@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.38 2005/06/15 09:47:16 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.39 2005/06/15 10:10:25 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -99,10 +99,10 @@ static char RCSid[]="$Id: gclient.c,v 1.38 2005/06/15 09:47:16 mikulik Exp $";
 #include <process.h>
 #include <signal.h>
 #include <time.h>
+#include "config.h"
 #include "term_api.h"
 #include "gnupmdrv.h"
 #include "pm_msgs.h"
-
 #define GNUPMDRV
 #include "mousecmn.h"
 
@@ -198,7 +198,9 @@ static POINTL zoomrect_from, zoomrect_now;
 static ULONG    ulPlotPos[4];
 static ULONG    ulShellPos[4];
 static PAUSEDATA pausedata = {sizeof(PAUSEDATA), NULL, NULL};
-static char     szFontNameSize[FONTBUF];
+static char     szFontNameSize[FONTBUF];	/* default name and size, format: "10.Helvetica" */
+/* FIXME: this might not always get updated on font change */
+static char	szCurrentFontNameSize[FONTBUF];	/* currently selected font */
 static PRQINFO3 infPrinter = { "" };
 static QPRINT   qPrintData = {
     sizeof(QPRINT), 0.0, 0.0, 1.0, 1.0, 0,
@@ -280,6 +282,20 @@ int gpPMmenu_update_req = 0;
 
 static enum JUSTIFY jmode;
 
+static SIZEF sizBaseSubSup;
+static SIZEF sizCurSubSup;
+static SIZEF sizCurFont;
+static long lVOffset = 0;
+static SIZEF sizBaseFont;
+
+static struct _ft {
+    char *name;
+    LONG  lcid;
+} tabFont[256] = {
+    {NULL,0L},
+    {NULL}
+};
+
 
 /*==== f u n c t i o n s =====================================================*/
 
@@ -292,8 +308,8 @@ BOOL            QueryIni(HAB);
 static void     SaveIni(HWND);
 static void     ThreadDraw(void*);
 static void     DoPaint(HWND, HPS);
-void            SelectFont(HPS, char *);
-void            SwapFont(HPS, char *);
+static void     SelectFont(HPS, char *);
+static void     SwapFont(HPS, char *);
 static void     CopyToClipBrd(HWND);
 static void     ReadGnu(void*);
 static void     EditLineTypes(HWND, HPS, BOOL);
@@ -302,25 +318,27 @@ static void     EditCharCell(HPS, SIZEF*);
 #endif
 static HPS      InitScreenPS(void);
 static int      BufRead(HFILE, void*, int, PULONG);
-int             GetNewFont(HWND, HPS);
+static int      GetNewFont(HWND, HPS);
 void            SigHandler(int);
-void            FontExpand(char *);
+static void     FontExpand(char *);
+#ifdef PM_KEEP_OLD_ENHANCED_TEXT
 static char    *ParseText(HPS, char *, BOOL, char *, int, int, BOOL, BOOL);
 static void     CharStringAt(HPS, int, int, int, char *);
 static int      QueryTextBox(HPS, int, char *);
+#endif
 static void     LMove(HPS hps, POINTL *p);
 static void     LLine(HPS hps, POINTL *p);
 static void     LType(int iType);
 
 /* Functions related to the mouse processing */
-static void	TextToClipboard(PCSZ);
+static void     TextToClipboard(PCSZ);
 static void     GetMousePosViewport(HWND hWnd, int *mx, int *my);
 static void     MousePosToViewport(int *x, int *y, SHORT mx, SHORT my);
 static void     DisplayStatusLine(HPS hps);
 static void     UpdateStatusLine(HPS hps, char *text);
-static void 	gpPMmenu_update(void);
+static void     gpPMmenu_update(void);
 static void     DrawZoomBox(void);
-static void	DrawRuler(void);
+static void     DrawRuler(void);
 
 #define IGNORE_MOUSE (!mouseTerminal || useMouse==0 || lock_mouse)
 /* || !gp4mouse.graph */
@@ -1023,7 +1041,6 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	}
 	return 0; /* return from: case WM_BUTTON3DOWN(zoom) */
 
-
     case WM_BUTTON3UP: /* WM_BUTTON3DBLCLK: */
 	/* write mouse position to screen */
 	if (! IGNORE_MOUSE) {
@@ -1205,7 +1222,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     case IDM_FONTS:
 	if (GetNewFont(hWnd, hpsScreen)) {
 #if 0
-	bNewFont = TRUE;
+	    bNewFont = TRUE;
 #endif
 	    WinInvalidateRect(hWnd, NULL, TRUE);
 	}
@@ -1480,6 +1497,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     return(NULL);
 }
 
+
 /*
 **  Utility function:
 **
@@ -1503,6 +1521,7 @@ ChangeCheck(HWND hWnd , USHORT wItem1 , USHORT wItem2)
 		   MPFROM2SHORT(MIA_CHECKED, MIA_CHECKED));
 }
 
+
 /*
 **  Copy window to clipboard as bitmap.
 */
@@ -1521,6 +1540,7 @@ CopyToClipBrd(HWND hWnd)
     WinSetClipbrdData(hab,(ULONG) hmf, CF_METAFILE, CFI_HANDLE);
     WinCloseClipbrd(hab);
 }
+
 
 /*
 **  Copy ps to a bitmap.
@@ -1574,6 +1594,7 @@ HBITMAP CopyToBitmap(HPS hps)
     return hbm;
 }
 
+
 /*
 **  Copy ps to a metafile.
 */
@@ -1602,6 +1623,7 @@ CopyToMetaFile(HPS hps)
     hmf = DevCloseDC(hdcMF);
     return hmf;
 }
+
 
 /*
 ** Query INI file
@@ -1700,6 +1722,7 @@ QueryIni(HAB hab)
     return bPos;
 }
 
+
 /*
 ** save data in ini file
 */
@@ -1764,6 +1787,7 @@ SaveIni(HWND hWnd)
     }
 }
 
+
 /*
 **  Paint the screen with current data
 */
@@ -1788,6 +1812,7 @@ DoPaint(HWND hWnd, HPS hps)
     WinBeginPaint(hWnd, hps, &rectl);                 /*rl */
     tidDraw = _beginthread(ThreadDraw, NULL, 32768, NULL);
 }
+
 
 /*
 **  Thread to draw plot on screen
@@ -1815,6 +1840,7 @@ ThreadDraw(void* arg)
     gp_exec_event(GE_plotdone, mx, my, 0, 0, 0); /* enable again zoom and scale by mouse motions */
 #endif
 }
+
 
 /*
 ** Initialise the screen ps for drawing
@@ -1898,19 +1924,6 @@ ScalePS(HPS hps)
     return 0;
 }
 
-static SIZEF sizBaseSubSup;
-static SIZEF sizCurSubSup;
-static SIZEF sizCurFont;
-static long lVOffset = 0;
-static SIZEF sizBaseFont;
-
-static struct _ft {
-    char *name;
-    LONG  lcid;
-} tabFont[256] = {
-    {NULL,0L},
-    {NULL}
-};
 
 /*
 **  Select a named and sized outline font
@@ -2000,6 +2013,7 @@ SelectFont(HPS hps, char *szFontNameSize)
     }
 #endif
 }
+
 
 /*
 **  Select a named and sized outline(adobe) font
@@ -2093,6 +2107,7 @@ SwapFont(HPS hps, char *szFNS)
 	}
     }
 }
+
 
 /*
 ** Thread to read plot commands from  GNUPLOT pm driver.
@@ -2380,6 +2395,71 @@ ReadGnu(void* arg)
 		break;
 	    }
 
+	    case GR_ENH_TEXT :  /* write enhanced text */
+		if (bPath) {
+		    GpiEndPath(hps);
+		    GpiStrokePath(hps, 1, 0);
+		    bPath = FALSE;
+		}
+		{
+                    unsigned int x, y, len;
+		    unsigned int mode;
+		    int textwidth, textheight;
+                    char *str;
+                    POINTL aptl[TXTBOX_COUNT];
+
+		    /* read x, y, mode, len */
+		    BufRead(hRead, &x, sizeof(int), &cbR);
+                    BufRead(hRead, &y, sizeof(int), &cbR);
+                    BufRead(hRead, &mode, sizeof(int), &cbR);
+                    BufRead(hRead, &len, sizeof(int), &cbR);
+
+                    DosEnterCritSec();
+                    len =(len+sizeof(int)-1)/sizeof(int);
+                    if (len == 0) len = 1; /*?? how about read */
+                    str = malloc(len*sizeof(int));
+		    *str = '\0';
+                    DosExitCritSec();
+                    BufRead(hRead, str, len*sizeof(int), &cbR);
+
+                    GpiQueryTextBox(hps, strlen(str), str, TXTBOX_COUNT, aptl);
+		    textwidth = aptl[TXTBOX_CONCAT].x;
+		    textheight = aptl[TXTBOX_CONCAT].y;
+
+		    /* only display text if requested */
+		    if (mode & 0x01) {
+                    	lCurCol = GpiQueryColor(hps);
+#ifdef PM3D
+		    	if (pm3d_color>=0)
+			    GpiSetColor(hps, pm3d_color);
+			/* @@@ FIXME -- UNIMPLEMENTED */
+			/* @@@ SEE "pm3d_rgb_color" ALSO ABOVE -- DO A ROUTINE TO BE REUSABLE */
+			/*
+			else
+			    GpiSetColor(hps, CLR_BLACK);
+			    GpiSetColor(hps, curr_color);
+			*/
+#endif
+			ptl.x = (LONG) (x + multLineVert * (lVOffset / 4));
+			ptl.y = (LONG) (y - multLineHor * (lVOffset / 4));
+
+			GpiSetBackMix(hps, BM_LEAVEALONE);
+			GpiCharStringAt(hps, &ptl, strlen(str), str);
+
+			GpiSetColor(hps, lCurCol);
+		    }
+
+		    /* report back textwidth */
+		    DosWrite(hRead, &textwidth, sizeof(textwidth), &cbR);
+		    DosWrite(hRead, &textheight, sizeof(textheight), &cbR);
+
+                    DosEnterCritSec();
+                    free(str);
+		    DosExitCritSec();
+
+		    break;
+		}
+
 	    case GR_TEXT :   /* write text */
 		/* read x, y, len */
 		if (bPath) {
@@ -2388,9 +2468,12 @@ ReadGnu(void* arg)
 		    bPath = FALSE;
 		}
 		{
-                    int x, y, len, sw;
+                    unsigned int x, y, len;
+		    int sw;
                     char *str;
-
+#ifndef PM_KEEP_OLD_ENHANCED_TEXT
+                    POINTL aptl[TXTBOX_COUNT];
+#endif
 		    BufRead(hRead,&x, sizeof(int), &cbR);
                     BufRead(hRead,&y, sizeof(int), &cbR);
                     BufRead(hRead,&len, sizeof(int), &cbR);
@@ -2414,28 +2497,40 @@ ReadGnu(void* arg)
 		      GpiSetColor(hps, curr_color);
 		    */
 #endif
+
+#ifdef PM_KEEP_OLD_ENHANCED_TEXT
                     sw = QueryTextBox(hps, strlen(str), str);
+#else
+                    GpiQueryTextBox(hps, strlen(str), str, TXTBOX_COUNT, aptl);
+		    sw = aptl[TXTBOX_BOTTOMRIGHT].x;
+#endif
+
                     switch (jmode) {
 		    case LEFT:
 			sw = 0;
 			break;
 		    case CENTRE:
-			sw = -sw/2;
+			sw /= -2;
 			break;
 		    case RIGHT:
-			sw = -sw;
+			sw *= -1;
 			break;
 		    }
 
 		    ptl.x = (LONG) (x + multLineHor * sw + multLineVert * (lVOffset / 4));
-		    ptl.y = (LONG) (y + multLineVert * sw - multLineHor * (lVOffset / 4));
-		
+		    ptl.y = (LONG) (y + multLineVert * sw - multLineHor * (lVOffset / 4));	
+
 		    GpiSetBackMix(hps, BM_LEAVEALONE);
+
+#ifdef PM_KEEP_OLD_ENHANCED_TEXT
                     if (bEnhanced)
                         CharStringAt(hps, ptl.x, ptl.y, strlen(str) , str);
                     else
+#endif
 			GpiCharStringAt(hps, &ptl, strlen(str), str);
+
                     GpiSetColor(hps, lCurCol);
+
                     DosEnterCritSec();
                     free(str);
 		    DosExitCritSec();
@@ -2445,6 +2540,7 @@ ReadGnu(void* arg)
 
 	    case SET_JUSTIFY :   /* justify */
 		BufRead(hRead, &jmode, sizeof(int), &cbR);
+		//printf( "SET_JUSTIFY: %i", jmode );
 		break;
 
 	    case SET_ANGLE :   /* text angle */
@@ -2656,31 +2752,45 @@ ReadGnu(void* arg)
 	    case SET_FONT :   /* set font */
 	    {
 		int len;
-		char *str;
-		char font[FONTBUF];
 
-		BufRead(hRead,&len, sizeof(int), &cbR);
-		len =(len + sizeof(int) - 1) / sizeof(int);
+		BufRead(hRead, &len, sizeof(int), &cbR);
+		len = (len + sizeof(int) - 1) / sizeof(int);
 
 		if (len == 0) {
 		    SwapFont(hps, NULL);
+		    strcpy(szCurrentFontNameSize, szFontNameSize);
 		} else {
-		    char *p;
+		    char font[FONTBUF];
+		    char *p, *tmp, *str;
 
-		    str = malloc(len * sizeof(int));
-		    BufRead(hRead, str, len*sizeof(int), &cbR);
+		    tmp = str = malloc(len * sizeof(int));
+		    BufRead(hRead, str, len * sizeof(int), &cbR);
 		    p = strchr(str, ',');
 		    if (p==NULL)
-			strcpy(font, "14");
+			strcpy(font, "10");
 		    else {
 			*p = '\0';
 			strcpy(font, p+1);
 		    }
 		    strcat(font, ".");
+		    /* allow abbreviation of some well known font names */
+		    FontExpand(str);
 		    strcat(font, str);
-		    free(str);
+		    free(tmp);
 		    SwapFont(hps, font);
+		    strcpy(szCurrentFontNameSize, font);
 		} /* else(len==0) */
+		break;
+	    }
+
+	    case GR_QUERY_FONT : /* query current font */
+	    {
+		int namelen;
+
+		namelen = strlen(szCurrentFontNameSize);
+		DosWrite(hRead, &namelen, sizeof(int), &cbR);
+		DosWrite(hRead, szCurrentFontNameSize, namelen, &cbR);
+		/* FIXME: is padding necessary? */
 		break;
 	    }
 
@@ -2692,8 +2802,9 @@ ReadGnu(void* arg)
 		BufRead(hRead,&len, sizeof(int), &cbR);
 		len =(len + sizeof(int) - 1) / sizeof(int);
 		bWideLines = FALSE; /* reset options */
+#ifdef PM_KEEP_OLD_ENHANCED_TEXT
 		bEnhanced = FALSE;
-
+#endif
 		if (len > 0) {
 		    char *p;
 
@@ -2703,8 +2814,10 @@ ReadGnu(void* arg)
 			++p;
 			if (*p == 'w')
 			    bWideLines = TRUE;
+#ifdef PM_KEEP_OLD_ENHANCED_TEXT
 			if (*p == 'e')
 			    bEnhanced = TRUE;
+#endif
 			++p;
 		    }
 		    free(str);
@@ -2714,13 +2827,17 @@ ReadGnu(void* arg)
 
 	    case SET_SPECIAL :   /* set special options */
 	    {
-		char opt, param;
+		char opt;
+#ifdef PM_KEEP_OLD_ENHANCED_TEXT
+		char param;
 		static int prev_bEnhanced = 0;
+#endif
 
 		BufRead(hRead,&opt, 1, &cbR);
 		switch (opt) {
-		case 'e': BufRead(hRead,&param, 1, &cbR);
-		    /* enhanced mode on, off and restore */
+#ifdef PM_KEEP_OLD_ENHANCED_TEXT
+		case 'e': /* enhanced mode on, off and restore */
+		    BufRead(hRead,&param, 1, &cbR);	    
 		    switch (param) {
 		    case '0': prev_bEnhanced = bEnhanced;
 			bEnhanced = 0;
@@ -2732,6 +2849,7 @@ ReadGnu(void* arg)
 			break;
 		    }
 		    break;
+#endif
 		case 'c': /* set codepage */
 		    BufRead(hRead,&codepage, sizeof(codepage), &cbR);
 		    break;
@@ -2990,6 +3108,7 @@ ReadGnu(void* arg)
     WinPostMsg(hApp, WM_CLOSE, 0L, 0L);
 }
 
+
 static void
 EditLineTypes(HWND hwnd, HPS hps, BOOL bDashed)
 {
@@ -3008,6 +3127,7 @@ EditLineTypes(HWND hwnd, HPS hps, BOOL bDashed)
     GpiSetEditMode(hps, SEGEM_INSERT);
     GpiCloseSegment(hps);
 }
+
 
 #if 0
 /*
@@ -3149,12 +3269,11 @@ void SigHandler(int sig)
     }
 }
 
+
+#ifdef PM_KEEP_OLD_ENHANCED_TEXT
+
 /* disable debugging info */
 #define TEXT_DEBUG(x) /* fprintf x */ ;
-
-/* used in determining height of processed text */
-
-/*static float max_height, min_height; */
 
 /* process a bit of string, and return the last character used.
  * p is start of string
@@ -3411,7 +3530,7 @@ static char
     }
     if (bText) {
 	if (textlen > 0) {
-	    if (showflag) 
+	    if (showflag)
 		GpiCharStringAt(hps, &ptlText, textlen, starttext);
 	    if (widthflag) {
 		ptlText.x += aptl[TXTBOX_CONCAT].x;
@@ -3434,6 +3553,7 @@ static char
     starttext = p+1;
     return p;
 }
+
 
 static void
 CharStringAt(HPS hps, int x, int y, int len, char *str)
@@ -3462,6 +3582,7 @@ CharStringAt(HPS hps, int x, int y, int len, char *str)
 	; /* do nothing */
 }
 
+
 static int
 QueryTextBox(HPS hps, int len, char *str)
 {
@@ -3487,10 +3608,15 @@ QueryTextBox(HPS hps, int len, char *str)
     return textwidth;
 }
 
+#endif
+
+
 void
 FontExpand(char *name)
 {
     if (strcmp(name,"S") == 0)
+	strcpy(name, "Symbol Set");
+    if (strcmp(name,"Symbol") == 0)
 	strcpy(name, "Symbol Set");
     else if (strcmp(name,"H") == 0)
 	strcpy(name, "Helvetica");
@@ -3500,7 +3626,9 @@ FontExpand(char *name)
 	strcpy(name, "Courier");
 }
 
+
 /*=======================================*/
+
 static POINTL pCur;
 static int iLinebegin = 1;
 static int iLtype = 0;
@@ -3516,6 +3644,7 @@ static int iPatt[8][9] = {
     { 300, 200, 150, 200, 150, 200, 150, 200, -1 },
     { 500, 200, 150, 200,  -1,   0,   0,   0,  0 }
 };
+
 
 void
 LMove(HPS hps, POINTL *p)
@@ -3556,6 +3685,7 @@ LMove(HPS hps, POINTL *p)
 	}
     }
 }
+
 
 void
 LLine(HPS hps, POINTL *p)
@@ -3825,6 +3955,7 @@ gpPMmenu_update()
 	== TRUE) gpPMmenu_update_req = 0;
     ChangeCheck(hApp, IDM_MOUSE_POLAR_DISTANCE, gpPMmenu.polar_distance?IDM_MOUSE_POLAR_DISTANCE:0);
 }
+
 
 static void
 DrawZoomBox()

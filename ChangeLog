@@ -1,3 +1,19 @@
+2005-07-28  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	SF patch #[ 1234634 ] OS/2: use generic enhanced text in pm terminal.
+
+	* config/config.os2 config/makefile.os2 src/os2/gclient.c
+	src/os2/gnupmdrv.c src/os2/gnupmdrv.h src/os2/pm_msgs.h term/pm.trm:
+	Use generic enhanced text in pm terminal -- Let pm terminal use the
+	new generic routines for enhanced text. Currently the only new feature
+	this provides is overprinted text. The binary interface between pm.trm
+	and gnupmdrv has been extended slightly.
+
+	To switch back to the old behaviour compile with PM_OLD_ENHANCED_TEXT
+	defined. The old code is compiled into gnupmdrv in any case to
+	maintain binary compatibility with programs using gnupmdrv like GP/ARI
+	or Term::Gnuplot (but I haven't acually checked that).
+
 2005-07-27  Ethan Merritt  <merritt@u.washington.edu
 
 	* src/set.c (set_timestamp) docs/gnuplot.doc:

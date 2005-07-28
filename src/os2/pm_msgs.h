@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id: pm_msgs.h,v 1.1 2005/06/15 10:10:27 mikulik Exp $
  */
 
 /* GNUPLOT - pm_msgs.h */
@@ -52,6 +52,7 @@
 #define SET_JUSTIFY	'J'
 #define SET_POINTMODE	'D'
 #define SET_FONT	'F'
+#define GR_QUERY_FONT   'g'
 #define SET_OPTIONS	'O'
 #define SET_SPECIAL	'o'  /* used for special options */
 #define SET_MENU	'#'
@@ -62,6 +63,7 @@
 #define GR_DRAW		'V'
 #define GR_RESET	'R'
 #define GR_TEXT		'T'
+#define GR_ENH_TEXT	'x'
 #define GR_PAUSE 	'P'
 #define GR_HELP		'H'
 #define GR_MOUSECAPABLE 'm' /* PM: say gnupmdrv we are mouseable */

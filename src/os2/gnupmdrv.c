@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gnupmdrv.c,v 1.4 2004/07/01 17:10:10 broeker Exp $" ;
+static char RCSid[]="$Id: gnupmdrv.c,v 1.5 2005/01/04 12:55:37 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -64,6 +64,7 @@ static char RCSid[]="$Id: gnupmdrv.c,v 1.4 2004/07/01 17:10:10 broeker Exp $" ;
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "config.h"
 #include "gnupmdrv.h"
 
 /*==== g l o b a l    d a t a ================================================*/
@@ -74,7 +75,9 @@ char szIniFile[256] ;
 int  bServer=0 ;
 int  bPersist=0 ;
 int  bWideLines=0 ;
+#ifdef PM_KEEP_OLD_ENHANCED_TEXT
 int  bEnhanced=0 ;
+#endif
 
 /*==== l o c a l    d a t a ==================================================*/
 
@@ -132,9 +135,11 @@ int main ( int argc, char **argv )
                         case 's' :
                             bServer = 1 ;
                             break ;
+#ifdef PM_KEEP_OLD_ENHANCED_TEXT
                         case 'e' :
                             bEnhanced = 1 ;
                             break ;
+#endif
                         case 'p' :
                             bPersist = 1 ;
                             break ;

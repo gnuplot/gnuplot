@@ -492,3 +492,25 @@
 # define OS2_IPC 1
 #endif
 
+/*
+ From the introduction of enhanced text support into gnuplot,
+ there were native implementations for postscript and PM
+ terminals.
+ This has been replaced by a generic approach (a terminal
+ API) in 2004. As there exist applications which use 
+ gnupmdrv.exe directly we still keep the old implementation
+ and binary interface.
+*/
+#define PM_KEEP_OLD_ENHANCED_TEXT 1
+
+/*
+ As the new generic approach for enhanced text for the PM 
+ terminal is still considered somewhat experimental, the
+ old code will be used if this is defined. (Please note 
+ that this option will be removed in the near future.)
+*/
+/* #undef PM_OLD_ENHANCED_TEXT */
+
+#if defined(PM_OLD_ENHANCED_TEXT) && !defined(PM_KEEP_OLD_ENHANCED_TEXT)
+#define PM_KEEP_OLD_ENHANCED_TEXT 1
+#endif

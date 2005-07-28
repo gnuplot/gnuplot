@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.43 2004/01/19 17:41:12 mikulik Exp $
+# $Id: makefile.os2,v 1.44 2004/04/05 10:38:45 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -284,7 +284,7 @@ OBJS = $(COREOBJS) version.$(O)
 
 $(OBJS): config.h
 
-term.$(O): $(CORETERM) term.h
+term.$(O): $(CORETERM) term.h config.h $(OS2DIR)\pm_msgs.h
 
 gnuplot.exe: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(TERMLIBS) $(LIBS)
@@ -292,10 +292,10 @@ gnuplot.exe: $(OBJS)
 #
 # Build the PM outboard driver
 #
-$(OS2DIR)\gnupmdrv.$(O2):  $(OS2DIR)\gnupmdrv.c   $(OS2DIR)\gnupmdrv.h
-$(OS2DIR)\gclient.$(O2):   $(OS2DIR)\gclient.c    $(OS2DIR)\gnupmdrv.h  mouse.h
-$(OS2DIR)\dialogs.$(O2):   $(OS2DIR)\dialogs.c    $(OS2DIR)\gnupmdrv.h  $(OS2DIR)\dialogs.h
-$(OS2DIR)\print.$(O2):     $(OS2DIR)\print.c      $(OS2DIR)\gnupmdrv.h
+$(OS2DIR)\gnupmdrv.$(O2):  $(OS2DIR)\gnupmdrv.c   $(OS2DIR)\gnupmdrv.h	config.h
+$(OS2DIR)\gclient.$(O2):   $(OS2DIR)\gclient.c    $(OS2DIR)\gnupmdrv.h	config.h  $(OS2DIR)\pm_msgs.h	mouse.h
+$(OS2DIR)\dialogs.$(O2):   $(OS2DIR)\dialogs.c    $(OS2DIR)\gnupmdrv.h	config.h  $(OS2DIR)\dialogs.h
+$(OS2DIR)\print.$(O2):     $(OS2DIR)\print.c      $(OS2DIR)\gnupmdrv.h	config.h
 $(OS2DIR)\gpexecute.$(O2): gpexecute.c            gpexecute.h
 $(OS2DIR)\gnupmdrv.res :   $(OS2DIR)\gnupmdrv.rc  $(OS2DIR)\gnuplot.ico $(OS2DIR)\dialogs.h
 	cd $(OS2DIR) && rc -r gnupmdrv.rc & cd ..

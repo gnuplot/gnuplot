@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.43 2005/06/15 09:53:50 mikulik Exp $
+ * $Id: pm.trm,v 1.44 2005/06/15 10:10:24 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -81,6 +81,14 @@ TERM_PUBLIC void PM_previous_palette (void);
 TERM_PUBLIC void PM_set_color (t_colorspec *);
 TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
 #endif
+#ifndef PM_OLD_ENHANCED_TEXT
+/* To support "set term pm enhanced" */
+TERM_PUBLIC void PM_enhanced_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void PM_enhanced_open __PROTO((char * fontname, double fontsize,
+	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+			int overprint));
+TERM_PUBLIC void PM_enhanced_flush __PROTO((void));
+#endif
 
 /* define PM world coordinate limits */
 
@@ -138,12 +146,36 @@ int mouseGnupmdrv = 0; /* PM set to 1 if we are connected to a mouseable gnupmdr
 FILE *PM_pipe = NULL;
 static FILE *PM_savepipe = NULL;
 
+
+#ifndef PM_OLD_ENHANCED_TEXT
+
+/* track current state of pm terminal */
+/* this is only needed for enhanced text */
+static char * PM_font = NULL; 
+static double PM_fontsize = 12.0;
+static unsigned int PM_x = 0;
+static unsigned int PM_y = 0;
+static enum JUSTIFY PM_justification = LEFT;
+static double PM_angle = 0.;  /* unit is radian */
+
+/* state variables for enhanced text processing */
+static TBOOLEAN ENHpm_opened_string;
+static TBOOLEAN ENHpm_show = TRUE;
+static int ENHpm_overprint = 0;
+static TBOOLEAN ENHpm_widthflag = TRUE;
+static TBOOLEAN ENHpm_sizeonly = FALSE;
+static double ENHpm_base;
+
+#endif
+
 int PM_pause __PROTO((char *str));
 void PM_intc_cleanup(void);
 static void PM_reset_opts(void);
 static void PM_query(void);
 static void PM_make_servername(char *);
 static void PM_abortplot();
+static void PM_query_font(void);
+
 
 TERM_PUBLIC void
 PM_init()
@@ -252,6 +284,7 @@ PM_init()
     PM_query();
 }
 
+
 static void
 PM_make_servername(char *str)
 {
@@ -306,10 +339,19 @@ PM_options()
 	    strcat(term_options, "widelines ");
 	    PM_optargs = 1;
 	} else if (almost_equals(c_token, "e$nhanced")) {
-	    strcat(PM_opts, "-e ");
 	    strcat(term_options, "enhanced ");
-	    term->flags |= TERM_ENHANCED_TEXT;
+#ifdef PM_OLD_ENHANCED_TEXT
 	    PM_optargs = 1;
+	    strcat(PM_opts, "-e ");
+	    term->put_text = PM_put_text;
+#else
+	    term->put_text = PM_enhanced_put_text;
+#endif
+	    term->flags |= TERM_ENHANCED_TEXT;
+	} else if (almost_equals(c_token, "noe$nhanced")) {
+	    strcat(term_options, "noenhanced ");
+	    term->put_text = PM_put_text;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
 	} else if (isstring(c_token)) {
 	    copy_str(PM_term_title, c_token, 127);
 	}
@@ -331,6 +373,7 @@ PM_options()
     PM_must_reset_opts = TRUE;
 }
 
+
 static void
 PM_reset_opts()
 {
@@ -346,6 +389,7 @@ PM_reset_opts()
     fflush(PM_pipe);
     PM_must_reset_opts = FALSE;
 }
+
 
 static void
 PM_query()
@@ -363,6 +407,7 @@ PM_query()
     rc = DosRead(fileno(PM_pipe), &term->v_char, sizeof(int), &cbR);
 }
 
+
 TERM_PUBLIC void
 PM_reset()
 {
@@ -375,6 +420,7 @@ PM_reset()
     }
 }
 
+
 TERM_PUBLIC void
 PM_suspend()
 {
@@ -382,12 +428,14 @@ PM_suspend()
     fflush(PM_pipe);
 }
 
+
 TERM_PUBLIC void
 PM_resume()
 {
     putc(GR_RESUME, PM_pipe);
     fflush(PM_pipe);
 }
+
 
 TERM_PUBLIC void
 PM_text()
@@ -411,6 +459,7 @@ PM_text()
     }
 #endif
 }
+
 
 TERM_PUBLIC void
 PM_graphics()
@@ -444,15 +493,24 @@ PM_graphics()
     PM_mode = SET_GRAPHICS;
 }
 
+
 TERM_PUBLIC void
 PM_move(unsigned int x, unsigned int y)
 {
     if (PM_must_abort)
 	PM_abortplot();
+
     putc(GR_MOVE, PM_pipe);
     fwrite(&x, sizeof(int), 1, PM_pipe);
     fwrite(&y, sizeof(int), 1, PM_pipe);
+
+#ifndef PM_OLD_ENHANCED_TEXT
+    /* save current position, only needed for enhanced text */
+    PM_x = x; 
+    PM_y = y;
+#endif
 }
+
 
 TERM_PUBLIC void
 PM_vector(unsigned int x, unsigned int y)
@@ -464,6 +522,7 @@ PM_vector(unsigned int x, unsigned int y)
     fwrite(&y, sizeof(int), 1, PM_pipe);
 }
 
+
 TERM_PUBLIC void
 PM_linetype(int lt)
 {
@@ -471,25 +530,36 @@ PM_linetype(int lt)
     fwrite(&lt, sizeof(int), 1, PM_pipe);
 }
 
+
 TERM_PUBLIC int
 PM_text_angle(int ang)
 {
     putc(SET_ANGLE, PM_pipe);
     fwrite(&ang, sizeof(int), 1, PM_pipe);
-    return (TRUE);
+#ifndef PM_OLD_ENHANCED_TEXT
+    /* store text angle, only needed for enhanced text */
+    PM_angle = (double)ang * M_PI / 180.;
+#endif
+    return TRUE;
 }
+
 
 TERM_PUBLIC void
 PM_put_text(unsigned int x, unsigned int y, const char *str)
 {
     int len;
+
     if (PM_must_abort)
 	PM_abortplot();
+
+#ifdef PM_OLD_ENHANCED_TEXT
     if (ignore_enhanced_text) {
 	putc(SET_SPECIAL, PM_pipe);
 	putc('e', PM_pipe); /* switch the enhanced mode off */
 	putc('0', PM_pipe);
     }
+#endif
+
     putc(GR_TEXT, PM_pipe);
     fwrite(&x, sizeof(int), 1, PM_pipe);
     fwrite(&y, sizeof(int), 1, PM_pipe);
@@ -500,35 +570,49 @@ PM_put_text(unsigned int x, unsigned int y, const char *str)
 	/* pad rest of int with zeros */
 	putc(NUL, PM_pipe);
     }
+
+#ifdef PM_OLD_ENHANCED_TEXT
     if (ignore_enhanced_text) {
 	putc(SET_SPECIAL, PM_pipe);
 	putc('e', PM_pipe); /* restore the enhanced mode */
 	putc('2', PM_pipe);
     }
+#endif
 }
+
 
 TERM_PUBLIC int
 PM_justify_text(enum JUSTIFY mode)
 {
+#ifdef PM_OLD_ENHANCED_TEXT
     if (ignore_enhanced_text) {
 	putc(SET_SPECIAL, PM_pipe);
 	putc('e', PM_pipe); /* switch the enhanced mode off */
 	putc('0', PM_pipe);
     }
+#endif
+	
     putc(SET_JUSTIFY, PM_pipe);
     fwrite(&mode, sizeof(int), 1, PM_pipe);
-    return (TRUE);
+
+#ifndef PM_OLD_ENHANCED_TEXT
+    /* store text justification, only needed for enhanced text */
+    PM_justification = mode;
+#else
     if (ignore_enhanced_text) {
 	putc(SET_SPECIAL, PM_pipe);
 	putc('e', PM_pipe); /* restore the enhanced mode */
 	putc('2', PM_pipe);
     }
+#endif
+    return TRUE;
 }
+
 
 TERM_PUBLIC int
 PM_set_font(const char *font)
 {
-    int len;
+    unsigned int len;
 
     putc(SET_FONT, PM_pipe);
     if (font == NULL)
@@ -543,12 +627,43 @@ PM_set_font(const char *font)
         fwrite(&len, sizeof(int), 1, PM_pipe);
         fwrite(font, 1, len, PM_pipe);
         for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
-	/* pad rest of int with zeros */
-            putc(NUL, PM_pipe);
+	    /* pad rest of int with zeros */
+	    putc(NUL, PM_pipe);
         }
     }
+
     return TRUE;
 }
+
+
+#ifndef PM_OLD_ENHANCED_TEXT
+
+/* PM_query_font:
+	get current font name and size from gnupmdrv and
+	save them to PM_font and PM_fontsize
+*/
+static void PM_query_font(void)
+{
+    unsigned int len, fontsize;
+    char *newfont;
+    ULONG cbR, rc;
+
+    putc(GR_QUERY_FONT, PM_pipe);
+    fflush(PM_pipe);  
+
+    free( PM_font );
+    rc = DosRead(fileno(PM_pipe), &len, sizeof(int), &cbR);
+    newfont = (char *)malloc( len + 1 ); 
+    rc = DosRead(fileno(PM_pipe), newfont, len*sizeof(char), &cbR);
+    newfont[len] = '\0';
+    
+    PM_font = (char *)malloc( len + 1 ); 
+    sscanf( newfont, "%i.%s", &fontsize, PM_font );
+    PM_fontsize = (double)fontsize;
+    free(newfont);
+}
+
+#endif
 
 
 TERM_PUBLIC void
@@ -568,8 +683,9 @@ PM_point(unsigned int x, unsigned int y, int number)
     fwrite(&mode, sizeof(int), 1, PM_pipe);
 }
 
+
 void
-PM_abortplot()
+PM_abortplot(void)
 {
     PM_must_abort = 0;
     term_reset();
@@ -579,7 +695,7 @@ PM_abortplot()
 
 
 void
-PM_intc_cleanup()
+PM_intc_cleanup(void)
 {
     if (PM_pipe == NULL || PM_mode == SET_TEXT)
 	PM_abortplot();
@@ -614,6 +730,7 @@ PM_pause(char *str)
     return len;
 }
 
+
 TERM_PUBLIC void
 PM_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
 {
@@ -624,6 +741,7 @@ PM_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned i
     fwrite(&w, sizeof(w), 1, PM_pipe);
     fwrite(&h, sizeof(h), 1, PM_pipe);
 }
+
 
 TERM_PUBLIC void
 PM_linewidth(double linewidth)
@@ -732,6 +850,7 @@ PM_put_tmptext(int i, const char str[])
     }
 }
 
+
 TERM_PUBLIC void
 PM_set_ruler(int x, int y)
 {
@@ -742,6 +861,7 @@ PM_set_ruler(int x, int y)
 	fflush(PM_pipe);
     }
 }
+
 
 TERM_PUBLIC void
 PM_set_cursor(int c, int x, int y)
@@ -754,6 +874,7 @@ PM_set_cursor(int c, int x, int y)
 	fflush(PM_pipe);
     }
 }
+
 
 TERM_PUBLIC void
 PM_set_clipboard(const char s[])
@@ -768,6 +889,240 @@ PM_set_clipboard(const char s[])
 }
 
 #endif /* USE_MOUSE */
+
+
+#ifndef PM_OLD_ENHANCED_TEXT
+
+TERM_PUBLIC void
+PM_enhanced_open(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag,
+    int overprint)
+{
+    static const int pm_scale = 35; /* scaling of base offset */  
+    static unsigned int ENHpm_xsave, ENHpm_ysave;
+    char *fontstring;
+
+    /* There are two special cases:
+     * overprint = 3 means save current position
+     * overprint = 4 means restore saved position
+     */
+    if (overprint == 3) {
+	ENHpm_xsave = PM_x;
+	ENHpm_ysave = PM_y;
+	return;
+    } else if (overprint == 4) {
+	PM_x = ENHpm_xsave;
+	PM_y = ENHpm_ysave;
+	return;
+    }
+
+    if (!ENHpm_opened_string) {
+	ENHpm_opened_string = TRUE;
+
+	/* Start new text fragment */
+	enhanced_cur_text = &enhanced_text[0];
+
+	/* Keep track of whether we are supposed to show this string */
+	ENHpm_show = showflag;
+
+	/* 0/1/2  no overprint / 1st pass / 2nd pass */
+	ENHpm_overprint = overprint;
+
+	/* widthflag FALSE means do not update text position after printing */
+	ENHpm_widthflag = widthflag;
+
+	/* Select font */
+	/* FIXME: It would be nice to have fractional font sizes 
+	          for super- and subscripts. */
+	/* FIXME: sometimes fontname has zero length */
+	if ((fontname != NULL) && strlen(fontname) > 0) {
+	    fontstring = malloc( strlen(fontname) + 16 );
+	    sprintf( fontstring, "%s,%i", fontname, (int)fontsize );
+	}
+	else {
+	    fontstring = malloc( strlen(PM_font) + 16 );
+	    sprintf( fontstring, "%s,%i", PM_font, (int)fontsize );
+	}
+	PM_set_font( fontstring );
+	free( fontstring );
+	PM_query_font();
+
+	/* Scale fractional font height to vertical units of display */
+	/* FIXME:	
+		Font scaling is not done properly (yet) and will lead to
+		non-optimal results for most font and size selections.
+		The old gnupmdrv code used FONTINFO information for super-
+		and subscripts.
+	*/
+	ENHpm_base = pm_scale * base;
+    }
+}
+
+
+TERM_PUBLIC void
+PM_enhanced_flush()
+{
+    static unsigned int ENHpm_xsave, ENHpm_ysave;
+
+    if (ENHpm_opened_string) {
+	int width, height;
+	unsigned int mode;
+	unsigned int x, y, len;
+	ULONG rc, cbR;
+
+	*enhanced_cur_text = '\0';
+	
+	if (PM_must_abort)
+	    PM_abortplot();
+
+	/* print the string fragment, perhaps invisibly */
+	/* NB: base expresses offset from current y pos */
+	x = PM_x - ENHpm_base * sin(PM_angle);
+	y = PM_y + ENHpm_base * cos(PM_angle);
+	mode = ((ENHpm_show && !ENHpm_sizeonly) ? 0x01 : 0x00 );
+	len = strlen(enhanced_text) + 1;
+
+	/* send message to gnupmdrv */
+	putc(GR_ENH_TEXT, PM_pipe);
+	fwrite(&x, sizeof(int), 1, PM_pipe);
+	fwrite(&y, sizeof(int), 1, PM_pipe);
+	/* write 'mode indicator' (currently show switch only) */
+	fwrite(&mode, sizeof(int), 1, PM_pipe); 
+	fwrite(&len, sizeof(int), 1, PM_pipe);
+	fwrite(enhanced_text, 1, len, PM_pipe);
+	for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
+	    /* pad rest of int with zeros */
+	    putc(NUL, PM_pipe);
+	}
+
+	/* answer from gnupmdrv is length of text */
+	fflush(PM_pipe);
+	rc = DosRead(fileno(PM_pipe), &width, sizeof(int), &cbR);
+	rc = DosRead(fileno(PM_pipe), &height, sizeof(int), &cbR);
+
+	/* update drawing position according to len */
+	if (!ENHpm_widthflag) {
+	    width = 0; 
+	    height = 0;
+	}
+	if (ENHpm_sizeonly) {
+	    /* This is the first pass for justified printing.        */
+	    /* We just adjust the starting position for second pass. */
+	    if (PM_justification == RIGHT) {
+		PM_x -= width;
+		PM_y -= height;
+	    }
+	    else if (PM_justification == CENTRE) {
+		PM_x -= width / 2;
+		PM_y -= height / 2;
+	    }
+	    /* nothing to do for LEFT justified text */
+	}
+	else if (ENHpm_overprint == 1) {
+	    /* Save current position */
+	    ENHpm_xsave = PM_x + width;
+	    ENHpm_ysave = PM_y + height;
+	    /* First pass of overprint, leave position in center of fragment */
+	    PM_x += width / 2;
+	    PM_y += height / 2;
+	}
+	else if (ENHpm_overprint == 2) {
+	    /* Restore current position,                          */
+	    /* this sets the position behind the overprinted text */
+	    PM_x = ENHpm_xsave;
+	    PM_y = ENHpm_ysave;
+	}
+	else {
+	    /* Normal case is to update position to end of fragment */
+	    PM_x += width;
+	    PM_y += height;
+	}
+
+	ENHpm_opened_string = FALSE;
+    }
+}
+
+
+TERM_PUBLIC void
+PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
+{
+    char *original_string = (char *)str;
+    unsigned int pass, num_passes;
+
+    /* If no enhanced text processing is needed, we can use the plain  */
+    /* vanilla put_text() routine instead of this fancy recursive one. */
+    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+	PM_put_text(x,y,str);
+	return;
+    }
+
+    /* Set up global variables needed by enhanced_recursion() */
+    ENHpm_opened_string = FALSE;
+    enhanced_fontscale = 1.0;
+    strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
+
+    /* Tell the terminal to move the drawing position */
+    /* we store the current position to PM_x and PM_y */
+    PM_x = x; 
+    PM_y = y;
+
+    /* Text justification requires two passes. During the first pass we */
+    /* don't draw anything, we just measure the space it will take.     */
+    /* Without justification one pass is enough                         */
+    if (PM_justification == LEFT) {
+	num_passes = 1;
+    }
+    else {
+	num_passes = 2;
+	ENHpm_sizeonly = TRUE; 
+    }
+
+    for( pass=1; pass <= num_passes; pass++ ) {
+
+	/* This will restore the default font 
+	   and update PM_font and PM_fontsize */
+	PM_set_font(NULL); 
+	PM_query_font(); 
+
+	/* Set the recursion going. We say to keep going until a
+	* closing brace, but we don't really expect to find one.
+	* If the return value is not the nul-terminator of the
+	* string, that can only mean that we did find an unmatched
+	* closing brace in the string. We increment past it (else
+	* we get stuck in an infinite loop) and try again.
+	*/
+	while (*(str = enhanced_recursion((char *)str, TRUE,
+			NULL, PM_fontsize,
+			0.0, TRUE, TRUE, 0))) {
+	    (term->enhanced_flush)();
+
+	    /* I think we can only get here if *str == '}' */
+	    enh_err_check(str);
+
+	    if (!*++str)
+	    	break; /* end of string */
+
+	    /* else carry on and process the rest of the string */
+	}
+
+	/* In order to do text justification we need to do a second pass that */
+	/* uses information stored during the first pass.                     */
+	/* see PM_enhanced_flush()                                            */
+	if (pass == 1) {
+	    /* do the actual printing in the next pass */
+	    ENHpm_sizeonly = FALSE;
+	    str = original_string;
+	}
+    }
+
+    /* restore default font */
+    PM_set_font(NULL); 
+}
+
+#endif /* PM_OLD_ENHANCED_TEXT */
+
 
 #endif /* TERM_BODY */
 
@@ -791,6 +1146,12 @@ TERM_TABLE_START(PM_driver)
     PM_previous_palette,
     PM_set_color,
     PM_filled_polygon
+#endif
+#ifdef WITH_IMAGE
+    , NULL
+#endif
+#ifndef PM_OLD_ENHANCED_TEXT
+    , PM_enhanced_open, PM_enhanced_flush, do_enh_writec
 #endif
 TERM_TABLE_END(PM_driver)
 
