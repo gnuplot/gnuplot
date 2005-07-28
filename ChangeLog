@@ -1,3 +1,9 @@
+2005-07-28  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.cyg config/config.mgw config/config.os2: Added #defines
+	GP_MACROS, GP_STRING_VARS, HIDDEN3D_GRIDBOX, HIDDEN3D_QUADTREE,
+	HAVE_PWD_H, __PROTOTYPES.
+
 2005-07-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	SF patch #[ 1234634 ] OS/2: use generic enhanced text in pm terminal.
