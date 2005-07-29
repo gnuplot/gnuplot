@@ -1,5 +1,5 @@
 #
-# $Id: pm3d.dem,v 1.13 2004/12/07 17:21:13 mikulik Exp $
+# $Id: pm3d.dem,v 1.14 2005/01/26 21:51:26 mikulik Exp $
 #
 # demo for pm3d splotting
 #
@@ -307,7 +307,7 @@ set xrange [-10:10]; set yrange [-10:10]
 set hidden3d
 set isosamples 40,40; set samples 40,40
 splot sin(y)/(y) w lp palette
-pause -1
+pause -1 "Hit return to continue"
 
 reset
 

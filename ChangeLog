@@ -1,3 +1,7 @@
+2005-07-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/pm3d.dem: Added missing text for a "pause -1".
+
 2005-07-29  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/gadgets.h src/graph3d.c src/graphics.c src/save.c src/set.c
