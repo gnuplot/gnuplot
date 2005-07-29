@@ -1,5 +1,5 @@
 %
-% $Id: $
+% $Id: tutorial.tex,v 1.2 2004/03/11 15:37:21 mikulik Exp $
 %
 % Tutorial for gnuplot plotting program, for LaTeX users
 % David Kotz
@@ -232,7 +232,7 @@ file on the same plot. This plot is shown in Figure~\ref{eg3}.
     set title "This is another plot"
     set xlabel "$x$ axis"
     set ylabel "$y$ axis"
-    set key 15,-10
+    set key at 15,-10
     plot x with lines, "eg3.dat" with linespoints
 \end{verbatim}
 \currentspace
@@ -349,7 +349,7 @@ self-explanatory. This is shown in Figure~\ref{eg6}.
     set ylabel "This is\\a longer\\version\\ of\\the $y$\\ axis"
     set label "Data" at -5,-5 right
     set arrow from -5,-5 to -3.3,-6.7
-    set key -4,8
+    set key at -4,8
     set xtic -10,5,10
     plot [-10:10] [-10:10] "eg3.dat" title "Data File"  with linespoints 1 7,\
        3*exp(-x*x)+1  title "$3e^{-x^{2}}+1$" with lines 4

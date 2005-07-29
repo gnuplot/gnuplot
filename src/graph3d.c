@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.122 2005/07/13 20:08:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.123 2005/07/23 04:08:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -355,7 +355,8 @@ boundary3d(struct surface_points *plots, int count)
     xright = xsize * t->xmax - t->h_char * 2 - t->h_tic;
     key_rows = ptitl_cnt;
     key_cols = 1;
-    if (key->flag == KEY_AUTO_PLACEMENT && key->vpos == TUNDER) {
+    if ((key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
+	&& key->margin == GPKEY_BMARGIN) {
 	if (ptitl_cnt > 0) {
 	    /* calculate max no cols, limited by label-length */
 	    key_cols = (int) (xright - xleft) / ((max_ptitl_len + 4) * t->h_char + key_sample_width);
@@ -376,7 +377,8 @@ boundary3d(struct surface_points *plots, int count)
 
     /* an absolute 1, with no terminal-dependent scaling ? */
     ybot = t->v_char * 2.5 + 1;
-    if (key_rows && key->flag == KEY_AUTO_PLACEMENT && key->vpos == TUNDER)
+    if (key_rows && (key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
+	&& key->margin == GPKEY_BMARGIN)
 	ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
 
     if (strlen(title.text)) {
@@ -387,7 +389,9 @@ boundary3d(struct surface_points *plots, int count)
 	}
     }
     ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
-    if (key->flag == KEY_AUTO_PLACEMENT && key->vpos != TUNDER) {
+    if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
+	|| ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
+	    && key->margin == GPKEY_RMARGIN)) {
 	/* calculate max no rows, limited be ytop-ybot */
 	i = (int) (ytop - ybot) / t->v_char - 1 - ktitle_lines;
 	/* HBB 20030321: div by 0 fix like above */
@@ -400,7 +404,8 @@ boundary3d(struct surface_points *plots, int count)
 	}
 	key_rows += ktitle_lines;
     }
-    if (key->flag == KEY_AUTO_PLACEMENT && key->hpos == TOUT) {
+    if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
+	&& key->margin == GPKEY_RMARGIN) {
 	xright -= key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
     }
     xleft += t->xmax * xoffset;
@@ -777,8 +782,8 @@ do_3dplot(
     }
     key_point_offset = (key_sample_left + key_sample_right) / 2;
 
-    if (key->flag == KEY_AUTO_PLACEMENT) {
-	if (key->vpos == TUNDER) {
+    if (key->region != GPKEY_USER_PLACEMENT) {
+	if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_BMARGIN) {
 #if 0
 	    yl = yoffset * t->ymax + (key_rows) * key_entry_height + (ktitle_lines + 2) * t->v_char;
 	    xl = max_ptitl_len * 1000 / (key_sample_width / t->h_char + max_ptitl_len + 2);
@@ -806,15 +811,15 @@ do_3dplot(
 	    }
 #endif
 	} else {
-	    if (key->vpos == TTOP) {
+	    if (key->vpos == JUST_TOP) {
 		yl = ytop - t->v_tic - t->v_char;
 	    } else {
 		yl = ybot + t->v_tic + key_entry_height * key_rows + ktitle_lines * t->v_char;
 	    }
-	    if (key->hpos == TOUT) {
+	    if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->region == GPKEY_RMARGIN) {
 		/* keys outside plot border (right) */
 		xl = xright + t->h_tic + key_size_left;
-	    } else if (key->hpos == TLEFT) {
+	    } else if (key->hpos == LEFT) {
 		xl = xleft + t->h_tic + key_size_left;
 	    } else {
 		xl = xright - key_size_right - key_col_wth * (key_cols - 1);
@@ -822,7 +827,7 @@ do_3dplot(
 	}
 	yl_ref = yl - ktitle_lines * t->v_char;
     }
-    if (key->flag == KEY_USER_PLACEMENT) {
+    if (key->region == GPKEY_USER_PLACEMENT) {
 	map3d_position(&key->user_pos, &xl, &yl, "key");
     }
     if (key->visible && key->box.l_type > L_TYPE_NODRAW) {
@@ -864,7 +869,7 @@ do_3dplot(
 
 	while ((e = (char *) strchr(s, '\n')) != NULL) {
 	    *e = '\0';
-	    if (key->just == JLEFT) {
+	    if (key->just == GPKEY_LEFT) {
 		(*t->justify_text) (LEFT);
 		(*t->put_text) (xl + key_text_left, yl, s);
 	    } else {
@@ -2858,18 +2863,18 @@ key_text(int xl, int yl, char *text)
 {
     legend_key *key = &keyT;
 
-    if (key->just == JLEFT && key->flag == KEY_AUTO_PLACEMENT) {
+    if (key->just == GPKEY_LEFT && key->region != GPKEY_USER_PLACEMENT) {
 	(*term->justify_text) (LEFT);
 	(*term->put_text) (xl + key_text_left, yl, text);
     } else {
 	if ((*term->justify_text) (RIGHT)) {
-	    if (key->flag == KEY_USER_PLACEMENT)
+	    if (key->region == GPKEY_USER_PLACEMENT)
 		clip_put_text(xl + key_text_right, yl, text);
 	    else
 		(*term->put_text) (xl + key_text_right, yl, text);
 	} else {
 	    int x = xl + key_text_right - (term->h_char) * estimate_strlen(text);
-	    if (key->flag == KEY_USER_PLACEMENT) {
+	    if (key->region == GPKEY_USER_PLACEMENT) {
 		if (i_inrange(x, xleft, xright))
 		    clip_put_text(x, yl, text);
 	    } else {
@@ -2884,7 +2889,7 @@ key_sample_line(int xl, int yl)
 {
     legend_key *key = &keyT;
 
-    if (key->flag == KEY_AUTO_PLACEMENT) {
+    if (key->region != GPKEY_USER_PLACEMENT) {
 	(*term->move) (xl + key_sample_left, yl);
 	(*term->vector) (xl + key_sample_right, yl);
     } else {
@@ -2907,7 +2912,7 @@ key_sample_point(int xl, int yl, int pointtype)
      *
      * Now, all 'automatically' placed cases will never be clipped,
      * only user-specified ones. */
-    if ((key->flag == KEY_AUTO_PLACEMENT)            /* ==-1 means auto-placed key */
+    if ((key->region != GPKEY_USER_PLACEMENT)            /* ==-1 means auto-placed key */
 	|| !clip_point(xl + key_point_offset, yl)) {
 	(*term->point) (xl + key_point_offset, yl, pointtype);
     }
@@ -2982,7 +2987,7 @@ key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
     gray_to = cb2gray(cbmax);
     gray_step = (gray_to - gray_from)/steps;
 
-    if (key->flag == KEY_AUTO_PLACEMENT)
+    if (key->region != GPKEY_USER_PLACEMENT)
 	(*term->move) (x1, yl);
     else
 	clip_move(x1, yl);
@@ -2993,7 +2998,7 @@ key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
 	set_color(gray);
 	(*term->move) (x2, yl);
 	x2 = (i==steps) ? x_to : x1 + (int)(i*step+0.5);
-	if (key->flag == KEY_AUTO_PLACEMENT)
+	if (key->region != GPKEY_USER_PLACEMENT)
 	    (*term->vector) (x2, yl);
 	else
 	    clip_vector(x2, yl);
@@ -3043,7 +3048,7 @@ key_sample_point_pm3d(
 	set_color(gray);
 	x2 = i==0 ? x1 : (i==steps ? x_to : x1 + (int)(i*step+0.5));
 	/* x2 += key_point_offset; ... that's if there is only 1 point */
-	if (key->flag == KEY_AUTO_PLACEMENT || !clip_point(x2, yl))
+	if (key->region != GPKEY_USER_PLACEMENT || !clip_point(x2, yl))
 	    (*term->point) (x2, yl, pointtype);
 	i++;
     }

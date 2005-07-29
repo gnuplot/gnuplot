@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.316 2005/07/25 21:04:52 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.317 2005/07/27 21:37:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5605,8 +5605,8 @@ C ... and restart the table:
        set format {<axes>} {'<format-string>'}
        show format
 
- where <axes> is either `x`, `y`, `z`, `cb`, `xy`, `x2`, `y2` or nothing (which is
- the same as `xy`).  The length of the string representing a tic mark (after
+ where <axes> is either `x`, `y`, `z`, `cb`, `xy`, `x2`, `y2` or nothing (which
+ is the same as `xy`).  The length of the string representing a tic mark (after
  formatting with 'printf') is restricted to 100 characters.  If the format
  string is omitted, the format will be returned to the default "% g".  For
  LaTeX users, the format "$%g$" is often desirable.  If the empty string "" is
@@ -6107,9 +6107,11 @@ C ... and restart the table:
 
  Syntax:
        set key {on|off} {default}
-               {left | right | top | bottom | outside | below | <position>}
-               {Left | Right} {{no}reverse}
-               {{no}invert}
+               {{inside | outside} | {lmargin | rmargin | tmargin | bmargin}
+                 | {at <position>}}
+               {left | right | center} {top | bottom | center}
+               {vertical | horizontal} {Left | Right}
+               {{no}reverse} {{no}invert}
                {samplen <sample_length>} {spacing <vertical_spacing>}
                {width <width_increment>}
                {height <height_increment>}
@@ -6121,13 +6123,83 @@ C ... and restart the table:
        unset key
        show key
 
- By default the key is placed in the upper right corner of the graph.  The
- keywords `left`, `right`, `top`, `bottom`, `outside` and `below` may be used
- to place the key in the other corners inside the graph or to the right
- (outside) or below the graph.  They may be given alone or combined.
-
  Plots may be drawn with no visible key by requesting `set key off` or
  `unset key`.
+
+ Elements within the key are stacked according to `vertical` or `horizontal`.
+ In the case of `vertical`, the key occupies as few columns as possible.  That
+ is, elements are aligned in a column until running out of vertical space at
+ which point a new column is started.  In the case of `horizontal`, the key
+ occupies as few rows as possible.
+
+ By default the key is placed in the upper right inside corner of the graph.
+ The keywords `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
+ `lmargin`, `rmargin`, `tmargin`, `bmargin` (, `above`, `over`, `below` and
+ `under`) may be used to automatically place the key in other positions of the
+ graph.  Also an `at <position>` may be given to indicate precisely where the
+ plot should be placed.  In this case, the keywords `left`, `right`, `center`,
+ `bottom` and `center` serve an analogous purpose for alignment.
+
+ To understand positioning, the best concept is to think of a region, i.e.,
+ inside/outside, or one of the margins.  Along with the region, keywords
+ `left/center/right` (l/c/r) and `top/center/bottom` (t/c/b) control where
+ within the particular region the key should be placed.
+
+ When in `inside` mode, the keywords `left` (l), `right` (r), `top` (t),
+ `bottom` (b), and `center` (c) push the key out toward the plot boundary as
+ illustrated:
+
+      t/l   t/c   t/r
+
+      c/l    c    c/r
+
+      b/l   b/c   b/r
+
+
+ When in `outside` mode, automatic placement is similar to the above
+ illustration, but with respect to the view, rather than the graph boundary.
+ That is, a border is moved inward to make room for the key outside of
+ the plotting area, although this may interfere with other labels and may
+ cause an error on some devices.  The particular plot border that is moved
+ depends upon the position described above and the stacking direction.  For
+ options centered in one of the dimensions, there is no ambiguity about which
+ border to move.  For the corners, when the stack direction is `vertical`, the
+ left or right border is moved inward appropriately.  When the stack direction
+ is `horizontal`, the top or bottom border is moved inward appropriately.
+
+ The margin syntax allows automatic placement of key regardless of stack
+ direction.  When one of the margins `lmargin` (lm), `rmargin` (rm),
+ `tmargin` (tm), and `bmargin` (bm) is combined with a single, non-conflicting
+ direction keyword, the following illustrated positions may contain the key:
+
+           l/tm  c/tm  r/tm
+
+      t/lm                  t/rm
+
+      c/lm                  c/rm
+
+      b/lm                  b/rm
+
+           l/bm  c/bm  r/bm
+
+
+ Keywords `above` and `over` are synonymous with `tmargin`.  For version
+ compatibility, `above` or `over` without an additional l/c/r or stack direction
+ keyword uses `center` and `horizontal`.  Keywords `below` and `under` are
+ synonymous with `bmargin`.  For compatibility, `below` or `under` without an
+ additional l/c/r or stack  direction keyword uses `center` and `horizontal`.  A
+ further compatibility issue is that `outside` appearing without an additional
+ t/b/c or stack direction keyword uses `top`, `right` and `vertical` (i.e., the
+ same as t/rm above).
+
+ The <position> can be a simple x,y,z as in previous versions, but these can
+ be preceded by one of five keywords (`first`, `second`, `graph`, `screen`,
+ `character`) which selects the coordinate system in which the position of
+ the first sample line is specified.  See `coordinates` for more details.
+ The effect of `left`, `right`, `top`, `bottom`, and `center` when <position>
+ is given is to align the key as though it were text positioned using the
+ label command, i.e., `left` means left align with key to the right of
+ <position>, etc.
 
  Justification of the labels within the key is controlled by `Left` or `Right`
  (default is `Right`).  The text and sample can be reversed (`reverse`) and a
@@ -6184,15 +6256,11 @@ C ... and restart the table:
  terminals supporting this, see `enhanced text` for more details.
  This default behavior can be switched off by the `noenhanced` option.
 
- The defaults for `set key` are `on`, `right`, `top`, `Right`, `noreverse`,
- `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and `nobox`.  
- The default <linetype> is the same as that used for the plot borders.
- Entering `set key default` returns the key to its default configuration.
-
- The <position> can be a simple x,y,z as in previous versions, but these can
- be preceded by one of five keywords (`first`, `second`, `graph`, `screen`,
- `character`) which selects the coordinate system in which the position of
- the first sample line is specified.  See `coordinates` for more details.
+ The defaults for `set key` are `on`, `right`, `top`, `vertical`, `Right`,
+ `noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and
+ `nobox`.  The default <linetype> is the same as that used for the plot
+ borders.  Entering `set key default` returns the key to its default
+ configuration.
 
  The key is drawn as a sequence of lines, with one plot described on each
  line.  On the right-hand side (or the left-hand side, if `reverse` is
@@ -6205,14 +6273,6 @@ C ... and restart the table:
  coordinates are used to specify the line position.  For a `splot`, x, y and
  z are all used as a 3-d location mapped using the same mapping as the graph
  itself to form the required 2-d screen position of the imaginary line.
-
- Some or all of the key may be outside of the graph boundary, although this
- may interfere with other labels and may cause an error on some devices.  If
- you use the keywords `outside` or `below`, `gnuplot` makes space for the keys
- and the graph becomes smaller.  Putting keys outside to the right, they
- occupy as few columns as possible, and putting them below, as many columns as
- possible (depending of the length of the labels), thus stealing as little
- space from the graph as possible.
 
  When using the TeX or PostScript drivers, or similar drivers where formatting
  information is embedded in the string, `gnuplot` is unable to calculate

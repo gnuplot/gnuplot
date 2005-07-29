@@ -1,5 +1,5 @@
 #
-# $Id: bivariat.dem,v 1.4 2003/10/28 05:35:54 sfeam Exp $
+# $Id: bivariat.dem,v 1.5 2003/12/13 06:33:44 sfeam Exp $
 #
 # This demo is very slow and requires unusually large stack size.
 # Do not attempt to run this demo under MSDOS.
@@ -78,7 +78,7 @@ set xrange [-5:5]
 set yrange [-10:10]
 set isosamples 10
 set samples 100
-set key 4,-3
+set key at 4,-3
 set title "Min(x,y) and Max(x,y)"
 
 #

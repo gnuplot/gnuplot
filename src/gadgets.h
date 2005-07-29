@@ -120,30 +120,37 @@ struct arrowstyle_def {
     struct arrow_style_type arrow_properties;
 };
 
-/* The vertical positioning of the key box: (top, bottom, under) */
-typedef enum en_key_vertical_position {
-    TTOP,
-    TBOTTOM,
-    TUNDER
-} t_key_vertical_position;
+/* The stacking direction of the key box: (vertical, horizontal) */
+typedef enum en_key_stack_direction {
+    GPKEY_VERTICAL,
+    GPKEY_HORIZONTAL
+} t_key_stack_direction;
 
-/* Horizontal positions of the key box: (left, right, outside right */
-typedef enum en_key_horizontal_position {
-    TLEFT,
-    TRIGHT,
-    TOUT
-} t_key_horizontal_position;
+/* The region, with respect to the border, key is located: (inside, outside) */
+typedef enum en_key_region {
+    GPKEY_AUTO_INTERIOR_LRTBC,   /* Auto placement, left/right/top/bottom/center */
+    GPKEY_AUTO_EXTERIOR_LRTBC,   /* Auto placement, left/right/top/bottom/center */
+    GPKEY_AUTO_EXTERIOR_MARGIN,  /* Auto placement, margin plus lrc or tbc */
+    GPKEY_USER_PLACEMENT         /* User specified placement */
+} t_key_region;
+
+/* If exterior, there are 12 possible auto placements.  Since
+   left/right/center with top/bottom/center can only define 9
+   locations, further subdivide the exterior region into four
+   subregions for which left/right/center (TMARGIN/BMARGIN)
+   and top/bottom/center (LMARGIN/RMARGIN) creates 12 locations. */
+typedef enum en_key_ext_region {
+    GPKEY_TMARGIN,
+    GPKEY_BMARGIN,
+    GPKEY_LMARGIN,
+    GPKEY_RMARGIN
+} t_key_ext_region;
 
 /* Key sample to the left or the right of the plot title? */
 typedef enum en_key_sample_positioning {
-    JLEFT,
-    JRIGHT
+    GPKEY_LEFT,
+    GPKEY_RIGHT
 } t_key_sample_positioning;
-
-typedef enum key_type {
-    KEY_USER_PLACEMENT,
-    KEY_AUTO_PLACEMENT
-} t_key_flag;
 
 /* The data describing an axis label, or the plot title */
 typedef struct {
@@ -205,11 +212,13 @@ typedef enum keytitle_type {
 
 typedef struct {
     TBOOLEAN visible;		/* Do we show this key at all? */
-    t_key_flag flag;		/* if so: where? */
+    t_key_region region;	/* if so: where? */
+    t_key_ext_region margin;	/* if exterior: where outside? */
     struct position user_pos;	/* if user specified position, this is it */
-    t_key_vertical_position vpos; /* otherwise these guide auto-positioning */
-    t_key_horizontal_position hpos;
+    VERT_JUSTIFY vpos;		/* otherwise these guide auto-positioning */
+    JUSTIFY hpos;
     t_key_sample_positioning just;
+    t_key_stack_direction stack_dir;
     double swidth;		/* 'width' of the linestyle sample line in the key */
     double vert_factor;		/* user specified vertical spacing multiplier */
     double width_fix;		/* user specified additional (+/-) width of key titles */
@@ -235,9 +244,10 @@ extern legend_key keyT;
 
 #define DEFAULT_KEY_PROPS \
 		{ TRUE, \
-		KEY_AUTO_PLACEMENT, \
+		GPKEY_AUTO_INTERIOR_LRTBC, GPKEY_RMARGIN, \
 		DEFAULT_KEY_POSITION, \
-		TTOP, TRIGHT, JRIGHT,  \
+		JUST_TOP, RIGHT, \
+		GPKEY_RIGHT, GPKEY_VERTICAL, \
 		4.0, 1.0, 0.0, 0.0, \
 		FILENAME_KEYTITLES, \
 		FALSE, FALSE, TRUE, \

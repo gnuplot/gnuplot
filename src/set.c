@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.190 2005/07/26 18:15:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.191 2005/07/27 21:37:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1497,10 +1497,56 @@ set_isosamples()
 }
 
 
+/* When plotting an external key, the margin and l/r/t/b/c are
+   used to determine one of twelve possible positions.  They must
+   be defined appropriately in the case where stack direction
+   determines exact position. */
+static void
+set_key_position_from_stack_direction(legend_key *key)
+{
+    if (key->stack_dir == GPKEY_VERTICAL) {
+	switch(key->hpos) {
+	case LEFT:
+	    key->margin = GPKEY_LMARGIN;
+	    break;
+	case CENTRE:
+	    if (key->vpos == JUST_TOP)
+		key->margin = GPKEY_TMARGIN;
+	    else
+		key->margin = GPKEY_BMARGIN;
+	    break;
+	case RIGHT:
+	    key->margin = GPKEY_RMARGIN;
+	    break;
+	}
+    } else {
+	switch(key->vpos) {
+	case JUST_TOP:
+	    key->margin = GPKEY_TMARGIN;
+	    break;
+	case JUST_CENTRE:
+	    if (key->hpos == LEFT)
+		key->margin = GPKEY_LMARGIN;
+	    else
+		key->margin = GPKEY_RMARGIN;
+	    break;
+	case JUST_BOT:
+	    key->margin = GPKEY_BMARGIN;
+	    break;
+	}
+    }
+}
+
+
 /* process 'set key' command */
 static void
 set_key()
 {
+    TBOOLEAN vpos_set = FALSE, hpos_set = FALSE, reg_set = FALSE, sdir_set = FALSE;
+    char *vpos_warn = "Multiple vertical position settings";
+    char *hpos_warn = "Multiple horizontal position settings";
+    char *reg_warn = "Multiple location region settings";
+    char *sdir_warn = "Multiple stack direction settings";
     struct value a;
     legend_key *key = &keyT;
 
@@ -1516,126 +1562,209 @@ set_key()
     }
 #endif
 
-	while (!END_OF_COMMAND) {
-	    switch(lookup_table(&set_key_tbl[0],c_token)) {
-	    case S_KEY_ON:
-		key->visible = TRUE;
-		break;
-	    case S_KEY_OFF:
-		key->visible = FALSE;
-		break;
-	    case S_KEY_DEFAULT:
-		reset_key();
-		key->title[0] = '\0';
-		break;
-	    case S_KEY_TOP:
-		key->vpos = TTOP;
-		key->flag = KEY_AUTO_PLACEMENT;
-		break;
-	    case S_KEY_BOTTOM:
-		key->vpos = TBOTTOM;
-		key->flag = KEY_AUTO_PLACEMENT;
-		break;
-	    case S_KEY_LEFT:
-		key->hpos = TLEFT;
-		/* key->just = TRIGHT; */
-		key->flag = KEY_AUTO_PLACEMENT;
-		break;
-	    case S_KEY_RIGHT:
-		key->hpos = TRIGHT;
-		key->flag = KEY_AUTO_PLACEMENT;
-		break;
-	    case S_KEY_UNDER:
-		key->vpos = TUNDER;
-		if (key->hpos == TOUT)
-		    key->hpos = TRIGHT;
-		key->flag = KEY_AUTO_PLACEMENT;
-		break;
-	    case S_KEY_OUTSIDE:
-		key->hpos = TOUT;
-		if (key->vpos == TUNDER)
-		    key->vpos = TBOTTOM;
-		key->flag = KEY_AUTO_PLACEMENT;
-		break;
-	    case S_KEY_LLEFT:
-		/* key->hpos = TLEFT; */
-		key->just = JLEFT;
-		break;
-	    case S_KEY_RRIGHT:
-		/* key->hpos = TLEFT; */
-		key->just = JRIGHT;
-		break;
-	    case S_KEY_REVERSE:
-		key->reverse = TRUE;
-		break;
-	    case S_KEY_NOREVERSE:
-		key->reverse = FALSE;
-		break;
-	    case S_KEY_INVERT:
-		key->invert = TRUE;
-		break;
-	    case S_KEY_NOINVERT:
-		key->invert = FALSE;
-		break;
-	    case S_KEY_ENHANCED:
-		key->enhanced = TRUE;
-		break;
-	    case S_KEY_NOENHANCED:
-		key->enhanced = FALSE;
-		break;
-	    case S_KEY_BOX:
-		c_token++;
-		if (END_OF_COMMAND)
-		    key->box.l_type = -2;
-		else {
-		    int old_token = c_token;
-
-		    lp_parse(&key->box,1,0,-2,0);
-		    if (old_token == c_token && isanumber(c_token)) {
-			key->box.l_type = real(const_express(&a)) - 1;
-			c_token++;
-		    }
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&set_key_tbl[0],c_token)) {
+	case S_KEY_ON:
+	    key->visible = TRUE;
+	    break;
+	case S_KEY_OFF:
+	    key->visible = FALSE;
+	    break;
+	case S_KEY_DEFAULT:
+	    reset_key();
+	    key->title[0] = '\0';
+	    break;
+	case S_KEY_TOP:
+	    if (vpos_set)
+		int_warn(c_token, vpos_warn);
+	    key->vpos = JUST_TOP;
+	    vpos_set = TRUE;
+	    break;
+	case S_KEY_BOTTOM:
+	    if (vpos_set)
+		int_warn(c_token, vpos_warn);
+	    key->vpos = JUST_BOT;
+	    vpos_set = TRUE;
+	    break;
+	case S_KEY_LEFT:
+	    if (hpos_set)
+		int_warn(c_token, hpos_warn);
+	    key->hpos = LEFT;
+	    hpos_set = TRUE;
+	    break;
+	case S_KEY_RIGHT:
+	    if (hpos_set)
+		int_warn(c_token, hpos_warn);
+	    key->hpos = RIGHT;
+	    hpos_set = TRUE;
+	    break;
+	case S_KEY_CENTER:
+	    if (!vpos_set) key->vpos = JUST_CENTRE;
+	    if (!hpos_set) key->hpos = CENTRE;
+	    if (vpos_set || hpos_set)
+		vpos_set = hpos_set = TRUE;
+	    break;
+	case S_KEY_VERTICAL:
+	    if (sdir_set)
+		int_warn(c_token, sdir_warn);
+	    key->stack_dir = GPKEY_VERTICAL;
+	    sdir_set = TRUE;
+	    break;
+	case S_KEY_HORIZONTAL:
+	    if (sdir_set)
+		int_warn(c_token, sdir_warn);
+	    key->stack_dir = GPKEY_HORIZONTAL;
+	    sdir_set = TRUE;
+	    break;
+	case S_KEY_OVER:
+#ifdef BACKWARDS_COMPATIBLE
+	    if (!hpos_set)
+		key->hpos = CENTRE;
+	    if (!sdir_set)
+		key->stack_dir = GPKEY_HORIZONTAL;
+#endif
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    key->region = GPKEY_AUTO_EXTERIOR_MARGIN;
+	    key->margin = GPKEY_TMARGIN;
+	    reg_set = TRUE;
+	    break;
+	case S_KEY_UNDER:
+#ifdef BACKWARDS_COMPATIBLE
+	    if (!hpos_set)
+		key->hpos = CENTRE;
+	    if (!sdir_set)
+		key->stack_dir = GPKEY_HORIZONTAL;
+#endif
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    key->region = GPKEY_AUTO_EXTERIOR_MARGIN;
+	    key->margin = GPKEY_BMARGIN;
+	    reg_set = TRUE;
+	    break;
+	case S_KEY_INSIDE:
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    key->region = GPKEY_AUTO_INTERIOR_LRTBC;
+	    reg_set = TRUE;
+	    break;
+	case S_KEY_OUTSIDE:
+#ifdef BACKWARDS_COMPATIBLE
+	    if (!hpos_set)
+		key->hpos = RIGHT;
+	    if (!sdir_set)
+		key->stack_dir = GPKEY_VERTICAL;
+#endif
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    key->region = GPKEY_AUTO_EXTERIOR_LRTBC;
+	    reg_set = TRUE;
+	    break;
+	case S_KEY_TMARGIN:
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    key->region = GPKEY_AUTO_EXTERIOR_MARGIN;
+	    key->margin = GPKEY_TMARGIN;
+	    reg_set = TRUE;
+	    break;
+	case S_KEY_BMARGIN:
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    key->region = GPKEY_AUTO_EXTERIOR_MARGIN;
+	    key->margin = GPKEY_BMARGIN;
+	    reg_set = TRUE;
+	    break;
+	case S_KEY_LMARGIN:
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    key->region = GPKEY_AUTO_EXTERIOR_MARGIN;
+	    key->margin = GPKEY_LMARGIN;
+	    reg_set = TRUE;
+	    break;
+	case S_KEY_RMARGIN:
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    key->region = GPKEY_AUTO_EXTERIOR_MARGIN;
+	    key->margin = GPKEY_RMARGIN;
+	    reg_set = TRUE;
+	    break;
+	case S_KEY_LLEFT:
+	    key->just = GPKEY_LEFT;
+	    break;
+	case S_KEY_RRIGHT:
+	    key->just = GPKEY_RIGHT;
+	    break;
+	case S_KEY_REVERSE:
+	    key->reverse = TRUE;
+	    break;
+	case S_KEY_NOREVERSE:
+	    key->reverse = FALSE;
+	    break;
+	case S_KEY_INVERT:
+	    key->invert = TRUE;
+	    break;
+	case S_KEY_NOINVERT:
+	    key->invert = FALSE;
+	    break;
+	case S_KEY_ENHANCED:
+	    key->enhanced = TRUE;
+	    break;
+	case S_KEY_NOENHANCED:
+	    key->enhanced = FALSE;
+	    break;
+	case S_KEY_BOX:
+	    c_token++;
+	    if (END_OF_COMMAND)
+		key->box.l_type = -2;
+	    else {
+		int old_token = c_token;
+		
+		lp_parse(&key->box,1,0,-2,0);
+		if (old_token == c_token && isanumber(c_token)) {
+		    key->box.l_type = real(const_express(&a)) - 1;
+		    c_token++;
 		}
-		c_token--;  /* is incremented after loop */
-		break;
-	    case S_KEY_NOBOX:
-		key->box.l_type = L_TYPE_NODRAW;
-		break;
-	    case S_KEY_SAMPLEN:
-		c_token++;
-		key->swidth = real(const_express(&a));
-		c_token--; /* it is incremented after loop */
-		break;
-	    case S_KEY_SPACING:
-		c_token++;
-		key->vert_factor = real(const_express(&a));
-		if (key->vert_factor < 0.0)
-		    key->vert_factor = 0.0;
-		c_token--; /* it is incremented after loop */
-		break;
-	    case S_KEY_WIDTH:
-		c_token++;
-		key->width_fix = real(const_express(&a));
-		c_token--; /* it is incremented after loop */
-		break;
-	    case S_KEY_HEIGHT:
-		c_token++;
-		key->height_fix = real(const_express(&a));
-		c_token--; /* it is incremented after loop */
-		break;
-	    case S_KEY_AUTOTITLES:
-		if (almost_equals(++c_token, "col$umnheader"))
-		    key->auto_titles = COLUMNHEAD_KEYTITLES;
-		else {
-		    key->auto_titles = FILENAME_KEYTITLES;
-		    c_token--;
-		}
-		break;
-	    case S_KEY_NOAUTOTITLES:
-		key->auto_titles = NOAUTO_KEYTITLES;
-		break;
-	    case S_KEY_TITLE:
-		{
+	    }
+	    c_token--;  /* is incremented after loop */
+	    break;
+	case S_KEY_NOBOX:
+	    key->box.l_type = L_TYPE_NODRAW;
+	    break;
+	case S_KEY_SAMPLEN:
+	    c_token++;
+	    key->swidth = real(const_express(&a));
+	    c_token--; /* it is incremented after loop */
+	    break;
+	case S_KEY_SPACING:
+	    c_token++;
+	    key->vert_factor = real(const_express(&a));
+	    if (key->vert_factor < 0.0)
+		key->vert_factor = 0.0;
+	    c_token--; /* it is incremented after loop */
+	    break;
+	case S_KEY_WIDTH:
+	    c_token++;
+	    key->width_fix = real(const_express(&a));
+	    c_token--; /* it is incremented after loop */
+	    break;
+	case S_KEY_HEIGHT:
+	    c_token++;
+	    key->height_fix = real(const_express(&a));
+	    c_token--; /* it is incremented after loop */
+	    break;
+	case S_KEY_AUTOTITLES:
+	    if (almost_equals(++c_token, "col$umnheader"))
+		key->auto_titles = COLUMNHEAD_KEYTITLES;
+	    else {
+		key->auto_titles = FILENAME_KEYTITLES;
+		c_token--;
+	    }
+	    break;
+	case S_KEY_NOAUTOTITLES:
+	    key->auto_titles = NOAUTO_KEYTITLES;
+	    break;
+	case S_KEY_TITLE:
+	    {
 		char *s;
 		c_token++;
 		if ((s = try_to_get_string())) {
@@ -1644,17 +1773,41 @@ set_key()
 		} else
 		    key->title[0] = '\0';
 		c_token--;
-		}
-		break;
-	    case S_KEY_INVALID:
-	    default:
-		get_position(&key->user_pos);
-		key->flag = KEY_USER_PLACEMENT;
-		c_token--;  /* will be incremented again soon */
-		break;
 	    }
+	    break;
+	case S_KEY_MANUAL:
 	    c_token++;
+#ifdef BACKWARDS_COMPATIBLE
+	case S_KEY_INVALID:
+	default:
+#endif
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    get_position(&key->user_pos);
+	    key->region = GPKEY_USER_PLACEMENT;
+	    reg_set = TRUE;
+	    c_token--;  /* will be incremented again soon */
+	    break;
+#ifndef BACKWARDS_COMPATIBLE
+	case S_KEY_INVALID:
+	default:
+	    int_error(c_token, "unknown key option");
+	    break;
+#endif
 	}
+	c_token++;
+    }
+
+    if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
+	set_key_position_from_stack_direction(key);
+    else if (key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
+	if (vpos_set && (key->margin == GPKEY_TMARGIN || key->margin == GPKEY_BMARGIN))
+	    int_warn(NO_CARET,
+		     "ignoring top/center/bottom; incompatible with tmargin/bmargin.");
+	else if (hpos_set && (key->margin == GPKEY_LMARGIN || key->margin == GPKEY_RMARGIN))
+	    int_warn(NO_CARET,
+		     "ignoring left/center/right; incompatible with lmargin/tmargin.");
+    }
 }
 
 

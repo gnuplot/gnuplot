@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.161 2005/07/23 04:08:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.162 2005/07/28 22:26:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -275,10 +275,10 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
  *
  * The order in which things is done is getting pretty critical:
  *  ytop depends on title, x2label, ylabels (if no rotated text)
- *  ybot depends on key, if TUNDER
+ *  ybot depends on key, if "under"
  *  once we have these, we can setup the y1 and y2 tics and the
  *  only then can we calculate xleft and xright
- *  xright depends also on key TRIGHT
+ *  xright depends also on key RIGHT
  *  then we can do x and x2 tics
  *
  * For set size ratio ..., everything depends on everything else...
@@ -470,13 +470,13 @@ boundary(struct curve_points *plots, int count)
     /*  end of preliminary ytop calculation }}} */
 
 
-    /*{{{  tentative xleft, needed for TUNDER */
+    /*{{{  tentative xleft, needed for "under" */
     xleft = (int) (xoffset * t->xmax
 		   + t->h_char * (lmargin >= 0 ? lmargin : 2));
     /*}}} */
 
 
-    /*{{{  tentative xright, needed for TUNDER */
+    /*{{{  tentative xright, needed for "under" */
     xright = (int) ((xsize + xoffset) * t->xmax
 		    - t->h_char * (rmargin >= 0 ? rmargin : 2));
     /*}}} */
@@ -562,6 +562,14 @@ boundary(struct curve_points *plots, int count)
 
     /*  end of preliminary ybot calculation }}} */
 
+    /* compute xleft from the various components
+     *     unless lmargin is explicitly specified  */
+    xleft = (int) (0.5 + t->xmax * xoffset);
+
+    /* compute xright from the various components
+     *     unless rmargin is explicitly specified  */
+
+    xright = (int) (0.5 + t->xmax * (xsize + xoffset));
 
     if (lkey) {
 	TBOOLEAN key_panic = FALSE;
@@ -615,75 +623,65 @@ boundary(struct curve_points *plots, int count)
 
 	/* calculate rows and cols for key */
 
-	if (key->flag == KEY_AUTO_PLACEMENT) {
-	    if (key->vpos == TUNDER) {
-		/* maximise no cols, limited by label-length */
-		key_cols = (int) (xright - xleft) / key_col_wth;
-		/* EAM Dec 2004 - Rather than turn off the key, try to squeeze */
-		if (key_cols == 0) {
-		    key_cols = 1;
-		    key_panic = TRUE;
-		    key_col_wth = (xright - xleft);
-		}
-		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
-
-		/* now calculate actual no cols depending on no rows */
-		key_cols = (key_rows == 0) ? 1
-			 : (int) (ptitl_cnt + key_rows - 1) / key_rows;
-		if (key_cols == 0) {
-		    key_cols = 1;
-		    key_panic = TRUE;
-		}
-
-		/* we divide into columns, then centre in column by
-		 * considering ratio of * key_left_size to
-		 * key_right_size
-		 *
-		 * key_size_left/(key_size_left+key_size_right) *
-		 * (xright-xleft)/key_cols do one integer division to
-		 * maximise accuracy (hope we don't overflow !)
-		 */
-		keybox.xl = xleft - key_size_left
-			+ ((xright - xleft) * key_size_left)
-			/ (key_cols * (key_size_left + key_size_right));
-		keybox.xr = keybox.xl + key_col_wth * (key_cols - 1)
-			+ key_size_left + key_size_right;
-
-		keybox.yb = t->ymax * yoffset;
-		keybox.yt = keybox.yb + key_rows * key_entry_height
-		    + ktitl_lines * t->v_char;
-		keybox.yt += (int) (key->height_fix * t->v_char);
-		/* HBB 20040725: leave manually set bmargin alone */
-		if (bmargin < 0) {
-		    ybot += key_entry_height * key_rows
-			+ (int) (t->v_char * (ktitl_lines + 1));
-		    ybot += (int) (key->height_fix * t->v_char);
-		}
-	    } else {
-		/* maximise no rows, limited by ytop-ybot */
-		int i = (int) (ytop - ybot - key->height_fix * t->v_char
-			       - (ktitl_lines + 1) * t->v_char)
-		    / key_entry_height;
-
-		if (i == 0) {
-		    i = 1;
-		    key_panic = TRUE;
-		}
-		if (ptitl_cnt > i) {
-		    key_cols = (int) (ptitl_cnt + i - 1) / i;
-		    /* now calculate actual no rows depending on no cols */
-		    if (key_cols == 0) {
-			key_cols = 1;
-			key_panic = TRUE;
-		    }
-		    key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
-		}
+	if (key->stack_dir == GPKEY_HORIZONTAL) {
+	    /* maximise no cols, limited by label-length */
+	    key_cols = (int) (xright - xleft) / key_col_wth;
+	    /* EAM Dec 2004 - Rather than turn off the key, try to squeeze */
+	    if (key_cols == 0) {
+		key_cols = 1;
+		key_panic = TRUE;
+		key_col_wth = (xright - xleft);
 	    }
+	    key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
+	    /* now calculate actual no cols depending on no rows */
+	    key_cols = (key_rows == 0) ? 1
+		: (int) (ptitl_cnt + key_rows - 1) / key_rows;
+	    if (key_cols == 0) {
+		key_cols = 1;
+		key_panic = TRUE;
+	    }
+	} else {
+	    /* maximise no rows, limited by ytop-ybot */
+	    int i = (int) (ytop - ybot - key->height_fix * t->v_char
+			   - (ktitl_lines + 1) * t->v_char)
+		/ key_entry_height;
 
-	    /* warn if we had to punt on key size calculations */
-	    if (key_panic)
-		int_warn(NO_CARET, "Warning - difficulty fitting plot titles into key");
+	    if (i == 0) {
+		i = 1;
+		key_panic = TRUE;
+	    }
+	    if (ptitl_cnt > i) {
+		key_cols = (int) (ptitl_cnt + i - 1) / i;
+		/* now calculate actual no rows depending on no cols */
+		if (key_cols == 0) {
+		    key_cols = 1;
+		    key_panic = TRUE;
+		}
+  		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
+	    }
 	}
+
+	/* warn if we had to punt on key size calculations */
+	if (key_panic)
+	    int_warn(NO_CARET, "Warning - difficulty fitting plot titles into key");
+
+	/* adjust for outside key, leave manually set margins alone */
+	if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC && (key->vpos != JUST_CENTRE || key->hpos != CENTRE))
+	    || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
+	    if (key->margin == GPKEY_BMARGIN && bmargin < 0) {
+		ybot += key_entry_height * key_rows
+		    + (int) (t->v_char * (ktitl_lines + 1));
+		ybot += (int) (key->height_fix * t->v_char);
+	    } else if (key->margin == GPKEY_TMARGIN && tmargin < 0) {
+		ytop -= key_entry_height * key_rows
+		    + (int) (t->v_char * (ktitl_lines + 1));
+		ytop += (int) (key->height_fix * t->v_char);
+	    } else if (key->margin == GPKEY_LMARGIN && lmargin < 0) {
+		xleft += key_col_wth * key_cols;
+	    } else if (key->margin == GPKEY_RMARGIN && rmargin < 0) {
+		xright -= key_col_wth * key_cols;
+	    }
+  	}
 	/*}}} */
     }
 
@@ -751,10 +749,6 @@ boundary(struct curve_points *plots, int count)
     } else
 	timelabel_textwidth = 0;
 
-    /* compute xleft from the various components
-     *     unless lmargin is explicitly specified  */
-    xleft = (int) (0.5 + t->xmax * xoffset);
-
     if (lmargin < 0) {
        double tmpx, tmpy;
 
@@ -780,15 +774,7 @@ boundary(struct curve_points *plots, int count)
 
     /*  end of xleft calculation }}} */
 
-    /* EAM Jul 2003 - Revisit key placement */
-    if (key->flag == KEY_AUTO_PLACEMENT && key->vpos == TUNDER) {
-	int key_half = (keybox.xr - keybox.xl) / 2;
-
-	keybox.xl = (xright + xleft) / 2 - key_half;
-	keybox.xr = (xright + xleft) / 2 + key_half;
-    }
-
-    /*{{{  recompute xright based on widest y2tic. y2labels, key TOUT
+    /*{{{  recompute xright based on widest y2tic. y2labels, key "outside"
        unless it has been explicitly set by rmargin */
 
     /* tic labels */
@@ -829,11 +815,6 @@ boundary(struct curve_points *plots, int count)
     } else
 	y2label_textwidth = 0;
 
-    /* compute xright from the various components
-     *     unless rmargin is explicitly specified  */
-
-    xright = (int) (0.5 + t->xmax * (xsize + xoffset));
-
 #ifdef PM3D
     /* Make room for the color box if needed. */
     if (is_plot_with_palette() && is_plot_with_colorbox() && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
@@ -848,11 +829,6 @@ boundary(struct curve_points *plots, int count)
 	if (y2label_textwidth > 0)
 	    xright -= y2label_textwidth;
 
-	/* adjust for outside key */
-	if (key->flag == KEY_AUTO_PLACEMENT && key->hpos == TOUT) {
-	    xright -= key_col_wth * key_cols;
-	    keybox.xl = xright + (int) t->h_tic;
-	}
 	if (xright == (int) (0.5 + t->xmax * (xsize + xoffset))) {
 	    /* make room for end of xtic or x2tic label */
 	    xright -= (int) (t->h_char * 2);
@@ -899,9 +875,19 @@ boundary(struct curve_points *plots, int count)
 
 	    if (current > required) {
 		/* too tall */
+		int height = ytop - ybot;
 		ytop = ybot + required * (xright - xleft);
+		height -= (ytop - ybot);
+		height /= 2;
+		ytop += height;
+		ybot += height;
 	    } else {
+		int width = xright - xleft;
 		xright = xleft + (ytop - ybot) / required;
+		width -= (xright - xleft);
+		width /= 2;
+		xright += width;
+		xleft += width;
 	    }
 	}
 	/*}}} */
@@ -1017,39 +1003,107 @@ boundary(struct curve_points *plots, int count)
     axis_set_graphical_range(SECOND_X_AXIS, xleft, xright);
     axis_set_graphical_range(SECOND_Y_AXIS, ybot, ytop);
 
-    /*{{{  calculate the window in the grid for the key */
-    if (key->flag == KEY_USER_PLACEMENT
-	|| (key->flag == KEY_AUTO_PLACEMENT && key->vpos != TUNDER)) {
-	/* Calculate space for keys to prevent grid overwrite the
-	 * keys. Do it even if there is no grid, as do_plot will use
-	 * these to position key */
-	key_w = key_col_wth * key_cols;
-	key_h = (ktitl_lines) * t->v_char + key_rows * key_entry_height;
-	key_h += (int) (key->height_fix * t->v_char);
-	if (key->flag == KEY_AUTO_PLACEMENT) {
-	    if (key->vpos == TTOP) {
-		keybox.yt = (int) ytop - t->v_tic;
+#define ALIGN_BORDERS 1
+    /* Calculate space for keys (do_plot will use these to position key). */
+    key_w = key_col_wth * key_cols;
+    key_h = (ktitl_lines) * t->v_char + key_rows * key_entry_height;
+    key_h += (int) (key->height_fix * t->v_char);
+    if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
+	|| (key->region == GPKEY_AUTO_EXTERIOR_LRTBC && key->vpos == JUST_CENTRE && key->hpos == CENTRE)) {
+	if (key->vpos == JUST_TOP) {
+	    keybox.yt = ytop - t->v_tic;
+	    keybox.yb = keybox.yt - key_h;
+	} else if (key->vpos == JUST_BOT) {
+	    keybox.yb = ybot + t->v_tic;
+	    keybox.yt = keybox.yb + key_h;
+	} else /* (key->vpos == JUST_CENTRE) */ {
+	    int key_box_half = key_h / 2;
+	    keybox.yb = (ybot + ytop) / 2 - key_box_half;
+	    keybox.yt = (ybot + ytop) / 2 + key_box_half;
+	}
+	if (key->hpos == LEFT) {
+	    keybox.xl = xleft + t->h_char;
+	    keybox.xr = keybox.xl + key_w;
+	} else if (key->hpos == RIGHT) {
+	    keybox.xr = xright - t->h_char;
+	    keybox.xl = keybox.xr - key_w;
+	} else /* (key->hpos == CENTER) */ {
+	    int key_box_half = key_w / 2;
+	    keybox.xl = (xright + xleft) / 2 - key_box_half;
+	    keybox.xr = (xright + xleft) / 2 + key_box_half;
+	}
+    } else if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
+
+	/* Vertical alignment */
+	if (key->margin == GPKEY_TMARGIN) {
+	    /* align top first since tmargin may be manual */
+	    keybox.yt = (ysize + yoffset) * t->ymax - t->v_tic;
+	    keybox.yb = keybox.yt - key_h;
+	} else if (key->margin == GPKEY_BMARGIN) {
+	    /* align bottom first since bmargin may be manual */
+	    keybox.yb = yoffset * t->ymax + t->v_tic;
+	    keybox.yt = keybox.yb + key_h;
+	} else {
+	    if (key->vpos == JUST_TOP) {
+		/* align top first since tmargin may be manual */
+#if ALIGN_BORDERS
+		keybox.yt = ytop;
+#else
+		keybox.yt = (ysize + yoffset) * t->ymax - t->v_tic;
+#endif
 		keybox.yb = keybox.yt - key_h;
+	    } else if (key->vpos == CENTRE) {
+		int key_box_half = key_h / 2;
+		keybox.yb = (ybot + ytop) / 2 - key_box_half;
+		keybox.yt = (ybot + ytop) / 2 + key_box_half;
 	    } else {
-		keybox.yb = ybot + t->v_tic;
+		/* align bottom first since bmargin may be manual */
+#if ALIGN_BORDERS
+		keybox.yb = ybot;
+#else
+		keybox.yb = yoffset * t->ymax + t->v_tic;
+#endif
 		keybox.yt = keybox.yb + key_h;
 	    }
-	    if (key->hpos == TLEFT) {
-		keybox.xl = xleft + t->h_char;	/* for Left just */
+	}
+
+	/* Horizontal alignment */
+	if (key->margin == GPKEY_LMARGIN) {
+	    /* align left first since lmargin may be manual */
+	    keybox.xl = xoffset * t->xmax + t->h_char;
+	    keybox.xr = keybox.xl + key_w;
+	} else if (key->margin == GPKEY_RMARGIN) {
+	    /* align right first since rmargin may be manual */
+	    keybox.xr = (xsize + xoffset) * t->xmax - t->h_char;
+	    keybox.xl = keybox.xr - key_w;
+	} else {
+	    if (key->hpos == LEFT) {
+		/* align left first since lmargin may be manual */
+#if ALIGN_BORDERS
+		keybox.xl = xleft;
+#else
+		keybox.xl = xoffset * t->xmax + t->h_char;
+#endif
 		keybox.xr = keybox.xl + key_w;
-	    } else if (key->hpos == TRIGHT) {
-		keybox.xr = xright - t->h_char;	/* for Right just */
-		keybox.xl = keybox.xr - key_w;
-	    } else {		/* TOUT */
-		/* do this here for do_plot() */
+	    } else if (key->hpos == CENTRE) {
+		int key_box_half = key_w / 2;
+		keybox.xl = (xright + xleft) / 2 - key_box_half;
+		keybox.xr = (xright + xleft) / 2 + key_box_half;
+	    } else {
 		/* align right first since rmargin may be manual */
+#if ALIGN_BORDERS
+		keybox.xr = xright;
+#else
 		keybox.xr = (xsize + xoffset) * t->xmax - t->h_char;
+#endif
 		keybox.xl = keybox.xr - key_w;
 	    }
-	} else {
-	    unsigned int x, y;
+	}
 
-	    map_position(&key->user_pos, &x, &y, "key");
+    } else {
+	unsigned int x, y;
+
+	map_position(&key->user_pos, &x, &y, "key");
 #if 0
 /* FIXME!!!
 ** pm 22.1.2002: if key->user_pos.scalex or scaley == first_axes or second_axes,
@@ -1057,15 +1111,23 @@ boundary(struct curve_points *plots, int count)
 ** you must do "replot" to avoid the wrong plot ... bad luck if output does not
 ** go to screen */
 #define OK fprintf(stderr,"Line %i of %s is OK\n",__LINE__,__FILE__)
-	    OK;
-	    fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key->user_pos.x,key->user_pos.y);
-	    fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
+	OK;
+	fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key->user_pos.x,key->user_pos.y);
+	fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
 #endif
-	    keybox.xl = x - key_size_left;
-	    keybox.xr = keybox.xl + key_w;
-	    keybox.yt = y + (ktitl_lines ? t->v_char : key_entry_height) / 2;
-	    keybox.yb = keybox.yt - key_h;
-	}
+	/* Here top, bottom, left, right refer to the alignment with respect to point. */
+	keybox.xl = x;
+	if (key->hpos == CENTRE)
+	    keybox.xl -= key_w/2;
+	else if (key->hpos == RIGHT)
+	    keybox.xl -= key_w;
+	keybox.xr = keybox.xl + key_w;
+	keybox.yt = y;
+	if (key->vpos == JUST_CENTRE)
+	    keybox.yt += key_h/2;
+	else if (key->vpos == JUST_BOT)
+	    keybox.yt += key_h;
+	keybox.yb = keybox.yt - key_h;
     }
     /*}}} */
 
@@ -1414,7 +1476,7 @@ do_plot(struct curve_points *plots, int pcount)
 	ignore_enhanced(axis_array[FIRST_X_AXIS].label.noenhanced);
 	apply_pm3dcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
 	write_multiline(x, y, axis_array[FIRST_X_AXIS].label.text,
-			CENTRE, JUST_TOP, 0,
+			JUST_CENTRE, JUST_TOP, 0,
 			axis_array[FIRST_X_AXIS].label.font);
 	reset_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
 	ignore_enhanced(FALSE);
@@ -1514,8 +1576,8 @@ do_plot(struct curve_points *plots, int pcount)
 		    write_multiline(center, yl, s, CENTRE, JUST_TOP, 0, NULL);
 		} else {
 		    int x = center - t->h_char * estimate_strlen(s) / 2;
-		    if (key->hpos == TOUT
-			|| key->vpos == TUNDER
+		    if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC ||
+			key->region == GPKEY_AUTO_EXTERIOR_MARGIN
 			|| inrange(x, xleft, xright))
 			write_multiline(x, yl, s, LEFT, JUST_TOP, 0, NULL);
 		}
@@ -4595,14 +4657,15 @@ do_key_sample(
     /* Draw key text in black */
     (*t->linetype)(LT_BLACK);
 
-    if (key->just == JLEFT) {
+    if (key->just == GPKEY_LEFT) {
 	write_multiline(xl + key_text_left, yl, title, LEFT, JUST_TOP, 0, NULL);
     } else {
 	if ((*t->justify_text) (RIGHT)) {
 	    write_multiline(xl + key_text_right, yl, title, RIGHT, JUST_TOP, 0, NULL);
 	} else {
 	    int x = xl + key_text_right - t->h_char * estimate_strlen(title);
-	    if (key->hpos == TOUT || key->vpos == TUNDER ||	/* HBB 990327 */
+	    if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC ||	/* HBB 990327 */
+		key->region == GPKEY_AUTO_EXTERIOR_MARGIN ||
 		i_inrange(x, xleft, xright))
 		write_multiline(x, yl, title, LEFT, JUST_TOP, 0, NULL);
 	}

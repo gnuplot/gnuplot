@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.156 2005/06/19 22:03:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.157 2005/07/25 17:32:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1657,33 +1657,56 @@ show_key()
 	return;
     }
 
-    switch (key->flag) {
-    case KEY_AUTO_PLACEMENT: {
-	char *str = gp_alloc(30, "show_key");
-
-	if (key->vpos == TUNDER) {
-	    strcpy(str, "below");
-	} else if (key->vpos == TTOP) {
-	    strcpy(str, "top");
+    switch (key->region) {
+    case GPKEY_AUTO_INTERIOR_LRTBC:
+    case GPKEY_AUTO_EXTERIOR_LRTBC:
+    case GPKEY_AUTO_EXTERIOR_MARGIN: {
+	fputs("\tkey is ON, position: ", stderr);
+	if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN && (key->margin == GPKEY_TMARGIN || key->margin == GPKEY_BMARGIN))) {
+	    if (key->vpos == JUST_TOP)
+		fputs("top", stderr);
+	    else if (key->vpos == JUST_BOT)
+		fputs("bottom", stderr);
+	    else
+		fputs("center", stderr);
+	}
+	if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN && (key->margin == GPKEY_LMARGIN || key->margin == GPKEY_RMARGIN))) {
+	    if (key->hpos == LEFT)
+		fputs(" left", stderr);
+	    else if (key->hpos == RIGHT)
+		fputs(" right", stderr);
+	    else if (key->vpos != JUST_CENTRE) /* Don't print "center" twice. */
+		fputs(" center", stderr);
+	}
+	if (key->stack_dir == GPKEY_VERTICAL) {
+	    fputs(" vertical", stderr);
 	} else {
-	    strcpy(str, "bottom");
+	    fputs(" horizontal", stderr);
 	}
-	if (key->hpos == TOUT) {
-	    strcpy(str, "outside (right)");
-	} else if (key->hpos == TLEFT) {
-	    strcat(str, " left");
-	} else {
-	    strcat(str, " right");
+	if (key->region == GPKEY_AUTO_INTERIOR_LRTBC)
+	    fputs(" inside", stderr);
+	else if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
+	    fputs(" outside", stderr);
+	else {
+	    switch (key->margin) {
+	    case GPKEY_TMARGIN:
+		fputs(" tmargin", stderr);
+		break;
+	    case GPKEY_BMARGIN:
+		fputs(" bmargin", stderr);
+		break;
+	    case GPKEY_LMARGIN:
+		fputs(" lmargin", stderr);
+		break;
+	    case GPKEY_RMARGIN:
+		fputs(" rmargin", stderr);
+		break;
+	    }
 	}
-	if (key->vpos != TUNDER && key->hpos != TOUT) {
-	    strcat(str, " corner");
-	}
-	fprintf(stderr, "\
-\tkey is ON, position: %s\n", str);
-	free(str);
+	fputs("\n", stderr);
 	break;
     }
-    case KEY_USER_PLACEMENT:
+    case GPKEY_USER_PLACEMENT:
 	fputs("\tkey is at ", stderr);
 	show_position(&key->user_pos);
 	putc('\n', stderr);
@@ -1692,7 +1715,7 @@ show_key()
 
     fprintf(stderr, "\
 \tkey is %s justified, %sreversed, %sinverted, %senhanced and ",
-	    key->just == JLEFT ? "left" : "right",
+	    key->just == GPKEY_LEFT ? "left" : "right",
 	    key->reverse ? "" : "not ",
 	    key->invert ? "" : "not ",
 	    key->enhanced ? "" : "not ");

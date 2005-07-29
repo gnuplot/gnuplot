@@ -1,5 +1,5 @@
 #
-# $Id: electron.dem,v 1.5 2003/10/28 05:35:54 sfeam Exp $
+# $Id: electron.dem,v 1.6 2004/02/20 17:51:46 broeker Exp $
 #
 # Electronics demo
 #
@@ -22,7 +22,7 @@ set xrange [0 : 0.75]
 set ylabel "Ic (collector current)"
 set yrange [0 : 0.005]
 set key box
-set key .2,.0045
+set key at .2,.0045
 set format y "%.4f"
 plot Ic(Vbe)
 set format "%g"

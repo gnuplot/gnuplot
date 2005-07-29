@@ -1,5 +1,6 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
+* NEW more versatile key placement and arrangement
 * NEW 'splot x*y with pm3d' no longer requires prior 'set pm3d'
 * NEW store a sequence of plots to an animated gif (requires libgd > 2.0.28)
 * NEW multi-byte font support in x11, control by the locale setting LC_CTYPE

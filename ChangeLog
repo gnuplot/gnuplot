@@ -1,3 +1,30 @@
+2005-07-29  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/gadgets.h src/graph3d.c src/graphics.c src/save.c src/set.c
+	src/show.c src/tables.c src/tables.h: Revamping of key placement
+	routines. Backward compatible with previous placement options but now
+	there are new, more flexible options.
+
+	  {{inside | outside} | {lmargin | rmargin | tmargin | bmargin}
+	    | {at <position>}}
+	  {left | right | center} {top | bottom | center}
+	  {vertical | horizontal} {Left | Right}
+
+	controlling key placement and key element arrangement.
+
+	* docs/gnuplot.doc: Updated documentation about new key options.
+	"at" for manual placement was included in the documentation even though
+	leaving "at" out will still work.
+
+	* demo/bivariat.dem demo/electron.dem tutorial/eg3.plt tutorial/eg6.plt
+	tutorial/tutorial.tex: Changed all uses of manual key placement to
+	include "at".
+
+	* demo/key.dem demo/all.dem: Added demo to show variety of key
+	placements, and added demo to the all demo file.
+
+	* NEWS:  Added note about more versatile key placement.
+
 2005-07-28  Ethan Merritt  <merritt@u.washington.edu
 
 	* src/term.c (term_start_multiplot mp_layout_size_and_offset):

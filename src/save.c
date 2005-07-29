@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.111 2005/07/26 18:15:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.112 2005/07/26 19:57:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -308,39 +308,65 @@ set y2data%s\n",
     if (!(key->visible))
 	fputs("unset key\n", fp);
     else {
-	switch (key->flag) {
-	case KEY_AUTO_PLACEMENT:
-	    fputs("set key", fp);
-	    switch (key->hpos) {
-	    case TRIGHT:
-		fputs(" right", fp);
+	fputs("set key ", fp);
+	switch (key->region) {
+	case GPKEY_AUTO_INTERIOR_LRTBC:
+	    fputs("inside", fp);
+	    break;
+	case GPKEY_AUTO_EXTERIOR_LRTBC:
+	    fputs("outside", fp);
+	    break;
+	case GPKEY_AUTO_EXTERIOR_MARGIN:
+	    switch (key->margin) {
+	    case GPKEY_TMARGIN:
+		fputs("tmargin", fp);
 		break;
-	    case TLEFT:
-		fputs(" left", fp);
+	    case GPKEY_BMARGIN:
+		fputs("bmargin", fp);
 		break;
-	    case TOUT:
-		fputs(" out", fp);
+	    case GPKEY_LMARGIN:
+		fputs("lmargin", fp);
 		break;
-	    }
-	    switch (key->vpos) {
-	    case TTOP:
-		fputs(" top", fp);
-		break;
-	    case TBOTTOM:
-		fputs(" bottom", fp);
-		break;
-	    case TUNDER:
-		fputs(" below", fp);
+	    case GPKEY_RMARGIN:
+		fputs("rmargin", fp);
 		break;
 	    }
 	    break;
-	case KEY_USER_PLACEMENT:
-	    fputs("set key ", fp);
+	case GPKEY_USER_PLACEMENT:
 	    save_position(fp, &key->user_pos);
 	    break;
 	}
-	fprintf(fp, " %s %sreverse %sinvert %senhanced samplen %g spacing %g width %g height %g %s box",
-		key->just == JLEFT ? "Left" : "Right",
+	if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
+	      && (key->margin == GPKEY_LMARGIN || key->margin == GPKEY_RMARGIN))) {
+	    switch (key->hpos) {
+	    case RIGHT:
+		fputs(" right", fp);
+		break;
+	    case LEFT:
+		fputs(" left", fp);
+		break;
+	    case CENTRE:
+		fputs(" center", fp);
+		break;
+	    }
+	}
+	if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
+	      && (key->margin == GPKEY_TMARGIN || key->margin == GPKEY_BMARGIN))) {
+	    switch (key->vpos) {
+	    case JUST_TOP:
+		fputs(" top", fp);
+		break;
+	    case JUST_BOT:
+		fputs(" bottom", fp);
+		break;
+	    case JUST_CENTRE:
+		fputs(" center", fp);
+		break;
+	    }
+	}
+	fprintf(fp, " %s %s %sreverse %sinvert %senhanced samplen %g spacing %g width %g height %g %s box",
+		key->stack_dir == GPKEY_VERTICAL ? "vertical" : "horizontal",
+		key->just == GPKEY_LEFT ? "Left" : "Right",
 		key->reverse ? "" : "no",
 		key->invert ? "" : "no",
 		key->enhanced ? "" : "no",
