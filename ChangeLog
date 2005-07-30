@@ -1,3 +1,9 @@
+2005-07-30  Ethan Merritt  <merritt@u.washington.edu
+
+	* src/save.c (save_position and its callers): Move printout of the
+	"offset" keyword into shared routine save_position().  That way we
+	can efficiently skip the whole thing if the offset is zero.
+
 2005-07-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/pm3d.dem: Added missing text for a "pause -1".

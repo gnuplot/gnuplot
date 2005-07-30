@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.112 2005/07/26 19:57:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.113 2005/07/29 07:54:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -59,7 +59,7 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.112 2005/07/26 19:57:29 sfe
 static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
 static void save_tics __PROTO((FILE *, AXIS_INDEX));
-static void save_position __PROTO((FILE *, struct position *));
+static void save_position __PROTO((FILE *, struct position *, TBOOLEAN offset));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
 
@@ -333,7 +333,7 @@ set y2data%s\n",
 	    }
 	    break;
 	case GPKEY_USER_PLACEMENT:
-	    save_position(fp, &key->user_pos);
+	    save_position(fp, &key->user_pos, FALSE);
 	    break;
 	}
 	if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
@@ -384,7 +384,7 @@ set y2data%s\n",
 	fprintf(fp, "set label %d \"%s\" at ",
 		this_label->tag,
 		conv_text(this_label->text));
-	save_position(fp, &this_label->place);
+	save_position(fp, &this_label->place, FALSE);
 
 	switch (this_label->pos) {
 	case LEFT:
@@ -411,17 +411,16 @@ set y2data%s\n",
 	    fprintf(fp, " point");
 	    save_linetype(fp, &(this_label->lp_properties), TRUE);
 	}
-	fprintf(fp," offset ");
-	save_position(fp, &this_label->offset);
+	save_position(fp, &this_label->offset, TRUE);
 	fputc('\n', fp);
     }
     fputs("unset arrow\n", fp);
     for (this_arrow = first_arrow; this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
 	fprintf(fp, "set arrow %d from ", this_arrow->tag);
-	save_position(fp, &this_arrow->start);
+	save_position(fp, &this_arrow->start, FALSE);
 	fputs(this_arrow->relative ? " rto " : " to ", fp);
-	save_position(fp, &this_arrow->end);
+	save_position(fp, &this_arrow->end, FALSE);
 	fprintf(fp, " %s %s %s",
 		arrow_head_names[this_arrow->arrow_properties.head],
 		(this_arrow->arrow_properties.layer==0) ? "back" : "front",
@@ -483,8 +482,8 @@ set y2data%s\n",
 	case HT_STACKED_IN_TOWERS:
 	    fprintf(fp,"columnstacked "); break;
     }
-    fprintf(fp,"title offset ");
-    save_position(fp, &histogram_opts.title.offset);
+    fprintf(fp,"title ");
+    save_position(fp, &histogram_opts.title.offset, TRUE);
     fprintf(fp, "\n");
 #endif
 
@@ -686,9 +685,9 @@ set ticscale %g %g\n",
 
 #define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)		\
     {								\
-	fprintf(fp, "set %s%s \"%s\" offset ",			\
+	fprintf(fp, "set %s%s \"%s\" ",			\
 		name, suffix, conv_text(lab.text));		\
-        save_position(fp, &(lab.offset));			\
+        save_position(fp, &(lab.offset), TRUE);			\
 	fprintf(fp, " font \"%s\"", conv_text(lab.font));	\
 	save_textcolor(fp, &(lab.textcolor));			\
 	fprintf(fp, "%s\n", (lab.noenhanced)?" noenhanced":"");	\
@@ -701,8 +700,7 @@ set ticscale %g %g\n",
 	    "timestamp", conv_text(timelabel.text),
 	    (timelabel_bottom ? "bottom" : "top"),
 	    (timelabel_rotate ? "" : "no"));
-    fprintf(fp, "offset ");
-    save_position(fp, &(timelabel.offset));
+    save_position(fp, &(timelabel.offset), TRUE);
     fprintf(fp, " \"%s\"\n", conv_text(timelabel.font));
 
     save_range(fp, R_AXIS);
@@ -899,8 +897,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	    axis_array[axis].tic_rotate ? "rotate" : "norotate");
     if (axis_array[axis].tic_rotate)
     	fprintf(fp,"by %d ",axis_array[axis].tic_rotate);
-    fprintf(fp," offset ");
-    save_position(fp, &axis_array[axis].ticdef.offset);
+    save_position(fp, &axis_array[axis].ticdef.offset, TRUE);
     fprintf(fp," ");
     switch (axis_array[axis].ticdef.type) {
     case TIC_COMPUTED:{
@@ -959,13 +956,20 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 }
 
 static void
-save_position(FILE *fp, struct position *pos)
+save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 {
     static const char *msg[] = { "first ", "second ", "graph ", "screen ",
 				 "character "};
  
     assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
 	   character == 4);
+
+    if (offset) {
+	if (pos->x != 0 || pos->y != 0 || pos->z != 0)
+	    fprintf(fp, "offset ");
+	else
+	    return;
+    }
 
     fprintf(fp, "%s%g, %s%g, %s%g",
 	    pos->scalex == first_axes ? "" : msg[pos->scalex], pos->x,
