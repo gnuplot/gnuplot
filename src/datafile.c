@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.87 2005/07/26 04:24:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.88 2005/07/31 04:20:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1175,6 +1175,11 @@ df_open(const char *cmd_filename, int max_using)
         if (almost_equals(c_token, "t$itle")) {
             c_token++;
             if (almost_equals(c_token, "col$umn")) {
+#ifdef EAM_HISTOGRAMS
+                if (df_current_plot && df_current_plot->plot_style == HISTOGRAMS)
+                    column_for_key_title = use_spec[0].column;
+		else
+#endif
                 if (df_no_use_specs == 1)
                     column_for_key_title = use_spec[0].column;
                 else
@@ -1182,10 +1187,9 @@ df_open(const char *cmd_filename, int max_using)
                 c_token++;
             } else if (!END_OF_COMMAND && isanumber(c_token)) {
                 struct value a;
-                
                 column_for_key_title = (int)real(const_express(&a));
             } else
-                    c_token--;
+                c_token--;
             break;
         }
 #endif
@@ -1203,6 +1207,11 @@ df_open(const char *cmd_filename, int max_using)
         legend_key *key = &keyT;
         
         if (key->auto_titles == COLUMNHEAD_KEYTITLES) {
+#ifdef EAM_HISTOGRAMS
+            if (df_current_plot && df_current_plot->plot_style == HISTOGRAMS)
+                column_for_key_title = use_spec[0].column;
+	    else
+#endif
             if (df_no_use_specs == 1)
                 column_for_key_title = use_spec[0].column;
             else

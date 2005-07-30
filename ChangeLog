@@ -12,6 +12,10 @@
 	corresponding to the old sscanf() input code.  This makes is easy if
 	someone wants to compare new and old code paths.
 
+	* src/datafile.c (df_open): Fix mis-match of column header to
+	column values in the case of `set style histogram errorbars` with
+	`set key autotitle columnheader`.
+
 2005-07-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/pm3d.dem: Added missing text for a "pause -1".
