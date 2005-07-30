@@ -1,3 +1,7 @@
+2005-07-30  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.mgw: Have HAVE_ERF, HAVE_ERFC for MingW >= 3.0.
+
 2005-07-30  Ethan Merritt  <merritt@u.washington.edu
 
 	* src/save.c (save_position and its callers): Move printout of the
