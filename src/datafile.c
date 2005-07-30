@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.86 2005/07/25 17:32:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.87 2005/07/26 04:24:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -742,6 +742,10 @@ df_tokenise(char *s)
                     )
                 ) {
 
+#if (0)
+		/* This was the [slow] code used through version 4.0 */
+		count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
+#else
 		/* Use strtod() because
 		 *  - it is faster than sscanf()
 		 *  - sscanf(... %n ...) may not be portable
@@ -752,7 +756,7 @@ df_tokenise(char *s)
 		 df_column[df_no_cols].datum = gp_strtod(s, &next);
 		 used = next - s;
 		 count = (used) ? 1 : 0;
-
+#endif
             } else {
                 /* skip any space at start of column */
                 /* HBB tells me that the cast must be to
