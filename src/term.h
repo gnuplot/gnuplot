@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.32 2005/07/18 18:24:00 sfeam Exp $
+ * $Id: term.h,v 1.33 2005/07/18 19:27:32 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -70,13 +70,17 @@
  */
 #ifdef SHORT_TERMLIST
 # include "dumb.trm"		/* dumb terminal */
-#ifdef POSTSCRIPT_DRIVER
-# include "post.trm"		/* postscript */
-#endif
 
-#ifdef GP_ENH_EST
-# include "estimate.trm"	/* used for enhanced text processing */
-#endif
+# ifdef GP_ENH_EST
+#  include "estimate.trm"	/* used for enhanced text processing */
+# endif
+
+# ifdef POSTSCRIPT_DRIVER
+#  ifdef  PSLATEX_DRIVER
+#   undef PSLATEX_DRIVER
+#  endif
+#  include "post.trm"		/* postscript */
+# endif
 
 # ifdef X11
 #  include "x11.trm"		/* X Window system */
