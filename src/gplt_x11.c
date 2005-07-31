@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.138 2005/05/25 12:15:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.139 2005/07/14 23:10:38 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -181,7 +181,6 @@ Error. Incompatible options.
 #  define INCL_DOSPROCESS
 #  define INCL_DOSSEMAPHORES
 #  include <os2.h>
-#  include "os2/dialogs.h"
 # endif
 # include "gpexecute.h"
 # include "mouse.h"
