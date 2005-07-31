@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.72 2004/08/25 22:33:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.73 2005/06/15 09:51:26 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -64,6 +64,11 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.72 2004/08/25 22:33:16 sfea
 
 #ifdef USE_MOUSE
 # include "mouse.h" /* for mouse_setting */
+# include "gpexecute.h"
+#endif
+
+/* on OS/2 this is needed even without USE_MOUSE */
+#if defined(OS2_IPC) && !defined(USE_MOUSE)
 # include "gpexecute.h"
 #endif
 
