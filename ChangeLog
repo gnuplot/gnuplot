@@ -1,3 +1,16 @@
+2005-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/show.c (show_version): Correct spelling error HIDDEN3D_GRDBOX =>
+	HIDDEN3D_GRIDBOX.
+
+	* src/term.h: Fix compilation with SHORT_TERMLIST.
+
+	* src/gplt_x11.c: Remove reference to os2/dialogs.h.
+
+	* src/mouse.c: Use OS/2 message definition file os2/pm_msgs.h.
+
+	* config/makefile.os2: Fix build of gplt_x11.exe on OS/2.
+
 2005-07-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.mgw: Have HAVE_ERF, HAVE_ERFC for MingW >= 3.0.
