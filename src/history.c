@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.15 2005/04/26 14:07:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.16 2005/05/20 13:47:47 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -42,14 +42,6 @@ static char *RCSid() { return RCSid("$Id: history.c,v 1.15 2005/04/26 14:07:08 b
 #include "util.h"
 
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE)
-
-/*
- *   In add_history(), do not store duplicated entries:
- *     Petr Mikulik
- *
- */
-
-/* history code from readline.c by Petr Mikulik (?) */
 
 struct hist *history = NULL;     /* no history yet */
 struct hist *cur_entry = NULL;

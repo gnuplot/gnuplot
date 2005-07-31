@@ -1,3 +1,7 @@
+2005-07-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/history.c: Removed old comments.
+
 2005-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/show.c (show_version): Correct spelling error HIDDEN3D_GRDBOX =>
