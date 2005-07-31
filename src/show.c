@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.157 2005/07/25 17:32:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.158 2005/07/29 07:54:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1022,7 +1022,7 @@ show_version(FILE *fp)
 		"+HIDDEN3D_QUADTREE   "
 #else
 # ifdef HIDDEN3D_GRIDBOX
-		"+HIDDEN3D_GRDBOX   "
+		"+HIDDEN3D_GRIDBOX   "
 # endif
 #endif
 		"";
