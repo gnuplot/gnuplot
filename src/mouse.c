@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.71 2005/04/22 21:40:37 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.72 2005/06/02 17:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -71,6 +71,10 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.71 2005/04/22 21:40:37 bro
 
 #ifdef _Windows
 # include "win/winmain.h"
+#endif
+
+#ifdef OS2
+#include "os2/pm_msgs.h"
 #endif
 
 /********************** variables ***********************************************************/
@@ -2391,7 +2395,7 @@ send_gpPMmenu(FILE * PM_pipe)
 	    gpPMmenu.where_zoom_queue |= 4;
     }
     gpPMmenu.polar_distance = mouse_setting.polardistance;
-    putc('#', PM_pipe);
+    putc(SET_MENU, PM_pipe);
     fwrite(&gpPMmenu, sizeof(gpPMmenu), 1, PM_pipe);
 }
 
