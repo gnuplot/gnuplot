@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.45 2005/07/15 17:02:49 broeker Exp $
+ * $Id: term_api.h,v 1.46 2005/07/23 04:08:35 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -284,7 +284,6 @@ enum { IPC_BACK_UNUSABLE = -2, IPC_BACK_CLOSED = -1 };
 /* HBB 20020225: currently not used anywhere outside term.c --> make
  * it static */
 /* extern int ipc_back_fd; */
-extern int isatty_state;
 
 # endif /* PIPE_IPC */
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.144 2005/06/03 05:11:55 sfeam Exp $
+ * $Id: x11.trm,v 1.145 2005/06/29 22:31:15 sfeam Exp $
  *
  */
 
@@ -754,7 +754,7 @@ X11_init()
 # ifdef PIPE_IPC
 	int fdes_back[2];
 
-#define X11_ALLOW_EVENTS (mouse_setting.on || isatty_state)
+#define X11_ALLOW_EVENTS (mouse_setting.on)
 	if (X11_ALLOW_EVENTS) {
 	    if (pipe(fdes_back))
 		perror("pipe() failed:");

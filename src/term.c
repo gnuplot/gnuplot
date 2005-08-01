@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.116 2005/07/24 00:28:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.117 2005/07/28 16:50:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -165,7 +165,6 @@ const char *arrow_head_names[3] = {"nohead", "head", "heads"};
 /* HBB 20020225: currently not used anywhere outside term.c --> make
  * it static */
 static SELECT_TYPE_ARG1 ipc_back_fd = IPC_BACK_CLOSED;
-int isatty_state = 1;
 #endif
 
 /* Internal variables */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.73 2005/06/15 09:51:26 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.74 2005/07/31 11:47:13 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -458,16 +458,6 @@ main(int argc, char **argv)
     interactive = TRUE;
 # else
     interactive = isatty(fileno(stdin));
-#ifdef PIPE_IPC
-    /* isatty_state is set here and nowhere else! (used in term/x11.trm) */
-    isatty_state = interactive;
-    if (!isatty_state) {
-	/* stdin is not from a tty --> Turn mouse off.
-	 * can be turned on again, e.g. if the user
-	 * wants to write on a pipe to gnuplot */
-	mouse_setting.on = 0;
-    }
-#endif
 # endif
 #endif /* !AMIGA_SC_6_1 */
 
