@@ -1,3 +1,7 @@
+2005-08-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.mgw: Some more #(un)define for MingW >= 3.0.
+
 2005-08-01  Ethan Merritt  <merritt@u.washington.edu
 
 	* src/save.c (save_position): OK, so maybe we have to print out
