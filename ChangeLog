@@ -1,3 +1,8 @@
+2005-08-01  Ethan Merritt  <merritt@u.washington.edu
+
+	* src/save.c (save_position): OK, so maybe we have to print out
+	the full "offset ...." even if it specifies zero offset.
+
 2005-07-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/history.c: Removed old comments.
