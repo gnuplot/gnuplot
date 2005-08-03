@@ -1,5 +1,9 @@
 2005-08-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* config/makefile.nt: Introduce variable OPTIONS for compile time
+	switches like PM3D, USE_MOUSE etc. This makes addition of options
+	easier.
+
 	* src/win/winmain.c src/win/wcommon.h: Add new function GetDllVersion()
 	which can determine the version of windows's shell and common control
 	libraries. It is only included if WANT_GETDLLVERSION is defined.

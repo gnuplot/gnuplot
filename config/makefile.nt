@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.12 2003/04/04 14:30:38 broeker Exp $
+# $Id: makefile.nt,v 1.13 2004/02/13 12:48:30 broeker Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -44,7 +44,8 @@ CC = cl /c
 LD = link
 
 # compiler flags
-CFLAGS = /G5 /O2 /MT /I$(TOP) /nologo /D_Windows /DHAVE_CONFIG_H /D__MSC__ /DUSE_MOUSE /DPM3D /DHELPFILE=\"$(HELPFILE)\" /DHAVE_LIBPNG /DHAVE_LIBPDF
+OPTIONS = /DUSE_MOUSE /DPM3D 
+CFLAGS = /G5 /O2 /MT /I$(TOP) /nologo /D_Windows /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" /DHAVE_LIBPNG /DHAVE_LIBPDF $(OPTIONS)
 
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = $(PROCESSOR_ARCHITECTURE)
