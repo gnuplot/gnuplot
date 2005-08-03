@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wprinter.c,v 1.3 2004/04/13 17:24:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wprinter.c,v 1.4 2004/07/01 17:10:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wprinter.c */
@@ -61,7 +61,7 @@ static char *RCSid() { return RCSid("$Id: wprinter.c,v 1.3 2004/04/13 17:24:14 b
 #include "wresourc.h"
 #include "wcommon.h"
 
-LPPRINT prlist = NULL;
+GP_LPPRINT prlist = NULL;
 
 BOOL CALLBACK WINEXPORT PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
 
@@ -69,7 +69,7 @@ BOOL CALLBACK WINEXPORT
 PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 {
     char buf[8];
-    LPPRINT lpr = (LPPRINT)GetWindowLong(GetParent(hdlg), 4);
+    GP_LPPRINT lpr = (GP_LPPRINT)GetWindowLong(GetParent(hdlg), 4);
 
     switch (wmsg) {
     case WM_INITDIALOG:
@@ -145,9 +145,9 @@ PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
     DLGPROC lpfnPrintSizeDlgProc;
 #endif
     BOOL status = FALSE;
-    PRINT pr;
+    GP_PRINT pr;
 
-    SetWindowLong(hwnd, 4, (LONG)((LPPRINT)&pr));
+    SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
     pr.poff.x = 0;
     pr.poff.y = 0;
     pr.psize.x = GetDeviceCaps(printer, HORZSIZE);
@@ -193,18 +193,18 @@ PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
 /* Win32 doesn't support OpenJob() etc. so we must use some old code
  * which attempts to sneak the output through a Windows printer driver */
 void
-PrintRegister(LPPRINT lpr)
+PrintRegister(GP_LPPRINT lpr)
 {
-    LPPRINT next;
+    GP_LPPRINT next;
     next = prlist;
     prlist = lpr;
     lpr->next = next;
 }
 
-LPPRINT
+GP_LPPRINT
 PrintFind(HDC hdc)
 {
-    LPPRINT this;
+    GP_LPPRINT this;
     this = prlist;
     while (this && (this->hdcPrn!=hdc)) {
 	this = this->next;
@@ -213,10 +213,10 @@ PrintFind(HDC hdc)
 }
 
 void
-PrintUnregister(LPPRINT lpr)
+PrintUnregister(GP_LPPRINT lpr)
 {
-    LPPRINT this, prev;
-    prev = (LPPRINT)NULL;
+    GP_LPPRINT this, prev;
+    prev = (GP_LPPRINT)NULL;
     this = prlist;
     while (this && (this!=lpr)) {
 	prev = this;
@@ -236,8 +236,8 @@ PrintUnregister(LPPRINT lpr)
 BOOL CALLBACK WINEXPORT
 PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    LPPRINT lpr;
-    lpr = (LPPRINT)GetWindowLong(GetParent(hDlg), 4);
+    GP_LPPRINT lpr;
+    lpr = (GP_LPPRINT)GetWindowLong(GetParent(hDlg), 4);
 
     switch(message) {
     case WM_INITDIALOG:
@@ -260,7 +260,7 @@ BOOL CALLBACK WINEXPORT
 PrintAbortProc(HDC hdcPrn, int code)
 {
     MSG msg;
-    LPPRINT lpr;
+    GP_LPPRINT lpr;
     lpr = PrintFind(hdcPrn);
 
     while (!lpr->bUserAbort && PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
@@ -279,7 +279,7 @@ DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
 {
     HDC printer;
     PRINTDLG pd;
-    PRINT pr;
+    GP_PRINT pr;
     DOCINFO di;
     char *buf;
     WORD *bufcount;
@@ -307,8 +307,8 @@ DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
 	printer = pd.hDC;
 	if (printer != (HDC)NULL) {
 	    pr.hdcPrn = printer;
-	    SetWindowLong(hwnd, 4, (LONG)((LPPRINT)&pr));
-	    PrintRegister((LPPRINT)&pr);
+	    SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
+	    PrintRegister((GP_LPPRINT)&pr);
 	    if ( (buf = malloc(4096+2)) != (char *)NULL ) {
 	    	bufcount = (WORD *)buf;
 		EnableWindow(hwnd,FALSE);
@@ -346,7 +346,7 @@ DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
 	    }
 	    DeleteDC(printer);
 	    SetWindowLong(hwnd, 4, (LONG)(0L));
-	    PrintUnregister((LPPRINT)&pr);
+	    PrintUnregister((GP_LPPRINT)&pr);
 	}
     }
     fclose(f);

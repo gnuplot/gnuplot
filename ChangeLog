@@ -1,3 +1,9 @@
+2005-08-03  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wprinter.c src/win/wgraph.c src/win/wgnuplib.h
+	src/win/wcommon.h: Rename struct PRINT to GP_PRINT due to name
+	collision with windows shlobj.h header file.
+
 2005-08-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.mgw: Some more #(un)define for MingW >= 3.0.

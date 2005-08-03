@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.18 2005/01/27 23:21:12 mikulik Exp $
+ * $Id: wgnuplib.h,v 1.19 2005/04/22 21:40:38 broeker Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -106,6 +106,7 @@ BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 /* wprinter.c - windows printer routines */
 void WDPROC DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName);
 
+
 typedef struct tagPRINT {
 	HDC		hdcPrn;
 	HWND	hDlgPrint;
@@ -114,8 +115,9 @@ typedef struct tagPRINT {
 	POINT	psize;
 	POINT	poff;
 	struct tagPRINT FAR *next;
-} PRINT;
-typedef PRINT FAR*  LPPRINT;
+} GP_PRINT;
+typedef GP_PRINT FAR*  GP_LPPRINT;
+
 
 /* ================================== */
 /* wpause.c - pause window structure */
@@ -169,7 +171,7 @@ typedef MW FAR * LPMW;
 #define MAXFONTNAME 80
 typedef struct tagTW
 {
-	LPPRINT	lpr;			/* must be first */
+	GP_LPPRINT	lpr;			/* must be first */
 	HINSTANCE hInstance;		/* required */
 	HINSTANCE hPrevInstance;	/* required */
 	LPSTR	Title;			/* required */
@@ -300,7 +302,7 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_fillstyle 42		/* NOTE HBB 20010916: used #if _FILLEDBOXES */
 
 typedef struct tagGW {
-	LPPRINT	lpr;		/* must be first */
+	GP_LPPRINT	lpr;		/* must be first */
 	HINSTANCE hInstance;	/* required */
 	HINSTANCE hPrevInstance;	/* required */
 	LPSTR	Title;		/* required */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.41 2005/03/26 22:06:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.42 2005/04/26 14:07:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1287,7 +1287,7 @@ CopyPrint(LPGW lpgw)
 	PRINTDLG pd;
 	HWND hwnd;
 	RECT rect;
-	PRINT pr;
+	GP_PRINT pr;
 
 	hwnd = lpgw->hWndGraph;
 
@@ -1308,9 +1308,9 @@ CopyPrint(LPGW lpgw)
 	}
 
 	pr.hdcPrn = printer;
-	SetWindowLong(hwnd, 4, (LONG)((LPPRINT)&pr));
+	SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
 #ifdef WIN32
-	PrintRegister((LPPRINT)&pr);
+	PrintRegister((GP_LPPRINT)&pr);
 #endif
 
 	EnableWindow(hwnd,FALSE);
@@ -1367,7 +1367,7 @@ CopyPrint(LPGW lpgw)
 	DeleteDC(printer);
 	SetWindowLong(hwnd, 4, (LONG)(0L));
 #ifdef WIN32
-	PrintUnregister((LPPRINT)&pr);
+	PrintUnregister((GP_LPPRINT)&pr);
 #endif /* WIN32 */
 	/* make certain that the screen pen set is restored */
 	SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);

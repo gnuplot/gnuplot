@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.3 2004/04/13 17:24:06 broeker Exp $
+ * $Id: wcommon.h,v 1.4 2004/07/01 17:10:10 broeker Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -80,8 +80,8 @@ void CloseMacros(LPTW lptw);
 
 /* wprinter.c - Printer setup and dump */
 BOOL PrintSize(HDC printer, HWND hwnd, LPRECT lprect);
-void PrintRegister(LPPRINT lpr);
-void PrintUnregister(LPPRINT lpr);
+void PrintRegister(GP_LPPRINT lpr);
+void PrintUnregister(GP_LPPRINT lpr);
 #if WINVER >= 0x030a
 BOOL CALLBACK WINEXPORT PrintAbortProc(HDC hdcPrn, int code);
 BOOL CALLBACK WINEXPORT PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
