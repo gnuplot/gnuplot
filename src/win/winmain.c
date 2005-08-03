@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.15 2004/07/01 17:10:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.16 2005/04/22 21:40:38 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -69,11 +69,19 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.15 2004/07/01 17:10:10 b
 # define mktemp _mktemp
 #endif
 #include <io.h>
+#if defined(WANT_GETDLLVERSION)
+# if defined(__MINGW__)
+#  define _WIN32_IE 0x0400
+# endif 
+# include <shlobj.h>
+# include <shlwapi.h>
+#endif
 #include "plot.h"
 #include "setshow.h"
 #include "version.h"
 #include "wgnuplib.h"
 #include "wtext.h"
+#include "wcommon.h"
 
 /* limits */
 #define MAXSTR 255
@@ -163,6 +171,51 @@ ShutDown()
 	exit(0);
 	return 0;
 }
+
+
+#ifdef WANT_GETDLLVERSION
+
+/* This function can be used to retrieve version information from Window's Shell
+   and common control libraries such (Comctl32.dll, Shell32.dll, and Shlwapi.dll)
+   The code was copied from the MSDN article "Shell and Common Controls Versions" 
+*/
+DWORD
+GetDllVersion(LPCTSTR lpszDllName)
+{
+    HINSTANCE hinstDll;
+    DWORD dwVersion = 0;
+
+    /* For security purposes, LoadLibrary should be provided with a 
+       fully-qualified path to the DLL. The lpszDllName variable should be
+       tested to ensure that it is a fully qualified path before it is used. */
+    hinstDll = LoadLibrary(lpszDllName);
+	
+    if (hinstDll) {
+        DLLGETVERSIONPROC pDllGetVersion;
+        pDllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(hinstDll, 
+                          "DllGetVersion");
+
+        /* Because some DLLs might not implement this function, you
+        must test for it explicitly. Depending on the particular 
+        DLL, the lack of a DllGetVersion function can be a useful
+        indicator of the version. */
+        if (pDllGetVersion) {
+            DLLVERSIONINFO dvi;
+            HRESULT hr;
+
+            ZeroMemory(&dvi, sizeof(dvi));
+            dvi.cbSize = sizeof(dvi);
+            hr = (*pDllGetVersion)(&dvi);
+            if (SUCCEEDED(hr))
+               dwVersion = PACKVERSION(dvi.dwMajorVersion, dvi.dwMinorVersion);
+        }
+        FreeLibrary(hinstDll);
+    }
+    return dwVersion;
+}
+
+#endif /* WANT_GETDLLVERSION */
+
 
 int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		LPSTR lpszCmdLine, int nCmdShow)

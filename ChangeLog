@@ -1,5 +1,9 @@
 2005-08-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/winmain.c src/win/wcommon.h: Add new function GetDllVersion()
+	which can determine the version of windows's shell and common control
+	libraries. It is only included if WANT_GETDLLVERSION is defined.
+
 	* src/win/wprinter.c src/win/wgraph.c src/win/wgnuplib.h
 	src/win/wcommon.h: Rename struct PRINT to GP_PRINT due to name
 	collision with windows shlobj.h header file.
