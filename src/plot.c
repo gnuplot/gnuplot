@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.74 2005/07/31 11:47:13 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.75 2005/08/01 09:00:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -169,7 +169,6 @@ static JMP_BUF command_line_env;
 #endif
 
 static void load_rcfile __PROTO((void));
-static void get_user_env __PROTO((void));
 static RETSIGTYPE inter __PROTO((int anint));
 static void init_memory __PROTO((void));
 
@@ -714,7 +713,7 @@ load_rcfile()
     free(rcfile);
 }
 
-static void
+void
 get_user_env()
 {
     if (user_homedir == NULL) {
@@ -722,6 +721,7 @@ get_user_env()
 
 	if ((env_home = getenv(HOME))
 #ifdef WIN32
+	    || (env_home = getenv("APPDATA"))
 	    || (env_home = getenv("USERPROFILE"))
 #endif
 #ifndef VMS

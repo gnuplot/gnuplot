@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.5 2005/08/03 16:55:42 mikulik Exp $
+ * $Id: wcommon.h,v 1.6 2005/08/03 16:58:32 mikulik Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -47,6 +47,20 @@
 #endif
 #endif
 /* this file contains items that are internal to wgnuplot.dll */
+
+#ifdef WIN32
+
+   /* Save wgnuplot.ini in user's appdata directory instead
+      of current directory on Win32. */
+# define INIFILE_IN_APPDATA
+
+#endif
+  
+/* GetDllVersion is required for INIFILE_IN_APPDATA
+*/
+#if defined(INIFILE_IN_APPDATA)
+# define WANT_GETDLLVERSION
+#endif
 
 /* winmain.c */
 #ifdef WANT_GETDLLVERSION

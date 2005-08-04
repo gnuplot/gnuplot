@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.16 2005/04/22 21:40:38 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.17 2005/08/03 16:58:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -50,6 +50,9 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.16 2005/04/22 21:40:38 b
 /* and Russell Lang (rjl@monu1.cc.monash.edu.au) 30 Nov 1992          */
 /*								      */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 #define STRICT
 #include <windows.h>
 #include <windowsx.h>
@@ -69,19 +72,21 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.16 2005/04/22 21:40:38 b
 # define mktemp _mktemp
 #endif
 #include <io.h>
-#if defined(WANT_GETDLLVERSION)
-# if defined(__MINGW__)
-#  define _WIN32_IE 0x0400
-# endif 
-# include <shlobj.h>
-# include <shlwapi.h>
-#endif
 #include "plot.h"
 #include "setshow.h"
 #include "version.h"
 #include "wgnuplib.h"
 #include "wtext.h"
 #include "wcommon.h"
+
+/* WANT_GETDLLVERSION is defined in wcommon.h */
+#ifdef WANT_GETDLLVERSION 
+# ifdef __MINGW__
+#  define _WIN32_IE 0x0400
+# endif 
+# include <shlobj.h>
+# include <shlwapi.h>
+#endif
 
 /* limits */
 #define MAXSTR 255
@@ -276,7 +281,24 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	textwin.hPrevInstance = hPrevInstance;
 	textwin.nCmdShow = nCmdShow;
 	textwin.Title = "gnuplot";
+#if defined(INIFILE_IN_APPDATA) 
+# ifndef CSIDL_APPDATA 
+#  define CSIDL_APPDATA (0x001a)
+# endif
+	/* Make sure that SHGetSpecialFolderPath is supported. */
+	if (GetDllVersion(TEXT("shell32.dll")) >= PACKVERSION(4,71)) {
+	    textwin.IniFile = (char *)malloc(MAX_PATH);
+	    SHGetSpecialFolderPath( NULL, textwin.IniFile, CSIDL_APPDATA, FALSE );
+	    strncat( textwin.IniFile, "\\wgnuplot.ini", MAX_PATH-1 );
+	} 
+	else {
+	    get_user_env(); /* this hasn't been called yet */
+	    textwin.IniFile = gp_strdup("~\\wgnuplot.ini");
+	    gp_expand_tilde(&(textwin.IniFile));
+	}
+#else
 	textwin.IniFile = "wgnuplot.ini";
+#endif
 	textwin.IniSection = "WGNUPLOT";
 	textwin.DragPre = "load '";
 	textwin.DragPost = "'\n";

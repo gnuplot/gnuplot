@@ -1,3 +1,15 @@
+2005-08-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	SF patch #[ 1233987 ] WIN32: save wgnuplot.ini to user's appdata dir
+
+	* src/plot.c src/plot.h src/win/winmain.c (WinMain): Change default
+	location of wgnuplot.ini to the user's APPDATA directory on Win32
+	platforms. This is necessary since the directory of the executable can
+	not be assumed to be writable.
+
+	* src/win/wcommon.h: Make the new behaviour the default by #defining
+	INIFILE_IN_APPDATA.
+
 2005-08-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/contour.c: CodeStyle cleanup (no superfluous pointer casts,
