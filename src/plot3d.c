@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.104 2005/07/12 03:37:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.105 2005/07/16 21:01:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -886,18 +886,12 @@ get_3ddata(struct surface_points *this_plot)
 #ifdef EAM_DATASTRINGS
 	    /* At this point we have stored the point coordinates. Now we need to copy */
 	    /* x,y,z into the text_label structure and add the actual text string.     */
-	    if (this_plot->plot_style == LABELPOINTS) {
-		if (df_tokens[3])
-		    store_label(this_plot->labels, cp, xdatum, df_tokens[3], color);
-		else
-		    this_plot->iso_crvs->points[xdatum].type = UNDEFINED;
-	    }
+	    if (this_plot->plot_style == LABELPOINTS)
+		store_label(this_plot->labels, cp, xdatum, df_tokens[3], color);
 #endif
 
-	    /* some may complain, but I regard this as the correct use
-	     * of goto
-	     */
 	come_here_if_undefined:
+	    /* some may complain, but I regard this as the correct use of goto */
 	    ++xdatum;
 	}			/* end of whileloop - end of surface */
 

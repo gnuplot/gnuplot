@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.110 2005/07/12 03:37:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.111 2005/07/16 21:01:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -589,14 +589,10 @@ get_data(struct curve_points *current_plot)
 		case LABELPOINTS:
 		    /* Load the coords just as we would have for a point plot */
 		    store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
-			      v[1], -1.0);
+				v[1], -1.0);
 		    /* Allocate and fill in a text_label structure to match it */
-		    if (df_tokens[2])
-			store_label(current_plot->labels,
-				  &(current_plot->points[i]), i, df_tokens[2],
-				  0.0);
-		    else
-			current_plot->points[i].type = UNDEFINED;
+		    store_label(current_plot->labels,
+				&(current_plot->points[i]), i, df_tokens[2], 0.0);
 		    i++;
 		    break;
 #endif
@@ -979,6 +975,10 @@ store_label(
     /* Check for optional (textcolor palette ...) */
     if (tl->textcolor.type == TC_Z)
 	tl->textcolor.value = colorval;
+
+    /* Check for null string (no label) */
+    if (!string)
+	string = "";
 
     textlen = 0;
     /* FIXME EAM - this code is ugly but seems to work */
