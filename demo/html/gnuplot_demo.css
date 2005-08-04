@@ -15,6 +15,7 @@
  	border-left: 3%; border-right: 3%; 
         background-image: url(grid.jpeg);
       }
+
  P    { 
         margin-top:  0%; margin-bot:   0%;
         margin-left:  0%; 
@@ -22,8 +23,11 @@
       }
 
  H1   { text-align: center; text-decoration: underline; }
- H3   { color:#009900; margin-left: 3%; }
- H4   { color:#009900; margin-left: 0%; }
+ H3   { color:#009900; margin-left: 0%; }
+ H4   { color:#009900; margin-left: 0%; 
+ 	margin-top: 1em; margin-bottom: 0;
+ 	border-top: 0; border-bottom: 0;
+      }
  H5   { color:#006600; margin-left: 3%; font-size=+1; }
 
  DT   { 
@@ -46,8 +50,16 @@
 	font-size: 0.5em ;
 	}
 
- div.box	{ border: solid; border-width: thin; 
- 		  margin-top: 5; margin-bottom: 5; margin-right: 5%;
+ LI	{
+ 	font-size: 0.9em ;
+	text-indent: 1em ;
+ 	list-style-type: none;
+	}
+
+ div.box	{ border: none; border-width: thin; 
+ 		  margin-top: 5; margin-bottom: 5; 
+		  border-right: 3em;  border-left: -3em;
+		  background: #AADDFF;
 		}
  div.color1	{ border: none;  background: #AADDFF; padding: 0.5em; }
  div.footer	{ border: solid; border-width: thin; 

@@ -2,7 +2,8 @@
 
 	Move generation of html demo files into a separate subdirectory.
 
-	* demo/html/index.save demo/html/gnuplot.css: Template files for html.
+	* demo/html/index.save demo/html/gnuplot_demo.css:
+	Template files for html pages.
 
 	* demo/html/Makefile demo/html/webify.pl: Modify webify.pl to accept
 	the "set term" parameters from environmental variable DEMOTERM. Create

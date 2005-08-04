@@ -1,14 +1,13 @@
 all: html
 
+distclean: clean
 clean:
-	rm -f *.png *.gnu *.html
+	rm -f *.png *.gnu *.html *.dat epslatex* fit.log soundfit.par
 
 GNUPLOT_LIB = ..
 
 #
 # Auto-generation of html demo set.
-# If you want to use a stylesheet (gnuplot.css) you must copy it to this directory
-# before running webify.pl or make.
 #
 # Several of the demos need manual intervention:
 #	fontfile vector multiplt epslatex
