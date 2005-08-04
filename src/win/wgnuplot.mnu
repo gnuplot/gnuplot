@@ -13,7 +13,7 @@
 		load '[OPEN]load[EOS]*.dem[EOS]'{ENTER}
 	--
 	&Change Directory ...
-		cd '[INPUT]New directory?[EOS]'{ENTER}
+		cd '[DIRECTORY]New directory?[EOS]'{ENTER}
 	show Current &Directory
 		pwd{ENTER}
 	--
@@ -730,7 +730,7 @@ Fu&nctions
 		save '[SAVE]save[EOS]*.plt[EOS]'{ENTER}
 [Button]
 	ChDir
-		cd '[INPUT]New directory?[EOS]'{ENTER}
+		cd '[DIRECTORY]New directory?[EOS]'{ENTER}
 [Button]
 	Print
 		set terminal [INPUT]Terminal type?{ENTER}set output "PRN"{ENTER}replot{ENTER}set terminal win{ENTER}set output{ENTER}

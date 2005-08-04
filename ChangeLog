@@ -1,6 +1,19 @@
 2005-08-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	SF patch #[ 1233987 ] WIN32: save wgnuplot.ini to user's appdata dir
+	SF patch [1233984] Directory selection dialog for Win32
+
+	* src/win/wgnuplot.mnu src/win/wmenu.c: Add new directory selection
+	dialog to Win32 platform. If SHELL_DIR_DIALOG is defined the common
+	directory dialog of the windows shell is used. Otherwise a modified
+	version of the common file open dialog is used. The new code is only
+	active if WITH_ADV_DIR_DIALOG is defined.
+
+	* src/win/wcommon.h: Make the new directory dialog the default by
+	#defining WITH_ADV_DIR_DIALOG and SHELL_DIR_DIALOG.
+
+2005-08-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	SF patch [1233987] WIN32: save wgnuplot.ini to user's appdata dir
 
 	* src/plot.c src/plot.h src/win/winmain.c (WinMain): Change default
 	location of wgnuplot.ini to the user's APPDATA directory on Win32
@@ -151,7 +164,7 @@
 
 2005-07-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	SF patch #[ 1234634 ] OS/2: use generic enhanced text in pm terminal.
+	SF patch [1234634] OS/2: use generic enhanced text in pm terminal.
 
 	* config/config.os2 config/makefile.os2 src/os2/gclient.c
 	src/os2/gnupmdrv.c src/os2/gnupmdrv.h src/os2/pm_msgs.h term/pm.trm:
@@ -730,7 +743,7 @@
 
 2005-05-25  Daniel Sebald  <daniel.sebald@ieee.org>
 
-	SF Patch [ 1117060 ] Mod to post.trm for PostScript Level 1 images.
+	SF Patch [1117060] Mod to post.trm for PostScript Level 1 images.
 
 	* term/post.trm: New routine PS_encode_image(), new postscript variable
 	InterpretLevel1 and some other changes.
@@ -1282,7 +1295,7 @@
 
 2005-03-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* NEWS src/plot2d.c src/plot3d.c docs/gnuplot.doc: SF patch # 1098256
+	* NEWS src/plot2d.c src/plot3d.c docs/gnuplot.doc: SF patch #1098256
 	"Ignore title string after notitle":
 	Let the string in '{s}plot ... notitle "string"' be silently ignored.
 
@@ -1780,7 +1793,7 @@
 2005-01-11  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/src/set.c src/term.c src/unset.c term/post.h term/post.trm
-	term/pslatex.trm: SF patch # 1098256 "Introduce struct that takes all
+	term/pslatex.trm: SF patch #1098256 "Introduce struct that takes all
 	postscript terminal options". This patch introduces the struct
 	ps_params_t that takes all postscript terminal options, e.g., color,
 	blacktext, pslevel, rounded, fontsize, ... This is useful when
@@ -1815,7 +1828,7 @@
 	them is PostScript (for example pslatex and epslatex).
 	 
 	* src/color.c src/pm3d.c src/term.c src/term_api.h term/epslatex.trm
-	term/post.trm term/pslatex.trm: SF patch [ 1098249 ] "Rename
+	term/post.trm term/pslatex.trm: SF patch #1098249 "Rename
 	postscript_gpoutfile to gppsfile". This patch renames the handler
 	'FILE *postscript_gpoutfile' to 'gppsfile' since the old variable name
 	is too long for more often use.
@@ -2884,7 +2897,7 @@
 2004-09-17  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc src/misc.c: New automatic variable $# gets
-	expanded to number of arguments after "call <file>". SF patch 943749.
+	expanded to number of arguments after "call <file>". SF patch #943749.
 
 2004-09-16  Ethan Merritt  <merritt@u.washington.edu>
 

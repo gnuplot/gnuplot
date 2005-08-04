@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.6 2005/08/03 16:58:32 mikulik Exp $
+ * $Id: wcommon.h,v 1.7 2005/08/04 16:34:09 mikulik Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -54,11 +54,19 @@
       of current directory on Win32. */
 # define INIFILE_IN_APPDATA
 
+  /* Enable new directory dialogs on Win32 */
+# define WITH_ADV_DIR_DIALOG
+
+  /* Choose between the directory dialog of the windows shell and
+     a modified version of the "file open" dialog */
+# define SHELL_DIR_DIALOG 
+
 #endif
   
 /* GetDllVersion is required for INIFILE_IN_APPDATA
+   and WITH_ADV_DIR_DIALOG
 */
-#if defined(INIFILE_IN_APPDATA)
+#if defined(INIFILE_IN_APPDATA) || defined(WITH_ADV_DIR_DIALOG)
 # define WANT_GETDLLVERSION
 #endif
 
