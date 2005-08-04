@@ -1,3 +1,11 @@
+2005-08-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c(store_label get_data)  src/plot3d.c (get_3ddata):
+	For 'plot with labels', instead of treating a missing label as an
+	undefined point, treat it as a blank label. That allows putting a
+	point on the plot even if there is no label to go with it.
+	Bug #1251922.
+
 2005-08-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	SF patch [1233984] Directory selection dialog for Win32
@@ -48,7 +56,7 @@
 	* demo/multiplt.dem: Add a missing "pause -1" command so that the
 	webify script works properly.
 
-2004-08-03  Lars Hecking  <lhecking@users.sourceforge.net>
+2005-08-03  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* docs/Makefile.in: Update CLEANFILES and clean-generic.
 
