@@ -1,3 +1,13 @@
+2005-08-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/contour.c: CodeStyle cleanup (no superfluous pointer casts,
+	sensible indentation).
+	(contour): Logarithmize parameters of incremental
+	contour specification to imitate the way other ticks on log axes
+	behave.
+	(edge_struct, poly_struct, cntr_struct): Typedef'd these structs,
+	use typedef names all over the place to render source less wordy.
+
 2005-08-03  Ethan Merritt  <merritt@u.washington.edu
 
 	Move generation of html demo files into a separate subdirectory.

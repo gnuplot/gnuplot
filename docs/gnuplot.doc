@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.318 2005/07/29 07:54:32 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.319 2005/08/01 09:01:30 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5047,7 +5047,8 @@ C ... and restart the table:
  For `incremental`, contours are generated at values of z beginning at <start>
  and increasing by <increment>, until the number of contours is reached. <end>
  is used to determine the number of contour levels, which will be changed by
- any subsequent `set cntrparam levels <n>`.
+ any subsequent `set cntrparam levels <n>`.  If the z axis is logarithmic,
+ <increment> will be interpreted as a factor, just like in `set ztics`.
 
  If the command `set cntrparam` is given without any arguments specified,  the
  defaults are used: linear, 5 points, order 4, 5 auto levels.
