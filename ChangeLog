@@ -6,6 +6,10 @@
 	point on the plot even if there is no label to go with it.
 	Bug #1251922.
 
+	* src/datafile.c: Better fix for mis-match of column header to column
+	values in the case of `set style histogram errorbars` with
+	`set key autotitle columnheader`. Supersedes 2005-07-30 patch.
+
 2005-08-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	SF patch [1233984] Directory selection dialog for Win32

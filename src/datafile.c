@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.88 2005/07/31 04:20:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.89 2005/07/31 04:26:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -310,6 +310,7 @@ static char *df_stringexpression[MAXDATACOLS] = {NULL,NULL,NULL,NULL,NULL,NULL,N
 #endif
 #define NO_COLUMN_HEADER (-99)  /* some value that can never be a real column */
 static int column_for_key_title = NO_COLUMN_HEADER;
+static TBOOLEAN key_title_auto_col = FALSE;
 static char df_key_title[MAX_TOKEN_LENGTH];     /* filled in from <col> in 1st row by df_tokenise */
 #endif
 
@@ -650,8 +651,17 @@ df_tokenise(char *s)
 #ifdef EAM_DATASTRINGS
     int i;
 
-        for (i = 0; i<MAXDATACOLS; i++)
-            df_tokens[i] = NULL;
+    for (i = 0; i<MAXDATACOLS; i++)
+	df_tokens[i] = NULL;
+
+#ifdef EAM_HISTOGRAMS
+    /* Auto-titling of histograms is a bit tricky because the x coord did not come */
+    /* from an explicit input column. This means our previous guess of what column */
+    /* to take the title from was probably wrong.                                  */
+    if (key_title_auto_col && df_current_plot
+    &&  (df_current_plot->plot_style == HISTOGRAMS))
+	column_for_key_title = use_spec[0].column;
+#endif
 #endif
 
 
@@ -1062,6 +1072,7 @@ df_open(const char *cmd_filename, int max_using)
 
 #ifdef EAM_DATASTRINGS
     column_for_key_title = NO_COLUMN_HEADER;
+    key_title_auto_col = FALSE;
 #endif
     /*}}} */
 
@@ -1175,11 +1186,7 @@ df_open(const char *cmd_filename, int max_using)
         if (almost_equals(c_token, "t$itle")) {
             c_token++;
             if (almost_equals(c_token, "col$umn")) {
-#ifdef EAM_HISTOGRAMS
-                if (df_current_plot && df_current_plot->plot_style == HISTOGRAMS)
-                    column_for_key_title = use_spec[0].column;
-		else
-#endif
+		key_title_auto_col = TRUE;
                 if (df_no_use_specs == 1)
                     column_for_key_title = use_spec[0].column;
                 else
@@ -1207,11 +1214,7 @@ df_open(const char *cmd_filename, int max_using)
         legend_key *key = &keyT;
         
         if (key->auto_titles == COLUMNHEAD_KEYTITLES) {
-#ifdef EAM_HISTOGRAMS
-            if (df_current_plot && df_current_plot->plot_style == HISTOGRAMS)
-                column_for_key_title = use_spec[0].column;
-	    else
-#endif
+	    key_title_auto_col = TRUE;
             if (df_no_use_specs == 1)
                 column_for_key_title = use_spec[0].column;
             else
@@ -1805,6 +1808,7 @@ df_readascii(double v[], int max)
                      "df_readline: Found key title in col %d %s\n",
                      column_for_key_title, df_key_title));
             column_for_key_title = NO_COLUMN_HEADER;
+            key_title_auto_col = FALSE;
             return(DF_FOUND_KEY_TITLE);
         }
 #endif
