@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.139 2005/07/14 23:10:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.140 2005/07/31 08:42:31 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -4649,39 +4649,39 @@ static char *type[20];
 static XrmValue value;
 
 static XrmOptionDescRec options[] = {
-    {"-mono", ".mono", XrmoptionNoArg, (caddr_t) "on"},
-    {"-gray", ".gray", XrmoptionNoArg, (caddr_t) "on"},
-    {"-clear", ".clear", XrmoptionNoArg, (caddr_t) "on"},
-    {"-tvtwm", ".tvtwm", XrmoptionNoArg, (caddr_t) "on"},
-    {"-pointsize", ".pointsize", XrmoptionSepArg, (caddr_t) NULL},
-    {"-display", ".display", XrmoptionSepArg, (caddr_t) NULL},
-    {"-name", ".name", XrmoptionSepArg, (caddr_t) NULL},
-    {"-geometry", "*geometry", XrmoptionSepArg, (caddr_t) NULL},
-    {"-background", "*background", XrmoptionSepArg, (caddr_t) NULL},
-    {"-bg", "*background", XrmoptionSepArg, (caddr_t) NULL},
-    {"-foreground", "*foreground", XrmoptionSepArg, (caddr_t) NULL},
-    {"-fg", "*foreground", XrmoptionSepArg, (caddr_t) NULL},
-    {"-bordercolor", "*bordercolor", XrmoptionSepArg, (caddr_t) NULL},
-    {"-bd", "*bordercolor", XrmoptionSepArg, (caddr_t) NULL},
-    {"-borderwidth", ".borderwidth", XrmoptionSepArg, (caddr_t) NULL},
-    {"-bw", ".borderwidth", XrmoptionSepArg, (caddr_t) NULL},
-    {"-font", "*font", XrmoptionSepArg, (caddr_t) NULL},
-    {"-fn", "*font", XrmoptionSepArg, (caddr_t) NULL},
-    {"-reverse", "*reverseVideo", XrmoptionNoArg, (caddr_t) "on"},
-    {"-rv", "*reverseVideo", XrmoptionNoArg, (caddr_t) "on"},
-    {"+rv", "*reverseVideo", XrmoptionNoArg, (caddr_t) "off"},
-    {"-iconic", "*iconic", XrmoptionNoArg, (caddr_t) "on"},
-    {"-synchronous", "*synchronous", XrmoptionNoArg, (caddr_t) "on"},
-    {"-xnllanguage", "*xnllanguage", XrmoptionSepArg, (caddr_t) NULL},
-    {"-selectionTimeout", "*selectionTimeout", XrmoptionSepArg, (caddr_t) NULL},
-    {"-title", ".title", XrmoptionSepArg, (caddr_t) NULL},
-    {"-xrm", NULL, XrmoptionResArg, (caddr_t) NULL},
-    {"-raise", "*raise", XrmoptionNoArg, (caddr_t) "on"},
-    {"-noraise", "*raise", XrmoptionNoArg, (caddr_t) "off"},
-    {"-feedback", "*feedback", XrmoptionNoArg, (caddr_t) "on"},
-    {"-nofeedback", "*feedback", XrmoptionNoArg, (caddr_t) "off"},
-    {"-ctrlq", "*ctrlq", XrmoptionNoArg, (caddr_t) "on"},
-    {"-persist", "*persist", XrmoptionNoArg, (caddr_t) "on"}
+    {"-mono", ".mono", XrmoptionNoArg, (XPointer) "on"},
+    {"-gray", ".gray", XrmoptionNoArg, (XPointer) "on"},
+    {"-clear", ".clear", XrmoptionNoArg, (XPointer) "on"},
+    {"-tvtwm", ".tvtwm", XrmoptionNoArg, (XPointer) "on"},
+    {"-pointsize", ".pointsize", XrmoptionSepArg, (XPointer) NULL},
+    {"-display", ".display", XrmoptionSepArg, (XPointer) NULL},
+    {"-name", ".name", XrmoptionSepArg, (XPointer) NULL},
+    {"-geometry", "*geometry", XrmoptionSepArg, (XPointer) NULL},
+    {"-background", "*background", XrmoptionSepArg, (XPointer) NULL},
+    {"-bg", "*background", XrmoptionSepArg, (XPointer) NULL},
+    {"-foreground", "*foreground", XrmoptionSepArg, (XPointer) NULL},
+    {"-fg", "*foreground", XrmoptionSepArg, (XPointer) NULL},
+    {"-bordercolor", "*bordercolor", XrmoptionSepArg, (XPointer) NULL},
+    {"-bd", "*bordercolor", XrmoptionSepArg, (XPointer) NULL},
+    {"-borderwidth", ".borderwidth", XrmoptionSepArg, (XPointer) NULL},
+    {"-bw", ".borderwidth", XrmoptionSepArg, (XPointer) NULL},
+    {"-font", "*font", XrmoptionSepArg, (XPointer) NULL},
+    {"-fn", "*font", XrmoptionSepArg, (XPointer) NULL},
+    {"-reverse", "*reverseVideo", XrmoptionNoArg, (XPointer) "on"},
+    {"-rv", "*reverseVideo", XrmoptionNoArg, (XPointer) "on"},
+    {"+rv", "*reverseVideo", XrmoptionNoArg, (XPointer) "off"},
+    {"-iconic", "*iconic", XrmoptionNoArg, (XPointer) "on"},
+    {"-synchronous", "*synchronous", XrmoptionNoArg, (XPointer) "on"},
+    {"-xnllanguage", "*xnllanguage", XrmoptionSepArg, (XPointer) NULL},
+    {"-selectionTimeout", "*selectionTimeout", XrmoptionSepArg, (XPointer) NULL},
+    {"-title", ".title", XrmoptionSepArg, (XPointer) NULL},
+    {"-xrm", NULL, XrmoptionResArg, (XPointer) NULL},
+    {"-raise", "*raise", XrmoptionNoArg, (XPointer) "on"},
+    {"-noraise", "*raise", XrmoptionNoArg, (XPointer) "off"},
+    {"-feedback", "*feedback", XrmoptionNoArg, (XPointer) "on"},
+    {"-nofeedback", "*feedback", XrmoptionNoArg, (XPointer) "off"},
+    {"-ctrlq", "*ctrlq", XrmoptionNoArg, (XPointer) "on"},
+    {"-persist", "*persist", XrmoptionNoArg, (XPointer) "on"}
 };
 
 #define Nopt (sizeof(options) / sizeof(options[0]))

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.54 2005/01/08 15:37:21 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.55 2005/08/05 15:48:32 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -544,7 +544,6 @@ draw_color_smooth_box(int plot_mode)
 
 	/* now corrections for outer tics */
 	if (color_box.rotation == 'v') {
-	    //	    int len = (X_AXIS.tic_in ? -1 : 1) * X_AXIS.ticscale * (term->h_tic); /* positive for outer tics */
 	    int cblen = (CB_AXIS.tic_in ? -1 : 1) * CB_AXIS.ticscale * 
 		(term->h_tic); /* positive for outer tics */
 	    int ylen = (Y_AXIS.tic_in ? -1 : 1) * Y_AXIS.ticscale * 

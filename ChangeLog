@@ -4,6 +4,12 @@
 
 2005-08-05  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/color.c: Remove C++ style comments.
+
+	* src/gplt_x11.c: Replace non-standard type caddr_t with XPointer.
+
+2005-08-05  Ethan Merritt  <merritt@u.washington.edu>
+
 	* demo/starmap.dem: Change style slightly for use with webify.
 
 	* demo/html/index.save: Add tics demo.
