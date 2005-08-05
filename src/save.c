@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.114 2005/07/30 17:51:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.115 2005/08/02 05:08:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -639,13 +639,7 @@ set origin %g,%g\n",
     save_zeroaxis(fp, SECOND_X_AXIS);
     save_zeroaxis(fp, SECOND_Y_AXIS);
 
-    fprintf(fp, "\
-set tics %s\n\
-set ticslevel %g\n\
-set ticscale %g %g\n",
-	    (tic_in) ? "in" : "out",
-	    ticslevel,
-	    ticscale, miniticscale);
+    fprintf(fp, "set ticslevel %g\n", ticslevel);
 
 #define SAVE_MINI(axis)							\
     switch(axis_array[axis].minitics & TICS_MASK) {			\
@@ -953,6 +947,15 @@ save_tics(FILE *fp, AXIS_INDEX axis)
     if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT) {
         fprintf(fp, " textcolor lt %d", axis_array[axis].ticdef.textcolor.lt+1);    }
     putc('\n', fp);
+
+    fprintf(fp, "\
+set tics %s %s\n\
+set ticscale %s %g %g\n",
+	    axis_defaults[axis].name,
+	    (axis_array[axis].tic_in) ? "in" : "out",
+	    axis_defaults[axis].name,
+	    axis_array[axis].ticscale, axis_array[axis].miniticscale);
+
 }
 
 static void

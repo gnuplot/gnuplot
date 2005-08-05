@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.117 2005/07/28 16:50:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.118 2005/08/01 09:00:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1876,12 +1876,12 @@ test_term()
 
     /* test tic size */
     (*t->linetype)(4);
-    (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)), (unsigned int) ymax_t - 1);
-    (*t->vector) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)),
-                  (unsigned int) (ymax_t - ticscale * t->v_tic));
-    (*t->move) ((unsigned int) (xmax_t / 2), (unsigned int) (ymax_t - t->v_tic * (1 + ticscale)));
-    (*t->vector) ((unsigned int) (xmax_t / 2 + ticscale * t->h_tic),
-                  (unsigned int) (ymax_t - t->v_tic * (1 + ticscale)));
+    (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)), (unsigned int) ymax_t - 1);
+    (*t->vector) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)),
+                  (unsigned int) (ymax_t - axis_array[FIRST_X_AXIS].ticscale * t->v_tic));
+    (*t->move) ((unsigned int) (xmax_t / 2), (unsigned int) (ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
+    (*t->vector) ((unsigned int) (xmax_t / 2 + axis_array[FIRST_X_AXIS].ticscale * t->h_tic),
+                  (unsigned int) (ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
     /* HBB 19990530: changed this to use right-justification, if possible... */
     str = "show ticscale";
     if ((*t->justify_text) (RIGHT))

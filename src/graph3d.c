@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.123 2005/07/23 04:08:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.124 2005/07/29 07:54:33 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -688,7 +688,7 @@ do_3dplot(
 	    unsigned int map_x1, map_y1, map_x2, map_y2;
 	    int tics_len = 0;
 	    if (X_AXIS.ticmode & TICS_MIRROR) {
-		tics_len = (int)(ticscale * (tic_in ? -1 : 1) * (term->v_tic));
+		tics_len = (int)(X_AXIS.ticscale * (X_AXIS.tic_in ? -1 : 1) * (term->v_tic));
 		if (tics_len < 0) tics_len = 0; /* take care only about upward tics */
 	    }
 	    map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &map_x1, &map_y1);
@@ -2265,17 +2265,17 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		map3d_xyz(mid_x, xaxis_y, base_z, &v1);
 		v2.x = v1.x;
 		v2.y = v1.y - tic_unity * t->v_char * 1;
-		if (!tic_in) {
+		if (!X_AXIS.tic_in) {
 		    /* FIXME
 		     * This code and its source in xtick_callback() is wrong --- tics
 		     * can be "in" but ticscale <0 ! To be corrected in both places!
 		     */
-		    v2.y -= tic_unity * t->v_tic * ticscale;
+		    v2.y -= tic_unity * t->v_tic * X_AXIS.ticscale;
 		}
 #if 0
 		/* PM: correct implementation for map should probably be like this: */
 		if (X_AXIS.ticmode) {
-		    int tics_len = (int)(ticscale * (tic_in ? -1 : 1) * (term->v_tic));
+		    int tics_len = (int)(X_AXIS.ticscale * (X_AXIS.tic_in ? -1 : 1) * (term->v_tic));
 		    if (tics_len < 0) tics_len = 0; /* take care only about upward tics */
 		    v2.y += tics_len;
 		}
@@ -2289,9 +2289,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		double step = (xaxis_y - other_end) / 4;
 
 		map3d_xyz(mid_x, xaxis_y + step, base_z, &v1);
-		if (!tic_in) {
-		    v1.x -= tic_unitx * ticscale * t->v_tic;
-		    v1.y -= tic_unity * ticscale * t->v_tic;
+		if (!X_AXIS.tic_in) {
+		    v1.x -= tic_unitx * X_AXIS.ticscale * t->v_tic;
+		    v1.y -= tic_unity * X_AXIS.ticscale * t->v_tic;
 		}
 		TERMCOORD(&v1, x1, y1);
 	    }
@@ -2357,8 +2357,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		    }
 		    v2.x = v1.x - tic_unitx * t->h_char * 1;
 		    v2.y = v1.y;
-		    if (!tic_in)
-			v2.x -= tic_unitx * t->h_tic * ticscale;
+		    if (!X_AXIS.tic_in)
+			v2.x -= tic_unitx * t->h_tic * X_AXIS.ticscale;
 		    TERMCOORD(&v2, x1, y1);
 		    /* calculate max length of y-tics labels */
 		    widest_tic_strlen = 0;
@@ -2375,7 +2375,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		    unsigned int map_y1, map_x2, map_y2;
 		    int tics_len = 0;
 		    if (Y_AXIS.ticmode) {
-			tics_len = (int)(ticscale * (tic_in ? 1 : -1) * (term->v_tic));
+			tics_len = (int)(X_AXIS.ticscale * (X_AXIS.tic_in ? 1 : -1) * (term->v_tic));
 			if (tics_len > 0) tics_len = 0; /* take care only about left tics */
 		    }
 		    map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &x1, &map_y1);
@@ -2394,9 +2394,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		} else { /* usual 3d set view ... */
 		    double step = (other_end - yaxis_x) / 4;
 		map3d_xyz(yaxis_x - step, mid_y, base_z, &v1);
-		if (!tic_in) {
-		    v1.x -= tic_unitx * ticscale * t->h_tic;
-		    v1.y -= tic_unity * ticscale * t->h_tic;
+		if (!X_AXIS.tic_in) {
+		    v1.x -= tic_unitx * X_AXIS.ticscale * t->h_tic;
+		    v1.y -= tic_unity * X_AXIS.ticscale * t->h_tic;
 		}
 		TERMCOORD(&v1, x1, y1);
 		    h_just = CENTRE;
@@ -2508,7 +2508,7 @@ xtick_callback(
     struct lp_style_type grid)	/* linetype or -2 for none */
 {
     vertex v1, v2;
-    double scale = (text ? ticscale : miniticscale) * (tic_in ? 1 : -1);
+    double scale = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale) * (axis_array[axis].tic_in ? 1 : -1);
     double other_end =
 	Y_AXIS.min + Y_AXIS.max - xaxis_y;
     struct termentry *t = term;
@@ -2551,9 +2551,9 @@ xtick_callback(
 	    just = RIGHT;
 	v2.x = v1.x - tic_unitx * t->h_char * 1;
 	v2.y = v1.y - tic_unity * t->v_char * 1;
-	if (!tic_in) {
-	    v2.x -= tic_unitx * t->v_tic * ticscale;
-	    v2.y -= tic_unity * t->v_tic * ticscale;
+	if (!axis_array[axis].tic_in) {
+	    v2.x -= tic_unitx * t->v_tic * axis_array[axis].ticscale;
+	    v2.y -= tic_unity * t->v_tic * axis_array[axis].ticscale;
 	}
 	TERMCOORD(&v2, x2, y2);
         /* User-specified different color for the tics text */
@@ -2585,7 +2585,7 @@ ytick_callback(
     struct lp_style_type grid)
 {
     vertex v1, v2;
-    double scale = (text ? ticscale : miniticscale) * (tic_in ? 1 : -1);
+    double scale = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale) * (axis_array[axis].tic_in ? 1 : -1);
     double other_end =
 	X_AXIS.min + X_AXIS.max - yaxis_x;
     struct termentry *t = term;
@@ -2628,9 +2628,9 @@ ytick_callback(
 	    just = RIGHT;
 	v2.x = v1.x - tic_unitx * t->h_char * 1;
 	v2.y = v1.y - tic_unity * t->v_char * 1;
-	if (!tic_in) {
-	    v2.x -= tic_unitx * t->h_tic * ticscale;
-	    v2.y -= tic_unity * t->v_tic * ticscale;
+	if (!axis_array[axis].tic_in) {
+	    v2.x -= tic_unitx * t->h_tic * axis_array[axis].ticscale;
+	    v2.y -= tic_unity * t->v_tic * axis_array[axis].ticscale;
 	}
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
@@ -2662,8 +2662,8 @@ ztick_callback(
     struct lp_style_type grid)
 {
     /* HBB: inserted some ()'s to shut up gcc -Wall, here and below */
-    int len = (text ? ticscale : miniticscale)
-	* (tic_in ? 1 : -1) * (term->h_tic);
+    int len = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale)
+	* (axis_array[axis].tic_in ? 1 : -1) * (term->h_tic);
     vertex v1, v2, v3;
 
     (void) axis;		/* avoid -Wunused warning */
@@ -2692,8 +2692,8 @@ ztick_callback(
 
 	TERMCOORD(&v1, x1, y1);
 	x1 -= (term->h_tic) * 2;
-	if (!tic_in)
-	    x1 -= (term->h_tic) * ticscale;
+	if (!axis_array[axis].tic_in)
+	    x1 -= (term->h_tic) * axis_array[axis].ticscale;
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.158 2005/07/29 07:54:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.159 2005/07/31 08:41:47 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2491,12 +2491,7 @@ show_tics(
 {
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\ttics are %s, \
-\tticslevel is %g\n\
-\tmajor ticscale is %g and minor ticscale is %g\n",
-	    (tic_in ? "IN" : "OUT"),
-	    ticslevel,
-	    ticscale, miniticscale);
+    fprintf(stderr, "\tticslevel is %g\n", ticslevel);
 
     if (showx)
 	show_ticdef(FIRST_X_AXIS);
@@ -2893,6 +2888,12 @@ show_ticdef(AXIS_INDEX axis)
 
     const char *ticfmt = conv_text(axis_array[axis].formatstring);
 
+    fprintf(stderr, "\t%s-axis tics are %s, \
+\tmajor ticscale is %g and minor ticscale is %g\n",
+	    axis_defaults[axis].name,
+	    (axis_array[axis].tic_in ? "IN" : "OUT"),
+	    axis_array[axis].ticscale, axis_array[axis].miniticscale);
+
     fprintf(stderr, "\t%s-axis tics:\t", axis_defaults[axis].name);
     switch (axis_array[axis].ticmode & TICS_MASK) {
     case NO_TICS:
@@ -2901,7 +2902,7 @@ show_ticdef(AXIS_INDEX axis)
     case TICS_ON_AXIS:
 	fputs("on axis", stderr);
 	if (axis_array[axis].ticmode & TICS_MIRROR)
-	    fprintf(stderr, " and mirrored %s", (tic_in ? "OUT" : "IN"));
+	    fprintf(stderr, " and mirrored %s", (axis_array[axis].tic_in ? "OUT" : "IN"));
 	break;
     case TICS_ON_BORDER:
 	fputs("on border", stderr);

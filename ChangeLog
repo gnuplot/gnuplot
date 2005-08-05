@@ -1,3 +1,15 @@
+2005-08-05  Harald Harders  <h.harders@tu-bs.de>
+
+	SF patch [1245558] Different ticscale and ticpos for different axes
+
+	* NEWS docs/gnuplot.doc src/axis.c src/axis.h src/color.c src/graph3d.c
+	src/graphics.c src/save.c src/set.c src/show.c src/term.c src/unset.c
+	demo/all.dem demo/tics.dem demo/html/Makefile: This patch enables the
+	user to specify different ticscales and tic-positions for each axis:
+	- new: "set tics" can change most settings for {x|y|z|cb}tics at once;
+	- new: tic scale can be set per axis using "set {x|y|z|cb}tics scale";
+	- change: "set ticsscale" is deprecated, use "set tics scale" instead.
+
 2005-08-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c(store_label get_data)  src/plot3d.c (get_3ddata):

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.82 2005/06/19 22:03:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.83 2005/07/25 17:32:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -114,7 +114,9 @@ static void unset_multiplot __PROTO((void));
 
 static void unset_month_day_tics __PROTO((AXIS_INDEX));
 static void unset_minitics __PROTO((AXIS_INDEX));
+#ifdef OLDUNSETTICS
 static void unset_tics_in __PROTO((void));
+#endif /* OLDUNSETTICS */
 
 static void unset_offsets __PROTO((void));
 static void unset_origin __PROTO((void));
@@ -352,7 +354,11 @@ unset_command()
 	unset_terminal();
 	break;
     case S_TICS:
+#ifdef OLDUNSETTICS
 	unset_tics_in();
+#else
+	unset_tics(AXIS_ARRAY_SIZE);
+#endif /* OLDUNSETTICS */
 	break;
     case S_TICSCALE:
 	unset_ticscale();
@@ -1064,23 +1070,35 @@ static void
 unset_tics(AXIS_INDEX axis)
 {
     struct position tics_nooffset = { character, character, character, 0., 0., 0.};
+    unsigned int istart = 0;
+    unsigned int iend = AXIS_ARRAY_SIZE;
+    unsigned int i;
 
-    axis_array[axis].ticmode = NO_TICS;
-
-    if (axis_array[axis].ticdef.font) {
-	free(axis_array[axis].ticdef.font);
-	axis_array[axis].ticdef.font = NULL;
+    if (axis < AXIS_ARRAY_SIZE) {
+	istart = axis;
+	iend = axis + 1;
     }
-    axis_array[axis].ticdef.textcolor.type = TC_DEFAULT;
-    axis_array[axis].ticdef.textcolor.lt = 0;
-    axis_array[axis].ticdef.textcolor.value = 0;
-    axis_array[axis].ticdef.offset = tics_nooffset;
-    axis_array[axis].tic_rotate = 0;
-    axis_array[axis].tic_rotate = 0;
+	
+    for (i = istart; i < iend; ++i) {
+	axis_array[i].ticmode = NO_TICS;
 
-    if (axis_array[axis].ticdef.type == TIC_USER) {
-	free_marklist(axis_array[axis].ticdef.def.user);
-	axis_array[axis].ticdef.def.user = NULL;
+	if (axis_array[i].ticdef.font) {
+	    free(axis_array[i].ticdef.font);
+	    axis_array[i].ticdef.font = NULL;
+	}
+	axis_array[i].ticdef.textcolor.type = TC_DEFAULT;
+	axis_array[i].ticdef.textcolor.lt = 0;
+	axis_array[i].ticdef.textcolor.value = 0;
+	axis_array[i].ticdef.offset = tics_nooffset;
+	axis_array[i].tic_rotate = 0;
+	axis_array[i].ticscale = 1.0;
+	axis_array[i].miniticscale = 0.5;
+	axis_array[i].tic_in = TRUE;
+
+	if (axis_array[i].ticdef.type == TIC_USER) {
+	    free_marklist(axis_array[i].ticdef.def.user);
+	    axis_array[i].ticdef.def.user = NULL;
+	}
     }
 }
 
@@ -1331,20 +1349,52 @@ unset_terminal()
 }
 
 
+#ifdef OLDUNSETTICS
 /* process 'unset tics' command */
 static void
 unset_tics_in()
 {
-    tic_in = TRUE;
+    unsigned int i = AXIS_ARRAY_SIZE;
+    c_token++;
+
+    if (equals(c_token,"x"))
+	i = FIRST_X_AXIS;
+    else if (equals(c_token,"y"))
+	i = FIRST_Y_AXIS;
+    else if (equals(c_token,"z"))
+	i = FIRST_Z_AXIS;
+    else if (equals(c_token,"x2"))
+	i = SECOND_X_AXIS;
+    else if (equals(c_token,"y2"))
+	i = SECOND_Y_AXIS;
+    else if (equals(c_token,"cb"))
+	i = COLOR_AXIS;
+    if (i < AXIS_ARRAY_SIZE)
+	c_token++;
+
+    if (i < AXIS_ARRAY_SIZE)
+	axis_array[i].tic_in = TRUE;
+    else {
+	for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+	    axis_array[i].tic_in = TRUE;
+    }
 }
+#endif /* OLDUNSETTICS */
 
 
 /* process 'unset ticscale' command */
 static void
 unset_ticscale()
 {
-    ticscale = 1.0;
-    miniticscale = 0.5;
+    unsigned int i;
+
+    int_warn(c_token,
+	     "Deprecated syntax - please use 'set tics scale default'");
+
+    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+	axis_array[i].ticscale = 1.0;
+	axis_array[i].miniticscale = 0.5;
+    }
 }
 
 
@@ -1575,9 +1625,10 @@ reset_command()
     unset_cntrparam();
     unset_zero();
     unset_dgrid3d();
-    unset_ticscale();
     unset_ticslevel();
+#ifdef OLDUNSETTICS
     unset_tics_in();
+#endif /* OLDUNSETTICS */
     unset_margin(&bmargin);
     unset_margin(&lmargin);
     unset_margin(&rmargin);

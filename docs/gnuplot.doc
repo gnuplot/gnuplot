@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.319 2005/08/01 09:01:30 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.320 2005/08/04 15:27:58 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8899,20 +8899,68 @@ C ... and restart the table:
 
 3 tics
 ?commands set tics
+?commands unset tics
 ?commands show tics
 ?set tics
+?unset tics
 ?show tics
 ?tics
- The `set tics` command can be used to change the tics to be drawn outwards.
+ Control of the major (labelled) tics on all axes at once is possible with the
+ `set tics` command.
+
+ Fine control of the major (labelled) tics on all axes at once is possible
+ with the `set tics` command.  The tics may be turned off with the `unset tics`
+ command, and may be turned on (the default state) with `set tics`.  Similar
+ commands (by preceeding 'tics' by the axis name) control the major tics on a
+ single axis.
 
  Syntax:
-       set tics {<direction>}
+       set tics {axis | border} {{no}mirror}
+                {in | out} {scale {default | <major> {,<minor>}}}
+                {{no}rotate {by <ang>}} {offset <offset> | nooffset}
+                { font "name{,<size>}" }
+                { textcolor <colorspec> }
+       unset tics
        show tics
 
- where <direction> may be `in` (the default) or `out`.
+ All specified options apply to all axes, i.e., x, y, z, x2, y2, and cb.
+
+ `axis` or `border` tells `gnuplot` to put the tics (both the tics themselves
+ and the accompanying labels) along the axis or the border, respectively.  If
+ the axis is very close to the border, the `axis` option will move the
+ tic labels to outside the border.  The relevant margin settings will usually
+ be sized badly by the automatic layout algorithm in this case.
+
+ `mirror` tells `gnuplot` to put unlabelled tics at the same positions on the
+ opposite border.  `nomirror` does what you think it does.
+
+ `in` and `out` change the tic marks to be drawn inwards or outwards.
+
+ With `scale`, the size of the tic marks can be adjusted. If <minor> is not
+ specified, it is 0.5*<major>.  The default size 1.0 for major tics and 0.5
+ for minor tics is requested by `scale default`.
+
+ `rotate` asks `gnuplot` to rotate the text through 90 degrees, which will be
+ done if the terminal driver in use supports text rotation.  `norotate`
+ cancels this. `rotate by <ang>` asks for rotation by <ang> degrees, supported
+ by some terminal types.
+
+ The defaults are `border mirror norotate` for tics on the x and y axes, and
+ `border nomirror norotate` for tics on the x2 and y2 axes.  For the z axis,
+ the default is `nomirror`.
+
+ The <offset> is specified by either x,y or x,y,z, and may be preceded by
+ `first`, `second`, `graph`, `screen`, or `character` to select the
+ coordinate system. <offset> is the offset of the tics texts from their
+ default positions, while the default coordinate system is `character`.
+ See `coordinates` for details. `nooffset` switches off the offset.
+
+ `set tics` with no options restores to place tics inwards. Every other 
+ options are retained.
 
  See also `set xtics` for more control of major (labelled) tic marks and
- `set mxtics` for control of minor tic marks.
+ `set mxtics` for control of minor tic marks.  These commands provide control
+ at a axis by axis basis.
 3 ticslevel
 ?commands set ticslevel
 ?commands show ticslevel
@@ -8939,15 +8987,7 @@ C ... and restart the table:
 ?set ticscale
 ?show ticscale
 ?ticscale
- The size of the tic marks can be adjusted with `set ticscale`.
-
- Syntax:
-       set ticscale {<major> {<minor>}}
-       show tics
-
- If <minor> is not specified, it is 0.5*<major>.  The default size is 1.0 for
- major tics and 0.5 for minor tics.  Note that it is possible to have the tic
- marks pointing outward by specifying a negative size.
+ The `set ticscale` command is deprecated, use `set tics scale` instead.
 3 timestamp
 ?commands set timestamp
 ?commands set time
@@ -9527,8 +9567,9 @@ C ... and restart the table:
  commands control the major tics on the y, z, x2 and y2 axes.
 
  Syntax:
-       set xtics {axis | border} {{no}mirror} {{no}rotate {by <ang>}}
-                 {offset <offset> | nooffset}
+       set xtics {axis | border} {{no}mirror}
+                 {in | out} {scale {default | <major> {,<minor>}}}
+                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
                  {  autofreq
                   | <incr>
                   | <start>, <incr> {,<end>}
@@ -9548,6 +9589,12 @@ C ... and restart the table:
 
  `mirror` tells `gnuplot` to put unlabelled tics at the same positions on the
  opposite border.  `nomirror` does what you think it does.
+
+ `in` and `out` change the tic marks to be drawn inwards or outwards.
+
+ With `scale`, the size of the tic marks can be adjusted. If <minor> is not
+ specified, it is 0.5*<major>.  The default size 1.0 for major tics and 0.5
+ for minor tics is requested by `scale default`.
 
  `rotate` asks `gnuplot` to rotate the text through 90 degrees, which will be
  done if the terminal driver in use supports text rotation.  `norotate`
@@ -9586,6 +9633,20 @@ C ... and restart the table:
  assumed to be negative infinity, <end> is assumed to be positive infinity,
  and the tics will be drawn at integral multiples of <incr>.  If the axis is
  logarithmic, the increment will be used as a multiplicative factor.
+
+ If you specify to a negative <start> or <incr> after a numerical value
+ (e.g., `rotate by <angle>` or `offset <offset>`), the parser fails because
+ it subtracts <start> or <incr> from that value.  As a workaround, specify
+ `0-<start>` resp. `0-<incr>` in that case.
+
+ Example:
+       set xtics border offset 0,0.5 -5,1,5
+ Fails with 'invalid expression' at the last comma.
+       set xtics border offset 0,0.5 0-5,1,5
+ or
+       set xtics offset 0,0.5 border -5,1,5
+ Sets tics at the border, tics text with an offset of 0,0.5 characters, and
+ sets the start, increment, and end to -5, 1, and 5, as requested.
 
  The `set grid` options 'front', 'back' and 'layerdefault' affect the drawing
  order of the xtics, too.

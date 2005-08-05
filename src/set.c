@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.191 2005/07/27 21:37:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.192 2005/07/29 07:54:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3492,15 +3492,129 @@ set_termoptions()
 static void
 set_tics()
 {
-    c_token++;
-    tic_in = TRUE;
+    unsigned int i = 0;
+    TBOOLEAN axisset = FALSE;
 
-    if (almost_equals(c_token,"i$n")) {
-	tic_in = TRUE;
-	c_token++;
-    } else if (almost_equals(c_token,"o$ut")) {
-	tic_in = FALSE;
-	c_token++;
+    ++c_token;
+
+    if (END_OF_COMMAND) {
+	for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+	    axis_array[i].tic_in = TRUE;
+    }
+
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "ax$is")) {
+	    axisset = TRUE;
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+		axis_array[i].ticmode &= ~TICS_ON_BORDER;
+		axis_array[i].ticmode |= TICS_ON_AXIS;
+	    }
+	    ++c_token;
+	} else if (almost_equals(c_token, "bo$rder")) {
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+		axis_array[i].ticmode &= ~TICS_ON_AXIS;
+		axis_array[i].ticmode |= TICS_ON_BORDER;
+	    }
+	    ++c_token;
+	} else if (almost_equals(c_token, "mi$rror")) {
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].ticmode |= TICS_MIRROR;
+	    ++c_token;
+	} else if (almost_equals(c_token, "nomi$rror")) {
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].ticmode &= ~TICS_MIRROR;
+	    ++c_token;
+	} else if (almost_equals(c_token,"in$wards")) {
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].tic_in = TRUE;
+	    ++c_token;
+	} else if (almost_equals(c_token,"out$wards")) {
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].tic_in = FALSE;
+	    ++c_token;
+	} else if (almost_equals(c_token, "sc$ale")) {
+	    struct value a;
+	    ++c_token;
+	    if (almost_equals(c_token, "def$ault")) {
+		for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+		    axis_array[i].ticscale = 1.0;
+		    axis_array[i].miniticscale = 0.5;
+		}
+		++c_token;
+	    } else {
+		double lticscale, lminiticscale;
+		lticscale = real(const_express(&a));
+		if (equals(c_token, ",")) {
+		    ++c_token;
+		    lminiticscale = real(const_express(&a));
+		} else
+		    lminiticscale = 0.5 * lticscale;
+		for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+		    axis_array[i].ticscale = lticscale;
+		    axis_array[i].miniticscale = lminiticscale;
+		}
+	    }
+	} else if (almost_equals(c_token, "ro$tate")) {
+	    axis_array[i].tic_rotate = TEXT_VERTICAL;
+	    ++c_token;
+	    if (equals(c_token, "by")) {
+		struct value a;
+		int langle;
+		++c_token;
+		langle = (int)real(const_express(&a));
+		for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		    axis_array[i].tic_rotate = langle;
+	    }
+	} else if (almost_equals(c_token, "noro$tate")) {
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].tic_rotate = 0;
+	    ++c_token;
+	} else if (almost_equals(c_token, "off$set")) {
+	    ++c_token;
+	    struct position lpos;
+	    get_position_default(&lpos, character);
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].ticdef.offset = lpos;
+	} else if (almost_equals(c_token, "nooff$set")) {
+	    struct position tics_nooffset =
+		{ character, character, character, 0., 0., 0.};
+	    ++c_token;
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].ticdef.offset = tics_nooffset;
+	} else if (almost_equals(c_token, "f$ont")) {
+	    ++c_token;
+	    /* Make sure they've specified a font */
+	    if (!isstringvalue(c_token))
+		int_error(c_token,"expected font");
+	    else {
+		char *lfont = try_to_get_string();
+		for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+		    free(axis_array[i].ticdef.font);
+		    axis_array[i].ticdef.font = gp_strdup(lfont);
+		}
+		free(lfont);
+	    }
+	} else if (equals(c_token,"tc") ||
+		   almost_equals(c_token,"text$color")) {
+	    struct t_colorspec lcolor;
+#ifdef PM3D
+	    parse_colorspec(&lcolor, TC_FRAC);
+#else
+	    parse_colorspec(&lcolor, TC_LT);
+#endif
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].ticdef.textcolor = lcolor;
+	} else if (!END_OF_COMMAND) {
+	    int_error(c_token, "extraneous arguments in set tics");
+	}
+    }
+
+    /* if tics are off and not set by axis, reset to default (border) */
+    if ((axis_array[i].ticmode == NO_TICS) && (!axisset)) {
+	axis_array[i].ticmode = TICS_ON_BORDER;
+	if ((i == FIRST_X_AXIS) || (i == FIRST_Y_AXIS)) {
+	    axis_array[i].ticmode |= TICS_MIRROR;
+	}
     }
 }
 
@@ -3510,18 +3624,29 @@ static void
 set_ticscale()
 {
     struct value tscl;
+    double lticscale, lminiticscale;
+    unsigned int i;
 
-    c_token++;
+    int_warn(c_token,
+	     "Deprecated syntax - please use 'set tics scale' keyword");
+
+    ++c_token;
     if (END_OF_COMMAND) {
-	ticscale = 1.0;
-	miniticscale = 0.5;
+	lticscale = 1.0;
+	lminiticscale = 0.5;
     } else {
-	ticscale = real(const_express(&tscl));
+	lticscale = real(const_express(&tscl));
 	if (END_OF_COMMAND) {
-	    miniticscale = ticscale*0.5;
+	    lminiticscale = lticscale*0.5;
 	} else {
-	    miniticscale = real(const_express(&tscl));
+	    if (equals(c_token, ","))
+		++c_token;
+	    lminiticscale = real(const_express(&tscl));
 	}
+    }
+    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+	axis_array[i].ticscale = lticscale;
+	axis_array[i].miniticscale = lminiticscale;
     }
 }
 
@@ -3840,83 +3965,108 @@ set_tic_prop(AXIS_INDEX axis)
     (void) strcpy(sfxptr, "t$ics");	/* STRING */
 
     if (almost_equals(c_token, cmdptr)) {
+	TBOOLEAN axisset = FALSE;
 	match = 1;
-	if (almost_equals(++c_token, "ax$is")) {
-	    axis_array[axis].ticmode &= ~TICS_ON_BORDER;
-	    axis_array[axis].ticmode |= TICS_ON_AXIS;
-	    ++c_token;
-	}
-	/* if tics are off, reset to default (border) */
-	if (axis_array[axis].ticmode == NO_TICS) {
+	++c_token;
+	do {
+	    if (almost_equals(c_token, "ax$is")) {
+		axisset = TRUE;
+		axis_array[axis].ticmode &= ~TICS_ON_BORDER;
+		axis_array[axis].ticmode |= TICS_ON_AXIS;
+		++c_token;
+	    } else if (almost_equals(c_token, "bo$rder")) {
+		axis_array[axis].ticmode &= ~TICS_ON_AXIS;
+		axis_array[axis].ticmode |= TICS_ON_BORDER;
+		++c_token;
+	    } else if (almost_equals(c_token, "mi$rror")) {
+		axis_array[axis].ticmode |= TICS_MIRROR;
+		++c_token;
+	    } else if (almost_equals(c_token, "nomi$rror")) {
+		axis_array[axis].ticmode &= ~TICS_MIRROR;
+		++c_token;
+	    } else if (almost_equals(c_token, "in$wards")) {
+		axis_array[axis].tic_in = TRUE;
+		++c_token;
+	    } else if (almost_equals(c_token, "out$wards")) {
+		axis_array[axis].tic_in = FALSE;
+		++c_token;
+	    } else if (almost_equals(c_token, "sc$ale")) {
+		struct value a;
+		++c_token;
+		if (almost_equals(c_token, "def$ault")) {
+		    axis_array[axis].ticscale = 1.0;
+		    axis_array[axis].miniticscale = 0.5;
+		    ++c_token;
+		} else {
+		    axis_array[axis].ticscale = real(const_express(&a));
+		    if (equals(c_token, ",")) {
+			++c_token;
+			axis_array[axis].miniticscale =
+			    real(const_express(&a));
+		    } else
+			axis_array[axis].miniticscale =
+			    0.5 * axis_array[axis].ticscale;
+		}
+	    } else if (almost_equals(c_token, "ro$tate")) {
+		axis_array[axis].tic_rotate = TEXT_VERTICAL;
+		++c_token;
+		if (equals(c_token, "by")) {
+		    struct value a;
+		    c_token++;
+		    axis_array[axis].tic_rotate =
+			(int)real(const_express(&a));
+		}
+	    } else if (almost_equals(c_token, "noro$tate")) {
+		axis_array[axis].tic_rotate = 0;
+		++c_token;
+	    } else if (almost_equals(c_token, "off$set")) {
+		++c_token;
+		get_position_default(&axis_array[axis].ticdef.offset,
+				     character);
+	    } else if (almost_equals(c_token, "nooff$set")) {
+		struct position tics_nooffset =
+		    { character, character, character, 0., 0., 0.};
+		++c_token;
+		axis_array[axis].ticdef.offset = tics_nooffset;
+	    } else if (almost_equals(c_token, "f$ont")) {
+		++c_token;
+		/* Make sure they've specified a font */
+		if (!isstringvalue(c_token))
+		    int_error(c_token,"expected font");
+		else {
+		    free(axis_array[axis].ticdef.font);
+		    axis_array[axis].ticdef.font = try_to_get_string();
+		}
+	    } else if (equals(c_token,"tc") ||
+		       almost_equals(c_token,"text$color")) {
+#ifdef PM3D
+		parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_FRAC);
+#else
+		parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_LT);
+#endif
+	    } else if (almost_equals(c_token, "au$tofreq")) {
+		/* auto tic interval */
+		++c_token;
+		if (axis_array[axis].ticdef.type == TIC_USER) {
+		    free_marklist(axis_array[axis].ticdef.def.user);
+		    axis_array[axis].ticdef.def.user = NULL;
+		}
+		axis_array[axis].ticdef.type = TIC_COMPUTED;
+	    } else if (!END_OF_COMMAND) {
+		load_tics(axis);
+	    }
+	} while (!END_OF_COMMAND);
+
+	/* if tics are off and not set by axis, reset to default (border) */
+	if ((axis_array[axis].ticmode == NO_TICS) && (!axisset)) {
 	    axis_array[axis].ticmode = TICS_ON_BORDER;
 	    if ((axis == FIRST_X_AXIS) || (axis == FIRST_Y_AXIS)) {
 		axis_array[axis].ticmode |= TICS_MIRROR;
 	    }
 	}
-	if (almost_equals(c_token, "bo$rder")) {
-	    axis_array[axis].ticmode &= ~TICS_ON_AXIS;
-	    axis_array[axis].ticmode |= TICS_ON_BORDER;
-	    ++c_token;
-	}
-	if (almost_equals(c_token, "mi$rror")) {
-	    axis_array[axis].ticmode |= TICS_MIRROR;
-	    ++c_token;
-	} else if (almost_equals(c_token, "nomi$rror")) {
-	    axis_array[axis].ticmode &= ~TICS_MIRROR;
-	    ++c_token;
-	}
-	if (almost_equals(c_token, "ro$tate")) {
-	    axis_array[axis].tic_rotate = TEXT_VERTICAL;
-	    ++c_token;
-	    if (equals(c_token, "by")) {
-		struct value a;
-	    	c_token++;
-		axis_array[axis].tic_rotate = (int)real(const_express(&a));
-	    }
-	} else if (almost_equals(c_token, "noro$tate")) {
-	    axis_array[axis].tic_rotate = 0;
-	    ++c_token;
-	}
-	if (almost_equals(c_token, "off$set")) {
-	    ++c_token;
-	    get_position_default(&axis_array[axis].ticdef.offset,character);
-	} else if (almost_equals(c_token, "nooff$set")) {
- 	    struct position tics_nooffset = { character, character, character, 0., 0., 0.};
-	    ++c_token;
-	    axis_array[axis].ticdef.offset = tics_nooffset;
-	}
-	if (almost_equals(c_token, "au$tofreq")) {	/* auto tic interval */
-	    ++c_token;
-	    if (axis_array[axis].ticdef.type == TIC_USER) {
-		free_marklist(axis_array[axis].ticdef.def.user);
-		axis_array[axis].ticdef.def.user = NULL;
-	    }
-	    axis_array[axis].ticdef.type = TIC_COMPUTED;
-	}
-	else if (!END_OF_COMMAND && !almost_equals(c_token, "f$ont") && !equals(c_token,"tc") &&
-		 !almost_equals(c_token,"text$color")) {
-	    load_tics(axis);
-	}
 
-	if (almost_equals(c_token, "f$ont")) {
-	    ++c_token;
-	    /* Make sure they've specified a font */
-	    if (equals(c_token,"tc") || almost_equals(c_token,"text$color") ||
-		END_OF_COMMAND || almost_equals(c_token, nocmd)) {
-		int_error(c_token,"expected font");
-	    } else {
-		free(axis_array[axis].ticdef.font);
-		axis_array[axis].ticdef.font = try_to_get_string();
-	    }
-	}
-	if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
-#ifdef PM3D
-	    parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_FRAC);
-#else
-	    parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_LT);
-#endif
-	}
     }
+
     if (almost_equals(c_token, nocmd)) {	/* NOSTRING */
 	axis_array[axis].ticmode = NO_TICS;
 	c_token++;

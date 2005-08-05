@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.41 2005/03/16 19:31:29 broeker Exp $
+ * $Id: axis.h,v 1.42 2005/06/30 06:52:42 sfeam Exp $
  *
  */
 
@@ -225,6 +225,9 @@ typedef struct axis {
     TBOOLEAN gridminor;		/* Grid lines for minor tics? */
     int minitics;		/* minor tic mode (none/auto/user)? */
     double mtic_freq;		/* minitic stepsize */
+    double ticscale;		/* scale factor for tic marks (was (0..1])*/
+    double miniticscale;	/* and for minitics */
+    TBOOLEAN tic_in;		/* tics to be drawn inward?  */
 
 /* other miscellaneous fields */
     label_struct label;		/* label string and position offsets */
@@ -252,6 +255,7 @@ typedef struct axis {
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
 	0, FALSE, FALSE, 	/* tic_rotate, grid{major,minor} */	    \
 	MINI_DEFAULT, 10,	/* minitics, mtic_freq */		    \
+        1.0, 0.5, TRUE,		/* ticscale, miniticscale, tic_in */	    \
 	EMPTY_LABELSTRUCT,	/* axis label */			    \
 	DEFAULT_AXIS_ZEROAXIS	/* zeroaxis line style */		    \
 }
@@ -303,10 +307,6 @@ extern int grid_layer;
 extern int tic_start, tic_direction, tic_mirror;
 /* These are for passing on to write_multiline(): */
 extern int tic_text, rotate_tics, tic_hjust, tic_vjust;
-/* Some of them are controlled by 'set' commands: */
-extern double ticscale;		/* scale factor for tic marks (was (0..1])*/
-extern double miniticscale;	/* and for minitics */
-extern TBOOLEAN	tic_in;		/* tics to be drawn inward?  */
 /* The remaining ones are for grid drawing; controlled by 'set grid': */
 /* extern int grid_selection; --- comm'ed out, HBB 20010806 */
 extern struct lp_style_type grid_lp; /* linestyle for major grid lines */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.49 2004/10/22 01:30:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.50 2005/02/01 11:23:48 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -127,10 +127,6 @@ const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE + 1] =
     rotate_tics, tic_hjust, tic_vjust, tic_mirror;
 
 const struct ticdef default_axis_ticdef = DEFAULT_AXIS_TICDEF;
-
-double ticscale = 1.0;		/* scale factor for tic mark */
-double miniticscale = 0.5;	/* and for minitics */
-TBOOLEAN tic_in = TRUE;		/* tics on inside of coordinate box? */
 
 /* axis labels */
 const label_struct default_axis_label = EMPTY_LABELSTRUCT;
@@ -1305,14 +1301,14 @@ axis_output_tics(
 			     *(tic_start - axis_position) > (2 * t->v_char))
 			    ? tic_start + (axis_is_second
 					   ? 0
-					   : - ticscale * t->v_tic)
+					   : - axis_array[axis].ticscale * t->v_tic)
 			    : axis_position
 		    ) - t->v_char;
 	    }
 	} else {
 	    /* tics not on axis --> on border */
 	    tic_start = axis_position;
-	    tic_direction = (tic_in ? 1 : -1) * (axis_is_second ? -1 : 1);
+	    tic_direction = (axis_array[axis].tic_in ? 1 : -1) * (axis_is_second ? -1 : 1);
 	    tic_text = (*ticlabel_position);
 	}
 	/* go for it */

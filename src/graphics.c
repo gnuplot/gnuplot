@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.162 2005/07/28 22:26:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.163 2005/07/29 07:54:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -404,11 +404,11 @@ boundary(struct curve_points *plots, int count)
 	x2tic_textheight = 0;
 
     /* tics */
-    if (!tic_in
+    if (!axis_array[SECOND_X_AXIS].tic_in
 	&& ((axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER)
 	    || ((axis_array[FIRST_X_AXIS].ticmode & TICS_MIRROR)
 		&& (axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER))))
-	x2tic_height = (int) (t->v_tic * ticscale);
+	x2tic_height = (int) (t->v_tic * axis_array[SECOND_X_AXIS].ticscale);
     else
 	x2tic_height = 0;
 
@@ -508,11 +508,11 @@ boundary(struct curve_points *plots, int count)
 	xtic_textheight = 0;
 
     /* tics */
-    if (!tic_in
+    if (!axis_array[FIRST_X_AXIS].tic_in
 	&& ((axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER)
 	    || ((axis_array[SECOND_X_AXIS].ticmode & TICS_MIRROR)
 		&& (axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER))))
-	xtic_height = (int) (t->v_tic * ticscale);
+	xtic_height = (int) (t->v_tic * axis_array[FIRST_X_AXIS].ticscale);
     else
 	xtic_height = 0;
 
@@ -721,11 +721,11 @@ boundary(struct curve_points *plots, int count)
     }
 
     /* tics */
-    if (!tic_in
+    if (!axis_array[FIRST_Y_AXIS].tic_in
 	&& ((axis_array[FIRST_Y_AXIS].ticmode & TICS_ON_BORDER)
 	    || ((axis_array[SECOND_Y_AXIS].ticmode & TICS_MIRROR)
 		&& (axis_array[SECOND_Y_AXIS].ticmode & TICS_ON_BORDER))))
-	ytic_width = (int) (t->h_tic * ticscale);
+	ytic_width = (int) (t->h_tic * axis_array[FIRST_Y_AXIS].ticscale);
     else
 	ytic_width = 0;
 
@@ -796,11 +796,11 @@ boundary(struct curve_points *plots, int count)
     }
 
     /* tics */
-    if (!tic_in
+    if (!axis_array[SECOND_Y_AXIS].tic_in
 	&& ((axis_array[SECOND_Y_AXIS].ticmode & TICS_ON_BORDER)
 	    || ((axis_array[FIRST_Y_AXIS].ticmode & TICS_MIRROR)
 		&& (axis_array[FIRST_Y_AXIS].ticmode & TICS_ON_BORDER))))
-	y2tic_width = (int) (t->h_tic * ticscale);
+	y2tic_width = (int) (t->h_tic * axis_array[SECOND_Y_AXIS].ticscale);
     else
 	y2tic_width = 0;
 
@@ -4200,7 +4200,7 @@ xtick2d_callback(
 {
     struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
-    int ticsize = tic_direction * (int) t->v_tic * (text ? ticscale : miniticscale);
+    int ticsize = tic_direction * (int) t->v_tic * (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale);
     unsigned int x = map_x(place);
 
     (void) axis;		/* avoid "unused parameter" warning */
@@ -4288,7 +4288,7 @@ ytick2d_callback(
 {
     struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
-    int ticsize = tic_direction * (int) t->h_tic * (text ? ticscale : miniticscale);
+    int ticsize = tic_direction * (int) t->h_tic * (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale);
     unsigned int y = map_y(place);
 
     (void) axis;		/* avoid "unused parameter" warning */

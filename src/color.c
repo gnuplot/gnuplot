@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.53 2004/11/27 02:38:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.54 2005/01/08 15:37:21 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -384,8 +384,8 @@ cbtick_callback(
     char *text,
     struct lp_style_type grid) /* linetype or -2 for no grid */
 {
-    int len = (text ? ticscale : miniticscale)
-	* (tic_in ? -1 : 1) * (term->h_tic);
+    int len = (text ? CB_AXIS.ticscale : CB_AXIS.miniticscale)
+	* (CB_AXIS.tic_in ? -1 : 1) * (term->h_tic);
     double cb_place = (place - CB_AXIS.min) / (CB_AXIS.max - CB_AXIS.min);
 	/* relative z position along the colorbox axis */
     unsigned int x1, y1, x2, y2;
@@ -544,16 +544,19 @@ draw_color_smooth_box(int plot_mode)
 
 	/* now corrections for outer tics */
 	if (color_box.rotation == 'v') {
-	    int len = (tic_in ? -1 : 1) * ticscale * (term->h_tic); /* positive for outer tics */
-	    if (len > 0) {
-		if (CB_AXIS.ticmode & TICS_MIRROR) {
-		    cb_x_from += len;
-		    cb_x_to += len;
-		}
-		if (axis_array[FIRST_Y_AXIS].ticmode & TICS_MIRROR) {
-		    cb_x_from += len;
-		    cb_x_to += len;
-		}
+	    //	    int len = (X_AXIS.tic_in ? -1 : 1) * X_AXIS.ticscale * (term->h_tic); /* positive for outer tics */
+	    int cblen = (CB_AXIS.tic_in ? -1 : 1) * CB_AXIS.ticscale * 
+		(term->h_tic); /* positive for outer tics */
+	    int ylen = (Y_AXIS.tic_in ? -1 : 1) * Y_AXIS.ticscale * 
+		(term->h_tic); /* positive for outer tics */
+	    if ((cblen > 0) && (CB_AXIS.ticmode & TICS_MIRROR)) {
+		cb_x_from += cblen;
+		cb_x_to += cblen;
+	    }
+	    if ((ylen > 0) && 
+		(axis_array[FIRST_Y_AXIS].ticmode & TICS_MIRROR)) {
+		cb_x_from += ylen;
+		cb_x_to += ylen;
 	    }
 	}
     }
@@ -605,7 +608,8 @@ draw_color_smooth_box(int plot_mode)
 	int x, y;
 	apply_pm3dcolor(&(CB_AXIS.label.textcolor),term);
 	if (color_box.rotation == 'h') {
-	    int len = ticscale * (tic_in ? 1 : -1) * (term->v_tic);
+	    int len = CB_AXIS.ticscale * (CB_AXIS.tic_in ? 1 : -1) * 
+		(term->v_tic);
 
 	    map3d_position_r(&(CB_AXIS.label.offset), &x, &y, "smooth_box");
 	    x += (cb_x_from + cb_x_to) / 2;
@@ -619,7 +623,8 @@ draw_color_smooth_box(int plot_mode)
 	    write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_CENTRE, 0,
 			    CB_AXIS.label.font);
 	} else {
-	    int len = ticscale * (tic_in ? -1 : 1) * (term->h_tic);
+	    int len = CB_AXIS.ticscale * (CB_AXIS.tic_in ? -1 : 1) *
+		(term->h_tic);
 	    /* calculate max length of cb-tics labels */
 	    widest_tic_strlen = 0;
 	    if (CB_AXIS.ticmode & TICS_ON_BORDER) {

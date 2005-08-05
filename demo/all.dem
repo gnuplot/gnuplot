@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.19 2005/06/14 19:13:43 sfeam Exp $
+# $Id: all.dem,v 1.20 2005/07/29 07:54:32 mikulik Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -165,6 +165,10 @@ reset
 
 print "********************** file vector.dem *********************"
 load "vector.dem"
+reset
+
+print "********************** file tics.dem *********************"
+load "tics.dem"
 reset
 
 print "********************** file datastrings.dem *********************"
