@@ -1,3 +1,11 @@
+2005-08-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/starmap.dem: Change style slightly for use with webify.
+
+	* demo/html/index.save: Add tics demo.
+	
+	* demo/html/webify.pl: Use in-tree gnuplot executable, if available.
+
 2005-08-05  Harald Harders  <h.harders@tu-bs.de>
 
 	SF patch [1245558] Different ticscale and ticpos for different axes

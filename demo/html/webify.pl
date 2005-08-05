@@ -34,6 +34,9 @@ use HTML::Entities;
 
 require "ctime.pl";
 
+# Use the in-tree copy of gnuplot if there is one
+	my $gnuplot = ( -x "../../src/gnuplot" ) ? "../../src/gnuplot" : "gnuplot" ;
+
 	my $date = &ctime(time);
 	my $plot = 1;
 
@@ -42,7 +45,7 @@ require "ctime.pl";
 	open(OUT, ">$ARGV[0].html") or die "can't open $ARGV[0].html";
 
 # open pipe to gnuplot and set terminal type
-	open(GNUPLOT, "|gnuplot") or die "can't find gnuplot";
+	open(GNUPLOT, "|$gnuplot") or die "can't find gnuplot";
 	if ((defined $ENV{DEMOTERM}) && $DEMOTERM ne "") {
 	    print GNUPLOT "set term $DEMOTERM\n";
 	} else {

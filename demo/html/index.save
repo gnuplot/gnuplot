@@ -20,64 +20,58 @@ Most of these plots were generated using the PNG terminal type:</p>
 <td>
 <ul>
     <h4>Basic plot styles</h4>
-    <li><a href="simple.html">simple</a>
-    </li><li><a href="candlesticks.html">candlesticks</a>
-    </li><li><a href="fillcrvs.html">fillcrvs</a>
-    </li><li><a href="fillbetween.html">fillbetween</a>
-    </li><li><a href="fillstyle.html">fillstyle</a>
-    </li><li><a href="histograms.html">histograms</a>
-    </li><li><a href="histograms2.html">histograms2</a>
-    </li><li><a href="steps.html">steps</a>
-    </li><li><a href="using.html">using</a>
-    </li><li><a href="pointsize.html">pointsize</a>
-    </li><li><a href="contours.html">contours</a>
-    </li><li><a href="param.html">param</a>
-    </li><li><a href="arrowstyle.html">arrowstyle</a>
-    </li><li><a href="vector.html">vector</a>
-    </li>
+    <li><a href="simple.html">simple</a></li>
+    <li><a href="candlesticks.html">candlesticks</a></li>
+    <li><a href="fillcrvs.html">fillcrvs</a></li>
+    <li><a href="fillbetween.html">fillbetween</a></li>
+    <li><a href="fillstyle.html">fillstyle</a></li>
+    <li><a href="histograms.html">histograms</a></li>
+    <li><a href="histograms2.html">histograms2</a></li>
+    <li><a href="steps.html">steps</a></li>
+    <li><a href="using.html">using</a></li>
+    <li><a href="pointsize.html">pointsize</a></li>
+    <li><a href="contours.html">contours</a></li>
+    <li><a href="param.html">param</a></li>
+    <li><a href="arrowstyle.html">arrowstyle</a></li>
+    <li><a href="vector.html">vector</a></li>
 
     <h4>Binary and Image data </h4>
-    <li><a href="binary.html">binary</a>
-    </li><li><a href="image.html">image</a>
-    </li>
+    <li><a href="binary.html">binary</a></li>
+    <li><a href="image.html">image</a></li>
 
     <h4>Coordinate and<br> axis transforms</h4>
-    <li><a href="polar.html">polar</a>
-    </li><li><a href="poldat.html">poldat</a>
-    </li><li><a href="world.html">world</a>
-</li></ul>
+    <li><a href="polar.html">polar</a></li>
+    <li><a href="poldat.html">poldat</a></li>
+    <li><a href="world.html">world</a></li>
+</ul>
 </td>
 
 <td>
 <ul>
     <h4>Math functions and<br> curve fitting</h4>
-    <li><a href="airfoil.html">airfoil</a>
-    </li><li><a href="fit.html">fit</a>
-    </li><li><a href="prob2.html">prob2</a>
-    </li><li><a href="prob.html">prob</a>
-    </li><li><a href="random.html">random</a>
-    </li><li><a href="spline.html">spline</a>
-    </li><li><a href="bivariat.html">bivariat</a>
-    </li>
+    <li><a href="airfoil.html">airfoil</a></li>
+    <li><a href="fit.html">fit</a></li>
+    <li><a href="prob2.html">prob2</a></li>
+    <li><a href="prob.html">prob</a></li>
+    <li><a href="random.html">random</a></li>
+    <li><a href="spline.html">spline</a></li>
+    <li><a href="bivariat.html">bivariat</a></li>
 
     <h4>Surfaces and<br> pm3d mode</h4>
-    <li><a href="surface1.html">surface1</a>
-    </li><li><a href="surface2.html">surface2</a>
-    </li><li><a href="pm3d.html">pm3d</a>
-    </li><li><a href="singulr.html">singulr</a>
-    </li><li><a href="world2.html">world2</a>
-    </li>
+    <li><a href="surface1.html">surface1</a></li>
+    <li><a href="surface2.html">surface2</a></li>
+    <li><a href="pm3d.html">pm3d</a></li>
+    <li><a href="singulr.html">singulr</a></li>
+    <li><a href="world2.html">world2</a></li>
 
     <h4>Animation</h4>
-    <li><a href="animate.html">animate</a>
-    </li>
+    <li><a href="animate.html">animate</a></li>
 
     <h4>Colors</h4>
-    <li><a href="dashcolor.html">dashcolor</a>
-    </li><li><a href="rainbow.html">rainbow</a>
-    </li><li><a href="pm3dcolors.html">pm3dcolors</a>
-    </li><li><a href="pm3dgamma.html">pm3dgamma</a>
-    </li>
+    <li><a href="dashcolor.html">dashcolor</a></li>
+    <li><a href="rainbow.html">rainbow</a></li>
+    <li><a href="pm3dcolors.html">pm3dcolors</a></li>
+    <li><a href="pm3dgamma.html">pm3dgamma</a></li>
 
 </ul>
 </td>
@@ -85,32 +79,29 @@ Most of these plots were generated using the PNG terminal type:</p>
 <td>
 <ul>
     <h4>General Plotting</h4>
-         <li><a href="controls.html">controls</a>
-    </li><li><a href="discrete.html">discrete</a>
-    </li><li><a href="electron.html">electron</a>
-    </li><li><a href="hidden.html">hidden</a>
-    </li><li><a href="mgr.html">mgr</a>
-    </li><li><a href="multimsh.html">multimsh</a>
-    </li><li><a href="scatter.html">scatter</a>
-    </li><li><a href="timedat.html">timedat</a>
-    </li>
+         <li><a href="controls.html">controls</a></li>
+    <li><a href="discrete.html">discrete</a></li>
+    <li><a href="electron.html">electron</a></li>
+    <li><a href="hidden.html">hidden</a></li>
+    <li><a href="mgr.html">mgr</a></li>
+    <li><a href="multimsh.html">multimsh</a></li>
+    <li><a href="scatter.html">scatter</a></li>
+    <li><a href="timedat.html">timedat</a></li>
 
     <h4>Text options</h4>
-    <li><a href="textcolor.html">textcolor</a>
-    </li><li><a href="textrotate.html">textrotate</a>
-    </li><li><a href="enhancedtext.html">enhancedtext</a>
-    </li><li><a href="datastrings.html">datastrings</a>
-    </li>
+    <li><a href="textcolor.html">textcolor</a></li>
+    <li><a href="textrotate.html">textrotate</a></li>
+    <li><a href="enhancedtext.html">enhancedtext</a></li>
+    <li><a href="datastrings.html">datastrings</a></li>
 
     <h4>Finance</h4>
-    <li><a href="finance.html">finance</a>
-    </li>
+    <li><a href="finance.html">finance</a></li>
 
     <h4>Page Layout</h4>
-    <li><a href="key.html">key</a>
-    </li><li><a href="layout.html">layout</a>
-    </li><li><a href="multiplt.html">multiplt</a>
-    </li>
+    <li><a href="key.html">key</a></li>
+    <li><a href="layout.html">layout</a></li>
+    <li><a href="multiplt.html">multiplt</a></li>
+    <li><a href="tics.html">tics</a></li>
 
 </ul>
 </td>
@@ -141,9 +132,9 @@ Most of these plots were generated using the PNG terminal type:</p>
     
     <td>
     <ul>
-    <li><a href="http://www.gnuplot.info/">Old (version 3.7.3) gnuplot home page</a>
-    </li><li><a href="http://www.gnuplot.info/faq/">Old (version 3.7.3) FAQ</a>
-    </li></ul>
+    <li><a href="http://www.gnuplot.info/">Old (version 3.7.3) gnuplot home page</a></li>
+    <li><a href="http://www.gnuplot.info/faq/">Old (version 3.7.3) FAQ</a></li></li>
+    </ul>
     </td>
     
 </tr>
