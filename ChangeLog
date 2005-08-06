@@ -1,3 +1,7 @@
+2005-08-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/set.c (set_tics): Fix non-ANSI ordering of declaration.
+
 2005-08-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/starmap.dem: Change style slightly for use with webify.

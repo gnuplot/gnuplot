@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.192 2005/07/29 07:54:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.193 2005/08/05 15:48:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3570,8 +3570,8 @@ set_tics()
 		axis_array[i].tic_rotate = 0;
 	    ++c_token;
 	} else if (almost_equals(c_token, "off$set")) {
-	    ++c_token;
 	    struct position lpos;
+	    ++c_token;
 	    get_position_default(&lpos, character);
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
 		axis_array[i].ticdef.offset = lpos;
