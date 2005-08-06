@@ -2,11 +2,14 @@
 
 	* src/set.c (set_tics): Fix non-ANSI ordering of declaration.
 
-2005-08-05  Ethan Merritt  <merritt@u.washington.edu>
+2005-08-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.c: Remove C++ style comments.
 
 	* src/gplt_x11.c: Replace non-standard type caddr_t with XPointer.
+
+	* src/set.c (set_tics) src/tables.c src/tables.h:  Do not consider
+	use of old syntax as an error. (E.g. 'set key outside below')
 
 2005-08-05  Ethan Merritt  <merritt@u.washington.edu>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.193 2005/08/05 15:48:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.194 2005/08/06 16:28:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1617,27 +1617,31 @@ set_key()
 	    sdir_set = TRUE;
 	    break;
 	case S_KEY_OVER:
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    /* Fall through */
 #ifdef BACKWARDS_COMPATIBLE
+	case S_KEY_ABOVE:
 	    if (!hpos_set)
 		key->hpos = CENTRE;
 	    if (!sdir_set)
 		key->stack_dir = GPKEY_HORIZONTAL;
 #endif
-	    if (reg_set)
-		int_warn(c_token, reg_warn);
 	    key->region = GPKEY_AUTO_EXTERIOR_MARGIN;
 	    key->margin = GPKEY_TMARGIN;
 	    reg_set = TRUE;
 	    break;
 	case S_KEY_UNDER:
+	    if (reg_set)
+		int_warn(c_token, reg_warn);
+	    /* Fall through */
 #ifdef BACKWARDS_COMPATIBLE
+	case S_KEY_BELOW:
 	    if (!hpos_set)
 		key->hpos = CENTRE;
 	    if (!sdir_set)
 		key->stack_dir = GPKEY_HORIZONTAL;
 #endif
-	    if (reg_set)
-		int_warn(c_token, reg_warn);
 	    key->region = GPKEY_AUTO_EXTERIOR_MARGIN;
 	    key->margin = GPKEY_BMARGIN;
 	    reg_set = TRUE;
