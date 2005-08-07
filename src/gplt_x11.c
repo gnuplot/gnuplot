@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.141 2005/08/06 17:22:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.142 2005/08/07 09:43:28 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -346,7 +346,6 @@ static char selection[SEL_LEN] = "";
 # define PIXMAP_HEIGHT(plot)  ((plot)->height)
 #endif
 
-static void GetGCpm3d __PROTO((plot_struct *, GC *));
 static void CmapClear __PROTO((cmap_t *));
 static void RecolorWindow __PROTO((plot_struct *));
 static void FreeColors __PROTO((plot_struct *));
@@ -502,7 +501,6 @@ t_sm_palette sm_palette = {
     /* Afunc, Bfunc and Cfunc can't be initialised here */
 };
 
-static GC gc_pm3d = (GC) 0;
 static int have_pm3d = 1;
 static int num_colormaps = 0;
 static unsigned int maximal_possible_colors = 0x100;
@@ -526,12 +524,6 @@ static int scr;
 static Window root;
 static Visual *vis = (Visual *) 0;
 static GC gc = (GC) 0;
-/* current_gc points to either the `line' GC `gc' or
- * to the pm3d smooth palette GC `gc_pm3d'. If pm3d
- * is disabled at compile time, current_gc always
- * points to the `line' GC `gc'. Thus the purpose of
- * current_gc is to switch between the `line' and the
- * pm3d GC's. */
 static GC *current_gc = (GC *) 0;
 static GC gc_xor = (GC) 0;
 static GC gc_xor_dashed = (GC) 0;
@@ -1743,6 +1735,7 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
     XImage *image_dest;
     XImage *image_scr;
     unsigned long fgpixel = 0;
+    unsigned long bgpixel = 0;
     XWindowAttributes win_attrib;
     int xscr, yscr, xoff, yoff;
     unsigned int scr_width, scr_height;
@@ -1751,24 +1744,24 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
     unsigned long gcFunctionMask = GCFunction;
     XGCValues gcValues;
     int gcCurrentFunction = 0;
-    Status s = XGetGCValues(dpy, gc, gcFunctionMask|GCForeground, &gcValues);
+    Status s;
 
     /* bitmapGC is static, so that is has to be initialized only once */
     static GC bitmapGC = (GC) 0;
-
-    if (s) {
-	/* success */
-	fgpixel = gcValues.foreground;
-	gcCurrentFunction = gcValues.function; /* save current function */
-	gcValues.function = fast_rotate ? GXand : GXcopy; /* merge image_scr with drawable */
-	XChangeGC(dpy, gc, gcFunctionMask, &gcValues);
-    }
 
     /* eventually initialize bitmapGC */
     if ((GC)0 == bitmapGC) {
 	bitmapGC = XCreateGC(dpy, pixmap_src, 0, (XGCValues *) 0);
 	XSetForeground(dpy, bitmapGC, 1);
 	XSetBackground(dpy, bitmapGC, 0);
+    }
+
+    s = XGetGCValues(dpy, gc, gcFunctionMask|GCForeground|GCBackground, &gcValues);
+    if (s) {
+	/* success */
+	fgpixel = gcValues.foreground;
+	bgpixel = gcValues.background;
+	gcCurrentFunction = gcValues.function; /* save current function */
     }
 
     /* set font for the bitmap GC */
@@ -1822,13 +1815,35 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
 #undef RotateX
 #undef RotateY
 
-    /* This method is a *lot* faster, but may corrupt the color of objects underneath */
-    /* the rotated text. */
     if (fast_rotate) {
+    /* This default method is a lot faster, but may corrupt the colors
+     * underneath the rotated text if the X display Visual is PseudoColor.
+     * EAM - August 2005
+     */
+	assert(s);	/* Previous success in reading XGetGCValues() */
+	/* Force pixels of new text to black, background unchanged */
+	gcValues.function = GXand;
+	gcValues.background = WhitePixel(dpy, scr);
+	gcValues.foreground = BlackPixel(dpy, scr);
+	XChangeGC(dpy, gc, gcFunctionMask|GCBackground|GCForeground, &gcValues);
 	XPutImage(dpy, d, gc, image_dest, 0, 0, xdest, ydest, dest_width, dest_height);
-    } else {
 
-    /* Slow version - grab the current screen area where the new text will go */
+	/* Force pixels of new text to color, background unchanged */
+	gcValues.function = GXor;
+	gcValues.background = BlackPixel(dpy, scr);
+	gcValues.foreground = fgpixel;
+	XChangeGC(dpy, gc, gcFunctionMask|GCBackground|GCForeground, &gcValues);
+	XPutImage(dpy, d, gc, image_dest, 0, 0, xdest, ydest, dest_width, dest_height);
+
+    } else {
+    /* Slow but sure version - grab the current screen area where the new
+     * text will go and substitute in the pixels of the new text one by one.
+     * NB: selected by X Resource
+     *                             gnuplot*fastrotate: off
+     */
+	assert(s);	/* Previous success in reading XGetGCValues() */
+	gcValues.function = GXcopy;
+	XChangeGC(dpy, gc, gcFunctionMask, &gcValues);
 	s = XGetWindowAttributes(dpy, w, &win_attrib);
 	/* compute screen coords that are within the current window */
 	xscr = (xdest<0)? 0 : xdest;
@@ -1942,8 +1957,6 @@ exec_cmd(plot_struct *plot, char *command)
 		pr_font(&buffer[2]);
 		if (font)
 		  gpXSetFont(dpy, gc, font->fid);
-		if (font && gc_pm3d)
-		  gpXSetFont(dpy, gc_pm3d, font->fid);
 		break;
 	case 'E':
 		/* Save the requested font encoding */
@@ -2156,15 +2169,6 @@ exec_cmd(plot_struct *plot, char *command)
 	XSetLineAttributes(dpy, gc, plot->lwidth, plot->type, CapButt, JoinBevel);
 	plot->current_rgb = plot->cmap->rgbcolors[plot->lt + 3];
 	current_gc = &gc;
-	if (gc_pm3d) {
-	    /* EAM Mar 2005 - Needed in order to maintain dash type separatedly from color */
-	    if (plot->type == LineOnOffDash) {
-		XSetDashes(dpy, gc_pm3d, 0, dashes[plot->lt], strlen(dashes[plot->lt]));
-		XSetLineAttributes(dpy, gc_pm3d, plot->lwidth, plot->type, CapButt, JoinBevel);
-	    } else
-	    /* Set line width for pm3d mode also, but not dashes */
-		XSetLineAttributes(dpy, gc_pm3d, plot->lwidth, LineSolid, CapButt, JoinBevel);
-	}
     }
     /*   X11_point(number) - draw a point */
     else if (*buffer == 'P') {
@@ -2321,9 +2325,9 @@ exec_cmd(plot_struct *plot, char *command)
 	    lt = (lt % 8) + 2;
 	    if (lt < 0) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 		lt = -3;
-	    XSetForeground(dpy, gc_pm3d, plot->cmap->colors[lt + 3]);
+	    XSetForeground(dpy, gc, plot->cmap->colors[lt + 3]);
 	    plot->current_rgb = plot->cmap->rgbcolors[lt + 3];
-	    current_gc = &gc_pm3d;
+	    current_gc = &gc;
     } else if (*buffer == X11_GR_SET_RGBCOLOR) {
 	    int rgb255color;
 	    XColor xcolor;
@@ -2334,19 +2338,19 @@ exec_cmd(plot_struct *plot, char *command)
 	    FPRINTF((stderr, "gplt_x11: got request for color %d %d %d\n",
 		    xcolor.red, xcolor.green, xcolor.blue));
 	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor)) {
-		XSetForeground(dpy, gc_pm3d, xcolor.pixel);
+		XSetForeground(dpy, gc, xcolor.pixel);
 		plot->current_rgb = rgb255color;
 	    } else {
 		FPRINTF((stderr, "          failed to allocate color\n"));
 	    }
-	    current_gc = &gc_pm3d;
+	    current_gc = &gc;
     } else if (*buffer == X11_GR_SET_COLOR) {	/* set color */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
 #ifndef BINARY_X11_POLYGON
 	    double gray;
 	    sscanf(buffer + 1, "%lf", &gray);
 	    PaletteSetColor(plot, gray);
-	    current_gc = &gc_pm3d;
+	    current_gc = &gc;
 #else
 	    /* This command will fit within a single buffer so it doesn't
 	     * need to be so elaborate.
@@ -2384,7 +2388,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    }
 
 	    PaletteSetColor(plot, (double)gray);
-	    current_gc = &gc_pm3d;
+	    current_gc = &gc;
 	}
     } else if (*buffer == X11_GR_FILLED_POLYGON) {	/* filled polygon */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
@@ -3016,7 +3020,7 @@ exec_cmd(plot_struct *plot, char *command)
 #endif
 
 			    /* Copy the image to the drawable d. */
-			    XPutImage(dpy, plot->pixmap, gc_pm3d, image_dest, 0, 0,
+			    XPutImage(dpy, plot->pixmap, gc, image_dest, 0, 0,
 				      final_1_1_x_plot, final_1_1_y_plot, M_view, N_view);
 
 			    /* Free resources. */
@@ -3117,10 +3121,6 @@ display(plot_struct *plot)
 	stipple_initialized = 1;
     }
 
-    /* Always initialize a gc_pm3d, in case we need it for a single rgb color */
-    if (!gc_pm3d)
-	GetGCpm3d(plot, &gc_pm3d);
-
     /* set pixmap background */
     XSetForeground(dpy, gc, plot->cmap->colors[0]);
     XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, PIXMAP_HEIGHT(plot) + vchar);
@@ -3215,19 +3215,6 @@ CmapClear(cmap_t * cmap_ptr)
     cmap_ptr->total = (int) 0;
     cmap_ptr->allocated = (int) 0;
     cmap_ptr->pixels = (unsigned long *) 0;
-}
-
-static void
-GetGCpm3d(plot_struct * plot, GC * ret)
-{
-    XGCValues values;
-    unsigned long mask = 0;
-
-    mask = GCForeground | GCBackground;
-    values.foreground = WhitePixel(dpy, scr);
-    values.background = BlackPixel(dpy, scr);
-
-    *ret = XCreateGC(dpy, plot->window, mask, &values);
 }
 
 static void
@@ -3446,10 +3433,6 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 	}
     }
 
-    if (!gc_pm3d) {
-	GetGCpm3d(plot, &gc_pm3d);
-    }
-
     if (!num_colormaps) {
 	XFree(XListInstalledColormaps(dpy, plot->window, &num_colormaps));
 	FPRINTF((stderr, "(PaletteMake) num_colormaps = %d\n", num_colormaps));
@@ -3555,7 +3538,7 @@ PaletteSetColor(plot_struct * plot, double gray)
 	if (index >= plot->cmap->allocated)
 		index = plot->cmap->allocated -1;
 
-	XSetForeground(dpy, gc_pm3d, plot->cmap->pixels[index]);
+	XSetForeground(dpy, gc, plot->cmap->pixels[index]);
     }
 }
 

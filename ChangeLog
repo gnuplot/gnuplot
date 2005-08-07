@@ -1,3 +1,12 @@
+2005-08-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Do away with special (GC *)gc_pm3d; use the same gc
+	for all normal plots elements except pattern fill. Tweak the algorithm
+	for text rotation as suggested long ago by Dave Denholm. The default
+	method should now work on all TrueColor or DirectColor displays. The
+	X resource "gnuplot*fastrotate: off" still allows fall-back to a slower
+	but guaranteed algorithm if necessary.  Fixes bug #1251193.
+
 2005-08-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	Let PM3D be always compiled in. Thus, this patch removes all constructs
