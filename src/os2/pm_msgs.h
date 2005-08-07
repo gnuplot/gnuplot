@@ -1,5 +1,5 @@
 /*
- * $Id: pm_msgs.h,v 1.1 2005/06/15 10:10:27 mikulik Exp $
+ * $Id: pm_msgs.h,v 1.2 2005/07/28 07:46:06 mikulik Exp $
  */
 
 /* GNUPLOT - pm_msgs.h */
@@ -71,13 +71,11 @@
 #define SET_RULER	'u'
 #define SET_CURSOR	'c'
 #define SET_CLIPBOARD	'l'
-#ifdef PM3D
 #define GR_MAKE_PALETTE		'p'
 #define GR_RELEASE_PALETTE	'e'
 #define GR_SET_COLOR		'C'
 #define GR_SET_RGBCOLOR		'b'
 #define GR_FILLED_POLYGON	'f'
-#endif
 
 #endif
 

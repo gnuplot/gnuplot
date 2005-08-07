@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.140 2005/07/31 08:42:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.141 2005/08/06 17:22:12 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -108,10 +108,7 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.140 2005/07/31 08:42:31
 #include "stdfn.h"
 #include "gp_types.h"
 #include "term_api.h"
-
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON) || defined(PM3D)
 #include "gplt_x11.h"
-#endif
 
 #ifdef EXPORT_SELECTION
 # undef EXPORT_SELECTION
@@ -139,10 +136,8 @@ Error. Incompatible options.
 # include <X11/Xlocale.h>
 #endif
 
-#ifdef PM3D
-# include <math.h>		/* pow() */
-# include "getcolor.h"
-#endif
+#include <math.h>
+#include "getcolor.h"
 
 #ifdef USE_MOUSE
 # include <X11/cursorfont.h>
@@ -239,12 +234,10 @@ typedef struct cmap_t {
     Colormap colormap;
     unsigned long colors[Ncolors];	/* line colors as pixel values */
     unsigned long rgbcolors[Ncolors];	/* line colors in rgb format */
-#ifdef             PM3D
     unsigned long xorpixel;	/* line colors */
     int total;
     int allocated;
     unsigned long *pixels;	/* pm3d colors */
-#endif
 } cmap_t;
 
 /* always allocate a default colormap (done in preset()) */
@@ -289,9 +282,7 @@ typedef struct plot_struct {
      * This is always the default colormap, if not in pm3d.
      */
     cmap_t *cmap;
-#ifdef PM3D
     TBOOLEAN release_cmap;
-#endif
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
     /* This array holds per-axis scaling information sufficient to reconstruct
      * plot coordinates of a mouse click.  It is a snapshot of the contents of
@@ -355,7 +346,6 @@ static char selection[SEL_LEN] = "";
 # define PIXMAP_HEIGHT(plot)  ((plot)->height)
 #endif
 
-#ifdef PM3D
 static void GetGCpm3d __PROTO((plot_struct *, GC *));
 static void CmapClear __PROTO((cmap_t *));
 static void RecolorWindow __PROTO((plot_struct *));
@@ -366,7 +356,6 @@ static void PaletteMake __PROTO((plot_struct *, t_sm_palette *));
 static void PaletteSetColor __PROTO((plot_struct *, double));
 static int GetVisual __PROTO((int, Visual **, int *));
 static void scan_palette_from_buf __PROTO((plot_struct *));
-#endif
 
 #if defined(WITH_IMAGE)
 static unsigned short BitMaskDetails __PROTO((unsigned long mask, unsigned short *left_shift, unsigned short *right_shift));
@@ -499,7 +488,6 @@ static unsigned int widths[Nwidths] = { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 #define Ndashes 10
 static char dashes[Ndashes][5];
 
-#ifdef PM3D
 t_sm_palette sm_palette = {
     -1,				/* colorFormulae */
     SMPAL_COLOR_MODE_NONE,	/* colorMode */
@@ -513,6 +501,7 @@ t_sm_palette sm_palette = {
     (gradient_struct *) 0       /* gradient */
     /* Afunc, Bfunc and Cfunc can't be initialised here */
 };
+
 static GC gc_pm3d = (GC) 0;
 static int have_pm3d = 1;
 static int num_colormaps = 0;
@@ -531,7 +520,6 @@ static char *visual_name[] = {
     "DirectColor",
     (char *) 0
 };
-#endif /* PM3D */
 
 static Display *dpy;
 static int scr;
@@ -1070,13 +1058,11 @@ delete_plot(plot_struct *plot)
 	XFreePixmap(dpy, plot->pixmap);
 	plot->pixmap = None;
     }
-#ifdef PM3D
     /* we release the colormap here to free color resources.
      * but how would be recreate the colormap ? -- need to
      * call PaletteMake() somewhere ... */
     ReleaseColormap(plot);
     sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
-#endif
     /* but preserve geometry */
 }
 
@@ -1136,9 +1122,7 @@ prepare_plot(plot_struct *plot, int term_number)
      * operation if no palette was allocated until then.
      */
     plot->angle = 0;		/* default is horizontal */
-#ifdef PM3D
     plot->release_cmap = TRUE;
-#endif
     reset_cursor();
     XDefineCursor(dpy, plot->window, cursor);
 }
@@ -1226,7 +1210,6 @@ gnuplot: X11 aborted.\n", stderr);
 }
 
 
-#ifdef PM3D
 /*
  * This function builds back a palette from what x11.trm has written
  * into the pipe.  It cheats:  SMPAL_COLOR_MODE_FUNCTIONS for user defined
@@ -1318,8 +1301,6 @@ scan_palette_from_buf( plot_struct *plot )
     }
     PaletteMake(plot, &tpal);
 }
-#endif  /* PM3D */
-
 
 
 /*
@@ -1450,7 +1431,6 @@ record()
 	    reset_cursor();
 	    return 0;
 
-#ifdef PM3D
 	case X11_GR_MAKE_PALETTE:
 	    if (plot)
 		scan_palette_from_buf( plot );
@@ -1464,7 +1444,6 @@ record()
 	    sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
 	    free( sm_palette.gradient );
 	    return 1;
-#endif
 #endif
 
 #if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
@@ -1963,10 +1942,8 @@ exec_cmd(plot_struct *plot, char *command)
 		pr_font(&buffer[2]);
 		if (font)
 		  gpXSetFont(dpy, gc, font->fid);
-#ifdef PM3D
 		if (font && gc_pm3d)
 		  gpXSetFont(dpy, gc_pm3d, font->fid);
-#endif
 		break;
 	case 'E':
 		/* Save the requested font encoding */
@@ -2179,7 +2156,6 @@ exec_cmd(plot_struct *plot, char *command)
 	XSetLineAttributes(dpy, gc, plot->lwidth, plot->type, CapButt, JoinBevel);
 	plot->current_rgb = plot->cmap->rgbcolors[plot->lt + 3];
 	current_gc = &gc;
-#ifdef PM3D
 	if (gc_pm3d) {
 	    /* EAM Mar 2005 - Needed in order to maintain dash type separatedly from color */
 	    if (plot->type == LineOnOffDash) {
@@ -2189,7 +2165,6 @@ exec_cmd(plot_struct *plot, char *command)
 	    /* Set line width for pm3d mode also, but not dashes */
 		XSetLineAttributes(dpy, gc_pm3d, plot->lwidth, LineSolid, CapButt, JoinBevel);
 	}
-#endif
     }
     /*   X11_point(number) - draw a point */
     else if (*buffer == 'P') {
@@ -2340,7 +2315,6 @@ exec_cmd(plot_struct *plot, char *command)
 	    XSetLineAttributes(dpy, *current_gc, plot->lwidth, plot->type, CapButt, JoinBevel);
 	}
     }
-#ifdef PM3D
     else if (*buffer == X11_GR_SET_LINECOLOR) {
 	    int lt;
 	    sscanf(buffer + 1, "%4d", &lt);
@@ -2411,7 +2385,6 @@ exec_cmd(plot_struct *plot, char *command)
 
 	    PaletteSetColor(plot, (double)gray);
 	    current_gc = &gc_pm3d;
-#endif
 	}
     } else if (*buffer == X11_GR_FILLED_POLYGON) {	/* filled polygon */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
@@ -3097,7 +3070,6 @@ display(plot_struct *plot)
 {
     int n;
 
-#ifdef PM3D
     if (TRUE == plot->release_cmap) {
 	/* no pm3d palette was allocated, so
 	 * switch back to the default cmap */
@@ -3105,7 +3077,6 @@ display(plot_struct *plot)
 	ReleaseColormap(plot);
 	sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
     }
-#endif
 
     FPRINTF((stderr, "Display %d ; %d commands\n", plot->plot_number, plot->ncommands));
 
@@ -3146,11 +3117,9 @@ display(plot_struct *plot)
 	stipple_initialized = 1;
     }
 
-#ifdef PM3D
     /* Always initialize a gc_pm3d, in case we need it for a single rgb color */
     if (!gc_pm3d)
 	GetGCpm3d(plot, &gc_pm3d);
-#endif
 
     /* set pixmap background */
     XSetForeground(dpy, gc, plot->cmap->colors[0]);
@@ -3239,8 +3208,6 @@ UpdateWindow(plot_struct * plot)
 #endif
 }
 
-
-#ifdef PM3D
 
 static void
 CmapClear(cmap_t * cmap_ptr)
@@ -3385,10 +3352,8 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
     int min_colors;
     char *save_title = (char *) 0;
 
-#ifdef PM3D
     /* don't release this cmap at the first drawing operation */
     plot->release_cmap = FALSE;
-#endif
 
     if (tpal && tpal->use_maxcolors > 0)
 	max_colors = tpal->use_maxcolors;
@@ -3593,7 +3558,6 @@ PaletteSetColor(plot_struct * plot, double gray)
 	XSetForeground(dpy, gc_pm3d, plot->cmap->pixels[index]);
     }
 }
-#endif /* PM3D */
 
 #ifdef USE_MOUSE
 
@@ -3752,9 +3716,7 @@ AllocateXorPixel(cmap_t *cmap_ptr)
 	 * in black. This color is already allocated. */
 	pixel = xcolor.pixel;
     }
-#ifdef PM3D
     cmap_ptr->xorpixel = pixel;
-#endif
     return pixel;
 }
 
@@ -4699,14 +4661,12 @@ preset(int argc, char *argv[])
 #endif
     char *home = getenv("HOME");
     char *server_defaults, *env, buffer[256];
-#ifdef PM3D
 #if 0
     Visual *TrueColor_vis, *PseudoColor_vis, *StaticGray_vis, *GrayScale_vis;
     int TrueColor_depth, PseudoColor_depth, StaticGray_depth, GrayScale_depth;
 #endif
     char *db_string;
     sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;	/* color is off by default */
-#endif
 
     FPRINTF((stderr, "(preset) \n"));
 
@@ -4852,7 +4812,6 @@ gnuplot: X11 aborted.\n", ldisplay);
 
 /*---set geometry, font, colors, line widths, dash styles, point size-----*/
 
-#ifdef PM3D
     /* a specific visual can be forced by the X resource visual */
     db_string = pr_GetR(db, ".visual") ? (char *) value.addr : (char *) 0;
     if (db_string) {
@@ -4942,7 +4901,6 @@ gnuplot: X11 aborted.\n", ldisplay);
 	    fprintf(stderr, "\nunable to parse '%s' as integer\n", db_string);
 	}
     }
-#endif /* PM3D */
 
     pr_geometry();
     pr_font(NULL);		/* set current font to default font */
@@ -5027,7 +4985,6 @@ pr_color(cmap_t * cmap_ptr)
 
 	ctype = (Gray) ? "Gray" : "Color";
 
-#ifdef PM3D
 	if (&cmap != cmap_ptr) {
 	    /* for private colormaps: make sure
 	     * that pixel 0 gets black (joze) */
@@ -5036,7 +4993,6 @@ pr_color(cmap_t * cmap_ptr)
 	    xcolor.blue = 0;
 	    XAllocColor(dpy, cmap_ptr->colormap, &xcolor);
 	}
-#endif
 
 	for (n = 0; n < Ncolors; n++) {
 	    strcpy(option, ".");
@@ -5080,7 +5036,7 @@ pr_color(cmap_t * cmap_ptr)
 	for (n = 1; n < Ncolors; n++)
 	    cmap_ptr->colors[n] = (Rv) ? white : black;
     }
-#if defined(PM3D) && defined(USE_MOUSE)
+#ifdef USE_MOUSE
     {
 	/* create the xor GC just for allocating the xor value
 	 * before a palette is created. This way the xor foreground
@@ -5661,7 +5617,6 @@ pr_window(plot_struct *plot)
 
     FPRINTF((stderr, "(pr_window) \n"));
 
-#ifdef PM3D
     if (have_pm3d) {
 	XSetWindowAttributes attr;
 	unsigned long mask = CWBackPixel | CWBorderPixel | CWColormap;
@@ -5675,7 +5630,6 @@ pr_window(plot_struct *plot)
 	    PaletteMake(plot, (t_sm_palette *) 0);
 	}
     } else
-#endif
 	plot->window = XCreateSimpleWindow(dpy, root, plot->x, plot->y,
 					   plot->width, plot->height, BorderWidth, plot->cmap->colors[1], plot->cmap->colors[0]);
 

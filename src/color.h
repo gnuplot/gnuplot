@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.21 2004/12/05 08:04:41 sfeam Exp $
+ * $Id: color.h,v 1.22 2005/02/06 05:05:49 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -23,8 +23,6 @@ Here we define structures which are required for the communication
 of palettes between terminals and making palette routines.
 */
 
-
-/** NOTICE: currently, this file is included only if PM3D is defined **/
 #ifndef COLOR_H
 #define COLOR_H
 
@@ -59,8 +57,6 @@ typedef struct {
 #endif
     int style;
 } gpiPoint;
-
-#ifdef PM3D
 
 #include "gp_types.h"
 #include "eval.h"
@@ -298,8 +294,6 @@ void filled_polygon_3dcoords_zfixed __PROTO((int points, struct coordinate GPHUG
 */
 void draw_color_smooth_box __PROTO((int plot_mode));
 
-
-#endif /* PM3D */
 
 #endif /* COLOR_H */
 

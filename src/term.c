@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.118 2005/08/01 09:00:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.119 2005/08/05 15:48:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -89,10 +89,7 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.118 2005/08/01 09:00:49 mik
 #include "util.h"
 #include "version.h"
 #include "misc.h"
-
-#ifdef PM3D
 #include "getcolor.h"
-#endif
 
 #ifdef USE_MOUSE
 #include "mouse.h"
@@ -882,11 +879,9 @@ term_apply_lp_properties(struct lp_style_type *lp)
 
     /* Apply "linetype", which can include both color and dot/dash */
     (*term->linetype) (lp->l_type);
-#ifdef PM3D
     /* Possibly override the linetype color with a fancier colorspec */
     if (lp->use_palette)
         apply_pm3dcolor(&lp->pm3d_color, term);
-#endif
 }
 
 
@@ -1138,9 +1133,7 @@ do_arrow(
     double dx = (double) sx - (double) ex;
     double dy = (double) sy - (double) ey;
     double len_arrow = sqrt(dx * dx + dy * dy);
-#ifdef PM3D
     gpiPoint filledhead[5];
-#endif
     int xm = 0, ym = 0;
 
     /* negative headstyle means draw heads only, no shaft */
@@ -1186,7 +1179,6 @@ do_arrow(
             xm = (int) (dx2 + backlen * cos( phi + beta ));
             ym = (int) (dy2 + backlen * sin( phi + beta ));
         }
-#ifdef PM3D
         if (curr_arrow_headfilled==2) {
             /* draw filled forward arrow head */
             filledhead[0].x = ex + xm;
@@ -1203,7 +1195,6 @@ do_arrow(
             if (t->filled_polygon)
                 (*t->filled_polygon) (5, filledhead);
         }
-#endif
         /* draw outline of forward arrow head */
         if (curr_arrow_headfilled!=0) {
             (*t->move) (ex + xm, ey + ym);
@@ -1217,7 +1208,6 @@ do_arrow(
             (*t->vector) (ex + x2, ey + y2);
         }
         if (head == BOTH_HEADS) { /* backward arrow head */
-#ifdef PM3D
             if (curr_arrow_headfilled==2) {
                 /* draw filled backward arrow head */
                 filledhead[0].x = sx - xm;
@@ -1234,7 +1224,6 @@ do_arrow(
                 if (t->filled_polygon)
                     (*t->filled_polygon) (5, filledhead);
             }
-#endif
             /* draw outline of backward arrow head */
             if (curr_arrow_headfilled!=0) {
                 (*t->move) ( sx - xm, sy - ym);
@@ -1976,7 +1965,6 @@ test_term()
         x += xl * 1.5;
     }
 
-#ifdef PM3D
     {
         int cen_x = (int)(0.75 * xmax_t);
         int cen_y = (int)(0.83 * ymax_t);
@@ -2007,7 +1995,6 @@ test_term()
         (*t->put_text) (cen_x + i, cen_y + radius + t->v_char * 0.5, str);
         (*t->linetype)(LT_BLACK);
     }
-#endif /* PM3D */
 
     term_end_plot();
 }

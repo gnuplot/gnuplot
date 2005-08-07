@@ -162,7 +162,6 @@ typedef struct {
 } label_struct;
 #define EMPTY_LABELSTRUCT {"", "", {character, character, character, 0.0, 0.0, 0.0}, {0,0,0.0}}
 
-#ifdef PM3D
 typedef struct {
     int opt_given; /* option given / not given (otherwise default) */
     int closeto;   /* from list FILLEDCURVES_CLOSED, ... */
@@ -171,7 +170,6 @@ typedef struct {
     int oneside;   /* -1 if fill below bound only; +1 if fill above bound only */
 } filledcurves_opts;
 #define EMPTY_FILLEDCURVES_OPTS { 0, 0, 0.0, 0.0, 0 }
-#endif
 
 #ifdef EAM_HISTOGRAMS
 typedef struct histogram_style {
@@ -234,11 +232,7 @@ typedef struct {
 
 extern legend_key keyT;
 
-#ifdef PM3D
 # define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0, 0 }	/* -3 = no linetype */
-#else
-# define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0 }	/* -3 = no linetype */
-#endif
 
 #define DEFAULT_KEY_POSITION { graph, graph, graph, 0.9, 0.9, 0. }
 
@@ -355,11 +349,9 @@ void reset_textcolor __PROTO((const struct t_colorspec *tc, const struct terment
 
 extern fill_style_type default_fillstyle;
 
-#ifdef PM3D
 /* filledcurves style options set by 'set style [data|func] filledcurves opts' */
 extern filledcurves_opts filledcurves_opts_data;
 extern filledcurves_opts filledcurves_opts_func;
-#endif
 
 #ifdef EAM_HISTOGRAMS
 extern histogram_style histogram_opts;

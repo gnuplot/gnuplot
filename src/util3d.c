@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.24 2004/11/12 18:13:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.25 2005/03/16 19:31:30 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -898,10 +898,8 @@ map3d_xyz(
     out->x = Res[0] / Res[3];
     out->y = Res[1] / Res[3];
     out->z = Res[2] / Res[3];
-#ifdef PM3D
     /* store z for later color calculation */
     out->real_z = z;
-#endif
 #ifdef EAM_DATASTRINGS
     out->label = NULL;
 #endif
@@ -1050,12 +1048,10 @@ draw3d_point_unconditional(p_vertex v, struct lp_style_type *lp)
 
     TERMCOORD(v, x, y);
     term_apply_lp_properties(lp);
-#ifdef PM3D
     /* HBB 20010822: implemented "linetype palette" for points, too */
     if (lp->use_palette) {
 	set_color(cb2gray( z2cb(v->real_z) ));
     }
-#endif
     if (!clip_point(x, y))
 	(term->point) (x, y, lp->p_type);
 }
@@ -1081,13 +1077,11 @@ draw3d_line_unconditional(
     TERMCOORD(v1, x1, y1);
     TERMCOORD(v2, x2, y2);
     term_apply_lp_properties(lp);
-#ifdef PM3D
     if (lp->use_palette) {
 	double z =  (v1->real_z + v2->real_z) * 0.5;
 
 	set_color(cb2gray(z2cb(z)));
     } else
-#endif
 	if (linetype != lp->l_type)
 	    (term->linetype)(linetype);
 
@@ -1167,7 +1161,6 @@ polyline3d_next(p_vertex v2, struct lp_style_type *lp)
 #endif
 
     /* Copied from draw3d_line_unconditional: */
-#ifdef PM3D
     /* If use_palette is active, polylines can't be used -->
      * revert back to old method */
     if (lp->use_palette) {
@@ -1177,7 +1170,6 @@ polyline3d_next(p_vertex v2, struct lp_style_type *lp)
 	return;
 
     }
-#endif
 
     TERMCOORD(v2, x2, y2);
     /* FIXME HBB 20031219: no clipping?! */

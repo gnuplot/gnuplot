@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  *
- * $Id: pstricks.trm,v 1.27 2004/09/16 00:22:31 sfeam Exp $
+ * $Id: pstricks.trm,v 1.28 2004/11/27 02:38:38 sfeam Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -99,11 +99,9 @@ TERM_PUBLIC void PSTRICKS_put_text __PROTO((unsigned int x, unsigned int y, cons
 TERM_PUBLIC int PSTRICKS_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int PSTRICKS_text_angle __PROTO((int ang));
 TERM_PUBLIC void PSTRICKS_reset __PROTO((void));
-#ifdef PM3D
 TERM_PUBLIC int PSTRICKS_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void PSTRICKS_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void PSTRICKS_filled_polygon __PROTO((int, gpiPoint *));
-#endif
 
 #define PSTRICKS_XMAX 10000.0
 #define PSTRICKS_YMAX 10000.0
@@ -124,8 +122,6 @@ static float PSTRICKS_posy;
 static enum JUSTIFY PSTRICKS_justify = LEFT;
 static int PSTRICKS_angle = 0;
 
-#ifdef PM3D
-
 /* if 1 below, then the file size is shorter thanks to a macro for polygon */
 #define PSTRICKS_SHORTER_FILE 1
 
@@ -136,7 +132,6 @@ static char PSTRICKS_color_str[16] = "";
 #endif
 static int PSTRICKS_palette_set = FALSE;
 static int PSTRICKS_palette_size = 128;
-#endif
 
 #define	PSTRICKS_TINY_DOT	0.00025		/* A tiny dot */
 
@@ -213,9 +208,7 @@ PSTRICKS_init()
     PSTRICKS_linetype(-1);
     fseek(gpoutfile,0,SEEK_SET);
     fputs("% GNUPLOT: LaTeX picture using PSTRICKS macros\n", gpoutfile);
-#ifdef PM3D
     PSTRICKS_palette_set = FALSE;    /* PM3D palette set? */
-#endif /* PM3D */
 }
 
 
@@ -570,8 +563,6 @@ PSTRICKS_reset()
 }
 
 
-#ifdef PM3D
-
 TERM_PUBLIC int
 PSTRICKS_make_palette (t_sm_palette *palette)
 {
@@ -656,8 +647,6 @@ PSTRICKS_filled_polygon (int points, gpiPoint *corners)
     fprintf(gpoutfile, "\n");
 }
 
-#endif /*PM3D*/
-
 #endif /* TERM_BODY */
 
 
@@ -674,9 +663,7 @@ TERM_TABLE_START(pstricks_driver)
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
 #endif
-#ifdef PM3D
      , PSTRICKS_make_palette, 0,  PSTRICKS_set_color, PSTRICKS_filled_polygon
-#endif /*PM3D*/
 TERM_TABLE_END(pstricks_driver)
 
 #undef LAST_TERM

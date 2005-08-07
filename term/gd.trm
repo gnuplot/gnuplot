@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.72 2005/07/03 16:21:15 vanzandt Exp $
+ * $Id: gd.trm,v 1.73 2005/07/14 23:10:39 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -124,12 +124,10 @@ TERM_PUBLIC void PNG_reset __PROTO((void));
 TERM_PUBLIC int PNG_set_font __PROTO((const char *fontname));
 TERM_PUBLIC void PNG_pointsize __PROTO((double ptsize));
 TERM_PUBLIC void PNG_boxfill(int, unsigned int, unsigned int, unsigned int, unsigned int);
-#ifdef PM3D
 TERM_PUBLIC int PNG_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void PNG_previous_palette (void); */
 TERM_PUBLIC void PNG_set_color (t_colorspec *);
 TERM_PUBLIC void PNG_filled_polygon (int, gpiPoint *);
-#endif
 #ifdef WITH_IMAGE
 TERM_PUBLIC void PNG_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif
@@ -902,8 +900,6 @@ PNG_reset()
     }
 }
 
-#ifdef PM3D
-
 #if 0
 /* use  #if 1  that's just for debugging */
 void
@@ -991,7 +987,7 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 #endif
     }
     return 0;
-    }
+}
 
 
 TERM_PUBLIC
@@ -1033,7 +1029,6 @@ void PNG_set_color (t_colorspec *colorspec)
 #endif
     }
 }
-
 
 TERM_PUBLIC
 void PNG_filled_polygon(int points, gpiPoint *corners)
@@ -1082,10 +1077,7 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
     for (i = 0; i < points; i++)
 	corners[i].y = Y(corners[i].y);
 #endif
-    }
-
-
-#endif
+}
 
 /*
  * This function is used for filledboxes
@@ -1187,7 +1179,6 @@ PNG_graphics()
 		png_state.loop_count );
     }
 #endif
-
 }
 
 /*
@@ -1869,12 +1860,10 @@ TERM_TABLE_START(png_driver)
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support */
 #endif
-#ifdef PM3D
     , PNG_make_palette,
     0, /* previous_palette() ... no, single array of 256 colours for PNG */
     PNG_set_color,
     PNG_filled_polygon
-#endif
 #ifdef WITH_IMAGE
     , PNG_image
 #endif
@@ -2040,12 +2029,10 @@ TERM_TABLE_START(jpeg_driver)
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support */
 #endif
-#ifdef PM3D
     , PNG_make_palette,
     0, /* previous_palette() ... no, single array of 256 colours for PNG */
     PNG_set_color,
     PNG_filled_polygon
-#endif
 #ifdef WITH_IMAGE
     , PNG_image
 #endif
@@ -2209,12 +2196,10 @@ TERM_TABLE_START(gif_driver)
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support */
 #endif
-#ifdef PM3D
     , PNG_make_palette,
     0, /* previous_palette() ... no, single array of 256 colours for PNG */
     PNG_set_color,
     PNG_filled_polygon
-#endif
 #ifdef WITH_IMAGE
     , PNG_image
 #endif

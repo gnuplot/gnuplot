@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.59 2005/07/18 18:24:02 sfeam Exp $
+ * $Id: pslatex.trm,v 1.60 2005/07/23 04:08:35 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -806,7 +806,6 @@ EPSLATEX_linetype(int linetype)
     }
 }
 
-#ifdef PM3D
 TERM_PUBLIC void
 EPSLATEX_set_color(t_colorspec *colorspec)
 {
@@ -845,7 +844,6 @@ EPSLATEX_set_color(t_colorspec *colorspec)
             fprintf(gpoutfile, "      \\colorgray{%s}%%\n",save_space(gray));
     }
 }
-#endif
 
 /*
  * The TERM_LAYER mechanism is used here to signal a difference between
@@ -912,10 +910,8 @@ TERM_TABLE_START(epslatex_driver)
 #ifdef USE_MOUSE
     0, 0, 0, 0, 0, /* no mouse support for postscript */
 #endif
-#ifdef PM3D
     PS_make_palette, PS_previous_palette,
     EPSLATEX_set_color, PS_filled_polygon,
-#endif
 #ifdef WITH_IMAGE
     PS_image,
 #endif
@@ -938,12 +934,10 @@ TERM_TABLE_START(pslatex_driver)
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for postscript */
 #endif
-#ifdef PM3D
    , PS_make_palette,
    PS_previous_palette, /* write grestore */
    PS_set_color,
    PS_filled_polygon
-#endif
 #ifdef WITH_IMAGE
     , PS_image
 #endif
@@ -964,12 +958,10 @@ TERM_TABLE_START(pstex_driver)
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for postscript */
 #endif
-#ifdef PM3D
    , PS_make_palette,
    PS_previous_palette, /* write grestore */
    PS_set_color,
    PS_filled_polygon
-#endif
 #ifdef WITH_IMAGE
     , PS_image
 #endif

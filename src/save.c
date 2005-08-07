@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.115 2005/08/02 05:08:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.116 2005/08/05 15:48:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -51,10 +51,8 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.115 2005/08/02 05:08:01 sfe
 #include "term_api.h"
 #include "util.h"
 #include "variable.h"
-#ifdef PM3D
-# include "pm3d.h"
-# include "getcolor.h"
-#endif
+#include "pm3d.h"
+#include "getcolor.h"
 
 static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
@@ -232,9 +230,7 @@ set y2data%s\n",
     SAVE_TIMEFMT(FIRST_Z_AXIS);
     SAVE_TIMEFMT(SECOND_X_AXIS);
     SAVE_TIMEFMT(SECOND_Y_AXIS);
-#ifdef PM3D
     SAVE_TIMEFMT(COLOR_AXIS);
-#endif
 #undef SAVE_TIMEFMT
 
     if (boxwidth < 0.0)
@@ -262,9 +258,7 @@ set y2data%s\n",
     SAVE_FORMAT(SECOND_X_AXIS);
     SAVE_FORMAT(SECOND_Y_AXIS);
     SAVE_FORMAT(FIRST_Z_AXIS );
-#ifdef PM3D
     SAVE_FORMAT(COLOR_AXIS );
-#endif
 #undef SAVE_FORMAT
 
     fprintf(fp, "set angles %s\n",
@@ -291,9 +285,7 @@ set y2data%s\n",
 	fputs(" \\\n", fp);
 	SAVE_GRID(SECOND_X_AXIS);
 	SAVE_GRID(SECOND_Y_AXIS);
-#ifdef PM3D
 	SAVE_GRID(COLOR_AXIS);
-#endif
 	fputs("\n", fp);
 #undef SAVE_GRID
 
@@ -497,9 +489,7 @@ set y2data%s\n",
     SAVE_LOG(SECOND_X_AXIS);
     SAVE_LOG(SECOND_Y_AXIS);
     SAVE_LOG(FIRST_Z_AXIS );
-#ifdef PM3D
     SAVE_LOG(COLOR_AXIS );
-#endif
 #undef SAVE_LOG
 
     /* FIXME */
@@ -663,9 +653,7 @@ set origin %g,%g\n",
     SAVE_MINI(FIRST_Z_AXIS);	/* HBB 20000506: noticed mztics were not saved! */
     SAVE_MINI(SECOND_X_AXIS);
     SAVE_MINI(SECOND_Y_AXIS);
-#ifdef PM3D
     SAVE_MINI(COLOR_AXIS);
-#endif
 #undef SAVE_MINI
 
     save_tics(fp, FIRST_X_AXIS);
@@ -673,9 +661,7 @@ set origin %g,%g\n",
     save_tics(fp, FIRST_Z_AXIS);
     save_tics(fp, SECOND_X_AXIS);
     save_tics(fp, SECOND_Y_AXIS);
-#ifdef PM3D
     save_tics(fp, COLOR_AXIS);
-#endif
 
 #define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)		\
     {								\
@@ -726,10 +712,8 @@ set origin %g,%g\n",
     SAVE_AXISLABEL(FIRST_Z_AXIS);
     save_range(fp, FIRST_Z_AXIS);
 
-#ifdef PM3D
     SAVE_AXISLABEL(COLOR_AXIS);
     save_range(fp, COLOR_AXIS);
-#endif
 #undef SAVE_AXISLABEL
 #undef SAVE_AXISLABEL_OR_TITLE
 
@@ -740,7 +724,6 @@ set origin %g,%g\n",
 
     fprintf(fp, "set locale \"%s\"\n", get_locale());
 
-#ifdef PM3D
     fputs("set pm3d ", fp);
     fputs((PM3D_IMPLICIT == pm3d.implicit ? "implicit" : "explicit"), fp);
     fprintf(fp, " at %s\n", pm3d.where);
@@ -830,7 +813,7 @@ set origin %g,%g\n",
     }
 
     /*
-     *  Save Colorbox info
+     *  Save colorbox info
      */
     if (color_box.where != SMCOLOR_BOX_NO)
 	fprintf(fp,"set colorbox %s\n", color_box.where==SMCOLOR_BOX_DEFAULT ? "default" : "user");
@@ -843,7 +826,6 @@ set origin %g,%g\n",
 		 else fprintf(fp, "border %d", color_box.border_lt_tag);
     if (color_box.where == SMCOLOR_BOX_NO) fputs("\nunset colorbox\n", fp);
 	else fputs("\n", fp);
-#endif
 
     fputs("set loadpath ", fp);
     {
@@ -1072,18 +1054,15 @@ save_pm3dcolor(FILE *fp, const struct t_colorspec *tc)
 		      break;
 	case TC_FRAC: fprintf(fp," palette fraction %4.2f", tc->value);
 		      break;
-	case TC_RGB:
-#ifdef PM3D
-			{
-			const char *color = reverse_table_lookup(pm3d_color_names_tbl, tc->lt);
-			if (color)
-			    fprintf(fp," rgb \"%s\" ", color);
-			else
-			    fprintf(fp," rgb \"#%6.6x\" ", tc->lt);
-			break;
-			}
-#endif
-	default:       break;
+	case TC_RGB:  {
+		      const char *color = reverse_table_lookup(pm3d_color_names_tbl, tc->lt);
+		      if (color)
+	    		fprintf(fp," rgb \"%s\" ", color);
+    		      else
+	    		fprintf(fp," rgb \"#%6.6x\" ", tc->lt);
+    		      break;
+	    	      }
+	default:      break;
 	}
     }
 }
@@ -1133,7 +1112,6 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
 	fputs("histograms\n", fp);
 	break;
 #endif
-#ifdef PM3D
     case FILLEDCURVES:
 	fputs("filledcurves ", fp);
 	if (!strcmp(which, "data") || !strcmp(which, "Data"))
@@ -1142,7 +1120,6 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
 	    filledcurves_options_tofile(&filledcurves_opts_func, fp);
 	fputc('\n', fp);
 	break;
-#endif
     case BOXERROR:
 	fputs("boxerrorbars\n", fp);
 	break;
@@ -1167,11 +1144,9 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
     case CANDLESTICKS:
 	fputs("candlesticks\n", fp);
 	break;
-#ifdef PM3D
     case PM3DSURFACE:
 	fputs("pm3d\n", fp);
 	break;
-#endif
 #ifdef EAM_DATASTRINGS
     case LABELPOINTS:
 	fputs("labels\n", fp);
@@ -1195,7 +1170,6 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 {
 
     fprintf(fp, " linetype %d", lp->l_type + 1);
-#ifdef PM3D
     if (lp->use_palette) {
 	fprintf(fp, " linecolor");
 	if (lp->pm3d_color.type == TC_LT)
@@ -1203,7 +1177,6 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 	else
     	    save_pm3dcolor(fp,&(lp->pm3d_color));
     }
-#endif
     fprintf(fp, " linewidth %.3f", lp->l_width);
 
     if (show_point && lp->pointflag) {

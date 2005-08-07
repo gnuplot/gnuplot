@@ -71,12 +71,10 @@ struct TERMENTRY {
    void (*set_cursor) __PROTO((int c, int x, int y));
    void (*set_clipboard) __PROTO((const char s[]));
 #endif
-#ifdef PM3D
    int (*make_palette)__PROTO((t_sm_palette *palette));
    void (*previous_palette) __PROTO(());
    void (*set_color) __PROTO((t_colorspec *colorspec));
    void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
-#endif
 #ifdef IMAGE_DRIVER
     void (*image) __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif
@@ -354,8 +352,9 @@ _set_cursor(int c, int x, int y) - Set cursor style and corner of
 _set_clipboard(const char s[]) - Write a string to the clipboard.
 
 
-The following four functions should be conditioned on PM3D.  See also:
-pm3d/old-docs/README-pm3d.
+The following four functions were conditioned on #ifdef PM3D; this necessity
+was removed in August 2005. For further documentation about pm3d routines,
+see also pm3d/old-docs/README-pm3d.
 
 _make_palette(t_sm_palette *palette) - If argument is NULL, return
    number of colors available.  If the number of colors is not limited
@@ -365,7 +364,7 @@ _make_palette(t_sm_palette *palette) - If argument is NULL, return
 
 _set_color(t_colorspec *colorspec) - EAM November 2004 ***CHANGED***
    This routine used to accept a single double value, which was 
-   interpreted as a fractional index into the current PM3D palette.
+   interpreted as a fractional index into the current color palette.
    Changing the parameter to a colorspec allows terminals to support
    other methods of specifying a color. If a given driver can not
    support a particular color request mechanism, it ignores it.

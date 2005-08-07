@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.72 2005/06/02 17:18:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.73 2005/07/31 08:42:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -51,11 +51,7 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.72 2005/06/02 17:18:45 sfe
 #ifdef USE_MOUSE		/* comment out whole file, otherwise... */
 
 #include "mouse.h"
-#ifdef PM3D
 #include "pm3d.h"
-#endif
-
-
 #include "alloc.h"
 #include "axis.h"
 #include "command.h"
@@ -972,25 +968,13 @@ builtin_help(struct gp_event_t *ge)
 static char *
 builtin_toggle_log(struct gp_event_t *ge)
 {
-    if (!ge) {
-#ifdef PM3D
+    if (!ge)
 	return "`builtin-toggle-log` y logscale for plots, z and cb logscale for splots";
-#else
-	return "`builtin-toggle-log` y logscale for plots, z logscale for splots";
-#endif
-    }
     if (is_3d_plot) {
-#ifdef PM3D
 	if (Z_AXIS.log || CB_AXIS.log)
 	    do_string_replot("unset log zcb");
 	else
 	    do_string_replot("set log zcb");
-#else
-	if (Z_AXIS.log)
-	    do_string_replot("unset log z");
-	else
-	    do_string_replot("set log z");
-#endif
     } else {
 #ifdef WITH_IMAGE
 	/* set log cb or log y whether using "with (rgb)image" plot or not */
@@ -1020,17 +1004,10 @@ builtin_nearest_log(struct gp_event_t *ge)
     }
     if (is_3d_plot) {
 	/* 3D-plot: toggle lin/log z axis */
-#ifdef PM3D
 	if (Z_AXIS.log || CB_AXIS.log)
 	    do_string_replot("unset log zcb");
 	else
 	    do_string_replot("set log zcb");
-#else
-	if (Z_AXIS.log)
-	    do_string_replot("unset log z");
-	else
-	    do_string_replot("set log z");
-#endif
     } else {
 	/* 2D-plot: figure out which axis/axes is/are
 	 * close to the mouse cursor, and toggle those lin/log */
@@ -1893,9 +1870,7 @@ do_save_3dplot(struct surface_points *plots, int pcount, int quick)
 	replotrequest();
     } else {
 	if (M_TEST_AXIS(X_AXIS) || M_TEST_AXIS(Y_AXIS) || M_TEST_AXIS(Z_AXIS)
-#ifdef PM3D
 	    || M_TEST_AXIS(CB_AXIS)
-#endif
 	    ) {
 		graph_error("axis ranges must be above 0 for log scale!");
 		return;

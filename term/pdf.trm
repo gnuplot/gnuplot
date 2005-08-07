@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.52 2005/05/22 18:49:39 sfeam Exp $
+ * $Id: pdf.trm,v 1.53 2005/07/25 18:12:27 sfeam Exp $
  */
 
 /*------------------------------
@@ -54,12 +54,9 @@ TERM_PUBLIC void PDF_point __PROTO ((unsigned int x, unsigned int y, int pointst
 TERM_PUBLIC int PDF_set_font __PROTO ((const char *font));
 TERM_PUBLIC void PDF_boxfill __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void PDF_linewidth __PROTO ((double linewidth));
-
-#ifdef PM3D
 TERM_PUBLIC int PDF_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void PDF_previous_palette __PROTO((void));
 TERM_PUBLIC void PDF_set_color __PROTO((t_colorspec *));
-#endif /* PM3D */
 #ifdef WITH_IMAGE
 TERM_PUBLIC void PDF_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif
@@ -1252,8 +1249,6 @@ PDF_filled_polygon(int points, gpiPoint* corners)
     PDF_restore(myPDF);
 }
 
-#ifdef PM3D
-
 TERM_PUBLIC int
 PDF_make_palette(t_sm_palette *palette)
 {
@@ -1264,7 +1259,6 @@ PDF_make_palette(t_sm_palette *palette)
 
     return 0;
 }
-
 
 TERM_PUBLIC void
 PDF_set_color(t_colorspec *colorspec)
@@ -1298,9 +1292,6 @@ TERM_PUBLIC void
 PDF_previous_palette()
 {
 }
-
-#endif /* PM3D */
-
  
 #ifdef WITH_IMAGE
 TERM_PUBLIC void
@@ -1575,12 +1566,10 @@ TERM_TABLE_START (pdf_driver)
 #   ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for pdf */
 #   endif
-#ifdef PM3D
    , PDF_make_palette,
    PDF_previous_palette,
    PDF_set_color,
    PDF_filled_polygon
-#endif /* PM3D */
 #ifdef WITH_IMAGE
    , PDF_image
 #endif

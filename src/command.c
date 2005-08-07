@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.126 2005/07/24 06:01:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.127 2005/07/25 21:05:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1394,9 +1394,6 @@ system_command()
 static void
 test_palette_subcommand()
 {
-#ifndef PM3D
-    int_error(c_token, "'test palette' requires pm3d support built-in");
-#else
     enum {test_palette_colors = 256};
 
     double gray, z[test_palette_colors];
@@ -1513,7 +1510,6 @@ se tit'R,G,B profiles of the current color palette';";
 
     /* further, gp_input_line[] and token[] now destroyed! */
     c_token = num_tokens = 0;
-#endif /* PM3D */
 }
 
 

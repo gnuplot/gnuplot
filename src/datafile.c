@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.89 2005/07/31 04:26:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.90 2005/08/04 22:39:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1538,10 +1538,8 @@ plot_option_using(int max_using)
                 plot_ticlabel_using(CT_Y2TICLABEL);
             } else if (almost_equals(c_token, "ztic$labels")) {
                 plot_ticlabel_using(CT_ZTICLABEL);
-# ifdef PM3D
             } else if (almost_equals(c_token, "cbtic$labels")) {
                 plot_ticlabel_using(CT_CBTICLABEL);
-# endif /* PM3D */
             } else if (almost_equals(c_token, "key")) {
                 plot_ticlabel_using(CT_KEYLABEL);
 #endif /* EAM_DATASTRINGS */
@@ -1863,14 +1861,12 @@ df_readascii(double v[], int max)
                             axis = FIRST_Z_AXIS;
                             axcol = 2;
                             break;
-#ifdef PM3D
                         case CT_CBTICLABEL:
                             /* EAM FIXME - I have no idea which column
                              * to set for cbtic */
                             axis = COLOR_AXIS;
                             axcol =3;
                             break;
-#endif
                     }
                     /* FIXME EAM - Trap special case of only a single
                      * 'using' column. But really we need to handle
@@ -2083,14 +2079,9 @@ df_3dmatrix(struct surface_points *this_plot, int need_palette)
     int width, height;
     int row, col;
     struct iso_curve *this_iso;
-#ifdef PM3D
     double used[4];             /* output from using manip */
     /* evaluate used[0..use_spec_34] */
     int use_spec_34 = (need_palette && df_no_use_specs == 4) ? 4 : 3; 
-#else
-    double used[3];             /* output from using manip */
-    int use_spec_34 = 3;        /* evaluate used[0..use_spec_34] */
-#endif
     struct coordinate GPHUGE *point;    /* HBB 980308: added 'GPHUGE' flag */
 
     assert(df_matrix);
@@ -2135,10 +2126,8 @@ df_3dmatrix(struct surface_points *this_plot, int need_palette)
         && df_no_use_specs != use_spec_34 /*3 or 4*/)
         int_error(NO_CARET, "Current implementation requires full `using` spec");
 
-#ifdef PM3D
     if (need_palette && df_no_use_specs == 4)
         this_plot->pm3d_color_from_column = 1;
-#endif
 
     /* columns are those in the binary data file, not those of `using` spec */
     if (df_max_cols < 3) {
@@ -2195,21 +2184,17 @@ df_3dmatrix(struct surface_points *this_plot, int need_palette)
                     used[i] = df_column[column - 1].datum;
             }
             /*}}} */
-#ifdef PM3D
             if (df_no_use_specs != 4)
                 used[3] = used[2]; /* 3 parameters of `using` => 4th color-value equals z-value */
-#endif
 
             point->type = INRANGE;      /* so far */
 
             STORE_WITH_LOG_AND_UPDATE_RANGE(point->x, used[0], point->type, FIRST_X_AXIS, NOOP, goto skip);
             STORE_WITH_LOG_AND_UPDATE_RANGE(point->y, used[1], point->type, FIRST_Y_AXIS, NOOP, goto skip);
             STORE_WITH_LOG_AND_UPDATE_RANGE(point->z, used[2], point->type, FIRST_Z_AXIS, NOOP, goto skip);
-#ifdef PM3D
             if (need_palette) {
                 COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(point->CRD_COLOR, used[3], point->type, COLOR_AXIS, NOOP, goto skip);
             }
-#endif
 
             /* some of you won't like this, but I say goto is for this */
 
@@ -2914,9 +2899,7 @@ df_bin_default_columns default_style_cols[LAST_PLOT_STYLE + 1] = {
     {YERRORLINES, 2, 1},
     {XYERRORLINES, 3, 1},
     {FILLEDCURVES, 1, 1},
-#ifdef PM3D
     {PM3DSURFACE, 1, 2},
-#endif
 #ifdef EAM_DATASTRINGS
     {LABELPOINTS, 2, 1},
 #endif

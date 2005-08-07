@@ -1,5 +1,5 @@
 /*
- * $Id: getcolor.h,v 1.7 2004/07/01 17:10:04 broeker Exp $
+ * $Id: getcolor.h,v 1.8 2004/07/13 14:11:22 broeker Exp $
  */
 
 /* GNUPLOT - getcolor.h */
@@ -22,8 +22,6 @@
 
 #ifndef GETCOLOR_H
 #define GETCOLOR_H
-
-#ifdef PM3D
 
 #include "syscfg.h"
 #include "color.h"
@@ -57,9 +55,6 @@ gradient_struct *approximate_palette __PROTO(( t_sm_palette *palette, int maxsam
 double GetColorValueFromFormula __PROTO((int formula, double x));
 
 extern const char *ps_math_color_formulae[];
-
-
-#endif /* PM3D */
 
 #endif /* GETCOLOR_H */
 

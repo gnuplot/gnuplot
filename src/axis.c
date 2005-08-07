@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.50 2005/02/01 11:23:48 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.51 2005/08/05 15:48:32 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -71,9 +71,7 @@ const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
     { - 0, 10, "r" , NO_TICS,                      },
     { - 5,  5, "u" , NO_TICS,                      },
     { - 5,  5, "v" , NO_TICS,                      },
-#ifdef PM3D
     { -10, 10, "cb", TICS_ON_BORDER | TICS_MIRROR, },
-#endif
 };
 
 
@@ -110,9 +108,7 @@ const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE + 1] =
     { "r", R_AXIS},
     { "u", U_AXIS},
     { "v", V_AXIS},
-#ifdef PM3D
     { "cb", COLOR_AXIS},
-#endif
     { NULL, -1}
 };
 
@@ -136,11 +132,7 @@ const lp_style_type default_axis_zeroaxis = DEFAULT_AXIS_ZEROAXIS;
 
 /* grid drawing */
 /* int grid_selection = GRID_OFF; */
-#ifdef PM3D
 # define DEFAULT_GRID_LP { 0, -1, 0, 1.0, 1.0, 0 }
-#else
-# define DEFAULT_GRID_LP { 0, -1, 0, 1.0, 1.0 }
-#endif
 const struct lp_style_type default_grid_lp = DEFAULT_GRID_LP;
 struct lp_style_type grid_lp   = DEFAULT_GRID_LP;
 struct lp_style_type mgrid_lp  = DEFAULT_GRID_LP;
@@ -1497,8 +1489,6 @@ some_grid_selected()
     return FALSE;
 }
 
-
-#ifdef PM3D
 /*
    Check and set the cb-range for use by pm3d or other palette using styles.
    Return 0 on wrong range, otherwise 1.
@@ -1542,8 +1532,6 @@ set_cbminmax()
 #endif
     return 1;
 }
-
-#endif /* PM3D */
 
 static void
 get_position_type(enum position_type *type, int *axes)

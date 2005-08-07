@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.30 2004/01/19 17:41:12 mikulik Exp $
+# $Id: makefile.mgw,v 1.31 2004/02/12 09:03:12 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #
@@ -69,9 +69,6 @@ FREETYPE=1
 
 # MOUSE support for the windows terminal
 MOUSE=1
-
-# PM3D splot mode + colours and filled polygons
-PM3D=1
 
 # PIPES: define if you would prefer support of pipes undef Windows (e.g.
 # plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot.exe keeps attached
@@ -155,10 +152,6 @@ CFLAGS += -I$(TOP) -I. -D_Windows -DHAVE_CONFIG_H\
 
 ifdef MOUSE
   CFLAGS += -DUSE_MOUSE=1
-endif
-
-ifdef PM3D
-  CFLAGS += -DPM3D=1
 endif
 
 ifdef NEWGD

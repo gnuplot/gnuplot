@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.61 2005/04/24 14:44:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.62 2005/04/29 07:33:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -17,11 +17,7 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.61 2005/04/24 14:44:34 miku
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#ifdef PM3D
-
 #include "pm3d.h"
-
 #include "alloc.h"
 #include "axis.h"
 #include "graphics.h"
@@ -788,10 +784,8 @@ set_plot_with_palette(int plot_num, int plot_mode)
     if (plot_mode == MODE_SPLOT) {
 	/* Any surface 'with pm3d', 'with image' or 'with line|dot palette'? */
 	while (surface++ < plot_num) {
-#ifdef PM3D
 	    if (this_3dplot->plot_style == PM3DSURFACE)
 		return;
-#endif
 #ifdef WITH_IMAGE
 	    if (this_3dplot->plot_style == IMAGE)
 		return;
@@ -849,4 +843,3 @@ is_plot_with_colorbox()
     return plot_wants_colorbox;
 }
 
-#endif

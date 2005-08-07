@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.37 2004/07/03 06:08:50 sfeam Exp $
+ * $Id: setshow.h,v 1.38 2005/06/05 04:55:15 sfeam Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -77,10 +77,8 @@ void delete_linestyle __PROTO((struct linestyle_def *, struct linestyle_def *));
 /* void delete_arrowstyle __PROTO((struct arrowstyle_def *, struct arrowstyle_def *)); */
 void reset_key __PROTO((void));
 void free_marklist __PROTO((struct ticmark * list));
-#ifdef PM3D
 extern int enable_reset_palette;
 void reset_palette __PROTO((void));
-#endif
 
 /* Called from set_label(), plot2d.c and plot3d.c */
 extern void parse_label_options __PROTO((struct text_label *this_label));

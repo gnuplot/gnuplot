@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ggi.trm,v 1.21 2004/12/22 00:41:58 sfeam Exp $
+ * $Id: ggi.trm,v 1.22 2004/12/24 07:39:05 sfeam Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -72,7 +72,7 @@ static TBOOLEAN GGI_use_whm = 0;
 #endif
 
 #if 1
-#if defined(PM3D) && defined(HAVE_GGI_XMI_H)
+#if defined(HAVE_GGI_XMI_H)
 #   define ENABLE_XMI 1
 #endif
 #endif
@@ -143,13 +143,11 @@ TERM_PUBLIC void GGI_draw_vline __PROTO((int y1, int y2, int x));
 TERM_PUBLIC void GGI_set_clipboard __PROTO((const char[]));
 #endif /* USE_MOUSE */
 
-#ifdef PM3D
 TERM_PUBLIC int GGI_make_palette __PROTO((t_sm_palette*));
 TERM_PUBLIC void GGI_previous_palette __PROTO((void));
 TERM_PUBLIC void GGI_set_color __PROTO((struct t_colorspec *colorspec));
 #ifdef ENABLE_XMI
 TERM_PUBLIC void GGI_filled_polygon __PROTO((int, gpiPoint*));
-#endif
 #endif
 
 #define GOT_GGI_PROTO
@@ -185,12 +183,10 @@ static int GGI_saved_stl = 0;
 static int GGI_needs_update = 1;
 #endif
 
-#ifdef PM3D
 static t_sm_palette GGI_save_pal = {
     -1, -1, -1, -1, -1, -1, -1, -1,
     (rgb_color*) 0, -1, -1
 };
-#endif
 
 /* First to some global variables
  *
@@ -207,11 +203,9 @@ static ggi_pixel GGIborderColor;
 static ggi_pixel GGIaxisColor;
 static ggi_pixel GGIblack;
 static ggi_pixel GGIcolors[7];
-#ifdef PM3D
 #define GGI_PM3D_COLORS 240
 static const int ggi_pm3d_colors = GGI_PM3D_COLORS;
 static ggi_pixel GGI_smooth_colors[GGI_PM3D_COLORS];
-#endif
 static unsigned int GGIx,GGIy;
 static unsigned int GGIwidth, GGIheight, GGIymax;
 #if 0
@@ -584,11 +578,9 @@ GGI_reset()
     if(GGIvisual!=NULL) {
 	GGI_close();
     }
-#ifdef PM3D
 # if 0 /* not needed */
     GGI_save_pal.colorFormulae = -1; /* force later reallocation of palette */
 # endif
-#endif
 }
 
 TERM_PUBLIC void
@@ -1379,7 +1371,6 @@ GGI_set_clipboard(const char s[])
 
 #endif
 
-#ifdef PM3D
 TERM_PUBLIC int
 GGI_make_palette(t_sm_palette *palette)
 {
@@ -1474,8 +1465,6 @@ GGI_filled_polygon(int points, gpiPoint *corners)
 }
 #endif
 
-#endif /* PM3D */
-
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -1500,7 +1489,6 @@ TERM_TABLE_START(ggi_driver)
 #ifdef USE_MOUSE
     , GGI_waitforinput, GGI_put_tmptext, GGI_set_ruler, GGI_set_cursor, GGI_set_clipboard
 #endif
-#ifdef PM3D
     , GGI_make_palette,
     GGI_previous_palette,
     GGI_set_color,
@@ -1508,7 +1496,6 @@ TERM_TABLE_START(ggi_driver)
     GGI_filled_polygon
 #else
     0 /* GGI_filled_polygon */
-#endif
 #endif
 TERM_TABLE_END(ggi_driver)
 

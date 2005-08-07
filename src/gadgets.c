@@ -40,9 +40,7 @@ static char *RCSid() { return RCSid("gadgets.c,v 1.1.3.1 2000/05/03 21:47:15 hbb
 #include "graphics.h"
 #include "plot3d.h" /* For is_plot_with_palette() */
 
-#ifdef PM3D
 #include "pm3d.h"
-#endif
 
 /* This file contains mainly a collection of global variables that
  * used to be in 'set.c', where they didn't really belong. They
@@ -112,11 +110,7 @@ double pointsize = 1.0;
 /* set border */
 int draw_border = 31;
 int border_layer = 1;
-#ifdef PM3D
 # define DEFAULT_BORDER_LP { 0, -2, 0, 1.0, 1.0, 0 }
-#else
-# define DEFAULT_BORDER_LP { 0, -2, 0, 1.0, 1.0 }
-#endif
 struct lp_style_type border_lp = DEFAULT_BORDER_LP;
 const struct lp_style_type default_border_lp = DEFAULT_BORDER_LP;
 
@@ -145,11 +139,9 @@ TBOOLEAN suppressMove = FALSE;	/* to prevent moveto while drawing contours */
 
 fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, LT_UNDEFINED } ;
 
-#ifdef PM3D
 /* filledcurves style options */
 filledcurves_opts filledcurves_opts_data = EMPTY_FILLEDCURVES_OPTS;
 filledcurves_opts filledcurves_opts_func = EMPTY_FILLEDCURVES_OPTS;
-#endif
 
 #ifdef EAM_HISTOGRAMS
 histogram_style histogram_opts = DEFAULT_HISTOGRAM_STYLE;
@@ -394,18 +386,13 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
     if (tc->type == TC_LINESTYLE) {
 	lp_use_properties(&style, tc->lt, 0);
 	(*t->linetype)(style.l_type);
-#ifdef PM3D
 	tc = &style.pm3d_color;
-#else
-	return;
-#endif
     }
 
     if (tc->type == TC_DEFAULT) {
 	(*t->linetype)(LT_BLACK);
 	return;
     }
-#ifdef PM3D
     if (tc->type == TC_LT) {
 	if (t->set_color)
 	    t->set_color(tc);
@@ -428,7 +415,6 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 				tc->value : 1-tc->value);
 		      break;
     }
-#endif
     if (tc->type == TC_LT) {
 	(*t->linetype)(tc->lt);
 	return;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.20 2004/09/01 15:53:47 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.21 2004/09/02 02:53:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -12,8 +12,6 @@ static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.20 2004/09/01 15:53:47 
 ]*/
 
 #include "syscfg.h"
-
-#ifdef PM3D
 
 #include "stdfn.h"
 
@@ -870,7 +868,5 @@ HSV_2_RGB(rgb_color *col)
 }
 #undef CONSTRAIN
 
-
-#endif /* PM3D */
 
 /* eof getcolor.c */

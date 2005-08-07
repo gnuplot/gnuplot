@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.194 2005/08/06 16:28:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.195 2005/08/06 19:07:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -63,14 +63,11 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.194 2005/08/06 16:28:37 sfea
 #ifdef USE_MOUSE
 #   include "mouse.h"
 #endif
-
-#ifdef PM3D
 #include "pm3d.h"
 #include "getcolor.h"
-static palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
-#endif
+#include <ctype.h>
 
-#include <ctype.h>		/* for isdigit() */
+static palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
 
 static void set_angles __PROTO((void));
 static void set_arrow __PROTO((void));
@@ -118,11 +115,9 @@ static void set_offsets __PROTO((void));
 static void set_origin __PROTO((void));
 static void set_output __PROTO((void));
 static void set_parametric __PROTO((void));
-#ifdef PM3D
 static void set_pm3d __PROTO((void));
 static void set_palette __PROTO((void));
 static void set_colorbox __PROTO((void));
-#endif
 static void set_pointsize __PROTO((void));
 static void set_polar __PROTO((void));
 static void set_print __PROTO((void));
@@ -162,12 +157,10 @@ static int looks_like_numeric __PROTO((char *));
 static int set_tic_prop __PROTO((AXIS_INDEX));
 static char *fill_numbers_into_string __PROTO((char *pattern));
 
-#ifdef PM3D
 static void check_palette_grayscale __PROTO((void));
 static int set_palette_defined __PROTO((void));
 static void set_palette_file __PROTO((void));
 static void set_palette_function __PROTO((void));
-#endif
 #ifdef EAM_HISTOGRAMS
 static void parse_histogramstyle __PROTO((histogram_style *hs, 
 		t_histogram_type def_type, int def_gap));
@@ -398,7 +391,6 @@ fprintf(stderr,"BLA \n");
 	case S_PARAMETRIC:
 	    set_parametric();
 	    break;
-#ifdef PM3D
 	case S_PM3D:
 	    set_pm3d();
 	    break;
@@ -408,7 +400,6 @@ fprintf(stderr,"BLA \n");
 	case S_COLORBOX:
 	    set_colorbox();
 	break;
-#endif
 	case S_POINTSIZE:
 	    set_pointsize();
 	    break;
@@ -514,7 +505,6 @@ fprintf(stderr,"BLA \n");
 	case S_NOZMTICS:
 	    set_tic_prop(FIRST_Z_AXIS);
 	    break;
-#ifdef PM3D
 	case S_MCBTICS:
 	case S_NOMCBTICS:
 	case S_CBTICS:
@@ -525,7 +515,6 @@ fprintf(stderr,"BLA \n");
 	case S_NOCBMTICS:
 	    set_tic_prop(COLOR_AXIS);
 	    break;
-#endif
 	case S_XDATA:
 	    set_timedata(FIRST_X_AXIS);
 	    /* HBB 20000506: the old cod this this, too, although it
@@ -545,11 +534,9 @@ fprintf(stderr,"BLA \n");
 	case S_ZDATA:
 	    set_timedata(FIRST_Z_AXIS);
 	    break;
-#ifdef PM3D
 	case S_CBDATA:
 	    set_timedata(COLOR_AXIS);
 	    break;
-#endif
 	case S_X2DATA:
 	    set_timedata(SECOND_X_AXIS);
 	    break;
@@ -565,11 +552,9 @@ fprintf(stderr,"BLA \n");
 	case S_ZLABEL:
 	    set_xyzlabel(&axis_array[FIRST_Z_AXIS].label);
 	    break;
-#ifdef PM3D
 	case S_CBLABEL:
 	    set_xyzlabel(&axis_array[COLOR_AXIS].label);
 	    break;
-#endif
 	case S_X2LABEL:
 	    set_xyzlabel(&axis_array[SECOND_X_AXIS].label);
 	    break;
@@ -591,11 +576,9 @@ fprintf(stderr,"BLA \n");
 	case S_ZRANGE:
 	    set_range(FIRST_Z_AXIS);
 	    break;
-#ifdef PM3D
 	case S_CBRANGE:
 	    set_range(COLOR_AXIS);
 	    break;
-#endif
 	case S_RRANGE:
 	    set_range(R_AXIS);
 	    break;
@@ -890,9 +873,7 @@ set_autoscale()
     PROCESS_AUTO_LETTER(FIRST_Z_AXIS);
     PROCESS_AUTO_LETTER(SECOND_X_AXIS);
     PROCESS_AUTO_LETTER(SECOND_Y_AXIS);
-#ifdef PM3D
     PROCESS_AUTO_LETTER(COLOR_AXIS);
-#endif
     /* came here only if nothing found: */
 	int_error(c_token, "Invalid range");
 }
@@ -1303,9 +1284,7 @@ set_format()
 	SET_DEFFORMAT(FIRST_Z_AXIS , set_for_axis);
 	SET_DEFFORMAT(SECOND_X_AXIS, set_for_axis);
 	SET_DEFFORMAT(SECOND_Y_AXIS, set_for_axis);
-#ifdef PM3D
 	SET_DEFFORMAT(COLOR_AXIS   , set_for_axis);
-#endif
     } else {
 	if (!isstring(c_token))
 	    int_error(c_token, "expecting format string");
@@ -1322,9 +1301,7 @@ set_format()
 	    SET_FORMATSTRING(FIRST_Z_AXIS);
 	    SET_FORMATSTRING(SECOND_X_AXIS);
 	    SET_FORMATSTRING(SECOND_Y_AXIS);
-#ifdef PM3D
 	    SET_FORMATSTRING(COLOR_AXIS);
-#endif
 #undef SET_FORMATSTRING
 
 	    c_token++;
@@ -1367,10 +1344,8 @@ set_grid()
 	else GRID_MATCH(FIRST_Z_AXIS, "nomz$tics")
 	else GRID_MATCH(SECOND_X_AXIS, "nomx2$tics")
 	else GRID_MATCH(SECOND_Y_AXIS, "nomy2$tics")
-#ifdef PM3D
 	else GRID_MATCH(COLOR_AXIS, "nocb$tics")
 	else GRID_MATCH(COLOR_AXIS, "nomcb$tics")
-#endif
 	else if (almost_equals(c_token,"po$lar")) {
 	    if (!some_grid_selected()) {
 		/* grid_selection = GRID_X; */
@@ -2455,7 +2430,6 @@ set_parametric()
 }
 
 
-#ifdef PM3D
 /* is resetting palette enabled?
  * note: reset_palette() is disabled within 'test palette'
  */
@@ -2567,8 +2541,7 @@ set_palette_defined()
 		    int_error( c_token-1, "Unknown color name." );
 		named_colors = 1;
 	    }
-}
-	else {
+	} else {
 	    /* numerical rgb, hsv, xyz, ... values  [0,1] */
 	    r = real(const_express(&a));
 	    if (r<0 || r>1 )  int_error(c_token-1,"Value out of range [0,1].");
@@ -2596,7 +2569,7 @@ set_palette_defined()
 	    int_error( c_token, "Expected comma." );
 	++c_token;
 
-}
+    }
 
     sm_palette.gradient_num = num + 1;
     check_palette_grayscale();
@@ -2681,7 +2654,6 @@ set_palette_file()
     check_palette_grayscale();
 
 }
-
 
 
 /* Process a 'set palette function' command.
@@ -3172,7 +3144,6 @@ set_pm3d()
 	}
     }
 }
-#endif
 
 
 /* process 'set pointsize' command */
@@ -3287,13 +3258,11 @@ set_style()
     switch(lookup_table(&show_style_tbl[0],c_token)){
     case SHOW_STYLE_DATA:
 	data_style = get_style();
-#ifdef PM3D
 	if (data_style == FILLEDCURVES) {
 	    get_filledcurves_style_options(&filledcurves_opts_data);
 	    if (!filledcurves_opts_data.opt_given) /* default value */
 		filledcurves_opts_data.closeto = FILLEDCURVES_CLOSED;
 	}
-#endif
 	break;
     case SHOW_STYLE_FUNCTION:
 	{
@@ -3310,13 +3279,11 @@ set_style()
 		int_error(c_token, "style not usable for function plots, left unchanged");
 	    else
 		func_style = temp_style;
-#ifdef PM3D
 	    if (func_style == FILLEDCURVES) {
 		get_filledcurves_style_options(&filledcurves_opts_func);
 		if (!filledcurves_opts_func.opt_given) /* default value */
 		    filledcurves_opts_func.closeto = FILLEDCURVES_CLOSED;
 	    }
-#endif
 	    break;
 	}
     case SHOW_STYLE_LINE:
@@ -3601,11 +3568,7 @@ set_tics()
 	} else if (equals(c_token,"tc") ||
 		   almost_equals(c_token,"text$color")) {
 	    struct t_colorspec lcolor;
-#ifdef PM3D
 	    parse_colorspec(&lcolor, TC_FRAC);
-#else
-	    parse_colorspec(&lcolor, TC_LT);
-#endif
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
 		axis_array[i].ticdef.textcolor = lcolor;
 	} else if (!END_OF_COMMAND) {
@@ -4043,11 +4006,7 @@ set_tic_prop(AXIS_INDEX axis)
 		}
 	    } else if (equals(c_token,"tc") ||
 		       almost_equals(c_token,"text$color")) {
-#ifdef PM3D
 		parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_FRAC);
-#else
-		parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_LT);
-#endif
 	    } else if (almost_equals(c_token, "au$tofreq")) {
 		/* auto tic interval */
 		++c_token;

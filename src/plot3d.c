@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.105 2005/07/16 21:01:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.106 2005/08/04 19:26:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -50,9 +50,7 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.105 2005/07/16 21:01:46 s
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
-#ifdef PM3D
-# include "pm3d.h"
-#endif
+#include "pm3d.h"
 #ifdef BINARY_DATA_FILE
 #include "plot.h"
 #endif
@@ -119,11 +117,8 @@ sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
     sp->contours = NULL;
     sp->iso_crvs = NULL;
     sp->num_iso_read = 0;
-
-#ifdef PM3D
     sp->pm3d_color_from_column = FALSE;
     sp->pm3d_where[0] = 0;
-#endif
 
     memset(&(sp->lp_properties),0,sizeof(lp_style_type));
     memset(&(sp->arrow_properties),0,sizeof(arrow_style_type));
@@ -262,9 +257,7 @@ plot3drequest()
     AXIS_INIT3D(FIRST_Z_AXIS, 0, 1);
     AXIS_INIT3D(U_AXIS, 1, 0);
     AXIS_INIT3D(V_AXIS, 1, 0);
-#ifdef PM3D
     AXIS_INIT3D(COLOR_AXIS, 0, 1);
-#endif
 
     if (!term)			/* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
@@ -535,13 +528,11 @@ grid_nongrid_data(struct surface_points *this_plot)
 
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
 
-#ifdef PM3D
 	    if (this_plot->pm3d_color_from_column)
 		int_error(NO_CARET, "Gridding of the color column is not implemented");
 	    else {
 		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points->CRD_COLOR, z, points->type, COLOR_AXIS, NOOP, continue);
 	    }
-#endif
 	}
     }
 
@@ -575,11 +566,9 @@ get_3ddata(struct surface_points *this_plot)
     struct iso_curve *this_iso;
 
     if (mapping3d == MAP3D_CARTESIAN) {
-#ifndef PM3D
 	/* do this check only, if we have PM3D / PM3D-COLUMN not compiled in */
 	if (df_no_use_specs == 2)
 	    int_error(this_plot->token, "Need 1 or 3 columns for cartesian data");
-#endif
     } else {
 	if (df_no_use_specs == 1)
 	    int_error(this_plot->token, "Need 2 or 3 columns for polar data");
@@ -587,9 +576,7 @@ get_3ddata(struct surface_points *this_plot)
 
     this_plot->num_iso_read = 0;
     this_plot->has_grid_topology = TRUE;
-#ifdef PM3D
     this_plot->pm3d_color_from_column = FALSE;
-#endif
 
     /* we ought to keep old memory - most likely case
      * is a replot, so it will probably exactly fit into
@@ -625,13 +612,8 @@ get_3ddata(struct surface_points *this_plot)
 	double x, y, z;
 	double xtail, ytail, ztail;
 	double color = VERYLARGE;
-
-#ifdef PM3D
 	int pm3d_color_from_column = FALSE;
 #define color_from_column(x) pm3d_color_from_column = x
-#else
-#define color_from_column(x)
-#endif
 
 #ifdef EAM_DATASTRINGS
 	if (this_plot->plot_style == LABELPOINTS)
@@ -728,7 +710,7 @@ get_3ddata(struct surface_points *this_plot)
 		    j = 3;
 		    break;
 		}
-#ifdef PM3D
+
 		if (j == 2) {
 		    if (PM3DSURFACE != this_plot->plot_style)
 			int_error(this_plot->token,
@@ -742,7 +724,6 @@ get_3ddata(struct surface_points *this_plot)
 		    j = 3;
 		    break;
 		}
-#endif
 
 		/* Assume everybody agrees that x,y,z are the first three specs */
 		if (j >= 3) {
@@ -872,7 +853,6 @@ get_3ddata(struct surface_points *this_plot)
 		if (this_plot->plot_style == VECTOR)
 		    STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->z, ztail, cp->type, z_axis, NOOP, goto come_here_if_undefined);
 
-#ifdef PM3D
 		if (NEED_PALETTE(this_plot)) {
 		    if (pm3d_color_from_column) {
 			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, color, cp->type, COLOR_AXIS, NOOP, goto come_here_if_undefined);
@@ -880,7 +860,6 @@ get_3ddata(struct surface_points *this_plot)
 			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, z, cp->type, COLOR_AXIS, NOOP, goto come_here_if_undefined);
 		    }
 		}
-#endif
 	    }
 
 #ifdef EAM_DATASTRINGS
@@ -895,11 +874,9 @@ get_3ddata(struct surface_points *this_plot)
 	    ++xdatum;
 	}			/* end of whileloop - end of surface */
 
-#ifdef PM3D
 	if (pm3d_color_from_column) {
 	    this_plot->pm3d_color_from_column = pm3d_color_from_column;
 	}
-#endif
 
 	if (xdatum > 0) {
 	    this_plot->num_iso_read++;	/* Update last iso. */
@@ -1060,10 +1037,6 @@ calculate_set_of_isolines(
     int i, j;
     struct coordinate GPHUGE *points = (*this_iso)->points;
 
-#ifndef PM3D
-    (void) need_palette;			/* Avoid -Wunused */
-#endif
-
     for (j = 0; j < num_iso_to_use; j++) {
 	double iso = iso_min + j * iso_step;
 	/* HBB 20000501: with the new code, it should
@@ -1099,11 +1072,9 @@ calculate_set_of_isolines(
 	    points[i].type = INRANGE;
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].z, temp, points[i].type,
 					    value_axis, NOOP, NOOP);
-#ifdef PM3D
 	    if (need_palette) {
 		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].CRD_COLOR, temp, points[i].type, COLOR_AXIS, NOOP, NOOP);
 	    }
-#endif
 	}
 	(*this_iso)->p_count = num_sam_to_use;
 	*this_iso = (*this_iso)->next;
@@ -1300,9 +1271,7 @@ eval_3dplots()
 	    }
 
 	    /* default line and point types, no palette */
-#ifdef PM3D
 	    this_plot->lp_properties.use_palette = 0;
-#endif
 	    this_plot->lp_properties.l_type = line_num;
 	    this_plot->lp_properties.p_type = point_num;
 
@@ -1363,12 +1332,11 @@ eval_3dplots()
 #ifdef EAM_DATASTRINGS
 			|| (this_plot->plot_style == LABELPOINTS)
 #endif
-			))
-			{
-			    int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
-			    this_plot->plot_style = POINTSTYLE;
-			}
-#ifdef PM3D
+			)) {
+			int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
+			this_plot->plot_style = POINTSTYLE;
+		    }
+
 		    if ((this_plot->plot_style | data_style) & PM3DSURFACE) {
 			if (equals(c_token, "at")) {
 			/* option 'with pm3d [at ...]' is explicitly specified */
@@ -1377,7 +1345,6 @@ eval_3dplots()
 			    return; /* error */
 			}
 		    }
-#endif
 
 		    set_with = TRUE;
 		    continue;
@@ -1520,11 +1487,9 @@ eval_3dplots()
 	    }
 
 	    if (crnt_param == 0
-#ifdef PM3D
 		&& this_plot->plot_style != PM3DSURFACE
 		/* don't increment the default line/point properties if
 		 * this_plot is an EXPLICIT pm3d surface plot */
-#endif
 #ifdef WITH_IMAGE
 		&& this_plot->plot_style != IMAGE
 		&& this_plot->plot_style != RGBIMAGE
@@ -1563,11 +1528,8 @@ eval_3dplots()
 		/* remember settings for second surface in file */
 		struct lp_style_type *these_props = &(this_plot->lp_properties);
 		enum PLOT_STYLE this_style = this_plot->plot_style;
-#ifdef PM3D
 		struct surface_points *first_dataset = this_plot;
 		    /* pointer to the plot of the first dataset (surface) in the file */
-#endif
-
 		int this_token = this_plot->token;
 		while (!df_eof) {
 		    this_plot = *tp_3d_ptr;
@@ -1592,11 +1554,9 @@ eval_3dplots()
 			 */
 			continue;
 
-#ifdef PM3D
 		    if (this_plot != first_dataset)
 			/* copy (explicit) "with pm3d at ..." option from the first dataset in the file */
 			strcpy(this_plot->pm3d_where, first_dataset->pm3d_where);
-#endif
 
 		    /* okay, we have read a surface */
 		    ++plot_num;
@@ -1826,7 +1786,6 @@ eval_3dplots()
     setup_tics(FIRST_Y_AXIS, 20);
     setup_tics(FIRST_Z_AXIS, 20);
 
-#ifdef PM3D
     set_plot_with_palette(plot_num, MODE_SPLOT);
     if (is_plot_with_palette()) {
 	set_cbminmax();
@@ -1834,7 +1793,6 @@ eval_3dplots()
 	/* axis_revert_and_unlog_range(COLOR_AXIS); */
 	/* fprintf(stderr,"plot3d.c: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max); */
     }
-#endif
 
     AXIS_WRITEBACK(FIRST_X_AXIS);
 

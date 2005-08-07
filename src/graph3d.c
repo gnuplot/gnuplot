@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.124 2005/07/29 07:54:33 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.125 2005/08/05 15:48:33 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -63,11 +63,10 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.124 2005/07/29 07:54:33 
 #include "util3d.h"
 #include "util.h"
 
-#ifdef PM3D
-#   include "pm3d.h"
-#   include "plot3d.h"
-#   include "color.h"
-#endif
+#include "pm3d.h"
+#include "plot3d.h"
+#include "color.h"
+
 #ifdef WITH_IMAGE
 #include "plot.h"
 #endif
@@ -76,9 +75,7 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.124 2005/07/29 07:54:33 
  * parts, one before, the other after drawing the main surfaces, as a
  * poor-man's depth-sorting algorithm.  Make this independent of
  * PM3D. Turn the new option on by default. */
-#if defined(PM3D) || !defined(USE_GRID_LAYERS)
-# define USE_GRID_LAYERS 1
-#endif
+#define USE_GRID_LAYERS 1
 
 
 static int p_height;
@@ -119,11 +116,9 @@ static void plot3d_impulses __PROTO((struct surface_points * plot));
 static void plot3d_lines __PROTO((struct surface_points * plot));
 static void plot3d_points __PROTO((struct surface_points * plot, /* FIXME PM3D: */ int p_type));
 static void plot3d_vectors __PROTO((struct surface_points * plot));
-#ifdef PM3D
 /* no pm3d for impulses */
 static void plot3d_lines_pm3d __PROTO((struct surface_points * plot));
 static void get_surface_cbminmax __PROTO((struct surface_points *plot, double *cbmin, double *cbmax));
-#endif
 static void cntr3d_impulses __PROTO((struct gnuplot_contours * cntr,
 				     struct lp_style_type * lp));
 static void cntr3d_lines __PROTO((struct gnuplot_contours * cntr,
@@ -155,11 +150,9 @@ static void boundary3d __PROTO((struct surface_points * plots, int count));
 /* put entries in the key */
 static void key_sample_line __PROTO((int xl, int yl));
 static void key_sample_point __PROTO((int xl, int yl, int pointtype));
-#ifdef PM3D
 static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, int yl));
 static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
 static TBOOLEAN can_pm3d = FALSE;
-#endif
 static void key_text __PROTO((int xl, int yl, char *text));
 
 static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, int*, int*, int*, int*));
@@ -662,7 +655,6 @@ do_3dplot(
     if (!hidden3d && grid_layer == 0)
 	draw_3d_graphbox(plots, pcount, ALLGRID);
 
-#ifdef PM3D
     /* Draw PM3D color key box */
     if (!quick) {
 	can_pm3d = is_plot_with_palette() && !make_palette()
@@ -670,7 +662,6 @@ do_3dplot(
 	if (can_pm3d && is_plot_with_colorbox())
 	    draw_color_smooth_box(MODE_SPLOT);
     }
-#endif /* PM3D */
 
 #ifdef USE_GRID_LAYERS
     if (!hidden3d && (grid_layer == -1))
@@ -903,13 +894,11 @@ do_3dplot(
 	for (surface = 0;
 	     surface < pcount;
 	     this_plot = this_plot->next_sp, surface++) {
-#ifdef PM3D
 	    /* just an abbreviation */
 	    TBOOLEAN use_palette = can_pm3d && this_plot->lp_properties.use_palette;
 	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit) {
 		pm3d_draw_one(this_plot);
 	    }
-#endif
 
 	    if (draw_surface) {
 		TBOOLEAN lkey = (key->visible && this_plot->title && this_plot->title[0]);
@@ -927,9 +916,7 @@ do_3dplot(
 
 	    switch (this_plot->plot_style) {
 	    case BOXES:	/* can't do boxes in 3d yet so use impulses */
-#ifdef PM3D
 	    case FILLEDCURVES:
-#endif
 	    case IMPULSES:
 		{
 		    if (lkey) {
@@ -945,19 +932,15 @@ do_3dplot(
 	    case LINES:
 		{
 		    if (lkey) {
-#ifdef PM3D
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_line_pm3d(this_plot, xl, yl);
 			else
-#endif
 			key_sample_line(xl, yl);
 		    }
 		    if (!(hidden3d && draw_surface)) {
-#ifdef PM3D
 			if (use_palette)
 			    plot3d_lines_pm3d(this_plot);
 			else
-#endif
 			    plot3d_lines(this_plot);
 		    }
 		    break;
@@ -974,11 +957,9 @@ do_3dplot(
 	    case FINANCEBARS:
 	    case POINTSTYLE:
 		if (lkey) {
-#ifdef PM3D
 		    if (this_plot->lp_properties.use_palette)
 			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 		    else
-#endif
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 		}
 		if (!(hidden3d && draw_surface)) {
@@ -989,30 +970,24 @@ do_3dplot(
 	    case LINESPOINTS:
 		/* put lines */
 		if (lkey) {
-#ifdef PM3D
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_line_pm3d(this_plot, xl, yl);
 			else
-#endif
 		    key_sample_line(xl, yl);
 		}
 
 		if (!(hidden3d && draw_surface)) {
-#ifdef PM3D
 		    if (use_palette)
 			plot3d_lines_pm3d(this_plot);
 		    else
-#endif
 			plot3d_lines(this_plot);
 		}
 
 		/* put points */
 		if (lkey) {
-#ifdef PM3D
 		    if (this_plot->lp_properties.use_palette)
 			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 		    else
-#endif
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 		}
 
@@ -1024,11 +999,9 @@ do_3dplot(
 
 	    case DOTS:
 		if (lkey) {
-#ifdef PM3D
 		    if (this_plot->lp_properties.use_palette)
 			key_sample_point_pm3d(this_plot, xl, yl, -1);
 		    else
-#endif
 			key_sample_point(xl, yl, -1);
 		}
 
@@ -1041,22 +1014,18 @@ do_3dplot(
 	    case VECTOR:
 		plot3d_vectors(this_plot);
 		if (lkey) {
-#ifdef PM3D
 		    if (this_plot->lp_properties.use_palette)
 			key_sample_line_pm3d(this_plot, xl, yl);
 		    else
-#endif
 			key_sample_line(xl, yl);
 		}
 		break;
 
-#ifdef PM3D
 	    case PM3DSURFACE:
 		if (can_pm3d && PM3D_IMPLICIT != pm3d.implicit) {
 		    pm3d_draw_one(this_plot);
 		}
 		break;
-#endif
 
 #ifdef EAM_DATASTRINGS
 	    case LABELPOINTS:
@@ -1108,9 +1077,7 @@ do_3dplot(
 		    case IMPULSES:
 		    case LINES:
 		    case BOXES:	/* HBB: I think these should be here... */
-#ifdef PM3D
 		    case FILLEDCURVES:
-#endif
 		    case VECTOR:
 		    case STEPS:
 		    case FSTEPS:
@@ -1128,33 +1095,25 @@ do_3dplot(
 		    case CANDLESTICKS:	/* HBB: dito */
 		    case FINANCEBARS:
 		    case POINTSTYLE:
-#ifdef PM3D
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 			else
-#endif
 			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 			break;
 		    case LINESPOINTS:
-#ifdef PM3D
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_line_pm3d(this_plot, xl, yl);
 			else
-#endif
 			key_sample_line(xl, yl);
 			break;
 		    case DOTS:
-#ifdef PM3D
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 			else
-#endif
 			key_sample_point(xl, yl, -1);
 			break;
-#ifdef PM3D
 		    case PM3DSURFACE: /* ignored */
 			break;
-#endif
 #ifdef EAM_HISTOGRAMS
 		    case HISTOGRAMS: /* ignored */
 			break;
@@ -1177,11 +1136,9 @@ do_3dplot(
 			    (*t->linetype)(LT_BLACK);
 			    key_text(xl, yl, cntrs->label);
 			}
-#ifdef PM3D
 			if (use_palette)
 			    set_color( cb2gray( z2cb(cntrs->z) ) );
 			else
-#endif
 			    (*t->linetype) (++thiscontour_lp_properties.l_type);
 
 			if (key->visible) {
@@ -1191,9 +1148,7 @@ do_3dplot(
 			    case LINES:
 			    case LINESPOINTS:
 			    case BOXES:	/* HBB: these should be treated as well... */
-#ifdef PM3D
 			    case FILLEDCURVES:
-#endif
 			    case VECTOR:
 			    case STEPS:
 			    case FSTEPS:
@@ -1211,25 +1166,19 @@ do_3dplot(
 			    case CANDLESTICKS:	/* HBB: ditto */
 			    case FINANCEBARS:
 			    case POINTSTYLE:
-#ifdef PM3D
 				if (this_plot->lp_properties.use_palette)
 				    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 				else
-#endif
-				key_sample_point(xl, yl, this_plot->lp_properties.p_type);
+				    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 				break;
 			    case DOTS:
-#ifdef PM3D
 				if (this_plot->lp_properties.use_palette)
 				    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 				else
-#endif
-				key_sample_point(xl, yl, -1);
+				    key_sample_point(xl, yl, -1);
 				break;
-#ifdef PM3D
 			    case PM3DSURFACE: /* ignored */
 				break;
-#endif
 #ifdef EAM_HISTOGRAMS
 			    case HISTOGRAMS: /* ignored */
 				break;
@@ -1254,9 +1203,7 @@ do_3dplot(
 		    switch (this_plot->plot_style) {
 			/* treat boxes like impulses: */
 		    case BOXES:
-#ifdef PM3D
 		    case FILLEDCURVES:
-#endif
 		    case VECTOR:
 		    case IMPULSES:
 			cntr3d_impulses(cntrs, &thiscontour_lp_properties);
@@ -1290,10 +1237,8 @@ do_3dplot(
 		    case DOTS:
 			cntr3d_dots(cntrs);
 			break;
-#ifdef PM3D
 		    case PM3DSURFACE: /* ignored */
 			break;
-#endif
 #ifdef WITH_IMAGE
 		    case IMAGE:
 		    case RGBIMAGE:
@@ -1353,7 +1298,6 @@ do_3dplot(
     }
 #endif
 
-#ifdef PM3D
     /* Release the palette we have made use of. Actually, now it is used only
      * in postscript terminals which write all pm3d plots in between
      * gsave/grestore. Thus, now I'm wondering whether term->previous_palette()
@@ -1362,7 +1306,6 @@ do_3dplot(
      */
     if (is_plot_with_palette() && term->previous_palette)
 	term->previous_palette();
-#endif
 
     term_end_plot();
 
@@ -1560,7 +1503,6 @@ plot3d_lines(struct surface_points *plot)
     }
 }
 
-#ifdef PM3D
 /* this is basically the same function as above, but:
  *  - it splits the bunch of scans in two sets corresponding to
  *    the two scan directions.
@@ -1730,7 +1672,6 @@ plot3d_lines_pm3d(struct surface_points *plot)
     if (icrvs_pair[1])
 	free(icrvs_pair[1]);
 }
-#endif
 
 /* plot3d_points:
  * Plot the surfaces in POINTSTYLE style
@@ -1751,14 +1692,12 @@ plot3d_points(struct surface_points *plot, int p_type)
 		map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
 		if (!clip_point(x, y)) {
-#ifdef PM3D
 		    if (can_pm3d && plot->lp_properties.use_palette) {
 			if (plot->pm3d_color_from_column)
 			    set_color( cb2gray(points[i].CRD_COLOR) );
 			else
 			    set_color( cb2gray( z2cb(points[i].z) ) );
 		    }
-#endif
 		    if (plot->plot_style == POINTSTYLE
 		    &&  plot->lp_properties.p_size < 0)
 			(*t->pointsize)(pointsize * points[i].CRD_PTSIZE);
@@ -1786,11 +1725,9 @@ cntr3d_impulses(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 		      &vertex_on_surface);
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
 		      &vertex_on_base);
-#ifdef PM3D
 	    /* HBB 20010822: Provide correct color-coding for
 	     * "linetype palette" PM3D mode */
 	    vertex_on_base.real_z = cntr->coords[i].z;
-#endif
 	    draw3d_line(&vertex_on_surface, &vertex_on_base, lp);
 	}
     } else {
@@ -1834,17 +1771,13 @@ cntr3d_lines(struct gnuplot_contours *cntr, struct lp_style_type *lp)
     if (draw_contour & CONTOUR_BASE) {
 	map3d_xyz(cntr->coords[0].x, cntr->coords[0].y, base_z,
 		  &this_vertex);
-#ifdef PM3D
 	this_vertex.real_z = cntr->coords[0].z;
-#endif
 	polyline3d_start(&this_vertex);
 
 	for (i = 1; i < cntr->num_pts; i++) {
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
 		      &this_vertex);
-#ifdef PM3D
 	    this_vertex.real_z = cntr->coords[i].z;
-#endif
 	    polyline3d_next(&this_vertex, lp);
 	}
     }
@@ -1886,22 +1819,18 @@ cntr3d_linespoints(struct gnuplot_contours *cntr, struct lp_style_type *lp)
     if (draw_contour & CONTOUR_BASE) {
 	map3d_xyz(cntr->coords[0].x, cntr->coords[0].y, base_z,
 		  &previous_vertex);
-#ifdef PM3D
 	/* HBB 20010822: in "linetype palette" mode,
 	 * draw3d_line_unconditional() will look at real_z to
 	 * determine the contour line's color --> override base_z by
 	 * the actual z position of the contour line */
 	previous_vertex.real_z = cntr->coords[0].z;
-#endif
 	draw3d_point(&previous_vertex, lp);
 
 	for (i = 1; i < cntr->num_pts; i++) {
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
 		      &this_vertex);
-#ifdef PM3D
 	    /* HBB 20010822: see above */
 	    this_vertex.real_z = cntr->coords[i].z;
-#endif
 	    draw3d_line(&previous_vertex, &this_vertex, lp);
 	    draw3d_point(&this_vertex, lp);
 	    previous_vertex=this_vertex;
@@ -1935,10 +1864,8 @@ cntr3d_points(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 	for (i = 0; i < cntr->num_pts; i++) {
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
 		     &v);
-#ifdef PM3D
 	    /* HBB 20010822: see above */
 	    v.real_z = cntr->coords[i].z;
-#endif
 	    draw3d_point(&v, lp);
 	}
     }
@@ -2091,9 +2018,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 
 	/* if surface is drawn, draw the rest of the graph box, too: */
 	if (draw_surface || (draw_contour & CONTOUR_SRF)
-#ifdef PM3D
 	    || strpbrk(pm3d.where,"st") != NULL
-#endif
 	   ) {
 	    vertex fl, fb, fr, ff; /* floor left/back/right/front corners */
 	    vertex tl, tb, tr, tf; /* top left/back/right/front corners */
@@ -2437,9 +2362,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	&& (splot_map == FALSE)
 	&& (draw_surface
 	    || (draw_contour & CONTOUR_SRF)
-#ifdef PM3D
 	    || strchr(pm3d.where,'s') != NULL
-#endif
 	    )
 	) {
 	gen_tics(FIRST_Z_AXIS, ztick_callback);
@@ -2471,9 +2394,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
     if (*Z_AXIS.label.text
 	&& (draw_surface
 	    || (draw_contour & CONTOUR_SRF)
-#ifdef PM3D
 	    || strpbrk(pm3d.where,"st") != NULL
-#endif
 	    )
 	) {
 	int tmpx, tmpy;
@@ -2530,9 +2451,7 @@ xtick_callback(
     v2.x = v1.x + tic_unitx * scale * t->v_tic ;
     v2.y = v1.y + tic_unity * scale * t->v_tic ;
     v2.z = v1.z + tic_unitz * scale * t->v_tic ;
-#ifdef PM3D
     v2.real_z = v1.real_z;
-#endif
     draw3d_line(&v1, &v2, &border_lp);
     term_apply_lp_properties(&border_lp);
 
@@ -2570,9 +2489,7 @@ xtick_callback(
 	v2.x = v1.x - tic_unitx * scale * t->v_tic;
 	v2.y = v1.y - tic_unity * scale * t->v_tic;
 	v2.z = v1.z - tic_unitz * scale * t->v_tic;
-#ifdef PM3D
 	v2.real_z = v1.real_z;
-#endif
 	draw3d_line(&v1, &v2, &border_lp);
     }
 }
@@ -2607,9 +2524,7 @@ ytick_callback(
     v2.x = v1.x + tic_unitx * scale * t->h_tic;
     v2.y = v1.y + tic_unity * scale * t->h_tic;
     v2.z = v1.z + tic_unitz * scale * t->h_tic;
-#ifdef PM3D
     v2.real_z = v1.real_z;
-#endif
     draw3d_line(&v1, &v2, &border_lp);
 
     if (text) {
@@ -2647,9 +2562,7 @@ ytick_callback(
 	v2.x = v1.x - tic_unitx * scale * t->h_tic;
 	v2.y = v1.y - tic_unity * scale * t->h_tic;
 	v2.z = v1.z - tic_unitz * scale * t->h_tic;
-#ifdef PM3D
 	v2.real_z = v1.real_z;
-#endif
 	draw3d_line(&v1, &v2, &border_lp);
     }
 }
@@ -2678,9 +2591,7 @@ ztick_callback(
     v2.x = v1.x + len / (double)xscaler;
     v2.y = v1.y;
     v2.z = v1.z;
-#ifdef PM3D
     v2.real_z = v1.real_z;
-#endif
     draw3d_line(&v1, &v2, &border_lp);
 
     if (text) {
@@ -2708,9 +2619,7 @@ ztick_callback(
 	v2.x = v1.x - len / (double)xscaler;
 	v2.y = v1.y;
 	v2.z = v1.z;
-#ifdef PM3D
 	v2.real_z = v1.real_z;
-#endif
 	draw3d_line(&v1, &v2, &border_lp);
     }
 }
@@ -2919,8 +2828,6 @@ key_sample_point(int xl, int yl, int pointtype)
 }
 
 
-#ifdef PM3D
-
 /*
  * returns minimal and maximal values of the cb-range (or z-range if taking the
  * color from the z value) of the given surface
@@ -3053,8 +2960,6 @@ key_sample_point_pm3d(
 	i++;
     }
 }
-
-#endif
 
 
 /* plot_vectors:

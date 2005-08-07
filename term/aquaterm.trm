@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.15 2005/05/09 20:58:57 persquare Exp $
+ * $Id: aquaterm.trm,v 1.16 2005/05/24 20:54:03 sfeam Exp $
  *
  */
 
@@ -62,12 +62,10 @@ TERM_PUBLIC void AQUA_resume __PROTO((void));  /* before subsequent plot of mult
 TERM_PUBLIC void AQUA_boxfill __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
 TERM_PUBLIC void AQUA_linewidth __PROTO((double linewidth));
 TERM_PUBLIC void AQUA_pointsize __PROTO((double pointsize));
-#ifdef PM3D
 TERM_PUBLIC int AQUA_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void AQUA_previous_palette __PROTO((void));
 TERM_PUBLIC void AQUA_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void AQUA_filled_polygon __PROTO((int points, gpiPoint *corners));
-#endif /* PM3D */
 # ifdef WITH_IMAGE
 TERM_PUBLIC void AQUA_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 # endif
@@ -512,7 +510,6 @@ AQUA_pointsize(double pointsize)
   term_pointsize = pointsize;
 }
 
-#ifdef PM3D
 TERM_PUBLIC int
 AQUA_make_palette(t_sm_palette *palette)
 {
@@ -557,8 +554,6 @@ TERM_PUBLIC void
 AQUA_previous_palette()
 {
 }
-
-#endif /* PM3D */
 
 #ifdef WITH_IMAGE
 
@@ -727,12 +722,10 @@ TERM_TABLE_START(aqua_driver)
 #ifdef USE_MOUSE
   , 0, 0, 0, 0, 0
 #endif /* USE_MOUSE */
-#ifdef PM3D
   , AQUA_make_palette,
   AQUA_previous_palette,
   AQUA_set_color,
   AQUA_filled_polygon
-#endif /* PM3D */
 #ifdef WITH_IMAGE
   , AQUA_image
 #endif

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.163 2005/07/29 07:54:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.164 2005/08/05 15:48:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -40,11 +40,9 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.163 2005/07/29 07:54:34
 
 #include "graphics.h"
 
-#ifdef PM3D
 #include "color.h"
 #include "pm3d.h"
 #include "plot.h"
-#endif
 
 #include "alloc.h"
 #include "axis.h"
@@ -123,14 +121,12 @@ static void plot_points __PROTO((struct curve_points * plot));
 static void plot_dots __PROTO((struct curve_points * plot));
 static void plot_bars __PROTO((struct curve_points * plot));
 static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y));
-#ifdef PM3D
 static void plot_filledcurves __PROTO((struct curve_points * plot));
 static void finish_filled_curve __PROTO((int, gpiPoint *, struct curve_points *));
 static void plot_betweencurves __PROTO((struct curve_points * plot));
 static void fill_between __PROTO((double, double, double, double, double, double, struct curve_points *));
 static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey, filledcurves_opts *filledcurves_options));
 static gpiPoint *fill_corners __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
-#endif
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
@@ -482,7 +478,6 @@ boundary(struct curve_points *plots, int count)
     /*}}} */
 
 
-#ifdef PM3D
 #define COLORBOX_SCALE 0.125
 #define WIDEST_COLORBOX_TICTEXT 3
     /* Make room for the color box if anything in the graph uses a palette. */
@@ -491,7 +486,6 @@ boundary(struct curve_points *plots, int count)
 	xright -= (int) (xright-xleft)*COLORBOX_SCALE;
 	xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
     }
-#endif
 
     /*{{{  preliminary ybot calculation
      *     first compute heights of labels and tics */
@@ -690,11 +684,9 @@ boundary(struct curve_points *plots, int count)
     setup_tics(SECOND_Y_AXIS, 20);
     /*}}} */
 
-#ifdef PM3D
     /* Adjust color axis limits if necessary. */
     set_cbminmax();
     axis_checked_extend_empty_range(COLOR_AXIS, "All points of color axis undefined.");
-#endif
 
     /*{{{  recompute xleft based on widths of ytics, ylabel etc
        unless it has been explicitly set by lmargin */
@@ -815,13 +807,11 @@ boundary(struct curve_points *plots, int count)
     } else
 	y2label_textwidth = 0;
 
-#ifdef PM3D
     /* Make room for the color box if needed. */
     if (is_plot_with_palette() && is_plot_with_colorbox() && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
 	xright -= (int) (xright-xleft)*COLORBOX_SCALE;
 	xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
     }
-#endif
 
     if (rmargin < 0) {
 	/* xright -= y2label_textwidth + y2tic_width + y2tic_textwidth; */
@@ -1367,11 +1357,9 @@ do_plot(struct curve_points *plots, int pcount)
      */
     boundary(plots, pcount);
 
-#ifdef PM3D
     /* Add colorbox if appropriate. */
     if (is_plot_with_palette() && !make_palette() && is_plot_with_colorbox() && term->set_color)
 	draw_color_smooth_box(MODE_PLOT);
-#endif
 
     screen_ok = FALSE;
 
@@ -1730,14 +1718,14 @@ do_plot(struct curve_points *plots, int pcount)
 	    plot_boxes(this_plot, Y_AXIS.term_zero);
 	    plot_bars(this_plot);
 	    break;
-#ifdef PM3D
+
 	case FILLEDCURVES:
 	    if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN)
 		plot_betweencurves(this_plot);
 	    else
 		plot_filledcurves(this_plot);
 	    break;
-#endif
+
 	case VECTOR:
 	    plot_vectors(this_plot);
 	    break;
@@ -1747,11 +1735,10 @@ do_plot(struct curve_points *plots, int pcount)
 	case CANDLESTICKS:
 	    plot_c_bars(this_plot);
 	    break;
-#ifdef PM3D
+
 	case PM3DSURFACE:
 	    fprintf(stderr, "** warning: can't use pm3d for 2d plots -- please unset pm3d\n");
 	    break;
-#endif
 
 #ifdef EAM_DATASTRINGS
 	case LABELPOINTS:
@@ -1921,10 +1908,8 @@ plot_lines(struct curve_points *plot)
 
 /* plot_filledcurves:
  * Plot FILLED curves.
- * Only compiled in for PM3D because term->filled_polygon() is required.
  * pm 8.9.2001 (main routine); pm 5.1.2002 (full support for options)
  */
-#ifdef PM3D
 
 /* finalize and draw the filled curve */
 static void
@@ -2326,7 +2311,6 @@ struct curve_points *plot)
 	finish_filled_curve(ic, box, plot);
 }
 
-#endif /* plot_filledcurves() only ifdef PM3D */
 
 /* XXX - JG  */
 /* plot_steps:
@@ -3143,11 +3127,9 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			style += (i<<4);
 #endif
 
-#ifdef PM3D
 		    if (plot->lp_properties.use_palette) {
 			(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
 		    } else
-#endif
 			(*t->fillbox) (style, x, y, w, h);
 
 		    /* FIXME EAM - Is this still correct??? */
@@ -3167,10 +3149,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 
 		if( t->fillbox && plot->fill_properties.border_linetype != LT_UNDEFINED) {
 		    (*t->linetype)(plot->lp_properties.l_type);
-#ifdef PM3D
 		    if (plot->lp_properties.use_palette)
 			apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
-#endif
 		}
 
 		break;
@@ -3493,7 +3473,6 @@ plot_c_bars(struct curve_points *plot)
 	    } else {
 		ymax = map_y(yopen); ymin = map_y(yclose);
 	    }
-#ifdef PM3D
 	    if (plot->lp_properties.use_palette) {
 		unsigned int x = xlowM;
 		unsigned int y = ymin;
@@ -3501,7 +3480,6 @@ plot_c_bars(struct curve_points *plot)
 		unsigned int h = (ymax-ymin);
 		(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
 	    } else
-#endif
 		term->fillbox( style,
 		    (unsigned int)(xlowM), (unsigned int)(ymin),
 		    (unsigned int)(xhighM-xlowM), (unsigned int)(ymax-ymin) );
@@ -4135,7 +4113,7 @@ two_edge_intersect(
     return (FALSE);
 }
 
-#ifdef PM3D
+
 /* EAM April 2004 - If the line segment crosses a bounding line we will
  * interpolate an extra corner and split the filled polygon into two.
  */
@@ -4182,7 +4160,6 @@ filledcurves_opts *filledcurves_options)
 
     return FALSE;
 }
-#endif
 
 
 /* HBB 20010118: all the *_callback() functions made non-static. This
@@ -4673,10 +4650,8 @@ do_key_sample(
 
     /* Draw sample in same style and color as the corresponding plot */
     (*t->linetype)(this_plot->lp_properties.l_type);
-#ifdef PM3D
     if (this_plot->lp_properties.use_palette)
 	apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
-#endif
 
     /* draw sample depending on bits set in plot_style */
     if (this_plot->plot_style & PLOT_STYLE_HAS_FILL
@@ -4688,11 +4663,9 @@ do_key_sample(
 	unsigned int w = key_sample_right - key_sample_left;
 	unsigned int h = key_entry_height/2;
 
-#ifdef PM3D
 	if (this_plot->lp_properties.use_palette) {
 	    (*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
 	} else
-#endif
 	    (*t->fillbox)(style,x,y,w,h);
 
 	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
@@ -4706,10 +4679,8 @@ do_key_sample(
 	}
 	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED) {
 	    (*t->linetype)(this_plot->lp_properties.l_type);
-#ifdef PM3D
 	    if (this_plot->lp_properties.use_palette)
 		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
-#endif
 	}
 
     } else if (this_plot->plot_style == VECTOR && t->arrow) {
@@ -4772,7 +4743,7 @@ style_from_fill(struct fill_style_type *fs)
     return style;
 }
 
-#ifdef PM3D
+
 /*
  * The equivalent of t->fillbox() except that it uses PM3D colors instead
  * of plain line types
@@ -4794,7 +4765,7 @@ fill_corners(int style, unsigned int x, unsigned int y, unsigned int w, unsigned
 
     return corner;
 }
-#endif
+
 
 #ifdef WITH_IMAGE
 
@@ -5277,7 +5248,6 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 
     } else {
 
-#ifdef PM3D
 	if (pixel_planes != IC_RGB) {
 
 	    /* Use sum of vectors to compute the pixel corners with respect to its center. */
@@ -5398,13 +5368,9 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	} else {
 	    fprintf(stdout, ERROR_NOTICE("Color boxes cannot handle RGB components.\n\n"));
 	}
-#else
-	fprintf(stdout, ERROR_NOTICE("Unable to plot color boxes without PM3D.\n\n"));
-	return;
-#endif
-
     }}
 
 }
+
 #endif
 

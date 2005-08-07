@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: xlib.trm,v 1.14 2004/07/01 17:10:35 broeker Exp $
+ * $Id: xlib.trm,v 1.15 2004/08/24 04:18:13 sfeam Exp $
  */
 
 /* GNUPLOT - xlib.trm */
@@ -68,10 +68,8 @@ TERM_TABLE_START(xlib_driver)
 #ifdef USE_MOUSE
     , X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
 #endif
-#ifdef PM3D
     , X11_make_palette, 0 /* X11_previous_palette */ ,
     X11_set_color, X11_filled_polygon
-#endif
 TERM_TABLE_END(xlib_driver)
 
 #undef LAST_TERM

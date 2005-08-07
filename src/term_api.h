@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.46 2005/07/23 04:08:35 sfeam Exp $
+ * $Id: term_api.h,v 1.47 2005/08/01 09:00:49 mikulik Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -71,10 +71,8 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
     int	    p_type;
     double  l_width;
     double  p_size;
-#ifdef PM3D
     TBOOLEAN use_palette;
     struct t_colorspec pm3d_color;
-#endif
     /* ... more to come ? */
 } lp_style_type;
 
@@ -111,11 +109,7 @@ typedef enum termlayer {
 
 #define L_TYPE_NODRAW -3	/* use if line is not to be drawn */
 
-#ifdef PM3D
-# define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0, FALSE, DEFAULT_COLORSPEC}
-#else
-# define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0}
-#endif
+#define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0, FALSE, DEFAULT_COLORSPEC}
 
 typedef struct fill_style_type {
     int fillstyle;
@@ -196,7 +190,6 @@ typedef struct TERMENTRY {
     void (*set_cursor) __PROTO((int, int, int));   /* set cursor style and corner of rubber band */
     void (*set_clipboard) __PROTO((const char[]));  /* write text into cut&paste buffer (clipboard) */
 #endif
-#ifdef PM3D
     int (*make_palette) __PROTO((t_sm_palette *palette));
     /* 1. if palette==NULL, then return nice/suitable
        maximal number of colours supported by this terminal.
@@ -214,14 +207,12 @@ typedef struct TERMENTRY {
        using their own palette. Those terminals that possess only
        one palette for the whole plot don't need this routine.
      */
-
     void (*set_color) __PROTO((t_colorspec *));
     /* EAM November 2004 - revised to take a pointer to struct rgb_color,
        so that a palette gray value is not the only option for
        specifying color.
      */
     void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
-#endif
 #ifdef WITH_IMAGE
     void (*image) __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif

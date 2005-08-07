@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.61 2005/07/29 07:54:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.62 2005/08/06 19:07:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -41,10 +41,7 @@ static char *RCSid() { return RCSid("$Id: tables.c,v 1.61 2005/07/29 07:54:35 mi
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
-
-#ifdef PM3D
 # include "getcolor.h"
-#endif
 
 /* gnuplot commands */
 
@@ -215,20 +212,15 @@ const struct gen_table set_tbl[] =
     { "nomy2t$ics", S_NOMY2TICS },
     { "mzt$ics", S_MZTICS },
     { "nomzt$ics", S_NOMZTICS },
-#ifdef PM3D
     { "mcbt$ics", S_MCBTICS },
     { "nomcbt$ics", S_NOMCBTICS },
-#endif
-
     { "of$fsets", S_OFFSETS },
     { "or$igin", S_ORIGIN },
     { "o$utput", SET_OUTPUT },
     { "pa$rametric", S_PARAMETRIC },
-#ifdef PM3D
     { "pm$3d", S_PM3D },
     { "pal$ette", S_PALETTE },
     { "colorb$ox", S_COLORBOX },
-#endif
     { "p$lot", S_PLOT },
     { "poi$ntsize", S_POINTSIZE },
     { "pol$ar", S_POLAR },
@@ -255,18 +247,14 @@ const struct gen_table set_tbl[] =
     { "yda$ta", S_YDATA },
     { "y2da$ta", S_Y2DATA },
     { "zda$ta", S_ZDATA },
-#ifdef PM3D
     { "cbda$ta", S_CBDATA },
-#endif
 
     { "xl$abel", S_XLABEL },
     { "x2l$abel", S_X2LABEL },
     { "yl$abel", S_YLABEL },
     { "y2l$abel", S_Y2LABEL },
     { "zl$abel", S_ZLABEL },
-#ifdef PM3D
     { "cbl$abel", S_CBLABEL },
-#endif
 
     { "xti$cs", S_XTICS },
     { "noxti$cs", S_NOXTICS },
@@ -278,10 +266,8 @@ const struct gen_table set_tbl[] =
     { "noy2ti$cs", S_NOY2TICS },
     { "zti$cs", S_ZTICS },
     { "nozti$cs", S_NOZTICS },
-#ifdef PM3D
     { "cbti$cs", S_CBTICS },
     { "nocbti$cs", S_NOCBTICS },
-#endif
 
     { "xdti$cs", S_XDTICS },
     { "noxdti$cs", S_NOXDTICS },
@@ -293,10 +279,8 @@ const struct gen_table set_tbl[] =
     { "noy2dti$cs", S_NOY2DTICS },
     { "zdti$cs", S_ZDTICS },
     { "nozdti$cs", S_NOZDTICS },
-#ifdef PM3D
     { "cbdti$cs", S_CBDTICS },
     { "nocbdti$cs", S_NOCBDTICS },
-#endif
 
     { "xmti$cs", S_XMTICS },
     { "noxmti$cs", S_NOXMTICS },
@@ -308,19 +292,15 @@ const struct gen_table set_tbl[] =
     { "noy2mti$cs", S_NOY2MTICS },
     { "zmti$cs", S_ZMTICS },
     { "nozmti$cs", S_NOZMTICS },
-#ifdef PM3D
     { "cbmti$cs", S_CBMTICS },
     { "nocbmti$cs", S_NOCBMTICS },
-#endif
 
     { "xr$ange", S_XRANGE },
     { "x2r$ange", S_X2RANGE },
     { "yr$ange", S_YRANGE },
     { "y2r$ange", S_Y2RANGE },
     { "zr$ange", S_ZRANGE },
-#ifdef PM3D
     { "cbr$ange", S_CBRANGE },
-#endif
     { "rr$ange", S_RRANGE },
     { "tr$ange", S_TRANGE },
     { "ur$ange", S_URANGE },
@@ -405,7 +385,6 @@ const struct gen_table test_tbl[] =
     { NULL, TEST_INVALID }
 };
 
-#ifdef PM3D
 /* 'set colorbox' options */
 const struct gen_table set_colorbox_tbl[] =
 {
@@ -565,8 +544,6 @@ const struct gen_table pm3d_color_names_tbl[] =
     { NULL, -1 }
 };
 
-#endif
-
 const struct gen_table show_style_tbl[] =
 {
     { "d$ata", SHOW_STYLE_DATA },
@@ -601,9 +578,7 @@ const struct gen_table plotstyle_tbl[] =
 #ifdef EAM_HISTOGRAMS
     { "hist$ograms", HISTOGRAMS },
 #endif
-#ifdef PM3D
     { "filledc$urves", FILLEDCURVES },
-#endif
     { "boxer$rorbars", BOXERROR },
     { "boxx$yerrorbars", BOXXYERROR },
     { "st$eps", STEPS },
@@ -612,9 +587,7 @@ const struct gen_table plotstyle_tbl[] =
     { "vec$tors", VECTOR },
     { "fin$ancebars", FINANCEBARS },
     { "can$dlesticks", CANDLESTICKS },
-#ifdef PM3D
     { "pm$3d", PM3DSURFACE },
-#endif
 #ifdef EAM_DATASTRINGS
     { "labels", LABELPOINTS },
 #endif
@@ -625,7 +598,6 @@ const struct gen_table plotstyle_tbl[] =
     { NULL, -1 }
 };
 
-#ifdef PM3D
 const struct gen_table filledcurves_opts_tbl[] =
 {
     { "c$losed", FILLEDCURVES_CLOSED },
@@ -638,7 +610,6 @@ const struct gen_table filledcurves_opts_tbl[] =
     { "below", FILLEDCURVES_BELOW },
     { NULL, -1 }
 };
-#endif
 
 int
 lookup_table(const struct gen_table *tbl, int find_token)

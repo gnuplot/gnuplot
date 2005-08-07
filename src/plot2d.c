@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.111 2005/07/16 21:01:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.112 2005/08/04 19:26:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -129,9 +129,7 @@ cp_alloc(int num)
     memset(&(cp->lp_properties),0,sizeof(lp_style_type));
     memset(&(cp->arrow_properties),0,sizeof(arrow_style_type));
     memset(&(cp->fill_properties),0,sizeof(fill_style_type));
-#ifdef PM3D
     memset(&(cp->filledcurves_options),0,sizeof(filledcurves_opts));
-#endif
     return (cp);
 }
 
@@ -233,9 +231,7 @@ plotrequest()
     AXIS_INIT2D(SECOND_Y_AXIS, 1);
     AXIS_INIT2D(T_AXIS, 0);
     AXIS_INIT2D(R_AXIS, 1);
-#ifdef PM3D
     AXIS_INIT2D(COLOR_AXIS, 1);
-#endif
 
     t_axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
 
@@ -281,9 +277,7 @@ get_data(struct curve_points *current_plot)
     double v[MAXDATACOLS];
     int storetoken = current_plot->token;
 #ifdef WITH_IMAGE
-#ifdef PM3D
     struct coordinate GPHUGE *cp;
-#endif
 #endif
 
     /* eval_plots has already opened file */
@@ -555,13 +549,11 @@ get_data(struct curve_points *current_plot)
 		    current_plot->plot_style = YERRORBARS;
 		    /* fall through */
 
-#ifdef PM3D
 		case FILLEDCURVES:
 		    current_plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
 					v[1], v[2], -1.0);
 		    break;
-#endif
 
 		case YERRORLINES:
 		case YERRORBARS:
@@ -601,11 +593,9 @@ get_data(struct curve_points *current_plot)
 		case IMAGE:  /* x_center y_center z_value */
 		    store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
 				  v[1], v[2]);
-#ifdef PM3D
 		    cp = &(current_plot->points[i]);
 		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, v[2], cp->type,
 							  COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
-#endif
 		    i++;
 		    break;
 #endif
@@ -706,7 +696,6 @@ get_data(struct curve_points *current_plot)
 #ifdef WITH_IMAGE
 		case RGBIMAGE:  /* x_center y_center r_value g_value b_value (rgb) */
 		    store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1], v[1], v[2]);
-#ifdef PM3D
 		    /* A slight kludge, but it does in fact do what it is supposed to.
 		     * There is only one color axis, but we are storing components in
 		     * different variables.  Place all components on the same axis.
@@ -724,7 +713,6 @@ get_data(struct curve_points *current_plot)
 		    cp->z = v[2];
 		    cp->xlow = v[3];
 		    cp->ylow = v[4];
-#endif
 		    i++;
 		    break;
 #endif
@@ -1339,11 +1327,9 @@ eval_plots()
 		this_plot->plot_type = DATA;
 		this_plot->plot_style = data_style;
 		this_plot->plot_smooth = SMOOTH_NONE;
-#ifdef PM3D
 		this_plot->filledcurves_options.opt_given = 0;
 		/* default no palette */
 		this_plot->lp_properties.use_palette = 0;
-#endif
 
 		/* up to MAXDATACOLS cols */
 		df_set_plot_mode(MODE_PLOT);	/* Needed for binary datafiles */
@@ -1374,11 +1360,9 @@ eval_plots()
 		}
 		this_plot->plot_type = FUNC;
 		this_plot->plot_style = func_style;
-#ifdef PM3D
 		this_plot->filledcurves_options.opt_given = 0;
 		/* default no palette */
 		this_plot->lp_properties.use_palette = 0;
-#endif
 		end_token = c_token - 1;
 	    }			/* end of IS THIS A FILE OR A FUNC block */
 
@@ -1505,12 +1489,10 @@ eval_plots()
 		    if (parametric && xparam)
 			int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		    this_plot->plot_style = get_style();
-#ifdef PM3D
 		    if (this_plot->plot_style == FILLEDCURVES) {
 			/* read a possible option for 'with filledcurves' */
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
 		    }
-#endif
 		    if ((this_plot->plot_type == FUNC) &&
 			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 #ifdef EAM_DATASTRINGS
@@ -1670,11 +1652,9 @@ eval_plots()
 		&&  (this_plot->lp_properties.p_size < 0))
 		    this_plot->lp_properties.p_size = 1;
 	    }
-#ifdef PM3D
 	    if (this_plot->lp_properties.use_palette
 	    &&  this_plot->lp_properties.pm3d_color.type >= TC_Z)
 		int_error(NO_CARET,"2D plots cannot color by Z value; please use splot instead");
-#endif
 
 	    /* Similar argument for check that all fill styles were set */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL) {

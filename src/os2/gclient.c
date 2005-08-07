@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.39 2005/06/15 10:10:25 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.40 2005/07/28 07:46:05 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -2136,13 +2136,11 @@ ReadGnu(void* arg)
     HPS hps;
     HAB hab;
     int linewidth = DEFLW;
-#ifdef PM3D
     HPAL pm3d_hpal = 0;     /* palette used for make_palette() */
     HPAL pm3d_hpal_old = 0; /* default palette used before make_palette() */
     /* Either of the two is used: */
     LONG pm3d_color = 0;     /* current colour(used if it is >0) */
     int pm3d_rgb_color = -1; /* current rgb colour(used if it is >=0) */
-#endif
 
     hab = WinInitialize(0);
     DosEnterCritSec();
@@ -2308,7 +2306,6 @@ ReadGnu(void* arg)
 
 	    case GR_MOVE :   /* move */
 	    case GR_DRAW :   /* draw vector */
-#ifdef PM3D
 	    {
 		LONG curr_color = -1;
 
@@ -2332,7 +2329,6 @@ ReadGnu(void* arg)
 		    // NOW FIND AN APPROXIMATIVE COLOR IN THE CURRENT PALETTE
 #endif
 		}
-#endif
 		if (*buff=='M') {
 		    if (bPath) {
 			GpiEndPath(hps);
@@ -2354,13 +2350,11 @@ ReadGnu(void* arg)
 		    LMove(hps, &ptl);
 		else
 		    LLine(hps, &ptl);
-#ifdef PM3D
 		if (pm3d_color >= 0)
 		    GpiSetColor(hps, curr_color);
 	    }
 		    /* @@@ FIXME -- UNIMPLEMENTED */
 		    /* @@@ SEE "pm3d_rgb_color" ALSO ABOVE -- DO A ROUTINE TO BE REUSABLE */
-#endif
 	    break;
 
 	    case GR_PAUSE  :   /* pause */
@@ -2429,7 +2423,6 @@ ReadGnu(void* arg)
 		    /* only display text if requested */
 		    if (mode & 0x01) {
                     	lCurCol = GpiQueryColor(hps);
-#ifdef PM3D
 		    	if (pm3d_color>=0)
 			    GpiSetColor(hps, pm3d_color);
 			/* @@@ FIXME -- UNIMPLEMENTED */
@@ -2439,7 +2432,6 @@ ReadGnu(void* arg)
 			    GpiSetColor(hps, CLR_BLACK);
 			    GpiSetColor(hps, curr_color);
 			*/
-#endif
 			ptl.x = (LONG) (x + multLineVert * (lVOffset / 4));
 			ptl.y = (LONG) (y - multLineHor * (lVOffset / 4));
 
@@ -2486,7 +2478,6 @@ ReadGnu(void* arg)
                     DosExitCritSec();
                     BufRead(hRead, str, len*sizeof(int), &cbR);
                     lCurCol = GpiQueryColor(hps);
-#ifdef PM3D
 		    if (pm3d_color>=0)
 			GpiSetColor(hps, pm3d_color);
 		    /* @@@ FIXME -- UNIMPLEMENTED */
@@ -2496,7 +2487,6 @@ ReadGnu(void* arg)
 		      GpiSetColor(hps, CLR_BLACK);
 		      GpiSetColor(hps, curr_color);
 		    */
-#endif
 
 #ifdef PM_KEEP_OLD_ENHANCED_TEXT
                     sw = QueryTextBox(hps, strlen(str), str);
@@ -2627,10 +2617,8 @@ ReadGnu(void* arg)
 		    else
 			GpiSetColor(hps, CLR_NEUTRAL);
 		}
-#ifdef PM3D
 		pm3d_color = -1; /* switch off using pm3d colours */
 		pm3d_rgb_color = -1;
-#endif
 		break;
 	    }
 
@@ -2885,7 +2873,6 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-#ifdef PM3D
 	    /* Implementation problems(I haven't understood that from
 	     * .INF doc): what is the difference between
 	     * GpiCreateLogColorTable and GpiCreatePalette? */
@@ -2998,7 +2985,6 @@ ReadGnu(void* arg)
 		GpiSetColor(hps, curr_color);
 		break;
 	    }
-#endif /* PM3D */
 
 	    case SET_RULER : { /* set_ruler(int x, int y) term API: x<0 switches ruler off */
 		int x, y;

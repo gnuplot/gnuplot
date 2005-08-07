@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.162 2005/07/18 18:24:00 sfeam Exp $
+ * $Id: post.trm,v 1.163 2005/07/24 00:28:55 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -94,12 +94,10 @@ TERM_PUBLIC int PS_set_font __PROTO((const char * font));
 TERM_PUBLIC void PS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void PS_linewidth __PROTO((double linewidth)); /* JFi [linewidth] */
 TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
-#ifdef PM3D
 TERM_PUBLIC int PS_make_palette (t_sm_palette *);
 TERM_PUBLIC void PS_previous_palette (void);
 TERM_PUBLIC void PS_set_color (t_colorspec *);
 TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
-#endif /* PM3D */
 #ifdef WITH_IMAGE
 TERM_PUBLIC void PS_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif
@@ -214,7 +212,6 @@ static const ps_params_t pstex_params_default = PSTEX_PARAMS_DEFAULT;
 
 static ps_params_t *ps_params = &post_params;
 
-#ifdef PM3D
 static void make_interpolation_code __PROTO((void));
 static void make_color_model_code __PROTO((void));
 static char * save_space __PROTO((double gray));
@@ -223,7 +220,6 @@ static void write_gradient_definition __PROTO((gradient_struct *gradient, int cn
 static void write_color_space __PROTO((t_sm_palette *palette));
 static void make_palette_formulae __PROTO((void));
 static void PS_make_header __PROTO((t_sm_palette *palette));
-#endif /* PM3D */
 
 static float ps_fontsize;
 
@@ -921,9 +917,7 @@ enum PS_id {
     PS_SOLIDE, PS_DASHED, PS_DASHLENGTH, PS_LINEWIDTH,
     PS_SIMPLEX, PS_DUPLEX, PS_DEFAULTPLEX,
     PS_ROUNDED, PS_NOROUNDED, PS_FONTFILE, PS_NOFONTFILES,
-#ifdef PM3D
     PS_PALFUNCPARAM,
-#endif /* PM3D */
     PS_LEVEL1, PS_LEVELDEFAULT, PS_FONT,
     PSLATEX_ROTATE, PSLATEX_NOROTATE, PSLATEX_AUXFILE, PSLATEX_NOAUXFILE,
     PSLATEX_OLDSTYLE, PSLATEX_NEWSTYLE, EPSLATEX_HEADER, EPSLATEX_NOHEADER,
@@ -957,9 +951,7 @@ static struct gen_table PS_opts[] =
     { "rou$nded", PS_ROUNDED },
     { "fontf$ile", PS_FONTFILE },
     { "nofontf$iles", PS_NOFONTFILES },
-#ifdef PM3D
     { "palf$uncparam", PS_PALFUNCPARAM },
-#endif /* PM3D */
     { "level1", PS_LEVEL1 },
     { "leveldefault", PS_LEVELDEFAULT },
     { "font", PS_FONT },
@@ -1354,7 +1346,6 @@ PS_options()
 	    }
 	    ++c_token;
 	    break;
-#ifdef PM3D
 	case PS_PALFUNCPARAM:
 	    ++c_token;
 	    ps_params->palfunc_samples = (int)real(const_express(&a));
@@ -1368,8 +1359,6 @@ PS_options()
 	    }
 	    ++c_token;
 	    break;
-#endif /* PM3D */
-
 	case PS_FONT:
 	    c_token++;
 	    /* Fall through to attempt to read font name */
@@ -1467,11 +1456,9 @@ PS_options()
 	    ps_params->rounded ? "rounded" : "butt");
     strcat(term_options,tmp_term_options);
 
-#ifdef PM3D
     sprintf(tmp_term_options,"   palfuncparam %d,%g \\\n   ",
 	    ps_params->palfunc_samples, ps_params->palfunc_deviation);
     strcat(term_options,tmp_term_options);
-#endif /* PM3D */
 
 #ifdef PSLATEX_DRIVER
     if ((ps_params->terminal == PSTERM_PSTEX) ||
@@ -3060,11 +3047,8 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
     PS_relative_ok = FALSE;
 }
 
-
-#ifdef PM3D
-
-
-static void make_palette_formulae()
+static void
+make_palette_formulae()
 {
 #define R sm_palette.formulaR
 #define G sm_palette.formulaG
@@ -3469,7 +3453,6 @@ TERM_PUBLIC void PS_previous_palette()
     fputs("grestore % colour palette end\n", gppsfile);
 }
 
-#endif /* PM3D */
 
 /*
  * The reason for having a PostScript-specific wrapper for do_arrow
@@ -3917,12 +3900,10 @@ TERM_TABLE_START(post_driver)
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support for postscript */
 #endif
-#ifdef PM3D
     , PS_make_palette,
     PS_previous_palette, /* write grestore */
     PS_set_color,
     PS_filled_polygon
-#endif /* PM3D */
 #ifdef WITH_IMAGE
     , PS_image
 #endif

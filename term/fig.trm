@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.51 2005/04/18 06:41:42 mikulik Exp $
+ * $Id: fig.trm,v 1.52 2005/05/13 13:33:04 mikulik Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -86,12 +86,10 @@ TERM_PUBLIC void FIG_linewidth __PROTO((double linewidth));
 TERM_PUBLIC void FIG_reset __PROTO((void));
 TERM_PUBLIC void FIG_lpoint __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void FIG_boxfill __PROTO((int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h));
-#ifdef PM3D
 TERM_PUBLIC int FIG_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void FIG_previous_palette (void); */
 TERM_PUBLIC void FIG_set_color (t_colorspec *);
 TERM_PUBLIC void FIG_filled_polygon (int, gpiPoint *);
-#endif
 
 #define GOT_FIG_PROTO
 #endif /* TERM_PROTO */
@@ -216,12 +214,10 @@ static int FIG_inches = INCH;
 static int FIG_text_flags = FIG_TEXT_NORMAL;    /* whether text is special or hidden etc. */
 static char FIG_version[MAX_ID_LEN+1] = FIG_DEFAULTVERSION;  /* file format version */
 static int FIG_solid = FALSE;                   /* dashed lines or not */
-#ifdef PM3D
 static int FIG_palette_set = FALSE;	/* PM3D Palette Set ? */
 static int FIG_palette_size = 128;	/* Number of colours in palette */
 static int FIG_palette_offst = 32;	/* Offset from zero for user colours */
 static int FIG_fill_style = 20;		/* Full saturation */
-#endif /* PM3D */
 
 static void FIG_poly_clean __PROTO((enum FIG_poly_stat fig_stat));
 
@@ -570,10 +566,7 @@ FIG_init()
     FIG_justify_text(LEFT);
     FIG_text_angle(0);
 
-#ifdef PM3D
     FIG_palette_set = FALSE;    /* PM3D Palette Set ? */
-#endif /* PM3D */
-
     FIG_line.tagged = FIG_DEFAULT;
     FIG_line.distrib = FIG_DEFAULT;
     FIG_line.type = T_POLYLINE;
@@ -1074,7 +1067,6 @@ FIG_boxfill(
             x, y, x+w, y, x+w, y-h, x, y-h, x, y );
 }
 
-#ifdef PM3D
 TERM_PUBLIC int FIG_make_palette(t_sm_palette *palette)
 {
     int i;
@@ -1181,7 +1173,6 @@ TERM_PUBLIC void FIG_filled_polygon(int points, gpiPoint *corners)
 	putc('\n', gpoutfile);
     }
 }
-#endif /* PM3D */
 
 #endif /* TERM_BODY */
 
@@ -1199,9 +1190,7 @@ TERM_TABLE_START(fig_driver)
 #ifdef USE_MOUSE
     ,0, 0, 0, 0, 0 /* no mouse support for the fig terminal */
 #endif
-#ifdef PM3D
     , FIG_make_palette, 0 /*previous_palette*/, FIG_set_color, FIG_filled_polygon
-#endif /* PM3D */
 TERM_TABLE_END(fig_driver)
 
 #undef LAST_TERM

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.36 2005/03/03 04:09:52 sfeam Exp $
+ * $Id: win.trm,v 1.37 2005/05/24 20:54:03 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -87,11 +87,9 @@ TERM_PUBLIC void WIN_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void WIN_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void WIN_set_clipboard __PROTO((const char[]));
 #endif
-#ifdef PM3D
 TERM_PUBLIC int WIN_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void WIN_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void WIN_filled_polygon __PROTO((int points, gpiPoint *corners));
-#endif
 TERM_PUBLIC void WIN_boxfill __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
 
 
@@ -371,8 +369,6 @@ WIN_set_clipboard ( const char s[] )
 
 #endif /* USE_MOUSE */
 
-#ifdef PM3D
-
 TERM_PUBLIC int
 WIN_make_palette(t_sm_palette *palette)
 {
@@ -404,8 +400,6 @@ WIN_filled_polygon(int points, gpiPoint *corners)
     /* finish series: */
     GraphOp(&graphwin, W_pm3d_filled_polygon_draw, points, 0, NULL);
 }
-
-#endif /* PM3D */
 
 TERM_PUBLIC void
 WIN_boxfill(
@@ -439,10 +433,8 @@ TERM_TABLE_START(win_driver)
     , 0 /* WIN_waitforinput */,
     WIN_put_tmptext, WIN_set_ruler, WIN_set_cursor, WIN_set_clipboard
 #endif
-#ifdef PM3D
     , WIN_make_palette, 0 /* previous_palette */,
     WIN_set_color, WIN_filled_polygon
-#endif
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM

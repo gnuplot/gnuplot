@@ -1,5 +1,5 @@
 # 
-# $Id$
+# $Id: makefile.oww,v 1.2 2005/04/28 20:33:22 broeker Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -48,7 +48,7 @@ WRC = wrc
 #
 # Defines
 
-CPPFLAGS =  -D_Windows -DHAVE_CONFIG_H -DUSE_MOUSE -DPM3D
+CPPFLAGS =  -D_Windows -DHAVE_CONFIG_H -DUSE_MOUSE
 # library-dependent ones may have to be added, like:
 # -DHAVE_LIBPNG -DHAVE_LIBPDF 
 

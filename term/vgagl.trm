@@ -1,8 +1,8 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vgagl.trm,v 1.12 2004/11/27 02:38:39 sfeam Exp $
+ * $Id: vgagl.trm,v 1.13 2005/02/14 10:19:17 mikulik Exp $
  */
 
-#if defined(USE_MOUSE) && defined(PM3D)
+#if defined(USE_MOUSE)
 /* GNUPLOT - vgagl.trm */
 
 /*[
@@ -1536,12 +1536,10 @@ TERM_TABLE_START(vgagl_driver)
     , 0 /* VGAGL_waitforinput */, VGAGL_put_tmptext, VGAGL_set_ruler,
     VGAGL_set_cursor, VGAGL_set_clipboard
 # endif
-# ifdef PM3D
     , VGAGL_make_palette,
     0 /* VGAGL_previous_palette */,
     VGAGL_set_color,
     VGAGL_filled_polygon
-# endif /* PM3D */
 TERM_TABLE_END(vgagl_driver)
 #undef LAST_TERM
 #define LAST_TERM vgagl_driver
@@ -1607,4 +1605,4 @@ START_HELP(vgagl)
 ""
 END_HELP(vgagl)
 #endif
-#endif /* defined(USE_MOUSE) && defined(PM3D) */
+#endif /* defined(USE_MOUSE) */

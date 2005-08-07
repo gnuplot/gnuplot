@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.30 2005/04/28 21:43:50 sfeam Exp $
+ * $Id: emf.trm,v 1.31 2005/06/29 22:31:14 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -124,12 +124,9 @@ TERM_PUBLIC int EMF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void EMF_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void EMF_set_pointsize __PROTO((double size));
 TERM_PUBLIC int EMF_set_font __PROTO((const char *));
-
-#ifdef PM3D
 TERM_PUBLIC void EMF_set_color __PROTO((t_colorspec *colorspec));
 TERM_PUBLIC void EMF_filled_polygon __PROTO((int, gpiPoint *));
 TERM_PUBLIC void EMF_fillbox __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
-#endif
 
 #undef RGB
 #define RGB(r,g,b) ((long)					\
@@ -713,8 +710,6 @@ EMF_linecolor(int linecolor)
     EMF_flush_polyline();
 }
 
-#ifdef PM3D
-
 TERM_PUBLIC void
 EMF_set_color(t_colorspec *colorspec)
 {
@@ -788,9 +783,6 @@ EMF_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, uns
 
 	EMF_filled_polygon(4, corner);
 }
-
-
-#endif /* PM3D */
 
 TERM_PUBLIC void 
 EMF_linewidth(double width)
@@ -1146,21 +1138,15 @@ TERM_TABLE_START(emf_driver)
     TERM_BINARY,		/* various flags */
     NULL,				/* suspend */
     NULL,				/* resume  */
-#ifdef PM3D
     EMF_fillbox,
-#else
-    NULL,				/* boxfill */
-#endif
     EMF_linewidth
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for emf */
 #endif
-#ifdef PM3D
    , NULL,		/* make_palette */
    NULL,		/* previous_palette */
    EMF_set_color,
    EMF_filled_polygon
-#endif /* PM3D */
 #ifdef WITH_IMAGE
     , NULL
 #endif

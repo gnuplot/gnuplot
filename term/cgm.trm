@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.66 2005/03/06 05:52:23 sfeam Exp $
+ * $Id: cgm.trm,v 1.67 2005/07/20 05:25:28 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -101,10 +101,8 @@ TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
 				    int number));
 TERM_PUBLIC void CGM_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
 				unsigned int width, unsigned int height));
-#ifdef PM3D
 TERM_PUBLIC int CGM_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void CGM_set_color __PROTO((t_colorspec *));
-#endif
 
 TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
 
@@ -199,9 +197,7 @@ static struct cgm_properties
 
 static int cgm_user_color_count = 0;
 static int cgm_user_color_max = 0;
-#ifdef PM3D
 static int cgm_smooth_colors = 0;
-#endif
 static int GPFAR *cgm_user_color_table = (int GPFAR*)0;
 static int GPFAR cgm_default_color_table[] =
 {
@@ -1049,8 +1045,6 @@ CGM_move(unsigned int x, unsigned int y)
     cgm_posy = y;
 }
 
-#ifdef PM3D
-
 TERM_PUBLIC int
 CGM_make_palette(t_sm_palette *palette)
 {
@@ -1107,7 +1101,6 @@ CGM_set_color(t_colorspec *colorspec)
 	  CGM_write_int_record(5, 14, 2, (int *) &cgm_color); /* text color */
      }
 }
-#endif /* PM3D */
 
 TERM_PUBLIC void
 CGM_filled_polygon(int points, gpiPoint *corner)
@@ -1681,12 +1674,10 @@ TERM_TABLE_START(cgm_driver)
     , NULL, NULL, NULL, NULL, NULL
 /*  , waitforinput, put_tmptext, set_ruler, set_cursor, set_clipboard */
 #endif
-#ifdef PM3D
     , CGM_make_palette,
     NULL /* _previous_palette */,
     CGM_set_color,
     CGM_filled_polygon
-#endif
 TERM_TABLE_END(cgm_driver)
 
 #undef LAST_TERM

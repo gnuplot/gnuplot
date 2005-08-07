@@ -150,9 +150,7 @@ static struct termentry ENHest = {
 #ifdef USE_MOUSE
     , NULL, NULL, NULL, NULL, NULL
 #endif
-#ifdef PM3D
     , NULL, NULL, NULL, NULL
-#endif
 #ifdef WITH_IMAGE
     , NULL
 #endif

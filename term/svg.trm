@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.51 2005/03/03 04:09:52 sfeam Exp $
+ * $Id: svg.trm,v 1.52 2005/03/09 18:26:46 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -55,14 +55,9 @@ TERM_PUBLIC int SVG_set_font __PROTO ((const char *font));
 /* TERM_PUBLIC void SVG_pointsize __PROTO((double pointsize)); */
 TERM_PUBLIC void SVG_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void SVG_linewidth __PROTO ((double linewidth));
-
-
-#ifdef PM3D
 TERM_PUBLIC int SVG_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void SVG_previous_palette __PROTO((void));
 TERM_PUBLIC void SVG_set_color __PROTO((t_colorspec *));
-#endif /* PM3D */
-
 TERM_PUBLIC void SVG_filled_polygon __PROTO((int, gpiPoint *));
 
 TERM_PUBLIC void ENHsvg_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
@@ -79,13 +74,11 @@ TERM_PUBLIC void ENHsvg_writec __PROTO((int));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
-#ifdef PM3D
 static t_sm_palette SVG_palette;
 static unsigned char SVG_red = 0;
 static unsigned char SVG_green = 0;
 static unsigned char SVG_blue = 0;
 static unsigned char SVG_use_pm3d_color = 0;
-#endif
 
 static TBOOLEAN SVG_groupFilledIsOpen = FALSE; /* open pm3d group flag*/
 
@@ -171,17 +164,15 @@ static void
 SVG_GroupOpen ()
 {
     SVG_GroupFilledClose();
-    if (!SVG_groupIsOpen)     {
+    if (!SVG_groupIsOpen) {
 
 	fprintf (gpoutfile, "<g style=\"fill:none; color:%s; stroke:",
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
 
-#ifdef PM3D
 	if (SVG_use_pm3d_color)
-		fprintf(gpoutfile, "rgb(%3d, %3d, %3d)", SVG_red, SVG_green, SVG_blue);
+	    fprintf(gpoutfile, "rgb(%3d, %3d, %3d)", SVG_red, SVG_green, SVG_blue);
 	else
-#endif
-		fprintf(gpoutfile, "currentColor");
+	    fprintf(gpoutfile, "currentColor");
 
 	fprintf (gpoutfile, "; stroke-width:%.2f\">\n",
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width * SVG_linewidth_factor);
@@ -196,8 +187,7 @@ SVG_GroupOpen ()
 static void
 SVG_GroupClose ()
 {
-    if (SVG_groupIsOpen)
-      {
+    if (SVG_groupIsOpen) {
 	  fprintf (gpoutfile, "</g>\n");
 	  SVG_groupIsOpen = FALSE;
 	  SVG_fillPattern = -1;
@@ -212,17 +202,12 @@ SVG_PathOpen ()
 {
     SVG_GroupFilledClose();
     if (!SVG_pathIsOpen) {
-#ifdef PM3D
 	if (SVG_use_pm3d_color) {
 	    fprintf(gpoutfile, "\t<path style='stroke:rgb(%3d, %3d, %3d)' d='",
 		    SVG_red, SVG_green, SVG_blue);
 	} else {
-#endif
 	    fprintf (gpoutfile, "\t<path d='");
-#ifdef PM3D
 	}
-#endif
-
 	SVG_pathIsOpen = TRUE;
     }
 }
@@ -296,12 +281,9 @@ SVG_GroupFilledClose()
 static void
 SVG_StyleColor(const char* paint)
 {
-#ifdef PM3D
     if (SVG_use_pm3d_color)
 	fprintf(gpoutfile, "%s = 'rgb(%3d, %3d, %3d)'", paint, SVG_red, SVG_green, SVG_blue);
     else
-#endif
-
 	fprintf(gpoutfile, "%s = 'currentColor'", paint);
 }
 
@@ -356,12 +338,10 @@ SVG_DefineFillPattern(int fillpat)
 		    break;
 	}
 	if (*path) {
-#ifdef PM3D
 	    if (SVG_use_pm3d_color)
 		fprintf(gpoutfile,"\t\t\t<path style=\"fill:none; %s:rgb(%d,%d,%d)\" d='%s'/>\n",
 		    style, SVG_red, SVG_green, SVG_blue, path);
 	    else
-#endif
 		fprintf(gpoutfile, "\t\t\t<path style = '%s:currentColor' d='%s'/>\n", style, path);
 	}
 	fputs("\t\t</pattern>\n" "\t</defs>\n", gpoutfile);
@@ -682,10 +662,8 @@ SVG_graphics ()
 
     SVG_fillPattern = -1;
     SVG_fillPatternIndex = 0;
-#ifdef PM3D
     SVG_groupFilledIsOpen = FALSE;
     SVG_use_pm3d_color = 0;
-#endif
     SVG_pathIsOpen = FALSE;
 
 /* reset position*/
@@ -720,9 +698,7 @@ SVG_reset ()
 TERM_PUBLIC void
 SVG_linetype (int linetype)
 {
-#ifdef PM3D
     SVG_use_pm3d_color = 0;
-#endif
     if (linetype != SVG_LineType) {
 	SVG_PathClose ();
 	SVG_GroupClose ();
@@ -805,7 +781,6 @@ SVG_vector (unsigned int x, unsigned int y)
 TERM_PUBLIC void
 SVG_point (unsigned int x, unsigned int y, int number)
 {
-#ifdef PM3D
     char color_spec[0x40];
     if (SVG_use_pm3d_color) {
        	sprintf(color_spec, " style='color:rgb(%3d, %3d, %3d)'",
@@ -813,36 +788,27 @@ SVG_point (unsigned int x, unsigned int y, int number)
     } else {
 	*color_spec = '\0';
     }
-#endif
 
     SVG_PathClose ();
 
     if (number < 0) {		/* do dot */
 	fprintf (gpoutfile,
 		 "\t<use xlink:href='#gpDot' x='%u' y='%u'"
-#ifdef PM3D
 		 "%s"
-#endif
 		 "/>\n",
 		 x, term->ymax - y
-#ifdef PM3D
 		 , color_spec
-#endif
 		 );
 
     } else {			/* draw a point symbol */
 	fprintf (
 	    gpoutfile,
 	    "\t<use xlink:href='#gpPt%u' transform='translate(%u,%u) scale(%.2f)'"
-#ifdef PM3D
 	     "%s"
-#endif
 	    "/>\n"
 	    , number % 13, x, term->ymax - y
 	    , term_pointsize * term->h_tic / 2
-#ifdef PM3D
 	     , color_spec
-#endif
 	    );
     }
     SVG_xLast = x;
@@ -913,14 +879,10 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 	fprintf (gpoutfile, " rotate(%i)", -SVG_TextAngle);
     fprintf (gpoutfile, "\" style=\"stroke:none; fill:");
 
-#ifdef PM3D
     if (!SVG_use_pm3d_color)
-#endif
 	fprintf (gpoutfile, "%s", SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
-#ifdef PM3D
     else
 	fprintf (gpoutfile, "rgb(%d,%d,%d)", SVG_red, SVG_green, SVG_blue);
-#endif
     fprintf (gpoutfile, "; font-family:%s; font-size:%.2f; text-anchor:%s\">\n",
 	     SVG_fontNameCur, SVG_fontSizeCur, alignment);
 
@@ -952,9 +914,6 @@ SVG_set_font (const char *font)
 
     return (TRUE);
 }
-
-
-#ifdef PM3D
 
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1024,7 +983,6 @@ SVG_previous_palette()
     SVG_GroupFilledClose();
 }
 
-#endif /* PM3D */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_filled_polygon
@@ -1301,12 +1259,10 @@ TERM_TABLE_START (svg_driver)
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for svg */
 #endif
-#ifdef PM3D
    , SVG_make_palette,
    SVG_previous_palette,
    SVG_set_color,
    SVG_filled_polygon
-#endif /* PM3D */
 #ifdef WITH_IMAGE
     , NULL
 #endif

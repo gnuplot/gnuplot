@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.50 2005/07/29 07:54:35 mikulik Exp $
+ * $Id: tables.h,v 1.51 2005/08/06 19:07:19 sfeam Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -89,11 +89,9 @@ enum set_id {
     S_MY2TICS, S_NOMY2TICS, S_MYTICS, S_NOMYTICS,
     S_MZTICS, S_NOMZTICS,
     S_OFFSETS, S_ORIGIN, SET_OUTPUT, S_PARAMETRIC,
-#ifdef PM3D
     S_PALETTE, S_PM3D, S_COLORBOX,
     S_CBLABEL, S_CBRANGE, S_CBTICS, S_NOCBTICS, S_MCBTICS, S_NOMCBTICS,
     S_CBDATA, S_CBDTICS, S_NOCBDTICS, S_CBMTICS, S_NOCBMTICS,
-#endif
     S_PLOT, S_POINTSIZE, S_POLAR, S_PRINT,
     S_RRANGE, S_SAMPLES, S_SIZE, S_SURFACE, S_STYLE, 
     S_TABLE, S_TERMINAL, S_TERMOPTIONS,
@@ -138,7 +136,6 @@ enum set_key_id {
     S_KEY_DEFAULT, S_KEY_ON, S_KEY_OFF
 };
 
-#ifdef PM3D
 enum set_colorbox_id {
     S_COLORBOX_INVALID,
     S_COLORBOX_VERTICAL, S_COLORBOX_HORIZONTAL,
@@ -167,7 +164,6 @@ enum set_pm3d_id {
     S_PM3D_IMPLICIT, S_PM3D_NOEXPLICIT, S_PM3D_NOIMPLICIT, S_PM3D_EXPLICIT,
     S_PM3D_WHICH_CORNER
 };
-#endif
 
 enum test_id {
     TEST_INVALID,
@@ -185,7 +181,6 @@ enum show_style_id {
 #endif
 };
 
-#ifdef PM3D
 enum filledcurves_opts_id {
     FILLEDCURVES_CLOSED,
     FILLEDCURVES_X1, FILLEDCURVES_Y1, FILLEDCURVES_X2, FILLEDCURVES_Y2,
@@ -195,7 +190,6 @@ enum filledcurves_opts_id {
     FILLEDCURVES_ABOVE, FILLEDCURVES_BELOW,
     FILLEDCURVES_BETWEEN
 };
-#endif
 
 extern const struct gen_table command_tbl[];
 /* pm 011129: unused for 2 yers, therefore #if 0 .. #endif; in future should
@@ -209,22 +203,18 @@ extern const struct gen_table save_tbl[];
 extern const struct gen_table set_tbl[];
 extern const struct gen_table test_tbl[];
 extern const struct gen_table set_key_tbl[];
-#ifdef PM3D
 extern const struct gen_table set_colorbox_tbl[];
 extern const struct gen_table set_palette_tbl[];
 extern const struct gen_table set_pm3d_tbl[];
 extern const struct gen_table color_model_tbl[];
 extern const struct gen_table pm3d_color_names_tbl[];
-#endif
 extern const struct gen_table set_hidden3d_tbl[];
 extern const struct gen_table show_style_tbl[];
 extern const struct gen_table plotstyle_tbl[];
 
 extern const struct gen_ftable command_ftbl[];
 
-#ifdef PM3D
 extern const struct gen_table filledcurves_opts_tbl[];
-#endif
 
 /* Function prototypes */
 int lookup_table __PROTO((const struct gen_table *, int));

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.44 2005/06/15 10:10:24 mikulik Exp $
+ * $Id: pm.trm,v 1.45 2005/07/28 07:46:06 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -75,12 +75,10 @@ TERM_PUBLIC void PM_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void PM_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void PM_set_clipboard __PROTO((const char[]));
 #endif
-#ifdef PM3D
 TERM_PUBLIC int PM_make_palette (t_sm_palette *);
 TERM_PUBLIC void PM_previous_palette (void);
 TERM_PUBLIC void PM_set_color (t_colorspec *);
 TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
-#endif
 #ifndef PM_OLD_ENHANCED_TEXT
 /* To support "set term pm enhanced" */
 TERM_PUBLIC void PM_enhanced_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
@@ -752,8 +750,6 @@ PM_linewidth(double linewidth)
     fwrite(&lw, sizeof(int), 1, PM_pipe);
 }
 
-#ifdef PM3D
-
 /* Note: gvpm sources have also limit 256, is it limit of PM palette?
    I suppose yes, thus let colours passed as unsigned char through the pipe.
    Gray interval [0;1] will be mapped to interval [0;255] whose r,g,b
@@ -832,8 +828,6 @@ TERM_PUBLIC void PM_filled_polygon ( int points, gpiPoint *corners )
     }
 }
 
-
-#endif /* PM3D */
 
 #ifdef USE_MOUSE
 
@@ -1141,12 +1135,10 @@ TERM_TABLE_START(PM_driver)
     , 0 /* PM_waitforinput */,
     PM_put_tmptext, PM_set_ruler, PM_set_cursor, PM_set_clipboard
 #endif
-#ifdef PM3D
     , PM_make_palette,
     PM_previous_palette,
     PM_set_color,
     PM_filled_polygon
-#endif
 #ifdef WITH_IMAGE
     , NULL
 #endif

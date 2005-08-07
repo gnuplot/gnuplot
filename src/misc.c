@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.68 2005/03/09 21:47:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.69 2005/04/29 16:36:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -626,7 +626,6 @@ expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
     return ps;
 }
 
-#ifdef PM3D
 /* Parse options for style filledcurves and fill fco accordingly.
  * If no option given, then set fco->opt_given to 0.
  */
@@ -699,7 +698,6 @@ filledcurves_options_tofile(filledcurves_opts *fco, FILE *fp)
 	return;
     }
 }
-#endif
 
 /* line/point parsing...
  *
@@ -726,13 +724,11 @@ lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
     while (this != NULL) {
 	if (this->tag == tag) {
 	    *lp = this->lp_properties;
-#ifdef PM3D
 	    /* FIXME - It would be nicer if this were always true already */
 	    if (!lp->use_palette) {
 		lp->pm3d_color.type = TC_LT;
 		lp->pm3d_color.lt = lp->l_type;
 	    }
-#endif
 	    lp->pointflag = pointflag;
 	    return;
 	} else {
@@ -762,9 +758,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 	/* set default values */
 	lp->l_type = def_line;
 	lp->l_width = 1.0;
-#ifdef PM3D
 	lp->use_palette = 0;
-#endif
 	lp->pointflag = allow_point;
 	lp->p_type = def_point;
 	lp->p_size = pointsize;	/* as in "set pointsize" */
@@ -773,7 +767,6 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 		if (set_lt++)
 		    break;
 		c_token++;
-#ifdef PM3D
 		if (almost_equals(c_token, "rgb$color")) {
 		    if (set_pal++)
 			break;
@@ -789,11 +782,10 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 		    parse_colorspec(&lp->pm3d_color, TC_Z);
 		    lp->use_palette = 1;
 		} else
-#endif
 		    lp->l_type = (int) real(const_express(&t)) - 1;
 		continue;
 	    } /* linetype, lt */
-#ifdef PM3D
+
 	    /* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
 	    if (almost_equals(c_token, "pal$ette")) {
 		if (set_pal++)
@@ -820,7 +812,6 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 		}
 		continue;
 	    }
-#endif
 
 	    if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw")) {
 		if (set_lw++)
@@ -992,7 +983,6 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	c_token++;
 	tc->type = TC_LINESTYLE;
 	tc->lt = (int)real(const_express(&a));
-#ifdef PM3D
     } else if (almost_equals(c_token,"rgb$color")) {
 	char *color;
 	int rgbtriple;
@@ -1008,7 +998,6 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	    int_error(c_token, "expected a known color name or a string of form \"#RRGGBB\"");
 	tc->type = TC_RGB;
 	tc->lt = rgbtriple;
-#endif
     } else if (almost_equals(c_token,"pal$ette")) {
 	c_token++;
 	if (END_OF_COMMAND || equals(c_token,"z")) {

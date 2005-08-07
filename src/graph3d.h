@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.19 2004/10/20 20:14:18 sfeam Exp $
+ * $Id: graph3d.h,v 1.20 2004/10/22 01:30:52 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -68,9 +68,7 @@ typedef struct gnuplot_contours {
     char isNewLevel;
     char label[32];
     int num_pts;
-#ifdef PM3D
     double z;
-#endif
 } gnuplot_contours;
 
 typedef struct iso_curve {
@@ -100,10 +98,8 @@ typedef struct surface_points {
 #ifdef EAM_DATASTRINGS
     struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */
 #endif
-#ifdef PM3D
     TBOOLEAN pm3d_color_from_column;
     char pm3d_where[7];		/* explicitly given base, top, surface */
-#endif
 
 } surface_points;
 

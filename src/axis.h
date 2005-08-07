@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.42 2005/06/30 06:52:42 sfeam Exp $
+ * $Id: axis.h,v 1.43 2005/08/05 15:48:32 mikulik Exp $
  *
  */
 
@@ -67,17 +67,10 @@ typedef enum AXIS_INDEX {
     R_AXIS,			/* never used ? */
     U_AXIS,			/* ditto */
     V_AXIS			/* ditto */
-#ifdef PM3D
     ,COLOR_AXIS
-#endif
 } AXIS_INDEX;
 
-#ifdef PM3D
 # define AXIS_ARRAY_SIZE 11
-#else
-# define AXIS_ARRAY_SIZE 10
-#endif
-
 
 /* What kind of ticmarking is wanted? */
 typedef enum en_ticseries_type {
@@ -162,7 +155,6 @@ typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, struct lp_styl
 #define GRID_MZ     (1<<7)
 #define GRID_MX2    (1<<8)
 #define GRID_MY2    (1<<9)
-/* GRID_{M}CB only for PM3D, but defined always for source code readability */
 #define GRID_CB     (1<<10)
 #define GRID_MCB    (1<<11)
 #endif /* 0 */
@@ -235,11 +227,7 @@ typedef struct axis {
 } AXIS;
 
 #define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0}, {NULL},  { character, character, character, 0., 0., 0. } }
-#ifdef PM3D
 # define DEFAULT_AXIS_ZEROAXIS {0, -3, 0, 1.0, 1.0, 0}
-#else
-# define DEFAULT_AXIS_ZEROAXIS {0, -3, 0, 1.0, 1.0}
-#endif
 
 #define DEFAULT_AXIS_STRUCT {						    \
 	AUTOSCALE_BOTH, AUTOSCALE_BOTH, /* auto, set_auto */		    \
@@ -323,9 +311,7 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
 #define X_AXIS axis_array[x_axis]
 #define Y_AXIS axis_array[y_axis]
 #define Z_AXIS axis_array[z_axis]
-#ifdef PM3D
 #define CB_AXIS axis_array[COLOR_AXIS]
-#endif
 
 /* -------- macros using these variables: */
 
@@ -582,7 +568,6 @@ do {									  \
  * the type of the point (out-of-range color is plotted with the color
  * of the min or max color value).
  */
-#ifdef PM3D
 #define COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
 				       OUT_ACTION, UNDEF_ACTION)	  \
 {									  \
@@ -590,7 +575,6 @@ do {									  \
     STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, AXIS,	  \
 				       OUT_ACTION, UNDEF_ACTION);	  \
 }
-#endif
 
 /* Empty macro arguments triggered NeXT cpp bug       */
 /* #define NOOP (0) caused many warnings from gcc 3.2 */
@@ -608,16 +592,9 @@ do {						\
 
 /* HBB 20000506: new macro to automatically build intializer lists
  * for arrays of AXIS_ARRAY_SIZE equal elements */
-#ifdef PM3D
 #define AXIS_ARRAY_INITIALIZER(value) {			\
     value, value, value, value, value,			\
 	value, value, value, value, value, value }
-#else
-#define AXIS_ARRAY_INITIALIZER(value) {		\
-    value, value, value, value, value,		\
-	value, value, value, value, value }
-#endif
-
 
 /* used by set.c */
 #define SET_DEFFORMAT(axis, flag_array)				\
@@ -664,20 +641,10 @@ void get_position __PROTO((struct position *pos));
 void get_position_default __PROTO((struct position *pos, enum position_type default_type));
 
 /* ------------ autoscaling of the color axis */
-#ifdef PM3D
-
 #define NEED_PALETTE(plot) \
    (PM3DSURFACE == (plot)->plot_style \
     || PM3D_IMPLICIT == pm3d.implicit \
     || 1 == (plot)->lp_properties.use_palette)
 int set_cbminmax __PROTO((void));
-
-#else
-
-/* make this available regardless of the status of PM3D itself, for
- * ease of use */
-#define NEED_PALETTE(plot) FALSE
-
-#endif /* PM3D */
 
 #endif /* GNUPLOT_AXIS_H */

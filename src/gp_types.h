@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.29 2005/03/03 04:09:47 sfeam Exp $
+ * $Id: gp_types.h,v 1.30 2005/07/07 20:35:12 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -99,9 +99,7 @@ typedef enum PLOT_STYLE {
     YERRORLINES  = 18*PLOT_STYLE_BITS + (PLOT_STYLE_HAS_LINE | PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR),
     XYERRORLINES = 19*PLOT_STYLE_BITS + (PLOT_STYLE_HAS_LINE | PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR)
     , FILLEDCURVES = 21*PLOT_STYLE_BITS + PLOT_STYLE_HAS_LINE + PLOT_STYLE_HAS_FILL
-#ifdef PM3D
     , PM3DSURFACE  = 22*PLOT_STYLE_BITS + 0
-#endif
 #ifdef EAM_DATASTRINGS
     , LABELPOINTS  = 23*PLOT_STYLE_BITS + 0
 #endif
@@ -177,10 +175,8 @@ typedef struct coordinate {
      * Another proposal is to completely separate 2d and 3d coordinates and
      * change the data storage.
      */
-# ifdef PM3D
     coordval color;		/* PM3D's color value to be used */
 				/* Note: accessed only if NEED_PALETTE(this_plot) */
-# endif
 #endif
 #if defined(WIN16) || (defined(MSDOS) && defined(__TURBOC__))
     /* FIXME HBB 20020301: addition of 'color' probably broke this */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.25 2005/03/23 19:01:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.26 2005/08/04 15:27:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -254,9 +254,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	if (contour_list != save_contour_list) {
 	    contour_list->isNewLevel = 1;
 	    sprintf(contour_list->label, contour_format, AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,z));
-#ifdef PM3D
 	    contour_list->z = z;
-#endif
 	}
     }
 

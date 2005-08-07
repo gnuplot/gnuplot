@@ -1,3 +1,34 @@
+2005-08-07  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	Let PM3D be always compiled in. Thus, this patch removes all constructs
+	#if(n)def PM3D and does a necessary code clean-up.
+
+	Files changed:
+
+	configure.in 
+
+	config/(11 files) config.amg config.cyg config.mgw config.os2 config.wc
+	makefile.cyg makefile.mgw makefile.nt makefile.os2 makefile.oww
+	makefile.win
+
+	demo/world2.dem
+
+	src/(37 files) axis.c axis.h color.c color.h command.c contour.c
+	datafile.c gadgets.c gadgets.h getcolor.c getcolor.h gplt_x11.c
+	gplt_x11.h gp_types.h graph3d.c graph3d.h graphics.c graphics.h
+	hidden3d.c misc.c misc.h mouse.c plot2d.c plot3d.c plot.c pm3d.c save.c
+	set.c setshow.h show.c tables.c tables.h term_api.h term.c unset.c
+	util3d.c util3d.h
+
+	src/os2/gclient.c src/os2/pm_msgs.h
+
+	src/win/wgraph.c
+
+	term/(22 files) README aquaterm.trm cgm.trm dumb.trm emf.trm
+	estimate.trm fig.trm gd.trm ggi.trm metapost.trm mif.trm pdf.trm pm.trm
+	post.trm pslatex.trm pstricks.trm svg.trm tgif.trm vgagl.trm win.trm
+	x11.trm xlib.trm
+
 2005-08-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/set.c (set_tics): Fix non-ANSI ordering of declaration.

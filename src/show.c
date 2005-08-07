@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.159 2005/07/31 08:41:47 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.160 2005/08/05 15:48:36 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -66,13 +66,9 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.159 2005/07/31 08:41:47 mik
 #ifdef USE_MOUSE
 # include "mouse.h"
 #endif
-
-#ifdef PM3D
-# include "color.h"
-# include "pm3d.h"
-# include "getcolor.h"
-#endif
-
+#include "color.h"
+#include "pm3d.h"
+#include "getcolor.h"
 #include <ctype.h>
 
 /******** Local functions ********/
@@ -107,7 +103,6 @@ static void show_offsets __PROTO((void));
 static void show_margin __PROTO((void));
 static void show_output __PROTO((void));
 static void show_parametric __PROTO((void));
-#ifdef PM3D
 static void show_pm3d __PROTO((void));
 static void show_palette __PROTO((void));
 static void show_palette_rgbformulae __PROTO((void));
@@ -116,7 +111,6 @@ static void show_palette_palette __PROTO((void));
 static void show_palette_gradient __PROTO((void));
 static void show_palette_colornames __PROTO((void));
 static void show_colorbox __PROTO((void));
-#endif
 static void show_pointsize __PROTO((void));
 static void show_encoding __PROTO((void));
 static void show_decimalsign __PROTO((void));
@@ -138,11 +132,7 @@ static void show_historysize __PROTO((void));
 static void show_size __PROTO((void));
 static void show_origin __PROTO((void));
 static void show_term __PROTO((void));
-#ifdef PM3D
 static void show_tics __PROTO((TBOOLEAN showx, TBOOLEAN showy, TBOOLEAN showz, TBOOLEAN showx2, TBOOLEAN showy2, TBOOLEAN showcb));
-#else
-static void show_tics __PROTO((TBOOLEAN showx, TBOOLEAN showy, TBOOLEAN showz, TBOOLEAN showx2, TBOOLEAN showy2));
-#endif
 static void show_mtics __PROTO((AXIS_INDEX));
 static void show_timestamp __PROTO((void));
 static void show_range __PROTO((AXIS_INDEX axis));
@@ -330,7 +320,6 @@ show_command()
     case S_PARAMETRIC:
 	show_parametric();
 	break;
-#ifdef PM3D
     case S_PM3D:
 	show_pm3d();
 	break;
@@ -340,7 +329,6 @@ show_command()
     case S_COLORBOX:
 	show_colorbox();
 	break;
-#endif
     case S_POINTSIZE:
 	show_pointsize();
 	break;
@@ -411,11 +399,7 @@ show_command()
     case S_TICS:
     case S_TICSLEVEL:
     case S_TICSCALE:
-#ifdef PM3D
 	show_tics(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-#else
-	show_tics(TRUE, TRUE, TRUE, TRUE, TRUE);
-#endif
 	break;
     case S_MXTICS:
 	show_mtics(FIRST_X_AXIS);
@@ -426,11 +410,9 @@ show_command()
     case S_MZTICS:
 	show_mtics(FIRST_Z_AXIS);
 	break;
-#ifdef PM3D
     case S_MCBTICS:
 	show_mtics(COLOR_AXIS);
 	break;
-#endif
     case S_MX2TICS:
 	show_mtics(SECOND_X_AXIS);
 	break;
@@ -467,11 +449,9 @@ show_command()
     case S_ZRANGE:
 	show_range(FIRST_Z_AXIS);
 	break;
-#ifdef PM3D
     case S_CBRANGE:
 	show_range(COLOR_AXIS);
 	break;
-#endif
     case S_TITLE:
 	show_title();
 	break;
@@ -484,11 +464,9 @@ show_command()
     case S_ZLABEL:
 	show_axislabel(FIRST_Z_AXIS);
 	break;
-#ifdef PM3D
     case S_CBLABEL:
 	show_axislabel(COLOR_AXIS);
 	break;
-#endif
     case S_X2LABEL:
 	show_axislabel(SECOND_X_AXIS);
 	break;
@@ -510,11 +488,9 @@ show_command()
     case S_ZDATA:
 	show_data_is_timedate(FIRST_Z_AXIS);
 	break;
-#ifdef PM3D
     case S_CBDATA:
 	show_data_is_timedate(COLOR_AXIS);
 	break;
-#endif
     case S_TIMEFMT:
 	show_timefmt();
 	break;
@@ -553,54 +529,32 @@ show_command()
     case S_XTICS:
     case S_XDTICS:
     case S_XMTICS:
-#ifdef PM3D
 	show_tics(TRUE, FALSE, FALSE, TRUE, FALSE, FALSE);
-#else
-	show_tics(TRUE, FALSE, FALSE, TRUE, FALSE);
-#endif
 	break;
     case S_YTICS:
     case S_YDTICS:
     case S_YMTICS:
-#ifdef PM3D
 	show_tics(FALSE, TRUE, FALSE, FALSE, TRUE, FALSE);
-#else
-	show_tics(FALSE, TRUE, FALSE, FALSE, TRUE);
-#endif
 	break;
     case S_ZTICS:
     case S_ZDTICS:
     case S_ZMTICS:
-#ifdef PM3D
 	show_tics(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE);
-#else
-	show_tics(FALSE, FALSE, TRUE, FALSE, FALSE);
-#endif
 	break;
-#ifdef PM3D
     case S_CBTICS:
     case S_CBDTICS:
     case S_CBMTICS:
 	show_tics(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE);
 	break;
-#endif
     case S_X2TICS:
     case S_X2DTICS:
     case S_X2MTICS:
-#ifdef PM3D
 	show_tics(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE);
-#else
-	show_tics(FALSE, FALSE, FALSE, TRUE, FALSE);
-#endif
 	break;
     case S_Y2TICS:
     case S_Y2DTICS:
     case S_Y2MTICS:
-#ifdef PM3D
 	show_tics(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE);
-#else
-	show_tics(FALSE, FALSE, FALSE, FALSE, TRUE);
-#endif
 	break;
 
 #ifdef BACKWARDS_COMPATIBLE
@@ -612,12 +566,10 @@ show_command()
     case S_NOMY2TICS:
     case S_NOMYTICS:
     case S_NOMZTICS:
-#ifdef PM3D
     case S_NOCBTICS:
     case S_NOMCBTICS:
     case S_NOCBDTICS:
     case S_NOCBMTICS:
-#endif
     case S_NOX2DTICS:
     case S_NOX2MTICS:
     case S_NOX2TICS:
@@ -787,11 +739,9 @@ show_all()
     show_output();
     show_print();
     show_parametric();
-#ifdef PM3D
-	show_palette();
+    show_palette();
     show_colorbox();
-	show_pm3d();
-#endif
+    show_pm3d();
     show_pointsize();
     show_encoding();
     show_decimalsign();
@@ -809,11 +759,7 @@ show_all()
     show_size();
     show_origin();
     show_term();
-#ifdef PM3D
     show_tics(TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);
-#else
-    show_tics(TRUE,TRUE,TRUE,TRUE,TRUE);
-#endif
     show_mtics(FIRST_X_AXIS);
     show_mtics(FIRST_Y_AXIS);
     show_mtics(FIRST_Z_AXIS);
@@ -1104,9 +1050,7 @@ show_autoscale()
     SHOW_AUTOSCALE(SECOND_Y_AXIS);
     fputs("\n\t               ", stderr);
     SHOW_AUTOSCALE(FIRST_Z_AXIS );
-#ifdef PM3D
     SHOW_AUTOSCALE(COLOR_AXIS);
-#endif
 #undef SHOW_AUTOSCALE
 
 }
@@ -1362,9 +1306,7 @@ show_format()
     SHOW_FORMAT(SECOND_X_AXIS);
     SHOW_FORMAT(SECOND_Y_AXIS);
     SHOW_FORMAT(FIRST_Z_AXIS );
-#ifdef PM3D
     SHOW_FORMAT(COLOR_AXIS);
-#endif
 #undef SHOW_FORMAT
 }
 
@@ -1473,12 +1415,8 @@ show_grid()
 	    grid_selection & GRID_MZ ? " mz" : "",
 	    grid_selection & GRID_MX2 ? " mx2" : "",
 	    grid_selection & GRID_MY2 ? " my2" : "",
-#ifdef PM3D
 	    grid_selection & GRID_CB ? " cb" : "",
 	    grid_selection & GRID_MCB ? " mcb" : ""
-#else
-	    "", ""
-#endif /* PM3D */
 	    );
 #else
     /* HBB 20010806: new storage method for grid options: */
@@ -1494,9 +1432,7 @@ show_grid()
     SHOW_GRID(SECOND_X_AXIS);
     SHOW_GRID(SECOND_Y_AXIS);
     SHOW_GRID(FIRST_Z_AXIS );
-#ifdef PM3D
     SHOW_GRID(COLOR_AXIS);
-#endif
 #undef SHOW_GRID
     fputs(" tics\n", stderr);
 #endif /* 0/1 */
@@ -1783,9 +1719,7 @@ show_logscale()
     SHOW_LOG(FIRST_Z_AXIS );
     SHOW_LOG(SECOND_X_AXIS);
     SHOW_LOG(SECOND_Y_AXIS);
-#ifdef PM3D
     SHOW_LOG(COLOR_AXIS );
-#endif
 #undef SHOW_LOG
 
     if (count == 0)
@@ -1863,7 +1797,6 @@ show_parametric()
     fprintf(stderr, "\tparametric is %s\n", (parametric) ? "ON" : "OFF");
 }
 
-#ifdef PM3D
 
 static void
 show_palette_rgbformulae()
@@ -2015,8 +1948,8 @@ show_palette_palette()
 		i, gray, rgb1.r, rgb1.g, rgb1.b,
 		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b,
 		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b );
+	}
     }
-}
 }
 
 
@@ -2256,8 +2189,6 @@ show_pm3d()
     }
 }
 
-#endif
-
 
 /* process 'show pointsize' command */
 static void
@@ -2478,16 +2409,10 @@ show_term()
 
 /* process 'show tics|[xyzx2y2cb]tics' commands */
 static void
-#ifdef PM3D
 show_tics(
     TBOOLEAN showx, TBOOLEAN showy, TBOOLEAN showz,
     TBOOLEAN showx2, TBOOLEAN showy2,
     TBOOLEAN showcb)
-#else
-show_tics(
-    TBOOLEAN showx, TBOOLEAN showy, TBOOLEAN showz,
-    TBOOLEAN showx2, TBOOLEAN showy2)
-#endif
 {
     SHOW_ALL_NL;
 
@@ -2503,10 +2428,8 @@ show_tics(
 	show_ticdef(SECOND_Y_AXIS);
     if (showz)
 	show_ticdef(FIRST_Z_AXIS);
-#ifdef PM3D
     if (showcb)
 	show_ticdef(COLOR_AXIS);
-#endif
     screen_ok = FALSE;
 }
 

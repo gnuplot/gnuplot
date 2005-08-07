@@ -400,10 +400,6 @@
 /* Unix-type of Interprocess Communication is required for mouse support. */
 /* #undef PIPE_IPC */
 
-/* Define if you want to have Petr Mikulik's fancy pm3d. */
-/* #undef PM3D */
-/* Don't change it here -- this define is set in config/makefile.cyg. */
-
 /* Define to have 'set term gif' produce PNG images instead */
 /* #undef PNG_FOR_GIF */
 /* Don't change it here -- this define is set in config/makefile.cyg. */

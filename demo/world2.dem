@@ -1,7 +1,7 @@
 #
 # Plot of location on globe, 
 # this time with labels color-coded by explicit 4th input column
-# Requires PM3D and EAM_DATASTRINGS
+# Requires EAM_DATASTRINGS
 #
 set dummy u,v
 set angles degrees

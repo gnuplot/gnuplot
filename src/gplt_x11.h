@@ -41,14 +41,12 @@
 #define X11_GR_CHECK_ENDIANESS  'B'
 #endif
 
-#ifdef PM3D
 #define X11_GR_MAKE_PALETTE     'p'
 #define X11_GR_RELEASE_PALETTE  'e'
 #define X11_GR_SET_COLOR        'c'
 #define X11_GR_SET_RGBCOLOR     'g'
 #define X11_GR_SET_LINECOLOR    'l'
 #define X11_GR_FILLED_POLYGON   'f'
-#endif
 
 #ifdef WITH_IMAGE
 #define X11_GR_IMAGE 'i'

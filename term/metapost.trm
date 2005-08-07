@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.31 2004/11/28 02:02:52 sfeam Exp $
+ * $Id: metapost.trm,v 1.32 2005/02/01 11:28:53 broeker Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -82,12 +82,10 @@ TERM_PUBLIC int MP_set_font __PROTO((const char *font));
 TERM_PUBLIC void MP_boxfill __PROTO((int style, unsigned int x1,
 				     unsigned int y1, unsigned int width,
 				     unsigned int height));
-#ifdef PM3D
 TERM_PUBLIC int MP_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void MP_previous_palette __PROTO((void));
 TERM_PUBLIC void MP_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void MP_filled_polygon __PROTO((int, gpiPoint *));
-#endif /* PM3D */
 
 /* 5 inches wide by 3 inches high (default) */
 #define MP_XSIZE 5.0
@@ -159,10 +157,8 @@ static int MP_a4paper = 0;
 /* write a prologues line */
 static int MP_prologues = -1;
 
-#ifdef PM3D
 /* has color changed? */
 static int MP_color_changed = 0;
-#endif
 
 /* has a font change taken place? */
 static TBOOLEAN MP_fontchanged = FALSE;
@@ -558,10 +554,8 @@ MP_graphics()
 	    (term->xmax) / 10.0, (term->ymax) / 10.0);
     fprintf(gpoutfile, "scalepen 1; ptsize %.3f;linetype -2;\n", pointsize);
     MP_char_code++;
-#ifdef PM3D
     /* reset MP_color_changed */
     MP_color_changed = 0;
-#endif
 }
 
 TERM_PUBLIC void
@@ -581,13 +575,11 @@ MP_linetype(int lt)
 	linetype %= MP_LINE_TYPES;
     if (MP_inline)
 	MP_endline();
-#ifdef PM3D
     /* reset the color in case it has been changed in MP_set_color() */
     if (MP_color_changed) {
 	MP_oldline = linetype + 1;
 	MP_color_changed = 0;
     }
-#endif
     if (MP_oldline != linetype) {
 	fprintf(gpoutfile, "linetype %d;\n", linetype);
 	MP_oldline = linetype;
@@ -817,8 +809,6 @@ fill (%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--cycle withcolor
 		(y1 + ht) / 10.0);
 }
 
-#ifdef PM3D
-
 TERM_PUBLIC int
 MP_make_palette(t_sm_palette *palette)
 {
@@ -885,8 +875,6 @@ MP_previous_palette()
     return;
 }
 
-#endif /* PM3D */
-
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -902,12 +890,10 @@ TERM_TABLE_START(mp_driver)
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0		/* no mouse support for metapost */
 #endif
-#ifdef PM3D
     , MP_make_palette,
     MP_previous_palette,	/* write grestore */
     MP_set_color,
     MP_filled_polygon
-#endif /* PM3D */
 TERM_TABLE_END(mp_driver)
 #undef LAST_TERM
 #define LAST_TERM mp_driver

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.34 2005/05/02 19:53:33 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.35 2005/06/29 22:31:14 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -101,12 +101,10 @@ TERM_PUBLIC void TGIF_set_pointsize __PROTO((double size));
 #ifdef USE_LINEWIDTH
 TERM_PUBLIC void TGIF_set_linewidth __PROTO((double size));
 #endif
-#ifdef PM3D
 TERM_PUBLIC int TGIF_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void TGIF_previous_palette (void); */
 TERM_PUBLIC void TGIF_set_color (t_colorspec *);
 TERM_PUBLIC void TGIF_filled_polygon (int, gpiPoint *);
-#endif /* PM3D */
 /*}}}  */
 /* default length for static strings */
 #define TGIF_STRLEN_MAX 255
@@ -132,7 +130,6 @@ TERM_PUBLIC void TGIF_filled_polygon (int, gpiPoint *);
 #define TGIF_VTIC (TGIF_YMAX/80)
 #define TGIF_HTIC (TGIF_YMAX/80)
 
-#ifdef PM3D
 static int TGIF_palette_set = FALSE;	/* PM3D Palette Set ? */
 static int TGIF_palette_size = 128;	/* Number of colours in palette */
 /* unused (joze) */
@@ -140,7 +137,6 @@ static int TGIF_palette_size = 128;	/* Number of colours in palette */
 static int TGIF_palette_offst = 32;	/* Offset from zero for user colours */
 #endif
 static char TGIF_colours[128][8];	/* Colours */
-#endif /* PM3D */
 
 
 #define TGIF_MAXPOLY 100
@@ -484,7 +480,7 @@ TGIF_init()
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
 %%\n\
-%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.34 2005/05/02 19:53:33 sfeam Exp $\n\
+%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.35 2005/06/29 22:31:14 sfeam Exp $\n\
 %% %%W%%\n\
 %%\n\
 page(1,\"\").\n",
@@ -493,12 +489,10 @@ page(1,\"\").\n",
     iTgifPolyCount = 0;
     uTgifPlotCount = 0;
     uActPage = 1;
-#ifdef PM3D
     TGIF_palette_set = FALSE;    /* PM3D Palette Set ? */
-#endif /* PM3D */
-
 }				/* TGIF_init */
 /*}}}  */
+
 /***************************************************************************/
 TERM_PUBLIC void
 TGIF_graphics()
@@ -1612,7 +1606,6 @@ TGIF_set_font(const char *font)
     return TRUE;
 }
 
-#ifdef PM3D
 TERM_PUBLIC int
 TGIF_make_palette(t_sm_palette *palette)
 {
@@ -1702,7 +1695,6 @@ TGIF_filled_polygon(int points, gpiPoint *corners)
     fprintf(gpoutfile, "],1,1,1,0,%u,0,0,0,0,0,[\n]).\n", uActNr);
     uActNr++;
 }
-#endif /* PM3D */
 
 /*}}}  */
 /***************************************************************************/
@@ -1727,9 +1719,7 @@ TERM_TABLE_START(tgif_driver)
 #ifdef USE_MOUSE
     ,0, 0, 0, 0, 0 /* no mouse support for the tgif terminal */
 #endif
-#ifdef PM3D
     , TGIF_make_palette, 0 /*previous_palette*/, TGIF_set_color, TGIF_filled_polygon
-#endif /* PM3D */
 TERM_TABLE_END(tgif_driver)
 
 #undef LAST_TERM

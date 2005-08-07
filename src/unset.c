@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.83 2005/07/25 17:32:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.84 2005/08/05 15:48:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -52,15 +52,11 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.83 2005/07/25 17:32:08 sfe
 #include "util.h"
 #include "variable.h"
 #ifdef USE_MOUSE
-# include "mouse.h"
+#  include "mouse.h"
 #endif
-
-#ifdef PM3D
 #include "pm3d.h"
-#endif
-
 #ifdef BINARY_DATA_FILE
-#include "datafile.h"
+#  include "datafile.h"
 #endif
 
 static void unset_angles __PROTO((void));
@@ -122,12 +118,10 @@ static void unset_offsets __PROTO((void));
 static void unset_origin __PROTO((void));
 static void unset_output __PROTO((void));
 static void unset_parametric __PROTO((void));
-#ifdef PM3D
 static void unset_pm3d __PROTO((void));
 static void unset_palette __PROTO((void));
 static void reset_colorbox __PROTO((void));
 static void unset_colorbox __PROTO((void));
-#endif
 static void unset_pointsize __PROTO((void));
 static void unset_polar __PROTO((void));
 static void unset_print __PROTO((void));
@@ -315,7 +309,6 @@ unset_command()
     case S_PARAMETRIC:
 	unset_parametric();
 	break;
-#ifdef PM3D
     case S_PM3D:
 	unset_pm3d();
 	break;
@@ -325,7 +318,6 @@ unset_command()
     case S_COLORBOX:
 	unset_colorbox();
 	break;
-#endif
     case S_POINTSIZE:
 	unset_pointsize();
 	break;
@@ -432,7 +424,6 @@ unset_command()
     case S_ZMTICS:
 	unset_month_day_tics(FIRST_X_AXIS);
 	break;
-#ifdef PM3D
     case S_MCBTICS:
 	unset_minitics(COLOR_AXIS);
 	break;
@@ -443,7 +434,6 @@ unset_command()
     case S_CBMTICS:
 	unset_month_day_tics(FIRST_X_AXIS);
 	break;
-#endif
     case S_XDATA:
 	unset_timedata(FIRST_X_AXIS);
 	/* FIXME HBB 20000506: does unsetting these axes make *any*
@@ -460,11 +450,9 @@ unset_command()
     case S_ZDATA:
 	unset_timedata(FIRST_Z_AXIS);
 	break;
-#ifdef PM3D
     case S_CBDATA:
 	unset_timedata(COLOR_AXIS);
 	break;
-#endif
     case S_X2DATA:
 	unset_timedata(SECOND_X_AXIS);
 	break;
@@ -480,11 +468,9 @@ unset_command()
     case S_ZLABEL:
 	unset_axislabel(FIRST_Z_AXIS);
 	break;
-#ifdef PM3D
     case S_CBLABEL:
 	unset_axislabel(COLOR_AXIS);
 	break;
-#endif
     case S_X2LABEL:
 	unset_axislabel(SECOND_X_AXIS);
 	break;
@@ -506,11 +492,9 @@ unset_command()
     case S_ZRANGE:
 	unset_range(FIRST_Z_AXIS);
 	break;
-#ifdef PM3D
     case S_CBRANGE:
 	unset_range(COLOR_AXIS);
 	break;
-#endif
     case S_RRANGE:
 	unset_range(R_AXIS);
 	break;
@@ -811,9 +795,7 @@ unset_format()
 	SET_DEFFORMAT(FIRST_Z_AXIS , set_for_axis);
 	SET_DEFFORMAT(SECOND_X_AXIS, set_for_axis);
 	SET_DEFFORMAT(SECOND_Y_AXIS, set_for_axis);
-#ifdef PM3D
 	SET_DEFFORMAT(COLOR_AXIS   , set_for_axis);
-#endif
     }
 }
 
@@ -1164,7 +1146,6 @@ unset_parametric()
     }
 }
 
-#ifdef PM3D
 /* process 'unset palette' command */
 static void
 unset_palette()
@@ -1208,7 +1189,7 @@ unset_pm3d()
     if (data_style == PM3DSURFACE) data_style = POINTSTYLE;
     if (func_style == PM3DSURFACE) func_style = LINES;
 }
-#endif
+
 
 /* process 'unset pointsize' command */
 static void
@@ -1636,11 +1617,9 @@ reset_command()
     unset_pointsize();
     unset_encoding();
     unset_decimalsign();
-#ifdef PM3D
     pm3d_reset();
     reset_colorbox();
     reset_palette();
-#endif
 #ifdef BINARY_DATA_FILE
     df_unset_datafile_binary();
 #endif

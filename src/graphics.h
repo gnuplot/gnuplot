@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.30 2004/10/22 01:30:52 sfeam Exp $
+ * $Id: graphics.h,v 1.31 2004/11/12 07:14:52 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -65,9 +65,7 @@ typedef struct curve_points {
     /* HBB 20000504: new field */
     int z_axis;			/* same as either x_axis or y_axis, for 5-column plot types */
     /* pm 5.1.2002: new field */
-#ifdef PM3D
     filledcurves_opts filledcurves_options;
-#endif
     struct coordinate GPHUGE *points;
 #ifdef EAM_DATASTRINGS
     struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */

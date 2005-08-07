@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: mif.trm,v 1.28 2005/03/03 04:09:51 sfeam Exp $
+ * $Id: mif.trm,v 1.29 2005/05/22 18:49:39 sfeam Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -113,9 +113,7 @@ TERM_PUBLIC int MIF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void MIF_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void MIF_boxfill __PROTO((int style, unsigned int x1, unsigned int y1,
 	    unsigned int width, unsigned int height));
-#ifdef PM3D
 TERM_PUBLIC void MIF_filled_polygon __PROTO((int points, gpiPoint* corners));
-#endif
 
 /** Coordinates **/
 /* The cast to float is not necessary because we are dividing by a float */
@@ -420,7 +418,6 @@ MIF_boxfill(int style, unsigned int x1, unsigned int y1,
 
 }
 
-#ifdef PM3D
 /* Filled polygon. Ethan Merritt <merritt@u.washington.edu> */
 TERM_PUBLIC void
 MIF_filled_polygon(int points, gpiPoint* corners)
@@ -449,7 +446,6 @@ MIF_filled_polygon(int points, gpiPoint* corners)
     proc_group_id(MIF_PEN_TO_GROUP(mif_pentype));
 
 }
-#endif
 
 /* Draw a point */
 static void
@@ -955,12 +951,10 @@ TERM_TABLE_START(mif_driver)
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
 #endif
-#ifdef PM3D
     ,0 /* make_palette */
     ,0 /* previous_palette */
     ,0 /* set_color */
     ,MIF_filled_polygon /* filled_polygon */
-#endif
 TERM_TABLE_END(mif_driver)
 
 #undef LAST_TERM

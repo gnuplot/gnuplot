@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.42 2005/04/26 14:07:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.43 2005/08/03 16:55:40 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -59,10 +59,8 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.42 2005/04/26 14:07:12 br
 # include "gpexecute.h"
 # include "mouse.h"
 #endif
-#ifdef PM3D
 # include "color.h"
 # include "getcolor.h"
-#endif
 
 #ifdef USE_MOUSE
 /* Petr Mikulik, February 2001
@@ -995,7 +993,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	     * state */
 	    line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
 	    break;
-#ifdef PM3D /* HBB 20000813: implemented PM3D for Windows terminal */
 	case W_pm3d_setcolor:
 	    {
 		double level = curptr->x / 256.0;
@@ -1014,7 +1011,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		/* create new pen, too: */
 		DeleteObject(SelectObject(hdc, CreatePen(PS_SOLID, 1, c)));
 	    }
-	break;
+	    break;
 	case W_pm3d_filled_polygon_pt:
 	    {
 		/* a point of the polygon is coming */
@@ -1026,15 +1023,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		ppt[polyi].y = ydash;
 		polyi++;
 	    }
-	break;
+	    break;
 	case W_pm3d_filled_polygon_draw:
 	    {
 		/* end of point series --> draw polygon now */
 		Polygon(hdc, ppt, polyi);
 		polyi = 0;
 	    }
-	break;
-#endif /* PM3D */
+	    break;
 	case W_dot:
 	    dot(hdc, xdash, ydash);
 	    break;

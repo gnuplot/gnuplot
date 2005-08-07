@@ -1,6 +1,6 @@
 #
 #
-# $Id: makefile.cyg,v 1.24 2004/02/12 09:03:11 mikulik Exp $
+# $Id: makefile.cyg,v 1.25 2004/03/26 07:47:53 mikulik Exp $
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
@@ -64,9 +64,6 @@ FREETYPE=1
 
 # MOUSE support for the windows terminal
 MOUSE=1
-
-# PM3D splot mode + colours and filled polygons
-PM3D=1
 
 # PIPES: define if you would prefer support of pipes undef Windows (e.g.
 # plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot.exe keeps attached
@@ -152,10 +149,6 @@ CFLAGS += -I. -D_Windows -DCYGWIN -mno-cygwin -DHAVE_CONFIG_H\
 
 ifdef MOUSE
   CFLAGS += -DUSE_MOUSE=1
-endif
-
-ifdef PM3D
-  CFLAGS += -DPM3D=1
 endif
 
 ifdef NEWGD
