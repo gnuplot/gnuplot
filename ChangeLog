@@ -1,3 +1,8 @@
+2005-08-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm: Keep track of current color regardless of whether it was
+	set by term->set_color() or term->linetype().
+
 2005-08-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/gp_hist.h src/history.c src/plot.c src/plot.h src/set.c src/show.c
