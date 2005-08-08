@@ -15,7 +15,7 @@ set style fill solid
 set key autotitle column
 set boxwidth 0.8
 set format y "    "
-set ticscale 0
+set tics scale 0
 set title "Plot 3"
 plot 'immigration.dat' using 2 with histograms, \
      '' using 7  with histograms , \
@@ -44,7 +44,7 @@ set style fill solid
 set key autotitle column
 set boxwidth 0.8
 set format y "    "
-set ticscale 0
+set tics scale 0
 plot 'immigration.dat' using 2 with histograms , \
      '' using  7 with histograms , \
      '' using  8 with histograms , \
@@ -73,7 +73,7 @@ set style fill solid
 set key autotitle column
 set boxwidth 0.8
 set format y "    "
-set ticscale 0
+set tics scale 0
 plot 'immigration.dat' using 2 with histograms , \
      '' using  7 with histograms , \
      '' using  8 with histograms , \

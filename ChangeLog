@@ -1,3 +1,8 @@
+2005-08-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/datastrings.dem demo/epslatex.dem demo/histograms.dem
+	demo/layout.dem demo/pm3d.dem: Update for "set tics scale".
+
 2005-08-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Do away with special (GC *)gc_pm3d; use the same gc

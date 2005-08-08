@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: epslatex.dem,v 1.1 2005/02/09 11:43:06 mikulik Exp $
 #
 # This file demonstrates new features in gnuplot 4.1
 print "\n This file demonstrates how to use the epslatex terminal."
@@ -47,7 +47,7 @@ set output
 set terminal epslatex standalone oldstyle linewidth 2 rounded \
   dashlen 1 color '' 12
 set output 'epslatex-oldstyle.tex'
-set ticscale 2
+set tics scale 2
 replot
 set output
 #

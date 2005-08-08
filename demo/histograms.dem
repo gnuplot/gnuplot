@@ -124,7 +124,7 @@ set key noinvert box
 set yrange [0:*]
 set ylabel "Immigration by decade"
 set xlabel "Country of Origin"
-set ticscale 0.0
+set tics scale 0.0
 set ytics
 unset xtics
 set xtics norotate

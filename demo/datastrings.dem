@@ -33,7 +33,7 @@ set pointsize 2
 set yrange [0:180]
 set xrange [-0.5:11.5]
 set ylabel "mm"
-set ticscale 0.0
+set tics scale 0.0
 set grid y
 set xtics
 #

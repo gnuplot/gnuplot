@@ -1,5 +1,5 @@
 #
-# $Id: pm3d.dem,v 1.14 2005/01/26 21:51:26 mikulik Exp $
+# $Id: pm3d.dem,v 1.15 2005/07/29 07:57:41 mikulik Exp $
 #
 # demo for pm3d splotting
 #
@@ -377,7 +377,7 @@ f(x,y)=2*x+y
 set key off
 unset xtics
 unset ytics
-set ticscale 2
+set tics scale 2
 set colorbox horizontal user origin 0.1,0.025 size .8,0.02
 
 # Needed by terminals limited on colors:
