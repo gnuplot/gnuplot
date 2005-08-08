@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.16 2005/05/20 13:47:47 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.17 2005/07/31 08:46:36 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -40,6 +40,17 @@ static char *RCSid() { return RCSid("$Id: history.c,v 1.16 2005/05/20 13:47:47 m
 
 #include "alloc.h"
 #include "util.h"
+
+
+/* moved here from plot.c */
+#ifdef GNUPLOT_HISTORY
+# ifndef HISTORY_SIZE
+/* Can be overriden with the environment variable 'GNUPLOT_HISTORY_SIZE' */
+#  define HISTORY_SIZE 666
+# endif
+long int gnuplot_history_size = HISTORY_SIZE;
+#endif
+
 
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE)
 

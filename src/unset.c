@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.84 2005/08/05 15:48:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.85 2005/08/07 09:43:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -41,6 +41,7 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.84 2005/08/05 15:48:37 mik
 #include "contour.h"
 #include "datafile.h"
 #include "fit.h"
+#include "gp_hist.h"
 #include "hidden3d.h"
 #include "misc.h"
 #include "parse.h"

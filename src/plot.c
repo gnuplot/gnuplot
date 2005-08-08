@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.76 2005/08/04 16:34:08 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.77 2005/08/07 09:43:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -117,11 +117,6 @@ extern int rl_complete_with_tilde_expansion;
 #  ifndef GNUPLOT_HISTORY_FILE
 #   define GNUPLOT_HISTORY_FILE "~/.gnuplot_history"
 #  endif
-#  ifndef HISTORY_SIZE
-/* Can be overriden with the environment variable 'GNUPLOT_HISTORY_SIZE' */
-#   define HISTORY_SIZE 666
-#  endif
-long int gnuplot_history_size = HISTORY_SIZE;
 /*
  * The next variable is a pointer to the value returned from 'tilde_expand()'.
  * This function expands '~' to the user's home directory, or $HOME, with
