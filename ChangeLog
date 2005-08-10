@@ -1,3 +1,8 @@
+2005-08-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Restore original background pixel setting after
+	test rotation.
+
 2005-08-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/winmain.c: Define _WIN32_IE independent of particular
@@ -22,7 +27,7 @@
 2005-08-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Do away with special (GC *)gc_pm3d; use the same gc
-	for all normal plots elements except pattern fill. Tweak the algorithm
+	for all normal plot elements except pattern fill. Tweak the algorithm
 	for text rotation as suggested long ago by Dave Denholm. The default
 	method should now work on all TrueColor or DirectColor displays. The
 	X resource "gnuplot*fastrotate: off" still allows fall-back to a slower

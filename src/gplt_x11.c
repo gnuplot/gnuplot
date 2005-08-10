@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.142 2005/08/07 09:43:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.143 2005/08/08 03:55:01 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1884,9 +1884,10 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
     XDestroyImage(image_dest);
 
     if (s) {
-	/* restore old function of gc */
+	/* restore original state of gc */
 	gcValues.function = gcCurrentFunction;
-	XChangeGC(dpy, gc, gcFunctionMask, &gcValues);
+	gcValues.background = bgpixel;
+	XChangeGC(dpy, gc, gcFunctionMask|GCBackground, &gcValues);
     }
 }
 
