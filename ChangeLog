@@ -1,13 +1,18 @@
+2005-08-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/winmain.c: Define _WIN32_IE independent of particular
+	compilers, conditional only on whether it's already defined.
+	
 2005-08-08  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/pdf.trm: Keep track of current color regardless of whether it was
-	set by term->set_color() or term->linetype().
+	* term/pdf.trm: Keep track of current color regardless of whether
+	it was set by term->set_color() or term->linetype().
 
 2005-08-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/gp_hist.h src/history.c src/plot.c src/plot.h src/set.c src/show.c
-	src/unset.c: Move variable gnuplot_history_size from plot.h to
-	gp_hist.h.
+	* src/gp_hist.h src/history.c src/plot.c src/plot.h src/set.c
+	src/show.c src/unset.c: Move variable gnuplot_history_size from
+	plot.h to gp_hist.h.
 
 2005-08-08  Petr Mikulik  <mikulik@physics.muni.cz>
 

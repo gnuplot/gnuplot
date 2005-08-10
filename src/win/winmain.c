@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.17 2005/08/03 16:58:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.18 2005/08/04 16:34:09 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -81,7 +81,7 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.17 2005/08/03 16:58:31 m
 
 /* WANT_GETDLLVERSION is defined in wcommon.h */
 #ifdef WANT_GETDLLVERSION 
-# ifdef __MINGW__
+# ifndef _WIN32_IE
 #  define _WIN32_IE 0x0400
 # endif 
 # include <shlobj.h>
