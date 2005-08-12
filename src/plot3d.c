@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.106 2005/08/04 19:26:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.107 2005/08/07 09:43:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -114,6 +114,7 @@ sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
 
     sp->next_sp = NULL;
     sp->title = NULL;
+    sp->title_no_enhanced = FALSE;
     sp->contours = NULL;
     sp->iso_crvs = NULL;
     sp->num_iso_read = 0;
@@ -1423,7 +1424,7 @@ eval_3dplots()
 
 	    /* set default values for title if this has not been specified */
 	    if (!set_title) {
-		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
+		this_plot->title_no_enhanced = TRUE; /* filename or function cannot be enhanced */
 		if (key->auto_titles == FILENAME_KEYTITLES) {
 #ifdef BINARY_DATA_FILE
 		    /* DJS (20 Aug 2004) I'd prefer that the df_binary flag be discarded.  There

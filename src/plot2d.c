@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.112 2005/08/04 19:26:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.113 2005/08/07 09:43:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -117,6 +117,7 @@ cp_alloc(int num)
 	cp->points = (struct coordinate GPHUGE *) NULL;
     cp->next = NULL;
     cp->title = NULL;
+    cp->title_no_enhanced = FALSE;
     cp->title_is_suppressed = FALSE;
 #ifdef EAM_DATASTRINGS
     cp->labels = NULL;	/* Will be allocated later if plot_style == LABELPOINTS */
@@ -1604,7 +1605,7 @@ eval_plots()
 	    /* set default values for title if this has not been specified */
 	    this_plot->title_is_filename = FALSE;
 	    if (!set_title) {
-		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
+		this_plot->title_no_enhanced = TRUE; /* filename or function cannot be enhanced */
 		if (key->auto_titles == FILENAME_KEYTITLES) {
 		    m_capture(&(this_plot->title), start_token, end_token);
 		    if (xparam)

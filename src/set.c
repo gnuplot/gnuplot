@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.197 2005/08/08 09:24:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.198 2005/08/12 08:31:56 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2690,7 +2690,7 @@ set_palette_function()
     /* Afunc */
     start_token = c_token;
     if (sm_palette.Afunc.at) {
-	free( sm_palette.Afunc.at );
+	free_at( sm_palette.Afunc.at );
 	sm_palette.Afunc.at = NULL;
     }
     dummy_func = &sm_palette.Afunc;
@@ -2706,7 +2706,7 @@ set_palette_function()
     /* Bfunc */
     start_token = c_token;
     if (sm_palette.Bfunc.at) {
-	free( sm_palette.Bfunc.at );
+	free_at( sm_palette.Bfunc.at );
 	sm_palette.Bfunc.at = NULL;
     }
     dummy_func = &sm_palette.Bfunc;
@@ -2722,7 +2722,7 @@ set_palette_function()
     /* Cfunc */
     start_token = c_token;
     if (sm_palette.Cfunc.at) {
-	free( sm_palette.Cfunc.at );
+	free_at( sm_palette.Cfunc.at );
 	sm_palette.Cfunc.at = NULL;
     }
     dummy_func = &sm_palette.Cfunc;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.90 2005/08/04 22:39:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.91 2005/08/07 09:43:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1009,7 +1009,7 @@ initialize_use_spec()
         use_spec[i].expected_type = CT_DEFAULT; /* no particular expectation */
 #endif
         if (use_spec[i].at) {
-            free(use_spec[i].at);
+            free_at(use_spec[i].at);
             use_spec[i].at = NULL;  /* no expression */
         }
         df_axis[i] = -1; /* no timefmt for this output column */
@@ -1091,7 +1091,7 @@ df_open(const char *cmd_filename, int max_using)
     /* defer opening until we have parsed the modifiers... */
 
     if (ydata_func.at) /* something for thru (?) */
-        free(ydata_func.at);
+        free_at(ydata_func.at);
     ydata_func.at = NULL;
 
     df_binary = df_matrix = FALSE;
@@ -1323,13 +1323,13 @@ df_close()
         return;
 
     if (ydata_func.at) {
-        free(ydata_func.at);
+        free_at(ydata_func.at);
         ydata_func.at = NULL;
     }
     /*{{{  free any use expression storage */
     for (i = 0; i < MAXDATACOLS; ++i)
         if (use_spec[i].at) {
-            free(use_spec[i].at);
+            free_at(use_spec[i].at);
             use_spec[i].at = NULL;
         }
     /*}}} */

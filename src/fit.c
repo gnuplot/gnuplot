@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.51 2005/07/12 03:37:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.52 2005/07/16 21:01:41 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -297,7 +297,7 @@ error_ex()
 	log_f = NULL;
     }
     if (func.at) {
-	free(func.at);		/* release perm. action table */
+	free_at(func.at);		/* release perm. action table */
 	func.at = (struct at_type *) NULL;
     }
     /* restore original SIGINT function */
@@ -1238,7 +1238,7 @@ fit_command()
     token1 = c_token;
 
     if (func.at) {
-	free(func.at);
+	free_at(func.at);
 	func.at = NULL;		/* in case perm_at() does int_error */
     }
     dummy_func = &func;
@@ -1623,7 +1623,7 @@ fit_command()
     free(a);
     free(par_name);
     if (func.at) {
-	free(func.at);		/* release perm. action table */
+	free_at(func.at);		/* release perm. action table */
 	func.at = (struct at_type *) NULL;
     }
     safe_strncpy(last_fit_command, gp_input_line, sizeof(last_fit_command));

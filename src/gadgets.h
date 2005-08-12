@@ -160,7 +160,7 @@ typedef struct {
     struct t_colorspec textcolor;
     TBOOLEAN noenhanced;	/* Don't apply enhanced text mode */
 } label_struct;
-#define EMPTY_LABELSTRUCT {"", "", {character, character, character, 0.0, 0.0, 0.0}, {0,0,0.0}}
+#define EMPTY_LABELSTRUCT {"", "", {character, character, character, 0.0, 0.0, 0.0}, {0,0,0.0}, FALSE}
 
 typedef struct {
     int opt_given; /* option given / not given (otherwise default) */

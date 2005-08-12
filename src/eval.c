@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.36 2005/07/10 18:24:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.37 2005/07/16 21:01:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -655,6 +655,8 @@ free_at(struct at_type *at_ptr)
     int i;
     /* All string constants belonging to this action table have to be
      * freed before destruction. */
+    if (!at_ptr)
+        return;
     for(i=0; i<at_ptr->a_count; i++) {
 	struct at_entry *a = &(at_ptr->actions[i]);
 	/* if union a->arg is used as a->arg.v_arg free potential string */

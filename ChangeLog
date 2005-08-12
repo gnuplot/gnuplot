@@ -1,3 +1,15 @@
+2005-08-12  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/datafile.c (initialize_use_spec df_open df_close)
+	  src/fit.c (error_ex fit_command) src/set.c (set_palette_function):
+	Use free_at() rather than free() for action table pointers.
+	Fixes minor memory leaks found by valgrind.
+
+	* src/eval.c (free_at): Handle null pointer gracefully.
+
+	* src/gadgets.h src/graphics.h src/plot2d.c src/plot3d.c:
+	Consistent initialization of the title_no_enhanced flag.
+
 2005-08-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	SF patch [1234632] gnuplot history file without GNU readline
@@ -14,7 +26,7 @@
 2005-08-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Restore original background pixel setting after
-	test rotation.
+	text rotation.
 
 2005-08-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
