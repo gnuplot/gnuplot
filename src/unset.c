@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.85 2005/08/07 09:43:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.86 2005/08/08 09:24:32 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -842,10 +842,10 @@ unset_histogram()
 static void
 unset_historysize()
 {
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#ifdef GNUPLOT_HISTORY
     gnuplot_history_size = -1; /* don't ever truncate the history. */
 #else
-    int_error(c_token, "Command 'unset historysize' requires GNU readline, but this gnuplot was configured with the default readline.");
+    int_error(c_token, "Command 'unset historysize' requires history support.");
 #endif
 }
 

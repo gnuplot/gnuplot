@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.77 2005/08/07 09:43:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.78 2005/08/08 09:24:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -109,14 +109,17 @@ extern smg$create_key_table();
  * so I don't put this into a header file. -lh
  */
 #ifdef HAVE_LIBREADLINE
-extern int rl_complete_with_tilde_expansion;
-
-/* enable gnuplot history with readline */
 # ifdef GNUPLOT_HISTORY
 #  include <readline/tilde.h>
-#  ifndef GNUPLOT_HISTORY_FILE
-#   define GNUPLOT_HISTORY_FILE "~/.gnuplot_history"
-#  endif
+# endif
+extern int rl_complete_with_tilde_expansion;
+#endif 
+
+/* enable gnuplot history with readline */
+#ifdef GNUPLOT_HISTORY
+# ifndef GNUPLOT_HISTORY_FILE
+#  define GNUPLOT_HISTORY_FILE "~/.gnuplot_history"
+# endif
 /*
  * The next variable is a pointer to the value returned from 'tilde_expand()'.
  * This function expands '~' to the user's home directory, or $HOME, with
@@ -128,8 +131,7 @@ static char *expanded_history_filename;
 
 static void wrapper_for_write_history __PROTO((void));
 
-# endif				/* GNUPLOT_HISTORY */
-#endif /* HAVE_LIBREADLINE */
+#endif				/* GNUPLOT_HISTORY */
 
 TBOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
 static TBOOLEAN noinputfiles = TRUE; /* FALSE if there are script files */
@@ -525,9 +527,14 @@ main(int argc, char **argv)
 	init_fit();		/* Initialization of fitting module */
 
 	if (interactive && term != 0) {		/* not unknown */
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#ifdef GNUPLOT_HISTORY
 	    FPRINTF((stderr, "Before read_history\n"));
+#ifdef HAVE_LIBREADLINE
 	    expanded_history_filename = tilde_expand(GNUPLOT_HISTORY_FILE);
+#else
+	    expanded_history_filename = gp_strdup(GNUPLOT_HISTORY_FILE);
+	    gp_expand_tilde(&expanded_history_filename);
+#endif
 	    FPRINTF((stderr, "expanded_history_filename = %s\n", expanded_history_filename));
 	    read_history(expanded_history_filename);
 	    {
@@ -547,7 +554,7 @@ main(int argc, char **argv)
 	     * want to use them, 'write_history()' is called directly.
 	     */
 	    GP_ATEXIT(wrapper_for_write_history);
-#endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
+#endif /* GNUPLOT_HISTORY */
 
 	    fprintf(stderr, "\nTerminal type set to '%s'\n", term->name);
 	}			/* if (interactive && term != 0) */
@@ -917,7 +924,9 @@ RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 }
 #endif
 
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#ifdef GNUPLOT_HISTORY
+# ifdef HAVE_LIBREADLINE
+
 static void
 wrapper_for_write_history()
 {
@@ -943,4 +952,22 @@ wrapper_for_write_history()
     }
 #endif
 }
-#endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
+
+# else /* HAVE_LIBREADLINE */
+
+/* version for gnuplot's own write_history */
+static void
+wrapper_for_write_history()
+{
+    /* What we really want to do is truncate(expanded_history_filename),
+       but this is only available on BSD compatible systems */
+    remove(expanded_history_filename);
+    if (gnuplot_history_size < 0)
+    	write_history(expanded_history_filename);
+    else
+	write_history_n(gnuplot_history_size, expanded_history_filename, "w");
+}
+
+# endif /* HAVE_LIBREADLINE */
+#endif /* GNUPLOT_HISTORY */
+

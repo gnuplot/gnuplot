@@ -1,3 +1,16 @@
+2005-08-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	SF patch [1234632] gnuplot history file without GNU readline
+
+	* NEWS src/gp_hist.h src/history.c src/plot.c src/set.c src/show.c
+	src/syscfg.h src/unset.c: This patch enables GNUPLOT_HISTORY if gnuplot
+	is not compiled with GNU readline. History is automatically saved on
+	program exit and reloaded on start. "set/unset history" commands are
+	supported.
+
+	* configure.in config/makefile.os2: Other makefiles should be adjusted
+	to allow GNUPLOT_HISTORY to be defined when HAVE_LIBREADLINE is not.
+
 2005-08-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Restore original background pixel setting after

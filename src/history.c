@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.17 2005/07/31 08:46:36 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.18 2005/08/08 09:24:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -61,6 +61,11 @@ struct hist *cur_entry = NULL;
 void
 add_history(char *line)
 {
+    static struct hist *first_entry = NULL; 
+	/* this points to first entry in history list, 
+	    whereas "history" points to last entry     */
+    static long int hist_count = 0;
+	/* number of entries in history list */
     struct hist *entry;
 
     entry = history;
@@ -75,6 +80,7 @@ add_history(char *line)
 	    if (entry->prev == NULL) {
 		/* current cmd line equals the first in the history */
 		(entry->next)->prev = NULL;
+		first_entry = entry->next;
 		history->next = entry;
 		entry->prev = history;
 		entry->next = NULL;
@@ -93,17 +99,46 @@ add_history(char *line)
 	entry = entry->prev;
     }				/* end of not-storing duplicated entries */
 
+#ifdef GNUPLOT_HISTORY
+    /* limit size of history list to "gnuplot_history_size" */
+    if (gnuplot_history_size != -1) {
+	while ((hist_count >= gnuplot_history_size) && (first_entry != NULL)) {
+    
+	    entry = first_entry;
+
+	    /* remove first entry from chain */
+	    first_entry = first_entry->next;
+	    if (first_entry) {
+	        first_entry->prev = NULL;
+            } 
+	    hist_count--;
+
+	    /* remove references */
+	    if (cur_entry == entry)
+		cur_entry = first_entry;
+	    if (history == entry) {
+		cur_entry = history = NULL;
+		hist_count = 0;
+	    }
+
+	    free( entry->line );
+	    free( entry );           
+	}
+    }
+#endif
+
     entry = (struct hist *) gp_alloc(sizeof(struct hist), "history");
-/*    entry->line = gp_alloc(strlen(line) + 1, "history");
-      strcpy(entry->line, line); */
     entry->line = gp_strdup(line);
 
     entry->prev = history;
     entry->next = NULL;
     if (history != NULL) {
 	history->next = entry;
-    }
+    } else {
+	first_entry = entry;
+    } 
     history = entry;
+    hist_count++;
 }
 
 
@@ -185,6 +220,34 @@ void
 write_history(char *filename)
 {
     write_history_n(0, filename, "w");
+}
+
+
+/* routine to read history entries from a file,
+ * this complements write_history and is necessary for
+ * saving of history when we are not using libreadline
+ */
+void
+read_history(char *filename)
+{
+    FILE *hist_file;
+    
+    if ((hist_file = fopen( filename, "r" ))) {
+    	while (!feof(hist_file)) {
+	    char *pline, line[MAX_LINE_LEN+1];
+	    pline = fgets(line, MAX_LINE_LEN, hist_file);
+	    if (pline) {
+		/* remove trailing linefeed */
+		if ((pline = strrchr(line, '\n')))
+		    *pline = '\0';
+		if ((pline = strrchr(line, '\r')))
+		    *pline = '\0';
+
+	    	add_history(line);
+	    }
+	}
+	fclose(hist_file);
+    }
 }
 
 

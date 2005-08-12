@@ -1,5 +1,5 @@
 /*
- * $Id: gp_hist.h,v 1.7 2005/05/23 18:39:09 sfeam Exp $
+ * $Id: gp_hist.h,v 1.8 2005/08/08 09:24:30 mikulik Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
@@ -70,6 +70,7 @@ extern long int gnuplot_history_size;
 void add_history __PROTO((char *line));
 void write_history_n __PROTO((const int, const char *, const char *));
 void write_history __PROTO((char *));
+void read_history __PROTO((char *));
 char *history_find __PROTO((char *));
 int history_find_all __PROTO((char *));
 #elif defined(HAVE_LIBREADLINE)

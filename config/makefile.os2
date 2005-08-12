@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.46 2005/07/31 08:43:20 mikulik Exp $
+# $Id: makefile.os2,v 1.47 2005/08/07 09:43:27 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -64,6 +64,9 @@ FREETYPE=1
 # GNU_ReadLine support
 # requires GNU readline library (static or DLL; not part of gnuplot)
 # GNU_RL=1
+
+# saving of history (no longer requires GNU readline)
+HISTORY=1
 
 # DEBUGging support
 # creates binaries suitable for debugging. Some bugs may come and go
@@ -142,12 +145,7 @@ OS2FLAGS = -DOS2
 # of today (20010918) it isn't any more ...
 #
 EMXSPECIFIC = -DHAVE_CONFIG_H -ffloat-store
-
 LIBS = 
-ifdef GNU_RL
-  EMXSPECIFIC += -DHAVE_LIBREADLINE
-  LIBS        += -lreadline -ltermcap
-endif
 
 #
 # Choose flags suitable for a debugging or for a production build
@@ -229,6 +227,19 @@ ifdef MOUSE
   TERMFLAGS += -DUSE_MOUSE
   # the interprocess communication flag OS2_IPC is #defined in config.(os2,h)
 endif
+
+# GNU readline support
+ifdef GNU_RL
+  CFLAGS  += -DHAVE_LIBREADLINE
+  LIBS    += -lreadline -ltermcap
+endif
+
+# saving history (independent of GNU readline)
+ifdef HISTORY
+  CFLAGS  += -DGNUPLOT_HISTORY 
+#  CFLAGS  +=  -DGNUPLOT_HISTORY_FILE=\"~\\\\gnuplot.his\"
+endif
+
 
 # TOOLS
 CPP = cpp

@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.29 2004/07/01 17:10:08 broeker Exp $
+ * $Id: syscfg.h,v 1.30 2005/04/22 21:40:37 broeker Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -121,6 +121,7 @@
 # define SHELL    "c:\\os2\\cmd.exe"
 # define DIRSEP1  '\\'
 # define PATHSEP  ';'
+# define GNUPLOT_HISTORY_FILE "~\\gnuplot_history"
 #endif /* OS/2 */
 
 #ifdef OSK
@@ -172,6 +173,7 @@
 # define SHELL   "\\command.com"
 # define DIRSEP1 '\\'
 # define PATHSEP ';'
+# define GNUPLOT_HISTORY_FILE "~\\gnuplot_history"
 #endif /* _WINDOWS */
 
 #if defined(MSDOS) && !defined(_Windows)
@@ -193,6 +195,7 @@
 # ifdef __DJGPP__
 #  define DIRSEP2 '/'
 # endif
+# define GNUPLOT_HISTORY_FILE "~\\gnuplot.his"
 #endif /* MSDOS */
 
 /* End OS dependent constants; fall-through defaults

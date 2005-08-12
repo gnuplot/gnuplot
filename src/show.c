@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.161 2005/08/07 09:43:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.162 2005/08/08 09:24:32 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -125,7 +125,7 @@ static void show_hidden3d __PROTO((void));
 #ifdef EAM_HISTOGRAMS
 static void show_histogram __PROTO((void));
 #endif
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#ifdef GNUPLOT_HISTORY
 static void show_historysize __PROTO((void));
 #endif
 static void show_size __PROTO((void));
@@ -381,7 +381,7 @@ show_command()
     case S_HIDDEN3D:
 	show_hidden3d();
 	break;
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#ifdef GNUPLOT_HISTORY
     case S_HISTORYSIZE:
 	show_historysize();
 	break;
@@ -752,7 +752,7 @@ show_all()
     show_view();
     show_surface();
     show_hidden3d();
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#ifdef GNUPLOT_HISTORY
     show_historysize();
 #endif
     show_size();
@@ -895,14 +895,12 @@ show_version(FILE *fp)
 		"-"
 #endif
 		"LIBREADLINE  "
-#ifdef HAVE_LIBREADLINE
-# ifdef GNUPLOT_HISTORY
+#ifdef GNUPLOT_HISTORY
 		"+"
-# else
+#else
 		"-"
-# endif
-		"HISTORY  "
 #endif
+		"HISTORY  "
 		"";
 
 	    const char *libgd =
@@ -2352,7 +2350,7 @@ show_histogram()
 }
 #endif
 
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#ifdef GNUPLOT_HISTORY
 /* process 'show historysize' command */
 static void
 show_historysize()

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.196 2005/08/07 09:43:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.197 2005/08/08 09:24:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -89,7 +89,7 @@ static void set_fit __PROTO((void));
 static void set_format __PROTO((void));
 static void set_grid __PROTO((void));
 static void set_hidden3d __PROTO((void));
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#ifdef GNUPLOT_HISTORY
 static void set_historysize __PROTO((void));
 #endif
 static void set_isosamples __PROTO((void));
@@ -304,11 +304,10 @@ set_command()
 	    set_hidden3d();
 	    break;
 	case S_HISTORYSIZE:
-fprintf(stderr,"BLA \n");
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#ifdef GNUPLOT_HISTORY
 	    set_historysize();
 #else
-	    int_error(c_token, "Command 'set historysize' requires GNU readline, but this gnuplot was configured with the default readline.");
+	    int_error(c_token, "Command 'set historysize' requires history support.");
 #endif
 	    break;
 	case S_ISOSAMPLES:
@@ -1423,7 +1422,7 @@ set_hidden3d()
 }
 
 
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#ifdef GNUPLOT_HISTORY
 /* process 'set historysize' command */
 static void
 set_historysize()
