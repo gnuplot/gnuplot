@@ -1,3 +1,8 @@
+2005-08-16  Harald Harders  <h.harders@tu-bs.de>
+
+	* src/save.c (save_tics): Fix inconsistency in the syntax of the saved
+	"set tics" command and the input "set tics" command. SF patch [1261165]
+
 2005-08-12  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/datafile.c (initialize_use_spec df_open df_close)

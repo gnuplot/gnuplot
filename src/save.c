@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.116 2005/08/05 15:48:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.117 2005/08/07 09:43:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -866,9 +866,12 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	fprintf(fp, "set no%stics\n", axis_defaults[axis].name);
 	return;
     }
-    fprintf(fp, "set %stics %s %smirror %s ", axis_defaults[axis].name,
+    fprintf(fp, "set %stics %s %s scale %g,%g %smirror %s ",
+	    axis_defaults[axis].name,
 	    ((axis_array[axis].ticmode & TICS_MASK) == TICS_ON_AXIS)
 	    ? "axis" : "border",
+	    (axis_array[axis].tic_in) ? "in" : "out",
+	    axis_array[axis].ticscale, axis_array[axis].miniticscale,
 	    (axis_array[axis].ticmode & TICS_MIRROR) ? "" : "no",
 	    axis_array[axis].tic_rotate ? "rotate" : "norotate");
     if (axis_array[axis].tic_rotate)
@@ -929,15 +932,6 @@ save_tics(FILE *fp, AXIS_INDEX axis)
     if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT) {
         fprintf(fp, " textcolor lt %d", axis_array[axis].ticdef.textcolor.lt+1);    }
     putc('\n', fp);
-
-    fprintf(fp, "\
-set tics %s %s\n\
-set ticscale %s %g %g\n",
-	    axis_defaults[axis].name,
-	    (axis_array[axis].tic_in) ? "in" : "out",
-	    axis_defaults[axis].name,
-	    axis_array[axis].ticscale, axis_array[axis].miniticscale);
-
 }
 
 static void
