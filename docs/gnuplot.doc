@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.320 2005/08/04 15:27:58 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.321 2005/08/05 15:48:29 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6741,7 +6741,13 @@ C ... and restart the table:
  For some terminals, no plot is displayed until the command `unset multiplot`
  is given, which causes the entire page to be drawn and then returns gnuplot
  to its normal single-plot mode.  For other terminals, each separate `plot`
- command produces a plot, but the screen may not be cleared between plots.
+ command produces an updated display, either by redrawing all previous ones
+ and the newly added plot, or by just adding the new plot to the existing
+ display.
+
+ The area to be used by the next plot is not erased before doing the
+ new plot.  The `clear` command can be used to do this if wanted, as is
+ typically the case for "inset" plots.
 
  Any labels or arrows that have been defined will be drawn for each plot
  according to the current size and origin (unless their coordinates are
