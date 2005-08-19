@@ -1,3 +1,9 @@
+2005-08-19  Ethan Merritt  <merritt@u.washington.edu>
+
+        * src/plot3d.c (get_3ddata) src/graph3d.c(plot3d_points): 
+	Variable pointsize should be honored in plot style "linespoints" 
+	exactly as in style "points".
+
 2005-08-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
         * docs/gnuplot.doc (multiplot): Extend description of how

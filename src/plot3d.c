@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.107 2005/08/07 09:43:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.108 2005/08/12 17:42:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -786,7 +786,8 @@ get_3ddata(struct surface_points *this_plot)
 	    if (j >= 4) {
 		color = v[3];
 		color_from_column(TRUE);
-		if (this_plot->plot_style == POINTSTYLE
+		if ((this_plot->plot_style == POINTSTYLE
+		   || this_plot->plot_style == LINESPOINTS)
 		&&  this_plot->lp_properties.p_size < 0) {
 		    cp->CRD_PTSIZE = v[3];
 		    color = z;
@@ -803,7 +804,8 @@ get_3ddata(struct surface_points *this_plot)
 	    }
 
 	    if (j >= 5) {
-		if (this_plot->plot_style == POINTSTYLE
+		if ((this_plot->plot_style == POINTSTYLE
+		   || this_plot->plot_style == LINESPOINTS)
 		&&  this_plot->lp_properties.p_size < 0) {
 		    color = v[4];
 		    color_from_column(TRUE);
