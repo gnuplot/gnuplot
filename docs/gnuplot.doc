@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.321 2005/08/05 15:48:29 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.322 2005/08/17 16:09:48 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1677,9 +1677,8 @@ C ... and restart the table:
 ?colorspec
 ?rgbcolor
 =colors
- Many commands allow you to specify a linetype with an explicit color.
- This option is only available if your gnuplot has been built with pm3d support,
- and only for terminals that support RGB color and/or pm3d palettes.
+ Many commands allow you to specify a linetype with an explicit color. This
+ option is only possible for terminals that support RGB color or pm3d palettes.
 
  Syntax:
 
@@ -1704,11 +1703,11 @@ C ... and restart the table:
 
  The color palette is a linear gradient of colors that smoothly maps a
  single numerical value onto a particular color.  Two such mappings are always
- in effect. The first maps a fractional value between 0 and 1 onto the full
- range of the color palette.  The second maps a separate color axis onto
- the same palette using an arbitrary scale and range.  This mapping is set
- by the command `set cbrange`.  See also `set colorbox`.  You can use either
- of these mappings to assign a constant color from the current palette.
+ in effect. `palette frac`  maps a fractional value between 0 and 1 onto the
+ full range of the color palette.  `palette cb` maps the range of the color
+ axis onto the same palette.  See `set cbrange`.  See also `set colorbox`.
+ You can use either of these to select a constant color from the current
+ palette.
 
  The final option, "palette z", is available only in 3d plots, and treats the
  z value of each plot segment or plot element as an index into the cbrange
@@ -8022,8 +8021,8 @@ C ... and restart the table:
  Not all terminals support the `linewidth` and `pointsize` features; if
  not supported, the option will be ignored.
 
- If gnuplot was built with pm3d support, terminal-independent colors may be
- assigned using either `linecolor <colorspec>` or `linetype <colorspec>`.
+ Terminal-independent colors may be assigned using either 
+ `linecolor <colorspec>` or `linetype <colorspec>`, abbreviated `lc` or `lt.
  This requires giving a RGB color triple, a known palette color name,
  a fractional index into the current palette, or a constant value from the
  current mapping of the palette onto cbrange.
