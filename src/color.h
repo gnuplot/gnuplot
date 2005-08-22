@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.22 2005/02/06 05:05:49 sfeam Exp $
+ * $Id: color.h,v 1.23 2005/08/07 09:43:28 mikulik Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -266,6 +266,7 @@ int make_palette __PROTO((void));
    according to sm_palette.positive == SMPAL_POSITIVE or SMPAL_NEGATIVE
 */
 void set_color __PROTO(( double gray ));
+void set_rgbcolor __PROTO(( int rgblt ));
 
 /*
    The routine above for 4 points explicitly

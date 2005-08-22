@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.126 2005/08/07 09:43:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.127 2005/08/19 23:44:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -935,7 +935,7 @@ do_3dplot(
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_line_pm3d(this_plot, xl, yl);
 			else
-			key_sample_line(xl, yl);
+			    key_sample_line(xl, yl);
 		    }
 		    if (!(hidden3d && draw_surface)) {
 			if (use_palette)
@@ -960,20 +960,20 @@ do_3dplot(
 		    if (this_plot->lp_properties.use_palette)
 			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 		    else
-		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
+			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 		}
 		if (!(hidden3d && draw_surface)) {
-			plot3d_points(this_plot, this_plot->lp_properties.p_type);
+		    plot3d_points(this_plot, this_plot->lp_properties.p_type);
 		}
 		break;
 
 	    case LINESPOINTS:
 		/* put lines */
 		if (lkey) {
-			if (this_plot->lp_properties.use_palette)
-			    key_sample_line_pm3d(this_plot, xl, yl);
-			else
-		    key_sample_line(xl, yl);
+		    if (this_plot->lp_properties.use_palette)
+			key_sample_line_pm3d(this_plot, xl, yl);
+		    else
+			key_sample_line(xl, yl);
 		}
 
 		if (!(hidden3d && draw_surface)) {
@@ -988,11 +988,11 @@ do_3dplot(
 		    if (this_plot->lp_properties.use_palette)
 			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 		    else
-		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
+			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 		}
 
 		if (!(hidden3d && draw_surface)) {
-			plot3d_points(this_plot, this_plot->lp_properties.p_type);
+		    plot3d_points(this_plot, this_plot->lp_properties.p_type);
 		}
 
 		break;
@@ -1326,11 +1326,20 @@ plot3d_impulses(struct surface_points *plot)
     int i;				/* point index */
     unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
     struct iso_curve *icrvs = plot->iso_crvs;
+    TBOOLEAN rgb_from_column;
+
+    rgb_from_column = can_pm3d && plot->pm3d_color_from_column
+			&& plot->lp_properties.pm3d_color.type == TC_RGB
+			&& plot->lp_properties.pm3d_color.value < 0.0;
 
     while (icrvs) {
 	struct coordinate GPHUGE *points = icrvs->points;
 
 	for (i = 0; i < icrvs->p_count; i++) {
+
+	    if (rgb_from_column)
+		set_rgbcolor((int)points[i].CRD_COLOR);
+
 	    switch (points[i].type) {
 	    case INRANGE:
 		{
@@ -1411,8 +1420,8 @@ plot3d_lines(struct surface_points *plot)
     double clip_x, clip_y, clip_z;
     struct iso_curve *icrvs = plot->iso_crvs;
     struct coordinate GPHUGE *points;
-    enum coord_type prev = UNDEFINED;
     double lx[2], ly[2], lz[2];	/* two edge points */
+    TBOOLEAN rgb_from_column;
 
 #ifndef LITE
 /* These are handled elsewhere.  */
@@ -1420,10 +1429,18 @@ plot3d_lines(struct surface_points *plot)
 	return;
 #endif /* not LITE */
 
+    rgb_from_column = can_pm3d && plot->pm3d_color_from_column
+			&& plot->lp_properties.pm3d_color.type == TC_RGB
+			&& plot->lp_properties.pm3d_color.value < 0.0;
+
     while (icrvs) {
-	prev = UNDEFINED;	/* type of previous plot */
+	enum coord_type prev = UNDEFINED;	/* type of previous plot */
 
 	for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
+
+	    if (rgb_from_column)
+		set_rgbcolor((int)points[i].CRD_COLOR);
+	
 	    switch (points[i].type) {
 	    case INRANGE:{
 		    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
@@ -1686,18 +1703,39 @@ plot3d_points(struct surface_points *plot, int p_type)
 
     while (icrvs) {
 	struct coordinate GPHUGE *points = icrvs->points;
+	int colortype = plot->lp_properties.pm3d_color.type;
+	TBOOLEAN rgb_from_column = plot->pm3d_color_from_column
+/*				&& plot->plot_type == DATA3D */
+				&& plot->lp_properties.pm3d_color.value < 0.0;
+
+	/* Apply constant color outside of the loop */
+	if (colortype == TC_RGB && !rgb_from_column)
+	    set_rgbcolor( plot->lp_properties.pm3d_color.lt );
 
 	for (i = 0; i < icrvs->p_count; i++) {
 	    if (points[i].type == INRANGE) {
 		map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
 		if (!clip_point(x, y)) {
-		    if (can_pm3d && plot->lp_properties.use_palette) {
-			if (plot->pm3d_color_from_column)
-			    set_color( cb2gray(points[i].CRD_COLOR) );
-			else
-			    set_color( cb2gray( z2cb(points[i].z) ) );
+		    switch( colortype ) {
+		    case TC_RGB:
+			if (rgb_from_column)
+			    set_rgbcolor( (int)points[i].CRD_COLOR );
+			break;
+		    case TC_Z:
+		    case TC_DEFAULT:   /* pm3d mode assumes this is default */
+			if (can_pm3d && plot->lp_properties.use_palette) {
+			    if (plot->pm3d_color_from_column)
+				set_color( cb2gray(points[i].CRD_COLOR) );
+			    else
+				set_color( cb2gray( z2cb(points[i].z) ) );
+			}
+			break;
+		    default:
+		    	/* The other cases were taken care of already */
+			break;
 		    }
+
 		    if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		    &&  plot->lp_properties.p_size < 0)
 			(*t->pointsize)(pointsize * points[i].CRD_PTSIZE);
