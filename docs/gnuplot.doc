@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.323 2005/08/22 16:28:34 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.324 2005/08/22 16:37:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8032,7 +8032,7 @@ C ... and restart the table:
  not supported, the option will be ignored.
 
  Terminal-independent colors may be assigned using either 
- `linecolor <colorspec>` or `linetype <colorspec>`, abbreviated `lc` or `lt.
+ `linecolor <colorspec>` or `linetype <colorspec>`, abbreviated `lc` or `lt`.
  This requires giving a RGB color triple, a known palette color name,
  a fractional index into the current palette, or a constant value from the
  current mapping of the palette onto cbrange.
