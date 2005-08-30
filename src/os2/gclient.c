@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.40 2005/07/28 07:46:05 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.41 2005/08/07 09:43:32 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -2119,7 +2119,6 @@ ReadGnu(void* arg)
 {
     HPIPE    hRead = 0L;
     POINTL ptl;
-    long lCurCol;
     long lOldLine = 0;
     BOOL bBW = FALSE; /* passed from print.c ?? */
     BOOL bPath = FALSE;
@@ -2138,9 +2137,7 @@ ReadGnu(void* arg)
     int linewidth = DEFLW;
     HPAL pm3d_hpal = 0;     /* palette used for make_palette() */
     HPAL pm3d_hpal_old = 0; /* default palette used before make_palette() */
-    /* Either of the two is used: */
-    LONG pm3d_color = 0;     /* current colour(used if it is >0) */
-    int pm3d_rgb_color = -1; /* current rgb colour(used if it is >=0) */
+    LONG pm3d_color = 0;    /* current colour (used if it is >0) */
 
     hab = WinInitialize(0);
     DosEnterCritSec();
@@ -2307,27 +2304,11 @@ ReadGnu(void* arg)
 	    case GR_MOVE :   /* move */
 	    case GR_DRAW :   /* draw vector */
 	    {
-		LONG curr_color = -1;
+		LONG curr_color;
 
-		if (pm3d_color>=0) {
+		if (pm3d_color >= 0) {
 		    curr_color = GpiQueryColor(hps);
 		    GpiSetColor(hps, pm3d_color);
-		} else if (pm3d_rgb_color >= 0) {
-#if 1
-		    /* @@@ FIXME -- UNIMPLEMENTED */
-		    /* @@@ SEE "pm3d_rgb_color" ALSO BELOW -- DO A ROUTINE TO BE REUSABLE */
-		    static int here = 1;
-		    if (here) {
-			fprintf(stderr, "set_color(pm3d_rgb_color) not yet implemented -- please contribute\n");
-			here = 0;
-		    }
-#else
-		    int r, g, b;
-		    r = (pm3d_rgb_color >> 16 ) & 255;
-		    g = (pm3d_rgb_color >> 8 ) & 255;
-		    b = (pm3d_rgb_color & 255);
-		    // NOW FIND AN APPROXIMATIVE COLOR IN THE CURRENT PALETTE
-#endif
 		}
 		if (*buff=='M') {
 		    if (bPath) {
@@ -2350,11 +2331,10 @@ ReadGnu(void* arg)
 		    LMove(hps, &ptl);
 		else
 		    LLine(hps, &ptl);
+
 		if (pm3d_color >= 0)
 		    GpiSetColor(hps, curr_color);
 	    }
-		    /* @@@ FIXME -- UNIMPLEMENTED */
-		    /* @@@ SEE "pm3d_rgb_color" ALSO ABOVE -- DO A ROUTINE TO BE REUSABLE */
 	    break;
 
 	    case GR_PAUSE  :   /* pause */
@@ -2422,23 +2402,20 @@ ReadGnu(void* arg)
 
 		    /* only display text if requested */
 		    if (mode & 0x01) {
-                    	lCurCol = GpiQueryColor(hps);
-		    	if (pm3d_color>=0)
+			LONG curr_color;
+
+			if (pm3d_color >= 0) {
+			    curr_color = GpiQueryColor(hps);
 			    GpiSetColor(hps, pm3d_color);
-			/* @@@ FIXME -- UNIMPLEMENTED */
-			/* @@@ SEE "pm3d_rgb_color" ALSO ABOVE -- DO A ROUTINE TO BE REUSABLE */
-			/*
-			else
-			    GpiSetColor(hps, CLR_BLACK);
-			    GpiSetColor(hps, curr_color);
-			*/
+			}
 			ptl.x = (LONG) (x + multLineVert * (lVOffset / 4));
 			ptl.y = (LONG) (y - multLineHor * (lVOffset / 4));
 
 			GpiSetBackMix(hps, BM_LEAVEALONE);
 			GpiCharStringAt(hps, &ptl, strlen(str), str);
 
-			GpiSetColor(hps, lCurCol);
+			if (pm3d_color >= 0)
+			    GpiSetColor(hps, curr_color);
 		    }
 
 		    /* report back textwidth */
@@ -2463,6 +2440,7 @@ ReadGnu(void* arg)
                     unsigned int x, y, len;
 		    int sw;
                     char *str;
+		    LONG curr_color;
 #ifndef PM_KEEP_OLD_ENHANCED_TEXT
                     POINTL aptl[TXTBOX_COUNT];
 #endif
@@ -2477,16 +2455,10 @@ ReadGnu(void* arg)
 		    *str = '\0';
                     DosExitCritSec();
                     BufRead(hRead, str, len*sizeof(int), &cbR);
-                    lCurCol = GpiQueryColor(hps);
-		    if (pm3d_color>=0)
+		    if (pm3d_color >= 0) {
+                        curr_color = GpiQueryColor(hps);
 			GpiSetColor(hps, pm3d_color);
-		    /* @@@ FIXME -- UNIMPLEMENTED */
-		    /* @@@ SEE "pm3d_rgb_color" ALSO ABOVE -- DO A ROUTINE TO BE REUSABLE */
-		    /*
-		      else
-		      GpiSetColor(hps, CLR_BLACK);
-		      GpiSetColor(hps, curr_color);
-		    */
+		    }
 
 #ifdef PM_KEEP_OLD_ENHANCED_TEXT
                     sw = QueryTextBox(hps, strlen(str), str);
@@ -2519,7 +2491,8 @@ ReadGnu(void* arg)
 #endif
 			GpiCharStringAt(hps, &ptl, strlen(str), str);
 
-                    GpiSetColor(hps, lCurCol);
+		    if (pm3d_color >= 0)
+                        GpiSetColor(hps, curr_color);
 
                     DosEnterCritSec();
                     free(str);
@@ -2618,7 +2591,6 @@ ReadGnu(void* arg)
 			GpiSetColor(hps, CLR_NEUTRAL);
 		}
 		pm3d_color = -1; /* switch off using pm3d colours */
-		pm3d_rgb_color = -1;
 		break;
 	    }
 
@@ -2944,32 +2916,41 @@ ReadGnu(void* arg)
 
 		BufRead(hRead,&c, 1, &cbR);
 		pm3d_color = c + nColors;
-		pm3d_rgb_color = -1;
 		break;
 	    }
 
 	    case GR_SET_RGBCOLOR :
 	    {
-		int i;
-		BufRead(hRead, &i, sizeof(i), &cbR);
-		pm3d_rgb_color = i;
-		pm3d_color = -1;
+		int rgb_color;
+
+		BufRead(hRead, &rgb_color, sizeof(rgb_color), &cbR);
+
+		/* Find an approximate color in the current palette */
+		pm3d_color = GpiQueryColorIndex(hps, 0, rgb_color);
+#if 0
+		{
+	        int real_rgb = GpiQueryRGBColor(hps, LCOLOPT_REALIZED, pm3d_rgb_color);
+		printf( "GR_SET_RGBCOLOR: req = %x  nearest = %x  index =", 
+			rgb_color, real_rgb, pm3d_color );
+		}
+#endif
 		break;
 	    }
 
 	    case GR_FILLED_POLYGON :
 	    {
 		int points, x,y, i;
-		LONG curr_color = GpiQueryColor(hps);
+		LONG curr_color;
 		POINTL p;
 
 		BufRead(hRead, &points, sizeof(points), &cbR);
 		GpiSetPattern(hps, PATSYM_SOLID);
 		GpiSetBackMix(hps, BM_OVERPAINT);
-		if (pm3d_color>=0)
+		if (pm3d_color >= 0) {
+		    curr_color = GpiQueryColor(hps);
 		    GpiSetColor(hps, pm3d_color);
-		    /* @@@ FIXME -- UNIMPLEMENTED */
-		    /* @@@ SEE "pm3d_rgb_color" ALSO ABOVE -- DO A ROUTINE TO BE REUSABLE */
+		}
+
 		/* using colours defined in the palette */
 		GpiBeginArea(hps, BA_BOUNDARY | BA_ALTERNATE);
 		for (i = 0; i < points; i++) {
@@ -2982,7 +2963,8 @@ ReadGnu(void* arg)
 			GpiMove(hps, &p);
 		}
 		GpiEndArea(hps);
-		GpiSetColor(hps, curr_color);
+		if (pm3d_color >= 0)
+		    GpiSetColor(hps, curr_color);
 		break;
 	    }
 

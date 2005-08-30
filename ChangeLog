@@ -1,10 +1,21 @@
+2005-08-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.dj2 (TERMLIBS): Updated to current version of GRX.
+	(LINKOPT): Fix it to actually use $(TERMLIBS).
+	(CFLAGS): Add -DHAVE_SYS_STAT_H.
+
+2005-08-30  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/os2/gclient.c (ReadGnu): implement stubs in pm terminal to
+	map RGB colors to nearest color from current pm3d palette
+	
 2005-08-22  Ethan Merritt  <merritt@u.washington.edu>
 
         * src/color.c src/color.h: New routine set_rgbcolor().
 
-	* src/misc.c (parse_colorspec) src/graph3d.c:
-	Allow color specification "rgb variable", in which case the RGB color is
-	taken from an additional field of the "using" specifier.
+	* src/misc.c (parse_colorspec) src/graph3d.c: Allow color
+	specification "rgb variable", in which case the RGB color is taken
+	from an additional field of the "using" specifier.
 
 	* docs/gnuplot.doc demo/rgb_variable.dat demo/rgb_variable.dem NEWS:
 	Explain and give example of reading rgb color from input data field.

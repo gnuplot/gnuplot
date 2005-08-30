@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.dj2,v 1.8 2002/03/07 16:20:15 lhecking Exp $
+# $Id: makefile.dj2,v 1.9 2005/07/15 16:08:09 broeker Exp $
 #
 # GNUPLOT Makefile for DJGPP version 2 on DOS
 #
@@ -50,8 +50,8 @@ INCLUDE = -I.
 
 # for svga term driver
 # HBB NEW 20050715: you can disable the DJSVGA driver by -DDJSVGA=0
-TERMFLAGS = -DDJSVGA=1 -Id:/gpp/contrib/grx23/include # -DHAVE_LIBGD
-TERMLIBS = -Ld:/gpp/contrib/grx23/lib/dj2 -lgrx20 # -lgd
+TERMFLAGS = -DDJSVGA=1 -Ic:/djgpp/contrib/grx246/include # -DHAVE_LIBGD
+TERMLIBS = -Lc:/djgpp/contrib/grx246/lib/dj2 -lgrx20 # -lgd
 
 # HBB : added $(OPTS) so user can
 #   change CFLAGS easily, without having to change makefile
@@ -66,10 +66,10 @@ CFLAGS = -DMSDOS -DDOS32 \
 	-DHAVE_STDBOOL_H -DHAVE_MEMCPY -DHAVE_TIME_H -DHAVE_TIME_T_IN_TIME_H \
 	-DHAVE_MATH_H -DHAVE_STRUCT_EXCEPTION_IN_MATH_H \
 	-DHAVE_STDLIB_H -DHAVE_FLOAT_H -DHAVE_ERRNO_H -DHAVE_LIMITS_H \
-	-DHAVE_DIRENT_H \
+	-DHAVE_DIRENT_H -DHAVE_SYS_STAT_H \
 	-O2 -g $(OPTS)
 
-LINKOPT = $(LDFLAGS) -lm -lpc
+LINKOPT = $(LDFLAGS) $(TERMLIBS) -lm -lpc
 
 # abbreviations for relative directory names (NB: target 'clean' will
 #   still need manual change if this is changed...)
