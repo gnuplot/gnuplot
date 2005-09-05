@@ -2279,9 +2279,8 @@ See `linestyle`, `set style line`.
 
 @cindex colors
 
-Many commands allow you to specify a linetype with an explicit color.
-This option is only available if your gnuplot has been built with pm3d support,
-and only for terminals that support RGB color and/or pm3d palettes.
+Many commands allow you to specify a linetype with an explicit color. This
+option is only possible for terminals that support RGB color or pm3d palettes.
 
 Syntax:
 
@@ -2295,6 +2294,7 @@ where <colorspec> has one of the following forms:
 @example
       rgbcolor "colorname"
       rgbcolor "#RRGGBB"
+      rgbcolor variable
       palette frac <val>      # <val> runs from 0 to 1
       palette cb <value>      # <val> lies within cbrange
       palette z
@@ -2310,18 +2310,30 @@ from 0 - 255.  For example, magenta = full-scale red + full-scale blue would
 be represented by #FF00FF, which is the hexadecimal representation of
 (255 << 16) + (0 << 8) + (255).
 
+"rgb variable" requires an additional column in the @ref{using} specifier, and
+is only available in 3D plotting mode (splot). The extra column is interpreted
+as a 24-bit packed RGB triple. These are most easily specified in a data file
+as hexidecimal values (see above).
+
+Example:
+
+@example
+      rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
+      splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
+
+@end example
+
 The color palette is a linear gradient of colors that smoothly maps a
 single numerical value onto a particular color.  Two such mappings are always
-in effect. The first maps a fractional value between 0 and 1 onto the full
-range of the color palette.  The second maps a separate color axis onto
-the same palette using an arbitrary scale and range.  This mapping is set
-by the command @ref{cbrange}.  See also `set colorbox`.  You can use either
-of these mappings to assign a constant color from the current palette.
+in effect. `palette frac`  maps a fractional value between 0 and 1 onto the
+full range of the color palette.  `palette cb` maps the range of the color
+axis onto the same palette.  See @ref{cbrange}.  See also `set colorbox`.
+You can use either of these to select a constant color from the current
+palette.
 
-The final option, "palette z", is available only in 3d plots, and treats the
-z value of each plot segment or plot element as an index into the cbrange
-mapping of the palette. This allows smoothly-varying color along a 3d line
-or surface.
+"palette z" maps the z value of each plot segment or plot element into the
+cbrange mapping of the palette. This allows smoothly-varying color along a
+3d line or surface. This option applies only to 3D plots (splot).
 
 
 @node mouse_input, Plotting, linetype, gnuplot
@@ -3118,6 +3130,15 @@ and file input (pipe).
 If input streams are nested (inherited `load` scripts), then reading will
 continue in the parent stream. When the top level stream is closed, the
 program itself will exit.
+
+The command `exit gnuplot` will immediately and unconditionally cause gnuplot
+to exit even if the input stream is multiply nested.  In this case any open
+output files may not be completed cleanly. Example of use:
+
+@example
+      bind "ctrl-x" "unset output; exit gnuplot"
+
+@end example
 
 See help for `batch/interactive` for more details.
 
@@ -6833,7 +6854,8 @@ In `discrete` mode, any `set cntrparam levels <n>` are ignored.
 For `incremental`, contours are generated at values of z beginning at <start>
 and increasing by <increment>, until the number of contours is reached. <end>
 is used to determine the number of contour levels, which will be changed by
-any subsequent `set cntrparam levels <n>`.
+any subsequent `set cntrparam levels <n>`.  If the z axis is logarithmic,
+<increment> will be interpreted as a factor, just like in @ref{ztics}.
 
 If the command @ref{cntrparam} is given without any arguments specified,  the
 defaults are used: linear, 5 points, order 4, 5 auto levels.
@@ -7036,17 +7058,30 @@ This form of the command is deprecated. Please see `set style data`.
 @c ?set datafile
 @c ?show datafile
 The `set datafile` command options control interpretation of fields read from
-input data files by the `plot`, `splot`, and `fit` commands.  Three such
+input data files by the `plot`, `splot`, and `fit` commands.  Four such
 options are currently implemented.
 
 @menu
+* set_datafile_fortran::        
 * set_datafile_missing::        
 * set_datafile_separator::      
 * set_datafile_commentschars::  
 * set_datafile_binary::         
 @end menu
 
-@node set_datafile_missing, set_datafile_separator, datafile_, datafile_
+@node set_datafile_fortran, set_datafile_missing, datafile_, datafile_
+@subsubsection set datafile fortran
+
+@c ?set datafile fortran
+@cindex fortran
+
+The `set datafile fortran` command enables a special check for values in the
+input file expressed as Fortran D or Q constants. This extra check slows down
+the input process, and should only be selected if you do in fact have datafiles
+containing Fortran D or Q constants. The option can be disabled again using
+`unset datafile fortran`.
+
+@node set_datafile_missing, set_datafile_separator, set_datafile_fortran, datafile_
 @subsubsection set datafile missing
 
 @c ?set datafile missing
@@ -7578,8 +7613,8 @@ Syntax:
 
 @end example
 
-where <axes> is either `x`, `y`, `z`, `cb`, `xy`, `x2`, `y2` or nothing (which is
-the same as `xy`).  The length of the string representing a tic mark (after
+where <axes> is either `x`, `y`, `z`, `cb`, `xy`, `x2`, `y2` or nothing (which
+is the same as `xy`).  The length of the string representing a tic mark (after
 formatting with 'printf') is restricted to 100 characters.  If the format
 string is omitted, the format will be returned to the default "% g".  For
 LaTeX users, the format "$%g$" is often desirable.  If the empty string "" is
@@ -8086,9 +8121,11 @@ Please see `plot title` and @ref{with} for more information.
 Syntax:
 @example
       set key @{on|off@} @{default@}
-              @{left | right | top | bottom | outside | below | <position>@}
-              @{Left | Right@} @{@{no@}reverse@}
-              @{@{no@}invert@}
+              @{@{inside | outside@} | @{lmargin | rmargin | tmargin | bmargin@}
+                | @{at <position>@}@}
+              @{left | right | center@} @{top | bottom | center@}
+              @{vertical | horizontal@} @{Left | Right@}
+              @{@{no@}reverse@} @{@{no@}invert@}
               @{samplen <sample_length>@} @{spacing <vertical_spacing>@}
               @{width <width_increment>@}
               @{height <height_increment>@}
@@ -8102,13 +8139,107 @@ Syntax:
 
 @end example
 
-By default the key is placed in the upper right corner of the graph.  The
-keywords `left`, `right`, `top`, `bottom`, `outside` and `below` may be used
-to place the key in the other corners inside the graph or to the right
-(outside) or below the graph.  They may be given alone or combined.
-
 Plots may be drawn with no visible key by requesting `set key off` or
 @ref{key}.
+
+Elements within the key are stacked according to `vertical` or `horizontal`.
+In the case of `vertical`, the key occupies as few columns as possible.  That
+is, elements are aligned in a column until running out of vertical space at
+which point a new column is started.  In the case of `horizontal`, the key
+occupies as few rows as possible.
+
+By default the key is placed in the upper right inside corner of the graph.
+The keywords `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
+@ref{lmargin}, @ref{rmargin}, @ref{tmargin}, @ref{bmargin} (, `above`, `over`, `below` and
+`under`) may be used to automatically place the key in other positions of the
+graph.  Also an `at <position>` may be given to indicate precisely where the
+plot should be placed.  In this case, the keywords `left`, `right`, `center`,
+`bottom` and `center` serve an analogous purpose for alignment.
+
+To understand positioning, the best concept is to think of a region, i.e.,
+inside/outside, or one of the margins.  Along with the region, keywords
+`left/center/right` (l/c/r) and `top/center/bottom` (t/c/b) control where
+within the particular region the key should be placed.
+
+When in `inside` mode, the keywords `left` (l), `right` (r), `top` (t),
+`bottom` (b), and `center` (c) push the key out toward the plot boundary as
+illustrated:
+
+@example
+     t/l   t/c   t/r
+
+@end example
+
+@example
+     c/l    c    c/r
+
+@end example
+
+@example
+     b/l   b/c   b/r
+
+@end example
+
+
+When in `outside` mode, automatic placement is similar to the above
+illustration, but with respect to the view, rather than the graph boundary.
+That is, a border is moved inward to make room for the key outside of
+the plotting area, although this may interfere with other labels and may
+cause an error on some devices.  The particular plot border that is moved
+depends upon the position described above and the stacking direction.  For
+options centered in one of the dimensions, there is no ambiguity about which
+border to move.  For the corners, when the stack direction is `vertical`, the
+left or right border is moved inward appropriately.  When the stack direction
+is `horizontal`, the top or bottom border is moved inward appropriately.
+
+The margin syntax allows automatic placement of key regardless of stack
+direction.  When one of the margins @ref{lmargin} (lm), @ref{rmargin} (rm),
+@ref{tmargin} (tm), and @ref{bmargin} (bm) is combined with a single, non-conflicting
+direction keyword, the following illustrated positions may contain the key:
+
+@example
+          l/tm  c/tm  r/tm
+
+@end example
+
+@example
+     t/lm                  t/rm
+
+@end example
+
+@example
+     c/lm                  c/rm
+
+@end example
+
+@example
+     b/lm                  b/rm
+
+@end example
+
+@example
+          l/bm  c/bm  r/bm
+
+@end example
+
+
+Keywords `above` and `over` are synonymous with @ref{tmargin}.  For version
+compatibility, `above` or `over` without an additional l/c/r or stack direction
+keyword uses `center` and `horizontal`.  Keywords `below` and `under` are
+synonymous with @ref{bmargin}.  For compatibility, `below` or `under` without an
+additional l/c/r or stack  direction keyword uses `center` and `horizontal`.  A
+further compatibility issue is that `outside` appearing without an additional
+t/b/c or stack direction keyword uses `top`, `right` and `vertical` (i.e., the
+same as t/rm above).
+
+The <position> can be a simple x,y,z as in previous versions, but these can
+be preceded by one of five keywords (`first`, `second`, `graph`, `screen`,
+`character`) which selects the coordinate system in which the position of
+the first sample line is specified.  See `coordinates` for more details.
+The effect of `left`, `right`, `top`, `bottom`, and `center` when <position>
+is given is to align the key as though it were text positioned using the
+label command, i.e., `left` means left align with key to the right of
+<position>, etc.
 
 Justification of the labels within the key is controlled by `Left` or `Right`
 (default is `Right`).  The text and sample can be reversed (`reverse`) and a
@@ -8165,15 +8296,11 @@ An explicitly given title is typeset using enhanced text properties on
 terminals supporting this, see `enhanced text` for more details.
 This default behavior can be switched off by the `noenhanced` option.
 
-The defaults for @ref{key} are `on`, `right`, `top`, `Right`, `noreverse`,
-`noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and `nobox`.  
-The default <linetype> is the same as that used for the plot borders.
-Entering `set key default` returns the key to its default configuration.
-
-The <position> can be a simple x,y,z as in previous versions, but these can
-be preceded by one of five keywords (`first`, `second`, `graph`, `screen`,
-`character`) which selects the coordinate system in which the position of
-the first sample line is specified.  See `coordinates` for more details.
+The defaults for @ref{key} are `on`, `right`, `top`, `vertical`, `Right`,
+`noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and
+`nobox`.  The default <linetype> is the same as that used for the plot
+borders.  Entering `set key default` returns the key to its default
+configuration.
 
 The key is drawn as a sequence of lines, with one plot described on each
 line.  On the right-hand side (or the left-hand side, if `reverse` is
@@ -8186,14 +8313,6 @@ specified with the @ref{key} command.  In a `plot`, only the x and y
 coordinates are used to specify the line position.  For a `splot`, x, y and
 z are all used as a 3-d location mapped using the same mapping as the graph
 itself to form the required 2-d screen position of the imaginary line.
-
-Some or all of the key may be outside of the graph boundary, although this
-may interfere with other labels and may cause an error on some devices.  If
-you use the keywords `outside` or `below`, `gnuplot` makes space for the keys
-and the graph becomes smaller.  Putting keys outside to the right, they
-occupy as few columns as possible, and putting them below, as many columns as
-possible (depending of the length of the labels), thus stealing as little
-space from the graph as possible.
 
 When using the TeX or PostScript drivers, or similar drivers where formatting
 information is embedded in the string, `gnuplot` is unable to calculate
@@ -8782,6 +8901,13 @@ See also help for @ref{bind} and @ref{label}.
 @c ?mouse x11_mouse
 @cindex x11_mouse
 
+If multiple X11 plot windows have been opened using the `set term x11 <n>`
+terminal option, then only the current plot window supports the entire 
+range of mouse commands and hotkeys.  The other windows will, however,
+continue to display mouse coordinates at the lower left.
+
+This was valid only for gnuplot 4.0 (now mousing is on by default as in
+the case of other screen terminals):
 X11 mouse support is turned on by default if standard input comes from a 
 terminal (tty). Mouse support is turned off if standard input does not 
 come from a tty, e.g. a pipe. If you want to use mouse support while writing
@@ -8790,11 +8916,6 @@ driver, e.g. immediately after startup with the explicit command `set mouse`.
 Beware: on some UNIX flavours, special input devices as /dev/null might not 
 be `select-able`; turning on the mouse when using such devices will hang 
 gnuplot.
-
-If multiple X11 plot windows have been opened using the `set term x11 <n>`
-terminal option, then only the current plot window supports the entire 
-range of mouse commands and hotkeys.  The other windows will, however,
-continue to display mouse coordinates at the lower left.
 
 @node multiplot, mx2tics, mouse, set-show
 @subsection multiplot
@@ -8825,7 +8946,13 @@ Syntax:
 For some terminals, no plot is displayed until the command @ref{multiplot}
 is given, which causes the entire page to be drawn and then returns gnuplot
 to its normal single-plot mode.  For other terminals, each separate `plot`
-command produces a plot, but the screen may not be cleared between plots.
+command produces an updated display, either by redrawing all previous ones
+and the newly added plot, or by just adding the new plot to the existing
+display.
+
+The area to be used by the next plot is not erased before doing the
+new plot.  The @ref{clear} command can be used to do this if wanted, as is
+typically the case for "inset" plots.
 
 Any labels or arrows that have been defined will be drawn for each plot
 according to the current size and origin (unless their coordinates are
@@ -10442,8 +10569,8 @@ both may be used.
 Not all terminals support the `linewidth` and @ref{pointsize} features; if
 not supported, the option will be ignored.
 
-If gnuplot was built with pm3d support, terminal-independent colors may be
-assigned using either `linecolor <colorspec>` or `linetype <colorspec>`.
+Terminal-independent colors may be assigned using either 
+`linecolor <colorspec>` or `linetype <colorspec>`, abbreviated `lc` or `lt`.
 This requires giving a RGB color triple, a known palette color name,
 a fractional index into the current palette, or a constant value from the
 current mapping of the palette onto cbrange.
@@ -11563,26 +11690,74 @@ be changed this way. Currently the only options accepted are
 @subsection tics
 
 @c ?commands set tics
+@c ?commands unset tics
 @c ?commands show tics
 @c ?set tics
+@c ?unset tics
 @c ?show tics
 @cindex tics
 @opindex tics
 
 
-The `set tics` command can be used to change the tics to be drawn outwards.
+Control of the major (labelled) tics on all axes at once is possible with the
+`set tics` command.
+
+Fine control of the major (labelled) tics on all axes at once is possible
+with the `set tics` command.  The tics may be turned off with the `unset tics`
+command, and may be turned on (the default state) with `set tics`.  Similar
+commands (by preceeding 'tics' by the axis name) control the major tics on a
+single axis.
 
 Syntax:
 @example
-      set tics @{<direction>@}
+      set tics @{axis | border@} @{@{no@}mirror@}
+               @{in | out@} @{scale @{default | <major> @{,<minor>@}@}@}
+               @{@{no@}rotate @{by <ang>@}@} @{offset <offset> | nooffset@}
+               @{ font "name@{,<size>@}" @}
+               @{ textcolor <colorspec> @}
+      unset tics
       show tics
 
 @end example
 
-where <direction> may be `in` (the default) or `out`.
+All specified options apply to all axes, i.e., x, y, z, x2, y2, and cb.
+
+`axis` or @ref{border} tells `gnuplot` to put the tics (both the tics themselves
+and the accompanying labels) along the axis or the border, respectively.  If
+the axis is very close to the border, the `axis` option will move the
+tic labels to outside the border.  The relevant margin settings will usually
+be sized badly by the automatic layout algorithm in this case.
+
+`mirror` tells `gnuplot` to put unlabelled tics at the same positions on the
+opposite border.  `nomirror` does what you think it does.
+
+`in` and `out` change the tic marks to be drawn inwards or outwards.
+
+With `scale`, the size of the tic marks can be adjusted. If <minor> is not
+specified, it is 0.5*<major>.  The default size 1.0 for major tics and 0.5
+for minor tics is requested by `scale default`.
+
+`rotate` asks `gnuplot` to rotate the text through 90 degrees, which will be
+done if the terminal driver in use supports text rotation.  `norotate`
+cancels this. `rotate by <ang>` asks for rotation by <ang> degrees, supported
+by some terminal types.
+
+The defaults are `border mirror norotate` for tics on the x and y axes, and
+`border nomirror norotate` for tics on the x2 and y2 axes.  For the z axis,
+the default is `nomirror`.
+
+The <offset> is specified by either x,y or x,y,z, and may be preceded by
+`first`, `second`, `graph`, `screen`, or `character` to select the
+coordinate system. <offset> is the offset of the tics texts from their
+default positions, while the default coordinate system is `character`.
+See `coordinates` for details. `nooffset` switches off the offset.
+
+`set tics` with no options restores to place tics inwards. Every other 
+options are retained.
 
 See also @ref{xtics} for more control of major (labelled) tic marks and
-@ref{mxtics} for control of minor tic marks.
+@ref{mxtics} for control of minor tic marks.  These commands provide control
+at a axis by axis basis.
 
 @node ticslevel, ticscale, tics, set-show
 @subsection ticslevel
@@ -11624,18 +11799,7 @@ See also @ref{view}.
 @opindex ticscale
 
 
-The size of the tic marks can be adjusted with @ref{ticscale}.
-
-Syntax:
-@example
-      set ticscale @{<major> @{<minor>@}@}
-      show tics
-
-@end example
-
-If <minor> is not specified, it is 0.5*<major>.  The default size is 1.0 for
-major tics and 0.5 for minor tics.  Note that it is possible to have the tic
-marks pointing outward by specifying a negative size.
+The @ref{ticscale} command is deprecated, use `set tics scale` instead.
 
 @node timestamp, timefmt, ticscale, set-show
 @subsection timestamp
@@ -11660,7 +11824,7 @@ margin.
 Syntax:
 @example
       set timestamp @{"<format>"@} @{top|bottom@} @{@{no@}rotate@}
-                    @{<xoff>@}@{,<yoff>@} @{"<font>"@}
+                    @{offset @{<xoff>@}@{,<yoff>@}@} @{font "<fontspec>"@}
       unset timestamp
       show timestamp
 
@@ -11672,15 +11836,14 @@ time.  Its default value is what asctime() uses: "%a %b %d %H:%M:%S %Y"
 year).  With `top` or `bottom` you can place the timestamp at the top or
 bottom of the left margin (default: bottom).  `rotate` lets you write the
 timestamp vertically, if your terminal supports vertical text.  The constants
-<xoff> and <yoff> are offsets from the default position given in character
-screen coordinates.  <font> is used to specify the font with which the time
-is to be written.
+<xoff> and <yoff> are offsets that let you adjust the position more finely.
+<font> is used to specify the font with which the time is to be written.
 
 The abbreviation `time` may be used in place of @ref{timestamp}.
 
 Example:
 @example
-      set timestamp "%d/%m/%y %H:%M" 80,-2 "Helvetica"
+      set timestamp "%d/%m/%y %H:%M" offset 80,-2 font "Helvetica"
 
 @end example
 
@@ -12390,8 +12553,9 @@ commands control the major tics on the y, z, x2 and y2 axes.
 
 Syntax:
 @example
-      set xtics @{axis | border@} @{@{no@}mirror@} @{@{no@}rotate @{by <ang>@}@}
-                @{offset <offset> | nooffset@}
+      set xtics @{axis | border@} @{@{no@}mirror@}
+                @{in | out@} @{scale @{default | <major> @{,<minor>@}@}@}
+                @{@{no@}rotate @{by <ang>@}@} @{offset <offset> | nooffset@}
                 @{  autofreq
                  | <incr>
                  | <start>, <incr> @{,<end>@}
@@ -12413,6 +12577,12 @@ be sized badly by the automatic layout algorithm in this case.
 
 `mirror` tells `gnuplot` to put unlabelled tics at the same positions on the
 opposite border.  `nomirror` does what you think it does.
+
+`in` and `out` change the tic marks to be drawn inwards or outwards.
+
+With `scale`, the size of the tic marks can be adjusted. If <minor> is not
+specified, it is 0.5*<major>.  The default size 1.0 for major tics and 0.5
+for minor tics is requested by `scale default`.
 
 `rotate` asks `gnuplot` to rotate the text through 90 degrees, which will be
 done if the terminal driver in use supports text rotation.  `norotate`
@@ -12454,6 +12624,29 @@ increment may be negative.  If neither <start> nor <end> is given, <start> is
 assumed to be negative infinity, <end> is assumed to be positive infinity,
 and the tics will be drawn at integral multiples of <incr>.  If the axis is
 logarithmic, the increment will be used as a multiplicative factor.
+
+If you specify to a negative <start> or <incr> after a numerical value
+(e.g., `rotate by <angle>` or `offset <offset>`), the parser fails because
+it subtracts <start> or <incr> from that value.  As a workaround, specify
+`0-<start>` resp. `0-<incr>` in that case.
+
+Example:
+@example
+      set xtics border offset 0,0.5 -5,1,5
+@end example
+
+Fails with 'invalid expression' at the last comma.
+@example
+      set xtics border offset 0,0.5 0-5,1,5
+@end example
+
+or
+@example
+      set xtics offset 0,0.5 border -5,1,5
+@end example
+
+Sets tics at the border, tics text with an offset of 0,0.5 characters, and
+sets the start, increment, and end to -5, 1, and 5, as requested.
 
 The `set grid` options 'front', 'back' and 'layerdefault' affect the drawing
 order of the xtics, too.
@@ -17984,7 +18177,6 @@ by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
 
 @end example
 
-
 , "
 
 
@@ -18473,7 +18665,6 @@ by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
  gnuplot*visual:     <visual name>
 
 @end example
-
 
 , "
 
