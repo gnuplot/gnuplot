@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.198 2005/08/12 08:31:56 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.199 2005/08/12 17:42:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3018,6 +3018,24 @@ set_pm3d()
 		     * like "set pm3d at X other_opts;", then implicit is switched on */
 		    pm3d.implicit = PM3D_IMPLICIT;
 #endif
+		continue;
+	    case S_PM3D_INTERPOLATE: /* "interpolate" */
+		c_token++;
+		if (END_OF_COMMAND) {
+		    int_error(c_token, "expecting step values i,j");
+		} else {
+		    struct value a;
+		    pm3d.interp_i = real(const_express(&a));
+		    if(pm3d.interp_i < 1)
+			pm3d.interp_i = 1;
+		    if (!equals(c_token,","))
+			int_error(c_token, "',' expected");
+		    c_token++;
+		    pm3d.interp_j = real(const_express(&a));
+		    if (pm3d.interp_j < 1)
+			pm3d.interp_j = 1;
+		    c_token--;
+                }
 		continue;
 	    /* forward and backward drawing direction */
 	    case S_PM3D_SCANSFORWARD: /* "scansfor$ward" */

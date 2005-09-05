@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.23 2005/02/11 11:37:20 mikulik Exp $
+ * $Id: pm3d.h,v 1.24 2005/03/29 08:07:16 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -121,6 +121,8 @@ typedef struct {
 			   0: only surfaces specified with 'with pm3d' */
   PM3D_WHICH_CORNERS2COLOR which_corner_color;
 			/* default: average color from all 4 points */
+  int interp_i;		/* # of interpolation steps along scanline */
+  int interp_j;		/* # of interpolation steps between scanlines */
 } pm3d_struct;
 
 

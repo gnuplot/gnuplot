@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.117 2005/08/07 09:43:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.118 2005/08/16 19:09:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -733,6 +733,7 @@ set origin %g,%g\n",
     case PM3D_SCANS_FORWARD: fputs("scansforward", fp); break;
     case PM3D_SCANS_BACKWARD: fputs("scansbackward", fp); break;
     }
+    fprintf(fp, "set pm3d interpolate %d,%d\n", pm3d.interp_i, pm3d.interp_j);
     fputs(" flush ", fp);
     switch (pm3d.flush) {
     case PM3D_FLUSH_CENTER: fputs("center", fp); break;

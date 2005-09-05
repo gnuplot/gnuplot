@@ -1,3 +1,15 @@
+2005-09-05  Geoffrey Hausheer  <ghaushe@users.sourceforge.net>
+
+	SF patch [1264939] Adds bilinear interpolation to pm3d surfaces
+
+	* demo/pm3d.dem docs/gnuplot.doc src/pm3d.c src/pm3d.h src/save.c
+	src/set.c src/show.c src/tables.c src/tables.h NEWS: When using pm3d
+	with data files (rather than functions), a single color is used for
+	each quadrangle (unless dgrid is used, but then you get weighted
+	averages instead). This patch does bilinear interpolation to subdivide
+	each quadrangle into nxn smaller quadrangles, and sets the color of
+	each one independantly.
+
 2005-08-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/makefile.dj2 (TERMLIBS): Updated to current version of GRX.

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.324 2005/08/22 16:37:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.325 2005/08/26 08:50:20 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7132,6 +7132,7 @@ C ... and restart the table:
  Syntax (the options can be given in any order):
        set pm3d {
                   { at <bst combination> }
+                  { interpolate <steps in scan>,<steps between scans> }
                   { scansautomatic | scansforward | scansbackward }
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
@@ -7230,6 +7231,13 @@ C ... and restart the table:
  Take care that you properly use `zrange` and `cbrange` for input data point
  filtering and color range scaling, respectively; and also `set (no)surface`
  seems to have a (side?) effect.
+
+ The option `interpolate` will interpolate grid points into a finer mesh, and
+ color each quadrangle appropriately. For data files, this will smoothen the
+ color surface, and enhance spikes in a color surface. For functions,
+ interpolation makes little sense, except to trade off precision for memory.
+ It would usually make more sense to use 'samples' and 'isosamples' when working
+ with functions.
 
  The coloring setup as well as the color box drawing are determined by
  `set palette`.  There can be only one palette for the current plot.  Drawing

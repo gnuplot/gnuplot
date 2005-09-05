@@ -1,5 +1,5 @@
 #
-# $Id: pm3d.dem,v 1.15 2005/07/29 07:57:41 mikulik Exp $
+# $Id: pm3d.dem,v 1.16 2005/08/08 09:13:02 mikulik Exp $
 #
 # demo for pm3d splotting
 #
@@ -260,6 +260,22 @@ pause -1 "Hit return to continue"
 
 set title "Data with different nb of points in scans; pm3d ftriangles flush end"
 set pm3d flush end ftriangles scansforward
+replot
+pause -1 "Hit return to continue"
+
+set title "Using interpolation with datafile; pm3d map interpolate 2,1"
+set pm3d flush begin noftriangles scansforward interpolate 2,1
+replot
+pause -1 "Hit return to continue"
+
+set title "Using interpolation with datafile; pm3d map ftriangles interpolate 10,1"
+set pm3d flush begin ftriangles scansforward interpolate 10,1
+replot
+pause -1 "Hit return to continue"
+
+set title "Using interpolation with datafile; pm3d at s ftriangles interpolate 10,1"
+set pm3d flush begin ftriangles scansforward at s interpolate 10,1
+set view 20,20
 replot
 pause -1 "Hit return to continue"
 
