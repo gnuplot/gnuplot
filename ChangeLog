@@ -1,3 +1,8 @@
+2005-09-05  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* command.c (print_show_output): Make the test to print_out, not
+	print_out_name (failed for stdout).
+
 2005-09-05  Geoffrey Hausheer  <ghaushe@users.sourceforge.net>
 
 	SF patch [1264939] Adds bilinear interpolation to pm3d surfaces
