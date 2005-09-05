@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.163 2005/08/12 08:31:56 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.164 2005/09/05 19:36:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1917,11 +1917,14 @@ show_palette_palette()
 	c_token++;
     }
 
+    i = (print_out==NULL || print_out==stderr || print_out==stdout);
     f = (print_out) ? print_out : stderr;
     fprintf(stderr, "%s palette with %i discrete colors",
 	    (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) ? "Gray" : "Color", colors);
-    if (print_out) fprintf(stderr," saved to \"%s\".", print_out_name);
-	else fprintf(stderr, ".\n");
+    if (!i)
+	fprintf(stderr," saved to \"%s\".", print_out_name);
+    else
+	fprintf(stderr, ".\n");
 
     for (i = 0; i < colors; i++) {
 	/* colours equidistantly from [0,1]  */
@@ -1936,15 +1939,14 @@ show_palette_palette()
 		fprintf(f, "%0.4f\t%0.4f\t%0.4f\n", rgb1.r, rgb1.g, rgb1.b);
 		break;
 	    case 2:
-		fprintf(f, "%i\t%i\t%i\n",
-			(int)rgb255.r, (int)rgb255.g, (int)rgb255.b);
+		fprintf(f, "%i\t%i\t%i\n", (int)rgb255.r, (int)rgb255.g, (int)rgb255.b);
 		break;
 	    default:
 		fprintf(f,
-		"%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
-		i, gray, rgb1.r, rgb1.g, rgb1.b,
-		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b,
-		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b );
+    		    "%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
+    		    i, gray, rgb1.r, rgb1.g, rgb1.b,
+    		    (int)rgb255.r, (int)rgb255.g, (int)rgb255.b,
+    		    (int)rgb255.r, (int)rgb255.g, (int)rgb255.b );
 	}
     }
 }
