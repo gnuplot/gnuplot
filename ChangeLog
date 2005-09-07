@@ -1,3 +1,19 @@
+2005-09-07  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* Makefile.am: Add share/LaTeX to SUBDIRS.
+
+	* depcomp, install-sh, missing, mkinstalldirs: Updated from automake.
+
+	* config/Makefile.am.in: Add MacOSX to EXTRA_DIST generation.
+
+	* demo/Makefile.am.in: Add *.cfg and html to EXTRA_DIST generation,
+	remove webify.pl.
+
+	* share/LaTeX: Add top_srcdir, INSTALL_DATA, DISTFILES, install,
+	distdir, clean, distclean. Clean up all and install targets.
+
+	* src/Makefile.am: Add makefile.awc to EXTRA_DIST.
+
 2005-09-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* show.c (show_palette_palette): Take care that print_out is stderr for
