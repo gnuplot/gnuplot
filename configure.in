@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.168 2005/08/07 09:43:23 mikulik Exp $
+dnl $Id: configure.in,v 1.169 2005/08/12 08:31:55 mikulik Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -904,6 +904,7 @@ AC_OUTPUT([Makefile
            docs/Makefile
            m4/Makefile
            man/Makefile
+           share/Makefile
            src/Makefile
            term/Makefile
            tutorial/Makefile],

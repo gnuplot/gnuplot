@@ -1,5 +1,11 @@
 2005-09-07  Lars Hecking  <lhecking@users.sourceforge.net>
 
+	* Makefile.am, configure.in, share/Makefile.am: SUBDIRS in automake
+	versions older than 1.9 can only contain direct children. Need a
+	minimal, dummy Makefile.am in share/ to address this.
+
+2005-09-07  Lars Hecking  <lhecking@users.sourceforge.net>
+
 	* Makefile.am: Add share/LaTeX to SUBDIRS.
 
 	* depcomp, install-sh, missing, mkinstalldirs: Updated from automake.
