@@ -4,6 +4,9 @@
 	versions older than 1.9 can only contain direct children. Need a
 	minimal, dummy Makefile.am in share/ to address this.
 
+	* configure.in, share/Makefile.am, share/LaTeX/Makefile.am: Fix
+	building outside source directory.
+
 2005-09-07  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* Makefile.am: Add share/LaTeX to SUBDIRS.

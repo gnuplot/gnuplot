@@ -2,4 +2,3 @@
 AUTOMAKE_OPTIONS = foreign 1.2h
                                                                                 
 SUBDIRS = LaTeX
-
