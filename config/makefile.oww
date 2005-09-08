@@ -1,5 +1,5 @@
 # 
-# $Id: makefile.oww,v 1.2 2005/04/28 20:33:22 broeker Exp $
+# $Id: makefile.oww,v 1.3 2005/08/07 09:43:27 mikulik Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -224,6 +224,7 @@ clean: .SYMBOLIC
 realclean: clean .SYMBOLIC
         if exist wgnuplot.exe del wgnuplot.exe
         if exist wgnuplot.hlp del wgnuplot.hlp
+        if exist wgnuplot.gid del wgnuplot.gid
         if exist wgnuplot.mnu del wgnuplot.mnu
         if exist pgnuplot.exe del pgnuplot.exe
         if exist ..\demo\binary1 del ..\demo\binary1

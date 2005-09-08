@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.14 2005/08/03 17:02:15 mikulik Exp $
+# $Id: makefile.nt,v 1.15 2005/08/07 09:43:27 mikulik Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -16,12 +16,15 @@
 #	Copy zlib.dll to \winnt\system32 or anywhere else in the path
 #	Download libpng to ..\src\libpng and compile it
 #	Download pdflib to ..\src\pdflib and compile it if you choose the source
-#	Copy ..\config\config.nt to ..\src\config.h
-#	Find and run VCVARS32.BAT
-#	Then from ..\src nmake -f ..\config\makefile.nt
 #
-# 15 February 2003: Added support for compiling pgnuplot
-#                   Cleaned up clean and veryclean
+#	Find and run VCVARS32.BAT (or maybe VSVARS32.BAT)
+#	change to the gnuplot\src directory
+#	Now run: 
+#	  nmake -f ..\config\makefile.nt
+#       You can also do it like this: 
+#	  copy ..\config\makefile.nt makefile.nt
+#         edit the copy to your liking
+#         nmake -f makefile.nt
 
 # where to place gnuplot.gih helpfile
 HELPFILE = wgnuplot.hlp
@@ -86,6 +89,8 @@ WINDOWS = makefile.win makefile.nt README.win win\wcommon.h \
 # default rules
 .c.obj:
 	$(CC) $(CFLAGS) $*.c
+
+$(OBJS): config.h
 
 linkopt1.msw: makefile.nt
 	copy gnuplot.opt linkopt1.msw

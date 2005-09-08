@@ -1,9 +1,10 @@
 2005-09-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* config/makefile.nt: Add a rule that makes all *.obj files
+	explicitly dependent on config.h.  Explain usage a bit more clearly.
+	
 	* src/graphics.c (plot_image_or_update_axes): Don't dereference
 	function pointer in test.
-
-2005-09-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.texi: Regenerated.
 
