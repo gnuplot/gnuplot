@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.164 2005/08/05 15:48:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.165 2005/08/07 09:43:29 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5019,7 +5019,7 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	/* If the terminal does not have image support indicate so,
 	 * just once.  Then, use polygons to construct pixels.
 	 */
-	if (*term->image) {
+	if (term->image) {
 	    rectangular_image = TRUE;
 	} else {
 	    static short no_image_support_indicated = 0;
