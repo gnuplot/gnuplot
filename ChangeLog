@@ -1,3 +1,17 @@
+2005-09-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.texi: Regenerated.
+
+	* docs/gnuplot.doc: Removed superfluous blanks, fixing some
+	blank-only lines.
+
+	* src/beos/Makefile.in: New file.  Edited copy of previous
+	Makefile to fix out-of-source 'make dist'.
+	
+	* src/beos/Makefile: Removed.
+
+	* configure.in: Add src/beos/Makefile to AC_OUTPUT.
+
 2005-09-07  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* Makefile.am, configure.in, share/Makefile.am: SUBDIRS in automake

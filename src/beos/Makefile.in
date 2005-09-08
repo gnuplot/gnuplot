@@ -355,16 +355,18 @@ rmapp ::
 
 # generic distdir rules - needed with automake
 # maybe we can automakify the Makefile?
-srcdir = .
-top_builddir = ../..
 
-distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/src/$(subdir)
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+top_builddir = @top_builddir@
+
+distdir = $(top_builddir)$(PACKAGE)-$(VERSION)/src/$(subdir)
 
 subdir = beos
 
 DISTFILES = $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
-distdir: $(DISTFILES)
+distdir: # $(DISTFILES)
 	distdir=`cd $(distdir) && pwd`
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
