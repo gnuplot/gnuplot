@@ -58,7 +58,9 @@ uninstall-local:
 
 distclean-local:
 	@if test "$(top_srcdir)" != "$(top_builddir)" ; then \
-	  rm -f gnuplot.el gnuplot-gui.el gpelcard.tex ; \
+	  for p in $(ELS) gpelcard.tex ; do \
+	    rm -f $$p ; \
+	  done ; \
 	fi
 
 SUFFIXES = .el .elc .pdf .ps .tex

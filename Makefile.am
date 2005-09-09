@@ -7,6 +7,8 @@ EXTRA_DIST = BUGS CodeStyle Copyright FAQ GNUmakefile INSTALL INSTALL.gnu \
 Makefile.maint PATCHLEVEL PGPKEYS PORTING README README.1ST README.exp \
 VERSION configure.vms pm3d
 
+DISTCLEANFILES = stamp-h
+
 LISP_DISTCLEANFILES = gpelcard.dvi gpelcard.pdf gpelcard.ps
 
 ACLOCAL_AMFLAGS = -I m4

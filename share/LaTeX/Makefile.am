@@ -2,13 +2,19 @@
 AUTOMAKE_OPTIONS = foreign 1.2h
 
 EXTRA_DIST = README gnuplot.cfg
-INSTALLDIR = `kpsexpand '$$TEXMFLOCAL'`/tex/latex/gnuplot
 
 install-data-hook: install-cfg
+uninstall-hook: uninstall-cfg
 
 install-cfg:
-	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(INSTALLDIR)
-	@if [ ! -f $(DESTDIR)$(INSTALLDIR)/gnuplot.cfg ]; then \
-	  $(INSTALL_DATA) $(srcdir)/gnuplot.cfg $(DESTDIR)$(INSTALLDIR)/gnuplot.cfg && \
-	  texhash; \
-	fi
+	@installdir=`kpsexpand '$$TEXMFLOCAL'/tex/latex/gnuplot |sed "s%^.*share/%$(prefix)/share/%"` ; \
+	  $(top_srcdir)/mkinstalldirs $(DESTDIR)$$installdir ; \
+	  if [ ! -f $(DESTDIR)$$installdir/gnuplot.cfg ]; then \
+	    $(INSTALL_DATA) $(srcdir)/gnuplot.cfg $(DESTDIR)$$installdir/gnuplot.cfg && \
+	    texhash; \
+	  fi
+
+uninstall-cfg:
+	@$(NORMAL_UNINSTALL)
+	@installdir=`kpsexpand '$$TEXMFLOCAL'/tex/latex/gnuplot |sed "s%^.*share/%$(prefix)/share/%"` ; \
+	  rm -f "$(DESTDIR)$$installdir/gnuplot.cfg"

@@ -1,3 +1,13 @@
+2005-09-09  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* Makefile.am: Add DISTCLEANFILES.
+
+	* lisp/Makefile.am: Add $(ELS) to distclean-local target.
+
+	* share/LaTeX/Makefile.am: Install .cfg file under gnuplot's directory
+	hierarchy rather than LaTeX's - it is the user's responsibility to
+	update the latter. Add uninstall-hook.
+
 2005-09-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/config.nt: Added flags for GP_ISVAR, libPDF details,
