@@ -1,8 +1,16 @@
+2005-09-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/config.nt: Added flags for GP_ISVAR, libPDF details,
+	HAVE_STRINGIZE, string variables, datastrings, histograms, fit
+	error variables, image mode, macros.  Added at least some
+	comments.
+
 2005-09-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/makefile.nt: Add a rule that makes all *.obj files
-	explicitly dependent on config.h.  Explain usage a bit more clearly.
-	
+	explicitly dependent on config.h.  Explain usage a bit more
+	clearly.
+
 	* src/graphics.c (plot_image_or_update_axes): Don't dereference
 	function pointer in test.
 
@@ -13,16 +21,17 @@
 
 	* src/beos/Makefile.in: New file.  Edited copy of previous
 	Makefile to fix out-of-source 'make dist'.
-	
+
 	* src/beos/Makefile: Removed.
 
 	* configure.in: Add src/beos/Makefile to AC_OUTPUT.
 
 2005-09-07  Lars Hecking  <lhecking@users.sourceforge.net>
 
-	* Makefile.am, configure.in, share/Makefile.am: SUBDIRS in automake
-	versions older than 1.9 can only contain direct children. Need a
-	minimal, dummy Makefile.am in share/ to address this.
+	* Makefile.am, configure.in, share/Makefile.am: SUBDIRS in
+	automake versions older than 1.9 can only contain direct
+	children. Need a minimal, dummy Makefile.am in share/ to address
+	this.
 
 	* configure.in, share/Makefile.am, share/LaTeX/Makefile.am: Fix
 	building outside source directory.
@@ -31,12 +40,13 @@
 
 	* Makefile.am: Add share/LaTeX to SUBDIRS.
 
-	* depcomp, install-sh, missing, mkinstalldirs: Updated from automake.
+	* depcomp, install-sh, missing, mkinstalldirs: Updated from
+	automake.
 
 	* config/Makefile.am.in: Add MacOSX to EXTRA_DIST generation.
 
-	* demo/Makefile.am.in: Add *.cfg and html to EXTRA_DIST generation,
-	remove webify.pl.
+	* demo/Makefile.am.in: Add *.cfg and html to EXTRA_DIST
+	generation, remove webify.pl.
 
 	* share/LaTeX: Add top_srcdir, INSTALL_DATA, DISTFILES, install,
 	distdir, clean, distclean. Clean up all and install targets.
@@ -45,8 +55,8 @@
 
 2005-09-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* show.c (show_palette_palette): Take care that print_out is stderr for
-	for both NULL and stderr.
+	* show.c (show_palette_palette): Take care that print_out is
+	stderr for for both NULL and stderr.
 
 	* command.c (print_show_output): Make the test to print_out, not
 	print_out_name (failed for stdout).
@@ -56,16 +66,17 @@
 	SF patch [1264939] Adds bilinear interpolation to pm3d surfaces
 
 	* demo/pm3d.dem docs/gnuplot.doc src/pm3d.c src/pm3d.h src/save.c
-	src/set.c src/show.c src/tables.c src/tables.h NEWS: When using pm3d
-	with data files (rather than functions), a single color is used for
-	each quadrangle (unless dgrid is used, but then you get weighted
-	averages instead). This patch does bilinear interpolation to subdivide
-	each quadrangle into nxn smaller quadrangles, and sets the color of
-	each one independantly.
+	src/set.c src/show.c src/tables.c src/tables.h NEWS: When using
+	pm3d with data files (rather than functions), a single color is
+	used for each quadrangle (unless dgrid is used, but then you get
+	weighted averages instead). This patch does bilinear interpolation
+	to subdivide each quadrangle into nxn smaller quadrangles, and
+	sets the color of each one independantly.
 
 2005-08-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* config/makefile.dj2 (TERMLIBS): Updated to current version of GRX.
+	* config/makefile.dj2 (TERMLIBS): Updated to current version of
+	GRX.
 	(LINKOPT): Fix it to actually use $(TERMLIBS).
 	(CFLAGS): Add -DHAVE_SYS_STAT_H.
 
