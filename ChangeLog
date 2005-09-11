@@ -1,3 +1,8 @@
+2005-09-11  Ethan Merritt  <merritt@u.washington.edu>
+
+        * src/save.c (save_set_all): Fix incorrect placement of newlines
+	in "set pm3d" options.
+
 2005-09-09  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* Makefile.am: Add DISTCLEANFILES.
