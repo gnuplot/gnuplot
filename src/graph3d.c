@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.127 2005/08/19 23:44:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.128 2005/08/22 16:37:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -374,7 +374,7 @@ boundary3d(struct surface_points *plots, int count)
 	&& key->margin == GPKEY_BMARGIN)
 	ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
 
-    if (strlen(title.text)) {
+    if (title.text) {
 	titlelin++;
 	for (i = 0; i < strlen(title.text); i++) {
 	    if (title.text[i] == '\\')
@@ -672,7 +672,7 @@ do_3dplot(
 #endif /* USE_GRID_LAYERS */
 
     /* PLACE TITLE */
-    if (*title.text != 0) {
+    if (title.text != 0) {
 	unsigned int x, y;
 	int tmpx, tmpy;
 	if (splot_map) { /* case 'set view map' */
@@ -707,7 +707,7 @@ do_3dplot(
     }
 
     /* PLACE TIMEDATE */
-    if (*timelabel.text) {
+    if (timelabel.text) {
 	char str[MAX_LINE_LEN+1];
 	time_t now;
 	int tmpx, tmpy;
@@ -2189,7 +2189,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
     } /* if (draw_border) */
 
     /* Draw ticlabels and axis labels. x axis, first:*/
-    if (X_AXIS.ticmode || *X_AXIS.label.text) {
+    if (X_AXIS.ticmode || X_AXIS.label.text) {
 	vertex v0, v1;
 	double other_end =
 	    Y_AXIS.min + Y_AXIS.max - xaxis_y;
@@ -2213,7 +2213,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	    gen_tics(FIRST_X_AXIS, xtick_callback);
 	}
 
-	if (*X_AXIS.label.text) {
+	if (X_AXIS.label.text) {
 	    /* label at xaxis_y + 1/4 of (xaxis_y-other_y) */
 #ifdef USE_GRID_LAYERS /* FIXME: still needed??? what for? */
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
@@ -2264,9 +2264,15 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	    y1 += tmpy;
 	    ignore_enhanced(X_AXIS.label.noenhanced);
 	    apply_pm3dcolor(&(X_AXIS.label.textcolor),t);
-	    write_multiline(x1, y1, X_AXIS.label.text,
+	    if (X_AXIS.label.rotate != 0 && splot_map && (term->text_angle)(X_AXIS.label.rotate)) {
+		write_multiline(x1, y1, X_AXIS.label.text, CENTRE, JUST_TOP,
+			    X_AXIS.label.rotate, X_AXIS.label.font);
+		(term->text_angle)(0);
+	    } else {
+		write_multiline(x1, y1, X_AXIS.label.text,
 			    CENTRE, JUST_TOP, 0,
 			    X_AXIS.label.font);
+	    }
 	    reset_textcolor(&(X_AXIS.label.textcolor),t);
 	    ignore_enhanced(FALSE);
 #ifdef USE_GRID_LAYERS
@@ -2276,12 +2282,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
     }
 
     /* y axis: */
-    if (Y_AXIS.ticmode || *Y_AXIS.label.text) {
+    if (Y_AXIS.ticmode || Y_AXIS.label.text) {
 	vertex v0, v1;
-	double other_end =
-	    X_AXIS.min + X_AXIS.max - yaxis_x;
-	double mid_y =
-	    (Y_AXIS.max + Y_AXIS.min) / 2;
+	double other_end = X_AXIS.min + X_AXIS.max - yaxis_x;
+	double mid_y = (Y_AXIS.max + Y_AXIS.min) / 2;
 
 	map3d_xyz(yaxis_x, mid_y, base_z, &v0);
 	map3d_xyz(other_end, mid_y, base_z, &v1);
@@ -2299,14 +2303,15 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	if (Y_AXIS.ticmode) {
 	    gen_tics(FIRST_Y_AXIS, ytick_callback);
 	}
-	if (*Y_AXIS.label.text) {
+	if (Y_AXIS.label.text) {
 #ifdef USE_GRID_LAYERS
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
 		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
 #endif
 		unsigned int x1, y1;
 		int tmpx, tmpy;
-		int h_just, v_just, angle;
+		int h_just, v_just;
+		int angle;
 
 		if (splot_map) { /* case 'set view map' */
 		    /* copied from ytick_callback(): baseline of tics labels */
@@ -2353,37 +2358,40 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 #endif
 		    h_just = CENTRE; /* vertical justification for rotated text */
 		    v_just = JUST_BOT; /* horizontal -- does not work for rotated text? */
-		    angle = TEXT_VERTICAL; /* seems it has not effect ... why? */
+		    angle = Y_AXIS.label.rotate;
 		} else { /* usual 3d set view ... */
 		    double step = (other_end - yaxis_x) / 4;
-		map3d_xyz(yaxis_x - step, mid_y, base_z, &v1);
-		if (!X_AXIS.tic_in) {
-		    v1.x -= tic_unitx * X_AXIS.ticscale * t->h_tic;
-		    v1.y -= tic_unity * X_AXIS.ticscale * t->h_tic;
-		}
-		TERMCOORD(&v1, x1, y1);
+		    map3d_xyz(yaxis_x - step, mid_y, base_z, &v1);
+		    if (!X_AXIS.tic_in) {
+			v1.x -= tic_unitx * X_AXIS.ticscale * t->h_tic;
+			v1.y -= tic_unity * X_AXIS.ticscale * t->h_tic;
+		    }
+		    TERMCOORD(&v1, x1, y1);
 		    h_just = CENTRE;
 		    v_just = JUST_TOP;
+		    /* No Y-label rotation in 3D plot mode */
 		    angle = 0;
 		}
 
 		map3d_position_r(&(Y_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
 		x1 += tmpx; /* user-defined label offset */
 		y1 += tmpy;
-		/* vertical y-label for maps */
-		if (splot_map == TRUE)
-		    (*t->text_angle)(TEXT_VERTICAL);
+
 		/* write_multiline mods it */
 		ignore_enhanced(Y_AXIS.label.noenhanced);
 		apply_pm3dcolor(&(Y_AXIS.label.textcolor),t);
-		write_multiline(x1, y1, Y_AXIS.label.text,
-				h_just, v_just, angle,
-				Y_AXIS.label.font);
+
+		if (angle != 0 && splot_map && (term->text_angle)(angle)) {
+		    write_multiline(x1, y1, Y_AXIS.label.text, h_just, v_just,
+				    angle, Y_AXIS.label.font);
+		    (term->text_angle)(0);
+		} else {
+		    write_multiline(x1, y1, Y_AXIS.label.text, h_just, v_just,
+				    0, Y_AXIS.label.font);
+		}
+		
 		reset_textcolor(&(Y_AXIS.label.textcolor),t);
 		ignore_enhanced(FALSE);
-		/* revert from vertical y-label for maps */
-		if (splot_map == TRUE)
-		    (*t->text_angle)(0);
 #ifdef USE_GRID_LAYERS
 	    }
 #endif
@@ -2429,7 +2437,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	draw3d_line(&v1, &v2, &X_AXIS.zeroaxis);
     }
     /* PLACE ZLABEL - along the middle grid Z axis - eh ? */
-    if (*Z_AXIS.label.text
+    if (Z_AXIS.label.text
+	&& (splot_map == FALSE)
 	&& (draw_surface
 	    || (draw_contour & CONTOUR_SRF)
 	    || strpbrk(pm3d.where,"st") != NULL

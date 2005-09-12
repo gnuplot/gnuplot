@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.119 2005/08/05 15:48:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.120 2005/08/07 09:43:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -278,7 +278,7 @@ static struct {
     double yoffset;        /* horizontal shift */
     double prev_xsize, prev_ysize, prev_xoffset, prev_yoffset;
                            /* values before 'set multiplot layout' */
-    label_struct title;    /* goes above complete set of plots */
+    text_label title;    /* goes above complete set of plots */
     double title_height;   /* fractional height reserved for title */
 } mp_layout = MP_LAYOUT_DEFAULT;
 
@@ -638,8 +638,8 @@ term_start_multiplot()
 	if (almost_equals(c_token, "ti$tle")) {
 	    c_token++;
 	    if ((s = try_to_get_string())) {
-		strncpy(mp_layout.title.text, s, sizeof(mp_layout.title.text));
-		free(s);
+		free(mp_layout.title.text);
+		mp_layout.title.text = s;
 	    }
 	    continue;
 	}
@@ -732,7 +732,7 @@ term_start_multiplot()
     multiplot = TRUE;
 
     /* Place overall title before doing anything else */
-    if (*mp_layout.title.text) {
+    if (mp_layout.title.text) {
 	double tmpx, tmpy;
 	unsigned int x, y;
 	char *p = mp_layout.title.text;
@@ -2591,7 +2591,7 @@ mp_layout_size_and_offset(void)
     /* fprintf(stderr,"xoffset==%g  yoffset==%g\n", xoffset,yoffset); */
 
     /* Allow a little space at the top for a title */
-    if (*mp_layout.title.text) {
+    if (mp_layout.title.text) {
 	ysize *= (1.0 - mp_layout.title_height);
 	yoffset *= (1.0 - mp_layout.title_height);
     }

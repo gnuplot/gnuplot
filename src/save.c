@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.119 2005/09/05 19:36:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.120 2005/09/11 23:41:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -396,6 +396,8 @@ set y2data%s\n",
 	if (this_label->font != NULL)
 	    fprintf(fp, " font \"%s\"", this_label->font);
 	fprintf(fp, " %s", (this_label->layer==0) ? "back" : "front");
+	if (this_label->noenhanced)
+	    fprintf(fp, " noenhanced");
 	save_textcolor(fp, &(this_label->textcolor));
 	if (this_label->lp_properties.pointflag == 0)
 	    fprintf(fp, " nopoint");
@@ -663,25 +665,25 @@ set origin %g,%g\n",
     save_tics(fp, SECOND_Y_AXIS);
     save_tics(fp, COLOR_AXIS);
 
-#define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)		\
-    {								\
-	fprintf(fp, "set %s%s \"%s\" ",			\
-		name, suffix, conv_text(lab.text));		\
-        save_position(fp, &(lab.offset), TRUE);			\
-	fprintf(fp, " font \"%s\"", conv_text(lab.font));	\
-	save_textcolor(fp, &(lab.textcolor));			\
-	fprintf(fp, "%s\n", (lab.noenhanced)?" noenhanced":"");	\
+#define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)			 \
+    {									 \
+	fprintf(fp, "set %s%s \"%s\" ",					 \
+		name, suffix, lab.text ? conv_text(lab.text) : "");	 \
+        save_position(fp, &(lab.offset), TRUE);				 \
+	fprintf(fp, " font \"%s\"", lab.font ? conv_text(lab.font) : "");\
+	save_textcolor(fp, &(lab.textcolor));				 \
+	if (lab.rotate)							 \
+	    fprintf(fp, " rotate by %d", lab.rotate);			 \
+	else								 \
+	    fprintf(fp, " norotate");					 \
+	fprintf(fp, "%s\n", (lab.noenhanced) ? " noenhanced" : "");	 \
     }
 
     SAVE_AXISLABEL_OR_TITLE("", "title", title);
 
     /* FIXME */
-    fprintf(fp, "set %s \"%s\" %s %srotate ",
-	    "timestamp", conv_text(timelabel.text),
-	    (timelabel_bottom ? "bottom" : "top"),
-	    (timelabel_rotate ? "" : "no"));
-    save_position(fp, &(timelabel.offset), TRUE);
-    fprintf(fp, " \"%s\"\n", conv_text(timelabel.font));
+    fprintf(fp, "set timestamp %s \n", timelabel_bottom ? "bottom" : "top");
+    SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel);
 
     save_range(fp, R_AXIS);
     save_range(fp, T_AXIS);
@@ -945,7 +947,7 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 	   character == 4);
 
     if (offset)
-	fprintf(fp, "offset ");
+	fprintf(fp, " offset ");
 
     fprintf(fp, "%s%g, %s%g, %s%g",
 	    pos->scalex == first_axes ? "" : msg[pos->scalex], pos->x,

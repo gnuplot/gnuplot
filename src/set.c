@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.199 2005/08/12 17:42:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.200 2005/09/05 19:36:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -144,7 +144,7 @@ static void set_allzeroaxis __PROTO((void));
 
 /******** Local functions ********/
 
-static void set_xyzlabel __PROTO((label_struct * label));
+static void set_xyzlabel __PROTO((text_label * label));
 static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
@@ -3689,32 +3689,11 @@ static void
 set_timestamp()
 {
     TBOOLEAN got_format = FALSE;
+    char *new;
 
     c_token++;
 
-    /* For backwards compatibility */
-    if (!(*timelabel.text))
-	strcpy(timelabel.text, DEFAULT_TIMESTAMP_FORMAT);
-
-    /* Version 4.1 - accept options in any order */
     while (!END_OF_COMMAND) {
-	if (!got_format && isstring(c_token)) {
-	    /* we have a format string */
-	    quote_str(timelabel.text, c_token, MAX_LINE_LEN);
-	    got_format = TRUE;
-	    c_token++;
-	    continue;
-	}
-
-	/* The "font" keyword is new (v4.1), for backward compatibility we don't enforce it */
-	if (equals(c_token,"font")) {
-	     c_token++;
-	}
-	if (!END_OF_COMMAND && isstring(c_token)) {
-	    quote_str(timelabel.font, c_token, MAX_LINE_LEN);
-	    c_token++;
-	    continue;
-	}
 
 	if (almost_equals(c_token,"t$op")) {
 	    timelabel_bottom = FALSE;
@@ -3736,15 +3715,44 @@ set_timestamp()
 	    continue;
 	}
 
-	/* The only remaining possibility is x,y offsets specified
-	 * The "offset" keyword is new (v4.1); 
-	 * for backward compatibility we don't enforce it
-	 */
-	if (almost_equals(c_token,"off$set"))
-	     c_token++;
+	if (almost_equals(c_token,"off$set")) {
+	    c_token++;
+	    get_position_default(&(timelabel.offset),character);
+	    continue;
+	}
+
+	if (equals(c_token,"font")) {
+	    c_token++;
+	    new = try_to_get_string();
+	    free(timelabel.font);
+	    timelabel.font = new;
+	    continue;
+	}
+
+	if (!got_format && ((new = try_to_get_string()))) {
+	    /* we have a format string */
+	    free(timelabel.text);
+	    timelabel.text = new;
+	    got_format = TRUE;
+	    continue;
+	}
+
+#ifdef BACKWARDS_COMPATIBLE
+	/* The "font" keyword is new (v4.1), for backward compatibility we don't enforce it */
+	if (!END_OF_COMMAND && ((new = try_to_get_string()))) {
+	    free(timelabel.font);
+	    timelabel.font = new;
+	    continue;
+	}
+	/* The "offset" keyword is new (v4.1); for backward compatibility we don't enforce it */
 	get_position_default(&(timelabel.offset),character);
+#endif
 
     }
+
+    if (!(timelabel.text))
+	timelabel.text = strdup(DEFAULT_TIMESTAMP_FORMAT);
+
 }
 
 
@@ -4114,99 +4122,41 @@ set_tic_prop(AXIS_INDEX axis)
 /* process a 'set {x/y/z}label command */
 /* set {x/y/z}label {label_text} {offset {x}{,y}} {<fontspec>} {<textcolor>} */
 static void
-set_xyzlabel(label_struct *label)
+set_xyzlabel(text_label *label)
 {
-    TBOOLEAN got_offsets = FALSE;
-    TBOOLEAN got_font = FALSE;
     char *text = NULL;
 
     c_token++;
     if (END_OF_COMMAND) {	/* no label specified */
-	*label->text = '\0';
+	free(label->text);
+	label->text = NULL;
 	return;
     }
 
-    /* FIXME - These tests wouldn't be needed if try_to_get_string() returned */
-    /* cleanly when the next token is a keyword rather than an expression.    */
-    if (!almost_equals(c_token, "f$ont")
-    &&  !almost_equals(c_token, "off$set")
-    &&  !almost_equals(c_token, "text$color") && !equals(c_token, "tc")
-    &&  !almost_equals(c_token, "enh$anced")
-    &&  !almost_equals(c_token, "noenh$anced")) {
+    parse_label_options(label);
 
-#ifdef GP_STRING_VARS
-	/* Protect against attempted string arithmetic triggered by */
-	/* old syntax  "set xlabel 'foo' -1,1" */
-	STRING_RESULT_ONLY = TRUE;
-	text = try_to_get_string();
-	STRING_RESULT_ONLY = FALSE;
-	if (text) {
-	    strncpy(label->text, text, MAX_LINE_LEN);
-	    free(text);
-	}
-	if (equals(c_token,","))
-	    c_token -= 2;
-#else
-	if (isstring(c_token)) {
-	    quote_str(label->text, c_token, MAX_LINE_LEN);
-	    c_token++;
-	}
-#endif
-    }
-
-    while (!END_OF_COMMAND) {
-
-	if (almost_equals(c_token, "f$ont"))  {
-	    ++c_token;
-	    if ((text = try_to_get_string())) {
-		strncpy(label->font,text,sizeof(label->font));
-		free(text);
-		got_font = TRUE;
-	    } else
-		int_error(c_token,"expecting font");
-	    continue;
-	}
-
+	if (!END_OF_COMMAND) {
+	    /* Protect against attempted string arithmetic triggered by */
+	    /* old syntax  "set xlabel 'foo' -1,1" */
+	    STRING_RESULT_ONLY = TRUE;
+	    text = try_to_get_string();
+	    STRING_RESULT_ONLY = FALSE;
+	    if (text) {
+		free(label->text);
+		label->text = text;
+ 	    }
+	    if (equals(c_token,","))
+		c_token -= 2;
 #ifdef BACKWARDS_COMPATIBLE
-	/* You didn't used to have to say "font" before giving a fontspec */
-	    if (!got_font && isstring(c_token)) {
-		int_warn(c_token,"deprecated syntax - please use 'font' keyword");
-		quote_str(label->font, c_token, MAX_LINE_LEN);
-		got_font = TRUE;
-		c_token++;
-	    continue;
+	    if (isanumber(c_token)) {
+		/* Parse offset with missing keyword "set xlabel 'foo' 1,2 "*/
+		get_position_default(&(label->offset),character);
 	    }
 #endif
-
-	/* EAM - allow set textcolor lt {<n> | rgb <foo>}, but not cb frac or z */
-	if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
-	    parse_colorspec( &(label->textcolor), TC_RGB );
-	    continue;
 	}
 
-	if (almost_equals(c_token,"noenh$anced")) {
-	    c_token++;
-	    label->noenhanced = TRUE;
-	    continue;
-	} else if (almost_equals(c_token,"enh$anced")) {
-	    c_token++;
-	    label->noenhanced = FALSE;
-	    continue;
-	}
+    parse_label_options(label);
 
-	if (almost_equals(c_token,"off$set")) {
-	    c_token++;
-	/* You didn't used to have to say "offset" before giving the values */
-	}
-	if (!got_offsets) {
-	    /* We have x,y offsets specified */
-	    get_position_default(&(label->offset),character);
-	    got_offsets = TRUE;
-	    continue;
-	}
-
-	int_error(c_token,"unexpected or unrecognized option");
-    }
 }
 
 
@@ -4699,6 +4649,7 @@ new_text_label(int tag)
     new->textcolor.type = TC_DEFAULT;
     new->lp_properties.pointflag = 0;
     new->offset = default_offset;
+    new->noenhanced = FALSE;
 
     return(new);
 }
@@ -4724,11 +4675,12 @@ parse_label_options( struct text_label *this_label )
     t_colorspec textcolor = {TC_DEFAULT,0,0.0};
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     loc_lp.pointflag = -2;
+    TBOOLEAN axis_label = (this_label->tag == -2);
 
    /* Now parse the label format and style options */
     while (!END_OF_COMMAND) {
 	/* get position */
-	if (! set_position && equals(c_token, "at")) {
+	if (! set_position && equals(c_token, "at") && !axis_label) {
 	    c_token++;
 	    get_position(&pos);
 	    set_position = TRUE;
@@ -4786,7 +4738,7 @@ parse_label_options( struct text_label *this_label )
 	}
 
 	/* get front/back (added by JDP) */
-	if (! set_layer) {
+	if (! set_layer && !axis_label) {
 	    if (equals(c_token, "back")) {
 		layer = 0;
 		c_token++;
@@ -4800,7 +4752,7 @@ parse_label_options( struct text_label *this_label )
 	    }
 	}
 
-	if (loc_lp.pointflag == -2) {
+	if (loc_lp.pointflag == -2 && !axis_label) {
 	    if (almost_equals(c_token, "po$int")) {
 		int stored_token = ++c_token;
 	    struct lp_style_type tmp_lp;
@@ -4834,6 +4786,18 @@ parse_label_options( struct text_label *this_label )
 	    continue;
 	}
 
+	/* EAM FIXME: Option to disable enhanced text processing currently not */
+	/* documented for ordinary labels. */
+	if (almost_equals(c_token,"noenh$anced")) {
+	    this_label->noenhanced = TRUE;
+	    c_token++;
+	    continue;
+	} else if (almost_equals(c_token,"enh$anced")) {
+	    this_label->noenhanced = FALSE;
+	    c_token++;
+	    continue;
+	}
+
 	/* Coming here means that none of the previous 'if's struck
 	 * its "continue" statement, i.e.  whatever is in the command
 	 * line is forbidden by the 'set label' command syntax.
@@ -4842,7 +4806,7 @@ parse_label_options( struct text_label *this_label )
 #ifdef GP_STRING_VARS
 	break;
 #else
-	if (this_label->tag == -1)
+	if (this_label->tag == -1 || this_label->tag == -2)
 	    break;
 	else
 	    int_error(c_token, "extraneous or contradicting arguments in label options");
@@ -4892,7 +4856,7 @@ parse_histogramstyle( histogram_style *hs,
 		int def_gap)
 {
     struct value a;
-    label_struct title_specs;
+    text_label title_specs;
 
     /* Set defaults */
     hs->type  = def_type;
@@ -4928,7 +4892,7 @@ parse_histogramstyle( histogram_style *hs,
 	    memcpy(&hs->title.textcolor,&title_specs.textcolor,sizeof(t_colorspec));
 	    hs->title.offset = title_specs.offset;
 	    /* EAM FIXME - could allocate space and copy parsed font instead */
-	    hs->title.font = &(axis_array[FIRST_X_AXIS].label.font[0]);
+	    hs->title.font = axis_array[FIRST_X_AXIS].label.font;
 	} else if ((equals(c_token,"lw") || almost_equals(c_token,"linew$idth"))
 		  && (hs->type == HT_ERRORBARS)) {
 	    c_token++;

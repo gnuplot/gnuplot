@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.326 2005/09/05 19:36:59 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.327 2005/09/08 16:44:47 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6330,6 +6330,7 @@ C ... and restart the table:
                  {left | center | right}
                  {norotate | rotate {by <degrees>}}
                  {font "<name>{,<size>}"}
+                 {noenhanced}
                  {front | back}
                  {textcolor <colorspec>}
                  {point <pointstyle> | nopoint}
@@ -6365,6 +6366,12 @@ C ... and restart the table:
  Font and its size can be chosen explicitly by `font "<name>{,<size>}"` if the
  terminal supports font settings.  Otherwise the default font of the terminal
  will be used.
+
+ Normally the enhanced text mode string interpretation, if enabled for the
+ current terminal, is applied to all text strings including label text.
+ The `noenhanced` property can be used to exempt a specific label from the
+ enhanced text mode processing.  The can be useful if the label contains
+ underscores, for example. See `enhanced text`.
 
  If `front` is given, the label is written on top of the graphed data. If
  `back` is given (the default), the label is written underneath the graphed
@@ -9403,6 +9410,7 @@ C ... and restart the table:
  Syntax:
        set xlabel {"<label>"} {offset <offset>} {font "<font>{,<size>}"}
                   {{textcolor | tc} {lt <line_type> | default}} {{no}enhanced}
+                  {rotate by <degrees>}
        show xlabel
 
  The same syntax applies to `x2label`, `ylabel`, `y2label`, `zlabel` and
@@ -9465,6 +9473,10 @@ C ... and restart the table:
 
  Note that double quotes must be used.  The same font will be used for both
  lines, of course.
+
+ The y and y2 axis labels can be explicitly rotated from their default
+ orientation, but this applies only to 2D plots and only on terminals
+ that support text rotation.
 
  If you are not satisfied with the default position of an axis label, use `set
  label` instead--that command gives you much more control over where text is

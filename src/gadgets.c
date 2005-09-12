@@ -91,10 +91,10 @@ struct arrowstyle_def *first_arrowstyle = NULL;
 struct arrow_def *first_arrow = NULL;
 
 /* 'set title' status */
-label_struct title = EMPTY_LABELSTRUCT;
+text_label title = EMPTY_LABELSTRUCT;
 
 /* 'set timelabel' status */
-label_struct timelabel = EMPTY_LABELSTRUCT;
+text_label timelabel = EMPTY_LABELSTRUCT;
 int timelabel_rotate = FALSE;
 int timelabel_bottom = TRUE;
 
@@ -505,6 +505,7 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	int justify = JUST_TOP;	/* This was the 2D default; 3D had CENTRE */
 
 	apply_pm3dcolor(&(this_label->textcolor),term);
+	ignore_enhanced(this_label->noenhanced);
 
 	get_offsets(this_label, term, &htic, &vtic);
 	if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
@@ -522,4 +523,6 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	    /* the default label color is that of border */
 	    term_apply_lp_properties(&border_lp);
 	}
+
+	ignore_enhanced(FALSE);
 }

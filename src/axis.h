@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.43 2005/08/05 15:48:32 mikulik Exp $
+ * $Id: axis.h,v 1.44 2005/08/07 09:43:27 mikulik Exp $
  *
  */
 
@@ -222,7 +222,7 @@ typedef struct axis {
     TBOOLEAN tic_in;		/* tics to be drawn inward?  */
 
 /* other miscellaneous fields */
-    label_struct label;		/* label string and position offsets */
+    text_label label;		/* label string and position offsets */
     lp_style_type zeroaxis;	/* drawing style for zeroaxis, if any */
 } AXIS;
 
@@ -278,7 +278,7 @@ extern const struct ticdef default_axis_ticdef;
 #define TIMEFMT "%d/%m/%y,%H:%M"
 
 /* axis labels */
-extern const label_struct default_axis_label;
+extern const text_label default_axis_label;
 
 /* zeroaxis linetype (flag type==-3 if none wanted) */
 extern const lp_style_type default_axis_zeroaxis;

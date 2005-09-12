@@ -94,7 +94,15 @@ typedef struct text_label {
     struct t_colorspec textcolor;
     struct lp_style_type lp_properties;
     struct position offset;
+    TBOOLEAN noenhanced;
 } text_label;
+
+/* This is the default state for the axis, timestamp, and plot title labels
+ * indicated by tag = -2 */
+#define EMPTY_LABELSTRUCT \
+    {NULL, -2, {character, character, character, 0.0, 0.0, 0.0}, CENTRE, 0, 0, \
+     NULL, NULL, {TC_LT, -1, 0.0}, DEFAULT_LP_STYLE_TYPE, \
+     {character, character, character, 0.0, 0.0, 0.0}, FALSE }
 
 /* Datastructure for implementing 'set arrow' */
 typedef struct arrow_def {
@@ -151,16 +159,6 @@ typedef enum en_key_sample_positioning {
     GPKEY_LEFT,
     GPKEY_RIGHT
 } t_key_sample_positioning;
-
-/* The data describing an axis label, or the plot title */
-typedef struct {
-    char text[MAX_LINE_LEN+1];
-    char font[MAX_LINE_LEN+1];
-    struct position offset;
-    struct t_colorspec textcolor;
-    TBOOLEAN noenhanced;	/* Don't apply enhanced text mode */
-} label_struct;
-#define EMPTY_LABELSTRUCT {"", "", {character, character, character, 0.0, 0.0, 0.0}, {0,0,0.0}, FALSE}
 
 typedef struct {
     int opt_given; /* option given / not given (otherwise default) */
@@ -273,9 +271,9 @@ extern struct linestyle_def *first_linestyle;
 
 extern struct arrowstyle_def *first_arrowstyle;
 
-extern label_struct title;
+extern text_label title;
 
-extern label_struct timelabel;
+extern text_label timelabel;
 #ifndef DEFAULT_TIMESTAMP_FORMAT
 /* asctime() format */
 # define DEFAULT_TIMESTAMP_FORMAT "%a %b %d %H:%M:%S %Y"

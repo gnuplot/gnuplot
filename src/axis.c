@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.51 2005/08/05 15:48:32 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.52 2005/08/07 09:43:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -125,7 +125,7 @@ const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE + 1] =
 const struct ticdef default_axis_ticdef = DEFAULT_AXIS_TICDEF;
 
 /* axis labels */
-const label_struct default_axis_label = EMPTY_LABELSTRUCT;
+const text_label default_axis_label = EMPTY_LABELSTRUCT;
 
 /* zeroaxis drawing */
 const lp_style_type default_axis_zeroaxis = DEFAULT_AXIS_ZEROAXIS;

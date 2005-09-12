@@ -1,3 +1,20 @@
+2005-09-12  Ethan Merritt  <merritt@u.washington.edu>
+
+
+	* src/axis.c src/axis.h src/color.c src/gadgets.c src/gadgets.c
+	src/graph3d.c src/graphics.c src/save.c src/set.c src/show.c src/term.c
+	src/unset.c:
+	Up till now gnuplot's axis labels, plot title, and timestamp have been
+	stored in statically allocated instances of struct label_struct.
+	All other labels use dynamically allocated struct text_label.
+	This set of changes converts all users of struct label_struct to use
+	stucture text_label instead. This saves space everywhere, and
+	consolidates the label parsing and handling routines.
+	
+	* docs/gnuplot.doc NEWS:
+	The y and y2 axis labels now allow explicit control over rotation angle;
+	all labels now allow explicit control over {no}enhanced text processing.
+
 2005-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.nt: Rearranged to comply with config.{h,cyg,mgw,os2}.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.164 2005/09/05 19:36:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.165 2005/09/05 19:44:14 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -135,7 +135,7 @@ static void show_tics __PROTO((TBOOLEAN showx, TBOOLEAN showy, TBOOLEAN showz, T
 static void show_mtics __PROTO((AXIS_INDEX));
 static void show_timestamp __PROTO((void));
 static void show_range __PROTO((AXIS_INDEX axis));
-static void show_xyzlabel __PROTO((const char *name, const char *suffix, label_struct * label));
+static void show_xyzlabel __PROTO((const char *name, const char *suffix, text_label * label));
 static void show_title __PROTO((void));
 static void show_axislabel __PROTO((AXIS_INDEX));
 static void show_data_is_timedate __PROTO((AXIS_INDEX));
@@ -1506,6 +1506,8 @@ show_label(int tag)
 		fprintf(stderr, " font \"%s\"", this_label->font);
 	    if (this_label->textcolor.type)
 		save_textcolor(stderr, &this_label->textcolor);
+	    if (this_label->noenhanced)
+		fprintf(stderr, " noenhanced");
 	    if (this_label->lp_properties.pointflag == 0)
 		fprintf(stderr, " nopoint");
 	    else {
@@ -2491,14 +2493,20 @@ show_range(AXIS_INDEX axis)
 
 /* called by the functions below */
 static void
-show_xyzlabel(const char *name, const char *suffix, label_struct *label)
+show_xyzlabel(const char *name, const char *suffix, text_label *label)
 {
-    fprintf(stderr, "\t%s%s is \"%s\", offset at ",
-	    name, suffix, conv_text(label->text));
-    show_position(&label->offset);
+    if (label) {
+	fprintf(stderr, "\t%s%s is \"%s\", offset at ", name, suffix,
+	    label->text ? conv_text(label->text) : "");
+	show_position(&label->offset);
+    } else
+	return;
 
-    if (label->font[0])
+    if (label->font)
 	fprintf(stderr, ", using font \"%s\"", conv_text(label->font));
+
+    if (label->rotate)
+	fprintf(stderr, ", rotated by %d degrees", label->rotate);
 
     if (label->textcolor.type)
 	save_textcolor(stderr, &label->textcolor);

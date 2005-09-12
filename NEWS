@@ -1,5 +1,7 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
+* NEW y and y2 axis label rotation can be explicitly controlled (2D plots only)
+* NEW {no}enhanced flag can be applied to individual labels
 * NEW suboption 'set pm3d interpolate' for bilinear interpolation of surfaces
 * NEW 3D plots can read RGB color triples as part of input data
 * NEW write command history file also for gnuplot's readline

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.57 2005/08/07 09:43:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.58 2005/08/22 16:37:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -610,7 +610,7 @@ draw_color_smooth_box(int plot_mode)
     }
 
     /* write the colour box label */
-    if (*CB_AXIS.label.text) {
+    if (CB_AXIS.label.text) {
 	int x, y;
 	apply_pm3dcolor(&(CB_AXIS.label.textcolor),term);
 	if (color_box.rotation == 'h') {

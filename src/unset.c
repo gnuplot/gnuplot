@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.86 2005/08/08 09:24:32 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.87 2005/08/12 08:31:56 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -144,7 +144,7 @@ static void unset_range __PROTO((AXIS_INDEX));
 static void unset_zeroaxis __PROTO((AXIS_INDEX));
 static void unset_all_zeroaxes __PROTO((void));
 
-static void unset_axislabel_or_title __PROTO((label_struct *));
+static void unset_axislabel_or_title __PROTO((text_label *));
 static void unset_axislabel __PROTO((AXIS_INDEX));
 
 /******** The 'unset' command ********/
@@ -1476,12 +1476,14 @@ unset_all_zeroaxes()
 
 /* process 'unset [xyz]{2}label command */
 static void
-unset_axislabel_or_title(label_struct *label)
+unset_axislabel_or_title(text_label *label)
 {
     struct position default_offset = { character, character, character, 
 				       0., 0., 0. };
-    strcpy(label->text, "");
-    strcpy(label->font, "");
+    free(label->text);
+    label->text = NULL;
+    free(label->font);
+    label->font = NULL;
     label->offset = default_offset;
     label->textcolor.type = TC_DEFAULT;
 }
@@ -1490,6 +1492,8 @@ static void
 unset_axislabel(AXIS_INDEX axis)
 {
     axis_array[axis].label = default_axis_label;
+    if (axis == FIRST_Y_AXIS || axis == SECOND_Y_AXIS)
+	axis_array[axis].label.rotate = TEXT_VERTICAL;
 }
 
 /******** The 'reset' command ********/
