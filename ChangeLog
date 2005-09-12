@@ -1,6 +1,10 @@
+2005-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.nt: Rearranged to comply with config.{h,cyg,mgw,os2}.
+
 2005-09-11  Ethan Merritt  <merritt@u.washington.edu>
 
-        * src/save.c (save_set_all): Fix incorrect placement of newlines
+	* src/save.c (save_set_all): Fix incorrect placement of newlines
 	in "set pm3d" options.
 
 2005-09-09  Lars Hecking  <lhecking@users.sourceforge.net>
@@ -102,7 +106,7 @@
 	
 2005-08-22  Ethan Merritt  <merritt@u.washington.edu>
 
-        * src/color.c src/color.h: New routine set_rgbcolor().
+	* src/color.c src/color.h: New routine set_rgbcolor().
 
 	* src/misc.c (parse_colorspec) src/graph3d.c: Allow color
 	specification "rgb variable", in which case the RGB color is taken
