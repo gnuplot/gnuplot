@@ -1,5 +1,9 @@
-2005-09-12  Ethan Merritt  <merritt@u.washington.edu>
+2005-09-14  Ethan Merritt  <merritt@u.washington.edu>
 
+	* docs/gnuplot.doc: The histogram plot style was not being listed as an
+	option under 'help plotting styles'.
+
+2005-09-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/color.c src/gadgets.c src/gadgets.c
 	src/graph3d.c src/graphics.c src/save.c src/set.c src/show.c src/term.c
