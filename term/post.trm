@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.163 2005/07/24 00:28:55 sfeam Exp $
+ * $Id: post.trm,v 1.164 2005/08/07 09:43:34 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1031,11 +1031,9 @@ PS_options()
 	case PS_DEFAULT:
 	    switch (ps_params->terminal) {
 	    case PSTERM_POSTSCRIPT:
-		while (ps_params->first_fontfile != NULL) {
+		while (ps_params->first_fontfile != NULL)
 		    delete_ps_fontfile((struct ps_fontfile_def *) NULL,
 				       ps_params->first_fontfile);
-		    ps_params->first_fontfile = NULL;
-		}
 		*ps_params = post_params_default;
 		break;
 	    case PSTERM_EPSLATEX:
@@ -1339,11 +1337,9 @@ PS_options()
 	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
-	    while (ps_params->first_fontfile != NULL) {
+	    while (ps_params->first_fontfile != NULL)
 		delete_ps_fontfile((struct ps_fontfile_def *) NULL,
 				   ps_params->first_fontfile);
-		ps_params->first_fontfile = NULL;
-	    }
 	    ++c_token;
 	    break;
 	case PS_PALFUNCPARAM:
@@ -1492,6 +1488,8 @@ PS_options()
 	sprintf(tmp_term_options,"%g ",ps_params->fontsize);
     else
 	tmp_term_options[0]='\0';
+    if (ps_fontfile_char)
+	free(ps_fontfile_char);
 
     strcat(term_options,tmp_term_options);
 }
@@ -3479,6 +3477,8 @@ static void
 delete_ps_fontfile(struct ps_fontfile_def *prev, struct ps_fontfile_def *this)
 {
     if (this != NULL) {		/* there really is something to delete */
+	FPRINTF((stderr, "Remove font/kerning file `%s'\n",
+		 this->fontfile_name));
 	if (prev != NULL)	/* there is a previous ps_fontfile */
 	    prev->next = this->next;
 	else			/* this = ps_params->first_fontfile */
@@ -4239,7 +4239,8 @@ START_HELP(post)
 "       set terminal postscript {landscape | portrait | eps}",
 "                               {enhanced | noenhanced}",
 "                               {defaultplex | simplex | duplex}",
-"                               {fontfile [add | delete] \"<filename>\"}",
+"                               {fontfile [add | delete] \"<filename>\"",
+"                                | nofontfiles}",
 PS_COMMON_OPTS1
 PS_COMMON_OPTS2
 "",
@@ -4273,11 +4274,11 @@ PS_COMMON_OPTS2
 PS_COMMON_DOC1
 " Fonts listed by `fontfile` or `fontfile add` encapsulate the font",
 " definitions of the listed font from a postscript Type 1 or TrueType font",
-" file directly into the gnuplot output postscript file. Thus, the enclosed",
-" font can be used in labels, titles, etc. See the section",
-" `postscript fontfile` for more details.",
-" With `fontfile delete` a fontfile is deleted from the list of embedded",
-" files.",
+" file directly into the gnuplot output postscript file.  Thus, the enclosed",
+" font can be used in labels, titles, etc.  See the section",
+" `postscript fontfile` for more details.  With `fontfile delete`, a fontfile",
+" is deleted from the list of embedded files.  `nofontfiles` cleans the list",
+" of embedded fonts.",
 "",
 " Examples:",
 "       set terminal postscript default       # old postscript",
@@ -4458,7 +4459,7 @@ PS_COMMON_DOC1
 " Type 1 fonts in binary file format (extension \".pfb\"), and TrueType",
 " fonts (extension \".ttf\"). Pfa files are understood directly, pfb and ttf",
 " files are converted on the fly if appropriate conversion tools are",
-" installed (see below). You have to specify the full filename with the",
+" installed (see below). You have to specify the full filename including the",
 " extension. Each `fontfile` option takes exact one font file name. This",
 " option can be used multiple times in order to include more than one font",
 " file.",
@@ -4488,15 +4489,19 @@ PS_COMMON_DOC1
 " use with gnuplot, start gnuplot in interactive mode and type in",
 " \"set terminal postscript fontfile '<filename.ttf>'\".",
 "",
-" For converting font files to pfa format the conversion tool has to read",
-" the font from a file and write it to standard output.",
+" For converting font files (either ttf or pfb) to pfa format, the conversion",
+" tool has to read the font from a file and write it to standard output. If",
+" the output cannot be written to standard output, on-the-fly conversion is",
+" not possible.",
+"",
 " For pfb files \"pfbtops\" is a tool which can do this. If this program",
 " is installed on your system the on the fly conversion should work.",
 " Just try to encapsulate a pfb file. If the compiled in program call does",
 " not work correctly you can specify how this program is called by",
 " defining the environment variable GNUPLOT_PFBTOPFA e.g. to",
-" \"pfbtops %s\". The `%s` will be repeated by the font file name and thus",
+" \"pfbtops %s\". The `%s` will be replaced by the font file name and thus",
 " has to exist in the string.",
+"",
 " If you don't want to do the conversion on the fly but get a pfa file of",
 " the font you can use the tool \"pfb2pfa\" which is written in simple c",
 " and should compile with any c compiler.",

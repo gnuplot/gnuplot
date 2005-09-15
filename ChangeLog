@@ -1,3 +1,9 @@
+2005-09-15  Harald Harders  <h.harders@tu-bs.de>
+
+	* src/variable.c term/post.trm (PS_options, documentation):
+	Fix bugs in fontfile handling of ps terminal. Document "nofontfiles".
+	SourceForge patch #1269469.
+
 2005-09-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/html/Makefile demo/html/index.save: Add rgb_variable.dem to the
