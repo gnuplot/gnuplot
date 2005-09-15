@@ -101,7 +101,7 @@ typedef struct text_label {
  * indicated by tag = -2 */
 #define EMPTY_LABELSTRUCT \
     {NULL, -2, {character, character, character, 0.0, 0.0, 0.0}, CENTRE, 0, 0, \
-     NULL, NULL, {TC_LT, -1, 0.0}, DEFAULT_LP_STYLE_TYPE, \
+     NULL, NULL, {TC_LT, -2, 0.0}, DEFAULT_LP_STYLE_TYPE, \
      {character, character, character, 0.0, 0.0, 0.0}, FALSE }
 
 /* Datastructure for implementing 'set arrow' */

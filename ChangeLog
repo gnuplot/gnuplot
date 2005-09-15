@@ -6,6 +6,8 @@
 	
 	* demo/all.dem: Add rainbow.dem and rgb_variable.dem
 
+	* src/gadgets.h: Initialize axis labels to use linetype -1, not 0.
+
 2005-09-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: The histogram plot style was not being listed as an
