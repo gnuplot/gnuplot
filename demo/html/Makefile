@@ -12,7 +12,7 @@ GNUPLOT_LIB = ..
 # Several of the demos need manual intervention:
 #	fontfile vector multiplt epslatex
 #
-html: airfoil.html arrowstyle.html binary.html bivariat.html candlesticks.html contours.html controls.html datastrings.html discrete.html electron.html enhancedtext.html epslatex.html fillbetween.html fillcrvs.html fillstyle.html finance.html fit.html hidden.html histograms.html histograms2.html image.html index.html key.html layout.html mgr.html multimsh.html multiplt.html param.html pm3dcolors.html pm3d.html pm3dgamma.html pointsize.html polar.html poldat.html prob2.html prob.html rainbow.html random.html scatter.html simple.html singulr.html spline.html steps.html surface1.html surface2.html textcolor.html textrotate.html tics.html timedat.html using.html vector.html world.html world2.html
+html: airfoil.html arrowstyle.html binary.html bivariat.html candlesticks.html contours.html controls.html datastrings.html discrete.html electron.html enhancedtext.html epslatex.html fillbetween.html fillcrvs.html fillstyle.html finance.html fit.html hidden.html histograms.html histograms2.html image.html index.html key.html layout.html mgr.html multimsh.html multiplt.html param.html pm3dcolors.html pm3d.html pm3dgamma.html pointsize.html polar.html poldat.html prob2.html prob.html rainbow.html random.html rgb_variable.html scatter.html simple.html singulr.html spline.html steps.html surface1.html surface2.html textcolor.html textrotate.html tics.html timedat.html using.html vector.html world.html world2.html dashcolor.html 
 
 index.html: index.save
 	cp index.save index.html
@@ -25,6 +25,13 @@ finance.html: $(GNUPLOT_LIB)/finance.dem ./webify.pl
 
 multiplt.html: $(GNUPLOT_LIB)/multiplt.dem ./webify.pl
 	export DEMOTERM="png enhanced transparent font arial 8 size 610,480"; ./webify.pl multiplt
+
+# The png terminal does not support dashed lines, so we create an eps file and convert it.
+# Do this one last, so that if conversion fails everything else has already been done.
+dashcolor.html: $(GNUPLOT_LIB)/dashcolor.dem ./webify.pl
+	export DEMOTERM="post eps color dash dashlength 3 font 'Helvetica' 16"; ./webify.pl dashcolor
+	mv dashcolor.1.png dashcolor.1.eps
+	convert -density 100 dashcolor.1.eps dashcolor.1.png
 
 %.html: $(GNUPLOT_LIB)/%.dem ./webify.pl
 	./webify.pl $*
