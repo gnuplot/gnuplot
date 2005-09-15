@@ -235,22 +235,6 @@ clip_put_text(unsigned int x, unsigned y, char *str)
     (*t->put_text) (x, y, str);
 }
 
-/* seems sensible to put the justification in here too..? */
-void
-clip_put_text_just(
-    unsigned int x, unsigned int y,
-    char *str,
-    JUSTIFY just,
-    VERT_JUSTIFY vert_just,
-    char *font)
-{
-    if (clip_point(x, y))
-	return;
-
-    write_multiline(x, y, str, just, vert_just, 0, font);
-}
-
-
 
 /* Clip the given line to drawing coords defined as xleft,xright,ybot,ytop.
  *   This routine uses the cohen & sutherland bit mapping for fast clipping -

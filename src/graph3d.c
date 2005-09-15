@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.128 2005/08/22 16:37:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.129 2005/09/12 23:51:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2505,6 +2505,8 @@ xtick_callback(
     if (text) {
 	int just;
 	unsigned int x2, y2;
+	int angle;
+
 	/* get offset */
 	int offsetx, offsety;
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
@@ -2525,9 +2527,12 @@ xtick_callback(
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
-	clip_put_text_just(x2+offsetx, y2+offsety, text,
-			   just, JUST_TOP,
-			   axis_array[axis].ticdef.font);
+	angle = axis_array[axis].tic_rotate;
+	if (!(splot_map && angle && term->text_angle(angle)))
+	    angle = 0;
+	write_multiline(x2+offsetx, y2+offsety, text, just, JUST_TOP,
+			    angle, axis_array[axis].ticdef.font);
+	term->text_angle(0);
 	term_apply_lp_properties(&border_lp);
     }
 
@@ -2577,6 +2582,8 @@ ytick_callback(
     if (text) {
 	int just;
 	unsigned int x2, y2;
+	int angle;
+
 	/* get offset */
 	int offsetx, offsety;
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
@@ -2598,9 +2605,12 @@ ytick_callback(
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	TERMCOORD(&v2, x2, y2);
-	clip_put_text_just(x2+offsetx, y2+offsety, text,
-			   just, JUST_TOP,
-			   axis_array[axis].ticdef.font);
+	angle = axis_array[axis].tic_rotate;
+	if (!(splot_map && angle && term->text_angle(angle)))
+	    angle = 0;
+	write_multiline(x2+offsetx, y2+offsety, text, just, JUST_TOP,
+			angle, axis_array[axis].ticdef.font);
+	term->text_angle(0);
 	term_apply_lp_properties(&border_lp);
     }
 
@@ -2655,9 +2665,8 @@ ztick_callback(
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
-	clip_put_text_just(x1+offsetx, y1+offsety, text,
-			   RIGHT, JUST_CENTRE,
-			   axis_array[axis].ticdef.font);
+	write_multiline(x1+offsetx, y1+offsety, text, RIGHT, JUST_CENTRE,
+			0, axis_array[axis].ticdef.font);
 	term_apply_lp_properties(&border_lp);
     }
 

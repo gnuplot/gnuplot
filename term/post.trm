@@ -3895,7 +3895,7 @@ TERM_TABLE_START(post_driver)
     PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
     PS_linetype, PS_put_text, PS_text_angle, 
     PS_justify_text, PS_point, PS_arrow, PS_set_font, PS_pointsize,
-    TERM_BINARY|TERM_IS_POSTSCRIPT /*flags*/, 
+    TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP /*flags*/, 
     0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support for postscript */

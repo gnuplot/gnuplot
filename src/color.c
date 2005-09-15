@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.58 2005/08/22 16:37:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.59 2005/09/12 23:51:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -443,27 +443,15 @@ cbtick_callback(
 	    int y3 = cb_y_from - (term->v_char);
 	    if (len > 0) y3 -= len; /* add outer tics len */
 	    if (y3<0) y3 = 0;
-#if 1
 	    if (term->justify_text)
 		term->justify_text(CENTRE);
 	    (*term->put_text)(x2+offsetx, y3+offsety, text);
-#else /* clipping does not work properly for text around 3d graph */
-	    clip_put_text_just(x2+offsetx, y3+offsety, text, 
-			       CENTRE, JUST_TOP,
-			       axis_array[axis].ticdef.font);
-#endif
 	} else {
 	    unsigned int x3 = cb_x_to + (term->h_char);
 	    if (len > 0) x3 += len; /* add outer tics len */
-#if 1
 	    if (term->justify_text)
 		term->justify_text(LEFT);
 	    (*term->put_text)(x3+offsetx, y2+offsety, text);
-#else /* clipping does not work properly for text around 3d graph */
-	    clip_put_text_just(x3+offsetx, y2+offsety, text, 
-			       LEFT, JUST_CENTRE,
-			       axis_array[axis].ticdef.font);
-#endif
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
     }

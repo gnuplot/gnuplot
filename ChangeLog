@@ -1,3 +1,25 @@
+2005-09-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (write_multiline, on_page): New routine on_page(x,y) to
+	check coordinates for being in range of entire terminal drawing area.
+	Use this in write_multiline() to centralize text clipping (may extend
+	it to single line text later). Fixes bug #1274007 and a lot of old
+	complaints about segfaults in libpdf.
+
+	* src/term_api.h term/post.trm: But some terminals can clip text just
+	fine on their own, and do it more cleanly than on_page() can do. Define
+	a terminal flag TERM_CAN_CLIP for these cases, starting with post.trm.
+	If the flag is set for the current terminal, on_page() always returns
+	TRUE.
+
+	* src/graph3d.c (xtick_callback ytick_callback ztick_callback):
+	Since write_multiline() now does its own clipping, it does not need to
+	be wrapped by clip_put_text_just(). While we're here, apply text
+	rotation for tic labels.
+
+	* src/gadgets.c src/gadgets.h src/color.c: This leaves no callers for
+	clip_put_text_just(), so remove the routine altogether.
+
 2005-09-15  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/variable.c term/post.trm (PS_options, documentation):

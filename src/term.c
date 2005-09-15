@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.120 2005/08/07 09:43:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.121 2005/09/12 23:51:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -223,6 +223,7 @@ static void enh_err_check __PROTO((const char *str));
 /* note: c is char, but must be declared int due to K&R compatibility. */
 static void do_enh_writec __PROTO((int c));
 
+static TBOOLEAN on_page __PROTO((int x, int y));
 
 /*
  * Bookkeeping and support routine for 'set multiplot layout <rows>, <cols>'
@@ -962,13 +963,18 @@ write_multiline(
             *p = 0;             /* terminate the string */
 
         if ((*t->justify_text) (hor)) {
-            (*t->put_text) (x, y, text);
+	    if (on_page(x, y))
+        	(*t->put_text) (x, y, text);
         } else {
 	    int fix = hor * t->h_char * estimate_strlen(text) / 2;
-            if (angle)
-                (*t->put_text) (x, y - fix, text);
-            else
-                (*t->put_text) (x - fix, y, text);
+            if (angle) {
+		if (on_page(x, y - fix))
+		    (*t->put_text) (x, y - fix, text);
+	    }
+            else {
+		if (on_page(x - fix, y))
+		    (*t->put_text) (x - fix, y, text);
+	    }
         }
         if (angle == TEXT_VERTICAL)
             x += t->v_char;
@@ -2645,4 +2651,21 @@ ignore_enhanced(TBOOLEAN flag)
             term->set_font("");
     }
     ignore_enhanced_text = flag;
+}
+
+/* Simple-minded test for whether the point (x,y) is in bounds for the current terminal.
+ * Some terminals can do their own clipping, and can clip partial objects.
+ * If the flag TERM_CAN_CLIP is set, we skip this relative crude test and let the
+ * driver or the hardware handle clipping.
+ */
+TBOOLEAN
+on_page(int x, int y)
+{
+    if (term->flags & TERM_CAN_CLIP)
+	return TRUE;
+
+    if ((0 < x && x < term->xmax) && (0 < y && y < term->ymax))
+	return TRUE;
+
+    return FALSE;
 }

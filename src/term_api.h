@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.47 2005/08/01 09:00:49 mikulik Exp $
+ * $Id: term_api.h,v 1.48 2005/08/07 09:43:31 mikulik Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -76,6 +76,8 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
     /* ... more to come ? */
 } lp_style_type;
 
+#define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0, FALSE, DEFAULT_COLORSPEC}
+
 typedef enum e_arrow_head {
 	NOHEAD = 0,
 	END_HEAD,
@@ -109,8 +111,6 @@ typedef enum termlayer {
 
 #define L_TYPE_NODRAW -3	/* use if line is not to be drawn */
 
-#define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0, FALSE, DEFAULT_COLORSPEC}
-
 typedef struct fill_style_type {
     int fillstyle;
     int filldensity;
@@ -142,6 +142,7 @@ typedef enum t_imagecolor { IC_PALETTE, IC_RGB }
 #define TERM_IS_POSTSCRIPT   16  /* post, next, pslatex, etc        */
 #define TERM_ENHANCED_TEXT   32  /* enhanced text mode is enabled   */
 #define TERM_NO_OUTPUTFILE   64  /* terminal doesnt write to a file */
+#define TERM_CAN_CLIP       128  /* terminal does its own clipping  */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *
