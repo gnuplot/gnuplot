@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.128 2005/08/07 09:43:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.129 2005/09/05 19:42:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2627,11 +2627,15 @@ call_kill_pending_Pause_dialog()
  * Replace the characters @<varname> with the contents of the string.
  * Anything inside quotes is not expanded.
  */
+
+#define COPY_CHAR gp_input_line[o++] = *c; \
+                  after_backslash = FALSE;
 static int
 string_expand()
 {
     TBOOLEAN in_squote = FALSE;
     TBOOLEAN in_dquote = FALSE;
+    TBOOLEAN after_backslash = FALSE;
     TBOOLEAN in_comment= FALSE;
     int   len;
     int   o = 0;
@@ -2675,21 +2679,26 @@ string_expand()
 		    }
 		    *c-- = temp_char;
 		} else
-		    gp_input_line[o++] = *c;
+		    COPY_CHAR;
 		break;
 
 	case '"':	
-		in_dquote = !in_dquote;
-		gp_input_line[o++] = *c; break;
+                if (!after_backslash)
+		    in_dquote = !in_dquote;
+		COPY_CHAR; break;
 	case '\'':	
 		in_squote = !in_squote;
-		gp_input_line[o++] = *c; break;
+		COPY_CHAR; break;
+        case '\\':
+                if (in_dquote)
+                    after_backslash = !after_backslash;
+                gp_input_line[o++] = *c; break;
 	case '#':
 		if (!in_squote && !in_dquote)
 		    in_comment = TRUE;
 	default :	
-		gp_input_line[o++] = *c; break;
-	}	
+	        COPY_CHAR; break;
+	}
     }
     gp_input_line[o] = '\0';
     free(temp_string);

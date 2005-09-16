@@ -1,3 +1,8 @@
+2005-09-16  Juergen Wieferink  <wieferink@freenet.de>
+
+        * src/command.c (string_expand):  Fix bug in macro handling; escaped
+	quotes were not recognized.
+
 2005-09-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (draw_3d_graphbox): Treat placement of Z-axis label in
