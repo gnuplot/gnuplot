@@ -1,3 +1,8 @@
+2005-09-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (draw_3d_graphbox): Treat placement of Z-axis label in
+	the same way as those for the X and Y axes.
+
 2005-09-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (write_multiline, on_page): New routine on_page(x,y) to

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.129 2005/09/12 23:51:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.130 2005/09/16 03:20:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2445,10 +2445,16 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	    )
 	) {
 	int tmpx, tmpy;
-	map3d_xy(zaxis_x, zaxis_y,
-		 Z_AXIS.max
-		 + (Z_AXIS.max - base_z) / 4,
-		 &x, &y);
+	vertex v1;
+	int h_just = CENTRE;
+	int v_just = JUST_TOP;
+	double other_end = X_AXIS.min + X_AXIS.max - zaxis_x;
+	double mid_z = (Z_AXIS.max + Z_AXIS.min) / 2.;
+	double step = (other_end - zaxis_x) / 4.;
+	
+	map3d_xyz(zaxis_x - step, zaxis_y, mid_z, &v1);
+
+	TERMCOORD(&v1, x, y);
 
 	map3d_position_r(&(Z_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
 	x += tmpx;
@@ -2457,7 +2463,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	ignore_enhanced(Z_AXIS.label.noenhanced);
 	apply_pm3dcolor(&(Z_AXIS.label.textcolor),t);
 	write_multiline(x, y, Z_AXIS.label.text,
-			CENTRE, CENTRE, 0,
+			h_just, v_just, 0,
 			Z_AXIS.label.font);
 	reset_textcolor(&(Z_AXIS.label.textcolor),t);
 	ignore_enhanced(FALSE);

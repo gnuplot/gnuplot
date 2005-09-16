@@ -37,6 +37,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW plot style "with points" can read variable point size from input file
 * NEW "set tics" can change most settings for {x|y|z|cb}tics at once
 * NEW tic scale can be set per axis using "set {x|y|z|cb}tics scale"
+* CHANGE Placement of z-axis label in 3D plots is now equivalent to x and y axes
 * CHANGE "set ticsscale" is deprecated, use "set tics scale" instead
 * CHANGE gnuplot on x11 has mousing always enabled on startup
 * CHANGE 'set datafile fortran' is now required in order to read D or Q constants
