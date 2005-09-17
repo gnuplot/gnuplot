@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.166 2005/09/08 17:47:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.167 2005/09/12 23:51:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2495,8 +2495,6 @@ plot_histeps(struct curve_points *plot)
 	return;			/* cannot plot less than 2 points */
 
     gl = gp_alloc(goodcount * sizeof(int), "histeps valid point mapping");
-    if (gl == NULL)
-	return;
 
     /* fill gl array with indexes of valid (non-undefined) points.  */
     goodcount = 0;
@@ -5087,7 +5085,7 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	    array_size *= 3;
 	}
 
-	image = (coordval *) malloc(array_size*sizeof(image[0]));
+	image = (coordval *) gp_alloc(array_size*sizeof(image[0]),"image");
 
 	/* Place points into image array based upon the arrangement of point indices and
 	 * the visibility of pixels.
