@@ -1,5 +1,18 @@
 2005-09-17  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/axis.c (gen_tics add_tic_user) src/axis.h src/save.c (save_tics)
+	src/setc.c (set_tic_prop load_tic_user load_tic_series)
+	src/show.c (show_ticdef) src/unset.c (unset_tics) docs/gnuplot.doc:
+
+	Sourceforge patchset #1104018.
+	Allow both user-specified axis tics and auto-generated tics at the
+	same time.  No change to basic syntax or behaviour of tics, but the
+	extra key word "add" in a "set [xuz]tics ..." command causes the
+	requested tics to be added to the current ones rather than replacing
+	them.
+
+2005-09-17  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/graphics.c (plot_image_or_update_axes): Use gp_alloc rather
 	than malloc. Bug #1254314.
 

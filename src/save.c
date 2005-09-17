@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.120 2005/09/11 23:41:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.121 2005/09/12 23:51:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -909,32 +909,36 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 			     axis);
 	}
 	break;
-
-    case TIC_USER:{
-	    struct ticmark *t;
-	    fputs(" (", fp);
-	    for (t = axis_array[axis].ticdef.def.user;
-		 t != NULL; t = t->next) {
-		if (t->label)
-		    fprintf(fp, "\"%s\" ", conv_text(t->label));
-		SAVE_NUM_OR_TIME(fp, (double) t->position, axis);
-		if (t->level)
-		    fprintf(fp, " %d", t->level);
-		if (t->next) {
-		    fputs(", ", fp);
-		}
-	    }
-	    fputs(")", fp);
-	    break;
-	}
+    case TIC_USER:
+	break;
     }
 
-    if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font) {
+    if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font)
         fprintf(fp, " font \"%s\"", axis_array[axis].ticdef.font);
-    }
-    if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT) {
-        fprintf(fp, " textcolor lt %d", axis_array[axis].ticdef.textcolor.lt+1);    }
+
+    if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
+        fprintf(fp, " textcolor lt %d", axis_array[axis].ticdef.textcolor.lt+1);
+
     putc('\n', fp);
+
+    if (axis_array[axis].ticdef.def.user) { 
+	struct ticmark *t;
+	fprintf(fp, "set %stics %s ", axis_defaults[axis].name,
+		(axis_array[axis].ticdef.type == TIC_USER) ? "" : "add");
+	fputs(" (", fp);
+	for (t = axis_array[axis].ticdef.def.user; t != NULL; t = t->next) {
+	    if (t->label)
+		fprintf(fp, "\"%s\" ", conv_text(t->label));
+	    SAVE_NUM_OR_TIME(fp, (double) t->position, axis);
+	    if (t->level)
+		fprintf(fp, " %d", t->level);
+	    if (t->next) {
+		fputs(", ", fp);
+	    }
+	}
+	fputs(")\n", fp);
+    }
+
 }
 
 static void

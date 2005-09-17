@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.200 2005/09/05 19:36:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.201 2005/09/12 23:51:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3959,6 +3959,7 @@ set_tic_prop(AXIS_INDEX axis)
 
     if (almost_equals(c_token, cmdptr)) {
 	TBOOLEAN axisset = FALSE;
+	axis_array[axis].ticdef.def.mix = FALSE;
 	match = 1;
 	++c_token;
 	do {
@@ -4036,11 +4037,14 @@ set_tic_prop(AXIS_INDEX axis)
 	    } else if (almost_equals(c_token, "au$tofreq")) {
 		/* auto tic interval */
 		++c_token;
-		if (axis_array[axis].ticdef.type == TIC_USER) {
+		if (!axis_array[axis].ticdef.def.mix) {
 		    free_marklist(axis_array[axis].ticdef.def.user);
 		    axis_array[axis].ticdef.def.user = NULL;
 		}
 		axis_array[axis].ticdef.type = TIC_COMPUTED;
+	    } else if (equals(c_token,"add")) {
+		++c_token;
+		axis_array[axis].ticdef.def.mix = TRUE;
 	    } else if (!END_OF_COMMAND) {
 		load_tics(axis);
 	    }
@@ -4065,7 +4069,7 @@ set_tic_prop(AXIS_INDEX axis)
 
     (void) strcpy(sfxptr, "m$tics");	/* MONTH */
     if (almost_equals(c_token, cmdptr)) {
-	if (axis_array[axis].ticdef.type == TIC_USER) {
+	if (!axis_array[axis].ticdef.def.mix) {
 	    free_marklist(axis_array[axis].ticdef.def.user);
 	    axis_array[axis].ticdef.def.user = NULL;
 	}
@@ -4081,7 +4085,7 @@ set_tic_prop(AXIS_INDEX axis)
     (void) strcpy(sfxptr, "d$tics");	/* DAYS */
     if (almost_equals(c_token, cmdptr)) {
 	match = 1;
-	if (axis_array[axis].ticdef.type == TIC_USER) {
+	if (!axis_array[axis].ticdef.def.mix) {
 	    free_marklist(axis_array[axis].ticdef.def.user);
 	    axis_array[axis].ticdef.def.user = NULL;
 	}
@@ -4359,11 +4363,10 @@ load_tic_user(AXIS_INDEX axis)
     double ticposition;
 
     /* Free any old tic labels */
-    if (axis_array[axis].ticdef.type == TIC_USER)
+    if (!axis_array[axis].ticdef.def.mix) {
 	free_marklist(axis_array[axis].ticdef.def.user);
-
-    axis_array[axis].ticdef.type = TIC_USER;
-    axis_array[axis].ticdef.def.user = NULL;
+	axis_array[axis].ticdef.def.user = NULL;
+    }
 
     while (!END_OF_COMMAND) {
       int ticlevel=0;
@@ -4466,9 +4469,7 @@ load_tic_series(AXIS_INDEX axis)
 	}
     }
 
-    if (tdef->type == TIC_USER) {
-	/* remove old list */
-	/* VAX Optimiser was stuffing up following line. Turn Optimiser OFF */
+    if (!tdef->def.mix) { /* remove old list */
 	free_marklist(tdef->def.user);
 	tdef->def.user = NULL;
     }

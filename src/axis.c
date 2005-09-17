@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.52 2005/08/07 09:43:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.53 2005/09/12 23:51:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -836,8 +836,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	mgrd.l_type = L_TYPE_NODRAW;
 
 
-    if (def->type == TIC_USER) {	/* special case */
-	/* {{{  do user tics then return */
+    if (def->def.user) {	/* user-defined tic entries */
 	struct ticmark *mark = def->def.user;
 	double uncertain = (axis_array[axis].max - axis_array[axis].min) / 10;
 	double internal_min = axis_array[axis].min - SIGNIF * uncertain;
@@ -870,9 +869,8 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    /* use NULL instead of label for minitic */
 	    (*callback) (axis, internal, mark->level?NULL:label, lgrd);
 	}
-
-	return;
-	/* }}} */
+	if (def->type == TIC_USER)
+	    return;
     }
 
     /* series-tics
@@ -1621,11 +1619,10 @@ add_tic_user(AXIS_INDEX axis, char *label, double position, int level)
     struct ticmark *tic, *newtic;
     struct ticmark listhead;
 
-    /* Make sure this axis is marked as having user tics */
-    if (axis_array[axis].ticdef.type != TIC_USER) {
+    /* Mark this axis as user-generated ticmarks only, unless the */
+    /* mix flag indicates that both user- and auto- tics are OK.  */
+    if (!axis_array[axis].ticdef.def.mix)
 	axis_array[axis].ticdef.type = TIC_USER;
-	axis_array[axis].ticdef.def.user = NULL;
-    }
 
     /* Walk along list to sorted positional order */
     listhead.next = axis_array[axis].ticdef.def.user;

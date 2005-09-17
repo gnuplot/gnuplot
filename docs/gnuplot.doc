@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.328 2005/09/12 23:51:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.329 2005/09/14 23:24:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6877,9 +6877,27 @@ C ... and restart the table:
  8, 9 between 1 and 10, for example) are obtained by setting <freq> to 10,
  even though there are but nine sub-intervals.
 
- Minor tics can be used only with uniformly spaced major tics.  Since major
- tics can be placed arbitrarily by `set {x|x2|y|y2|z}tics`, minor tics cannot
- be used if major tics are explicitly `set`.
+ To set minor tics at arbitrary positions, use the ("<label>" <pos> <level>,
+ ...) form of `set {x|x2|y|y2|z}tics` with <label> empty and <level> set to 1.
+
+ The `set m{x|x2|y|y2|z}tics` commands work only when there are uniformly
+ spaced major tics.  If all major tics were placed explicitly by
+ `set {x|x2|y|y2|z}tics`, then minor tic commands are ignored.  Implicit
+ major tics and explicit minor tics can be combined using
+ `set {x|x2|y|y2|z}tics` and `set {x|x2|y|y2|z}tics add`.
+
+ Examples:
+       set xtics 0, 5, 10
+       set xtics add (7.5)
+       set mxtics 5
+ Major tics at 0,5,7.5,10, minor tics at 1,2,3,4,6,7,8,9
+       set logscale y
+       set format y ""
+       set ytics 1e-6, 10, 1
+       set ytics add ("1" 1, ".1" 0.1, ".01" 0.01, "10^-3" 0.001, \
+                      "10^-4" 0.0001)
+       set mytics 10
+ Major tics with special formatting, minor tics at log positions
 
  By default, minor tics are off for linear axes and on for logarithmic axes.
  They inherit the settings for `axis|border` and `{no}mirror` specified for
@@ -9606,6 +9624,7 @@ C ... and restart the table:
        set xtics {axis | border} {{no}mirror}
                  {in | out} {scale {default | <major> {,<minor>}}}
                  {{no}rotate {by <ang>}} {offset <offset> | nooffset}
+                 {add}
                  {  autofreq
                   | <incr>
                   | <start>, <incr> {,<end>}
@@ -9721,12 +9740,26 @@ C ... and restart the table:
  In the second example, all tics are labelled.  In the third, only the end
  tics are labelled.  In the fourth, the unlabeled tic is a minor tic.
 
+ Normally if explicit tics are given, they are used instead of auto-generated
+ tics. Conversely if you specify `set xtics auto` or the like it will erase
+ any previously specified explicit tics. You can mix explicit and auto-
+ generated tics by using the keyword `add`, which must appear before
+ the tic style being added.
+
+ Example:
+       set xtics 0,.5,10
+       set xtics add ("Pi" 3.14159)
+
+ This will automatically generate tic marks every 0.5 along x, but will
+ also add an explicit labeled tic mark at pi.
+
  However they are specified, tics will only be plotted when in range.
 
  Format (or omission) of the tic labels is controlled by `set format`, unless
- the explicit text of a labels is included in the `set xtics (`<label>`)` form.
+ the explicit text of a label is included in the `set xtics ("<label>")` form.
 
- Minor (unlabelled) tics can be added by the `set mxtics` command.
+ Minor (unlabelled) tics can be added automatically by the `set mxtics` 
+ command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
 
  In case of timeseries data, position values must be given as quoted dates
  or times according to the format `timefmt`.  If the <start>, <incr>, <end>

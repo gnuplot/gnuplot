@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.165 2005/09/05 19:44:14 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.166 2005/09/12 23:51:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2883,27 +2883,27 @@ show_ticdef(AXIS_INDEX axis)
 	    break;
 	}
     case TIC_USER:{
-/* this appears to be unused? lh
-	    int time;
-	    time = (axis_array[axis].is_timedata);
- */
-	    fputs("  list (", stderr);
-	    for (t = axis_array[axis].ticdef.def.user; t != NULL; t = t->next) {
-		if (t->label)
-		    fprintf(stderr, "\"%s\" ", conv_text(t->label));
-		SHOW_NUM_OR_TIME(t->position, axis);
-		if (t->level)
-		    fprintf(stderr," %d",t->level);
-		if (t->next)
-		    fputs(", ", stderr);
-	    }
-	    fputs(")\n", stderr);
+	    fputs("  no auto-generated tics\n", stderr);
 	    break;
 	}
     default:{
 	    int_error(NO_CARET, "unknown ticdef type in show_ticdef()");
 	    /* NOTREACHED */
 	}
+    }
+
+    if (axis_array[axis].ticdef.def.user) {
+	fputs("\t  explicit list (", stderr);
+	for (t = axis_array[axis].ticdef.def.user; t != NULL; t = t->next) {
+	    if (t->label)
+		fprintf(stderr, "\"%s\" ", conv_text(t->label));
+	    SHOW_NUM_OR_TIME(t->position, axis);
+	    if (t->level)
+		fprintf(stderr," %d",t->level);
+	    if (t->next)
+		fputs(", ", stderr);
+	}
+	fputs(")\n", stderr);
     }
 
     if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT) {

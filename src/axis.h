@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.44 2005/08/07 09:43:27 mikulik Exp $
+ * $Id: axis.h,v 1.45 2005/09/12 23:51:36 sfeam Exp $
  *
  */
 
@@ -98,12 +98,13 @@ typedef struct ticdef {
     t_ticseries_type type;
     char *font;
     struct t_colorspec textcolor;
-    union {
+    struct {
 	   struct ticmark *user;	/* for TIC_USER */
 	   struct {			/* for TIC_SERIES */
 		  double start, incr;
 		  double end;		/* ymax, if VERYLARGE */
 	   } series;
+	   TBOOLEAN mix;		/* TRUE to use both the above */
     } def;
     struct position offset;
 } t_ticdef;
@@ -226,7 +227,7 @@ typedef struct axis {
     lp_style_type zeroaxis;	/* drawing style for zeroaxis, if any */
 } AXIS;
 
-#define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0}, {NULL},  { character, character, character, 0., 0., 0. } }
+#define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0}, {NULL, {0,0}, FALSE},  { character, character, character, 0., 0., 0. } }
 # define DEFAULT_AXIS_ZEROAXIS {0, -3, 0, 1.0, 1.0, 0}
 
 #define DEFAULT_AXIS_STRUCT {						    \
