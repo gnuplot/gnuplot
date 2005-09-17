@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.143 2005/08/08 03:55:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.144 2005/08/10 17:55:43 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1271,6 +1271,7 @@ scan_palette_from_buf( plot_struct *plot )
 	}
 	tpal.gradient = (gradient_struct*)
 	  malloc( tpal.gradient_num * sizeof(gradient_struct) );
+	assert(tpal.gradient);
 	for( i=0; i<tpal.gradient_num; i++ ) {
 	    /*  this %50 *must* match the amount of gradient structs
 		written to the pipe by x11.trm!  */
