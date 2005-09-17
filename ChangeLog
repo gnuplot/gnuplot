@@ -3,6 +3,8 @@
 	* src/graphics.c (plot_image_or_update_axes): Use gp_alloc rather
 	than malloc. Bug #1254314.
 
+	* demo/all.dem: Fixed mis-matched quotes around "rgb_variable.dem".
+
 2005-09-16  Juergen Wieferink  <wieferink@freenet.de>
 
         * src/command.c (string_expand):  Fix bug in macro handling; escaped

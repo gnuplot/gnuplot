@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.21 2005/08/05 15:48:28 mikulik Exp $
+# $Id: all.dem,v 1.22 2005/09/15 18:41:48 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -140,7 +140,7 @@ load "rainbow.dem"
 reset
 
 print "********************** file rgb_variable.dem *********************"
-load 'rgb_variable.dem"
+load "rgb_variable.dem"
 reset
 
 print "********************** file pm3d.dem *********************"
