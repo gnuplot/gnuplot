@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.167 2005/09/12 23:51:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.168 2005/09/18 03:12:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -330,6 +330,8 @@ boundary(struct curve_points *plots, int count)
     int vertical_ytics  = can_rotate ? axis_array[FIRST_Y_AXIS].tic_rotate : 0;
     int vertical_y2tics = can_rotate ? axis_array[SECOND_Y_AXIS].tic_rotate : 0;
 
+    TBOOLEAN shift_labels_to_border = FALSE;
+
     lkey = key->visible;	/* but we may have to disable it later */
 
     xticlin = ylablin = y2lablin = xlablin = x2lablin = titlelin = 0;
@@ -491,7 +493,18 @@ boundary(struct curve_points *plots, int count)
      *     first compute heights of labels and tics */
 
     /* tic labels */
-    if (axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER) {
+    shift_labels_to_border = FALSE;
+    if (axis_array[FIRST_X_AXIS].ticmode & TICS_ON_AXIS) {
+	/* FIXME: This test for how close the axis is to the border does not match */
+	/*        the tests in axis_output_tics(), and assumes FIRST_Y_AXIS.       */
+	if (!inrange(0.0, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max))
+	    shift_labels_to_border = TRUE;
+	if (0.05 > fabs( axis_array[FIRST_Y_AXIS].min
+		/ (axis_array[FIRST_Y_AXIS].max - axis_array[FIRST_Y_AXIS].min)))
+	    shift_labels_to_border = TRUE;
+    }
+    if ((axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER)
+    ||  shift_labels_to_border) {
 	/* ought to consider tics on axes if axis near border */
 	if (vertical_xtics) {
 	    /* guess at tic length, since we don't know it yet */
@@ -499,7 +512,7 @@ boundary(struct curve_points *plots, int count)
 	} else
 	    xtic_textheight = (int) (t->v_char * (xticlin + 1));
     } else
-	xtic_textheight = 0;
+	xtic_textheight =  0;
 
     /* tics */
     if (!axis_array[FIRST_X_AXIS].tic_in
@@ -692,7 +705,19 @@ boundary(struct curve_points *plots, int count)
        unless it has been explicitly set by lmargin */
 
     /* tic labels */
-    if (axis_array[FIRST_Y_AXIS].ticmode & TICS_ON_BORDER) {
+    shift_labels_to_border = FALSE;
+    if (axis_array[FIRST_Y_AXIS].ticmode & TICS_ON_AXIS) {
+	/* FIXME: This test for how close the axis is to the border does not match */
+	/*        the tests in axis_output_tics(), and assumes FIRST_X_AXIS.       */
+        if (!inrange(0.0, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max))
+	    shift_labels_to_border = TRUE;
+	if (0.1 > fabs( axis_array[FIRST_X_AXIS].min
+	       /  (axis_array[FIRST_X_AXIS].max - axis_array[FIRST_X_AXIS].min)))
+	    shift_labels_to_border = TRUE;
+    }
+    
+    if ((axis_array[FIRST_Y_AXIS].ticmode & TICS_ON_BORDER)
+    ||  shift_labels_to_border) {
 	if (vertical_ytics)
 	    /* HBB: we will later add some white space as part of this, so
 	     * reserve two more rows (one above, one below the text ...).
