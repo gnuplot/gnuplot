@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.201 2005/09/12 23:51:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.202 2005/09/18 06:20:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4672,11 +4672,11 @@ parse_label_options( struct text_label *this_label )
 	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
 	set_layer = FALSE, set_textcolor = FALSE;
     int layer = 0;
+    TBOOLEAN axis_label = (this_label->tag == -2);
     struct position offset = { character, character, character, 0., 0., 0. };
     t_colorspec textcolor = {TC_DEFAULT,0,0.0};
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     loc_lp.pointflag = -2;
-    TBOOLEAN axis_label = (this_label->tag == -2);
 
    /* Now parse the label format and style options */
     while (!END_OF_COMMAND) {

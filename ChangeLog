@@ -1,3 +1,8 @@
+2005-09-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (parse_label_options): Fix incorrect ordering of
+	declaration/initialization. Non-gcc compilers didn't like it.
+
 2005-09-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Allow space for zeroaxis tic labels when
