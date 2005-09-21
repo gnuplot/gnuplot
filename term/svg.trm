@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.52 2005/03/09 18:26:46 sfeam Exp $
+ * $Id: svg.trm,v 1.53 2005/08/07 09:43:34 mikulik Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -513,6 +513,7 @@ TERM_PUBLIC void
 SVG_init ()
 {
     double stroke_width;
+    char *svg_encoding = "";
 
     /* setup pens*/
     SVG_pens[0].width = SVG_LineWidth;
@@ -574,12 +575,20 @@ SVG_init ()
 
 /* write file header*/
 
+    switch (encoding) {
+	case S_ENC_ISO8859_1:	svg_encoding = "encoding=\"iso-8859-1\" "; break;
+	case S_ENC_ISO8859_2:	svg_encoding = "encoding=\"iso-8859-2\" "; break;
+	case S_ENC_ISO8859_15:	svg_encoding = "encoding=\"iso-8859-15\" "; break;
+	case S_ENC_KOI8_R:	svg_encoding = "encoding=\"koi8_r\" "; break;
+	case S_ENC_KOI8_U:	svg_encoding = "encoding=\"koi8_u\" "; break;
+	default: break;
+    }
+
     fprintf (gpoutfile,
-	     "<?xml version=\"1.0\" %sstandalone=\"no\"?>\n"
+	     "<?xml version=\"1.0\" %s standalone=\"no\"?>\n"
 	     "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \n"
 	     " \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n"
-	     "<svg ",
-	     (encoding == S_ENC_ISO8859_1) ? "encoding=\"iso-8859-1\" " : "");
+	     "<svg ", svg_encoding);
 
     if (SVG_fixed_size)
         fprintf (gpoutfile, "width=\"%u\" height=\"%u\" ",

@@ -1,3 +1,9 @@
+2005-09-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm (SVG_init): Place encoding information in the 
+	XML header record if an encoding is explicitly set in gnuplot.
+	Bug #1231209.
+
 2005-09-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (parse_label_options): Fix incorrect ordering of
