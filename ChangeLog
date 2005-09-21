@@ -7,6 +7,8 @@
 	* src/axis.c (gen_tics): Correct the calculation of last minitic
 	position to be plotted on a log-scale axis. Bug #1223149.
 
+	* src/term.c (write_multiline): Fix trivial line-counting bug.
+
 2005-09-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (parse_label_options): Fix incorrect ordering of

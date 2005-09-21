@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.121 2005/09/12 23:51:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.122 2005/09/16 03:20:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -947,8 +947,8 @@ write_multiline(
     if (vert != JUST_TOP) {
         /* count lines and adjust y */
         int lines = 0;          /* number of linefeeds - one fewer than lines */
-        while (*p++) {
-            if (*p == '\n')
+        while (p++) {
+            if (*p++ == '\n')
                 ++lines;
         }
         if (angle)
