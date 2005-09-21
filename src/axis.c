@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.53 2005/09/12 23:51:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.54 2005/09/18 06:20:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -972,13 +972,15 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		/* they have said what they want */
 		if (minifreq <= 0)
 		    minitics = 0;	/* not much else we can do */
-/* 		else if (axis_array[axis].log) { */
-/* 		    ministart = ministep = step / minifreq * axis_array[axis].base; */
-/* 		    miniend = step * base_array[axis]; */
-/* 		} else { */
-		ministart = ministep = step / minifreq;
-		miniend = step;
-/* 		} */
+ 		else if (axis_array[axis].log) {
+		    /* Sep 2005 - This case has been commented out since v3.7 */
+		    /* but in fact it seems correct, and fixes but #1223149 */
+ 		    ministart = ministep = step / minifreq * axis_array[axis].base;
+ 		    miniend = step * axis_array[axis].base;
+ 		} else {
+		    ministart = ministep = step / minifreq;
+		    miniend = step;
+ 		}
 	    } else if (axis_array[axis].log) {
 		if (step > 1.5) {	/* beware rounding errors */
 		    /* {{{  10,100,1000 case */
