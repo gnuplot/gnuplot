@@ -1,3 +1,13 @@
+2005-09-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/graphics.c (boundary do_plot label_width): Correct the layout
+	of the key title area for enhanced text super- and sub- scripts, and
+	ensure the box is wide enough for the key title string.
+	Bug/RFE #1002488.
+
+	NB: This fix reveals that the x11 driver has incorrect vertical
+	centering for enhanced text; other drivers are fine.
+
 2005-09-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm (SVG_init): Place encoding information in the 

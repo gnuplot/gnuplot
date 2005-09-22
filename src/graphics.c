@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.168 2005/09/18 03:12:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.169 2005/09/20 05:06:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -83,7 +83,7 @@ static int key_text_right;	/* offset from x for right-justified text */
 static int key_size_left;	/* size of left bit of key (text or sample, depends on key->reverse) */
 static int key_size_right;	/* size of right part of key (including padding) */
 static int max_ptitl_len = 0;	/* max length of plot-titles (keys) */
-static int ktitl_lines = 0;	/* no lines in key->title (key header) */
+static double ktitl_lines = 0;	/* no lines in key->title (key header) */
 static int ptitl_cnt;		/* count keys with len > 0  */
 static int key_rows, key_col_wth, yl_ref;
 static struct clipbox keybox;	/* boundaries for key field */
@@ -581,7 +581,6 @@ boundary(struct curve_points *plots, int count)
     if (lkey) {
 	TBOOLEAN key_panic = FALSE;
 	/*{{{  essential key features */
-	int ytlen;
 
 	p_width = pointsize * t->h_tic;
 	p_height = pointsize * t->v_tic;
@@ -598,9 +597,18 @@ boundary(struct curve_points *plots, int count)
 	if (key_entry_height == 0)
 	    key_entry_height = 1;
 
-	/* count max_len key and number keys with len > 0 */
+	/* Count max_len key and number keys with len > 0 */
 	max_ptitl_len = find_maxl_keys(plots, count, &ptitl_cnt);
-	ytlen = label_width(key->title, &ktitl_lines);
+
+	/* Key title length and height */
+	if (key->title) {
+	    int ytlen, ytheight;
+	    ytlen = label_width(key->title, &ytheight);
+	    ytlen -= key->swidth + 2;
+	    if (ytlen > max_ptitl_len)
+		max_ptitl_len = ytlen;
+	    ktitl_lines = (int)ytheight;
+	}
 
 	if (key->reverse) {
 	    key_sample_left = -key_sample_width;
@@ -1331,7 +1339,6 @@ do_plot(struct curve_points *plots, int pcount)
     int xl = 0, yl = 0;	/* avoid gcc -Wall warning */
     int key_count = 0;
     legend_key *key = &keyT;
-    char *s, *e;
 
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
@@ -1576,31 +1583,20 @@ do_plot(struct curve_points *plots, int pcount)
 	yl = keybox.yt;
 
 	if (*key->title) {
-	    char *ss = gp_alloc(strlen(key->title) + 2, "tmp string ss");
-	    strcpy(ss, key->title);
-	    strcat(ss, "\n");
+	    int center = (keybox.xl + keybox.xr) / 2;
+	    double extra_height = 0.0;
 
-	    s = ss;
-	    yl -= t->v_char / 2;
-	    while ((e = (char *) strchr(s, '\n')) != NULL) {
-		/* EAM June 2003 - Always center the title */
-		int center = (keybox.xl + keybox.xr) / 2;
-		*e = '\0';
-		if ((*t->justify_text) (CENTRE)) {
-		    write_multiline(center, yl, s, CENTRE, JUST_TOP, 0, NULL);
-		} else {
-		    int x = center - t->h_char * estimate_strlen(s) / 2;
-		    if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC ||
-			key->region == GPKEY_AUTO_EXTERIOR_MARGIN
-			|| inrange(x, xleft, xright))
-			write_multiline(x, yl, s, LEFT, JUST_TOP, 0, NULL);
-		}
-		s = ++e;
-		yl -= t->v_char;
-	    }
-	    yl += t->v_char / 2;
-	    free(ss);
+	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
+		extra_height += 0.51;
+	    write_multiline(center, yl - (0.5 + extra_height/2.0) * t->v_char,
+			    key->title, CENTRE, JUST_TOP, 0, NULL);
+	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
+		extra_height += 0.3;
+	    ktitl_lines += extra_height;
+	    keybox.yb -= extra_height * t->v_char;
+	    yl -= t->v_char * ktitl_lines;
 	}
+
 	yl -= (int)(0.5 * key->height_fix * t->v_char);
 	yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 	key_count = 0;
@@ -4372,12 +4368,12 @@ label_width(const char *str, int *lines)
     strcpy(lab, str);
     strcat(lab, "\n");
     s = lab;
-    while ((e = (char *) strchr(s, '\n')) != NULL) {	/* HBB 980308: quiet BC-3.1 warning */
+    while ((e = (char *) strchr(s, '\n')) != NULL) {
 	*e = '\0';
 	len = estimate_strlen(s);	/* = e-s ? */
 	if (len > mlen)
 	    mlen = len;
-	if (len || l)
+	if (len || l || *str == '\n')
 	    l++;
 	s = ++e;
     }
