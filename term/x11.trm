@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.146 2005/08/01 09:00:50 mikulik Exp $
+ * $Id: x11.trm,v 1.147 2005/08/07 09:43:35 mikulik Exp $
  *
  */
 
@@ -1680,7 +1680,7 @@ ENHX11_put_text(unsigned int x, unsigned int y, const char *str)
 
 
     /* Tell gnuplot_x11 to set the current position to (x,y) */
-	PRINT2("T%04d%04d\n", x, y);
+	PRINT2("Tl%04d%04d\n", x, y);
 
     /* Text justification requires two passes. During the first pass we */
     /* don't draw anything, we just measure the space it will take.     */

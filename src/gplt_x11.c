@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.144 2005/08/10 17:55:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.145 2005/09/18 03:45:04 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1989,12 +1989,17 @@ exec_cmd(plot_struct *plot, char *command)
 	case 'j':	/* Set start for right-justified enhanced text */
 		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
 		    plot->xLast = x_offset - (plot->xLast - x_offset);
-		    plot->yLast = y_offset - (plot->yLast - y_offset);
+		    plot->yLast = y_offset - (vchar/3) / yscale;
 		    return;
 	case 'k':	/* Set start for center-justified enhanced text */
 		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
 		    plot->xLast = x_offset - 0.5*(plot->xLast - x_offset);
-		    plot->yLast = y_offset - 0.5*(plot->yLast - y_offset);
+		    plot->yLast = y_offset - (vchar/3) / yscale;
+		    return;
+	case 'l':	/* Set start for left-justified enhanced text */
+		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
+		    plot->xLast = x_offset;
+		    plot->yLast = y_offset - (vchar/3) / yscale;
 		    return;
 	case 'o':	/* Enhanced mode print with no update */
 	case 'c':	/* Enhanced mode print with update to center */

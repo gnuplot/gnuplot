@@ -1,3 +1,9 @@
+2005-09-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (exec_cmd) term/x11.trm (ENHX11_put_text):
+	Change the vertical centering of enhanced mode text so that it matches
+	that of non-enhanced text.
+
 2005-09-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/set.c term/gd.trm: Always allow animated gif options in
