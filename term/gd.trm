@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.73 2005/07/14 23:10:39 sfeam Exp $
+ * $Id: gd.trm,v 1.74 2005/08/07 09:43:34 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -196,14 +196,13 @@ static struct {
     char      default_ttffont[64];
     int       default_ttfsize;
     TBOOLEAN  TrueColor;
-#ifdef GIF_ANIMATION
+    /* Variables for animated gif support: */
     TBOOLEAN  animate;		/* Only gif supports animation */
     int       loop_count;	/* Number of times to repeat sequence */
     int       frame_count;	/* Number of frames in animation */
     int       frame_delay;	/* Time between frames in .01 seconds */
     TBOOLEAN  frame_optimization;
     gdImagePtr previous_image;	/* Needed to encode animation as a series of deltas */
-#endif
 } png_state;
 
 #define PNG_USE_TRANSPARENT 1
@@ -221,12 +220,7 @@ enum PNG_id {
     PNG_ENHANCED, PNG_NOENHANCED,
     PNG_TRUECOLOR, PNG_NOTRUECOLOR,
     PNG_LINEWIDTH,
-#ifdef GIF_ANIMATION
-    GIF_ANIMATE,
-    GIF_DELAY,
-    GIF_LOOP,
-    GIF_NOOPT,
-#endif
+    GIF_ANIMATE, GIF_DELAY, GIF_LOOP, GIF_NOOPT,
     PNG_OTHER
 };
 
@@ -260,12 +254,10 @@ static struct gen_table PNG_opts[] =
     { "true$color", PNG_TRUECOLOR },
     { "notrue$color", PNG_NOTRUECOLOR },
     { "linew$idth", PNG_LINEWIDTH },
-#ifdef GIF_ANIMATION
-    { "animate", GIF_ANIMATE },
+    { "anim$ate", GIF_ANIMATE }, /* gif animation options */
     { "delay", GIF_DELAY },
     { "loop", GIF_LOOP },
-    { "noopt$imize", GIF_NOOPT },
-#endif
+    { "noopt$imize", GIF_NOOPT }, /* end of gif animation options */
     { "lw", PNG_LINEWIDTH },
     { NULL, PNG_OTHER }
 };
@@ -482,6 +474,7 @@ PNG_options()
     char *string;
     unsigned long color;
     TBOOLEAN new_colors = FALSE;
+    TBOOLEAN gif_anim_option = FALSE; /* set to TRUE if an animated gif option given */
 
     if (!PNG_initialized) {
 	PNG_initialized = TRUE;
@@ -504,7 +497,6 @@ PNG_options()
 	}
     }
 
-#ifdef GIF_ANIMATION
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we are already in animation mode.                          */
     if (c_token == 2)
@@ -519,7 +511,6 @@ PNG_options()
 	    png_state.loop_count = 0;
 	}
     }
-#endif
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PNG_opts[0],c_token)) {
@@ -670,7 +661,7 @@ PNG_options()
 		PNG_linewidth_factor = 1.0;
 	    break;
 
-#ifdef GIF_ANIMATION
+	/* parse gif animation options */
 	case GIF_ANIMATE:
 	    if (strncmp("gif",term->name,3))
 		int_error(c_token,"Only the gif terminal supports animation");
@@ -678,6 +669,7 @@ PNG_options()
 	    png_state.animate = TRUE;
 	    png_state.frame_count = 0;
 	    png_state.frame_delay = 10;
+	    gif_anim_option = 1;
 	    break;
 	case GIF_DELAY:
 	    if (strncmp("gif",term->name,3))
@@ -686,20 +678,22 @@ PNG_options()
 	    png_state.frame_delay = (int)real(const_express(&s));
 	    if (png_state.frame_delay <= 0)
 		png_state.frame_delay = 10;
+	    gif_anim_option = 1;
 	    break;
 	case GIF_LOOP:
 	    if (strncmp("gif",term->name,3))
 		int_error(c_token,"Only the gif terminal supports animation");
 	    c_token++;
 	    png_state.loop_count = (int)real(const_express(&s));
+	    gif_anim_option = 1;
 	    break;
 	case GIF_NOOPT:
 	    if (strncmp("gif",term->name,3))
 		int_error(c_token,"Only the gif terminal supports animation");
 	    c_token++;
 	    png_state.frame_optimization = FALSE;
+	    gif_anim_option = 1;
 	    break;
-#endif
 
 	case PNG_OTHER:
 	default:
@@ -734,6 +728,13 @@ PNG_options()
 	    break;
 	}
     }
+
+#ifndef GIF_ANIMATION /* animated gifs not supported by the current GD library */
+    if (gif_anim_option) {
+	png_state.animate = FALSE;
+	int_warn(NO_CARET, "gif animation options ignored (not compiled into this binary)");
+    }
+#endif
 
 #ifdef HAVE_GD_TTF
     /* If no font has been chosen but there is a default, use it */
@@ -830,13 +831,11 @@ PNG_options()
 	sprintf(term_options + strlen(term_options),
 	    "linewidth %3.1f ", PNG_linewidth_factor);
 
-#ifdef GIF_ANIMATION
     if (png_state.animate) {
 	sprintf(term_options + strlen(term_options),
 	    "animate delay %d loop %d ", 
 	    png_state.frame_delay, png_state.loop_count);
     }
-#endif
 
     sprintf(term_options + strlen(term_options),
 	    "size %d,%d ", PNG_XMAX, PNG_YMAX);

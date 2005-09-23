@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.202 2005/09/18 06:20:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.203 2005/09/20 19:08:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3465,11 +3465,9 @@ set_termoptions()
 	    (term->options)();
 	} else
 	    c_token += 2;
-#ifdef GIF_ANIMATION
     } else if (!strcmp(term->name,"gif") && equals(c_token,"delay") && num_tokens==4) {
 	*term_options = 0;
 	(term->options)();
-#endif
     } else {
 	int_error(c_token,"This option cannot be changed using 'set termoption'");
     }
