@@ -1,3 +1,8 @@
+2005-09-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/os2/gclient.c term/pm.trm: Full RGB colour support for pm terminal
+	(if display supports it).
+
 2005-09-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (process_event): Drain any backlog of keypress

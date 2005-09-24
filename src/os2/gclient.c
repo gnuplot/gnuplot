@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.41 2005/08/07 09:43:32 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.42 2005/08/30 09:50:10 broeker Exp $";
 #endif
 
 /****************************************************************************
@@ -106,6 +106,15 @@ static char RCSid[]="$Id: gclient.c,v 1.41 2005/08/07 09:43:32 mikulik Exp $";
 #define GNUPMDRV
 #include "mousecmn.h"
 
+/*==== d e b u g g i n g =====================================================*/
+
+#if 0
+# include "pmprintf.h"
+# define DEBUG_COLOR(a) PmPrintf a
+#else
+# define DEBUG_COLOR(a)
+#endif
+
 
 /*==== l o c a l    d a t a ==================================================*/
 
@@ -118,6 +127,7 @@ static long lLineTypes[7] = {
     LINETYPE_DOUBLEDOT,
     LINETYPE_DASHDOUBLEDOT
 };
+
 static long lCols[16] = {
     CLR_BLACK,
     CLR_DARKGRAY,
@@ -147,7 +157,22 @@ static long bkColor = -1;
 #define nColors 16
 static LONG alColourTable[nColors + 2];
 
-#define   GNUBUF    1024        /* buffer for gnuplot commands */
+static BOOL bPMPaletteMode = TRUE; /* do we use PM palette manager? */
+
+/* RGB equivalents of all normal CLR_xxx colour constants
+   Note: First entry corresponds to CLR_WHITE, which is negative (-2)!
+*/
+static LONG rgb_colors[18];
+/* macro to facilitate translation */
+#define RGB_TRANS(v) rgb_colors[(v)-CLR_WHITE]
+
+/* A value of 0 indicates direct rgb colors without palette */
+/* FIXME: gnupmdrv crashes if this is > GNUBUF/4 ! */
+/* FIXME: this must be <= 256 (see PM_SET_COLOR)   */
+#define   RGB_PALETTE_SIZE 0    /* size of the 'virtual' palette used for 
+				   translation of index to RGB value */
+
+#define   GNUBUF    2048        /* buffer for gnuplot commands */
 #define   PIPEBUF   4096        /* size of pipe buffers */
 #define   CMDALLOC  4096        /* command buffer allocation increment (ints) */
 
@@ -158,6 +183,7 @@ static LONG alColourTable[nColors + 2];
 #define   DEFLW     50
 
 // ULONG    ppidGnu = 0L;  /* gnuplot pid  */ -- now in gpexecute.c
+static HDC      hdcScreen;
 static HPS      hpsScreen;     /* screen pres. space */
 static int      iSeg = 1;
 
@@ -215,7 +241,6 @@ static ULONG    ulPauseMode  = PAUSE_DLG;
 static HWND     hSysMenu;
             /* stuff for screen-draw thread control */
 
-static BOOL     bExist;
 //static HEV      semDrawDone;
 
             /* thread control */
@@ -274,9 +299,9 @@ HWND hptrDefault, hptrCrossHair, hptrScaling,
 struct t_gpPMmenu gpPMmenu;
 int gpPMmenu_update_req = 0;
 
-// colours of mouse-relating drawings
-#define COLOR_MOUSE    CLR_DEFAULT  // mouse position
-#define COLOR_ANNOTATE CLR_DEFAULT  // annotating strings (MB3)
+// colours of mouse-relating drawings (CLR_DEFAULT is not allowed!)
+#define COLOR_MOUSE    CLR_BLACK    // mouse position
+#define COLOR_ANNOTATE CLR_BLACK    // annotating strings (MB3)
 #define COLOR_RULER    CLR_DARKPINK // colour of the ruler
 #define COLOR_ERROR    CLR_RED      // colour of error messages
 
@@ -381,8 +406,8 @@ report_error(HWND hWnd, char* s)
       hps = WinGetPS(hWnd);
       GpiSetMix(hps, FM_OVERPAINT);
       /* clear the rectangle below the text */
-      /* GpiSetColor(hps, CLR_CYAN); */
-      GpiSetColor(hps, CLR_BACKGROUND);
+      /* GpiSetColor(hps, RGB_TRANS(CLR_CYAN)); */
+      GpiSetColor(hps, RGB_TRANS(CLR_BACKGROUND));
       pt.x = 0;
       pt.y = 0;
       GpiMove(hps,&pt);
@@ -392,7 +417,7 @@ report_error(HWND hWnd, char* s)
       pt.y = 16;
       GpiBox(hps, DRO_FILL, &pt, 0,0);
       /* now write the mouse position on the screen */
-      GpiSetColor(hps, COLOR_ERROR); /* set text color */
+      GpiSetColor(hps, RGB_TRANS(COLOR_ERROR)); /* set text color */
       GpiSetCharMode(hps,CM_MODE1);
 
       pt.x = 2;
@@ -623,8 +648,9 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     switch (message) {
     case WM_CREATE:
     {
-	HDC     hdcScreen;
 	SIZEL   sizlPage;
+	LONG    NumColors;
+	LONG    PalSupport;
 
 	/* set initial values */
 	ChangeCheck(hWnd, IDM_LINES_THICK, bWideLines?IDM_LINES_THICK:0);
@@ -646,9 +672,20 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	DosCreateEventSem(NULL, &semPause, 0L, 0L);
 	DosCreateMutexSem(NULL, &semHpsAccess, 0L, 1L);
 
-	bExist = TRUE;
 	/* create a dc and hps to draw on the screen */
 	hdcScreen = WinOpenWindowDC(hWnd);
+
+	/* How many colors can be displayed ? */
+	DevQueryCaps(hdcScreen, CAPS_COLORS, 1, &NumColors);
+	/* Is Palette Manager supported at all? */
+	DevQueryCaps(hdcScreen, CAPS_ADDITIONAL_GRAPHICS, 1, &PalSupport);
+
+	/* Determine if PM Palette Manager should be used */
+	bPMPaletteMode = (PalSupport & CAPS_PALETTE_MANAGER) &&
+			 (NumColors <= 256);
+	DEBUG_COLOR(( "WM_CREATE: colors = %i, pm = %i, rgb = %i",
+		NumColors, PalSupport & CAPS_PALETTE_MANAGER, !bPMPaletteMode ));
+
 	sizlPage.cx = 0; sizlPage.cy = 0;
 	sizlPage.cx = 19500; sizlPage.cy = 12500;
 	hpsScreen = GpiCreatePS(hab, hdcScreen, &sizlPage,
@@ -1050,7 +1087,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    POINTL pt;
 	    HPS hps = WinGetPS(hWnd);
 
-	    GpiSetColor(hps, COLOR_ANNOTATE);    /* set color of the text */
+	    GpiSetColor(hps, RGB_TRANS(COLOR_ANNOTATE));    /* set color of the text */
 	    GpiSetCharMode(hps,CM_MODE1);
 	    pt.x = mx; pt.y = my+4;
 	    GpiCharStringAt(hps,&pt,(long)strlen(s),s);
@@ -1880,34 +1917,48 @@ InitScreenPS()
     if (!bColours) {
         int i;
 
-	for (i=0; i<8; i++)
-	    alColourTable[i] = 0;
-	for (i=8; i<16; i++)
-	    alColourTable[i] = 0;
-	alColourTable[0] = 0xFFFFFF;
 	nColour = 16;
+	alColourTable[0] = 0xFFFFFF;
+	for (i=1; i<nColour; i++)
+	    alColourTable[i] = 0;
     }
 
-    GpiCreateLogColorTable(hpsScreen,
-			   LCOL_RESET,
-			   LCOLF_CONSECRGB,
-			   0, nColour, alColourTable);
-    if (!lCols_init) { /* Ilya: avoid white line on white background */
-	int i = -1;
+    if (bPMPaletteMode) {
+	int i;
 
-	lCols_init = 1;
-	GpiQueryLogColorTable(hpsScreen, 0, 0, 16, alColourTable + 2);
-	alColourTable[2+CLR_WHITE] = 0xffffff;		/* -2 */
-	alColourTable[2+CLR_BLACK] = 0;			/* -1 */
-	bkColor = alColourTable[2+CLR_BACKGROUND];
-	while (i++ < 16) {
-	    if (alColourTable[2+lCols[i]] == bkColor) {
-		while (i++ < 16)
-		    lCols[i - 1] = lCols[i];
-		lCols_num--;
-		break;
+	GpiCreateLogColorTable(hpsScreen, LCOL_RESET, LCOLF_CONSECRGB,
+			       0, nColour, alColourTable);
+	if (!lCols_init) { /* Ilya: avoid white line on white background */
+	    lCols_init = 1;
+	    GpiQueryLogColorTable(hpsScreen, 0, 0, 16, alColourTable + 2);
+	    alColourTable[2+CLR_WHITE] = 0xffffff;		/* -2 */
+	    alColourTable[2+CLR_BLACK] = 0;			/* -1 */
+	    bkColor = alColourTable[2+CLR_BACKGROUND];
+	    i = -1;
+	    while (i++ < 16) {
+		if (alColourTable[2+lCols[i]] == bkColor) {
+		    while (i++ < 16)
+			lCols[i - 1] = lCols[i];
+		    lCols_num--;
+		    break;
+		}
 	    }
 	}
+
+	/* init rgb_colors: simple index translation only */
+	for (i=0; i<18; i++)
+	    rgb_colors[i] = i + CLR_WHITE;
+    } else {
+	if (!lCols_init) {
+	    int i;
+
+	    lCols_init = 1;
+	    /* get RGB values of all CLR_xxx constants */
+	    for (i=0; i<18; i++)
+		rgb_colors[i] = GpiQueryRGBColor(hpsScreen, LCOLOPT_REALIZED, i + CLR_WHITE );
+	}
+
+	GpiCreateLogColorTable(hpsScreen, LCOL_RESET, LCOLF_RGB, 0, 0, 0);
     }
     return hpsScreen;
 }
@@ -2120,7 +2171,6 @@ ReadGnu(void* arg)
     HPIPE    hRead = 0L;
     POINTL ptl;
     long lOldLine = 0;
-    BOOL bBW = FALSE; /* passed from print.c ?? */
     BOOL bPath = FALSE;
     BOOL bDots = FALSE;
     ULONG rc;
@@ -2138,6 +2188,7 @@ ReadGnu(void* arg)
     HPAL pm3d_hpal = 0;     /* palette used for make_palette() */
     HPAL pm3d_hpal_old = 0; /* default palette used before make_palette() */
     LONG pm3d_color = 0;    /* current colour (used if it is >0) */
+    ULONG *rgbTable = NULL; /* current colour table (this is a 'virtual' palette) */
 
     hab = WinInitialize(0);
     DosEnterCritSec();
@@ -2207,7 +2258,7 @@ ReadGnu(void* arg)
 		    POINTL p;
 		    hps = hpsScreen;  /* drawings back to screen */
 		    breakDrawing = 0;
-		    GpiSetColor(hps, CLR_RED); /* cross the unfinished plot */
+		    GpiSetColor(hps, RGB_TRANS(CLR_RED)); /* cross the unfinished plot */
 		    GpiBeginPath(hps, 1);
 		    p.x = p.y = 0; GpiMove(hps, &p);
 		    p.x = 19500; p.y = 12500; GpiLine(hps, &p);
@@ -2579,17 +2630,15 @@ ReadGnu(void* arg)
 		col =(col+2)%16;
 		GpiLabel(hps, lLineTypes[lt]);
 		lOldLine = lt;
-		LType((bLineTypes||bBW)?lt:0);
-		/* GpiSetLineType(hps,(bLineTypes||bBW)?lLineTypes[lt]:lLineTypes[0]); */
-		if (!bBW) {
-		    /* maintain some flexibility here in case we don't want
-		     * the model T option */
-		    if (bColours)
-			GpiSetColor(hps, lCols[col]);
-		    /* else GpiSetColor(hps, CLR_BLACK); */
-		    else
-			GpiSetColor(hps, CLR_NEUTRAL);
-		}
+		LType((bLineTypes) ? lt : 0);
+		/* GpiSetLineType(hps, (bLineTypes) ? lLineTypes[lt] : lLineTypes[0]); */
+		/* maintain some flexibility here in case we don't want
+		 * the model T option */
+		if (bColours)
+		    GpiSetColor(hps, RGB_TRANS(lCols[col]));
+		/* else GpiSetColor(hps, RGB_TRANS(CLR_BLACK)); */
+		else
+		    GpiSetColor(hps, RGB_TRANS(CLR_NEUTRAL));
 		pm3d_color = -1; /* switch off using pm3d colours */
 		break;
 	    }
@@ -2658,7 +2707,7 @@ ReadGnu(void* arg)
 			/* style == 0 or unknown --> fill with background color */
 			GpiSetMix(hps, FM_OVERPAINT);
 			GpiSetBackMix(hps, BM_OVERPAINT);
-			//GpiSetColor(hps, CLR_BACKGROUND);  // fixes 'with boxes' white on white
+			//GpiSetColor(hps, RGB_TRANS(CLR_BACKGROUND));  // fixes 'with boxes' white on white
 			GpiSetPattern(hps, PATSYM_SOLID);
 		    }
 		}
@@ -2687,7 +2736,7 @@ ReadGnu(void* arg)
 
 		BufRead(hRead,&lt, sizeof(int), &cbR);
 		/* 1: enter point mode, 0: exit */
-		if (bLineTypes || bBW) {
+		if (bLineTypes) {
 		    if (lt==1)
 			LType(0);
 		    else
@@ -2850,58 +2899,56 @@ ReadGnu(void* arg)
 	     * GpiCreateLogColorTable and GpiCreatePalette? */
 	    case GR_MAKE_PALETTE :
 	    {
-		char c;
-		int i;
+		unsigned char c;
 		int smooth_colors;
 		LONG lRetCount;
-		ULONG rgbTable[256];
 
 		/* read switch */
 		BufRead(hRead, &c, sizeof(c), &cbR);
 		if (c == 0) {
 		    /* gnuplot asks for the number of colours in palette */
-		    i = 256 - nColors;
-		    DosWrite(hRead, &i, sizeof(int), &cbR);
+		    smooth_colors = (bPMPaletteMode ? (256 - nColors) : RGB_PALETTE_SIZE);
+		    DosWrite(hRead, &smooth_colors, sizeof(int), &cbR);
+		    DEBUG_COLOR(("GR_MAKE_PALETTE: max %i colours", smooth_colors));
 		    break;
 		}
-		/* retrieve the current table */
-		lRetCount = GpiQueryLogColorTable(hps, 0L, 0L, nColors, alColourTable);
-#if 0
-		{
-		    FILE *ff = fopen("deb", "a");
-		    fprintf(ff, "\n*** lRetCount=%i while nColors=%i\n",
-			    (int) lRetCount,(int) nColors);
-		    fclose(ff);
-		}
-#endif /* 0 */
-		if (lRetCount>0 && lRetCount!=nColors) /* ring for developers! */
-		    DosBeep(880,777);
-		for (i=0; i<nColors; i++)
-		    rgbTable[i] = alColourTable[i];
 
 		/* read the number of colours for the palette */
 		BufRead(hRead, &smooth_colors, sizeof(int), &cbR);
+		free(rgbTable);
+		rgbTable = malloc(smooth_colors * sizeof(ULONG));
+
 		/* append new RGB table after */
-		BufRead(hRead, &rgbTable[nColors], smooth_colors*sizeof(rgbTable[0]), &cbR);
-#if 0
-		{
-		    FILE *ff = fopen("deb", "a");
-		    fprintf(ff, "\n*** nColors=%i  alloc=%i\n",
-			    (int) nColors,(int) smooth_colors);
-		    fclose(ff);
+		DEBUG_COLOR(("GR_MAKE_PALETTE: reading palette with %i colours", smooth_colors));
+		BufRead(hRead, &rgbTable[bPMPaletteMode ? nColors : 0],
+			smooth_colors * sizeof(ULONG), &cbR);
+
+		if (bPMPaletteMode) {
+		    int i;
+		    ULONG cclr;
+
+		    /* preserve the first nColors entries of current palette */
+		    /* retrieve the current table */
+		    lRetCount = GpiQueryLogColorTable(hps, 0L, 0L, nColors, alColourTable);
+		    if ((lRetCount > 0) && (lRetCount != nColors)) /* ring for developers! */
+			DosBeep(880, 777);
+		    for (i=0; i<nColors; i++)
+			rgbTable[i] = alColourTable[i];
+
+		    if (pm3d_hpal != 0)
+			GpiDeletePalette(pm3d_hpal);
+		    pm3d_hpal = GpiCreatePalette(hab, 0L, LCOLF_CONSECRGB,
+					     (long) (nColors + smooth_colors), rgbTable);
+		    pm3d_hpal_old = GpiSelectPalette(hps, pm3d_hpal);
+
+		    /* tell presentation manager to use the new palette */
+		    WinRealizePalette(WinWindowFromDC(hdcScreen), hps, &cclr);
 		}
-#endif /* 0 */
-		if (pm3d_hpal != 0)
-		    GpiDeletePalette(pm3d_hpal);
-		pm3d_hpal = GpiCreatePalette(hab, 0L, LCOLF_CONSECRGB,
-					     (long) (nColors + smooth_colors),
-					     rgbTable);
-		pm3d_hpal_old = GpiSelectPalette(hps, pm3d_hpal);
 		break;
 	    }
 
 	    case GR_RELEASE_PALETTE :
-#if 0 /* REMOVE THIS ROUTINE COMPLETELY! */
+#if 0 /* FIXME: REMOVE THIS ROUTINE COMPLETELY! */
 		if (pm3d_hpal) {
 		    GpiDeletePalette(pm3d_hpal);
 		    pm3d_hpal = 0;
@@ -2912,10 +2959,16 @@ ReadGnu(void* arg)
 
 	    case GR_SET_COLOR :
 	    {
+		/* FIXME: usgage of uchar limits the size of the 'virtual'
+			  palette to 256 entries. (see also RGB_PALETTE_SIZE) */
 		unsigned char c;
 
-		BufRead(hRead,&c, 1, &cbR);
-		pm3d_color = c + nColors;
+		BufRead(hRead, &c, sizeof(c), &cbR);
+		if (bPMPaletteMode)
+		    pm3d_color = c + nColors;
+		else
+		    pm3d_color = rgbTable[c];
+		DEBUG_COLOR(("GR_SET_COLOR: %i -> 0x%x", (int)c, pm3d_color)); 
 		break;
 	    }
 
@@ -2926,12 +2979,15 @@ ReadGnu(void* arg)
 		BufRead(hRead, &rgb_color, sizeof(rgb_color), &cbR);
 
 		/* Find an approximate color in the current palette */
-		pm3d_color = GpiQueryColorIndex(hps, 0, rgb_color);
+		if (bPMPaletteMode)
+		    pm3d_color = GpiQueryColorIndex(hps, 0, rgb_color);
+		else
+		    pm3d_color = rgb_color;
 #if 0
 		{
-	        int real_rgb = GpiQueryRGBColor(hps, LCOLOPT_REALIZED, pm3d_rgb_color);
-		printf( "GR_SET_RGBCOLOR: req = %x  nearest = %x  index =", 
-			rgb_color, real_rgb, pm3d_color );
+		int real_rgb = GpiQueryRGBColor(hps, LCOLOPT_REALIZED, pm3d_color);
+		DEBUG_COLOR(( "GR_SET_RGBCOLOR: req = %x  nearest = %x  index = %x", 
+		              rgb_color, real_rgb, pm3d_color ));
 		}
 #endif
 		break;
@@ -3746,8 +3802,8 @@ DrawRuler()
 
     if (!ruler.on || ruler.x < 0)
 	return;
-    /* GpiSetColor(hpsScreen, COLOR_RULER); */
-    GpiSetColor(hpsScreen, CLR_RED);
+    /* GpiSetColor(hpsScreen, RGB_TRANS(COLOR_RULER)); */
+    GpiSetColor(hpsScreen, RGB_TRANS(CLR_RED));
     GpiSetLineWidth(hpsScreen, LINEWIDTH_THICK);
     GpiSetMix(hpsScreen, FM_INVERT);
     /*GpiBeginPath(hpsScreen, 1); // will this help? I don't know, but makes thic cross */
@@ -3864,7 +3920,7 @@ DisplayStatusLine(HPS hps)
 
     if (!sl_curr_text)
 	return;
-    GpiSetColor(hps, COLOR_MOUSE); /* set text color */
+    GpiSetColor(hps, RGB_TRANS(COLOR_MOUSE)); /* set text color */
     GpiSetCharMode(hps, CM_MODE1);
     pt.x = 2;
     pt.y = 2;

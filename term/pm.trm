@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.45 2005/07/28 07:46:06 mikulik Exp $
+ * $Id: pm.trm,v 1.46 2005/08/07 09:43:34 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -76,7 +76,9 @@ TERM_PUBLIC void PM_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void PM_set_clipboard __PROTO((const char[]));
 #endif
 TERM_PUBLIC int PM_make_palette (t_sm_palette *);
+#if 0
 TERM_PUBLIC void PM_previous_palette (void);
+#endif
 TERM_PUBLIC void PM_set_color (t_colorspec *);
 TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
 #ifndef PM_OLD_ENHANCED_TEXT
@@ -750,69 +752,90 @@ PM_linewidth(double linewidth)
     fwrite(&lw, sizeof(int), 1, PM_pipe);
 }
 
-/* Note: gvpm sources have also limit 256, is it limit of PM palette?
-   I suppose yes, thus let colours passed as unsigned char through the pipe.
-   Gray interval [0;1] will be mapped to interval [0;255] whose r,g,b
-   components are mapped by the array below.
-*/
 
-TERM_PUBLIC int PM_make_palette (t_sm_palette *palette)
+TERM_PUBLIC int
+PM_make_palette(t_sm_palette * palette)
 {
-    int i;
-    int rc;
-    ULONG cbR, r, g, b, rgbTable[256];
-    putc(GR_MAKE_PALETTE, PM_pipe);
     if (palette == NULL) {
-	/* return maximal number of colours in palette */
+	ULONG rc, cbR;
 	int PM_nColors;
+
+	/* query maximum number of colours in palette */
+	putc(GR_MAKE_PALETTE, PM_pipe);
 	putc(0, PM_pipe);
 	fflush(PM_pipe);
 	rc = DosRead(fileno(PM_pipe), &PM_nColors, sizeof(int), &cbR);
-	return PM_nColors; /*  usually = 256-18; */
+	return PM_nColors;
     }
-    putc(1, PM_pipe);
-    for (i = 0; i < sm_palette.colors; i++) {
-	r = (int)( palette->color[i].r * 255 + 0.5 );
-	g = (int)( palette->color[i].g * 255 + 0.5 );
-	b = (int)( palette->color[i].b * 255 + 0.5 );
-	rgbTable[i] = (r<<16) + (g<<8) + b; /*  PM API likes this form */
+
+    if (sm_palette.colors > 0) {
+	ULONG *rgbTable;
+	unsigned int i;
+
+	/* Note: gvpm sources have also limit 256, is it limit of PM palette?
+	   I suppose yes, thus let colours passed as unsigned char through the pipe.
+	   Gray interval [0;1] will be mapped to interval [0;255] whose r,g,b
+	   components are mapped by the array below.
+	 */
+	putc(GR_MAKE_PALETTE, PM_pipe);
+	putc(1, PM_pipe);
+	rgbTable = (ULONG *) malloc(sizeof(ULONG) * sm_palette.colors);
+	for (i = 0; i < sm_palette.colors; i++) {
+	    ULONG r, g, b;
+
+	    r = (ULONG) (palette->color[i].r * 255 + 0.5);
+	    g = (ULONG) (palette->color[i].g * 255 + 0.5);
+	    b = (ULONG) (palette->color[i].b * 255 + 0.5);
+	    rgbTable[i] = (r << 16) + (g << 8) + b;	/*  PM API likes this form */
+	}
+	fwrite(&sm_palette.colors, sizeof(int), 1, PM_pipe);
+	fwrite(rgbTable, sizeof(ULONG) * sm_palette.colors, 1, PM_pipe);
+	free(rgbTable);
     }
-    fwrite(&sm_palette.colors, sizeof(int), 1, PM_pipe);
-    fwrite(&rgbTable, sizeof(rgbTable[0])*sm_palette.colors, 1, PM_pipe);
     return 0;
 }
 
 
+#if 0
 /* switch back to the palette used before calling make_palette */
-TERM_PUBLIC void PM_previous_palette ()
+TERM_PUBLIC void
+PM_previous_palette()
 {
     putc(GR_RELEASE_PALETTE, PM_pipe);
 }
+#endif
 
 
-TERM_PUBLIC void PM_set_color (t_colorspec *colorspec)
+TERM_PUBLIC void
+PM_set_color(t_colorspec *colorspec)
 {
-    if (colorspec->type == TC_LT) {
+    switch (colorspec->type) {
+    case TC_FRAC:
+	if (sm_palette.colors == 0) {
+	    rgb255_color rgb255;
+	    unsigned int rgb;
+
+	    rgb255maxcolors_from_gray(colorspec->value, &rgb255);
+	    rgb = (rgb255.r << 16) + (rgb255.g << 8) + rgb255.b;
+	    putc(GR_SET_RGBCOLOR, PM_pipe);
+	    fwrite(&rgb, sizeof(int), 1, PM_pipe);
+	} else {
+	    unsigned char colorindex;
+
+	    /* map [0;1] to interval [0;sm_palette.colors-1] */
+	    colorindex = ((colorspec->value * (sm_palette.colors - 1.)) + 0.5);
+	    putc(GR_SET_COLOR, PM_pipe);
+	    fwrite(&colorindex, sizeof(colorindex), 1, PM_pipe);
+	}
+	break;
+    case TC_LT:
 	PM_linetype(colorspec->lt);
-	return;
-    }
-    if (colorspec->type == TC_RGB) {
+	break;
+    case TC_RGB:
 	putc(GR_SET_RGBCOLOR, PM_pipe);
 	fwrite(&(colorspec->lt), sizeof(int), 1, PM_pipe);
-	fflush(PM_pipe);
-	return;
-    }
-    if (colorspec->type == TC_FRAC) {
-    /* map [0;1] to interval [0;smooth_colors-1] */
-        unsigned char colorindex = 0;
-	/* FIXME: we are actually checking if colorspec->value is
-		  in range [0;1]. Is this really necessary? */
-        if (colorspec->value > 0)
-	    colorindex = floor( colorspec->value * sm_palette.colors );
-	if (colorindex >= sm_palette.colors)  
-	    colorindex = sm_palette.colors - 1;
-	putc(GR_SET_COLOR, PM_pipe);
-	putc(colorindex, PM_pipe);
+	/* fflush(PM_pipe); */ /* FIXME: why should that be necessary? */
+	break;
     }
 }
 
@@ -1136,7 +1159,7 @@ TERM_TABLE_START(PM_driver)
     PM_put_tmptext, PM_set_ruler, PM_set_cursor, PM_set_clipboard
 #endif
     , PM_make_palette,
-    PM_previous_palette,
+    0, /* PM_previous_palette */
     PM_set_color,
     PM_filled_polygon
 #ifdef WITH_IMAGE
