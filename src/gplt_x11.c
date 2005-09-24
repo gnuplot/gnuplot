@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.145 2005/09/18 03:45:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.146 2005/09/23 22:01:14 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -4223,6 +4223,13 @@ process_event(XEvent *event)
 	}                                                            \
 	return;
 
+/* Prevent hysteresis if redraw cannot keep up with rate of keystrokes */
+#define DRAIN_KEYSTROKES(key)					\
+	if (plot == current_plot) {				\
+	    while (XCheckTypedWindowEvent(dpy, 			\
+		    event->xany.window, KeyPress, event));	\
+	}
+
 	case XK_BackSpace:
 	    KNOWN_KEYSYMS(GP_BackSpace);
 	case XK_Tab:
@@ -4250,12 +4257,16 @@ process_event(XEvent *event)
 	case XK_Home:
 	    KNOWN_KEYSYMS(GP_Home);
 	case XK_Left:
+	    DRAIN_KEYSTROKES(XK_Left);
 	    KNOWN_KEYSYMS(GP_Left);
 	case XK_Up:
+	    DRAIN_KEYSTROKES(XK_Up);
 	    KNOWN_KEYSYMS(GP_Up);
 	case XK_Right:
+	    DRAIN_KEYSTROKES(XK_Right);
 	    KNOWN_KEYSYMS(GP_Right);
 	case XK_Down:
+	    DRAIN_KEYSTROKES(XK_Down);
 	    KNOWN_KEYSYMS(GP_Down);
 	case XK_Prior:		/* XXX */
 	    KNOWN_KEYSYMS(GP_PageUp);

@@ -1,3 +1,11 @@
+2005-09-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (process_event): Drain any backlog of keypress
+	events from the current plot window every time we see an arrow key.
+	This prevents hysteresis if the redraw rate is slower than the
+	keyboard autorepeat rate.
+	Bug #1111734.
+
 2005-09-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (exec_cmd) term/x11.trm (ENHX11_put_text):
