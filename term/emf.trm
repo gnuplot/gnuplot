@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.31 2005/06/29 22:31:14 sfeam Exp $
+ * $Id: emf.trm,v 1.32 2005/08/07 09:43:34 mikulik Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -826,6 +826,9 @@ EMF_dashtype(int dashtype)
 
     if (dashtype >= 0)
 	dashtype = (dashtype / emf_colors) % EMF_LINE_TYPES;
+
+    if (dashtype == LT_AXIS)
+	dashtype = 2;
 
     if (dashtype < 1 || !emf_dashed) {	/* solid mode */
 	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
