@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.73 2005/07/31 08:42:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.74 2005/08/07 09:43:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -598,8 +598,7 @@ static void
 apply_zoom(struct t_zoom *z)
 {
     char s[1024];		/* HBB 20011005: made larger */
-    /* HBB 20011004: new variable, fixing 'unzoom' back to autoscaled
-     * range */
+    /* HBB 20011004: new variable, fixing 'unzoom' back to autoscaled range */
     static t_autoscale autoscale_copies[AXIS_ARRAY_SIZE];
 
     if (zoom_now != NULL) {	/* remember the current zoom */
@@ -637,7 +636,19 @@ apply_zoom(struct t_zoom *z)
 	return;
     }
 
-    sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
+#ifdef HAVE_LOCALE_H
+    if (strcmp(localeconv()->decimal_point,".")) {
+	char *save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
+	setlocale(LC_NUMERIC,"C");
+	sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
+	       zoom_now->xmin, zoom_now->xmax, 
+	       (splot_map) ? zoom_now->ymax : zoom_now->ymin,
+	       (splot_map) ? zoom_now->ymin : zoom_now->ymax);
+	setlocale(LC_NUMERIC,save_locale);
+	free(save_locale);
+    } else
+#endif
+	sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
 	       zoom_now->xmin, zoom_now->xmax, 
 	       (splot_map) ? zoom_now->ymax : zoom_now->ymin,
 	       (splot_map) ? zoom_now->ymin : zoom_now->ymax);
@@ -675,7 +686,19 @@ apply_zoom(struct t_zoom *z)
     }
 
     if (!is_3d_plot) {
-	sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
+#ifdef HAVE_LOCALE_H
+	if (strcmp(localeconv()->decimal_point,".")) {
+	    char *save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
+	    setlocale(LC_NUMERIC,"C");
+	    sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
+		zoom_now->x2min, zoom_now->x2max,
+		(splot_map) ? zoom_now->y2max : zoom_now->y2min,
+		(splot_map) ? zoom_now->y2min : zoom_now->y2max);
+	    setlocale(LC_NUMERIC,save_locale);
+	    free(save_locale);
+	} else
+#endif
+	    sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
 		zoom_now->x2min, zoom_now->x2max,
 		(splot_map) ? zoom_now->y2max : zoom_now->y2min,
 		(splot_map) ? zoom_now->y2min : zoom_now->y2max);

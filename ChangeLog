@@ -1,3 +1,19 @@
+2005-09-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	Even when gnuplot honors a LOCALE setting for input of data or output
+	of plots, gnuplot's own command syntax requries LC_NUMERIC == C. We
+	must check for this anywhere that a command is generated or parsed.
+
+	* src/mouse.c (apply_zoom): Enforce C locale before creating 
+	command sequence to do zooming.
+
+	* src/scanner.c (get_num): Enforce C locale before reading a number
+	that is part of a command line.
+
+	* src/command.c (save_command test_palette_subcommand)
+	src/show.c (show_command show_style): Enforce C locale before saving or
+	showing state of internal variables.
+
 2005-09-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/svg.trm (SVG_init): Encodings for OS/2 and Windows.

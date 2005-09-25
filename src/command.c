@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.129 2005/09/05 19:42:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.130 2005/09/16 19:44:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1270,6 +1270,7 @@ save_command()
 {
     FILE *fp;
     char *save_file = NULL;
+    char *save_locale = NULL;
     int what;
 
     c_token++;
@@ -1302,6 +1303,14 @@ save_command()
     if (!fp)
 	os_error(c_token, "Cannot open save file");
 
+#ifdef HAVE_LOCALE_H
+    /* Make sure that numbers in the saved gnuplot commands use standard form */
+    if (strcmp(localeconv()->decimal_point,".")) {
+	save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
+	setlocale(LC_NUMERIC,"C");
+    }
+#endif
+
     switch (what) {
 	case SAVE_FUNCS:
 	    save_functions(fp);
@@ -1318,6 +1327,15 @@ save_command()
     default:
 	    save_all(fp);
     }
+
+#ifdef HAVE_LOCALE_H
+    if (save_locale) {
+	setlocale(LC_NUMERIC,save_locale);
+	free(save_locale);
+	fprintf(fp, "set decimalsign locale \"%s\"\n", setlocale(LC_NUMERIC,NULL));
+	fprintf(fp, "set decimalsign '%s'\n", decimalsign);
+    }
+#endif
 
     if (stdout != fp) {
 #ifdef PIPES
@@ -1421,6 +1439,7 @@ se tit'R,G,B profiles of the current color palette';";
     TBOOLEAN save_is_cb_plot;
 #endif
     FILE *f = tmpfile();
+    char *save_locale = NULL;
 
     c_token++;
     /* parse optional option */
@@ -1439,6 +1458,14 @@ se tit'R,G,B profiles of the current color palette';";
     }
     if (!f)
 	int_error(NO_CARET, "cannot write temporary file");
+
+#ifdef HAVE_LOCALE_H
+    /* Make sure that numbers in the saved gnuplot commands use standard form */
+    if (strcmp(localeconv()->decimal_point,".")) {
+	save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
+	setlocale(LC_NUMERIC,"C");
+    }
+#endif
 
     /* generate r,g,b curves */
     for (i = 0; i < test_palette_colors; i++) {
@@ -1492,8 +1519,19 @@ se tit'R,G,B profiles of the current color palette';";
     }
     fputs(post, f);
 
-    /* save current gnuplot 'set' status because of the tricky set's for our temporary testing plot */
+    /* save current gnuplot 'set' status because of the tricky sets 
+     * for our temporary testing plot.
+     */
     save_set(f);
+
+#ifdef HAVE_LOCALE_H
+    if (save_locale) {
+	setlocale(LC_NUMERIC,save_locale);
+	free(save_locale);
+	fprintf(f, "set decimalsign locale \"%s\"\n", setlocale(LC_NUMERIC,NULL));
+	fprintf(f, "set decimalsign '%s'\n", decimalsign);
+    }
+#endif
 
     /* execute all commands from the temporary file */
     rewind(f);

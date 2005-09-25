@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.166 2005/09/12 23:51:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.167 2005/09/18 06:20:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -191,10 +191,20 @@ show_command()
     enum set_id token_found;
     struct value a;
     int tag =0;
+    char *save_locale = NULL;
+    char *error_message = NULL;
 
     c_token++;
 
     token_found = lookup_table(&set_tbl[0],c_token);
+
+#ifdef HAVE_LOCALE_H
+    /* Report internal values in C locale (dot for decimal sign) */
+    if (strcmp(localeconv()->decimal_point,".")) {
+       save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
+       setlocale(LC_NUMERIC,"C");
+    }
+#endif
 
     /* rationalize c_token advancement stuff a bit: */
     if (token_found != S_INVALID)
@@ -273,8 +283,10 @@ show_command()
 #define CHECK_TAG_GT_ZERO					\
 	if (!END_OF_COMMAND) {					\
 	    tag = real(const_express(&a));			\
-	    if (tag <= 0)					\
-		int_error(c_token, "tag must be > zero");	\
+	    if (tag <= 0) {					\
+		error_message =  "tag must be > zero";		\
+		break;						\
+		}						\
 	}							\
 	(void) putc('\n',stderr);
 
@@ -369,7 +381,7 @@ show_command()
 	    show_styles("Data", data_style);
 	    c_token++;
 	} else
-	    int_error(c_token, "keyword 'style' expected after 'show data'");
+	    error_message = "keyword 'style' expected after 'show data'";
 	break;
 #endif
     case S_STYLE:
@@ -584,9 +596,8 @@ show_command()
     case S_NOZDTICS:
     case S_NOZMTICS:
     case S_NOZTICS:
-	int_error(c_token,
-		  "'show' does not accept the 'no...' type of 'set' options");
-	/* FALLTHROUGH into S_INVALID! */
+	error_message = "'show' does not accept the 'no...' type of 'set' options";
+	break;
 #endif /* BACKWARDS_COMPATIBLE */
 
     case S_MULTIPLOT:
@@ -603,14 +614,27 @@ show_command()
     /* --- such case now, all implemented. */
 
     case S_INVALID:
-	int_error(c_token, showmess);
+	error_message = showmess;
+	break;
     default:
-	int_error(c_token, "internal parser error -- report as a bug");
+	error_message = "internal parser error -- report as a bug";
+	break;
     }
+
+#ifdef HAVE_LOCALE_H
+    if (save_locale) {
+       setlocale(LC_NUMERIC,save_locale);
+       free(save_locale);
+    }
+#endif
+
+    if (error_message)
+	int_error(c_token,error_message);
 
     screen_ok = FALSE;
     (void) putc('\n', stderr);
 
+#undef CHECK_TAG_GT_ZERO
 }
 
 
@@ -1315,6 +1339,13 @@ show_style()
     struct value a;
     int tag = 0;
 
+#define CHECK_TAG_GT_ZERO					\
+	if (!END_OF_COMMAND) {					\
+	    tag = real(const_express(&a));			\
+	    if (tag <= 0)					\
+		int_error(c_token,"tag must be > zero");	\
+	}
+
     switch(lookup_table(&show_style_tbl[0],c_token)){
     case SHOW_STYLE_DATA:
 	SHOW_ALL_NL;
@@ -1358,6 +1389,7 @@ show_style()
 	show_arrowstyle(0);
 	break;
     }
+#undef CHECK_TAG_GT_ZERO
 }
 
 /* called by show_data() and show_func() */
