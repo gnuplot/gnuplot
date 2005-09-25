@@ -1,3 +1,7 @@
+2005-09-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/svg.trm (SVG_init): Encodings for OS/2 and Windows.
+
 2005-09-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/os2/gclient.c term/pm.trm: Full RGB colour support for pm terminal

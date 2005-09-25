@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.53 2005/08/07 09:43:34 mikulik Exp $
+ * $Id: svg.trm,v 1.54 2005/09/21 17:05:45 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -579,9 +579,13 @@ SVG_init ()
 	case S_ENC_ISO8859_1:	svg_encoding = "encoding=\"iso-8859-1\" "; break;
 	case S_ENC_ISO8859_2:	svg_encoding = "encoding=\"iso-8859-2\" "; break;
 	case S_ENC_ISO8859_15:	svg_encoding = "encoding=\"iso-8859-15\" "; break;
+	case S_ENC_CP850:	svg_encoding = "encoding=\"ibm-850\" "; break;
+	case S_ENC_CP852:	svg_encoding = "encoding=\"ibm-852\" "; break;
+	case S_ENC_CP1250:	svg_encoding = "encoding=\"windows-1250\" "; break;
 	case S_ENC_KOI8_R:	svg_encoding = "encoding=\"koi8_r\" "; break;
 	case S_ENC_KOI8_U:	svg_encoding = "encoding=\"koi8_u\" "; break;
-	default: break;
+	default: /* S_ENC_CP437 ... DOS encoding */
+				break;
     }
 
     fprintf (gpoutfile,
