@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.25 2005/03/16 19:31:30 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.26 2005/08/07 09:43:32 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -1077,10 +1077,12 @@ draw3d_line_unconditional(
     TERMCOORD(v1, x1, y1);
     TERMCOORD(v2, x2, y2);
     term_apply_lp_properties(lp);
+
+    /* FIXME - This whole set of tests may now be unnecessary */
     if (lp->use_palette) {
 	double z =  (v1->real_z + v2->real_z) * 0.5;
-
-	set_color(cb2gray(z2cb(z)));
+	if (lp->pm3d_color.type != TC_RGB)
+	    set_color(cb2gray(z2cb(z)));
     } else
 	if (linetype != lp->l_type)
 	    (term->linetype)(linetype);

@@ -1,3 +1,9 @@
+2005-09-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util3d.c (draw3d_line_unconditional): The code previously assumed
+	that any 3D colored line is colored by Z value. This is no longer true.
+	Bugfix.
+
 2005-09-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/post.trm (PS_COMMON_DOC1): More details for 'color' and
