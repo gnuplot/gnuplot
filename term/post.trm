@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.164 2005/08/07 09:43:34 mikulik Exp $
+ * $Id: post.trm,v 1.166 2005/09/16 03:20:30 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3941,11 +3941,14 @@ START_HELP(00psglobal)
 "                               {blacktext | colortext | colourtext}",\
 "                               {\"<fontname>\"} {<fontsize>}",
 #define PS_COMMON_DOC1 \
-" The option `color` enables color;",\
-" `solid` draws all plots with solid lines, overriding any dashed patterns;",\
-" `dashlength` or `dl` scales the length of the dashed-line segments by <DL>",\
-" (which is a floating-point number greater than zero);",\
-" `linewidth` or `lw` scales all linewidths by <LW>;",\
+" The option `color` enables color, while `monochrome` prefers black and white",\
+" drawing elements. Further, `monochrome` uses gray `palette` but it does not",\
+" change color of objects specified with an explicit `colorspec`."\
+"",\
+" `solid` draws all plots with solid lines, overriding any dashed patterns.",\
+" `dashlength` or `dl` scales the length of the dashed-line segments by <DL>,",\
+" which is a floating-point number greater than zero.",\
+" `linewidth` or `lw` scales all linewidths by <LW>.",\
 "",\
 " By default the generated PostScript code uses language features that were",\
 " introduced in PostScript Level 2, notably filters and pattern-fill of",\

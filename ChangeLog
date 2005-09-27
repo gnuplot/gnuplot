@@ -1,3 +1,8 @@
+2005-09-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm (PS_COMMON_DOC1): More details for 'color' and
+	'monochrome' options.
+
 2005-09-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	Even when gnuplot honors a LOCALE setting for input of data or output
