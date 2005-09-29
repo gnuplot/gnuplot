@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.54 2005/09/18 06:20:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.55 2005/09/21 19:21:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1330,11 +1330,12 @@ axis_position_zeroaxis(AXIS_INDEX axis)
     AXIS *this = axis_array + axis;
 
     /* HBB 20020215: correctly treat reversed axes, too! */
-    if ((this->min >= 0.0 && this->max >= 0.0)
+    /* EAM Sep 2005: Nothing wrong with 0 at extreme of the range */
+    if ((this->min > 0.0 && this->max > 0.0)
 	|| this->log) {
 	this->term_zero = (this->max < this->min)
 	    ? this->term_upper : this->term_lower;
-    } else if (this->min <= 0.0 && this->max <= 0.0) {
+    } else if (this->min < 0.0 && this->max < 0.0) {
 	this->term_zero = (this->max < this->min)
 	    ? this->term_lower : this->term_upper;
     } else {

@@ -1,3 +1,10 @@
+2005-09-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (axis_position_zeroaxis): More zeroaxis bugs; does nobody
+	ever use this option?  Range terminating at 0.0 is a perfectly valid
+	case in which to draw a zeroaxis.
+	Bugfix.
+
 2005-09-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c (draw3d_line_unconditional): The code previously assumed
