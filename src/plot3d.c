@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.108 2005/08/12 17:42:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.109 2005/08/19 23:44:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -788,7 +788,7 @@ get_3ddata(struct surface_points *this_plot)
 		color_from_column(TRUE);
 		if ((this_plot->plot_style == POINTSTYLE
 		   || this_plot->plot_style == LINESPOINTS)
-		&&  this_plot->lp_properties.p_size < 0) {
+		&&  this_plot->lp_properties.p_size == PTSZ_VARIABLE) {
 		    cp->CRD_PTSIZE = v[3];
 		    color = z;
 		    color_from_column(FALSE);
@@ -806,7 +806,7 @@ get_3ddata(struct surface_points *this_plot)
 	    if (j >= 5) {
 		if ((this_plot->plot_style == POINTSTYLE
 		   || this_plot->plot_style == LINESPOINTS)
-		&&  this_plot->lp_properties.p_size < 0) {
+		&&  this_plot->lp_properties.p_size == PTSZ_VARIABLE) {
 		    color = v[4];
 		    color_from_column(TRUE);
 		}
@@ -1401,9 +1401,10 @@ eval_3dplots()
 		    int stored_token = c_token;
 		    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
 
- 		    lp_parse(&lp, 1,
-			     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
-			     line_num, point_num);
+		    lp.l_type = line_num;
+		    lp.p_type = point_num;
+ 		    lp_parse(&lp, TRUE,
+			     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 		    checked_once = TRUE;
 		    if (stored_token != c_token) {
 			if (set_lpstyle) {
@@ -1460,10 +1461,15 @@ eval_3dplots()
 	    if (! set_lpstyle) {
 		if (this_plot->plot_style == VECTOR)
 		    arrow_parse(&this_plot->arrow_properties, line_num, TRUE);
-		else
-		    lp_parse(&this_plot->lp_properties, 1,
-			 this_plot->plot_style & PLOT_STYLE_HAS_POINT,
-			 line_num, point_num);
+		else {
+		    this_plot->lp_properties.l_type = line_num;
+		    this_plot->lp_properties.l_width = 1.0;
+		    this_plot->lp_properties.p_type = point_num;
+		    this_plot->lp_properties.p_size = pointsize;
+		    this_plot->lp_properties.use_palette = 0;
+		    lp_parse(&this_plot->lp_properties, TRUE,
+			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);
+		}
 
 #ifdef BACKWARDS_COMPATIBLE
 		/* allow old-style syntax - ignore case lt 3 4 for example */
@@ -1485,7 +1491,7 @@ eval_3dplots()
 	    /* Rule out incompatible line/point/style options */
 	    if (this_plot->plot_type == FUNC3D) {
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_POINT)
-		&&  (this_plot->lp_properties.p_size < 0))
+		&&  (this_plot->lp_properties.p_size == PTSZ_VARIABLE))
 		    this_plot->lp_properties.p_size = 1;
 	    }
 

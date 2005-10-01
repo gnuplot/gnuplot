@@ -57,6 +57,10 @@
 #define LT_BACKGROUND (-4)
 #define LT_UNDEFINED  (-5)
 
+/* Default point size is taken from the global "pointsize" variable */
+#define PTSZ_DEFAULT    (-2)
+#define PTSZ_VARIABLE   (-3)
+
 /* Constant value passed to (term->text_angle)(ang) to generate vertical
  * text. Current implementation has ang equal to rotation in degrees.
  */

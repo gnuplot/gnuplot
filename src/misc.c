@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.70 2005/08/07 09:43:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.71 2005/08/22 16:37:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -741,10 +741,10 @@ lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
 }
 
 
-/* was a macro in plot.h */
 /* allow any order of options - pm 24.11.2001 */
+/* EAM Oct 2005 - Require that default values have been placed in lp by the caller */
 void
-lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int def_line, int def_point)
+lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 {
     struct value t;
 
@@ -755,13 +755,15 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
     } else {
 	/* avoid duplicating options */
 	int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0;
+
+#ifndef OMIT_THIS_CODE_TO_MAKE_SET_LINESTYLE_INCREMENTAL
 	/* set default values */
-	lp->l_type = def_line;
 	lp->l_width = 1.0;
 	lp->use_palette = 0;
-	lp->pointflag = allow_point;
-	lp->p_type = def_point;
 	lp->p_size = pointsize;	/* as in "set pointsize" */
+#endif
+	lp->pointflag = allow_point;
+
 	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
 		if (set_lt++)
@@ -845,7 +847,10 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 			break;
 		    c_token++;
 		    if (almost_equals(c_token, "var$iable")) {
-			lp->p_size = -1;
+			lp->p_size = PTSZ_VARIABLE;
+			c_token++;
+		    } else if (almost_equals(c_token, "def$ault")) {
+			lp->p_size = PTSZ_DEFAULT;
 			c_token++;
 		    } else {
 			lp->p_size = real(const_express(&t));
@@ -1168,9 +1173,10 @@ arrow_parse(
 	    /* pick up a line spec - allow ls, but no point. */
 	    {
 		int stored_token = c_token;
-		struct lp_style_type loc_lp;
+		struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
 
-		lp_parse(&loc_lp, 1, 0, default_linetype, 0);
+		loc_lp.l_type = default_linetype;
+		lp_parse(&loc_lp, TRUE, FALSE);
 		if (stored_token != c_token) {
 		    if (set_line++)
 			break;

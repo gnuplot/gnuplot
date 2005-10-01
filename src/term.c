@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.123 2005/09/22 02:10:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.124 2005/09/22 04:18:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -870,7 +870,10 @@ term_apply_lp_properties(struct lp_style_type *lp)
          * there is a special function also dealing with (x,y) co-
          * ordinates.
          */
-        (*term->pointsize) (lp->p_size);
+	if (lp->p_size < 0)
+            (*term->pointsize) (pointsize);
+	else
+            (*term->pointsize) (lp->p_size);
     }
     /*  _first_ set the line width, _then_ set the line type !
 

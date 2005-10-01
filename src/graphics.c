@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.169 2005/09/20 05:06:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.170 2005/09/23 00:36:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1782,7 +1782,7 @@ do_plot(struct curve_points *plots, int pcount)
 	if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 	    /* we deferred point sample until now */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
-		if (this_plot->lp_properties.p_size < 0)
+		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize);
 		(*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
 	    }
@@ -3212,7 +3212,7 @@ plot_points(struct curve_points *plot)
 		    && y <= ytop - p_height)) {
 
 		if (plot->plot_style == POINTSTYLE
-		&&  plot->lp_properties.p_size < 0)
+		&&  plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize * plot->points[i].z);
 		(*t->point) (x, y, plot->lp_properties.p_type);
 	    }

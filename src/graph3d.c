@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.130 2005/09/16 03:20:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.131 2005/09/16 17:14:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1737,7 +1737,7 @@ plot3d_points(struct surface_points *plot, int p_type)
 		    }
 
 		    if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
-		    &&  plot->lp_properties.p_size < 0)
+		    &&  plot->lp_properties.p_size == PTSZ_VARIABLE)
 			(*t->pointsize)(pointsize * points[i].CRD_PTSIZE);
 		    (*t->point) (x, y, p_type);
 		}

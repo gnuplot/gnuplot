@@ -1,3 +1,27 @@
+2005-10-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	Lines have more properties now than they used to. Rather than expanding
+	the number of parameters to lp_parse() to pass default values for each
+	property separately, change to requiring the caller of lp_parse() to
+	preload default values into the lp_style_type structure being passed.
+	This change should not by itself affect current syntax or behaviour,
+	but will allow us to remove the style initialization from lp_parse().
+	This in turn will allow different callers to have different default
+	line styles while still sharing the same parsing routine.
+
+	* src/misc.h src/misc.c (lp_parse): Remove def_line and def_point
+	parameters; instead assume they have been preloaded into lp.
+
+	* src/plot2d.c src/plot3d.c src/set.c: Modify all callers of lp_parse()
+	to follow the new scheme.
+
+	* src/gadgets.h src/term_api.h src/graph3d.c src/graphics.c src/save.c
+	src/plot2d.c src/plot3d.c: #define PTSZ_VARIABLE and PTSZ_DEFAULT as
+	constants rather than passing magic values for lp_style_type.p_size.
+
+	* src/term.c (term_apply_lp_properties): Check explicitly for
+	PTSZ_VARIABLE and PTSZ_DEFAULT.
+
 2005-09-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (axis_position_zeroaxis): More zeroaxis bugs; does nobody

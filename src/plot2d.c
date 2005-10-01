@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.113 2005/08/07 09:43:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.114 2005/08/12 17:42:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1259,7 +1259,7 @@ eval_plots()
 
 #ifdef EAM_HISTOGRAMS
 	if (almost_equals(c_token,"newhist$ogram")) {
-	    struct lp_style_type lp;
+	    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
 	    struct fill_style_type fs;
 	    int previous_token;
 	    c_token++;
@@ -1282,7 +1282,7 @@ eval_plots()
 		    histogram_title = try_to_get_string();
 
 		/* Allow explicit starting color or pattern for this histogram */
-		lp_parse(&lp, TRUE, FALSE, lp.l_type, 0);
+		lp_parse(&lp, TRUE, FALSE);
 		parse_fillstyle(&fs, FS_SOLID, 100, fs.fillpattern, -1); 
 
 		} while (c_token != previous_token);
@@ -1560,11 +1560,12 @@ eval_plots()
 		    }
 		} else {
 		    int stored_token = c_token;
-		    struct lp_style_type lp;
+		    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
+		    lp.l_type = line_num;
+		    lp.p_type = point_num;
 
-		    lp_parse(&lp, 1,
-			     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
-			     line_num, point_num);
+		    lp_parse(&lp, TRUE,
+				this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 		    if (stored_token != c_token) {
 			if (set_lpstyle) {
 			    duplication=TRUE;
@@ -1627,9 +1628,13 @@ eval_plots()
 	     * the defaults for linewidth and pointsize, call it now
 	     * to define them. */
 	    if (! set_lpstyle) {
-		lp_parse(&this_plot->lp_properties, 1,
-			 this_plot->plot_style & PLOT_STYLE_HAS_POINT,
-			 line_num, point_num);
+		this_plot->lp_properties.l_type = line_num;
+		this_plot->lp_properties.l_width = 1.0;
+		this_plot->lp_properties.p_type = point_num;
+		this_plot->lp_properties.p_size = pointsize;
+		this_plot->lp_properties.use_palette = 0;
+		lp_parse(&this_plot->lp_properties, TRUE,
+			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 
 #ifdef BACKWARDS_COMPATIBLE
 		/* allow old-style syntax - ignore case lt 3 4 for example */
@@ -1650,7 +1655,7 @@ eval_plots()
 	    /* Rule out incompatible line/point/style options */
 	    if (this_plot->plot_type == FUNC) {
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_POINT) 
-		&&  (this_plot->lp_properties.p_size < 0))
+		&&  (this_plot->lp_properties.p_size == PTSZ_VARIABLE))
 		    this_plot->lp_properties.p_size = 1;
 	    }
 	    if (this_plot->lp_properties.use_palette

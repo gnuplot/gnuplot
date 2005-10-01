@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.203 2005/09/20 19:08:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.204 2005/09/23 14:58:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -925,7 +925,7 @@ set_border()
 	    c_token++;
 	} else {
 	    int save_token = c_token;
-	    lp_parse(&border_lp, TRUE, FALSE, border_lp.l_type, 0);
+	    lp_parse(&border_lp, TRUE, FALSE);
 	    if (save_token != c_token)
 		continue;
 	    draw_border = (int)real(const_express(&a));
@@ -1379,7 +1379,7 @@ set_grid()
 	struct value a;
 	int old_token = c_token;
 
-	lp_parse(&grid_lp,1,0,-1,1);
+	lp_parse(&grid_lp, TRUE, FALSE);
 	if (c_token == old_token) { /* nothing parseable found... */
 	    grid_lp.l_type = real(const_express(&a)) - 1;
 	}
@@ -1392,7 +1392,7 @@ set_grid()
 	    if (equals(c_token,","))
 		c_token++;
 	    old_token = c_token;
-	    lp_parse(&mgrid_lp,1,0,-1,1);
+	    lp_parse(&mgrid_lp, TRUE, FALSE);
 	    if (c_token == old_token) {
 		mgrid_lp.l_type = real(const_express(&a)) -1;
 	    }
@@ -1698,7 +1698,8 @@ set_key()
 	    else {
 		int old_token = c_token;
 		
-		lp_parse(&key->box,1,0,-2,0);
+		key->box.l_type = LT_BLACK;  /* Only reset if currently LT_NO_DRAW? */
+		lp_parse(&key->box, TRUE, FALSE);
 		if (old_token == c_token && isanumber(c_token)) {
 		    key->box.l_type = real(const_express(&a)) - 1;
 		    c_token++;
@@ -3890,7 +3891,8 @@ set_zeroaxis(AXIS_INDEX axis)
     else {
 	struct value a;
 	int old_token = c_token;
-	lp_parse(&axis_array[axis].zeroaxis,1,0,-1,0);
+	axis_array[axis].zeroaxis.l_type = LT_AXIS;
+	lp_parse(&axis_array[axis].zeroaxis, TRUE, FALSE);
 	if (old_token == c_token)
 	    axis_array[axis].zeroaxis.l_type = real(const_express(&a)) - 1;
 }
@@ -4163,9 +4165,8 @@ set_xyzlabel(text_label *label)
 
 
 
-/* ======================================================== */
-/* process a 'set linestyle' command */
-/* set linestyle {tag} {linetype n} {linewidth x} {pointtype n} {pointsize x} */
+/* 'set style line' command */
+/* set style line {tag} {linetype n} {linewidth x} {pointtype n} {pointsize x} */
 static void
 set_linestyle()
 {
@@ -4187,15 +4188,11 @@ set_linestyle()
     } else
 	tag = assign_linestyle_tag();	/* default next tag */
 
-    /* pick up a line spec : dont allow ls, do allow point type
-     * default to same line type = point type = tag
-     */
-    lp_parse(&loc_lp, 0, 1, tag - 1, tag - 1);
+    /* Default style is based on linetype with the same tag id */
+    loc_lp.l_type = tag - 1;
+    loc_lp.p_type = tag - 1;
 
-    if (!END_OF_COMMAND)
-	int_error(c_token, "extraneous or out-of-order arguments in set linestyle");
-
-    /* OK! add linestyle */
+    /* Check if linestyle is already defined */
     if (first_linestyle != NULL) {	/* skip to last linestyle */
 	for (this_linestyle = first_linestyle; this_linestyle != NULL;
 	     prev_linestyle = this_linestyle, this_linestyle = this_linestyle->next)
@@ -4203,13 +4200,9 @@ set_linestyle()
 	    if (tag <= this_linestyle->tag)
 		break;
     }
-    if (this_linestyle != NULL && tag == this_linestyle->tag) {
-	/* changing the linestyle */
-	this_linestyle->lp_properties = loc_lp;
-    } else {
-	/* adding the linestyle */
-	new_linestyle = (struct linestyle_def *)
-	    gp_alloc(sizeof(struct linestyle_def), "linestyle");
+
+    if (this_linestyle == NULL || tag != this_linestyle->tag) {
+	new_linestyle = gp_alloc(sizeof(struct linestyle_def), "linestyle");
 	if (prev_linestyle != NULL)
 	    prev_linestyle->next = new_linestyle;	/* add it to end of list */
 	else
@@ -4217,7 +4210,27 @@ set_linestyle()
 	new_linestyle->tag = tag;
 	new_linestyle->next = this_linestyle;
 	new_linestyle->lp_properties = loc_lp;
+	this_linestyle = new_linestyle;
     }
+#ifndef OMIT_THIS_CODE_TO_MAKE_SET_LINESTYLE_INCREMENTAL
+    else
+	this_linestyle->lp_properties = loc_lp;
+#endif
+
+    /* Reset to default values */
+    if (END_OF_COMMAND)
+	this_linestyle->lp_properties = loc_lp;
+    else if (almost_equals(c_token, "def$ault")) {
+	this_linestyle->lp_properties = loc_lp;
+	c_token++;
+    } else
+
+    /* pick up a line spec; dont allow ls, do allow point type */
+	lp_parse(&this_linestyle->lp_properties, FALSE, TRUE);
+
+    if (!END_OF_COMMAND)
+	int_error(c_token,"Extraneous arguments to set style line");
+
 }
 
 /* assign a new linestyle tag
@@ -4754,9 +4767,10 @@ parse_label_options( struct text_label *this_label )
 	if (loc_lp.pointflag == -2 && !axis_label) {
 	    if (almost_equals(c_token, "po$int")) {
 		int stored_token = ++c_token;
-	    struct lp_style_type tmp_lp;
+	    struct lp_style_type tmp_lp = loc_lp;
 
-	    lp_parse(&tmp_lp, 1, 1, -2, -2);
+	    tmp_lp.p_type = -2;
+	    lp_parse(&tmp_lp, TRUE, TRUE);
 	    if (stored_token != c_token) {
 		loc_lp = tmp_lp;
 		loc_lp.pointflag = 1;
