@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.329 2005/09/14 23:24:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.330 2005/09/18 06:20:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9011,25 +9011,7 @@ C ... and restart the table:
  `set mxtics` for control of minor tic marks.  These commands provide control
  at a axis by axis basis.
 3 ticslevel
-?commands set ticslevel
-?commands show ticslevel
-?set ticslevel
-?show ticslevel
-?ticslevel
- Using `splot`, one can adjust the relative height of the vertical (Z) axis
- using `set ticslevel`.  The numeric argument provided specifies the location
- of the bottom of the scale (as a fraction of the z-range) above the xy-plane.
- The default value is 0.5.  Negative values are permitted, but tic labels on
- the three axes may overlap.
-
- To place the xy-plane at a position 'pos' on the z-axis, `ticslevel` should
- be set equal to  (pos - zmin) / (zmin - zmax).
-
- Syntax:
-       set ticslevel {<level>}
-       show tics
-
- See also `set view`.
+ See `set xyplane`.
 3 ticscale
 ?commands set ticscale
 ?commands show ticscale
@@ -9782,6 +9764,42 @@ C ... and restart the table:
  Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the
  second example the tic at "Dec 3" will be unlabelled.
 
+3 xyplane
+?commands set ticslevel
+?commands show ticslevel
+?set ticslevel
+?show ticslevel
+?ticslevel
+?commands set xyplane
+?commands show xyplane
+?set xyplane
+?show xyplane
+?xyplane
+ The `set xyplane` command adjusts the position at which the xy plane is drawn
+ in a 3D plot.  The synonym "set ticslevel" is accepted for backwards
+ compatibility.
+
+ Syntax:
+       set ticslevel <level>
+       set xyplane <level>
+       set xyplane at <level>
+       show xyplane
+
+ The form `set ticslevel <frac>` places the xy plane below the range in Z, where
+ the distance from the xy plane to Zmin is given as a fraction of the total 
+ range in z.  The default value is 0.5.  Negative values are permitted, but tic
+ labels on the three axes may overlap.
+
+ To place the xy-plane at a position 'pos' on the z-axis, `ticslevel` may
+ be set equal to  (pos - zmin) / (zmin - zmax).  However, this position will
+ change if the z range is changed.
+
+ The alternative form `set xyplane at <zvalue>` fixes the placement of the
+ xy plane at a specific Z value regardless of the current z range. Thus to
+ force the x, y, and z axes to meet at a common origin one would specify
+ `set xyplane at 0`.
+
+ See also `set view`, and `set zeroaxis`.
 3 xzeroaxis
 ?commands set xzeroaxis
 ?commands unset xzeroaxis

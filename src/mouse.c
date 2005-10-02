@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.74 2005/08/07 09:43:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.75 2005/09/26 04:19:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1698,7 +1698,7 @@ event_motion(struct gp_event_t *ge)
 		return;
 # endif
 	    if (modifier_mask & Mod_Shift) {
-		ticslevel += (1 + fabs(ticslevel))
+		xyplane.ticslevel += (1 + fabs(xyplane.ticslevel))
 		    * (mouse_y - start_y) * 2.0 / term->ymax;
 	    } else {
 
@@ -2088,7 +2088,7 @@ bind_display(char *lhs)
 	fprintf(stderr, fmt, "<B3>", "mark zoom region (only for 2d-plots and maps).");
 	fprintf(stderr, fmt, "<B1-Motion>", "change view (rotation). Use <ctrl> to rotate the axes only.");
 	fprintf(stderr, fmt, "<B2-Motion>", "change view (scaling). Use <ctrl> to scale the axes only.");
-	fprintf(stderr, fmt, "<Shift-B2-Motion>", "vertical motion -- change ticslevel");
+	fprintf(stderr, fmt, "<Shift-B2-Motion>", "vertical motion -- change xyplane");
 	fprintf(stderr, "\n");
 	fprintf(stderr, " %-12s   %s\n", "Space", "raise gnuplot console window");
 	fprintf(stderr, " %-12s * %s\n", "q", "close this X11 plot window");

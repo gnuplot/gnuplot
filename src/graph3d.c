@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.131 2005/09/16 17:14:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.132 2005/10/01 23:38:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -102,7 +102,7 @@ float surface_zscale = 1.0;
 int splot_map = FALSE;
 
 /* position of the base plane, as given by 'set ticslevel' */
-float ticslevel = 0.5;
+t_xyplane xyplane = { 0.5, 0.0, FALSE };
 
 /* 'set isosamples' settings */
 int iso_samples_1 = ISO_SAMPLES;
@@ -577,13 +577,13 @@ do_3dplot(
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
     if (X_AXIS.ticmode || Y_AXIS.ticmode || some_grid_selected()) {
 	base_z = Z_AXIS.min
-	    - (Z_AXIS.max - Z_AXIS.min) * ticslevel;
-	if (ticslevel >= 0)
+	    - (Z_AXIS.max - Z_AXIS.min) * xyplane.ticslevel;
+	if (xyplane.ticslevel >= 0)
 	    floor_z = base_z;
 	else
 	    floor_z = Z_AXIS.min;
 
-	if (ticslevel < -1)
+	if (xyplane.ticslevel < -1)
 	    ceiling_z = base_z;
 	else
 	    ceiling_z = Z_AXIS.max;
@@ -591,6 +591,10 @@ do_3dplot(
 	floor_z = base_z = Z_AXIS.min;
 	ceiling_z = Z_AXIS.max;
     }
+
+    /* Allow an absolute setting of base_z via "set xyplane at <z>" */
+    if (xyplane.absolute)
+	base_z = xyplane.xyplane_z;
 
     /*  see comment accompanying similar tests of x_min/x_max and y_min/y_max
      *  in graphics.c:do_plot(), for history/rationale of these tests */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.122 2005/09/18 06:20:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.123 2005/10/01 23:38:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -631,7 +631,10 @@ set origin %g,%g\n",
     save_zeroaxis(fp, SECOND_X_AXIS);
     save_zeroaxis(fp, SECOND_Y_AXIS);
 
-    fprintf(fp, "set ticslevel %g\n", ticslevel);
+    if (xyplane.absolute)
+	fprintf(fp, "set xyplane at %g\n", xyplane.xyplane_z);
+    else
+	fprintf(fp, "set ticslevel %g\n", xyplane.ticslevel);
 
 #define SAVE_MINI(axis)							\
     switch(axis_array[axis].minitics & TICS_MASK) {			\

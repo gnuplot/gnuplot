@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.88 2005/09/12 23:51:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.89 2005/09/18 06:20:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1382,7 +1382,8 @@ unset_ticscale()
 static void
 unset_ticslevel()
 {
-    ticslevel = 0.5;
+    xyplane.ticslevel = 0.5;
+    xyplane.absolute = FALSE;
 }
 
 

@@ -2,6 +2,19 @@
 
 	* src/gadgets.h: Remove unused struct default_keybox_lp.
 
+	* src/graph3d.c src/graph3d.h src/mouse.c src/save.c src/set.c
+	src/show.c src/tables.c src/unset.c docs/gnuplot.doc:
+	Move global ticslevel into a global struct xyplane that also contains a
+	flag indicating whether the value fixes the Z-intercept of the x/y plane
+	at a fraction of the z range (old behaviour) or a specific value of
+	Z (new option). To select a specific Z, use "set ticslevel at <zval>".
+	This change also introduces "xyplane" as a synonym for "ticslevel",
+	so the more easily remembered form of the command is
+	"set xyplane at <zval>".
+
+	* src/graph3d.c (do_3dplot): Check for absolute placement of xyplane
+	along Z axis, controlled by "set {ticslevel|xyplane} at <zval>".
+
 2005-10-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	Lines have more properties now than they used to. Rather than expanding

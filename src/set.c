@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.204 2005/09/23 14:58:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.205 2005/10/01 23:38:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -185,7 +185,7 @@ set_command()
 \t'offsets', 'origin', 'output', 'palette', 'parametric', 'pm3d',\n\
 \t'pointsize', 'polar', 'print', '[rtuv]range', 'samples', 'size',\n\
 \t'style', 'surface', 'terminal', tics', 'ticscale', 'ticslevel',\n\
-\t'timestamp', 'timefmt', 'title', 'view', '[xyz]{2}data',\n\
+\t'timestamp', 'timefmt', 'title', 'view', 'xyplane', '[xyz]{2}data',\n\
 \t'[xyz]{2}label', '[xyz]{2}range', '{no}{m}[xyz]{2}tics',\n\
 \t'[xyz]{2}[md]tics', '{[xy]{2}}zeroaxis', 'zero'";
 
@@ -3635,17 +3635,21 @@ set_ticscale()
 }
 
 
-/* process 'set ticslevel' command */
+/* process 'set ticslevel' or 'set xyplane' command */
+/* is datatype 'time' relevant here ? */
 static void
 set_ticslevel()
 {
     struct value a;
-    double tlvl;
 
-    c_token++;
-    /* is datatype 'time' relevant here ? */
-    tlvl = real(const_express(&a));
-    ticslevel = tlvl;
+    if (equals(++c_token, "at")) {
+	c_token++;
+	xyplane.xyplane_z = real(const_express(&a));
+	xyplane.absolute = TRUE;
+    } else {
+	xyplane.ticslevel = real(const_express(&a));
+	xyplane.absolute = FALSE;
+    }
 }
 
 
