@@ -118,14 +118,14 @@ typedef struct arrow_def {
     struct arrow_style_type arrow_properties;
 } arrow_def;
 
-/* Datastructure implementing 'set linestyle' */
+/* Datastructure implementing 'set style line' */
 struct linestyle_def {
     struct linestyle_def *next;	/* pointer to next linestyle in linked list */
     int tag;			/* identifies the linestyle */
     struct lp_style_type lp_properties;
 };
 
-/* Datastructure implementing 'set linestyle' */
+/* Datastructure implementing 'set style arrow' */
 struct arrowstyle_def {
     struct arrowstyle_def *next;/* pointer to next arrowstyle in linked list */
     int tag;			/* identifies the arrowstyle */
@@ -227,8 +227,7 @@ typedef struct {
     TBOOLEAN reverse;		/* key back to front */
     TBOOLEAN invert;		/* key top to bottom */
     TBOOLEAN enhanced;		/* enable/disable enhanced text of key titles */
-    struct lp_style_type default_keybox_lp; /* linetype of box around key:  */
-    struct lp_style_type box;		    /*    default and current state */
+    struct lp_style_type box;	/* linetype of box around key:  */
     char title[MAX_LINE_LEN+1];	/* title line for the key as a whole */
 } legend_key;
 
@@ -247,7 +246,6 @@ extern legend_key keyT;
 		4.0, 1.0, 0.0, 0.0, \
 		FILENAME_KEYTITLES, \
 		FALSE, FALSE, TRUE, \
-		DEFAULT_KEYBOX_LP, \
 		DEFAULT_KEYBOX_LP, \
 		"" }
 
