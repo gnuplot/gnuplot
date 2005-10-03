@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.171 2005/09/08 15:27:59 lhecking Exp $
+dnl $Id: configure.in,v 1.172 2005/09/08 16:45:48 broeker Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -979,7 +979,11 @@ if test "$ac_cv_lib_gd_gdImageGifAnimBegin" = yes; then
 fi
 
 if test "$with_png" != no; then
-  AC_MSG_RESULT([  Enable generation of PNG files])
+  if test "$with_gd" != no; then
+    AC_MSG_RESULT([  Enable generation of PNG files])
+  else
+    AC_MSG_RESULT([  PNG support disabled because libgd not found])
+  fi
 fi
 
 if test "$have_ttf" = yes; then

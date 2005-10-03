@@ -1,3 +1,8 @@
+2005-10-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* configure.in: Issue a warning message if someone tries to build the
+	PNG terminal without libgd.
+
 2005-10-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h: Remove unused struct default_keybox_lp.
