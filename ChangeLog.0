@@ -1,3 +1,8 @@
+This is ChangeLog for gnuplot development period from April 1998 until April 2004
+when gnuplot 4.0 was released
+=================================================================================
+
+
 2004-04-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* README: Mention CTAN as a distributor.
