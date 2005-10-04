@@ -1,3 +1,9 @@
+2005-10-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+        * src/win/wtext.c (DragFunc): Increase maximum length of filenames in
+	drag and drop operations to MAX_PATH (bug found by Tim Chippington
+	Derrick).
+
 2005-10-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Issue a warning message if someone tries to build the

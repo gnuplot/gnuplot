@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.9 2004/07/01 17:10:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.10 2004/07/07 16:56:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -742,7 +742,6 @@ UpdateMark(LPTW lptw, POINT pt)
 
 #if WINVER >= 0x030a
 /* Windows 3.1 drag-drop feature */
-char szFile[80];
 
 void
 DragFunc(LPTW lptw, HDROP hdrop)
@@ -754,7 +753,9 @@ DragFunc(LPTW lptw, HDROP hdrop)
 	return;
     cFiles = DragQueryFile(hdrop, (UINT) -1, (LPSTR)NULL, 0);
     for (i=0; i<cFiles; i++) {
-	DragQueryFile(hdrop, i, szFile, 80);
+	char szFile[MAX_PATH];
+
+	DragQueryFile(hdrop, i, szFile, MAX_PATH);
 	for (p=lptw->DragPre; *p; p++)
 	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
 	for (p=szFile; *p; p++)
