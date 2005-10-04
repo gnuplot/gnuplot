@@ -1,3 +1,8 @@
+2005-10-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/pbm.trm (PBM_options): Add an option to set the output size.
+	set term pbm size XXX,YYY
+
 2005-10-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
         * src/win/wtext.c (DragFunc): Increase maximum length of filenames in

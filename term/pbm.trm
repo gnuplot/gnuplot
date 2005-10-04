@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pbm.trm,v 1.19 2004/04/13 17:24:36 broeker Exp $
+ * $Id: pbm.trm,v 1.20 2004/07/01 17:10:33 broeker Exp $
  *
  */
 
@@ -100,7 +100,7 @@ static int ppm_color[] ={ 15, 8, 3, 5, 6, 2, 4, 1, 11, 13, 14 };  /* colors */
 
 enum PBM_id {
     PBM_SMALL, PBM_MEDIUM, PBM_LARGE,
-    PBM_MONOCHROME, PBM_GRAY, PBM_COLOR,
+    PBM_MONOCHROME, PBM_GRAY, PBM_COLOR, PBM_SIZE,
     PBM_OTHER
 };
 
@@ -113,6 +113,7 @@ static struct gen_table PBM_opts[] =
     { "g$ray", PBM_GRAY },
     { "c$olor", PBM_COLOR },
     { "c$olour", PBM_COLOR },
+    { "size", PBM_SIZE },
     { NULL, PBM_OTHER }
 };
 
@@ -121,6 +122,9 @@ PBM_options()
 {
     pbm_font = 1;
     pbm_mode = 0;
+    int xpixels = PBM_XMAX;
+    int ypixels = PBM_YMAX;
+    struct value a;
 
     term_options[0] = NUL;
 
@@ -149,6 +153,23 @@ PBM_options()
 	case PBM_COLOR:
 	    pbm_mode = 2;
 	    c_token++;
+	    break;
+	case PBM_SIZE:
+	    c_token++;
+	    if (END_OF_COMMAND) {
+		term->xmax = PBM_XMAX;
+		term->ymax = PBM_YMAX;
+	    } else {
+		xpixels = real(const_express(&a));
+		if (equals(c_token, ",")) {
+		    c_token++;
+		    ypixels = real(const_express(&a));
+		}
+	    }
+	    if (xpixels > 0)
+		term->xmax = xpixels;
+	    if (ypixels > 0)
+		term->ymax = ypixels;
 	    break;
 	case PBM_OTHER:
 	default:
@@ -185,6 +206,9 @@ PBM_options()
 	strcat(term_options, " color");
 	break;
     }
+
+    sprintf(term_options + strlen(term_options), " size %d,%d",
+	    term->xmax, term->ymax);
 }
 
 
@@ -253,8 +277,8 @@ PBM_graphics()
     /* PBMsetfont(); */
     /* rotate plot -90 degrees by reversing XMAX and YMAX and by
        setting b_rastermode to TRUE */
-    b_makebitmap((unsigned int) (PBM_YMAX * ysize),
-		 (unsigned int) (PBM_XMAX * xsize), numplanes);
+    b_makebitmap((unsigned int) (term->ymax * ysize),
+		 (unsigned int) (term->xmax * xsize), numplanes);
     b_rastermode = TRUE;
 
     if (pbm_mode != 0)
@@ -448,11 +472,11 @@ START_HELP(pbm)
 " Several options may be set in the `pbm` terminal---the driver for PBMplus.",
 "",
 " Syntax:",
-"       set terminal pbm {<fontsize>} {<mode>}",
+"       set terminal pbm {<fontsize>} {<mode>} {size <x>,<y>}",
 "",
 " where <fontsize> is `small`, `medium`, or `large` and <mode> is `monochrome`,",
 " `gray` or `color`.  The default plot size is 640 pixels wide and 480 pixels",
-" high; this may be changed by `set size`.",
+" high.",
 "",
 " The output of the `pbm` driver depends upon <mode>: `monochrome` produces a",
 " portable bitmap (one bit per pixel), `gray` a portable graymap (three bits",
@@ -467,6 +491,6 @@ START_HELP(pbm)
 "",
 " Examples:",
 "       set terminal pbm small monochrome             # defaults",
-"       set size 2,2; set terminal pbm color medium"
+"       set terminal pbm color medium size 800,600"
 END_HELP(pbm)
 #endif /* TERM_HELP */
