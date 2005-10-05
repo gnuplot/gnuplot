@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.75 2005/09/23 14:58:28 mikulik Exp $
+ * $Id: gd.trm,v 1.76 2005/10/05 15:48:58 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -659,6 +659,10 @@ PNG_options()
 		    c_token++;
 		    PNG_YMAX = real(const_express(&s));
 		}
+		if (PNG_XMAX < 0)
+		    PNG_XMAX = GREG_XMAX;
+		if (PNG_YMAX < 0)
+		    PNG_YMAX = GREG_YMAX;
 	    }
 	    term->ymax = PNG_YMAX;
 	    term->xmax = PNG_XMAX;

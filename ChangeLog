@@ -1,3 +1,7 @@
+2005-10-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_options): Test for valid (>0) size of image.
+
 2005-10-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	SF RFE [1063878] Support for pre-compiled bgd.dll
