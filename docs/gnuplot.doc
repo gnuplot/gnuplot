@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.330 2005/09/18 06:20:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.331 2005/10/02 22:15:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9964,6 +9964,18 @@ C ... and restart the table:
 ?nozdtics
  The `set zdtics` command changes tics on the z axis to days of the week.
  Please see `set xdtics` for details.
+3 zzeroaxis
+?commands set zzeroaxis
+?commands unset zzeroaxis
+?commands show zzeroaxis
+?set zzeroaxis
+?unset zzeroaxis
+?show zzeroaxis
+?zzeroaxis
+?nozzeroaxis
+ The `set zzeroaxis` command draws a line through (x=0,y=0).  This has no effect
+ on 2D plots, including splot with `set view map`. For details, please
+ see `set zeroaxis` and `set xyplane`.
 3 cbdata
 ?commands set cbdata
 ?commands show cbdata
@@ -10009,14 +10021,14 @@ C ... and restart the table:
 ?show zeroaxis
 ?zeroaxis
  The x axis may be drawn by `set xzeroaxis` and removed by `unset xzeroaxis`.
- Similar commands behave similarly for the y, x2, and y2 axes.
+ Similar commands behave similarly for the y, x2, y2, and z axes.
 
  Syntax:
-       set {x|x2|y|y2|}zeroaxis { {linestyle | ls <line_style>}
+       set {x|x2|y|y2|z}zeroaxis { {linestyle | ls <line_style>}
                                   | { linetype | lt <line_type>}
                                     { linewidth | lw <line_width>}}
-       unset {x|x2|y|y2|}zeroaxis
-       show {x|y|}zeroaxis
+       unset {x|x2|y|y2|z}zeroaxis
+       show {x|y|z}zeroaxis
 
 
  By default, these options are off.  The selected zero axis is drawn
@@ -10028,7 +10040,7 @@ C ... and restart the table:
  using the axis linetype (linetype 0).
 
  `set zeroaxis` is equivalent to `set xzeroaxis; set yzeroaxis`.
- `set nozeroaxis` is equivalent to `unset xzeroaxis; unset yzeroaxis`.
+ Note that the z-axis must be set separately using `set zzeroaxis`.
 
  Examples:
 

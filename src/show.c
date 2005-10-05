@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.168 2005/09/26 04:19:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.169 2005/10/02 22:15:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -186,7 +186,7 @@ show_command()
 \t'samples', 'size', 'style', 'terminal', 'tics', 'timestamp',\n\
 \t'timefmt', 'title', 'variables', 'version', 'view',\n\
 \t'[xyz,cb]{2}label', '[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics',\n\
-\t'[xyz,cb]{2}[md]tics', '{[xy]{2}}zeroaxis', '[xyz,cb]data', 'zero'";
+\t'[xyz,cb]{2}[md]tics', '{[xyz]{2}}zeroaxis', '[xyz,cb]data', 'zero'";
 
     enum set_id token_found;
     struct value a;
@@ -264,12 +264,14 @@ show_command()
     case S_GRID:
 	show_grid();
 	break;
+    case S_ZEROAXIS:
+	show_zeroaxis(FIRST_X_AXIS);
+	show_zeroaxis(FIRST_Y_AXIS);
+	show_zeroaxis(FIRST_Z_AXIS);
+	break;
     case S_XZEROAXIS:
 	show_zeroaxis(FIRST_X_AXIS);
 	break;
-    case S_ZEROAXIS:
-	show_zeroaxis(FIRST_X_AXIS);
-	/* FALLTHROUGH */
     case S_YZEROAXIS:
 	show_zeroaxis(FIRST_Y_AXIS);
 	break;
@@ -278,6 +280,9 @@ show_command()
 	break;
     case S_Y2ZEROAXIS:
 	show_zeroaxis(SECOND_Y_AXIS);
+	break;
+    case S_ZZEROAXIS:
+	show_zeroaxis(FIRST_Z_AXIS);
 	break;
 
 #define CHECK_TAG_GT_ZERO					\
@@ -749,6 +754,7 @@ show_all()
     show_grid();
     show_zeroaxis(FIRST_X_AXIS);
     show_zeroaxis(FIRST_Y_AXIS);
+    show_zeroaxis(FIRST_Z_AXIS);
     show_label(0);
     show_arrow(0);
 /*
@@ -1480,7 +1486,7 @@ show_grid()
 }
 
 
-/* process 'show {x|y}zeroaxis' command */
+/* process 'show {x|y|z}zeroaxis' command */
 static void
 show_zeroaxis(AXIS_INDEX axis)
 {

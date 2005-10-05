@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.52 2005/08/07 09:43:31 mikulik Exp $
+ * $Id: tables.h,v 1.53 2005/09/05 19:36:59 mikulik Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -111,7 +111,8 @@ enum set_id {
     S_ZDATA, S_ZDTICS, S_NOZDTICS, S_ZLABEL, S_ZMTICS, S_NOZMTICS, S_ZRANGE,
     S_ZTICS, S_NOZTICS,
 
-    S_ZERO, S_ZEROAXIS, S_XZEROAXIS, S_X2ZEROAXIS, S_YZEROAXIS, S_Y2ZEROAXIS
+    S_ZERO, S_ZEROAXIS, S_XZEROAXIS, S_X2ZEROAXIS, S_YZEROAXIS, S_Y2ZEROAXIS,
+    S_ZZEROAXIS
 };
 
 enum set_hidden3d_id {

@@ -20,6 +20,15 @@ splot 'rgb_variable.dat' using 1:2:3:(5*rand(0)):4 with points pt 7 ps variable 
       title "variable pointsize and rgb color read as hexidecimal"
 pause -1 "Hit return to continue"
 #
+set border 0
+set xtics axis nomirror
+set ytics axis nomirror
+set ztics axis nomirror
+set xzeroaxis lt -1 lc rgb "red" lw 2
+set yzeroaxis lt -1 lc rgb "green" lw 2
+set zzeroaxis lt -1 lc rgb "blue" lw 2
+set xyplane at 0.0
+
 splot 'rgb_variable.dat' using 1:2:3:(5*rand(0)):(rgb($1,$2,$3)) with points pt 7 ps variable lc rgb variable \
       title "variable pointsize and rgb color computed from coords"
 pause -1 "Hit return to continue"

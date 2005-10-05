@@ -1,5 +1,17 @@
 2005-10-05  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/graph3d.c (draw_3d_graphbox ztick_callback)
+	src/save.c (save_set_all) src/set.c (set_command set_zeroaxis)
+	src/show.c (show_command show_all show_zeroaxis) src/tables.c
+	src/tables.h src/unset.c (unset_command unset_zeroaxis)
+	demo/rgb_variable.dem:
+
+	Implement zzeroaxis, and rework the placement of axis tics and labels
+	in 3D when the corresponding "set {xyz}tics axis" flag is set.
+	Bug #1293118.
+
+2005-10-05  Ethan Merritt  <merritt@u.washington.edu>
+
 	* term/gd.trm (PNG_options): Test for valid (>0) size of image.
 
 2005-10-05  Bastian Maerkisch  <bmaerkisch@web.de>

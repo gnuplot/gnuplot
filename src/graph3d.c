@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.132 2005/10/01 23:38:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.133 2005/10/02 22:15:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2255,7 +2255,11 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	    } else { /* usual 3d set view ... */
 		double step = (xaxis_y - other_end) / 4;
 
-		map3d_xyz(mid_x, xaxis_y + step, base_z, &v1);
+		if (X_AXIS.ticmode & TICS_ON_AXIS) {
+		    map3d_xyz(mid_x, (X_AXIS.tic_in ? step : -step)/2., base_z, &v1);
+		} else {
+		    map3d_xyz(mid_x, xaxis_y + step, base_z, &v1);
+		}
 		if (!X_AXIS.tic_in) {
 		    v1.x -= tic_unitx * X_AXIS.ticscale * t->v_tic;
 		    v1.y -= tic_unity * X_AXIS.ticscale * t->v_tic;
@@ -2365,7 +2369,11 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		    angle = Y_AXIS.label.rotate;
 		} else { /* usual 3d set view ... */
 		    double step = (other_end - yaxis_x) / 4;
-		    map3d_xyz(yaxis_x - step, mid_y, base_z, &v1);
+		    if (Y_AXIS.ticmode & TICS_ON_AXIS) {
+			map3d_xyz((X_AXIS.tic_in ? -step : step)/2., mid_y, base_z, &v1);
+		    } else {
+			map3d_xyz(yaxis_x - step, mid_y, base_z, &v1);
+		    }
 		    if (!X_AXIS.tic_in) {
 			v1.x -= tic_unitx * X_AXIS.ticscale * t->h_tic;
 			v1.y -= tic_unity * X_AXIS.ticscale * t->h_tic;
@@ -2428,6 +2436,17 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	map3d_xyz(0.0, Y_AXIS.max, base_z, &v2);
 	draw3d_line(&v1, &v2, &Y_AXIS.zeroaxis);
     }
+    if ((Z_AXIS.zeroaxis.l_type > L_TYPE_NODRAW)
+	&& !X_AXIS.log
+	&& inrange(0, X_AXIS.min, X_AXIS.max)
+	) {
+	vertex v1, v2;
+
+	/* line through x=0 y=0 */
+	map3d_xyz(0.0, 0.0, Z_AXIS.min, &v1);
+	map3d_xyz(0.0, 0.0, Z_AXIS.max, &v2);
+	draw3d_line(&v1, &v2, &Z_AXIS.zeroaxis);
+    }
     if ((X_AXIS.zeroaxis.l_type > L_TYPE_NODRAW)
 	&& !Y_AXIS.log
 	&& inrange(0, Y_AXIS.min, Y_AXIS.max)
@@ -2455,10 +2474,17 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	double other_end = X_AXIS.min + X_AXIS.max - zaxis_x;
 	double mid_z = (Z_AXIS.max + Z_AXIS.min) / 2.;
 	double step = (other_end - zaxis_x) / 4.;
-	
-	map3d_xyz(zaxis_x - step, zaxis_y, mid_z, &v1);
 
-	TERMCOORD(&v1, x, y);
+	if (Z_AXIS.ticmode & TICS_ON_AXIS) {
+	    map3d_xyz(0, 0, mid_z, &v1);
+	    TERMCOORD(&v1, x, y);
+	    x -= 5 * t->h_char;
+	    h_just = RIGHT;
+	} else {
+	    map3d_xyz(zaxis_x - step, zaxis_y, mid_z, &v1);
+	    TERMCOORD(&v1, x, y);
+	    h_just = CENTRE;
+	}
 
 	map3d_position_r(&(Z_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
 	x += tmpx;
@@ -2648,7 +2674,10 @@ ztick_callback(
 
     (void) axis;		/* avoid -Wunused warning */
 
-    map3d_xyz(zaxis_x, zaxis_y, place, &v1);
+    if (axis_array[axis].ticmode & TICS_ON_AXIS)
+	map3d_xyz(0., 0., place, &v1);
+    else
+	map3d_xyz(zaxis_x, zaxis_y, place, &v1);
     if (grid.l_type > L_TYPE_NODRAW) {
 	map3d_xyz(back_x, back_y, place, &v2);
 	map3d_xyz(right_x, right_y, place, &v3);

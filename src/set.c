@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.205 2005/10/01 23:38:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.206 2005/10/02 22:15:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -187,7 +187,7 @@ set_command()
 \t'style', 'surface', 'terminal', tics', 'ticscale', 'ticslevel',\n\
 \t'timestamp', 'timefmt', 'title', 'view', 'xyplane', '[xyz]{2}data',\n\
 \t'[xyz]{2}label', '[xyz]{2}range', '{no}{m}[xyz]{2}tics',\n\
-\t'[xyz]{2}[md]tics', '{[xy]{2}}zeroaxis', 'zero'";
+\t'[xyz]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
 
     c_token++;
 
@@ -596,6 +596,9 @@ set_command()
 	    break;
 	case S_YZEROAXIS:
 	    set_zeroaxis(FIRST_Y_AXIS);
+	    break;
+	case S_ZZEROAXIS:
+	    set_zeroaxis(FIRST_Z_AXIS);
 	    break;
 	case S_X2ZEROAXIS:
 	    set_zeroaxis(SECOND_X_AXIS);
@@ -3884,7 +3887,7 @@ set_range(AXIS_INDEX axis)
 	splot_map_activate();
 }
 
-/* process 'set xzeroaxis' command */
+/* process 'set {xyz}zeroaxis' command */
 static void
 set_zeroaxis(AXIS_INDEX axis)
 {
@@ -3909,6 +3912,9 @@ set_allzeroaxis()
 {
     set_zeroaxis(FIRST_X_AXIS);
     axis_array[FIRST_Y_AXIS].zeroaxis = axis_array[FIRST_X_AXIS].zeroaxis;
+#ifndef BACKWARDS_COMPATIBLE
+    axis_array[FIRST_Z_AXIS].zeroaxis = axis_array[FIRST_X_AXIS].zeroaxis;
+#endif
 }
 
 /*********** Support functions for set_command ***********/
