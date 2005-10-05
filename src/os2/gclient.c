@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.42 2005/08/30 09:50:10 broeker Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.43 2005/09/24 21:13:34 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -110,6 +110,13 @@ static char RCSid[]="$Id: gclient.c,v 1.42 2005/08/30 09:50:10 broeker Exp $";
 
 #if 0
 # include "pmprintf.h"
+# define DEBUG_IMAGE(a) PmPrintf a
+#else
+# define DEBUG_IMAGE(a)
+#endif
+
+#if 0
+# include "pmprintf.h"
 # define DEBUG_COLOR(a) PmPrintf a
 #else
 # define DEBUG_COLOR(a)
@@ -172,7 +179,10 @@ static LONG rgb_colors[18];
 #define   RGB_PALETTE_SIZE 0    /* size of the 'virtual' palette used for 
 				   translation of index to RGB value */
 
-#define   GNUBUF    2048        /* buffer for gnuplot commands */
+/* FIXME: increasing GNUBUF circumvents a bug/limitation in BufRead:
+   it cannot read datablocks larger than GNUBUF */
+#define   GNUBUF    131072
+//#define   GNUBUF    2048        /* buffer for gnuplot commands */
 #define   PIPEBUF   4096        /* size of pipe buffers */
 #define   CMDALLOC  4096        /* command buffer allocation increment (ints) */
 
@@ -1857,7 +1867,7 @@ DoPaint(HWND hWnd, HPS hps)
 static void
 ThreadDraw(void* arg)
 {
-    HAB     hab = WinInitialize(0);
+    HAB hab = WinInitialize(0);
 
     InitScreenPS();
 
@@ -2159,16 +2169,23 @@ SwapFont(HPS hps, char *szFNS)
     }
 }
 
+typedef struct image_list_entry {
+    PBITMAPINFO2 pbmi;
+    PBYTE image;
+    struct image_list_entry *next;
+} image_list_entry;
+static image_list_entry *image_list = NULL;
+
 
 /*
-** Thread to read plot commands from  GNUPLOT pm driver.
+** Thread to read plot commands from GNUPLOT pm driver.
 ** Opens named pipe, then clears semaphore to allow GNUPLOT driver to proceed.
 ** Reads commands and builds a command list.
 */
 static void
 ReadGnu(void* arg)
 {
-    HPIPE    hRead = 0L;
+    HPIPE hRead = 0L;
     POINTL ptl;
     long lOldLine = 0;
     BOOL bPath = FALSE;
@@ -2272,6 +2289,8 @@ ReadGnu(void* arg)
             switch (*buff) {
 	    case SET_GRAPHICS :    /* enter graphics mode */
 	    {
+		image_list_entry *ile;
+
 		if (tidDraw != 0) {
 		    /* already drawing - stop it */
 		    GpiSetStopDraw(hpsScreen, SDW_ON);
@@ -2293,6 +2312,16 @@ ReadGnu(void* arg)
 		GpiSetLineEnd(hps, LINEEND_ROUND);
 		GpiSetLineWidthGeom(hps, linewidth);
 		GpiSetCharBox(hps, &sizBaseFont);
+
+		/* free image buffers from previous plot, if any */
+		while (image_list) {
+		    DEBUG_IMAGE(("freeing image from last plot"));
+		    ile = image_list;
+		    image_list = ile->next;
+		    free(ile->image);
+		    free(ile->pbmi);
+		    free(ile);
+		}
 
 		break;
 	    }
@@ -3024,6 +3053,74 @@ ReadGnu(void* arg)
 		break;
 	    }
 
+	    case GR_RGB_IMAGE : 
+	    {
+		unsigned int i, M, N, image_size;
+		POINTL corner[4];
+		PBYTE image;
+		PBITMAPINFO2 pbmi;
+		POINTL points[4];
+		LONG hits;
+		PERRINFO perriBlk;
+		image_list_entry *ile;
+
+		BufRead(hRead, &M, sizeof(M), &cbR);
+		BufRead(hRead, &N, sizeof(N), &cbR);
+		for (i=0; i<4; i++) {
+		    BufRead(hRead, &(corner[i].x), sizeof(int), &cbR);
+		    BufRead(hRead, &(corner[i].y), sizeof(int), &cbR);
+		}
+		BufRead(hRead, &image_size, sizeof(image_size), &cbR);
+		DEBUG_IMAGE(("GR_IMAGE: M=%i, N=%i, size=%i", M, N, image_size));
+		DEBUG_IMAGE(("GR_IMAGE: corner [0]=(%i,%i) [1]=(%i,%i)", corner[0].x, corner[0].y, corner[1].x, corner[1].y));
+		image = (PBYTE) malloc(image_size);
+		/* FIXME: does not work if GNUBUF < image_size ! */
+		BufRead(hRead, image, image_size, &cbR);
+
+		points[0].x = corner[0].x;
+		points[0].y = corner[1].y;
+		points[1].x = corner[1].x; 
+		points[1].y = corner[0].y;
+		points[2].x = points[2].y = 0;
+		points[3].x = M;
+		points[3].y = N;
+
+		pbmi = (PBITMAPINFO2) calloc( sizeof(BITMAPINFOHEADER2), 1 );
+		pbmi->cbFix = sizeof(BITMAPINFOHEADER2);
+		pbmi->cx = M;
+		pbmi->cy = N;
+		pbmi->cPlanes = 1;
+		pbmi->cBitCount = 24;
+		pbmi->ulCompression = BCA_UNCOMP;
+		hits = GpiDrawBits(hps, image, pbmi, 4, &points, ROP_SRCCOPY, BBO_IGNORE );
+
+#if 0
+		if (hits == GPI_ERROR) {
+		    perriBlk = WinGetErrorInfo(hab);
+		    if (perriBlk) {
+			PSZ pszOffset, pszErrMsg;
+			pszOffset = ((PSZ)perriBlk) + perriBlk->offaoffszMsg;
+			pszErrMsg = ((PSZ)perriBlk) + *((PULONG)pszOffset);
+			if (perriBlk->cDetailLevel >= 2)
+				pszErrMsg = ((PSZ)perriBlk) + ((PULONG)pszOffset)[1];
+			DEBUG_IMAGE(("GpiDrawBits code=%x msg=%s", perriBlk->idError, pszErrMsg));
+			// DEBUG_IMAGE(("GpiDrawBits code=%x", perriErrorInfo->idError)); 
+			WinFreeErrorInfo(perriBlk);
+		    }
+		}
+#endif
+
+		/* We have to keep the image and the image header in memory since
+		   we use retained graphics */
+		ile = (image_list_entry *) malloc(sizeof(image_list_entry));
+		ile->next = image_list;
+		ile->pbmi = pbmi;
+		ile->image = image;
+		image_list = ile;
+
+		break;
+	    }
+
 	    case SET_RULER : { /* set_ruler(int x, int y) term API: x<0 switches ruler off */
 		int x, y;
 
@@ -3233,7 +3330,7 @@ GetNewFont(HWND hwnd, HPS hps)
     static int i1 =1;
     static int iSize;
     char szPtList[64];
-    HWND    hwndFontDlg;     /* Font dialog window handle */
+    HWND hwndFontDlg;     /* Font dialog window handle */
     char szFamilyname[FACESIZE];
 
     if (i1) {

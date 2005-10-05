@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.46 2005/08/07 09:43:34 mikulik Exp $
+ * $Id: pm.trm,v 1.47 2005/09/24 21:13:34 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -81,6 +81,9 @@ TERM_PUBLIC void PM_previous_palette (void);
 #endif
 TERM_PUBLIC void PM_set_color (t_colorspec *);
 TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
+#ifdef WITH_IMAGE
+TERM_PUBLIC void PM_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
+#endif
 #ifndef PM_OLD_ENHANCED_TEXT
 /* To support "set term pm enhanced" */
 TERM_PUBLIC void PM_enhanced_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
@@ -908,6 +911,82 @@ PM_set_clipboard(const char s[])
 #endif /* USE_MOUSE */
 
 
+#ifdef WITH_IMAGE
+
+TERM_PUBLIC void
+PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
+{
+    PBYTE rgb_image;
+    unsigned int image_size;
+    unsigned int pad_bytes;
+
+    /* IC_PALETTE and IC_RGB images are converted to a 24bit RGB format
+       suitable for OS/2's presentation manager:
+        - sequence of lines is reversed 
+        - each line starts at a 4 byte boundary
+    */
+
+    /* fprintf(stderr, "PM_image: %i x %i, mode=%s\n", M, N, color_mode==IC_RGB?"IC_RGB":"IC_PALETTE" ); */
+    pad_bytes = (4 - (3 * M) % 4) % 4; /* scan lines start on ULONG boundaries */
+    image_size = (M + pad_bytes ) * N * 3;
+    rgb_image = (PBYTE) gp_alloc(image_size, "PM RGB image");
+
+    if (color_mode == IC_PALETTE) {
+    	unsigned int x, y;
+
+	rgb_image += N * (3 * M + pad_bytes);
+	for (y=0; y<N; y++) {
+	    rgb_image -= 3 * M + pad_bytes;
+	    for(x=0; x<M; x++) {
+		rgb255_color rgb255;
+		rgb255maxcolors_from_gray(*image++, &rgb255);
+		*(rgb_image++) = rgb255.b;
+		*(rgb_image++) = rgb255.g;
+		*(rgb_image++) = rgb255.r;
+	    }
+	    rgb_image -= 3 * M;
+	}
+    } else if (color_mode == IC_RGB) {
+    	unsigned int x, y;
+
+	rgb_image += N * (3 * M + pad_bytes);
+	for (y=0; y<N; y++) {
+	    rgb_image -= 3 * M + pad_bytes;
+	    for(x=0; x<M; x++) {
+		rgb255_color rgb255;
+		rgb255.r = (BYTE) (*image++ * 255 + 0.5);
+		rgb255.g = (BYTE) (*image++ * 255 + 0.5);
+		rgb255.b = (BYTE) (*image++ * 255 + 0.5);
+		*(rgb_image++) = rgb255.b;
+		*(rgb_image++) = rgb255.g;
+		*(rgb_image++) = rgb255.r;
+	    }
+	    rgb_image -= 3 * M;
+	}
+    }
+
+    if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB)) {
+	unsigned int i;
+
+	/* transfer data to gnupmdrv */
+	putc(GR_RGB_IMAGE, PM_pipe);
+	fwrite(&M, sizeof(M), 1, PM_pipe);
+	fwrite(&N, sizeof(N), 1, PM_pipe);
+	for (i=0; i<4; i++) {
+	    fwrite(&(corner[i].x), sizeof(int), 1, PM_pipe);
+	    fwrite(&(corner[i].y), sizeof(int), 1, PM_pipe);
+	}
+	fwrite(&image_size, sizeof(image_size), 1, PM_pipe);
+	fwrite(rgb_image, image_size, 1, PM_pipe);
+	fflush(PM_pipe);
+    }
+
+    free(rgb_image);
+}
+
+#endif /* WITH_IMAGE */
+
+
 #ifndef PM_OLD_ENHANCED_TEXT
 
 TERM_PUBLIC void
@@ -1163,7 +1242,7 @@ TERM_TABLE_START(PM_driver)
     PM_set_color,
     PM_filled_polygon
 #ifdef WITH_IMAGE
-    , NULL
+    , PM_image
 #endif
 #ifndef PM_OLD_ENHANCED_TEXT
     , PM_enhanced_open, PM_enhanced_flush, do_enh_writec

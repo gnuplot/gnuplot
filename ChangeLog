@@ -1,3 +1,8 @@
+2005-10-05  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/pm.trm src/os2/pm_msgs.h src/os2/gclient.c: Support for
+	"with image" on pm terminal.
+
 2005-10-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pbm.trm (PBM_options): Add an option to set the output size.
@@ -5,7 +10,7 @@
 
 2005-10-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
-        * src/win/wtext.c (DragFunc): Increase maximum length of filenames in
+	* src/win/wtext.c (DragFunc): Increase maximum length of filenames in
 	drag and drop operations to MAX_PATH (bug found by Tim Chippington
 	Derrick).
 
@@ -180,7 +185,7 @@
 
 2005-09-16  Juergen Wieferink  <wieferink@freenet.de>
 
-        * src/command.c (string_expand):  Fix bug in macro handling; escaped
+	* src/command.c (string_expand):  Fix bug in macro handling; escaped
 	quotes were not recognized.
 
 2005-09-16  Ethan Merritt  <merritt@u.washington.edu>
