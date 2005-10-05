@@ -1,5 +1,18 @@
 2005-10-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	SF RFE [1063878] Support for pre-compiled bgd.dll
+	If gd.trm made use of the gdFontGetTiny() and related methods to read
+	the font pointers instead of referencing them as extern, gnuplot could
+	more easily be compiled to work with the pre-compiled GD library
+	bgd.dll instead of having to download and compile zlib, libpng and
+	libgd.
+
+	* config/makefile.nt: Support for binary version of gdlib (bgd.dll).
+
+	* term/gd.trm: New BGD_EXPORT_DATA_PROT and gp_gdXXX() for Win32.
+
+2005-10-05  Bastian Maerkisch  <bmaerkisch@web.de>
+
 	* term/pm.trm src/os2/pm_msgs.h src/os2/gclient.c: Support for
 	"with image" on pm terminal.
 
