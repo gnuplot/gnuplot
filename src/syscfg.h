@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.30 2005/04/22 21:40:37 broeker Exp $
+ * $Id: syscfg.h,v 1.31 2005/08/12 08:31:56 mikulik Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -355,7 +355,7 @@ typedef double coordval;
 #ifdef DOS16
 # define MAX_NUM_VAR	3
 #else
-# define MAX_NUM_VAR	5
+# define MAX_NUM_VAR	12
 #endif
 
 /* HBB 20010223: Moved VERYLARGE definition to stdfn.h: it can only be
