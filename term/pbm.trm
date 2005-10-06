@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pbm.trm,v 1.20 2004/07/01 17:10:33 broeker Exp $
+ * $Id: pbm.trm,v 1.21 2005/10/05 06:27:27 sfeam Exp $
  *
  */
 
@@ -120,11 +120,11 @@ static struct gen_table PBM_opts[] =
 TERM_PUBLIC void
 PBM_options()
 {
-    pbm_font = 1;
-    pbm_mode = 0;
     int xpixels = PBM_XMAX;
     int ypixels = PBM_YMAX;
     struct value a;
+    pbm_font = 1;
+    pbm_mode = 0;
 
     term_options[0] = NUL;
 

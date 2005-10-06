@@ -3,6 +3,10 @@
 	* src/syscfg.h: Increased MAX_NUM_VAR from 5 to 12 (max number of
 	parameters for functions).
 
+2005-10-06  Amitha Perera  <amithaperera@users.sourceforge.net>
+
+	* term/pbm.trm (PBM_options): Re-order declarations to be strict ANSI C.
+
 2005-10-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (draw_3d_graphbox ztick_callback)
