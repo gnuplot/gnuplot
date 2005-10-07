@@ -1,3 +1,12 @@
+2005-10-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/cgm.trm: Fix pattern-fill code, which was not working.
+	If the user explicitly provides a background color, apply it to the
+	entire canvas when plotting is started. The was documented, but
+	apparently never implemented.  Bug #616167.
+	Also update linetype code so that it is possible to give the 
+	the background color as a line property.
+
 2005-10-07  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	SF patch [ 859716 ] new raise/lower commands

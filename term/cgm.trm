@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.67 2005/07/20 05:25:28 sfeam Exp $
+ * $Id: cgm.trm,v 1.68 2005/08/07 09:43:33 mikulik Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -783,6 +783,13 @@ Gnuplot version %s patchlevel %s,\
 	CGM_set_font(buf);
     }
     CGM_set_pointsize(pointsize);
+
+    /* Fill with background color if user has specified one */
+    if (!cgm_monochrome && cgm_user_color_count > 0) {
+	CGM_linecolor(LT_BACKGROUND);
+	CGM_fillbox(FS_SOLID, 0, 0, t->xmax, t->ymax);
+    }
+
 }
 
 /* Return the index for the font with the name `name'.  The index for
@@ -863,7 +870,9 @@ CGM_text()
 TERM_PUBLIC void
 CGM_linetype(int linetype)
 {
-    assert(linetype > L_TYPE_NODRAW);
+    if (linetype < LT_NODRAW)
+	linetype = LT_NODRAW;
+
     if (linetype == cgm_linetype)
 	return;
     cgm_linetype = linetype;
@@ -882,14 +891,17 @@ CGM_linetype(int linetype)
 TERM_PUBLIC void
 CGM_linecolor(int linecolor)
 {
-    assert(linecolor > L_TYPE_NODRAW);
     if (linecolor >= 0) {
 	/* subtract 2 due to linetypes -2 / -1 */
 	if (cgm_linetypes > 3)
 	    linecolor %= (cgm_linetypes - 3);
 	else
 	    linecolor = 0;
-    }
+    } else if (linecolor == LT_BACKGROUND && !cgm_monochrome) {
+	linecolor = -3;
+    } else if (linecolor <= LT_NODRAW)
+	return;
+
     linecolor += 3;
     if (cgm_monochrome)
 	cgm_color = linecolor = 1;
@@ -911,10 +923,9 @@ CGM_fillbox(
      unsigned int width, unsigned int height)
 {
     int saved_fill_color = cgm_next.fill_color;
-    /* CGM defines six hatch patterns.  For pattern 0 we want solid
-       fill.  Otherwise, we offset by 2 to use the better patterns
-       first (so the first pattern has slanted lines). */
-    int hatch_index[]={0, 3, 4, 5, 6, 1, 2};
+    /* We will use solid fill for patterns 0 and 3 */
+    int hatch_index[]={0, 6, 5, 0, 4, 3};
+    int pattern;
     double filldens;
     gpiPoint corner[5];
 
@@ -925,6 +936,7 @@ CGM_fillbox(
     corner[4].x = x1;        corner[4].y = y1;
 
     switch( style & 0xf ) {
+
     case FS_SOLID:
 	/* style == 1 --> fill with intensity according to filldensity */
         filldens = (style >> 4) / 100.0;
@@ -937,31 +949,43 @@ CGM_fillbox(
 	 * initialize the color table with some generic colors
 	 * (e.g. the "web colors") whether or not we know we'll need
 	 * them. */
-
 	cgm_next.interior_style = 1; /* solid */
-        break;
-    case FS_PATTERN:
-	/* style == 2 --> fill with pattern according to fillpattern */
-	/* the upper 3 nibbles of 'style' contain hatch pattern number */
-	cgm_next.fill_color = 0; /* index 0 is always the background color */
-	cgm_next.interior_style = 1; /* solid */
-	cgm_next.hatch_index = hatch_index[(style >> 4) % 7];
 	corner->style = style;
-	if (cgm_next.hatch_index) {
-	     CGM_filled_polygon(5, corner);
-	     cgm_next.fill_color = saved_fill_color;
-	     cgm_next.interior_style = 3; /* hatched */
-	}
+	CGM_filled_polygon(5, corner);
         break;
+
+    case FS_PATTERN:
+	/* Fill with background, then go back and draw a hatched pattern */
+	cgm_next.fill_color = 0; /* index 0 is always the background color */
+	cgm_current.interior_style = -1; /* invalidate previouse style */
+	cgm_next.interior_style = 1; /* solid */
+	CGM_filled_polygon(5, corner);
+	cgm_next.fill_color = saved_fill_color;
+
+	pattern = (style >> 4) % 6;
+	if (pattern == 0) {
+	    /* Fill with background  - done */
+	    break;
+	}
+	if (pattern == 3) {
+	    /* Fill with solid color */
+	    CGM_filled_polygon(5, corner);
+	    break;
+	}
+
+	/* The rest of the patterns are hatch-filled */
+	cgm_next.interior_style = 3; /* hatched */
+	cgm_next.hatch_index = hatch_index[pattern];
+	CGM_filled_polygon(5, corner);
+	cgm_next.interior_style = 1; /* solid */
+        break;
+
     default: /* style == 0 or unknown --> fill with background color */
 	cgm_next.fill_color = 0; /* index 0 is always the background color */
 	cgm_next.interior_style = 1; /* solid */
 	corner->style = style;
 	CGM_filled_polygon(5, corner);
     }
-    corner->style = style;
-    CGM_filled_polygon(5, corner);
-    cgm_next.interior_style = 1; /* solid */
 }
 
 TERM_PUBLIC void
@@ -969,7 +993,9 @@ CGM_linewidth(double width)
 {
     int new_linewidth;
 
-    assert(width > 0);
+    if (width <= 0)
+	width = 0.5;
+
     new_linewidth = width * cgm_linewidth_pt * CGM_PT;
     if (new_linewidth == cgm_linewidth)
 	return;
@@ -1002,7 +1028,6 @@ CGM_dashtype(int dashtype)
 	4, 10, 4, 10, 4, 1, 4, 1};	/* 8 - dash-dash-dot-dot */
 
 
-    assert(dashtype > L_TYPE_NODRAW);
     if (dashtype == cgm_dashtype)
 	return;
     cgm_dashtype = dashtype;
