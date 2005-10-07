@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.146 2005/09/23 22:01:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.147 2005/09/24 15:00:30 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1389,6 +1389,47 @@ record()
 		    Remove_Plot_From_Linked_List(psp->window);
 		} else if (current_plot) {
 		  Remove_Plot_From_Linked_List(current_plot->window);
+		}
+		return 1;
+	    }
+	    break;
+	case '^':		/* raise the plot with given number or the whole group */
+	    {
+		int itmp;
+		if (strcspn(buf+1," \n") && sscanf(buf, "^%d", &itmp)) {
+		    plot_struct *psp;
+		    if ((psp = Find_Plot_In_Linked_List_By_Number(itmp))) {
+			XRaiseWindow(dpy, psp->window);
+		    }
+		} else {
+		    /* Find end of list, i.e., first created. */
+		    plot_struct *psp = list_start;
+		    while (psp != NULL) {
+			if (psp->next_plot == NULL) break;
+			psp = psp->next_plot;
+		    }
+		    while (psp != NULL) {
+			XRaiseWindow(dpy, psp->window);
+			psp = psp->prev_plot;
+		    }
+		}
+		return 1;
+	    }
+	    break;
+	case 'v':		/* lower the plot with given number or the whole group */
+	    {
+		int itmp;
+		if (strcspn(buf+1," \n") && sscanf(buf, "v%d", &itmp)) {
+		    plot_struct *psp;
+		    if ((psp = Find_Plot_In_Linked_List_By_Number(itmp))) {
+			XLowerWindow(dpy, psp->window);
+		    }
+		} else if (current_plot) {
+		    plot_struct *psp = list_start;
+		    while (psp != NULL) {
+			XLowerWindow(dpy, psp->window);
+			psp = psp->next_plot;
+		    }
 		}
 		return 1;
 	    }

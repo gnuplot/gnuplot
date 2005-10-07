@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.131 2005/09/26 04:19:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.132 2005/10/07 12:44:56 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -537,6 +537,86 @@ command()
 	(*lookup_ftable(&command_ftbl[0],c_token))();
 
     return;
+}
+
+
+/* process the 'raise' or 'lower' command */
+void
+raise_lower_command(int lower)
+{
+    ++c_token;
+
+    if (END_OF_COMMAND) {
+	if (lower) {
+#ifdef OS2
+	    pm_lower_terminal_window();
+#endif
+#ifdef X11
+	    x11_lower_terminal_group();
+#endif
+#ifdef _Windows
+	    win_lower_terminal_window();
+#endif
+	} else {
+#ifdef OS2
+	    pm_raise_terminal_window();
+#endif
+#ifdef X11
+	    x11_raise_terminal_group();
+#endif
+#ifdef _Windows
+	    win_raise_terminal_window();
+#endif
+	}
+	return;
+    } else {
+	int number;
+	int negative = equals(c_token, "-");
+
+	if (negative || equals(c_token, "+")) c_token++;
+	if (!END_OF_COMMAND && isanumber(c_token)) {
+	    struct value a;
+	    number = real(const_express(&a));
+	    if (negative)
+	    number = -number;
+	    if (lower) {
+#ifdef OS2
+		pm_lower_terminal_window();
+#endif
+#ifdef X11
+		x11_lower_terminal_window(number);
+#endif
+#ifdef _Windows
+		win_lower_terminal_window();
+#endif
+	    } else {
+#ifdef OS2
+		pm_raise_terminal_window();
+#endif
+#ifdef X11
+		x11_raise_terminal_window(number);
+#endif
+#ifdef _Windows
+		win_raise_terminal_window();
+#endif
+	    }
+	    ++c_token;
+	    return;
+	}
+    }
+    int_error(c_token, "usage: raise {x11_plot_n}");
+}
+
+void
+raise_command(void)
+{
+    raise_lower_command(0);
+}
+
+void
+lower_command(void)
+{
+    raise_lower_command(1);
 }
 
 

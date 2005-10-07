@@ -1,5 +1,6 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
+* NEW commands raise and lower
 * NEW y and y2 axis label rotation can be explicitly controlled (2D plots only)
 * NEW {no}enhanced flag can be applied to individual labels
 * NEW suboption 'set pm3d interpolate' for bilinear interpolation of surfaces

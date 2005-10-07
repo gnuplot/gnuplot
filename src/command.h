@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.36 2005/04/22 05:25:34 sfeam Exp $
+ * $Id: command.h,v 1.37 2005/07/10 18:24:00 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -122,6 +122,24 @@ void call_kill_pending_Pause_dialog(void);
 extern __far int num_tokens, c_token;
 #else
 extern int num_tokens, c_token;
+#endif
+
+void raise_lower_command __PROTO((int));
+void raise_command __PROTO((void));
+void lower_command __PROTO((void));
+#ifdef OS2
+extern void pm_raise_terminal_window __PROTO((void));
+extern void pm_lower_terminal_window __PROTO((void));
+#endif
+#ifdef X11
+extern void x11_raise_terminal_window __PROTO((int));
+extern void x11_raise_terminal_group __PROTO((void));
+extern void x11_lower_terminal_window __PROTO((int));
+extern void x11_lower_terminal_group __PROTO((void));
+#endif
+#ifdef _Windows
+extern void win_raise_terminal_window();
+extern void win_lower_terminal_window();
 #endif
 
 #ifdef USE_MOUSE

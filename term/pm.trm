@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.47 2005/09/24 21:13:34 mikulik Exp $
+ * $Id: pm.trm,v 1.48 2005/10/05 08:05:41 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -1218,6 +1218,28 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 }
 
 #endif /* PM_OLD_ENHANCED_TEXT */
+
+
+/* helper function */
+void
+pm_raise_terminal_window()
+{
+    putc(SET_SPECIAL, PM_pipe);
+    putc('^', PM_pipe); /* raise window */
+    fflush(PM_pipe);
+}
+
+void
+pm_lower_terminal_window()
+{
+#if 0
+    putc(SET_SPECIAL, PM_pipe);
+    putc('_', PM_pipe); /* lower window */
+    fflush(PM_pipe);
+#else
+    fprintf(stderr, "'lower' N/A for OS/2 PM terminal -- please contribute\n");
+#endif
+}
 
 
 #endif /* TERM_BODY */

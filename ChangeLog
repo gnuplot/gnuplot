@@ -1,3 +1,12 @@
+2005-10-07  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	SF patch [ 859716 ] new raise/lower commands
+
+	* NEWS docs/gnuplot.doc src/command.c src/command.h src/gplt_x11.c
+	src/os2/gclient.c src/tables.c src/win/winmain.c term/pm.trm
+	term/x11.trm: Commands "raise" and "lower" to raise and lower windows of
+	interactive terminals.
+
 2005-10-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (system_command): Remove superfluous c_token++.

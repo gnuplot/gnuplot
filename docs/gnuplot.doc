@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.331 2005/10/02 22:15:09 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.332 2005/10/06 04:18:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2866,6 +2866,24 @@ C ... and restart the table:
  The `load` command is performed implicitly on any file names given as
  arguments to `gnuplot`.  These are loaded in the order specified, and
  then `gnuplot` exits.
+2 lower
+?commands lower
+?lower
+ Syntax:
+       lower {x11_plot_window_nb}
+
+ The `lower` command lowers (opposite to `raise`) plot window(s) associated
+ with the interactive terminal of your gnuplot session, i.e. `pm`, `win` or
+ `x11`. It puts the plot window to bottom in the z-order windows stack of the
+ window manager of your desktop.
+
+ As `x11` supports multiple plot windows, then by default it lowers these
+ windows in descending order of most recently created on top to the least
+ recently created on bottom. If a plot number is supplied as an optional
+ parameter, only the associated plot window will be lowered if it exists.
+
+ The optional parameter is ignored for single plot-window terminals, i.e. `pm`
+ and `win`.
 2 pause
 ?commands pause
 ?pause
@@ -4261,6 +4279,24 @@ C ... and restart the table:
  The `exit` and `quit` commands and END-OF-FILE character will exit `gnuplot`.
  Each of these commands will clear the output device (as does the `clear`
  command) before exiting.
+2 raise
+?commands raise
+?raise
+ Syntax:
+       raise {x11_plot_window_nb}
+
+ The `raise` command raises (opposite to `lower`) plot window(s) associated
+ with the interactive terminal of your gnuplot session, i.e. `pm`, `win` or
+ `x11`. It puts the plot window to front (top) in the z-order windows stack of
+ the window manager of your desktop.
+
+ As `x11` supports multiple plot windows, then by default it raises these
+ windows in descending order of most recently created on top to the least
+ recently created on bottom. If a plot number is supplied as an optional
+ parameter, only the associated plot window will be raised if it exists.
+
+ The optional parameter is ignored for single plot-windows terminal, i.e. `pm`
+ and `win`.
 2 replot
 ?commands replot
 ?replot

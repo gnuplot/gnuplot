@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.147 2005/08/07 09:43:35 mikulik Exp $
+ * $Id: x11.trm,v 1.148 2005/09/23 22:01:14 sfeam Exp $
  *
  */
 
@@ -531,6 +531,47 @@ X11_options()
 #ifdef USE_MOUSE
     X11_update_opts();
 #endif
+}
+
+
+void
+x11_raise_terminal_window(int number)
+{
+    /* Send the raise character and a number. */
+    if (X11_ipc) {
+	fprintf(X11_ipc, "^%d\n", number);
+	fflush(X11_ipc);
+    }
+}
+
+void
+x11_raise_terminal_group(void)
+{
+    /* Send just the raise character. */
+    if (X11_ipc) {
+	fprintf(X11_ipc, "^\n");
+	fflush(X11_ipc);
+    }
+}
+
+void
+x11_lower_terminal_window(int number)
+{
+    /* Send the raise character and a number. */
+    if (X11_ipc) {
+	fprintf(X11_ipc, "v%d\n", number);
+	fflush(X11_ipc);
+    }
+}
+
+void
+x11_lower_terminal_group(void)
+{
+    /* Send just the raise character. */
+    if (X11_ipc) {
+	fprintf(X11_ipc, "v\n");
+	fflush(X11_ipc);
+    }
 }
 
 

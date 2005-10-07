@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.43 2005/09/24 21:13:34 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.44 2005/10/05 08:05:41 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -2891,6 +2891,16 @@ ReadGnu(void* arg)
 		case 'c': /* set codepage */
 		    BufRead(hRead,&codepage, sizeof(codepage), &cbR);
 		    break;
+	        case '^': /* raise window */
+		    WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER ) ;
+		    WinSetFocus( HWND_DESKTOP, hApp ) ;
+		    break;
+#if 0
+	        case '_': /* lower window */
+		    WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, ??? SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER ) ;
+		    WinSetFocus( HWND_DESKTOP, hApp ) ;
+		    break;
+#endif
 		}
 		break;
 	    }
