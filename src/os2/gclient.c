@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.44 2005/10/05 08:05:41 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.45 2005/10/07 13:00:52 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -2895,12 +2895,9 @@ ReadGnu(void* arg)
 		    WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER ) ;
 		    WinSetFocus( HWND_DESKTOP, hApp ) ;
 		    break;
-#if 0
 	        case '_': /* lower window */
-		    WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, ??? SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER ) ;
-		    WinSetFocus( HWND_DESKTOP, hApp ) ;
+		    WinSetWindowPos( hwndFrame, HWND_BOTTOM, 0,0,0,0, SWP_ZORDER ) ;
 		    break;
-#endif
 		}
 		break;
 	    }

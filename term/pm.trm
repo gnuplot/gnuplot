@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.48 2005/10/05 08:05:41 mikulik Exp $
+ * $Id: pm.trm,v 1.49 2005/10/07 13:00:52 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -1232,13 +1232,9 @@ pm_raise_terminal_window()
 void
 pm_lower_terminal_window()
 {
-#if 0
     putc(SET_SPECIAL, PM_pipe);
     putc('_', PM_pipe); /* lower window */
     fflush(PM_pipe);
-#else
-    fprintf(stderr, "'lower' N/A for OS/2 PM terminal -- please contribute\n");
-#endif
 }
 
 

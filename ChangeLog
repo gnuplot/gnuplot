@@ -1,3 +1,7 @@
+2005-10-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/os2/gclient.c term/pm.trm: "lower" command for the pm terminal.
+
 2005-10-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/cgm.trm: Fix pattern-fill code, which was not working.
