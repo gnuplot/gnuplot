@@ -1,5 +1,7 @@
 2005-10-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* term/pdf.trm term/svg.trm (START_HELP): Small changes.
+
 	* term/x11.trm (START_HELP): Reorganized list of options.
 
 2005-10-08  Bastian Maerkisch  <bmaerkisch@web.de>

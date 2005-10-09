@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.54 2005/09/21 17:05:45 sfeam Exp $
+ * $Id: svg.trm,v 1.55 2005/09/25 15:45:03 mikulik Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1301,12 +1301,13 @@ START_HELP(svg)
 "",
 " Syntax:",
 "       set terminal svg {size <x> <y> {|fixed|dynamic}}",
-"                        {linewidth <w>}",
+"                        {{no}enhanced}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
-"                        {{no}enhanced} {fontfile <filename>}",
+"                        {fontfile <filename>}",
+"                        {linewidth <lw>}",
 "",
 " where <x> and <y> are the size of the SVG plot to generate,",
-" `dynamic` allows a svg-Viewer to resize plot, whereas the default",
+" `dynamic` allows a svg-viewer to resize plot, whereas the default",
 " setting, `fixed`, will request an absolute size.",
 "",
 " `linewidth <w>` increases the width of all lines used in the figure",

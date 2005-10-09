@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.55 2005/08/08 23:41:10 sfeam Exp $
+ * $Id: pdf.trm,v 1.56 2005/08/09 03:00:50 sfeam Exp $
  */
 
 /*------------------------------
@@ -1590,25 +1590,26 @@ START_HELP(pdf)
 "",
 " Syntax:",
 "       set terminal pdf {monochrome|color|colour}",
+"                        {{no}enhanced}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
-"                        {{no}enhanced} {linewidth <n>} {rounded|butt}",
-"                        {solid|dashed {dl <dashlength>}}",
+"                        {linewidth <lw>} {rounded|butt}",
+"                        {solid|dashed} {dl <dashlength>}}",
 "",
-" The default is to use a different color for each line type. Selecting ",
-" `monochome` will use black for all linetypes, in which case you probably ",
-" want to select `dashed` to distinguish line types. Even in in mono mode ",
+" The default is to use a different color for each line type. Selecting",
+" `monochome` will use black for all linetypes, in which case you probably",
+" want to select `dashed` to distinguish line types. Even in in mono mode",
 " you can still use explicit colors for filled areas or linestyles.",
 "",
 " where <font> is the name of the default font to use (default Helvetica)",
 " and <fontsize> is the font size (in points, default 12).",
-" For help on which fonts are available or how to install new ones, please ",
+" For help on which fonts are available or how to install new ones, please",
 " see the documentation for your local installation of pdflib.",
 "",
 " The `enhanced` option enables enhanced text processing features",
 " (subscripts, superscripts and mixed fonts). See `enhanced`.",
 "",
 " The width of all lines in the plot can be increased by the factor <n>",
-" specified in `linewidth`. Similarly `dashlength` is a multiplier for the ",
+" specified in `linewidth`. Similarly `dashlength` is a multiplier for the",
 " default dash spacing.",
 "",
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",
