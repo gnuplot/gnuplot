@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.206 2005/10/02 22:15:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.207 2005/10/06 04:18:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4205,7 +4205,8 @@ set_linestyle()
     /* Check if linestyle is already defined */
     if (first_linestyle != NULL) {	/* skip to last linestyle */
 	for (this_linestyle = first_linestyle; this_linestyle != NULL;
-	     prev_linestyle = this_linestyle, this_linestyle = this_linestyle->next)
+	     prev_linestyle = this_linestyle,
+	     this_linestyle = this_linestyle->next)
 	    /* is this the linestyle we want? */
 	    if (tag <= this_linestyle->tag)
 		break;
@@ -4222,10 +4223,6 @@ set_linestyle()
 	new_linestyle->lp_properties = loc_lp;
 	this_linestyle = new_linestyle;
     }
-#ifndef OMIT_THIS_CODE_TO_MAKE_SET_LINESTYLE_INCREMENTAL
-    else
-	this_linestyle->lp_properties = loc_lp;
-#endif
 
     /* Reset to default values */
     if (END_OF_COMMAND)
@@ -4234,8 +4231,7 @@ set_linestyle()
 	this_linestyle->lp_properties = loc_lp;
 	c_token++;
     } else
-
-    /* pick up a line spec; dont allow ls, do allow point type */
+	/* pick up a line spec; dont allow ls, do allow point type */
 	lp_parse(&this_linestyle->lp_properties, FALSE, TRUE);
 
     if (!END_OF_COMMAND)
@@ -4307,37 +4303,44 @@ set_arrowstyle()
     } else
 	tag = assign_arrowstyle_tag();	/* default next tag */
 
-    /* pick up a arrow spec : dont allow ls, do allow point type
-     * default to same arrow type = point type = tag
-     */
-    arrow_parse(&loc_arrow, 0, FALSE);
-
-    if (!END_OF_COMMAND)
-	int_error(c_token, "extraneous or out-of-order arguments in set arrowstyle");
-
-    /* OK! add arrowstyle */
+    /* search for arrowstyle */
     if (first_arrowstyle != NULL) {	/* skip to last arrowstyle */
 	for (this_arrowstyle = first_arrowstyle; this_arrowstyle != NULL;
-	     prev_arrowstyle = this_arrowstyle, this_arrowstyle = this_arrowstyle->next)
+	     prev_arrowstyle = this_arrowstyle,
+	     this_arrowstyle = this_arrowstyle->next)
 	    /* is this the arrowstyle we want? */
 	    if (tag <= this_arrowstyle->tag)
 		break;
     }
-    if (this_arrowstyle != NULL && tag == this_arrowstyle->tag) {
-	/* changing the arrowstyle */
-	this_arrowstyle->arrow_properties = loc_arrow;
-    } else {
+
+    if (this_arrowstyle == NULL || tag != this_arrowstyle->tag) {
 	/* adding the arrowstyle */
 	new_arrowstyle = (struct arrowstyle_def *)
 	    gp_alloc(sizeof(struct arrowstyle_def), "arrowstyle");
+	default_arrow_style(&(new_arrowstyle->arrow_properties));
 	if (prev_arrowstyle != NULL)
 	    prev_arrowstyle->next = new_arrowstyle;	/* add it to end of list */
 	else
 	    first_arrowstyle = new_arrowstyle;	/* make it start of list */
 	new_arrowstyle->tag = tag;
 	new_arrowstyle->next = this_arrowstyle;
-	new_arrowstyle->arrow_properties = loc_arrow;
+	this_arrowstyle = new_arrowstyle;
     }
+
+    if (END_OF_COMMAND)
+	this_arrowstyle->arrow_properties = loc_arrow;
+    else if (almost_equals(c_token, "def$ault")) {
+	this_arrowstyle->arrow_properties = loc_arrow;
+	c_token++;
+    } else
+	/* pick up a arrow spec : dont allow ls, do allow point type
+	 * default to same arrow type = point type = tag
+	 */
+	arrow_parse(&this_arrowstyle->arrow_properties, 0, FALSE);
+
+    if (!END_OF_COMMAND)
+	int_error(c_token, "extraneous or out-of-order arguments in set arrowstyle");
+
 }
 
 /* assign a new arrowstyle tag

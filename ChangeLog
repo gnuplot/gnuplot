@@ -1,3 +1,13 @@
+2005-10-09  Harald Harders  <h.harders@tu-bs.de>
+
+	* src/misc.c (lp_parse arrow_parse) set.c (set_linestyle set_arrowstyle)
+	src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots) docs/gnuplot.doc:
+
+	Bring "set style line ..." and "set style arrow ..." into agreement with
+	other "set style <foo>" commands by retaining current properties, rather
+	than resetting to the default style each time. The previous behavior was
+	undocumented.  Add an explicit command "set style {line|arrow} default".
+
 2005-10-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/pdf.trm term/svg.trm (START_HELP): Small changes.

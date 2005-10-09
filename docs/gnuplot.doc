@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.332 2005/10/06 04:18:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.333 2005/10/07 13:00:49 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7937,6 +7937,7 @@ C ... and restart the table:
  an index instead of repeating all the information at each invocation.
 
  Syntax:
+       set style arrow <index> default
        set style arrow <index> {nohead | head | heads}
                                {size <length>,<angle>{,<backangle>}}
                                {filled | empty | nofilled}
@@ -7948,6 +7949,13 @@ C ... and restart the table:
        show style arrow
 
  <index> is an integer that identifies the arrowstyle.
+
+ If `default` is given all arrow style parameters are set to their default
+ values.
+
+ If the linestyle <index> already exists, only the given parameters are
+ changed while all others are preserved.  If not, all undefined values are
+ set to the default values.
 
  Specifying `nohead` produces arrows drawn without a head---a line segment.
  This gives you yet another way to draw a line segment on the plot.  By
@@ -8077,6 +8085,7 @@ C ... and restart the table:
  an index instead of repeating all the information at each invocation.
 
  Syntax:
+       set style line <index> default
        set style line <index> {{linetype  | lt} <line_type> | <colorspec>}
                               {{linecolor | lc} <colorspec>}
                               {{linewidth | lw} <line_width>}
@@ -8085,6 +8094,13 @@ C ... and restart the table:
                               {palette}
        unset style line
        show style line
+
+ If `default` is given all line style parameters are set to their default
+ values.
+
+ If the linestyle <index> already exists, only the given parameters are
+ changed while all others are preserved.  If not, all undefined values are
+ set to the default values.
 
  The line and point types are taken from the default types for the terminal
  currently in use.  The line width and point size are multipliers for the

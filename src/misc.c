@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.71 2005/08/22 16:37:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.72 2005/10/01 23:38:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -756,12 +756,6 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	/* avoid duplicating options */
 	int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0;
 
-#ifndef OMIT_THIS_CODE_TO_MAKE_SET_LINESTYLE_INCREMENTAL
-	/* set default values */
-	lp->l_width = 1.0;
-	lp->use_palette = 0;
-	lp->p_size = pointsize;	/* as in "set pointsize" */
-#endif
 	lp->pointflag = allow_point;
 
 	while (!END_OF_COMMAND) {
@@ -1086,7 +1080,6 @@ arrow_parse(
 	int set_layer=0, set_line=0, set_head=0;
 	int set_headsize=0, set_headfilled=0;
 	/* set default values */
-	default_arrow_style(arrow);
 	if (default_linetype)
 	    arrow->lp_properties.l_type = default_linetype;
 
@@ -1173,19 +1166,13 @@ arrow_parse(
 	    /* pick up a line spec - allow ls, but no point. */
 	    {
 		int stored_token = c_token;
-		struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
-
-		loc_lp.l_type = default_linetype;
-		lp_parse(&loc_lp, TRUE, FALSE);
-		if (stored_token != c_token) {
-		    if (set_line++)
-			break;
-		    arrow->lp_properties = loc_lp;
-		    continue;
-		}
+		lp_parse(&arrow->lp_properties, TRUE, FALSE);
+		if (stored_token == c_token || set_line++)
+		    break;
+		continue;
 	    }
 
-	    /* unknown option catched -> quit the while(1) loop */
+	    /* unknown option caught -> quit the while(1) loop */
 	    break;
 	}
 
