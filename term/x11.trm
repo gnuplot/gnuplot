@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.148 2005/09/23 22:01:14 sfeam Exp $
+ * $Id: x11.trm,v 1.149 2005/10/07 13:00:52 mikulik Exp $
  *
  */
 
@@ -1993,13 +1993,18 @@ START_HELP(x11)
 " if the `-display` command line option is used.",
 "",
 " Syntax:",
-"    set terminal x11 [reset] <n> [[no]enhanced] [font <fontspec>]",
-"                     [title \"<string>\"] [[no]persist] [[no]raise] [close]",
+"    set terminal x11 {<n>}",
+"                     {title \"<string>\"}",
+"                     {{no}enhanced}",
+"                     {font <fontspec>}",
+"                     {{no}persist} {{no}raise}",
+"                     {close}",
+"    set terminal x11 {reset}",
 "",
 " Multiple plot windows are supported: `set terminal x11 <n>` directs the",
 " output to plot window number n.  If n>0, the terminal number will be",
 " appended to the window title (unless a title has been supplied manually)",
-" and the icon will be labeled `gplt <n>`.  The active window may be",
+" and the icon will be labeled `Gnuplot <n>`.  The active window may be",
 " distinguished by a change in cursor (from default to crosshair.)",
 "",
 " The x11 terminal support enhanced text mode (see `enhanced`), subject",
