@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.19 2005/08/10 12:52:20 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.20 2005/10/07 13:00:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -613,6 +613,6 @@ win_raise_terminal_window()
 void
 win_lower_terminal_window()
 {
-    MessageBox(NULL, "`lower` N/A for windows terminal -- please contribute", "gnuplot", MB_ICONSTOP | MB_OK);
+    SetWindowPos(graphwin.hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
 }
 

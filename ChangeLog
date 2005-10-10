@@ -1,3 +1,8 @@
+2005-10-10  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c (win_lower_terminal_window): "lower" command for the
+	Windows terminal.
+
 2005-10-09  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/misc.c (lp_parse arrow_parse) set.c (set_linestyle set_arrowstyle)
