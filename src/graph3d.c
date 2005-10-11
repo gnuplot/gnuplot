@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.133 2005/10/02 22:15:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.134 2005/10/06 04:18:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1706,10 +1706,9 @@ plot3d_points(struct surface_points *plot, int p_type)
     struct iso_curve *icrvs = plot->iso_crvs;
 
     while (icrvs) {
-	struct coordinate GPHUGE *points = icrvs->points;
+	struct coordinate GPHUGE *point;
 	int colortype = plot->lp_properties.pm3d_color.type;
 	TBOOLEAN rgb_from_column = plot->pm3d_color_from_column
-/*				&& plot->plot_type == DATA3D */
 				&& plot->lp_properties.pm3d_color.value < 0.0;
 
 	/* Apply constant color outside of the loop */
@@ -1717,22 +1716,23 @@ plot3d_points(struct surface_points *plot, int p_type)
 	    set_rgbcolor( plot->lp_properties.pm3d_color.lt );
 
 	for (i = 0; i < icrvs->p_count; i++) {
-	    if (points[i].type == INRANGE) {
-		map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
+	    point = &(icrvs->points[i]);
+	    if (point->type == INRANGE) {
+		map3d_xy(point->x, point->y, point->z, &x, &y);
 
 		if (!clip_point(x, y)) {
 		    switch( colortype ) {
 		    case TC_RGB:
 			if (rgb_from_column)
-			    set_rgbcolor( (int)points[i].CRD_COLOR );
+			    set_rgbcolor( (int)point->CRD_COLOR );
 			break;
 		    case TC_Z:
 		    case TC_DEFAULT:   /* pm3d mode assumes this is default */
 			if (can_pm3d && plot->lp_properties.use_palette) {
 			    if (plot->pm3d_color_from_column)
-				set_color( cb2gray(points[i].CRD_COLOR) );
+				set_color( cb2gray(point->CRD_COLOR) );
 			    else
-				set_color( cb2gray( z2cb(points[i].z) ) );
+				set_color( cb2gray( z2cb(point->z) ) );
 			}
 			break;
 		    default:
@@ -1742,7 +1742,7 @@ plot3d_points(struct surface_points *plot, int p_type)
 
 		    if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		    &&  plot->lp_properties.p_size == PTSZ_VARIABLE)
-			(*t->pointsize)(pointsize * points[i].CRD_PTSIZE);
+			(*t->pointsize)(pointsize * point->CRD_PTSIZE);
 		    (*t->point) (x, y, p_type);
 		}
 	    }
