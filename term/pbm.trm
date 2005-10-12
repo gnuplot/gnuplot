@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pbm.trm,v 1.21 2005/10/05 06:27:27 sfeam Exp $
+ * $Id: pbm.trm,v 1.22 2005/10/07 05:08:59 sfeam Exp $
  *
  */
 
@@ -482,15 +482,15 @@ START_HELP(pbm)
 " portable bitmap (one bit per pixel), `gray` a portable graymap (three bits",
 " per pixel) and `color` a portable pixmap (color, four bits per pixel).",
 "",
-" The output of this driver can be used with Jef Poskanzer's excellent PBMPLUS",
-" package, which provides programs to convert the above PBMPLUS formats to GIF,",
-" TIFF, MacPaint, Macintosh PICT, PCX, X11 bitmap and many others.  PBMPLUS may",
-" be obtained from ftp.x.org.  The relevant files have names that begin with",
-" \"netpbm-1mar1994.p1\"; they reside in /contrib/utilities.  The package can",
-" probably also be obtained from one of the many sites that mirrors ftp.x.org.",
+" The output of this driver can be used with various image conversion and",
+" manipulation utilities provided by NETPBM.  Based on Jef Poskanzer's",
+" PBMPLUS package, NETPBM provides programs to convert the above PBM formats",
+" to GIF, TIFF, MacPaint, Macintosh PICT, PCX, X11 bitmap and many others.",
+" Complete information is available at http://netpbm.sourceforge.net/.",
 "",
 " Examples:",
-"       set terminal pbm small monochrome             # defaults",
-"       set terminal pbm color medium size 800,600"
+"       set terminal pbm small monochrome                # defaults",
+"       set terminal pbm color medium size 800,600",
+"       set output '| pnmrotate 45 | pnmtopng > tilted.png'  # uses NETPBM"
 END_HELP(pbm)
 #endif /* TERM_HELP */

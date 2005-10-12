@@ -1,3 +1,7 @@
+2005-10-12  Don Taber  <dtaber@topaflyers.com>
+
+	* term/pbm.trm: Update description of the PBMPLUS and NETPBM packages.
+
 2005-10-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm: Add TERM_CAN_CLIP to terminal flags, since the core
