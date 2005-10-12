@@ -33,7 +33,7 @@ SOURCES= GPApp.cpp GPWindow.cpp GPView.cpp GPBitmap.cpp
 
 HEADERS= GPApp.h GPBitmap.h GPView.h GPWindow.h XStringList.h constants.h
 
-EXTRA_DIST= Makefile XStringList.cpp
+EXTRA_DIST= XStringList.cpp
 
 # specify the resource files to use
 #	full path or a relative path to the resource file can be used.

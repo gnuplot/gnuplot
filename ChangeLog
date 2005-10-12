@@ -1,3 +1,7 @@
+2005-10-12  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* src/beos/Makefile.in: Remove Makefile from EXTRA_DIST.
+
 2005-10-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (plot3d_points): Small code clean up in preparation
