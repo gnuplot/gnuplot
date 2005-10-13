@@ -1,3 +1,10 @@
+2005-10-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/dumb.trm: Fix dumb bug in dumb term. coords run from 0->xmax
+	and 0->ymax, but array space was only allocated for xmax*ymax pixels.
+	Correct this to (xmax+1)*(ymax+1). Fixes segfault triggered by
+	"set size 2,2".
+
 2005-10-12  Don Taber  <dtaber@topaflyers.com>
 
 	* term/pbm.trm: Update description of the PBMPLUS and NETPBM packages.
