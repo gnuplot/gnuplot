@@ -1,3 +1,9 @@
+2005-10-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots): Explicitly
+	initialize arrow style for "{s}plot with vector", since arrow_parse()
+	no longer does this for us.
+
 2005-10-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/dumb.trm: Fix dumb bug in dumb term. coords run from 0->xmax
