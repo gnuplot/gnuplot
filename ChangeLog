@@ -1,3 +1,8 @@
+2005-10-15   Hans Grobler  <grobh@users.sourceforge.net>
+
+	* src/gplt_x11.c: Fix buffer overflow caused by incorrect size
+	allocation for rdbuf.
+
 2005-10-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots): Explicitly

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.147 2005/09/24 15:00:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.148 2005/10/07 13:00:51 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1153,7 +1153,7 @@ static int
 read_input()
 {
     static int rdbuf_size = 10 * Nbuf;
-    static char rdbuf[10 * Nbuf - 1];
+    static char rdbuf[10 * Nbuf];
     static int total_chars;
     static int rdbuf_offset;
     static int buf_offset;
