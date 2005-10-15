@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.75 2005/09/26 04:19:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.76 2005/10/02 22:15:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -310,15 +310,15 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 {
     if (!is_3d_plot) {
 # if 0
-	printf("POS: xleft=%i, xright=%i, ybot=%i, ytop=%i\n", xleft, xright, ybot, ytop);
+	printf("POS: plot_bounds.xleft=%i, plot_bounds.xright=%i, plot_bounds.ybot=%i, plot_bounds.ytop=%i\n", plot_bounds.xleft, plot_bounds.xright, plot_bounds.ybot, plot_bounds.ytop);
 # endif
-	if (xright == xleft)
+	if (plot_bounds.xright == plot_bounds.xleft)
 	    *x = *x2 = 1e38;	/* protection */
 	else {
 	    *x = AXIS_MAPBACK(FIRST_X_AXIS, xx);
 	    *x2 = AXIS_MAPBACK(SECOND_X_AXIS, xx);
 	}
-	if (ytop == ybot)
+	if (plot_bounds.ytop == plot_bounds.ybot)
 	    *y = *y2 = 1e38;	/* protection */
 	else {
 	    *y = AXIS_MAPBACK(FIRST_Y_AXIS, yy);
@@ -365,7 +365,7 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	*x2 = *y2 = 1e38;	/* protection */
     }
     /*
-       Note: there is xleft+0.5 in "#define map_x" in graphics.c, which
+       Note: there is plot_bounds.xleft+0.5 in "#define map_x" in graphics.c, which
        makes no major impact here. It seems that the mistake of the real
        coordinate is at about 0.5%, which corresponds to the screen resolution.
        It would be better to round the distance to this resolution, and thus
@@ -1038,19 +1038,19 @@ builtin_nearest_log(struct gp_event_t *ge)
 	 * the bottom, x2 at top, y left and y2 right; it
 	 * would be better to derive that from the ..tics settings */
 	TBOOLEAN change = FALSE;
-	if (mouse_y < ybot + (ytop - ybot) / 4 && mouse_x > xleft && mouse_x < xright) {
+	if (mouse_y < plot_bounds.ybot + (plot_bounds.ytop - plot_bounds.ybot) / 4 && mouse_x > plot_bounds.xleft && mouse_x < plot_bounds.xright) {
 	    do_string(axis_array[FIRST_X_AXIS].log ? "unset log x" : "set log x");
 	    change = TRUE;
 	}
-	if (mouse_y > ytop - (ytop - ybot) / 4 && mouse_x > xleft && mouse_x < xright) {
+	if (mouse_y > plot_bounds.ytop - (plot_bounds.ytop - plot_bounds.ybot) / 4 && mouse_x > plot_bounds.xleft && mouse_x < plot_bounds.xright) {
 	    do_string(axis_array[SECOND_X_AXIS].log ? "unset log x2" : "set log x2");
 	    change = TRUE;
 	}
-	if (mouse_x < xleft + (xright - xleft) / 4 && mouse_y > ybot && mouse_y < ytop) {
+	if (mouse_x < plot_bounds.xleft + (plot_bounds.xright - plot_bounds.xleft) / 4 && mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop) {
 	    do_string(axis_array[FIRST_Y_AXIS].log ? "unset log y" : "set log y");
 	    change = TRUE;
 	}
-	if (mouse_x > xright - (xright - xleft) / 4 && mouse_y > ybot && mouse_y < ytop) {
+	if (mouse_x > plot_bounds.xright - (plot_bounds.xright - plot_bounds.xleft) / 4 && mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop) {
 	    do_string(axis_array[SECOND_Y_AXIS].log ? "unset log y2" : "set log y2");
 	    change = TRUE;
 	}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.170 2005/09/23 00:36:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.171 2005/10/01 23:38:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -100,7 +100,7 @@ static int p_width, p_height;	/* pointsize * { t->h_tic | t->v_tic } */
 /* there are several things on right of plot - key, y2tics and y2label
  * when working out boundary, save posn of y2label for later...
  * Same goes for x2label.
- * key posn is also stored in keybox.xl, and tics go at xright
+ * key posn is also stored in keybox.xl, and tics go at plot_bounds.xright
  */
 static int ylabel_x, y2label_x, xlabel_y, x2label_y, title_y, time_y, time_x;
 static int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
@@ -270,11 +270,11 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
  * computed once on every call to do_plot
  *
  * The order in which things is done is getting pretty critical:
- *  ytop depends on title, x2label, ylabels (if no rotated text)
- *  ybot depends on key, if "under"
+ *  plot_bounds.ytop depends on title, x2label, ylabels (if no rotated text)
+ *  plot_bounds.ybot depends on key, if "under"
  *  once we have these, we can setup the y1 and y2 tics and the
- *  only then can we calculate xleft and xright
- *  xright depends also on key RIGHT
+ *  only then can we calculate plot_bounds.xleft and plot_bounds.xright
+ *  plot_bounds.xright depends also on key RIGHT
  *  then we can do x and x2 tics
  *
  * For set size ratio ..., everything depends on everything else...
@@ -366,7 +366,7 @@ boundary(struct curve_points *plots, int count)
 	label_width(timelabel.text, &timelin);
     /*}}} */
 
-    /*{{{  preliminary ytop  calculation */
+    /*{{{  preliminary plot_bounds.ytop  calculation */
 
     /*     first compute heights of things to be written in the margin */
 
@@ -436,11 +436,11 @@ boundary(struct curve_points *plots, int count)
     } else
 	y2label_textheight = 0;
 
-    /* compute ytop from the various components
+    /* compute plot_bounds.ytop from the various components
      *     unless tmargin is explicitly specified  */
 
     /* HBB 20010118: fix round-off bug */
-    ytop = (int) (0.5 + (ysize + yoffset) * t->ymax);
+    plot_bounds.ytop = (int) (0.5 + (ysize + yoffset) * t->ymax);
 
     if (tmargin < 0) {
 	int top_margin = x2label_textheight + title_textheight;
@@ -457,25 +457,25 @@ boundary(struct curve_points *plots, int count)
 	if (top_margin > x2tic_height)
 	    top_margin += (int) t->v_char;
 
-	ytop -= top_margin;
-	if (ytop == (int) (0.5 + (ysize + yoffset) * t->ymax)) {
+	plot_bounds.ytop -= top_margin;
+	if (plot_bounds.ytop == (int) (0.5 + (ysize + yoffset) * t->ymax)) {
 	    /* make room for the end of rotated ytics or y2tics */
-	    ytop -= (int) (t->h_char * 2);
+	    plot_bounds.ytop -= (int) (t->h_char * 2);
 	}
     } else
-	ytop -= (int) (t->v_char * tmargin);
+	plot_bounds.ytop -= (int) (t->v_char * tmargin);
 
-    /*  end of preliminary ytop calculation }}} */
+    /*  end of preliminary plot_bounds.ytop calculation }}} */
 
 
-    /*{{{  tentative xleft, needed for "under" */
-    xleft = (int) (xoffset * t->xmax
+    /*{{{  tentative plot_bounds.xleft, needed for "under" */
+    plot_bounds.xleft = (int) (xoffset * t->xmax
 		   + t->h_char * (lmargin >= 0 ? lmargin : 2));
     /*}}} */
 
 
-    /*{{{  tentative xright, needed for "under" */
-    xright = (int) ((xsize + xoffset) * t->xmax
+    /*{{{  tentative plot_bounds.xright, needed for "under" */
+    plot_bounds.xright = (int) ((xsize + xoffset) * t->xmax
 		    - t->h_char * (rmargin >= 0 ? rmargin : 2));
     /*}}} */
 
@@ -485,11 +485,11 @@ boundary(struct curve_points *plots, int count)
     /* Make room for the color box if anything in the graph uses a palette. */
     set_plot_with_palette(0, MODE_PLOT); /* EAM FIXME - 1st parameter is a dummy */
     if (is_plot_with_palette() && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
-	xright -= (int) (xright-xleft)*COLORBOX_SCALE;
-	xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
+	plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
+	plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
     }
 
-    /*{{{  preliminary ybot calculation
+    /*{{{  preliminary plot_bounds.ybot calculation
      *     first compute heights of labels and tics */
 
     /* tic labels */
@@ -547,36 +547,36 @@ boundary(struct curve_points *plots, int count)
     } else
 	timebot_textheight = 0;
 
-    /* compute ybot from the various components
+    /* compute plot_bounds.ybot from the various components
      *     unless bmargin is explicitly specified  */
 
-    ybot = (int) (0.5 + t->ymax * yoffset);
+    plot_bounds.ybot = (int) (0.5 + t->ymax * yoffset);
 
     if (bmargin < 0) {
-	ybot += xtic_height + xtic_textheight;
+	plot_bounds.ybot += xtic_height + xtic_textheight;
 	if (xlabel_textheight > 0)
-	    ybot += xlabel_textheight;
+	    plot_bounds.ybot += xlabel_textheight;
 	if (timebot_textheight > 0)
-	    ybot += timebot_textheight;
+	    plot_bounds.ybot += timebot_textheight;
 	/* HBB 19990616: round to nearest integer, required to escape
 	 * floating point inaccuracies */
-	if (ybot == (int) (0.5 + t->ymax * yoffset)) {
+	if (plot_bounds.ybot == (int) (0.5 + t->ymax * yoffset)) {
 	    /* make room for the end of rotated ytics or y2tics */
-	    ybot += (int) (t->h_char * 2);
+	    plot_bounds.ybot += (int) (t->h_char * 2);
 	}
     } else
-	ybot += (int) (bmargin * t->v_char);
+	plot_bounds.ybot += (int) (bmargin * t->v_char);
 
-    /*  end of preliminary ybot calculation }}} */
+    /*  end of preliminary plot_bounds.ybot calculation }}} */
 
-    /* compute xleft from the various components
+    /* compute plot_bounds.xleft from the various components
      *     unless lmargin is explicitly specified  */
-    xleft = (int) (0.5 + t->xmax * xoffset);
+    plot_bounds.xleft = (int) (0.5 + t->xmax * xoffset);
 
-    /* compute xright from the various components
+    /* compute plot_bounds.xright from the various components
      *     unless rmargin is explicitly specified  */
 
-    xright = (int) (0.5 + t->xmax * (xsize + xoffset));
+    plot_bounds.xright = (int) (0.5 + t->xmax * (xsize + xoffset));
 
     if (lkey) {
 	TBOOLEAN key_panic = FALSE;
@@ -640,12 +640,12 @@ boundary(struct curve_points *plots, int count)
 
 	if (key->stack_dir == GPKEY_HORIZONTAL) {
 	    /* maximise no cols, limited by label-length */
-	    key_cols = (int) (xright - xleft) / key_col_wth;
+	    key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) / key_col_wth;
 	    /* EAM Dec 2004 - Rather than turn off the key, try to squeeze */
 	    if (key_cols == 0) {
 		key_cols = 1;
 		key_panic = TRUE;
-		key_col_wth = (xright - xleft);
+		key_col_wth = (plot_bounds.xright - plot_bounds.xleft);
 	    }
 	    key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
 	    /* now calculate actual no cols depending on no rows */
@@ -656,8 +656,8 @@ boundary(struct curve_points *plots, int count)
 		key_panic = TRUE;
 	    }
 	} else {
-	    /* maximise no rows, limited by ytop-ybot */
-	    int i = (int) (ytop - ybot - key->height_fix * t->v_char
+	    /* maximise no rows, limited by plot_bounds.ytop-plot_bounds.ybot */
+	    int i = (int) (plot_bounds.ytop - plot_bounds.ybot - key->height_fix * t->v_char
 			   - (ktitl_lines + 1) * t->v_char)
 		/ key_entry_height;
 
@@ -684,17 +684,17 @@ boundary(struct curve_points *plots, int count)
 	if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC && (key->vpos != JUST_CENTRE || key->hpos != CENTRE))
 	    || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
 	    if (key->margin == GPKEY_BMARGIN && bmargin < 0) {
-		ybot += key_entry_height * key_rows
+		plot_bounds.ybot += key_entry_height * key_rows
 		    + (int) (t->v_char * (ktitl_lines + 1));
-		ybot += (int) (key->height_fix * t->v_char);
+		plot_bounds.ybot += (int) (key->height_fix * t->v_char);
 	    } else if (key->margin == GPKEY_TMARGIN && tmargin < 0) {
-		ytop -= key_entry_height * key_rows
+		plot_bounds.ytop -= key_entry_height * key_rows
 		    + (int) (t->v_char * (ktitl_lines + 1));
-		ytop += (int) (key->height_fix * t->v_char);
+		plot_bounds.ytop += (int) (key->height_fix * t->v_char);
 	    } else if (key->margin == GPKEY_LMARGIN && lmargin < 0) {
-		xleft += key_col_wth * key_cols;
+		plot_bounds.xleft += key_col_wth * key_cols;
 	    } else if (key->margin == GPKEY_RMARGIN && rmargin < 0) {
-		xright -= key_col_wth * key_cols;
+		plot_bounds.xright -= key_col_wth * key_cols;
 	    }
   	}
 	/*}}} */
@@ -709,7 +709,7 @@ boundary(struct curve_points *plots, int count)
     set_cbminmax();
     axis_checked_extend_empty_range(COLOR_AXIS, "All points of color axis undefined.");
 
-    /*{{{  recompute xleft based on widths of ytics, ylabel etc
+    /*{{{  recompute plot_bounds.xleft based on widths of ytics, ylabel etc
        unless it has been explicitly set by lmargin */
 
     /* tic labels */
@@ -777,29 +777,29 @@ boundary(struct curve_points *plots, int count)
     if (lmargin < 0) {
        double tmpx, tmpy;
 
-	xleft += (timelabel_textwidth > ylabel_textwidth
+	plot_bounds.xleft += (timelabel_textwidth > ylabel_textwidth
 		  ? timelabel_textwidth : ylabel_textwidth)
 	    + ytic_width + ytic_textwidth;
 
-	/* make sure xleft is wide enough for a negatively
+	/* make sure plot_bounds.xleft is wide enough for a negatively
 	 * x-offset horizontal timestamp
 	 */
 	map_position_r(&(timelabel.offset), &tmpx, &tmpy, "boundary");
 	if (!vertical_timelabel
-	    && xleft - ytic_width - ytic_textwidth < -(int) (tmpx))
-	    xleft = ytic_width + ytic_textwidth - (int) (tmpx);
-	if (xleft == (int) (0.5 + t->xmax * xoffset)) {
+	    && plot_bounds.xleft - ytic_width - ytic_textwidth < -(int) (tmpx))
+	    plot_bounds.xleft = ytic_width + ytic_textwidth - (int) (tmpx);
+	if (plot_bounds.xleft == (int) (0.5 + t->xmax * xoffset)) {
 	    /* make room for end of xtic or x2tic label */
-	    xleft += (int) (t->h_char * 2);
+	    plot_bounds.xleft += (int) (t->h_char * 2);
 	}
 	/* DBT 12-3-98  extra margin just in case */
-	xleft += 0.5 * t->v_char;
+	plot_bounds.xleft += 0.5 * t->v_char;
     } else
-	xleft += (int) (lmargin * t->h_char);
+	plot_bounds.xleft += (int) (lmargin * t->h_char);
 
-    /*  end of xleft calculation }}} */
+    /*  end of plot_bounds.xleft calculation }}} */
 
-    /*{{{  recompute xright based on widest y2tic. y2labels, key "outside"
+    /*{{{  recompute plot_bounds.xright based on widest y2tic. y2labels, key "outside"
        unless it has been explicitly set by rmargin */
 
     /* tic labels */
@@ -842,27 +842,27 @@ boundary(struct curve_points *plots, int count)
 
     /* Make room for the color box if needed. */
     if (is_plot_with_palette() && is_plot_with_colorbox() && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
-	xright -= (int) (xright-xleft)*COLORBOX_SCALE;
-	xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
+	plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
+	plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
     }
 
     if (rmargin < 0) {
-	/* xright -= y2label_textwidth + y2tic_width + y2tic_textwidth; */
-	xright -= y2tic_width + y2tic_textwidth;
+	/* plot_bounds.xright -= y2label_textwidth + y2tic_width + y2tic_textwidth; */
+	plot_bounds.xright -= y2tic_width + y2tic_textwidth;
 	if (y2label_textwidth > 0)
-	    xright -= y2label_textwidth;
+	    plot_bounds.xright -= y2label_textwidth;
 
-	if (xright == (int) (0.5 + t->xmax * (xsize + xoffset))) {
+	if (plot_bounds.xright == (int) (0.5 + t->xmax * (xsize + xoffset))) {
 	    /* make room for end of xtic or x2tic label */
-	    xright -= (int) (t->h_char * 2);
+	    plot_bounds.xright -= (int) (t->h_char * 2);
 	}
 	/* DBT 12-3-98  extra margin just in case */
-	xright -= 0.5 * t->v_char;
+	plot_bounds.xright -= 0.5 * t->v_char;
 
     } else
-	xright -= (int) (rmargin * t->h_char);
+	plot_bounds.xright -= (int) (rmargin * t->h_char);
 
-    /*  end of xright calculation }}} */
+    /*  end of plot_bounds.xright calculation }}} */
 
 
     /*{{{  set up x and x2 tics */
@@ -893,24 +893,24 @@ boundary(struct curve_points *plots, int count)
 
 	/*{{{  set aspect ratio if valid and sensible */
 	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
-	    double current = ((double) (ytop - ybot)) / (xright - xleft);
+	    double current = ((double) (plot_bounds.ytop - plot_bounds.ybot)) / (plot_bounds.xright - plot_bounds.xleft);
 	    double required = (current_aspect_ratio * t->v_tic) / t->h_tic;
 
 	    if (current > required) {
 		/* too tall */
-		int height = ytop - ybot;
-		ytop = ybot + required * (xright - xleft);
-		height -= (ytop - ybot);
+		int height = plot_bounds.ytop - plot_bounds.ybot;
+		plot_bounds.ytop = plot_bounds.ybot + required * (plot_bounds.xright - plot_bounds.xleft);
+		height -= (plot_bounds.ytop - plot_bounds.ybot);
 		height /= 2;
-		ytop += height;
-		ybot += height;
+		plot_bounds.ytop += height;
+		plot_bounds.ybot += height;
 	    } else {
-		int width = xright - xleft;
-		xright = xleft + (ytop - ybot) / required;
-		width -= (xright - xleft);
+		int width = plot_bounds.xright - plot_bounds.xleft;
+		plot_bounds.xright = plot_bounds.xleft + (plot_bounds.ytop - plot_bounds.ybot) / required;
+		width -= (plot_bounds.xright - plot_bounds.xleft);
 		width /= 2;
-		xright += width;
-		xleft += width;
+		plot_bounds.xright += width;
+		plot_bounds.xleft += width;
 	    }
 	}
 	/*}}} */
@@ -923,52 +923,52 @@ boundary(struct curve_points *plots, int count)
 	&& vertical_x2tics) {
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(SECOND_X_AXIS, /* 0, */ widest_tic_callback);
-	ytop += x2tic_textheight;
+	plot_bounds.ytop += x2tic_textheight;
 	/* Now compute a new one and use that instead: */
 	x2tic_textheight = (int) (t->h_char * (widest_tic_strlen));
-	ytop -= x2tic_textheight;
+	plot_bounds.ytop -= x2tic_textheight;
     }
     if (bmargin < 0
 	&& axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER
 	&& vertical_xtics) {
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(FIRST_X_AXIS, /* 0, */ widest_tic_callback);
-	ybot -= xtic_textheight;
+	plot_bounds.ybot -= xtic_textheight;
 	xtic_textheight = (int) (t->h_char * widest_tic_strlen);
-	ybot += xtic_textheight;
+	plot_bounds.ybot += xtic_textheight;
     }
 
     /* EAM - FIXME
-     * Notwithstanding all these fancy calculations, ytop must always be above ybot
+     * Notwithstanding all these fancy calculations, plot_bounds.ytop must always be above plot_bounds.ybot
      */
-    if (ytop < ybot) {
-	int i = ytop;
+    if (plot_bounds.ytop < plot_bounds.ybot) {
+	int i = plot_bounds.ytop;
 
-	ytop = ybot;
-	ybot = i;
-	FPRINTF((stderr,"boundary: Big problems! ybot > ytop\n"));
+	plot_bounds.ytop = plot_bounds.ybot;
+	plot_bounds.ybot = i;
+	FPRINTF((stderr,"boundary: Big problems! plot_bounds.ybot > plot_bounds.ytop\n"));
     }
 
     /*  compute coordinates for axis labels, title et al
      *     (some of these may not be used) */
 
-    x2label_y = ytop + x2tic_height + x2tic_textheight + x2label_textheight;
+    x2label_y = plot_bounds.ytop + x2tic_height + x2tic_textheight + x2label_textheight;
     if (x2tic_textheight && (title_textheight || x2label_textheight))
 	x2label_y += t->v_char;
 
     title_y = x2label_y + title_textheight;
 
-    ylabel_y = ytop + x2tic_height + x2tic_textheight + ylabel_textheight;
+    ylabel_y = plot_bounds.ytop + x2tic_height + x2tic_textheight + ylabel_textheight;
 
-    y2label_y = ytop + x2tic_height + x2tic_textheight + y2label_textheight;
+    y2label_y = plot_bounds.ytop + x2tic_height + x2tic_textheight + y2label_textheight;
 
-    xlabel_y = ybot - xtic_height - xtic_textheight - xlabel_textheight
+    xlabel_y = plot_bounds.ybot - xtic_height - xtic_textheight - xlabel_textheight
 	+ xlablin * t->v_char;
-    ylabel_x = xleft - ytic_width - ytic_textwidth;
+    ylabel_x = plot_bounds.xleft - ytic_width - ytic_textwidth;
     if (axis_array[FIRST_Y_AXIS].label.text && can_rotate)
 	ylabel_x -= ylabel_textwidth;
 
-    y2label_x = xright + y2tic_width + y2tic_textwidth;
+    y2label_x = plot_bounds.xright + y2tic_width + y2tic_textwidth;
     if (axis_array[SECOND_Y_AXIS].label.text && can_rotate)
 	y2label_x += y2label_textwidth - y2lablin * t->v_char;
 
@@ -981,50 +981,50 @@ boundary(struct curve_points *plots, int count)
 	}
     } else {
 	if (timelabel_bottom)
-	    time_y = ybot - xtic_height - xtic_textheight - xlabel_textheight
+	    time_y = plot_bounds.ybot - xtic_height - xtic_textheight - xlabel_textheight
 		- timebot_textheight + t->v_char;
 	else if (ylabel_textheight > 0)
 	    time_y = ylabel_y + timetop_textheight;
 	else
-	    time_y = ytop + x2tic_height + x2tic_textheight
+	    time_y = plot_bounds.ytop + x2tic_height + x2tic_textheight
 		+ timetop_textheight + (int) t->h_char;
     }
     if (vertical_timelabel)
-	time_x = xleft - ytic_width - ytic_textwidth - timelabel_textwidth;
+	time_x = plot_bounds.xleft - ytic_width - ytic_textwidth - timelabel_textwidth;
     else {
 	double tmpx, tmpy;
 	map_position_r(&(timelabel.offset), &tmpx, &tmpy, "boundary");
-	time_x = xleft - ytic_width - ytic_textwidth + (int) (tmpx);
+	time_x = plot_bounds.xleft - ytic_width - ytic_textwidth + (int) (tmpx);
     }
 
-    xtic_y = ybot - xtic_height
+    xtic_y = plot_bounds.ybot - xtic_height
 	- (int) (vertical_xtics ? t->h_char : t->v_char);
 
-    x2tic_y = ytop + x2tic_height
+    x2tic_y = plot_bounds.ytop + x2tic_height
 	+ (vertical_x2tics ? (int) t->h_char : x2tic_textheight);
 
-    ytic_x = xleft - ytic_width
+    ytic_x = plot_bounds.xleft - ytic_width
 	- (vertical_ytics
 	   ? (ytic_textwidth - (int) t->v_char)
 	   : (int) t->h_char);
 
-    y2tic_x = xright + y2tic_width
+    y2tic_x = plot_bounds.xright + y2tic_width
 	+ (int) (vertical_y2tics ? t->v_char : t->h_char);
 
     /* restore text to horizontal [we tested rotation above] */
     (void) (*t->text_angle) (0);
 
     /* needed for map_position() below */
-    AXIS_SETSCALE(FIRST_Y_AXIS, ybot, ytop);
-    AXIS_SETSCALE(SECOND_Y_AXIS, ybot, ytop);
-    AXIS_SETSCALE(FIRST_X_AXIS, xleft, xright);
-    AXIS_SETSCALE(SECOND_X_AXIS, xleft, xright);
+    AXIS_SETSCALE(FIRST_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
+    AXIS_SETSCALE(SECOND_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
+    AXIS_SETSCALE(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
+    AXIS_SETSCALE(SECOND_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
     /* HBB 20020122: moved here from do_plot, because map_position
      * needs these, too */
-    axis_set_graphical_range(FIRST_X_AXIS, xleft, xright);
-    axis_set_graphical_range(FIRST_Y_AXIS, ybot, ytop);
-    axis_set_graphical_range(SECOND_X_AXIS, xleft, xright);
-    axis_set_graphical_range(SECOND_Y_AXIS, ybot, ytop);
+    axis_set_graphical_range(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
+    axis_set_graphical_range(FIRST_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
+    axis_set_graphical_range(SECOND_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
+    axis_set_graphical_range(SECOND_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
 
 #define ALIGN_BORDERS 1
     /* Calculate space for keys (do_plot will use these to position key). */
@@ -1034,26 +1034,26 @@ boundary(struct curve_points *plots, int count)
     if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
 	|| (key->region == GPKEY_AUTO_EXTERIOR_LRTBC && key->vpos == JUST_CENTRE && key->hpos == CENTRE)) {
 	if (key->vpos == JUST_TOP) {
-	    keybox.yt = ytop - t->v_tic;
+	    keybox.yt = plot_bounds.ytop - t->v_tic;
 	    keybox.yb = keybox.yt - key_h;
 	} else if (key->vpos == JUST_BOT) {
-	    keybox.yb = ybot + t->v_tic;
+	    keybox.yb = plot_bounds.ybot + t->v_tic;
 	    keybox.yt = keybox.yb + key_h;
 	} else /* (key->vpos == JUST_CENTRE) */ {
 	    int key_box_half = key_h / 2;
-	    keybox.yb = (ybot + ytop) / 2 - key_box_half;
-	    keybox.yt = (ybot + ytop) / 2 + key_box_half;
+	    keybox.yb = (plot_bounds.ybot + plot_bounds.ytop) / 2 - key_box_half;
+	    keybox.yt = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
 	}
 	if (key->hpos == LEFT) {
-	    keybox.xl = xleft + t->h_char;
+	    keybox.xl = plot_bounds.xleft + t->h_char;
 	    keybox.xr = keybox.xl + key_w;
 	} else if (key->hpos == RIGHT) {
-	    keybox.xr = xright - t->h_char;
+	    keybox.xr = plot_bounds.xright - t->h_char;
 	    keybox.xl = keybox.xr - key_w;
 	} else /* (key->hpos == CENTER) */ {
 	    int key_box_half = key_w / 2;
-	    keybox.xl = (xright + xleft) / 2 - key_box_half;
-	    keybox.xr = (xright + xleft) / 2 + key_box_half;
+	    keybox.xl = (plot_bounds.xright + plot_bounds.xleft) / 2 - key_box_half;
+	    keybox.xr = (plot_bounds.xright + plot_bounds.xleft) / 2 + key_box_half;
 	}
     } else if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
 
@@ -1070,19 +1070,19 @@ boundary(struct curve_points *plots, int count)
 	    if (key->vpos == JUST_TOP) {
 		/* align top first since tmargin may be manual */
 #if ALIGN_BORDERS
-		keybox.yt = ytop;
+		keybox.yt = plot_bounds.ytop;
 #else
 		keybox.yt = (ysize + yoffset) * t->ymax - t->v_tic;
 #endif
 		keybox.yb = keybox.yt - key_h;
 	    } else if (key->vpos == CENTRE) {
 		int key_box_half = key_h / 2;
-		keybox.yb = (ybot + ytop) / 2 - key_box_half;
-		keybox.yt = (ybot + ytop) / 2 + key_box_half;
+		keybox.yb = (plot_bounds.ybot + plot_bounds.ytop) / 2 - key_box_half;
+		keybox.yt = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
 	    } else {
 		/* align bottom first since bmargin may be manual */
 #if ALIGN_BORDERS
-		keybox.yb = ybot;
+		keybox.yb = plot_bounds.ybot;
 #else
 		keybox.yb = yoffset * t->ymax + t->v_tic;
 #endif
@@ -1103,19 +1103,19 @@ boundary(struct curve_points *plots, int count)
 	    if (key->hpos == LEFT) {
 		/* align left first since lmargin may be manual */
 #if ALIGN_BORDERS
-		keybox.xl = xleft;
+		keybox.xl = plot_bounds.xleft;
 #else
 		keybox.xl = xoffset * t->xmax + t->h_char;
 #endif
 		keybox.xr = keybox.xl + key_w;
 	    } else if (key->hpos == CENTRE) {
 		int key_box_half = key_w / 2;
-		keybox.xl = (xright + xleft) / 2 - key_box_half;
-		keybox.xr = (xright + xleft) / 2 + key_box_half;
+		keybox.xl = (plot_bounds.xright + plot_bounds.xleft) / 2 - key_box_half;
+		keybox.xr = (plot_bounds.xright + plot_bounds.xleft) / 2 + key_box_half;
 	    } else {
 		/* align right first since rmargin may be manual */
 #if ALIGN_BORDERS
-		keybox.xr = xright;
+		keybox.xr = plot_bounds.xright;
 #else
 		keybox.xr = (xsize + xoffset) * t->xmax - t->h_char;
 #endif
@@ -1382,9 +1382,9 @@ do_plot(struct curve_points *plots, int pcount)
     term_init();		/* may set xmax/ymax */
     term_start_plot();
 
-    /* compute boundary for plot (xleft, xright, ytop, ybot)
-     * also calculates tics, since xtics depend on xleft
-     * but xleft depends on ytics. Boundary calculations depend
+    /* compute boundary for plot (plot_bounds.xleft, plot_bounds.xright, plot_bounds.ytop, plot_bounds.ybot)
+     * also calculates tics, since xtics depend on plot_bounds.xleft
+     * but plot_bounds.xleft depends on ytics. Boundary calculations depend
      * on term->v_char etc, so terminal must be initialised first.
      */
     boundary(plots, pcount);
@@ -1433,7 +1433,7 @@ do_plot(struct curve_points *plots, int pcount)
 			   &tmpx, &tmpy, "doplot");
 
 	    x = ylabel_x + (t->v_char / 2);
-	    y = (ytop + ybot) / 2 + tmpy;
+	    y = (plot_bounds.ytop + plot_bounds.ybot) / 2 + tmpy;
 
 	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text,
 			    CENTRE, JUST_TOP, axis_array[FIRST_Y_AXIS].label.rotate,
@@ -1464,7 +1464,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    map_position_r(&(axis_array[SECOND_Y_AXIS].label.offset),
 			   &tmpx, &tmpy, "doplot");
 	    x = y2label_x + (t->v_char / 2) - 1;
-	    y = (ytop + ybot) / 2 + tmpy;
+	    y = (plot_bounds.ytop + plot_bounds.ybot) / 2 + tmpy;
 
 	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text,
 			    CENTRE, JUST_TOP, 
@@ -1491,7 +1491,7 @@ do_plot(struct curve_points *plots, int pcount)
 	map_position_r(&(axis_array[FIRST_X_AXIS].label.offset),
 		       &tmpx, &tmpy, "doplot");
 
-	x = (xright + xleft) / 2 +  tmpx;
+	x = (plot_bounds.xright + plot_bounds.xleft) / 2 +  tmpx;
 	y = xlabel_y - t->v_char / 2;   /* HBB */
 
 	ignore_enhanced(axis_array[FIRST_X_AXIS].label.noenhanced);
@@ -1509,7 +1509,7 @@ do_plot(struct curve_points *plots, int pcount)
 	unsigned int x, y;
 	map_position_r(&(title.offset), &tmpx, &tmpy, "doplot");
 	/* we worked out y-coordinate in boundary() */
-	x = (xleft + xright) / 2 + tmpx;
+	x = (plot_bounds.xleft + plot_bounds.xright) / 2 + tmpx;
 	y = title_y - t->v_char / 2;
 
 	ignore_enhanced(title.noenhanced);
@@ -1526,7 +1526,7 @@ do_plot(struct curve_points *plots, int pcount)
 	map_position_r(&(axis_array[SECOND_X_AXIS].label.offset),
 		       &tmpx, &tmpy, "doplot");
 	/* we worked out y-coordinate in boundary() */
-	x = (xright + xleft) / 2 + tmpx;
+	x = (plot_bounds.xright + plot_bounds.xleft) / 2 + tmpx;
 	y = x2label_y - t->v_char / 2 - 1;
 	ignore_enhanced(axis_array[SECOND_X_AXIS].label.noenhanced);
 	apply_pm3dcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
@@ -3206,10 +3206,10 @@ plot_points(struct curve_points *plot)
 	    y = map_y(plot->points[i].y);
 	    /* do clipping if necessary */
 	    if (!clip_points
-		|| (x >= xleft + p_width
-		    && y >= ybot + p_height
-		    && x <= xright - p_width
-		    && y <= ytop - p_height)) {
+		|| (x >= plot_bounds.xleft + p_width
+		    && y >= plot_bounds.ybot + p_height
+		    && x <= plot_bounds.xright - p_width
+		    && y <= plot_bounds.ytop - p_height)) {
 
 		if (plot->plot_style == POINTSTYLE
 		&&  plot->lp_properties.p_size == PTSZ_VARIABLE)
@@ -4234,18 +4234,18 @@ xtick2d_callback(
 	    }
 	} else {
 	    if (lkey && x < keybox.xr && x > keybox.xl
-	    &&  keybox.yt > ybot && keybox.yb < ytop) {
-		if (keybox.yb > ybot) {
-		    (*t->move) (x, ybot);
+	    &&  keybox.yt > plot_bounds.ybot && keybox.yb < plot_bounds.ytop) {
+		if (keybox.yb > plot_bounds.ybot) {
+		    (*t->move) (x, plot_bounds.ybot);
 		    (*t->vector) (x, keybox.yb);
 		}
-		if (keybox.yt < ytop) {
+		if (keybox.yt < plot_bounds.ytop) {
 		    (*t->move) (x, keybox.yt);
-		    (*t->vector) (x, ytop);
+		    (*t->vector) (x, plot_bounds.ytop);
 		}
 	    } else {
-		(*t->move) (x, ybot);
-		(*t->vector) (x, ytop);
+		(*t->move) (x, plot_bounds.ybot);
+		(*t->vector) (x, plot_bounds.ytop);
 	    }
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
@@ -4313,18 +4313,18 @@ ytick2d_callback(
 	} else {
 	    /* Make the grid avoid the key box */
 	    if (lkey && y < keybox.yt && y > keybox.yb
-	    &&  keybox.xl < xright && keybox.xr > xleft) {
-		if (keybox.xl > xleft) {
-		    (*t->move) (xleft, y);
+	    &&  keybox.xl < plot_bounds.xright && keybox.xr > plot_bounds.xleft) {
+		if (keybox.xl > plot_bounds.xleft) {
+		    (*t->move) (plot_bounds.xleft, y);
 		    (*t->vector) (keybox.xl, y);
 		}
-		if (keybox.xr < xright) {
+		if (keybox.xr < plot_bounds.xright) {
 		    (*t->move) (keybox.xr, y);
-		    (*t->vector) (xright, y);
+		    (*t->vector) (plot_bounds.xright, y);
 		}
 	    } else {
-		(*t->move) (xleft, y);
-		(*t->vector) (xright, y);
+		(*t->move) (plot_bounds.xleft, y);
+		(*t->vector) (plot_bounds.xright, y);
 	    }
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
@@ -4423,7 +4423,7 @@ map_position_double(
 	}
     case graph:
 	{
-	    *x = xleft + pos->x * (xright - xleft);
+	    *x = plot_bounds.xleft + pos->x * (plot_bounds.xright - plot_bounds.xleft);
 	    break;
 	}
     case screen:
@@ -4456,7 +4456,7 @@ map_position_double(
 	}
     case graph:
 	{
-	    *y = ybot + pos->y * (ytop - ybot);
+	    *y = plot_bounds.ybot + pos->y * (plot_bounds.ytop - plot_bounds.ybot);
 	    break;
 	}
     case screen:
@@ -4502,7 +4502,7 @@ map_position_r(
 	}
     case graph:
 	{
-	    *x = pos->x * (xright - xleft);
+	    *x = pos->x * (plot_bounds.xright - plot_bounds.xleft);
 	    break;
 	}
     case screen:
@@ -4533,7 +4533,7 @@ map_position_r(
 	}
     case graph:
 	{
-	    *y = pos->y * (ytop - ybot);
+	    *y = pos->y * (plot_bounds.ytop - plot_bounds.ybot);
 	    return;
 	}
     case screen:
@@ -4558,26 +4558,26 @@ static void
 plot_border()
 {
 	term_apply_lp_properties(&border_lp);	/* border linetype */
-	(*term->move) (xleft, ybot);
+	(*term->move) (plot_bounds.xleft, plot_bounds.ybot);
 	if (border_south) {
-	    (*term->vector) (xright, ybot);
+	    (*term->vector) (plot_bounds.xright, plot_bounds.ybot);
 	} else {
-	    (*term->move) (xright, ybot);
+	    (*term->move) (plot_bounds.xright, plot_bounds.ybot);
 	}
 	if (border_east) {
-	    (*term->vector) (xright, ytop);
+	    (*term->vector) (plot_bounds.xright, plot_bounds.ytop);
 	} else {
-	    (*term->move) (xright, ytop);
+	    (*term->move) (plot_bounds.xright, plot_bounds.ytop);
 	}
 	if (border_north) {
-	    (*term->vector) (xleft, ytop);
+	    (*term->vector) (plot_bounds.xleft, plot_bounds.ytop);
 	} else {
-	    (*term->move) (xleft, ytop);
+	    (*term->move) (plot_bounds.xleft, plot_bounds.ytop);
 	}
 	if (border_west) {
-	    (*term->vector) (xleft, ybot);
+	    (*term->vector) (plot_bounds.xleft, plot_bounds.ybot);
 	} else {
-	    (*term->move) (xleft, ybot);
+	    (*term->move) (plot_bounds.xleft, plot_bounds.ybot);
 	}
 }
 
@@ -4663,7 +4663,7 @@ do_key_sample(
 	    int x = xl + key_text_right - t->h_char * estimate_strlen(title);
 	    if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC ||	/* HBB 990327 */
 		key->region == GPKEY_AUTO_EXTERIOR_MARGIN ||
-		i_inrange(x, xleft, xright))
+		i_inrange(x, plot_bounds.xleft, plot_bounds.xright))
 		write_multiline(x, yl, title, LEFT, JUST_TOP, 0, NULL);
 	}
     }

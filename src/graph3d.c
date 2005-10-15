@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.134 2005/10/06 04:18:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.135 2005/10/12 05:51:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -342,24 +342,25 @@ boundary3d(struct surface_points *plots, int count)
     /* luecken@udel.edu modifications
        sizes the plot to take up more of available resolution */
     if (lmargin >= 0)
-	xleft = t->h_char * lmargin;
+	plot_bounds.xleft = t->h_char * lmargin;
     else
-	xleft = t->h_char * 2 + t->h_tic;
-    xright = xsize * t->xmax - t->h_char * 2 - t->h_tic;
+	plot_bounds.xleft = t->h_char * 2 + t->h_tic;
+    plot_bounds.xright = xsize * t->xmax - t->h_char * 2 - t->h_tic;
     key_rows = ptitl_cnt;
     key_cols = 1;
     if ((key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
 	&& key->margin == GPKEY_BMARGIN) {
 	if (ptitl_cnt > 0) {
 	    /* calculate max no cols, limited by label-length */
-	    key_cols = (int) (xright - xleft) / ((max_ptitl_len + 4) * t->h_char + key_sample_width);
+	    key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) 
+		     / ((max_ptitl_len + 4) * t->h_char + key_sample_width);
 	    /* HBB 991019: fix division by zero problem */
 	    if (key_cols == 0)
 		key_cols = 1;
 	    key_rows = (int) ((ptitl_cnt - 1)/ key_cols) + 1;
 	    /* now calculate actual no cols depending on no rows */
 	    key_cols = (int) ((ptitl_cnt - 1)/ key_rows) + 1;
-	    key_col_wth = (int) (xright - xleft) / key_cols;
+	    key_col_wth = (int) (plot_bounds.xright - plot_bounds.xleft) / key_cols;
 	    /* key_rows += ktitle_lines; - messes up key - div */
 	} else {
 	    key_rows = key_cols = key_col_wth = 0;
@@ -369,10 +370,10 @@ boundary3d(struct surface_points *plots, int count)
      * xformat || yformat || xlabel || ylabel */
 
     /* an absolute 1, with no terminal-dependent scaling ? */
-    ybot = t->v_char * 2.5 + 1;
+    plot_bounds.ybot = t->v_char * 2.5 + 1;
     if (key_rows && (key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
 	&& key->margin == GPKEY_BMARGIN)
-	ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
+	plot_bounds.ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
 
     if (title.text) {
 	titlelin++;
@@ -381,12 +382,12 @@ boundary3d(struct surface_points *plots, int count)
 		titlelin++;
 	}
     }
-    ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
+    plot_bounds.ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
     if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
 	|| ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
 	    && key->margin == GPKEY_RMARGIN)) {
-	/* calculate max no rows, limited be ytop-ybot */
-	i = (int) (ytop - ybot) / t->v_char - 1 - ktitle_lines;
+	/* calculate max no rows, limited by plot_bounds.ytop-plot_bounds.ybot */
+	i = (int) (plot_bounds.ytop - plot_bounds.ybot) / t->v_char - 1 - ktitle_lines;
 	/* HBB 20030321: div by 0 fix like above */
 	if (i == 0)
 	    i = 1;
@@ -399,19 +400,19 @@ boundary3d(struct surface_points *plots, int count)
     }
     if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
 	&& key->margin == GPKEY_RMARGIN) {
-	xright -= key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
+	plot_bounds.xright -= key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
     }
-    xleft += t->xmax * xoffset;
-    xright += t->xmax * xoffset;
-    ytop += t->ymax * yoffset;
-    ybot += t->ymax * yoffset;
-    xmiddle = (xright + xleft) / 2;
-    ymiddle = (ytop + ybot) / 2;
+    plot_bounds.xleft += t->xmax * xoffset;
+    plot_bounds.xright += t->xmax * xoffset;
+    plot_bounds.ytop += t->ymax * yoffset;
+    plot_bounds.ybot += t->ymax * yoffset;
+    xmiddle = (plot_bounds.xright + plot_bounds.xleft) / 2;
+    ymiddle = (plot_bounds.ytop + plot_bounds.ybot) / 2;
     /* HBB 980308: sigh... another 16bit glitch: on term's with more than
      * 8000 pixels in either direction, these calculations produce garbage
      * results if done in (16bit) ints */
-    xscaler = ((xright - xleft) * 4L) / 7L;	/* HBB: Magic number alert! */
-    yscaler = ((ytop - ybot) * 4L) / 7L;
+    xscaler = ((plot_bounds.xright - plot_bounds.xleft) * 4L) / 7L;	/* HBB: Magic number alert! */
+    yscaler = ((plot_bounds.ytop - plot_bounds.ybot) * 4L) / 7L;
 
     /* HBB 20011011: 'set size {square|ratio}' for splots */
     if (aspect_ratio != 0.0) {
@@ -636,11 +637,11 @@ do_3dplot(
     if (term->layer)
 	(term->layer)(TERM_LAYER_BACKTEXT);
 
-    /* now compute boundary for plot (xleft, xright, ytop, ybot) */
+    /* now compute boundary for plot */
     boundary3d(plots, pcount);
 
-    axis_set_graphical_range(FIRST_X_AXIS, xleft, xright);
-    axis_set_graphical_range(FIRST_Y_AXIS, ybot, ytop);
+    axis_set_graphical_range(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
+    axis_set_graphical_range(FIRST_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
     axis_set_graphical_range(FIRST_Z_AXIS, floor_z, ceiling_z);
 
     /* SCALE FACTORS */
@@ -697,8 +698,8 @@ do_3dplot(
 #undef DEFAULT_Y_DISTANCE
 	} else { /* usual 3d set view ... */
 	    map3d_position_r(&(title.offset), &tmpx, &tmpy, "3dplot");
-	    x = (unsigned int) ((xleft + xright) / 2 + tmpx);
-	    y = (unsigned int) (ytop + tmpy + titlelin * (t->h_char));
+	    x = (unsigned int) ((plot_bounds.xleft + plot_bounds.xright) / 2 + tmpx);
+	    y = (unsigned int) (plot_bounds.ytop + tmpy + titlelin * (t->h_char));
 	}
 	ignore_enhanced(title.noenhanced);
 	apply_pm3dcolor(&(title.textcolor),t);
@@ -721,7 +722,7 @@ do_3dplot(
 	x = t->v_char + tmpx;
 	y = timelabel_bottom
 	    ? yoffset * Y_AXIS.max + tmpy + t->v_char
-	    : ytop + tmpy - t->v_char;
+	    : plot_bounds.ytop + tmpy - t->v_char;
 
 	time(&now);
 	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
@@ -782,42 +783,46 @@ do_3dplot(
 #if 0
 	    yl = yoffset * t->ymax + (key_rows) * key_entry_height + (ktitle_lines + 2) * t->v_char;
 	    xl = max_ptitl_len * 1000 / (key_sample_width / t->h_char + max_ptitl_len + 2);
-	    xl *= (xright - xleft) / key_cols;
+	    xl *= (plot_bounds.xright - plot_bounds.xleft) / key_cols;
 	    xl /= 1000;
-	    xl += xleft;
+	    xl += plot_bounds.xleft;
 #else
 	    /* HBB 19990608: why calculate these again? boundary3d has already
 	     * done it... */
 	    if (ptitl_cnt > 0) {
 		/* maximise no cols, limited by label-length */
-		key_cols = (int) (xright - xleft) / key_col_wth;
+		key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) / key_col_wth;
 		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
 		/* now calculate actual no cols depending on no rows */
 		key_cols = (int) (ptitl_cnt + key_rows - 1) / key_rows;
-		key_col_wth = (int) (xright - xleft) / key_cols;
+		key_col_wth = (int) (plot_bounds.xright - plot_bounds.xleft) / key_cols;
 		/* we divide into columns, then centre in column by considering
 		 * ratio of key_left_size to key_right_size
-		 * key_size_left/(key_size_left+key_size_right) * (xright-xleft)/key_cols
+		 * key_size_left/(key_size_left+key_size_right) 
+		 *  * (plot_bounds.xright-plot_bounds.xleft)/key_cols
 		 * do one integer division to maximise accuracy (hope we dont
 		 * overflow !)
 		 */
-		xl = xleft + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
-		yl = yoffset * t->ymax + (key_rows) * key_entry_height + (ktitle_lines + 2) * t->v_char;
+		xl = plot_bounds.xleft
+		   + ((plot_bounds.xright - plot_bounds.xleft) * key_size_left) 
+		   / (key_cols * (key_size_left + key_size_right));
+		yl = yoffset * t->ymax + (key_rows) * key_entry_height 
+		   + (ktitle_lines + 2) * t->v_char;
 	    }
 #endif
 	} else {
 	    if (key->vpos == JUST_TOP) {
-		yl = ytop - t->v_tic - t->v_char;
+		yl = plot_bounds.ytop - t->v_tic - t->v_char;
 	    } else {
-		yl = ybot + t->v_tic + key_entry_height * key_rows + ktitle_lines * t->v_char;
+		yl = plot_bounds.ybot + t->v_tic + key_entry_height * key_rows + ktitle_lines * t->v_char;
 	    }
 	    if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->region == GPKEY_RMARGIN) {
 		/* keys outside plot border (right) */
-		xl = xright + t->h_tic + key_size_left;
+		xl = plot_bounds.xright + t->h_tic + key_size_left;
 	    } else if (key->hpos == LEFT) {
-		xl = xleft + t->h_tic + key_size_left;
+		xl = plot_bounds.xleft + t->h_tic + key_size_left;
 	    } else {
-		xl = xright - key_size_right - key_col_wth * (key_cols - 1);
+		xl = plot_bounds.xright - key_size_right - key_col_wth * (key_cols - 1);
 	    }
 	}
 	yl_ref = yl - ktitle_lines * t->v_char;
@@ -873,7 +878,7 @@ do_3dplot(
 				    yl, s);
 		} else {
 		    int x = xl + key_text_right - t->h_char * estimate_strlen(s);
-		    if (inrange(x, xleft, xright))
+		    if (inrange(x, plot_bounds.xleft, plot_bounds.xright))
 			(*t->put_text) (x, yl, s);
 		}
 	    }
@@ -2879,7 +2884,7 @@ key_text(int xl, int yl, char *text)
 	} else {
 	    int x = xl + key_text_right - (term->h_char) * estimate_strlen(text);
 	    if (key->region == GPKEY_USER_PLACEMENT) {
-		if (i_inrange(x, xleft, xright))
+		if (i_inrange(x, plot_bounds.xleft, plot_bounds.xright))
 		    clip_put_text(x, yl, text);
 	    } else {
 		(*term->put_text) (x, yl, text);

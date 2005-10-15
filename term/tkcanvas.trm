@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.22 2004/04/13 17:24:39 broeker Exp $
+ * $Id: tkcanvas.trm,v 1.23 2004/07/01 17:10:34 broeker Exp $
  *
  */
 
@@ -114,8 +114,6 @@ TERM_PUBLIC void TK_linewidth __PROTO((double linewidth));
  * a 'frontier' layer: it should not be dependant on any other code
  * inside gnuplot */
 extern AXIS axis_array[];
-/* gadgets.c */
-extern int xleft, xright, ybot, ytop;
 /* command.c */
 extern TBOOLEAN is_3d_plot;
 
@@ -239,10 +237,10 @@ TK_move(unsigned int x, unsigned int y)
           + value*(axis_array[axis].max-axis_array[axis].min)
 
 #define TK_X_VALUE(value) \
- (double)(value-xleft)/(double)(xright-xleft)
+ (double)(value-plot_bounds.xleft)/(double)(plot_bounds.xright-plot_bounds.xleft)
 
 #define TK_Y_VALUE(value) \
- (double)((TK_YMAX-value)-ybot)/(double)(ytop-ybot)
+ (double)((TK_YMAX-value)-plot_bounds.ybot)/(double)(plot_bounds.ytop-plot_bounds.ybot)
 
 TERM_PUBLIC void
 TK_vector(unsigned int x, unsigned int y)
@@ -509,7 +507,7 @@ TK_text()
 	    fputs("sub gnuplot_plotarea {\n", gpoutfile);
 	    fprintf(gpoutfile,
 		    "return (%d, %d, %d, %d);\n",
-		    xleft, xright, 1000 - ytop, 1000 - ybot);
+		    plot_bounds.xleft, plot_bounds.xright, 1000 - plot_bounds.ytop, 1000 - plot_bounds.ybot);
 	    fputs("};\n", gpoutfile);
 	    fputs("sub gnuplot_axisranges {\n", gpoutfile);
 	    fprintf(gpoutfile,
@@ -553,7 +551,7 @@ TK_text()
 	    fputs("proc gnuplot_plotarea {} {\n", gpoutfile);
 	    fprintf(gpoutfile,
 		    "return {%d %d %d %d}\n",
-		    xleft, xright, 1000 - ytop, 1000 - ybot);
+		    plot_bounds.xleft, plot_bounds.xright, 1000 - plot_bounds.ytop, 1000 - plot_bounds.ybot);
 	    fputs("}\n", gpoutfile);
 	    fputs("proc gnuplot_axisranges {} {\n", gpoutfile);
 	    fprintf(gpoutfile,

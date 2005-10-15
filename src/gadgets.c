@@ -54,8 +54,13 @@ legend_key keyT = DEFAULT_KEY_PROPS;
 
 /* The graph box, in terminal coordinates, as calculated by boundary()
  * or boundary3d(): */
-/* FIXME HBB 20000521: should probably be unsigned... */
-int xleft, xright, ybot, ytop;
+BoundingBox plot_bounds;
+
+/* The bounding box for the entire drawable area  of current terminal */
+BoundingBox canvas;
+
+/* The bounding box against which clipping is to be done */
+BoundingBox *clip_area = &plot_bounds;
 
 /* 'set size', 'set origin' setttings */
 float xsize = 1.0;		/* scale factor for size */
@@ -65,13 +70,13 @@ float xoffset = 0.0;		/* x origin */
 float yoffset = 0.0;		/* y origin */
 float aspect_ratio = 0.0;	/* don't attempt to force it */
 
-/* space between left edge and xleft in chars (-1: computed) */
+/* space between left edge and plot_bounds.xleft in chars (-1: computed) */
 float lmargin = -1;
-/* space between bottom and ybot in chars (-1: computed) */
+/* space between bottom and plot_bounds.ybot in chars (-1: computed) */
 float bmargin = -1;
-/* space between right egde and xright in chars (-1: computed) */
+/* space between right egde and plot_bounds.xright in chars (-1: computed) */
 float rmargin = -1;
-/* space between top egde and ytop in chars (-1: computed) */
+/* space between top egde and plot_bounds.ytop in chars (-1: computed) */
 float tmargin = -1;
 
 /* File descriptor for output during 'set table' mode */
@@ -153,7 +158,7 @@ histogram_style histogram_opts = DEFAULT_HISTOGRAM_STYLE;
 
 /* Clipping to the bounding box: */
 
-/* Test a single point to be within the xleft,xright,ybot,ytop bbox.
+/* Test a single point to be within the BoundingBox.
  * Sets the returned integers 4 l.s.b. as follows:
  * bit 0 if to the left of xleft.
  * bit 1 if to the right of xright.
@@ -166,19 +171,19 @@ clip_point(unsigned int x, unsigned int y)
 {
     int ret_val = 0;
 
-    if ((int)x < xleft)
+    if ((int)x < clip_area->xleft)
 	ret_val |= 0x01;
-    if ((int)x > xright)
+    if ((int)x > clip_area->xright)
 	ret_val |= 0x02;
-    if ((int)y < ybot)
+    if ((int)y < clip_area->ybot)
 	ret_val |= 0x04;
-    if ((int)y > ytop)
+    if ((int)y > clip_area->ytop)
 	ret_val |= 0x08;
 
     return ret_val;
 }
 
-/* Clip the given line to drawing coords defined as xleft,xright,ybot,ytop.
+/* Clip the given line to drawing coords defined by BoundingBox.
  *   This routine uses the cohen & sutherland bit mapping for fast clipping -
  * see "Principles of Interactive Computer Graphics" Newman & Sproull page 65.
  */
@@ -236,7 +241,7 @@ clip_put_text(unsigned int x, unsigned y, char *str)
 }
 
 
-/* Clip the given line to drawing coords defined as xleft,xright,ybot,ytop.
+/* Clip the given line to drawing coords defined by BoundingBox.
  *   This routine uses the cohen & sutherland bit mapping for fast clipping -
  * see "Principles of Interactive Computer Graphics" Newman & Sproull page 65.
  */
@@ -266,27 +271,27 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
     dy = *y2 - *y1;
     /* Find intersections with the x parallel bbox lines: */
     if (dy != 0) {
-	x = (ybot - *y2) * dx / dy + *x2;	/* Test for ybot boundary. */
-	if (x >= xleft && x <= xright) {
+	x = (clip_area->ybot - *y2) * dx / dy + *x2;	/* Test for clip_area->ybot boundary. */
+	if (x >= clip_area->xleft && x <= clip_area->xright) {
 	    x_intr[count] = x;
-	    y_intr[count++] = ybot;
+	    y_intr[count++] = clip_area->ybot;
 	}
-	x = (ytop - *y2) * dx / dy + *x2;	/* Test for ytop boundary. */
-	if (x >= xleft && x <= xright) {
+	x = (clip_area->ytop - *y2) * dx / dy + *x2;	/* Test for clip_area->ytop boundary. */
+	if (x >= clip_area->xleft && x <= clip_area->xright) {
 	    x_intr[count] = x;
-	    y_intr[count++] = ytop;
+	    y_intr[count++] = clip_area->ytop;
 	}
     }
     /* Find intersections with the y parallel bbox lines: */
     if (dx != 0) {
-	y = (xleft - *x2) * dy / dx + *y2;	/* Test for xleft boundary. */
-	if (y >= ybot && y <= ytop) {
-	    x_intr[count] = xleft;
+	y = (clip_area->xleft - *x2) * dy / dx + *y2;	/* Test for clip_area->xleft boundary. */
+	if (y >= clip_area->ybot && y <= clip_area->ytop) {
+	    x_intr[count] = clip_area->xleft;
 	    y_intr[count++] = y;
 	}
-	y = (xright - *x2) * dy / dx + *y2;	/* Test for xright boundary. */
-	if (y >= ybot && y <= ytop) {
-	    x_intr[count] = xright;
+	y = (clip_area->xright - *x2) * dy / dx + *y2;	/* Test for clip_area->xright boundary. */
+	if (y >= clip_area->ybot && y <= clip_area->ytop) {
+	    x_intr[count] = clip_area->xright;
 	    y_intr[count++] = y;
 	}
     }

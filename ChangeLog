@@ -1,3 +1,27 @@
+2005-10-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h src/gadgets.c: Define a BoundingBox structure type,
+	and create two instances: one for the plot boundary and one for the
+	canvas boundary.  Also export a (BoundingBox *)clip_area  pointer to
+	the currently active BoundingBox for clipping.  At this point,
+	clip_area always points to plot_bounds.
+
+	* src/term.c (term_start_plot): Immediately after each call to
+	term->graphics(), load terminal's coordinate range into canvas
+	BoundingBox.
+
+	* src/gadgets.c (clip_point clip_line): Clip against the BoundingBox
+	pointed to by clip_area. In the past this has always been the plot
+	boundary, but now we will be able to use the same routines to clip
+	against other areas.
+
+	* src/graphics.c src/graph3d.c src/mouse.c: Replace all instances of
+	xright, xleft, ytop, ybot with references to those same fields in the
+	plot_bounds BoundingBox.
+
+	* term/tkcanvas.trm: Replace xright, xleft, ytop, ybut here to.
+	PLEASE FIX: But no terminal should be referring to these directly.
+
 2005-10-15   Hans Grobler  <grobh@users.sourceforge.net>
 
 	* src/gplt_x11.c: Fix buffer overflow caused by incorrect size

@@ -250,7 +250,15 @@ extern legend_key keyT;
 		"" }
 
 /* bounding box position, in terminal coordinates */
-extern int xleft, xright, ybot, ytop;
+typedef struct {
+    int xleft;
+    int xright;
+    int ybot;
+    int ytop;
+} BoundingBox;
+
+extern BoundingBox plot_bounds;
+extern BoundingBox canvas;
 
 extern float xsize;		/* x scale factor for size */
 extern float ysize;		/* y scale factor for size */
