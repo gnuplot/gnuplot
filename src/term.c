@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.126 2005/10/16 06:12:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.127 2005/10/16 19:19:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1220,15 +1220,13 @@ do_arrow(
 	if (clip_point(ex,ey))
 	    ;
         else if (curr_arrow_headfilled!=0) {
-            (*t->move) (ex + xm, ey + ym);
-            (*t->vector) (ex + x1, ey + y1);
-            (*t->vector) (ex, ey);
-            (*t->vector) (ex + x2, ey + y2);
-            (*t->vector) (ex + xm, ey + ym);
+	    draw_clip_line(ex+xm, ey+ym, ex+x1, ey+y1);
+	    draw_clip_line(ex+x1, ey+y1, ex, ey);
+	    draw_clip_line(ex, ey, ex+x2, ey+y2);
+	    draw_clip_line(ex+x2, ey+y2, ex+xm, ey+ym);
         } else {
-            (*t->move) (ex + x1, ey + y1);
-            (*t->vector) (ex, ey);
-            (*t->vector) (ex + x2, ey + y2);
+	    draw_clip_line(ex+x1, ey+y1, ex, ey);
+	    draw_clip_line(ex, ey, ex+x2, ey+y2);
         }
 
 	/* backward arrow head */
@@ -1251,38 +1249,31 @@ do_arrow(
             }
             /* draw outline of backward arrow head */
             if (curr_arrow_headfilled!=0) {
-                (*t->move) ( sx - xm, sy - ym);
-                (*t->vector) ( sx - x2, sy - y2);
-                (*t->vector) (sx, sy);
-                (*t->vector) (sx - x1, sy - y1);
-                (*t->vector) ( sx - xm, sy - ym);
+		draw_clip_line(sx-xm, sy-ym, sx-x2, sy-y2);
+		draw_clip_line(sx-x2, sy-y2, sx, sy);
+		draw_clip_line(sx, sy, sx-x1, sy-y1);
+		draw_clip_line(sx-x1, sy-y1, sx-xm, sy-ym);
             } else {
-                (*t->move) ( sx - x2, sy - y2);
-                (*t->vector) (sx, sy);
-                (*t->vector) (sx - x1, sy - y1);
+		draw_clip_line(sx-x2, sy-y2, sx, sy);
+		draw_clip_line(sx, sy, sx-x1, sy-y1);
             }
         }
     }
 
-    /* Clip to canvas FIXME: Can merge with headstyle test */
-	if (!clip_line(&sx, &sy, &ex, &ey)) {
-	    fprintf(stderr,"do_arrow: skipping out-of-bounds arrow %d,%d %d,%d\n", sx,sy,ex,ey);
-	    clip_area = clip_save;
-	    return;
-	}
-
     /* Draw the line for the arrow. */
     if (headstyle >= 0) {
 	if ((head == BOTH_HEADS)
-	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
-	    (*t->move) (sx - xm, sy - ym);
-	else
-	    (*t->move) (sx, sy);
+	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) ) {
+	    sx -= xm;
+	    sy -= ym;
+	}
 	if ((head != NOHEAD)
-	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
-	    (*t->vector) (ex + xm, ey + ym);
-	else
-	    (*t->vector) (ex, ey);
+	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) ) {
+	    ex += xm;
+	    ey += ym;
+	}
+	if (clip_line(&sx, &sy, &ex, &ey))
+	    draw_clip_line(sx, sy, ex, ey);
     }
 
     /* Restore previous clipping box */
