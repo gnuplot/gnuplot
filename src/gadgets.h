@@ -257,8 +257,9 @@ typedef struct {
     int ytop;
 } BoundingBox;
 
-extern BoundingBox plot_bounds;
-extern BoundingBox canvas;
+extern BoundingBox plot_bounds;	/* Plot Boundary */
+extern BoundingBox canvas; 	/* Writable area on terminal */
+extern BoundingBox *clip_area;	/* Current clipping box */
 
 extern float xsize;		/* x scale factor for size */
 extern float ysize;		/* y scale factor for size */

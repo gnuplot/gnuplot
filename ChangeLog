@@ -1,3 +1,18 @@
+2005-10-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h: Export (BoundingBox *)clip_area, so that gnuplot
+	core routines can specify clipping boundaries before calling
+	clip_point() and clip_line().
+
+	* src/term.c (do_arrow): clip all lines in arrow to the canvas.
+	Bug #1187336.
+
+	* term/pdf.trm (PDF_filled_polygon): Filled arrowheads can still
+	protrude across the canvas boundary, and the pdflib routines 
+	cannot deal with this due to the use of (unsigned int) for the
+	polygon vertices.  Cast to (int) prevents segfaults or error
+	exit by pdflib library.
+
 2005-10-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/gadgets.c: Define a BoundingBox structure type,

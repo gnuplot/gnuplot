@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.125 2005/10/01 23:38:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.126 2005/10/16 06:12:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1151,6 +1151,11 @@ do_arrow(
     double len_arrow = sqrt(dx * dx + dy * dy);
     gpiPoint filledhead[5];
     int xm = 0, ym = 0;
+    BoundingBox *clip_save;
+
+    /* Clip arrows to canvas */
+    clip_save = clip_area;
+    clip_area = &canvas;
 
     /* negative headstyle means draw heads only, no shaft */
     t_arrow_head head = (t_arrow_head)((headstyle < 0) ? -headstyle : headstyle);
@@ -1195,7 +1200,7 @@ do_arrow(
             xm = (int) (dx2 + backlen * cos( phi + beta ));
             ym = (int) (dy2 + backlen * sin( phi + beta ));
         }
-        if (curr_arrow_headfilled==2) {
+        if (curr_arrow_headfilled==2 && !clip_point(ex,ey)) {
             /* draw filled forward arrow head */
             filledhead[0].x = ex + xm;
             filledhead[0].y = ey + ym;
@@ -1212,7 +1217,9 @@ do_arrow(
                 (*t->filled_polygon) (5, filledhead);
         }
         /* draw outline of forward arrow head */
-        if (curr_arrow_headfilled!=0) {
+	if (clip_point(ex,ey))
+	    ;
+        else if (curr_arrow_headfilled!=0) {
             (*t->move) (ex + xm, ey + ym);
             (*t->vector) (ex + x1, ey + y1);
             (*t->vector) (ex, ey);
@@ -1223,7 +1230,9 @@ do_arrow(
             (*t->vector) (ex, ey);
             (*t->vector) (ex + x2, ey + y2);
         }
-        if (head == BOTH_HEADS) { /* backward arrow head */
+
+	/* backward arrow head */
+        if (head == BOTH_HEADS && !clip_point(sx,sy)) { 
             if (curr_arrow_headfilled==2) {
                 /* draw filled backward arrow head */
                 filledhead[0].x = sx - xm;
@@ -1255,20 +1264,30 @@ do_arrow(
         }
     }
 
-    if (headstyle < 0)
-        return;
+    /* Clip to canvas FIXME: Can merge with headstyle test */
+	if (!clip_line(&sx, &sy, &ex, &ey)) {
+	    fprintf(stderr,"do_arrow: skipping out-of-bounds arrow %d,%d %d,%d\n", sx,sy,ex,ey);
+	    clip_area = clip_save;
+	    return;
+	}
 
     /* Draw the line for the arrow. */
-    if ( (head == BOTH_HEADS) &&
-         (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
-        (*t->move) (sx - xm, sy - ym);
-    else
-        (*t->move) (sx, sy);
-    if ( (head != NOHEAD) &&
-         (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
-        (*t->vector) (ex + xm, ey + ym);
-    else
-        (*t->vector) (ex, ey);
+    if (headstyle >= 0) {
+	if ((head == BOTH_HEADS)
+	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
+	    (*t->move) (sx - xm, sy - ym);
+	else
+	    (*t->move) (sx, sy);
+	if ((head != NOHEAD)
+	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
+	    (*t->vector) (ex + xm, ey + ym);
+	else
+	    (*t->vector) (ex, ey);
+    }
+
+    /* Restore previous clipping box */
+    clip_area = clip_save;
+	
 }
 
 #define TERM_PROTO
