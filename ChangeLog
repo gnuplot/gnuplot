@@ -16,6 +16,8 @@
 	polygon vertices.  Cast to (int) prevents segfaults or error
 	exit by pdflib library.
 
+	* term/pdf.trm (PDF_point): Bugfix: Do not crash on pointsize 0.
+
 2005-10-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/gadgets.c: Define a BoundingBox structure type,
