@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.135 2005/10/12 05:51:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.136 2005/10/16 06:12:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -450,10 +450,9 @@ get_arrow3d(
 {
     map3d_position(&(arrow->start), sx, sy, "arrow");
 
-    /* EAM  FIXME - Is this a sufficiently general test for out-of-bounds? */
-    /*              Should we test the other end of the arrow also?        */
-    if (*sx < 0 || *sx > term->xmax || *sy < 0 || *sy > term->ymax)
-	return FALSE;
+    /* Oct 2005 - arrow clipping now donw in do_arrow() */
+    /* if (*sx < 0 || *sx > term->xmax || *sy < 0 || *sy > term->ymax)
+	return FALSE; */
 
     if (arrow->relative) {
 	map3d_position_r(&(arrow->end), ex, ey, "arrow");

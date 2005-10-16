@@ -7,6 +7,9 @@
 	* src/term.c (do_arrow): clip all lines in arrow to the canvas.
 	Bug #1187336.
 
+	* src/graph3d.c (get_arrow3d): Since arrow clipping is now
+	handled properly in do_arrow(), remove the old cruder clipping test.
+
 	* term/pdf.trm (PDF_filled_polygon): Filled arrowheads can still
 	protrude across the canvas boundary, and the pdflib routines 
 	cannot deal with this due to the use of (unsigned int) for the
