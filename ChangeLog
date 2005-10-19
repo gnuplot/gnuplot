@@ -1,3 +1,7 @@
+2005-10-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Update description of xticlabels(<col>).
+
 2005-10-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/x11.trm (START_HELP): Update docs about window title.
