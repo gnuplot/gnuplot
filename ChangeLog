@@ -1,3 +1,9 @@
+2005-10-20  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/term.c (do_arrow): Moved misplaced declaration.
+
+	* config/config.cyg config/config.mgw: Updated.
+
 2005-10-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Update description of xticlabels(<col>).

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.127 2005/10/16 19:19:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.128 2005/10/16 19:49:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1152,13 +1152,12 @@ do_arrow(
     gpiPoint filledhead[5];
     int xm = 0, ym = 0;
     BoundingBox *clip_save;
+    t_arrow_head head = (t_arrow_head)((headstyle < 0) ? -headstyle : headstyle);
+	/* negative headstyle means draw heads only, no shaft */
 
     /* Clip arrows to canvas */
     clip_save = clip_area;
     clip_area = &canvas;
-
-    /* negative headstyle means draw heads only, no shaft */
-    t_arrow_head head = (t_arrow_head)((headstyle < 0) ? -headstyle : headstyle);
 
     /* Calculate and draw arrow heads.
      * Draw no head for arrows with length = 0, or, to be more specific,
