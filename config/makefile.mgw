@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.31 2004/02/12 09:03:12 mikulik Exp $
+# $Id: makefile.mgw,v 1.32 2005/08/07 09:43:27 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #
@@ -82,7 +82,7 @@ MOUSE=1
 HELPFILE = wgnuplot.hlp
 
 # Destination directory, used in 'make install':
-DESTDIR = c:/Progra~1/Gnuplot3.7
+DESTDIR = c:/Progra~1/Gnuplot4.1
 
 # give here the path to MinGW compiler unless it is already in PATH
 #GCCPATH = g:/mingw32/bin/
