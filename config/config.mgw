@@ -9,7 +9,7 @@
 /* #undef CGI */
 
 /* Define if you want online help and subtopic tables sorted by column. */
-#undef COLUMN_HELP
+/* #undef COLUMN_HELP */
 
 /* Define if you want to use libgrx20 with MSDOS/djgpp. */
 /* #undef DJSVGA */
@@ -24,7 +24,7 @@
 #define EAM_HISTOGRAMS 1
 
 /* Define if color information should be passed for each vertex. */
-#undef EXTENDED_COLOR_SPECS
+/* #undef EXTENDED_COLOR_SPECS */
 
 /* Define if <errno.h> declares errno. */
 /* #undef EXTERN_ERRNO */
@@ -43,7 +43,7 @@
 #define GP_MACROS 1
 
 /* Define to allow string variables. EXPERIMENTAL */
-#define GP_STRING_VARS 1
+#define GP_STRING_VARS 2
 
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
 /* #undef GRX21 */
@@ -62,7 +62,9 @@
 
 /* Define to 1 if you have the declaration of `signgam', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_SIGNGAM */
+#if __GNUC__ >= 3
+#  define HAVE_DECL_SIGNGAM 1
+#endif
 
 /* Define to 1 if you have the <dirent.h> header file. */
 #define HAVE_DIRENT_H 1
@@ -240,7 +242,9 @@
 /* #undef HAVE_SLEEP */
 
 /* Define to 1 if you have the `snprintf' function. */
-/* #undef HAVE_SNPRINTF */
+#if __GNUC__ >= 3
+#  define HAVE_SNPRINTF 1
+#endif
 
 /* Define to 1 if stdbool.h conforms to C99. */
 #define HAVE_STDBOOL_H 1
@@ -278,9 +282,7 @@
 #define HAVE_STRINGIZE 1
 
 /* Define to 1 if you have the <strings.h> header file. */
-#if __GNUC__ >= 3
-#  define HAVE_STRINGS_H 1
-#endif
+/* #undef HAVE_STRINGS_H */
 
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
@@ -449,7 +451,7 @@
 /* #undef SUN */
 
 /* Define to use thin plate spines. */
-#undef THIN_PLATE_SPLINES_GRID
+/* #undef THIN_PLATE_SPLINES_GRID */
 
 /* Define if the 3dkit libray is present. */
 /* #undef THREEDKIT */
@@ -497,7 +499,7 @@
 /* #undef const */
 
 /* libgd versions < 1.8.4 need gdImageStringTTF rather than gdImageStringFT */
-#undef gdImageStringFT
+/* #undef gdImageStringFT */
 
 /* Define as `__inline' if that's what the C compiler calls it, or to nothing
    if it is not supported. */

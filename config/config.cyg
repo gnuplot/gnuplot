@@ -9,7 +9,7 @@
 /* #undef CGI */
 
 /* Define if you want online help and subtopic tables sorted by column. */
-#undef COLUMN_HELP
+/* #undef COLUMN_HELP */
 
 /* Define if you want to use libgrx20 with MSDOS/djgpp. */
 /* #undef DJSVGA */
@@ -24,7 +24,7 @@
 #define EAM_HISTOGRAMS 1
 
 /* Define if color information should be passed for each vertex. */
-#undef EXTENDED_COLOR_SPECS
+/* #undef EXTENDED_COLOR_SPECS */
 
 /* Define if <errno.h> declares errno. */
 /* #undef EXTERN_ERRNO */
@@ -43,7 +43,7 @@
 #define GP_MACROS 1
 
 /* Define to allow string variables. EXPERIMENTAL */
-#define GP_STRING_VARS 1
+#define GP_STRING_VARS 2
 
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
 /* #undef GRX21 */
@@ -62,7 +62,7 @@
 
 /* Define to 1 if you have the declaration of `signgam', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_SIGNGAM */
+#define HAVE_DECL_SIGNGAM 1
 
 /* Define to 1 if you have the <dirent.h> header file. */
 #define HAVE_DIRENT_H 1
@@ -71,10 +71,10 @@
 /* #undef HAVE_DOPRNT */
 
 /* Define to 1 if you have the `erf' function. */
-/* #undef HAVE_ERF */
+#define HAVE_ERF 1
 
 /* Define to 1 if you have the `erfc' function. */
-/* #undef HAVE_ERFC */
+#define HAVE_ERFC 1
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
@@ -118,7 +118,7 @@
 /* #undef HAVE_INDEX */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-/* #undef HAVE_INTTYPES_H */
+#define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `lgamma' function. */
 /* #undef HAVE_LGAMMA */
@@ -172,7 +172,7 @@
 #define HAVE_MEMMOVE 1
 
 /* Define to 1 if you have the <memory.h> header file. */
-/* #undef HAVE_MEMORY_H */
+#define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
@@ -232,13 +232,13 @@
 /* #undef HAVE_SLEEP */
 
 /* Define to 1 if you have the `snprintf' function. */
-/* #undef HAVE_SNPRINTF */
+#define HAVE_SNPRINTF 1
 
 /* Define to 1 if stdbool.h conforms to C99. */
 #define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -337,7 +337,7 @@
 #define HAVE_TIME_T_IN_TIME_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
-/* #undef HAVE_UNISTD_H */
+#define HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the `usleep' function. */
 /* #undef HAVE_USLEEP */
@@ -435,7 +435,7 @@
 /* #undef SUN */
 
 /* Define to use thin plate spines. */
-#undef THIN_PLATE_SPLINES_GRID
+/* #undef THIN_PLATE_SPLINES_GRID */
 
 /* Define if the 3dkit libray is present. */
 /* #undef THREEDKIT */
@@ -483,7 +483,7 @@
 /* #undef const */
 
 /* libgd versions < 1.8.4 need gdImageStringTTF rather than gdImageStringFT */
-#undef gdImageStringFT
+/* #undef gdImageStringFT */
 
 /* Define as `__inline' if that's what the C compiler calls it, or to nothing
    if it is not supported. */
