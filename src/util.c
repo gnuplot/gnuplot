@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.58 2005/06/19 22:03:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.59 2005/06/29 22:31:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -156,21 +156,18 @@ isstring(int t_num)
 	     gp_input_line[token[t_num].start_index] == '"'));
 }
 
-#ifdef GP_STRING_VARS
-TBOOLEAN
-isstringvar(int t_num)
+int
+type_udv(int t_num)
 {
     struct udvt_entry **udv_ptr = &first_udv;
 
     while (*udv_ptr) {
        if (equals(t_num, (*udv_ptr)->udv_name))
-	   return ((*udv_ptr)->udv_value.type == STRING);
+	   return (*udv_ptr)->udv_value.type;
        udv_ptr = &((*udv_ptr)->next_udv);
     }
-    return FALSE;
+    return 0;
 }
-#endif
-
 
 int
 isanumber(int t_num)

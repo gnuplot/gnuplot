@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.25 2005/05/02 19:26:12 sfeam Exp $
+ * $Id: util.h,v 1.26 2005/06/29 22:31:14 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -79,11 +79,11 @@ void m_capture __PROTO((char **, int, int));
 void m_quote_capture __PROTO((char **, int, int));
 char *try_to_get_string __PROTO((void));
 void parse_esc __PROTO((char *));
+int type_udv __PROTO((int));
 
 #ifdef GP_STRING_VARS
 char *gp_stradd __PROTO((const char *, const char *));
-TBOOLEAN isstringvar __PROTO((int));
-#define isstringvalue(c_token) (isstring(c_token) || isstringvar(c_token))
+#define isstringvalue(c_token) (isstring(c_token) || type_udv(c_token)==STRING)
 #else
 #define isstringvalue(c_token) isstring(c_token)
 #endif

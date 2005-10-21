@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.30 2005/07/07 20:35:12 sfeam Exp $
+ * $Id: gp_types.h,v 1.31 2005/08/07 09:43:28 mikulik Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -44,10 +44,10 @@
 
 #define DEG2RAD (M_PI / 180.0)
 
-/* These used to be #defines in plot.h. For easier debugging, I've
- * converted most of them into enum's. */
+/* type_udv() will return 0 rather than type if udv does not exist */
 enum DATA_TYPES {
-	INTGR, CMPLX
+	INTGR=1,
+	CMPLX
 #ifdef GP_STRING_VARS
 	, STRING
 #endif

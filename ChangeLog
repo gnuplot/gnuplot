@@ -1,3 +1,17 @@
+2005-10-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gp_types.h: Force enum for variable types to start at
+	INTGR = 1, so that 0 (NULL) is guaranteed not to be a valid
+	variable type.
+
+	* src/util.c src/util.h (type_udv): New function returning the
+	type of a user-defined variable, or 0 if there is no such udv.
+	Replaces isstringvar().
+
+	* datafile.c (plot_ticlabel_using df_readascii): Allow the
+	using specs {x|y|z}ticlabel(<foo>) to accept an expression
+	for <foo> rather than accepting only an integer constant.
+
 2005-10-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/term.c (do_arrow): Moved misplaced declaration.
