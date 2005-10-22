@@ -1,3 +1,8 @@
+2005-10-22  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/pslatex.trm (EPSLATEX_set_color): Fix bug in setting
+	pure black or white via a gray value.
+
 2005-10-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_tokenise): Fix [very] long-standing bug
