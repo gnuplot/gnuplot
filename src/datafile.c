@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.92 2005/08/12 17:42:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.93 2005/10/22 05:50:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1145,6 +1145,7 @@ df_open(const char *cmd_filename, int max_using)
             if (df_matrix) { duplication=TRUE; break; }
             df_matrix = TRUE;
 #endif
+	    fast_columns = 0;
             continue;
     }
 
@@ -4978,8 +4979,7 @@ Last point in the binary file did not match the specified `using` columns");
 	    for (output = 0; output < limit; ++output) {
 		int column = use_spec[output].column;
 
-		/* if there was no using spec, column is output+1
-		 * and at=NULL */
+		/* if there was no using spec, column is output+1 and at=NULL */
 		if (use_spec[output].at) {
 		    struct value a;
                         

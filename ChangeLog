@@ -1,3 +1,10 @@
+2005-10-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_tokenise): Fix [very] long-standing bug
+	that caused only the first 3 columns of ascii matrix data to
+	be read after the command:   splot "data" using 1:2:3 matrix
+	Bug #1264105.
+
 2005-10-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h: Force enum for variable types to start at
