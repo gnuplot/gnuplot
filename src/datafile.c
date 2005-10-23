@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.93 2005/10/22 05:50:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.94 2005/10/23 04:38:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3036,16 +3036,22 @@ adjust_binary_use_spec()
                 && (default_style_cols[ps_index].excluding_gen_coords == 1)) {
                 df_no_use_specs = 3;
             } else if ((default_style_cols[ps_index].dimen_in_2d == 1)
-                        && (df_plot_mode == MODE_SPLOT)
-                        && (default_style_cols[ps_index].excluding_gen_coords == 1) ) {
-                df_no_use_specs = 3;
+                   &&  (default_style_cols[ps_index].excluding_gen_coords == 1) ) {
+		if (df_plot_mode == MODE_SPLOT)
+                    df_no_use_specs = 3;
+		else {
+		    /* Command:  plot 'foo' matrix       with no using spec */
+		    /* Matix element treated as y value rather than z value */
+		    df_no_use_specs = 2;
+		    use_spec[1].column = 3;
+		}
             } else
                 int_error(NO_CARET, "Plot style does not conform to three column data in this graph mode");
         }
 
     }
 
-    /* Adjust for ASCII matrix format.  The first two "columns" come from indeces. */
+    /* Adjust for ASCII matrix format.  The first two "columns" come from indices. */
     if (df_matrix_file && !df_binary_file) {
     }
 
