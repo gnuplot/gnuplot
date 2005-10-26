@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.334 2005/10/10 02:44:34 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.335 2005/10/19 19:53:21 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10422,16 +10422,28 @@ C ... and restart the table:
 ?data-file matrix ascii
 ?datafile matrix ascii
 ?matrix ascii
- The `matrix` flag indicates that the ASCII data are stored in matrix format.
- The z-values are read in a row at a time, i. e.,
-       z11 z12 z13 z14 ...
-       z21 z22 z23 z24 ...
-       z31 z32 z33 z34 ...
- and so forth.  The row and column indices are used for the x- and y-values.
+ The `matrix` keyword (without a sequent `binary` keyword) in
+     {s}plot 'a.dat' matrix
+ indicates that data are stored in an ascii numbers matrix format.
 
- A blank line or comment line ends the matrix, and starts a new
- surface mesh. You can select among the meshes inside a file by the
- `index` option to the `splot` command, as usual.
+ The z-values are read in a row at a time, i. e.,
+     z11 z12 z13 z14 ...
+     z21 z22 z23 z24 ...
+     z31 z32 z33 z34 ...
+ and so forth.
+
+ In 3D, the x- and y-indices of the matrix surface plot correspond to column
+ and row indices of the matrix, respectively, being enumerated from 0. You can
+ rescale or transform the axes as usual for a data file with three columns
+ by means of x=$1, y=$2, z=$3. For example
+     splot 'a.dat' matrix using (1+$1/100):(1+$2*10):3
+
+ A blank line or comment line ends the matrix, and starts a new surface mesh.
+ You can select among the meshes inside a file by the `index` option to the
+ `splot` command, as usual.
+
+ See `help matrix` for examples of plotting rows and columns of the matrix in
+ a 2D plot.
 4 matrix
 ?commands plot datafile matrix
 ?commands splot datafile matrix
@@ -10442,9 +10454,32 @@ C ... and restart the table:
 ?data-file matrix
 ?datafile matrix
 ?matrix
- The `matrix` flag indicates that the file data (ASCII or binary) are stored
- in matrix format.  The formats are slightly different amongst these two.  For
- details, see `matrix ascii` or `matrix binary`.
+ Datafile can be in an ascii or binary matrix format. The `matrix` flag
+ indicates that the file is ascii, the `binary` or `matrix binary` stands for
+ a binary format. For details, see `matrix ascii` and `matrix binary`.
+
+ Basic usage in `splot`:
+     splot 'a.dat' matrix
+     splot 'a.gpbin' {matrix} binary
+ Advanced usage in `splot`:
+     splot 'a.dat' matrix using 1:2:3
+     splot 'a.gpbin' {matrix} binary using 1:2:3
+ allows to transform the axes coordinates and the z-data independently.
+
+ Usage in `plot`:
+     plot `a.dat` matrix
+     plot `a.dat` matrix using 1:3
+     plot 'a.gpbin' {matrix} binary using 1:3
+ will plot rows of the matrix, while using 2:3 will plot matrix columns, and 
+ using 1:2 the point coordinates (rather useless). Applying the `every` option
+ you can specify explicit rows and columns.
+
+ Example -- rescale axes of a matrix in an ascii file:
+     splot `a.dat` matrix using (1+$1):(1+$2*10):3
+
+ Example -- plot the 3rd row of a matrix in an ascii file:
+     plot 'a.dat' matrix using 1:3 every 1:999:1:2
+ (rows are enumerated from 0, thus 2 instead of 3).
 3 grid_data
 ?commands splot grid_data
 ?splot grid_data

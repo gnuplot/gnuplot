@@ -1,3 +1,7 @@
+2005-10-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Updated 'help matrix' and 'help matrix ascii'.
+
 2005-10-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (adjust_binary_use_spec): Interpret the command
