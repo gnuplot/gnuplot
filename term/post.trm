@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.166 2005/09/16 03:20:30 sfeam Exp $
+ * $Id: post.trm,v 1.167 2005/09/27 13:29:54 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -979,6 +979,13 @@ PS_options()
 #ifdef PSLATEX_DRIVER
     char *tmp_epslatex_header = NULL;
 #endif
+    TBOOLEAN set_orientation = FALSE, set_enhanced = FALSE, set_plex = FALSE;
+    TBOOLEAN set_level = FALSE, set_color = FALSE, set_dashed = FALSE;
+    TBOOLEAN set_dashlen = FALSE, set_linewidth = FALSE, set_round = FALSE;
+    TBOOLEAN set_palfunc = FALSE, set_colortext = FALSE;
+    TBOOLEAN set_standalone = FALSE, set_epslheader = FALSE;
+    TBOOLEAN set_pslrotate = FALSE, set_pslauxfile = FALSE;
+    TBOOLEAN set_psloldstyle = FALSE, set_font = FALSE, set_fontsize = FALSE;
 
     if (strcmp(term->name, "pstex") == 0)
 	ps_params = &pstex_params;
@@ -997,38 +1004,8 @@ PS_options()
 	term->set_font = PS_set_font;
     }
 
-    while (!END_OF_COMMAND) {
-	switch(lookup_table(&PS_opts[0],c_token)) {
-	case PS_PORTRAIT:
-	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
-		int_error(c_token,
-			  "extraneous argument in set terminal %s",term->name);
-	    ps_params->psformat = PSTERM_PORTRAIT;
-	    c_token++;
-	    break;
-	case PS_LANDSCAPE:
-	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
-		int_error(c_token,
-			  "extraneous argument in set terminal %s",term->name);
-	    ps_params->psformat = PSTERM_LANDSCAPE;
-	    c_token++;
-	    break;
-	case PS_EPSF:
-	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
-		int_error(c_token,
-			  "extraneous argument in set terminal %s",term->name);
-	    ps_params->psformat = PSTERM_EPS;
-	    c_token++;
-	    break;
-	case PS_LEVEL1:
-	    ps_params->level1 = TRUE;
-	    c_token++;
-	    break;
-	case PS_LEVELDEFAULT:
-	    ps_params->level1 = FALSE;
-	    c_token++;
-	    break;
-	case PS_DEFAULT:
+    if (!END_OF_COMMAND) {
+	if (lookup_table(&PS_opts[0],c_token) == PS_DEFAULT) {
 	    switch (ps_params->terminal) {
 	    case PSTERM_POSTSCRIPT:
 		while (ps_params->first_fontfile != NULL)
@@ -1048,20 +1025,74 @@ PS_options()
 	    }
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    c_token++;
-	    break;
-	case PS_ENHANCED:
-	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+	    if (!END_OF_COMMAND) 
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	}
+    }
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&PS_opts[0],c_token)) {
+	case PS_PORTRAIT:
+	    if (set_orientation || ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_orientation = TRUE;
+	    ps_params->psformat = PSTERM_PORTRAIT;
+	    c_token++;
+	    break;
+	case PS_LANDSCAPE:
+	    if (set_orientation || ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_orientation = TRUE;
+	    ps_params->psformat = PSTERM_LANDSCAPE;
+	    c_token++;
+	    break;
+	case PS_EPSF:
+	    if (set_orientation || ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_orientation = TRUE;
+	    ps_params->psformat = PSTERM_EPS;
+	    c_token++;
+	    break;
+	case PS_LEVEL1:
+	    if (set_level)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_level = TRUE;
+	    ps_params->level1 = TRUE;
+	    c_token++;
+	    break;
+	case PS_LEVELDEFAULT:
+	    if (set_level)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_level = TRUE;
+	    ps_params->level1 = FALSE;
+	    c_token++;
+	    break;
+	case PS_DEFAULT:
+	    int_error(c_token,
+		      "extraneous argument in set terminal %s",term->name);
+	    c_token++;
+	    break;
+	case PS_ENHANCED:
+	    if (set_enhanced || ps_params->terminal != PSTERM_POSTSCRIPT)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_enhanced = TRUE;
 	    term->put_text = ENHPS_put_text;
 	    term->set_font = ENHPS_set_font;
 	    term->flags |= TERM_ENHANCED_TEXT;
 	    ++c_token;
 	    break;
 	case PS_NOENHANCED:
-            if (ps_params->terminal != PSTERM_POSTSCRIPT)
+            if (set_enhanced || ps_params->terminal != PSTERM_POSTSCRIPT)
                 int_error(c_token,
                           "extraneous argument in set terminal %s",term->name);
+	    set_enhanced = TRUE;
 	    term->put_text = PS_put_text;
 	    term->set_font = PS_set_font;
 	    term->flags &= ~TERM_ENHANCED_TEXT;
@@ -1069,23 +1100,26 @@ PS_options()
 	    break;
 #ifdef PSLATEX_DRIVER
 	case EPSLATEX_STANDALONE:
-	    if (ps_params->terminal != PSTERM_EPSLATEX)
+	    if (set_standalone || ps_params->terminal != PSTERM_EPSLATEX)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_standalone = TRUE;
 	    ps_params->epslatex_standalone = TRUE;
 	    ++c_token;
 	    break;
 	case EPSLATEX_INPUT:
-	    if (ps_params->terminal != PSTERM_EPSLATEX)
+	    if (set_standalone || ps_params->terminal != PSTERM_EPSLATEX)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_standalone = TRUE;
 	    ps_params->epslatex_standalone = FALSE;
 	    ++c_token;
 	    break;
 	case EPSLATEX_HEADER:
-	    if (ps_params->terminal != PSTERM_EPSLATEX)
+	    if (set_epslheader || ps_params->terminal != PSTERM_EPSLATEX)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_epslheader = TRUE;
 	    ++c_token;
             if (!isstring(c_token))
 		int_error(c_token,
@@ -1109,134 +1143,180 @@ PS_options()
 	    ++c_token;
 	    break;
 	case EPSLATEX_NOHEADER:
-	    if (ps_params->terminal != PSTERM_EPSLATEX)
+	    if (set_epslheader || ps_params->terminal != PSTERM_EPSLATEX)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_epslheader = TRUE;
 	    if (epslatex_header)
 		free(epslatex_header);
 	    ++c_token;
 	    break;
 	case PSLATEX_ROTATE:
-	    if ((ps_params->terminal != PSTERM_PSLATEX) &&
-		(ps_params->terminal != PSTERM_PSTEX))
+	    if (set_pslrotate || ((ps_params->terminal != PSTERM_PSLATEX) &&
+				  (ps_params->terminal != PSTERM_PSTEX)))
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_pslrotate = TRUE;
 	    ps_params->rotate = TRUE;
 	    ++c_token;
 	    break;
 	case PSLATEX_NOROTATE:
-	    if ((ps_params->terminal != PSTERM_PSLATEX) &&
-		(ps_params->terminal != PSTERM_PSTEX))
+	    if (set_pslrotate || ((ps_params->terminal != PSTERM_PSLATEX) &&
+				  (ps_params->terminal != PSTERM_PSTEX)))
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_pslrotate = TRUE;
 	    ps_params->rotate = FALSE;
 	    ++c_token;
 	    break;
 	case PSLATEX_AUXFILE:
-	    if ((ps_params->terminal == PSTERM_POSTSCRIPT) ||
-		(ps_params->terminal == PSTERM_EPSLATEX))
+	    if (set_pslauxfile ||
+		((ps_params->terminal == PSTERM_POSTSCRIPT) ||
+		 (ps_params->terminal == PSTERM_EPSLATEX)))
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_pslauxfile = TRUE;
 	    ps_params->useauxfile = TRUE;
 	    c_token++;
 	    break;
 	case PSLATEX_NOAUXFILE:
-	    if ((ps_params->terminal == PSTERM_POSTSCRIPT) ||
-		(ps_params->terminal == PSTERM_EPSLATEX))
+	    if (set_pslauxfile ||
+		((ps_params->terminal == PSTERM_POSTSCRIPT) ||
+		 (ps_params->terminal == PSTERM_EPSLATEX)))
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_pslauxfile = TRUE;
 	    ps_params->useauxfile = FALSE;
 	    c_token++;
 	    break;
 	case PSLATEX_OLDSTYLE:
-	    if (ps_params->terminal == PSTERM_POSTSCRIPT)
+	    if (set_psloldstyle || ps_params->terminal == PSTERM_POSTSCRIPT)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_psloldstyle = TRUE;
 	    ps_params->oldstyle = TRUE;
 	    if (ps_params->terminal == PSTERM_EPSLATEX)
 		ps_params->rounded = TRUE;
 	    c_token++;
 	    break;
 	case PSLATEX_NEWSTYLE:
-	    if (ps_params->terminal == PSTERM_POSTSCRIPT)
+	    if (set_psloldstyle || ps_params->terminal == PSTERM_POSTSCRIPT)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_psloldstyle = TRUE;
 	    ps_params->oldstyle = FALSE;
 	    c_token++;
 	    break;
 #endif
 	case PS_MONOCHROME:
+	    if (set_color)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_color = TRUE;
 	    ps_params->color = FALSE;
 	    c_token++;
 	    break;
 	case PS_COLOR:
+	    if (set_color)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_color = TRUE;
 	    ps_params->color = TRUE;
 	    c_token++;
 	    break;
 	case PS_BLACKTEXT:
-	    if ((ps_params->terminal != PSTERM_POSTSCRIPT) &&
-		(ps_params->terminal != PSTERM_EPSLATEX))
+	    if (set_colortext || ((ps_params->terminal != PSTERM_POSTSCRIPT) &&
+				  (ps_params->terminal != PSTERM_EPSLATEX)))
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_colortext = TRUE;
 	    ps_params->blacktext = TRUE;
 	    c_token++;
 	    break;
 	case PS_COLORTEXT:
-	    if ((ps_params->terminal != PSTERM_POSTSCRIPT) &&
-		(ps_params->terminal != PSTERM_EPSLATEX))
+	    if (set_colortext || ((ps_params->terminal != PSTERM_POSTSCRIPT) &&
+				  (ps_params->terminal != PSTERM_EPSLATEX)))
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_colortext = TRUE;
 	    ps_params->blacktext = FALSE;
 	    c_token++;
 	    break;
         case PS_SOLIDE:
+	    if (set_dashed)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_dashed = TRUE;
 	    ps_params->solid = TRUE;
 	    c_token++;
 	    break;
 	case PS_DASHED:
+	    if (set_dashed)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_dashed = TRUE;
 	    ps_params->solid = FALSE;
 	    c_token++;
 	    break;
 	case PS_DASHLENGTH:
+	    if (set_dashlen)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_dashlen = TRUE;
 	    c_token++;
 	    ps_params->dash_length = real(const_express(&a));
 	    if (ps_params->dash_length <= 0.0)
 		ps_params->dash_length = 1.0;
 	    break;
 	case PS_LINEWIDTH:
+	    if (set_linewidth)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_linewidth = TRUE;
 	    c_token++;
 	    ps_params->linewidth_factor = real(const_express(&a));
 	    if (ps_params->linewidth_factor <= 0.0)
 		ps_params->linewidth_factor = 1.0;
 	    break;
 	case PS_SIMPLEX:
-	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+	    if (set_plex || ps_params->terminal != PSTERM_POSTSCRIPT)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_plex = TRUE;
 	    ps_params->duplex_state  = FALSE;
 	    ps_params->duplex_option = TRUE;
 	    c_token++;
 	    break;
 	case PS_DUPLEX:
-	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+	    if (set_plex || ps_params->terminal != PSTERM_POSTSCRIPT)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_plex = TRUE;
 	    ps_params->duplex_state  = TRUE;
 	    ps_params->duplex_option = TRUE;
 	    c_token++;
 	    break;
 	case PS_DEFAULTPLEX:
-	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
+	    if (set_plex || ps_params->terminal != PSTERM_POSTSCRIPT)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
+	    set_plex = TRUE;
 	    ps_params->duplex_option = FALSE;
 	    c_token++;
 	    break;
 	case PS_ROUNDED:
+	    if (set_round)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_round = TRUE;
 	    ps_params->rounded = TRUE;
 	    c_token++;
 	    break;
 	case PS_NOROUNDED:
+	    if (set_round)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_round = TRUE;
 	    ps_params->rounded = FALSE;
 	    c_token++;
 	    break;
@@ -1343,6 +1423,10 @@ PS_options()
 	    ++c_token;
 	    break;
 	case PS_PALFUNCPARAM:
+	    if (set_palfunc)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_palfunc = TRUE;
 	    ++c_token;
 	    ps_params->palfunc_samples = (int)real(const_express(&a));
 	    if (ps_params->palfunc_samples < 2)
@@ -1361,6 +1445,11 @@ PS_options()
 	case PS_OTHER:
 	default:
 	    if ((s = try_to_get_string())) {
+		if (set_font)
+		    int_error(c_token,
+			      "extraneous argument in set terminal %s",
+			      term->name);
+		set_font = TRUE;
 		if ((ps_params->terminal == PSTERM_POSTSCRIPT) ||
 		    (ps_params->terminal == PSTERM_EPSLATEX)) {
 		    strncpy(ps_params->font, s, sizeof(ps_params->font));
@@ -1370,6 +1459,11 @@ PS_options()
 			      "terminal %s does not allow specification %s",
 			      term->name, "of font name");
 	    } else {
+		if (set_fontsize)
+		    int_error(c_token,
+			      "extraneous argument in set terminal %s",
+			      term->name);
+		set_fontsize = TRUE;
 		/* We have font size specified */
 		ps_params->fontsize = real(const_express(&a));
 	    }
@@ -3929,7 +4023,6 @@ TERM_TABLE_END(post_driver)
  */
 START_HELP(00psglobal)
 #define PS_COMMON_OPTS1 \
-"                               {default}",\
 "                               {level1 | leveldefault}",\
 "                               {color | colour | monochrome}",\
 "                               {solid | dashed}",\
@@ -3991,6 +4084,7 @@ START_HELP(epslatex)
 " The `epslatex` driver generates output for further processing by LaTeX.",
 "",
 " Syntax:",
+"       set terminal epslatex   {default}",
 "       set terminal epslatex   {standalone | input}",
 "                               {oldstyle | newstyle}",
 PS_COMMON_OPTS1
@@ -4169,6 +4263,7 @@ START_HELP(pslatex)
 " LaTeX).",
 "",
 " Syntax:",
+"       set terminal [pslatex | pstex] {default}",
 "       set terminal [pslatex | pstex]",
 "                               {rotate | norotate}",
 "                               {oldstyle | newstyle}",
@@ -4239,6 +4334,7 @@ START_HELP(post)
 " Several options may be set in the `postscript` driver.",
 "",
 " Syntax:",
+"       set terminal postscript {default}",
 "       set terminal postscript {landscape | portrait | eps}",
 "                               {enhanced | noenhanced}",
 "                               {defaultplex | simplex | duplex}",

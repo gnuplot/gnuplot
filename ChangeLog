@@ -1,3 +1,8 @@
+2005-10-31  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/post.trm (PS_options): Add flags to track whether terminal
+	options have been set; issue error on attempt set option twice.
+
 2005-10-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Updated 'help matrix' and 'help matrix ascii'.
