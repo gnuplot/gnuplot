@@ -1,3 +1,8 @@
+2005-11-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (eval_3dplots): Fix logic bug in vector style
+	initialization.
+
 2005-10-31  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm (PS_options): Add flags to track whether terminal
