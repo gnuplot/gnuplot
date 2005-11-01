@@ -1,7 +1,8 @@
 2005-11-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (eval_3dplots): Fix logic bug in vector style
-	initialization.
+	initialization.  Replicate vector line style properties stored
+	in arrow_properties into plot's main lp_properties.
 
 2005-10-31  Harald Harders  <h.harders@tu-bs.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.112 2005/10/14 21:19:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.113 2005/11/01 18:01:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -676,6 +676,7 @@ get_3ddata(struct surface_points *this_plot)
 		if (this_plot->plot_style == VECTOR)
 		    iso_extend(local_this_iso->next,
 			   xdatum + (xdatum < 1000 ? xdatum : 1000));
+		    local_this_iso->next->p_count = 0;
 	    }
 	    cp = local_this_iso->points + xdatum;
 
@@ -1396,6 +1397,7 @@ eval_3dplots()
 			    break;
 			 } else {
 			    set_lpstyle = TRUE;
+			    this_plot->lp_properties = this_plot->arrow_properties.lp_properties;
 			    continue;
 			}
 		    }
@@ -1461,9 +1463,10 @@ eval_3dplots()
 	     * the defaults for linewidth and pointsize, call it now
 	     * to define them. */
 	    if (! set_lpstyle) {
-		if (this_plot->plot_style == VECTOR)
+		if (this_plot->plot_style == VECTOR) {
 		    arrow_parse(&this_plot->arrow_properties, line_num, TRUE);
-		else {
+		    this_plot->lp_properties = this_plot->arrow_properties.lp_properties;
+		} else {
 		    this_plot->lp_properties.l_type = line_num;
 		    this_plot->lp_properties.l_width = 1.0;
 		    this_plot->lp_properties.p_type = point_num;
