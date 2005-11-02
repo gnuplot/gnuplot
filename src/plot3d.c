@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.113 2005/11/01 18:01:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.114 2005/11/02 05:33:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -673,10 +673,11 @@ get_3ddata(struct surface_points *this_plot)
 		 */
 		iso_extend(local_this_iso,
 			   xdatum + (xdatum < 1000 ? xdatum : 1000));
-		if (this_plot->plot_style == VECTOR)
+		if (this_plot->plot_style == VECTOR) {
 		    iso_extend(local_this_iso->next,
 			   xdatum + (xdatum < 1000 ? xdatum : 1000));
 		    local_this_iso->next->p_count = 0;
+		}
 	    }
 	    cp = local_this_iso->points + xdatum;
 
