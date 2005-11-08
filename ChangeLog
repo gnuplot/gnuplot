@@ -1,3 +1,13 @@
+2005-11-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (do_arrow): Add a work-around for broken behaviour
+	by the postscript terminal.  post.trm does not correctly report
+	the current canvas size, so arrows cannot be clipped against the
+	canvas boundaries if the current terminal is post.trm. The proper
+	fix is probably in post.trm itself, but it potentially affects
+	many aspects of plot layout so I am reluctant to make the change
+	there.
+
 2005-11-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (eval_3dplots): Fix logic bug in vector style
