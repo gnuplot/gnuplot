@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.129 2005/10/20 08:53:08 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.130 2005/11/08 18:33:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1156,12 +1156,8 @@ do_arrow(
 	/* negative headstyle means draw heads only, no shaft */
 
     /* Clip arrows to canvas */
-    /* FIXME - the test against TERM_CAN_CLIP is a work-around for a broken */
-    /* post.trm, which fails to correctly report the canvas size. If post.trm */
-    /* were fixed, then we could correctly clip arrows to the canvas here. */
     clip_save = clip_area;
-    if (!(term->flags & TERM_CAN_CLIP))
-	clip_area = &canvas;
+    clip_area = &canvas;
 
     /* Calculate and draw arrow heads.
      * Draw no head for arrows with length = 0, or, to be more specific,

@@ -1,3 +1,8 @@
+2005-11-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (do_arrow): Revert previous patch, since it seems
+	the bad effects outweigh the good.
+
 2005-11-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (do_arrow): Add a work-around for broken behaviour
