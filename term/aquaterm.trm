@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.16 2005/05/24 20:54:03 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.17 2005/08/07 09:43:33 mikulik Exp $
  *
  */
 
@@ -425,13 +425,17 @@ TERM_PUBLIC void
 AQUA_point(unsigned int x, unsigned int y, int number)
 {
   /* The default dot-routine doesn't work with AQT */
-  [adapter setLinewidth:1.0];
-  [adapter moveToPoint:NSMakePoint(x/AQUA_RESOLUTION-.5, y/AQUA_RESOLUTION)];
-  [adapter addLineToPoint:NSMakePoint(x/AQUA_RESOLUTION+.5, y/AQUA_RESOLUTION)];
-  if (number<0) {
-    return;
+  [adapter setLinewidth:1.0];  
+  [adapter setLineCapStyle:AQTRoundLineCapStyle]; /* Set line cap style to round to create a dot */
+  [adapter moveToPoint:NSMakePoint(x/AQUA_RESOLUTION-0.005, y/AQUA_RESOLUTION)];
+  [adapter addLineToPoint:NSMakePoint(x/AQUA_RESOLUTION+0.005, y/AQUA_RESOLUTION)];
+  [adapter moveToPoint:NSMakePoint(0,0)]; /* Force a path end  to work around a bug in AquaTerm 1.0.0 */
+  /* Round caps results in nicer symbols too */  
+  if (number>=0) {
+    do_point(x, y, number);
   }
-  do_point(x, y, number);
+  [adapter moveToPoint:NSMakePoint(0,0)]; /* Force a path end to work around a bug in AquaTerm 1.0.0 */
+  [adapter setLineCapStyle:AQTButtLineCapStyle]; /* Reset line capstyle */
 }
 
 /* after one plot of multiplot */
