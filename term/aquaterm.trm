@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.17 2005/08/07 09:43:33 mikulik Exp $
+ * $Id: aquaterm.trm,v 1.18 2005/11/10 21:20:13 persquare Exp $
  *
  */
 
@@ -84,6 +84,8 @@ TERM_PUBLIC void ENHAQUA_writec __PROTO((int c));
 #define AQUA_HTIC (8.0*AQUA_RESOLUTION)
 #define AQUA_VCHAR (16.0*AQUA_RESOLUTION)         /* default font is Times at 14 points */
 #define AQUA_HCHAR (AQUA_VCHAR*6.0/10.0)
+#define AQUA_DASH_PATTERNS 8
+#define AQUA_DEFAULT_DASHLENGTH_FACTOR 0.5
 
 #define SPECIAL_COLORS 4
 #define CYCLIC_COLORS 9
@@ -134,6 +136,21 @@ static double AQUA_fontSizeDef = 14; /* default text size*/
 /* current text font family: */
 static char AQUA_fontNameCur[MAX_ID_LEN + 1] = "Times-Roman";
 static double AQUA_fontSizeCur = 14; /* current text size*/
+
+/* dash patterns */
+static TBOOLEAN AQUA_dashedlines = FALSE;
+static float AQUA_dashlength_factor = AQUA_DEFAULT_DASHLENGTH_FACTOR;
+static int AQUA_dashPatternLengths[AQUA_DASH_PATTERNS] = {0, 2, 2, 2, 4, 4, 4, 6};
+static int AQUA_dashPatterns[AQUA_DASH_PATTERNS][6] = {
+        {0, 0, 0, 0, 0, 0},
+        {8, 8, 0, 0, 0, 0},
+        {4, 6, 0, 0, 0, 0},
+        {2, 3, 0, 0, 0, 0},
+        {12, 4, 2, 4, 0, 0},
+        {6, 6, 2, 6, 0, 0},
+        {4, 4, 4, 12, 0, 0},
+        {1, 4, 12, 4, 1, 4}
+    };
 
 /* Helper functions */
 static void AQUA_local_reset __PROTO((void));
@@ -206,6 +223,28 @@ AQUA_options()
 	continue;
     }
 
+	if (equals(c_token, "solid")) {
+	    c_token++;
+	    AQUA_dashedlines = FALSE;
+	    continue;
+	}
+	
+	if (almost_equals(c_token, "dash$ed")) {
+	    c_token++;
+	    AQUA_dashedlines = TRUE;
+	    continue;
+	}
+
+	if (equals(c_token, "dl") || almost_equals(c_token, "dashl$ength")) {
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "expecting dashlength multiplier");
+	    AQUA_dashlength_factor = real(const_express(&a));
+	    if (AQUA_dashlength_factor < 0.0)
+		AQUA_dashlength_factor = AQUA_DEFAULT_DASHLENGTH_FACTOR;
+	    continue;
+	}
+
     if (almost_equals(c_token, "enh$anced")) {
       term->put_text = ENHAQUA_put_text;
       c_token++;
@@ -231,12 +270,15 @@ AQUA_options()
   if (AQUA_title[0]=='\0') /* always set title */
     sprintf(AQUA_title, "Figure %d", AQUA_plotRef);
   /* Save options back into options string in normalized format */
-  sprintf(term_options, "%d title '%s' size %d %d fname '%s' fsize %g %s",
+  sprintf(term_options, "%d title '%s' size %d %d fname '%s' fsize %g %s %s ",
 	  AQUA_plotRef,
 	  AQUA_title,
 	  (unsigned int) (AQUA_xSize/AQUA_RESOLUTION), (unsigned int) (AQUA_ySize/AQUA_RESOLUTION),
 	  AQUA_fontNameCur, AQUA_fontSizeCur,
-	  term->put_text == ENHAQUA_put_text?"enhanced":"noenhanced");
+	  term->put_text == ENHAQUA_put_text?"enhanced":"noenhanced", 
+	  AQUA_dashedlines?"dashed":"solid");
+  if (AQUA_dashedlines)
+	   sprintf(&(term_options[strlen(term_options)]), "dl %3.1f", AQUA_dashlength_factor);
 }
 
 static void
@@ -355,12 +397,26 @@ AQUA_vector(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 AQUA_linetype(int linetype)
 {
+  float dash[8];
+  int i, style;
   LOG(@"AQUA_linetype(%d) ---> entry: %d", linetype, (linetype%CYCLIC_COLORS)+SPECIAL_COLORS);
-  /* Note: this operation maps linestyle -4 to -1 onto colormap entries 0 to 3 */
   if (linetype != AQUA_LineType) {
-      AQUA_LineType = linetype;
-      [adapter takeColorFromColormapEntry:(linetype%CYCLIC_COLORS)+SPECIAL_COLORS];
+    /* Note: this operation maps linestyle -4 to -1 onto colormap entries 0 to 3 */
+    AQUA_LineType = linetype;
+    [adapter takeColorFromColormapEntry:(linetype%CYCLIC_COLORS)+SPECIAL_COLORS];
+  }
+  if (AQUA_dashedlines) {
+    style = linetype%AQUA_DASH_PATTERNS;
+    if (style <= 0) {
+       [adapter setLinestyleSolid];
+    } else {      
+       // Set up a dash array
+	   for(i = 0; i<AQUA_dashPatternLengths[style]; i++) {
+	      dash[i] = AQUA_dashPatterns[style][i] * AQUA_dashlength_factor;
+	   }
+       [adapter setLinestylePattern:dash count:AQUA_dashPatternLengths[style] phase:0.0];
     }
+  }
 }
 
 TERM_PUBLIC void
@@ -425,6 +481,7 @@ TERM_PUBLIC void
 AQUA_point(unsigned int x, unsigned int y, int number)
 {
   /* The default dot-routine doesn't work with AQT */
+  [adapter setLinestyleSolid]; /* Symbols should never be dashed */
   [adapter setLinewidth:1.0];  
   [adapter setLineCapStyle:AQTRoundLineCapStyle]; /* Set line cap style to round to create a dot */
   [adapter moveToPoint:NSMakePoint(x/AQUA_RESOLUTION-0.005, y/AQUA_RESOLUTION)];
