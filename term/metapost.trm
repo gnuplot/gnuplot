@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.32 2005/02/01 11:28:53 broeker Exp $
+ * $Id: metapost.trm,v 1.33 2005/08/07 09:43:34 mikulik Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -183,6 +183,7 @@ enum MP_id {
     MP_OPT_A4PAPER,
     MP_OPT_PSNFSS, MP_OPT_PSNFSS_V7, MP_OPT_NOPSNFSS,
     MP_OPT_AMSTEX,
+    MP_OPT_FONT, MP_OPT_FONTSIZE,
     MP_OPT_PROLOGUES, MP_OPT_NOPROLOGUES,
     MP_OPT_MAGNIFICATION, MP_OPT_OTHER
 };
@@ -204,6 +205,7 @@ static struct gen_table MP_opts[] = {
     { "pro$logues", MP_OPT_PROLOGUES },
     { "nopro$logues", MP_OPT_NOPROLOGUES },
     { "ma$gnification", MP_OPT_MAGNIFICATION },
+    { "fo$nt", MP_OPT_FONT },
     { NULL, MP_OPT_OTHER }
 };
 
@@ -300,6 +302,13 @@ MP_options()
 		MP_textmag = (double) real(const_express(&a));
 	    /* c_token++; */ /* Needed ??? */
 	    break;
+	case MP_OPT_FONT:
+	    c_token++;
+	    if (isstringvalue(c_token)) {
+		char *s = try_to_get_string();
+		strncpy(MP_fontname, s, sizeof(MP_fontname));
+	    }
+	    break;
 	case MP_OPT_OTHER:
 	default:
 	    if (isstring(c_token)) {	/* font name */
@@ -329,7 +338,7 @@ MP_options()
 
     if (MP_psnfss == MP_PSNFSS_NONE) { /* using the normal font scheme */
       sprintf(term_options,
-	    "%s %s %stex%s%s mag %.3f font \"%s\" fontsize %.2f %sprologues(%d)",
+	    "%s %s %stex%s%s mag %.3f font \"%s\" %.2f %sprologues(%d)",
 	    MP_color ? "color" : "monochrome",
 	    MP_solid ? "solid" : "dashed",
 	    (MP_tex == MP_NO_TEX) ? "no" : (MP_tex == MP_LATEX) ? "la" : "",
@@ -449,6 +458,7 @@ verbatimtex\n\
     }
     fputs("\n\
 color currentcolor; currentcolor:=black;\n\
+color fillcolor;\n\
 boolean colorlines,dashedlines;\n", gpoutfile);
     if (MP_color) {
 	fputs("colorlines:=true;\n", gpoutfile);
@@ -531,7 +541,7 @@ def put_text(expr pic, x, y, r, j) =\n\
     elseif j = 2: (-center GPtext)\n\
     else: (-(urcorner GPtext + lrcorner GPtext)/2)\n\
     fi\n\
-    rotated if r > 0: 90 else: 0 fi;\n\
+    rotated r;\n\
   draw GPtext shifted (x,y)\n\
 enddef;\n", gpoutfile);
 }
@@ -754,7 +764,7 @@ TERM_PUBLIC int
 MP_text_angle(int ang)
 {
     /* Metapost code does the conversion */
-    MP_ang = (ang ? 1 : 0);
+    MP_ang = ang;
     return (TRUE);
 }
 
@@ -794,19 +804,53 @@ MP_reset()
 
 TERM_PUBLIC void
 MP_boxfill(
-    int sty,
+    int style,
     unsigned int x1, unsigned int y1,
     unsigned int wd, unsigned int ht)
 {
-    /* for now simply clear box if sty <= 0, do nothing otherwise */
+
+    /* fillpar:
+     * - solid   : 0 - 100% intensity
+     * - pattern : 0 - n    pattern number
+     */
+    int fillpar = style >> 4;
+    style &= 0xf;
+
     if (MP_inline)
 	MP_endline();
-    if (sty <= 0)
-	fprintf(gpoutfile, "\
+
+    switch (style) {
+
+	case FS_EMPTY: /* fill with background color */
+	    fprintf(gpoutfile, "\
 fill (%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--cycle withcolor background;\n",
 		x1 / 10.0, y1 / 10.0, (x1 + wd) / 10.0, y1 / 10.0,
 		(x1 + wd) / 10.0, (y1 + ht) / 10.0, x1 / 10.0,
 		(y1 + ht) / 10.0);
+	    break;
+
+	case FS_PATTERN: /* pattern fill */
+	    /* FIXME: not yet implemented, dummy it up as fill density */
+	    fillpar *= 12;
+
+	default:
+	case FS_SOLID: /* solid fill */
+	    if (fillpar < 100) {
+		double density = (100-fillpar) * 0.01;
+		fprintf(gpoutfile,"fillcolor:=currentcolor*%.2f+background*%.2f;\n",
+		    density, 1.0-density);
+		MP_color_changed = 1;
+	    } else
+		fprintf(gpoutfile,"fillcolor:=currentcolor;\n");
+	    fprintf(gpoutfile, "\
+fill (%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--cycle withpen (pencircle scaled 0pt) withcolor fillcolor;\n",
+	    x1 / 10.0, y1 / 10.0, (x1 + wd) / 10.0, y1 / 10.0,
+	    (x1 + wd) / 10.0, (y1 + ht) / 10.0, x1 / 10.0,
+	    (y1 + ht) / 10.0);
+	    break;
+
+    }
+
 }
 
 TERM_PUBLIC int
@@ -833,6 +877,15 @@ MP_set_color(t_colorspec *colorspec)
 	if (gray < 1e-3) gray = 0;
 	fprintf(gpoutfile, "currentcolor:=%.3gwhite;\n", gray);
     } else {			/* color mode */
+	if (colorspec->type == TC_LT) {
+	    int linecolor = colorspec->lt;
+	    if (linecolor >= MP_LINE_TYPES)
+		linecolor %= MP_LINE_TYPES;
+	    if (linecolor == -1)
+		fprintf(gpoutfile, "currentcolor:=black;\n");
+	    else if (linecolor >= 0)
+		fprintf(gpoutfile, "currentcolor:=col%d;\n",linecolor);
+	}
 	if (colorspec->type == TC_FRAC) {
 	    if (sm_palette.colors != 0) /* finite nb of colors explicitly requested */
 		gray = (gray >= ((double)(sm_palette.colors-1)) / sm_palette.colors) ?
@@ -858,15 +911,35 @@ TERM_PUBLIC void
 MP_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
+    int fillpar = corners->style >> 4;
+    int style = corners->style & 0xf;
 
     if (MP_inline)
 	MP_endline();
+
+    switch (style) {
+	case FS_EMPTY:	/* fill with background color */
+		fprintf(gpoutfile,"fillcolor:=background;\n");
+		break;
+	case FS_PATTERN: /* pattern fill implemented as partial density */
+		fillpar *= 12;
+	case FS_SOLID:	/* solid fill */
+		if (fillpar < 100) {
+		    double density = (100-fillpar) * 0.01;
+		    fprintf(gpoutfile,"fillcolor:=currentcolor*%.2f+background*%.2f;\n",
+		        density, 1.0-density);
+		} else {
+		    fprintf(gpoutfile,"fillcolor:=currentcolor;\n");
+		}
+	default:
+		break;
+    }
 
     fprintf(gpoutfile, "fill ");
     for (i = 0; i < points; i++)
 	fprintf(gpoutfile, "(%.1fa,%.1fb)--",
 		corners[i].x / 10.0, corners[i].y / 10.0);
-    fprintf(gpoutfile, "cycle withcolor currentcolor;\n");
+    fprintf(gpoutfile, "cycle withcolor fillcolor;\n");
 }
 
 TERM_PUBLIC void
