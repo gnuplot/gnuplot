@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.335 2005/10/19 19:53:21 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.336 2005/10/26 15:42:31 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9039,8 +9039,9 @@ C ... and restart the table:
  `axis` or `border` tells `gnuplot` to put the tics (both the tics themselves
  and the accompanying labels) along the axis or the border, respectively.  If
  the axis is very close to the border, the `axis` option will move the
- tic labels to outside the border.  The relevant margin settings will usually
- be sized badly by the automatic layout algorithm in this case.
+ tic labels to outside the border in case the border is printed (see
+ `set border`).  The relevant margin settings will usually be sized badly by
+ the automatic layout algorithm in this case.
 
  `mirror` tells `gnuplot` to put unlabelled tics at the same positions on the
  opposite border.  `nomirror` does what you think it does.

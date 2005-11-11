@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.55 2005/09/21 19:21:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.56 2005/09/30 03:21:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1281,21 +1281,28 @@ axis_output_tics(
 	    tic_direction = axis_is_second ? 1 : -1;
 	    if (axis_array[axis].ticmode & TICS_MIRROR)
 		tic_mirror = tic_start;
-	    /* put text at boundary if axis is close to boundary */
+	    /* put text at boundary if axis is close to boundary and the
+	     * corresponding boundary is switched on */
 	    if (axis_is_vertical) {
-		tic_text = (((axis_is_second ? -1 : 1)
-			     *(tic_start - axis_position) > (3 * t->h_char))
-			    ? tic_start
-			    : axis_position
-		    ) + (axis_is_second ? 1 : -1) * t->h_char;
+		if (((axis_is_second ? -1 : 1) * (tic_start - axis_position)
+		     > (3 * t->h_char))
+		    || (!axis_is_second && (!(draw_border & 2)))
+		    || (axis_is_second && (!(draw_border & 8))))
+		    tic_text = tic_start;
+		else
+		    tic_text = axis_position;
+		tic_text += (axis_is_second ? 1 : -1) * t->h_char;
 	    } else {
-		tic_text = (((axis_is_second ? -1 : 1)
-			     *(tic_start - axis_position) > (2 * t->v_char))
-			    ? tic_start + (axis_is_second
-					   ? 0
-					   : - axis_array[axis].ticscale * t->v_tic)
-			    : axis_position
-		    ) - t->v_char;
+		if (((axis_is_second ? -1 : 1) * (tic_start - axis_position)
+		     > (2 * t->v_char))
+		    || (!axis_is_second && (!(draw_border & 1)))
+		    || (axis_is_second && (!(draw_border & 4))))
+		    tic_text = tic_start +
+			(axis_is_second ? 0
+			 : - axis_array[axis].ticscale * t->v_tic);
+		else
+		    tic_text = axis_position;
+		tic_text -= t->v_char;
 	    }
 	} else {
 	    /* tics not on axis --> on border */
