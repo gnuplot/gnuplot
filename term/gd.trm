@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.76 2005/10/05 15:48:58 mikulik Exp $
+ * $Id: gd.trm,v 1.77 2005/10/05 20:19:14 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1792,14 +1792,14 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
 	int y_offset = 0;
 
 	if (png_state.angle != 0)
-	    y_offset = x_offset * tan((double)png_state.angle * M_PI_2/90.);
+	    y_offset = png_state.y - y;
 	png_state.justify = LEFT;
 	ENHgd_sizeonly = FALSE;
 
 	if (justification == RIGHT) {
 	    ENHGD_put_text(x - x_offset, y - y_offset, original_string);
 	} else if (justification == CENTRE) {
-	    ENHGD_put_text(x - x_offset/2, y - yoffset/2, original_string);
+	    ENHGD_put_text(x - x_offset/2, y - y_offset/2, original_string);
 	}
 	png_state.justify = justification;
     }

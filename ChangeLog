@@ -3,6 +3,10 @@
 	* src/axis.c (gen_tics): Check whether user-specified tic is major
 	or minor before choosing a line type for the corresponding grid line.
 
+	* term/gd.trm (ENHGD_put_text) term/pdf.trm (ENHPDF_put_text):
+	Fix typos that caused justification to fail for rotated, enhanced
+	mode text strings.
+
 2005-11-11  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/axis.c (axis_output_tics): Normally the tics are placed to

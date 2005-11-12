@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.58 2005/10/16 19:19:35 sfeam Exp $
+ * $Id: pdf.trm,v 1.59 2005/10/17 06:01:02 sfeam Exp $
  */
 
 /*------------------------------
@@ -1533,14 +1533,14 @@ ENHPDF_put_text(unsigned int x, unsigned int y, const char *str)
 	int y_offset = 0;
 
 	if (PDF_TextAngle != 0)
-	    y_offset = x_offset * tan((double)PDF_TextAngle * M_PI_2/90.);
+	    y_offset = PDF_yLast - y;
 	PDF_TextJust = LEFT;
 	ENHpdf_sizeonly = FALSE;
 
 	if (justification == RIGHT) {
 	    ENHPDF_put_text(x - x_offset, y - y_offset, original_string);
 	} else if (justification == CENTRE) {
-	    ENHPDF_put_text(x - x_offset/2, y - yoffset/2, original_string);
+	    ENHPDF_put_text(x - x_offset/2, y - y_offset/2, original_string);
 	}
 	PDF_TextJust = justification;
     }
