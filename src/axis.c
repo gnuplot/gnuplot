@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.56 2005/09/30 03:21:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.57 2005/11/12 06:58:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -867,7 +867,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    else
 		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log10_base, mark->position);
 	    /* use NULL instead of label for minitic */
-	    (*callback) (axis, internal, mark->level?NULL:label, lgrd);
+	    (*callback) (axis, internal, mark->level?NULL:label, mark->level?mgrd:lgrd);
 	}
 	if (def->type == TIC_USER)
 	    return;

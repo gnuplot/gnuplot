@@ -1,3 +1,8 @@
+2005-11-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics): Check whether user-specified tic is major
+	or minor before choosing a line type for the corresponding grid line.
+
 2005-11-11  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/axis.c (axis_output_tics): Normally the tics are placed to
