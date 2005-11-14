@@ -1,3 +1,8 @@
+2005-11-14  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/set.c (set_xyzlabel): Fix parsing error in backwards-compatible
+	form "set xlabel 'foo' -1,-1".
+
 2005-11-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics): Check whether user-specified tic is major

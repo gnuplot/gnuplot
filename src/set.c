@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.207 2005/10/06 04:18:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.208 2005/10/10 02:44:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4162,7 +4162,7 @@ set_xyzlabel(text_label *label)
 	    if (equals(c_token,","))
 		c_token -= 2;
 #ifdef BACKWARDS_COMPATIBLE
-	    if (isanumber(c_token)) {
+	    if (isanumber(c_token) || equals(c_token, "-")) {
 		/* Parse offset with missing keyword "set xlabel 'foo' 1,2 "*/
 		get_position_default(&(label->offset),character);
 	    }
