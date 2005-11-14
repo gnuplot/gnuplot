@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.336 2005/10/26 15:42:31 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.337 2005/11/12 06:58:25 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2088,8 +2088,10 @@ C ... and restart the table:
  processing of the quoted text depends on the choice of quote marks.
 
  Backslash processing of special characters like \n (newline) and
- \345 (octal character code) is performed for double-quoted strings,
- but not for single-quoted strings.
+ \345 (octal character code) is performed for double-quoted strings.  In
+ single-quoted strings, backslashes are just ordinary characters.  To get
+ a single-quote (ascii 39) in a single-quoted string, it has to be doubled.
+ Thus the strings "d\" s' b\\" and 'd" s'' b\' are completely equivalent.
 
  Text justification is the same for each line of a multi-line string.
  Thus the center-justified string
@@ -2191,11 +2193,13 @@ C ... and restart the table:
        cd 'subdir'
        cd ".."
 
- DOS users _must_ use single-quotes---backslash [\] has special significance
- inside double-quotes.  For example,
+ It is recommended for DOS and Windows users to use 
+ single-quotes---backslash [\] has special significance inside 
+ double-quotes and has to be escaped.  For example,
        cd "c:\newdata"
  fails, but
        cd 'c:\newdata'
+       cd "c:\\newdata"
  works as expected.
 2 call
 ?commands call

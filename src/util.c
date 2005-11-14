@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.59 2005/06/29 22:31:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.60 2005/10/22 05:50:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -71,6 +71,7 @@ const char *current_prompt = NULL; /* to be set by read_line() */
 /* internal prototypes */
 
 static void mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
+static void parse_sq __PROTO((char *));
 
 #if 0 /* UNUSED */
 /*
@@ -270,6 +271,8 @@ quote_str(char *str, int t_num, int max)
     /* convert \t and \nnn (octal) to char if in double quotes */
     if (gp_input_line[token[t_num].start_index] == '"')
 	parse_esc(str);
+    else
+        parse_sq(str);
 }
 
 
@@ -331,6 +334,8 @@ m_quote_capture(char **str, int start, int end)
 
     if (gp_input_line[token[start].start_index] == '"')
 	parse_esc(*str);
+    else
+        parse_sq(*str);
 
 }
 
@@ -1041,6 +1046,26 @@ squash_spaces(char *s)
 	}
     }
     *w = NUL;			/* null terminate string */
+}
+
+
+/* postprocess single quoted strings: replace "''" by "'"
+*/
+void
+parse_sq(char *instr)
+{
+    char *s = instr, *t = instr;
+
+    /* the string will always get shorter, so we can do the
+     * conversion in situ
+     */
+
+    while (*s != NUL) {
+        if (*s == '\'' && *(s+1) == '\'')
+            s++;
+        *t++ = *s++;
+    }
+    *t = NUL;
 }
 
 

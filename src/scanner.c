@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.21 2005/07/10 18:24:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.22 2005/09/26 04:19:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -174,7 +174,8 @@ scanner(char **expressionp, size_t *expressionlenp)
 		    expression[current] = quote;
 		    expression[current + 1] = NUL;
 		    break;
-		} else if (expression[current] == '\\'
+		} else if (quote == '\"'
+                           && expression[current] == '\\'
 			   && expression[current + 1]) {
 		    current++;
 		    token[t_num].length += 2;
@@ -182,6 +183,14 @@ scanner(char **expressionp, size_t *expressionlenp)
 		    substitute(expressionp, expressionlenp, current);
 		    expression = *expressionp;	/* it might have moved */
 		    current--;
+                } else if (quote == '\'' 
+                           && expression[current+1] == '\''
+                           && expression[current+2] == '\'') {
+                    /* look ahead: two subsequent single quotes 
+                     * -> take them in
+                     */
+                    current += 2;
+                    token[t_num].length += 3;
 		} else
 		    token[t_num].length++;
 	    }

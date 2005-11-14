@@ -1,3 +1,8 @@
+2005-11-14  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/util.c (parse_sq) src/scanner.c (scanner) docs/gnuplot.doc:
+	Fixed \' in single-quoted strings.
+
 2005-11-24  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/gplt_x11.c: Linked list of color maps separate from the linked
