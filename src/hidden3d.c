@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.48 2005/05/03 04:36:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.49 2005/08/07 09:43:29 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1038,8 +1038,7 @@ build_networks(struct surface_points *plots, int pcount)
 			labelpoint.y = label->place.y;
 			labelpoint.z = label->place.z;
 			thisvertex = store_vertex(&labelpoint, 1, color_from_column);
-			if (thisvertex < 0 || previousvertex < 0) {
-			    previousvertex = thisvertex;
+			if (thisvertex < 0) {
 			    continue;
 	 		}
 			(vlist+thisvertex)->label = label;
@@ -1054,7 +1053,7 @@ build_networks(struct surface_points *plots, int pcount)
 		    thisvertex = store_vertex(points+i, pointtype,
 					      color_from_column);
 
-		    if (thisvertex < 0 || previousvertex < 0) {
+		    if (thisvertex < 0) {
 			previousvertex = thisvertex;
 			continue;
 		    }
@@ -1065,7 +1064,8 @@ build_networks(struct surface_points *plots, int pcount)
 		    case FSTEPS:
 		    case HISTEPS:
 		    case LINES:
-			store_edge(thisvertex, edir_west, 0, lp, above);
+		    	if (previousvertex >= 0)
+			    store_edge(thisvertex, edir_west, 0, lp, above);
 			break;
 		    case BOXES:
 		    case FILLEDCURVES:

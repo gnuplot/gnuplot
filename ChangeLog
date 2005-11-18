@@ -1,3 +1,8 @@
+2005-11-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/hidden3d.c (build_networks): Fix handling of previousvertex
+	variable for point-like objects, which don't need it.
+
 2005-11-14  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/set.c (set_xyzlabel): Fix parsing error in backwards-compatible
