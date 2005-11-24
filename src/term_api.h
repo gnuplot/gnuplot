@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.49 2005/09/16 03:20:30 sfeam Exp $
+ * $Id: term_api.h,v 1.50 2005/10/01 23:38:49 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -356,6 +356,9 @@ void test_term __PROTO((void));
 /* flag: don't use enhanced output methods --- for output of
  * filenames, which usually looks bad using subscripts */
 void ignore_enhanced __PROTO((TBOOLEAN flag));
+
+/* Simple-minded test that point is with drawable area */
+TBOOLEAN on_page __PROTO((int x, int y));
 
 #ifdef LINUXVGA
 void LINUX_setup __PROTO((void));

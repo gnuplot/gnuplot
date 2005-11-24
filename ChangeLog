@@ -1,4 +1,16 @@
-2005-11-14  Juergen Wieferink  <wieferink@freenet.de>
+2005-11-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c (clip_point) src/term.c (do_arrow): If terminal
+	flag TERM_CAN_CLIP is set, then set canvas clipping description 
+	to NULL.
+
+	* src/term_api.h src/term.c: Export on_page() so that it can be
+	used for clipping tests by other core modules.
+
+	* src/gadgets.c (write_label): If a label has an associated point,
+	clip the point using the same test as were used for the label itself.
+
+2005-11-24  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/util.c (parse_sq) src/scanner.c (scanner) docs/gnuplot.doc:
 	Fixed \' in single-quoted strings.

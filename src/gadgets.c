@@ -171,6 +171,8 @@ clip_point(unsigned int x, unsigned int y)
 {
     int ret_val = 0;
 
+    if (!clip_area)
+	return 0;
     if ((int)x < clip_area->xleft)
 	ret_val |= 0x01;
     if ((int)x > clip_area->xright)
@@ -506,7 +508,8 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	    write_multiline(x + htic, y + vtic, this_label->text,
 			    this_label->pos, justify, 0, this_label->font);
 	}
-	if (this_label->lp_properties.pointflag) {
+	/* write_multiline() clips text to on_page; do the same for any point */
+	if (this_label->lp_properties.pointflag && on_page(x,y)) {
 	    term_apply_lp_properties(&this_label->lp_properties);
 	    (*term->point) (x, y, this_label->lp_properties.p_type);
 	    /* the default label color is that of border */

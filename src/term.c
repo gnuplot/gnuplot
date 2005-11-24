@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.130 2005/11/08 18:33:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.131 2005/11/09 21:22:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -222,8 +222,6 @@ static char *enhanced_recursion __PROTO((char *p, TBOOLEAN brace,
 static void enh_err_check __PROTO((const char *str));
 /* note: c is char, but must be declared int due to K&R compatibility. */
 static void do_enh_writec __PROTO((int c));
-
-static TBOOLEAN on_page __PROTO((int x, int y));
 
 /*
  * Bookkeeping and support routine for 'set multiplot layout <rows>, <cols>'
@@ -1157,7 +1155,10 @@ do_arrow(
 
     /* Clip arrows to canvas */
     clip_save = clip_area;
-    clip_area = &canvas;
+    if (term->flags & TERM_CAN_CLIP)
+	clip_area = NULL;
+    else
+	clip_area = &canvas;
 
     /* Calculate and draw arrow heads.
      * Draw no head for arrows with length = 0, or, to be more specific,
