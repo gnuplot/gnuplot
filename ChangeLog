@@ -1,3 +1,9 @@
+2005-11-24  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/gplt_x11.c: Linked list of color maps separate from the linked
+	list for x11 plots. Bugfix for different color palettes in different
+	x11 terminal windows and resizing them.
+
 2005-11-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/hidden3d.c (build_networks): Fix handling of previousvertex

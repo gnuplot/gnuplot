@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.148 2005/10/07 13:00:51 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.149 2005/10/15 23:49:41 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -231,6 +231,8 @@ typedef struct axis_scale_t {
 #define Ncolors 13
 
 typedef struct cmap_t {
+    struct cmap_t *prev_cmap;  /* Linked list pointers and number */
+    struct cmap_t *next_cmap;
     Colormap colormap;
     unsigned long colors[Ncolors];	/* line colors as pixel values */
     unsigned long rgbcolors[Ncolors];	/* line colors in rgb format */
@@ -241,7 +243,7 @@ typedef struct cmap_t {
 } cmap_t;
 
 /* always allocate a default colormap (done in preset()) */
-static cmap_t cmap;
+static cmap_t default_cmap;
 
 /* information about one window/plot */
 typedef struct plot_struct {
@@ -282,7 +284,6 @@ typedef struct plot_struct {
      * This is always the default colormap, if not in pm3d.
      */
     cmap_t *cmap;
-    TBOOLEAN release_cmap;
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
     /* This array holds per-axis scaling information sufficient to reconstruct
      * plot coordinates of a mouse click.  It is a snapshot of the contents of
@@ -307,9 +308,10 @@ static plot_struct *Add_Plot_To_Linked_List __PROTO((int));
 static void Remove_Plot_From_Linked_List __PROTO((Window));
 static plot_struct *Find_Plot_In_Linked_List_By_Number __PROTO((int));
 static plot_struct *Find_Plot_In_Linked_List_By_Window __PROTO((Window));
+static plot_struct *Find_Plot_In_Linked_List_By_CMap __PROTO((cmap_t *));
 
 static struct plot_struct *current_plot = NULL;
-static struct plot_struct *list_start = NULL;
+static struct plot_struct *plot_list_start = NULL;
 
 /* information about window/plot to be removed */
 typedef struct plot_remove_struct {
@@ -323,6 +325,22 @@ static void Process_Remove_FIFO_Queue __PROTO((void));
 
 static struct plot_remove_struct *remove_fifo_queue_start = NULL;
 static int process_remove_fifo_queue = 0;
+
+static cmap_t *Add_CMap_To_Linked_List __PROTO((void));
+static void Remove_CMap_From_Linked_List __PROTO((cmap_t *));
+static cmap_t *Find_CMap_In_Linked_List __PROTO((cmap_t *));
+static int cmaps_differ __PROTO((cmap_t *, cmap_t *));
+
+/* current_cmap always points to a valid colormap.  At start up
+ * it is the default colormap.  When a palette command comes
+ * across the pipe, the current_cmap is set to point at the
+ * resulting colormap which ends up in the linked list of colormaps.
+ * The current_cmap should never be removed from the linked list
+ * even if all windows are deleted, because that colormap will be
+ * used for the next plot.
+ */
+static struct cmap_t *current_cmap = NULL;
+static struct cmap_t *cmap_list_start = NULL;
 
 /* These might work better as fuctions, but defines will do for now. */
 #define ERROR_NOTICE(str)         "\nGNUPLOT (gplt_x11):  " str
@@ -348,13 +366,13 @@ static char selection[SEL_LEN] = "";
 
 static void CmapClear __PROTO((cmap_t *));
 static void RecolorWindow __PROTO((plot_struct *));
-static void FreeColors __PROTO((plot_struct *));
-static void ReleaseColormap __PROTO((plot_struct *));
-static unsigned long *ReallocColors __PROTO((plot_struct *, int));
-static void PaletteMake __PROTO((plot_struct *, t_sm_palette *));
+static void FreeColors __PROTO((cmap_t *));
+static void ReleaseColormap __PROTO((cmap_t *));
+static unsigned long *ReallocColors __PROTO((cmap_t *, int));
+static void PaletteMake __PROTO((t_sm_palette *));
 static void PaletteSetColor __PROTO((plot_struct *, double));
 static int GetVisual __PROTO((int, Visual **, int *));
-static void scan_palette_from_buf __PROTO((plot_struct *));
+static void scan_palette_from_buf __PROTO((void));
 
 #if defined(WITH_IMAGE)
 static unsigned short BitMaskDetails __PROTO((unsigned long mask, unsigned short *left_shift, unsigned short *right_shift));
@@ -1050,11 +1068,12 @@ delete_plot(plot_struct *plot)
 	XFreePixmap(dpy, plot->pixmap);
 	plot->pixmap = None;
     }
-    /* we release the colormap here to free color resources.
-     * but how would be recreate the colormap ? -- need to
-     * call PaletteMake() somewhere ... */
-    ReleaseColormap(plot);
-    sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
+    /* Release the colormap here to free color resources, but only
+     * if this plot is using a colormap not used by another plot
+     * and is not using the current colormap.
+     */
+    if (plot->cmap != current_cmap && !Find_Plot_In_Linked_List_By_CMap(plot->cmap))
+	Remove_CMap_From_Linked_List(plot->cmap);
     /* but preserve geometry */
 }
 
@@ -1087,7 +1106,8 @@ prepare_plot(plot_struct *plot, int term_number)
 #endif
     }
     if (!plot->window) {
-	plot->cmap = &cmap;	/* default color space */
+	plot->cmap = current_cmap;	/* color space */
+	RecolorWindow(plot);
 	pr_window(plot);
 #ifdef USE_MOUSE
 	/*
@@ -1106,15 +1126,12 @@ prepare_plot(plot_struct *plot, int term_number)
 	plot->time = 0;		/* XXX how should we initialize this ? XXX */
 #endif
     }
-/* We don't know that it is the same window as before, so we reset the
- * cursors for all windows and then define the cursor for the active
- * window
- */
-    /* allow releasing of the cmap at the first drawing
-     * operation if no palette was allocated until then.
+
+    /* We don't know that it is the same window as before, so we reset the
+     * cursors for all windows and then define the cursor for the active
+     * window
      */
     plot->angle = 0;		/* default is horizontal */
-    plot->release_cmap = TRUE;
     reset_cursor();
     XDefineCursor(dpy, plot->window, cursor);
 }
@@ -1125,7 +1142,22 @@ store_command(char *buffer, plot_struct *plot)
 {
     char *p;
 
-    FPRINTF((stderr, "Store in %d : %s", plot->plot_number, buffer));
+    /* binary can't be printed as string */
+#if defined(WITH_IMAGE) && defined(BINARY_X11_POLYGON)
+    if (*buffer == X11_GR_IMAGE || *buffer == X11_GR_FILLED_POLYGON || *buffer == X11_GR_SET_COLOR)
+#else
+#ifdef WITH_IMAGE
+    if (*buffer == X11_GR_IMAGE)
+#endif
+#ifdef BINARY_X11_POLYGON
+    if (*buffer != X11_GR_FILLED_POLYGON && *buffer != X11_GR_SET_COLOR)
+#endif
+#endif
+#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
+    {FPRINTF((stderr, "Store in %d : %c\n", plot->plot_number, *buffer));}
+    else
+#endif
+    {FPRINTF((stderr, "Store in %d : %s", plot->plot_number, buffer));}
 
     if (plot->ncommands >= plot->max_commands) {
 	plot->max_commands = plot->max_commands * 2 + 1;
@@ -1222,7 +1254,7 @@ gnuplot: X11 aborted.\n", stderr);
  * became a function of its own.
 */
 static void
-scan_palette_from_buf( plot_struct *plot )
+scan_palette_from_buf(void)
 {
     t_sm_palette tpal;
     char cm, pos, mod;
@@ -1292,7 +1324,10 @@ scan_palette_from_buf( plot_struct *plot )
 	tpal.colorMode = SMPAL_COLOR_MODE_GRAY;
 	break;
     }
-    PaletteMake(plot, &tpal);
+    PaletteMake(&tpal);
+
+    if (tpal.gradient)
+	free(tpal.gradient);
 }
 
 
@@ -1403,7 +1438,7 @@ record()
 		    }
 		} else {
 		    /* Find end of list, i.e., first created. */
-		    plot_struct *psp = list_start;
+		    plot_struct *psp = plot_list_start;
 		    while (psp != NULL) {
 			if (psp->next_plot == NULL) break;
 			psp = psp->next_plot;
@@ -1425,7 +1460,7 @@ record()
 			XLowerWindow(dpy, psp->window);
 		    }
 		} else if (current_plot) {
-		    plot_struct *psp = list_start;
+		    plot_struct *psp = plot_list_start;
 		    while (psp != NULL) {
 			XLowerWindow(dpy, psp->window);
 			psp = psp->next_plot;
@@ -1466,10 +1501,20 @@ record()
 	    return 0;
 
 	case X11_GR_MAKE_PALETTE:
-	    if (plot)
-		scan_palette_from_buf( plot );
+	    if (have_pm3d)
+		scan_palette_from_buf();
 	    return 1;
 #if 0
+//
+/* (DJS 28sep2004)  Possibly remove.  Not sure this is useful for anything.
+ * What gnuplot command would issue this?  When would gnuplot know it is OK to
+ * release a palette inside gnuplot_x11?  I see no X11_GR_RELEASE_PALETTE
+ * or 'e' inside x11.trm.
+ *
+ * Plots and colormaps are independent in new scheme, so the line below
+ * "if (plot)" is outdated.  Also, sm_palette is a global, static structure.
+ *  sm_palette.gradient should be set to NULL after freeing the memory.
+ */
 	case X11_GR_RELEASE_PALETTE:
 	    /* turn pm3d off */
 	    FPRINTF((stderr, "X11_GR_RELEASE_PALETTE\n"));
@@ -1943,7 +1988,22 @@ exec_cmd(plot_struct *plot, char *command)
     char *buffer, *str;
 
     buffer = command;
-    FPRINTF((stderr, "(display) buffer = |%s|\n", buffer));
+    /* binary can't be printed as string */
+#if defined(WITH_IMAGE) && defined(BINARY_X11_POLYGON)
+    if (*buffer == X11_GR_IMAGE || *buffer == X11_GR_FILLED_POLYGON || *buffer == X11_GR_SET_COLOR)
+#else
+#ifdef WITH_IMAGE
+    if (*buffer == X11_GR_IMAGE)
+#endif
+#ifdef BINARY_X11_POLYGON
+    if (*buffer != X11_GR_FILLED_POLYGON && *buffer != X11_GR_SET_COLOR)
+#endif
+#endif
+#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
+    {FPRINTF((stderr, "(display) buffer = |%c|\n", *buffer));}
+    else
+#endif
+    {FPRINTF((stderr, "(display) buffer = |%s|\n", buffer));}
 
 #ifdef X11_POLYLINE
     /*   X11_vector(x, y) - draw vector  */
@@ -2673,6 +2733,10 @@ exec_cmd(plot_struct *plot, char *command)
 	static int color_mode;
 	static unsigned i_remaining;
 
+	/* ignore, if your X server is not supported */
+	if (!have_pm3d)
+	    return;
+
 /* These might work better as fuctions, but defines will do for now. */
 #define ERROR_NOTICE(str)         "\nGNUPLOT (gplt_x11):  " str
 #define ERROR_NOTICE_NEWLINE(str) "\n                     " str
@@ -3122,14 +3186,6 @@ display(plot_struct *plot)
 {
     int n;
 
-    if (TRUE == plot->release_cmap) {
-	/* no pm3d palette was allocated, so
-	 * switch back to the default cmap */
-	plot->release_cmap = FALSE;
-	ReleaseColormap(plot);
-	sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
-    }
-
     FPRINTF((stderr, "Display %d ; %d commands\n", plot->plot_number, plot->ncommands));
 
     if (plot->ncommands == 0)
@@ -3289,17 +3345,17 @@ RecolorWindow(plot_struct * plot)
  * free'd nor even touched.
  */
 static void
-FreeColors(plot_struct * plot)
+FreeColors(cmap_t *cmp)
 {
-    if (plot->cmap->total && plot->cmap->pixels) {
-	if (plot->cmap->allocated) {
+    if (cmp->total && cmp->pixels) {
+	if (cmp->allocated) {
 	    FPRINTF((stderr, "freeing palette colors\n"));
-	    XFreeColors(dpy, plot->cmap->colormap, plot->cmap->pixels,
-			plot->cmap->allocated, 0 /* XXX ??? XXX */ );
+	    XFreeColors(dpy, cmp->colormap, cmp->pixels,
+			cmp->allocated, 0 /* XXX ??? XXX */ );
 	}
-	free(plot->cmap->pixels);
+	free(cmp->pixels);
     }
-    CmapClear(plot->cmap);
+    CmapClear(cmp);
 }
 
 /*
@@ -3309,28 +3365,26 @@ FreeColors(plot_struct * plot)
  * colormap.
  */
 static void
-ReleaseColormap(plot_struct * plot)
+ReleaseColormap(cmap_t *cmp)
 {
-    FreeColors(plot);
-    if (plot->cmap && plot->cmap != &cmap) {
-	fprintf(stderr, "releasing private colormap\n");
-	if (plot->cmap->colormap && plot->cmap->colormap != cmap.colormap) {
-	    XFreeColormap(dpy, plot->cmap->colormap);
+    if (cmp && cmp != current_cmap) {
+	FreeColors(cmp);
+	FPRINTF((stderr, "releasing private colormap\n"));
+	if (cmp->colormap && cmp->colormap != current_cmap->colormap) {
+	    XFreeColormap(dpy, cmp->colormap);
 	}
-	free((char *) plot->cmap);
-	plot->cmap = &cmap;	/* switching to default colormap */
-	RecolorWindow(plot);
+	free((char *) cmp);
     }
 }
 
 static unsigned long *
-ReallocColors(plot_struct * plot, int n)
+ReallocColors(cmap_t *cmap, int n)
 {
-    FreeColors(plot);
-    plot->cmap->total = n;
-    plot->cmap->pixels = (unsigned long *)
-	malloc(sizeof(unsigned long) * plot->cmap->total);
-    return plot->cmap->pixels;
+    FreeColors(cmap);
+    cmap->total = n;
+    cmap->pixels = (unsigned long *)
+	malloc(sizeof(unsigned long) * cmap->total);
+    return cmap->pixels;
 }
 
 /*
@@ -3379,200 +3433,217 @@ GetVisual(int class, Visual ** visual, int *depth)
 }
 
 static void
-PaletteMake(plot_struct * plot, t_sm_palette * tpal)
+PaletteMake(t_sm_palette * tpal)
 {
-    static int virgin = yes;
-    static int recursion = 0;
     int max_colors;
     int min_colors;
     char *save_title = (char *) 0;
 
-    /* don't release this cmap at the first drawing operation */
-    plot->release_cmap = FALSE;
-
-    if (tpal && tpal->use_maxcolors > 0)
-	max_colors = tpal->use_maxcolors;
-    else
-	max_colors = maximal_possible_colors;
-
-    if (minimal_possible_colors < max_colors)
-        min_colors = minimal_possible_colors;
-    else
-        min_colors = max_colors / (num_colormaps > 1 ? 2 : 8);
-
-    if (tpal) {
-	FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n",
-		 tpal->use_maxcolors));
-    } else {
-	FPRINTF((stderr, "(PaletteMake) tpal=NULL\n"));
-    }
-
-    /* reallocate the palette
-     * only if it has changed.
+    /* The information retained in a linked list is the cmap_t structure.
+     * That colormap structure doesn't contain the palette specifications
+     * t_sm_palette used to generate the colormap.  Therefore, the making
+     * of the colormap must be carried all the way through before we can
+     * determine if it is unique from the other colormaps in the linked list.
+     *
+     * Rather than create and initialize a colormap outside of the list, we'll
+     * just put a new one in the list, and if it isn't unique remove it later.
      */
-    if (tpal) {
-        /*  make sure they do not differ by unused members of palette struct */
-	sm_palette.colorFormulae = tpal-> colorFormulae = 1;
-    }
 
-    if (no == virgin && tpal && !palettes_differ(tpal, &sm_palette)) {
-	FPRINTF((stderr, "(PaletteMake) palette didn't change.\n"));
-	free(tpal->gradient);
-	return;
-    } else if (tpal) {
-        /*  free old gradient table  */
-        if (sm_palette.gradient) {
-	    free( sm_palette.gradient );
-	    sm_palette.gradient = NULL;
-	    sm_palette.gradient_num = 0;
-	}
+    cmap_t *new_cmap = Add_CMap_To_Linked_List();
 
-	sm_palette.colorMode = tpal->colorMode;
-	sm_palette.positive = tpal->positive;
-	sm_palette.use_maxcolors = tpal->use_maxcolors;
-	sm_palette.cmodel = tpal->cmodel;
+    /* Continue until valid palette is built.  May require multiple passes. */
+    while (1) {
 
-	virgin = no;
-	switch( sm_palette.colorMode ) {
-          case SMPAL_COLOR_MODE_GRAY:
-	    sm_palette.gamma = tpal->gamma;
-	    break;
-	  case SMPAL_COLOR_MODE_RGB:
-	    sm_palette.formulaR = tpal->formulaR;
-	    sm_palette.formulaG = tpal->formulaG;
-	    sm_palette.formulaB = tpal->formulaB;
-	    break;
-        case SMPAL_COLOR_MODE_FUNCTIONS:
-	  fprintf( stderr, "Ooops:  no SMPAL_COLOR_MODE_FUNCTIONS here!\n" );
-	  break;
-	case SMPAL_COLOR_MODE_GRADIENT:
-	  sm_palette.gradient_num = tpal->gradient_num;
-	  sm_palette.gradient = tpal->gradient;
-	  break;
-	default:
-	  fprintf(stderr, "%s:%d ooops: Unknown color mode '%c'.\n",
-		  __FILE__, __LINE__, (char)(sm_palette.colorMode) );
-	}
-    }
+	if (tpal) {
 
-    if (!have_pm3d) {
-	return;
-    }
-
-    if (!plot->window) {
-	fprintf(stderr, "(PaletteMake) calling pr_window()\n");
-	pr_window(plot);
-    }
-
-
-    if (plot->window) {
-	char *msg;
-	char *added_text = " allocating colors ...";
-	int orig_len = (plot->titlestring ? strlen(plot->titlestring) : 0);
-	XFetchName(dpy, plot->window, &save_title);
-	if ((msg = (char *) malloc(orig_len + strlen(added_text) + 1))) {
-	    if (plot->titlestring)
-		strcpy(msg, plot->titlestring);
-	    else
-		msg[0] = '\0';
-	    strcat(msg, added_text);
-	    XStoreName(dpy, plot->window, msg);
-	    free(msg);
-	}
-    }
-
-    if (!num_colormaps) {
-	XFree(XListInstalledColormaps(dpy, plot->window, &num_colormaps));
-	FPRINTF((stderr, "(PaletteMake) num_colormaps = %d\n", num_colormaps));
-    }
-
-    /* TODO */
-    /* EventuallyChangeVisual(plot); */
-
-    /*
-     * start with trying to allocate max_colors. This should
-     * always succeed with TrueColor visuals >= 16bit. If it
-     * fails (for example for a PseudoColor visual of depth 8),
-     * try it with half of the colors. Proceed until min_colors
-     * is reached. If this fails we should probably install a
-     * private colormap.
-     * Note that I make no difference for different
-     * visual types here. (joze)
-     */
-    for ( /* EMPTY */ ; max_colors >= min_colors; max_colors /= 2) {
-
-	XColor xcolor;
-	double fact = 1.0 / (double)(max_colors-1);
-
-	ReallocColors(plot, max_colors);
-
-	for (plot->cmap->allocated = 0; plot->cmap->allocated < max_colors; plot->cmap->allocated++) {
-
-	    double gray = (double) plot->cmap->allocated * fact;
-	    rgb_color color;
-	    rgb1_from_gray( gray, &color );
-	    xcolor.red = 0xffff * color.r + 0.5;
-	    xcolor.green = 0xffff * color.g + 0.5;
-	    xcolor.blue = 0xffff * color.b + 0.5;
-
-	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor)) {
-		plot->cmap->pixels[plot->cmap->allocated] = xcolor.pixel;
+	    if (tpal->use_maxcolors > 0) {
+		max_colors = tpal->use_maxcolors;
 	    } else {
-		FPRINTF((stderr, "failed at color %d\n", plot->cmap->allocated));
+		max_colors = maximal_possible_colors;
+	    }
+
+	    FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n",
+		     tpal->use_maxcolors));
+
+	    /*  free old gradient table  */
+	    if (sm_palette.gradient) {
+		free( sm_palette.gradient );
+		sm_palette.gradient = NULL;
+		sm_palette.gradient_num = 0;
+	    }
+
+	    sm_palette.colorMode = tpal->colorMode;
+	    sm_palette.positive = tpal->positive;
+	    sm_palette.use_maxcolors = tpal->use_maxcolors;
+	    sm_palette.cmodel = tpal->cmodel;
+
+	    switch( sm_palette.colorMode ) {
+	    case SMPAL_COLOR_MODE_GRAY:
+		sm_palette.gamma = tpal->gamma;
 		break;
+	    case SMPAL_COLOR_MODE_RGB:
+		sm_palette.formulaR = tpal->formulaR;
+		sm_palette.formulaG = tpal->formulaG;
+		sm_palette.formulaB = tpal->formulaB;
+		break;
+	    case SMPAL_COLOR_MODE_FUNCTIONS:
+		fprintf( stderr, "Ooops:  no SMPAL_COLOR_MODE_FUNCTIONS here!\n" );
+		break;
+	    case SMPAL_COLOR_MODE_GRADIENT:
+		sm_palette.gradient_num = tpal->gradient_num;
+		/* Take over the memory from tpal. */
+		sm_palette.gradient = tpal->gradient;
+		tpal->gradient = NULL;
+		break;
+	    default:
+		fprintf(stderr,"%s:%d ooops: Unknown color mode '%c'.\n",
+			__FILE__, __LINE__, (char)(sm_palette.colorMode) );
+	    }
+
+	} else {
+	    max_colors = maximal_possible_colors;
+	    FPRINTF((stderr, "(PaletteMake) tpal=NULL\n"));
+	}
+
+	if (minimal_possible_colors < max_colors)
+	    min_colors = minimal_possible_colors;
+	else
+	    min_colors = max_colors / (num_colormaps > 1 ? 2 : 8);
+
+	if (current_plot) {
+
+	    if (current_plot->window) {
+		char *msg;
+		char *added_text = " allocating colors ...";
+		int orig_len = (current_plot->titlestring ? strlen(current_plot->titlestring) : 0);
+		XFetchName(dpy, current_plot->window, &save_title);
+		if ((msg = (char *) malloc(orig_len + strlen(added_text) + 1))) {
+		    if (current_plot->titlestring)
+			strcpy(msg, current_plot->titlestring);
+		    else
+			msg[0] = '\0';
+		    strcat(msg, added_text);
+		    XStoreName(dpy, current_plot->window, msg);
+		    free(msg);
+		}
+	    }
+
+	    if (!num_colormaps) {
+		XFree(XListInstalledColormaps(dpy, current_plot->window, &num_colormaps));
+		FPRINTF((stderr, "(PaletteMake) num_colormaps = %d\n", num_colormaps));
+	    }
+
+	}
+
+	/* TODO */
+	/* EventuallyChangeVisual(plot); */
+
+	/*
+	 * start with trying to allocate max_colors. This should
+	 * always succeed with TrueColor visuals >= 16bit. If it
+	 * fails (for example for a PseudoColor visual of depth 8),
+	 * try it with half of the colors. Proceed until min_colors
+	 * is reached. If this fails we should probably install a
+	 * private colormap.
+	 * Note that I make no difference for different
+	 * visual types here. (joze)
+	 */
+	for ( /* EMPTY */ ; max_colors >= min_colors; max_colors /= 2) {
+
+	    XColor xcolor;
+	    double fact = 1.0 / (double)(max_colors-1);
+
+	    if (current_plot)
+		ReallocColors(new_cmap, max_colors);
+
+	    for (new_cmap->allocated = 0; new_cmap->allocated < max_colors; new_cmap->allocated++) {
+
+		double gray = (double) new_cmap->allocated * fact;
+		rgb_color color;
+		rgb1_from_gray( gray, &color );
+		xcolor.red = 0xffff * color.r + 0.5;
+		xcolor.green = 0xffff * color.g + 0.5;
+		xcolor.blue = 0xffff * color.b + 0.5;
+
+		if (XAllocColor(dpy, new_cmap->colormap, &xcolor)) {
+		    new_cmap->pixels[new_cmap->allocated] = xcolor.pixel;
+		} else {
+		    FPRINTF((stderr, "failed at color %d\n", new_cmap->allocated));
+		    break;
+		}
+	    }
+
+	    if (new_cmap->allocated == max_colors) {
+		break;		/* success! */
+	    }
+
+	    /* reduce the number of max_colors to at
+	     * least less than new_cmap->allocated */
+	    while (max_colors > new_cmap->allocated && max_colors >= min_colors) {
+		max_colors /= 2;
 	    }
 	}
 
-	if (plot->cmap->allocated == max_colors) {
-	    break;		/* success! */
-	}
+	FPRINTF((stderr, "(PaletteMake) allocated = %d\n", new_cmap->allocated));
+	FPRINTF((stderr, "(PaletteMake) max_colors = %d\n", max_colors));
+	FPRINTF((stderr, "(PaletteMake) min_colors = %d\n", min_colors));
 
-	/* reduce the number of max_colors to at
-	 * least less than plot->cmap->allocated */
-	while (max_colors > plot->cmap->allocated && max_colors >= min_colors) {
-	    max_colors /= 2;
+	if (new_cmap->allocated < min_colors && tpal) {
+	    /* create a private colormap on second pass. */
+	    FPRINTF((stderr, "switching to private colormap\n"));
+	    tpal = 0;
+	} else {
+	    break;
 	}
     }
 
-    FPRINTF((stderr, "(PaletteMake) allocated = %d\n", plot->cmap->allocated));
-    FPRINTF((stderr, "(PaletteMake) max_colors = %d\n", max_colors));
-    FPRINTF((stderr, "(PaletteMake) min_colors = %d\n", min_colors));
+    /* Now check the uniqueness of the new colormap against all the other
+     * colormaps in the linked list.
+     */
+    {
+	cmap_t *cmp = cmap_list_start;
 
-    if (plot->cmap->allocated < min_colors && !recursion) {
-	ReleaseColormap(plot);
-	/* create a private colormap. */
-	fprintf(stderr, "switching to private colormap\n");
-	plot->cmap = (cmap_t *) malloc(sizeof(cmap_t));
-	assert(plot->cmap);
-	CmapClear(plot->cmap);
-	plot->cmap->colormap = XCreateColormap(dpy, root, vis, AllocNone);
-	assert(plot->cmap->colormap);
-	pr_color(plot->cmap);	/* set default colors for lines */
-	RecolorWindow(plot);
-	recursion = 1;
-	PaletteMake(plot, (t_sm_palette *) 0);
-    } else {
-	/* this is just for calculating the number of unique colors */
-	int i;
-	unsigned long previous = plot->cmap->allocated ? plot->cmap->pixels[0] : 0;
-	int unique_colors = 1;
-	for (i = 0; i < plot->cmap->allocated; i++) {
-	    if (plot->cmap->pixels[i] != previous) {
-		previous = plot->cmap->pixels[i];
-		unique_colors++;
+	while (cmp != NULL) {
+	    if ((cmp != new_cmap) && !cmaps_differ(cmp, new_cmap))
+		break;
+	    cmp = cmp->next_cmap;
+	}
+
+	if (cmp != NULL) {
+	    /* Found a match. Discard the newly created colormap.  (Could
+	     * have simply discarded the old one and combined parts of
+	     * code similar to these if statements, but we'll avoid removing
+	     * old blocks of memory so that it is more likely that heap
+	     * memory will remain more tidy.
+	     */
+	    Remove_CMap_From_Linked_List(new_cmap);
+	    if (current_plot) {
+		current_plot->cmap = cmp;
+		RecolorWindow(current_plot);
 	    }
+	    current_cmap = cmp;
+	} else {
+	    /* Unique and truely new colormap.  Make it the current map. */
+	    if (current_plot) {
+		current_plot->cmap = new_cmap;
+		RecolorWindow(current_plot);
+	    }
+	    /* If no other plots using colormap, then can be removed. */
+	    if (!Find_Plot_In_Linked_List_By_CMap(current_cmap))
+		Remove_CMap_From_Linked_List(current_cmap);
+	    current_cmap = new_cmap;
 	}
+
     }
 
-    if (plot->window && save_title) {
-	/* restore default window title */
-	XStoreName(dpy, plot->window, save_title);
-    }
     if (save_title) {
+	/* Restore window title (current_plot and current_plot->window are
+	 * valid, otherwise would not have been able to get save_title.
+	 */
+	XStoreName(dpy, current_plot->window, save_title);
 	XFree(save_title);
     }
 
-    recursion = 0;
 }
 
 static void
@@ -4045,7 +4116,7 @@ getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
 static void
 reset_cursor()
 {
-    plot_struct *plot = list_start;
+    plot_struct *plot = plot_list_start;
 
     while (plot) {
 	if (plot->window) {
@@ -4708,7 +4779,6 @@ preset(int argc, char *argv[])
     int TrueColor_depth, PseudoColor_depth, StaticGray_depth, GrayScale_depth;
 #endif
     char *db_string;
-    sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;	/* color is off by default */
 
     FPRINTF((stderr, "(preset) \n"));
 
@@ -4779,7 +4849,8 @@ gnuplot: X11 aborted.\n", ldisplay);
     server_defaults = XResourceManagerString(dpy);
     vis = DefaultVisual(dpy, scr);
     dep = DefaultDepth(dpy, scr);
-    cmap.colormap = DefaultColormap(dpy, scr);
+    default_cmap.colormap = DefaultColormap(dpy, scr);
+    current_cmap = &default_cmap;
     max_request_size = XMaxRequestSize(dpy) / 2;
 
 
@@ -4873,7 +4944,7 @@ gnuplot: X11 aborted.\n", ldisplay);
 		    dep = depth;
 		    if (vis != DefaultVisual(dpy, scr)) {
 			/* this will be the default colormap */
-			cmap.colormap = XCreateColormap(dpy, root, vis, AllocNone);
+			default_cmap.colormap = XCreateColormap(dpy, root, vis, AllocNone);
 		    }
 		} else {
 		    fprintf(stderr, "%s not supported by %s, using default.\n", *ptr, ldisplay);
@@ -4894,7 +4965,7 @@ gnuplot: X11 aborted.\n", ldisplay);
 	fprintf(stderr, "Using %s at depth %d.\n", visual_name[vis->class], dep);
     }
 #endif
-    CmapClear(&cmap);
+    CmapClear(&default_cmap);
 
     /* set default of maximal_possible_colors */
     if (dep > 12) {
@@ -4946,7 +5017,7 @@ gnuplot: X11 aborted.\n", ldisplay);
 
     pr_geometry();
     pr_font(NULL);		/* set current font to default font */
-    pr_color(&cmap);		/* set colors for default colormap */
+    pr_color(&default_cmap);	/* set colors for default colormap */
     pr_width();
     pr_dashes();
     pr_pointsize();
@@ -5027,7 +5098,7 @@ pr_color(cmap_t * cmap_ptr)
 
 	ctype = (Gray) ? "Gray" : "Color";
 
-	if (&cmap != cmap_ptr) {
+	if (current_cmap != cmap_ptr) {
 	    /* for private colormaps: make sure
 	     * that pixel 0 gets black (joze) */
 	    xcolor.red = 0;
@@ -5667,10 +5738,6 @@ pr_window(plot_struct *plot)
 	attr.colormap = plot->cmap->colormap;
 	plot->window = XCreateWindow(dpy, root, plot->x, plot->y, plot->width,
 				     plot->height, BorderWidth, dep, InputOutput, vis, mask, &attr);
-	/* XXX need this ? yes. (joze) XXX */
-	if (plot->window && SMPAL_COLOR_MODE_NONE != sm_palette.colorMode) {
-	    PaletteMake(plot, (t_sm_palette *) 0);
-	}
     } else
 	plot->window = XCreateSimpleWindow(dpy, root, plot->x, plot->y,
 					   plot->width, plot->height, BorderWidth, plot->cmap->colors[1], plot->cmap->colors[0]);
@@ -5870,7 +5937,7 @@ handle_selection_event(XEvent *event)
 
 		XChangeProperty(dpy, reply.xselection.requestor,
 				reply.xselection.property, reply.xselection.target,
-				32, PropModeReplace, (unsigned char *) &(cmap.colormap), 1);
+				32, PropModeReplace, (unsigned char *) &(default_cmap.colormap), 1);
 	    } else if (reply.xselection.target == XA_PIXMAP) {
 
 		FPRINTF((stderr, "pixmap request from %d\n", reply.xselection.requestor));
@@ -5945,7 +6012,7 @@ mouse_to_axis(int mouse_coord, axis_scale_t *axis)
 static plot_struct *
 Add_Plot_To_Linked_List(int plot_number)
 {
-    /* Make sure plot does not already exists in the list. */
+    /* Make sure plot does not already exist in the list. */
     plot_struct *psp = Find_Plot_In_Linked_List_By_Number(plot_number);
 
     if (psp == NULL) {
@@ -5956,12 +6023,12 @@ Add_Plot_To_Linked_List(int plot_number)
 	    psp->plot_number = plot_number;
 	    /* Add link to beginning of the list. */
 	    psp->prev_plot = NULL;
-	    if (list_start != NULL) {
-		list_start->prev_plot = psp;
-		psp->next_plot = list_start;
+	    if (plot_list_start != NULL) {
+		plot_list_start->prev_plot = psp;
+		psp->next_plot = plot_list_start;
 	    } else
 		psp->next_plot = NULL;
-	    list_start = psp;
+	    plot_list_start = psp;
 	}
 	else {
 	    psp = NULL;
@@ -5990,7 +6057,7 @@ Remove_Plot_From_Linked_List(Window plot_window)
 	if (psp->prev_plot != NULL) {
 	    psp->prev_plot->next_plot = psp->next_plot;
 	} else {
-	    list_start = psp->next_plot;
+	    plot_list_start = psp->next_plot;
 	}
 	/* If global pointers point at this plot, reassign them. */
 	if (current_plot == psp) {
@@ -6005,7 +6072,7 @@ Remove_Plot_From_Linked_List(Window plot_window)
 	}
 	if (plot == psp)
 	    plot = current_plot;
-	/* Deallocate memory. */
+	/* Deallocate memory.  Make sure plot removed from list first. */
 	delete_plot(psp);
 	free(psp);
     }
@@ -6019,7 +6086,7 @@ Remove_Plot_From_Linked_List(Window plot_window)
 static plot_struct *
 Find_Plot_In_Linked_List_By_Number(int plot_number)
 {
-    plot_struct *psp = list_start;
+    plot_struct *psp = plot_list_start;
 
     while (psp != NULL) {
 	if (psp->plot_number == plot_number)
@@ -6038,10 +6105,29 @@ Find_Plot_In_Linked_List_By_Number(int plot_number)
 static plot_struct *
 Find_Plot_In_Linked_List_By_Window(Window window)
 {
-    plot_struct *psp = list_start;
+    plot_struct *psp = plot_list_start;
 
     while (psp != NULL) {
 	if (psp->window == window)
+	    break;
+	psp = psp->next_plot;
+    }
+
+    return psp;
+}
+
+
+/*-----------------------------------------------------------------------------
+ *   Find_Plot_In_Linked_List_By_CMap - Search for the plot in the linked list.
+ *---------------------------------------------------------------------------*/
+
+static plot_struct *
+Find_Plot_In_Linked_List_By_CMap(cmap_t *cmp)
+{
+    plot_struct *psp = plot_list_start;
+
+    while (psp != NULL) {
+	if (psp->cmap == cmp)
 	    break;
 	psp = psp->next_plot;
     }
@@ -6230,3 +6316,114 @@ BitMaskDetails(unsigned long mask, unsigned short *left_shift, unsigned short *r
     return (unsigned short) m;
 }
 #endif
+
+
+/*-----------------------------------------------------------------------------
+ *   Add_CMap_To_Linked_List - Create space for colormap and put in linked list.
+ *---------------------------------------------------------------------------*/
+
+static cmap_t *
+Add_CMap_To_Linked_List(void)
+{
+    cmap_t *cmp = (cmap_t *) malloc(sizeof(cmap_t));
+    if (cmp) {
+	/* Add link to beginning of the list. */
+	cmp->prev_cmap = NULL;
+	if (cmap_list_start != NULL) {
+	    cmap_list_start->prev_cmap = cmp;
+	    cmp->next_cmap = cmap_list_start;
+	} else
+	    cmp->next_cmap = NULL;
+	cmap_list_start = cmp;
+    } else {
+	cmp = NULL;
+	fprintf(stderr, ERROR_NOTICE("Could not allocate memory for color map.\n\n"));
+    }
+    /* Initialize structure variables. */
+    CmapClear(cmp);
+    cmp->colormap = XCreateColormap(dpy, root, vis, AllocNone);
+    assert(cmp->colormap);
+    pr_color(cmp);	/* set default colors for lines */
+    return cmp;
+}
+
+
+/*-----------------------------------------------------------------------------
+ *   Remove_CMap_From_Linked_List - Remove from linked list and free memory.
+ *---------------------------------------------------------------------------*/
+
+static void
+Remove_CMap_From_Linked_List(cmap_t *cmp)
+{
+    /* Make sure colormap exists in the list. */
+    cmp = Find_CMap_In_Linked_List(cmp);
+
+    if (cmp != NULL) {
+	/* Remove link from the list. */
+	if (cmp->next_cmap != NULL)
+	    cmp->next_cmap->prev_cmap = cmp->prev_cmap;
+	if (cmp->prev_cmap != NULL) {
+	    cmp->prev_cmap->next_cmap = cmp->next_cmap;
+	} else {
+	    cmap_list_start = cmp->next_cmap;
+	}
+	/* If global pointers point at this plot, reassign them. */
+	if (current_cmap == cmp) {
+#if 0 /* Make some other cmap current. */
+	    if (cmp->prev_cmap != NULL)
+		current_cmap = cmp->prev_cmap;
+	    else
+		current_cmap = psp->next_cmap;
+#else /* No current cmap. */
+	    current_cmap = &default_cmap;
+#endif
+	}
+	/* Remove any memory for pixels and memory for colormap structure. */
+	ReleaseColormap(cmp);
+    }
+}
+
+
+/*-----------------------------------------------------------------------------
+ *   Find_CMap_In_Linked_List - Search for the color map in the linked list.
+ *---------------------------------------------------------------------------*/
+
+static cmap_t *
+Find_CMap_In_Linked_List(cmap_t *colormap)
+{
+    cmap_t *cmp = cmap_list_start;
+
+    while (cmp != NULL) {
+	if (cmp == colormap)
+	    break;
+	cmp = cmp->next_cmap;
+    }
+
+    return cmp;
+}
+
+
+/*-----------------------------------------------------------------------------
+ *   cmaps_differ - Compare two colormaps, return 1 if differ.
+ *---------------------------------------------------------------------------*/
+
+static int
+cmaps_differ(cmap_t *cmap1, cmap_t *cmap2)
+{
+
+    /* First compare non-pointer elements. */
+    if ( memcmp(&(cmap1->colors[0]), &(cmap2->colors[0]), (long)&(cmap1->pixels)-(long)&(cmap1->colors[0])) )
+	return 1;
+
+    /* Now compare pointer elements. */
+    if (cmap1->allocated) {
+	if (cmap1->pixels && cmap2->pixels) {
+	    if ( memcmp(cmap1->pixels, cmap2->pixels, cmap1->allocated*sizeof(cmap1->pixels[0])) )
+		return 1;
+	} else
+	    return 1;
+    }
+
+    return 0;  /* They are the same. */
+
+}
