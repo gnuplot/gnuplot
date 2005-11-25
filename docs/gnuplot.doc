@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.337 2005/11/12 06:58:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.338 2005/11/23 23:33:37 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3250,6 +3250,14 @@ C ... and restart the table:
  Command line keywords may be used to override settings extracted from the file.
  The settings from the file override any defaults.  (See `set datafile binary`
  for details.)
+6 avs
+?binary general filetype avs
+?filetype avs
+?avs
+ `avs` is one of the automatically recognized binary file types for images.
+ AVS is an extremely simple format, suitable mostly for streaming between
+ applications. It consists of 2 longs (xwidth, ywidth) followed by a stream
+ of pixels, each with four bytes of information alpha/red/green/blue.
 6 edf
 ?binary general filetype edf
 ?filetype edf

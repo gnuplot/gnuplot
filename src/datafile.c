@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.95 2005/10/23 19:24:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.96 2005/11/26 03:37:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -456,6 +456,7 @@ typedef struct df_bin_filetype_table_struct {
 
 static void gpbin_filetype_function __PROTO((void));
 static void raw_filetype_function __PROTO((void));
+static void avs_filetype_function __PROTO((void));
 
 df_bin_filetype_table_struct df_bin_filetype_table[] = {
     {"gpbin", gpbin_filetype_function},
@@ -463,6 +464,7 @@ df_bin_filetype_table_struct df_bin_filetype_table[] = {
     {"rgb", raw_filetype_function},
     {"bin", raw_filetype_function},
 #if 1
+    {"avs", avs_filetype_function},
     {"edf", edf_filetype_function},
     {"ehf", edf_filetype_function},
 #endif
@@ -2839,6 +2841,63 @@ raw_filetype_function(void)
     df_matrix_file = FALSE;
     df_binary_file = TRUE;
 }
+
+
+void
+avs_filetype_function(void)
+{
+    /* A very simple file format: 8 byte header (width and height 4 byte big endian),
+       followed by pixels in 1 byte (alpha, red, green, blue). */
+
+    FILE *fp;
+    unsigned long M, N;
+    int read_order = 0;
+
+    /* open (header) file */
+    fp = loadpath_fopen(df_filename, "rb");
+    if (!fp)
+	os_error(NO_CARET, "Can't open data file \"%s\"", df_filename);
+
+    /* read header: it is only 8 bytes */
+    if (!fread(&M, 4, 1, fp))
+	os_error(NO_CARET, "Can't read first dimension in data file \"%s\"", df_filename);
+    if (M > 0xFFFF)
+	read_order = DF_3210;
+    df_swap_bytes_by_endianess((char *) &M, read_order, 4);
+    if (!fread(&N, 4, 1, fp))
+	os_error(NO_CARET, "Can't read second dimension in data file \"%s\"", df_filename);
+    df_swap_bytes_by_endianess((char *) &N, read_order, 4);
+
+    fclose(fp);
+
+    df_matrix_file = FALSE;
+    df_binary_file = TRUE;
+
+    df_bin_record[0].scan_skip[0] = 8;
+    df_bin_record[0].scan_dim[0] = M;
+    df_bin_record[0].scan_dim[1] = N;
+ 
+    df_bin_record[0].scan_dir[0] = 1;
+    df_bin_record[0].scan_dir[1] = -1;
+    df_bin_record[0].scan_generate_coord = TRUE;
+    df_bin_record[0].cart_scan[0] = DF_SCAN_POINT;
+    df_bin_record[0].cart_scan[1] = DF_SCAN_LINE;
+
+    /* The four components are 1 byte each.  Treat as three components
+       with the first one ignored. */
+    df_extend_binary_columns(3);
+    df_set_read_type(1, DF_UCHAR);  /* Each pixel component is 1 byte */
+    df_set_read_type(2, DF_UCHAR);
+    df_set_read_type(3, DF_UCHAR);
+    df_set_skip_before(1,1);        /* Ignore the alpha component of 4-tuple */
+
+    df_no_use_specs = 3;
+    use_spec[0].column = 1;
+    use_spec[1].column = 2;
+    use_spec[2].column = 3;
+
+}
+
 
 
 

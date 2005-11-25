@@ -1,3 +1,10 @@
+2005-11-25  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/datafile.c (avs_filetype_function) docs/gnuplot.doc:
+	Support AVS image file format.
+	Example:
+	      plot '<convert foo.jpeg avs:-' binary filetype=avs with rgbimage
+
 2005-11-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_plot do_key_sample)
@@ -15,7 +22,7 @@
 2005-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/tgif.trm (TGIF_init): Message "Creator: gnuplot %s patchlevel %s"
-	instead of $Header: /cvsroot/gnuplot/gnuplot/ChangeLog,v 1.1756 2005/11/25 19:13:28 sfeam Exp $ in output file header.
+	instead of $Header: /cvsroot/gnuplot/gnuplot/ChangeLog,v 1.1757 2005/11/26 03:37:11 sfeam Exp $ in output file header.
 
 2005-11-24  Ethan Merritt  <merritt@u.washington.edu>
 
