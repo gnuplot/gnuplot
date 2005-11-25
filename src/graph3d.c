@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.136 2005/10/16 06:12:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.137 2005/10/16 21:34:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2895,35 +2895,34 @@ key_text(int xl, int yl, char *text)
 static void
 key_sample_line(int xl, int yl)
 {
-    legend_key *key = &keyT;
+    BoundingBox *clip_save = clip_area;
 
-    if (key->region != GPKEY_USER_PLACEMENT) {
-	(*term->move) (xl + key_sample_left, yl);
-	(*term->vector) (xl + key_sample_right, yl);
-    } else {
-	clip_move(xl + key_sample_left, yl);
-	clip_vector(xl + key_sample_right, yl);
-    }
+    /* Clip against canvas */
+    if (term->flags & TERM_CAN_CLIP)
+	clip_area = NULL;
+    else
+	clip_area = &canvas;
+
+    draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
+
+    clip_area = clip_save;
 }
 
 static void
 key_sample_point(int xl, int yl, int pointtype)
 {
-    legend_key *key = &keyT;
+    BoundingBox *clip_save = clip_area;
 
-    /* HBB 20000412: fixed incorrect clipping: the point sample was
-     * clipped against the graph box, even if in 'below' or 'outside'
-     * position. But the result of that clipping was utterly ignored,
-     * because the 'else' part did exactly the same thing as the
-     * 'then' one. Some callers of this routine thus did their own
-     * clipping, which I removed, along with this change.
-     *
-     * Now, all 'automatically' placed cases will never be clipped,
-     * only user-specified ones. */
-    if ((key->region != GPKEY_USER_PLACEMENT)            /* ==-1 means auto-placed key */
-	|| !clip_point(xl + key_point_offset, yl)) {
+    /* Clip against canvas */
+    if (term->flags & TERM_CAN_CLIP)
+	clip_area = NULL;
+    else
+	clip_area = &canvas;
+
+    if (!clip_point(xl + key_point_offset, yl))
 	(*term->point) (xl + key_point_offset, yl, pointtype);
-    }
+
+    clip_area = clip_save;
 }
 
 
@@ -3022,7 +3021,7 @@ key_sample_point_pm3d(
     int xl, int yl,
     int pointtype)
 {
-    legend_key *key = &keyT;
+    BoundingBox *clip_save = clip_area;
     /* int x_from = xl + key_sample_left; */
     int x_to = xl + key_sample_right;
     int i = 0, x1 = xl + key_sample_left, x2;
@@ -3048,16 +3047,24 @@ key_sample_point_pm3d(
     fprintf(stderr,"POINT_pm3D: cbmin=%g  cbmax=%g\n",cbmin, cbmax);
     fprintf(stderr,"steps=%i gray_from=%g gray_to=%g gray_step=%g\n",steps,gray_from,gray_to,gray_step);
 #endif
+    /* Clip to canvas */
+    if (term->flags & TERM_CAN_CLIP)
+	clip_area = NULL;
+    else
+	clip_area = &canvas;
+
     while (i <= steps) {
 	/* if (i>0) set_color( i==steps ? gray_to : (i-0.5)/steps ); ... range [0:1] */
 	gray = (i==steps) ? gray_to : gray_from+i*gray_step;
 	set_color(gray);
 	x2 = i==0 ? x1 : (i==steps ? x_to : x1 + (int)(i*step+0.5));
 	/* x2 += key_point_offset; ... that's if there is only 1 point */
-	if (key->region != GPKEY_USER_PLACEMENT || !clip_point(x2, yl))
+	if (!clip_point(x2, yl))
 	    (*term->point) (x2, yl, pointtype);
 	i++;
     }
+
+    clip_area = clip_save;
 }
 
 

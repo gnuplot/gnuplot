@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.171 2005/10/01 23:38:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.172 2005/10/16 06:12:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1602,15 +1602,20 @@ do_plot(struct curve_points *plots, int pcount)
 	key_count = 0;
 
 	if (key->box.l_type > L_TYPE_NODRAW) {
+	    BoundingBox *clip_save = clip_area;
+	    if (term->flags & TERM_CAN_CLIP)
+		clip_area = NULL;
+	    else
+		clip_area = &canvas;
 	    term_apply_lp_properties(&key->box);
-	    (*t->move) (keybox.xl, keybox.yb);
-	    (*t->vector) (keybox.xl, keybox.yt);
-	    (*t->vector) (keybox.xr, keybox.yt);
-	    (*t->vector) (keybox.xr, keybox.yb);
-	    (*t->vector) (keybox.xl, keybox.yb);
+	    draw_clip_line(keybox.xl, keybox.yb, keybox.xl, keybox.yt);
+	    draw_clip_line(keybox.xl, keybox.yt, keybox.xr, keybox.yt);
+	    draw_clip_line(keybox.xr, keybox.yt, keybox.xr, keybox.yb);
+	    draw_clip_line(keybox.xr, keybox.yb, keybox.xl, keybox.yb);
 	    /* draw a horizontal line between key title and first entry */
-	    (*t->move) (keybox.xl, keybox.yt - (ktitl_lines) * t->v_char);
-	    (*t->vector) (keybox.xr, keybox.yt - (ktitl_lines) * t->v_char);
+	    draw_clip_line(keybox.xl, keybox.yt - (ktitl_lines) * t->v_char,
+			   keybox.xr, keybox.yt - (ktitl_lines) * t->v_char);
+	    clip_area = clip_save;
 	}
     } /* lkey */
 
@@ -1698,7 +1703,8 @@ do_plot(struct curve_points *plots, int pcount)
 	    break;
 	case DOTS:
 	    if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
-		(*t->point) (xl + key_point_offset, yl, -1);
+		if (on_page(xl + key_point_offset, yl))
+		    (*t->point) (xl + key_point_offset, yl, -1);
 	    }
 	    plot_dots(this_plot);
 	    break;
@@ -1784,7 +1790,8 @@ do_plot(struct curve_points *plots, int pcount)
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
 		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize);
-		(*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
+		if (on_page(xl + key_point_offset, yl))
+		    (*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
 	    }
 	    if (key->invert)
 		yl = keybox.yb + yl_ref + key_entry_height/2 - yl;
@@ -4651,6 +4658,13 @@ do_key_sample(
     struct termentry *t,
     int xl, int yl)
 {
+    /* Clip key box against canvas */
+    BoundingBox *clip_save = clip_area;
+    if (term->flags & TERM_CAN_CLIP)
+	clip_area = NULL;
+    else
+	clip_area = &canvas;
+
     /* Draw key text in black */
     (*t->linetype)(LT_BLACK);
 
@@ -4691,11 +4705,14 @@ do_key_sample(
 	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
 	    (*t->linetype)(fs->border_linetype);
 	if (fs->border_linetype != LT_NODRAW) {
-	    (*t->move)  (xl + key_sample_left,  yl - key_entry_height/4);
-	    (*t->vector)(xl + key_sample_right, yl - key_entry_height/4);
-	    (*t->vector)(xl + key_sample_right, yl + key_entry_height/4);
-	    (*t->vector)(xl + key_sample_left,  yl + key_entry_height/4);
-	    (*t->vector)(xl + key_sample_left,  yl - key_entry_height/4);
+	    draw_clip_line( xl + key_sample_left,  yl - key_entry_height/4,
+			    xl + key_sample_right, yl - key_entry_height/4);
+	    draw_clip_line( xl + key_sample_right, yl - key_entry_height/4,
+			    xl + key_sample_right, yl + key_entry_height/4);
+	    draw_clip_line( xl + key_sample_right, yl + key_entry_height/4,
+			    xl + key_sample_left,  yl + key_entry_height/4);
+	    draw_clip_line( xl + key_sample_left,  yl + key_entry_height/4,
+	    		    xl + key_sample_left,  yl - key_entry_height/4);
 	}
 	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED) {
 	    (*t->linetype)(this_plot->lp_properties.l_type);
@@ -4713,17 +4730,16 @@ do_key_sample(
 		   || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 		       && this_plot->plot_type == DATA)) {
 	    /* errors for data plots only */
-	    (*t->move) (xl + key_sample_left, yl);
-	    (*t->vector) (xl + key_sample_right, yl);
+	    draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
     }
 
     if ((this_plot->plot_type == DATA)
 	&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 	&& (bar_size > 0.0)) {
-	(*t->move) (xl + key_sample_left, yl + ERRORBARTIC);
-	(*t->vector) (xl + key_sample_left, yl - ERRORBARTIC);
-	(*t->move) (xl + key_sample_right, yl + ERRORBARTIC);
-	(*t->vector) (xl + key_sample_right, yl - ERRORBARTIC);
+	draw_clip_line( xl + key_sample_left, yl + ERRORBARTIC,
+			xl + key_sample_left, yl - ERRORBARTIC);
+	draw_clip_line( xl + key_sample_right, yl + ERRORBARTIC,
+			xl + key_sample_right, yl - ERRORBARTIC);
     }
 
     /* oops - doing the point sample now would break the postscript
@@ -4731,6 +4747,9 @@ do_key_sample(
      * when drawing a point, but does not restore it. We must wait
      then draw the point sample at the end of do_plot (line 1625)
      */
+
+    /* Restore previous clipping area */
+    clip_area = clip_save;
 }
 
 /* Squeeze all fill information into the old style parameter.

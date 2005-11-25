@@ -1,7 +1,13 @@
+2005-11-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (do_plot do_key_sample)
+	src/graph3d.c (key_sample_line key_sample_point key_sample_point_pm3d):
+	Clip key to canvas unless TERM_CAN_CLIP flag is set.
+
 2005-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/tgif.trm (TGIF_init): Message "Creator: gnuplot %s patchlevel %s"
-	instead of $Header:$ in output file header.
+	instead of $Header: /cvsroot/gnuplot/gnuplot/ChangeLog,v 1.1754 2005/11/25 18:44:09 mikulik Exp $ in output file header.
 
 2005-11-24  Ethan Merritt  <merritt@u.washington.edu>
 
