@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.208 2005/10/10 02:44:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.209 2005/11/14 19:22:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4382,9 +4382,9 @@ load_tics(AXIS_INDEX axis)
 static void
 load_tic_user(AXIS_INDEX axis)
 {
-    char temp_string[MAX_LINE_LEN];
     char *ticlabel;
     double ticposition;
+    int save_token;
 
     /* Free any old tic labels */
     if (!axis_array[axis].ticdef.def.mix) {
@@ -4393,20 +4393,26 @@ load_tic_user(AXIS_INDEX axis)
     }
 
     while (!END_OF_COMMAND) {
-      int ticlevel=0;
-	/* syntax is  (  ['format'] value [level] [, ...] )
+	int ticlevel=0;
+	/* syntax is  (  {'format'} value {level} {, ...} )
 	 * but for timedata, the value itself is a string, which
 	 * complicates things somewhat
 	 */
 
 	/* has a string with it? */
-	if (isstring(c_token) &&
-	    (!axis_array[axis].is_timedata || isstring(c_token + 1))) {
-	    quote_str(temp_string, c_token, MAX_LINE_LEN);
-	    ticlabel = temp_string;
-	    c_token++;
+	save_token = c_token;
+	STRING_RESULT_ONLY = TRUE;
+	if ((ticlabel = try_to_get_string())) {
+	    if (equals(c_token,",") || equals(c_token,")")) {
+		if (axis_array[axis].is_timedata) {
+		    c_token = save_token;
+		    ticlabel = NULL;
+		} else
+		    c_token -= 2;
+	    }
 	} else
-	    ticlabel = NULL;
+	    c_token = save_token;
+	STRING_RESULT_ONLY = FALSE;
 
 	/* in any case get the value */
 	GET_NUM_OR_TIME(ticposition, axis);
