@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.35 2005/06/29 22:31:14 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.36 2005/08/07 09:43:34 mikulik Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -480,11 +480,12 @@ TGIF_init()
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
 %%\n\
-%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.35 2005/06/29 22:31:14 sfeam Exp $\n\
+%% @(#)Creator: gnuplot %s patchlevel %s\n\
 %% %%W%%\n\
 %%\n\
 page(1,\"\").\n",
-	    TgifPortrait ? 0 : 1, uActResolution, uActZoom, sActFont, uActFontSize);
+	    TgifPortrait ? 0 : 1, uActResolution, uActZoom, sActFont, uActFontSize,
+	    gnuplot_version, gnuplot_patchlevel);
     eTgifState = NEWPOLY;
     iTgifPolyCount = 0;
     uTgifPlotCount = 0;

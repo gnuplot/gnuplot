@@ -1,3 +1,8 @@
+2005-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/tgif.trm (TGIF_init): Message "Creator: gnuplot %s patchlevel %s"
+	instead of $Header:$ in output file header.
+
 2005-11-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (clip_point) src/term.c (do_arrow): If terminal
