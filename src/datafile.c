@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.96 2005/11/26 03:37:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.97 2005/11/26 06:50:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2846,8 +2846,10 @@ raw_filetype_function(void)
 void
 avs_filetype_function(void)
 {
-    /* A very simple file format: 8 byte header (width and height 4 byte big endian),
-       followed by pixels in 1 byte (alpha, red, green, blue). */
+    /* A very simple file format: 
+     * 8 byte header (width and height, 4 bytes each), unknown endian
+     * followed by 4 bytes per pixel (alpha, red, green, blue).
+     */
 
     FILE *fp;
     unsigned long M, N;
@@ -2897,9 +2899,6 @@ avs_filetype_function(void)
     use_spec[2].column = 3;
 
 }
-
-
-
 
 static void
 initialize_binary_vars()

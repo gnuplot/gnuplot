@@ -22,7 +22,7 @@
 2005-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/tgif.trm (TGIF_init): Message "Creator: gnuplot %s patchlevel %s"
-	instead of $Header: /cvsroot/gnuplot/gnuplot/ChangeLog,v 1.1757 2005/11/26 03:37:11 sfeam Exp $ in output file header.
+	instead of $Header: /cvsroot/gnuplot/gnuplot/ChangeLog,v 1.1758 2005/11/26 06:50:47 sfeam Exp $ in output file header.
 
 2005-11-24  Ethan Merritt  <merritt@u.washington.edu>
 
@@ -34,7 +34,7 @@
 	used for clipping tests by other core modules.
 
 	* src/gadgets.c (write_label): If a label has an associated point,
-	clip the point using the same test as were used for the label itself.
+	clip the point using the same test as was used for the label itself.
 
 2005-11-24  Juergen Wieferink  <wieferink@freenet.de>
 
