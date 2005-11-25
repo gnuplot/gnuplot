@@ -7,10 +7,15 @@
 	* src/set.c (load_tic_user): Allow string variables and string functions
 	in 'set {xyz}tics ( FOO <foo>, BAR(x) x, "string"."exp" <place> )
 
+	* src/datafile.c (plot_option_binary): Fix logic error in binary file
+	initialization. Initialization was done inside a parsing loop, but the
+	loop was never entered unless there were additional keywords on the 
+	command line.  Bugfix.  "set style data rgbimage" now works.
+
 2005-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/tgif.trm (TGIF_init): Message "Creator: gnuplot %s patchlevel %s"
-	instead of $Header: /cvsroot/gnuplot/gnuplot/ChangeLog,v 1.1755 2005/11/25 18:54:40 sfeam Exp $ in output file header.
+	instead of $Header: /cvsroot/gnuplot/gnuplot/ChangeLog,v 1.1756 2005/11/25 19:13:28 sfeam Exp $ in output file header.
 
 2005-11-24  Ethan Merritt  <merritt@u.washington.edu>
 

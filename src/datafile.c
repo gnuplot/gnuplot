@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.94 2005/10/23 04:38:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.95 2005/10/23 19:24:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3132,35 +3132,27 @@ char *equal_symbol_msg = "Equal ('=') symbol required";
 static void
 plot_option_binary(TBOOLEAN set_matrix)
 {
-    int item_count = -1;
 #define MAX_FILE_EXT_LEN 10
     char file_ext[MAX_FILE_EXT_LEN+1];
 
     TBOOLEAN duplication = FALSE;
-    TBOOLEAN set_record = FALSE, set_array = FALSE, set_dx = FALSE, set_dy = FALSE, set_dz = FALSE;
+    TBOOLEAN set_record = FALSE;
+    TBOOLEAN set_array = FALSE, set_dx = FALSE, set_dy = FALSE, set_dz = FALSE;
     TBOOLEAN set_center = FALSE, set_origin = FALSE, set_skip = FALSE, set_endian = FALSE;
-    TBOOLEAN set_rotation = FALSE, set_perpendicular = FALSE, set_type = FALSE;
-    TBOOLEAN set_flip = FALSE, set_noflip = FALSE, set_flipx = FALSE, set_flipy = FALSE, set_flipz = FALSE;
+    TBOOLEAN set_rotation = FALSE, set_perpendicular = FALSE;
+    TBOOLEAN set_flip = FALSE, set_noflip = FALSE;
+    TBOOLEAN set_flipx = FALSE, set_flipy = FALSE, set_flipz = FALSE;
     TBOOLEAN set_scan = FALSE;
 #if BINARY_HAS_OWN_FORMAT_STRING
     TBOOLEAN set_format = FALSE;
 #endif
 
-    while (!END_OF_COMMAND) {
-
-        char origin_and_center_conflict_message[] = "Can specify `origin` or `center`, but not both";
-
-        item_count++;
-
-        /* deal with various types of binary files */
-        if (almost_equals(c_token, "file$type")
-            || ((df_bin_filetype >= 0) && (!set_type))) {
+        /* Binary file type must be the first word in the command following `binary`" */
+        if (almost_equals(c_token, "file$type") || (df_bin_filetype >= 0)) {
             int i;
 
-            if (item_count > 0)
-                int_error(c_token, "Binary file type must be the first word to follow `binary`");
-            if (set_type) { duplication=TRUE; break; }
-            /* Above keyword not part of pre-existing binary definition.  So use general binary. */
+            /* Above keyword not part of pre-existing binary definition.
+	     * So use general binary. */
             if (set_matrix)
                 int_error(c_token, matrix_general_binary_conflict_msg);
             df_matrix_file = FALSE;
@@ -3250,10 +3242,11 @@ plot_option_binary(TBOOLEAN set_matrix)
                 if (df_bin_record[i].scan_trans != DF_TRANSLATE_DEFAULT)
                     df_bin_record[i].cart_trans = DF_TRANSLATE_DEFAULT;
             }
-
-            set_type = TRUE;
-            continue;
         }
+
+
+    while (!END_OF_COMMAND) {
+        char origin_and_center_conflict_message[] = "Can specify `origin` or `center`, but not both";
 
         /* look for record */
         if (almost_equals(c_token, "rec$ord")) {

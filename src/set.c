@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.209 2005/11/14 19:22:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.210 2005/11/25 19:13:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -184,7 +184,7 @@ set_command()
 \t'logscale', 'macros', '[blrt]margin', 'mapping', 'mouse', 'multiplot',\n\
 \t'offsets', 'origin', 'output', 'palette', 'parametric', 'pm3d',\n\
 \t'pointsize', 'polar', 'print', '[rtuv]range', 'samples', 'size',\n\
-\t'style', 'surface', 'terminal', tics', 'ticscale', 'ticslevel',\n\
+\t'style', 'surface', 'terminal', 'tics', 'ticscale', 'ticslevel',\n\
 \t'timestamp', 'timefmt', 'title', 'view', 'xyplane', '[xyz]{2}data',\n\
 \t'[xyz]{2}label', '[xyz]{2}range', '{no}{m}[xyz]{2}tics',\n\
 \t'[xyz]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
