@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.114 2005/11/02 05:33:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.115 2005/11/02 06:39:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1389,9 +1389,11 @@ eval_3dplots()
 
 		    if (!checked_once) {
 			default_arrow_style(&this_plot->arrow_properties);
+			this_plot->arrow_properties.lp_properties.l_type = line_num;
 			checked_once = TRUE;
 		    }
-		    arrow_parse(&this_plot->arrow_properties, line_num, TRUE);
+		    arrow_parse(&this_plot->arrow_properties,
+				this_plot->arrow_properties.lp_properties.l_type, TRUE);
 		    if (stored_token != c_token) {
 			 if (set_lpstyle) {
 			    duplication = TRUE;
