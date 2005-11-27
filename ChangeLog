@@ -1,3 +1,8 @@
+2005-11-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/pm3d.dem: Change one splot from "with lp palette" to
+	"with lines palette".
+
 2005-11-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots):
@@ -28,7 +33,7 @@
 2005-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/tgif.trm (TGIF_init): Message "Creator: gnuplot %s patchlevel %s"
-	instead of $Header: /cvsroot/gnuplot/gnuplot/ChangeLog,v 1.1759 2005/11/27 04:25:40 sfeam Exp $ in output file header.
+	instead of (dollar)Header:(dollar) in output file header.
 
 2005-11-24  Ethan Merritt  <merritt@u.washington.edu>
 

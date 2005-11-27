@@ -1,12 +1,12 @@
 #
-# $Id: pm3d.dem,v 1.16 2005/08/08 09:13:02 mikulik Exp $
+# $Id: pm3d.dem,v 1.17 2005/09/05 19:36:59 mikulik Exp $
 #
 # demo for pm3d splotting
 #
 # This demo can be directly used if your default terminal supports pm3d, 
 # like OS/2 Presentation Manager, X11, Linux VGA, Windows.
 # Otherwise you can use the output to postscript, for example:
-#	set term push; set term post color enha;
+#	set term push; set term postscript color enhanced
 #	set out 'pm3d_demo.ps'
 #	load 'pm3d.dem'
 #	set out; set term pop
@@ -316,13 +316,13 @@ unset pm3d
 set surface
 set format z
 set palette
-set title "color lines: 'splot sin(y)/(y) with linespoints palette'"
+set title "color lines: 'splot sin(y)/(y) with lines palette'"
 set ticslevel 0
 set border 4095
 set xrange [-10:10]; set yrange [-10:10]
 set hidden3d
 set isosamples 40,40; set samples 40,40
-splot sin(y)/(y) w lp palette
+splot sin(y)/(y) w lines palette
 pause -1 "Hit return to continue"
 
 reset
