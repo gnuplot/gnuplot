@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.117 2005/10/14 21:19:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.118 2005/11/27 05:55:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1550,8 +1550,7 @@ eval_plots()
 			this_plot->arrow_properties.lp_properties.l_type = line_num;
 		    }
 
-		    arrow_parse(&(this_plot->arrow_properties),
-				this_plot->arrow_properties.lp_properties.l_type, TRUE);
+		    arrow_parse(&(this_plot->arrow_properties), TRUE);
 		    if (stored_token != c_token) {
 			if (set_lpstyle) {
 			    duplication=TRUE;
@@ -1622,8 +1621,10 @@ eval_plots()
 	    /* Vectors will be drawn using linetype from arrow style, so we
 	     * copy this to overall plot linetype so that the key sample matches */
 	    if (this_plot->plot_style == VECTOR) {
-		if (!set_lpstyle)
-		    arrow_parse(&this_plot->arrow_properties, line_num, TRUE);
+		if (!set_lpstyle) {
+		    this_plot->arrow_properties.lp_properties.l_type = line_num;
+		    arrow_parse(&this_plot->arrow_properties, TRUE);
+		}
 		this_plot->lp_properties = this_plot->arrow_properties.lp_properties;
 		set_lpstyle = TRUE;
 	    }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.115 2005/11/02 06:39:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.116 2005/11/27 05:55:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1392,8 +1392,7 @@ eval_3dplots()
 			this_plot->arrow_properties.lp_properties.l_type = line_num;
 			checked_once = TRUE;
 		    }
-		    arrow_parse(&this_plot->arrow_properties,
-				this_plot->arrow_properties.lp_properties.l_type, TRUE);
+		    arrow_parse(&this_plot->arrow_properties, TRUE);
 		    if (stored_token != c_token) {
 			 if (set_lpstyle) {
 			    duplication = TRUE;
@@ -1467,7 +1466,8 @@ eval_3dplots()
 	     * to define them. */
 	    if (! set_lpstyle) {
 		if (this_plot->plot_style == VECTOR) {
-		    arrow_parse(&this_plot->arrow_properties, line_num, TRUE);
+		    this_plot->arrow_properties.lp_properties.l_type = line_num;
+		    arrow_parse(&this_plot->arrow_properties, TRUE);
 		    this_plot->lp_properties = this_plot->arrow_properties.lp_properties;
 		} else {
 		    this_plot->lp_properties.l_type = line_num;

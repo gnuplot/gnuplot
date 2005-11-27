@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.210 2005/11/25 19:13:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.211 2005/11/26 03:37:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -166,7 +166,9 @@ static void set_palette_function __PROTO((void));
 static void parse_histogramstyle __PROTO((histogram_style *hs, 
 		t_histogram_type def_type, int def_gap));
 #endif
-  
+
+static struct position default_position
+	= {first_axes, first_axes, first_axes, 0., 0., 0.};
 
 /* Backwards compatibility ... */
 static void set_nolinestyle __PROTO((void));
@@ -652,26 +654,56 @@ set_angles()
 static void
 set_arrow()
 {
-    struct value a;
     struct arrow_def *this_arrow = NULL;
     struct arrow_def *new_arrow = NULL;
     struct arrow_def *prev_arrow = NULL;
-    struct position spos, epos;
-    struct arrow_style_type loc_arrow;
-    TBOOLEAN relative = FALSE;
-    int tag = -999;
-    TBOOLEAN set_tag = FALSE, set_start = FALSE, set_end = FALSE;
-    TBOOLEAN set_arrowstyle = FALSE;
     TBOOLEAN duplication = FALSE;
-    /* remember current token number to see because it can be a tag: */
-    int maybe_tag_coken = ++c_token;
+    TBOOLEAN set_start = FALSE;
+    TBOOLEAN set_end = FALSE;
+    struct value a;
+    int save_token;
+    int tag;
+    
+    c_token++;
 
-    /* default values */
-    spos.x = spos.y = spos.z = 0;
-    spos.scalex = spos.scaley = spos.scalez = first_axes;
-    epos.x = epos.y = epos.z = 0;
-    epos.scalex = epos.scaley = epos.scalez = first_axes;
-    default_arrow_style(&loc_arrow);
+    /* get tag */
+    if (almost_equals(c_token, "back$head") || equals(c_token, "front")
+	    || equals(c_token, "from") || equals(c_token, "size")
+	    || equals(c_token, "to") || equals(c_token, "rto")
+	    || equals(c_token, "filled") || equals(c_token, "empty")
+	    || equals(c_token, "as") || equals(c_token, "arrowstyle")
+	    || almost_equals(c_token, "head$s") || equals(c_token, "nohead")) {
+	tag = assign_arrow_tag();
+
+    } else
+	tag = (int) real(const_express(&a));
+
+    if (tag <= 0)
+	int_error(c_token, "tag must be > 0");
+
+    /* OK! add arrow */
+    if (first_arrow != NULL) {	/* skip to last arrow */
+	for (this_arrow = first_arrow; this_arrow != NULL;
+	     prev_arrow = this_arrow, this_arrow = this_arrow->next)
+	    /* is this the arrow we want? */
+	    if (tag <= this_arrow->tag)
+		break;
+    }
+    if (this_arrow == NULL || tag != this_arrow->tag) {
+	new_arrow = gp_alloc(sizeof(struct arrow_def), "arrow");
+	if (prev_arrow == NULL)
+	    first_arrow = new_arrow;
+	else
+	    prev_arrow->next = new_arrow;
+	new_arrow->tag = tag;
+	new_arrow->next = this_arrow;
+	this_arrow = new_arrow;
+
+	this_arrow->start = default_position;
+	this_arrow->end = default_position;
+
+	default_arrow_style(&(new_arrow->arrow_properties));
+    }
 
     while (!END_OF_COMMAND) {
 
@@ -682,7 +714,7 @@ set_arrow()
 	    if (END_OF_COMMAND)
 		int_error(c_token, "start coordinates expected");
 	    /* get coordinates */
-	    get_position(&spos);
+	    get_position(&this_arrow->start);
 	    set_start = TRUE;
 	    continue;
 	}
@@ -690,40 +722,21 @@ set_arrow()
 	/* get end or relative end position */
 	if (equals(c_token, "to") || equals(c_token,"rto")) {
 	    if (set_end) { duplication = TRUE; break; }
-	    relative = (equals(c_token,"rto")) ? TRUE : FALSE;
+	    this_arrow->relative = (equals(c_token,"rto")) ? TRUE : FALSE;
 	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token, "end coordinates expected");
 	    /* get coordinates */
-	    get_position(&epos);
+	    get_position(&this_arrow->end);
 	    set_end = TRUE;
 	    continue;
 	}
 
-
-	/* pick up a arrow spec - allow as. */
-	{
-	    int stored_token = c_token;
-	    /* struct arrow_style_type loc_arrow; */
-
-	    arrow_parse(&loc_arrow, 0, TRUE);
-	    if (stored_token != c_token) {
-		if (set_arrowstyle) { duplication = TRUE; break; }
-		set_arrowstyle = TRUE;
-		/* arrow->arrow_properties = loc_arrow; */
-		continue;
-	    }
-	}
-
-	/* no option given, thus it could be the tag */
-	if (maybe_tag_coken == c_token) {
-	    /* must be a tag expression! */
-	    tag = (int) real(const_express(&a));
-	    if (tag <= 0)
-		int_error(--c_token, "tag must be > zero");
-	    set_tag = TRUE;
+	/* Allow interspersed style commands */
+	save_token = c_token;
+	arrow_parse(&this_arrow->arrow_properties, TRUE);
+	if (save_token != c_token)
 	    continue;
-	}
 
 	if (!END_OF_COMMAND)
 	    int_error(c_token, "wrong argument in set arrow");
@@ -731,45 +744,8 @@ set_arrow()
     } /* while (!END_OF_COMMAND) */
 
     if (duplication)
-	int_error(c_token, "duplicated or contradicting arguments in set arrow");
+	int_error(c_token, "duplicate or contradictory arguments");
 
-    /* no tag given, the default is the next tag */
-    if (!set_tag)
-	tag = assign_arrow_tag();
-
-    /* OK! add arrow */
-    if (first_arrow != NULL) {	/* skip to last arrow */
-	for (this_arrow = first_arrow; this_arrow != NULL;
-	     prev_arrow = this_arrow, this_arrow = this_arrow->next)
-	    /* is this the arrow we want? */
-	    if (tag <= this_arrow->tag)
-		break;
-    }
-    if (this_arrow != NULL && tag == this_arrow->tag) {
-	/* changing the arrow */
-	if (set_start) {
-	    this_arrow->start = spos;
-	}
-	if (set_end) {
-	    this_arrow->end = epos;
-	    this_arrow->relative = relative;
-	}
-	if (set_arrowstyle)
-	    this_arrow->arrow_properties = loc_arrow;
-    } else {	/* adding the arrow */
-	new_arrow = (struct arrow_def *)
-	    gp_alloc(sizeof(struct arrow_def), "arrow");
-	if (prev_arrow != NULL)
-	    prev_arrow->next = new_arrow;	/* add it to end of list */
-	else
-	    first_arrow = new_arrow;	/* make it start of list */
-	new_arrow->tag = tag;
-	new_arrow->next = this_arrow;
-	new_arrow->start = spos;
-	new_arrow->end = epos;
-	new_arrow->relative = relative;
-	new_arrow->arrow_properties = loc_arrow;
-    }
 }
 
 
@@ -4333,10 +4309,8 @@ set_arrowstyle()
 	this_arrowstyle->arrow_properties = loc_arrow;
 	c_token++;
     } else
-	/* pick up a arrow spec : dont allow ls, do allow point type
-	 * default to same arrow type = point type = tag
-	 */
-	arrow_parse(&this_arrowstyle->arrow_properties, 0, FALSE);
+	/* pick up a arrow spec : dont allow arrowstyle */
+	arrow_parse(&this_arrowstyle->arrow_properties, FALSE);
 
     if (!END_OF_COMMAND)
 	int_error(c_token, "extraneous or out-of-order arguments in set arrowstyle");
@@ -4666,12 +4640,7 @@ new_text_label(int tag)
     new = gp_alloc( sizeof(struct text_label), "text_label");
     new->next = NULL;
     new->tag = tag;
-    new->place.scalex = first_axes;
-    new->place.scaley = first_axes;
-    new->place.scalez = first_axes;
-    new->place.x = 0;
-    new->place.y = 0;
-    new->place.z = 0;
+    new->place = default_position;
     new->pos = LEFT;
     new->rotate = 0;
     new->layer = 0;
@@ -4849,10 +4818,8 @@ parse_label_options( struct text_label *this_label )
     /* HBB 20011120: this chunk moved here, behind the while()
      * loop. Only after all options have been parsed it's safe to
      * overwrite the position if none has been specified. */
-    if (!set_position) {
-	pos.x = pos.y = pos.z = 0;
-	pos.scalex = pos.scaley = pos.scalez = first_axes;
-    }
+    if (!set_position)
+	pos = default_position;
 
     /* OK! copy the requested options into the label */
 	if (set_position)

@@ -1,3 +1,13 @@
+2005-11-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/src.c (set_arrow): Rewrite set_arrow() to behave the same as
+	set_label() and other "set <foo>" routines; attribute changes for any
+	one arrow are now incremental.
+
+	* src/misc.c (arrow_parse) src/plot2d.c src/plot3d.c src/set.c:
+	Remove 2nd parameter of arrow_parse, since it is no longer used by
+	any callers.
+
 2005-11-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/pm3d.dem: Change one splot from "with lp palette" to

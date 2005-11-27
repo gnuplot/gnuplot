@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.72 2005/10/01 23:38:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.73 2005/10/10 02:44:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1066,7 +1066,6 @@ arrow_use_properties(struct arrow_style_type *arrow, int tag)
 void
 arrow_parse(
     struct arrow_style_type *arrow,
-    int default_linetype,
     TBOOLEAN allow_as)
 {
     struct value t;
@@ -1079,9 +1078,6 @@ arrow_parse(
 	/* avoid duplicating options */
 	int set_layer=0, set_line=0, set_head=0;
 	int set_headsize=0, set_headfilled=0;
-	/* set default values */
-	if (default_linetype)
-	    arrow->lp_properties.l_type = default_linetype;
 
 	while (!END_OF_COMMAND) {
 	    if (equals(c_token, "nohead")) {
