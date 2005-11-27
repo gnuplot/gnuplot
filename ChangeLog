@@ -22,6 +22,9 @@
 	Remove 2nd parameter of arrow_parse, since it is no longer used by
 	any callers.
 
+	* src/axis.c (axis_checked_extend_empty_range) src/plot3d.c:
+	Suppress warning message "empty z range" when mode is "set view map".
+
 2005-11-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/pm3d.dem: Change one splot from "with lp palette" to

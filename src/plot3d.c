@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.116 2005/11/27 05:55:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.117 2005/11/27 18:31:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1793,7 +1793,10 @@ eval_3dplots()
 
     axis_checked_extend_empty_range(FIRST_X_AXIS, "All points x value undefined");
     axis_checked_extend_empty_range(FIRST_Y_AXIS, "All points y value undefined");
-    axis_checked_extend_empty_range(FIRST_Z_AXIS, "All points z value undefined");
+    if (splot_map)
+	axis_checked_extend_empty_range(FIRST_Z_AXIS, NULL); /* Suppress warning message */
+    else
+	axis_checked_extend_empty_range(FIRST_Z_AXIS, "All points z value undefined");
 
     axis_revert_and_unlog_range(FIRST_X_AXIS);
     axis_revert_and_unlog_range(FIRST_Y_AXIS);

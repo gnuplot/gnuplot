@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.57 2005/11/12 06:58:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.58 2005/11/12 22:43:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -315,7 +315,8 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
 	    double widen = (dmax == 0.0) ?
 		FIXUP_RANGE__WIDEN_ZERO_ABS
 		: FIXUP_RANGE__WIDEN_NONZERO_REL * dmax;
-	    fprintf(stderr, "Warning: empty %s range [%g:%g], ",
+	    if (!(axis == FIRST_Z_AXIS && !mesg)) /* set view map */
+		fprintf(stderr, "Warning: empty %s range [%g:%g], ",
 		    axis_defaults[axis].name, dmin, dmax);
 	    /* HBB 20010525: correctly handle single-ended
 	     * autoscaling, too: */
@@ -323,7 +324,8 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
 		axis_array[axis].min -= widen;
 	    if (axis_array[axis].autoscale & AUTOSCALE_MAX)
 		axis_array[axis].max += widen;
-	    fprintf(stderr, "adjusting to [%g:%g]\n",
+	    if (!(axis == FIRST_Z_AXIS && !mesg)) /* set view map */
+		fprintf(stderr, "adjusting to [%g:%g]\n",
 		    axis_array[axis].min, axis_array[axis].max);
 	} else {
 	    /* user has explicitly set the range (to something empty)
