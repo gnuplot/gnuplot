@@ -1,3 +1,17 @@
+2005-11-27  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/parse.c (const_string_express parse_additive_expression)
+	src/parse.h src/eval.c (pop_or_convert_from_string) src/eval.h 
+	src/util.c (try_to_get_string) src/internal.c (f_minus)
+	src/set.c (set_label set_xyzlabel load_tic_user):
+
+	Clean up parsing and evaluation of try_to_get_string() by moving the
+	test against STRING_RESULT_ONLY into the actual parsing code. Now if
+	a + or - operator is encountered while parsing something that is 
+	supposed to be a string, no further tokens are processed. Before, this
+	triggered an arithmetic operation on the string that had to be thrown
+	out afterwards.
+
 2005-11-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/src.c (set_arrow): Rewrite set_arrow() to behave the same as

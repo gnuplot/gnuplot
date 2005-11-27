@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.41 2005/07/20 09:20:25 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.42 2005/07/23 04:19:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -41,6 +41,10 @@ static char *RCSid() { return RCSid("$Id: parse.c,v 1.41 2005/07/20 09:20:25 mik
 #include "eval.h"
 #include "help.h"
 #include "util.h"
+
+/* protection mechanism for parsing string followed by + or - sign */
+static int parse_recursion_level;
+static TBOOLEAN string_result_only = FALSE;
 
 /* Exported globals: the current 'dummy' variable names */
 char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
@@ -89,6 +93,20 @@ convert(struct value *val_ptr, int t_num)
     *val_ptr = token[t_num].l_val;
 }
 
+
+/* JW 20051126:
+ * Wrapper around const_express() called by try_to_get_string().
+ * Disallows top level + and - operators.
+ * This enables things like set xtics ('-\pi' -pi, '-\pi/2' -pi/2.)
+ */
+struct value *
+const_string_express(struct value *valptr)
+{
+    string_result_only = TRUE;
+    const_express(valptr);
+    string_result_only = FALSE;
+    return (valptr);
+}
 
 struct value *
 const_express(struct value *valptr)
@@ -187,6 +205,7 @@ temp_at()
     memset(at, 0, sizeof(*at));		/* reset action table !!! */
     at_size = MAX_AT_LEN;
 
+    parse_recursion_level = 0;
     parse_expression();
     return (at);
 }
@@ -230,11 +249,15 @@ add_action(enum operators sf_index)
 }
 
 
+/* For external calls to parse_expressions() 
+ * parse_recursion_level is expected to be 0 */
 static void
 parse_expression()
 {				/* full expressions */
+    parse_recursion_level++;
     accept_logical_OR_expression();
     parse_conditional_expression();
+    parse_recursion_level--;
 }
 
 static void
@@ -520,6 +543,13 @@ parse_conditional_expression()
     if (equals(c_token, "?")) {
 	int savepc1, savepc2;
 
+	/* Fake same recursion level for alternatives
+	 *   set xlabel a>b ? 'foo' : 'bar' -1, 1
+	 * FIXME: This won't work:
+	 *   set xlabel a-b>c ? 'foo' : 'bar'  offset -1, 1
+	 */
+	parse_recursion_level--;
+
 	c_token++;
 	savepc1 = at->a_count;
 	add_action(JTERN);
@@ -533,6 +563,7 @@ parse_conditional_expression()
 	at->actions[savepc1].arg.j_arg = at->a_count - savepc1;
 	parse_expression();
 	at->actions[savepc2].arg.j_arg = at->a_count - savepc2;
+	parse_recursion_level++;
     }
 }
 
@@ -679,9 +710,19 @@ parse_relational_expression()
 static void
 parse_additive_expression()
 {
-    /* create action codes for + and - operators */
-
+    /* create action codes for +, - and . operators */
     while (TRUE) {
+#ifdef GP_STRING_VARS
+	if (equals(c_token, ".")) {
+	    c_token++;
+	    accept_multiplicative_expression();
+	    (void) add_action(CONCATENATE);
+	/* If only string results are wanted
+	 * do not accept '-' or '+' at the top level. */
+	} else if (string_result_only && parse_recursion_level == 1)
+	    break;
+	else
+#endif
 	if (equals(c_token, "+")) {
 	    c_token++;
 	    accept_multiplicative_expression();
@@ -690,12 +731,6 @@ parse_additive_expression()
 	    c_token++;
 	    accept_multiplicative_expression();
 	    (void) add_action(MINUS);
-#ifdef GP_STRING_VARS
-	} else if (equals(c_token, ".")) {
-	    c_token++;
-	    accept_multiplicative_expression();
-	    (void) add_action(CONCATENATE);
-#endif
 	} else
 	    break;
     }

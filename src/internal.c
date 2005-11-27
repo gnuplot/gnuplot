@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.36 2005/07/11 01:58:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.37 2005/07/14 23:10:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -681,17 +681,7 @@ f_minus(union argument *arg)
 	    BAD_DEFAULT
 	}
 	break;
-
-#if (GP_STRING_VARS > 1)
-    case STRING:
-    /* We can only get here if the STRING_RESULT_ONLY flag was set. */
-    /* This is triggered by the old syntax "set xlabel 'foo' -1,1"  */
-	FPRINTF((stderr,"Ignore <string> - <number>\n"));
-	result = a;
-	break;
-#endif
-
-    BAD_DEFAULT
+	BAD_DEFAULT
     }
     push(&result);
 }

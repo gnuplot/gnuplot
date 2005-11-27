@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.60 2005/10/22 05:50:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.61 2005/11/23 23:33:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -354,7 +354,7 @@ try_to_get_string()
     int save_token = c_token;
     if (END_OF_COMMAND)
 	return NULL;
-    const_express(&a);
+    const_string_express(&a);
     if (a.type == STRING)
 	newstring = a.v.string_val;
     else

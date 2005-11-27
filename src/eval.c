@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.37 2005/07/16 21:01:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.38 2005/08/12 17:42:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -63,11 +63,6 @@ struct udvt_entry udv_pi = { NULL, "pi", FALSE, {INTGR, {0} } };
 /* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
-
-#ifdef GP_STRING_VARS
-/* Used to prevent auto-conversion of strings to numbers */
-TBOOLEAN STRING_RESULT_ONLY = FALSE;
-#endif
 
 TBOOLEAN undefined;
 
@@ -467,7 +462,7 @@ struct value *
 pop_or_convert_from_string(struct value *v)
 {
     (void) pop(v);
-    if (v->type == STRING && !STRING_RESULT_ONLY) {
+    if (v->type == STRING) {
 	double d = atof(v->v.string_val);
 	gpfree_string(v);
 	Gcomplex(v, d, 0.);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.211 2005/11/26 03:37:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.212 2005/11/27 18:31:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1866,18 +1866,11 @@ set_label()
 
 #ifdef GP_STRING_VARS
     if (!END_OF_COMMAND) {
-	struct value a;
-	int save_token = c_token;
+	char* text;
 	parse_label_options( this_label );
-	if (!END_OF_COMMAND) {
-	    STRING_RESULT_ONLY = TRUE;
-	    (void) const_express(&a);
-	    STRING_RESULT_ONLY = FALSE;
-	    if (a.type == STRING)
-		this_label->text = a.v.string_val;
-	    else
-		c_token = save_token;
-	}
+	text = try_to_get_string();
+	if (text)
+	    this_label->text = text;
 #else
     /* get text from string */
     if (!END_OF_COMMAND && isstring(c_token)) {
@@ -4125,25 +4118,19 @@ set_xyzlabel(text_label *label)
 
     parse_label_options(label);
 
-	if (!END_OF_COMMAND) {
-	    /* Protect against attempted string arithmetic triggered by */
-	    /* old syntax  "set xlabel 'foo' -1,1" */
-	    STRING_RESULT_ONLY = TRUE;
-	    text = try_to_get_string();
-	    STRING_RESULT_ONLY = FALSE;
-	    if (text) {
-		free(label->text);
-		label->text = text;
- 	    }
-	    if (equals(c_token,","))
-		c_token -= 2;
-#ifdef BACKWARDS_COMPATIBLE
-	    if (isanumber(c_token) || equals(c_token, "-")) {
-		/* Parse offset with missing keyword "set xlabel 'foo' 1,2 "*/
-		get_position_default(&(label->offset),character);
-	    }
-#endif
+    if (!END_OF_COMMAND) {
+	text = try_to_get_string();
+	if (text) {
+	    free(label->text);
+	    label->text = text;
 	}
+#ifdef BACKWARDS_COMPATIBLE
+	if (isanumber(c_token) || equals(c_token, "-")) {
+	    /* Parse offset with missing keyword "set xlabel 'foo' 1,2 "*/
+	    get_position_default(&(label->offset),character);
+	}
+#endif
+    }
 
     parse_label_options(label);
 
@@ -4358,7 +4345,6 @@ load_tic_user(AXIS_INDEX axis)
 {
     char *ticlabel;
     double ticposition;
-    int save_token;
 
     /* Free any old tic labels */
     if (!axis_array[axis].ticdef.def.mix) {
@@ -4368,6 +4354,7 @@ load_tic_user(AXIS_INDEX axis)
 
     while (!END_OF_COMMAND) {
 	int ticlevel=0;
+	int save_token;
 	/* syntax is  (  {'format'} value {level} {, ...} )
 	 * but for timedata, the value itself is a string, which
 	 * complicates things somewhat
@@ -4375,18 +4362,12 @@ load_tic_user(AXIS_INDEX axis)
 
 	/* has a string with it? */
 	save_token = c_token;
-	STRING_RESULT_ONLY = TRUE;
-	if ((ticlabel = try_to_get_string())) {
-	    if (equals(c_token,",") || equals(c_token,")")) {
-		if (axis_array[axis].is_timedata) {
-		    c_token = save_token;
-		    ticlabel = NULL;
-		} else
-		    c_token -= 2;
-	    }
-	} else
+	ticlabel = try_to_get_string();
+	if (ticlabel && axis_array[axis].is_timedata
+	    && (equals(c_token,",") || equals(c_token,")"))) {
 	    c_token = save_token;
-	STRING_RESULT_ONLY = FALSE;
+	    ticlabel = NULL;
+	}
 
 	/* in any case get the value */
 	GET_NUM_OR_TIME(ticposition, axis);
