@@ -1,3 +1,8 @@
+2005-11-28  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/datafile.c (df_set_datafile_binary): Give an error message for
+	'set datafile binary' (without any option).
+
 2005-11-27  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/parse.c (const_string_express parse_additive_expression)
