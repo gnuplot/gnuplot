@@ -1,3 +1,8 @@
+2005-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c (apply_zoom): Fix for "set view map; plot x" and y-axis
+	reversal when mouse zooming.
+
 2005-11-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/datafile.c (df_set_datafile_binary): Give an error message for

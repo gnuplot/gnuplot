@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.76 2005/10/02 22:15:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.77 2005/10/16 06:12:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -600,13 +600,14 @@ apply_zoom(struct t_zoom *z)
     char s[1024];		/* HBB 20011005: made larger */
     /* HBB 20011004: new variable, fixing 'unzoom' back to autoscaled range */
     static t_autoscale autoscale_copies[AXIS_ARRAY_SIZE];
+    int is_splot_map = (is_3d_plot && (splot_map == TRUE));
 
     if (zoom_now != NULL) {	/* remember the current zoom */
 	zoom_now->xmin = axis_array[FIRST_X_AXIS].set_min;
 	zoom_now->x2min = axis_array[SECOND_X_AXIS].set_min;
 	zoom_now->xmax = axis_array[FIRST_X_AXIS].set_max;
 	zoom_now->x2max = axis_array[SECOND_X_AXIS].set_max;
-	if (!splot_map) {
+	if (!is_splot_map) {
 	    zoom_now->ymin = axis_array[FIRST_Y_AXIS].set_min;
 	    zoom_now->y2min = axis_array[SECOND_Y_AXIS].set_min;
 	    zoom_now->ymax = axis_array[FIRST_Y_AXIS].set_max;
@@ -642,16 +643,16 @@ apply_zoom(struct t_zoom *z)
 	setlocale(LC_NUMERIC,"C");
 	sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
 	       zoom_now->xmin, zoom_now->xmax, 
-	       (splot_map) ? zoom_now->ymax : zoom_now->ymin,
-	       (splot_map) ? zoom_now->ymin : zoom_now->ymax);
+	       (is_splot_map) ? zoom_now->ymax : zoom_now->ymin,
+	       (is_splot_map) ? zoom_now->ymin : zoom_now->ymax);
 	setlocale(LC_NUMERIC,save_locale);
 	free(save_locale);
     } else
 #endif
 	sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
 	       zoom_now->xmin, zoom_now->xmax, 
-	       (splot_map) ? zoom_now->ymax : zoom_now->ymin,
-	       (splot_map) ? zoom_now->ymin : zoom_now->ymax);
+	       (is_splot_map) ? zoom_now->ymax : zoom_now->ymin,
+	       (is_splot_map) ? zoom_now->ymin : zoom_now->ymax);
 
     /* HBB 20011004: the final part of 'unzoom to autoscale mode'.
      * Optionally appends 'set autoscale' commands to the string to be
@@ -692,16 +693,16 @@ apply_zoom(struct t_zoom *z)
 	    setlocale(LC_NUMERIC,"C");
 	    sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
 		zoom_now->x2min, zoom_now->x2max,
-		(splot_map) ? zoom_now->y2max : zoom_now->y2min,
-		(splot_map) ? zoom_now->y2min : zoom_now->y2max);
+		(is_splot_map) ? zoom_now->y2max : zoom_now->y2min,
+		(is_splot_map) ? zoom_now->y2min : zoom_now->y2max);
 	    setlocale(LC_NUMERIC,save_locale);
 	    free(save_locale);
 	} else
 #endif
 	    sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
 		zoom_now->x2min, zoom_now->x2max,
-		(splot_map) ? zoom_now->y2max : zoom_now->y2min,
-		(splot_map) ? zoom_now->y2min : zoom_now->y2max);
+		(is_splot_map) ? zoom_now->y2max : zoom_now->y2min,
+		(is_splot_map) ? zoom_now->y2min : zoom_now->y2max);
 	if (zoom_now == zoom_head) {
 	    /* new current zoom is the head --> returning to unzoomed
 	     * settings --> restore autoscale */
