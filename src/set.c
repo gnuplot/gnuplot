@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.212 2005/11/27 18:31:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.213 2005/11/27 19:30:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3236,6 +3236,10 @@ set_size()
 		ysize = xsize;
 	    }
 	}
+    }
+    if (xsize <= 0 || ysize <=0) {
+	xsize = ysize = 1.0;
+	int_error(NO_CARET,"Illegal value for size");
     }
 }
 

@@ -1,3 +1,7 @@
+2005-12-01  Michael Williamson  <mwilliamson@users.sourceforge.net>
+
+	* src/set.c (set_size): Do not allow size values <= 0.
+
 2005-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c (apply_zoom): Fix for "set view map; plot x" and y-axis
@@ -24,7 +28,7 @@
 
 2005-11-27  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/src.c (set_arrow): Rewrite set_arrow() to behave the same as
+	* src/set.c (set_arrow): Rewrite set_arrow() to behave the same as
 	set_label() and other "set <foo>" routines; attribute changes for any
 	one arrow are now incremental.
 
