@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.150 2005/10/09 09:32:05 mikulik Exp $
+ * $Id: x11.trm,v 1.151 2005/10/19 14:05:56 mikulik Exp $
  *
  */
 
@@ -511,8 +511,6 @@ X11_options()
 	    free(s);
 	} else
 	    copy_str(term_options+strlen(term_options), c_title_token, MAX_LINE_LEN-strlen(term_options));
-#define X11_COMMAND_BUFFER_LENGTH 1024
-/* #include "gplt_x11.h" X11_COMMAND_BUFFER_LENGTH defined in here in future */
 	if (X11_ipc) {
 	    /* Send up to maximum buffer length minus three characters of
 	     * title string to account for required 'n', '\0', '\n'.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.149 2005/10/15 23:49:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.150 2005/11/23 23:19:43 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -150,17 +150,6 @@ Error. Incompatible options.
 #ifdef HAVE_SYS_BSDTYPES_H
 # include <sys/bsdtypes.h>
 #endif
-
-#if defined(HAVE_SYS_SELECT_H) && !defined(VMS)
-# include <sys/select.h>
-#endif
-
-#ifndef FD_SET
-# define FD_SET(n, p)    ((p)->fds_bits[0] |= (1 << ((n) % 32)))
-# define FD_CLR(n, p)    ((p)->fds_bits[0] &= ~(1 << ((n) % 32)))
-# define FD_ISSET(n, p)  ((p)->fds_bits[0] & (1 << ((n) % 32)))
-# define FD_ZERO(p)      memset((char *)(p), '\0', sizeof(*(p)))
-#endif /* not FD_SET */
 
 #if defined(HAVE_SYS_SYSTEMINFO_H) && defined(HAVE_SYSINFO)
 # include <sys/systeminfo.h>

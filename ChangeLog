@@ -1,3 +1,11 @@
+2005-12-02  Ethan Merritt  <merritt@u.washington.edu>
+	* src/gplt_x11.c src/gplt_x11.h: Move #include <sys/select.h> from
+	gplt_x11.c to gplt_x11.h so that x11.trm can see it also.
+	Bugfix #1365076.
+
+	* term/x11.trm: Remove duplicate #define for constants present in
+	gplt_x11.h.
+
 2005-12-01  Michael Williamson  <mwilliamson@users.sourceforge.net>
 
 	* src/set.c (set_size): Do not allow size values <= 0.
