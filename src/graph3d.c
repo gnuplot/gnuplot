@@ -997,7 +997,8 @@ do_3dplot(
 		break;
 
 	    case VECTOR:
-		plot3d_vectors(this_plot);
+	        if (!(hidden3d && draw_surface))
+		    plot3d_vectors(this_plot);
 		if (lkey) {
 		    if (this_plot->lp_properties.use_palette)
 			key_sample_line_pm3d(this_plot, xl, yl);

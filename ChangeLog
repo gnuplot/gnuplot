@@ -16,6 +16,12 @@
 	* demo/pointsize.dem demo/rgb_variable.dem: Update demos to show off
 	use of 'set hidden3d' for 3D point plots.
 
+	* src/graph3d.c src/hidden3d.c: Handle 'splot with vectors' in
+	hidden3d mode.
+
+	* demo/molecule.dem demo/GM1_bonds.r3d demo/GM1_sugar.pdb: New
+	demo that shows off vector+point plots in hidded3d mode.
+
 2005-12-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c src/gplt_x11.h: Move #include <sys/select.h> from

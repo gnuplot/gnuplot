@@ -216,7 +216,8 @@ typedef polygon GPHUGE *p_polygon;
 typedef enum edge_direction {
     edir_west, edir_north,
     edir_NW, edir_NE,
-    edir_impulse, edir_point
+    edir_impulse, edir_point,
+    edir_vector
 } edge_direction;
 
 /* direction into which the polygon is facing (the corner with the
@@ -554,6 +555,10 @@ store_edge(
     unsigned int drawbits = (0x1 << direction);
 
     switch (direction) {
+    case edir_vector:
+	v2 = v1 + 1;
+	drawbits = 0;
+	break;
     case edir_west:
 	v2 = v1 - 1;
 	break;
@@ -942,10 +947,11 @@ build_networks(struct surface_points *plots, int pcount)
 	    ncrvs = this_plot->num_iso_read;
 	    if (this_plot->has_grid_topology)
 		nverts += ncrvs * crvlen;
+	    else if (this_plot->plot_style == VECTOR)
+		nverts += this_plot->iso_crvs->p_count;
 	    else {
 		/* have to check each isoline separately: */
-		for(icrvs = this_plot->iso_crvs;
-		    icrvs; icrvs = icrvs->next)
+		for (icrvs = this_plot->iso_crvs; icrvs; icrvs = icrvs->next)
 		    nverts += icrvs->p_count;
 	    }
 	} else {
@@ -972,6 +978,7 @@ build_networks(struct surface_points *plots, int pcount)
 	case BOXES:
 	case FILLEDCURVES:
 	case IMPULSES:
+	case VECTOR:
 	    nv += 2 * nverts;
 	    ne += nverts;
 	    break;
@@ -1063,6 +1070,10 @@ build_networks(struct surface_points *plots, int pcount)
 		    thisvertex = store_vertex(points+i, lp_style,
 					      color_from_column);
 
+		    if (this_plot->plot_style == VECTOR) {
+			store_vertex(icrvs->next->points+i, 0, 0);
+		    }
+
 		    if (thisvertex < 0) {
 			previousvertex = thisvertex;
 			continue;
@@ -1076,6 +1087,9 @@ build_networks(struct surface_points *plots, int pcount)
 		    case LINES:
 			if (previousvertex >= 0)
 			    store_edge(thisvertex, edir_west, 0, lp, above);
+			break;
+		    case VECTOR:
+			store_edge(thisvertex, edir_vector, 0, lp, above);
 			break;
 		    case BOXES:
 		    case FILLEDCURVES:
