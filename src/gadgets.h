@@ -56,6 +56,7 @@
 #define LT_NODRAW     (-3)
 #define LT_BACKGROUND (-4)
 #define LT_UNDEFINED  (-5)
+#define LT_COLORFROMCOLUMN  (-6)	/* Used by hidden3d code */
 
 /* Default point size is taken from the global "pointsize" variable */
 #define PTSZ_DEFAULT    (-2)

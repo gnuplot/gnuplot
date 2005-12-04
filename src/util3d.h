@@ -1,5 +1,5 @@
 /*
- * $Id: util3d.h,v 1.11 2004/11/26 07:04:35 sfeam Exp $
+ * $Id: util3d.h,v 1.12 2005/08/07 09:43:32 mikulik Exp $
  */
 
 /* GNUPLOT - util3d.h */
@@ -44,15 +44,16 @@
 
 #include "graph3d.h"
 
-/* All the necessary information about one vertex. FIXME: Might need
- * an lp_style_type pointer element? */
-/* HBB 20000617: moved this definition here, from hidden3d.c */
+/* All the necessary information about one vertex. */
 typedef struct vertex {
     coordval x, y, z;		/* vertex coordinates */
-    int style;			/* point symbol type (if any) */
+    lp_style_type *lp_style;	/* where to find point symbol type (if any) */
     coordval real_z;
 #ifdef EAM_DATASTRINGS
     struct text_label *label;
+#endif
+#ifdef HIDDEN3D_VAR_PTSIZE	/* Needed for variable pointsize, but takes space */
+    struct coordinate *original;
 #endif
 } vertex;
 typedef vertex GPHUGE * p_vertex;

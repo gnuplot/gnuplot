@@ -32,3 +32,8 @@ set xyplane at 0.0
 splot 'rgb_variable.dat' using 1:2:3:(5*rand(0)):(rgb($1,$2,$3)) with points pt 7 ps variable lc rgb variable \
       title "variable pointsize and rgb color computed from coords"
 pause -1 "Hit return to continue"
+
+set title "Demo of hidden3d with points only (no surface)"
+set hidden3d
+replot
+pause -1 "Hit return to continue"

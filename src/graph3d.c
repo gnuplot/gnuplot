@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.137 2005/10/16 21:34:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.138 2005/11/25 18:54:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -604,29 +604,6 @@ do_3dplot(
 	graph_error("y_min3d should not equal y_max3d!");
     if (Z_AXIS.min == Z_AXIS.max)
 	graph_error("z_min3d should not equal z_max3d!");
-
-#ifndef LITE
-    /* HBB 20000715: changed meaning of this test. Only warn if _none_
-     * of the plotted datasets has grid topology, as that would mean
-     * that there is nothing in the plot anything could be hidden
-     * behind... */
-    if (hidden3d) {
-	struct surface_points *plot;
-	int p = 0;
-	TBOOLEAN any_gridded_dataset = FALSE;
-
-	/* Verify data is hidden line removable - grid based. */
-	for (plot = plots; ++p <= pcount; plot = plot->next_sp) {
-	    if (!(plot->plot_type == DATA3D && !plot->has_grid_topology)) {
-		any_gridded_dataset = TRUE;
-	    }
-	}
-
-	if (!any_gridded_dataset) {
-	    fprintf(stderr, "Notice: No surface grid anything could be hidden behind\n");
-	}
-    }
-#endif /* not LITE */
 
     term_start_plot();
 

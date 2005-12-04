@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.49 2005/08/07 09:43:29 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.50 2005/11/18 18:39:38 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -265,7 +265,7 @@ static dynarray qtree;
 
 /* Prototypes for internal functions of this module. */
 static long int store_vertex __PROTO((struct coordinate GPHUGE *point,
-				      int pointtype, TBOOLEAN color_from_column));
+				      lp_style_type *lp_style, TBOOLEAN color_from_column));
 static long int make_edge __PROTO((long int vnum1, long int vnum2,
 				   struct lp_style_type *lp,
 				   int style, int next));
@@ -483,19 +483,29 @@ do {									\
 static long int
 store_vertex (
     struct coordinate GPHUGE * point,
-    int pointtype,
+    lp_style_type *lp_style,
     TBOOLEAN color_from_column)
 {
     p_vertex thisvert = nextfrom_dynarray(&vertices);
 
-    thisvert->style = pointtype;
+    thisvert->lp_style = lp_style;
     if ((int) point->type >= hiddenHandleUndefinedPoints) {
 	FLAG_VERTEX_AS_UNDEFINED(*thisvert);
 	return (-1);
     }
     map3d_xyz(point->x, point->y, point->z, thisvert);
-    if (color_from_column)
+    if (color_from_column) {
 	thisvert->real_z = point->CRD_COLOR;
+	thisvert->lp_style->pm3d_color.lt = LT_COLORFROMCOLUMN;
+    } else
+	thisvert->real_z = point->z;
+
+#ifdef HIDDEN3D_VAR_PTSIZE
+    /* Store pointer back to original point */
+    /* Needed to support variable pointsize */
+    thisvert->original = point;
+#endif
+	
     return (thisvert - vlist);
 }
 
@@ -998,7 +1008,7 @@ build_networks(struct surface_points *plots, int pcount)
 	 surface < pcount;
 	 this_plot = this_plot->next_sp, surface++) {
 	long int crvlen = this_plot->iso_crvs->p_count;
-	int pointtype = -1;
+	lp_style_type *lp_style = NULL;
 	TBOOLEAN color_from_column = this_plot->pm3d_color_from_column;
 
 	lp = &(this_plot->lp_properties);
@@ -1012,7 +1022,7 @@ build_networks(struct surface_points *plots, int pcount)
 	     * lp_properties were always filled with a usable value
 	     * (i.e.: -1 if nothing to draw) It may also be clearer to
 	     * move this down, into the other switch structure.  */
-	    pointtype = this_plot->lp_properties.p_type;
+	    lp_style = &(this_plot->lp_properties);
 	}
 
 	/* HBB 20000715: new initialization code block for non-grid
@@ -1037,10 +1047,10 @@ build_networks(struct surface_points *plots, int pcount)
 			labelpoint.x = label->place.x;
 			labelpoint.y = label->place.y;
 			labelpoint.z = label->place.z;
-			thisvertex = store_vertex(&labelpoint, 1, color_from_column);
-			if (thisvertex < 0) {
+			thisvertex = store_vertex(&labelpoint, 
+				&(this_plot->lp_properties), color_from_column);
+			if (thisvertex < 0)
 			    continue;
-	 		}
 			(vlist+thisvertex)->label = label;
 			store_edge(thisvertex, edir_point, crvlen, lp, above);
 		    }
@@ -1050,7 +1060,7 @@ build_networks(struct surface_points *plots, int pcount)
 		for (i = 0; i < icrvs->p_count; i++) {
 		    long int thisvertex, basevertex;
 
-		    thisvertex = store_vertex(points+i, pointtype,
+		    thisvertex = store_vertex(points+i, lp_style,
 					      color_from_column);
 
 		    if (thisvertex < 0) {
@@ -1064,7 +1074,7 @@ build_networks(struct surface_points *plots, int pcount)
 		    case FSTEPS:
 		    case HISTEPS:
 		    case LINES:
-		    	if (previousvertex >= 0)
+			if (previousvertex >= 0)
 			    store_edge(thisvertex, edir_west, 0, lp, above);
 			break;
 		    case BOXES:
@@ -1075,7 +1085,7 @@ build_networks(struct surface_points *plots, int pcount)
 			    coordval remember_z = points[i].z;
 
 			    points[i].z = axis_array[FIRST_Z_AXIS].min;
-			    basevertex = store_vertex(points + i, pointtype,
+			    basevertex = store_vertex(points + i, lp_style,
 						      color_from_column);
 			    points[i].z = remember_z;
 			}
@@ -1117,7 +1127,7 @@ build_networks(struct surface_points *plots, int pcount)
 		long int e1, e2, e3;
 		long int pnum;
 
-		thisvertex = store_vertex(points+i, pointtype,
+		thisvertex = store_vertex(points+i, lp_style,
 					  color_from_column);
 
 		/* Preset the pointers to the polygons and edges
@@ -1258,7 +1268,7 @@ build_networks(struct surface_points *plots, int pcount)
 			coordval remember_z = points[i].z;
 
 			points[i].z = axis_array[FIRST_Z_AXIS].min;
-			basevertex = store_vertex(points + i, pointtype,
+			basevertex = store_vertex(points + i, lp_style,
 						  color_from_column);
 			points[i].z = remember_z;
 		    }
@@ -1430,17 +1440,39 @@ draw_vertex(p_vertex v)
     unsigned int x, y;
 
     TERMCOORD(v, x, y);
-    if (v->style >= 0 && !clip_point(x,y)) {
+    if (v->lp_style && v->lp_style->p_type >= 0
+    && !clip_point(x,y)) {
+
+	int colortype = v->lp_style->pm3d_color.type;
 
 #ifdef EAM_DATASTRINGS
 	if (v->label)  {
 	    write_label(x,y, v->label);
-	} else
+	    v->lp_style = NULL;
+	    return;
+	}
 #endif
-	    (term->point)(x,y, v->style);
+
+	/* EAM DEBUG - Check for extra point properties */
+	if (colortype == TC_LT)
+	    /* Should have been set already! */
+	    ;
+	else if (colortype == TC_RGB && v->lp_style->pm3d_color.lt == LT_COLORFROMCOLUMN)
+	    set_rgbcolor(v->real_z);
+	else if (colortype == TC_RGB)
+	    set_rgbcolor(v->lp_style->pm3d_color.lt);
+	else if (colortype == TC_Z)
+	    set_color( cb2gray(z2cb(v->real_z)) );
+
+#ifdef HIDDEN3D_VAR_PTSIZE
+	if (v->lp_style->p_size == PTSZ_VARIABLE)
+	    (term->pointsize)(pointsize * v->original->CRD_PTSIZE);
+#endif
+
+	(term->point)(x,y, v->lp_style->p_type);
 
 	/* vertex has been drawn --> flag it as done */
-	v->style = -1;
+	v->lp_style = NULL;
     }
 }
 
@@ -1499,7 +1531,7 @@ split_line_at_ratio(
 	+ vlist[vnum1].real_z;
 
     /* no point symbol for vertices generated by splitting an edge */
-    v->style = -1;
+    v->lp_style = NULL;
 
     /* additional checks to prevent adding unnecessary vertices */
     if (V_EQUAL(v, vlist + vnum1)) {
@@ -2315,16 +2347,16 @@ draw_line_hidden(
     vstore1 = vertices.end - 1;
     vlist[vstore1] = *v1;
     if (v2) {
-	vlist[vstore1].style = -1;
+	vlist[vstore1].lp_style = NULL;
 	nextfrom_dynarray(&vertices);
 	vstore2 = vertices.end - 1;
 	vlist[vstore2] = *v2;
-	vlist[vstore2].style = -1;
+	vlist[vstore2].lp_style = NULL;
     } else {
 	/* v2 == NULL --> this is a point symbol to be drawn. Make two
 	 * vertex pointers the same, and set up the 'style' field */
 	vstore2 = vstore1;
-	vlist[vstore2].style = lp->p_type;
+	vlist[vstore2].lp_style = lp;
     }
 
     /* store the edge into the hidden3d datastructures */
@@ -2358,11 +2390,11 @@ plot3d_hidden(struct surface_points *plots, int pcount)
 
     if (! polygons.end) {
 	/* No polygons anything could be hidden behind... */
-	/* FIXME: put out a warning message ??? */
-	int i;
 
-	for (i=0; i<edges.end; i++) {
-	    draw_edge(elist + i, vlist + elist[i].v1, vlist + elist[i].v2);
+	sort_edges_by_z();
+	while (efirst >= 0) {
+	    draw_edge(elist+efirst, vlist + elist[efirst].v1, vlist + elist[efirst].v2);
+	    efirst = elist[efirst].next;
 	}
     } else {
 	long int temporary_pfirst;

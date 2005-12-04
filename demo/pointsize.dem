@@ -40,17 +40,16 @@ splot cos(u)*cos(v),cos(u)*sin(v),sin(u) with lines lt 5,\
 pause -1 "Hit return to continue"
 
 #
-# This demo does not work yet, because the structures used to hold
-# hidden line information have no room to store the point size info.
-# same plot, but with hidden3d active
+# hidden3d still not working fully
+# pointsize is now handled, but axes are never obscured
 # 
-#set title "3D solid version through hiddenlining"
-#set hidden3d
-#set arrow from 0,0,-1.2 to 0,0,1.2 lt 5 lw 2
-#set arrow from -1.2, 0, 0 to 1.2, 0, 0 nohead lt 5 lw 1 
-#set arrow from 0, -1.2, 0 to 0, 1.2, 0 nohead lt 5 lw 1
-#splot cos(u)*cos(v),-cos(u)*sin(v),sin(u) with lines lt 5,\
-#   'world.dat' u 1:2:(1.001) with lines lt 3, \
-#   'world.cor' using 1:2:(1):(5.*rand(0))  with points lt 1 pt 6 ps var
-#pause -1 "Hit return to continue"
+set title "3D solid version through hiddenlining"
+set hidden3d
+set arrow from 0,0,-1.2 to 0,0,1.2 lt 5 lw 2
+set arrow from -1.2, 0, 0 to 1.2, 0, 0 nohead lt 5 lw 1 
+set arrow from 0, -1.2, 0 to 0, 1.2, 0 nohead lt 5 lw 1
+splot cos(u)*cos(v),-cos(u)*sin(v),sin(u) with lines lt 5,\
+   'world.dat' u 1:2:(1.001) with lines lt 3, \
+   'world.cor' using 1:2:(1):(5.*rand(0))  with points lt 1 pt 6 ps var
+pause -1 "Hit return to continue"
 

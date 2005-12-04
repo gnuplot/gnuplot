@@ -1,4 +1,23 @@
+2005-12-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h: Add new internal linetype LT_COLORFROMCOLUMN
+
+	* src/graph3d.c (do_3dplot): Remove warning if no surface is visible
+	in plot with hidden3d set.
+
+	* src/hidden3d.c src/util3d.h: Modify struct vertex so that it contains
+	a pointer (lp_style_type *)lp rather than simply an (int)style. This
+	allows all the various point properties to be handled in hidden3d mode
+	except for variable pointsize. Variable pointsize is handled by adding
+	a new field (struct coordinate *)original. This, however, increases the
+	size of struct vertex, so it can be configured out under the control of
+	HIDDEN3D_VAR_PTSIZE.
+	
+	* demo/pointsize.dem demo/rgb_variable.dem: Update demos to show off
+	use of 'set hidden3d' for 3D point plots.
+
 2005-12-02  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/gplt_x11.c src/gplt_x11.h: Move #include <sys/select.h> from
 	gplt_x11.c to gplt_x11.h so that x11.trm can see it also.
 	Bugfix #1365076.
