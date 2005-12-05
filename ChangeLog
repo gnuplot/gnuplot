@@ -1,3 +1,11 @@
+2005-12-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c (build_networks):  Each plot with style LABELPOINTS
+	contains a linked list of labels. But the first label in this list is
+	a dummy entry used only as a placeholder for style parameters. The
+	hidden3d code was incorrectly counting this as an actual label.
+	Fixes at least some instances of bug #1372464.
+
 2005-12-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h: Add new internal linetype LT_COLORFROMCOLUMN
