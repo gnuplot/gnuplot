@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.52 2005/12/05 05:14:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.53 2005/12/05 22:00:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -196,8 +196,8 @@ typedef polygon GPHUGE *p_polygon;
 
 #if HIDDEN3D_GRIDBOX
 # define UINT_BITS (CHAR_BIT * sizeof(unsigned int))
-# define COORD_TO_BITMASK(x,shift)					\
-  (~0U << (unsigned int) (((x) + 1.0) / 2.0 * UINT_BITS + (shift)))
+# define COORD_TO_BITMASK(x,shift)							\
+  (~0U << (unsigned int) ((((x) / surface_scale) + 1.0) / 2.0 * UINT_BITS + (shift)))
 # define CALC_BITRANGE(range_min, range_max)				 \
   ((~COORD_TO_BITMASK((range_max), 1)) & COORD_TO_BITMASK(range_min, 0))
 #endif
@@ -256,8 +256,8 @@ typedef qtreelist GPHUGE *p_qtreelist;
 /* indices of the heads of all the cells' chains: */
 static long quadtree[QUADTREE_GRANULARITY][QUADTREE_GRANULARITY];
 /* and a macro to calculate the cells' position in that array: */
-#define COORD_TO_TREECELL(x)					\
-    ((unsigned int)((((x)+1.0)/2.0)*QUADTREE_GRANULARITY))
+#define COORD_TO_TREECELL(x)								\
+    ((unsigned int)(((((x) / surface_scale) + 1.0) / 2.0) * QUADTREE_GRANULARITY))
 
 /* the dynarray to actually store all that stuff in: */
 static dynarray qtree;
@@ -753,6 +753,7 @@ store_polygon(long vnum1, polygon_direction direction, long crvlen)
 	for (i = 1; i< POLY_NVERT; i++, v++)	\
 	    if (vlist[*v].var < min)		\
 		min = vlist[*v].var;		\
+        assert(min >= -surface_scale);		\
     } while (0)
 
     /* Gets Maximum 'var' value of polygon 'poly', as with GET_MIN */
@@ -765,6 +766,7 @@ store_polygon(long vnum1, polygon_direction direction, long crvlen)
 	for (i = 1; i< POLY_NVERT; i++, v++)	\
 	    if (vlist[*v].var > max)		\
 		max = vlist[*v].var;		\
+	assert(max <= surface_scale);		\
     } while (0)
 
     GET_MIN(p, x, p->xmin);
@@ -1049,6 +1051,7 @@ build_networks(struct surface_points *plots, int pcount)
 		    struct text_label *label;
 		    long int thisvertex;
 		    struct coordinate labelpoint = {0};
+
 		    lp->pointflag = 1; /* Labels can use the code for hidden points */
 		    for (label = this_plot->labels->next; label != NULL; label = label->next) {
 			labelpoint.x = label->place.x;
@@ -1147,7 +1150,7 @@ build_networks(struct surface_points *plots, int pcount)
 		/* Preset the pointers to the polygons and edges
 		 * belonging to this isoline */
 		these_polygons[2 * i] = these_polygons[2 * i + 1]
-		    =	these_edges[3 * i] = these_edges[3 * i + 1]
+		    = these_edges[3 * i] = these_edges[3 * i + 1]
 		    = these_edges[3 * i + 2]
 		    = -3;
 
@@ -1340,8 +1343,8 @@ sort_edges_by_z()
     if (!edges.end)
 	return;
 
-    sortarray = (long *) gp_alloc((unsigned long) sizeof(long) * edges.end,
-				  "hidden sort edges");
+    sortarray = gp_alloc((unsigned long) sizeof(long) * edges.end,
+			 "hidden sort edges");
     /* initialize sortarray with an identity mapping */
     for (i = 0; i < edges.end; i++)
 	sortarray[i] = i;
@@ -1380,8 +1383,8 @@ sort_polys_by_z()
     if (!polygons.end)
 	return;
 
-    sortarray = (long *) gp_alloc((unsigned long) sizeof(long) * polygons.end,
-				  "hidden sortarray");
+    sortarray = gp_alloc((unsigned long) sizeof(long) * polygons.end,
+			 "hidden sortarray");
 
     /* initialize sortarray with an identity mapping */
     for (i = 0; i < polygons.end; i++)
@@ -1696,18 +1699,13 @@ in_front(
 
     for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x ++)
 	for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y ++)
-	    for (listhead = quadtree[grid_x][grid_y],
-		     polynum = qlist[listhead].p, p = plist + polynum;
+	    for (listhead = quadtree[grid_x][grid_y];
 		 listhead >= 0;
-		 listhead = qlist[listhead].next,
-		     polynum = qlist[listhead].p, p = plist + polynum)
+		 listhead = qlist[listhead].next)
 #else /* HIDDEN3D_QUADTREE */
     /* loop over all the polygons in the sorted list, starting at the
      * currently first (i.e. furthest, from the viewer) polgon. */
-    for (polynum = *firstpoly, p = plist + polynum;
-	 polynum >=0;
-	 polynum = p->next, p = plist + polynum
-	)
+    for (polynum = *firstpoly; polynum >=0; polynum = p->next)
 #endif /* HIDDEN3D_QUADTREE */
 	{
 	    /* shortcut variables for the three vertices of 'p':*/
@@ -1731,6 +1729,11 @@ in_front(
 	    int whichside;
 	    /* stores classification of cases as 4 2-bit patterns, mainly */
 	    unsigned int classification[POLY_NVERT + 1];
+
+#if HIDDEN3D_QUADTREE
+	    polynum = qlist[listhead].p;
+#endif
+	    p = plist + polynum;
 
 	    /* OK, off we go with the real work. This algo is mainly
 	     * following the one of 'HLines.java', as described in the
@@ -1873,11 +1876,12 @@ in_front(
 	     * which side of a given edge a vertex lies. */
 	    /* HBB 20000621: this test only makes sense if this is a
 	     * 'real' edge, not just a single point */
+	    /* HBB 20051206: but p_side[] may still have to be computed, to be used
+	     * by Test 9 */
+	    p_side[0] = area2D(v1, v2, w1);
+	    p_side[1] = area2D(v1, v2, w2);
+	    p_side[2] = area2D(v1, v2, w3);
 	    if (v1 != v2) {
-		p_side[0] = area2D(v1, v2, w1);
-		p_side[1] = area2D(v1, v2, w2);
-		p_side[2] = area2D(v1, v2, w3);
-
 		/* HBB 20001104: made this more restrictive: only
 		 * reject p if areas are greater than 0, i.e. don't
 		 * allow EQ(..,0). Otherwise, edges coincident with a

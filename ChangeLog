@@ -1,796 +1,807 @@
+2005-12-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+        * src/hidden3d.c (COORD_TO_TREECELL, COORD_TO_BITMASK): Avoid
+        overflow by undoing effect of surface_scale before mapping to
+        integers.
+        (store_polygon): Add assert()s to internal macros GET_MIN,
+        GET_MAX, to catch problems not handled by above changes.
+        (in_front): Avoid accessing qlist[-1].  Make sure
+        p_list[] is always filled, even if doing a single-vertex pseudo
+        edge.
+
 2005-12-05  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/hidden3d.c (build_networks):  Each plot with style LABELPOINTS
-	contains a linked list of labels. But the first label in this list is
-	a dummy entry used only as a placeholder for style parameters. The
-	hidden3d code was incorrectly counting this as an actual label.
-	Fixes at least some instances of bug #1372464.
+        * src/hidden3d.c (build_networks):  Each plot with style LABELPOINTS
+        contains a linked list of labels. But the first label in this list is
+        a dummy entry used only as a placeholder for style parameters. The
+        hidden3d code was incorrectly counting this as an actual label.
+        Fixes at least some instances of bug #1372464.
 
 2005-12-04  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gadgets.h: Add new internal linetype LT_COLORFROMCOLUMN
+        * src/gadgets.h: Add new internal linetype LT_COLORFROMCOLUMN
 
-	* src/graph3d.c (do_3dplot): Remove warning if no surface is visible
-	in plot with hidden3d set.
+        * src/graph3d.c (do_3dplot): Remove warning if no surface is visible
+        in plot with hidden3d set.
 
-	* src/hidden3d.c src/util3d.h: Modify struct vertex so that it contains
-	a pointer (lp_style_type *)lp rather than simply an (int)style. This
-	allows all the various point properties to be handled in hidden3d mode
-	except for variable pointsize. Variable pointsize is handled by adding
-	a new field (struct coordinate *)original. This, however, increases the
-	size of struct vertex, so it can be configured out under the control of
-	HIDDEN3D_VAR_PTSIZE.
-	
-	* demo/pointsize.dem demo/rgb_variable.dem: Update demos to show off
-	use of 'set hidden3d' for 3D point plots.
+        * src/hidden3d.c src/util3d.h: Modify struct vertex so that it contains
+        a pointer (lp_style_type *)lp rather than simply an (int)style. This
+        allows all the various point properties to be handled in hidden3d mode
+        except for variable pointsize. Variable pointsize is handled by adding
+        a new field (struct coordinate *)original. This, however, increases the
+        size of struct vertex, so it can be configured out under the control of
+        HIDDEN3D_VAR_PTSIZE.
+        
+        * demo/pointsize.dem demo/rgb_variable.dem: Update demos to show off
+        use of 'set hidden3d' for 3D point plots.
 
-	* src/graph3d.c src/hidden3d.c: Handle 'splot with vectors' in
-	hidden3d mode.
+        * src/graph3d.c src/hidden3d.c: Handle 'splot with vectors' in
+        hidden3d mode.
 
-	* demo/molecule.dem demo/GM1_bonds.r3d demo/GM1_sugar.pdb: New
-	demo that shows off vector+point plots in hidded3d mode.
+        * demo/molecule.dem demo/GM1_bonds.r3d demo/GM1_sugar.pdb: New
+        demo that shows off vector+point plots in hidded3d mode.
 
 2005-12-02  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gplt_x11.c src/gplt_x11.h: Move #include <sys/select.h> from
-	gplt_x11.c to gplt_x11.h so that x11.trm can see it also.
-	Bugfix #1365076.
+        * src/gplt_x11.c src/gplt_x11.h: Move #include <sys/select.h> from
+        gplt_x11.c to gplt_x11.h so that x11.trm can see it also.
+        Bugfix #1365076.
 
-	* term/x11.trm: Remove duplicate #define for constants present in
-	gplt_x11.h.
+        * term/x11.trm: Remove duplicate #define for constants present in
+        gplt_x11.h.
 
 2005-12-01  Michael Williamson  <mwilliamson@users.sourceforge.net>
 
-	* src/set.c (set_size): Do not allow size values <= 0.
+        * src/set.c (set_size): Do not allow size values <= 0.
 
 2005-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/mouse.c (apply_zoom): Fix for "set view map; plot x" and y-axis
-	reversal when mouse zooming.
+        * src/mouse.c (apply_zoom): Fix for "set view map; plot x" and y-axis
+        reversal when mouse zooming.
 
 2005-11-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/datafile.c (df_set_datafile_binary): Give an error message for
-	'set datafile binary' (without any option).
+        * src/datafile.c (df_set_datafile_binary): Give an error message for
+        'set datafile binary' (without any option).
 
 2005-11-27  Juergen Wieferink  <wieferink@freenet.de>
 
-	* src/parse.c (const_string_express parse_additive_expression)
-	src/parse.h src/eval.c (pop_or_convert_from_string) src/eval.h 
-	src/util.c (try_to_get_string) src/internal.c (f_minus)
-	src/set.c (set_label set_xyzlabel load_tic_user):
+        * src/parse.c (const_string_express parse_additive_expression)
+        src/parse.h src/eval.c (pop_or_convert_from_string) src/eval.h 
+        src/util.c (try_to_get_string) src/internal.c (f_minus)
+        src/set.c (set_label set_xyzlabel load_tic_user):
 
-	Clean up parsing and evaluation of try_to_get_string() by moving the
-	test against STRING_RESULT_ONLY into the actual parsing code. Now if
-	a + or - operator is encountered while parsing something that is 
-	supposed to be a string, no further tokens are processed. Before, this
-	triggered an arithmetic operation on the string that had to be thrown
-	out afterwards.
+        Clean up parsing and evaluation of try_to_get_string() by moving the
+        test against STRING_RESULT_ONLY into the actual parsing code. Now if
+        a + or - operator is encountered while parsing something that is 
+        supposed to be a string, no further tokens are processed. Before, this
+        triggered an arithmetic operation on the string that had to be thrown
+        out afterwards.
 
 2005-11-27  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/set.c (set_arrow): Rewrite set_arrow() to behave the same as
-	set_label() and other "set <foo>" routines; attribute changes for any
-	one arrow are now incremental.
+        * src/set.c (set_arrow): Rewrite set_arrow() to behave the same as
+        set_label() and other "set <foo>" routines; attribute changes for any
+        one arrow are now incremental.
 
-	* src/misc.c (arrow_parse) src/plot2d.c src/plot3d.c src/set.c:
-	Remove 2nd parameter of arrow_parse, since it is no longer used by
-	any callers.
+        * src/misc.c (arrow_parse) src/plot2d.c src/plot3d.c src/set.c:
+        Remove 2nd parameter of arrow_parse, since it is no longer used by
+        any callers.
 
-	* src/axis.c (axis_checked_extend_empty_range) src/plot3d.c:
-	Suppress warning message "empty z range" when mode is "set view map".
+        * src/axis.c (axis_checked_extend_empty_range) src/plot3d.c:
+        Suppress warning message "empty z range" when mode is "set view map".
 
 2005-11-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* demo/pm3d.dem: Change one splot from "with lp palette" to
-	"with lines palette".
+        * demo/pm3d.dem: Change one splot from "with lp palette" to
+        "with lines palette".
 
 2005-11-26  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots):
-	Bugfix: Arrow style used by "with vector" was getting over-written
-	during subsequent command line parsing.
+        * src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots):
+        Bugfix: Arrow style used by "with vector" was getting over-written
+        during subsequent command line parsing.
 
 2005-11-25  Daniel Sebald  <daniel.sebald@ieee.org>
 
-	* src/datafile.c (avs_filetype_function) docs/gnuplot.doc:
-	Support AVS image file format.
-	Example:
-	      plot '<convert foo.jpeg avs:-' binary filetype=avs with rgbimage
+        * src/datafile.c (avs_filetype_function) docs/gnuplot.doc:
+        Support AVS image file format.
+        Example:
+              plot '<convert foo.jpeg avs:-' binary filetype=avs with rgbimage
 
 2005-11-25  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (do_plot do_key_sample)
-	src/graph3d.c (key_sample_line key_sample_point key_sample_point_pm3d):
-	Clip key to canvas unless TERM_CAN_CLIP flag is set.
+        * src/graphics.c (do_plot do_key_sample)
+        src/graph3d.c (key_sample_line key_sample_point key_sample_point_pm3d):
+        Clip key to canvas unless TERM_CAN_CLIP flag is set.
 
-	* src/set.c (load_tic_user): Allow string variables and string functions
-	in 'set {xyz}tics ( FOO <foo>, BAR(x) x, "string"."exp" <place> )
+        * src/set.c (load_tic_user): Allow string variables and string functions
+        in 'set {xyz}tics ( FOO <foo>, BAR(x) x, "string"."exp" <place> )
 
-	* src/datafile.c (plot_option_binary): Fix logic error in binary file
-	initialization. Initialization was done inside a parsing loop, but the
-	loop was never entered unless there were additional keywords on the 
-	command line.  Bugfix.  "set style data rgbimage" now works.
+        * src/datafile.c (plot_option_binary): Fix logic error in binary file
+        initialization. Initialization was done inside a parsing loop, but the
+        loop was never entered unless there were additional keywords on the 
+        command line.  Bugfix.  "set style data rgbimage" now works.
 
 2005-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* term/tgif.trm (TGIF_init): Message "Creator: gnuplot %s patchlevel %s"
-	instead of (dollar)Header:(dollar) in output file header.
+        * term/tgif.trm (TGIF_init): Message "Creator: gnuplot %s patchlevel %s"
+        instead of (dollar)Header:(dollar) in output file header.
 
 2005-11-24  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gadgets.c (clip_point) src/term.c (do_arrow): If terminal
-	flag TERM_CAN_CLIP is set, then set canvas clipping description 
-	to NULL.
+        * src/gadgets.c (clip_point) src/term.c (do_arrow): If terminal
+        flag TERM_CAN_CLIP is set, then set canvas clipping description 
+        to NULL.
 
-	* src/term_api.h src/term.c: Export on_page() so that it can be
-	used for clipping tests by other core modules.
+        * src/term_api.h src/term.c: Export on_page() so that it can be
+        used for clipping tests by other core modules.
 
-	* src/gadgets.c (write_label): If a label has an associated point,
-	clip the point using the same test as was used for the label itself.
+        * src/gadgets.c (write_label): If a label has an associated point,
+        clip the point using the same test as was used for the label itself.
 
 2005-11-24  Juergen Wieferink  <wieferink@freenet.de>
 
-	* src/util.c (parse_sq) src/scanner.c (scanner) docs/gnuplot.doc:
-	Fixed \' in single-quoted strings.
+        * src/util.c (parse_sq) src/scanner.c (scanner) docs/gnuplot.doc:
+        Fixed \' in single-quoted strings.
 
 2005-11-24  Daniel Sebald  <daniel.sebald@ieee.org>
 
-	* src/gplt_x11.c: Linked list of color maps separate from the linked
-	list for x11 plots. Bugfix for different color palettes in different
-	x11 terminal windows and resizing them.
+        * src/gplt_x11.c: Linked list of color maps separate from the linked
+        list for x11 plots. Bugfix for different color palettes in different
+        x11 terminal windows and resizing them.
 
 2005-11-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* src/hidden3d.c (build_networks): Fix handling of previousvertex
-	variable for point-like objects, which don't need it.
+        * src/hidden3d.c (build_networks): Fix handling of previousvertex
+        variable for point-like objects, which don't need it.
 
 2005-11-14  Juergen Wieferink  <wieferink@freenet.de>
 
-	* src/set.c (set_xyzlabel): Fix parsing error in backwards-compatible
-	form "set xlabel 'foo' -1,-1".
+        * src/set.c (set_xyzlabel): Fix parsing error in backwards-compatible
+        form "set xlabel 'foo' -1,-1".
 
 2005-11-12  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/axis.c (gen_tics): Check whether user-specified tic is major
-	or minor before choosing a line type for the corresponding grid line.
+        * src/axis.c (gen_tics): Check whether user-specified tic is major
+        or minor before choosing a line type for the corresponding grid line.
 
-	* term/gd.trm (ENHGD_put_text) term/pdf.trm (ENHPDF_put_text):
-	Fix typos that caused justification to fail for rotated, enhanced
-	mode text strings.
+        * term/gd.trm (ENHGD_put_text) term/pdf.trm (ENHPDF_put_text):
+        Fix typos that caused justification to fail for rotated, enhanced
+        mode text strings.
 
 2005-11-11  Harald Harders  <h.harders@tu-bs.de>
 
-	* src/axis.c (axis_output_tics): Normally the tics are placed to
-	dodge the border line.  If the border line is not drawn, then do
-	not try to dodge it.
+        * src/axis.c (axis_output_tics): Normally the tics are placed to
+        dodge the border line.  If the border line is not drawn, then do
+        not try to dodge it.
 
 2005-11-11  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/metapost.trm: Update driver to support version 4.1 features.
-	Implement general text rotation.
-	Add partial density solid fill support for rectangles and polygons,
-	with pattern fill implemented as incremental density solid fill.
-	Fix bugs in terminal option font parsing.
-	Keep track of dash pattern independent of line color
+        * term/metapost.trm: Update driver to support version 4.1 features.
+        Implement general text rotation.
+        Add partial density solid fill support for rectangles and polygons,
+        with pattern fill implemented as incremental density solid fill.
+        Fix bugs in terminal option font parsing.
+        Keep track of dash pattern independent of line color
 
 2005-11-09  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/term.c (do_arrow): Revert previous patch, since it seems
-	the bad effects outweigh the good.
+        * src/term.c (do_arrow): Revert previous patch, since it seems
+        the bad effects outweigh the good.
 
 2005-11-08  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/term.c (do_arrow): Add a work-around for broken behaviour
-	by the postscript terminal.  post.trm does not correctly report
-	the current canvas size, so arrows cannot be clipped against the
-	canvas boundaries if the current terminal is post.trm. The proper
-	fix is probably in post.trm itself, but it potentially affects
-	many aspects of plot layout so I am reluctant to make the change
-	there.
+        * src/term.c (do_arrow): Add a work-around for broken behaviour
+        by the postscript terminal.  post.trm does not correctly report
+        the current canvas size, so arrows cannot be clipped against the
+        canvas boundaries if the current terminal is post.trm. The proper
+        fix is probably in post.trm itself, but it potentially affects
+        many aspects of plot layout so I am reluctant to make the change
+        there.
 
 2005-11-01  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/plot3d.c (eval_3dplots): Fix logic bug in vector style
-	initialization.  Replicate vector line style properties stored
-	in arrow_properties into plot's main lp_properties.
+        * src/plot3d.c (eval_3dplots): Fix logic bug in vector style
+        initialization.  Replicate vector line style properties stored
+        in arrow_properties into plot's main lp_properties.
 
 2005-10-31  Harald Harders  <h.harders@tu-bs.de>
 
-	* term/post.trm (PS_options): Add flags to track whether terminal
-	options have been set; issue error on attempt set option twice.
+        * term/post.trm (PS_options): Add flags to track whether terminal
+        options have been set; issue error on attempt set option twice.
 
 2005-10-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* docs/gnuplot.doc: Updated 'help matrix' and 'help matrix ascii'.
+        * docs/gnuplot.doc: Updated 'help matrix' and 'help matrix ascii'.
 
 2005-10-23  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/datafile.c (adjust_binary_use_spec): Interpret the command
-	"plot <foo> matrix" as equivalent to "plot <foo> matrix using 1:3".
+        * src/datafile.c (adjust_binary_use_spec): Interpret the command
+        "plot <foo> matrix" as equivalent to "plot <foo> matrix using 1:3".
 
 2005-10-22  Harald Harders  <h.harders@tu-bs.de>
 
-	* term/pslatex.trm (EPSLATEX_set_color): Fix bug in setting
-	pure black or white via a gray value.
+        * term/pslatex.trm (EPSLATEX_set_color): Fix bug in setting
+        pure black or white via a gray value.
 
 2005-10-22  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/datafile.c (df_open): Fix [very] long-standing bug
-	that caused only the first 3 columns of ascii matrix data to
-	be read after the command:   splot "data" using 1:2:3 matrix
-	Bug #1264105.
+        * src/datafile.c (df_open): Fix [very] long-standing bug
+        that caused only the first 3 columns of ascii matrix data to
+        be read after the command:   splot "data" using 1:2:3 matrix
+        Bug #1264105.
 
 2005-10-21  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gp_types.h: Force enum for variable types to start at
-	INTGR = 1, so that 0 (NULL) is guaranteed not to be a valid
-	variable type.
+        * src/gp_types.h: Force enum for variable types to start at
+        INTGR = 1, so that 0 (NULL) is guaranteed not to be a valid
+        variable type.
 
-	* src/util.c src/util.h (type_udv): New function returning the
-	type of a user-defined variable, or 0 if there is no such udv.
-	Replaces isstringvar().
+        * src/util.c src/util.h (type_udv): New function returning the
+        type of a user-defined variable, or 0 if there is no such udv.
+        Replaces isstringvar().
 
-	* datafile.c (plot_ticlabel_using df_readascii): Allow the
-	using specs {x|y|z}ticlabel(<foo>) to accept an expression
-	for <foo> rather than accepting only an integer constant.
+        * datafile.c (plot_ticlabel_using df_readascii): Allow the
+        using specs {x|y|z}ticlabel(<foo>) to accept an expression
+        for <foo> rather than accepting only an integer constant.
 
 2005-10-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/term.c (do_arrow): Moved misplaced declaration.
+        * src/term.c (do_arrow): Moved misplaced declaration.
 
-	* config/config.cyg config/config.mgw: Updated.
+        * config/config.cyg config/config.mgw: Updated.
 
 2005-10-19  Ethan Merritt  <merritt@u.washington.edu>
 
-	* docs/gnuplot.doc: Update description of xticlabels(<col>).
+        * docs/gnuplot.doc: Update description of xticlabels(<col>).
 
 2005-10-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* term/x11.trm (START_HELP): Update docs about window title.
+        * term/x11.trm (START_HELP): Update docs about window title.
 
 2005-10-16  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gadgets.h: Export (BoundingBox *)clip_area, so that gnuplot
-	core routines can specify clipping boundaries before calling
-	clip_point() and clip_line().
+        * src/gadgets.h: Export (BoundingBox *)clip_area, so that gnuplot
+        core routines can specify clipping boundaries before calling
+        clip_point() and clip_line().
 
-	* src/term.c (do_arrow): clip all lines in arrow to the canvas.
-	Bug #1187336.
+        * src/term.c (do_arrow): clip all lines in arrow to the canvas.
+        Bug #1187336.
 
-	* src/graph3d.c (get_arrow3d): Since arrow clipping is now
-	handled properly in do_arrow(), remove the old cruder clipping test.
+        * src/graph3d.c (get_arrow3d): Since arrow clipping is now
+        handled properly in do_arrow(), remove the old cruder clipping test.
 
-	* term/pdf.trm (PDF_filled_polygon): Filled arrowheads can still
-	protrude across the canvas boundary, and the pdflib routines 
-	cannot deal with this due to the use of (unsigned int) for the
-	polygon vertices.  Cast to (int) prevents segfaults or error
-	exit by pdflib library.
+        * term/pdf.trm (PDF_filled_polygon): Filled arrowheads can still
+        protrude across the canvas boundary, and the pdflib routines 
+        cannot deal with this due to the use of (unsigned int) for the
+        polygon vertices.  Cast to (int) prevents segfaults or error
+        exit by pdflib library.
 
-	* term/pdf.trm (PDF_point): Bugfix: Do not crash on pointsize 0.
+        * term/pdf.trm (PDF_point): Bugfix: Do not crash on pointsize 0.
 
 2005-10-15  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gadgets.h src/gadgets.c: Define a BoundingBox structure type,
-	and create two instances: one for the plot boundary and one for the
-	canvas boundary.  Also export a (BoundingBox *)clip_area  pointer to
-	the currently active BoundingBox for clipping.  At this point,
-	clip_area always points to plot_bounds.
+        * src/gadgets.h src/gadgets.c: Define a BoundingBox structure type,
+        and create two instances: one for the plot boundary and one for the
+        canvas boundary.  Also export a (BoundingBox *)clip_area  pointer to
+        the currently active BoundingBox for clipping.  At this point,
+        clip_area always points to plot_bounds.
 
-	* src/term.c (term_start_plot): Immediately after each call to
-	term->graphics(), load terminal's coordinate range into canvas
-	BoundingBox.
+        * src/term.c (term_start_plot): Immediately after each call to
+        term->graphics(), load terminal's coordinate range into canvas
+        BoundingBox.
 
-	* src/gadgets.c (clip_point clip_line): Clip against the BoundingBox
-	pointed to by clip_area. In the past this has always been the plot
-	boundary, but now we will be able to use the same routines to clip
-	against other areas.
+        * src/gadgets.c (clip_point clip_line): Clip against the BoundingBox
+        pointed to by clip_area. In the past this has always been the plot
+        boundary, but now we will be able to use the same routines to clip
+        against other areas.
 
-	* src/graphics.c src/graph3d.c src/mouse.c: Replace all instances of
-	xright, xleft, ytop, ybot with references to those same fields in the
-	plot_bounds BoundingBox.
+        * src/graphics.c src/graph3d.c src/mouse.c: Replace all instances of
+        xright, xleft, ytop, ybot with references to those same fields in the
+        plot_bounds BoundingBox.
 
-	* term/tkcanvas.trm: Replace xright, xleft, ytop, ybut here to.
-	PLEASE FIX: But no terminal should be referring to these directly.
+        * term/tkcanvas.trm: Replace xright, xleft, ytop, ybut here to.
+        PLEASE FIX: But no terminal should be referring to these directly.
 
 2005-10-15   Hans Grobler  <grobh@users.sourceforge.net>
 
-	* src/gplt_x11.c: Fix buffer overflow caused by incorrect size
-	allocation for rdbuf.
+        * src/gplt_x11.c: Fix buffer overflow caused by incorrect size
+        allocation for rdbuf.
 
 2005-10-14  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots): Explicitly
-	initialize arrow style for "{s}plot with vector", since arrow_parse()
-	no longer does this for us.
+        * src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots): Explicitly
+        initialize arrow style for "{s}plot with vector", since arrow_parse()
+        no longer does this for us.
 
 2005-10-13  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/dumb.trm: Fix dumb bug in dumb term. coords run from 0->xmax
-	and 0->ymax, but array space was only allocated for xmax*ymax pixels.
-	Correct this to (xmax+1)*(ymax+1). Fixes segfault triggered by
-	"set size 2,2".
+        * term/dumb.trm: Fix dumb bug in dumb term. coords run from 0->xmax
+        and 0->ymax, but array space was only allocated for xmax*ymax pixels.
+        Correct this to (xmax+1)*(ymax+1). Fixes segfault triggered by
+        "set size 2,2".
 
 2005-10-12  Don Taber  <dtaber@topaflyers.com>
 
-	* term/pbm.trm: Update description of the PBMPLUS and NETPBM packages.
+        * term/pbm.trm: Update description of the PBMPLUS and NETPBM packages.
 
 2005-10-12  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/pslatex.trm: Add TERM_CAN_CLIP to terminal flags, since the core
-	routines cannot correctly estimate the length of TeX strings.
-	Bug #1324794.
+        * term/pslatex.trm: Add TERM_CAN_CLIP to terminal flags, since the core
+        routines cannot correctly estimate the length of TeX strings.
+        Bug #1324794.
 
 2005-10-12  Lars Hecking  <lhecking@users.sourceforge.net>
 
-	* src/beos/Makefile.in: Remove Makefile from EXTRA_DIST.
+        * src/beos/Makefile.in: Remove Makefile from EXTRA_DIST.
 
 2005-10-11  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graph3d.c (plot3d_points): Small code clean up in preparation
-	for possible addition of a sorting step prior to plotting.
+        * src/graph3d.c (plot3d_points): Small code clean up in preparation
+        for possible addition of a sorting step prior to plotting.
 
 2005-10-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/winmain.c (win_lower_terminal_window): "lower" command for the
-	Windows terminal.
+        * src/win/winmain.c (win_lower_terminal_window): "lower" command for the
+        Windows terminal.
 
 2005-10-09  Harald Harders  <h.harders@tu-bs.de>
 
-	* src/misc.c (lp_parse arrow_parse) set.c (set_linestyle set_arrowstyle)
-	src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots) docs/gnuplot.doc:
+        * src/misc.c (lp_parse arrow_parse) set.c (set_linestyle set_arrowstyle)
+        src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots) docs/gnuplot.doc:
 
-	Bring "set style line ..." and "set style arrow ..." into agreement with
-	other "set style <foo>" commands by retaining current properties, rather
-	than resetting to the default style each time. The previous behavior was
-	undocumented.  Add an explicit command "set style {line|arrow} default".
+        Bring "set style line ..." and "set style arrow ..." into agreement with
+        other "set style <foo>" commands by retaining current properties, rather
+        than resetting to the default style each time. The previous behavior was
+        undocumented.  Add an explicit command "set style {line|arrow} default".
 
 2005-10-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* term/pdf.trm term/svg.trm (START_HELP): Small changes.
+        * term/pdf.trm term/svg.trm (START_HELP): Small changes.
 
-	* term/x11.trm (START_HELP): Reorganized list of options.
+        * term/x11.trm (START_HELP): Reorganized list of options.
 
 2005-10-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/os2/gclient.c term/pm.trm: "lower" command for the pm terminal.
+        * src/os2/gclient.c term/pm.trm: "lower" command for the pm terminal.
 
 2005-10-07  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/cgm.trm: Fix pattern-fill code, which was not working.
-	If the user explicitly provides a background color, apply it to the
-	entire canvas when plotting is started. The was documented, but
-	apparently never implemented.  Bug #616167.
-	Also update linetype code so that it is possible to give the 
-	the background color as a line property.
+        * term/cgm.trm: Fix pattern-fill code, which was not working.
+        If the user explicitly provides a background color, apply it to the
+        entire canvas when plotting is started. The was documented, but
+        apparently never implemented.  Bug #616167.
+        Also update linetype code so that it is possible to give the 
+        the background color as a line property.
 
 2005-10-07  Daniel Sebald  <daniel.sebald@ieee.org>
 
-	SF patch [ 859716 ] new raise/lower commands
+        SF patch [ 859716 ] new raise/lower commands
 
-	* NEWS docs/gnuplot.doc src/command.c src/command.h src/gplt_x11.c
-	src/os2/gclient.c src/tables.c src/win/winmain.c term/pm.trm
-	term/x11.trm: Commands "raise" and "lower" to raise and lower windows of
-	interactive terminals.
+        * NEWS docs/gnuplot.doc src/command.c src/command.h src/gplt_x11.c
+        src/os2/gclient.c src/tables.c src/win/winmain.c term/pm.trm
+        term/x11.trm: Commands "raise" and "lower" to raise and lower windows of
+        interactive terminals.
 
 2005-10-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/command.c (system_command): Remove superfluous c_token++.
+        * src/command.c (system_command): Remove superfluous c_token++.
 
 2005-10-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/syscfg.h: Increased MAX_NUM_VAR from 5 to 12 (max number of
-	parameters for functions).
+        * src/syscfg.h: Increased MAX_NUM_VAR from 5 to 12 (max number of
+        parameters for functions).
 
 2005-10-06  Amitha Perera  <amithaperera@users.sourceforge.net>
 
-	* term/pbm.trm (PBM_options): Re-order declarations to be strict ANSI C.
+        * term/pbm.trm (PBM_options): Re-order declarations to be strict ANSI C.
 
 2005-10-05  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graph3d.c (draw_3d_graphbox ztick_callback)
-	src/save.c (save_set_all) src/set.c (set_command set_zeroaxis)
-	src/show.c (show_command show_all show_zeroaxis) src/tables.c
-	src/tables.h src/unset.c (unset_command unset_zeroaxis)
-	demo/rgb_variable.dem:
+        * src/graph3d.c (draw_3d_graphbox ztick_callback)
+        src/save.c (save_set_all) src/set.c (set_command set_zeroaxis)
+        src/show.c (show_command show_all show_zeroaxis) src/tables.c
+        src/tables.h src/unset.c (unset_command unset_zeroaxis)
+        demo/rgb_variable.dem:
 
-	Implement zzeroaxis, and rework the placement of axis tics and labels
-	in 3D when the corresponding "set {xyz}tics axis" flag is set.
-	Bug #1293118.
+        Implement zzeroaxis, and rework the placement of axis tics and labels
+        in 3D when the corresponding "set {xyz}tics axis" flag is set.
+        Bug #1293118.
 
 2005-10-05  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/gd.trm (PNG_options): Test for valid (>0) size of image.
+        * term/gd.trm (PNG_options): Test for valid (>0) size of image.
 
 2005-10-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	SF RFE [1063878] Support for pre-compiled bgd.dll
-	If gd.trm made use of the gdFontGetTiny() and related methods to read
-	the font pointers instead of referencing them as extern, gnuplot could
-	more easily be compiled to work with the pre-compiled GD library
-	bgd.dll instead of having to download and compile zlib, libpng and
-	libgd.
+        SF RFE [1063878] Support for pre-compiled bgd.dll
+        If gd.trm made use of the gdFontGetTiny() and related methods to read
+        the font pointers instead of referencing them as extern, gnuplot could
+        more easily be compiled to work with the pre-compiled GD library
+        bgd.dll instead of having to download and compile zlib, libpng and
+        libgd.
 
-	* config/makefile.nt: Support for binary version of gdlib (bgd.dll).
+        * config/makefile.nt: Support for binary version of gdlib (bgd.dll).
 
-	* term/gd.trm: New BGD_EXPORT_DATA_PROT and gp_gdXXX() for Win32.
+        * term/gd.trm: New BGD_EXPORT_DATA_PROT and gp_gdXXX() for Win32.
 
 2005-10-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* term/pm.trm src/os2/pm_msgs.h src/os2/gclient.c: Support for
-	"with image" on pm terminal.
+        * term/pm.trm src/os2/pm_msgs.h src/os2/gclient.c: Support for
+        "with image" on pm terminal.
 
 2005-10-04  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/pbm.trm (PBM_options): Add an option to set the output size.
-	set term pbm size XXX,YYY
+        * term/pbm.trm (PBM_options): Add an option to set the output size.
+        set term pbm size XXX,YYY
 
 2005-10-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wtext.c (DragFunc): Increase maximum length of filenames in
-	drag and drop operations to MAX_PATH (bug found by Tim Chippington
-	Derrick).
+        * src/win/wtext.c (DragFunc): Increase maximum length of filenames in
+        drag and drop operations to MAX_PATH (bug found by Tim Chippington
+        Derrick).
 
 2005-10-03  Ethan Merritt  <merritt@u.washington.edu>
 
-	* configure.in: Issue a warning message if someone tries to build the
-	PNG terminal without libgd.
+        * configure.in: Issue a warning message if someone tries to build the
+        PNG terminal without libgd.
 
 2005-10-02  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gadgets.h: Remove unused struct default_keybox_lp.
+        * src/gadgets.h: Remove unused struct default_keybox_lp.
 
-	* src/graph3d.c src/graph3d.h src/mouse.c src/save.c src/set.c
-	src/show.c src/tables.c src/unset.c docs/gnuplot.doc:
-	Move global ticslevel into a global struct xyplane that also contains a
-	flag indicating whether the value fixes the Z-intercept of the x/y plane
-	at a fraction of the z range (old behaviour) or a specific value of
-	Z (new option). To select a specific Z, use "set ticslevel at <zval>".
-	This change also introduces "xyplane" as a synonym for "ticslevel",
-	so the more easily remembered form of the command is
-	"set xyplane at <zval>".
+        * src/graph3d.c src/graph3d.h src/mouse.c src/save.c src/set.c
+        src/show.c src/tables.c src/unset.c docs/gnuplot.doc:
+        Move global ticslevel into a global struct xyplane that also contains a
+        flag indicating whether the value fixes the Z-intercept of the x/y plane
+        at a fraction of the z range (old behaviour) or a specific value of
+        Z (new option). To select a specific Z, use "set ticslevel at <zval>".
+        This change also introduces "xyplane" as a synonym for "ticslevel",
+        so the more easily remembered form of the command is
+        "set xyplane at <zval>".
 
-	* src/graph3d.c (do_3dplot): Check for absolute placement of xyplane
-	along Z axis, controlled by "set {ticslevel|xyplane} at <zval>".
+        * src/graph3d.c (do_3dplot): Check for absolute placement of xyplane
+        along Z axis, controlled by "set {ticslevel|xyplane} at <zval>".
 
 2005-10-01  Ethan Merritt  <merritt@u.washington.edu>
 
-	Lines have more properties now than they used to. Rather than expanding
-	the number of parameters to lp_parse() to pass default values for each
-	property separately, change to requiring the caller of lp_parse() to
-	preload default values into the lp_style_type structure being passed.
-	This change should not by itself affect current syntax or behaviour,
-	but will allow us to remove the style initialization from lp_parse().
-	This in turn will allow different callers to have different default
-	line styles while still sharing the same parsing routine.
+        Lines have more properties now than they used to. Rather than expanding
+        the number of parameters to lp_parse() to pass default values for each
+        property separately, change to requiring the caller of lp_parse() to
+        preload default values into the lp_style_type structure being passed.
+        This change should not by itself affect current syntax or behaviour,
+        but will allow us to remove the style initialization from lp_parse().
+        This in turn will allow different callers to have different default
+        line styles while still sharing the same parsing routine.
 
-	* src/misc.h src/misc.c (lp_parse): Remove def_line and def_point
-	parameters; instead assume they have been preloaded into lp.
+        * src/misc.h src/misc.c (lp_parse): Remove def_line and def_point
+        parameters; instead assume they have been preloaded into lp.
 
-	* src/plot2d.c src/plot3d.c src/set.c: Modify all callers of lp_parse()
-	to follow the new scheme.
+        * src/plot2d.c src/plot3d.c src/set.c: Modify all callers of lp_parse()
+        to follow the new scheme.
 
-	* src/gadgets.h src/term_api.h src/graph3d.c src/graphics.c src/save.c
-	src/plot2d.c src/plot3d.c: #define PTSZ_VARIABLE and PTSZ_DEFAULT as
-	constants rather than passing magic values for lp_style_type.p_size.
+        * src/gadgets.h src/term_api.h src/graph3d.c src/graphics.c src/save.c
+        src/plot2d.c src/plot3d.c: #define PTSZ_VARIABLE and PTSZ_DEFAULT as
+        constants rather than passing magic values for lp_style_type.p_size.
 
-	* src/term.c (term_apply_lp_properties): Check explicitly for
-	PTSZ_VARIABLE and PTSZ_DEFAULT.
+        * src/term.c (term_apply_lp_properties): Check explicitly for
+        PTSZ_VARIABLE and PTSZ_DEFAULT.
 
 2005-09-29  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/axis.c (axis_position_zeroaxis): More zeroaxis bugs; does nobody
-	ever use this option?  Range terminating at 0.0 is a perfectly valid
-	case in which to draw a zeroaxis.
-	Bugfix.
+        * src/axis.c (axis_position_zeroaxis): More zeroaxis bugs; does nobody
+        ever use this option?  Range terminating at 0.0 is a perfectly valid
+        case in which to draw a zeroaxis.
+        Bugfix.
 
 2005-09-27  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/util3d.c (draw3d_line_unconditional): The code previously assumed
-	that any 3D colored line is colored by Z value. This is no longer true.
-	Bugfix.
+        * src/util3d.c (draw3d_line_unconditional): The code previously assumed
+        that any 3D colored line is colored by Z value. This is no longer true.
+        Bugfix.
 
 2005-09-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* term/post.trm (PS_COMMON_DOC1): More details for 'color' and
-	'monochrome' options.
+        * term/post.trm (PS_COMMON_DOC1): More details for 'color' and
+        'monochrome' options.
 
 2005-09-25  Ethan Merritt  <merritt@u.washington.edu>
 
-	Even when gnuplot honors a LOCALE setting for input of data or output
-	of plots, gnuplot's own command syntax requires LC_NUMERIC == C. We
-	must check for this anywhere that a command is generated or parsed.
+        Even when gnuplot honors a LOCALE setting for input of data or output
+        of plots, gnuplot's own command syntax requires LC_NUMERIC == C. We
+        must check for this anywhere that a command is generated or parsed.
 
-	* src/mouse.c (apply_zoom): Enforce C locale before creating 
-	command sequence to do zooming.
+        * src/mouse.c (apply_zoom): Enforce C locale before creating 
+        command sequence to do zooming.
 
-	* src/scanner.c (get_num): Enforce C locale before reading a number
-	that is part of a command line.
+        * src/scanner.c (get_num): Enforce C locale before reading a number
+        that is part of a command line.
 
-	* src/command.c (save_command test_palette_subcommand)
-	src/show.c (show_command show_style): Enforce C locale before saving or
-	showing state of internal variables.
+        * src/command.c (save_command test_palette_subcommand)
+        src/show.c (show_command show_style): Enforce C locale before saving or
+        showing state of internal variables.
 
 2005-09-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* term/svg.trm (SVG_init): Encodings for OS/2 and Windows.
+        * term/svg.trm (SVG_init): Encodings for OS/2 and Windows.
 
 2005-09-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/os2/gclient.c term/pm.trm: Full RGB colour support for pm terminal
-	(if display supports it).
+        * src/os2/gclient.c term/pm.trm: Full RGB colour support for pm terminal
+        (if display supports it).
 
 2005-09-24  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gplt_x11.c (process_event): Drain any backlog of keypress
-	events from the current plot window every time we see an arrow key.
-	This prevents hysteresis if the redraw rate is slower than the
-	keyboard autorepeat rate.
-	Bug #1111734.
+        * src/gplt_x11.c (process_event): Drain any backlog of keypress
+        events from the current plot window every time we see an arrow key.
+        This prevents hysteresis if the redraw rate is slower than the
+        keyboard autorepeat rate.
+        Bug #1111734.
 
-	* term/emf.trm: (EMF_dashtype): Make axis dotted by default, consistent
-	with other terminal types.
+        * term/emf.trm: (EMF_dashtype): Make axis dotted by default, consistent
+        with other terminal types.
 
 2005-09-23  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gplt_x11.c (exec_cmd) term/x11.trm (ENHX11_put_text):
-	Change the vertical centering of enhanced mode text so that it matches
-	that of non-enhanced text.
+        * src/gplt_x11.c (exec_cmd) term/x11.trm (ENHX11_put_text):
+        Change the vertical centering of enhanced mode text so that it matches
+        that of non-enhanced text.
 
 2005-09-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/set.c term/gd.trm: Always allow animated gif options in
-	'set term gif ...'. Issue a warning if the gd library does not support
-	animated gifs.
+        * src/set.c term/gd.trm: Always allow animated gif options in
+        'set term gif ...'. Issue a warning if the gd library does not support
+        animated gifs.
 
 2005-09-22  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (boundary do_plot label_width): Correct the layout
-	of the key title area for enhanced text super- and sub- scripts, and
-	ensure the box is wide enough for the key title string.
-	Bug/RFE #1002488.
+        * src/graphics.c (boundary do_plot label_width): Correct the layout
+        of the key title area for enhanced text super- and sub- scripts, and
+        ensure the box is wide enough for the key title string.
+        Bug/RFE #1002488.
 
-	NB: This fix reveals that the x11 driver has incorrect vertical
-	centering for enhanced text; other drivers are fine.
+        NB: This fix reveals that the x11 driver has incorrect vertical
+        centering for enhanced text; other drivers are fine.
 
-	* term/xlib.trm: Add enhanced text entry points to TERM_TABLE so that
-	enhanced text handling by x11 driver can be debugged.
+        * term/xlib.trm: Add enhanced text entry points to TERM_TABLE so that
+        enhanced text handling by x11 driver can be debugged.
 
 2005-09-21  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/svg.trm (SVG_init): Place encoding information in the 
-	XML header record if an encoding is explicitly set in gnuplot.
-	Bug #1231209.
+        * term/svg.trm (SVG_init): Place encoding information in the 
+        XML header record if an encoding is explicitly set in gnuplot.
+        Bug #1231209.
 
-	* src/axis.c (gen_tics): Correct the calculation of last minitic
-	position to be plotted on a log-scale axis. Bug #1223149.
+        * src/axis.c (gen_tics): Correct the calculation of last minitic
+        position to be plotted on a log-scale axis. Bug #1223149.
 
-	* src/term.c (write_multiline): Fix trivial line-counting bug.
+        * src/term.c (write_multiline): Fix trivial line-counting bug.
 
 2005-09-20  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/set.c (parse_label_options): Fix incorrect ordering of
-	declaration/initialization. Non-gcc compilers didn't like it.
+        * src/set.c (parse_label_options): Fix incorrect ordering of
+        declaration/initialization. Non-gcc compilers didn't like it.
 
 2005-09-19  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (boundary): Allow space for zeroaxis tic labels when
-	zeroaxis is near plot border.  Bug #219867 swatted after 5 years!
+        * src/graphics.c (boundary): Allow space for zeroaxis tic labels when
+        zeroaxis is near plot border.  Bug #219867 swatted after 5 years!
 
 2005-09-17  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/axis.c (gen_tics add_tic_user) src/axis.h src/save.c (save_tics)
-	src/setc.c (set_tic_prop load_tic_user load_tic_series)
-	src/show.c (show_ticdef) src/unset.c (unset_tics) docs/gnuplot.doc:
+        * src/axis.c (gen_tics add_tic_user) src/axis.h src/save.c (save_tics)
+        src/setc.c (set_tic_prop load_tic_user load_tic_series)
+        src/show.c (show_ticdef) src/unset.c (unset_tics) docs/gnuplot.doc:
 
-	Sourceforge patchset #1104018.
-	Allow both user-specified axis tics and auto-generated tics at the
-	same time.  No change to basic syntax or behaviour of tics, but the
-	extra key word "add" in a "set [xuz]tics ..." command causes the
-	requested tics to be added to the current ones rather than replacing
-	them.
+        Sourceforge patchset #1104018.
+        Allow both user-specified axis tics and auto-generated tics at the
+        same time.  No change to basic syntax or behaviour of tics, but the
+        extra key word "add" in a "set [xuz]tics ..." command causes the
+        requested tics to be added to the current ones rather than replacing
+        them.
 
 2005-09-17  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (plot_image_or_update_axes): Use gp_alloc rather
-	than malloc. Bug #1254314.
+        * src/graphics.c (plot_image_or_update_axes): Use gp_alloc rather
+        than malloc. Bug #1254314.
 
-	* src/gplt_x11.c src/getcolor.c: Check for NULL return from malloc().
-	Bug #1254314.
+        * src/gplt_x11.c src/getcolor.c: Check for NULL return from malloc().
+        Bug #1254314.
 
-	* demo/all.dem: Fixed mis-matched quotes around "rgb_variable.dem".
+        * demo/all.dem: Fixed mis-matched quotes around "rgb_variable.dem".
 
 2005-09-16  Juergen Wieferink  <wieferink@freenet.de>
 
-	* src/command.c (string_expand):  Fix bug in macro handling; escaped
-	quotes were not recognized.
+        * src/command.c (string_expand):  Fix bug in macro handling; escaped
+        quotes were not recognized.
 
 2005-09-16  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graph3d.c (draw_3d_graphbox): Treat placement of Z-axis label in
-	the same way as those for the X and Y axes.
+        * src/graph3d.c (draw_3d_graphbox): Treat placement of Z-axis label in
+        the same way as those for the X and Y axes.
 
 2005-09-15  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/term.c (write_multiline, on_page): New routine on_page(x,y) to
-	check coordinates for being in range of entire terminal drawing area.
-	Use this in write_multiline() to centralize text clipping (may extend
-	it to single line text later). Fixes bug #1274007 and a lot of old
-	complaints about segfaults in libpdf.
+        * src/term.c (write_multiline, on_page): New routine on_page(x,y) to
+        check coordinates for being in range of entire terminal drawing area.
+        Use this in write_multiline() to centralize text clipping (may extend
+        it to single line text later). Fixes bug #1274007 and a lot of old
+        complaints about segfaults in libpdf.
 
-	* src/term_api.h term/post.trm: But some terminals can clip text just
-	fine on their own, and do it more cleanly than on_page() can do. Define
-	a terminal flag TERM_CAN_CLIP for these cases, starting with post.trm.
-	If the flag is set for the current terminal, on_page() always returns
-	TRUE.
+        * src/term_api.h term/post.trm: But some terminals can clip text just
+        fine on their own, and do it more cleanly than on_page() can do. Define
+        a terminal flag TERM_CAN_CLIP for these cases, starting with post.trm.
+        If the flag is set for the current terminal, on_page() always returns
+        TRUE.
 
-	* src/graph3d.c (xtick_callback ytick_callback ztick_callback):
-	Since write_multiline() now does its own clipping, it does not need to
-	be wrapped by clip_put_text_just(). While we're here, apply text
-	rotation for tic labels.
+        * src/graph3d.c (xtick_callback ytick_callback ztick_callback):
+        Since write_multiline() now does its own clipping, it does not need to
+        be wrapped by clip_put_text_just(). While we're here, apply text
+        rotation for tic labels.
 
-	* src/gadgets.c src/gadgets.h src/color.c: This leaves no callers for
-	clip_put_text_just(), so remove the routine altogether.
+        * src/gadgets.c src/gadgets.h src/color.c: This leaves no callers for
+        clip_put_text_just(), so remove the routine altogether.
 
 2005-09-15  Harald Harders  <h.harders@tu-bs.de>
 
-	* src/variable.c term/post.trm (PS_options, documentation):
-	Fix bugs in fontfile handling of ps terminal. Document "nofontfiles".
-	SourceForge patch #1269469.
+        * src/variable.c term/post.trm (PS_options, documentation):
+        Fix bugs in fontfile handling of ps terminal. Document "nofontfiles".
+        SourceForge patch #1269469.
 
 2005-09-15  Ethan Merritt  <merritt@u.washington.edu>
 
-	* demo/html/Makefile demo/html/index.save: Add rgb_variable.dem to the
-	autogenerated html set.  Also add dashcolor.dem, which is complicated
-	by needing to generate an *.eps file and then convert it to *.png.
-	
-	* demo/all.dem: Add rainbow.dem and rgb_variable.dem
+        * demo/html/Makefile demo/html/index.save: Add rgb_variable.dem to the
+        autogenerated html set.  Also add dashcolor.dem, which is complicated
+        by needing to generate an *.eps file and then convert it to *.png.
+        
+        * demo/all.dem: Add rainbow.dem and rgb_variable.dem
 
-	* src/gadgets.h: Initialize axis labels to use linetype -1, not 0.
+        * src/gadgets.h: Initialize axis labels to use linetype -1, not 0.
 
 2005-09-14  Ethan Merritt  <merritt@u.washington.edu>
 
-	* docs/gnuplot.doc: The histogram plot style was not being listed as an
-	option under 'help plotting styles'.
+        * docs/gnuplot.doc: The histogram plot style was not being listed as an
+        option under 'help plotting styles'.
 
 2005-09-12  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/axis.c src/axis.h src/color.c src/gadgets.c src/gadgets.c
-	src/graph3d.c src/graphics.c src/save.c src/set.c src/show.c src/term.c
-	src/unset.c:
-	Up till now gnuplot's axis labels, plot title, and timestamp have been
-	stored in statically allocated instances of struct label_struct.
-	All other labels use dynamically allocated struct text_label.
-	This set of changes converts all users of struct label_struct to use
-	stucture text_label instead. This saves space everywhere, and
-	consolidates the label parsing and handling routines.
-	
-	* docs/gnuplot.doc NEWS:
-	The y and y2 axis labels now allow explicit control over rotation angle;
-	all labels now allow explicit control over {no}enhanced text processing.
+        * src/axis.c src/axis.h src/color.c src/gadgets.c src/gadgets.c
+        src/graph3d.c src/graphics.c src/save.c src/set.c src/show.c src/term.c
+        src/unset.c:
+        Up till now gnuplot's axis labels, plot title, and timestamp have been
+        stored in statically allocated instances of struct label_struct.
+        All other labels use dynamically allocated struct text_label.
+        This set of changes converts all users of struct label_struct to use
+        stucture text_label instead. This saves space everywhere, and
+        consolidates the label parsing and handling routines.
+        
+        * docs/gnuplot.doc NEWS:
+        The y and y2 axis labels now allow explicit control over rotation angle;
+        all labels now allow explicit control over {no}enhanced text processing.
 
 2005-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* config/config.nt: Rearranged to comply with config.{h,cyg,mgw,os2}.
+        * config/config.nt: Rearranged to comply with config.{h,cyg,mgw,os2}.
 
 2005-09-11  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/save.c (save_set_all): Fix incorrect placement of newlines
-	in "set pm3d" options.
+        * src/save.c (save_set_all): Fix incorrect placement of newlines
+        in "set pm3d" options.
 
 2005-09-09  Lars Hecking  <lhecking@users.sourceforge.net>
 
-	* Makefile.am: Add DISTCLEANFILES.
+        * Makefile.am: Add DISTCLEANFILES.
 
-	* lisp/Makefile.am: Add $(ELS) to distclean-local target.
+        * lisp/Makefile.am: Add $(ELS) to distclean-local target.
 
-	* share/LaTeX/Makefile.am: Install .cfg file under gnuplot's directory
-	hierarchy rather than LaTeX's - it is the user's responsibility to
-	update the latter. Add uninstall-hook.
+        * share/LaTeX/Makefile.am: Install .cfg file under gnuplot's directory
+        hierarchy rather than LaTeX's - it is the user's responsibility to
+        update the latter. Add uninstall-hook.
 
 2005-09-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* config/config.nt: Added flags for GP_ISVAR, libPDF details,
-	HAVE_STRINGIZE, string variables, datastrings, histograms, fit
-	error variables, image mode, macros.  Added at least some
-	comments.
+        * config/config.nt: Added flags for GP_ISVAR, libPDF details,
+        HAVE_STRINGIZE, string variables, datastrings, histograms, fit
+        error variables, image mode, macros.  Added at least some
+        comments.
 
 2005-09-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* config/makefile.nt: Add a rule that makes all *.obj files
-	explicitly dependent on config.h.  Explain usage a bit more
-	clearly.
+        * config/makefile.nt: Add a rule that makes all *.obj files
+        explicitly dependent on config.h.  Explain usage a bit more
+        clearly.
 
-	* src/graphics.c (plot_image_or_update_axes): Don't dereference
-	function pointer in test.
+        * src/graphics.c (plot_image_or_update_axes): Don't dereference
+        function pointer in test.
 
-	* docs/gnuplot.texi: Regenerated.
+        * docs/gnuplot.texi: Regenerated.
 
-	* docs/gnuplot.doc: Removed superfluous blanks, fixing some
-	blank-only lines.
+        * docs/gnuplot.doc: Removed superfluous blanks, fixing some
+        blank-only lines.
 
-	* src/beos/Makefile.in: New file.  Edited copy of previous
-	Makefile to fix out-of-source 'make dist'.
+        * src/beos/Makefile.in: New file.  Edited copy of previous
+        Makefile to fix out-of-source 'make dist'.
 
-	* src/beos/Makefile: Removed.
+        * src/beos/Makefile: Removed.
 
-	* configure.in: Add src/beos/Makefile to AC_OUTPUT.
-
-2005-09-07  Lars Hecking  <lhecking@users.sourceforge.net>
-
-	* Makefile.am, configure.in, share/Makefile.am: SUBDIRS in
-	automake versions older than 1.9 can only contain direct
-	children. Need a minimal, dummy Makefile.am in share/ to address
-	this.
-
-	* configure.in, share/Makefile.am, share/LaTeX/Makefile.am: Fix
-	building outside source directory.
+        * configure.in: Add src/beos/Makefile to AC_OUTPUT.
 
 2005-09-07  Lars Hecking  <lhecking@users.sourceforge.net>
 
-	* Makefile.am: Add share/LaTeX to SUBDIRS.
+        * Makefile.am, configure.in, share/Makefile.am: SUBDIRS in
+        automake versions older than 1.9 can only contain direct
+        children. Need a minimal, dummy Makefile.am in share/ to address
+        this.
 
-	* depcomp, install-sh, missing, mkinstalldirs: Updated from
-	automake.
+        * configure.in, share/Makefile.am, share/LaTeX/Makefile.am: Fix
+        building outside source directory.
 
-	* config/Makefile.am.in: Add MacOSX to EXTRA_DIST generation.
+2005-09-07  Lars Hecking  <lhecking@users.sourceforge.net>
 
-	* demo/Makefile.am.in: Add *.cfg and html to EXTRA_DIST
-	generation, remove webify.pl.
+        * Makefile.am: Add share/LaTeX to SUBDIRS.
 
-	* share/LaTeX: Add top_srcdir, INSTALL_DATA, DISTFILES, install,
-	distdir, clean, distclean. Clean up all and install targets.
+        * depcomp, install-sh, missing, mkinstalldirs: Updated from
+        automake.
 
-	* src/Makefile.am: Add makefile.awc to EXTRA_DIST.
+        * config/Makefile.am.in: Add MacOSX to EXTRA_DIST generation.
+
+        * demo/Makefile.am.in: Add *.cfg and html to EXTRA_DIST
+        generation, remove webify.pl.
+
+        * share/LaTeX: Add top_srcdir, INSTALL_DATA, DISTFILES, install,
+        distdir, clean, distclean. Clean up all and install targets.
+
+        * src/Makefile.am: Add makefile.awc to EXTRA_DIST.
 
 2005-09-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* show.c (show_palette_palette): Take care that print_out is
-	stderr for for both NULL and stderr.
+        * show.c (show_palette_palette): Take care that print_out is
+        stderr for for both NULL and stderr.
 
-	* command.c (print_show_output): Make the test to print_out, not
-	print_out_name (failed for stdout).
+        * command.c (print_show_output): Make the test to print_out, not
+        print_out_name (failed for stdout).
 
 2005-09-05  Geoffrey Hausheer  <ghaushe@users.sourceforge.net>
 
-	SF patch [1264939] Adds bilinear interpolation to pm3d surfaces
+        SF patch [1264939] Adds bilinear interpolation to pm3d surfaces
 
-	* demo/pm3d.dem docs/gnuplot.doc src/pm3d.c src/pm3d.h src/save.c
-	src/set.c src/show.c src/tables.c src/tables.h NEWS: When using
-	pm3d with data files (rather than functions), a single color is
-	used for each quadrangle (unless dgrid is used, but then you get
-	weighted averages instead). This patch does bilinear interpolation
-	to subdivide each quadrangle into nxn smaller quadrangles, and
-	sets the color of each one independantly.
+        * demo/pm3d.dem docs/gnuplot.doc src/pm3d.c src/pm3d.h src/save.c
+        src/set.c src/show.c src/tables.c src/tables.h NEWS: When using
+        pm3d with data files (rather than functions), a single color is
+        used for each quadrangle (unless dgrid is used, but then you get
+        weighted averages instead). This patch does bilinear interpolation
+        to subdivide each quadrangle into nxn smaller quadrangles, and
+        sets the color of each one independantly.
 
 2005-08-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* config/makefile.dj2 (TERMLIBS): Updated to current version of
-	GRX.
-	(LINKOPT): Fix it to actually use $(TERMLIBS).
-	(CFLAGS): Add -DHAVE_SYS_STAT_H.
+        * config/makefile.dj2 (TERMLIBS): Updated to current version of
+        GRX.
+        (LINKOPT): Fix it to actually use $(TERMLIBS).
+        (CFLAGS): Add -DHAVE_SYS_STAT_H.
 
 2005-08-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/os2/gclient.c (ReadGnu): implement stubs in pm terminal to
-	map RGB colors to nearest color from current pm3d palette
-	
+        * src/os2/gclient.c (ReadGnu): implement stubs in pm terminal to
+        map RGB colors to nearest color from current pm3d palette
+        
 2005-08-22  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/color.c src/color.h: New routine set_rgbcolor().
+        * src/color.c src/color.h: New routine set_rgbcolor().
 
-	* src/misc.c (parse_colorspec) src/graph3d.c: Allow color
-	specification "rgb variable", in which case the RGB color is taken
-	from an additional field of the "using" specifier.
+        * src/misc.c (parse_colorspec) src/graph3d.c: Allow color
+        specification "rgb variable", in which case the RGB color is taken
+        from an additional field of the "using" specifier.
 
-	* docs/gnuplot.doc demo/rgb_variable.dat demo/rgb_variable.dem NEWS:
-	Explain and give example of reading rgb color from input data field.
+        * docs/gnuplot.doc demo/rgb_variable.dat demo/rgb_variable.dem NEWS:
+        Explain and give example of reading rgb color from input data field.
 
 2005-08-19  Ethan Merritt  <merritt@u.washington.edu>
 
         * src/plot3d.c (get_3ddata) src/graph3d.c(plot3d_points): 
-	Variable pointsize should be honored in plot style "linespoints" 
-	exactly as in style "points".
+        Variable pointsize should be honored in plot style "linespoints" 
+        exactly as in style "points".
 
 2005-08-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
