@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.138 2005/11/25 18:54:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.140 2005/12/05 05:14:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -922,7 +922,7 @@ do_3dplot(
 			else
 			    key_sample_line(xl, yl);
 		    }
-		    if (!(hidden3d && draw_surface)) {
+		    if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d) {
 			if (use_palette)
 			    plot3d_lines_pm3d(this_plot);
 			else
@@ -947,7 +947,7 @@ do_3dplot(
 		    else
 			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 		}
-		if (!(hidden3d && draw_surface)) {
+		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d) {
 		    plot3d_points(this_plot, this_plot->lp_properties.p_type);
 		}
 		break;
@@ -961,7 +961,7 @@ do_3dplot(
 			key_sample_line(xl, yl);
 		}
 
-		if (!(hidden3d && draw_surface)) {
+		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d) {
 		    if (use_palette)
 			plot3d_lines_pm3d(this_plot);
 		    else
@@ -976,7 +976,7 @@ do_3dplot(
 			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 		}
 
-		if (!(hidden3d && draw_surface)) {
+		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d) {
 		    plot3d_points(this_plot, this_plot->lp_properties.p_type);
 		}
 
@@ -990,14 +990,14 @@ do_3dplot(
 			key_sample_point(xl, yl, -1);
 		}
 
-		if (!(hidden3d && draw_surface)) {
-			plot3d_points(this_plot, -1);
+		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d) {
+		    plot3d_points(this_plot, -1);
 		}
 
 		break;
 
 	    case VECTOR:
-	        if (!(hidden3d && draw_surface))
+		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d)
 		    plot3d_vectors(this_plot);
 		if (lkey) {
 		    if (this_plot->lp_properties.use_palette)
@@ -1015,7 +1015,7 @@ do_3dplot(
 
 #ifdef EAM_DATASTRINGS
 	    case LABELPOINTS:
-		if (!(hidden3d && draw_surface))
+		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d)
 		    place_labels3d(this_plot->labels->next, LAYER_PLOTLABELS);
 		break;
 #endif

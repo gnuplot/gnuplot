@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.117 2005/11/27 18:31:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.118 2005/11/27 23:52:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -115,6 +115,7 @@ sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
     sp->next_sp = NULL;
     sp->title = NULL;
     sp->title_no_enhanced = FALSE;
+    sp->opt_out_of_hidden3d = FALSE;
     sp->contours = NULL;
     sp->iso_crvs = NULL;
     sp->num_iso_read = 0;
@@ -1352,6 +1353,15 @@ eval_3dplots()
 		    }
 
 		    set_with = TRUE;
+		    continue;
+		}
+
+		/* EAM Dec 2005 - Hidden3D code by default includes points,  */
+		/* labels and vectors in the hidden3d processing. Check here */
+		/* if this particular plot wants to be excluded.             */
+		if (almost_equals(c_token, "nohidden$3d")) {
+		    c_token++;
+		    this_plot->opt_out_of_hidden3d = TRUE;
 		    continue;
 		}
 

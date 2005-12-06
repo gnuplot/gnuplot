@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.53 2005/12/05 22:00:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.54 2005/12/06 15:00:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -930,6 +930,10 @@ build_networks(struct surface_points *plots, int pcount)
 	 this_plot = this_plot->next_sp, surface++) {
 	long int crvlen = this_plot->iso_crvs->p_count;
 
+	/* Allow individual plots to opt out of hidden3d calculations */
+	if (this_plot->opt_out_of_hidden3d)
+	    continue;
+
 	/* register maximal isocurve length. Only necessary for
 	 * grid-topology plots that will create polygons, so I can do
 	 * it here, already. */
@@ -1019,6 +1023,10 @@ build_networks(struct surface_points *plots, int pcount)
 	long int crvlen = this_plot->iso_crvs->p_count;
 	lp_style_type *lp_style = NULL;
 	TBOOLEAN color_from_column = this_plot->pm3d_color_from_column;
+
+	/* Allow individual plots to opt out of hidden3d calculations */
+	if (this_plot->opt_out_of_hidden3d)
+	    continue;
 
 	lp = &(this_plot->lp_properties);
 	above = this_plot->lp_properties.l_type;

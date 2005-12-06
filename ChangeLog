@@ -1,3 +1,10 @@
+2005-12-06  Ethan Merritt  <merritt@u.washington.edu>
+
+        * src/graph3d.c (do_3dplot) src/graph3d.h src/plot3d.c (eval_3dplots)
+	src/hidden3d.c (build_networks) docs/gnuplot.doc: Add an option to
+	`with <plotstyle> nohidden3d` that allows you to exclude a particular
+	plot from the global `set hidden3d` processing.
+
 2005-12-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
         * src/hidden3d.c (COORD_TO_TREECELL, COORD_TO_BITMASK): Avoid

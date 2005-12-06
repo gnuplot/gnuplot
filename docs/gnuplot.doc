@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.338 2005/11/23 23:33:37 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.339 2005/11/26 06:50:47 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4165,6 +4165,7 @@ C ... and restart the table:
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}
                          {fill | fs <fillstyle>}
+                         {nohidden3d}
                          {palette}}
                     }
 
@@ -4224,6 +4225,13 @@ C ... and restart the table:
  colors as specified by either their fractional value or the corresponding value
  mapped to the colorbox range. 2d plots can not use palette colors mapped by
  Z value. See `colors`, `set palette`, `linetype`.
+
+ The keyword `nohidden3d` applies only to plots made with the `splot` command.
+ Normally the global option `set hidden3d` applies to all plots in the graph.
+ You can attach the `nohidden3d` option to any individual plots that you want
+ to exclude from the hidden3d processing.  The individual elements
+ (lines, dots, labels, ...) of a plot marked `nohidden3d` will all be drawn,
+ even if they would normally be obscured by the elements of some other plot.
 
  The keywords may be abbreviated as indicated.
 
@@ -6025,9 +6033,14 @@ C ... and restart the table:
  its contours drawn on the base (see `set contour`) as well as the grid will
  be hidden.  Each surface has its hidden parts removed with respect to itself
  and to other surfaces, if more than one surface is plotted.  Contours drawn
- on the surface (`set contour surface`) don't work.  Labels and arrows are
- always visible and are unaffected.  The key is also never hidden by the
- surface.
+ on the surface (`set contour surface`) don't work.  
+ 
+ Labels and arrows are always visible and are unaffected.  The key box is
+ never hidden by the surface. As of gnuplot version 4.1, `set hidden3d` also
+ affects 3D plotting styles `with points`, `with labels`, and `with vectors`,
+ even if no surface is present in the graph.  Individual plots within the
+ graph may be explicitly excluded from this processing by appending the extra
+ option `nohidden` to the `with` specifier.
 
  Functions are evaluated at isoline intersections.  The algorithm interpolates
  linearly between function points or data points when determining the visible
