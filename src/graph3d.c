@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.140 2005/12/05 05:14:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.141 2005/12/06 18:23:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -450,10 +450,6 @@ get_arrow3d(
 {
     map3d_position(&(arrow->start), sx, sy, "arrow");
 
-    /* Oct 2005 - arrow clipping now donw in do_arrow() */
-    /* if (*sx < 0 || *sx > term->xmax || *sy < 0 || *sy > term->ymax)
-	return FALSE; */
-
     if (arrow->relative) {
 	map3d_position_r(&(arrow->end), ex, ey, "arrow");
 	*ex += *sx;
@@ -546,7 +542,7 @@ do_3dplot(
     int surface;
     struct surface_points *this_plot = NULL;
     int xl, yl;
-    /* double ztemp, temp; unused */
+    BoundingBox clip_splot_map;	/* FIXME: Not hooked up to anything yet! */
     transform_matrix mat;
     int key_count;
     legend_key *key = &keyT;
@@ -651,6 +647,17 @@ do_3dplot(
 	 * lines being output after all surfaces have been defined. */
 	draw_3d_graphbox(plots, pcount, BACKGRID);
 #endif /* USE_GRID_LAYERS */
+
+    /* Clipping in 'set view map' mode should be like 2D clipping */
+    if (splot_map) {
+	unsigned int map_x1, map_y1, map_x2, map_y2;
+	map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &map_x1, &map_y1);
+	map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
+	clip_splot_map.xleft = map_x1;
+	clip_splot_map.xright = map_x2;
+	clip_splot_map.ybot = map_y2;
+	clip_splot_map.ytop = map_y1;
+    }
 
     /* PLACE TITLE */
     if (title.text != 0) {

@@ -1,7 +1,12 @@
+2005-12-11  Ethan Merritt  <merritt@u.washington.edu>
+
+        * src/graph3d.c (do_3dplot): Add a BoundingBox structure to describe
+	the plot boundaries in 'set view map' mode.
+
 2005-12-06  Ethan Merritt  <merritt@u.washington.edu>
 
         * src/graph3d.c (do_3dplot) src/graph3d.h src/plot3d.c (eval_3dplots)
-	src/hidden3d.c (build_networks) docs/gnuplot.doc: Add an option to
+	src/hidden3d.c (build_networks) docs/gnuplot.doc:   Add an option
 	`with <plotstyle> nohidden3d` that allows you to exclude a particular
 	plot from the global `set hidden3d` processing.
 
