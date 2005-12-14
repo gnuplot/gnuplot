@@ -1,3 +1,9 @@
+2005-12-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/makefile.nt: Fixes for linking with bgd.dll.
+
+	* src/term.c: #include <io.h> for __MSC__.
+
 2005-12-11  Ethan Merritt  <merritt@u.washington.edu>
 
         * src/graph3d.c (do_3dplot): Add a BoundingBox structure to describe

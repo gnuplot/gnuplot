@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.131 2005/11/09 21:22:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.132 2005/11/25 04:43:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -319,7 +319,7 @@ void fflush_binary();
 #include <fcntl.h>
 #endif
 
-#ifdef __WATCOMC__
+#if defined(__WATCOMC__) || defined(__MSC__)
 # include <io.h>        /* for setmode() */
 #endif
 
