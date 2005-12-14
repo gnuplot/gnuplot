@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.15 2005/08/07 09:43:27 mikulik Exp $
+# $Id: makefile.nt,v 1.16 2005/09/08 19:42:00 broeker Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -9,12 +9,14 @@
 #   Added pdf support with pdflib as a sub of .\src
 #     pdflib can be downloaded from http://www.pdflib.com
 #   Added MSC multi-thread support for compatibility with pdflib
+# Bastian Maerkisch bmaerkisch@web.de:
+#   Added support for binary version of the GD library (bgd.dll) 
+#     gdlib can be downloaded from http://www.boutell.com/gd
+#   Removed zlib and libpng again as they're already included in bgd.dll
 
 #
 # To compile with Visual C: 
-#	Download zlib to ..\src\zlib and compile it 
-#	Copy zlib.dll to \winnt\system32 or anywhere else in the path
-#	Download libpng to ..\src\libpng and compile it
+#	Download gdlib to ..\src\gdwin32
 #	Download pdflib to ..\src\pdflib and compile it if you choose the source
 #
 #	Find and run VCVARS32.BAT (or maybe VSVARS32.BAT)
@@ -42,13 +44,17 @@ TOP = .
 # /G4 means optimize code for 486
 # /G3 means optimize code for 386
 # /MT means include multi-thread support
+# /MD means include multi-thread support (DLL)
 
 CC = cl /c
 LD = link
 
 # compiler flags
 OPTIONS = /DUSE_MOUSE
-CFLAGS = /G5 /O2 /MT /I$(TOP) /nologo /D_Windows /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" /DHAVE_LIBPNG /DHAVE_LIBPDF $(OPTIONS)
+OPTIONS = $(OPTIONS) /DHAVE_LIBGD /DHAVE_GD_GIF /DHAVE_GD_PNG /DHAVE_GD_JPEG /DHAVE_GD_TTF
+OPTIONS = $(OPTIONS) /DHAVE_LIBPDF
+OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
+CFLAGS = /O2 /G5 /GX /GR /MD /I$(TOP) /nologo /D_Windows /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
 
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = $(PROCESSOR_ARCHITECTURE)
@@ -57,12 +63,11 @@ MACHINE = IX86
 !ENDIF
 
 # paths for external libs added here... 
-# /NODEFAULTLIBs to avoid MSC multi-thread conflicts 
-LDFLAGS = /subsystem:windows /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT /libpath:..\src\zlib /libpath:..\src\libpng /libpath:..\src\pdflib\pdflib /NODEFAULTLIB:LIBC.lib /NODEFAULTLIB:LIBCMTD.lib 
+LDFLAGS = /subsystem:windows /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT /libpath:..\src\pdflib\pdflib /libpath:..\src\gdwin32 
 
 # ...and here.
 # see other terminal defines in term.h
-TERMFLAGS = /I..\\term /I..\\src\\libpng /I..\\src\\zlib /I..\\src\\pdflib\\pdflib
+TERMFLAGS = /I..\\term /I..\\src\\pdflib\\pdflib /I..\\src\\gdwin32
 
 # macros for makefile.all
 O=obj
@@ -111,8 +116,7 @@ linkopt1.msw: makefile.nt
 	echo advapi32.lib >> linkopt1.msw
 	echo shell32.lib >> linkopt1.msw
 	echo pdflib.lib >> linkopt1.msw
-	echo libpng.lib >> linkopt1.msw
-	echo zlib.lib >> linkopt1.msw
+	echo bgd.lib >> linkopt1.msw
 	echo wgnuplot.res >> linkopt1.msw
 
 makefile.nt: ..\config\makefile.nt
