@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.43 2005/08/03 16:55:40 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.44 2005/08/07 09:43:33 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -944,6 +944,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    SelectObject(hdc, halftone_brush[0]);
 	    }
 	    /* needs to be fixed for monochrome devices */
+	    /* FIXME: probably should keep track of text color */
 	    SetTextColor(hdc, lpgw->colorpen[pen].lopnColor);
 	    xdash -= rl;
 	    ydash -= rb - 1;
@@ -995,14 +996,20 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    break;
 	case W_pm3d_setcolor:
 	    {
-		double level = curptr->x / 256.0;
-		rgb255_color rgb255;
 		static HBRUSH last_pm3d_brush = NULL;
 		HBRUSH this_brush;
 		COLORREF c;
 
-		rgb255maxcolors_from_gray( level, &rgb255 );
-		c = RGB(rgb255.r, rgb255.g, rgb255.b);
+		/* distinguish gray values and RGB colors */
+		if (curptr->y == 0) {
+		    rgb255_color rgb255;
+		    rgb255maxcolors_from_gray( curptr->x / 256.0, &rgb255 );
+		    c = RGB(rgb255.r, rgb255.g, rgb255.b);
+		}
+		else {
+		    c = RGB(curptr->y & 0xff, (curptr->x >> 8) & 0xff, curptr->x & 0xff);
+		}
+
 		this_brush = CreateSolidBrush(c);
 		SelectObject(hdc, this_brush);
 		if (last_pm3d_brush != NULL)
@@ -1010,6 +1017,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		last_pm3d_brush = this_brush;
 		/* create new pen, too: */
 		DeleteObject(SelectObject(hdc, CreatePen(PS_SOLID, 1, c)));
+		/* finally set text color */
+		SetTextColor(hdc, c);
 	    }
 	    break;
 	case W_pm3d_filled_polygon_pt:
