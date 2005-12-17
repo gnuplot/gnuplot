@@ -1,5 +1,8 @@
 2005-12-17  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/version.c: Changed value of gnuplot_date[] from a useless 
+	July 2004 day into "December 2005".
+
 	* src/mouse.h src/mouse.c: Added new field was_splot_map in structure
 	t_zoom. It should fix yet another occurence of "set view map; plot x"
 	and y-axis reversal when zooming by mouse and unzooming by hotkeys.
