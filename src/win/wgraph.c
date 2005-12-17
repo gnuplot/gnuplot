@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.44 2005/08/07 09:43:33 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.45 2005/12/15 13:22:46 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1016,7 +1016,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    DeleteObject(last_pm3d_brush);
 		last_pm3d_brush = this_brush;
 		/* create new pen, too: */
-		DeleteObject(SelectObject(hdc, CreatePen(PS_SOLID, 1, c)));
+		DeleteObject(SelectObject(hdc, CreatePen(PS_SOLID, line_width, c)));
 		/* finally set text color */
 		SetTextColor(hdc, c);
 	    }

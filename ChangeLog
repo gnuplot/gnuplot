@@ -1,3 +1,7 @@
+2005-12-17  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph): Fixed "splot x with line palette lw 10".
+
 2005-12-17  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/version.c: Changed value of gnuplot_date[] from a useless 
