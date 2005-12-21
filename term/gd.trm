@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.77 2005/10/05 20:19:14 sfeam Exp $
+ * $Id: gd.trm,v 1.78 2005/11/13 00:35:02 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1258,7 +1258,19 @@ PNG_text()
 	else
 #endif
 	    im_crop = gdImageCreate(x,y);
+
+	bg = gdImageColorAllocateAlpha(im_crop,255,255,255,127);
+
 	gdImagePaletteCopy(im_crop, png_state.image);
+	if (png_state.flags & PNG_USE_TRANSPARENT) {
+	    gdImageColorTransparent(im_crop, bg);
+	    /* WARNING: This is a work-around for strangeness in libgd,  */
+	    /* which doesn't copy transparent pixels in TrueColor images. */
+	    if (png_state.TrueColor)
+		gdImageColorTransparent(png_state.image, -1);
+	} else
+	    gdImageColorTransparent(im_crop, -1);
+
 	gdImageCopy(im_crop, png_state.image, 0, 0, x1, y1, x, y);
 	gdImageDestroy(png_state.image);
 	png_state.image = im_crop;

@@ -1,3 +1,9 @@
+2005-12-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_text): Work around unexpected behaviour in libgd,
+	which does not copy transparent pixels during a copy operation.
+	Fixes bug #1386553.
+
 2005-12-17  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph): Fixed "splot x with line palette lw 10".
