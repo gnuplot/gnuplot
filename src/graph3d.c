@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.141 2005/12/06 18:23:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.142 2005/12/12 06:51:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -485,13 +485,6 @@ place_labels3d(struct text_label *listhead, int layer)
 		     this_label->place.z, &x, &y);
 	else
 	    map3d_position(&this_label->place, &x, &y, "label");
-
-	/* EAM FIXME - Is this a sufficient test for out-of-bounds? */
-	if (x < 0 || x > term->xmax || y < 0 || y > term->ymax) {
-	    FPRINTF((stderr,
-	             "place_labels3d: skipping out-of-bounds label\n"));
-	    continue;
-	}
 
 	write_label(x, y, this_label);
     }

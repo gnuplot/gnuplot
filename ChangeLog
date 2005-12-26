@@ -1,3 +1,8 @@
+2005-12-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (place_label3d):  Let write_label handle clipping to
+	the page, rather than duplicating it in place_label3d.
+
 2005-12-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_text): Work around unexpected behaviour in libgd,
