@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.78 2005/11/13 00:35:02 sfeam Exp $
+ * $Id: gd.trm,v 1.79 2005/12/22 06:22:27 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -316,6 +316,65 @@ gp_gdImageFilledPolygon(gdImagePtr im, gdPointPtr p, int n, int c)
     gdImageFilledPolygon(im, p, n, c);
 }
 #endif
+
+
+/* Common code to crop the image around its bounding box, just before writing
+   down the file.
+*/
+static void
+image_do_crop ()
+{
+    if (png_state.flags & PNG_USE_CROP) {
+	int x, y, x1, y1, x2, y2, flag;
+	int bg = png_state.color_table[0]; /* index of the background color */
+	gdImagePtr im_crop;
+	for (flag=0, x1=0; x1 < gdImageSX(png_state.image)-1; x1++) {
+	    for (y=0; y < gdImageSY(png_state.image); y++)
+		if (gdImageGetPixel(png_state.image, x1, y) != bg) { flag = 1; break; }
+	    if (flag) break;
+	}
+	for (flag=0, x2=gdImageSX(png_state.image)-1; x2 >= x1; x2--) {
+	    for (y=0; y < gdImageSY(png_state.image); y++)
+		if (gdImageGetPixel(png_state.image, x2, y) != bg) { flag = 1; break; }
+	    if (flag) break;
+	}
+	for (flag=0, y1=0; y1 < gdImageSY(png_state.image)-1; y1++) {
+	    for (x=x1; x <= x2; x++)
+		if (gdImageGetPixel(png_state.image, x, y1) != bg) { flag = 1; break; };
+	    if (flag) break;
+	}
+	for (flag=0, y2=gdImageSY(png_state.image)-1; y2 >= y1; y2--) {
+	    for (x=x1; x <= x2; x++)
+		if (gdImageGetPixel(png_state.image, x, y2) != bg) { flag = 1; break; };
+	    if (flag) break;
+	}
+	x = x2 - x1 + 1; /* width */
+	y = y2 - y1 + 1; /* height */
+#if (GD2_VERS >= 2)
+	if (png_state.TrueColor)
+	    im_crop = gdImageCreateTrueColor(x,y);
+	else
+#endif
+	    im_crop = gdImageCreate(x,y);
+
+	bg = gdImageColorAllocateAlpha(im_crop,255,255,255,127);
+
+	gdImagePaletteCopy(im_crop, png_state.image);
+	if (png_state.flags & PNG_USE_TRANSPARENT) {
+	    gdImageColorTransparent(im_crop, bg);
+	    /* WARNING: This is a work-around for strangeness in libgd,  */
+	    /* which doesn't copy transparent pixels in TrueColor images. */
+	    if (png_state.TrueColor)
+		gdImageColorTransparent(png_state.image, -1);
+	} else
+	    gdImageColorTransparent(im_crop, -1);
+
+	gdImageCopy(im_crop, png_state.image, 0, 0, x1, y1, x, y);
+	gdImageDestroy(png_state.image);
+	png_state.image = im_crop;
+    }
+}
+
 
 static int PNG_FillSolid __PROTO((int fillpar));
 static int PNG_FillPattern __PROTO((int fillpar));
@@ -1225,56 +1284,7 @@ PNG_graphics()
 TERM_PUBLIC void
 PNG_text()
 {
-    if (png_state.flags & PNG_USE_CROP) {
-	/* PM 23. 8. 2002: crop the image around its bounding box */
-	int x, y, x1, y1, x2, y2, flag;
-	int bg = png_state.color_table[0]; /* index of the background color */
-	gdImagePtr im_crop;
-	for (flag=0, x1=0; x1 < gdImageSX(png_state.image)-1; x1++) {
-	    for (y=0; y < gdImageSY(png_state.image); y++)
-		if (gdImageGetPixel(png_state.image, x1, y) != bg) { flag = 1; break; }
-	    if (flag) break;
-	}
-	for (flag=0, x2=gdImageSX(png_state.image)-1; x2 >= x1; x2--) {
-	    for (y=0; y < gdImageSY(png_state.image); y++)
-		if (gdImageGetPixel(png_state.image, x2, y) != bg) { flag = 1; break; }
-	    if (flag) break;
-	}
-	for (flag=0, y1=0; y1 < gdImageSY(png_state.image)-1; y1++) {
-	    for (x=x1; x <= x2; x++)
-		if (gdImageGetPixel(png_state.image, x, y1) != bg) { flag = 1; break; };
-	    if (flag) break;
-	}
-	for (flag=0, y2=gdImageSY(png_state.image)-1; y2 >= y1; y2--) {
-	    for (x=x1; x <= x2; x++)
-		if (gdImageGetPixel(png_state.image, x, y2) != bg) { flag = 1; break; };
-	    if (flag) break;
-	}
-	x = x2 - x1 + 1; /* width */
-	y = y2 - y1 + 1; /* height */
-#if (GD2_VERS >= 2)
-	if (png_state.TrueColor)
-	    im_crop = gdImageCreateTrueColor(x,y);
-	else
-#endif
-	    im_crop = gdImageCreate(x,y);
-
-	bg = gdImageColorAllocateAlpha(im_crop,255,255,255,127);
-
-	gdImagePaletteCopy(im_crop, png_state.image);
-	if (png_state.flags & PNG_USE_TRANSPARENT) {
-	    gdImageColorTransparent(im_crop, bg);
-	    /* WARNING: This is a work-around for strangeness in libgd,  */
-	    /* which doesn't copy transparent pixels in TrueColor images. */
-	    if (png_state.TrueColor)
-		gdImageColorTransparent(png_state.image, -1);
-	} else
-	    gdImageColorTransparent(im_crop, -1);
-
-	gdImageCopy(im_crop, png_state.image, 0, 0, x1, y1, x, y);
-	gdImageDestroy(png_state.image);
-	png_state.image = im_crop;
-    }
+    image_do_crop();
     if (png_state.flags & PNG_USE_INTERLACE)
 	gdImageInterlace(png_state.image, 1);
     gdImagePng(png_state.image, gpoutfile);
@@ -2051,6 +2061,7 @@ JPEG_text()
 {
 int quality = 90;
 
+    image_do_crop();
     if (png_state.flags & PNG_USE_INTERLACE)
 	gdImageInterlace(png_state.image, 1);
     gdImageJpeg(png_state.image, gpoutfile, quality);
@@ -2200,6 +2211,7 @@ TERM_PUBLIC void GIF_text __PROTO((void));
 TERM_PUBLIC void
 GIF_text()
 {
+    image_do_crop();
 #ifdef GIF_ANIMATION
     /* FIXME - using the global colormap would be better, but it breaks	*/
     /* if the individual frames specify ad-hoc RGB colors.		*/

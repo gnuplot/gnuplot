@@ -1,3 +1,8 @@
+2005-12-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/gd.trm: New routine image_do_crop(), extracted from png_text().
+	Now shared for cropping all png/gif/jpeg images.
+
 2005-12-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (place_label3d):  Let write_label handle clipping to
