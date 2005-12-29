@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vgagl.trm,v 1.13 2005/02/14 10:19:17 mikulik Exp $
+ * $Id: vgagl.trm,v 1.14 2005/08/07 09:43:35 mikulik Exp $
  */
 
 #if defined(USE_MOUSE)
@@ -118,12 +118,6 @@ void (*VGAGL_old_handler) __PROTO((int));
 TERM_PUBLIC void VGAGL_write_dump_file __PROTO((void));
 #endif
 
-#define VGA_FPRINTF(x) fprintf x
-#ifdef Y
-#   undef Y
-#endif
-#define Y(y) (vgagl_lasty - y)
-
 TERM_PUBLIC int VGAGL_make_palette __PROTO((t_sm_palette*));
 TERM_PUBLIC void VGAGL_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void VGAGL_filled_polygon __PROTO((int, gpiPoint*));
@@ -167,6 +161,10 @@ static unsigned char VGAGL_palette[0x100][3];
 #include <3dkit.h>
 #include <vgamouse.h>
 #include <vgakeyboard.h>
+
+#define VGA_FPRINTF(x) fprintf x
+#define Y(y) (vgagl_lasty - y)
+
 static int VGAGL_processing_graphics_events = no;
 static int VGAGL_interpolate = yes;
 static GraphicsContext backscreen;
@@ -1518,6 +1516,8 @@ VGAGL_write_dump_file()
     fclose(fp);
 }
 #endif
+
+#undef Y
 
 #endif
 

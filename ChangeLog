@@ -1,3 +1,8 @@
+2005-12-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm term/vgagl.trm:  Cleanup (#undef) definition of Y(coord)
+	before leaving driver code.
+
 2005-12-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/gd.trm: New routine image_do_crop(), extracted from png_text().

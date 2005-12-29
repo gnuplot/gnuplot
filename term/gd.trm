@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.79 2005/12/22 06:22:27 sfeam Exp $
+ * $Id: gd.trm,v 1.80 2005/12/29 18:38:07 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1893,6 +1893,7 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
 
 #endif
 #undef MAXLINEWIDTH
+#undef Y
 
 #endif /* TERM_BODY */
 #ifdef TERM_TABLE
