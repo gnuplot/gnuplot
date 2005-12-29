@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.55 2005/09/25 15:45:03 mikulik Exp $
+ * $Id: svg.trm,v 1.56 2005/10/09 09:43:01 mikulik Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -31,6 +31,7 @@
  * Added beginnings of enhanced text support.
  *   Ethan Merritt  <merritt@u.washington.edu>
  */
+/* Increase resolution by adding a coordinate scale factor - Ethan Merritt Dec 2005 */
 
 #include "driver.h"
 
@@ -66,8 +67,12 @@ TERM_PUBLIC void ENHsvg_put_text __PROTO((unsigned int, unsigned int, const char
 TERM_PUBLIC void ENHsvg_writec __PROTO((int));
 
 
-#define SVG_XMAX	600
-#define SVG_YMAX	480
+#define SVG_SCALE	10.
+#define Y(y) ((float)(term->ymax - y) / SVG_SCALE)
+#define X(x) ((float)(x) / SVG_SCALE)
+
+#define SVG_XMAX	(600 * SVG_SCALE)
+#define SVG_YMAX	(480 * SVG_SCALE)
 
 #endif /* TERM_PROTO */
 
@@ -253,10 +258,10 @@ SVG_SetFont (const char *name, double size)
  * 'font-size' (!), we have to to define font properties in a less
  * than optimal way */
 
-    SVG_fontAscent = (int) (SVG_fontSizeCur * 1.00);	/* estimated current font ascent*/
-    SVG_fontDescent = (int) (SVG_fontSizeCur * 0.25);	/* estimated current font descent*/
-    SVG_fontLeading = (int) (SVG_fontSizeCur * 0.25);	/* estimated current font leading*/
-    SVG_fontAvWidth = (int) (SVG_fontSizeCur * 0.70);	/* estimated current font char average width*/
+    SVG_fontAscent = (int) (SVG_fontSizeCur * 1.00 * SVG_SCALE); /* estimated current font ascent*/
+    SVG_fontDescent = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE); /* estimated current font descent*/
+    SVG_fontLeading = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE); /* estimated current font leading*/
+    SVG_fontAvWidth = (int) (SVG_fontSizeCur * 0.70 * SVG_SCALE); /* estimated current font char average width*/
 }
 
 static void
@@ -353,7 +358,7 @@ SVG_MoveForced(unsigned int x, unsigned int y)
 {
     SVG_PathOpen ();
 
-    fprintf (gpoutfile, "M%u,%u ", x, term->ymax - y);
+    fprintf (gpoutfile, "M%.1f,%.1f ", X(x), Y(y));
     SVG_path_count++;
 
     SVG_PathLimit ();
@@ -381,16 +386,16 @@ SVG_options ()
 	    if (END_OF_COMMAND)
 		int_error(c_token,"expecting x size");
 	    value = real(const_express (&a));
-	    if (SVG_xSize < 2 || SVG_xSize > 8192)
+	    if (value < 2 || value > 8192)
 		int_error(c_token,"x size out of range");
-	    SVG_xSize = (unsigned int) value;
+	    SVG_xSize = value * SVG_SCALE;
 
 	    if (END_OF_COMMAND)
 		int_error(c_token,"expecting y size");
 	    value = real(const_express (&a));
-	    if (SVG_ySize < 2 || SVG_ySize > 8192)
+	    if (value < 2 || value > 8192)
 		int_error(c_token,"y size out of range");
-	    SVG_ySize = (unsigned int) value;
+	    SVG_ySize = value * SVG_SCALE;
 	    continue;
 	}
 
@@ -476,7 +481,7 @@ SVG_options ()
 
     /* Save options back into options string in normalized format */
     sprintf(term_options, "size %d %d%s %s fname '%s'  fsize %g ",
-	    SVG_xSize, SVG_ySize,
+	    (int)(SVG_xSize/SVG_SCALE), (int)(SVG_ySize/SVG_SCALE),
         SVG_fixed_size ? " fixed": " dynamic",
 	term->put_text == ENHsvg_put_text ? "enhanced" : "",
         SVG_fontNameCur, SVG_fontSizeCur);
@@ -596,9 +601,9 @@ SVG_init ()
 
     if (SVG_fixed_size)
         fprintf (gpoutfile, "width=\"%u\" height=\"%u\" ",
-		 term->xmax, term->ymax);
+		 (int)(term->xmax/SVG_SCALE), (int)(term->ymax/SVG_SCALE));
 
-    fprintf (gpoutfile, "viewBox=\"0 0 %u %u\"\n", term->xmax, term->ymax);
+    fprintf (gpoutfile, "viewBox=\"0 0 %u %u\"\n", (int)(term->xmax/SVG_SCALE), (int)(term->ymax/SVG_SCALE));
     fprintf (gpoutfile, " xmlns=\"http://www.w3.org/2000/svg\"\n");
     fprintf (gpoutfile, " xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n");
     fprintf (gpoutfile,
@@ -617,7 +622,7 @@ SVG_init ()
      * defined one :-( That would make for much larger files */
     /* "\t<path id='gpPt3' style='stroke-width:%.3f' d='M-1,-1 h2 v2 h-2 z'/>\n" */
 
-    stroke_width = 2.0 / term->h_tic;
+    stroke_width = 2.0 *SVG_SCALE / term->h_tic;
     fprintf (gpoutfile,
 	     "\n"
 	     /* dot: */
@@ -778,7 +783,7 @@ SVG_vector (unsigned int x, unsigned int y)
 	    SVG_MoveForced(SVG_xLast, SVG_yLast);
 	}
 
-	fprintf (gpoutfile, "L%u,%u ", x, term->ymax - y);
+	fprintf (gpoutfile, "L%.1f,%.1f ", X(x), Y(y));
 	SVG_path_count++;
 
 	SVG_PathLimit ();
@@ -806,21 +811,21 @@ SVG_point (unsigned int x, unsigned int y, int number)
 
     if (number < 0) {		/* do dot */
 	fprintf (gpoutfile,
-		 "\t<use xlink:href='#gpDot' x='%u' y='%u'"
+		 "\t<use xlink:href='#gpDot' x='%.1f' y='%.1f'"
 		 "%s"
 		 "/>\n",
-		 x, term->ymax - y
+		 X(x), Y(y)
 		 , color_spec
 		 );
 
     } else {			/* draw a point symbol */
 	fprintf (
 	    gpoutfile,
-	    "\t<use xlink:href='#gpPt%u' transform='translate(%u,%u) scale(%.2f)'"
+	    "\t<use xlink:href='#gpPt%u' transform='translate(%.1f,%.1f) scale(%.2f)'"
 	     "%s"
 	    "/>\n"
-	    , number % 13, x, term->ymax - y
-	    , term_pointsize * term->h_tic / 2
+	    , number % 13, X(x), Y(y)
+	    , term_pointsize * term->h_tic / (2 * SVG_SCALE)
 	     , color_spec
 	    );
     }
@@ -887,7 +892,7 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 
 /* define text position and attributes */
 
-    fprintf (gpoutfile, "\t<g transform=\"translate(%d,%d)", h, term->ymax - v);
+    fprintf (gpoutfile, "\t<g transform=\"translate(%.1f,%.1f)", X(h), Y(v));
     if (SVG_TextAngle)
 	fprintf (gpoutfile, " rotate(%i)", -SVG_TextAngle);
     fprintf (gpoutfile, "\" style=\"stroke:none; fill:");
@@ -1037,8 +1042,8 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 
     fputs(" points = '", gpoutfile);
     for (i = 0; i < points; i++)
-        fprintf(gpoutfile, "%d,%d%s",
-	    corners[i].x, term->ymax - corners[i].y, (i % 16 == 15 ? "\n" : " "));
+        fprintf(gpoutfile, "%.1f,%.1f%s",
+	    X(corners[i].x), Y(corners[i].y), (i % 16 == 15 ? "\n" : " "));
     fputs("'/>\n", gpoutfile);
 }
 
@@ -1256,6 +1261,9 @@ SVG_load_fontfile(char *fontfile)
 
     }
 }
+
+#undef Y
+#undef X
 
 #endif /* TERM_BODY */
 
