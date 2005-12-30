@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.80 2005/12/29 18:38:07 mikulik Exp $
+ * $Id: gd.trm,v 1.81 2005/12/30 04:59:24 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -764,6 +764,7 @@ PNG_options()
 	    png_state.animate = TRUE;
 	    png_state.frame_count = 0;
 	    png_state.frame_delay = 10;
+	    png_state.frame_optimization = TRUE;
 	    gif_anim_option = 1;
 	    break;
 	case GIF_DELAY:
@@ -928,8 +929,9 @@ PNG_options()
 
     if (png_state.animate) {
 	sprintf(term_options + strlen(term_options),
-	    "animate delay %d loop %d ", 
-	    png_state.frame_delay, png_state.loop_count);
+	    "animate delay %d loop %d %soptimize ", 
+	    png_state.frame_delay, png_state.loop_count,
+	    png_state.frame_optimization ? "" : "no");
     }
 
     sprintf(term_options + strlen(term_options),
@@ -1269,7 +1271,7 @@ PNG_graphics()
     if (png_state.animate && png_state.frame_count == 0) {
 	/* Initialize the animation with a global colormap */
 	gdImageGifAnimBegin(png_state.image, gpoutfile, 
-		1 /* Global Colormap */, 
+		1 /* Local Colormap */, 
 		png_state.loop_count );
     }
 #endif
@@ -2096,7 +2098,7 @@ TERM_TABLE_START(jpeg_driver)
     , PNG_image
 #endif
     , ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec
-TERM_TABLE_END(png_driver)
+TERM_TABLE_END(jpeg_driver)
 
 #undef LAST_TERM
 #define LAST_TERM jpeg_driver
@@ -2264,7 +2266,7 @@ TERM_TABLE_START(gif_driver)
     , PNG_image
 #endif
     , ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec
-TERM_TABLE_END(png_driver)
+TERM_TABLE_END(gif_driver)
 
 #undef LAST_TERM
 #define LAST_TERM gif_driver
