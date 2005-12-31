@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.81 2005/12/30 04:59:24 sfeam Exp $
+ * $Id: gd.trm,v 1.82 2005/12/31 06:37:17 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1271,7 +1271,7 @@ PNG_graphics()
     if (png_state.animate && png_state.frame_count == 0) {
 	/* Initialize the animation with a global colormap */
 	gdImageGifAnimBegin(png_state.image, gpoutfile, 
-		1 /* Local Colormap */, 
+		1 /* Load Global Colormap */, 
 		png_state.loop_count );
     }
 #endif
