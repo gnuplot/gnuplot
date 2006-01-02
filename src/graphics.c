@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.172 2005/10/16 06:12:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.173 2005/11/25 18:54:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4859,7 +4859,7 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
     int grid_corner[4] = {-1, -1, -1, -1};     /* The corner pixels of the image. */
     double view_port_x[2];                     /* Viewable portion of the image. */
     double view_port_y[2];
-    double view_port_z[2];
+    double view_port_z[2] = {0,0};
 
 
     if (project_points) {

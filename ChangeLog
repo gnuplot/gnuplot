@@ -1,8 +1,8 @@
-2005-01-02  Ethan Merritt  <merritt@u.washington.edu>
+2006-01-02  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/gd.trm (PNG_options): Change default animation mode to "nooptimize".
-	Disable optimization if the background is transparent, as this combination
-	is not handled well by most viewing programs.
+	* term/gd.trm (PNG_options): Change default animation mode to 
+	"nooptimize".  Disable optimization if the background is transparent,
+	as this combination is not handled well by most viewing programs.
 
 2006-01-02  Dennis Linse <djlinse37@yahoo.com>
 
@@ -20,9 +20,9 @@
 
 	* term/pdf.trm:  Correct signedness problem in call to PDF_open_image().
 
-	* term/svg.trm:  Increase the internal resolution of terminal coordinates
-	by adding a scale factor SVG_SCALE. This fixes the "wavy line" bug seen in
-	svg plots.
+	* term/svg.trm: Increase the internal resolution of terminal coordinates
+	by adding a scale factor SVG_SCALE. This fixes the "wavy line" bug seen
+	in svg plots.
 
 2005-12-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
