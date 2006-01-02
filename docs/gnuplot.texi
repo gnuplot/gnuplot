@@ -2845,8 +2845,10 @@ elements may be enclosed in either single quotes or double quotes. Further
 processing of the quoted text depends on the choice of quote marks.
 
 Backslash processing of special characters like \n (newline) and
-\345 (octal character code) is performed for double-quoted strings,
-but not for single-quoted strings.
+\345 (octal character code) is performed for double-quoted strings.  In
+single-quoted strings, backslashes are just ordinary characters.  To get
+a single-quote (ascii 39) in a single-quoted string, it has to be doubled.
+Thus the strings "d\" s' b\\" and 'd" s'' b\' are completely equivalent.
 
 Text justification is the same for each line of a multi-line string.
 Thus the center-justified string
@@ -2971,11 +2973,13 @@ vertical bar (|) separates mutually exclusive choices.
 * history::                     
 * if::                          
 * load::                        
+* lower::                       
 * pause::                       
 * plot::                        
 * print::                       
 * pwd::                         
 * quit::                        
+* raise::                       
 * replot::                      
 * reread::                      
 * reset::                       
@@ -3014,8 +3018,9 @@ Examples:
 
 @end example
 
-DOS users _must_ use single-quotes---backslash [\] has special significance
-inside double-quotes.  For example,
+It is recommended for DOS and Windows users to use 
+single-quotes---backslash [\] has special significance inside 
+double-quotes and has to be escaped.  For example,
 @example
       cd "c:\newdata"
 @end example
@@ -3023,6 +3028,7 @@ inside double-quotes.  For example,
 fails, but
 @example
       cd 'c:\newdata'
+      cd "c:\\newdata"
 @end example
 
 works as expected.
@@ -3848,7 +3854,7 @@ else:
 See @ref{reread} for an example of how @ref{if} and @ref{reread} can be used together to
 perform a loop.
 
-@node load, pause, if, Commands
+@node load, lower, if, Commands
 @section load
 
 @c ?commands load
@@ -3892,7 +3898,34 @@ The `load` command is performed implicitly on any file names given as
 arguments to `gnuplot`.  These are loaded in the order specified, and
 then `gnuplot` exits.
 
-@node pause, plot, load, Commands
+@node lower, pause, load, Commands
+@section lower
+
+@c ?commands lower
+@cindex lower
+@cmindex lower
+
+
+Syntax:
+@example
+      lower @{x11_plot_window_nb@}
+
+@end example
+
+The @ref{lower} command lowers (opposite to @ref{raise}) plot window(s) associated
+with the interactive terminal of your gnuplot session, i.e. `pm`, `win` or
+`x11`. It puts the plot window to bottom in the z-order windows stack of the
+window manager of your desktop.
+
+As `x11` supports multiple plot windows, then by default it lowers these
+windows in descending order of most recently created on top to the least
+recently created on bottom. If a plot number is supplied as an optional
+parameter, only the associated plot window will be lowered if it exists.
+
+The optional parameter is ignored for single plot-window terminals, i.e. `pm`
+and `win`.
+
+@node pause, plot, lower, Commands
 @section pause
 
 @c ?commands pause
@@ -4350,6 +4383,18 @@ binary file's extension is a quasi-standard extension for a supported format.
 Command line keywords may be used to override settings extracted from the file.
 The settings from the file override any defaults.  (See `set datafile binary`
 for details.)
+
+
+@noindent --- AVS ---
+
+@c ?binary general filetype avs
+@c ?filetype avs
+@cindex avs
+
+`avs` is one of the automatically recognized binary file types for images.
+AVS is an extremely simple format, suitable mostly for streaming between
+applications. It consists of 2 longs (xwidth, ywidth) followed by a stream
+of pixels, each with four bytes of information alpha/red/green/blue.
 
 
 @noindent --- EDF ---
@@ -5141,19 +5186,32 @@ The entry in the first row of column 3 will be ignored.
 @c ?using xticlabels
 @c ?plot using xticlabels
 If gnuplot is built with configuration option --enable-datastrings, then
-a column of the input data file can be used to label axis tic marks in a 2-D
-plot command. The format of such a plot command is
+a column of the input data file can be used to label axis tic marks.
+The format of such a plot command is
 
 @example
   plot 'datafile' using <xcol>:<ycol>:xticlabels(<labelcol>) with <plotstyle>
 
 @end example
 
-The `xticlabels(<val>)` option must be the final entry of the @ref{using} column
-specifications. For each point which has a valid pair of X,Y coordinates,
+Tic labels may be read for any of the plot axes: x x2 y y2 z.
+The `ticlabels(<labelcol>)` specifiers must come after all of the data
+coordinate specifiers in the @ref{using} portion of the command.
+For each data point which has a valid set of X,Y[,Z] coordinates,
 the text field found in column <labelcol> is added to the list of xtic labels
 at the same X coordinate as the point it belongs to. `xticlabels(<labelcol>)`
 may be shortened to `xtic(<labelcol>)`.
+
+Example:
+
+@example
+      splot "data" using 2:4:6:xtic(1):ytic(3):ztic(6)
+
+@end example
+
+In this example the x and y axis tic labels are taken from different columns
+than the x and y coordinate values. The z axis tics, however, are generated
+from the z coordinate of the corresponding point.
 
 
 @noindent --- X2TICLABELS ---
@@ -5522,6 +5580,7 @@ Syntax:
                         @{pointtype | pt <point_type>@}
                         @{pointsize | ps <point_size>@}
                         @{fill | fs <fillstyle>@}
+                        @{nohidden3d@}
                         @{palette@}@}
                    @}
 
@@ -5583,6 +5642,13 @@ in @ref{using}. Both 2d and 3d plots (`plot` and `splot` commands) can use palet
 colors as specified by either their fractional value or the corresponding value
 mapped to the colorbox range. 2d plots can not use palette colors mapped by
 Z value. See `colors`, @ref{palette}, `linetype`.
+
+The keyword `nohidden3d` applies only to plots made with the `splot` command.
+Normally the global option @ref{hidden3d} applies to all plots in the graph.
+You can attach the `nohidden3d` option to any individual plots that you want
+to exclude from the hidden3d processing.  The individual elements
+(lines, dots, labels, ...) of a plot marked `nohidden3d` will all be drawn,
+even if they would normally be obscured by the elements of some other plot.
 
 The keywords may be abbreviated as indicated.
 
@@ -5715,7 +5781,7 @@ See `expressions`.  The output file can be set with `set print`.
 
 The @ref{pwd} command prints the name of the working directory to the screen.
 
-@node quit, replot, pwd, Commands
+@node quit, raise, pwd, Commands
 @section quit
 
 @c ?commands quit
@@ -5727,7 +5793,34 @@ The @ref{exit} and @ref{quit} commands and END-OF-FILE character will exit `gnup
 Each of these commands will clear the output device (as does the @ref{clear}
 command) before exiting.
 
-@node replot, reread, quit, Commands
+@node raise, replot, quit, Commands
+@section raise
+
+@c ?commands raise
+@cindex raise
+@cmindex raise
+
+
+Syntax:
+@example
+      raise @{x11_plot_window_nb@}
+
+@end example
+
+The @ref{raise} command raises (opposite to @ref{lower}) plot window(s) associated
+with the interactive terminal of your gnuplot session, i.e. `pm`, `win` or
+`x11`. It puts the plot window to front (top) in the z-order windows stack of
+the window manager of your desktop.
+
+As `x11` supports multiple plot windows, then by default it raises these
+windows in descending order of most recently created on top to the least
+recently created on bottom. If a plot number is supplied as an optional
+parameter, only the associated plot window will be raised if it exists.
+
+The optional parameter is ignored for single plot-windows terminal, i.e. `pm`
+and `win`.
+
+@node replot, reread, raise, Commands
 @section replot
 
 @c ?commands replot
@@ -6018,6 +6111,7 @@ when the variable was initially defined.
 * xmtics::                      
 * xrange::                      
 * xtics::                       
+* xyplane::                     
 * xzeroaxis::                   
 * y2data::                      
 * y2dtics::                     
@@ -6035,6 +6129,7 @@ when the variable was initially defined.
 * yzeroaxis::                   
 * zdata::                       
 * zdtics::                      
+* zzeroaxis::                   
 * cbdata::                      
 * cbdtics::                     
 * zero::                        
@@ -7947,9 +8042,14 @@ When @ref{hidden3d} is set, both the hidden portion of the surface and possibly
 its contours drawn on the base (see @ref{contour}) as well as the grid will
 be hidden.  Each surface has its hidden parts removed with respect to itself
 and to other surfaces, if more than one surface is plotted.  Contours drawn
-on the surface (@ref{surface}) don't work.  Labels and arrows are
-always visible and are unaffected.  The key is also never hidden by the
-surface.
+on the surface (@ref{surface}) don't work.  
+
+Labels and arrows are always visible and are unaffected.  The key box is
+never hidden by the surface. As of gnuplot version 4.1, @ref{hidden3d} also
+affects 3D plotting styles `with points`, `with labels`, and `with vectors`,
+even if no surface is present in the graph.  Individual plots within the
+graph may be explicitly excluded from this processing by appending the extra
+option `nohidden` to the @ref{with} specifier.
 
 Functions are evaluated at isoline intersections.  The algorithm interpolates
 linearly between function points or data points when determining the visible
@@ -8388,6 +8488,7 @@ Syntax:
                 @{left | center | right@}
                 @{norotate | rotate @{by <degrees>@}@}
                 @{font "<name>@{,<size>@}"@}
+                @{noenhanced@}
                 @{front | back@}
                 @{textcolor <colorspec>@}
                 @{point <pointstyle> | nopoint@}
@@ -8425,6 +8526,12 @@ treat this as vertical text.
 Font and its size can be chosen explicitly by `font "<name>@{,<size>@}"` if the
 terminal supports font settings.  Otherwise the default font of the terminal
 will be used.
+
+Normally the enhanced text mode string interpretation, if enabled for the
+current terminal, is applied to all text strings including label text.
+The `noenhanced` property can be used to exempt a specific label from the
+enhanced text mode processing.  The can be useful if the label contains
+underscores, for example. See `enhanced text`.
 
 If `front` is given, the label is written on top of the graphed data. If
 `back` is given (the default), the label is written underneath the graphed
@@ -9093,9 +9200,33 @@ be overridden if <freq> is given.  However the usual minor tics (2, 3, ...,
 8, 9 between 1 and 10, for example) are obtained by setting <freq> to 10,
 even though there are but nine sub-intervals.
 
-Minor tics can be used only with uniformly spaced major tics.  Since major
-tics can be placed arbitrarily by `set @{x|x2|y|y2|z@}tics`, minor tics cannot
-be used if major tics are explicitly `set`.
+To set minor tics at arbitrary positions, use the ("<label>" <pos> <level>,
+...) form of `set @{x|x2|y|y2|z@}tics` with <label> empty and <level> set to 1.
+
+The `set m@{x|x2|y|y2|z@}tics` commands work only when there are uniformly
+spaced major tics.  If all major tics were placed explicitly by
+`set @{x|x2|y|y2|z@}tics`, then minor tic commands are ignored.  Implicit
+major tics and explicit minor tics can be combined using
+`set @{x|x2|y|y2|z@}tics` and `set @{x|x2|y|y2|z@}tics add`.
+
+Examples:
+@example
+      set xtics 0, 5, 10
+      set xtics add (7.5)
+      set mxtics 5
+@end example
+
+Major tics at 0,5,7.5,10, minor tics at 1,2,3,4,6,7,8,9
+@example
+      set logscale y
+      set format y ""
+      set ytics 1e-6, 10, 1
+      set ytics add ("1" 1, ".1" 0.1, ".01" 0.01, "10^-3" 0.001, \
+                     "10^-4" 0.0001)
+      set mytics 10
+@end example
+
+Major tics with special formatting, minor tics at log positions
 
 By default, minor tics are off for linear axes and on for logarithmic axes.
 They inherit the settings for `axis|border` and `@{no@}mirror` specified for
@@ -10385,6 +10516,7 @@ an index instead of repeating all the information at each invocation.
 
 Syntax:
 @example
+      set style arrow <index> default
       set style arrow <index> @{nohead | head | heads@}
                               @{size <length>,<angle>@{,<backangle>@}@}
                               @{filled | empty | nofilled@}
@@ -10398,6 +10530,13 @@ Syntax:
 @end example
 
 <index> is an integer that identifies the arrowstyle.
+
+If `default` is given all arrow style parameters are set to their default
+values.
+
+If the linestyle <index> already exists, only the given parameters are
+changed while all others are preserved.  If not, all undefined values are
+set to the default values.
 
 Specifying `nohead` produces arrows drawn without a head---a line segment.
 This gives you yet another way to draw a line segment on the plot.  By
@@ -10557,6 +10696,7 @@ an index instead of repeating all the information at each invocation.
 
 Syntax:
 @example
+      set style line <index> default
       set style line <index> @{@{linetype  | lt@} <line_type> | <colorspec>@}
                              @{@{linecolor | lc@} <colorspec>@}
                              @{@{linewidth | lw@} <line_width>@}
@@ -10567,6 +10707,13 @@ Syntax:
       show style line
 
 @end example
+
+If `default` is given all line style parameters are set to their default
+values.
+
+If the linestyle <index> already exists, only the given parameters are
+changed while all others are preserved.  If not, all undefined values are
+set to the default values.
 
 The line and point types are taken from the default types for the terminal
 currently in use.  The line width and point size are multipliers for the
@@ -11038,6 +11185,7 @@ create bins and determine their population from some data set.
 @c ?commands set style histogram
 @c ?set style histogram
 @c ?style histograms
+@c ?plotting styles histograms
 @cindex histograms
 
 The `histograms` style is only relevant to 2-d plotting.  It produces a bar
@@ -11738,8 +11886,9 @@ All specified options apply to all axes, i.e., x, y, z, x2, y2, and cb.
 `axis` or @ref{border} tells `gnuplot` to put the tics (both the tics themselves
 and the accompanying labels) along the axis or the border, respectively.  If
 the axis is very close to the border, the `axis` option will move the
-tic labels to outside the border.  The relevant margin settings will usually
-be sized badly by the automatic layout algorithm in this case.
+tic labels to outside the border in case the border is printed (see
+@ref{border}).  The relevant margin settings will usually be sized badly by
+the automatic layout algorithm in this case.
 
 `mirror` tells `gnuplot` to put unlabelled tics at the same positions on the
 opposite border.  `nomirror` does what you think it does.
@@ -11775,31 +11924,7 @@ at a axis by axis basis.
 @node ticslevel, ticscale, tics, set-show
 @subsection ticslevel
 
-@c ?commands set ticslevel
-@c ?commands show ticslevel
-@c ?set ticslevel
-@c ?show ticslevel
-@cindex ticslevel
-@opindex ticslevel
-
-
-Using `splot`, one can adjust the relative height of the vertical (Z) axis
-using @ref{ticslevel}.  The numeric argument provided specifies the location
-of the bottom of the scale (as a fraction of the z-range) above the xy-plane.
-The default value is 0.5.  Negative values are permitted, but tic labels on
-the three axes may overlap.
-
-To place the xy-plane at a position 'pos' on the z-axis, @ref{ticslevel} should
-be set equal to  (pos - zmin) / (zmin - zmax).
-
-Syntax:
-@example
-      set ticslevel @{<level>@}
-      show tics
-
-@end example
-
-See also @ref{view}.
+See @ref{xyplane}.
 
 @node ticscale, timestamp, ticslevel, set-show
 @subsection ticscale
@@ -12331,6 +12456,7 @@ Syntax:
 @example
       set xlabel @{"<label>"@} @{offset <offset>@} @{font "<font>@{,<size>@}"@}
                  @{@{textcolor | tc@} @{lt <line_type> | default@}@} @{@{no@}enhanced@}
+                 @{rotate by <degrees>@}
       show xlabel
 
 @end example
@@ -12398,6 +12524,10 @@ characters to make a multi-line plot title, e.g.,
 
 Note that double quotes must be used.  The same font will be used for both
 lines, of course.
+
+The y and y2 axis labels can be explicitly rotated from their default
+orientation, but this applies only to 2D plots and only on terminals
+that support text rotation.
 
 If you are not satisfied with the default position of an axis label, use @ref{label} instead--that command gives you much more control over where text is
 placed.
@@ -12544,7 +12674,7 @@ To autoscale xmin while leaving xmax unchanged:
 
 @end example
 
-@node xtics, xzeroaxis, xrange, set-show
+@node xtics, xyplane, xrange, set-show
 @subsection xtics
 
 @c ?commands set xtics
@@ -12569,6 +12699,7 @@ Syntax:
       set xtics @{axis | border@} @{@{no@}mirror@}
                 @{in | out@} @{scale @{default | <major> @{,<minor>@}@}@}
                 @{@{no@}rotate @{by <ang>@}@} @{offset <offset> | nooffset@}
+                @{add@}
                 @{  autofreq
                  | <incr>
                  | <start>, <incr> @{,<end>@}
@@ -12710,12 +12841,29 @@ Examples:
 In the second example, all tics are labelled.  In the third, only the end
 tics are labelled.  In the fourth, the unlabeled tic is a minor tic.
 
+Normally if explicit tics are given, they are used instead of auto-generated
+tics. Conversely if you specify `set xtics auto` or the like it will erase
+any previously specified explicit tics. You can mix explicit and auto-
+generated tics by using the keyword `add`, which must appear before
+the tic style being added.
+
+Example:
+@example
+      set xtics 0,.5,10
+      set xtics add ("Pi" 3.14159)
+
+@end example
+
+This will automatically generate tic marks every 0.5 along x, but will
+also add an explicit labeled tic mark at pi.
+
 However they are specified, tics will only be plotted when in range.
 
 Format (or omission) of the tic labels is controlled by `set format`, unless
-the explicit text of a labels is included in the `set xtics (`<label>`)` form.
+the explicit text of a label is included in the `set xtics ("<label>")` form.
 
-Minor (unlabelled) tics can be added by the @ref{mxtics} command.
+Minor (unlabelled) tics can be added automatically by the @ref{mxtics} 
+command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
 
 In case of timeseries data, position values must be given as quoted dates
 or times according to the format @ref{timefmt}.  If the <start>, <incr>, <end>
@@ -12745,7 +12893,55 @@ Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the
 second example the tic at "Dec 3" will be unlabelled.
 
 
-@node xzeroaxis, y2data, xtics, set-show
+@node xyplane, xzeroaxis, xtics, set-show
+@subsection xyplane
+
+@c ?commands set ticslevel
+@c ?commands show ticslevel
+@c ?set ticslevel
+@c ?show ticslevel
+@cindex ticslevel
+@opindex ticslevel
+
+
+@c ?commands set xyplane
+@c ?commands show xyplane
+@c ?set xyplane
+@c ?show xyplane
+@cindex xyplane
+@opindex xyplane
+
+
+The @ref{xyplane} command adjusts the position at which the xy plane is drawn
+in a 3D plot.  The synonym "set ticslevel" is accepted for backwards
+compatibility.
+
+Syntax:
+@example
+      set ticslevel <level>
+      set xyplane <level>
+      set xyplane at <level>
+      show xyplane
+
+@end example
+
+The form `set ticslevel <frac>` places the xy plane below the range in Z, where
+the distance from the xy plane to Zmin is given as a fraction of the total 
+range in z.  The default value is 0.5.  Negative values are permitted, but tic
+labels on the three axes may overlap.
+
+To place the xy-plane at a position 'pos' on the z-axis, @ref{ticslevel} may
+be set equal to  (pos - zmin) / (zmin - zmax).  However, this position will
+change if the z range is changed.
+
+The alternative form `set xyplane at <zvalue>` fixes the placement of the
+xy plane at a specific Z value regardless of the current z range. Thus to
+force the x, y, and z axes to meet at a common origin one would specify
+`set xyplane at 0`.
+
+See also @ref{view}, and @ref{zeroaxis}.
+
+@node xzeroaxis, y2data, xyplane, set-show
 @subsection xzeroaxis
 
 @c ?commands set xzeroaxis
@@ -13003,7 +13199,7 @@ please see @ref{zeroaxis}.
 The @ref{zdata} command sets zaxis data to timeseries (dates/times).
 Please see @ref{xdata}.
 
-@node zdtics, cbdata, zdata, set-show
+@node zdtics, zzeroaxis, zdata, set-show
 @subsection zdtics
 
 @c ?commands set zdtics
@@ -13021,7 +13217,26 @@ Please see @ref{xdata}.
 The @ref{zdtics} command changes tics on the z axis to days of the week.
 Please see @ref{xdtics} for details.
 
-@node cbdata, cbdtics, zdtics, set-show
+@node zzeroaxis, cbdata, zdtics, set-show
+@subsection zzeroaxis
+
+@c ?commands set zzeroaxis
+@c ?commands unset zzeroaxis
+@c ?commands show zzeroaxis
+@c ?set zzeroaxis
+@c ?unset zzeroaxis
+@c ?show zzeroaxis
+@cindex zzeroaxis
+@opindex zzeroaxis
+
+
+@cindex nozzeroaxis
+
+The @ref{zzeroaxis} command draws a line through (x=0,y=0).  This has no effect
+on 2D plots, including splot with `set view map`. For details, please
+see @ref{zeroaxis} and @ref{xyplane}.
+
+@node cbdata, cbdtics, zzeroaxis, set-show
 @subsection cbdata
 
 @c ?commands set cbdata
@@ -13093,15 +13308,15 @@ it is not unreasonable to set `zero` to 0.0.
 
 
 The x axis may be drawn by @ref{xzeroaxis} and removed by @ref{xzeroaxis}.
-Similar commands behave similarly for the y, x2, and y2 axes.
+Similar commands behave similarly for the y, x2, y2, and z axes.
 
 Syntax:
 @example
-      set @{x|x2|y|y2|@}zeroaxis @{ @{linestyle | ls <line_style>@}
+      set @{x|x2|y|y2|z@}zeroaxis @{ @{linestyle | ls <line_style>@}
                                  | @{ linetype | lt <line_type>@}
                                    @{ linewidth | lw <line_width>@}@}
-      unset @{x|x2|y|y2|@}zeroaxis
-      show @{x|y|@}zeroaxis
+      unset @{x|x2|y|y2|z@}zeroaxis
+      show @{x|y|z@}zeroaxis
 
 @end example
 
@@ -13115,7 +13330,7 @@ If no linetype is specified, any zero axes selected will be drawn
 using the axis linetype (linetype 0).
 
 @ref{zeroaxis} is equivalent to @ref{yzeroaxis}.
-`set nozeroaxis` is equivalent to @ref{yzeroaxis}.
+Note that the z-axis must be set separately using @ref{zzeroaxis}.
 
 Examples:
 
@@ -13569,19 +13784,37 @@ on a case-by-case basis.
 @c ?data-file matrix ascii
 @c ?datafile matrix ascii
 @c ?matrix ascii
-The `matrix` flag indicates that the ASCII data are stored in matrix format.
-The z-values are read in a row at a time, i. e.,
+The `matrix` keyword (without a sequent `binary` keyword) in
 @example
-      z11 z12 z13 z14 ...
-      z21 z22 z23 z24 ...
-      z31 z32 z33 z34 ...
+    @{s@}plot 'a.dat' matrix
 @end example
 
-and so forth.  The row and column indices are used for the x- and y-values.
+indicates that data are stored in an ascii numbers matrix format.
 
-A blank line or comment line ends the matrix, and starts a new
-surface mesh. You can select among the meshes inside a file by the
-@ref{index} option to the `splot` command, as usual.
+The z-values are read in a row at a time, i. e.,
+@example
+    z11 z12 z13 z14 ...
+    z21 z22 z23 z24 ...
+    z31 z32 z33 z34 ...
+@end example
+
+and so forth.
+
+In 3D, the x- and y-indices of the matrix surface plot correspond to column
+and row indices of the matrix, respectively, being enumerated from 0. You can
+rescale or transform the axes as usual for a data file with three columns
+by means of x=$1, y=$2, z=$3. For example
+@example
+    splot 'a.dat' matrix using (1+$1/100):(1+$2*10):3
+
+@end example
+
+A blank line or comment line ends the matrix, and starts a new surface mesh.
+You can select among the meshes inside a file by the @ref{index} option to the
+`splot` command, as usual.
+
+See `help matrix` for examples of plotting rows and columns of the matrix in
+a 2D plot.
 
 @node matrix,  , matrix_ascii, data-file
 @subsubsection matrix
@@ -13596,9 +13829,47 @@ surface mesh. You can select among the meshes inside a file by the
 @c ?datafile matrix
 @cindex matrix
 
-The `matrix` flag indicates that the file data (ASCII or binary) are stored
-in matrix format.  The formats are slightly different amongst these two.  For
-details, see `matrix ascii` or `matrix binary`.
+Datafile can be in an ascii or binary matrix format. The `matrix` flag
+indicates that the file is ascii, the `binary` or `matrix binary` stands for
+a binary format. For details, see `matrix ascii` and `matrix binary`.
+
+Basic usage in `splot`:
+@example
+    splot 'a.dat' matrix
+    splot 'a.gpbin' @{matrix@} binary
+@end example
+
+Advanced usage in `splot`:
+@example
+    splot 'a.dat' matrix using 1:2:3
+    splot 'a.gpbin' @{matrix@} binary using 1:2:3
+@end example
+
+allows to transform the axes coordinates and the z-data independently.
+
+Usage in `plot`:
+@example
+    plot `a.dat` matrix
+    plot `a.dat` matrix using 1:3
+    plot 'a.gpbin' @{matrix@} binary using 1:3
+@end example
+
+will plot rows of the matrix, while using 2:3 will plot matrix columns, and 
+using 1:2 the point coordinates (rather useless). Applying the @ref{every} option
+you can specify explicit rows and columns.
+
+Example -- rescale axes of a matrix in an ascii file:
+@example
+    splot `a.dat` matrix using (1+$1):(1+$2*10):3
+
+@end example
+
+Example -- plot the 3rd row of a matrix in an ascii file:
+@example
+    plot 'a.dat' matrix using 1:3 every 1:999:1:2
+@end example
+
+(rows are enumerated from 0, thus 2 instead of 3).
 
 @node grid_data, splot_overview, data-file, splot
 @subsection grid_data
@@ -16658,29 +16929,29 @@ Several options may be set in the `pbm` terminal---the driver for PBMplus.
 
 Syntax:
 @example
-      set terminal pbm @{<fontsize>@} @{<mode>@}
+      set terminal pbm @{<fontsize>@} @{<mode>@} @{size <x>,<y>@}
 
 @end example
 
 where <fontsize> is `small`, `medium`, or `large` and <mode> is `monochrome`,
 `gray` or `color`.  The default plot size is 640 pixels wide and 480 pixels
-high; this may be changed by @ref{size}.
+high.
 
 The output of the `pbm` driver depends upon <mode>: `monochrome` produces a
 portable bitmap (one bit per pixel), `gray` a portable graymap (three bits
 per pixel) and `color` a portable pixmap (color, four bits per pixel).
 
-The output of this driver can be used with Jef Poskanzer's excellent PBMPLUS
-package, which provides programs to convert the above PBMPLUS formats to GIF,
-TIFF, MacPaint, Macintosh PICT, PCX, X11 bitmap and many others.  PBMPLUS may
-be obtained from ftp.x.org.  The relevant files have names that begin with
-"netpbm-1mar1994.p1"; they reside in /contrib/utilities.  The package can
-probably also be obtained from one of the many sites that mirrors ftp.x.org.
+The output of this driver can be used with various image conversion and
+manipulation utilities provided by NETPBM.  Based on Jef Poskanzer's
+PBMPLUS package, NETPBM provides programs to convert the above PBM formats
+to GIF, TIFF, MacPaint, Macintosh PICT, PCX, X11 bitmap and many others.
+Complete information is available at http://netpbm.sourceforge.net/.
 
 Examples:
 @example
-      set terminal pbm small monochrome             # defaults
-      set size 2,2; set terminal pbm color medium"
+      set terminal pbm small monochrome                # defaults
+      set terminal pbm color medium size 800,600
+      set output '| pnmrotate 45 | pnmtopng > tilted.png'  # uses NETPBM"
 
 @end example
 
@@ -16718,27 +16989,28 @@ This terminal produces files in the Adobe Portable Document Format
 Syntax:
 @example
       set terminal pdf @{monochrome|color|colour@}
+                       @{@{no@}enhanced@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
-                       @{@{no@}enhanced@} @{linewidth <n>@} @{rounded|butt@}
-                       @{solid|dashed @{dl <dashlength>@}@}
+                       @{linewidth <lw>@} @{rounded|butt@}
+                       @{solid|dashed@} @{dl <dashlength>@}@}
 
 @end example
 
-The default is to use a different color for each line type. Selecting 
-`monochome` will use black for all linetypes, in which case you probably 
-want to select `dashed` to distinguish line types. Even in in mono mode 
+The default is to use a different color for each line type. Selecting
+`monochome` will use black for all linetypes, in which case you probably
+want to select `dashed` to distinguish line types. Even in in mono mode
 you can still use explicit colors for filled areas or linestyles.
 
 where <font> is the name of the default font to use (default Helvetica)
 and <fontsize> is the font size (in points, default 12).
-For help on which fonts are available or how to install new ones, please 
+For help on which fonts are available or how to install new ones, please
 see the documentation for your local installation of pdflib.
 
 The `enhanced` option enables enhanced text processing features
 (subscripts, superscripts and mixed fonts). See `enhanced`.
 
 The width of all lines in the plot can be increased by the factor <n>
-specified in `linewidth`. Similarly `dashlength` is a multiplier for the 
+specified in `linewidth`. Similarly `dashlength` is a multiplier for the
 default dash spacing.
 
 `rounded` sets line caps and line joins to be rounded; `butt` is the
@@ -16909,14 +17181,15 @@ This terminal produces files in the W3C Scalable Vector Graphics format.
 Syntax:
 @example
       set terminal svg @{size <x> <y> @{|fixed|dynamic@}@}
-                       @{linewidth <w>@}
+                       @{@{no@}enhanced@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
-                       @{@{no@}enhanced@} @{fontfile <filename>@}
+                       @{fontfile <filename>@}
+                       @{linewidth <lw>@}
 
 @end example
 
 where <x> and <y> are the size of the SVG plot to generate,
-`dynamic` allows a svg-Viewer to resize plot, whereas the default
+`dynamic` allows a svg-viewer to resize plot, whereas the default
 setting, `fixed`, will request an absolute size.
 
 `linewidth <w>` increases the width of all lines used in the figure
@@ -17749,16 +18022,21 @@ if the `-display` command line option is used.
 
 Syntax:
 @example
-   set terminal x11 [reset] <n> [[no]enhanced] [font <fontspec>]
-                    [title "<string>"] [[no]persist] [[no]raise] [close]
+   set terminal x11 @{<n>@}
+                    @{title "<string>"@}
+                    @{@{no@}enhanced@}
+                    @{font <fontspec>@}
+                    @{@{no@}persist@} @{@{no@}raise@}
+                    @{close@}
+   set terminal x11 @{reset@}
 
 @end example
 
 Multiple plot windows are supported: `set terminal x11 <n>` directs the
-output to plot window number n.  If n>0, the terminal number will be
+output to plot window number n.  If n is not 0, the terminal number will be
 appended to the window title (unless a title has been supplied manually)
-and the icon will be labeled `gplt <n>`.  The active window may be
-distinguished by a change in cursor (from default to crosshair.)
+and the icon will be labeled `Gnuplot <n>`.  The active window may be
+distinguished by a change in cursor (from default to crosshair).
 
 The x11 terminal support enhanced text mode (see `enhanced`), subject
 to the available fonts. In order for font size commands embedded in text
@@ -17795,7 +18073,7 @@ location.
 Plot windows will automatically be closed at the end of the session
 unless the `-persist` option was given.
 
-The options `persist` and `raise` are unset by default, which means that
+The options `persist` and @ref{raise} are unset by default, which means that
 the defaults (persist == no and raise == yes) or the command line options
 -persist / -raise or the Xresources are taken.  If [no]persist or
 [no]raise are specified, they will override command line options and
@@ -17823,7 +18101,7 @@ A number of other `gnuplot` options are available for the `x11` terminal.
 These may be specified either as command-line options when `gnuplot` is
 invoked or as resources in the configuration file ".Xdefaults".  They are
 set upon initialization and cannot be altered during a `gnuplot` session.
-(except `persist` and `raise`)
+(except `persist` and @ref{raise})
 
 
 @noindent --- X11_FONTS ---
@@ -17918,7 +18196,7 @@ Japanese PS fonts) without the prefix "mbfont:".
 
 In addition to the X Toolkit options, the following options may be specified
 on the command line when starting `gnuplot` or as resources in your
-".Xdefaults" file (note that `raise` and `persist` can be overridden
+".Xdefaults" file (note that @ref{raise} and `persist` can be overridden
 later by `set term x11 [no]raise [no]persist)`:
 
 @example
@@ -18238,16 +18516,21 @@ if the `-display` command line option is used.
 
 Syntax:
 @example
-   set terminal x11 [reset] <n> [[no]enhanced] [font <fontspec>]
-                    [title "<string>"] [[no]persist] [[no]raise] [close]
+   set terminal x11 @{<n>@}
+                    @{title "<string>"@}
+                    @{@{no@}enhanced@}
+                    @{font <fontspec>@}
+                    @{@{no@}persist@} @{@{no@}raise@}
+                    @{close@}
+   set terminal x11 @{reset@}
 
 @end example
 
 Multiple plot windows are supported: `set terminal x11 <n>` directs the
-output to plot window number n.  If n>0, the terminal number will be
+output to plot window number n.  If n is not 0, the terminal number will be
 appended to the window title (unless a title has been supplied manually)
-and the icon will be labeled `gplt <n>`.  The active window may be
-distinguished by a change in cursor (from default to crosshair.)
+and the icon will be labeled `Gnuplot <n>`.  The active window may be
+distinguished by a change in cursor (from default to crosshair).
 
 The x11 terminal support enhanced text mode (see `enhanced`), subject
 to the available fonts. In order for font size commands embedded in text
@@ -18284,7 +18567,7 @@ location.
 Plot windows will automatically be closed at the end of the session
 unless the `-persist` option was given.
 
-The options `persist` and `raise` are unset by default, which means that
+The options `persist` and @ref{raise} are unset by default, which means that
 the defaults (persist == no and raise == yes) or the command line options
 -persist / -raise or the Xresources are taken.  If [no]persist or
 [no]raise are specified, they will override command line options and
@@ -18312,7 +18595,7 @@ A number of other `gnuplot` options are available for the `x11` terminal.
 These may be specified either as command-line options when `gnuplot` is
 invoked or as resources in the configuration file ".Xdefaults".  They are
 set upon initialization and cannot be altered during a `gnuplot` session.
-(except `persist` and `raise`)
+(except `persist` and @ref{raise})
 
 
 @noindent --- X11_FONTS ---
@@ -18407,7 +18690,7 @@ Japanese PS fonts) without the prefix "mbfont:".
 
 In addition to the X Toolkit options, the following options may be specified
 on the command line when starting `gnuplot` or as resources in your
-".Xdefaults" file (note that `raise` and `persist` can be overridden
+".Xdefaults" file (note that @ref{raise} and `persist` can be overridden
 later by `set term x11 [no]raise [no]persist)`:
 
 @example
