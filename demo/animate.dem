@@ -1,15 +1,25 @@
 #
-# $Id: animate.dem,v 1.5 2003/10/17 15:02:21 mikulik Exp $
+# $Id: animate.dem,v 1.6 2003/10/28 05:35:54 sfeam Exp $
 #
-# HBB: Demo animation, tumbling around 'glass.dat'
-# meant to replace the 'rotating whale' demo.
+# Demo animation, tumbling around 'glass.dat'.
+#
+# History:
+#   - 1. 1. 2006 Dan Sebald:  Defined variables for more generic rotate
+#   - ?. ?. ?    Hans-Bernhard Broeker:  Changed from rotating whale to
+#                rotating glass
+#   - ?. ?. ?    ?:  Initial tumbling whale demo
+
 set parametric
 set hidden3d
 unset key
 set style data line
 xrot=60
+xrot_delta = 17
 zrot=0
-set view xrot,zrot
+zrot_delta = 10
+xview(xrot)=(50.+30.*sin((xrot%180)/180.*pi))
+zview(zrot)=(60.+45.*sin(zrot/180.*pi))
+set view xview(xrot),zview(zrot)
 splot "glass.dat"
 
 limit_iterations=40 # limits number of iterations if nonzero

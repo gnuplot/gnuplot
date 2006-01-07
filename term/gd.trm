@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.83 2005/12/31 22:05:10 sfeam Exp $
+ * $Id: gd.trm,v 1.84 2006/01/03 06:25:29 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -594,14 +594,13 @@ PNG_options()
     if (c_token == 2)
 	FPRINTF((stderr,"gif: Maintaining animation state\n"));
     else {
-	/* Otherwise reset animation */
-	png_state.animate = FALSE;
-	if (png_state.previous_image) {
+	/* Otherwise reset animation parameters */
+	if (png_state.previous_image)
 	    gdImageDestroy(png_state.previous_image);
-	    png_state.previous_image = NULL;
-	    png_state.frame_optimization = FALSE;
-	    png_state.loop_count = 0;
-	}
+	png_state.animate = FALSE;
+	png_state.previous_image = NULL;
+	png_state.frame_optimization = FALSE;
+	png_state.loop_count = 0;
     }
 
     while (!END_OF_COMMAND) {
@@ -817,7 +816,7 @@ PNG_options()
 #endif
 
 	    if (sscanf(string, "x%lx", &color) != 1) {
-		    int_error(c_token, "invalid color spec, must be xRRGGBB");
+		int_error(c_token, "invalid color spec, must be xRRGGBB");
 	    } else if (png_state.n_colors == PNG_MAX_COLORS && new_colors) {
 		int_warn(c_token, "too many colors, ignoring");
 		++c_token;
@@ -885,10 +884,6 @@ PNG_options()
     /* This code is shared by png, gif, and jpeg terminal types */
     if (!strcmp(term->name,"jpeg"))
 	png_state.flags &= ~PNG_USE_TRANSPARENT;
-
-    /* But transparent animations cannot be optimized */
-    if (png_state.flags & PNG_USE_TRANSPARENT)
-	png_state.frame_optimization = FALSE;
 
     /* now generate options string */
 
@@ -1006,6 +1001,14 @@ PNG_reset()
 	gdImageDestroy(PNG_fill_tile.im);
 	PNG_fill_tile.im = (gdImagePtr)0;
     }
+#ifdef GIF_ANIMATION
+    if (png_state.animate) {
+	gdImageGifAnimEnd(gpoutfile);
+	png_state.frame_count = 0;
+	png_state.animate = FALSE;
+	fprintf(stderr,"End of animation sequence\n");
+    }
+#endif
 }
 
 #if 0
@@ -1279,14 +1282,6 @@ PNG_graphics()
     else
 	gdImageColorTransparent(png_state.image, -1);
 
-#ifdef GIF_ANIMATION
-    if (png_state.animate && png_state.frame_count == 0) {
-	/* Initialize the animation with a global colormap */
-	gdImageGifAnimBegin(png_state.image, gpoutfile, 
-		1 /* Load Global Colormap */, 
-		png_state.loop_count );
-    }
-#endif
 }
 
 /*
@@ -2227,19 +2222,26 @@ TERM_PUBLIC void
 GIF_text()
 {
     image_do_crop();
+
 #ifdef GIF_ANIMATION
-    /* FIXME - using the global colormap would be better, but it breaks	*/
-    /* if the individual frames specify ad-hoc RGB colors.		*/
-    /* Also, the very last frame should be followed by a call to	*/
-    /* gdImageGifAnimEnd(gpoutfile)  although in practice it doesn't	*/
-    /* seem to matter.							*/
     if (png_state.animate) {
-	gdImageGifAnimAdd(png_state.image, gpoutfile, 
-		1 /* 0 = global 1 = local colormap */,
-		0, 0 /* No offset */,
-		png_state.frame_delay,
-		gdDisposalNone, 
-		png_state.frame_optimization ? png_state.previous_image : NULL);
+	/* Note - using a global colormap saves space, but it breaks	*/
+	/* if later frames add new colors to the palette.		*/
+	if (png_state.frame_count == 0) {
+	    gdImageGifAnimBegin(png_state.image, gpoutfile, 
+		1, /* Load Global Colormap even if it isn't used */ 
+		png_state.loop_count );
+	}
+	gdImageGifAnimAdd(png_state.image, gpoutfile,
+	    png_state.frame_optimization ? 0  /* use global map  */
+	                                 : 1, /* use private map */
+	    0, 0 /* No offset */,
+	    png_state.frame_delay,
+	    (png_state.flags & PNG_USE_TRANSPARENT)
+			? gdDisposalRestorePrevious 
+			: gdDisposalNone, 
+	    (png_state.frame_optimization && !(png_state.flags & PNG_USE_TRANSPARENT))
+	    ? png_state.previous_image : NULL);
 	png_state.frame_count++;
 	if (png_state.previous_image)
 	    gdImageDestroy(png_state.previous_image);
@@ -2247,6 +2249,7 @@ GIF_text()
 	return;
     }
 #endif
+
     gdImageGif(png_state.image, gpoutfile);
     gdImageDestroy(png_state.image);
 }
@@ -2348,12 +2351,26 @@ START_HELP(gif)
 " the creation of animated gifs. The default delay between display of",
 " successive images may be specified in units of 1/100 second (default 5).",
 " The actual delay may vary depending on the program used as a viewer.",
-" The `optimize` option requests that only the difference between successive",
-" frames is stored, which can substantially reduce the output file size.",
-" However, some programs cannot handle animations encoded this way.",
-" The `nooptimize` option ensures that each frame is described independently.",
+" An animation sequence is terminated by the next `set output` or `set term`",
+" command.  The `optimize` option has two effects on the animation.",
+"",
+" 1) A single color map is used for the entire animation. This requires",
+" that all colors used in any frame of the animation are already",
+" defined in the first frame.",
+"",
+" 2) If possible, only the portions of a frame that differ from the",
+" previous frame are stored in the animation file.  This space saving",
+" may not be possible if the animation uses transparency.",
+"",
+" Both of these optimizations are intended to produce a smaller output file,",
+" but the decrease in size is probably only significant for long animations",
+" or very small frame sizes.",
+" The `nooptimize` option turns off both of the effects just described.",
+" Each frame is stored in its entirety along with a private color map.",
+" Note that it is possible to post-process a non-optimized animation",
+" using external utilities, and this post-processing can yield a smaller",
+" file than gnuplot's internal optimization mode.",
 " The default is `nooptimize`.",
-" An animation sequence is terminated by the next `set term` command.",
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
 " pixels can be also modified by scaling with the `set size` command.",

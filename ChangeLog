@@ -1,3 +1,12 @@
+2005-01-07  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* term/gd.trm: Addtional processing of animated gifs to bring
+	output file into compliance with the Gif89a standard.
+
+	* demo/animate2.dem demo/rotate.gnu: New demo of gif animation,
+	showing transparency.  Revised rotation code for both animate
+	and animate2 demos.
+
 2006-01-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (term_end_multiplot): Free title string and clear
