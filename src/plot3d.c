@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.118 2005/11/27 23:52:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.119 2005/12/06 18:23:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -622,8 +622,10 @@ get_3ddata(struct surface_points *this_plot)
 	    expect_string( 4 );
 #endif
 
-	if (this_plot->plot_style == VECTOR)
+	if (this_plot->plot_style == VECTOR) {
 	    local_this_iso->next = iso_alloc(samples_1);
+	    local_this_iso->next->p_count = 0;
+	}
 
 	while ((j = df_readline(v,MAXDATACOLS)) != DF_EOF) {
 	    if (j == DF_SECOND_BLANK)

@@ -1,3 +1,8 @@
+2006-01-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (get3d_data):  Fix initialization code for 3D plot
+	style `with vectors`.
+
 2005-01-07  Mike Sutton  <mws116@usa.com>
 
 	* term/gd.trm: New terminal option {rounded|butt} controls line caps.
