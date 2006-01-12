@@ -1,3 +1,14 @@
+2006-01-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Avoid improper call to strcpy found be valgrind.
+
+	* term/emf.trm: Allow terminal to use LT_BACKGROUND as a line or
+	fill color.
+
+	* term/xlib.trm (Xlib_reset): Give xlib its own reset function,
+	because sharing one with x11 can lead to a double-free of the
+	output file, resulting in a segfault (found by valgrind).
+
 2006-01-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (get3d_data):  Fix initialization code for 3D plot

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.56 2005/10/09 09:43:01 mikulik Exp $
+ * $Id: svg.trm,v 1.57 2005/12/30 05:24:52 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -249,7 +249,8 @@ SVG_PathLimit ()
 static void
 SVG_SetFont (const char *name, double size)
 {
-    strcpy (SVG_fontNameCur, name);
+    if (name && name != SVG_fontNameCur)
+	strcpy (SVG_fontNameCur, name);
     SVG_fontSizeCur = size;
 
 /* since we cannot interrogate SVG about text properties and according
