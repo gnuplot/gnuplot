@@ -1,5 +1,5 @@
 # 
-# $Id: makefile.oww,v 1.3 2005/08/07 09:43:27 mikulik Exp $
+# $Id: makefile.oww,v 1.4 2005/09/08 19:42:00 broeker Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -119,7 +119,7 @@ wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res texticon.ico grpicon.ico
         $(WLD) @<<linkopt1.oww $(LDLIBS)
 RUNTIME windows=4.0
 SYSTEM nt_win
-DEBUG WATCOM ALL
+DEBUG ALL
 OPTION quiet
 FILE {
  $(OBJS)
@@ -171,7 +171,7 @@ wgnuplot.mnu: win\wgnuplot.mnu
         copy win\wgnuplot.mnu wgnuplot.mnu
 
 pgnuplot.exe: win\pgnuplot.c version.obj .AUTODEPEND
-        $(WCL) -5r -zq win\pgnuplot.c -fe=pgnuplot.exe -I. &
+        $(WCL) -5r -zq -d2 -fm win\pgnuplot.c -fe=pgnuplot.exe -I. &
 	  version.obj user32.lib
 
 
@@ -190,7 +190,7 @@ $(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win\wgnuplot.hpj
         $(HCW) /c /e win\wgnuplot.hpj
         if exist win\wgnuplot.hlp copy win\wgnuplot.hlp .
 
-doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
+doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c config.h
         $(WCL) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI /I..\docs;..\term -fedoc2rtf.exe $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 
 #make binary demo files
@@ -219,12 +219,14 @@ clean: .SYMBOLIC
         if exist geticon.exe del geticon.exe
         if exist wgnuplot.map del wgnuplot.map
         if exist wgnuplot.sym del wgnuplot.sym
+        if exist pgnuplot.map del pgnuplot.map
+        -if exist wgnuplot.gid attrib -h wgnuplot.gid
+        if exist wgnuplot.gid del wgnuplot.gid
         
 
 realclean: clean .SYMBOLIC
         if exist wgnuplot.exe del wgnuplot.exe
         if exist wgnuplot.hlp del wgnuplot.hlp
-        if exist wgnuplot.gid del wgnuplot.gid
         if exist wgnuplot.mnu del wgnuplot.mnu
         if exist pgnuplot.exe del pgnuplot.exe
         if exist ..\demo\binary1 del ..\demo\binary1
