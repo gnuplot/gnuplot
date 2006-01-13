@@ -1,3 +1,7 @@
+2006-01-13  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* demo/rainbow.dem:  Do not "unset mouse" inside demo.
+
 2006-01-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Avoid improper call to strcpy found be valgrind.
