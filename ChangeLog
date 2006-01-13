@@ -1,3 +1,9 @@
+2006-01-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm: EMF_filled_polygon has the side-effect of
+	changing the current line color.  Force re-evaluation of line
+	properties the next time a line is drawn.
+
 2006-01-13  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* demo/rainbow.dem:  Do not "unset mouse" inside demo.
