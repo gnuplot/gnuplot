@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.32 2005/08/07 09:43:34 mikulik Exp $
+ * $Id: emf.trm,v 1.33 2005/09/25 03:54:10 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -670,9 +670,11 @@ EMF_linetype(int linetype)
 {
     /* Note : separating linetype and color would have not been futile, but anyway... */
 
-    assert(linetype > L_TYPE_NODRAW);
     if (linetype == emf_linetype)
 	return;
+    if (linetype == L_TYPE_NODRAW)
+	return;
+	
     emf_linetype = linetype;
 
     EMF_linecolor(linetype);
@@ -698,14 +700,17 @@ EMF_linecolor(int linecolor)
 	RGB(128, 0, 128),	/* dark magenta */
 	RGB(192, 192, 192),	/* light grey */
 	RGB(0, 255, 255),	/* cyan */
-	RGB(255, 255, 0),	/* yellow */
+	RGB(255, 255, 0)	/* yellow */
     };
 
-    assert(linecolor > L_TYPE_NODRAW);
-    linecolor = (linecolor < 0 || emf_monochrome) ? 7 : (linecolor % EMF_COLORS);
-    if (color_table_data[linecolor] == emf_color)
-	return;
-    emf_color = color_table_data[linecolor];
+    if (linecolor == LT_BACKGROUND)
+	emf_color = RGB(255, 255, 255);	/* white (background) */
+    else {
+	linecolor = (linecolor < 0 || emf_monochrome) ? 7 : (linecolor % EMF_COLORS);
+	if (color_table_data[linecolor] == emf_color)
+	    return;
+	emf_color = color_table_data[linecolor];
+    }
 
     EMF_flush_polyline();
 }
@@ -816,7 +821,8 @@ EMF_dashtype(int dashtype)
     };
 
 
-    assert(dashtype > L_TYPE_NODRAW);
+    if (dashtype < 0)
+	dashtype = 0;
     if (dashtype == emf_dashtype)
 	return;
 
