@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.339 2005/11/26 06:50:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.340 2005/12/06 18:23:40 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -334,7 +334,7 @@ C
  Version 4.1 continues to allow the older syntax, but such backwards
  compatibility may be lost in future versions.
 
- Commands of the form `set <something> <style>` also are deprectated in favor
+ Commands of the form `set <something> <style>` also are deprecated in favor
  of the more general form `set style <something> <options>`.  Many more plot
  elements now have style options of their own, including arrows, filled
  areas, lines, and points. There are also style settings for input data and
@@ -1126,7 +1126,7 @@ C
 %substr("string",beg,end)@multiple@string "string"[beg:end]
  `substr("string",beg,end)` returns the substring consisting of characters
  beg through end of the original string. This is exactly equivalent to the
- expressiong "string"[beg:end] except that you do not have the option of
+ expression "string"[beg:end] except that you do not have the option of
  ommitting beg or end.
 4 system
 ?expressions functions system
@@ -8404,7 +8404,7 @@ C ... and restart the table:
 ?dots
  The `dots` style plots a tiny dot at each point; this is useful for scatter
  plots with many points. For some terminals (post, pdf) the size of the dot can
- be contolled by changing the linewidth.
+ be controlled by changing the linewidth.
 5 filledcurves
 ?commands set style filledcurves
 ?set style filledcurves
@@ -9047,7 +9047,7 @@ C ... and restart the table:
  Fine control of the major (labelled) tics on all axes at once is possible
  with the `set tics` command.  The tics may be turned off with the `unset tics`
  command, and may be turned on (the default state) with `set tics`.  Similar
- commands (by preceeding 'tics' by the axis name) control the major tics on a
+ commands (by preceding 'tics' by the axis name) control the major tics on a
  single axis.
 
  Syntax:
@@ -10468,7 +10468,7 @@ C ... and restart the table:
  You can select among the meshes inside a file by the `index` option to the
  `splot` command, as usual.
 
- See `help matrix` for examples of plotting rows and columns of the matrix in
+ See `matrix` for examples of plotting rows and columns of the matrix in
  a 2D plot.
 4 matrix
 ?commands plot datafile matrix

@@ -1,3 +1,7 @@
+2006-01-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Correct various typos and spelling errors.
+
 2006-01-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm: EMF_filled_polygon has the side-effect of
