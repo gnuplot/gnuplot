@@ -1,3 +1,22 @@
+2006-01-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/color.c src/color.h src/gadgets.c src/gadgets.h: Move color_box
+	structure and associated definitions from color.* to gadgets.*. This
+	resolves a circular header dependency if the structure is to be shared
+	by 2D and 3D code. Add (struct position) entries to color_box structure
+	to generalize the placement options.
+
+	* src/command.c src/command.h src/gadgets.c src/gadgets.h: Move the
+	related TBOOLEAN flags is_3d_plot and is_cb_plot from command.* to
+	gadgets.*.
+
+	* src/save.c src/show.c src/set.c src/unset.c: Convert the relevant
+	routines to manipulate color_box position using new (struct position)
+	fields.
+
+	* docs/gnuplot.doc: Document that color_box placement can now be
+	specified in any of gnuplot's coordinate systems.
+
 2006-01-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Correct various typos and spelling errors.
@@ -14,7 +33,7 @@
 
 2006-01-12  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/svg.trm: Avoid improper call to strcpy found be valgrind.
+	* term/svg.trm: Avoid improper call to strcpy found by valgrind.
 
 	* term/emf.trm: Allow terminal to use LT_BACKGROUND as a line or
 	fill color.

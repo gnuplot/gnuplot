@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.124 2005/10/02 22:15:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.125 2005/10/06 04:18:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -824,10 +824,11 @@ set origin %g,%g\n",
      */
     if (color_box.where != SMCOLOR_BOX_NO)
 	fprintf(fp,"set colorbox %s\n", color_box.where==SMCOLOR_BOX_DEFAULT ? "default" : "user");
-    fprintf(fp, "set colorbox %sal origin %g,%g size %g,%g ",
-	color_box.rotation ==  'v' ? "vertic" : "horizont",
-	color_box.xorigin, color_box.yorigin,
-	color_box.xsize, color_box.ysize);
+    fprintf(fp, "set colorbox %sal origin ", color_box.rotation ==  'v' ? "vertic" : "horizont");
+    save_position(fp, &color_box.origin, FALSE);
+    fputs(" size ", fp);
+    save_position(fp, &color_box.size, FALSE);
+    fputs(" ", fp);
     if (color_box.border == 0) fputs("noborder", fp);
 	else if (color_box.border_lt_tag < 0) fputs("bdefault", fp);
 		 else fprintf(fp, "border %d", color_box.border_lt_tag);

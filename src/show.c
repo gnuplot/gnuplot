@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.169 2005/10/02 22:15:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.170 2005/10/06 04:18:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2158,9 +2158,11 @@ show_colorbox()
 	    fputs("drawn at DEFAULT position\n", stderr);
 	    break;
 	case SMCOLOR_BOX_USER:
-	    fputs("drawn at USER position:\n", stderr);
-	    fprintf(stderr,"\t\torigin: %g, %g\n", color_box.xorigin, color_box.yorigin);
-	    fprintf(stderr,"\t\tsize  : %g, %g\n", color_box.xsize  , color_box.ysize  );
+	    fputs("drawn at USER position: ", stderr);
+	    show_position(&color_box.origin);
+	    fputs("\n\t          size: ", stderr);
+	    show_position(&color_box.size);
+	    fputs("\n", stderr);
 	    break;
 	default: /* should *never* happen */
 	    int_error(NO_CARET, "Argh !");

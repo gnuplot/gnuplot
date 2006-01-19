@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.213 2005/11/27 19:30:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.214 2005/12/01 21:58:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2933,14 +2933,9 @@ set_colorbox()
 		if (END_OF_COMMAND) {
 		    int_error(c_token, "expecting screen value [0 - 1]");
 		} else {
-		    struct value a;
-		    color_box.xorigin = real(const_express(&a));
-		    if (!equals(c_token,","))
-			int_error(c_token, "',' expected");
-		    c_token++;
-		    color_box.yorigin = real(const_express(&a));
-		    c_token--;
+		    get_position_default(&color_box.origin, screen);
 		}
+		c_token--;
 		continue;
 	    /* colorbox size */
 	    case S_COLORBOX_SIZE: /* "s$ize" */
@@ -2948,14 +2943,9 @@ set_colorbox()
 		if (END_OF_COMMAND) {
 		    int_error(c_token, "expecting screen value [0 - 1]");
 		} else {
-		    struct value a;
-		    color_box.xsize = real(const_express(&a));
-		    if (!equals(c_token,","))
-			int_error(c_token, "',' expected");
-		    c_token++;
-		    color_box.ysize = real(const_express(&a));
-		    c_token--;
+		    get_position_default(&color_box.size, screen);
 		}
+		c_token--;
 		continue;
 	    } /* switch over colorbox lookup table */
 	    int_error(c_token,"invalid colorbox option");

@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.23 2005/08/07 09:43:28 mikulik Exp $
+ * $Id: color.h,v 1.24 2005/08/22 16:37:06 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -198,53 +198,6 @@ extern t_sm_palette sm_palette;
 #ifdef EXTENDED_COLOR_SPECS
 extern int supply_extended_color_specs;
 #endif
-
-/*
-Position of the colour smooth box that shows the colours used.
-Currently, everything is default (I haven't figured out how to make it
-in gnuplot's usual way (like set labels, set key etc.) so the box is put
-somewhere right from the 3d graph.
-*/
-#define SMCOLOR_BOX_NO      'n'
-#define SMCOLOR_BOX_DEFAULT 'd'
-#define SMCOLOR_BOX_USER    'u'
-
-typedef struct {
-  char where;
-    /* where
-	SMCOLOR_BOX_NO .. do not draw the colour box
-	SMCOLOR_BOX_DEFAULT .. draw it at default position and size
-	SMCOLOR_BOX_USER .. draw it at the position given by user by using
-			  corners from below ... ! NOT IMPLEMENTED !
-    */
-#if 0
-  /* corners of the box */
-PROPOSALS (WHO WANTS TO MAKE THIS?):
-  /* coordval ? */ double xlow, xhigh, ylow, yhigh;
-			OR
-  /* coordval ? */ double xlow, ylow, xsize, ysize; <--- preferred!
-  /* or some structure (x,y) or (x,y,z) that can do
-	set color_smooth_box from 0.8,0.6 screen to 0.95,0.95 screen
-	as well as
-	set color_smooth_box from 0.34,0.45,12.4 to 1.0,2.0,45
-  */
-#endif
-  char rotation; /* 'v' or 'h' vertical or horizontal box */
-
-  char border; /* if non-null, a border will be drawn around the box (default) */
-  int border_lt_tag;
-
-  float xorigin;
-  float yorigin;
-  float xsize;
-  float ysize;
-
-} color_box_struct;
-
-
-/* GLOBAL VARIABLES */
-
-extern color_box_struct color_box;
 
 
 /* ROUTINES */

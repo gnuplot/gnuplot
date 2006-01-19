@@ -258,6 +258,33 @@ typedef struct {
     int ytop;
 } BoundingBox;
 
+
+/*
+ * EAM Jan 2006 - Move colorbox structure definition to here from color.h
+ * in order to be able to use struct position
+ */
+
+#define SMCOLOR_BOX_NO      'n'
+#define SMCOLOR_BOX_DEFAULT 'd'
+#define SMCOLOR_BOX_USER    'u'
+
+typedef struct {
+  char where;
+    /* where
+	SMCOLOR_BOX_NO .. do not draw the colour box
+	SMCOLOR_BOX_DEFAULT .. draw it at default position and size
+	SMCOLOR_BOX_USER .. draw it at the position given by user
+    */
+  char rotation; /* 'v' or 'h' vertical or horizontal box */
+  char border; /* if non-null, a border will be drawn around the box (default) */
+  int border_lt_tag;
+  struct position origin;
+  struct position size;
+} color_box_struct;
+
+extern color_box_struct color_box;
+extern color_box_struct default_color_box;
+
 extern BoundingBox plot_bounds;	/* Plot Boundary */
 extern BoundingBox canvas; 	/* Writable area on terminal */
 extern BoundingBox *clip_area;	/* Current clipping box */
@@ -329,9 +356,11 @@ extern enum PLOT_STYLE func_style;
 
 extern TBOOLEAN parametric;
 
-#if 0 /* UNUSED */
-extern TBOOLEAN suppressMove;
-#endif 
+extern TBOOLEAN is_3d_plot;
+
+#ifdef WITH_IMAGE
+extern TBOOLEAN is_cb_plot;
+#endif
 
 /* Plot layer definitions are collected here. */
 /* Someday they might actually be used.       */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.132 2005/10/07 12:44:56 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.133 2005/10/07 13:00:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -173,14 +173,6 @@ TBOOLEAN replot_disabled = FALSE;
 
 #ifdef USE_MOUSE
 int paused_for_mouse = 0;
-#endif
-
-/* If last plot was a 3d one. */
-TBOOLEAN is_3d_plot = FALSE;
-
-#ifdef WITH_IMAGE
-/* If last plot was one using color bus, e.g., image, map, pm3d. */
-TBOOLEAN is_cb_plot = FALSE;
 #endif
 
 /* output file for the print command */

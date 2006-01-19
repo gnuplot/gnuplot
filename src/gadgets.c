@@ -52,6 +52,12 @@ static char *RCSid() { return RCSid("gadgets.c,v 1.1.3.1 2000/05/03 21:47:15 hbb
 
 legend_key keyT = DEFAULT_KEY_PROPS;
 
+/* Description of the color box associated with CB_AXIS */
+color_box_struct color_box; /* initialized in init_color() */
+color_box_struct default_color_box = {SMCOLOR_BOX_DEFAULT, 'v', 1, LT_BLACK,
+					{screen, screen, screen, 0.90, 0.2, 0.0},
+					{screen, screen, screen, 0.05, 0.6, 0.0}};
+
 /* The graph box, in terminal coordinates, as calculated by boundary()
  * or boundary3d(): */
 BoundingBox plot_bounds;
@@ -138,8 +144,12 @@ enum PLOT_STYLE func_style = LINES;
 
 TBOOLEAN parametric = FALSE;
 
-#if 0 /* UNUSED */
-TBOOLEAN suppressMove = FALSE;	/* to prevent moveto while drawing contours */
+/* If last plot was a 3d one. */
+TBOOLEAN is_3d_plot = FALSE;
+
+#ifdef WITH_IMAGE
+/* If last plot was one using color bus, e.g., image, map, pm3d. */
+TBOOLEAN is_cb_plot = FALSE;
 #endif
 
 fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, LT_UNDEFINED } ;

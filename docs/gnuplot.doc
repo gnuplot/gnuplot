@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.340 2005/12/06 18:23:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.341 2006/01/16 06:17:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5191,8 +5191,9 @@ C ... and restart the table:
  gradient.
 
  `origin x, y` and `size x, y` are used only in combination with the `user`
- option. The x and y values must be given in screen coordinates (as everything
- else did not seem to make sense) that is between [0 - 1]. Try for example:
+ option. The x and y values are interpreted as screen coordinates by default,
+ and this is the only legal option for 3D plots. 2D plots, including splot with
+ `set view map`, allow any coordinate system to be specified.  Try for example:
      set colorbox horiz user origin .1,.02 size .8,.04
  which will draw a horizontal gradient somewhere at the bottom of the graph.
 

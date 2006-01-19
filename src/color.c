@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.60 2005/09/16 03:20:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.61 2006/01/08 06:34:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -37,9 +37,6 @@ static char *RCSid() { return RCSid("$Id: color.c,v 1.60 2005/09/16 03:20:30 sfe
 
 /* COLOUR MODES - GLOBAL VARIABLES */
 t_sm_palette sm_palette;  /* initialized in init_color() */
-
-/* SMOOTH COLOUR BOX - GLOBAL VARIABLES */
-color_box_struct color_box; /* initialized in init_color() */
 
 #ifdef EXTENDED_COLOR_SPECS
 int supply_extended_color_specs = 0;
@@ -81,14 +78,7 @@ init_color()
   sm_palette.gamma = 1.5;
 
   /* initialisation of smooth color box */
-  color_box.where = SMCOLOR_BOX_DEFAULT;
-  color_box.rotation = 'v';
-  color_box.border = 1;
-  color_box.border_lt_tag = -1;
-  color_box.xorigin = 0.9;
-  color_box.yorigin = 0.2;
-  color_box.xsize = 0.1;
-  color_box.ysize = 0.63;
+  color_box = default_color_box;
 }
 
 
@@ -494,59 +484,49 @@ draw_color_smooth_box(int plot_mode)
        }
      */
     if (color_box.where == SMCOLOR_BOX_USER) {
-	cb_x_from = color_box.xorigin * (term->xmax) + 0.5;
-	cb_y_from = color_box.yorigin * (term->ymax) + 0.5;
-	cb_x_to = color_box.xsize * (term->xmax) + 0.5;
-	cb_y_to = color_box.ysize * (term->ymax) + 0.5;
+	if (!is_3d_plot) {
+	    double xtemp, ytemp;
+	    map_position(&color_box.origin, &cb_x_from, &cb_y_from, "cbox");
+	    map_position_r(&color_box.size, &xtemp, &ytemp, "cbox");
+	    cb_x_to = xtemp;
+	    cb_y_to = ytemp;
+	} else if (splot_map && is_3d_plot) {
+	    /* In map view mode we allow any coordinate system for placement */
+	    map3d_position(&color_box.origin, &cb_x_from, &cb_y_from, "cbox");
+	    map3d_position_r(&color_box.size, &cb_x_to, &cb_y_to, "cbox");
+	} else {
+	    /* But in full 3D mode we only allow screen coordinates */
+	    cb_x_from = color_box.origin.x * (term->xmax) + 0.5;
+	    cb_y_from = color_box.origin.y * (term->ymax) + 0.5;
+	    cb_x_to = color_box.size.x * (term->xmax) + 0.5;
+	    cb_y_to = color_box.size.y * (term->ymax) + 0.5;
+	}
 	cb_x_to += cb_x_from;
 	cb_y_to += cb_y_from;
-    } else {			/* color_box.where == SMCOLOR_BOX_DEFAULT */
-#if 0
-	/* HBB 20031215: replaced this by view-independant placment method */
-	double dx = (X_AXIS.max - X_AXIS.min);
-	/* don't use CB_AXIS here, CB_AXIS might be completely
-	 * unrelated to the Z axis 26 Jan 2002 (joze) */
-	double dz = Z_AXIS.max - Z_AXIS.min;
 
-	/* note: [0.05 0.35; 0.20 0.00] were the values before cbaxis */
-	map3d_xy(X_AXIS.max + dx * 0.03, Y_AXIS.max, base_z + dz * 0.35,
-		 &cb_x_from, &cb_y_from);
-	map3d_xy(X_AXIS.max + dx * 0.11, Y_AXIS.max, ceiling_z - dz * 0,
-		 &cb_x_to, &cb_y_to);
-	if (cb_y_from == cb_y_to || cb_x_from == cb_x_to) { /* map, i.e. plot with "set view 0,0 or 180,0" */
-	    dz = Y_AXIS.max - Y_AXIS.min;
-	    /* note: [0.04 0.25; 0.18 0.25] were the values before cbaxis */
-	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, & cb_x_from, &cb_y_from);
-	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &cb_x_to, &cb_y_to);
-	}
-#else
-	/* MWS 09-Dec-05, make color full size for splot maps.*/
-	if (plot_mode == MODE_SPLOT && splot_map) {
-	    /* set sets the default colorbox to extend for the full y-axis when
-	     * a splot is done in map mode. */
-	    double dx = (X_AXIS.max - X_AXIS.min);
-
-	    /* note: [0.04 0.25; 0.18 0.25] were the values before cbaxis */
-	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, & cb_x_from, &cb_y_from);
-	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &cb_x_to, &cb_y_to);
-
-	  } else {
+    } else { /* color_box.where == SMCOLOR_BOX_DEFAULT */
+	if (plot_mode == MODE_SPLOT && !splot_map) {
 	    /* HBB 20031215: new code.  Constants fixed to what the result
 	     * of the old code in default view (set view 60,30,1,1)
-	     * happened to be. Somebody fix them if they're not right!*/
+	     * happened to be. Somebody fix them if they're not right! */
 	    cb_x_from = xmiddle + 0.709 * xscaler;
 	    cb_x_to   = xmiddle + 0.778 * xscaler;
 	    cb_y_from = ymiddle - 0.147 * yscaler;
 	    cb_y_to   = ymiddle + 0.497 * yscaler;
-	  }
-#endif
-	/* EAM FIXME 15-Jan-2004: This code may want reworking similar to HBB's fix just above */
-	if (plot_mode != MODE_SPLOT) {
+
+	} else if (is_3d_plot) {
+	    /* MWS 09-Dec-05, make color box full size for splot maps. */
 	    double dx = (X_AXIS.max - X_AXIS.min);
-	    cb_x_from = map_x(X_AXIS.max + dx * 0.025);
-	    cb_x_to = map_x(X_AXIS.max + dx * 0.075);
-	    cb_y_from = map_y(Y_AXIS.min);
-	    cb_y_to = map_y(Y_AXIS.max);
+	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, &cb_x_from, &cb_y_from);
+	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &cb_x_to, &cb_y_to);
+	} else { /* 2D plot */
+	    struct position default_origin = {graph,graph,graph, 1.025, 0, 0};
+	    struct position default_size = {graph,graph,graph, 0.05, 1.0, 0};
+	    double xtemp, ytemp;
+	    map_position(&default_origin, &cb_x_from, &cb_y_from, "cbox");
+	    map_position_r(&default_size, &xtemp, &ytemp, "cbox");
+	    cb_x_to = xtemp + cb_x_from;
+	    cb_y_to = ytemp + cb_y_from;
 	}
 
 	/* now corrections for outer tics */
