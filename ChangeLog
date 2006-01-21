@@ -1,3 +1,9 @@
+2006-01-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graph3d.c (do_3dplot): The mistake of missing blank lines in a
+	datafile for pm3d plot is so frequently made that it really deserves
+	a warning. 
+
 2006-01-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.c src/color.h src/gadgets.c src/gadgets.h: Move color_box

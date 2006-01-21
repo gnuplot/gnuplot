@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.142 2005/12/12 06:51:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.143 2005/12/27 06:11:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -873,6 +873,15 @@ do_3dplot(
 	yl = yl_ref; xl += key_col_wth; key_count = 0;	\
     } else						\
 	yl -= key_entry_height
+
+
+    /* PM January 2005: The mistake of missing blank lines in the data file is
+     * so frequently made (see questions at comp.graphics.apps.gnuplot) that it
+     * really deserves this warning. But don't show it too often --- only if it
+     * is a single surface in the plot.
+     */
+    if (pcount == 1 && plots->num_iso_read == 1)
+	    fprintf(stderr, "  Warning: Single isoline (scan) is not enough for a pm3d plot.\n\t   Hint: Missing blank lines in the data file? See 'help pm3d' and FAQ.\n");
 
     this_plot = plots;
     if (!quick)
