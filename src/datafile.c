@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.98 2005/11/27 04:25:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.99 2005/11/28 22:41:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -914,7 +914,10 @@ df_read_matrix(int *rows, int *cols)
             int i;
             
             for (i = 0; i < c; ++i) {
-                if (df_column[i].good != DF_GOOD) {
+		if (i < firstpoint && df_column[i].good != DF_GOOD) {
+		    /* It's going to be skipped anyhow, so... */
+                    linearized_matrix[index++] = 0;
+                } else if (df_column[i].good != DF_GOOD) {
                     if (linearized_matrix)
                         free(linearized_matrix);
                     int_error(NO_CARET, "Bad number in matrix");
@@ -986,7 +989,7 @@ df_read_matrix(int *rows, int *cols)
                                                    "df_matrix row");
 
             for (i = 0; i < c; ++i) {
-                if (df_column[i].good != DF_GOOD)
+                if (df_column[i].good != DF_GOOD && i >= firstpoint)
                     int_error(NO_CARET, "Bad number in matrix");
 
                 row[i] = (float) df_column[i].datum;
