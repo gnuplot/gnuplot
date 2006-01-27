@@ -3,7 +3,7 @@
 	* src/datafile.c (df_read_matrix):  Bugfix for "every" option in plot
 	"matrix ... every *:*:firstpoint:*".  If we are explicitly skipping
 	input columns, it doesn't matter whether they contain legal input or
-	not. There for test index against firstpoint before trying to parse
+	not. Therefore test index against firstpoint before trying to parse
 	it as a number.
 
 2005-01-23  Daniel Sebald  <daniel.sebald@ieee.org>
