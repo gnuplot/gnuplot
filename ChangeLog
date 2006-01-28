@@ -1,3 +1,16 @@
+2006-01-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (parse_term_size): New routine intended to be shared
+	by terminals with "set term <foo> size XX, YY" option. The routine
+	itself supports size specification in inches, cm, or pixels. The
+	calling terminal can limit which units are acceptable.
+
+	* term/post.trm (term_options): "set term ... size XX, YY" option.
+	This is intended to replace the older mechanism:
+	"set size ... ; set term ...".  The new code gets the bounding box
+	right, which the old mechanism does not, and it rationalizes the use
+	of screen coordinates to match that of other (but not all) terminals.
+
 2006-01-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_read_matrix):  Bugfix for "every" option in plot

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.133 2005/12/14 12:18:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.134 2006/01/07 20:14:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -164,6 +164,9 @@ const char *arrow_head_names[3] = {"nohead", "head", "heads"};
 static SELECT_TYPE_ARG1 ipc_back_fd = IPC_BACK_CLOSED;
 #endif
 
+/* resolution in dpi for converting pixels to size units */
+int gp_resolution = 72;
+
 /* Internal variables */
 
 /* true if terminal is in graphics mode */
@@ -222,6 +225,14 @@ static char *enhanced_recursion __PROTO((char *p, TBOOLEAN brace,
 static void enh_err_check __PROTO((const char *str));
 /* note: c is char, but must be declared int due to K&R compatibility. */
 static void do_enh_writec __PROTO((int c));
+
+/* Used by terminals and by shared routine parse_term_size() */
+typedef enum {
+    PIXELS,
+    INCHES,
+    CM
+} size_units;
+static size_units parse_term_size __PROTO((float *xsize, float *ysize, size_units def_units));
 
 /*
  * Bookkeeping and support routine for 'set multiplot layout <rows>, <cols>'
@@ -2692,4 +2703,53 @@ on_page(int x, int y)
 	return TRUE;
 
     return FALSE;
+}
+
+/* Utility routine for drivers to accept an explicit size for the 
+ * output image.
+ */
+size_units
+parse_term_size( float *xsize, float *ysize, size_units default_units )
+{
+    size_units units = default_units;
+    struct value a;
+
+    if (END_OF_COMMAND)
+	int_error(c_token, "size requires two numbers:  xsize, ysize");
+    *xsize = real(const_express(&a));
+    if (almost_equals(c_token,"in$ches")) {
+	c_token++;
+	units = INCHES;
+    } else if (equals(c_token,"cm")) {
+	c_token++;
+	units = CM;
+    }
+    switch (units) {
+    case INCHES:	*xsize *= gp_resolution; break;
+    case CM:		*xsize *= (float)gp_resolution / 2.54; break;
+    case PIXELS:
+    default:		 break;
+    }
+
+    if (!equals(c_token++,","))
+	int_error(c_token, "size requires two numbers:  xsize, ysize");
+    *ysize = real(const_express(&a));
+    if (almost_equals(c_token,"in$ches")) {
+	c_token++;
+	units = INCHES;
+    } else if (equals(c_token,"cm")) {
+	c_token++;
+	units = CM;
+    }
+    switch (units) {
+    case INCHES:	*ysize *= gp_resolution; break;
+    case CM:		*ysize *= (float)gp_resolution / 2.54; break;
+    case PIXELS:
+    default:		 break;
+    }
+
+    if (*xsize < 1 || *ysize < 1)
+	int_error(c_token, "size: out of range");
+
+    return units;
 }

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.167 2005/09/27 13:29:54 mikulik Exp $
+ * $Id: post.trm,v 1.168 2005/10/31 23:41:33 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -239,6 +239,11 @@ static void delete_ps_fontfile __PROTO((struct ps_fontfile_def *, struct ps_font
 
 TERM_PUBLIC void PS_load_fontfile __PROTO((struct ps_fontfile_def *,TBOOLEAN));
 TERM_PUBLIC void PS_load_fontfiles __PROTO((TBOOLEAN));
+
+static TBOOLEAN ps_explicit_size = FALSE;
+static size_units ps_explicit_units = INCHES;
+static int eps_explicit_x = 0;
+static int eps_explicit_y = 0;
 
 #define DOTS_PER_INCH (300)    /* resolution of printer we expect to use */
 
@@ -921,6 +926,7 @@ enum PS_id {
     PS_LEVEL1, PS_LEVELDEFAULT, PS_FONT,
     PSLATEX_ROTATE, PSLATEX_NOROTATE, PSLATEX_AUXFILE, PSLATEX_NOAUXFILE,
     PSLATEX_OLDSTYLE, PSLATEX_NEWSTYLE, EPSLATEX_HEADER, EPSLATEX_NOHEADER,
+    PS_SIZE,
     PS_OTHER
 };
 
@@ -944,6 +950,7 @@ static struct gen_table PS_opts[] =
     { "dl", PS_DASHLENGTH },
     { "linew$idth", PS_LINEWIDTH },
     { "lw", PS_LINEWIDTH },
+    { "size", PS_SIZE },
     { "si$mplex", PS_SIMPLEX },
     { "du$plex", PS_DUPLEX },
     { "defaultp$lex", PS_DEFAULTPLEX },
@@ -986,6 +993,8 @@ PS_options()
     TBOOLEAN set_standalone = FALSE, set_epslheader = FALSE;
     TBOOLEAN set_pslrotate = FALSE, set_pslauxfile = FALSE;
     TBOOLEAN set_psloldstyle = FALSE, set_font = FALSE, set_fontsize = FALSE;
+
+    ps_explicit_size = FALSE;
 
     if (strcmp(term->name, "pstex") == 0)
 	ps_params = &pstex_params;
@@ -1439,6 +1448,23 @@ PS_options()
 	    }
 	    ++c_token;
 	    break;
+	
+	case PS_SIZE:
+	    {
+	    float xmax_t, ymax_t;
+
+	    c_token++;
+	    ps_explicit_size = TRUE;
+	    ps_explicit_units = parse_term_size(&xmax_t, &ymax_t, INCHES);
+
+	    /* PostScript *always* works in pts, not locally defined dpi */
+	    term->xmax = xmax_t * PS_SC * 72./gp_resolution;
+	    term->ymax = ymax_t * PS_SC * 72./gp_resolution;
+	    eps_explicit_x = 2 * term->xmax;
+	    eps_explicit_y = 2 * term->ymax;
+	    break;
+	    }
+	
 	case PS_FONT:
 	    c_token++;
 	    /* Fall through to attempt to read font name */
@@ -1571,6 +1597,16 @@ PS_options()
     }
 #endif
 
+    if (ps_explicit_size) {
+	if (ps_explicit_units == CM)
+	    sprintf(tmp_term_options,"size %.2fcm, %.2fcm ",
+		2.54*(float)term->xmax/(72.*PS_SC), 2.54*(float)term->ymax/(72.*PS_SC));
+	else
+	    sprintf(tmp_term_options,"size %.2fin, %.2fin ",
+		(float)term->xmax/(72.*PS_SC), (float)term->ymax/(72.*PS_SC));
+	strcat(term_options,tmp_term_options);
+    }
+
     if (ps_params->terminal == PSTERM_POSTSCRIPT)
 	sprintf(tmp_term_options,"\"%s\" %g%s ",
 		ps_params->font,ps_params->fontsize,
@@ -1586,6 +1622,7 @@ PS_options()
 	free(ps_fontfile_char);
 
     strcat(term_options,tmp_term_options);
+
 }
 
 /* store settings passed to common_init() for use in PS_graphics()
@@ -2432,27 +2469,36 @@ PS_init()
 
     switch (ps_params->psformat) {
     case PSTERM_EPS:
-	term->xmax = PS_XMAX;
-	if (ps_params->oldstyle)
-	    term->ymax = PS_YMAX_OLDSTYLE;
-	else
-	    term->ymax = PS_YMAX;
+	if (ps_explicit_size) {
+	    term->xmax = eps_explicit_x;
+	    term->ymax = eps_explicit_y;
+	} else {
+	    term->xmax = PS_XMAX;
+	    if (ps_params->oldstyle)
+		term->ymax = PS_YMAX_OLDSTYLE;
+	    else
+		term->ymax = PS_YMAX;
+	}
 	xmin_t = term->xmax * xoffset / (2*PS_SC);
 	xmax_t = term->xmax * (xsize + xoffset) / (2*PS_SC);
 	ymin_t = term->ymax * yoffset / (2*PS_SC);
 	ymax_t = term->ymax * (ysize + yoffset) / (2*PS_SC);
 	break;
     case PSTERM_PORTRAIT:
-	term->xmax = PS_YMAX;
-	term->ymax = PS_XMAX;
+	if (!ps_explicit_size) {
+	    term->xmax = PS_YMAX;
+	    term->ymax = PS_XMAX;
+	}
 	xmin_t = term->xmax * xoffset / PS_SC;
 	xmax_t = term->xmax * (xsize + xoffset) / PS_SC;
 	ymin_t = term->ymax * yoffset / PS_SC;
 	ymax_t = term->ymax * (ysize + yoffset) / PS_SC;
 	break;
     case PSTERM_LANDSCAPE:
-	term->xmax = PS_XMAX;
-	term->ymax = PS_YMAX;
+	if (!ps_explicit_size) {
+	    term->xmax = PS_XMAX;
+	    term->ymax = PS_YMAX;
+	}
 	ymin_t = term->xmax * xoffset / PS_SC;
 	ymax_t = term->xmax * (xsize+xoffset) / PS_SC;
 	xmin_t = term->ymax * (1-ysize-yoffset) / PS_SC;
@@ -2519,7 +2565,7 @@ gnudict begin\ngsave\n\
 	    (ps_params->psformat == PSTERM_EPS ? 0.5 : 1.0)/PS_SC,
 	    (ps_params->psformat == PSTERM_EPS ? 0.5 : 1.0)/PS_SC);
     if (ps_params->psformat == PSTERM_LANDSCAPE)
-	fprintf(gppsfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
+	fprintf(gppsfile,"90 rotate\n0 %d translate\n", -(int)(term->ymax));
     fprintf(gppsfile, psg1);
     if (ps_common_uses_fonts)
 	fprintf(gppsfile, "(%s) findfont %d scalefont setfont\n",
@@ -4029,7 +4075,8 @@ START_HELP(00psglobal)
 "                               {dashlength | dl <DL>}",\
 "                               {linewidth | lw <LW>}",\
 "                               {rounded | butt}",\
-"                               {palfuncparam <samples>{,<maxdeviation>}}",
+"                               {palfuncparam <samples>{,<maxdeviation>}}",\
+"                               {size <XX>{unit},<YY>{unit}}",
 #define PS_COMMON_OPTS2 \
 "                               {blacktext | colortext | colourtext}",\
 "                               {\"<fontname>\"} {<fontsize>}",
@@ -4069,6 +4116,18 @@ START_HELP(00psglobal)
 " resulting colors by more than <maxdeviation>.  For almost every useful",\
 " palette you may savely leave the defaults of <samples>=2000 and",\
 " <maxdeviation>=0.003 untouched.",\
+"",\
+" The default size for postscript output is 10 inches x 7 inches. The default",\
+" for eps output is 5 x 3.5 inches.  The `size` option changes this to",\
+" whatever the user requests. By default the X and Y sizes are taken to be in",\
+" inches, but other units are possibly (currently only cm). The BoundingBox",\
+" of the plot is correctly adjusted to contain the resized image.",\
+" Screen coordinates always run from 0.0 to 1.0 along the full length of the",\
+" plot edges as specified by the `size` option.",\
+" NB: `this is a change from the previously recommended method of using the",\
+" set size command prior to setting the terminal type`.  The old method left",\
+" the BoundingBox unchanged and screen coordinates did not correspond to the",\
+" actual limits of the plot.",\
 "",
 ""
 END_HELP(00psglobal)
