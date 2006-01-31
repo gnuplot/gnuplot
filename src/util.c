@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.61 2005/11/23 23:33:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.62 2005/11/27 19:30:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1140,6 +1140,8 @@ existdir (const char *name)
 	if (finddata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	    return TRUE;
     }
+    return FALSE;
+#elif defined(VMS)
     return FALSE;
 #else
     int_warn(NO_CARET,

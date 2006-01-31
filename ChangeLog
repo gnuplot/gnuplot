@@ -1,3 +1,17 @@
+2006-01-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/command.c: (VMS) replace MAILBOX with "PLOT$MAILBOX"
+
+	* src/set.c (set_timestamp): Use gp_strdup() rather than strdup().
+
+	* src/term_api.h: Remove trailing comma from definition of 
+	t_termlayer.
+
+	* src/util.c (existdir): Special case VMS.
+
+	With these minor tweaks, the current gnuplot source will compile
+	and build under VMS using DECC.  Not all drivers tested, though.
+
 2006-01-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (parse_term_size): New routine intended to be shared

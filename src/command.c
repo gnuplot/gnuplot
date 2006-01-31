@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.133 2005/10/07 13:00:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.134 2006/01/20 06:18:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2842,7 +2842,7 @@ do_system_func(const char *cmd, char **output)
 # elif defined(VMS)
     int chan, one = 1;
     struct dsc$descriptor_s pgmdsc = {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, 0};
-    static $DESCRIPTOR(lognamedsc, MAILBOX);
+    static $DESCRIPTOR(lognamedsc, "PLOT$MAILBOX");
 # endif /* VMS */
 
     cmd_len = strlen(cmd);
@@ -2857,7 +2857,7 @@ do_system_func(const char *cmd, char **output)
     if (!((vaxc$errno = lib$spawn(&pgmdsc, 0, &lognamedsc, &one)) & 1))
 	os_error(NO_CARET, "lib$spawn failed");
 
-    if ((f = fopen(MAILBOX, "r")) == NULL)
+    if ((f = fopen("PLOT$MAILBOX", "r")) == NULL)
 	os_error(NO_CARET, "mailbox open failed");
 # elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
     if (system(NULL) == 0)
