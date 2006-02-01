@@ -1,3 +1,11 @@
+2006-02-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (handle_selection_event): Fix bad interaction 
+	between gnuplot_x11 and X11 clipboard management tool "klipper".
+	Refuse to export the pixmap and colormap more than once per
+	plot export. For unknown reasons, klipper continues to ask for
+	copies of both ad infinitum.  Fixes bugs ##1225866 and #1420675.
+
 2006-01-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c: (VMS) replace MAILBOX with "PLOT$MAILBOX"

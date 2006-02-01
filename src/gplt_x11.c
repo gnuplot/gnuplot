@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.151 2005/12/03 05:23:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.152 2006/01/07 20:04:10 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -4683,6 +4683,7 @@ process_event(XEvent *event)
 #endif /* USE_MOUSE */
 #ifdef EXPORT_SELECTION
     case SelectionNotify:
+	break;
     case SelectionRequest:
 	if (exportselection)
 	    handle_selection_event(event);
@@ -5876,6 +5877,7 @@ pr_exportselection()
 
 /* bit of a bodge, but ... */
 static struct plot_struct *exported_plot;
+static int export_interlock = 0;  /* One bit each for bitmap and colormap */
 
 static void
 export_graph(struct plot_struct *plot)
@@ -5887,6 +5889,7 @@ export_graph(struct plot_struct *plot)
      * GetSelectionOwner(), but if it failed, it failed - no big deal
      */
     exported_plot = plot;
+    export_interlock |= 3;
 }
 
 static void
@@ -5910,9 +5913,9 @@ handle_selection_event(XEvent *event)
 	    reply.xselection.property = event->xselectionrequest.property;
 	    reply.xselection.time = event->xselectionrequest.time;
 
-	    FPRINTF((stderr, "selection request\n"));
+	    FPRINTF((stderr, "selection request target: %d\n", reply.xselection.target));
 
-	    if (reply.xselection.target == XA_TARGETS) {
+	    if (reply.xselection.target == XA_TARGETS && export_interlock & 1) {
 		static Atom targets[] = { XA_PIXMAP, XA_COLORMAP };
 
 		FPRINTF((stderr, "Targets request from %d\n", reply.xselection.requestor));
@@ -5920,6 +5923,7 @@ handle_selection_event(XEvent *event)
 		XChangeProperty(dpy, reply.xselection.requestor,
 				reply.xselection.property, reply.xselection.target,
 				32, PropModeReplace, (unsigned char *) targets, 2);
+		export_interlock &= ~1;
 	    } else if (reply.xselection.target == XA_COLORMAP) {
 
 		FPRINTF((stderr, "colormap request from %d\n", reply.xselection.requestor));
@@ -5927,13 +5931,14 @@ handle_selection_event(XEvent *event)
 		XChangeProperty(dpy, reply.xselection.requestor,
 				reply.xselection.property, reply.xselection.target,
 				32, PropModeReplace, (unsigned char *) &(default_cmap.colormap), 1);
-	    } else if (reply.xselection.target == XA_PIXMAP) {
+	    } else if (reply.xselection.target == XA_PIXMAP && export_interlock & 2) {
 
 		FPRINTF((stderr, "pixmap request from %d\n", reply.xselection.requestor));
 
 		XChangeProperty(dpy, reply.xselection.requestor,
 				reply.xselection.property, reply.xselection.target,
 				32, PropModeReplace, (unsigned char *) &(exported_plot->pixmap), 1);
+		export_interlock &= ~2;
 #ifdef PIPE_IPC
 	    } else if (reply.xselection.target == XA_STRING) {
 		FPRINTF((stderr, "XA_STRING request\n"));
@@ -5943,6 +5948,9 @@ handle_selection_event(XEvent *event)
 #endif
 	    } else {
 		reply.xselection.property = None;
+		if (!export_interlock)
+		    /* We have now satisfied the select request. Say goodbye */
+		    XSetSelectionOwner(dpy, EXPORT_SELECTION, None, CurrentTime);
 	    }
 
 	    XSendEvent(dpy, reply.xselection.requestor, False, 0L, &reply);
