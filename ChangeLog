@@ -1,3 +1,10 @@
+2006-02-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (handle_selection_event): Clean up yesterday's
+	code a little, and separate the pixmap request from the mouse
+	coordinate string request.  By making the string request
+	separately, it seems that klipper now notices it. 
+
 2006-02-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (handle_selection_event): Fix bad interaction 
