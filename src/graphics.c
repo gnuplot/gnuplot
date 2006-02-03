@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.174 2006/01/03 20:18:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.175 2006/01/23 15:13:29 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3403,7 +3403,8 @@ plot_c_bars(struct curve_points *plot)
     int i;
     double x;						/* position of the bar */
     double dxl, dxr, ylow, yhigh, yclose, yopen;	/* the ends of the bars */
-    unsigned int xlowM, xhighM, xM, ylowM, yhighM;	/* mapped version of above */
+    int xlowM, xhighM, xM, ylowM, yhighM;		/* mapped version of above */
+    int ymin, ymax;					/* clipped to plot extent */
     enum coord_type prev = UNDEFINED;			/* type of previous point */
     TBOOLEAN low_inrange, high_inrange;
     int tic = GPMAX(ERRORBARTIC/2,1);
@@ -3425,9 +3426,6 @@ plot_c_bars(struct curve_points *plot)
 	yclose = plot->points[i].z;
 	yopen = plot->points[i].y;
 
-	high_inrange = inrange(yhigh, axis_array[y_axis].min, axis_array[y_axis].max);
-	low_inrange = inrange(ylow, axis_array[y_axis].min, axis_array[y_axis].max);
-
 	/* HBB 20010928: To make code match the documentation, ensure
 	 * yhigh is actually higher than ylow */
 	if (yhigh < ylow) {
@@ -3435,6 +3433,9 @@ plot_c_bars(struct curve_points *plot)
 	    ylow = yhigh;
 	    yhigh = temp;
 	}
+
+	high_inrange = inrange(yhigh, axis_array[y_axis].min, axis_array[y_axis].max);
+	low_inrange = inrange(ylow, axis_array[y_axis].min, axis_array[y_axis].max);
 
 	/* compute the plot position of yhigh */
 	if (high_inrange)
@@ -3490,26 +3491,26 @@ plot_c_bars(struct curve_points *plot)
 	xhighM = map_x(dxr);
 	}
 
-	/* EAM Sep 2001 use term->fillbox() code if present */
-	if (term->fillbox) {
-	    int ymin, ymax;
-	    int style = style_from_fill(&plot->fill_properties);
+	/* EAM Feb 2006 Clip to plot vertical extent */
+	cliptorange(yopen, Y_AXIS.min, Y_AXIS.max);
+	cliptorange(yclose, Y_AXIS.min, Y_AXIS.max);
+	if (map_y(yopen) < map_y(yclose)) {
+	    ymin = map_y(yopen); ymax = map_y(yclose);
+	} else {
+	    ymax = map_y(yopen); ymin = map_y(yclose);
+	}
 
-	    if (map_y(yopen) < map_y(yclose)) {
-		ymin = map_y(yopen); ymax = map_y(yclose);
-	    } else {
-		ymax = map_y(yopen); ymin = map_y(yclose);
-	    }
-	    if (plot->lp_properties.use_palette) {
-		unsigned int x = xlowM;
-		unsigned int y = ymin;
-		unsigned int w = (xhighM-xlowM);
-		unsigned int h = (ymax-ymin);
+	if (term->fillbox) {
+	    int style = style_from_fill(&plot->fill_properties);
+	    unsigned int x = xlowM;
+	    unsigned int y = ymin;
+	    unsigned int w = (xhighM-xlowM);
+	    unsigned int h = (ymax-ymin);
+
+	    if (plot->lp_properties.use_palette)
 		(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
-	    } else
-		term->fillbox( style,
-		    (unsigned int)(xlowM), (unsigned int)(ymin),
-		    (unsigned int)(xhighM-xlowM), (unsigned int)(ymax-ymin) );
+	    else
+		(*t->fillbox)(style, x, y, w, h);
 	}
 
 	/* Draw whiskers and an open box */
@@ -3533,10 +3534,10 @@ plot_c_bars(struct curve_points *plot)
 
 	/* draw two extra vertical bars to indicate open > close */
 	if (yopen > yclose) {
-	    (*t->move)   ( (xM + xlowM) / 2, map_y(yclose));
-	    (*t->vector) ( (xM + xlowM) / 2, map_y(yopen));
-	    (*t->move)   ( (xM + xhighM) / 2, map_y(yclose));
-	    (*t->vector) ( (xM + xhighM) / 2, map_y(yopen));
+	    (*t->move)   ( (xM + xlowM) / 2, ymin);
+	    (*t->vector) ( (xM + xlowM) / 2, ymax);
+	    (*t->move)   ( (xM + xhighM) / 2, ymin);
+	    (*t->vector) ( (xM + xhighM) / 2, ymax);
 	}
 
 	prev = plot->points[i].type;
