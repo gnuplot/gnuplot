@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.215 2006/01/20 06:18:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.216 2006/02/01 06:05:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3448,6 +3448,7 @@ set_tics()
 {
     unsigned int i = 0;
     TBOOLEAN axisset = FALSE;
+    TBOOLEAN mirror_opt = FALSE; /* set to true if (no)mirror option specified) */
 
     ++c_token;
 
@@ -3473,10 +3474,12 @@ set_tics()
 	} else if (almost_equals(c_token, "mi$rror")) {
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
 		axis_array[i].ticmode |= TICS_MIRROR;
+    	    mirror_opt = TRUE;
 	    ++c_token;
 	} else if (almost_equals(c_token, "nomi$rror")) {
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
 		axis_array[i].ticmode &= ~TICS_MIRROR;
+	    mirror_opt = TRUE;
 	    ++c_token;
 	} else if (almost_equals(c_token,"in$wards")) {
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
@@ -3560,10 +3563,14 @@ set_tics()
     }
 
     /* if tics are off and not set by axis, reset to default (border) */
-    if ((axis_array[i].ticmode == NO_TICS) && (!axisset)) {
-	axis_array[i].ticmode = TICS_ON_BORDER;
-	if ((i == FIRST_X_AXIS) || (i == FIRST_Y_AXIS)) {
-	    axis_array[i].ticmode |= TICS_MIRROR;
+    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+	if ((axis_array[i].ticmode == NO_TICS) && (!axisset)) {
+	    if ((i == SECOND_X_AXIS) || (i == SECOND_Y_AXIS))
+		continue; /* don't switch on secondary axes by default */
+	    axis_array[i].ticmode = TICS_ON_BORDER;
+	    if ((mirror_opt == FALSE) && ((i == FIRST_X_AXIS) || (i == FIRST_Y_AXIS) || (i == COLOR_AXIS))) {
+		axis_array[i].ticmode |= TICS_MIRROR;
+	    }
 	}
     }
 }
@@ -3932,6 +3939,7 @@ set_tic_prop(AXIS_INDEX axis)
 
     if (almost_equals(c_token, cmdptr)) {
 	TBOOLEAN axisset = FALSE;
+	TBOOLEAN mirror_opt = FALSE; /* set to true if (no)mirror option specified) */
 	axis_array[axis].ticdef.def.mix = FALSE;
 	match = 1;
 	++c_token;
@@ -3947,9 +3955,11 @@ set_tic_prop(AXIS_INDEX axis)
 		++c_token;
 	    } else if (almost_equals(c_token, "mi$rror")) {
 		axis_array[axis].ticmode |= TICS_MIRROR;
+		mirror_opt = TRUE;
 		++c_token;
 	    } else if (almost_equals(c_token, "nomi$rror")) {
 		axis_array[axis].ticmode &= ~TICS_MIRROR;
+		mirror_opt = TRUE;
 		++c_token;
 	    } else if (almost_equals(c_token, "in$wards")) {
 		axis_array[axis].tic_in = TRUE;
@@ -4026,7 +4036,7 @@ set_tic_prop(AXIS_INDEX axis)
 	/* if tics are off and not set by axis, reset to default (border) */
 	if ((axis_array[axis].ticmode == NO_TICS) && (!axisset)) {
 	    axis_array[axis].ticmode = TICS_ON_BORDER;
-	    if ((axis == FIRST_X_AXIS) || (axis == FIRST_Y_AXIS)) {
+	    if ((mirror_opt == FALSE) && ((axis == FIRST_X_AXIS) || (axis == FIRST_Y_AXIS) || (axis == COLOR_AXIS))) {
 		axis_array[axis].ticmode |= TICS_MIRROR;
 	    }
 	}
