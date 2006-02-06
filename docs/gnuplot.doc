@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.341 2006/01/16 06:17:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.342 2006/01/20 06:18:40 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9869,9 +9869,9 @@ C ... and restart the table:
  compatibility.
 
  Syntax:
-       set ticslevel <level>
-       set xyplane <level>
-       set xyplane at <level>
+       set ticslevel <frac>
+       set xyplane <frac>
+       set xyplane at <zvalue>
        show xyplane
 
  The form `set ticslevel <frac>` places the xy plane below the range in Z, where

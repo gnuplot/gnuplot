@@ -1,3 +1,7 @@
+2006-02-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Make "set xyplane" description more self-consistent.
+
 2006-02-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/set.c (set_tics set_tic_prop): Draw nomirrored tics correctly for
