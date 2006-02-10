@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.143 2006-11-17 12:36:43+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.400
+2 RCS $Id: gnuplot-ja.doc,v 1.154 2007-02-09 13:43:17+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.415
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -134,26 +134,27 @@ C Shigeharu Takeno et al (3.7, 4.X)
 2 Introduction
 ?introduction
 ?
- `gnuplot` は，コマンド入力方式の対話的な関数描画プログラムです．コマン
- ドや関数名は大文字小文字を区別します．いずれのコマンドも，あいまいさ
- の無い限りにおいて省略することができます．1行中にはセミコロン(;)で区
- 切って複数のコマンドを書くことができます (ただし、`load` と `call` は
- 最後のコマンドでなければなりません)．文字列は引用符を使って表します．
- 引用符は，一重でも，二重でも構いません．例えば
+ `gnuplot` は、コマンド入力方式の対話的な関数描画プログラムです。
 
-          load "filename"
-          cd 'dir'
+ コマンドラインでの引数は `gnuplot` 用のコマンドの書かれたファイルの名
+ 前であるものとします。但し標準の X11 の引数は例外で、まず最初に処理さ
+ れます。各ファイルはコマンドライン上で指定された順に `load` コマンドで
+ ロードされます。`gnuplot` は、最後に指定されたファイルを処理し終ると終
+ 了します。特別なファイル名 "-" は標準入力を表します。ファイルが 1 つも
+ 指定されていない場合は、`gnuplot` は対話モードになります。詳細について
+ は、`batch/interactive` に関するヘルプを参照してください。
+
+ `gnuplot` は、コマンドや関数名は大文字小文字を区別します。いずれのコマ
+ ンドも、あいまいさの無い限りにおいて省略することができます。1 行中には
+ セミコロン (;) で区切って複数のコマンドを書くことができます (ただし、
+ `load` と `call` は最後のコマンドでなければなりません)。文字列は引用符
+ を使って表します。引用符は，一重でも，二重でも構いません。例えば
+
+       load "filename"
+       cd 'dir'
 
  しかし、両者には微妙な違いがあります (詳細は `syntax` を参照してくだ
  さい)。
-
- コマンドラインでの引数は `gnuplot` 用のコマンドの書かれたファイルの名前
- であるものとします．但し標準の X11 の引数は例外で，まず最初に処理され
- ます．各ファイルはコマンドライン上で指定された順に `load` コマンドで
- ロードされます．`gnuplot` は，最後に指定されたファイルを処理し終ると終
- 了します．ファイルが1つも指定されていない場合は，`gnuplot` は対話モー
- ドになります．特別なファイル名 "-" は標準入力を表します。詳細は
- `batch/interactive` に関するヘルプを参照してください。
 
  `gnuplot` のコマンドの多くは複数のオプションを持っています。Version 4
  は以前の版に比べて、それらのオプションの順序に関しては許容的になってい
@@ -330,6 +331,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 `emf`
  `emf` 出力形式は Enhanced Metafile Format (EMF) ファイルを生成します。
  このファイル形式は MS Win32 システムでは標準的なメタファイル形式です。
+ emf 出力形式は、pm3d, rgb 色指定、画像描画モードをサポートしています。
 4 `gif`, `jpeg`, `png`
  `gd` ライブラリを利用するこれらの出力形式のソースコードは統合されまし
  た。`gif` 出力形式には、複数のグラフからアニメーション GIF を作成する
@@ -350,6 +352,82 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 `windows`
  `windows` 出力形式は、現在は拡張文字処理 (`enhanced text`) モードをサ
  ポートしています。
+
+3 Canvas size
+?canvas size
+?canvas
+?set term size
+
+ gnuplot の以前の版では、`set size` の値を、出力する描画領域 (キャンバ
+ ス) のサイズを制御するのにも使っていた出力形式もありましたが、すべての
+ 出力形式がそうだったわけではありませんでした。この目的のために
+ `set size` を使用することは version 4.2 で非推奨となり、version 4.3 で
+ は、ほとんどの出力形式が以下のルールに従うようになりました:
+
+ `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
+ または "キャンバス" のサイズを制御します。サイズパラメータの有効な値に
+ ついては、個々の出力形式のヘルプを参照してください。デフォルトでは、グ
+ ラフはそのキャンバス全体に描画されます。
+
+ `set size <XX>, <YY>` は、描画自体をキャンバスのサイズに対して相対的に
+ 伸縮させます。1 より小さい伸縮値を指定すると、グラフはキャンバス全体を
+ 埋めず、1 より大きい伸縮値を指定すると、グラフの一部分のみがキャンバス
+ 全体に合うように描画されます。1 より大きい伸縮値を指定すると、ある出力
+ 形式では問題が起こるかもしれないことに注意してください。
+
+ このルールに沿わない主な例外は PostScript ドライバで、デフォルトでは以
+ 前の版のと同じ振舞いをします。gnuplot の次の版では、PostScript ドライ
+ バも同様にデフォルトの振舞いを変更することになるでしょう。
+
+ 例:
+
+       set size 0.5, 0.5
+       set term png size 600, 400
+       set output "figure.png"
+       plot "data" using lines
+
+ このコマンドは、幅 600 ピクセル、高さ 400 ピクセルの出力ファイル
+ "figure.png" を生成します。グラフはキャンバスの中の左下に置かれます。
+ これは、multiplot モードが常に行ってきた方法とは矛盾していませんが、し
+ かし単一のグラフに対する version 4.0 の png ドライバの挙動とは異ってい
+ ます。
+
+2 Backwards compatibility
+?backwards compatibility
+?compatibility
+ 以前の版で使われていたいくつかの書式は gnuplot 4.0 で非推奨となりまし
+ たが、それは今でも認識はされ続けています。これは現在コンパイル時に制御
+ され、以下のようにして無効にできます:
+
+       ./configure --disable-backwards-compatibility
+
+ 注意: 非推奨の書式は、未来の gnuplot のある版からは、完全に無効になっ
+ てしまうかもしれません。
+
+ 一つの主な違いは、複雑なコマンド (特に文字列変数を含むコマンド) のあい
+ まいさを避けるようなキーワードの導入です。特に注意すべき点は、オフセッ
+ ト、線種、点種に対する生の数の使用でした。
+ 具体例:
+
+ 非推奨:
+       set title "Old" 0,-1
+       set data linespoints
+       plot 1 2 4               # horizontal line at y=1
+ 新:
+       TITLE = "New"
+       set title TITLE offset char 0, char -1
+       set style data linespoints
+       plot 1 linetype 2 pointtype 4
+
+ その他の互換性の部分は、multiplot モード以外でのコマンド `set size` の
+ 外側への影響です。以前の版では、コマンド `set size <xx>, <yy>` は、出
+ 力形式によっては、グラフのサイズとそれが書かれるキャンバスのサイズの両
+ 方を変更し、一方でグラフサイズのみを変更する出力形式もありました。キャ
+ ンバスサイズを変更するための `set size` の使用は、現在では非推奨となっ
+ ています。
+
+ `set size`, `set term size`、および個々の出力形式のヘルプも参照してく
+ ださい。
 
 2 Features introduced in version 4.0
 ?version 4 features
@@ -3201,7 +3279,7 @@ C ... and restart the table:
  書式：
        plot '<file_name>' {binary <binary list>}
                           {matrix}
-                          {index <index list>}
+                          {index <index list> | index "<name>"}
                           {every <every list>}
                           {thru <thru expression>}
                           {using <using list>}
@@ -3402,8 +3480,8 @@ C ... and restart the table:
  の次元方向 (x) には 10 点、2 番目の次元方向 (y) には 20 点の標本化デー
  タがあることを意味します。特別な "数字" として `Inf` を、ファイルの終
  了までデータが続くことを示すのに使えます。複数のデータのサイズ指定を分
- 離するのに、コンマを使うことができます。例えば `array=25,35` は 2 つの
- 1 次元データがファイルの中にあることを意味します。そのコンマの意味は他
+ 離するのに、コロンを使うことができます。例えば `array=25:35` は 2 つの
+ 1 次元データがファイルの中にあることを意味します。そのコロンの意味は他
  の <binary list> 内のキーワードにも影響を与え、それぞれが個々のデータ
  に対応するように意味を持つようになります。
 
@@ -3539,7 +3617,7 @@ C ... and restart the table:
  配列をグラフのその他の場所に配置したい場合、`origin` キーワードで指定
  した場所に gnuplot は配列の左下の点を合わせます。その指定は、`plot` で
  は 2 つの座標の組、`splot` では 3 つの座標の組を指定してください。例え
- ば `origin=(100,100),(100,200)` は、一つのファイルに含まれる 2 つのデ
+ ば `origin=(100,100):(100,200)` は、一つのファイルに含まれる 2 つのデ
  ータに対する指定で、2 次元の描画に対する指定です。2 つ目の例として
  `origin=(0,0,3.5)` をあげると、これは 3 次元描画用の指定です。
 6 center
@@ -3602,13 +3680,13 @@ C ... and restart the table:
        # する (左上が原点になるように)。ピクセルの間隔も指定し、ファイ
        # ルには 2 つの画像が含まれていて、そのうち一つは origin で平行
        # 移動する。
-       plot '<file_name>' binary array=512x1024,1024x512 format='%uchar' \
-            dx=2,1 dy=1,2 origin=(0,0),(1024,1024) flipy u 1:2:3 w rgbimage
+       plot '<file_name>' binary array=512x1024:1024x512 format='%uchar' \
+            dx=2:1 dy=1:2 origin=(0,0):(1024,1024) flipy u 1:2:3 w rgbimage
 
        # 4 つの別のデータからなり、座標情報もデータファイルに含まれてい
        # る。ファイルは gnuplot が実行されているシステムとは異なるエン
        # ディアンで生成されている。
-       splot '<file_name>' binary record=30,30,29,26 endian=swap u 1:2:3
+       splot '<file_name>' binary record=30:30:29:26 endian=swap u 1:2:3
 
  `binary matrix` も参照してください。
 4 every
@@ -3699,7 +3777,7 @@ C ... and restart the table:
  タセットのみを選び出すのに使われます。
 
  書式:
-       plot 'file' index <m>{{:<n>}:<p>}
+       plot 'file' index { <m>{{:<n>}:<p>} | "<name>" }
 
  データセットは 2 行の空白で分離されています。`index <m>` は <m> 番目の
  セットだけを選択します; `index <m>:<n>` は <m> から <n> までのデータセ
@@ -3712,6 +3790,19 @@ C ... and restart the table:
 
  例:
        plot 'file' index 4:5
+
+ `index '<name>'` は、データセットを名前 '<name>' で選択します。名前は
+ コメント行に書いてデータセットに割り当てます。コメント文字とそれに続く
+ 空白をそのコメント行から取り除いて、その結果が <name> から始まっていれ
+ ば、それに続くデータセットに <name> という名前がつけられて、それを指定
+ できます。
+
+ 例:
+       plot 'file' index 'Population'
+
+ <name> で始まるすべてのコメントがそれに続くデータセットの名前になるこ
+ とに注意してください。問題を避けるために、例えば '== Popolation ==' や
+ '[Population]' などの命名法を採用するといいでしょう。
 
 ^ 以下の Web ページも参照:
 ^ <a href="http://www.gnuplot.info/demo/multimsh.html">
@@ -4347,8 +4438,8 @@ C ... and restart the table:
  ンドの繰り返し (iteration) でそれを行うのが便利です。
 
  書式:
-       plot for [<variable>=<start>:<end>{:<increment>}] 
-       splot for [<variable>=<start>:<end>{:<increment>}] 
+       plot for [<variable>=<start>:<end>{:<increment>}]
+       splot for [<variable>=<start>:<end>{:<increment>}]
 
  例:
        file(n) = sprintf("dataset_%d.dat",n)
@@ -4504,8 +4595,8 @@ C ... and restart the table:
  されます。通常、グローバルなオプション `set hidden3d` はグラフ上の全て
  の描画に適用されますが、各々の描画に `nohidden3d` オプションをつけるこ
  とで、それを hidden3d の処理から除外することができます。`nohidden3d`
- がマークされた個々の描画要素 (線分、点、ラベル等) は、通常は他の何らか
- の描画要素で隠されてしまう場合も全て描画されます。
+ がマークされた曲面以外の個々の描画要素 (線分、点、ラベル等) は、通常は
+ 他の何らかの描画要素で隠されてしまう場合も全て描画されます。
 
  キーワードは暗示するような形で省略可能です。
 
@@ -5572,6 +5663,7 @@ C ... and restart the table:
  ユーザ定義レベルの等高線のデモ (discrete.dem).
 ^ </a>
 3 data style
+?DUMMYLABEL set style data
  このコマンドの形式は現在は推奨されていません。`set style data` を参照
  してください。
 3 datafile
@@ -6502,15 +6594,18 @@ C ... and restart the table:
                {width <width_increment>}
                {height <height_increment>}
                {{no}autotitles {columnheader}}
-               {title "<text>"} {{no}enhanced} {font "<face>,<size>"}
+               {title "<text>"} {{no}enhanced}
+               {font "<face>,<size>"} {textcolor <colorspec>}
                {{no}box { {linestyle | ls <line_style>}
                           | {linetype | lt <line_type>}
                             {linewidth | lw <line_width>}}}
        unset key
        show key
 
- `set key off` か `unset key` によって説明表示なしに描画することができ
- ます。
+ キー (説明) は、グラフ内の各描画に対するタイトルとサンプル (凡例; 線、
+ 点、箱) から成ります。キーの機能は、`set key off` または `unset key`
+ で無効にできます。個々のキーのエントリは、対応する plot コマンド内にキ
+ ーワード `notitle` を使うことで無効にできます。
 
  キー内の各要素は `vertical` (縦) または `horizontal` (横) に従って重ね
  られます。`vertical` の場合、key は可能ならば 2,3 個の縦の列を使います。
@@ -6525,7 +6620,91 @@ C ... and restart the table:
  key の描画をどこに置くかをより詳しく指示するための `at <position>` も
  あります。この場合、キーワード `left`, `right`, `top`, `bottom`,
  `center` が同様の基準点合わせの設定の目的で使われます。
+ より詳しくは、`key placement` を参照してください。
 
+ グラフのタイトルの行揃えは `Left`, `Right` (デフォルト) で指示し
+ ます。ラベル文字列と曲線のサンプルは左右入れ替えることができます
+ (`reverse`) し、 全体を枠で囲むこともできます (`box {...}`)。その枠の
+ 線は、線種 (`linetype`), 線幅 (`linewidth`)、あるいは定義済のラインス
+ タイル (`linestyle`) を指定することもできます。
+
+ デフォルトでは最初の描画のラベルが説明の一番上に現われ、それに続くラベ
+ ルがその下に並んで行きます。オプション `invert` は、最初のラベルを説明
+ の一番下に置き、それに続くラベルをその上に並べて行きます。このオプショ
+ ンは、説明のラベルの縦の並びの順番を、積み上げ形式のヒストグラム
+ (`histograms`) の箱の順番に合わせるときに便利でしょう。
+
+ <height_increment> は、説明の箱の高さに加えたり減らしたりする高さ (何
+ 文字分か) を表す数値です。これは主に、説明の回りに箱を描く場合のための
+ ものですが、他に、自動的に設定される説明の位置を <height_increment>/2
+ だけ垂直方向にずらすのにも使えます。
+
+ `plot` や `splot` で描画される全ての曲線は、デフォルトのオプション
+ `autotitles` に従って表題 (title) がつけられます。表題の自動生成は、
+ `noautotaitle` で抑制できますがその場合、`(s)plot ... title ...` で明
+ 示的に指定された表題のみが描かれることになります。
+
+ `set key autotitles columnheader` コマンドは、各入力データの先頭行の各
+ 列のエントリをテキスト文字列と解釈し、対応する描画グラフのタイトルとし
+ て使用します。描画される量が、複数の列データの関数である場合は、
+ gnuplot はどの列をタイトルの描画に使えばいいのかわからなくなりますので、
+ そのような場合、plot コマンド上で、例えば 
+ `plot "datafile" using (($2+$3)/$4) title 3 with lines` のように明示的
+ にタイトルの列を指定する必要があります。
+
+ 全体に渡る表題は説明の上につけることもできます (`title "<text>"`) --
+ 単一引用符 (') と二重引用符 (") の違いについては `syntax` を参照してく
+ ださい。説明の表題の行揃えは、グラフの表題の行揃えと同じものが使われま
+ す。
+
+ `set key` のデフォルトは、`on`,  `right`, `top`, `vertical`, `Right`,
+ `noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`,
+ `nobox` です。説明の枠の線種はデフォルトではグラフ描画の外枠と同じもの
+ が使われます。`set key default` とするとデフォルトの設定に戻ります。
+
+ 説明は、1 行に 1 曲線分ずつの数行のまとまりとして書かれます。各行の右
+ 側には (`reverse` を使っていれば左側には) その曲線と同じ種類の直線のサ
+ ンプルが引かれ、他の側には `plot` コマンドから得られる文字列 (title)
+ が置かれます。これらの行は、架空の直線が説明の左側と右側を分けるかのよ
+ うに垂直に整列されます。コマンド `set key` で指定する座標はこの架空の
+ 線分の上の端の座標です。`plot` では直線の位置を指定するために x と y
+ だけが使われ、`splot` では、x, y, z の値全てを使い、グラフを 2 次元面
+ へ投影するのと同じ方法を使って、架空の直線の 2 次元画面での位置を生成
+ します。
+
+ TeX, PostScript, またはこれらと同等の、整形情報が文字列に埋め込まれる
+ 出力を使う場合は、`gnuplot` は説明の位置合わせのための文字列の幅を
+ 正しく計算できません。よって説明を左に置く場合は
+ `set key left Left reverse` という組合せを使うのがいいでしょう。そうす
+ れば説明の枠と枠内のすき間は文字列そのままの幅に合わせられます。
+
+ `splot` で等高線を書く場合、説明には等高線のラベルも表示されます。
+ これらのラベルの並び具合がうまくいかない、または別な位置に小数点を
+ 置きたい場合はそのラベルの書式を指定できます。詳細は `set clabel` を
+ 参照してください。
+
+ 例:
+
+ 以下はデフォルトの位置に説明を表示します:
+       set key default
+
+ 以下は説明を表示しなくします:
+       unset key
+
+ 以下はデフォルトの (第一の) 座標系での (2,3.5,2) の位置に説明を表示
+ します:
+       set key at 2,3.5,2
+
+ 以下は説明をグラフの下に表示します:
+       set key below
+
+ 以下は説明を左下角に表示し、テキストは左に行揃えで、タイトルをつけ、
+ 線種 3 の外枠を書きます:
+       set key left bottom Left title 'Legend' box 3
+4 key placement
+?commands set key placement
+?set key placement
+?key placement
  配置の仕組みを理解ための最も重要な概念は、グラフ領域、すなわち内か外か
  ということと、グラフ領域の境界との間の余白 (margin) を考えることです。
  グラフ領域に沿って、キーワード `left/center/right` (l/c/r) と
@@ -6587,19 +6766,17 @@ C ... and restart the table:
  `center` の効果は、label コマンドで配置される文字列の場合と同じように
  基準位置の位置合わせに使用されます。すなわち、`left` は key が
  <position> の右に置かれて左合わせで出力されます。他の場合も同様です。
-
- 説明中のラベル (名前) の行揃えは `Left`, `Right` (デフォルト) で指示し
- ます。ラベル文字列と曲線のサンプルは左右入れ替えることができます
- (`reverse`) し、 全体を枠で囲むこともできます (`box {...}`)。その枠の
- 線は、線種 (`linetype`), 線幅 (`linewidth`)、あるいは定義済のラインス
- タイル (`linestyle`) を指定することもできます。ただ、全ての出力装置が
- 線幅の選択をサポートしているとは限らないことに注意してください。
-
- デフォルトでは最初の描画のラベルが説明の一番上に現われ、それに続くラベ
- ルがその下に並んで行きます。オプション `invert` は、最初のラベルを説明
- の一番下に置き、それに続くラベルをその上に並べて行きます。このオプショ
- ンは、説明のラベルの縦の並びの順番を、積み上げ形式のヒストグラム
- (`histograms`) の箱の順番に合わせるときに便利でしょう。
+4 key samples
+?commands set key samples
+?set key samples
+?key samples
+ デフォルトでは、グラフ上の各描画はキー内にそれぞれに対応するエントリを
+ 生成します。このエントリには、描画タイトルと、その描画で使われるのと同
+ じ色、同じ塗りつぶし属性による線/点/箱 のサンプルが入ります。font と
+ textcolor 属性は、キー内に現われる個々の描画タイトルの見た目を制御しま
+ す。textcolor を "rgb variable" にセットすると、キーの各エントリの文字
+ 列は、描画グラフの線や塗りつぶし色と同じ色になります。これは、以前のあ
+ る時期の gnuplot のデフォルトの挙動でした。
 
  グラフ曲線のサンプルの線分の長さは `samplen` で指定できます。その長さ
  は目盛りの長さと、<sample_length>*(文字幅) の和として計算されます。
@@ -6613,81 +6790,9 @@ C ... and restart the table:
  ます。
 
  <width_increment> は、文字列の長さに加えたり減らしたりする幅 (何文字分
- か) を表す数値です。これは、説明に外枠を書き、ラベル文字列の文字数を調
- 節するときには役立つでしょう。`gnuplot` は外枠の幅を計算するときは、ラ
- ベル文字列の文字数を単純に数えるだけなので、それを修正するのに使えます。
-
- <height_increment> は、説明の箱の高さに加えたり減らしたりする高さ (何
- 文字分か) を表す数値です。これは主に、説明の回りに箱を描く場合のための
- ものですが、他に、自動的に設定される説明の位置を <height_increment>/2
- だけ垂直方向にずらすのにも使えます。
-
- `plot` や `splot` で描画される全ての曲線は、デフォルトのオプション
- `autotitles` に従って表題 (title) がつけられます。表題の自動生成は、
- `noautotaitle` で抑制できますがその場合、`(s)plot ... title ...` で明
- 示的に指定された表題のみが描かれることになります。
-
- `set key autotitles columnheader` オプションは、gnuplot が configure
- オプション --enable-datastrings 付きでインストールされた場合に有効です。
- このコマンドは各描画データの先頭行の各列のエントリをテキスト文字列と解
- 釈し、対応する描画グラフのタイトルとして使用します。描画される量が、複
- 数の列データの関数である場合は、gnuplot はどの列をタイトルの描画に使え
- ばいいのかわからなくなりますので、そのような場合、plot コマンド上で、
- 例えば `plot "datafile" using (($2+$3)/$4) title 3 with lines` のよう
- に明示的にタイトルの列を指定する必要があります。
-
- 表題は説明の上につけることもできます (`title "<text>"`) -- 単一引用符
- (') と二重引用符 (") の違いについては `syntax` を参照してください。説
- 明の表題の行揃えは、グラフの表題の行揃えと同じものが使われます。
-
- 明示的に与えられた表題は、出力形式がサポートする拡張文字列属性を使って
- 出力されます。詳細は `enhanced text` を参照してください。そのデフォル
- トの挙動は `noenhanced` オプションで無効にできます。
-
- `set key` のデフォルトは、`on`,  `right`, `top`, `vertical`, `Right`,
- `noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`,
- `nobox` です。説明の枠の線種はデフォルトではグラフ描画の外枠と同じもの
- が使われます。`set key default` とするとデフォルトの設定に戻ります。
-
- 説明は、1 行に 1 曲線分ずつの数行のまとまりとして書かれます。各行の右
- 側には (`reverse` を使っていれば左側には) その曲線と同じ種類の直線のサ
- ンプルが引かれ、他の側には `plot` コマンドから得られる文字列 (title)
- が置かれます。これらの行は、架空の直線が説明の左側と右側を分けるかのよ
- うに垂直に整列されます。コマンド `set key` で指定する座標はこの架空の
- 線分の上の端の座標です。`plot` では直線の位置を指定するために x と y
- だけが使われ、`splot` では、x, y, z の値全てを使い、グラフを 2 次元面
- へ投影するのと同じ方法を使って、架空の直線の 2 次元画面での位置を生成
- します。
-
- TeX, PostScript, またはこれらと同等の、整形情報が文字列に埋め込まれる
- 出力を使う場合は、`gnuplot` は説明の位置合わせのための文字列の幅を
- 正しく計算できません。よって説明を左に置く場合は
- `set key left Left reverse` という組合せを使うのがいいでしょう。そうす
- れば説明の枠と枠内のすき間は文字列そのままの幅に合わせられます。
-
- `splot` で等高線を書く場合、説明には等高線のラベルも表示されます。
- これらのラベルの並び具合がうまくいかない、または別な位置に小数点を
- 置きたい場合はそのラベルの書式を指定できます。詳細は `set clabel` を
- 参照してください。
-
- 例:
-
- 以下はデフォルトの位置に説明を表示します:
-       set key default
-
- 以下は説明を表示しなくします:
-       unset key
-
- 以下はデフォルトの (第一の) 座標系での (2,3.5,2) の位置に説明を表示
- します:
-       set key at 2,3.5,2
-
- 以下は説明をグラフの下に表示します:
-       set key below
-
- 以下は説明を左下角に表示し、テキストは左に行揃えで、タイトルをつけ、
- 線種 3 の外枠を書きます:
-       set key left bottom Left title 'Legend' box 3
+ か) を表す数値です。これは、説明に外枠を書き、文字列に制御文字を使う場
+ 合にだけ有用でしょう。`gnuplot` は外枠の幅を計算するときは、ラベル文字
+ 列の文字数を単純に数えるだけなので、それを修正するのに使えます。
 3 label
 ?commands set label
 ?commands unset label
@@ -6752,10 +6857,10 @@ C ... and restart the table:
  を使うことで、密なデータによって見出しが隠されてしまうことを避けること
  が出来ます。
 
- `textcolor <colorspec>` は文字列の色を変更します。`<colorspec>` は線種
- か、あるいは pm3d カラーパレット (`splot` でのみ有効) への割当 のいず
- れかです。`set palette` を参照してください。
-    `textcolor` は、`tc` と省略可能です。
+ `textcolor <colorspec>` は文字列の色を変更します。`<colorspec>` は、線
+ 種、rgb 色、またはパレットへの割当のいずれかが指定できます。
+ `colorspec`, `palette` を参照してください。`textcolor` は、`tc` と省略
+ 可能です。
     `tc default` は、文字色をデフォルトにします。
     `tc lt <n>` は、文字色を線種 <n> (line type)と同じものにします。
     `tc ls <n>` は、文字色を line style <n> と同じものにします。
@@ -6763,6 +6868,7 @@ C ... and restart the table:
     `tc palette cb <val>` は、色見本 (colorbar) の <val> の色になります。
     `tc palette fraction <val>` (0<=val<=1) は、[0:1] から `palette` の
         灰色階調/カラーへの写像に対応した色になります。
+    `tc rgb "#RRGGBB"` は、任意の 24-bit RGB 色を選択します。
 
  <pointstyle> がキーワード `lt`, `pt`, `ps` とともに与えられると
  (`style` 参照)、与えられたスタイルと、与えられた線種の色で見出し位置に
@@ -7162,8 +7268,6 @@ C ... and restart the table:
  さい。
 
  例:
-       set size 0.7,0.7
-       set origin 0.1,0.1
        set multiplot
        set size 0.4,0.4
        set origin 0.1,0.1
@@ -7173,20 +7277,16 @@ C ... and restart the table:
        plot cos(x)
        unset multiplot
 
- は、cos(x) のグラフを、sin(x) の上に積み重ねて表示します。最初の
- `set size` と `set origin` に注意してください。これらはなくてもいいの
- ですがそれを入れておくことを勧めます。ある種の出力ドライバは、描画が一
- つでも作られる前に全体の外枠の情報が参照できることを要求します。そして、
- 上のやり方は、その外枠が最初の描画のための外枠ではなく、描画列全体を含
- む外枠であるということを保証しています。
+ これは、cos(x) のグラフを、sin(x) の上に積み重ねて表示します。
 
- `set size` と `set origin` は全体の描画領域を参照しそれは各描画で利用
- されます。描画境界を一列に揃えたいならば、`set margin` コマンドで、境
- 界の外の余白サイズを同じサイズに揃えることが出来ます。その使用に関して
- は `set margin` を参照してください。余白サイズは文字サイズ単位の絶対的
- な数値単位を使用することに注意してください。よって残ったスペースに描か
- れるグラフは表示するデバイスの表示サイズに依存します。例えば、プリンタ
- とディスプレイの表示は多分違ったものになるでしょう。
+ `set size` と `set origin` は全体の描画領域を参照し、それは各描画で利
+ 用されます。`set term size` も参照してください。描画境界を一列に揃えた
+ いならば、`set margin` コマンドで、境界の外の余白サイズを同じサイズに
+ 揃えることが出来ます。その使用に関しては `set margin` を参照してくださ
+ い。余白サイズは文字サイズ単位の絶対的な数値単位を使用することに注意し
+ てください。よって残ったスペースに描かれるグラフは表示するデバイスの表
+ 示サイズに依存します。例えば、プリンタとディスプレイの表示は多分違った
+ ものになるでしょう。
 
  オプション `layout` により、各描画の前にそれぞれ与えていた `set size`
  や `set origin` コマンドなしに、単純な複数グラフの描画を作成できます。
@@ -7499,6 +7599,7 @@ C ... and restart the table:
      cgm
      pdf
      svg
+     emf
 
  まず、地図/曲面がどのように描かれるのかについて記述します。入力データ
  は、関数を評価して得られるかまたは `splot data file` から得られます。
@@ -8278,14 +8379,30 @@ C ... and restart the table:
 ?show size
 ?size
 ?aspect ratio
- コマンド `set size` は描画出力の大きさを伸縮します。
-
  書式:
        set size {{no}square | ratio <r> | noratio} {<xscale>,<yscale>}
        show size
 
- <xscale> と <yscale> は描画全体の拡大の倍率で、描画全体とはグラフと余
- 白の部分を含みます。
+ <xscale> と <yscale> は描画全体の拡大の倍率で、描画全体とはグラフとラ
+ ベルと余白の部分を含みます。
+
+ 重要な注意:
+       gnuplot の以前の版では、`set size` の値を、出力する描画領域
+       (キャンバス) のサイズを制御するのにも使っていた出力形式もありま
+       したが、すべての出力形式がそうだったわけではありませんでした。
+       version 4.2 では、ほとんどの出力形式が以下のルールに従うようにな
+       りました:
+
+ `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
+ または "キャンバス" のサイズを制御します。サイズパラメータの有効な値に
+ ついては、個々の出力形式のヘルプを参照してください。デフォルトでは、グ
+ ラフはそのキャンバス全体に描画されます。
+
+ `set size <XX>, <YY>` は、描画自体をキャンバスのサイズに対して相対的に
+ 伸縮させます。1 より小さい伸縮値を指定すると、グラフはキャンバス全体を
+ 埋めず、1 より大きい伸縮値を指定すると、グラフの一部分のみがキャンバス
+ 全体に合うように描画されます。1 より大きい伸縮値を指定すると、ある出力
+ 形式では問題が起こるかもしれないことに注意してください。
 
  `ratio` は、指定した <xscale>, <yscale> の描画範囲内で、グラフのアスペ
  クト比 (縦横比) を <r> にします (<r> は x 方向の長さに対する y 方向の
@@ -8309,17 +8426,9 @@ C ... and restart the table:
 
  `ratio` と `square` は 3 次元描画では意味を持ちません。
 
- `set size` はデフォルトサイズに対する相対的な指定で、デフォルトサイズ
- は出力形式毎に異なります。`gnuplot` はデフォルトで可能な限り使用可能な
- 描画領域内一杯を使おうとしますから、`set size` は拡大する、という使い
- 方でなくて縮小する、という使い方の方が安全です。
-
- 出力形式によっては、描画サイズの変更は、テキストの出力位置をおかしくさ
- せる可能性があります。
-
  例:
 
- 通常の大きさに設定します:
+ グラフが現在のキャンバスを埋めるような大きさに設定します:
        set size 1,1
 
  グラフを通常の半分の大きさで正方形にします:
@@ -8464,8 +8573,8 @@ C ... and restart the table:
  filledcurves のスタイルの設定に使われます。
 
  書式:
-       set style fill {empty 
-                       | {transparent} solid {<density>} 
+       set style fill {empty
+                       | {transparent} solid {<density>}
                        | {transparent} pattern {<n>}}
                       {border {<linetype>} | noborder}
 
@@ -8498,7 +8607,7 @@ C ... and restart the table:
 ?fillstyle transparent
 ?transparent
  いくつかの出力形式は、塗りつぶし領域の `transparent` (透明化) 属性をサ
- ポートしています。transparent solid の領域塗りつぶしでは、`density` 
+ ポートしています。transparent solid の領域塗りつぶしでは、`density`
  (密度) パラメータはアルファ値として使用されます。つまり、密度 0 は完全
  な透明を、密度 1 は完全な不透明を意味します。transparent pattern の塗
  りつぶしでは、パターンの背景が完全な透明か完全な不透明のいずれかです。
@@ -8537,6 +8646,13 @@ C ... and restart the table:
 %x11@no@yes@no
 %_
 @end table
+ 透明な塗りつぶし領域を含むグラフを見たり作ったりするのには、別な制限が
+ ありうることに注意してください。例えば、png 出力形式では、"truecolor"
+ オプションが指定されている場合にのみ透明化の塗り潰しが利用できます。
+ PDF ファイルには透明化領域が正しく記述されていても、PDF の表示ソフトに
+ よってはそれを正しく表示できないこともありえます。実際に PostScript プ
+ リンタでは問題はないのに、Ghostscript/gv ではパターン塗りつぶし領域を
+ 正しく表示できません。
 4 set style function
 ?commands set style function
 ?commands show style function
@@ -8917,8 +9033,8 @@ C ... and restart the table:
  スタイル `filledcurves` は 2 次元描画でのみ利用可能です。これは 3 種類
  の異なる指定が可能です。最初の 2 種類は関数描画、あるいは 2 列の入力デ
  ータ用のもので、後で紹介するようにオプションで更なる指定ができます。最
- 初のものは `closed` で、これは曲線それ自身を閉多角形と見なし、これがデ
- フォルトです。
+ 初のものは `closed` で、これは曲線それ自身を閉多角形と見なします。入力
+ データが 2 列の場合にはこれがデフォルトです。
 
  2 種類目は指定された軸、あるいは水平線、垂直線、与えられた点などと、曲
  線との間に作られる領域を塗りつぶします。
@@ -8926,6 +9042,7 @@ C ... and restart the table:
  3 種類目は 3 列の入力データを必要とし、それらは x 座標と、それに対する
  2 つの y 座標からなり、それらは同じ x 座標の集合に対する 2 つの曲線の
  y 座標に対応します。そしてその 2 つの曲線の間の領域が塗りつぶされます。
+ 入力データが 3 列以上の場合にはこれがデフォルトです。
 
  書式:
 
@@ -9190,6 +9307,23 @@ C ... and restart the table:
  データ集合が (M-1) x (N-1) 要素を作成する pm3d の構造とはやや異なりま
  す。画像データの格子の走査方向は 8 つの組合せの任意の一つが可能です。
 
+ `rgbimage` も参照してください。
+6 image failsafe
+?commands set style image failsafe
+?set style image failsafe
+?plotting styles image failsafe
+?style image failsafe
+?image failsafe
+?failsafe
+ 出力形式のドライバによっては、2 次元の長方形領域内での画像データのレン
+ ダリングを最適化するルーチンを提供している場合があります。しかし、その
+ ルーチンは不完全であることが知られています (それで、gnuplot version
+ 4.2 の画像サポートは「実験的な (EXPERIMENTAL)」というラベルがついてい
+ ます)。この最適化ルーチンは、キーワード `failsafe` を使うことで無効化
+ できます。例:
+
+       plot 'data' with image failsafe
+
  以下はいくつかの出力形式に関する特有の情報です:
 
  x11 と wxt - ピクセルはディスプレイの解像度に合うように繰り返されるか
@@ -9199,13 +9333,6 @@ C ... and restart the table:
 
  postscript (pslatex, epslatex, pstex) - 標本化補間機能は無効になり、画
        像は元の解像度のままコピーされます。
-
- png - 出力はインストールされている libgd のバージョンに依存します。
-       gd 1.8.4  truecolor はサポートされていませんがドライバの関数は動
-                 作します。
-       gd 2.0.4  truecolor は動作しますが、truecolor を選択しないと画像
-                 は空白になってしまいます。
-       gd 2.0.9  truecolor も動作しますし、非 truecolor も動作します。
 
  `rgbimage` も参照してください。
 5 impulses
@@ -9756,7 +9883,7 @@ C ... and restart the table:
 
  書式:
        set title {"<title-text>"} {offset <offset>} {font "<font>{,<size>}"}
-                 {{textcolor | tc} {lt <line_type> | default}} {{no}enhanced}
+                 {{textcolor | tc} {<colorspec> | default}} {{no}enhanced}
        show title
 
  <offset> を x,y かまたは x,y,z の形式で指定した場合は、タイトルは与え
@@ -9771,7 +9898,9 @@ C ... and restart the table:
  <font> はタイトルが書かれるフォントを指定するのに使われます。<size> の
  単位は、どの出力形式 (terminal) を使っているかによって変わります。
 
- `textcolor lt <n>` は文字の色を線種 (line type) <n> と同じものにします。
+ `textcolor <colorspec>` は、文字の色を変更します。<colorspec> は、線
+ 種、rgb 色、またはパレットへの割当のいずれかが指定できます。
+ `colorspec`, `palette` を参照してください。
 
  `noenhanced` は、拡張文字列処理 (enhanced text) モードが有効になってい
  る場合でも、タイトルを拡張文字列処理させないようにします。
