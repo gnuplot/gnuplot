@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.153 2006/02/01 20:33:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.154 2006/02/02 18:07:29 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -5877,6 +5877,7 @@ pr_exportselection()
 
 /* bit of a bodge, but ... */
 static struct plot_struct *exported_plot;
+static Time export_time;
 
 static void
 export_graph(struct plot_struct *plot)
@@ -5887,8 +5888,10 @@ export_graph(struct plot_struct *plot)
     /* to check we have selection, we would have to do a
      * GetSelectionOwner(), but if it failed, it failed - no big deal
      */
-    if (! *selection)
+    if (! *selection) {
 	exported_plot = plot;
+	export_time = (!plot || !(plot->time)) ? 1 : plot->time;
+    }
 }
 
 static void
@@ -5900,8 +5903,12 @@ handle_selection_event(XEvent *event)
 	    XEvent reply;
 
 	    static Atom XA_TARGETS = (Atom) 0;
+	    static Atom XA_TIMESTAMP = (Atom) 0;
+
 	    if (XA_TARGETS == 0)
 		XA_TARGETS = XInternAtom(dpy, "TARGETS", False);
+	    if (XA_TIMESTAMP == 0)
+		XA_TIMESTAMP = XInternAtom(dpy, "TIMESTAMP", False);
 
 	    reply.type = SelectionNotify;
 	    reply.xselection.send_event = True;
@@ -5941,6 +5948,14 @@ handle_selection_event(XEvent *event)
 				reply.xselection.property, reply.xselection.target,
 				32, PropModeReplace, (unsigned char *) &(exported_plot->pixmap), 1);
 		exported_plot = NULL;
+	    } else if (reply.xselection.target == XA_TIMESTAMP) {
+
+		FPRINTF((stderr, "timestamp request from %d : %ld\n", i
+			reply.xselection.requestor, export_time));
+
+		XChangeProperty(dpy, reply.xselection.requestor,
+				reply.xselection.property, reply.xselection.target,
+				32, PropModeReplace, (unsigned char *) &(export_time), 1);
 #ifdef PIPE_IPC
 	    } else if (reply.xselection.target == XA_STRING && *selection) {
 		FPRINTF((stderr, "XA_STRING request\n"));

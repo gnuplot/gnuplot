@@ -1,3 +1,8 @@
+2006-02-11  Timothée Lecomte <timothee.lecomte@ens.fr>
+
+	* src/gplt_x11.c (handle_selection_event): Export a timestamp for each
+	selection request, as per the X11 clipboard handling standard.
+
 2006-02-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Make "set xyplane" description more self-consistent.
