@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.143 2005/12/27 06:11:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.144 2006/01/21 22:59:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -880,9 +880,9 @@ do_3dplot(
      * really deserves this warning. But don't show it too often --- only if it
      * is a single surface in the plot.
      */
-    if (pcount == 1 && plots->num_iso_read == 1)
+    if (pcount == 1 && plots->num_iso_read == 1 && can_pm3d &&
+	(plots->plot_style == PM3DSURFACE || PM3D_IMPLICIT == pm3d.implicit))
 	    fprintf(stderr, "  Warning: Single isoline (scan) is not enough for a pm3d plot.\n\t   Hint: Missing blank lines in the data file? See 'help pm3d' and FAQ.\n");
-
     this_plot = plots;
     if (!quick)
 	for (surface = 0;
