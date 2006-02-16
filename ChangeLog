@@ -1,4 +1,16 @@
-2002-02-12  Daniel Sebald  <daniel.sebald@ieee.org>
+2006-02-16  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	SF patch [ 1384525 ] Small fixes to gd terminals
+
+	* term/gd.trm: Fixes for Win32 to allow linking with bgd.dll or static.
+	- Static linking with gdlib is now possible (again) on windows (NONDLL
+	  is taken into account).
+	- A new define GD_NEED_LOCAL_FONT_POINTERS is added. When defined
+	  gd.trm will use local pointers to the fonts built into gdlib. This
+	  is highly recommended by Mr. Boutell on Windows platforms. Currently
+	  it is only activated on Windows when linking to bgd.dll.
+
+2006-02-12  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* term/post.trm (PS_encode_image PS_image): Bug fix for the PostScript
 	image using the five operand form (i.e., no palette). The bug was

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.84 2006/01/03 06:25:29 sfeam Exp $
+ * $Id: gd.trm,v 1.86 2006/01/08 05:34:33 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -142,6 +142,21 @@ TERM_PUBLIC void ENHGD_FLUSH __PROTO((void));
 
 #include "gd.h"
 
+#if defined(WIN32) && !defined(NONDLL)
+  /* static font pointers are recommended when using bgd.dll */
+# ifndef GD_NEED_LOCAL_FONT_POINTERS
+#  define GD_NEED_LOCAL_FONT_POINTERS
+# endif
+#endif
+
+#ifdef GD_NEED_LOCAL_FONT_POINTERS
+# include "gdfonts.h"
+# include "gdfontl.h"
+# include "gdfontmb.h"
+# include "gdfontt.h"
+# include "gdfontg.h"
+#endif
+
 /* This is required for the shared library version of libgd on Windows.
    Newer versions of libgd (>=2.0.24 ?) already define it. */
 #ifndef BGD_EXPORT_DATA_PROT 
@@ -152,9 +167,9 @@ TERM_PUBLIC void ENHGD_FLUSH __PROTO((void));
    the shared version of libgd uses a different calling convention
    and there is no proper macro defined.
 */
-#ifdef WIN32
-void gp_gdImagePolygon(gdImagePtr, gdPointPtr, int, int);
-void gp_gdImageFilledPolygon(gdImagePtr, gdPointPtr, int, int);
+#if defined(WIN32) && !defined(NONDLL)
+static void gp_gdImagePolygon(gdImagePtr, gdPointPtr, int, int);
+static void gp_gdImageFilledPolygon(gdImagePtr, gdPointPtr, int, int);
 #else
 # define gp_gdImagePolygon gdImagePolygon
 # define gp_gdImageFilledPolygon gdImageFilledPolygon 
@@ -167,11 +182,19 @@ static void PNG_Triangle(unsigned int x, unsigned int y, int direction,
 static void PNG_Diamond(unsigned int x, unsigned int y,
 	void (*draw_func)(gdImagePtr, gdPointPtr, int, int));
 
+#ifndef GD_NEED_LOCAL_FONT_POINTERS
 BGD_EXPORT_DATA_PROT gdFontPtr gdFontSmall;	/* 6x12 */
 BGD_EXPORT_DATA_PROT gdFontPtr gdFontLarge;	/* 8x16 */
 BGD_EXPORT_DATA_PROT gdFontPtr gdFontMediumBold;	/* 7x13 */
 BGD_EXPORT_DATA_PROT gdFontPtr gdFontGiant;  /* 9x15 */
 BGD_EXPORT_DATA_PROT gdFontPtr gdFontTiny;  /* 5x8 */
+#else
+static gdFontPtr gdFontSmall;	/* 6x12 */
+static gdFontPtr gdFontLarge;	/* 8x16 */
+static gdFontPtr gdFontMediumBold;	/* 7x13 */
+static gdFontPtr gdFontGiant;  /* 9x15 */
+static gdFontPtr gdFontTiny;  /* 5x8 */
+#endif
 
 #define GREG_XMAX 640
 #define GREG_YMAX 480
@@ -307,7 +330,7 @@ typedef struct {
 
 static PNG_FILL_TILE PNG_fill_tile = { (gdImagePtr)0, 0, 0 };
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(NONDLL)
 static void 
 gp_gdImagePolygon(gdImagePtr im, gdPointPtr p, int n, int c)
 {
@@ -584,7 +607,14 @@ PNG_options()
 	png_state.justify = CENTRE;
 	png_state.TrueColor = FALSE;
 	PNG_linewidth_factor = 1.0;
-	png_state.capbutt = FALSE;/* to preserve previous default behavior */
+	png_state.capbutt = FALSE; /* to preserve previous default behavior */
+#ifdef GD_NEED_LOCAL_FONT_POINTERS
+	gdFontSmall = gdFontGetSmall();
+	gdFontLarge = gdFontGetLarge();
+	gdFontMediumBold = gdFontGetMediumBold();
+	gdFontGiant = gdFontGetGiant();
+	gdFontTiny = gdFontGetTiny();
+#endif
     } else {
 	/* FIXME EAM - these should never happen! */
 	if (!png_state.default_font) {
