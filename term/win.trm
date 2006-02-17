@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.38 2005/08/07 09:43:35 mikulik Exp $
+ * $Id: win.trm,v 1.39 2005/12/15 13:22:46 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -279,7 +279,7 @@ WIN_text_angle(int ang)
 {
     if (graphwin.rotate)
 	/* Notice HBB 20010208: --> WIN_move() */
-	GraphOp(&graphwin, W_text_angle, (int)(ang ? 1 : 0), 0, NULL);
+	GraphOp(&graphwin, W_text_angle, ang, 0, NULL);
     return graphwin.rotate;
 }
 

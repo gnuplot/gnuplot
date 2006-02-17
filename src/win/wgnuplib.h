@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.19 2005/04/22 21:40:38 broeker Exp $
+ * $Id: wgnuplib.h,v 1.20 2005/08/03 16:55:41 mikulik Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -325,7 +325,8 @@ typedef struct tagGW {
 	char	fontname[MAXFONTNAME];	/* font name */
 	int	fontsize;	/* font size in pts */
 	HFONT	hfonth;		/* horizonal font */
-	HFONT	hfontv;		/* vertical font */
+	HFONT	hfontv;		/* rotated font (arbitrary angle) */
+	LOGFONT lf;		/* cached to speed up rotated fonts */
 	BOOL	resized;	/* has graph window been resized? */
 	BOOL	graphtotop;	/* bring graph window to top after every plot? */
 	BOOL	color;		/* color pens? */

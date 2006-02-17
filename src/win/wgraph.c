@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.45 2005/12/15 13:22:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.46 2005/12/18 18:59:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -598,7 +598,6 @@ Wnd_GetTextSize(HDC hdc, LPCSTR str, size_t len, int *cx, int *cy)
 static void
 MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 {
-	LOGFONT lf;
 	HFONT hfontold;
 	TEXTMETRIC tm;
 	int result;
@@ -606,28 +605,29 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	int cx, cy;
 
 	lpgw->rotate = FALSE;
-	_fmemset(&lf, 0, sizeof(LOGFONT));
-	_fstrncpy(lf.lfFaceName,lpgw->fontname,LF_FACESIZE);
-	lf.lfHeight = -MulDiv(lpgw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-	lf.lfCharSet = DEFAULT_CHARSET;
+	_fmemset(&(lpgw->lf), 0, sizeof(LOGFONT));
+	_fstrncpy(lpgw->lf.lfFaceName,lpgw->fontname,LF_FACESIZE);
+	lpgw->lf.lfHeight = -MulDiv(lpgw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	lpgw->lf.lfCharSet = DEFAULT_CHARSET;
 	if ( (p = _fstrstr(lpgw->fontname," Italic")) != (LPSTR)NULL ) {
-		lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
-		lf.lfItalic = TRUE;
+		lpgw->lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
+		lpgw->lf.lfItalic = TRUE;
 	}
 	if ( (p = _fstrstr(lpgw->fontname," Bold")) != (LPSTR)NULL ) {
-		lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
-		lf.lfWeight = FW_BOLD;
+		lpgw->lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
+		lpgw->lf.lfWeight = FW_BOLD;
 	}
 
 	if (lpgw->hfonth == 0) {
-		lpgw->hfonth = CreateFontIndirect((LOGFONT FAR *)&lf);
+		lpgw->hfonth = CreateFontIndirect((LOGFONT FAR *)&(lpgw->lf));
 	}
 
-	if (lpgw->hfontv == 0) {
-		lf.lfEscapement = 900;
-		lf.lfOrientation = 900;
-		lpgw->hfontv = CreateFontIndirect((LOGFONT FAR *)&lf);
-	}
+	/* we do need a 90 degree font */
+	if (lpgw->hfontv) 
+		DeleteObject(lpgw->hfontv);
+	lpgw->lf.lfEscapement = 900;
+	lpgw->lf.lfOrientation = 900;
+	lpgw->hfontv = CreateFontIndirect((LOGFONT FAR *)&(lpgw->lf));
 
 	/* save text size */
 	hfontold = SelectObject(hdc, lpgw->hfonth);
@@ -672,14 +672,18 @@ DestroyFonts(LPGW lpgw)
 static void
 SetFont(LPGW lpgw, HDC hdc)
 {
-	if (lpgw->rotate && lpgw->angle) {
-		if (lpgw->hfontv)
-			SelectObject(hdc, lpgw->hfontv);
-	} else {
-		if (lpgw->hfonth)
-			SelectObject(hdc, lpgw->hfonth);
-	}
-	return;
+    if (lpgw->rotate && lpgw->angle) {
+	if (lpgw->hfontv)
+	    DeleteObject(lpgw->hfontv);
+	lpgw->lf.lfEscapement = lpgw->lf.lfOrientation  = lpgw->angle * 10;
+	lpgw->hfontv = CreateFontIndirect((LOGFONT FAR *)&(lpgw->lf));
+       if (lpgw->hfontv)
+	    SelectObject(hdc, lpgw->hfontv);
+    } else {
+	if (lpgw->hfonth)
+	    SelectObject(hdc, lpgw->hfonth);
+    }
+    return;
 }
 
 static void
@@ -814,10 +818,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     lpgw->angle = 0;
     SetFont(lpgw, hdc);
     SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
+
+    /* calculate text shifting for horizontal text */
+    hshift = 0;
     vshift = MulDiv(lpgw->vchar, rb-rt, lpgw->ymax)/2;
-    /* HBB 980630: new variable for moving rotated text to the correct
-     * position: */
-    hshift = MulDiv(lpgw->vchar, rr-rl, lpgw->xmax)/2;
 
     pen = 2;
     SelectObject(hdc, lpgw->hapen);
@@ -887,11 +891,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		char *str;
 		str = LocalLock(curptr->htext);
 		if (str) {
-		    /* HBB 980630: shift differently for rotated text: */
-		    if (lpgw->angle)
-			xdash += hshift;
-		    else
-			ydash += vshift;
+		    /* shift correctly for rotated text */
+		    xdash += hshift;
+		    ydash += vshift;
+
 		    SetBkMode(hdc,TRANSPARENT);
 		    TextOut(hdc,xdash,ydash,str,lstrlen(str));
 		    SetBkMode(hdc,OPAQUE);
@@ -951,9 +954,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    PatBlt(hdc, ppt[0].x, ppt[0].y, xdash, ydash, PATCOPY);
 	    polyi = 0;
 	    break;
-	case W_text_angle:
-	    lpgw->angle = curptr->x;
-	    SetFont(lpgw,hdc);
+  	case W_text_angle:
+ 	    if (lpgw->angle != (short int)curptr->x) {
+ 		lpgw->angle = (short int)curptr->x;
+ 		/* correctly calculate shifting of rotated text */
+ 		hshift = sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
+ 		vshift = cos(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rb-rt, lpgw->ymax) / 2;
+ 		SetFont(lpgw, hdc);
+ 	    }
 	    break;
 	case W_justify:
 	    switch (curptr->x)
