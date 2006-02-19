@@ -4,6 +4,11 @@
 	src/set.c src/show.c: Replace L_TYPE_NODRAW everywhere in core code
 	with LT_NODRAW. 
 
+	* term/post.trm (PS_options): Fix a memory leak and a double-free
+	in the code handling epslatex epslatex_header option. While there,
+	update the code to handle string variables.
+	Bug #1434633.
+
 2006-02-19  Dennis Linse  <djlinse37@users.sourceforge.net>
 
 	* missing: Add work-around for parsing bug that cannot handle the

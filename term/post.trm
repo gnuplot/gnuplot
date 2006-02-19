@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.169 2006/01/29 04:55:41 sfeam Exp $
+ * $Id: post.trm,v 1.170 2006/02/12 22:19:36 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -983,9 +983,7 @@ PS_options()
     char *s;
     char *ps_fontfile_char = NULL;
     char tmp_term_options[MAX_LINE_LEN+1] = "";
-#ifdef PSLATEX_DRIVER
-    char *tmp_epslatex_header = NULL;
-#endif
+
     TBOOLEAN set_orientation = FALSE, set_enhanced = FALSE, set_plex = FALSE;
     TBOOLEAN set_level = FALSE, set_color = FALSE, set_dashed = FALSE;
     TBOOLEAN set_dashlen = FALSE, set_linewidth = FALSE, set_round = FALSE;
@@ -1124,42 +1122,29 @@ PS_options()
 	    ps_params->epslatex_standalone = FALSE;
 	    ++c_token;
 	    break;
+
 	case EPSLATEX_HEADER:
 	    if (set_epslheader || ps_params->terminal != PSTERM_EPSLATEX)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
 	    set_epslheader = TRUE;
 	    ++c_token;
-            if (!isstring(c_token))
-		int_error(c_token,
-			  "String containing header information expected");
-	    if (epslatex_header)
-		free(epslatex_header);
-	    epslatex_header = gp_alloc (token_len(c_token),
-					"epslatex_header");
-	    quote_str(epslatex_header, c_token, token_len(c_token));
-
-	    if (strlen(epslatex_header) == 0)
-		free(epslatex_header);
-	    else {
-		tmp_epslatex_header = gp_alloc(token_len(c_token)+2,
-					       "tmp_epslatex_header");
-		strncpy(tmp_epslatex_header,
-			&gp_input_line[token[c_token].start_index],
-			token[c_token].length);
-		tmp_epslatex_header[token[c_token].length] = NUL;
-	    }
-	    ++c_token;
+	    free(epslatex_header);
+	    epslatex_header = try_to_get_string();
+	    if (!epslatex_header)
+		int_error(c_token,"String containing header information expected");
 	    break;
+
 	case EPSLATEX_NOHEADER:
 	    if (set_epslheader || ps_params->terminal != PSTERM_EPSLATEX)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
 	    set_epslheader = TRUE;
-	    if (epslatex_header)
-		free(epslatex_header);
+	    free(epslatex_header);
+	    epslatex_header = NULL;
 	    ++c_token;
 	    break;
+
 	case PSLATEX_ROTATE:
 	    if (set_pslrotate || ((ps_params->terminal != PSTERM_PSLATEX) &&
 				  (ps_params->terminal != PSTERM_PSTEX)))
@@ -1588,10 +1573,9 @@ PS_options()
     if (ps_params->terminal == PSTERM_EPSLATEX) {
 	sprintf(tmp_term_options, "%s ",
 		ps_params->epslatex_standalone ? "standalone" : "input");
-	if (tmp_epslatex_header) {
-	    sprintf(tmp_term_options, "header %s ", tmp_epslatex_header);
-	    free(tmp_epslatex_header);
-	} else
+	if (epslatex_header)
+	    sprintf(tmp_term_options, "header \"%s\" ", epslatex_header);
+	else
 	    sprintf(tmp_term_options, "noheader ");
 	strcat(term_options,tmp_term_options);
     }
