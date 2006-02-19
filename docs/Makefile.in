@@ -32,9 +32,12 @@
 #   For troff
 #     make "TROFF=itroff" troff    (use your troff here)
 #
+#   For GNU info (texinfo)
+#     make info
+#
 
 # default is what is needed for interactive gnuplot
-all: gnuplot.gih gnuplot.info
+all: gnuplot.gih
 
 # this tells GNU make not to export variables into the environment
 # But other makes dont understand its significance, so it must
@@ -421,6 +424,8 @@ install-info: gnuplot.info
 	else : ; fi
 
 installcheck:
+
+install-exec:
 
 # uninstall section
 uninstall: uninstall-gih uninstall-info

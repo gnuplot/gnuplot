@@ -3,6 +3,17 @@
 	* term/gd.trm (image_do_crop): Move libgd version 2 dependency
 	inside conditional code segment. Bug #1434658.
 
+	* docs/Makefile.in: Add an empty target for "install-exec", and
+	remove gnuplot.info from the target "all".  These changes are needed
+	in order for either a default "make" or "make install-exec" to 
+	succeed on a system without emacs or makeinfo.
+	Bug #1430819.
+	Thanks to Dennis Linse  <djlinse37@users.sourceforge.net>
+	
+	Note: an alternative is not to use the .../missing script for
+	makeinfo, or somehow make the fact that it's missing a non-fatal
+	error.
+
 2006-02-17  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	SF patch [ 1432890 ] Win: rotated text at arbitrary angles
