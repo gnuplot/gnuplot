@@ -291,6 +291,9 @@ WARNING: \`$1' is $msg.  You should only need it if
     # The file to touch is that specified with -o ...
     file=`echo "$*" | sed -n 's/.*-o \([^ ]*\).*/\1/p'`
     if test -z "$file"; then
+      file=`echo "$*" | sed -n 's/.*--output=\([^ ]*\).*/\1/p'`
+    fi
+    if test -z "$file"; then
       # ... or it is the one specified with @setfilename ...
       infile=`echo "$*" | sed 's/.* \([^ ]*\) *$/\1/'`
       file=`sed -n '/^@setfilename/ { s/.* \([^ ]*\) *$/\1/; p; q; }' $infile`

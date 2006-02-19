@@ -1,3 +1,10 @@
+2006-02-19  Dennis Linse  <djlinse37@users.sourceforge.net>
+
+	* missing: Add work-around for parsing bug that cannot handle the
+	"--output=<foof>" option to makeinfo. See also the change below,
+	which removes gnuplot.info from the default make target.
+	Bug #1422925.
+
 2006-02-19  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/gd.trm (image_do_crop): Move libgd version 2 dependency
