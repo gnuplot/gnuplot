@@ -1,3 +1,8 @@
+2006-02-19  Ethan A Merritt <merritt@u.washington.edu>
+
+	* term/gd.trm (image_do_crop): Move libgd version 2 dependency
+	inside conditional code segment. Bug #1434658.
+
 2006-02-17  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	SF patch [ 1432890 ] Win: rotated text at arbitrary angles

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.86 2006/01/08 05:34:33 sfeam Exp $
+ * $Id: gd.trm,v 1.87 2006/02/16 15:43:28 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -381,10 +381,11 @@ image_do_crop ()
 	if (png_state.TrueColor)
 	    im_crop = gdImageCreateTrueColor(x,y);
 	else
-#endif
 	    im_crop = gdImageCreate(x,y);
-
 	bg = gdImageColorAllocateAlpha(im_crop,255,255,255,127);
+#else
+	im_crop = gdImageCreate(x,y);
+#endif
 
 	gdImagePaletteCopy(im_crop, png_state.image);
 	if (png_state.flags & PNG_USE_TRANSPARENT) {
