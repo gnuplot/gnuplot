@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.144 2006/01/21 22:59:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.145 2006/02/12 22:05:25 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -806,7 +806,7 @@ do_3dplot(
     if (key->region == GPKEY_USER_PLACEMENT) {
 	map3d_position(&key->user_pos, &xl, &yl, "key");
     }
-    if (key->visible && key->box.l_type > L_TYPE_NODRAW) {
+    if (key->visible && key->box.l_type > LT_NODRAW) {
 	int yt = yl;
 	int yb = yl - key_entry_height * (key_rows - ktitle_lines) - ktitle_lines * t->v_char;
 	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
@@ -2416,7 +2416,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	) {
 	gen_tics(FIRST_Z_AXIS, ztick_callback);
     }
-    if ((Y_AXIS.zeroaxis.l_type > L_TYPE_NODRAW)
+    if ((Y_AXIS.zeroaxis.l_type > LT_NODRAW)
 	&& !X_AXIS.log
 	&& inrange(0, X_AXIS.min, X_AXIS.max)
 	) {
@@ -2427,7 +2427,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	map3d_xyz(0.0, Y_AXIS.max, base_z, &v2);
 	draw3d_line(&v1, &v2, &Y_AXIS.zeroaxis);
     }
-    if ((Z_AXIS.zeroaxis.l_type > L_TYPE_NODRAW)
+    if ((Z_AXIS.zeroaxis.l_type > LT_NODRAW)
 	&& !X_AXIS.log
 	&& inrange(0, X_AXIS.min, X_AXIS.max)
 	) {
@@ -2438,7 +2438,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	map3d_xyz(0.0, 0.0, Z_AXIS.max, &v2);
 	draw3d_line(&v1, &v2, &Z_AXIS.zeroaxis);
     }
-    if ((X_AXIS.zeroaxis.l_type > L_TYPE_NODRAW)
+    if ((X_AXIS.zeroaxis.l_type > LT_NODRAW)
 	&& !Y_AXIS.log
 	&& inrange(0, Y_AXIS.min, Y_AXIS.max)
 	) {
@@ -2511,7 +2511,7 @@ xtick_callback(
     (void) axis;		/* avoid -Wunused warning */
 
     map3d_xyz(place, xaxis_y, base_z, &v1);
-    if (grid.l_type > L_TYPE_NODRAW) {
+    if (grid.l_type > LT_NODRAW) {
 	/* to save mapping twice, map non-axis y */
 	map3d_xyz(place, other_end, base_z, &v2);
 	draw3d_line(&v1, &v2, &grid);
@@ -2589,7 +2589,7 @@ ytick_callback(
     (void) axis;		/* avoid -Wunused warning */
 
     map3d_xyz(yaxis_x, place, base_z, &v1);
-    if (grid.l_type > L_TYPE_NODRAW) {
+    if (grid.l_type > LT_NODRAW) {
 	map3d_xyz(other_end, place, base_z, &v2);
 	draw3d_line(&v1, &v2, &grid);
     }
@@ -2669,7 +2669,7 @@ ztick_callback(
 	map3d_xyz(0., 0., place, &v1);
     else
 	map3d_xyz(zaxis_x, zaxis_y, place, &v1);
-    if (grid.l_type > L_TYPE_NODRAW) {
+    if (grid.l_type > LT_NODRAW) {
 	map3d_xyz(back_x, back_y, place, &v2);
 	map3d_xyz(right_x, right_y, place, &v3);
 	draw3d_line(&v1, &v2, &grid);

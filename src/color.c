@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.61 2006/01/08 06:34:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.62 2006/01/20 06:18:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -404,7 +404,7 @@ cbtick_callback(
     }
 
     /* draw grid line */
-    if (grid.l_type > L_TYPE_NODRAW) {
+    if (grid.l_type > LT_NODRAW) {
 	term_apply_lp_properties(&grid);	/* grid linetype */
 	if (color_box.rotation == 'h') {
 	    (*term->move) (x1, cb_y_from);

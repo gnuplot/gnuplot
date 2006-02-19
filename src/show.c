@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.170 2005/10/06 04:18:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.171 2006/01/20 06:18:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1492,7 +1492,7 @@ show_zeroaxis(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
 
-    if (axis_array[axis].zeroaxis.l_type > L_TYPE_NODRAW) {
+    if (axis_array[axis].zeroaxis.l_type > LT_NODRAW) {
 	fprintf(stderr, "\t%szeroaxis is drawn with", axis_defaults[axis].name);
 	save_linetype(stderr, &(axis_array[axis].zeroaxis), FALSE);
 	fputc('\n',stderr);
@@ -1692,7 +1692,7 @@ show_key()
 	    key->reverse ? "" : "not ",
 	    key->invert ? "" : "not ",
 	    key->enhanced ? "" : "not ");
-    if (key->box.l_type > L_TYPE_NODRAW) {
+    if (key->box.l_type > LT_NODRAW) {
 	fprintf(stderr, "boxed\n\twith ");
 	save_linetype(stderr, &(key->box), FALSE);
 	fputc('\n', stderr);

@@ -234,7 +234,7 @@ typedef struct {
 
 extern legend_key keyT;
 
-# define DEFAULT_KEYBOX_LP { 0, -3, 0, 1.0, 1.0, 0 }	/* -3 = no linetype */
+# define DEFAULT_KEYBOX_LP { 0, LT_NODRAW, 0, 1.0, 1.0, 0 }
 
 #define DEFAULT_KEY_POSITION { graph, graph, graph, 0.9, 0.9, 0. }
 

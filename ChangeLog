@@ -1,3 +1,9 @@
+2006-02-19  Ethan A Merritt <merritt@u.washington.edu>
+
+	* src/axis.c src/color.c src/gadgets.h src/graph3d.c src/graphics.c
+	src/set.c src/show.c: Replace L_TYPE_NODRAW everywhere in core code
+	with LT_NODRAW. 
+
 2006-02-19  Dennis Linse  <djlinse37@users.sourceforge.net>
 
 	* missing: Add work-around for parsing bug that cannot handle the

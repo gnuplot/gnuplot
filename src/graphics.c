@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.175 2006/01/23 15:13:29 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.176 2006/02/03 17:57:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1601,7 +1601,7 @@ do_plot(struct curve_points *plots, int pcount)
 	yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 	key_count = 0;
 
-	if (key->box.l_type > L_TYPE_NODRAW) {
+	if (key->box.l_type > LT_NODRAW) {
 	    BoundingBox *clip_save = clip_area;
 	    if (term->flags & TERM_CAN_CLIP)
 		clip_area = NULL;
@@ -4210,7 +4210,7 @@ xtick2d_callback(
 
     (void) axis;		/* avoid "unused parameter" warning */
 
-    if (grid.l_type > L_TYPE_NODRAW) {
+    if (grid.l_type > LT_NODRAW) {
 	term_apply_lp_properties(&grid);
 	if (polar_grid_angle) {
 	    double x = place, y = 0, s = sin(0.1), c = cos(0.1);
@@ -4298,7 +4298,7 @@ ytick2d_callback(
 
     (void) axis;		/* avoid "unused parameter" warning */
 
-    if (grid.l_type > L_TYPE_NODRAW) {
+    if (grid.l_type > LT_NODRAW) {
 	term_apply_lp_properties(&grid);
 	if (polar_grid_angle) {
 	    double x = 0, y = place, s = sin(0.1), c = cos(0.1);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.216 2006/02/01 06:05:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.217 2006/02/03 22:47:38 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1672,12 +1672,9 @@ set_key()
 	    break;
 	case S_KEY_BOX:
 	    c_token++;
-	    if (END_OF_COMMAND)
-		key->box.l_type = -2;
-	    else {
+	    key->box.l_type = LT_BLACK;
+	    if (!END_OF_COMMAND) {
 		int old_token = c_token;
-		
-		key->box.l_type = LT_BLACK;  /* Only reset if currently LT_NO_DRAW? */
 		lp_parse(&key->box, TRUE, FALSE);
 		if (old_token == c_token && isanumber(c_token)) {
 		    key->box.l_type = real(const_express(&a)) - 1;
@@ -1687,7 +1684,7 @@ set_key()
 	    c_token--;  /* is incremented after loop */
 	    break;
 	case S_KEY_NOBOX:
-	    key->box.l_type = L_TYPE_NODRAW;
+	    key->box.l_type = LT_NODRAW;
 	    break;
 	case S_KEY_SAMPLEN:
 	    c_token++;

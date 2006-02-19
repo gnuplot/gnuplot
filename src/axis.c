@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.58 2005/11/12 22:43:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.59 2005/11/27 23:52:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -833,9 +833,9 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
     memcpy(&lgrd, &grid_lp, sizeof(grid_lp));
     memcpy(&mgrd, &mgrid_lp, sizeof(mgrid_lp));
     if (! axis_array[axis].gridmajor)
-	lgrd.l_type = L_TYPE_NODRAW;
+	lgrd.l_type = LT_NODRAW;
     if (! axis_array[axis].gridminor)
-	mgrd.l_type = L_TYPE_NODRAW;
+	mgrd.l_type = LT_NODRAW;
 
 
     if (def->def.user) {	/* user-defined tic entries */
@@ -1364,7 +1364,7 @@ axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
     AXIS *this = axis_array + axis;
 
     if (axis_position_zeroaxis(crossaxis)
-	    && (this->zeroaxis.l_type > L_TYPE_NODRAW)) {
+	    && (this->zeroaxis.l_type > LT_NODRAW)) {
 	term_apply_lp_properties(&this->zeroaxis);
 	if ((axis % SECOND_AXES) == FIRST_X_AXIS) {
 	    (*term->move) (this->term_lower, axis_array[crossaxis].term_zero);
