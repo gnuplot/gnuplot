@@ -4,6 +4,9 @@
 	because if they had they would have noticed that it's been trampling
 	on unallocated memory since version 3.7 times or earlier.  Fixed.
 
+	* term/metapost.trm(MP_filled_polygon MP_boxfill): solid fill density
+	parameter was being interpreted incorrectly.
+
 2006-02-20  Ethan A Merritt <merritt@u.washington.edu>
 
 	* aed.trm ai.trm amiga.trm corel.trm debug.trm djsvga.trm dumb.trm 
