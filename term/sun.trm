@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: sun.trm,v 1.9 2004/04/13 17:24:38 broeker Exp $
+ * $Id: sun.trm,v 1.10 2004/07/01 17:10:34 broeker Exp $
  *
  */
 
@@ -176,6 +176,8 @@ SUN_text()
 TERM_PUBLIC void
 SUN_linetype(int linetype)
 {
+    if (linetype < -2)
+	linetype = LT_BLACK;
     if (linetype >= 7)
 	linetype %= 7;
     sun_line_mask = sun_pattern[linetype + 2];

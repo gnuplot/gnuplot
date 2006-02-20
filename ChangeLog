@@ -1,3 +1,21 @@
+2006-02-20  Ethan A Merritt <merritt@u.washington.edu>
+
+	* aed.trm ai.trm amiga.trm corel.trm debug.trm djsvga.trm dumb.trm 
+	dxy.trm emf.trm excl.trm fg.trm fig.trm gd.trm ggi.trm gnugraph.trm 
+	gpic.trm grass.trm hp26.trm hpgl.trm imagen.trm iris4d.trm latex.trm
+	linux.trm metafont.trm mif.trm next.trm openstep.trm pbm.trm pc.trm
+	pdf.trm post.trm pstricks.trm regis.trm rgip.trm sun.trm svg.trm 
+	t410x.trm tex.trm texdraw.trm tgif.trm tkcanvas.trm tpic.trm unixpc.trm
+	unixplot.trm vgagl.trm vws.trm win.trm 
+
+	Replace L_TYPE_NODRAW and explicit constants -2, and -1 with
+	LT_NODRAW, LT_BLACK, and LT_AXIS respectively.
+	
+	Make sure all drivers check for legal linetype in term->linetype().
+	Many drivers were not prepared to handle term->linetype(LT_BACKGROUND).
+	Note that it was unsafe even to call term->linetype(LT_BLACK) or
+	LT_AXIS on some older drivers (e.g. iris4d).
+
 2006-02-19  Ethan A Merritt <merritt@u.washington.edu>
 
 	* src/axis.c src/color.c src/gadgets.h src/graph3d.c src/graphics.c

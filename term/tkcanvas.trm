@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.23 2004/07/01 17:10:34 broeker Exp $
+ * $Id: tkcanvas.trm,v 1.24 2005/10/16 06:12:45 sfeam Exp $
  *
  */
 
@@ -212,6 +212,8 @@ TK_reset()
 TERM_PUBLIC void
 TK_linetype(int linetype)
 {
+    if (linetype < -2)
+	linetype = LT_BLACK;
     tk_color = (linetype + 2) & 7;
 }
 

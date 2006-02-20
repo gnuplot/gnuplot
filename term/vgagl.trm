@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vgagl.trm,v 1.14 2005/08/07 09:43:35 mikulik Exp $
+ * $Id: vgagl.trm,v 1.15 2005/12/30 04:59:24 sfeam Exp $
  */
 
 #if defined(USE_MOUSE)
@@ -832,6 +832,9 @@ VGAGL_resume()
 TERM_PUBLIC void
 VGAGL_linetype(int linetype)
 {
+    if (linetype < -3)
+	linetype = LT_NODRAW;
+
 #ifdef VGAGL_ENABLE_TRUECOLOR
     switch (VGAGL_truecolor) {
 	case yes:

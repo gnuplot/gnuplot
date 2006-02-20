@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vws.trm,v 1.14 2004/04/13 17:24:39 broeker Exp $
+ * $Id: vws.trm,v 1.15 2004/07/01 17:10:34 broeker Exp $
  *
  */
 
@@ -337,7 +337,7 @@ VWS_linetype(int lt)
 
     if (lt < 0) {
 	switch (lt) {
-	case -1:		/* used for axis */
+	case LT_AXIS:		/* used for axis */
 	    uis$set_line_style(&vd_id, &line_attr, &line_attr, &n1);
 	    uis$set_line_width(&vd_id, &line_attr, &line_attr, &p15,
 			       &uis$c_width_world);
@@ -345,7 +345,7 @@ VWS_linetype(int lt)
 		uis$set_writing_index(&vd_id, &line_attr, &line_attr, &i[1]);
 	    }
 	    break;
-	case -2:		/* the borders */
+	case LT_BLACK:		/* the borders */
 	    uis$set_line_style(&vd_id, &line_attr, &line_attr, &n1);
 	    uis$set_line_width(&vd_id, &line_attr, &line_attr, &p20,
 			       &uis$c_width_world);

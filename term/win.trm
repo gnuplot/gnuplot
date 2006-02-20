@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.39 2005/12/15 13:22:46 mikulik Exp $
+ * $Id: win.trm,v 1.40 2006/02/17 09:59:24 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -127,7 +127,7 @@ static struct gen_table WIN_opts[] =
     { NULL, WIN_OTHER }
 };
 
-static int WIN_last_linetype = -3;		/* HBB 20000813: linetype caching */
+static int WIN_last_linetype = LT_NODRAW;	/* HBB 20000813: linetype caching */
 
 TERM_PUBLIC void
 WIN_options()
@@ -211,7 +211,7 @@ WIN_init()
 #endif
 	graphwin.resized = FALSE;
     }
-    WIN_last_linetype = -3;		/* HBB 20000813: linetype caching */
+    WIN_last_linetype = LT_NODRAW;	/* HBB 20000813: linetype caching */
 }
 
 
@@ -230,7 +230,7 @@ TERM_PUBLIC void
 WIN_graphics()
 {
     GraphStart(&graphwin, pointsize);
-    WIN_last_linetype = -3;			/* HBB 20000813: linetype caching */
+    WIN_last_linetype = LT_NODRAW;		/* HBB 20000813: linetype caching */
 }
 
 TERM_PUBLIC void
@@ -332,7 +332,7 @@ TERM_PUBLIC void
 WIN_linewidth(double linewidth)
 {
     /* HBB 20000813: New routine */
-    WIN_last_linetype = -3;        /* invalidate cached linetype */
+    WIN_last_linetype = LT_NODRAW;        /* invalidate cached linetype */
     /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_line_width, (int) 100 * linewidth, 0, NULL);
 }
@@ -385,7 +385,7 @@ WIN_set_color(t_colorspec *colorspec)
 {
     switch (colorspec->type ) {
 	case TC_FRAC:
-    WIN_last_linetype = -3;      /* invalidate cached linetype */
+    WIN_last_linetype = LT_NODRAW;      /* invalidate cached linetype */
     GraphOp(&graphwin, W_pm3d_setcolor, (int)(256*colorspec->value), 0, NULL);
 	    break;
 	case TC_RGB:

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: mif.trm,v 1.29 2005/05/22 18:49:39 sfeam Exp $
+ * $Id: mif.trm,v 1.30 2005/08/07 09:43:34 mikulik Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -688,7 +688,7 @@ MIF_linetype(int linetype)
 
 	/* Translate gnuplot pen types to MIF pen types */
 	if (linetype < 0) {	/* Special lines */
-	    if (linetype == -1) {
+	    if (linetype == LT_AXIS) {
 		mif_pentype = 8 + MIF_NPENS;	/* -1 */
 		if (mif_colour == TRUE)
 		    sprintf(mif_separation, " <Separation 0> ");

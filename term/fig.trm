@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.52 2005/05/13 13:33:04 mikulik Exp $
+ * $Id: fig.trm,v 1.53 2005/08/07 09:43:34 mikulik Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -670,12 +670,12 @@ FIG_linetype(int linetype)		/* expect linetype >= -2 */
 	FIG_thickness = 1;
     FIG_color = DEFAULT;
 
-    if (linetype <= L_TYPE_NODRAW)
-	linetype = -2;
+    if (linetype <= LT_NODRAW)
+	linetype = LT_BLACK;
 
     switch (linetype) {
     case 0:
-    case -2:{
+    case LT_BLACK:{
 	    FIG_type = SOLID_LINE;
 	    FIG_spacing = 0.0;
 	    if (FIG_use_color)
@@ -686,7 +686,7 @@ FIG_linetype(int linetype)		/* expect linetype >= -2 */
 #endif
 	    break;
 	}
-    case -1:{
+    case LT_AXIS:{
 	    FIG_type = DOTTED_LINE;
             if( FIG_solid )
                 FIG_type = SOLID_LINE;

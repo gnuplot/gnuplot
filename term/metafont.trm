@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metafont.trm,v 1.16 2004/04/13 17:24:34 broeker Exp $
+ * $Id: metafont.trm,v 1.17 2004/07/01 17:10:15 broeker Exp $
  */
 
 /* GNUPLOT - metafont.trm */
@@ -374,6 +374,8 @@ MF_linetype(int linetype)
     if (linetype >= 8)
 	linetype %= 8;
     linetype += 2;
+    if (linetype < 0)
+	linetype = 0;
     /* Only output change in pens if it actually affects the pen used */
     if ((MF_lines[linetype].thickness != MF_lines[MF_line_type].thickness) ||
 	(!MF_picked_up_pen)) {

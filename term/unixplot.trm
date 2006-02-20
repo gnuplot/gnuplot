@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: unixplot.trm,v 1.12 2004/04/13 17:24:39 broeker Exp $
+ * $Id: unixplot.trm,v 1.13 2004/07/01 17:10:34 broeker Exp $
  *
  */
 
@@ -116,6 +116,9 @@ UP_linetype(int linetype)
 {
     static char *lt[2 + 5] = {"solid", "longdashed", "solid", "dotted",
      "shortdashed", "dotdashed", "longdashed"};
+
+    if (linetype < -2)
+	linetype = LT_BLACK;
 
     if (linetype >= 5)
 	linetype %= 5;

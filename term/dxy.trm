@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dxy.trm,v 1.10 2004/04/13 17:24:16 broeker Exp $
+ * $Id: dxy.trm,v 1.11 2004/07/01 17:10:13 broeker Exp $
  *
  */
 
@@ -115,7 +115,7 @@ DXY_linetype(int linetype)
     /* select pen */
     fprintf(gpoutfile, "J%d\n", (linetype + 2) % 8 + 1);
     switch (linetype) {
-    case -1:
+    case LT_AXIS:
 	/* use dotted line for axis */
 	fputs("L1\nB50\n", gpoutfile);
 	break;

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ggi.trm,v 1.22 2004/12/24 07:39:05 sfeam Exp $
+ * $Id: ggi.trm,v 1.23 2005/08/07 09:43:34 mikulik Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -484,9 +484,9 @@ TERM_PUBLIC void GGI_init()
 
 TERM_PUBLIC void GGI_linetype(int linetype)
 {
-    if(linetype == -2)
+    if(linetype == LT_BLACK)
 	ggiSetGCForeground(GGIvisual,GGIborderColor);
-    if(linetype == -1)
+    if(linetype == LT_AXIS)
 	ggiSetGCForeground(GGIvisual,GGIaxisColor);
     if(linetype < 0)
 	return;

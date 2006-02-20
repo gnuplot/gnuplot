@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.57 2005/12/30 05:24:52 sfeam Exp $
+ * $Id: svg.trm,v 1.58 2006/01/13 07:04:57 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ static TBOOLEAN SVG_fixed_size = TRUE;  /* make SVG viewer size fixed */
 static unsigned int SVG_xLast = UINT_MAX; /* current pen horizontal position*/
 static unsigned int SVG_yLast = UINT_MAX;	/* current pen vertical position*/
 
-static int SVG_LineType = -3;	/* current line type*/
+static int SVG_LineType = LT_NODRAW;	/* current line type*/
 static double SVG_LineWidth = 1.0; /* current line width*/
 static double SVG_linewidth_factor = 1.0; /* Multiplier for linewidths */
 static int SVG_TextAngle = 0;	/* current text orientation*/
@@ -558,7 +558,7 @@ SVG_init ()
     SVG_pens[15].width = SVG_LineWidth;
     sprintf (SVG_pens[15].color, "#%2.2X%2.2X%2.2X", 171, 214, 0);	/* green yellow*/
 
-    SVG_LineType = -3;
+    SVG_LineType = LT_NODRAW;
 
 /* set xmax, ymax*/
 

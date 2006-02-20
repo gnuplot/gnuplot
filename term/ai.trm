@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ai.trm,v 1.16 2004/07/01 17:10:11 broeker Exp $
+ * $Id: ai.trm,v 1.17 2005/01/26 00:32:01 sfeam Exp $
  *
  */
 
@@ -256,8 +256,8 @@ AI_linetype(int linetype)
 	fputs("U\n", gpoutfile);
 	ai_subgroup_level--;
     }
-    if (linetype == -2 && multiplot) {
-	/* for each new plot, line_type gets called twice with a value of -2.
+    if (linetype == LT_BLACK && multiplot) {
+	/* for each new plot, line_type gets called twice with a value of LT_BLACK.
 	   It gets called once for the border and again for the tics.
 	   This code will need to be changed if gnuplot's behavior changes.
 	 */
@@ -276,7 +276,7 @@ AI_linetype(int linetype)
 	    break;
 	}
     }
-    if (linetype == -2 && !multiplot) {
+    if (linetype == LT_BLACK && !multiplot) {
 	if (ai_multiplot_group) {
 	    fputs("U\n", gpoutfile);
 	    ai_subgroup_level--;
@@ -287,7 +287,7 @@ AI_linetype(int linetype)
     ai_subgroup_level++;
 
     switch (linetype) {
-    case -2:
+    case LT_BLACK:
 	fprintf(gpoutfile, "%.2f w\n", AI_LW / AI_SC * 2.0);
 	if (ai_color) {
 	    fputs("0 0 0 1 K\n", gpoutfile);
@@ -296,7 +296,7 @@ AI_linetype(int linetype)
 	}
 	break;
 
-    case -1:
+    case LT_AXIS:
 	fprintf(gpoutfile, "%.2f w\n", AI_LW / AI_SC / 2.0);
 	if (ai_color) {
 	    fputs("0 0 0 1 K\n", gpoutfile);

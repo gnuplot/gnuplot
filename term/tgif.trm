@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.36 2005/08/07 09:43:34 mikulik Exp $ */
+/* $Id: tgif.trm,v 1.37 2005/11/25 18:44:09 mikulik Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -593,6 +593,8 @@ TGIF_linetype(int linetype)
 
     if (linetype >= 0)
 	ult = 2 + linetype % 10;
+    else if (linetype < -2)
+	ult = 0;
     else
 	ult = linetype + 2;
 

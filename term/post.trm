@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.170 2006/02/12 22:19:36 mikulik Exp $
+ * $Id: post.trm,v 1.171 2006/02/20 07:45:23 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2558,7 +2558,7 @@ gnudict begin\ngsave\n\
     PS_relative_ok = FALSE;
     PS_pen_x = PS_pen_y = -4000;
     PS_taken = 0;
-    PS_linewidth_last = PS_linetype_last =  -1;
+    PS_linewidth_last = PS_linetype_last =  LT_UNDEFINED;
 }
 
 

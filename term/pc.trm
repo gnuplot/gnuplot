@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pc.trm,v 1.19 2004/07/01 17:10:33 broeker Exp $
+ * $Id: pc.trm,v 1.20 2005/04/28 20:33:24 broeker Exp $
  *
  */
 
@@ -349,6 +349,9 @@ PC_graphics()
 TERM_PUBLIC void
 PC_linetype(int linetype)
 {
+    if (linetype < -2)
+	linetype = LT_BLACK;
+
     if (pc_colors > 14) {	/* 16 or more colors */
 	if (linetype >= 13)
 	    linetype %= 13;

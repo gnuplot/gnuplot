@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tpic.trm,v 1.17 2004/04/13 17:24:39 broeker Exp $
+ * $Id: tpic.trm,v 1.18 2004/07/01 17:10:34 broeker Exp $
  */
 
 /* GNUPLOT - tpic.trm */
@@ -489,6 +489,8 @@ TERM_PUBLIC void
 TPIC_linetype(int linetype)
 {
     tpic_endline();
+    if (linetype < -2)
+	linetype = LT_BLACK;
     if (linetype >= tpic_numlines - 2)
 	linetype %= (tpic_numlines - 2);
     tpic_linetype = linetype;

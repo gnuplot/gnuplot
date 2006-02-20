@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fg.trm,v 1.9 2004/04/13 17:24:31 broeker Exp $
+ * $Id: fg.trm,v 1.10 2004/07/01 17:10:13 broeker Exp $
  */
 
 /* GNUPLOT - fg.trm */
@@ -274,6 +274,8 @@ VGA_linetype(int linetype)
 {
     if (linetype >= 13)
 	linetype %= 13;
+    if (linetype < -2)
+	linetype = LT_BLACK;
     vga_color = fg.color[vgacolor[linetype + 2]];
 }
 

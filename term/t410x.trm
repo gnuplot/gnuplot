@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: t410x.trm,v 1.12 2004/04/13 17:24:38 broeker Exp $
+ * $Id: t410x.trm,v 1.13 2004/07/01 17:10:34 broeker Exp $
  *
  */
 
@@ -189,11 +189,14 @@ T410X_point(unsigned int x, unsigned int y, int number)
 TERM_PUBLIC void
 T410X_linetype(int linetype)
 {
+    if (linetype < -2)
+	linetype = LT_BLACK;
+
     switch (linetype) {
-    case -1:
+    case LT_AXIS:
 	fputs("\033ML5", gpoutfile);
 	break;
-    case -2:
+    case LT_BLACK:
 	fputs("\033ML?", gpoutfile);
 	break;
     default:

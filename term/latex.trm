@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: latex.trm,v 1.26 2004/04/13 17:24:34 broeker Exp $
+ * $Id: latex.trm,v 1.27 2004/07/01 17:10:15 broeker Exp $
  *
  */
 
@@ -279,7 +279,7 @@ LATEX_init()
 \\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n",
 	    LATEX_UNIT);
 
-    LATEX_linetype(-1);
+    LATEX_linetype(LT_AXIS);
     LATEX_size = 0;
 }
 
@@ -779,7 +779,7 @@ EMTEX_init()
 \\setlength{\\unitlength}{%fpt}\n\
 \\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n",
 	    LATEX_UNIT);
-    LATEX_linetype(-1);
+    LATEX_linetype(LT_AXIS);
 }
 
 

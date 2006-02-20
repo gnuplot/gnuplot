@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  *
- * $Id: pstricks.trm,v 1.28 2004/11/27 02:38:38 sfeam Exp $
+ * $Id: pstricks.trm,v 1.29 2005/08/07 09:43:34 mikulik Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -302,6 +302,9 @@ PSTRICKS_linetype(int linetype)
 
     if (linetype >= PSTRICKS_NUMLINES - 2)
 	linetype %= (PSTRICKS_NUMLINES - 2);
+
+    if (linetype < -2)
+	linetype = LT_BLACK;
 
     PSTRICKS_type = linetype;
 }

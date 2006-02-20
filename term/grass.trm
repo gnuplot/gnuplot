@@ -294,9 +294,9 @@ GRASS_linetype(int lt)
 
     while (lt > 10) lt-=10;
 
-    if (lt <= -2)
+    if (lt <= LT_BLACK)
 	R_standard_color (D_translate_color ("gray"));
-    else if (lt == -1)
+    else if (lt == LT_AXIS)
 	R_standard_color (D_translate_color ("white"));
     else if (lt == 0)
 	R_standard_color (D_translate_color ("red"));

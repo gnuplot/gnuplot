@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: imagen.trm,v 1.15 2004/04/13 17:24:34 broeker Exp $
+ * $Id: imagen.trm,v 1.16 2004/07/01 17:10:15 broeker Exp $
  */
 
 /* GNUPLOT - imagen.trm */
@@ -281,7 +281,7 @@ IMAGEN_init()
     putc(imP_SET_ABS_V, gpoutfile);
     IMAGEN_putwd(0);
 
-    IMAGEN_linetype(-1);
+    IMAGEN_linetype(LT_AXIS);
     /*
        if ((IM_xvector = (unsigned int *) malloc(STOREPATH*sizeof(int))) == NULL) {
        fputs("Imagendriver: Unable to allocate memory for draw path\n", stderr);
@@ -347,12 +347,11 @@ IMAGEN_linetype(int lt)
 	/* fprintf(stderr,"move, draw path\n"); */
 	IMAGEN_draw_path();
     }
-/* -2: axis
-   -1: border
-    0: arrow
-    1-7: graph
-*/
-    if (lt == -2) {
+
+    if (lt < -2)
+	lt = LT_BLACK;
+
+    if (lt == LT_BLACK) {
 	pen = 4;
     } else {
 	pen = (int) (lt / 8) * 2;

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: unixpc.trm,v 1.10 2004/04/13 17:24:39 broeker Exp $
+ * $Id: unixpc.trm,v 1.11 2004/07/01 17:10:34 broeker Exp $
  *
  */
 
@@ -250,7 +250,7 @@ uPC_plot_word(Scr_type *a, Scr_type b)
 {
     /* Various line types */
     switch (uPC_cur_linetype) {
-    case -1:
+    case LT_AXIS:
 	/* Distinguish between horizontal and vertical axis. */
 	if (uPC_sx > uPC_XMAX / 8 && uPC_sx < 7 * uPC_XMAX / 8) {
 	    /* Fuzzy tolerance because we don't know exactly where the y axis is */

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.60 2005/11/13 00:35:02 sfeam Exp $
+ * $Id: pdf.trm,v 1.61 2005/12/30 05:13:44 sfeam Exp $
  */
 
 /*------------------------------
@@ -141,8 +141,8 @@ PDF_Pen_RealID (int inPenCode)
 {
     if (inPenCode >= 12)
 	inPenCode %= 12;	/* normalize pen code*/
-    if (inPenCode <= L_TYPE_NODRAW)
-	inPenCode = -3;
+    if (inPenCode <= LT_NODRAW)
+	inPenCode = LT_NODRAW;
 
     return (inPenCode + 2);
 }

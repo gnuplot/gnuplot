@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pbm.trm,v 1.22 2005/10/07 05:08:59 sfeam Exp $
+ * $Id: pbm.trm,v 1.23 2005/10/12 20:29:38 sfeam Exp $
  *
  */
 
@@ -411,6 +411,9 @@ PBM_text()
 TERM_PUBLIC void
 PBM_linetype(int linetype)
 {
+    if (linetype < -2)
+	linetype = LT_BLACK;
+
     switch (pbm_mode) {
     case 0:
 	b_setlinetype(linetype);

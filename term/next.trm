@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*- objc -*-
- * $Id: next.trm,v 1.23 2004/04/13 17:24:35 broeker Exp $
+ * $Id: next.trm,v 1.24 2004/07/01 17:10:33 broeker Exp $
  *
  */
 
@@ -766,7 +766,7 @@ NEXT_graphics()
     NEXT_relative_ok = FALSE;
     NEXT_pen_x = NEXT_pen_y = -4000;
     NEXT_taken = 0;
-    NEXT_linetype_last = -1;
+    NEXT_linetype_last = LT_UNDEFINED;
 
 #ifdef NEXT_OLDTERMINAL
     if (NEXT_oldterminal) {
@@ -967,7 +967,7 @@ NEXT_point(unsigned int x, unsigned int y, int number)
 
     NEXT_relative_ok = 0;
     NEXT_path_count = 0;
-    NEXT_linetype_last = -1;	/* force next linetype change */
+    NEXT_linetype_last = LT_UNDEFINED;	/* force next linetype change */
 }
 
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: texdraw.trm,v 1.15 2004/04/13 17:24:38 broeker Exp $
+ * $Id: texdraw.trm,v 1.16 2004/07/01 17:10:34 broeker Exp $
  */
 
 /* GNUPLOT - texdraw.trm */
@@ -198,7 +198,7 @@ TEXDRAW_linetype(int linetype)
     if (linetype >= TEXDRAW_NUMLINES - 2)
 	linetype %= (TEXDRAW_NUMLINES - 2);
 
-    TEXDRAW_type = linetype;
+    TEXDRAW_type = linetype > -2 ? linetype : LT_BLACK;
 }
 
 TERM_PUBLIC void
