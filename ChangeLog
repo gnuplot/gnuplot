@@ -1,5 +1,11 @@
 2006-02-20  Ethan A Merritt <merritt@u.washington.edu>
 
+	* term/imagen.trm(IMAGEN_cvts):  Obviously no one uses this driver,
+	because if they had they would have noticed that it's been trampling
+	on unallocated memory since version 3.7 times or earlier.  Fixed.
+
+2006-02-20  Ethan A Merritt <merritt@u.washington.edu>
+
 	* aed.trm ai.trm amiga.trm corel.trm debug.trm djsvga.trm dumb.trm 
 	dxy.trm emf.trm excl.trm fg.trm fig.trm gd.trm ggi.trm gnugraph.trm 
 	gpic.trm grass.trm hp26.trm hpgl.trm imagen.trm iris4d.trm latex.trm
