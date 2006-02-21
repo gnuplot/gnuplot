@@ -1,3 +1,10 @@
+2006-02-21  Daniel Sebald <daniel.sebald@ieee.org>
+ 
+ 	* src/getcolor.c (interpolate_color_from_gray): The index could go
+ 	to one past the end of the array and cause a program crash. This
+ 	was fixed with a bisecting routine as suggested by the old comment
+ 	nearby, as opposed to the linear search.
+
 2006-02-20  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/imagen.trm(IMAGEN_cvts):  Obviously no one uses this driver,

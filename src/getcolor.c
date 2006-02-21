@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.22 2005/08/07 09:43:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.23 2005/09/18 03:45:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -211,9 +211,19 @@ interpolate_color_from_gray(double gray, rgb_color *color)
         return 1;
     }
 
-    /* find index, bisecting would be faster */
-    for (idx = 0; sm_palette.gradient[idx].pos < gray; ++idx)
-	; /* do nothing */
+    /* find index by bisecting */
+    idx = 0;
+    if (maxidx > 1) {
+        int topidx = maxidx - 1;
+        /* treat idx as though it is bottom index */
+        while (idx != topidx) {
+            int tmpidx = (idx + topidx) / 2;
+            if (sm_palette.gradient[tmpidx].pos < gray)
+                idx = tmpidx + 1;  /* round up */
+            else
+                topidx = tmpidx;
+        }
+    }
 
     col2 = & sm_palette.gradient[idx].col;
     if (gray == sm_palette.gradient[idx].pos) {
