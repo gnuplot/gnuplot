@@ -1,5 +1,16 @@
 2006-02-21  Daniel Sebald <daniel.sebald@ieee.org>
  
+	* src/gplt_x11.c (scan_palette_from_buf): The read_input() status
+ 	was ignored and consequently when a partial read of the pipe happened
+ 	a full line was not removed from pipe. For long palettes garbage
+ 	remained in pipe when done and next command was bogus.
+ 
+ 	* src/gplt_x11.c (read_input_line): A new routine that will check
+ 	status of read_input and continue reading if only a partial read.
+ 	If there are too many reads, the routine gives warning.
+
+2006-02-21  Daniel Sebald <daniel.sebald@ieee.org>
+ 
  	* src/getcolor.c (interpolate_color_from_gray): The index could go
  	to one past the end of the array and cause a program crash. This
  	was fixed with a bisecting routine as suggested by the old comment
@@ -7,11 +18,11 @@
 
 2006-02-20  Ethan A Merritt <merritt@u.washington.edu>
 
-	* term/imagen.trm(IMAGEN_cvts):  Obviously no one uses this driver,
+	* term/imagen.trm (IMAGEN_cvts):  Obviously no one uses this driver,
 	because if they had they would have noticed that it's been trampling
 	on unallocated memory since version 3.7 times or earlier.  Fixed.
 
-	* term/metapost.trm(MP_filled_polygon MP_boxfill): solid fill density
+	* term/metapost.trm (MP_filled_polygon MP_boxfill): solid fill density
 	parameter was being interpreted incorrectly.
 
 2006-02-20  Ethan A Merritt <merritt@u.washington.edu>

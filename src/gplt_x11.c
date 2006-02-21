@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.154 2006/02/02 18:07:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.155 2006/02/11 23:58:26 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1204,10 +1204,8 @@ read_input()
 	}
 
 	if (buf_offset == Nbuf) {
-	    fputs("\
-\n\
-gnuplot: buffer overflow in read_input!\n\
-gnuplot: X11 aborted.\n", stderr);
+	    fputs("\ngplt_x11.c: buffer overflow in read_input!\n"
+		    "            X11 aborted.\n", stderr);
 	    EXIT(1);
 	} else
 	    buf[buf_offset] = NUL;
@@ -1222,6 +1220,22 @@ gnuplot: X11 aborted.\n", stderr);
     return partial_read;
 }
 
+static void read_input_line __PROTO((void));
+
+/*
+ * Handle a whole input line, issuing an error message if a complete
+ * read does not appear after a few tries.
+ */
+static void
+read_input_line()
+{
+    int i_read;
+    for (i_read = 1; read_input() == 1; i_read++) {
+	if (i_read == 5)
+	    fprintf(stderr, "\ngplt_x11.c: A complete buffer instruction is not appearing across\n"
+			      "            link.  Check for system overload or driver error.\n");
+    };
+}
 
 /*
  * This function builds back a palette from what x11.trm has written
@@ -1266,7 +1280,7 @@ scan_palette_from_buf(void)
 
     switch( tpal.colorMode ) {
     case SMPAL_COLOR_MODE_GRAY:
-	read_input();  /*  FIXME: discarding status  */
+	read_input_line();
 	if (1 != sscanf( buf, "%lf", &(tpal.gamma) )) {
 	    fprintf( stderr, "%s:%d error in setting palette.\n",
 		     __FILE__, __LINE__);
@@ -1274,7 +1288,7 @@ scan_palette_from_buf(void)
 	}
 	break;
     case SMPAL_COLOR_MODE_RGB:
-	read_input();  /*  FIXME: discarding status  */
+	read_input_line();
 	if (3 != sscanf( buf, "%d %d %d", &(tpal.formulaR),
 			 &(tpal.formulaG), &(tpal.formulaB) )) {
 	    fprintf( stderr, "%s:%d error in setting palette.\n",
@@ -1284,7 +1298,7 @@ scan_palette_from_buf(void)
 	break;
     case SMPAL_COLOR_MODE_GRADIENT: {
 	int i=0;
-	read_input();  /*  FIXME: discarding status  */
+	read_input_line();
 	if (1 != sscanf( buf, "%d", &(tpal.gradient_num) )) {
 	    fprintf( stderr, "%s:%d error in setting palette.\n",
 		     __FILE__, __LINE__);
@@ -1297,7 +1311,7 @@ scan_palette_from_buf(void)
 	    /*  this %50 *must* match the amount of gradient structs
 		written to the pipe by x11.trm!  */
 	    if (i%50 == 0) {
-	        read_input();  /*  FIXME: discarding status  */
+	        read_input_line();
 	    }
 	    str_to_gradient_entry( &(buf[8*(i%50)]), &(tpal.gradient[i]) );
 	}
