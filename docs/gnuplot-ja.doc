@@ -1,5 +1,5 @@
-2 RCS $Id: gnuplot-ja.doc,v 1.154 2007-02-09 13:43:17+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.415
+C RCS $Id: gnuplot-ja.doc,v 1.158 2007-02-18 17:36:25+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.418
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -39,13 +39,13 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ^   Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net <p>
 ^</h2><p>
 ^<h3> This manual was prepared by Dick Crawford</h3><p>
-^<h3> Last revised: October 2006</h3><p>
+^<h3> Last revised: February 2007</h3><p>
 ^<hr>
 1 gnuplot
 2 Copyright
 ?copyright
 ?license
-       Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+     Copyright (C) 1986 - 1993, 1998, 2004, 2007  Thomas Williams, Colin Kelley
 
  Permission to use, copy, and distribute this software and its
  documentation for any purpose with or without fee is hereby granted,
@@ -5614,7 +5614,10 @@ C ... and restart the table:
 ?contour
 ?nocontour
  コマンド `set contour` は曲面の等高線を引くことを指示します。このオプ
- ションは `splot` でのみ有効です。
+ ションは `splot` でのみ有効です。これは、格子状データ (grid data) を必
+ 要とします。詳細は、`grid data` を参照してください。非格子状データで等
+ 高線を描きたい場合は、格子を生成するために `set dgrid3d` を使用します。
+ 詳しいことは `set dgrid3d` の項目を参照してください。
 
  書式:
        set contour {base | surface | both}
@@ -5652,8 +5655,6 @@ C ... and restart the table:
  行以外の文字を含まない行) を挟みます。`splot datafile` も参照してくだ
  さい。
 
- 非格子上データで等高線を描きたい場合は、格子を生成するために `set dgrid3d`
- を使用します。詳しいことは `set dgrid3d` の項目を参照してください。
  以下も参照してください。
 ^ <a href="http://www.gnuplot.info/demo/contours.html">
  等高線のデモ (contours.dem)
@@ -5864,7 +5865,8 @@ C ... and restart the table:
 ?dgrid3d
 ?nodgrid3d
  コマンド `set dgrid3d` は、非格子状データから格子状データへの写像機能を
- 有効にし、そのためのパラメータを設定します。
+ 有効にし、そのためのパラメータを設定します。格子状データの構造について
+ の詳細は、`splot grid_data` を参照してください。
 
  書式:
        set dgrid3d {<row_size>} {,{<col_size>} {,<norm>}}
@@ -6987,21 +6989,18 @@ C ... and restart the table:
 ?unset logscale
 ?show logscale
 ?set log
-?set log cb
 ?logscale
 ?nologscale
- 対数スケールは，x, y, z, x2, y2 の各軸について設定できます。
-
  書式:
          set logscale <axes> <base>
          unset logscale <axes>
          show logscale
 
- ここで、<axes> (軸) は、`x`, `y`, `z`, `cb` の任意の順序、または `x2`,
- `y2` による組み合せが可能です。また、<base> は、対数スケールの底です。
- <base> が指定されなかった場合は 10 になります。もし、<axes> が指定され
- なかった場合は、全部が指定されたことになります。`unset logscale` は、
- 指定した軸の対数スケールを解除します。
+ ここで、<axes> (軸) は、`x`, `x2`, `y`, `y2`, `z`, `cb` の任意の順序の
+ 組み合せが可能です。また、<base> は、対数スケールの底です。<base> が指
+ 定されなかった場合は 10 になります。もし、<axes> が指定されなかった場
+ 合は、全部が指定されたことになります。コマンド `unset logscale` は、指
+ 定した軸の対数スケールを解除します。
 
  例:
 
@@ -7262,10 +7261,10 @@ C ... and restart the table:
  たブロック内の `plot` (または `splot`, `replot`) 命令の一つを `set time`
  と `unset time` ではさんでください。
 
- `layout` が指定されていない場合、あるいはより良い位置合わせをしたい場
- 合は、コマンド `set origin` と `set size` 各描画で正しい位置に設定する
- 必要があります。詳細は `set origin` と `set size` の項目を参照してくだ
- さい。
+ layout が指定されていない場合、あるいはより良い位置合わせをしたい場合
+ は、コマンド `set origin` と `set size` 各描画で正しい位置に設定する必
+ 要があります。詳細は `set origin` と `set size` の項目を参照してくださ
+ い。
 
  例:
        set multiplot
@@ -11219,7 +11218,7 @@ C ... and restart the table:
  `set hidden3d` で不透明にもできます。3 次元曲面を眺める向きは、`set view`
  で変更できます。
 
- さらに、格子上のデータ点に対しては、`splot` は同じ高さを持つ点を補間す
+ さらに、格子状のデータ点に対しては、`splot` は同じ高さを持つ点を補間す
  ることができ (`set contour` 参照)、そしてそれらを結んで等高線を描くこ
  とができます。さらに、その結び方には真直な線分や滑らかな線を使うことが
  できます (`set cntrparam` 参照)。関数は、常に `set isosamples` と
