@@ -1,4 +1,13 @@
-2006-02-21  Daniel Sebald <daniel.sebald@ieee.org>
++2006-02-21  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* term/post.trm (PS_encode_image): The computation for the max number
+	of required bytes for encoding the image didn't take into account that
+	there is 8 bit alignment (potentially additional 7 bits) at the end
+	of each image line. The encoded image was written outside memory on
+	the heap and corrupted when cleared. Fixed, and added an assert()
+	test, after the fact, to compare encode size against memory size.
+
+2006-02-21  Daniel Sebald  <daniel.sebald@ieee.org>
  
 	* src/gplt_x11.c (scan_palette_from_buf): The read_input() status
  	was ignored and consequently when a partial read of the pipe happened
@@ -9,14 +18,14 @@
  	status of read_input and continue reading if only a partial read.
  	If there are too many reads, the routine gives warning.
 
-2006-02-21  Daniel Sebald <daniel.sebald@ieee.org>
+2006-02-21  Daniel Sebald  <daniel.sebald@ieee.org>
  
  	* src/getcolor.c (interpolate_color_from_gray): The index could go
  	to one past the end of the array and cause a program crash. This
  	was fixed with a bisecting routine as suggested by the old comment
  	nearby, as opposed to the linear search.
 
-2006-02-20  Ethan A Merritt <merritt@u.washington.edu>
+2006-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/imagen.trm (IMAGEN_cvts):  Obviously no one uses this driver,
 	because if they had they would have noticed that it's been trampling
@@ -25,7 +34,7 @@
 	* term/metapost.trm (MP_filled_polygon MP_boxfill): solid fill density
 	parameter was being interpreted incorrectly.
 
-2006-02-20  Ethan A Merritt <merritt@u.washington.edu>
+2006-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* aed.trm ai.trm amiga.trm corel.trm debug.trm djsvga.trm dumb.trm 
 	dxy.trm emf.trm excl.trm fg.trm fig.trm gd.trm ggi.trm gnugraph.trm 
@@ -43,7 +52,7 @@
 	Note that it was unsafe even to call term->linetype(LT_BLACK) or
 	LT_AXIS on some older drivers (e.g. iris4d).
 
-2006-02-19  Ethan A Merritt <merritt@u.washington.edu>
+2006-02-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/color.c src/gadgets.h src/graph3d.c src/graphics.c
 	src/set.c src/show.c: Replace L_TYPE_NODRAW everywhere in core code
@@ -61,7 +70,7 @@
 	which removes gnuplot.info from the default make target.
 	Bug #1422925.
 
-2006-02-19  Ethan A Merritt <merritt@u.washington.edu>
+2006-02-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (image_do_crop): Move libgd version 2 dependency
 	inside conditional code segment. Bug #1434658.

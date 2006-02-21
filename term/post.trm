@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.171 2006/02/20 07:45:23 sfeam Exp $
+ * $Id: post.trm,v 1.172 2006/02/20 20:17:57 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3665,6 +3665,12 @@ PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode
 
     total_bits = bits_per_component*M*N*((color_mode == IC_RGB && ps_params->color) ? 3 : 1);
 
+    /* At the end of each image line, data is aligned to the nearest 8 bits,
+     * which means potentially adding 7 bits per line.
+     */
+    end_of_line = M;
+    total_bits += N*7;
+
     /* Compute max number of ascii characters encoding will require.
      */
     if (encoding == PS_ASCII_HEX) {
@@ -3685,7 +3691,6 @@ PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode
     coord_ptr = image;
     i_line = ASCII_PER_LINE;
     i_element = 0;
-    end_of_line = M;
     coord_remaining = M*N;
     if (color_mode == IC_RGB && ps_params->color) {
 	end_of_line *= 3;
@@ -3809,6 +3814,7 @@ PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode
     }
 
     *return_num_bytes = (encoded_image_ptr - encoded_image);
+    assert(*return_num_bytes <= max_encoded_bytes); 
     return encoded_image;
 }
 
