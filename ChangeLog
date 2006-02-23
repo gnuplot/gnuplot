@@ -1,4 +1,8 @@
-+2006-02-21  Daniel Sebald  <daniel.sebald@ieee.org>
+2006-02-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/pointsize.dem: Add 'reset' at the end.
+
+2006-02-21  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* term/post.trm (PS_encode_image): The computation for the max number
 	of required bytes for encoding the image didn't take into account that
