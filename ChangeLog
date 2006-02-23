@@ -1,3 +1,8 @@
+2006-02-23  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* term/wxt.trm (TERM_HELP): Fix typos, thanks to Shigeharu
+	Takeno.
+
 2006-05-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/vgagl.trm (VGAGL_init_keytable): Fix bug #1492341 by

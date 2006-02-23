@@ -271,7 +271,7 @@ START_HELP(wxt)
 "?set terminal wxt",
 "?wxt",
 " The `wxt` terminal device generates output in a separate window. The window ",
-" created by the wxWidgets library, where the 'wxt' comes from.",
+" is created by the wxWidgets library, where the 'wxt' comes from.",
 " The actual drawing is done via cairo, a 2D graphics library.",
 " Text is handled by pango, a library for laying out and rendering text.",
 "",
@@ -303,7 +303,7 @@ START_HELP(wxt)
 "",
 " This terminal supports an enhanced text mode, which allows font",
 " and other formatting commands (subscripts, superscripts, etc.)",
-" to be embedded in labels and other text strings."
+" to be embedded in labels and other text strings.",
 " The enhanced text mode syntax is shared with other gnuplot",
 " terminal types. See `enhanced` for more details.",
 "",
@@ -333,11 +333,11 @@ START_HELP(wxt)
 " translate character codes to their utf-8 counterparts, and it will use",
 " your current font instead of Symbol.",
 " However, this will not work with other non conform fonts, such as",
-" \"windings\". These fonts may not appear at all."
+" \"windings\". These fonts may not appear at all.",
 "",
 " The rendering of the plot can be done in several ways.",
-" It can be altered with a dialog available from the toolbar."
-" To obtain the best output possible, the rendering involves three"
+" It can be altered with a dialog available from the toolbar.",
+" To obtain the best output possible, the rendering involves three",
 " mechanisms : antialiasing, oversampling and hinting.",
 " Antialiasing allows to display non-horizontal and non-vertical lines",
 " smoother.",
