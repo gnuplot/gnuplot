@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.172 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: post.trm,v 1.173 2006/02/21 13:01:55 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -4099,7 +4099,7 @@ START_HELP(00psglobal)
 " errors but, rather, display a message or a PostScript Level 1 approximation.",\
 " The `level1` option substitutes PostScript Level 1 approximations of these",\
 " features and uses no PostScript Level 2 code.  This may be required by some",\
-" old printers and old versions of Adobe Illustrator.  The flag `Level1` can be",\
+" old printers and old versions of Adobe Illustrator.  The flag `level1` can be", \
 " toggled later by editing a single line in the PostScript output file to force",\
 " PostScript Level 1 interpretation.  In the case of files containing level 2",\
 " code, the above features will not appear or will be replaced by a note when",\

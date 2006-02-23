@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.342 2006/01/20 06:18:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.343 2006/02/07 04:27:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6041,7 +6041,7 @@ C ... and restart the table:
  affects 3D plotting styles `with points`, `with labels`, and `with vectors`,
  even if no surface is present in the graph.  Individual plots within the
  graph may be explicitly excluded from this processing by appending the extra
- option `nohidden` to the `with` specifier.
+ option `nohidden3d` to the `with` specifier.
 
  Functions are evaluated at isoline intersections.  The algorithm interpolates
  linearly between function points or data points when determining the visible
@@ -7333,7 +7333,7 @@ C ... and restart the table:
  color each quadrangle appropriately. For data files, this will smoothen the
  color surface, and enhance spikes in a color surface. For functions,
  interpolation makes little sense, except to trade off precision for memory.
- It would usually make more sense to use 'samples' and 'isosamples' when working
+ It would usually make more sense to use `samples` and `isosamples` when working
  with functions.
 
  The coloring setup as well as the color box drawing are determined by
