@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.66 2005/10/06 04:18:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.67 2005/10/07 13:00:51 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -410,6 +410,7 @@ const struct gen_table set_palette_tbl[] =
     { "pos$itive",	S_PALETTE_POSITIVE },
     { "neg$ative",	S_PALETTE_NEGATIVE },
     { "gray",		S_PALETTE_GRAY },
+    { "grey",		S_PALETTE_GRAY },
     { "col$or",		S_PALETTE_COLOR },
     { "rgb$formulae",	S_PALETTE_RGBFORMULAE },
     { "def$ined",       S_PALETTE_DEFINED },
@@ -465,22 +466,36 @@ const struct gen_table set_pm3d_tbl[] =
 /* fixed RGB color names for 'set palette defined' */
 const struct gen_table pm3d_color_names_tbl[] =
 {
-    /* black, white and gray */
+    /* black, white and gray/grey */
     { "white"           , 255*(1<<16) + 255*(1<<8) + 255 },
     { "black"           ,   0*(1<<16) +   0*(1<<8) +   0 },
     { "gray0"           ,   0*(1<<16) +   0*(1<<8) +   0 },
+    { "grey0"           ,   0*(1<<16) +   0*(1<<8) +   0 },
     { "gray10"          ,  26*(1<<16) +  26*(1<<8) +  26 },
+    { "grey10"          ,  26*(1<<16) +  26*(1<<8) +  26 },
+    { "gray20"          ,  51*(1<<16) +  51*(1<<8) +  51 },
     { "grey20"          ,  51*(1<<16) +  51*(1<<8) +  51 },
+    { "gray30"          ,  77*(1<<16) +  77*(1<<8) +  77 },
     { "grey30"          ,  77*(1<<16) +  77*(1<<8) +  77 },
     { "gray40"          , 102*(1<<16) + 102*(1<<8) + 102 },
+    { "grey40"          , 102*(1<<16) + 102*(1<<8) + 102 },
     { "gray50"          , 127*(1<<16) + 127*(1<<8) + 127 },
+    { "grey50"          , 127*(1<<16) + 127*(1<<8) + 127 },
     { "gray60"          , 153*(1<<16) + 153*(1<<8) + 153 },
+    { "grey60"          , 153*(1<<16) + 153*(1<<8) + 153 },
+    { "gray70"          , 179*(1<<16) + 179*(1<<8) + 179 },
     { "grey70"          , 179*(1<<16) + 179*(1<<8) + 179 },
+    { "gray80"          , 204*(1<<16) + 204*(1<<8) + 204 },
     { "grey80"          , 204*(1<<16) + 204*(1<<8) + 204 },
     { "gray90"          , 229*(1<<16) + 229*(1<<8) + 229 },
+    { "grey90"          , 229*(1<<16) + 229*(1<<8) + 229 },
+    { "gray100"         , 255*(1<<16) + 255*(1<<8) + 255 },
     { "grey100"         , 255*(1<<16) + 255*(1<<8) + 255 },
+    { "gray"            , 190*(1<<16) + 190*(1<<8) + 190 },
     { "grey"            , 190*(1<<16) + 190*(1<<8) + 190 },
+    { "light-gray"      , 211*(1<<16) + 211*(1<<8) + 211 },
     { "light-grey"      , 211*(1<<16) + 211*(1<<8) + 211 },
+    { "dark-gray"       , 169*(1<<16) + 169*(1<<8) + 169 },
     { "dark-grey"       , 169*(1<<16) + 169*(1<<8) + 169 },
     /* red */
     { "red"             , 255*(1<<16) +   0*(1<<8) +   0 },

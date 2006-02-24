@@ -1,3 +1,8 @@
+2006-02-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/tables.c (set_palette_tbl pm3d_color_names_tbl): Support both
+	spellings of "gray" and "grey".
+
 2006-02-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc term/post.trm: Correction of misprints.
