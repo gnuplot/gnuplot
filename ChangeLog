@@ -1,5 +1,12 @@
 2006-02-25  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* graph3d.c (do_3dplot): Contour lines are supposed to be in different
+	colors, but this was only working if the surface itself was drawn in a
+	simple linetype.  Fix contour auto-coloring even for explicit rgb or
+	other surface-coloring modes.
+
+2006-02-25  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/gadgets.h src/term_api.h:  Move line type definitions into
 	term_api.h, since they exist to request specific terminal behavior.
 	Remove definition of L_TYPE_NODRAW. It is now superseded by LT_NODRAW.
