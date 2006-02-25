@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.73 2005/10/10 02:44:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.74 2005/11/27 18:31:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -777,6 +777,11 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    c_token--;
 		    parse_colorspec(&lp->pm3d_color, TC_Z);
 		    lp->use_palette = 1;
+#ifdef KEYWORD_BGND
+		} else if (equals(c_token,"bgnd")) {
+		    lp->l_type = LT_BACKGROUND;
+		    c_token++;
+#endif
 		} else
 		    lp->l_type = (int) real(const_express(&t)) - 1;
 		continue;
@@ -802,6 +807,12 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		} else if (almost_equals(c_token, "pal$ette")) {
 		    c_token--;
 		    parse_colorspec(&lp->pm3d_color, TC_Z);
+#ifdef KEYWORD_BGND
+		} else if (equals(c_token,"bgnd")) {
+		    lp->pm3d_color.type = TC_LT;
+		    lp->pm3d_color.lt = LT_BACKGROUND;
+		    c_token++;
+#endif
 		} else {
 		    lp->pm3d_color.type = TC_LT;
 		    lp->pm3d_color.lt = (int) real(const_express(&t)) - 1;
@@ -965,13 +976,19 @@ parse_colorspec(struct t_colorspec *tc, int options)
     if (almost_equals(c_token,"def$ault")) {
 	c_token++;
 	tc->type = TC_DEFAULT;
+#ifdef KEYWORD_BGND
+    } else if (equals(c_token,"bgnd")) {
+	c_token++;
+	tc->type = TC_LT;
+	tc->lt = LT_BACKGROUND;
+#endif
     } else if (equals(c_token,"lt")) {
 	c_token++;
 	if (END_OF_COMMAND)
 	    int_error(c_token, "expected linetype");
 	tc->type = TC_LT;
 	tc->lt = (int)real(const_express(&a))-1;
-	if (tc->lt < LT_NODRAW) {
+	if (tc->lt < LT_BACKGROUND) {
 	    tc->type = TC_DEFAULT;
 	    int_warn(c_token,"illegal linetype");
 	}

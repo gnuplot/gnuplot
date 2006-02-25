@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.51 2005/11/25 04:43:56 sfeam Exp $
+ * $Id: term_api.h,v 1.52 2006/02/01 06:05:28 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -45,6 +45,23 @@
 
 #include "color.h"
 #include "tables.h"
+
+/* Constants that are interpreted by terminal driver routines */
+
+/* Default line type is LT_BLACK; reset to this after changing colors */
+#define LT_AXIS       (-1)
+#define LT_BLACK      (-2)
+#define LT_NODRAW     (-3)
+#define LT_BACKGROUND (-4)
+#define LT_UNDEFINED  (-5)
+#define LT_COLORFROMCOLUMN  (-6)	/* Used by hidden3d code */
+#define LT_DEFAULT    (-7)
+
+/* Constant value passed to (term->text_angle)(ang) to generate vertical
+ * text. Current implementation has ang equal to rotation in degrees.
+ */
+#define TEXT_VERTICAL (90)
+
 
 /* Type definitions */
 
@@ -107,9 +124,6 @@ typedef enum termlayer {
 	TERM_LAYER_FRONTTEXT,
 	TERM_LAYER_END_TEXT
 } t_termlayer;
-
-
-#define L_TYPE_NODRAW -3	/* use if line is not to be drawn */
 
 typedef struct fill_style_type {
     int fillstyle;
