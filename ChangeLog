@@ -1,3 +1,7 @@
+2006-02-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/html/index.save: Update web site template for 4.1 demos.
+
 2006-02-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* graph3d.c (do_3dplot): Contour lines are supposed to be in different
