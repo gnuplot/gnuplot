@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.343 2006/02/07 04:27:27 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.344 2006/02/23 19:49:58 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5449,8 +5449,8 @@ C ... and restart the table:
        set decimalsign locale "foo"
 
  This instructs the program to format all input and output in accordance with
- locale "foo", which must already installed.  If locale "foo" is not found
- then an error message is printed and the decimal sign setting is unchanged.
+ locale "foo", which must be installed.  If locale "foo" is not found then an
+ error message is printed and the decimal sign setting is unchanged.
 
        set decimalsign locale; set decimalsign "."
 

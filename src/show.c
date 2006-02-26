@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.171 2006/01/20 06:18:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.172 2006/02/20 05:09:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -163,6 +163,7 @@ static char *num_to_str __PROTO((double r));
 
 static int var_show_all = 0;
 
+static char *save_locale = NULL;
 
 /* following code segment appears over and over again */
 
@@ -191,7 +192,6 @@ show_command()
     enum set_id token_found;
     struct value a;
     int tag =0;
-    char *save_locale = NULL;
     char *error_message = NULL;
 
     c_token++;
@@ -200,10 +200,8 @@ show_command()
 
 #ifdef HAVE_LOCALE_H
     /* Report internal values in C locale (dot for decimal sign) */
-    if (strcmp(localeconv()->decimal_point,".")) {
        save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
        setlocale(LC_NUMERIC,"C");
-    }
 #endif
 
     /* rationalize c_token advancement stuff a bit: */
@@ -630,6 +628,7 @@ show_command()
     if (save_locale) {
        setlocale(LC_NUMERIC,save_locale);
        free(save_locale);
+       save_locale = NULL;
     }
 #endif
 
@@ -2256,10 +2255,16 @@ static void
 show_decimalsign()
 {
     SHOW_ALL_NL;
+#ifdef HAVE_LOCALE_H
+    if (save_locale) {
+	setlocale(LC_NUMERIC,save_locale);
+	fprintf(stderr, "\tdecimalsign for input is  %s \n", localeconv()->decimal_point);
+    }
+#endif
     if (decimalsign!=NULL)
-        fprintf(stderr, "\tdecimalsign is '%s'\n", decimalsign);
+        fprintf(stderr, "\tdecimalsign for output is %s \n", decimalsign);
     else
-        fprintf(stderr, "\tdecimalsign has default value (normally '.')\n");
+        fprintf(stderr, "\tdecimalsign for output has default value (normally '.')\n");
 }
 
 
@@ -2620,6 +2625,10 @@ show_locale()
 {
     SHOW_ALL_NL;
     locale_handler(ACTION_SHOW,NULL);
+#ifdef HAVE_LOCALE_H
+    /* We reset LC_NUMERIC locale explicitly to C, so we must undo it here */
+    fprintf(stderr, "\tLC_NUMERIC is %s\n", setlocale(LC_NUMERIC,save_locale));
+#endif
 }
 
 

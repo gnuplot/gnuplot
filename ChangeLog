@@ -2,6 +2,11 @@
 
 	* demo/html/index.save: Update web site template for 4.1 demos.
 
+	* src/set.c(set_decimalsign) src/variable.c(locale_handler)
+	src/show.c(show_command show_decimalsign show_locale) docs/gnuplot.doc:
+	Work a little harder to show both the current input and output settings
+	for decimal point handling (LC_NUMERIC locale setting).
+
 2006-02-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* graph3d.c (do_3dplot): Contour lines are supposed to be in different

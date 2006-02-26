@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.217 2006/02/03 22:47:38 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.218 2006/02/20 05:09:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1143,10 +1143,11 @@ set_decimalsign()
 {
     c_token++;
 
-    if (END_OF_COMMAND) {
-	if (decimalsign != NULL)
-	    free(decimalsign);
+    /* Clear current setting */
+	free(decimalsign);
 	decimalsign=NULL;
+
+    if (END_OF_COMMAND) {
 #ifdef HAVE_LOCALE_H
 	setlocale(LC_NUMERIC,"C");
     } else if (equals(c_token,"locale")) {
@@ -1156,8 +1157,8 @@ set_decimalsign()
 	if (!setlocale(LC_NUMERIC, newlocale ? newlocale : ""))
 	    int_error(c_token-1, "Could not find requested locale");
 	free(newlocale);
-	fprintf(stderr,"decimal_sign in locale is %s\n", (localeconv()->decimal_point));
 	decimalsign = gp_strdup(localeconv()->decimal_point);
+	fprintf(stderr,"decimal_sign in locale is %s\n", decimalsign);
 #endif
     } else if (!(decimalsign = try_to_get_string()))
 	int_error(c_token, "expecting string");
