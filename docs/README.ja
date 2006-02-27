@@ -1,4 +1,4 @@
-# $Id: README.ja,v 1.9 2008-01-11 11:44:27+09 shige Exp $
+# $Id: README.ja,v 1.11 2008-06-27 19:07:59+09 shige Exp $
 # The Japanese translations of gnuplot manuals
 # Shigeharu TAKENO <shige@iee.niit.ac.jp>
 #
@@ -55,8 +55,8 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 % patch -p0 < docs/term-ja.diff
 
 これで、terminal ドライバのマニュアル部分が日本語訳が追加され、
-docs/doc2rtf.c に日本語化パッチが適用され、docs/sjisenc.c が追加
-されます。
+docs/doc2rtf.c に日本語化パッチが適用され、docs/sjisenc.c, 
+docs/tex2ja.awk が追加されます。
 
 [3] docs/Makefile の修正
 
@@ -110,9 +110,15 @@ LaTeX 形式のファイルは以下のように作成します。
 
 % cd docs
 % make doc2tex 
-% ./doc2tex gnuplot-ja.gih gnuplot-ja.tex
+% ./doc2tex gnuplot-ja.gih tmpf
+% awk -f tex2ja.awk tmpf > gnuplot-ja.tex
 
-これは platex でほぼコンパイルできるのですが、platex だと
+この tex2ja.awk は、\pageref や \index を適切につけるための awk 
+スクリプトで、multibyte 対応の GNU awk など (Solaris の nawk でも
+いいよう) の日本語の通る awk が必要です。
+
+こうやって作った LaTeX ファイルは platex でほぼコンパイルできるの
+ですが、platex だと
 
  \subsection{New plot style {\bf pm3d}}
 
@@ -130,7 +136,7 @@ LaTeX 形式のファイルは以下のように作成します。
 % platex gnuplot-ja.tex
 % platex gnuplot-ja.tex
 % platex gnuplot-ja.tex
-% makeindex gnuplot-ja
+% makeindex gnuplot-ja.idx
 % platex gnuplot-ja.tex
 
 英語版の gnuplot.doc を、日本語訳で上書きしている場合は、
@@ -176,7 +182,12 @@ titlepag.tex の 20 行目位から始まる \usepackage[ の行の次
 
    dvipdfm,
 
-という行を入れてからコンパイルします。
+という行を入れ、12 行目位の \else の後に、
+
+  \AtBeginDvi{\special{pdf:tounicode EUC-UCS2}}
+
+のような行を入れてからコンパイルします。後者は、しおりの文字化け
+を修正するためのものです。
 
 % setenv TEXINPUTS .:..::
 % platex gnuplot-ja.tex
@@ -201,8 +212,10 @@ HTML 形式は、デフォルトの Makefile では [a] の LaTeX ファイルから
 latex2html で作るようになっているようですが、latex2html がない場
 合は、texinfo 形式を経由して makeinfo で作るといいでしょう。
 
-% sed -e "s/gnuplot.doc/gnuplot-ja.doc/g" \
-   -e "s/gnuplot.texi/gnuplot-ja.texi/g" doc2texi.el > doc2texi-ja.el
+% sed -e 's/gnuplot.doc/gnuplot-ja.doc/g' \
+   -e 's/gnuplot.texi/gnuplot-ja.texi/g' \
+   -e 's/Commands/コマンド (Commands)/' \
+   -e 's/Bugs\("\)/バグ\1/' doc2texi.el > doc2texi-ja.el
 % emacs -batch -l ./doc2texi-ja.el -f d2t-doc-to-texi
 
 これで gnuplot-ja.texi ができます。
