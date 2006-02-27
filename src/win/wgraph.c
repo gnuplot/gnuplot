@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.46 2005/12/18 18:59:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.47 2006/02/17 09:59:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1116,11 +1116,23 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    shape = 4;
 		    break;
 		case W_fbox:
+		    shape = 0;
+		    filled = 1;
+		    break;
 		case W_fdiamond:
+		    shape = 1;
+		    filled = 1;
+		    break;
 		case W_fitriangle:
-		    case W_ftriangle:
-		    case W_fpentagon:
-		    shape = curptr->op-W_fbox;
+		    shape = 2;
+		    filled = 1;
+		    break;
+		case W_ftriangle:
+		    shape = 3;
+		    filled = 1;
+		    break;
+		case W_fpentagon:
+		    shape = 4;
 		    filled = 1;
 		    break;
 		}

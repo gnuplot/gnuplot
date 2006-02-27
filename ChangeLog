@@ -1,3 +1,11 @@
+2006-02-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	SF patch [1436005] WIN: change sequence of pointstyles
+
+	* src/win/wgnuplib.h src/win/wgraph.c: Change the sequence of poinstyle
+	symbols such that it matches the sequence of terminals like postscript
+	or gd.
+
 2006-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/html/index.save: Update web site template for 4.1 demos.

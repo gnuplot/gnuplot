@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.20 2005/08/03 16:55:41 mikulik Exp $
+ * $Id: wgnuplib.h,v 1.21 2006/02/17 09:59:24 mikulik Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -271,22 +271,24 @@ struct GWOPBLK {			/* kept in local memory */
 
 /* ops */
 #define W_endoflist 0
+
 #define W_dot 10
-#define W_diamond 11
-#define W_plus 12
-#define W_box 13
-#define W_cross 14
-#define W_triangle 15
-#define W_star 16
-#define W_circle 17
-#define W_fcircle 18
-#define W_fbox 19
-#define W_fdiamond 20
-#define W_fitriangle 21
-#define W_ftriangle 22
-#define W_fpentagon 23
-#define W_itriangle 24		/* HBB 20010411: renumbered! */
-#define W_pentagon 25
+#define W_plus 11
+#define W_cross 12
+#define W_star 13
+#define W_box 14
+#define W_fbox 15
+#define W_circle 16
+#define W_fcircle 17
+#define W_itriangle 18
+#define W_fitriangle 19
+#define W_triangle 20
+#define W_ftriangle 21
+#define W_diamond 22
+#define W_fdiamond 23
+#define W_pentagon 24
+#define W_fpentagon 25
+
 #define W_move 30
 #define W_vect 31
 #define W_line_type 32
