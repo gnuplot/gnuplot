@@ -4,6 +4,9 @@
 	triggered by error return from post terminal at a point where gppsfile
 	and gpoutfile both point to the same file descriptor.
 
+	* term/post.trm: Fix broken linetype definitions loaded by
+	set term epslatex oldstyle
+
 2006-02-28  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* demo/Makefile.am.in: Add *.pdb and *.r3d to EXTRA_DIST generation.
