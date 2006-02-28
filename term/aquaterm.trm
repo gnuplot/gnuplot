@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.23 2006/04/17 18:51:58 persquare Exp $
+ * $Id: aquaterm.trm,v 1.24 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -206,11 +206,16 @@ AQUA_options()
     }
 
     if (almost_equals(c_token, "fn$ame") || almost_equals(c_token, "font"))  {
-	c_token++;
-
+        char *comma;
+        c_token++;
+    
 	if (!(s = try_to_get_string()))
-	    int_error(c_token,"fname: expecting font name");
-	strncpy(AQUA_fontNameCur,s,sizeof(AQUA_fontNameCur));
+	    int_error(c_token,"expecting font specifier");
+        comma = strrchr(s, ',');
+	if (comma && (1 == sscanf(comma+1, "%lf", &AQUA_fontSizeCur)))
+	    *comma = '\0';
+	if (*s)
+	    strncpy(AQUA_fontNameCur, s, sizeof(AQUA_fontNameCur));
 	free(s);
 	continue;
     }
@@ -219,7 +224,7 @@ AQUA_options()
 	c_token++;
 
 	if (END_OF_COMMAND)
-	    int_error(c_token,"fsize: expecting font size");
+	    int_error(c_token,"expecting font size");
 	AQUA_fontSizeCur = real (const_express (&a));
 	continue;
     }
@@ -271,7 +276,7 @@ AQUA_options()
   if (AQUA_title[0]=='\0') /* always set title */
     sprintf(AQUA_title, "Figure %d", AQUA_plotRef);
   /* Save options back into options string in normalized format */
-  sprintf(term_options, "%d title '%s' size %d %d fname '%s' fsize %g %s %s ",
+  sprintf(term_options, "%d title \"%s\" size %d %d font \"%s,%g\" %s %s",
 	  AQUA_plotRef,
 	  AQUA_title,
 	  (unsigned int) (AQUA_xSize/AQUA_RESOLUTION), (unsigned int) (AQUA_ySize/AQUA_RESOLUTION),
@@ -279,7 +284,7 @@ AQUA_options()
 	  term->put_text == ENHAQUA_put_text?"enhanced":"noenhanced", 
 	  AQUA_dashedlines?"dashed":"solid");
   if (AQUA_dashedlines)
-	   sprintf(&(term_options[strlen(term_options)]), "dl %3.1f", AQUA_dashlength_factor);
+    sprintf(&(term_options[strlen(term_options)]), " dl %3.1f", AQUA_dashlength_factor);
 }
 
 static NSString* 
@@ -495,9 +500,11 @@ AQUA_set_font(const char *font) /* "font,size" */
     /* Try to split the non-empty string into array parts (as string objects) */
     NSArray *parts = [AQUA_convert_using_encoding(font) componentsSeparatedByString:@","];
     /* Check that we have both non-empty name and size, otherwise stay with defaults */
-    if ([parts count] > 1 && ![[parts objectAtIndex:0] isEqualToString:@""] ) {
-      fontSize = [[parts objectAtIndex:1] floatValue]; /* Convert 2nd string object (fontsize) to float */ 
+    if ([parts count] > 0 && ![[parts objectAtIndex:0] isEqualToString:@""] ) {
       fontFace = [parts objectAtIndex:0]; /* fontname */
+      if ([parts count] > 1 && ![[parts objectAtIndex:1] isEqualToString:@""] ) {
+        fontSize = [[parts objectAtIndex:1] floatValue]; /* Convert (optional) 2nd string object (fontsize) to float */ 
+      }   
     }
   }
 
@@ -857,15 +864,16 @@ START_HELP(aqua)
 "",
 " Syntax:",
 "       set terminal aqua {<n>} {title \"<wintitle>\"} {size <x> <y>}",
-"                         {fname \"<fontface>\"} {fsize <fontsize>}",
+"                         {font \"<fontname>{,<fontsize>}\"}",
 "                         {{no}enhanced} {solid|dashed} {dl <dashlength>}}",
 "",
 " where <n> is the number of the window to draw in (default is 0),",
 " <wintitle> is the name shown in the title bar (default \"Figure <n>\"),",
 " <x> <y> is the size of the plot (default is 846x594 pt = 11.75x8.25 in).",
 "",
-" Use <fontface> to specify the font to use (default is \"Times-Roman\"),",
-" <fontsize> sets the font size (default is 14.0 pt).",
+" Use <fontname> to specify the font to use (default is \"Times-Roman\"),",
+" and <fontsize> to specify the font size (default is 14.0 pt). The old syntax",
+" {fname \"<fontname>\"} {fsize <fontsize>} is still supported.",
 "",
 " The aqua terminal supports enhanced text mode (see `enhanced`), except for",
 " overprint. Font support is limited to the fonts available on the system.",

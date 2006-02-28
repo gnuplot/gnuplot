@@ -1,3 +1,8 @@
+2006-02-28  Per Persson  <persquare@mac.com>
+
+	* term/aquaterm.trm: Made aqua terminal respect font requests of the
+	form: font "<fontface>{,<fontsize>}", old syntax still supported too. 
+	
 2006-07-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.cyg config/makefile.mgw config/makefile.nt: #define
