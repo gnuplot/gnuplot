@@ -1,3 +1,9 @@
+2006-02-28  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* demo/Makefile.am.in: Add *.pdb and *.r3d to EXTRA_DIST generation.
+
+	* docs/gnuplot.texi: Regenerated after recent documentation updates.
+
 2006-02-28  Per Persson  <persquare@mac.com>
 
 	* term/aquaterm.trm: Added encoding support to aqua terminal. Currently 

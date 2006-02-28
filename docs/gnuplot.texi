@@ -614,7 +614,7 @@ The older form has been deprecated.
 Version 4.1 continues to allow the older syntax, but such backwards
 compatibility may be lost in future versions.
 
-Commands of the form `set <something> <style>` also are deprectated in favor
+Commands of the form `set <something> <style>` also are deprecated in favor
 of the more general form `set style <something> <options>`.  Many more plot
 elements now have style options of their own, including arrows, filled
 areas, lines, and points. There are also style settings for input data and
@@ -1659,7 +1659,7 @@ index rather than a string pointer. strstrt("hayneedlestack","needle") = 4.
 
 `substr("string",beg,end)` returns the substring consisting of characters
 beg through end of the original string. This is exactly equivalent to the
-expressiong "string"[beg:end] except that you do not have the option of
+expression "string"[beg:end] except that you do not have the option of
 ommitting beg or end.
 
 @node system, word, substr, Functions
@@ -7046,8 +7046,9 @@ values as given with the @ref{origin} and @ref{size} subcommands are used.
 gradient.
 
 `origin x, y` and `size x, y` are used only in combination with the `user`
-option. The x and y values must be given in screen coordinates (as everything
-else did not seem to make sense) that is between [0 - 1]. Try for example:
+option. The x and y values are interpreted as screen coordinates by default,
+and this is the only legal option for 3D plots. 2D plots, including splot with
+`set view map`, allow any coordinate system to be specified.  Try for example:
 @example
     set colorbox horiz user origin .1,.02 size .8,.04
 @end example
@@ -7410,8 +7411,8 @@ variables.
 @end example
 
 This instructs the program to format all input and output in accordance with
-locale "foo", which must already installed.  If locale "foo" is not found
-then an error message is printed and the decimal sign setting is unchanged.
+locale "foo", which must be installed.  If locale "foo" is not found then an
+error message is printed and the decimal sign setting is unchanged.
 
 @example
       set decimalsign locale; set decimalsign "."
@@ -8049,7 +8050,7 @@ never hidden by the surface. As of gnuplot version 4.1, @ref{hidden3d} also
 affects 3D plotting styles `with points`, `with labels`, and `with vectors`,
 even if no surface is present in the graph.  Individual plots within the
 graph may be explicitly excluded from this processing by appending the extra
-option `nohidden` to the @ref{with} specifier.
+option `nohidden3d` to the @ref{with} specifier.
 
 Functions are evaluated at isoline intersections.  The algorithm interpolates
 linearly between function points or data points when determining the visible
@@ -9672,7 +9673,7 @@ The option `interpolate` will interpolate grid points into a finer mesh, and
 color each quadrangle appropriately. For data files, this will smoothen the
 color surface, and enhance spikes in a color surface. For functions,
 interpolation makes little sense, except to trade off precision for memory.
-It would usually make more sense to use 'samples' and 'isosamples' when working
+It would usually make more sense to use @ref{samples} and @ref{isosamples} when working
 with functions.
 
 The coloring setup as well as the color box drawing are determined by
@@ -11035,7 +11036,7 @@ box-and-whisker plot requires additional plot commands as in this example:
 
 The `dots` style plots a tiny dot at each point; this is useful for scatter
 plots with many points. For some terminals (post, pdf) the size of the dot can
-be contolled by changing the linewidth.
+be controlled by changing the linewidth.
 
 
 @noindent --- FILLEDCURVES ---
@@ -11866,7 +11867,7 @@ Control of the major (labelled) tics on all axes at once is possible with the
 Fine control of the major (labelled) tics on all axes at once is possible
 with the `set tics` command.  The tics may be turned off with the `unset tics`
 command, and may be turned on (the default state) with `set tics`.  Similar
-commands (by preceeding 'tics' by the axis name) control the major tics on a
+commands (by preceding 'tics' by the axis name) control the major tics on a
 single axis.
 
 Syntax:
@@ -12918,9 +12919,9 @@ compatibility.
 
 Syntax:
 @example
-      set ticslevel <level>
-      set xyplane <level>
-      set xyplane at <level>
+      set ticslevel <frac>
+      set xyplane <frac>
+      set xyplane at <zvalue>
       show xyplane
 
 @end example
@@ -13813,7 +13814,7 @@ A blank line or comment line ends the matrix, and starts a new surface mesh.
 You can select among the meshes inside a file by the @ref{index} option to the
 `splot` command, as usual.
 
-See `help matrix` for examples of plotting rows and columns of the matrix in
+See `matrix` for examples of plotting rows and columns of the matrix in
 a 2D plot.
 
 @node matrix,  , matrix_ascii, data-file
@@ -14277,7 +14278,9 @@ Use <fontface> to specify the font to use (default is "Times-Roman"),
 <fontzise> sets the font size (default is 14.0 pt).
 
 The aqua terminal support enhanced text mode (see `enhanced`), except for
-overprint. Font support is limited to the fonts available on the system."
+overprint. Font support is limited to the fonts available on the system.
+Character encoding can be selected by @ref{encoding} and currently supports
+iso_latin_1, iso_latin2, and cp1250 with iso_latin_1 being the dafault."  
 
 @node atari_ST_(via_AES), atari_ST_(via_VDI), aqua, terminal_
 @subsubsection atari ST (via AES)
@@ -15520,7 +15523,7 @@ Syntax:
 @example
       set terminal png 
              @{@{no@}transparent@} @{@{no@}interlace@}
-             @{@{no@}truecolor@}
+             @{@{no@}truecolor@} @{rounded|butt@}
              @{tiny | small | medium | large | giant@}
              @{font <face> @{<pointsize>@}@}
              @{size <x>,<y>@} @{@{no@}crop@}
@@ -15538,6 +15541,12 @@ color will be the transparent one. Default is `notransparent`.
 
 `interlace` instructs the driver to generate interlaced PNGs.
 Default is `nointerlace`.
+
+`butt` instructs the driver to use a line drawing method that does
+not overshoot the desired end point of a line.  This setting is only
+applicable for line widths greater than 1.  This setting is most useful when
+drawing horizontal or vertical lines.  Default is `rounded`.
+Version 2.0 or greater of libgd is required.
 
 PNG plots may be conveniently viewed by piping the output to the
 'display' program from the ImageMagick package as follows:
