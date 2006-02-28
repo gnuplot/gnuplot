@@ -1,3 +1,9 @@
+2006-02-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (term_close_output): Fix fatial double-close error
+	triggered by error return from post terminal at a point where gppsfile
+	and gpoutfile both point to the same file descriptor.
+
 2006-02-28  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* demo/Makefile.am.in: Add *.pdb and *.r3d to EXTRA_DIST generation.

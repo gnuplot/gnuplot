@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.134 2006/01/07 20:14:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.135 2006/01/29 04:55:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -381,7 +381,8 @@ term_close_output()
         close_printer(gpoutfile);
     else
 #endif
-        (void) fclose(gpoutfile);
+    if (gpoutfile != gppsfile)
+        fclose(gpoutfile);
 
     gpoutfile = stdout;         /* Don't dup... */
     free(outstr);
