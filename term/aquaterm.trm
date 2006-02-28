@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.18 2005/11/10 21:20:13 persquare Exp $
+ * $Id: aquaterm.trm,v 1.19 2005/11/10 22:03:50 persquare Exp $
  *
  */
 
@@ -153,6 +153,7 @@ static int AQUA_dashPatterns[AQUA_DASH_PATTERNS][6] = {
     };
 
 /* Helper functions */
+static NSString* AQUA_convert_using_encoding __PROTO((const char *string));
 static void AQUA_local_reset __PROTO((void));
 
 /*
@@ -281,6 +282,45 @@ AQUA_options()
 	   sprintf(&(term_options[strlen(term_options)]), "dl %3.1f", AQUA_dashlength_factor);
 }
 
+static NSString* 
+AQUA_convert_using_encoding(const char *string)
+{
+  static bool didCheckEncodingSupport = false;
+  static bool hasStringEncodingSupport = false;
+  NSStringEncoding currentEncoding;
+  NSString *translatedString;
+
+  /* Check encoding support in system on first call */
+  if(!didCheckEncodingSupport) {
+    didCheckEncodingSupport = true;
+    hasStringEncodingSupport = [NSString respondsToSelector:@selector(stringWithCString:encoding:)];
+  }
+  /* Set encoding as requested by user via "set encoding" */
+  switch(encoding){
+  case S_ENC_ISO8859_1:
+    currentEncoding = NSISOLatin1StringEncoding;
+    break;
+  case S_ENC_ISO8859_2:
+    currentEncoding = NSISOLatin2StringEncoding;
+    break;
+  case S_ENC_CP1250:
+    currentEncoding = NSWindowsCP1250StringEncoding;
+    break;
+    /* FIXME: Add more encodings... */
+  case S_ENC_DEFAULT:  /* Fallthrough */
+  default :
+    currentEncoding = NSISOLatin1StringEncoding; 
+    break;
+  }
+  /* Perform translation (into UTF8 encoding used by Mac OS X) */
+  if (hasStringEncodingSupport) {
+    translatedString = [NSString stringWithCString:string encoding:currentEncoding];
+  } else {
+    translatedString = [NSString stringWithCString:string];
+  }
+  return translatedString;
+}
+
 static void
 AQUA_local_reset()
 {
@@ -317,7 +357,7 @@ AQUA_init()
   term->xmax = AQUA_xSize;
   term->ymax = AQUA_ySize;
   /* set current font*/
-  [adapter setFontname:[NSString stringWithCString:AQUA_fontNameCur]];
+  [adapter setFontname:AQUA_convert_using_encoding(AQUA_fontNameCur)];
   [adapter setFontsize:AQUA_fontSizeCur];
   /* set h_char, v_char*/
   term->h_char = (int) (AQUA_fontSizeCur * 0.7 * AQUA_RESOLUTION);
@@ -327,7 +367,7 @@ AQUA_init()
   term->v_tic = term->v_char / 3;
 
   [adapter setPlotSize:NSMakeSize(AQUA_xSize/AQUA_RESOLUTION, AQUA_ySize/AQUA_RESOLUTION)];
-  [adapter setPlotTitle:[NSString stringWithCString:AQUA_title]];
+  [adapter setPlotTitle:AQUA_convert_using_encoding(AQUA_title)];
 
   /*
    * Set up the basic indexed colormap for gnuplot
@@ -424,7 +464,7 @@ AQUA_put_text(unsigned int x, unsigned int y, const char *str)
 {
   if (!strlen(str))
     return;
-  [adapter  addLabel:[NSString stringWithCString: str]
+  [adapter  addLabel:AQUA_convert_using_encoding(str)
 	     atPoint:NSMakePoint(x/AQUA_RESOLUTION, y/AQUA_RESOLUTION)
 	       angle:AQUA_TextAngle
 	       align:(AQUA_TextJust | AQTAlignMiddle)];
@@ -448,12 +488,12 @@ TERM_PUBLIC int
 AQUA_set_font(const char *font) /* "font,size" */
 {
   /* Obtain default fontname and fontsize. If these are invalid, AquaTerm will handle it. */
-  NSString *fontFace = [NSString stringWithCString:AQUA_fontNameCur];
+  NSString *fontFace = AQUA_convert_using_encoding(AQUA_fontNameCur);
   float fontSize = AQUA_fontSizeCur;
   
   if (strlen(font) > 0) {
     /* Try to split the non-empty string into array parts (as string objects) */
-    NSArray *parts = [[NSString stringWithCString:font] componentsSeparatedByString:@","];
+    NSArray *parts = [AQUA_convert_using_encoding(font) componentsSeparatedByString:@","];
     /* Check that we have both non-empty name and size, otherwise stay with defaults */
     if ([parts count] > 1 && ![[parts objectAtIndex:0] isEqualToString:@""] ) {
       fontSize = [[parts objectAtIndex:1] floatValue]; /* Convert 2nd string object (fontsize) to float */ 
@@ -729,7 +769,7 @@ ENHAQUA_open(char * fontname, double fontsize,
   
   [attributes release];
   attributes = [[NSMutableDictionary alloc] initWithCapacity:16]; 
-  [attributes setObject:[NSString stringWithCString:fontname] forKey:@"AQTFontname"];
+  [attributes setObject:AQUA_convert_using_encoding(fontname) forKey:@"AQTFontname"];
 
   if (abs(base)>0.01) { 
     /* consider this as super/subscript, and compute subscript level */
@@ -824,7 +864,9 @@ START_HELP(aqua)
 " <fontzise> sets the font size (default is 14.0 pt).",
 "",
 " The aqua terminal support enhanced text mode (see `enhanced`), except for",
-" overprint. Font support is limited to the fonts available on the system."
+" overprint. Font support is limited to the fonts available on the system.",
+" Character encoding can be selected by `set encoding` and currently supports",
+" iso_latin_1, iso_latin2, and cp1250 with iso_latin_1 being the dafault."  
 END_HELP(aqua)
 #endif /* TERM_HELP */
 

@@ -1,3 +1,8 @@
+2006-02-28  Per Persson  <persquare@mac.com>
+
+	* term/aquaterm.trm: Added encoding support to aqua terminal. Currently 
+	supports iso_latin_1, iso_latin2, and cp1250. Default is iso_latin_1.
+
 2006-02-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	SF patch [1436005] WIN: change sequence of pointstyles
