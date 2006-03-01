@@ -1,7 +1,7 @@
 2006-02-28  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/term.c (term_close_output): Fix fatial double-close error
-	triggered by error return from post terminal at a point where gppsfile
+	* src/term.c (term_close_output): Fix fatal double-close error
+	triggered by error return from post.trm at any point where gppsfile
 	and gpoutfile both point to the same file descriptor.
 
 	* term/post.trm: Fix broken linetype definitions loaded by
