@@ -39,7 +39,7 @@
 	term_api.h, since they exist to request specific terminal behavior.
 	Remove definition of L_TYPE_NODRAW. It is now superseded by LT_NODRAW.
 
-	* src/misc.c (parse_colorspec);  Now that LT_BACKGROUND is sage to pass
+	* src/misc.c (parse_colorspec);  Now that LT_BACKGROUND is safe to pass
 	to all terminal drivers, allow it as a legal linetype (-3) in commands.
 
 2006-02-24  Petr Mikulik  <mikulik@physics.muni.cz>
