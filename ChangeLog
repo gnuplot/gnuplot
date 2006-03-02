@@ -1,3 +1,8 @@
+2006-03-02  Mike Sutton  <mws116@usa.com>
+
+	* term/cgm.trm (CGM_set_color): Let the CGM driver set color
+	when colorspec type is TC_LT.
+
 2006-02-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (term_close_output): Fix fatal double-close error

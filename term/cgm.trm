@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.68 2005/08/07 09:43:33 mikulik Exp $
+ * $Id: cgm.trm,v 1.69 2005/10/08 04:01:57 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1108,23 +1108,26 @@ CGM_set_color(t_colorspec *colorspec)
 {
     double gray = colorspec->value;
 
-    if (colorspec->type != TC_FRAC)
-	return;
+    if (colorspec->type == TC_LT) {
+	 CGM_linetype(colorspec->lt);
 
-     /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
-	offset to get past the default colors */
-     cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);
-     if (cgm_next.fill_color >= cgm_smooth_colors)
-	  cgm_smooth_colors = cgm_smooth_colors - 1;
-     cgm_next.fill_color += CGM_COLORS;
-     /* EAM - force color immediately so that lines and text can use it */
-     if (cgm_color != cgm_next.fill_color) {
-	  cgm_color = cgm_next.fill_color;
-	  cgm_linetype = cgm_color;
-	  CGM_flush_polyline();
-	  CGM_write_int_record(5,  4, 2, (int *) &cgm_color); /* line color */
-	  CGM_write_int_record(5, 14, 2, (int *) &cgm_color); /* text color */
-     }
+    } else if (colorspec->type == TC_FRAC){
+
+	 /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
+	    offset to get past the default colors */
+	 cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);
+	 if (cgm_next.fill_color >= cgm_smooth_colors)
+	      cgm_smooth_colors = cgm_smooth_colors - 1;
+	 cgm_next.fill_color += CGM_COLORS;
+	 /* EAM - force color immediately so that lines and text can use it */
+	 if (cgm_color != cgm_next.fill_color) {
+	      cgm_color = cgm_next.fill_color;
+	      cgm_linetype = cgm_color;
+	      CGM_flush_polyline();
+	      CGM_write_int_record(5,  4, 2, (int *) &cgm_color); /* line color */
+	      CGM_write_int_record(5, 14, 2, (int *) &cgm_color); /* text color */
+	 }
+    }
 }
 
 TERM_PUBLIC void
