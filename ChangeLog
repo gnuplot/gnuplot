@@ -1,3 +1,11 @@
+2006-03-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+        * term/cgm.trm (CGM_options) term/emf.trm (EMF_options)
+	term/pdf.trm (PDF_options) term/post.trm (PS_OPTIONS):
+	Accept font request strings of the form
+	    set term <foo> ... font "<fontface>,<fontsize>"
+	Whatever previous syntax each terminal used remains valid as well.
+
 2006-03-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
         * term/win.trm (WIN_image): New function.  An edited copy of

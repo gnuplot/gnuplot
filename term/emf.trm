@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.35 2006/01/14 05:41:45 sfeam Exp $
+ * $Id: emf.trm,v 1.36 2006/02/20 20:17:57 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -540,7 +540,12 @@ EMF_options()
 	    c_token++;
 	/* Fall through to old-style bare font name */
 	if ((s = try_to_get_string())) {
-	    strncpy(emf_defaultfontname, s, sizeof(emf_defaultfontname));
+	    char *comma = strrchr(s,',');
+	    if (comma && (1 == sscanf(comma+1,"%d",&emf_defaultfontsize))) {
+		*comma = '\0';
+	    }
+	    if (*s)
+		strncpy(emf_defaultfontname, s, sizeof(emf_defaultfontname));
 	    free(s);
 	    if (isanumber(c_token)) {
 		struct value a;
@@ -1186,7 +1191,8 @@ START_HELP(emf)
 "",
 " Syntax:",
 "       set terminal emf {<color>} {solid | dashed} {linewidth <X>}",
-"                        {\"<font>\"} {<fontsize>}",
+"                        {\"<fontname>\"} {<fontsize>}    #old syntax",
+"                        {font \"<fontname>,<fontsize>\"} #new syntax",
 "",
 " <color> is either `color` or `monochrome`; ",
 " `solid` draws all curves with solid lines, overriding any dashed patterns;",

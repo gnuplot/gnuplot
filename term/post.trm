@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.174 2006/02/23 19:49:58 mikulik Exp $
+ * $Id: post.trm,v 1.175 2006/03/01 07:10:35 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1464,7 +1464,13 @@ PS_options()
 		set_font = TRUE;
 		if ((ps_params->terminal == PSTERM_POSTSCRIPT) ||
 		    (ps_params->terminal == PSTERM_EPSLATEX)) {
-		    strncpy(ps_params->font, s, sizeof(ps_params->font));
+		    char *comma = strrchr(s,',');
+		    if (comma && (1 == sscanf(comma+1,"%f",&ps_params->fontsize))) {
+			set_fontsize = TRUE;
+			*comma = '\0';
+		    }
+		    if (*s)
+			strncpy(ps_params->font, s, sizeof(ps_params->font));
 		    free(s);
 		} else
 		    int_error(c_token-1,
@@ -4082,7 +4088,7 @@ START_HELP(00psglobal)
 "                               {size <XX>{unit},<YY>{unit}}",
 #define PS_COMMON_OPTS2 \
 "                               {blacktext | colortext | colourtext}",\
-"                               {\"<fontname>\"} {<fontsize>}",
+"                               {{font} \"fontname{,fontsize}\" {<fontsize>}}",
 #define PS_COMMON_DOC1 \
 " The option `color` enables color, while `monochrome` prefers black and white",\
 " drawing elements. Further, `monochrome` uses gray `palette` but it does not",\

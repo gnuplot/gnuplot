@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.61 2005/12/30 05:13:44 sfeam Exp $
+ * $Id: pdf.trm,v 1.62 2006/02/20 20:17:57 sfeam Exp $
  */
 
 /*------------------------------
@@ -313,12 +313,16 @@ PDF_options ()
 	}
 
 	if (almost_equals(c_token, "fn$ame") || almost_equals(c_token, "font"))  {
-	    char *s;
+	    char *s, *comma;
 	    c_token++;
 
 	    if (!(s = try_to_get_string()))
 		int_error(c_token,"fname: expecting font name");
-	    strncpy(PDF_fontNameDef, s, sizeof(PDF_fontNameDef));
+	    comma = strrchr(s,',');
+	    if (comma && (1 == sscanf(comma+1,"%lf",&PDF_fontSizeDef)))
+		*comma = '\0';
+	    if (*s)
+		strncpy(PDF_fontNameDef, s, sizeof(PDF_fontNameDef));
 	    free(s);
 	    continue;
 	}
@@ -1593,6 +1597,7 @@ START_HELP(pdf)
 "       set terminal pdf {monochrome|color|colour}",
 "                        {{no}enhanced}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
+"                        {font \"<fontname>{,<fontsize>}\"}",
 "                        {linewidth <lw>} {rounded|butt}",
 "                        {solid|dashed} {dl <dashlength>}}",
 "",
