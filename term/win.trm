@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.41 2006/02/20 20:17:58 sfeam Exp $
+ * $Id: win.trm,v 1.42 2006/03/04 22:40:12 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -97,6 +97,9 @@ TERM_PUBLIC void WIN_enhanced_open __PROTO((char * fontname, double fontsize,
 	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
 			int overprint));
 TERM_PUBLIC void WIN_enhanced_flush __PROTO((void));
+#ifdef WITH_IMAGE
+TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
+#endif
 
 
 /* Initialization values - Guess Now Scale later */
@@ -425,6 +428,82 @@ WIN_set_clipboard ( const char s[] )
 }
 
 #endif /* USE_MOUSE */
+
+
+#ifdef WITH_IMAGE
+
+/* Note: this is a verbatim copy of PM_image (pm.trm) with only minor changes */
+
+TERM_PUBLIC void
+WIN_image(unsigned int M, unsigned int N, coordval *image,
+	  gpiPoint *corner, t_imagecolor color_mode)
+{
+    PBYTE rgb_image;
+    unsigned int image_size;
+    unsigned int pad_bytes;
+
+    /* IC_PALETTE and IC_RGB images are converted to a 24bit RGB format
+       suitable for Windows:
+        - sequence of lines is reversed 
+        - each line starts at a 4 byte boundary
+    */
+
+    /* fprintf(stderr, "WIN_image: %i x %i, mode=%s\n", M, N, color_mode==IC_RGB?"IC_RGB":"IC_PALETTE" ); */
+    pad_bytes = (4 - (3 * M) % 4) % 4; /* scan lines start on ULONG boundaries */
+
+    image_size = (M + pad_bytes ) * N * 3;
+    rgb_image = (PBYTE) gp_alloc(image_size, "WIN RGB image");
+
+    if (color_mode == IC_PALETTE) {
+    	unsigned int x, y;
+
+	rgb_image += N * (3 * M + pad_bytes);
+	for (y=0; y<N; y++) {
+	    rgb_image -= 3 * M + pad_bytes;
+	    for(x=0; x<M; x++) {
+		rgb255_color rgb255;
+		rgb255maxcolors_from_gray(*image++, &rgb255);
+		*(rgb_image++) = rgb255.b;
+		*(rgb_image++) = rgb255.g;
+		*(rgb_image++) = rgb255.r;
+	    }
+	    rgb_image -= 3 * M;
+	}
+    } else if (color_mode == IC_RGB) {
+    	unsigned int x, y;
+
+	rgb_image += N * (3 * M + pad_bytes);
+	for (y=0; y<N; y++) {
+	    rgb_image -= 3 * M + pad_bytes;
+	    for(x=0; x<M; x++) {
+		rgb255_color rgb255;
+		rgb255.r = (BYTE) (*image++ * 255 + 0.5);
+		rgb255.g = (BYTE) (*image++ * 255 + 0.5);
+		rgb255.b = (BYTE) (*image++ * 255 + 0.5);
+		*(rgb_image++) = rgb255.b;
+		*(rgb_image++) = rgb255.g;
+		*(rgb_image++) = rgb255.r;
+	    }
+	    rgb_image -= 3 * M;
+	}
+    }
+
+    /* squeze all the information into the buffer */
+    if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB)) {
+        GraphOp(&graphwin, W_image, corner[0].x, corner[0].y, NULL);
+        GraphOp(&graphwin, W_image, corner[1].x, corner[1].y, NULL);
+        GraphOp(&graphwin, W_image, corner[2].x, corner[2].y, NULL);
+        GraphOp(&graphwin, W_image, corner[3].x, corner[3].y, NULL);
+	/* GraphOp() cannot be used here since the image might 
+	   contain char(0), so use  GraphOpSize() instead */
+        GraphOpSize(&graphwin, W_image, M, N, rgb_image, image_size);
+    }
+
+    free(rgb_image);
+}
+
+#endif /* WITH_IMAGE */
+
 
 TERM_PUBLIC int
 WIN_make_palette(t_sm_palette *palette)
@@ -766,7 +845,7 @@ TERM_TABLE_START(win_driver)
     , WIN_make_palette, 0 /* previous_palette */,
     WIN_set_color, WIN_filled_polygon
 #ifdef WITH_IMAGE
-    , 0 /* WIN_image */
+    , WIN_image
 #endif
     , WIN_enhanced_open, WIN_enhanced_flush, do_enh_writec
 TERM_TABLE_END(win_driver)

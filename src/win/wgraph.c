@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.48 2006/02/27 17:06:36 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.49 2006/03/04 22:40:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -292,9 +292,19 @@ AddBlock(LPGW lpgw)
 void WDPROC
 GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str)
 {
-    struct GWOPBLK *this;
-    struct GWOP FAR *gwop;
-    char *npstr;
+    if (str)
+	GraphOpSize(lpgw, op, x, y, str, _fstrlen(str)+1);
+    else
+	GraphOpSize(lpgw, op, x, y, NULL, 0);
+}
+
+
+void WDPROC
+GraphOpSize(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str, DWORD size)
+{
+	struct GWOPBLK *this;
+	struct GWOP FAR *gwop;
+	char *npstr;
 
 	this = lpgw->gwopblk_tail;
 	if ( (this==NULL) || (this->used >= GWOPMAX) ) {
@@ -309,10 +319,10 @@ GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str)
 	gwop->y = y;
 	gwop->htext = 0;
 	if (str) {
-		gwop->htext = LocalAlloc(LHND, _fstrlen(str)+1);
+		gwop->htext = LocalAlloc(LHND, size);
 		npstr = LocalLock(gwop->htext);
 		if (gwop->htext && (npstr != (char *)NULL))
-			lstrcpy(npstr, str);
+			memcpy(npstr, str, size);
 		LocalUnlock(gwop->htext);
 	}
 	this->used++;
@@ -1062,6 +1072,53 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		polyi = 0;
 	    }
 	    break;
+	case W_image:
+	    {
+		/* Due to the structure of gwop in total 5 entries are needed.
+		   These static variables help to collect all the needed information
+		*/
+		static int seq = 0;  /* sequence counter */
+		static POINT corners[4];
+
+		if (seq < 4) {
+		    /* The first four OPs contain the `corner` array */
+		    corners[seq].x = xdash;
+		    corners[seq].y = ydash;
+		} else {
+		    /* The last OP contains the image and it's size */
+		    BITMAPINFO bmi;
+		    char *image;
+		    unsigned int M, N;
+		    int rc;
+
+		    M = curptr->x;
+		    N = curptr->y;
+		    image = LocalLock(curptr->htext);
+		    if (image) {
+
+			/* rc = SetStretchBltMode(hdc, HALFTONE); */
+
+			memset(&bmi, 0, sizeof(bmi));
+			bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
+			bmi.bmiHeader.biWidth = M;
+			bmi.bmiHeader.biHeight = N;
+			bmi.bmiHeader.biPlanes = 1;
+			bmi.bmiHeader.biBitCount = 24;
+    			bmi.bmiHeader.biCompression = BI_RGB;
+			bmi.bmiHeader.biClrUsed = 0;
+
+			rc = StretchDIBits(hdc, 
+			    corners[0].x, corners[0].y, 
+			    corners[1].x - corners[0].x, corners[1].y - corners[0].y,
+			    0, 0,
+			    M, N,
+			    image, &bmi,
+			    DIB_RGB_COLORS, SRCCOPY );
+		    }
+		    LocalUnlock(curptr->htext);
+		}
+		seq = (seq + 1) % 5;
+	    }
 	case W_dot:
 	    dot(hdc, xdash, ydash);
 	    break;

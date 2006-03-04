@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.22 2006/02/27 17:06:36 mikulik Exp $
+ * $Id: wgnuplib.h,v 1.23 2006/03/04 22:40:11 broeker Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -303,6 +303,7 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_boxfill 41
 #define W_fillstyle 42		/* NOTE HBB 20010916: used #if _FILLEDBOXES */
 #define W_font 43
+#define W_image 50
 
 typedef struct tagGW {
 	GP_LPPRINT	lpr;		/* must be first */
@@ -365,6 +366,7 @@ void WDPROC GraphStart(LPGW lpgw, double pointsize);
 void WDPROC GraphEnd(LPGW lpgw);
 void WDPROC GraphResume(LPGW lpgw);
 void WDPROC GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str);
+void WDPROC GraphOpSize(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str, DWORD size);
 void WDPROC GraphPrint(LPGW lpgw);
 void WDPROC GraphRedraw(LPGW lpgw);
 void WDPROC GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
