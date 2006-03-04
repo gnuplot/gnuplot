@@ -1,3 +1,13 @@
+2006-03-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.cyg (HCWPATH): Look for HCW in the default place
+	where it installs itself.
+	($(OBJS) $(WINOBJS) dbinary.$(O)): Make these depend on config.h.
+	(default, all): Generate config.h by real dependency.
+	(show.$(O)): Don't assume .o extension.
+
+	* config/config.cyg: No, we don't HAVE_PWD_H.
+
 2006-03-02  Mike Sutton  <mws116@usa.com>
 
 	* term/cgm.trm (CGM_set_color): Let the CGM driver set color

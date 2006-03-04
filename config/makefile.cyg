@@ -1,6 +1,7 @@
+# Hey, Emacs, this is a -*- Makefile -*-
 #
+# $Id: makefile.cyg,v 1.26 2005/08/07 09:43:27 mikulik Exp $
 #
-# $Id: makefile.cyg,v 1.25 2004/03/26 07:47:53 mikulik Exp $
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
@@ -91,8 +92,7 @@ CFLAGS =
 # To compile the .hlp file you need hcw either out of Microsoft SDK or MS Help
 # Workshop. The latter can be obtained at www.helpmaster.com/help/devaids.htm.
 # Put the path to hcw here unless it is already in PATH:
-#HCWPATH = /Program\ Files/Help\ Workshop/
-#HCWPATH = h:/mssdk/bin/
+HCWPATH = /cygdrive/c/Program\ Files/Help\ Workshop/
 HCW = $(HCWPATH)hcw
 # Switches are for HCW 4.03:
 HCWFLAG =
@@ -106,7 +106,7 @@ endif
 
 # GNU sort
 #GNUSORT = gsort.exe
-GNUSORT = c:/cygwin/bin/sort.exe
+GNUSORT = /usr/bin/sort
 
 #
 # *************** End of Configuration section *************************
@@ -206,14 +206,14 @@ ifdef GNU_RC
   RCFLAGS = --include-dir win \
 	--define __WIN32__ --define __WIN95__ --define MSRC \
 	--define __GNUWIN32__ --define WIN32
-  RCOUT = wgplt_res.o
-  RES2COFF = echo wgplt_res.o
+  RCOUT = wgplt_res.$(O)
+  RES2COFF = echo wgplt_res.$(O)
 else
   RC = $(MSSDK)/bin/rc
   RCFLAGS = -v -i$(MSSDK)/include -iwin \
 	-dWIN32 -dMSRC
   RCOUT = -fowgnuplot.res
-  RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.o
+  RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.$(O)
 endif
 
 # macros for makefile.all
@@ -224,11 +224,9 @@ L=docs/latex/
 M=../demo/
 
 
-default: config.h wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe \
-	pgnuplot.exe
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe
 
-all: config.h wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe \
-	pgnuplot.exe gnuplot.ps gnuplot.pdf
+all: default gnuplot.ps gnuplot.pdf
 
 
 # include the 'core makefile template'
@@ -254,26 +252,26 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 
 LDLIBS = -L/usr/local/lib -lkernel32 -lgdi32
 
-wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpicon.ico
+wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.$(O) texticon.ico grpicon.ico
 	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -mno-cygwin -o $@ \
-		$(OBJS) $(WINOBJS) \
-		wgplt_res.o $(LDLIBS) $(TERMLIBS)
+		$(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS) $(TERMLIBS)
 
-pgnuplot.exe: win/pgnuplot.c version.o
-	gcc -O2 -s -mno-cygwin -DHAVE_STDBOOL_H -o pgnuplot.exe win/pgnuplot.c version.o -I. -luser32
+pgnuplot.exe: win/pgnuplot.c version.$(O)
+	gcc -O2 -s -mno-cygwin -DHAVE_STDBOOL_H -o $@ \
+		win/pgnuplot.c version.$(O) -I. -luser32
 
 
 # Rules:
 
-wgplt_res.o :  win/wgnuplot.rc win/wgnuplib.rc win/wresourc.h texticon.ico grpicon.ico
+wgplt_res.$(O):  win/wgnuplot.rc win/wgnuplib.rc win/wresourc.h texticon.ico grpicon.ico
 	$(RC) $(RCFLAGS) win/wgnuplot.rc $(RCOUT) --include-dir=win
 	$(RES2COFF)
 
-show.o: show.c plot.h setshow.h
-	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -c $<
+show.$(O): show.c plot.h setshow.h
+	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(TERMFLAGS) term.c
+	$(CC) -c $(CFLAGS) $(TERMFLAGS) $<
 
 version.$(O): version.c
 
@@ -324,20 +322,18 @@ doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
 	$(LD) $(LDFLAGS) $(CFLAGS) -U_Windows -o $@ $^
 	(cd ../demo ; ./bf_test.exe )
-# cd ..
 
 # _Windows causes wtext.h to define fread() etc
 dbinary.$(O): binary.c
-	$(CC) -c $(CFLAGS) -U_Windows -o $@ $^
+	$(CC) -c $(CFLAGS) -U_Windows -o $@ $<
 
 
 #
 # Create config.h
-# This file is preferable over having explicit gcc command longer than 10 lines:
-# gcc ... -DHAVE_ -DHAVE_ ... -DHAVE_ -DHAVE_ ... myfile.c
 #
+$(OBJS) $(WINOBJS) dbinary.$(O): config.h
 config.h: ../config/config.cyg
-	cp $< $@
+	cp -p $< $@
 
 # Create documentation in various formats
 #
@@ -387,7 +383,8 @@ gnuplot.ps: gnuplot.dvi
 gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
 	cp gnuplot.tex $(D)gp_tex2.tex
 	cp $(D)../VERSION $(D)
-	cd $(D) && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex
+	cd $(D) && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex \
+	 	&& pdflatex gp_tex2.tex
 	mv $(D)gp_tex2.pdf gnuplot.pdf
 	rm -f $(D)gp_tex2.*
 
