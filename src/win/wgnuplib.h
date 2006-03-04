@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.21 2006/02/17 09:59:24 mikulik Exp $
+ * $Id: wgnuplib.h,v 1.22 2006/02/27 17:06:36 mikulik Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -302,6 +302,7 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_pm3d_filled_polygon_draw 40
 #define W_boxfill 41
 #define W_fillstyle 42		/* NOTE HBB 20010916: used #if _FILLEDBOXES */
+#define W_font 43
 
 typedef struct tagGW {
 	GP_LPPRINT	lpr;		/* must be first */
@@ -326,6 +327,8 @@ typedef struct tagGW {
 	BOOL	rotate;		/* can text be rotated 90 degrees ? */
 	char	fontname[MAXFONTNAME];	/* font name */
 	int	fontsize;	/* font size in pts */
+	char	deffontname[MAXFONTNAME]; /* default font name */
+	int	deffontsize;	/* default font size */
 	HFONT	hfonth;		/* horizonal font */
 	HFONT	hfontv;		/* rotated font (arbitrary angle) */
 	LOGFONT lf;		/* cached to speed up rotated fonts */
@@ -364,6 +367,9 @@ void WDPROC GraphResume(LPGW lpgw);
 void WDPROC GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str);
 void WDPROC GraphPrint(LPGW lpgw);
 void WDPROC GraphRedraw(LPGW lpgw);
+void WDPROC GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
+unsigned int WDPROC GraphGetTextLength(LPGW lpgw, LPCSTR text, LPCSTR fontname, int fontsize);
+int WDPROC GraphGetFontScaling(LPGW lpgw, LPCSTR font, int fontsize);
 
 #ifdef USE_MOUSE
 void WDPROC Graph_set_cursor (LPGW lpgw, int c, int x, int y );

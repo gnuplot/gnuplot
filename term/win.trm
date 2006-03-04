@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.40 2006/02/17 09:59:24 mikulik Exp $
+ * $Id: win.trm,v 1.41 2006/02/20 20:17:58 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -91,6 +91,12 @@ TERM_PUBLIC int WIN_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void WIN_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void WIN_filled_polygon __PROTO((int points, gpiPoint *corners));
 TERM_PUBLIC void WIN_boxfill __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
+/* To support "set term win enhanced" */
+TERM_PUBLIC void WIN_enhanced_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void WIN_enhanced_open __PROTO((char * fontname, double fontsize,
+	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+			int overprint));
+TERM_PUBLIC void WIN_enhanced_flush __PROTO((void));
 
 
 /* Initialization values - Guess Now Scale later */
@@ -116,7 +122,8 @@ TERM_PUBLIC void WIN_boxfill __PROTO((int, unsigned int, unsigned int, unsigned 
 
 /* Interface routines - create list of actions for Windows */
 
-enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR, WIN_OTHER };
+enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR,
+	      WIN_ENHANCED, WIN_NOENHANCED, WIN_OTHER };
 
 static struct gen_table WIN_opts[] =
 {
@@ -124,10 +131,33 @@ static struct gen_table WIN_opts[] =
     { "m$onochrome", WIN_MONOCHROME },
     { "c$olor", WIN_COLOR },
     { "c$olour", WIN_COLOR },
+    { "noe$nhanced", WIN_NOENHANCED },
+    { "e$nhanced", WIN_ENHANCED },
     { NULL, WIN_OTHER }
 };
 
-static int WIN_last_linetype = LT_NODRAW;	/* HBB 20000813: linetype caching */
+static int WIN_last_linetype = LT_NODRAW; /* HBB 20000813: linetype caching */
+
+/* these variables are needed for enhanced text only */
+
+/* FIXME: these are duplicates of struct graphwin members */
+static char WIN_font[MAXFONTNAME] = {'\0'}; 
+static int WIN_fontsize = 12.0;
+static double WIN_angle = 0.;  /* unit is radian */
+
+/* FIXME: these should most likely be members of struct graphwin */
+static unsigned int WIN_x = 0;
+static unsigned int WIN_y = 0;
+static enum JUSTIFY WIN_justification = LEFT;
+
+/* state variables for enhanced text processing */
+static TBOOLEAN ENHwin_opened_string;
+static TBOOLEAN ENHwin_show = TRUE;
+static int ENHwin_overprint = 0;
+static TBOOLEAN ENHwin_widthflag = TRUE;
+static TBOOLEAN ENHwin_sizeonly = FALSE;
+static double ENHwin_base;
+
 
 TERM_PUBLIC void
 WIN_options()
@@ -140,6 +170,8 @@ WIN_options()
 	    graphwin.color = TRUE;
 	    strcpy(graphwin.fontname, WINFONT);
 	    graphwin.fontsize = WINFONTSIZE;
+	    strcpy(graphwin.deffontname, WINFONT);
+	    graphwin.deffontsize = WINFONTSIZE;
 	    c_token++;
 	    break;
 	case WIN_MONOCHROME:
@@ -150,24 +182,39 @@ WIN_options()
 	    graphwin.color = TRUE;
 	    c_token++;
 	    break;
+	case WIN_ENHANCED:
+	    c_token++;
+	    term->put_text = WIN_enhanced_put_text;
+	    term->flags |= TERM_ENHANCED_TEXT;
+	    break;
+	case WIN_NOENHANCED:
+	    c_token++;
+	    term->put_text = WIN_put_text;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
+	    break;
 	case WIN_OTHER:
 	default:
 	    if (isstring(c_token)) {
 		quote_str(graphwin.fontname, c_token, MAX_ID_LEN);
+		strcpy(graphwin.deffontname, graphwin.fontname);
 		c_token++;
 	    } else {
 		/* We have font size specified */
 		graphwin.fontsize = (int) real(const_express(&a));
+		graphwin.deffontsize = graphwin.fontsize;
 	    }
 	    break;
 	}
     }
 
     if (graphwin.fontname[0] == '\0')
-	sprintf(term_options, "%s", graphwin.color ? "color" : "monochrome");
+	sprintf(term_options, "%s %s", 
+		graphwin.color ? "color" : "monochrome", 
+		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced");
     else
-	sprintf(term_options, "%s \"%s\" %d",
+	sprintf(term_options, "%s %s \"%s\" %d",
 		graphwin.color ? "color" : "monochrome",
+		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced",
 		graphwin.fontname, graphwin.fontsize);
 
     if (IsWindow(graphwin.hWndGraph) && IsIconic(graphwin.hWndGraph))
@@ -240,6 +287,10 @@ WIN_move(unsigned int x, unsigned int y)
      * unsigned int arguments to GraphOp() might cause problems: int
      * is 32bits, but GraphOp() args are 16bit WORDS. */
     GraphOp(&graphwin, W_move, x, y, NULL);
+
+    /* save current position, only needed for enhanced text */
+    WIN_x = x; 
+    WIN_y = y;
 }
 
 TERM_PUBLIC void
@@ -271,15 +322,21 @@ WIN_justify_text(enum JUSTIFY mode)
 {
     /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_justify, mode, 0, NULL);
+    /* store text justification, only needed for enhanced text */
+    WIN_justification = mode;
     return (TRUE);
 }
 
 TERM_PUBLIC int
 WIN_text_angle(int ang)
 {
-    if (graphwin.rotate)
+    if (graphwin.rotate) {
 	/* Notice HBB 20010208: --> WIN_move() */
-	GraphOp(&graphwin, W_text_angle, ang, 0, NULL);
+ 	GraphOp(&graphwin, W_text_angle, ang, 0, NULL);
+
+        /* store text angle, only needed for enhanced text */
+	WIN_angle = (double)ang * M_PI / 180.;
+    }
     return graphwin.rotate;
 }
 
@@ -422,6 +479,272 @@ WIN_boxfill(
 }
 
 
+TERM_PUBLIC int
+WIN_set_font(const char *font)
+{
+    char fontname[MAXFONTNAME];
+    int  fontsize;
+
+    if (font != NULL) {
+	if (font[0] == '\0') {
+	    strcpy(fontname, graphwin.deffontname);
+	    fontsize = graphwin.deffontsize;
+	} else {
+	    char *size;
+
+	    size = strrchr(font, ',');
+	    if (size == NULL) {
+		/* only font name given */
+		strcpy(fontname, font);
+    		fontsize = graphwin.deffontsize;
+	    } else if (size == font) {
+		/* only font size given */
+		strcpy(fontname, graphwin.deffontname);
+		sscanf(size+1,"%i", &fontsize);
+	    } else {
+		/* full font information supplied */
+		strncpy(fontname, font, size-font);
+		fontname[size-font] = '\0';
+		sscanf(size+1,"%i", &fontsize);
+	    }
+	}
+    }
+
+    if (font != NULL) {
+	GraphOp(&graphwin, W_font, fontsize, 0, fontname);
+        strcpy(WIN_font, fontname);
+        WIN_fontsize = fontsize;
+    }
+    else {
+	GraphOp(&graphwin, W_font, 0, 0, "");
+        strcpy(WIN_font, graphwin.deffontname);
+        WIN_fontsize = graphwin.deffontsize;
+    }
+    return TRUE;
+}
+
+
+TERM_PUBLIC void
+WIN_enhanced_open(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag,
+    int overprint)
+{
+    static const int win_scale = 40; /* scaling of base offset */  
+    static unsigned int ENHwin_xsave, ENHwin_ysave;
+    char *fontstring;
+
+    /* There are two special cases:
+     * overprint = 3 means save current position
+     * overprint = 4 means restore saved position
+     */
+    if (overprint == 3) {
+	ENHwin_xsave = WIN_x;
+	ENHwin_ysave = WIN_y;
+	return;
+    } else if (overprint == 4) {
+	WIN_x = ENHwin_xsave;
+	WIN_y = ENHwin_ysave;
+	return;
+    }
+
+    if (!ENHwin_opened_string) {
+	ENHwin_opened_string = TRUE;
+
+	/* Start new text fragment */
+	enhanced_cur_text = &enhanced_text[0];
+
+	/* Keep track of whether we are supposed to show this string */
+	ENHwin_show = showflag;
+
+	/* 0/1/2  no overprint / 1st pass / 2nd pass */
+	ENHwin_overprint = overprint;
+
+	/* widthflag FALSE means do not update text position after printing */
+	ENHwin_widthflag = widthflag;
+
+	/* Scale fractional font height to vertical units of display */
+	/* FIXME:	
+		Font scaling is not done properly (yet) and will lead to
+		non-optimal results for most font and size selections.
+		OUTLINEFONTMETRICS could be used for better here.
+	*/
+	ENHwin_base = win_scale * base;
+	 
+ 	/* Select font */
+	/* FIXME: It would be nice to have fractional font sizes 
+	          for super- and subscripts. */
+	/* FIXME: sometimes fontname has zero length */
+	if ((fontname != NULL) && strlen(fontname) > 0) {
+	    fontstring = malloc( strlen(fontname) + 16 );
+	    sprintf( fontstring, "%s,%i", fontname, (int)fontsize );
+	}
+	else {
+	    fontstring = malloc( strlen(WIN_font) + 16 );
+	    sprintf( fontstring, "%s,%i", WIN_font, (int)fontsize );
+	}
+	WIN_set_font( fontstring );
+	free( fontstring );
+   }
+}
+
+
+TERM_PUBLIC void
+WIN_enhanced_flush()
+{
+    static unsigned int ENHwin_xsave, ENHwin_ysave;
+
+    if (ENHwin_opened_string) {
+	int width, height;
+	unsigned int mode;
+	unsigned int x, y, len;
+	ULONG rc, cbR;
+
+	*enhanced_cur_text = '\0';
+	
+	/* print the string fragment, perhaps invisibly */
+	/* NB: base expresses offset from current y pos */
+	x = WIN_x - ENHwin_base * sin(WIN_angle);
+	y = WIN_y + ENHwin_base * cos(WIN_angle);
+	mode = ((ENHwin_show && !ENHwin_sizeonly) ? 0x01 : 0x00 );
+	
+
+	/* calculate length of string first */
+    	len = GraphGetTextLength(&graphwin, enhanced_text, WIN_font, WIN_fontsize);
+	width = cos(WIN_angle) * len;
+	height = sin(WIN_angle) * len;
+
+	if (ENHwin_show && !ENHwin_sizeonly) {
+	    /* display string */
+	    GraphOp(&graphwin, W_put_text, x, y, enhanced_text);
+	}
+
+	/* update drawing position according to len */
+	if (!ENHwin_widthflag) {
+	    width = 0; 
+	    height = 0;
+	}
+	if (ENHwin_sizeonly) {
+	    /* This is the first pass for justified printing.        */
+	    /* We just adjust the starting position for second pass. */
+	    if (WIN_justification == RIGHT) {
+		WIN_x -= width;
+		WIN_y -= height;
+	    }
+	    else if (WIN_justification == CENTRE) {
+		WIN_x -= width / 2;
+		WIN_y -= height / 2;
+	    }
+	    /* nothing to do for LEFT justified text */
+	}
+	else if (ENHwin_overprint == 1) {
+	    /* Save current position */
+	    ENHwin_xsave = WIN_x + width;
+	    ENHwin_ysave = WIN_y + height;
+	    /* First pass of overprint, leave position in center of fragment */
+	    WIN_x += width / 2;
+	    WIN_y += height / 2;
+	}
+	else if (ENHwin_overprint == 2) {
+	    /* Restore current position,                          */
+	    /* this sets the position behind the overprinted text */
+	    WIN_x = ENHwin_xsave;
+	    WIN_y = ENHwin_ysave;
+	}
+	else {
+	    /* Normal case is to update position to end of fragment */
+	    WIN_x += width;
+	    WIN_y += height;
+	}
+
+	ENHwin_opened_string = FALSE;
+    }
+}
+
+
+TERM_PUBLIC void
+WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
+{
+    char *original_string = (char *)str;
+    unsigned int pass, num_passes;
+
+    /* If no enhanced text processing is needed, we can use the plain  */
+    /* vanilla put_text() routine instead of this fancy recursive one. */
+    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+	WIN_put_text(x,y,str);
+	return;
+    }
+
+    /* Set up global variables needed by enhanced_recursion() */
+    ENHwin_opened_string = FALSE;
+    enhanced_fontscale = 1.0;
+    strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
+
+    /* Tell the terminal to move the drawing position */
+    /* we store the current position to WIN_x and WIN_y */
+    WIN_x = x; 
+    WIN_y = y;
+
+    /* Text justification requires two passes. During the first pass we */
+    /* don't draw anything, we just measure the space it will take.     */
+    /* Without justification one pass is enough                         */
+    if (WIN_justification == LEFT) {
+	num_passes = 1;
+    }
+    else {
+	num_passes = 2;
+	ENHwin_sizeonly = TRUE; 
+    }
+
+    for( pass=1; pass <= num_passes; pass++ ) {
+
+	/* This will restore the default font 
+	   and update WIN_font and WIN_fontsize */
+	WIN_set_font(NULL); 
+
+	/* Set the recursion going. We say to keep going until a
+	* closing brace, but we don't really expect to find one.
+	* If the return value is not the nul-terminator of the
+	* string, that can only mean that we did find an unmatched
+	* closing brace in the string. We increment past it (else
+	* we get stuck in an infinite loop) and try again.
+	*/
+	while (*(str = enhanced_recursion((char *)str, TRUE,
+			NULL, WIN_fontsize,
+			0.0, TRUE, TRUE, 0))) {
+	    (term->enhanced_flush)();
+
+	    /* I think we can only get here if *str == '}' */
+	    enh_err_check(str);
+
+	    if (!*++str)
+	    	break; /* end of string */
+
+	    /* else carry on and process the rest of the string */
+	}
+
+	/* In order to do text justification we need to do a second pass that */
+	/* uses information stored during the first pass.                     */
+	/* see WIN_enhanced_flush()                                           */
+	if (pass == 1) {
+	    /* do the actual printing in the next pass */
+	    ENHwin_sizeonly = FALSE;
+	    str = original_string;
+
+	    /* temporarily switch to left alignment since we do it ourselves */
+	    GraphOp(&graphwin, W_justify, LEFT, 0, NULL);
+	}
+    }
+
+    /* restore default font */
+    WIN_set_font(NULL); 
+
+    /* restore text alignment */
+    if (num_passes > 1)
+        GraphOp(&graphwin, W_justify, WIN_justification, 0, NULL);
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -432,7 +755,7 @@ TERM_TABLE_START(win_driver)
     WIN_VTIC, WIN_HTIC, WIN_options, WIN_init, WIN_reset,
     WIN_text, null_scale, WIN_graphics, WIN_move, WIN_vector,
     WIN_linetype, WIN_put_text, WIN_text_angle,
-    WIN_justify_text, WIN_point, do_arrow, set_font_null,
+    WIN_justify_text, WIN_point, do_arrow, WIN_set_font,
     WIN_set_pointsize, TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE,
     WIN_text /* suspend */ , WIN_resume,
     WIN_boxfill, WIN_linewidth
@@ -442,6 +765,10 @@ TERM_TABLE_START(win_driver)
 #endif
     , WIN_make_palette, 0 /* previous_palette */,
     WIN_set_color, WIN_filled_polygon
+#ifdef WITH_IMAGE
+    , 0 /* WIN_image */
+#endif
+    , WIN_enhanced_open, WIN_enhanced_flush, do_enh_writec
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM

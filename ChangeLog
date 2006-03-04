@@ -1,5 +1,38 @@
 2006-03-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	Bastian Maerkisch's enhanced text mode patch for Windows:
+	
+	* src/win/wgnuplib.h (W_font): New operation code macro.
+	(struct tagGW): New members deffontname, deffontsize describing
+	the default font.
+	(GraphChangeFont, GraphGetTextLength, GraphGetFontScaling): Added
+	prototypes.
+
+	* src/win/wgraph.c (SelFont): Write font to graphwin struct.
+	(drawgraph): Use TA_BASELINE instead of TA_BOTTOM text alignment.
+	Add handling of opcode W_font.
+	(WriteGraphIni): Write default font instead of current font as
+	GraphFont= entry.
+	(ReadGraphIni): Read default font from GraphFont= entry.
+	(GraphChangeFont, GraphGetTextLength): New functions.
+	(GraphGetFontScaling): New function (#if'ed out).
+
+	* term/win.trm (enum WIN_id, WIN_opts): New option {no}enhanced.
+	(WIN_font, WIN_fontsize, WIN_angle, WIN_x, WIN_y,
+	WIN_justification): New variables duplicated out of graphwin
+	struct.
+	(ENHwin_opened_string, ENHwin_show, ENHwin_overprint,
+	ENHwin_widthflag, ENHwin_sizeonly, ENHwin_base): New variables.
+	(WIN_options): Pass font name and size on to struct graphwin.
+	Accept new option {no}enhanced.
+	(WIN_move, WIN_justify_text, WIN_text_angle): Save arguments to
+	new variables.
+	(WIN_set_font, WIN_enhanced_open, WIN_enhanced_flush,
+	WIN_enhanced_put_text):
+	(TERM_ENTRY): Add entries for new functions.
+
+2006-03-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* config/makefile.cyg (HCWPATH): Look for HCW in the default place
 	where it installs itself.
 	($(OBJS) $(WINOBJS) dbinary.$(O)): Make these depend on config.h.

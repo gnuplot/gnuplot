@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.47 2006/02/17 09:59:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.48 2006/02/27 17:06:36 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -725,6 +725,9 @@ SelFont(LPGW lpgw)
 			lstrcat(lpgw->fontname," Bold");
 		if (cf.nFontType & ITALIC_FONTTYPE)
 			lstrcat(lpgw->fontname," Italic");
+		/* set current font as default font */
+		strcpy(lpgw->deffontname,lpgw->fontname);
+		lpgw->deffontsize = lpgw->fontsize;
 		SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);
 	}
 #endif
@@ -812,17 +815,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     rt = rect->top;
     rb = rect->bottom;
 
-    htic = lpgw->org_pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
-    vtic = lpgw->org_pointsize*MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
+    htic = lpgw->org_pointsize*MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1;
+    vtic = lpgw->org_pointsize*MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1;
 
     lpgw->angle = 0;
     SetFont(lpgw, hdc);
-    SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
-
+    SetTextAlign(hdc, TA_LEFT|TA_BASELINE);
+ 
     /* calculate text shifting for horizontal text */
     hshift = 0;
-    vshift = MulDiv(lpgw->vchar, rb-rt, lpgw->ymax)/2;
-
+    vshift = MulDiv(lpgw->vchar, rb - rt, lpgw->ymax)/2;
+  
     pen = 2;
     SelectObject(hdc, lpgw->hapen);
     SelectObject(hdc, lpgw->colorbrush[pen]);
@@ -967,15 +970,26 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    switch (curptr->x)
 		{
 		case LEFT:
-		    SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
+		    SetTextAlign(hdc, TA_LEFT|TA_BASELINE);
 		    break;
 		case RIGHT:
-		    SetTextAlign(hdc, TA_RIGHT|TA_BOTTOM);
+		    SetTextAlign(hdc, TA_RIGHT|TA_BASELINE);
 		    break;
 		case CENTRE:
-		    SetTextAlign(hdc, TA_CENTER|TA_BOTTOM);
+		    SetTextAlign(hdc, TA_CENTER|TA_BASELINE);
 		    break;
 		}
+	    break;
+	case W_font: {
+		char *font;
+
+		font = LocalLock(curptr->htext);
+		if (font) {
+		    GraphChangeFont(lpgw, font, curptr->x, hdc, *rect);
+	            SetFont(lpgw, hdc);
+		}
+		LocalUnlock(curptr->htext);
+	    }
 	    break;
 	case W_pointsize:
 	    if (curptr->x != 0) {
@@ -1423,7 +1437,7 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, "GraphOrigin", profile, file);
 	wsprintf(profile, "%d %d", rect.right-rect.left, rect.bottom-rect.top);
 	WritePrivateProfileString(section, "GraphSize", profile, file);
-	wsprintf(profile, "%s,%d", lpgw->fontname, lpgw->fontsize);
+	wsprintf(profile, "%s,%d", lpgw->deffontname, lpgw->deffontsize);
 	WritePrivateProfileString(section, "GraphFont", profile, file);
 	wsprintf(profile, "%d", lpgw->color);
 	WritePrivateProfileString(section, "GraphColor", profile, file);
@@ -1500,6 +1514,9 @@ ReadGraphIni(LPGW lpgw)
 			else
 				_fstrcpy(lpgw->fontname,WINFONT);
 		}
+		/* set current font as default font */
+		_fstrcpy(lpgw->deffontname, lpgw->fontname);
+		lpgw->deffontsize = lpgw->fontsize;
 	}
 
 	if (bOKINI)
@@ -2291,6 +2308,78 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
+
+
+void WDPROC
+GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect)
+{
+    int newfontsize;
+    bool remakefonts = FALSE;
+
+    newfontsize = (fontsize != 0) ? fontsize : lpgw->deffontsize;
+    if (font != NULL) {
+	remakefonts = (strcmp(lpgw->fontname, font) != 0) || (newfontsize != lpgw->fontsize);
+    } else {
+	remakefonts = (strcmp(lpgw->fontname, lpgw->deffontname) != 0) || (newfontsize != lpgw->fontsize);
+    }
+
+    if (remakefonts) {
+        lpgw->fontsize = newfontsize;
+        strcpy(lpgw->fontname, (font) ? font : lpgw->deffontname);
+
+        DestroyFonts(lpgw);
+        MakeFonts(lpgw, &rect, hdc);
+    }
+}
+
+
+#if 0
+int WDPROC
+GraphGetFontScaling(LPGW lpgw, LPCSTR font, int fontsize)
+{
+    HDC hdc;
+    RECT rect;
+    HGDIOBJ hprevfont;
+    OUTLINETEXTMETRIC otm;
+    int shift = 35;
+
+    hdc = GetDC(lpgw->hWndGraph);
+    GetClientRect(lpgw->hWndGraph, &rect);
+    GraphChangeFont(lpgw, font, fontsize, hdc, rect);
+    hprevfont = SelectObject(hdc, lpgw->hfonth);
+    if (GetOutlineTextMetrics(hdc, sizeof(otm), &otm) != 0) {
+        shift = otm.otmptSuperscriptOffset.y - otm.otmptSubscriptOffset.y;
+        shift = MulDiv(shift, GetDeviceCaps(hdc, LOGPIXELSY), 2 * 72);
+        printf( "shift: %i (%i %i)\n", shift*8, otm.otmptSuperscriptOffset.y, otm.otmptSubscriptOffset.y);
+    }
+    SelectObject(hdc, hprevfont);
+
+    return shift * 8;
+}
+#endif
+
+
+unsigned int WDPROC
+GraphGetTextLength(LPGW lpgw, LPCSTR text, LPCSTR fontname, int fontsize)
+{
+    HDC hdc;
+    RECT rect;
+    SIZE size;
+    HGDIOBJ hprevfont;
+
+    hdc = GetDC(lpgw->hWndGraph);
+    GetClientRect(lpgw->hWndGraph, &rect);
+
+    GraphChangeFont(lpgw, fontname, fontsize, hdc, rect);
+
+    hprevfont = SelectObject(hdc, lpgw->hfonth);
+    GetTextExtentPoint(hdc, text, strlen(text), &size);
+    SelectObject(hdc, hprevfont);
+    
+    size.cx = MulDiv(size.cx + GetTextCharacterExtra(hdc), lpgw->xmax, rect.right-rect.left-1);
+    return size.cx;
+}
+
 
 #ifdef USE_MOUSE
 /* Implemented by Petr Mikulik, February 2001 --- the best Windows solutions
