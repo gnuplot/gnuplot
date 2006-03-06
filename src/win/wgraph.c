@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.49 2006/03/04 22:40:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.50 2006/03/05 01:15:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1119,6 +1119,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 		seq = (seq + 1) % 5;
 	    }
+	    break;
 	case W_dot:
 	    dot(hdc, xdash, ydash);
 	    break;

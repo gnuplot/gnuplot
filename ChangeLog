@@ -6,6 +6,20 @@
 	sort out that mess.  Just assume that hyperref knows this on its
 	own, these days.
 
+	* src/syscfg.h (OS): Provide a fallback definition to avoid using
+	an undefined macro.
+	(GP_EXCEPTION_NAME) [__WATCOMC__]: Define.
+	
+        * config/makefile.oww: Some changes to make better use of Watcom's
+	Make tool.
+	
+	* src/win/wgraph.c (drawgraph): Add missing break.
+	
+	* term/win.trm (Win_Opts): Change abbreviations of option
+	{no}enhanced.
+	(WIN_Font, WIN_Fontsize): Initialize to sensible defaults.
+	(WIN_enhanced_flush): Remove unused local variable mode.
+	
 2006-03-04  Ethan A Merritt  <merritt@u.washington.edu>
 
         * term/cgm.trm (CGM_options) term/emf.trm (EMF_options)
