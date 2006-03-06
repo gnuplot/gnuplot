@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.31 2005/08/12 08:31:56 mikulik Exp $
+ * $Id: syscfg.h,v 1.32 2005/10/06 18:21:10 mikulik Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -202,6 +202,10 @@
  * for the constants defined above are following.
  */
 
+#ifndef OS
+# define OS "non-recognized OS"
+#endif
+
 #ifndef HELPFILE
 # define HELPFILE "docs/gnuplot.gih"
 #endif
@@ -306,6 +310,7 @@
 # include <direct.h>
 # include <dos.h>
 # define HAVE_GETCWD 1
+# define GP_EXCEPTION_NAME _exception
 #endif
 
 
