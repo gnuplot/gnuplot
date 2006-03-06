@@ -1,3 +1,11 @@
+2006-03-06  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* docs/titlepag.tex: The previous method of detecting pdflatex
+	vs. normal latex no longer works (some clever guys decided that
+	they should use pdflatex to make DVI files...).  Give up trying to
+	sort out that mess.  Just assume that hyperref knows this on its
+	own, these days.
+
 2006-03-04  Ethan A Merritt  <merritt@u.washington.edu>
 
         * term/cgm.trm (CGM_options) term/emf.trm (EMF_options)

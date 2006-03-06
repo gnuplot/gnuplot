@@ -1,5 +1,5 @@
 %
-% $Id: titlepag.tex,v 1.17 2004/04/13 17:23:36 broeker Exp $
+% $Id: titlepag.tex,v 1.18 2005/06/03 05:11:55 sfeam Exp $
 %
 
 \ifx\LaTeXe\undefined
@@ -17,19 +17,10 @@
    \documentclass[twoside]{article}
    \usepackage{toc_entr}
 
-  % Fine tuning of the hyperref output option:
-  \def\OtherHyperrefOpt{} % no special option by default
-  \ifx\pdfoutput\undefined
-        % *** uncomment for dvipdfm output
-        % ***
-        % \def\OtherHyperrefOpt{dvipdfm,}
-  \else % *** pdflatex output
-        % ***
-        \def\OtherHyperrefOpt{pdftex,}
-  \fi
-
   \usepackage[
-        \OtherHyperrefOpt
+% We've given up trying to understand pdftex vs. normal latex.
+% It'll just have to sort itself out.  If it doesn't, add your
+% own local hyperref options HERE.
         hyperindex,
         bookmarks,
         bookmarksnumbered=true,
@@ -166,7 +157,7 @@
 \else {
   \catcode`\$=10 \let\$\relax
   \def\ignoredate#1Date: #2{#2}
-  Last edited: \ignoredate $Date: 2004/04/13 17:23:36 $
+  Last edited: \ignoredate $Date: 2005/06/03 05:11:55 $
   }
 \fi
 
