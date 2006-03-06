@@ -1,3 +1,7 @@
+2006-03-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/command.c: #include direct.h if compiling with MSVC.
+
 2006-03-06  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* docs/titlepag.tex: The previous method of detecting pdflatex
@@ -10,7 +14,7 @@
 	an undefined macro.
 	(GP_EXCEPTION_NAME) [__WATCOMC__]: Define.
 	
-        * config/makefile.oww: Some changes to make better use of Watcom's
+	* config/makefile.oww: Some changes to make better use of Watcom's
 	Make tool.
 	
 	* src/win/wgraph.c (drawgraph): Add missing break.
@@ -22,7 +26,7 @@
 	
 2006-03-04  Ethan A Merritt  <merritt@u.washington.edu>
 
-        * term/cgm.trm (CGM_options) term/emf.trm (EMF_options)
+	* term/cgm.trm (CGM_options) term/emf.trm (EMF_options)
 	term/pdf.trm (PDF_options) term/post.trm (PS_OPTIONS):
 	Accept font request strings of the form
 	    set term <foo> ... font "<fontface>,<fontsize>"
