@@ -1,3 +1,7 @@
+2006-03-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/datafile.c (df_open): Shift misplaced call to gp_expand_tilde.
+
 2006-03-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c: #include direct.h if compiling with MSVC.

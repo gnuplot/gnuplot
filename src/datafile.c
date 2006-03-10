@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.99 2005/11/28 22:41:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.100 2006/01/27 07:05:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1240,9 +1240,6 @@ df_open(const char *cmd_filename, int max_using)
     }
     /*}}} */
 
-    /* filename cannot be static array! */
-    gp_expand_tilde(&df_filename);
-
     /*{{{  open file */
 #if defined(PIPES)
     if (*df_filename == '<') {
@@ -1260,6 +1257,8 @@ df_open(const char *cmd_filename, int max_using)
             data_fp = stdin;
         mixed_data_fp = TRUE;   /* don't close command file */
     } else {
+	/* filename cannot be static array! */
+	gp_expand_tilde(&df_filename);
 #ifdef HAVE_SYS_STAT_H
         struct stat statbuf;
 
