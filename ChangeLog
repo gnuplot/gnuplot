@@ -1,5 +1,29 @@
 2006-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/datafile.c (df_open): If a requested input data file is missing,
+	issue a warning and continue.  The old behaviour was to issue an error
+	and bail to the command line.  df_open() now returns a negative number
+	if the requested file cannot be opened.  Callers must test for error
+	return.
+
+	* src/plot2d.c (eval_plots): If a requested file is missing or empty,
+	create an empty plot structure for it, but plot other functions or
+	datafiles as usual. May not work for some combinations of missing
+	binary input files.
+
+	* src/plot3d.c (eval_3dplots): Treat a missing input file the same way
+	as an input file with no usable data points.  This is not the same
+	as skipping it cleanly as in the 2D case.  3D should be brought in line
+	with 2D, but it will require revision of the data structure handling.
+
+	* src/fit.c (fit_command): Give an error message if an input data file
+	is missing or not readable.
+
+	* src/graphics.c (do_plot): Re-indent code section dealing with
+	empty plots.
+
+2006-03-11  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/plot2d.c (cp_alloc) src/plot3d.c (sp_alloc): Our plot structures
 	have gained additional fields over the years, but not all of them were
 	being initialized on allocation. Switch to zeroing the entire structure

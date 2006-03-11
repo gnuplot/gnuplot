@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.52 2005/07/16 21:01:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.53 2005/08/12 17:42:32 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1270,6 +1270,8 @@ fit_command()
     df_set_plot_mode(MODE_QUERY);  /* Does nothing except for binary datafiles */
     columns = df_open(file_name, 4);	/* up to 4 using specs allowed */
     free(file_name);
+    if (columns < 0)
+	int_error(NO_CARET,"Can't read data file");
     if (columns == 1)
 	int_error(c_token, "Need 2 to 4 using specs");
     is_a_3d_fit = (columns == 4);

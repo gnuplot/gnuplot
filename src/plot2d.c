@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.119 2005/11/27 18:31:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.120 2006/03/11 18:04:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1728,6 +1728,14 @@ eval_plots()
 	    /* we can now do some checks that we deferred earlier */
 
 	    if (this_plot->plot_type == DATA) {
+		if (specs < 0) {
+		    /* Error check to handle missing or unreadable file */
+		    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
+			++point_num;
+		    ++line_num;
+		    this_plot->plot_type = NODATA;
+		    goto SKIPPED_EMPTY_FILE;
+		}
 		if (! (uses_axis[x_axis] & USES_AXIS_FOR_DATA)
 		    && X_AXIS.autoscale) {
 		    if (X_AXIS.autoscale & AUTOSCALE_MIN)
@@ -1856,11 +1864,20 @@ eval_plots()
      * may still change.  we stored last token of each plot, so we
      * dont need to do everything again */
 
-    /* give error if xrange badly set from missing datafile error
-     * parametric or polar fns can still affect x ranges
-     */
-
+    /* parametric or polar fns can still affect x ranges */
     if (!parametric && !polar) {
+	/* If we were expecting to autoscale on X but found no usable
+	 * points in the data files, then the axis limits are still sitting
+	 * at +/- VERYLARGE.  The default range for bare functions is [-10:10].
+	 * Or we could give up and fall through to "x range invalid".
+	 */
+	if (some_functions && uses_axis[FIRST_X_AXIS])
+	    if (axis_array[FIRST_X_AXIS].max == -VERYLARGE ||
+		axis_array[FIRST_X_AXIS].min == VERYLARGE) {
+		    axis_array[FIRST_X_AXIS].min = -10;
+		    axis_array[FIRST_X_AXIS].max = 10;
+	}
+
 	/* check that xmin -> xmax is not too small */
 	axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
 
@@ -2072,6 +2089,9 @@ eval_plots()
 	int_error(c_token, "no functions or data to plot");
     }
 
+    if (!uses_axis[FIRST_X_AXIS] && !uses_axis[SECOND_X_AXIS])
+	if (first_plot->plot_type == NODATA)
+	    int_error(NO_CARET,"No data in plot");
 
     if (uses_axis[FIRST_X_AXIS]) {
 	if (axis_array[FIRST_X_AXIS].max == -VERYLARGE ||

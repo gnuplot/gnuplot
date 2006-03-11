@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.176 2006/02/03 17:57:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.177 2006/02/20 05:09:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1677,111 +1677,114 @@ do_plot(struct curve_points *plots, int pcount)
 
 	/* and now the curves, plus any special key requirements */
 	/* be sure to draw all lines before drawing any points */
+	/* Skip missing/empty curves */
+	if (this_plot->plot_type != NODATA) {
 
-	switch (this_plot->plot_style) {
-	case IMPULSES:
-	    plot_impulses(this_plot, X_AXIS.term_zero, Y_AXIS.term_zero);
-	    break;
-	case LINES:
-	    plot_lines(this_plot);
-	    break;
-	case STEPS:
-	    plot_steps(this_plot);
-	    break;
-	case FSTEPS:
-	    plot_fsteps(this_plot);
-	    break;
-	case HISTEPS:
-	    plot_histeps(this_plot);
-	    break;
-	case POINTSTYLE:
-	    plot_points(this_plot);
-	    break;
-	case LINESPOINTS:
-	    plot_lines(this_plot);
-	    plot_points(this_plot);
-	    break;
-	case DOTS:
-	    if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
-		if (on_page(xl + key_point_offset, yl))
-		    (*t->point) (xl + key_point_offset, yl, -1);
-	    }
-	    plot_dots(this_plot);
-	    break;
-	case YERRORLINES:
-	case XERRORLINES:
-	case XYERRORLINES:
-	    plot_lines(this_plot);
-	    plot_bars(this_plot);
-	    plot_points(this_plot);
-	    break;
-	case YERRORBARS:
-	case XERRORBARS:
-	case XYERRORBARS:
-	    plot_bars(this_plot);
-	    plot_points(this_plot);
-	    break;
-	case BOXXYERROR:
-	case BOXES:
-	    plot_boxes(this_plot, Y_AXIS.term_zero);
-	    break;
+	    switch (this_plot->plot_style) {
+	    case IMPULSES:
+		plot_impulses(this_plot, X_AXIS.term_zero, Y_AXIS.term_zero);
+		break;
+	    case LINES:
+		plot_lines(this_plot);
+		break;
+	    case STEPS:
+		plot_steps(this_plot);
+		break;
+	    case FSTEPS:
+		plot_fsteps(this_plot);
+		break;
+	    case HISTEPS:
+		plot_histeps(this_plot);
+		break;
+	    case POINTSTYLE:
+		plot_points(this_plot);
+		break;
+	    case LINESPOINTS:
+		plot_lines(this_plot);
+		plot_points(this_plot);
+		break;
+	    case DOTS:
+		if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
+		    if (on_page(xl + key_point_offset, yl))
+			(*t->point) (xl + key_point_offset, yl, -1);
+		}
+		plot_dots(this_plot);
+		break;
+	    case YERRORLINES:
+	    case XERRORLINES:
+	    case XYERRORLINES:
+		plot_lines(this_plot);
+		plot_bars(this_plot);
+		plot_points(this_plot);
+		break;
+	    case YERRORBARS:
+	    case XERRORBARS:
+	    case XYERRORBARS:
+		plot_bars(this_plot);
+		plot_points(this_plot);
+		break;
+	    case BOXXYERROR:
+	    case BOXES:
+		plot_boxes(this_plot, Y_AXIS.term_zero);
+		break;
 
 #ifdef EAM_HISTOGRAMS
-	case HISTOGRAMS:
-	    /* Draw the bars first, so that the box will cover the bottom half */
-	    if (histogram_opts.type == HT_ERRORBARS) {
-		(term->linewidth)(histogram_opts.bar_lw);
-		if (default_fillstyle.border_linetype > LT_NODRAW)
-		    (term->linetype)(default_fillstyle.border_linetype);
-		else
-		    (term->linetype)(this_plot->lp_properties.l_type);
-		plot_bars(this_plot);
-		term_apply_lp_properties(&(this_plot->lp_properties));
-	    }
-	    plot_boxes(this_plot, Y_AXIS.term_zero);
-	    break;
+	    case HISTOGRAMS:
+		/* Draw the bars first, so that the box will cover the bottom half */
+		if (histogram_opts.type == HT_ERRORBARS) {
+		    (term->linewidth)(histogram_opts.bar_lw);
+		    if (default_fillstyle.border_linetype > LT_NODRAW)
+			(term->linetype)(default_fillstyle.border_linetype);
+		    else
+			(term->linetype)(this_plot->lp_properties.l_type);
+		    plot_bars(this_plot);
+		    term_apply_lp_properties(&(this_plot->lp_properties));
+		}
+		plot_boxes(this_plot, Y_AXIS.term_zero);
+		break;
 #endif
 
-	case BOXERROR:
-	    plot_boxes(this_plot, Y_AXIS.term_zero);
-	    plot_bars(this_plot);
-	    break;
+	    case BOXERROR:
+		plot_boxes(this_plot, Y_AXIS.term_zero);
+		plot_bars(this_plot);
+		break;
 
-	case FILLEDCURVES:
-	    if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN)
-		plot_betweencurves(this_plot);
-	    else
-		plot_filledcurves(this_plot);
-	    break;
+	    case FILLEDCURVES:
+		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN)
+		    plot_betweencurves(this_plot);
+		else
+		    plot_filledcurves(this_plot);
+		break;
 
-	case VECTOR:
-	    plot_vectors(this_plot);
-	    break;
-	case FINANCEBARS:
-	    plot_f_bars(this_plot);
-	    break;
-	case CANDLESTICKS:
-	    plot_c_bars(this_plot);
-	    break;
+	    case VECTOR:
+		plot_vectors(this_plot);
+		break;
+	    case FINANCEBARS:
+		plot_f_bars(this_plot);
+		break;
+	    case CANDLESTICKS:
+		plot_c_bars(this_plot);
+		break;
 
-	case PM3DSURFACE:
-	    fprintf(stderr, "** warning: can't use pm3d for 2d plots -- please unset pm3d\n");
-	    break;
+	    case PM3DSURFACE:
+		fprintf(stderr, "** warning: can't use pm3d for 2d plots -- please unset pm3d\n");
+		break;
 
 #ifdef EAM_DATASTRINGS
-	case LABELPOINTS:
-	    place_labels( this_plot->labels->next, LAYER_PLOTLABELS, TRUE);
-	    break;
+	    case LABELPOINTS:
+		place_labels( this_plot->labels->next, LAYER_PLOTLABELS, TRUE);
+		break;
 #endif
 #ifdef WITH_IMAGE
-	case IMAGE:
-	    PLOT_IMAGE(this_plot, IC_PALETTE);
-	    break;
+	    case IMAGE:
+		PLOT_IMAGE(this_plot, IC_PALETTE);
+		break;
 
-	case RGBIMAGE:
-	    PLOT_IMAGE(this_plot, IC_RGB);
-	    break;
+	    case RGBIMAGE:
+		PLOT_IMAGE(this_plot, IC_RGB);
+		break;
 #endif
+	    }
 	}
 
 

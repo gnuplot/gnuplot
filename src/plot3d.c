@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.120 2006/01/12 04:26:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.121 2006/03/11 18:04:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1543,6 +1543,11 @@ eval_3dplots()
 		struct surface_points *first_dataset = this_plot;
 		    /* pointer to the plot of the first dataset (surface) in the file */
 		int this_token = this_plot->token;
+		/* Error check to handle unreadable or missing data file */
+		if (specs < 0) {
+		    this_plot->plot_type = NODATA;
+		    df_eof = 1;
+		}
 		while (!df_eof) {
 		    this_plot = *tp_3d_ptr;
 		    assert(this_plot != NULL);

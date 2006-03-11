@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.100 2006/01/27 07:05:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.101 2006/03/10 18:17:14 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1274,7 +1274,9 @@ df_open(const char *cmd_filename, int max_using)
         if ((data_fp = loadpath_fopen(df_filename, df_binary ? "rb" : "r")) ==
 #endif
             (FILE *) NULL) {
-            os_error(name_token, "can't read data file \"%s\"", df_filename);
+            /* os_error(name_token, "can't read data file \"%s\"", df_filename); */
+	    int_warn(NO_CARET, "Skipping unreadable file \"%s\"", df_filename);
+	    return -1;
         }
     }
 /*}}} */
