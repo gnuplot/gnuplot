@@ -1,3 +1,19 @@
+2006-03-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/pm.trm src/term_api.h src/mouse.h src/mouse.c src/plot.c
+	src/set.c src/unset.c: Cleanup of the OS/2 menu stuff communicating
+	gnuplot -> gnupmdrv. This eliminates some 'extern's in C files and moves
+	code specific to pm terminal to pm.trm.
+	1. Remove update_menu_items_PM_terminal() from mouse.c.
+	2. Rename send_gpPMmenu() in mouse.c to PM_set_gpPMmenu() and move the
+	   actual communication with gnupmdrv to new routine
+	   PM_update_menu_items() in pm.trm.
+	   PM_set_gpPMmenu() now only updates the gpPMmenu struct.
+	3. Replace all calls to update_menu_items_PM_terminal() with calls to
+	   PM_update_menu_items().
+	4. Removed multiple definitions of PM_intc_cleanup() in plot.c and
+	   pm.trm to term_api.h.
+
 2006-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_open): If a requested input data file is missing,

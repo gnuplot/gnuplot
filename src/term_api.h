@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.52 2006/02/01 06:05:28 sfeam Exp $
+ * $Id: term_api.h,v 1.53 2006/02/26 05:44:11 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -44,6 +44,7 @@
 #include "gp_types.h"
 
 #include "color.h"
+#include "mousecmn.h"
 #include "tables.h"
 
 /* Constants that are interpreted by terminal driver routines */
@@ -338,11 +339,6 @@ extern const struct gen_table set_encoding_tbl[];
 /* mouse module needs this */
 extern TBOOLEAN term_initialised;
 
-#ifdef OS2
-extern int mouseGnupmdrv;
-extern FILE *PM_pipe;
-#endif
-
 
 /* Prototypes of functions exported by term.c */
 
@@ -387,7 +383,12 @@ void vms_reset();
 #endif
 
 #ifdef OS2
-int PM_pause __PROTO((char *)); /* term/pm.trm */
+int PM_pause __PROTO((char *));
+void PM_intc_cleanup __PROTO((void));
+# ifdef USE_MOUSE
+void PM_update_menu_items __PROTO((void));
+void PM_set_gpPMmenu __PROTO((struct t_gpPMmenu * gpPMmenu));
+# endif
 #endif
 
 /* in set.c (used in pm3d.c) */

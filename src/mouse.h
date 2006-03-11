@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.15 2005/03/26 22:06:51 sfeam Exp $
+ * $Id: mouse.h,v 1.16 2005/12/17 19:35:13 mikulik Exp $
  */
 
 /* GNUPLOT - mouse.h */
@@ -188,9 +188,6 @@ void UpdateStatusline __PROTO((void));
 void do_event __PROTO((struct gp_event_t *ge));
 int plot_mode __PROTO((int mode));
 void event_reset __PROTO((struct gp_event_t *ge));
-#ifdef OS2
-void update_menu_items_PM_terminal __PROTO((void));
-#endif
 
 /* bind prototype(s) */
 

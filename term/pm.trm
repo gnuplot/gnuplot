@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.49 2005/10/07 13:00:52 mikulik Exp $
+ * $Id: pm.trm,v 1.50 2005/10/08 19:36:19 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -144,9 +144,9 @@ static int PM_optargs = 0;
 static int PM_plot_number = 0;
 static char PM_term_title[128] = "";
 
-int mouseGnupmdrv = 0; /* PM set to 1 if we are connected to a mouseable gnupmdrv */
+static int mouseGnupmdrv = 0; /* PM set to 1 if we are connected to a mouseable gnupmdrv */
 
-FILE *PM_pipe = NULL;
+static FILE *PM_pipe = NULL;
 static FILE *PM_savepipe = NULL;
 
 
@@ -171,8 +171,6 @@ static double ENHpm_base;
 
 #endif
 
-int PM_pause __PROTO((char *str));
-void PM_intc_cleanup(void);
 static void PM_reset_opts(void);
 static void PM_query(void);
 static void PM_make_servername(char *);
@@ -411,6 +409,23 @@ PM_query()
 }
 
 
+# ifdef USE_MOUSE
+/* update menu items in PM terminal */
+void
+PM_update_menu_items()
+{
+    /* connected to a mouseable gnupmdrv */
+    if ((PM_pipe != NULL) && (mouseGnupmdrv)) {
+	struct t_gpPMmenu gpPMmenu;
+
+	PM_set_gpPMmenu(&gpPMmenu);
+	putc(SET_MENU, PM_pipe);
+	fwrite(&gpPMmenu, sizeof(gpPMmenu), 1, PM_pipe);
+    }
+}
+#endif
+
+
 TERM_PUBLIC void
 PM_reset()
 {
@@ -471,12 +486,7 @@ PM_graphics()
     putc(SET_GRAPHICS, PM_pipe);
     fflush(PM_pipe);
 #ifdef USE_MOUSE
-    if (mouseGnupmdrv) { /*  we are connected to mouseable gnupmdrv */
-	/* FIXME 20040712: 'extern' in a source file is always wrong. */
-	extern void send_gpPMmenu(FILE *);
-
-	send_gpPMmenu(PM_pipe);
-    }
+    PM_update_menu_items();
 #endif
     if (encoding != last_encoding) {
 	int cp;

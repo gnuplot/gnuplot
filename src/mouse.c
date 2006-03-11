@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.78 2005/11/29 19:00:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.79 2005/12/17 19:35:13 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -252,9 +252,6 @@ static void turn_ruler_off __PROTO((void));
 static int nearest_label_tag __PROTO((int x, int y, struct termentry * t));
 static void remove_label __PROTO((int x, int y));
 static void put_label __PROTO((char *label, double x, double y));
-# ifdef OS2
-void send_gpPMmenu __PROTO((FILE * PM_pipe));
-# endif
 
 /********* functions ********************************************/
 
@@ -1087,7 +1084,7 @@ builtin_toggle_mouse(struct gp_event_t *ge)
 # endif
     }
 # ifdef OS2
-    update_menu_items_PM_terminal();
+    PM_update_menu_items();
 # endif
     UpdateStatusline();
     return (char *) 0;
@@ -1170,7 +1167,7 @@ builtin_toggle_polardistance(struct gp_event_t *ge)
     }
     mouse_setting.polardistance = !mouse_setting.polardistance;
 # ifdef OS2
-    update_menu_items_PM_terminal();
+    PM_update_menu_items();
 # endif
     UpdateStatusline();
     if (display_ipc_commands()) {
@@ -2374,39 +2371,26 @@ put_label(char *label, double x, double y)
     do_string_replot(cmd);
 }
 
-# ifdef OS2
-/* routine required by pm.trm: fill & send information needed for (un)checking
+#ifdef OS2
+/* routine required by pm.trm: fill in information needed for (un)checking
    menu items in the Presentation Manager terminal
 */
-void
-send_gpPMmenu(FILE * PM_pipe)
+void 
+PM_set_gpPMmenu __PROTO((struct t_gpPMmenu * gpPMmenu))
 {
-    struct t_gpPMmenu gpPMmenu;
-    /* not connected to mouseable gnupmdrv */
-    if (!PM_pipe || !mouseGnupmdrv)
-	return;
-    gpPMmenu.use_mouse = mouse_setting.on;
+    gpPMmenu->use_mouse = mouse_setting.on;
     if (zoom_now == NULL)
-	gpPMmenu.where_zoom_queue = 0;
+	gpPMmenu->where_zoom_queue = 0;
     else {
-	gpPMmenu.where_zoom_queue = (zoom_now == zoom_head) ? 0 : 1;
+	gpPMmenu->where_zoom_queue = (zoom_now == zoom_head) ? 0 : 1;
 	if (zoom_now->prev != NULL)
-	    gpPMmenu.where_zoom_queue |= 2;
+	    gpPMmenu->where_zoom_queue |= 2;
 	if (zoom_now->next != NULL)
-	    gpPMmenu.where_zoom_queue |= 4;
+	    gpPMmenu->where_zoom_queue |= 4;
     }
-    gpPMmenu.polar_distance = mouse_setting.polardistance;
-    putc(SET_MENU, PM_pipe);
-    fwrite(&gpPMmenu, sizeof(gpPMmenu), 1, PM_pipe);
+    gpPMmenu->polar_distance = mouse_setting.polardistance;
 }
-
-/* update menu items in PM terminal */
-void
-update_menu_items_PM_terminal()
-{
-    send_gpPMmenu(PM_pipe);
-}
-# endif
+#endif
 
 /* Save current mouse position to user-accessible variables.
  * Save the keypress or mouse button that triggered this in MOUSE_KEY,

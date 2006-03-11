@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.91 2005/10/06 04:18:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.92 2006/01/20 06:18:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -52,9 +52,6 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.91 2005/10/06 04:18:16 sfe
 #include "term_api.h"
 #include "util.h"
 #include "variable.h"
-#ifdef USE_MOUSE
-#  include "mouse.h"
-#endif
 #include "pm3d.h"
 #ifdef BINARY_DATA_FILE
 #  include "datafile.h"
@@ -1036,7 +1033,7 @@ unset_mouse()
 {
     mouse_setting.on = 0;
 #ifdef OS2
-    update_menu_items_PM_terminal();
+    PM_update_menu_items();
 #endif
     UpdateStatusline(); /* wipe status line */
 }

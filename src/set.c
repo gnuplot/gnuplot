@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.218 2006/02/20 05:09:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.219 2006/02/27 07:09:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -61,9 +61,6 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.218 2006/02/20 05:09:15 sfea
 #include "term_api.h"
 #include "util.h"
 #include "variable.h"
-#ifdef USE_MOUSE
-#   include "mouse.h"
-#endif
 #include "pm3d.h"
 #include "getcolor.h"
 #include <ctype.h>
@@ -2288,8 +2285,8 @@ set_mouse()
 	    break;
 	}
     }
-#if defined(USE_MOUSE) && defined(OS2)
-    update_menu_items_PM_terminal();
+#ifdef OS2
+    PM_update_menu_items();
 #endif
 }
 #endif
