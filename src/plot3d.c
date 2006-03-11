@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.119 2005/12/06 18:23:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.120 2006/01/12 04:26:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -111,19 +111,7 @@ static struct surface_points *
 sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
 {
     struct surface_points *sp = gp_alloc(sizeof(*sp), "surface");
-
-    sp->next_sp = NULL;
-    sp->title = NULL;
-    sp->title_no_enhanced = FALSE;
-    sp->opt_out_of_hidden3d = FALSE;
-    sp->contours = NULL;
-    sp->iso_crvs = NULL;
-    sp->num_iso_read = 0;
-    sp->pm3d_color_from_column = FALSE;
-    sp->pm3d_where[0] = 0;
-
-    memset(&(sp->lp_properties),0,sizeof(lp_style_type));
-    memset(&(sp->arrow_properties),0,sizeof(arrow_style_type));
+    memset(sp,0,sizeof(struct surface_points));
 
     if (num_iso_2 > 0 && num_samp_1 > 0) {
 	int i;
@@ -139,12 +127,7 @@ sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
 	    icrv->next = sp->iso_crvs;
 	    sp->iso_crvs = icrv;
 	}
-    } else
-	sp->iso_crvs = NULL;
-
-#ifdef EAM_DATASTRINGS
-    sp->labels = NULL; /* Will be allocated later if plot_style === LABELPOINTS */
-#endif
+    }
 
     return (sp);
 }

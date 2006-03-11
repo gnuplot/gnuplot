@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.118 2005/11/27 05:55:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.119 2005/11/27 18:31:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -100,7 +100,7 @@ static int stack_count = 0;			/* counter for stackheight */
  */
 /*
  * cp_alloc() allocates a curve_points structure that can hold 'num'
- * points.
+ * points.   Initialize all fields to NULL.
  */
 static struct curve_points *
 cp_alloc(int num)
@@ -108,29 +108,13 @@ cp_alloc(int num)
     struct curve_points *cp;
 
     cp = (struct curve_points *) gp_alloc(sizeof(struct curve_points), "curve");
-    cp->p_max = (num >= 0 ? num : 0);
+    memset(cp,0,sizeof(struct curve_points));
 
-    if (num > 0) {
+    cp->p_max = (num >= 0 ? num : 0);
+    if (num > 0)
 	cp->points = (struct coordinate GPHUGE *)
 	    gp_alloc(num * sizeof(struct coordinate), "curve points");
-    } else
-	cp->points = (struct coordinate GPHUGE *) NULL;
-    cp->next = NULL;
-    cp->title = NULL;
-    cp->title_no_enhanced = FALSE;
-    cp->title_is_suppressed = FALSE;
-#ifdef EAM_DATASTRINGS
-    cp->labels = NULL;	/* Will be allocated later if plot_style == LABELPOINTS */
-#endif
-#ifdef EAM_HISTOGRAMS
-    cp->histogram = NULL; /* Will be allocated later if plot_style == HISTOGRAM */
-    cp->histogram_sequence = 0;
-#endif
 
-    memset(&(cp->lp_properties),0,sizeof(lp_style_type));
-    memset(&(cp->arrow_properties),0,sizeof(arrow_style_type));
-    memset(&(cp->fill_properties),0,sizeof(fill_style_type));
-    memset(&(cp->filledcurves_options),0,sizeof(filledcurves_opts));
     return (cp);
 }
 
