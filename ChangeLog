@@ -4,6 +4,13 @@
 	conditions are handled in an if/elseif/else construct. No actual change
 	in behavior, but it quiets valgrind warning messages.
 
+	* term/post.trm: Prevent segfault if someone passes off an undefined
+	variable as an epslatex header.  This is a bandaid rather than a true
+	fix, but it's better than segfaulting. The true problem is that an
+	int_error() exit from expression parsing bypasses proper cleanup of
+	storage for string variables, and also fails to return NULL to the
+	caller.
+
 2006-03-15  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c (plot_option_comma_separated):   Found by valgrind.
