@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.121 2006/03/11 18:04:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.122 2006/03/11 21:35:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -772,9 +772,7 @@ get_3ddata(struct surface_points *this_plot)
 	    /* After the first three columns it gets messy because */
 	    /* different plot styles assume different contents in the columns */
 	    if (j >= 4) {
-		color = v[3];
-		color_from_column(TRUE);
-		if ((this_plot->plot_style == POINTSTYLE
+		if (( this_plot->plot_style == POINTSTYLE
 		   || this_plot->plot_style == LINESPOINTS)
 		&&  this_plot->lp_properties.p_size == PTSZ_VARIABLE) {
 		    cp->CRD_PTSIZE = v[3];
@@ -782,13 +780,17 @@ get_3ddata(struct surface_points *this_plot)
 		    color_from_column(FALSE);
 		}
 #ifdef EAM_DATASTRINGS
-		if (this_plot->plot_style == LABELPOINTS) {
+		else if (this_plot->plot_style == LABELPOINTS) {
 		/* 4th column holds label text rather than color */
 		/* text = df_tokens[3]; */
 		    color = z;
 		    color_from_column(FALSE);
 		}
 #endif
+		else {
+		    color = v[3];
+		    color_from_column(TRUE);
+		}
 	    }
 
 	    if (j >= 5) {

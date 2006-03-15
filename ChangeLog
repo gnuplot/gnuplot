@@ -1,3 +1,9 @@
+2006-03-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (get_3ddata): Reorder code so that mutually exclusive
+	conditions are handled in an if/elseif/else construct. No actual change
+	in behavior, but it quiets valgrind warning messages.
+
 2006-03-15  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c (plot_option_comma_separated):   Found by valgrind.
