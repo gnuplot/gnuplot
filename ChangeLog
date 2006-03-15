@@ -1,3 +1,8 @@
+2006-03-15  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/datafile.c (plot_option_comma_separated): 
+	Set an uninitialized tuple value to 0.0.
+
 2006-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/html/index.save demo/html/Makefile: Add animate2 to the list

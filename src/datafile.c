@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.101 2006/03/10 18:17:14 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.102 2006/03/11 21:35:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4092,6 +4092,7 @@ The number of bytes to skip must be positive");
                             int_error(c_token, "\
 Two-dimensional tuple required for 2D plot");
                         c_token = token2tuple(c_token, tuple, 2);
+                        tuple[2] = 0.0;
                     } else if (arg == MODE_SPLOT) {
                         if (test_val != 3)
                             int_error(c_token, "\
@@ -4136,13 +4137,11 @@ Internal error (datafile.c): Unknown plot mode");
                     if (test_val != 3)
                         int_error(c_token, "Three-dimensional tuple required");
                     c_token = token2tuple(c_token, tuple, 3);
-                    /* ????? Is there a precision constant for doubles
-                     * similar to what is in limits.h for other types?  */
-                    /* FIXME HBB 20050603: of course there is: DBL_EPS
-                     * in <float.h> */
+                    /* Compare vector length against variable precision
+                     * to determine if this is the null vector */
                     if ((tuple[0]*tuple[0]
                          + tuple[1]*tuple[1]
-                         + tuple[2]*tuple[2]) < 10e-10)
+                         + tuple[2]*tuple[2]) < 100.*DBL_EPSILON)
                         int_error(c_token, "\
 Perpendicular vector cannot be zero");
                     memcpy(df_bin_record[bin_record_count].cart_p,
