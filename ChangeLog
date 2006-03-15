@@ -1,7 +1,10 @@
 2006-03-15  Daniel Sebald  <daniel.sebald@ieee.org>
 
-	* src/datafile.c (plot_option_comma_separated): 
+	* src/datafile.c (plot_option_comma_separated):   Found by valgrind.
 	Set an uninitialized tuple value to 0.0.
+
+	* src/set.c (parse_histogramstyle):   Found by valgrind.
+	Set an unitialized text label to EMPTY_LABELSTRUCT
 
 2006-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 

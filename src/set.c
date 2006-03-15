@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.219 2006/02/27 07:09:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.220 2006/03/11 22:11:44 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4835,7 +4835,7 @@ parse_histogramstyle( histogram_style *hs,
 		int def_gap)
 {
     struct value a;
-    text_label title_specs;
+    text_label title_specs = EMPTY_LABELSTRUCT;
 
     /* Set defaults */
     hs->type  = def_type;
