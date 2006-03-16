@@ -1,3 +1,8 @@
+2006-03-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_tic_prop): Another bandaid to protect against
+	int_error() from inside try_to_get_string().  Bug #1434633.
+
 2006-03-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (get_3ddata): Reorder code so that mutually exclusive
@@ -9,7 +14,7 @@
 	fix, but it's better than segfaulting. The true problem is that an
 	int_error() exit from expression parsing bypasses proper cleanup of
 	storage for string variables, and also fails to return NULL to the
-	caller.
+	caller.  Bug #1434633.
 
 2006-03-15  Daniel Sebald  <daniel.sebald@ieee.org>
 
