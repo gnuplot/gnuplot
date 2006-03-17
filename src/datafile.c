@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.102 2006/03/11 21:35:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.103 2006/03/15 23:40:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1260,13 +1260,14 @@ df_open(const char *cmd_filename, int max_using)
 	/* filename cannot be static array! */
 	gp_expand_tilde(&df_filename);
 #ifdef HAVE_SYS_STAT_H
-        struct stat statbuf;
-
-        if ((stat(df_filename, &statbuf) > -1) &&
-            !S_ISREG(statbuf.st_mode) && !S_ISFIFO(statbuf.st_mode)) {
-            os_error(name_token, "\"%s\" is not a regular file or pipe",
-                     df_filename);
-        }
+	{
+	    struct stat statbuf;
+	    if ((stat(df_filename, &statbuf) > -1) &&
+		!S_ISREG(statbuf.st_mode) && !S_ISFIFO(statbuf.st_mode)) {
+		os_error(name_token, "\"%s\" is not a regular file or pipe",
+			df_filename);
+	    }
+	}
 #endif /* HAVE_SYS_STAT_H */
 #ifdef BINARY_DATA_FILE
         if ((data_fp = loadpath_fopen(df_filename, df_binary_file ? "rb" : "r")) ==
