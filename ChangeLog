@@ -1,5 +1,8 @@
 2006-03-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/fit.c (splitpath): Reorder tests avoid possible read of
+	uninitialized memory.
+
 	* src/alloc.c (gp_alloc): Cast to (generic *)
 	(checked_free): Introduced new local variable to reduce number of
 	horrible casts.

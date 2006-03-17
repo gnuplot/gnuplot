@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.53 2005/08/12 17:42:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.54 2006/03/11 21:35:49 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -983,9 +983,9 @@ createdvar(char *varname, double value)
 static void
 splitpath(char *s, char *p, char *f)
 {
-    char *tmp;
-    tmp = s + strlen(s) - 1;
-    while (*tmp != '\\' && *tmp != '/' && *tmp != ':' && tmp - s >= 0)
+    char *tmp = s + strlen(s) - 1;
+
+    while (tmp >= s && *tmp != '\\' && *tmp != '/' && *tmp != ':')
 	tmp--;
     /* FIXME HBB 20010121: unsafe! Sizes of 'f' and 'p' are not known.
      * May write past buffer end. */
