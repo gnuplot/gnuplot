@@ -1,3 +1,10 @@
+2006-03-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/hidden3d.c (build_networks): Initialize lp_style from
+	lp_properties, regardless of whether the plot supposedly has point
+	symbols drawn or not.  Needed because PM3D drops stuff inside that
+	struct.
+
 2006-03-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/aquaterm.trm: Correction of misprints.

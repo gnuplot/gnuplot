@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.54 2005/12/06 15:00:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.55 2005/12/06 18:23:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1033,14 +1033,9 @@ build_networks(struct surface_points *plots, int pcount)
 	below = this_plot->lp_properties.l_type + hiddenBacksideLinetypeOffset;
 
 	/* calculate the point symbol type: */
-	if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
-	    /* Plot style contains point symbols */
-	    /* FIXME: would be easier if the p_style field of
-	     * lp_properties were always filled with a usable value
-	     * (i.e.: -1 if nothing to draw) It may also be clearer to
-	     * move this down, into the other switch structure.  */
-	    lp_style = &(this_plot->lp_properties);
-	}
+	/* Assumest hat upstream functions have made sure this is
+	 * initialized sensibly --- thou hast been warned */
+	lp_style = &(this_plot->lp_properties);
 
 	/* HBB 20000715: new initialization code block for non-grid
 	 * structured datasets. Sufficiently different from the rest
@@ -1078,7 +1073,7 @@ build_networks(struct surface_points *plots, int pcount)
 		for (i = 0; i < icrvs->p_count; i++) {
 		    long int thisvertex, basevertex;
 
-		    thisvertex = store_vertex(points+i, lp_style,
+		    thisvertex = store_vertex(points + i, lp_style,
 					      color_from_column);
 
 		    if (this_plot->plot_style == VECTOR) {
@@ -1152,7 +1147,7 @@ build_networks(struct surface_points *plots, int pcount)
 		long int e1, e2, e3;
 		long int pnum;
 
-		thisvertex = store_vertex(points+i, lp_style,
+		thisvertex = store_vertex(points + i, lp_style,
 					  color_from_column);
 
 		/* Preset the pointers to the polygons and edges
@@ -1465,9 +1460,7 @@ draw_vertex(p_vertex v)
     unsigned int x, y;
 
     TERMCOORD(v, x, y);
-    if (v->lp_style && v->lp_style->p_type >= 0
-    && !clip_point(x,y)) {
-
+    if (v->lp_style && v->lp_style->p_type >= 0 && !clip_point(x,y)) {
 	int colortype = v->lp_style->pm3d_color.type;
 
 #ifdef EAM_DATASTRINGS
