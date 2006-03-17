@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: alloc.c,v 1.10 2004/04/13 17:23:50 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: alloc.c,v 1.11 2004/07/01 17:10:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - alloc.c */
@@ -158,7 +158,8 @@ gp_alloc(size_t size, const char *usage)
     struct frame_struct *p;
     size_t total_size = size + RESERVED_SIZE + 1;
 
-    TRACE_ALLOC(("gp_alloc %d for %s\n", (int) size, usage ? usage : "<unknown>"));
+    TRACE_ALLOC(("gp_alloc %d for %s\n", (int) size,
+		 usage ? usage : "<unknown>"));
 
     p = malloc(total_size);
     if (!p)
@@ -168,7 +169,8 @@ gp_alloc(size_t size, const char *usage)
 
     mark(p, size, usage);
 
-    return (char *) (p + 1);
+    /* Cast possibly needed for K&R compilers */
+    return (generic *) (p + 1);
 }
 
 generic *
@@ -177,9 +179,9 @@ gp_realloc(generic *old, size_t size, const char *usage)
     if (!old)
 	return gp_alloc(size, usage);
     validate(old);
-    mark_free(old);		/* if block gets moved, old block is marked free */
-    /* if not, we'll remark it later */
-
+    /* if block gets moved, old block is marked free.  If not, we'll
+     * remark it later */
+    mark_free(old);		
 
     {
 	struct frame_struct *p = (struct frame_struct *) old - 1;
@@ -190,8 +192,8 @@ gp_realloc(generic *old, size_t size, const char *usage)
 	if (!p)
 	    int_error(NO_CARET, "Out of memory");
 
-	TRACE_ALLOC(("gp_realloc %d for %s (was %d)\n",
-		     (int) size, usage ? usage : "<unknown>", p->requested_size));
+	TRACE_ALLOC(("gp_realloc %d for %s (was %d)\n", (int) size,
+		     usage ? usage : "<unknown>", p->requested_size));
 
 	bytes_allocated += size - p->requested_size;
 
@@ -206,14 +208,16 @@ gp_realloc(generic *old, size_t size, const char *usage)
 void
 checked_free(generic *p)
 {
+    struct frame_struct *frame;
+
     validate(p);
     mark_free(p);		/* trap attempts to free twice */
+    frame = (struct frame_struct *) p - 1;
     TRACE_ALLOC(("free %d for %s\n",
-		 ((struct frame_struct *) p - 1)->requested_size,
-		 (((struct frame_struct *) p - 1)->use ? ((struct frame_struct *) p - 1)->use :
-		  "(NULL)")));
-    bytes_allocated -= ((struct frame_struct *) p - 1)->requested_size;
-    free((struct frame_struct *) p - 1);
+		 frame->requested_size,
+		 (frame->use ? frame->use : "(NULL)")));
+    bytes_allocated -= frame->requested_size;
+    free(frame);
 }
 
 
@@ -223,7 +227,8 @@ void
 start_leak_check(char *file, int line)
 {
     if (leak_frame >= leak_stack + 40) {
-	fprintf(stderr, "too many nested memory-leak checks - %s:%d\n", file, line);
+	fprintf(stderr, "too many nested memory-leak checks - %s:%d\n",
+		file, line);
 	return;
     }
     leak_frame->file = file;
@@ -241,7 +246,8 @@ end_leak_check(char *file, int line)
 	return;
     }
     if (leak_frame->allocated != bytes_allocated) {
-	fprintf(stderr, "net change of %+d heap bytes between %s:%d and %s:%d\n",
+	fprintf(stderr,
+		"net change of %+d heap bytes between %s:%d and %s:%d\n",
 		(int) (bytes_allocated - leak_frame->allocated),
 		leak_frame->file, leak_frame->line, file, line);
     }

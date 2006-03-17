@@ -1,5 +1,9 @@
 2006-03-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/alloc.c (gp_alloc): Cast to (generic *)
+	(checked_free): Introduced new local variable to reduce number of
+	horrible casts.
+
 	* src/hidden3d.c (build_networks): Initialize lp_style from
 	lp_properties, regardless of whether the plot supposedly has point
 	symbols drawn or not.  Needed because PM3D drops stuff inside that
