@@ -1,3 +1,9 @@
+2006-03-17  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/gplt_x11.c (exec_cmd): Realigned conditional code to allow
+	compilation with ./configure --with-image --disable-binary-x11-polygon.
+	Fix conditional test associated whith ./configure --disable-with-image.
+
 2006-03-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/fit.c (splitpath): Reorder tests avoid possible read of

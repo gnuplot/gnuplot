@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.155 2006/02/11 23:58:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.156 2006/02/21 09:22:04 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1999,7 +1999,7 @@ exec_cmd(plot_struct *plot, char *command)
     if (*buffer == X11_GR_IMAGE)
 #endif
 #ifdef BINARY_X11_POLYGON
-    if (*buffer != X11_GR_FILLED_POLYGON && *buffer != X11_GR_SET_COLOR)
+    if (*buffer == X11_GR_FILLED_POLYGON && *buffer == X11_GR_SET_COLOR)
 #endif
 #endif
 #if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
@@ -2466,13 +2466,13 @@ exec_cmd(plot_struct *plot, char *command)
 	    /* This command will fit within a single buffer so it doesn't
 	     * need to be so elaborate.
 	     */
-            unsigned char *iptr;
+	    unsigned char *iptr;
 	    float gray;
 	    unsigned i_remaining;
 	    char *bptr;
 	    TBOOLEAN code_detected = 0;
 
-            iptr = (unsigned char *) &gray;
+	    iptr = (unsigned char *) &gray;
 	    i_remaining = sizeof(gray);
 
 	    /* Decode and reconstruct the data. */
@@ -2500,6 +2500,7 @@ exec_cmd(plot_struct *plot, char *command)
 
 	    PaletteSetColor(plot, (double)gray);
 	    current_gc = &gc;
+#endif
 	}
     } else if (*buffer == X11_GR_FILLED_POLYGON) {	/* filled polygon */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
@@ -2723,7 +2724,6 @@ exec_cmd(plot_struct *plot, char *command)
 	}
 
     }
-#endif
 #ifdef WITH_IMAGE
     else if (*buffer == X11_GR_IMAGE) {	/* image */
 
