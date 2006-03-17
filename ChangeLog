@@ -1,3 +1,7 @@
+2006-03-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/aquaterm.trm: Correction of misprints.
+
 2006-03-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_tic_prop): Another bandaid to protect against

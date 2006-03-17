@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.19 2005/11/10 22:03:50 persquare Exp $
+ * $Id: aquaterm.trm,v 1.20 2006/02/28 17:50:38 persquare Exp $
  *
  */
 
@@ -866,7 +866,7 @@ START_HELP(aqua)
 " The aqua terminal support enhanced text mode (see `enhanced`), except for",
 " overprint. Font support is limited to the fonts available on the system.",
 " Character encoding can be selected by `set encoding` and currently supports",
-" iso_latin_1, iso_latin2, and cp1250 with iso_latin_1 being the dafault."  
+" iso_latin_1, iso_latin_2, and cp1250 with iso_latin_1 being the default."  
 END_HELP(aqua)
 #endif /* TERM_HELP */
 
