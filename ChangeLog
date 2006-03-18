@@ -1,3 +1,21 @@
+2006-03-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Daniel Sebald has pointed out that when the same plot is being redrawn
+	repeatedly, for instance during interactive rotation of 3D plots, the
+	process is noticibly slowed by resending the color palette on each 
+	refresh. The following set of changes insures that the palette is only
+	sent if something has changed.
+
+	* src/color.c (make_palette): Do not call term->make_palette() unless
+	either (a) the palette has changes, (b) the terminal has changed, or
+	(c) the output device has changed.  New routine invalidate_palette()
+	is available to signal that one of these conditions has occurred.
+
+	* src/set.c (set_output set_palette set_palette_defined):
+	Call invalidate_palette().  Also fix a memory leak.
+
+	* src/term.c (change_term): Call invalidate_palette().
+
 2006-03-17  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/gplt_x11.c (exec_cmd): Realigned conditional code to allow

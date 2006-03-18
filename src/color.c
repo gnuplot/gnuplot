@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.62 2006/01/20 06:18:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.63 2006/02/20 05:09:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -36,7 +36,18 @@ static char *RCSid() { return RCSid("$Id: color.c,v 1.62 2006/01/20 06:18:40 sfe
 #include "alloc.h"
 
 /* COLOUR MODES - GLOBAL VARIABLES */
+
 t_sm_palette sm_palette;  /* initialized in init_color() */
+
+/* Copy of palette previously in use.
+ * Exported so that change_term() can invalidate contents
+ * FIXME: better naming 
+ */
+static t_sm_palette prev_palette = {
+	-1, -1, -1, -1, -1, -1, -1, -1,
+	(rgb_color *) 0, -1
+    };
+
 
 #ifdef EXTENDED_COLOR_SPECS
 int supply_extended_color_specs = 0;
@@ -92,13 +103,6 @@ make_palette()
     int i;
     double gray;
 
-    /* this is simpy for deciding, if we print
-     * a message after allocating new colors */
-    static t_sm_palette save_pal = {
-	-1, -1, -1, -1, -1, -1, -1, -1,
-	(rgb_color *) 0, -1
-    };
-
 #if 0
     GIF_show_current_palette();
 #endif
@@ -115,7 +119,13 @@ make_palette()
 	   It will not change palette passed below, but non-NULL has to be
 	   passed there to create the header or force its initialization
 	 */
-	term->make_palette(&sm_palette);
+
+	if (memcmp(&prev_palette, &sm_palette, sizeof(t_sm_palette))) {
+	    term->make_palette(&sm_palette);
+	    prev_palette = sm_palette;
+	    FPRINTF(("make_palette: calling term->make_palette for term with ncolors == 0\n"));
+	} else
+	    FPRINTF(("make_palette: skipping duplicate palette for term with ncolors == 0\n"));
 	return 0;
     }
 
@@ -124,20 +134,20 @@ make_palette()
     if (sm_palette.use_maxcolors > 0 && i > sm_palette.use_maxcolors)
 	sm_palette.colors = sm_palette.use_maxcolors;
 
-    if (save_pal.colorFormulae < 0
-	|| sm_palette.colorFormulae != save_pal.colorFormulae
-	|| sm_palette.colorMode != save_pal.colorMode
-	|| sm_palette.formulaR != save_pal.formulaR
-	|| sm_palette.formulaG != save_pal.formulaG
-	|| sm_palette.formulaB != save_pal.formulaB
-	|| sm_palette.positive != save_pal.positive
-	|| sm_palette.colors != save_pal.colors) {
+    if (prev_palette.colorFormulae < 0
+	|| sm_palette.colorFormulae != prev_palette.colorFormulae
+	|| sm_palette.colorMode != prev_palette.colorMode
+	|| sm_palette.formulaR != prev_palette.formulaR
+	|| sm_palette.formulaG != prev_palette.formulaG
+	|| sm_palette.formulaB != prev_palette.formulaB
+	|| sm_palette.positive != prev_palette.positive
+	|| sm_palette.colors != prev_palette.colors) {
 	/* print the message only if colors have changed */
 	if (interactive)
 	fprintf(stderr, "smooth palette in %s: available %i color positions; using %i of them\n", term->name, i, sm_palette.colors);
     }
 
-    save_pal = sm_palette;
+    prev_palette = sm_palette;
 
     if (sm_palette.color != NULL) {
 	free(sm_palette.color);
@@ -162,6 +172,15 @@ make_palette()
     return 0;
 }
 
+/*
+ * Force a mismatch between the current palette and whatever is sent next,
+ * so that the new one will always be loaded 
+ */
+void
+invalidate_palette()
+{
+    prev_palette.colors = -1;
+}
 
 /*
    Set the colour on the terminal

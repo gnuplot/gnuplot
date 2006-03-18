@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.344 2006/02/23 19:49:58 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.345 2006/02/27 07:09:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7585,7 +7585,7 @@ C ... and restart the table:
  To produce a blue yellow red palette use (all equivalent):
        set palette defined ( 0 "blue", 1 "yellow", 2 "red" )
        set palette defined ( 0 0 0 1, 1 1 1 0, 2 1 0 0 )
-       set palette defined ( 0 "#0000ff", 1 "#ffff00", 2 "ff0000" )
+       set palette defined ( 0 "#0000ff", 1 "#ffff00", 2 "#ff0000" )
 
  To produce some rainbow-like palette use:
        set palette defined ( 0 "blue", 3 "green", 6 "yellow", 10 "red" )

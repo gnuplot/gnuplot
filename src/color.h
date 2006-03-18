@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.24 2005/08/22 16:37:06 sfeam Exp $
+ * $Id: color.h,v 1.25 2006/01/20 06:18:40 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -211,6 +211,8 @@ void init_color __PROTO((void));  /* call once to initialize variables */
   Put number of allocated colours into sm_palette.colors
 */
 int make_palette __PROTO((void));
+
+void invalidate_palette __PROTO((void));
 
 /*
    Set the colour on the terminal

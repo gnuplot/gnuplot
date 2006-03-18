@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.221 2006/03/16 01:05:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.222 2006/03/16 17:27:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2351,6 +2351,10 @@ set_output()
 	/* if we get here then it worked, and outstr now = testfile */
     } else
 	int_error(c_token, "expecting filename");
+
+    /* Invalidate previous palette */
+    invalidate_palette();
+	
 }
 
 
@@ -2415,7 +2419,10 @@ reset_palette()
     sm_palette.ps_allcF = 0;
     sm_palette.use_maxcolors = 0;
     sm_palette.gradient_num = 0;
+    free(sm_palette.gradient);
     sm_palette.gradient = NULL;
+    free(sm_palette.color);
+    sm_palette.color = NULL;
     sm_palette.cmodel = C_MODEL_RGB;
     sm_palette.gamma = 1.5;
     pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
@@ -2442,11 +2449,11 @@ set_palette_defined()
     int num, named_colors=0;
     int actual_size=8;
 
-    if (sm_palette.gradient) {
-	free( sm_palette.gradient );
-    }
-    sm_palette.gradient = (gradient_struct*)
-      gp_alloc( actual_size*sizeof(gradient_struct), "pm3d gradient" );
+    /* Invalidate previous gradient */
+    invalidate_palette();
+
+    free( sm_palette.gradient );
+    sm_palette.gradient = gp_alloc( actual_size*sizeof(gradient_struct), "pm3d gradient" );
 
     if (END_OF_COMMAND) {
 	/* lets use some default gradient */
@@ -2523,8 +2530,7 @@ set_palette_defined()
 	if ( num >= actual_size ) {
 	    /* get more space for the gradient */
 	    actual_size += 10;
-	    sm_palette.gradient = (gradient_struct*)
-	      gp_realloc( sm_palette.gradient,
+	    sm_palette.gradient = gp_realloc( sm_palette.gradient,
 			  actual_size*sizeof(gradient_struct),
 			  "pm3d gradient" );
 	}
@@ -2578,7 +2584,7 @@ set_palette_file()
 	sm_palette.gradient = 0;
     }
     actual_size = 10;
-    sm_palette.gradient = (gradient_struct*)
+    sm_palette.gradient =
       gp_alloc( actual_size*sizeof(gradient_struct), "gradient" );
 
     i = 0;
@@ -2868,6 +2874,9 @@ set_palette()
     if (named_color && sm_palette.cmodel != C_MODEL_RGB && interactive)
 	int_warn(NO_CARET,
 		 "Named colors will produce strange results if not in color mode RGB." );
+
+    /* Invalidate previous palette */
+    invalidate_palette();
 }
 
 #undef CHECK_TRANSFORM
