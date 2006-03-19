@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.177 2006/02/20 05:09:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.178 2006/03/11 21:35:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -344,8 +344,9 @@ boundary(struct curve_points *plots, int count)
 #ifdef GP_ENH_EST
     /* This should go *inside* label_width(), but it messes up the key title */
     /* Imperfect check for subscripts */
-    if (term->flags & TERM_ENHANCED_TEXT)
-	if (strchr(axis_array[FIRST_X_AXIS].label.text,'_'))
+    if ((term->flags & TERM_ENHANCED_TEXT)
+        && axis_array[FIRST_X_AXIS].label.text
+	&& strchr(axis_array[FIRST_X_AXIS].label.text, '_'))
 	    xlablin++;
 #endif
     if (axis_array[SECOND_X_AXIS].label.text)

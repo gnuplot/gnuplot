@@ -1,3 +1,8 @@
+2006-03-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graphics.c (boundary): Avoid strchr() on NULL x axis label
+	text.
+
 2006-03-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Daniel Sebald has pointed out that when the same plot is being redrawn
