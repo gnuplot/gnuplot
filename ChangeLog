@@ -1,3 +1,12 @@
+2006-03-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/unset.c (unset_axislabel): Fix memory leak from failure to
+	free axis labels.
+
+2006-03-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+        * src/gplt_x11.c (handle_selection_event): Fix typo in debug code.
+
 2006-03-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (boundary): Avoid strchr() on NULL x axis label

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.156 2006/02/21 09:22:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.157 2006/03/17 23:41:40 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -5964,7 +5964,7 @@ handle_selection_event(XEvent *event)
 		exported_plot = NULL;
 	    } else if (reply.xselection.target == XA_TIMESTAMP) {
 
-		FPRINTF((stderr, "timestamp request from %d : %ld\n", i
+		FPRINTF((stderr, "timestamp request from %d : %ld\n",
 			reply.xselection.requestor, export_time));
 
 		XChangeProperty(dpy, reply.xselection.requestor,
