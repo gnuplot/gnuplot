@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.74 2005/11/27 18:31:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.75 2006/02/26 05:44:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -827,6 +827,13 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		lp->l_width = real(const_express(&t));
 		if (lp->l_width < 0)
 		    lp->l_width = 0;
+		continue;
+	    }
+
+	    if (equals(c_token,"bgnd")) {
+		lp->l_type = LT_BACKGROUND;
+		lp->use_palette = 0;
+		c_token++;
 		continue;
 	    }
 

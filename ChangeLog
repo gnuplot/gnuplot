@@ -1,3 +1,7 @@
+2006-03-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lp_parse): Allow "bgnd" as shorthand for "lt -3".
+
 2006-03-23  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* demo/pm3dcolors.dem: Make one example more happy.
