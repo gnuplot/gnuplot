@@ -158,6 +158,9 @@ fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, LT_UNDEFINED } ;
 filledcurves_opts filledcurves_opts_data = EMPTY_FILLEDCURVES_OPTS;
 filledcurves_opts filledcurves_opts_func = EMPTY_FILLEDCURVES_OPTS;
 
+/* Prefer line styles over plain line types */
+TBOOLEAN prefer_line_styles = FALSE;
+
 #ifdef EAM_HISTOGRAMS
 histogram_style histogram_opts = DEFAULT_HISTOGRAM_STYLE;
 #endif

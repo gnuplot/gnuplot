@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.172 2006/02/20 05:09:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.173 2006/02/27 07:09:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -122,6 +122,7 @@ static void show_isosamples __PROTO((void));
 static void show_view __PROTO((void));
 static void show_surface __PROTO((void));
 static void show_hidden3d __PROTO((void));
+static void show_increment __PROTO((void));
 #ifdef EAM_HISTOGRAMS
 static void show_histogram __PROTO((void));
 #endif
@@ -1371,6 +1372,10 @@ show_style()
 	show_fillstyle();
 	c_token++;
 	break;
+    case SHOW_STYLE_INCREMENT:
+	show_increment();
+	c_token++;
+	break;
 #ifdef EAM_HISTOGRAMS
     case SHOW_STYLE_HISTOGRAM:
 	show_histogram();
@@ -1388,6 +1393,7 @@ show_style()
 	show_styles("Functions", func_style);
 	show_linestyle(0);
 	show_fillstyle();
+	show_increment();
 #ifdef EAM_HISTOGRAMS
 	show_histogram();
 #endif
@@ -2377,6 +2383,16 @@ show_hidden3d()
 	    hidden3d ? "removed" : "drawn");
     show_hidden3doptions();
 #endif /* LITE */
+}
+
+static void
+show_increment()
+{
+    fprintf(stderr,"\tPlot lines increment over ");
+    if (prefer_line_styles)
+	fprintf(stderr, "user-defined line styles rather than default line types\n");
+    else
+	fprintf(stderr, "default linetypes\n");
 }
 
 #ifdef EAM_HISTOGRAMS

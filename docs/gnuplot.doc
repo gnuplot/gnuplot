@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.345 2006/02/27 07:09:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.346 2006/03/18 19:03:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8106,6 +8106,34 @@ C ... and restart the table:
  See `plotting styles` for the choices.  If no choice is given, the choices are
  listed.  `show style function` shows the current default function plotting
  style.
+4 set style increment
+?commands set style increment
+?commands show style increment
+?set style increment
+?show style increment
+ Syntax:
+       set style increment {default|userstyles}
+       show style increment
+
+ By default, successive plots within the same graph will use successive
+ linetypes from the default set for the current terminal type.
+ However, choosing `set style increment user` allows you to step through
+ the user-defined line styles rather than through the default linetypes.
+
+ Example:
+
+       set style line 1 lw 2 lc rgb "gold"
+       set style line 2 lw 2 lc rgb "purple"
+       set style line 4 lw 1 lc rgb "sea-green"
+       set style increment user
+
+       plot f1(x), f2(x), f3(x), f4(x)
+
+ should plot functions f1, f2, f4 in your 3 newly defined line styles.
+ If a user-defined line style is not found then the corresponding default
+ linetype is used instead.  E.g. in the example above, f3(x) will be plotted
+ using the default linetype 3.
+
 4 set style line
 ?commands set style line
 ?commands unset style line
@@ -8146,8 +8174,9 @@ C ... and restart the table:
  The defaults for the line and point types is the index.  The defaults for
  the width and size are both unity.
 
- Linestyles created by this mechanism do not replace the default styles;
- both may be used.
+ Linestyles created by this mechanism do not replace the default linetype
+ styles; both may be used.  If you want plots to use the defined styles in
+ preference to the default linetypes, please see `set style increment`.
 
  Not all terminals support the `linewidth` and `pointsize` features; if
  not supported, the option will be ignored.

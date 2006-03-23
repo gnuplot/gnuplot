@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.75 2006/02/26 05:44:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.76 2006/03/23 21:48:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -737,7 +737,7 @@ lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
     }
 
     /* tag not found: */
-    int_error(NO_CARET, "linestyle not found", NO_CARET);
+    int_warn(NO_CARET, "linestyle not found", NO_CARET);
 }
 
 

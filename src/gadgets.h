@@ -377,6 +377,9 @@ extern fill_style_type default_fillstyle;
 extern filledcurves_opts filledcurves_opts_data;
 extern filledcurves_opts filledcurves_opts_func;
 
+/* Prefer line styles over plain line types */
+extern TBOOLEAN prefer_line_styles;
+
 #ifdef EAM_HISTOGRAMS
 extern histogram_style histogram_opts;
 #endif

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.222 2006/03/16 17:27:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.223 2006/03/18 19:03:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3293,6 +3293,14 @@ set_style()
 	parse_histogramstyle(&histogram_opts,HT_CLUSTERED,histogram_opts.gap);
 	break;
 #endif
+    case SHOW_STYLE_INCREMENT:
+	c_token++;
+	if (END_OF_COMMAND || almost_equals(c_token,"def$ault"))
+	    prefer_line_styles = FALSE;
+	else if (almost_equals(c_token,"u$serstyles"))
+	    prefer_line_styles = TRUE;
+	c_token++;
+	break;
     default:
 	int_error(c_token,
 		  "expecting 'data', 'function', 'line', 'fill' or 'arrow'" );

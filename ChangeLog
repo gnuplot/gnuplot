@@ -1,5 +1,25 @@
 2006-03-23  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* docs/gnuplot.doc: New option "set style increment {user|default}"
+
+	By default, successive plots within the same graph will use successive
+	linetypes from the default set for the current terminal type.
+	However, choosing the "user" option allows you to step through 
+	user-defined linestyles rather than through the default line types.
+
+	* src/gadgets.c src/gadgets.h: Global flag TBOOLEAN prefer_line_styles.
+
+	* src/save.c src/set.c src/show.c src/tables.c src/tables.h:
+	Save/set/show preference for line styles rather than linetypes.
+
+	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots):
+	If (prefer_lines_styles) then autoincrement successive plots by line
+	style rather than linetype.
+
+	* src/misc.c: Missing line style is non-fatal error.
+
+2006-03-23  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/misc.c (lp_parse): Allow "bgnd" as shorthand for "lt -3".
 
 2006-03-23  Daniel Sebald  <daniel.sebald@ieee.org>
