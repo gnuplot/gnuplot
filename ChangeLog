@@ -1,3 +1,7 @@
+2006-03-23  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* demo/pm3dcolors.dem: Make one example more happy.
+
 2006-03-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c (unset_axislabel): Fix memory leak from failure to
@@ -5,7 +9,7 @@
 
 2006-03-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-        * src/gplt_x11.c (handle_selection_event): Fix typo in debug code.
+	* src/gplt_x11.c (handle_selection_event): Fix typo in debug code.
 
 2006-03-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
