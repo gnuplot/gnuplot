@@ -1,5 +1,21 @@
 2006-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* configure.in term/Makefile.am.in term/PostScript/*.ps
+	term/post (PS_common_init PS_dump_prologue_file):
+
+	Install and maintain PostScript prologue and character encoding files
+	in a separate directory, external to the gnuplot executable.  This
+	removes a large chunk of text from the postscript driver, and allows
+	local customization, editing, or patching of the postscript 
+	configuration.  The directory in which these files are stored is taken
+	from config.h:  #define GNUPLOT_PS_DIR
+	but may be replaced at runtime by an environmental variable of the same
+	name, or by a "set loadpath" command inside gnuplot.
+	This change should result in no change to the postscript files output
+	by gnuplot.
+
+2006-03-24  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/datafile.h src/datafile.c: Allow an input field expected to be
 	a time format to be in quotes. Previously anything in quotes was
 	assumed to be invalid as a numerical value.
