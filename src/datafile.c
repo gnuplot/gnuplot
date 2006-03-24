@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.104 2006/03/17 10:04:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.105 2006/03/24 16:23:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -66,9 +66,6 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.104 2006/03/17 10:04:30
  * of 2d/3d. I really dont want to have to pass a flag to
  * this is plot or splot.
  *
- * use a global array df_timecol[] - cleared by df_open, then
- * columns needing time set by client.
- *
  * Now that df_2dbinary() and df_3dbinary() are here, I am seriously
  * tempted to move get_data() and get_3ddata() in here too
  *
@@ -80,7 +77,6 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.104 2006/03/17 10:04:30
  *    TBOOLEAN df_binary  - it's a binary file
  *        [ might change this to return value from df_open() ]
  *    int df_eof          - end of file
- *    int df_timecol[]    - client controls which cols read as time
  *
  * functions
  *   int df_open(char *file_name, int max_using)
@@ -313,8 +309,6 @@ static int column_for_key_title = NO_COLUMN_HEADER;
 static TBOOLEAN key_title_auto_col = FALSE;
 static char df_key_title[MAX_TOKEN_LENGTH];     /* filled in from <col> in 1st row by df_tokenise */
 #endif
-
-/* columns needing timefmt are passed in df_timecol[] after df_open */
 
 #ifdef BINARY_DATA_FILE
 

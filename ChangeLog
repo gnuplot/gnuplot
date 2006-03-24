@@ -1,5 +1,9 @@
 2006-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/datafile.c: Remove vestigial comments about df_timecol[].
+
+2006-03-24  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* configure.in term/Makefile.am.in term/PostScript/*.ps
 	term/post.trm (PS_common_init PS_dump_prologue_file):
 
