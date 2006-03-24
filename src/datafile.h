@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.18 2005/07/16 21:01:39 sfeam Exp $
+ * $Id: datafile.h,v 1.19 2005/07/25 17:32:04 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -50,10 +50,9 @@
 #define DF_FIRST_BLANK  (-3)
 #define DF_SECOND_BLANK (-4)
 #define DF_MISSING      (-5)
-#ifdef EAM_DATASTRINGS
 #define DF_FOUND_KEY_TITLE   (-6)
 #define DF_KEY_TITLE_MISSING (-7)
-#endif
+#define DF_STRINGDATA	(-8)
 #ifdef EAM_HISTOGRAMS
 /* should really be a parameter to df_readline rather than a global */
 extern struct curve_points *df_current_plot;

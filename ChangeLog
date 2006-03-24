@@ -1,3 +1,9 @@
+2006-03-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.h src/datafile.c: Allow an input field expected to be
+	a time format to be in quotes. Previously anything in quotes was
+	assumed to be invalid as a numerical value.
+
 2006-03-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: New option "set style increment {user|default}"
