@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.63 2006/02/20 05:09:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.64 2006/03/18 19:03:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -511,7 +511,10 @@ draw_color_smooth_box(int plot_mode)
 	    cb_y_to = ytemp;
 	} else if (splot_map && is_3d_plot) {
 	    /* In map view mode we allow any coordinate system for placement */
-	    map3d_position(&color_box.origin, &cb_x_from, &cb_y_from, "cbox");
+	    double xtemp, ytemp;
+	    map3d_position_double(&color_box.origin, &xtemp, &ytemp, "cbox");
+	    cb_x_from = xtemp;
+	    cb_y_from = ytemp;
 	    map3d_position_r(&color_box.size, &cb_x_to, &cb_y_to, "cbox");
 	} else {
 	    /* But in full 3D mode we only allow screen coordinates */

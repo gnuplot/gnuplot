@@ -6,6 +6,12 @@
 
 	* term/PostScript/prologue.ps: Add a shorthand for closepath.
 
+	* src/graph3d.c src/graph3d.h: New routine map3d_position_double() will
+	be used by "set object" code.
+
+	* src/color.c (draw_color_smooth_box): Use new routine
+	map3d_position_double to avoid a mismatch of parameter types.
+
 2006-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: Remove vestigial comments about df_timecol[].

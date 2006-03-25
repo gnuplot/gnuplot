@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.147 2006/02/26 07:10:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.148 2006/03/17 15:36:26 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2787,29 +2787,39 @@ map3d_getposition(
     return (screen_coords || char_coords);
 }
 
+/*
+ * map3d_position()  wrapper for map3d_position_double
+ */
 void
 map3d_position(
     struct position *pos,
     int *x, int *y,
     const char *what)
 {
+    double xx, yy;
+
+    map3d_position_double(pos, &xx, &yy, what);
+    *x = xx;
+    *y = yy;
+}
+
+void
+map3d_position_double(
+    struct position *pos,
+    double *x, double *y,
+    const char *what)
+{
     double xpos = pos->x;
     double ypos = pos->y;
     double zpos = pos->z;
 
-
     if (map3d_getposition(pos, what, &xpos, &ypos, &zpos) == 0) {
-	double xx, yy;
-	map3d_xy_double(xpos, ypos, zpos, &xx, &yy);
-	*x = xx;
-	*y = yy;
+	map3d_xy_double(xpos, ypos, zpos, x, y);
     } else {
 	/* Screen or character coordinates */
 	*x = xpos;
 	*y = ypos;
     }
-
-    return;
 }
 
 void
