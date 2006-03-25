@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.93 2006/03/11 22:11:44 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.94 2006/03/23 07:14:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -556,7 +556,7 @@ unset_arrow()
 	/* get tag */
 	tag = (int) real(const_express(&a));
 	if (!END_OF_COMMAND)
-	    int_error(c_token, "extraneous arguments to set noarrow");
+	    int_error(c_token, "extraneous arguments to unset arrow");
 	for (this_arrow = first_arrow, prev_arrow = NULL;
 	     this_arrow != NULL;
 	     prev_arrow = this_arrow, this_arrow = this_arrow->next) {
@@ -907,7 +907,7 @@ unset_label()
 	/* get tag */
 	tag = (int) real(const_express(&a));
 	if (!END_OF_COMMAND)
-	    int_error(c_token, "extraneous arguments to set nolabel");
+	    int_error(c_token, "extraneous arguments to unset label");
 	for (this_label = first_label, prev_label = NULL;
 	     this_label != NULL;
 	     prev_label = this_label, this_label = this_label->next) {
@@ -1400,7 +1400,7 @@ unset_timefmt()
 }
 
 
-/* process 'unset notimestamp' command */
+/* process 'unset timestamp' command */
 static void
 unset_timestamp()
 {

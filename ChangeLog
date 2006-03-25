@@ -12,6 +12,9 @@
 	* src/color.c (draw_color_smooth_box): Use new routine
 	map3d_position_double to avoid a mismatch of parameter types.
 
+	* src/unset.c: Replace "set no<foo>" with "unset <foo>" in comments and
+	error messages; i.e. make them match current syntax.
+
 2006-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: Remove vestigial comments about df_timecol[].
