@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.148 2006/03/17 15:36:26 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.149 2006/03/26 05:08:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -614,6 +614,10 @@ do_3dplot(
     yscale3d = 2.0 / (Y_AXIS.max - Y_AXIS.min);
     xscale3d = 2.0 / (X_AXIS.max - X_AXIS.min);
 
+    /* Give a chance for rectangles to be behind everything else */
+    if (splot_map)
+	place_rectangles( first_object, -1, NULL );
+
     term_apply_lp_properties(&border_lp);	/* border linetype */
 
     /* must come before using draw_3d_graphbox() the first time */
@@ -717,6 +721,10 @@ do_3dplot(
 		write_multiline(x, y, str, LEFT, JUST_TOP, 0, timelabel.font);
 	}
     }
+
+    /* Add 'back' rectangles */
+    if (splot_map)
+	place_rectangles(first_object, 0, &clip_splot_map);
 
     /* PLACE LABELS */
     place_labels3d(first_label, 0);
@@ -1273,6 +1281,10 @@ do_3dplot(
 	draw_3d_graphbox(plots, pcount, FRONTGRID);
 
 #endif /* USE_GRID_LAYERS */
+
+    /* Add 'front' rectangles */
+    if (splot_map)
+	place_rectangles(first_object, 1, &clip_splot_map);
 
     /* PLACE LABELS */
     place_labels3d(first_label, 1);

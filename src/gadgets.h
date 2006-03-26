@@ -105,6 +105,29 @@ typedef struct arrow_def {
     struct arrow_style_type arrow_properties;
 } arrow_def;
 
+#ifdef EAM_OBJECTS
+/* The only object type supported so far is OBJ_RECTANGLE */
+typedef struct rectangle {
+    int type;			/* 0 = corners;  1 = center + size */
+    t_position bl;		/* bottom left */
+    t_position tr;		/* top right */
+    t_position center;		/* center */
+    t_position extent;		/* width and height */
+} t_rectangle;
+
+/* Datastructure for 'set object' */
+typedef struct object {
+    struct object *next;
+    int tag;
+    int layer;			/* behind or back or front */
+    int object_type;	/* OBJ_RECTANGLE */
+    fill_style_type fillstyle;
+    lp_style_type lp_properties;
+    union o {t_rectangle rectangle;} o;
+} t_object;
+#define OBJ_RECTANGLE (1)
+#endif
+
 /* Datastructure implementing 'set style line' */
 struct linestyle_def {
     struct linestyle_def *next;	/* pointer to next linestyle in linked list */
@@ -296,6 +319,10 @@ extern struct linestyle_def *first_linestyle;
 
 extern struct arrowstyle_def *first_arrowstyle;
 
+#ifdef EAM_OBJECTS
+extern struct object *first_object;
+#endif
+
 extern text_label title;
 
 extern text_label timelabel;
@@ -372,6 +399,14 @@ void apply_pm3dcolor __PROTO((struct t_colorspec *tc, const struct termentry *t)
 void reset_textcolor __PROTO((const struct t_colorspec *tc, const struct termentry *t));
 
 extern fill_style_type default_fillstyle;
+
+#ifdef EAM_OBJECTS
+extern struct object default_rectangle;
+#define DEFAULT_RECTANGLE_STYLE { NULL, -1, 0, OBJ_RECTANGLE,	\
+	{FS_SOLID, 100, 0, LT_BLACK},   			\
+	{1, LT_BACKGROUND, 0, 1.0, 0.0},			\
+	{{0, {0,0.,0.,0.}, {0,0.,0.,0.}, {0,0.,0.,0.}, {0,0.,0.,0.}}} }
+#endif
 
 /* filledcurves style options set by 'set style [data|func] filledcurves opts' */
 extern filledcurves_opts filledcurves_opts_data;

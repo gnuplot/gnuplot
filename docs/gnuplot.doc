@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.346 2006/03/18 19:03:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.347 2006/03/23 22:16:30 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -206,6 +206,14 @@ C
 
 4 Vectors
  See `vectors`.
+
+3 New plot elements
+
+4 Explicit RGB colors can be specified for all plot elements
+ See `colorspec`.
+
+4 Rectangles with desired fill and border can be placed anywhere in 2D
+ See `set object rectangle`
 
 3 String handling
 4 String and text data read from datafiles
@@ -531,9 +539,9 @@ C
  data files.
 2 Coordinates
 ?coordinates
- The commands `set arrow`, `set key`, and `set label` allow you to draw
- something at an arbitrary position on the graph.  This position is specified
- by the syntax:
+ The commands `set arrow`, `set key`, `set label` and `set object` allow you
+ to draw something at an arbitrary position on the graph.  This position is
+ specified by the syntax:
 
        {<system>} <x>, {<system>} <y> {,{<system>} <z>}
 
@@ -7832,6 +7840,65 @@ C ... and restart the table:
  "-" means <STDOUT>. The `append` flag causes the file to be opened in append
  mode.  A <filename> starting with "|" is opened as a pipe to the
  <shell_command> on platforms that support piping.
+3 object
+?object
+?rectangle
+?commands set object
+?commands show object
+?commands set object rectangle
+?commands show object rectangle
+?set object
+?show object
+?set object rectangle
+?show object rectangle
+ This command defines a single object, which will appear in all subsequent
+ 2D plots. You may define as many objects as you like. Currently the only
+ object type supported is `rectangle`.
+ Each rectangle is specified by a pair of points that define diagonal vertices.
+ A default set of style properties (fill, color, border) are inherited from
+ those set by the command `set style rectangle`, but each rectangle can also be
+ given individual style properties.
+
+ Syntax:
+     set object <index> rectangle
+         {from <position> {to|rto} <position> |
+          center <position> size <w>,<h> |
+          at <position> size <w>,<h>}
+         {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
+         {default} {lw|linewidth <width>}
+
+ The position of the rectangle may be specified by giving the position of two
+ diagonal corners (bottom left and top right) or by giving the position of the
+ center followed by the width and the height.  In either case the positions
+ may be given in axis, graph, or screen coordinates. See `coordinates`.
+ The options `at` and `center` are synonyms.
+
+ Setting `front` will draw the rectangle in front of all plot elements, but
+ behind any labels that are also marked `front`. Setting `back` will place the
+ rectangle behind all plot curves and labels. Setting `behind` will place the
+ rectangle behind everything including the axes and `back` rectangles, and can
+ be used to provide a colored background for the entire graph or page.
+
+ The fill color of the rectangle is taken from the <colorspec>. `fillcolor`
+ may be abbreviated `fc`.  The fill style is taken from <fillstyle>.
+ See `colorspec` and `fillstyle`.  If the keyword `default` is given,
+ these properties are inherited from the default settings of at the time a plot
+ is drawn. See `set style rectangle`.
+
+ Examples:
+     # Force the entire area enclosed by the axes to have background color cyan
+     set object 1 rect from graph 0, graph 0 to graph 1, graph 1 back
+     set object 1 rect fc rgb "cyan" fillstyle solid 1.0
+
+     # Position a red square with lower left at 0,0 and upper right at 2,3
+     set object 2 rect from 0,0 to 2,3 fc lt 1
+
+     # Position an empty rectangle (no fill) with a blue border
+     set object 3 rect from 0,0 to 2,3 fs empty border 3
+
+     # Return fill and color to the default style but leave vertices unchanged
+     set object 2 rect default
+
 3 rmargin
 ?commands set rmargin
 ?set rmargin
@@ -8278,6 +8345,31 @@ C ... and restart the table:
 
  For more information about error bars with and without lines,
  please see `plot errorlines` and `plot errorbars`.
+
+4 set style rectangle
+?commands set style rectangle
+?commands unset style rectangle
+?commands show style rectangle
+?set style rectangle
+?unset style rectangle
+?show style rectangle
+
+ Rectangles defined with the `set object rectangle` command can have individual
+ styles. However, if a rectangle is not assigned a private style then it
+ inherits a default that is taken from the `set style rectangle` command.
+
+ Syntax:
+     set style rectangle {front|back} {fillcolor <colorspec>} {fs <fillstyle>}
+                         {lw|linewidth <lw>}
+ 
+ See `colorspec` and `fillstyle`.  `fillcolor` may be abbreviated as `fc`.
+
+ Examples:
+     set style rectangle back fc rgb "white" fs solid 1.0 border -1
+     set style rectangle fc linsestyle 3 fs pattern 2 noborder
+
+ The default values correspond to solid fill with the background color and a
+ black border.
 
 5 boxerrorbars
 ?commands set style boxerrorbars

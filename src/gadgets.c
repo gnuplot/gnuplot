@@ -101,6 +101,11 @@ struct arrowstyle_def *first_arrowstyle = NULL;
 /* set arrow */
 struct arrow_def *first_arrow = NULL;
 
+#ifdef EAM_OBJECTS
+/* Pointer to first object instance in linked list */
+struct object *first_object = NULL;
+#endif
+
 /* 'set title' status */
 text_label title = EMPTY_LABELSTRUCT;
 
@@ -153,6 +158,11 @@ TBOOLEAN is_cb_plot = FALSE;
 #endif
 
 fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, LT_UNDEFINED } ;
+
+#ifdef EAM_OBJECTS
+/* Default rectangle style - background fill, black border */
+struct object default_rectangle = DEFAULT_RECTANGLE_STYLE;
+#endif
 
 /* filledcurves style options */
 filledcurves_opts filledcurves_opts_data = EMPTY_FILLEDCURVES_OPTS;

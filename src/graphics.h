@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.32 2005/08/07 09:43:29 mikulik Exp $
+ * $Id: graphics.h,v 1.33 2005/08/12 17:42:32 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -123,6 +123,12 @@ void plot_image_or_update_axes __PROTO((void *plot, t_imagecolor pixel_planes,
 	plot_image_or_update_axes(plot, pixel_planes, FALSE, TRUE)
 #define SPLOT_IMAGE(plot, pixel_planes) \
 	plot_image_or_update_axes(plot, pixel_planes, TRUE, FALSE)
+#endif
+
+#ifdef EAM_OBJECTS
+void place_rectangles __PROTO((struct object *listhead, int layer, BoundingBox *clip_area));
+#else
+#define place_rectangles(listhead,layer,clip_area) /* void() */
 #endif
 
 #endif /* GNUPLOT_GRAPHICS_H */

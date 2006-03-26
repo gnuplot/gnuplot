@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.179 2006/03/19 15:37:53 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.180 2006/03/26 00:09:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1331,6 +1331,128 @@ place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
     }
 }
 
+#ifdef EAM_OBJECTS
+void
+place_rectangles(struct object *listhead, int layer, BoundingBox *clip_area)
+{
+    t_object *this_object;
+    t_rectangle *this_rect;
+    double x1, y1, x2, y2;
+    unsigned int x, y, w, h;
+    int style;
+
+    for (this_object = listhead; this_object != NULL; this_object = this_object->next) {
+	struct lp_style_type *lpstyle;
+	struct fill_style_type *fillstyle;
+	TBOOLEAN clip_x = FALSE;
+	TBOOLEAN clip_y = FALSE;
+    
+	if (this_object->object_type == OBJ_RECTANGLE)
+	    this_rect = &this_object->o.rectangle;
+	else
+	    continue;
+
+	if (this_object->layer != layer)
+	    continue;
+
+	if (this_rect->type == 1) {
+	    double width, height;
+
+	    if (splot_map) {
+		int junkw, junkh;
+		map3d_position_double(&this_rect->center, &x1, &y1, "rect");
+		map3d_position_r(&this_rect->extent, &junkw, &junkh, "rect");
+		width = junkw;
+		height = junkh;
+	    } else {
+		map_position_double(&this_rect->center, &x1, &y1, "rect");
+		map_position_r(&this_rect->extent, &width, &height, "rect");
+	    }
+	    x1 -= width/2;
+	    y1 -= height/2;
+	    x2 = x1 + width;
+	    y2 = y1 + height;
+	    w = width;
+	    h = height;
+	    if (this_rect->extent.scalex == first_axes
+	    ||  this_rect->extent.scalex == second_axes)
+		clip_x = TRUE;
+	    if (this_rect->extent.scaley == first_axes
+	    ||  this_rect->extent.scaley == second_axes)
+		clip_y = TRUE;
+	} else {
+	    if (splot_map) {
+		map3d_position_double(&this_rect->bl, &x1, &y1, "rect");
+		map3d_position_double(&this_rect->tr, &x2, &y2, "rect");
+	    } else {
+		map_position_double(&this_rect->bl, &x1, &y1, "rect");
+		map_position_double(&this_rect->tr, &x2, &y2, "rect");
+	    }
+	    if (x1 > x2) {double t=x1; x1=x2; x2=t;}
+	    if (y1 > y2) {double t=y1; y1=y2; y2=t;}
+	    if (this_rect->bl.scalex == first_axes
+	    ||  this_rect->bl.scalex == second_axes)
+		clip_x = TRUE;
+	    if (this_rect->bl.scaley == first_axes
+	    ||  this_rect->bl.scaley == second_axes)
+		clip_y = TRUE;
+	}
+
+	/* FIXME - Should there be a generic clip_rectangle() routine?	*/
+	/* Clip to the graph boundaries, but only if the rectangle 	*/
+	/* itself was specified in plot coords.				*/
+	if (clip_area) {
+	    if (clip_x && x1 < clip_area->xleft)
+		x1 = clip_area->xleft;
+	    if (clip_x && x2 > clip_area->xright)
+		x2 = clip_area->xright;
+	    if (clip_y && y1 < clip_area->ybot)
+		y1 = clip_area->ybot;
+	    if (clip_y && y2 > clip_area->ytop)
+		y2 = clip_area->ytop;
+	    if (x1 > x2 || y1 > y2)
+		continue;
+	}
+
+	w = x2 - x1;
+	h = y2 - y1;
+	x = x1;
+	y = y1;
+
+	if (w == 0 || h == 0)
+	    continue;
+
+	if (this_object->lp_properties.l_type == LT_DEFAULT)
+	    lpstyle = &default_rectangle.lp_properties;
+	else
+	    lpstyle = &this_object->lp_properties;
+	
+	if (this_object->fillstyle.fillstyle == FS_DEFAULT)
+	    fillstyle = &default_rectangle.fillstyle;
+	else
+	    fillstyle = &this_object->fillstyle;
+	
+	term_apply_lp_properties(lpstyle);
+	style = style_from_fill(fillstyle);
+
+	if (lpstyle->use_palette && term->filled_polygon) {
+	    (*term->filled_polygon)(4, fill_corners(style,x,y,w,h));
+	} else if (term->fillbox)
+	    (*term->fillbox) (style, x, y, w, h);
+
+	if (fillstyle->border_linetype != LT_NODRAW
+	&&  fillstyle->border_linetype != LT_UNDEFINED) {
+	    (*term->linetype)(fillstyle->border_linetype);
+	    (*term->move)   (x, y);
+	    (*term->vector) (x, y+h);
+	    (*term->vector) (x+w, y+h);
+	    (*term->vector) (x+w, y);
+	    (*term->vector) (x, y);
+	}
+    }
+}
+#endif
+
 void
 do_plot(struct curve_points *plots, int pcount)
 {
@@ -1389,6 +1511,9 @@ do_plot(struct curve_points *plots, int pcount)
      * on term->v_char etc, so terminal must be initialised first.
      */
     boundary(plots, pcount);
+
+    /* Give a chance for rectangles to be behind everything else*/
+    place_rectangles( first_object, -1, NULL );
 
     /* Add colorbox if appropriate. */
     if (is_plot_with_palette() && !make_palette() && is_plot_with_colorbox() && term->set_color)
@@ -1566,6 +1691,9 @@ do_plot(struct curve_points *plots, int pcount)
 	}
 	free(str);
     }
+
+    /* And rectangles */
+    place_rectangles( first_object, 0, clip_area );
 
     /* PLACE LABELS */
     place_labels( first_label, 0, FALSE );
@@ -1815,6 +1943,9 @@ do_plot(struct curve_points *plots, int pcount)
     /* REDRAW PLOT BORDER */
     if (draw_border && border_layer == 1)
 	plot_border();
+
+    /* And rectangles */
+    place_rectangles( first_object, 1, clip_area );
 
     /* PLACE LABELS */
     place_labels( first_label, 1, FALSE );

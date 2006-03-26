@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.173 2006/02/27 07:09:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.174 2006/03/23 22:16:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -364,6 +364,14 @@ show_command()
 	break;
     case S_PRINT:
 	show_print();
+	break;
+    case S_OBJECT:
+#ifdef EAM_OBJECTS
+	if (almost_equals(c_token,"rect$angle"))
+	    c_token++;
+	CHECK_TAG_GT_ZERO;
+	save_rectangle(stderr,tag);
+#endif
 	break;
     case S_ANGLES:
 	show_angles();
@@ -777,6 +785,9 @@ show_all()
     show_fit();
     show_polar();
     show_angles();
+#ifdef EAM_OBJECTS
+    save_rectangle(stderr,0);
+#endif
     show_samples();
     show_isosamples();
     show_view();
@@ -1398,6 +1409,23 @@ show_style()
 	show_histogram();
 #endif
 	show_arrowstyle(0);
+#ifdef EAM_OBJECTS
+	/* Fall through (FIXME: this is ugly) */
+    case SHOW_STYLE_RECTANGLE:
+	fprintf(stderr, "\tRectangle style is %s, fill color ",
+		default_rectangle.layer > 0 ? "front" : 
+		default_rectangle.layer < 0 ? "behind" : "back");
+	if (default_rectangle.lp_properties.use_palette)
+	    save_pm3dcolor(stderr, &default_rectangle.lp_properties.pm3d_color);
+	else if (default_rectangle.lp_properties.l_type == LT_BACKGROUND)
+	    fprintf(stderr, "background");
+	else
+	    fprintf(stderr, "lt %d",default_rectangle.lp_properties.l_type+1);
+	fprintf(stderr, ", lw %.1f ", default_rectangle.lp_properties.l_width);
+	fprintf(stderr, ", fillstyle");
+	save_fillstyle(stderr, &default_rectangle.fillstyle);
+	c_token++;
+#endif
 	break;
     }
 #undef CHECK_TAG_GT_ZERO

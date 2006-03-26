@@ -1,3 +1,33 @@
+2006-03-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	SourceForge patchset #1143563  "Place arbitrary objects in plots".
+	This patchset introduces a general infrastructure for placing
+	individual geometric objects, similar to "set label" and "set arrow".
+	However the only objects implemented at this point are rectangles.
+
+	set object <tag> rectangle
+	    {from <position> {to|rto} <position>
+		| center <position> size <w>,<h> | at <position> size <w>,<h>}
+	    {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
+	    {default} {lw|linewidth <width>}
+
+	set style rectangle {front|back} {fillcolor <colorspec>}
+	    {fs <fillstyle>} {lw|linewidth <lw>}
+
+	* configure.in: Configuration option:    ./configure --enable-objects
+	Conditional compilation flag EAM_OBJECTS
+
+	* demo/rect.dem docs/gnuplot.doc
+
+	* src/gadgets.h src/gadgets.c src/tables.h src/tables.c:  Infrastructure
+
+	* src/graph3d.c (do_3dplot) src/graphics.c (place_rectangles do_plot)
+	src/graphics.h:  Shared routine to place rectangles in 2D and 3D.
+
+	* src/save.c (save_rectangle) src/set.c (set_object set_rectangle)
+	src/unset.c (unset_object delete_object unset_style_rectangle)
+	src/save.h src/show.c: General bookkeeping for objects.
+
 2006-03-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_c_bars): Re-order the lines making up a

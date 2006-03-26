@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.126 2006/01/20 06:18:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.127 2006/03/23 22:16:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -242,6 +242,19 @@ set y2data%s\n",
     fprintf(fp, "set style fill ");
     save_fillstyle(fp, &default_fillstyle);
 
+#ifdef EAM_OBJECTS
+    /* Default rectangle style */
+    fprintf(fp, "set style rectangle %s fc ",
+	    default_rectangle.layer > 0 ? "front" : 
+	    default_rectangle.layer < 0 ? "behind" : "back");
+    if (default_rectangle.lp_properties.use_palette)
+	save_pm3dcolor(fp, &default_rectangle.lp_properties.pm3d_color);
+    else
+	fprintf(fp, "lt %d",default_rectangle.lp_properties.l_type+1);
+    fprintf(fp, " fillstyle ");
+    save_fillstyle(fp, &default_rectangle.fillstyle);
+#endif
+
     if (dgrid3d)
 	fprintf(fp, "set dgrid3d %d,%d, %d\n",
 		dgrid3d_row_fineness,
@@ -480,6 +493,10 @@ set y2data%s\n",
     fprintf(fp,"title ");
     save_position(fp, &histogram_opts.title.offset, TRUE);
     fprintf(fp, "\n");
+#endif
+
+#ifdef EAM_OBJECTS
+    save_rectangle(fp, 0);
 #endif
 
     fputs("unset logscale\n", fp);
@@ -1024,6 +1041,9 @@ save_fillstyle(FILE *fp, const struct fill_style_type *fs)
     case FS_PATTERN:
 	fprintf(fp, " pattern %d ", fs->fillpattern);
 	break;
+    case FS_DEFAULT:
+	fprintf(fp, " default\n");
+	return;
     default:
 	fprintf(fp, " empty ");
 	break;
@@ -1197,3 +1217,55 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
     }
 	
 }
+
+#ifdef EAM_OBJECTS
+
+/* Save/show rectangle <tag> (0 means show all) */
+void
+save_rectangle(FILE *fp, int tag)
+{
+    t_object *this_object;
+    t_rectangle *this_rect;
+    TBOOLEAN showed = FALSE;
+
+    for (this_object = first_object; this_object != NULL; this_object = this_object->next) {
+	if (this_object->object_type == OBJ_RECTANGLE)
+	    this_rect = &this_object->o.rectangle;
+	else
+	    continue;
+	if (tag == 0 || tag == this_object->tag) {
+	    showed = TRUE;
+	    fprintf(fp, "%sobject %2d rect ", (fp==stderr) ? "\t" : "set ",this_object->tag);
+
+	    if (this_rect->type == 1) {
+		fprintf(fp, "center ");
+		save_position(fp, &this_rect->center, FALSE);
+		fprintf(fp, " size ");
+		save_position(fp, &this_rect->extent, FALSE);
+	    } else {
+		fprintf(fp, "from ");
+		save_position(fp, &this_rect->bl, FALSE);
+		fprintf(fp, " to ");
+		save_position(fp, &this_rect->tr, FALSE);
+	    }
+
+	    fprintf(fp, " %s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
+	    if (this_object->lp_properties.l_width)
+		fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
+	    fprintf(fp, "fc ");
+	    if (this_object->lp_properties.l_type == LT_DEFAULT)
+		fprintf(fp,"default");
+	    else if (this_object->lp_properties.use_palette)
+		save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
+	    else
+		fprintf(fp, "lt %d",this_object->lp_properties.l_type+1);
+	    fprintf(fp, " fillstyle ");
+	    save_fillstyle(fp, &this_object->fillstyle);
+	}
+    }
+    if (tag > 0 && !showed)
+	int_error(c_token, "rect not found");
+}
+
+#endif
+

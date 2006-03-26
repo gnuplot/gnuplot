@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.94 2006/03/23 07:14:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.95 2006/03/26 05:23:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -89,6 +89,11 @@ static void unset_key __PROTO((void));
 static void unset_keytitle __PROTO((void));
 static void unset_label __PROTO((void));
 static void delete_label __PROTO((struct text_label * prev, struct text_label * this));
+#ifdef EAM_OBJECTS
+static void unset_object __PROTO((void));
+static void delete_object __PROTO((struct object * prev, struct object * this));
+static void unset_style_rectangle __PROTO(());
+#endif
 static void unset_loadpath __PROTO((void));
 static void unset_locale __PROTO((void));
 static void reset_logscale __PROTO((AXIS_INDEX));
@@ -325,6 +330,11 @@ unset_command()
     case S_PRINT:
 	unset_print();
 	break;
+#ifdef EAM_OBJECTS
+    case S_OBJECT:
+	unset_object();
+	break;
+#endif
     case S_SAMPLES:
 	unset_samples();
 	break;
@@ -941,6 +951,58 @@ delete_label(struct text_label *prev, struct text_label *this)
     }
 }
 
+#ifdef EAM_OBJECTS
+/* process 'unset rectangle' command */
+static void
+unset_object()
+{
+    struct value a;
+    struct object *this_object;
+    struct object *prev_object;
+    int tag;
+
+    if (END_OF_COMMAND) {
+	/* delete all objects */
+	while (first_object != NULL)
+	    delete_object((struct object *) NULL, first_object);
+    } else {
+	/* get tag */
+	tag = (int) real(const_express(&a));
+	if (!END_OF_COMMAND)
+	    int_error(c_token, "extraneous arguments to unset rectangle");
+	for (this_object = first_object, prev_object = NULL;
+	     this_object != NULL;
+	     prev_object = this_object, this_object = this_object->next) {
+	    if (this_object->tag == tag) {
+		delete_object(prev_object, this_object);
+		return;		/* exit, our job is done */
+	    }
+	}
+	int_error(c_token, "object not found");
+    }
+}
+
+
+/* delete object from linked list started by first_object.
+ * called with pointers to the previous object (prev) and the
+ * object to delete (this).
+ * If there is no previous object (the object to delete is
+ * first_object) then call with prev = NULL.
+ */
+static void
+delete_object(struct object *prev, struct object *this)
+{
+    if (this != NULL) {		/* there really is something to delete */
+	if (prev != NULL)	/* there is a previous rectangle */
+	    prev->next = this->next;
+	else			/* this = first_object so change first_object */
+	    first_object = this->next;
+	/* FIXME:  Must free contents as well */
+	free (this);
+    }
+}
+#endif
+
 
 /* process 'unset loadpath' command */
 static void
@@ -1248,6 +1310,9 @@ unset_style()
 	while (first_linestyle != NULL)
 	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
 	unset_fillstyle();
+#ifdef EAM_OBJECTS
+	unset_style_rectangle();
+#endif
 #ifdef EAM_HISTOGRAMS
 	unset_histogram();
 #endif
@@ -1283,6 +1348,12 @@ unset_style()
 	unset_arrowstyles();
 	c_token++;
 	break;
+#ifdef EAM_OBJECTS
+    case SHOW_STYLE_RECTANGLE:
+	unset_style_rectangle();
+	c_token++;
+	break;
+#endif
     default:
 	int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
     }
@@ -1528,6 +1599,12 @@ reset_command()
     /* delete linestyles */
     while (first_linestyle != NULL)
 	delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
+#ifdef EAM_OBJECTS
+    /* delete objects */
+    while (first_object != NULL)
+	delete_object((struct object *) NULL, first_object);
+    unset_style_rectangle();
+#endif
 
     /* 'polar', 'parametric' and 'dummy' are interdependent, so be
      * sure to keep the order intact */
@@ -1648,3 +1725,12 @@ reset_command()
     interactive = save_interactive;
 }
 
+#ifdef EAM_OBJECTS
+static void
+unset_style_rectangle()
+{
+    struct object foo = DEFAULT_RECTANGLE_STYLE;
+    default_rectangle = foo;
+    return;
+}
+#endif

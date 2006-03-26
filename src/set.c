@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.223 2006/03/18 19:03:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.224 2006/03/23 22:16:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -119,6 +119,10 @@ static void set_colorbox __PROTO((void));
 static void set_pointsize __PROTO((void));
 static void set_polar __PROTO((void));
 static void set_print __PROTO((void));
+#ifdef EAM_OBJECTS
+static void set_object __PROTO((void));
+static void set_rectangle __PROTO((int));
+#endif
 static void set_samples __PROTO((void));
 static void set_size __PROTO((void));
 static void set_style __PROTO((void));
@@ -408,6 +412,11 @@ set_command()
 	case S_PRINT:
 	    set_print();
 	    break;
+#ifdef EAM_OBJECTS
+	case S_OBJECT:
+	    set_object();
+	    break;
+#endif
 	case S_SAMPLES:
 	    set_samples();
 	    break;
@@ -3168,6 +3177,234 @@ set_polar()
     }
 }
 
+#ifdef EAM_OBJECTS
+/* 
+ * Process 'set object <tag> rectangle' command
+ * set object {tag} rectangle {from <bottom_left> {to|rto} <top_right>}
+ *                     {{at|center} <xcen>,<ycen> size <w>,<h>}
+ *                     {fc|fillcolor <colorspec>} {lw|linewidth <lw>}
+ *                     {fs <fillstyle>} {front|back|behind}
+ *                     {default}
+ * EAM Jan 2005
+ */
+
+static void
+set_object()
+{
+    struct value a;
+    int tag;
+
+    /* The next token must either be a tag or the object type */
+    c_token++;
+    if (almost_equals(c_token, "rect$angle"))
+	tag = -1; /* We'll figure out what it really is later */
+    else {
+	tag = (int) real(const_express(&a));
+	if (tag <= 0)
+	    int_error(c_token, "tag must be > zero");
+    }
+
+    if (almost_equals(c_token, "rect$angle")) {
+	set_rectangle(tag);
+
+    } else if (tag > 0) {
+	/* Look for existing object with this tag */
+	t_object *this_object = first_object;
+	for (; this_object != NULL; this_object = this_object->next)
+	     if (tag == this_object->tag)
+		break;
+	if (tag == this_object->tag && this_object->object_type == OBJ_RECTANGLE) {
+	    c_token--;
+	    set_rectangle(tag);
+	} else
+	    int_error(c_token, "unknown object");
+
+    } else
+	int_error(c_token, "unrecognized object type");
+
+}
+
+static t_object *
+new_object(int tag, int object_type)
+{
+    t_object *new = gp_alloc(sizeof(struct object), "object");
+    if (object_type == OBJ_RECTANGLE) {
+	t_object def = DEFAULT_RECTANGLE_STYLE;
+	*new = def;
+	new->tag = tag;
+	new->object_type = object_type;
+	new->lp_properties.l_type = LT_DEFAULT; /* Use default rectangle color */
+	new->fillstyle.fillstyle = FS_DEFAULT;  /* and default fill style */
+    } else
+	fprintf(stderr,"object initialization failure\n");
+    return new;
+}
+
+static void
+set_rectangle(int tag)
+{
+    t_rectangle *this_rect = NULL;
+    t_object *this_object = NULL;
+    t_object *new_obj = NULL;
+    t_object *prev_object = NULL;
+    struct value a;
+    TBOOLEAN got_fill = FALSE;
+    TBOOLEAN got_lt = FALSE;
+    TBOOLEAN got_lw = FALSE;
+    TBOOLEAN got_corners = FALSE;
+    TBOOLEAN got_center = FALSE;
+    double lw = 1.0;
+
+    c_token++;
+    
+    /* We are setting the default, not any particular rectangle */
+    if (tag < -1) {
+	this_object = &default_rectangle;
+	this_rect = &default_rectangle.o.rectangle;
+	c_token--;
+
+    } else {
+	/* Look for existing rectangle with this tag */
+	for (this_object = first_object; this_object != NULL;
+	     prev_object = this_object, this_object = this_object->next)
+	     /* is this the rect we want? */
+	     if (0 < tag  &&  tag <= this_object->tag)
+		break;
+
+	/* Insert this rect into the list if it is a new one */
+	if (this_object == NULL || tag != this_object->tag) {
+	    if (tag == -1)
+		tag = (prev_object) ? prev_object->tag+1 : 1;
+	    new_obj = new_object(tag, OBJ_RECTANGLE);
+	    if (prev_object == NULL)
+		first_object = new_obj;
+	    else
+		prev_object->next = new_obj;
+	    new_obj->next = this_object;
+	    this_object = new_obj;
+	}
+	this_rect = &this_object->o.rectangle;
+    }
+
+    while (!END_OF_COMMAND) {
+	int save_token = c_token;
+
+	if (equals(c_token,"from")) {
+	    /* Read in the bottom left and upper right corners */
+	    c_token++;
+	    get_position(&this_rect->bl);
+	    if (equals(c_token,"to")) {
+		c_token++;
+		get_position(&this_rect->tr);
+	    } else if (equals(c_token,"rto")) {
+		c_token++;
+		get_position_default(&this_rect->tr,this_rect->bl.scalex);
+		if (this_rect->bl.scalex != this_rect->tr.scalex
+		||  this_rect->bl.scaley != this_rect->tr.scaley)
+		    int_error(c_token,"relative coordinates must match in type");
+		this_rect->tr.x += this_rect->bl.x;
+		this_rect->tr.y += this_rect->bl.y;
+	    } else
+		int_error(c_token,"Expecting to or rto");
+	    got_corners = TRUE;
+	    this_rect->type = 0;
+	    continue;
+
+	} else if (equals(c_token,"at") || almost_equals(c_token,"cen$ter")) {
+	    /* Read in the center position */
+	    c_token++;
+	    get_position(&this_rect->center);
+	    got_center = TRUE;
+	    this_rect->type = 1;
+	    continue;
+	} else if (equals(c_token,"size")) {
+	    /* Read in the width and height */
+	    c_token++;
+	    get_position(&this_rect->extent);
+	    got_center = TRUE;
+	    this_rect->type = 1;
+	    continue;
+
+	} else if (equals(c_token,"front")) {
+	    this_object->layer = 1;
+	    c_token++;
+	    continue;
+	} else if (equals(c_token,"back")) {
+	    this_object->layer = 0;
+	    c_token++;
+	    continue;
+	} else if (equals(c_token,"behind")) {
+	    this_object->layer = -1;
+	    c_token++;
+	    continue;
+	} else if (almost_equals(c_token,"def$ault")) {
+	    if (tag < 0) {
+		int_error(c_token,
+		    "Invalid command - did you mean 'unset style rectangle'?");
+	    } else {
+		this_object->lp_properties.l_type = LT_DEFAULT;
+		this_object->fillstyle.fillstyle = FS_DEFAULT;
+	    }
+	    got_fill = got_lt = TRUE;
+	    c_token++;
+	    continue;
+	}
+
+	/* Now parse the style options; default to whatever the global style is  */
+	if (!got_fill) {
+	    if (new_obj)
+		parse_fillstyle(&this_object->fillstyle, default_rectangle.fillstyle.fillstyle,
+			default_rectangle.fillstyle.filldensity, default_rectangle.fillstyle.fillpattern,
+			default_rectangle.fillstyle.border_linetype);
+	    else
+		parse_fillstyle(&this_object->fillstyle, this_object->fillstyle.fillstyle,
+			this_object->fillstyle.filldensity, this_object->fillstyle.fillpattern,
+			this_object->fillstyle.border_linetype);
+	    if (c_token != save_token) {
+		got_fill = TRUE;
+		continue;
+	    }
+	}
+
+	/* Parse the colorspec */
+	if (!got_lt) {
+	    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
+		this_object->lp_properties.use_palette = TRUE;
+		this_object->lp_properties.l_type = LT_BLACK; /* Anything but LT_DEFAULT */
+		parse_colorspec(&this_object->lp_properties.pm3d_color, TC_FRAC);
+		if (this_object->lp_properties.pm3d_color.type == TC_DEFAULT)
+		    this_object->lp_properties.l_type = LT_DEFAULT;
+	    }
+
+	    if (c_token != save_token) {
+		got_lt = TRUE;
+		continue;
+	    }
+	}
+
+	/* And linewidth */
+	if (!got_lw) {
+	    if (equals(c_token,"lw") || almost_equals(c_token,"linew$idth")) {
+		c_token++;
+		lw = real(const_express(&a));
+	    }
+	    if (c_token != save_token) {
+		got_lw = TRUE;
+		continue;
+	    }
+	}
+
+	int_error(c_token, "Unrecognized or duplicate option");
+    }
+
+    if (got_lw)
+	this_object->lp_properties.l_width = lw;
+
+    if (got_center && got_corners)
+	int_error(NO_CARET,"Inconsistent options");
+
+}
+#endif
 
 /* process 'set samples' command */
 static void
@@ -3288,6 +3525,12 @@ set_style()
     case SHOW_STYLE_ARROW:
 	set_arrowstyle();
 	break;
+#ifdef EAM_OBJECTS
+    case SHOW_STYLE_RECTANGLE:
+	c_token++;
+	set_rectangle(-2);
+	break;
+#endif
 #ifdef EAM_HISTOGRAMS
     case SHOW_STYLE_HISTOGRAM:
 	parse_histogramstyle(&histogram_opts,HT_CLUSTERED,histogram_opts.gap);
