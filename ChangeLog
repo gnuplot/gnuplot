@@ -1,5 +1,9 @@
 2006-03-26  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* NEWS: List various new features added since last October.
+
+2006-03-26  Ethan A Merritt  <merritt@u.washington.edu>
+
 	SourceForge patchset #1143563  "Place arbitrary objects in plots".
 	This patchset introduces a general infrastructure for placing
 	individual geometric objects, similar to "set label" and "set arrow".

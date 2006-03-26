@@ -1,5 +1,8 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
+* NEW support for placement of individual rectangles within plot or canvas
+* NEW command "set style increment user" allows customization of default lines
+* NEW support for enhanced text mode in Windows terminal driver
 * NEW commands raise and lower
 * NEW y and y2 axis label rotation can be explicitly controlled (2D plots only)
 * NEW {no}enhanced flag can be applied to individual labels
@@ -38,6 +41,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW plot style "with points" can read variable point size from input file
 * NEW "set tics" can change most settings for {x|y|z|cb}tics at once
 * NEW tic scale can be set per axis using "set {x|y|z|cb}tics scale"
+* CHANGE PostScript prolog and character encoding files now maintained separately
 * CHANGE Placement of z-axis label in 3D plots is now equivalent to x and y axes
 * CHANGE "set ticsscale" is deprecated, use "set tics scale" instead
 * CHANGE gnuplot on x11 has mousing always enabled on startup
