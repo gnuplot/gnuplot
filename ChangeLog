@@ -17,7 +17,7 @@
 	* configure.in: Configuration option:    ./configure --enable-objects
 	Conditional compilation flag EAM_OBJECTS
 
-	* demo/rect.dem docs/gnuplot.doc
+	* demo/rectangle.dem docs/gnuplot.doc
 
 	* src/gadgets.h src/gadgets.c src/tables.h src/tables.c:  Infrastructure
 
