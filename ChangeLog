@@ -2,6 +2,8 @@
 
 	* NEWS: List various new features added since last October.
 
+	* src/gplt_x11.c: Store text rotation angle internally as a double.
+
 2006-03-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	SourceForge patchset #1143563  "Place arbitrary objects in plots".

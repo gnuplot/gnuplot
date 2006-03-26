@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.157 2006/03/17 23:41:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.158 2006/03/23 07:14:23 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -258,7 +258,7 @@ typedef struct plot_struct {
     int type;			/* variables used during drawing in exec_cmd() */
     int user_width;
     enum JUSTIFY jmode;
-    int angle;			/* 0 = horizontal (default), 1 = vertical */
+    double angle;		/* Text rotation angle in degrees */
     int lt;
 #ifdef USE_MOUSE
     TBOOLEAN mouse_on;		/* is mouse bar on? */
@@ -1803,7 +1803,7 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
 {
     Window w = plot->window;
     Drawable d = plot->pixmap;
-    int angle = plot->angle;
+    double angle = plot->angle;
     enum JUSTIFY just = plot->jmode;
     int x, y;
     double src_x, src_y;
@@ -2183,8 +2183,8 @@ exec_cmd(plot_struct *plot, char *command)
 	    plot->xLast = RevX(X(x) + sj + sw) - x_offset;
 	    plot->yLast = y - y_offset;
 	    if (plot->angle != 0) { /* This correction is not perfect */
-		plot->yLast += RevX(sw) * sin((double)(plot->angle) * 0.01745) * xscale/yscale;
-		plot->xLast -= RevX(sw) * (1.0 - cos((double)(plot->angle) * 0.01745));
+		plot->yLast += RevX(sw) * sin((plot->angle) * 0.01745) * xscale/yscale;
+		plot->xLast -= RevX(sw) * (1.0 - cos((plot->angle) * 0.01745));
 	    }
 	}
 
@@ -2255,7 +2255,7 @@ exec_cmd(plot_struct *plot, char *command)
 	sscanf(buffer, "J%4d", (int *) &plot->jmode);
 
     else if (*buffer == 'A')
-	sscanf(buffer + 1, "%d", (int *) &plot->angle);
+	sscanf(buffer + 1, "%lf", &plot->angle);
 
     /*  X11_linewidth(plot->lwidth) - set line width */
     else if (*buffer == 'W')
