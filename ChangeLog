@@ -1,3 +1,9 @@
+2006-03-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (cp_alloc) src/plot3d.c (sp_alloc): Initialize the
+	line style, arrow style, and fill style fields of each new plot to
+	something reasonable.
+
 2006-03-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* NEWS: List various new features added since last October.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.123 2006/03/16 03:49:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.124 2006/03/23 22:16:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -110,8 +110,14 @@ int plot3d_num=0;
 static struct surface_points *
 sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
 {
+    struct lp_style_type default_lp_properties = DEFAULT_LP_STYLE_TYPE;
+
     struct surface_points *sp = gp_alloc(sizeof(*sp), "surface");
     memset(sp,0,sizeof(struct surface_points));
+
+    /* Initialize various fields */
+    sp->lp_properties = default_lp_properties;
+    default_arrow_style(&(sp->arrow_properties));
 
     if (num_iso_2 > 0 && num_samp_1 > 0) {
 	int i;

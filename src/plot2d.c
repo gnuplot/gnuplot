@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.121 2006/03/11 21:35:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.122 2006/03/23 22:16:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -106,6 +106,7 @@ static struct curve_points *
 cp_alloc(int num)
 {
     struct curve_points *cp;
+    struct lp_style_type default_lp_properties = DEFAULT_LP_STYLE_TYPE;
 
     cp = (struct curve_points *) gp_alloc(sizeof(struct curve_points), "curve");
     memset(cp,0,sizeof(struct curve_points));
@@ -114,6 +115,11 @@ cp_alloc(int num)
     if (num > 0)
 	cp->points = (struct coordinate GPHUGE *)
 	    gp_alloc(num * sizeof(struct coordinate), "curve points");
+
+    /* Initialize various fields */
+    cp->lp_properties = default_lp_properties;
+    default_arrow_style(&(cp->arrow_properties));
+    cp->fill_properties = default_fillstyle;
 
     return (cp);
 }
