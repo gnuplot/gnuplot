@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.79 2005/08/12 08:31:56 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.80 2006/03/11 22:11:44 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -102,6 +102,8 @@ extern smg$create_key_table();
 # ifndef SIGINT
 #  define SIGINT 2		/* for MSC */
 # endif
+# include "win/wgnuplib.h"
+# include "win/wcommon.h"
 #endif /* _Windows */
 
 /* GNU readline
@@ -720,7 +722,7 @@ get_user_env()
 
 	if ((env_home = getenv(HOME))
 #ifdef WIN32
-	    || (env_home = getenv("APPDATA"))
+	    || (env_home = appdata_directory())
 	    || (env_home = getenv("USERPROFILE"))
 #endif
 #ifndef VMS

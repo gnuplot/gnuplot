@@ -1,3 +1,21 @@
+2006-03-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/winmain.c: WANT_GET_DLLVERSION hardcoded active.
+	(CSIDL_APPDATA): Provide fallback definition.
+	(ShutDown): Removed ancient cruft.
+	(appdata_directory): New function.  Dynamically attach to
+	shell32.dll and ask it for the "application data" directory.
+	(WinMain): Have get_user_env() take care of finding $HOME.
+	INIFILE_IN_APPDATA hardcoded.
+
+	* src/win/wcommon.h (INIFILE_IN_APPDATA, WANT_GETDLLVERSION):
+	Definitions removed, hardcoded active now.
+	(appdata_directory): Added prototype.
+
+	* src/plot.c: Added #includes of win/wgnuplib.h, win/wcommon.h.
+	(get_user_env) [WIN32]: Call helper routine to find Windows'
+	"application data" directory.
+
 2006-03-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (cp_alloc) src/plot3d.c (sp_alloc): Initialize the

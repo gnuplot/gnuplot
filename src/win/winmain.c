@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.20 2005/10/07 13:00:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.21 2005/10/10 19:07:08 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -79,13 +79,16 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.20 2005/10/07 13:00:52 m
 #include "wtext.h"
 #include "wcommon.h"
 
-/* WANT_GETDLLVERSION is defined in wcommon.h */
-#ifdef WANT_GETDLLVERSION 
+#ifdef WIN32
 # ifndef _WIN32_IE
 #  define _WIN32_IE 0x0400
 # endif 
 # include <shlobj.h>
 # include <shlwapi.h>
+  /* workaround for old header files */
+# ifndef CSIDL_APPDATA 
+#  define CSIDL_APPDATA (0x001a)
+# endif
 #endif
 
 /* limits */
@@ -166,24 +169,16 @@ WinExit()
 int CALLBACK WINEXPORT
 ShutDown()
 {
-#if 0  /* HBB 19990505: try to avoid crash on clicking 'close' */
-       /* Problem was that WinExit was called *twice*, once directly,
-        * and again via 'atexit'. This caused problems by double-freeing
-        * of GlobalAlloc-ed memory inside TextClose() */
-       /* Caveat: relies on atexit() working properly */
-	WinExit();
-#endif
 	exit(0);
 	return 0;
 }
 
+#ifdef WIN32
 
-#ifdef WANT_GETDLLVERSION
-
-/* This function can be used to retrieve version information from Window's Shell
-   and common control libraries such (Comctl32.dll, Shell32.dll, and Shlwapi.dll)
-   The code was copied from the MSDN article "Shell and Common Controls Versions" 
-*/
+/* This function can be used to retrieve version information from
+ * Window's Shell and common control libraries such (Comctl32.dll,
+ * Shell32.dll, and Shlwapi.dll) The code was copied from the MSDN
+ * article "Shell and Common Controls Versions" */
 DWORD
 GetDllVersion(LPCTSTR lpszDllName)
 {
@@ -219,8 +214,36 @@ GetDllVersion(LPCTSTR lpszDllName)
     return dwVersion;
 }
 
-#endif /* WANT_GETDLLVERSION */
 
+char *
+appdata_directory(void)
+{
+    HMODULE hShell32; 
+    FARPROC pSHGetSpecialFolderPath;
+    static char dir[MAX_PATH] = "";
+
+    if (dir[0])
+	return dir;
+
+    /* Make sure that SHGetSpecialFolderPath is supported. */
+    hShell32 = LoadLibrary(TEXT("shell32.dll"));
+    if (hShell32) {
+	pSHGetSpecialFolderPath =
+	    GetProcAddress(hShell32, 
+			   TEXT("SHGetSpecialFolderPathA"));
+	if (pSHGetSpecialFolderPath)
+	    (*pSHGetSpecialFolderPath)(NULL, dir, CSIDL_APPDATA, FALSE);
+	FreeModule(hShell32);
+    }
+
+    /* use APPDATA environment variable as fallback */
+    if (dir[0] == '\0')
+	strcpy(dir, getenv("APPDATA"));
+
+    return dir;
+}
+
+#endif /* WIN32 */
 
 int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		LPSTR lpszCmdLine, int nCmdShow)
@@ -281,24 +304,17 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	textwin.hPrevInstance = hPrevInstance;
 	textwin.nCmdShow = nCmdShow;
 	textwin.Title = "gnuplot";
-#if defined(INIFILE_IN_APPDATA) 
-# ifndef CSIDL_APPDATA 
-#  define CSIDL_APPDATA (0x001a)
-# endif
-	/* Make sure that SHGetSpecialFolderPath is supported. */
-	if (GetDllVersion(TEXT("shell32.dll")) >= PACKVERSION(4,71)) {
-	    textwin.IniFile = (char *)malloc(MAX_PATH);
-	    SHGetSpecialFolderPath( NULL, textwin.IniFile, CSIDL_APPDATA, FALSE );
-	    strncat( textwin.IniFile, "\\wgnuplot.ini", MAX_PATH-1 );
-	} 
-	else {
-	    get_user_env(); /* this hasn't been called yet */
-	    textwin.IniFile = gp_strdup("~\\wgnuplot.ini");
-	    gp_expand_tilde(&(textwin.IniFile));
+
+        get_user_env(); /* this hasn't been called yet */
+        textwin.IniFile = gp_strdup("~\\wgnuplot.ini");
+        gp_expand_tilde(&(textwin.IniFile));
+
+	/* if tilde expansion fails use current directory as
+	   default - that was the previous default behaviour */
+	if (textwin.IniFile[0] == '~') {
+	    free(textwin.IniFile);
+	    textwin.IniFile = "wgnuplot.ini";
 	}
-#else
-	textwin.IniFile = "wgnuplot.ini";
-#endif
 	textwin.IniSection = "WGNUPLOT";
 	textwin.DragPre = "load '";
 	textwin.DragPost = "'\n";

@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.7 2005/08/04 16:34:09 mikulik Exp $
+ * $Id: wcommon.h,v 1.8 2005/08/04 16:44:58 mikulik Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -50,10 +50,6 @@
 
 #ifdef WIN32
 
-   /* Save wgnuplot.ini in user's appdata directory instead
-      of current directory on Win32. */
-# define INIFILE_IN_APPDATA
-
   /* Enable new directory dialogs on Win32 */
 # define WITH_ADV_DIR_DIALOG
 
@@ -63,17 +59,12 @@
 
 #endif
   
-/* GetDllVersion is required for INIFILE_IN_APPDATA
-   and WITH_ADV_DIR_DIALOG
-*/
-#if defined(INIFILE_IN_APPDATA) || defined(WITH_ADV_DIR_DIALOG)
-# define WANT_GETDLLVERSION
-#endif
 
 /* winmain.c */
-#ifdef WANT_GETDLLVERSION
+#ifdef WIN32
 # define PACKVERSION(major,minor) MAKELONG(minor,major)
 extern DWORD GetDllVersion(LPCTSTR lpszDllName);
+extern char *appdata_directory(void);
 #endif
 
 /* wgnuplib.c */
