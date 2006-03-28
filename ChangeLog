@@ -61,7 +61,7 @@
 2006-03-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_c_bars): Re-order the lines making up a
-	candlestick so that line-joining terminals have some change of
+	candlestick so that line-joining terminals have some chance of
 	recognizing that the body is a closed rectangle.
 
 	* term/PostScript/prologue.ps: Add a shorthand for closepath.
@@ -152,7 +152,7 @@
 	sent if something has changed.
 
 	* src/color.c (make_palette): Do not call term->make_palette() unless
-	either (a) the palette has changes, (b) the terminal has changed, or
+	either (a) the palette has changed, (b) the terminal has changed, or
 	(c) the output device has changed.  New routine invalidate_palette()
 	is available to signal that one of these conditions has occurred.
 
