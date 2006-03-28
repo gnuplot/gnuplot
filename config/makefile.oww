@@ -1,5 +1,5 @@
-# 
-# $Id: makefile.oww,v 1.5 2006/01/13 17:06:08 broeker Exp $
+# Hello, emacs: this is a -*- Makefile -*-
+# $Id: makefile.oww,v 1.6 2006/03/06 17:42:29 broeker Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -51,7 +51,7 @@ WRC = wrc
 #
 # Defines
 
-CPPFLAGS =  -D_Windows -DHAVE_CONFIG_H -DUSE_MOUSE
+CPPFLAGS =  -D_Windows -DHAVE_CONFIG_H -DUSE_MOUSE -DEAM_OBJECTS
 # library-dependent ones may have to be added, like:
 # -DHAVE_LIBPNG -DHAVE_LIBPDF 
 
@@ -75,7 +75,6 @@ CPPFLAGS =  -D_Windows -DHAVE_CONFIG_H -DUSE_MOUSE
 # -j  : char is signed
 # -aa : allow non-const initializers for locals
 # -d2 : debug information
-        
 WCFLAGS = -zlf -ei -zq -I. -zm -bm -5r -sg -orilt -j -aa -d2 $(CPPFLAGS)
 
 
