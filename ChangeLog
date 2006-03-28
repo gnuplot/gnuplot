@@ -9,6 +9,12 @@
 
 2006-03-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* config/makefile.oww (CPPFLAGS): Added -DEAM_OBJECTS.
+
+	* src/plot2d.c (get_data): Avoid small size increments on
+	reallocation --- at least double, and add another 1000 entries for
+	good measure.
+
 	* src/win/winmain.c: WANT_GET_DLLVERSION hardcoded active.
 	(CSIDL_APPDATA): Provide fallback definition.
 	(ShutDown): Removed ancient cruft.
