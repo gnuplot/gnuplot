@@ -346,13 +346,14 @@ list of changes and minor new features.
 
 @menu
 * New_plot_styles::             
+* New_plot_elements::           
 * String_handling::             
 * Auto-layout_of_multiple_plots_on_a_page::  
 * Input_from_binary_data_files::  
 * New_or_revised_terminal_drivers::  
 @end menu
 
-@node New_plot_styles, String_handling, New_Features, New_Features
+@node New_plot_styles, New_plot_elements, New_Features, New_Features
 @subsection New plot styles
 
 
@@ -395,7 +396,29 @@ See `filledcurves`.
 See `vectors`.
 
 
-@node String_handling, Auto-layout_of_multiple_plots_on_a_page, New_plot_styles, New_Features
+@node New_plot_elements, String_handling, New_plot_styles, New_Features
+@subsection New plot elements
+
+
+
+@menu
+* Explicit_RGB_colors_can_be_specified_for_all_plot_elements::  
+* Rectangles_with_desired_fill_and_border_can_be_placed_anywhere_in_2D::  
+@end menu
+
+@node Explicit_RGB_colors_can_be_specified_for_all_plot_elements, Rectangles_with_desired_fill_and_border_can_be_placed_anywhere_in_2D, New_plot_elements, New_plot_elements
+@subsubsection Explicit RGB colors can be specified for all plot elements
+
+See @ref{colorspec}.
+
+
+@node Rectangles_with_desired_fill_and_border_can_be_placed_anywhere_in_2D,  , Explicit_RGB_colors_can_be_specified_for_all_plot_elements, New_plot_elements
+@subsubsection Rectangles with desired fill and border can be placed anywhere in 2D
+
+See `set object rectangle`
+
+
+@node String_handling, Auto-layout_of_multiple_plots_on_a_page, New_plot_elements, New_Features
 @subsection String handling
 
 
@@ -790,9 +813,9 @@ data files.
 
 @cindex coordinates
 
-The commands @ref{arrow}, @ref{key}, and @ref{label} allow you to draw
-something at an arbitrary position on the graph.  This position is specified
-by the syntax:
+The commands @ref{arrow}, @ref{key}, @ref{label} and @ref{object} allow you
+to draw something at an arbitrary position on the graph.  This position is
+specified by the syntax:
 
 @example
       @{<system>@} <x>, @{<system>@} <y> @{,@{<system>@} <z>@}
@@ -6076,6 +6099,7 @@ when the variable was initially defined.
 * pointsize::                   
 * polar::                       
 * print_::                      
+* object::                      
 * rmargin::                     
 * rrange::                      
 * samples::                     
@@ -9981,7 +10005,7 @@ To produce a blue yellow red palette use (all equivalent):
 @example
       set palette defined ( 0 "blue", 1 "yellow", 2 "red" )
       set palette defined ( 0 0 0 1, 1 1 1 0, 2 1 0 0 )
-      set palette defined ( 0 "#0000ff", 1 "#ffff00", 2 "ff0000" )
+      set palette defined ( 0 "#0000ff", 1 "#ffff00", 2 "#ff0000" )
 
 @end example
 
@@ -10292,7 +10316,7 @@ and
 @uref{http://www.gnuplot.info/demo/poldat.html,polar data plot (poldat.dem).
 }
 
-@node print_, rmargin, polar, set-show
+@node print_, object, polar, set-show
 @subsection print
 
 @c ?commands set print
@@ -10316,7 +10340,88 @@ Without "<filename>", the output file is restored to <STDERR>.  The <filename>
 mode.  A <filename> starting with "|" is opened as a pipe to the
 <shell_command> on platforms that support piping.
 
-@node rmargin, rrange, print_, set-show
+@node object, rmargin, print_, set-show
+@subsection object
+
+@cindex object
+@opindex object
+
+
+@cindex rectangle
+
+@c ?commands set object
+@c ?commands show object
+@c ?commands set object rectangle
+@c ?commands show object rectangle
+@c ?set object
+@c ?show object
+@c ?set object rectangle
+@c ?show object rectangle
+This command defines a single object, which will appear in all subsequent
+2D plots. You may define as many objects as you like. Currently the only
+object type supported is `rectangle`.
+Each rectangle is specified by a pair of points that define diagonal vertices.
+A default set of style properties (fill, color, border) are inherited from
+those set by the command `set style rectangle`, but each rectangle can also be
+given individual style properties.
+
+Syntax:
+@example
+    set object <index> rectangle
+        @{from <position> @{to|rto@} <position> |
+         center <position> size <w>,<h> |
+         at <position> size <w>,<h>@}
+        @{front|back|behind@} @{fc|fillcolor <colorspec>@} @{fs <fillstyle>@}
+        @{default@} @{lw|linewidth <width>@}
+
+@end example
+
+The position of the rectangle may be specified by giving the position of two
+diagonal corners (bottom left and top right) or by giving the position of the
+center followed by the width and the height.  In either case the positions
+may be given in axis, graph, or screen coordinates. See `coordinates`.
+The options `at` and `center` are synonyms.
+
+Setting `front` will draw the rectangle in front of all plot elements, but
+behind any labels that are also marked `front`. Setting `back` will place the
+rectangle behind all plot curves and labels. Setting `behind` will place the
+rectangle behind everything including the axes and `back` rectangles, and can
+be used to provide a colored background for the entire graph or page.
+
+The fill color of the rectangle is taken from the <colorspec>. `fillcolor`
+may be abbreviated `fc`.  The fill style is taken from <fillstyle>.
+See @ref{colorspec} and `fillstyle`.  If the keyword `default` is given,
+these properties are inherited from the default settings of at the time a plot
+is drawn. See `set style rectangle`.
+
+Examples:
+@example
+    # Force the entire area enclosed by the axes to have background color cyan
+    set object 1 rect from graph 0, graph 0 to graph 1, graph 1 back
+    set object 1 rect fc rgb "cyan" fillstyle solid 1.0
+
+@end example
+
+@example
+    # Position a red square with lower left at 0,0 and upper right at 2,3
+    set object 2 rect from 0,0 to 2,3 fc lt 1
+
+@end example
+
+@example
+    # Position an empty rectangle (no fill) with a blue border
+    set object 3 rect from 0,0 to 2,3 fs empty border 3
+
+@end example
+
+@example
+    # Return fill and color to the default style but leave vertices unchanged
+    set object 2 rect default
+
+@end example
+
+
+@node rmargin, rrange, object, set-show
 @subsection rmargin
 
 @c ?commands set rmargin
@@ -10493,8 +10598,10 @@ Syntax:
 * set_style_data::              
 * set_style_fill::              
 * set_style_function::          
+* set_style_increment::         
 * set_style_line::              
 * plotting_styles::             
+* set_style_rectangle::         
 @end menu
 
 @node set_style_arrow, set_style_data, style, style
@@ -10656,7 +10763,7 @@ By default, @ref{border}, the box is bounded by a solid line of the current
 linetype. `border <lt>` specifies that a border is to be drawn using
 linetype <lt>. `noborder` specifies that no bounding lines are drawn.
 
-@node set_style_function, set_style_line, set_style_fill, style
+@node set_style_function, set_style_increment, set_style_fill, style
 @subsubsection set style function
 
 @c ?commands set style function
@@ -10678,7 +10785,47 @@ See `plotting styles` for the choices.  If no choice is given, the choices are
 listed.  `show style function` shows the current default function plotting
 style.
 
-@node set_style_line, plotting_styles, set_style_function, style
+@node set_style_increment, set_style_line, set_style_function, style
+@subsubsection set style increment
+
+@c ?commands set style increment
+@c ?commands show style increment
+@c ?set style increment
+@c ?show style increment
+Syntax:
+@example
+      set style increment @{default|userstyles@}
+      show style increment
+
+@end example
+
+By default, successive plots within the same graph will use successive
+linetypes from the default set for the current terminal type.
+However, choosing `set style increment user` allows you to step through
+the user-defined line styles rather than through the default linetypes.
+
+Example:
+
+@example
+      set style line 1 lw 2 lc rgb "gold"
+      set style line 2 lw 2 lc rgb "purple"
+      set style line 4 lw 1 lc rgb "sea-green"
+      set style increment user
+
+@end example
+
+@example
+      plot f1(x), f2(x), f3(x), f4(x)
+
+@end example
+
+should plot functions f1, f2, f4 in your 3 newly defined line styles.
+If a user-defined line style is not found then the corresponding default
+linetype is used instead.  E.g. in the example above, f3(x) will be plotted
+using the default linetype 3.
+
+
+@node set_style_line, plotting_styles, set_style_increment, style
 @subsubsection set style line
 
 @c ?commands set style line
@@ -10724,8 +10871,9 @@ the multiplier given on @ref{pointsize}).
 The defaults for the line and point types is the index.  The defaults for
 the width and size are both unity.
 
-Linestyles created by this mechanism do not replace the default styles;
-both may be used.
+Linestyles created by this mechanism do not replace the default linetype
+styles; both may be used.  If you want plots to use the defined styles in
+preference to the default linetypes, please see `set style increment`.
 
 Not all terminals support the `linewidth` and @ref{pointsize} features; if
 not supported, the option will be ignored.
@@ -10794,7 +10942,7 @@ will assign linestyle 10 to be a solid cyan line on any terminal that
 supports rgb colors.
 
 
-@node plotting_styles,  , set_style_line, style
+@node plotting_styles, set_style_rectangle, set_style_line, style
 @subsubsection plotting styles
 
 @c ?plotting styles
@@ -10845,6 +10993,40 @@ changed to `xyerrorbars` before plotting.
 
 For more information about error bars with and without lines,
 please see @ref{errorlines} and @ref{errorbars}.
+
+
+@node set_style_rectangle,  , plotting_styles, style
+@subsubsection set style rectangle
+
+@c ?commands set style rectangle
+@c ?commands unset style rectangle
+@c ?commands show style rectangle
+@c ?set style rectangle
+@c ?unset style rectangle
+@c ?show style rectangle
+
+Rectangles defined with the `set object rectangle` command can have individual
+styles. However, if a rectangle is not assigned a private style then it
+inherits a default that is taken from the `set style rectangle` command.
+
+Syntax:
+@example
+    set style rectangle @{front|back@} @{fillcolor <colorspec>@} @{fs <fillstyle>@}
+                        @{lw|linewidth <lw>@}
+
+@end example
+
+See @ref{colorspec} and `fillstyle`.  `fillcolor` may be abbreviated as `fc`.
+
+Examples:
+@example
+    set style rectangle back fc rgb "white" fs solid 1.0 border -1
+    set style rectangle fc linsestyle 3 fs pattern 2 noborder
+
+@end example
+
+The default values correspond to solid fill with the background color and a
+black border.
 
 
 
@@ -14280,7 +14462,7 @@ Use <fontface> to specify the font to use (default is "Times-Roman"),
 The aqua terminal support enhanced text mode (see `enhanced`), except for
 overprint. Font support is limited to the fonts available on the system.
 Character encoding can be selected by @ref{encoding} and currently supports
-iso_latin_1, iso_latin2, and cp1250 with iso_latin_1 being the dafault."  
+iso_latin_1, iso_latin_2, and cp1250 with iso_latin_1 being the default."  
 
 @node atari_ST_(via_AES), atari_ST_(via_VDI), aqua, terminal_
 @subsubsection atari ST (via AES)
@@ -15146,7 +15328,8 @@ format is the metafile standard on MS Win32 Systems.
 Syntax:
 @example
       set terminal emf @{<color>@} @{solid | dashed@} @{linewidth <X>@}
-                       @{"<font>"@} @{<fontsize>@}
+                       @{"<fontname>"@} @{<fontsize>@}    #old syntax
+                       @{font "<fontname>,<fontsize>"@} #new syntax
 
 @end example
 
@@ -17000,6 +17183,7 @@ Syntax:
       set terminal pdf @{monochrome|color|colour@}
                        @{@{no@}enhanced@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
+                       @{font "<fontname>@{,<fontsize>@}"@}
                        @{linewidth <lw>@} @{rounded|butt@}
                        @{solid|dashed@} @{dl <dashlength>@}@}
 
