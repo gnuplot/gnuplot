@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.53 2006/02/26 05:44:11 sfeam Exp $
+ * $Id: term_api.h,v 1.54 2006/03/11 22:11:44 mikulik Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -247,6 +247,12 @@ typedef struct TERMENTRY {
  */
     void (*layer) __PROTO((t_termlayer));
 
+/* Begin/End path control. 
+ * Needed by PostScript-like devices in order to join the endpoints of
+ * a polygon cleanly.
+ */
+    void (*path) __PROTO((int p));
+
 } TERMENTRY;
 
 #ifdef WIN16
@@ -393,5 +399,9 @@ void PM_set_gpPMmenu __PROTO((struct t_gpPMmenu * gpPMmenu));
 
 /* in set.c (used in pm3d.c) */
 void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag));
+
+/* Wrappers for term->path() */
+void newpath __PROTO((void));
+void closepath __PROTO((void));
 
 #endif /* GNUPLOT_TERM_API_H */

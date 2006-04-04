@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.136 2006/03/01 06:16:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.137 2006/03/18 19:03:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2756,4 +2756,22 @@ parse_term_size( float *xsize, float *ysize, size_units default_units )
 	int_error(c_token, "size: out of range");
 
     return units;
+}
+
+/*
+ * Wrappers for newpath and closepath
+ */
+
+void
+newpath()
+{
+    if (term->path)
+	(*term->path)(0);
+}
+
+void
+closepath()
+{
+    if (term->path)
+	(*term->path)(1);
 }

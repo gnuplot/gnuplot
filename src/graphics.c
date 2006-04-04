@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.180 2006/03/26 00:09:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.181 2006/03/26 20:00:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1737,10 +1737,12 @@ do_plot(struct curve_points *plots, int pcount)
 	    else
 		clip_area = &canvas;
 	    term_apply_lp_properties(&key->box);
+	    newpath();
 	    draw_clip_line(keybox.xl, keybox.yb, keybox.xl, keybox.yt);
 	    draw_clip_line(keybox.xl, keybox.yt, keybox.xr, keybox.yt);
 	    draw_clip_line(keybox.xr, keybox.yt, keybox.xr, keybox.yb);
 	    draw_clip_line(keybox.xr, keybox.yb, keybox.xl, keybox.yb);
+	    closepath();
 	    /* draw a horizontal line between key title and first entry */
 	    draw_clip_line(keybox.xl, keybox.yt - (ktitl_lines) * t->v_char,
 			   keybox.xr, keybox.yt - (ktitl_lines) * t->v_char);
@@ -3303,11 +3305,13 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			(*t->linetype)(plot->fill_properties.border_linetype);
 		}
 
+		newpath();
 		(*t->move) (xl, yb);
 		(*t->vector) (xl, yt);
 		(*t->vector) (xr, yt);
 		(*t->vector) (xr, yb);
 		(*t->vector) (xl, yb);
+		closepath();
 
 		if( t->fillbox && plot->fill_properties.border_linetype != LT_UNDEFINED) {
 		    (*t->linetype)(plot->lp_properties.l_type);
@@ -3654,11 +3658,13 @@ plot_c_bars(struct curve_points *plot)
 	    (*t->move)   (xM, map_y(yclose));
 	    (*t->vector) (xM, yhighM);
 
+	    newpath();
 	    (*t->move)   (xlowM, map_y(yopen));
 	    (*t->vector) (xhighM, map_y(yopen));
 	    (*t->vector) (xhighM, map_y(yclose));
 	    (*t->vector) (xlowM, map_y(yclose));
 	    (*t->vector) (xlowM, map_y(yopen));
+	    closepath();
 
 	/* Some users prefer bars at the end of the whiskers */
 	if (plot->arrow_properties.head == BOTH_HEADS) {
@@ -4702,6 +4708,7 @@ static void
 plot_border()
 {
 	term_apply_lp_properties(&border_lp);	/* border linetype */
+	newpath();
 	(*term->move) (plot_bounds.xleft, plot_bounds.ybot);
 	if (border_south) {
 	    (*term->vector) (plot_bounds.xright, plot_bounds.ybot);
@@ -4723,6 +4730,7 @@ plot_border()
 	} else {
 	    (*term->move) (plot_bounds.xleft, plot_bounds.ybot);
 	}
+	closepath();
 }
 
 
@@ -4842,6 +4850,7 @@ do_key_sample(
 	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
 	    (*t->linetype)(fs->border_linetype);
 	if (fs->border_linetype != LT_NODRAW) {
+	    newpath();
 	    draw_clip_line( xl + key_sample_left,  yl - key_entry_height/4,
 			    xl + key_sample_right, yl - key_entry_height/4);
 	    draw_clip_line( xl + key_sample_right, yl - key_entry_height/4,
@@ -4850,6 +4859,7 @@ do_key_sample(
 			    xl + key_sample_left,  yl + key_entry_height/4);
 	    draw_clip_line( xl + key_sample_left,  yl + key_entry_height/4,
 	    		    xl + key_sample_left,  yl - key_entry_height/4);
+	    closepath();
 	}
 	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED) {
 	    (*t->linetype)(this_plot->lp_properties.l_type);

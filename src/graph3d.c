@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.149 2006/03/26 05:08:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.150 2006/03/26 20:00:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -824,11 +824,13 @@ do_3dplot(
 
 	/* key_rows seems to contain title at this point ??? */
 	term_apply_lp_properties(&key->box);
+	newpath();
 	(*t->move) (xl - key_size_left, yb);
 	(*t->vector) (xl - key_size_left, yt);
 	(*t->vector) (key_xr, yt);
 	(*t->vector) (key_xr, yb);
 	(*t->vector) (xl - key_size_left, yb);
+	closepath();
 
 	/* draw a horizontal line between key title and first entry  JFi */
 	(*t->move) (xl - key_size_left, yt - (ktitle_lines) * t->v_char);
@@ -2028,6 +2030,20 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 {
     unsigned int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
+
+    if (draw_border && splot_map) {
+	    term_apply_lp_properties(&border_lp);
+	    newpath();
+	    map3d_xy(zaxis_x, zaxis_y, base_z, &x, &y);
+	    term->move(x, y);
+	    map3d_xy(back_x , back_y , base_z, &x, &y);
+	    term->vector(x, y);
+	    map3d_xy(right_x, right_y, base_z, &x, &y);
+	    term->vector(x, y);
+	    map3d_xy(front_x, front_y, base_z, &x, &y);
+	    term->vector(x, y);
+	    closepath();
+    } else
 
     if (draw_border) {
 	/* the four corners of the base plane, in normalized view

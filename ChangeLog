@@ -1,5 +1,20 @@
 2006-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/term_api.h src/term.c (newpath closepath) term/README:
+	Define a new terminal entry point term->path(foo), and wrapper routines
+	newpath() == term->path(0);  closepath == term->path(1).
+	These are needed to ensure smooth line joins at the ends of a closed
+	path in PostScript-like	terminals.
+
+	* src/graph3d.c (do_3dplot draw_3d_graphbox) 
+	* src/graphics.c (do_plot plot_boxes plot_cbars do_key_sample)
+	* src/graphics.c (plot_border) src/color.c (draw_color_smooth_box):
+	Enclose the vector commands that draw rectangles with a
+	newpath()...closepath() pair. This guarantees a smooth join for the
+	plot boundary, the key box, colorbox, boxes, and candlesticks.
+
+2006-04-04  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/gplt_x11.c (gpXLoadQueryFont): When trying to load a multibyte
 	fontset, treat "missing charsets" as a non-fatal warning.  This seems
 	necessary in order to handle en_US.UTF-8 and similar locales, which

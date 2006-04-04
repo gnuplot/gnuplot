@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.177 2006/03/16 04:34:54 sfeam Exp $
+ * $Id: post.trm,v 1.178 2006/03/24 21:48:47 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -116,6 +116,9 @@ TERM_PUBLIC void ENHPS_WRITEC __PROTO((int c));
 TERM_PUBLIC char *PS_RememberFont __PROTO((char *fname, int reencode));
 
 TERM_PUBLIC char *PS_escape_string __PROTO((char *origstr, char *escapelist));
+
+TERM_PUBLIC void PS_path __PROTO((int p));
+static TBOOLEAN PS_newpath = FALSE;
 
 #endif /* TERM_PROTO */
 
@@ -1801,6 +1804,10 @@ PS_move(unsigned int x, unsigned int y)
     sprintf(abso, "%d %d M\n", x, y);
     sprintf(rel, "%d %d R\n", dx, dy);
 
+    if (PS_newpath) {
+	fprintf(gppsfile, "%d %d N\n", x, y);
+	PS_newpath = FALSE;
+    } else
     if (strlen(rel) < strlen(abso) && PS_relative_ok) {
 	fputs(rel, gppsfile);
 	PS_taken++;
@@ -3144,6 +3151,23 @@ char *name;
     fclose(prologue_fd);
 }
 
+TERM_PUBLIC void
+PS_path(int p)
+{
+    switch (p) {
+	case 0:	/* Start new path */
+		PS_FLUSH_PATH;
+		PS_newpath = TRUE;
+		break;
+
+	case 1: /* Close path */
+		fprintf(gppsfile, "Z ");
+		PS_FLUSH_PATH;
+		break;
+    }
+
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -3169,6 +3193,8 @@ TERM_TABLE_START(post_driver)
     , PS_image
 #endif
     , ENHPS_OPEN, ENHPS_FLUSH, ENHPS_WRITEC
+    , 0		/* layer control */
+    , PS_path
 TERM_TABLE_END(post_driver)
 
 #undef LAST_TERM

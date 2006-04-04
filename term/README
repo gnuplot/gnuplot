@@ -86,6 +86,8 @@ struct TERMENTRY {
     void (*enhanced_writec) __PROTO((int c));
 /* Driver-specific synchronization or other layering commands */
     void (*layer) __PROTO((t_termlayer syncpoint));
+/* Path control for end-joins of closed polygons on PostScript-like devices */
+    void (*path) __PROTO((int p));
 };
 
 One consequence of (1) is that we would like drivers to be backwards
@@ -432,6 +434,16 @@ _layer(t_termlayer syncpoint)
    Driver-specific synchronization or other layering commands.
    As of this point (July 2005) used only by pslatex.trm
 
+_path(int p)
+   PostScript-like devices make a distinction between the end of a 
+   line segment that is internal to a polyline and one that has no
+   line-join to another segment.  In order to treat the endpoints of
+   a closed polygon as "internal" line-joins, one must bracket the
+   polygon segments with "newpath ... closepath". 
+   term->path(0) triggers a "newpath"
+   term->path(1) triggers a "closepath"
+   These calls are optional, and only required by a few drivers.
+   
 
 The following should illustrate the order in which calls to these
 routines are made:
@@ -442,8 +454,10 @@ routines are made:
     _graphics()
       _linewidth(lw)
       _linetype(lt)
-      _move(x,y)
-      _vector(x,y)
+      _path(0)
+         _move(x,y)
+         _vector(x,y)
+      _path(1)
       _pointsize(size)
       _point(x,y,point)
       _text_angle(angle)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.64 2006/03/18 19:03:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.65 2006/03/26 05:08:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -594,11 +594,13 @@ draw_color_smooth_box(int plot_mode)
 	    /* black solid colour should be chosen, so it's border linetype */
 	    term_apply_lp_properties(&border_lp);
 	}
+	newpath();
 	(term->move) (cb_x_from, cb_y_from);
 	(term->vector) (cb_x_to, cb_y_from);
 	(term->vector) (cb_x_to, cb_y_to);
 	(term->vector) (cb_x_from, cb_y_to);
 	(term->vector) (cb_x_from, cb_y_from);
+	closepath();
 
 	/* Set line properties to some value, this also draws lines in postscript terminals. */
 	    term_apply_lp_properties(&border_lp);
