@@ -1,5 +1,6 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
+* NEW windows terminal supports enhanced text mode
 * NEW support for placement of individual rectangles within plot or canvas
 * NEW command "set style increment user" allows customization of default lines
 * NEW support for enhanced text mode in Windows terminal driver
@@ -12,7 +13,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW more versatile key placement and arrangement
 * NEW 'splot x*y with pm3d' no longer requires prior 'set pm3d'
 * NEW store a sequence of plots to an animated gif (requires libgd > 2.0.28)
-* NEW multi-byte font support in x11, control by the locale setting LC_CTYPE
+* NEW multi-byte font support in x11, controlled by the locale setting LC_CTYPE
 * NEW control decimal sign conventions using locale setting LC_NUMERIC
 * NEW pstex, pslatex and epslatex terminals share functionality with postscript
 * NEW suboptions "set pm3d corners2color min|max"

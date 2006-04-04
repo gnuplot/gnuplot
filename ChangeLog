@@ -82,7 +82,7 @@
 
 	* src/term_api.h src/term.c (newpath closepath) term/README:
 	Define a new terminal entry point term->path(foo), and wrapper routines
-	newpath() == term->path(0);  closepath == term->path(1).
+	newpath() == term->path(0);  closepath() == term->path(1).
 	These are needed to ensure smooth line joins at the ends of a closed
 	path in PostScript-like	terminals.
 
