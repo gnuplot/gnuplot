@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.152 2005/12/03 05:23:10 sfeam Exp $
+ * $Id: x11.trm,v 1.153 2006/01/02 19:57:44 sfeam Exp $
  *
  */
 
@@ -130,10 +130,14 @@ TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
 
 /* non-zero if '-display' found on command line */
 static int X11_Display = 0;
-static char X11_default_font[MAX_ID_LEN+1] = {'\0'};
+
+/* Fonts can have very long names */
+/* EAM FIXME - these should be dynamically allocated */
+#define X11_MAX_FONTNAME_LENGTH 255
+static char X11_default_font[X11_MAX_FONTNAME_LENGTH+1] = {'\0'};
 static int  X11_default_fontsize = 12;
-static char X11_last_font_used[MAX_ID_LEN+1] = {'\01','\0'};
-static char X11_next_font_used[MAX_ID_LEN+1] = {'\0'};
+static char X11_last_font_used[X11_MAX_FONTNAME_LENGTH+1] = {'\01','\0'};
+static char X11_next_font_used[X11_MAX_FONTNAME_LENGTH+1] = {'\0'};
 static enum JUSTIFY X11_last_justification = LEFT;
 
 static void X11_atexit __PROTO((void));

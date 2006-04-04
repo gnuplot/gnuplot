@@ -1,5 +1,16 @@
 2006-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/gplt_x11.c (gpXLoadQueryFont): When trying to load a multibyte
+	fontset, treat "missing charsets" as a non-fatal warning.  This seems
+	necessary in order to handle en_US.UTF-8 and similar locales, which
+	claim to require many exotic but trivial charsets.  Normally these are
+	not needed, so it should not be a fatal error if they are missing.
+	Bug #1458525
+
+	* term/x11.trm: Increase maximum allowed length of font names.
+
+2006-04-04  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* misc.c (lp_use_properties lp_parse): In "set style increment user"
 	mode, an explicit linetype should be interpreted as a call for the
 	corresponding line style. But if there is none, we should load a

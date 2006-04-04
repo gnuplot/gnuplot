@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.158 2006/03/23 07:14:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.159 2006/03/27 01:32:28 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -5297,6 +5297,7 @@ XFontStruct *gpXLoadQueryFont (Display *disp, char *fontname)
     return XLoadQueryFont(disp, fontname);
 #else
     static char **miss, *def;
+    static TBOOLEAN first_time = TRUE;
     int n_miss;
     char tmpfname[256];
 
@@ -5305,13 +5306,29 @@ XFontStruct *gpXLoadQueryFont (Display *disp, char *fontname)
     else {
 	fontset_transsep(tmpfname, fontname, 256-1);
 	mbfont = XCreateFontSet(disp, tmpfname, &miss, &n_miss, &def);
+
+	/* This test seemed to make sense for Japanese locales, which only */
+	/* claim to require a small number of character sets.  But it is   */
+	/* highly likely to fail for more generic locales like en_US.UTF-8 */
+	/* that claim to "require" about 2 dozen obscure character sets.   */
+	/* EAM - do not fail the request; just continue after a warning.   */
 	if (n_miss>0) {
+#if (0)
 	    if (mbfont) {
 		XFreeFontSet(disp, mbfont);
 		mbfont=NULL;
 	    }
+#else
+	    if (first_time) {
+		fprintf(stderr,"gnuplot_x11: Some character sets not available\n");
+		first_time = FALSE;
+	    }
+	    while (n_miss-- > 0)
+		FPRINTF((stderr,"Missing charset: %s\n", miss[n_miss]));
+#endif
 	    XFreeStringList(miss);
 	}
+
 	return NULL;
     }
 #endif
