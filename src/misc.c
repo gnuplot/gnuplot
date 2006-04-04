@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.76 2006/03/23 21:48:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.77 2006/03/23 22:16:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -737,7 +737,12 @@ lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
     }
 
     /* tag not found: */
-    int_warn(NO_CARET, "linestyle not found", NO_CARET);
+    /* Mar 2006 - This used to be a fatal error; now we fall back to line type */
+    if (tag > 1)
+	int_warn(NO_CARET, "linestyle not found", NO_CARET);
+    lp->l_type = tag - 1;
+    lp->pm3d_color.type = TC_LT;
+    lp->pm3d_color.lt = lp->l_type;
 }
 
 
@@ -782,9 +787,13 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    lp->l_type = LT_BACKGROUND;
 		    c_token++;
 #endif
-		} else
-		    lp->l_type = (int) real(const_express(&t)) - 1;
-		continue;
+		} else {
+		    int lt = real(const_express(&t));
+		    lp->l_type = lt - 1;
+		    /* user may prefer explicit line styles */
+		    if (prefer_line_styles)
+			lp_use_properties(lp, lt, TRUE);
+		}
 	    } /* linetype, lt */
 
 	    /* both syntaxes allowed: 'with lt pal' as well as 'with pal' */

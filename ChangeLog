@@ -1,3 +1,11 @@
+2006-04-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* misc.c (lp_use_properties lp_parse): In "set style increment user"
+	mode, an explicit linetype should be interpreted as a call for the
+	corresponding line style. But if there is none, we should load a
+	description of the linetype rather than failing to initialize the
+	lp_style_type at all.
+
 2006-03-28  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* docs/gnuplot.texi: Regenerated after recent documentation updates.
