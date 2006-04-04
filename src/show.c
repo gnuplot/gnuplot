@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.174 2006/03/23 22:16:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.175 2006/03/26 20:00:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1609,7 +1609,7 @@ show_arrow(int tag)
 	    showed = TRUE;
 	    fprintf(stderr, "\tarrow %d, %s %s %s",
 		    this_arrow->tag,
-		    this_arrow->arrow_properties.head ? (this_arrow->arrow_properties.head==2 ? " both heads " : "") : " (nohead)",
+		    arrow_head_names[this_arrow->arrow_properties.head],
 		    ( (this_arrow->arrow_properties.head_filled==2) ? "filled" :
 		      ( (this_arrow->arrow_properties.head_filled==1) ? "empty" :
 			"nofilled" )),

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.347 2006/03/23 22:16:30 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.348 2006/03/26 20:00:20 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4547,7 +4547,7 @@ C ... and restart the table:
  Syntax:
        set arrow {<tag>} {from <position>} {to|rto <position>}
                  { {arrowstyle | as <arrow_style>}
-                   | { {nohead | head | heads}
+                   | { {nohead | head | backhead | heads}
                        {size <length>,<angle>{,<backangle>}}
                        {filled | empty | nofilled}
                        {front | back}
@@ -4581,7 +4581,8 @@ C ... and restart the table:
 
  Specifying `nohead` produces an arrow drawn without a head---a line segment.
  This gives you yet another way to draw a line segment on the plot.  By
- default, arrows have heads. Specifying `heads` draws arrow heads on both
+ default, an arrow has a head at its end. Specifying `backhead` draws an arrow
+ head at the start point of the arrow while `heads` draws arrow heads on both
  ends of the line.  Not all terminal types support double-ended arrows.
 
  Head size can be controlled by `size <length>,<angle>` or

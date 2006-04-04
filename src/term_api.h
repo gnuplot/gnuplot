@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.54 2006/03/11 22:11:44 mikulik Exp $
+ * $Id: term_api.h,v 1.55 2006/04/05 01:09:44 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -98,11 +98,12 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 
 typedef enum e_arrow_head {
 	NOHEAD = 0,
-	END_HEAD,
-	BOTH_HEADS
+	END_HEAD = 1,
+	BACKHEAD = 2,
+	BOTH_HEADS = 3
 } t_arrow_head;
 
-extern const char *arrow_head_names[3];
+extern const char *arrow_head_names[4];
 
 typedef struct arrow_style_type {    /* contains all Arrow properties */
     int layer;	                     /* 0 = back, 1 = front */

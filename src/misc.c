@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.77 2006/03/23 22:16:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.78 2006/04/05 01:00:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1117,21 +1117,28 @@ arrow_parse(
 		if (set_head++)
 		    break;
 		c_token++;
-		arrow->head = 0;
+		arrow->head = NOHEAD;
 		continue;
 	    }
 	    if (equals(c_token, "head")) {
 		if (set_head++)
 		    break;
 		c_token++;
-		arrow->head = 1;
+		arrow->head = END_HEAD;
+		continue;
+	    }
+	    if (equals(c_token, "backhead")) {
+		if (set_head++)
+		    break;
+		c_token++;
+		arrow->head = BACKHEAD;
 		continue;
 	    }
 	    if (equals(c_token, "heads")) {
 		if (set_head++)
 		    break;
 		c_token++;
-		arrow->head = 2;
+		arrow->head = BACKHEAD | END_HEAD;
 		continue;
 	    }
 

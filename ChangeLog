@@ -1,3 +1,13 @@
+2006-04-04  Harald Harders  <h.harders@tu-bs.de>
+
+	* src/term.c (do_arrow) src/term_api.h docs/gnuplot.doc
+	* src/graphics.c (get_arrow plot_boxes plot_vectors)
+	* src/misc.c (arrow_use_properties) src/show.c (show_arrow):
+	Add an option "backhead" to arrow style that reverses the sense
+	of the arrow. Modify flags to indicate the forward arrowhead and
+	the backward arrowhead separately, so "heads" sets both flags.
+	Patchset #1318546
+
 2006-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/term.c (newpath closepath) term/README:

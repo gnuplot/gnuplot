@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.137 2006/03/18 19:03:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.138 2006/04/05 01:09:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -154,7 +154,8 @@ const struct gen_table set_encoding_tbl[] =
     { NULL, S_ENC_INVALID }
 };
 
-const char *arrow_head_names[3] = {"nohead", "head", "heads"};
+const char *arrow_head_names[4] = 
+    {"nohead", "head", "backhead", "heads"};
 
 /* HBB 20020225: moved here, from ipc.h, where it never should have
  * been. */
@@ -1152,16 +1153,22 @@ int curr_arrow_headfilled;      /* arrow head filled or not */
 
 static void
 do_arrow(
-    unsigned int sx, unsigned int sy,   /* start point */
-    unsigned int ex, unsigned int ey,   /* end point (point of arrowhead) */
+    unsigned int usx, unsigned int usy,   /* start point */
+    unsigned int uex, unsigned int uey,   /* end point (point of arrowhead) */
     int headstyle)
 {
+    /* Clipping and angle calculations do not work if coords are unsigned! */
+    int sx = (int)usx;
+    int sy = (int)usy;
+    int ex = (int)uex;
+    int ey = (int)uey;
+
     struct termentry *t = term;
     float len_tic = ((double) (t->h_tic + t->v_tic)) / 2.0;
     /* average of tic sizes */
     /* (dx,dy) : vector from end to start */
-    double dx = (double) sx - (double) ex;
-    double dy = (double) sy - (double) ey;
+    double dx = sx - ex;
+    double dy = sy - ey;
     double len_arrow = sqrt(dx * dx + dy * dy);
     gpiPoint filledhead[5];
     int xm = 0, ym = 0;
@@ -1216,37 +1223,40 @@ do_arrow(
             xm = (int) (dx2 + backlen * cos( phi + beta ));
             ym = (int) (dy2 + backlen * sin( phi + beta ));
         }
-        if (curr_arrow_headfilled==2 && !clip_point(ex,ey)) {
-            /* draw filled forward arrow head */
-            filledhead[0].x = ex + xm;
-            filledhead[0].y = ey + ym;
-            filledhead[1].x = ex + x1;
-            filledhead[1].y = ey + y1;
-            filledhead[2].x = ex;
-            filledhead[2].y = ey;
-            filledhead[3].x = ex + x2;
-            filledhead[3].y = ey + y2;
-            filledhead[4].x = ex + xm;
-            filledhead[4].y = ey + ym;
-            filledhead->style = FS_OPAQUE;
-            if (t->filled_polygon)
-                (*t->filled_polygon) (5, filledhead);
-        }
-        /* draw outline of forward arrow head */
-	if (clip_point(ex,ey))
-	    ;
-        else if (curr_arrow_headfilled!=0) {
-	    draw_clip_line(ex+xm, ey+ym, ex+x1, ey+y1);
-	    draw_clip_line(ex+x1, ey+y1, ex, ey);
-	    draw_clip_line(ex, ey, ex+x2, ey+y2);
-	    draw_clip_line(ex+x2, ey+y2, ex+xm, ey+ym);
-        } else {
-	    draw_clip_line(ex+x1, ey+y1, ex, ey);
-	    draw_clip_line(ex, ey, ex+x2, ey+y2);
+
+	if (head & END_HEAD) {
+            if (curr_arrow_headfilled==2 && !clip_point(ex,ey)) {
+		/* draw filled forward arrow head */
+		filledhead[0].x = ex + xm;
+		filledhead[0].y = ey + ym;
+		filledhead[1].x = ex + x1;
+		filledhead[1].y = ey + y1;
+		filledhead[2].x = ex;
+		filledhead[2].y = ey;
+		filledhead[3].x = ex + x2;
+		filledhead[3].y = ey + y2;
+		filledhead[4].x = ex + xm;
+		filledhead[4].y = ey + ym;
+		filledhead->style = FS_OPAQUE;
+		if (t->filled_polygon)
+                    (*t->filled_polygon) (5, filledhead);
+            }
+            /* draw outline of forward arrow head */
+	    if (clip_point(ex,ey))
+		;
+            else if (curr_arrow_headfilled!=0) {
+		draw_clip_line(ex+xm, ey+ym, ex+x1, ey+y1);
+		draw_clip_line(ex+x1, ey+y1, ex, ey);
+		draw_clip_line(ex, ey, ex+x2, ey+y2);
+		draw_clip_line(ex+x2, ey+y2, ex+xm, ey+ym);
+            } else {
+		draw_clip_line(ex+x1, ey+y1, ex, ey);
+		draw_clip_line(ex, ey, ex+x2, ey+y2);
+            }
         }
 
 	/* backward arrow head */
-        if (head == BOTH_HEADS && !clip_point(sx,sy)) { 
+        if ((head & BACKHEAD) && !clip_point(sx,sy)) { 
             if (curr_arrow_headfilled==2) {
                 /* draw filled backward arrow head */
                 filledhead[0].x = sx - xm;
@@ -1278,12 +1288,12 @@ do_arrow(
 
     /* Draw the line for the arrow. */
     if (headstyle >= 0) {
-	if ((head == BOTH_HEADS)
+	if ((head & BACKHEAD)
 	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) ) {
 	    sx -= xm;
 	    sy -= ym;
 	}
-	if ((head != NOHEAD)
+	if ((head & END_HEAD)
 	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) ) {
 	    ex += xm;
 	    ey += ym;
@@ -1968,8 +1978,10 @@ test_term()
     curr_arrow_headfilled = i;
     xl = t->h_tic * 5;
     yl = t->v_tic * 5;
-    (*t->arrow) (x - xl, y - yl, x + xl, y + yl, BOTH_HEADS);
-    (*t->arrow) (x - xl, y + yl, x + xl, y - yl, NOHEAD);
+    (*t->arrow) (x - xl, y - yl, x + xl, y + yl, END_HEAD | BACKHEAD);
+    (*t->arrow) (x - xl, y + yl, x, y, NOHEAD);
+    curr_arrow_headfilled = 3;
+    (*t->arrow) (x, y, x + xl, y - yl, BACKHEAD);
 
     /* test line widths */
     (void) (*t->justify_text) (LEFT);

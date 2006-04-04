@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.181 2006/03/26 20:00:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.182 2006/04/05 01:09:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1166,21 +1166,21 @@ get_arrow(
     unsigned int* sx, unsigned int* sy,
     unsigned int* ex, unsigned int* ey)
 {
+    double sx_d, sy_d, ex_d, ey_d;
+    map_position_double(&arrow->start, &sx_d, &sy_d, "arrow");
+    *sx = (unsigned int)(sx_d);
+    *sy = (unsigned int)(sy_d);
     if (arrow->relative) {
 	/* different coordinate systems:
-	 * add the values in the drivers
-	 * coordinate system.
+	 * add the values in the drivers coordinate system.
 	 * For log scale: relative coordinate is factor */
-	double sx_d, sy_d, ex_d, ey_d;
-	map_position_double(&arrow->start, &sx_d, &sy_d, "arrow");
 	map_position_r(&arrow->end, &ex_d, &ey_d, "arrow");
-	*sx = (unsigned int)sx_d;
-	*sy = (unsigned int)sy_d;
 	*ex = (unsigned int)(ex_d + sx_d);
 	*ey = (unsigned int)(ey_d + sy_d);
     } else {
-	map_position(&arrow->start, sx, sy, "arrow");
-	map_position(&arrow->end, ex, ey, "arrow");
+	map_position_double(&arrow->end, &ex_d, &ey_d, "arrow");
+	*ex = (unsigned int)(ex_d);
+	*ey = (unsigned int)(ey_d);
     }
 }
 
@@ -3427,10 +3427,10 @@ plot_vectors(struct curve_points *plot)
 		    edge_intersect(points, 1, &ex, &ey);
 		    x1 = map_x(ex);
 		    y1 = map_y(ey);
-		    if (plot->arrow_properties.head == BOTH_HEADS)
+		    if (plot->arrow_properties.head & END_HEAD)
 			(*t->arrow) (x1, y1, x2, y2, END_HEAD);
 		    else
-			(*t->arrow) (x1, y1, x2, y2, plot->arrow_properties.head);
+			(*t->arrow) (x1, y1, x2, y2, NOHEAD);
 		}
 	    }
 	} else {
@@ -3444,8 +3444,8 @@ plot_vectors(struct curve_points *plot)
 		    edge_intersect(points, 1, &ex, &ey);
 		    x2 = map_x(ex);
 		    y2 = map_y(ey);
-		    if (plot->arrow_properties.head == BOTH_HEADS)
-			(*t->arrow) (x2, y2, x1, y1, END_HEAD);
+		    if (plot->arrow_properties.head & BACKHEAD)
+			(*t->arrow) (x2, y2, x1, y1, BACKHEAD);
 		    else
 			(*t->arrow) (x1, y1, x2, y2, NOHEAD);
 		}

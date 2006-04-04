@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.224 2006/03/23 22:16:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.225 2006/03/26 20:00:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4503,7 +4503,7 @@ delete_linestyle(struct linestyle_def *prev, struct linestyle_def *this)
 
 /* ======================================================== */
 /* process a 'set arrowstyle' command */
-/* set style arrow {tag} {nohead|head|heads} {size l,a{,b}} {{no}filled} {linestyle...} {layer n}*/
+/* set style arrow {tag} {nohead|head|backhead|heads} {size l,a{,b}} {{no}filled} {linestyle...} {layer n}*/
 static void
 set_arrowstyle()
 {
