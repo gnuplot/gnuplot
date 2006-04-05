@@ -212,7 +212,6 @@ clip_point(unsigned int x, unsigned int y)
  *   This routine uses the cohen & sutherland bit mapping for fast clipping -
  * see "Principles of Interactive Computer Graphics" Newman & Sproull page 65.
  */
-/* FIXME HBB 20000522: The parameter type has to become unsigned int */
 void
 draw_clip_line(int x1, int y1, int x2, int y2)
 {
@@ -251,6 +250,22 @@ draw_clip_line(int x1, int y1, int x2, int y2)
     (*t->vector) (x2, y2);
 }
 
+void
+draw_clip_arrow( int sx, int sy, int ex, int ey, int head)
+{
+    struct termentry *t = term;
+
+    /* Don't draw head if the arrow itself is clipped */
+    if (clip_point(sx,sy))
+	head &= ~BACKHEAD;
+    if (clip_point(ex,ey))
+	head &= ~END_HEAD;
+    clip_line(&sx, &sy, &ex, &ey);
+
+    /* Call terminal routine to draw the clipped arrow */
+    (*t->arrow)((unsigned int)sx, (unsigned int)sy,
+		(unsigned int)ex, (unsigned int)ey, head);
+}
 
 
 /* And text clipping routine. */

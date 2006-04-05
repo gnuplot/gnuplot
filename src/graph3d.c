@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.150 2006/03/26 20:00:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.151 2006/04/05 01:09:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -480,10 +480,13 @@ place_labels3d(struct text_label *listhead, int layer)
 	/* HBB FIXME 20050428: conflicting types for &x,&y in these
 	 * two routines.  One takes pointers to unsigned, the other to
 	 * signed ints. */
-	if (layer == LAYER_PLOTLABELS)
-	    map3d_xy(this_label->place.x, this_label->place.y,
-		     this_label->place.z, &x, &y);
-	else
+	if (layer == LAYER_PLOTLABELS) {
+	    double xx, yy;
+	    map3d_xy_double(this_label->place.x, this_label->place.y,
+		     this_label->place.z, &xx, &yy);
+	    x = xx;
+	    y = yy;
+	} else
 	    map3d_position(&this_label->place, &x, &y, "label");
 
 	write_label(x, y, this_label);
@@ -493,7 +496,6 @@ place_labels3d(struct text_label *listhead, int layer)
 static void
 place_arrows3d(int layer)
 {
-    struct termentry *t = term;
     struct arrow_def *this_arrow;
     for (this_arrow = first_arrow; this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
@@ -504,8 +506,7 @@ place_arrows3d(int layer)
 	if (get_arrow3d(this_arrow, &sx, &sy, &ex, &ey)) {
 	    term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
 	    apply_head_properties(&(this_arrow->arrow_properties));
-	    (*t->arrow) ((unsigned int)sx, (unsigned int)sy, (unsigned int)ex, (unsigned int)ey,
-		this_arrow->arrow_properties.head);
+	    draw_clip_arrow(sx, sy, ex, ey, this_arrow->arrow_properties.head);
 	} else {
 	    FPRINTF((stderr,"place_arrows3d: skipping out-of-bounds arrow\n"));
 	}
@@ -3103,7 +3104,7 @@ static void
 plot3d_vectors(struct surface_points *plot)
 {
     int i;
-    unsigned int x1, y1, x2, y2;
+    double x1, y1, x2, y2;
     struct coordinate GPHUGE *heads = plot->iso_crvs->points;
     struct coordinate GPHUGE *tails = plot->iso_crvs->next->points;
 
@@ -3117,11 +3118,9 @@ plot3d_vectors(struct surface_points *plot)
 	    continue;
 
 	if (heads[i].type == INRANGE && tails[i].type == INRANGE) {
-	    map3d_xy(heads[i].x, heads[i].y, heads[i].z, &x1, &y1);
-	    map3d_xy(tails[i].x, tails[i].y, tails[i].z, &x2, &y2);
-
-	    if (!clip_point(x1, y1) && !(clip_point(x2,y2)))
-		(*term->arrow) (x1, y1, x2, y2, plot->arrow_properties.head);
+	    map3d_xy_double(heads[i].x, heads[i].y, heads[i].z, &x1, &y1);
+	    map3d_xy_double(tails[i].x, tails[i].y, tails[i].z, &x2, &y2);
+	    draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2, plot->arrow_properties.head);
 	}
     }
 }

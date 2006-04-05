@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.182 2006/04/05 01:09:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.183 2006/04/05 03:00:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -156,7 +156,7 @@ void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_s
 void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
-static void get_arrow __PROTO((struct arrow_def* arrow, unsigned int* sx, unsigned int* sy, unsigned int* ex, unsigned int* ey));
+static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* ex, int* ey));
 static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
 
 static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
@@ -1163,24 +1163,24 @@ boundary(struct curve_points *plots, int count)
 static void
 get_arrow(
     struct arrow_def *arrow,
-    unsigned int* sx, unsigned int* sy,
-    unsigned int* ex, unsigned int* ey)
+    int* sx, int* sy,
+    int* ex, int* ey)
 {
     double sx_d, sy_d, ex_d, ey_d;
     map_position_double(&arrow->start, &sx_d, &sy_d, "arrow");
-    *sx = (unsigned int)(sx_d);
-    *sy = (unsigned int)(sy_d);
+    *sx = (int)(sx_d);
+    *sy = (int)(sy_d);
     if (arrow->relative) {
 	/* different coordinate systems:
 	 * add the values in the drivers coordinate system.
 	 * For log scale: relative coordinate is factor */
 	map_position_r(&arrow->end, &ex_d, &ey_d, "arrow");
-	*ex = (unsigned int)(ex_d + sx_d);
-	*ey = (unsigned int)(ey_d + sy_d);
+	*ex = (int)(ex_d + sx_d);
+	*ey = (int)(ey_d + sy_d);
     } else {
 	map_position_double(&arrow->end, &ex_d, &ey_d, "arrow");
-	*ex = (unsigned int)(ex_d);
-	*ey = (unsigned int)(ey_d);
+	*ex = (int)(ex_d);
+	*ey = (int)(ey_d);
     }
 }
 
@@ -1273,12 +1273,15 @@ static void
 place_arrows(int layer)
 {
     struct arrow_def *this_arrow;
-    struct termentry *t = term;
+    BoundingBox *clip_save = clip_area;
+
+    /* Allow arrows to run off the plot, so long as they are still on the canvas */
+    clip_area = &canvas;
 
     for (this_arrow = first_arrow;
 	 this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
-	unsigned int sx, sy, ex, ey;
+	int sx, sy, ex, ey;
 	
 	if (this_arrow->arrow_properties.layer != layer)
 	    continue;
@@ -1286,9 +1289,10 @@ place_arrows(int layer)
 
 	term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
 	apply_head_properties(&(this_arrow->arrow_properties));
-	(*t->arrow) (sx, sy, ex, ey, this_arrow->arrow_properties.head);
+	draw_clip_arrow(sx, sy, ex, ey, this_arrow->arrow_properties.head);
     }
     term_apply_lp_properties(&border_lp);
+    clip_area = clip_save;
 }
 
 static void
@@ -4870,7 +4874,7 @@ do_key_sample(
     } else if (this_plot->plot_style == VECTOR && t->arrow) {
 	    apply_head_properties(&(this_plot->arrow_properties));
 	    curr_arrow_headlength = -1;
-	    (*t->arrow)(xl + key_sample_left, yl, xl + key_sample_right, yl,
+	    draw_clip_arrow(xl + key_sample_left, yl, xl + key_sample_right, yl,
 			this_plot->arrow_properties.head);
 
     } else if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)

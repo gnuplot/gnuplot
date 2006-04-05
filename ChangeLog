@@ -4,6 +4,18 @@
 	with support for smooth joining of closed polygons via the recently
 	added newpath()/closepath() mechanism.
 
+	* src/gadgets.c (draw_clip_arrow): Provide a routine in the core
+	code that clips arrow head/tail to the canvas boundaries. This means
+	we don't have to do the clipping in do_arrow(), which has been messy.
+
+	* src/graph3d.c (plot_arrows3d plot3d_vectors)
+	src/graphics.c (place_arrows do_key_sample get_arrow)
+	Draw arrows using new routine draw_clip_arrow.
+	Addresses bug #1348015 and others.
+
+	* src/term.c (do_arrow): Add a note that the clipping here is now
+	redundant, and can be removed.  Defer removal to a separate patchset.
+
 2006-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots): Fix inadvertant breakage due to an
