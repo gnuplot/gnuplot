@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.225 2006/03/26 20:00:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.226 2006/04/05 03:00:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4127,7 +4127,7 @@ set_zeroaxis(AXIS_INDEX axis)
 	lp_parse(&axis_array[axis].zeroaxis, TRUE, FALSE);
 	if (old_token == c_token)
 	    axis_array[axis].zeroaxis.l_type = real(const_express(&a)) - 1;
-}
+	}
 
 }
 
