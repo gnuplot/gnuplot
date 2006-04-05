@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.58 2006/01/13 07:04:57 sfeam Exp $
+ * $Id: svg.trm,v 1.59 2006/02/20 20:17:58 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -27,11 +27,14 @@
 /* ISO-Latin encoding, Font selection fixes, option "fixed|dynamic" by
  * Wilhelm Braunschober <Wilhelm.Braunschober@t-online.de>, Feb-21-2002 */
 
-/* Tweaked code for compatibility with Sodipodi svg viewer/editor.
- * Added beginnings of enhanced text support.
+/*
+ * Tweaked code for compatibility with Sodipodi svg viewer/editor.
+ * Added enhanced text support.
+ * Additional line properties.
+ * Increase resolution by adding a coordinate scale factor.
+ *
  *   Ethan Merritt  <merritt@u.washington.edu>
  */
-/* Increase resolution by adding a coordinate scale factor - Ethan Merritt Dec 2005 */
 
 #include "driver.h"
 
@@ -66,6 +69,7 @@ TERM_PUBLIC void ENHsvg_FLUSH __PROTO((void));
 TERM_PUBLIC void ENHsvg_put_text __PROTO((unsigned int, unsigned int, const char *));
 TERM_PUBLIC void ENHsvg_writec __PROTO((int));
 
+TERM_PUBLIC void SVG_path __PROTO((int p));
 
 #define SVG_SCALE	10.
 #define Y(y) ((float)(term->ymax - y) / SVG_SCALE)
@@ -103,6 +107,7 @@ static unsigned int SVG_yLast = UINT_MAX;	/* current pen vertical position*/
 static int SVG_LineType = LT_NODRAW;	/* current line type*/
 static double SVG_LineWidth = 1.0; /* current line width*/
 static double SVG_linewidth_factor = 1.0; /* Multiplier for linewidths */
+static TBOOLEAN SVG_rounded = FALSE; /* linejoin and linecap */
 static int SVG_TextAngle = 0;	/* current text orientation*/
 static enum JUSTIFY SVG_TextJust = LEFT; /* current text justification*/
 
@@ -179,8 +184,10 @@ SVG_GroupOpen ()
 	else
 	    fprintf(gpoutfile, "currentColor");
 
-	fprintf (gpoutfile, "; stroke-width:%.2f\">\n",
-		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width * SVG_linewidth_factor);
+	fprintf (gpoutfile, "; stroke-width:%.2f; stroke-linecap:%s; stroke-linejoin:%s\">\n",
+		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width * SVG_linewidth_factor,
+		 SVG_rounded ? "round" : "butt",
+		 SVG_rounded ? "round" : "miter");
 
 	SVG_groupIsOpen = TRUE;
     }
@@ -466,11 +473,23 @@ SVG_options ()
             continue;
 	}
 
-	if (almost_equals (c_token, "linew$idth")) {
+	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw")) {
 	    c_token++;
 	    SVG_linewidth_factor = real(const_express(&a));
 	    if (SVG_linewidth_factor <= 0.0)
 		SVG_linewidth_factor = 1.0;
+	    continue;
+	}
+									
+	if (almost_equals (c_token, "round$ed")) {
+	    c_token++;
+	    SVG_rounded = TRUE;
+	    continue;
+	}
+									
+	if (equals (c_token, "butt")) {
+	    c_token++;
+	    SVG_rounded = FALSE;
 	    continue;
 	}
 									
@@ -491,6 +510,9 @@ SVG_options ()
 	sprintf(&(term_options[strlen(term_options)]),
 	    "fontfile \"%s\" ", SVG_embedded_font);
     }
+
+    sprintf(&(term_options[strlen(term_options)]),
+	SVG_rounded ? "rounded " : "butt ");
 
     if (SVG_linewidth_factor != 1.0) {
 	sprintf(&(term_options[strlen(term_options)]),
@@ -1263,6 +1285,20 @@ SVG_load_fontfile(char *fontfile)
     }
 }
 
+TERM_PUBLIC void
+SVG_path(int p)
+{
+    switch (p) {
+	case 1: /* Close path */
+		fprintf(gpoutfile, "Z ");
+		SVG_PathClose();
+		break;
+	case 0:
+		break;
+    }
+}
+
+
 #undef Y
 #undef X
 
@@ -1289,6 +1325,8 @@ TERM_TABLE_START (svg_driver)
     , NULL
 #endif
    , ENHsvg_OPEN, ENHsvg_FLUSH, ENHsvg_writec
+   , 0		/* layer */
+   , SVG_path 	/* path */
 TERM_TABLE_END (svg_driver)
 
 #undef LAST_TERM
@@ -1313,7 +1351,7 @@ START_HELP(svg)
 "                        {{no}enhanced}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
 "                        {fontfile <filename>}",
-"                        {linewidth <lw>}",
+"                        {rounded|butt} {linewidth <lw>}",
 "",
 " where <x> and <y> are the size of the SVG plot to generate,",
 " `dynamic` allows a svg-viewer to resize plot, whereas the default",

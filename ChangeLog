@@ -1,3 +1,9 @@
+2006-04-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: New line-join terminal option {rounded|butt},
+	with support for smooth joining of closed polygons via the recently
+	added newpath()/closepath() mechanism.
+
 2006-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots): Fix inadvertant breakage due to an
