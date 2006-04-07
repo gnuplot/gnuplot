@@ -1,3 +1,9 @@
+2006-04-07  <laboratoryman@users.sourceforge.net>
+
+	* src/term.c (test_term): No terminal currently implements any head
+	fill style (curr_arrow_headfilled) other than 0/1/2.  So don't use 3 as
+	a test case.
+
 2006-04-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: New line-join terminal option {rounded|butt},
