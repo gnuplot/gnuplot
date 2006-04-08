@@ -1,3 +1,9 @@
+2006-04-08  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/set.c (set_palette_file) docs/gnuplot.doc: Binary palette files
+	are supported as well. Example:
+	    set palette file "palette.bin" binary record=64 using 1:2:3
+
 2006-04-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.os2: Define more features.
