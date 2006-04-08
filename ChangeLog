@@ -1,7 +1,8 @@
 2006-04-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/pgnuplot.c: Patch for SF bug [1232950] "-persist option does
-	not work in Version 4.0.0 (Windows)".
+	not work in Version 4.0.0 (Windows)".  Omit sending `exit` from pgnuplot
+	to wgnuplot when `-persist` is given on command line.
 
 2006-04-08  Daniel Sebald  <daniel.sebald@ieee.org>
 
