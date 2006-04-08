@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.13 2005/01/26 16:19:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.14 2005/04/22 21:40:38 broeker Exp $"); }
 #endif
 
 /*
@@ -222,6 +222,7 @@ main (int argc, char *argv[])
     char    psGnuplotCommandLine[MAX_PATH] = PROGNAME;
     LPTSTR  psCmdLine;
     BOOL    bSuccess;
+    BOOL    bPersist = FALSE;
     int	i;
 
 #if !defined(_O_BINARY) && defined(O_BINARY)
@@ -237,6 +238,9 @@ main (int argc, char *argv[])
 	    printf("gnuplot %s patchlevel %s\n",
 		   gnuplot_version, gnuplot_patchlevel);
 	    return 0;
+	} else if ((!stricmp(argv[i], "-noend")) || (!stricmp(argv[i], "/noend")) || 
+		   (!stricmp(argv[i], "-persist"))) {
+	    bPersist = TRUE;
 	} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 	    printf("Usage: gnuplot [OPTION] [FILE] [-]\n"
 		    "  -V, --version   show gnuplot version\n"
@@ -340,9 +344,11 @@ main (int argc, char *argv[])
 	PostString(hwndText, psBuffer);
     }
 
-    /* exit gracefully */
-    /* CRS: Add a test to see if gnuplot is still running? */
-    PostString(hwndText, "\nexit\n");
+    /* exit gracefully, unless -persist is requested */
+    if (!bPersist) {
+	/* CRS: Add a test to see if gnuplot is still running? */
+	PostString(hwndText, "\nexit\n");
+    }
 
     return EXIT_SUCCESS;
 }
