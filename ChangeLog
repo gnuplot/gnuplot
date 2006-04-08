@@ -1,3 +1,8 @@
+2006-04-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/standard.c (f_tanh): Fix a two-fold error in bounds checking for
+	tanh().  Bug #1452627
+
 2006-04-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/pgnuplot.c: Patch for SF bug [1232950] "-persist option does

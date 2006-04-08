@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.21 2004/11/10 23:30:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.22 2005/03/06 02:20:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -700,30 +700,34 @@ f_tanh(union argument *arg)
 {
     struct value a;
     double den;
+    double real_2arg, imag_2arg;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
 
+    real_2arg = 2. * real(&a);
+    imag_2arg = 2. * imag(&a);
+
 #ifdef E_MINEXP
-    if (-fabs(real(&a)) < E_MINEXP) {
-	push(Gcomplex(&a, 1.0, 0.0));
+    if (-fabs(real_2arg) < E_MINEXP) {
+	push(Gcomplex(&a, real_2arg < 0 ? -1.0 : 1.0, 0.0));
 	return;
     }
 #else
     {
 	int old_errno = errno;
 
-	if (exp(-fabs(real(&a))) == 0.0) {
+	if (exp(-fabs(real_2arg)) == 0.0) {
 	    /* some libm's will raise a silly ERANGE in cosh() and sin() */
 	    errno = old_errno;
-	    push(Gcomplex(&a, 1.0, 0.0));
+	    push(Gcomplex(&a, real_2arg < 0 ? -1.0 : 1.0, 0.0));
 	    return;
 	}
     }
 #endif
 
-    den = cosh(2 * real(&a)) + cos(2 * imag(&a));
-    push(Gcomplex(&a, sinh(2 * real(&a)) / den, sin(2 * imag(&a)) / den));
+    den = cosh(real_2arg) + cos(imag_2arg);
+    push(Gcomplex(&a, sinh(real_2arg) / den, sin(imag_2arg) / den));
 }
 
 void
