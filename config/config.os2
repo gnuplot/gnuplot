@@ -55,10 +55,10 @@
 #define HAVE_ATEXIT 1
 
 /* Define to 1 if you have the `bcopy' function. */
-/* #undef HAVE_BCOPY */
+#define HAVE_BCOPY 1
 
 /* Define to 1 if you have the `bzero' function. */
-/* #undef HAVE_BZERO */
+#define HAVE_BZERO 1
 
 /* Define to 1 if you have the declaration of `signgam', and to 0 if you
    don't. */
@@ -115,7 +115,7 @@
 /* #undef HAVE_GGI_XMI_H */
 
 /* Define to 1 if you have the `index' function. */
-/* #undef HAVE_INDEX */
+#define HAVE_INDEX 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 /* #undef HAVE_INTTYPES_H */
@@ -160,7 +160,7 @@
 #define HAVE_LOCALE_H 1
 
 /* Define to 1 if you have the <malloc.h> header file. */
-/* #undef HAVE_MALLOC_H */
+#define HAVE_MALLOC_H 1
 
 /* Define to 1 if you have the <math.h> header file. */
 #define HAVE_MATH_H 1
@@ -172,7 +172,7 @@
 #define HAVE_MEMMOVE 1
 
 /* Define to 1 if you have the <memory.h> header file. */
-/* #undef HAVE_MEMORY_H */
+#define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
@@ -184,7 +184,7 @@
 /* #undef HAVE_ON_EXIT */
 
 /* Define to 1 if you have the `pclose' function. */
-/* #undef HAVE_PCLOSE */
+#define HAVE_PCLOSE 1
 
 /* Define to 1 if you have the <pdflib.h> header file. */
 /* #undef HAVE_PDFLIB_H */
@@ -199,10 +199,10 @@
 /* #undef HAVE_POLL_H */
 
 /* Define to 1 if you have the `popen' function. */
-/* #undef HAVE_POPEN */
+#define HAVE_POPEN 1
 
 /* Define to 1 if you have the <pwd.h> header file. */
-/* #undef HAVE_PWD_H */
+#define HAVE_PWD_H 1
 
 /* Define to 1 if you have the <readline/history.h> header file. */
 /* #undef HAVE_READLINE_HISTORY_H */
@@ -214,7 +214,7 @@
 /* #undef HAVE_READLINE_TILDE_H */
 
 /* Define to 1 if you have the `rindex' function. */
-/* #undef HAVE_RINDEX */
+#define HAVE_RINDEX 1
 
 /* Define to 1 if you have the `select' function. */
 #define HAVE_SELECT 1
@@ -262,13 +262,13 @@
 #define HAVE_STRERROR 1
 
 /* Define to 1 if you have the `stricmp' function. */
-/* #undef HAVE_STRICMP */
+#define HAVE_STRICMP 1
 
 /* Define to 1 if cpp supports the ANSI # stringizing operator. */
 #define HAVE_STRINGIZE 1
 
 /* Define to 1 if you have the <strings.h> header file. */
-/* #undef HAVE_STRINGS_H */
+#define HAVE_STRINGS_H 1
 
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1

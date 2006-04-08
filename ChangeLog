@@ -1,4 +1,18 @@
-2006-04-07  <laboratoryman@users.sourceforge.net>
+2006-04-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.os2: Define more features.
+
+	* config/makefile.os2:
+	  - add a list of required/recommended tools and libraries,
+	  - make use of pre-built version of libgd from hobbes.nmsu.edu,
+	  - change requirements for newer versions of PDFlib,
+	  - replace shell script to create allterm.h by 4allterm.cmd in Rexx.
+
+	* src/os2/4allterm.cmd: New Rexx script to create allterm.h, much faster
+	than previous code and does not require the unix tool chain to be
+	installed.
+
+2006-04-07  laboratoryman  <laboratoryman@users.sourceforge.net>
 
 	* src/term.c (test_term): No terminal currently implements any head
 	fill style (curr_arrow_headfilled) other than 0/1/2.  So don't use 3 as

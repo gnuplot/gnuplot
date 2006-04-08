@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.47 2005/08/07 09:43:27 mikulik Exp $
+# $Id: makefile.os2,v 1.48 2005/08/12 08:31:56 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -7,6 +7,17 @@
 # To compile gnuplot, run the following command in directory gnuplot\src:
 #	make -f ..\config\makefile.os2
 #
+
+# The following tools and libraries are recommended/required to use this
+# makefile out of the box:
+#	- GNU make, e.g. http://hobbes.nmsu.edu/pub/os2/dev/util/make-3.81beta3-r2-bin.zip
+#	- IPFC included in the OS/2 developer kit
+#	- emtex is only required for some parts of the documentation
+#
+#	- GD library, http://hobbes.nmsu.edu/pub/os2/util/gd-2-0-33.zip
+#	- GNU readline, http://os2ports.com/ftp/pub/os2/unix/devtools/readline/readline4.1-os2.zip
+#	- PDFlib Lite 6.0 or later compiled for emx (available as source from http://www.pdflib.com/ )
+#	- XFree86 libraries, ftp://ftp.netlabs.org/pub/xfree86/4.5.0
 
 # We depend on using cmd.exe (or a compatible one) and the
 # standard OS/2 tool set. (additionally we use 'cat')
@@ -25,37 +36,25 @@ SHELL=cmd.exe
 X11=1
 
 # GIF, PNG, JPEG device drivers
-# Requires gd library. There are two possibilities how to configure these
-# drivers for use in gnuplot, depending on the gd version. See README.1ST for
-# more details. 
+# Requires gd library (not part of gnuplot)
 #
-# 1. You can use the following set of options for GD library v1.8 or newer. 
-# This library writes PNG and JPEG images, but not GIF. Therefore the option
-# PNG_FOR_GIF allows backwards compatibility with the old GIF driver, i.e.
-# 'set term gif ...' is still valid, but it actually writes out PNG files
-# instead of GIF.
+# You can use the following set of options for GD library v2.0 something
+# or newer. This library writes PNG, JPEG and GIF images.
 # If libgd has been compiled with TrueType font support, then you can use
-# scaled TrueType fonts in png images. If not, then uncomment FREETYPE.
-# Requires GD, PNG and Z libraries, optionally libfreetype.
-#
-NEWGD=1
-PNG_FOR_GIF=1
-#JPEG=1
+# scaled TrueType fonts in PNG images. If not, then uncomment FREETYPE.
+# The pre-compiled GD library by Ilya Zakharevich available at 
+# http://hobbes.nmsu.edu/pub/os2/util/gd-2-0-33.zip
+# is strongly recommended. This packages already includes the required
+# GD, JPEG and Z and freetype libraries.
+GD=1
+PNG=1
+GIF=1
+JPEG=1
 FREETYPE=1
-#
-# 2. You can use the following set of options for the old GD library
-# (v1.2 - v1.4), which supports GIF images only.
-# In this case the PNG driver is independent on GD driver, but there are
-# several functionality limitations of the old non-libgd png driver.
-# Required libraries: GD (GIF driver), PNG and Z (PNG driver).
-#
-#GD=1
-#GIF=1
-#PNG=1
 
 # PDF device driver
 # requires PDFlib (not part of gnuplot)
-# PDF=1
+PDF=1
 
 # VESAkit support
 # requires SVGA- and VESA Kit (not part of gnuplot)
@@ -167,48 +166,26 @@ endif
 #
 TERMFLAGS = -I. -I.. -I$(T)
 
-ifdef NEWGD
-  GD=1
-  PNG=1
-endif
-
 ifdef GD
   CFLAGS += -DHAVE_LIBGD
   TERMLIBS += -lgd
+ifdef FREETYPE
+  CFLAGS += -DHAVE_GD_TTF
 endif
-
+ifdef PNG
+  CFLAGS += -DHAVE_GD_PNG
+endif
 ifdef GIF
   CFLAGS += -DHAVE_GD_GIF
 endif
-
-ifdef PNG
-  CFLAGS += -DHAVE_LIBPNG
-  TERMLIBS += -lpng -lz
-endif
-
-ifdef NEWGD
-  CFLAGS += -DHAVE_GD_PNG
-ifdef FREETYPE
-  CFLAGS += -DHAVE_GD_TTF
-  TERMLIBS += -lfreetype
-endif
 ifdef JPEG
   CFLAGS += -DHAVE_GD_JPEG
-  TERMLIBS += -ljpeg
-endif
-ifdef PNG_FOR_GIF
-  CFLAGS += -DPNG_FOR_GIF
-  CFLAGS += -DHAVE_GD_GIF
 endif
 endif
 
 ifdef PDF
   TERMFLAGS += -DHAVE_LIBPDF
-  # amai: don't ask me... My libpdf requires all those additional libs
-  TERMLIBS += -lpdf -ltiff -ljpeg
-ifndef PNG
-  TERMLIBS += -lz
-endif
+  TERMLIBS  += -lpdflib
 endif
 
 # SVGA-/VESAkit support
@@ -237,7 +214,6 @@ endif
 # saving history (independent of GNU readline)
 ifdef HISTORY
   CFLAGS  += -DGNUPLOT_HISTORY 
-#  CFLAGS  +=  -DGNUPLOT_HISTORY_FILE=\"~\\\\gnuplot.his\"
 endif
 
 
@@ -411,40 +387,12 @@ ifdef SORT_TERMINALS
 # sort alphabetically all terminals
 $(DOCDIR)\allterm.h: $(CORETERM)
 	@echo "Building allterm.h"
-ifdef NO_BUGGY_GMAKE
-#	This is the original version, like in makefile.mgw or .cyg; but OS/2's
-#	GNU make crashes so we cannot use it.
-	@echo "Building allterm.h"
-	@for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
-	     gsort -f -t':' -k2` ; do \
-	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
-	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
-	done >$@
-else
-#	Instead, create a temporary script file and run bash on it:
-	echo T=$(TERMDIR)\ | tr \\ / >4alltrm.sh
-	grep "(T)" makefile.all | \
-	  sed "s/CORETERM = /CORETERM=%/;s/xlib.trm/xlib.trm%/" | \
-	  sed "s/%/\""/g;s/(/{/g;s/)/}/g" >>4alltrm.sh
-	@echo \
-	  for e in `egrep "^[ 	]*START_HELP" $${CORETERM} % \
-	  gsort -f -t':' -k2` ; do | tr  "%" "|" >>4alltrm.sh
-	@echo \
-	  f=`echo $$e % cut -d\: -f1` ; s=`echo $$e % cut -d\: -f2` ;\
-	    | tr  "%" "|" >>4alltrm.sh
-	@echo \
-	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; >>4alltrm.sh
-	@echo \
-	  done >>4alltrm.sh
-	bash ./4alltrm.sh >$@
-	del 4alltrm.sh
-endif
+	@..\src\os2\4allterm.cmd sort
 else
 # SORT_TERMINALS==0, then sequence of terminals according to "ls term/*.trm":
 $(DOCDIR)\allterm.h: $(CORETERM)
-	cd $(DOCDIR) && cat $(TERMDIR)/*.trm > allterm.c
-	cd $(DOCDIR) && $(CPP) -I$(TERMDIR) -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
-      sed -e "/^ *$$/d;/^#/d" > allterm.h
+	@echo "Building allterm.h"
+	@..\src\os2\4allterm.cmd nosort
 endif
 
 $(DOCDIR)\doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERM)
