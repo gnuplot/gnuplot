@@ -1,3 +1,9 @@
+2006-04-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (draw_3d_graphbox):  Fix bug introduced when adding
+	newpath/closepath around the border of 3D plots with 'set view map'.
+	The top border was not getting drawn.
+
 2006-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/standard.c (f_tanh): Fix a two-fold error in bounds checking for
