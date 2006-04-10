@@ -8,6 +8,11 @@
 
 	* src/graphics.c (plot_border) src/gadgets.h:  Similar bugfix in 2D.
 
+	* src/misc.c (lp_parse): Don't fall into a recursion trap in the
+	case that 'set style incr user' and  'set style line <foo> lt <baz>'.
+	This should set the linetype of <foo> to <baz> even if <baz> itself
+	has been assigned as another line style.
+
 2006-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/standard.c (f_tanh): Fix a two-fold error in bounds checking for
