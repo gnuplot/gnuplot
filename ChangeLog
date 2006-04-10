@@ -4,6 +4,7 @@
 	newpath/closepath around the border of 3D plots with 'set view map'.
 	The top border was not getting drawn, and the individual border
 	components were not being considered separately.
+	Also, when in 'set view map' mode, honor 'set border {front|back}'.
 
 	* src/graphics.c (plot_border) src/gadgets.h:  Similar bugfix in 2D.
 

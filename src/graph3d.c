@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.152 2006/04/06 03:43:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.154 2006/04/10 18:32:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1280,6 +1280,8 @@ do_3dplot(
      * the whole shebang now, otherwise only the front part. */
     if (hidden3d || grid_layer == 1)
 	draw_3d_graphbox(plots, pcount, ALLGRID);
+    else if (splot_map && (border_layer == 1))
+	draw_3d_graphbox(plots, pcount, ALLGRID);
     else if (grid_layer == -1)
 	draw_3d_graphbox(plots, pcount, FRONTGRID);
 
@@ -2034,7 +2036,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 
     if (draw_border && splot_map) {
 	    term_apply_lp_properties(&border_lp);
-	    newpath();
+	    if ((draw_border & 15) == 15)
+		newpath();
 	    map3d_xy(zaxis_x, zaxis_y, base_z, &x, &y);
 	    term->move(x, y);
 	    map3d_xy(back_x , back_y , base_z, &x, &y);
@@ -2057,7 +2060,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		term->vector(x, y);
 	    else
 		term->move(x, y);
-	    closepath();
+	    if ((draw_border & 15) == 15)
+		closepath();
     } else
 
     if (draw_border) {
