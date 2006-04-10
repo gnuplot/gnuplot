@@ -348,6 +348,7 @@ extern double pointsize;
 #define border_west	(draw_border & WEST)
 #define border_south	(draw_border & SOUTH)
 #define border_north	(draw_border & NORTH)
+#define border_complete	((draw_border & 15) == 15)
 extern int draw_border;
 extern int border_layer;
 

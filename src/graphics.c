@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.183 2006/04/05 03:00:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.184 2006/04/06 03:43:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4712,8 +4712,14 @@ static void
 plot_border()
 {
 	term_apply_lp_properties(&border_lp);	/* border linetype */
-	newpath();
-	(*term->move) (plot_bounds.xleft, plot_bounds.ybot);
+	if (border_complete)
+	    newpath();
+	(*term->move) (plot_bounds.xleft, plot_bounds.ytop);
+	if (border_west) {
+	    (*term->vector) (plot_bounds.xleft, plot_bounds.ybot);
+	} else {
+	    (*term->move) (plot_bounds.xleft, plot_bounds.ybot);
+	}
 	if (border_south) {
 	    (*term->vector) (plot_bounds.xright, plot_bounds.ybot);
 	} else {
@@ -4729,12 +4735,8 @@ plot_border()
 	} else {
 	    (*term->move) (plot_bounds.xleft, plot_bounds.ytop);
 	}
-	if (border_west) {
-	    (*term->vector) (plot_bounds.xleft, plot_bounds.ybot);
-	} else {
-	    (*term->move) (plot_bounds.xleft, plot_bounds.ybot);
-	}
-	closepath();
+	if (border_complete)
+	    closepath();
 }
 
 
