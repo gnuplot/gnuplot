@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.70 2006/03/02 21:37:38 sfeam Exp $
+ * $Id: cgm.trm,v 1.71 2006/03/06 00:13:27 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1551,14 +1551,14 @@ CGM_point(unsigned int x, unsigned int y, int number)
       cgm_current.fill_color = cgm_next.fill_color;
       CGM_write_int_record(5, 23, 2, &cgm_next.fill_color);
     }
+    if (cgm_current.edge_visibility != cgm_next.edge_visibility){
+      cgm_current.edge_visibility = cgm_next.edge_visibility;
+      CGM_write_int_record(5, 30, 2, &cgm_current.edge_visibility);
+    }
     if (cgm_current.edge_visibility &&
 	cgm_current.edge_color != cgm_next.edge_color){
       cgm_current.edge_color = cgm_next.edge_color;
       CGM_write_int_record(5, 29, 2, &cgm_current.edge_color);
-    }
-    if (cgm_current.edge_visibility != cgm_next.edge_visibility){
-      cgm_current.edge_visibility = cgm_next.edge_visibility;
-      CGM_write_int_record(5, 30, 2, &cgm_current.edge_visibility);
     }
 
     switch (number) {
