@@ -1,3 +1,10 @@
+2006-04-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (change_term init_term): Save value of GNUTERM into a
+	user-defined variable on entry.  Use only first word of GNUTERM when
+	calling change_term. This allows GNUTERM to contain extended terminal
+	specs, e.g.  setenv GNUTERM "png truecolor transparent".
+
 2006-04-12  James R. Van Zandt  <jrv@debian.org>
 
 	* term/cgm.trm (CGM_point): Update cgm_current.edge_visibility

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.140 2006/04/06 03:43:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.141 2006/04/08 06:28:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1589,6 +1589,11 @@ init_terminal()
     /* GNUTERM environment variable is primary */
     gnuterm = getenv("GNUTERM");
     if (gnuterm != (char *) NULL) {
+#ifdef GP_STRING_VARS
+	struct udvt_entry *name = add_udv_by_name("GNUTERM");
+	Gstring(&name->udv_value, gp_strdup(gnuterm));
+	name->udv_undef = FALSE;
+#endif
         term_name = gnuterm;
     } else {
 
@@ -1710,7 +1715,10 @@ init_terminal()
 
     /* We have a name, try to set term type */
     if (term_name != NULL && *term_name != '\0') {
-        if (change_term(term_name, (int) strlen(term_name)))
+	int namelength = strlen(term_name);
+	if (strchr(term_name,' '))
+	    namelength = strchr(term_name,' ') - term_name;
+        if (change_term(term_name, namelength))
             return;
         fprintf(stderr, "Unknown or ambiguous terminal name '%s'\n", term_name);
     }
