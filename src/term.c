@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.141 2006/04/08 06:28:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.142 2006/04/14 23:46:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1589,11 +1589,6 @@ init_terminal()
     /* GNUTERM environment variable is primary */
     gnuterm = getenv("GNUTERM");
     if (gnuterm != (char *) NULL) {
-#ifdef GP_STRING_VARS
-	struct udvt_entry *name = add_udv_by_name("GNUTERM");
-	Gstring(&name->udv_value, gp_strdup(gnuterm));
-	name->udv_undef = FALSE;
-#endif
         term_name = gnuterm;
     } else {
 
@@ -1716,6 +1711,11 @@ init_terminal()
     /* We have a name, try to set term type */
     if (term_name != NULL && *term_name != '\0') {
 	int namelength = strlen(term_name);
+#ifdef GP_STRING_VARS
+	struct udvt_entry *name = add_udv_by_name("GNUTERM");
+	Gstring(&name->udv_value, gp_strdup(term_name));
+	name->udv_undef = FALSE;
+#endif
 	if (strchr(term_name,' '))
 	    namelength = strchr(term_name,' ') - term_name;
         if (change_term(term_name, namelength))

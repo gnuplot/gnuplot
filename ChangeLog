@@ -5,6 +5,9 @@
 	* src/set.c (set_object): Fix segfault on incomplete command
 	'set obj <new>'.
 
+	* src/term.c (init_terminal): Keep initial terminal setting in GNUTERM
+	even if it did not actually come from environmental variable GNUTERM.
+
 2006-04-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (change_term init_term): Save value of GNUTERM into a
