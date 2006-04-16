@@ -1,3 +1,10 @@
+2006-04-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/aquaterm.trm: Corrent typos in help text.
+
+	* src/set.c (set_object): Fix segfault on incomplete command
+	'set obj <new>'.
+
 2006-04-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (change_term init_term): Save value of GNUTERM into a
