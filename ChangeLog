@@ -1,3 +1,7 @@
+2006-04-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.h: Add comments to document the meaning of TC_* flag values.
+
 2006-04-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/aquaterm.trm: Corrent typos in help text.

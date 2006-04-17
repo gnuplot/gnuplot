@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.25 2006/01/20 06:18:40 sfeam Exp $
+ * $Id: color.h,v 1.26 2006/03/18 19:03:16 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -37,13 +37,13 @@ typedef struct t_colorspec {
     int lt;			/* used for TC_LT, TC_LINESTYLE and TC_RGB */
     double value;		/* used for TC_CB and TC_FRAC */
 } t_colorspec;
-#define	TC_DEFAULT	0
-#define	TC_LT		1
-#define	TC_LINESTYLE	2
-#define	TC_RGB		3
-#define	TC_CB		4
-#define	TC_FRAC		5
-#define	TC_Z		6
+#define	TC_DEFAULT	0	/* Use default color, set separately */
+#define	TC_LT		1	/* Use the color of linetype <n> */
+#define	TC_LINESTYLE	2	/* Use the color of line style <n> */
+#define	TC_RGB		3	/* Explicit RGB triple provided by user */
+#define	TC_CB		4	/* "palette cb <value>" */
+#define	TC_FRAC		5	/* "palette frac <value> */
+#define	TC_Z		6	/* "palette z" */
 
 #define DEFAULT_COLORSPEC {TC_DEFAULT, 0, 0.0}
 
