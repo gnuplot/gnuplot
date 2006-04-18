@@ -4,6 +4,11 @@
 	Allow user to control the width of whiskerbars on candlestick plots.
 	    plot <foo> with candlesticks {whiskerbars {<width>}}
 
+	* demo/utf8.dem:  Provide a demo for use in testing support of UTF-8
+	support by gnuplot terminals.  This demo will only produce reasonable
+	output on a terminal that supports UTF-8 and a current UTF-8 encoded
+	font with the relevant character maps.
+
 2006-04-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.h: Add comments to document the meaning of TC_* flag values.
