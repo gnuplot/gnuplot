@@ -1,10 +1,16 @@
+2006-04-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_c_bars) src/plot2d.c (eval_plots):
+	Allow user to control the width of whiskerbars on candlestick plots.
+	    plot <foo> with candlesticks {whiskerbars {<width>}}
+
 2006-04-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.h: Add comments to document the meaning of TC_* flag values.
 
 2006-04-16  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/aquaterm.trm: Corrent typos in help text.
+	* term/aquaterm.trm: Correct typos in help text.
 
 	* src/set.c (set_object): Fix segfault on incomplete command
 	'set obj <new>'.
