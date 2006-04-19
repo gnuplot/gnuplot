@@ -1,3 +1,10 @@
+2006-04-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_set_font): Do not write font change commands into
+	the PostScript output stream of the TeX terminal variants (epslatex,
+	pstex, pslatex). All font handling is done via the TeX output stream.
+	Bug #1472260
+
 2006-04-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_c_bars) src/plot2d.c (eval_plots):
