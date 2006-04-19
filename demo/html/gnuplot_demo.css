@@ -50,6 +50,13 @@
 	font-size: 0.5em ;
 	}
 
+ UL	{
+	margin-left:  0.1em ;
+	padding-left: 0.1em ;
+	margin-top:  0;
+	padding-top: 0;
+ 	}
+
  LI	{
  	font-size: 0.9em ;
 	text-indent: 1em ;

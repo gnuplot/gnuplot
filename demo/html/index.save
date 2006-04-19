@@ -8,8 +8,8 @@
 <p>
 Gnuplot is distributed with a large set of scripts demonstrating
 various features of the program.  Collected below are the results of running
-most of these demo scripts using the development version of gnuplot. Interactive demo 
-scripts, for instance those demonstrating mouse function, are not included here.
+most of these scripts using the development version of gnuplot. Interactive demo 
+scripts are not included on this page.
 
 
 
@@ -17,104 +17,117 @@ scripts, for instance those demonstrating mouse function, are not included here.
 <tbody><tr valign="top">
 
 <td rowspan=2>
-<ul>
-    <h4>Basic plot styles</h4>
-    <li><a href="simple.html">simple</a></li>
+    <h4>Basic 2D plot styles</h4>
+    <ul>
+    <li><a href="simple.html">simple&nbsp;functions</a></li>
+    <li><a href="fillcrvs.html">filled&nbsp;curves</a></li>
+    <li><a href="fillbetween.html">fill&nbsp;between&nbsp;curves</a></li>
     <li><a href="candlesticks.html">candlesticks</a></li>
-    <li><a href="fillcrvs.html">fillcrvs</a></li>
-    <li><a href="fillbetween.html">fillbetween</a></li>
-    <li><a href="fillstyle.html">fillstyle</a></li>
+    <li><a href="mgr.html">error bars</a></li>
     <li><a href="histograms.html">histograms</a></li>
-    <li><a href="histograms2.html">histograms2</a></li>
-    <li><a href="steps.html">steps</a></li>
-    <li><a href="using.html">using</a></li>
-    <li><a href="pointsize.html">pointsize</a></li>
-    <li><a href="contours.html">contours</a></li>
-    <li><a href="param.html">param</a></li>
-    <li><a href="arrowstyle.html">arrowstyle</a></li>
-    <li><a href="vector.html">vector</a></li>
+    <li><a href="steps.html">step functions</a></li>
+    <li><a href="using.html">mixing styles</a></li>
+    <li><a href="pointsize.html">variable size points</a></li>
+    <li><a href="param.html">parametric&nbsp;functions</a></li>
+    <li><a href="vector.html">vector fields</a></li>
+    </ul>
+
+    <h4>Math functions and<br> curve fitting</h4>
+    <ul>
+    <li><a href="spline.html">B-splines</a></li>
+    <li><a href="airfoil.html">Bezier splines</a></li>
+    <li><a href="fit.html">parameter fitting</a></li>
+    <li><a href="prob2.html">probability</a></li>
+    <li><a href="prob.html">probability (more)</a></li>
+    <li><a href="random.html">random numbers</a></li>
+    <li><a href="bivariat.html">recursion, etc...</a></li>
+    </ul>
 
     <h4>Binary and Image data </h4>
-    <li><a href="binary.html">binary</a></li>
-    <li><a href="image.html">image</a></li>
+    <ul>
+    <li><a href="binary.html">binary data</a></li>
+    <li><a href="image.html">image data</a></li>
+    </ul>
+</td>
+
+<td rowspan=2>
+    <h4>Surfaces and<br>3D plotting</h4>
+    <ul>
+    <li><a href="surface1.html">surfaces 1</a></li>
+    <li><a href="surface2.html">surfaces 2</a></li>
+    <li><a href="contours.html">contours</a></li>
+    <li><a href="singulr.html">singularities</a></li>
+    <li><a href="pm3d.html">pm3d coloring</a></li>
+    <li><a href="world2.html">3D mapping</a></li>
+    </ul>
 
     <h4>Coordinate and<br> axis transforms</h4>
-    <li><a href="polar.html">polar</a></li>
-    <li><a href="poldat.html">poldat</a></li>
-    <li><a href="world.html">world</a></li>
-</ul>
-</td>
-
-<td rowspan=2>
-<ul>
-    <h4>Math functions and<br> curve fitting</h4>
-    <li><a href="airfoil.html">airfoil</a></li>
-    <li><a href="fit.html">fit</a></li>
-    <li><a href="prob2.html">prob2</a></li>
-    <li><a href="prob.html">prob</a></li>
-    <li><a href="random.html">random</a></li>
-    <li><a href="spline.html">spline</a></li>
-    <li><a href="bivariat.html">bivariat</a></li>
-
-    <h4>Surfaces and<br> pm3d mode</h4>
-    <li><a href="surface1.html">surface1</a></li>
-    <li><a href="surface2.html">surface2</a></li>
-    <li><a href="pm3d.html">pm3d</a></li>
-    <li><a href="singulr.html">singulr</a></li>
-    <li><a href="world2.html">world2</a></li>
+    <ul>
+    <li><a href="polar.html">polar coords</a></li>
+    <li><a href="poldat.html">polar data</a></li>
+    <li><a href="world.html">cylindrical/spherical</a></li>
+    <li><a href="timedat.html">time/date coords</a></li>
+    </ul>
 
     <h4>Animation</h4>
-    <li><a href="animate2.html">animate2</a></li>
+    <ul>
+    <li><a href="animate2.html">animated gif</a></li>
+    </ul>
 
     <h4>Colors</h4>
-    <li><a href="dashcolor.html">dashcolor</a></li>
-    <li><a href="rainbow.html">rainbow</a></li>
-    <li><a href="rgb_variable.html">rgb_variable</a></li>
-    <li><a href="pm3dcolors.html">pm3dcolors</a></li>
-    <li><a href="pm3dgamma.html">pm3dgamma</a></li>
-
-</ul>
+    <ul>
+    <li><a href="rainbow.html">user-defined colors</a></li>
+    <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="pm3dcolors.html">pm3d colors</a></li>
+    <li><a href="pm3dgamma.html">pm3d gamma</a></li>
+    </ul>
 </td>
 
 <td rowspan=2>
-<ul>
-    <h4>General Plotting</h4>
-         <li><a href="controls.html">controls</a></li>
-    <li><a href="discrete.html">discrete</a></li>
-    <li><a href="electron.html">electron</a></li>
-    <li><a href="hidden.html">hidden</a></li>
-    <li><a href="mgr.html">mgr</a></li>
-    <li><a href="multimsh.html">multimsh</a></li>
-    <li><a href="scatter.html">scatter</a></li>
-    <li><a href="timedat.html">timedat</a></li>
+    <h4>Sample Applications</h4>
+    <ul>
+    <li><a href="controls.html">control models</a></li>
+    <li><a href="discrete.html">discrete&nbsp;contours</a></li>
+    <!--- <li><a href="electron.html">electron</a></li> --->
+    <li><a href="finance.html">financial data</a></li>
+    <li><a href="hidden.html">hidden surfaces</a></li>
+    <li><a href="scatter.html">non-gridded data</a></li>
+    </ul>
 
     <h4>Text options</h4>
-    <li><a href="textcolor.html">textcolor</a></li>
-    <li><a href="textrotate.html">textrotate</a></li>
-    <li><a href="enhancedtext.html">enhancedtext</a></li>
-    <li><a href="datastrings.html">datastrings</a></li>
-
-    <h4>Finance</h4>
-    <li><a href="finance.html">finance</a></li>
+    <ul>
+    <li><a href="textcolor.html">colored text</a></li>
+    <li><a href="textrotate.html">rotated text</a></li>
+    <li><a href="enhancedtext.html">'enhanced' text</a></li>
+    <li><a href="datastrings.html">string data</a></li>
+    </ul>
 
     <h4>Page Layout</h4>
-    <li><a href="key.html">key</a></li>
-    <li><a href="layout.html">layout</a></li>
-    <li><a href="multiplt.html">multiplt</a></li>
-    <li><a href="tics.html">tics</a></li>
+    <ul>
+    <li><a href="key.html">plot key</a></li>
+    <li><a href="layout.html">multiplot&nbsp;layout</a></li>
+    <li><a href="multiplt.html">multiple plots</a></li>
+    <li><a href="tics.html">axis tics</a></li>
+    <li><a href="rectangle.html">rectangles</a></li>
+    </ul>
 
-</ul>
+    <h4>Styles</h4>
+    <ul>
+    <li><a href="dashcolor.html">line styles</a></li>
+    <li><a href="fillstyle.html">fill styles</a></li>
+    <li><a href="arrowstyle.html">arrow styles</a></li>
+    </ul>
 </td>
 
 <td align=center valign=bot>
 	<h4></h4>
 	Most of these plots were generated using
-	<pre> set terminal png font "arial" 8 transparent size 420,320 </pre>
+	<font size="-1"><pre>set terminal png transparent font "arial" 8</pre></font>
 </td>
 </tr>
 
 <tr valign=top><td align=center>
-<img src="histograms.4.png">
+<img src="showcase_plot.png">
 </td></tr>
 
 </tbody></table>
@@ -126,7 +139,7 @@ scripts, for instance those demonstrating mouse function, are not included here.
 <tbody><tr valign="top">
 
     <td>
-    <i>generated by Ethan Merritt<br>February 2006</i>
+    <i>generated by Ethan Merritt<br>April 2006</i>
     </td>
 
     <td>

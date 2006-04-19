@@ -5,6 +5,9 @@
 	pstex, pslatex). All font handling is done via the TeX output stream.
 	Bug #1472260
 
+	* demo/html/Makefile demo/html/index.save demo/html/gnuplot_demo.css:
+	Update html display of gnuplot demos.
+
 2006-04-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_c_bars) src/plot2d.c (eval_plots):
