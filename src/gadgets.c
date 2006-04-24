@@ -461,7 +461,8 @@ reset_textcolor(const struct t_colorspec *tc, const struct termentry *t)
 void
 default_arrow_style(struct arrow_style_type *arrow)
 {
-    struct lp_style_type tmp_lp_style = DEFAULT_LP_STYLE_TYPE;
+    static const struct lp_style_type tmp_lp_style = DEFAULT_LP_STYLE_TYPE;
+
     arrow->layer = 0;
     arrow->lp_properties = tmp_lp_style;
     arrow->head = 1;

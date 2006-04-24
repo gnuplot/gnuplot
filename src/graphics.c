@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.185 2006/04/10 18:32:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.186 2006/04/19 03:17:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5115,74 +5115,6 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
     /* The grid spacing in the second direction. */
     delta_x_grid[1] = (p_end_corner[0] - p_mid_corner[0])/(L-1);
     delta_y_grid[1] = (p_end_corner[1] - p_mid_corner[1])/(L-1);
-
-#define GRID_TOLERANCE 0.001
-
-#ifdef WITH_IMAGE_VERIFY_ALL_PIXEL_LOCATIONS
-    /* The following is an extensive verification of each pixel location in the
-     * image array.  There may be a scenario where this is desirable.  Since it
-     * is a rather nice approach, it is left here even though perhaps not active
-     * most of the time.  This could be utilized elsewhere when attempting to
-     * determine if a valid grid exists, yet data may have been in a data file
-     * where x and y were specified, rather than generated or in matrix format.
-     */
-
-    /* Could perhaps have a global variable indicating uniform grid.  However,
-     * df_matrix does not necessarily indicate that.  Also, because of the
-     * possibility of applying a function to grid coordinates, determining if
-     * the grid is uniform inside datafile.c is tricky.
-     */
-    {
-	int l;
-	double p1[2], p2[2], w_tol[2][2], b_tol[2];
-	double x_start, y_start;
-
-	/* Position middle of tolerance box at origin when computing hyperplanes. */
-	p1[0] = GRID_TOLERANCE*(delta_x_grid[0] + delta_x_grid[1])/2;
-	p1[1] = GRID_TOLERANCE*(delta_y_grid[0] + delta_y_grid[1])/2;
-	p2[0] = GRID_TOLERANCE*(delta_x_grid[0] - delta_x_grid[1])/2;
-	p2[1] = GRID_TOLERANCE*(delta_y_grid[0] - delta_y_grid[1])/2;
-	for (l=0; l < 2; l++) {
-	    hyperplane_between_points(p1, p2, &w_tol[l][0], &b_tol[l]);
-	    b_tol[l] = fabs(b_tol[l]); /* Force interior of tolerance parallelogram to be positive. */
-	    p2[0] = -p2[0];            /* Change sign for next time through loop. */
-	    p2[1] = -p2[1];
-	}
-
-	if (project_points) {
-	    map3d_xy_double(points[grid_corner[0]].x, points[grid_corner[0]].y, points[grid_corner[0]].z, &x_start, &y_start);
-	} else {
-	    x_start = points[grid_corner[0]].x;
-	    y_start = points[grid_corner[0]].y;
-	}
-	i = 0;
-	for (l=0; l < L; l++) {
-	    int k;
-	    for (k=0; k < K; k++) {
-		double x, y, vprod;
-		int m;
-		if (project_points) {
-		    map3d_xy_double(points[i].x, points[i].y, points[i].z, &x, &y);
-		} else {
-		    x = points[i].x;
-		    y = points[i].y;
-		}
-		i++;
-		/* Subtract expected position. */
-		x -= x_start + k*delta_x_grid[0] + l*delta_x_grid[1];
-		y -= y_start + k*delta_y_grid[0] + l*delta_y_grid[1];
-		/* Check if within tolerance. */
-		for (m=0; m < 2; m++) {
-		    vprod = w_tol[m][0]*x + w_tol[m][1]*y;
-		    if (fabs(vprod) > b_tol[m]) {
-			fprintf(stderr, ERROR_NOTICE("Pixel %d (location %d,%d in grid) out of tolerance.\n\n"), i, k+1, l+1);
-			return;
-		    }
-		}
-	    }
-	}
-    }
-#endif
 
     if (update_axes) {
 	for (i=0; i < 4; i++) {
