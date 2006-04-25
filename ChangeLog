@@ -1,3 +1,11 @@
+2006-04-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wgnuplot.hpj (COMPRESS): New option, enables compression
+	of the generated .hlp file.
+	(LCID): New option, fixed the language of generated help files to
+	English.  Hopefully this will avoid incompatibilities like the one
+	observed with the first binary release of 4.0 for Win32.
+
 2006-04-24  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/graphics.c (plot_image_or_update_axes) config/config.cyg
