@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.71 2006/03/06 00:13:27 sfeam Exp $
+ * $Id: cgm.trm,v 1.72 2006/04/13 01:06:43 vanzandt Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -108,6 +108,8 @@ TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
 
 TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 
+#define FATAL(msg) { fprintf(stderr, "%s\nFile %s line %d\n", msg, __FILE__, __LINE__); exit(EXIT_FAILURE); }
+
 #define CGM_LARGE 32767
 #define CGM_SMALL 32767/18*13	/* aspect ratio 1:.7222 */
 #define CGM_MARGIN (CGM_LARGE/180)
@@ -117,7 +119,7 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 #define CGM_COLORS 12		/* number of line colors we support in
                                    the default color table */
 #define CGM_POINTS 13		/* number of markers we support */
-#define CGM_MAX_SEGMENTS 104	/* maximum # polyline coordinates */
+#define CGM_MAX_SEGMENTS 16382	/* maximum # polyline coordinates */
 #define CGM_VCHAR (CGM_SMALL/360*12)
 #define CGM_HCHAR (CGM_SMALL/360*12*5/9)
 #define CGM_VTIC (CGM_LARGE/80)
@@ -167,8 +169,10 @@ static unsigned int cgm_linetype = 1;
 static unsigned int cgm_linetypes = CGM_COLORS;
 static unsigned int cgm_dashtype = 0;
 static unsigned int cgm_color = 0;
-static int cgm_polyline[CGM_MAX_SEGMENTS]; /* stored polyline coordinates */
+static int *cgm_polyline; /* stored polyline coordinates */
 static int cgm_coords = 0;	/* # polyline coordinates saved */
+static int cgm_doing_polygon = 0; /* nonzero if creating polygon, else
+				   * creating polyline */
 /* static enum JUSTIFY cgm_justify = LEFT; */ /* unused */
 static int cgm_step_sizes[8];	/* array of currently used dash
 				   lengths in plot units */
@@ -578,6 +582,9 @@ CGM_init()
     cgm_next.angle = 0;
     cgm_next.interior_style = 2;
     cgm_next.hatch_index = 1;
+    
+    if (!(cgm_polyline=malloc(CGM_MAX_SEGMENTS*sizeof(int))))
+	 FATAL("Cannot malloc space");
 }
 
 TERM_PUBLIC void
@@ -1113,13 +1120,14 @@ CGM_make_palette(t_sm_palette *palette)
 TERM_PUBLIC void
 CGM_set_color(t_colorspec *colorspec)
 {
-    double gray = colorspec->value;
+    double gray;
 
     if (colorspec->type == TC_LT) {
 	 CGM_linetype(colorspec->lt);
 
     } else if (colorspec->type == TC_FRAC){
 
+	 gray = colorspec->value;
 	 /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
 	    offset to get past the default colors */
 	 cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);
@@ -1142,9 +1150,13 @@ CGM_filled_polygon(int points, gpiPoint *corner)
 {
     int i;
 
-    /* Note:  The CGM_flush_polygon stack in Win2000 cannot handle polygons  */
-    /* with more than about 50 edges.  We can't fix it, but we can put this  */
-    /* explaination here in case you wonder why some filledcurves are flaky. */
+    /* Note: This implementation cannot handle polygons with more than
+     * about 8190 edges.  The best fix is to implement continuation
+     * blocks.  If the high order bit of the "length" field of a block
+     * is set, then it is followed by another block with more data.
+     * This allows an arbitrary amount of data in a record.  However,
+     * we implement a big enough block that problems should be
+     * rare.  */
 
     if (cgm_current.interior_style != cgm_next.interior_style){
       cgm_current.interior_style = cgm_next.interior_style;
@@ -1165,9 +1177,11 @@ CGM_filled_polygon(int points, gpiPoint *corner)
       CGM_write_int_record(5, 30, 2, &cgm_current.edge_visibility);
     }
     CGM_move(corner[0].x, corner[0].y);
+    cgm_doing_polygon = 1;
     for (i = 1; i < points; i++)
 	 CGM_solid_vector(corner[i].x, corner[i].y);
     CGM_flush_polygon();
+    cgm_doing_polygon = 0;
 }
 
 static void
@@ -1394,7 +1408,10 @@ CGM_solid_vector(unsigned int ux, unsigned int uy)
     if (ux == cgm_posx && uy == cgm_posy)
 	return;
     if (cgm_coords > CGM_MAX_SEGMENTS - 2) {
-	CGM_flush_polyline();
+	if (cgm_doing_polygon)
+	      CGM_flush_polygon();
+	else
+	      CGM_flush_polyline();
 	cgm_polyline[cgm_coords++] = cgm_posx;
 	cgm_polyline[cgm_coords++] = cgm_posy + CGM_MARGIN;
     } else if (cgm_coords == 0) {
@@ -1512,6 +1529,7 @@ TERM_PUBLIC void
 CGM_reset()
 {
     cgm_posx = cgm_posy = 0;
+    free(cgm_polyline);
 }
 
 TERM_PUBLIC void

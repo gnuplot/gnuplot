@@ -1,3 +1,13 @@
+2006-04-25  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* term/cgm.trm (CGM_filled_polygon): Allow filled polygons with up
+	to 8190 vertices (was only 50).  Also, allocate the
+	polygon/polyline array from the heap, so it only takes space if
+	the CGM terminal is used.
+
+	* term/cgm.trm (CGM_set_color): access colorspec->value only
+	for type=TC_FRAC when it is defined.
+	
 2006-04-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wgnuplot.hpj (COMPRESS): New option, enables compression
