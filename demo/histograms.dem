@@ -136,7 +136,7 @@ pause -1 "Next we do several sets of parallel histograms"
 # 'newhistogram' keyword to plot
 #
 set title "Immigration from different regions\n(give each histogram a separate title)"
-set key under
+set key under nobox
 set style histogram clustered gap 1 title 2,0.25
 set style fill solid noborder
 set boxwidth 0.95
