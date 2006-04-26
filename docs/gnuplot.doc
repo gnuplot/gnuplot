@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.350 2006/04/08 13:48:35 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.351 2006/04/19 03:18:43 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2656,7 +2656,7 @@ C ... and restart the table:
        FIT_LOG
  changes the name (and/or path) of the file to which the fit log will be
  written from the default of "fit.log" in the working directory. The default
- value can be overwritten using the command `set fitlogfile`.
+ value can be overwritten using the command `set fit logfile`.
 
        FIT_SCRIPT
  specifies a command that may be executed after an user interrupt. The default
