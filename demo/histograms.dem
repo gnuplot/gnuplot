@@ -127,7 +127,7 @@ set xlabel "Country of Origin"
 set tics scale 0.0
 set ytics
 unset xtics
-set xtics norotate
+set xtics norotate nomirror
 plot 'immigration.dat' using 6 ti col, '' using 12 ti col, \
      '' using 13 ti col, '' using 14:key(1) ti col
 #
@@ -141,7 +141,7 @@ set style histogram clustered gap 1 title 2,0.25
 set style fill solid noborder
 set boxwidth 0.95
 unset xtics
-set xtics rotate by -45
+set xtics nomirror rotate by -45
 set xlabel "(note: histogram titles have specified offset relative to X-axis label)" 0,-2
 set ytics
 set grid y
