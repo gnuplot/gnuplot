@@ -2,7 +2,7 @@
 AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
 
 # in the spirit of automake ...
-pkglibexecdir = $(libexecdir)/@PACKAGE@/@PKG_MAJOR@
+pkglibexecdir = $(libexecdir)/@PACKAGE@/@VERSION_MAJOR@
 
 # Where to send email about bugs and comments (locally)
 EMAIL = gnuplot-bugs@lists.sourceforge.net

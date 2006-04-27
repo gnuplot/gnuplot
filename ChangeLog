@@ -1,3 +1,10 @@
+2006-04-27  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in src/Makefile.am: Change PKG_MAJOR to
+	VERSION_MAJOR to avoid a conflict with pkg-config macros.
+	They will be used with cairo, pango, and gtk+ for the wxWidgets
+	terminal.
+
 2006-04-27  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* src/plot2d.c (get_data): Initialize further elements of df_data
