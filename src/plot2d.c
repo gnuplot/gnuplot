@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.125 2006/04/05 03:14:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.126 2006/04/19 03:17:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -283,8 +283,17 @@ get_data(struct curve_points *current_plot)
     case XYERRORLINES:
     case XYERRORBARS:
     case BOXXYERROR:
-        min_cols = 4;
-        max_cols = 7;
+	min_cols = 4;
+	max_cols = 7;		/* HBB FIXME 20060427: what's 7th? */
+
+	if (df_no_use_specs >= 6) {
+	    /* HBB 20060427: signal 3rd and 4th column are absolute x
+	     * data --- needed so time/date parsing works */
+	    df_axis[2] = df_axis[3] = df_axis[0];
+	    /* and 5th and 6th are absolute y data */
+	    df_axis[4] = df_axis[5] = df_axis[1];
+	}
+	
         break;
 
     case FINANCEBARS:
@@ -292,11 +301,25 @@ get_data(struct curve_points *current_plot)
         /* HBB 20000504: use 'z' coordinate for y-axis quantity */
         current_plot->z_axis = current_plot->y_axis;
         min_cols = max_cols = 5;
+	/* HBB 20060427: signal 3rd and 4th column are absolute y data
+	 * --- needed so time/date parsing works */
+	df_axis[2] = df_axis[3] = df_axis[4] = df_axis[1];
         break;
 
     case BOXERROR:
         min_cols = 3;           /* HBB 20040520: fixed, was 4 */
         max_cols = 5;
+
+	/* There are four(!) possible cases: */
+	/* 3 cols --> (x,y,dy), auto dx */
+	/* 4 cols, boxwidth==-2 --> (x,y,ylow,yhigh), auto dx */
+	/* 4 cols, boxwidth!=-2 --> (x,y,dy,dx) */
+	/* 5 cols --> (x,y,ylow,yhigh,dx) */
+	if ((df_no_use_specs == 4 && boxwidth == -2)
+	    || df_no_use_specs == 5)
+	    /* HBB 20060427: signal 3rd and 4th column are absolute y
+	     * data --- needed so time/date parsing works */
+	    df_axis[2] = df_axis[3] = df_axis[1];
         break;
 
     case VECTOR:
@@ -304,11 +327,23 @@ get_data(struct curve_points *current_plot)
         break;
 
     case XERRORLINES:
-    case YERRORLINES:
     case XERRORBARS:
+        min_cols = 3;
+        max_cols = 4;
+	if (df_no_use_specs == 4)
+	    /* HBB 20060427: signal 3rd and 4th column are absolute x
+	     * data --- needed so time/date parsing works */
+	    df_axis[2] = df_axis[3] = df_axis[0];
+        break;
+
+    case YERRORLINES:
     case YERRORBARS:
         min_cols = 3;
         max_cols = 4;
+	if (df_no_use_specs == 4)
+	    /* HBB 20060427: signal 3rd and 4th column are absolute y
+	     * data --- needed so time/date parsing works */
+	    df_axis[2] = df_axis[3] = df_axis[1];
         break;
 
 #ifdef EAM_HISTOGRAMS
@@ -321,12 +356,7 @@ get_data(struct curve_points *current_plot)
     case BOXES:
         min_cols = 1;
         max_cols = 4;
-        /* HBB 20010214: commented out. z_axis is abused to store a
-         * flag here, not for the actual width, as I thought it
-         * was. Setting it to x_axis would cause the x axis to be
-         * auto-extended to contain -1 or 0 because of those magical
-         * values */
-        /* current_plot->z_axis = current_plot->x_axis; */
+	
         break;
 
     case FILLEDCURVES:
@@ -481,7 +511,7 @@ get_data(struct curve_points *current_plot)
 
                 if (histogram_opts.type == HT_STACKED_IN_TOWERS) {
                     histogram_rightmost = current_plot->histogram_sequence
-                                        + current_plot->histogram->start;
+			+ current_plot->histogram->start;
                     current_plot->histogram->end = histogram_rightmost;
                 } else if (v[0] + current_plot->histogram->start > histogram_rightmost) {
                     histogram_rightmost = v[0] + current_plot->histogram->start;
@@ -490,40 +520,40 @@ get_data(struct curve_points *current_plot)
                 /* Histogram boxwidths are always absolute */
                 if (boxwidth > 0)
                     store2d_point(current_plot, i++, v[0], v[1],
-                              v[0] - boxwidth / 2, v[0] + boxwidth / 2,
-                              v[1]-v[2], v[1]+v[2], 0.0);
+				  v[0] - boxwidth / 2, v[0] + boxwidth / 2,
+				  v[1]-v[2], v[1]+v[2], 0.0);
                 else
                     store2d_point(current_plot, i++, v[0], v[1], 
-                              v[0] - 0.5, v[0] + 0.5,
-                              v[1]-v[2], v[1]+v[2], 0.0);       /* EAM DEBUG -1.0 ?? */
+				  v[0] - 0.5, v[0] + 0.5,
+				  v[1]-v[2], v[1]+v[2], 0.0);       /* EAM DEBUG -1.0 ?? */
             } else
 #endif
-            /* x, y */
-            /* ylow and yhigh are same as y */
+		/* x, y */
+		/* ylow and yhigh are same as y */
 
-            if ( (current_plot->plot_style == BOXES)
-                 && boxwidth > 0 && boxwidth_is_absolute) {
-                /* calculate width now */
-                if (axis_array[current_plot->x_axis].log) {
-                    double base = axis_array[current_plot->x_axis].base;
-                    store2d_point(current_plot, i++, v[0], v[1],
-                        v[0] * pow(base, -boxwidth/2.), v[0] * pow(base, boxwidth/2.),
-                        v[1], v[1], 0.0);
-                } else
-                    store2d_point(current_plot, i++, v[0], v[1],
-                        v[0] - boxwidth / 2, v[0] + boxwidth / 2,
-                        v[1], v[1], 0.0);
-            } else {
-                if (current_plot->plot_style == CANDLESTICKS
-                    || current_plot->plot_style == FINANCEBARS) {
-                    int_warn(storetoken, "This plot style does not work with 1 or 2 cols. Setting to points");
-                    current_plot->plot_style = POINTSTYLE;
-                }
-                /* xlow and xhigh are same as x */
-                /* auto width if boxes, else ignored */
-                store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1],
-                              v[1], -1.0);
-            }
+		if ( (current_plot->plot_style == BOXES)
+		     && boxwidth > 0 && boxwidth_is_absolute) {
+		    /* calculate width now */
+		    if (axis_array[current_plot->x_axis].log) {
+			double base = axis_array[current_plot->x_axis].base;
+			store2d_point(current_plot, i++, v[0], v[1],
+				      v[0] * pow(base, -boxwidth/2.), v[0] * pow(base, boxwidth/2.),
+				      v[1], v[1], 0.0);
+		    } else
+			store2d_point(current_plot, i++, v[0], v[1],
+				      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
+				      v[1], v[1], 0.0);
+		} else {
+		    if (current_plot->plot_style == CANDLESTICKS
+			|| current_plot->plot_style == FINANCEBARS) {
+			int_warn(storetoken, "This plot style does not work with 1 or 2 cols. Setting to points");
+			current_plot->plot_style = POINTSTYLE;
+		    }
+		    /* xlow and xhigh are same as x */
+		    /* auto width if boxes, else ignored */
+		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1],
+				  v[1], -1.0);
+		}
             break;
 
 
@@ -542,7 +572,7 @@ get_data(struct curve_points *current_plot)
                 case FILLEDCURVES:
                     current_plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
                     store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
-                                        v[1], v[2], -1.0);
+				  v[1], v[2], -1.0);
                     break;
 
                 case YERRORLINES:
@@ -571,7 +601,7 @@ get_data(struct curve_points *current_plot)
                 case LABELPOINTS:
                     /* Load the coords just as we would have for a point plot */
                     store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
-                                v[1], -1.0);
+				  v[1], -1.0);
                     /* Allocate and fill in a text_label structure to match it */
                     store_label(current_plot->labels,
                                 &(current_plot->points[i]), i, df_tokens[2], 0.0);
