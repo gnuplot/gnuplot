@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.124 2006/03/23 22:16:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.125 2006/03/28 05:30:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -560,6 +560,11 @@ get_3ddata(struct surface_points *this_plot)
 	/* do this check only, if we have PM3D / PM3D-COLUMN not compiled in */
 	if (df_no_use_specs == 2)
 	    int_error(this_plot->token, "Need 1 or 3 columns for cartesian data");
+	/* HBB NEW 20060427: if there's only one, explicit using
+	 * column, it's z data.  df_axis[] has to reflect that, so
+	 * df_readline() will expect time/date input. */
+	if (df_no_use_specs == 1)
+	    df_axis[0] = FIRST_Z_AXIS;
     } else {
 	if (df_no_use_specs == 1)
 	    int_error(this_plot->token, "Need 2 or 3 columns for polar data");
@@ -622,13 +627,16 @@ get_3ddata(struct surface_points *this_plot)
 	    if (j == DF_FIRST_BLANK) {
 
 #if defined(WITH_IMAGE) && defined(BINARY_DATA_FILE)
-		/* Images are in a sense similar to isocurves.  However, the routine
-		 * for images is written to compute the two dimensions of coordinates
-		 * by examining the data alone.  That way it can be used in the 2D
-		 * plots, for which there is no isoline record.  So, toss out isoline
-		 * information for images.
+		/* Images are in a sense similar to isocurves.
+		 * However, the routine for images is written to
+		 * compute the two dimensions of coordinates by
+		 * examining the data alone.  That way it can be used
+		 * in the 2D plots, for which there is no isoline
+		 * record.  So, toss out isoline information for
+		 * images.
 		 */
-		if ((this_plot->plot_style == IMAGE) || (this_plot->plot_style == RGBIMAGE))
+		if ((this_plot->plot_style == IMAGE)
+		    || (this_plot->plot_style == RGBIMAGE))
 		    continue;
 #endif
 		if (this_plot->plot_style == VECTOR)
@@ -655,19 +663,15 @@ get_3ddata(struct surface_points *this_plot)
 		}
 		continue;
 	    }
-	    /* its a data point or undefined */
 
+	    /* its a data point or undefined */
 	    if (xdatum >= local_this_iso->p_max) {
-		/*
-		 * overflow about to occur. Extend size of points[] array. We
-		 * either double the size, or add 1000 points, whichever is a
-		 * smaller increment. Note i = p_max.
-		 */
-		iso_extend(local_this_iso,
-			   xdatum + (xdatum < 1000 ? xdatum : 1000));
+		/* overflow about to occur. Extend size of points[]
+		 * array. Double the size, and add 1000 points, to
+		 * avoid needlessly small steps. */
+		iso_extend(local_this_iso, xdatum + xdatum + 1000);
 		if (this_plot->plot_style == VECTOR) {
-		    iso_extend(local_this_iso->next,
-			   xdatum + (xdatum < 1000 ? xdatum : 1000));
+		    iso_extend(local_this_iso->next, xdatum + xdatum + 1000);
 		    local_this_iso->next->p_count = 0;
 		}
 	    }
@@ -697,7 +701,6 @@ get_3ddata(struct surface_points *this_plot)
 	    switch (mapping3d) {
 
 	    case MAP3D_CARTESIAN:
-
 		if (j == 1) {
 		    x = xdatum;
 		    y = ydatum;
@@ -1215,12 +1218,11 @@ eval_3dplots()
 		    if (axis_array[FIRST_Y_AXIS].is_timedata) {
 			int_error(c_token, "Need full using spec for y time data");
 		    }
-		    /* df_axis[0] = FIRST_Z_AXIS; */
-		} /*  else */ {  /* HBB 20000725: testestest */
-		    df_axis[0] = FIRST_X_AXIS;
-		    df_axis[1] = FIRST_Y_AXIS;
-		    df_axis[2] = FIRST_Z_AXIS;
-		}
+		} 
+		df_axis[0] = FIRST_X_AXIS;
+		df_axis[1] = FIRST_Y_AXIS;
+		df_axis[2] = FIRST_Z_AXIS;
+
 		/*}}} */
 
 	    } else {		/* function to plot */

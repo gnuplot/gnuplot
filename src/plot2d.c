@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.126 2006/04/19 03:17:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.127 2006/04/27 20:03:39 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -278,6 +278,12 @@ get_data(struct curve_points *current_plot)
      * the z coordinate as a real coordinate (i.e. not a width or
      * 'delta' component, change the setting inside the switch: */
     current_plot->z_axis = -1;
+
+    /* HBB NEW 20060427: if there's only one, explicit using column,
+     * it's y data.  df_axis[] has to reflect that, so df_readline()
+     * will expect time/date input. */
+    if (df_no_use_specs == 1)
+	df_axis[0] = df_axis[1];
 
     switch (current_plot->plot_style) { /* set maximum columns to scan */
     case XYERRORLINES:

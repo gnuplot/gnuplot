@@ -2,7 +2,12 @@
 
 	* src/plot2d.c (get_data): Initialize further elements of df_data
 	depending on plot style, so datafile module can parse absolute
-	time/data for xlow etc.
+	time/data for xlow etc.  Similar fix for handling 'set ydata time;
+	plot "-" u 2'.
+
+	* src/plot3d.c (eval_3dplots): Fix for 'set zdata time; plot "-" u
+	2'.  Replicate realloc size fix from get_data (--> 2006-03-28)
+	here.
 
 2006-04-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
