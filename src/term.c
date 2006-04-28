@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.143 2006/04/16 23:28:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.144 2006/04/28 22:45:45 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -105,8 +105,6 @@ void close_printer __PROTO((FILE * outfile));
 #  include <alloc.h>
 # endif                         /* MSC */
 #endif /* _Windows */
-
-enum { UNSET = -1, no = 0, yes = 1 }; /* FIXME HBB 20001031: should this be here? */
 
 static int termcomp __PROTO((const generic * a, const generic * b));
 

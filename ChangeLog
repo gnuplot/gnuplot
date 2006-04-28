@@ -1,5 +1,7 @@
 2006-04-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
+	* src/gplot_x11.c (UNSET, no, yes): Remove enum declaration.
+
 	* src/term.c
 	(enhanced_recursion, enh_err_check, do_enh_writec):
 	Remove static declarations.
@@ -7,11 +9,11 @@
 	(enhanced_escape_format, enhanced_min_height)
 	(enhanced_max_height, ignore_enhanced_text):
 	Remove static declarations.
+	(UNSET, no, yes): Remove enum declaration.
 
-	* src/term_api.h : declare the above extern variables and
-	functions.
-
-2006-04-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
+	* src/term_api.h: Declare here the above variables and functions
+	related to enhanced text support. Variables are declared extern.
+	(UNSET, no, yes): Declare enum.
 
 	* src/readline.c (msdos_getch) [_Windows && USE_MOUSE]:
 	Call term->waitforinput() when appropriate, so that the wxWidgets

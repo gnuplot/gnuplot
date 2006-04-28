@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.159 2006/03/27 01:32:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.160 2006/04/05 01:04:27 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -539,10 +539,6 @@ static XFontStruct *font = NULL;
 #ifdef USE_X11_MULTIBYTE
 static XFontSet mbfont = NULL;
 #endif
-/* must match the definition in term/x11.trm: */
-/* FIXME HBB 20020225: that really should be ensured by sharing a common
- * header file between this file and term/x11.trm! */
-enum { UNSET = -1, no = 0, yes = 1 };
 static int do_raise = yes, persist = no;
 static TBOOLEAN fast_rotate = TRUE;
 static int feedback = yes;
