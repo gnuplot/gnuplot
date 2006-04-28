@@ -1,5 +1,18 @@
 2006-04-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
+	* src/term.c
+	(enhanced_recursion, enh_err_check, do_enh_writec):
+	Remove static declarations.
+	(enhanced_text, enhanced_cur_text, enhanced_fontscale)
+	(enhanced_escape_format, enhanced_min_height)
+	(enhanced_max_height, ignore_enhanced_text):
+	Remove static declarations.
+
+	* src/term_api.h : declare the above extern variables and
+	functions.
+
+2006-04-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
 	* src/readline.c (msdos_getch) [_Windows && USE_MOUSE]:
 	Call term->waitforinput() when appropriate, so that the wxWidgets
 	terminal can process events.

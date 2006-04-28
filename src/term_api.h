@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.55 2006/04/05 01:09:44 sfeam Exp $
+ * $Id: term_api.h,v 1.56 2006/04/05 03:00:50 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -346,6 +346,15 @@ extern const struct gen_table set_encoding_tbl[];
 /* mouse module needs this */
 extern TBOOLEAN term_initialised;
 
+/* Support for enhanced text mode. */
+extern char  enhanced_text[];
+extern char *enhanced_cur_text;
+extern double enhanced_fontscale;
+/* give array size to allow the use of sizeof */
+extern char enhanced_escape_format[16];
+extern double enhanced_max_height, enhanced_min_height;
+extern TBOOLEAN ignore_enhanced_text;
+
 
 /* Prototypes of functions exported by term.c */
 
@@ -370,6 +379,14 @@ struct termentry *set_term __PROTO((int));
 void init_terminal __PROTO((void));
 void test_term __PROTO((void));
 
+/* Support for enhanced text mode. */
+char *enhanced_recursion __PROTO((char *p, TBOOLEAN brace,
+                                         char *fontname, double fontsize,
+                                         double base, TBOOLEAN widthflag,
+                                         TBOOLEAN showflag, int overprint));
+void enh_err_check __PROTO((const char *str));
+/* note: c is char, but must be declared int due to K&R compatibility. */
+void do_enh_writec __PROTO((int c));
 /* flag: don't use enhanced output methods --- for output of
  * filenames, which usually looks bad using subscripts */
 void ignore_enhanced __PROTO((TBOOLEAN flag));

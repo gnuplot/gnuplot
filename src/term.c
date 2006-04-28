@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.142 2006/04/14 23:46:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.143 2006/04/16 23:28:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -168,6 +168,15 @@ static SELECT_TYPE_ARG1 ipc_back_fd = IPC_BACK_CLOSED;
 /* resolution in dpi for converting pixels to size units */
 int gp_resolution = 72;
 
+/* Support for enhanced text mode. Declared extern in term_api.h */
+char  enhanced_text[MAX_LINE_LEN+1] = "";
+char *enhanced_cur_text = NULL;
+double enhanced_fontscale = 1.0;
+char enhanced_escape_format[16] = "";
+double enhanced_max_height = 0.0, enhanced_min_height = 0.0;
+/* flag variable to disable enhanced output of filenames, mainly. */
+TBOOLEAN ignore_enhanced_text = FALSE;
+
 /* Internal variables */
 
 /* true if terminal is in graphics mode */
@@ -184,9 +193,6 @@ static TBOOLEAN term_force_init = FALSE;
 
 /* internal pointsize for do_point */
 static double term_pointsize=1;
-
-/* flag variable to disable enhanced output of filenames, mainly */
-static TBOOLEAN ignore_enhanced_text = FALSE;
 
 /* Internal prototypes: */
 
@@ -210,22 +216,6 @@ static void UNKNOWN_null __PROTO((void));
 static void MOVE_null __PROTO((unsigned int, unsigned int));
 static void LINETYPE_null __PROTO((int));
 static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
-
-/* Support for enhanced text mode. These can be static because all  */
-/* the terminal drivers are included into term.c at compile time.   */
-static char  enhanced_text[MAX_LINE_LEN];
-static char *enhanced_cur_text;
-static double enhanced_fontscale = 1.0;
-static char enhanced_escape_format[16];
-static double enhanced_max_height, enhanced_min_height;
-
-static char *enhanced_recursion __PROTO((char *p, TBOOLEAN brace,
-                                         char *fontname, double fontsize,
-                                         double base, TBOOLEAN widthflag,
-                                         TBOOLEAN showflag, int overprint));
-static void enh_err_check __PROTO((const char *str));
-/* note: c is char, but must be declared int due to K&R compatibility. */
-static void do_enh_writec __PROTO((int c));
 
 /* Used by terminals and by shared routine parse_term_size() */
 typedef enum {
@@ -2323,7 +2313,7 @@ fflush_binary()
 #define ENH_DEBUG(x)
 #endif
 
-static void
+void
 do_enh_writec(int c)
 {
     /* note: c is meant to hold a char, but is actually an int, for
@@ -2347,7 +2337,7 @@ do_enh_writec(int c)
  *              (overprinted text is centered horizontally on underprinted text
  */
 
-static char *
+char *
 enhanced_recursion(
     char *p,
     TBOOLEAN brace,
@@ -2627,7 +2617,7 @@ enhanced_recursion(
 }
 
 /* Called after the end of recursion to check for errors */
-static void
+void
 enh_err_check(const char *str)
 {
     if (*str == '}')
