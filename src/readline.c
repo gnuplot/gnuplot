@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.39 2005/04/28 20:33:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.40 2005/05/23 18:39:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -800,17 +800,21 @@ ansi_getc()
 static char
 msdos_getch()
 {
+	char c;
+	
 #ifdef DJGPP
-    char c;
     int ch = getkey();
     c = (ch & 0xff00) ? 0 : ch & 0xff;
-#else /* not DJGPP */
-# ifdef OS2
-    char c = getc(stdin);
-# else				/* not OS2 */
-    char c = getch();
-# endif				/* not OS2 */
-#endif /* not DJGPP */
+#elif defined (OS2)
+    c = getc(stdin);
+#else /* not OS2, not DJGPP*/
+# if defined (_Windows) && defined (USE_MOUSE)
+    if (term && term->waitforinput && interactive)
+	c = term->waitforinput();
+    else
+# endif /* not _Windows && not USE_MOUSE */
+    c = getch();
+#endif /* not DJGPP, not OS2 */
 
     if (c == 0) {
 #ifdef DJGPP

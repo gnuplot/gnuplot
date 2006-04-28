@@ -1,3 +1,9 @@
+2006-04-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/readline.c (msdos_getch) [_Windows && USE_MOUSE]:
+	Call term->waitforinput() when appropriate, so that the wxWidgets
+	terminal can process events.
+
 2006-04-27  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in src/Makefile.am: Change PKG_MAJOR to
