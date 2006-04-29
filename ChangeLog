@@ -1,3 +1,63 @@
+2006-04-29  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in: C++, wxWidgets, cairo and pango	configuration
+	tests.
+
+	* config/makefile.mgw: Likewise.
+
+	* src/command.c (raise_lower_command): Raise and lower commands
+	for the wxWidgets terminal.
+
+	* src/command.h : Likewise.
+
+	* src/Makefile.am : wxWidgets terminal conditional compilation.
+
+	* src/plot.c (main): wxWidgets terminal hook on exit to handle
+	the 'persist' behaviour.
+
+	* src/term.c (init_terminal): Make the wxWidgets terminal
+	the default on Windows and X11.
+
+	* src/term.h: Include the wxWidgets terminal.
+
+	* src/win/wgnuplot.rc: Include wxWidgets ressources file.
+
+	* src/win/wpause.c (PauseBox): Process events from the wxWidgets
+	terminal when in pause.
+
+	* src/wxterminal/bitmaps/png/autoscale.png
+	* src/wxterminal/bitmaps/png/clipboard.png
+	* src/wxterminal/bitmaps/png/config.png
+	* src/wxterminal/bitmaps/png/grid.png
+	* src/wxterminal/bitmaps/png/help.png
+	* src/wxterminal/bitmaps/png/nextzoom.png
+	* src/wxterminal/bitmaps/png/previouszoom.png
+	* src/wxterminal/bitmaps/png/replot.png:
+	PNG icons for the wxWidgets toolbar.
+
+	* src/wxterminal/bitmaps/xpm/icon16x16.xpm
+	* src/wxterminal/bitmaps/xpm/icon32x32.xpm
+	* src/wxterminal/bitmaps/xpm/icon64x64.xpm:
+	XPM icons for the wxWidgets window icon.
+
+	* src/wxterminal/bitmaps/xpm/notfound.xpm:
+	XPM icon for the wxWidgets toolbar.
+
+	* src/wxterminal/gp_cairo.c
+	* src/wxterminal/gp_cairo.h
+	* src/wxterminal/gp_cairo_term.h:
+	Generic routines to render a plot to a cairo surface.
+
+	* src/wxterminal/wxt_gui.cpp
+	* src/wxterlinal/wxt_gui.h
+	* src/wxterminal/wxt_plot.h
+	* src/wxterminal/wxt_term.h:
+	Graphical user interface based on wxWidgets.
+
+	* term/wxt.trm:
+	Terminal hooks between term.c and the wxWidgets and cairo
+	files.
+
 2006-04-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/gplot_x11.c (UNSET, no, yes): Remove enum declaration.

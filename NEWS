@@ -1,5 +1,6 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
+* NEW multi-platform and interactive wxWidgets terminal
 * NEW windows terminal supports enhanced text mode
 * NEW support for placement of individual rectangles within plot or canvas
 * NEW command "set style increment user" allows customization of default lines
