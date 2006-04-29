@@ -127,7 +127,7 @@ TERM_PUBLIC void wxt_options()
 				if (s[sep] == ',')
 					sscanf(&(s[sep+1]), "%d", &wxt_set_fontsize);
 			}
-			font_setting = (char*) malloc(strlen(s)*sizeof(char));
+			font_setting = (char*) gp_alloc(strlen(s) + 1,"wxt font");
 			strcpy(font_setting,s);
 			free(s);
 			if (set_font) duplication=TRUE;

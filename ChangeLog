@@ -1,3 +1,7 @@
+2006-04-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/wxt.trm (wxt_options): Fix improper malloc for font name.
+
 2006-04-29  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in: C++, wxWidgets, cairo and pango	configuration
