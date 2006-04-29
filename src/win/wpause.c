@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.7 2004/07/01 17:10:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.8 2005/04/22 05:25:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -51,6 +51,10 @@ static char *RCSid() { return RCSid("$Id: wpause.c,v 1.7 2004/07/01 17:10:11 bro
 #include "wgnuplib.h"
 #include "wresourc.h"
 #include "wcommon.h"
+
+#ifdef WXWIDGETS
+extern void wxt_waitforinput_pause( LPPW lppw );
+#endif /* WXWIDGETS */
 
 /* Pause Window */
 LRESULT CALLBACK WINEXPORT WndPauseProc(HWND, UINT, WPARAM, LPARAM);
@@ -149,6 +153,9 @@ PauseBox(LPPW lppw)
 
 	lppw->bPause = TRUE;
 	lppw->bPauseCancel = IDCANCEL;
+#ifdef WXWIDGETS
+	wxt_waitforinput_pause(lppw);
+#else
 	while (lppw->bPause) {
 	    /* HBB 20021211: Nigel Nunn found a better way to avoid
 	     * 100% CPU load --> use it */
@@ -159,6 +166,7 @@ PauseBox(LPPW lppw)
 	    } else
 		WaitMessage();
 	}
+#endif /* WXWIDGETS */
 
 	DestroyWindow(lppw->hWndPause);
 #ifndef WIN32

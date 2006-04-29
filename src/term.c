@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.144 2006/04/28 22:45:45 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.145 2006/04/29 00:37:42 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1610,7 +1610,11 @@ init_terminal()
 #endif /* SUN */
 
 #ifdef _Windows
-        term_name = "win";
+# ifdef WXWIDGETS
+	term_name = "wxt";
+# else
+	term_name = "win";
+# endif /* WXWIDGETS*/
 #endif /* _Windows */
 
 #ifdef GPR
@@ -1631,15 +1635,20 @@ init_terminal()
 #endif
 
 #ifdef X11
+# ifdef WXWIDGETS
+# define GP_X11_TERM "wxt"
+# else
+# define GP_X11_TERM "x11"
+# endif
         env_term = getenv("TERM");      /* try $TERM */
         if (term_name == (char *) NULL
             && env_term != (char *) NULL && strcmp(env_term, "xterm") == 0)
-            term_name = "x11";
+            term_name = GP_X11_TERM;
         display = getenv("DISPLAY");
         if (term_name == (char *) NULL && display != (char *) NULL)
-            term_name = "x11";
+            term_name = GP_X11_TERM;
         if (X11_Display)
-            term_name = "x11";
+            term_name = GP_X11_TERM;
 #endif /* x11 */
 
 #ifdef AMIGA

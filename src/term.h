@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.33 2005/07/18 19:27:32 sfeam Exp $
+ * $Id: term.h,v 1.34 2005/07/31 08:42:08 mikulik Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -448,6 +448,11 @@
 
 #ifdef GP_ENH_EST
 #include "estimate.trm"
+#endif
+
+/* WXWIDGETS */
+#ifdef WXWIDGETS
+# include "wxt.trm"
 #endif
 
 #endif /* !SHORT_TERMLIST */

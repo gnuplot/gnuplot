@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.80 2006/03/11 22:11:44 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.81 2006/03/28 09:56:30 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -105,6 +105,10 @@ extern smg$create_key_table();
 # include "win/wgnuplib.h"
 # include "win/wcommon.h"
 #endif /* _Windows */
+
+#ifdef WXWIDGETS
+# include "wxterminal/wxt_plot.h"
+#endif
 
 /* GNU readline
  * Only required by two files directly,
@@ -633,6 +637,11 @@ main(int argc, char **argv)
 	/* take commands from stdin */
 	while (!com_line());
     }
+
+#ifdef WXWIDGETS
+    /* handle persist setting */
+    wxt_atexit(argc,argv);
+#endif
 
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 #if !defined(HAVE_ATEXIT) && !defined(HAVE_ON_EXIT)

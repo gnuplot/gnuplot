@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.177 2006/04/24 09:54:32 broeker Exp $
+dnl $Id: configure.in,v 1.178 2006/04/28 00:24:49 tlecomte Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -886,6 +886,94 @@ if test ! -f src/graphics.c ; then
   cp ${srcdir}/tutorial/eg3.dat tutorial
 fi
 
+dnl  WXWIDGETS TERMINAL
+
+AC_ARG_ENABLE(wxwidgets, [  --disable-wxwidgets      wxWidgets terminal (default enabled)], enable_wxwidgets=no, enable_wxwidgets=yes)
+if test "${enable_wxwidgets}" = yes
+then
+	dnl variable used to determine if all checks pass
+	enable_wxwidgets_ok=yes
+
+	dnl wxWidgets terminal needs C++
+	AC_PROG_CXX
+	AC_PROG_CXXCPP
+	dnl To check for object files creation, needed to build these object files in subdirs
+	AM_PROG_CC_C_O
+
+	dnl The user can specify another path for wx-config
+	WXWIDGETS_PATH="${PATH}"
+	AC_ARG_WITH(wx-config-path, [dnl
+  --with-wx-config=PATH   Use the given path to wx-config, the wxWidgets configuration program
+                          (default search in $PATH)],
+	   [ if test "${with_wx_config}" != "no"
+	     then
+		WXWIDGETS_PATH="${with_wx_config}:${PATH}"
+	     fi ])
+
+	dnl Look for wx-config in the path
+	AC_PATH_PROG(WX_CONFIG, wx-config, no, ${WXWIDGETS_PATH})
+	if test "${WX_CONFIG}" = "no"; then
+	   AC_MSG_WARN([wxWidgets can't be found. You can try --with-wx-config-path to give the right path to wx-config. The wxWidgets terminal won't be compiled.])
+	   enable_wxwidgets_ok=no
+	fi
+
+	dnl Ckeck for wxWidgets version
+	if expr 2.3.3 \> `${WX_CONFIG} --version` >/dev/null; then
+	   AC_MSG_WARN([Your development package for wxWidgets is too old, you need at least version 2.3.3. The wxWidgets terminal will not be compiled.])
+	   enable_wxwidgets_ok=no
+        fi
+
+	dnl Check for Cairo
+	PKG_CHECK_MODULES(CAIRO, [cairo >= 0.9.0],
+		[HAVE_CAIRO=1], dnl not used, but may solve problems with some pkg-config
+		[AC_MSG_WARN([Cairo can't be found. The wxWidgets terminal will not be compiled.])
+		enable_wxwidgets_ok=no
+		])
+
+	dnl Check for Pango
+	PKG_CHECK_MODULES(PANGO, [pango >= 1.4],
+		[HAVE_PANGO=1], dnl not used, but may solve problems with some pkg-config
+		[AC_MSG_WARN([Pango can't be found. The wxWidgets terminal will not be compiled.])
+		enable_wxwidgets_ok=no
+		])
+fi
+
+if test "${enable_wxwidgets_ok}" = yes
+then
+	WX_CPPFLAGS="`$WX_CONFIG --cppflags` $CAIRO_CFLAGS $PANGO_CFLAGS"
+	WX_CXXFLAGS="`$WX_CONFIG --cxxflags | sed -e 's/-fno-exceptions//'` $CAIRO_CFLAGS $PANGO_CFLAGS"
+	WX_LIBS="`$WX_CONFIG --libs` $CAIRO_LIBS $PANGO_LIBS"
+
+	dnl Check for gtk (raise/lower tweaks)
+	PKG_CHECK_MODULES(GTK, [gtk+-2.0], have_gtk=yes, have_gtk=no)
+	if  test "${have_gtk}" = yes
+	then
+	   AC_DEFINE(HAVE_GTK, 1, [Define to use gtk/gdk tweaks])
+	   WX_CPPFLAGS="$WX_CPPFLAGS $GTK_CFLAGS"
+	   WX_CXXFLAGS="$WX_CXXFLAGS $GTK_CFLAGS"
+	   WX_LIBS="$WX_LIBS $GTK_LIBS"
+	fi
+
+	dnl Check for gtk>2.8 for direct rendering to screen
+	PKG_CHECK_MODULES(GTK28, [gtk+-2.0 >= 2.8.0], have_gtk28=yes, have_gtk28=no)
+	if  test "${have_gtk28}" = yes
+	then
+	   AC_DEFINE(HAVE_GTK28, 1, [Define to use gtk+ functions to handle cairo])
+	fi
+
+	CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
+	CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS"
+	AC_SUBST(WX_LIBS)
+	AC_DEFINE(WXWIDGETS,1,
+            [ Define if you want the wxwidgets terminal. ])
+	WX_OBJ='wxterminal/wxt_gui.$(OBJEXT) wxterminal/gp_cairo.$(OBJEXT)'
+	AC_SUBST([WX_OBJ])
+fi
+
+AM_CONDITIONAL(BUILD_WXWIDGETS, test "${enable_wxwidgets_ok}" = yes)
+
+dnl  END WXWIDGETS TERMINAL
+
 dnl build lisp files
 if test "$with_lisp_files" != no; then
   AC_CONFIG_SUBDIRS(lisp)
@@ -1094,6 +1182,10 @@ fi
 
 if test "$enable_h3d_gridbox" = yes; then
   AC_MSG_RESULT([  Enable hidden3d gridbox optimization])
+fi
+
+if test "$enable_wxwidgets_ok" = yes; then
+  AC_MSG_RESULT([  Enable wxWidgets interactive terminal (EXPERIMENTAL)])
 fi
 
 dnl end config report

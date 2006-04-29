@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
+AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h subdir-objects
 
 # in the spirit of automake ...
 pkglibexecdir = $(libexecdir)/@PACKAGE@/@VERSION_MAJOR@
@@ -22,7 +22,7 @@ pkglibexec_PROGRAMS = $(GNUPLOT_X11)
 noinst_PROGRAMS = bf_test
 
 XLIBS = @LIBRARIES_FOR_X@
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DPREFIX=\"$(prefix)\" -DVERSION_MAJOR=\"$(VERSION_MAJOR)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h bin_hook.c \
 breaders.c breaders.h bitmap.c bitmap.h color.c color.h command.c \
@@ -38,7 +38,9 @@ standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h \
 template.h term_api.h term.c term.h time.c unset.c util.c util.h \
 util3d.c util3d.h variable.c variable.h version.c version.h
 
-gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
+gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS) $(WX_OBJ) $(WX_LIBS)
+
+gnuplot_DEPENDENCIES = $(WX_OBJ)
 
 gnuplot_x11_SOURCES = gplt_x11.c gplt_x11.h gpexecute.c gpexecute.h mousecmn.h
 
@@ -55,13 +57,27 @@ endif
 
 SUBDIRS = $(d_beos)
 
-EXTRA_gnuplot_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c
+wx_files = wxterminal/gp_cairo.c wxterminal/wxt_gui.cpp
+
+EXTRA_gnuplot_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c $(wx_files)
 
 EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep README \
 corgraph.asm genopt.com gnuplot.def gnuplot.opt gnuplot.prj header.mac \
 hrcgraph.asm intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc \
 makefile.all makefile.awc os2 pcgraph.asm rgipgnu win x11.opt \
 $(EXTRA_gnuplot_SOURCES)
+
+if BUILD_WXWIDGETS
+pngdir = $(pkgdatadir)/$(VERSION_MAJOR)/png
+png_DATA = wxterminal/bitmaps/png/clipboard.png \
+	wxterminal/bitmaps/png/grid.png \
+	wxterminal/bitmaps/png/replot.png \
+	wxterminal/bitmaps/png/previouszoom.png \
+	wxterminal/bitmaps/png/nextzoom.png \
+	wxterminal/bitmaps/png/autoscale.png \
+	wxterminal/bitmaps/png/config.png \
+	wxterminal/bitmaps/png/help.png
+endif
 
 ## we don't need COREOBJS, but CORETERM
 ## for the term.o dependencies

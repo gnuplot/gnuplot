@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.135 2006/02/01 06:05:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.136 2006/03/06 18:36:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -550,6 +550,9 @@ raise_lower_command(int lower)
 #ifdef _Windows
 	    win_lower_terminal_window();
 #endif
+#ifdef WXWIDGETS
+	    wxt_lower_terminal_group();
+#endif
 	} else {
 #ifdef OS2
 	    pm_raise_terminal_window();
@@ -559,6 +562,9 @@ raise_lower_command(int lower)
 #endif
 #ifdef _Windows
 	    win_raise_terminal_window();
+#endif
+#ifdef WXWIDGETS
+	    wxt_raise_terminal_group();
 #endif
 	}
 	return;
@@ -582,6 +588,9 @@ raise_lower_command(int lower)
 #ifdef _Windows
 		win_lower_terminal_window();
 #endif
+#ifdef WXWIDGETS
+		wxt_lower_terminal_window(number);
+#endif
 	    } else {
 #ifdef OS2
 		pm_raise_terminal_window();
@@ -591,6 +600,9 @@ raise_lower_command(int lower)
 #endif
 #ifdef _Windows
 		win_raise_terminal_window();
+#endif
+#ifdef WXWIDGETS
+		wxt_raise_terminal_window(number);
 #endif
 	    }
 	    ++c_token;

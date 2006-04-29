@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.38 2005/10/07 13:00:51 mikulik Exp $
+ * $Id: command.h,v 1.39 2006/01/20 06:18:41 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -134,6 +134,12 @@ extern void x11_lower_terminal_group __PROTO((void));
 #ifdef _Windows
 extern void win_raise_terminal_window();
 extern void win_lower_terminal_window();
+#endif
+#ifdef WXWIDGETS
+extern void wxt_raise_terminal_window __PROTO((int));
+extern void wxt_raise_terminal_group __PROTO((void));
+extern void wxt_lower_terminal_window __PROTO((int));
+extern void wxt_lower_terminal_group __PROTO((void));
 #endif
 
 #ifdef USE_MOUSE

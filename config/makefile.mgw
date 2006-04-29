@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.32 2005/08/07 09:43:27 mikulik Exp $
+# $Id: makefile.mgw,v 1.33 2005/10/20 13:20:50 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #
@@ -76,6 +76,13 @@ MOUSE=1
 # Also does not work properly with pgnuplot.
 #PIPES=1
 
+# WXWIDGETS interactive terminal
+# Requires wxWidgets, Cairo, Pango, and their respective dependencies.
+# Uncomment the following lines to compile it.
+# WXT_LOCATION should give the path where can be found wx/*.h headers
+#WXT=1
+#WX_LOCATION=/usr/local/include/wx-2.6
+
 # Below you can adapt paths according to your software setup:
 
 # Where to place gnuplot.gih helpfile:
@@ -126,6 +133,8 @@ GNUSORT = c:/cygwin/bin/sort.exe
 
 CC = $(GCCPATH)gcc
 LD = $(GCCPATH)gcc
+CXX = $(GCCPATH)g++
+LDX = $(GCCPATH)g++
 
 RM = rm -f
 CP = cp -p
@@ -208,6 +217,19 @@ ifdef NEED_PNG_W
 endif
 endif
 
+ifdef WXT
+	CFLAGS += -DWXWIDGETS
+	CXXFLAGS += $(shell wx-config --cxxflags)
+	CAIRO_CFLAGS = $(shell pkg-config --cflags cairo)
+	CAIRO_LIBS = $(shell pkg-config --libs cairo)
+	PANGO_CFLAGS = $(shell pkg-config --cflags pangocairo)
+	PANGO_LIBS = $(shell pkg-config --libs pangocairo)
+	WX_LIBS = $(shell wx-config --libs)
+	WX_OBJS = wxt_gui.o gp_cairo.o
+	WX_INSTALL = mkdir -p $(DESTDIR)/share && \
+	cp wxterminal/bitmaps/png/* $(DESTDIR)/share/
+endif
+
 ifdef GNU_RC
   # RC = d:/cygnus/cygwin-b20/H-i586-cygwin32/bin/windres
   RC  = $(GCCPATH)windres
@@ -215,12 +237,18 @@ ifdef GNU_RC
 	--include-dir=win \
 	--define __WIN32__ --define __WIN95__ --define MSRC \
 	--define __GNUWIN32__
+  ifdef WXT
+	RCFLAGS += --define WXWIDGETS --include-dir=$(WX_LOCATION)
+  endif
   RCOUT = wgplt_res.o
   RES2COFF = echo wgplt_res.o
 else
   RC = $(MSSDK)/bin/rc
   RCFLAGS = -v -i$(MSSDK)/include -iwin \
   	-dWIN32 -dMSRC
+  ifdef WXT
+	RCFLAGS += -dWXWIDGETS -i$(WX_LOCATION)
+  endif
   RCOUT = -fowgnuplot.res
   RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.o
 endif
@@ -243,7 +271,7 @@ all:	 config.h wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe \
 # include the 'core makefile template'
 include makefile.all
 
-OBJS = $(COREOBJS) version.$(O) gpexecute.$(O)
+OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS)
 
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) wpause.$(O) wmenu.$(O)
 
@@ -263,7 +291,8 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -ladvapi32
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpicon.ico
-	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS) $(TERMLIBS)
+	$(LDX) $(LDFLAGS) $(LDFLAGS2) -mwindows -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS)\
+	$(TERMLIBS) $(WX_LIBS) $(CAIRO_LIBS) $(PANGO_LIBS)
 
 pgnuplot.exe: win/pgnuplot.c version.o
 	gcc -O2 -s -o pgnuplot.exe win/pgnuplot.c version.o -I. -luser32
@@ -296,7 +325,7 @@ wmenu.$(O): win/wmenu.c $(WINDEPS)
 wtext.$(O): win/wtext.c $(WINDEPS)
 	$(CC) -c $(CFLAGS) win/wtext.c
 
-wpause.$(O): win/wpause.c $(WINDEPS)
+wpause.$(O): win/wpause.c wxterminal/wxt_term.h $(WINDEPS)
 	$(CC) -c $(CFLAGS) win/wpause.c
 
 wprinter.$(O): win/wprinter.c $(WINDEPS)
@@ -307,6 +336,12 @@ wgraph.$(O): win/wgraph.c $(WINDEPS)
 
 wgnuplot.mnu: win/wgnuplot.mnu
 	$(CP) $^ $@
+
+wxt_gui.$(O): wxterminal/wxt_gui.cpp wxterminal/wxt_gui.h $(WX_LOCATION)
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) wxterminal/wxt_gui.cpp
+
+gp_cairo.$(O): wxterminal/gp_cairo.c wxterminal/gp_cairo.h
+	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) $(PANGO_CFLAGS) wxterminal/gp_cairo.c
 
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
@@ -400,6 +435,7 @@ gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
 # clean up temporary files
 clean:
 	$(RM) config.h *.$(O) wgnuplot.map wgnuplot.res win/gnuplot.rtf
+	$(RM) wxterminal/*.$(O)
 	$(RM) doc2rtf.exe win/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe *.ico geticon.exe allterm.h allterm.c
 	$(RM) gnuplot.tex gnuplot.dvi gnuplot.ps gnuplot.pdf
@@ -416,3 +452,4 @@ install: default
 	cp win/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
 	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
+	$(WX_INSTALL)
