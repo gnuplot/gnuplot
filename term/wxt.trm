@@ -1,0 +1,345 @@
+/* GNUPLOT - wxt.trm */
+
+/*[
+ * Copyright 2005,2006   Timothee Lecomte
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/* ------------------------------------------------------
+ * Here you will find the terminal table, filled
+ * with C++ functions defined in wxt_gui.cpp,
+ * where the wxWidgets terminal is mainly implemented.
+ * See wxt_gui.cpp for details about this terminal.
+ * ------------------------------------------------------*/
+
+#ifdef TERM_REGISTER
+register_term (wxt)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void wxt_options __PROTO ((void));
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+
+#ifdef TERM_BODY
+
+#include "wxterminal/wxt_term.h"
+/* for enhanced text mode */
+#include "wxterminal/gp_cairo_term.h"
+
+/* terminal state, defined extern in wxt_term.h */
+int wxt_window_number = 0;
+TBOOLEAN wxt_enhanced_enabled = FALSE;
+int wxt_persist = UNSET;
+int wxt_raise = UNSET;
+/* default text font family: */
+char wxt_set_fontname[MAX_ID_LEN + 1] = "";
+/* default text size*/
+int wxt_set_fontsize = 0;
+/* window title */
+char wxt_title[MAX_ID_LEN + 1] = "";
+
+enum WXT_id {
+    WXT_FONT,
+    WXT_ENHANCED,
+    WXT_NOENHANCED,
+    WXT_PERSIST,
+    WXT_NOPERSIST,
+    WXT_RAISE,
+    WXT_NORAISE,
+    WXT_TITLE,
+    WXT_CLOSE,
+    WXT_OTHER
+};
+
+static struct gen_table wxt_opts[] = {
+    {"font",   WXT_FONT},
+    {"enh$anced", WXT_ENHANCED},
+    {"noenh$anced", WXT_NOENHANCED},
+    {"per$sist", WXT_PERSIST},
+    {"noper$sist", WXT_NOPERSIST},
+    {"rai$se", WXT_RAISE},
+    {"norai$se", WXT_NORAISE},
+    {"ti$tle", WXT_TITLE},
+    {"cl$ose", WXT_CLOSE},
+    {NULL, WXT_OTHER}
+};
+
+
+/* "Called when terminal type is selected. This procedure should parse options on the command line.
+* A list of the currently selected options should be stored in term_options[],
+* in a form suitable for use with the set term command.
+* term_options[] is used by the save command.  Use options_null() if no options are available." */
+TERM_PUBLIC void wxt_options()
+{
+	struct value a;
+	char *s;
+	char *font_setting;
+	int sep;
+	TBOOLEAN duplication = FALSE;
+	TBOOLEAN set_enhanced = FALSE, set_font = FALSE;
+	TBOOLEAN set_persist = FALSE, set_number = FALSE;
+	TBOOLEAN set_raise = FALSE, set_title = FALSE;
+	TBOOLEAN set_close = FALSE;
+
+	while (!END_OF_COMMAND) {
+		FPRINTF((stderr, "processing token\n"));
+		switch (lookup_table(&wxt_opts[0], c_token)) {
+		case WXT_FONT:
+			c_token++;
+			if (!(s = try_to_get_string()))
+				int_error(c_token,"font: expecting string");
+			if (!(*s)) {
+				strcpy (wxt_set_fontname, "");
+				wxt_set_fontsize = 0;
+			} else {
+				sep = strcspn(s,",");
+				if (sep > 0) {
+					strncpy(wxt_set_fontname, s, sep);
+					wxt_set_fontname[sep] = '\0';
+				}
+				if (s[sep] == ',')
+					sscanf(&(s[sep+1]), "%d", &wxt_set_fontsize);
+			}
+			font_setting = (char*) malloc(strlen(s)*sizeof(char));
+			strcpy(font_setting,s);
+			free(s);
+			if (set_font) duplication=TRUE;
+			set_font = TRUE;
+			break;
+		case WXT_ENHANCED:
+			c_token++;
+			wxt_enhanced_enabled = TRUE;
+			term->flags |= TERM_ENHANCED_TEXT;
+			if (set_enhanced) duplication=TRUE;
+			set_enhanced = TRUE;
+			break;
+		case WXT_NOENHANCED:
+			c_token++;
+			wxt_enhanced_enabled = FALSE;
+			term->flags &= ~TERM_ENHANCED_TEXT;
+			if (set_enhanced) duplication=TRUE;
+			set_enhanced = TRUE;
+			break;
+		case WXT_PERSIST:
+			c_token++;
+			wxt_persist = yes;
+			if (set_persist) duplication=TRUE;
+			set_persist = TRUE;
+			break;
+		case WXT_NOPERSIST:
+			c_token++;
+			wxt_persist = no;
+			if (set_persist) duplication=TRUE;
+			set_persist = TRUE;
+			break;
+		case WXT_RAISE:
+			c_token++;
+			wxt_raise = yes;
+			if (set_raise) duplication=TRUE;
+			set_raise = TRUE;
+			break;
+		case WXT_NORAISE:
+			c_token++;
+			wxt_raise = no;
+			if (set_raise) duplication=TRUE;
+			set_raise = TRUE;
+			break;
+		case WXT_TITLE:
+			c_token++;
+			if (!(s = try_to_get_string()))
+				int_error(c_token,"title: expecting string");
+			if (*s)
+				strncpy(wxt_title, s, sizeof(wxt_title));
+			free(s);
+			if (set_title) duplication=TRUE;
+			set_title = TRUE;
+			break;
+		case WXT_CLOSE:
+			c_token++;
+			if (set_close) duplication=TRUE;
+			set_close = TRUE;
+			break;
+		case WXT_OTHER:
+		default:
+			wxt_window_number = (int) real(const_express(&a));
+			if (set_number) duplication=TRUE;
+			set_number = TRUE;
+			/*int_error(c_token, "unrecognized terminal option");*/
+			break;
+		}
+
+		if (duplication)
+			int_error(c_token-1, "Duplicated or contradicting arguments in wxt term options.");
+	}
+
+	/* Save options back into options string in normalized format */
+	sprintf(term_options, "%d", wxt_window_number);
+
+	if (set_title) {
+		strcat(term_options, " title \"");
+		strcat(term_options, wxt_title);
+		strcat(term_options, "\"");
+		wxt_update_title(wxt_window_number);
+	}
+
+	if (set_enhanced)
+		strcat(term_options, wxt_enhanced_enabled ? " enhanced" : " noenhanced");
+
+	if (set_font) {
+		strcat(term_options, " font \"");
+		strcat(term_options, font_setting);
+		strcat(term_options, "\"");
+		free(font_setting);
+	}
+
+	if (set_persist)
+		strcat(term_options, wxt_persist ? " persist" : " nopersist");
+
+	if (set_raise)
+		strcat(term_options, wxt_raise ? " raise" : " noraise");
+
+	if (set_close)
+		wxt_close_terminal_window(wxt_window_number);
+}
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+TERM_TABLE_START (wxt_driver)
+    "wxt", "wxWidgets cross-platform windowed terminal",
+    /* the following values are overriden by wxt_graphics */
+    1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
+    1 /* vtic */ , 1 /* htic */ ,
+    wxt_options, wxt_init, wxt_reset, wxt_text, null_scale, wxt_graphics,
+    wxt_move, wxt_vector, wxt_linetype, wxt_put_text,
+    wxt_text_angle, wxt_justify_text,
+    wxt_point, do_arrow, wxt_set_font,
+    wxt_pointsize, TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE,
+    wxt_text /* suspend */, 0 /* resume */, wxt_fillbox, wxt_linewidth
+#ifdef USE_MOUSE
+    , wxt_waitforinput, wxt_put_tmptext, wxt_set_ruler, wxt_set_cursor, wxt_set_clipboard
+#endif
+    , wxt_make_palette, 0 /* wxt_previous_palette */, wxt_set_color, wxt_filled_polygon
+#ifdef WITH_IMAGE
+    , wxt_image
+#endif
+    , gp_cairo_enhanced_open, gp_cairo_enhanced_flush, do_enh_writec
+TERM_TABLE_END (wxt_driver)
+
+#undef LAST_TERM
+#define LAST_TERM wxt_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(wxt)
+"1 wxt",
+"?set terminal wxt",
+"?wxt",
+" The `wxt` terminal device generates output in a separate window. The window ",
+" created by the wxWidgets library, where the 'wxt' comes from.",
+" The actual drawing is done via cairo, a 2D graphics library.",
+" Text is handled by pango, a library for laying out and rendering text.",
+"",
+" Syntax:",
+"         set term wxt {<n>}",
+"                      {{no}enhanced}",
+"                      {font <font>}",
+"                      {title \"title\"}",
+"                      {{no}persist}",
+"                      {{no}raise}",
+"                      {close}",
+"",
+" Multiple plot windows are supported: `set terminal wxt <n>` directs the",
+" output to plot window number n.",
+" The default window title includes this number.",
+" This title can also be specified with the keyword \"title\".",
+"",
+" Plot windows remain open even when the `gnuplot` driver is changed to a",
+" different device.  A plot window can be closed by pressing the letter q",
+" while that window has input focus, by choosing `close` from a window",
+" manager menu, or with `set term wxt <n> close`.",
+" The size of a plot may be changed by resizing the terminal window.",
+" The aspect ratio of the plot will be conserved, and the contents ",
+" will be scaled, fonts and linewidths included.",
+"",
+" The active plot window (the one selected by `set term wxt <n>`) is interactive.",
+" Its behaviour is shared with other terminal types. See `mouse` for details.",
+" It also has some extra icons, which should be self-explanatory.",
+"",
+" This terminal supports an enhanced text mode, which allows font",
+" and other formatting commands (subscripts, superscripts, etc.)",
+" to be embedded in labels and other text strings."
+" The enhanced text mode syntax is shared with other gnuplot",
+" terminal types. See `enhanced` for more details.",
+"",
+" <font> is in the format \"FontFace,FontSize\", i.e. the face and",
+" the size comma-separated in a single string.",
+" FontFace is a usual font face name, such as \'Arial\'.",
+" If you do not provide FontFace, the wxt terminal will try"
+" to choose you system default font.",
+" FontSize is the font size, in points. If you do not provide the size,",
+" the wxt terminal will try to choose your system default font size.",
+"    For example :",
+"       set term wxt font \"Arial,10\"",
+"       set term wxt font \"Arial\" # to change the font face only",
+"       set term wxt font \",10\" # to change the font size only",
+"       set term wxt font \"\" # to reset the font name and size",
+"",
+" Pango, the library used to layout the text, is based on utf-8.",
+" Thus, the wxt terminal has to convert from your encoding to utf-8.",
+" The default input encoding is based on your \'locale\'.",
+" If you want to use another encoding, make sure gnuplot knows",
+" which one you are using. See `encoding` for more details.",
+"",
+" Note that pango cannot deal with fonts that do not respect",
+" the unicode mapping.",
+" That is the case with the Symbol font. To ensure compatibility",
+" with other terminals, if you choose the Symbol font in enhanced mode",
+" the wxt terminal will use the map provided by http://www.unicode.org/ to",
+" translate character codes to their utf-8 counterparts, and it will use",
+" your current font instead of Symbol.",
+" However, this will not work with other non conform fonts, such as",
+" \"windings\". These fonts may not appear at all."
+"",
+" The rendering of the plot can be done in several ways.",
+" It can be altered with a dialog available from the toolbar."
+" To obtain the best output possible, the rendering involves three"
+" mechanisms : antialiasing, oversampling and hinting.",
+" Antialiasing allows to display non-horizontal and non-vertical lines",
+" smoother.",
+" Oversampling combined with antialiasing provides subpixel accuracy,",
+" so that gnuplot can draw a line from non-integer coordinates. This avoids",
+" wobbling effects on diagonal lines ('plot x' for example).",
+" Hinting avoids the blur on horizontal and vertical caused by oversampling.",
+" The terminal will snap these lines to integer coordinates so that a one-pixel-",
+" wide line will actually be drawn on one and only one pixel."
+END_HELP(wxt)
+#endif /* TERM_HELP */
