@@ -1,5 +1,15 @@
 2006-04-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* config/makefile.mgw (DESTDIR): MSYS-ify the drive letter.
+	(GNUSORT): Use Unix-ish path to MSYS port of GNU sort.
+	(all): Refer to default target instead of copying all its entries.
+	(default): Remove config.h dependency.
+	($(OBJS) $(WINOBJS) dbinary.$(O)): Add rule that they depend on
+	config.h.
+	($(M)bf_test.exe): Chdir to $(M), not $(D).
+	(dbinary.$(O)): Input file is $<, not $^.
+	(install) [WXT]: Move WX-specific installation rules here.
+
 	* term/win.trm (WIN_enhanced_flush): Removed unused variables rc,
 	cbR.
 

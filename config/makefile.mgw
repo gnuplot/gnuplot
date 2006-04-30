@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.34 2006/04/29 05:30:06 tlecomte Exp $
+# $Id: makefile.mgw,v 1.35 2006/04/30 19:46:52 broeker Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #  This assumes that MinGW32 is used via the MSYS toolkit
@@ -90,7 +90,7 @@ MOUSE=1
 HELPFILE = wgnuplot.hlp
 
 # Destination directory, used in 'make install':
-DESTDIR = c:/Progra~1/Gnuplot4.1
+DESTDIR = /c/Progra~1/Gnuplot4.1
 
 # give here the path to MinGW compiler unless it is already in PATH
 #GCCPATH = g:/mingw32/bin/
@@ -118,8 +118,7 @@ ifndef GNU_RC
 endif
 
 # GNU sort
-#GNUSORT = gsort.exe
-GNUSORT = c:/cygwin/bin/sort.exe
+GNUSORT = /bin/sort
 
 #
 # *************** End of Configuration section *************************
@@ -226,8 +225,6 @@ ifdef WXT
 	PANGO_LIBS = $(shell pkg-config --libs pangocairo)
 	WX_LIBS = $(shell wx-config --libs)
 	WX_OBJS = wxt_gui.o gp_cairo.o
-	WX_INSTALL = mkdir -p $(DESTDIR)/share && \
-	cp wxterminal/bitmaps/png/* $(DESTDIR)/share/
 endif
 
 ifdef GNU_RC
@@ -260,11 +257,10 @@ L=docs/latex/			# HBB FIXME 20060430: what's this for?
 M=../demo/
 
 
-default: config.h wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe \
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe \
 	pgnuplot.exe
 
-all:	 config.h wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe \
-	pgnuplot.exe gnuplot.ps gnuplot.pdf
+all:	default gnuplot.ps gnuplot.pdf
 
 
 # include the 'core makefile template'
@@ -288,6 +284,14 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 	$(CC) -c $(CFLAGS) $*.c
 
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -ladvapi32
+
+#
+# Create config.h
+#
+config.h: ../config/config.mgw
+	cp $< $@
+
+$(OBJS) $(WINOBJS) dbinary.$(O): config.h
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpicon.ico
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -mwindows -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS)\
@@ -362,21 +366,13 @@ doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 #make binary demo files
 $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
 	$(LD) $(LDFLAGS) $(CFLAGS) -U_Windows -o $@ $^
-	(cd $(D) ; ./bf_test.exe )
+	(cd $(M) ; ./bf_test.exe )
 #	cd ..
 
 # _Windows causes wtext.h to define fread() etc
 dbinary.$(O): binary.c
-	$(CC) -c $(CFLAGS) -U_Windows -o $@ $^
+	$(CC) -c $(CFLAGS) -U_Windows -o $@ $<
 
-
-#
-# Create config.h
-# This file is preferable over having explicit gcc command longer than 10 lines:
-# gcc ... -DHAVE_ -DHAVE_ ... -DHAVE_ -DHAVE_ ... myfile.c
-#
-config.h: ../config/config.mgw
-	cp $< $@
 
 # Create documentation in various formats
 #
@@ -452,4 +448,7 @@ install: default
 	cp win/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
 	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
-	$(WX_INSTALL)
+ifdef WXT
+	mkdir -p $(DESTDIR)/share 
+	cp wxterminal/bitmaps/png/*.png $(DESTDIR)/share/
+endif
