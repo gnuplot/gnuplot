@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.62 2005/10/12 17:23:08 sfeam Exp $
+ * $Id: pslatex.trm,v 1.63 2005/10/23 06:16:04 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -278,15 +278,16 @@ PSTEX_common_init()
         if (psfile_basename)
             psfile_basename++;
         else {
-            if (DIRSEP2 != NUL) {
-                psfile_basename = strrchr(pslatex_auxname, DIRSEP2);
-                if (psfile_basename)
-                    psfile_basename++;
-                else
-                    psfile_basename = pslatex_auxname;
-            } else
-                psfile_basename = pslatex_auxname;
-        }
+#if DIRSEP2 != NUL
+	    psfile_basename = strrchr(pslatex_auxname, DIRSEP2);
+	    if (psfile_basename)
+		psfile_basename++;
+	    else
+		psfile_basename = pslatex_auxname;
+#else
+	    psfile_basename = pslatex_auxname;
+#endif
+	}
 
         /* generate special which xdvi and dvips can handle */
         fprintf(gpoutfile,

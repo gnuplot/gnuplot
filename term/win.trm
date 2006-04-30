@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.43 2006/03/05 01:15:56 broeker Exp $
+ * $Id: win.trm,v 1.44 2006/03/06 18:31:26 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -678,7 +678,6 @@ WIN_enhanced_flush()
     if (ENHwin_opened_string) {
 	int width, height;
 	unsigned int x, y, len;
-	ULONG rc, cbR;
 
 	*enhanced_cur_text = '\0';
 	
