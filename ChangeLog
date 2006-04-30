@@ -1,3 +1,22 @@
+2006-04-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/win.trm (WIN_enhanced_flush): Removed unused variables rc,
+	cbR.
+
+	* term/pslatex.trm (PSTEX_common_init): Avoid warning by making
+	compile-time test an #if rather than an if.
+
+	* config/makefile.mgw: Change this to expect MSYS tools to be used
+	instead of the older native MINGW32 ports.  Necessitates some
+	workarounds for MSYS quirks.
+	(HCWPATH): Uncomment one definition, provide a usable default,
+	remove the other.
+	(pgnuplot.exe): Needs -HAVE_STDBOOL_H to avoid a warning.
+	($(HELPFILE)): Use `-' instead of `/' for $(HCW) options, to avoid
+	MSYS translating them to drive letters.
+	(doc2rtf.exe, doc2tex): Strip trailing `/' off macros holding
+	`../docs/' and `../term/' --- MSYS/MINGW32 gets confused by it.
+
 2006-04-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/wxt.trm (wxt_options): Fix improper malloc for font name.
