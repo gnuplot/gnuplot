@@ -4,6 +4,9 @@
 	and workaround harmful autoconf settings if no compiler is found.
 	(PANGO): Raise minimum version to 1.10.
 
+	* term.c (init_terminal): Make wxt the default terminal if it
+	is available even if X11 is not defined.
+
 2006-04-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/makefile.mgw (DESTDIR): MSYS-ify the drive letter.
