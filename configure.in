@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.178 2006/04/28 00:24:49 tlecomte Exp $
+dnl $Id: configure.in,v 1.179 2006/04/29 05:30:05 tlecomte Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -886,18 +886,40 @@ if test ! -f src/graphics.c ; then
   cp ${srcdir}/tutorial/eg3.dat tutorial
 fi
 
-dnl  WXWIDGETS TERMINAL
+dnl  wxWidgets terminal
+
+dnl wxWidgets terminal needs C++
+dnl These tests cannot be called conditionally.
+dnl However, even if there is no C++ compiler on the system,
+dnl autoconf will set CXX as g++ : this must be reverted.
+AC_PROG_CXX
+AC_PROG_CXXCPP
+
+AC_LANG_PUSH([C++])
+AC_MSG_CHECKING(whether $CXX is actually working)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <iostream>]],
+                [[const char hw[] = "Hello, World\n"; std::cout << hw;]])],
+	[AC_MSG_RESULT([yes])
+	working_cxx=yes],
+	[AC_MSG_RESULT([no])
+	working_cxx=no
+	CXX=$CC ])
+AC_LANG_POP([C++])
 
 AC_ARG_ENABLE(wxwidgets, [  --disable-wxwidgets      wxWidgets terminal (default enabled)], enable_wxwidgets=no, enable_wxwidgets=yes)
+
 if test "${enable_wxwidgets}" = yes
 then
 	dnl variable used to determine if all checks pass
 	enable_wxwidgets_ok=yes
 
-	dnl wxWidgets terminal needs C++
-	AC_PROG_CXX
-	AC_PROG_CXXCPP
-	dnl To check for object files creation, needed to build these object files in subdirs
+	dnl Check for the C++ compiler
+	if test "${working_cxx}" = "no"; then
+		AC_MSG_WARN([No C++ compiler found. The wxWidgets terminal will not be compiled.])
+		enable_wxwidgets_ok=no
+	fi
+
+	dnl Check for object files creation, needed to build these object files in subdirs
 	AM_PROG_CC_C_O
 
 	dnl The user can specify another path for wx-config
@@ -913,7 +935,7 @@ then
 	dnl Look for wx-config in the path
 	AC_PATH_PROG(WX_CONFIG, wx-config, no, ${WXWIDGETS_PATH})
 	if test "${WX_CONFIG}" = "no"; then
-	   AC_MSG_WARN([wxWidgets can't be found. You can try --with-wx-config-path to give the right path to wx-config. The wxWidgets terminal won't be compiled.])
+	   AC_MSG_WARN([wxWidgets can't be found. You can try --with-wx-config-path to give the right path to wx-config. The wxWidgets terminal will not be compiled.])
 	   enable_wxwidgets_ok=no
 	fi
 
@@ -931,7 +953,7 @@ then
 		])
 
 	dnl Check for Pango
-	PKG_CHECK_MODULES(PANGO, [pango >= 1.4],
+	PKG_CHECK_MODULES(PANGO, [pango >= 1.10],
 		[HAVE_PANGO=1], dnl not used, but may solve problems with some pkg-config
 		[AC_MSG_WARN([Pango can't be found. The wxWidgets terminal will not be compiled.])
 		enable_wxwidgets_ok=no
@@ -972,7 +994,7 @@ fi
 
 AM_CONDITIONAL(BUILD_WXWIDGETS, test "${enable_wxwidgets_ok}" = yes)
 
-dnl  END WXWIDGETS TERMINAL
+dnl  End wxWidgets terminal
 
 dnl build lisp files
 if test "$with_lisp_files" != no; then
