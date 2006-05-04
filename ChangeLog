@@ -1,3 +1,14 @@
+2006-05-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in (AC_PROG_CXX): Redefine AC_MSG_ERROR for
+	AC_PROG_CXX, to prevent possible fatal errors in future autoconf
+	versions.
+	(WX_OBJ): Remove definition, let automake handle it.
+
+	* src/Makefile.am (BUILD_WXWIDGETS): Simplify conditional
+	compilation of the wxWidgets terminal, using automake
+	conditionals instead of gnuplot_DEPENDENCIES and gnuplot_LDADD.
+
 2006-05-01  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in (AC_PROG_CXX): Check for C++ unconditionally,

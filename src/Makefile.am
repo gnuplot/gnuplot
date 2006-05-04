@@ -38,9 +38,7 @@ standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h \
 template.h term_api.h term.c term.h time.c unset.c util.c util.h \
 util3d.c util3d.h variable.c variable.h version.c version.h
 
-gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS) $(WX_OBJ) $(WX_LIBS)
-
-gnuplot_DEPENDENCIES = $(WX_OBJ)
+gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS) $(WX_LIBS)
 
 gnuplot_x11_SOURCES = gplt_x11.c gplt_x11.h gpexecute.c gpexecute.h mousecmn.h
 
@@ -57,9 +55,7 @@ endif
 
 SUBDIRS = $(d_beos)
 
-wx_files = wxterminal/gp_cairo.c wxterminal/wxt_gui.cpp
-
-EXTRA_gnuplot_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c $(wx_files)
+EXTRA_gnuplot_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c
 
 EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep README \
 corgraph.asm genopt.com gnuplot.def gnuplot.opt gnuplot.prj header.mac \
@@ -68,6 +64,8 @@ makefile.all makefile.awc os2 pcgraph.asm rgipgnu win x11.opt \
 $(EXTRA_gnuplot_SOURCES)
 
 if BUILD_WXWIDGETS
+gnuplot_SOURCES += wxterminal/gp_cairo.c wxterminal/wxt_gui.cpp
+
 pngdir = $(pkgdatadir)/$(VERSION_MAJOR)/png
 png_DATA = wxterminal/bitmaps/png/clipboard.png \
 	wxterminal/bitmaps/png/grid.png \
