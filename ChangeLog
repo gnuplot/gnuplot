@@ -1,3 +1,8 @@
+2006-05-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_point):  Draw filled circles with 
+	gdImageFilledArc rather than a 2-stage bound-and-fill.
+
 2006-05-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in (AC_PROG_CXX): Redefine AC_MSG_ERROR for

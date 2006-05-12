@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.88 2006/02/19 22:10:20 sfeam Exp $
+ * $Id: gd.trm,v 1.89 2006/02/20 20:17:57 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1613,10 +1613,15 @@ PNG_point(unsigned int x, unsigned int y, int number)
 		   0, 360, png_state.color);
 	break;
     case 6: /* circle (disk)         filled */
+#if (GD2_VERS >= 2)
+	gdImageFilledArc(png_state.image, x, y, 2 * PNG_ps, 2 * PNG_ps,
+		   0, 360, png_state.color, gdArc);
+#else
 	gdImageArc(png_state.image, x, y, 2 * PNG_ps, 2 * PNG_ps,
 		   0, 360, png_state.color);
 	gdImageFillToBorder(png_state.image, x, y,
 			    png_state.color, png_state.color);
+#endif
 	break;
     case 7: /* triangle */
 	PNG_Triangle(x, y, 1, gp_gdImagePolygon);
