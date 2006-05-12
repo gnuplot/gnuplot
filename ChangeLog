@@ -10,6 +10,8 @@
 	* demo/contours.dem: Where the above fix removes a vertical line along
 	z, remove the z axis tics also.  Add a single-color contour demo.
 
+	* src/wxterminal/gp_cairo.c: Remove unused variables.
+
 2006-05-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in (AC_PROG_CXX): Redefine AC_MSG_ERROR for

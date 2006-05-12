@@ -305,7 +305,7 @@ void gp_cairo_set_textangle(plot_struct *plot, double angle)
  */
 void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 {
-	int i,j;
+	int i;
 
 	/* begin by stroking any open path */
 	gp_cairo_stroke(plot);
@@ -596,7 +596,6 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 {
 	double x,y;
 	double arg = plot->text_angle * M_PI/180;
-	double length, height;
 	double vert_just, delta, deltax, deltay;
 	PangoRectangle ink_rect;
 	PangoRectangle logical_rect;
@@ -992,7 +991,6 @@ void gp_cairo_enhanced_flush()
 {
 	PangoRectangle save_logical_rect;
 	PangoLayout *save_layout;
-	PangoFontDescription *save_desc;
 
 	PangoLayout *current_layout;
 	PangoRectangle current_ink_rect;
@@ -1002,7 +1000,6 @@ void gp_cairo_enhanced_flush()
 	PangoRectangle underprinted_logical_rect;
 	int overprinted_width;
 	PangoLayout *underprinted_layout;
-	PangoFontDescription *underprinted_desc;
 	int start, end;
 	PangoLayout *hide_layout;
 
@@ -1275,7 +1272,6 @@ void gp_cairo_enhanced_open(char* fontname, double fontsize, double base, TBOOLE
  * and finally _enhanced_flush() to draw the buffer with the correct justification. */
 void gp_cairo_draw_enhanced_text(plot_struct *plot, int x, int y, const char* string)
 {
-	char *original_string = (char *) string;
 	PangoRectangle ink_rect, logical_rect;
 	PangoLayout *layout;
 	double vert_just, arg, enh_x, enh_y, delta, deltax, deltay;
