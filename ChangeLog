@@ -1,7 +1,14 @@
 2006-05-12  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/gd.trm (PNG_point):  Draw filled circles with 
+	* term/gd.trm (PNG_point):  Bugfix: Draw filled circles with 
 	gdImageFilledArc rather than a 2-stage bound-and-fill.
+
+	* src/graph3d.c (draw_3d_graphbox):  Bugfix: Only draw vertical lines
+	from base corners to surface if there really _is_ a surface.
+	Having pm3d in surface mode is not sufficient.
+	
+	* demo/contours.dem: Where the above fix removes a vertical line along
+	z, remove the z axis tics also.  Add a single-color contour demo.
 
 2006-05-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
 

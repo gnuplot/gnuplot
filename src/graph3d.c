@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.154 2006/04/10 18:32:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.155 2006/04/10 21:26:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2101,7 +2101,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 
 	/* if surface is drawn, draw the rest of the graph box, too: */
 	if (draw_surface || (draw_contour & CONTOUR_SRF)
-	    || strpbrk(pm3d.where,"st") != NULL
+	    || (pm3d.implicit == PM3D_IMPLICIT && strpbrk(pm3d.where,"st") != NULL)
 	   ) {
 	    vertex fl, fb, fr, ff; /* floor left/back/right/front corners */
 	    vertex tl, tb, tr, tf; /* top left/back/right/front corners */
