@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.44 2006/03/06 18:31:26 broeker Exp $
+ * $Id: win.trm,v 1.45 2006/04/30 19:48:02 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -127,7 +127,7 @@ TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiP
 /* Interface routines - create list of actions for Windows */
 
 enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR,
-	      WIN_ENHANCED, WIN_NOENHANCED, WIN_OTHER };
+	      WIN_ENHANCED, WIN_NOENHANCED, WIN_FONT, WIN_OTHER };
 
 static struct gen_table WIN_opts[] =
 {
@@ -137,6 +137,7 @@ static struct gen_table WIN_opts[] =
     { "c$olour", WIN_COLOR },
     { "noenh$anced", WIN_NOENHANCED },
     { "enh$anced", WIN_ENHANCED },
+    { "font", WIN_FONT },
     { NULL, WIN_OTHER }
 };
 
@@ -167,6 +168,8 @@ TERM_PUBLIC void
 WIN_options()
 {
     struct value a;
+    char *s;
+    TBOOLEAN set_font = FALSE, set_fontsize = FALSE;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&WIN_opts[0],c_token)) {
@@ -196,13 +199,36 @@ WIN_options()
 	    term->put_text = WIN_put_text;
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    break;
+	case WIN_FONT:
+	    c_token++;
+	    /* Fall through to attempt to read font name */
 	case WIN_OTHER:
 	default:
-	    if (isstring(c_token)) {
-		quote_str(graphwin.fontname, c_token, MAX_ID_LEN);
-		strcpy(graphwin.deffontname, graphwin.fontname);
-		c_token++;
+	    /* Code copied from ps.trm and modified for windows terminal */
+	    if ((s = try_to_get_string())) {
+		char *comma;
+		if (set_font)
+		    int_error(c_token,
+			      "extraneous argument in set terminal %s",
+			      term->name);
+		set_font = TRUE;
+	        comma = strrchr(s,',');
+	        if (comma && (1 == sscanf(comma+1,"%i", &graphwin.fontsize))) {
+		    graphwin.deffontsize = graphwin.fontsize;
+		    set_fontsize = TRUE;
+		    *comma = '\0';
+		}
+		if (*s) {
+		    strncpy(graphwin.fontname, s, MAX_ID_LEN);
+		    strcpy(graphwin.deffontname, graphwin.fontname);
+		    free(s);
+    		}
 	    } else {
+		if (set_fontsize)
+		    int_error(c_token,
+			      "extraneous argument in set terminal %s",
+			      term->name);
+		set_fontsize = TRUE;
 		/* We have font size specified */
 		graphwin.fontsize = (int) real(const_express(&a));
 		graphwin.deffontsize = graphwin.fontsize;
@@ -216,7 +242,7 @@ WIN_options()
 		graphwin.color ? "color" : "monochrome", 
 		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced");
     else
-	sprintf(term_options, "%s %s \"%s\" %d",
+	sprintf(term_options, "%s %s font \"%s, %d\"",
 		graphwin.color ? "color" : "monochrome",
 		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced",
 		graphwin.fontname, graphwin.fontsize);
@@ -865,11 +891,15 @@ START_HELP(windows)
 " Three options may be set in the `windows` terminal driver.",
 "",
 " Syntax:",
-"       set terminal windows {<color>} {\"<fontname>\"} {<fontsize>}",
+"       set terminal windows {color | monochrome}",
+"                            {enhanced | noenhanced}",
+"			     {{font} \"fontname{,fontsize}\" {<fontsize>}},
 "",
-" where `<color>` is either `color` or `monochrome`, `\"<fontname>\"` is the",
-" name of a valid Windows font, and `<fontsize>` is the size of the font in",
-" points.",
+" where `color` and `monochrome` select colored or mono output,", 
+" `enhanced` enables enhanced text mode features (subscripts,",
+" superscripts and mixed fonts). See `enhanced` for more information.",
+" `\"<fontname>\"` is the name of a valid Windows font, and `<fontsize>`",
+" is the size of the font in points.",
 "",
 " Other options may be set with the graph-menu, the initialization file,",
 " and `set linestyle`.  Note that there is one restriction imposed by",

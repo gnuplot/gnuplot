@@ -1,5 +1,12 @@
 2006-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/win.trm (WIN_options, help text):
+	Accept font request strings of the form
+	    set term win ... font "<fontface>,<fontsize>"
+	Previous syntax
+	    set term win ... "<fontface>" <fontsize>
+	remains valid as well. Update documentation.
+
 	* src/os2/4allterm.cmd: Fix broken argument parsing. Convert end of line
 	to CR/LF pairs. This is a must for the script to be readable by the OS/2
 	REXX interpreter.
