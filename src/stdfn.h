@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.30 2005/04/22 21:40:37 broeker Exp $
+ * $Id: stdfn.h,v 1.31 2005/07/26 04:24:16 sfeam Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -348,7 +348,7 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 #    define HAVE_SLEEP
 #  endif
 #elif defined(WIN32)
-#  define GP_SLEEP(delay) Sleep((DWORD) 1000*(delay))
+#  define GP_SLEEP(delay) win_sleep((DWORD) 1000*delay)
 #  ifndef HAVE_SLEEP
 #    define HAVE_SLEEP
 #  endif

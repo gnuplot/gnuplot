@@ -1,5 +1,8 @@
 2006-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/stdfn.h src/win/winmain.h src/win/wpause.c:  Implementation of a
+	non-blocking sleep function (gnuplot's 'pause' command) for windows.
+
 	* term/win.trm (WIN_options, help text):
 	Accept font request strings of the form
 	    set term win ... font "<fontface>,<fontsize>"

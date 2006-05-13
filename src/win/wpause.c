@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.8 2005/04/22 05:25:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.9 2006/04/29 05:30:07 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -69,6 +69,44 @@ LRESULT CALLBACK WINEXPORT PauseButtonProc(HWND, UINT, WPARAM, LPARAM);
 #define TBOOLEAN unsigned char
 #endif
 extern int paused_for_mouse;
+
+
+/* Non-blocking Sleep function, called by pause_command.
+   This allows redrawing and (some) user interaction.
+*/
+void 
+win_sleep(DWORD dwMilliSeconds)
+{
+    MSG msg;
+    DWORD t0, t1, tstop, rc;
+    
+    t0 = GetTickCount();
+    tstop  = t0 + dwMilliSeconds;
+    t1 = dwMilliSeconds; /* remaining time to wait */
+    do {
+	rc = MsgWaitForMultipleObjects(0, NULL, 0, t1, QS_ALLINPUT);
+        if (rc != WAIT_TIMEOUT) {
+	    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
+		if (msg.message == WM_QUIT)
+		    return;
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	    }
+
+	    /* calculate remaining time, detect overflow */
+	    t1 = GetTickCount();
+	    if (tstop > t0) 
+		if ((t1 >= tstop) || (t1 < t0))
+		    rc = WAIT_TIMEOUT;
+	    else
+		if ((t1 >= tstop) && (t1 < t0))
+		    rc = WAIT_TIMEOUT;
+	    t1 = tstop - t1; /* remaining time to wait */
+	}
+    } while(rc != WAIT_TIMEOUT);
+#endif
+}
+
 
 /* Create Pause Class */
 /* called from PauseBox the first time a pause window is created */
