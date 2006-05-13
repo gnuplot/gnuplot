@@ -1,5 +1,9 @@
 2006-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/os2/4allterm.cmd: Fix broken argument parsing. Convert end of line
+	to CR/LF pairs. This is a must for the script to be readable by the OS/2
+	REXX interpreter.
+
 	* docs/doc2ipf.c docs/titlepag.ipf:
 	- Increase depth of table of contents from 5 to 6. This fixes
 	  "unknown reference" errors during compilation.
