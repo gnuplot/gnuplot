@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.17 2004/07/01 17:10:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.18 2005/06/03 05:11:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -78,7 +78,7 @@ struct TABENTRY table;
 struct TABENTRY *tableins = &table;
 int tablecols = 0;
 int tablewidth[MAX_COL] = {0, 0, 0, 0, 0, 0};	/* there must be the correct
-	                        			   number of zeroes here */
+							   number of zeroes here */
 int tablelines = 0;
 
 #define TmpFileName "doc2ipf.tmp"
@@ -121,7 +121,7 @@ convert(FILE *a, FILE *b)
     /* generate ipf header */
     fprintf(b, ":userdoc.\n:prolog.\n");
     fprintf(b, ":title.GNUPLOT\n");
-    fprintf(b, ":docprof toc=12345.\n:eprolog.\n");
+    fprintf(b, ":docprof toc=123456.\n:eprolog.\n");
 
     /* process each line of the file */
     while (get_line(line, sizeof(line), a)) {
@@ -182,6 +182,7 @@ process_line(char *line, FILE *b)
 	} else
 	    switch (line[i]) {
 	    case '$':
+		/* FIXME: this fails for '$' entry in 'unitary operators' */
 		if (intable && (tablechar != '$') && (line[0] == '%')) {
 		    ++i;
 		    if (line[i + 1] == '$' || line[i] == 'x' || line[i] == '|') {
@@ -269,9 +270,12 @@ process_line(char *line, FILE *b)
 	    case '.':
 		/* Makes code less readable but fixes warnings like
 		   <..\docs\gnuplot.ipf:6546> Warning 204: Invalid macro [.gnuplot_iris4d]
-		   which seems to be triggered by a '.' character in the first column?! */
-		strcpy(line2+j, "&per.");
-		j += 4;
+		   which is triggered by a '.' character in the first column */
+		if (i==1) {
+		    strcpy(line2+j, "&per.");
+		    j += 4;
+		} else
+		    line2[j] = line[i];
 		break;
 
 	    default:
@@ -292,6 +296,8 @@ process_line(char *line, FILE *b)
 
     switch (line[0]) {		/* control character */
     case '?':{			/* interactive help entry */
+	    if (line[1] != '\n') /* skip empty index entries */
+		fprintf(b, ":i1.%s", line+1);
 	    if (intable)
 		intablebut = TRUE;
 	    break;
@@ -300,7 +306,8 @@ process_line(char *line, FILE *b)
 	    intable = !intable;
 	    if (intable) {
 		tablechar = '@';
-		introffheader = FALSE;
+		introffheader = TRUE;
+		intablebut = FALSE;
 		tablelines = 0;
 		tablecols = 0;
 		tableins = &table;
@@ -308,16 +315,17 @@ process_line(char *line, FILE *b)
 		    tablewidth[j] = 0;
 	    } else {		/* dump table */
 		int header = 0;
+		introffheader = FALSE; /* position is no longer in a troff header */
 		intablebut = FALSE;
 		tableins = &table;
-		fprintf(b, ":table cols=\'");
+		fprintf(b, ":table frame=none rules=vert cols=\'");
 		for (j = 0; j < MAX_COL; j++)
 		    if (tablewidth[j] > 0)
 			fprintf(b, " %d", tablewidth[j]);
 		fprintf(b, "\'.\n");
 		tableins = tableins->next;
 		if (tableins->next != NULL)
-		    header = (tableins->next->col[0][0] == '_');
+		    header = (tableins->next->col[0][1] == '_');
 		if (header)
 		    tableins->next = tableins->next->next;
 		while (tableins != NULL) {
@@ -328,6 +336,10 @@ process_line(char *line, FILE *b)
 			else
 			    fprintf(b, ":c.%s\n", tableins->col[j]);
 		    tableins = tableins->next;
+ 		    /* skip troff 'horizontal rule' command */		    
+ 		    if (tableins)
+			if (tableins->col[0][1] == '_')
+			    tableins = tableins->next;
 		    header = 0;
 		}
 		fprintf(b, ":etable.\n");
@@ -343,7 +355,10 @@ process_line(char *line, FILE *b)
 	    }
 	    break;
 	}
-    case '=':			/* latex index entry */
+    case '=':{			/* index entry */
+	    fprintf(b, ":i1.%s", line+1);
+	    break;
+	}
     case '#':{			/* latex table entry */
 	    break;		/* ignore */
 	}
@@ -354,7 +369,7 @@ process_line(char *line, FILE *b)
 		       fprintf(stderr, ">%s\n", line2);
 		       fprintf(stderr, "tablechar: %c\n", tablechar);
 		    }
-		    if (line2[1] == '.')
+		    if ((line[1] == '.') && (strchr(line2, tablechar) == NULL)) /* ignore troff commands */
 			break;
 		    pt = strchr(line2, '(');
 		    if (pt != NULL)
@@ -367,7 +382,7 @@ process_line(char *line, FILE *b)
 			introffheader = FALSE;
 		    break;
 		}
-		if (line[1] == '.') {	/* ignore troff commands */
+		if ((line[1] == '.') && (strchr(line+2, tablechar) == NULL)) {	/* ignore troff commands */
 		    introffheader = TRUE;
 		    break;
 		}
@@ -380,10 +395,35 @@ process_line(char *line, FILE *b)
 		line2[0] = tablechar;
 		while ((pt = strtok(tablerow, tabledelim + 1)) != NULL) {
 		    if (*pt != NUL) {	/* ignore null columns */
+			char *tagend, *tagstart;
 			/* this fails on format line */
 			assert(j < MAX_COL);
-			strcpy(tableins->col[j], pt);
+			while (*pt==' ') pt++; /* strip spaces */		
+			strcpy(tableins->col[j], " ");
+			strcat(tableins->col[j], pt);
 			k = strlen(pt);
+			while (pt[k-1]==' ') k--; /* strip spaces */
+			/* length calculation is not correct if we have ipf tag replacements! */
+			if (debug) {
+			    if (((strchr(pt, ':')!=NULL) && (strchr(pt, '.')!=NULL)) ||
+				((strchr(pt, '&')!=NULL) && (strchr(pt, '.')!=NULL)))
+				fprintf(stderr, "Warning: likely overestimating table width (%s)\n", pt);
+			}
+			/* crudely filter out ipf tags:
+			     "&tag." and ":tag." are recognized, 
+			     (works since all '&' and ':' characters have already been replaced)
+			*/
+			for (tagend = tagstart = pt; tagstart; ) {
+			    tagstart = strchr(tagend, '&');
+			    if (!tagstart)
+				tagstart = strchr(tagend, ':');
+			    if (tagstart) {
+				tagend = strchr(tagstart, '.');
+				if (tagend)
+				    k -= tagend - tagstart;
+			    }
+			}
+			k += 2; /* add some space */
 			if (k > tablewidth[j])
 			    tablewidth[j] = k;
 			++j;
@@ -398,9 +438,10 @@ process_line(char *line, FILE *b)
 	    break;		/* ignore */
 	}
     case '\n':			/* empty text line */
+	/* previously this used to emit ":p." to start a new paragraph,
+	   now we just note the end of a paragraph or table */
 	para = 0;
 	tabl = 0;
-	fprintf(bo, ":p.");
 	break;
     case ' ':{			/* normal text line */
 	    if (intable && !intablebut)
@@ -421,18 +462,21 @@ process_line(char *line, FILE *b)
 	    if (intablebut && (bt == NULL))
 		break;
 	    if ((line2[1] == 0) || (line2[1] == '\n')) {
-		fprintf(bo, ":p.");
+		    fprintf(bo, ":p.");
 		para = 0;
 	    }
 	    if (line2[1] == ' ') {
-		if (!tabl)
-		    fprintf(bo, ":p.");
-		fprintf(bo, "%s", &line2[1]);
-		fprintf(bo, "\n.br\n");
-		tabl = 1;
-		para = 0;
+		/* start table in a new paragraph */
+		if (!tabl) {
+		    fprintf(bo, ":p.%s\n", &line2[1]);
+		    tabl = 1;	/* not in table so start one */
+		    para = 0;
+		} else {
+		    fprintf(bo, ".br\n%s\n", &line2[1]);
+		}
 	    } else {
 		if (!para) {
+		    fprintf(bo, ":p.");
 		    para = 1;	/* not in para so start one */
 		    tabl = 0;
 		}
@@ -444,6 +488,8 @@ process_line(char *line, FILE *b)
     case '^':
 	break;			/* ignore */
     default:{
+	    TBOOLEAN leaf;
+	    
 	    if (isdigit((int)line[0])) {	/* start of section */
 		if (intable) {
 		    intablebut = TRUE;
@@ -457,25 +503,68 @@ process_line(char *line, FILE *b)
 			    bo = bt;
 		    }
 		}
+
+#if 0
+		/* disabled by BM: this doesn't do anything? */
 		if (startpage)	/* use new level 0 item */
 		    refs(0, bo, NULL, NULL, NULL);
 		else
 		    refs(last_line, bo, NULL, NULL, NULL);
-		para = 0;	/* not in a paragraph */
-		tabl = 0;
-		last_line = line_count;
-		startpage = 0;
+#endif		
 		if (debug) {
 		   fprintf(stderr, "%d: %s\n", line_count, &line2[1]);
 		}
 		klist = lookup(&line2[2]);
 		if (klist != NULL)
 		    k = klist->line;
+		    
+		/* end all sections in an empty paragraph to prevent empty sections */
+		/* we therefore do no longer have to start sections with an empty paragraph */
+		if (!startpage)
+		    fprintf(bo, ":p.\n");
+		
 		/*if( k<0 ) fprintf(bo,":h%c.", line[0]=='1'?line[0]:line[0]-1);
 		   else */
+
+#ifdef IPF_MENU_SECTIONS
+		/* To make navigation with the old IBM online help viewer (View)
+		   easier, the following code creates additional panels which contain
+		   references to sub-sections. These are not really needed for
+		   Aaron Lawrence's NewView and are therefore disabled by default.
+		*/
+
+		/* is this section a leaf ? */
+		leaf = TRUE:	
+		if (klist)
+		    if (klist->next)
+			leaf = (klist->next->level <= klist->level);
+		
+		/* if not create a reference panel */
+		if (!leaf) {
+		    fprintf(bo, ":h%c res=%d x=left y=top width=20%% height=100%% group=1.%s\n",
+		            line[0], line_count, line2+1);
+		    fprintf(bo, ":link auto reftype=hd res=%d.\n", line_count+20000);
+		    fprintf(bo, ":hp2.%s:ehp2.\n.br\n", line2+1);
+		    refs(line_count, bo, NULL, NULL, ":link reftype=hd res=%d.%s:elink.\n.br\n");
+		    fprintf(bo, ":h%c res=%d x=right y=top width=80%% height=100%% group=2 hide.", 
+		            line[0]+1, line_count+20000);
+		}
+		else {
+		    fprintf(bo, ":h%c res=%d x=right y=top width=80%% height=100%% group=2.", line[0], line_count);
+		}
+#else		
 		fprintf(bo, ":h%c res=%d.", line[0], line_count);
-		fprintf(bo, &(line2[1]));	/* title */
-		fprintf(bo, "\n:p.");
+#endif		
+		fprintf(bo, "%s\n", line2+1);	/* title */
+		
+		/* add title page */
+		if (startpage)
+		    fprintf(bo, ".im titlepag.ipf\n");
+		    
+		para = 0;	/* not in a paragraph */
+		tabl = 0;	/* not in a table     */
+		last_line = line_count;
+		startpage = 0;
 	    } else
 		fprintf(stderr, "unknown control code '%c' in column 1, line %d\n",
 			line[0], line_count);

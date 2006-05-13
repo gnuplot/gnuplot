@@ -1,3 +1,31 @@
+2006-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* docs/doc2ipf.c docs/titlepag.ipf:
+	- Increase depth of table of contents from 5 to 6. This fixes
+	  "unknown reference" errors during compilation.
+	- Only replace '.' in first column by ipf tag, it's not needed
+	  otherwise.
+	- Add an index: interactive help ('?') and explicit index entries ('=')
+	  are supported.
+	- Table layout improvements:
+	    - omit table frame and horizontal lines
+	    - add additional horizontal spacing around table entries (1 char)
+	    - omit horizontal rules '_' (troff command)
+	    - entries are only interpreted as troff commands if they start with
+	      '.' and do not contain a table separator
+	    - try to filter out ipf tags when calculating column widths
+	    - always assume troff header at beginning of table. This fixes
+	      coloring of table headers, which has been broken since 17 Jun 1998
+	- Change handling of paragraphs and verbatim sections: successive empty
+	  lines only yield one new paragraph :p. This eliminates large empty
+	  spaces (especially in front of tables).
+	- End sections with an empty paragraph instead of starting with an empty
+	  paragraph. Eliminates empty space at beginning of section and (still)
+	  ensures non-empty sections.
+	- Optionally add additional reference panels to make navigation with
+	  IBM's online viewer easier. Controlled by #define IPF_MENU_SECTIONS.
+	- Add a title page (new file titlepag.ipf).
+
 2006-05-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_point):  Bugfix: Draw filled circles with 
