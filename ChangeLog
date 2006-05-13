@@ -1,5 +1,9 @@
 2006-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* config/makefile.nt: Make sure that the same (basic) compiler options
+	are used for compiling wgnuplot and pgnuplot. This is necessary since
+	they both contain version.c.
+
 	* src/stdfn.h src/win/winmain.h src/win/wpause.c:  Implementation of a
 	non-blocking sleep function (gnuplot's 'pause' command) for windows.
 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.16 2005/09/08 19:42:00 broeker Exp $
+# $Id: makefile.nt,v 1.17 2005/12/14 12:17:50 mikulik Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -54,7 +54,8 @@ OPTIONS = /DUSE_MOUSE
 OPTIONS = $(OPTIONS) /DHAVE_LIBGD /DHAVE_GD_GIF /DHAVE_GD_PNG /DHAVE_GD_JPEG /DHAVE_GD_TTF
 OPTIONS = $(OPTIONS) /DHAVE_LIBPDF
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
-CFLAGS = /O2 /G5 /GX /GR /MD /I$(TOP) /nologo /D_Windows /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
+CBASEFLAGS = /G5 /GX /GR /MD /O2 /nologo
+CFLAGS = $(CBASEFLAGS) /I$(TOP) /D_Windows /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
 
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = $(PROCESSOR_ARCHITECTURE)
@@ -163,7 +164,7 @@ wgnuplot.mnu: win\wgnuplot.mnu
 	copy win\wgnuplot.mnu wgnuplot.mnu
 
 pgnuplot.exe: win\pgnuplot.c
-	cl /nologo /O2 win\pgnuplot.c /I. /link /NODEFAULTLIB:LIBC.lib version.obj user32.lib
+	cl $(CBASEFLAGS) /I$(TOP) win\pgnuplot.c /link version.obj user32.lib
 
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
@@ -185,7 +186,7 @@ doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 
 #make binary demo files
 $(M)bf_test.exe : bf_test.c dbinary.obj alloc.obj
-		cl $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe bf_test.c dbinary.obj alloc.obj
+	cl $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe bf_test.c dbinary.obj alloc.obj
 	cd ..\demo
 	bf_test
 	cd ..\src
