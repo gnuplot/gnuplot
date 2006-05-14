@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.9 2006/04/29 05:30:07 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.10 2006/05/13 09:22:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -104,7 +104,6 @@ win_sleep(DWORD dwMilliSeconds)
 	    t1 = tstop - t1; /* remaining time to wait */
 	}
     } while(rc != WAIT_TIMEOUT);
-#endif
 }
 
 
