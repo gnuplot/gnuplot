@@ -19,6 +19,8 @@
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_linetype2color): Fix modulo
 	operator to use the whole nine colors.
+	(gp_cairo_draw_point): Fix position of triangles with the
+	oversampling. Close the path for the filled triangle.
 
 	* configure.in (CPPFLAGS): Remove useless gtk and wxWidgets flags
 	from the cppflags.
