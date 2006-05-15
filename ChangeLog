@@ -1,3 +1,18 @@
+2006-05-15  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/bitmaps/xpm/cross.xpm
+	* src/wxterminal/bitmaps/xpm/right.xpm
+	* src/wxterminal/bitmaps/xpm/rotate.xpm
+	* src/wxterminal/bitmaps/xpm/size.cpm:
+	Cross-platform cursors.
+
+	* src/wxterminal/wxt_gui.h 
+	* src/wxterminal/wxt_gui.cpp
+	(wxt_cursor_cross, wxt_cursor_right, wxt_cursor_rotate,
+	wxt_cursor_size): Cursors declarations.
+	(wxtApp::LoadCursor): Routine to initialize a cursor.
+	(wxtApp::OnInit, wxt_set_cursor): Use new cursors.
+
 2006-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/makefile.os2: Define GIF_ANIMATION and HAVE_PDFLIB_H.

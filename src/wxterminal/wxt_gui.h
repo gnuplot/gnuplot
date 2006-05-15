@@ -216,6 +216,8 @@ public:
 private:
 	/* load a toolbar icon, given its path and number */
 	bool LoadPngIcon(wxString path, int icon_number);
+	/* load a cursor */
+	void LoadCursor(wxCursor &cursor, char* xpm_bits[], int hotspot_x, int hotspot_y);
 };
 
 /* IDs for gnuplot commands */
@@ -449,6 +451,12 @@ wxT("/help.png")
 
 /* frames icons in the window manager */
 static wxIconBundle icon;
+
+/* mouse cursors */
+static wxCursor wxt_cursor_cross;
+static wxCursor wxt_cursor_right;
+static wxCursor wxt_cursor_rotate;
+static wxCursor wxt_cursor_size;
 
 #ifdef DEBUG
  /* performance watch */

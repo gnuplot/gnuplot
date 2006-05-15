@@ -97,6 +97,11 @@
 #include "bitmaps/xpm/icon64x64.xpm"
 /* icon used in the toolbar when png icons are not found */
 #include "bitmaps/xpm/notfound.xpm"
+/* cursors */
+#include "bitmaps/xpm/cross.xpm"
+#include "bitmaps/xpm/right.xpm"
+#include "bitmaps/xpm/rotate.xpm"
+#include "bitmaps/xpm/size.xpm"
 
 
 /* ---------------------------------------------------------------------------
@@ -243,12 +248,18 @@ bool wxtApp::OnInit()
 	if (icon_error)
 		fprintf(stderr,"Can\'t load PNG icon(s) of the toolbar.\n");
 
+	/* load cursors */
+	LoadCursor(wxt_cursor_cross, cross, 7, 7);
+	LoadCursor(wxt_cursor_right, right, 15, 0);
+	LoadCursor(wxt_cursor_rotate, rotate, 7, 7);
+	LoadCursor(wxt_cursor_size, size, 7, 7);
+
 	/* Initialize the config object */
 	/* application and vendor name are used by wxConfig to construct the name
 	 * of the config file/registry key and must be set before the first call
 	 * to Get() */
-	SetVendorName(_T("gnuplot"));
-	SetAppName(_T("gnuplot-wxt"));
+	SetVendorName(wxT("gnuplot"));
+	SetAppName(wxT("gnuplot-wxt"));
 	wxConfigBase *pConfig = wxConfigBase::Get();
 	/* this will force writing back of the defaults for all values
 	 * if they're not present in the config - this can give the user an idea
@@ -266,6 +277,16 @@ bool wxtApp::LoadPngIcon(wxString path, int icon_number)
 	icon_path = path + icon_file[icon_number];
 	toolBarBitmaps[icon_number] = new wxBitmap(icon_path, wxBITMAP_TYPE_PNG);
 	return toolBarBitmaps[icon_number]->Ok();
+}
+
+/* load a cursor */
+void wxtApp::LoadCursor(wxCursor &cursor, char* xpm_bits[], int hotspot_x, int hotspot_y)
+{
+	wxBitmap cursor_bitmap = wxBitmap(xpm_bits);
+	wxImage cursor_image = cursor_bitmap.ConvertToImage();
+	cursor_image.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, hotspot_x);
+	cursor_image.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, hotspot_y);
+	cursor = wxCursor(cursor_image);
 }
 
 /* cleanup on exit
@@ -1270,7 +1291,7 @@ void wxt_init()
 		/* make the panel able to receive keyboard input */
 		window.frame->panel->SetFocus();
 		/* set the default crosshair cursor */
-		window.frame->panel->SetCursor( wxCursor(wxCURSOR_CROSS) );
+		window.frame->panel->SetCursor(wxt_cursor_cross);
 		/* creating the true context (at initialization, it may be a fake one).
 		 * Note : the frame must be shown for this to succeed */
 		if (!window.frame->panel->plot.success)
@@ -1852,13 +1873,12 @@ void wxt_put_tmptext(int n, const char str[])
 	wxt_sigint_restore();
 }
 
+/* c selects the action: -2=warp the cursor to
+ * the given point, -1=start zooming, 0=standard cross-hair cursor,
+ * 1=cursor during rotation, 2=cursor during scaling, 3=cursor during
+ * zooming. */
 void wxt_set_cursor(int c, int x, int y)
 {
-	/* c selects the action: -2=warp the cursor to
-	 * the given point, -1=start zooming, 0=standard cross-hair cursor,
-	 * 1=cursor during rotation, 2=cursor during scaling, 3=cursor during
-	 * zooming. */
-
 	if (wxt_status == STATUS_UNINITIALIZED)
 		return;
 
@@ -1872,24 +1892,24 @@ void wxt_set_cursor(int c, int x, int y)
 				(int) device_y(wxt_current_plot, y) );
 		break;
 	case -1: /* start zooming */
-		wxt_current_panel->SetCursor( wxCursor(wxCURSOR_RIGHT_ARROW) );
+		wxt_current_panel->SetCursor(wxt_cursor_right);
 		break;
 	case 0: /* cross-hair cursor, also cancel zoombox when Echap is pressed */
 		wxt_current_panel->wxt_zoombox = false;
-		wxt_current_panel->SetCursor( wxCursor(wxCURSOR_CROSS) );
+		wxt_current_panel->SetCursor(wxt_cursor_cross);
 		wxt_current_panel->Draw();
 		break;
 	case 1: /* rotation */
-		wxt_current_panel->SetCursor( wxCursor(wxCURSOR_BULLSEYE) );
+		wxt_current_panel->SetCursor(wxt_cursor_rotate);
 		break;
 	case 2: /* scaling */
-		wxt_current_panel->SetCursor( wxCursor(wxCURSOR_SIZING) );
+		wxt_current_panel->SetCursor(wxt_cursor_size);
 		break;
 	case 3: /* zooming */
-		wxt_current_panel->SetCursor( wxCursor(wxCURSOR_RIGHT_ARROW) );
+		wxt_current_panel->SetCursor(wxt_cursor_right);
 		break;
 	default:
-		wxt_current_panel->SetCursor( wxCursor(wxCURSOR_CROSS) );
+		wxt_current_panel->SetCursor(wxt_cursor_cross);
 		break;
 	}
 
