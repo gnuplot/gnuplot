@@ -20,6 +20,9 @@
 	* src/wxterminal/gp_cairo.c (gp_cairo_linetype2color): Fix modulo
 	operator to use the whole nine colors.
 
+	* configure.in (CPPFLAGS): Remove useless gtk and wxWidgets flags
+	from the cppflags.
+
 2006-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/makefile.os2: Define GIF_ANIMATION and HAVE_PDFLIB_H.
