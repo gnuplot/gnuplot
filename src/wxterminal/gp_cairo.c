@@ -111,18 +111,18 @@ static void gp_cairo_fill_pattern(plot_struct *plot, int fillpar);
 /* array of colors
  * FIXME could be shared with all gnuplot terminals */
 static rgb_color gp_cairo_colorlist[12] = {
-{1,1,1},
-{0,0,0},
-{0,0,0},
-{1,0,0},
-{0,1,0},
-{0,0,1},
-{1,0,1},
-{0,1,1},
-{1,1,0},
-{0,0,0},
-{1,0.3,0},
-{0.5,0.5,0.5}
+{1,1,1}, /* white */
+{0,0,0}, /* black */
+{0,0,0}, /* black */
+{1,0,0}, /* red */
+{0,1,0}, /* green */
+{0,0,1}, /* blue */
+{1,0,1}, /* magenta */
+{0,1,1}, /* cyan */
+{1,1,0}, /* yellow */ 
+{0,0,0}, /* black */
+{1,0.3,0}, /* orange */
+{0.5,0.5,0.5} /* grey */
 };
 
 /* correspondance between gnuplot linetypes and terminal colors */
@@ -131,7 +131,7 @@ rgb_color gp_cairo_linetype2color( int linetype )
 	if (linetype<=LT_NODRAW)
 		linetype = LT_NODRAW; /* background color*/
 
-	return gp_cairo_colorlist[ linetype%8 +3 ];
+	return gp_cairo_colorlist[ linetype%9 +3 ];
 }
 
 /* initialize all fields of the plot structure */

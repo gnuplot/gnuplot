@@ -17,6 +17,9 @@
 	(wxt_reset): Clear the events list when receiving ctrl-c.
 	(wxtPanel::DrawToDC): Fix zoom strings on Windows.
 
+	* src/wxterminal/gp_cairo.c (gp_cairo_linetype2color): Fix modulo
+	operator to use the whole nine colors.
+
 2006-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/makefile.os2: Define GIF_ANIMATION and HAVE_PDFLIB_H.
