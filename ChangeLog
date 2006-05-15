@@ -1,15 +1,15 @@
 2006-05-15  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-	* src/wxterminal/bitmaps/xpm/cross.xpm
-	* src/wxterminal/bitmaps/xpm/right.xpm
-	* src/wxterminal/bitmaps/xpm/rotate.xpm
-	* src/wxterminal/bitmaps/xpm/size.cpm:
+	* src/wxterminal/bitmaps/xpm/cross.xpm:
+	* src/wxterminal/bitmaps/xpm/right.xpm:
+	* src/wxterminal/bitmaps/xpm/rotate.xpm:
+	* src/wxterminal/bitmaps/xpm/size.xpm:
 	Cross-platform cursors.
 
-	* src/wxterminal/wxt_gui.h 
-	* src/wxterminal/wxt_gui.cpp
+	* src/wxterminal/wxt_gui.h
 	(wxt_cursor_cross, wxt_cursor_right, wxt_cursor_rotate,
 	wxt_cursor_size): Cursors declarations.
+	(wxtApp::LoadCursor): Routine to initialize a cursor.
 
 	* src/wxterminal/wxt_gui.cpp
 	(wxtApp::LoadCursor): Likewise.
