@@ -1472,6 +1472,9 @@ void wxt_reset()
 		 * but not process it. */
 		FPRINTF((stderr,"send reset event to the mouse system\n"));
 		event_reset((gp_event_t *)1);   /* cancel zoombox etc. */
+
+		/* clear the event list */
+		wxt_clear_event_list();
 #endif
 	}
 

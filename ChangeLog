@@ -10,8 +10,11 @@
 	* src/wxterminal/wxt_gui.cpp
 	(wxt_cursor_cross, wxt_cursor_right, wxt_cursor_rotate,
 	wxt_cursor_size): Cursors declarations.
-	(wxtApp::LoadCursor): Routine to initialize a cursor.
+
+	* src/wxterminal/wxt_gui.cpp
+	(wxtApp::LoadCursor): Likewise.
 	(wxtApp::OnInit, wxt_set_cursor): Use new cursors.
+	(wxt_reset√√):lear the events list when receiving ctrl-c.
 
 2006-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
