@@ -1,3 +1,16 @@
+2006-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/makefile.os2: Define GIF_ANIMATION and HAVE_PDFLIB_H.
+
+	* config/config.os2: Sync to config.h created by `configure`. Define
+	EAM_OBJECTS, GP_STRING_VARS = 2, HIDDEN3D_VAR_PTSIZE and
+	WITH_IMAGE_VERIFY_ALL_PIXEL_LOCATIONS,
+
+	* src/os2/gclient.c (DisplayClientWndProc): Filter out WM_MOUSEMOVE
+	events when the mouse hasn't been really moved. This eliminates
+	excessive calls to gp_exec_event(GE_motion, ...) and subsequent
+	unnecessary redraws of the plot.
+
 2006-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/makefile.nt: Make sure that the same (basic) compiler options
