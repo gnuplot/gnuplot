@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.48 2005/08/12 08:31:56 mikulik Exp $
+# $Id: makefile.os2,v 1.49 2006/04/08 13:21:48 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -167,7 +167,7 @@ endif
 TERMFLAGS = -I. -I.. -I$(T)
 
 ifdef GD
-  CFLAGS += -DHAVE_LIBGD
+  CFLAGS += -DHAVE_LIBGD -DHAVE_GD_H
   TERMLIBS += -lgd
 ifdef FREETYPE
   CFLAGS += -DHAVE_GD_TTF
@@ -176,7 +176,7 @@ ifdef PNG
   CFLAGS += -DHAVE_GD_PNG
 endif
 ifdef GIF
-  CFLAGS += -DHAVE_GD_GIF
+  CFLAGS += -DHAVE_GD_GIF -DGIF_ANIMATION
 endif
 ifdef JPEG
   CFLAGS += -DHAVE_GD_JPEG
@@ -184,7 +184,7 @@ endif
 endif
 
 ifdef PDF
-  TERMFLAGS += -DHAVE_LIBPDF
+  TERMFLAGS += -DHAVE_LIBPDF -DHAVE_PDFLIB_H
   TERMLIBS  += -lpdflib
 endif
 
