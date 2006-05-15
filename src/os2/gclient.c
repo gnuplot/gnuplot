@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.45 2005/10/07 13:00:52 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.46 2005/10/08 19:36:19 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -552,10 +552,11 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     static RECTL   rectlPaint = { 0, 0, 0, 0 };
     static int     iPaintCount = 0;
     static int     firstcall = 1;
-    int mx, my;
+    static int     prev_mx = 0, prev_my = 0;		/* previous mouse position */
+    int            mx, my;				/* current mouse position  */
 
 #if 1
-    GetMousePosViewport(hWnd,&mx,&my);
+    GetMousePosViewport(hWnd, &mx, &my);
 #else
     /* The following cannot be used because `message' is not OK for
      * WM_CHAR */
@@ -577,18 +578,23 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    WinSetPointer(HWND_DESKTOP, hptrDefault); /* set default pointer */
 	    return 0L;
 	}
+	/* was the mouse moved? */
+	if ((prev_mx != mx) || (prev_my != my)) {
 #if 1
-	WinSetPointer(HWND_DESKTOP, hptrCurrent);
+	    WinSetPointer(HWND_DESKTOP, hptrCurrent);
 #else
-	WinSetPointer(HWND_DESKTOP, hptrCrossHair);
+	    WinSetPointer(HWND_DESKTOP, hptrCrossHair);
 #endif
-	if (zoombox.on) {
-	    DrawZoomBox(); /* erase zoom box */
-	    zoombox.to.x = mx; zoombox.to.y = my;
-	    DrawZoomBox(); /* draw new zoom box */
+	    if (zoombox.on) {
+		DrawZoomBox(); /* erase zoom box */
+		zoombox.to.x = mx; zoombox.to.y = my;
+		DrawZoomBox(); /* draw new zoom box */
+	    }
+	    /* track(show) mouse position -- send the event to gnuplot */
+	    gp_exec_event(GE_motion, mx, my, 0, 0, 0);
 	}
-	/* track(show) mouse position -- send the event to gnuplot */
-	gp_exec_event(GE_motion, mx, my, 0, 0, 0);
+	prev_mx = mx;
+	prev_my = my;
 	return 0L; /* end of WM_MOUSEMOVE */
 
     case WM_BUTTON1DOWN:
