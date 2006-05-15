@@ -642,8 +642,17 @@ void wxtPanel::DrawToDC(wxWindowDC &dc, wxRegion &region)
 		buffered_dc.SetLogicalFunction( wxAND );
 		buffered_dc.DrawRectangle( zoom_x1, zoom_y1, mouse_x -zoom_x1, mouse_y -zoom_y1);
 		buffered_dc.SetLogicalFunction( wxCOPY );
-		buffered_dc.DrawText( zoom_string1, zoom_x1, zoom_y1 - term->v_char/plot.oversampling_scale);
-		buffered_dc.DrawText( zoom_string2, mouse_x, mouse_y - term->v_char/plot.oversampling_scale);
+
+		buffered_dc.DrawText( zoom_string1.BeforeFirst(wxT('\r')),
+			zoom_x1, zoom_y1 - term->v_char/plot.oversampling_scale);
+		buffered_dc.DrawText( zoom_string1.AfterFirst(wxT('\r')),
+			zoom_x1, zoom_y1);
+
+		buffered_dc.DrawText( zoom_string2.BeforeFirst(wxT('\r')),
+			mouse_x, mouse_y - term->v_char/plot.oversampling_scale);
+		buffered_dc.DrawText( zoom_string2.AfterFirst(wxT('\r')),
+			mouse_x, mouse_y);
+
 		/* if we have to redraw the zoombox, it is with another size,
 		 * so it will be issued later and we can disable it now */
 		wxt_zoombox = false;

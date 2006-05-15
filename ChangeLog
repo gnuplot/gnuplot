@@ -14,7 +14,8 @@
 	* src/wxterminal/wxt_gui.cpp
 	(wxtApp::LoadCursor): Likewise.
 	(wxtApp::OnInit, wxt_set_cursor): Use new cursors.
-	(wxt_reset√√):lear the events list when receiving ctrl-c.
+	(wxt_reset): Clear the events list when receiving ctrl-c.
+	(wxtPanel::DrawToDC): Fix zoom strings on Windows.
 
 2006-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
