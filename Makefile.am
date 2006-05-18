@@ -16,5 +16,6 @@ ACLOCAL_AMFLAGS = -I m4
 dist-hook:
 	@for dir in `find $(distdir) -type d -name CVS -print`; do \
 	  rm -rf $$dir; done
+	@find $(distdir) -type d -name .deps -print | xargs rm -rf
 	@find $(distdir) -type f -name .cvsignore -print | xargs rm -f
 	@(cd $(distdir)/lisp && rm -f $(LISP_DISTCLEANFILES))
