@@ -1,3 +1,7 @@
+2006-05-18  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wtext.c: Add mouse wheel scroll support for text window.
+
 2006-06-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/README.ja docs/term-ja.diff

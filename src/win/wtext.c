@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.12 2006/05/18 22:50:02 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.13 2006/06/13 20:26:35 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -50,6 +50,11 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.12 2006/05/18 22:50:02 tle
 #include <dos.h>
 #ifndef __MSC__
 # include <mem.h>
+#endif
+
+#ifdef WIN32
+/* needed for mouse scroll wheel support */
+#define _WIN32_WINNT 0x0400
 #endif
 
 #include <windows.h>
@@ -1428,6 +1433,36 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    } /* moved inside viewport */
 	} /* if(dragging) */
 	break;
+#if _WIN32_WINNT >= 0x0400
+    case WM_MOUSEWHEEL: {
+	    WORD fwKeys;
+	    short int zDelta;
+
+	    fwKeys = LOWORD(wParam);
+	    zDelta = HIWORD(wParam);
+	    switch (fwKeys) {
+	    case 0:
+	        if (zDelta < 0)
+		    SendMessage(hwnd, WM_VSCROLL, SB_LINEDOWN, (LPARAM)0);
+		else
+		    SendMessage(hwnd, WM_VSCROLL, SB_LINEUP, (LPARAM)0);
+		return 0;
+	    case MK_SHIFT:
+	        if (zDelta < 0)
+	    	    SendMessage(hwnd, WM_VSCROLL, SB_PAGEDOWN, (LPARAM)0);
+	        else
+		    SendMessage(hwnd, WM_VSCROLL, SB_PAGEUP, (LPARAM)0);
+		return 0;
+	    case MK_CONTROL:
+	        if (zDelta < 0)
+	    	    SendMessage(hwnd, WM_CHAR, 0x0e, (LPARAM)0); // CTRL-N
+	        else
+		    SendMessage(hwnd, WM_CHAR, 0x10, (LPARAM)0); // CTRL-P
+		return 0;
+	    }
+	}
+	break;
+#endif
     case WM_CHAR: {
 	/* store key in circular buffer */
 	long count = lptw->KeyBufIn - lptw->KeyBufOut;
