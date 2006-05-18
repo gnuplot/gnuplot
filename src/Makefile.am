@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h subdir-objects
+AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
 
 # in the spirit of automake ...
 pkglibexecdir = $(libexecdir)/@PACKAGE@/@VERSION_MAJOR@

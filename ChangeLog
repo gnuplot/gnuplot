@@ -1,3 +1,11 @@
+2006-05-18  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/Makefile.am (AUTOMAKE_OPTIONS): Remove 'subdir-objects',
+	not mandatory.
+
+	* configure.in (enable_wxwidgets): Remove test AM_PROG_CC_C_O,
+	not needed now that 'subdir-objects' is not used.
+
 2006-05-15  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/bitmaps/xpm/cross.xpm:
