@@ -56,6 +56,11 @@ extern "C" {
 
 extern void wxt_atexit(int argc, char **argv);
 
+#ifdef _Windows
+/* handle mouse events when the pause window is displayed */
+extern int wxt_terminal_events(void);
+#endif /*_Windows*/
+
 #ifdef __cplusplus
 }
 #endif /*__cplusplus*/

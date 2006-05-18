@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.10 2004/07/07 16:56:07 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.11 2005/10/04 19:18:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -61,6 +61,10 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.10 2004/07/07 16:56:07 bro
 #include "wgnuplib.h"
 #include "wresourc.h"
 #include "wcommon.h"
+
+#ifdef WXWIDGETS
+#include "wxterminal/wxt_plot.h"
+#endif /* WXWIDGETS */
 
 /* font stuff */
 #define TEXTFONTSIZE 9
@@ -1650,6 +1654,11 @@ TextGetCh(LPTW lptw)
 	ShowCaret(lptw->hWndText);
     }
     while (!TextKBHit(lptw)) {
+#ifdef WXWIDGETS
+	if (wxt_terminal_events())
+		return '\0';
+#endif /* WXWIDGETS */
+	
 	/* CMW: can't use TextMessage here as it does not idle properly */
 	MSG msg;
 	GetMessage(&msg, 0, 0, 0);

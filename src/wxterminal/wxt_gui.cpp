@@ -2674,90 +2674,28 @@ int wxt_process_events()
 }
 
 #ifdef __WXMSW__
-
-/* ====license information====
- * The following code originates from other gnuplot files,
- * and is not subject to the alternative license statement.
- */
-
 /* Implements waitforinput used in wxt.trm
- * Returns the next input charachter, meanwhile treats terminal events.
- * The following implementation is taken from TextGetch() in wtext.c */
+ * To avoid code duplication, the terminal events are directly
+ * processed in TextGetCh(), which implements getch()
+ * under Windows */
 int wxt_waitforinput()
 {
-	int ch;
-	LPTW lptw;
-	MSG msg;
-
-	/* wxt_waitforinput *is* launched immediately after the wxWidgets terminal
-	 * is set using 'set term wxt' whereas wxt_init has not been called.
-	 * So we must ensure that the library has been initialized
-	 * before using any wxwidgets functions */
-	if (wxt_status != STATUS_OK)
-		return getch();
-
-	FPRINTF2((stderr,"waitforinput for Windows starting\n"));
-	lptw = &textwin;
-	TextToCursor(lptw);
-	lptw->bGetCh = TRUE;
-
-	if (lptw->bFocus) {
-		SetCaretPos(lptw->CursorPos.x * lptw->CharSize.x - lptw->ScrollPos.x,
-			lptw->CursorPos.y * lptw->CharSize.y + lptw->CharAscent
-			- lptw->CaretHeight - lptw->ScrollPos.y);
-		ShowCaret(lptw->hWndText);
-	}
-
-	while (!TextKBHit(lptw)) {
-		if (wxt_process_events())
-			return '\0';
-
-		GetMessage(&msg, 0, 0, 0);
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-
-	ch = *lptw->KeyBufOut++;
-
-	if (ch=='\r')
-		ch = '\n';
-	if (lptw->KeyBufOut - lptw->KeyBuf >= lptw->KeyBufSize)
-		lptw->KeyBufOut = lptw->KeyBuf;	/* wrap around */
-	if (lptw->bFocus)
-		HideCaret(lptw->hWndText);
-	lptw->bGetCh = FALSE;
-	return ch;
+	return getch();
 }
 
-
-/* handles mouse processing while the pause dialog is on.
- * Used in wpause.c (PauseBox)
- * Will work even if the wxWidgets terminal is not the current one */
-void wxt_waitforinput_pause(LPPW lppw)
+/* handles mouse events while the pause dialog is on,
+ * if the wxWidgets is initialized and in use.
+ * Used in wpause.c (PauseBox and win_sleep) .
+ * It will return 1 if one event ends the pause */
+int wxt_terminal_events()
 {
-	MSG msg;
+	int result = 0;
 	
-	FPRINTF((stderr,"waitforinput_pause\n"));
-
-	while (lppw->bPause) {
-		/* wxt_waitforinput_pause may be launched whereas wxt_init has not been called.
-		 * So we must ensure that the library has been initialized
-		 * before using any wxWidgets functions */
-		if (wxt_status == STATUS_OK)
-			wxt_process_events();
-
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-			/* wait until window closed */
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		} else
-			WaitMessage();
-	}
+	if (!strcmp(term->name,"wxt") && wxt_status == STATUS_OK)
+		result = wxt_process_events();
+		
+	return 0;
 }
-
-/* ====license information====
- * End of the non-relicensable portion.
- */
 
 #elif defined(__WXGTK__)
 

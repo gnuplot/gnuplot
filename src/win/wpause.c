@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.10 2006/05/13 09:22:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.11 2006/05/14 14:09:25 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -53,7 +53,7 @@ static char *RCSid() { return RCSid("$Id: wpause.c,v 1.10 2006/05/13 09:22:17 mi
 #include "wcommon.h"
 
 #ifdef WXWIDGETS
-extern void wxt_waitforinput_pause( LPPW lppw );
+#include "wxterminal/wxt_plot.h"
 #endif /* WXWIDGETS */
 
 /* Pause Window */
@@ -89,6 +89,9 @@ win_sleep(DWORD dwMilliSeconds)
 	    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 		if (msg.message == WM_QUIT)
 		    return;
+#ifdef WXWIDGETS
+		wxt_terminal_events();
+#endif /* WXWIDGETS */
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	    }
@@ -190,20 +193,20 @@ PauseBox(LPPW lppw)
 
 	lppw->bPause = TRUE;
 	lppw->bPauseCancel = IDCANCEL;
-#ifdef WXWIDGETS
-	wxt_waitforinput_pause(lppw);
-#else
+
 	while (lppw->bPause) {
 	    /* HBB 20021211: Nigel Nunn found a better way to avoid
 	     * 100% CPU load --> use it */
 	    if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
+#ifdef WXWIDGETS
+		wxt_terminal_events();
+#endif /* WXWIDGETS */
 		/* wait until window closed */
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	    } else
 		WaitMessage();
 	}
-#endif /* WXWIDGETS */
 
 	DestroyWindow(lppw->hWndPause);
 #ifndef WIN32

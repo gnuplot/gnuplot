@@ -99,11 +99,6 @@ extern char wxt_set_fontname[MAX_ID_LEN + 1];
 extern int wxt_set_fontsize;
 extern char wxt_title[MAX_ID_LEN + 1];
 
-#ifdef _Windows
-/* handle mouse events when the pause window is displayed */
-extern void wxt_waitforinput_pause( LPPW lppw );
-#endif /*_Windows*/
-
 #ifdef __cplusplus
 }
 #endif /*__cplusplus*/
