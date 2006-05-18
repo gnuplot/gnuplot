@@ -6,13 +6,17 @@
 	* configure.in (enable_wxwidgets): Remove test AM_PROG_CC_C_O,
 	not needed now that 'subdir-objects' is not used.
 
-	* src/wxterminal/wxt√_gui.cpp (xt_waitforinput) [_Windows]:
+	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput) [_Windows]:
 	Rework event processing to avoid code duplication and handle
 	more cases (pause, etc.).
 	(wxt_waitforinput_pause) [_Windows]: Removed.
 	(wxt_terminal_events) [_Windows]: New routine to process
 	pending events from the wxWidgets terminal when it is selected
 	and initialized. Its return code is used to stop a pause.
+	(wxt_set_font): Use reasonable defaults for font name ("Sans")
+	and size (10) instead of the wxWidgets system settings. It
+	avoids to choose the inappropriate Courier font on Windows,
+	where it is used by the console-like window.
 
 	* src/wxterminal/wxt_term.h (wxt_waitforinput_pause):
 	Remove declaration.
@@ -24,6 +28,9 @@
 	wxt_terminal_events().
 
 	* src/win/wtext.c (TextGetCh) [WXWIDGETS]: Likewise.
+
+	* term/wxt.trm (help): Change the help text according to the
+	change in the default font name and font size.
 
 2006-05-15  Timothee Lecomte  <timothee.lecomte@ens.fr>
 

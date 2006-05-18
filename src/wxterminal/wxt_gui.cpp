@@ -1600,18 +1600,15 @@ int wxt_set_font (const char *font)
 	wxt_MutexGuiEnter();
 
 	if ( strlen(fontname) == 0 ) {
-		/* NOTE may be changed to a reasonable default (Sans, 10) */
 		if ( strlen(wxt_set_fontname) == 0 )
-			strcpy(fontname,
-		((wxSystemSettings::GetFont(wxSYS_ANSI_FIXED_FONT)).GetFaceName()).mb_str());
+			strcpy(fontname, "Sans");
 		else
 			strcpy(fontname,wxt_set_fontname);
 	}
 
 	if ( fontsize == 0 ) {
-		/* NOTE to make it work under Wine, may be changed to a reasonable default (Sans, 10) */
 		if ( wxt_set_fontsize == 0 )
-			fontsize = (wxSystemSettings::GetFont(wxSYS_ANSI_FIXED_FONT)).GetPointSize();
+			fontsize = 10;
 		else
 			fontsize = wxt_set_fontsize;
 	}
