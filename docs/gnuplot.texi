@@ -3628,7 +3628,7 @@ to do so depends on your operating system.
 
 changes the name (and/or path) of the file to which the fit log will be
 written from the default of "fit.log" in the working directory. The default
-value can be overwritten using the command `set fitlogfile`.
+value can be overwritten using the command `set fit logfile`.
 
 @example
       FIT_SCRIPT
@@ -6249,7 +6249,7 @@ Syntax:
 @example
       set arrow @{<tag>@} @{from <position>@} @{to|rto <position>@}
                 @{ @{arrowstyle | as <arrow_style>@}
-                  | @{ @{nohead | head | heads@}
+                  | @{ @{nohead | head | backhead | heads@}
                       @{size <length>,<angle>@{,<backangle>@}@}
                       @{filled | empty | nofilled@}
                       @{front | back@}
@@ -6288,7 +6288,8 @@ not allowed for logarithmic axes.
 
 Specifying `nohead` produces an arrow drawn without a head---a line segment.
 This gives you yet another way to draw a line segment on the plot.  By
-default, arrows have heads. Specifying `heads` draws arrow heads on both
+default, an arrow has a head at its end. Specifying `backhead` draws an arrow
+head at the start point of the arrow while `heads` draws arrow heads on both
 ends of the line.  Not all terminal types support double-ended arrows.
 
 Head size can be controlled by `size <length>,<angle>` or
@@ -10114,6 +10115,14 @@ Equidistant rainbow (blue-green-yellow-red) palette:
 
 @end example
 
+Binary palette files are supported as well, see `binary general`. Example: 
+put 64 triplets of R,G,B doubles into file palette.bin and load it by
+@example
+      set palette file "palette.bin" binary record=64 using 1:2:3
+
+@end example
+
+
 
 @node gamma-correction, postscript, file, palette
 @subsubsection gamma-correction
@@ -11174,7 +11183,9 @@ rectangle is controlled by `set bars <width>`.
 
 By default the vertical line segments have no crossbars at the top and
 bottom. If you want crossbars, which are typically used for box-and-whisker
-plots, then add the keyword `whiskerbars` to the plot command.
+plots, then add the keyword `whiskerbars` to the plot command.  By default
+these whiskerbars extend the full horizontal width of the candlestick, but
+you can modify this by specifying a fraction of the full width.
 
 By default the rectangle is empty if (open > close), and filled with three
 vertical bars if (close > open). If filled-boxes support is present, then
@@ -11197,8 +11208,8 @@ box-and-whisker plot requires additional plot commands as in this example:
 @end example
 
 @example
-  # Plot with crossbars on the whiskers
-  plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars
+  # Plot with crossbars on the whiskers, crossbars are 50% of full width
+  plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
 
 @end example
 
@@ -14448,7 +14459,7 @@ Syntax:
 @example
       set terminal aqua @{<n>@} @{title "<wintitle>"@} @{size <x> <y>@}
                         @{fname "<fontface>"@} @{fsize <fontsize>@}
-                        @{@{no@}enhanced@}
+                        @{@{no@}enhanced@} @{solid|dashed@} @{dl <dashlength>@}@}
 
 @end example
 
@@ -14457,12 +14468,16 @@ where <n> is the number of the window to draw in (default is 0),
 <x> <y> is the size of the plot (default is 846x594 pt = 11.75x8.25 in).
 
 Use <fontface> to specify the font to use (default is "Times-Roman"),
-<fontzise> sets the font size (default is 14.0 pt).
+<fontsize> sets the font size (default is 14.0 pt).
 
-The aqua terminal support enhanced text mode (see `enhanced`), except for
+The aqua terminal supports enhanced text mode (see `enhanced`), except for
 overprint. Font support is limited to the fonts available on the system.
 Character encoding can be selected by @ref{encoding} and currently supports
-iso_latin_1, iso_latin_2, and cp1250 with iso_latin_1 being the default."  
+iso_latin_1, iso_latin_2, and cp1250 with iso_latin_1 being the default.
+
+Lines can be drawn either solid or dashed, (default is solid) and the dash
+spacing can be modified by <dashlength> which is a multiplier > 0.
+
 
 @node atari_ST_(via_AES), atari_ST_(via_VDI), aqua, terminal_
 @subsubsection atari ST (via AES)
@@ -17377,7 +17392,7 @@ Syntax:
                        @{@{no@}enhanced@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
                        @{fontfile <filename>@}
-                       @{linewidth <lw>@}
+                       @{rounded|butt@} @{linewidth <lw>@}
 
 @end example
 
@@ -17965,13 +17980,17 @@ Three options may be set in the `windows` terminal driver.
 
 Syntax:
 @example
-      set terminal windows @{<color>@} @{"<fontname>"@} @{<fontsize>@}
-
+      set terminal windows @{color | monochrome@}
+                           @{enhanced | noenhanced@}
 @end example
 
-where `<color>` is either `color` or `monochrome`, `"<fontname>"` is the
-name of a valid Windows font, and `<fontsize>` is the size of the font in
-points.
+			     @{@{font@} "fontname@{,fontsize@}" @{<fontsize>@}@}
+
+where `color` and `monochrome` select colored or mono output,
+`enhanced` enables enhanced text mode features (subscripts,
+superscripts and mixed fonts). See `enhanced` for more information.
+`"<fontname>"` is the name of a valid Windows font, and `<fontsize>`
+is the size of the font in points.
 
 Other options may be set with the graph-menu, the initialization file,
 and `set linestyle`.  Note that there is one restriction imposed by
