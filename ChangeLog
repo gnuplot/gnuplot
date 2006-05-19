@@ -2,6 +2,9 @@
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_enhanced_text):
 	Remove unappropriate comments about enhanced_max_height.
+	(gp_cairo_end_polygon): Remove useless comment.
+	(gp_cairo_convert_symbol_to_unicode): Change C++-style
+	comments to C style /* ... */.
 
 2006-05-18  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
