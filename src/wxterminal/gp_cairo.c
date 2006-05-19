@@ -1287,9 +1287,6 @@ void gp_cairo_draw_enhanced_text(plot_struct *plot, int x, int y, const char* st
 		return;
 
 	/* set up the global variables needed by enhanced_recursion() */
-	/* FIXME What is this for ?
-	 * enhanced_max_height = -1000;
-	 * enhanced_min_height = 1000; */
 	enhanced_fontscale = 1.0;
 	strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
 
@@ -1367,8 +1364,6 @@ void gp_cairo_draw_enhanced_text(plot_struct *plot, int x, int y, const char* st
 	g_object_unref (layout);
 	cairo_restore(plot->cr);
 	strcpy(gp_cairo_utf8,"");
-	/* FIXME What is this for ?
-	 * enhanced_max_height += enhanced_min_height; */
 }
 
 
