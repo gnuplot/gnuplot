@@ -151,7 +151,7 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 
 	plot->opened_path = FALSE;
 
-	strcpy(plot->fontname,"");
+	strncpy(plot->fontname, "", sizeof(plot->fontname));
 	plot->fontsize = 1.0;
 	plot->encoding = S_ENC_DEFAULT;
 
@@ -256,7 +256,7 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
 {
 	FPRINTF((stderr,"set_font\n"));
 
-	strcpy( plot->fontname, name );
+	strncpy( plot->fontname, name, sizeof(plot->fontname) );
 	plot->fontsize = fontsize;
 }
 
@@ -977,7 +977,7 @@ void gp_cairo_add_shape( PangoRectangle rect,int position)
 
 	FPRINTF((stderr, "adding blank custom shape\n"));
 
-	strcat(gp_cairo_utf8," ");
+	strncat(gp_cairo_utf8, " ", sizeof(gp_cairo_utf8)-strlen(gp_cairo_utf8));
 	p_attr_shape = pango_attr_shape_new (&rect,&rect);
 	p_attr_shape->start_index = position;
 	p_attr_shape->end_index = position+1;
@@ -1038,15 +1038,19 @@ void gp_cairo_enhanced_flush()
 	TBOOLEAN symbol_font_parsed = FALSE;
 
 	/* we have to treat Symbol font as a special case */
-	if (strcmp(gp_cairo_enhanced_font,"Symbol")==0) {
+	if (!strcmp(gp_cairo_enhanced_font,"Symbol")) {
 		FPRINTF((stderr,"Parsing a Symbol string\n"));
 
 		enhanced_text_utf8 = gp_cairo_convert_symbol_to_unicode(gp_cairo_enhanced_plot, enhanced_text);
 
-		if (strcmp(gp_cairo_enhanced_plot->fontname,"Symbol")!=0)
-			strcpy(gp_cairo_enhanced_font, gp_cairo_enhanced_plot->fontname);
-		else
-			strcpy(gp_cairo_enhanced_font, "Sans");
+		if (!strcmp(gp_cairo_enhanced_plot->fontname,"Symbol")) {
+			strncpy(gp_cairo_enhanced_font,
+				gp_cairo_enhanced_plot->fontname,
+				sizeof(gp_cairo_enhanced_font));
+		} else {
+			strncpy(gp_cairo_enhanced_font,
+				"Sans", sizeof(gp_cairo_enhanced_font));
+		}
 		symbol_font_parsed = TRUE;
 	} else
 #endif /*MAP_SYMBOL*/
@@ -1076,7 +1080,7 @@ void gp_cairo_enhanced_flush()
 		/* adding a blank character with the corresponding shape */
 		gp_cairo_add_shape(save_logical_rect,start);
 
-		strcpy(gp_cairo_save_utf8,"");
+		strncpy(gp_cairo_save_utf8, "", sizeof(gp_cairo_save_utf8));
 		gp_cairo_enhanced_restore_now = FALSE;
 		start++;
 	}
@@ -1115,13 +1119,13 @@ void gp_cairo_enhanced_flush()
 		/* adding a blank character with the corresponding shape */
 		gp_cairo_add_shape(underprinted_logical_rect, start);
 
-		strcpy(gp_cairo_underprinted_utf8,"");
+		strncpy(gp_cairo_underprinted_utf8, "", sizeof(gp_cairo_underprinted_utf8));
 		/* increment the position as we added a character */
 		start++;
 	}
 
 	if (gp_cairo_enhanced_showflag) {
-		strcat(gp_cairo_utf8,enhanced_text_utf8);
+		strncat(gp_cairo_utf8, enhanced_text_utf8, sizeof(gp_cairo_utf8)-strlen(gp_cairo_utf8));
 		end = strlen(gp_cairo_utf8);
 
 		/* add text attributes to the main list */
@@ -1194,7 +1198,7 @@ void gp_cairo_enhanced_flush()
 
 	if (gp_cairo_enhanced_save) /* we aim at restoring position later */ {
 		save_start = strlen( gp_cairo_save_utf8);
-		strcat(gp_cairo_save_utf8,enhanced_text_utf8);
+		strncat(gp_cairo_save_utf8, enhanced_text_utf8, sizeof(gp_cairo_utf8)-strlen(gp_cairo_utf8));
 		save_end = strlen( gp_cairo_save_utf8);
 
 		/* add text attributes to the save list */
@@ -1203,7 +1207,9 @@ void gp_cairo_enhanced_flush()
 
 	if (gp_cairo_enhanced_overprint==1) /* save underprinted text with its attributes */{
 		underprinted_start = strlen(gp_cairo_underprinted_utf8);
-		strcat(gp_cairo_underprinted_utf8,enhanced_text_utf8);
+		strncat(gp_cairo_underprinted_utf8,
+			enhanced_text_utf8,
+			sizeof(gp_cairo_underprinted_utf8)-strlen(gp_cairo_underprinted_utf8));
 		underprinted_end = strlen(gp_cairo_underprinted_utf8);
 
 		gp_cairo_enhanced_underprinted_AttrList = pango_attr_list_new();
@@ -1215,7 +1221,7 @@ void gp_cairo_enhanced_flush()
 
 #ifdef MAP_SYMBOL
 	if (symbol_font_parsed)
-		strcpy(gp_cairo_enhanced_font,"Symbol");
+		strncpy(gp_cairo_enhanced_font, "Symbol", sizeof(gp_cairo_enhanced_font));
 	else
 #endif
 		g_free(enhanced_text_utf8);
@@ -1253,7 +1259,7 @@ void gp_cairo_enhanced_open(char* fontname, double fontsize, double base, TBOOLE
 	if (!gp_cairo_enhanced_opened_string) {
 		gp_cairo_enhanced_opened_string = TRUE;
 		enhanced_cur_text = &enhanced_text[0];
-		strcpy(gp_cairo_enhanced_font,fontname);
+		strncpy(gp_cairo_enhanced_font, fontname, sizeof(gp_cairo_enhanced_font));
 		gp_cairo_enhanced_fontsize = fontsize*gp_cairo_enhanced_plot->oversampling_scale;
 		gp_cairo_enhanced_base = base*gp_cairo_enhanced_plot->oversampling_scale;
 		gp_cairo_enhanced_showflag = showflag;
@@ -1292,7 +1298,7 @@ void gp_cairo_draw_enhanced_text(plot_struct *plot, int x, int y, const char* st
 	gp_cairo_enhanced_overprint = FALSE;
 	gp_cairo_enhanced_showflag = TRUE;
 	gp_cairo_enhanced_fontsize = plot->fontsize*plot->oversampling_scale;
-	strcpy(gp_cairo_enhanced_font,plot->fontname);
+	strncpy(gp_cairo_enhanced_font, plot->fontname, sizeof(gp_cairo_enhanced_font));
 	gp_cairo_enhanced_AttrList = pango_attr_list_new();
 
 	/* Set the recursion going. We say to keep going until a
@@ -1360,7 +1366,7 @@ void gp_cairo_draw_enhanced_text(plot_struct *plot, int x, int y, const char* st
 	pango_attr_list_unref( gp_cairo_enhanced_AttrList );
 	g_object_unref (layout);
 	cairo_restore(plot->cr);
-	strcpy(gp_cairo_utf8,"");
+	strncpy(gp_cairo_utf8, "", sizeof(gp_cairo_utf8));
 }
 
 

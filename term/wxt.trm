@@ -200,30 +200,37 @@ TERM_PUBLIC void wxt_options()
 	}
 
 	/* Save options back into options string in normalized format */
-	sprintf(term_options, "%d", wxt_window_number);
+	snprintf(term_options, sizeof(term_options)-strlen(term_options),
+		"%d", wxt_window_number);
 
 	if (set_title) {
-		strcat(term_options, " title \"");
-		strcat(term_options, wxt_title);
-		strcat(term_options, "\"");
+		strncat(term_options, " title \"", sizeof(term_options)-strlen(term_options));
+		strncat(term_options, wxt_title, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, "\"", sizeof(term_options)-strlen(term_options));
 		wxt_update_title(wxt_window_number);
 	}
 
 	if (set_enhanced)
-		strcat(term_options, wxt_enhanced_enabled ? " enhanced" : " noenhanced");
+		strncat(term_options,
+			wxt_enhanced_enabled ? " enhanced" : " noenhanced",
+			sizeof(term_options)-strlen(term_options));
 
 	if (set_font) {
-		strcat(term_options, " font \"");
-		strcat(term_options, font_setting);
-		strcat(term_options, "\"");
+		strncat(term_options, " font \"", sizeof(term_options)-strlen(term_options));
+		strncat(term_options, font_setting, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, "\"", sizeof(term_options)-strlen(term_options));
 		free(font_setting);
 	}
 
 	if (set_persist)
-		strcat(term_options, wxt_persist ? " persist" : " nopersist");
+		strncat(term_options,
+			wxt_persist ? " persist" : " nopersist",
+			sizeof(term_options)-strlen(term_options));
 
 	if (set_raise)
-		strcat(term_options, wxt_raise ? " raise" : " noraise");
+		strncat(term_options,
+			wxt_raise ? " raise" : " noraise",
+			sizeof(term_options)-strlen(term_options));
 
 	if (set_close)
 		wxt_close_terminal_window(wxt_window_number);

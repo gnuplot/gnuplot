@@ -1584,7 +1584,7 @@ int wxt_set_font (const char *font)
 	temp_command.command = command_set_font;
 
 	if (!font || !(*font)) {
-		strcpy (fontname, "");
+		strncpy(fontname, "", sizeof(fontname));
 		fontsize = 0;
 	} else {
 		sep = strcspn(font,",");
@@ -1601,9 +1601,9 @@ int wxt_set_font (const char *font)
 
 	if ( strlen(fontname) == 0 ) {
 		if ( strlen(wxt_set_fontname) == 0 )
-			strcpy(fontname, "Sans");
+			strncpy(fontname, "Sans", sizeof(fontname));
 		else
-			strcpy(fontname,wxt_set_fontname);
+			strncpy(fontname, wxt_set_fontname, sizeof(fontname));
 	}
 
 	if ( fontsize == 0 ) {

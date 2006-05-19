@@ -5,6 +5,18 @@
 	(gp_cairo_end_polygon): Remove useless comment.
 	(gp_cairo_convert_symbol_to_unicode): Change C++-style
 	comments to C style /* ... */.
+	(gp_cairo_initialize_plot): To avoid overflows, change
+	strcpy() to strncpy(), strcat() to strncat() and sprintf() to
+	snprintf().
+	(gp_cairo_set_font): Likewise.
+	(gp_cairo_add_shape): Likewise.
+	(gp_cairo_enhanced_flush): Likewise.
+	(gp_cairo_enhanced_open): Likewise.
+	(gp_cairo_draw_enhanced_text): Likewise.
+
+	* src/wxterminal/wxt_gui.cpp (wxt_set_font): Likewise.
+
+	* term/wxt.trm (wxt_options): Likewise.
 
 2006-05-18  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
