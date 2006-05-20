@@ -1,3 +1,9 @@
+2006-05-20  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/color.h (colorspec_t) [EXTENDED_COLOR_SPECS]: Declare the
+	type before using it (fixes the compilation of linux.trm and
+	vgagl.trm).
+
 2006-05-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c term/x11.trm: Allow user control of solid/dashed line
