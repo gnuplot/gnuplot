@@ -1,3 +1,10 @@
+2006-05-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* share/Gnuplot.app-defaults share/Makefile.am:
+	New X resources file, intended for installation in the system's
+	default location for X resources.
+	Bug #1376604.
+
 2006-05-19  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_enhanced_text):
