@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.153 2006/01/02 19:57:44 sfeam Exp $
+ * $Id: x11.trm,v 1.154 2006/04/05 01:04:28 sfeam Exp $
  *
  */
 
@@ -93,9 +93,9 @@ TERM_PUBLIC void X11_set_ruler __PROTO((int, int));
 TERM_PUBLIC void X11_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void X11_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void X11_set_clipboard __PROTO((const char[]));
-TERM_PUBLIC void X11_update_opts __PROTO((void));
 # endif
 
+TERM_PUBLIC void X11_update_opts __PROTO((void));
 TERM_PUBLIC int X11_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void X11_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
@@ -169,6 +169,7 @@ static struct x11opt {
     { "-selectionTimeout", hasArg}, { "-title", hasArg},
     { "-xnllanguage", hasArg}, { "-xrm", hasArg},
     { "-raise", hasNoArg}, { "-noraise", hasNoArg},
+    { "-solid", hasNoArg}, { "-dashed", hasNoArg},
     { "-persist", hasNoArg}
 #ifdef USE_MOUSE
     , { "-nofeedback", hasNoArg}
@@ -212,6 +213,7 @@ static char *X11_full_command_path = NULL;
 /* must match the definition in src/gplt_x11.c: */
 static int persist = UNSET;
 static int do_raise = UNSET;
+static int dashedlines = UNSET;
 
 #ifdef USE_MOUSE
 /* Interlock to prevent the mouse channel from being coopted more than
@@ -349,6 +351,8 @@ enum X11_id {
     X11_TITLE,
     X11_ENHANCED,
     X11_NOENHANCED,
+    X11_SOLID,
+    X11_DASHED,
     X11_OTHER
 };
 
@@ -364,6 +368,8 @@ static struct gen_table X11_opts[] = {
     {"ti$tle", X11_TITLE},
     {"enh$anced", X11_ENHANCED},
     {"noenh$anced", X11_NOENHANCED},
+    {"solid", X11_SOLID},
+    {"dash$ed", X11_DASHED},
     {NULL, X11_OTHER}
 };
 
@@ -379,7 +385,7 @@ X11_options()
     int new_term_number = 0;
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_reset = FALSE, set_persist = FALSE, set_raise = FALSE, set_font = FALSE;
-    TBOOLEAN set_title = FALSE, set_number = FALSE, set_close = FALSE;
+    TBOOLEAN set_title = FALSE, set_number = FALSE, set_close = FALSE, set_solid = FALSE;
 
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&X11_opts[0], c_token)) {
@@ -404,6 +410,18 @@ X11_options()
 	    c_token++;
 	    if (set_persist) duplication=TRUE;
 	    set_persist = TRUE;
+	    break;
+	case X11_SOLID:
+	    dashedlines = FALSE;
+	    c_token++;
+	    if (set_solid) duplication=TRUE;
+	    set_solid = TRUE;
+	    break;
+	case X11_DASHED:
+	    dashedlines = TRUE;
+	    c_token++;
+	    if (set_solid) duplication=TRUE;
+	    set_solid = TRUE;
 	    break;
 	case X11_RAISE:
 	    do_raise = yes;
@@ -495,6 +513,9 @@ X11_options()
     if (UNSET != persist) {
 	strcat(term_options, (yes == persist ? " persist" : " nopersist"));
     }
+    if (UNSET != dashedlines) {
+	strcat(term_options, (yes == dashedlines ? " dashed" : " solid"));
+    }
     if (term->put_text == ENHX11_put_text) {
 	strcat(term_options, " enhanced");
     }
@@ -530,9 +551,7 @@ X11_options()
 	strncat(term_options, "\"", MAX_LINE_LEN-strlen(term_options));
 	c_token = save_token;
     }
-#ifdef USE_MOUSE
     X11_update_opts();
-#endif
 }
 
 
@@ -577,16 +596,14 @@ x11_lower_terminal_group(void)
 }
 
 
-#ifdef USE_MOUSE
 TERM_PUBLIC void
 X11_update_opts()
 {
-    if (X11_ipc && (UNSET != do_raise || UNSET != persist)) {
-	fprintf(X11_ipc, "X %d %d\n", do_raise, persist);
+    if (X11_ipc && (UNSET != do_raise || UNSET != persist || UNSET != dashedlines)) {
+	fprintf(X11_ipc, "X %d %d %d\n", do_raise, persist, dashedlines);
 	fflush(X11_ipc);
     }
 }
-#endif
 
 
 /*-----------------------------------------------------------------------------
@@ -863,8 +880,8 @@ X11_init()
 #endif
 #ifdef USE_MOUSE
     default_font_size_known = FALSE;
-    X11_update_opts();
 #endif
+    X11_update_opts();
 }
 
 TERM_PUBLIC void
@@ -1994,7 +2011,7 @@ START_HELP(x11)
 "                     {title \"<string>\"}",
 "                     {{no}enhanced}",
 "                     {font <fontspec>}",
-"                     {{no}persist} {{no}raise}",
+"                     {{no}persist} {{no}raise} {solid|dashed}",
 "                     {close}",
 "    set terminal x11 {reset}",
 "",
@@ -2385,10 +2402,10 @@ START_HELP(x11)
 " pixel on followed by six pixels off.  More elaborate on/off patterns can be",
 " specified with a four-digit value.  For example, '4441' is four on, four off,",
 " four on, one off.  The default values shown below are for monochrome displays",
-" or monochrome rendering on color or grayscale displays.  For color displays,",
-" the default for each is 0 (solid line) except for `axisDashes` which defaults",
-" to a '16' dotted line.",
+" or monochrome rendering on color or grayscale displays.",
+" Color displays default to dashed:off ",
 "@start table - first is interactive cleartext form",
+"  gnuplot*dashed:       off",
 "  gnuplot*borderDashes:   0",
 "  gnuplot*axisDashes:    16",
 "  gnuplot*line1Dashes:    0",
@@ -2400,6 +2417,7 @@ START_HELP(x11)
 "  gnuplot*line7Dashes:   42",
 "  gnuplot*line8Dashes:   13",
 "#\\begin{tabular}{|cl|} \\hline",
+"#&gnuplot*dashed: off\\\\",
 "#&gnuplot*borderDashes: 0\\\\",
 "#&gnuplot*axisDashes: 16\\\\",
 "#&gnuplot*line1Dashes: 0\\\\",
@@ -2411,6 +2429,7 @@ START_HELP(x11)
 "#&gnuplot*line7Dashes: 42\\\\",
 "#&gnuplot*line8Dashes: 13\\\\",
 "%c l .",
+"%@gnuplot*dashed: off",
 "%@gnuplot*borderDashes: 0",
 "%@gnuplot*axisDashes: 16",
 "%@gnuplot*line1Dashes: 0",

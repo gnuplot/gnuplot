@@ -1,5 +1,16 @@
 2006-05-20  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/gplt_x11.c term/x11.trm: Allow user contrl of solid/dashed line
+	setting via the usual three mechanisms
+	new X resource              gnuplot*dashed: on 
+	from command line          `gnuplot -dashed ...`
+	from gnuplot command       `set term x11 {dashed|solid} ...`
+
+	* term/x11.trm: Bugfix: persist/raise/dashed terminal settings should
+	not be conditional on mouse support.
+
+2006-05-20  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* share/Gnuplot.app-defaults share/Makefile.am:
 	New X resources file, intended for installation in the system's
 	default location for X resources.

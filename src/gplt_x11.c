@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.160 2006/04/05 01:04:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.161 2006/04/29 00:37:42 tlecomte Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -543,6 +543,7 @@ static int do_raise = yes, persist = no;
 static TBOOLEAN fast_rotate = TRUE;
 static int feedback = yes;
 static int ctrlq = no;
+static int dashedlines = no;
 #ifdef EXPORT_SELECTION
 static TBOOLEAN exportselection = TRUE;
 #endif
@@ -1539,15 +1540,14 @@ record()
 
 	case 'X':		/* tell the driver about do_raise /  persist */
 	    {
-		int tmp_do_raise, tmp_persist;
-		if (2 == sscanf(buf, "X%d%d", &tmp_do_raise, &tmp_persist)) {
-		    if (UNSET != tmp_do_raise) {
-			do_raise = tmp_do_raise;
-		    }
-		    if (UNSET != tmp_persist) {
-			persist = tmp_persist;
-		    }
-		}
+		int tmp_do_raise = UNSET, tmp_persist = UNSET, tmp_dashed = UNSET;
+		sscanf(buf, "X%d%d%d", &tmp_do_raise, &tmp_persist, &tmp_dashed);
+		if (UNSET != tmp_do_raise)
+		    do_raise = tmp_do_raise;
+		if (UNSET != tmp_persist)
+		    persist = tmp_persist;
+		if (UNSET != tmp_dashed)
+		    dashedlines = tmp_dashed;
 	    }
 	    return 1;
 
@@ -2266,7 +2266,7 @@ exec_cmd(plot_struct *plot, char *command)
 
 	/* default width is 0 {which X treats as 1} */
 	plot->lwidth = widths[plot->lt] ? plot->user_width * widths[plot->lt] : plot->user_width;
-	if (dashes[plot->lt][0]) {
+	if (dashedlines && dashes[plot->lt][0]) {
 	    plot->type = LineOnOffDash;
 	    XSetDashes(dpy, gc, 0, dashes[plot->lt], strlen(dashes[plot->lt]));
 	} else {
@@ -4756,6 +4756,8 @@ static XrmOptionDescRec options[] = {
     {"-feedback", "*feedback", XrmoptionNoArg, (XPointer) "on"},
     {"-nofeedback", "*feedback", XrmoptionNoArg, (XPointer) "off"},
     {"-ctrlq", "*ctrlq", XrmoptionNoArg, (XPointer) "on"},
+    {"-dashed", "*dashed", XrmoptionNoArg, (XPointer) "on"},
+    {"-solid", "*dashed", XrmoptionNoArg, (XPointer) "off"},
     {"-persist", "*persist", XrmoptionNoArg, (XPointer) "on"}
 };
 
@@ -5183,6 +5185,10 @@ pr_dashes()
 {
     int n, j, l, ok;
     char option[20], *v;
+
+    if (pr_GetR(db, ".dashed")) {
+	dashedlines = (!strncasecmp(value.addr, "on", 2) || !strncasecmp(value.addr, "true", 4));
+    }
 
     for (n = 0; n < Ndashes; n++) {
 	strcpy(option, ".");
