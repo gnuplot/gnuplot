@@ -1,3 +1,19 @@
+2006-05-21  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* demo/random.dem: Examples to illustrate generating normal random
+	data, generating data points not linked to grid using table,
+	setting the contour lines to the same color as surface, and
+	creating histograms.
+
+2006-05-21  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* term/win.trm (HELP): Got rid of some tabs.
+	
+	* docs/gnuplot.doc: Fixed some blank-only lines.
+	(fit control, fit control variables, fit control environment,
+	splot overview): Get rid of _ between words.  Suggested by Dan
+	Sebald.
+	
 2006-05-20  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/color.h (colorspec_t) [EXTENDED_COLOR_SPECS]: Declare the

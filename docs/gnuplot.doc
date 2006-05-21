@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.351 2006/04/19 03:18:43 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.352 2006/04/26 10:17:00 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2600,17 +2600,15 @@ C ... and restart the table:
  to account for "errors" in the values of x, only in y.  Also, any "outliers"
  (data points outside the normal distribution of the model) will have an
  exaggerated effect on the solution.
-3 fit controlling
-?commands fit_control
-?fit_control
+3 control
+?commands fit control
 ?fit control
  There are a number of `gnuplot` variables that can be defined to affect
  `fit`.  Those which can be defined once `gnuplot` is running are listed
  under 'control_variables' while those defined before starting `gnuplot`
  are listed under 'environment_variables'.
 4 control variables
-?commands fit_control variables
-?fit_control variables
+?commands fit control variables
 ?fit control variables
  The default epsilon limit (1e-5) may be changed by declaring a value for
        FIT_LIMIT
@@ -2647,8 +2645,7 @@ C ... and restart the table:
  second independent variable and `using` are used to specify the branch.
  See `fit multi-branch`.
 4 environment variables
-?commands fit_control environment
-?fit_control environment
+?commands fit control environment
 ?fit control environment
  The environment variables must be defined before `gnuplot` is executed; how
  to do so depends on your operating system.
@@ -6044,7 +6041,7 @@ C ... and restart the table:
  be hidden.  Each surface has its hidden parts removed with respect to itself
  and to other surfaces, if more than one surface is plotted.  Contours drawn
  on the surface (`set contour surface`) don't work.  
- 
+
  Labels and arrows are always visible and are unaffected.  The key box is
  never hidden by the surface. As of gnuplot version 4.1, `set hidden3d` also
  affects 3D plotting styles `with points`, `with labels`, and `with vectors`,
@@ -8367,7 +8364,7 @@ C ... and restart the table:
  Syntax:
      set style rectangle {front|back} {fillcolor <colorspec>} {fs <fillstyle>}
                          {lw|linewidth <lw>}
- 
+
  See `colorspec` and `fillstyle`.  `fillcolor` may be abbreviated as `fc`.
 
  Examples:
@@ -10669,9 +10666,9 @@ C ... and restart the table:
         set samples 4,10; replot
         set samples 10,4; replot
 
-3 splot_overview
-?commands splot_overview
-?splot_overview
+3 splot overview
+?commands splot overview
+?splot overview
  `splot` can display a surface as a collection of points, or by connecting
  those points.  As with `plot`, the points may be read from a data file or
  result from evaluation of a function at specified intervals, see

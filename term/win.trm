@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.46 2006/05/13 09:17:42 mikulik Exp $
+ * $Id: win.trm,v 1.47 2006/05/14 14:09:25 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -893,7 +893,7 @@ START_HELP(windows)
 " Syntax:",
 "       set terminal windows {color | monochrome}",
 "                            {enhanced | noenhanced}",
-"			     {{font} \"fontname{,fontsize}\" {<fontsize>}}",
+"                            {{font} \"fontname{,fontsize}\" {<fontsize>}}",
 "",
 " where `color` and `monochrome` select colored or mono output,", 
 " `enhanced` enables enhanced text mode features (subscripts,",
