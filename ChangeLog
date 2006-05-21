@@ -1,6 +1,6 @@
 2006-05-20  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/gplt_x11.c term/x11.trm: Allow user contrl of solid/dashed line
+	* src/gplt_x11.c term/x11.trm: Allow user control of solid/dashed line
 	setting via the usual three mechanisms
 	new X resource              gnuplot*dashed: on 
 	from command line          `gnuplot -dashed ...`
