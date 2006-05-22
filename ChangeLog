@@ -4,6 +4,13 @@
 	replacing sizeof() on an array of int (which gives an overflow
 	by writing four times more than the size of the array) by the 
 	actual size of the array (KEYTABLE_SIZE).
+	(VGAGL_truecolor): Declare as a TBOOLEAN instead of an integer,
+	do not use the enums yes and no but TRUE and FALSE.
+	(VGAGL_processing_graphics_events): Likewise.
+	(VGAGL_interpolate): Likewise.
+	(VGAGL_cursor_drawn): Likewise.
+	(VGAGL_need_update): Likewise.
+	(VGAGL_graphics_on): Likewise.
 
 2006-05-22  Lars Hecking  <lhecking@users.sourceforge.net>
 
