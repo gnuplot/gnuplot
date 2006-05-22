@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vgagl.trm,v 1.15 2005/12/30 04:59:24 sfeam Exp $
+ * $Id: vgagl.trm,v 1.16 2006/02/20 20:17:58 sfeam Exp $
  */
 
 #if defined(USE_MOUSE)
@@ -221,7 +221,7 @@ void
 VGAGL_init_keytable()
 {
     int i;
-    for (i = 0; i < sizeof(VGAGL_Keytable); i++) {
+    for (i = 0; i < KEYTABLE_SIZE; i++) {
 	VGAGL_Keytable[i] = -1;
     }
     VGAGL_Keytable[SCANCODE_1] = '1';

@@ -1,3 +1,10 @@
+2006-05-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* term/vgagl.trm (VGAGL_init_keytable): Fix bug #1492341 by
+	replacing sizeof() on an array of int (which gives an overflow
+	by writing four times more than the size of the array) by the 
+	actual size of the array (KEYTABLE_SIZE).
+
 2006-05-22  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* configure.in: Reformat and bugfix wxwidgets section.
