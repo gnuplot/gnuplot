@@ -3277,7 +3277,7 @@ for details.
 * adjustable_parameters::       
 * short_introduction::          
 * error_estimates::             
-* fit_controlling::             
+* control::                     
 * multi-branch::                
 * starting_values::             
 * tips::                        
@@ -3393,7 +3393,7 @@ However, if all you really want is a smooth curve through your data points,
 the @ref{smooth} option to `plot` may be what you've been looking for rather
 than `fit`.
 
-@node error_estimates, fit_controlling, short_introduction, fit
+@node error_estimates, control, short_introduction, fit
 @subsection error estimates
 
 @c ?commands fit error_estimates
@@ -3543,12 +3543,10 @@ to account for "errors" in the values of x, only in y.  Also, any "outliers"
 (data points outside the normal distribution of the model) will have an
 exaggerated effect on the solution.
 
-@node fit_controlling, multi-branch, error_estimates, fit
-@subsection fit controlling
+@node control, multi-branch, error_estimates, fit
+@subsection control
 
-@c ?commands fit_control
-@cindex fit_control
-
+@c ?commands fit control
 @c ?fit control
 There are a number of `gnuplot` variables that can be defined to affect
 `fit`.  Those which can be defined once `gnuplot` is running are listed
@@ -3560,11 +3558,10 @@ are listed under 'environment_variables'.
 * environment_variables::       
 @end menu
 
-@node control_variables, environment_variables, fit_controlling, fit_controlling
+@node control_variables, environment_variables, control, control
 @subsubsection control variables
 
-@c ?commands fit_control variables
-@c ?fit_control variables
+@c ?commands fit control variables
 @c ?fit control variables
 The default epsilon limit (1e-5) may be changed by declaring a value for
 @example
@@ -3613,11 +3610,10 @@ one independent variable is now done as a pseudo-3D fit in which the
 second independent variable and @ref{using} are used to specify the branch.
 See @ref{multi-branch}.
 
-@node environment_variables,  , control_variables, fit_controlling
+@node environment_variables,  , control_variables, control
 @subsubsection environment variables
 
-@c ?commands fit_control environment
-@c ?fit_control environment
+@c ?commands fit control environment
 @c ?fit control environment
 The environment variables must be defined before `gnuplot` is executed; how
 to do so depends on your operating system.
@@ -3638,7 +3634,7 @@ specifies a command that may be executed after an user interrupt. The default
 is @ref{replot}, but a `plot` or `load` command may be useful to display a plot
 customized to highlight the progress of the fit.
 
-@node multi-branch, starting_values, fit_controlling, fit
+@node multi-branch, starting_values, control, fit
 @subsection multi-branch
 
 @c ?commands fit multi-branch
@@ -14106,11 +14102,10 @@ a y-isoline intersection will ignore such samples. Try:
 
 
 @node splot_overview,  , grid_data, splot
-@subsection splot_overview
+@subsection splot overview
 
-@c ?commands splot_overview
-@cindex splot_overview
-
+@c ?commands splot overview
+@c ?splot overview
 `splot` can display a surface as a collection of points, or by connecting
 those points.  As with `plot`, the points may be read from a data file or
 result from evaluation of a function at specified intervals, see
@@ -17982,9 +17977,9 @@ Syntax:
 @example
       set terminal windows @{color | monochrome@}
                            @{enhanced | noenhanced@}
-@end example
+                           @{@{font@} "fontname@{,fontsize@}" @{<fontsize>@}@}
 
-			     @{@{font@} "fontname@{,fontsize@}" @{<fontsize>@}@}
+@end example
 
 where `color` and `monochrome` select colored or mono output,
 `enhanced` enables enhanced text mode features (subscripts,
@@ -18238,7 +18233,7 @@ Syntax:
                     @{title "<string>"@}
                     @{@{no@}enhanced@}
                     @{font <fontspec>@}
-                    @{@{no@}persist@} @{@{no@}raise@}
+                    @{@{no@}persist@} @{@{no@}raise@} @{solid|dashed@}
                     @{close@}
    set terminal x11 @{reset@}
 
@@ -18600,11 +18595,11 @@ on followed by `k` pixels off.  For example, '16' is a dotted line with one
 pixel on followed by six pixels off.  More elaborate on/off patterns can be
 specified with a four-digit value.  For example, '4441' is four on, four off,
 four on, one off.  The default values shown below are for monochrome displays
-or monochrome rendering on color or grayscale displays.  For color displays,
-the default for each is 0 (solid line) except for `axisDashes` which defaults
-to a '16' dotted line.
+or monochrome rendering on color or grayscale displays.
+Color displays default to dashed:off 
 
 @example
+ gnuplot*dashed:       off
  gnuplot*borderDashes:   0
  gnuplot*axisDashes:    16
  gnuplot*line1Dashes:    0
@@ -18732,7 +18727,7 @@ Syntax:
                     @{title "<string>"@}
                     @{@{no@}enhanced@}
                     @{font <fontspec>@}
-                    @{@{no@}persist@} @{@{no@}raise@}
+                    @{@{no@}persist@} @{@{no@}raise@} @{solid|dashed@}
                     @{close@}
    set terminal x11 @{reset@}
 
@@ -19094,11 +19089,11 @@ on followed by `k` pixels off.  For example, '16' is a dotted line with one
 pixel on followed by six pixels off.  More elaborate on/off patterns can be
 specified with a four-digit value.  For example, '4441' is four on, four off,
 four on, one off.  The default values shown below are for monochrome displays
-or monochrome rendering on color or grayscale displays.  For color displays,
-the default for each is 0 (solid line) except for `axisDashes` which defaults
-to a '16' dotted line.
+or monochrome rendering on color or grayscale displays.
+Color displays default to dashed:off 
 
 @example
+ gnuplot*dashed:       off
  gnuplot*borderDashes:   0
  gnuplot*axisDashes:    16
  gnuplot*line1Dashes:    0
