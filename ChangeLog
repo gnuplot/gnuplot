@@ -1,3 +1,19 @@
+2006-05-22  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* configure.in: Reformat and bugfix wxwidgets section.
+
+	* docs/gnuplot.texi: Regenerated.
+
+	* share/Makefile.am: Add EXTRA_DIST.
+
+	* src/Makefile.am: Add wxterminal to EXTRA_DIST.
+
+	* src/makefile.all, src/makefile.awc: Regenerated.
+
+	* src/wxterminal/wxt_gui.cpp: Fix typos.
+
+	* term/estimate.trm: Add cvs Id.
+
 2006-05-21  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* demo/random.dem: Examples to illustrate generating normal random
@@ -91,6 +107,12 @@
 
 	* term/wxt.trm (help): Change the help text according to the
 	change in the default font name and font size.
+
+2006-05-18  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* docs/Makefile.in: Add titlepag.ipf to EXTRA_DIST.
+
+	* docs/gnuplot.texi: Regenerated.
 
 2006-05-15  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
