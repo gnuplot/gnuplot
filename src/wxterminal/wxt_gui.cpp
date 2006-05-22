@@ -446,12 +446,12 @@ void wxtFrame::OnHelp( wxCommandEvent& WXUNUSED( event ) )
 	wxMessageBox( wxString(wxT("You are using an interactive terminal "\
 		"based on wxWidgets for the interface, Cairo "\
 		"for the drawing facilities, and Pango for the text layouts.\n"\
-		"Please not that toolbar icons in the terminal "\
+		"Please note that toolbar icons in the terminal "\
 		"don't reflect the whole range of mousing "\
 		"possibilities in the terminal.\n"\
 		"Hit 'h' in the plot window "\
-		"and an help message will appear "\
-		"in gnuplot console about mouse commands.\n"\
+		"and a help message for mouse commands "\
+		"will appear in the gnuplot console.\n"\
 		"See also 'help mouse'.\n"\
 		"\n"\
 		"Configuration and runtime information :\n"\
