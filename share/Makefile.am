@@ -12,7 +12,7 @@ SUBDIRS = LaTeX
 XRESOURCEPATH = /usr/lib/X11/app-defaults
 
 install:
-	if test -d $(XRESOURCEPATH); then \
+	if test -d $(XRESOURCEPATH) && test -w $(XRESOURCEPATH); then \
 	  $(INSTALL_DATA) Gnuplot.app-defaults $(XRESOURCEPATH)/Gnuplot \
 	; fi
 
