@@ -6,16 +6,16 @@
   gnuplot*exportselection:  on
   gnuplot*fastrotate:   on
   gnuplot*feedback:     on
-  gnuplot*ctrlq:        on
+! gnuplot*ctrlq:        off
   gnuplot*persist:      off
-  gnuplot*raise:        off
+! gnuplot*raise:        on
   gnuplot*dashed:       off
 
 ! Default font
 ! gnuplot*font:   verdana,11,bold
 
 ! Default line colors
-  gnuplot*background:  white
+! gnuplot*background:  white
   gnuplot*textColor:   black
   gnuplot*borderColor: black
   gnuplot*axisColor:   black

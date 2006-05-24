@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.161 2006/04/29 00:37:42 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.162 2006/05/21 00:40:30 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2261,17 +2261,23 @@ exec_cmd(plot_struct *plot, char *command)
     else if (*buffer == 'L') {
 	sscanf(buffer, "L%4d", &plot->lt);
 	plot->lt = (plot->lt % 8) + 2;
+
 	if (plot->lt < 0) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	    plot->lt = -3;
 
-	/* default width is 0 {which X treats as 1} */
-	plot->lwidth = widths[plot->lt] ? plot->user_width * widths[plot->lt] : plot->user_width;
-	if (dashedlines && dashes[plot->lt][0]) {
-	    plot->type = LineOnOffDash;
-	    XSetDashes(dpy, gc, 0, dashes[plot->lt], strlen(dashes[plot->lt]));
-	} else {
-	    plot->type = LineSolid;
+	else { /* Fixme: no mechanism to hold width or dashstyle for LT_BACKGROUND */
+	    /* default width is 0 {which X treats as 1} */
+	    plot->lwidth = widths[plot->lt] ? plot->user_width * widths[plot->lt] : plot->user_width;
+
+	    if ((dashedlines && dashes[plot->lt][0])
+	    ||  (plot->lt == LT_AXIS+2 && dashes[LT_AXIS+2][0])) {
+		plot->type = LineOnOffDash;
+		XSetDashes(dpy, gc, 0, dashes[plot->lt], strlen(dashes[plot->lt]));
+	    } else {
+		plot->type = LineSolid;
+	    }
 	}
+
 	XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
 	XSetLineAttributes(dpy, gc, plot->lwidth, plot->type, CapButt, JoinBevel);
 	plot->current_rgb = plot->cmap->rgbcolors[plot->lt + 3];

@@ -1,7 +1,17 @@
+2006-05-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c:  Treat LT_AXIS linetype as dotted even if the
+	terminal is 'set term x11 solid'.  Do not try to set dash type or
+	linewidth for LT_BACKGROUND because this will underflow the type arrays.
+	Bugfix.
+
+	* share/Gnuplot.app-defaults:  Comment out settings for *ctrlq *raise
+	and *background so that the default remains the same as having no
+	app-defaults file.
+
 2006-02-23  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-	* term/wxt.trm (TERM_HELP): Fix typos, thanks to Shigeharu
-	Takeno.
+	* term/wxt.trm (TERM_HELP): Fix typos, thanks to Shigeharu Takeno.
 
 2006-05-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
