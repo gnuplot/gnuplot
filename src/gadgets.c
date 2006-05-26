@@ -185,8 +185,8 @@ histogram_style histogram_opts = DEFAULT_HISTOGRAM_STYLE;
  * Sets the returned integers 4 l.s.b. as follows:
  * bit 0 if to the left of xleft.
  * bit 1 if to the right of xright.
- * bit 2 if above of ytop.
- * bit 3 if below of ybot.
+ * bit 2 if below of ybot.
+ * bit 3 if above of ytop.
  * 0 is returned if inside.
  */
 int

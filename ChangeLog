@@ -1,3 +1,8 @@
+2006-05-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c (clip_point): The code comments incorrectly described
+	the bit values returned by clip_point().  
+
 2006-05-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:  Treat LT_AXIS linetype as dotted even if the
