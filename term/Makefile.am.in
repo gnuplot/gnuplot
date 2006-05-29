@@ -12,7 +12,7 @@ object.h post.h $(CORETERM) PostScript
 # For Unix and MSDOS only
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(GNUPLOT_PS_DIR)
-	$(INSTALL_DATA) PostScript/*.ps $(DESTDIR)$(GNUPLOT_PS_DIR)
+	$(INSTALL_DATA) $(srcdir)/PostScript/*.ps $(DESTDIR)$(GNUPLOT_PS_DIR)
 
 uninstall-local:
 	@$(NORMAL_UNINSTALL)

@@ -1,3 +1,8 @@
+2006-05-29  Michael Ritzert  <ritzert@t-online.de>
+
+	* term/Makefile.am.in: Look for the postscript files to be installed
+	relative to $(srcdir).
+
 2006-05-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (clip_point): The code comments incorrectly described
