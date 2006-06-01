@@ -6,6 +6,9 @@
 	for later use.  f(x) = a+b; reset; print f(1)  - oops, no more a or b.
 	Bugfix.
 
+	* demo/world.dat: Rearrange line segments to make more continuous
+	boundaries. Now it almost works for filledcurves.
+
 2006-05-29  Michael Ritzert  <ritzert@t-online.de>
 
 	* term/Makefile.am.in: Look for the postscript files to be installed
