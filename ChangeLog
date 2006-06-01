@@ -1,3 +1,11 @@
+2006-06-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/unset.c (reset_command): Abandon the idea of automatic
+	garbage collection of space for undefined user variables. The problem
+	with this is that user-defined functions may still hold pointers to them
+	for later use.  f(x) = a+b; reset; print f(1)  - oops, no more a or b.
+	Bugfix.
+
 2006-05-29  Michael Ritzert  <ritzert@t-online.de>
 
 	* term/Makefile.am.in: Look for the postscript files to be installed

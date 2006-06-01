@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.95 2006/03/26 05:23:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.96 2006/03/26 20:00:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1718,8 +1718,15 @@ reset_command()
 #endif
     unset_fit();
 
-    /* garbage collection on space allocated for user variables */
+#if 0
+    /* 01-Jun-2006: Deleting undefined user variables can break user functions.
+     * E.g.    f(x) = a + b;  reset;
+     * f(x) is still defined, sort of, but it holds pointers to a and b, which
+     * have been deleted. Evaluation after a reset can trigger a segfault.
+     */
+    /* Garbage collection on space allocated for user variables */
     cleanup_udvlist();
+#endif
 
     /* HBB 20000506: set 'interactive' back to its real value: */
     interactive = save_interactive;
