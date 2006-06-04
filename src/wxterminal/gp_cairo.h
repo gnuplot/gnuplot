@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 /* GNUPLOT - gp_cairo.h */
 
 /*[

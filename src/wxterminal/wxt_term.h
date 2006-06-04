@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 /* GNUPLOT - wxt_term.h */
 
 /*[

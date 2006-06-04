@@ -1,4 +1,8 @@
-/* GNUPLOT - gp_cairo.cpp */
+/*
+ * $Id$
+ */
+
+/* GNUPLOT - gp_cairo.c */
 
 /*[
  * Copyright 2005,2006   Timothee Lecomte

@@ -1,3 +1,13 @@
+2006-06-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/gp_cairo.c: Add $Id$.
+	* src/wxterminal/gp_cairo.h: Likewise.
+	* src/wxterminal/gp_cairo_term.h: Likewise.
+	* src/wxterminal/wxt_gui.cpp: Likewise.
+	* src/wxterminal/wxt_gui.h: Likewise.
+	* src/wxterminal/wxt_plot.h: Likewise.
+	* src/wxterminal/wxt_term.h: Likewise.
+
 2006-06-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (two_edge_intersect) Remove old debugging code.
