@@ -1,9 +1,21 @@
+2006-06-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (two_edge_intersect) Remove old debugging code.
+
+	* src/graphics.c (edge_intersect plot_filled_curves):  Bugfix.
+	Fix clipping of filled curves. When a curve leaves the plot and 
+	reenters via a different plot edge, we must add dummy points at the
+	intervening plot corners.
+
+	* src/graphics.c (fill_missing_corners): New routine to support
+	clipping of filled areas defined by a bounding curve.
+
 2006-06-01  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/unset.c (reset_command): Abandon the idea of automatic
-	garbage collection of space for undefined user variables. The problem
-	with this is that user-defined functions may still hold pointers to them
-	for later use.  f(x) = a+b; reset; print f(1)  - oops, no more a or b.
+	* src/unset.c (reset_command): Abandon the idea of automatic garbage
+	collection for undefined user variables. The problem with this is that
+	user-defined functions may still hold pointers to them for later use.
+	E.g.:    f(x) = a+b; reset; print f(1)  - oops, no more a or b.
 	Bugfix.
 
 	* demo/world.dat: Rearrange line segments to make more continuous

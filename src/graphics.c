@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.186 2006/04/19 03:17:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.187 2006/04/24 09:54:32 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -124,6 +124,7 @@ static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y));
 static void plot_filledcurves __PROTO((struct curve_points * plot));
 static void finish_filled_curve __PROTO((int, gpiPoint *, struct curve_points *));
 static void plot_betweencurves __PROTO((struct curve_points * plot));
+static void fill_missing_corners __PROTO((gpiPoint *corners, int *points, int exit, int reentry, int updown, int leftright));
 static void fill_between __PROTO((double, double, double, double, double, double, struct curve_points *));
 static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey, filledcurves_opts *filledcurves_options));
 static gpiPoint *fill_corners __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
@@ -135,7 +136,7 @@ static void place_labels __PROTO((struct text_label * listhead, int layer, TBOOL
 static void place_arrows __PROTO((int layer));
 static void place_grid __PROTO((void));
 
-static void edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
+static int edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
 static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
@@ -170,6 +171,15 @@ static int style_from_fill __PROTO((struct fill_style_type *));
  * half the width of error bar tic mark
  */
 #define ERRORBARTIC GPMAX((t->h_tic/2),1)
+
+/* For tracking exit and re-entry of bounding curves that extend out of plot */
+/* these must match the bit values returned by clip_point(). */
+#define LEFT_EDGE	1
+#define RIGHT_EDGE	2
+#define BOTTOM_EDGE	4
+#define TOP_EDGE	8
+
+#define clip_fill	(plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED)
 
 /*
  * The Amiga SAS/C 6.2 compiler moans about macro envocations causing
@@ -2215,6 +2225,13 @@ plot_filledcurves(struct curve_points *plot)
     static gpiPoint *corners = 0;	/* array of corners */
     static int corners_allocated = 0;	/* how many allocated */
 
+    /* This set of variables is for tracking closed curve fill areas */
+    int exit_edge = 0;		/* Which edge did an OUTRANGE point exit via? */
+    int reentry_edge = 0;	/* Where did it reenter? */
+    int out_updown = 0;		/* And where has it been in the meantime? */
+    int out_leftright = 0;
+    int first_entry = 0;	/* If the start point of the curve was OUTRANGE */
+
     if (!t->filled_polygon) { /* filled polygons are not available */
 	plot_lines(plot);
 	return;
@@ -2277,8 +2294,6 @@ plot_filledcurves(struct curve_points *plot)
 					&plot->filledcurves_options)) {
 			corners[points].x = map_x(ex);
 			corners[points++].y = map_y(ey);
-			FPRINTF((stderr,"Breaking line segment at %d,%d = %g,%g\n",
-				corners[points-1].x,corners[points-1].y,ex,ey));
 			finish_filled_curve(points, corners, plot);
 			points = 0;
 			corners[points].x = map_x(ex);
@@ -2289,12 +2304,32 @@ plot_filledcurves(struct curve_points *plot)
 		    corners[points++].y = y;
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to inrange */
-		    if (!clip_lines1) {
+		    if (clip_fill) {  /* EAM concave bounding curves */
+			reentry_edge = edge_intersect(plot->points, i, &ex, &ey);
+
+			if (!exit_edge)
+			    /* Curve must have started outside the plot area */
+			    first_entry = reentry_edge;
+			else if (reentry_edge != exit_edge)
+			    /* Fill in dummy points at plot corners if the bounding curve */
+			    /* went around the corner while out of range */
+			    fill_missing_corners(corners, &points, 
+			    	exit_edge, reentry_edge, out_updown, out_leftright);
+
+			/* vector(map_x(ex),map_y(ey)); */
+			corners[points].x = map_x(ex);
+			corners[points++].y = map_y(ey);
+			/* vector(x,y); */
+			corners[points].x = x;
+			corners[points++].y = y;
+
+		    } else if (!clip_lines1) {
 			finish_filled_curve(points, corners, plot);
 			points = 0;
 			/* move(x,y) */
 			corners[points].x = x;
 			corners[points++].y = y;
+
 		    } else {
 			finish_filled_curve(points, corners, plot);
 			points = 0;
@@ -2305,7 +2340,6 @@ plot_filledcurves(struct curve_points *plot)
 			/* vector(x,y); */
 			corners[points].x = x;
 			corners[points++].y = y;
-
 		    }
 		} else {	/* prev == UNDEFINED */
 		    finish_filled_curve(points, corners, plot);
@@ -2320,17 +2354,62 @@ plot_filledcurves(struct curve_points *plot)
 		break;
 	    }
 	case OUTRANGE:{
+		if (clip_fill) {
+		    int where_was_I = clip_point(map_x(plot->points[i].x), map_y(plot->points[i].y));
+		    if (where_was_I & (LEFT_EDGE|RIGHT_EDGE))
+			out_leftright = where_was_I & (LEFT_EDGE|RIGHT_EDGE);
+		    if (where_was_I & (TOP_EDGE|BOTTOM_EDGE))
+			out_updown = where_was_I & (TOP_EDGE|BOTTOM_EDGE);
+		}
 		if (prev == INRANGE) {
 		    /* from inrange to outrange */
-		    if (clip_lines1) {
-			edge_intersect(plot->points, i, &ex, &ey);
+		    if (clip_lines1 || clip_fill) {
+			exit_edge = edge_intersect(plot->points, i, &ex, &ey);
 			/* vector(map_x(ex),map_y(ey)); */
 			corners[points].x = map_x(ex);
 			corners[points++].y = map_y(ey);
 		    }
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to outrange */
-		    if (clip_lines2) {
+		    if (clip_fill) {
+			if (two_edge_intersect(plot->points, i, lx, ly)) {
+			    coordinate temp;
+
+			    /* vector(map_x(lx[0]),map_y(ly[0])); */
+			    corners[points].x = map_x(lx[0]);
+			    corners[points++].y = map_y(ly[0]);
+
+			    /* Figure out which side we entered by */
+			    temp.x = plot->points[i].x;
+			    temp.y = plot->points[i].y;
+			    plot->points[i].x = lx[1];
+			    plot->points[i].y = ly[1];
+			    reentry_edge = edge_intersect(plot->points, i, &ex, &ey);
+			    plot->points[i].x = temp.x;
+			    plot->points[i].y = temp.y;
+
+			    if (!exit_edge) {
+			    /* Curve must have started outside the plot area */
+				first_entry = reentry_edge;
+			    } else if (reentry_edge != exit_edge) {
+				fill_missing_corners(corners, &points, exit_edge, reentry_edge,
+					out_updown, out_leftright);
+			    }
+			    /* vector(map_x(lx[1]),map_y(ly[1])); */
+			    corners[points].x = map_x(lx[1]);
+			    corners[points++].y = map_y(ly[1]);
+
+			    /* Figure out which side we left by */
+			    temp.x = plot->points[i-1].x;
+			    temp.y = plot->points[i-1].y;
+			    plot->points[i-1].x = lx[0];
+			    plot->points[i-1].y = ly[0];
+			    exit_edge = edge_intersect(plot->points, i, &ex, &ey);
+			    plot->points[i-1].x = temp.x;
+			    plot->points[i-1].y = temp.y;
+			}
+		    }
+		    else if (clip_lines2) {
 			if (two_edge_intersect(plot->points, i, lx, ly)) {
 			    finish_filled_curve(points, corners, plot);
 			    points = 0;
@@ -2345,16 +2424,70 @@ plot_filledcurves(struct curve_points *plot)
 		}
 		break;
 	    }
-	default:		/* just a safety */
 	case UNDEFINED:{
+		/* UNDEFINED flags a blank line in the input file. 
+		 * Unfortunately, it can also mean that the point was undefined.
+		 * Is there a clean way to detect or handle the latter case?
+		 */
+		if (prev != UNDEFINED) {
+		    if (first_entry && first_entry != exit_edge)
+			fill_missing_corners(corners, &points, 
+				exit_edge, first_entry, out_updown, out_leftright);
+		    finish_filled_curve(points, corners, plot);
+		    points = 0;
+		    exit_edge = reentry_edge = first_entry = 0;
+		}
 		break;
 	    }
+	default:		/* just a safety */
+		break;
 	}
 	prev = plot->points[i].type;
     }
+
+    if (clip_fill) {   /* Did we finish cleanly, or is there an unresolved corner-crossing? */
+	if (first_entry && first_entry != exit_edge) {
+	    fill_missing_corners(corners, &points, exit_edge, first_entry,
+	    	out_updown, out_leftright);
+	}
+    }
+    
     finish_filled_curve(points, corners, plot);
 }
 
+/*
+ * When the bounding curve of a filled area passes through the plot box but
+ * exits through a different edge than it entered by, in order to properly
+ * fill the enclosed area we must add dummy points at the plot corners.
+ */
+static void
+fill_missing_corners(gpiPoint *corners, int *points, int exit, int reentry, int updown, int leftright)
+{
+    if ((exit | reentry) == (LEFT_EDGE | RIGHT_EDGE)) {
+	corners[(*points)].x   = (exit & LEFT_EDGE)
+			? map_x(X_AXIS.min) : map_x(X_AXIS.max);
+	corners[(*points)++].y = (updown & TOP_EDGE)
+			? map_y(Y_AXIS.max) : map_y(Y_AXIS.min);
+	corners[(*points)].x   = (reentry & LEFT_EDGE)
+			? map_x(X_AXIS.min) : map_x(X_AXIS.max);
+	corners[(*points)++].y = (updown & TOP_EDGE)
+			? map_y(Y_AXIS.max) : map_y(Y_AXIS.min);
+    } else  if ((exit | reentry) == (BOTTOM_EDGE | TOP_EDGE)) {
+	corners[(*points)].x   = (leftright & LEFT_EDGE)
+			? map_x(X_AXIS.min) : map_x(X_AXIS.max);
+	corners[(*points)++].y = (exit & TOP_EDGE)
+			? map_y(Y_AXIS.max) : map_y(Y_AXIS.min);
+	corners[(*points)].x   = (leftright & LEFT_EDGE)
+			? map_x(X_AXIS.min) : map_x(X_AXIS.max);
+	corners[(*points)++].y = (reentry & TOP_EDGE)
+			? map_y(Y_AXIS.max) : map_y(Y_AXIS.min);
+    } else {
+	corners[(*points)].x   = (exit | reentry) & LEFT_EDGE
+			? map_x(X_AXIS.min) : map_x(X_AXIS.max);
+	corners[(*points)++].y = (exit | reentry) & TOP_EDGE
+			? map_y(Y_AXIS.max) : map_y(Y_AXIS.min);
+    }
+}
 /*
  * Fill the area between two curves
  */
@@ -3702,7 +3835,7 @@ plot_c_bars(struct curve_points *plot)
  * the point where an edge of the plot intersects the line segment defined
  * by the two points.
  */
-static void
+static int
 edge_intersect(
     struct coordinate GPHUGE *points, /* the points array */
     int i,			/* line segment from point i-1 to point i */
@@ -3740,14 +3873,14 @@ edge_intersect(
 	    /* can't get a direction to draw line, so simply
 	     * return INRANGE point */
 	    if (oy == -VERYLARGE)
-		return;
+		return LEFT_EDGE|BOTTOM_EDGE;
 
 	    *ex = X_AXIS.min;
-	    return;
+	    return LEFT_EDGE;
 	}
 	/* obviously oy is -VERYLARGE and ox != -VERYLARGE */
 	*ey = Y_AXIS.min;
-	return;
+	return BOTTOM_EDGE;
     }
     /*
      * Can't have case (ix == ox && iy == oy) as one point
@@ -3758,27 +3891,31 @@ edge_intersect(
 	/* assume inrange(iy, Y_AXIS.min, Y_AXIS.max) */
 	*ey = iy;		/* == oy */
 
-	if (inrange(X_AXIS.max, ix, ox))
+	if (inrange(X_AXIS.max, ix, ox)) {
 	    *ex = X_AXIS.max;
-	else if (inrange(X_AXIS.min, ix, ox))
+	    return RIGHT_EDGE;
+	} else if (inrange(X_AXIS.min, ix, ox)) {
 	    *ex = X_AXIS.min;
-	else {
+	    return LEFT_EDGE;
+	} else {
 	    graph_error("error in edge_intersect");
+	    return 0;
 	}
-	return;
     } else if (ix == ox) {
 	/* vertical line */
 	/* assume inrange(ix, X_AXIS.min, X_AXIS.max) */
 	*ex = ix;		/* == ox */
 
-	if (inrange(Y_AXIS.max, iy, oy))
+	if (inrange(Y_AXIS.max, iy, oy)) {
 	    *ey = Y_AXIS.max;
-	else if (inrange(Y_AXIS.min, iy, oy))
+	    return TOP_EDGE;
+	} else if (inrange(Y_AXIS.min, iy, oy)) {
 	    *ey = Y_AXIS.min;
-	else {
+	    return BOTTOM_EDGE;
+	} else {
 	    graph_error("error in edge_intersect");
+	    return 0;
 	}
-	return;
     }
     /* slanted line of some kind */
 
@@ -3788,7 +3925,7 @@ edge_intersect(
 	if (inrange(x, X_AXIS.min, X_AXIS.max)) {
 	    *ex = x;
 	    *ey = Y_AXIS.min;
-	    return;		/* yes */
+	    return BOTTOM_EDGE;		/* yes */
 	}
     }
     /* does it intersect Y_AXIS.max edge */
@@ -3797,7 +3934,7 @@ edge_intersect(
 	if (inrange(x, X_AXIS.min, X_AXIS.max)) {
 	    *ex = x;
 	    *ey = Y_AXIS.max;
-	    return;		/* yes */
+	    return TOP_EDGE;		/* yes */
 	}
     }
     /* does it intersect X_AXIS.min edge */
@@ -3806,7 +3943,7 @@ edge_intersect(
 	if (inrange(y, Y_AXIS.min, Y_AXIS.max)) {
 	    *ex = X_AXIS.min;
 	    *ey = y;
-	    return;
+	    return LEFT_EDGE;
 	}
     }
     /* does it intersect X_AXIS.max edge */
@@ -3815,7 +3952,7 @@ edge_intersect(
 	if (inrange(y, Y_AXIS.min, Y_AXIS.max)) {
 	    *ex = X_AXIS.max;
 	    *ey = y;
-	    return;
+	    return RIGHT_EDGE;
 	}
     }
     /* If we reach here, the inrange point is on the edge, and
@@ -3826,7 +3963,7 @@ edge_intersect(
      */
     *ex = ix;
     *ey = iy;
-    return;
+    return 0;
 }
 
 /* XXX - JG  */
@@ -4075,10 +4212,6 @@ two_edge_intersect(
     double swap;
     double t_min, t_max;
 
-#if 0
-    fprintf(stderr, "\ntwo_edge_intersect (%g, %g) and (%g, %g) : ", points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
-#endif
-
     /* nasty degenerate cases, effectively drawing to an infinity
      * point (?)  cope with them here, so don't process them as a
      * "real" OUTRANGE point
@@ -4100,9 +4233,6 @@ two_edge_intersect(
      * infinities to get a direction to draw line, so simply
      * return(FALSE) */
     if (count > 1) {
-#if 0
-	fprintf(stderr, "\tA\n");
-#endif
 	return (FALSE);
     }
 
@@ -4125,14 +4255,8 @@ two_edge_intersect(
 
 	    lx[1] = X_AXIS.max;
 	    ly[1] = iy;
-#if 0
-	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
-#endif
 	    return (TRUE);
 	} else {
-#if 0
-	    fprintf(stderr, "\tB\n");
-#endif
 	    return (FALSE);
 	}
     }
@@ -4155,14 +4279,8 @@ two_edge_intersect(
 
 	    lx[1] = ix;
 	    ly[1] = Y_AXIS.max;
-#if 0
-	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
-#endif
 	    return (TRUE);
 	} else {
-#if 0
-	    fprintf(stderr, "\tC\n");
-#endif
 	    return (FALSE);
 	}
     }
@@ -4198,9 +4316,6 @@ two_edge_intersect(
 
 	    lx[1] = ix;
 	    ly[1] = Y_AXIS.max;
-#if 0
-	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
-#endif
 	    return (TRUE);
 	} else
 	    return (FALSE);
@@ -4220,9 +4335,6 @@ two_edge_intersect(
 
 	    lx[1] = X_AXIS.max;
 	    ly[1] = iy;
-#if 0
-	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
-#endif
 	    return (TRUE);
 	} else
 	    return (FALSE);
@@ -4282,9 +4394,6 @@ two_edge_intersect(
 		   (Y_AXIS.max + 1e-5 * (Y_AXIS.max - Y_AXIS.min))))
     {
 
-#if 0
-	fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
-#endif
 	return (TRUE);
     }
     return (FALSE);
