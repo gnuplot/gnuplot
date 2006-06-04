@@ -1,6 +1,6 @@
 2006-06-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-	* src/wxterminal/gp_cairo.c: Add $Id$.
+	* src/wxterminal/gp_cairo.c: Add Id.
 	* src/wxterminal/gp_cairo.h: Likewise.
 	* src/wxterminal/gp_cairo_term.h: Likewise.
 	* src/wxterminal/wxt_gui.cpp: Likewise.
