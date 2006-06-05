@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.136 2006/03/06 18:36:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.137 2006/04/29 05:30:06 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2380,16 +2380,20 @@ rlgets(char *s, size_t n, const char *prompt)
 	/* If it's not an EOF */
 	if (line && *line) {
 #  ifdef HAVE_LIBREADLINE
-	    HIST_ENTRY *temp;
-
-	    /* Must always be called at this point or
-	     * 'temp' has the wrong value. */
+	    int found;
+	    /* Initialize readline history functions */
 	    using_history();
-	    temp = previous_history();
 
-	    if (temp == 0 || strcmp(temp->line, line) != 0)
-		add_history(line);
-
+	    found = history_search(line, -1);
+	    if (found != -1) {
+	    /* this line is already in the history, remove the earlier entry */
+		HIST_ENTRY *removed = remove_history(where_history());
+		/* according to history docs we are supposed to free the stuff */
+		if (removed->line) free(removed->line);
+		if (removed->data) free(removed->data);
+		free(removed);
+	    }
+	    add_history(line);
 #  else /* !HAVE_LIBREADLINE */
 	    add_history(line);
 #  endif

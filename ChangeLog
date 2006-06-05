@@ -1,3 +1,9 @@
+2006-06-05  Peter Weilbacher  <paepse@users.sourceforge.net>
+
+	SF Patch [1498727] "Remove duplicate entries in GNU readline history"
+
+	* command.c (rlgets): Remove duplicate entries in GNU readline history.
+
 2006-06-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.c: Add Id.
@@ -3172,7 +3178,7 @@
 	* term/estimate.trm (ENHest_put_text): Track estimated limits on
 	string y extent also.
 
-2005-05-22  Peter Weilbacher <paepse@users.sourceforge.net>
+2005-05-22  Peter Weilbacher  <paepse@users.sourceforge.net>
 
 	* src/gp_hist.h src/readline.c: Fix conditional dependencies on
 	READLINE and HAVE_LIBREADLINE so that ./configure + build is
@@ -3191,7 +3197,7 @@
 	while protecting itself from current_prompt == NULL.
 	(os_error, int_error, int_warn): Use new macro.
 
-2005-05-20  Peter Weilbacher <paepse@users.sourceforge.net>
+2005-05-20  Peter Weilbacher  <paepse@users.sourceforge.net>
 
 	SF Patch [981476] "Get history functions working with GNU readline"
 
