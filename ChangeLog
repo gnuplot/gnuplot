@@ -1,3 +1,9 @@
+2006-06-06  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/gp_cairo.c (device_y): Fix computation of
+	coordinates.
+	(gnuplot_y): Likewise.
+
 2006-06-05  Peter Weilbacher  <paepse@users.sourceforge.net>
 
 	SF Patch [1498727] "Remove duplicate entries in GNU readline history"

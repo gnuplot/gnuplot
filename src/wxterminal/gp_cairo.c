@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gp_cairo.c,v 1.8 2006/06/04 23:16:04 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1626,7 +1626,7 @@ double device_x(plot_struct *plot, double x)
 double device_y(plot_struct *plot, double y)
 {
 	double scaled_and_mirrored_y;
-	scaled_and_mirrored_y = plot->current_ymax - plot->yscale*y/plot->oversampling_scale;
+	scaled_and_mirrored_y = (plot->ymax - y)*plot->yscale/plot->oversampling_scale;
 	return scaled_and_mirrored_y + OFFSET;
 }
 
@@ -1640,7 +1640,7 @@ double gnuplot_x(plot_struct *plot, double x)
 double gnuplot_y(plot_struct *plot, double y)
 {
 	double scaled_and_mirrored_y;
-	scaled_and_mirrored_y = (plot->current_ymax -y + OFFSET)/plot->yscale*plot->oversampling_scale;
+	scaled_and_mirrored_y = plot->ymax +(-y + OFFSET)/plot->yscale*plot->oversampling_scale;
 	return scaled_and_mirrored_y;
 }
 
