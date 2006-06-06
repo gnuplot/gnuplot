@@ -438,3 +438,7 @@
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */
+
+/* Define to enable parsing of deprecated syntax */
+#define BACKWARDS_COMPATIBLE 1
+

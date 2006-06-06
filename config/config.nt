@@ -528,3 +528,7 @@
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1
+
+/* Define to enable parsing of deprecated syntax */
+#define BACKWARDS_COMPATIBLE 1
+

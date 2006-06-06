@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.38 2005/06/05 04:55:15 sfeam Exp $
+ * $Id: setshow.h,v 1.39 2005/08/07 09:43:31 mikulik Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -45,10 +45,6 @@
 #include "term_api.h"
 
 #define PROGRAM "G N U P L O T"  /* FIXME: move to show.c! */
-
-/* activate backwards compatible syntax */
-#define BACKWARDS_COMPATIBLE
-
 
 #define SAVE_NUM_OR_TIME(fp, x, axis)				\
 do{								\

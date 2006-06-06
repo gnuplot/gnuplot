@@ -1,3 +1,9 @@
+2006-06-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in src/setshow.h config/config.*: Move definition of
+	BACKWARDS_COMPATIBLE into config.h and the various config.* files rather
+	than setshow.h so that it is visible to all the source files.
+
 2006-06-06  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.c (device_y): Fix computation of

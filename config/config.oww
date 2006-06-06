@@ -80,3 +80,7 @@
 #define HAVE_TIME_T_IN_TIME_H	1
 #define HAVE_VFPRINTF		1
 
+
+/* Define to enable parsing of deprecated syntax */
+#define BACKWARDS_COMPATIBLE 1
+

@@ -556,3 +556,7 @@
 #if defined(PM_OLD_ENHANCED_TEXT) && !defined(PM_KEEP_OLD_ENHANCED_TEXT)
 #define PM_KEEP_OLD_ENHANCED_TEXT 1
 #endif
+
+/* Define to enable parsing of deprecated syntax */
+#define BACKWARDS_COMPATIBLE 1
+
