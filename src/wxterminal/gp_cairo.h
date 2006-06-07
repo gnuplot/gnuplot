@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gp_cairo.h,v 1.2 2006/06/04 23:16:04 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -103,13 +103,13 @@ typedef struct plot_struct {
 	 * For a static terminal, scales are 1 and sizes are those of the term table.
 	 * For an interactive terminal, they are used to handle window resizing.
 	 * xmax and ymax are the sizes known by gnuplot.
-	 * current_xmax and current_ymax are the device size, which may change when the window
+	 * device_xmax and device_ymax are the device size, which may change when the window
 	 * is resized.
 	 * xmax and ymax are stored here in addition to term->xmax and term->ymax,
 	 * to handle the case when another terminal is chosen (x11 for example), which
 	 * may change these variables whereas we want to keep the one used for our plot */
 	double xscale, yscale;
-	int current_xmax, current_ymax;
+	int device_xmax, device_ymax;
 	int xmax, ymax;
 
 	/* either GP_CAIRO_SCALE or 1, depending on rendering */

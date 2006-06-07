@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.8 2006/06/04 23:16:04 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.9 2006/06/06 21:45:31 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -142,7 +142,7 @@ rgb_color gp_cairo_linetype2color( int linetype )
 void gp_cairo_initialize_plot(plot_struct *plot)
 {
 	plot->xscale = 1.0; plot->yscale = 1.0;
-	plot->current_xmax = 1; plot->current_ymax = 1;
+	plot->device_xmax = 1; plot->device_ymax = 1;
 	plot->xmax = 1; plot->ymax = 1;
 	
 	plot->justify_mode = LEFT;
@@ -375,8 +375,8 @@ void gp_cairo_end_polygon(plot_struct *plot)
 	cairo_surface_t *surface;
 	surface = cairo_surface_create_similar(cairo_get_target(plot->cr),
                                              CAIRO_CONTENT_COLOR_ALPHA,
-                                             plot->current_xmax*SCALE,
-                                             plot->current_ymax*SCALE);
+                                             plot->device_xmax*SCALE,
+                                             plot->device_ymax*SCALE);
 	context = cairo_create(surface);
 	cairo_set_operator(context,CAIRO_OPERATOR_SATURATE);
 	if (plot->antialiasing)

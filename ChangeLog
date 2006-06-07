@@ -15,6 +15,12 @@
 	Remove hotpost arguments, take hotspot coordinates from the XPM files.
 	(wxtApp::OnInit): Update calls to LoadCursor.
 
+	* src/wxterminal/gp_cairo.h (current_xmax): Rename to the more
+	meaningful device_xmax.
+	(current_ymax): Rename to device_ymax.
+	* src/wxterminal/gp_cairo.c: All callers changed.
+	* src/wxterminal/wxt_gui.cpp: Likewise.
+
 2006-06-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/setshow.h config/config.*: Move definition of

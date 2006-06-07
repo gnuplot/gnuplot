@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.9 2006/06/04 23:16:05 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.10 2006/06/08 03:37:06 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -377,7 +377,7 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id, int xpos, int ypos, in
 void wxtFrame::OnCopy( wxCommandEvent& WXUNUSED( event ) )
 {
 	FPRINTF((stderr,"Copy to clipboard\n"));
-	int width = panel->plot.current_xmax, height = panel->plot.current_ymax;
+	int width = panel->plot.device_xmax, height = panel->plot.device_ymax;
 	wxBitmap cp_bitmap(width,height);
 	wxMemoryDC cp_dc;
 	wxClientDC dc(panel);
@@ -506,7 +506,7 @@ wxtPanel::wxtPanel( wxWindow *parent, wxWindowID id, const wxSize& size )
 
 	/* initialisations */
 	gp_cairo_initialize_plot(&plot);
-	GetSize(&(plot.current_xmax),&(plot.current_ymax));
+	GetSize(&(plot.device_xmax),&(plot.device_ymax));
 
 	mouse_x = 0;
 	mouse_y = 0;
@@ -595,7 +595,7 @@ void wxtPanel::OnPaint( wxPaintEvent &WXUNUSED(event) )
 void wxtPanel::Draw()
 {
 	wxClientDC dc(this);
-	wxRegion region(0, 0, plot.current_xmax, plot.current_ymax);
+	wxRegion region(0, 0, plot.device_xmax, plot.device_ymax);
 	DrawToDC(dc, region);
 }
 
@@ -631,7 +631,7 @@ void wxtPanel::DrawToDC(wxWindowDC &dc, wxRegion &region)
 		++upd;
 	}
 #elif defined(__WXMSW__)
-	BitBlt((HDC) buffered_dc.GetHDC(), 0, 0, plot.current_xmax, plot.current_ymax, hdc, 0, 0, SRCCOPY);
+	BitBlt((HDC) buffered_dc.GetHDC(), 0, 0, plot.device_xmax, plot.device_ymax, hdc, 0, 0, SRCCOPY);
 #else
 	buffered_dc.DrawBitmap(*cairo_bitmap, 0, 0, false);
 #endif
@@ -691,12 +691,12 @@ void wxtPanel::OnSize( wxSizeEvent& event )
 		return;
 
 	/* update window size, and scaling variables */
-	GetSize(&(plot.current_xmax),&(plot.current_ymax));
+	GetSize(&(plot.device_xmax),&(plot.device_ymax));
 
 	double new_xscale, new_yscale;
 	
-	new_xscale = ((double) plot.current_xmax)*plot.oversampling_scale/((double) plot.xmax);
-	new_yscale = ((double) plot.current_ymax)*plot.oversampling_scale/((double) plot.ymax);
+	new_xscale = ((double) plot.device_xmax)*plot.oversampling_scale/((double) plot.xmax);
+	new_yscale = ((double) plot.device_ymax)*plot.oversampling_scale/((double) plot.ymax);
 
 	/* We will keep the aspect ratio constant */
 	if (new_yscale == new_xscale) {
@@ -710,7 +710,7 @@ void wxtPanel::OnSize( wxSizeEvent& event )
 		plot.yscale = new_xscale;
 	}
 	FPRINTF((stderr,"panel OnSize %d %d %lf %lf\n",
-		plot.current_xmax, plot.current_ymax, plot.xscale,plot.yscale));
+		plot.device_xmax, plot.device_ymax, plot.xscale,plot.yscale));
 
 	/* create a new cairo context of the good size */
 	wxt_cairo_create_context();
@@ -1411,8 +1411,8 @@ void wxt_graphics()
 
 	/* set or refresh terminal size according to the window size */
 	/* oversampling_scale is updated in gp_cairo_initialize_context */
-	term->xmax = (unsigned int) wxt_current_plot->current_xmax*wxt_current_plot->oversampling_scale;
-	term->ymax = (unsigned int) wxt_current_plot->current_ymax*wxt_current_plot->oversampling_scale;
+	term->xmax = (unsigned int) wxt_current_plot->device_xmax*wxt_current_plot->oversampling_scale;
+	term->ymax = (unsigned int) wxt_current_plot->device_ymax*wxt_current_plot->oversampling_scale;
 	wxt_current_plot->xmax = term->xmax;
 	wxt_current_plot->ymax = term->ymax;
 	/* initialize encoding */
@@ -2042,8 +2042,8 @@ void wxtPanel::wxt_cairo_refresh()
 	cairo_surface_t *surface;
 	surface = cairo_surface_create_similar(cairo_get_target(plot.cr),
                                              CAIRO_CONTENT_COLOR_ALPHA,
-                                             plot.current_xmax,
-                                             plot.current_ymax);
+                                             plot.device_xmax,
+                                             plot.device_ymax);
 	context = cairo_create(surface);
 	cairo_set_operator(context,CAIRO_OPERATOR_SATURATE);
 
@@ -2422,7 +2422,7 @@ int wxtPanel::wxt_cairo_create_platform_context()
 		return 1;
 
 
-	gdkpixmap = gdk_pixmap_new(dc.GetWindow(), plot.current_xmax, plot.current_ymax, -1);
+	gdkpixmap = gdk_pixmap_new(dc.GetWindow(), plot.device_xmax, plot.device_ymax, -1);
 
 	if ( !GDK_IS_DRAWABLE(gdkpixmap) )
 		return 1;
@@ -2460,7 +2460,7 @@ int wxtPanel::wxt_cairo_create_platform_context()
 		return 1;
 
 	/* Create a bitmap big enough for our client rectangle. */
-	hbm = CreateCompatibleBitmap((HDC) dc.GetHDC(), plot.current_xmax, plot.current_ymax);
+	hbm = CreateCompatibleBitmap((HDC) dc.GetHDC(), plot.device_xmax, plot.device_ymax);
 
 	if ( !hbm )
 		return 1;
@@ -2494,8 +2494,8 @@ int wxtPanel::wxt_cairo_create_platform_context()
 	if (data32)
 		delete[] data32;
 
-	width = plot.current_xmax;
-	height = plot.current_ymax;
+	width = plot.device_xmax;
+	height = plot.device_ymax;
 
 	if (width<1||height<1)
 		return 1;
@@ -2520,8 +2520,8 @@ void wxtPanel::wxt_cairo_create_bitmap()
 	if (!data32)
 		return;
 
-	width = plot.current_xmax;
-	height = plot.current_ymax;
+	width = plot.device_xmax;
+	height = plot.device_ymax;
 
 	data24 = new unsigned char[3*width*height];
 
