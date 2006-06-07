@@ -1,3 +1,7 @@
+2006-06-07  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in (--with-wx-config=PATH): Fix wrong variable name.
+
 2006-06-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/setshow.h config/config.*: Move definition of
