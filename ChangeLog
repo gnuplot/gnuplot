@@ -2,6 +2,8 @@
 
 	* configure.in (--with-wx-config=PATH): Fix wrong variable name.
 
+	* term.c (init_terminal) [WXWIDGETS]: Take DEFAULTTERM into account.
+
 2006-06-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/setshow.h config/config.*: Move definition of
