@@ -2,7 +2,18 @@
 
 	* configure.in (--with-wx-config=PATH): Fix wrong variable name.
 
-	* term.c (init_terminal) [WXWIDGETS]: Take DEFAULTTERM into account.
+	* src/term.c (init_terminal) [WXWIDGETS]: Take DEFAULTTERM into account.
+
+	* src/wxterminal/bitmaps/xpm/cross.xpm:
+	* src/wxterminal/bitmaps/xpm/right.xpm:
+	* src/wxterminal/bitmaps/xpm/rotate.xpm:
+	* src/wxterminal/bitmaps/xpm/size.xpm:
+	Write the hotspot coordinates directly in the cursor files.
+
+	* src/wxterminal/wxt_gui.h (wxtApp::LoadCursor):
+	* src/wxterminal/wxt_gui.cpp (wxtApp::LoadCursor):
+	Remove hotpost arguments, take hotspot coordinates from the XPM files.
+	(wxtApp::OnInit): Update calls to LoadCursor.
 
 2006-06-06  Ethan A Merritt  <merritt@u.washington.edu>
 

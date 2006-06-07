@@ -1,6 +1,6 @@
 /* XPM */
 static char *rotate[]={
-"16 16 3 1",
+"16 16 3 1 7 7",
 ". c None",
 "a c #000000",
 "# c #ffffff",

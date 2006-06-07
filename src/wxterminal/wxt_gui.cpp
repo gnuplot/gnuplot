@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: wxt_gui.cpp,v 1.9 2006/06/04 23:16:05 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -253,10 +253,10 @@ bool wxtApp::OnInit()
 		fprintf(stderr,"Can\'t load PNG icon(s) of the toolbar.\n");
 
 	/* load cursors */
-	LoadCursor(wxt_cursor_cross, cross, 7, 7);
-	LoadCursor(wxt_cursor_right, right, 15, 0);
-	LoadCursor(wxt_cursor_rotate, rotate, 7, 7);
-	LoadCursor(wxt_cursor_size, size, 7, 7);
+	LoadCursor(wxt_cursor_cross, cross);
+	LoadCursor(wxt_cursor_right, right);
+	LoadCursor(wxt_cursor_rotate, rotate);
+	LoadCursor(wxt_cursor_size, size);
 
 	/* Initialize the config object */
 	/* application and vendor name are used by wxConfig to construct the name
@@ -284,10 +284,14 @@ bool wxtApp::LoadPngIcon(wxString path, int icon_number)
 }
 
 /* load a cursor */
-void wxtApp::LoadCursor(wxCursor &cursor, char* xpm_bits[], int hotspot_x, int hotspot_y)
+void wxtApp::LoadCursor(wxCursor &cursor, char* xpm_bits[])
 {
+	int hotspot_x, hotspot_y;
 	wxBitmap cursor_bitmap = wxBitmap(xpm_bits);
 	wxImage cursor_image = cursor_bitmap.ConvertToImage();
+	/* XPM spec : first string is :
+	 * width height ncolors charperpixel hotspotx hotspoty */
+	sscanf(xpm_bits[0], "%*d %*d %*d %*d %d %d", &hotspot_x, &hotspot_y);
 	cursor_image.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, hotspot_x);
 	cursor_image.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, hotspot_y);
 	cursor = wxCursor(cursor_image);
