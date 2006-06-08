@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: wxt_term.h,v 1.3 2006/06/04 23:16:05 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -58,41 +58,41 @@
 extern "C" {
 #endif /*__cplusplus*/
 
-extern void wxt_init(void);
-extern void wxt_graphics(void);
-extern void wxt_text(void);
-extern void wxt_linetype(int linetype);
-extern void wxt_move(unsigned int x, unsigned int y);
-extern void wxt_vector(unsigned int x, unsigned int y);
-extern void wxt_put_text(unsigned int x, unsigned int y, const char *str);
-extern void wxt_reset(void);
-extern int wxt_justify_text(enum JUSTIFY mode);
-extern void wxt_point(unsigned int x, unsigned int y, int pointstyle);
-extern void wxt_linewidth(double linewidth);
-extern int wxt_text_angle(int ang);
-extern void wxt_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
-extern int wxt_set_font __PROTO ((const char *font));
-extern void wxt_pointsize(double ptsize);
+void wxt_init(void);
+void wxt_graphics(void);
+void wxt_text(void);
+void wxt_linetype(int linetype);
+void wxt_move(unsigned int x, unsigned int y);
+void wxt_vector(unsigned int x, unsigned int y);
+void wxt_put_text(unsigned int x, unsigned int y, const char *str);
+void wxt_reset(void);
+int wxt_justify_text(enum JUSTIFY mode);
+void wxt_point(unsigned int x, unsigned int y, int pointstyle);
+void wxt_linewidth(double linewidth);
+int wxt_text_angle(int ang);
+void wxt_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
+int wxt_set_font __PROTO ((const char *font));
+void wxt_pointsize(double ptsize);
 #ifdef WITH_IMAGE
-extern void wxt_image(unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode);
+void wxt_image(unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode);
 #endif /*WITH_IMAGE*/
 # ifdef USE_MOUSE
-extern int wxt_waitforinput(void);
-extern void wxt_put_tmptext(int, const char str[]);
-extern void wxt_set_ruler(int x, int y);
-extern void wxt_set_cursor(int, int, int);
-extern void wxt_set_clipboard(const char s[]);
+int wxt_waitforinput(void);
+void wxt_put_tmptext(int, const char str[]);
+void wxt_set_ruler(int x, int y);
+void wxt_set_cursor(int, int, int);
+void wxt_set_clipboard(const char s[]);
 # endif /*USE_MOUSE*/
-extern int wxt_make_palette(t_sm_palette *palette);
-extern void wxt_set_color(t_colorspec *colorspec);
-extern void wxt_filled_polygon(int n, gpiPoint * corners);
+int wxt_make_palette(t_sm_palette *palette);
+void wxt_set_color(t_colorspec *colorspec);
+void wxt_filled_polygon(int n, gpiPoint * corners);
 
-extern void wxt_raise_terminal_window __PROTO((int));
-extern void wxt_raise_terminal_group __PROTO((void));
-extern void wxt_lower_terminal_window __PROTO((int));
-extern void wxt_lower_terminal_group __PROTO((void));
-extern void wxt_close_terminal_window __PROTO((int number));
-extern void wxt_update_title __PROTO((int number));
+void wxt_raise_terminal_window __PROTO((int));
+void wxt_raise_terminal_group __PROTO((void));
+void wxt_lower_terminal_window __PROTO((int));
+void wxt_lower_terminal_group __PROTO((void));
+void wxt_close_terminal_window __PROTO((int number));
+void wxt_update_title __PROTO((int number));
 
 /* state variables shared between wxt.trm and wxt_gui.cpp */
 extern int wxt_window_number;

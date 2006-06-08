@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: wxt_plot.h,v 1.3 2006/06/04 23:16:05 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_plot.h */
@@ -58,11 +58,12 @@
 extern "C" {
 #endif /*__cplusplus*/
 
-extern void wxt_atexit(int argc, char **argv);
+/* cleanup at exit, and handle 'persist' setting */
+void wxt_atexit(int argc, char **argv);
 
 #ifdef _Windows
 /* handle mouse events when the pause window is displayed */
-extern int wxt_terminal_events(void);
+int wxt_terminal_events(void);
 #endif /*_Windows*/
 
 #ifdef __cplusplus

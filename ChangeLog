@@ -1,3 +1,10 @@
+2006-06-08  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/gp_cairo.h:
+	* src/wxterminal/wxt_plot.h:
+	* src/wxterminal/wxt_term.h:
+	Remove "extern" for functions.
+
 2006-06-07  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in (--with-wx-config=PATH): Fix wrong variable name.

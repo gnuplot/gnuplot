@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.2 2006/06/04 23:16:04 tlecomte Exp $
+ * $Id: gp_cairo.h,v 1.3 2006/06/08 03:53:06 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -169,51 +169,51 @@ GP_CAIRO_DASH
 };
 
 /* correspondance between gnuplot's linetypes and colors */
-extern rgb_color gp_cairo_linetype2color( int linetype );
+rgb_color gp_cairo_linetype2color( int linetype );
 
 /* functions to handle scaling between device and gnuplot coordinates */
-extern double device_x(plot_struct *plot, double x);
-extern double device_y(plot_struct *plot, double y);
-extern double gnuplot_x(plot_struct *plot, double x);
-extern double gnuplot_y(plot_struct *plot, double y);
+double device_x(plot_struct *plot, double x);
+double device_y(plot_struct *plot, double y);
+double gnuplot_x(plot_struct *plot, double x);
+double gnuplot_y(plot_struct *plot, double y);
 
 /* initialize all fields of the plot structure */
-extern void gp_cairo_initialize_plot(plot_struct *plot);
+void gp_cairo_initialize_plot(plot_struct *plot);
 /* initialize the transformation matrix of the drawing context and other details */
 /* Depends on the setting of xscale and yscale */
-extern void gp_cairo_initialize_context(plot_struct *plot);
+void gp_cairo_initialize_context(plot_struct *plot);
 
 /* functions used to process gnuplot commands */
-extern void gp_cairo_move(plot_struct *plot, int x, int y);
-extern void gp_cairo_vector(plot_struct *plot, int x, int y);
-extern void gp_cairo_stroke(plot_struct *plot);
-extern void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* str);
-extern void gp_cairo_draw_enhanced_text(plot_struct *plot, int x1, int y1, const char* str);
-extern void gp_cairo_draw_point(plot_struct *plot, int x1, int y1, int style);
-extern void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int height, int style);
-extern void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners);
-extern void gp_cairo_end_polygon(plot_struct *plot);
+void gp_cairo_move(plot_struct *plot, int x, int y);
+void gp_cairo_vector(plot_struct *plot, int x, int y);
+void gp_cairo_stroke(plot_struct *plot);
+void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* str);
+void gp_cairo_draw_enhanced_text(plot_struct *plot, int x1, int y1, const char* str);
+void gp_cairo_draw_point(plot_struct *plot, int x1, int y1, int style);
+void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int height, int style);
+void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners);
+void gp_cairo_end_polygon(plot_struct *plot);
 #ifdef WITH_IMAGE
-extern void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int M, int N, t_imagecolor color_mode);
+void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int M, int N, t_imagecolor color_mode);
 #endif /*WITH_IMAGE*/
-extern void gp_cairo_set_color(plot_struct *plot, rgb_color color);
-extern void gp_cairo_set_linestyle(plot_struct *plot, int linestyle);
-extern void gp_cairo_set_linetype(plot_struct *plot, int linetype);
-extern void gp_cairo_set_pointsize(plot_struct *plot, double pointsize);
-extern void gp_cairo_set_justify(plot_struct *plot, JUSTIFY mode);
-extern void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize);
-extern void gp_cairo_set_linewidth(plot_struct *plot, double linewidth);
-extern void gp_cairo_set_textangle(plot_struct *plot, double angle);
+void gp_cairo_set_color(plot_struct *plot, rgb_color color);
+void gp_cairo_set_linestyle(plot_struct *plot, int linestyle);
+void gp_cairo_set_linetype(plot_struct *plot, int linetype);
+void gp_cairo_set_pointsize(plot_struct *plot, double pointsize);
+void gp_cairo_set_justify(plot_struct *plot, JUSTIFY mode);
+void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize);
+void gp_cairo_set_linewidth(plot_struct *plot, double linewidth);
+void gp_cairo_set_textangle(plot_struct *plot, double angle);
 
 /* erase the contents of the cairo drawing context */
-extern void gp_cairo_clear(plot_struct *plot);
+void gp_cairo_clear(plot_struct *plot);
 
 /* fill term->h_char, v_char, h_tic, v_tic
  * Depends on plot->fontsize and fontname */
-extern void gp_cairo_set_termvar(plot_struct *plot);
+void gp_cairo_set_termvar(plot_struct *plot);
 
 /* translate plot->encoding int to char* suitable for glib */
-extern const char* gp_cairo_get_encoding(plot_struct *plot);
+const char* gp_cairo_get_encoding(plot_struct *plot);
 
 #ifdef __cplusplus
 }
