@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.185 2006/06/07 03:54:01 sfeam Exp $
+dnl $Id: configure.in,v 1.186 2006/06/07 07:28:20 tlecomte Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -269,8 +269,8 @@ AC_ARG_WITH(readline,dnl
 
 dnl Gnuplot history
 AC_ARG_ENABLE(history-file,dnl
-[  --enable-history-file   use history file],,
-  test -z "$enable_history_file" && enable_history_file=no)
+[  --disable-history-file  do not use history file],,
+  test -z "$enable_history_file" && enable_history_file=yes)
 
 dnl GNU readline and the required terminal library
 if test "$with_readline" != no; then

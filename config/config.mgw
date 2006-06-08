@@ -33,8 +33,7 @@
 /* #undef GNUGRAPH */
 
 /* Define if you want to use a gnuplot history file with GNU readline. */
-/* #undef GNUPLOT_HISTORY */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+#define GNUPLOT_HISTORY 1
 
 /* Define to allow 'fit' to create parameter error variables. */
 #define GP_FIT_ERRVARS 1
