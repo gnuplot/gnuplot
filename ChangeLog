@@ -11,6 +11,11 @@
 	The new version handles the full general case by using string variables.
 	Bugfix: #1497957
 
+	* src/color.c (make_palette): Revert optimization (18 Mar 2006) that
+	only sent palette information for a plot if it had changed since the 
+	previous plot.  This doesn't work for PostScript output, because the
+	pages may be viewed out of order.  Bugfix.
+
 2006-06-08  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.h:
