@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.22 2005/03/06 02:20:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.23 2006/04/08 23:53:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -972,23 +972,27 @@ f_ceil(union argument *arg)
 #undef pop
 #endif
 
-/* JSR - Check to see if a variable is defined */
-/* Returns 1 if the varibale is defined, 0 if not */
-/* If a constant is passed then returns the constant, i.e. isvar(10)=10 */
+#ifdef GP_STRING_VARS
+/* EAM - replacement for defined(foo) + f_pushv + f_isvar
+ *       implements      exists("foo") instead
+ */
 void
-f_isvar(union argument *arg)
+f_exists(union argument *arg)
 {
     struct value a;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
 
-    /* The actual work of this function is done in the PUSHV internal function
-       which should have checked the variable and pushed a value onto the stack */
-
-    push(Ginteger(&a, a.v.int_val));
-
+    if (a.type == STRING) {
+	struct udvt_entry *udv = add_udv_by_name(a.v.string_val);
+	gpfree_string(&a);
+	push(Ginteger(&a, udv->udv_undef ? 0 : 1));
+    } else {
+	push(Ginteger(&a, 0));
+    }
 }
+#endif
 
 /* bessel function approximations */
 static double

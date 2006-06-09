@@ -1,5 +1,5 @@
 /*
- * $Id: internal.h,v 1.13 2005/07/02 20:01:51 sfeam Exp $
+ * $Id: internal.h,v 1.14 2005/07/10 18:24:00 sfeam Exp $
  */
 
 /* GNUPLOT - internal.h */
@@ -51,7 +51,6 @@ void f_pushc __PROTO((union argument *x));
 void f_pushd1 __PROTO((union argument *x));
 void f_pushd2 __PROTO((union argument *x));
 void f_pushd __PROTO((union argument *x));
-void f_pushv __PROTO((union argument *x));
 void f_call __PROTO((union argument *x));
 void f_calln __PROTO((union argument *x));
 void f_lnot __PROTO((union argument *x));

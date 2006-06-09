@@ -55,6 +55,7 @@ News, changes and fixes since gnuplot version 4.0
 * CHANGE X-resource gnuplot*exportselection:off disables plot->clipboard export
 * CHANGE prefer use of offset keyword in 'set [xyz]label "foo" offset -1,-1'
 * CHANGE 'set table "outfile"; ...; unset table' replaces 'set term table'
+* CHANGE 'defined(foo)' is deprecated; new syntax is 'exists("foo")'
 * FIXED empty datafiles are not a fatal error
 * FIXED setenv GNUTERM now works for png, jpeg, and gif drivers
 * FIXED PostScript output can be restricted to Level 1 compatible features
@@ -62,6 +63,7 @@ News, changes and fixes since gnuplot version 4.0
 * FIXED limit size of X11 requests to half the maximum allowed by the X display
 * FIXED arrowheads drawn in solid lines even if the shaft is dotted (PostScript)
 * FIXED estimate true effective length of strings in enhanced text mode
+* FIXED clipping of filled curves
 
 
 Changes between gnuplot versions 3.7.2 and 4.0

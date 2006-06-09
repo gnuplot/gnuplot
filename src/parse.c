@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.42 2005/07/23 04:19:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.43 2005/11/27 19:30:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -83,9 +83,6 @@ static int is_builtin_function __PROTO((int t_num));
 
 static struct at_type *at = NULL;
 static int at_size = 0;
-
-/* isvar - When this variable is true PUSH operations become PUSHV */
-static TBOOLEAN push_vars = TRUE;
 
 static void
 convert(struct value *val_ptr, int t_num)
@@ -371,14 +368,18 @@ parse_primary_expression()
 	    num_params.type = INTGR;
 
 	    if (whichfunc) {
-		/* Check to see if it is isvar */
-		/* Is so then turn off normal variable pushing */
-                /* Push variable definition state instead */
+#ifdef BACKWARDS_COMPATIBLE
+		/* Deprecated syntax:   if (defined(foo)) ...  */
+		/* New syntax:          if (exists("foo")) ... */
 		if (strcmp(ft[whichfunc].f_name,"defined")==0) {
-			push_vars=FALSE;
+		    struct udvt_entry *udv = add_udv(c_token+2);
+		    union argument *foo = add_action(PUSHC);
+		    foo->v_arg.type = INTGR;
+		    foo->v_arg.v.int_val = udv->udv_undef ? 0 : 1;
+		    c_token += 4;  /* skip past "defined ( <foo> ) " */
+		    return;
 		}
-
-		/* it's a standard function */
+#endif
 		c_token += 2;	/* skip fnc name and '(' */
 		parse_expression(); /* parse fnc argument */
 		num_params.v.int_val = 1;
@@ -404,9 +405,6 @@ parse_primary_expression()
 		}
 #endif
 		(void) add_action(whichfunc);
-
-		 /* Turn normal variable pushing back on */
-		push_vars=TRUE;
 
 	    } else {
 		/* it's a call to a user-defined function */
@@ -460,11 +458,7 @@ parse_primary_expression()
 	    }
 	    /* its a variable, with no dummies active - div */
 	} else {
-            if (push_vars == FALSE)
-		add_action(PUSHV)->udv_arg = add_udv(c_token);
-	    else
-		add_action(PUSH)->udv_arg = add_udv(c_token);
-
+	    add_action(PUSH)->udv_arg = add_udv(c_token);
 	    c_token++;
 	}
     }

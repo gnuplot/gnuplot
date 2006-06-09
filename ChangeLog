@@ -1,3 +1,16 @@
+2006-06-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c src/eval.h src/internal.c src/internal.h src/parse.c
+	src/standard.c src/standard.h docs/gnuplot.doc NEWS:
+
+	Deprecate built-in pseudo-function  `if defined(foo)`
+	Replace it with string function exists("foo")
+	The previous version (defined) tried to bypass normal expression
+	parsing, but succeeded only for the simplest cases. This variant,
+	although deprecated, is still supported by BACKWARDS_COMPATIBLE.
+	The new version handles the full general case by using string variables.
+	Bugfix: #1497957
+
 2006-06-08  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.h:

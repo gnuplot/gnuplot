@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.37 2005/07/14 23:10:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.38 2005/11/27 19:30:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -112,22 +112,6 @@ f_push(union argument *x)
     }
     push(&(udv->udv_value));
 }
-
-/* JSR - Like f_push but pushes the defined/undefined status of the argument */
-void
-f_pushv(union argument *x)
-{
-    struct udvt_entry *udv;
-    struct value a;
-
-    udv = x->udv_arg;
-
-    if (udv->udv_undef)
-        push(Ginteger(&a, 0));
-    else
-        push(Ginteger(&a, 1));
-}
-
 
 void
 f_pushc(union argument *x)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.38 2005/08/12 17:42:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.39 2005/11/27 19:30:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -88,7 +88,6 @@ const struct ft_entry GPFAR ft[] =
     {"pushd1",  f_pushd1},
     {"pushd2",  f_pushd2},
     {"pushd",  f_pushd},
-    {"pushv", f_pushv},
     {"call",  f_call},
     {"calln",  f_calln},
     {"lnot",  f_lnot},
@@ -160,7 +159,9 @@ const struct ft_entry GPFAR ft[] =
     {"rand",  f_rand},
     {"floor",  f_floor},
     {"ceil",  f_ceil},
-    {"defined",  f_isvar},       /* isvar function */
+#ifdef BACKWARDS_COMPATIBLE
+    {"defined",  f_exists},       /* deprecated syntax defined(foo) */
+#endif
 
     {"norm",  f_normal},	/* XXX-JG */
     {"inverf",  f_inverse_erf},	/* XXX-JG */
@@ -193,6 +194,7 @@ const struct ft_entry GPFAR ft[] =
     {"word", f_words},		/* for string variables only */
     {"words", f_words},		/* implemented as word(s,-1) */
     {"system", f_system},       /* "dynamic backtics" */
+    {"exists", f_exists},	/* exists("foo") replaces defined(foo) */
 #endif
 
     {NULL, NULL}

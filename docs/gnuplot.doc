@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.352 2006/04/26 10:17:00 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.353 2006/05/21 19:57:51 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1188,9 +1188,16 @@ C
 4 defined
 ?expressions functions defined
 ?functions defined
-#defined(X) & variable name & returns 1 if a variable X is defined, 0 otherwise. \\
-%defined(X)@variable name@ returns 1 if a variable X is defined, 0 otherwise.
- `defined(X)` returns 1 if a variable named X has been defined, otherwise
+#defined(X) & variable name & [DEPRECATED] returns 1 if X is defined, 0 otherwise. \\
+%defined(X)@variable name@ [DEPRECATED] returns 1 if X is defined, 0 otherwise.
+ `defined(X)` [DEPRECATED] returns 1 if a variable named X has been defined, otherwise
+ it returns 0.
+4 exists 
+?expressions functions exists
+?functions exists
+#exists("X") & "variable name" & returns 1 if a variable named X is defined, 0 otherwise. \\
+%exists("X")@"variable name"@ returns 1 if a variable named X is defined, 0 otherwise.
+ `exists("X")` returns 1 if a variable named X has been defined, otherwise
  it returns 0.
 4 stringcolumn
 ?expressions functions stringcolumn
