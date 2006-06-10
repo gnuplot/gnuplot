@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.3 2006/06/04 23:16:05 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.4 2006/06/08 03:37:09 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -240,8 +240,10 @@ typedef enum wxt_gp_command_t {
 	command_linewidth,
 	command_text_angle,
 	command_fillbox,
-	command_filled_polygon,
-	command_image
+	command_filled_polygon
+#ifdef WITH_IMAGE
+	,command_image
+#endif /* WITH_IMAGE */
 } wxt_gp_command_t;
 
 /* base structure for storing gnuplot commands */
@@ -257,13 +259,15 @@ typedef struct gp_command {
 	unsigned int y4;
 	int integer_value;
 	int integer_value2;
-	t_imagecolor color_mode;
 	double double_value;
 	char *string;
 	gpiPoint *corners;
 	enum JUSTIFY mode;
-	coordval * image;
 	rgb_color color;
+#ifdef WITH_IMAGE
+	t_imagecolor color_mode;
+	coordval * image;
+#endif /* WITH_IMAGE */
 } gp_command;
 
 /* declare a type for our list of gnuplot commands */

@@ -3,6 +3,10 @@
 	* docs/Mafefile.in (CORETERM): Add wxt.trm in the list of
 	terminals.
 
+	* src/wxterminal/wxt_gui.cpp:
+	* src/wxterminal/wxt_gui.h:
+	Fix compilation with --disable-with-image.
+
 2006-06-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/eval.h src/internal.c src/internal.h src/parse.c

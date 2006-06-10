@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.10 2006/06/08 03:37:06 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.11 2006/06/08 03:53:07 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -572,8 +572,10 @@ void wxtPanel::ClearCommandlist()
 			delete[] iter->string;
 		if (iter->command == command_filled_polygon)
 			delete[] iter->corners;
+#ifdef WITH_IMAGE
 		if (iter->command == command_image)
 			delete[] iter->image;
+#endif /* WITH_IMAGE */
 	}
 
 	command_list.clear();
