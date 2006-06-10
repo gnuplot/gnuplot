@@ -1,3 +1,8 @@
+2006-06-10  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* docs/Mafefile.in (CORETERM): Add wxt.trm in the list of
+	terminals.
+
 2006-06-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/eval.h src/internal.c src/internal.h src/parse.c
