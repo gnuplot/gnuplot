@@ -3,6 +3,9 @@
 	* docs/Mafefile.in (CORETERM): Add wxt.trm in the list of
 	terminals.
 
+	* docs/gnuplot.doc : Add mentions of `wxt` among other terminals when
+	useful (mouse, raise, lower, image, set_output, fillstyles).
+
 	* src/wxterminal/wxt_gui.cpp:
 	Fix compilation with --disable-with-image.
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.353 2006/05/21 19:57:51 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.354 2006/06/10 00:35:25 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1741,8 +1741,8 @@ C ... and restart the table:
 
 2 mouse input
 ?mouse input
- The `x11`, `pm`, `windows`, and `ggi` terminals allow interaction with the
- current plot using the mouse. They also support the definition of hotkeys
+ The `x11`, `pm`, `windows`, `ggi`, and `wxt` terminals allow interaction with
+ the current plot using the mouse. They also support the definition of hotkeys
  to activate pre-defined functions by hitting a single key while the mouse
  focus is in the active plot window.  It is even possible to combine mouse
  input with `batch` command scripts, by invoking the command `pause mouse`
@@ -2886,15 +2886,15 @@ C ... and restart the table:
 ?commands lower
 ?lower
  Syntax:
-       lower {x11_plot_window_nb}
+       lower {plot_window_nb}
 
  The `lower` command lowers (opposite to `raise`) plot window(s) associated
- with the interactive terminal of your gnuplot session, i.e. `pm`, `win` or
- `x11`. It puts the plot window to bottom in the z-order windows stack of the
- window manager of your desktop.
+ with the interactive terminal of your gnuplot session, i.e. `pm`, `win`, `wxt`
+ or `x11`. It puts the plot window to bottom in the z-order windows stack of
+ the window manager of your desktop.
 
- As `x11` supports multiple plot windows, then by default it lowers these
- windows in descending order of most recently created on top to the least
+ As `x11` and `wxt` support multiple plot windows, then by default they lower
+ these windows in descending order of most recently created on top to the least
  recently created on bottom. If a plot number is supplied as an optional
  parameter, only the associated plot window will be lowered if it exists.
 
@@ -4325,15 +4325,15 @@ C ... and restart the table:
 ?commands raise
 ?raise
  Syntax:
-       raise {x11_plot_window_nb}
+       raise {plot_window_nb}
 
  The `raise` command raises (opposite to `lower`) plot window(s) associated
- with the interactive terminal of your gnuplot session, i.e. `pm`, `win` or
- `x11`. It puts the plot window to front (top) in the z-order windows stack of
- the window manager of your desktop.
+ with the interactive terminal of your gnuplot session, i.e. `pm`, `win`, `wxt`
+ or `x11`. It puts the plot window to front (top) in the z-order windows stack
+ of the window manager of your desktop.
 
- As `x11` supports multiple plot windows, then by default it raises these
- windows in descending order of most recently created on top to the least
+ As `x11` and `wxt` support multiple plot windows, then by default they raise
+ these windows in descending order of most recently created on top to the least
  recently created on bottom. If a plot number is supplied as an optional
  parameter, only the associated plot window will be raised if it exists.
 
@@ -6715,16 +6715,16 @@ C ... and restart the table:
 ?unset mouse
 ?mouse
 ?nomouse
- The command `set mouse` enables mouse actions. Currently the pm, x11, ggi and
- windows terminals are mouse enhanced. There are two mouse modes. The 2d-graph
- mode works for 2d graphs and for maps (i.e. splots with `set view` having
- z-rotation 0, 90, 180, 270 or 360 degrees, including `set view map`) and it
- allows tracing the position over graph, zooming, annotating graph etc. For 3d
- graphs `splot`, the view and scaling of the graph can be changed with mouse
- buttons 1 and 2. If additionally to these buttons the modifier <ctrl> is hold
- down, the coordinate system only is rotated which is useful for large data
- sets. A vertical motion of Button 2 with the shift key hold down changes the
- `ticslevel`.
+ The command `set mouse` enables mouse actions. Currently the pm, x11, ggi,
+ windows and wxt terminals are mouse enhanced. There are two mouse modes. The
+ 2d-graph mode works for 2d graphs and for maps (i.e. splots with `set view`
+ having z-rotation 0, 90, 180, 270 or 360 degrees, including `set view map`)
+ and it allows tracing the position over graph, zooming, annotating graph etc.
+ For 3d graphs `splot`, the view and scaling of the graph can be changed with
+ mouse buttons 1 and 2. If additionally to these buttons the modifier <ctrl> is
+ hold down, the coordinate system only is rotated which is useful for large
+ data sets. A vertical motion of Button 2 with the shift key hold down changes
+ the `ticslevel`.
 
  Mousing is not available in multiplot mode. When multiplot is finished using
  `unset multiplot`, then the mouse will be turned on again and acts on the
@@ -7083,7 +7083,7 @@ C ... and restart the table:
  output file opened by a previous invocation of `set output` will be closed
  and new output will be sent to STDOUT.  (If you give the command `set output
  "STDOUT"`, your output may be sent to a file named "STDOUT"!  ["May be", not
- "will be", because some terminals, like `x11`, ignore `set output`.])
+ "will be", because some terminals, like `x11` or `wxt`, ignore `set output`.])
 
  MSDOS users should note that the \ character has special significance in
  double-quoted strings, so single-quotes should be used for filenames in
@@ -8461,9 +8461,9 @@ C ... and restart the table:
 
  Currently only the following terminal drivers support fillstyles other
  than `empty`:
- x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
- jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
- tandy_60dpi. The BeOS driver (`be`) is untested.
+ x11, windows, pm, wxt, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii,
+ hp500c, jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc
+ and tandy_60dpi. The BeOS driver (`be`) is untested.
 5 boxxyerrorbars
 ?commands set style boxxyerrorbars
 ?set style boxxyerrorbars
@@ -8826,9 +8826,9 @@ C ... and restart the table:
 
  Currently only the following terminal drivers support data matrix images:
 
- x11 - Pixels are either repeated or decimated to fit the x11 resolution;
-       no other processing (filtering) is done.  Thus, aliasing may occur
-       when decimating images having high spatial frequency content.
+ x11 and wxt - Pixels are either repeated or decimated to fit the display
+       resolution; no other processing (filtering) is done.  Thus, aliasing may
+       occur when decimating images having high spatial frequency content.
 
  postscript (pslatex, epslatex, pstex) - Image is copied in its original
        resolution, and sample interpolation is turned off.
