@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.4 2006/06/08 03:37:09 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.5 2006/06/10 22:51:58 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -104,7 +104,14 @@
 #include <list>
 
 extern "C" {
-# include "stdfn.h"
+/* for stdfn.h, JUSTIFY, encoding, *term definition, color.h */
+# include "term_api.h"
+/* for do_event declaration */
+# include "mouse.h"
+/* for rgb functions */
+# include "getcolor.h"
+/* for paused_for_mouse, PAUSE_BUTTON1 and friends */
+# include "command.h"
 }
 
 /* if the gtk headers are available, use them to tweak some behaviours */
@@ -131,19 +138,6 @@ extern "C" {
 #endif
 
 extern "C" {
-/* for JUSTIFY, encoding, *term definition, color.h */
-# include "term_api.h"
-/* for do_event declaration */
-# include "mouse.h"
-/* for rgb functions */
-# include "getcolor.h"
-/* for paused_for_mouse, PAUSE_BUTTON1 and friends */
-# include "command.h"
-/* for interactive, and bail_to_command_line declaration */
-# include "plot.h"
-/* for int_error declaration */
-# include "util.h"
-
 /* Windows native backend,
  * redefinition of fprintf, getch...
  * console window */

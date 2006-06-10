@@ -4,8 +4,16 @@
 	terminals.
 
 	* src/wxterminal/wxt_gui.cpp:
+	Fix compilation with --disable-with-image.
+
 	* src/wxterminal/wxt_gui.h:
 	Fix compilation with --disable-with-image.
+	Cleanup includes.
+
+	* src/wxterminal/gp_cairo.c
+	(gp_cairo_draw_polygon): Replace malloc by gp_alloc.
+	(gp_cairo_draw_image): Likewise.
+	(gp_cairo_convert_symbol_to_unicode): Likewise.
 
 2006-06-09  Ethan A Merritt  <merritt@u.washington.edu>
 

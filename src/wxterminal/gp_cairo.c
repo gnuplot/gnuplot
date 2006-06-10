@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.9 2006/06/06 21:45:31 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.10 2006/06/08 03:53:06 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -315,10 +315,10 @@ void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 	gp_cairo_stroke(plot);
 
 	path_item *path;
-	path = (path_item*) malloc(sizeof(path_item));
+	path = (path_item*) gp_alloc(sizeof(path_item), "gp_cairo : polygon path");
 
 	path->n = n;
-	path->corners = malloc(n*sizeof(gpiPoint));
+	path->corners = (gpiPoint*) gp_alloc(n*sizeof(gpiPoint), "gp_cairo : polygon corners");
 	for(i=0;i<n;i++)
 		*(path->corners + i) = *corners++;
 
@@ -895,7 +895,7 @@ void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, in
 
 	/* cairo image buffer, upper bits are alpha, then r, g and b
 	 * Depends on endianess */
-	image255 = (unsigned int*) malloc(M*N*sizeof(unsigned int));
+	image255 = (unsigned int*) gp_alloc(M*N*sizeof(unsigned int), "gp_cairo : draw image");
 	image255copy = image255;
 
 	/* TrueColor 24-bit plot->color mode */
@@ -1700,7 +1700,7 @@ gchar* gp_cairo_convert_symbol_to_unicode(plot_struct *plot, char* string)
 	/* Assume that the output string in utf8 won't use more than 8 bytes per character/
 	 * The utf8 specification fixes the limit to 4 bytes per character, but here we can also
 	 * composite two characters */
-	output = (gchar*) g_malloc((4*strlen(string)+1)*sizeof(gchar));
+	output = (gchar*) gp_alloc((4*strlen(string)+1)*sizeof(gchar),"Symbol to unicode");
 	iter_mod = output;
 	imax = g_utf8_strlen(string_utf8,-1) + 1;
 
