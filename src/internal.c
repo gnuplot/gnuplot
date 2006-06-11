@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.38 2005/11/27 19:30:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.39 2006/06/10 00:35:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -157,6 +157,9 @@ f_call(union argument *x)
     save_dummy = udf->dummy_values[0];
     (void) pop(&(udf->dummy_values[0]));
 
+    if (udf->dummy_num != 1)
+	int_error(NO_CARET, "function %s requires %d variables", udf->udf_name, udf->dummy_num);
+
     execute_at(udf->at);
     gpfree_string(&udf->dummy_values[0]);
     udf->dummy_values[0] = save_dummy;
@@ -175,16 +178,19 @@ f_calln(union argument *x)
     struct value num_params;
 
     udf = x->udf_arg;
-    if (!udf->at) {		/* undefined */
+    if (!udf->at)		/* undefined */
 	int_error(NO_CARET, "undefined function: %s", udf->udf_name);
-    }
     for (i = 0; i < MAX_NUM_VAR; i++)
 	save_dummy[i] = udf->dummy_values[i];
 
-    /* if there are more parameters than the function is expecting */
-    /* simply ignore the excess */
     (void) pop(&num_params);
 
+    if (num_params.v.int_val != udf->dummy_num)
+	int_error(NO_CARET, "function %s requires %d variable%c", 
+	    udf->udf_name, udf->dummy_num, (udf->dummy_num == 1)?'\0':'s');
+
+    /* if there are more parameters than the function is expecting */
+    /* simply ignore the excess */
     if (num_params.v.int_val > MAX_NUM_VAR) {
 	/* pop and discard the dummies that there is no room for */
 	num_pop = num_params.v.int_val - MAX_NUM_VAR;

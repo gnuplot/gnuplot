@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.22 2005/11/27 19:30:49 sfeam Exp $
+ * $Id: eval.h,v 1.23 2006/06/10 00:35:26 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -69,9 +69,10 @@ enum operators {
 /* user-defined function table entry */
 typedef struct udft_entry {
     struct udft_entry *next_udf; /* pointer to next udf in linked list */
-    char *udf_name;		/* name of this function entry */
-    struct at_type *at;		/* pointer to action table to execute */
-    char *definition;		/* definition of function as typed */
+    char *udf_name;		 /* name of this function entry */
+    struct at_type *at;		 /* pointer to action table to execute */
+    char *definition;		 /* definition of function as typed */
+    int dummy_num;		 /* required number of input variables */
     t_value dummy_values[MAX_NUM_VAR]; /* current value of dummy variables */
 } udft_entry;
 

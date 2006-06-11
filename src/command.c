@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.137 2006/04/29 05:30:06 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.138 2006/06/05 20:57:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -491,6 +491,7 @@ define()
 	if (END_OF_COMMAND)
 	    int_error(c_token, "function definition expected");
 	udf = dummy_func = add_udf(start_token);
+	udf->dummy_num = dummy_num;
 	if ((at_tmp = perm_at()) == (struct at_type *) NULL)
 	    int_error(start_token, "not enough memory for function");
 	if (udf->at)		/* already a dynamic a.t. there */

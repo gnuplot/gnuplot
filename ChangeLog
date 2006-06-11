@@ -1,3 +1,18 @@
+2006-06-11  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/eval.h: Added number of variables to user defined function struct.
+
+	* src/command.c (define): Recorded number of variables into udf entry.
+
+	* src/parse.c (add_is_udf, is_ud_functin, add_udf): 
+	Slight rearranging of functions to allow code reuse.
+
+	* src/parse.c (parse_primary_expression): Check if function used in
+	command is user defined.  If so, verify number of variables is correct.
+
+	* src/internal.c (f_call, f_calln): Added tests to catch variable
+	mismatch at time of evaluation.
+
 2006-06-10  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* docs/Mafefile.in (CORETERM): Add wxt.trm in the list of
