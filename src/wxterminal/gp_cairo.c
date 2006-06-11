@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.10 2006/06/08 03:53:06 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.11 2006/06/10 23:36:31 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -76,6 +76,9 @@
 # include <pango/pangocairo.h>
 # include <glib.h>
 
+/* undef this to see what happens without the Symbol-to-unicode processing */
+#define MAP_SYMBOL
+
 /* ========  enhanced text mode ======== */
 /* copies of internal variables */
 static char gp_cairo_enhanced_font[100] = "";
@@ -100,7 +103,7 @@ static PangoAttrList *gp_cairo_enhanced_save_AttrList = NULL;
 static gchar gp_cairo_underprinted_utf8[2048] = "";
 static PangoAttrList *gp_cairo_enhanced_underprinted_AttrList = NULL;
 /* converts text from symbol encoding to utf8 encoding */
-static gchar* gp_cairo_convert_symbol_to_unicode(plot_struct *plot, char* string);
+static gchar* gp_cairo_convert_symbol_to_unicode(plot_struct *plot, const char* string);
 /* add standard attributes (fontsize,fontfamily, rise) to
  * the specified characters in a PangoAttrList */
 static void gp_cairo_add_attr( PangoAttrList * AttrList, int start, int end );
@@ -603,14 +606,30 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	PangoLayout *layout;
 	PangoFontDescription *desc;
 	gchar* string_utf8;
+#ifdef MAP_SYMBOL
+	TBOOLEAN symbol_font_parsed = FALSE;
+#endif /*MAP_SYMBOL*/
+
 
 	/* begin by stroking any open path */
 	gp_cairo_stroke(plot);
 	/* also draw any open polygon set */
 	gp_cairo_end_polygon(plot);
 
-	/* convert the input string to utf8 */
-	string_utf8 = gp_cairo_convert(plot, string);
+#ifdef MAP_SYMBOL
+	/* we have to treat Symbol font as a special case */
+	if (!strcmp(plot->fontname,"Symbol")) {
+		FPRINTF((stderr,"Parsing a Symbol string\n"));
+		string_utf8 = gp_cairo_convert_symbol_to_unicode(plot, string);
+		strncpy(gp_cairo_enhanced_font,
+			"Sans", sizeof(gp_cairo_enhanced_font));
+		symbol_font_parsed = TRUE;
+	} else
+#endif /*MAP_SYMBOL*/
+	{
+		/* convert the input string to utf8 */
+		string_utf8 = gp_cairo_convert(plot, string);
+	}
 
 	/* Create a PangoLayout, set the font and text */
 	layout = pango_cairo_create_layout (plot->cr);
@@ -619,6 +638,11 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	g_free(string_utf8);
 	desc = pango_font_description_new ();
 	pango_font_description_set_family (desc, (const char*) plot->fontname);
+#ifdef MAP_SYMBOL
+	/* restore the Symbol font setting */
+	if (symbol_font_parsed)
+		strncpy(plot->fontname, "Symbol", sizeof(plot->fontname));
+#endif /*MAP_SYMBOL*/
 	pango_font_description_set_size (desc, (int) (plot->fontsize*PANGO_SCALE*plot->oversampling_scale) );
 	pango_layout_set_font_description (layout, desc);
 	pango_font_description_free (desc);
@@ -1018,6 +1042,10 @@ void gp_cairo_enhanced_flush()
 
 	gchar* enhanced_text_utf8;
 
+#ifdef MAP_SYMBOL
+	TBOOLEAN symbol_font_parsed = FALSE;
+#endif /*MAP_SYMBOL*/
+
 	if (!gp_cairo_enhanced_opened_string)
 		return;
 
@@ -1035,12 +1063,7 @@ void gp_cairo_enhanced_flush()
 
 	gp_cairo_enhanced_opened_string = FALSE;
 
-/* undef this to see what happens without the Symbol-to-unicode processing */
-#define MAP_SYMBOL
-
 #ifdef MAP_SYMBOL
-	TBOOLEAN symbol_font_parsed = FALSE;
-
 	/* we have to treat Symbol font as a special case */
 	if (!strcmp(gp_cairo_enhanced_font,"Symbol")) {
 		FPRINTF((stderr,"Parsing a Symbol string\n"));
@@ -1226,9 +1249,9 @@ void gp_cairo_enhanced_flush()
 #ifdef MAP_SYMBOL
 	if (symbol_font_parsed)
 		strncpy(gp_cairo_enhanced_font, "Symbol", sizeof(gp_cairo_enhanced_font));
-	else
-#endif
-		g_free(enhanced_text_utf8);
+#endif /* MAP_SYMBOL */
+
+	g_free(enhanced_text_utf8);
 }
 
 /* brace is TRUE to keep processing to },
@@ -1675,7 +1698,7 @@ const char* gp_cairo_get_encoding(plot_struct *plot)
  * use the map provided by http://www.unicode.org/ to
  * translate character codes to their unicode counterparts.
  * The returned string has te be freed by the calling function. */
-gchar* gp_cairo_convert_symbol_to_unicode(plot_struct *plot, char* string)
+gchar* gp_cairo_convert_symbol_to_unicode(plot_struct *plot, const char* string)
 {
 	gchar *string_utf8;
 	gchar *output;

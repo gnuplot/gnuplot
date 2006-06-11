@@ -1,3 +1,13 @@
+2006-06-11  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_draw_text): Use the Symbol to
+	Unicode conversion step, as for the enhanced text mode.
+	(gp_cairo_enhanced_flush): Small cleanup and fix a forgotten free().
+
+	* term/wxt.trm (TERM_HELP): Document the font requirements properly, in
+	particular how the Symbol font is handled. Layout the whole help text
+	so that lines are smaller than 80 characters.
+
 2006-06-11  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/eval.h: Added number of variables to user defined function struct.
