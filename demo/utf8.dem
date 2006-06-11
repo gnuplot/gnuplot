@@ -58,3 +58,4 @@ set label 12 "אבגדהוזחטיךכלםמןנסעףפץצקרשת"
 set xrange [-1:1]
 set yrange [-1:1]
 plot -10 notitle
+reset

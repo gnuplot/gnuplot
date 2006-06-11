@@ -1,5 +1,8 @@
 2006-06-11  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
+	* demo/utf8.dem: Issue a 'reset' at the end of the file, as other demos
+	 do.
+
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_text): Use the Symbol to
 	Unicode conversion step, as for the enhanced text mode.
 	(gp_cairo_enhanced_flush): Small cleanup and fix a forgotten free().
