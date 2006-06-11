@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.6 2006/06/04 23:16:05 tlecomte Exp $
+ * $Id: wxt.trm,v 1.7 2006/06/12 04:26:45 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -322,6 +322,10 @@ START_HELP(wxt)
 "       set term wxt font \"Arial\" # to change the font face only",
 "       set term wxt font \",12\" # to change the font size only",
 "       set term wxt font \"\" # to reset the font name and size",
+"",
+" The fonts are retrieved from the usual fonts subsystems. Under Windows,",
+" those fonts are to be found and configured in the entry \"Fonts\" of the",
+" control panel. Under UNIX, they are handled by the \"fontconfig\" program.",
 "",
 " Pango, the library used to layout the text, is based on utf-8. Thus, the wxt",
 " terminal has to convert from your encoding to utf-8. The default input",

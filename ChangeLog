@@ -5,8 +5,9 @@
 	(gp_cairo_enhanced_flush): Small cleanup and fix a forgotten free().
 
 	* term/wxt.trm (TERM_HELP): Document the font requirements properly, in
-	particular how the Symbol font is handled. Layout the whole help text
-	so that lines are smaller than 80 characters.
+	particular how the Symbol font is handled and where the fonts are taken
+	from. Layout the whole help text so that lines are smaller than 80
+	characters.
 
 2006-06-11  Daniel Sebald  <daniel.sebald@ieee.org>
 
