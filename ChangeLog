@@ -1,3 +1,9 @@
+2006-06-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in:  Move options marked EXPERIMENTAL to the end of the
+	configuration summary printout.  Remove EXPERIMENTAL label from 
+	string variables.
+
 2006-06-11  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* demo/utf8.dem: Issue a 'reset' at the end of the file, as other demos
