@@ -1,3 +1,14 @@
+2006-06-13  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/win/wtext.c:
+	* src/win/wgraph.c:
+	* src/wxterminal/wxt_gui.cpp:
+	* src/wxterminal/wxt_gui.h:
+	* src/wxterminal/wxt_term.h:
+	Fix failures when compiling the wxWidgets terminal with
+	--disable-mouse, by putting more code and declarations inside #ifdef
+	USE_MOUSE ... #endif
+
 2006-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  Move options marked EXPERIMENTAL to the end of the

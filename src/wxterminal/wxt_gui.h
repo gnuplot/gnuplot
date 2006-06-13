@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.5 2006/06/10 22:51:58 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.6 2006/06/10 23:36:31 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -300,6 +300,7 @@ public :
 	/* method to clear the command list, free the allocated memory */
 	void ClearCommandlist();
 
+#ifdef USE_MOUSE
 	/* mouse and zoom events datas */
 	bool wxt_zoombox;
 	int mouse_x, mouse_y;
@@ -309,6 +310,7 @@ public :
 	double wxt_ruler_x, wxt_ruler_y;
 	/* modifier_mask for wxKeyEvents */
 	int modifier_mask;
+#endif
 
 	/* cairo context creation */
 	void wxt_cairo_create_context();
@@ -335,10 +337,12 @@ private:
 	/* any class wishing to process wxWidgets events must use this macro */
 	DECLARE_EVENT_TABLE()
 
+#ifdef USE_MOUSE
 	/* watches for time between mouse clicks */
 	wxStopWatch left_button_sw;
 	wxStopWatch right_button_sw;
 	wxStopWatch middle_button_sw;
+#endif /*USE_MOUSE*/
 
 	/* cairo surfaces, which depends on the implementation */
 #if defined(GTK_SURFACE)
@@ -398,11 +402,13 @@ public:
 	void OnClose( wxCloseEvent& event );
 	void OnSize( wxSizeEvent& event );
 	void OnCopy( wxCommandEvent& event );
+#ifdef USE_MOUSE
 	void OnReplot( wxCommandEvent& event );
 	void OnToggleGrid( wxCommandEvent& event );
 	void OnZoomPrevious( wxCommandEvent& event );
 	void OnZoomNext( wxCommandEvent& event );
 	void OnAutoscale( wxCommandEvent& event );
+#endif /*USE_MOUSE*/
 	void OnConfig( wxCommandEvent& event );
 	void OnHelp( wxCommandEvent& event );
 
@@ -507,6 +513,7 @@ static plot_struct *wxt_current_plot;
 /* push a command to the commands list */
 static void wxt_command_push(gp_command command);
 
+#ifdef USE_MOUSE
 /* routine to send an event to gnuplot */
 static void wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id);
 
@@ -528,6 +535,7 @@ static wxt_thread_state_t wxt_thread_state;
 static wxMutex mutexProtectingThreadState;
 static wxt_thread_state_t wxt_check_thread_state();
 static void wxt_change_thread_state(wxt_thread_state_t state);
+#endif /*USE_MOUSE*/
 
 /* returns true if at least one plot window is opened.
  * Used to handle 'persist' */

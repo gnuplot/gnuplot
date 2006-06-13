@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.11 2006/06/08 03:53:07 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.12 2006/06/10 22:51:58 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -34,8 +34,8 @@
  * to the extent permitted by applicable law.
  *
  *
- * Alternatively, the contents of this file, apart from two portions
- * that originate from other gnuplot files and are designated as such,
+ * Alternatively, the contents of this file, apart from one portion
+ * that originates from other gnuplot files and is designated as such,
  * may be used under the terms of the GNU General Public License
  * Version 2 or later (the "GPL"), in which case the provisions of GPL
  * are applicable instead of those above. If you wish to allow
@@ -121,11 +121,13 @@ BEGIN_EVENT_TABLE( wxtFrame, wxFrame )
 	EVT_CLOSE( wxtFrame::OnClose )
 	EVT_SIZE( wxtFrame::OnSize )
 	EVT_TOOL( Toolbar_CopyToClipboard, wxtFrame::OnCopy )
+#ifdef USE_MOUSE
 	EVT_TOOL( Toolbar_Replot, wxtFrame::OnReplot )
 	EVT_TOOL( Toolbar_ToggleGrid, wxtFrame::OnToggleGrid )
 	EVT_TOOL( Toolbar_ZoomPrevious, wxtFrame::OnZoomPrevious )
 	EVT_TOOL( Toolbar_ZoomNext, wxtFrame::OnZoomNext )
 	EVT_TOOL( Toolbar_Autoscale, wxtFrame::OnAutoscale )
+#endif /*USE_MOUSE*/
 	EVT_TOOL( Toolbar_Config, wxtFrame::OnConfig )
 	EVT_TOOL( Toolbar_Help, wxtFrame::OnHelp )
 END_EVENT_TABLE()
@@ -134,6 +136,7 @@ BEGIN_EVENT_TABLE( wxtPanel, wxPanel )
 	EVT_PAINT( wxtPanel::OnPaint )
 	EVT_ERASE_BACKGROUND( wxtPanel::OnEraseBackground )
 	EVT_SIZE( wxtPanel::OnSize )
+#ifdef USE_MOUSE
 	EVT_MOTION( wxtPanel::OnMotion )
 	EVT_LEFT_DOWN( wxtPanel::OnLeftDown )
 	EVT_LEFT_UP( wxtPanel::OnLeftUp )
@@ -144,6 +147,7 @@ BEGIN_EVENT_TABLE( wxtPanel, wxPanel )
 	EVT_KEY_DOWN( wxtPanel::OnKeyDownModifier )
 	EVT_KEY_UP( wxtPanel::OnKeyUpModifier )
 	EVT_CHAR( wxtPanel::OnKeyDownChar )
+#endif /*USE_MOUSE*/
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( wxtConfigDialog, wxDialog )
@@ -342,6 +346,7 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id, int xpos, int ypos, in
 
 	toolbar->AddTool(Toolbar_CopyToClipboard, wxT("Copy"),
 				*(toolBarBitmaps[0]), wxT("Copy the plot to clipboard"));
+#ifdef USE_MOUSE
 	toolbar->AddSeparator();
 	toolbar->AddTool(Toolbar_Replot, wxT("Replot"),
 				*(toolBarBitmaps[1]), wxT("Replot"));
@@ -353,6 +358,7 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id, int xpos, int ypos, in
 				*(toolBarBitmaps[4]), wxT("Apply the next zoom settings"));
 	toolbar->AddTool(Toolbar_Autoscale, wxT("Autoscale"),
 				*(toolBarBitmaps[5]), wxT("Apply autoscale"));
+#endif /*USE_MOUSE*/
 	toolbar->AddSeparator();
 	toolbar->AddTool(Toolbar_Config, wxT("Terminal configuration"),
 				*(toolBarBitmaps[6]), wxT("Open configuration dialog"));
@@ -395,7 +401,7 @@ void wxtFrame::OnCopy( wxCommandEvent& WXUNUSED( event ) )
 	wxTheClipboard->Flush();
 }
 
-
+#ifdef USE_MOUSE
 /* toolbar event : Replot */
 void wxtFrame::OnReplot( wxCommandEvent& WXUNUSED( event ) )
 {
@@ -430,7 +436,7 @@ void wxtFrame::OnAutoscale( wxCommandEvent& WXUNUSED( event ) )
 	if ( this->GetId()==wxt_window_number )
 		wxt_exec_event(GE_keypress, 0, 0, 'a', 0, this->GetId());
 }
-
+#endif /*USE_MOUSE*/
 
 /* toolbar event : Config */
 void wxtFrame::OnConfig( wxCommandEvent& WXUNUSED( event ) )
@@ -508,6 +514,7 @@ wxtPanel::wxtPanel( wxWindow *parent, wxWindowID id, const wxSize& size )
 	gp_cairo_initialize_plot(&plot);
 	GetSize(&(plot.device_xmax),&(plot.device_ymax));
 
+#ifdef USE_MOUSE
 	mouse_x = 0;
 	mouse_y = 0;
 	wxt_zoombox = false;
@@ -521,6 +528,7 @@ wxtPanel::wxtPanel( wxWindow *parent, wxWindowID id, const wxSize& size )
 	wxt_ruler_y = 0;
 
 	modifier_mask = 0;
+#endif /*USE_MOUSE*/
 
 #if defined(GTK_SURFACE)
 	gdkpixmap = NULL;
@@ -638,6 +646,7 @@ void wxtPanel::DrawToDC(wxWindowDC &dc, wxRegion &region)
 	buffered_dc.DrawBitmap(*cairo_bitmap, 0, 0, false);
 #endif
 
+#ifdef USE_MOUSE
 	if (wxt_zoombox) {
 		tmp_pen = wxPen( wxT("BLACK") );
 		tmp_pen.SetCap( wxCAP_ROUND );
@@ -676,6 +685,7 @@ void wxtPanel::DrawToDC(wxWindowDC &dc, wxRegion &region)
 		buffered_dc.CrossHair( (int)wxt_ruler_x, (int)wxt_ruler_y );
 		buffered_dc.SetLogicalFunction( wxCOPY );
 	}
+#endif /*USE_MOUSE*/
 
 	buffered_dc.EndDrawing();
 }
@@ -720,7 +730,7 @@ void wxtPanel::OnSize( wxSizeEvent& event )
 	wxt_cairo_refresh();
 }
 
-
+#ifdef USE_MOUSE
 /* when the mouse is moved over the panel */
 void wxtPanel::OnMotion( wxMouseEvent& event )
 {
@@ -957,6 +967,7 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 	 *	GP_Linefeed, GP_Clear, GP_Sys_Req, GP_Begin
 	 */
 }
+#endif /*USE_MOUSE*/
 
 /* ====license information====
  * The following code originates from other gnuplot files,
@@ -1272,8 +1283,11 @@ void wxt_init()
 # error "Not implemented."
 #endif /*__WXMSW__*/
 
+
+#ifdef USE_MOUSE
 		/* initialize the gnuplot<->terminal event system state */
 		wxt_change_thread_state(RUNNING);
+#endif /*USE_MOUSE*/
 
  		FPRINTF((stderr,"First Init2\n"));
 #ifdef HAVE_LOCALE_H
@@ -1468,7 +1482,7 @@ void wxt_text()
 #ifdef USE_MOUSE
 	/* Inform gnuplot that we have finished plotting */
 	wxt_exec_event(GE_plotdone, 0, 0, 0, 0, wxt_window_number );
-#endif
+#endif /*USE_MOUSE*/
 
 	wxt_sigint_check();
 	wxt_sigint_restore();
@@ -1484,8 +1498,8 @@ void wxt_reset()
 	if (wxt_status == STATUS_UNINITIALIZED)
 		return;
 
-	if (wxt_status == STATUS_INTERRUPT) {
 #ifdef USE_MOUSE
+	if (wxt_status == STATUS_INTERRUPT) {
 		/* send "reset" event to restore the mouse system in a well-defined state.
 		 * Send it directly, not with wxt_exec_event(), which would only enqueue it,
 		 * but not process it. */
@@ -1494,12 +1508,12 @@ void wxt_reset()
 
 		/* clear the event list */
 		wxt_clear_event_list();
-#endif
 	}
 
 	/* stop sending mouse events */
 	FPRINTF((stderr,"change thread state\n"));
 	wxt_change_thread_state(RUNNING);
+#endif /*USE_MOUSE*/
 
 	FPRINTF((stderr,"wxt_reset ends\n"));
 }
@@ -2574,6 +2588,7 @@ void wxtPanel::wxt_cairo_free_platform_context()
 # define FPRINTF2
 #endif
 
+#ifdef USE_MOUSE
 /* protected check for the state of the event list */
 bool wxt_check_eventlist_empty()
 {
@@ -2765,6 +2780,8 @@ int wxt_waitforinput()
 #error "Not implemented"
 #endif
 
+#endif /*USE_MOUSE*/
+
 /* --------------------------------------------------------
  * 'persist' option handling
  * --------------------------------------------------------*/
@@ -2833,13 +2850,17 @@ void wxt_atexit(int argc, char **argv)
 
 	FPRINTF((stderr,"wxWidgets terminal handles 'persist' setting\n"));
 
+#ifdef USE_MOUSE
 	wxt_change_thread_state(WAITING_FOR_STDIN);
+#endif /*USE_MOUSE*/
 
 	/* protect the following from interrupt */
 	wxt_sigint_init();
 
 	while (wxt_window_opened()) {
+#ifdef USE_MOUSE
 		wxt_process_events();
+#endif /*USE_MOUSE*/
 #ifdef _Windows
 		/* continue to process gui messages */
 		GetMessage(&msg, 0, 0, 0);
@@ -2853,7 +2874,9 @@ void wxt_atexit(int argc, char **argv)
 
 	wxt_sigint_restore();
 
+#ifdef USE_MOUSE
 	wxt_change_thread_state(RUNNING);
+#endif /*USE_MOUSE*/
 
 	/* cleanup and quit */
 	wxt_cleanup();
