@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.162 2006/05/21 00:40:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.163 2006/05/25 04:30:38 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -252,8 +252,8 @@ typedef struct plot_struct {
 #ifdef USE_MOUSE
     int button;			/* buttons which are currently pressed */
     char str[0xff];		/* last displayed string */
-    Time time;			/* time of last button press event */
 #endif
+    Time time;			/* time stamp of previous event */
     int lwidth;			/* this and the following 6 lines declare */
     int type;			/* variables used during drawing in exec_cmd() */
     int user_width;
@@ -335,13 +335,11 @@ static struct cmap_t *cmap_list_start = NULL;
 #define ERROR_NOTICE(str)         "\nGNUPLOT (gplt_x11):  " str
 #define ERROR_NOTICE_NEWLINE(str) "\n                     " str
 
-#ifdef USE_MOUSE
 enum { NOT_AVAILABLE = -1 };
 
 #define SEL_LEN 0xff
 static char selection[SEL_LEN] = "";
 
-#endif /* USE_MOUSE */
 
 #ifdef USE_MOUSE
 # define GRAPH_HEIGHT(plot)  ((plot)->gheight)
