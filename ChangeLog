@@ -1,3 +1,11 @@
+2006-06-13  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* configure.in src/Makefile.am src/makefile.awc src/makefile.all:
+	Add a configuration mechanism for including binary.c in list of
+	gnuplot sources when appropriate.
+
+	* src/bin_hook.c:  Remove from source tree.
+
 2006-06-13  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/win/wtext.c:

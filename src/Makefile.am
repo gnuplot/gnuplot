@@ -24,7 +24,7 @@ noinst_PROGRAMS = bf_test
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DPREFIX=\"$(prefix)\" -DVERSION_MAJOR=\"$(VERSION_MAJOR)\"
 
-gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h bin_hook.c \
+gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h \
 breaders.c breaders.h bitmap.c bitmap.h color.c color.h command.c \
 command.h contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h \
 eval.c eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c getcolor.h gp_hist.h \
@@ -37,6 +37,10 @@ save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h \
 standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h \
 template.h term_api.h term.c term.h time.c unset.c util.c util.h \
 util3d.c util3d.h variable.c variable.h version.c version.h
+
+if INCLUDE_BINARY_C
+gnuplot_SOURCES += binary.c
+endif
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS) $(WX_LIBS)
 
