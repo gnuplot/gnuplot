@@ -1,9 +1,13 @@
 #
-# $Id: prob2.dem,v 1.7 2003/12/16 04:46:20 sfeam Exp $
+# $Id: prob2.dem,v 1.8 2004/02/14 03:14:43 sfeam Exp $
 #
 # Demo Statistical Approximations version 1.1
 #
 # Copyright (c) 1991, Jos van der Woude, jvdwoude@hut.nl
+
+# History:
+#    -- --- 1991 Jos van der Woude:  1st version
+#    06 Jun 2006 Dan Sebald:  Added plot methods for better visual effect.
 
 print ""
 print ""
@@ -31,35 +35,35 @@ print ""
 pause -1 "                      Press Return to start demo ..."
 
 load "stat.inc"
+rnd(x) = floor(x+0.5)
+r_xmin = -1
+r_sigma = 4.0
 
 # Binomial PDF using normal approximation
 n = 25; p = 0.15
 mu = n * p
 sigma = sqrt(n * p * (1.0 - p))
-xmin = floor(mu - 4.0 * sigma)
-xmin = xmin < 0 ? 0 : xmin
-xmax = ceil(mu + 4.0 * sigma)
-ymax = 1.1 * binom(mu) #mode of binomial PDF used
-xinc = ceil((xmax - xmin) / 10)
-xinc = xinc > 1 ? xinc : 1
+xmin = floor(mu - r_sigma * sigma)
+xmin = xmin < r_xmin ? r_xmin : xmin
+xmax = ceil(mu + r_sigma * sigma)
+ymax = 1.1 * binom(floor((n+1)*p), n, p) #mode of binomial PDF used
 set key box
 unset zeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
 set xlabel "k, x ->"
 set ylabel "probability density ->"
-set xtics xmin + 0.499, ceil(sigma), xmax
 set ytics 0, ymax / 10.0, ymax
 set format x "%2.0f"
 set format y "%3.2f"
 set sample 200
 set title "binomial PDF using normal approximation"
-set arrow from mu + 0.5, 0 to mu + 0.5, normal(mu) nohead
-set arrow from mu + 0.5, normal(mu + sigma) \
-          to mu + 0.5 + sigma, normal(mu + sigma) nohead
-set label "mu" at mu + 1, ymax / 10
-set label "sigma" at mu + 1 + sigma, normal(mu + sigma)
-plot binom(x), normal(x - 0.5)
+set arrow from mu, 0 to mu, normal(mu, mu, sigma) nohead
+set arrow from mu, normal(mu + sigma, mu, sigma) \
+          to mu + sigma, normal(mu + sigma, mu, sigma) nohead
+set label "mu" at mu + 0.5, ymax / 10
+set label "sigma" at mu + 0.5 + sigma, normal(mu + sigma, mu, sigma)
+plot binom(rnd(x), n, p) with histeps, normal(x, mu, sigma)
 pause -1 "Hit return to continue"
 unset arrow
 unset label
@@ -68,30 +72,27 @@ unset label
 n = 50; p = 0.1
 mu = n * p
 sigma = sqrt(mu)
-xmin = floor(mu - 4.0 * sigma)
-xmin = xmin < 0 ? 0 : xmin
-xmax = ceil(mu + 4.0 * sigma)
-ymax = 1.1 * binom(mu) #mode of binomial PDF used
-xinc = ceil((xmax - xmin) / 10)
-xinc = xinc > 1 ? xinc : 1
+xmin = floor(mu - r_sigma * sigma)
+xmin = xmin < r_xmin ? r_xmin : xmin
+xmax = ceil(mu + r_sigma * sigma)
+ymax = 1.1 * binom(floor((n+1)*p), n, p) #mode of binomial PDF used
 set key box
 unset zeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
 set xlabel "k ->"
 set ylabel "probability density ->"
-set xtics xmin + 0.499, ceil(sigma), xmax
 set ytics 0, ymax / 10.0, ymax
 set format x "%2.0f"
 set format y "%3.2f"
-set sample 200
+set sample (xmax - xmin + 3)
 set title "binomial PDF using poisson approximation"
-set arrow from mu + 0.5, 0 to mu + 0.5, normal(mu) nohead
-set arrow from mu + 0.5, normal(mu + sigma) \
-          to mu + 0.5 + sigma, normal(mu + sigma) nohead
-set label "mu" at mu + 1, ymax / 10
-set label "sigma" at mu + 1 + sigma, normal(mu + sigma)
-plot binom(x), poisson(x)
+set arrow from mu, 0 to mu, normal(mu, mu, sigma) nohead
+set arrow from mu, normal(mu + sigma, mu, sigma) \
+          to mu + sigma, normal(mu + sigma, mu, sigma) nohead
+set label "mu" at mu + 0.5, ymax / 10
+set label "sigma" at mu + 0.5 + sigma, normal(mu + sigma, mu, sigma)
+plot binom(x, n, p) with histeps, poisson(x, mu) with histeps
 pause -1 "Hit return to continue"
 unset arrow
 unset label
@@ -102,11 +103,9 @@ mu = (1.0 - p) / p
 sigma = sqrt(mu / p)
 lambda = p
 rho = 1.0 - p
-xmin = floor(mu - 4.0 * sigma)
-xmin = xmin < 0 ? 0 : xmin
-xmax = ceil(mu + 4.0 * sigma)
-xinc = ceil((xmax - xmin) / 10)
-xinc = xinc > 1 ? xinc : 1
+xmin = floor(mu - r_sigma * sigma)
+xmin = xmin < r_xmin ? r_xmin : xmin
+xmax = ceil(mu + r_sigma * sigma)
 ymax = 1.1 * p
 set key box
 unset zeroaxis
@@ -114,18 +113,17 @@ set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
 set xlabel "k, x ->"
 set ylabel "probability density ->"
-set xtics xmin + 0.499, ceil((xmax - xmin)/ 10.0), xmax
 set ytics 0, ymax / 10.0, ymax
 set format x "%2.0f"
 set format y "%3.2f"
 set sample 200
 set title "geometric PDF using gamma approximation"
-set arrow from mu + 0.5, 0 to mu + 0.5, g(mu) nohead
-set arrow from mu + 0.5, g(mu + sigma) \
-          to mu + 0.5 + sigma, g(mu + sigma) nohead
-set label "mu" at mu + 1, ymax / 10
-set label "sigma" at mu + 1 + sigma, g(mu + sigma)
-plot geometric(x), g(x - 0.5)
+set arrow from mu, 0 to mu, gmm(mu, rho, lambda) nohead
+set arrow from mu, gmm(mu + sigma, rho, lambda) \
+          to mu + sigma, gmm(mu + sigma, rho, lambda) nohead
+set label "mu" at mu + 0.5, ymax / 10
+set label "sigma" at mu + 0.5 + sigma, gmm(mu + sigma, rho, lambda)
+plot geometric(rnd(x),p) with histeps, gmm(x, rho, lambda)
 pause -1 "Hit return to continue"
 unset arrow
 unset label
@@ -134,11 +132,9 @@ unset label
 p = 0.3
 mu = (1.0 - p) / p
 sigma = sqrt(mu / p)
-xmin = floor(mu - 4.0 * sigma)
-xmin = xmin < 0 ? 0 : xmin
-xmax = ceil(mu + 4.0 * sigma)
-xinc = ceil((xmax - xmin) / 10)
-xinc = xinc > 1 ? xinc : 1
+xmin = floor(mu - r_sigma * sigma)
+xmin = xmin < r_xmin ? r_xmin : xmin
+xmax = ceil(mu + r_sigma * sigma)
 ymax = 1.1 * p
 set key box
 unset zeroaxis
@@ -146,18 +142,17 @@ set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
 set xlabel "k, x ->"
 set ylabel "probability density ->"
-set xtics xmin + 0.499, ceil((xmax - xmin)/ 10.0), xmax
 set ytics 0, ymax / 10.0, ymax
 set format x "%2.0f"
 set format y "%3.2f"
 set sample 200
 set title "geometric PDF using normal approximation"
-set arrow from mu + 0.5, 0 to mu + 0.5, normal(mu) nohead
-set arrow from mu + 0.5, normal(mu + sigma) \
-          to mu + 0.5 + sigma, normal(mu + sigma) nohead
-set label "mu" at mu + 1, ymax / 10
-set label "sigma" at mu + 1 + sigma, normal(mu + sigma)
-plot geometric(x), normal(x - 0.5)
+set arrow from mu, 0 to mu, normal(mu, mu, sigma) nohead
+set arrow from mu, normal(mu + sigma, mu, sigma) \
+          to mu + sigma, normal(mu + sigma, mu, sigma) nohead
+set label "mu" at mu + 0.5, ymax / 10
+set label "sigma" at mu + 0.5 + sigma, normal(mu + sigma, mu, sigma)
+plot geometric(rnd(x),p) with histeps, normal(x, mu, sigma)
 pause -1 "Hit return to continue"
 unset arrow
 unset label
@@ -167,30 +162,27 @@ nn = 75; mm = 25; n = 10
 p = real(mm) / nn
 mu = n * p
 sigma = sqrt(real(nn - n) / (nn - 1.0) * n * p * (1.0 - p))
-xmin = floor(mu - 4.0 * sigma)
-xmin = xmin < 0 ? 0 : xmin
-xmax = ceil(mu + 4.0 * sigma)
-xinc = ceil((xmax - xmin) / 10)
-xinc = xinc > 1 ? xinc : 1
-ymax = 1.1 * hypgeo(mu) #mode of binom PDF used
+xmin = floor(mu - r_sigma * sigma)
+xmin = xmin < r_xmin ? r_xmin : xmin
+xmax = ceil(mu + r_sigma * sigma)
+ymax = 1.1 * hypgeo(floor(mu), nn, mm, n) #mode of binom PDF used
 set key box
 unset zeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
 set xlabel "k ->"
 set ylabel "probability density ->"
-set xtics xmin, xinc, xmax
 set ytics 0, ymax / 10.0, ymax
 set format x "%2.0f"
 set format y "%3.2f"
-set sample 200
+set sample (xmax - xmin + 3)
 set title "hypergeometric PDF using binomial approximation"
-set arrow from mu + 0.5, 0 to mu + 0.5, binom(mu) nohead
-set arrow from mu + 0.5, binom(mu + sigma) \
-          to mu + 0.5 + sigma, binom(mu + sigma) nohead
-set label "mu" at mu + 1, ymax / 10
-set label "sigma" at mu + 1 + sigma, binom(mu + sigma)
-plot hypgeo(x), binom(x)
+set arrow from mu, 0 to mu, binom(floor(mu), n, p) nohead
+set arrow from mu, binom(floor(mu + sigma), n, p) \
+          to mu + sigma, binom(floor(mu + sigma), n, p) nohead
+set label "mu" at mu + 0.5, ymax / 10
+set label "sigma" at mu + 0.5 + sigma, binom(floor(mu + sigma), n, p)
+plot hypgeo(x, nn, mm, n) with histeps, binom(x, n, p) with histeps
 pause -1 "Hit return to continue"
 unset arrow
 unset label
@@ -200,30 +192,27 @@ nn = 75; mm = 25; n = 10
 p = real(mm) / nn
 mu = n * p
 sigma = sqrt(real(nn - n) / (nn - 1.0) * n * p * (1.0 - p))
-xmin = floor(mu - 4.0 * sigma)
-xmin = xmin < 0 ? 0 : xmin
-xmax = ceil(mu + 4.0 * sigma)
-xinc = ceil((xmax - xmin) / 10)
-xinc = xinc > 1 ? xinc : 1
-ymax = 1.1 * hypgeo(mu) #mode of binom PDF used
+xmin = floor(mu - r_sigma * sigma)
+xmin = xmin < r_xmin ? r_xmin : xmin
+xmax = ceil(mu + r_sigma * sigma)
+ymax = 1.1 * hypgeo(floor(mu), nn, mm, n) #mode of binom PDF used
 set key box
 unset zeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
 set xlabel "k, x ->"
 set ylabel "probability density ->"
-set xtics xmin, xinc, xmax
 set ytics 0, ymax / 10.0, ymax
 set format x "%2.0f"
 set format y "%3.2f"
 set sample 200
 set title "hypergeometric PDF using normal approximation"
-set arrow from mu + 0.5, 0 to mu + 0.5, normal(mu) nohead
-set arrow from mu + 0.5, normal(mu + sigma) \
-          to mu + 0.5 + sigma, normal(mu + sigma) nohead
-set label "mu" at mu + 1, ymax / 10
-set label "sigma" at mu + 1 + sigma, normal(mu + sigma)
-plot hypgeo(x), normal(x - 0.5)
+set arrow from mu, 0 to mu, normal(mu, mu, sigma) nohead
+set arrow from mu, normal(mu + sigma, mu, sigma) \
+          to mu + sigma, normal(mu + sigma, mu, sigma) nohead
+set label "mu" at mu + 0.5, ymax / 10
+set label "sigma" at mu + 0.5 + sigma, normal(mu + sigma, mu, sigma)
+plot hypgeo(rnd(x), nn, mm, n) with histeps, normal(x, mu, sigma)
 pause -1 "Hit return to continue"
 unset arrow
 unset label
@@ -234,30 +223,27 @@ mu = r * (1.0 - p) / p
 sigma = sqrt(mu / p)
 lambda = p
 rho = r * (1.0 - p)
-xmin = int(mu - 4.0 * sigma)
-xmin = xmin < 0 ? 0 : xmin
-xmax = int(mu + 4.0 * sigma)
-xinc = ceil((xmax - xmin) / 10)
-xinc = xinc > 1 ? xinc : 1
-ymax = 1.1 * g((rho - 1) / lambda) #mode of gamma PDF used
+xmin = floor(mu - r_sigma * sigma)
+xmin = xmin < r_xmin ? r_xmin : xmin
+xmax = ceil(mu + r_sigma * sigma)
+ymax = 1.1 * gmm((rho - 1) / lambda, rho, lambda) #mode of gamma PDF used
 set key box
 unset zeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
 set xlabel "k, x ->"
 set ylabel "probability density ->"
-set xtics xmin + 0.499, ceil((xmax - xmin)/ 10.0), xmax
 set ytics 0, ymax / 10.0, ymax
 set format x "%2.0f"
 set format y "%3.2f"
 set sample 200
 set title "negative binomial PDF using gamma approximation"
-set arrow from mu + 0.5, 0 to mu + 0.5, g(mu) nohead
-set arrow from mu + 0.5, g(mu + sigma) \
-          to mu + 0.5 + sigma, g(mu + sigma) nohead
-set label "mu" at mu + 1, ymax / 10
-set label "sigma" at mu + 1 + sigma, g(mu + sigma)
-plot negbin(x), g(x - 0.5)
+set arrow from mu, 0 to mu, gmm(mu, rho, lambda) nohead
+set arrow from mu, gmm(mu + sigma, rho, lambda) \
+          to mu + sigma, gmm(mu + sigma, rho, lambda) nohead
+set label "mu" at mu + 0.5, ymax / 10
+set label "sigma" at mu + 0.5 + sigma, gmm(mu + sigma, rho, lambda)
+plot negbin(rnd(x), r, p) with histeps, gmm(x, rho, lambda)
 pause -1 "Hit return to continue"
 unset arrow
 unset label
@@ -266,30 +252,27 @@ unset label
 r = 8; p = 0.4
 mu = r * (1.0 - p) / p
 sigma = sqrt(mu / p)
-xmin = floor(mu - 4.0 * sigma)
-xmin = xmin < 0 ? 0 : xmin
-xmax = ceil(mu + 4.0 * sigma)
-xinc = ceil((xmax - xmin) / 10)
-xinc = xinc > 1 ? xinc : 1
-ymax = 1.1 * negbin(mu - 1/p) #mode of gamma PDF used
+xmin = floor(mu - r_sigma * sigma)
+xmin = xmin < r_xmin ? r_xmin : xmin
+xmax = ceil(mu + r_sigma * sigma)
+ymax = 1.1 * negbin(floor((r-1)*(1-p)/p), r, p) #mode of gamma PDF used
 set key box
 unset zeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
 set xlabel "k, x ->"
 set ylabel "probability density ->"
-set xtics xmin + 0.499, ceil((xmax - xmin)/ 10.0), xmax
 set ytics 0, ymax / 10.0, ymax
 set format x "%2.0f"
 set format y "%3.2f"
 set sample 200
 set title "negative binomial PDF using normal approximation"
-set arrow from mu + 0.5, 0 to mu + 0.5, normal(mu) nohead
-set arrow from mu + 0.5, normal(mu + sigma) \
-          to mu + 0.5 + sigma, normal(mu + sigma) nohead
-set label "mu" at mu + 1, ymax / 10
-set label "sigma" at mu + 1 + sigma, normal(mu + sigma)
-plot negbin(x), normal(x - 0.5)
+set arrow from mu, 0 to mu, normal(mu, mu, sigma) nohead
+set arrow from mu, normal(mu + sigma, mu, sigma) \
+          to mu + sigma, normal(mu + sigma, mu, sigma) nohead
+set label "mu" at mu + 0.5, ymax / 10
+set label "sigma" at mu + 0.5 + sigma, normal(mu + sigma, mu, sigma)
+plot negbin(rnd(x), r, p) with histeps, normal(x, mu, sigma)
 pause -1 "Hit return to continue"
 unset arrow
 unset label
@@ -298,27 +281,26 @@ unset label
 mu = 1.0; sigma = 1.5
 a = mu
 lambda = pi / (sqrt(3.0) * sigma)
-xmin = mu - 4.0 * sigma
-xmax = mu + 4.0 * sigma
-ymax = 1.1 * logistic(mu) #mode of logistic PDF used
+xmin = mu - r_sigma * sigma
+xmax = mu + r_sigma * sigma
+ymax = 1.1 * logistic(mu, a, lambda) #mode of logistic PDF used
 set key box
 unset zeroaxis
 set xrange [xmin: xmax]
 set yrange [0 : ymax]
 set xlabel "x ->"
 set ylabel "probability density ->"
-set xtics xmin, (xmax - xmin)/ 10.0, xmax
 set ytics 0, ymax / 10.0, ymax
 set format x "%.1f"
 set format y "%.2f"
 set sample 200
 set title "normal PDF using logistic approximation"
-set arrow from mu,0 to mu, normal(mu) nohead
-set arrow from mu, normal(mu + sigma) \
-          to mu + sigma, normal(mu + sigma) nohead
-set label "mu" at mu + 1, ymax / 10
-set label "sigma" at mu + 1 + sigma, normal(mu + sigma)
-plot logistic(x), normal(x)
+set arrow from mu,0 to mu, normal(mu, mu, sigma) nohead
+set arrow from mu, normal(mu + sigma, mu, sigma) \
+          to mu + sigma, normal(mu + sigma, mu, sigma) nohead
+set label "mu" at mu + 0.5, ymax / 10
+set label "sigma" at mu + 0.5 + sigma, normal(mu + sigma, mu, sigma)
+plot logistic(x, a, lambda), normal(x, mu, sigma)
 pause -1 "Hit return to continue"
 unset arrow
 unset label
@@ -326,29 +308,26 @@ unset label
 # Poisson PDF using normal approximation
 mu = 5.0
 sigma = sqrt(mu)
-xmin = floor(mu - 4.0 * sigma)
-xmin = xmin < 0 ? 0 : xmin
-xmax = ceil(mu + 4.0 * sigma)
-xinc = ceil((xmax - xmin) / 10)
-xinc = xinc > 1 ? xinc : 1
-ymax = 1.1 * poisson(mu) #mode of poisson PDF used
+xmin = floor(mu - r_sigma * sigma)
+xmin = xmin < r_xmin ? r_xmin : xmin
+xmax = ceil(mu + r_sigma * sigma)
+ymax = 1.1 * poisson(mu, mu) #mode of poisson PDF used
 set key box
 unset zeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
 set xlabel "k, x ->"
 set ylabel "probability density ->"
-set xtics xmin, xinc, xmax
 set ytics 0, ymax / 10.0, ymax
 set format x "%2.0f"
 set format y "%3.2f"
 set sample 200
 set title "poisson PDF using normal approximation"
-set arrow from mu + 0.5, 0 to mu + 0.5, normal(mu) nohead
-set arrow from mu + 0.5, normal(mu + sigma) \
-          to mu + 0.5 + sigma, normal(mu + sigma) nohead
-set label "mu" at mu + 1, ymax / 10
-set label "sigma" at mu + 1 + sigma, normal(mu + sigma)
-plot poisson(x), normal(x - 0.5)
+set arrow from mu, 0 to mu, normal(mu, mu, sigma) nohead
+set arrow from mu, normal(mu + sigma, mu, sigma) \
+          to mu + sigma, normal(mu + sigma, mu, sigma) nohead
+set label "mu" at mu + 0.5, ymax / 10
+set label "sigma" at mu + 0.5 + sigma, normal(mu + sigma, mu, sigma)
+plot poisson(rnd(x), mu) with histeps, normal(x, mu, sigma)
 pause -1 "Hit return to continue"
 reset

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.354 2006/06/10 00:35:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.355 2006/06/11 00:29:44 tlecomte Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -942,9 +942,9 @@ C
 ?igamma
 #igamma(a,x) & any & $\mbox{igamma}(\mbox{real}(a,x))$,  igamma function of real($a$,$x$) \\
 %igamma(a,x)@any@$igamma ( roman real (a,x))$, igamma function of real ($a$,$x$)
- The `igamma(a,x)` function returns the incomplete gamma function of the real
- parts of its arguments.  a > 0 and x >= 0.  If the arguments are complex,
- the imaginary components are ignored.
+ The `igamma(a,x)` function returns the normalized incomplete gamma function
+ of the real parts of its arguments.  a > 0 and x >= 0.  If the arguments are
+ complex, the imaginary components are ignored.
 4 imag
 ?expressions functions imag
 ?functions imag

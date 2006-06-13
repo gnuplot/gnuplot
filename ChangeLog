@@ -1,3 +1,20 @@
+2006-06-13  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* demo/stat.inc: Overhaul of routines to add variable arguments,
+	range checking and verify integer when appropriate.  The significant
+	change is forcing some input vars to be an integer, rather than casting
+	them to int() in the formulae.  (There are proper plot styles like
+	"steps" to work with discrete r.v.s.)
+
+	* demo/prob.dem: Modified the discrete r.v. examples to look more like
+	a mass function or scaled impulses.  More varied examples to show
+	various plotting features.
+
+	* demo/prob2.dem demo/random.dem: Add input variables to p.d.f. and
+	c.d.f. functions.  Added new Maxwell demo to random.dem.
+
+	* docs/gnuplot.doc: Added adjective "normalized" to igamma()
+
 2006-06-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Move export selection flags outside the the
