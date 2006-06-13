@@ -3,6 +3,10 @@
 	* src/gplt_x11.c: Move export selection flags outside the the
 	USE_MOUSE conditional code.  Bug #1505704
 
+	* src/term_api.h: DEFAULT_LP_STYLE_TYPE to lt -1 (makes arrows
+	default to black rather than red).
+	
+
 2006-06-13  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* configure.in src/Makefile.am src/makefile.awc src/makefile.all:
