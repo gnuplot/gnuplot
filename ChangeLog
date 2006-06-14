@@ -2,6 +2,9 @@
 
 	* docs/faq-ja.tex:  Japanese translation of faq.tex
 
+	* NEWS docs/Makefile.in:  Include faq-ja.tex in list of distributed
+	files, and in NEWS.
+
 2006-06-13  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* demo/stat.inc: Overhaul of routines to add variable arguments,
