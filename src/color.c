@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.66 2006/04/05 01:09:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.67 2006/06/10 03:20:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -103,10 +103,6 @@ make_palette()
     int i;
     double gray;
 
-#if 0
-    GIF_show_current_palette();
-#endif
-
     if (!term->make_palette) {
 	fprintf(stderr, "Error: terminal \"%s\" does not support continuous colors.\n",term->name);
 	return 1;
@@ -115,10 +111,6 @@ make_palette()
     /* ask for suitable number of colours in the palette */
     i = term->make_palette(NULL);
     if (i == 0) {
-#if (0)	/* This optimization doesn't work, because it assumes a specific */
-	/* sequence of palette loads in the output stream. If you view   */
-	/* PostScript pages out of order, they will use the wrong palette*/
-
 	/* terminal with its own mapping (PostScript, for instance)
 	   It will not change palette passed below, but non-NULL has to be
 	   passed there to create the header or force its initialization
@@ -129,10 +121,6 @@ make_palette()
 	    FPRINTF(("make_palette: calling term->make_palette for term with ncolors == 0\n"));
 	} else
 	    FPRINTF(("make_palette: skipping duplicate palette for term with ncolors == 0\n"));
-#else
-	term->make_palette(&sm_palette);
-	prev_palette = sm_palette;
-#endif
 	return 0;
     }
 
@@ -171,10 +159,6 @@ make_palette()
 
     /* let the terminal make the palette from the supplied RGB triplets */
     term->make_palette(&sm_palette);
-
-#if 0
-    GIF_show_current_palette();
-#endif
 
     return 0;
 }

@@ -1,3 +1,11 @@
+2006-06-14  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/color.c (make_palette) src/term.c (term_start_plot):  
+	Revert change of 9-Jun-2006, so that we are again optimizing color 
+	palette usage by avoiding unnecessary calls to term->make_palette().
+	However, make the PostScript terminal an exception by invalidating
+	the previous palette at the start of every plot.
+
 2006-06-14  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/faq-ja.tex:  Japanese translation of faq.tex
