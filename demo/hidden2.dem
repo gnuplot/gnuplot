@@ -1,0 +1,30 @@
+#
+# Another example of hidden surface removal,
+# this time using pm3d depth-ordering
+#
+
+set title "Interlocking Tori - PM3D surface with no depth sorting"
+
+set parametric
+set urange [-pi:pi]
+set vrange [-pi:pi]
+set isosamples 50,20
+
+unset key
+set view 60, 30, 1.1, 1.33
+
+set pm3d scansbackward
+splot cos(u)+.5*cos(u)*cos(v),sin(u)+.5*sin(u)*cos(v),.5*sin(v) with pm3d, \
+      1+cos(u)+.5*cos(u)*cos(v),.5*sin(v),sin(u)+.5*sin(u)*cos(v) with pm3d
+
+pause -1 "Hit return to continue"
+
+set title "Interlocking Tori - PM3D surface with depth sorting"
+
+set pm3d depthorder
+splot cos(u)+.5*cos(u)*cos(v),sin(u)+.5*sin(u)*cos(v),.5*sin(v) with pm3d, \
+      1+cos(u)+.5*cos(u)*cos(v),.5*sin(v),sin(u)+.5*sin(u)*cos(v) with pm3d
+
+pause -1 "Hit return to continue"
+
+reset
