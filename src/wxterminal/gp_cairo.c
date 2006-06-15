@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.11 2006/06/10 23:36:31 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.12 2006/06/12 04:26:45 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -73,8 +73,10 @@
 #include "gp_cairo.h"
 #include "gp_cairo_term.h"
 
-# include <pango/pangocairo.h>
-# include <glib.h>
+#include "alloc.h"
+
+#include <pango/pangocairo.h>
+#include <glib.h>
 
 /* undef this to see what happens without the Symbol-to-unicode processing */
 #define MAP_SYMBOL
