@@ -1,3 +1,12 @@
+2006-06-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc docs/README.ja term-ja.diff: Japanese translation
+	of user manual and instructions for building the help system from it.
+
+	* src/win/wgnuplot-ja.mnu /src/win/README.win-ja: Instructions for
+	building a Japanese language versino of wgnuplot for Windows, and a
+	corresponding set of menus.
+
 2006-06-15  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.c: Fix a warning about gp_alloc() by
