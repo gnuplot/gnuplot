@@ -11,7 +11,8 @@
 2006-06-15  Johannes Zellner <johannes@zellner.org>
 
 	* src/save.c src/set.c src/show.c src/tables.c src/tables.h:
-	New option 'set p3md depthorder' give depth-ordering of pm3d quadrangles.
+	New option 'set p3md depthorder' to request depth-ordering of 
+	pm3d quadrangles.
 
 	* src/graph3d.c: TBOOLEAN pm3d_order_depth tracks the new option.
 
