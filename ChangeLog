@@ -1,7 +1,6 @@
 2006-06-14  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
-	* docs/faq-ja.tex:  Japanese language FAQ for installation and use of 
-	gnuplot with Japanese character sets.
+	* docs/faq-ja.tex:  Japanese translation of faq.tex
 
 2006-06-13  Daniel Sebald  <daniel.sebald@ieee.org>
 
