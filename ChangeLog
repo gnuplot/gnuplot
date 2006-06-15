@@ -1,3 +1,8 @@
+2006-06-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/show.c (show_version): Add the rest of the non-driver
+	configuration option choices to the output of 'show version long'.
+
 2006-06-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/README.ja term-ja.diff: Japanese translation

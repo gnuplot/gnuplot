@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.176 2006/04/05 03:00:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.177 2006/06/15 15:42:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -952,11 +952,14 @@ show_version(FILE *fp)
 # ifdef HAVE_GD_JPEG
 		"+GD_JPEG  "
 # endif
+# ifdef HAVE_GD_TTF
+		"+GD_TTF  "
+# endif
 # ifdef HAVE_GD_GIF
 		"+GD_GIF  "
 # endif
-# ifdef HAVE_GD_TTF
-		"+GD_TTF  "
+# ifdef GIF_ANIMATION
+		"ANIMATION  "
 # endif
 #else
 		"-LIBGD  "
@@ -966,6 +969,20 @@ show_version(FILE *fp)
 	    const char *linuxvga =
 #ifdef LINUXVGA
 		"+LINUXVGA  "
+#endif
+		"";
+
+	    const char *compatibility =
+#ifdef BACKWARDS_COMPATIBLE
+		"+BACKWARDS_COMPATIBILITY  "
+#else
+		"-BACKWARDS_COMPATIBILITY  "
+#endif
+		"";
+
+	    const char *binary_files =
+#ifdef BINARY_DATA_FILE
+		"+BINARY_DATA  "
 #endif
 		"";
 
@@ -980,6 +997,12 @@ show_version(FILE *fp)
 	    const char *x11 =
 #ifdef X11
 		"+X11  "
+#endif
+#ifdef BINARY_X11_POLYGON
+		"+X11_POLYGON  "
+#endif
+#ifdef USE_X11_MULTIBYTE
+		"+MULTIBYTE  "
 #endif
 		"";
 
@@ -1011,12 +1034,36 @@ show_version(FILE *fp)
 #endif
 		"";
 
+	    const char *plotoptions=
+#ifdef EAM_DATASTRINGS
+		"+DATASTRINGS  "
+#endif
+#ifdef EAM_HISTOGRAMS
+		"+HISTOGRAMS  "
+#endif
+#ifdef EAM_OBJECTS
+		"+OBJECTS  "
+#endif
+#ifdef GP_STRING_VARS
+		"+STRINGVARS  "
+#endif
+#ifdef GP_MACROS
+		"+MACROS  "
+#endif
+#ifdef WITH_IMAGE
+		"+IMAGE  "
+#endif
+	    "";
+
 	    fprintf(stderr, "\
 Compile options:\n\
 %s%s%s%s\n\
-%s%s%s%s%s%s\n\n",
+%s%s\n\
+%s%s%s%s%s%s\n%s\n\n",
 		    rdline, gnu_rdline, libgd, linuxvga,
-		    nocwdrc, x11, use_mouse, unixplot, gnugraph, hiddenline);
+		    compatibility, binary_files,
+		    nocwdrc, x11, use_mouse, unixplot, gnugraph, hiddenline,
+		    plotoptions);
 	}
 
 	if ((helpfile = getenv("GNUHELP")) == NULL) {
@@ -1036,14 +1083,22 @@ Compile options:\n\
 	    if (driverdir == NULL)
 		driverdir = X11_DRIVER_DIR;
 	    fprintf(stderr, "\
-DRIVER_DIR   = \"%s\"\n", driverdir);
+DRIVER_DIR     = \"%s\"\n", driverdir);
 	}
 #endif
 
-	fprintf(stderr, "\
-HELPFILE     = \"%s\"\n\
-CONTACT      = <%s>\n\
-HELPMAIL     = <%s>\n", helpfile, bug_email, help_email);
+#ifdef GNUPLOT_PS_DIR
+	{
+	   fprintf(stderr, "GNUPLOT_PS_DIR = \"%s\"\n", GNUPLOT_PS_DIR);
+	}
+#endif
+
+	fprintf(stderr, "HELPFILE       = \"%s\"\n", helpfile);
+#if 0
+	/* These are redundant. We just printed them 5 lines ago. */
+	fprintf(stderr, "CONTACT        = <%s>\n", bug_email);
+	fprintf(stderr, "HELPMAIL       = <%s>\n", help_email);
+#endif
 
     }
 }
