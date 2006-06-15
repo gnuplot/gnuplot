@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.125 2006/03/28 05:30:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.126 2006/04/27 20:51:22 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1038,6 +1038,7 @@ calculate_set_of_isolines(
 {
     int i, j;
     struct coordinate GPHUGE *points = (*this_iso)->points;
+    int do_update_color = need_palette && (!parametric || (parametric && value_axis == FIRST_Z_AXIS));
 
     for (j = 0; j < num_iso_to_use; j++) {
 	double iso = iso_min + j * iso_step;
@@ -1074,7 +1075,7 @@ calculate_set_of_isolines(
 	    points[i].type = INRANGE;
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].z, temp, points[i].type,
 					    value_axis, NOOP, NOOP);
-	    if (need_palette) {
+	    if (do_update_color) {
 		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].CRD_COLOR, temp, points[i].type, COLOR_AXIS, NOOP, NOOP);
 	    }
 	}

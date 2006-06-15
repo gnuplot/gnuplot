@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.155 2006/04/10 21:26:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.156 2006/05/13 00:42:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -541,6 +541,7 @@ do_3dplot(
     int key_count;
     legend_key *key = &keyT;
     char *s, *e;
+    TBOOLEAN pm3d_order_depth = 0;
 
     /* Initiate transformation matrix using the global view variables. */
     mat_rot_z(surface_rot_z, trans_mat);
@@ -894,6 +895,14 @@ do_3dplot(
     if (pcount == 1 && plots->num_iso_read == 1 && can_pm3d &&
 	(plots->plot_style == PM3DSURFACE || PM3D_IMPLICIT == pm3d.implicit))
 	    fprintf(stderr, "  Warning: Single isoline (scan) is not enough for a pm3d plot.\n\t   Hint: Missing blank lines in the data file? See 'help pm3d' and FAQ.\n");
+
+
+    pm3d_order_depth = (can_pm3d && !draw_contour && pm3d.direction == PM3D_DEPTH);
+
+    if (pm3d_order_depth) {
+	pm3d_depth_queue_clear();
+    }
+
     this_plot = plots;
     if (!quick)
 	for (surface = 0;
@@ -904,6 +913,10 @@ do_3dplot(
 
 	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit) {
 		pm3d_draw_one(this_plot);
+	    }
+
+	    if (pm3d_order_depth && this_plot->plot_style != PM3DSURFACE) {
+		pm3d_depth_queue_flush(); /* draw pending plots */
 	    }
 
 	    if (draw_surface) {
@@ -1031,6 +1044,9 @@ do_3dplot(
 	    case PM3DSURFACE:
 		if (can_pm3d && PM3D_IMPLICIT != pm3d.implicit) {
 		    pm3d_draw_one(this_plot);
+		    if (!pm3d_order_depth) {
+			pm3d_depth_queue_flush(); /* draw plot immediately */
+		    }
 		}
 		break;
 
@@ -1267,6 +1283,11 @@ do_3dplot(
 		} /* loop over contours */
 	    } /* draw contours */
 	} /* loop over surfaces */
+
+    if (pm3d_order_depth) {
+	pm3d_depth_queue_flush(); /* draw pending plots */
+    }
+
 
     /* DRAW GRID AND BORDER */
 #ifndef USE_GRID_LAYERS

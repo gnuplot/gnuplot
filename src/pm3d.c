@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.63 2005/08/07 09:43:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.64 2005/09/05 19:36:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -29,6 +29,8 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.63 2005/08/07 09:43:31 miku
 #include "term_api.h"		/* for lp_use_properties() */
 #include "command.h"		/* for c_token */
 
+#include <stdlib.h> /* qsort() */
+
 
 /*
   Global options for pm3d algorithm (to be accessed by set / show).
@@ -49,6 +51,17 @@ pm3d_struct pm3d = {
     1,				/* interpolate along scanline */
     1				/* interpolate between scanlines */
 };
+
+typedef struct {
+    double gray;
+    double z; /* maximal z value after rotation to graph coordinate system */
+    gpdPoint corners[4];
+    gpiPoint icorners[4]; /* also if EXTENDED_COLOR_SPECS is not defined */
+} quadrangle;
+
+static int allocated_quadrangles = 0;
+static int current_quadrangle = 0;
+static quadrangle* quadrangles = (quadrangle*)0;
 
 /* Internal prototypes for this module */
 static TBOOLEAN plot_has_palette;
@@ -324,6 +337,77 @@ pm3d_rearrange_scan_array(
     }
 }
 
+static int compare_quadrangles(const void* v1, const void* v2)
+{
+    const quadrangle* q1 = (const quadrangle*)v1;
+    const quadrangle* q2 = (const quadrangle*)v2;
+
+    if (q1->z > q2->z)
+	return 1;
+    else if (q1->z < q2->z)
+	return -1;
+    else
+	return 0;
+}
+
+void pm3d_depth_queue_clear(void)
+{
+    if (pm3d.direction != PM3D_DEPTH)
+	return;
+
+    if (quadrangles)
+	free(quadrangles);
+    quadrangles = (quadrangle*)0;
+    allocated_quadrangles = 0;
+    current_quadrangle = 0;
+}
+
+void pm3d_depth_queue_flush(void)
+{
+    if (pm3d.direction != PM3D_DEPTH)
+	return;
+
+    if (current_quadrangle > 0 && quadrangles) {
+
+	quadrangle* qp;
+	quadrangle* qe;
+	gpdPoint* gpdPtr;
+	gpiPoint* gpiPtr;
+	vertex out;
+	double z = 0; /* assignment keeps the compiler happy */
+	double w = trans_mat[3][3];
+	int i;
+
+	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
+
+	    gpdPtr = qp->corners;
+	    gpiPtr = qp->icorners;
+
+	    for (i = 0; i < 4; i++, gpdPtr++, gpiPtr++) {
+
+		map3d_xyz(gpdPtr->x, gpdPtr->y, gpdPtr->z, &out);
+
+		if (i == 0 || out.z > z)
+		    z = out.z;
+
+		gpiPtr->x = (unsigned int) ((out.x * xscaler / w) + xmiddle);
+		gpiPtr->y = (unsigned int) ((out.y * yscaler / w) + ymiddle);
+	    }
+
+	    qp->z = z; /* maximal z value of all four corners */
+	}
+
+	qsort(quadrangles, current_quadrangle, sizeof (quadrangle), compare_quadrangles);
+
+	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
+
+	    set_color(qp->gray);
+	    ifilled_quadrangle(qp->icorners);
+	}
+    }
+
+    pm3d_depth_queue_clear();
+}
 
 /*
  * Now the implementation of the pm3d (s)plotting mode
@@ -376,6 +460,25 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     curve = 0;
 
     pm3d_rearrange_scan_array(this_plot, &scan_array, &scan_array_n, &invert, (struct iso_curve ***) 0, (int *) 0, (int *) 0);
+
+    if (pm3d.direction == PM3D_DEPTH) {
+
+	for (scan = 0; scan < this_plot->num_iso_read - 1; scan++) {
+
+	    scanA = scan_array[scan];
+	    scanB = scan_array[scan + 1];
+
+	    are_ftriangles = pm3d.ftriangles && (scanA->p_count != scanB->p_count);
+	    if (!are_ftriangles)
+		allocated_quadrangles += GPMIN(scanA->p_count, scanB->p_count) - 1;
+	    else {
+		allocated_quadrangles += GPMAX(scanA->p_count, scanB->p_count) - 1;
+	    }
+	}
+
+	quadrangles = (quadrangle*)gp_realloc(quadrangles, allocated_quadrangles * sizeof (quadrangle), "pm3d_plot->quadrangles");
+	/* DEBUG: fprintf(stderr, "allocated_quadrangles = %d\n", allocated_quadrangles); */
+    }
     /* pm3d_rearrange_scan_array(this_plot, (struct iso_curve***)0, (int*)0, &scan_array, &invert); */
 
 #if 0
@@ -584,8 +687,30 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			cb2gray( color_from_column ? icorners[i].z : z2cb(icorners[i].z) );
 		}
 	    }
+	    if (pm3d.direction == PM3D_DEPTH) {
+
+		/* copy quadrangle */
+		quadrangle* qp = quadrangles + current_quadrangle;
+		memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
+		qp->gray = gray;
+		for (i = 0; i < 4; i++) {
+		    qp->icorners[i].z = icorners[i].z;
+		    qp->icorners[i].spec.gray = icorners[i].spec.gray;
+		}
+		current_quadrangle++;
+
+	    } else
 	    filled_quadrangle(corners, icorners);
 #else
+	    if (pm3d.direction == PM3D_DEPTH) {
+
+		/* copy quadrangle */
+		quadrangle* qp = quadrangles + current_quadrangle;
+		memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
+		qp->gray = gray;
+		current_quadrangle++;
+
+	    } else
 	    if (pm3d.interp_i > 1 || pm3d.interp_j > 1) {
 		/* Interpolation is enabled.
 		 * interp_i is the # of points along scan lines
@@ -663,7 +788,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     }
     /* free memory allocated by scan_array */
     free(scan_array);
-
 }				/* end of pm3d splotting mode */
 
 

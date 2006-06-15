@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.175 2006/03/26 20:00:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.176 2006/04/05 03:00:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2222,7 +2222,9 @@ show_pm3d()
 	}
 	fputs("\n", stderr);
     }
-    if (pm3d.direction != PM3D_SCANS_AUTOMATIC) {
+    if (pm3d.direction == PM3D_DEPTH) {
+	fprintf(stderr,"\ttrue depth ordering\n");
+    } else if (pm3d.direction != PM3D_SCANS_AUTOMATIC) {
 	fprintf(stderr,"\ttaking scans in %s direction\n",
 	    pm3d.direction == PM3D_SCANS_FORWARD ? "FORWARD" : "BACKWARD");
     } else {

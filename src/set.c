@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.228 2006/04/08 13:48:38 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.229 2006/04/16 21:22:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3019,6 +3019,9 @@ set_pm3d()
 		continue;
 	    case S_PM3D_SCANS_AUTOMATIC: /* "scansauto$matic" */
 		pm3d.direction = PM3D_SCANS_AUTOMATIC;
+		continue;
+	    case S_PM3D_DEPTH: /* "dep$thorder" */
+		pm3d.direction = PM3D_DEPTH;
 		continue;
 	    /* flush scans: left, right or center */
 	    case S_PM3D_FLUSH:  /* "fl$ush" */

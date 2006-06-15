@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.355 2006/06/11 00:29:44 tlecomte Exp $
+C RCS $Id: gnuplot.doc,v 1.356 2006/06/14 03:24:10 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7243,7 +7243,7 @@ C ... and restart the table:
        set pm3d {
                   { at <bst combination> }
                   { interpolate <steps in scan>,<steps between scans> }
-                  { scansautomatic | scansforward | scansbackward }
+                  { scansautomatic | scansforward | scansbackward | depthorder }
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
                   { clip1in | clip4in }

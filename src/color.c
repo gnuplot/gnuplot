@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.67 2006/06/10 03:20:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.68 2006/06/15 04:53:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -200,6 +200,29 @@ set_rgbcolor(int rgblt)
     term->set_color(&color);
 }
 
+void ifilled_quadrangle(gpiPoint* icorners)
+{
+    icorners->style = FS_OPAQUE;
+    term->filled_polygon(4, icorners);
+
+    if (pm3d.hidden3d_tag) {
+
+	int i;
+
+	/* Colour has changed, thus must apply properties again. That's because
+	   gnuplot has no inner notion of color.
+	 */
+	struct lp_style_type lp;
+	lp_use_properties(&lp, pm3d.hidden3d_tag, 1);
+	term_apply_lp_properties(&lp);
+
+	term->move(icorners[0].x, icorners[0].y);
+	for (i = 3; i >= 0; i--) {
+	    term->vector(icorners[i].x, icorners[i].y);
+	}
+    }
+}
+
 
 /* The routine above for 4 points explicitly.
  * This is the only routine which supportes extended
@@ -221,23 +244,7 @@ filled_quadrangle(gpdPoint * corners)
 	map3d_xy(corners[i].x, corners[i].y, corners[i].z, &icorners[i].x, &icorners[i].y);
     }
 
-    icorners->style = FS_OPAQUE;
-    term->filled_polygon(4, icorners);
-
-    if (pm3d.hidden3d_tag) {
-
-	/* Colour has changed, thus must apply properties again. That's because
-	   gnuplot has no inner notion of color.
-	 */
-	struct lp_style_type lp;
-	lp_use_properties(&lp, pm3d.hidden3d_tag, 1);
-	term_apply_lp_properties(&lp);
-
-	term->move(icorners[0].x, icorners[0].y);
-	for (i = 3; i >= 0; i--) {
-	    term->vector(icorners[i].x, icorners[i].y);
-	}
-    }
+    ifilled_quadrangle(icorners);
 }
 
 

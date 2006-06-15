@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.24 2005/03/29 08:07:16 mikulik Exp $
+ * $Id: pm3d.h,v 1.25 2005/09/05 19:36:59 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -65,6 +65,7 @@
 #define PM3D_SCANS_AUTOMATIC  'a'
 #define PM3D_SCANS_FORWARD    'f'
 #define PM3D_SCANS_BACKWARD   'b'
+#define PM3D_DEPTH            'd'
 
 /*
   clipping method:
@@ -134,6 +135,8 @@ extern pm3d_struct pm3d;
 ****/
 
 int get_pm3d_at_option __PROTO((char *pm3d_where));
+void pm3d_depth_queue_clear __PROTO((void));
+void pm3d_depth_queue_flush __PROTO((void));
 void pm3d_reset __PROTO((void));
 void pm3d_draw_one __PROTO((struct surface_points* plots));
 double z2cb __PROTO((double z));

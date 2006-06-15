@@ -1,3 +1,14 @@
+2006-06-15  Johannes Zellner <johannes@zellner.org>
+
+	* src/save.c src/set.c src/show.c src/tables.c src/tables.h:
+	New option 'set p3md depthorder' give depth-ordering of pm3d quadrangles.
+
+	* src/graph3d.c: TBOOLEAN pm3d_order_depth tracks the new option.
+
+	* src/pm3d.c src/pm3d.h (pm3d_depth_queue_clear pm3d_depth_queue_flush)
+	src/plot3d.c (calculate_set_of_isolines)
+	src/color.h src/color.c (ifilled_quadrangle): New support routines.
+
 2006-06-14  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/color.c (make_palette) src/term.c (term_start_plot):  
