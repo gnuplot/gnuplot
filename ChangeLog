@@ -3,6 +3,15 @@
 	* src/command.h: Add missing statement about copyright holders (i.e
 	the same as command.c, as command.h was created from this file).
 
+	* src/wxterminal/Makefile.am: New Makefile used to put all the
+	wxterminal source files and bitmaps in the 'make dist' target.
+
+	* src/Makefile.am (SUBDIRS): Add wxterminal to take the new Makefile.am
+	into account.
+
+	* configure.in (AC_OUTPUT): Include src/wxterminal/Makefile in the list
+	of files to create.
+
 2006-06-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version): Add the rest of the non-driver

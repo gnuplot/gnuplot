@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.188 2006/06/13 05:48:28 sfeam Exp $
+dnl $Id: configure.in,v 1.189 2006/06/14 00:13:10 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -1027,6 +1027,7 @@ AC_OUTPUT([Makefile
            share/LaTeX/Makefile
            src/Makefile
 	   src/beos/Makefile
+           src/wxterminal/Makefile
            term/Makefile
            tutorial/Makefile],
           [test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h])
