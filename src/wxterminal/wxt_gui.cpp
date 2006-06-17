@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.13 2006/06/13 20:26:37 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.14 2006/06/18 04:21:47 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -154,8 +154,6 @@ BEGIN_EVENT_TABLE( wxtPanel, wxPanel )
 	EVT_MIDDLE_UP( wxtPanel::OnMiddleUp )
 	EVT_RIGHT_DOWN( wxtPanel::OnRightDown )
 	EVT_RIGHT_UP( wxtPanel::OnRightUp )
-	EVT_KEY_DOWN( wxtPanel::OnKeyDownModifier )
-	EVT_KEY_UP( wxtPanel::OnKeyUpModifier )
 	EVT_CHAR( wxtPanel::OnKeyDownChar )
 #endif /*USE_MOUSE*/
 END_EVENT_TABLE()
@@ -714,6 +712,8 @@ void wxtPanel::OnMotion( wxMouseEvent& event )
 	mouse_x = event.GetX();
 	mouse_y = event.GetY();
 
+	UpdateModifiers(event);
+
 	/* informs gnuplot */
 	if ( this->GetId()==wxt_window_number )
 		wxt_exec_event(GE_motion,
@@ -729,6 +729,8 @@ void wxtPanel::OnLeftDown( wxMouseEvent& event )
 	x = (int) gnuplot_x( &plot, event.GetX() );
 	y = (int) gnuplot_y( &plot, event.GetY() );
 
+	UpdateModifiers(event);
+
 	if ( this->GetId()==wxt_window_number )
 		wxt_exec_event(GE_buttonpress, x, y, 1, 0, this->GetId());
 }
@@ -739,6 +741,8 @@ void wxtPanel::OnLeftUp( wxMouseEvent& event )
 	int x,y;
 	x = (int) gnuplot_x( &plot, event.GetX() );
 	y = (int) gnuplot_y( &plot, event.GetY() );
+
+	UpdateModifiers(event);
 
 	if ( this->GetId()==wxt_window_number ) {
 		wxt_exec_event(GE_buttonrelease, x, y, 1, (int) left_button_sw.Time(), this->GetId());
@@ -754,6 +758,8 @@ void wxtPanel::OnMiddleDown( wxMouseEvent& event )
 	x = (int) gnuplot_x( &plot, event.GetX() );
 	y = (int) gnuplot_y( &plot, event.GetY() );
 
+	UpdateModifiers(event);
+
 	if ( this->GetId()==wxt_window_number )
 		wxt_exec_event(GE_buttonpress, x, y, 2, 0, this->GetId());
 }
@@ -764,6 +770,8 @@ void wxtPanel::OnMiddleUp( wxMouseEvent& event )
 	int x,y;
 	x = (int) gnuplot_x( &plot, event.GetX() );
 	y = (int) gnuplot_y( &plot, event.GetY() );
+
+	UpdateModifiers(event);
 
 	if ( this->GetId()==wxt_window_number ) {
 		wxt_exec_event(GE_buttonrelease, x, y, 2,
@@ -780,6 +788,8 @@ void wxtPanel::OnRightDown( wxMouseEvent& event )
 	x = (int) gnuplot_x( &plot, event.GetX() );
 	y = (int) gnuplot_y( &plot, event.GetY() );
 
+	UpdateModifiers(event);
+
 	if ( this->GetId()==wxt_window_number )
 		wxt_exec_event(GE_buttonpress, x, y, 3, 0, this->GetId());
 }
@@ -791,6 +801,8 @@ void wxtPanel::OnRightUp( wxMouseEvent& event )
 	x = (int) gnuplot_x( &plot, event.GetX() );
 	y = (int) gnuplot_y( &plot, event.GetY() );
 
+	UpdateModifiers(event);
+
 	if ( this->GetId()==wxt_window_number ) {
 		wxt_exec_event(GE_buttonrelease, x, y, 3, (int) right_button_sw.Time(), this->GetId());
 		/* start a watch to send the time elapsed between up and down */
@@ -798,37 +810,24 @@ void wxtPanel::OnRightUp( wxMouseEvent& event )
 	}
 }
 
-/* a key has been pressed.
- * Here we handle modifiers (alt,ctrl,shift) and let OnKeyDownChar do the rest */
-void wxtPanel::OnKeyDownModifier( wxKeyEvent &event )
+/* the state of the modifiers is checked each time a key is pressed instead of
+ * tracking the press and release events of the modifiers keys, because the
+ * window manager catches some combinations, like ctrl+F1, and thus we do not
+ * receive a release event in this case */
+void wxtPanel::UpdateModifiers( wxMouseEvent& event )
 {
-	int keycode = event.GetKeyCode();
+	int current_modifier_mask = 0;
 
-	switch (keycode) {
-	case WXK_ALT : modifier_mask=(1<<2); break;
-	case WXK_CONTROL : modifier_mask=(1<<1); break;
-	case WXK_SHIFT : modifier_mask=(1); break;
-	default : break;
-	}
+	/* retrieve current modifier mask from the wxEvent */
+	current_modifier_mask |= (event.AltDown() ? (1<<2) : 0);
+	current_modifier_mask |= (event.ControlDown() ? (1<<1) : 0);
+	current_modifier_mask |= (event.ShiftDown() ? (1) : 0);
 
-	if (keycode == WXK_ALT || keycode == WXK_CONTROL ||
-	  keycode == WXK_SHIFT /*&& this->GetId() == wxt_window_number*/) {
+	/* update if changed */
+	if (modifier_mask != current_modifier_mask) {
+		modifier_mask = current_modifier_mask;
 		wxt_exec_event(GE_modifier, 0, 0, modifier_mask, 0, this->GetId());
-		return;
 	}
-
-	event.Skip(); /* an EVT_CHAR will follow, with translated keycodes */
-}
-
-/* a key has been released : we inform gnuplot about modifiers
- * (ctrl,alt,shift) */
-void wxtPanel::OnKeyUpModifier( wxKeyEvent &event )
-{
-	int keycode = event.GetKeyCode();
-
-	if (keycode == WXK_ALT || keycode==WXK_CONTROL ||
-	  keycode == WXK_SHIFT /*&& this->GetId()==wxt_window_number*/)
-		wxt_exec_event(GE_modifier, 0, 0, 0, 0, this->GetId());
 }
 
 /* a key has been pressed, modifiers have already been handled.
@@ -837,6 +836,22 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 {
 	int keycode = event.GetKeyCode();
 	int gp_keycode;
+
+	/* this is the same code as in UpdateModifiers(), but the latter method cannot be
+	 * used here because wxKeyEvent and wxMouseEvent are different classes, both of them
+	 * derive from wxEvent, but wxEvent does not have the necessary AltDown() and friends */
+	int current_modifier_mask = 0;
+
+	/* retrieve current modifier mask from the wxEvent */
+	current_modifier_mask |= (event.AltDown() ? (1<<2) : 0);
+	current_modifier_mask |= (event.ControlDown() ? (1<<1) : 0);
+	current_modifier_mask |= (event.ShiftDown() ? (1) : 0);
+
+	/* update if changed */
+	if (modifier_mask != current_modifier_mask) {
+		modifier_mask = current_modifier_mask;
+		wxt_exec_event(GE_modifier, 0, 0, modifier_mask, 0, this->GetId());
+	}
 
 #define WXK_GPKEYCODE(wxkey,kcode) case wxkey : gp_keycode=kcode; break;
 
@@ -924,13 +939,14 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 	}
 
 	/* only send char events to gnuplot if we are the active window */
-// 	if ( this->GetId()==wxt_window_number ) {
+	if ( this->GetId()==wxt_window_number ) {
 		FPRINTF((stderr,"sending char event\n"));
 		wxt_exec_event(GE_keypress, (int) gnuplot_x( &plot, mouse_x ),
 			(int) gnuplot_y( &plot, mouse_y ), gp_keycode, 0, this->GetId());
-// 	}
+	}
 
 	/* The following wxWidgets keycodes are not mapped :
+	 *	WXK_ALT, WXK_CONTROL, WXK_SHIFT,
 	 *	WXK_LBUTTON, WXK_RBUTTON, WXK_CANCEL, WXK_MBUTTON,
 	 *	WXK_CLEAR, WXK_MENU,
 	 *	WXK_NUMPAD_PRIOR, WXK_NUMPAD_NEXT,
