@@ -11,6 +11,9 @@
 	* docs/gnuplot.doc: Replace old "bugs" section with current list of
 	known bugs and limitations.
 
+	* docs/gnuplot.doc: Add pointers to 'set pm3d depthorder' in the 
+	discussion of hidden surface removal.
+
 2006-06-16  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/command.h: Add missing statement about copyright holders (i.e
