@@ -69,16 +69,6 @@ $(EXTRA_gnuplot_SOURCES)
 
 if BUILD_WXWIDGETS
 gnuplot_SOURCES += wxterminal/gp_cairo.c wxterminal/wxt_gui.cpp
-
-pngdir = $(pkgdatadir)/$(VERSION_MAJOR)/png
-png_DATA = wxterminal/bitmaps/png/clipboard.png \
-	wxterminal/bitmaps/png/grid.png \
-	wxterminal/bitmaps/png/replot.png \
-	wxterminal/bitmaps/png/previouszoom.png \
-	wxterminal/bitmaps/png/nextzoom.png \
-	wxterminal/bitmaps/png/autoscale.png \
-	wxterminal/bitmaps/png/config.png \
-	wxterminal/bitmaps/png/help.png
 endif
 
 ## we don't need COREOBJS, but CORETERM

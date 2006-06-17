@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.6 2006/06/10 23:36:31 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.7 2006/06/13 20:26:37 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -87,9 +87,6 @@
 /* double buffering facility for the drawing context */
 #include <wx/dcbuffer.h>
 
-/* path methods to look for pngs */
-#include <wx/stdpaths.h>
-
 /* system options used with wxMSW to workaround PNG problem in the toolbar */
 #include <wx/sysopt.h>
 
@@ -98,6 +95,9 @@
 
 /* wxGenericValidator */
 #include <wx/valgen.h>
+
+/* wxMemoryInputStream, for the embedded PNG icons */
+#include <wx/mstream.h>
 
 /* c++ vectors and lists, used to store gnuplot commands */
 #include <vector>
@@ -212,8 +212,8 @@ public:
 	 * displayed in the "about" dialog */
 	wxString datapath;
 private:
-	/* load a toolbar icon, given its path and number */
-	bool LoadPngIcon(wxString path, int icon_number);
+	/* load a toolbar icon */
+	void LoadPngIcon(const unsigned char *embedded_png, int length, int icon_number);
 	/* load a cursor */
 	void LoadCursor(wxCursor &cursor, char* xpm_bits[]);
 };
@@ -441,21 +441,9 @@ Config_APPLY,
 Config_CANCEL
 };
 
-
 /* array of toolbar icons */
 #define ICON_NUMBER 8
 static wxBitmap* toolBarBitmaps[ICON_NUMBER];
-/* array of toolbar icons location */
-static wxString icon_file[ICON_NUMBER] = {
-wxT("/clipboard.png"),
-wxT("/replot.png"),
-wxT("/grid.png"),
-wxT("/previouszoom.png"),
-wxT("/nextzoom.png"),
-wxT("/autoscale.png"),
-wxT("/config.png"),
-wxT("/help.png")
-};
 
 /* frames icons in the window manager */
 static wxIconBundle icon;

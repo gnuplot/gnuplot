@@ -1,3 +1,28 @@
+2006-06-17  TImothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/bitmaps/png/autoscale_png.h:
+	* src/wxterminal/bitmaps/png/clipboard_png.h:
+	* src/wxterminal/bitmaps/png/config_png.h:
+	* src/wxterminal/bitmaps/png/grid_png.h:
+	* src/wxterminal/bitmaps/png/help_png.h:
+        * src/wxterminal/bitmaps/png/nextzoom_png.h:
+	* src/wxterminal/bitmaps/png/previouszoom.h:
+        * src/wxterminal/bitmaps/png/replot_png.h:
+	New files containing the translation of the binary PNG files into
+	C arrays to be included in the source code.
+
+	* src/wxterminal/bitmaps/png/README.embedded:
+	Text file briefly explaining the purpose of the embedded PNG files.
+
+	* src/wxterminal/wxt_gui.cpp (wxtApp::OnInit): Remove the code to load
+	the PNG files from standard paths (unreliable). Replace by the loading
+	of the embedded files.
+
+	* src/wxterminal/wxt_gui.h: Update prototypes and included wxWidgets
+	headers according to the above changes.
+
+	* src/Makefile.am (png_DATA): Do not install the PNG icons. 
+
 2006-06-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/Makefile.am.in: Clean up temp.dat

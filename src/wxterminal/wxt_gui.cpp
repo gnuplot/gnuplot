@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.12 2006/06/10 22:51:58 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.13 2006/06/13 20:26:37 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -106,7 +106,17 @@
 #include "bitmaps/xpm/right.xpm"
 #include "bitmaps/xpm/rotate.xpm"
 #include "bitmaps/xpm/size.xpm"
-
+/* Toolbar icons
+ * Those are embedded PNG icons previously converted to an array.
+ * See bitmaps/png/README for details */
+#include "bitmaps/png/clipboard_png.h"
+#include "bitmaps/png/replot_png.h"
+#include "bitmaps/png/grid_png.h"
+#include "bitmaps/png/previouszoom_png.h"
+#include "bitmaps/png/nextzoom_png.h"
+#include "bitmaps/png/autoscale_png.h"
+#include "bitmaps/png/config_png.h"
+#include "bitmaps/png/help_png.h"
 
 /* ---------------------------------------------------------------------------
  * event tables and other macros for wxWidgets
@@ -205,9 +215,6 @@ bool wxtApp::OnInit()
 	 * However, in the context of multiple plot windows, the same code is written in wxt_init().
 	 * So, to avoid duplication of the code, we do only what is strictly necessary.*/
 
-	bool icon_error = false;
-	wxString suffix;
-
 	/* initialize frames icons */
 	icon.AddIcon(wxIcon(icon16x16_xpm));
 	icon.AddIcon(wxIcon(icon32x32_xpm));
@@ -221,40 +228,15 @@ bool wxtApp::OnInit()
 	wxSystemOptions::SetOption(wxT("msw.remap"), 0);
 #endif /* __WXMSW__ */
 
-	/* Path of the png icons for the toolbar.
-	 * With wxGTK, they are supposed to be in PREFIX/share/gnuplot/
-	 * With wxMSW, they are supposed to be in [path of wgnuplot.exe]/share/
-	 * If the following doesn't work,
-	 * the environement variable WXPREFIX may help. To be tested. */
-	wxStandardPathsBase& stdpathbase = wxStandardPaths::Get();
-	wxStandardPaths *stdpath = dynamic_cast<wxStandardPaths*>(&stdpathbase);
-#ifdef __WXGTK__
-	/* The prefix of the installation is defined in the preprocessor macro PREFIX. */
-	stdpath->SetInstallPrefix(wxT(PREFIX));
-	suffix = wxString(wxT("/"))
-				+ wxString(wxT(PACKAGE))
-				+ wxString(wxT("/"))
-				+ wxString(wxT(VERSION_MAJOR))
-				+ wxString(wxT("/png"));
-#elif defined(__WXMSW__)
-	suffix = wxT("/share");
-#else /* !__WXGTK__&&!__WXMSW__ */
-# warning "Not implemented."
-	suffix = wxT("");
-#endif 
-
-	datapath = wxString( stdpath->GetDataDir() );
-	datapath += suffix;
-
-	for (int i=0; i<ICON_NUMBER; ++i) {
-		if (!LoadPngIcon(datapath,i)) {
-			icon_error = true;
-			toolBarBitmaps[i] = new wxBitmap(notfound_xpm);
-		}
-	}
-
-	if (icon_error)
-		fprintf(stderr,"Can\'t load PNG icon(s) of the toolbar.\n");
+	/* load toolbar icons */
+	LoadPngIcon(clipboard_png, sizeof(clipboard_png), 0);
+	LoadPngIcon(replot_png, sizeof(replot_png), 1);
+	LoadPngIcon(grid_png, sizeof(grid_png), 2);
+	LoadPngIcon(previouszoom_png, sizeof(previouszoom_png), 3);
+	LoadPngIcon(nextzoom_png, sizeof(nextzoom_png), 4);
+	LoadPngIcon(autoscale_png, sizeof(autoscale_png), 5);
+	LoadPngIcon(config_png, sizeof(config_png), 6);
+	LoadPngIcon(help_png, sizeof(help_png), 7);
 
 	/* load cursors */
 	LoadCursor(wxt_cursor_cross, cross);
@@ -277,14 +259,11 @@ bool wxtApp::OnInit()
 	return true; /* means that process must continue */
 }
 
-/* load an icon from a file.
- * return true if it has succeeded. */
-bool wxtApp::LoadPngIcon(wxString path, int icon_number)
+/* load an icon from a PNG file embedded as a C array */
+void wxtApp::LoadPngIcon(const unsigned char *embedded_png, int length, int icon_number)
 {
-	wxString icon_path;
-	icon_path = path + icon_file[icon_number];
-	toolBarBitmaps[icon_number] = new wxBitmap(icon_path, wxBITMAP_TYPE_PNG);
-	return toolBarBitmaps[icon_number]->Ok();
+	wxMemoryInputStream pngstream(embedded_png, length);
+	toolBarBitmaps[icon_number] = new wxBitmap(wxImage(pngstream, wxBITMAP_TYPE_PNG));
 }
 
 /* load a cursor */
@@ -466,10 +445,7 @@ void wxtFrame::OnHelp( wxCommandEvent& WXUNUSED( event ) )
 		"Hit 'h' in the plot window "\
 		"and a help message for mouse commands "\
 		"will appear in the gnuplot console.\n"\
-		"See also 'help mouse'.\n"\
-		"\n"\
-		"Configuration and runtime information :\n"\
-		"\tPath for icons : ")) + wxGetApp().datapath,
+		"See also 'help mouse'.\n")),
 		wxT("wxWidgets terminal help"), wxOK | wxICON_INFORMATION, this );
 }
 
