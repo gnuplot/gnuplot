@@ -8,6 +8,9 @@
 
 	* docs/Makefile.in: Add Japanese language files to EXTRA_DIST
 
+	* docs/gnuplot.doc: Replace old "bugs" section with current list of
+	known bugs and limitations.
+
 2006-06-16  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/command.h: Add missing statement about copyright holders (i.e
