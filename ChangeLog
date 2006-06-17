@@ -3,8 +3,7 @@
 	* demo/Makefile.am.in: Clean up temp.dat
 
 	* share/Makefile.am: Attempt to install/uninstall Gnuplot.app-defaults
-	properly.  But autoconf/automake still doesn't handle it correctly.  
-	Somebody please fix it.
+	properly.
 
 	* docs/Makefile.in: Add Japanese language files to EXTRA_DIST
 
