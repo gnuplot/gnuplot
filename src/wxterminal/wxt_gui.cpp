@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.14 2006/06/18 04:21:47 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.15 2006/06/18 06:09:43 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -858,13 +858,27 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 	if (keycode<256) {
 		switch (keycode) {
 		case WXK_SPACE :
-			RaiseConsoleWindow();
-			return;
+			if ((wxt_ctrl==yes && event.ControlDown())
+				|| wxt_ctrl!=yes) {
+				RaiseConsoleWindow();
+				return;
+			} else {
+				gp_keycode = ' ';
+				break;
+			}
 		case 'q' :
-			/* closes terminal window */
-			/* TODO a "ctrlq" option */
-			this->GetParent()->Close(false);
-			return;
+		/* ctrl+q does not send 113 but 17 */
+		/* WARNING : may be the same for other combinations */
+		case 17 :
+			if ((wxt_ctrl==yes && event.ControlDown())
+				|| wxt_ctrl!=yes) {
+				/* closes terminal window */
+				this->GetParent()->Close(false);
+				return;
+			} else {
+				gp_keycode = 'q';
+				break;
+			}
 		WXK_GPKEYCODE(WXK_BACK,GP_BackSpace);
 		WXK_GPKEYCODE(WXK_TAB,GP_Tab);
 		WXK_GPKEYCODE(WXK_RETURN,GP_Return);
@@ -1099,6 +1113,7 @@ void wxtConfigDialog::OnButton( wxCommandEvent& event )
 		/* changes are applied immediately */
 		wxt_raise = raise_setting?yes:no;
 		wxt_persist = persist_setting?yes:no;
+		wxt_ctrl = ctrl_setting?yes:no;
 
 		switch (rendering_setting) {
 		case 0 :
@@ -1122,6 +1137,8 @@ void wxtConfigDialog::OnButton( wxCommandEvent& event )
 			wxLogError(wxT("Cannot write raise"));
 		if (!pConfig->Write(wxT("persist"), persist_setting))
 			wxLogError(wxT("Cannot write persist"));
+		if (!pConfig->Write(wxT("ctrl"), ctrl_setting))
+			wxLogError(wxT("Cannot write ctrl"));
 		if (!pConfig->Write(wxT("rendering"), rendering_setting))
 			wxLogError(wxT("Cannot write rendering_setting"));
 		if (!pConfig->Write(wxT("hinting"), hinting_setting))
@@ -1151,6 +1168,7 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	wxConfigBase *pConfig = wxConfigBase::Get();
 	pConfig->Read(wxT("raise"),&raise_setting);
 	pConfig->Read(wxT("persist"),&persist_setting);
+	pConfig->Read(wxT("ctrl"),&ctrl_setting);
 	pConfig->Read(wxT("rendering"),&rendering_setting);
 	pConfig->Read(wxT("hinting"),&hinting_setting);
 
@@ -1160,6 +1178,9 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	wxCheckBox *check2 = new wxCheckBox (this, wxID_ANY,
 		_T("Don't quit until all windows are closed (persist)"),
 		wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&persist_setting));
+	wxCheckBox *check3 = new wxCheckBox (this, wxID_ANY,
+		_T("Replace 'q' by <ctrl>+'q' and <space> by <ctrl>+<space> (ctrl)"),
+		wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&ctrl_setting));
 
 	wxString choices[3];
 	choices[0] = wxT("No antialiasing");
@@ -1204,6 +1225,7 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	wxBoxSizer *vsizer = new wxBoxSizer( wxVERTICAL );
 	vsizer->Add(check1,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	vsizer->Add(check2,wxSizerFlags().Align(0).Expand().Border(wxALL));
+	vsizer->Add(check3,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	vsizer->Add(box_sizer2,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	/*vsizer->Add(CreateButtonSizer(wxOK|wxCANCEL),wxSizerFlags().Align(0).Expand().Border(wxALL));*/
 	vsizer->Add(hsizer,wxSizerFlags().Align(0).Expand().Border(wxALL));
@@ -1336,6 +1358,7 @@ void wxt_init()
 
 	bool raise_setting;
        bool persist_setting;
+	bool ctrl_setting;
 	int rendering_setting;
 	int hinting_setting;
 
@@ -1352,6 +1375,13 @@ void wxt_init()
 
 	if (!pConfig->Read(wxT("persist"), &persist_setting))
 		pConfig->Write(wxT("persist"), false);
+
+	if (!pConfig->Read(wxT("ctrl"), &ctrl_setting)) {
+		pConfig->Write(wxT("ctrl"), false);
+		ctrl_setting = false;
+	}
+	if (wxt_ctrl==UNSET)
+		wxt_ctrl = ctrl_setting?yes:no;
 
 	if (!pConfig->Read(wxT("rendering"), &rendering_setting)) {
 		pConfig->Write(wxT("rendering"), 2);

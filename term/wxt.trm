@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.7 2006/06/12 04:26:45 tlecomte Exp $
+ * $Id: wxt.trm,v 1.8 2006/06/12 04:43:46 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -62,6 +62,7 @@ int wxt_window_number = 0;
 TBOOLEAN wxt_enhanced_enabled = FALSE;
 int wxt_persist = UNSET;
 int wxt_raise = UNSET;
+int wxt_ctrl = UNSET;
 /* default text font family: */
 char wxt_set_fontname[MAX_ID_LEN + 1] = "";
 /* default text size*/
@@ -77,6 +78,8 @@ enum WXT_id {
     WXT_NOPERSIST,
     WXT_RAISE,
     WXT_NORAISE,
+    WXT_CTRL,
+    WXT_NOCTRL,
     WXT_TITLE,
     WXT_CLOSE,
     WXT_OTHER
@@ -90,6 +93,8 @@ static struct gen_table wxt_opts[] = {
     {"noper$sist", WXT_NOPERSIST},
     {"rai$se", WXT_RAISE},
     {"norai$se", WXT_NORAISE},
+    {"ct$rl", WXT_CTRL},
+    {"noct$rl", WXT_NOCTRL},
     {"ti$tle", WXT_TITLE},
     {"cl$ose", WXT_CLOSE},
     {NULL, WXT_OTHER}
@@ -109,8 +114,8 @@ TERM_PUBLIC void wxt_options()
 	TBOOLEAN duplication = FALSE;
 	TBOOLEAN set_enhanced = FALSE, set_font = FALSE;
 	TBOOLEAN set_persist = FALSE, set_number = FALSE;
-	TBOOLEAN set_raise = FALSE, set_title = FALSE;
-	TBOOLEAN set_close = FALSE;
+	TBOOLEAN set_raise = FALSE, set_ctrl = FALSE;
+	TBOOLEAN set_title = FALSE, set_close = FALSE;
 
 	while (!END_OF_COMMAND) {
 		FPRINTF((stderr, "processing token\n"));
@@ -175,6 +180,18 @@ TERM_PUBLIC void wxt_options()
 			if (set_raise) duplication=TRUE;
 			set_raise = TRUE;
 			break;
+		case WXT_CTRL:
+			c_token++;
+			wxt_ctrl = yes;
+			if (set_ctrl) duplication=TRUE;
+			set_ctrl = TRUE;
+			break;
+		case WXT_NOCTRL:
+			c_token++;
+			wxt_ctrl = no;
+			if (set_ctrl) duplication=TRUE;
+			set_ctrl = TRUE;
+			break;
 		case WXT_TITLE:
 			c_token++;
 			if (!(s = try_to_get_string()))
@@ -236,6 +253,11 @@ TERM_PUBLIC void wxt_options()
 			wxt_raise ? " raise" : " noraise",
 			sizeof(term_options)-strlen(term_options));
 
+	if (set_ctrl)
+		strncat(term_options,
+			wxt_ctrl ? " ctrl" : " noctrl",
+			sizeof(term_options)-strlen(term_options));
+
 	if (set_close)
 		wxt_close_terminal_window(wxt_window_number);
 }
@@ -286,6 +308,7 @@ START_HELP(wxt)
 "                      {title \"title\"}",
 "                      {{no}persist}",
 "                      {{no}raise}",
+"                      {{no}ctrl}",
 "                      {close}",
 "",
 " Multiple plot windows are supported: `set terminal wxt <n>` directs the",
@@ -295,7 +318,7 @@ START_HELP(wxt)
 " be specified with the keyword \"title\".",
 "",
 " Plot windows remain open even when the `gnuplot` driver is changed to a",
-" different device.  A plot window can be closed by pressing the letter q",
+" different device.  A plot window can be closed by pressing the letter 'q'",
 " while that window has input focus, by choosing `close` from a window",
 " manager menu, or with `set term wxt <n> close`.",
 " The size of a plot may be changed by resizing the terminal window. The aspect",
@@ -359,6 +382,16 @@ START_HELP(wxt)
 " wobbling effects on diagonal lines ('plot x' for example).",
 " Hinting avoids the blur on horizontal and vertical lines caused by",
 " oversampling. The terminal will snap these lines to integer coordinates so",
-" that a one-pixel-wide line will actually be drawn on one and only one pixel."
+" that a one-pixel-wide line will actually be drawn on one and only one pixel.",
+"",
+" By default, the window is raised to the top of your desktop when a plot is",
+" drawn. This can be controlled with the keyword \"raise\".",
+" The keyword \"persist\" will prevent gnuplot from exiting before you",
+" explicitely close all the plot windows.",
+" Finally, by default the key <space> raises the gnuplot console window, and",
+" 'q' closes the plot window. The keyword \"ctrl\" allows you to replace those",
+" bindings by <ctrl>+<space> and <ctrl>+'q', respectively.",
+" These three keywords (raise, persist and ctrl) can also be set and remembered",
+" between sessions through the configuration dialog."
 END_HELP(wxt)
 #endif /* TERM_HELP */

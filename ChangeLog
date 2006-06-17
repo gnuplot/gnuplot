@@ -21,9 +21,18 @@
 	state of the modifier keys as known by the core. It replaces the
 	unreliable tracking of the press and release events. All wxMouseEvent
 	and wxKeyEvent processing methods updated.
+	(wxtPanel::OnKeyEvent):
+	(wxt_init):
+	(wxtConfigDialog):
+	New variable wxt_ctrl to handle 'q' and <space>.
 
-	* src/wxterminal/wxt_gui.h: Update prototypes and included wxWidgets
-	headers according to the above changes.
+	* src/wxterminal/wxt_gui.h:
+	* src/wxterminal/wxt_term.h:
+	Update prototypes and included wxWidgets headers according to the above
+	changes.
+
+	* term/wxt.trm (wxt_options): New terminal option '{no}ctrl'.
+	(TERM_HELP): Updated.
 
 	* src/Makefile.am (png_DATA): Do not install the PNG icons.
 

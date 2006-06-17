@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.8 2006/06/18 04:21:47 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.9 2006/06/18 06:09:43 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -208,9 +208,6 @@ public:
 	/* cleanup on exit */
 	int OnExit();
 
-	/* data path used to look for png icons in the toolbar
-	 * displayed in the "about" dialog */
-	wxString datapath;
 private:
 	/* load a toolbar icon */
 	void LoadPngIcon(const unsigned char *embedded_png, int length, int icon_number);
@@ -380,6 +377,7 @@ class wxtConfigDialog : public wxDialog
 	/* settings */
 	bool raise_setting;
 	bool persist_setting;
+	bool ctrl_setting;
 	/* rendering_setting :
 	 * 0 = no antialiasing, no oversampling
 	 * 1 = antialiasing, no oversampling

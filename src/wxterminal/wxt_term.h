@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.3 2006/06/04 23:16:05 tlecomte Exp $
+ * $Id: wxt_term.h,v 1.4 2006/06/08 17:59:50 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -99,6 +99,7 @@ extern int wxt_window_number;
 extern TBOOLEAN wxt_enhanced_enabled;
 extern int wxt_persist;
 extern int wxt_raise;
+extern int wxt_ctrl;
 extern char wxt_set_fontname[MAX_ID_LEN + 1];
 extern int wxt_set_fontsize;
 extern char wxt_title[MAX_ID_LEN + 1];
