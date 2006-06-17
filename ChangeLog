@@ -1,3 +1,10 @@
+2006-06-17  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/help.c (FindHelp): Return a pointer to an empty help key if the
+	user help string is ambiguous.  Change the len computation from strlen()
+	to strcspn() so that non ambiguous, sub-optioned strings work.
+	(help): Only PrintHelp if text exists to prevent blank line at output.
+
 2006-06-23  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* demo/image.dem: Clean up missing quotes.  Removed some resets so

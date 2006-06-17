@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.15 2004/04/13 17:23:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.16 2004/07/01 17:10:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -137,6 +137,7 @@ static LINKEY *keylist = NULL;	/* linked list of keys */
 static KEY *keys = NULL;	/* array of keys */
 static int keycount = 0;	/* number of keys */
 static FILE *helpfp = NULL;
+KEY empty_key = {NULL, 0, NULL, 0};
 
 static int LoadHelp __PROTO((char *path));
 static void sortkeys __PROTO((void));
@@ -191,8 +192,9 @@ help(
     /* look for the keyword in the help file */
     key = FindHelp(keyword);
     if (key != NULL) {
-	/* found the keyword: print help and return */
-	PrintHelp(key, subtopics);
+	/* found the keyword: if help exists, print and return */
+	if (key->text)
+	    PrintHelp(key, subtopics);
 	status = H_FOUND;
     } else {
 	status = H_NOTFOUND;
@@ -401,7 +403,7 @@ static KEY * /* NULL if not found */
 FindHelp(char *keyword)		/* string we look for */
 {
     KEY *key;
-    size_t len = strlen(keyword);
+    size_t len = strcspn(keyword, " ");
     int compare;
 
     for (key = keys, compare = 1; key->key != NULL && compare > 0; key++) {
@@ -411,10 +413,11 @@ FindHelp(char *keyword)		/* string we look for */
 		/* non-ambiguous abbreviation */
 		(void) strcpy(keyword, key->key);	/* give back the full spelling */
 		return (key);	/* found!! */
-	    }
+	    } else
+		return (&empty_key);
     }
 
-    /* not found, or ambiguous */
+    /* not found */
     return (NULL);
 }
 
