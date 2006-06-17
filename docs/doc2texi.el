@@ -373,9 +373,9 @@ particular conversion chore."
     (search-forward "@node")
     ;; (beginning-of-line)
     ;; (insert "\n\n" d2t-main-menu "\n\n")
-    (search-forward "@node Old_bugs")	; `texinfo-all-menus-update' seems
+    (search-forward "@node Bugs")	; `texinfo-all-menus-update' seems
     (beginning-of-line)			; to miss this one.  how odd.
-    (insert "@menu\n* Old_bugs::\t\t\t\n@end menu\n\n")
+    (insert "@menu\n* Bugs::\t\t\t\n@end menu\n\n")
     (goto-char (point-max))
     (insert d2t-texi-footer))
   (load-library "texinfo") ;; now do the hard stuff with texinfo-mode

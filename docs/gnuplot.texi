@@ -1098,6 +1098,7 @@ defaults to radians.
 * words::                       
 * column::                      
 * defined::                     
+* exists_::                     
 * stringcolumn::                
 * timecolumn::                  
 * tm_hour::                     
@@ -1411,9 +1412,9 @@ of its argument.   See `erf` and @ref{invnorm}.
 @findex igamma
 
 
-The `igamma(a,x)` function returns the incomplete gamma function of the real
-parts of its arguments.  a > 0 and x >= 0.  If the arguments are complex,
-the imaginary components are ignored.
+The `igamma(a,x)` function returns the normalized incomplete gamma function
+of the real parts of its arguments.  a > 0 and x >= 0.  If the arguments are
+complex, the imaginary components are ignored.
 
 @node imag, invnorm, igamma, Functions
 @subsubsection imag
@@ -1750,15 +1751,23 @@ This can be used to import external functions into gnuplot scripts using
 to fits or datafile plots.  It evaluates to the numerical value of the contents
 of column x. See @ref{using}.
 
-@node defined, stringcolumn, column, Functions
+@node defined, exists_, column, Functions
 @subsubsection defined
 
 @c ?expressions functions defined
 @c ?functions defined
-`defined(X)` returns 1 if a variable named X has been defined, otherwise
+`defined(X)` [DEPRECATED] returns 1 if a variable named X has been defined, otherwise
 it returns 0.
 
-@node stringcolumn, timecolumn, defined, Functions
+@node exists_, stringcolumn, defined, Functions
+@subsubsection exists 
+
+@c ?expressions functions exists
+@c ?functions exists
+`exists("X")` returns 1 if a variable named X has been defined, otherwise
+it returns 0.
+
+@node stringcolumn, timecolumn, exists_, Functions
 @subsubsection stringcolumn
 
 @c ?expressions functions stringcolumn
@@ -2363,8 +2372,8 @@ cbrange mapping of the palette. This allows smoothly-varying color along a
 @section mouse input
 
 @c ?mouse input
-The `x11`, `pm`, `windows`, and `ggi` terminals allow interaction with the
-current plot using the mouse. They also support the definition of hotkeys
+The `x11`, `pm`, `windows`, `ggi`, and `wxt` terminals allow interaction with
+the current plot using the mouse. They also support the definition of hotkeys
 to activate pre-defined functions by hitting a single key while the mouse
 focus is in the active plot window.  It is even possible to combine mouse
 input with `batch` command scripts, by invoking the command `pause mouse`
@@ -3927,17 +3936,17 @@ then `gnuplot` exits.
 
 Syntax:
 @example
-      lower @{x11_plot_window_nb@}
+      lower @{plot_window_nb@}
 
 @end example
 
 The @ref{lower} command lowers (opposite to @ref{raise}) plot window(s) associated
-with the interactive terminal of your gnuplot session, i.e. `pm`, `win` or
-`x11`. It puts the plot window to bottom in the z-order windows stack of the
-window manager of your desktop.
+with the interactive terminal of your gnuplot session, i.e. `pm`, `win`, `wxt`
+or `x11`. It puts the plot window to bottom in the z-order windows stack of
+the window manager of your desktop.
 
-As `x11` supports multiple plot windows, then by default it lowers these
-windows in descending order of most recently created on top to the least
+As `x11` and `wxt` support multiple plot windows, then by default they lower
+these windows in descending order of most recently created on top to the least
 recently created on bottom. If a plot number is supplied as an optional
 parameter, only the associated plot window will be lowered if it exists.
 
@@ -5822,17 +5831,17 @@ command) before exiting.
 
 Syntax:
 @example
-      raise @{x11_plot_window_nb@}
+      raise @{plot_window_nb@}
 
 @end example
 
 The @ref{raise} command raises (opposite to @ref{lower}) plot window(s) associated
-with the interactive terminal of your gnuplot session, i.e. `pm`, `win` or
-`x11`. It puts the plot window to front (top) in the z-order windows stack of
-the window manager of your desktop.
+with the interactive terminal of your gnuplot session, i.e. `pm`, `win`, `wxt`
+or `x11`. It puts the plot window to front (top) in the z-order windows stack
+of the window manager of your desktop.
 
-As `x11` supports multiple plot windows, then by default it raises these
-windows in descending order of most recently created on top to the least
+As `x11` and `wxt` support multiple plot windows, then by default they raise
+these windows in descending order of most recently created on top to the least
 recently created on bottom. If a plot number is supplied as an optional
 parameter, only the associated plot window will be raised if it exists.
 
@@ -8073,6 +8082,9 @@ even if no surface is present in the graph.  Individual plots within the
 graph may be explicitly excluded from this processing by appending the extra
 option `nohidden3d` to the @ref{with} specifier.
 
+Hidden3d does not affect solid surfaces drawn using the pm3d mode. To 
+achieve a similar effect for pm3d surfaces, use instead set `pm3d depthorder`.
+
 Functions are evaluated at isoline intersections.  The algorithm interpolates
 linearly between function points or data points when determining the visible
 line segments.  This means that the appearance of a function may be different
@@ -8929,16 +8941,16 @@ to tic labels overwriting other text if the axis is very close to the border.
 
 @cindex nomouse
 
-The command `set mouse` enables mouse actions. Currently the pm, x11, ggi and
-windows terminals are mouse enhanced. There are two mouse modes. The 2d-graph
-mode works for 2d graphs and for maps (i.e. splots with @ref{view} having
-z-rotation 0, 90, 180, 270 or 360 degrees, including `set view map`) and it
-allows tracing the position over graph, zooming, annotating graph etc. For 3d
-graphs `splot`, the view and scaling of the graph can be changed with mouse
-buttons 1 and 2. If additionally to these buttons the modifier <ctrl> is hold
-down, the coordinate system only is rotated which is useful for large data
-sets. A vertical motion of Button 2 with the shift key hold down changes the
-@ref{ticslevel}.
+The command `set mouse` enables mouse actions. Currently the pm, x11, ggi,
+windows and wxt terminals are mouse enhanced. There are two mouse modes. The
+2d-graph mode works for 2d graphs and for maps (i.e. splots with @ref{view}
+having z-rotation 0, 90, 180, 270 or 360 degrees, including `set view map`)
+and it allows tracing the position over graph, zooming, annotating graph etc.
+For 3d graphs `splot`, the view and scaling of the graph can be changed with
+mouse buttons 1 and 2. If additionally to these buttons the modifier <ctrl> is
+hold down, the coordinate system only is rotated which is useful for large
+data sets. A vertical motion of Button 2 with the shift key hold down changes
+the @ref{ticslevel}.
 
 Mousing is not available in multiplot mode. When multiplot is finished using
 @ref{multiplot}, then the mouse will be turned on again and acts on the
@@ -9400,7 +9412,7 @@ The filename must be enclosed in quotes.  If the filename is omitted, any
 output file opened by a previous invocation of @ref{output} will be closed
 and new output will be sent to STDOUT.  (If you give the command `set output
 "STDOUT"`, your output may be sent to a file named "STDOUT"!  ["May be", not
-"will be", because some terminals, like `x11`, ignore @ref{output}.])
+"will be", because some terminals, like `x11` or `wxt`, ignore @ref{output}.])
 
 MSDOS users should note that the \ character has special significance in
 double-quoted strings, so single-quotes should be used for filenames in
@@ -9586,7 +9598,7 @@ Syntax (the options can be given in any order):
       set pm3d @{
                  @{ at <bst combination> @}
                  @{ interpolate <steps in scan>,<steps between scans> @}
-                 @{ scansautomatic | scansforward | scansbackward @}
+                 @{ scansautomatic | scansforward | scansbackward | depthorder @}
                  @{ flush @{ begin | center | end @} @}
                  @{ ftriangles | noftriangles @}
                  @{ clip1in | clip4in @}
@@ -11128,9 +11140,9 @@ To specify explicit fillstyles for each dataset:
 
 Currently only the following terminal drivers support fillstyles other
 than `empty`:
-x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
-jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
-tandy_60dpi. The BeOS driver (`be`) is untested.
+x11, windows, pm, wxt, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii,
+hp500c, jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc
+and tandy_60dpi. The BeOS driver (`be`) is untested.
 
 
 @noindent --- BOXXYERRORBARS ---
@@ -11582,10 +11594,10 @@ image data grid can be any of eight possible combinations.
 
 Currently only the following terminal drivers support data matrix images:
 
-x11 - Pixels are either repeated or decimated to fit the x11 resolution;
+x11 and wxt - Pixels are either repeated or decimated to fit the display
 @example
-      no other processing (filtering) is done.  Thus, aliasing may occur
-      when decimating images having high spatial frequency content.
+      resolution; no other processing (filtering) is done.  Thus, aliasing may
+      occur when decimating images having high spatial frequency content.
 
 @end example
 
@@ -19241,11 +19253,10 @@ gnuplot_x11 commands, but sends them to the output file specified by
 @cindex gui's
 
 Several graphical user interfaces have been written for `gnuplot` and one for
-win32 is included in this distribution.  In addition, there is a Macintosh
+win32 is included in this distribution.  In addition, there is a Python
 interface at
-@uref{ftp://ftp.ee.gatech.edu/pub/mac/gnuplot,ftp://ftp.ee.gatech.edu/pub/mac/gnuplot
+@uref{http://py-gnuplot.darwinports.com/,http://py-gnuplot.darwinports.com/
 }
-
 
 Also several X11 interfaces exist.
 One of them is called xgfe. It uses the Qt library and can be found on
@@ -19263,10 +19274,36 @@ version of this package is available from
 }
 
 
+@menu
+* Bugs::			
+@end menu
+
 @node Bugs, Concept_Index, Graphical_User_Interfaces, Top
 @chapter Bugs
 
 @cindex bugs
+
+Bugs reported since the current release as well as older ones
+may be located via the official distribution site on SourceForge.
+
+Please e-mail bug reports to the gnuplot-bugs mailing list.
+Or upload the report to the gnuplot web site on SourceForge.
+Please give complete information on the version of gnuplot you are using
+and, if possible, a test script that demonstrates the bug.
+See @ref{Seeking-assistance}.
+
+
+@menu
+* Known_bugs_and_limitations::  
+@end menu
+
+@node Known_bugs_and_limitations,  , Bugs, Bugs
+@section Known bugs and limitations
+
+
+This is a list of problems known to be present in gnuplot version 4.2 at the
+time of release.  Some of these are actually bugs in external support libraries
+and may have been fixed indepently of any changes in gnuplot.
 
 Floating point exceptions (floating point number too large/small, divide by
 zero, etc.) may occasionally be generated by user defined functions.  Some of
@@ -19279,106 +19316,33 @@ The bessel functions do not work for complex arguments.
 
 The gamma function does not work for complex arguments.
 
-As of `gnuplot` version 3.7, all development has been done using ANSI C.
-With current operating system, compiler, and library releases, the OS
-specific bugs documented in release 3.5, now relegated to `old_bugs`, may
-no longer be relevant.
+Only one color palette at a time is active for any given x11 plot window.
+This means that multiplots whose constituent plots use different palettes
+will not display correctly in x11.
 
-Bugs reported since the current release as well as older ones
-may be located via the official distribution site:
-@uref{http://www.gnuplot.info,http://www.gnuplot.info
-}
+Coordinates specified as "time" wrap at 24 hours, and have a precision limited
+to 1 second.  This is in particular a limitation in using time format to
+handle geographic coordinates.
 
-Please e-mail any bugs to bug-gnuplot mailing list (see @ref{Seeking-assistance}).
-
-
-@menu
-* Old_bugs::                    
-@end menu
-
-@node Old_bugs,  , Bugs, Bugs
-@section Old_bugs
-
-@cindex old_bugs
-
-@cindex os_bugs
-
-There is a bug in the stdio library for old Sun operating systems (SunOS
-Sys4-3.2).  The "%g" format for 'printf' sometimes incorrectly prints numbers
-(e.g., 200000.0 as "2").  Thus, tic mark labels may be incorrect on a Sun4
-version of `gnuplot`.  A work-around is to rescale the data or use the `set
-format` command to change the tic mark format to "%7.0f" or some other
-appropriate format.  This appears to have been fixed in SunOS 4.0.
-
-Another bug: On a Sun3 under SunOS 4.0, and on Sun4's under Sys4-3.2 and
-SunOS 4.0, the 'sscanf' routine incorrectly parses "00 12" with the format
-"%f %f" and reads 0 and 0 instead of 0 and 12.  This affects data input.  If
-the data file contains x coordinates that are zero but are specified like
-'00', '000', etc, then you will read the wrong y values.  Check any data
-files or upgrade the SunOS.  It appears to have been fixed in SunOS 4.1.1.
-
-Suns appear to overflow when calculating exp(-x) for large x, so `gnuplot`
-gets an undefined result.  One work-around is to make a user-defined function
-like e(x) = x<-500 ? 0 : exp(x).  This affects plots of Gaussians (exp(-x*x))
-in particular, since x*x grows quite rapidly.
-
-Microsoft C 5.1 has a nasty bug associated with the %g format for 'printf'.
-When any of the formats "%.2g", "%.1g", "%.0g", "%.g" are used, 'printf' will
-incorrectly print numbers in the range 1e-4 to 1e-1.  Numbers that should be
-printed in the %e format are incorrectly printed in the %f format, with the
-wrong number of zeros after the decimal point.  To work around this problem,
-use the %e or %f formats explicitly.
-
-`gnuplot`, when compiled with Microsoft C, did not work correctly on two VGA
-displays that were tested.  The CGA, EGA and VGA drivers should probably be
-rewritten to use the Microsoft C graphics library.  `gnuplot` compiled with
-Borland C++ uses the Turbo C graphics drivers and does work correctly with
-VGA displays.
-
-VAX/VMS 4.7 C compiler release 2.4 also has a poorly implemented %g format
-for 'printf'.  The numbers are printed numerically correct, but may not be in
-the requested format.  The K&R second edition says that for the %g format, %e
-is used if the exponent is less than -4 or greater than or equal to the
-precision.  The VAX uses %e format if the exponent is less than -1.  The VAX
-appears to take no notice of the precision when deciding whether to use %e or
-%f for numbers less than 1.  To work around this problem, use the %e or %f
-formats explicitly.  From the VAX C 2.4 release notes: e,E,f,F,g,G  Result
-will always contain a decimal  point.  For g and G, trailing zeros will not
-be removed from the result.
-
-VAX/VMS 5.2 C compiler release 3.0 has a slightly better implemented %g
-format than release 2.4, but not much.  Trailing decimal points are now
-removed, but trailing zeros are still not removed from %g numbers in
-exponential format.
-
-The two preceding problems are actually in the libraries rather than in the
-compilers.  Thus the problems will occur whether `gnuplot` is built using
-either the DEC compiler or some other one (e.g. the latest gcc).
-
-ULTRIX X11R3 has a bug that causes the X11 driver to display "every other"
-graph.  The bug seems to be fixed in DEC's release of X11R4 so newer releases
-of ULTRIX don't seem to have the problem.  Solutions for older sites include
-upgrading the X11 libraries (from DEC or direct from MIT) or defining
-ULTRIX_KLUDGE when compiling the x11.trm file.  Note that the kludge is not
-an ideal fix, however.
-
-The constant HUGE was incorrectly defined in the NeXT OS 2.0 operating
-system.  HUGE should be set to 1e38 in plot.h. This error has been corrected
-in the 2.1 version of NeXT OS.
+Error bars are not handled properly in polar/spherical coordinate plot modes.
 
 Some older models of HP plotters do not have a page eject command 'PG'.  The
 current HPGL driver uses this command in HPGL_reset.  This may need to be
 removed for these plotters.  The current PCL5 driver uses HPGL/2 for text as
 well as graphics.  This should be modified to use scalable PCL fonts.
 
-On the Atari version, it is not possible to send output directly to the
-printer (using `/dev/lp` as output file), since CRs are added to LFs in
-binary output.  As a work-around, write the output to a file and copy it to
-the printer afterwards using a shell command.
+External library GD (used by PNG/JPEG/GIF drivers):
+Versions of libgd through 2.0.33 contain various bugs in mapping the characters
+of Adobe's Symbol font.  Also it is possible to trigger a library segfault if
+an anti-aliased line crosses an upper corner of the canvas.
 
-On AIX 4, the literal 'NaNq' in a datafile causes the special internal value
-'not-a-number' to be stored, rather than setting an internal 'undefined'
-flag.  A workaround is to use `set datafile missing 'NaNq'`.
+External library PDFlib (used by PDF driver):
+Gnuplot can be linked against libpdf versions 4, 5, or 6. However, these
+versions differ in their handling of piped I/O.  Therefore gnuplot scripts
+using piped output to PDF may work only for some versions of PDFlib.
+
+
+
 @node Concept_Index, Command_Index, Bugs, Top
 @unnumbered Concept Index
 @printindex cp

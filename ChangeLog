@@ -13,6 +13,8 @@
 	* docs/gnuplot.doc: Add pointers to 'set pm3d depthorder' in the 
 	discussion of hidden surface removal.
 
+	* docs/gnuplot.texi docs/doc2texi.el: Regenerate gnuplot.texi
+
 2006-06-16  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/command.h: Add missing statement about copyright holders (i.e
