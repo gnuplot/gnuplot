@@ -1,3 +1,13 @@
+2006-06-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/Makefile.am.in: Clean up temp.dat
+
+	* share/Makefile.am: Attempt to install/uninstall Gnuplot.app-defaults
+	properly.  But autoconf/automake still doesn't handle it correctly.  
+	Somebody please fix it.
+
+	* docs/Makefile.in: Add Japanese language files to EXTRA_DIST
+
 2006-06-16  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/command.h: Add missing statement about copyright holders (i.e

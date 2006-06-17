@@ -6,16 +6,19 @@ EXTRA_DIST = Gnuplot.app-defaults
 SUBDIRS = LaTeX
 
 #
-# Someone please generalize this path definition. 
-# I have no idea how find it via autoconf!
+# Someone please rewrite this to work correctly
+# DESTDIR is not being recognized; 
+# XRESOURCEPATH should come from the syste config
 #
 XRESOURCEPATH = /usr/lib/X11/app-defaults
 
 install:
-	if test -d $(XRESOURCEPATH) && test -w $(XRESOURCEPATH); then \
-	  $(INSTALL_DATA) Gnuplot.app-defaults $(XRESOURCEPATH)/Gnuplot \
+	if test -d $(DESTDIR)$(XRESOURCEPATH) && test -w $(DESTDIR)$(XRESOURCEPATH); then \
+	  $(INSTALL_DATA) Gnuplot.app-defaults $(DESTDIR)$(XRESOURCEPATH)/Gnuplot \
 	; fi
 
 uninstall:
-	rm -f $(XRESOURCEPATH)/Gnuplot
+	if test -d $(DESTDIR)$(XRESOURCEPATH) && test -w $(DESTDIR)$(XRESOURCEPATH); then \
+	rm -f $(DESTDIR)$(XRESOURCEPATH)/Gnuplot \
+	; fi
 
