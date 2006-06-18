@@ -3,6 +3,10 @@
 	* src/show.c (show_version):  List additional configuration options.
 	Make the show version output more compact (25 lines).
 
+	* term/emf.trm (EMF_linetype EMF_dashtype): It is necessary to set the
+	line color and dash type every time either is changed.
+	Bugfix.
+
 2006-06-17  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/bitmaps/png/autoscale_png.h:

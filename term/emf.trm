@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.36 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: emf.trm,v 1.37 2006/03/06 00:13:27 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -675,8 +675,11 @@ EMF_linetype(int linetype)
 {
     /* Note : separating linetype and color would have not been futile, but anyway... */
 
+#if (0)  /* Not safe because linetype/color/pen are intermixed */
     if (linetype == emf_linetype)
 	return;
+#endif
+
     if (linetype == LT_NODRAW)
 	linetype = LT_BACKGROUND;
 	
@@ -712,8 +715,6 @@ EMF_linecolor(int linecolor)
 	emf_color = RGB(255, 255, 255);	/* white (background) */
     else {
 	linecolor = (linecolor < 0 || emf_monochrome) ? 7 : (linecolor % EMF_COLORS);
-	if (color_table_data[linecolor] == emf_color)
-	    return;
 	emf_color = color_table_data[linecolor];
     }
 
@@ -814,6 +815,9 @@ EMF_linewidth(double width)
 	EMF_dashtype(current_dashtype);    /* Force re-evaluation of dash type */
 }
 
+/*
+ * Resets _both_ line color and dash type!
+ */
 TERM_PUBLIC void 
 EMF_dashtype(int dashtype)
 {
@@ -830,11 +834,8 @@ EMF_dashtype(int dashtype)
 	4, 9, 4, 2, 4, 2, 0, 0,	/* 4 - dash-dot-dot      */
     };
 
-
     if (dashtype < 0)
 	dashtype = 0;
-    if (dashtype == emf_dashtype)
-	return;
 
     emf_dashtype = dashtype;
 
