@@ -5,7 +5,6 @@ News, changes and fixes since gnuplot version 4.0
 * NEW windows terminal supports enhanced text mode
 * NEW support for placement of individual rectangles within plot or canvas
 * NEW command "set style increment user" allows customization of default lines
-* NEW support for enhanced text mode in Windows terminal driver
 * NEW commands raise and lower
 * NEW y and y2 axis label rotation can be explicitly controlled (2D plots only)
 * NEW {no}enhanced flag can be applied to individual labels
@@ -19,6 +18,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW control decimal sign conventions using locale setting LC_NUMERIC
 * NEW pstex, pslatex and epslatex terminals share functionality with postscript
 * NEW suboptions "set pm3d corners2color min|max"
+* NEW suboption  "set pm3d depthorder" does hidden-surface removal (sort of)
 * NEW linetype colors via "lt {palette {frac <val> | cb <val>}}"
 * NEW linetype colors via "lt {rgbcolor {"name" | "#RRGGBB"}}"
 * NEW palette and rgb linetype colors apply to all 2D and 3D plot elements

@@ -1,31 +1,5 @@
-This is the list of known bugs that remain in the program for lack of
-opportunity or knowledge how to solve them.  Please see and use
+Please see and use
 
 	http://sourceforge.net/tracker/?atid=102055&group_id=2055&func=browse
 
 for an up-to-date bug tracking system.
-
- *) The hidden line algorithm still is not perfect.  Especially when
-    hidden edges would pass very close to visible vertices or edges,
-    they can appear to "bleed through".  There is an option to draw
-    both sides of the surface in the same linetype, thus avoiding this
-    problem to become noticeable.
-
- *) In the Atari version, windows are not currently supported.  This
-    means gnuplot 3.4 will not run with MultiAES.  We hope to correct
-    this shortly in gpcontrb.tar.z.
-    [Status of this bug: unknown]
-
- *) Arrows and labels are not clipped (2D and 3D).
-
- *) (Not really a bug)
-    Terminal drivers which are accompanied by external executables
-    could cause some trouble: their subprocesses (started by fork() e.g.)
-    may inherit handles to open file(s) from the main process.
-    If the filesystem doesn't allow deleting open files these file are
-    locked for the time the terminal driver is running.
-
- *) In pcl5 mode, the hpgl driver prints a spurious "DI,1DI,0" string in the
-    upper left corner of the plot. 
-    [Source code suggests this is solved.  Needs confirmation.]
-
