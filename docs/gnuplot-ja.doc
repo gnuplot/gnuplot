@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.348 2006/03/26 20:00:20 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.360 2006/06/18 05:15:52 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -89,7 +89,7 @@ C
  (以下おおまかな訳; 訳は正しくないかも知れませんので詳しくは上記の原文
  を当たってください。訳者は責任を持ちません。)
 
-       Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+       Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 
  このソフトウェアとその付属文書の使用、複製、配布の許可は、上記の著作権
  (copyright) 表示が、全ての複製物に書かれていること、および著作権表示と
@@ -991,8 +991,8 @@ C
 ?igamma
 #igamma(a,x) & 任意 & $\mbox{igamma}(\mbox{real}(a,x))$, $a$,$x$ の実部の不完全ガンマ関数 \\
 %igamma(a,x)@任意@$igamma ( roman real (a,x))$, $a$,$x$ の実部の不完全ガンマ関数
- 関数 `igamma(a,x)` 引数の実部の不完全ガンマ関数の値を返します。a > 0,
- x >= 0 です。引数が複素数の場合は虚部は無視されます。
+ 関数 `igamma(a,x)` は引数の実部の、正規化された不完全ガンマ関数の値を
+ 返します。a > 0, x >= 0 です。引数が複素数の場合は虚部は無視されます。
 4 imag
 ?expressions functions imag
 ?functions imag
@@ -1233,9 +1233,15 @@ C
 4 defined
 ?expressions functions defined
 ?functions defined
-#defined(X) & 変数名 & 変数 X が定義されていれば 1 そうでなければ 0 を返す\\
-%defined(X)@変数名@ 変数 X が定義されていれば 1 そうでなければ 0 を返す
- `defined(X)` は、変数 X が定義されていれば 1 そうでなければ 0 を返します。
+#defined(X) & 変数名 & [非推奨] X が定義されていれば 1 そうでなければ 0 を返す\\
+%defined(X)@変数名@ [非推奨] X が定義されていれば 1 そうでなければ 0 を返す
+ `defined(X)` [非推奨] は、X が定義されていれば 1 そうでなければ 0 を返します。
+4 exists 
+?expressions functions exists
+?functions exists
+#exists("X") & "変数名" & 変数名 X が定義されていれば 1 そうでなければ 0 を返す\\
+%exists("X")@"変数名"@ 変数名 X が定義されていれば 1 そうでなければ 0 を返す
+ `exists("X")` は、変数名 X が定義されていれば 1 そうでなければ 0 を返します。
 4 stringcolumn
 ?expressions functions stringcolumn
 ?functions stringcolumn
@@ -1793,14 +1799,14 @@ C ... and restart the table:
 
 2 mouse input
 ?mouse input
- 出力形式 `x11`, `pm`, `windows`, `ggi` では、現在の描画にマウスを使って
- 作用をすることが可能になっています。これらはホットキーの定義もサポート
- していて、マウスカーソルが有効な描画ウィンドウにあるときに、あるキーを
- 押すことであらかじめ定義した関数を実行させることができます。マウス入力
- を `batch` コマンドスクリプトと組み合わせることも可能で、例えば
- `pause mouse` として、その後にマウスクリックによってパラメータとして返
- って来るマウス変数をその後のスクリプト動作に反映させることができます。
- `bind`, `mouse variables`, も参照してください。また、コマンド
+ 出力形式 `x11`, `pm`, `windows`, `ggi`, `wxt` では、現在の描画にマウス
+ を使って作用をすることが可能になっています。これらはホットキーの定義も
+ サポートしていて、マウスカーソルが有効な描画ウィンドウにあるときに、あ
+ るキーを押すことであらかじめ定義した関数を実行させることができます。マ
+ ウス入力を `batch` コマンドスクリプトと組み合わせることも可能で、例え
+ ば `pause mouse` として、その後にマウスクリックによってパラメータとし
+ て返って来るマウス変数をその後のスクリプト動作に反映させることができま
+ す。`bind`, `mouse variables`, も参照してください。また、コマンド
  `set mouse` も参照してください。
 3 bind
 ?commands bind
@@ -2660,17 +2666,15 @@ C ... and restart the table:
  それは、x の値の "誤差" を計算に関してはどんな方法も与えてはおらず、単
  に y に関する評価のみです。また、"孤立点" (正規分布のモデルのから外れ
  ているデータ点) は常に解を悪化させる可能性があります。
-3 fit controlling
-?commands fit_control
-?fit_control
+3 control
+?commands fit control
 ?fit control
  `fit` に影響を与えるために定義できるたくさんの `gnuplot` の変数があり
  ます。それらは `gnuplot` の動作中に一度定義できますが、それは
  `control_variable` で紹介し、`gnuplot` が立 ち上がる前に設定する変数は
  `environment_variables` で紹介します。
 4 control variables
-?commands fit_control variables
-?fit_control variables
+?commands fit control variables
 ?fit control variables
  デフォルトのもっとも小さい数字の限界 (1e-5) は、変数
        FIT_LIMIT
@@ -2705,8 +2709,7 @@ C ... and restart the table:
  なわれていて、そこでは枝の指定には 2 変数と `using` が使われています。
  `fit multi-branch` を参照してください。
 4 environment variables
-?commands fit_control environment
-?fit_control environment
+?commands fit control environment
 ?fit control environment
  環境変数は `gnuplot` が立ち上がる前に定義しなければなりません。その設
  定方法はオペレーティングシステムに依存します。
@@ -2714,7 +2717,7 @@ C ... and restart the table:
        FIT_LOG
  は、当てはめのログが書かれるファイル名 (およびパス) を変更します。デフ
  ォルトでは、作業ディレクトリ上の "fit.log" となっています。そのデフォ
- ルトの値はコマンド `set fitlogfile` を使って上書きできます。
+ ルトの値はコマンド `set fit logfile` を使って上書きできます。
 
        FIT_SCRIPT
  は、ユーザが中断した後に実行するコマンドを指定します。デフォルトでは
@@ -2949,18 +2952,18 @@ C ... and restart the table:
 ?commands lower
 ?lower
  書式:
-       lower {x11_plot_window_nb}
+       lower {plot_window_nb}
 
- コマンド `lower` (`raise` の反対) は、`pm`, `win`, `x11` 等の gnuplot
- の対話型出力形式の実行中に、描画ウィンドウを下 (背後) に下げます。描画
- ウィンドウを、デスクトップ上のウィンドウマネージャの z 方向のウィンド
- ウの重なりの下に置きます。
+ コマンド `lower` (`raise` の反対) は、`pm`, `win`, `wxt`, `x11` 等の 
+ gnuplot の対話型出力形式の実行中に、描画ウィンドウを下 (背後) に下げま
+ す。描画ウィンドウを、デスクトップ上のウィンドウマネージャの z 方向の
+ ウィンドウの重なりの下に置きます。
 
- `x11` のように複数の描画ウィンドウをサポートしている場合、デフォルトで
- はこのコマンドはそれらの複数のウィンドウを降順に下げ、最初に作られたウ
- ィンドウを一番下に、最後に作られたウィンドウを一番上に並べます。オプシ
- ョン引数の描画番号が与えられた場合、それに対応する描画ウィンドウが存在
- すればそれのみが下げられます。
+ `x11` や `wxt` のように複数の描画ウィンドウをサポートしている場合、デ
+ フォルトではこのコマンドはそれらの複数のウィンドウを降順に下げ、最初に
+ 作られたウィンドウを一番下に、最後に作られたウィンドウを一番上に並べま
+ す。オプション引数の描画番号が与えられた場合、それに対応する描画ウィン
+ ドウが存在すればそれのみが下げられます。
 
  オプション引数は、単一の描画ウィンドウの出力形式、すなわち `pm` と 
  `win` では無視されます。
@@ -4428,18 +4431,18 @@ C ... and restart the table:
 ?commands raise
 ?raise
  書式:
-       raise {x11_plot_window_nb}
+       raise {plot_window_nb}
 
- コマンド `raise` (`lower` の反対) は、`pm`, `win`, `x11` 等の gnuplot
- の対話型出力形式の実行中に、描画ウィンドウを上 (前面) に上げます。描画
- ウィンドウを、デスクトップ上のウィンドウマネージャの z 方向のウィンド
- ウの重なりの前 (上) に置きます。
+ コマンド `raise` (`lower` の反対) は、`pm`, `win`, `wxt`, `x11` 等の 
+ gnuplot の対話型出力形式の実行中に、描画ウィンドウを上 (前面) に上げま
+ す。描画ウィンドウを、デスクトップ上のウィンドウマネージャの z 方向の
+ ウィンドウの重なりの前 (上) に置きます。
 
- `x11` のように複数の描画ウィンドウをサポートしている場合、デフォルトで
- はこのコマンドはそれらの複数のウィンドウを降順に上げ、最初に作られたウ
- ィンドウを一番下に、最後に作られたウィンドウを一番上に並べます。オプシ
- ョン引数の描画番号が与えられた場合、それに対応する描画ウィンドウが存在
- すればそれのみが上げられます。
+ `x11` や `wxt` のように複数の描画ウィンドウをサポートしている場合、デ
+ フォルトではこのコマンドはそれらの複数のウィンドウを降順に上げ、最初に
+ 作られたウィンドウを一番下に、最後に作られたウィンドウを一番上に並べま
+ す。オプション引数の描画番号が与えられた場合、それに対応する描画ウィン
+ ドウが存在すればそれのみが上げられます。
 
  オプション引数は、単一の描画ウィンドウの出力形式、すなわち `pm` と 
  `win` では無視されます。
@@ -4666,7 +4669,7 @@ C ... and restart the table:
  書式:
        set arrow {<tag>} {from <position>} {to|rto <position>}
                  { {arrowstyle | as <arrow_style>}
-                   | { {nohead | head | heads}
+                   | { {nohead | head | backhead | heads}
                        {size <length>,<angle>{,<backangle>}}
                        {filled | empty | nofilled}
                        {front | back}
@@ -4700,7 +4703,9 @@ C ... and restart the table:
 
  `nohead` を指定することで、矢先のない矢 -- すなわち線分を書くことも
  できます。これは描画の上に線分を描く別な方法を与えます。デフォルトでは
- 1 つの矢先がついています。`heads` の指定で線分の両端に矢先が描かれます。
+ 1 つの矢は 1 つの矢先をその終端に持っています。`backhead` は始点に矢先
+ を描き、`heads` は線分の両端に矢先を描きます。全ての出力形式が両端の矢
+ 先の描画をサポートしているわけではありません。
 
  矢先の大きさは `size <length>,<angle>` または
  `size <length>,<angle>,<backangle>` で制御できます。`<length>` は矢先
@@ -6167,6 +6172,10 @@ C ... and restart the table:
  の描画をこの処理から明示的に除外したいときは、`with` 指定に特別のオプ
  ション `nohidden3d` を追加してください。
 
+ hidden3d は、pm3d モードで描画された、塗り潰された曲面には影響を与えま
+ せん。pm3d の曲面に対して同様の効果を得るには、これの代わりに set 
+ `pm3d depthorder` を使ってください。
+
  関数値は格子孤立線の交点で評価されます。見ることの出来る線分を求めると
  きは個々の関数値、あるいはデータ点の間はそのアルゴリズムによって線形補
  間されます。これは、`hidden3d` で描画する場合と `nohidden3d` で描画す
@@ -6824,16 +6833,16 @@ C ... and restart the table:
 ?mouse
 ?nomouse
  コマンド `set mouse` はマウス機能を有効にします。現在、pm, x11, ggi,
- windows の各出力ドライバがマウス拡張されています。2 種類のマウスモード
- があります。2 次元グラフモードは、2 次元グラフ、または地図型表示 (すな
- わち、z の回転角が 0, 90, 180, 270, 360 度の `set view` での splot、お
- よび `set view map`) で動作し、グラフ上の位置の追跡、拡大表示、グラフ
- の注釈づけ等を可能にします。`splot` による 3 次元グラフに対しては、グ
- ラフの視方向 (view) と拡大縮小の変更が、マウスボタン 1 と 2 (によるド
- ラッグ) で行えます。これらのボタンにさらに <ctrl> キーを押すと、座標系
- のみが回転、拡大されますが、これは大きなデータに対して有用でしょう。ボ
- タン 2 の垂直方向のドラッグを shift キーと同時に行うと、z 軸の一番下の
- 位置 (`ticslevel`) を上下します。
+ windows, wxt の各出力ドライバがマウス拡張されています。2 種類のマウス
+ モードがあります。2 次元グラフモードは、2 次元グラフ、または地図型表示
+ (すなわち、z の回転角が 0, 90, 180, 270, 360 度の `set view` での 
+ splot、および `set view map`) で動作し、グラフ上の位置の追跡、拡大表示、
+ グラフの注釈づけ等を可能にします。`splot` による 3 次元グラフに対して
+ は、グラフの視方向 (view) と拡大縮小の変更が、マウスボタン 1 と 2 (に
+ よるドラッグ) で行えます。これらのボタンにさらに <ctrl> キーを押すと、
+ 座標系のみが回転、拡大されますが、これは大きなデータに対して有用でしょ
+ う。ボタン 2 の垂直方向のドラッグを shift キーと同時に行うと、z 軸の一
+ 番下の位置 (`ticslevel`) を上下します。
 
  マウスは多重描画 (multiplot) モードでは無効ですが、`unset multiplot`
  で多重描画が終了すれば、マウス機能は ON になり、直前の描画 (ほぼ
@@ -7027,7 +7036,7 @@ C ... and restart the table:
  きます。各描画は水平サイズが 1.1/2、垂直サイズが 0.9/3 となります。
 
  以下も参照
-^ <a href="http://gnuplot.sourceforge.net/demo/multiplot.html">
+^ <a href="http://gnuplot.sourceforge.net/demo/multiplt.html">
  multiplot のデモ (multiplt.dem)
 ^ </a>
 3 mx2tics
@@ -7198,8 +7207,8 @@ C ... and restart the table:
  は、直前の `set output` で開かれたファイルがクローズされ、新たな出力が
  標準出力 (STDOUT) に送られます。(もし、`set output "STDOUT"` とすると
  出力は "STDOUT" という名前のファイルに送られるかもしれません ! ["かも
- しれない" というのは、例えば `x11` などの terminal (出力形式) では
- `set output` が無視されるからです。])
+ しれない" というのは、例えば `x11` や `wxt` などの terminal (出力形式)
+ では `set output` が無視されるからです。])
 
  MSDOS のユーザは次のことに注意すべきです: 文字 '\' は 2 重引用符の中で
  は特別な意味を持ちます。よって、別のディレクトリにあるファイル名を指定
@@ -7361,7 +7370,7 @@ C ... and restart the table:
        set pm3d {
                   { at <bst combination> }
                   { interpolate <steps in scan>,<steps between scans> }
-                  { scansautomatic | scansforward | scansbackward }
+                  { scansautomatic | scansforward | scansbackward | depthorder }
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
                   { clip1in | clip4in }
@@ -7801,6 +7810,12 @@ C ... and restart the table:
        1 1 0
        1 0 0
        e
+
+ バイナリパレットファイルも同様にサポートされています。`binary general`
+ を参照してください。例: R,G,B の double のデータの 64 個の 3 つ組をフ
+ ァイル palette.bin に出力し、それを読み込む:
+       set palette file "palette.bin" binary record=64 using 1:2:3
+
 
 4 gamma-correction
 ?commands set palette gamma-correction
@@ -8503,7 +8518,7 @@ C ... and restart the table:
  書式:
      set style rectangle {front|back} {fillcolor <colorspec>} {fs <fillstyle>}
                          {lw|linewidth <lw>}
- 
+
  `colorspec` と `fillstyle` を参照してください。`fillcolor` は `fc` と
  省略できます。
 
@@ -8590,9 +8605,10 @@ C ... and restart the table:
 
  現在、以下の出力ドライバのみが `empty` 以外の塗りつぶしスタイルをサポ
  ートしています:
- x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
- jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc,
- tandy_60dpi。BeOS ドライバ (`be`) はまだテストされていません。
+ x11, windows, pm, wxt, postscript, fig, pbm, png, gif, hpdj, hppj, 
+ hpljii, hp500c, jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800,
+ okidata, starc, tandy_60dpi。BeOS ドライバ (`be`) はまだテストされてい
+ ません。
 5 boxxyerrorbars
 ?commands set style boxxyerrorbars
 ?set style boxxyerrorbars
@@ -8632,7 +8648,8 @@ C ... and restart the table:
  デフォルトでは、鉛直線分のてっぺんと底には垂直に交わる水平線は引かれま
  せん。それを引きたい場合、例えば典型的な例は箱ひげ図 (box-and-whisker
  plot) での使用ですが、描画コマンドにキーワード `whiskerbars` を追加し
- てください。
+ てください。デフォルトでは、水平線は箱 (candlestick) の水平幅一杯に引
+ かれますが、それは全体の幅に対する割合を指定することで変更できます。
 
  デフォルトでは長方形は (開始値)>(終値) の場合は空で、(開始値)<(終値)
  の場合は 3 本の垂直線が入ります。箱の塗りつぶしが有効である場合、その
@@ -8652,8 +8669,8 @@ C ... and restart the table:
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks title 'Quartiles', \
         ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
 
-   # ひげの上に水平線を伴う描画
-   plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars
+   # ひげの上に水平線を伴う描画で、水平線の幅を全体幅の 50% にする
+   plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
 
  `set boxwidth` と `set bars`, `set style fill` を参照してください。
 5 dots
@@ -8950,13 +8967,13 @@ C ... and restart the table:
 
  現在以下の出力形式のみがデータ配列画像をサポートしています:
 
- x11 - ピクセルは x11 の解像度に合うように繰り返されるか一定の割合で潰
-       されるかされ、フィルタ用の処理は他に持っていません。よって、かな
-       り高い面積の割合の画像が潰される場合、エイリアシングが起こる可能
-       性があります。
+ x11 と wxt - ピクセルはディスプレイの解像度に合うように繰り返されるか
+       一定の割合で潰されるかされ、フィルタ用の処理は他に持っていませ
+       ん。よって、かなり高い面積の割合の画像が潰される場合、エイリアシ
+       ングが起こる可能性があります。
 
  postscript (pslatex, epslatex, pstex) - 標本化補間機能は無効になり、画
-        像は元の解像度のままコピーされます。
+       像は元の解像度のままコピーされます。
 
  png - 出力はインストールされている libgd のバージョンに依存します。
        gd 1.8.4  truecolor はサポートされていませんがドライバの関数は動
@@ -10831,9 +10848,9 @@ C ... and restart the table:
         set samples 4,10; replot
         set samples 10,4; replot
 
-3 splot_overview
-?commands splot_overview
-?splot_overview
+3 splot overview
+?commands splot overview
+?splot overview
  `splot` は点の集まりとして、あるいは、それらの点を結ぶことによって曲面
  を表示することができます。`plot` と同様に、点はデータファイルから読む
  こともできますし、指定された区間で関数の値を評価して得ることもできます。
@@ -10932,10 +10949,10 @@ C ... and restart the table:
 ?graphical user interfaces
 ?gui's
  `gnuplot` のために色々なグラフィカルユーザインターフェースが書かれてき
- ました。その win32 用の物はこの配布版に含まれています。そして、
- Macintosh に対するインターフェースは
-^ <a href="http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/">
-           http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/
+ ました。その win32 用の物はこの配布版に含まれています。そして、Python 
+ によるインターフェースが
+^ <a href="http://py-gnuplot.darwinports.com/">
+          http://py-gnuplot.darwinports.com/
 ^ </a>
  に置いてあります。
 
@@ -10953,12 +10970,27 @@ C ... and restart the table:
  gnuplot.el を元に、GNU emacs と XEmacs に対する新しい版の gnuplot-mode
  を書きました。gnuplot の CVS リポジトリにはそのコピーが含まれているが、
  このパッケージの最新版は以下にもあります。
-^ <a href="http://feff.phys.washington.edu/~ravel/gnuplot/">
-           http://feff.phys.washington.edu/~ravel/gnuplot
+^ <a href="http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/">
+           http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/
 ^ </a>
 
 1 Bugs
 ?bugs
+ 以前のものと現在のリリースに関して報告されたバグは SourceForge 上の公
+ 式配布サイトに置かれています。
+
+ バグリポートは e-mail で gnuplot-bugs メーリングリストへ送って下さい。
+ または、SourceForge の gnuplot ウェブサイトにその報告を投稿してくださ
+ い。その際、あなたが使用している gnuplot のバージョンの完全な情報、そ
+ して可能ならばそのバグを実証するテストスクリプトを送ってください。
+ `Seeking-assistance` 参照。
+
+2 Known bugs and limitations
+
+ 以下は、gnuplot 4.2 のリリース時現在に知られている問題のリストです。こ
+ れらには外部のサポートライブラリのバグも含まれているので、gnuplot の修
+ 正とは関係なく改良されるかもしれません。
+
  浮動小数計算例外 (浮動小数値が大きすぎる (または小さすぎる) 場合、0 で
  割算した場合など) は、ユーザ定義関数において時折発生します。特に、いく
  つかのデモで、浮動小数の範囲を越える数値を生成することが起こるようです。
@@ -10970,88 +11002,15 @@ C ... and restart the table:
 
  ガンマ関数は複素数引数に対しては動作しません。
 
- `gnuplot` の現在のバージョン 3.7 では、全ての開発は ANSI C コンパイラ
- が使われています。現在のオペレーティングシステム、コンパイラ、ライブラ
- リ、バージョン 3.5 のドキュメントに上げられた各 OS 毎のバグに関しては、
- ここではなく、今は `old_bugs` の方にあげられています。
+ すべての x11 描画ウィンドウに対して、一度に 1 つのカラーパレットのみが
+ 有効です。これは、異なるパレットを使用する描画を含んだ multiplot では
+ x11 上では正しく表示されない、ということを意味します。
 
- 現在の版以降に関するバグの報告、及び古い報告は以下の公式配布サイトに置
- かれます。
-^ <a href="http://www.gnuplot.info">
-           http://www.gnuplot.info
-^ </a>
+ "時刻" として指定された座標は 24 時で折り返し、精度の最小単位は 1 秒で
+ す。これは、特に地理上の座標に基づく時刻を使っている場合には制限になり
+ ます。
 
- 全てのバグに関しては、bug-gnuplot メーリングリスト (`Seeking-assistance`
- 参照) に e-mail してください。
-
-2 Old_bugs
-?old_bugs
-?os_bugs
- 古い Sun の OS (SunOS Sys4-3.2) には、標準入出力 (stdio) ライブラリに
- バグがあります。'printf' の書式 "%g" は時々正しくない表示を行ないます
- (例えば "2" を 200000.0 と表示する)。よって、目盛りの見出しは、Sun4 上
- の `gnuplot` では不正になる場合があります。回避方法としては、データの
- スケール変換 (定数倍する) を行なうこと、あるいはコマンド `set format`
- で目盛りの見出しの書式を "%7.0f" などの適当な物に変えることなどがあり
- ます。これは SunOS 4.0 では修正されているようです。
-
- 他のバグ: Sun3 上の SunOS 4.0, Sun4 上の Sys4-3.2 と SunOS 4.0 で、
- 'sscanf' ルーチンが、書式 "%f %f" で "00 12" を不正に解釈し、0 と 12
- ではなく、0 と 0 のように読んでしまいます。これはデータの入力に影響を
- 与えます。もし、データファイルが x 座標として '00' や '000' のように書
- かれたゼロを含んでいる場合、y の値は不正なものとなるでしょう。データフ
- ァイルをチェックするか SunOS をバージョンアップしてください。これは
- SunOS 4.1.1 では修正されているようです。
-
- Sun は、大きな x に対する exp(-x) の計算で桁溢れを起こすようで、よって
- `gnuplot` は未定義値を取得することになります。一つの回避策は、ユーザ定
- 義関数として e(x) = x<-500 ? 0 : exp(x) のようなものを使うことです。こ
- れは、例えばガウス関数 (exp(-x*x)) の描画に影響を与えます。x*x は非常
- に早く大きくなるからです。
-
- Microsoft C 5.1 では 'printf' の %g 書式に関するひどいバグがあります。
- "%.2g", "%.1g", "%.0g", "%.g" のような書式を使うと、'printf' は 1e-4
- から 1e-1 の間の不正な数値を表示するでしょう。%e の書式で表示されるべ
- き数値は、 %f では小数点の後に間違った数のゼロがついた不正な数値になり
- ます。この問題を回避するには、%e や %f の書式を明示的に使用してくださ
- い。
-
- Microsoft C でコンパイルされた `gnuplot` は、テストでは 2 つの VGA デ
- ィスプレイで正しく動作しませんでした。多分 CGA, EGA, VGA ドライバは
- Microsoft C グラフィックライブラリを使うように書き直すべきでしょう。
- Borland C++ でコンパイルされた `gnuplot` は Turbo C グラフィックドライ
- バを使用し、これは VGA ディスプレイでちゃんと動作します。
-
- VAX/VMS 4.7 C コンパイラ (release 2.4) の 'printf' の書式 %g の実装は
- 貧弱です。数は数値としては正しく表示されますが、要求した書式でないもの
- になり得ます。K&R 第 2 版には、書式 %g は、指数部が -4 より小さい場合、
- あるいは指定精度以上になる場合は %e を使う、と書いてあります。しかし
- VAX は指数部が -1 より小さい場合に %e を使います。VAX では、1 より小さ
- い数に対して、%e と %f のどちらを使うのかを決定するときに精度が評価さ
- れていないようです。この問題を回避するには、%e, %f を明示的に使ってく
- ださい。VAX C 2.4 のリリースノートより: e,E,f,F,g,G の結果は常に小数点
- を含みます。g と G に対しては、末尾のゼロは取り除かれません。
-
- VAX/VMS 5.2 C コンパイラ (release 3.0) は release 2.4 よりも多少ましな
- 書式 %g の実装を持ちますが、さほどではありません。末尾の小数点は取り除
- かれるようになりましたが、末尾のゼロは相変わらず %g の指数表記の数から
- は取り除かれていません。
-
- これらの問題はコンパイラの問題ではなく、実際にはライブラリの問題です。
- よって、DEC コンパイラ、または他のもの (例えば最新の gcc) を使って
- `gnuplot` をコンパイルしてももこの問題は起こるでしょう。
-
- ULTRIX X11R3 は、X11 ドライバがグラフを "一つおき" に表示する、という
- ことを引き起こすバグがあります。このバグは、DEC の X11R4 では修正され
- たようで、新しいリリースの ULTRIX ではこの問題を起こさないようです。古
- いサイトでの解決策は、X11 ライブラリをバージョンアップする (DEC から、
- あるいは MIT から直接) か、または x11.trm ファイルのコンパイル時に
- ULTRIX_KLUDGE を定義してください。しかし、kludge は理想的な回避策では
- ないことに注意してください。
-
- NeXT OS 2.0 では、定数 HUGE が不正な値に定義されています。HUGE は
- plot.h で 1e38 にセットされるのが正しいです。このエラーは NeXT OS の
- バージョン 2.1 では修正されています。
+ 誤差指示線 (errorbars) は、極座標/球面座標描画モードでは使えません。
 
  HP プロッタの古いモデルの中にはページの排出コマンド 'PG' を持たないも
  のがあります。現在の HPGL ドライバはこのコマンドを HPGL_reset で使用し
@@ -11060,11 +11019,20 @@ C ... and restart the table:
  HPGL/2 を使用しています。これはスケーラブル PCL フォントを使うように修
  正されるべきでしょう。
 
- Atari 版では、プリンタに直接出力を送れません (出力ファイルを `/dev/lp`
- としては)。それはバイナリ出力の LF (改行) に CR (復帰) が追加されるか
- らです。回避策としては、出力をファイルに書き出し、それをその後でシェル
- コマンドを使ってプリンタにコピーしてください。
+ 外部ライブラリ GD (PNG/JPEG/GIF ドライバで使用):
+ バージョン 2.0.33 までの libgd には、Adobe の Symbol フォントの文字の
+ マッピングに関するいくつかのバグがあります。また、アンチエイリアスされ
+ た線分がキャンバスの上の角と交わる場合に、ライブラリがセグメンテーショ
+ ンフォルトを引き起すこともあります。
 
- AIX 4 では、データファイル中の文字 'NaNq' は、内部の '未定義' フラグと
- しては処理されず、内部の特殊な `非数値` として保存されてしまいます。回
- 避するには `set datafile missing 'NaNq'` を使ってください。
+ 外部ライブラリ PDFlib (PDF ドライバで使用):
+ gnuplot は libpdf のバージョン 4, 5, 6 のいずれかをリンクできます。し
+ かし、これらはバージョンによってパイプされた入出力の処理が違っています
+ ので、パイプを使って PDF を出力する gnuplot スクリプトは、PDFlib のあ
+ るバージョンでだけしかちゃんと動かないかもしれません。
+
+ 外部ライブラリ svgalib (linux, vgagl ドライバで使用):
+ これは gnuplot が root に setuid (嫌!) されることを要求しますし、ビデ
+ オカードや X11 で使用されるグラフィックドライバに特有の多くのバグがあ
+ ります。
+

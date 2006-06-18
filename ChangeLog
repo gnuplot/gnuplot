@@ -1,3 +1,9 @@
+2006-06-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc docs/README.ja docs/term-ja.diff
+	src/win/README.win-ja src/win/wgnuplot-ja.mnu:
+	Sync Japanese documentation to recent changes in English files.
+
 2006-06-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version):  List additional configuration options.
