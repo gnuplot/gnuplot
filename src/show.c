@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.177 2006/06/15 15:42:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.178 2006/06/16 05:16:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -886,10 +886,8 @@ show_version(FILE *fp)
 %s\tThe gnuplot FAQ is available from\n\
 %s\t\t%s\n\
 %s\n\
-%s\tSend comments and requests for help to\n\
-%s\t\t<%s>\n\
-%s\tSend bugs, suggestions and mods to\n\
-%s\t\t<%s>\n\
+%s\tSend comments and help requests to  <%s>\n\
+%s\tSend bug reports and suggestions to <%s>\n\
 %s\n",
 	    p,			/* empty line */
 	    p, PROGRAM,
@@ -904,9 +902,7 @@ show_version(FILE *fp)
 	    p,			/* FAQ is at */
 	    p, faq_location,
 	    p,			/* empty line */
-	    p,
 	    p, help_email,
-	    p,
 	    p, bug_email,
 	    p);			/* empty line */
 
@@ -959,7 +955,7 @@ show_version(FILE *fp)
 		"+GD_GIF  "
 # endif
 # ifdef GIF_ANIMATION
-		"ANIMATION  "
+		"+ANIMATION  "
 # endif
 #else
 		"-LIBGD  "
@@ -1026,10 +1022,10 @@ show_version(FILE *fp)
 
 	    const char *hiddenline =
 #ifdef HIDDEN3D_QUADTREE
-		"+HIDDEN3D_QUADTREE   "
+		"+HIDDEN3D_QUADTREE  "
 #else
 # ifdef HIDDEN3D_GRIDBOX
-		"+HIDDEN3D_GRIDBOX   "
+		"+HIDDEN3D_GRIDBOX  "
 # endif
 #endif
 		"";
@@ -1050,6 +1046,9 @@ show_version(FILE *fp)
 #ifdef GP_MACROS
 		"+MACROS  "
 #endif
+# ifdef THIN_PLATE_SPLINES_GRID
+		"+THIN_SPLINES  "
+# endif
 #ifdef WITH_IMAGE
 		"+IMAGE  "
 #endif
@@ -1060,8 +1059,8 @@ Compile options:\n\
 %s%s%s%s\n\
 %s%s\n\
 %s%s%s%s%s%s\n%s\n\n",
-		    rdline, gnu_rdline, libgd, linuxvga,
-		    compatibility, binary_files,
+		    rdline, gnu_rdline, compatibility, binary_files,
+		    libgd, linuxvga,
 		    nocwdrc, x11, use_mouse, unixplot, gnugraph, hiddenline,
 		    plotoptions);
 	}

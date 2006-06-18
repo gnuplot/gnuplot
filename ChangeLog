@@ -1,3 +1,8 @@
+2006-06-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/show.c (show_version):  List additional configuration options.
+	Make the show version output more compact (25 lines).
+
 2006-06-17  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/bitmaps/png/autoscale_png.h:
