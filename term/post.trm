@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.179 2006/04/05 01:09:44 sfeam Exp $
+ * $Id: post.trm,v 1.180 2006/04/19 19:36:20 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -328,7 +328,7 @@ static struct PS_FontName {
 	struct PS_FontName *next;
 } *PS_DocFonts = NULL;
 
-static char PS_default_font[MAX_ID_LEN+1] = {'\0'};
+static char PS_default_font[MAX_ID_LEN+1] = {'H','e','l','v','e','t','i','c','a',',','1','4','\0'};
 
 /* given a font, look in store to see if it is there already
  * if so, return NULL. If not, reencode it if allowed to, otherwise

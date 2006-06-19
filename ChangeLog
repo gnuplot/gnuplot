@@ -1,3 +1,10 @@
+2006-06-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: Initialize PS_default_font to "Helvetica,14".
+	In the worst case scenario, this guarantees a non-zero font size
+	and an actual PostScript font.
+	Bug #1509033
+
 2006-06-19  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in (GNUPLOT_PS_DIR): Do not pass GNUPLOT_PS_DIR in
