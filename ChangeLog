@@ -7,6 +7,9 @@
 
 	* term/Makefile.am.in: Install the *.ps files the automake way.
 
+	* config/makefile.mgw (WXT): Do not install the PNG icons of the
+	wxWidgets terminal (now embedded).
+
 2006-06-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (get_3ddata): After reading in the data points, check
