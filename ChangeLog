@@ -1,3 +1,10 @@
+2006-06-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (get_3ddata): After reading in the data points, check
+	that the axis ranges are legal.  If the input data contains NaN or Inf
+	then the axis scaling may fail.
+	Bug #1490699.
+
 2006-05-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wtext.c: Add mouse wheel scroll support for text window.

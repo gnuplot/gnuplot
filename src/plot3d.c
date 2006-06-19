@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.126 2006/04/27 20:51:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.127 2006/06/15 15:42:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -904,6 +904,13 @@ get_3ddata(struct surface_points *this_plot)
 
     if (dgrid3d && this_plot->num_iso_read > 0)
         grid_nongrid_data(this_plot);
+
+    /* This check used to be done in graph3d */
+	if (X_AXIS.min == VERYLARGE || X_AXIS.max == -VERYLARGE ||
+	    Y_AXIS.min == VERYLARGE || Y_AXIS.max == -VERYLARGE || 
+	    Z_AXIS.min == VERYLARGE || Z_AXIS.max == -VERYLARGE)
+		int_error(NO_CARET,
+		    "Axis range undefined due to improper data values. NaN? Inf?");
 
     if (this_plot->num_iso_read <= 1)
 	this_plot->has_grid_topology = FALSE;
