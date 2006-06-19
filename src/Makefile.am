@@ -13,6 +13,9 @@ HELPFILE=@GIHDIR@/gnuplot.gih
 # Default X11 driver location
 X11_DRIVER_DIR=$(pkglibexecdir)
 
+# Default Postscript prologues location
+GNUPLOT_PS_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/PostScript
+
 # There is probably no need to edit anything below this line
 
 GNUPLOT_X11 = @GNUPLOT_X11@
@@ -22,7 +25,7 @@ pkglibexec_PROGRAMS = $(GNUPLOT_X11)
 noinst_PROGRAMS = bf_test
 
 XLIBS = @LIBRARIES_FOR_X@
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DPREFIX=\"$(prefix)\" -DVERSION_MAJOR=\"$(VERSION_MAJOR)\"
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DPREFIX=\"$(prefix)\" -DVERSION_MAJOR=\"$(VERSION_MAJOR)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h \
 breaders.c breaders.h bitmap.c bitmap.h color.c color.h command.c \

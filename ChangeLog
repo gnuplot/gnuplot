@@ -1,3 +1,12 @@
+2006-06-19  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in (GNUPLOT_PS_DIR): Do not pass GNUPLOT_PS_DIR in
+	config.h .
+
+	* src/Makefile.am: Pass GNUPLOT_PS_DIR as a CPPFLAG.
+
+	* term/Makefile.am.in: Install the *.ps files the automake way.
+
 2006-06-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (get_3ddata): After reading in the data points, check

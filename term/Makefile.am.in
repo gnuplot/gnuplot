@@ -9,15 +9,11 @@ object.h post.h $(CORETERM) PostScript
 ##trm-files-begin
 ##trm-files-end
 
-# For Unix and MSDOS only
-install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(GNUPLOT_PS_DIR)
-	$(INSTALL_DATA) $(srcdir)/PostScript/*.ps $(DESTDIR)$(GNUPLOT_PS_DIR)
-
-uninstall-local:
-	@$(NORMAL_UNINSTALL)
-	echo " rm -f $(DESTDIR)$(GNUPLOT_PS_DIR)/*.ps"
-	rm -f $(DESTDIR)$(GNUPLOT_PS_DIR)/*.ps
+postscriptdir = $(pkgdatadir)/$(VERSION_MAJOR)/PostScript
+postscript_DATA = PostScript/8859-15.ps PostScript/8859-1.ps\
+	PostScript/8859-2.ps PostScript/cp1250.ps PostScript/cp437.ps\
+	PostScript/cp850.ps PostScript/cp852.ps PostScript/koi8r.ps PostScript/koi8u.ps\
+	PostScript/prologue.ps
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t

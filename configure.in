@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.189 2006/06/14 00:13:10 sfeam Exp $
+dnl $Id: configure.in,v 1.190 2006/06/16 22:36:48 tlecomte Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -195,12 +195,6 @@ AC_ARG_WITH(gihdir,dnl
                           (default PREFIX/share/PACKAGE/VERSION)],
   GIHDIR="$withval",
   GIHDIR="$pkgdatadir/$VERSION_MAJOR")
-
-dnl location of PostScript prolog and adjunct files
-  GNUPLOT_PS_DIR="$pkgdatadir/$VERSION_MAJOR/PostScript"
-  eval GNUPLOT_PS_DIR=${GNUPLOT_PS_DIR}
-  AC_DEFINE_UNQUOTED(GNUPLOT_PS_DIR,"${GNUPLOT_PS_DIR}",
-            [ Directory for PostScript prolog and associated files ])
 
 dnl The Linux console driver
 AC_ARG_WITH(linux-vga,dnl
@@ -1009,7 +1003,6 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION_MAJOR)
 AC_SUBST(VERSION)
 AC_SUBST(GIHDIR)
-AC_SUBST(GNUPLOT_PS_DIR)
 AC_SUBST(LASERGNU)
 AC_SUBST(LINUXSUID)
 AC_SUBST(TERMLIBS)
