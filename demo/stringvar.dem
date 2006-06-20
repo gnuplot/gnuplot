@@ -1,6 +1,7 @@
 #
 # Miscellaneous neat things you can do using the string variables code
 #
+set print "stringvar.tmp"
 print ""
 print "Exercise substring handling"
 print ""
@@ -21,7 +22,18 @@ print "foo[*:*]      = ",foo[*:*]
 print "foo.foo[2:2]  = ",foo.foo[2:2]
 print "(foo.foo)[2:2]= ",(foo.foo)[2:2]
 print ""
+unset print
+
+set label 1 system("cat stringvar.tmp") at graph 0.1, graph 0.9
+unset xtics
+unset ytics
+set yrange [0:1]
+plot 0
+
 pause -1 "Hit return to continue"
+
+
+set print "stringvar.tmp"
 print "Exercise string handling functions"
 print ""
 print "foo          = ",foo
@@ -48,7 +60,16 @@ foo = sprintf("%40d %40d %40d %40d %40d %40d",1,2,3,4,5,6)
 if (strlen(foo) == 245) print "sprintf output of long strings works OK"
 if (strlen(foo) != 245) print "sprintf output of long strings BROKEN"
 print ""
+
+unset print
+set label 1 system("cat stringvar.tmp") at graph 0.1, graph 0.9
+unset xtics
+unset ytics
+set yrange [0:1]
+plot 0
+
 pause -1 "Hit return to continue"
+reset
 #
 set xrange [300:400]
 set title "String-valued expression in using spec"

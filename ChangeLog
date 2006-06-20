@@ -10,6 +10,10 @@
 	it turns out to be necessary for PostScript also, and probably others.
 	Bug #1509033
 
+	* demo/stringvar.dem demo/html/index.save demo/html/Makefile:
+	Modify the stringvar demo for use with webify, and add it to the
+	demo web page.
+
 2006-06-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Initialize PS_default_font to "Helvetica,14".
