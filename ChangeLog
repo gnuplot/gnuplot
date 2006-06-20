@@ -14,6 +14,10 @@
 	Modify the stringvar demo for use with webify, and add it to the
 	demo web page.
 
+	* src/set.c (load_tic_series): Fix parsing error that had the effect
+	of requiring an explicit end point for the tic series unless this was
+	the last thing on the command line.
+
 2006-06-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Initialize PS_default_font to "Helvetica,14".
