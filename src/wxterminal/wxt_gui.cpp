@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.15 2006/06/18 06:09:43 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.16 2006/06/18 07:45:43 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -99,8 +99,6 @@
 #include "bitmaps/xpm/icon16x16.xpm"
 #include "bitmaps/xpm/icon32x32.xpm"
 #include "bitmaps/xpm/icon64x64.xpm"
-/* icon used in the toolbar when png icons are not found */
-#include "bitmaps/xpm/notfound.xpm"
 /* cursors */
 #include "bitmaps/xpm/cross.xpm"
 #include "bitmaps/xpm/right.xpm"
@@ -1805,7 +1803,6 @@ void wxt_filled_polygon(int n, gpiPoint *corners)
 	if (wxt_status != STATUS_OK)
 		return;
 
-	int i;
 	gp_command temp_command;
 
 	temp_command.command = command_filled_polygon;
@@ -1860,7 +1857,7 @@ void wxt_image(unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_im
 	if (wxt_status != STATUS_OK)
 		return;
 
-	int i, imax;
+	int imax;
 	gp_command temp_command;
 
 	temp_command.command = command_image;
@@ -2216,7 +2213,7 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 /* given a plot number (id), return the associated plot structure */
 wxt_window_t* wxt_findwindowbyid(wxWindowID id)
 {
-	int i;
+	size_t i;
 	for(i=0;i<wxt_window_list.size();++i) {
 		if (wxt_window_list[i].id == id)
 			return &(wxt_window_list[i]);
@@ -2271,7 +2268,7 @@ void wxt_raise_terminal_window(int number)
 	wxt_sigint_init();
 
 	wxt_MutexGuiEnter();
-	if (window = wxt_findwindowbyid(number)) {
+	if ((window = wxt_findwindowbyid(number))) {
 		FPRINTF((stderr,"wxt : raise window %d\n",number));
 		window->frame->Show(true);
 		wxt_raise_window(window,true);
@@ -2317,7 +2314,7 @@ void wxt_lower_terminal_window(int number)
 	wxt_sigint_init();
 
 	wxt_MutexGuiEnter();
-	if (window = wxt_findwindowbyid(number)) {
+	if ((window = wxt_findwindowbyid(number))) {
 		FPRINTF((stderr,"wxt : lower window %d\n",number));
 		wxt_lower_window(window);
 	}
@@ -2360,7 +2357,7 @@ void wxt_close_terminal_window(int number)
 	wxt_sigint_init();
 
 	wxt_MutexGuiEnter();
-	if (window = wxt_findwindowbyid(number)) {
+	if ((window = wxt_findwindowbyid(number))) {
 		FPRINTF((stderr,"wxt : close window %d\n",number));
 		window->frame->Close(false);
 	}
@@ -2383,7 +2380,7 @@ void wxt_update_title(int number)
 
 	wxt_MutexGuiEnter();
 
-	if (window = wxt_findwindowbyid(number)) {
+	if ((window = wxt_findwindowbyid(number))) {
 		FPRINTF((stderr,"wxt : close window %d\n",number));
 		if (strlen(wxt_title)) {
 			/* NOTE : this assumes that the title is encoded in the locale charset.
@@ -2605,9 +2602,9 @@ void wxtPanel::wxt_cairo_free_platform_context()
  * To debug it, define DEBUG and WXTDEBUGINPUT */
 
 #ifdef WXTDEBUGINPUT
-# define FPRINTF2 FPRINTF
+# define FPRINTF2(a) FPRINTF(a)
 #else
-# define FPRINTF2
+# define FPRINTF2(a)
 #endif
 
 #ifdef USE_MOUSE

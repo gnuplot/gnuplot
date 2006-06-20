@@ -1,3 +1,7 @@
+2006-06-20  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp: Small cleanups to avoid -Wall warnings.
+
 2006-06-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c (main) src/term.c (init_terminal): Revisit fix of
