@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.81 2006/03/28 09:56:30 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.82 2006/04/29 05:30:06 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -441,13 +441,6 @@ main(int argc, char **argv)
     interactive = FALSE;
     init_terminal();		/* can set term type if it likes */
     push_terminal(0);		/* remember the default terminal */
-
-    /* If the terminal was specified via GNUTERM, this is the only chance we */
-    /* get to initialize things such as default fonts done in term->options. */
-    /* Without this, the gd and tgif drivers (any others?) cause a segfault. */
-    /* Note that gp_input_line[] is blank at this point.           EAM Aug 2004 */
-    if (!strcmp(term->name,"png") || !strcmp(term->name,"jpeg") || !strcmp(term->name,"tgif"))
-	(term->options)();
 
 #ifdef AMIGA_SC_6_1
     if (IsInteractive(Input()) == DOSTRUE)

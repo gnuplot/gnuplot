@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.148 2006/06/07 21:40:48 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.149 2006/06/15 04:53:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1718,8 +1718,15 @@ init_terminal()
 #endif
 	if (strchr(term_name,' '))
 	    namelength = strchr(term_name,' ') - term_name;
-        if (change_term(term_name, namelength))
+
+	/* Force the terminal to initialize default fonts, etc.	*/
+	/* This prevents segfaults and other strangeness if you */
+	/* set GNUTERM to "post" or "png" for example.          */
+	/* Note that gp_input_line[] is blank at this point.	*/
+        if (change_term(term_name, namelength)) {
+            term->options();
             return;
+        }
         fprintf(stderr, "Unknown or ambiguous terminal name '%s'\n", term_name);
     }
     change_term("unknown", 7);

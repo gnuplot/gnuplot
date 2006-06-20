@@ -1,3 +1,11 @@
+2006-06-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c (main) src/term.c (init_terminal): Revisit fix of
+	2004-08-25 - call term->option() on entry if the default terminal is set
+	from GNUTERM. We have only been doing this for the libgd terminals, but
+	it turns out to be necessary for PostScript also, and probably others.
+	Bug #1509033
+
 2006-06-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Initialize PS_default_font to "Helvetica,14".
