@@ -1,3 +1,7 @@
+2006-06-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* term/wxt.trm: Small correction in TERM_HELP.
+
 2006-06-20  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp: Small cleanups to avoid -Wall warnings.

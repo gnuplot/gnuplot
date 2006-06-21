@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.8 2006/06/12 04:43:46 tlecomte Exp $
+ * $Id: wxt.trm,v 1.9 2006/06/18 07:45:43 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -348,7 +348,7 @@ START_HELP(wxt)
 "",
 " The fonts are retrieved from the usual fonts subsystems. Under Windows,",
 " those fonts are to be found and configured in the entry \"Fonts\" of the",
-" control panel. Under UNIX, they are handled by the \"fontconfig\" program.",
+" control panel. Under UNIX, they are handled by \"fontconfig\".",
 "",
 " Pango, the library used to layout the text, is based on utf-8. Thus, the wxt",
 " terminal has to convert from your encoding to utf-8. The default input",
