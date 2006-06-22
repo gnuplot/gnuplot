@@ -1,3 +1,10 @@
+2006-06-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/scatter2.bin demo/sine.bin demo/using.bin demo/blutux.rgb:
+	Flag these files as binary in the CVS repository
+		 cvs admin -kb *.bin *.rgb
+	Hopefully this will fix image.dem under Windows
+
 2006-06-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/wxt.trm: Small correction in TERM_HELP.
