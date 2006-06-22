@@ -1,3 +1,10 @@
+2006-06-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in src/datafile.c (df_readline): Check input values
+	against NaN, but only if the system supports the isnan() test.
+	NaN input values are treated as UNDEFINED.
+	Bug #1490699
+
 2006-06-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/scatter2.bin demo/sine.bin demo/using.bin demo/blutux.rgb:
