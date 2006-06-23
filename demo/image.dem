@@ -31,7 +31,7 @@ print "   set output"
 print ""
 print "View the PostScript file in which each graph appears on a different"
 print "page.  Rerun the demo for the text associated with each graph.  (Use"
-print "a similar process for the pdf terminal.)
+print "a similar process for the pdf terminal.)"
 print ""
 pause -1 "Hit return to continue"
 print ""
@@ -86,7 +86,7 @@ reset
 
 print ""
 print "There is the ability to plot both color images and palette based"
-print "images.  This is controlled by the styles \`image\`, which derives
+print "images.  This is controlled by the styles \`image\`, which derives"
 print "color information from the current palette, and \`rgbimage\`,"
 print "which requires three components representing the red, blue and"
 print "green primary color scheme."
@@ -100,7 +100,6 @@ set xrange [-10:137]
 set yrange [-10:157]
 set label 1 "\"I am the penguin, GOO GOO GOO JOOB.\"" at 63,140 center
 set title "Palette mode 'image' used to produce psychedelic bird"
-set palette color
 unset colorbox
 plot 'blutux.rgb' binary array=128x128 flipy format='%uchar%uchar%uchar' using ($1+$2+$3) with image
 pause -1 "Hit return to continue"
@@ -128,7 +127,7 @@ set palette gray
 unset colorbox
 plot 'blutux.rgb' binary array=128x128 flipy format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
-reset
+unset label 1
 
 print ""
 print "Also, similar to 3d color surface plots, a color box showing the"
@@ -150,15 +149,14 @@ set pm3d map
 set xrange [10:117]
 set yrange [10:117]
 set tics out
-set palette gray
+set colorbox
 set cbrange [0:255]
 set title "As with 3d color surfaces, a color box may be added to the plot"
 splot 'blutux.rgb' binary array=128x128 flipy format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
-reset
 
 print ""
-print "The \'rotation\' key word works not only with angles of integer
+print "The \'rotation\' key word works not only with angles of integer"
 print "multiples of 90 degrees but also arbitrary rotations.  When"
 print "constructing an image, Gnuplot verifies that pixel locations"
 print "form a valid grid.  Pixel widths are based upon the grid"
@@ -177,13 +175,13 @@ print "with the key word \'center\' in the plot command.  Before doing the"
 print "rotation, the image's natural center is subtracted, and after doing"
 print "the rotation, the specified center is added."
 print ""
+set key
 set xrange [-10:138]
 set yrange [-10:138]
 set tics out
 set title "Polygons used to draw pixels for rotated images\nNotice the slower refresh rate than for the next plot"
-set palette gray
 unset colorbox
-plot 'blutux.rgb' binary array=128x128 dx=0.70711 dy=0.70711 flipy rotation=45d center=(63.5,63.5) format='%uchar' using ($1+$2+$3) with image
+plot 'blutux.rgb' binary array=128x128 dx=0.70711 dy=0.70711 flipy rotation=45d center=(63.5,63.5) format='%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
 reset
 
@@ -202,9 +200,8 @@ set xrange [-138:10]
 set yrange [-10:138]
 set tics out
 set title "Terminal image routine used to draw plot rotated about origin\nNotice the faster refresh rate than for the previous plot"
-set palette gray
 unset colorbox
-plot 'blutux.rgb' binary array=128x128 dx=1 flip=y rotation=0.5pi origin=(0,0) format='%uchar' using ($1+$2+$3) with image
+plot 'blutux.rgb' binary array=128x128 dx=1 flip=y rotation=0.5pi origin=(0,0) format='%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
 reset
 
@@ -656,7 +653,6 @@ print "is in \'auto\' mode.  Details are pulled from the header of"
 print "file itself and not specified at the command line.  The command"
 print "line can still be used to over-ride in-file attributes."
 print ""
-#unset colorbox
 set title "Automatically recognizing file type and extracting file information"
 plot 'demo.edf' binary filetype=auto with image
 pause -1 "Hit return to continue"
@@ -676,7 +672,7 @@ print "fastest rate or point-by-point increment.  The second letter"
 print "pertains to the medium rate or line-by-line increment.  If"
 print "there is a third letter, it pertains to the slowest rate or"
 print "plane-by-plane increment.  The default or inherent scan order"
-print "is \'scan=xyz\'.
+print "is \'scan=xyz\'."
 print ""
 print "The pseudonym \'transpose\' is equivalent to \'scan=yx\' when"
 print "generating 2D coordinates and \'scan=yxz\' when generating"

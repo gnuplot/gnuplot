@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.230 2006/06/15 15:42:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.231 2006/06/21 03:40:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -397,12 +397,12 @@ set_command()
 	case S_PM3D:
 	    set_pm3d();
 	    break;
-    case S_PALETTE:
-	set_palette();
-	break;
+	case S_PALETTE:
+	    set_palette();
+	    break;
 	case S_COLORBOX:
 	    set_colorbox();
-	break;
+	    break;
 	case S_POINTSIZE:
 	    set_pointsize();
 	    break;

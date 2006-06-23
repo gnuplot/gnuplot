@@ -1,3 +1,10 @@
+2006-06-23  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* demo/image.dem: Clean up missing quotes.  Removed some resets so
+	that the palette doesn't change except when necessary.
+
+	* src/graphics.dem src/set.c: Cosmetic changes.
+
 2006-06-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/datafile.c (df_readline): Check input values

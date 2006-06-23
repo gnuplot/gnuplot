@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.187 2006/04/24 09:54:32 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.188 2006/06/04 21:08:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5269,10 +5269,6 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 
     }
 
-    /* This make_palette() call needs to be present not only for the polygon
-     * function but also the image function.  May want to investigate why
-     * this is because it seems like only the polygon function would need it.
-     */
     if (make_palette() || !term->set_color) {
 	fprintf(stderr, ERROR_NOTICE("Unable to make palette or set terminal color.\n\n"));
 	return;
