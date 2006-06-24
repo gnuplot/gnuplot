@@ -1,11 +1,11 @@
 #
-# $Id: contours.dem,v 1.10 2004/09/17 05:01:12 sfeam Exp $
+# $Id: contours.dem,v 1.11 2006/05/13 00:42:41 sfeam Exp $
 #
 set samples 20
 set isosamples 21
-set xlabel "X axis" offset -5,-2
-set ylabel "Y axis" offset 4,-1
-set zlabel "Z axis"
+set xlabel "X axis"
+set ylabel "Y axis"
+set zlabel "Z axis" offset 1, 0
 set title "3D gnuplot demo - contour plot"
 set contour
 splot x*y
@@ -92,7 +92,8 @@ set zrange [-1.2:1.2]
 unset parametric
 splot "glass.dat" using 1
 pause -1 "Hit return to continue (20)"
-set view 0,0,1
+#set view 0,0,1
+set view map
 unset surface
 set title "3D gnuplot demo - 2D contour projection of last plot"
 replot

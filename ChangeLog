@@ -2,6 +2,8 @@
 
 	* src/datafile.c: Whitespace cleanup, comments.
 
+	* demo/contours.dem: Update demo to use "set view map".
+
 2006-06-23  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/help.c (FindHelp): Return a pointer to an empty help key if the
