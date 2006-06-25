@@ -6,6 +6,7 @@ set isosamples 21
 set xlabel "X axis"
 set ylabel "Y axis"
 set zlabel "Z axis" offset 1, 0
+set view 60, 30, 0.85, 1.1
 set title "3D gnuplot demo - contour plot"
 set contour
 splot x*y
@@ -92,7 +93,6 @@ set zrange [-1.2:1.2]
 unset parametric
 splot "glass.dat" using 1
 pause -1 "Hit return to continue (20)"
-#set view 0,0,1
 set view map
 unset surface
 set title "3D gnuplot demo - 2D contour projection of last plot"
@@ -128,7 +128,7 @@ set samples 100
 set logscale z
 set hidden3d
 set isosamples 20
-set view 70,335,1
+set view 70,335,1,1
 set xlabel "x"
 set ylabel "y"
 set title "Rosenbrock Function"
