@@ -1,3 +1,12 @@
+2006-06-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data): If a data field matches the current setting
+	of 'set datafile missing "foo"', then do not interrupt the plotted line
+	spanning the adjacent points in the plot.  This was the behavior in 
+	version 3.7, and is what the documents describe, but has not been the
+	case in version 4.0.
+	Bugs #775810 #918793 #969322 #1403945
+
 2006-06-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: Whitespace cleanup, comments.

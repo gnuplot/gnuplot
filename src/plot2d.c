@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.127 2006/04/27 20:03:39 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.128 2006/04/27 20:51:22 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -445,7 +445,12 @@ get_data(struct curve_points *current_plot)
 
         case DF_MISSING:
             /* Plot type specific handling of missing points could go here. */
-            /* For now missing data is treated the same as undefined */
+            /* Jun 2006 - Return to behavior of 3.7 and current docs:
+	     *            do not interrupt plotted line because of missing data
+	     */
+	     FPRINTF((stderr,"Missing datum %d\n", i));
+	     continue;
+
         case DF_UNDEFINED:
             /* bad result from extended using expression, */
             /* or data field contains missing-data symbol */
