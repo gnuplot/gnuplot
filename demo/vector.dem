@@ -1,5 +1,5 @@
 #
-# $Id: vector.dem,v 1.8 2004/09/25 03:39:20 sfeam Exp $
+# $Id: vector.dem,v 1.9 2005/03/25 05:01:06 sfeam Exp $
 #
 # This file demonstrates
 # -1- saving contour lines as a gnuplottable file
@@ -47,7 +47,8 @@ unset autoscale
 set xr [xmin:xmax]
 set yr [ymin:ymax]
 set isosam 31,31
-set view 0, 0, 1, 1
+#set view 0, 0, 1, 1
+set view map
 unset surface
 set contour base
 set cntrparam order 4
