@@ -1,3 +1,13 @@
+2006-06-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/wxt.trm: Add index point for "help set term wxt".
+
+2006-06-26  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/help.c (FindHelp): Fixed bug introduced on 2006-06-23 where
+	strcpy() overwrote keyword, inadvertently losing the subtopic string.
+	Now expand all abbreviated sub-keywords until end of keyword string.
+
 2006-06-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data): If a data field matches the current setting

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.16 2004/07/01 17:10:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.17 2006/06/24 03:41:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -137,7 +137,7 @@ static LINKEY *keylist = NULL;	/* linked list of keys */
 static KEY *keys = NULL;	/* array of keys */
 static int keycount = 0;	/* number of keys */
 static FILE *helpfp = NULL;
-KEY empty_key = {NULL, 0, NULL, 0};
+static KEY empty_key = {NULL, 0, NULL, 0};
 
 static int LoadHelp __PROTO((char *path));
 static void sortkeys __PROTO((void));
@@ -404,15 +404,29 @@ FindHelp(char *keyword)		/* string we look for */
 {
     KEY *key;
     size_t len = strcspn(keyword, " ");
-    int compare;
 
-    for (key = keys, compare = 1; key->key != NULL && compare > 0; key++) {
-	compare = strncmp(keyword, key->key, len);
-	if (compare == 0)	/* we have a match! */
+    for (key = keys; key->key != NULL; key++) {
+	if (!strncmp(keyword, key->key, len))  /* we have a match! */
 	    if (!Ambiguous(key, len)) {
-		/* non-ambiguous abbreviation */
-		(void) strcpy(keyword, key->key);	/* give back the full spelling */
-		return (key);	/* found!! */
+		size_t key_len = strlen(key->key);
+		size_t keyword_len = strlen(keyword);
+
+		if (key_len != len) {
+		    /* Expand front portion of keyword */
+		    int i, shift = key_len - len;
+
+		    for (i=keyword_len+shift; i >= len; i--)
+			keyword[i] = keyword[i-shift];
+		    strncpy(keyword, key->key, key_len);  /* give back the full spelling */
+		    len = key_len;
+		    keyword_len += shift;
+		}
+		/* Check for another subword */
+		if (keyword[len] == ' ') {
+		    len = len + 1 + strcspn(keyword + len + 1, " ");
+		    key--; /* start with current key */
+		} else
+		    return (key);  /* found!!  non-ambiguous abbreviation */
 	    } else
 		return (&empty_key);
     }
