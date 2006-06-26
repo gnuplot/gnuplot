@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.357 2006/06/15 15:42:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.360 2006/06/18 05:15:52 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -228,8 +228,9 @@ C
  See `binary`.
 
 3 New or revised terminal drivers
-4 Consolidated gif/jpeg/png driver
+4 New wxWidgets (wxt) cross-platform interactive terminal driver
 4 New Enhanced MetaFile (EMF) driver
+4 Consolidated gif/jpeg/png driver
 4 Adobe Illustrator (ai) driver deprecated
 4 epslatex, pslatex support consolidated into the main postscript driver
 
