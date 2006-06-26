@@ -2,6 +2,10 @@
 
 	* term/wxt.trm: Add index point for "help set term wxt".
 
+	* configure.in src/variable.c:  Only invoke kpsexpand if configuration
+	option --with-kpsexpand is chosen at build time.
+	Bug #1377786
+
 2006-06-26  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/help.c (FindHelp): Fixed bug introduced on 2006-06-23 where
@@ -21,7 +25,7 @@
 
 	* src/datafile.c: Whitespace cleanup, comments.
 
-	* demo/contours.dem: Update demo to use "set view map".
+	* demo/contours.dem demo/vector.dem: Update demo to use "set view map".
 
 2006-06-23  Daniel Sebald  <daniel.sebald@ieee.org>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.25 2005/09/15 19:51:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.26 2006/02/27 07:09:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -220,11 +220,13 @@ static const struct path_table fontpath_tbl[] =
     { "c:\\gs\\fonts" },
     /* X11 */
     { "$(CYGWIN_ROOT)\\usr\\X11R6\\lib\\X11\\fonts\\Type1" },
+#ifdef HAVE_KPSEXPAND
     /* fpTeX */
     { "$`kpsewhich -expand-path=$HOMETEXMF`\\fonts\\type1!" },
     { "$`kpsewhich -expand-path=$TEXMFLOCAL`\\fonts\\type1!" },
     { "$`kpsewhich -expand-path=$TEXMFMAIN`\\fonts\\type1!" },
     { "$`kpsewhich -expand-path=$TEXMFDIST`\\fonts\\type1!" },
+#endif
     { NULL }
 };
 #endif
@@ -253,11 +255,13 @@ static const struct path_table fontpath_tbl[] =
 #ifndef FONTPATHSET
 static const struct path_table fontpath_tbl[] =
 {
+#ifdef HAVE_KPSEXPAND
     /* teTeX or TeXLive */
     { "$`kpsexpand '$HOMETEXMF'`/fonts/type1!" },
     { "$`kpsexpand '$TEXMFLOCAL'`/fonts/type1!" },
     { "$`kpsexpand '$TEXMFMAIN'`/fonts/type1!" },
     { "$`kpsexpand '$TEXMFDIST'`/fonts/type1!" },
+#endif
     /* Linux paths */
     { "/usr/X11R6/lib/X11/fonts/Type1" },
     { "/usr/X11R6/lib/X11/fonts/truetype" },

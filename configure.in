@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.191 2006/06/19 22:02:46 tlecomte Exp $
+dnl $Id: configure.in,v 1.192 2006/06/22 18:39:43 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -36,6 +36,11 @@ AC_CHECK_PROGS(LATEX, latex latex2e, no)
 AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
 AC_CHECK_PROGS(DVIPS, dvips, no)
 AC_CHECK_PROGS(TROFF, troff, no)
+
+dnl Allow manual specification of kpsexpand 
+AC_ARG_WITH(kpsexpand,dnl
+  [--with-kpsexpand        search for kpsexpand at run-time ],
+   AC_DEFINE(HAVE_KPSEXPAND,1,[ Define if you use have kpsexpand (TeX). ]))
 
 dnl X Window System files.
 AC_SUBST(LIBRARIES_FOR_X)
@@ -1128,6 +1133,10 @@ fi
 
 if test "$TUTORIAL" = tutorial; then
   AC_MSG_RESULT([  Build LaTeX tutorial])
+fi
+
+if test "$with_kpsexpand" = yes; then
+  AC_MSG_RESULT([  Use TeX component kpsexpand to search for fonts])
 fi
 
 if test "$no_x" != yes; then
