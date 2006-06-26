@@ -12,6 +12,8 @@
 	strcpy() overwrote keyword, inadvertently losing the subtopic string.
 	Now expand all abbreviated sub-keywords until end of keyword string.
 
+	* src/util.c (lower_case): Fix off-by-one bug in characters treated.
+
 2006-06-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data): If a data field matches the current setting
