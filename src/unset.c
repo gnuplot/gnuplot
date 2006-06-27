@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.96 2006/03/26 20:00:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.97 2006/06/01 22:48:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1105,7 +1105,7 @@ unset_mouse()
 static void
 unset_minitics(AXIS_INDEX axis)
 {
-    axis_array[axis].minitics = MINI_DEFAULT;
+    axis_array[axis].minitics = MINI_OFF;
     axis_array[axis].mtic_freq = 10.0;
 }
 
@@ -1638,6 +1638,7 @@ reset_command()
 	axis_array[axis].ticmode = axis_defaults[axis].ticmode;
 	unset_minitics(axis);
 	axis_array[axis].ticdef = default_axis_ticdef;
+	axis_array[axis].minitics = MINI_DEFAULT;
 
 	reset_logscale(axis);
     }

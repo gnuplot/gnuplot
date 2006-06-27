@@ -1,3 +1,10 @@
+2006-06-27  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/unset.c (unset_minitics, reset_command): Change action of
+	unset_minitics to MINI_OFF and set to MINI_DEFAULT after calling
+	from reset_command().
+	Bug #1346814.
+
 2006-06-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:
