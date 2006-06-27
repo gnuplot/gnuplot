@@ -1,3 +1,9 @@
+2006-06-27  Keith Hellman  <khellman@users.sourceforge.net>
+
+	* Accommodate new gnu autotools convention of installing read-only
+	data relative to @datarootdir@
+	Bug #1513675
+
 2006-06-27  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* m4/pkg.m4: New files containing the pkg-config macros.
