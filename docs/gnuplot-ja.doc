@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.360 2006/06/18 05:15:52 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.361 2006/06/26 18:31:23 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -280,8 +280,9 @@ C
  `binary` 参照。
 
 3 新しい/修正された出力形式
-4 gif/jpeg/png ドライバの統合
+4 新しい多プラットフォーム上の wxWidgets (wxt) 対話型出力ドライバ
 4 新しい Enhanced MetaFile (EMF) ドライバ
+4 gif/jpeg/png ドライバの統合
 4 非推奨の Adobe Illustrator (ai) ドライバ
 4 epslatex, pslatex サポートをメインの postscript ドライバに統合
 
@@ -11031,7 +11032,7 @@ C ... and restart the table:
  ので、パイプを使って PDF を出力する gnuplot スクリプトは、PDFlib のあ
  るバージョンでだけしかちゃんと動かないかもしれません。
 
- 外部ライブラリ svgalib (linux, vgagl ドライバで使用):
+ 外部ライブラリ svgalib (linux, vgadl ドライバで使用):
  これは gnuplot が root に setuid (嫌!) されることを要求しますし、ビデ
  オカードや X11 で使用されるグラフィックドライバに特有の多くのバグがあ
  ります。
