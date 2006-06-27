@@ -1,3 +1,7 @@
+2006-06-27  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* m4/pkg.m4: New files containing the pkg-config macros.
+
 2006-06-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/wxt.trm: Add index point for "help set term wxt".
