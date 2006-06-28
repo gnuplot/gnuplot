@@ -1,3 +1,9 @@
+2006-06-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/command.c (rlgets) [HAVE_LIBREADLINE]: Add an extra string
+	comparison not to remove false duplicates from the history.
+	BUG #1529200
+
 2006-07-28  Ethan A Merritt <merritt@u.washington.edu>
 
 	* tutorial/Makefile.am.in:  Set environmental variable GNUTERM to latex

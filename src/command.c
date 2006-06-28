@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.141 2006/07/07 22:38:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.142 2006/07/15 22:17:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2390,8 +2390,11 @@ rlgets(char *s, size_t n, const char *prompt)
 	    /* Initialize readline history functions */
 	    using_history();
 
+	    /* search in the history for entries containing line.
+	     * They may have other tokens before and after line, hence
+	     * the check on strcmp below. */
 	    found = history_search(line, -1);
-	    if (found != -1) {
+	    if (found != -1 && !strcmp(current_history()->line,line)) {
 	    /* this line is already in the history, remove the earlier entry */
 		HIST_ENTRY *removed = remove_history(where_history());
 		/* according to history docs we are supposed to free the stuff */
