@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.18 2005/08/08 09:24:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.19 2005/08/12 08:31:56 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -172,14 +172,13 @@ write_history_n(const int n, const char *filename, const char *mode)
     /* find the beginning of the history and count nb of entries */
     while (entry->prev != NULL) {
 	hist_entries++;
-	if (n > 0 && n == hist_entries)	/* listing will start from this entry */
-	    start = entry;
+	if (n <= 0 || hist_entries <= n)
+	    start = entry;	/* listing will start from this entry */
 	entry = entry->prev;
     }
-    if (start != NULL) {
-	entry = start;
-	hist_index = hist_entries - n + 1;
-    }
+    entry = start;
+    hist_index = (n > 0) ? GPMAX(hist_entries - n, 0) + 1 : 1;
+
     /* now write the history */
     if (filename != NULL && filename[0]) {
 #ifdef PIPES

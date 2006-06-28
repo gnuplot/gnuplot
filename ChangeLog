@@ -1,3 +1,8 @@
+2006-06-28  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/history.c (write_history_n): Account for the case where the
+	number of history entries is less than what the user asked for.
+
 2006-06-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (change_term) term/x11.trm: The x11 terminal driver has
