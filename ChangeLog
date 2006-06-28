@@ -1,5 +1,8 @@
 2006-06-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
+	* docs/gnuplot.doc: Add details about new features in 4.2 with full
+	sentences and following the same format as 4.0 new features.
+
 	* src/command.c (rlgets) [HAVE_LIBREADLINE]: Add an extra string
 	comparison not to remove false duplicates from the history.
 	BUG #1529200

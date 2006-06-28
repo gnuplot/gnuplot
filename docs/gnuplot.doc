@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.372 2006/07/23 22:28:41 tlecomte Exp $
+C RCS $Id: gnuplot.doc,v 1.373 2006/07/28 06:20:12 tlecomte Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -193,46 +193,77 @@ C
 3 New plot styles
 
 4 Histogram
+ Histograms, or bar charts, can be produced.
  See `histograms`.
 
 4 Label plots
+ In coordination with the new `datastrings` feature described below, gnuplot
+ can draw a label at each vertex of a curve.
  See `labels`.
 
 4 Image data mapped onto plot
+ The `image` style allows to plot 2D images and map them in a 2D or 3D plot.
  See `image`.
 
 4 Filled curves
+ It is now possible to fill the area between two input curves with a color or a
+ pattern.
  See `filledcurves`.
 
 4 Vectors
+ gnuplot can draw plots with vectors with a small arrowhead, requiring four or
+ six columns of data for 2D or 3D, respectively.
  See `vectors`.
 
 3 New plot elements
 
-4 Explicit RGB colors can be specified for all plot elements
+4 RGB colors
+ Explicit RGB colors can be specified for all plot elements instead of
+ specifying a predefined linetype.
  See `colorspec`.
 
-4 Rectangles with desired fill and border can be placed anywhere in 2D
+4 Arbitrary rectangles
+ You can place rectangles with desired fill style and border anywhere in a 2D
+ plot.
  See `set object rectangle`
 
 3 String handling
 4 String and text data read from datafiles
+ gnuplot can now read and process text fields in datafiles.
  See `datastrings`
 4 User-defined string variables, operators, and functions
+ String variables and string functions are introduced. Most gnuplot commands
+ that previously required a string constant will now also accept a string
+ variable, a string expression, or a function that returns a string.
  See `string variables`
 
 3 Auto-layout of multiple plots on a page
+ A `layout` option for the `multiplot` mode allows to generate simple
+ multiplots without having to set the size or the position for each plot.
  See `multiplot`.
 
 3 Input from binary data files
+ gnuplot can now read binary input, as opposed to ASCII input. The `binary`
+ keyword allows you to select this mode.
  See `binary`.
 
 3 New or revised terminal drivers
-4 New wxWidgets (wxt) cross-platform interactive terminal driver
-4 New Enhanced MetaFile (EMF) driver
-4 Consolidated gif/jpeg/png driver
-4 Adobe Illustrator (ai) driver deprecated
-4 epslatex, pslatex support consolidated into the main postscript driver
+4 `wxt`
+ The `wxt` terminal is an interactive and cross-platform terminal for on-screen
+ rendering. It uses the wxWidgets library for its user interface, and Cairo
+ associated with Pango for the actual rendering, providing nice plots with
+ antialiasing.
+4 `emf`
+ The `emf` terminal generates an Enhanced Metafile Format file. This file
+ format is the metafile standard on MS Win32 Systems.
+4 `gif`,`jpeg`,`png`
+ The code for the terminals using the `gd` library has been consolidated.
+4 `ai`
+ The Adobe Illustrator `ai` driver is outdated. Since Adobe Illustrator
+ understands PostScript files, the `post` terminal should be used instead.
+4 `epslatex`, `pslatex`, `pstex`
+ The terminals supporting an output to latex augmented by PostScript files have
+ been consolidated into the main `post` driver.
 
 2 Features introduced in version 4.0
 ?version 4 features
@@ -268,10 +299,6 @@ C
  old png driver, including TrueType fonts. Requires libgd.
 
  `svg`: New terminal exporting Scalable Vector Graphics.
-
- `wxt` : New interactive and cross-platform terminal for on-screen rendering.
- It uses wxWidgets for its user interface, and Cairo associated with Pango for
- the actual rendering, providing nice plots with antialiasing.
 
 3 New plot style `pm3d`
 
@@ -331,7 +358,7 @@ C
  to recognize text fields with embedded blanks as single entities based on the
  datafile format settings.  This allows input from csv (comma-separated value)
  files such as those exported by spreadsheet programs. See `set datafile`.
- See also the `binary` option in (new in version 4.2).
+ See also the `binary` option (introduced in 4.2).
 
 3 New commands
 
@@ -1923,11 +1950,10 @@ C ... and restart the table:
 2 String constants and string variables
 ?strings
 ?string variables
- A new feature in gnuplot 4.2 is the introduction of string variables and
- string functions. Most gnuplot commands that previously required a string
- constant will now also accept a string variable, a string expression, or a
- function that returns a string.  For example, the following four methods of
- creating a plot all result in the same plot title:
+ In addition to string constants, most gnuplot commands also accept a string
+ variable, a string expression, or a function that returns a string.
+ For example, the following four methods of creating a plot all result in the
+ same plot title:
 
        four = "4"
        graph4 = "Title for plot #4"
