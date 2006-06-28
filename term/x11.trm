@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.154 2006/04/05 01:04:28 sfeam Exp $
+ * $Id: x11.trm,v 1.155 2006/05/21 00:40:30 sfeam Exp $
  *
  */
 
@@ -1959,30 +1959,6 @@ TERM_TABLE_START(x11_driver)
 #endif
     , ENHX11_OPEN, ENHX11_FLUSH, do_enh_writec
 TERM_TABLE_END(x11_driver)
-
-#undef LAST_TERM
-#define LAST_TERM x11_driver
-
-TERM_TABLE_START(X11_driver)
-    "X11", "X11 Window System (identical to x11)",
-    X11_XMAX, X11_YMAX, X11_VCHAR, X11_HCHAR,
-    X11_VTIC, X11_HTIC, X11_options, X11_init, X11_reset,
-    X11_text, null_scale, X11_graphics, X11_move, X11_vector,
-    X11_linetype, X11_put_text, X11_text_angle,
-    X11_justify_text, X11_point, do_arrow, X11_set_font,
-    X11_pointsize, TERM_CAN_MULTIPLOT,
-    X11_text /* suspend can use same routine */ , 0 /* resume */ ,
-    X11_fillbox, X11_linewidth
-#ifdef USE_MOUSE
-    , X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
-#endif
-    , X11_make_palette, 0 /* X11_previous_palette */ ,
-    X11_set_color, X11_filled_polygon
-#ifdef WITH_IMAGE
-    , X11_image
-#endif
-    , ENHX11_OPEN, ENHX11_FLUSH, do_enh_writec
-TERM_TABLE_END(X11_driver)
 
 #undef LAST_TERM
 #define LAST_TERM x11_driver

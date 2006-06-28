@@ -1,3 +1,11 @@
+2006-06-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (change_term) term/x11.trm: The x11 terminal driver has
+	been carrying around two copies of TERM_TABLE, one named "x11" and
+	the other named "X11". But the "X11" copy has suffered from bit rot.
+	Delete this redundant copy, and instead replace "X11" with "x11"
+	at the time the "set term" request is processed.
+
 2006-06-27  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/unset.c (unset_minitics, reset_command): Change action of

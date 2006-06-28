@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.149 2006/06/15 04:53:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.150 2006/06/20 19:54:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1502,10 +1502,12 @@ set_term(int c_token_arg)
  * driver pointer
  */
 static struct termentry *
-change_term(const char *name, int length)
+change_term(const char *origname, int length)
 {
     int i;
     struct termentry *t = NULL;
+    /* For backwards compatibility only */
+    const char *name = (!strncmp(origname,"X11",length)) ? "x11" : origname;
 
     for (i = 0; i < TERMCOUNT; i++) {
         if (!strncmp(name, term_tbl[i].name, length)) {
