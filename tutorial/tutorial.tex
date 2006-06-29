@@ -1,11 +1,12 @@
 %
-% $Id: tutorial.tex,v 1.2 2004/03/11 15:37:21 mikulik Exp $
+% $Id: tutorial.tex,v 1.3 2005/07/29 07:54:35 mikulik Exp $
 %
 % Tutorial for gnuplot plotting program, for LaTeX users
 % David Kotz
 % Duke University Computer Science Department
 %
 % Slightly updated by the gnuplot team in 2004, for gnuplot 4.0.
+% Updated for gnuplot 4.2 to include epslatex example by Ethan A Merritt
 %
 % NOTE: If LaTeX runs out of memory processing plots,
 % add ``with lines 4'' to each curve in eg*.plt and rerun make.
@@ -262,7 +263,7 @@ data points, and another called {\tt dots} that plots a tiny dot for
 each data point.  The {\tt points} and {\tt linespoints} styles
 produce a different point symbol for each curve on the plot (for up to
 twelve symbols, after which they are re-used; see
-Figure~\ref{linepoint} for a complete list). The {\tt lines} and {\tt
+Figure~\ref{test} for a complete list). The {\tt lines} and {\tt
 linespoints} styles use a different line style for each curve on the
 plot (in this example the dots have different spacing). The
 style {\tt impulses} draws a perpendicular from each point to the
@@ -365,14 +366,14 @@ self-explanatory. This is shown in Figure~\ref{eg6}.
 }
 
 \paragraph{Line and point types:} For reference, we show all of the
-line and point types available in Figure~\ref{linepoint}.
+line and point types available in Figure~\ref{test}.
 
 \boxfigure{htbp}{\fullboxwidth}{
   \begin{center}
-    \input{linepoin}
+    \input{test}
   \end{center}
   \caption{All of the line and point types in the \LaTeX\ driver.}
-  \label{linepoint}
+  \label{test}
 }
 
 \subsection{Summary --- Use with \LaTeX}
@@ -453,7 +454,6 @@ from \verb+cs.duke.edu+ as \verb+dist/sources/gnuplot/gnut2p.tar.Z+.
 This file also contains directions and a list of changes from Gnu\TeX\
 to gnuplot.
 
-
 \section{What is new for \TeX{} and \LaTeX{} terminals in gnuplot 4.0}
 
 In addition to the \texttt{latex} terminal, the following \LaTeX-friendly
@@ -480,6 +480,26 @@ See helps of these terminals for more details about their usage.
 In addition, the \texttt{postscript eps enhanced} is the most useful for \TeX{}
 and \LaTeX{} if you don't insist of using \TeX{} fonts for the graph labels, and
 \texttt{pdf enhanced} and \texttt{png enhanced} for pdf\LaTeX{}.
+
+\section{Sample of epslatex terminal driver}
+\label{epslatex}
+
+The epslatex terminal driver allows you to mix the best features of \TeX\
+and PostScript. Text elements are typeset by \TeX\, while the graphic
+elements are created and positioned in parallel by gnuplot's PostScript
+driver. The plot can use either color or grayscale.
+The driver produces two different files, one for the eps part of the figure
+and one for the \LaTeX{} part. The name of the \LaTeX{} file is taken from the
+`set output` command. The name of the eps file is derived by replacing
+the file extension (normally `.tex`) with `.eps` instead.
+
+\boxfigure{htbp}{\fullboxwidth}{
+  \begin{center}
+    \input{epslatex}
+  \end{center}
+  \caption{Interlocking tori demo, drawn using the epslatex driver.}
+  \label{epslatex_test}
+}
 
 
 \section{Contact for help}

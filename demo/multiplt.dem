@@ -44,7 +44,7 @@ mag(w) = -10*log10( (1-w**2)**2 + 4*(zeta*w)**2)
 set dummy w
 set logscale x
 set xlabel "Frequency (w/wn)"
-set ylabel "Magnitude (dB)" 1,0
+set ylabel "Magnitude (dB)" offset 1,0
 set label 1 "Damping =.1,.2,.3,.4,.5,.707,1.0,2.0" at .14,17
 set xrange [.1:10]
 set yrange [-40:20]
@@ -62,7 +62,7 @@ set size 0.5,0.5
 set origin 0.0,0.0
 set title "Second Order System Transfer Function - Phase"
 set label 1 ""
-set ylabel "Phase (deg)" 1,0
+set ylabel "Phase (deg)" offset 1,0
 set ytics -180, 30, 0 
 set yrange [-180:0]
 tmp(w) = (-180/pi)*atan( 2*zeta*w/(1-w**2) )
@@ -85,7 +85,7 @@ set origin 0.5,0.5
 set dummy wnt
 unset logscale x
 set title "Second Order System - Unit Step Response"
-set ylabel "Amplitude y(wnt)" 1,0 
+set ylabel "Amplitude y(wnt)" offset 1,0 
 set xlabel "Normalized Time (wnt)"
 set xrange [0:20]
 set xtics 0,5,20

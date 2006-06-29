@@ -1,5 +1,5 @@
 #
-# $Id: airfoil.dem,v 1.8 2003/12/16 04:46:20 sfeam Exp $
+# $Id: airfoil.dem,v 1.9 2004/09/28 06:06:10 sfeam Exp $
 #
 # This demo shows how to use bezier splines to define NACA four
 # series airfoils and complex variables to define Joukowski
@@ -149,7 +149,7 @@ set isosamples 10
 set style data lines
 set style function lines
 print  "Joukowski Airfoil using Complex Variables" 
-set title "Joukowski Airfoil using Complex Variables" 0,0
+set title "Joukowski Airfoil using Complex Variables" offset 0,0
 set time
 set yrange [-.2 : 1.8]
 set trange [0: 2*pi]

@@ -137,12 +137,12 @@ pause -1 "Next we do several sets of parallel histograms"
 #
 set title "Immigration from different regions\n(give each histogram a separate title)"
 set key under nobox
-set style histogram clustered gap 1 title 2,0.25
+set style histogram clustered gap 1 title offset 2,0.25
 set style fill solid noborder
 set boxwidth 0.95
 unset xtics
 set xtics nomirror rotate by -45
-set xlabel "(note: histogram titles have specified offset relative to X-axis label)" 0,-2
+set xlabel "(note: histogram titles have specified offset relative to X-axis label)" offset 0,-2
 set ytics
 set grid y
 set auto y

@@ -1,5 +1,5 @@
 #
-# $Id: random.dem,v 1.9 2006/05/21 19:50:51 broeker Exp $
+# $Id: random.dem,v 1.10 2006/06/14 03:24:09 sfeam Exp $
 #
 # random.dem
 #
@@ -170,7 +170,7 @@ set size 0.47,0.72
 set origin 0.44,0.18
 tstring(n) = sprintf("Histogram of distance from origin of\n%d multivariate unit variance samples", n)
 set title tstring(nsamp) offset graph 0, graph 0.15
-set key below right vert
+set key bmargin right vertical
 xlow = 0.0
 xhigh = 4.5
 binwidth = 20

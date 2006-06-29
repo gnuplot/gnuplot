@@ -223,7 +223,7 @@ set xrange [-0.5:127.5]
 set yrange [-0.5:127.5]
 set tics out
 set label 1 "Selection of the input channels via \`using\`" at 140,160 center
-set title '"I do impersonations..."' 0,-0.5
+set title '"I do impersonations..."' offset 0,-0.5
 plot 'blutux.rgb' binary array=128x128 flip=y format='%uchar' using 1:2:3 with rgbimage
 unset label 1
 set size 0.5,0.48
@@ -265,7 +265,7 @@ set xrange [-0.5:127.5]
 set yrange [-0.5:127.5]
 set tics out
 set label 1 "Luminance adjustment via \`cbrange\`" at 140,160 center
-set title 'Lake Mendota, "or Wonk-sheck-ho-mik-la!"' 0,-0.5
+set title 'Lake Mendota, "or Wonk-sheck-ho-mik-la!"' offset 0,-0.5
 set cbrange [*:*]
 plot 'blutux.rgb' binary array=128x128 flipy format='%uchar' using 1:2:3 with rgbimage
 unset label 1
@@ -384,7 +384,7 @@ set size 0.5,0.48
 set origin 0.0,0.47
 unset key
 set label 1 "If plots in columns match, your compiler is little endian" at 100,1200,3.0 center
-set title 'Little endian' 0,-0.5
+set title 'Little endian' offset 0,-0.5
 splot 'scatter2.bin' binary record=30,30,29,26 endian=little using 1:2:3
 unset label 1
 set size 0.5,0.48
@@ -495,7 +495,7 @@ unset key
 set xrange [0:2]
 set yrange [-1:1]
 set label 1 "Temporal data having one generated coordinate" at 2.25,1.5 center
-set title 'Along the x-axis' 0,-0.5
+set title 'Along the x-axis' offset 0,-0.5
 plot 'sine.bin' binary endian=little array=201 dx=0.01 origin=(0,0) format='%f' using 1 with lines
 unset label 1
 set size 0.5,0.48
@@ -697,7 +697,7 @@ unset key
 set xrange [-5:635]
 set yrange [-5:635]
 set tics out
-set title 'Details read from file' 0,-0.5
+set title 'Details read from file' offset 0,-0.5
 plot 'demo.edf' binary filetype=auto with image
 set size 0.5,0.5
 set origin 0.5,0.5

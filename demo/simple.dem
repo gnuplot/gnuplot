@@ -1,5 +1,5 @@
 #
-# $Id: simple.dem,v 1.2 1999/08/17 15:31:56 lhecking Exp $
+# $Id: simple.dem,v 1.3 1999/10/17 19:17:00 lhecking Exp $
 #
 # Requires data files "[123].dat" from this directory,
 # so change current working directory to this directory before running.
@@ -28,7 +28,7 @@ set samples 400
 plot [-10:10] real(sin(x)**besj0(x))
 pause -1 "Hit return to continue"
 
-set key outside below
+set key bmargin center horizontal
 plot [-5*pi:5*pi] [-5:5] real(tan(x)/atan(x)), 1/x
 pause -1 "Hit return to continue"
 

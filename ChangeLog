@@ -1,3 +1,22 @@
+2006-06-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c src/show.c: Less alarming error message if deprecated syntax
+	is detected. Undeprecate "set key {below|above}".
+	Bug #1514614.
+
+	* tutorial/Makefile.am.in eg4.plt eg5.plt eg6.plt eg7.plt test.plt 
+	tutorial.tex header.tex makefile.dst linepoin.plot (removed):
+	Replace deprecated syntax in tex example plots. Add an epslatex sample.
+
+2006-06-29  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* demo/airfoil.dem histograms.dem histograms2.dem image.dem multiplt.dem
+	random.dem simple.dem starmap.dem: 
+	Small changes to ensure demos do not use deprecated syntax.
+
+	* docs/gnuplot.doc: Clean up "set title" and "set xlabel" and remove
+	any examples with non up-to-date syntax.
+
 2006-06-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	SF Patch [1488448] User-available GPVAL_ variables

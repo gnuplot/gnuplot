@@ -8,7 +8,7 @@ EXTRA_DIST = Makefile.am.in $(PLT_FILES) \
 header.tex makefile.dst tutorial.tex eg3.dat
 
 CLEANFILES = tutorial.aux tutorial.dvi tutorial.log tutorial.pdf tutorial.ps \
-tutorial.toc eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex
+tutorial.toc eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex eg7.tex test.tex
 
 DVIPS = dvips
 LATEX = @LATEX@
@@ -29,13 +29,13 @@ tutorial.ps: tutorial.dvi
 
 pdf: tutorial.pdf
 
-tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
+tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex eg7.tex test.tex \
 	tutorial.tex header.tex
 	@echo Building LaTeX tutorial
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) tutorial
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) tutorial
 
-tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
+tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex eg7.tex test.tex \
 	tutorial.tex header.tex
 	@echo "Building LaTeX tutorial (PDF version)"
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) tutorial

@@ -73,7 +73,7 @@ print '	set style line 7 lt rgb "violet" lw 3'
 print ''
 print '# And this is the result'
 #
-show linestyle
+show style line
 replot
 #
 pause -1 "Hit return to continue"
