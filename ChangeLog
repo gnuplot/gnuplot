@@ -8,6 +8,8 @@
 	tutorial.tex header.tex makefile.dst linepoin.plot (removed):
 	Replace deprecated syntax in tex example plots. Add an epslatex sample.
 
+	* src/save.c: Add missing newline after 'set pm3d depthorder'.
+
 2006-06-29  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* demo/airfoil.dem histograms.dem histograms2.dem image.dem multiplt.dem
