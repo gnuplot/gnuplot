@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.138 2006/06/05 20:57:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.139 2006/06/11 17:42:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -502,6 +502,9 @@ define()
 	dummy_func = NULL;	/* dont let anyone else use our workspace */
     } else {
 	/* variable ! */
+	char *varname = gp_input_line + token[c_token].start_index;
+	if (!strncmp(varname, "GPVAL_", 6) || !strncmp(varname, "MOUSE_", 6))
+	    int_error(c_token, "Cannot set internal variables GPVAL_ and MOUSE_");
 	start_token = c_token;
 	c_token += 2;
 	udv = add_udv(start_token);

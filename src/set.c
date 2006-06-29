@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.231 2006/06/21 03:40:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.232 2006/06/24 03:30:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -625,6 +625,7 @@ set_command()
 #ifdef BACKWARDS_COMPATIBLE
     }
 #endif
+    update_gpval_variables(0); /* update GPVAL_ inner variables */
 
 }
 

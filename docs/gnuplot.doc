@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.360 2006/06/18 05:15:52 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.361 2006/06/26 18:31:23 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1524,6 +1524,11 @@ C ... and restart the table:
 
  Working with interactive terminals with `mouse` functionality defines
  variables with names that begin "MOUSE_", see `mouse variables` for details.
+
+ Further, there are several "read-only" variables that begin "GPVAL_", like 
+ GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN,... Type `show variables all`
+ to display their list and values. Values related to axes parameters (ranges, log
+ base) are values used during the last plot, not those currently `set`.
 
  The `fit` mechanism uses several variables with names that begin "FIT_".  It
  is safest to avoid using such names.  "FIT_LIMIT", however, is one that you
@@ -9438,7 +9443,11 @@ C ... and restart the table:
  values.
 
  Syntax:
-       show variables
+       show variables {all}
+
+ With the optional keyword "all", also the `gnuplot-defined variables` that
+ begin with `GPVAL_` are listed.
+
 3 version
 ?show version
  The `show version` command lists the version of gnuplot being run, its last

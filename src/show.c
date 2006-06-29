@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.178 2006/06/16 05:16:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.179 2006/06/18 18:55:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2873,12 +2873,29 @@ show_variables()
 {
     struct udvt_entry *udv = first_udv;
     int len;
+    int show_gpval = 0;
 
     SHOW_ALL_NL;
 
-    fputs("\n\tVariables:\n", stderr);
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "all"))
+	    show_gpval = 1;
+	else 
+	    int_error(c_token, "Required no option or 'all'");
+	c_token++;
+    }
+
+    if (show_gpval)
+	fputs("\n\tAll available variables:\n", stderr);
+    else
+	fputs("\n\tUser and default variables:\n", stderr);
+
     while (udv) {
 	len = strcspn(udv->udv_name, " ");
+	if (!show_gpval && !strncmp(udv->udv_name,"GPVAL_",6)) { /* skip GPVAL_ variables */
+	    udv = udv->next_udv;
+	    continue;
+	}
 	if (udv->udv_undef) {
 	    FPRINTF((stderr, "\t%-*s is undefined\n", len, udv->udv_name));
 	} else {

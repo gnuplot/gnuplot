@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.39 2005/11/27 19:30:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.40 2006/06/10 00:35:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -687,3 +687,80 @@ add_udv_by_name(char *key)
     (*udv_ptr)->udv_undef = TRUE;
     return (*udv_ptr);
 }
+
+
+static void fill_gpval_axis __PROTO((AXIS_INDEX axis));
+static void set_gpval_axis_sth_double __PROTO((AXIS_INDEX axis, const char *suffix, double value, int is_int));
+static void fill_gpval_string __PROTO((char *var, char *value));
+
+static void 
+set_gpval_axis_sth_double(AXIS_INDEX axis, const char *suffix, double value, int is_int)
+{
+    struct udvt_entry *v;
+    char *cc, s[24];
+    sprintf(s, "GPVAL_%s_%s", axis_defaults[axis].name, suffix);
+    for (cc=s; *cc; cc++) *cc = toupper(*cc); /* make the name uppercase */
+    v = add_udv_by_name(s);
+    if (!v) return; /* should not happen */
+    v->udv_undef = FALSE;
+    if (is_int)
+	Ginteger(&v->udv_value, (int)(value+0.5));
+    else
+	Gcomplex(&v->udv_value, value, 0);
+}
+
+static void
+fill_gpval_axis(AXIS_INDEX axis)
+{
+#define A axis_array[axis]
+    double a = AXIS_DE_LOG_VALUE(axis, A.min); /* FIXME GPVAL: This should be replaced by  a = A.real_min  and */
+    double b = AXIS_DE_LOG_VALUE(axis, A.max); /* FIXME GPVAL: b = A.real_max  when true (delogged) min/max range values are implemented in the axis structure */
+    set_gpval_axis_sth_double(axis, "MIN", ((a < b) ? a : b), 0);
+    set_gpval_axis_sth_double(axis, "MAX", ((a < b) ? b : a), 0);
+    set_gpval_axis_sth_double(axis, "REVERSE", (A.range_flags & RANGE_REVERSE), 1);
+    set_gpval_axis_sth_double(axis, "LOG", A.base, 0);
+#undef A
+}
+
+static void
+fill_gpval_string(char *var, char *value)
+{
+#ifdef GP_STRING_VARS
+    struct udvt_entry *v = add_udv_by_name(var);
+    if (!v)
+	return;
+    if (v->udv_undef == FALSE && !strcmp((char*)&v->udv_value, value))
+	return;
+    v->udv_undef = FALSE; 
+    gpfree_string(&v->udv_value);
+    Gstring(&v->udv_value, gp_strdup(value));
+    /* fprintf(stderr, "now it is: |%s|\n", &v->udv_value.v.string_val); */
+#endif
+}
+
+void
+update_gpval_variables(int from_plot_command)
+{
+    struct udvt_entry *v;
+
+    if (from_plot_command) {
+	fill_gpval_axis(FIRST_X_AXIS);
+	fill_gpval_axis(FIRST_Y_AXIS);
+	fill_gpval_axis(SECOND_X_AXIS);
+	fill_gpval_axis(SECOND_Y_AXIS);
+	fill_gpval_axis(FIRST_Z_AXIS);
+	fill_gpval_axis(COLOR_AXIS);
+	fill_gpval_axis(T_AXIS);
+	fill_gpval_axis(U_AXIS);
+	fill_gpval_axis(V_AXIS);
+    }
+
+    v = add_udv_by_name("GPVAL_TERM");
+    if (v) {
+	v->udv_undef = FALSE;
+	Gstring(&v->udv_value,(char*)term->name); /* this can be pointer */
+    }
+    fill_gpval_string("GPVAL_TERMOPTIONS", term_options); /* this we must copy */
+    fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : ""); /* this we must copy */
+}
+
