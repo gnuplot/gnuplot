@@ -3,6 +3,9 @@
 	* src/plot.c (main): Fix parsing of "-persist" for the wxWidgets
 	terminal when X11 is not defined.
 
+	* term/ai.trm (TERM_HELP): Add notice that the terminal is outdated
+	and that post should be used instead.
+
 2006-06-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* docs/gnuplot.doc: Add details about new features in 4.2 with full

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ai.trm,v 1.19 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: ai.trm,v 1.20 2006/07/21 02:35:45 sfeam Exp $
  *
  */
 
@@ -535,6 +535,11 @@ START_HELP(aifm)
 "?terminal aifm",
 "?term aifm",
 "?aifm",
+"",
+" NOTE: this terminal driver is outdated. Since Adobe Illustrator understands",
+" PostScript level 1 directly, you should use `set terminal post level1`",
+" instead.",
+"",
 " Several options may be set in `aifm`---the Adobe Illustrator 3.0+ driver.",
 "",
 " Syntax:",
