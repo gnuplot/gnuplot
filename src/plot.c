@@ -631,7 +631,11 @@ main(int argc, char **argv)
 
     if (argc > 1) {
 #ifdef _Windows
-	int noend = 0;
+# ifdef WXWIDGETS
+	TBOOLEAN noend = persist;
+# else
+	TBOOLEAN noend = FALSE;
+# endif
 #endif
 
 	/* load filenames given as arguments */
@@ -641,7 +645,7 @@ main(int argc, char **argv)
 #ifdef _Windows
 	    if (stricmp(*argv, "-noend") == 0 || stricmp(*argv, "/noend") == 0
 	       	|| stricmp(*argv, "-persist") == 0)
-		noend = 1;
+		noend = TRUE;
 	    else
 #endif
 	    if (strcmp(*argv, "-") == 0) {
