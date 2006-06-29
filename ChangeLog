@@ -1,5 +1,8 @@
 2006-06-29  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
+	* docs/gnuplot.doc: Another round of additions to the "news" section
+	of the help.
+
 	* src/plot.c (main): Fix parsing of "-persist" for the wxWidgets
 	terminal when X11 is not defined.
 

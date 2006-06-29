@@ -187,8 +187,9 @@ C
 ?new-features
 ?version 4.2 features
  Gnuplot version 4.2 offers many new features introduced since the preceding
- official version 4.0.  This section lists major additions and gives a partial
- list of changes and minor new features.
+ official version 4.0. This section lists major additions and gives a partial
+ list of changes and minor new features. For a more exhaustive list, see the
+ NEWS file.
 
 3 New plot styles
 
@@ -206,8 +207,8 @@ C
  See `image`.
 
 4 Filled curves
- It is now possible to fill the area between two input curves with a color or a
- pattern.
+ The plot style `fillstyle` has been augmented to allow to fill the area
+ between two input curves with a color or a pattern.
  See `filledcurves`.
 
 4 Vectors
@@ -238,7 +239,7 @@ C
  See `string variables`
 
 3 Auto-layout of multiple plots on a page
- A `layout` option for the `multiplot` mode allows to generate simple
+ The `multiplot` mode is now able to layout automatically simple
  multiplots without having to set the size or the position for each plot.
  See `multiplot`.
 
@@ -247,23 +248,35 @@ C
  keyword allows you to select this mode.
  See `binary`.
 
+3 Internal variables
+ gnuplot now exports several "read-only" variables such as GPVAL_TERM,
+ GPVAL_X_MIN, etc.
+ See `gnuplot-defined variables`.
+
 3 New or revised terminal drivers
 4 `wxt`
  The `wxt` terminal is an interactive and cross-platform terminal for on-screen
  rendering. It uses the wxWidgets library for its user interface, and Cairo
  associated with Pango for the actual rendering, providing nice plots with
- antialiasing.
+ antialiasing on lines and text. The terminal support the full range of gnuplot
+ capabilities, including mousing, `pm3d` plots, `image` plots and enhanced
+ text.
 4 `emf`
  The `emf` terminal generates an Enhanced Metafile Format file. This file
  format is the metafile standard on MS Win32 Systems.
 4 `gif`,`jpeg`,`png`
  The code for the terminals using the `gd` library has been consolidated.
+ The `gif` terminal also knows how to produce an animated gif from a sequence
+ of plots.
 4 `ai`
  The Adobe Illustrator `ai` driver is outdated. Since Adobe Illustrator
- understands PostScript files, the `post` terminal should be used instead.
+ understands PostScript files, `set terminal post level1 ...` should be used
+ instead.
 4 `epslatex`, `pslatex`, `pstex`
  The terminals supporting an output to latex augmented by PostScript files have
  been consolidated into the main `post` driver.
+4 `windows`
+ The `windows` terminal now supports the `enhanced text` mode.
 
 2 Features introduced in version 4.0
 ?version 4 features
