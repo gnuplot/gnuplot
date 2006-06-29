@@ -4,7 +4,7 @@ C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Col
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
 ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-^ <h2>  Version 4.1 organized by Hans-Bernhard Broeker and others</h2><p>
+^ <h2>  Version 4.2 organized by Hans-Bernhard Broeker and others</h2><p>
 ^ <h2>Major contributors (alphabetic order):</h2>
 ^<ul><h3>
 ^<li>  Hans-Bernhard Broeker
@@ -185,8 +185,8 @@ C
 
 2 New Features
 ?new-features
-?version 4.1 features
- Gnuplot version 4.1 contained many features introduced since the preceding
+?version 4.2 features
+ Gnuplot version 4.2 offers many new features introduced since the preceding
  official version 4.0.  This section lists major additions and gives a partial
  list of changes and minor new features.
 
@@ -326,7 +326,7 @@ C
  to recognize text fields with embedded blanks as single entities based on the
  datafile format settings.  This allows input from csv (comma-separated value)
  files such as those exported by spreadsheet programs. See `set datafile`.
- See also the `binary` option in version 4.1.
+ See also the `binary` option in (new in version 4.2).
 
 3 New commands
 
@@ -340,7 +340,7 @@ C
 
  Since gnuplot 4.0, `unset <something>` is preferred to `set no<something>`.
  The older form has been deprecated.
- Version 4.1 continues to allow the older syntax, but such backwards
+ Version 4.2 continues to allow the older syntax, but such backwards
  compatibility may be lost in future versions.
 
  Commands of the form `set <something> <style>` also are deprecated in favor
@@ -1909,7 +1909,7 @@ C ... and restart the table:
 2 String constants and string variables
 ?strings
 ?string variables
- A new feature in gnuplot 4.1 is the introduction of string variables and
+ A new feature in gnuplot 4.2 is the introduction of string variables and
  string functions. Most gnuplot commands that previously required a string
  constant will now also accept a string variable, a string expression, or a
  function that returns a string.  For example, the following four methods of
@@ -6056,7 +6056,7 @@ C ... and restart the table:
  on the surface (`set contour surface`) don't work.  
 
  Labels and arrows are always visible and are unaffected.  The key box is
- never hidden by the surface. As of gnuplot version 4.1, `set hidden3d` also
+ never hidden by the surface. As of gnuplot version 4.2, `set hidden3d` also
  affects 3D plotting styles `with points`, `with labels`, and `with vectors`,
  even if no surface is present in the graph.  Individual plots within the
  graph may be explicitly excluded from this processing by appending the extra

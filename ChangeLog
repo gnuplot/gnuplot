@@ -15,6 +15,9 @@
 
 	* src/save.c: Add missing newline after 'set pm3d depthorder'.
 
+	* docs/gnuplot.doc docs/gnuplot-ja.doc: Refer to current version as
+	4.2 rather than 4.1.
+
 2006-06-29  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* demo/airfoil.dem histograms.dem histograms2.dem image.dem multiplt.dem

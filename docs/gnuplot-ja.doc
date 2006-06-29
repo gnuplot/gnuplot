@@ -1,10 +1,10 @@
-C RCS $Id: gnuplot.doc,v 1.361 2006/06/26 18:31:23 sfeam Exp $
+C RCS $Id: gnuplot-ja.doc,v 1.3 2006/06/28 00:17:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
 ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-^ <h2>  Version 4.1 organized by Hans-Bernhard Broeker and others</h2><p>
+^ <h2>  Version 4.2 organized by Hans-Bernhard Broeker and others</h2><p>
 ^ <h2>Major contributors (alphabetic order):</h2>
 ^<ul><h3>
 ^<li>  Hans-Bernhard Broeker
@@ -237,8 +237,8 @@ C
 
 2 New Features
 ?new-features
-?version 4.1 features
- gnuplot version 4.1 は、直前の公式バージョン 4.0 以降に追加されたたく
+?version 4.2 features
+ gnuplot version 4.2 は、直前の公式バージョン 4.0 以降に追加されたたく
  さんの特徴を含んでいます。この節では、主な追加機能の一覧と、変更や細か
  い新機能の一部を紹介します。
 
@@ -383,7 +383,7 @@ C
  datafile 形式の設定に基づいて、空白を持つような文字列フィールドも単一
  項目とみなすことができます。これにより表計算ソフトが出力するような csv
  (コンマ分離形式) ファイルの入力も可能になります。`set datafile` 参照。
- version 4.1 ではオプション `binary` も参照のこと。
+ version 4.2 ではオプション `binary` も参照のこと。
 
 3 新しいコマンド
 
@@ -396,7 +396,7 @@ C
 3 他の変更と追加
 
  現在は `set no<something>` よりむしろ `unset <something>` を使ってくだ
- さい。以前の形は推奨されていません。Version 4.1 は古い書式も受け付けま
+ さい。以前の形は推奨されていません。Version 4.2 は古い書式も受け付けま
  すが、そのような後方互換性は将来の版では失われるでしょう。
 
  `set <something> <style>` の形式のコマンドも、より一般的な形式である
@@ -1968,7 +1968,7 @@ C ... and restart the table:
 2 String constants and string variables
 ?strings
 ?string variables
- gnuplot 4.1 の新機能として、文字列変数と文字列関数が導入されました。今
+ gnuplot 4.2 の新機能として、文字列変数と文字列関数が導入されました。今
  まで文字列定数を受け付けていたような gnuplot コマンドのほとんどは文字
  列変数、文字列式、または文字列を返す関数も受け付けます。例えば、以下の
  4 つの plot のやり方は結果として全て同じ描画タイトルを生成します。
@@ -6167,7 +6167,7 @@ C ... and restart the table:
  (`set contour surface`) は機能しません。
 
  見出しと矢印は常に表示され、影響を受けません。グラフの説明 (key) も曲
- 面に隠されることはありません。gnuplot バージョン 4.1 ではグラフ上に曲
+ 面に隠されることはありません。gnuplot バージョン 4.2 ではグラフ上に曲
  面が一つもない状態でも、`set hidden3d` は `with points`, `with labels`
  `with vectors` の 3 次元の描画スタイルに影響を与えます。グラフ内の各々
  の描画をこの処理から明示的に除外したいときは、`with` 指定に特別のオプ
