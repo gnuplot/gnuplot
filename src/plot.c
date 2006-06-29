@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.85 2006/07/21 05:19:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.86 2006/07/28 00:03:19 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -388,14 +388,24 @@ main(int argc, char **argv)
     /* the X11 terminal removes tokens that it recognizes from argv.
      * We have to parse -persist for the wxWidgets terminal before it happens, and
      * keep that value for later use */
-    for (i=0; i<argc; ++i) {
-	if (!argv[i])
+    i=0;
+    while (i<argc) {
+	if (!argv[i]) {
+	    ++i;
 	    continue;
+	}
 	if (!strcmp(argv[i], "-persist")) {
 	    FPRINTF((stderr,"'persist' command line option recognized"));
 	    persist = TRUE;
+# ifdef X11
+	    ++i;
+# else
+	    --argc;
+	    ++argv;
+# endif
 	    break;
-	}
+	} else
+	    ++i;
     }
 #endif /* WXWIDGETS */
 
