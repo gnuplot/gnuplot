@@ -1,5 +1,8 @@
 2006-06-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/breaders.c (edf_filetype_function): Don't print a debugging
+	message.
+
 	* src/eval.c (update_gpval_variables): Added automatic read-only
 	variables GPVAL_VERSION and GPVAL_PATCHLEVEL.
 

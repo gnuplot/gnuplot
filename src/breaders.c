@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: breaders.c,v 1.1 2004/09/01 15:56:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: breaders.c,v 1.2 2004/09/03 15:56:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - breaders.c */
@@ -255,8 +255,8 @@ edf_filetype_function(void)
     }
 
     free(header);
-#if 1
-    /* !!! Print results. This routine will be completely removed later. !!! */
+#if 0
+    /* Print results. This routine will be completely removed later. */
     fprintf(stderr,"EDF: dim=%ix%i skip=%i datatype=%i datasize=%i dx=%g dy=%g\n",
 	df_bin_record[0].scan_dim[0], df_bin_record[0].scan_dim[1],
 	df_bin_record[0].scan_skip[0],
