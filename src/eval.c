@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.40 2006/06/10 00:35:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.41 2006/06/29 19:36:43 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -48,6 +48,7 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.40 2006/06/10 00:35:26 sfea
 #include "specfun.h"
 #include "standard.h"
 #include "util.h"
+#include "version.h"
 
 #include <signal.h>
 #include <setjmp.h>
@@ -762,5 +763,16 @@ update_gpval_variables(int from_plot_command)
     }
     fill_gpval_string("GPVAL_TERMOPTIONS", term_options); /* this we must copy */
     fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : ""); /* this we must copy */
+
+    v = add_udv_by_name("GPVAL_VERSION");
+    if (v && v->udv_undef == TRUE) {
+	v->udv_undef = FALSE; 
+	Gcomplex(&v->udv_value, atof(gnuplot_version), 0);
+    }
+    v = add_udv_by_name("GPVAL_PATCHLEVEL");
+    if (v && v->udv_undef == TRUE) {
+	v->udv_undef = FALSE; 
+	Ginteger(&v->udv_value, atoi(gnuplot_patchlevel));
+    }
 }
 
