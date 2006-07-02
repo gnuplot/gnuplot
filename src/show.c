@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.180 2006/06/29 19:36:44 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.181 2006/06/30 02:17:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -307,6 +307,10 @@ show_command()
 	CHECK_TAG_GT_ZERO;
 	show_linestyle(tag);
 	break;
+#else
+    case S_LINESTYLE:
+	error_message = "keyword 'linestyle' deprecated, use 'show style line'";
+	break;
 #endif
     case S_KEYTITLE:
 	show_keytitle();
@@ -394,6 +398,10 @@ show_command()
 	    c_token++;
 	} else
 	    error_message = "keyword 'style' expected after 'show data'";
+	break;
+#else
+    case S_DATA:
+	error_message = "keyword 'data' deprecated, use 'show style data'";
 	break;
 #endif
     case S_STYLE:
@@ -765,9 +773,6 @@ show_all()
     show_zeroaxis(FIRST_Z_AXIS);
     show_label(0);
     show_arrow(0);
-/*
-    show_linestyle(0);
-*/
     show_keytitle();
     show_key();
     show_logscale();
