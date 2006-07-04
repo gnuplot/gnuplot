@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.79 2005/12/17 19:35:13 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.80 2006/03/11 22:11:44 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -566,12 +566,21 @@ GetRulerString(char *p, double x, double y)
     dy = DIST(y, ruler.y, FIRST_Y_AXIS);
     sprintf(p, format, ruler.x, ruler.y, dx, dy);
 
-    if (mouse_setting.polardistance && !axis_array[FIRST_X_AXIS].log && !axis_array[FIRST_Y_AXIS].log) {
-	/* polar coords of distance (axes cannot be logarithmic) */
-	double rho = sqrt((x - ruler.x) * (x - ruler.x) + (y - ruler.y) * (y - ruler.y));
-	double phi = (180 / M_PI) * atan2(y - ruler.y, x - ruler.x);
+    /* Previously, the following "if" let the polar coordinates to be shown only
+       for lin-lin plots:
+	    if (mouse_setting.polardistance && !axis_array[FIRST_X_AXIS].log && !axis_array[FIRST_Y_AXIS].log) ...
+       Now, let us support also semilog and log-log plots.
+    */
+    if (mouse_setting.polardistance) {
+	double rho, phi, rx, ry;
 	char ptmp[69];
-
+	x = AXIS_LOG_VALUE(FIRST_X_AXIS, x);
+	y = AXIS_LOG_VALUE(FIRST_Y_AXIS, y);
+	rx = AXIS_LOG_VALUE(FIRST_X_AXIS, ruler.x);
+	ry = AXIS_LOG_VALUE(FIRST_Y_AXIS, ruler.y);
+	/* polar coords of distance */
+	rho = sqrt((x - rx) * (x - rx) + (y - ry) * (y - ry));
+	phi = (180 / M_PI) * atan2(y - ry, x - rx);
 	format[0] = '\0';
 	strcat(format, " (");
 	strcat(format, mouse_setting.fmt);

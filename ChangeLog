@@ -1,3 +1,8 @@
+2006-07-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c (GetRulerString): Support polar coordinates in the
+	mouse&ruler message string also for log-log plots.
+
 2006-06-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/image.dem demo/demo.edf:  Set binary flag in cvs repository.
