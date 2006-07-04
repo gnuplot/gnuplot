@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.80 2006/03/11 22:11:44 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.81 2006/07/04 15:54:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -570,6 +570,8 @@ GetRulerString(char *p, double x, double y)
        for lin-lin plots:
 	    if (mouse_setting.polardistance && !axis_array[FIRST_X_AXIS].log && !axis_array[FIRST_Y_AXIS].log) ...
        Now, let us support also semilog and log-log plots.
+       Values of mouse_setting.polardistance are:
+	    0 (no polar coordinates), 1 (polar coordinates), 2 (tangent instead of angle).
     */
     if (mouse_setting.polardistance) {
 	double rho, phi, rx, ry;
@@ -578,17 +580,22 @@ GetRulerString(char *p, double x, double y)
 	y = AXIS_LOG_VALUE(FIRST_Y_AXIS, y);
 	rx = AXIS_LOG_VALUE(FIRST_X_AXIS, ruler.x);
 	ry = AXIS_LOG_VALUE(FIRST_Y_AXIS, ruler.y);
-	/* polar coords of distance */
-	rho = sqrt((x - rx) * (x - rx) + (y - ry) * (y - ry));
-	phi = (180 / M_PI) * atan2(y - ry, x - rx);
 	format[0] = '\0';
 	strcat(format, " (");
 	strcat(format, mouse_setting.fmt);
+	rho = sqrt((x - rx) * (x - rx) + (y - ry) * (y - ry)); /* distance */
+	if (mouse_setting.polardistance == 1) { /* (distance, angle) */
+	    phi = (180 / M_PI) * atan2(y - ry, x - rx);
 # ifdef OS2
-	strcat(format, ";% #.4gø)");
+	    strcat(format, ";% #.4gø)");
 # else
-	strcat(format, ", % #.4gdeg)");
+	    strcat(format, ", % #.4gdeg)");
 # endif
+	} else { /* mouse_setting.polardistance==2: (distance, tangent) */
+	    phi = x - rx;
+	    phi = (phi == 0) ? ((y-ry>0) ? 1e308:-1e308) : (y - ry)/phi;
+	    sprintf(format+strlen(format), ", tangent=%s)", mouse_setting.fmt);
+	}
 	sprintf(ptmp, format, rho, phi);
 	strcat(p, ptmp);
     }
@@ -1174,7 +1181,8 @@ builtin_toggle_polardistance(struct gp_event_t *ge)
     if (!ge) {
 	return "`builtin-toggle-polardistance`";
     }
-    mouse_setting.polardistance = !mouse_setting.polardistance;
+    if (++mouse_setting.polardistance > 2) mouse_setting.polardistance = 0;
+	/* values: 0 (no polar coordinates), 1 (polar coordinates), 2 (tangent instead of angle) */
 # ifdef OS2
     PM_update_menu_items();
 # endif
