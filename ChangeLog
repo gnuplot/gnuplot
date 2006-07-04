@@ -1,3 +1,9 @@
+2006-07-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/win.trm (WIN_enhanced_open):  (2nd try)
+	Reset to _default_ font, not _current_ font!
+	Bug #1510055
+
 2006-07-04  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_justify_text): Move the conditional test for

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.48 2006/05/21 19:57:51 broeker Exp $
+ * $Id: win.trm,v 1.49 2006/06/30 02:32:59 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -683,12 +683,11 @@ WIN_enhanced_open(
 	          for super- and subscripts. */
 	/* FIXME: sometimes fontname has zero length */
 	if ((fontname != NULL) && strlen(fontname) > 0) {
-	    fontstring = malloc( strlen(fontname) + 16 );
-	    sprintf( fontstring, "%s,%i", fontname, (int)fontsize );
-	}
-	else {
-	    fontstring = malloc( strlen(WINFONT) + 16 );
-	    sprintf( fontstring, "%s,%i", WINFONT, WINFONTSIZE );
+	    fontstring = malloc(strlen(fontname) + 16);
+	    sprintf(fontstring, "%s,%i", fontname, (int)fontsize);
+	} else {
+	    fontstring = malloc( strlen(graphwin.deffontname) + 16 );
+	    sprintf( fontstring, "%s,%i", graphwin.deffontname, fontsize);
 	}
 	WIN_set_font( fontstring );
 	free( fontstring );
