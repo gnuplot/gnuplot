@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.89 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: gd.trm,v 1.90 2006/05/12 23:58:54 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1556,8 +1556,12 @@ PNG_text_angle(int ang)
 TERM_PUBLIC int
 PNG_justify_text(enum JUSTIFY mode)
 {
+#ifdef HAVE_GD_TTF
     png_state.justify = mode;
     return TRUE;
+#else
+    return null_justify_text(mode);
+#endif
 }
 
 TERM_PUBLIC void
@@ -1977,12 +1981,7 @@ TERM_TABLE_START(png_driver)
     PNG_TICSIZE, PNG_TICSIZE, PNG_options, PNG_init, PNG_reset,
     PNG_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
     PNG_linetype, PNG_put_text, PNG_text_angle,
-#ifdef HAVE_GD_TTF
-    PNG_justify_text,
-#else
-    null_justify_text,
-#endif
-    PNG_point, do_arrow, PNG_set_font,
+    PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
     PNG_pointsize,
     TERM_BINARY,
     0 /*suspend*/, 0 /*resume*/,
