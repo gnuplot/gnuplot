@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.81 2006/07/04 15:54:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.82 2006/07/04 16:21:13 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1116,17 +1116,25 @@ builtin_toggle_ruler(struct gp_event_t *ge)
 	return (char *) 0;
     if (ruler.on) {
 	turn_ruler_off();
-	if (display_ipc_commands()) {
+	if (display_ipc_commands())
 	    fprintf(stderr, "turning ruler off.\n");
-	}
     } else if (ALMOST2D) {
 	/* only allow ruler, if the plot
 	 * is 2d or a 3d `map' */
+	struct udvt_entry *u;
 	ruler.on = TRUE;
 	ruler.px = ge->mx;
 	ruler.py = ge->my;
 	MousePosToGraphPosReal(ruler.px, ruler.py, &ruler.x, &ruler.y, &ruler.x2, &ruler.y2);
 	(*term->set_ruler) (ruler.px, ruler.py);
+	if ((u = add_udv_by_name("MOUSE_RULER_X"))) {
+	    u->udv_undef = FALSE;
+	    Gcomplex(&u->udv_value,ruler.x,0);
+	}
+	if ((u = add_udv_by_name("MOUSE_RULER_Y"))) {
+	    u->udv_undef = FALSE;
+	    Gcomplex(&u->udv_value,ruler.y,0);
+	}
 	if (display_ipc_commands()) {
 	    fprintf(stderr, "turning ruler on.\n");
 	}
@@ -2323,9 +2331,17 @@ static void
 turn_ruler_off()
 {
     if (ruler.on) {
+	struct udvt_entry *u;
 	ruler.on = FALSE;
 	if (term && term->set_ruler) {
 	    (*term->set_ruler) (-1, -1);
+	}
+	if ((u = add_udv_by_name("MOUSE_RULER_X")))
+	    u->udv_undef = TRUE;
+	if ((u = add_udv_by_name("MOUSE_RULER_Y")))
+	    u->udv_undef = TRUE;
+	if (display_ipc_commands()) {
+	    fprintf(stderr, "turning ruler off.\n");
 	}
     }
 }
