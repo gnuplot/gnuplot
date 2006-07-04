@@ -1,3 +1,7 @@
+2006-07-04  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* demo/image.dem: Remove obsolete warning about terminal support.
+
 2006-07-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm (WIN_enhanced_open):  (2nd try)
