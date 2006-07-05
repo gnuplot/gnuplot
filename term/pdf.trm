@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.62 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: pdf.trm,v 1.63 2006/03/06 00:13:27 sfeam Exp $
  */
 
 /*------------------------------
@@ -75,6 +75,9 @@ TERM_PUBLIC void ENHPDF_FLUSH __PROTO((void));
 #define PDF_RESOLUTION  (20)	/* number of terminal pixels per pt */
 #define PDF_XMAX	(5*72*PDF_RESOLUTION) /* 5 inches, 72 pt/inch */
 #define PDF_YMAX	(3*72*PDF_RESOLUTION) /* 3 inches, 72 pt/inch */
+
+static TBOOLEAN pdf_explicit_size = FALSE;
+static size_units pdf_explicit_units = INCHES;
 
 #endif /* TERM_PROTO */
 
@@ -298,6 +301,8 @@ PDF_options ()
 {
     struct value a;
 
+    pdf_explicit_size = FALSE;
+
     while (!END_OF_COMMAND) {
 
 	if (almost_equals(c_token, "enh$anced")) {
@@ -386,6 +391,16 @@ PDF_options ()
 	    continue;
 	}
 
+	if (equals(c_token, "size")) {
+	    float xmax_t, ymax_t;
+	    c_token++;
+	    pdf_explicit_size = TRUE;
+	    pdf_explicit_units = parse_term_size(&xmax_t, &ymax_t, INCHES);
+	    term->xmax = xmax_t*PDF_RESOLUTION*72./gp_resolution;
+	    term->ymax = ymax_t*PDF_RESOLUTION*72./gp_resolution;
+	    break;
+	}
+
 #ifdef HAVE_NODASH_LIBPDF
 	int_warn(NO_CARET,"gnuplot was linked against a version of pdflib with no dash or pattern support");
 #else
@@ -409,6 +424,16 @@ PDF_options ()
     if (PDF_dashedlines)
 	sprintf(&(term_options[strlen(term_options)]), "dashed dl %3.1f",
 		PDF_dashlength_factor);
+    if (pdf_explicit_size) {
+	if (pdf_explicit_units == CM)
+	    sprintf(&(term_options[strlen(term_options)]), "size %.2fcm, %.2fcm ", 
+		2.54*(float)term->xmax/(72.*PDF_RESOLUTION),
+		2.54*(float)term->ymax/(72.*PDF_RESOLUTION));
+	else
+	    sprintf(&(term_options[strlen(term_options)]), "size %.2fin, %.2fin ", 
+		(float)term->xmax/(72.*PDF_RESOLUTION),
+		(float)term->ymax/(72.*PDF_RESOLUTION));
+    }
 }
 
 
@@ -507,9 +532,13 @@ PDF_graphics ()
     PDF_pathIsOpen = FALSE;
     PDF_xLast = PDF_yLast = UINT_MAX;
 
-    /* set xmax, ymax*/
-    term->xmax = PDF_XMAX * xsize;
-    term->ymax = PDF_YMAX * ysize;
+    /* set size of canvas */
+    if (!pdf_explicit_size) {
+	term->xmax = PDF_XMAX;
+	term->ymax = PDF_YMAX;
+    }
+    term->xmax *= xsize;
+    term->ymax *= ysize;
 
     PDF_begin_page(myPDF, (double)term->xmax / PDF_RESOLUTION,
 		   (double)term->ymax / PDF_RESOLUTION);
@@ -1600,6 +1629,7 @@ START_HELP(pdf)
 "                        {font \"<fontname>{,<fontsize>}\"}",
 "                        {linewidth <lw>} {rounded|butt}",
 "                        {solid|dashed} {dl <dashlength>}}",
+"                        {size <XX>{unit},<YY>{unit}}",
 "",
 " The default is to use a different color for each line type. Selecting",
 " `monochome` will use black for all linetypes, in which case you probably",
@@ -1619,7 +1649,11 @@ START_HELP(pdf)
 " default dash spacing.",
 "",
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",
-" default, butt caps and mitered joins;"
+" default, butt caps and mitered joins.",
+"",
+" The default size for PDF output is 5 inches by 3 inches. The `size` option",
+" changes this to whatever the user requests. By default the X and Y sizes",
+" are taken to be in inches, but other units are possible (currently only cm).",
 ""
 END_HELP(pdf)
 #endif

@@ -1,3 +1,9 @@
+2006-07-05  Ethan A Merritt <merritt@u.washington.edu>
+
+        * term/pdf.trm: Add {size xx,yy} option, exactly parallel to the
+	option recently added for PostScript. Size can be given in inches
+	or cm.
+
 2006-07-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
         * config/makefile.nt:  Add /DWIN32 to CFLAGS
