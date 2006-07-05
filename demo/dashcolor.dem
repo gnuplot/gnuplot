@@ -28,7 +28,7 @@ set label 7 'plot ... lt 5 lc 3 lw 3' at -0.4, -0.85 tc lt 3
 #
 set xlabel "You will only see dashed lines if your current terminal setting permits it"
 #
-show linestyle
+show style line
 #
 # draw some plots
 #
