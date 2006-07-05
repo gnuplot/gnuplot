@@ -1,3 +1,7 @@
+2006-07-05  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/makefile.nt:  Add /DWIN32 to CFLAGS
+
 2006-07-04  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* demo/image.dem: Remove obsolete warning about terminal support.
