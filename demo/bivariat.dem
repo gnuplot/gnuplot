@@ -1,5 +1,5 @@
 #
-# $Id: bivariat.dem,v 1.5 2003/12/13 06:33:44 sfeam Exp $
+# $Id: bivariat.dem,v 1.6 2005/07/29 07:54:32 mikulik Exp $
 #
 # This demo is very slow and requires unusually large stack size.
 # Do not attempt to run this demo under MSDOS.
@@ -9,35 +9,42 @@
 # integral2_f(x,y) approximates the integral from x to y.
 # define f(x) to be any single variable function
 #
-# the integral is calculated as the sum of f(x_n)*delta 
-#   do this x/delta times (from x down to 0)
+# the integral is calculated using Simpson's rule as 
+#          ( f(x-delta) + 4*f(x-delta/2) + f(x) )*delta/6
+# repeated x/delta times (from x down to 0)
 #
-f(x) = exp(-x**2)
 delta = 0.2
 #  delta can be set to 0.025 for non-MSDOS machines
 #
 # integral_f(x) takes one variable, the upper limit.  0 is the lower limit.
 # calculate the integral of function f(t) from 0 to x
-integral_f(x) = (x>0)?integral1a(x):-integral1b(x)
-integral1a(x) = (x<=0)?0:(integral1a(x-delta)+delta*f(x))
-integral1b(x) = (x>=0)?0:(integral1b(x+delta)+delta*f(x))
+# choose a step size no larger than delta such that an integral number of
+# steps will cover the range of integration.
+integral_f(x) = (x>0)?int1a(x,x/ceil(x/delta)):-int1b(x,-x/ceil(-x/delta))
+int1a(x,d) = (x<=d*.1) ? 0 : (int1a(x-d,d)+(f(x-d)+4*f(x-d*.5)+f(x))*d/6.)
+int1b(x,d) = (x>=-d*.1) ? 0 : (int1b(x+d,d)+(f(x+d)+4*f(x+d*.5)+f(x))*d/6.)
 #
 # integral2_f(x,y) takes two variables; x is the lower limit, and y the upper.
-# claculate the integral of function f(t) from x to y
-integral2_f(x,y) = (x<y)?integral2(x,y):-integral2(y,x)
-integral2(x,y) = (x>y)?0:(integral2(x+delta,y)+delta*f(x))
+# calculate the integral of function f(t) from x to y
+integral2_f(x,y) = (x<y)?int2(x,y,(y-x)/ceil((y-x)/delta)): \
+                        -int2(y,x,(x-y)/ceil((x-y)/delta))
+int2(x,y,d) = (x>y-d*.5) ? 0 : (int2(x+d,y,d) + (f(x)+4*f(x+d*.5)+f(x+d))*d/6.)
 
 set autoscale
 set title "approximate the integral of functions"
 set samples 50
 
-plot [-5:5] f(x) title "f(x)=exp(-x**2)", 2/sqrt(pi)*integral_f(x) title "erf(x)=2/sqrt(pi)*integral_f(x)"
+f(x) = exp(-x**2)
+
+plot [-5:5] f(x) title "f(x)=exp(-x**2)", \
+  2/sqrt(pi)*integral_f(x) title "erf(x)=2/sqrt(pi)*integral_f(x)", \
+  erf(x) with points
 
 pause -1 "Hit return to continue"
 
-f(x)=sin(x)
+f(x)=cos(x)
 
-plot [-5:5] f(x) title "f(x)=sin(x)", integral_f(x)
+plot [-5:5] f(x) title "f(x)=cos(x)", integral_f(x)
 
 pause -1 "Hit return to continue"
 
@@ -104,7 +111,7 @@ set key default
 
 set title "Greatest Common Divisor (for integers only)"
 
-plot gcd(x, 60)
+plot gcd(x, 60) with impulses
 pause -1 "Hit return to continue"
 
 reset

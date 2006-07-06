@@ -1,3 +1,17 @@
+2006-07-06  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+        * demo/bivariat.dem:
+	- Adjust the step size so the range of integration is an integral
+	  number of steps
+	- Use Simpson's rule rather than just taking the function value at
+	  one end of each step
+	- Add points from the real erf(x) to the first plot, for comparison
+	- For the second plot, define the integrand f(x)=cos(x)
+	  That way, the integral is sin(x) instead of being offset by a
+	  constant of integration
+	- For the last plot, use "with impulses" to make the pattern more
+	  apparent, and because the function is only defined over the integers
+
 2006-07-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/set.c (set_mouse) docs/gnuplot.doc: Command 'set mouse
