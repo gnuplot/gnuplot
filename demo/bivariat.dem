@@ -33,6 +33,7 @@ int2(x,y,d) = (x>y-d*.5) ? 0 : (int2(x+d,y,d) + (f(x)+4*f(x+d*.5)+f(x+d))*d/6.)
 set autoscale
 set title "approximate the integral of functions"
 set samples 50
+set key bottom right
 
 f(x) = exp(-x**2)
 
@@ -85,7 +86,7 @@ set xrange [-5:5]
 set yrange [-10:10]
 set isosamples 10
 set samples 100
-set key at 4,-3
+set key top right at 4,-3
 set title "Min(x,y) and Max(x,y)"
 
 #
