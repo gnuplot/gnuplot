@@ -1,3 +1,12 @@
+2006-07-06  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* docs/gnuplot.doc term/*.trm: Remove redundant help keys; i.e. those
+	that are distinguished only by one being a short form of the other.
+	No change in help or documentation behavior is intended.
+	E.g.
+	    ?set terminal cgm
+	    ?set term cgm         %% delete this one
+
 2006-07-06  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_linetype EPSLATEX_set_color):

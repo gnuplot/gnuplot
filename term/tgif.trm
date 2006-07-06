@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.37 2005/11/25 18:44:09 mikulik Exp $ */
+/* $Id: tgif.trm,v 1.38 2006/02/20 20:17:58 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -1737,9 +1737,7 @@ START_HELP(tgif)
 "1 tgif",
 "?commands set terminal tgif",
 "?set terminal tgif",
-"?set term tgif",
 "?terminal tgif",
-"?term tgif",
 "?tgif",
 " Tgif is an X11-based drawing tool---it has nothing to do with GIF.",
 "",

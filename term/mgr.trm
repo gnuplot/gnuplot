@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: mgr.trm,v 1.8 2004/04/13 17:24:35 broeker Exp $
+ * $Id: mgr.trm,v 1.9 2004/07/01 17:10:16 broeker Exp $
  */
 
 /* GNUPLOT - mgr.trm */
@@ -235,9 +235,7 @@ START_HELP(mgr)
 "1 mgr",
 "?commands set terminal mgr",
 "?set terminal mgr",
-"?set term mgr",
 "?terminal mgr",
-"?term mgr",
 "?mgr",
 " The `mgr` terminal driver supports the Mgr Window system.  It has no options."
 END_HELP(mgr)

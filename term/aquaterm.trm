@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.22 2006/04/16 21:22:09 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.23 2006/04/17 18:51:58 persquare Exp $
  *
  */
 
@@ -851,11 +851,8 @@ START_HELP(aqua)
 "1 aqua",
 "?commands set terminal aqua",
 "?set terminal aqua",
-"?set term aqua",
 "?terminal aqua",
-"?term aqua",
 "?aqua",
-"?Aqua",
 " This terminal relies on AquaTerm.app for display on Mac OS X.",
 "",
 " Syntax:",

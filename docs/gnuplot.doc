@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.365 2006/07/06 19:34:05 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.366 2006/07/06 23:12:49 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1189,6 +1189,7 @@ C
 4 defined
 ?expressions functions defined
 ?functions defined
+?defined
 #defined(X) & variable name & [DEPRECATED] returns 1 if X is defined, 0 otherwise. \\
 %defined(X)@variable name@ [DEPRECATED] returns 1 if X is defined, 0 otherwise.
  `defined(X)` [DEPRECATED] returns 1 if a variable named X has been defined, otherwise
@@ -1196,6 +1197,7 @@ C
 4 exists 
 ?expressions functions exists
 ?functions exists
+?exists
 #exists("X") & "variable name" & returns 1 if a variable named X is defined, 0 otherwise. \\
 %exists("X")@"variable name"@ returns 1 if a variable named X is defined, 0 otherwise.
  `exists("X")` returns 1 if a variable named X has been defined, otherwise
@@ -1229,6 +1231,7 @@ C
 4 tm_hour
 ?expressions tm_hour
 ?functions tm_hour
+?tm_hour
 #tm\_hour(x) & int & the hour \\
 %tm_hour(x)@int@the hour
  The `tm_hour` function interprets its argument as a time, in seconds from
@@ -1236,6 +1239,7 @@ C
 4 tm_mday
 ?expressions tm_mday
 ?functions tm_mday
+?tm_mday
 #tm\_mday(x) & int & the day of the month \\
 %tm_mday(x)@int@the day of the month
  The `tm_mday` function interprets its argument as a time, in seconds from
@@ -1244,6 +1248,7 @@ C
 4 tm_min
 ?expressions tm_min
 ?functions tm_min
+?tm_min
 #tm\_min(x) & int & the minute \\
 %tm_min(x)@int@the minute
  The `tm_min` function interprets its argument as a time, in seconds from
@@ -1251,6 +1256,7 @@ C
 4 tm_mon
 ?expressions tm_mon
 ?functions tm_mon
+?tm_mon
 #tm\_mon(x) & int & the month \\
 %tm_mon(x)@int@the month
  The `tm_mon` function interprets its argument as a time, in seconds from
@@ -1258,6 +1264,7 @@ C
 4 tm_sec
 ?expressions tm_sec
 ?functions tm_sec
+?tm_sec
 #tm\_sec(x) & int & the second \\
 %tm_sec(x)@int@the second
  The `tm_sec` function interprets its argument as a time, in seconds from
@@ -1265,6 +1272,7 @@ C
 4 tm_wday
 ?expressions tm_wday
 ?functions tm_wday
+?tm_wday
 #tm\_wday(x) & int & the day of the week \\
 %tm_wday(x)@int@the day of the week
  The `tm_wday` function interprets its argument as a time, in seconds from
@@ -1273,6 +1281,7 @@ C
 4 tm_yday
 ?expressions tm_yday
 ?functions tm_yday
+?tm_yday
 #tm\_yday(x) & int & the day of the year \\
 %tm_yday(x)@int@the day of the year
  The `tm_yday` function interprets its argument as a time, in seconds from
@@ -1281,6 +1290,7 @@ C
 4 tm_year
 ?expressions tm_year
 ?functions tm_year
+?tm_year
 #tm\_year(x) & int & the year \\
 %tm_year(x)@int@the year
  The `tm_year` function interprets its argument as a time, in seconds from
@@ -1303,7 +1313,6 @@ C
 ?expressions random
 ?functions random
 ?random
-
  The behavior of the built-in function `rand(x)` has changed as of version 3.8l.
  Older scripts that expected rand(x>0) to produce sequential pseudo-random
  numbers from the same seeded sequence must be changed to call rand(0) instead.
@@ -3385,7 +3394,7 @@ C ... and restart the table:
  data of the file is inherently not three-dimensional, logical rules are used to
  place the data in three-space.  (E.g., usually setting the z-dimension value to
  zero and placing 2D data in the x-y plane.)
-5 binary_examples
+5 binary examples
 ?binary_examples
 ?binary examples
 ?binary general examples
@@ -6400,7 +6409,7 @@ C ... and restart the table:
 
  This places a key at coordinates 2,3.5,2 in the default (first) coordinate
  system:
-       set key 2,3.5,2
+       set key at 2,3.5,2
 
  This places the key below the graph:
        set key below
@@ -6819,9 +6828,10 @@ C ... and restart the table:
  overridden with the `bind` command.
 
  See also help for `bind` and `label`.
-4 x11_mouse
+4 X11 mouse
 ?mouse x11_mouse
 ?x11_mouse
+?x11 mouse
  If multiple X11 plot windows have been opened using the `set term x11 <n>`
  terminal option, then only the current plot window supports the entire
  range of mouse commands and hotkeys.  The other windows will, however,
@@ -7692,7 +7702,7 @@ C ... and restart the table:
        set palette file "palette.bin" binary record=64 using 1:2:3
 
 
-4 gamma-correction
+4 gamma correction
 ?commands set palette gamma-correction
 ?set palette gamma-correction
 ?palette gamma-correction
@@ -9258,11 +9268,9 @@ C ... and restart the table:
  The `set ticscale` command is deprecated, use `set tics scale` instead.
 3 timestamp
 ?commands set timestamp
-?commands set time
 ?commands unset timestamp
 ?commands show timestamp
 ?set timestamp
-?set time
 ?unset timestamp
 ?show timestamp
 ?timestamp
@@ -10658,7 +10666,7 @@ C ... and restart the table:
  Example -- plot the 3rd row of a matrix in an ascii file:
      plot 'a.dat' matrix using 1:3 every 1:999:1:2
  (rows are enumerated from 0, thus 2 instead of 3).
-3 grid_data
+3 grid data
 ?commands splot grid_data
 ?splot grid_data
 ?grid_data

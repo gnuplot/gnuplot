@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.24 2005/10/16 06:12:45 sfeam Exp $
+ * $Id: tkcanvas.trm,v 1.25 2006/02/20 20:17:58 sfeam Exp $
  *
  */
 
@@ -613,9 +613,7 @@ START_HELP(tkcanvas)
 "1 tkcanvas",
 "?commands set terminal tkcanvas",
 "?set terminal tkcanvas",
-"?set term tkcanvas",
 "?terminal tkcanvas",
-"?term tkcanvas",
 "?tkcanvas",
 " This terminal driver generates Tk canvas widget commands based on Tcl/Tk",
 " (default) or Perl.  To use it, rebuild `gnuplot` (after uncommenting or",

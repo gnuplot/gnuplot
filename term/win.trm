@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.49 2006/06/30 02:32:59 sfeam Exp $
+ * $Id: win.trm,v 1.50 2006/07/05 03:47:03 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -883,9 +883,7 @@ START_HELP(windows)
 "1 windows",
 "?commands set terminal windows",
 "?set terminal windows",
-"?set term windows",
 "?terminal windows",
-"?term windows",
 "?windows",
 " Three options may be set in the `windows` terminal driver.",
 "",

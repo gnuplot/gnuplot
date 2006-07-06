@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.10 2006/06/21 16:41:05 tlecomte Exp $
+ * $Id: wxt.trm,v 1.11 2006/06/26 18:27:15 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -296,8 +296,6 @@ START_HELP(wxt)
 "1 wxt",
 "?set terminal wxt",
 "?terminal wxt",
-"?set term wxt",
-"?term wxt",
 "?wxt",
 " The `wxt` terminal device generates output in a separate window. The window",
 " is created by the wxWidgets library, where the 'wxt' comes from. The actual",
