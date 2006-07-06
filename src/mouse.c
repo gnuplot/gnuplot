@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.82 2006/07/04 16:21:13 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.83 2006/07/04 20:10:21 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2311,6 +2311,32 @@ update_ruler()
     (*term->set_ruler) (-1, -1);
     recalc_ruler_pos();
     (*term->set_ruler) (ruler.px, ruler.py);
+}
+
+/* Set ruler on/off, and set its position.
+   Called from set.c for 'set mouse ruler ...' command.
+*/
+void
+set_ruler(TBOOLEAN on, int mx, int my)
+{
+    struct gp_event_t ge;
+    if (ruler.on == FALSE && on == FALSE)
+	return;
+    if (ruler.on == TRUE && on == TRUE && (mx < 0 || my < 0))
+	return;
+    if (ruler.on == TRUE) /* ruler is on => switch it off */
+	builtin_toggle_ruler(&ge);
+    /* now the ruler is off */
+    if (on == FALSE) /* want ruler off */
+	return;
+    if (mx>=0 && my>=0) { /* change ruler position */
+	ge.mx = mx;
+	ge.my = my;
+    } else { /* don't change ruler position */
+	ge.mx = ruler.px;
+	ge.my = ruler.py;
+    }
+    builtin_toggle_ruler(&ge);
 }
 
 /* for checking if we change from plot to splot (or vice versa) */
