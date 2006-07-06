@@ -1,3 +1,15 @@
+2006-07-06  Ethan A Merritt <merritt@u.washington.edu>
+
+	* term/pslatex.trm (EPSLATEX_linetype EPSLATEX_set_color):
+	Keep track of last color and/or linetype set, and filter out
+	duplicate requests for the same setting. It remains true that the
+	color change command is sent to both the *.eps and *.tex output stream,
+	whereas in general only one of the two needs to see it.
+	Bug #1517932.
+
+	* tutorial/tutorial.tex tutorial/eg7.plt:  Make the file names
+	of the 7th example plot match the other six examples.
+
 2006-07-07  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.h:

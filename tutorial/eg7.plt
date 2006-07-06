@@ -1,5 +1,5 @@
 set term epslatex color solid
-set output 'epslatex.tex'
+set output 'eg7.tex'
 unset border
 set dummy u,v
 unset key

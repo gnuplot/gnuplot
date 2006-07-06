@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.63 2005/10/23 06:16:04 sfeam Exp $
+ * $Id: pslatex.trm,v 1.64 2006/04/30 19:48:02 broeker Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -120,6 +120,8 @@ struct pstex_text_command {
 
 static struct pstex_text_command *pstex_labels = NULL;
 static int epslatex_text_layer = 0;
+
+static t_colorspec tex_previous_colorspec = {-1, 0, 0.0};  /* Initialize to invalid type */
 
 /* Common functions for epslatex and ps(la)tex */
 
@@ -457,6 +459,9 @@ EPSLATEX_common_init()
             break;
         }
 
+	/* Clear previous state */
+	tex_previous_colorspec.type = -1;
+
 	/* Clear any leftover text-layering state */
 	EPSLATEX_layer(TERM_LAYER_RESET);
 
@@ -789,28 +794,16 @@ EPSLATEX_reopen_output()
 
 
 TERM_PUBLIC void
-EPSLATEX_linetype(int linetype)
-{
-    PS_linetype(linetype);
-
-    if (gpoutfile) {
-        /* from PS_linetype, should better not be used in twice
-         * in source code */
-        if (ps_params->oldstyle)
-            linetype = (linetype % 4) + 3;
-        else
-            linetype = (linetype % 9) + 3;
-        if (linetype < 0)       /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
-            linetype = 0;
-	fprintf(gpoutfile,"      \\csname LT%c\\endcsname\n",
-		"wba012345678"[linetype]);
-    }
-}
-
-TERM_PUBLIC void
 EPSLATEX_set_color(t_colorspec *colorspec)
 {
     double gray;
+
+    /* EAM Jul 2006 - Filter out duplicate requests */
+    if (!memcmp(&tex_previous_colorspec, colorspec, sizeof(t_colorspec)))
+	return;
+    else
+	memcpy(&tex_previous_colorspec, colorspec, sizeof(t_colorspec));
+    
     PS_set_color(colorspec);
 
     if (colorspec->type == TC_RGB) {
@@ -844,6 +837,14 @@ EPSLATEX_set_color(t_colorspec *colorspec)
         else
             fprintf(gpoutfile, "      \\colorgray{%s}%%\n",save_space(gray));
     }
+}
+
+TERM_PUBLIC void
+EPSLATEX_linetype(int linetype)
+{
+    t_colorspec tempcol = {TC_LT, 0, 0.0};
+    tempcol.lt = linetype;
+    EPSLATEX_set_color(&tempcol);
 }
 
 /*
