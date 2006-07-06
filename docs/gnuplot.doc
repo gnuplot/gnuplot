@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.362 2006/06/29 19:36:42 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.364 2006/06/30 04:14:12 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6740,14 +6740,14 @@ C ... and restart the table:
  last plot (like replot does).
 
  Syntax:
-       set mouse [doubleclick <ms>] [nodoubleclick] \
-                 [[no]zoomcoordinates] \
-                 [[no]polardistance] \
-                 [format <string>] \
-                 [clipboardformat <int>/<string>] \
-                 [mouseformat <int>/<string>] \
-                 [[no]labels] [labeloptions <string>] \
-                 [[no]zoomjump] [[no]verbose]
+       set mouse {doubleclick <ms>} {nodoubleclick} \
+                 {{no}zoomcoordinates} \
+                 {polardistance{deg|tan} | nopolardistance} \
+                 {format <string>} \
+                 {clipboardformat <int>/<string>} \
+                 {mouseformat <int>/<string>} \
+                 {{no}labels} {labeloptions <string>} \
+                 {{no}zoomjump} {{no}verbose}
        unset mouse
 
  The doubleclick resolution is given in milliseconds and used for Button 1
@@ -6758,8 +6758,9 @@ C ... and restart the table:
  The option `zoomcoordinates` determines if the coordinates of the zoom box are
  drawn at the edges while zooming. This is on by default.
 
- The option `polardistance` determines if the distance to the ruler is also
- shown in polar coordinates. This corresponds to the default key binding '5'.
+ The option `polardistance` determines if the distance between the mouse cursor
+ and the ruler is also shown in polar coordinates (distance and angle in
+ degrees or tangent (slope)). This corresponds to the default key binding '5'.
 
  The `format` option takes a fprintf like format string which determines how
  floating point numbers are printed to the drivers window and the clipboard.

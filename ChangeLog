@@ -1,3 +1,9 @@
+2006-07-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/set.c (set_mouse) docs/gnuplot.doc: Command 'set mouse
+	polardistance{deg|tan}' to flip between the two possibilities
+	of displaying polar distance.
+
 2006-07-05  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/pdf.trm: Add {size xx,yy} option, exactly parallel to the
@@ -6,7 +12,7 @@
 
 2006-07-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* config/makefile.nt:  Add /DWIN32 to CFLAGS
+	* config/makefile.nt: Add /DWIN32 to CFLAGS.
 
 2006-07-04  Daniel Sebald  <daniel.sebald@ieee.org>
 
