@@ -1,3 +1,10 @@
+2006-07-07  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/parse.c (parse_primary_expression): Partially back out patch of
+	2006-06-11.  Do not check number of variables passed to a user function
+	at the time of parsing - only at time of evaluation.
+	Bug #1518553
+
 2006-07-07  Ethan A Merritt <merritt@u.washington.edu>
 
 	* src/help.c (FindHelp): Add missing pair of brackets to disambiguate

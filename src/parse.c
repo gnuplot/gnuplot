@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.44 2006/06/10 00:35:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.45 2006/06/11 17:42:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -412,7 +412,6 @@ parse_primary_expression()
 		/* it's a call to a user-defined function */
 		enum operators call_type = (int) CALL;
 		int tok = c_token;
-		struct udft_entry *udf = is_ud_function(c_token);
 
 		c_token += 2;	/* skip func name and '(' */
 		parse_expression();
@@ -423,13 +422,9 @@ parse_primary_expression()
 			c_token += 1;
 			parse_expression();
 		    }
-		    if (udf && udf->dummy_num && num_params.v.int_val != udf->dummy_num)
-			int_error(c_token, "requires %d variable%c",
-			    udf->dummy_num, (udf->dummy_num == 1)?'\0':'s');
 		    add_action(PUSHC)->v_arg = num_params;
 		    call_type = (int) CALLN;
-		} else if (udf && udf->dummy_num && udf->dummy_num != 1)
-		    int_error(c_token, "requires %d variables", udf->dummy_num);
+		}
 		if (!equals(c_token, ")"))
 		    int_error(c_token, "')' expected");
 		c_token++;
