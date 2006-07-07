@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.111 2006-07-01 17:54:21+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.364
+C RCS $Id: gnuplot-ja.doc,v 1.112 2006-07-07 11:12:26+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.366
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C 
@@ -6859,14 +6859,15 @@ C ... and restart the table:
  replot で描画されるもの) に対して作用します。
 
  書式:
-       set mouse [doubleclick <ms>] [nodoubleclick] \
-                 [[no]zoomcoordinates] \
-                 [[no]polardistance] \
-                 [format <string>] \
-                 [clipboardformat <int>/<string>] \
-                 [mouseformat <int>/<string>] \
-                 [[no]labels] [labeloptions <string>] \
-                 [[no]zoomjump] [[no]verbose]
+       set mouse {doubleclick <ms>} {nodoubleclick} \
+                 {{no}zoomcoordinates} \
+                 {noruler | ruler {at x,y}} \
+                 {polardistance{deg|tan} | nopolardistance} \
+                 {format <string>} \
+                 {clipboardformat <int>/<string>} \
+                 {mouseformat <int>/<string>} \
+                 {{no}labels} {labeloptions <string>} \
+                 {{no}zoomjump} {{no}verbose}
        unset mouse
 
  ダブルクリックの解像度はミリ秒 (ms) 単位で与えます。これは、ボタン 1
@@ -6877,9 +6878,13 @@ C ... and restart the table:
  オプション `zoomcoordinates` は、拡大 (zoom) の時に、ズームの枠の端に
  その座標を書くかどうかを決定し、デフォルトでは ON になっています。
 
- オプション `polardistance` は、定規 (ruler) までの距離を極座標でも表示
- するかどうかを決定します。これはデフォルトのキー割り当て '5' に対応し
- ます。
+ オプション `noruler` と `ruler` は、定規 (ruler) 機能を off, on にしま
+ す。`ruler` には座標を与えることもできます。これは、デフォルトのキー割
+ り当て 'r' に対応します。
+
+ オプション `polardistance` は、マウスカーソルから定規 (ruler) までの距
+ 離を極座標でも表示 (距離、および角度または傾き) するかどうかを決定しま
+ す。これはデフォルトのキー割り当て '5' に対応します。
 
  オプション `format` は、fprintf と似た書式文字列で、ドライバウィンドウ
  とクリップボード上で実数をどのように表示するかを決定します。デフォルト
