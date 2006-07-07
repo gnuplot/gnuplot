@@ -1,6 +1,14 @@
+2006-07-07  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/set.c docs/gnuplot.doc: New options 
+	'set mouse {noruler|ruler {at x,y}}'.
+
+	* src/mouse.h src/mouse.c: New function set_ruler() to (un)set ruler
+	(at a given position).
+
 2006-07-06  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
-        * demo/bivariat.dem:
+	* demo/bivariat.dem:
 	- Adjust the step size so the range of integration is an integral
 	  number of steps
 	- Use Simpson's rule rather than just taking the function value at
@@ -18,7 +26,7 @@
 	polardistance{deg|tan}' to flip between the two possibilities
 	of displaying polar distance.
 
-2006-07-05  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm: Add {size xx,yy} option, exactly parallel to the
 	option recently added for PostScript. Size can be given in inches
@@ -38,7 +46,7 @@
 	Reset to _default_ font, not _current_ font!
 	Bug #1510055
 
-2006-07-04  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_justify_text): Move the conditional test for
 	HAVE_GD_TTF inside the PNG_justify_text() routine, rather than

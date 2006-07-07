@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.234 2006/06/30 02:17:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.235 2006/07/06 19:34:06 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2173,17 +2173,20 @@ set_mouse()
 	    ++c_token;
 	} else if (almost_equals(c_token, "po$lardistancedeg")) {
 	    mouse_setting.polardistance = 1;
+	    UpdateStatusline();
 	    ++c_token;
 	} else if (almost_equals(c_token, "polardistancet$an")) {
 	    mouse_setting.polardistance = 2;
+	    UpdateStatusline();
 	    ++c_token;
 	} else if (almost_equals(c_token, "nopo$lardistance")) {
 	    mouse_setting.polardistance = 0;
+	    UpdateStatusline();
 	    ++c_token;
 	} else if (equals(c_token, "labels")) {
 	    mouse_setting.label = 1;
 	    ++c_token;
-	    /* check if the optional argument "<label options>" is present. */
+	    /* check if the optional argument "<label options>" is present */
 	    if (isstring(c_token)) {
 		if (token_len(c_token) >= sizeof(mouse_setting.labelopts)) {
 		    int_error(c_token, "option string too long");
@@ -2289,8 +2292,26 @@ set_mouse()
 			MOUSE_COORDINATES_REAL, MOUSE_COORDINATES_XDATETIME);
 		}
 	    }
+	} else if (almost_equals(c_token, "noru$ler")) {
+	    c_token++;
+	    set_ruler(FALSE, -1, -1);
+	} else if (almost_equals(c_token, "ru$ler")) {
+	    c_token++;
+    	    if (END_OF_COMMAND || !equals(c_token, "at")) {
+		set_ruler(TRUE, -1, -1);
+	    } else { /* set mouse ruler at ... */
+		struct position where;
+		int x, y;
+		c_token++;
+		if (END_OF_COMMAND)
+		    int_error(c_token, "expecting ruler coordinates");
+		get_position(&where);
+		map_position(&where, &x, &y, "ruler at");
+		set_ruler(TRUE, (int)x, (int)y);
+	    }
 	} else {
-	    /* discard unknown options (joze) */
+	    if (!END_OF_COMMAND)
+    		int_error(c_token, "wrong option");
 	    break;
 	}
     }
