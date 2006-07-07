@@ -17,7 +17,7 @@ set obj 20 rect from graph 0, graph 0 to graph 1, graph 1 fs solid 0.15 fc rgb "
 
 plot [-5:5] x, -3+sin(x*5)/x lt 3 lw 3
 
-pause -1
+pause -1 "Hit return to continue"
 
 reset
 
@@ -42,5 +42,6 @@ plot 'using.dat' using 3:4 title "Logged in" with impulses,\
      'using.dat' using 3:5 t "Load average" with points,\
      'using.dat' using 3:6 t "%CPU used" with lines
 
-pause -1
+pause -1 "Hit return to continue"
 
+reset
