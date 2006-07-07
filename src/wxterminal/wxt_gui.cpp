@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.16 2006/06/18 07:45:43 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.17 2006/06/20 21:34:22 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -568,7 +568,6 @@ void wxtPanel::ClearCommandlist()
 void wxtPanel::OnPaint( wxPaintEvent &WXUNUSED(event) )
 {
 	/* Constructor of the device context */
-// 	wxBufferedPaintDC dc(this);
 	wxPaintDC dc(this);
 	DrawToDC(dc, GetUpdateRegion());
 }
@@ -577,16 +576,15 @@ void wxtPanel::OnPaint( wxPaintEvent &WXUNUSED(event) )
 void wxtPanel::Draw()
 {
 	wxClientDC dc(this);
+	wxBufferedDC buffered_dc(&dc, dc.GetSize());
 	wxRegion region(0, 0, plot.device_xmax, plot.device_ymax);
-	DrawToDC(dc, region);
+	DrawToDC(buffered_dc, region);
 }
 
 /* copy the plot to the panel, draw zoombow and ruler needed */
-void wxtPanel::DrawToDC(wxWindowDC &dc, wxRegion &region)
+void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 {
-	wxBufferedDC buffered_dc;
-	buffered_dc.Init(&dc);
-	buffered_dc.BeginDrawing();
+	dc.BeginDrawing();
 
 	wxPen tmp_pen;
 
@@ -604,8 +602,8 @@ void wxtPanel::DrawToDC(wxWindowDC &dc, wxRegion &region)
 		FPRINTF((stderr,"OnPaint %d,%d,%d,%d\n",vX,vY,vW,vH));
 		/* Repaint this rectangle */
 		if (gdkpixmap)
-			gdk_draw_drawable(buffered_dc.GetWindow(),
-				buffered_dc.m_penGC,
+			gdk_draw_drawable(dc.GetWindow(),
+				dc.m_penGC,
 				gdkpixmap,
 				vX,vY,
 				vX,vY,
@@ -613,35 +611,35 @@ void wxtPanel::DrawToDC(wxWindowDC &dc, wxRegion &region)
 		++upd;
 	}
 #elif defined(__WXMSW__)
-	BitBlt((HDC) buffered_dc.GetHDC(), 0, 0, plot.device_xmax, plot.device_ymax, hdc, 0, 0, SRCCOPY);
+	BitBlt((HDC) dc.GetHDC(), 0, 0, plot.device_xmax, plot.device_ymax, hdc, 0, 0, SRCCOPY);
 #else
-	buffered_dc.DrawBitmap(*cairo_bitmap, 0, 0, false);
+	dc.DrawBitmap(*cairo_bitmap, 0, 0, false);
 #endif
 
 #ifdef USE_MOUSE
 	if (wxt_zoombox) {
 		tmp_pen = wxPen( wxT("BLACK") );
 		tmp_pen.SetCap( wxCAP_ROUND );
-		buffered_dc.SetPen( tmp_pen );
-		buffered_dc.SetLogicalFunction( wxINVERT );
-		buffered_dc.DrawLine( zoom_x1, zoom_y1, mouse_x, zoom_y1 );
-		buffered_dc.DrawLine( mouse_x, zoom_y1, mouse_x, mouse_y );
-		buffered_dc.DrawLine( mouse_x, mouse_y, zoom_x1, mouse_y );
-		buffered_dc.DrawLine( zoom_x1, mouse_y, zoom_x1, zoom_y1 );
-		buffered_dc.SetPen( *wxTRANSPARENT_PEN );
-		buffered_dc.SetBrush( wxBrush( wxT("LIGHT BLUE"), wxSOLID ) );
-		buffered_dc.SetLogicalFunction( wxAND );
-		buffered_dc.DrawRectangle( zoom_x1, zoom_y1, mouse_x -zoom_x1, mouse_y -zoom_y1);
-		buffered_dc.SetLogicalFunction( wxCOPY );
+		dc.SetPen( tmp_pen );
+		dc.SetLogicalFunction( wxINVERT );
+		dc.DrawLine( zoom_x1, zoom_y1, mouse_x, zoom_y1 );
+		dc.DrawLine( mouse_x, zoom_y1, mouse_x, mouse_y );
+		dc.DrawLine( mouse_x, mouse_y, zoom_x1, mouse_y );
+		dc.DrawLine( zoom_x1, mouse_y, zoom_x1, zoom_y1 );
+		dc.SetPen( *wxTRANSPARENT_PEN );
+		dc.SetBrush( wxBrush( wxT("LIGHT BLUE"), wxSOLID ) );
+		dc.SetLogicalFunction( wxAND );
+		dc.DrawRectangle( zoom_x1, zoom_y1, mouse_x -zoom_x1, mouse_y -zoom_y1);
+		dc.SetLogicalFunction( wxCOPY );
 
-		buffered_dc.DrawText( zoom_string1.BeforeFirst(wxT('\r')),
+		dc.DrawText( zoom_string1.BeforeFirst(wxT('\r')),
 			zoom_x1, zoom_y1 - term->v_char/plot.oversampling_scale);
-		buffered_dc.DrawText( zoom_string1.AfterFirst(wxT('\r')),
+		dc.DrawText( zoom_string1.AfterFirst(wxT('\r')),
 			zoom_x1, zoom_y1);
 
-		buffered_dc.DrawText( zoom_string2.BeforeFirst(wxT('\r')),
+		dc.DrawText( zoom_string2.BeforeFirst(wxT('\r')),
 			mouse_x, mouse_y - term->v_char/plot.oversampling_scale);
-		buffered_dc.DrawText( zoom_string2.AfterFirst(wxT('\r')),
+		dc.DrawText( zoom_string2.AfterFirst(wxT('\r')),
 			mouse_x, mouse_y);
 
 		/* if we have to redraw the zoombox, it is with another size,
@@ -652,14 +650,14 @@ void wxtPanel::DrawToDC(wxWindowDC &dc, wxRegion &region)
 	if (wxt_ruler) {
 		tmp_pen = wxPen(wxT("black"), 1, wxSOLID);
 		tmp_pen.SetCap(wxCAP_BUTT);
-		buffered_dc.SetPen( tmp_pen );
-		buffered_dc.SetLogicalFunction( wxINVERT );
-		buffered_dc.CrossHair( (int)wxt_ruler_x, (int)wxt_ruler_y );
-		buffered_dc.SetLogicalFunction( wxCOPY );
+		dc.SetPen( tmp_pen );
+		dc.SetLogicalFunction( wxINVERT );
+		dc.CrossHair( (int)wxt_ruler_x, (int)wxt_ruler_y );
+		dc.SetLogicalFunction( wxCOPY );
 	}
 #endif /*USE_MOUSE*/
 
-	buffered_dc.EndDrawing();
+	dc.EndDrawing();
 }
 
 /* avoid flickering under win32 */

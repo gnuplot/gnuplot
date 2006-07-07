@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.9 2006/06/18 06:09:43 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.10 2006/06/18 07:45:43 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -286,7 +286,7 @@ public :
 	void OnKeyDownChar( wxKeyEvent& event );
 	void UpdateModifiers( wxMouseEvent& event );
 	void RaiseConsoleWindow();
-	void DrawToDC(wxWindowDC &dc, wxRegion& region);
+	void DrawToDC( wxDC& dc, wxRegion& region );
 	void Draw();
 
 	/* list of commands sent by gnuplot */
