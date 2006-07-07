@@ -16,6 +16,10 @@
 
 	* demo/rectangle.dem: Add reset at end, and prompts at 'pause -1'.
 
+	* src/plot2d.c (get_data): HISTOGRAM plot styles must leave a slot for
+	all entries, even if they are flagged as DF_MISSING. Otherwise the
+	histogram plot elements do not line up properly.
+
 2006-07-06  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* docs/gnuplot.doc term/*.trm: Remove redundant help keys; i.e. those
