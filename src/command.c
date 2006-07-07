@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.139 2006/06/11 17:42:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.140 2006/06/29 19:36:43 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -850,6 +850,7 @@ history_command()
 	    save_input_line_len = gp_input_line_len;
 	    flag = 1;
 	    gp_input_line = copy_name;
+	    gp_input_line_len = strlen(copy_name);
 	    printf("  Executing:\n\t%s\n",name);
 	    do_line();
 	    free(copy_name);

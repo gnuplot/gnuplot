@@ -1,7 +1,11 @@
 2006-07-07  Ethan A Merritt <merritt@u.washington.edu>
 
-	* src/help.c: Add missing pair of brackets to disambiguate
+	* src/help.c (FindHelp): Add missing pair of brackets to disambiguate
 	if/if/else syntax.
+
+	* src/command.c (history_command): Fix segfault if re-execution of a
+	previous command terminates via int_error().
+	Bug #1514453
 
 2006-07-06  Daniel Sebald  <daniel.sebald@ieee.org>
 
