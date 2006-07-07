@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.17 2006/06/24 03:41:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.18 2006/06/26 18:27:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -406,7 +406,7 @@ FindHelp(char *keyword)		/* string we look for */
     size_t len = strcspn(keyword, " ");
 
     for (key = keys; key->key != NULL; key++) {
-	if (!strncmp(keyword, key->key, len))  /* we have a match! */
+	if (!strncmp(keyword, key->key, len)) {  /* we have a match! */
 	    if (!Ambiguous(key, len)) {
 		size_t key_len = strlen(key->key);
 		size_t keyword_len = strlen(keyword);
@@ -429,6 +429,7 @@ FindHelp(char *keyword)		/* string we look for */
 		    return (key);  /* found!!  non-ambiguous abbreviation */
 	    } else
 		return (&empty_key);
+	}
     }
 
     /* not found */
