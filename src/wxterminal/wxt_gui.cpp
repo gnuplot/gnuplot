@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.17 2006/06/20 21:34:22 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.18 2006/07/07 00:06:16 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -576,7 +576,7 @@ void wxtPanel::OnPaint( wxPaintEvent &WXUNUSED(event) )
 void wxtPanel::Draw()
 {
 	wxClientDC dc(this);
-	wxBufferedDC buffered_dc(&dc, dc.GetSize());
+	wxBufferedDC buffered_dc(&dc, wxSize(plot.device_xmax, plot.device_ymax));
 	wxRegion region(0, 0, plot.device_xmax, plot.device_ymax);
 	DrawToDC(buffered_dc, region);
 }
