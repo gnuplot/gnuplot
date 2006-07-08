@@ -30,9 +30,11 @@
 	This does away with dead code left after yesterday's partial
 	reversion.
 
-	* term/post.trm (PS_linetype): Restore long-time commented out test
-	for redundant linetype commands. Don't "change" linetype if the new
-	one is the same as the current one.
+	* term/post.trm (PS_linetype PS_set_color): Restore long-time commented
+	out test for redundant linetype commands. Don't "change" linetype if the
+	new one is the same as the current one.  term->set_color must also 
+	invalidate the previous linetype so that the next call to term->linetype
+	isn't ignored.
 	Bug #1517932.
 
 2006-07-07  Shigeharu Takeno  <shige@iee.niit.ac.jp>

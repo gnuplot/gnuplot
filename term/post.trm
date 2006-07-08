@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.182 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: post.trm,v 1.183 2006/07/08 23:13:11 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2554,6 +2554,8 @@ TERM_PUBLIC int PS_make_palette (t_sm_palette *palette)
 TERM_PUBLIC void PS_set_color (t_colorspec *colorspec)
 {
     double gray;
+
+    PS_linetype_last = -1;  /* Force next call to linetype to be honored */
 
     if (colorspec->type == TC_LT) {
 	int linetype = colorspec->lt;
