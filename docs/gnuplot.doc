@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.366 2006/07/06 23:12:49 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.367 2006/07/07 03:51:20 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10825,7 +10825,7 @@ C ... and restart the table:
 ?bugs
  Bugs reported since the current release as well as older ones
  may be located via the official distribution site on SourceForge.
- 
+
  Please e-mail bug reports to the gnuplot-bugs mailing list.
  Or upload the report to the gnuplot web site on SourceForge.
  Please give complete information on the version of gnuplot you are using
@@ -10858,7 +10858,7 @@ C ... and restart the table:
  handle geographic coordinates.
 
  Error bars are not handled properly in polar/spherical coordinate plot modes.
- 
+
  Some older models of HP plotters do not have a page eject command 'PG'.  The
  current HPGL driver uses this command in HPGL_reset.  This may need to be
  removed for these plotters.  The current PCL5 driver uses HPGL/2 for text as
@@ -10877,4 +10877,4 @@ C ... and restart the table:
  External library svgalib (used by linux and vgagl driver):
  Requires gnuplot to be suid root (bad!) and has many bugs that are specific
  to the video card or graphics driver used in X11.
- 
+
