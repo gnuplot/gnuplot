@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.181 2006/06/20 03:54:46 sfeam Exp $
+ * $Id: post.trm,v 1.182 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1704,17 +1704,8 @@ PS_linetype(int linetype)
 	linetype = 0;
     PS_relative_ok = FALSE;
 
-#if 0
-    /*  In order to make 'PS_linewidth' work properly, I need to comment
-     *  this line out.  Especially in combination with the line width
-     *  extension of the `set arrow` command this is necessary.
-     *  Can we live with that drawback?  (JFi)
-     */
     if (PS_linetype_last == linetype) return;
-#endif
 
-    /* HBB 20031219: use PS_FLUSH_PATH! */
-    /* PS_relative_ok = FALSE; */
     PS_FLUSH_PATH;
 
     PS_linetype_last = linetype;
