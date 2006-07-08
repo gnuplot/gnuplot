@@ -1,3 +1,9 @@
+2006-07-08  Ethan A Merritt <merritt@u.washington.edu>
+
+	* src/parse.c:  Revert to parse.c version 1.44 (10 Jun 2006).
+	This does away with dead code left after yesterday's partial
+	reversion.
+
 2006-07-07  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:

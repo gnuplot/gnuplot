@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.45 2006/06/11 17:42:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.44 2006/06/10 00:35:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -77,8 +77,6 @@ static void parse_relational_expression __PROTO((void));
 static void parse_additive_expression __PROTO((void));
 static void parse_multiplicative_expression __PROTO((void));
 static void parse_unary_expression __PROTO((void));
-static struct udft_entry *add_is_udf __PROTO((int t_num, int search_type));
-static struct udft_entry *is_ud_function __PROTO((int t_num));
 static int is_builtin_function __PROTO((int t_num));
 
 /* Internal variables: */
@@ -791,12 +789,9 @@ add_udv(int t_num)
 }
 
 
-#define ADD_UDF 1
-#define IS_UDF 2
-
 /* find or add function at index <t_num>, and return pointer */
-static struct udft_entry *
-add_is_udf(int t_num, int search_type)
+struct udft_entry *
+add_udf(int t_num)
 {
     struct udft_entry **udf_ptr = &first_udf;
 
@@ -806,9 +801,6 @@ add_is_udf(int t_num, int search_type)
 	    return (*udf_ptr);
 	udf_ptr = &((*udf_ptr)->next_udf);
     }
-
-    if (search_type == IS_UDF)
-	return (*udf_ptr);
 
     /* get here => not found. udf_ptr points at first_udf or
      * next_udf field of last udf
@@ -828,27 +820,8 @@ add_is_udf(int t_num, int search_type)
     copy_str((*udf_ptr)->udf_name, t_num, token_len(t_num)+1);
     for (i = 0; i < MAX_NUM_VAR; i++)
 	(void) Ginteger(&((*udf_ptr)->dummy_values[i]), 0);
-    (*udf_ptr)->dummy_num = 0;
-
     return (*udf_ptr);
 }
-
-/* find or add function at index <t_num>, and return pointer */
-struct udft_entry *
-add_udf(int t_num)
-{
-    return add_is_udf(t_num, ADD_UDF);
-}
-
-/* find function at index <t_num>, and return pointer */
-static struct udft_entry *
-is_ud_function(int t_num)
-{
-    return add_is_udf(t_num, IS_UDF);
-}
-
-#undef ADD_UDF
-#undef IS_UDF
 
 /* return standard function index or 0 */
 static int
