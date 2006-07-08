@@ -3,6 +3,12 @@
 	* configure.in: Always check for Cairo rendering support in Pango, and
 	add the corresponding linking flags to WX_LIBS.
 
+	* src/wxterminal/gp_cairo.c (gp_cairo_enhanced_flush): Initialize
+	overprinted_width to avoid gcc warning.
+
+	* term/wxt.trm (wxt_options): Initialize font_setting to avoid gcc
+	warning.
+
 2006-07-08  Ethan A Merritt <merritt@u.washington.edu>
 
 	* src/parse.c:  Revert to parse.c version 1.44 (10 Jun 2006).

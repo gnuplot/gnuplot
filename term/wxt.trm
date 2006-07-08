@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.11 2006/06/26 18:27:15 sfeam Exp $
+ * $Id: wxt.trm,v 1.12 2006/07/07 03:51:23 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -108,8 +108,8 @@ static struct gen_table wxt_opts[] = {
 TERM_PUBLIC void wxt_options()
 {
 	struct value a;
-	char *s;
-	char *font_setting;
+	char *s = NULL;
+	char *font_setting = NULL;
 	int sep;
 	TBOOLEAN duplication = FALSE;
 	TBOOLEAN set_enhanced = FALSE, set_font = FALSE;

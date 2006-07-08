@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.12 2006/06/12 04:26:45 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.13 2006/06/15 16:17:21 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1026,7 +1026,7 @@ void gp_cairo_enhanced_flush()
 	PangoFontDescription *current_desc;
 
 	PangoRectangle underprinted_logical_rect;
-	int overprinted_width;
+	int overprinted_width = 0;
 	PangoLayout *underprinted_layout;
 	int start, end;
 	PangoLayout *hide_layout;
