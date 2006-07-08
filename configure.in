@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.192 2006/06/22 18:39:43 sfeam Exp $
+dnl $Id: configure.in,v 1.193 2006/06/27 02:36:30 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -962,11 +962,18 @@ if test "${enable_wxwidgets}" = yes ; then
     [AC_MSG_WARN([Pango can't be found. The wxWidgets terminal will not be compiled.])
     enable_wxwidgets_ok=no
   ])
+
+  dnl Check for Pango
+  PKG_CHECK_MODULES(PANGOCAIRO, [pangocairo >= 1.10],
+    [HAVE_PANGOCAIRO=1], dnl not used, but may solve problems with some pkg-config
+    [AC_MSG_WARN([Cairo rendering support for Pango can't be found. The wxWidgets terminal will not be compiled.])
+    enable_wxwidgets_ok=no
+  ])
 fi
 
 if test "${enable_wxwidgets_ok}" = yes ; then
   WX_CXXFLAGS="`$WX_CONFIG --cxxflags | sed 's/-fno-exceptions//'` $CAIRO_CFLAGS $PANGO_CFLAGS"
-  WX_LIBS="`$WX_CONFIG --libs` $CAIRO_LIBS $PANGO_LIBS"
+  WX_LIBS="`$WX_CONFIG --libs` $CAIRO_LIBS $PANGO_LIBS $PANGOCAIRO_LIBS"
 
   dnl Check for gtk (raise/lower tweaks)
   PKG_CHECK_MODULES(GTK, [gtk+-2.0], have_gtk=yes, have_gtk=no)

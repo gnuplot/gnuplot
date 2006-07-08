@@ -1,3 +1,8 @@
+2006-07-08  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in: Always check for Cairo rendering support in Pango, and
+	add the corresponding linking flags to WX_LIBS.
+
 2006-07-08  Ethan A Merritt <merritt@u.washington.edu>
 
 	* src/parse.c:  Revert to parse.c version 1.44 (10 Jun 2006).
