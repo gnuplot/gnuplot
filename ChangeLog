@@ -1,3 +1,16 @@
+2006-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* tutorial/Makefile.am.in (CLEANFILES): Fix up list of created
+	files to be cleaned.
+	(.plt.tex): Allow vpath builds.
+	(.eps.pdf): New rule to fix pdf build of tutorial.
+	(tutorial.dvi): Add dependency on eg7.eps.
+	(tutorial.pdf): Add dependency on eg7.pdf
+
+	* src/win/wtext.c: Fix mixed-up line endings.
+
+	* docs/gnuplot.doc: Repair some blank-only lines.  Again.
+
 2006-07-08  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in: Always check for Cairo rendering support in Pango, and
