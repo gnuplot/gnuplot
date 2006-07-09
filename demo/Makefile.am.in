@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign 1.2h
 CLEANFILES = binary1 binary2 binary3 defaults.ini equipo2.dat field2xy.dat \
 fit.log soundfit.par temp.set fontfile.ps fontfile_latex.ps epslatex-inc.eps \
 epslatex-inc.pdf epslatex.aux epslatex.dvi epslatex.log epslatex.pdf \
-epslatex.ps epslatex.tex temp.dat
+epslatex.ps epslatex.tex stringvar.tmp temp.dat
 
 BINARY_FILES = binary1 binary2 binary3
 
