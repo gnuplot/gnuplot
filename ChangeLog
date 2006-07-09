@@ -1,5 +1,7 @@
 2006-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
+	* demo/Makefile.am.in (CLEANFILES): Remove stringvar.tmp.
+
 	* tutorial/Makefile.am.in (CLEANFILES): Fix up list of created
 	files to be cleaned.
 	(.plt.tex): Allow vpath builds.
