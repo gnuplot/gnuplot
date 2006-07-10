@@ -1,5 +1,5 @@
 #
-# $Id: mouselabels.dem,v 1.0 2006/06/22 00:34:09 sfeam Exp $
+# $Id: mouselabels.dem,v 1.1 2006/07/10 19:49:54 sfeam Exp $
 #
 # Demonstrate screen interaction using mouse variables
 #
@@ -36,5 +36,5 @@ show label
 unset label 1
 set label 2 "DONE"
 replot
-pause -1
+pause -1 "Hit <cr> to continue"
 reset
