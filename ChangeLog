@@ -9,6 +9,9 @@
 	Remove the keystroke part of this demo, since this feature is now
 	demonstrated more usefully by mouselabels.dem
 
+	* src/eval.c:  Allow both  if(exists("foo")) and if(exist("foo")).
+	The latter is what octave uses.
+
 2006-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* demo/Makefile.am.in (CLEANFILES): Remove stringvar.tmp.
