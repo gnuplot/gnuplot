@@ -1,9 +1,9 @@
 #
-# $Id: mousevariables.dem,v 1.6 2004/10/26 04:30:50 sfeam Exp $
+# $Id: mousevariables.dem,v 1.7 2005/01/12 00:34:09 sfeam Exp $
 #
 # Demonstrate use of user variables 
 # MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2
-# and built-in function defined(<varname>)
+# and built-in function exists("<varname>")
 #
 reset
 set title "Scripted zoom using exported MOUSE variables"
@@ -14,7 +14,7 @@ plot sin(13*besj0(x))/x
 #
 pause mouse "Click on one corner of desired zoom region"
 #
-if (defined(MOUSE_BUTTON)) \
+if (exists("MOUSE_BUTTON")) \
     print "Mouse button ", MOUSE_BUTTON, " at ", MOUSE_X, " ", MOUSE_Y ;\
     set label 1 sprintf("   Mouse button %d\n   clicked here!", MOUSE_BUTTON) ;\
     set label 1 at MOUSE_X, MOUSE_Y ;\
@@ -31,7 +31,7 @@ replot
 #
 pause mouse "Click on diagonal corner of desired zoom region"
 #
-if (defined(MOUSE_BUTTON)) \
+if (exists("MOUSE_BUTTON")) \
     print "Mouse button ", MOUSE_BUTTON, " at ", MOUSE_X, " ", MOUSE_Y ;\
     set label 2 sprintf("   Mouse button %d\n   clicked here!", MOUSE_BUTTON) ;\
     set label 2 at MOUSE_X, MOUSE_Y ;\
@@ -66,15 +66,5 @@ print "Zoomed to xrange ",BOT_X," ",TOP_X
 print "Zoomed to yrange ",BOT_Y," ",TOP_Y
 #
 pause -1 "Type <cr> to continue"
-
-reset
-
-set title "Echo keystrokes in plot window\nTerminate with <enter> or <tab>"
-plot sin(13*besj0(x))/x
-load "keystroke.dem"
-reset
-set label 1 "DONE" at 0,.1
-set yrange [0:.2]
-plot 0
 
 reset

@@ -1,4 +1,0 @@
-pause mouse key
-set label MOUSE_CHAR at MOUSE_X, MOUSE_Y
-replot
-if (MOUSE_KEY != 13 && MOUSE_CHAR ne "	") reread

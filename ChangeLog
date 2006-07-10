@@ -1,3 +1,14 @@
+2006-07-10  Ethan A Merritt <merritt@u.washington.edu>
+
+	* demo/mouselabels.dem demo/mouselab_1.dem demo/mouselab_2.dem:
+	New demo using GPVAL_* variables and mouse/keystroke interaction to
+	achieve interactive placement of plot labels.  Works great in x11.
+	Wxt needs a mechanism to defaul trapping of 'q' and '<space>'.
+
+	* demo/mousevariables.dem demo/keystroke.dem(removed): 
+	Remove the keystroke part of this demo, since this feature is now
+	demonstrated more usefully by mouselabels.dem
+
 2006-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* demo/Makefile.am.in (CLEANFILES): Remove stringvar.tmp.
