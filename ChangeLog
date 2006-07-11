@@ -1,4 +1,12 @@
-2006-02-28  Per Persson  <persquare@mac.com>
+2006-07-11  Ethan A Merritt <merritt@u.washington.edu>
+
+	* term/pslatex.trm (EPSLATEX_set_color): Restore support for color
+	text set using fractional palette values. If the terminal is in mono
+	mode, or has the blacktext option, the fractional text color remains
+	a pure grayscale.
+	Bug #1517932
+
+2006-07-11  Per Persson  <persquare@mac.com>
 
 	* term/aquaterm.trm: Made aqua terminal respect font requests of the
 	form: font "<fontface>{,<fontsize>}", old syntax still supported too. 
@@ -12,8 +20,7 @@
 
 	* demo/mouselabels.dem demo/mouselab_1.dem demo/mouselab_2.dem:
 	New demo using GPVAL_* variables and mouse/keystroke interaction to
-	achieve interactive placement of plot labels.  Works great in x11.
-	Wxt needs a mechanism to defaul trapping of 'q' and '<space>'.
+	achieve interactive placement of plot labels. Tested for x11 and wxt.
 
 	* demo/mousevariables.dem demo/keystroke.dem(removed): 
 	Remove the keystroke part of this demo, since this feature is now

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.64 2006/04/30 19:48:02 broeker Exp $
+ * $Id: pslatex.trm,v 1.65 2006/07/07 00:49:19 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -829,13 +829,18 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 
 /* map [0;1] to gray/colors */
     gray = colorspec->value;
-    if (gray <= 0)
-        fputs("      \\color{black}%\n",gpoutfile);
-    else {
-        if (gray >= 1)
-            fputs("      \\color{white}%\n",gpoutfile);
+
+    if (ps_params->blacktext) {
+	if (gray <= 0)
+	    fputs("      \\color{black}%\n",gpoutfile);
+	else if (gray >= 1)
+	    fputs("      \\color{white}%\n",gpoutfile);
         else
-            fprintf(gpoutfile, "      \\colorgray{%s}%%\n",save_space(gray));
+	    fprintf(gpoutfile, "      \\colorgray{%s}%%\n",save_space(gray));
+    } else {
+	rgb_color color;
+	rgb1_from_gray( colorspec->value, &color );
+	fprintf(gpoutfile, "      \\colorrgb{%3.2f,%3.2f,%3.2f}%%\n",color.r,color.g,color.b);
     }
 }
 
