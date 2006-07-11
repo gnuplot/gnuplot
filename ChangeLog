@@ -1,3 +1,8 @@
+2006-07-11  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.cyg config/makefile.mgw config/makefile.nt: #define
+	EAM_OBJECTS and HIDDEN3D_VAR_PTSIZE.
+
 2006-07-10  Ethan A Merritt <merritt@u.washington.edu>
 
 	* demo/mouselabels.dem demo/mouselab_1.dem demo/mouselab_2.dem:

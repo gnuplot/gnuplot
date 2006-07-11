@@ -23,6 +23,9 @@
 /* Define to enable histograms plot style. */
 #define EAM_HISTOGRAMS 1
 
+/* Define to allow placement of rectangles and other objects */
+#define EAM_OBJECTS 1
+
 /* Define if color information should be passed for each vertex. */
 /* #undef EXTENDED_COLOR_SPECS */
 
@@ -374,6 +377,9 @@
 
 /* Define to enable quadtree optimization in hidden3d code. */
 /* #undef HIDDEN3D_QUADTREE */
+
+/* Define to enable handling point size in hidden3d code. */
+#define HIDDEN3D_VAR_PTSIZE 1
 
 /* Define if you want to use the IRIS terminal on IRIS4D series computers. */
 /* #undef IRIS */
