@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.24 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.25 2006/07/11 21:23:36 persquare Exp $
  *
  */
 
@@ -365,7 +365,7 @@ AQUA_init()
   [adapter setFontname:AQUA_convert_using_encoding(AQUA_fontNameCur)];
   [adapter setFontsize:AQUA_fontSizeCur];
   /* set h_char, v_char*/
-  term->h_char = (int) (AQUA_fontSizeCur * 0.7 * AQUA_RESOLUTION);
+  term->h_char = (int) (AQUA_fontSizeCur * 0.6 * AQUA_RESOLUTION);
   term->v_char = (int) (AQUA_fontSizeCur * 1.5 * AQUA_RESOLUTION);
   /* set h_tic, v_tic*/
   term->h_tic = term->v_char / 3;
@@ -512,7 +512,7 @@ AQUA_set_font(const char *font) /* "font,size" */
   [adapter setFontname:fontFace];
   [adapter setFontsize:fontSize];
 
-  term->h_char = (int) (fontSize * 0.7 * AQUA_RESOLUTION);
+  term->h_char = (int) (fontSize * 0.6 * AQUA_RESOLUTION);
   term->v_char = (int) (fontSize * 1.5 * AQUA_RESOLUTION);
 
   return (TRUE);
