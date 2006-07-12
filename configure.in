@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.193 2006/06/27 02:36:30 sfeam Exp $
+dnl $Id: configure.in,v 1.194 2006/07/08 22:04:53 tlecomte Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -862,11 +862,13 @@ dnl hidden3d compile-time options...
 dnl NOTE: have to check that they're not both turned on --- the code
 dnl doesn't allow that choice.
 AC_ARG_ENABLE(h3d-quadtree,dnl
-[  --enable-h3d-quadtree   enable quadtree optimization in hidden3d code],
-  [if test "$enableval" = yes; then
+[  --disable-h3d-quadtree   disable quadtree optimization in hidden3d code],,
+  [test -z "${enable_h3d_quadtree}" && enable_h3d_quadtree=yes])
+if test "$enable_h3d_quadtree" = yes; then
      AC_DEFINE(HIDDEN3D_QUADTREE,1,
 	       [ Define to enable quadtree optimization in hidden3d code.])
-   fi])
+fi
+
 AC_ARG_ENABLE(h3d-gridbox,dnl
 [  --enable-h3d-gridbox    enable gridbox optimization in hidden3d code],
   [if test "$enable_h3d_quadtree" = yes; then
@@ -877,6 +879,7 @@ AC_ARG_ENABLE(h3d-gridbox,dnl
      AC_DEFINE(HIDDEN3D_GRIDBOX,1,
                [ Define to enable gridbox optimization in hidden3d code.])
    fi])
+
 AC_DEFINE(HIDDEN3D_VAR_PTSIZE,1,
 	[ Define to enable handling point size in hidden3d code.])
 
