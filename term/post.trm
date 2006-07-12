@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.183 2006/07/08 23:13:11 sfeam Exp $
+ * $Id: post.trm,v 1.184 2006/07/09 01:30:59 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1702,10 +1702,10 @@ PS_linetype(int linetype)
 	linetype = (linetype % 9) + 3;
     if (linetype < 0)	/* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	linetype = 0;
-    PS_relative_ok = FALSE;
 
     if (PS_linetype_last == linetype) return;
 
+    PS_relative_ok = FALSE;
     PS_FLUSH_PATH;
 
     PS_linetype_last = linetype;

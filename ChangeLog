@@ -2,6 +2,15 @@
 
 	* configure.in:  Enable HIDDEN3D_QUADTREE by default.
 
+	* term/post.trm (PS_linetype): Additional optimization from not
+	forced an absolute move if the linetype change has been optimized away.
+
+	* term/pslatex.trm (EPSLATEX_linetype): Step back from over-general test
+	for unnecessary linetype change.  Forward it to PS_linetype for the
+	actual decision. Without this, a pure linewidth change or a pure
+	dash style change are incorrectly ignored.
+	Bugfix.
+
 2006-07-12  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* demo/Makefile.am.in:

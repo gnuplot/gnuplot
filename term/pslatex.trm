@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.65 2006/07/07 00:49:19 sfeam Exp $
+ * $Id: pslatex.trm,v 1.66 2006/07/12 04:43:21 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -849,6 +849,9 @@ EPSLATEX_linetype(int linetype)
 {
     t_colorspec tempcol = {TC_LT, 0, 0.0};
     tempcol.lt = linetype;
+    PS_linetype(linetype);
+
+    /* This leads to redundant *.eps output */
     EPSLATEX_set_color(&tempcol);
 }
 
