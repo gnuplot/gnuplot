@@ -1,5 +1,5 @@
 #
-# $Id: vector.dem,v 1.9 2005/03/25 05:01:06 sfeam Exp $
+# $Id: vector.dem,v 1.10 2006/06/26 03:44:44 sfeam Exp $
 #
 # This file demonstrates
 # -1- saving contour lines as a gnuplottable file
@@ -62,19 +62,19 @@ splot vtot(x,y) w l
 print "Now create a file with equipotential lines"
 pause -1 "Hit return to continue"
 
-set table "equipo2.dat"
+set table "equipo2.tmp"
 replot
 unset table
 reset
 pause 0
 
-plot "equipo2.dat" w l
+plot "equipo2.tmp" w l
 print "Now create a x/y datafile for plotting with vectors "
 print "and display vectors parallel to the electrostatic field"
 pause -1 "Hit return to continue"
 set isosam 31,31
 
-set table "field2xy.dat"
+set table "field2xy.tmp"
 splot vtot(x,y) w l
 unset table
 pause 0
@@ -84,8 +84,8 @@ set xr [xmin:xmax]
 set yr [ymin:ymax]
 set isosam 31,31
 set key under Left reverse
-plot "field2xy.dat" u 1:2:(coef*dx1($1,$2)):(coef*dy1($1,$2)) w vec, \
-     "equipo2.dat" w l
+plot "field2xy.tmp" u 1:2:(coef*dx1($1,$2)):(coef*dy1($1,$2)) w vec, \
+     "equipo2.tmp" w l
 pause -1 "Hit return to continue"
 
 reset

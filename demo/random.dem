@@ -1,5 +1,5 @@
 #
-# $Id: random.dem,v 1.10 2006/06/14 03:24:09 sfeam Exp $
+# $Id: random.dem,v 1.11 2006/06/30 02:17:22 sfeam Exp $
 #
 # random.dem
 #
@@ -53,7 +53,7 @@ set parametric
 # non-pressing plot-command feature addition may address this issue.
 set samples nsamp
 set format "%8.5g"
-set table "temp.dat"
+set table "random.tmp"
 plot invnorm(rand(0)),invnorm(rand(0))
 unset table
 unset format
@@ -75,7 +75,7 @@ set vrange [-3:3]
 set ticslevel 0
 set isosamples 30
 splot u,v,( 1/(2*pi) * exp(-0.5 * (u**2 + v**2)) ) with line lc rgb "black", \
-   "temp.dat" using 1:2:(-0.2) with points pointtype 7 lc rgb "black"
+   "random.tmp" using 1:2:(-0.2) with points pointtype 7 lc rgb "black"
 pause -1 "Hit return to continue"
 unset contour
 
@@ -101,7 +101,7 @@ scale = (binwidth/(xhigh-xlow))
 set parametric
 set samples nsamp
 set format "%8.5g"
-set table "temp.dat"
+set table "random.tmp"
 plot invnorm(rand(0)),(1.0*scale/nsamp)
 unset table
 unset format
@@ -115,7 +115,7 @@ set grid
 set xrange [-3:3]
 set yrange [0:0.45]
 bin(x) = (1.0/scale)*floor(x*scale)
-plot "temp.dat" using (bin($1)):2 smooth frequency with steps \
+plot "random.tmp" using (bin($1)):2 smooth frequency with steps \
                 title "scaled bin frequency", \
                 normal(x,0,1) with lines title "Gaussian p.d.f."
 pause -1 "Hit return to continue"
@@ -136,7 +136,7 @@ set parametric
 set samples nsamp
 set isosamples 2,2 # Smallest possible
 set format "%8.5g"
-set table "temp.dat"
+set table "random.tmp"
 splot invnorm(rand(0)),invnorm(rand(0)),invnorm(rand(0))
 unset table
 unset format
@@ -158,7 +158,7 @@ set zzeroaxis lt -1
 set view 68, 28, 1.4, 0.9
 tstring(n) = sprintf("Gaussian 3D cloud of %d random samples\n", n)
 set title tstring(nsamp) offset graph 0.15, graph -0.33
-splot "temp.dat" every :::::0 with dots
+splot "random.tmp" every :::::0 with dots
 if (!oneplot) pause -1 "Hit return to continue"
 
 unset parametric
@@ -178,7 +178,7 @@ scale = (binwidth/(xhigh-xlow))
 set xrange [0:xhigh]
 set yrange [0:0.65]
 bin(x) = (1.0/scale)*floor(x*scale)
-plot "temp.dat" using (bin(sqrt($1**2+$2**2+$3**2))):(1.0*scale/nsamp) every :::::0 smooth frequency with steps \
+plot "random.tmp" using (bin(sqrt($1**2+$2**2+$3**2))):(1.0*scale/nsamp) every :::::0 smooth frequency with steps \
                 title "scaled bin frequency", \
                 maxwell(x, 1/sqrt(2)) with lines title "Maxwell p.d.f."
 #
