@@ -733,8 +733,10 @@ fill_gpval_string(char *var, char *value)
 	return;
     if (v->udv_undef == FALSE && !strcmp((char*)&v->udv_value, value))
 	return;
-    v->udv_undef = FALSE; 
-    gpfree_string(&v->udv_value);
+    if (v->udv_undef)
+	v->udv_undef = FALSE; 
+    else
+	gpfree_string(&v->udv_value);
     Gstring(&v->udv_value, gp_strdup(value));
     /* fprintf(stderr, "now it is: |%s|\n", &v->udv_value.v.string_val); */
 #endif
@@ -757,13 +759,9 @@ update_gpval_variables(int from_plot_command)
 	fill_gpval_axis(V_AXIS);
     }
 
-    v = add_udv_by_name("GPVAL_TERM");
-    if (v) {
-	v->udv_undef = FALSE;
-	Gstring(&v->udv_value,(char*)term->name); /* this can be pointer */
-    }
-    fill_gpval_string("GPVAL_TERMOPTIONS", term_options); /* this we must copy */
-    fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : ""); /* this we must copy */
+    fill_gpval_string("GPVAL_TERM", term->name);
+    fill_gpval_string("GPVAL_TERMOPTIONS", term_options);
+    fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : "");
 
     v = add_udv_by_name("GPVAL_VERSION");
     if (v && v->udv_undef == TRUE) {
