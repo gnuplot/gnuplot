@@ -1,5 +1,5 @@
 /*
- * $Id: standard.h,v 1.9 2005/03/06 02:20:21 sfeam Exp $
+ * $Id: standard.h,v 1.10 2006/06/10 00:35:26 sfeam Exp $
  */
 
 /* GNUPLOT - standard.h */
@@ -80,9 +80,7 @@ void f_besj0 __PROTO((union argument *x));
 void f_besj1 __PROTO((union argument *x));
 void f_besy0 __PROTO((union argument *x));
 void f_besy1 __PROTO((union argument *x));
-#ifdef GP_STRING_VARS
 void f_exists __PROTO((union argument *x));   /* exists("foo") */
-#endif
 
 void f_tmsec __PROTO((union argument *x));
 void f_tmmin __PROTO((union argument *x));

@@ -759,7 +759,7 @@ update_gpval_variables(int from_plot_command)
 	fill_gpval_axis(V_AXIS);
     }
 
-    fill_gpval_string("GPVAL_TERM", term->name);
+    fill_gpval_string("GPVAL_TERM", (char *)(term->name));
     fill_gpval_string("GPVAL_TERMOPTIONS", term_options);
     fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : "");
 

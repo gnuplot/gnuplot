@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.23 2006/04/08 23:53:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.24 2006/06/10 00:35:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -972,13 +972,13 @@ f_ceil(union argument *arg)
 #undef pop
 #endif
 
-#ifdef GP_STRING_VARS
 /* EAM - replacement for defined(foo) + f_pushv + f_isvar
  *       implements      exists("foo") instead
  */
 void
 f_exists(union argument *arg)
 {
+#ifdef GP_STRING_VARS
     struct value a;
 
     (void) arg;			/* avoid -Wunused warning */
@@ -991,8 +991,8 @@ f_exists(union argument *arg)
     } else {
 	push(Ginteger(&a, 0));
     }
-}
 #endif
+}
 
 /* bessel function approximations */
 static double

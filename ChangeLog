@@ -6,6 +6,9 @@
 	* src/eval.c (update_gpval_variables): Treat GPVAL_TERM just like all
 	the other GPCAL_* variables.
 
+	* standard.c standard.h (f_exists): Allow to compile with 
+	./configure --disable-stringvariables
+
 2006-07-12  Ethan A Merritt <merritt@u.washington.edu>
 
 	* configure.in:  Enable HIDDEN3D_QUADTREE by default.
