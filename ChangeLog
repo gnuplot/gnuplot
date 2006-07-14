@@ -4,13 +4,18 @@
 	file name into legal VMS or Windows path+file. Give more informative
 	error messages if the file cannot be found.
 
+2006-07-14  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/eval.c (fill_gpval_string): Remove cast to (char *) by correcting
+	a dereference of the string value.
+
 2006-07-13  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/eval.c (fill_gpval_string): Do not risk calling gpfree_string
 	on uninitialized udv.
 
 	* src/eval.c (update_gpval_variables): Treat GPVAL_TERM just like all
-	the other GPCAL_* variables.
+	the other GPVAL_* variables.
 
 	* standard.c standard.h (f_exists): Allow to compile with 
 	./configure --disable-stringvariables

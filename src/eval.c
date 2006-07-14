@@ -693,7 +693,7 @@ add_udv_by_name(char *key)
 
 static void fill_gpval_axis __PROTO((AXIS_INDEX axis));
 static void set_gpval_axis_sth_double __PROTO((AXIS_INDEX axis, const char *suffix, double value, int is_int));
-static void fill_gpval_string __PROTO((char *var, char *value));
+static void fill_gpval_string __PROTO((char *var, const char *value));
 
 static void 
 set_gpval_axis_sth_double(AXIS_INDEX axis, const char *suffix, double value, int is_int)
@@ -725,20 +725,19 @@ fill_gpval_axis(AXIS_INDEX axis)
 }
 
 static void
-fill_gpval_string(char *var, char *value)
+fill_gpval_string(char *var, const char *stringvalue)
 {
 #ifdef GP_STRING_VARS
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    if (v->udv_undef == FALSE && !strcmp((char*)&v->udv_value, value))
+    if (v->udv_undef == FALSE && !strcmp(v->udv_value.v.string_val, stringvalue))
 	return;
     if (v->udv_undef)
 	v->udv_undef = FALSE; 
     else
 	gpfree_string(&v->udv_value);
-    Gstring(&v->udv_value, gp_strdup(value));
-    /* fprintf(stderr, "now it is: |%s|\n", &v->udv_value.v.string_val); */
+    Gstring(&v->udv_value, gp_strdup(stringvalue));
 #endif
 }
 
