@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.13 2006/06/15 16:17:21 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.14 2006/07/08 22:27:55 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -185,6 +185,8 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 /* NOTE : depends on the setting of xscale and yscale */
 void gp_cairo_initialize_context(plot_struct *plot)
 {
+	cairo_matrix_t matrix;
+
 	if (plot->oversampling)
 		plot->oversampling_scale = GP_CAIRO_SCALE;
 	else
@@ -195,7 +197,6 @@ void gp_cairo_initialize_context(plot_struct *plot)
 	else
 		cairo_set_antialias(plot->cr,CAIRO_ANTIALIAS_NONE);
 
-	cairo_matrix_t matrix;
 	cairo_matrix_init(&matrix,
 			plot->xscale/plot->oversampling_scale,
 			0, 0,
@@ -315,11 +316,11 @@ void gp_cairo_set_textangle(plot_struct *plot, double angle)
 void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 {
 	int i;
+	path_item *path;
 
 	/* begin by stroking any open path */
 	gp_cairo_stroke(plot);
 
-	path_item *path;
 	path = (path_item*) gp_alloc(sizeof(path_item), "gp_cairo : polygon path");
 
 	path->n = n;
@@ -343,12 +344,22 @@ void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 
 void gp_cairo_end_polygon(plot_struct *plot)
 {
+	int i;
+	path_item *path;
+	path_item *path2;
+	rgb_color color_sav;
+	cairo_t *context;
+	cairo_t *context_sav;
+	cairo_surface_t *surface;
+	cairo_matrix_t matrix;
+	cairo_matrix_t matrix2;
+	cairo_pattern_t *pattern;
+
 	if (plot->polygon_path_last == NULL)
 		return;
 
-	path_item *path = plot->polygon_path_last;
-	int i;
-	rgb_color color_sav = plot->color;
+	path = plot->polygon_path_last;
+	color_sav = plot->color;
 
 	/* if there's only one polygon, draw it directly */
 	if (path->previous == NULL) {
@@ -375,9 +386,7 @@ void gp_cairo_end_polygon(plot_struct *plot)
 
 	/* otherwise, draw front-to-back to a separate context,
 	 * using CAIRO_OPERATOR_SATURATE */
-	cairo_t *context;
-	cairo_t *context_sav = plot->cr;
-	cairo_surface_t *surface;
+	context_sav = plot->cr;
 	surface = cairo_surface_create_similar(cairo_get_target(plot->cr),
                                              CAIRO_CONTENT_COLOR_ALPHA,
                                              plot->device_xmax*SCALE,
@@ -390,7 +399,6 @@ void gp_cairo_end_polygon(plot_struct *plot)
 		cairo_set_antialias(context,CAIRO_ANTIALIAS_NONE);
 
 	/* transformation matrix between gnuplot and cairo coordinates */
-	cairo_matrix_t matrix;
 	cairo_matrix_init(&matrix,
 			plot->xscale/SCALE/plot->oversampling_scale,
 			0,0,
@@ -400,7 +408,6 @@ void gp_cairo_end_polygon(plot_struct *plot)
 
  	plot->cr = context;
 	path = plot->polygon_path_last;
-	path_item *path2;
 
 	while (path != NULL) {
 		/* check for interrupt */
@@ -424,11 +431,10 @@ void gp_cairo_end_polygon(plot_struct *plot)
 
 	plot->polygon_path_last = NULL;
 
-	cairo_pattern_t *pattern = cairo_pattern_create_for_surface( surface );
+	pattern = cairo_pattern_create_for_surface( surface );
 	cairo_destroy( context );
 
 	/* compensate the transformation matrix of the main context */
-	cairo_matrix_t matrix2;
 	cairo_matrix_init(&matrix2,
 			plot->xscale*SCALE/plot->oversampling_scale,
 			0,0,
@@ -446,6 +452,8 @@ void gp_cairo_end_polygon(plot_struct *plot)
 
 void gp_cairo_stroke(plot_struct *plot)
 {
+	double dashes[2] = {0,0};
+
 	if (!plot->opened_path)
 		return;
 
@@ -454,7 +462,8 @@ void gp_cairo_stroke(plot_struct *plot)
 	/* add last point */
 	cairo_line_to (plot->cr, plot->current_x, plot->current_y);
 
-	double dashes[2] = {2.0*plot->oversampling_scale,2.0*plot->oversampling_scale};
+	dashes[0] = 2.0*plot->oversampling_scale;
+	dashes[1] = 2.0*plot->oversampling_scale;
 
 	cairo_save(plot->cr);
 
@@ -493,12 +502,12 @@ void gp_cairo_move(plot_struct *plot, int x, int y)
 
 void gp_cairo_vector(plot_struct *plot, int x, int y)
 {
-	FPRINTF((stderr,"vector\n"));
-
 	double x1 = x, y1 = y;
 	double new_pos;
 	double weight1 = (double) plot->hinting/100;
 	double weight2 = 1.0 - weight1;
+
+	FPRINTF((stderr,"vector\n"));
 
 	/* begin by drawing any open polygon set */
 	gp_cairo_end_polygon(plot);
@@ -1450,6 +1459,8 @@ void gp_cairo_fill_pattern(plot_struct *plot, int fillpar)
 	cairo_surface_t *pattern_surface;
 	cairo_t *pattern_cr;
 	cairo_pattern_t *pattern;
+	cairo_matrix_t context_matrix;
+	cairo_matrix_t matrix;
 
 	pattern_surface = cairo_surface_create_similar(cairo_get_target(plot->cr),
                                              CAIRO_CONTENT_COLOR_ALPHA,
@@ -1457,7 +1468,6 @@ void gp_cairo_fill_pattern(plot_struct *plot, int fillpar)
                                              PATTERN_SIZE);
 	pattern_cr = cairo_create(pattern_surface);
 
-	cairo_matrix_t context_matrix;
 	cairo_matrix_init_scale(&context_matrix,
 		PATTERN_SIZE,
 		PATTERN_SIZE);
@@ -1567,7 +1577,6 @@ void gp_cairo_fill_pattern(plot_struct *plot, int fillpar)
 	cairo_destroy( pattern_cr );
 
 	/* compensate the transformation matrix of the main context */
-	cairo_matrix_t matrix;
 	cairo_matrix_init_scale(&matrix,
 		1.0/plot->oversampling_scale,
 		1.0/plot->oversampling_scale);
