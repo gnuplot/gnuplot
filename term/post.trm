@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.184 2006/07/09 01:30:59 sfeam Exp $
+ * $Id: post.trm,v 1.185 2006/07/13 03:40:43 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -72,6 +72,7 @@
  */
 
 #include "driver.h"
+#include "variable.h"	/* For loadpath_handler */
 
 #ifdef TERM_REGISTER
 register_term(post)
@@ -3130,17 +3131,24 @@ char *name;
 
     fullname = gp_alloc(strlen(ps_prologue_dir) + strlen(name) + 4,"Prolog name");
     strcpy(fullname,ps_prologue_dir);
+#if defined(_Windows)
+    if (fullname[strlen(fullname)-1] != '\\')
+	strcat(fullname,"\\");
+#elif !defined(VMS)
     if (fullname[strlen(fullname)-1] != '/')
 	strcat(fullname,"/");
+#endif
     strcat(fullname,name);
     prologue_fd = fopen(fullname,"r");
-    free(fullname);
     if (!prologue_fd)
 	prologue_fd = loadpath_fopen(name,"r");
     if (!prologue_fd) {
-	fprintf(stderr,"Can't find PostScript prologue file ");
-	int_error(NO_CARET,name);
+	fprintf(stderr,"Can't find PostScript prologue file %s\n", fullname);
+	loadpath_handler(ACTION_SHOW,NULL);
+	free(fullname);
+	int_error(NO_CARET,"Please copy %s to one of the above directories",name);
     }
+    free(fullname);
     while (fgets(buf, sizeof(buf), prologue_fd))
 	fputs(buf, gppsfile);
     fclose(prologue_fd);

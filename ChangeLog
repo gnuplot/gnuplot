@@ -1,3 +1,9 @@
+2006-07-14  Ethan A Merritt <merritt@u.washington.edu>
+
+	* term/post.trm (PS_dump_prologue_file): Try harder to expand short
+	file name into legal VMS or Windows path+file. Give more informative
+	error messages if the file cannot be found.
+
 2006-07-13  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/eval.c (fill_gpval_string): Do not risk calling gpfree_string
