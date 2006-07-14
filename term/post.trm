@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.185 2006/07/13 03:40:43 sfeam Exp $
+ * $Id: post.trm,v 1.186 2006/07/14 16:44:30 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -72,7 +72,10 @@
  */
 
 #include "driver.h"
-#include "variable.h"	/* For loadpath_handler */
+
+#ifdef TERM_PROTO
+#include "variable.h"	/* For loadpath_handler used in PS_dump_prologue_file */
+#endif
 
 #ifdef TERM_REGISTER
 register_term(post)
