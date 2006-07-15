@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.54 2006/03/11 21:35:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.55 2006/03/17 16:26:11 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -131,8 +131,6 @@ char fitbuf[256];
 char *fitlogfile = NULL;
 
 #ifdef GP_FIT_ERRVARS
-/* NEW 20030131: should we place parameter errors into user-defined
- * variables?  */
 TBOOLEAN fit_errorvariables = FALSE;
 #endif /* GP_FIT_ERRVARS */
 
@@ -578,6 +576,7 @@ regress(double a[])
     double **covar, *dpar, **C, chisq, last_chisq, lambda;
     int iter, i, j;
     marq_res_t res;
+    struct udvt_entry *v;	/* For exporting results to the user */
 
     chisq = last_chisq = INFINITY;
     C = matr(num_data + num_params, num_params);
@@ -594,6 +593,11 @@ regress(double a[])
 
     show_fit(iter, chisq, chisq, a, lambda, STANDARD);
     show_fit(iter, chisq, chisq, a, lambda, log_f);
+
+    /* Reset flag describing fit result status */
+	v = add_udv_by_name("FIT_CONVERGED");
+	v->udv_undef = FALSE;
+	Ginteger(&v->udv_value, 0);
 
     /* MAIN FIT LOOP: do the regression iteration */
 
@@ -659,6 +663,9 @@ regress(double a[])
 	Dblf2("\nThe fit was stopped by the user after %d iterations.\n", iter);
     } else {
 	Dblf2("\nAfter %d iterations the fit converged.\n", iter);
+	v = add_udv_by_name("FIT_CONVERGED");
+	v->udv_undef = FALSE;
+	Ginteger(&v->udv_value, 1);
     }
 
     Dblf2("final sum of squares of residuals : %g\n", chisq);
@@ -699,10 +706,23 @@ regress(double a[])
 	for (k = 0; k < num_params; k++)
 	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k]);
     } else {
-	Dblf2("degrees of freedom (ndf) : %d\n", num_data - num_params);
-	Dblf2("rms of residuals      (stdfit) = sqrt(WSSR/ndf)      : %g\n", sqrt(chisq /
-										  (num_data - num_params)));
-	Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf : %g\n\n", chisq / (num_data - num_params));
+	int ndf          = num_data - num_params; 
+	double stdfit    = sqrt(chisq/ndf);
+	
+	Dblf2("degrees of freedom    (FIT_NDF)                        : %d\n", ndf);
+	Dblf2("rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : %g\n", stdfit);
+	Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf   : %g\n\n", chisq/ndf);
+
+	/* Export these to user-accessible variables */
+	v = add_udv_by_name("FIT_NDF");
+	v->udv_undef = FALSE;
+	Ginteger(&v->udv_value, ndf);
+	v = add_udv_by_name("FIT_STDFIT");
+	v->udv_undef = FALSE;
+	Gcomplex(&v->udv_value, stdfit, 0);
+	v = add_udv_by_name("FIT_WSSR");
+	v->udv_undef = FALSE;
+	Gcomplex(&v->udv_value, chisq, 0);
 
 	/* get covariance-, Korrelations- and Kurvature-Matrix */
 	/* and errors in the parameters                     */
