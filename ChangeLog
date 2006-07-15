@@ -1,3 +1,9 @@
+2006-07-15  Daniel Sebald  <daniel.sebald@ieee.org>
+	* src/command.c (history_command): Remove recursive function call to
+	avoid problem with "flag" being in incorrect state if the recalled
+	command from history fails.  Now use approach where command from
+	history is parsed to check if it itself is also history.
+
 2006-07-14  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.c: Respect ISO C90 standard (mainly move

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.140 2006/06/29 19:36:43 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.141 2006/07/07 22:38:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -801,67 +801,67 @@ exit_command()
 /* help_command() is below */
 
 
-/* process the 'history' command
- * FIXME: chock full of memory leaks
- */
+/* process the 'history' command */
 void
 history_command()
 {
 #if defined(READLINE) || defined(HAVE_LIBREADLINE)
-    struct value a;
-    char *name = NULL; /* name of the output file; NULL for stdout */
-    int n = 0;         /* print only <last> entries */
-    TBOOLEAN append = FALSE;    /* rewrite output file or append it */
-
     c_token++;
 
     if (!END_OF_COMMAND && equals(c_token,"?")) {
+	static char *search_str = NULL;  /* string from command line to search for */
+
 	/* find and show the entries */
 	c_token++;
-	m_capture(&name, c_token, c_token);
-	printf ("history ?%s\n", name);
-	if (!history_find_all(name))
+	m_capture(&search_str, c_token, c_token);  /* reallocates memory */
+	printf ("history ?%s\n", search_str);
+	if (!history_find_all(search_str))
 	    int_error(c_token,"not in history");
 	c_token++;
-    } else if (!END_OF_COMMAND && equals(c_token,"!")) {
-	/* execute the entry */
-	static char flag = 0;
-	static char *save_input_line;
-	static int save_c_token, save_input_line_len;
 
-	if (flag) {
-	    flag = 0;
-	    gp_input_line = save_input_line;
-	    c_token = save_c_token;
-	    gp_input_line_len = save_input_line_len;
-	    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
-	    int_error(c_token,"recurrency forbidden");
-	}
+    } else if (!END_OF_COMMAND && equals(c_token,"!")) {
+	char *search_str = NULL;  /* string from command line to search for */
+	char *line_to_do = NULL;  /* command to execute at end if necessary */
+	int c_token_copy;
+	static char *gpil_copy = NULL;
+
 	c_token++;
-	m_capture(&name, c_token, c_token);
-	name = history_find(name);
-	if (name == NULL)
-	    int_error(c_token,"not in history");
-	else {
-	    /* execute the command "name" */
-	    char *copy_name = gp_strdup(name);
-	    save_input_line = gp_input_line;
-	    save_c_token = c_token;
-	    save_input_line_len = gp_input_line_len;
-	    flag = 1;
-	    gp_input_line = copy_name;
-	    gp_input_line_len = strlen(copy_name);
-	    printf("  Executing:\n\t%s\n",name);
-	    do_line();
-	    free(copy_name);
-	    gp_input_line = save_input_line;
-	    c_token = save_c_token;
-	    gp_input_line_len = save_input_line_len;
-	    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
-	    flag = 0;
+	m_capture(&search_str, c_token, c_token);
+	line_to_do = history_find(search_str);
+	free(search_str);
+	if (line_to_do == NULL)
+	    int_error(c_token, "not in history");
+
+	/* Must keep current input line in case there are some remaining lines
+	 * to process after a semicolon.  However, could int_error() some where
+	 * during do_line() so a static copy is kept.
+	 */
+	free(gpil_copy);
+	gpil_copy = gp_strdup(gp_input_line);
+	c_token_copy = c_token;
+
+	while (gp_input_line_len < strlen(line_to_do) + 1)
+	    extend_input_line();
+	strcpy(gp_input_line, line_to_do);
+	if (scanner(&gp_input_line, &gp_input_line_len)) {
+	    if (almost_equals(0, "hi$story") && equals(1, "!"))
+		int_error(c_token-1,"petitio principii");	/* Oops... infinite loop */
+	    else {
+		printf("  Executing:\n\t%s\n", line_to_do);
+		do_line();
+	    }
 	}
-	c_token++;
+	/* Restore previous state of line and parser, gpil_copy will be freed next time */
+	strcpy(gp_input_line, gpil_copy);
+	num_tokens = scanner(&gp_input_line, &gp_input_line_len);
+	c_token = c_token_copy + 1;
+
     } else {
+	struct value a;
+	int n = 0;		   /* print only <last> entries */
+	TBOOLEAN append = FALSE;   /* rewrite output file or append it */
+	static char *name = NULL;  /* name of the output file; NULL for stdout */
+
 	TBOOLEAN quiet = FALSE;
 	if (!END_OF_COMMAND && almost_equals(c_token,"q$uiet")) {
 	    /* option quiet to suppress history entry numbers */
@@ -872,6 +872,7 @@ history_command()
 	if (!END_OF_COMMAND && isanumber(c_token)) {
 	    n = (int)real(const_express(&a));
 	}
+	free(name);
 	if ((name = try_to_get_string())) {
 	    if (!END_OF_COMMAND && almost_equals(c_token, "ap$pend")) {
 		append = TRUE;
@@ -879,8 +880,8 @@ history_command()
 	    }
 	}
 	write_history_n(n, (quiet ? "" : name), (append ? "a" : "w"));
-	free(name);
     }
+
 #else
     c_token++;
     int_warn(NO_CARET, "You have to compile gnuplot with builtin readline or GNU readline to enable history support.");
