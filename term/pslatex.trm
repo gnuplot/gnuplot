@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.66 2006/07/12 04:43:21 sfeam Exp $
+ * $Id: pslatex.trm,v 1.67 2006/07/13 03:40:43 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -121,7 +121,18 @@ struct pstex_text_command {
 static struct pstex_text_command *pstex_labels = NULL;
 static int epslatex_text_layer = 0;
 
+/* Support for optimization of set_color */
 static t_colorspec tex_previous_colorspec = {-1, 0, 0.0};  /* Initialize to invalid type */
+static char tex_current_color[64];
+static TBOOLEAN tex_color_synced = FALSE;
+
+#define EPSLATEX_sync_color \
+    do { \
+	if (!tex_color_synced) { \
+	    fputs(tex_current_color,gpoutfile); \
+	    tex_color_synced = TRUE; \
+	} \
+    } while (0)
 
 /* Common functions for epslatex and ps(la)tex */
 
@@ -711,6 +722,7 @@ TERM_PUBLIC void
 EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
 {
     if (gpoutfile) {
+	EPSLATEX_sync_color;
 	fprintf(gpoutfile, "      \\put(%d,%d){", x, y);
         if (ps_ang)
             fprintf(gpoutfile,"\\rotatebox{%d}{", ps_ang);
@@ -803,14 +815,21 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 	return;
     else
 	memcpy(&tex_previous_colorspec, colorspec, sizeof(t_colorspec));
-    
+
     PS_set_color(colorspec);
+
+    /* Many [most? all?] of the set_color commands only affect the *.eps     */
+    /* output stream.  So rather than printing them all to the *.tex stream, */
+    /* we update the current color and set a flag to say it has changed.     */
+    /* Only when some TeX object is output do we sync the current color by   */
+    /* writing it out.                                                       */
+    tex_color_synced = FALSE;
 
     if (colorspec->type == TC_RGB) {
         double r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
         double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
         double b = (double)(colorspec->lt & 255) / 255.;
-	fprintf(gpoutfile, "      \\colorrgb{%3.2f,%3.2f,%3.2f}%%\n",r,g,b);
+	sprintf(tex_current_color, "      \\colorrgb{%3.2f,%3.2f,%3.2f}%%\n",r,g,b);
     }
 
     if (colorspec->type == TC_LT) {
@@ -820,7 +839,7 @@ EPSLATEX_set_color(t_colorspec *colorspec)
         else
             linetype = (linetype % 9) + 3;
 
-	fprintf(gpoutfile, "      \\csname LT%c\\endcsname\n",
+	sprintf(tex_current_color, "      \\csname LT%c\\endcsname%%\n",
                 "wba012345678"[linetype]);
     }
 
@@ -836,11 +855,11 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 	else if (gray >= 1)
 	    fputs("      \\color{white}%\n",gpoutfile);
         else
-	    fprintf(gpoutfile, "      \\colorgray{%s}%%\n",save_space(gray));
+	    sprintf(tex_current_color, "      \\colorgray{%s}%%\n",save_space(gray));
     } else {
 	rgb_color color;
 	rgb1_from_gray( colorspec->value, &color );
-	fprintf(gpoutfile, "      \\colorrgb{%3.2f,%3.2f,%3.2f}%%\n",color.r,color.g,color.b);
+	sprintf(tex_current_color, "      \\colorrgb{%3.2f,%3.2f,%3.2f}%%\n",color.r,color.g,color.b);
     }
 }
 

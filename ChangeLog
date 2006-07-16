@@ -1,3 +1,11 @@
+2006-07-16  Ethan A Merritt <merritt@u.washington.edu>
+
+	* term/pslatex.trm (EPSLATEX_set_color): Filter out redundant commands
+	to change the color in the *.tex output stream by buffering each 
+	set_color command, and only sending the most recent one if necessary at
+	the time the next TeX plot element is sent.
+	Bug #1517932.
+
 2006-07-15  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/PostScript/prologues.h term/PostScript/ps_header.sh
