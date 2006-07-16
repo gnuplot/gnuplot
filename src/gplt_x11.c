@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.163 2006/05/25 04:30:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.164 2006/06/14 00:16:46 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1503,7 +1503,6 @@ record()
 		scan_palette_from_buf();
 	    return 1;
 #if 0
-//
 /* (DJS 28sep2004)  Possibly remove.  Not sure this is useful for anything.
  * What gnuplot command would issue this?  When would gnuplot know it is OK to
  * release a palette inside gnuplot_x11?  I see no X11_GR_RELEASE_PALETTE

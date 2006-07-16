@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.367 2006/07/07 03:51:20 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.368 2006/07/08 23:55:32 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2472,7 +2472,10 @@ C ... and restart the table:
  either (1) the fit has "converged" (the relative change in WSSR is less than
  FIT_LIMIT), or (2) it reaches a preset iteration count limit, FIT_MAXITER
  (see `fit control variables`).  The fit may also be interrupted
- and subsequently halted from the keyboard (see `fit`).
+ and subsequently halted from the keyboard (see `fit`).  The user variable
+ FIT_CONVERGED contains 1 if the previous fit command terminated due to
+ convergence; it contains 0 if the previous fit terminated for any other
+ reason.
 
  Often the function to be fitted will be based on a model (or theory) that
  attempts to describe or predict the behaviour of the data.  Then `fit` can
@@ -2536,6 +2539,10 @@ C ... and restart the table:
  degrees of freedom (the number of data points minus the number of fitted
  parameters) is used in these estimates because the parameters used in
  calculating the residuals of the datapoints were obtained from the same data.
+ These values are exported to the variables
+       FIT_NDF = Number of degrees of freedom
+       FIT_WSSR = Weighted sum-of-squares residual
+       FIT_STDFIT = sqrt(WSSR/NDF)
 
  To estimate confidence levels for the parameters, one can use the minimum
  chisquare obtained from the fit and chisquare statistics to determine the
@@ -5479,6 +5486,12 @@ C ... and restart the table:
  This instructs the program to format all input and output in accordance with
  locale "foo", which must be installed.  If locale "foo" is not found then an
  error message is printed and the decimal sign setting is unchanged.
+ On linux systems you can get a list of the locales installed on your machine by
+ typing "locale -a". A typical linux locale string is of the form "sl_SI.UTF-8".
+ A typical Windows locale string is of the form "Slovenian_Slovenia.1250" or 
+ "slovenian". Please note that interpretation of the locale settings is done by
+ the C library at runtime. Older C libraries may offer only partial support for
+ locale settings such as the thousands grouping separator character.
 
        set decimalsign locale; set decimalsign "."
 

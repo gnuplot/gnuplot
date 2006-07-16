@@ -6,6 +6,9 @@
 	the time the next TeX plot element is sent.
 	Bug #1517932.
 
+	* docs/gnuplot.doc: Document the new FIT_* user variables, and clarify
+	the use of locale settings.
+
 2006-07-15  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/PostScript/prologues.h term/PostScript/ps_header.sh
