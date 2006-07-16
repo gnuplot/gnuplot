@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.h,v 1.4 2004/07/01 17:10:11 broeker Exp $
+ * $Id: winmain.h,v 1.5 2006/05/13 09:22:17 mikulik Exp $
  */
 
 /* GNUPLOT - win/winmain.h */
@@ -54,6 +54,7 @@ extern PW pausewin;
 extern MW menuwin;
 
 extern LPSTR winhelpname;
+extern LPSTR szModuleName;
 
 int Pause __PROTO((LPSTR str));
 void screen_dump __PROTO((void));

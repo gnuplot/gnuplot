@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.36 2006/04/30 21:27:56 broeker Exp $
+# $Id: makefile.mgw,v 1.37 2006/06/19 22:20:56 tlecomte Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #  This assumes that MinGW32 is used via the MSYS toolkit
@@ -448,3 +448,5 @@ install: default
 	cp win/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
 	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
+	mkdir -p $(DESTDIR)/share/PostScript
+	cp ../term/PostScript/*.ps $(DESTDIR)/share/PostScript/

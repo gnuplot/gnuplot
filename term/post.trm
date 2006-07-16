@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.186 2006/07/14 16:44:30 sfeam Exp $
+ * $Id: post.trm,v 1.187 2006/07/14 23:44:50 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -323,6 +323,14 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 
 NULL
 };
+
+#ifdef _Windows
+# include "win/winmain.h"
+#else
+# ifndef GNUPLOT_PS_DIR
+#  include "PostScript/prologues.h"
+# endif
+#endif
 
 /* added to enhpost by Matt Heffron <heffron@falstaff.css.beckman.com> */
 /* moved to post.trm by drd */
@@ -3115,22 +3123,66 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 
 #endif /* WITH_IMAGE */
 
-/* This definition should be in config.h or in the compilation flags */
-#ifndef GNUPLOT_PS_DIR
-#define GNUPLOT_PS_DIR "/usr/local/share/gnuplot/4.1/PostScript"
-#endif
-
+/* First look for the GNUPLOT_PS_DIR environment variable
+ * If unsuccessful, look for hardcoded path on UNIX
+ * or files included at compile time on other platforms. */
 static void
-PS_dump_prologue_file(name)
-char *name;
+PS_dump_prologue_file(char *name)
 {
     char *fullname;
     char *ps_prologue_dir;
     FILE *prologue_fd;
     char buf[256];
-    
-    if ((ps_prologue_dir = getenv("GNUPLOT_PS_DIR")) == NULL)
+
+    if ((ps_prologue_dir = getenv("GNUPLOT_PS_DIR")) == NULL) {
+#ifdef _Windows
+	/* retrieve prologues path relatively to gnuplot executable,
+	 * whose path is in szModuleName (winmain.c) */
+	ps_prologue_dir = gp_alloc(strlen((char*) szModuleName)
+			+ strlen("\\share\\PostScript\\") + 1,
+			"Prolog path");
+	strcpy(ps_prologue_dir, (char*) szModuleName);
+	strcat(ps_prologue_dir,"\\share\\PostScript\\");
+#else
+# ifndef GNUPLOT_PS_DIR
+	const char **dump = NULL;
+	int i;
+
+	/* load from included header */
+	if (!strcmp(name,"8859-15.ps"))
+		dump = prologue_8859_15_ps;
+	else if (!strcmp(name,"8859-1.ps"))
+		dump = prologue_8859_1_ps;
+	else if (!strcmp(name,"8859-2.ps"))
+		dump = prologue_8859_2_ps;
+	else if (!strcmp(name,"cp1250.ps"))
+		dump = prologue_cp1250_ps;
+	else if (!strcmp(name,"cp437.ps"))
+		dump = prologue_cp437_ps;
+	else if (!strcmp(name,"cp850.ps"))
+		dump = prologue_cp850_ps;
+	else if (!strcmp(name,"cp852.ps"))
+		dump = prologue_cp852_ps;
+	else if (!strcmp(name,"koi8r.ps"))
+		dump = prologue_koi8r_ps;
+	else if (!strcmp(name,"koi8u.ps"))
+		dump = prologue_koi8u_ps;
+	else if (!strcmp(name,"prologue.ps"))
+		dump = prologue_prologue_ps;
+	else
+		int_error(NO_CARET,"Requested Postscript prologue is not included");
+
+	if (dump) {
+		for (i = 0; dump[i] != NULL; ++i)
+		fprintf(gppsfile, "%s", dump[i]);
+	}
+	return;
+# else
+	/* use hardcoded path */
 	ps_prologue_dir = GNUPLOT_PS_DIR;
+# endif
+#endif
+    }
 
     fullname = gp_alloc(strlen(ps_prologue_dir) + strlen(name) + 4,"Prolog name");
     strcpy(fullname,ps_prologue_dir);
@@ -3143,6 +3195,10 @@ char *name;
 #endif
     strcat(fullname,name);
     prologue_fd = fopen(fullname,"r");
+#ifdef _Windows
+    if (getenv("GNUPLOT_PS_DIR") == NULL)
+	free(ps_prologue_dir);
+#endif
     if (!prologue_fd)
 	prologue_fd = loadpath_fopen(name,"r");
     if (!prologue_fd) {

@@ -1,3 +1,22 @@
+2006-07-15  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* term/PostScript/prologues.h term/PostScript/ps_header.sh
+	term/PostScript/README:  Set up an automated system for encapsulating
+	the external PostScript prologue files back into a header for inclusion
+	in-line in post.trm if necessary.
+	
+	* term/post.trm: If GNUPLOT_PS_DIR is defined, then load the prologue
+	data at run-time from the externally maintained files in that directory.
+	If GNUPLOT_PS_DIR is not defined, then include the equivalent text data
+	as static arrays at compile time.
+
+	* config/makefile.mgw:  Define some GNUPLOT_PS_DIR.
+
+	* src/win/winmain.h:  Declare szModuleName as extern
+	(EAM - what is this???).
+
+	Bug #1510816
+
 2006-07-15  Ethan A Merritt <merritt@u.washington.edu>
 
 	* src/fit.c (regress): Export user-visible variables from the fit.
