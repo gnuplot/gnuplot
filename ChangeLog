@@ -1,3 +1,8 @@
+2006-07-17  Ethan A Merritt <merritt@u.washington.edu>
+
+	* NEWS docs/gnuplot.doc:  Update list of known bugs, and add index
+	entries to help find them in the docs.
+
 2006-07-16  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color): Filter out redundant commands
