@@ -453,4 +453,4 @@ install: default
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
 	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
 	mkdir -p $(DESTDIR)/share/PostScript
-	cp ../term/PostScript/*.ps $(DESTDIR)/share/PostScript/
+	cp ../term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
