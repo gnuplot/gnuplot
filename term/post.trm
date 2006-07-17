@@ -3136,9 +3136,6 @@ PS_dump_prologue_file(char *name)
     char *ps_prologue_dir;
     FILE *prologue_fd;
     char buf[256];
-#ifdef OS2
-    char *exepath;
-#endif
 
     if ((ps_prologue_dir = getenv("GNUPLOT_PS_DIR")) == NULL) {
 #ifdef GNUPLOT_PS_DIR
