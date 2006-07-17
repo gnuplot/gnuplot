@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.130 2006/06/29 19:36:43 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.131 2006/07/07 23:51:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -454,7 +454,7 @@ get_data(struct curve_points *current_plot)
             /* Jun 2006 - Return to behavior of 3.7 and current docs:
 	     *            do not interrupt plotted line because of missing data
 	     */
-	    fprintf(stderr,"Missing datum %d\n", i);
+	    FPRINTF((stderr,"Missing datum %d\n", i));
 	    continue;
 
         case DF_UNDEFINED:
