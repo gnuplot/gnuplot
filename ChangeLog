@@ -1,3 +1,15 @@
+2006-07-17  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* term/post.trm (PS_dump_prologue_file): Modify the Windows code
+	to use GNUPLOT_PS_DIR as the relative path
+
+	* config/makefile.mgw: Add an entry to define GNUPLOT_PS_DIR.
+
+2006-07-17  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/post.trm (PS_dump_prologue_file): OS/2 code to look
+	for PostScript prologue files relatively to the executable path.
+
 2006-07-17  Ethan A Merritt <merritt@u.washington.edu>
 
 	* NEWS docs/gnuplot.doc:  Update list of known bugs, and add index

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.187 2006/07/14 23:44:50 sfeam Exp $
+ * $Id: post.trm,v 1.188 2006/07/16 02:50:56 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -324,12 +324,14 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 NULL
 };
 
-#ifdef _Windows
+#if defined(_Windows)
 # include "win/winmain.h"
-#else
-# ifndef GNUPLOT_PS_DIR
+#elif defined(OS2)
+# define INCL_DOSPROCESS
+# define INCL_DOSMODULEMGR
+# include <os2.h>
+#elif !defined(GNUPLOT_PS_DIR)
 #  include "PostScript/prologues.h"
-# endif
 #endif
 
 /* added to enhpost by Matt Heffron <heffron@falstaff.css.beckman.com> */
@@ -3124,8 +3126,9 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 #endif /* WITH_IMAGE */
 
 /* First look for the GNUPLOT_PS_DIR environment variable
- * If unsuccessful, look for hardcoded path on UNIX
- * or files included at compile time on other platforms. */
+ * If unsuccessful, look for hardcoded absolute path on UNIX,
+ * or hardcoded relative path on Windows and OS2,
+ * or files included at compile time. */
 static void
 PS_dump_prologue_file(char *name)
 {
@@ -3133,18 +3136,50 @@ PS_dump_prologue_file(char *name)
     char *ps_prologue_dir;
     FILE *prologue_fd;
     char buf[256];
+#ifdef OS2
+    char *exepath;
+#endif
 
     if ((ps_prologue_dir = getenv("GNUPLOT_PS_DIR")) == NULL) {
-#ifdef _Windows
+#ifdef GNUPLOT_PS_DIR
+# if defined(_Windows)
 	/* retrieve prologues path relatively to gnuplot executable,
 	 * whose path is in szModuleName (winmain.c) */
 	ps_prologue_dir = gp_alloc(strlen((char*) szModuleName)
-			+ strlen("\\share\\PostScript\\") + 1,
-			"Prolog path");
+			+ strlen(GNUPLOT_PS_DIR) + 2, "Prolog path");
 	strcpy(ps_prologue_dir, (char*) szModuleName);
-	strcat(ps_prologue_dir,"\\share\\PostScript\\");
-#else
-# ifndef GNUPLOT_PS_DIR
+	strcat(ps_prologue_dir, "\\");
+	/* GNUPLOT_PS_DIR is _relative_ path */
+	strcat(ps_prologue_dir, GNUPLOT_PS_DIR);
+# elif defined(OS2)
+	const ULONG bufsiz = 1024;
+	CHAR exepath[bufsiz];
+	PPIB ppib;
+	ULONG rc;
+	
+	rc = DosGetInfoBlocks(NULL, &ppib);
+	if (!rc)
+		rc = DosQueryModuleName(ppib->pib_hmte, bufsiz, (PCHAR) &exepath);
+	if (!rc) {
+	    char *p = strrchr(exepath, '\\');
+	    *(++p) = '\0';
+	    ps_prologue_dir = gp_alloc(strlen(exepath) + strlen(GNUPLOT_PS_DIR) + 2,
+			"Prolog path");
+	    strcpy(ps_prologue_dir, exepath);
+	    strcat(ps_prologue_dir, "\\");
+	    /* GNUPLOT_PS_DIR is _relative_ path */
+	    strcat(ps_prologue_dir, GNUPLOT_PS_DIR);
+	}
+	else {
+	    ps_prologue_dir = gp_alloc(1, "Prolog path");
+	    /* unsucessful to retrieve executable path */
+	    strcpy(ps_prologue_dir,"");
+	}
+# else /* !_Windows && !OS2 */
+	/* use hardcoded _absolute_ path */
+	ps_prologue_dir = GNUPLOT_PS_DIR;
+# endif
+#else /* using headers included at compile time */
 	const char **dump = NULL;
 	int i;
 
@@ -3177,16 +3212,12 @@ PS_dump_prologue_file(char *name)
 		fprintf(gppsfile, "%s", dump[i]);
 	}
 	return;
-# else
-	/* use hardcoded path */
-	ps_prologue_dir = GNUPLOT_PS_DIR;
-# endif
-#endif
+#endif /* GNUPLOT_PS_DIR */
     }
 
     fullname = gp_alloc(strlen(ps_prologue_dir) + strlen(name) + 4,"Prolog name");
     strcpy(fullname,ps_prologue_dir);
-#if defined(_Windows)
+#if defined(_Windows) || defined(OS2)
     if (fullname[strlen(fullname)-1] != '\\')
 	strcat(fullname,"\\");
 #elif !defined(VMS)
@@ -3195,7 +3226,7 @@ PS_dump_prologue_file(char *name)
 #endif
     strcat(fullname,name);
     prologue_fd = fopen(fullname,"r");
-#ifdef _Windows
+#if defined(_Windows) || defined(OS2)
     if (getenv("GNUPLOT_PS_DIR") == NULL)
 	free(ps_prologue_dir);
 #endif

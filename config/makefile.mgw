@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.37 2006/06/19 22:20:56 tlecomte Exp $
+# $Id: makefile.mgw,v 1.38 2006/07/16 02:50:56 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #  This assumes that MinGW32 is used via the MSYS toolkit
@@ -88,6 +88,10 @@ MOUSE=1
 
 # Where to place gnuplot.gih helpfile:
 HELPFILE = wgnuplot.hlp
+
+# Where to install the PostScript prologue files, relatively to the executable
+# wgnuplot.exe
+GNUPLOT_PS_DIR = share/PostScript
 
 # Destination directory, used in 'make install':
 DESTDIR = /c/Progra~1/Gnuplot4.1
@@ -310,7 +314,7 @@ show.o: show.c plot.h setshow.h
 	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -c $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(TERMFLAGS) term.c
+	$(CC) -c $(CFLAGS) -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" $(TERMFLAGS) term.c
 
 version.$(O): version.c
 
