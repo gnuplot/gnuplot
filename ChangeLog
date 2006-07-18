@@ -8,6 +8,9 @@
 	* docs/Makefile.in: Define GNUPLOT_PS_DIR so that the corresponding
 	documentation is processed (Timothee Lecomte).
 
+	* src/plot3d.c (eval_3dplots): Unnecessary initialization to quiet
+	spurious compiler warning.
+
 2006-07-18  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* config/makefile.oww (TERMFLAGS): Add -DGNUPLOT_PS_DIR flag.
