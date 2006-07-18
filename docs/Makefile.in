@@ -51,12 +51,14 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 datadir = @datadir@
+pkgdatadir = @pkgdatadir@
 datarootdir = @datarootdir@
 infodir = @infodir@
 srcdir = @srcdir@
 top_builddir = ..
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
+VERSION_MAJOR = @VERSION_MAJOR@
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -68,13 +70,15 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 
+GNUPLOT_PS_DIR = $(pkgdatadir)/$(VERSION_MAJOR)/PostScript
+
 INFO_DEPS = $(srcdir)/gnuplot.info
 
 CC     = @CC@
 CPP    = @CPP@
 DEFS   = @DEFS@
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.. -I$(top_builddir)
-CPPFLAGS = @CPPFLAGS@
+CPPFLAGS = @CPPFLAGS@ -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\"
 CFLAGS = @CFLAGS@
 GIHDIR = @GIHDIR@
 INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/term

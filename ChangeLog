@@ -5,6 +5,9 @@
 	
 	* term/post.trm: Add a %%BeginProlog line to the output stream.
 
+	* docs/Makefile.in: Define GNUPLOT_PS_DIR so that the corresponding
+	documentation is processed (Timothee Lecomte).
+
 2006-07-18  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* config/makefile.oww (TERMFLAGS): Add -DGNUPLOT_PS_DIR flag.
