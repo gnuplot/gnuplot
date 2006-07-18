@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.oww,v 1.6 2006/03/06 17:42:29 broeker Exp $
+# $Id: makefile.oww,v 1.7 2006/03/28 21:50:01 broeker Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -45,6 +45,10 @@ WRC = wrc
 !  loaddll wlib     wlibd
 !endif
 
+# Where to install the PostScript prologue files, relatively to the executable
+# wgnuplot.exe
+GNUPLOT_PS_DIR = share/PostScript
+
 
 
 # compiler flags: 
@@ -82,7 +86,7 @@ WCFLAGS = -zlf -ei -zq -I. -zm -bm -5r -sg -orilt -j -aa -d2 $(CPPFLAGS)
 LDLIBS = 
 # ...and here.
 # see other terminal defines in term.h
-TERMFLAGS = -I..\term 
+TERMFLAGS = -DGNUPLOT_PS_DIR="$(GNUPLOT_PS_DIR)" -I..\term 
 
 # macros for makefile.all
 O=obj

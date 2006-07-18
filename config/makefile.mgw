@@ -1,5 +1,5 @@
-#
-# $Id: makefile.mgw,v 1.38 2006/07/16 02:50:56 sfeam Exp $
+# Hello, emacs: this is a -*- Makefile -*-
+# $Id: makefile.mgw,v 1.40 2006/07/17 23:01:26 tlecomte Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #  This assumes that MinGW32 is used via the MSYS toolkit
@@ -156,7 +156,7 @@ ifdef PIPES
 endif
 
 TOP = ..
-TERMFLAGS = -I$(TOP)/term
+TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -I$(TOP)/term
 TERMLIBS = 
 
 CFLAGS += -I$(TOP) -I. -D_Windows -DHAVE_CONFIG_H\
@@ -314,7 +314,7 @@ show.o: show.c plot.h setshow.h
 	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -c $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" $(TERMFLAGS) term.c
+	$(CC) -c $(CFLAGS) $(TERMFLAGS) term.c
 
 version.$(O): version.c
 

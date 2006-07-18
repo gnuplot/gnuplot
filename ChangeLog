@@ -1,3 +1,13 @@
+2006-07-18  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* config/makefile.oww (TERMFLAGS): Add -DGNUPLOT_PS_DIR flag.
+	(GNUPLOT_PS_DIR): Define the relative PostScript path.
+
+	* config/makefile.mgw: Add a line to help Emacs detect this is a
+	Makefile.
+	(term.$(O)): -DGNUPLOT_PS_DIR shouldn't really be down here.
+	(TERMFLAGS): Move the -DGNUPLOT_PS_DIR flag in here.
+
 2006-07-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	SF Patch [1520821] line from ruler to current mouse position if polar
