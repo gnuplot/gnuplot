@@ -349,7 +349,8 @@ _set_cursor(int c, int x, int y) - Set cursor style and corner of
    rubber band rectangle.  c selects the action: -2=warp the cursor to
    the given point, -1=start zooming, 0=standard cross-hair cursor,
    1=cursor during rotation, 2=cursor during scaling, 3=cursor during
-   zooming.
+   zooming, -3=draw line between ruler and current mouse position,
+   -4=don't draw (erase) line between ruler and current mouse position.
 
 _set_clipboard(const char s[]) - Write a string to the clipboard.
 

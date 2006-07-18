@@ -1,3 +1,22 @@
+2006-07-18  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	SF Patch [1520821] line from ruler to current mouse position if polar
+	distance
+
+	* src/mouse.c term/README: Two new flags for term->set_cursor(flag,...):
+	-3 = draw line between ruler and current mouse position,
+	-4 = don't draw (erase) line between ruler and current mouse position.
+	They are issued when mousing with displayed ruler and showing polar
+	distance or tangent.
+
+	* src/gplt_x11.c: New plot variables ruler_lineto_{on|x|y}, and function
+	DrawLineToRuler(plot) to draw and erase line between ruler and current
+	mouse position. This implements calls of set_cursor(flag,...) for 
+	flag=-3 and -4.
+
+	* src/win/wgraph.c: Same as for gplt_x11.c, just with ruler_lineto
+	structure.
+
 2006-07-17  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/post.trm (PS_dump_prologue_file): Modify the Windows code

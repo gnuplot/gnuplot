@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.83 2006/07/04 20:10:21 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.84 2006/07/06 23:11:09 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1191,6 +1191,7 @@ builtin_toggle_polardistance(struct gp_event_t *ge)
     }
     if (++mouse_setting.polardistance > 2) mouse_setting.polardistance = 0;
 	/* values: 0 (no polar coordinates), 1 (polar coordinates), 2 (tangent instead of angle) */
+    term->set_cursor((mouse_setting.polardistance ? -3:-4), ge->mx, ge->my); /* change cursor type */
 # ifdef OS2
     PM_update_menu_items();
 # endif

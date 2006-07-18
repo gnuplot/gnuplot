@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.164 2006/06/14 00:16:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.165 2006/07/16 22:46:41 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -263,7 +263,9 @@ typedef struct plot_struct {
 #ifdef USE_MOUSE
     TBOOLEAN mouse_on;		/* is mouse bar on? */
     TBOOLEAN ruler_on;		/* is ruler on? */
+    TBOOLEAN ruler_lineto_on;	/* is line between ruler and mouse cursor on? */
     int ruler_x, ruler_y;	/* coordinates of ruler */
+    int ruler_lineto_x, ruler_lineto_y;	/* draw line from ruler to current mouse pos */
     TBOOLEAN zoombox_on;	/* is zoombox on? */
     int zoombox_x1, zoombox_y1, zoombox_x2, zoombox_y2;	/* coordinates of zoombox as last drawn */
     char zoombox_str1a[64], zoombox_str1b[64], zoombox_str2a[64], zoombox_str2b[64];	/* strings to be drawn at corners of zoombox ; 1/2 indicate corner; a/b indicate above/below */
@@ -411,6 +413,7 @@ static int ErrorHandler __PROTO((Display *, XErrorEvent *));
 static void DrawRuler __PROTO((plot_struct *));
 static void EventuallyDrawMouseAddOns __PROTO((plot_struct *));
 static void DrawBox __PROTO((plot_struct *));
+static void DrawLineToRuler __PROTO((plot_struct *));
 static void AnnotatePoint __PROTO((plot_struct *, int, int, const char[], const char[]));
 static long int SetTime __PROTO((plot_struct *, Time));
 static unsigned long AllocateXorPixel __PROTO((cmap_t *));
@@ -1559,6 +1562,18 @@ record()
 		sscanf(buf, "u%4d%4d%4d", &c, &x, &y);
 		if (plot) {
 		    switch (c) {
+		    case -4:	/* switch off line between ruler and mouse cursor */
+			DrawLineToRuler(plot);
+			plot->ruler_lineto_on = FALSE;
+			break;
+		    case -3:	/* switch on line between ruler and mouse cursor */
+			if (plot->ruler_on && plot->ruler_lineto_on)
+			    break;
+			plot->ruler_lineto_x = X(x);
+			plot->ruler_lineto_y = Y(y);
+			plot->ruler_lineto_on = TRUE;
+			DrawLineToRuler(plot);
+			break;
 		    case -2:	/* warp pointer */
 			XWarpPointer(dpy, None /* src_w */ ,
 				     plot->window /* dest_w */ , 0, 0, 0, 0, X(x), Y(y));
@@ -1589,6 +1604,11 @@ record()
 			/* erase zoom box */
 			DrawBox(plot);
 			plot->zoombox_on = FALSE;
+		    }
+		    if (c >= 0 && plot->ruler_lineto_on) {
+			/* erase line from ruler to cursor */
+			DrawLineToRuler(plot);
+			plot->ruler_lineto_on = FALSE;
 		    }
 		}
 	    }
@@ -1655,12 +1675,16 @@ record()
 		    int x, y;
 		    DrawRuler(plot);	/* erase previous ruler */
 		    sscanf(buf, "r%4d%4d", &x, &y);
-		    if (x < 0)
+		    if (x < 0) {
+			DrawLineToRuler(plot);
 			plot->ruler_on = FALSE;
-		    else {
+		    } else {
 			plot->ruler_on = TRUE;
 			plot->ruler_x = x;
 			plot->ruler_y = y;
+			plot->ruler_lineto_x = X(x);
+			plot->ruler_lineto_y = Y(y);
+			DrawLineToRuler(plot);
 		    }
 		    DrawRuler(plot);	/* draw new one */
 		}
@@ -3696,6 +3720,7 @@ static void
 EventuallyDrawMouseAddOns(plot_struct * plot)
 {
     DrawRuler(plot);
+    DrawLineToRuler(plot);
     if (plot->zoombox_on)
 	DrawBox(plot);
     DrawCoords(plot, plot->str);
@@ -3703,6 +3728,28 @@ EventuallyDrawMouseAddOns(plot_struct * plot)
        TODO more ...
      */
 }
+
+
+/*
+ * draw a line using the gc with the GXxor function.
+ * This can be used to turn on *and off* a line between
+ * the current mouse pointer and the ruler.
+ */
+static void
+DrawLineToRuler(plot_struct * plot)
+{
+    if (plot->ruler_on == FALSE || plot->ruler_lineto_on == FALSE)
+	return;
+    if (plot->ruler_lineto_x < 0)
+	return;
+    if (!gc_xor) {
+	GetGCXor(plot, &gc_xor);
+    }
+    XDrawLine(dpy, plot->window, gc_xor, 
+	    X(plot->ruler_x), Y(plot->ruler_y),
+	    plot->ruler_lineto_x, plot->ruler_lineto_y);
+}
+
 
 
 
@@ -4586,6 +4633,12 @@ process_event(XEvent *event)
 	    plot->zoombox_y2 = event->xcrossing.y;
 	    DrawBox(plot);
 	}
+	if (plot->ruler_on) {
+	    DrawLineToRuler(plot);
+	    plot->ruler_lineto_x = event->xcrossing.x;
+	    plot->ruler_lineto_y = event->xcrossing.y;
+	    DrawLineToRuler(plot);
+	}
 	break;
     case MotionNotify:
 	update_modifiers(event->xmotion.state);
@@ -4642,6 +4695,12 @@ process_event(XEvent *event)
 		plot->zoombox_x2 = pos_x;
 		plot->zoombox_y2 = pos_y;
 		DrawBox(plot);
+	    }
+	    if (plot->ruler_on && plot->ruler_lineto_on) {
+		DrawLineToRuler(plot);
+		plot->ruler_lineto_x = event->xcrossing.x;
+		plot->ruler_lineto_y = event->xcrossing.y;
+		DrawLineToRuler(plot);
 	    }
 	}
 	break;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.50 2006/03/05 01:15:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.51 2006/03/06 18:31:24 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -77,6 +77,12 @@ static struct Ruler {
     int x, y;			/* ruler position */
 } ruler = {FALSE,0,0,};
 
+/* Status of the line from ruler to cursor */
+static struct RulerLineTo {
+    TBOOLEAN on;		/* ruler line active ? */
+    int x, y;			/* ruler line end position (previous cursor position) */
+} ruler_lineto = {FALSE,0,0,};
+
 /* Status of zoom box */
 static struct Zoombox {
     TBOOLEAN on;		/* set to TRUE during zooming */
@@ -90,11 +96,13 @@ HCURSOR hptrDefault, hptrCrossHair, hptrScaling, hptrRotating, hptrZooming, hptr
 /* Mouse support routines */
 static void	Wnd_exec_event(LPGW lpgw, LPARAM lparam, char type, int par1);
 static void	Wnd_refresh_zoombox(LPGW lpgw, LPARAM lParam);
+static void	Wnd_refresh_ruler_lineto(LPGW lpgw, LPARAM lParam);
 static void     GetMousePosViewport(LPGW lpgw, int *mx, int *my);
 static void	Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y);
 static void     DisplayStatusLine(LPGW lpgw);
 static void     UpdateStatusLine(LPGW lpgw, const char text[]);
 static void	DrawRuler(LPGW lpgw);
+static void	DrawRulerLineTo(LPGW lpgw);
 static void     DrawZoomBox(LPGW lpgw);
 static void	LoadCursors(LPGW lpgw);
 static void	DestroyCursors(LPGW lpgw);
@@ -1942,6 +1950,17 @@ Wnd_refresh_zoombox(LPGW lpgw, LPARAM lParam)
     zoombox.to.x = mx; zoombox.to.y = my;
     DrawZoomBox(lpgw); /*  draw new zoom box */
 }
+
+static void
+Wnd_refresh_ruler_lineto(LPGW lpgw, LPARAM lParam)
+{
+    int mx, my;
+
+    GetMousePosViewport(lpgw, &mx, &my);
+    DrawRulerLineTo(lpgw); /*  erase current line */
+    ruler_lineto.x = mx; ruler_lineto.y = my;
+    DrawRulerLineTo(lpgw); /*  draw new line box */
+}
 #endif /* USE_MOUSE */
 
 /* ================================== */
@@ -1974,6 +1993,9 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
 				if (zoombox.on) {
 					Wnd_refresh_zoombox(lpgw, lParam);
+				}
+				if (ruler.on && ruler_lineto.on) {
+					Wnd_refresh_ruler_lineto(lpgw, lParam);
 				}
 				/* track (show) mouse position -- send the event to gnuplot */
 				Wnd_exec_event(lpgw, lParam,  GE_motion, wParam);
@@ -2320,6 +2342,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			 * doesn't know anything about has to be redrawn */
 			DrawRuler(lpgw);
 			DisplayStatusLine(lpgw);
+			DrawRulerLineTo(lpgw);
 			DrawZoomBox(lpgw);
 #endif
 			return 0;
@@ -2456,6 +2479,18 @@ void WDPROC
 Graph_set_cursor (LPGW lpgw, int c, int x, int y )
 {
 	switch (c) {
+	case -4: /* switch off line between ruler and mouse cursor */
+		DrawRulerLineTo(lpgw);
+		ruler_lineto.on = FALSE;
+		break;
+	case -3: /* switch on line between ruler and mouse cursor */
+		if (ruler.on && ruler_lineto.on)
+		    break;
+		ruler_lineto.x = x;
+		ruler_lineto.y = y;
+		ruler_lineto.on = TRUE;
+		DrawRulerLineTo(lpgw);
+		break;
 	case -2:
 		{ /* move mouse to the given point */
 			RECT rc;
@@ -2491,6 +2526,10 @@ Graph_set_cursor (LPGW lpgw, int c, int x, int y )
 		DrawZoomBox(lpgw);
 		zoombox.on = FALSE;
 	}
+	if (c>=0 && ruler_lineto.on) { /* erase ruler line */
+		DrawRulerLineTo(lpgw);
+		ruler_lineto.on = FALSE;
+	}
 }
 
 /* set_ruler(int x, int y) term API: x<0 switches ruler off. */
@@ -2498,6 +2537,7 @@ void WDPROC
 Graph_set_ruler (LPGW lpgw, int x, int y )
 {
 	DrawRuler(lpgw); /* remove previous drawing, if any */
+	DrawRulerLineTo(lpgw);
 	if (x < 0) {
 		ruler.on = FALSE;
 		return;
@@ -2505,6 +2545,7 @@ Graph_set_ruler (LPGW lpgw, int x, int y )
 	ruler.on = TRUE;
 	ruler.x = x; ruler.y = y;
 	DrawRuler(lpgw); /* draw ruler at new positions */
+	DrawRulerLineTo(lpgw);
 }
 
 /* put_tmptext(int i, char c[]) term API
@@ -2707,6 +2748,34 @@ DrawRuler (LPGW lpgw)
 	LineTo(hdc, rc.right, ry);
 	MoveTo(hdc, rx, rc.top);
 	LineTo(hdc, rx, rc.bottom);
+	SetROP2(hdc, iOldRop);
+	ReleaseDC(lpgw->hWndGraph, hdc);
+}
+
+/* Draw the ruler line to cursor position.
+ */
+static void
+DrawRulerLineTo (LPGW lpgw)
+{
+	HDC hdc;
+	int iOldRop;
+	RECT rc;
+	long rx, ry, rlx, rly;
+
+	if (!ruler.on || !ruler_lineto.on || ruler.x < 0 || ruler_lineto.x < 0)
+		return;
+
+	hdc = GetDC(lpgw->hWndGraph);
+	GetClientRect(lpgw->hWndGraph, &rc);
+
+	rx  = MulDiv(ruler.x, rc.right - rc.left, lpgw->xmax);
+	ry  = rc.bottom - MulDiv(ruler.y, rc.bottom - rc.top, lpgw->ymax);
+	rlx = MulDiv(ruler_lineto.x, rc.right - rc.left, lpgw->xmax);
+	rly = rc.bottom - MulDiv(ruler_lineto.y, rc.bottom - rc.top, lpgw->ymax);
+
+	iOldRop = SetROP2(hdc, R2_NOT);
+	MoveTo(hdc, rx, ry);
+	LineTo(hdc, rlx, rly);
 	SetROP2(hdc, iOldRop);
 	ReleaseDC(lpgw->hWndGraph, hdc);
 }
