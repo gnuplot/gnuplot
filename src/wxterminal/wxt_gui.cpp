@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.18 2006/07/07 00:06:16 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.19 2006/07/07 00:33:18 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -655,6 +655,15 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		dc.CrossHair( (int)wxt_ruler_x, (int)wxt_ruler_y );
 		dc.SetLogicalFunction( wxCOPY );
 	}
+
+	if (wxt_ruler && wxt_ruler_lineto) {
+		tmp_pen = wxPen(wxT("black"), 1, wxSOLID);
+		tmp_pen.SetCap(wxCAP_BUTT);
+		dc.SetPen( tmp_pen );
+		dc.SetLogicalFunction( wxINVERT );
+		dc.DrawLine((int)wxt_ruler_x, (int)wxt_ruler_y, mouse_x, mouse_y);
+		dc.SetLogicalFunction( wxCOPY );
+	}
 #endif /*USE_MOUSE*/
 
 	dc.EndDrawing();
@@ -709,6 +718,10 @@ void wxtPanel::OnMotion( wxMouseEvent& event )
 	mouse_y = event.GetY();
 
 	UpdateModifiers(event);
+
+	/* update the ruler_lineto thing */
+	if (wxt_ruler && wxt_ruler_lineto)
+		Draw();
 
 	/* informs gnuplot */
 	if ( this->GetId()==wxt_window_number )
@@ -1923,10 +1936,15 @@ void wxt_put_tmptext(int n, const char str[])
 	wxt_sigint_restore();
 }
 
-/* c selects the action: -2=warp the cursor to
- * the given point, -1=start zooming, 0=standard cross-hair cursor,
- * 1=cursor during rotation, 2=cursor during scaling, 3=cursor during
- * zooming. */
+/* c selects the action:
+ * -4=don't draw (erase) line between ruler and current mouse position,
+ * -3=draw line between ruler and current mouse position,
+ * -2=warp the cursor to the given point,
+ * -1=start zooming,
+ * 0=standard cross-hair cursor,
+ * 1=cursor during rotation,
+ * 2=cursor during scaling,
+ * 3=cursor during zooming. */
 void wxt_set_cursor(int c, int x, int y)
 {
 	if (wxt_status == STATUS_UNINITIALIZED)
@@ -1936,6 +1954,14 @@ void wxt_set_cursor(int c, int x, int y)
 	wxt_MutexGuiEnter();
 
 	switch ( c ) {
+	case -4:
+		wxt_current_panel->wxt_ruler_lineto = false;
+		wxt_current_panel->Draw();
+		break;
+	case -3:
+		wxt_current_panel->wxt_ruler_lineto = true;
+		wxt_current_panel->Draw();
+		break;
 	case -2: /* warp the pointer to the given position */
 		wxt_current_panel->WarpPointer(
 				(int) device_x(wxt_current_plot, x),

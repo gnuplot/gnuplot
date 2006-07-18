@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.10 2006/06/18 07:45:43 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.11 2006/07/07 00:06:16 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -304,6 +304,7 @@ public :
 	wxString zoom_string1, zoom_string2;
 	bool wxt_ruler;
 	double wxt_ruler_x, wxt_ruler_y;
+	bool wxt_ruler_lineto;
 	/* modifier_mask for wxKeyEvents */
 	int modifier_mask;
 #endif
