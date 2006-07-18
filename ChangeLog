@@ -1,3 +1,10 @@
+2006-07-18  Ethan A Merritt <merritt@u.washington.edu>
+
+	* term/post.trm:  Add help-file sections describing the PostScript
+	prolog processing, and the environmental variable GNUPLOT_PS_DIR.
+	
+	* term/post.trm: Add a %%BeginProlog line to the output stream.
+
 2006-07-18  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* config/makefile.oww (TERMFLAGS): Add -DGNUPLOT_PS_DIR flag.

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.188 2006/07/16 02:50:56 sfeam Exp $
+ * $Id: post.trm,v 1.190 2006/07/17 23:10:57 tlecomte Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1380,6 +1380,7 @@ PS_common_init(
 
     static const char GPFAR psi2[] = "\
 %%%%EndComments\n\
+%%%%BeginProlog\n\
 /gnudict 256 dict def\ngnudict begin\n\
 %%\n\
 %% The following 6 true/false flags may be edited by hand if required\n\
@@ -3233,7 +3234,10 @@ PS_dump_prologue_file(char *name)
 	fprintf(stderr,"Can't find PostScript prologue file %s\n", fullname);
 	loadpath_handler(ACTION_SHOW,NULL);
 	free(fullname);
-	int_error(NO_CARET,"Please copy %s to one of the above directories",name);
+	fprintf(stderr,"Please copy %s to one of the above directories\n",name);
+	fprintf(stderr,"or set the loadpath appropriately\n");
+	fprintf(stderr,"or set the environmental variable GNUPLOT_PS_DIR\n");
+	int_error(NO_CARET,"Plot failed!");
     }
     free(fullname);
     while (fgets(buf, sizeof(buf), prologue_fd))
@@ -3317,6 +3321,15 @@ START_HELP(00psglobal)
 #define PS_COMMON_OPTS2 \
 "                               {blacktext | colortext | colourtext}",\
 "                               {{font} \"fontname{,fontsize}\" {<fontsize>}}",
+#ifdef GNUPLOT_PS_DIR
+#define PS_COMMON_PROLOG_INFO \
+" If you see the error message",\
+"       \"Can't find PostScript prologue file ... \"",\
+" Please see and follow the instructions in `postscript prologue`.",\
+"",
+#else
+#define PS_COMMON_PROLOG_INFO
+#endif
 #define PS_COMMON_DOC1 \
 " The option `color` enables color, while `monochrome` prefers black and white",\
 " drawing elements. Further, `monochrome` uses gray `palette` but it does not",\
@@ -3401,6 +3414,7 @@ PS_COMMON_OPTS2
 " `set ticscale`, and the arrows have all features as in the postscript",
 " terminal.)",
 "",
+PS_COMMON_PROLOG_INFO
 PS_COMMON_DOC1
 " `blacktext` forces all text to be written in black even in color mode;",
 "",
@@ -3561,6 +3575,7 @@ START_HELP(pslatex)
 PS_COMMON_OPTS1
 "                               {<font_size>}",
 "",
+PS_COMMON_PROLOG_INFO
 PS_COMMON_DOC1
 " if `rotate` is specified, the y-axis label is rotated.",
 " <font_size> is the size (in pts) of the desired font.",
@@ -3630,6 +3645,7 @@ START_HELP(post)
 "                                | nofontfiles}",
 PS_COMMON_OPTS1
 PS_COMMON_OPTS2
+PS_COMMON_PROLOG_INFO
 "",
 " `landscape` and `portrait` choose the plot orientation.",
 " `eps` mode generates EPS (Encapsulated PostScript) output, which is just",
@@ -3934,6 +3950,23 @@ PS_COMMON_DOC1
 " If the font \"CMEX10\" is embedded (file \"cmex10.pfb\") gnuplot defines",
 " the additional font \"CMEX10-Baseline\". It is shifted vertically in order",
 " to fit better to the other glyphs (CMEX10 has its baseline at the top of",
-" the symbols)."
+" the symbols).",
+#ifdef GNUPLOT_PS_DIR
+"2 postscript prologue",
+"?commands set terminal postscript prologue",
+"?set terminal postscript prologue",
+"?terminal postscript prologue",
+"?postscript prologue",
+"?prologue",
+" Each PostScript output file includes a %%Prolog section and possibly some",
+" additional user-defined sections containing, for example, character",
+" encodings. These sections are copied from a set of PostScript prologue files",
+" stored elsewhere on your computer. The default directory where these files",
+" live is set at the time gnuplot is built. However, you can control this",
+" either by defining an environmental variable GNUPLOT_PS_DIR or by using the",
+" gnuplot command `set loadpath`. See `set loadpath`.",
+#endif
+"",
+""
 END_HELP(post)
 #endif /* TERM_HELP */
