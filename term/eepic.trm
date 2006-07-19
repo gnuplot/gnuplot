@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.27 2005/02/01 11:28:52 broeker Exp $
+ * $Id: eepic.trm,v 1.28 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -559,7 +559,9 @@ START_HELP(eepic)
 "1 eepic",
 "?commands set terminal eepic",
 "?set terminal eepic",
+"?set term eepic",
 "?terminal eepic",
+"?term eepic",
 "?eepic",
 " The `eepic` terminal driver supports the extended LaTeX picture environment.",
 " It is an alternative to the `latex` driver.",

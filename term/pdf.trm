@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.64 2006/07/06 04:51:27 sfeam Exp $
+ * $Id: pdf.trm,v 1.65 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /*------------------------------
@@ -1615,7 +1615,9 @@ START_HELP(pdf)
 "1 pdf",
 "?commands set terminal pdf",
 "?set terminal pdf",
+"?set term pdf",
 "?terminal pdf",
+"?term pdf",
 "?pdf",
 " This terminal produces files in the Adobe Portable Document Format",
 " (PDF), useable for printing or display with tools like Acrobat Reader",

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: debug.trm,v 1.15 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: debug.trm,v 1.16 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -312,7 +312,9 @@ START_HELP(debug)
 "1 debug",
 "?commands set terminal debug",
 "?set terminal debug",
+"?set term debug",
 "?terminal debug",
+"?term debug",
 "?debug",
 " This terminal is provided to allow for the debugging of `gnuplot`.  It is",
 " likely to be of use only for users who are modifying the source code."

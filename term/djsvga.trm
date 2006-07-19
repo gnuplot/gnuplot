@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: djsvga.trm,v 1.18 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: djsvga.trm,v 1.19 2006/07/07 03:51:21 sfeam Exp $
  */
 
 /* GNUPLOT - djsvga.trm */
@@ -459,7 +459,9 @@ START_HELP(svga)
 "1 svga",
 "?commands set terminal svga",
 "?set terminal svga",
+"?set term svga",
 "?terminal svga",
+"?term svga",
 "?svga",
 " The `svga` terminal driver supports PCs with SVGA graphics.  It can only be",
 " used if it is compiled with DJGPP.  Its only option is the font.",

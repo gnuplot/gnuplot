@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hpgl.trm,v 1.20 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: hpgl.trm,v 1.21 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -2613,11 +2613,15 @@ START_HELP(hpgl)
 "1 hpgl",
 "?commands set terminal hpgl",
 "?set terminal hpgl",
+"?set term hpgl",
 "?terminal hpgl",
+"?term hpgl",
 "?hpgl",
 "?commands set terminal pcl5",
 "?set terminal pcl5",
+"?set term pcl5",
 "?terminal pcl5",
+"?term pcl5",
 "?pcl5",
 " The `hpgl` driver produces HPGL output for devices like the HP7475A plotter.",
 " There are two options which can be set: the number of pens and `eject`,",

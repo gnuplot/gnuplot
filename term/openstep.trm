@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: openstep.trm,v 1.16 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: openstep.trm,v 1.17 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -1377,10 +1377,15 @@ START_HELP(openstep)
 #ifndef TERM_HELP_OPENSTEP
 "?commands set terminal openstep",
 "?set terminal openstep",
+"?set term openstep",
 "?terminal openstep",
+"?term openstep",
 "?openstep",
+"?OpenStep",
+"?Openstep",
 /*
 "?next",
+"?NeXT",
 */
 #endif
 " Several options may be set in the openstep (next) driver.",

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: latex.trm,v 1.28 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: latex.trm,v 1.29 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -854,11 +854,15 @@ START_HELP(latex)
 "1 latex",
 "?commands set terminal emtex",
 "?set terminal emtex",
+"?set term emtex",
 "?terminal emtex",
+"?term emtex",
 "?emtex",
 "?commands set terminal latex",
 "?set terminal latex",
+"?set term latex",
 "?terminal latex",
+"?term latex",
 "?latex",
 " The `latex` and `emtex` drivers allow two options.",
 "",

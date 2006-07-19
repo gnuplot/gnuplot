@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: unixplot.trm,v 1.14 2006/02/20 20:17:58 sfeam Exp $
+ * $Id: unixplot.trm,v 1.15 2006/07/07 03:51:23 sfeam Exp $
  *
  */
 
@@ -179,7 +179,9 @@ START_HELP(unixplot)
 "1 unixplot",
 "?commands set terminal unixplot",
 "?set terminal unixplot",
+"?set term unixplot",
 "?terminal unixplot",
+"?term unixplot",
 "?unixplot",
 " The `unixplot` terminal driver generates output in the Unix \"plot\" graphics",
 " language.  It has no options.",

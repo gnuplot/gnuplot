@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ggi.trm,v 1.24 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: ggi.trm,v 1.25 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -1507,7 +1507,9 @@ START_HELP(ggi)
 "1 ggi",
 "?commands set terminal ggi",
 "?set terminal ggi",
+"?set term ggi",
 "?terminal ggi",
+"?term ggi",
 "?ggi",
 " The `ggi` driver can run on different targets as X or svgalib.",
 "",

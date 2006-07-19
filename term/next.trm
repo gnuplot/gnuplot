@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*- objc -*-
- * $Id: next.trm,v 1.25 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: next.trm,v 1.26 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -1504,8 +1504,11 @@ START_HELP(next)
 "1 next",
 "?commands set terminal next",
 "?set terminal next",
+"?set term next",
 "?terminal next",
+"?term next",
 "?next",
+"?NeXT",
 " Several options may be set in the next driver.",
 "",
 " Syntax:",

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: rgip.trm,v 1.15 2006/02/20 20:17:58 sfeam Exp $
+ * $Id: rgip.trm,v 1.16 2006/07/07 03:51:23 sfeam Exp $
  */
 
 /* GNUPLOT - rgip.trm Uniplex graphics metafile */
@@ -588,11 +588,15 @@ START_HELP(rgip)
 "1 rgip",
 "?commands set terminal rgip",
 "?set terminal rgip",
+"?set term rgip",
 "?terminal rgip",
+"?term rgip",
 "?rgip",
 "?commands set terminal uniplex",
 "?set terminal uniplex",
+"?set term uniplex",
 "?terminal uniplex",
+"?term uniplex",
 "?uniplex",
 " The `rgip` and `uniplex` terminal drivers support RGIP metafiles.  They can",
 " combine several graphs on a single page, but only one page is allowed in a",

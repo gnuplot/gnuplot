@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hpljii.trm,v 1.22 2004/07/01 17:10:15 broeker Exp $
+ * $Id: hpljii.trm,v 1.23 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -404,11 +404,15 @@ START_HELP(hpljii)
 "1 hpljii",
 "?commands set terminal hpljii",
 "?set terminal hpljii",
+"?set term hpljii",
 "?terminal hpljii",
+"?term hpljii",
 "?hpljii",
 "?commands set terminal hpdj",
 "?set terminal hpdj",
+"?set term hpdj",
 "?terminal hpdj",
+"?term hpdj",
 "?hpdj",
 " The `hpljii` terminal driver supports the HP Laserjet Series II printer.  The",
 " `hpdj` driver supports the HP DeskJet 500 printer.  These drivers allow a",

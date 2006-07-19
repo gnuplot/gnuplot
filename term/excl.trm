@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: excl.trm,v 1.14 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: excl.trm,v 1.15 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -276,7 +276,9 @@ START_HELP(excl)
 "1 excl",
 "?commands set terminal excl",
 "?set terminal excl",
+"?set term excl",
 "?terminal excl",
+"?term excl",
 "?excl",
 " The `excl` terminal driver supports Talaris printers such as the EXCL Laser",
 " printer and the 1590.  It has no options."

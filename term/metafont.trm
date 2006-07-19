@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metafont.trm,v 1.18 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: metafont.trm,v 1.19 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - metafont.trm */
@@ -543,7 +543,9 @@ START_HELP(mf)
 "1 mf",
 "?commands set terminal mf",
 "?set terminal mf",
+"?set term mf",
 "?terminal mf",
+"?term mf",
 "?mf",
 "?metafont",
 " The `mf` terminal driver creates an input file to the METAFONT program.  Thus a",
@@ -568,6 +570,7 @@ START_HELP(mf)
 "2 METAFONT Instructions",
 "?commands set terminal mf detailed",
 "?set terminal mf detailed",
+"?set term mf detailed",
 "?mf detailed",
 "?metafont detailed",
 "",

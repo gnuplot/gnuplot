@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: aed.trm,v 1.12 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: aed.trm,v 1.13 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -206,11 +206,15 @@ START_HELP(aed767)
 "1 aed767",
 "?commands set terminal aed767",
 "?set terminal aed767",
+"?set term aed767",
 "?terminal aed767",
+"?term aed767",
 "?aed767",
 "?commands set terminal aed512",
 "?set terminal aed512",
+"?set term aed512",
 "?terminal aed512",
+"?term aed512",
 "?aed512",
 " The `aed512` and `aed767` terminal drivers support AED graphics terminals.",
 " The two drivers differ only in their horizontal ranges, which are 512 and",

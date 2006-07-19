@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.35 2006/02/20 23:33:25 sfeam Exp $
+ * $Id: metapost.trm,v 1.36 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -979,7 +979,9 @@ START_HELP(mp)
 "1 mp",
 "?commands set terminal mpost",
 "?set terminal mp",
+"?set term mp",
 "?terminal mp",
+"?term mp",
 "?mp",
 "?metapost",
 "",
@@ -1105,6 +1107,7 @@ START_HELP(mp)
 "2 Metapost Instructions",
 "?commands set terminal mp detailed",
 "?set terminal mp detailed",
+"?set term mp detailed",
 "?mp detailed",
 "?metapost detailed",
 "",

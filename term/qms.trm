@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: qms.trm,v 1.10 2004/07/01 17:10:34 broeker Exp $
+ * $Id: qms.trm,v 1.11 2006/07/07 03:51:23 sfeam Exp $
  *
  */
 
@@ -228,7 +228,9 @@ START_HELP(qms)
 "1 qms",
 "?commands set terminal qms",
 "?set terminal qms",
+"?set term qms",
 "?terminal qms",
+"?term qms",
 "?qms",
 " The `qms` terminal driver supports the QMS/QUIC Laser printer, the Talaris",
 " 1200 and others.  It has no options."

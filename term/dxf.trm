@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dxf.trm,v 1.14 2004/07/01 17:10:13 broeker Exp $
+ * $Id: dxf.trm,v 1.15 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -407,7 +407,9 @@ START_HELP(dxf)
 "1 dxf",
 "?commands set terminal dxf",
 "?set terminal dxf",
+"?set term dxf",
 "?terminal dxf",
+"?term dxf",
 "?dxf",
 " The `dxf` terminal driver creates pictures that can be imported into AutoCad",
 " (Release 10.x).  It has no options of its own, but some features of its plots",

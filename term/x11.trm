@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.156 2006/06/28 19:41:37 sfeam Exp $
+ * $Id: x11.trm,v 1.157 2006/07/07 03:51:23 sfeam Exp $
  *
  */
 
@@ -1972,8 +1972,11 @@ START_HELP(x11)
 "1 x11",
 "?commands set terminal x11",
 "?set terminal x11",
+"?set term x11",
 "?terminal x11",
+"?term x11",
 "?x11",
+"?X11",
 " `gnuplot` provides the `x11` terminal type for use with X servers.  This",
 " terminal type is set automatically at startup if the `DISPLAY` environment",
 " variable is set, if the `TERM` environment variable is set to `xterm`, or",
@@ -2054,6 +2057,7 @@ START_HELP(x11)
 "2 x11_fonts",
 "?commands set terminal x11 x11_fonts",
 "?set terminal x11 x11_fonts",
+"?set term x11 x11_fonts",
 "?x11 x11_fonts",
 "?x11_fonts",
 "=fonts",
@@ -2112,6 +2116,7 @@ START_HELP(x11)
 "2 command-line_options",
 "?commands set terminal x11 command-line-options",
 "?set terminal x11 command-line-options",
+"?set term x11 command-line-options",
 "?x11 command-line-options",
 "?command-line-options",
 " In addition to the X Toolkit options, the following options may be specified",
@@ -2194,6 +2199,7 @@ START_HELP(x11)
 "2 monochrome_options",
 "?commands set terminal x11 monochrome_options",
 "?set terminal x11 monochrome_options",
+"?set term x11 monochrome_options",
 "?x11 monochrome_options",
 "?monochrome_options",
 "=X resources",
@@ -2204,6 +2210,7 @@ START_HELP(x11)
 "2 color_resources",
 "?commands set terminal x11 color_resources",
 "?set terminal x11 color_resources",
+"?set term x11 color_resources",
 "?x11 color_resources",
 "?color_resources",
 "=X resources",
@@ -2270,6 +2277,7 @@ START_HELP(x11)
 "2 grayscale_resources",
 "?commands set terminal x11 grayscale_resources",
 "?set terminal x11 grayscale_resources",
+"?set term x11 grayscale_resources",
 "?x11 grayscale_resources",
 "?grayscale_resources",
 "=X resources",
@@ -2320,6 +2328,7 @@ START_HELP(x11)
 "2 line_resources",
 "?commands set terminal x11 line_resources",
 "?set terminal x11 line_resources",
+"?set term x11 line_resources",
 "?x11 line_resources",
 "?line_resources",
 "=X resources",
@@ -2412,6 +2421,7 @@ START_HELP(x11)
 "2 x11 pm3d_resources",
 "?commands set terminal x11 pm3d_resources",
 "?set terminal x11 pm3d_resources",
+"?set term x11 pm3d_resources",
 "?x11 pm3d_resources",
 "?pm3d_resources",
 "?x11 pm3d",
@@ -2473,6 +2483,7 @@ START_HELP(x11)
 "2 x11 other_resources",
 "?commands set terminal x11 other_resources",
 "?set terminal x11 other_resources",
+"?set term x11 other_resources",
 "?x11 other_resources",
 "=X resources",
 " By default the contents of the current plot window are exported to the X11",

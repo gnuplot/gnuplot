@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: amiga.trm,v 1.18 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: amiga.trm,v 1.19 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -812,7 +812,9 @@ START_HELP(amiga)
 "1 amiga",
 "?commands set terminal amiga",
 "?set terminal amiga",
+"?set term amiga",
 "?terminal amiga",
+"?term amiga",
 "?amiga",
 " The `amiga` terminal, for Commodore Amiga computers, allows the user to",
 " plot either to a screen (default), or, if Kickstart 3.0 or higher is",

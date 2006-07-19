@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.73 2006/04/26 02:07:18 vanzandt Exp $
+ * $Id: cgm.trm,v 1.74 2006/07/07 03:51:21 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1744,7 +1744,9 @@ START_HELP(cgm)
 "1 cgm",
 "?commands set terminal cgm",
 "?set terminal cgm",
+"?set term cgm",
 "?terminal cgm",
+"?term cgm",
 "?cgm",
 " The `cgm` terminal generates a Computer Graphics Metafile, Version 1. ",
 " This file format is a subset of the ANSI X3.122-1986 standard entitled",
@@ -1787,6 +1789,7 @@ START_HELP(cgm)
 "2 font",
 "?commands set terminal cgm font",
 "?set terminal cgm font",
+"?set term cgm font",
 "?cgm font",
 " The first part of a Computer Graphics Metafile, the metafile description,",
 " includes a font table.  In the picture body, a font is designated by an",
@@ -1938,6 +1941,7 @@ START_HELP(cgm)
 "2 fontsize",
 "?commands set terminal cgm fontsize",
 "?set terminal cgm fontsize",
+"?set term cgm fontsize",
 "?cgm fontsize",
 " Fonts are scaled assuming the page is 6 inches wide.  If the `size`",
 " command is used to change the aspect ratio of the page or the CGM file",
@@ -1948,6 +1952,7 @@ START_HELP(cgm)
 "2 linewidth",
 "?commands set terminal cgm linewidth",
 "?set terminal cgm linewidth",
+"?set term cgm linewidth",
 "?cgm linewidth",
 " The `linewidth` option sets the width of lines in pt.  The default width",
 " is 1 pt.  Scaling is affected by the actual width of the page, as",
@@ -1956,6 +1961,7 @@ START_HELP(cgm)
 "2 rotate",
 "?commands set terminal cgm rotate",
 "?set terminal cgm rotate",
+"?set term cgm rotate",
 "?cgm rotate",
 " The `norotate` option may be used to disable text rotation.  For",
 " example, the CGM input filter for Word for Windows 6.0c can accept",
@@ -1967,8 +1973,8 @@ START_HELP(cgm)
 " the default behavior.",
 
 "2 solid",
-"?commands set terminal cgm solid",
 "?set terminal cgm solid",
+"?set term cgm solid",
 "?cgm solid",
 " The `solid` option may be used to disable dashed line styles in the",
 " plots.  This is useful when color is enabled and the dashing of the",
@@ -1979,6 +1985,7 @@ START_HELP(cgm)
 "2 size",
 "?commands set terminal cgm size",
 "?set terminal cgm size",
+"?set term cgm size",
 "?cgm size",
 " Default size of a CGM plot is 32599 units wide and 23457 units high for",
 " landscape, or 23457 units wide by 32599 units high for portrait.",
@@ -1986,6 +1993,7 @@ START_HELP(cgm)
 "2 width",
 "?commands set terminal cgm width",
 "?set terminal cgm width",
+"?set term cgm width",
 "?cgm width",
 " All distances in the CGM file are in abstract units.  The application",
 " that reads the file determines the size of the final plot.  By default,",
@@ -2004,9 +2012,11 @@ START_HELP(cgm)
 "2 nofontlist",
 "?commands set terminal cgm nofontlist",
 "?set terminal cgm nofontlist",
+"?set term cgm nofontlist",
 "?cgm nofontlist",
 "?commands set terminal cgm winword6",
 "?set terminal cgm winword6",
+"?set term cgm winword6",
 "?cgm winword6",
 " The default font table includes the fonts recommended for WebCGM, which",
 " are compatible with the Computer Graphics Metafile input filter for",

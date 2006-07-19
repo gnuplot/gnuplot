@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ai.trm,v 1.18 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: ai.trm,v 1.19 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -531,7 +531,9 @@ START_HELP(aifm)
 "1 aifm",
 "?commands set terminal aifm",
 "?set terminal aifm",
+"?set term aifm",
 "?terminal aifm",
+"?term aifm",
 "?aifm",
 " Several options may be set in `aifm`---the Adobe Illustrator 3.0+ driver.",
 "",

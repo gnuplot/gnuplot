@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pbm.trm,v 1.24 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: pbm.trm,v 1.25 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -468,7 +468,9 @@ START_HELP(pbm)
 "1 pbm",
 "?commands set terminal pbm",
 "?set terminal pbm",
+"?set term pbm",
 "?terminal pbm",
+"?term pbm",
 "?pbm",
 " Several options may be set in the `pbm` terminal---the driver for PBMplus.",
 "",

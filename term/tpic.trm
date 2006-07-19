@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tpic.trm,v 1.19 2006/02/20 20:17:58 sfeam Exp $
+ * $Id: tpic.trm,v 1.20 2006/07/07 03:51:23 sfeam Exp $
  */
 
 /* GNUPLOT - tpic.trm */
@@ -931,7 +931,9 @@ START_HELP(tpic)
 "1 tpic",
 "?commands set terminal tpic",
 "?set terminal tpic",
+"?set term tpic",
 "?terminal tpic",
+"?term tpic",
 "?tpic",
 " The `tpic` terminal driver supports the LaTeX picture environment with tpic",
 " \\specials.  It is an alternative to the `latex` and `eepic` terminal drivers.",

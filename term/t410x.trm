@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: t410x.trm,v 1.14 2006/02/20 20:17:58 sfeam Exp $
+ * $Id: t410x.trm,v 1.15 2006/07/07 03:51:23 sfeam Exp $
  *
  */
 
@@ -318,7 +318,9 @@ START_HELP(tek410x)
 "1 tek410x",
 "?commands set terminal tek410x",
 "?set terminal tek410x",
+"?set term tek410x",
 "?terminal tek410x",
+"?term tek410x",
 "?tek410x",
 " The `tek410x` terminal driver supports the 410x and 420x family of Tektronix",
 " terminals.  It has no options."

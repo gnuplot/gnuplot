@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: mif.trm,v 1.31 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: mif.trm,v 1.32 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -968,7 +968,9 @@ START_HELP(mif)
 "1 mif",
 "?commands set terminal mif",
 "?set terminal mif",
+"?set term mif",
 "?terminal mif",
+"?term mif",
 "?mif",
 " The `mif` terminal driver produces Frame Maker MIF format version 3.00.  It",
 " plots in MIF Frames with the size 15*10 cm, and plot primitives with the same",

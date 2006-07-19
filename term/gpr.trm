@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gpr.trm,v 1.11 2004/07/01 17:10:15 broeker Exp $
+ * $Id: gpr.trm,v 1.12 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -465,7 +465,9 @@ START_HELP(gpr)
 "1 gpr",
 "?commands set terminal gpr",
 "?set terminal gpr",
+"?set term gpr",
 "?terminal gpr",
+"?term gpr",
 "?gpr",
 " The `gpr` terminal driver supports the Apollo Graphics Primitive Resource",
 " for a fixed-size window.  It has no options.",

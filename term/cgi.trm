@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: cgi.trm,v 1.12 2004/07/01 17:10:12 broeker Exp $
+ * $Id: cgi.trm,v 1.13 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -322,11 +322,15 @@ START_HELP(cgi)
 "1 cgi",
 "?commands set terminal cgi",
 "?set terminal cgi",
+"?set term cgi",
 "?terminal cgi",
+"?term cgi",
 "?cgi",
 "?commands set terminal hcgi",
 "?set terminal hcgi",
+"?set term hcgi",
 "?terminal hcgi",
+"?term hcgi",
 "?hcgi",
 " The `cgi` and `hcgi` terminal drivers support SCO CGI drivers.  `hcgi` is for",
 " printers; the environment variable CGIPRNT must be set.  `cgi` may be used",

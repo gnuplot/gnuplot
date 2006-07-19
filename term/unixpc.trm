@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: unixpc.trm,v 1.12 2006/02/20 20:17:58 sfeam Exp $
+ * $Id: unixpc.trm,v 1.13 2006/07/07 03:51:23 sfeam Exp $
  *
  */
 
@@ -618,7 +618,9 @@ START_HELP(unixpc)
 "1 unixpc",
 "?commands set terminal unixpc",
 "?set terminal unixpc",
+"?set term unixpc",
 "?terminal unixpc",
+"?term unixpc",
 "?unixpc",
 " The `unixpc` terminal driver supports AT&T 3b1 and AT&T 7300 Unix PC.  It has",
 " no options."

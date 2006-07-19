@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.51 2006/03/11 22:11:45 mikulik Exp $
+ * $Id: pm.trm,v 1.52 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -1287,7 +1287,9 @@ START_HELP(pm)
 "1 pm",
 "?commands set terminal pm",
 "?set terminal pm",
+"?set term pm",
 "?terminal pm",
+"?term pm",
 "?pm",
 " The `pm` terminal driver provides an OS/2 Presentation Manager window in",
 " which the graph is plotted.  The window is opened when the first graph is",

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: texdraw.trm,v 1.17 2006/02/20 20:17:58 sfeam Exp $
+ * $Id: texdraw.trm,v 1.18 2006/07/07 03:51:23 sfeam Exp $
  */
 
 /* GNUPLOT - texdraw.trm */
@@ -371,7 +371,9 @@ START_HELP(texdraw)
 "1 texdraw",
 "?commands set terminal texdraw",
 "?set terminal texdraw",
+"?set term texdraw",
 "?terminal texdraw",
+"?term texdraw",
 "?texdraw",
 " The `texdraw` terminal driver supports the LaTeX texdraw environment.  It is",
 " intended for use with \"texdraw.sty\" and \"texdraw.tex\" in the texdraw package.",

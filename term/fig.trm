@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.54 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: fig.trm,v 1.55 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1203,7 +1203,9 @@ START_HELP(fig)
 "1 fig",
 "?commands set terminal fig",
 "?set terminal fig",
+"?set term fig",
 "?terminal fig",
+"?term fig",
 "?fig",
 "?xfig",
 " The `fig` terminal device generates output in the Fig graphics language.",

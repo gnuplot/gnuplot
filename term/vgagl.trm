@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vgagl.trm,v 1.18 2006/05/23 02:44:49 tlecomte Exp $
+ * $Id: vgagl.trm,v 1.19 2006/07/07 03:51:23 sfeam Exp $
  */
 
 #if defined(USE_MOUSE)
@@ -1553,7 +1553,9 @@ START_HELP(vgagl)
 "1 vgagl",
 "?commands set terminal vgagl",
 "?set terminal vgagl",
+"?set term vgagl",
 "?terminal vgagl",
+"?term vgagl",
 "?vgagl",
 " The `vgagl` driver is a fast linux console driver with full mouse and pm3d",
 " support.  It looks at the environment variable SVGALIB_DEFAULT_MODE for the",

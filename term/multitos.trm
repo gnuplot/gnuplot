@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: multitos.trm,v 1.13 2004/07/01 17:10:33 broeker Exp $
+ * $Id: multitos.trm,v 1.14 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - multitos.trm */
@@ -410,7 +410,9 @@ START_HELP(mtos)
 "1 mtos",
 "?commands set terminal mtos",
 "?set terminal mtos",
+"?set term mtos",
 "?terminal mtos",
+"?term mtos",
 "?mtos",
 " The `mtos` terminal has no options.  It sends data via a pipe to an external",
 " program called GPCLIENT.  It runs under MULTITOS, Magic 3.x, MagicMAC. and",

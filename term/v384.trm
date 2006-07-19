@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: v384.trm,v 1.10 2004/07/01 17:10:34 broeker Exp $
+ * $Id: v384.trm,v 1.11 2006/07/07 03:51:23 sfeam Exp $
  *
  */
 
@@ -197,7 +197,9 @@ START_HELP(vx384)
 "1 vx384",
 "?commands set terminal vx384",
 "?set terminal vx384",
+"?set term vx384",
 "?terminal vx384",
+"?term vx384",
 "?vx384",
 " The `vx384` terminal driver supports the Vectrix 384 and Tandy color",
 " printers.  It has no options."

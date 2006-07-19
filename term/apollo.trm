@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: apollo.trm,v 1.12 2004/07/01 17:10:12 broeker Exp $
+ * $Id: apollo.trm,v 1.13 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -598,7 +598,9 @@ START_HELP(apollo)
 "1 apollo",
 "?commands set terminal apollo",
 "?set terminal apollo",
+"?set term apollo",
 "?terminal apollo",
+"?term apollo",
 "?apollo",
 " The `apollo` terminal driver supports the Apollo Graphics Primitive Resource",
 " with rescaling after window resizing.  It has no options.",

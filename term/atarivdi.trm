@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: atarivdi.trm,v 1.17 2004/07/01 17:10:12 broeker Exp $
+ * $Id: atarivdi.trm,v 1.18 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -455,7 +455,9 @@ START_HELP(vdi)
 "1 atari ST (via VDI)",
 "?commands set terminal vdi",
 "?set terminal vdi",
+"?set term vdi",
 "?terminal vdi",
+"?term vdi",
 "?vdi",
 " The `vdi` terminal is the same as the `atari` terminal, except that it sends",
 " output to the screen via the VDI and not into AES-Windows.",

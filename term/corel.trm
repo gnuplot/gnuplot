@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: corel.trm,v 1.15 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: corel.trm,v 1.16 2006/07/07 03:51:21 sfeam Exp $
  */
 
 /*
@@ -434,7 +434,9 @@ START_HELP(corel)
 "1 corel",
 "?commands set terminal corel",
 "?set terminal corel",
+"?set term corel",
 "?terminal corel",
+"?term corel",
 "?corel",
 " The `corel` terminal driver supports CorelDraw.",
 "",

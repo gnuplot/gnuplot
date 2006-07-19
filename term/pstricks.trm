@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  *
- * $Id: pstricks.trm,v 1.30 2006/02/20 20:17:58 sfeam Exp $
+ * $Id: pstricks.trm,v 1.31 2006/07/07 03:51:23 sfeam Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -680,7 +680,9 @@ START_HELP(pstricks)
 "1 pstricks",
 "?commands set terminal pstricks",
 "?set terminal pstricks",
+"?set term pstricks",
 "?terminal pstricks",
+"?term pstricks",
 "?pstricks",
 " The `pstricks` driver is intended for use with the \"pstricks.sty\" macro",
 " package for LaTeX.  It is an alternative to the `eepic` and `latex` drivers.",

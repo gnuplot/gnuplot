@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hp500c.trm,v 1.15 2004/07/01 17:10:15 broeker Exp $
+ * $Id: hp500c.trm,v 1.16 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -530,7 +530,9 @@ START_HELP(hp500c)
 "1 hp500c",
 "?commands set terminal hp500c",
 "?set terminal hp500c",
+"?set term hp500c",
 "?terminal hp500c",
+"?term hp500c",
 "?hp500c",
 " The `hp500c` terminal driver supports the Hewlett Packard HP DeskJet 500c.",
 " It has options for resolution and compression.",

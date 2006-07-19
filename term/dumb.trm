@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.23 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: dumb.trm,v 1.24 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -563,7 +563,9 @@ START_HELP(dumb)
 "1 dumb",
 "?commands set terminal dumb",
 "?set terminal dumb",
+"?set term dumb",
 "?terminal dumb",
+"?term dumb",
 "?dumb",
 " The `dumb` terminal driver has an optional size specification and trailing",
 " linefeed control.",

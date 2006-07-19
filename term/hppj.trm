@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hppj.trm,v 1.13 2004/07/01 17:10:15 broeker Exp $
+ * $Id: hppj.trm,v 1.14 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -276,7 +276,9 @@ START_HELP(hppj)
 "1 hppj",
 "?commands set terminal hppj",
 "?set terminal hppj",
+"?set term hppj",
 "?terminal hppj",
+"?term hppj",
 "?hppj",
 " The `hppj` terminal driver supports the HP PaintJet and HP3630 printers.  The",
 " only option is the choice of font.",

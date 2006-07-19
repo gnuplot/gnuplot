@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: linux.trm,v 1.27 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: linux.trm,v 1.28 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -339,7 +339,9 @@ START_HELP(linux)
 "1 linux",
 "?commands set terminal linux",
 "?set terminal linux",
+"?set term linux",
 "?terminal linux",
+"?term linux",
 "?linux",
 " The `linux` driver has no additional options to specify.  It looks at the",
 " environment variable GSVGAMODE for the default mode; if not set, it uses",

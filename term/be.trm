@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: be.trm,v 1.16 2005/05/24 20:54:03 sfeam Exp $
+ * $Id: be.trm,v 1.17 2006/07/07 03:51:21 sfeam Exp $
  *
  */
 
@@ -393,8 +393,11 @@ START_HELP(be)
 "1 be",
 "?commands set terminal be",
 "?set terminal be",
+"?set term be",
 "?terminal be",
+"?term be",
 "?be",
+"?BE",
 " `gnuplot` provides the `be` terminal type for use with X servers.  This",
 " terminal type is set automatically at startup if the `DISPLAY` environment",
 " variable is set, if the `TERM` environment variable is set to `xterm`, or",
@@ -437,6 +440,7 @@ START_HELP(be)
 "2 command-line_options",
 "?commands set terminal be command-line-options",
 "?set terminal be command-line-options",
+"?set term be command-line-options",
 "?be command-line-options",
 " In addition to the X Toolkit options, the following options may be specified",
 " on the command line when starting `gnuplot` or as resources in your",
@@ -484,6 +488,7 @@ START_HELP(be)
 "2 monochrome_options",
 "?commands set terminal be monochrome_options",
 "?set terminal be monochrome_options",
+"?set term be monochrome_options",
 "?be monochrome_options",
 " For monochrome displays, `gnuplot` does not honor foreground or background",
 " colors.  The default is black-on-white.  `-rv` or `gnuplot*reverseVideo: on`",
@@ -492,6 +497,7 @@ START_HELP(be)
 "2 color_resources",
 "?commands set terminal be color_resources",
 "?set terminal be color_resources",
+"?set term be color_resources",
 "?be color_resources",
 " For color displays, `gnuplot` honors the following resources (shown here",
 " with their default values) or the greyscale resources.  The values may be",
@@ -548,6 +554,7 @@ START_HELP(be)
 "2 grayscale_resources",
 "?commands set terminal be grayscale_resources",
 "?set terminal be grayscale_resources",
+"?set term be grayscale_resources",
 "?be grayscale_resources",
 " When `-gray` is selected, `gnuplot` honors the following resources for",
 " grayscale or color displays (shown here with their default values).  Note",
@@ -596,6 +603,7 @@ START_HELP(be)
 "2 line_resources",
 "?commands set terminal be line_resources",
 "?set terminal be line_resources",
+"?set term be line_resources",
 "?be line_resources",
 " `gnuplot` honors the following resources for setting the width (in pixels) of",
 " plot lines (shown here with their default values.)  0 or 1 means a minimal",

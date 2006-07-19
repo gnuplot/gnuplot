@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: emxvga.trm,v 1.13 2004/07/01 17:10:13 broeker Exp $
+ * $Id: emxvga.trm,v 1.14 2006/07/07 03:51:21 sfeam Exp $
  */
 
 /* GNUPLOT - emxvga.trm */
@@ -478,15 +478,21 @@ START_HELP(emxvga)
 "1 emxvga",
 "?commands set terminal emxvga",
 "?set terminal emxvga",
+"?set term emxvga",
 "?terminal emxvga",
+"?term emxvga",
 "?emxvga",
 "?commands set terminal emxvesa",
 "?set terminal emxvesa",
+"?set term emxvesa",
 "?terminal emxvesa",
+"?term emxvesa",
 "?emxvesa",
 "?commands set terminal vgal",
 "?set terminal vgal",
+"?set term vgal",
 "?terminal vgal",
+"?term vgal",
 "?vgal",
 " The `emxvga`, `emxvesa` and `vgal` terminal drivers support PCs with SVGA,",
 " vesa SVGA and VGA graphics boards, respectively.  They are intended to be",

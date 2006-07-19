@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: imagen.trm,v 1.18 2006/02/20 21:05:27 sfeam Exp $
+ * $Id: imagen.trm,v 1.19 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - imagen.trm */
@@ -889,7 +889,9 @@ START_HELP(imagen)
 "1 imagen",
 "?commands set terminal imagen",
 "?set terminal imagen",
+"?set term imagen",
 "?terminal imagen",
+"?term imagen",
 "?imagen",
 " The `imagen` terminal driver supports Imagen laser printers.  It is capable",
 " of placing multiple graphs on a single page.",

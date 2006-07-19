@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hp26.trm,v 1.16 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: hp26.trm,v 1.17 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - HP26.trm */
@@ -701,7 +701,9 @@ START_HELP(hp2623a)
 "1 hp2623a",
 "?commands set terminal hp2623a",
 "?set terminal hp2623a",
+"?set term hp2623a",
 "?terminal hp2623a",
+"?term hp2623a",
 "?hp2623a",
 " The `hp2623a` terminal driver supports the Hewlett Packard HP2623A.  It has",
 " no options."

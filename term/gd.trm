@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.91 2006/07/05 03:28:52 sfeam Exp $
+ * $Id: gd.trm,v 1.92 2006/07/07 03:51:22 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2012,7 +2012,9 @@ START_HELP(png)
 "1 png (NEW)",
 "?commands set terminal png",
 "?set terminal png",
+"?set term png",
 "?terminal png",
+"?term png",
 "?png",
 " Syntax:",
 "       set terminal png ",
@@ -2186,7 +2188,9 @@ START_HELP(jpeg)
 "1 jpeg",
 "?commands set terminal jpeg",
 "?set terminal jpeg",
+"?set term jpeg",
 "?terminal jpeg",
+"?term jpeg",
 "?jpeg",
 "",
 " Syntax:",
@@ -2360,7 +2364,9 @@ START_HELP(gif)
 "1 gif",
 "?commands set terminal gif",
 "?set terminal gif",
+"?set term gif",
 "?terminal gif",
+"?term gif",
 "?gif",
 "",
 " Syntax:",

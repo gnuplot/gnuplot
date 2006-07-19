@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: mac.trm,v 1.7 2004/07/01 17:10:15 broeker Exp $
+ * $Id: mac.trm,v 1.8 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -139,7 +139,9 @@ TERM_TABLE_END(mac_driver)
 START_HELP(mac)
 "1 macintosh",
 "?set terminal macintosh",
+"?set term macintosh",
 "?terminal macintosh",
+"?term macintosh",
 "?macintosh",
 " Several options may be set in the 'macintosh' driver.",
 "",

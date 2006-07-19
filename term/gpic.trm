@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gpic.trm,v 1.16 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: gpic.trm,v 1.17 2006/07/07 03:51:22 sfeam Exp $
  */
 
 /* GNUPLOT - gpic.trm */
@@ -297,7 +297,9 @@ START_HELP(gpic)
 "1 gpic",
 "?commands set terminal gpic",
 "?set terminal gpic",
+"?set term gpic",
 "?terminal gpic",
+"?term gpic",
 "?gpic",
 " The `gpic` terminal driver generates GPIC graphs in the Free Software",
 " Foundations's \"groff\" package.  The default size is 5 x 3 inches.  The only",

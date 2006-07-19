@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: kyo.trm,v 1.10 2004/07/01 17:10:15 broeker Exp $
+ * $Id: kyo.trm,v 1.11 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -207,11 +207,15 @@ START_HELP(kyo)
 "1 kyo",
 "?commands set terminal kyo",
 "?set terminal kyo",
+"?set term kyo",
 "?terminal kyo",
+"?term kyo",
 "?kyo",
 "?commands set terminal prescribe",
 "?set terminal prescribe",
+"?set term prescribe",
 "?terminal prescribe",
+"?term prescribe",
 "?prescribe",
 " The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.",
 " The only difference between the two is that `kyo` uses \"Helvetica\" whereas",

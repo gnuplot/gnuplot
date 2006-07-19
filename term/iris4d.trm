@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: iris4d.trm,v 1.13 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: iris4d.trm,v 1.14 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -315,7 +315,9 @@ START_HELP(iris4d)
 "1 iris4d",
 "?commands set terminal iris4d",
 "?set terminal iris4d",
+"?set term iris4d",
 "?terminal iris4d",
+"?term iris4d",
 "?iris4d",
 " The `iris4d` terminal driver supports Silicon Graphics IRIS 4D computers.",
 " Its only option is 8- or 24-bit color depth.  The default is 8.",

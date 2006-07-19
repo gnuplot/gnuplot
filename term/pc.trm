@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pc.trm,v 1.21 2006/02/20 20:17:57 sfeam Exp $
+ * $Id: pc.trm,v 1.22 2006/07/07 03:51:22 sfeam Exp $
  *
  */
 
@@ -549,7 +549,9 @@ START_HELP(dospc)
 "1 dospc",
 "?commands set terminal dospc",
 "?set terminal dospc",
+"?set term dospc",
 "?terminal dospc",
+"?term dospc",
 "?dospc",
 " The `dospc` terminal driver supports PCs with arbitrary graphics boards,",
 " which will be automatically detected.  It should be used only if you are",
