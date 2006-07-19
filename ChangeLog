@@ -1,8 +1,6 @@
 2006-07-19  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc: Sync to current English version.
-	(Update to term-ja.diff is not needed, since the patchset it tracks
-	was reverted).
 
 2006-07-19  Ethan A Merritt <merritt@u.washington.edu>
 
@@ -11,6 +9,10 @@
 	Daniel has a patch to help.c which would obviate this fix, but I judge
 	that had better wait til after 4.2.  This returns us to a state that
 	was satisfactory for a long time.
+
+	* docs/term-ja.diff: EAM - Modify patch so that it applies without error,
+	but it still needs to be updated to track the recent changes to post.trm
+	that add a section describing GNUPLOT_PS_DIR.
 
 2006-07-18  Timothee Lecomte  <timothee.lecomte@ens.fr>
 

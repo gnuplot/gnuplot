@@ -4141,11 +4141,11 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
   "?commands set terminal postscript",
   "?set terminal postscript",
 ***************
-*** 3863,3867 ****
---- 4185,4519 ----
+*** 3863,3868 ****
+--- 4185,4520 ----
   " the additional font \"CMEX10-Baseline\". It is shifted vertically in order",
   " to fit better to the other glyphs (CMEX10 has its baseline at the top of",
-  " the symbols)."
+  " the symbols).",
 + #else
 + "1 postscript",
 + "?commands set terminal postscript",
@@ -4476,8 +4476,9 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
 + " うに垂直方向にずらされたものです (CMEX10 は、記号の天辺にベースライン",
 + " があります)。"
 + #endif
-  END_HELP(post)
-  #endif /* TERM_HELP */
+  #ifdef GNUPLOT_PS_DIR
+  "2 postscript prologue",
+  "?commands set terminal postscript prologue",
 diff -rc term-4.1.0-20060707/pstricks.trm term-4.1.0-ja-20060707/pstricks.trm
 *** term-4.1.0-20060707/pstricks.trm	2006-02-21 05:17:58.000000000 +0900
 --- term-4.1.0-ja-20060707/pstricks.trm	2006-07-07 11:18:00.000000000 +0900
