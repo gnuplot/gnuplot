@@ -1,3 +1,7 @@
+2006-07-19  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc: Sync to current English version.
+
 2006-07-18  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.h (wxtPanel): New state variable

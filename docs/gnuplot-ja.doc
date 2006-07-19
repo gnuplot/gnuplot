@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.112 2006-07-07 11:12:26+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.366
+C RCS $Id: gnuplot-ja.doc,v 1.115 2006-07-18 11:02:30+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.370
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C 
@@ -1237,12 +1237,14 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 defined
 ?expressions functions defined
 ?functions defined
+?defined
 #defined(X) & 変数名 & [非推奨] X が定義されていれば 1 そうでなければ 0 を返す\\
 %defined(X)@変数名@ [非推奨] X が定義されていれば 1 そうでなければ 0 を返す
  `defined(X)` [非推奨] は、X が定義されていれば 1 そうでなければ 0 を返します。
 4 exists 
 ?expressions functions exists
 ?functions exists
+?exists
 #exists("X") & "変数名" & 変数名 X が定義されていれば 1 そうでなければ 0 を返す\\
 %exists("X")@"変数名"@ 変数名 X が定義されていれば 1 そうでなければ 0 を返す
  `exists("X")` は、変数名 X が定義されていれば 1 そうでなければ 0 を返します。
@@ -1276,6 +1278,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 tm_hour
 ?expressions tm_hour
 ?functions tm_hour
+?tm_hour
 #tm\_hour(x) & 整数 & 時\\
 %tm_hour(x)@整数@時
  関数 `tm_hour` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
@@ -1283,6 +1286,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 tm_mday
 ?expressions tm_mday
 ?functions tm_mday
+?tm_mday
 #tm\_mday(x) & 整数 & 日 \\
 %tm_mday(x)@整数@日
  関数 `tm_mday` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
@@ -1290,6 +1294,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 tm_min
 ?expressions tm_min
 ?functions tm_min
+?tm_min
 #tm\_min(x) & 整数 & 分 \\
 %tm_min(x)@整数@分
  関数 `tm_min` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
@@ -1297,6 +1302,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 tm_mon
 ?expressions tm_mon
 ?functions tm_mon
+?tm_mon
 #tm\_mon(x) & 整数 & 月 \\
 %tm_mon(x)@整数@月
  関数 `tm_mon` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
@@ -1304,6 +1310,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 tm_sec
 ?expressions tm_sec
 ?functions tm_sec
+?tm_sec
 #tm\_sec(x) & 整数 & 秒 \\
 %tm_sec(x)@整数@秒
  関数 `tm_sec` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
@@ -1311,6 +1318,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 tm_wday
 ?expressions tm_wday
 ?functions tm_wday
+?tm_wday
 #tm\_wday(x) & 整数 & その週の何日目 \\
 %tm_wday(x)@整数@その週の何日目
  関数 `tm_wday` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
@@ -1318,6 +1326,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 tm_yday
 ?expressions tm_yday
 ?functions tm_yday
+?tm_yday
 #tm\_yday(x) & 整数 & その年の何日目 \\
 %tm_yday(x)@整数@その年の何日目
  関数 `tm_yday` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
@@ -1325,6 +1334,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 tm_year
 ?expressions tm_year
 ?functions tm_year
+?tm_year
 #tm\_year(x) & 整数 & 西暦 \\
 %tm_year(x)@整数@西暦
  関数 `tm_year` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
@@ -1347,7 +1357,6 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?expressions random
 ?functions random
 ?random
-
  組み込み関数 `rand(x)` の挙動は version 3.8l で変更されました。古い
  gnuplot スクリプトで、rand(x>0) により同じ種からなる疑似乱数列が生成さ
  れることを期待しているような場合は、代わりに rand(0) を使うように修正
@@ -2536,7 +2545,9 @@ C ... and restart the table:
  じめ設定された反復数の限界 FIT_MAXITER (`fit control variables` 参照)
  に達した場合、のいずれかを満たすまで続けられます。キーボードからその
  当てはめの反復は中断できますし、それに続いて中止することもできます
- (`fit` 参照)。
+ (`fit` 参照)。ユーザ変数 FIT_CONVERGED は、直前の fit コマンドが収束に
+ より終了した場合は 1 を含み、それ以外の理由で中断した場合は 0 を含みま
+ す。
 
  当てはめに使われる関数はしばしばあるモデル (またはある理論) を元にして
  いて、それはデータの振舞を記述したり、あるいは予測しようとします。よっ
@@ -2593,7 +2604,10 @@ C ... and restart the table:
  されたχ自乗' とも呼ばれる残差の分散をレポートします。自由度 (データ点
  の数から当てはめパラメータの数を引いたもの) はこれらの評価で使用されま
  す。なぜなら、データ点の残差の計算で使われるパラメータは同じデータから
- 得られるものだからです。
+ 得られるものだからです。これらの値は以下の変数に代入されます:
+       FIT_NDF = 自由度の数
+       FIT_WSSR = 重みつき残差の自乗和
+       FIT_STDFIT = sqrt(WSSR/NDF)
 
  パラメータに関する信頼レベルを評価することで、当てはめから得られる最小
  のχ自乗と、要求する信頼レベルのχ自乗の値を決定するためのχ自乗の統計
@@ -3468,7 +3482,7 @@ C ... and restart the table:
  3 x 1 の位置ベクトルです。ファイルのデータが 3 次元的なものでない場合
  は、論理的なルールが適用されて 3 次元空間内のデータと見なされます (例
  えば、通常は z 座標は 0 とされ、xy 平面内の 2 次元データと見なされます)。
-5 binary_examples
+5 binary examples
 ?binary_examples
 ?binary examples
 ?binary general examples
@@ -5558,6 +5572,7 @@ C ... and restart the table:
 ?show decimalsign
 ?unset decimalsign
 ?decimalsign
+=locale
  コマンド `set decimalsign` は、目盛りの見出し、あるいは `set label` 文
  字列に書かれる数の小数点記号を選択します。
 
@@ -5593,7 +5608,14 @@ C ... and restart the table:
  これは、gnuplot に、入力と出力の書式を、ロケール "foo" に従ったものに
  しますが、そのロケールがインストールされている必要があります。もしロケ
  ール "foo" が見つからなかった場合、エラーメッセージが出力され、小数点
- の設定は変更されません。
+ の設定は変更されません。linux システム上では、そこにインストールされて
+ いるロケールの一覧は "locale -a" で見ることができます。linux のロケー
+ ル文字列はだいたい "sl_SI.UTF-8" のような形式をしていますが、Windows
+ のロケール文字列は "Slovenian_Slovenia.1250"、または "slovenian" のよ
+ うな形式です。ロケール文字列の解釈は、C のランタイムライブラリが行うこ
+ とに注意してください。古い C ライブラリでは、ロケール設定のサポート
+ (例えば数字の 3 桁毎の区切り文字など) を部分的にしか提供していないかも
+ しれません。
 
        set decimalsign locale; set decimalsign "."
 
@@ -6517,7 +6539,7 @@ C ... and restart the table:
 
  以下はデフォルトの (第一の) 座標系での (2,3.5,2) の位置に説明を表示
  します:
-       set key 2,3.5,2
+       set key at 2,3.5,2
 
  以下は説明をグラフの下に表示します:
        set key below
@@ -6938,9 +6960,9 @@ C ... and restart the table:
  `bind` コマンドでは無効にできません。
 
  `bind` や `label` も参照してください。
-4 x11_mouse
+4 X11 mouse
 ?mouse x11_mouse
-?x11_mouse
+?x11 mouse
  x11 の出力形式のオプション `set term x11 <n>` を使って複数の X11 描画
  ウィンドウが開いている場合、マウスコマンドとホットキーの機能をちゃんと
  使えるのは現在の描画ウィンドウのみです。しかし、他のウィンドウも左下に
@@ -7832,7 +7854,7 @@ C ... and restart the table:
        set palette file "palette.bin" binary record=64 using 1:2:3
 
 
-4 gamma-correction
+4 gamma correction
 ?commands set palette gamma-correction
 ?set palette gamma-correction
 ?palette gamma-correction
@@ -9411,11 +9433,9 @@ C ... and restart the table:
  `set tics scale` を使ってください。
 3 timestamp
 ?commands set timestamp
-?commands set time
 ?commands unset timestamp
 ?commands show timestamp
 ?set timestamp
-?set time
 ?unset timestamp
 ?show timestamp
 ?timestamp
@@ -10832,7 +10852,7 @@ C ... and restart the table:
  例 -- ASCII データファイルの配列の第 3 行の描画:
      plot 'a.dat' matrix using 1:3 every 1:999:1:2
  (行は 0 から数えられるので、3 ではなくて 2 を指定します)。
-3 grid_data
+3 grid data
 ?commands splot grid_data
 ?splot grid_data
 ?grid_data
@@ -11006,12 +11026,16 @@ C ... and restart the table:
  して可能ならばそのバグを実証するテストスクリプトを送ってください。
  `Seeking-assistance` 参照。
 
-2 Known bugs and limitations
+ 以下のセクションは、gnuplot 4.2 のリリース時現在に知られている問題の一
+ 覧を示しています。これらには外部のサポートライブラリのバグも含まれてい
+ るので、gnuplot の修正とは関係なく改良されるかもしれません。
 
- 以下は、gnuplot 4.2 のリリース時現在に知られている問題のリストです。こ
- れらには外部のサポートライブラリのバグも含まれているので、gnuplot の修
- 正とは関係なく改良されるかもしれません。
-
+2 Gnuplot limitations
+?bugs gnuplot
+=gamma
+=bessel
+=timefmt
+=load
  浮動小数計算例外 (浮動小数値が大きすぎる (または小さすぎる) 場合、0 で
  割算した場合など) は、ユーザ定義関数において時折発生します。特に、いく
  つかのデモで、浮動小数の範囲を越える数値を生成することが起こるようです。
@@ -11019,9 +11043,10 @@ C ... and restart the table:
  ないもの、と見なします) か、または `gnuplot` の実行を中止するかは、コ
  ンパイル時 (あるいは実行時) の環境によります。
 
- ベッセル関数は複素数引数に対しては動作しません。
+ ガンマ関数とベッセル関数は複素数引数に対しては動作しません。
 
- ガンマ関数は複素数引数に対しては動作しません。
+ コマンドラインに一つの "load" コマンドが含まれている場合、そのコマンド
+ ラインの "load <filename>" 以降はすべて無視されます。
 
  すべての x11 描画ウィンドウに対して、一度に 1 つのカラーパレットのみが
  有効です。これは、異なるパレットを使用する描画を含んだ multiplot では
@@ -11033,6 +11058,8 @@ C ... and restart the table:
 
  誤差指示線 (errorbars) は、極座標/球面座標描画モードでは使えません。
 
+2 Specific terminals
+?bugs terminals
  HP プロッタの古いモデルの中にはページの排出コマンド 'PG' を持たないも
  のがあります。現在の HPGL ドライバはこのコマンドを HPGL_reset で使用し
  ていますが、そのようなプロッタには、このコマンドを取り除く必要があるで
@@ -11040,6 +11067,13 @@ C ... and restart the table:
  HPGL/2 を使用しています。これはスケーラブル PCL フォントを使うように修
  正されるべきでしょう。
 
+2 External libraries
+?bugs external_libraries
+=libgd
+=svgalib
+=locale
+=internationalization
+=pdf
  外部ライブラリ GD (PNG/JPEG/GIF ドライバで使用):
  バージョン 2.0.33 までの libgd には、Adobe の Symbol フォントの文字の
  マッピングに関するいくつかのバグがあります。また、アンチエイリアスされ
@@ -11057,3 +11091,9 @@ C ... and restart the table:
  オカードや X11 で使用されるグラフィックドライバに特有の多くのバグがあ
  ります。
 
+ 国際化 (ロケールの設定):
+ gnuplot は、入出力の数、時刻、日付文字列のロケールに依存した書式の制御
+ を、C ランタイムライブラリに含まれる setlocale() を用いて行うので、ロ
+ ケールの有効性や、ロケール機能のサポートのレベル (例えば数字の 3 桁毎
+ の区切り文字など) などは、あなたのコンピュータが提供する国際化のサポー
+ トの度合いに依存します。
