@@ -1,8 +1,15 @@
-2006-07-19  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+2006-07-20  Ethan A Merritt <merritt@u.washington.edu>
+
+	* src/eval.c src/eval.h src/plot.c: Add a pre-defined udv NaN that is
+	guaranteed to evaluate as NaN. This provides a convenient way to define
+	a user function that explicitly returns NaN under some conditions.
+	Bug #1158281
+
+2006-07-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc: Sync to current English version.
 
-2006-07-19  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-20  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/*.trm:  Revert patchset of 2006-07-06
 	Restore explicit help entries for "set term foo ...".
