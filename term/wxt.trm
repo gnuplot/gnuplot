@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.13 2006/07/08 22:27:55 tlecomte Exp $
+ * $Id: wxt.trm,v 1.14 2006/07/21 02:35:48 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -93,8 +93,8 @@ static struct gen_table wxt_opts[] = {
     {"noper$sist", WXT_NOPERSIST},
     {"rai$se", WXT_RAISE},
     {"norai$se", WXT_NORAISE},
-    {"ct$rl", WXT_CTRL},
-    {"noct$rl", WXT_NOCTRL},
+    {"ct$rlq", WXT_CTRL},
+    {"noct$rlq", WXT_NOCTRL},
     {"ti$tle", WXT_TITLE},
     {"cl$ose", WXT_CLOSE},
     {NULL, WXT_OTHER}

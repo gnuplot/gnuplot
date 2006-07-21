@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.165 2006/07/16 22:46:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.166 2006/07/18 05:20:51 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1540,14 +1540,17 @@ record()
 
 	case 'X':		/* tell the driver about do_raise /  persist */
 	    {
-		int tmp_do_raise = UNSET, tmp_persist = UNSET, tmp_dashed = UNSET;
-		sscanf(buf, "X%d%d%d", &tmp_do_raise, &tmp_persist, &tmp_dashed);
+		int tmp_do_raise = UNSET, tmp_persist = UNSET;
+		int tmp_dashed = UNSET, tmp_ctrlq = UNSET;
+		sscanf(buf, "X%d%d%d%d", &tmp_do_raise, &tmp_persist, &tmp_dashed, &tmp_ctrlq);
 		if (UNSET != tmp_do_raise)
 		    do_raise = tmp_do_raise;
 		if (UNSET != tmp_persist)
 		    persist = tmp_persist;
 		if (UNSET != tmp_dashed)
 		    dashedlines = tmp_dashed;
+		if (UNSET != tmp_ctrlq)
+		    ctrlq = tmp_ctrlq;
 	    }
 	    return 1;
 

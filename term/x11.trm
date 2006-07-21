@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.157 2006/07/07 03:51:23 sfeam Exp $
+ * $Id: x11.trm,v 1.158 2006/07/21 02:35:49 sfeam Exp $
  *
  */
 
@@ -214,6 +214,7 @@ static char *X11_full_command_path = NULL;
 static int persist = UNSET;
 static int do_raise = UNSET;
 static int dashedlines = UNSET;
+static int ctrlq = UNSET;
 
 #ifdef USE_MOUSE
 /* Interlock to prevent the mouse channel from being coopted more than
@@ -353,6 +354,8 @@ enum X11_id {
     X11_NOENHANCED,
     X11_SOLID,
     X11_DASHED,
+    X11_CTRLQ,
+    X11_NOCTRLQ,
     X11_OTHER
 };
 
@@ -370,6 +373,8 @@ static struct gen_table X11_opts[] = {
     {"noenh$anced", X11_NOENHANCED},
     {"solid", X11_SOLID},
     {"dash$ed", X11_DASHED},
+    {"ctrl$q", X11_CTRLQ},
+    {"noctrl$q", X11_NOCTRLQ},
     {NULL, X11_OTHER}
 };
 
@@ -385,7 +390,10 @@ X11_options()
     int new_term_number = 0;
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_reset = FALSE, set_persist = FALSE, set_raise = FALSE, set_font = FALSE;
+    TBOOLEAN set_ctrlq = FALSE;
     TBOOLEAN set_title = FALSE, set_number = FALSE, set_close = FALSE, set_solid = FALSE;
+
+    persist = do_raise = dashedlines = ctrlq = UNSET;
 
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&X11_opts[0], c_token)) {
@@ -410,6 +418,18 @@ X11_options()
 	    c_token++;
 	    if (set_persist) duplication=TRUE;
 	    set_persist = TRUE;
+	    break;
+	case X11_CTRLQ:
+	    ctrlq = yes;
+	    c_token++;
+	    if (set_ctrlq) duplication=TRUE;
+	    set_ctrlq = TRUE;
+	    break;
+	case X11_NOCTRLQ:
+	    ctrlq = no;
+	    c_token++;
+	    if (set_ctrlq) duplication=TRUE;
+	    set_ctrlq = TRUE;
 	    break;
 	case X11_SOLID:
 	    dashedlines = FALSE;
@@ -513,6 +533,9 @@ X11_options()
     if (UNSET != persist) {
 	strcat(term_options, (yes == persist ? " persist" : " nopersist"));
     }
+    if (UNSET != ctrlq) {
+	strcat(term_options, (yes == ctrlq ? " ctrlq" : " noctrlq"));
+    }
     if (UNSET != dashedlines) {
 	strcat(term_options, (yes == dashedlines ? " dashed" : " solid"));
     }
@@ -599,8 +622,9 @@ x11_lower_terminal_group(void)
 TERM_PUBLIC void
 X11_update_opts()
 {
-    if (X11_ipc && (UNSET != do_raise || UNSET != persist || UNSET != dashedlines)) {
-	fprintf(X11_ipc, "X %d %d %d\n", do_raise, persist, dashedlines);
+    if (X11_ipc && (UNSET != do_raise || UNSET != persist || UNSET != dashedlines || UNSET != ctrlq)) {
+	fprintf(X11_ipc, "X %d %d %d %d\n", 
+		do_raise, persist, dashedlines, ctrlq);
 	fflush(X11_ipc);
     }
 }
@@ -1987,7 +2011,7 @@ START_HELP(x11)
 "                     {title \"<string>\"}",
 "                     {{no}enhanced}",
 "                     {font <fontspec>}",
-"                     {{no}persist} {{no}raise} {solid|dashed}",
+"                     {{no}persist} {{no}raise} {solid|dashed} {{no}ctrlq}",
 "                     {close}",
 "    set terminal x11 {reset}",
 "",
