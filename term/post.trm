@@ -3412,7 +3412,7 @@ PS_COMMON_OPTS2
 " nearly identical to the old one specify the option `oldstyle`. (In fact",
 " some small differences remain: the symbol sizes are slightly different, the",
 " tics are half as large as in the old terminal which can be changed using",
-" `set ticscale`, and the arrows have all features as in the postscript",
+" `set tics scale`, and the arrows have all features as in the postscript",
 " terminal.)",
 "",
 PS_COMMON_PROLOG_INFO

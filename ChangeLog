@@ -2,6 +2,8 @@
 
 	* term/post.trm (00psglobal): Remove reference to 'if compiled with
 	pm3d'.
+	* term/post.trm (epslatex): Change reference from 'set ticscale' to
+	'set tics scale'.
 
 2006-07-21  Ethan A Merritt <merritt@u.washington.edu>
 
