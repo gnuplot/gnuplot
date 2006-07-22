@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.191 2006/07/18 22:58:28 sfeam Exp $
+ * $Id: post.trm,v 1.192 2006/07/21 02:35:48 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3357,15 +3357,14 @@ START_HELP(00psglobal)
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",\
 " default, butt caps and mitered joins;",\
 "",\
-" `palfuncparam` is only available if compiled with `pm3d` support.  It controls",\
-" how `set palette functions` are encoded as gradients in the output.",\
-" Analytic color component functions (set via `set palette functions`) are",\
-" encoded as linear interpolated gradients in the postscript output:  The color",\
-" component functions are sampled at <samples> points and all points are",\
-" removed from this gradient which can be removed without changing the",\
-" resulting colors by more than <maxdeviation>.  For almost every useful",\
-" palette you may savely leave the defaults of <samples>=2000 and",\
-" <maxdeviation>=0.003 untouched.",\
+" `palfuncparam` controls how `set palette functions` are encoded as gradients",\
+" in the output. Analytic color component functions (set via",\
+" `set palette functions`) are encoded as linear interpolated gradients in the",\
+" postscript output:  The color component functions are sampled at <samples>",\
+" points and all points are removed from this gradient which can be removed",\
+" without changing the resulting colors by more than <maxdeviation>. For",\
+" almost every useful palette you may savely leave the defaults of",\
+" <samples>=2000 and <maxdeviation>=0.003 untouched.",\
 "",\
 " The default size for postscript output is 10 inches x 7 inches. The default",\
 " for eps output is 5 x 3.5 inches.  The `size` option changes this to",\
