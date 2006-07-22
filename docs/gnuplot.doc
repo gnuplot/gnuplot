@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.369 2006/07/16 22:46:41 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.370 2006/07/17 19:54:33 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -242,10 +242,10 @@ C
 3 Mouse and hotkey support in interactive terminals
 
  Interaction with the current plot via mouse and hotkeys is supported for the
- X11, OS/2 Presentation Manager, ggi and Windows terminals. See `mouse input`
- for more information on mousing. See help for `bind` for information on
- hotkeys. Also see the documentation for individual mousing terminals `ggi`,
- `pm`, `windows` and `x11`.
+ X11, OS/2 Presentation Manager, ggi, Windows, and wxWidgets terminals. See
+ `mouse input` for more information on mousing. See help for `bind` for
+ information on hotkeys. Also see the documentation for individual mousing
+ terminals `ggi`, `pm`, `windows`, `wxt` and `x11`.
 
  Sample script: mousevariables.dem
 
@@ -268,6 +268,10 @@ C
  old png driver, including TrueType fonts. Requires libgd.
 
  `svg`: New terminal exporting Scalable Vector Graphics.
+
+ `wxt` : New interactive and cross-platform terminal for on-screen rendering.
+ It uses wxWidgets for its user interface, and Cairo associated with Pango for
+ the actual rendering, providing nice plots with antialiasing.
 
 3 New plot style `pm3d`
 
@@ -299,7 +303,8 @@ C
  Not all terminal types support these options, however.  The enhanced text
  mode previously available for the postscript and pm terminals has been
  extended to other terminal types as well.  Terminal types currently supported
- include aqua, dumb, jpeg, pdf, pm, png, postscript, and x11. See `enhanced text`.
+ include aqua, dumb, jpeg, pdf, pm, png, postscript, x11, windows, and wxt.
+ See `enhanced text`.
 
  Sample scripts: textcolor.dem textrotate.dem
 
@@ -5625,7 +5630,7 @@ C ... and restart the table:
  Generally you must set the encoding before setting the terminal type.
  Note that encoding is not supported by all terminal drivers and that
  the device must be able to produce the desired non-standard characters.
- The PostScript and X11 terminals support all encodings. OS/2 Presentation
+ The PostScript, X11 and wxt terminals support all encodings. OS/2 Presentation
  Manager switches automatically to codepage 912 for `iso_8859_2`.
 3 fit
 ?commands set fit
@@ -7224,6 +7229,7 @@ C ... and restart the table:
      GGI
      Windows
      AquaTerm (Mac OS X)
+     wxWidgets (wxt)
    Files:
      PostScript
      pslatex, pstex, epslatex

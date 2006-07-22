@@ -1,5 +1,7 @@
 2006-07-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
+	* docs/gnuplot.doc: Add here and there some references to the wxWidgets
+	terminal, where appropriate.
 	* term/post.trm (00psglobal): Remove reference to 'if compiled with
 	pm3d'.
 	* term/post.trm (epslatex): Change reference from 'set ticscale' to
