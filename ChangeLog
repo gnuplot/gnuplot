@@ -1,3 +1,8 @@
+2006-07-23  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* docs/gnuplot.doc (Syntax): Change wording to avoid reference to
+	`enhanced postscript`.
+
 2006-07-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* docs/gnuplot.doc: Add here and there some references to the wxWidgets

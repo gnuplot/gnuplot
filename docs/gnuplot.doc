@@ -2103,8 +2103,8 @@ C ... and restart the table:
  Braces are used in text to be specially processed by some terminals, like
  `postscript`.  They are also used to denote complex numbers: {3,2} = 3 + 2i.
 
- At present you should not embed \n inside {} when using the `enhanced postscript`
- terminal.
+ At present you should not embed \n inside {} when using the PostScript
+ terminal in `enhanced text` mode.
 
  The EEPIC, Imagen, Uniplex, LaTeX, and TPIC drivers allow a newline to be
  specified by \\ in a single-quoted string or \\\\ in a double-quoted string.
