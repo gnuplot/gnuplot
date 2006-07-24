@@ -1,3 +1,7 @@
+2006-07-24  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* term/wxt.trm (wxt_options): Fix wrong test on tri-state variable.
+
 2006-07-23  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* docs/gnuplot.doc (Syntax): Change wording to avoid reference to

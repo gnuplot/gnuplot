@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.14 2006/07/21 02:35:48 sfeam Exp $
+ * $Id: wxt.trm,v 1.15 2006/07/22 00:01:29 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -245,17 +245,17 @@ TERM_PUBLIC void wxt_options()
 
 	if (set_persist)
 		strncat(term_options,
-			wxt_persist ? " persist" : " nopersist",
+			(wxt_persist==yes) ? " persist" : " nopersist",
 			sizeof(term_options)-strlen(term_options));
 
 	if (set_raise)
 		strncat(term_options,
-			wxt_raise ? " raise" : " noraise",
+			(wxt_raise==yes) ? " raise" : " noraise",
 			sizeof(term_options)-strlen(term_options));
 
 	if (set_ctrl)
 		strncat(term_options,
-			wxt_ctrl ? " ctrl" : " noctrl",
+			(wxt_ctrl==yes) ? " ctrl" : " noctrl",
 			sizeof(term_options)-strlen(term_options));
 
 	if (set_close)
