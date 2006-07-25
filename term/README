@@ -75,7 +75,7 @@ struct TERMENTRY {
    void (*previous_palette) __PROTO(());
    void (*set_color) __PROTO((t_colorspec *colorspec));
    void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
-#ifdef IMAGE_DRIVER
+#ifdef WITH_IMAGE
     void (*image) __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif
 /* Enhanced text mode driver call-backs */
@@ -398,7 +398,7 @@ _enhanced_writec() - write (or buffer) a single character of the text fragment
 _enhanced_flush()  - finish processing of previous fragment and write it to
                      the output stream
 
-The following function should be conditioned on IMAGE_DRIVER.  See also:
+The following function should be conditioned on WITH_IMAGE.  See also:
 src/README for notes about image support.
 
 _image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)

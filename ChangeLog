@@ -1,3 +1,7 @@
+2006-07-25  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* term/README: Change IMAGE_DRIVER to the true WITH_IMAGE.
+
 2006-07-24  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/wxt.trm (wxt_options): Fix wrong test on tri-state variable.
