@@ -44,17 +44,22 @@ tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex eg7.tex eg7.pdf te
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) tutorial
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) tutorial
 
-.dvi.ps:
-	$(DVIPS) -o $@ $<
-
-.plt.tex:
-	@if test -x $(top_builddir)/src/gnuplot ; then \
+RUN_GNUPLOT = if test -x $(top_builddir)/src/gnuplot ; then \
 	  GNUPLOT_PS_DIR=$(top_srcdir)/term/PostScript \
 	  GNUPLOT_LIB=$(srcdir) \
 	  $(top_builddir)/src/gnuplot $< ; \
 	else \
 	  gnuplot $< ; \
 	fi
+
+eg7.eps: eg7.plt
+	$(RUN_GNUPLOT)
+
+.dvi.ps:
+	$(DVIPS) -o $@ $<
+
+.plt.tex:
+	$(RUN_GNUPLOT)
 
 .eps.pdf:
 	epstopdf $<

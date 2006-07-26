@@ -1,7 +1,16 @@
+2006-07-26  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* tutorial/Makefile.am.in (RUN_GNUPLOT): Can the .plt.tex command
+	sequence into this new macro.
+	(.plt.tex): Use the new macro. Ged rid of the @ marker that hides
+	the gnuplot invocation, while at it.
+	(eg7.eps): New rule using the macro, to ensure make knows how to
+	make the .eps file, even if the .tex output is still present.
+
 2006-07-26  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-	* tutorial/.cvsignore: Add *.eps and test.tex to the list of files to
-	be ignore by CVS.
+	* tutorial/.cvsignore: Add *.eps and test.tex to the list of files
+	to be ignored by CVS.
 
 2006-07-25  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
