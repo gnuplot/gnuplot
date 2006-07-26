@@ -3,9 +3,11 @@ Makefile.am
 Makefile.in
 eg?.tex
 linepoin.tex
+test.tex
 *.aux
 *.log
 *.dvi
 *.pdf
 *.ps
+*.eps
 *.toc

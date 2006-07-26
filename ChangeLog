@@ -1,3 +1,8 @@
+2006-07-26  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* tutorial/.cvsignore: Add *.eps and test.tex to the list of files to
+	be ignore by CVS.
+
 2006-07-25  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/README: Change IMAGE_DRIVER to the true WITH_IMAGE.
