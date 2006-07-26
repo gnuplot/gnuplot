@@ -1,3 +1,6 @@
+2006-07-26  Per Persson  <persquare@mac.com>
+	* term/aquaterm.trm: Made UTF8 the default encoding for AquaTerm.
+	
 2006-07-26  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* tutorial/Makefile.am.in (RUN_GNUPLOT): Can the .plt.tex command
