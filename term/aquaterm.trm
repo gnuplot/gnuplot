@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.26 2006/07/11 22:07:28 persquare Exp $
+ * $Id: aquaterm.trm,v 1.27 2006/07/21 02:35:45 sfeam Exp $
  *
  */
 
@@ -314,7 +314,8 @@ AQUA_convert_using_encoding(const char *string)
     /* FIXME: Add more encodings... */
   case S_ENC_DEFAULT:  /* Fallthrough */
   default :
-    currentEncoding = NSISOLatin1StringEncoding; 
+    /* UTF8 is 'default' */
+    currentEncoding = NSUTF8StringEncoding;
     break;
   }
   /* Perform translation (into UTF8 encoding used by Mac OS X) */
@@ -881,7 +882,7 @@ START_HELP(aqua)
 " The aqua terminal supports enhanced text mode (see `enhanced`), except for",
 " overprint. Font support is limited to the fonts available on the system.",
 " Character encoding can be selected by `set encoding` and currently supports",
-" iso_latin_1, iso_latin_2, and cp1250 with iso_latin_1 being the default.",
+" iso_latin_1, iso_latin_2, cp1250, and default which equals UTF8.",
 "",
 " Lines can be drawn either solid or dashed, (default is solid) and the dash",
 " spacing can be modified by <dashlength> which is a multiplier > 0.",
