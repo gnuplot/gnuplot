@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.115 2006-07-18 11:02:30+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.370
+C RCS $Id: gnuplot-ja.doc,v 1.117 2006-07-24 12:46:15+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.372
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C 
@@ -283,7 +283,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  `binary` 参照。
 
 3 新しい/修正された出力形式
-4 新しい多プラットフォーム上の wxWidgets (wxt) 対話型出力ドライバ
+4 複数のプラットホーム用の新しい wxWidgets (wxt) 対話型出力ドライバ
 4 新しい Enhanced MetaFile (EMF) ドライバ
 4 gif/jpeg/png ドライバの統合
 4 非推奨の Adobe Illustrator (ai) ドライバ
@@ -297,10 +297,10 @@ C Shigeharu Takeno et al (3.7, 4.X)
 3 対話型出力形式上のマウスとホットキーのサポート
 
  マウス、またはホットキーによる現在の描画への作用が、X11, OS/2 プレゼン
- テーションマネージャ、ggi, windows 出力ドライバでサポートされています。
- マウス動作に関する詳細は `mouse input` を、ホットキーに関する詳細は
- `bind` を参照してください。また、`ggi`, `pm`, `windows`, `x11` それぞ
- れのマウス動作に関する記述も参照してください。
+ テーションマネージャ、ggi, Windows, wxWidgets 出力ドライバでサポートさ
+ れています。マウス動作に関する詳細は `mouse input` を、ホットキーに関
+ する詳細は `bind` を参照してください。また、`ggi`, `pm`, `windows`,
+ `wxt`, `x11` それぞれのマウス動作に関する記述も参照してください。
 
  サンプルスクリプト: mousevariables.dem
 
@@ -325,6 +325,11 @@ C Shigeharu Takeno et al (3.7, 4.X)
 
  `svg`: 縮尺可能なベクトルグラフィックス (Scalable Vector Graphics) を
  出力する新しい出力形式。
+
+ `wxt`: 複数のプラットホームで動作する対話型、スクリーン描画用の新しい
+ 出力形式。これはユーザインターフェースには wxWidgets を使用し、実際の
+ 描画には Pango と関連する Cairo を使用します。これはアンチエイリアスを
+ 利用した素晴しい描画を生成します。
 
 3 新しい描画スタイル `pm3d`
 
@@ -356,8 +361,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
  しかし、全ての出力形式がこれらをサポートしているわけではありません。
  拡張テキストモードは postscript, pm 出力形式では既に有効だったものです
  がそれが、他の出力形式にも拡張されました。この機能をサポートしているの
- は、aqua, dump, jpeg, pdf, pm, png, postscript, x11 などです。
- `enhanced text` を参照。
+ は、aqua, dump, jpeg, pdf, pm, png, postscript, x11, windows, wxt など
+ です。`enhanced text` を参照。
 
  サンプルスクリプト: textcolor.dem textrotate.dem
 
@@ -2166,8 +2171,8 @@ C ... and restart the table:
  文字列内で使用されます。または複素数を記述するのにも使われます: {3,2}
  = 3 + 2i となります。
 
- `enhanced postscript` 出力形式 (terminal) を使う場合、現在は、{} の内
- 部に \n を入れてはいけません。
+ PostScript 出力形式で `enhanced text` モード (拡張文字列処理モード) を
+ 使う場合、現在は、{} の内部に \n を入れてはいけません。
 
  EEPIC, Imagen, Uniplex, LaTeX, TPIC の各出力形式では、単一引用符内の
  \\ または二重引用符内の \\\\ で改行を示すことが可能です。
@@ -3336,8 +3341,8 @@ C ... and restart the table:
  のグループと、マシンに依存しない変数名のグループに分かれています。
 5 endian
 ?binary general endian
- ファイルのバイナリデータのエンディアンは、gnuplot が動作するプラットフ
- ォームのエンディアンとは異なる場合も良くあります。いくつかの指定で
+ ファイルのバイナリデータのエンディアンは、gnuplot が動作するプラットホ
+ ームのエンディアンとは異なる場合も良くあります。いくつかの指定で
  gnuplot がバイトをどのように扱うかを制御できます。例えば
  `endian=little` は、バイナリファイルを、そのバイトの並びが小さい桁から
  大きい桁へ並んでいると見なされます。オプションは以下のものが使えます。
@@ -5746,7 +5751,7 @@ C ... and restart the table:
  一般に、コード化の設定は出力形式の設定の前に行なう必要があります。この
  コード化はどんな出力形式でもサポートされているとは限らず、そして出力形
  式は要求されたどんな非標準文字も生成できなければいけません。PostScript
- と X11 出力形式はすべてのコード化をサポートしています。OS/2
+ と X11 と wxt 出力形式はすべてのコード化をサポートしています。OS/2
  Presentation Manager は `iso_8859_2` に対しては自動的にコードページ
  912 に変更します。
 3 fit
@@ -7348,6 +7353,7 @@ C ... and restart the table:
      GGI
      Windows
      AquaTerm (Mac OS X)
+     wxWidgets (wxt)
    画像ファイル出力ドライバ:
      PostScript
      pslatex, pstex, epslatex
@@ -8026,9 +8032,9 @@ C ... and restart the table:
 
  "<filename>" がない場合は出力は <STDERR> になります。"-" という
  <filename> は <STDOUT> を意味します。`append` フラグはファイルを追加
- (append) モードで開くことを意味します。パイプをサポートするプラットフ
- ォーム上では、<filename> が "|" で始まっていたら、<shell_command> への
- パイプが開かれます。
+ (append) モードで開くことを意味します。パイプをサポートするプラットホ
+ ーム上では、<filename> が "|" で始まっていたら、<shell_command> へのパ
+ イプが開かれます。
 3 object
 ?object
 ?rectangle
@@ -9336,7 +9342,7 @@ C ... and restart the table:
  は、印刷後にプラットホームに依存しない形で出力形式を復帰する目的に使え
  ます。gnuplot の起動後、デフォルト、または `startup` ファイルに書かれ
  た出力形式が自動的に記憶 (push) されます。よって、明示的に出力形式を記
- 憶させることなく、任意のプラットフォーム上でデフォルトの出力形式を
+ 憶させることなく、任意のプラットホーム上でデフォルトの出力形式を
  `set term pop` によって復帰させる、という動作を期待したスクリプトを可
  搬性を失わずに書くことが出来ます。
 

@@ -1,6 +1,6 @@
-diff -rc term-4.1.0-20060707/aed.trm term-4.1.0-ja-20060707/aed.trm
-*** term-4.1.0-20060707/aed.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/aed.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/aed.trm term-4.1.0-ja-20060727/aed.trm
+*** term-4.1.0-20060727/aed.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/aed.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 203,208 ****
 --- 203,209 ----
@@ -38,9 +38,9 @@ diff -rc term-4.1.0-20060707/aed.trm term-4.1.0-ja-20060707/aed.trm
 + #endif
   END_HELP(aed767)
   #endif
-diff -rc term-4.1.0-20060707/ai.trm term-4.1.0-ja-20060707/ai.trm
-*** term-4.1.0-20060707/ai.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/ai.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/ai.trm term-4.1.0-ja-20060727/ai.trm
+*** term-4.1.0-20060727/ai.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/ai.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 528,533 ****
 --- 528,534 ----
@@ -89,9 +89,9 @@ diff -rc term-4.1.0-20060707/ai.trm term-4.1.0-ja-20060707/ai.trm
 + #endif
   END_HELP(ai)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/amiga.trm term-4.1.0-ja-20060707/amiga.trm
-*** term-4.1.0-20060707/amiga.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/amiga.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/amiga.trm term-4.1.0-ja-20060727/amiga.trm
+*** term-4.1.0-20060727/amiga.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/amiga.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 809,814 ****
 --- 809,815 ----
@@ -131,9 +131,9 @@ diff -rc term-4.1.0-20060707/amiga.trm term-4.1.0-ja-20060707/amiga.trm
 + #endif
   END_HELP(amiga)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/apollo.trm term-4.1.0-ja-20060707/apollo.trm
-*** term-4.1.0-20060707/apollo.trm	2004-07-02 02:10:12.000000000 +0900
---- term-4.1.0-ja-20060707/apollo.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/apollo.trm term-4.1.0-ja-20060727/apollo.trm
+*** term-4.1.0-20060727/apollo.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/apollo.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 595,600 ****
 --- 595,601 ----
@@ -167,12 +167,12 @@ diff -rc term-4.1.0-20060707/apollo.trm term-4.1.0-ja-20060707/apollo.trm
 + #endif
   END_HELP(apollo)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/aquaterm.trm term-4.1.0-ja-20060707/aquaterm.trm
-*** term-4.1.0-20060707/aquaterm.trm	2006-04-18 03:51:58.000000000 +0900
---- term-4.1.0-ja-20060707/aquaterm.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/aquaterm.trm term-4.1.0-ja-20060727/aquaterm.trm
+*** term-4.1.0-20060727/aquaterm.trm	2006-07-27 13:28:52.000000000 +0900
+--- term-4.1.0-ja-20060727/aquaterm.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
-*** 848,853 ****
---- 848,854 ----
+*** 857,862 ****
+--- 857,863 ----
   
   #ifdef TERM_HELP
   START_HELP(aqua)
@@ -181,8 +181,8 @@ diff -rc term-4.1.0-20060707/aquaterm.trm term-4.1.0-ja-20060707/aquaterm.trm
   "?commands set terminal aqua",
   "?set terminal aqua",
 ***************
-*** 878,883 ****
---- 879,917 ----
+*** 888,893 ****
+--- 889,929 ----
   " Lines can be drawn either solid or dashed, (default is solid) and the dash",
   " spacing can be modified by <dashlength> which is a multiplier > 0.",
   ""
@@ -199,21 +199,23 @@ diff -rc term-4.1.0-20060707/aquaterm.trm term-4.1.0-ja-20060707/aquaterm.trm
 + "",
 + " 書式:",
 + "       set terminal aqua {<n>} {title \"<wintitle>\"} {size <x> <y>}",
-+ "                         {fname \"<fontface>\"} {fsize <fontsize>}",
++ "                         {font \"<fontname>{,<fontsize>}\"}",
 + "                         {{no}enhanced} {solid|dashed} {dl <dashlength>}}",
 + "",
 + " <n> は描画するウィンドウの番号 (デフォルトでは 0)",
 + " <wintitle> はタイトルバーに表示される名前 (デフォルトは \"Figure <n>\"),",
 + " <x> <y> は描画サイズ (デフォルトは 846x594 pt = 11.75x8.25 インチ) です。",
 + "",
-+ " 使用されるフォントは <fontface> で指定し (デフォルトは \"Times-Roman\")、",
-+ " フォントサイズは <fontsize> で設定します (デフォルトは 14.0 pt)。",
++ " 使用されるフォントは <fontname> で指定し (デフォルトは \"Times-Roman\")、",
++ " フォントサイズは <fontsize> で設定します (デフォルトは 14.0 pt)。古い",
++ " 書式 {fname \"<fontname>\"} {fsize <fontsize>} もとりあえずサポートし",
++ " ています。",
 + "",
 + " aqua 出力形式は、拡張テキスト出力モード (enhanced text mode; `enhanced` ",
-+ " 参照) を、重ね書き以外はサポートしてます。フォントの使用はシステムで有効",
-+ " なフォントに制限されています。文字エンコーディングは `set encoding` で選",
-+ " 択できますが、現在は iso_latin_1, iso_latin_2, cp1250 がサポートされてい",
-+ " て、デフォルトでは iso_latin_1 が使用されます。",
++ " 参照) を、重ね書き以外はサポートしてます。フォントの使用はシステムで有",
++ " 効なフォントに制限されています。文字エンコーディングは `set encoding` ",
++ " で選択できますが、現在は iso_latin_1, iso_latin_2, cp1250 と default",
++ " (= UTF8) がサポートされています。",
 + "",
 + " 曲線は、実線か点線 (デフォルトは実線) のいずれかで描画でき、点線の間隔は",
 + " 倍率 <dashlength> (>0) で変更できます。",
@@ -222,9 +224,9 @@ diff -rc term-4.1.0-20060707/aquaterm.trm term-4.1.0-ja-20060707/aquaterm.trm
   END_HELP(aqua)
   #endif /* TERM_HELP */
   
-diff -rc term-4.1.0-20060707/atariaes.trm term-4.1.0-ja-20060707/atariaes.trm
-*** term-4.1.0-20060707/atariaes.trm	2004-07-02 02:10:12.000000000 +0900
---- term-4.1.0-ja-20060707/atariaes.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/atariaes.trm term-4.1.0-ja-20060727/atariaes.trm
+*** term-4.1.0-20060727/atariaes.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/atariaes.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 754,759 ****
 --- 754,760 ----
@@ -273,9 +275,9 @@ diff -rc term-4.1.0-20060707/atariaes.trm term-4.1.0-ja-20060707/atariaes.trm
 + #endif
   END_HELP(atari)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/atarivdi.trm term-4.1.0-ja-20060707/atarivdi.trm
-*** term-4.1.0-20060707/atarivdi.trm	2004-07-02 02:10:12.000000000 +0900
---- term-4.1.0-ja-20060707/atarivdi.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/atarivdi.trm term-4.1.0-ja-20060727/atarivdi.trm
+*** term-4.1.0-20060727/atarivdi.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/atarivdi.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 452,457 ****
 --- 452,458 ----
@@ -327,9 +329,9 @@ diff -rc term-4.1.0-20060707/atarivdi.trm term-4.1.0-ja-20060707/atarivdi.trm
 + #endif
   END_HELP(vdi)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/be.trm term-4.1.0-ja-20060707/be.trm
-*** term-4.1.0-20060707/be.trm	2005-05-25 05:54:03.000000000 +0900
---- term-4.1.0-ja-20060707/be.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/be.trm term-4.1.0-ja-20060727/be.trm
+*** term-4.1.0-20060727/be.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/be.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 390,395 ****
 --- 390,396 ----
@@ -643,9 +645,9 @@ diff -rc term-4.1.0-20060707/be.trm term-4.1.0-ja-20060707/be.trm
 + #endif
   END_HELP(be)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/cgi.trm term-4.1.0-ja-20060707/cgi.trm
-*** term-4.1.0-20060707/cgi.trm	2004-07-02 02:10:12.000000000 +0900
---- term-4.1.0-ja-20060707/cgi.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/cgi.trm term-4.1.0-ja-20060727/cgi.trm
+*** term-4.1.0-20060727/cgi.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/cgi.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 319,324 ****
 --- 319,325 ----
@@ -685,9 +687,9 @@ diff -rc term-4.1.0-20060707/cgi.trm term-4.1.0-ja-20060707/cgi.trm
 + #endif
   END_HELP(cgi)
   #endif
-diff -rc term-4.1.0-20060707/cgm.trm term-4.1.0-ja-20060707/cgm.trm
-*** term-4.1.0-20060707/cgm.trm	2006-04-26 11:07:18.000000000 +0900
---- term-4.1.0-ja-20060707/cgm.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/cgm.trm term-4.1.0-ja-20060727/cgm.trm
+*** term-4.1.0-20060727/cgm.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/cgm.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 1741,1746 ****
 --- 1741,1747 ----
@@ -1006,9 +1008,9 @@ diff -rc term-4.1.0-20060707/cgm.trm term-4.1.0-ja-20060707/cgm.trm
   
   END_HELP(cgm)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/corel.trm term-4.1.0-ja-20060707/corel.trm
-*** term-4.1.0-20060707/corel.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/corel.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/corel.trm term-4.1.0-ja-20060727/corel.trm
+*** term-4.1.0-20060727/corel.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/corel.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 431,436 ****
 --- 431,437 ----
@@ -1047,9 +1049,9 @@ diff -rc term-4.1.0-20060707/corel.trm term-4.1.0-ja-20060707/corel.trm
 + #endif
   END_HELP(corel)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/debug.trm term-4.1.0-ja-20060707/debug.trm
-*** term-4.1.0-20060707/debug.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/debug.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/debug.trm term-4.1.0-ja-20060727/debug.trm
+*** term-4.1.0-20060727/debug.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/debug.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 309,314 ****
 --- 309,315 ----
@@ -1079,9 +1081,9 @@ diff -rc term-4.1.0-20060707/debug.trm term-4.1.0-ja-20060707/debug.trm
 + #endif
   END_HELP(debug)
   #endif
-diff -rc term-4.1.0-20060707/djsvga.trm term-4.1.0-ja-20060707/djsvga.trm
-*** term-4.1.0-20060707/djsvga.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/djsvga.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/djsvga.trm term-4.1.0-ja-20060727/djsvga.trm
+*** term-4.1.0-20060727/djsvga.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/djsvga.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 456,461 ****
 --- 456,462 ----
@@ -1115,9 +1117,9 @@ diff -rc term-4.1.0-20060707/djsvga.trm term-4.1.0-ja-20060707/djsvga.trm
 + #endif
   END_HELP(svga)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/dumb.trm term-4.1.0-ja-20060707/dumb.trm
-*** term-4.1.0-20060707/dumb.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/dumb.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/dumb.trm term-4.1.0-ja-20060727/dumb.trm
+*** term-4.1.0-20060727/dumb.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/dumb.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 560,565 ****
 --- 560,566 ----
@@ -1161,9 +1163,9 @@ diff -rc term-4.1.0-20060707/dumb.trm term-4.1.0-ja-20060707/dumb.trm
 + #endif
   END_HELP(dumb)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/dxf.trm term-4.1.0-ja-20060707/dxf.trm
-*** term-4.1.0-20060707/dxf.trm	2004-07-02 02:10:13.000000000 +0900
---- term-4.1.0-ja-20060707/dxf.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/dxf.trm term-4.1.0-ja-20060727/dxf.trm
+*** term-4.1.0-20060727/dxf.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/dxf.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 404,409 ****
 --- 404,410 ----
@@ -1199,9 +1201,9 @@ diff -rc term-4.1.0-20060707/dxf.trm term-4.1.0-ja-20060707/dxf.trm
 + #endif
   END_HELP(dxf)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/dxy.trm term-4.1.0-ja-20060707/dxy.trm
-*** term-4.1.0-20060707/dxy.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/dxy.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/dxy.trm term-4.1.0-ja-20060727/dxy.trm
+*** term-4.1.0-20060727/dxy.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/dxy.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 191,196 ****
 --- 191,197 ----
@@ -1231,9 +1233,9 @@ diff -rc term-4.1.0-20060707/dxy.trm term-4.1.0-ja-20060707/dxy.trm
 + #endif
   END_HELP(dxy800a)
   #endif
-diff -rc term-4.1.0-20060707/eepic.trm term-4.1.0-ja-20060707/eepic.trm
-*** term-4.1.0-20060707/eepic.trm	2005-02-01 20:28:52.000000000 +0900
---- term-4.1.0-ja-20060707/eepic.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/eepic.trm term-4.1.0-ja-20060727/eepic.trm
+*** term-4.1.0-20060727/eepic.trm	2006-07-22 17:39:07.000000000 +0900
+--- term-4.1.0-ja-20060727/eepic.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 556,561 ****
 --- 556,562 ----
@@ -1339,9 +1341,9 @@ diff -rc term-4.1.0-20060707/eepic.trm term-4.1.0-ja-20060707/eepic.trm
 + #endif
   END_HELP(eepic)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/emf.trm term-4.1.0-ja-20060707/emf.trm
-*** term-4.1.0-20060707/emf.trm	2006-06-19 20:10:14.000000000 +0900
---- term-4.1.0-ja-20060707/emf.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/emf.trm term-4.1.0-ja-20060727/emf.trm
+*** term-4.1.0-20060727/emf.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/emf.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 1180,1185 ****
 --- 1180,1186 ----
@@ -1389,9 +1391,9 @@ diff -rc term-4.1.0-20060707/emf.trm term-4.1.0-ja-20060707/emf.trm
 + #endif
   END_HELP(emf)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/emxvga.trm term-4.1.0-ja-20060707/emxvga.trm
-*** term-4.1.0-20060707/emxvga.trm	2004-07-02 02:10:13.000000000 +0900
---- term-4.1.0-ja-20060707/emxvga.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/emxvga.trm term-4.1.0-ja-20060727/emxvga.trm
+*** term-4.1.0-20060727/emxvga.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/emxvga.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 475,480 ****
 --- 475,481 ----
@@ -1445,9 +1447,9 @@ diff -rc term-4.1.0-20060707/emxvga.trm term-4.1.0-ja-20060707/emxvga.trm
 + #endif
   END_HELP(emxvga)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/epson.trm term-4.1.0-ja-20060707/epson.trm
-*** term-4.1.0-20060707/epson.trm	2004-07-02 02:10:13.000000000 +0900
---- term-4.1.0-ja-20060707/epson.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/epson.trm term-4.1.0-ja-20060727/epson.trm
+*** term-4.1.0-20060727/epson.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/epson.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 884,889 ****
 --- 884,890 ----
@@ -1540,9 +1542,9 @@ diff -rc term-4.1.0-20060707/epson.trm term-4.1.0-ja-20060707/epson.trm
 + #endif
   END_HELP(epson_180dpi)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/excl.trm term-4.1.0-ja-20060707/excl.trm
-*** term-4.1.0-20060707/excl.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/excl.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/excl.trm term-4.1.0-ja-20060727/excl.trm
+*** term-4.1.0-20060727/excl.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/excl.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 273,278 ****
 --- 273,279 ----
@@ -1572,9 +1574,9 @@ diff -rc term-4.1.0-20060707/excl.trm term-4.1.0-ja-20060707/excl.trm
 + #endif
   END_HELP(excl)
   #endif
-diff -rc term-4.1.0-20060707/fg.trm term-4.1.0-ja-20060707/fg.trm
-*** term-4.1.0-20060707/fg.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/fg.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/fg.trm term-4.1.0-ja-20060727/fg.trm
+*** term-4.1.0-20060727/fg.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/fg.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 414,419 ****
 --- 414,420 ----
@@ -1641,9 +1643,9 @@ diff -rc term-4.1.0-20060707/fg.trm term-4.1.0-ja-20060707/fg.trm
 + #endif
   END_HELP(hercules)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/fig.trm term-4.1.0-ja-20060707/fig.trm
-*** term-4.1.0-20060707/fig.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/fig.trm	2006-07-07 11:17:58.000000000 +0900
+diff -rc term-4.1.0-20060727/fig.trm term-4.1.0-ja-20060727/fig.trm
+*** term-4.1.0-20060727/fig.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/fig.trm	2006-07-27 13:34:14.000000000 +0900
 ***************
 *** 1200,1205 ****
 --- 1200,1206 ----
@@ -1759,9 +1761,9 @@ diff -rc term-4.1.0-20060707/fig.trm term-4.1.0-ja-20060707/fig.trm
   END_HELP(fig)
   #endif /* TERM_HELP */
   
-diff -rc term-4.1.0-20060707/gd.trm term-4.1.0-ja-20060707/gd.trm
-*** term-4.1.0-20060707/gd.trm	2006-07-05 17:47:15.000000000 +0900
---- term-4.1.0-ja-20060707/gd.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/gd.trm term-4.1.0-ja-20060727/gd.trm
+*** term-4.1.0-20060727/gd.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/gd.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 2009,2014 ****
 --- 2009,2015 ----
@@ -2115,9 +2117,9 @@ diff -rc term-4.1.0-20060707/gd.trm term-4.1.0-ja-20060707/gd.trm
   END_HELP(gif)
   #endif /* TERM_HELP */
   #endif /* HAVE_GD_GIF */
-diff -rc term-4.1.0-20060707/ggi.trm term-4.1.0-ja-20060707/ggi.trm
-*** term-4.1.0-20060707/ggi.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/ggi.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/ggi.trm term-4.1.0-ja-20060727/ggi.trm
+*** term-4.1.0-20060727/ggi.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/ggi.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 1504,1509 ****
 --- 1504,1510 ----
@@ -2172,9 +2174,9 @@ diff -rc term-4.1.0-20060707/ggi.trm term-4.1.0-ja-20060707/ggi.trm
 + #endif
   END_HELP(ggi)
   #endif
-diff -rc term-4.1.0-20060707/gnugraph.trm term-4.1.0-ja-20060707/gnugraph.trm
-*** term-4.1.0-20060707/gnugraph.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/gnugraph.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/gnugraph.trm term-4.1.0-ja-20060727/gnugraph.trm
+*** term-4.1.0-20060727/gnugraph.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/gnugraph.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 422,427 ****
 --- 422,428 ----
@@ -2225,9 +2227,9 @@ diff -rc term-4.1.0-20060707/gnugraph.trm term-4.1.0-ja-20060707/gnugraph.trm
 + #endif
   END_HELP(gnugraph)
   #endif
-diff -rc term-4.1.0-20060707/gpic.trm term-4.1.0-ja-20060707/gpic.trm
-*** term-4.1.0-20060707/gpic.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/gpic.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/gpic.trm term-4.1.0-ja-20060727/gpic.trm
+*** term-4.1.0-20060727/gpic.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/gpic.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 294,299 ****
 --- 294,300 ----
@@ -2311,9 +2313,9 @@ diff -rc term-4.1.0-20060707/gpic.trm term-4.1.0-ja-20060707/gpic.trm
 + #endif
   END_HELP(gpic)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/gpr.trm term-4.1.0-ja-20060707/gpr.trm
-*** term-4.1.0-20060707/gpr.trm	2004-07-02 02:10:15.000000000 +0900
---- term-4.1.0-ja-20060707/gpr.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/gpr.trm term-4.1.0-ja-20060727/gpr.trm
+*** term-4.1.0-20060727/gpr.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/gpr.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 462,467 ****
 --- 462,468 ----
@@ -2346,9 +2348,9 @@ diff -rc term-4.1.0-20060707/gpr.trm term-4.1.0-ja-20060707/gpr.trm
 + #endif
   END_HELP(gpr)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/grass.trm term-4.1.0-ja-20060707/grass.trm
-*** term-4.1.0-20060707/grass.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/grass.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/grass.trm term-4.1.0-ja-20060727/grass.trm
+*** term-4.1.0-20060727/grass.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/grass.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 624,629 ****
 --- 624,630 ----
@@ -2380,9 +2382,9 @@ diff -rc term-4.1.0-20060707/grass.trm term-4.1.0-ja-20060707/grass.trm
 + #endif
   END_HELP(grass)
   #endif
-diff -rc term-4.1.0-20060707/hp26.trm term-4.1.0-ja-20060707/hp26.trm
-*** term-4.1.0-20060707/hp26.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/hp26.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/hp26.trm term-4.1.0-ja-20060727/hp26.trm
+*** term-4.1.0-20060727/hp26.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/hp26.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 698,703 ****
 --- 698,704 ----
@@ -2412,9 +2414,9 @@ diff -rc term-4.1.0-20060707/hp26.trm term-4.1.0-ja-20060707/hp26.trm
 + #endif
   END_HELP(hp2623a)
   #endif
-diff -rc term-4.1.0-20060707/hp2648.trm term-4.1.0-ja-20060707/hp2648.trm
-*** term-4.1.0-20060707/hp2648.trm	2004-07-02 02:10:15.000000000 +0900
---- term-4.1.0-ja-20060707/hp2648.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/hp2648.trm term-4.1.0-ja-20060727/hp2648.trm
+*** term-4.1.0-20060727/hp2648.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/hp2648.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 188,193 ****
 --- 188,194 ----
@@ -2444,9 +2446,9 @@ diff -rc term-4.1.0-20060707/hp2648.trm term-4.1.0-ja-20060707/hp2648.trm
 + #endif
   END_HELP(hp2648)
   #endif
-diff -rc term-4.1.0-20060707/hp500c.trm term-4.1.0-ja-20060707/hp500c.trm
-*** term-4.1.0-20060707/hp500c.trm	2004-07-02 02:10:15.000000000 +0900
---- term-4.1.0-ja-20060707/hp500c.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/hp500c.trm term-4.1.0-ja-20060727/hp500c.trm
+*** term-4.1.0-20060727/hp500c.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/hp500c.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 527,532 ****
 --- 527,533 ----
@@ -2485,9 +2487,9 @@ diff -rc term-4.1.0-20060707/hp500c.trm term-4.1.0-ja-20060707/hp500c.trm
 + #endif
   END_HELP(hp500c)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/hpgl.trm term-4.1.0-ja-20060707/hpgl.trm
-*** term-4.1.0-20060707/hpgl.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/hpgl.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/hpgl.trm term-4.1.0-ja-20060727/hpgl.trm
+*** term-4.1.0-20060727/hpgl.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/hpgl.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 2610,2615 ****
 --- 2610,2616 ----
@@ -2587,9 +2589,9 @@ diff -rc term-4.1.0-20060707/hpgl.trm term-4.1.0-ja-20060707/hpgl.trm
 + #endif
   END_HELP(hpgl)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/hpljii.trm term-4.1.0-ja-20060707/hpljii.trm
-*** term-4.1.0-20060707/hpljii.trm	2004-07-02 02:10:15.000000000 +0900
---- term-4.1.0-ja-20060707/hpljii.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/hpljii.trm term-4.1.0-ja-20060727/hpljii.trm
+*** term-4.1.0-20060727/hpljii.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/hpljii.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 401,406 ****
 --- 401,407 ----
@@ -2636,9 +2638,9 @@ diff -rc term-4.1.0-20060707/hpljii.trm term-4.1.0-ja-20060707/hpljii.trm
 + #endif
   END_HELP(hpljii)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/hppj.trm term-4.1.0-ja-20060707/hppj.trm
-*** term-4.1.0-20060707/hppj.trm	2004-07-02 02:10:15.000000000 +0900
---- term-4.1.0-ja-20060707/hppj.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/hppj.trm term-4.1.0-ja-20060727/hppj.trm
+*** term-4.1.0-20060727/hppj.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/hppj.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 273,278 ****
 --- 273,279 ----
@@ -2673,9 +2675,9 @@ diff -rc term-4.1.0-20060707/hppj.trm term-4.1.0-ja-20060707/hppj.trm
 + #endif
   END_HELP(hppj)
   #endif
-diff -rc term-4.1.0-20060707/imagen.trm term-4.1.0-ja-20060707/imagen.trm
-*** term-4.1.0-20060707/imagen.trm	2006-02-21 06:05:27.000000000 +0900
---- term-4.1.0-ja-20060707/imagen.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/imagen.trm term-4.1.0-ja-20060727/imagen.trm
+*** term-4.1.0-20060727/imagen.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/imagen.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 886,891 ****
 --- 886,892 ----
@@ -2719,9 +2721,9 @@ diff -rc term-4.1.0-20060707/imagen.trm term-4.1.0-ja-20060707/imagen.trm
 + #endif
   END_HELP(imagen)
   #endif
-diff -rc term-4.1.0-20060707/iris4d.trm term-4.1.0-ja-20060707/iris4d.trm
-*** term-4.1.0-20060707/iris4d.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/iris4d.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/iris4d.trm term-4.1.0-ja-20060727/iris4d.trm
+*** term-4.1.0-20060727/iris4d.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/iris4d.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 312,317 ****
 --- 312,318 ----
@@ -2780,9 +2782,9 @@ diff -rc term-4.1.0-20060707/iris4d.trm term-4.1.0-ja-20060707/iris4d.trm
 + #endif
   END_HELP(iris4d)
   #endif /* TERM_TABLE */
-diff -rc term-4.1.0-20060707/kyo.trm term-4.1.0-ja-20060707/kyo.trm
-*** term-4.1.0-20060707/kyo.trm	2004-07-02 02:10:15.000000000 +0900
---- term-4.1.0-ja-20060707/kyo.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/kyo.trm term-4.1.0-ja-20060727/kyo.trm
+*** term-4.1.0-20060727/kyo.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/kyo.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 204,209 ****
 --- 204,210 ----
@@ -2820,9 +2822,9 @@ diff -rc term-4.1.0-20060707/kyo.trm term-4.1.0-ja-20060707/kyo.trm
 + #endif
   END_HELP(kyo)
   #endif
-diff -rc term-4.1.0-20060707/latex.trm term-4.1.0-ja-20060707/latex.trm
-*** term-4.1.0-20060707/latex.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/latex.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/latex.trm term-4.1.0-ja-20060727/latex.trm
+*** term-4.1.0-20060727/latex.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/latex.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 851,856 ****
 --- 851,857 ----
@@ -2846,13 +2848,13 @@ diff -rc term-4.1.0-20060707/latex.trm term-4.1.0-ja-20060707/latex.trm
 + "?set term emtex",
 + "?terminal emtex",
 + "?term emtex",
-+ "?latex",
++ "?emtex",
 + "?commands set terminal latex",
 + "?set terminal latex",
 + "?set term latex",
 + "?terminal latex",
 + "?term latex",
-+ "?emtex",
++ "?latex",
 + " `latex` と `emtex` ドライバは 2 つのオプションを持ちます。",
 + "",
 + " 書式:",
@@ -2894,9 +2896,9 @@ diff -rc term-4.1.0-20060707/latex.trm term-4.1.0-ja-20060707/latex.trm
 + #endif
   END_HELP(latex)
   #endif /* TERM_TABLE */
-diff -rc term-4.1.0-20060707/linux.trm term-4.1.0-ja-20060707/linux.trm
-*** term-4.1.0-20060707/linux.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/linux.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/linux.trm term-4.1.0-ja-20060727/linux.trm
+*** term-4.1.0-20060727/linux.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/linux.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 336,341 ****
 --- 336,342 ----
@@ -2928,9 +2930,9 @@ diff -rc term-4.1.0-20060707/linux.trm term-4.1.0-ja-20060707/linux.trm
 + #endif
   END_HELP(linux)
   #endif
-diff -rc term-4.1.0-20060707/mac.trm term-4.1.0-ja-20060707/mac.trm
-*** term-4.1.0-20060707/mac.trm	2004-07-02 02:10:15.000000000 +0900
---- term-4.1.0-ja-20060707/mac.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/mac.trm term-4.1.0-ja-20060727/mac.trm
+*** term-4.1.0-20060727/mac.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/mac.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 137,142 ****
 --- 137,143 ----
@@ -2985,9 +2987,9 @@ diff -rc term-4.1.0-20060707/mac.trm term-4.1.0-ja-20060707/mac.trm
 + #endif
   END_HELP(mac)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/metafont.trm term-4.1.0-ja-20060707/metafont.trm
-*** term-4.1.0-20060707/metafont.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/metafont.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/metafont.trm term-4.1.0-ja-20060727/metafont.trm
+*** term-4.1.0-20060727/metafont.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/metafont.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 540,545 ****
 --- 540,546 ----
@@ -3104,9 +3106,9 @@ diff -rc term-4.1.0-20060707/metafont.trm term-4.1.0-ja-20060707/metafont.trm
 + #endif
   END_HELP(mf)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/metapost.trm term-4.1.0-ja-20060707/metapost.trm
-*** term-4.1.0-20060707/metapost.trm	2006-02-21 08:33:25.000000000 +0900
---- term-4.1.0-ja-20060707/metapost.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/metapost.trm term-4.1.0-ja-20060727/metapost.trm
+*** term-4.1.0-20060727/metapost.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/metapost.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 976,981 ****
 --- 976,982 ----
@@ -3320,9 +3322,9 @@ diff -rc term-4.1.0-20060707/metapost.trm term-4.1.0-ja-20060707/metapost.trm
 + #endif
   END_HELP(mp)
   #endif				/* TERM_HELP */
-diff -rc term-4.1.0-20060707/mgr.trm term-4.1.0-ja-20060707/mgr.trm
-*** term-4.1.0-20060707/mgr.trm	2004-07-02 02:10:16.000000000 +0900
---- term-4.1.0-ja-20060707/mgr.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/mgr.trm term-4.1.0-ja-20060727/mgr.trm
+*** term-4.1.0-20060727/mgr.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/mgr.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 232,237 ****
 --- 232,238 ----
@@ -3352,9 +3354,9 @@ diff -rc term-4.1.0-20060707/mgr.trm term-4.1.0-ja-20060707/mgr.trm
 + #endif
   END_HELP(mgr)
   #endif
-diff -rc term-4.1.0-20060707/mif.trm term-4.1.0-ja-20060707/mif.trm
-*** term-4.1.0-20060707/mif.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/mif.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/mif.trm term-4.1.0-ja-20060727/mif.trm
+*** term-4.1.0-20060727/mif.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/mif.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 965,970 ****
 --- 965,971 ----
@@ -3407,9 +3409,9 @@ diff -rc term-4.1.0-20060707/mif.trm term-4.1.0-ja-20060707/mif.trm
 + #endif
   END_HELP(mif)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/multitos.trm term-4.1.0-ja-20060707/multitos.trm
-*** term-4.1.0-20060707/multitos.trm	2004-07-02 02:10:33.000000000 +0900
---- term-4.1.0-ja-20060707/multitos.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/multitos.trm term-4.1.0-ja-20060727/multitos.trm
+*** term-4.1.0-20060727/multitos.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/multitos.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 407,412 ****
 --- 407,413 ----
@@ -3441,9 +3443,9 @@ diff -rc term-4.1.0-20060707/multitos.trm term-4.1.0-ja-20060707/multitos.trm
 + #endif
   END_HELP(mtos)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/next.trm term-4.1.0-ja-20060707/next.trm
-*** term-4.1.0-20060707/next.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/next.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/next.trm term-4.1.0-ja-20060727/next.trm
+*** term-4.1.0-20060727/next.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/next.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 1501,1506 ****
 --- 1501,1507 ----
@@ -3496,9 +3498,9 @@ diff -rc term-4.1.0-20060707/next.trm term-4.1.0-ja-20060707/next.trm
   END_HELP(next)
   #endif /* TERM_HELP */
   
-diff -rc term-4.1.0-20060707/openstep.trm term-4.1.0-ja-20060707/openstep.trm
-*** term-4.1.0-20060707/openstep.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/openstep.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/openstep.trm term-4.1.0-ja-20060727/openstep.trm
+*** term-4.1.0-20060727/openstep.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/openstep.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 1373,1378 ****
 --- 1373,1379 ----
@@ -3558,9 +3560,9 @@ diff -rc term-4.1.0-20060707/openstep.trm term-4.1.0-ja-20060707/openstep.trm
   END_HELP(openstep)
   #endif /* TERM_HELP */
   
-diff -rc term-4.1.0-20060707/pbm.trm term-4.1.0-ja-20060707/pbm.trm
-*** term-4.1.0-20060707/pbm.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/pbm.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/pbm.trm term-4.1.0-ja-20060727/pbm.trm
+*** term-4.1.0-20060727/pbm.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/pbm.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 465,470 ****
 --- 465,471 ----
@@ -3613,9 +3615,9 @@ diff -rc term-4.1.0-20060707/pbm.trm term-4.1.0-ja-20060707/pbm.trm
 + #endif
   END_HELP(pbm)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/pc.trm term-4.1.0-ja-20060707/pc.trm
-*** term-4.1.0-20060707/pc.trm	2006-02-21 05:17:57.000000000 +0900
---- term-4.1.0-ja-20060707/pc.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/pc.trm term-4.1.0-ja-20060727/pc.trm
+*** term-4.1.0-20060727/pc.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/pc.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 546,551 ****
 --- 546,552 ----
@@ -3646,9 +3648,9 @@ diff -rc term-4.1.0-20060707/pc.trm term-4.1.0-ja-20060707/pc.trm
 + #endif
   END_HELP(dospc)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/pdf.trm term-4.1.0-ja-20060707/pdf.trm
-*** term-4.1.0-20060707/pdf.trm	2006-07-07 10:47:48.000000000 +0900
---- term-4.1.0-ja-20060707/pdf.trm	2006-07-07 11:17:59.000000000 +0900
+diff -rc term-4.1.0-20060727/pdf.trm term-4.1.0-ja-20060727/pdf.trm
+*** term-4.1.0-20060727/pdf.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/pdf.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 1612,1617 ****
 --- 1612,1618 ----
@@ -3713,9 +3715,9 @@ diff -rc term-4.1.0-20060707/pdf.trm term-4.1.0-ja-20060707/pdf.trm
 + #endif
   END_HELP(pdf)
   #endif
-diff -rc term-4.1.0-20060707/pm.trm term-4.1.0-ja-20060707/pm.trm
-*** term-4.1.0-20060707/pm.trm	2006-03-12 07:11:45.000000000 +0900
---- term-4.1.0-ja-20060707/pm.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/pm.trm term-4.1.0-ja-20060727/pm.trm
+*** term-4.1.0-20060727/pm.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/pm.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 1284,1289 ****
 --- 1284,1290 ----
@@ -3770,12 +3772,12 @@ diff -rc term-4.1.0-20060707/pm.trm term-4.1.0-ja-20060707/pm.trm
 + #endif
   END_HELP(pm)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
-*** term-4.1.0-20060707/post.trm	2006-06-21 21:34:51.000000000 +0900
---- term-4.1.0-ja-20060707/post.trm	2006-07-07 11:18:01.000000000 +0900
+diff -rc term-4.1.0-20060727/post.trm term-4.1.0-ja-20060727/post.trm
+*** term-4.1.0-20060727/post.trm	2006-07-23 18:52:01.000000000 +0900
+--- term-4.1.0-ja-20060727/post.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
-*** 3217,3222 ****
---- 3217,3223 ----
+*** 3309,3314 ****
+--- 3309,3315 ----
    * of "text" that is necessary to avoid errors.
    */
   START_HELP(00psglobal)
@@ -3784,8 +3786,8 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
   "                               {level1 | leveldefault}",\
   "                               {color | colour | monochrome}",\
 ***************
-*** 3279,3287 ****
---- 3280,3355 ----
+*** 3379,3387 ****
+--- 3380,3463 ----
   " actual limits of the plot.",\
   "",
   ""
@@ -3802,6 +3804,15 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
 + #define PS_COMMON_OPTS2 \
 + "                               {blacktext | colortext | colourtext}",\
 + "                               {{font} \"fontname{,fontsize}\" {<fontsize>}}",
++ #ifdef GNUPLOT_PS_DIR
++ #define PS_COMMON_PROLOG_INFO \
++ " 以下のようなエラーメッセージが出た場合:",\
++ "       \"Can't find PostScript prologue file ... \"",\
++ " `postscript prologue` の項目を見て、その指示に従ってください。",\
++ "",
++ #else
++ #define PS_COMMON_PROLOG_INFO
++ #endif
 + #define PS_COMMON_DOC1 \
 + " オプション `color` はカラーを有効にし、`monochrome` は各要素を黒と白",\
 + " 描画します。さらに、`monochrome` は灰色の `palette` も使用しますが、",\
@@ -3831,14 +3842,13 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
 + " `rounded` は、線の端や接合部を丸くし、デフォルトの `butt` は尖った端と",\
 + " 角張った接合部を使用します。",\
 + "",\
-+ " `palfuncparam` は `pm3d` を有効にしてコンパイルした場合のみ使用できま",\
-+ " す。これは `set palette functions` から出力の傾きをどのようにコード化",\
-+ " するかを制御します。解析的な色の成分関数 (`set palatte functions` で設",\
-+ " 定される) は、postscript 出力では傾きの線形補完を用いてコード化されま",\
-+ " す: まず色の成分関数が <samples> 個の点で標本化され、そしてそれらの点",\
-+ " は、結果として線形補完との偏差が <maxdeviation> 以内に収まるように削除",\
-+ " されます。ほとんど全ての有効なパレットで、デフォルトの <samples>=2000",\
-+ " と <maxdeviation>=0.003 の値をそのまま使うのが良いでしょう。",\
++ " `palfuncparam` は `set palette functions` から出力の傾きをどのようにコ",\
++ " ード化するかを制御します。解析的な色の成分関数 (`set palatte functions` ",\
++ " で設定される) は、postscript 出力では傾きの線形補完を用いてコード化さ",\
++ " れます: まず色の成分関数が <samples> 個の点で標本化され、そしてそれら",\
++ " の点は、結果として線形補完との偏差が <maxdeviation> 以内に収まるように",\
++ " 削除されます。ほとんど全ての有効なパレットで、デフォルトの <samples>",\
++ " =2000 と <maxdeviation>=0.003 の値をそのまま使うのが良いでしょう。",\
 + "",\
 + " PostScript 出力のデフォルトの大きさは 10 インチ x 7 インチです。EPS ",\
 + " 出力のデフォルトの大きさは 5 x 3.5 インチです。オプション `size` は",\
@@ -3863,8 +3873,8 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
   "?commands set terminal epslatex",
   "?set terminal epslatex",
 ***************
-*** 3448,3456 ****
---- 3516,3699 ----
+*** 3549,3557 ****
+--- 3625,3809 ----
   " by the `header` command.  Thus, you can use `header` to overwrite some of",
   " settings performed using \"gnuplot.cfg\"",
   ""
@@ -3897,10 +3907,11 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
 + " なしています。より多くの Postscript の線種や記号も使われます。以前の状",
 + " 態にほぼ等しい状態にするにはオプション `oldstyle` を指定してください。",
 + " (実際にはごくわずかな違いが残ります: 記号のサイズがわずかに違い、目盛り",
-+ " 刻 (tics) は従来の半分になっていますがそれは `set ticscale` で変更でき",
-+ " ます。そして矢 (arrow) に関しては postscript 出力形式で使える全ての機能",
-+ " が利用できます。)",
++ " 刻 (tics) は従来の半分になっていますがそれは `set tics scale` で変更で",
++ " きます。そして矢 (arrow) に関しては postscript 出力形式で使える全ての機",
++ " 能が利用できます。)",
 + "",
++ PS_COMMON_PROLOG_INFO
 + PS_COMMON_DOC1
 + " `blacktext` は、たとえカラーモードでも全ての文字列を黒で書きます。",
 + "",
@@ -4050,8 +4061,8 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
   "?commands set terminal pslatex",
   "?set terminal pslatex",
 ***************
-*** 3529,3537 ****
---- 3772,3859 ----
+*** 3631,3639 ****
+--- 3883,3971 ----
   "",
   " Linewidths and pointsizes may be changed with `set style line`."
   ""
@@ -4083,6 +4094,7 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
 + PS_COMMON_OPTS1
 + "                               {<font_size>}",
 + "",
++ PS_COMMON_PROLOG_INFO
 + PS_COMMON_DOC1
 + " `rotate` が指定されると y 軸の見出しが回転されます。",
 + " <font_size> は希望するフォントの (ポイント単位での) 大きさです。",
@@ -4141,11 +4153,11 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
   "?commands set terminal postscript",
   "?set terminal postscript",
 ***************
-*** 3863,3868 ****
---- 4185,4520 ----
-  " the additional font \"CMEX10-Baseline\". It is shifted vertically in order",
-  " to fit better to the other glyphs (CMEX10 has its baseline at the top of",
-  " the symbols).",
+*** 3983,3987 ****
+--- 4315,4668 ----
+  #endif
+  "",
+  ""
 + #else
 + "1 postscript",
 + "?commands set terminal postscript",
@@ -4165,6 +4177,7 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
 + "                                | nofontfiles}",
 + PS_COMMON_OPTS1
 + PS_COMMON_OPTS2
++ PS_COMMON_PROLOG_INFO
 + "",
 + " `landscape` と `portrait` は出力が横置か、縦置かを選択します。",
 + " `eps` モードは EPS (Encapsulated PostScript) 出力を生成しますが、これ",
@@ -4474,14 +4487,31 @@ diff -rc term-4.1.0-20060707/post.trm term-4.1.0-ja-20060707/post.trm
 + " フォント \"CMEX10\" (ファイル \"cmex10.pfb\") を埋め込むと、gnuplot は",
 + " 追加フォント \"CMEX10-Baseline\" も定義します。それは、他の文字にあうよ",
 + " うに垂直方向にずらされたものです (CMEX10 は、記号の天辺にベースライン",
-+ " があります)。"
++ " があります)。",
++ #ifdef GNUPLOT_PS_DIR
++ "2 postscript prologue",
++ "?commands set terminal postscript prologue",
++ "?set terminal postscript prologue",
++ "?terminal postscript prologue",
++ "?postscript prologue",
++ "?prologue",
++ " 各 PostScript 出力ファイルは %%Prolog セクションを含みますし、例えば文",
++ " 字エンコーディングなどを含む追加ユーザ定義セクションを含むかもしれませ",
++ " せん。これらのセクションは、あなたのコンピュータの別のところに保存され",
++ " ている PostScript prologue ファイル群からコピーされます。それらのファ",
++ " イルの置き場所のデフォルトのディレクトリは、gnuplot のコンパイル時にセ",
++ " ットされます。しかしこれは、環境変数 GNUPLOT_PS_DIR を定義するか、また",
++ " は gnuplot コマンドの `set loadpath` を使うことで制御できます。詳細は",
++ " `set loadpath` を参照してください。",
 + #endif
-  #ifdef GNUPLOT_PS_DIR
-  "2 postscript prologue",
-  "?commands set terminal postscript prologue",
-diff -rc term-4.1.0-20060707/pstricks.trm term-4.1.0-ja-20060707/pstricks.trm
-*** term-4.1.0-20060707/pstricks.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/pstricks.trm	2006-07-07 11:18:00.000000000 +0900
++ "",
++ ""
++ #endif
+  END_HELP(post)
+  #endif /* TERM_HELP */
+diff -rc term-4.1.0-20060727/pstricks.trm term-4.1.0-ja-20060727/pstricks.trm
+*** term-4.1.0-20060727/pstricks.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/pstricks.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 677,682 ****
 --- 677,683 ----
@@ -4524,9 +4554,9 @@ diff -rc term-4.1.0-20060707/pstricks.trm term-4.1.0-ja-20060707/pstricks.trm
 + #endif
   END_HELP(pstricks)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/qms.trm term-4.1.0-ja-20060707/qms.trm
-*** term-4.1.0-20060707/qms.trm	2004-07-02 02:10:34.000000000 +0900
---- term-4.1.0-ja-20060707/qms.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/qms.trm term-4.1.0-ja-20060727/qms.trm
+*** term-4.1.0-20060727/qms.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/qms.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 225,230 ****
 --- 225,231 ----
@@ -4556,9 +4586,9 @@ diff -rc term-4.1.0-20060707/qms.trm term-4.1.0-ja-20060707/qms.trm
 + #endif
   END_HELP(qms)
   #endif
-diff -rc term-4.1.0-20060707/regis.trm term-4.1.0-ja-20060707/regis.trm
-*** term-4.1.0-20060707/regis.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/regis.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/regis.trm term-4.1.0-ja-20060727/regis.trm
+*** term-4.1.0-20060727/regis.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/regis.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 258,263 ****
 --- 258,264 ----
@@ -4592,9 +4622,9 @@ diff -rc term-4.1.0-20060707/regis.trm term-4.1.0-ja-20060707/regis.trm
 + #endif
   END_HELP(regis)
   #endif
-diff -rc term-4.1.0-20060707/rgip.trm term-4.1.0-ja-20060707/rgip.trm
-*** term-4.1.0-20060707/rgip.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/rgip.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/rgip.trm term-4.1.0-ja-20060727/rgip.trm
+*** term-4.1.0-20060727/rgip.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/rgip.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 585,590 ****
 --- 585,591 ----
@@ -4645,9 +4675,9 @@ diff -rc term-4.1.0-20060707/rgip.trm term-4.1.0-ja-20060707/rgip.trm
 + #endif
   END_HELP(rgip)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/sun.trm term-4.1.0-ja-20060707/sun.trm
-*** term-4.1.0-20060707/sun.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/sun.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/sun.trm term-4.1.0-ja-20060727/sun.trm
+*** term-4.1.0-20060727/sun.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/sun.trm	2006-07-27 13:34:15.000000000 +0900
 ***************
 *** 360,365 ****
 --- 360,366 ----
@@ -4677,9 +4707,9 @@ diff -rc term-4.1.0-20060707/sun.trm term-4.1.0-ja-20060707/sun.trm
 + #endif
   END_HELP(sun)
   #endif
-diff -rc term-4.1.0-20060707/svg.trm term-4.1.0-ja-20060707/svg.trm
-*** term-4.1.0-20060707/svg.trm	2006-04-06 00:09:08.000000000 +0900
---- term-4.1.0-ja-20060707/svg.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/svg.trm term-4.1.0-ja-20060727/svg.trm
+*** term-4.1.0-20060727/svg.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/svg.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 1337,1342 ****
 --- 1337,1343 ----
@@ -4743,9 +4773,9 @@ diff -rc term-4.1.0-20060707/svg.trm term-4.1.0-ja-20060707/svg.trm
 + #endif
   END_HELP(svg)
   #endif
-diff -rc term-4.1.0-20060707/t410x.trm term-4.1.0-ja-20060707/t410x.trm
-*** term-4.1.0-20060707/t410x.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/t410x.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/t410x.trm term-4.1.0-ja-20060727/t410x.trm
+*** term-4.1.0-20060727/t410x.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/t410x.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 315,320 ****
 --- 315,321 ----
@@ -4775,9 +4805,9 @@ diff -rc term-4.1.0-20060707/t410x.trm term-4.1.0-ja-20060707/t410x.trm
 + #endif
   END_HELP(tek410x)
   #endif
-diff -rc term-4.1.0-20060707/tek.trm term-4.1.0-ja-20060707/tek.trm
-*** term-4.1.0-20060707/tek.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/tek.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/tek.trm term-4.1.0-ja-20060727/tek.trm
+*** term-4.1.0-20060727/tek.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/tek.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 725,730 ****
 --- 725,731 ----
@@ -4842,9 +4872,9 @@ diff -rc term-4.1.0-20060707/tek.trm term-4.1.0-ja-20060707/tek.trm
 + #endif
   END_HELP(tek40)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/texdraw.trm term-4.1.0-ja-20060707/texdraw.trm
-*** term-4.1.0-20060707/texdraw.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/texdraw.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/texdraw.trm term-4.1.0-ja-20060727/texdraw.trm
+*** term-4.1.0-20060727/texdraw.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/texdraw.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 368,373 ****
 --- 368,374 ----
@@ -4883,9 +4913,9 @@ diff -rc term-4.1.0-20060707/texdraw.trm term-4.1.0-ja-20060707/texdraw.trm
 + #endif
   END_HELP(texdraw)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/tgif.trm term-4.1.0-ja-20060707/tgif.trm
-*** term-4.1.0-20060707/tgif.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/tgif.trm	2006-07-07 11:18:02.000000000 +0900
+diff -rc term-4.1.0-20060727/tgif.trm term-4.1.0-ja-20060727/tgif.trm
+*** term-4.1.0-20060727/tgif.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/tgif.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 1734,1739 ****
 --- 1734,1740 ----
@@ -4978,9 +5008,9 @@ diff -rc term-4.1.0-20060707/tgif.trm term-4.1.0-ja-20060707/tgif.trm
   END_HELP(tgif)
   #endif
   /*{{{}}}*/
-diff -rc term-4.1.0-20060707/tkcanvas.trm term-4.1.0-ja-20060707/tkcanvas.trm
-*** term-4.1.0-20060707/tkcanvas.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/tkcanvas.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/tkcanvas.trm term-4.1.0-ja-20060727/tkcanvas.trm
+*** term-4.1.0-20060727/tkcanvas.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/tkcanvas.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 610,615 ****
 --- 610,616 ----
@@ -5053,9 +5083,9 @@ diff -rc term-4.1.0-20060707/tkcanvas.trm term-4.1.0-ja-20060707/tkcanvas.trm
 + #endif
   END_HELP(tkcanvas)
   #endif
-diff -rc term-4.1.0-20060707/tpic.trm term-4.1.0-ja-20060707/tpic.trm
-*** term-4.1.0-20060707/tpic.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/tpic.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/tpic.trm term-4.1.0-ja-20060727/tpic.trm
+*** term-4.1.0-20060727/tpic.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/tpic.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 928,933 ****
 --- 928,934 ----
@@ -5113,9 +5143,9 @@ diff -rc term-4.1.0-20060707/tpic.trm term-4.1.0-ja-20060707/tpic.trm
 + #endif
   END_HELP(tpic)
   #endif /* TERM_TABLE */
-diff -rc term-4.1.0-20060707/unixpc.trm term-4.1.0-ja-20060707/unixpc.trm
-*** term-4.1.0-20060707/unixpc.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/unixpc.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/unixpc.trm term-4.1.0-ja-20060727/unixpc.trm
+*** term-4.1.0-20060727/unixpc.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/unixpc.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 615,620 ****
 --- 615,621 ----
@@ -5145,9 +5175,9 @@ diff -rc term-4.1.0-20060707/unixpc.trm term-4.1.0-ja-20060707/unixpc.trm
 + #endif
   END_HELP(unixpc)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/unixplot.trm term-4.1.0-ja-20060707/unixplot.trm
-*** term-4.1.0-20060707/unixplot.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/unixplot.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/unixplot.trm term-4.1.0-ja-20060727/unixplot.trm
+*** term-4.1.0-20060727/unixplot.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/unixplot.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 176,181 ****
 --- 176,182 ----
@@ -5181,9 +5211,9 @@ diff -rc term-4.1.0-20060707/unixplot.trm term-4.1.0-ja-20060707/unixplot.trm
   END_HELP(unixplot)
   #endif
   #endif
-diff -rc term-4.1.0-20060707/v384.trm term-4.1.0-ja-20060707/v384.trm
-*** term-4.1.0-20060707/v384.trm	2004-07-02 02:10:34.000000000 +0900
---- term-4.1.0-ja-20060707/v384.trm	2006-07-07 11:18:00.000000000 +0900
+diff -rc term-4.1.0-20060727/v384.trm term-4.1.0-ja-20060727/v384.trm
+*** term-4.1.0-20060727/v384.trm	2006-07-22 17:39:08.000000000 +0900
+--- term-4.1.0-ja-20060727/v384.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 194,199 ****
 --- 194,200 ----
@@ -5213,9 +5243,9 @@ diff -rc term-4.1.0-20060707/v384.trm term-4.1.0-ja-20060707/v384.trm
 + #endif
   END_HELP(vx384)
   #endif
-diff -rc term-4.1.0-20060707/vgagl.trm term-4.1.0-ja-20060707/vgagl.trm
-*** term-4.1.0-20060707/vgagl.trm	2006-05-25 10:31:43.000000000 +0900
---- term-4.1.0-ja-20060707/vgagl.trm	2006-07-07 11:18:01.000000000 +0900
+diff -rc term-4.1.0-20060727/vgagl.trm term-4.1.0-ja-20060727/vgagl.trm
+*** term-4.1.0-20060727/vgagl.trm	2006-07-22 17:39:09.000000000 +0900
+--- term-4.1.0-ja-20060727/vgagl.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 1550,1555 ****
 --- 1550,1556 ----
@@ -5293,9 +5323,9 @@ diff -rc term-4.1.0-20060707/vgagl.trm term-4.1.0-ja-20060707/vgagl.trm
   END_HELP(vgagl)
   #endif
   #endif /* defined(USE_MOUSE) */
-diff -rc term-4.1.0-20060707/vws.trm term-4.1.0-ja-20060707/vws.trm
-*** term-4.1.0-20060707/vws.trm	2006-02-21 05:17:58.000000000 +0900
---- term-4.1.0-ja-20060707/vws.trm	2006-07-07 11:18:01.000000000 +0900
+diff -rc term-4.1.0-20060727/vws.trm term-4.1.0-ja-20060727/vws.trm
+*** term-4.1.0-20060727/vws.trm	2006-07-22 17:39:09.000000000 +0900
+--- term-4.1.0-ja-20060727/vws.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 480,485 ****
 --- 480,486 ----
@@ -5326,9 +5356,9 @@ diff -rc term-4.1.0-20060707/vws.trm term-4.1.0-ja-20060707/vws.trm
 + #endif
   END_HELP(VWS)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/win.trm term-4.1.0-ja-20060707/win.trm
-*** term-4.1.0-20060707/win.trm	2006-07-05 17:47:15.000000000 +0900
---- term-4.1.0-ja-20060707/win.trm	2006-07-07 11:18:01.000000000 +0900
+diff -rc term-4.1.0-20060727/win.trm term-4.1.0-ja-20060727/win.trm
+*** term-4.1.0-20060727/win.trm	2006-07-22 17:39:09.000000000 +0900
+--- term-4.1.0-ja-20060727/win.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 880,885 ****
 --- 880,886 ----
@@ -5561,9 +5591,9 @@ diff -rc term-4.1.0-20060707/win.trm term-4.1.0-ja-20060707/win.trm
 + #endif
   END_HELP(windows)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/wxt.trm term-4.1.0-ja-20060707/wxt.trm
-*** term-4.1.0-20060707/wxt.trm	2006-06-27 08:59:40.000000000 +0900
---- term-4.1.0-ja-20060707/wxt.trm	2006-07-07 11:18:01.000000000 +0900
+diff -rc term-4.1.0-20060727/wxt.trm term-4.1.0-ja-20060727/wxt.trm
+*** term-4.1.0-20060727/wxt.trm	2006-07-25 11:28:23.000000000 +0900
+--- term-4.1.0-ja-20060727/wxt.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 293,298 ****
 --- 293,299 ----
@@ -5691,12 +5721,12 @@ diff -rc term-4.1.0-20060707/wxt.trm term-4.1.0-ja-20060707/wxt.trm
 + #endif
   END_HELP(wxt)
   #endif /* TERM_HELP */
-diff -rc term-4.1.0-20060707/x11.trm term-4.1.0-ja-20060707/x11.trm
-*** term-4.1.0-20060707/x11.trm	2006-06-29 21:50:40.000000000 +0900
---- term-4.1.0-ja-20060707/x11.trm	2006-07-07 11:18:01.000000000 +0900
+diff -rc term-4.1.0-20060727/x11.trm term-4.1.0-ja-20060727/x11.trm
+*** term-4.1.0-20060727/x11.trm	2006-07-22 17:39:09.000000000 +0900
+--- term-4.1.0-ja-20060727/x11.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
-*** 1969,1974 ****
---- 1969,1975 ----
+*** 1993,1998 ****
+--- 1993,1999 ----
   
   #ifdef TERM_HELP
   START_HELP(x11)
@@ -5705,8 +5735,8 @@ diff -rc term-4.1.0-20060707/x11.trm term-4.1.0-ja-20060707/x11.trm
   "?commands set terminal x11",
   "?set terminal x11",
 ***************
-*** 2507,2512 ****
---- 2508,3053 ----
+*** 2531,2536 ****
+--- 2532,3077 ----
   "%@gnuplot*fastrotate:  on",
   "%@gnuplot*ctrlq:  off",
   "@end table"
@@ -5729,7 +5759,7 @@ diff -rc term-4.1.0-20060707/x11.trm term-4.1.0-ja-20060707/x11.trm
 + "                     {title \"<string>\"}",
 + "                     {{no}enhanced}",
 + "                     {font <fontspec>}",
-+ "                     {{no}persist} {{no}raise} {solid|dashed}",
++ "                     {{no}persist} {{no}raise} {solid|dashed} {{no}ctrlq}",
 + "                     {close}",
 + "    set terminal x11 {reset}",
 + "",
@@ -6253,9 +6283,9 @@ diff -rc term-4.1.0-20060707/x11.trm term-4.1.0-ja-20060707/x11.trm
   
   END_HELP(x11)
   #endif				/* TERM_HELP */
-diff -rc term-4.1.0-20060707/xlib.trm term-4.1.0-ja-20060707/xlib.trm
-*** term-4.1.0-20060707/xlib.trm	2006-01-13 16:04:57.000000000 +0900
---- term-4.1.0-ja-20060707/xlib.trm	2006-07-07 11:18:01.000000000 +0900
+diff -rc term-4.1.0-20060727/xlib.trm term-4.1.0-ja-20060727/xlib.trm
+*** term-4.1.0-20060727/xlib.trm	2006-07-22 17:39:09.000000000 +0900
+--- term-4.1.0-ja-20060727/xlib.trm	2006-07-27 13:34:16.000000000 +0900
 ***************
 *** 91,96 ****
 --- 91,97 ----

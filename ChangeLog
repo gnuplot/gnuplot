@@ -1,3 +1,8 @@
+2006-07-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc docs/term-ja.diff:
+	Sync Japanese documentation to recent changes in English files.
+
 2006-07-26  Per Persson  <persquare@mac.com>
 	* term/aquaterm.trm: Made UTF8 the default encoding for AquaTerm.
 	
