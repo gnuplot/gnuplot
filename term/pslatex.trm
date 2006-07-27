@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.67 2006/07/13 03:40:43 sfeam Exp $
+ * $Id: pslatex.trm,v 1.68 2006/07/16 22:28:02 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -816,7 +816,11 @@ EPSLATEX_set_color(t_colorspec *colorspec)
     else
 	memcpy(&tex_previous_colorspec, colorspec, sizeof(t_colorspec));
 
-    PS_set_color(colorspec);
+    /* Fancy footwork to deal with mono/grayscale plots */
+    if (colorspec->type == TC_LT && !ps_params->color)
+	PS_linetype(colorspec->lt);
+    else
+	PS_set_color(colorspec);
 
     /* Many [most? all?] of the set_color commands only affect the *.eps     */
     /* output stream.  So rather than printing them all to the *.tex stream, */

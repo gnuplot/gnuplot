@@ -1,3 +1,9 @@
+2006-07-27  Ethan A Merritt <merritt@u.washington.edu>
+
+	* term/pslatex.trm (EPSLATEX_set_color): If the color is specified
+	by linetype, fall back to PS_linetype for monochrome/grayscale plots.
+	Bug #1529884
+
 2206-07-27  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/plot.c (main):
