@@ -1,3 +1,10 @@
+2006-07-28  Ethan A Merritt <merritt@u.washington.edu>
+
+	* tutorial/Makefile.am.in:  Set environmental variable GNUTERM to latex
+	before running gnuplot on the tutorial demos.  Bypasses any potential
+	conflicts of default terminal type with currently installed terminals.
+	Bugfix.
+
 2006-07-27  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color): If the color is specified
