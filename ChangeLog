@@ -5,6 +5,10 @@
 	conflicts of default terminal type with currently installed terminals.
 	Bugfix.
 
+	* src/misc.c (lp_parse parse_colorspec): Incorrect parsing of linetype
+	colorspec if the colorspec was not the last thing on the command line.
+	Bug #1526387
+
 2006-07-27  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color): If the color is specified

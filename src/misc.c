@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.79 2006/04/05 03:00:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.80 2006/04/12 03:48:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -800,7 +800,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    if (almost_equals(c_token, "pal$ette")) {
 		if (set_pal++)
 		    break;
-		c_token++;
+		c_token--;
+		parse_colorspec(&lp->pm3d_color, TC_Z);
 		lp->use_palette = 1;
 		continue;
 	    }
@@ -1040,7 +1041,7 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	tc->lt = rgbtriple;
     } else if (almost_equals(c_token,"pal$ette")) {
 	c_token++;
-	if (END_OF_COMMAND || equals(c_token,"z")) {
+	if (equals(c_token,"z")) {
 	    /* The actual z value is not yet known, fill it in later */
 	    if (options >= TC_Z) {
 		tc->type = TC_Z;
@@ -1063,6 +1064,10 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	    tc->value = real(const_express(&a));
 	    if (tc->value < 0. || tc->value > 1.0)
 		int_error(c_token, "palette fraction out of range");
+	} else {
+	    /* END_OF_COMMAND or palette <blank> */
+	    if (options >= TC_Z)
+		tc->type = TC_Z;
 	}
     } else {
 	int_error(c_token, "colorspec option not recognized");
