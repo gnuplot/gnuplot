@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.39 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: emf.trm,v 1.40 2006/07/21 02:35:46 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -536,6 +536,26 @@ EMF_options()
 		emf_linewidth_factor = 1.0;
 	    continue;
 	}
+	if (almost_equals(c_token, "si$ze")) {
+	    int tempxmax = 1024;
+	    int tempymax = 768;
+	    struct value a;
+	    c_token++;
+	    if (!END_OF_COMMAND) {
+		tempxmax = real(const_express(&a));
+		if (equals(c_token, ",")) {
+		    c_token++;
+		    tempymax = real(const_express(&a));
+		}
+	    }
+	    if (tempxmax > 0)
+		term->xmax = tempxmax * EMF_PX2HM;
+	    if (tempymax > 0)
+		term->ymax = tempymax * EMF_PX2HM;
+	    term->h_tic = term->xmax / 160;
+	    term->v_tic = term->h_tic;
+	    break;
+	}
 	if (equals(c_token, "font"))
 	    c_token++;
 	/* Fall through to old-style bare font name */
@@ -569,6 +589,9 @@ EMF_options()
 	    emf_monochrome ? "monochrome" : "color",
 	    emf_dashed ? "dashed" : "solid",
 	    emf_defaultfontname, emf_defaultfontsize);
+    if (term->xmax != (int)EMF_XMAX || term->ymax != (int)EMF_YMAX)
+	sprintf(&(term_options[strlen(term_options)]), " size %d,%d ",
+	    (int)(0.5+term->xmax/EMF_PX2HM), (int)(0.5+term->ymax/EMF_PX2HM));
     if (emf_linewidth_factor != 1.0)
 	sprintf(&(term_options[strlen(term_options)]), " lw %4.1f",
 		emf_linewidth_factor);
@@ -586,6 +609,11 @@ EMF_init()
 TERM_PUBLIC void 
 EMF_graphics()
 {
+    int width = 0.5 + term->xmax/EMF_PX2HM;
+    int height = 0.5 + term->ymax/EMF_PX2HM;
+    int mmwidth = 0.5 + (term->xmax/EMF_PX2HM) * (270./1024.);
+    int mmheight = 0.5 + (term->ymax/EMF_PX2HM) * (200./768.);
+
     /* header start */
     emf_record_count = 0;
     EMF_write_emr(1, 100);
@@ -606,10 +634,10 @@ EMF_graphics()
     EMF_write_long(0);		/* descSize */
     EMF_write_long(0);		/* descOff */
     EMF_write_long(0);		/* nPalEntries */
-    EMF_write_long(1024);	/* ref dev pixwidth */
-    EMF_write_long(768);	/* ref dev pixheight */
-    EMF_write_long(270);	/* ref dev mwidth */
-    EMF_write_long(200);	/* ref dev mheight */
+    EMF_write_long(width);	/* ref dev pixwidth, default 1024 */
+    EMF_write_long(height);	/* ref dev pixheight, default 768 */
+    EMF_write_long(mmwidth);	/* ref dev mwidth, default 270 */
+    EMF_write_long(mmheight);	/* ref dev mheight, default 200 */
     EMF_write_long(0);		/* cbPixelFormat  */
     EMF_write_long(0);		/* offPixelFormat  */
     EMF_write_long(0);		/* bOpenGL */
@@ -1192,6 +1220,7 @@ START_HELP(emf)
 "",
 " Syntax:",
 "       set terminal emf {<color>} {solid | dashed} {linewidth <X>}",
+"                        {size XX,YY}",
 "                        {\"<fontname>\"} {<fontsize>}    #old syntax",
 "                        {font \"<fontname>,<fontsize>\"} #new syntax",
 "",
@@ -1200,6 +1229,9 @@ START_HELP(emf)
 " `linewidth <factor>` multiplies all line widths by this factor.",
 " <font> is the name of a font; and ",
 " `<fontsize>` is the size of the font in points.",
+"",
+" The nominal size of the output image default to 1024x768 in arbitrary",
+" units. You may specify a different nominal size using the `size` option.",
 "",
 " The first two options can be in any order.  Selecting `default` sets all",
 " options to their default values.",
