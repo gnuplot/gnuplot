@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.192 2006/07/21 02:35:48 sfeam Exp $
+ * $Id: post.trm,v 1.194 2006/07/23 06:22:25 tlecomte Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3268,7 +3268,7 @@ PS_path(int p)
 
 TERM_TABLE_START(post_driver)
     "postscript",
-    "PostScript graphics language [mode \042fontname\042 font_size]",
+    "PostScript graphics, including EPSF embedded files (*.eps)",
     PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR, 
     PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
     PS_text, null_scale, PS_graphics, PS_move, PS_vector, 

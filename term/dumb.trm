@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.24 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: dumb.trm,v 1.25 2006/07/21 02:35:45 sfeam Exp $
  *
  */
 
@@ -532,7 +532,7 @@ ENHdumb_put_text(unsigned int x, unsigned int y, const char *str)
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(dumb_driver)
-    "dumb", "printer or glass dumb terminal",
+    "dumb", "ascii art for anything that prints text",
     DUMB_XMAX, DUMB_YMAX, 1, 1,
     1, 1, DUMB_options, DUMB_init, DUMB_reset,
     DUMB_text, null_scale, DUMB_graphics, DUMB_move, DUMB_vector,

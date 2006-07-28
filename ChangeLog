@@ -20,6 +20,8 @@
 
 	* term/emf.trm: Implement "set term emf ... size XX,YY".
 
+	* term/post.trm term/dumb.trm: Update terminal description
+
 2006-07-27  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color): If the color is specified
