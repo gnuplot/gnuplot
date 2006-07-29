@@ -340,8 +340,9 @@ a reply to you.  There is a form for such postings on the WWW site.
 
 @c ?version 4.2 features
 Gnuplot version 4.2 offers many new features introduced since the preceding
-official version 4.0.  This section lists major additions and gives a partial
-list of changes and minor new features.
+official version 4.0. This section lists major additions and gives a partial
+list of changes and minor new features. For a more exhaustive list, see the
+NEWS file.
 
 
 @menu
@@ -350,6 +351,7 @@ list of changes and minor new features.
 * String_handling::             
 * Auto-layout_of_multiple_plots_on_a_page::  
 * Input_from_binary_data_files::  
+* Internal_variables::          
 * New_or_revised_terminal_drivers::  
 @end menu
 
@@ -369,30 +371,38 @@ list of changes and minor new features.
 @node Histogram, Label_plots, New_plot_styles, New_plot_styles
 @subsubsection Histogram
 
+Histograms, or bar charts, can be produced.
 See `histograms`.
 
 
 @node Label_plots, Image_data_mapped_onto_plot, Histogram, New_plot_styles
 @subsubsection Label plots
 
+In coordination with the new `datastrings` feature described below, gnuplot
+can draw a label at each vertex of a curve.
 See `labels`.
 
 
 @node Image_data_mapped_onto_plot, Filled_curves, Label_plots, New_plot_styles
 @subsubsection Image data mapped onto plot
 
+The `image` style allows to plot 2D images and map them in a 2D or 3D plot.
 See `image`.
 
 
 @node Filled_curves, Vectors, Image_data_mapped_onto_plot, New_plot_styles
 @subsubsection Filled curves
 
+The plot style `fillstyle` has been augmented to allow to fill the area
+between two input curves with a color or a pattern.
 See `filledcurves`.
 
 
 @node Vectors,  , Filled_curves, New_plot_styles
 @subsubsection Vectors
 
+gnuplot can draw plots with vectors with a small arrowhead, requiring four or
+six columns of data for 2D or 3D, respectively.
 See `vectors`.
 
 
@@ -402,19 +412,23 @@ See `vectors`.
 
 
 @menu
-* Explicit_RGB_colors_can_be_specified_for_all_plot_elements::  
-* Rectangles_with_desired_fill_and_border_can_be_placed_anywhere_in_2D::  
+* RGB_colors::                  
+* Arbitrary_rectangles::        
 @end menu
 
-@node Explicit_RGB_colors_can_be_specified_for_all_plot_elements, Rectangles_with_desired_fill_and_border_can_be_placed_anywhere_in_2D, New_plot_elements, New_plot_elements
-@subsubsection Explicit RGB colors can be specified for all plot elements
+@node RGB_colors, Arbitrary_rectangles, New_plot_elements, New_plot_elements
+@subsubsection RGB colors
 
+Explicit RGB colors can be specified for all plot elements instead of
+specifying a predefined linetype.
 See @ref{colorspec}.
 
 
-@node Rectangles_with_desired_fill_and_border_can_be_placed_anywhere_in_2D,  , Explicit_RGB_colors_can_be_specified_for_all_plot_elements, New_plot_elements
-@subsubsection Rectangles with desired fill and border can be placed anywhere in 2D
+@node Arbitrary_rectangles,  , RGB_colors, New_plot_elements
+@subsubsection Arbitrary rectangles
 
+You can place rectangles with desired fill style and border anywhere in a 2D
+plot.
 See `set object rectangle`
 
 
@@ -430,57 +444,95 @@ See `set object rectangle`
 @node String_and_text_data_read_from_datafiles, User-defined_string_variables, String_handling, String_handling
 @subsubsection String and text data read from datafiles
 
+gnuplot can now read and process text fields in datafiles.
 See `datastrings`
 
 @node User-defined_string_variables,  , String_and_text_data_read_from_datafiles, String_handling
 @subsubsection User-defined string variables, operators, and functions
 
+String variables and string functions are introduced. Most gnuplot commands
+that previously required a string constant will now also accept a string
+variable, a string expression, or a function that returns a string.
 See @ref{variables}
 
 
 @node Auto-layout_of_multiple_plots_on_a_page, Input_from_binary_data_files, String_handling, New_Features
 @subsection Auto-layout of multiple plots on a page
 
+The @ref{multiplot} mode is now able to layout automatically simple
+multiplots without having to set the size or the position for each plot.
 See @ref{multiplot}.
 
 
-@node Input_from_binary_data_files, New_or_revised_terminal_drivers, Auto-layout_of_multiple_plots_on_a_page, New_Features
+@node Input_from_binary_data_files, Internal_variables, Auto-layout_of_multiple_plots_on_a_page, New_Features
 @subsection Input from binary data files
 
+gnuplot can now read binary input, as opposed to ASCII input. The `binary`
+keyword allows you to select this mode.
 See `binary`.
 
 
-@node New_or_revised_terminal_drivers,  , Input_from_binary_data_files, New_Features
+@node Internal_variables, New_or_revised_terminal_drivers, Input_from_binary_data_files, New_Features
+@subsection Internal variables
+
+gnuplot now exports several "read-only" variables such as GPVAL_TERM,
+GPVAL_X_MIN, etc.
+See @ref{variables}.
+
+
+@node New_or_revised_terminal_drivers,  , Internal_variables, New_Features
 @subsection New or revised terminal drivers
 
 
 @menu
-* New_wxWidgets_(wxt)_cross-platform_interactive_terminal_driver::  
-* New_Enhanced_MetaFile_(EMF)_driver::  
-* Consolidated_gif/jpeg/png_driver::  
-* Adobe_Illustrator_(ai)_driver_deprecated::  
-* epslatex::                    
+* `wxt`::                       
+* `emf`::                       
+* `gif`::                       
+* `ai`::                        
+* `epslatex`::                  
+* `windows`::                   
 @end menu
 
-@node New_wxWidgets_(wxt)_cross-platform_interactive_terminal_driver, New_Enhanced_MetaFile_(EMF)_driver, New_or_revised_terminal_drivers, New_or_revised_terminal_drivers
-@subsubsection New wxWidgets (wxt) cross-platform interactive terminal driver
+@node `wxt`, `emf`, New_or_revised_terminal_drivers, New_or_revised_terminal_drivers
+@subsubsection `wxt`
 
+The `wxt` terminal is an interactive and cross-platform terminal for on-screen
+rendering. It uses the wxWidgets library for its user interface, and Cairo
+associated with Pango for the actual rendering, providing nice plots with
+antialiasing on lines and text. The terminal supports the full range of
+gnuplot capabilities, including mousing, @ref{pm3d} plots, `image` plots and
+enhanced text.
 
-@node New_Enhanced_MetaFile_(EMF)_driver, Consolidated_gif/jpeg/png_driver, New_wxWidgets_(wxt)_cross-platform_interactive_terminal_driver, New_or_revised_terminal_drivers
-@subsubsection New Enhanced MetaFile (EMF) driver
+@node `emf`, `gif`, `wxt`, New_or_revised_terminal_drivers
+@subsubsection `emf`
 
+The `emf` terminal generates an Enhanced Metafile Format file. This file
+format is the metafile standard on MS Win32 Systems.
 
-@node Consolidated_gif/jpeg/png_driver, Adobe_Illustrator_(ai)_driver_deprecated, New_Enhanced_MetaFile_(EMF)_driver, New_or_revised_terminal_drivers
-@subsubsection Consolidated gif/jpeg/png driver
+@node `gif`, `ai`, `emf`, New_or_revised_terminal_drivers
+@subsubsection `gif`, `jpeg`, `png`
 
+The code for the terminals using the `gd` library has been consolidated.
+The `gif` terminal also knows how to produce an animated gif from a sequence
+of plots.
 
-@node Adobe_Illustrator_(ai)_driver_deprecated, epslatex, Consolidated_gif/jpeg/png_driver, New_or_revised_terminal_drivers
-@subsubsection Adobe Illustrator (ai) driver deprecated
+@node `ai`, `epslatex`, `gif`, New_or_revised_terminal_drivers
+@subsubsection `ai`
 
+The Adobe Illustrator `ai` driver is outdated. Since Adobe Illustrator
+understands PostScript files, `set terminal post level1 ...` should be used
+instead.
 
-@node epslatex,  , Adobe_Illustrator_(ai)_driver_deprecated, New_or_revised_terminal_drivers
-@subsubsection epslatex, pslatex support consolidated into the main postscript driver
+@node `epslatex`, `windows`, `ai`, New_or_revised_terminal_drivers
+@subsubsection `epslatex`, `pslatex`, `pstex`
 
+The terminals supporting an output to latex augmented by PostScript files have
+been consolidated into the main `post` driver.
+
+@node `windows`,  , `epslatex`, New_or_revised_terminal_drivers
+@subsubsection `windows`
+
+The `windows` terminal now supports the `enhanced text` mode.
 
 
 @node Features_introduced_in_version_4.0, Batch/Interactive_Operation, New_Features, gnuplot
@@ -511,10 +563,10 @@ official version 3.7.  These are summarized here.
 
 
 Interaction with the current plot via mouse and hotkeys is supported for the
-X11, OS/2 Presentation Manager, ggi and Windows terminals. See `mouse input`
-for more information on mousing. See help for @ref{bind} for information on
-hotkeys. Also see the documentation for individual mousing terminals `ggi`,
-`pm`, `windows` and `x11`.
+X11, OS/2 Presentation Manager, ggi, Windows, and wxWidgets terminals. See
+`mouse input` for more information on mousing. See help for @ref{bind} for
+information on hotkeys. Also see the documentation for individual mousing
+terminals `ggi`, `pm`, `windows`, `wxt` and `x11`.
 
 Sample script: mousevariables.dem
 
@@ -583,7 +635,8 @@ specify text color, font, size, and rotation angle. See @ref{label}.
 Not all terminal types support these options, however.  The enhanced text
 mode previously available for the postscript and pm terminals has been
 extended to other terminal types as well.  Terminal types currently supported
-include aqua, dumb, jpeg, pdf, pm, png, postscript, and x11. See `enhanced text`.
+include aqua, dumb, jpeg, pdf, pm, png, postscript, x11, windows, and wxt.
+See `enhanced text`.
 
 Sample scripts: textcolor.dem textrotate.dem
 
@@ -619,7 +672,7 @@ to indicate comment lines, and to specify missing data.  Gnuplot now attempts
 to recognize text fields with embedded blanks as single entities based on the
 datafile format settings.  This allows input from csv (comma-separated value)
 files such as those exported by spreadsheet programs. See @ref{datafile}.
-See also the `binary` option in (new in version 4.2).
+See also the `binary` option (introduced in 4.2).
 
 
 @node New_commands, Other_changes_and_additions, Data_file_format, Features_introduced_in_version_4.0
@@ -1417,9 +1470,11 @@ of its argument.   See `erf` and @ref{invnorm}.
 @findex igamma
 
 
-The `igamma(a,x)` function returns the normalized incomplete gamma function
-of the real parts of its arguments.  a > 0 and x >= 0.  If the arguments are
-complex, the imaginary components are ignored.
+The `igamma(a,x)` function returns the normalized incomplete gamma
+function of the real parts of its arguments, where a > 0 and x >= 0.
+The standard notation is P(a,x), e.g. Abramowitz and Stegun (6.5.1),
+with limiting value of 1 as x approaches infinity.  If the arguments
+are complex, the imaginary components are ignored.
 
 @node imag, invnorm, igamma, Functions
 @subsubsection imag
@@ -1515,8 +1570,8 @@ The `log10(x)` function returns the logarithm (base 10) of its argument.
 @findex norm
 
 
-The `norm(x)` function returns the normal distribution function (or Gaussian)
-of the real part of its argument.   See @ref{invnorm}, `erf` and @ref{erfc}.
+The `norm(x)` function returns the cumulative normal distribution function
+(or Gaussian) of the real part of its argument.   See @ref{invnorm}, `erf` and @ref{erfc}.
 
 @node rand, real, norm, Functions
 @subsubsection rand
@@ -2643,11 +2698,10 @@ setting the terminal and defining frequently-used functions or variables.
 @cindex strings
 
 @c ?string variables
-A new feature in gnuplot 4.2 is the introduction of string variables and
-string functions. Most gnuplot commands that previously required a string
-constant will now also accept a string variable, a string expression, or a
-function that returns a string.  For example, the following four methods of
-creating a plot all result in the same plot title:
+In addition to string constants, most gnuplot commands also accept a string
+variable, a string expression, or a function that returns a string.
+For example, the following four methods of creating a plot all result in the
+same plot title:
 
 @example
       four = "4"
@@ -2896,8 +2950,8 @@ Semicolons are used to separate commands given on a single command line.
 Braces are used in text to be specially processed by some terminals, like
 @ref{postscript}.  They are also used to denote complex numbers: @{3,2@} = 3 + 2i.
 
-At present you should not embed \n inside @{@} when using the @ref{postscript}
-terminal.
+At present you should not embed \n inside @{@} when using the PostScript
+terminal in `enhanced text` mode.
 
 The EEPIC, Imagen, Uniplex, LaTeX, and TPIC drivers allow a newline to be
 specified by \\ in a single-quoted string or \\\\ in a double-quoted string.
@@ -3431,7 +3485,10 @@ the next iteration.  The process continues until a preset criterion is met,
 either (1) the fit has "converged" (the relative change in WSSR is less than
 FIT_LIMIT), or (2) it reaches a preset iteration count limit, FIT_MAXITER
 (see @ref{variables}).  The fit may also be interrupted
-and subsequently halted from the keyboard (see `fit`).
+and subsequently halted from the keyboard (see `fit`).  The user variable
+FIT_CONVERGED contains 1 if the previous fit command terminated due to
+convergence; it contains 0 if the previous fit terminated for any other
+reason.
 
 Often the function to be fitted will be based on a model (or theory) that
 attempts to describe or predict the behaviour of the data.  Then `fit` can
@@ -3507,6 +3564,13 @@ called 'reduced chisquare' when the data points are weighted.  The number of
 degrees of freedom (the number of data points minus the number of fitted
 parameters) is used in these estimates because the parameters used in
 calculating the residuals of the datapoints were obtained from the same data.
+These values are exported to the variables
+@example
+      FIT_NDF = Number of degrees of freedom
+      FIT_WSSR = Weighted sum-of-squares residual
+      FIT_STDFIT = sqrt(WSSR/NDF)
+
+@end example
 
 To estimate confidence levels for the parameters, one can use the minimum
 chisquare obtained from the fit and chisquare statistics to determine the
@@ -7442,6 +7506,10 @@ Examples:
 @opindex decimalsign
 
 
+@cindex locale
+@opindex locale
+
+
 The @ref{decimalsign} command selects a decimal sign for numbers printed
 into tic labels or @ref{label} strings.
 
@@ -7490,6 +7558,12 @@ variables.
 This instructs the program to format all input and output in accordance with
 locale "foo", which must be installed.  If locale "foo" is not found then an
 error message is printed and the decimal sign setting is unchanged.
+On linux systems you can get a list of the locales installed on your machine by
+typing "locale -a". A typical linux locale string is of the form "sl_SI.UTF-8".
+A typical Windows locale string is of the form "Slovenian_Slovenia.1250" or 
+"slovenian". Please note that interpretation of the locale settings is done by
+the C library at runtime. Older C libraries may offer only partial support for
+locale settings such as the thousands grouping separator character.
 
 @example
       set decimalsign locale; set decimalsign "."
@@ -7665,7 +7739,7 @@ Valid values are
 Generally you must set the encoding before setting the terminal type.
 Note that encoding is not supported by all terminal drivers and that
 the device must be able to produce the desired non-standard characters.
-The PostScript and X11 terminals support all encodings. OS/2 Presentation
+The PostScript, X11 and wxt terminals support all encodings. OS/2 Presentation
 Manager switches automatically to codepage 912 for `iso_8859_2`.
 
 @node fit_, fontpath, encoding, set-show
@@ -9106,16 +9180,11 @@ terminal option, then only the current plot window supports the entire
 range of mouse commands and hotkeys.  The other windows will, however,
 continue to display mouse coordinates at the lower left.
 
-This was valid only for gnuplot 4.0 (now mousing is on by default as in
-the case of other screen terminals):
-X11 mouse support is turned on by default if standard input comes from a
-terminal (tty). Mouse support is turned off if standard input does not
-come from a tty, e.g. a pipe. If you want to use mouse support while writing
-to gnuplot from a pipe, the mouse must be turned on *before* starting the x11
-driver, e.g. immediately after startup with the explicit command `set mouse`.
-Beware: on some UNIX flavours, special input devices as /dev/null might not
-be `select-able`; turning on the mouse when using such devices will hang
-gnuplot.
+For consistency with other screen terminals, X11 mouse support is turned on by
+default, wherever the standard input comes from. However, on some UNIX
+flavors, special input devices as /dev/null might not be `select-able`; using
+such devices with the mouse turned on will hang gnuplot. Please turn off
+mousing with `unset mouse` if you are in this situation.
 
 @node multiplot, mx2tics, mouse, set-show
 @subsection multiplot
@@ -9591,6 +9660,7 @@ terminals include
     GGI
     Windows
     AquaTerm (Mac OS X)
+    wxWidgets (wxt)
   Files:
     PostScript
     pslatex, pstex, epslatex
@@ -14355,6 +14425,7 @@ with no modifiers.
 * kyo::                         
 * latex::                       
 * linux::                       
+* linux_::                      
 * macintosh::                   
 * mf::                          
 * mp::                          
@@ -14398,14 +14469,18 @@ with no modifiers.
 
 @c ?commands set terminal aed767
 @c ?set terminal aed767
+@c ?set term aed767
 @c ?terminal aed767
+@c ?term aed767
 @cindex aed767
 @tmindex aed767
 
 
 @c ?commands set terminal aed512
 @c ?set terminal aed512
+@c ?set term aed512
 @c ?terminal aed512
+@c ?term aed512
 @cindex aed512
 @tmindex aed512
 
@@ -14420,10 +14495,15 @@ no options for these drivers."
 
 @c ?commands set terminal aifm
 @c ?set terminal aifm
+@c ?set term aifm
 @c ?terminal aifm
+@c ?term aifm
 @cindex aifm
-@tmindex aifm
 
+
+NOTE: this terminal driver is outdated. Since Adobe Illustrator understands
+PostScript level 1 directly, you should use `set terminal post level1`
+instead.
 
 Several options may be set in `aifm`---the Adobe Illustrator 3.0+ driver.
 
@@ -14456,7 +14536,9 @@ Examples:
 
 @c ?commands set terminal amiga
 @c ?set terminal amiga
+@c ?set term amiga
 @c ?terminal amiga
+@c ?term amiga
 @cindex amiga
 @tmindex amiga
 
@@ -14482,7 +14564,9 @@ will be larger than the screen."
 
 @c ?commands set terminal apollo
 @c ?set terminal apollo
+@c ?set term apollo
 @c ?terminal apollo
+@c ?term apollo
 @cindex apollo
 @tmindex apollo
 
@@ -14497,17 +14581,19 @@ If a fixed-size window is desired, the `gpr` terminal may be used instead."
 
 @c ?commands set terminal aqua
 @c ?set terminal aqua
+@c ?set term aqua
 @c ?terminal aqua
+@c ?term aqua
 @cindex aqua
-@tmindex aqua
 
+@cindex Aqua
 
 This terminal relies on AquaTerm.app for display on Mac OS X.
 
 Syntax:
 @example
       set terminal aqua @{<n>@} @{title "<wintitle>"@} @{size <x> <y>@}
-                        @{fname "<fontface>"@} @{fsize <fontsize>@}
+                        @{font "<fontname>@{,<fontsize>@}"@}
                         @{@{no@}enhanced@} @{solid|dashed@} @{dl <dashlength>@}@}
 
 @end example
@@ -14516,13 +14602,14 @@ where <n> is the number of the window to draw in (default is 0),
 <wintitle> is the name shown in the title bar (default "Figure <n>"),
 <x> <y> is the size of the plot (default is 846x594 pt = 11.75x8.25 in).
 
-Use <fontface> to specify the font to use (default is "Times-Roman"),
-<fontsize> sets the font size (default is 14.0 pt).
+Use <fontname> to specify the font to use (default is "Times-Roman"),
+and <fontsize> to specify the font size (default is 14.0 pt). The old syntax
+@{fname "<fontname>"@} @{fsize <fontsize>@} is still supported.
 
 The aqua terminal supports enhanced text mode (see `enhanced`), except for
 overprint. Font support is limited to the fonts available on the system.
 Character encoding can be selected by @ref{encoding} and currently supports
-iso_latin_1, iso_latin_2, and cp1250 with iso_latin_1 being the default.
+iso_latin_1, iso_latin_2, cp1250, and default which equals UTF8.
 
 Lines can be drawn either solid or dashed, (default is solid) and the dash
 spacing can be modified by <dashlength> which is a multiplier > 0.
@@ -14533,7 +14620,9 @@ spacing can be modified by <dashlength> which is a multiplier > 0.
 
 @c ?commands set terminal atari
 @c ?set terminal atari
+@c ?set term atari
 @c ?terminal atari
+@c ?term atari
 @cindex atari
 @tmindex atari
 
@@ -14572,7 +14661,9 @@ precedence."
 
 @c ?commands set terminal vdi
 @c ?set terminal vdi
+@c ?set term vdi
 @c ?terminal vdi
+@c ?term vdi
 @cindex vdi
 @tmindex vdi
 
@@ -14614,10 +14705,12 @@ precedence."
 
 @c ?commands set terminal be
 @c ?set terminal be
+@c ?set term be
 @c ?terminal be
+@c ?term be
 @cindex be
-@tmindex be
 
+@cindex BE
 
 `gnuplot` provides the `be` terminal type for use with X servers.  This
 terminal type is set automatically at startup if the `DISPLAY` environment
@@ -14667,6 +14760,7 @@ set upon initialization and cannot be altered during a `gnuplot` session.
 
 @c ?commands set terminal be command-line-options
 @c ?set terminal be command-line-options
+@c ?set term be command-line-options
 @c ?be command-line-options
 In addition to the X Toolkit options, the following options may be specified
 on the command line when starting `gnuplot` or as resources in your
@@ -14705,6 +14799,7 @@ sizes.  For example, `-pointsize 2` uses points twice the default size, and
 
 @c ?commands set terminal be monochrome_options
 @c ?set terminal be monochrome_options
+@c ?set term be monochrome_options
 @c ?be monochrome_options
 For monochrome displays, `gnuplot` does not honor foreground or background
 colors.  The default is black-on-white.  `-rv` or `gnuplot*reverseVideo: on`
@@ -14716,6 +14811,7 @@ requests white-on-black.
 
 @c ?commands set terminal be color_resources
 @c ?set terminal be color_resources
+@c ?set term be color_resources
 @c ?be color_resources
 For color displays, `gnuplot` honors the following resources (shown here
 with their default values) or the greyscale resources.  The values may be
@@ -14755,6 +14851,7 @@ Example:
 
 @c ?commands set terminal be grayscale_resources
 @c ?set terminal be grayscale_resources
+@c ?set term be grayscale_resources
 @c ?be grayscale_resources
 When `-gray` is selected, `gnuplot` honors the following resources for
 grayscale or color displays (shown here with their default values).  Note
@@ -14783,6 +14880,7 @@ that the default background is black.
 
 @c ?commands set terminal be line_resources
 @c ?set terminal be line_resources
+@c ?set term be line_resources
 @c ?be line_resources
 `gnuplot` honors the following resources for setting the width (in pixels) of
 plot lines (shown here with their default values.)  0 or 1 means a minimal
@@ -14835,14 +14933,18 @@ to a '16' dotted line.
 
 @c ?commands set terminal cgi
 @c ?set terminal cgi
+@c ?set term cgi
 @c ?terminal cgi
+@c ?term cgi
 @cindex cgi
 @tmindex cgi
 
 
 @c ?commands set terminal hcgi
 @c ?set terminal hcgi
+@c ?set term hcgi
 @c ?terminal hcgi
+@c ?term hcgi
 @cindex hcgi
 @tmindex hcgi
 
@@ -14859,7 +14961,9 @@ These terminals have no options."
 
 @c ?commands set terminal cgm
 @c ?set terminal cgm
+@c ?set term cgm
 @c ?terminal cgm
+@c ?term cgm
 @cindex cgm
 @tmindex cgm
 
@@ -14914,6 +15018,7 @@ Examples:
 
 @c ?commands set terminal cgm font
 @c ?set terminal cgm font
+@c ?set term cgm font
 @c ?cgm font
 The first part of a Computer Graphics Metafile, the metafile description,
 includes a font table.  In the picture body, a font is designated by an
@@ -15005,6 +15110,7 @@ You cannot introduce a new font in a @ref{label} command.
 
 @c ?commands set terminal cgm fontsize
 @c ?set terminal cgm fontsize
+@c ?set term cgm fontsize
 @c ?cgm fontsize
 Fonts are scaled assuming the page is 6 inches wide.  If the @ref{size}
 command is used to change the aspect ratio of the page or the CGM file
@@ -15018,6 +15124,7 @@ scaled up or down accordingly.  To change the assumed width, use the
 
 @c ?commands set terminal cgm linewidth
 @c ?set terminal cgm linewidth
+@c ?set term cgm linewidth
 @c ?cgm linewidth
 The `linewidth` option sets the width of lines in pt.  The default width
 is 1 pt.  Scaling is affected by the actual width of the page, as
@@ -15029,6 +15136,7 @@ discussed under the `fontsize` and `width` options.
 
 @c ?commands set terminal cgm rotate
 @c ?set terminal cgm rotate
+@c ?set term cgm rotate
 @c ?cgm rotate
 The `norotate` option may be used to disable text rotation.  For
 example, the CGM input filter for Word for Windows 6.0c can accept
@@ -15043,8 +15151,8 @@ the default behavior.
 
 @noindent --- SOLID ---
 
-@c ?commands set terminal cgm solid
 @c ?set terminal cgm solid
+@c ?set term cgm solid
 @c ?cgm solid
 The `solid` option may be used to disable dashed line styles in the
 plots.  This is useful when color is enabled and the dashing of the
@@ -15058,6 +15166,7 @@ each curve.
 
 @c ?commands set terminal cgm size
 @c ?set terminal cgm size
+@c ?set term cgm size
 @c ?cgm size
 Default size of a CGM plot is 32599 units wide and 23457 units high for
 landscape, or 23457 units wide by 32599 units high for portrait.
@@ -15068,6 +15177,7 @@ landscape, or 23457 units wide by 32599 units high for portrait.
 
 @c ?commands set terminal cgm width
 @c ?set terminal cgm width
+@c ?set term cgm width
 @c ?cgm width
 All distances in the CGM file are in abstract units.  The application
 that reads the file determines the size of the final plot.  By default,
@@ -15092,9 +15202,11 @@ Example:
 
 @c ?commands set terminal cgm nofontlist
 @c ?set terminal cgm nofontlist
+@c ?set term cgm nofontlist
 @c ?cgm nofontlist
 @c ?commands set terminal cgm winword6
 @c ?set terminal cgm winword6
+@c ?set term cgm winword6
 @c ?cgm winword6
 The default font table includes the fonts recommended for WebCGM, which
 are compatible with the Computer Graphics Metafile input filter for
@@ -15118,7 +15230,9 @@ gnuplot bugs which have now been fixed."
 
 @c ?commands set terminal corel
 @c ?set terminal corel
+@c ?set term corel
 @c ?terminal corel
+@c ?term corel
 @cindex corel
 @tmindex corel
 
@@ -15142,7 +15256,9 @@ inches.  The defaults are monochrome, "SwitzerlandLight", 22, 8.2, 10 and 1.2."
 
 @c ?commands set terminal debug
 @c ?set terminal debug
+@c ?set term debug
 @c ?terminal debug
+@c ?term debug
 @cindex debug
 @tmindex debug
 
@@ -15155,7 +15271,9 @@ likely to be of use only for users who are modifying the source code."
 
 @c ?commands set terminal svga
 @c ?set terminal svga
+@c ?set term svga
 @c ?terminal svga
+@c ?term svga
 @cindex svga
 @tmindex svga
 
@@ -15174,7 +15292,9 @@ Syntax:
 
 @c ?commands set terminal dumb
 @c ?set terminal dumb
+@c ?set term dumb
 @c ?terminal dumb
+@c ?term dumb
 @cindex dumb
 @tmindex dumb
 
@@ -15204,7 +15324,9 @@ Examples:
 
 @c ?commands set terminal dxf
 @c ?set terminal dxf
+@c ?set term dxf
 @c ?terminal dxf
+@c ?term dxf
 @cindex dxf
 @tmindex dxf
 
@@ -15223,7 +15345,9 @@ AutoCad print/plot command."
 
 @c ?commands set terminal dxy800a
 @c ?set terminal dxy800a
+@c ?set term dxy800a
 @c ?terminal dxy800a
+@c ?term dxy800a
 @cindex dxy800a
 @tmindex dxy800a
 
@@ -15235,7 +15359,9 @@ This terminal driver supports the Roland DXY800A plotter.  It has no options."
 
 @c ?commands set terminal eepic
 @c ?set terminal eepic
+@c ?set term eepic
 @c ?terminal eepic
+@c ?term eepic
 @cindex eepic
 @tmindex eepic
 
@@ -15340,7 +15466,9 @@ The other label -- account for long ticlabels:
 
 @c ?commands set terminal emf
 @c ?set terminal emf
+@c ?set term emf
 @c ?terminal emf
+@c ?term emf
 @cindex emf
 @tmindex emf
 
@@ -15351,6 +15479,7 @@ format is the metafile standard on MS Win32 Systems.
 Syntax:
 @example
       set terminal emf @{<color>@} @{solid | dashed@} @{linewidth <X>@}
+                       @{size XX,YY@}
                        @{"<fontname>"@} @{<fontsize>@}    #old syntax
                        @{font "<fontname>,<fontsize>"@} #new syntax
 
@@ -15361,6 +15490,9 @@ Syntax:
 `linewidth <factor>` multiplies all line widths by this factor.
 <font> is the name of a font; and 
 `<fontsize>` is the size of the font in points.
+
+The nominal size of the output image default to 1024x768 in arbitrary
+units. You may specify a different nominal size using the @ref{size} option.
 
 The first two options can be in any order.  Selecting `default` sets all
 options to their default values.
@@ -15377,21 +15509,27 @@ Examples:
 
 @c ?commands set terminal emxvga
 @c ?set terminal emxvga
+@c ?set term emxvga
 @c ?terminal emxvga
+@c ?term emxvga
 @cindex emxvga
 @tmindex emxvga
 
 
 @c ?commands set terminal emxvesa
 @c ?set terminal emxvesa
+@c ?set term emxvesa
 @c ?terminal emxvesa
+@c ?term emxvesa
 @cindex emxvesa
 @tmindex emxvesa
 
 
 @c ?commands set terminal vgal
 @c ?set terminal vgal
+@c ?set term vgal
 @c ?terminal vgal
+@c ?term vgal
 @cindex vgal
 @tmindex vgal
 
@@ -15417,49 +15555,63 @@ The only option is the vesa mode for `emxvesa`, which defaults to G640x480x256."
 
 @c ?commands set terminal epson-180dpi
 @c ?set terminal epson-180dpi
+@c ?set term epson-180dpi
 @c ?terminal epson-180dpi
+@c ?term epson-180dpi
 @cindex epson-180dpi
 @tmindex epson-180dpi
 
 
 @c ?commands set terminal epson-60dpi
 @c ?set terminal epson-60dpi
+@c ?set term epson-60dpi
 @c ?terminal epson-60dpi
+@c ?term epson-60dpi
 @cindex epson-60dpi
 @tmindex epson-60dpi
 
 
 @c ?commands set terminal epson-lx800
 @c ?set terminal epson-lx800
+@c ?set term epson-lx800
 @c ?terminal epson-lx800
+@c ?term epson-lx800
 @cindex epson-lx800
 @tmindex epson-lx800
 
 
 @c ?commands set terminal nec-cp6
 @c ?set terminal nec-cp6
+@c ?set term nec-cp6
 @c ?terminal nec-cp6
+@c ?term nec-cp6
 @cindex nec-cp6
 @tmindex nec-cp6
 
 
 @c ?commands set terminal okidata
 @c ?set terminal okidata
+@c ?set term okidata
 @c ?terminal okidata
+@c ?term okidata
 @cindex okidata
 @tmindex okidata
 
 
 @c ?commands set terminal starc
 @c ?set terminal starc
+@c ?set term starc
 @c ?terminal starc
+@c ?term starc
 @cindex starc
 @tmindex starc
 
 
 @c ?commands set terminal tandy-60dpi
 @c ?set terminal tandy-60dpi
+@c ?set term tandy-60dpi
 @c ?terminal tandy-60dpi
+@c ?term tandy-60dpi
 @cindex tandy-60dpi
 @tmindex tandy-60dpi
 
@@ -15500,7 +15652,9 @@ not use `print`---use instead `copy file /b lpt1:`."
 
 @c ?commands set terminal excl
 @c ?set terminal excl
+@c ?set term excl
 @c ?terminal excl
+@c ?term excl
 @cindex excl
 @tmindex excl
 
@@ -15513,49 +15667,63 @@ printer and the 1590.  It has no options."
 
 @c ?commands set terminal hercules
 @c ?set terminal hercules
+@c ?set term hercules
 @c ?terminal hercules
+@c ?term hercules
 @cindex hercules
 @tmindex hercules
 
 
 @c ?commands set terminal egalib
 @c ?set terminal egalib
+@c ?set term egalib
 @c ?terminal egalib
+@c ?term egalib
 @cindex egalib
 @tmindex egalib
 
 
 @c ?commands set terminal egamono
 @c ?set terminal egamono
+@c ?set term egamono
 @c ?terminal egamono
+@c ?term egamono
 @cindex egamono
 @tmindex egamono
 
 
 @c ?commands set terminal vgalib
 @c ?set terminal vgalib
+@c ?set term vgalib
 @c ?terminal vgalib
+@c ?term vgalib
 @cindex vgalib
 @tmindex vgalib
 
 
 @c ?commands set terminal vgamono
 @c ?set terminal vgamono
+@c ?set term vgamono
 @c ?terminal vgamono
+@c ?term vgamono
 @cindex vgamono
 @tmindex vgamono
 
 
 @c ?commands set terminal svgalib
 @c ?set terminal svgalib
+@c ?set term svgalib
 @c ?terminal svgalib
+@c ?term svgalib
 @cindex svgalib
 @tmindex svgalib
 
 
 @c ?commands set terminal ssvgalib
 @c ?set terminal ssvgalib
+@c ?set term ssvgalib
 @c ?terminal ssvgalib
+@c ?term ssvgalib
 @cindex ssvgalib
 @tmindex ssvgalib
 
@@ -15568,7 +15736,9 @@ can be used only when compiled with Zortech C/C++.  None have options."
 
 @c ?commands set terminal fig
 @c ?set terminal fig
+@c ?set term fig
 @c ?terminal fig
+@c ?term fig
 @cindex fig
 
 @cindex xfig
@@ -15680,7 +15850,9 @@ To plot the error bars on top of the circles use
 
 @c ?commands set terminal png
 @c ?set terminal png
+@c ?set term png
 @c ?terminal png
+@c ?term png
 @cindex png
 @tmindex png
 
@@ -15798,7 +15970,9 @@ gray for axes, and a gray-scale for the six plotting colors.
 
 @c ?commands set terminal ggi
 @c ?set terminal ggi
+@c ?set term ggi
 @c ?terminal ggi
+@c ?term ggi
 @cindex ggi
 @tmindex ggi
 
@@ -15847,7 +16021,9 @@ Examples:
 
 @c ?commands set terminal gnugraph
 @c ?set terminal gnugraph
+@c ?set term gnugraph
 @c ?terminal gnugraph
+@c ?term gnugraph
 @cindex gnugraph
 @tmindex gnugraph
 
@@ -15887,7 +16063,9 @@ unless this version is left out."
 
 @c ?commands set terminal gpic
 @c ?set terminal gpic
+@c ?set term gpic
 @c ?terminal gpic
+@c ?term gpic
 @cindex gpic
 @tmindex gpic
 
@@ -15973,7 +16151,9 @@ for example, using
 
 @c ?commands set terminal gpic
 @c ?set terminal gpic
+@c ?set term gpic
 @c ?terminal gpic
+@c ?term gpic
 @cindex gpic
 @tmindex gpic
 
@@ -16059,7 +16239,9 @@ for example, using
 
 @c ?commands set terminal gpr
 @c ?set terminal gpr
+@c ?set term gpr
 @c ?terminal gpr
+@c ?term gpr
 @cindex gpr
 @tmindex gpr
 
@@ -16074,7 +16256,9 @@ If a variable window size is desired, use the `apollo` terminal instead."
 
 @c ?commands set terminal grass
 @c ?set terminal grass
+@c ?set term grass
 @c ?terminal grass
+@c ?term grass
 @cindex grass
 @tmindex grass
 
@@ -16089,7 +16273,9 @@ Graphics Window.  There are no options."
 
 @c ?commands set terminal hp2623a
 @c ?set terminal hp2623a
+@c ?set term hp2623a
 @c ?terminal hp2623a
+@c ?term hp2623a
 @cindex hp2623a
 @tmindex hp2623a
 
@@ -16102,7 +16288,9 @@ no options."
 
 @c ?commands set terminal hp2648
 @c ?set terminal hp2648
+@c ?set term hp2648
 @c ?terminal hp2648
+@c ?term hp2648
 @cindex hp2648
 @tmindex hp2648
 
@@ -16115,7 +16303,9 @@ It has no options."
 
 @c ?commands set terminal hp500c
 @c ?set terminal hp500c
+@c ?set term hp500c
 @c ?terminal hp500c
+@c ?term hp500c
 @cindex hp500c
 @tmindex hp500c
 
@@ -16139,14 +16329,18 @@ large amount of memory."
 
 @c ?commands set terminal hpgl
 @c ?set terminal hpgl
+@c ?set term hpgl
 @c ?terminal hpgl
+@c ?term hpgl
 @cindex hpgl
 @tmindex hpgl
 
 
 @c ?commands set terminal pcl5
 @c ?set terminal pcl5
+@c ?set term pcl5
 @c ?terminal pcl5
+@c ?term pcl5
 @cindex pcl5
 @tmindex pcl5
 
@@ -16236,14 +16430,18 @@ HPGL graphics can be imported by many software packages."
 
 @c ?commands set terminal hpljii
 @c ?set terminal hpljii
+@c ?set term hpljii
 @c ?terminal hpljii
+@c ?term hpljii
 @cindex hpljii
 @tmindex hpljii
 
 
 @c ?commands set terminal hpdj
 @c ?set terminal hpdj
+@c ?set term hpdj
 @c ?terminal hpdj
+@c ?term hpdj
 @cindex hpdj
 @tmindex hpdj
 
@@ -16269,7 +16467,9 @@ color and compression."
 
 @c ?commands set terminal hppj
 @c ?set terminal hppj
+@c ?set term hppj
 @c ?terminal hppj
+@c ?term hppj
 @cindex hppj
 @tmindex hppj
 
@@ -16290,7 +16490,9 @@ with the middle-sized font (FNT9X17) being the default."
 
 @c ?commands set terminal imagen
 @c ?set terminal imagen
+@c ?set term imagen
 @c ?terminal imagen
+@c ?term imagen
 @cindex imagen
 @tmindex imagen
 
@@ -16322,7 +16524,9 @@ puts six graphs on the page in three rows of two in portrait orientation."
 
 @c ?commands set terminal iris4d
 @c ?set terminal iris4d
+@c ?set term iris4d
 @c ?terminal iris4d
+@c ?term iris4d
 @cindex iris4d
 @tmindex iris4d
 
@@ -16369,14 +16573,18 @@ allowed, and anything after the third number on a line is ignored."
 
 @c ?commands set terminal kyo
 @c ?set terminal kyo
+@c ?set term kyo
 @c ?terminal kyo
+@c ?term kyo
 @cindex kyo
 @tmindex kyo
 
 
 @c ?commands set terminal prescribe
 @c ?set terminal prescribe
+@c ?set term prescribe
 @c ?terminal prescribe
+@c ?term prescribe
 @cindex prescribe
 @tmindex prescribe
 
@@ -16390,14 +16598,18 @@ The only difference between the two is that `kyo` uses "Helvetica" whereas
 
 @c ?commands set terminal emtex
 @c ?set terminal emtex
+@c ?set term emtex
 @c ?terminal emtex
+@c ?term emtex
 @cindex emtex
 @tmindex emtex
 
 
 @c ?commands set terminal latex
 @c ?set terminal latex
+@c ?set term latex
 @c ?terminal latex
+@c ?term latex
 @cindex latex
 @tmindex latex
 
@@ -16454,12 +16666,14 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, macintosh, latex, terminal_
+@node linux, linux_, latex, terminal_
 @subsubsection linux
 
 @c ?commands set terminal linux
 @c ?set terminal linux
+@c ?set term linux
 @c ?terminal linux
+@c ?term linux
 @cindex linux
 @tmindex linux
 
@@ -16469,11 +16683,30 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node macintosh, mf, linux, terminal_
+@node linux_, macintosh, linux, terminal_
+@subsubsection linux
+
+@c ?commands set terminal linux
+@c ?set terminal linux
+@c ?set term linux
+@c ?terminal linux
+@c ?term linux
+@cindex linux
+@tmindex linux
+
+
+The `linux` driver has no additional options to specify.  It looks at the
+environment variable GSVGAMODE for the default mode; if not set, it uses
+1024x768x256 as default mode or, if that is not possible, 640x480x16
+(standard VGA)."
+
+@node macintosh, mf, linux_, terminal_
 @subsubsection macintosh
 
 @c ?set terminal macintosh
+@c ?set term macintosh
 @c ?terminal macintosh
+@c ?term macintosh
 @cindex macintosh
 @tmindex macintosh
 
@@ -16525,7 +16758,9 @@ Syntax:
 
 @c ?commands set terminal mf
 @c ?set terminal mf
+@c ?set term mf
 @c ?terminal mf
+@c ?term mf
 @cindex mf
 
 @cindex metafont
@@ -16555,6 +16790,7 @@ The `mf` terminal has no options.
 
 @c ?commands set terminal mf detailed
 @c ?set terminal mf detailed
+@c ?set term mf detailed
 @c ?mf detailed
 @c ?metafont detailed
 
@@ -16653,7 +16889,9 @@ commands are used as in the eepic and tpic drivers."
 
 @c ?commands set terminal mpost
 @c ?set terminal mp
+@c ?set term mp
 @c ?terminal mp
+@c ?term mp
 @cindex mp
 
 @cindex metapost
@@ -16790,6 +17028,7 @@ if you send the Metapost output as-is to a PostScript interpreter.
 
 @c ?commands set terminal mp detailed
 @c ?set terminal mp detailed
+@c ?set term mp detailed
 @c ?mp detailed
 @c ?metapost detailed
 
@@ -16861,7 +17100,9 @@ LaTeX instead of plainTeX."
 
 @c ?commands set terminal mgr
 @c ?set terminal mgr
+@c ?set term mgr
 @c ?terminal mgr
+@c ?term mgr
 @cindex mgr
 @tmindex mgr
 
@@ -16873,7 +17114,9 @@ The `mgr` terminal driver supports the Mgr Window system.  It has no options."
 
 @c ?commands set terminal mif
 @c ?set terminal mif
+@c ?set term mif
 @c ?terminal mif
+@c ?term mif
 @cindex mif
 @tmindex mif
 
@@ -16914,7 +17157,9 @@ Examples:
 
 @c ?commands set terminal mtos
 @c ?set terminal mtos
+@c ?set term mtos
 @c ?terminal mtos
+@c ?term mtos
 @cindex mtos
 @tmindex mtos
 
@@ -16928,10 +17173,12 @@ MiNT.  If you cannot find GPCLIENT, than mail to dirk@@lstm.uni-erlangen.de."
 
 @c ?commands set terminal next
 @c ?set terminal next
+@c ?set term next
 @c ?terminal next
+@c ?term next
 @cindex next
-@tmindex next
 
+@cindex NeXT
 
 Several options may be set in the next driver.
 
@@ -16968,13 +17215,19 @@ Pointsizes may be changed with `set linestyle`."
 
 @c ?commands set terminal openstep
 @c ?set terminal openstep
+@c ?set term openstep
 @c ?terminal openstep
+@c ?term openstep
 @cindex openstep
+
+@cindex OpenStep
+
+@cindex Openstep
 
 /*
 @cindex next
-@tmindex next
 
+@cindex NeXT
 
 */
 Several options may be set in the openstep (next) driver.
@@ -17012,7 +17265,9 @@ Pointsizes may be changed with `set linestyle`."
 
 @c ?commands set terminal pbm
 @c ?set terminal pbm
+@c ?set term pbm
 @c ?terminal pbm
+@c ?term pbm
 @cindex pbm
 @tmindex pbm
 
@@ -17052,7 +17307,9 @@ Examples:
 
 @c ?commands set terminal dospc
 @c ?set terminal dospc
+@c ?set term dospc
 @c ?terminal dospc
+@c ?term dospc
 @cindex dospc
 @tmindex dospc
 
@@ -17066,7 +17323,9 @@ not using the gcc or Zortec C/C++ compilers."
 
 @c ?commands set terminal pdf
 @c ?set terminal pdf
+@c ?set term pdf
 @c ?terminal pdf
+@c ?term pdf
 @cindex pdf
 @tmindex pdf
 
@@ -17117,7 +17376,9 @@ are taken to be in inches, but other units are possible (currently only cm).
 
 @c ?commands set terminal pstricks
 @c ?set terminal pstricks
+@c ?set term pstricks
 @c ?terminal pstricks
+@c ?term pstricks
 @cindex pstricks
 @tmindex pstricks
 
@@ -17145,7 +17406,9 @@ has to do with plot scaling.  The defaults are `hacktext` and `nounit`."
 
 @c ?commands set terminal qms
 @c ?set terminal qms
+@c ?set term qms
 @c ?terminal qms
+@c ?term qms
 @cindex qms
 @tmindex qms
 
@@ -17158,7 +17421,9 @@ The `qms` terminal driver supports the QMS/QUIC Laser printer, the Talaris
 
 @c ?commands set terminal regis
 @c ?set terminal regis
+@c ?set term regis
 @c ?terminal regis
+@c ?term regis
 @cindex regis
 @tmindex regis
 
@@ -17177,7 +17442,9 @@ Syntax:
 
 @c ?commands set terminal regis
 @c ?set terminal regis
+@c ?set term regis
 @c ?terminal regis
+@c ?term regis
 @cindex regis
 @tmindex regis
 
@@ -17196,14 +17463,18 @@ Syntax:
 
 @c ?commands set terminal rgip
 @c ?set terminal rgip
+@c ?set term rgip
 @c ?terminal rgip
+@c ?term rgip
 @cindex rgip
 @tmindex rgip
 
 
 @c ?commands set terminal uniplex
 @c ?set terminal uniplex
+@c ?set term uniplex
 @c ?terminal uniplex
+@c ?term uniplex
 @cindex uniplex
 @tmindex uniplex
 
@@ -17236,7 +17507,9 @@ puts six graphs on a page in three rows of two in portrait orientation."
 
 @c ?commands set terminal sun
 @c ?set terminal sun
+@c ?set term sun
 @c ?terminal sun
+@c ?term sun
 @cindex sun
 @tmindex sun
 
@@ -17249,7 +17522,9 @@ options."
 
 @c ?commands set terminal svg
 @c ?set terminal svg
+@c ?set term svg
 @c ?terminal svg
+@c ?term svg
 @cindex svg
 @tmindex svg
 
@@ -17297,7 +17572,9 @@ directory list in the GNUPLOT_FONTPATH environmental variable."
 
 @c ?commands set terminal tek410x
 @c ?set terminal tek410x
+@c ?set term tek410x
 @c ?terminal tek410x
+@c ?term tek410x
 @cindex tek410x
 @tmindex tek410x
 
@@ -17310,7 +17587,9 @@ terminals.  It has no options."
 
 @c ?commands set terminal tek410x
 @c ?set terminal tek410x
+@c ?set term tek410x
 @c ?terminal tek410x
+@c ?term tek410x
 @cindex tek410x
 @tmindex tek410x
 
@@ -17323,42 +17602,54 @@ terminals.  It has no options."
 
 @c ?commands set terminal tek40xx
 @c ?set terminal tek40xx
+@c ?set term tek40xx
 @c ?terminal tek40xx
+@c ?term tek40xx
 @cindex tek40
 @tmindex tek40
 
 
 @c ?commands set terminal vttek
 @c ?set terminal vttek
+@c ?set term vttek
 @c ?terminal vttek
+@c ?term vttek
 @cindex vttek
 @tmindex vttek
 
 
 @c ?commands set terminal kc-tek40xx
 @c ?set terminal kc-tek40xx
+@c ?set term kc-tek40xx
 @c ?terminal kc-tek40xx
+@c ?term kc-tek40xx
 @cindex kc-tek40xx
 @tmindex kc-tek40xx
 
 
 @c ?commands set terminal km-tek40xx
 @c ?set terminal km-tek40xx
+@c ?set term km-tek40xx
 @c ?terminal km-tek40xx
+@c ?term km-tek40xx
 @cindex km-tek40xx
 @tmindex km-tek40xx
 
 
 @c ?commands set terminal selanar
 @c ?set terminal selanar
+@c ?set term selanar
 @c ?terminal selanar
+@c ?term selanar
 @cindex selanar
 @tmindex selanar
 
 
 @c ?commands set terminal bitgraph
 @c ?set terminal bitgraph
+@c ?set term bitgraph
 @c ?terminal bitgraph
+@c ?term bitgraph
 @cindex bitgraph
 @tmindex bitgraph
 
@@ -17375,7 +17666,9 @@ BBN Bitgraph terminals.  None have any options."
 
 @c ?commands set terminal texdraw
 @c ?set terminal texdraw
+@c ?set term texdraw
 @c ?terminal texdraw
+@c ?term texdraw
 @cindex texdraw
 @tmindex texdraw
 
@@ -17395,7 +17688,9 @@ It has no options."
 
 @c ?commands set terminal tgif
 @c ?set terminal tgif
+@c ?set term tgif
 @c ?terminal tgif
+@c ?term tgif
 @cindex tgif
 @tmindex tgif
 
@@ -17481,7 +17776,9 @@ Examples using the built-in multiplot mechanism:
 
 @c ?commands set terminal tgif
 @c ?set terminal tgif
+@c ?set term tgif
 @c ?terminal tgif
+@c ?term tgif
 @cindex tgif
 @tmindex tgif
 
@@ -17567,7 +17864,9 @@ Examples using the built-in multiplot mechanism:
 
 @c ?commands set terminal tkcanvas
 @c ?set terminal tkcanvas
+@c ?set term tkcanvas
 @c ?terminal tkcanvas
+@c ?term tkcanvas
 @cindex tkcanvas
 @tmindex tkcanvas
 
@@ -17630,7 +17929,9 @@ The current version of `tkcanvas` supports neither @ref{multiplot} nor @ref{repl
 
 @c ?commands set terminal tpic
 @c ?set terminal tpic
+@c ?set term tpic
 @c ?terminal tpic
+@c ?term tpic
 @cindex tpic
 @tmindex tpic
 
@@ -17685,7 +17986,9 @@ The other label -- account for long ticlabels:
 
 @c ?commands set terminal unixpc
 @c ?set terminal unixpc
+@c ?set term unixpc
 @c ?terminal unixpc
+@c ?term unixpc
 @cindex unixpc
 @tmindex unixpc
 
@@ -17698,7 +18001,9 @@ no options."
 
 @c ?commands set terminal unixplot
 @c ?set terminal unixplot
+@c ?set term unixplot
 @c ?terminal unixplot
+@c ?term unixplot
 @cindex unixplot
 @tmindex unixplot
 
@@ -17714,7 +18019,9 @@ in that case, use the `gnugraph` terminal instead."
 
 @c ?commands set terminal vx384
 @c ?set terminal vx384
+@c ?set term vx384
 @c ?terminal vx384
+@c ?term vx384
 @cindex vx384
 @tmindex vx384
 
@@ -17727,7 +18034,9 @@ printers.  It has no options."
 
 @c ?commands set terminal vgagl
 @c ?set terminal vgagl
+@c ?set term vgagl
 @c ?terminal vgagl
+@c ?term vgagl
 @cindex vgagl
 @tmindex vgagl
 
@@ -17789,7 +18098,9 @@ The vgagl driver uses the first *available* vga mode from the following list:
 
 @c ?commands set terminal VWS
 @c ?set terminal VWS
+@c ?set term VWS
 @c ?terminal VWS
+@c ?term VWS
 @cindex VWS
 @tmindex VWS
 
@@ -17803,7 +18114,9 @@ or color.)  All line styles are plotted as solid lines."
 
 @c ?commands set terminal windows
 @c ?set terminal windows
+@c ?set term windows
 @c ?terminal windows
+@c ?term windows
 @cindex windows
 @tmindex windows
 
@@ -18052,10 +18365,12 @@ You need to use the WINHELP.EXE supplied with Borland C++ 3.1.
 
 @c ?commands set terminal x11
 @c ?set terminal x11
+@c ?set term x11
 @c ?terminal x11
+@c ?term x11
 @cindex x11
-@tmindex x11
 
+@cindex X11
 
 `gnuplot` provides the `x11` terminal type for use with X servers.  This
 terminal type is set automatically at startup if the `DISPLAY` environment
@@ -18068,7 +18383,7 @@ Syntax:
                     @{title "<string>"@}
                     @{@{no@}enhanced@}
                     @{font <fontspec>@}
-                    @{@{no@}persist@} @{@{no@}raise@} @{solid|dashed@}
+                    @{@{no@}persist@} @{@{no@}raise@} @{solid|dashed@} @{@{no@}ctrlq@}
                     @{close@}
    set terminal x11 @{reset@}
 
@@ -18150,6 +18465,7 @@ set upon initialization and cannot be altered during a `gnuplot` session.
 
 @c ?commands set terminal x11 x11_fonts
 @c ?set terminal x11 x11_fonts
+@c ?set term x11 x11_fonts
 @c ?x11 x11_fonts
 @cindex x11_fonts
 
@@ -18231,6 +18547,7 @@ Japanese PS fonts) without the prefix "mbfont:".
 
 @c ?commands set terminal x11 command-line-options
 @c ?set terminal x11 command-line-options
+@c ?set term x11 command-line-options
 @c ?x11 command-line-options
 @cindex command-line-options
 
@@ -18291,6 +18608,7 @@ replaces the <space> hot-key with <ctrl><space> for the same reason.
 
 @c ?commands set terminal x11 monochrome_options
 @c ?set terminal x11 monochrome_options
+@c ?set term x11 monochrome_options
 @c ?x11 monochrome_options
 @cindex monochrome_options
 
@@ -18306,6 +18624,7 @@ requests white-on-black.
 
 @c ?commands set terminal x11 color_resources
 @c ?set terminal x11 color_resources
+@c ?set term x11 color_resources
 @c ?x11 color_resources
 @cindex color_resources
 
@@ -18360,6 +18679,7 @@ to override the first linetype color.
 
 @c ?commands set terminal x11 grayscale_resources
 @c ?set terminal x11 grayscale_resources
+@c ?set term x11 grayscale_resources
 @c ?x11 grayscale_resources
 @cindex grayscale_resources
 
@@ -18392,6 +18712,7 @@ that the default background is black.
 
 @c ?commands set terminal x11 line_resources
 @c ?set terminal x11 line_resources
+@c ?set term x11 line_resources
 @c ?x11 line_resources
 @cindex line_resources
 
@@ -18449,6 +18770,7 @@ Color displays default to dashed:off
 
 @c ?commands set terminal x11 pm3d_resources
 @c ?set terminal x11 pm3d_resources
+@c ?set term x11 pm3d_resources
 @c ?x11 pm3d_resources
 @cindex pm3d_resources
 
@@ -18510,6 +18832,7 @@ by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
 
 @c ?commands set terminal x11 other_resources
 @c ?set terminal x11 other_resources
+@c ?set term x11 other_resources
 @c ?x11 other_resources
 @cindex X resources
 
@@ -18536,10 +18859,12 @@ you can set the resource 'gnuplot.fastrotate' to 'off'
 
 @c ?commands set terminal x11
 @c ?set terminal x11
+@c ?set term x11
 @c ?terminal x11
+@c ?term x11
 @cindex x11
-@tmindex x11
 
+@cindex X11
 
 `gnuplot` provides the `x11` terminal type for use with X servers.  This
 terminal type is set automatically at startup if the `DISPLAY` environment
@@ -18552,7 +18877,7 @@ Syntax:
                     @{title "<string>"@}
                     @{@{no@}enhanced@}
                     @{font <fontspec>@}
-                    @{@{no@}persist@} @{@{no@}raise@} @{solid|dashed@}
+                    @{@{no@}persist@} @{@{no@}raise@} @{solid|dashed@} @{@{no@}ctrlq@}
                     @{close@}
    set terminal x11 @{reset@}
 
@@ -18634,6 +18959,7 @@ set upon initialization and cannot be altered during a `gnuplot` session.
 
 @c ?commands set terminal x11 x11_fonts
 @c ?set terminal x11 x11_fonts
+@c ?set term x11 x11_fonts
 @c ?x11 x11_fonts
 @cindex x11_fonts
 
@@ -18715,6 +19041,7 @@ Japanese PS fonts) without the prefix "mbfont:".
 
 @c ?commands set terminal x11 command-line-options
 @c ?set terminal x11 command-line-options
+@c ?set term x11 command-line-options
 @c ?x11 command-line-options
 @cindex command-line-options
 
@@ -18775,6 +19102,7 @@ replaces the <space> hot-key with <ctrl><space> for the same reason.
 
 @c ?commands set terminal x11 monochrome_options
 @c ?set terminal x11 monochrome_options
+@c ?set term x11 monochrome_options
 @c ?x11 monochrome_options
 @cindex monochrome_options
 
@@ -18790,6 +19118,7 @@ requests white-on-black.
 
 @c ?commands set terminal x11 color_resources
 @c ?set terminal x11 color_resources
+@c ?set term x11 color_resources
 @c ?x11 color_resources
 @cindex color_resources
 
@@ -18844,6 +19173,7 @@ to override the first linetype color.
 
 @c ?commands set terminal x11 grayscale_resources
 @c ?set terminal x11 grayscale_resources
+@c ?set term x11 grayscale_resources
 @c ?x11 grayscale_resources
 @cindex grayscale_resources
 
@@ -18876,6 +19206,7 @@ that the default background is black.
 
 @c ?commands set terminal x11 line_resources
 @c ?set terminal x11 line_resources
+@c ?set term x11 line_resources
 @c ?x11 line_resources
 @cindex line_resources
 
@@ -18933,6 +19264,7 @@ Color displays default to dashed:off
 
 @c ?commands set terminal x11 pm3d_resources
 @c ?set terminal x11 pm3d_resources
+@c ?set term x11 pm3d_resources
 @c ?x11 pm3d_resources
 @cindex pm3d_resources
 
@@ -18994,6 +19326,7 @@ by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
 
 @c ?commands set terminal x11 other_resources
 @c ?set terminal x11 other_resources
+@c ?set term x11 other_resources
 @c ?x11 other_resources
 @cindex X resources
 
@@ -19020,7 +19353,9 @@ you can set the resource 'gnuplot.fastrotate' to 'off'
 
 @c ?commands set terminal xlib
 @c ?set terminal xlib
+@c ?set term xlib
 @c ?terminal xlib
+@c ?term xlib
 @cindex xlib
 @tmindex xlib
 
@@ -19036,7 +19371,9 @@ gnuplot_x11 commands, but sends them to the output file specified by
 
 @c ?commands set terminal xlib
 @c ?set terminal xlib
+@c ?set term xlib
 @c ?terminal xlib
+@c ?term xlib
 @cindex xlib
 @tmindex xlib
 
@@ -19093,18 +19430,34 @@ Please give complete information on the version of gnuplot you are using
 and, if possible, a test script that demonstrates the bug.
 See @ref{Seeking-assistance}.
 
+The sections below list problems known to be present in gnuplot version 4.2 at
+the time of release.  Some of these are actually bugs in external support
+libraries and may have been fixed indepently of any changes in gnuplot.
+
 
 @menu
-* Known_bugs_and_limitations::  
+* Gnuplot_limitations::         
+* Specific_terminals::          
+* External_libraries::          
 @end menu
 
-@node Known_bugs_and_limitations,  , Bugs, Bugs
-@section Known bugs and limitations
+@node Gnuplot_limitations, Specific_terminals, Bugs, Bugs
+@section Gnuplot limitations
+
+@c ?bugs gnuplot
+@cindex gamma
+@findex gamma
 
 
-This is a list of problems known to be present in gnuplot version 4.2 at the
-time of release.  Some of these are actually bugs in external support libraries
-and may have been fixed indepently of any changes in gnuplot.
+@cindex bessel
+
+@cindex timefmt
+@opindex timefmt
+
+
+@cindex load
+@cmindex load
+
 
 Floating point exceptions (floating point number too large/small, divide by
 zero, etc.) may occasionally be generated by user defined functions.  Some of
@@ -19113,9 +19466,10 @@ Whether the system ignores such exceptions (in which case `gnuplot` labels
 the corresponding point as undefined) or aborts `gnuplot` depends on the
 compiler/runtime environment.
 
-The bessel functions do not work for complex arguments.
+The gamma and bessel functions do not work for complex arguments.
 
-The gamma function does not work for complex arguments.
+If a command line contains a "load" command, then anything on the line after
+the "load <filename>" is ignored.
 
 Only one color palette at a time is active for any given x11 plot window.
 This means that multiplots whose constituent plots use different palettes
@@ -19127,10 +19481,36 @@ handle geographic coordinates.
 
 Error bars are not handled properly in polar/spherical coordinate plot modes.
 
+
+@node Specific_terminals, External_libraries, Gnuplot_limitations, Bugs
+@section Specific terminals
+
+@c ?bugs terminals
 Some older models of HP plotters do not have a page eject command 'PG'.  The
 current HPGL driver uses this command in HPGL_reset.  This may need to be
 removed for these plotters.  The current PCL5 driver uses HPGL/2 for text as
 well as graphics.  This should be modified to use scalable PCL fonts.
+
+
+@node External_libraries,  , Specific_terminals, Bugs
+@section External libraries
+
+@c ?bugs external_libraries
+@cindex libgd
+
+@cindex svgalib
+@tmindex svgalib
+
+
+@cindex locale
+@opindex locale
+
+
+@cindex internationalization
+
+@cindex pdf
+@tmindex pdf
+
 
 External library GD (used by PNG/JPEG/GIF drivers):
 Versions of libgd through 2.0.33 contain various bugs in mapping the characters
@@ -19146,6 +19526,12 @@ External library svgalib (used by linux and vgagl driver):
 Requires gnuplot to be suid root (bad!) and has many bugs that are specific
 to the video card or graphics driver used in X11.
 
+Internationalization (locale settings):
+Gnuplot uses the C runtime library routine setlocale() to control
+locale-specific formatting of input and output number, times, and date strings.
+The locales available, and the level of support for locale features such as
+"thousands' grouping separator", depend on the internationalization support
+provided by your individual machine.
 @node Concept_Index, Command_Index, Bugs, Top
 @unnumbered Concept Index
 @printindex cp
