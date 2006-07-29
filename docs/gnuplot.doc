@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.373 2006/07/28 06:20:12 tlecomte Exp $
+C RCS $Id: gnuplot.doc,v 1.375 2006/07/29 22:49:17 tlecomte Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -988,9 +988,11 @@ C
 ?igamma
 #igamma(a,x) & any & $\mbox{igamma}(\mbox{real}(a,x))$,  igamma function of real($a$,$x$) \\
 %igamma(a,x)@any@$igamma ( roman real (a,x))$, igamma function of real ($a$,$x$)
- The `igamma(a,x)` function returns the normalized incomplete gamma function
- of the real parts of its arguments.  a > 0 and x >= 0.  If the arguments are
- complex, the imaginary components are ignored.
+ The `igamma(a,x)` function returns the normalized incomplete gamma
+ function of the real parts of its arguments, where a > 0 and x >= 0.
+ The standard notation is P(a,x), e.g. Abramowitz and Stegun (6.5.1),
+ with limiting value of 1 as x approaches infinity.  If the arguments
+ are complex, the imaginary components are ignored.
 4 imag
 ?expressions functions imag
 ?functions imag
@@ -1054,8 +1056,8 @@ C
 ?norm
 #norm(x) & any & normal distribution (Gaussian) function of real($x$) \\
 %norm(x)@any@$norm(x)$, normal distribution function of real($x$)
- The `norm(x)` function returns the normal distribution function (or Gaussian)
- of the real part of its argument.   See `invnorm`, `erf` and `erfc`.
+ The `norm(x)` function returns the cumulative normal distribution function
+ (or Gaussian) of the real part of its argument.   See `invnorm`, `erf` and `erfc`.
 4 rand
 ?expressions functions rand
 ?functions rand

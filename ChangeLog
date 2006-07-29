@@ -1,3 +1,7 @@
+2006-07-29  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* docs/gnuplot.doc: clarify definitions of functions norm() and igamma()
+
 2006-06-29  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* docs/gnuplot.doc: Another round of additions to the "news" section
