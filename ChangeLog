@@ -1,3 +1,8 @@
+2006-07-29  Ethan A Merritt <merritt@u.washington.edu>
+
+	* configure.in: Remove warning about needing a patch for libreadline
+	(not relevant to libreadline version 5).
+
 2006-07-29  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
 	* docs/gnuplot.doc: clarify definitions of functions norm() and igamma()
