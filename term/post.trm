@@ -3321,15 +3321,11 @@ START_HELP(00psglobal)
 #define PS_COMMON_OPTS2 \
 "                               {blacktext | colortext | colourtext}",\
 "                               {{font} \"fontname{,fontsize}\" {<fontsize>}}",
-#ifdef GNUPLOT_PS_DIR
 #define PS_COMMON_PROLOG_INFO \
 " If you see the error message",\
 "       \"Can't find PostScript prologue file ... \"",\
 " Please see and follow the instructions in `postscript prologue`.",\
 "",
-#else
-#define PS_COMMON_PROLOG_INFO
-#endif
 #define PS_COMMON_DOC1 \
 " The option `color` enables color, while `monochrome` prefers black and white",\
 " drawing elements. Further, `monochrome` uses gray `palette` but it does not",\
@@ -3966,7 +3962,6 @@ PS_COMMON_DOC1
 " the additional font \"CMEX10-Baseline\". It is shifted vertically in order",
 " to fit better to the other glyphs (CMEX10 has its baseline at the top of",
 " the symbols).",
-#ifdef GNUPLOT_PS_DIR
 "2 postscript prologue",
 "?commands set terminal postscript prologue",
 "?set terminal postscript prologue",
@@ -3976,11 +3971,11 @@ PS_COMMON_DOC1
 " Each PostScript output file includes a %%Prolog section and possibly some",
 " additional user-defined sections containing, for example, character",
 " encodings. These sections are copied from a set of PostScript prologue files",
-" stored elsewhere on your computer. The default directory where these files",
-" live is set at the time gnuplot is built. However, you can control this",
+" which are either compiled in the gnuplot exectable or stored elsewhere on your",
+" computer. This behaviour and the default directory where these files live are",
+" controlled at the time gnuplot is built. However, you can control this",
 " either by defining an environmental variable GNUPLOT_PS_DIR or by using the",
 " gnuplot command `set loadpath`. See `set loadpath`.",
-#endif
 "",
 ""
 END_HELP(post)

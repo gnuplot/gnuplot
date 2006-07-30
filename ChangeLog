@@ -1,3 +1,10 @@
+2006-07-30  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* term/post.trm: Reword the doc about the prologue files, so that we do
+	not need the #ifdef GNUPLOT_PS_DIR, and so that the use of the
+	environment variable GNUPLOT_PS_DIR is always documented since it is
+	always available.
+
 2006-07-30  Daniel Sebald <daniel.sebald@ieee.org>
 
 	* docs/gnuplot.doc: Format norm()/invnorm() info for 80 characters.
@@ -13,7 +20,7 @@
 
 	* docs/gnuplot.doc: clarify definitions of functions norm() and igamma()
 
-2006-06-29  Timothee Lecomte  <timothee.lecomte@ens.fr>
+2006-07-29  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* docs/gnuplot.doc: Another round of additions to the "news" section
 	of the help.
@@ -24,7 +31,7 @@
 	* term/ai.trm (TERM_HELP): Add notice that the terminal is outdated
 	and that post should be used instead.
 
-2006-06-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
+2006-07-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* docs/gnuplot.doc: Add details about new features in 4.2 with full
 	sentences and following the same format as 4.0 new features.
