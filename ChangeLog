@@ -1,3 +1,8 @@
+2006-07-30  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc docs/term-ja.diff:
+	Sync Japanese documentation to recent changes in English files.
+
 2006-07-30  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/post.trm: Reword the doc about the prologue files, so that we do

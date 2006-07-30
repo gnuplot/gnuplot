@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.117 2006-07-24 12:46:15+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.372
+C RCS $Id: gnuplot-ja.doc,v 1.120 2006-07-31 10:45:49+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.378
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C 
@@ -243,51 +243,97 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?version 4.2 features
  gnuplot version 4.2 は、直前の公式バージョン 4.0 以降に追加されたたく
  さんの機能を提供します。この節では、主な追加機能の一覧と、変更や細かい
- 新機能の一部を紹介します。
+ 新機能の一部を紹介します。より網羅的な一覧は、ファイル NEWS を参照して
+ ください。l
 
 3 新しい描画スタイル
 
 4 ヒストグラム
+ ヒストグラムや棒グラフが生成できます。
  `histograms` 参照。
 
 4 ラベル描画
+ 以下に述べる新しい `datastrings` の機能との組み合わせによって、gnuplot
+ に曲線の各頂点にラベルを付けさせることが可能になります。
  `labels` 参照。
 
 4 画像データの描画への取り込み
+ `image` スタイルにより、2 次元や 3 次元グラフ内に 2 次元画像を描画、あ
+ るいは写像することができます。
  `image` 参照。
 
 4 閉曲線の塗りつぶし
+ 描画スタイル `fillstyle` は、入力された 2 つの曲線で囲まれた領域を、色
+ やパターンで塗りつぶすことを可能にします。
  `filledcurves` 参照。
 
 4 ベクトル
+ gnuplot は、2 次元グラフでは 4 列、3次元グラフでは 6 列のデータを使っ
+ て、小さい矢先を持つベクトルの描画が行えます。
  `vectors` 参照。
 
 3 新しい描画要素
 
-4 すべての描画要素に対する明示的な RGB 色指定
+4 RGB 色指定
+ すべての描画要素に対して、定義済み線種 (linetype) の指定の代わりに明示
+ 的に RGB の色を指定することが可能です。
  `colorspec` 参照。
 
-4 2 次元グラフの任意の位置への多種の塗り潰しや境界を持つ長方形の描画
+4 任意の長方形描画
+ 2 次元グラフ内の任意の位置に、お好みの塗り潰しスタイルや境界を持つ長方
+ 形を描画することができます。
  `set object rectangle` 参照。
 
 3 文字列処理
 4 データファイルからの文字列や文字データの入力
+ 現在、gnuplot はデータファイルからテキスト部分を読み、処理できます。
  `datastrings` 参照。
 4 ユーザ定義文字列変数、文字列用の演算子や関数
+ 文字列変数と文字列関数が導入されました。これまで文字列定数を要求してい
+ た gnuplot コマンドは、現在はそのほとんどが、文字列変数、文字列式、文
+ 字列を返す関数を受けつけます。
  `string variables` 参照。
 
 3 複数グラフの 1 ページ自動配置描画
+ `multiplot` モードは現在は、各グラフに対していちいちサイズや位置を設定
+ することなしに、単純な複数グラフの描画を生成することができます。
  `multiplot` 参照。
 
 3 バイナリデータファイルからの入力
+ 現在 gnuplot は、ASCII データ入力以外にバイナリデータ入力も可能です。
+ キーワード `binary` でこのモードを選択できます。
  `binary` 参照。
 
+3 内部変数
+ gnuplot は現在、GPVAL_TERM, GPVAL_X_MIN 等のいくつかの "参照専用" の変
+ 数の値を見せます。
+ `gnuplot-defined variables` 参照。
+
 3 新しい/修正された出力形式
-4 複数のプラットホーム用の新しい wxWidgets (wxt) 対話型出力ドライバ
-4 新しい Enhanced MetaFile (EMF) ドライバ
-4 gif/jpeg/png ドライバの統合
-4 非推奨の Adobe Illustrator (ai) ドライバ
-4 epslatex, pslatex サポートをメインの postscript ドライバに統合
+4 `wxt`
+ `wxt` 出力形式は、複数のプラットホームで動作する、スクリーン描画用の対
+ 話型出力形式です。これはユーザインターフェースには wxWidgets ライブラ
+ リを使用し、実際の描画には Pango と関連する Cairo を使用します。これは
+ 線や文字にアンチエイリアスを利用した素晴しい描画を生成します。この出力
+ 形式はマウス、`pm3d` 描画、`image` 描画、拡張文字処理 (enhanced text)
+ を含む、gnuplot の能力のすべてをサポートしています。
+4 `emf`
+ `emf` 出力形式は Enhanced Metafile Format (EMF) ファイルを生成します。
+ このファイル形式は MS Win32 システムでは標準的なメタファイル形式です。
+4 `gif`, `jpeg`, `png`
+ `gd` ライブラリを利用するこれらの出力形式のソースコードは統合されまし
+ た。`gif` 出力形式には、複数のグラフからアニメーション GIF を作成する
+ 機能もあります。
+4 `ai`
+ Adobe Illustrator 用のドライバ `ai` は時代遅れです。Adobe Illustrator
+ は PostScript ファイルを認識するので、`set terminal post level1 ...`
+ を代わりに使うべきです。
+4 `epslatex`, `pslatex`, `pstex`
+ PostScript ファイルを伴う latex ファイルへの出力をサポートするこれらの
+ 出力形式は、メインの `post` 出力ドライバに統合されました。
+4 `windows`
+ `windows` 出力形式は、現在は拡張文字処理 (`enhanced text`) モードをサ
+ ポートしています。
 
 2 Features introduced in version 4.0
 ?version 4 features
@@ -325,11 +371,6 @@ C Shigeharu Takeno et al (3.7, 4.X)
 
  `svg`: 縮尺可能なベクトルグラフィックス (Scalable Vector Graphics) を
  出力する新しい出力形式。
-
- `wxt`: 複数のプラットホームで動作する対話型、スクリーン描画用の新しい
- 出力形式。これはユーザインターフェースには wxWidgets を使用し、実際の
- 描画には Pango と関連する Cairo を使用します。これはアンチエイリアスを
- 利用した素晴しい描画を生成します。
 
 3 新しい描画スタイル `pm3d`
 
@@ -391,7 +432,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  datafile 形式の設定に基づいて、空白を持つような文字列フィールドも単一
  項目とみなすことができます。これにより表計算ソフトが出力するような csv
  (コンマ分離形式) ファイルの入力も可能になります。`set datafile` 参照。
- オプション `binary` も参照のこと (version 4.2 では新しくなっています)。
+ オプション `binary` も参照のこと (version 4.2 で導入されました)。
 
 3 新しいコマンド
 
@@ -1001,7 +1042,9 @@ C Shigeharu Takeno et al (3.7, 4.X)
 #igamma(a,x) & 任意 & $\mbox{igamma}(\mbox{real}(a,x))$, $a$,$x$ の実部の不完全ガンマ関数 \\
 %igamma(a,x)@任意@$igamma ( roman real (a,x))$, $a$,$x$ の実部の不完全ガンマ関数
  関数 `igamma(a,x)` は引数の実部の、正規化された不完全ガンマ関数の値を
- 返します。a > 0, x >= 0 です。引数が複素数の場合は虚部は無視されます。
+ 返します。ここで、a > 0, x >= 0 です。標準的な記法では P(a,x) (例えば
+ Abramowitz and Stegun (6.5.1)) で、x が無限大に発散する場合の極限値は
+ 1 です。引数が複素数の場合は虚部は無視されます。
 4 imag
 ?expressions functions imag
 ?functions imag
@@ -1015,8 +1058,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?invnorm
 #invnorm(x) & 任意 & $x$ の実部の逆正規分布関数 \\
 %invnorm(x)@任意@$x$ の実部の逆正規分布関数
- 関数 `invnorm(x)` は引数の実部の逆正規分布関数の値を返します。`norm`
- も参照してください。
+ 関数 `invnorm(x)` は引数の実部に対する、正規分布 (ガウス分布) の累積分
+ 布関数の逆関数の値を返します。`norm` も参照してください。
 4 int
 ?expressions functions int
 ?functions int
@@ -1062,8 +1105,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?norm
 #norm(x) & 任意 & $x$ の実部の正規分布 (ガウス分布) 関数 \\
 %norm(x)@任意@$norm(x)$, $x$ の実部の正規分布 (ガウス分布) 関数
- 関数 `norm(x)` は引数の実部の正規分布 (ガウス分布) 関数の値を返します。
- `invnorm`, `erf`, `erfc` も参照してください。
+ 関数 `norm(x)` は、引数の実部に対する、正規分布 (ガウス分布) の累積分
+ 布関数の値を返します。`invnorm`, `erf`, `erfc` も参照してください。
 4 rand
 ?expressions functions rand
 ?functions rand
@@ -1991,10 +2034,9 @@ C ... and restart the table:
 2 String constants and string variables
 ?strings
 ?string variables
- gnuplot 4.2 の新機能として、文字列変数と文字列関数が導入されました。今
- まで文字列定数を受け付けていたような gnuplot コマンドのほとんどは文字
- 列変数、文字列式、または文字列を返す関数も受け付けます。例えば、以下の
- 4 つの plot のやり方は結果として全て同じ描画タイトルを生成します。
+ 文字列定数に加えて、ほとんどの gnuplot コマンドは文字列変数、文字列式
+ または文字列を返す関数も受け付けます。例えば、以下の 4 つの plot のや
+ り方は結果として全て同じ描画タイトルを生成します:
 
        four = "4"
        graph4 = "Title for plot #4"
@@ -6973,16 +7015,12 @@ C ... and restart the table:
  使えるのは現在の描画ウィンドウのみです。しかし、他のウィンドウも左下に
  マウスの座標を表示位はしてくれるでしょう。
 
- 以下は gnuplot 4.0 にのみ有効です (現在は、他のスクリーン端末の場合も
- 含めて、マウス機能はデフォルトで ON になります):
- X11 のマウスサポートは、標準入力が端末 (tty) から来る場合はデフォルト
- で ON にされますが、標準入力が tty から来てない場合 (例えばパイプの場
- 合)、マウスサポートは OFF にされます。パイプから gnuplot に入力すると
- きもマウスサポートを使いたい場合は、X11 ドライバが立ち上がる *前* にマ
- ウスを ON にしなければいけません。例えば、明示的なコマンド `set mouse`
- を起動時に指定した直後に X11 ドライバを起動します。注意: UNIX 特有の話
- ですが、/dev/null のような特殊な入力デバイスは選択できません; そのよう
- なデバイスでマウスを ON にすると gnuplot はハングアップするでしょう。
+ 他のスクリーン出力形式との統一性も考え、X11 でのマウスサポートは、標準
+ 入力がどこからであっても、デフォルトで ON になります。しかし、UNIX 風
+ の OS の中には、/dev/null のような特殊な入力デバイスを選択してはいけな
+ いものがあり、そのようなデバイスでマウスを ON にすると gnuplot がハン
+ グアップしてしまうことがあります。このような状況では、`unset mouse` で
+ マウス機能を OFF にしてください。
 3 multiplot
 ?commands set multiplot
 ?commands unset multiplot
