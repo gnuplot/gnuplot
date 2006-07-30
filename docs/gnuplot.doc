@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.375 2006/07/29 22:49:17 tlecomte Exp $
+C RCS $Id: gnuplot.doc,v 1.376 2006/07/30 02:53:08 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -258,13 +258,13 @@ C
  The `wxt` terminal is an interactive and cross-platform terminal for on-screen
  rendering. It uses the wxWidgets library for its user interface, and Cairo
  associated with Pango for the actual rendering, providing nice plots with
- antialiasing on lines and text. The terminal support the full range of gnuplot
- capabilities, including mousing, `pm3d` plots, `image` plots and enhanced
- text.
+ antialiasing on lines and text. The terminal supports the full range of
+ gnuplot capabilities, including mousing, `pm3d` plots, `image` plots and
+ enhanced text.
 4 `emf`
  The `emf` terminal generates an Enhanced Metafile Format file. This file
  format is the metafile standard on MS Win32 Systems.
-4 `gif`,`jpeg`,`png`
+4 `gif`, `jpeg`, `png`
  The code for the terminals using the `gd` library has been consolidated.
  The `gif` terminal also knows how to produce an animated gif from a sequence
  of plots.
