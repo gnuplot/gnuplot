@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.376 2006/07/30 02:53:08 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.377 2006/07/30 03:28:30 tlecomte Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1007,8 +1007,8 @@ C
 ?invnorm
 #invnorm(x) & any &  inverse normal distribution function of real($x$)  \\
 %invnorm(x)@any@inverse normal distribution function real($x$)
- The `invnorm(x)` function returns the inverse normal distribution function of
- the real part of its argument.  See `norm`.
+ The `invnorm(x)` function returns the inverse cumulative normal (Gaussian)
+ distribution function of the real part of its argument.  See `norm`.
 4 int
 ?expressions functions int
 ?functions int
@@ -1056,8 +1056,8 @@ C
 ?norm
 #norm(x) & any & normal distribution (Gaussian) function of real($x$) \\
 %norm(x)@any@$norm(x)$, normal distribution function of real($x$)
- The `norm(x)` function returns the cumulative normal distribution function
- (or Gaussian) of the real part of its argument.   See `invnorm`, `erf` and `erfc`.
+ The `norm(x)` function returns the cumulative normal (Gaussian) distribution
+ function of the real part of its argument.   See `invnorm`, `erf` and `erfc`.
 4 rand
 ?expressions functions rand
 ?functions rand

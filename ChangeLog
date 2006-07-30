@@ -1,3 +1,7 @@
+2006-07-30  Daniel Sebald <daniel.sebald@ieee.org>
+
+	* docs/gnuplot.doc: Format norm()/invnorm() info for 80 characters.
+
 2006-07-29  Ethan A Merritt <merritt@u.washington.edu>
 
 	* configure.in: Remove warning about needing a patch for libreadline
