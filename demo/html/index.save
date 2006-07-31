@@ -110,7 +110,7 @@ scripts are not included on this page.
     <li><a href="layout.html">multiplot&nbsp;layout</a></li>
     <li><a href="multiplt.html">multiple plots</a></li>
     <li><a href="tics.html">axis tics</a></li>
-    <li><a href="rectangle.html">boxed areas</a></li>
+    <li><a href="rectangle.html">rectangles</a></li>
     </ul>
 
     <h4>Styles</h4>
@@ -146,8 +146,12 @@ scripts are not included on this page.
 
     <td>
     <ul>
-    <li><a href="http://sourceforge.net/projects/gnuplot/">development pages on SourceForge</a></li>
-    <li><a href="http://gnuplot.sourceforge.net/demo/">demo scripts for version 4.0</a></li>
+    <li><a href="http://sourceforge.net/projects/gnuplot/">
+	Gnuplot development pages on SourceForge</a></li>
+    <li>On-line documentation in
+	<a href="http://gnuplot.sourceforge.net/docs_4.2/index.html">HTML</a>
+	and
+	<a href="http://gnuplot.sourceforge.net/docs_4.2/gnuplot.pdf">PDF</a></li>
     </ul>
     </td>
     
