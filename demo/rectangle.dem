@@ -1,16 +1,27 @@
-set style line 1 lt 4
+set style line 1 bgnd
 set style line 2 lt rgb "cyan"
 
 set object 1 rect from 0,0 to 1,4 fc lt 2
 set object 2 rect from -1,1 to 0,5 fc rgb "gold"
-set object 5 rect from 2,3 to 4,5 fc ls 1
-set object 7 rect from 0, -3 to 2, -2 fc ls 2 fs pattern 1 bo -1
+set object 5 rect from 0, -3 to 2, -2 fc ls 2 fs pattern 1 bo -1
 
 
 set style fill pattern 2 bo 1
 
-set obj 10 rect from -2, -3 to -4, -5 fs empty bo -1 front
-set label 10 at -3,-4 "label in a box" front center
+#
+# Illustrate putting a different color under the key box
+#
+set key nobox
+set object 7 rect from graph 0.65,graph 0.85 to graph 0.99, graph 0.99 fc ls 1
+
+#
+# Illustrate using character widths to put a box around a label
+#
+LABEL = "Label in a box"
+set obj 10 rect at -3,-4 size char strlen(LABEL), char 1 
+set obj 10 fillstyle empty border -1 front
+set label 10 at -3,-4 LABEL front center
+
 set obj 9 rect from -4, -4 to -4, -3 fc lt -1
 
 set obj 20 rect from graph 0, graph 0 to graph 1, graph 1 fs solid 0.15 fc rgb "#FFD700" behind

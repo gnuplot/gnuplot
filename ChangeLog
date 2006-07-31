@@ -7,6 +7,8 @@
 	* term/gd.trm (PNG_linetype): Fix off-by-one error in checking for
 	minimum legal linetype. Could conceivably have caused a segfault.
 
+	* demo/rectangle.dem demo/html/index.save: Update demo for 4.2
+
 2006-07-30  Ethan A Merritt <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc (Known Bugs): The 'nohidden3d' options does
