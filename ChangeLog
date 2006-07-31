@@ -1,3 +1,7 @@
+2006-07-31  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* README.1ST: Update notes on the gd library.
+
 2006-07-31  Ethan A Merritt <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_linetype): Fix off-by-one error in checking for

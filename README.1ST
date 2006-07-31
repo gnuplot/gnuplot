@@ -35,51 +35,24 @@
  IMPORTANT NOTE ON GIF, PNG and JPEG SUPPORT
  ===========================================
 
- Previous versions of gnuplot (through 3.7.1) used the gd library
- from http://www.boutell.com/gd/ to create GIF output. 
- Because of patent concerns (see Note 1 below) GIF support was removed
- from the gd library, and hence current versions of the gd library
- cannot be used to make GIF images.  This means that gnuplot, when
- linked against a current gd library, cannot produce GIF images either.
+ The gd library from http://www.boutell.com/gd/ is used to generate
+ GIF, PNG and JPEG outputs.
 
- On the other hand, the gd library now supports PNG and JPEG 
- image generation.  It also supports the use TrueType fonts,
- line widths, and other features that were not possible in the 
- older gnuplot terminal drivers for either GIF or PNG.
+ Old versions of the Boutell gd library (versions 1.2 to 1.4) produced only
+ GIF output. This means you cannot obtain a PNG or a JPEG output from
+ gnuplot 4.2 with these versions. (Note that gnuplot's old minimalistic but
+ standalone PNG driver driver has now been removed).
 
- When you build gnuplot 4.0 you may choose between two options.
- 
- Option 1:
- If you link against an old version of the Boutell gd library 
- (versions 1.2 - 1.4) then you can enable the GIF terminal driver. 
- In this case you cannot enable either PNG or JPEG support via
- the gd library. You can still selection the old minimalistic
- PNG driver by using ./configure --with-png .
+ Versions of the the Boutell gd library between 1.6 and 2.0.27 do not
+ support GIF output because of patent concerns (see Note 1 below). This
+ means that with these versions, you cannot generate a GIF output directly
+ from gnuplot. However versions 1.6 and newer support PNG outputs, and 1.7
+ and newer support JPEG outputs. Versions 1.6.2 and newer also support
+ TrueType fonts.
 
- Option 2:
- If you link against gd library version 1.8 or newer then you 
- get PNG and JPEG support.  In this case you cannot enable 
- the generation of true GIF images.  For backwards compatibility 
- with existing scripts, however, you can enable the 
- --with-gif=png option. This will use the old GIF driver, 
- accepting all the old 'set term gif' commands, but will actually 
- produce a PNG image file.  By default gnuplot assumes that if you
- have one of these newer versions of the gd library that it supports
- the use of TrueType fonts via the freetype library.  If you need to
- specify where this library lives, use --with-freetype=PATH.  If your
- local installation of libgd was not built with TrueType font support
- you can fall back to using generic fonts by using --with-freetype=no.
-
- Several open source programs exist that will convert PNG images 
- to GIF images. See Note 2 below.  If you need GIF images but want 
- to use the newer, more feature-full, terminal drivers, then you 
- may produce PNG images and convert them to GIF externally.  
- On platforms that allow pipes in the "set output" command, you can
- generate and convert the images at the same time, as in this example:
-
- 	set terminal png medium
-	set output '| convert png:- image.gif'
-
+ Version 2.0.28 of the Boutell gd library restored GIF functionality.
+ Version 2.0.29 added support for GIF animation. We recommend using
+ version 2.0.29 or newer for use with gnuplot.
 
  Note 1 - UNISYS patent (why no more GIF images)
  -----------------------------------------------
@@ -98,6 +71,12 @@
  conversion, supported on a wide variety of platforms.  For example the 
  command "convert file.png file.gif" will convert a PNG image file to an 
  equivalent GIF image file.
+ On platforms that allow pipes in the "set output" command, you can
+ generate and convert the images at the same time from gnuplot, as in this
+ example:
+
+ 	set terminal png font "arial,12" size 500,300
+	set output '| convert png:- image.tiff'
 
  Utah Raster Toolkit ( http://www.cs.utah.edu/gdc/projects/urt/ )
  A general image file conversion library and associated file conversion
