@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.92 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: gd.trm,v 1.93 2006/07/21 02:35:46 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1432,8 +1432,8 @@ PNG_linetype(int type)
 {
     if (type >= (png_state.n_colors - 3))
 	type %= (png_state.n_colors - 3);
-    if (type < -3) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
-	type = LT_BACKGROUND;	/* Draw in background color */
+    if (type <= LT_BACKGROUND) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
+	type = -3;	/* Draw in background color */
 
     png_state.color = png_state.color_table[type + 3];
     png_state.rgb = png_state.rgb_table[type + 3];
