@@ -1,3 +1,10 @@
+2006-08-01  Ethan A Merritt <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii): Allow a string-valued function
+	to provide the time/date string for interpreting axis coordinates
+	given after 'set {xyz}data time'.
+	Bug #1445586
+
 2006-07-31  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* README.1ST: Update notes on the gd library.
