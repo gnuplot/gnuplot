@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.28 2006/07/26 21:05:17 persquare Exp $
+ * $Id: aquaterm.trm,v 1.29 2006/07/26 21:54:53 persquare Exp $
  *
  */
 
@@ -745,7 +745,7 @@ ENHAQUA_put_text(unsigned int x, unsigned int y, const char str[])
   enhanced_max_height = -1000;
   enhanced_min_height = 1000;
   enhanced_fontscale = 1;
-  strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
+  strncpy(enhanced_escape_format,"\\%o",sizeof(enhanced_escape_format));
   
   /* Clear the attributed string */
   [enhString release];
@@ -802,21 +802,33 @@ ENHAQUA_open(char * fontname, double fontsize,
 		   forKey:@"AQTNonPrintingChar"];
 }
 
+/* Local buffer used in encoding conversion */
+#define ENHAQUA_CSTRBUFLEN 1023
+static char cStrBuf[ENHAQUA_CSTRBUFLEN + 1]; 
+static unsigned int cStrBufIndex = 0;
 
 TERM_PUBLIC void 
 ENHAQUA_flush(void)
 {
-  LOG(@"ENHAQUA_flush");
+  /* Convert cStrBuf UTF8 according to encoding, use convert_using_encoding()
+     and apply attributes before adding to enhString 
+  */
+  NSAttributedString *aStr;
+  cStrBuf[cStrBufIndex] = '\0';
+  cStrBufIndex = 0; 
+  aStr = [[NSAttributedString alloc] initWithString:AQUA_convert_using_encoding(cStrBuf) attributes:attributes];
+  [enhString appendAttributedString:aStr];
+  [aStr release];
 }
 
 TERM_PUBLIC void 
 ENHAQUA_writec(int c)
-{
-  NSAttributedString *aStr;
-  aStr = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%C", (c+0x100) & 0xFF]
-				         attributes:attributes];
-  [enhString appendAttributedString:aStr];
-  [aStr release];
+{ 
+  /* Buffer byte sequence into cStrBuf */
+  LOG(@"int c = 0x%04x", c);
+  cStrBuf[cStrBufIndex] = (char)(c+0x100) & 0xFF; /* FIXME: Sometimes c is overflowed */
+  if (cStrBufIndex < ENHAQUA_CSTRBUFLEN) 
+    cStrBufIndex++;
 }
 #endif /* TERM_BODY */
 
