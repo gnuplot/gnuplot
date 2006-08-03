@@ -1,5 +1,7 @@
 2006-08-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* term/PostScript/ps_header.sh: Force always the same sorting.
+
 	* term/post.trm term/PostScript/prologue.ps: Move "Blacktext {} if" into
 	the definitions of {M}{LCR}show, to avoid it directly in the postscript
 	body.

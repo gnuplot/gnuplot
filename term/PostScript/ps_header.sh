@@ -4,7 +4,7 @@ echo "/* This script-generated file contains the PostScript prologues" > output
 echo " * in a form suitable to inclusion in a C source code */" >> output
 echo "" >> output
 
-for i in *.ps; do
+for i in `ls -1 *.ps | LC_ALL=C sort`; do
 	echo $i > temp
 	name=`sed -e 's/\.ps/_ps/g' -e 's/-/_/g' temp`
 	rm temp
