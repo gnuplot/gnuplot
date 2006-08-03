@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.29 2006/07/26 21:54:53 persquare Exp $
+ * $Id: aquaterm.trm,v 1.30 2006/08/02 17:12:40 persquare Exp $
  *
  */
 
@@ -154,7 +154,6 @@ static int AQUA_dashPatterns[AQUA_DASH_PATTERNS][6] = {
 
 /* Helper functions */
 static NSString* AQUA_convert_using_encoding __PROTO((const char *string));
-static void AQUA_local_reset __PROTO((void));
 
 /*
  * ----------------------------------------------------------------
@@ -169,8 +168,8 @@ AQUA_options()
 {
   struct value a;
   char *s;
-
-  AQUA_local_reset();
+  
+  AQUA_title[0] = '\0'; /* Force re-interpretation of title string */
 
   while (!END_OF_COMMAND) {
   
@@ -327,17 +326,6 @@ AQUA_convert_using_encoding(const char *string)
   /* Check for nil result before returning */
   return translatedString?translatedString:@"";
 }
-
-static void
-AQUA_local_reset()
-{
-  AQUA_title[0]	= '\0';
-  AQUA_xSize      = AQUA_XMAX;
-  AQUA_ySize      = AQUA_YMAX;
-  strcpy(AQUA_fontNameCur, AQUA_fontNameDef);
-  AQUA_fontSizeCur  = AQUA_fontSizeDef;
-}
-
 
 TERM_PUBLIC void
 AQUA_init()
