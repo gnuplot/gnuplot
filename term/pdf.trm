@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.65 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: pdf.trm,v 1.66 2006/07/21 02:35:47 sfeam Exp $
  */
 
 /*------------------------------
@@ -99,8 +99,9 @@ static enum JUSTIFY PDF_TextJust = LEFT;	/* current text justification*/
 static double PDF_linewidth_factor = 1.0;	/* multiplier for line width */
 static double PDF_dashlength_factor = 1.0;	/* multiplier for dash length */
 static TBOOLEAN PDF_dashedlines = FALSE;	/* solid or dashed? */
-static TBOOLEAN PDF_monochrome = FALSE;		/* ignore all color requests */
+static TBOOLEAN PDF_monochrome = FALSE;		/* default all linetypes to black */
 static rgb_color PDF_current_rgb = {0.,0.,0.};	/* Last color set */
+static double PDF_current_gray = 0.0;		/* Last color set (mono version) */
 
 /* default text font family: */
 static char PDF_fontNameDef[MAX_ID_LEN + 1] = "Helvetica";
@@ -587,7 +588,10 @@ PDF_linetype (int linetype)
     PDF_PathClose ();
     PDF_LineType = linetype;
 
-    if (!PDF_monochrome) {
+    if (PDF_monochrome) {
+	PDF_current_gray = 0.0;
+	PDF_setgray(myPDF, PDF_current_gray);
+    } else {
 	struct rgb *this_color = web_color_rgbs + 1 + linetype;
 	PDF_current_rgb.r = this_color->r / 255.0;
 	PDF_current_rgb.g = this_color->g / 255.0;
@@ -1249,7 +1253,10 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 		double red   = PDF_current_rgb.r * fact + _fact;
 		double green = PDF_current_rgb.g * fact + _fact;
 		double blue  = PDF_current_rgb.b * fact + _fact;
-		PDF_setrgbcolor_fill(myPDF, red, green, blue);
+		if (PDF_monochrome)
+		    PDF_setgray_fill(myPDF, PDF_current_gray);
+		else
+		    PDF_setrgbcolor_fill(myPDF, red, green, blue);
 	    }
 	    break;
 #if !HAVE_OLD_LIBPDF
@@ -1298,9 +1305,11 @@ PDF_set_color(t_colorspec *colorspec)
 	PDF_current_rgb.r = this_color->r / 255.0;
 	PDF_current_rgb.g = this_color->g / 255.0;
 	PDF_current_rgb.b = this_color->b / 255.0;
-    } else if (colorspec->type == TC_FRAC)
+	PDF_current_gray = 0.0; /* monochrome mode only */
+    } else if (colorspec->type == TC_FRAC) {
 	rgb1maxcolors_from_gray( colorspec->value, &PDF_current_rgb);
-    else if (colorspec->type == TC_RGB) {
+	PDF_current_gray = colorspec->value; /* monochrome mode only */
+    } else if (colorspec->type == TC_RGB) {
 	PDF_current_rgb.r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
 	PDF_current_rgb.g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
 	PDF_current_rgb.b = (double)(colorspec->lt & 255) / 255.;
@@ -1310,7 +1319,11 @@ PDF_set_color(t_colorspec *colorspec)
     /* make sure that the path is stroked with the current color
      * before changing the color */
     PDF_PathClose();
-    PDF_setrgbcolor(myPDF, PDF_current_rgb.r, PDF_current_rgb.g, PDF_current_rgb.b);
+
+    if (PDF_monochrome && colorspec->type != TC_RGB)
+	PDF_setgray(myPDF, PDF_current_gray);  /* FIXME - Should this be NTSC(current_rgb)? */
+    else
+	PDF_setrgbcolor(myPDF, PDF_current_rgb.r, PDF_current_rgb.g, PDF_current_rgb.b);
 
     /* mark linetype invalid so that the color will be
      * set when PDF_linetype() is called next */

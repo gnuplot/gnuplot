@@ -1,3 +1,10 @@
+2006-08-03  Ethan A Merritt <merritt@u.washington.edu>
+
+	* term/pdf.trm (PDF_set_color PDF_linetype PDF_filled_polygon):
+	Implement the "mono" option, which up until now has not done anything
+	other than failing to set new linetypes.
+	Bug #1517932
+
 2006-08-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/PostScript/prologues.h: Regenerated.
@@ -335,8 +342,8 @@
 
 	* configure.in:  Enable HIDDEN3D_QUADTREE by default.
 
-	* term/post.trm (PS_linetype): Additional optimization from not
-	forced an absolute move if the linetype change has been optimized away.
+	* term/post.trm (PS_linetype): Additional optimization from not forcing
+	an absolute move if the linetype change has been optimized away.
 
 	* term/pslatex.trm (EPSLATEX_linetype): Step back from over-general test
 	for unnecessary linetype change.  Forward it to PS_linetype for the
