@@ -1,5 +1,7 @@
 2006-08-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* term/PostScript/prologues.h: Regenerated.
+
 	* term/PostScript/ps_header.sh: Force always the same sorting.
 
 	* term/post.trm term/PostScript/prologue.ps: Move "Blacktext {} if" into
