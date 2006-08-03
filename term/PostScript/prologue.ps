@@ -11,12 +11,12 @@
 /f {rlineto fill} bind def
 /vpt2 vpt 2 mul def
 /hpt2 hpt 2 mul def
-/Lshow { currentpoint stroke M
-  0 vshift R show } def
-/Rshow { currentpoint stroke M
-  dup stringwidth pop neg vshift R show } def
-/Cshow { currentpoint stroke M
-  dup stringwidth pop -2 div vshift R show } def
+/Lshow { currentpoint stroke M 0 vshift R 
+	Blacktext {gsave 0 setgray show grestore} {show} ifelse } def
+/Rshow { currentpoint stroke M dup stringwidth pop neg vshift R
+	Blacktext {gsave 0 setgray show grestore} {show} ifelse } def
+/Cshow { currentpoint stroke M dup stringwidth pop -2 div vshift R 
+	Blacktext {gsave 0 setgray show grestore} {show} ifelse } def
 /UP { dup vpt_ mul /vpt exch def hpt_ mul /hpt exch def
   /hpt2 hpt 2 mul def /vpt2 vpt 2 mul def } def
 /DL { Color {setrgbcolor Solid {pop []} if 0 setdash }

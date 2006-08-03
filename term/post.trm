@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.194 2006/07/23 06:22:25 tlecomte Exp $
+ * $Id: post.trm,v 1.196 2006/07/30 20:49:54 tlecomte Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -307,15 +307,15 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 
 /* flush left show */
 "/MLshow { currentpoint stroke M\n",
-"  0 exch R MFshow } bind def\n",
+"  0 exch R\n  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def\n",
 
 /* flush right show */
 "/MRshow { currentpoint stroke M\n",
-"  exch dup MFwidth neg 3 -1 roll R MFshow } def\n",
+"  exch dup MFwidth neg 3 -1 roll R\n  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def\n",
 
 /* centred show */
 "/MCshow { currentpoint stroke M\n",
-"  exch dup MFwidth -2 div 3 -1 roll R MFshow } def\n",
+"  exch dup MFwidth -2 div 3 -1 roll R\n  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def\n",
 
 /* Save and restore for @-text (phantom box) */
 "/XYsave    { [( ) 1 2 true false 3 ()] } bind def\n",
@@ -1886,7 +1886,6 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
     if (!str && !strlen(str))
 	return;
     PS_move(x,y);
-    fputs("Blacktext { gsave 0 setgray } if\n", gppsfile);
     if (ps_ang != 0)
 	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 M\n",
 		ps_ang);
@@ -1912,7 +1911,6 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
     }
     if (ps_ang != 0)
 	fputs("grestore\n", gppsfile);
-    fputs("Blacktext { grestore } if\n", gppsfile);
     ps_path_count = 0;
     PS_relative_ok = FALSE;
 }
@@ -2212,7 +2210,6 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
 
     PS_move(x,y);
 
-    fputs("Blacktext { gsave 0 setgray } if\n", gppsfile);
     if (ps_ang != 0)
 	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
 		ps_ang);
@@ -2270,7 +2267,6 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
 
     if (ps_ang != 0)
 	fputs("grestore\n", gppsfile);
-    fputs("Blacktext { grestore } if\n", gppsfile);
     ps_path_count = 0;
     PS_relative_ok = FALSE;
 }
@@ -3023,9 +3019,7 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 	    fprintf(gppsfile, "  %d 0 V\n", -(corner[1].x - corner[0].x));
 	    fprintf(gppsfile, "  %d %d L\n", corner[0].x, corner[0].y);
 	    fputs("  40 -110 R\n"
-		  "  Blacktext { gsave 0 setgray } if\n"
 		  "  (PS level 2 image) Lshow\n"
-		  "  Blacktext { grestore } if\n"
 		  "  %% Read data but ignore it\n", gppsfile);
 	    fprintf(gppsfile, "  /imagebuf %d string def\n", num_encoded_bytes);
 	    fputs("  currentfile imagebuf readstring\n"
@@ -3060,9 +3054,7 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 	    fprintf(gppsfile, "  %d 0 V\n", -(corner[1].x - corner[0].x));
 	    fprintf(gppsfile, "  %d %d L\n", corner[0].x, corner[0].y);
 	    fprintf(gppsfile, "  40 -110 R\n"
-		    "  Blacktext { gsave 0 setgray } if\n"
 		    "  (PS level 2 image) Lshow\n"
-		    "  Blacktext { grestore } if\n"
 		    "  %% Read data but ignore it\n"
 		    "  /imagebuf %d string def\n"
 		    "  currentfile imagebuf readstring\n", num_encoded_bytes);

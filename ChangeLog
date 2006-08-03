@@ -1,3 +1,9 @@
+2006-08-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm term/PostScript/prologue.ps: Move "Blacktext {} if" into
+	the definitions of {M}{LCR}show, to avoid it directly in the postscript
+	body.
+
 2006-08-01  Ethan A Merritt <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readascii): Allow a string-valued function
