@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.46 2006/07/14 17:25:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.47 2006/07/21 05:19:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -771,7 +771,11 @@ update_gpval_variables(int from_plot_command)
     v = add_udv_by_name("GPVAL_PATCHLEVEL");
     if (v && v->udv_undef == TRUE) {
 	v->udv_undef = FALSE; 
+#ifdef GP_STRING_VARS
+	Gstring(&v->udv_value, gnuplot_patchlevel);
+#else
 	Ginteger(&v->udv_value, atoi(gnuplot_patchlevel));
+#endif
     }
 }
 
