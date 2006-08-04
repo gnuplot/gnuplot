@@ -1,4 +1,4 @@
-2006-08-04  Ethan A Merritt <merritt@u.washington.edu>
+2006-08-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm term/post.trm term/emf.trm term/cgm.trm 
 	term/metapost.trm: term->options() should not reset the terminal to
@@ -6,7 +6,7 @@
 	from "set term".
 	Bug #1534649
 
-2006-08-03  Ethan A Merritt <merritt@u.washington.edu>
+2006-08-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm (PDF_set_color PDF_linetype PDF_filled_polygon):
 	Implement the "mono" option, which up until now has not done anything
@@ -23,7 +23,7 @@
 	the definitions of {M}{LCR}show, to avoid it directly in the postscript
 	body.
 
-2006-08-01  Ethan A Merritt <merritt@u.washington.edu>
+2006-08-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readascii): Allow a string-valued function
 	to provide the time/date string for interpreting axis coordinates
@@ -34,14 +34,14 @@
 
 	* README.1ST: Update notes on the gd library.
 
-2006-07-31  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_linetype): Fix off-by-one error in checking for
 	minimum legal linetype. Could conceivably have caused a segfault.
 
 	* demo/rectangle.dem demo/html/index.save: Update demo for 4.2
 
-2006-07-30  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc (Known Bugs): The 'nohidden3d' options does
 	not work for parametric curves. Bug #1531432.
@@ -58,11 +58,11 @@
 	environment variable GNUPLOT_PS_DIR is always documented since it is
 	always available.
 
-2006-07-30  Daniel Sebald <daniel.sebald@ieee.org>
+2006-07-30  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* docs/gnuplot.doc: Format norm()/invnorm() info for 80 characters.
 
-2006-07-29  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Remove warning about needing a patch for libreadline
 	(not relevant to libreadline version 5).
@@ -93,7 +93,7 @@
 	comparison not to remove false duplicates from the history.
 	BUG #1529200
 
-2006-07-28  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* tutorial/Makefile.am.in:  Set environmental variable GNUTERM to latex
 	before running gnuplot on the tutorial demos.  Bypasses any potential
@@ -108,7 +108,7 @@
 
 	* term/post.trm term/dumb.trm: Update terminal description
 
-2006-07-27  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color): If the color is specified
 	by linetype, fall back to PS_linetype for monochrome/grayscale plots.
@@ -173,14 +173,14 @@
 	* term/post.trm (epslatex): Change reference from 'set ticscale' to
 	'set tics scale'.
 
-2006-07-21  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c term/x11.trm term/wxt.trm:  Make x11 and wxt share a
 	common syntax for switching between "quit = q" and "quit = ctrl-q"
 	behaviour from the command line:
 		set term foo {{no}ctrlq}
 
-2006-07-20  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/eval.h src/plot.c: Add a pre-defined udv NaN that is
 	guaranteed to evaluate as NaN. This provides a convenient way to define
@@ -191,7 +191,7 @@
 
 	* docs/gnuplot-ja.doc: Sync to current English version.
 
-2006-07-20  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/*.trm:  Revert patchset of 2006-07-06
 	Restore explicit help entries for "set term foo ...".
@@ -213,7 +213,7 @@
 	(OnMotion): Redraw on mouse motionto update the line to ruler.
 	(Draw): Draw a line from the ruler to current position when asked to.
 
-2006-07-18  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm:  Add help-file sections describing the PostScript
 	prolog processing, and the environmental variable GNUPLOT_PS_DIR.
@@ -267,7 +267,7 @@
 	* term/post.trm (PS_dump_prologue_file): OS/2 code to look
 	for PostScript prologue files relatively to the executable path.
 
-2006-07-17  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* NEWS docs/gnuplot.doc:  Update list of known bugs, and add index
 	entries to help find them in the docs.
@@ -275,7 +275,7 @@
 	* src/plot2d.c (get_data): Remove debugging statement that escaped
 	into cvs.
 
-2006-07-16  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color): Filter out redundant commands
 	to change the color in the *.tex output stream by buffering each 
@@ -305,7 +305,7 @@
 
 	Bug #1510816
 
-2006-07-15  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (regress): Export user-visible variables from the fit.
 	FIT_NDF	: Number of degrees of freedom
@@ -324,7 +324,7 @@
 	* src/wxterminal/gp_cairo.c: Respect ISO C90 standard (mainly move
 	declarations to beginning of functions).
 
-2006-07-14  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_dump_prologue_file): Try harder to expand short
 	file name into legal VMS or Windows path+file. Give more informative
@@ -346,7 +346,7 @@
 	* standard.c standard.h (f_exists): Allow to compile with 
 	./configure --disable-stringvariables
 
-2006-07-12  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  Enable HIDDEN3D_QUADTREE by default.
 
@@ -367,7 +367,7 @@
 	Rename temporary *.dat files to *.tmp to prevent them to be included by
 	'make dist'.
 
-2006-07-11  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color): Restore support for color
 	text set using fractional palette values. If the terminal is in mono
@@ -385,7 +385,7 @@
 	* config/makefile.cyg config/makefile.mgw config/makefile.nt: #define
 	EAM_OBJECTS and HIDDEN3D_VAR_PTSIZE.
 
-2006-07-10  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/mouselabels.dem demo/mouselab_1.dem demo/mouselab_2.dem:
 	New demo using GPVAL_* variables and mouse/keystroke interaction to
@@ -424,7 +424,7 @@
 	* term/wxt.trm (wxt_options): Initialize font_setting to avoid gcc
 	warning.
 
-2006-07-08  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c:  Revert to parse.c version 1.44 (10 Jun 2006).
 	This does away with dead code left after yesterday's partial
@@ -449,7 +449,7 @@
 	at the time of parsing - only at time of evaluation.
 	Bug #1518553
 
-2006-07-07  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/help.c (FindHelp): Add missing pair of brackets to disambiguate
 	if/if/else syntax.
@@ -473,7 +473,7 @@
 	    ?set terminal cgm
 	    ?set term cgm         %% delete this one
 
-2006-07-06  Ethan A Merritt <merritt@u.washington.edu>
+2006-07-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_linetype EPSLATEX_set_color):
 	Keep track of last color and/or linetype set, and filter out
