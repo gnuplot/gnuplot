@@ -1,8 +1,9 @@
 2006-08-04  Ethan A Merritt <merritt@u.washington.edu>
 
-	* term/pdf.trm term/post.trm term/emf.trm term/cgm.trm:
-	term->options() should not reset the terminal to default values if it
-	is called from "set termoption".
+	* term/pdf.trm term/post.trm term/emf.trm term/cgm.trm 
+	term/metapost.trm: term->options() should not reset the terminal to
+	its default values if it is called from "set termoption" rather than
+	from "set term".
 	Bug #1534649
 
 2006-08-03  Ethan A Merritt <merritt@u.washington.edu>

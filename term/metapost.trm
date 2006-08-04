@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.36 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: metapost.trm,v 1.37 2006/07/21 02:35:47 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -214,16 +214,20 @@ MP_options()
 {
     struct value a;
 
-    MP_color = FALSE;
-    MP_solid = FALSE;
-    MP_tex = MP_TEX;
-    MP_a4paper = 0;
-    MP_amstex  = 0;
-    MP_psnfss = MP_PSNFSS_NONE;
-    MP_fontsize = 10.0;
-    MP_textmag = 1.0;
-    MP_prologues = -1;
-    strcpy(MP_fontname, "cmr10");
+    /* Annoying hack to handle the case of 'set termoption' after */
+    /* we have already initialized the terminal.                  */
+    if (c_token != 2) {
+	MP_color = FALSE;
+	MP_solid = FALSE;
+	MP_tex = MP_TEX;
+	MP_a4paper = 0;
+	MP_amstex  = 0;
+	MP_psnfss = MP_PSNFSS_NONE;
+	MP_fontsize = 10.0;
+	MP_textmag = 1.0;
+	MP_prologues = -1;
+	strcpy(MP_fontname, "cmr10");
+    }
 
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&MP_opts[0], c_token)) {

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.66 2006/07/21 02:35:47 sfeam Exp $
+ * $Id: pdf.trm,v 1.67 2006/08/03 22:24:55 sfeam Exp $
  */
 
 /*------------------------------
@@ -302,7 +302,10 @@ PDF_options ()
 {
     struct value a;
 
-    pdf_explicit_size = FALSE;
+    /* Annoying hack to handle the case of 'set termoption' after */
+    /* we have already initialized the terminal.                  */
+    if (c_token != 2)
+	pdf_explicit_size = FALSE;
 
     while (!END_OF_COMMAND) {
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.196 2006/07/30 20:49:54 tlecomte Exp $
+ * $Id: post.trm,v 1.197 2006/08/03 19:45:58 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -516,7 +516,10 @@ PS_options()
     TBOOLEAN set_pslrotate = FALSE, set_pslauxfile = FALSE;
     TBOOLEAN set_psloldstyle = FALSE, set_font = FALSE, set_fontsize = FALSE;
 
-    ps_explicit_size = FALSE;
+    /* Annoying hack to handle the case of 'set termoption' after */
+    /* we have already initialized the terminal.                  */
+    if (c_token != 2)
+	ps_explicit_size = FALSE;
 
     if (strcmp(term->name, "pstex") == 0)
 	ps_params = &pstex_params;

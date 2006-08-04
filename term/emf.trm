@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.40 2006/07/21 02:35:46 sfeam Exp $
+ * $Id: emf.trm,v 1.41 2006/07/28 22:47:58 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -495,10 +495,15 @@ EMF_options()
 {
     char *s;
 
-    term->xmax = EMF_XMAX;
-    term->ymax = EMF_YMAX;
-    emf_dashed = TRUE;
-    emf_monochrome = FALSE;
+    /* Annoying hack to handle the case of 'set termoption' after */
+    /* we have already initialized the terminal.                  */
+    if (c_token != 2) {
+	term->xmax = EMF_XMAX;
+	term->ymax = EMF_YMAX;
+	emf_dashed = TRUE;
+	emf_monochrome = FALSE;
+    }
+
     while (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "de$fault")) {
 	    strcpy(emf_defaultfontname, EMF_FONTNAME);
