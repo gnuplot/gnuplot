@@ -6,6 +6,9 @@
 	from "set term".
 	Bug #1534649
 
+	* docs/gnuplot.doc: Fix typo and update example commands to use
+	exists("Foo") rather than define(Foo).
+
 2006-08-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm (PDF_set_color PDF_linetype PDF_filled_polygon):

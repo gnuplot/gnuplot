@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.378 2006/07/30 19:43:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.379 2006/07/31 03:44:55 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1634,11 +1634,11 @@ C ... and restart the table:
  defined under various gnuplot operations like mousing in interactive terminals
  or fitting; see `gnuplot-defined variables` for details.
 
- You can check for existence of a given variable by the defined(v) expression,
- for example
+ You can check for existence of a given variable V by the exists("V")
+ expression. For example
        a = 10
-       if (defined(a)) print "a is defined"
-       if (!defined(b)) print "b is not defined"
+       if (exists("a")) print "a is defined"
+       if (!exists("b")) print "b is not defined"
 
  Valid names are the same as in most programming languages: they must begin
  with a letter, but subsequent characters may be letters, digits, "$", or "_".
@@ -3829,7 +3829,7 @@ C ... and restart the table:
  If a format is specified, each datafile record is read using the C library's
  'scanf' function, with the specified format string.  Otherwise the record is
  read and broken into columns at spaces or tabs.  A format cannot be specified
- if time-format data is being used (this must be done by `set data time`).
+ this way for time-format data (instead use `set xdata time`).
 
  The resulting array of data is then sorted into columns according to the
  entries.  Each <entry> may be a simple column number, which selects the
