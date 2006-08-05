@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.181 2006/06/30 02:17:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.182 2006/07/05 20:51:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -866,59 +866,11 @@ show_version(FILE *fp)
     prefix[1] = prefix[2] = prefix[3] = prefix[4] = ' ';
     prefix[5] = NUL;
 
-    if (fp == stderr) {
-	/* No hash mark - let p point to the trailing '\0' */
-	p += sizeof(prefix) - 1;
-    } else {
-#ifdef BINDIR
-# ifdef X11
-	fprintf(fp, "#!%s/gnuplot -persist\n#\n", BINDIR);
-#  else
-	fprintf(fp, "#!%s/gnuplot\n#\n", BINDIR);
-# endif				/* not X11 */
-#endif /* BINDIR */
-    }
-    fprintf(fp, "%s\n\
-%s\t%s\n\
-%s\tVersion %s patchlevel %s\n\
-%s\tlast modified %s\n\
-%s\tSystem: %s %s\n\
-%s\n\
-%s\t%s\n\
-%s\tThomas Williams, Colin Kelley and many others\n\
-%s\n\
-%s\tType `help` to access the on-line reference manual.\n\
-%s\tThe gnuplot FAQ is available from\n\
-%s\t\t%s\n\
-%s\n\
-%s\tSend comments and help requests to  <%s>\n\
-%s\tSend bug reports and suggestions to <%s>\n\
-%s\n",
-	    p,			/* empty line */
-	    p, PROGRAM,
-	    p, gnuplot_version, gnuplot_patchlevel,
-	    p, gnuplot_date,
-	    p, os_name, os_rel,
-	    p,			/* empty line */
-	    p, gnuplot_copyright,
-	    p,			/* authors */
-	    p,			/* empty line */
-	    p,			/* Type `help` */
-	    p,			/* FAQ is at */
-	    p, faq_location,
-	    p,			/* empty line */
-	    p, help_email,
-	    p, bug_email,
-	    p);			/* empty line */
+    /* Construct string of configuration options used to build */
+    /* this particular copy of gnuplot. Executed once only.    */
+    if (!compile_options) {
+	compile_options = gp_alloc(1024,"compile_options");
 
-
-    /* show version long */
-    if (almost_equals(c_token, "l$ong")) {
-	char *helpfile = NULL;
-
-	c_token++;
-
-	{
 	    /* The following code could be a lot simpler if
 	     * it wasn't for Borland's broken compiler ...
 	     */
@@ -1059,16 +1011,75 @@ show_version(FILE *fp)
 #endif
 	    "";
 
-	    fprintf(stderr, "\
-Compile options:\n\
+	    sprintf(compile_options, "\
 %s%s%s%s\n\
 %s%s\n\
-%s%s%s%s%s%s\n%s\n\n",
+%s%s%s%s%s%s\n%s\n",
 		    rdline, gnu_rdline, compatibility, binary_files,
 		    libgd, linuxvga,
 		    nocwdrc, x11, use_mouse, unixplot, gnugraph, hiddenline,
 		    plotoptions);
-	}
+
+	compile_options = gp_realloc(compile_options, strlen(compile_options)+1, "compile_options");
+    }
+
+    /* The only effect of fp == NULL is to load the compile_options string */
+    if (fp == NULL)
+	return;
+	
+    if (fp == stderr) {
+	/* No hash mark - let p point to the trailing '\0' */
+	p += sizeof(prefix) - 1;
+    } else {
+#ifdef BINDIR
+# ifdef X11
+	fprintf(fp, "#!%s/gnuplot -persist\n#\n", BINDIR);
+#  else
+	fprintf(fp, "#!%s/gnuplot\n#\n", BINDIR);
+# endif				/* not X11 */
+#endif /* BINDIR */
+    }
+
+    fprintf(fp, "%s\n\
+%s\t%s\n\
+%s\tVersion %s patchlevel %s\n\
+%s\tlast modified %s\n\
+%s\tSystem: %s %s\n\
+%s\n\
+%s\t%s\n\
+%s\tThomas Williams, Colin Kelley and many others\n\
+%s\n\
+%s\tType `help` to access the on-line reference manual.\n\
+%s\tThe gnuplot FAQ is available from\n\
+%s\t\t%s\n\
+%s\n\
+%s\tSend comments and help requests to  <%s>\n\
+%s\tSend bug reports and suggestions to <%s>\n\
+%s\n",
+	    p,			/* empty line */
+	    p, PROGRAM,
+	    p, gnuplot_version, gnuplot_patchlevel,
+	    p, gnuplot_date,
+	    p, os_name, os_rel,
+	    p,			/* empty line */
+	    p, gnuplot_copyright,
+	    p,			/* authors */
+	    p,			/* empty line */
+	    p,			/* Type `help` */
+	    p,			/* FAQ is at */
+	    p, faq_location,
+	    p,			/* empty line */
+	    p, help_email,
+	    p, bug_email,
+	    p);			/* empty line */
+
+
+    /* show version long */
+    if (almost_equals(c_token, "l$ong")) {
+	char *helpfile = NULL;
+
+	c_token++;
+	fprintf(stderr, "Compile options:\n%s\n", compile_options);
 
 	if ((helpfile = getenv("GNUHELP")) == NULL) {
 #if defined(ATARI) || defined(MTOS)

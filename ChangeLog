@@ -2,6 +2,19 @@
 
 	* tutorial/tutorial.tex: Update version statement to 4.2
 
+	* src/version.c src/version.h: Global (char *)compile_options.
+
+	* src/show.c (show_version): Save the configuration options string
+	produced for "show version long" in (char *)compile_options. If called
+	as show_version(NULL), do this and nothing else.
+
+	* src/plot.c (main): Call show_version() on program entry in both
+	interactive and non-interactive mode so that it initializes the
+	compile_options string.
+
+	* src/eval.c (update_gpval_variables): New udv GPVAL_COMPILE_OPTIONS
+	that makes the compile_options string available to the user.
+
 2006-08-05  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/history.c: Built-in readline history command was losing one
