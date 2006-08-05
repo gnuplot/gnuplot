@@ -2,6 +2,12 @@
 
 	* tutorial/tutorial.tex: Update version statement to 4.2
 
+2006-08-05  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/history.c: Built-in readline history command was losing one
+	saved entry every time.  Fix the start point for the save.
+	Bug #1531532
+
 2006-08-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm term/post.trm term/emf.trm term/cgm.trm 
