@@ -5,6 +5,7 @@
 
 	* INSTALL: Likewise.
 	Synchronize the output of `./configure --help'.
+	Document the requirements of the wxWidgets terminal.
 
 	* configure.in: Remove detection of libpng, useless since the
 	standalone png driver has been removed.

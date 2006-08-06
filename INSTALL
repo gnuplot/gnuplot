@@ -14,6 +14,8 @@ Table of contents:
     * How to test gnuplot
     * Installing WPS object for gnuplot on OS/2
 	- How to install WPS icon for drag&drop.
+    * Compiling Gnuplot with the wxWidgets terminal
+	- Notes about the requirements of the `wxt` terminal.
     * Front-ends for gnuplot
 	- Few notes about graphical front-ends for gnuplot.
 
@@ -785,6 +787,32 @@ options, if you wish.
 PM terminal is fully mouse-capable. Type 'm' to switch the mouse on/off (see
 'help mouse' for more details), or 'h' for the full list of current hotkeys
 (see also 'help bind').
+
+
+Compiling Gnuplot with the wxWidgets terminal
+==============================================
+
+The `wxt` terminal provides an interactive windowed output. The code is
+cross-platform and can be compiled as soon as the following requirements are
+met:
+
+First, this terminal is based on the wxWidgets library. This library can be
+found on http://www.wxwidgets.org. It comes in different flavours corresponding
+to the underlying API : Microsoft Windows ("wxMSW"), GTK+ ("wxGTK"), X11
+("wxX11"), MacOS ("wxMAC"), etc. Only wxMSW and wxGTK have been tested for
+gnuplot 4.2. If you want to use one of the other flavours, some things are
+likely to need a little work. You can find help on the gnuplot-beta mailing
+list. If you compile against the wxGTK port, you are encouraged to have the
+gtk+ development files too for the raise/lower commands to work as expected.
+
+Then, the terminal needs the Cairo library (no specific backend is required)
+which can be found on http://www.cairographics.org, and the Pango library,
+which can be found on http://www.pango.org and need to be compiled with its
+Cairo backend.
+
+On Unix, use the usual `./configure; make; make install' build process to
+compile this terminal. On Windows, please use the MinGW/MSYS makefile, namely
+config/makefile.mgw. MinGW and MSYS can be found on http://www.mingw.org.
 
 
 Front-ends for gnuplot
