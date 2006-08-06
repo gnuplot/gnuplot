@@ -9,6 +9,9 @@
 	* configure.in: Remove detection of libpng, useless since the
 	standalone png driver has been removed.
 
+	* src/Makefile.am (AM_CPPFLAGS); Remove PREFIX and VERSION_MAJOR, those
+	were used by the wxWidgets terminal but are not anymore.
+
 2006-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* tutorial/tutorial.tex: Update version statement to 4.2
