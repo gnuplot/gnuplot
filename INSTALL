@@ -198,7 +198,6 @@ $ ./configure --help
   --with-readline=gnu     use the GNU readline library (4.2 or newer required)
   --with-readline=DIR     Specify the location of GNU readline
   --with-plot=DIR       use the Unix plot library
-  --with-png=DIR        where to find the png library
   --with-gd=DIR (*)     where to find Tom Boutell's gd library
   --with-pdf=DIR (*)      enable pdf terminal
                           (requires PDFLib)

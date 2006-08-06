@@ -6,6 +6,9 @@
 	* INSTALL: Likewise.
 	Synchronize the output of `./configure --help'.
 
+	* configure.in: Remove detection of libpng, useless since the
+	standalone png driver has been removed.
+
 2006-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* tutorial/tutorial.tex: Update version statement to 4.2

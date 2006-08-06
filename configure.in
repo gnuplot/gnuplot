@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.195 2006/07/13 03:28:42 sfeam Exp $
+dnl $Id: configure.in,v 1.196 2006/07/30 03:49:41 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -381,52 +381,6 @@ AC_CHECK_LIB(z,deflate,
 please add path to zlib.h to CPPFLAGS in Makefile])])],
   AC_MSG_WARN([zlib is required - see http://www.gzip.org/zlib/]))
 
-dnl check presence of png library
-AC_ARG_WITH(png,dnl
-[  --with-png[=DIR]        where to find the png library],,
-  with_png=yes)
-
-if test "$with_png" != no; then
-  AC_PATH_PROG([LIBPNG_CONFIG], [libpng-config])
-  if test -n "$LIBPNG_CONFIG"; then
-    libpng_CPPFLAGS=`libpng-config --cflags`
-    # should be --ldopts, but it's currently broken
-    libpng_LDFLAGS=`libpng-config --ldflags | sed 's/ -l[[^ ]][[^ ]]*//g'`
-  elif test -d "$with_png"; then
-    libpng_CPPFLAGS="-I$with_png/include"
-    libpng_LDFLAGS="-L$with_png/lib"
-  fi
-
-  _cppflags="$CPPFLAGS"
-  _ldflags="$LDFLAGS"
-  CPPFLAGS="$CPPFLAGS $libpng_CPPFLAGS"
-  LDFLAGS="$LDFLAGS $libpng_LDFLAGS"
-
-  AC_CHECK_LIB(png,png_create_write_struct,
-    AC_DEFINE(HAVE_LIBPNG,1,[ Define if you have the png library. ]),,[-lz -lm])
-
-  AC_CHECK_HEADERS(png.h,,
-    [AC_CHECK_HEADERS(libpng/png.h,
-       [libpng_CPPFLAGS="$libpng_CPPFLAGS/libpng"])])
-
-  if test "$ac_cv_lib_png_png_create_write_struct" = yes ; then
-    AC_EGREP_CPP([You lose],[#include "png.h"
-#if PNG_LIBPNG_VER < 89
-You lose.
-#endif
-      ],[AC_MSG_WARN([- libpng too old - not including png support])
-         with_png=no])
-  else
-    with_png=no
-  fi
-
-  dnl we'll use the png-specific flags later
-  CPPFLAGS="$_cppflags"
-  LDFLAGS="$_ldflags"
-
-fi
-dnl end png
-
 dnl check presence of gd library
 dnl we don't check for libfreetype and libjpeg locations - if gd requires
 dnl them, the gdlib-config scipt contains all the required information
@@ -486,8 +440,7 @@ if test "$with_gd" != no; then
      dnl png support in libgd
      AC_CHECK_LIB(gd,gdImagePng,
        [AC_DEFINE(HAVE_GD_PNG,1,[ Define if libgd supports png. ])
-        libgd_LIBS="$libgd_LIBS -lpng"
-        have_gd_png=yes])
+        libgd_LIBS="$libgd_LIBS -lpng"])
      LIBS="$_libs"
 
     ],[dnl gd library not found
@@ -1105,12 +1058,8 @@ if test "$ac_cv_lib_gd_gdImageGifAnimBegin" = yes; then
   AC_MSG_RESULT([         (including animated GIF)])
 fi
 
-if test "$with_png" != no; then
-  if test "$with_gd" != no; then
-    AC_MSG_RESULT([  Enable generation of PNG files])
-  else
-    AC_MSG_RESULT([  PNG support disabled because libgd not found])
-  fi
+if test "$ac_cv_lib_gd_gdImagePng" = yes; then
+  AC_MSG_RESULT([  Enable generation of PNG files])
 fi
 
 if test "$have_ttf" = yes; then
