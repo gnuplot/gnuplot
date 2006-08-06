@@ -165,37 +165,52 @@ $ ./configure --help
   --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --mandir=DIR            Man documentation in DIR [PREFIX/man]
-  --with-x          (*)   use the X Window System
+  --disable-history-file  do not use history file
+  --disable-mouse         disable mouse for the x11 terminal
+  --disable-x11-mbfonts   disable multi-byte font support for x11
+  --disable-binary-data-file          disable binary_data_file
+  --disable-with-image          disable image support
+  --disable-binary-x11-polygon        disable binary_x11_polygon
+  --enable-thin-splines   enable thin plate splines
+  --disable-datastrings   disable reading strings from datafiles
+  --disable-histograms    disable histograms plot style
+  --disable-objects       disable rectangles and other objects
+  --disable-stringvariables   disable string variables
+  --disable-macros        disable command line macros
+  --enable-iris           enable IRIS terminal (IRIS4D only)
+  --enable-mgr            enable MGR terminal
+  --disable-fiterrvars    enable fitting error variables
+  --enable-rgip           enable Redwood Graphics Interface Protocol
+  --disable-h3d-quadtree   disable quadtree optimization in hidden3d code
+  --enable-h3d-gridbox    enable gridbox optimization in hidden3d code
+  --disable-wxwidgets      wxWidgets terminal (default enabled)
+  --with-kpsexpand        search for kpsexpand at run-time
+  --with-x (*)            use the X Window System
   --with-lasergnu         install lasergnu printer script
+  --with-gihdir=DIR       location of .gih file
+                          (default PREFIX/share/PACKAGE/VERSION)
   --with-linux-vga        use the Linux SVGA console driver
                           (requires /usr/lib/libvga)
-  --with-ggi[=DIR]        enable the ggi driver (EXPERIMENTAL)
-  --with-xmi[=DIR]        ggi's xmi support for pm3d (EXPERIMENTAL)
-  --with-readline   (*)   use the builtin minimal readline function (default)
+  --with-ggi=DIR          enable the ggi driver (EXPERIMENTAL)
+  --with-xmi=DIR          ggi's xmi support for pm3d (EXPERIMENTAL)
+  --with-readline (*)     use the builtin minimal readline function (default)
   --without-readline      do not use the builtin readline function
   --with-readline=gnu     use the GNU readline library (4.2 or newer required)
   --with-readline=DIR     Specify the location of GNU readline
-  --enable-history-file   use history file (requires GNU readline)
-  --with-plot[=DIR]       use the Unix plot library
-  --with-png[=DIR]  (*)   where to find the png library
-  --with-gd[=DIR]   (*)   where to find Tom Boutell's gd library
-  --with-gif=png          'set term gif' produces png images instead
-                          (libgd version >= 1.8) 
-  --with-pdf[=DIR]  (*)   enable pdf terminal 
+  --with-plot=DIR       use the Unix plot library
+  --with-png=DIR        where to find the png library
+  --with-gd=DIR (*)     where to find Tom Boutell's gd library
+  --with-pdf=DIR (*)      enable pdf terminal
                           (requires PDFLib)
   --with-cwdrc            check current directory for .gnuplot file,
                           normally disabled for security reasons
+  --without-lisp-files    do not build emacs lisp files
   --with-row-help         format help and subtopic tables by row (default)
   --without-row-help (*)  format help and subtopic tables by column
   --without-tutorial      do not build LaTeX tutorial
-  --disable-mouse         disable mouse for the x11 terminal
-  --disable-pm3d          disable pm3d
-  --disable-filledboxes   disable filledboxes style
-  --disable-relative-boxwidth   disable relative_boxwidths
-  --enable-thin-splines   enable thin plate splines
-  --enable-iris           enable IRIS terminal (IRIS4D only)
-  --enable-mgr            enable MGR terminal
-  --enable-rgip           enable Redwood Graphics Interface Protocol
+  --with-wx-config=PATH   Use the given path to wx-config, the wxWidgets configuration program
+    (default search in $PATH)
+
 
 Options marked with (*) are enabled by default, ie. these features or
 packages are used if configure detects them even if the corresponding

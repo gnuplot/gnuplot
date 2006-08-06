@@ -4,6 +4,7 @@
 	variables.
 
 	* INSTALL: Likewise.
+	Synchronize the output of `./configure --help'.
 
 2006-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
