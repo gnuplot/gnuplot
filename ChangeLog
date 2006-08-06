@@ -1,3 +1,10 @@
+2006-08-06  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* docs/gnuplot.doc: Document GNUPLOT_PS_DIR in the list of environment
+	variables.
+
+	* INSTALL: Likewise.
+
 2006-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* tutorial/tutorial.tex: Update version statement to 4.2

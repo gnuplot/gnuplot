@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.379 2006/07/31 03:44:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.380 2006/08/05 01:00:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -716,6 +716,12 @@ C
  the environmental variable GNUPLOT_FONTPATH. The format is the same as for
  GNUPLOT_LIB. The contents of GNUPLOT_FONTPATH are appended to the `fontpath`
  variable, but not saved with the `save` and `save set` commands.
+
+ GNUPLOT_PS_DIR is used by the postscript driver to use external prologue
+ files. Depending on the build process, gnuplot contains either a builtin
+ copy of those files or simply a default hardcoded path. Use this variable
+ to test the postscript terminal with custom prologue files. See
+ `postscript prologue`.
 2 Expressions
 ?expressions
  In general, any mathematical expression accepted by C, FORTRAN, Pascal, or

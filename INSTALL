@@ -658,6 +658,11 @@ GNUPLOT_FONTPATH is used by the postscript driver as search path for
 postscript (Adobe Type 1 and Type 2) fonts.  It is also used by the
 svg driver to look for svg or Adobe cef fonts.
 
+GNUPLOT_PS_DIR is used by the postscript driver to use external prologue
+files. Depending on the build process, gnuplot contains either a builtin
+copy of those files or simply a default hardcoded path. Use this variable
+to test the postscript terminal with custom prologue files.
+
 GNUPLOT_LIB may be used to define additional search directories for
 data and command files. The variable may contain a single directory
 name, or a list of directories separated by a platform-specific path
