@@ -1,3 +1,9 @@
+2006-08-07  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp (wxtPanel::wxt_cairo_create_bitmap):
+	Use a reference instead of a pointer to avoid misusing an undocumented
+	constructor that will be removed in wxWidgets >= 2.7.0.
+
 2006-08-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/all.dem: Add rectangle.dem to the standard test set.

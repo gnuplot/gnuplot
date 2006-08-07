@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.20 2006/07/19 06:07:43 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.21 2006/07/28 00:03:19 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2600,7 +2600,7 @@ void wxtPanel::wxt_cairo_create_bitmap()
 		delete cairo_bitmap;
 
 	/* create a wxBitmap from the wxImage. */
-	cairo_bitmap = new wxBitmap( image );
+	cairo_bitmap = new wxBitmap( *image );
 
 	/* free memory */
 	delete image;
