@@ -1,3 +1,17 @@
+2006-08-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/all.dem: Add rectangle.dem to the standard test set.
+	
+	* demo/image.dem demo/macros.dem demo/rainbow.dem demo/rectangle.dem:
+	Now that we have the configuration options in GPVAL_COMPILE_OPTIONS we
+	can use this to test for the presence of optional feature needed for
+	any particular demo.  These particular demos required configuration
+	options that are marked EXPERIMENTAL in version 4.2, so we test for
+	the presence of the feature and if it is missing then we print a 
+	warning message and skip the rest of the demo.  This allows "make check"
+	to succeed even if the EXPERIMENTAL features are configured out.
+
+
 2006-08-06  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* docs/gnuplot.doc: Document GNUPLOT_PS_DIR in the list of environment

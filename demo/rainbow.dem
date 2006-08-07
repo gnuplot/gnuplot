@@ -3,44 +3,15 @@
 # terminal-independent color choices
 #
 reset
-set title "Terminal-independent palette colors in 2D\nImplemented using command line macros referring to a fixed HSV palette"
+#
+set title "Terminal-independent RGB colors in 2D"
+set xlabel "Implemented using built-in rgb color names\n(only works for terminals that can do full rgb color)"
+#
 set xrange [-0.5:3.5]
 set yrange [-1:1.4]
 set bmargin 7
 unset ytics
 unset xtics
-set colorbox horizontal user origin .1,.08 size .8,.05
-set xlabel 'HSV color wheel'
-#
-# Load terminal-independent colorwheel (HSV full saturation)
-#
-load 'colorwheel.dem'
-#
-# define line styles using macros and a fixed palette
-#
-set style line 1 @red lw 3
-set style line 2 @orange lw 2
-set style line 3 @yellow lw 3
-set style line 4 @green lw 2
-set style line 5 @cyan lw 3
-set style line 6 @blue lw 2
-set style line 7 @violet lw 3
-#
-# draw some plots
-#
-plot cos(x)     ls 1 title 'red',   \
-     cos(x-.2)  ls 2 title 'orange',\
-     cos(x-.4)  ls 3 title 'yellow',\
-     cos(x-.6)  ls 4 title 'green', \
-     cos(x-.8)  ls 5 title 'cyan',  \
-     cos(x-1.)  ls 6 title 'blue',  \
-     cos(x-1.2) ls 7 title 'violet'
-
-pause -1 "Hit return to continue"
-#
-set title "Terminal-independent RGB colors in 2D"
-set xlabel "Implemented using built-in rgb color names\n(only works for terminals that can do full rgb color)"
-unset colorbox
 #
 # define line styles using explicit rgbcolor names
 #
@@ -74,7 +45,54 @@ print ''
 print '# And this is the result'
 #
 show style line
-replot
+#
+# draw some plots
+#
+plot cos(x)     ls 1 title 'red',   \
+     cos(x-.2)  ls 2 title 'orange',\
+     cos(x-.4)  ls 3 title 'yellow',\
+     cos(x-.6)  ls 4 title 'green', \
+     cos(x-.8)  ls 5 title 'cyan',  \
+     cos(x-1.)  ls 6 title 'blue',  \
+     cos(x-1.2) ls 7 title 'violet'
 #
 pause -1 "Hit return to continue"
+
+if ((GPVAL_VERSION == 4.1 || GPVAL_VERSION == 4.2) \
+&&  (!strstrt(GPVAL_COMPILE_OPTIONS,"+MACROS"))) \
+    print ">>> Skipping demo <<<\n" ; \
+    print "This copy of gnuplot was built without support for macro substitution\n" ; \
+    exit ;
+
+
+set title "Terminal-independent palette colors in 2D\nImplemented using command line macros referring to a fixed HSV palette"
+set colorbox horizontal user origin .1,.08 size .8,.05
+set xlabel 'HSV color wheel'
+#
+unset label 1
+unset label 2
+unset label 3
+unset label 4
+unset label 5
+unset label 6
+unset label 7
+#
+# Load terminal-independent colorwheel (HSV full saturation)
+#
+load 'colorwheel.dem'
+#
+# define line styles using macros and a fixed palette
+#
+set style line 1 @red lw 3
+set style line 2 @orange lw 2
+set style line 3 @yellow lw 3
+set style line 4 @green lw 2
+set style line 5 @cyan lw 3
+set style line 6 @blue lw 2
+set style line 7 @violet lw 3
+
+replot
+
+pause -1 "Hit return to continue"
+
 reset

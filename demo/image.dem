@@ -9,6 +9,11 @@
 #	- 9.23. 2003 ds: redone in response to discussion list feedback
 #	- 5. 3. 2003 ds: 1st version
 
+if ((GPVAL_VERSION == 4.1 || GPVAL_VERSION == 4.2) \
+&&  (!strstrt(GPVAL_COMPILE_OPTIONS,"+IMAGE"))) \
+    print ">>> Skipping demo <<<\n" ; \
+    print "This copy of gnuplot was built without support for plotting images" ; \
+    exit ;
 
 print ""
 print "The plotting styles \`image\` and \`rgbimage\` are intended for plotting"
