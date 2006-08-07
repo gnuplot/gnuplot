@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.197 2006/08/03 19:45:58 mikulik Exp $
+ * $Id: post.trm,v 1.198 2006/08/04 20:31:56 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3969,7 +3969,7 @@ PS_COMMON_DOC1
 " which are either compiled in the gnuplot exectable or stored elsewhere on your",
 " computer. This behaviour and the default directory where these files live are",
 " controlled at the time gnuplot is built. However, you can control this",
-" either by defining an environmental variable GNUPLOT_PS_DIR or by using the",
+" either by defining an environment variable GNUPLOT_PS_DIR or by using the",
 " gnuplot command `set loadpath`. See `set loadpath`.",
 "",
 ""
