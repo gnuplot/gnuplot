@@ -10,8 +10,8 @@
 	
 	* demo/image.dem demo/macros.dem demo/rainbow.dem demo/rectangle.dem:
 	Now that we have the configuration options in GPVAL_COMPILE_OPTIONS we
-	can use this to test for the presence of optional feature needed for
-	any particular demo.  These particular demos required configuration
+	can use this to test for the presence of optional features needed for
+	any particular demo.  These particular demos require configuration
 	options that are marked EXPERIMENTAL in version 4.2, so we test for
 	the presence of the feature and if it is missing then we print a 
 	warning message and skip the rest of the demo.  This allows "make check"
