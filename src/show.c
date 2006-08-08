@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.182 2006/07/05 20:51:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.183 2006/08/05 21:33:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -871,6 +871,7 @@ show_version(FILE *fp)
     if (!compile_options) {
 	compile_options = gp_alloc(1024,"compile_options");
 
+	{
 	    /* The following code could be a lot simpler if
 	     * it wasn't for Borland's broken compiler ...
 	     */
@@ -1019,6 +1020,7 @@ show_version(FILE *fp)
 		    libgd, linuxvga,
 		    nocwdrc, x11, use_mouse, unixplot, gnugraph, hiddenline,
 		    plotoptions);
+	}
 
 	compile_options = gp_realloc(compile_options, strlen(compile_options)+1, "compile_options");
     }
