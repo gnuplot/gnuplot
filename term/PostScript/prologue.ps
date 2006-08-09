@@ -333,18 +333,22 @@
               -4 0 M 12 8 L -4 4 M 8 10 L stroke }
 >> matrix makepattern
 /Pat9 exch def
-/Pattern1 {KeepColor Pat1 setpattern} bind def
-/Pattern2 {KeepColor Pat2 setpattern} bind def
-/Pattern3 {KeepColor Pat3 setpattern} bind def
-/Pattern4 {KeepColor Landscape { Pat5 } { Pat4 } ifelse setpattern} bind def
-/Pattern5 {KeepColor Landscape { Pat4 } { Pat5 } ifelse setpattern} bind def
-/Pattern6 {KeepColor Landscape { Pat9 } { Pat6 } ifelse setpattern} bind def
-/Pattern7 {KeepColor Landscape { Pat8 } { Pat7 } ifelse setpattern} bind def
+/Pattern1 {PatternBgnd KeepColor Pat1 setpattern} bind def
+/Pattern2 {PatternBgnd KeepColor Pat2 setpattern} bind def
+/Pattern3 {PatternBgnd KeepColor Pat3 setpattern} bind def
+/Pattern4 {PatternBgnd KeepColor Landscape { Pat5 } { Pat4 } ifelse setpattern} bind def
+/Pattern5 {PatternBgnd KeepColor Landscape { Pat4 } { Pat5 } ifelse setpattern} bind def
+/Pattern6 {PatternBgnd KeepColor Landscape { Pat9 } { Pat6 } ifelse setpattern} bind def
+/Pattern7 {PatternBgnd KeepColor Landscape { Pat8 } { Pat7 } ifelse setpattern} bind def
 } def
 %
 %
 %End of PostScript Level 2 code
 %
+TransparentPatterns
+  {/PatternBgnd {} def }
+  {/PatternBgnd {gsave 1 setgray fill grestore} def }
+  ifelse
 %
 % Substitute for Level 2 pattern fill codes with
 % grayscale if Level 2 support is not selected.

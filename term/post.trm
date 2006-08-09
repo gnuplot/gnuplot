@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.198 2006/08/04 20:31:56 sfeam Exp $
+ * $Id: post.trm,v 1.199 2006/08/07 00:44:45 tlecomte Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1396,6 +1396,7 @@ PS_common_init(
 /Landscape %s def\n\
 /Level1 %s def\n\
 /Rounded %s def\n\
+/TransparentPatterns false def\n\
 /gnulinewidth %.3f def\n\
 /userlinewidth gnulinewidth def\n\
 %%\n\
@@ -2654,7 +2655,7 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 		filldens = 0.5;
 		fprintf(gppsfile, " %.1f PolyFill\n", filldens);
 	    } else {
-		fprintf(gppsfile," gsave 1 setgray fill grestore Pattern%d fill grestore\n", pattern);
+		fprintf(gppsfile," Pattern%d fill grestore\n", pattern);
 	    }
 	    break;
 
