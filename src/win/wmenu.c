@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.6 2004/07/01 17:10:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.7 2005/08/04 16:44:58 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -348,6 +348,8 @@ char *szFilter;
 				   COMMDLG.DLL is redistributable */
 				{
 				BOOL save;
+				char cwd[MAX_PATH];
+
 				if ( (szTitle = LocalAllocPtr(LHND, MAXSTR+1)) == (char *)NULL )
 					return;
 				if ( (szFile = LocalAllocPtr(LHND, MAXSTR+1)) == (char *)NULL )
@@ -394,7 +396,11 @@ char *szFilter;
 				ofn.lpstrFileTitle = szFile;
 				ofn.nMaxFileTitle = MAXSTR;
 				ofn.lpstrTitle = szTitle;
-				ofn.lpstrInitialDir = (LPSTR)NULL;
+				/* Windows XP has it's very special meaning of 'default directory'  */
+				/* (search for OPENFILENAME on MSDN). So we set it here explicitly: */
+				/* ofn.lpstrInitialDir = (LPSTR)NULL; */
+				_getcwd(&cwd, sizeof(cwd));
+				ofn.lpstrInitialDir = cwd;
 				ofn.Flags = OFN_SHOWHELP | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 				flag = (save ? GetSaveFileName(&ofn) : GetOpenFileName(&ofn));
 				if( flag ) {

@@ -1,3 +1,12 @@
+2006-08-09  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	SF Patch [1505261] wgnuplot: open file-open-dialog in current dir
+
+	* src/win/wmenu.c (SendMacro): Windows XP uses a strange initial
+	directory for the file open dialog. This patch forces the dialog to
+	always open in the current directory. So now, if you change the
+	directory via 'cd', the file open dialog opens where expected.
+
 2006-08-08  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* src/show.c (show_version): Fix C99-ism by reintroducing
