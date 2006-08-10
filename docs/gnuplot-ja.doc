@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.120 2006-07-31 10:45:49+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.378
+C RCS $Id: gnuplot-ja.doc,v 1.123 2006-08-08 09:32:13+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.381
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C 
@@ -780,6 +780,13 @@ C Shigeharu Takeno et al (3.7, 4.X)
  それは環境変数 GNUPLOT_FONTPATH で制御できます。書式は GNUPLOT_LIB と
  同じです。GNUPLOT_FONTPATH の値は変数 `fontpath` に追加されますが、そ
  れは `save` や `save set` コマンドでは保存されません。
+
+ PostScript ドライバは、外部 (組み込まれていない) 定義ファイルを使うた
+ めに環境変数 GNUPLOT_PS_DIR を利用します。インストール時の作業により、
+ gnuplot にはそれらのファイルのコピーが組み込まれているか、または単にそ
+ れらのファイルのあるデフォルトのパスが埋め込まれるかが変わります。カス
+ タマイズした定義ファイルで PostScript 出力をテストする場合はこの環境変
+ 数を使ってください。`postscript prologue` も参照してください。
 2 Expressions
 ?expressions
  基本的には C, FORTRAN, Pascal, BASIC において利用可能な数学表現を使用
@@ -1684,11 +1691,11 @@ C ... and restart the table:
  動作状態に応じて定義されます。詳細は `gnuplot-defined variables` を参
  照してください。
 
- ある変数が既に定義されているかどうかは、式 defined(v) でチェックできま
- す。例:
+ ある変数 V が既に定義されているかどうかは、式 exists("V") でチェックで
+ きます。例:
        a = 10
-       if (defined(a)) print "a is defined"
-       if (!defined(b)) print "b i
+       if (exists("a")) print "a is defined"
+       if (!exists("b")) print "b is not defined"
 
  変数名や関数名の命名規則は、大抵のプログラミング言語と同じで、先頭はア
  ルファベットで、その後の文字はアルファベット、数字、"$", "_" が使えま
@@ -3918,12 +3925,11 @@ C ... and restart the table:
  書式:
        plot 'file' using {<entry> {:<entry> {:<entry> ...}}} {'format'}
 
- もし、フォーマット (format) が指定されれば、C のライブラリ関数 'scanf' を
- 使ってデータファイルの各行をそのフォーマット文字列に従って読み込みます。
- そうでなければ、行はスペースまたはタブの所で列に分割されて読み込まれます。
- もし時系列フォーマットデータ (time-format data) を使っている場合は、
- フォーマットを指定することはできません (これは `set data time` で行わ
- なければなりません)。
+ もし、フォーマット (format) が指定されれば、C のライブラリ関数 'scanf' 
+ を使ってデータファイルの各行をそのフォーマット文字列に従って読み込みま
+ す。そうでなければ、行はスペースまたはタブの所で列に分割されて読み込ま
+ れます。時系列フォーマットデータ (time-format data) の書式はこの方法で
+ は指定できません (代わりに `set xdata time` を使ってください)。
 
  データは entry の指定に従った列に並び直されます。各 <entry> には、
  データを選び出すための単なる列の番号、カッコで囲まれた数式を指定するか、
@@ -11080,6 +11086,7 @@ C ... and restart the table:
 =bessel
 =timefmt
 =load
+=nohidden3d
  浮動小数計算例外 (浮動小数値が大きすぎる (または小さすぎる) 場合、0 で
  割算した場合など) は、ユーザ定義関数において時折発生します。特に、いく
  つかのデモで、浮動小数の範囲を越える数値を生成することが起こるようです。
@@ -11101,6 +11108,10 @@ C ... and restart the table:
  ます。
 
  誤差指示線 (errorbars) は、極座標/球面座標描画モードでは使えません。
+
+ `nohidden3d` は、全体的な設定である `set hidden3d` を、個々の描画に対
+ して免除するためのオプションですが、これは媒介変数の曲線 (parametric)
+ に対しては機能しません。 
 
 2 Specific terminals
 ?bugs terminals
