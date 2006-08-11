@@ -281,7 +281,6 @@
  ifelse
 %
 % PostScript level 2 pattern fill definitions
-% Ethan A Merritt April 2004
 %
 /Level2PatternFill {
 /Tile8x8 {/PaintType 2 /PatternType 1 /TilingType 1 /BBox [0 0 8 8] /XStep 8 /YStep 8}
@@ -343,10 +342,9 @@
 %
 %End of PostScript Level 2 code
 %
-TransparentPatterns
-  {/PatternBgnd {} def}
-  {/PatternBgnd {gsave 1 setgray fill grestore} def}
-  ifelse
+/PatternBgnd {
+  TransparentPatterns {} {gsave 1 setgray fill grestore} ifelse
+} def
 %
 % Substitute for Level 2 pattern fill codes with
 % grayscale if Level 2 support is not selected.

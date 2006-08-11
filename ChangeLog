@@ -1,3 +1,8 @@
+2006-08-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/PostScript/prologue.ps: Remove comment with my name in it.
+	Further tweak to the PatternBgnd macro.
+
 2006-08-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/PostScript/cp437.ps term/PostScript/cp850.ps 
