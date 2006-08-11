@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.18 2006/05/13 09:28:51 mikulik Exp $
+# $Id: makefile.nt,v 1.19 2006/07/05 17:41:30 sfeam Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -30,6 +30,9 @@
 
 # where to place gnuplot.gih helpfile
 HELPFILE = wgnuplot.hlp
+
+# directory for PostScript prolog and associated files
+GNUPLOT_PS_DIR = share\\PostScript
 
 TOP = .
 
@@ -68,7 +71,7 @@ LDFLAGS = /subsystem:windows /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT /libpath:.
 
 # ...and here.
 # see other terminal defines in term.h
-TERMFLAGS = /I..\\term /I..\\src\\pdflib\\pdflib /I..\\src\\gdwin32
+TERMFLAGS = /I..\\term /I..\\src\\pdflib\\pdflib /I..\\src\\gdwin32 /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\"
 
 # macros for makefile.all
 O=obj
