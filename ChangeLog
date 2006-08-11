@@ -1,5 +1,7 @@
 2006-08-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* term/PostScript/prologue.ps: Replace multiple spaces by a tabulator.
+
 	* docs/doc2tex.c (puttex): Remove superfluous spaces around \index{x}.
 
 2006-08-11 Bastian Maerkisch  <bmaerkisch@web.de>
