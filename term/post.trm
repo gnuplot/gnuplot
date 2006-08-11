@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.199 2006/08/07 00:44:45 tlecomte Exp $
+ * $Id: post.trm,v 1.200 2006/08/10 04:41:54 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -324,15 +324,18 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 NULL
 };
 
-#if defined(_Windows)
-# include "win/winmain.h"
-#elif defined(OS2)
-# define INCL_DOSPROCESS
-# define INCL_DOSMODULEMGR
-# include <os2.h>
-#elif !defined(GNUPLOT_PS_DIR)
-#  include "PostScript/prologues.h"
-#endif
+/* external/internal prologue files machinery */
+#if defined(GNUPLOT_PS_DIR)
+# if defined(_Windows)
+#  include "win/winmain.h"
+# elif defined(OS2)
+#  define INCL_DOSPROCESS
+#  define INCL_DOSMODULEMGR
+#  include <os2.h>
+# endif /* _Windows || OS2 */
+#else /* GNUPLOT_PS_DIR */
+# include "PostScript/prologues.h"
+#endif /* GNUPLOT_PS_DIR */
 
 /* added to enhpost by Matt Heffron <heffron@falstaff.css.beckman.com> */
 /* moved to post.trm by drd */
