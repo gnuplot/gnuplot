@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.18 2005/04/01 22:16:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.19 2005/06/03 05:11:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -418,7 +418,7 @@ puttex( char *str, FILE *file)
 		    (void) fputs("})", file);
 #ifndef NO_CROSSREFS
 		    /* Make the final word an index entry also */
-		    fputs(" \\index{",file);
+		    fputs("\\index{",file);
 		    if (strrchr(index,'-'))
 			index = strrchr(index,'-')+1;
 		    if (strrchr(index,'_'))
@@ -426,7 +426,7 @@ puttex( char *str, FILE *file)
 		    if (strrchr(index,' '))
 			index = strrchr(index,' ')+1;
 		    fputs(index,file);
-		    fputs("} ",file);
+		    fputs("}",file);
 #endif
                     /* see = FALSE; */
                 }
