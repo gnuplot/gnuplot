@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.380 2006/08/05 01:00:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.381 2006/08/07 00:38:15 tlecomte Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1825,8 +1825,11 @@ C ... and restart the table:
  while the driver's window has the input focus. Note that `bind` is only
  available if gnuplot was compiled with `mouse` support and it is used by all
  mouse-capable terminals. Bindings overwrite the builtin bindings (like in
- every real editor), except <space> and 'q' which cannot be rebound. Mouse
- buttons cannot be rebound.
+ every real editor), except <space> and 'q' which cannot be rebound (unless
+ one exception, see below). Mouse buttons cannot be rebound.
+
+ You get the list of all hotkeys by typing `bind` or by hitting 'h' in the
+ graph window.
 
  Note that multikey-bindings with modifiers have to be quoted.
 
@@ -1835,6 +1838,14 @@ C ... and restart the table:
  causes the binding for <key> to apply to all gnuplot plot windows, active
  or not.  In this case gnuplot variable MOUSE_KEY_WINDOW is set to the ID
  of the originating window, and may be used by the bound command.
+
+ By default, the <space> hotkey raises gnuplot's command window. On some
+ terminals (e.g. x11, wx, pm), 'q' closes the graph window. These defaults can
+ be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
+ see `x11 command-line-options`.  Note: if <space> is not working by
+ default, that may be due to a protection by your window manager.  On KDE, you
+ may like to set the 'protection level against focus stealing' to None (see the
+ Control Center, item 'Windows behaviour').
 
  Syntax:
        bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
@@ -1915,6 +1926,11 @@ C ... and restart the table:
  contain the character itself as a string variable.  If the pause command is
  terminated abnormally (e.g. by ctrl-C or by externally closing the plot window)
  then MOUSE_KEY will equal -1.
+
+ Note that after a zoom by mouse, you can read the new ranges as GPVAL_X_MIN,
+ GPVAL_X_MAX, GPVAL_Y_MIN, and GPVAL_Y_MAX, see `gnuplot-defined variables`.
+
+
 2 Plotting
 ?plotting
  There are three `gnuplot` commands which actually create a plot: `plot`,

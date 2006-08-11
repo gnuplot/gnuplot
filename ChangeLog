@@ -1,3 +1,8 @@
+2006-08-11  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Some comments in the help for bind and mouse
+	variables. 
+
 2006-08-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc
@@ -50,7 +55,6 @@
 	the presence of the feature and if it is missing then we print a 
 	warning message and skip the rest of the demo.  This allows "make check"
 	to succeed even if the EXPERIMENTAL features are configured out.
-
 
 2006-08-06  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
