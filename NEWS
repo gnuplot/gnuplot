@@ -45,6 +45,7 @@ New features, changes and fixes since gnuplot version 4.0
 * NEW plot style "with points" can read variable point size from input file
 * NEW "set tics" can change most settings for {x|y|z|cb}tics at once
 * NEW tic scale can be set per axis using "set {x|y|z|cb}tics scale"
+* CHANGE history file is written by default
 * CHANGE PostScript prolog and character encoding files now maintained separately
 * CHANGE Placement of z-axis label in 3D plots is now equivalent to x and y axes
 * CHANGE "set ticsscale" is deprecated, use "set tics scale" instead
