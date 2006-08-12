@@ -1,3 +1,7 @@
+2006-08-12  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/PostScript/cp852.ps: Remove my info.
+
 2006-08-11  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/post.trm: Fix preprocessor logic for !defined(GNUPLOT_PS_DIR).
