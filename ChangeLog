@@ -1,5 +1,8 @@
 2006-08-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* term/PostScript/cp437.ps term/PostScript/cp850.ps 
+	term/PostScript/koi8r.ps: Remove superfluous C comment characters.
+
 	* term/PostScript/cp852.ps: Remove my info.
 
 2006-08-11  Timothee Lecomte  <timothee.lecomte@ens.fr>
