@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.19 2005/06/03 05:11:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.20 2006/08/11 20:37:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -413,18 +413,24 @@ puttex( char *str, FILE *file)
 	    if (inquote) {
                 if (see){
 		    char *index = string;
+		    char *s;
                     (void) fputs(" (p.~\\pageref{", file);
                     (void) fputs(string, file);
 		    (void) fputs("})", file);
 #ifndef NO_CROSSREFS
 		    /* Make the final word an index entry also */
 		    fputs("\\index{",file);
+#if 0
+		    /* Aug 2006: no need to split index words at - or _ */
 		    if (strrchr(index,'-'))
 			index = strrchr(index,'-')+1;
 		    if (strrchr(index,'_'))
 			index = strrchr(index,'_')+1;
+#endif
 		    if (strrchr(index,' '))
 			index = strrchr(index,' ')+1;
+		    while ((s = strchr(index,'_')) != NULL) /* replace _ by space */
+			*s = ' ';
 		    fputs(index,file);
 		    fputs("}",file);
 #endif
