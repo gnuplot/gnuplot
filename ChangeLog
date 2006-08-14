@@ -1,3 +1,11 @@
+2006-08-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (do_key_sample): Check for terminal support of 
+	term->filled_polygon before using it to draw a key sample. Fixes
+	segfault in epson driver (and probably others) if a filled area
+	is assigned an RGB color.
+	Bugfix.
+
 2006-08-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Clarify the argument required by exists(), and

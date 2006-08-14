@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.188 2006/06/04 21:08:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.189 2006/06/24 03:30:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4960,7 +4960,7 @@ do_key_sample(
 	unsigned int w = key_sample_right - key_sample_left;
 	unsigned int h = key_entry_height/2;
 
-	if (this_plot->lp_properties.use_palette) {
+	if (this_plot->lp_properties.use_palette && t->filled_polygon) {
 	    (*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
 	} else
 	    (*t->fillbox)(style,x,y,w,h);
