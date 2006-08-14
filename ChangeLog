@@ -6,6 +6,11 @@
 	is assigned an RGB color.
 	Bugfix.
 
+	* src/eval.c (update_gpval_variables): Test for term==NULL, and if so
+	return without doing anything. This prevents a segfault. However, why
+	does the program not trigger a similar segfault elsewhere?
+	Bug #1540398
+
 2006-08-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Clarify the argument required by exists(), and

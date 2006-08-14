@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.48 2006/08/05 05:04:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.49 2006/08/05 21:33:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -758,6 +758,13 @@ update_gpval_variables(int from_plot_command)
 	fill_gpval_axis(U_AXIS);
 	fill_gpval_axis(V_AXIS);
     }
+
+    /* FIXME! This preventa a segfault if term==NULL, which can */
+    /* happen if set_terminal() exits via int_error().  But why */
+    /* was this never a problem before we added this routine?   */
+    if (!term)
+	return;
+
 
     fill_gpval_string("GPVAL_TERM", (char *)(term->name));
     fill_gpval_string("GPVAL_TERMOPTIONS", term_options);
