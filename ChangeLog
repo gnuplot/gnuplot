@@ -1,3 +1,9 @@
+2006-08-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h: Initialize default histogram title structure to use
+	character units for the title offset. Fixes spurious error if the
+	y axis is log scale.
+
 2006-08-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_key_sample): Check for terminal support of 

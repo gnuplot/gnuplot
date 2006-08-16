@@ -203,7 +203,7 @@ typedef enum histogram_type {
 	HT_CLUSTERED,
 	HT_ERRORBARS
 } t_histogram_type;
-#define DEFAULT_HISTOGRAM_STYLE { HT_NONE, 2, 1, 0.0, 0.0, LT_UNDEFINED, LT_UNDEFINED, 0, NULL, { 0 } }
+#define DEFAULT_HISTOGRAM_STYLE { HT_NONE, 2, 1, 0.0, 0.0, LT_UNDEFINED, LT_UNDEFINED, 0, NULL, EMPTY_LABELSTRUCT }
 
 #endif
 
