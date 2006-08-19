@@ -1,3 +1,7 @@
+2006-08-19  James R. Van Zandt  <jrvz@comcast.net>
+
+	* term/cgm.trm: update email address
+
 2006-08-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: One half of the definition of clip_fill was 
@@ -226,6 +230,7 @@
 	always available.
 
 2006-07-30  Daniel Sebald  <daniel.sebald@ieee.org>
+>>>>>>> 1.2187
 
 	* docs/gnuplot.doc: Format norm()/invnorm() info for 80 characters.
 

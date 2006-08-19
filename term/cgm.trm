@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.75 2006/07/21 02:35:45 sfeam Exp $
+ * $Id: cgm.trm,v 1.76 2006/08/04 20:31:56 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -68,7 +68,7 @@
  *   M. Mumford, Butterworths, London, 1990, ISBN 0-408-02680-4.
  *
  * AUTHOR
- *   Jim Van Zandt <jrv@vanzandt.mv.com>
+ *   Jim Van Zandt <jrvz@comcast.net>
  *
  * send your comments or suggestions to the author or
  * gnuplot-info@lists.sourceforge.net.
