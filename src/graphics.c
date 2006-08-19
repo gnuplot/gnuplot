@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.189 2006/06/24 03:30:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.190 2006/08/15 03:57:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -179,7 +179,7 @@ static int style_from_fill __PROTO((struct fill_style_type *));
 #define BOTTOM_EDGE	4
 #define TOP_EDGE	8
 
-#define clip_fill	(plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED)
+#define clip_fill	((plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED) || clip_lines2)
 
 /*
  * The Amiga SAS/C 6.2 compiler moans about macro envocations causing

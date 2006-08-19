@@ -1,3 +1,10 @@
+2006-08-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c: One half of the definition of clip_fill was 
+	inadvertently omitted from the patch of 2006-06-04. This fix allows the
+	improved clipping to apply to all filled curves, whereas without it the
+	new clipping code only checked for "closed" filled curves.
+
 2006-08-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h: Initialize default histogram title structure to use
