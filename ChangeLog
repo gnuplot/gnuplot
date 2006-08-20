@@ -230,7 +230,6 @@
 	always available.
 
 2006-07-30  Daniel Sebald  <daniel.sebald@ieee.org>
->>>>>>> 1.2187
 
 	* docs/gnuplot.doc: Format norm()/invnorm() info for 80 characters.
 
