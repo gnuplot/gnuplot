@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.88 2006/07/30 03:37:06 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.89 2006/08/05 21:33:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -533,7 +533,7 @@ main(int argc, char **argv)
     else
 	show_version(NULL); /* Only load GPVAL_COMPILE_OPTIONS */
 
-    update_gpval_variables(1);  /* update GPVAL_ variables available to user */
+    update_gpval_variables(3);  /* update GPVAL_ variables available to user */
 
 #ifdef VMS
     /* initialise screen management routines for command recall */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.49 2006/08/05 21:33:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.50 2006/08/15 05:57:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -742,12 +742,20 @@ fill_gpval_string(char *var, const char *stringvalue)
 #endif
 }
 
+/*
+ * Put all the handling for GPVAL_* variables in this one routine.
+ * We call it from one of several contexts:
+ * 0: following a successful set/unset command
+ * 1: following a successful plot/splot
+ * 2: following an unsuccessful command (int_error)
+ * 3: program entry
+ */
 void
-update_gpval_variables(int from_plot_command)
+update_gpval_variables(int context)
 {
-    struct udvt_entry *v;
 
-    if (from_plot_command) {
+    /* These values may change during a plot command due to auto range */
+    if (context == 1) {
 	fill_gpval_axis(FIRST_X_AXIS);
 	fill_gpval_axis(FIRST_Y_AXIS);
 	fill_gpval_axis(SECOND_X_AXIS);
@@ -757,36 +765,43 @@ update_gpval_variables(int from_plot_command)
 	fill_gpval_axis(T_AXIS);
 	fill_gpval_axis(U_AXIS);
 	fill_gpval_axis(V_AXIS);
-    }
-
-    /* FIXME! This preventa a segfault if term==NULL, which can */
-    /* happen if set_terminal() exits via int_error().  But why */
-    /* was this never a problem before we added this routine?   */
-    if (!term)
 	return;
-
-
-    fill_gpval_string("GPVAL_TERM", (char *)(term->name));
-    fill_gpval_string("GPVAL_TERMOPTIONS", term_options);
-    fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : "");
-
-    v = add_udv_by_name("GPVAL_VERSION");
-    if (v && v->udv_undef == TRUE) {
-	v->udv_undef = FALSE; 
-	Gcomplex(&v->udv_value, atof(gnuplot_version), 0);
     }
-    v = add_udv_by_name("GPVAL_PATCHLEVEL");
-    if (v && v->udv_undef == TRUE) {
+    
+    /* These are set every time, which is kind of silly because they */
+    /* only change after 'set term' 'set output' ...                 */
+    else {
+	/* FIXME! This preventa a segfault if term==NULL, which can */
+	/* happen if set_terminal() exits via int_error().          */
+	if (!term)
+	    fill_gpval_string("GPVAL_TERM", "unknown");
+	else
+	    fill_gpval_string("GPVAL_TERM", (char *)(term->name));
+	
+	fill_gpval_string("GPVAL_TERMOPTIONS", term_options);
+	fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : "");
+    }
+
+    /* These initializations need only be done once, on program entry */
+    if (context == 3) {
+	struct udvt_entry *v = add_udv_by_name("GPVAL_VERSION");
+	if (v && v->udv_undef == TRUE) {
+	    v->udv_undef = FALSE; 
+	    Gcomplex(&v->udv_value, atof(gnuplot_version), 0);
+	}
+	v = add_udv_by_name("GPVAL_PATCHLEVEL");
+	if (v && v->udv_undef == TRUE) {
 #ifdef GP_STRING_VARS
-	fill_gpval_string("GPVAL_PATCHLEVEL", gnuplot_patchlevel);
+	    fill_gpval_string("GPVAL_PATCHLEVEL", gnuplot_patchlevel);
 #else
-	v->udv_undef = FALSE; 
-	Ginteger(&v->udv_value, atoi(gnuplot_patchlevel));
+	    v->udv_undef = FALSE; 
+	    Ginteger(&v->udv_value, atoi(gnuplot_patchlevel));
 #endif
+	}
+	v = add_udv_by_name("GPVAL_COMPILE_OPTIONS");
+	if (v && v->udv_undef == TRUE)
+	    fill_gpval_string("GPVAL_COMPILE_OPTIONS", compile_options);
     }
-    v = add_udv_by_name("GPVAL_COMPILE_OPTIONS");
-    if (v && v->udv_undef == TRUE) {
-	fill_gpval_string("GPVAL_COMPILE_OPTIONS", compile_options);
-    }
+
 }
 

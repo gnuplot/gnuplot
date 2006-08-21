@@ -3,6 +3,14 @@
 	* src/save.c (save_variables__sub): Do not save NaN to output file,
 	since it does not print correctly.
 
+	* src/eval.c (update_gpval_variables): Make it explicit which variables
+	are updated from which context.
+
+	* src/plot.c (main) src/util.c (int_error): Call update_gpval_variables
+	on program entry and on int_error.
+
+	Bug #1540398  (last release-critical tracker item)
+
 2006-08-19  James R. Van Zandt  <jrvz@comcast.net>
 
 	* term/cgm.trm: update email address
