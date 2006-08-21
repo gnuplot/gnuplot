@@ -1,3 +1,8 @@
+2006-08-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_variables__sub): Do not save NaN to output file,
+	since it does not print correctly.
+
 2006-08-19  James R. Van Zandt  <jrvz@comcast.net>
 
 	* term/cgm.trm: update email address
