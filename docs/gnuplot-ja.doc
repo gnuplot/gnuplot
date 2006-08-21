@@ -1,8 +1,8 @@
-C RCS $Id: gnuplot-ja.doc,v 1.123 2006-08-08 09:32:13+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.381
+C RCS $Id: gnuplot-ja.doc,v 1.127 2006-08-15 20:00:30+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.383
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
-C 
+C
 C Japanese translation: Hiroharu Tamaru (2.0, 3.2), MASUTANI Yasuhiro (3.5),
 C Shigeharu Takeno et al (3.7, 4.X)
 ^ <h2> An Interactive Plotting Program </h2><p>
@@ -1296,13 +1296,14 @@ C Shigeharu Takeno et al (3.7, 4.X)
 #defined(X) & 変数名 & [非推奨] X が定義されていれば 1 そうでなければ 0 を返す\\
 %defined(X)@変数名@ [非推奨] X が定義されていれば 1 そうでなければ 0 を返す
  `defined(X)` [非推奨] は、X が定義されていれば 1 そうでなければ 0 を返します。
-4 exists 
+4 exists
 ?expressions functions exists
 ?functions exists
 ?exists
 #exists("X") & "変数名" & 変数名 X が定義されていれば 1 そうでなければ 0 を返す\\
 %exists("X")@"変数名"@ 変数名 X が定義されていれば 1 そうでなければ 0 を返す
- `exists("X")` は、変数名 X が定義されていれば 1 そうでなければ 0 を返します。
+ exists() の引数は文字列定数、または文字列変数です。その文字列が、定義
+ されている変数名を持っていれば 1 を、そうでなければ 0 を返します。
 4 stringcolumn
 ?expressions functions stringcolumn
 ?functions stringcolumn
@@ -1701,8 +1702,8 @@ C ... and restart the table:
  ルファベットで、その後の文字はアルファベット、数字、"$", "_" が使えま
  す。
 
- `show functions`, `functions`, `gnuplot-defined variables` も参照して
- ください。
+ `show functions`, `functions`, `gnuplot-defined variables`, `macros`
+ も参照してください。
 2 Glossary
 ?glossary
  このドキュメント全体に渡って、用語に関する一貫性の維持が考えられていま
@@ -1892,7 +1893,11 @@ C ... and restart the table:
  かつマウスが有効な出力形式上で使われてる場合にのみ有効であることに注意
  してください。キー割当 (binding) は、組み込み (builtin) キー割当 (通常
  のエディタに似た形に設定されている) を上書きしますが、<space> と 'q'
- だけは再定義はできません。マウスボタンも再定義はできません。
+ だけは再定義はできません (下で述べる 1 例を除いて)。マウスボタンも再定
+ 義はできません。
+
+ ホットキーの一覧を得るには `bind` とタイプするか、グラフウィンドウ上で
+ 'h' と入力してください。
 
  修飾キーを含む複数のキーの定義は引用符で囲む必要があることに注意してく
  ださい。
@@ -1903,6 +1908,16 @@ C ... and restart the table:
  の gnuplot の描画ウィンドウ上で可能にします。この場合、gnuplot 変数
  MOUSE_KEY_WINDOW にそれが行なわれたウィンドウの ID が保存されるのでそ
  れをキーに割り当てたコマンドで使用することができます。
+
+ デフォルトでは、<space> ホットキーは gnuplot のコマンドウィンドウを前
+ 面に出します。いくつかの出力形式 (例えば x11, wxt, pm) では 'q' はグラ
+ フウィンドウを閉じます。これらのデフォルトは、'gnuplot -ctrlq' のよう
+ にして gnuplot を起動することで、ctrl-space や ctrl-q に変更できます。
+ `x11 command-line-options` も参照してください。注意: <space> がデフォ
+ ルトで機能しない場合、それはウィンドウマネージャのせいかもしれません。
+ KDE では、'protection level against focus stealing' (フォーカスの奪取
+ に関する保護レベル) を None に設定するとうまくいくかもしれません
+ (Control Center の 'Windows behaviour' の項目を参照してください)。
 
  書式:
        bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
@@ -1985,6 +2000,12 @@ C ... and restart the table:
  字列値として保存されます。pause コマンドが (例えば ctrl-C や描画ウィン
  ドウが外部から閉じられるなどして) 異常終了した場合は MOUSE_KEY は -1
  になります。
+
+ マウスによる拡大の後の新しい描画範囲は、GPVAL_X_MIN, GPVAL_X_MAX,
+ GPVAL_Y_MIN, GPVAL_Y_MAX で参照できることに注意してください。
+ `gnuplot-defined variables` も参照してください。
+
+
 2 Plotting
 ?plotting
  `gnuplot` には描画を生成する 3 つのコマンド、`plot`, `splot`, `replot`
@@ -2118,6 +2139,7 @@ C ... and restart the table:
 3 Substitution of string variables as macros
 ?substitution macros
 ?macros
+=exists
  コマンドラインのマクロ置換はデフォルトでは無効になっていますが、
  `set macros` で有効にできます。マクロ置換が有効である場合、文字 @ は、
  コマンドライン上でその文字列変数の値への置換を行なうのに使われます。文
@@ -2139,6 +2161,12 @@ C ... and restart the table:
 
        plot "foo" using 1:3 with lines lt 4 lw 2, \
             "bar" using 1:5 with points lt 3 pt 5 ps 2
+
+ 関数 exists() はマクロの評価に関して有用でしょう。以下の例は、C が安全
+ にユーザ定義変数の名前に展開できるかどうかをチェックします。
+
+       C = "pi"
+       if (exists(C)) print C," = ", @C
 
  マクロの展開は、単一引用符内、または二重引用符内では行なわれませんが、
  バッククォート内ではマクロ展開されます。
@@ -3032,7 +3060,7 @@ C ... and restart the table:
  書式:
        lower {plot_window_nb}
 
- コマンド `lower` (`raise` の反対) は、`pm`, `win`, `wxt`, `x11` 等の 
+ コマンド `lower` (`raise` の反対) は、`pm`, `win`, `wxt`, `x11` 等の
  gnuplot の対話型出力形式の実行中に、描画ウィンドウを下 (背後) に下げま
  す。描画ウィンドウを、デスクトップ上のウィンドウマネージャの z 方向の
  ウィンドウの重なりの下に置きます。
@@ -3043,7 +3071,7 @@ C ... and restart the table:
  す。オプション引数の描画番号が与えられた場合、それに対応する描画ウィン
  ドウが存在すればそれのみが下げられます。
 
- オプション引数は、単一の描画ウィンドウの出力形式、すなわち `pm` と 
+ オプション引数は、単一の描画ウィンドウの出力形式、すなわち `pm` と
  `win` では無視されます。
 2 pause
 ?commands pause
@@ -3925,7 +3953,7 @@ C ... and restart the table:
  書式:
        plot 'file' using {<entry> {:<entry> {:<entry> ...}}} {'format'}
 
- もし、フォーマット (format) が指定されれば、C のライブラリ関数 'scanf' 
+ もし、フォーマット (format) が指定されれば、C のライブラリ関数 'scanf'
  を使ってデータファイルの各行をそのフォーマット文字列に従って読み込みま
  す。そうでなければ、行はスペースまたはタブの所で列に分割されて読み込ま
  れます。時系列フォーマットデータ (time-format data) の書式はこの方法で
@@ -4423,7 +4451,7 @@ C ... and restart the table:
  キーワード `nohidden3d` は、`splot` コマンドで生成される描画にのみ適用
  されます。通常、グローバルなオプション `set hidden3d` はグラフ上の全て
  の描画に適用されますが、各々の描画に `nohidden3d` オプションをつけるこ
- とで、それを hidden3d の処理から除外することができます。`nohidden3d` 
+ とで、それを hidden3d の処理から除外することができます。`nohidden3d`
  がマークされた個々の描画要素 (線分、点、ラベル等) は、通常は他の何らか
  の描画要素で隠されてしまう場合も全て描画されます。
 
@@ -4510,7 +4538,7 @@ C ... and restart the table:
  書式:
        raise {plot_window_nb}
 
- コマンド `raise` (`lower` の反対) は、`pm`, `win`, `wxt`, `x11` 等の 
+ コマンド `raise` (`lower` の反対) は、`pm`, `win`, `wxt`, `x11` 等の
  gnuplot の対話型出力形式の実行中に、描画ウィンドウを上 (前面) に上げま
  す。描画ウィンドウを、デスクトップ上のウィンドウマネージャの z 方向の
  ウィンドウの重なりの前 (上) に置きます。
@@ -4521,7 +4549,7 @@ C ... and restart the table:
  す。オプション引数の描画番号が与えられた場合、それに対応する描画ウィン
  ドウが存在すればそれのみが上げられます。
 
- オプション引数は、単一の描画ウィンドウの出力形式、すなわち `pm` と 
+ オプション引数は、単一の描画ウィンドウの出力形式、すなわち `pm` と
  `win` では無視されます。
 2 replot
 ?commands replot
@@ -6258,8 +6286,8 @@ C ... and restart the table:
  ション `nohidden3d` を追加してください。
 
  hidden3d は、pm3d モードで描画された、塗り潰された曲面には影響を与えま
- せん。pm3d の曲面に対して同様の効果を得るには、これの代わりに set 
- `pm3d depthorder` を使ってください。
+ せん。pm3d の曲面に対して同様の効果を得るには、これの代わりに
+ set `pm3d depthorder` を使ってください。
 
  関数値は格子孤立線の交点で評価されます。見ることの出来る線分を求めると
  きは個々の関数値、あるいはデータ点の間はそのアルゴリズムによって線形補
@@ -6920,7 +6948,7 @@ C ... and restart the table:
  コマンド `set mouse` はマウス機能を有効にします。現在、pm, x11, ggi,
  windows, wxt の各出力ドライバがマウス拡張されています。2 種類のマウス
  モードがあります。2 次元グラフモードは、2 次元グラフ、または地図型表示
- (すなわち、z の回転角が 0, 90, 180, 270, 360 度の `set view` での 
+ (すなわち、z の回転角が 0, 90, 180, 270, 360 度の `set view` での
  splot、および `set view map`) で動作し、グラフ上の位置の追跡、拡大表示、
  グラフの注釈づけ等を可能にします。`splot` による 3 次元グラフに対して
  は、グラフの視方向 (view) と伸縮の変更が、マウスボタン 1 と 2 (による
@@ -7176,7 +7204,7 @@ C ... and restart the table:
  コマンド `set m{x|x2|y|y2|z}tics` は、大目盛りが一様の間隔の場合にのみ
  働きます。もし全ての大目盛りが `set {x|x2|y|y2|z}tics` によって手動で
  配置された場合は、この小目盛りのコマンドは無視されます。自動的な大目盛
- りの配置と手動の小目盛りの配置は、`set {x|x2|y|y2|z}tics` と 
+ りの配置と手動の小目盛りの配置は、`set {x|x2|y|y2|z}tics` と
  `set {x|x2|y|y2|z}tics add` とを使うことで共存できます。
 
  例:
@@ -8118,14 +8146,14 @@ C ... and restart the table:
  は軸や `back` の長方形を含むすべてのものの後ろに配置されます。これは、
  グラフやページ全体の背景に色をつけるのに利用できます。
 
- 長方形の塗り潰しの色は <colorspec> で指定します。`fillcolor` は `fc` 
+ 長方形の塗り潰しの色は <colorspec> で指定します。`fillcolor` は `fc`
  と省略できます。塗り潰しパターンは <fillstyle> で指定します。詳細は
  `colorspec` と `fillstyle` を参照してください。キーワード `default` を
  指定すると、これらの属性は描画が実際に行われるときのデフォルトの設定を
  受け継ぎます。`set style rectangle` 参照。
 
  例:
-     # 座標軸で囲まれた領域全体の背景を水色に 
+     # 座標軸で囲まれた領域全体の背景を水色に
      set object 1 rect from graph 0, graph 0 to graph 1, graph 1 back
      set object 1 rect fc rgb "cyan" fillstyle solid 1.0
 
@@ -8692,7 +8720,7 @@ C ... and restart the table:
 
  現在、以下の出力ドライバのみが `empty` 以外の塗りつぶしスタイルをサポ
  ートしています:
- x11, windows, pm, wxt, postscript, fig, pbm, png, gif, hpdj, hppj, 
+ x11, windows, pm, wxt, postscript, fig, pbm, png, gif, hpdj, hppj,
  hpljii, hp500c, jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800,
  okidata, starc, tandy_60dpi。BeOS ドライバ (`be`) はまだテストされてい
  ません。
@@ -9623,9 +9651,9 @@ C ... and restart the table:
        show title
 
  <offset> を x,y かまたは x,y,z の形式で指定した場合は、タイトルは与え
- られた値だけ移動されます。それに座標系を選択して、その前に `first`, 
+ られた値だけ移動されます。それに座標系を選択して、その前に `first`,
  `second`, `graph`, `screen`, `character` のいずれかをつけることもでき
- ます。詳細は `coordinates` を参照してください。デフォルトでは 
+ ます。詳細は `coordinates` を参照してください。デフォルトでは
  `character` 座標系が使われます。例えば、"`set title offset 0,-1`" はタ
  イトルの y 方向の位置のみ変更し、大ざっぱに言って 1 文字分の高さだけタ
  イトルを下に下げます。1 文字の大きさは、フォントと出力形式の両方に依存
@@ -9887,9 +9915,9 @@ C ... and restart the table:
  用されます。
 
  <offset> を x,y かまたは x,y,z の形式で指定した場合は、見出しは与えら
- れた値だけ移動されます。それに座標系を選択して、その前に `first`, 
+ れた値だけ移動されます。それに座標系を選択して、その前に `first`,
  `second`, `graph`, `screen`, `character` のいずれかをつけることもでき
- ます。詳細は `coordinates` を参照してください。デフォルトでは 
+ ます。詳細は `coordinates` を参照してください。デフォルトでは
  `character` 座標系が使われます。例えば、"`set xlabel offset -1,0`" は
  見出しの x 方向の位置のみ変更し、大ざっぱに言って 1 文字分の幅だけ見出
  しを左にずらします。1 文字の大きさは、フォントと出力形式の両方に依存し
@@ -10267,9 +10295,9 @@ C ... and restart the table:
  に対する割合を与えます。デフォルトの値は 0.5 です。負の値も許されてい
  ますが、そうすると 3 つの軸の目盛りの見出しが重なる可能性があります。
 
- xy 平面を z 軸の 'pos' の位置に置くには、`ticslevel` の値を (pos - 
- zmin) / (zmin - zmax) としてください。しかし、この位置は z の範囲 
- (`zrange`) を変更した場合は変わってしまいます。
+ xy 平面を z 軸の 'pos' の位置に置くには、`ticslevel` の値を
+ (pos - zmin) / (zmin - zmax) としてください。しかし、この位置は z の範
+ 囲 (`zrange`) を変更した場合は変わってしまいます。
 
  もう一つの形式である `set xyplane at <zvalue>` は、現在の z の範囲を気
  にすることなく、指定した z の値の位置に xy 平面を固定します。よって、
@@ -11040,7 +11068,7 @@ C ... and restart the table:
 ?graphical user interfaces
 ?gui's
  `gnuplot` のために色々なグラフィカルユーザインターフェースが書かれてき
- ました。その win32 用の物はこの配布版に含まれています。そして、Python 
+ ました。その win32 用の物はこの配布版に含まれています。そして、Python
  によるインターフェースが
 ^ <a href="http://py-gnuplot.darwinports.com/">
           http://py-gnuplot.darwinports.com/
@@ -11111,7 +11139,7 @@ C ... and restart the table:
 
  `nohidden3d` は、全体的な設定である `set hidden3d` を、個々の描画に対
  して免除するためのオプションですが、これは媒介変数の曲線 (parametric)
- に対しては機能しません。 
+ に対しては機能しません。
 
 2 Specific terminals
 ?bugs terminals

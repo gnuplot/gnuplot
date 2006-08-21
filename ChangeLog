@@ -1,3 +1,9 @@
+2006-08-21  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc
+	Sync Japanese documentation to recent changes in English files.
+	(rev.1.383) 15Aug2006
+
 2006-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_variables__sub): Do not save NaN to output file,
