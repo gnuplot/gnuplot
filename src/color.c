@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.68 2006/06/15 04:53:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.69 2006/06/15 15:42:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -448,17 +448,24 @@ cbtick_callback(
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
 	if (color_box.rotation == 'h') {
 	    int y3 = cb_y_from - (term->v_char);
+	    int hrotate = 0;
+
+	    if (axis_array[axis].tic_rotate
+		&& (*term->text_angle)(axis_array[axis].tic_rotate))
+		    hrotate = axis_array[axis].tic_rotate;
 	    if (len > 0) y3 -= len; /* add outer tics len */
 	    if (y3<0) y3 = 0;
-	    if (term->justify_text)
-		term->justify_text(CENTRE);
-	    (*term->put_text)(x2+offsetx, y3+offsety, text);
+	    write_multiline(x2+offsetx, y3+offsety, text,
+			    (hrotate ? LEFT : CENTRE), CENTRE, hrotate,
+			    axis_array[axis].ticdef.font);
+	    if (hrotate)
+		(*term->text_angle)(0);
 	} else {
 	    unsigned int x3 = cb_x_to + (term->h_char);
 	    if (len > 0) x3 += len; /* add outer tics len */
-	    if (term->justify_text)
-		term->justify_text(LEFT);
-	    (*term->put_text)(x3+offsetx, y2+offsety, text);
+	    write_multiline(x3+offsetx, y2+offsety, text,
+			    LEFT, CENTRE, 0.0,
+			    axis_array[axis].ticdef.font);
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
     }

@@ -1,3 +1,9 @@
+2006-08-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c (cbtick_callback): Add handling of text properties 
+	associated with tic labels, making them like the other axis tic labels.
+	Bug #1543927
+
 2006-08-21  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc
