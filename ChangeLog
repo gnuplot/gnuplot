@@ -1,3 +1,13 @@
+2006-08-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (get_3ddata): Increment the current point even if its
+	value is undefined.  This allows grid spacing to be maintained, and
+	correcly handes `splot ... using ($1):($2):($3)`.
+
+	FIXME: This is only a partial solution. Deeper problems exist in the
+	handling of missing/NaN/junk data values during input. In particular,
+	gridding is still corrupted in the case of `splot ... using 1:2:3`.
+
 2006-08-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (cbtick_callback): Add handling of text properties 
