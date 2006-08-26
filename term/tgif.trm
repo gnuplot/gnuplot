@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.39 2006/07/07 03:51:23 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.40 2006/07/21 02:35:48 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -388,6 +388,12 @@ TGIF_options()
 	{
 	    char *s;
 	    if ((s = try_to_get_string())) {
+		double fontsize;
+		char *comma = strrchr(s,',');
+		if (comma && (1 == sscanf(comma+1,"%lf",&fontsize))) {
+		    *comma = '\0';
+		    uActFontSize =  (int)(fontsize+0.5);
+		}
 		strncpy(sActFont, s, sizeof(sActFont));
 		strcpy(sDefaultFont, sActFont);
 		free(s);

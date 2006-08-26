@@ -1,3 +1,15 @@
+2006-08-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Fix program errors revealed by issuing the command sequence
+	   set termoption font 'face,size'; show term
+	   set termoption font 'face'; show term
+	to all terminal types.
+
+	* term/gd.trm term/svg.trm term/tgif.trm:  Accept comma-separated font
+	face, size. Reset to default font size if no size information is given.
+
+	* term/tkcanvas.trm: Fix infinite loop if unrecognized terminal option.
+
 2006-08-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (get_3ddata): Increment the current point even if its

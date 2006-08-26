@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.93 2006/07/21 02:35:46 sfeam Exp $
+ * $Id: gd.trm,v 1.94 2006/07/31 21:08:11 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -636,6 +636,9 @@ PNG_options()
 	png_state.previous_image = NULL;
 	png_state.frame_optimization = FALSE;
 	png_state.loop_count = 0;
+	/* And default font size */
+	term->h_char = PNG_HCHAR;
+	png_state.default_ttfsize = 0;
     }
 
     while (!END_OF_COMMAND) {
@@ -667,56 +670,65 @@ PNG_options()
 	case PNG_TINY:
 #ifdef HAVE_GD_TTF
 # define UNSET_TTF_FONT \
-	    png_state.ttffont[0] = png_state.default_ttffont[0] = '\0';
+	    png_state.ttffont[0] = png_state.default_ttffont[0] = '\0'; \
+	    png_state.default_ttfsize = 2 * term->h_char - 2;
 #else
 # define UNSET_TTF_FONT \
 	    ; /* nothing to do */
 #endif
-	    UNSET_TTF_FONT;
 	    png_state.default_font=gdFontTiny;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
+	    UNSET_TTF_FONT;
 	    break;
 	case PNG_SMALL:
-	    UNSET_TTF_FONT;
 	    png_state.default_font = gdFontSmall;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
+	    UNSET_TTF_FONT;
 	    break;
 	case PNG_MEDIUM:
-	    UNSET_TTF_FONT;
 	    png_state.default_font = gdFontMediumBold;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
+	    UNSET_TTF_FONT;
 	    break;
 	case PNG_LARGE:
-	    UNSET_TTF_FONT;
 	    png_state.default_font = gdFontLarge;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
+	    UNSET_TTF_FONT;
 	    break;
 	case PNG_GIANT:
-	    UNSET_TTF_FONT;
 	    png_state.default_font=gdFontGiant;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
+	    UNSET_TTF_FONT;
 	    break;
 	case PNG_FONT:
 	    c_token++;
 #ifdef HAVE_GD_TTF
 	    if (END_OF_COMMAND) {
 		png_state.ttffont[0] = '\0';
+		png_state.default_ttfsize = 0;
 	    } else {
 		int brect[8];
 		char *err;
 
 		if (isstringvalue(c_token)) {
 		    char *s = try_to_get_string();
+		    char *comma = strrchr(s,',');
+		    double fontsize;
+		    if (comma && (1 == sscanf(comma+1,"%lf",&fontsize))) {
+			png_state.default_ttfsize = (int)(fontsize+0.5);
+			png_state.ttfsize = png_state.default_ttfsize;
+			*comma = '\0';
+		    }
 		    strncpy(png_state.ttffont, s, sizeof(png_state.ttffont));
 		    free(s);
 		} else {
@@ -725,7 +737,6 @@ PNG_options()
 		    c_token++;
 		}
 		strcpy(png_state.default_ttffont, png_state.ttffont);
-		png_state.ttfsize = 2 * term->h_char - 2;
 		err = gdImageStringFT(NULL, &brect[0], 0,
 			png_state.ttffont, (double)png_state.ttfsize,
 			0.0, 0, 0, "test");
@@ -894,9 +905,9 @@ PNG_options()
 		char *err;
 		strncpy(png_state.ttffont, external_default, sizeof(png_state.ttffont));
 		strcpy(png_state.default_ttffont, png_state.ttffont);
-	        png_state.ttfsize = 2 * term->h_char - 2;
+	        png_state.default_ttfsize = 2 * term->h_char - 2;
 		err = gdImageStringFT(NULL, &brect[0], 0,
-			png_state.ttffont, (double)png_state.ttfsize,
+			png_state.ttffont, (double)png_state.default_ttfsize,
 			0.0, 0, 0, "test");
 		if (err) {
 			fprintf(stderr,"%s when opening font %s, using default\n",

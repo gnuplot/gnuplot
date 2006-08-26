@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.61 2006/07/07 03:51:23 sfeam Exp $
+ * $Id: svg.trm,v 1.62 2006/07/21 02:35:48 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -398,6 +398,8 @@ SVG_options ()
 		int_error(c_token,"x size out of range");
 	    SVG_xSize = value * SVG_SCALE;
 
+	    if (equals(c_token,","))
+		c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token,"expecting y size");
 	    value = real(const_express (&a));
@@ -434,12 +436,16 @@ SVG_options ()
 	}
 
 	if (almost_equals(c_token, "fn$ame") || almost_equals(c_token, "font"))  {
-	    char *s;
+	    char *s, *comma;
 	    c_token++;
 
 	    if (!(s = try_to_get_string()))
-		int_error(c_token,"fname: expecting font name");
-	    strncpy(SVG_fontNameDef, s, sizeof(SVG_fontNameDef));
+		int_error(c_token,"expecting font name");
+	    comma = strrchr(s,',');
+	    if (comma && (1 == sscanf(comma+1,"%lf",&SVG_fontSizeDef)))
+		*comma = '\0';
+	    if (*s)
+		strncpy(SVG_fontNameDef, s, sizeof(SVG_fontNameDef));
 	    free(s);
 	    continue;
 	}
@@ -1053,7 +1059,7 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 	case FS_SOLID: /* solid fill */
 	    SVG_StyleFillColor();
 	    if (fillpar >= 0 && fillpar < 100)
-		fprintf(gpoutfile, " style = 'fill-opacity:%f'", ((double)fillpar * 0.01));
+		fprintf(gpoutfile, " fill-opacity = '%f'", ((double)fillpar * 0.01));
 	    break;
 	case FS_PATTERN: /* pattern fill */
 	    fprintf(gpoutfile, " fill = 'url(#gpPat%d)'", SVG_fillPatternIndex);
@@ -1347,9 +1353,10 @@ START_HELP(svg)
 " This terminal produces files in the W3C Scalable Vector Graphics format.",
 "",
 " Syntax:",
-"       set terminal svg {size <x> <y> {|fixed|dynamic}}",
+"       set terminal svg {size <x>,<y> {|fixed|dynamic}}",
 "                        {{no}enhanced}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
+"                        {font \"<fontname>{,<fontsize>}\"}",
 "                        {fontfile <filename>}",
 "                        {rounded|butt} {linewidth <lw>}",
 "",
