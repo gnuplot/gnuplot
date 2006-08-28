@@ -1,10 +1,17 @@
 #! /bin/sh --
-# $Id: prepare,v 1.9 2003/11/24 09:49:37 lhecking Exp $
+# $Id: prepare,v 1.10 2004/01/07 14:46:22 lhecking Exp $
 # Small shell script to prepare the gnuplot sources when
 # checked out from CVS.
 
 # Note that autoconf 2.52 or newer is required; automake versions older than
 # 1.7 might not work
+
+# allow importing from the environment (mainly for FreeBSD; use
+# "AUTOCONF=autoconf259 ... ./prepare")
+ACLOCAL=${ACLOCAL:-aclocal}
+AUTOCONF=${AUTOCONF:-autoconf}
+AUTOHEADER=${AUTOHEADER:-autoheader}
+AUTOMAKE=${AUTOMAKE:-automake}
 
 exelist="configure configure.vms depcomp install-sh missing mkinstalldirs config/djconfig.sh lisp/configure"
 
@@ -14,18 +21,18 @@ chmod og-w docs/* lisp/* >/dev/null 2>&1
 # Clean up
 rm -rf autom4te.cache lisp/autom4te.cache config.cache config.status
 
-if aclocal -I m4 && autoheader \
+if ${ACLOCAL} -I m4 && ${AUTOHEADER} \
   && (cd config && make -f Makefile.am.in Makefile.am ) \
   && (cd demo && make -f Makefile.am.in Makefile.am ) \
   && (cd m4 && make -f Makefile.am.in Makefile.am ) \
   && (cd term && make -f Makefile.am.in Makefile.am ) \
   && (cd tutorial && make -f Makefile.am.in Makefile.am ) \
-  && (cd lisp && aclocal && automake && autoconf ) \
-  && automake -a -c \
+  && (cd lisp && ${ACLOCAL} && ${AUTOMAKE} && ${AUTOCONF} ) \
+  && ${AUTOMAKE} -a -c \
   && sed 's/noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@/noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@$(EXEEXT)/' \
 	<src/Makefile.in >src/Makefile.in2 \
   && mv -f src/Makefile.in2 src/Makefile.in \
-  && autoconf
+  && ${AUTOCONF}
 then
   echo
   echo "The gnuplot source code was successfully prepared."

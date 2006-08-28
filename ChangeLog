@@ -1,3 +1,7 @@
+2006-08-28  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* prepare: Allow importing auto* tools from the environment.
+
 2006-08-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Fix program errors revealed by issuing the command sequence
