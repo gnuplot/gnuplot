@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.190 2006/08/15 03:57:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.191 2006/08/19 20:54:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1286,7 +1286,10 @@ place_arrows(int layer)
     BoundingBox *clip_save = clip_area;
 
     /* Allow arrows to run off the plot, so long as they are still on the canvas */
-    clip_area = &canvas;
+    if (term->flags & TERM_CAN_CLIP)
+      clip_area = NULL;
+    else
+      clip_area = &canvas;
 
     for (this_arrow = first_arrow;
 	 this_arrow != NULL;

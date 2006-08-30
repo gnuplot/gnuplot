@@ -1,3 +1,8 @@
+2006-08-30  Harald Harders  <h.harders@tu-bs.de>
+
+	* src/graphics.c (place_arrows): Allow for terminal-specific clipping,
+	exactly as done elsewhere in the code.
+
 2006-08-28  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* prepare: Allow importing auto* tools from the environment.
