@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.191 2006/08/19 20:54:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.192 2006/08/30 16:55:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1900,8 +1900,14 @@ do_plot(struct curve_points *plots, int pcount)
 	    case FILLEDCURVES:
 		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN)
 		    plot_betweencurves(this_plot);
-		else
+		else {
 		    plot_filledcurves(this_plot);
+		    if (this_plot->fill_properties.border_linetype == LT_NODRAW)
+			break;
+		    if (this_plot->fill_properties.border_linetype != LT_UNDEFINED)
+			(*t->linetype)(this_plot->fill_properties.border_linetype);
+		    plot_lines(this_plot);
+		}
 		break;
 
 	    case VECTOR:

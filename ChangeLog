@@ -3,6 +3,12 @@
 	* src/graphics.c (place_arrows): Allow for terminal-specific clipping,
 	exactly as done elsewhere in the code.
 
+2006-08-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (do_plot): The border attribute of fill style was
+	ignored by filledcurves. Change this to match all other places where
+	fillstyle is honored.
+
 2006-08-28  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* prepare: Allow importing auto* tools from the environment.
