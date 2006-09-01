@@ -1,3 +1,7 @@
+2006-09-01  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc term/x11.trm: Comments on 'raise' does not raise.
+
 2006-08-30  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/graphics.c (place_arrows): Allow for terminal-specific clipping,

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.382 2006/08/11 07:44:56 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.383 2006/08/14 20:45:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1843,10 +1843,9 @@ C ... and restart the table:
  By default, the <space> hotkey raises gnuplot's command window. On some
  terminals (e.g. x11, wx, pm), 'q' closes the graph window. These defaults can
  be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
- see `x11 command-line-options`.  Note: if <space> is not working by
- default, that may be due to a protection by your window manager.  On KDE, you
- may like to set the 'protection level against focus stealing' to None (see the
- Control Center, item 'Windows behaviour').
+ see `x11 command-line-options`, or by the X Resource 'gnuplot*ctrlq'.
+ Note: if <space> (or ctrl-space) does not raise the gnuplot window under X11,
+ see discussion in `raise`.
 
  Syntax:
        bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
@@ -4438,6 +4437,12 @@ C ... and restart the table:
 
  The optional parameter is ignored for single plot-windows terminal, i.e. `pm`
  and `win`.
+
+  If the window is not raised under X11, then (1) they don't run in the same
+  X11 session (telnet or ssh session, for example), or (2) raising is blocked
+  by your window manager. On KDE, you may like to go to the KDE Control Center
+  => Desktop => Window Behaviour => Advanced and set the "Focus stealing
+  prevention level" to None (default is Low).
 2 replot
 ?commands replot
 ?replot

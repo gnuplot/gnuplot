@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.158 2006/07/21 02:35:49 sfeam Exp $
+ * $Id: x11.trm,v 1.159 2006/07/22 00:01:29 sfeam Exp $
  *
  */
 
@@ -2055,7 +2055,8 @@ START_HELP(x11)
 " -persist / -raise or the Xresources are taken.  If [no]persist or",
 " [no]raise are specified, they will override command line options and",
 " Xresources.  Setting one of these options takes place immediately, so",
-" the behaviour of an already running driver can be modified.",
+" the behaviour of an already running driver can be modified.  If the window",
+" does not get raised, see discussion in `raise`.",
 "",
 " The option `title \"<title name>\"` will supply the title name of the window",
 " for the current plot window or plot window <n> if a number is given.",
