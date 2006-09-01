@@ -1,5 +1,7 @@
 2006-09-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* docs/gnuplot.doc: Edits of the "What is new in gnuplot 4.2".
+
 	* docs/gnuplot.doc term/x11.trm: Comments on 'raise' does not raise.
 
 2006-08-30  Harald Harders  <h.harders@tu-bs.de>

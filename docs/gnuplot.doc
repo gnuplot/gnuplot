@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.383 2006/08/14 20:45:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.384 2006/09/01 09:58:44 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -183,7 +183,7 @@ C
  you are subscribed to the list, so that users who use news will know to email
  a reply to you.  There is a form for such postings on the WWW site.
 
-2 New Features
+2 New features introduced in version 4.2
 ?new-features
 ?version 4.2 features
  Gnuplot version 4.2 offers many new features introduced since the preceding
@@ -202,9 +202,10 @@ C
  can draw a label at each vertex of a curve.
  See `labels`.
 
-4 Image data mapped onto plot
- The `image` style allows to plot 2D images and map them in a 2D or 3D plot.
- See `image`.
+4 Image data
+ The `image` and `rgbimage` styles allow to plot 2D images (from ascii or
+ `binary` files) and map them in a 2D or 3D plot.
+ See `image` and `rgbimage`.
 
 4 Filled curves
  The plot style `fillstyle` has been augmented to allow to fill the area
@@ -212,9 +213,16 @@ C
  See `filledcurves`.
 
 4 Vectors
- gnuplot can draw plots with vectors with a small arrowhead, requiring four or
+ Gnuplot can draw plots with vectors with a small arrowhead, requiring four or
  six columns of data for 2D or 3D, respectively.
  See `vectors`.
+
+3 Input from binary data files
+ Gnuplot can now read a generic `binary` input, including matrix binary and
+ `general binary` (until now gnuplot supported only its own `binary matrix`
+ format). Several matrix file formats are autodetected (`gpbin`, `edf`, `avs`).
+ Binary data files are mainly useful for `image` and `rgbimage` drawings.
+ See `binary` and `binary general filetype`.
 
 3 New plot elements
 
@@ -226,30 +234,29 @@ C
 4 Arbitrary rectangles
  You can place rectangles with desired fill style and border anywhere in a 2D
  plot.
- See `set object rectangle`
+ See `set object rectangle`.
 
 3 String handling
 4 String and text data read from datafiles
- gnuplot can now read and process text fields in datafiles.
- See `datastrings`
+ Gnuplot can now read and process text fields in datafiles.
+ See `datastrings`.
 4 User-defined string variables, operators, and functions
  String variables and string functions are introduced. Most gnuplot commands
  that previously required a string constant will now also accept a string
  variable, a string expression, or a function that returns a string.
- See `string variables`
+ See `string variables`.
+
+3 Macros
+ Gnuplot support macro expansion  by '@stringvariablename'. 
+ See `macros`.
 
 3 Auto-layout of multiple plots on a page
  The `multiplot` mode is now able to layout automatically simple
  multiplots without having to set the size or the position for each plot.
  See `multiplot`.
 
-3 Input from binary data files
- gnuplot can now read binary input, as opposed to ASCII input. The `binary`
- keyword allows you to select this mode.
- See `binary`.
-
 3 Internal variables
- gnuplot now exports several "read-only" variables such as GPVAL_TERM,
+ Gnuplot now exports several "read-only" variables such as GPVAL_TERM,
  GPVAL_X_MIN, etc.
  See `gnuplot-defined variables`.
 
@@ -259,7 +266,7 @@ C
  rendering. It uses the wxWidgets library for its user interface, and Cairo
  associated with Pango for the actual rendering, providing nice plots with
  antialiasing on lines and text. The terminal supports the full range of
- gnuplot capabilities, including mousing, `pm3d` plots, `image` plots and
+ gnuplot capabilities, including mousing, pm3d plots, image plots and
  enhanced text.
 4 `emf`
  The `emf` terminal generates an Enhanced Metafile Format file. This file
@@ -268,13 +275,18 @@ C
  The code for the terminals using the `gd` library has been consolidated.
  The `gif` terminal also knows how to produce an animated gif from a sequence
  of plots.
+4 `postscript`
+ The `postscript` terminal can load prologue files, which can contain
+ additional user-defined sections with, for example, character encodings.
+ See `postscript prologue`.
 4 `ai`
  The Adobe Illustrator `ai` driver is outdated. Since Adobe Illustrator
  understands PostScript files, `set terminal post level1 ...` should be used
  instead.
 4 `epslatex`, `pslatex`, `pstex`
- The terminals supporting an output to latex augmented by PostScript files have
- been consolidated into the main `post` driver.
+ The terminals supporting an output to latex augmented by PostScript commands
+ have been consolidated. Many options are the same as in the `postscript`
+ terminal.
 4 `windows`
  The `windows` terminal now supports the `enhanced text` mode.
 
@@ -3372,6 +3384,8 @@ C ... and restart the table:
 ?binary general filetype edf
 ?filetype edf
 ?edf
+?filetype ehf
+?ehf
  `edf` is one of the automatically recognized binary file types for images.
  EDF stands for ESRF Data Format, and it supports both edf and ehf formats
  (the latter means ESRF Header Format).  More information on specifications
@@ -10601,6 +10615,7 @@ C ... and restart the table:
 ?splot matrix binary
 ?matrix binary
 ?binary matrix
+?gpbin
  Gnuplot can read matrix binary files by use of the option `binary` appearing
  without keyword qualifications unique to general binary, i.e., `array`,
  `record`, `format`, or `filetype`.  Other general binary keywords for
