@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.142 2006/07/15 22:17:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.143 2006/07/28 21:14:35 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2805,7 +2805,7 @@ string_expand()
 			nfound++;
 			m = udv->udv_value.v.string_val;
 			FPRINTF((stderr,"Replacing @%s with \"%s\"\n",udv->udv_name,m));
-			if (strlen(m) + o + len > gp_input_line_len)
+			while (strlen(m) + o + len > gp_input_line_len)
 			    extend_input_line();
 			while (*m)
 			    gp_input_line[o++] = (*m++);

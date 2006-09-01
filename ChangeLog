@@ -1,3 +1,8 @@
+2006-09-01  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/command.c (string_expand): Fix segfault if a truly enormous string
+	is to be used as an input line.
+
 2006-09-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Edits of the "What is new in gnuplot 4.2".
