@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.127 2006-08-15 20:00:30+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.383
+C RCS $Id: gnuplot-ja.doc,v 1.129 2006-09-02 11:30:13+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.385
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -238,7 +238,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  ザはあなたへの返事をメールで出せば良いことが分かるでしょうから。そのよ
  うな記事のポストの form が WWW サイトにあります。
 
-2 New Features
+2 New features introduced in version 4.2
 ?new-features
 ?version 4.2 features
  gnuplot version 4.2 は、直前の公式バージョン 4.0 以降に追加されたたく
@@ -257,10 +257,11 @@ C Shigeharu Takeno et al (3.7, 4.X)
  に曲線の各頂点にラベルを付けさせることが可能になります。
  `labels` 参照。
 
-4 画像データの描画への取り込み
- `image` スタイルにより、2 次元や 3 次元グラフ内に 2 次元画像を描画、あ
- るいは写像することができます。
- `image` 参照。
+4 画像データ
+ スタイル `image` や `rgbimage` により、2 次元や 3 次元グラフ内に 2 次
+ 元画像 (ASCII 形式、または `binary` 形式のファイル) を描画、あるいは写
+ 像することができます。
+ `image`, `rgbimage` 参照。
 
 4 閉曲線の塗りつぶし
  描画スタイル `fillstyle` は、入力された 2 つの曲線で囲まれた領域を、色
@@ -271,6 +272,15 @@ C Shigeharu Takeno et al (3.7, 4.X)
  gnuplot は、2 次元グラフでは 4 列、3次元グラフでは 6 列のデータを使っ
  て、小さい矢先を持つベクトルの描画が行えます。
  `vectors` 参照。
+
+3 バイナリデータファイルからの入力
+ 現在の gnuplot は、行列 (matrix) 形式のバイナリや `general binary` (こ
+ れまで gnuplot は `binary matrix` 形式のみをサポートしていました) を含
+ む一般的な `binary` データの入力が可能になっています。色々な matrix フ
+ ァイルフォーマット (`gpbin`, `edf`, `avs`) が自動的に認識されるように
+ なっています。バイナリデータファイルは、`image` や `rgbimage` の描画で
+ 特に有用です。
+ `binary`, `binary general filetype` 参照。
 
 3 新しい描画要素
 
@@ -294,15 +304,14 @@ C Shigeharu Takeno et al (3.7, 4.X)
  字列を返す関数を受けつけます。
  `string variables` 参照。
 
+3 マクロ
+ gnuplot は '@stringvariablename' によるマクロの展開をサポートします。
+ `macros` 参照。
+
 3 複数グラフの 1 ページ自動配置描画
  `multiplot` モードは現在は、各グラフに対していちいちサイズや位置を設定
  することなしに、単純な複数グラフの描画を生成することができます。
  `multiplot` 参照。
-
-3 バイナリデータファイルからの入力
- 現在 gnuplot は、ASCII データ入力以外にバイナリデータ入力も可能です。
- キーワード `binary` でこのモードを選択できます。
- `binary` 参照。
 
 3 内部変数
  gnuplot は現在、GPVAL_TERM, GPVAL_X_MIN 等のいくつかの "参照専用" の変
@@ -315,8 +324,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
  話型出力形式です。これはユーザインターフェースには wxWidgets ライブラ
  リを使用し、実際の描画には Pango と関連する Cairo を使用します。これは
  線や文字にアンチエイリアスを利用した素晴しい描画を生成します。この出力
- 形式はマウス、`pm3d` 描画、`image` 描画、拡張文字処理 (enhanced text)
- を含む、gnuplot の能力のすべてをサポートしています。
+ 形式はマウス、pm3d 描画、画像 (image) の描画、拡張文字処理 (enhanced
+ text) を含む、gnuplot の能力のすべてをサポートしています。
 4 `emf`
  `emf` 出力形式は Enhanced Metafile Format (EMF) ファイルを生成します。
  このファイル形式は MS Win32 システムでは標準的なメタファイル形式です。
@@ -324,13 +333,19 @@ C Shigeharu Takeno et al (3.7, 4.X)
  `gd` ライブラリを利用するこれらの出力形式のソースコードは統合されまし
  た。`gif` 出力形式には、複数のグラフからアニメーション GIF を作成する
  機能もあります。
+4 `postscript`
+ `postscript` 出力形式は、prologue ファイルを読みこむことができます。
+ prologue ファイルには、ユーザ定義セクション、例えば文字エンコーディン
+ グに関するものを追加することができます。
+ `postscript prologue` 参照。
 4 `ai`
  Adobe Illustrator 用のドライバ `ai` は時代遅れです。Adobe Illustrator
  は PostScript ファイルを認識するので、`set terminal post level1 ...`
  を代わりに使うべきです。
 4 `epslatex`, `pslatex`, `pstex`
- PostScript ファイルを伴う latex ファイルへの出力をサポートするこれらの
- 出力形式は、メインの `post` 出力ドライバに統合されました。
+ PostScript コマンドを伴う latex ファイルへの出力をサポートするこれらの
+ 出力形式のコードは統合され、多くのオプションが `postscript` 出力形式の
+ ものと同一になっています。
 4 `windows`
  `windows` 出力形式は、現在は拡張文字処理 (`enhanced text`) モードをサ
  ポートしています。
@@ -1912,12 +1927,10 @@ C ... and restart the table:
  デフォルトでは、<space> ホットキーは gnuplot のコマンドウィンドウを前
  面に出します。いくつかの出力形式 (例えば x11, wxt, pm) では 'q' はグラ
  フウィンドウを閉じます。これらのデフォルトは、'gnuplot -ctrlq' のよう
- にして gnuplot を起動することで、ctrl-space や ctrl-q に変更できます。
- `x11 command-line-options` も参照してください。注意: <space> がデフォ
- ルトで機能しない場合、それはウィンドウマネージャのせいかもしれません。
- KDE では、'protection level against focus stealing' (フォーカスの奪取
- に関する保護レベル) を None に設定するとうまくいくかもしれません
- (Control Center の 'Windows behaviour' の項目を参照してください)。
+ にして gnuplot を起動する (`x11 command-line-options` も参照)、または
+ X リソースの 'gnuplot*ctrlq' で、ctrl-space や ctrl-q に変更できます。
+ 注意: <space> (または ctrl-space) で X11 の gnuplot ウィンドウが前面に
+ 出ない場合は `raise` の項をよく読んでください。
 
  書式:
        bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
@@ -3459,6 +3472,8 @@ C ... and restart the table:
 ?binary general filetype edf
 ?filetype edf
 ?edf
+?filetype ehf
+?ehf
  `edf` は、自動的に認識される画像イメージに対するバイナリファイルの型の
  一つです。EDF は ESRF データフォーマット (ESRF Data Format) を意味して
  いて、それは edf と ehf の両方の形式をサポートしています (後者は ESRF
@@ -4551,6 +4566,13 @@ C ... and restart the table:
 
  オプション引数は、単一の描画ウィンドウの出力形式、すなわち `pm` と
  `win` では無視されます。
+
+ ウィンドウが X11 で前面に出ない場合、(1) それらが同じ X11 セッションで
+ 動作してない (例えば telnet や ssh セッションなどによって)、または (2)
+ 前面に出すことがウィンドウマネージャによって防害されているかのどちらか
+ でしょう。KDE では、KDE Control Center => Desktop => Window Behaviour
+ => Advanced と進んで、"Focus stealing prevention level" を None (デフ
+ ォルトは Low) に設定するといいでしょう。
 2 replot
 ?commands replot
 ?replot
@@ -10340,8 +10362,8 @@ C ... and restart the table:
 ?set y2label
 ?show y2label
 ?y2label
- コマンド `set y2label` は y2 (右) 軸の見出しを設定します。詳細は `set
- xlabel` を参照してください。
+ コマンド `set y2label` は y2 (右) 軸の見出しを設定します。詳細は 
+ `set xlabel` を参照してください。
 3 y2mtics
 ?commands set y2mtics
 ?commands unset y2mtics
@@ -10769,6 +10791,7 @@ C ... and restart the table:
 ?splot matrix binary
 ?matrix binary
 ?binary matrix
+?gpbin
  Gnuplot は、`array`, `record`, `format`, `filetype` などの general バ
  イナリ形式を特定するようなキーワードをつけずにオプション `binary` を使
  うことで、matrix バイナリファイルを読み込むことができます。その他の変換
@@ -10987,9 +11010,9 @@ C ... and restart the table:
  にするか、あるいは格子データを生成する (`set dgrid3d` 参照) ということ
  をしなければそうはなりません。
 
- 等高線は曲面の上に表示することもできるし、底面に射影することもできる。
- 底面への射影は、ファイルに書き出すこともでき、そしてそれを `plot` で
- 再び読み込んで `plot` のより強い整形能力を生かすこともできる。
+ 等高線は曲面の上に表示することもできますし、底面に射影することもできま
+ す。底面への射影は、ファイルに書き出すこともでき、そしてそれを `plot`
+ で再び読み込んで `plot` のより強い整形能力を生かすこともできます。
 2 system
 ?commands system
 ?system
