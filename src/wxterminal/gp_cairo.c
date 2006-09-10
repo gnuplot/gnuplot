@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.14 2006/07/08 22:27:55 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.15 2006/07/14 18:25:41 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -632,8 +632,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	if (!strcmp(plot->fontname,"Symbol")) {
 		FPRINTF((stderr,"Parsing a Symbol string\n"));
 		string_utf8 = gp_cairo_convert_symbol_to_unicode(plot, string);
-		strncpy(gp_cairo_enhanced_font,
-			"Sans", sizeof(gp_cairo_enhanced_font));
+		strncpy(plot->fontname, "Sans", sizeof(plot->fontname));
 		symbol_font_parsed = TRUE;
 	} else
 #endif /*MAP_SYMBOL*/

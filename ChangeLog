@@ -1,3 +1,9 @@
+2006-09-10  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_draw_text): Fix the use of the
+	Symbol font in non-enhanced mode, a peace of code was not pasted
+	properly.
+
 2006-09-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc: Sync Japanese documentation to recent changes in
