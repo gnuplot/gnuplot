@@ -1,8 +1,8 @@
                                   Gnuplot FAQ
 
-   This document deals with gnuplot version 4.0 which is the latest official
-   release as of April 2004.
-   Its version is $Revision: 1.15 $, dated $Date: 2004/04/14 13:18:59 $.
+   This document deals with gnuplot version 4.2 which is the latest official
+   release as of September 2006.
+   Its version is $Revision: 1.23 $, dated $Date: 2006/09/10 10:30:58 $.
 
 Contents
 
@@ -45,7 +45,7 @@ Contents
           * 3.14 How to overlay contour plot over pm3d map/surface
           * 3.15 Color facets with pm3d
           * 3.16 Palette for printing my color map on color as well as
-            blank&white printer?
+            black&white printer?
      * 4 Wanted features
           * 4.1 What's new in gnuplot 3.7, 4.0 etc?
           * 4.2 Does gnuplot support a driver for <graphics format>?
@@ -111,7 +111,6 @@ Contents
             produce a plot!
      * 8 Credits
 
-
 0 Meta - Questions
 
 0.1 Where do I get this document?
@@ -128,7 +127,6 @@ Contents
    gnuplot-beta@lists.sourceforge.net. Please contribute your suggestions
    with respect to the file faq.tex available from
    http://cvs.sourceforge.net/viewcvs.py/gnuplot/faq/.
-
 
 1 General Information
 
@@ -236,7 +234,6 @@ Contents
    English. See http://gnuplot.sourceforge.net/help.html, section "Localized
    learning pages about gnuplot", for the most up-to-date list.
 
-
 2 Setting it up
 
 2.1 What is the current version of gnuplot?
@@ -295,7 +292,12 @@ Contents
    section "CVS". You can download all current sources according to the
    documentation therein; for example by a sequence of commands like
 
-   export CVSROOT=:pserver:anonymous@cvs.gnuplot.sourceforge.net:/cvsroot/gnuplot
+   cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuplot login
+   cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuplot co -P gnuplot
+
+   or (in bash)
+
+   export CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnuplot
    cvs login
    cvs -z3 checkout gnuplot
 
@@ -370,7 +372,6 @@ Contents
 
    There is repository of contributed patches in the "Patches" section on
    gnuplot's sourceforge site http://www.sourceforge.net/projects/gnuplot/.
-
 
 3 Working with it.
 
@@ -459,7 +460,9 @@ Contents
 
    Into some office applications, like OpenOffice.org, or into applications
    in the Windows world, you can insert vectorial images produces by the emf
-   terminal type.
+   terminal type. OpenOffice.org can also read AutoCAD's dxf format, as well
+   as SVG thanks to SVG Import Filter
+   http://http://www.ipd.uni-karlsruhe.de/ hauma/svg-import/.
 
    With TEX, it depends on what you use to print your dvi files. If you use
    dvips or dvi2ps, you can use Encapsulated PostScript. For emTeX (popular
@@ -499,10 +502,11 @@ Contents
        interactive 2-D drawing tool under X11.
 
      * You may use the svg terminal (scalable vector graphics), which can be
-       further edited by a svg editor, e.g. Sodipodi
-       (http://sodipodi.sourceforge.net), Sketch
-       (http://sketch.sourceforge.net) or Dia
-       (http://http://www.lysator.liu.se/ alla/dia).
+       further edited by a svg editor, e.g. Inkscape
+       (http://www.inkscape.org), Sodipodi (http://sodipodi.sourceforge.net),
+       Sketch (http://sketch.sourceforge.net) or Dia
+       (http://www.lysator.liu.se/ alla/dia), or loaded into OpenOffice.org
+       with an on-fly conversion into OO.o Draw primitives.
 
      * PostScript or PDF output can be edited directly by tools such as Adobe
        Illustrator or Acrobat, or can be converted to a variety of other
@@ -510,6 +514,9 @@ Contents
        at http://www.pstoedit.net.
 
      * The mif terminal type produces an editable FrameMaker document.
+
+     * The DXF format is the AutoCAD's format, editable by several other
+       applications.
 
      * Bitmapped graphics (e.g. png, jpeg, pbm) can be edited using tools
        such as ImageMagick or Gimp. In general, you should use a vector
@@ -526,28 +533,35 @@ Contents
 
 3.6 How do I generate plots in GIF format?
 
-   GIF support was provided by an external library, libgd. Version 1.6 of the
-   gd library dropped support for gif in favour of the superior png format.
-   More recent versions of libgd also support jpeg output. If your
-   installation of gnuplot is linked to the gd library, you will get support
-   for whatever formats (gif, png, jpeg) are in that version of libgd.
+   GIF support is provided by an external library, libgd
+   (http://www.boutell.com/gd/). Old versions of gd (versions 1.2 to 1.4)
+   produce only GIF output. Versions 1.6 to 2.0.27 do not support GIF output
+   because of patent concerns. However versions 1.6 and newer support PNG
+   outputs, and 1.7 and newer support JPEG outputs. Version 2.0.28 of the
+   Boutell gd library restored GIF functionality, and 2.0.29 added support
+   for GIF animation. If your installation of gnuplotis linked to the gd
+   library, you will get support for whatever formats (GIF, PNG, JPEG) are in
+   that version of gd.
 
-   Thus, nowadays, the usual way is to output the image as png and then use
-   your favourite program to convert it into gif, either using command line
-   (e.g. convert f.png f.gif or nconvert -out gif f.png) or by any GUI
-   program. Another possibility is to output the image as (encapsulated)
-   postscript and convert (export) it into gif or png by ghostscript, e.g.
-   convert -density 150 f.eps f.gif or by any ghostscript-based GUI like
-   gsview, gv or kghostview.
+   In any case, it is easy to convert from one format to another. To convert
+   a PNG output into GIF, you can either use the command line (e.g. convert
+   f.png f.gif or nconvert -out gif f.png) or any GUI program. Another
+   possibility is to output the image as (encapsulated) postscript and
+   convert (export) it into GIF or PNG by ghostscript, e.g. convert -density
+   150 f.eps f.gif or by any ghostscript-based GUI like gsview, gv or
+   kghostview.
 
 3.7 Can I animate my graphs?
 
    First have a look at animate.dem in the demo directory of gnuplot.
    Basically, animated graphs are a sequence of plots in a suitable format.
 
-   Then have a look at the tool whirlgif 3.04, available at
-   http://www.danbbs.dk/ dino/whirlgif. It reads run-length encoded gifs and
-   packs them into a minimal animation. On the web-pages you will find a
+   If your installation of gnuplotis linked with gd 2.0.29 or newer (see
+   previous entry), the gif terminal can generate directly an animated GIF.
+
+   Otherwise, have a look at the tool whirlgif 3.04, available at
+   http://www.danbbs.dk/ dino/whirlgif. It reads run-length encoded GIF files
+   and packs them into a minimal animation. On the web-pages you will find a
    manual and an example.
 
    You can also write a small script to get gnuplot to output a family of GIF
@@ -613,7 +627,7 @@ Contents
    which adds blank lines to a data file whenever number in the first column
    changes:
 
- /[:blank:]*#/ {next} # ignore comments (lines starting with #)
+ /^[[:blank:]]*#/ {next} # ignore comments (lines starting with #)
  NF < 3 {next} # ignore lines which don't have at least 3 columns
  $1 != prev {printf "\n"; prev=$1} # print blank line
  {print} # print the line
@@ -662,7 +676,7 @@ Contents
  reset
  # Change single blank lines to double blank lines
  !awk "NF<2{printf\"\n\"}{print}" <contour.dat >contour1.dat
- plot 'contour1.dat' with line -1
+ splot 'contour1.dat' with line -1
 
    See also the following question "How to overlay contour plot over pm3d
    map/surface".
@@ -732,7 +746,7 @@ Contents
    pm3d.
 
    In the above example, pm3d displays triangles as independent surfaces.
-   They are plotted one surface after another as found in the data file.
+   They are plotted one surface after another, as found in the data file.
    Parts overlapping in 2D projection are overdrawn.
 
    Gnuplot is not 3D modeling program. Its hidden routines apply for points
@@ -748,18 +762,18 @@ Contents
    reality. It works OK for set pm3d map but for true 3D you would be
    probably more happy writing a convertor of your facets into a VRML file.
 
-3.16 Palette for printing my color map on color as well as blank&white printer?
+3.16 Palette for printing my color map on color as well as black&white printer?
 
    I think it is this one, for example: set palette rgbformulae -25,-24,-32.
    Can somebody prove this?
-
 
 4 Wanted features
 
 4.1 What's new in gnuplot 3.7, 4.0 etc?
 
    Too many things to be named here. Please refer to the NEWS file in the
-   source distribution, or the News section in the gnuplot documentation.
+   source distribution, or the "New features" section in the gnuplot
+   documentation.
 
 4.2 Does gnuplot support a driver for <graphics format>?
 
@@ -914,7 +928,6 @@ Contents
    gnuplot as many times as you need for replotting the drawing to different
    terminals or output files.
 
-
 5 Miscellaneous
 
 5.1 I've found a bug, what do I do?
@@ -955,7 +968,7 @@ Contents
    Octave (http://www.octave.org), uses this method. This also works from a
    cgi script to drive gnuplot from a forms-based web page.
 
-   John Campbell jdc@nauvax.ucc.nau.edu modified a much earlier version of
+   John Campbell (jdc@nauvax.ucc.nau.edu) modified a much earlier version of
    gnuplot (3.5) to be a library of C subroutines callable from a C program.
    Gnuplot itself has changed radically since then, and we are not aware of
    any plans to create a similar library based on the current version.
@@ -1045,9 +1058,10 @@ Contents
    running an older version of gnuplot (check your PATH).
 
    If your gnuplot is running as the plotting engine of Octave under X11,
-   then please put gset mouse into your $HOME/.octaverc. According to
-   gnuplot's help x11, gnuplot under x11 running through a pipe needs set
-   mouse to be executed before launching the x11 plot window.
+   then please put set mouse into your $HOME/.gnuplot (preferred than putting
+   gset mouse into $HOME/.octaverc). This is needed only for gnuplot 4.0:
+   according to its help x11_mouse, gnuplot 4.0 under x11 running through a
+   pipe needs set mouse to be executed before launching the x11 plot window.
 
 5.7 How to use hotkeys in my interactive terminals
 
@@ -1081,11 +1095,8 @@ Contents
 
 5.10 Open questions for inclusion into the FAQ?
 
-   gnuplot-beta@lists.sourceforge.net.
-
    Please submit your questions (along with the answer) to
    gnuplot-beta@lists.sourceforge.net.
-
 
 6 Making life easier
 
@@ -1218,7 +1229,6 @@ x-y plane?
  set title 'Title on an empty page'
  plot [][0:1] 2
 
-
 7 Common problems
 
 7.1 Gnuplot is not plotting any points under X11! How come?
@@ -1303,11 +1313,10 @@ What can I do?
 
 7.7 When using the LATEX-terminal, there is an error during the LATEX-run!
 
-   Please upgrade to at least gnuplot 3.7. The LATEX2$\epsilon$-core no
-   longer includes the commands "$\backslash$Diamond" and "$\backslash$Box";
-   they are included in the latexsym package, which is part of the base
-   distribution and thus part of any LaTeX implementation. Please do not
-   forget to use this package.
+   Please upgrade to at least gnuplot 3.7. The LATEX2-core no longer includes
+   the commands "Diamond" and "Box"; they are included in the latexsym
+   package, which is part of the base distribution and thus part of any LaTeX
+   implementation. Please do not forget to use this package.
 
 7.8 The exit command does not work as documented!
 
@@ -1340,7 +1349,6 @@ What can I do?
    sure that you don't need gnuplot and its plot window anymore. Last, you
    can use the command line option -persist: this option leaves the X-Window
    System plot window open.
-
 
 8 Credits
 
