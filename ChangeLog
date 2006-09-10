@@ -4,6 +4,9 @@
 	Symbol font in non-enhanced mode, a peace of code was not pasted
 	properly.
 
+	* src/wxterminal/wxt_gui.cpp (wxt_set_font): Fix the use of a
+	non-initialized integer as the fontsize.
+
 2006-09-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc: Sync Japanese documentation to recent changes in

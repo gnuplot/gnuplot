@@ -1631,10 +1631,9 @@ int wxt_set_font (const char *font)
 	if (wxt_status != STATUS_OK)
 		return 1;
 
-	char fontname[MAX_ID_LEN + 1];
+	char fontname[MAX_ID_LEN + 1] = "";
 	gp_command temp_command;
-	int fontsize;
-	int sep;
+	int fontsize = 0;
 
 	temp_command.command = command_set_font;
 
@@ -1642,6 +1641,8 @@ int wxt_set_font (const char *font)
 		strncpy(fontname, "", sizeof(fontname));
 		fontsize = 0;
 	} else {
+		int sep;
+
 		sep = strcspn(font,",");
 		if (sep > 0) {
 			strncpy(fontname, font, sep);
@@ -1683,6 +1684,7 @@ int wxt_set_font (const char *font)
 	temp_command.integer_value = fontsize;
 
 	wxt_command_push(temp_command);
+	/* the returned int is not used anywhere */
 	return 1;
 }
 	
