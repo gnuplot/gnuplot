@@ -344,6 +344,7 @@ private:
 	TBOOLEAN antialiasing_queued;
 	TBOOLEAN oversampling_queued;
 	int hinting_queued;
+	wxMutex mutex_queued;
 
 #ifdef USE_MOUSE
 	/* watches for time between mouse clicks */

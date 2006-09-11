@@ -543,21 +543,25 @@ void wxtPanel::wxt_settings_queue(TBOOLEAN antialiasing,
 					TBOOLEAN oversampling,
 					int hinting_setting)
 {
+	mutex_queued.Lock();
 	settings_queued = true;
 	antialiasing_queued = antialiasing;
 	oversampling_queued = oversampling;
 	hinting_queued = hinting_setting;
+	mutex_queued.Unlock();
 }
 
 /* apply queued settings */
 void wxtPanel::wxt_settings_apply()
 {
+	mutex_queued.Lock();
 	if (settings_queued) {
 		plot.antialiasing = antialiasing_queued;
 		plot.oversampling = oversampling_queued;
 		plot.hinting = hinting_queued;
 		settings_queued = false;
 	}
+	mutex_queued.Unlock();
 }
 
 /* clear the command list, free the allocated memory */
