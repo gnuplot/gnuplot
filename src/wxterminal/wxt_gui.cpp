@@ -552,10 +552,12 @@ void wxtPanel::wxt_settings_queue(TBOOLEAN antialiasing,
 /* apply queued settings */
 void wxtPanel::wxt_settings_apply()
 {
-	plot.antialiasing = antialiasing_queued;
-	plot.oversampling = oversampling_queued;
-	plot.hinting = hinting_queued;
-	settings_queued = false;
+	if (settings_queued) {
+		plot.antialiasing = antialiasing_queued;
+		plot.oversampling = oversampling_queued;
+		plot.hinting = hinting_queued;
+		settings_queued = false;
+	}
 }
 
 /* clear the command list, free the allocated memory */
