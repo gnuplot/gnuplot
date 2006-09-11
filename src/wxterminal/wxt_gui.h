@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.11 2006/07/07 00:06:16 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.12 2006/07/19 06:07:43 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -284,10 +284,16 @@ public :
 	void OnRightDown( wxMouseEvent& event );
 	void OnRightUp( wxMouseEvent& event );
 	void OnKeyDownChar( wxKeyEvent& event );
+
 	void UpdateModifiers( wxMouseEvent& event );
 	void RaiseConsoleWindow();
 	void DrawToDC( wxDC& dc, wxRegion& region );
 	void Draw();
+
+	void wxt_settings_queue(TBOOLEAN antialiasing,
+					TBOOLEAN oversampling,
+					int hinting_setting);
+	void wxt_settings_apply();
 
 	/* list of commands sent by gnuplot */
 	command_list_t command_list;
@@ -333,6 +339,11 @@ public :
 private:
 	/* any class wishing to process wxWidgets events must use this macro */
 	DECLARE_EVENT_TABLE()
+
+	bool settings_queued;
+	TBOOLEAN antialiasing_queued;
+	TBOOLEAN oversampling_queued;
+	int hinting_queued;
 
 #ifdef USE_MOUSE
 	/* watches for time between mouse clicks */

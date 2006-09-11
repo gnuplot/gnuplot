@@ -486,6 +486,8 @@ wxtPanel::wxtPanel( wxWindow *parent, wxWindowID id, const wxSize& size )
 	gp_cairo_initialize_plot(&plot);
 	GetSize(&(plot.device_xmax),&(plot.device_ymax));
 
+	settings_queued = false;
+
 #ifdef USE_MOUSE
 	mouse_x = 0;
 	mouse_y = 0;
@@ -536,6 +538,25 @@ wxtPanel::~wxtPanel()
 	ClearCommandlist();
 }
 
+/* temporary store new settings values to be applied for the next plot */
+void wxtPanel::wxt_settings_queue(TBOOLEAN antialiasing,
+					TBOOLEAN oversampling,
+					int hinting_setting)
+{
+	settings_queued = true;
+	antialiasing_queued = antialiasing;
+	oversampling_queued = oversampling;
+	hinting_queued = hinting_setting;
+}
+
+/* apply queued settings */
+void wxtPanel::wxt_settings_apply()
+{
+	plot.antialiasing = antialiasing_queued;
+	plot.oversampling = oversampling_queued;
+	plot.hinting = hinting_queued;
+	settings_queued = false;
+}
 
 /* clear the command list, free the allocated memory */
 void wxtPanel::ClearCommandlist()
@@ -1108,6 +1129,9 @@ void wxtConfigDialog::OnClose( wxCloseEvent& WXUNUSED( event ) )
 /* configuration dialog : handler for a button event */
 void wxtConfigDialog::OnButton( wxCommandEvent& event )
 {
+	TBOOLEAN antialiasing;
+	TBOOLEAN oversampling;
+
 	wxConfigBase *pConfig = wxConfigBase::Get();
 	Validate();
 	TransferDataFromWindow();
@@ -1126,21 +1150,24 @@ void wxtConfigDialog::OnButton( wxCommandEvent& event )
 
 		switch (rendering_setting) {
 		case 0 :
-			parent->panel->plot.antialiasing = FALSE;
-			parent->panel->plot.oversampling = FALSE;
+			antialiasing = FALSE;
+			oversampling = FALSE;
 			break;
 		case 1 :
-			parent->panel->plot.antialiasing = TRUE;
-			parent->panel->plot.oversampling = FALSE;
+			antialiasing = TRUE;
+			oversampling = FALSE;
 			break;
 		case 2 :
 		default :
-			parent->panel->plot.antialiasing = TRUE;
-			parent->panel->plot.oversampling = TRUE;
+			antialiasing = TRUE;
+			oversampling = TRUE;
 			break;
 		}
 
-		parent->panel->plot.hinting = hinting_setting;
+		/* we cannot apply the new settings right away, because it would mess up
+		 * the plot in case of a window resize.
+		 * Instead, we queue the settings until the next plot. */
+		parent->panel->wxt_settings_queue(antialiasing, oversampling, hinting_setting);
 
 		if (!pConfig->Write(wxT("raise"), raise_setting))
 			wxLogError(wxT("Cannot write raise"));
@@ -1448,6 +1475,9 @@ void wxt_graphics()
 	/* update the window scale factor first, cairo needs it */
 	wxt_current_plot->xscale = 1.0;
 	wxt_current_plot->yscale = 1.0;
+
+	/* apply the queued rendering settings */
+	wxt_current_panel->wxt_settings_apply();
 
 	FPRINTF((stderr,"Graphics1\n"));
 

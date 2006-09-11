@@ -1,3 +1,10 @@
+2006-09-11  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp (wxtConfigDialog::OnButton):
+	* src/wxterminal/wxt_gui.h (wxt_settings_queue, wxt_settings_apply):
+	Queue the modified rendering settings instead of applying them right
+	away, so that the plot is not messed up during a window resize.
+
 2006-09-10  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_text): Fix the use of the
