@@ -123,7 +123,7 @@ Johannes Zellner
 * Copyright::                   
 * Introduction::                
 * Seeking-assistance::          
-* New_Features::                
+* New_features_introduced_in_version_4.2::  
 * Features_introduced_in_version_4.0::  
 * Batch/Interactive_Operation::  
 * Command-line-editing::        
@@ -276,7 +276,7 @@ See the simple.dem demo, also available together with other demos on the web pag
 @uref{http://www.gnuplot.info/demo/simple.html,http://www.gnuplot.info/demo/simple.html
 }
 
-@node Seeking-assistance, New_Features, Introduction, gnuplot
+@node Seeking-assistance, New_features_introduced_in_version_4.2, Introduction, gnuplot
 @section Seeking-assistance
 
 @c ^ <a name="Seeking-assistance"></a>
@@ -333,8 +333,8 @@ you are subscribed to the list, so that users who use news will know to email
 a reply to you.  There is a form for such postings on the WWW site.
 
 
-@node New_Features, Features_introduced_in_version_4.0, Seeking-assistance, gnuplot
-@section New Features
+@node New_features_introduced_in_version_4.2, Features_introduced_in_version_4.0, Seeking-assistance, gnuplot
+@section New features introduced in version 4.2
 
 @cindex new-features
 
@@ -347,15 +347,16 @@ NEWS file.
 
 @menu
 * New_plot_styles::             
+* Input_from_binary_data_files::  
 * New_plot_elements::           
 * String_handling::             
+* Macros::                      
 * Auto-layout_of_multiple_plots_on_a_page::  
-* Input_from_binary_data_files::  
 * Internal_variables::          
 * New_or_revised_terminal_drivers::  
 @end menu
 
-@node New_plot_styles, New_plot_elements, New_Features, New_Features
+@node New_plot_styles, Input_from_binary_data_files, New_features_introduced_in_version_4.2, New_features_introduced_in_version_4.2
 @subsection New plot styles
 
 
@@ -363,7 +364,7 @@ NEWS file.
 @menu
 * Histogram::                   
 * Label_plots::                 
-* Image_data_mapped_onto_plot::  
+* Image_data::                  
 * Filled_curves::               
 * Vectors::                     
 @end menu
@@ -375,7 +376,7 @@ Histograms, or bar charts, can be produced.
 See `histograms`.
 
 
-@node Label_plots, Image_data_mapped_onto_plot, Histogram, New_plot_styles
+@node Label_plots, Image_data, Histogram, New_plot_styles
 @subsubsection Label plots
 
 In coordination with the new `datastrings` feature described below, gnuplot
@@ -383,14 +384,15 @@ can draw a label at each vertex of a curve.
 See `labels`.
 
 
-@node Image_data_mapped_onto_plot, Filled_curves, Label_plots, New_plot_styles
-@subsubsection Image data mapped onto plot
+@node Image_data, Filled_curves, Label_plots, New_plot_styles
+@subsubsection Image data
 
-The `image` style allows to plot 2D images and map them in a 2D or 3D plot.
-See `image`.
+The `image` and `rgbimage` styles allow to plot 2D images (from ascii or
+`binary` files) and map them in a 2D or 3D plot.
+See `image` and `rgbimage`.
 
 
-@node Filled_curves, Vectors, Image_data_mapped_onto_plot, New_plot_styles
+@node Filled_curves, Vectors, Image_data, New_plot_styles
 @subsubsection Filled curves
 
 The plot style `fillstyle` has been augmented to allow to fill the area
@@ -401,12 +403,22 @@ See `filledcurves`.
 @node Vectors,  , Filled_curves, New_plot_styles
 @subsubsection Vectors
 
-gnuplot can draw plots with vectors with a small arrowhead, requiring four or
+Gnuplot can draw plots with vectors with a small arrowhead, requiring four or
 six columns of data for 2D or 3D, respectively.
 See `vectors`.
 
 
-@node New_plot_elements, String_handling, New_plot_styles, New_Features
+@node Input_from_binary_data_files, New_plot_elements, New_plot_styles, New_features_introduced_in_version_4.2
+@subsection Input from binary data files
+
+Gnuplot can now read a generic `binary` input, including matrix binary and
+`general binary` (until now gnuplot supported only its own `binary matrix`
+format). Several matrix file formats are autodetected (`gpbin`, `edf`, `avs`).
+Binary data files are mainly useful for `image` and `rgbimage` drawings.
+See `binary` and `binary general filetype`.
+
+
+@node New_plot_elements, String_handling, Input_from_binary_data_files, New_features_introduced_in_version_4.2
 @subsection New plot elements
 
 
@@ -429,10 +441,10 @@ See @ref{colorspec}.
 
 You can place rectangles with desired fill style and border anywhere in a 2D
 plot.
-See `set object rectangle`
+See `set object rectangle`.
 
 
-@node String_handling, Auto-layout_of_multiple_plots_on_a_page, New_plot_elements, New_Features
+@node String_handling, Macros, New_plot_elements, New_features_introduced_in_version_4.2
 @subsection String handling
 
 
@@ -444,8 +456,8 @@ See `set object rectangle`
 @node String_and_text_data_read_from_datafiles, User-defined_string_variables, String_handling, String_handling
 @subsubsection String and text data read from datafiles
 
-gnuplot can now read and process text fields in datafiles.
-See `datastrings`
+Gnuplot can now read and process text fields in datafiles.
+See `datastrings`.
 
 @node User-defined_string_variables,  , String_and_text_data_read_from_datafiles, String_handling
 @subsubsection User-defined string variables, operators, and functions
@@ -453,10 +465,17 @@ See `datastrings`
 String variables and string functions are introduced. Most gnuplot commands
 that previously required a string constant will now also accept a string
 variable, a string expression, or a function that returns a string.
-See @ref{variables}
+See @ref{variables}.
 
 
-@node Auto-layout_of_multiple_plots_on_a_page, Input_from_binary_data_files, String_handling, New_Features
+@node Macros, Auto-layout_of_multiple_plots_on_a_page, String_handling, New_features_introduced_in_version_4.2
+@subsection Macros
+
+Gnuplot support macro expansion  by '@@stringvariablename'. 
+See @ref{macros}.
+
+
+@node Auto-layout_of_multiple_plots_on_a_page, Internal_variables, Macros, New_features_introduced_in_version_4.2
 @subsection Auto-layout of multiple plots on a page
 
 The @ref{multiplot} mode is now able to layout automatically simple
@@ -464,23 +483,15 @@ multiplots without having to set the size or the position for each plot.
 See @ref{multiplot}.
 
 
-@node Input_from_binary_data_files, Internal_variables, Auto-layout_of_multiple_plots_on_a_page, New_Features
-@subsection Input from binary data files
-
-gnuplot can now read binary input, as opposed to ASCII input. The `binary`
-keyword allows you to select this mode.
-See `binary`.
-
-
-@node Internal_variables, New_or_revised_terminal_drivers, Input_from_binary_data_files, New_Features
+@node Internal_variables, New_or_revised_terminal_drivers, Auto-layout_of_multiple_plots_on_a_page, New_features_introduced_in_version_4.2
 @subsection Internal variables
 
-gnuplot now exports several "read-only" variables such as GPVAL_TERM,
+Gnuplot now exports several "read-only" variables such as GPVAL_TERM,
 GPVAL_X_MIN, etc.
 See @ref{variables}.
 
 
-@node New_or_revised_terminal_drivers,  , Internal_variables, New_Features
+@node New_or_revised_terminal_drivers,  , Internal_variables, New_features_introduced_in_version_4.2
 @subsection New or revised terminal drivers
 
 
@@ -488,6 +499,7 @@ See @ref{variables}.
 * `wxt`::                       
 * `emf`::                       
 * `gif`::                       
+* @ref{postscript}::            
 * `ai`::                        
 * `epslatex`::                  
 * `windows`::                   
@@ -500,7 +512,7 @@ The `wxt` terminal is an interactive and cross-platform terminal for on-screen
 rendering. It uses the wxWidgets library for its user interface, and Cairo
 associated with Pango for the actual rendering, providing nice plots with
 antialiasing on lines and text. The terminal supports the full range of
-gnuplot capabilities, including mousing, @ref{pm3d} plots, `image` plots and
+gnuplot capabilities, including mousing, pm3d plots, image plots and
 enhanced text.
 
 @node `emf`, `gif`, `wxt`, New_or_revised_terminal_drivers
@@ -509,14 +521,21 @@ enhanced text.
 The `emf` terminal generates an Enhanced Metafile Format file. This file
 format is the metafile standard on MS Win32 Systems.
 
-@node `gif`, `ai`, `emf`, New_or_revised_terminal_drivers
+@node `gif`, @ref{postscript}, `emf`, New_or_revised_terminal_drivers
 @subsubsection `gif`, `jpeg`, `png`
 
 The code for the terminals using the `gd` library has been consolidated.
 The `gif` terminal also knows how to produce an animated gif from a sequence
 of plots.
 
-@node `ai`, `epslatex`, `gif`, New_or_revised_terminal_drivers
+@node @ref{postscript}, `ai`, `gif`, New_or_revised_terminal_drivers
+@subsubsection @ref{postscript}
+
+The @ref{postscript} terminal can load prologue files, which can contain
+additional user-defined sections with, for example, character encodings.
+See `postscript prologue`.
+
+@node `ai`, `epslatex`, @ref{postscript}, New_or_revised_terminal_drivers
 @subsubsection `ai`
 
 The Adobe Illustrator `ai` driver is outdated. Since Adobe Illustrator
@@ -526,8 +545,9 @@ instead.
 @node `epslatex`, `windows`, `ai`, New_or_revised_terminal_drivers
 @subsubsection `epslatex`, `pslatex`, `pstex`
 
-The terminals supporting an output to latex augmented by PostScript files have
-been consolidated into the main `post` driver.
+The terminals supporting an output to latex augmented by PostScript commands
+have been consolidated. Many options are the same as in the @ref{postscript}
+terminal.
 
 @node `windows`,  , `epslatex`, New_or_revised_terminal_drivers
 @subsubsection `windows`
@@ -535,7 +555,7 @@ been consolidated into the main `post` driver.
 The `windows` terminal now supports the `enhanced text` mode.
 
 
-@node Features_introduced_in_version_4.0, Batch/Interactive_Operation, New_Features, gnuplot
+@node Features_introduced_in_version_4.0, Batch/Interactive_Operation, New_features_introduced_in_version_4.2, gnuplot
 @section Features introduced in version 4.0
 
 @c ?version 4 features
@@ -1032,6 +1052,12 @@ the environmental variable GNUPLOT_FONTPATH. The format is the same as for
 GNUPLOT_LIB. The contents of GNUPLOT_FONTPATH are appended to the @ref{fontpath}
 variable, but not saved with the @ref{save} and `save set` commands.
 
+GNUPLOT_PS_DIR is used by the postscript driver to use external prologue
+files. Depending on the build process, gnuplot contains either a builtin
+copy of those files or simply a default hardcoded path. Use this variable
+to test the postscript terminal with custom prologue files. See
+`postscript prologue`.
+
 @node Expressions, Glossary, Environment, gnuplot
 @section Expressions
 
@@ -1497,8 +1523,8 @@ number.
 @findex invnorm
 
 
-The `invnorm(x)` function returns the inverse normal distribution function of
-the real part of its argument.  See @ref{norm}.
+The `invnorm(x)` function returns the inverse cumulative normal (Gaussian)
+distribution function of the real part of its argument.  See @ref{norm}.
 
 @node int, lambertw, invnorm, Functions
 @subsubsection int
@@ -1570,8 +1596,8 @@ The `log10(x)` function returns the logarithm (base 10) of its argument.
 @findex norm
 
 
-The `norm(x)` function returns the cumulative normal distribution function
-(or Gaussian) of the real part of its argument.   See @ref{invnorm}, `erf` and @ref{erfc}.
+The `norm(x)` function returns the cumulative normal (Gaussian) distribution
+function of the real part of its argument.   See @ref{invnorm}, `erf` and @ref{erfc}.
 
 @node rand, real, norm, Functions
 @subsubsection rand
@@ -1830,8 +1856,9 @@ it returns 0.
 @c ?functions exists
 @cindex exists
 
-`exists("X")` returns 1 if a variable named X has been defined, otherwise
-it returns 0.
+The argument to exists() is a string constant or a string variable;
+if the string contains the name of a defined variable, the function returns 1.
+Otherwise the function returns 0.
 
 @node stringcolumn, timecolumn, exists_, Functions
 @subsubsection stringcolumn
@@ -2258,19 +2285,19 @@ you may redefine it to be whatever you like. Some other variables may be
 defined under various gnuplot operations like mousing in interactive terminals
 or fitting; see @ref{variables} for details.
 
-You can check for existence of a given variable by the defined(v) expression,
-for example
+You can check for existence of a given variable V by the exists("V")
+expression. For example
 @example
       a = 10
-      if (defined(a)) print "a is defined"
-      if (!defined(b)) print "b is not defined"
+      if (exists("a")) print "a is defined"
+      if (!exists("b")) print "b is not defined"
 
 @end example
 
 Valid names are the same as in most programming languages: they must begin
 with a letter, but subsequent characters may be letters, digits, "$", or "_".
 
-See `show functions`, `functions`, @ref{variables}.
+See `show functions`, `functions`, @ref{variables}, @ref{macros}.
 
 @node Glossary, linetype, Expressions, gnuplot
 @section Glossary
@@ -2499,8 +2526,11 @@ commands which will be executed when a certain key or key sequence is pressed
 while the driver's window has the input focus. Note that @ref{bind} is only
 available if gnuplot was compiled with `mouse` support and it is used by all
 mouse-capable terminals. Bindings overwrite the builtin bindings (like in
-every real editor), except <space> and 'q' which cannot be rebound. Mouse
-buttons cannot be rebound.
+every real editor), except <space> and 'q' which cannot be rebound (unless
+one exception, see below). Mouse buttons cannot be rebound.
+
+You get the list of all hotkeys by typing @ref{bind} or by hitting 'h' in the
+graph window.
 
 Note that multikey-bindings with modifiers have to be quoted.
 
@@ -2509,6 +2539,13 @@ has focus. `bind allwindows <key> ...` (short form: `bind all <key> ...`)
 causes the binding for <key> to apply to all gnuplot plot windows, active
 or not.  In this case gnuplot variable MOUSE_KEY_WINDOW is set to the ID
 of the originating window, and may be used by the bound command.
+
+By default, the <space> hotkey raises gnuplot's command window. On some
+terminals (e.g. x11, wx, pm), 'q' closes the graph window. These defaults can
+be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
+see `x11 command-line-options`, or by the X Resource 'gnuplot*ctrlq'.
+Note: if <space> (or ctrl-space) does not raise the gnuplot window under X11,
+see discussion in @ref{raise}.
 
 Syntax:
 @example
@@ -2628,6 +2665,11 @@ contain the ascii character value of the key that was pressed. MOUSE_CHAR will
 contain the character itself as a string variable.  If the pause command is
 terminated abnormally (e.g. by ctrl-C or by externally closing the plot window)
 then MOUSE_KEY will equal -1.
+
+Note that after a zoom by mouse, you can read the new ranges as GPVAL_X_MIN,
+GPVAL_X_MAX, GPVAL_Y_MIN, and GPVAL_Y_MAX, see @ref{variables}.
+
+
 
 @node Plotting, Start-up, mouse_input, gnuplot
 @section Plotting
@@ -2821,6 +2863,8 @@ These will generate labels with the current time and userid:
 @opindex macros
 
 
+@cindex exists
+
 Substitution of command line macros is disabled by default, but may be
 enabled using the @ref{macros} command.  If macro substitution is enabled,
 the character @@ is used to trigger substitution of the current value of a
@@ -2846,6 +2890,16 @@ executed the effect is identical to having typed in full
 @example
       plot "foo" using 1:3 with lines lt 4 lw 2, \
            "bar" using 1:5 with points lt 3 pt 5 ps 2
+
+@end example
+
+The function exists() may be useful in connection with macro evaluation.
+The following example checks that C can safely be expanded as the name of
+a user-defined variable:
+
+@example
+      C = "pi"
+      if (exists(C)) print C," = ", @@C
 
 @end example
 
@@ -4542,6 +4596,9 @@ of pixels, each with four bytes of information alpha/red/green/blue.
 @c ?filetype edf
 @cindex edf
 
+@c ?filetype ehf
+@cindex ehf
+
 `edf` is one of the automatically recognized binary file types for images.
 EDF stands for ESRF Data Format, and it supports both edf and ehf formats
 (the latter means ESRF Header Format).  More information on specifications
@@ -5182,7 +5239,7 @@ Syntax:
 If a format is specified, each datafile record is read using the C library's
 'scanf' function, with the specified format string.  Otherwise the record is
 read and broken into columns at spaces or tabs.  A format cannot be specified
-if time-format data is being used (this must be done by `set data time`).
+this way for time-format data (instead use `set xdata time`).
 
 The resulting array of data is then sorted into columns according to the
 entries.  Each <entry> may be a simple column number, which selects the
@@ -5958,6 +6015,15 @@ parameter, only the associated plot window will be raised if it exists.
 
 The optional parameter is ignored for single plot-windows terminal, i.e. `pm`
 and `win`.
+
+@example
+ If the window is not raised under X11, then (1) they don't run in the same
+ X11 session (telnet or ssh session, for example), or (2) raising is blocked
+ by your window manager. On KDE, you may like to go to the KDE Control Center
+ => Desktop => Window Behaviour => Advanced and set the "Focus stealing
+ prevention level" to None (default is Low).
+
+@end example
 
 @node replot, reread, raise, Commands
 @section replot
@@ -7967,7 +8033,7 @@ Examples:
 @example
       set format y "%t"; set ytics (5,10)          # "5.0" and "1.0"
       set format y "%s"; set ytics (500,1000)      # "500" and "1.0"
-      set format y "+-12.3f"; set ytics(12345)     # "+12345.000  "
+      set format y "%+-12.3f"; set ytics(12345)    # "+12345.000  "
       set format y "%.2t*10^%+03T"; set ytic(12345)# "1.23*10^+04"
       set format y "%s*10^@{%S@}"; set ytic(12345)   # "12.345*10^@{3@}"
       set format y "%s %cg"; set ytic(12345)       # "12.345 kg"
@@ -13980,6 +14046,8 @@ It is no longer necessary to specify `parametric` mode for three-column
 @c ?splot matrix binary
 @c ?matrix binary
 @c ?binary matrix
+@cindex gpbin
+
 Gnuplot can read matrix binary files by use of the option `binary` appearing
 without keyword qualifications unique to general binary, i.e., `array`,
 `record`, `format`, or `filetype`.  Other general binary keywords for
@@ -14425,7 +14493,6 @@ with no modifiers.
 * kyo::                         
 * latex::                       
 * linux::                       
-* linux_::                      
 * macintosh::                   
 * mf::                          
 * mp::                          
@@ -16666,7 +16733,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, linux_, latex, terminal_
+@node linux, macintosh, latex, terminal_
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -16683,24 +16750,7 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node linux_, macintosh, linux, terminal_
-@subsubsection linux
-
-@c ?commands set terminal linux
-@c ?set terminal linux
-@c ?set term linux
-@c ?terminal linux
-@c ?term linux
-@cindex linux
-@tmindex linux
-
-
-The `linux` driver has no additional options to specify.  It looks at the
-environment variable GSVGAMODE for the default mode; if not set, it uses
-1024x768x256 as default mode or, if that is not possible, 640x480x16
-(standard VGA)."
-
-@node macintosh, mf, linux_, terminal_
+@node macintosh, mf, linux, terminal_
 @subsubsection macintosh
 
 @c ?set terminal macintosh
@@ -17533,9 +17583,10 @@ This terminal produces files in the W3C Scalable Vector Graphics format.
 
 Syntax:
 @example
-      set terminal svg @{size <x> <y> @{|fixed|dynamic@}@}
+      set terminal svg @{size <x>,<y> @{|fixed|dynamic@}@}
                        @{@{no@}enhanced@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
+                       @{font "<fontname>@{,<fontsize>@}"@}
                        @{fontfile <filename>@}
                        @{rounded|butt@} @{linewidth <lw>@}
 
@@ -18435,7 +18486,8 @@ the defaults (persist == no and raise == yes) or the command line options
 -persist / -raise or the Xresources are taken.  If [no]persist or
 [no]raise are specified, they will override command line options and
 Xresources.  Setting one of these options takes place immediately, so
-the behaviour of an already running driver can be modified.
+the behaviour of an already running driver can be modified.  If the window
+does not get raised, see discussion in @ref{raise}.
 
 The option `title "<title name>"` will supply the title name of the window
 for the current plot window or plot window <n> if a number is given.
@@ -18929,7 +18981,8 @@ the defaults (persist == no and raise == yes) or the command line options
 -persist / -raise or the Xresources are taken.  If [no]persist or
 [no]raise are specified, they will override command line options and
 Xresources.  Setting one of these options takes place immediately, so
-the behaviour of an already running driver can be modified.
+the behaviour of an already running driver can be modified.  If the window
+does not get raised, see discussion in @ref{raise}.
 
 The option `title "<title name>"` will supply the title name of the window
 for the current plot window or plot window <n> if a number is given.
@@ -19459,6 +19512,8 @@ libraries and may have been fixed indepently of any changes in gnuplot.
 @cmindex load
 
 
+@cindex nohidden3d
+
 Floating point exceptions (floating point number too large/small, divide by
 zero, etc.) may occasionally be generated by user defined functions.  Some of
 the demos in particular may cause numbers to exceed the floating point range.
@@ -19480,6 +19535,9 @@ to 1 second.  This is in particular a limitation in using time format to
 handle geographic coordinates.
 
 Error bars are not handled properly in polar/spherical coordinate plot modes.
+
+The 'nohidden3d' option that is supposed to exempt individual plots from the
+global property 'set hidden3d' does not work for parametric curves.
 
 
 @node Specific_terminals, External_libraries, Gnuplot_limitations, Bugs

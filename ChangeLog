@@ -1,3 +1,7 @@
+2006-09-12  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* docs/gnuplot.doc (format specifiers): Fix typo in one example.
+
 2006-09-11  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp (wxtConfigDialog::OnButton):
@@ -21,8 +25,8 @@
 
 2006-09-01  Juergen Wieferink  <wieferink@freenet.de>
 
-	* src/command.c (string_expand): Fix segfault if a truly enormous string
-	is to be used as an input line.
+	* src/command.c (string_expand): Fix segfault if a truly enormous
+	string is to be used as an input line.
 
 2006-09-01  Petr Mikulik  <mikulik@physics.muni.cz>
 

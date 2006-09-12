@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.384 2006/09/01 09:58:44 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.385 2006/09/01 13:13:36 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5937,7 +5937,7 @@ C ... and restart the table:
  Examples:
        set format y "%t"; set ytics (5,10)          # "5.0" and "1.0"
        set format y "%s"; set ytics (500,1000)      # "500" and "1.0"
-       set format y "+-12.3f"; set ytics(12345)     # "+12345.000  "
+       set format y "%+-12.3f"; set ytics(12345)    # "+12345.000  "
        set format y "%.2t*10^%+03T"; set ytic(12345)# "1.23*10^+04"
        set format y "%s*10^{%S}"; set ytic(12345)   # "12.345*10^{3}"
        set format y "%s %cg"; set ytic(12345)       # "12.345 kg"
