@@ -1,3 +1,9 @@
+2006-09-14  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in: Bump the required version of pango to 1.10.3 to fix a
+	bug in earlier versions about scaling matrix not being applied properly
+	to the fonts.
+
 2006-09-12  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* docs/gnuplot.doc (format specifiers): Fix typo in one example.
