@@ -3,6 +3,9 @@
 	* src/wxterminal/wxt_gui.cpp (DrawToDC): Fill in gray the empty space
 	that has been let by a change in the aspect ratio of the window.
 
+	* trm/wxt.trm (TERM_HELP): Try to document the window resize behaviour
+	a little better.
+
 2006-09-14  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in: Bump the required version of pango to 1.10.3 to fix a

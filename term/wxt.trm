@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.15 2006/07/22 00:01:29 sfeam Exp $
+ * $Id: wxt.trm,v 1.16 2006/07/24 17:13:25 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -324,9 +324,14 @@ START_HELP(wxt)
 " different device.  A plot window can be closed by pressing the letter 'q'",
 " while that window has input focus, by choosing `close` from a window",
 " manager menu, or with `set term wxt <n> close`.",
-" The size of a plot may be changed by resizing the terminal window. The aspect",
-" ratio of the plot will be conserved, and the contents will be scaled, fonts",
-" and linewidths included.",
+"",
+" When you resize a window, the plot is immediately scaled to fit in the",
+" new size of the window. Unlike other interactive terminals, the `wxt`",
+" terminal scales the whole plot, including fonts and linewidths, and keeps",
+" its global aspect ratio constant, leaving an empty space painted in gray.",
+" If you type `replot`, click the `replot` icon in the terminal toolbar or",
+" type a new `plot` command, the new plot will completely fit in the window",
+" and the font size and the linewidths will be reset to their defaults.",
 "",
 " The active plot window (the one selected by `set term wxt <n>`) is",
 " interactive. Its behaviour is shared with other terminal types. See `mouse`",
