@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.21 2006/07/28 00:03:19 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.26 2006/09/11 21:48:38 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -642,6 +642,23 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 #else
 	dc.DrawBitmap(*cairo_bitmap, 0, 0, false);
 #endif
+
+	/* fill in gray when the aspect ratio conservation has let empty space in the panel */
+	if (plot.device_xmax*plot.ymax > plot.device_ymax*plot.xmax) {
+		dc.SetPen( *wxTRANSPARENT_PEN );
+		dc.SetBrush( wxBrush( wxT("LIGHT GREY"), wxSOLID ) );
+		dc.DrawRectangle(plot.xmax/plot.oversampling_scale*plot.xscale,
+				0,
+				plot.device_xmax - plot.xmax/plot.oversampling_scale*plot.xscale,
+				plot.device_ymax);
+	} else if (plot.device_xmax*plot.ymax < plot.device_ymax*plot.xmax) {
+		dc.SetPen( *wxTRANSPARENT_PEN );
+		dc.SetBrush( wxBrush( wxT("LIGHT GREY"), wxSOLID ) );
+		dc.DrawRectangle(0,
+				plot.ymax/plot.oversampling_scale*plot.yscale,
+				plot.device_xmax,
+				plot.device_ymax - plot.ymax/plot.oversampling_scale*plot.yscale);
+	}
 
 #ifdef USE_MOUSE
 	if (wxt_zoombox) {
