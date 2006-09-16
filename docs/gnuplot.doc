@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.385 2006/09/01 13:13:36 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.386 2006/09/12 19:47:01 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5820,13 +5820,14 @@ C ... and restart the table:
        set format {<axes>} {'<format-string>'}
        show format
 
- where <axes> is either `x`, `y`, `z`, `cb`, `xy`, `x2`, `y2` or nothing (which
- is the same as `xy`).  The length of the string representing a tic mark (after
- formatting with 'printf') is restricted to 100 characters.  If the format
- string is omitted, the format will be returned to the default "% g".  For
- LaTeX users, the format "$%g$" is often desirable.  If the empty string "" is
- used, no label will be plotted with each tic, though the tic mark will still
- be plotted.  To eliminate all tic marks, use `unset xtics` or `unset ytics`.
+ where <axes> is either `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb` or
+ nothing (which refers to all axes at once).  The length of the string
+ representing a tic mark (after formatting with 'printf') is restricted
+ to 100 characters.  If the format string is omitted, the format will
+ be returned to the default "% g".  For LaTeX users, the format "$%g$"
+ is often desirable.  If the empty string "" is used, no label will be
+ plotted with each tic, though the tic mark will still be plotted.  To
+ eliminate all tic marks, use `unset xtics` or `unset ytics`.
 
  Newline (\n) is accepted in the format string.  Use double-quotes rather than
  single-quotes to enable such interpretation.  See also `syntax`.

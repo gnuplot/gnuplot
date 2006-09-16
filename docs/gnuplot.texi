@@ -7931,13 +7931,14 @@ Syntax:
 
 @end example
 
-where <axes> is either `x`, `y`, `z`, `cb`, `xy`, `x2`, `y2` or nothing (which
-is the same as `xy`).  The length of the string representing a tic mark (after
-formatting with 'printf') is restricted to 100 characters.  If the format
-string is omitted, the format will be returned to the default "% g".  For
-LaTeX users, the format "$%g$" is often desirable.  If the empty string "" is
-used, no label will be plotted with each tic, though the tic mark will still
-be plotted.  To eliminate all tic marks, use @ref{xtics} or @ref{ytics}.
+where <axes> is either `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb` or
+nothing (which refers to all axes at once).  The length of the string
+representing a tic mark (after formatting with 'printf') is restricted
+to 100 characters.  If the format string is omitted, the format will
+be returned to the default "% g".  For LaTeX users, the format "$%g$"
+is often desirable.  If the empty string "" is used, no label will be
+plotted with each tic, though the tic mark will still be plotted.  To
+eliminate all tic marks, use @ref{xtics} or @ref{ytics}.
 
 Newline (\n) is accepted in the format string.  Use double-quotes rather than
 single-quotes to enable such interpretation.  See also `syntax`.
