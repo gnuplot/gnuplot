@@ -1,3 +1,11 @@
+2006-09-16  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in: Rework the checks for cairo and pango so that the error
+	messages are more helpful, mostly by copying the defaults pkg-config
+	messages and making them non-fatal.
+	Revert the minimum version of pango to 1.10.0 but refuse to compile the
+	wxWidgets terminal with pango 1.10.2.
+
 2006-09-16  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* docs/gnuplot.doc (set format): Make documentation for missing

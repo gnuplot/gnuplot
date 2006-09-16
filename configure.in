@@ -906,30 +906,54 @@ if test "${enable_wxwidgets}" = yes ; then
   fi
 
   dnl Check for Cairo
-  PKG_CHECK_MODULES(CAIRO, [cairo >= 0.9.0],
-    [HAVE_CAIRO=1], dnl not used, but may solve problems with some pkg-config
-    [AC_MSG_WARN([Cairo can't be found. The wxWidgets terminal will not be compiled.])
-    enable_wxwidgets_ok=no
-  ])
+  PKG_CHECK_MODULES(CAIROPANGO, [cairo >= 0.9.0 pango >= 1.10 pangocairo >= 1.10],
+    [HAVE_CAIROPANGO=1], dnl not used, but may solve problems with some pkg-config
+    [if test $pkg_failed = yes; then
+	AC_MSG_WARN(dnl
+[Package requirements (cairo >= 0.9.0 pango >= 1.10 pangocairo >= 1.10) were not met:
 
-  dnl Check for Pango
-  PKG_CHECK_MODULES(PANGO, [pango >= 1.10.3],
-    [HAVE_PANGO=1], dnl not used, but may solve problems with some pkg-config
-    [AC_MSG_WARN([Pango can't be found. The wxWidgets terminal will not be compiled.])
-    enable_wxwidgets_ok=no
-  ])
+$CAIROPANGO_PKG_ERRORS
 
-  dnl Check for Pango
-  PKG_CHECK_MODULES(PANGOCAIRO, [pangocairo >= 1.10.3],
-    [HAVE_PANGOCAIRO=1], dnl not used, but may solve problems with some pkg-config
-    [AC_MSG_WARN([Cairo rendering support for Pango can't be found. The wxWidgets terminal will not be compiled.])
-    enable_wxwidgets_ok=no
-  ])
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you can avoid the need to call pkg-config if you set the
+environment variables CAIROPANGO_CFLAGS and CAIROPANGO_LIBS to the
+corresponding flags for cairo, pango, and pangocairo.
+See the pkg-config man page for more details.
+
+The wxWidgets terminal will not be compiled.])
+    elif test $pkg_failed = untried; then
+	AC_MSG_WARN(dnl
+[The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you can avoid the need to call pkg-config if you set the
+environment variables CAIROPANGO_CFLAGS and CAIROPANGO_LIBS to the
+corresponding flags for cairo, pango, and pangocairo.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://www.freedesktop.org/software/pkgconfig>.
+
+The wxWidgets terminal will not be compiled.])
+    fi
+    enable_wxwidgets_ok=no])
+
+  dnl Check for buggy Pango 1.10.2
+  PKG_CHECK_MODULES(PANGO_1_10_2, [pango = 1.10.2],
+    [AC_MSG_WARN(dnl
+[Pango 1.10.2 has been found. This version has a bug which gives unexpected
+results in the wxWidgets terminal. If you want to use this terminal, please
+install a different version of Pango.])
+    enable_wxwidgets_ok=no],
+    [AC_MSG_RESULT([no])
+    HAVE_PANGO_1_10_2=0])
 fi
 
 if test "${enable_wxwidgets_ok}" = yes ; then
-  WX_CXXFLAGS="`$WX_CONFIG --cxxflags | sed 's/-fno-exceptions//'` $CAIRO_CFLAGS $PANGO_CFLAGS"
-  WX_LIBS="`$WX_CONFIG --libs` $CAIRO_LIBS $PANGO_LIBS $PANGOCAIRO_LIBS"
+  WX_CXXFLAGS="`$WX_CONFIG --cxxflags | sed 's/-fno-exceptions//'` $CAIROPANGO_CFLAGS"
+  WX_LIBS="`$WX_CONFIG --libs` $CAIROPANGO_LIBS"
 
   dnl Check for gtk (raise/lower tweaks)
   PKG_CHECK_MODULES(GTK, [gtk+-2.0], have_gtk=yes, have_gtk=no)
@@ -945,7 +969,7 @@ if test "${enable_wxwidgets_ok}" = yes ; then
     AC_DEFINE(HAVE_GTK28, 1, [Define to use gtk+ functions to handle cairo])
   fi
 
-  CPPFLAGS="$CPPFLAGS $CAIRO_CFLAGS $PANGO_CFLAGS"
+  CPPFLAGS="$CPPFLAGS $CAIROPANGO_CFLAGS"
   CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS"
   AC_SUBST(WX_LIBS)
   AC_DEFINE(WXWIDGETS,1, [ Define if you want the wxwidgets terminal. ])
