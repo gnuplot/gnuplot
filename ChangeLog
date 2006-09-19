@@ -1,3 +1,10 @@
+2006-09-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/show.c (disp_value): Force clean printout of "NaN" on save, print,
+	or show commands.  Without this, the value is printed as "nan.0",
+	which is not parsable by set or load commands.
+	Bugfix #1544347
+
 2006-09-16  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in: Rework the checks for cairo and pango so that the error
