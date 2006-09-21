@@ -1,3 +1,7 @@
+2006-09-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp (DrawToDC): Fix double cast warnings.
+
 2006-09-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (disp_value): Force clean printout of "NaN" on save, print,

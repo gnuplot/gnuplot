@@ -647,17 +647,17 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 	if (plot.device_xmax*plot.ymax > plot.device_ymax*plot.xmax) {
 		dc.SetPen( *wxTRANSPARENT_PEN );
 		dc.SetBrush( wxBrush( wxT("LIGHT GREY"), wxSOLID ) );
-		dc.DrawRectangle(plot.xmax/plot.oversampling_scale*plot.xscale,
+		dc.DrawRectangle((int) (plot.xmax/plot.oversampling_scale*plot.xscale),
 				0,
-				plot.device_xmax - plot.xmax/plot.oversampling_scale*plot.xscale,
+				plot.device_xmax - (int) (plot.xmax/plot.oversampling_scale*plot.xscale),
 				plot.device_ymax);
 	} else if (plot.device_xmax*plot.ymax < plot.device_ymax*plot.xmax) {
 		dc.SetPen( *wxTRANSPARENT_PEN );
 		dc.SetBrush( wxBrush( wxT("LIGHT GREY"), wxSOLID ) );
 		dc.DrawRectangle(0,
-				plot.ymax/plot.oversampling_scale*plot.yscale,
+				(int) (plot.ymax/plot.oversampling_scale*plot.yscale),
 				plot.device_xmax,
-				plot.device_ymax - plot.ymax/plot.oversampling_scale*plot.yscale);
+				(int) (plot.device_ymax - plot.ymax/plot.oversampling_scale*plot.yscale));
 	}
 
 #ifdef USE_MOUSE
