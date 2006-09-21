@@ -1,6 +1,7 @@
 2006-09-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp (DrawToDC): Fix double cast warnings.
+	Fix a lazy constructor that seems not to be accepted on all setups.
 
 2006-09-19  Ethan A Merritt  <merritt@u.washington.edu>
 

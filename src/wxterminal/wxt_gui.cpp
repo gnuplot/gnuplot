@@ -662,7 +662,7 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 
 #ifdef USE_MOUSE
 	if (wxt_zoombox) {
-		tmp_pen = wxPen( wxT("BLACK") );
+		tmp_pen = wxPen(wxT("black"), 1, wxSOLID);
 		tmp_pen.SetCap( wxCAP_ROUND );
 		dc.SetPen( tmp_pen );
 		dc.SetLogicalFunction( wxINVERT );
