@@ -899,8 +899,8 @@ if test "${enable_wxwidgets}" = yes ; then
   else
 
     dnl Ckeck for wxWidgets version
-    if expr 2.6.0 \> `${WX_CONFIG} --version` >/dev/null; then
-      AC_MSG_WARN([Your development package for wxWidgets is too old, you need at least version 2.6.0. The wxWidgets terminal will not be compiled.])
+    if expr 2.5.3 \> `${WX_CONFIG} --version` >/dev/null; then
+      AC_MSG_WARN([Your development package for wxWidgets is too old, you need at least version 2.5.3. The wxWidgets terminal will not be compiled.])
       enable_wxwidgets_ok=no
     fi
   fi
