@@ -1,5 +1,8 @@
 2006-09-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
+	* configure.in: Bump required version of wxWidgets to 2.6.0 for the
+	wxt terminal.
+
 	* src/wxterminal/wxt_gui.cpp (DrawToDC): Fix double cast warnings.
 	Fix a lazy constructor that seems not to be accepted on all setups.
 
