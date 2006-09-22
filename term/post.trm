@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.200 2006/08/10 04:41:54 sfeam Exp $
+ * $Id: post.trm,v 1.201 2006/08/11 21:41:31 tlecomte Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1852,36 +1852,24 @@ PS_vector(unsigned int x, unsigned int y)
     if (!PS_relative_ok)
 	PS_move(PS_pen_x, PS_pen_y);
 
-    if (strlen(rel) < strlen(abso)) {
-	fputs(rel, gppsfile);
-	PS_taken++;
-    } else
-	fputs(abso, gppsfile);
-
-    PS_relative_ok = TRUE;
-    ps_path_count += 1;
-    PS_pen_x = x;
-    PS_pen_y = y;
     /* Ghostscript has a "pile-up of rounding errors" bug: a sequence of many
      * rmove's or rlineto's does not give the same line made aby move's or
      * lineto's.
      * Therefore, let us do a stroke very often. There was a case when 400
      * rlineto's were too much, so let's go a little bit higher than the default
      * function sampling rate in gnuplot. */
-    if (ps_path_count >= 105) {
-#if 0 /* Code up to February 2003: it uses the current position as calculated
-       * by the RIP. */
-	fputs("currentpoint stroke M\n", gppsfile);
+    if (strlen(rel) < strlen(abso) && ps_path_count < 105) {
+	fputs(rel, gppsfile);
+	PS_taken++;
+	ps_path_count += 1;
+    } else {
+	fputs(abso, gppsfile);
 	ps_path_count = 0;
-#else
-	/* Don't rely on RIP's value of the current position due to the
-	 * above-mentioned bug in ghostscript. A macro is used to make a stroke
-	 * and then let PS_relative_ok=FALSE so that the next call to
-	 * PS_vector() starts with an absolute position of the current
-	 * PS_vector(). */
-	PS_FLUSH_PATH;
-#endif
     }
+
+    PS_relative_ok = TRUE;
+    PS_pen_x = x;
+    PS_pen_y = y;
 }
 
 

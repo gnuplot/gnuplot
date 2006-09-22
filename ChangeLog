@@ -1,3 +1,14 @@
+2006-09-22  Juergen Wieferink  <wieferink@freenet.de>
+
+	* term/post.trm (PS_vector): To avoid accummulated error in a long
+	series of relative moves or draws, we were issuing a "stroke" command
+	periodically to force an update of the absolute position. This has the
+	bad side affect of resetting the current dot/dash pattern.  Fix this so
+	that instead of using "stroke", we simply force an absolute vector
+	before continuing. This avoids accummulated error but does not reset
+	the dot/dash pattern.
+	Bugfix #1542050
+
 2006-09-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in: Bump required version of wxWidgets to 2.5.3 for the
