@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.201 2006/08/11 21:41:31 tlecomte Exp $
+ * $Id: post.trm,v 1.202 2006/09/22 21:42:50 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1853,11 +1853,11 @@ PS_vector(unsigned int x, unsigned int y)
 	PS_move(PS_pen_x, PS_pen_y);
 
     /* Ghostscript has a "pile-up of rounding errors" bug: a sequence of many
-     * rmove's or rlineto's does not give the same line made aby move's or
+     * rmove's or rlineto's does not yield the same line made by move's or
      * lineto's.
-     * Therefore, let us do a stroke very often. There was a case when 400
-     * rlineto's were too much, so let's go a little bit higher than the default
-     * function sampling rate in gnuplot. */
+     * Therefore, we periodically force an update of the absolute position.
+     * There was a case when 400 rlineto's were too much, so let's go a little
+     * bit higher than the default function sampling rate in gnuplot. */
     if (strlen(rel) < strlen(abso) && ps_path_count < 105) {
 	fputs(rel, gppsfile);
 	PS_taken++;
