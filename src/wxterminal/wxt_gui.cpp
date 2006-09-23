@@ -734,13 +734,10 @@ void wxtPanel::OnSize( wxSizeEvent& event )
 	new_yscale = ((double) plot.device_ymax)*plot.oversampling_scale/((double) plot.ymax);
 
 	/* We will keep the aspect ratio constant */
-	if (new_yscale == new_xscale) {
-		plot.xscale = new_xscale;
-		plot.yscale = new_yscale;
-	} else if (new_yscale < new_xscale) {
+	if (new_yscale < new_xscale) {
 		plot.xscale = new_yscale;
 		plot.yscale = new_yscale;
-	} else if (new_yscale > new_xscale) {
+	} else {
 		plot.xscale = new_xscale;
 		plot.yscale = new_xscale;
 	}
