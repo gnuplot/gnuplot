@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.64 2005/09/05 19:36:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.65 2006/06/15 15:42:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -999,8 +999,8 @@ set_plot_with_palette(int plot_num, int plot_mode)
 		return;
 #endif
 	    if (this_3dplot->lp_properties.use_palette) {
-		if (this_3dplot->lp_properties.pm3d_color.type != TC_DEFAULT)
-		    /* can this really happen? for which syntax? */
+	        int type = this_3dplot->lp_properties.pm3d_color.type;
+		if (type == TC_LT || type == TC_LINESTYLE || type == TC_RGB)
 		    want_palette_but_not_colorbox = TRUE;
 		    /* don't return yet -- decide later whether showing color box is desirable */
 		else

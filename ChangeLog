@@ -1,3 +1,10 @@
+2006-09-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c (set_plot_with_palette): It used to be that all plots
+	needing a colorbox had pm3d_color.type == TC_DEFAULT.  This is no longer
+	true, so add a more specific check on whether a colorbox is needed.
+	Bugfix.
+
 2006-09-23  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp (wxtPanel::OnSize): Clean floating-point
