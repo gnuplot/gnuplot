@@ -1,8 +1,8 @@
 %% Don't forget to change the paper format in the next line
 %
-% $Id: faq-j.tex,v 1.10 2006-03-26 11:53:15+09 shige Exp $
+% $Id: faq-ja.tex,v 1.12 2006-09-10 20:40:55+09 shige Exp $
 % translated to Japanese by Shigeharu TAKENO 2005/03/14
-% Original: Id: faq.tex,v 1.19 2006/01/19 09:57:54 mikulik Exp
+% Original: Id: faq.tex,v 1.23 2006/09/10 10:30:58 mikulik Exp $
 %
 %
 %\documentclass[a4paper,11pt]{article}
@@ -110,14 +110,14 @@
 % versions or (recent) beta versions are explicitly marked.
 
 \noindent
-%% This document deals with \gnuplot{} version 4.0 which is the
-%% latest official release as of April 2004.
-この文書では、2004 年 4 月にリリースされた \gnuplot{} の正式最新版である %
-version 4.0 を取り扱っています。
+%% This document deals with \gnuplot{} version 4.2 which is the
+%% latest official release as of September 2006.
+この文書では、2006 年 9 月にリリースされた \gnuplot{} の正式最新版である %
+version 4.2 を取り扱っています。
         \\
 この文書のバージョンは %
-\verb+$+\verb+Revision: 1.19 $+,
-\verb+$+\verb+Date: 2006/01/19 09:57:54 $+ です。
+\verb+$+\verb+Revision: 1.23 $+,
+\verb+$+\verb+Date: 2006/09/10 10:30:58 $+ です。
 % 少し細工をしないと RCS に書き換えられてしまう。
 
 
@@ -868,10 +868,16 @@ Tiff 6 パックビットを選択すれば最もその増加を押えることができます。
 %% Into some office applications, like OpenOffice.org, or into applications 
 %% in the
 %% Windows world, you can insert vectorial images produces by the emf terminal
-%% type.
+%% type. OpenOffice.org can also read AutoCAD's dxf format, as well as SVG
+%% thanks to SVG Import Filter
+%% \http{http://www.ipd.uni-karlsruhe.de/~hauma/svg-import/}.
 OpenOffice.org のようないくつかのオフィスアプリケーション、
 あるいは Windows の世界に持って行く場合は、
 emf 出力形式で生成されるベクトル画像を使用することができます。
+OpenOffice.org は AutoCAD の dxf 形式も読みこむこともでき、
+SVG 読み込みフィルタ
+\http{http://www.ipd.uni-karlsruhe.de/~hauma/svg-import/}
+によって SVG 形式も読み込むことができます。
 
 %% With \TeX, it depends on what you use to print your dvi files.
 %% If you use dvips or dvi2ps, you can use Encapsulated PostScript. For emTeX
@@ -956,16 +962,21 @@ tgif 出力形式を使うこともできます。
 
 %% \item You may use the svg terminal (scalable vector graphics), which can
 %% be further edited by a svg editor, e.g. 
+%% \textbf{Inkscape} (\http{www.inkscape.org}),
 %% \textbf{Sodipodi} (\http{sodipodi.sourceforge.net}),
 %% \textbf{Sketch} (\http{sketch.sourceforge.net}) or
-%% \textbf{Dia} (\http{www.lysator.liu.se/~alla/dia}).
+%% \textbf{Dia} (\http{www.lysator.liu.se/~alla/dia}), or loaded
+%% into \textbf{OpenOffice.org} with an on-fly conversion into OO.o Draw
+%% primitives.
 \item svg 出力形式 (scalable vector graphics) を使うこともできます。
 これは %
-\textbf{Sodipodi} \\
-(\http{sodipodi.sourceforge.net}),
+\textbf{Inkscape} (\http{www.inkscape.org}),
+\textbf{Sodipodi} (\http{sodipodi.sourceforge.net}),
 \textbf{Sketch} (\http{sketch.sourceforge.net}), 
-\textbf{Dia} (\http{www.lysator.liu.se/~alla/dia}) %
-のような svg エディタで更なる編集も行なえます。
+\textbf{Dia} (\http{www.lysator.liu.se/~alla/dia}), 
+のような svg エディタで更なる編集も行なえますし、
+\textbf{OpenOffice.org} (OO.o Draw プリミティブへの変換によって) 
+の中に取り込むこともできます。
 
 %% \item PostScript or PDF output can be edited directly by tools such
 %% as Adobe Illustrator or Acrobat, or can be converted to a variety
@@ -979,6 +990,11 @@ pstoedit は \http{www.pstoedit.net} にあります。
 
 %% \item The mif terminal type produces an editable FrameMaker document.
 \item mif 出力形式は FrameMaker で編集できる文書を生成します。
+
+%% \item The DXF format is the AutoCAD's format, editable by several
+%% other applications.
+\item DXF 出力形式は AutoCAD の書式で、他のいくつかのアプリケーションでも
+編集できます。
 
 %% \item Bitmapped graphics (e.g. png, jpeg, pbm) can be edited using
 %% tools such as ImageMagick or Gimp.  
@@ -1013,39 +1029,50 @@ gnuplot は、例えば色や太さや点の形などの、
 %% \subsection{How do I generate plots in GIF format?}
 \subsection{どうやったら GIF フォーマットの画像を作れますか}
 
-%% GIF support was provided by an external library, libgd.
-%% Version 1.6 of the gd library dropped support for gif in favour of the
-%% superior png format. More recent versions of libgd also support jpeg
-%% output.  If your installation of gnuplot is linked to the gd library,
-%% you will get support for whatever formats (gif, png, jpeg) are in that
-%% version of libgd.
-GIF のサポートは外部のライブラリである libgd で与えられていましたが、
-Version 1.6 の gd ライブラリは、より優れている png 形式に味方して、
-gif のサポートをやめてしまいました。
-より最近の libgd では jpeg 出力もサポートされています。
-もしその gd ライブラリをリンクして gnuplot をインストールしたのであれば、
-その版の libgd ではいずれの形式 (gif, png, jpeg) も含まれているので、
+%% GIF support is provided by an external library, libgd
+%% (\http{www.boutell.com/gd/}).
+%% Old versions of gd (versions 1.2 to 1.4) produce only GIF output. 
+%% Versions 1.6
+%% to 2.0.27 do not support GIF output because of patent concerns. However
+%% versions 1.6 and newer support PNG outputs, and 1.7 and newer support JPEG
+%% outputs. Version 2.0.28 of the Boutell gd library restored GIF 
+%% functionality,
+%% and 2.0.29 added support for GIF animation. If your installation of 
+%% \gnuplot is
+%% linked to the gd library, you will get support for whatever formats 
+%% (GIF, PNG,
+%% JPEG) are in that version of gd.
+GIF のサポートは外部のライブラリである libgd (\http{www.boutell.com/gd/})
+で与えられています。
+古いバージョンの gd (バージョン 1.2 から 1.4 まで) は GIF 出力のみ
+生成していましたが、
+バージョン 1.6 から 2.0.27 までは特許の問題で GIF 出力を
+サポートしませんでした。
+しかし、バージョン 1.6 以降は PNG 出力をサポートし、
+1.7 以降は JPEG 出力もサポートしています。
+Boutell の gd ライブラリのバージョン 2.0.28 では GIF 出力を復活し、
+2.0.29 では GIF アニメーションのサポートも追加されました。
+あなたの使用している \gnuplot が gd ライブラリをリンクして作られたものならば、
+その版の gd ではいずれの形式 (GIF, PNG, JPEG) も含まれているので、
 それらはいずれもサポートされています。
 
-%% Thus, nowadays, the usual way is to output the image as png and then use your
-%% favourite program to convert it into gif, either using command line (e.g.
-%% \verb+convert f.png f.gif+ or \verb+nconvert -out gif f.png+) or by any GUI
-%% program. Another possibility is to output the image as (encapsulated) 
-%% postscript
-%% and convert (export) it into gif or png by ghostscript, e.g.
-%% \verb+convert -density 150 f.eps f.gif+ or by any ghostscript-based GUI 
-%% like gsview,
-%% gv or kghostview.
-よって、現在の一般的な方法は、png 画像を出力させ、
-それを適当なプログラムを使って、
-コマンドラインから %
-(例えば \verb+convert f.png f.gif+ や \verb+nconvert -out gif f.png+ 等)、
-あるいは GUI ツールによって変換させることでしょう。
+%% In any case, it is easy to convert from one format to another. To convert 
+%% a PNG
+%% output into GIF, you can either use the command line (e.g.
+%% \verb+convert f.png f.gif+ or \verb+nconvert -out gif f.png+) or any GUI
+%% program. Another possibility is to output the image as (encapsulated)
+%% postscript and convert (export) it into GIF or PNG by ghostscript, e.g.
+%% \verb+convert -density 150 f.eps f.gif+ or by any ghostscript-based GUI like
+%% gsview, gv or kghostview.
+いずれにせよ、ある画像形式から他の形式へ変換するのも面倒ではありません。
+例えば PNG 出力を GIF に変換するには、コマンドラインから %
+(例えば \verb+convert f.png f.gif+ や \verb+nconvert -out gif f.png+ など)
+でも、適当な GUI ツールからでもできるでしょう。
 他にも、postscript (EPS) 画像として出力させ、
 それを ghostscript によって、
 例えば \verb+convert -density 150 f.eps f.gif+ のようにして、
 あるいは gsview, gv, kghostview などの ghostscript ベースの GUI ツールによって %
-gif や png に変換するという手があります。
+GIF や PNG に変換するという手があります。
 
 
 %% \subsection{Can I animate my graphs?}
@@ -1058,13 +1085,18 @@ gif や png に変換するという手があります。
 基本的にグラフのアニメーションは、
 適当なフォーマットの複数の描画の列で表現されます。
 
-%% Then have a look at the tool whirlgif 3.04, available at
+%% If your installation of \gnuplot is linked with gd 2.0.29 or newer (see
+%% previous entry), the gif terminal can generate directly an animated GIF.
+あなたの \gnuplot が gd 2.0.29 以降 (直前の項参照) をリンクして作られたもの
+であれば、gif 出力形式で直接アニメーション GIF 画像を作成できます。 
+
+%% Otherwise, have a look at the tool whirlgif 3.04, available at
 %% \http{www.danbbs.dk/~dino/whirlgif}. It reads run-length 
-%% encoded gifs and packs them into a minimal animation.
+%% encoded GIF files and packs them into a minimal animation.
 %% On the web-pages you will find a manual and an example.
-そして、\http{www.danbbs.dk/~dino/whirlgif} にある %
+そうでなければ、\http{www.danbbs.dk/~dino/whirlgif} にある %
 whirlgif 3.04 というツールを入手してください。
-それはランレングス圧縮された複数の gif ファイルを読んで、
+それはランレングス圧縮された複数の GIF ファイルを読んで、
 それらを最小のアニメーションファイルにまとめます。 
 マニュアルや例は、その Web ページで参照できます。
 
@@ -1475,11 +1507,12 @@ gnuplot は曲面や 3 次元の物体を仮想現実としては描画しません。
 \subsection{\gnuplot{} 3.7, 4.0 等で新しくなったことは}
 
 %% Too many things to be named here.
-%% Please refer to the \texttt{NEWS} file in the source distribution, or the News
-%% section in the gnuplot documentation.
+%% Please refer to the \texttt{NEWS} file in the source distribution, or the
+%% "New features" section in the gnuplot documentation.
 ここに記すには多すぎます。
 ソース配布物に含まれるファイル \texttt{NEWS}、
-あるいは gnuplot のヘルプドキュメントの News のセクションを参照してください。
+あるいは gnuplot のヘルプドキュメントの "New features" のセクションを
+参照してください。
 
 
 %% \subsection{Does \gnuplot{} support a driver for <graphics format>?}

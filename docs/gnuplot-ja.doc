@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.129 2006-09-02 11:30:13+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.385
+C RCS $Id: gnuplot-ja.doc,v 1.131 2006-09-17 20:12:12+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.387
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5948,13 +5948,14 @@ C ... and restart the table:
        set format {<axes>} {'<format-string>'}
        show format
 
- ここで、<axes> (軸) は `x`, `y`, `z`, `cb`, `xy`, `x2`, `y2`、または
- 何も指定しない (`xy` と同じ) かのいずれかです。刻みの見出しの文字列の
- 長さ ('printf' で整形された後の) は 100 文字まで、と制限されています。
- 書式文字列 (<format-string>) を省略した場合、それはデフォルトの "% g"
- になります。LaTeX ユーザにはよく "$%g$" が好まれます。空の文字列 ""
- を指定した場合、刻み自身は表示されますが見出しはつきません。すべての
- 刻みを消すには `unset xtics` や `unset ytics` を使用してください。
+ ここで、<axes> (軸) は `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb`、または
+ 何も指定しない (その場合、一度にすべての軸を参照します) のいずれかで
+ す。刻みの見出しの文字列の長さ ('printf' で整形された後の) は 100 文
+ 字まで、と制限されています。書式文字列 (<format-string>) を省略した場
+ 合、それはデフォルトの "% g" になります。LaTeX ユーザにはよく "$%g$"
+ が好まれます。空の文字列 "" を指定した場合、刻み自身は表示されますが見
+ 出しはつきません。すべての刻みを消すには、`unset xtics` や 
+ `unset ytics` を使用してください。
 
  改行文字 (\n) も書式文字列で使えます。それを解釈させるには、単一引用符
  (') でなく (") を使ってください。`syntax` の項も参照してください。
@@ -6064,7 +6065,7 @@ C ... and restart the table:
  例:
        set format y "%t"; set ytics (5,10)          # "5.0" と "1.0"
        set format y "%s"; set ytics (500,1000)      # "500" と "1.0"
-       set format y "+-12.3f"; set ytics(12345)     # "+12345.000  "
+       set format y "%+-12.3f"; set ytics(12345)    # "+12345.000  "
        set format y "%.2t*10^%+03T"; set ytic(12345)# "1.23*10^+04"
        set format y "%s*10^{%S}"; set ytic(12345)   # "12.345*10^{3}"
        set format y "%s %cg"; set ytic(12345)       # "12.345 kg"
