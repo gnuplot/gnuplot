@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.192 2006/08/30 16:55:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.193 2006/08/30 22:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2519,6 +2519,13 @@ plot_betweencurves(struct curve_points *plot)
      * If so, split the interval into two parts.
      */
     for (i = 0; i < plot->p_count-1; i++) {
+
+	/* FIXME: This isn't really testing for undefined points, it	*/
+	/* is looking for blank lines. We need to distinguish these.	*/
+	/* Anyhow, if there's a blank line then start a new fill area.	*/
+	if (plot->points[i].type == UNDEFINED
+	    || plot->points[i+1].type == UNDEFINED)
+	    continue;
 
 	x1  = plot->points[i].x;
 	yl1 = plot->points[i].y;

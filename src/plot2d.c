@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.131 2006/07/07 23:51:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.132 2006/07/18 05:24:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -458,17 +458,13 @@ get_data(struct curve_points *current_plot)
 	    continue;
 
         case DF_UNDEFINED:
-            /* bad result from extended using expression, */
-            /* or data field contains missing-data symbol */
+            /* NaN or bad result from extended using expression */
             current_plot->points[i].type = UNDEFINED;
             i++;
             continue;
 
         case DF_FIRST_BLANK:
-#if !defined(WITH_IMAGE) || !defined(BINARY_DATA_FILE)
-            /* break in data, make next point undefined */
-            current_plot->points[i].type = UNDEFINED;
-#else
+#if defined(WITH_IMAGE) && defined(BINARY_DATA_FILE)
             /* The binary input routines generate DF_FIRST_BLANK at the end
              * of scan lines, so that the data may be used for the isometric
              * splots.  Rather than turning that off inside the binary
@@ -478,9 +474,11 @@ get_data(struct curve_points *current_plot)
              */
             if ((current_plot->plot_style == IMAGE) || (current_plot->plot_style == RGBIMAGE))
                 continue;
-            /* break in data, make next point undefined */
-            current_plot->points[i].type = UNDEFINED;
 #endif
+            /* break in data, make next point undefined */
+	    /* FIXME: We really should distinguish between a blank	*/
+	    /*        line and an undefined value on a non-blank line. 	*/
+            current_plot->points[i].type = UNDEFINED;
             i++;
             continue;
 

@@ -1,3 +1,15 @@
+2006-09-26  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/graphics.c (plot_betweencurves): If the input file contains a
+	blank line, terminate current filled area and start a new one.
+	Unfortunately it is not currently possible to distinguish between a
+	blank line and an invalid/missing coordinate.
+
+	* src/plot2d.c (get_data): Add comments to document the problem of
+	distinguishing a blank line from an invalid data point. (EAM)
+
+	Bug #1563430
+
 2006-09-24  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/faq-ja.tex: Sync Japanese documentation,
