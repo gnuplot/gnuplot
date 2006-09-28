@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_plot.h,v 1.4 2006/06/08 17:59:50 tlecomte Exp $
+ * $Id: wxt_plot.h,v 1.5 2006/07/28 00:03:19 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_plot.h */
@@ -53,6 +53,9 @@
 
 #ifndef GNUPLOT_WXT_PLOT_H
 # define GNUPLOT_WXT_PLOT_H
+
+/* for TBOOLEAN */
+#include "syscfg.h"
 
 #ifdef __cplusplus
 extern "C" {
