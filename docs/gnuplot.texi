@@ -99,7 +99,7 @@ Johannes Zellner
 @c ^   Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net <p>
 @c ^</h2><p>
 @c ^<h3> This manual was prepared by Dick Crawford</h3><p>
-@c ^<h3> Last revised: 31 October 2004</h3><p>
+@c ^<h3> Last revised: October 2006</h3><p>
 @c ^<hr>
 
 @menu
