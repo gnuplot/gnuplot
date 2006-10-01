@@ -1,3 +1,9 @@
+2006-10-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* PATCHLEVEL: Mark for first release candidate.
+
+	* VERSION: Bump to version 4.2.
+
 2006-10-01  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* configure.in (AC_INIT, AM_INIT_AUTOMAKE, AC_CONFIG_SRCDIR):
