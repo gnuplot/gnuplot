@@ -5,17 +5,13 @@
 COMMANDS:
 =========
 
--- pm3d doesn't work for concave data, concave in the sense of valid data
-  per scan, where single scans are interrupted by invalid data points. (joze)
-  * Petr: what do you mean? Example?
+-- no problem
 
 
 DOCUMENTATION:
 ==============
 
--- gnuplot.doc
-	- better document that you need a blank line in between scans
-	  for 3D (many people ask why pm3d plots nothing...)
+-- gnuplot.doc: no problem
 
 Recently I've moved importants things from README.os2 into gnuplot.doc and
 INSTALL; those other README.{win, xli, nex} should be
@@ -54,10 +50,6 @@ Pstricks:
 
 Windows:
   -- update its docs from docs/old/README.win, then delete this file
-  -- rotated text is not supported
-	demo/textrotate.dem does not pass correctly
-  -- palette colored text is not supported
-	demo/textcolor.dem does not pass correctly
   -- windows driver does not report font size to windows.trm, thus
      character widht and height are quite useless numbers
   -- update wgnuplot menus
@@ -115,6 +107,7 @@ INSTALLATION --- LINUX:
 
 -- add .spec file and a 'make' target to create RPM file?
    [HBB: no.]
+
 
 INSTALLATION --- VMS:
 =====================
@@ -175,7 +168,6 @@ Lars' list
   former, latter requires reading passwd file (-> not!)
 - general expansion of user defined and environment vars in
   labels?
-- string variables, aliases
 - [Lucas] fix axis ranges, overwritten labels in demos
 - png driver needs update for png versions >=0.95
   must be backwards compatible (do we want to require png >=0.95? We
@@ -201,9 +193,4 @@ Lars' list
 
 HBB:
 [Optional:] See if 16-bit compilations can be made to work again.
-
-Petr:
--- it would be very convenient to set values/formulae for columns in advance,
-   before "plot" --- something like
-        set data using 3:($8/$9+1)
 
