@@ -1,3 +1,7 @@
+2006-10-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.texi docs/doc2texi.el: Update version number to 4.2
+
 2006-10-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* PATCHLEVEL: Mark for first release candidate.

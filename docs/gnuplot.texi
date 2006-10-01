@@ -26,15 +26,15 @@
 
             An Interactive Plotting Program
              Thomas Williams & Colin Kelley
-          Version 4.1 organized by: Hans-Bernhard Broeker
+          Version 4.2 organized by: Hans-Bernhard Broeker
 
  Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 
        Mailing list for comments: gnuplot-info@@lists.sourceforge.net
      Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net
 
-         This manual was prepared by Dick Crawford
-                   3 December 1998
+         This manual was originally prepared by Dick Crawford
+                   Version 4.2 - 1 Oct 2006
 
 
 Major contributors (alphabetic order):
@@ -14494,6 +14494,7 @@ with no modifiers.
 * kyo::                         
 * latex::                       
 * linux::                       
+* linux_::                      
 * macintosh::                   
 * mf::                          
 * mp::                          
@@ -16734,7 +16735,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, macintosh, latex, terminal_
+@node linux, linux_, latex, terminal_
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -16751,7 +16752,24 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node macintosh, mf, linux, terminal_
+@node linux_, macintosh, linux, terminal_
+@subsubsection linux
+
+@c ?commands set terminal linux
+@c ?set terminal linux
+@c ?set term linux
+@c ?terminal linux
+@c ?term linux
+@cindex linux
+@tmindex linux
+
+
+The `linux` driver has no additional options to specify.  It looks at the
+environment variable GSVGAMODE for the default mode; if not set, it uses
+1024x768x256 as default mode or, if that is not possible, 640x480x16
+(standard VGA)."
+
+@node macintosh, mf, linux_, terminal_
 @subsubsection macintosh
 
 @c ?set terminal macintosh
