@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387 2006/09/16 12:14:57 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.1 2006/10/01 23:03:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -247,7 +247,7 @@ C
  See `string variables`.
 
 3 Macros
- Gnuplot support macro expansion  by '@stringvariablename'. 
+ Gnuplot supports command line macro expansion  by '@stringvariablename'. 
  See `macros`.
 
 3 Auto-layout of multiple plots on a page
@@ -3205,11 +3205,11 @@ C ... and restart the table:
  constitutes column 1, repetition of the coordinate column constitutes
  column 2, and the array of values constitutes column 3.
 
- The general binary format contains an arbitrary number of columns fow which
+ The general binary format contains an arbitrary number of columns for which
  information must be specified at the command line.  For example, `array`,
  `record`, `format` and `using` can indicate the size, format and dimension
- of data.  There are a variety of useful commands for skipping file headers,
- changing endianess.  There are a set of commands for positioning and
+ of data.  There are a variety of useful commands for skipping file headers
+ and changing endianess.  There are a set of commands for positioning and
  translating data since often coordinates are not part of the file when
  uniform sampling is inherent in the data.  Different from matrix binary or
  ASCII, general binary does not treat the generated columns as 1, 2 or 3 in
@@ -3278,7 +3278,7 @@ C ... and restart the table:
  The keyword `filetype` in <binary list> controls the routine used to
  read the file, i.e., the format of the data.  For a list of the supported
  file types, type `show datafile binary filetypes`.  If no file type is
- given, the rule is that "traditional" gnuplot binary is assumed for `splot`
+ given, the rule is that traditional gnuplot binary is assumed for `splot`
  if the `binary` keyword stands alone.  In all other circumstances, for
  `plot` or when one of the <binary list> keywords appears, a raw binary
  file is assumed whereby the keywords specify the binary format.
@@ -8932,23 +8932,21 @@ C ... and restart the table:
 ?style image
 ?image
  The `image` style is intendend for plotting 2D images.  It may be used for
- both `plot` and `splot` provided the 3D data (x,y,value) or projected 4D
- data (x,y,z,value) forms a valid grid.  A valid grid is one in which the
- data in the viewing plane is equidistant along two, not necessarily
- orthogonal, directions.  In other words, groups of four adjacent points
- must form the same size parallelogram.  The variable `value` in the tuples
- represent a palette color (gray value) for indexing in the current palette.
+ both `plot` and `splot` in the form of 3D data (x,y,value) or projected 4D
+ data (x,y,z,value), respectively.  It is assumed that in the viewing plane
+ the image data forms an equidistant sampling grid in the viewing plane along
+ two, not necessarily  orthogonal, directions.  In other words, groups of
+ four adjacent points are assumed to form the same size parallelogram.  The
+ variable `value` in the tuples represent a palette color (gray value) for
+ indexing in the current palette.
 
- If the data points form a valid rectangular grid, i.e., a valid grid for
- which the directions are orthogonal and lie along the x and y axes of the
- viewing plane, the `image` style will attempt to create a properly
- positioned and scaled data matrix to match the plot borders for those
- terminals supporting palettes and images.  The result is efficient storage
- and fast refresh.  However, for terminal drivers not supporting palettes
- and images, or those not yet implemented, the `image` style will revert
- to drawing filled rectangular boxes for pixels, which is not as efficient.
- Furthermore, general parallelogram-shaped images have filled parallelograms
- for pixels.
+ The `image` style will attempt to create a properly positioned and scaled
+ data matrix to match the plot borders for those terminals supporting palettes
+ and images.  Such output is efficient and draws quickly.  However, when a
+ terminal driver does not support palettes and images, or when image support
+ is not implemented, the `image` style reverts to drawing filled rectangular
+ boxes for pixels, which is not as efficient.  General parallelogram-shaped
+ images currently always have filled parallelograms for pixels.
 
  The coordinate of each data point of an image will lie at the center of a
  pixel.  That is, an M x N set of data will form an image with M x N pixels.
@@ -8956,7 +8954,7 @@ C ... and restart the table:
  will form a surface of (M-1) x (N-1) elements.  The scan directions for the
  image data grid can be any of eight possible combinations.
 
- Currently only the following terminal drivers support data matrix images:
+ Here are some specific comments about particular terminal drivers:
 
  x11 and wxt - Pixels are either repeated or decimated to fit the display
        resolution; no other processing (filtering) is done.  Thus, aliasing may
@@ -8970,9 +8968,6 @@ C ... and restart the table:
        gd 2.0.4  Truecolor works, but if truecolor is not selected
                  the image comes out blank.
        gd 2.0.9  Truecolor works, non-truecolor also works.
-
- aqua
- pdf, svg
 
  See also `rgbimage`.
 5 impulses
@@ -10468,13 +10463,13 @@ C ... and restart the table:
 ?set cbrange
 ?show cbrange
 ?cbrange
- The `set cbrange` command sets the range of values which are colored according
- to the current `palette` by styles `with pm3d`, `with image` and `with ...
- palette`. Values outside of the color range use color of the nearest extreme.
+ The `set cbrange` command sets the range of values which are colored using
+ the current `palette` by styles `with pm3d`, `with image` and `with palette`.
+ Values outside of the color range use color of the nearest extreme.
 
- If the cb-axis is autoscaled in `splot`, then the range is taken from `zrange`.
- Points drawn in `splot ... pm3d|palette` can be filtered by using different
- `zrange` and `cbrange`.
+ If the cb-axis is autoscaled in `splot`, then the colorbox range is taken from
+ `zrange`.  Points drawn in `splot ... pm3d|palette` can be filtered by using
+ different `zrange` and `cbrange`.
 
  Please see `set xrange` for details on `set cbrange` syntax. See also
  `set palette` and `set colorbox`.
