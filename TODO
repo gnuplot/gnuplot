@@ -5,13 +5,16 @@
 COMMANDS:
 =========
 
--- no problem
+-- (EAM) Iterate over plot commands:   plot for [i=1,n] ....
+-- (EAM) Everything on command line after "load <foo>" is lost; it shouldn't be
+-- (EAM) Fill between curves for functions (already works for data)
+-- (EAM) set object <tag> {circle|ellipse}
 
 
 DOCUMENTATION:
 ==============
 
--- gnuplot.doc: no problem
+-- gnuplot.doc: Add embedded figures from the demo set for PDF and HTML docs
 
 Recently I've moved importants things from README.os2 into gnuplot.doc and
 INSTALL; those other README.{win, xli, nex} should be
@@ -53,7 +56,7 @@ Windows:
   -- windows driver does not report font size to windows.trm, thus
      character widht and height are quite useless numbers
   -- update wgnuplot menus
-  -- repaire the linetype bug in wgraph.c --- crash for
+  -- repair the linetype bug in wgraph.c --- crash for
 		set style fill solid border
 		plot [-2.5:4.5] 100/(1.0+x*x) with boxes lt -1
 	or
@@ -67,13 +70,6 @@ Windows:
 	demos complain about this. This bug is associated to BUG 561418 
 	"(MS Windows) 100% CPU Usage during pause", and to HBB 20001217's note
 	about WaitMessage(); in wpause.c.
-
-Xlib:
-  -- update its docs from docs/old/README.xli, then delete this file
-  -- does the file gnuplib_x11.c still exist somewhere?  As I understand
-     the README, this file was intended as a GPL-compatible interface
-     to gnuplot.
-
 
 TERMINALS, GENERAL COMMENTS:
 ============================
@@ -129,9 +125,6 @@ Projects, in no particular order:
 - revise border command to use keywords
 - put minor tics into demo file
 
-- define either quit or exit to mean finish-this-file, not finish session
-  - at present, they are ignored in script files
-
 longer term
 
 - break it into four layers:
@@ -169,17 +162,8 @@ Lars' list
 - general expansion of user defined and environment vars in
   labels?
 - [Lucas] fix axis ranges, overwritten labels in demos
-- png driver needs update for png versions >=0.95
-  must be backwards compatible (do we want to require png >=0.95? We
-  already require >=0.89; possible compile problems under Irix 6.x which
-  comes with png 0.88/zlib 1.0)
 - write or organise a portable version of snprintf(3) with a copyright
   compatible with the gnuplot copyright (ie. no GPL) (Apache?)
-- gnuplot often doesn't free() memory; rearrange code to do this
-  [memdump() function, command; mem_cleanup(), to be called on
-   exit and reset; check existing code]
-- add Amiga WinGnuplot driver and related files (difficult; cannot get
-  it to run successfully when compiled with gcc)
 - add more maintainer checks (eg. file permissions)
 - better lisp/ files integration (Makefile target to import Bruce's
   latest version). How to handle duplicates?
@@ -193,4 +177,11 @@ Lars' list
 
 HBB:
 [Optional:] See if 16-bit compilations can be made to work again.
+
+Ethan's List:
+- transparency (alpha channel) for fill areas and images
+- separate out the handling of junk, NaN, Inf, and missing data entries
+- 2D plot styles should accept color info from an extra input column
+- you should be able to set a default style for arrows and labels
+- isosurfaces (3D contour of 4D data)
 
