@@ -7,14 +7,18 @@ install-data-hook: install-cfg
 uninstall-hook: uninstall-cfg
 
 install-cfg:
-	@installdir=`kpsexpand '$$TEXMFLOCAL'/tex/latex/gnuplot |sed "s%^.*share/%$(prefix)/share/%"` ; \
+	@if test $(PLAINTEX) != no ; then \
+	  installdir=`kpsexpand '$$TEXMFLOCAL'/tex/latex/gnuplot |sed "s%^.*share/%$(prefix)/share/%"` ; \
 	  $(top_srcdir)/mkinstalldirs $(DESTDIR)$$installdir ; \
 	  if [ ! -f $(DESTDIR)$$installdir/gnuplot.cfg ]; then \
 	    $(INSTALL_DATA) $(srcdir)/gnuplot.cfg $(DESTDIR)$$installdir/gnuplot.cfg && \
 	    texhash; \
+	  fi ; \
 	  fi
 
 uninstall-cfg:
 	@$(NORMAL_UNINSTALL)
-	@installdir=`kpsexpand '$$TEXMFLOCAL'/tex/latex/gnuplot |sed "s%^.*share/%$(prefix)/share/%"` ; \
-	  rm -f "$(DESTDIR)$$installdir/gnuplot.cfg"
+	@if test $(PLAINTEX) != no ; then \
+	  installdir=`kpsexpand '$$TEXMFLOCAL'/tex/latex/gnuplot |sed "s%^.*share/%$(prefix)/share/%"` ; \
+	  rm -f "$(DESTDIR)$$installdir/gnuplot.cfg" ; \
+	fi

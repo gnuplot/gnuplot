@@ -1,3 +1,10 @@
+2006-10-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* share/LaTeX/Makefile.am: If ./configure has determined that TeX is
+	not installed on this machine, do not try to install gnuplot.cfg
+	in the TeX directory tree.
+	Bug #1569033
+
 2006-10-02  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* docs/gnuplot.doc: Changed documentation for image to reflect fact
