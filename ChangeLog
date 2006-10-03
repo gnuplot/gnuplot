@@ -1,3 +1,8 @@
+2006-10-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c (place_arrows3d): Clip arrows even in 3D.  Patch
+	from Harald Harders (SF #1569232).
+
 2006-10-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* share/LaTeX/Makefile.am: If ./configure has determined that TeX is

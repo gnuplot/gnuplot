@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.156 2006/05/13 00:42:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.158 2006/10/03 00:13:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -497,6 +497,14 @@ static void
 place_arrows3d(int layer)
 {
     struct arrow_def *this_arrow;
+
+    /* Allow arrows to run off the plot, so long as they are still on
+     * the canvas */
+    if (term->flags & TERM_CAN_CLIP)
+      clip_area = NULL;
+    else
+      clip_area = &canvas;
+
     for (this_arrow = first_arrow; this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
 	int sx, sy, ex, ey;
