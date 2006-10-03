@@ -1,3 +1,7 @@
+2006-10-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/version.c: Changed date, version and patchlevel.
+
 2006-10-03  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* src/graph3d.c (place_arrows3d): Clip arrows even in 3D.  Patch
