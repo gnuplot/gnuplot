@@ -1,3 +1,13 @@
+2006-10-03  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* src/graph3d.c (place_arrows3d): Clip arrows even in 3D.  Patch
+	from Harald Harders (SF #1569232).
+	
+	* term/svg.trm: Change sprintf() and fprintf() to strcpy and
+	fputs, all over the place.
+	(SVG_put_text): Fix handling of XML reserved characters in
+	non-enhanced text output.
+
 2006-10-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* share/LaTeX/Makefile.am: If ./configure has determined that TeX is
