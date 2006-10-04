@@ -3,6 +3,7 @@ set output 'eg7.tex'
 unset border
 set dummy u,v
 unset key
+unset encoding
 set parametric
 set view 60, 30, 1.2, 1.3
 set isosamples 50, 20

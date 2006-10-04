@@ -1,3 +1,8 @@
+2006-10-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* tutorial/eg7.plt: Make sure no local encoding is in effect, since
+	the corresponding TeX package is probably not going to be loaded.
+
 2006-10-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graph3d.c (place_arrows3d): Clip arrows even in 3D.  Patch
