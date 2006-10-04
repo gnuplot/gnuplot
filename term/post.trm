@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.202 2006/09/22 21:42:50 sfeam Exp $
+ * $Id: post.trm,v 1.203 2006/09/22 21:54:20 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1864,7 +1864,7 @@ PS_vector(unsigned int x, unsigned int y)
 	ps_path_count += 1;
     } else {
 	fputs(abso, gppsfile);
-	ps_path_count = 0;
+	ps_path_count = 1;  /* If we set it to zero, it may never get flushed */
     }
 
     PS_relative_ok = TRUE;
