@@ -1,4 +1,9 @@
-+2006-10-03  Daniel Sebald  <daniel.sebald@ieee.org>
+2006-10-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* tutorial/eg7.plt: Make sure no local encoding is in effect, since
+	the corresponding TeX package is probably not going to be loaded.
+
+2006-10-03  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* demo/borders.dem: Place all 16 plots on one multiplot.
 
