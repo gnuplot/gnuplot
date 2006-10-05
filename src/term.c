@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.150 2006/06/20 19:54:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.151 2006/06/28 19:41:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1506,8 +1506,13 @@ change_term(const char *origname, int length)
 {
     int i;
     struct termentry *t = NULL;
+
     /* For backwards compatibility only */
-    const char *name = (!strncmp(origname,"X11",length)) ? "x11" : origname;
+    char *name = (char *)origname;
+    if (!strncmp(origname,"X11",length)) {
+	name = "x11";
+	length = 3;
+    }
 
     for (i = 0; i < TERMCOUNT; i++) {
         if (!strncmp(name, term_tbl[i].name, length)) {
@@ -1524,7 +1529,6 @@ change_term(const char *origname, int length)
 
     term = t;
     term_initialised = FALSE;
-    name = term->name;
 
     if (term->scale != null_scale)
         fputs("Warning: scale interface is not null_scale - may not work with multiplot\n", stderr);
@@ -1544,13 +1548,13 @@ change_term(const char *origname, int length)
         term->linewidth = null_linewidth;
 
     /* Special handling for unixplot term type */
-    if (!strncmp("unixplot", name, 8)) {
+    if (!strncmp("unixplot", term->name, 8)) {
         UP_redirect(2);         /* Redirect actual stdout for unixplots */
     } else if (unixplot) {
         UP_redirect(3);         /* Put stdout back together again. */
     }
     if (interactive)
-        fprintf(stderr, "Terminal type set to '%s'\n", name);
+        fprintf(stderr, "Terminal type set to '%s'\n", term->name);
 
     /* Invalidate any terminal-specific structures that may be active */
     invalidate_palette();
