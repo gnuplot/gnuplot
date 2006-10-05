@@ -1,3 +1,8 @@
+2006-10-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (change_term): For backward compatibility, allow
+	"set term X" as shorthand for "set term x11".
+
 2006-10-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* tutorial/eg7.plt: Make sure no local encoding is in effect, since
