@@ -1,6 +1,6 @@
 2006-10-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* NEWS README.1ST: Updates.
+	* NEWS README.1ST src/version.c: Updates.
 
 2006-10-08  Daniel Sebald  <daniel.sebald@ieee.org>
 
