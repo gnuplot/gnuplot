@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.159 2006/07/22 00:01:29 sfeam Exp $
+ * $Id: x11.trm,v 1.160 2006/09/01 09:58:44 mikulik Exp $
  *
  */
 
@@ -1519,7 +1519,7 @@ X11_set_color(t_colorspec *colorspec)
     unsigned short byte_remaining;
     float fgray = colorspec->value;
 
-    fputc(X11_GR_SET_COLOR, X11_ipc);
+    fputc(X11_GR_BINARY_COLOR, X11_ipc);
     byte_remaining = sizeof(fgray);
     c_ptr = (char *) &fgray;
 
@@ -1583,7 +1583,7 @@ X11_filled_polygon(int points, gpiPoint *corners)
 
     if (!points) return;
 
-    fputc(X11_GR_FILLED_POLYGON, X11_ipc);
+    fputc(X11_GR_BINARY_POLYGON, X11_ipc);
     i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
 
     /* First put number of points into the buffer.  Initialize the "cache"
@@ -1629,7 +1629,7 @@ X11_filled_polygon(int points, gpiPoint *corners)
 		fputc('\n', X11_ipc);  FFLUSH();                   /* End of chunk. */
 		i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
 		if (point_remaining || byte_remaining)
-		    fputc(X11_GR_FILLED_POLYGON, X11_ipc);         /* Will be another chunk. */
+		    fputc(X11_GR_BINARY_POLYGON, X11_ipc);         /* Will be another chunk. */
 	    }
 
 	}

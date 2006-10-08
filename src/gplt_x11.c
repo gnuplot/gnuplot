@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.166 2006/07/18 05:20:51 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167 2006/07/22 00:01:29 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -304,6 +304,8 @@ static plot_struct *Find_Plot_In_Linked_List_By_CMap __PROTO((cmap_t *));
 static struct plot_struct *current_plot = NULL;
 static struct plot_struct *plot_list_start = NULL;
 
+static void x11_setfill __PROTO((GC *gc, int style));
+
 /* information about window/plot to be removed */
 typedef struct plot_remove_struct {
     Window plot_window_to_remove;
@@ -594,12 +596,7 @@ double pointsize = -1.;
 #define RevY(y) (4095-((y)+0.5)/yscale)
 /* note: the 0.5 term in RevX(x) and RevY(y) compensates for the round-off in X(x) and Y(y) */
 
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
-#define Nbuf X11_COMMAND_BUFFER_LENGTH
-#else
-#define Nbuf 1024
-#endif
-static char buf[Nbuf];
+static char buf[X11_COMMAND_BUFFER_LENGTH];
 static int buffered_input_available = 0;
 
 static FILE *X11_ipc;
@@ -1129,23 +1126,6 @@ store_command(char *buffer, plot_struct *plot)
 {
     char *p;
 
-    /* binary can't be printed as string */
-#if defined(WITH_IMAGE) && defined(BINARY_X11_POLYGON)
-    if (*buffer == X11_GR_IMAGE || *buffer == X11_GR_FILLED_POLYGON || *buffer == X11_GR_SET_COLOR)
-#else
-#ifdef WITH_IMAGE
-    if (*buffer == X11_GR_IMAGE)
-#endif
-#ifdef BINARY_X11_POLYGON
-    if (*buffer != X11_GR_FILLED_POLYGON && *buffer != X11_GR_SET_COLOR)
-#endif
-#endif
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
-    {FPRINTF((stderr, "Store in %d : %c\n", plot->plot_number, *buffer));}
-    else
-#endif
-    {FPRINTF((stderr, "Store in %d : %s", plot->plot_number, buffer));}
-
     if (plot->ncommands >= plot->max_commands) {
 	plot->max_commands = plot->max_commands * 2 + 1;
 	plot->commands = (plot->commands)
@@ -1171,8 +1151,8 @@ static int read_input __PROTO((void));
 static int
 read_input()
 {
-    static int rdbuf_size = 10 * Nbuf;
-    static char rdbuf[10 * Nbuf];
+    static int rdbuf_size = 10 * X11_COMMAND_BUFFER_LENGTH;
+    static char rdbuf[10 * X11_COMMAND_BUFFER_LENGTH];
     static int total_chars;
     static int rdbuf_offset;
     static int buf_offset;
@@ -1194,14 +1174,14 @@ read_input()
     }
 
     if (rdbuf_offset < total_chars) {
-	while (rdbuf_offset < total_chars && buf_offset < Nbuf) {
+	while (rdbuf_offset < total_chars && buf_offset < X11_COMMAND_BUFFER_LENGTH) {
 	    char c = rdbuf[rdbuf_offset++];
 	    buf[buf_offset++] = c;
 	    if (c == '\n')
 		break;
 	}
 
-	if (buf_offset == Nbuf) {
+	if (buf_offset == X11_COMMAND_BUFFER_LENGTH) {
 	    fputs("\ngplt_x11.c: buffer overflow in read_input!\n"
 		    "            X11 aborted.\n", stderr);
 	    EXIT(1);
@@ -2011,22 +1991,6 @@ exec_cmd(plot_struct *plot, char *command)
     char *buffer, *str;
 
     buffer = command;
-    /* binary can't be printed as string */
-#if defined(WITH_IMAGE) && defined(BINARY_X11_POLYGON)
-    if (*buffer == X11_GR_IMAGE || *buffer == X11_GR_FILLED_POLYGON || *buffer == X11_GR_SET_COLOR)
-#else
-#ifdef WITH_IMAGE
-    if (*buffer == X11_GR_IMAGE)
-#endif
-#ifdef BINARY_X11_POLYGON
-    if (*buffer == X11_GR_FILLED_POLYGON && *buffer == X11_GR_SET_COLOR)
-#endif
-#endif
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
-    {FPRINTF((stderr, "(display) buffer = |%c|\n", *buffer));}
-    else
-#endif
-    {FPRINTF((stderr, "(display) buffer = |%s|\n", buffer));}
 
 #ifdef X11_POLYLINE
     /*   X11_vector(x, y) - draw vector  */
@@ -2212,51 +2176,8 @@ exec_cmd(plot_struct *plot, char *command)
 	int style, xtmp, ytmp, w, h;
 
 	if (sscanf(buffer + 1, "%4d%4d%4d%4d%4d", &style, &xtmp, &ytmp, &w, &h) == 5) {
-	    int fillpar, idx;
-	    XColor xcolor, bgnd;
-	    float dim;
 
-	    /* upper 3 nibbles contain fillparameter (ULIG) */
-	    fillpar = style >> 4;
-
-	    /* lower nibble contains fillstyle */
-	    switch (style & 0xf) {
-	    case FS_SOLID:
-		/* filldensity is from 0..100 percent */
-		if (fillpar >= 100)
-		    break;
-		dim = (double)(fillpar)/100.;
-		/* retrieve current rgb color and shift it towards the background color */
-		xcolor.red = (double)(0xffff) * (double)((plot->current_rgb >> 16) & 0xff) /255.;
-		xcolor.green = (double)(0xffff) * (double)((plot->current_rgb >> 8) & 0xff) /255.;
-		xcolor.blue = (double)(0xffff) * (double)(plot->current_rgb & 0xff) /255.;
-		bgnd.red = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 16) & 0xff) /255.;
-		bgnd.green = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 8) & 0xff) /255.;
-		bgnd.blue = (double)(0xffff) * (double)(plot->cmap->rgbcolors[0] & 0xff) /255.;
-		xcolor.red   = dim*xcolor.red   + (1.-dim)*bgnd.red;
-		xcolor.green = dim*xcolor.green + (1.-dim)*bgnd.green;
-		xcolor.blue  = dim*xcolor.blue  + (1.-dim)*bgnd.blue;
-		FPRINTF((stderr,"Dimming box color %.6x by %.2f to %2d %2d %2d\n",
-				(unsigned long)(plot->current_rgb), dim, xcolor.red, xcolor.green, xcolor.blue));
-		if (XAllocColor(dpy, plot->cmap->colormap, &xcolor))
-		    XSetForeground(dpy, gc, xcolor.pixel);
-		break;
-	    case FS_PATTERN:
-		/* use fill pattern according to fillpattern */
-		idx = (int) fillpar;	/* fillpattern is enumerated */
-		if (idx < 0)
-		    idx = 0;
-		idx = idx % stipple_pattern_num;
-		XSetStipple(dpy, gc, stipple_pattern[idx]);
-		XSetFillStyle(dpy, gc, FillOpaqueStippled);
-		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
-		break;
-	    case FS_EMPTY:
-	    default:
-	    /* fill with background color */
-		XSetFillStyle(dpy, gc, FillSolid);
-		XSetForeground(dpy, gc, plot->cmap->colors[0]);
-	    }
+	    x11_setfill(&gc, style);
 
 	    /* gnuplot has origin at bottom left, but X uses top left
 	     * There may be an off-by-one (or more) error here.
@@ -2481,14 +2402,19 @@ exec_cmd(plot_struct *plot, char *command)
 		FPRINTF((stderr, "          failed to allocate color\n"));
 	    }
 	    current_gc = &gc;
+
     } else if (*buffer == X11_GR_SET_COLOR) {	/* set color */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
-#ifndef BINARY_X11_POLYGON
 	    double gray;
 	    sscanf(buffer + 1, "%lf", &gray);
 	    PaletteSetColor(plot, gray);
 	    current_gc = &gc;
-#else
+	}
+    }
+
+#ifdef BINARY_X11_POLYGON
+    else if (*buffer == X11_GR_BINARY_COLOR) {	/* set color */
+	if (have_pm3d) {	/* ignore, if your X server is not supported */
 	    /* This command will fit within a single buffer so it doesn't
 	     * need to be so elaborate.
 	     */
@@ -2526,13 +2452,12 @@ exec_cmd(plot_struct *plot, char *command)
 
 	    PaletteSetColor(plot, (double)gray);
 	    current_gc = &gc;
-#endif
 	}
-    } else if (*buffer == X11_GR_FILLED_POLYGON) {	/* filled polygon */
+    }
+#endif
+
+    else if (*buffer == X11_GR_FILLED_POLYGON) {	/* filled polygon */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
-
-#ifndef BINARY_X11_POLYGON
-
 	    static XPoint *points = NULL;
 	    static int st_npoints = 0;
 	    static int saved_npoints = -1, saved_i = -1;	/* HBB 20010919 */
@@ -2582,30 +2507,46 @@ exec_cmd(plot_struct *plot, char *command)
 	    }
 
 	    if (i >= npoints) {
-		/* only do the call if list is complete by now */
-		int fillpar, idx;
-		XColor xcolor, bgnd;
-		float dim;
+		/* Load selected pattern or fill into a separate gc */
+		if (!fill_gc)
+		    fill_gc = XCreateGC(dpy, plot->window, 0, 0);
+		XCopyGC(dpy, *current_gc, ~0, fill_gc);
 
-#else /* BINARY_X11_POLYGON */
+		x11_setfill(&fill_gc, style);
 
+		XFillPolygon(dpy, plot->pixmap, fill_gc, points, npoints,
+			     Nonconvex, CoordModeOrigin);
+
+		/* Flag this continuation line as closed */
+		saved_npoints = saved_i = -1;
+	    } else {
+		/* Store how far we got: */
+		saved_i = i;
+	    }
+
+	}
+
+    }
+
+#ifdef BINARY_X11_POLYGON
+    else if (*buffer == X11_GR_BINARY_POLYGON) {	/* filled polygon */
+	if (have_pm3d) {	/* ignore, if your X server is not supported */
 	    static TBOOLEAN transferring = 0;
 	    static unsigned char *iptr;
 	    static int int_cache[2];
-#define style int_cache[1]
-#define npoints int_cache[0]
 	    static unsigned i_remaining;
 	    unsigned short i_buffer;
 	    char *bptr;
 	    static TBOOLEAN code_detected = 0;
 	    static XPoint *points = NULL;
 	    static int st_npoints = 0;
+	    int npoints = 0, style = 0;
 
 	    /* The first value read will be the number of points or the number of
 	     * points followed by style.  Set up parameters to point to npoints.
 	     */
 	    if (!transferring) {
-		iptr = (unsigned char *) &npoints;
+		iptr = (unsigned char *) int_cache;
 		i_remaining = sizeof(int_cache);
 	    }
 
@@ -2632,9 +2573,11 @@ exec_cmd(plot_struct *plot, char *command)
 		if(!i_remaining && !transferring) {
 		    /* The number of points was just read.  Now set up points array and continue. */
 		    if (swap_endian) {
-			byteswap((char *)&npoints, sizeof(npoints));
-			byteswap((char *)&style, sizeof(style));
+			byteswap((char *)&int_cache[0], sizeof(int));
+			byteswap((char *)&int_cache[1], sizeof(int));
 		    }
+		    npoints = int_cache[0];
+		    style = int_cache[1];
 		    if (npoints > st_npoints) {
 			XPoint *new_points = realloc(points, npoints*2*sizeof(int));
 			st_npoints = npoints;
@@ -2654,9 +2597,6 @@ exec_cmd(plot_struct *plot, char *command)
 	    if (!i_remaining) {
 
 		int i;
-		int fillpar, idx;
-		XColor xcolor, bgnd;
-		float dim;
 
 		transferring = 0;
 
@@ -2676,80 +2616,21 @@ exec_cmd(plot_struct *plot, char *command)
 		    points[i].y = Y( ((int *)points)[2*i+1] );
 		}
 
-#endif /* BINARY_X11_POLYGON */
-
 		/* Load selected pattern or fill into a separate gc */
 		if (!fill_gc)
 		    fill_gc = XCreateGC(dpy, plot->window, 0, 0);
 		XCopyGC(dpy, *current_gc, ~0, fill_gc);
-		current_gc = &fill_gc;
 
-		fillpar = style >> 4;
-		switch (style & 0xf) {
-		case FS_SOLID:
-		    /* filldensity is from 0..100 percent */
-		    if (fillpar >= 100)
-			break;
-		    dim = (double)(fillpar)/100.;
-		    /* use halftone fill pattern according to filldensity */
-		    xcolor.red = (double)(0xffff) * (double)((plot->current_rgb >> 16) & 0xff) /255.;
-		    xcolor.green = (double)(0xffff) * (double)((plot->current_rgb >> 8) & 0xff) /255.;
-		    xcolor.blue = (double)(0xffff) * (double)(plot->current_rgb & 0xff) /255.;
-		    bgnd.red = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 16) & 0xff) /255.;
-		    bgnd.green = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 8) & 0xff) /255.;
-		    bgnd.blue = (double)(0xffff) * (double)(plot->cmap->rgbcolors[0] & 0xff) /255.;
-		    xcolor.red   = dim*xcolor.red   + (1.-dim)*bgnd.red;
-		    xcolor.green = dim*xcolor.green + (1.-dim)*bgnd.green;
-		    xcolor.blue  = dim*xcolor.blue  + (1.-dim)*bgnd.blue;
-		    FPRINTF((stderr,"Dimming poly color %.6x by %.2f to %2d %2d %2d\n",
-				(unsigned long)(plot->current_rgb), dim, xcolor.red, xcolor.green, xcolor.blue));
-		    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor))
-			XSetForeground(dpy, *current_gc, xcolor.pixel);
-		    break;
-		case FS_PATTERN:
-		    /* use fill pattern according to fillpattern */
-		    idx = (int) fillpar;	/* fillpattern is enumerated */
-		    if (idx < 0)
-			idx = 0;
-		    idx = idx % stipple_pattern_num;
-		    XSetStipple(dpy, *current_gc, stipple_pattern[idx]);
-		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
-		    XSetBackground(dpy, *current_gc, plot->cmap->colors[0]);
-		    break;
-		case FS_EMPTY:
-		    /* fill with background color */
-		    XSetFillStyle(dpy, *current_gc, FillSolid);
-		    XSetForeground(dpy, *current_gc, plot->cmap->colors[0]);
-		    break;
-		default:
-		    /* fill with current color */
-		    XSetFillStyle(dpy, *current_gc, FillSolid);
-		    break;
-		}
+		x11_setfill(&fill_gc, style);
 
-		XFillPolygon(dpy, plot->pixmap, *current_gc, points, npoints,
+		XFillPolygon(dpy, plot->pixmap, fill_gc, points, npoints,
 			     Nonconvex, CoordModeOrigin);
-
-#ifndef BINARY_X11_POLYGON
-
-		/* Flag this continuation line as closed */
-		saved_npoints = saved_i = -1;
-	    } else {
-		/* Store how far we got: */
-		saved_i = i;
 	    }
-
-#else /* BINARY_X11_POLYGON */
-
-	    }
-#undef style
-#undef npoints
-
-#endif /* BINARY_X11_POLYGON */
-
 	}
 
     }
+#endif /* BINARY_X11_POLYGON */
+
 #ifdef WITH_IMAGE
     else if (*buffer == X11_GR_IMAGE) {	/* image */
 
@@ -3184,6 +3065,7 @@ exec_cmd(plot_struct *plot, char *command)
 
     }
 #endif /* WITH_IMAGE */
+
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
     /*   Axis scaling information to save for later mouse clicks */
     else if (*buffer == 'S') {
@@ -6540,4 +6422,60 @@ cmaps_differ(cmap_t *cmap1, cmap_t *cmap2)
 
     return 0;  /* They are the same. */
 
+}
+
+/*
+ * Shared code for setting fill style
+ */
+static void
+x11_setfill(GC *gc, int style)
+{
+    int fillpar = style >> 4;
+    XColor xcolor, bgnd;
+    float dim;
+    int idx;
+
+    style = style & 0xf;
+
+	switch (style) {
+	case FS_SOLID:
+	    /* filldensity is from 0..100 percent */
+	    if (fillpar >= 100)
+		break;
+	    dim = (double)(fillpar)/100.;
+	    /* use halftone fill pattern according to filldensity */
+	    xcolor.red = (double)(0xffff) * (double)((plot->current_rgb >> 16) & 0xff) /255.;
+	    xcolor.green = (double)(0xffff) * (double)((plot->current_rgb >> 8) & 0xff) /255.;
+	    xcolor.blue = (double)(0xffff) * (double)(plot->current_rgb & 0xff) /255.;
+	    bgnd.red = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 16) & 0xff) /255.;
+	    bgnd.green = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 8) & 0xff) /255.;
+	    bgnd.blue = (double)(0xffff) * (double)(plot->cmap->rgbcolors[0] & 0xff) /255.;
+	    xcolor.red   = dim*xcolor.red   + (1.-dim)*bgnd.red;
+	    xcolor.green = dim*xcolor.green + (1.-dim)*bgnd.green;
+	    xcolor.blue  = dim*xcolor.blue  + (1.-dim)*bgnd.blue;
+	    FPRINTF((stderr,"Dimming poly color %.6x by %.2f to %2d %2d %2d\n",
+			(unsigned long)(plot->current_rgb), dim, xcolor.red, xcolor.green, xcolor.blue));
+	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor))
+		XSetForeground(dpy, *gc, xcolor.pixel);
+	    break;
+	case FS_PATTERN:
+	    /* use fill pattern according to fillpattern */
+	    idx = (int) fillpar;	/* fillpattern is enumerated */
+	    if (idx < 0)
+		idx = 0;
+	    idx = idx % stipple_pattern_num;
+	    XSetStipple(dpy, *gc, stipple_pattern[idx]);
+	    XSetFillStyle(dpy, *gc, FillOpaqueStippled);
+	    XSetBackground(dpy, *gc, plot->cmap->colors[0]);
+	    break;
+	case FS_EMPTY:
+	    /* fill with background color */
+	    XSetFillStyle(dpy, *gc, FillSolid);
+	    XSetForeground(dpy, *gc, plot->cmap->colors[0]);
+	    break;
+	default:
+	    /* fill with current color */
+	    XSetFillStyle(dpy, *gc, FillSolid);
+	    break;
+	}
 }

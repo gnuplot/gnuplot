@@ -54,10 +54,12 @@
 
 #define X11_GR_MAKE_PALETTE     'p'
 #define X11_GR_RELEASE_PALETTE  'e'
-#define X11_GR_SET_COLOR        'c'
+#define X11_GR_SET_COLOR        'k'
+#define X11_GR_BINARY_COLOR     'c'
 #define X11_GR_SET_RGBCOLOR     'g'
 #define X11_GR_SET_LINECOLOR    'l'
-#define X11_GR_FILLED_POLYGON   'f'
+#define X11_GR_FILLED_POLYGON   'I'
+#define X11_GR_BINARY_POLYGON   'f'
 
 #ifdef WITH_IMAGE
 #define X11_GR_IMAGE 'i'

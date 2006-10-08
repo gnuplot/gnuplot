@@ -1,3 +1,10 @@
+2006-10-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.h src/gplt_x11.c term/x11.trm: Code cleanup.
+	Assign separate protocol keys and disentangle the code supporting
+	binary/ascii descriptions of color and polygons passed by the x11
+	driver to gnuplot_x11.   Patchset #1549408
+
 2006-10-08  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* docs/gnuplot.doc (set key): Fix gotcha in list of alignment 
