@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.151 2006/06/28 19:41:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.152 2006/10/05 23:51:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1349,15 +1349,6 @@ null_scale(double x, double y)
     return FALSE;               /* can't be done */
 }
 
-/* HBB 990829: unused --> commented out */
-#if 0
-int
-do_scale(double x, double y)
-{
-    return TRUE;                /* can be done */
-}
-#endif /* commented out */
-
 static void
 options_null()
 {
@@ -1398,11 +1389,6 @@ null_linewidth(double s)
 }
 
 
-/* cast to get rid of useless warnings about UNKNOWN_null */
-/* HBB 20040619: unused --- commented out */
-/* typedef void (*void_fp) __PROTO((void)); */
-
-
 /* setup the magic macros to compile in the right parts of the
  * terminal drivers included by term.h
  */
@@ -1427,10 +1413,9 @@ static struct termentry term_tbl[] =
 
 };
 
-#define TERMCOUNT (sizeof(term_tbl) / sizeof(term_tbl[0]))
-
 #if 0 /* UNUSED */
 /* mainly useful for external code */
+#define TERMCOUNT (sizeof(term_tbl) / sizeof(term_tbl[0]))
 int
 term_count()
 {

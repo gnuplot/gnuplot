@@ -1,4 +1,4 @@
-/* $Id: driver.h,v 1.20 2004/04/13 17:24:16 broeker Exp $ */
+/* $Id: driver.h,v 1.21 2004/08/21 20:57:54 sfeam Exp $ */
 
 /* GNUPLOT - driver.h */
 
@@ -40,12 +40,6 @@
 
 #include <stdio.h>
 
-#if 0
-/* Dangerous; putc may already be defined as fputc */
-/* corey@cac added the next line for efficiency */
-#define fputc putc
-#endif
-
 /* functions provided by term.c */
 
 static void do_point __PROTO((unsigned int x, unsigned int y, int number));
@@ -53,12 +47,10 @@ static void line_and_point __PROTO((unsigned int x, unsigned int y, int number))
 static int null_text_angle __PROTO((int ang));
 static int null_justify_text __PROTO((enum JUSTIFY just));
 static int null_scale __PROTO((double x, double y));
-/* static int do_scale __PROTO((double x, double y)); */ /* unused */
 static void options_null __PROTO((void));
 static void UNKNOWN_null __PROTO((void));
 /* static int set_font_null __PROTO((const char *s));     */ /* unused */
 #define set_font_null NULL
-/* static void null_set_pointsize __PROTO((double size)); */ /* unused */
 
 extern FILE *gpoutfile;
 extern struct termentry *term;
@@ -82,8 +74,6 @@ static int sign(int x)
 #ifndef ABS
 # define ABS(x) ((x) >= 0 ? (x) : -(x))
 #endif /* ABS */
-
-/*  GPMIN/GPMAX are already defined in "plot.h"  */
 
 #define NICE_LINE		0
 #define POINT_TYPES		6
