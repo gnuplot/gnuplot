@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.1 2006/10/01 23:03:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.2 2006/10/02 18:02:14 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6361,7 +6361,7 @@ C ... and restart the table:
  `lmargin`, `rmargin`, `tmargin`, `bmargin` (, `above`, `over`, `below` and
  `under`) may be used to automatically place the key in other positions of the
  graph.  Also an `at <position>` may be given to indicate precisely where the
- plot should be placed.  In this case, the keywords `left`, `right`, `center`,
+ plot should be placed.  In this case, the keywords `left`, `right`, `top`,
  `bottom` and `center` serve an analogous purpose for alignment.
 
  To understand positioning, the best concept is to think of a region, i.e.,

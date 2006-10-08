@@ -1,3 +1,8 @@
+2006-10-08  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* docs/gnuplot.doc: Fix gotcha in list of alignment 
+	options in 'at <position>' case.
+
 2006-10-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (change_term): For backward compatibility, allow
