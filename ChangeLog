@@ -1,3 +1,13 @@
+2006-10-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS README.1ST: Updates.
+
+2006-10-08  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* demo/borders.dem: Place all 16 plots on one multiplot.
+
+	* demo/all.dem: Put borders.dem inside all.dem.
+
 2006-10-08  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* docs/gnuplot.doc: Fix gotcha in list of alignment 
