@@ -3,6 +3,9 @@
 	* m4/alpha.m4:  Have the new macro use __alpha as the basis for the
 	test.  Checked on Digital Unix 4.0D and Tru64 V5.1
 
+	* term/svg.trm (SVG_put_text): Fix bracket scope error introduced
+	on 3 Oct.
+
 2006-10-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* m4/alpha.m4: New macro GP_ALPHA.  Try to auto-detect if compiler
