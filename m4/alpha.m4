@@ -9,7 +9,7 @@
 AC_DEFUN([GP_ALPHA],
 [AC_MSG_CHECKING(for Alpha/AXP CPU)
 AC_EGREP_CPP(yes,
-[#ifdef __ALPHA__
+[#ifdef __alpha
   yes
 #endif
 ],AC_MSG_RESULT(yes)
