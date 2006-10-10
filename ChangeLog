@@ -1,3 +1,11 @@
+2006-10-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* m4/alpha.m4: New macro GP_ALPHA.  Try to auto-detect if
+	compilater targets DEC Alpha/AXP CPU.  If so, add -mieee or -ieee
+	flag to CFLAGS to avoid FPU weirdness.
+
+	* configure.in (GP_ALPHA): Call new macro.
+
 2006-10-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS README.1ST src/version.c: Updates.
