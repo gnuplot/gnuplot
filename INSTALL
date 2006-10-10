@@ -573,7 +573,9 @@ whenever you re-run configure.
   whole program because of a floating point exception in certain cases.
   In order to avoid these, you may want to turn on IEEE compatibility
   mode in your compiler flags. For DEC cc, the relevant option is
-  `-ieee', for GCC, it's `-mieee'.
+  `-ieee', for GCC, it's `-mieee'.  The configure script tries to
+  automatically detect this situation and apply the flag, but you may want
+  to double-check it.
 
  - IRIX 6.x
    If you want to use the png terminal, you must install your own

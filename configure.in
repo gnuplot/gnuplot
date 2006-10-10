@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.201 2006/09/21 15:35:00 tlecomte Exp $
+dnl $Id: configure.in,v 1.202.2.1 2006/10/09 22:29:06 broeker Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -71,6 +71,7 @@ GP_MSDOS
 GP_NEXT
 GP_APPLE
 GP_BEOS
+GP_ALPHA
 AM_CONDITIONAL(BUILD_SRC_BEOS_SUBDIR, test x$build_beos_subdir = xyes)
 
 dnl Apparently, -lNeXT_s is needed on NeXT
