@@ -1,3 +1,8 @@
+2006-10-11  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (test_palette_subcommand): Fixed order of set tics
+	commands.
+
 2006-10-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* m4/alpha.m4:  Have the new macro use __alpha as the basis for the

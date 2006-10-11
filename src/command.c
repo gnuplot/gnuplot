@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.143 2006/07/28 21:14:35 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.145 2006/10/11 21:43:50 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1509,8 +1509,8 @@ test_palette_subcommand()
     int i;
     static const char pre1[] = "\
 reset;set multi;\
-uns border;uns key;uns xtics;uns ytics;\
-se tic out;se cbtic 0,0.1,1; se cbtic nomirr;\
+uns border;uns key;set tic out;uns xtics;uns ytics;\
+se cbtic 0,0.1,1;se cbtic nomirr;\
 se xr[0:1];se yr[0:1];se zr[0:1];se cbr[0:1];\
 se pm3d map;set colorbox hor user orig 0.08,0.07 size 0.79,0.12;";
     static const char pre2[] = "splot 1/0;\n\n\n";
