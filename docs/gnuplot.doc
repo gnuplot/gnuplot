@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.2 2006/10/02 18:02:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.391 2006/10/12 21:20:41 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7724,8 +7724,8 @@ C ... and restart the table:
  Examples:
 
  To produce a gray palette (useless but instructive) use:
-      set palette model RGB
-      set palette defined ( 0 "black", 1 "white" )
+       set palette model RGB
+       set palette defined ( 0 "black", 1 "white" )
 
  To produce a blue yellow red palette use (all equivalent):
        set palette defined ( 0 "blue", 1 "yellow", 2 "red" )
@@ -7818,9 +7818,9 @@ C ... and restart the table:
  <gamma>`.  <gamma> defaults to 1.5 which is quite suitable for most
  terminals.
 
- For color mappings no automatic gamma correction is done by gnuplot.  But
- you may easily implement gamma correction, here an example for a gray scale
- image by use of explicit functions for the red, green and blue component
+ For color mappings no automatic gamma correction is done by gnuplot.  However,
+ you may easily implement gamma correction.  Here is an example for a gray
+ scale image by use of explicit functions for the red, green and blue component
  with slightly different values of gamma
 
  Example:
@@ -7834,7 +7834,7 @@ C ... and restart the table:
 
  use e.g.
 
-      set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
+       set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
 
  or even more intermediate points until the linear interpolation fits the
  "gamma corrected" interpolation well enough.
