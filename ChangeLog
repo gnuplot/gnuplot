@@ -1,3 +1,9 @@
+2006-10-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Replace -rc1 svg driver with the version from cvs
+	12 Oct 2006.  This changes the handling of escaped characters and
+	characters given as octal constants.  Bug #1575007
+
 2006-10-12  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* docs/gnuplot.doc: Small corrections.
