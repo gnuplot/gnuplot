@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.203 2006/09/22 21:54:20 sfeam Exp $
+ * $Id: post.trm,v 1.205 2006/10/12 21:22:15 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2478,7 +2478,7 @@ PS_make_header(t_sm_palette *palette)
 
     switch(sm_palette.colorMode) {
     case SMPAL_COLOR_MODE_GRAY:
-	break;  /* nothing to do form gray */
+	break;  /* nothing to do for gray */
     case SMPAL_COLOR_MODE_RGB:
 	make_palette_formulae();
 	break;
@@ -2910,6 +2910,32 @@ PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode
     return encoded_image;
 }
 
+
+static void
+print_five_operand_image(unsigned M, unsigned N, gpiPoint *corner, t_imagecolor color_mode, unsigned short bits_per_component)
+{
+    char *space = ps_params->level1 ? "" : "  ";
+
+    fprintf(gppsfile, "%sgsave\n", space);
+    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)
+	fprintf(gppsfile, "%s{pm3dGamma exp} settransfer\n", space);
+    fprintf(gppsfile, "%s%d %d translate\n", space, corner[0].x, corner[0].y);
+    fprintf(gppsfile, "%s%d %d scale\n", space, (corner[1].x - corner[0].x), (corner[1].y - corner[0].y));
+    fprintf(gppsfile, "%s%d %d %d\n", space, M, N, bits_per_component);
+    fprintf(gppsfile, "%s[ %d 0 0 %d 0 0 ]\n", space, M, N);
+    if (ps_params->level1) {
+	fprintf(gppsfile, "/imagebuf %d string def\n", (M*N*bits_per_component*((color_mode == IC_RGB && ps_params->color) ? 3 : 1) + 7)/8);
+        fputs("{currentfile imagebuf readhexstring pop}\n", gppsfile);
+    } else
+	fprintf(gppsfile, "  currentfile /ASCII85Decode filter\n");
+    if (color_mode == IC_RGB && ps_params->color) {
+	fprintf(gppsfile, "%sfalse 3\n"
+			  "%scolorimage\n", space, space);
+    } else
+	fprintf(gppsfile, "%simage\n", space);
+}
+
+
 TERM_PUBLIC void
 PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
 {
@@ -2992,18 +3018,7 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
     if (five_operand_image) {
 
 	if (ps_params->level1) {
-	    fputs("gsave\n", gppsfile);
-	    fprintf(gppsfile, "%d %d translate\n", corner[0].x, corner[0].y);
-	    fprintf(gppsfile, "%d %d scale\n", (corner[1].x - corner[0].x), (corner[1].y - corner[0].y));
-	    fprintf(gppsfile, "%d %d %d\n", M, N, bits_per_component);
-	    fprintf(gppsfile, "[ %d 0 0 %d 0 0 ]\n", M, N);
-	    fprintf(gppsfile, "/imagebuf %d string def\n", (M*N*bits_per_component*((color_mode == IC_RGB && ps_params->color) ? 3 : 1) + 7)/8);
-	    fputs("{currentfile imagebuf readhexstring pop}\n", gppsfile);
-	    if (color_mode == IC_RGB && ps_params->color) {
-		fputs("false 3\n"
-		      "colorimage\n", gppsfile);
-	    } else
-		fputs("image\n", gppsfile);
+	    print_five_operand_image(M, N, corner, color_mode, bits_per_component);
 	} else {
 	    fputs("InterpretLevel1 {\n"
 		  "  %% Construct a box instead of image\n"
@@ -3018,18 +3033,8 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 		  "  %% Read data but ignore it\n", gppsfile);
 	    fprintf(gppsfile, "  /imagebuf %d string def\n", num_encoded_bytes);
 	    fputs("  currentfile imagebuf readstring\n"
-		  "} {\n"
-		  "  gsave\n", gppsfile);
-	    fprintf(gppsfile, "  %d %d translate\n", corner[0].x, corner[0].y);
-	    fprintf(gppsfile, "  %d %d scale\n", (corner[1].x - corner[0].x), (corner[1].y - corner[0].y));
-	    fprintf(gppsfile, "  %d %d %d\n", M, N, bits_per_component);
-	    fprintf(gppsfile, "  [ %d 0 0 %d 0 0 ]\n", M, N);
-	    fprintf(gppsfile, "  currentfile /ASCII85Decode filter\n");
-	    if (color_mode == IC_RGB && ps_params->color) {
-		fputs("  false 3\n"
-		      "  colorimage\n", gppsfile);
-	    } else
-		fputs("  image\n", gppsfile);
+		  "} {\n", gppsfile);
+	    print_five_operand_image(M, N, corner, color_mode, bits_per_component);
 	    fputs("} ifelse\n", gppsfile);
 	}
 

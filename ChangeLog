@@ -1,3 +1,10 @@
+2006-10-12  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* docs/gnuplot.doc: Small corrections.
+
+	* term/post.trm (PS_encode_image): Added gamma correction for images
+	using a PostScript transfer function. SF Patch [1575425].
+
 2006-10-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (test_palette_subcommand): Fixed order of set tics
