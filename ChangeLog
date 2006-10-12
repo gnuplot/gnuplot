@@ -1,3 +1,12 @@
+2006-10-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c src/plot2d.c: Allow 2D plots to read color info from
+	input column. Implemented for points and labels. SF Patch #1573026
+	  plot ... with points linecolor rgb variable
+	  plot ... with labels textcolor rgb variable
+	
+	* demo/rgb_variable.dem: Add 2D example plots.
+
 2006-10-12  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* docs/gnuplot.doc: Small corrections.

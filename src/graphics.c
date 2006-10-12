@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.193 2006/08/30 22:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194 2006/09/27 04:24:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3509,6 +3509,10 @@ plot_points(struct curve_points *plot)
 		    && y >= plot_bounds.ybot + p_height
 		    && x <= plot_bounds.xright - p_width
 		    && y <= plot_bounds.ytop - p_height)) {
+
+		if ((plot->lp_properties.pm3d_color.value < 0.0)
+		    && (plot->lp_properties.pm3d_color.type == TC_RGB))
+		    set_rgbcolor( plot->points[i].yhigh);
 
 		if (plot->plot_style == POINTSTYLE
 		&&  plot->lp_properties.p_size == PTSZ_VARIABLE)
