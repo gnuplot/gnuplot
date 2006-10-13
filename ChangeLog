@@ -6,6 +6,11 @@
 	Even if they did, the code in question is hardly a required feature.
 	Fixes compile problem on Ultrix.
 
+	* demo/rgb_variable.dem: Some platforms do not allow you to read a
+	hexadecimal constant via strtod(). This prevents reading RGB colors as
+	hexadecimal constants. Add a test for this, and print a warning.
+	Bug #1574814.
+
 2006-10-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/plot2d.c: Allow 2D plots to read color info from
