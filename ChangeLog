@@ -1,5 +1,10 @@
 2006-10-13  Ethan Merritt  <merritt@u.washington.edu>
 
+	* demo/rgb_variable.dem: Some platforms do not allow you to read a
+	hexadecimal constant via strtod(). This prevents reading RGB colors as
+	hexadecimal constants. Add a test for this, and print a warning.
+	Bug #1574814.
+
 	* term/gplt_x11.c: Place #ifdef HAVE_STRDUP protection around a code
 	section that uses it to send signals to the KDE konsole.
 	Older systems may not provide strdup(), but they also don't run KDE.
@@ -90,7 +95,7 @@
 
 2006-10-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* PATCHLEVEL: Mark for first release candidate.
+	* PATCHLEVEL: Mark for first release candidate.  4.2-rc1
 
 	* VERSION: Bump to version 4.2.
 

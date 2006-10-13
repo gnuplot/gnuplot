@@ -16,9 +16,18 @@ splot 'rgb_variable.dat' using 1:2:3:(rgb($1,$2,$3)) with points pt 7 ps 4 lc rg
       '' using 1:2:3:(sprintf("0x%x",rgb($1,$2,$3))) with labels left offset 1 notitle
 pause -1 "Hit return to continue"
 #
+#
+# Unfortunately, not all platforms allow us to read hexadecimal constants
+# from a data file. Warn the user if that is the case.
+#
+if (0 == int('0x01')) \
+   set label 99 at screen .05, screen .15 "If you see only black dots,\nthis means your platform does not \nsupport reading hexadecimal constants\nfrom a data file. Get a newer libc."
+
 splot 'rgb_variable.dat' using 1:2:3:(5*rand(0)):4 with points pt 7 ps variable lc rgb variable \
       title "variable pointsize and rgb color read as hexidecimal"
+
 pause -1 "Hit return to continue"
+set label 99 ""
 #
 set border 0
 set xtics axis nomirror
@@ -37,3 +46,5 @@ set title "Demo of hidden3d with points only (no surface)"
 set hidden3d
 replot
 pause -1 "Hit return to continue"
+#
+reset
