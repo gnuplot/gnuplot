@@ -1,3 +1,11 @@
+2006-10-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gplt_x11.c: Place #ifdef HAVE_STRDUP protection around a code
+	section that uses it to send signals to the KDE konsole.
+	Older systems may not provide strdup(), but they also don't run KDE.
+	Even if they did, the code in question is hardly a required feature.
+	Fixes compile problem on Ultrix.
+
 2006-10-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Replace -rc1 svg driver with the version from cvs
