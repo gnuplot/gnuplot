@@ -5,6 +5,10 @@
 	UTF-8 byte sequences, convert them to the form  &#xAAAA; where AAAA
 	is the hex representation of the unicode character.
 
+	* term/svg.trm (SVG_options): Do not reset terminal options to default
+	values if invoked from `set termoption` rather than `set terminal`.
+	Bug #1534649
+
 2006-10-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gplt_x11.c: Place #ifdef HAVE_STRDUP protection around a code
