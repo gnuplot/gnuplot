@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.65 2006/10/11 05:08:02 sfeam Exp $
+ * $Id: svg.trm,v 1.66 2006/10/12 04:57:49 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -152,6 +152,8 @@ static void SVG_load_fontfile __PROTO((char *fontfile));
 /* Stuff for enhanced text mode */
 static int ENHsvg_string_state = 0;
 
+/* UTF-8 support */
+static int utf8_to_unicode __PROTO((const unsigned char *input, char **output));
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_Pen_RealID
 ------------------------------------------------------------------------------------------------------------------------------------*/
@@ -619,7 +621,8 @@ SVG_init ()
 	case S_ENC_CP1250:	svg_encoding = "encoding=\"windows-1250\" "; break;
 	case S_ENC_KOI8_R:	svg_encoding = "encoding=\"koi8_r\" "; break;
 	case S_ENC_KOI8_U:	svg_encoding = "encoding=\"koi8_u\" "; break;
-	default: /* S_ENC_CP437 ... DOS encoding */
+	default: /* UTF-8 */
+				svg_encoding = "encoding=\"utf-8\" ";
 				break;
     }
 
@@ -933,6 +936,15 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 
     fputs ("\t\t<text>", gpoutfile);
     if (!ENHsvg_string_state) {
+
+	/* Replace any UTF-8 character sequences in the input string with
+	 * an escaped representation of the Unicode code point
+	 */
+	char *unicode = NULL;
+	if (utf8_to_unicode((const unsigned char *)str, &unicode) > 0) {
+	    str = unicode;
+	}
+
 	while (*str) {
 	    int symb = (unsigned char) *str;
 
@@ -943,6 +955,10 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 		break;
 	    case '&':
 		fputs("&amp;", gpoutfile);
+		break;
+	    case '\177':
+		/* Used by utf8_to_unicode() to force an & in the output */
+		fputs("&", gpoutfile);
 		break;
 	    default:
 		/* Some SVG viewers really dislike non-ascii characters */
@@ -956,6 +972,7 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 	    str++;
 	}
 	fputs("</text>\n\t</g>\n", gpoutfile);
+	free(unicode);
     }
 }
 
@@ -1175,10 +1192,22 @@ ENHsvg_FLUSH()
 TERM_PUBLIC void
 ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
 {
+    /* Dynamically allocated storage for escaped unicode translation
+     * of UTF-8 string.  If there are no UTF-8 chars we don't need it.
+     */
+    char *unicode = NULL;
+
     /* We need local copies of the starting font properties */
     char fontname[MAX_ID_LEN + 1];
     double fontsize = SVG_fontSizeCur;
     strncpy(fontname,SVG_fontNameCur,sizeof(fontname));
+
+    /* Replace any UTF-8 character sequences in the input string with
+     * an escaped representation of the Unicode code point
+     */
+    if (utf8_to_unicode((const unsigned char *)str, &unicode) > 0) {
+	str = unicode;
+    }
 
     /* We need the full set of tags for text, just as normal. But in */
     /* the case of enhanced text ENHsvg_string_state == 1 tells the  */
@@ -1186,6 +1215,7 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
     if (ignore_enhanced_text) {
 	ENHsvg_string_state = 0;
 	SVG_put_text(x, y, str);
+	free(unicode);
 	return;
     } else {
 	ENHsvg_string_state = 1;
@@ -1212,6 +1242,9 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
     /* Close the text section */
     fputs("</text>\n\t</g>\n", gpoutfile);
 
+    /* Free unicode version of input string */
+    free(unicode);
+    return;
 }
 
 TERM_PUBLIC void
@@ -1221,13 +1254,6 @@ ENHsvg_writec(int c)
 
     /* Kludge for phantom box accounting */
     ENHsvg_charcount++;
-
-    /* My SVG viewers really dislike non-ascii characters */
-    if (symb < ' ' || symb > '~') {
-	sprintf(enhanced_cur_text, "&#x%2.2x;", symb);
-	enhanced_cur_text += 6;
-	return;
-    }
 
     /* Escape SVG reserved characters. Are there any besides '<' and '&' ? */
     switch (c) {
@@ -1244,8 +1270,17 @@ ENHsvg_writec(int c)
 		*enhanced_cur_text++ = 'p';
 		*enhanced_cur_text++ = ';';
 		break;
+    case '\177':
+		/* Used by utf8_to_unicode() to force an & in the output */
+		*enhanced_cur_text++ = '&';
+		break;
     default:
-		*enhanced_cur_text++ = c;
+		/* My SVG viewers really dislike non-ascii characters */
+		if (symb < ' ' || symb > '~') {
+		    sprintf(enhanced_cur_text, "&#x%2.2x;", symb);
+		    enhanced_cur_text += 6;
+		} else
+		    *enhanced_cur_text++ = c;
 		break;
     }
 }
@@ -1329,6 +1364,92 @@ SVG_path(int p)
 
 #undef Y
 #undef X
+
+
+/* UTF-8 support
+ *	E A Merritt Oct 2006
+ *
+ * Replace UTF-8 byte sequences in the NULL-terminated input string 
+ * with escaped Unicode code points in the form  <\177>#XXYY;
+ * The octal byte <\177> will itself be replace by a '&' when 
+ * it later passes through the non-UTF escape checks. 
+ *
+ * Return number of UTF-8 sequences converted, or -1 on error.
+ */
+static int
+utf8_to_unicode(const unsigned char *input, char **output)
+{
+    unsigned char in;
+    char *out;
+    unsigned int c;
+    int size;
+    int nconverted = 0;
+
+    if (!input)
+	return 0;
+
+    *output = gp_alloc(8*strlen((char *)input), "utf8_unicode");
+    out = *output;
+
+    while (*input) {
+	in = *input++;
+	*out = '\0';	/* Assume error, replace later if OK */
+
+	if ((in & 0x80) == 0) {			/* First byte 00..7F */
+	    size = 1;
+	    *out++ = in & 0x7f;
+	    continue;
+	} else if ((in & 0xe0) == 0xc0) {	/* First byte C0..DF */
+	    size = 2;
+	    c = in & 0x1f;
+	} else if ((in & 0xf0) == 0xe0) {	/* First byte E0..EF */
+	    size = 3;
+	    c = in & 0x0f;
+	} else if ((in & 0xf8) == 0xf0) {	/* First byte F0..F7 */
+	    size = 4;
+	    c = in & 0x07;
+	} else { 
+	    /* First byte not a legal UTF-8 element 80..BF F8..FF */
+	    return -1;
+	}
+
+	switch (size) {
+	    case 4:
+	    	c = c << 6;
+	    	c |= *input++ & 0x3f;
+	    case 3:
+	    	c = c << 6;
+	    	c |= *input++ & 0x3f;
+	    case 2:
+	    	c = c << 6;
+	    	c |= *input++ & 0x3f;
+	    default:
+	    	break;
+	}
+
+	/* check for overlong UTF-8 sequences */
+	if (size == 2 && c < 0x00000080)
+	    return -1;
+	if (size == 3 && c < 0x00000800)
+	    return -1;
+	if (size == 4 && c < 0x00010000)
+	    return -1;
+
+	/* check for illegal code positions */
+	if ((c > 0xD7FF && c < 0xE000) || c == 0xFFFE || c == 0xFFFF)
+	    return -1;
+
+	/* OK, it's a legitimate UTF-8 byte sequence. Convert it to unicode */
+	sprintf(out, "%c#x%4.4x;", 0x7F, c);
+	out += 8;
+	nconverted++;
+
+    } /* End of while loop. Go back for next input char */
+
+    *out = '\0';
+    return nconverted;
+}
+
 
 #endif /* TERM_BODY */
 
