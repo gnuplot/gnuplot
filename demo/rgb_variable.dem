@@ -57,7 +57,7 @@ splot 'rgb_variable.dat' using 1:2:3:(5*rand(0)):4 with points pt 7 ps variable 
       title "variable pointsize and rgb color read as hexidecimal"
 
 pause -1 "Hit return to continue"
-unset label 99
+set label 99 ""
 #
 set border 0
 set xtics axis nomirror
