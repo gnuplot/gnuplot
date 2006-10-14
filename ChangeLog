@@ -1,9 +1,15 @@
+2006-10-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm (SVG_options): Do not reset terminal options to default
+	values if invoked from `set termoption` rather than `set terminal`.
+	Bug #1534649
+
 2006-10-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/rgb_variable.dem: Some platforms do not allow you to read a
 	hexadecimal constant via strtod(). This prevents reading RGB colors as
 	hexadecimal constants. Add a test for this, and print a warning.
-	Bug #1574814.
+	Bug #1574814
 
 	* term/gplt_x11.c: Place #ifdef HAVE_STRDUP protection around a code
 	section that uses it to send signals to the KDE konsole.

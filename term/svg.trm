@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.66 2006/10/12 04:57:49 sfeam Exp $
+ * $Id: svg.trm,v 1.63.2.1 2006/10/13 02:38:06 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -387,7 +387,10 @@ SVG_options ()
 {
     struct value a;
 
-    SVG_local_reset();
+    /* Annoying hack to handle the case of 'set termoption' after */
+    /* we have already initialized the terminal settings.         */
+    if (c_token != 2)
+	SVG_local_reset();
 
     while (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "s$ize")) {
