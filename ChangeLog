@@ -4,6 +4,9 @@
 	characters given as \xxx in a single-quoted test string.
 	Bug #1534649
 
+	* term/svg.trm: Only re-code utf-8 into Unicode if current encoding
+	is default or iso_8859_1.
+
 2006-10-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Implement full (?) UTF-8 support via escaped unicode

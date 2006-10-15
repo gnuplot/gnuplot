@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.67 2006/10/15 04:13:01 sfeam Exp $
+ * $Id: svg.trm,v 1.68 2006/10/15 05:44:57 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -944,8 +944,9 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 	 * an escaped representation of the Unicode code point
 	 */
 	char *unicode = NULL;
-	if (utf8_to_unicode((const unsigned char *)str, &unicode) > 0) {
-	    str = unicode;
+	if (encoding == S_ENC_DEFAULT || encoding == S_ENC_ISO8859_1) {
+	    if (utf8_to_unicode((const unsigned char *)str, &unicode) > 0)
+		str = unicode;
 	}
 
 	while (*str) {
@@ -1208,8 +1209,9 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
     /* Replace any UTF-8 character sequences in the input string with
      * an escaped representation of the Unicode code point
      */
-    if (utf8_to_unicode((const unsigned char *)str, &unicode) > 0) {
-	str = unicode;
+    if (encoding == S_ENC_DEFAULT || encoding == S_ENC_ISO8859_1) {
+	if (utf8_to_unicode((const unsigned char *)str, &unicode) > 0)
+	    str = unicode;
     }
 
     /* We need the full set of tags for text, just as normal. But in */
