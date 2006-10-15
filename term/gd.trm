@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.94 2006/07/31 21:08:11 sfeam Exp $
+ * $Id: gd.trm,v 1.95 2006/08/27 22:13:13 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1855,7 +1855,7 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
     enhanced_max_height = -1000;
     enhanced_min_height = 1000;
     enhanced_fontscale = 1.0;
-    strncpy(enhanced_escape_format,"&#%o;",sizeof(enhanced_escape_format));
+    strncpy(enhanced_escape_format,"&#x%2.2x;",sizeof(enhanced_escape_format));
 
     ENHgd_opened_string = FALSE;
     ENHgd_show = TRUE;
