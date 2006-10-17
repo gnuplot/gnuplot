@@ -4,6 +4,10 @@
 	"set term svg raw" - pass them through unaltered
 	"set term svg escaped" - replace byte-by-byte with &#xNN;
 
+	* configure.in: Print a warning if snprintf() is not found during auto-
+	configuration. Recommend that the user provide snprintf() via an
+	external version.
+
 2006-10-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Switch to Unicode-compatible representation of octal
