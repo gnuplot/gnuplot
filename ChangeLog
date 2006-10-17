@@ -1,3 +1,9 @@
+2006-10-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Back off to simpler treatment of non-ascii characters.
+	"set term svg raw" - pass them through unaltered
+	"set term svg escaped" - replace byte-by-byte with &#xNN;
+
 2006-10-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Switch to Unicode-compatible representation of octal
