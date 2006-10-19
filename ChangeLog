@@ -1,3 +1,8 @@
+2006-10-20  Bernhard Simon
+
+	* src/colorc (make_palette): Add missing stderr parameter in 
+	FPRINTF debugging statements.
+
 2006-10-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readline): If the datafile we are supposedly
