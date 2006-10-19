@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.69 2006/06/15 15:42:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.71 2006/10/19 17:43:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -118,9 +118,9 @@ make_palette()
 	if (memcmp(&prev_palette, &sm_palette, sizeof(t_sm_palette))) {
 	    term->make_palette(&sm_palette);
 	    prev_palette = sm_palette;
-	    FPRINTF(("make_palette: calling term->make_palette for term with ncolors == 0\n"));
+	    FPRINTF((stderr,"make_palette: calling term->make_palette for term with ncolors == 0\n"));
 	} else
-	    FPRINTF(("make_palette: skipping duplicate palette for term with ncolors == 0\n"));
+	    FPRINTF((stderr,"make_palette: skipping duplicate palette for term with ncolors == 0\n"));
 	return 0;
     }
 
