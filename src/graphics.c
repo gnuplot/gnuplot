@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194 2006/09/27 04:24:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.195 2006/10/13 06:15:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1810,6 +1810,8 @@ do_plot(struct curve_points *plots, int pcount)
 #endif
 
 	if (this_plot->title && !*this_plot->title) {
+	    localkey = FALSE;
+	} else if (this_plot->plot_type == NODATA) {
 	    localkey = FALSE;
 	} else {
 	    ignore_enhanced(this_plot->title_no_enhanced);

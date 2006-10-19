@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.130 2006/07/18 23:51:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.131 2006/08/25 20:38:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1575,12 +1575,8 @@ eval_3dplots()
 		struct surface_points *first_dataset = this_plot;
 		    /* pointer to the plot of the first dataset (surface) in the file */
 		int this_token = this_plot->token;
-		/* Error check to handle unreadable or missing data file */
-		if (specs < 0) {
-		    this_plot->plot_type = NODATA;
-		    df_eof = 1;
-		}
-		while (!df_eof) {
+
+		do {
 		    this_plot = *tp_3d_ptr;
 		    assert(this_plot != NULL);
 
@@ -1596,12 +1592,7 @@ eval_3dplots()
 		    this_plot->token = c_token;
 
 		    if (this_plot->num_iso_read == 0)
-			/* probably df_eof, in which case we
-			 * will leave loop. if not eof, then
-			 * how come we got no surface ? - retry
-			 * in neither case do we update tp_3d_ptr
-			 */
-			continue;
+			this_plot->plot_type = NODATA;
 
 		    if (this_plot != first_dataset)
 			/* copy (explicit) "with pm3d at ..." option from the first dataset in the file */
@@ -1633,7 +1624,8 @@ eval_3dplots()
 		    this_plot->plot_style = this_style;
 		    /* Struct copy */
 		    this_plot->lp_properties = *these_props;
-		}
+		} while (!df_eof);
+
 		df_close();
 		/*}}} */
 
