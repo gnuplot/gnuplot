@@ -1,6 +1,7 @@
 2006-10-20  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/datafile.c (df_open): Current syntax for using specs allows
+	* src/datafile.c (df_open) docs/gnuplot.doc:
+	Current syntax for using specs allows
 	    plot foo using 1:2 title column
 	    plot foo using 1:2 title 2
 	but not
@@ -11,7 +12,7 @@
 
 2006-10-20  Bernhard Simon
 
-	* src/colorc (make_palette): Add missing stderr parameter in 
+	* src/color.c (make_palette): Add missing stderr parameter in 
 	FPRINTF debugging statements.
 
 2006-10-19  Ethan Merritt  <merritt@u.washington.edu>

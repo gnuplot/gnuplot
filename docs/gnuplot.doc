@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.390 2006/10/08 15:35:49 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.391 2006/10/12 21:20:41 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3983,11 +3983,11 @@ C ... and restart the table:
  to provide the plot title in the key box.  The column containing specified
  is independent of the column[s] used for the plot itself.
 
-    plot 'data' using 1:($2/$3) title 2
+    plot 'data' using 1:($2/$3) title column(N)
 
- In this case the entry in the first row of column 2 will be used for the
+ In this case the entry in the first row of column N will be used for the
  key entry of the plot constructed from dividing column 2 by column 3.
- The entry in the first row of column 3 will be ignored.
+ The entry in the first row of columns 2 and 3 will be ignored.
 
 5 xticlabels
 ?using xticlabels
