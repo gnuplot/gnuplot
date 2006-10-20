@@ -1,3 +1,14 @@
+2006-10-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_open): Current syntax for using specs allows
+	    plot foo using 1:2 title column
+	    plot foo using 1:2 title 2
+	but not
+	    plot foo using 1:(column(N)) title N
+	Fix this by allowing 'title column(N)' in a `using` clause. Note that
+	this does not affect the general case 'title "foo"' found outside of a 
+	`using` clause.
+
 2006-10-20  Bernhard Simon
 
 	* src/colorc (make_palette): Add missing stderr parameter in 
