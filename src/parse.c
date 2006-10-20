@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.44 2006/06/10 00:35:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.47 2006/07/08 16:59:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -49,6 +49,12 @@ static TBOOLEAN string_result_only = FALSE;
 /* Exported globals: the current 'dummy' variable names */
 char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 char set_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1] = { "x", "y" };
+
+/* These are used by the iterate-over-plot code */
+static struct udvt_entry *iteration_udv = NULL;
+static int iteration_start = 0, iteration_end = 0;
+static int iteration_increment = 1;
+static int iteration_current = 0;
 
 /* Internal prototypes: */
 
@@ -852,4 +858,64 @@ cleanup_udvlist()
 	} else
 	    udv_ptr = udv_ptr->next_udv;
     }
+}
+
+/* Look for an iterate-over-plot construct, of the form
+ *    {s}plot  for [<var> = <start> : <end> { : <increment>}] ...
+ */
+void
+check_for_iteration()
+{
+    iteration_udv = NULL;
+    iteration_increment = 1;
+    if (equals(c_token, "for")) {
+	struct value a;
+	char *errormsg = "Expecting iterator of the form: for [<var> = <start> : <end>]";
+	c_token++;
+	if (!equals(c_token++, "["))
+	    int_error(c_token, errormsg);
+	iteration_udv = add_udv(c_token++);
+	if (!equals(c_token++, "="))
+	    int_error(c_token, errormsg);
+	iteration_start = (int) real(const_express(&a));
+	if (!equals(c_token++, ":"))
+	    int_error(c_token, errormsg);
+	iteration_end = (int) real(const_express(&a));
+	if (equals(c_token,":")) {
+	    c_token++;
+	    iteration_increment = (int) real(const_express(&a));
+	    if (iteration_increment <= 0)
+		iteration_increment = 1;
+	}
+	if (!equals(c_token++, "]"))
+	    int_error(c_token, errormsg);
+	if (iteration_udv->udv_undef == FALSE)
+	    gpfree_string(&iteration_udv->udv_value);
+	Ginteger(&(iteration_udv->udv_value), iteration_start);
+	iteration_current = iteration_start;
+	iteration_udv->udv_undef = FALSE;
+    }
+}
+
+/* Set up next iteration.
+ * Return TRUE if there is one, FALSE if we're done
+ */
+TBOOLEAN
+next_iteration()
+{
+    if (!iteration_udv)
+	return FALSE;
+    iteration_current += iteration_increment;
+    iteration_udv->udv_value.v.int_val = iteration_current;
+    return (iteration_current <= iteration_end);
+}
+
+TBOOLEAN
+empty_iteration()
+{
+    if (iteration_udv
+        && (iteration_start > iteration_end))
+        return TRUE;
+    else
+        return FALSE;
 }

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.391 2006/10/12 21:20:41 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.392 2006/10/20 17:36:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3082,6 +3082,7 @@ C ... and restart the table:
 
  Syntax:
        plot {<ranges>}
+            {<iteration>}
             {<function> | {"<datafile>" {datafile-modifiers}}}
             {axes <axes>} {<title-spec>} {with <style>}
             {, {definitions,} <function> ...}
@@ -4223,6 +4224,39 @@ C ... and restart the table:
  This sets the x range for a timeseries:
        set timefmt "%d/%m/%y %H:%M"
        plot ["1/6/93 12:00":"5/6/93 12:00"] 'timedata.dat'
+
+3 iteration
+?commands plot iteration
+?commands splot iteration
+?plot iteration
+?splot iteration
+?iteration
+ If many similar files or functions are to be plotted together, it may be
+ convenient to do so by iterating over a shared plot command.
+
+ Syntax:
+       plot for [<variable>=<start>:<end>{:<increment>}] 
+       splot for [<variable>=<start>:<end>{:<increment>}] 
+
+ Example:
+       file(n) = sprintf("dataset_%d.dat",n)
+       plot for [i=1:10] file(i) title sprintf("dataset %d",i)
+
+ This example defines a string-valued function that generates file names,
+ and plots ten such files together. The iteration variable ('i' in this
+ example) is treated as an integer, and may be used more than once. In this
+ example it is used both to generate a file name and a corresponding title.
+
+ Example:
+       list = "a b c foo baz"
+       item(n) = word(list,n)
+       plot for [i=1:words(list)] item[i].".dat" title item(i)
+       list = "new stuff"
+       replot
+
+ This example steps through a list and plots once per item.
+ Because the items are retrieved dynamically, you can change the list
+ and then replot.
 
 3 title
 ?commands plot title
@@ -10526,6 +10560,7 @@ C ... and restart the table:
 
  Syntax:
        splot {<ranges>}
+             {<iteration>}
              <function> | "<datafile>" {datafile-modifiers}}
              {<title-spec>} {with <style>}
              {, {definitions,} <function> ...}

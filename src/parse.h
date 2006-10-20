@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.13 2005/07/16 21:01:46 sfeam Exp $
+ * $Id: parse.h,v 1.14 2005/11/27 19:30:49 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -67,5 +67,10 @@ struct at_type * perm_at __PROTO((void));
 struct udvt_entry * add_udv __PROTO((int t_num));
 struct udft_entry * add_udf __PROTO((int t_num));
 void cleanup_udvlist __PROTO((void));
+
+/* These are used by the iterate-over-plot code */
+void check_for_iteration __PROTO((void));
+TBOOLEAN next_iteration  __PROTO((void));
+TBOOLEAN empty_iteration  __PROTO((void));
 
 #endif /* PARSE_H */

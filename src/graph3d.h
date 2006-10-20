@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.23 2005/12/06 18:23:40 sfeam Exp $
+ * $Id: graph3d.h,v 1.24 2006/03/26 05:08:27 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -81,6 +81,7 @@ typedef struct iso_curve {
 typedef struct surface_points {
     struct surface_points *next_sp; /* linked list */
     int token;			/* last token nr, for second pass */
+    int plot_num;		/* needed for tracking iteration */
     enum PLOT_TYPE plot_type;
     enum PLOT_STYLE plot_style;
     char *title;

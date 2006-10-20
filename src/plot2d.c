@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133 2006/09/27 04:24:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.134 2006/10/13 06:15:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1293,6 +1293,7 @@ eval_plots()
     int pattern_num;
     char *xtitle = NULL;
     int begin_token = c_token;  /* so we can rewind for second pass */
+    int start_token, end_token;
     legend_key *key = &keyT;
 
 #ifdef EAM_HISTOGRAMS
@@ -1329,9 +1330,12 @@ eval_plots()
      * as filling in every thing except the function data. That is done after
      * the xrange is defined.
      */
+    check_for_iteration();
     while (TRUE) {
         if (END_OF_COMMAND)
             int_error(c_token, "function to plot expected");
+	start_token = c_token;
+	this_plot = NULL;
 
 #ifdef EAM_HISTOGRAMS
         if (almost_equals(c_token,"newhist$ogram")) {
@@ -1367,13 +1371,14 @@ eval_plots()
             newhist_pattern = fs.fillpattern;
         } else
 #endif /* EAM_DATASTRINGS */
+
         if (is_definition(c_token)) {
             define();
+
         } else {
             int specs = 0;
 
             /* for datafile plot, record datafile spec for title */
-            int start_token = c_token, end_token;
             char* name_str;
 
             TBOOLEAN duplication = FALSE;
@@ -1953,9 +1958,18 @@ eval_plots()
 
         } /* !is_defn */
 
-        if (equals(c_token, ","))
+	/* Iterate-over-plot mechanism */
+	if (empty_iteration() && this_plot) {
+	    this_plot->plot_type = NODATA;
+	} else if (next_iteration()) {
+	    c_token = start_token;
+	    continue;
+	}
+
+        if (equals(c_token, ",")) {
             c_token++;
-        else
+	    check_for_iteration();
+        } else
             break;
     }
 
@@ -2037,10 +2051,15 @@ eval_plots()
         this_plot = first_plot;
         c_token = begin_token;  /* start over */
 
+	check_for_iteration();
+
         /* Read through functions */
         while (TRUE) {
+	    start_token = c_token;
+	    
             if (is_definition(c_token)) {
                 define();
+
             } else {
                 struct at_type *at_ptr;
                 char *name_str;
@@ -2166,9 +2185,16 @@ eval_plots()
                 this_plot = this_plot->next;
             }
 
-            if (equals(c_token, ","))
+	    /* Iterate-over-plot mechanism */
+	    if (next_iteration()) {
+		c_token = start_token;
+		continue;
+	    }
+
+            if (equals(c_token, ",")) {
                 c_token++;
-            else
+		check_for_iteration();
+            } else
                 break;
         }
         /* when step debugging, set breakpoint here to get through

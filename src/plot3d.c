@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.131 2006/08/25 20:38:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.132 2006/10/19 04:00:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1147,6 +1147,8 @@ eval_3dplots()
      * well as filling in every thing except the function data. That is done
      * after the x/yrange is defined.
      */
+    check_for_iteration();
+    start_token = c_token;
     while (TRUE) {
 	if (END_OF_COMMAND)
 	    int_error(c_token, "function to plot expected");
@@ -1167,6 +1169,7 @@ eval_3dplots()
 #ifdef EAM_DATASTRINGS
 	    TBOOLEAN set_labelstyle = FALSE;
 #endif
+	    start_token = c_token;
 
 	    dummy_func = &plot_func;
 	    /* WARNING: do NOT free name_str */
@@ -1216,6 +1219,7 @@ eval_3dplots()
 
 		/* for capture to key */
 		this_plot->token = end_token = c_token - 1;
+		this_plot->plot_num = plot_num;
 
 		/* this_plot->token is temporary, for errors in get_3ddata() */
 
@@ -1590,6 +1594,7 @@ eval_3dplots()
 		    get_3ddata(this_plot);
 		    /* for second pass */
 		    this_plot->token = c_token;
+		    this_plot->plot_num = plot_num;
 
 		    if (this_plot->num_iso_read == 0)
 			this_plot->plot_type = NODATA;
@@ -1632,14 +1637,24 @@ eval_3dplots()
 	    } else {		/* not a data file */
 		tp_3d_ptr = &(this_plot->next_sp);
 		this_plot->token = c_token;	/* store for second pass */
+		this_plot->plot_num = plot_num;
 	    }
+
+	    if (empty_iteration())
+		this_plot->plot_type = NODATA;
 
 	}			/* !is_definition() : end of scope of this_plot */
 
+	/* Iterate-over-plot mechanisms */
+	if (next_iteration()) {
+	    c_token = start_token;
+	    continue;
+	}
 
-	if (equals(c_token, ","))
+	if (equals(c_token, ",")) {
 	    c_token++;
-	else
+	    check_for_iteration();
+	} else
 	    break;
 
     }				/* while(TRUE), ie first pass */
@@ -1715,6 +1730,7 @@ eval_3dplots()
 	/* start over */
 	this_plot = first_3dplot;
 	c_token = begin_token;
+	check_for_iteration();
 
 	/* why do attributes of this_plot matter ? */
 	/* FIXME HBB 20000501: I think they don't, actually. I'm
@@ -1741,6 +1757,7 @@ eval_3dplots()
 	    } else {
 		struct at_type *at_ptr;
 		char *name_str;
+		start_token = c_token;
 
 		dummy_func = &plot_func;
 		name_str = string_or_express(&at_ptr);
@@ -1787,15 +1804,25 @@ eval_3dplots()
 		c_token = this_plot->token;
 
 		/* one data file can make several plots */
+		i = this_plot->plot_num;
 		do
 		    this_plot = this_plot->next_sp;
-		while (this_plot && this_plot->token == c_token);
+		while (this_plot 
+			&& this_plot->token == c_token
+			&& this_plot->plot_num == i);
 
 	    }			/* !is_definition */
 
-	    if (equals(c_token, ","))
+	    /* Iterate-over-plot mechanism */
+	    if (next_iteration()) {
+		c_token = start_token;
+		continue;
+	    }
+
+	    if (equals(c_token, ",")) {
 		c_token++;
-	    else
+		check_for_iteration();
+	    } else
 		break;
 
 	}			/* while(TRUE) */
