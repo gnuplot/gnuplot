@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.109 2006/06/25 17:56:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110 2006/08/02 01:19:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1191,8 +1191,13 @@ df_open(const char *cmd_filename, int max_using)
 #ifdef EAM_DATASTRINGS
 	/* Take key title from column head? */
 	if (almost_equals(c_token, "t$itle")) {
+	    struct value a;
 	    c_token++;
-	    if (almost_equals(c_token, "col$umn")) {
+	    if (equals(c_token, "column") && equals(c_token+1,"(")) {
+		c_token += 2;
+		column_for_key_title = (int)real(const_express(&a));
+		c_token++;
+	    } else if (almost_equals(c_token, "col$umn")) {
 		key_title_auto_col = TRUE;
 		if (df_no_use_specs == 1)
 		    column_for_key_title = use_spec[0].column;
@@ -1200,9 +1205,8 @@ df_open(const char *cmd_filename, int max_using)
 		    column_for_key_title = use_spec[1].column;
 		c_token++;
 	    } else if (!END_OF_COMMAND && isanumber(c_token)) {
-		struct value a;
 		column_for_key_title = (int)real(const_express(&a));
-	    } else
+	    } else /* Let the general case parser handle it */
 		c_token--;
 	    break;
 	}

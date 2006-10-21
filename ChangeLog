@@ -1,3 +1,9 @@
+2006-10-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_open): Fix bug limiting the options for reading a
+	plot key label from the data file; now allow title subcommand:
+	    plot foo using 1:(column(N)) title column(N)
+
 2006-10-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in: Rework the summary displayed at the end of the
@@ -6,7 +12,7 @@
 
 2006-10-20  Bernhard Simon
 
-	* src/colorc (make_palette): Add missing stderr parameter in 
+	* src/color.c (make_palette): Add missing stderr parameter in 
 	FPRINTF debugging statements.
 
 2006-10-17  Ethan Merritt  <merritt@u.washington.edu>
