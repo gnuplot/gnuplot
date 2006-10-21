@@ -19,7 +19,9 @@ AC_EGREP_CPP(yes,
        AC_DEFINE(HAVE_LIBAQUATERM,1,
                  [Define to 1 if you're using the aquaterm library on Mac OS X])
      ],[], -lobjc)
+     is_apple=yes
    ],
-   AC_MSG_RESULT(no))
+   AC_MSG_RESULT(no)
+   is_apple=no)
 ])
 

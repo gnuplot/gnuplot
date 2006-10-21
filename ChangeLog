@@ -1,3 +1,9 @@
+2006-10-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in: Rework the summary displayed at the end of the
+	'configure' script, so that it is more complete, useful, consistent and
+	still readable.
+
 2006-10-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.h src/parse.c src/parse.h src/plot2d.c src/plot3d.c:
