@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.26 2005/08/07 09:43:32 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.27 2005/09/28 00:19:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -950,8 +950,15 @@ map3d_xy(
     if (w == 0)
 	w = 1e-5;
 
-    *xt = (unsigned int) ((res[0] * xscaler / w) + xmiddle);
-    *yt = (unsigned int) ((res[1] * yscaler / w) + ymiddle);
+    if (lmargin.scalex == screen || rmargin.scalex == screen)
+	*xt = res[0] * xscaler/w + xmiddle;
+    else
+	*xt = (unsigned int) ((res[0] * xscaler / w) + xmiddle);
+
+    if (tmargin.scalex == screen || bmargin.scalex == screen)
+	*yt = res[1] * yscaler/w + ymiddle;
+    else
+	*yt = (unsigned int) ((res[1] * yscaler / w) + ymiddle);
 }
 
 /* Function to map from user 3D space to normalized 'camera' view
@@ -981,8 +988,15 @@ map3d_xy_double(
     if (w == 0)
 	w = 1e-5;
 
-    *xt = ((res[0] * xscaler / w) + xmiddle);
-    *yt = ((res[1] * yscaler / w) + ymiddle);
+    if (lmargin.scalex == screen || rmargin.scalex == screen)
+	*xt = res[0] * xscaler + xmiddle;
+    else
+	*xt = (res[0] * xscaler / w) + xmiddle;
+
+    if (tmargin.scalex == screen || bmargin.scalex == screen)
+	*yt = res[1] * yscaler + ymiddle;
+    else
+	*yt = (res[1] * yscaler / w) + ymiddle;
 }
 
 #else /* REPLICATE_CODE_FOR_BACKWARD_COMPATIBLE_ROUNDING */

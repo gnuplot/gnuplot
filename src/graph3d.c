@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.158 2006/10/03 00:13:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.159 2006/10/19 04:00:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -339,13 +339,18 @@ boundary3d(struct surface_points *plots, int count)
 	max_ptitl_len = ytlen;
     key_col_wth = (max_ptitl_len + 4) * t->h_char + key_sample_width;
 
-    /* luecken@udel.edu modifications
-       sizes the plot to take up more of available resolution */
-    if (lmargin >= 0)
-	plot_bounds.xleft = t->h_char * lmargin;
+    if (lmargin.scalex == screen)
+	plot_bounds.xleft = lmargin.x * (float)t->xmax + 0.5;
+    else if (lmargin.x >= 0)
+	plot_bounds.xleft = lmargin.x * (float)t->h_char + 0.5;
     else
 	plot_bounds.xleft = t->h_char * 2 + t->h_tic;
-    plot_bounds.xright = xsize * t->xmax - t->h_char * 2 - t->h_tic;
+
+    if (rmargin.scalex == screen)
+	plot_bounds.xright = rmargin.x * (float)t->xmax + 0.5;
+    else /* No tic label on the right side, so ignore rmargin */
+	plot_bounds.xright = xsize * t->xmax - t->h_char * 2 - t->h_tic;
+
     key_rows = ptitl_cnt;
     key_cols = 1;
     if ((key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
@@ -369,8 +374,11 @@ boundary3d(struct surface_points *plots, int count)
     /* this should also consider the view and number of lines in
      * xformat || yformat || xlabel || ylabel */
 
-    /* an absolute 1, with no terminal-dependent scaling ? */
-    plot_bounds.ybot = t->v_char * 2.5 + 1;
+    if (bmargin.scalex == screen)
+	plot_bounds.ybot = bmargin.x * (float)t->ymax + 0.5;
+    else /* FIXME: How come no provision for bmargin in characters? */
+	plot_bounds.ybot = t->v_char * 2.5 + 1;
+
     if (key_rows && (key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
 	&& key->margin == GPKEY_BMARGIN)
 	plot_bounds.ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
@@ -382,7 +390,12 @@ boundary3d(struct surface_points *plots, int count)
 		titlelin++;
 	}
     }
-    plot_bounds.ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
+
+    if (tmargin.scalex == screen)
+	plot_bounds.ytop = tmargin.x * (float)t->ymax + 0.5;
+    else /* FIXME: Why no provision for tmargin in terms of character height? */
+	plot_bounds.ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
+
     if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
 	|| ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
 	    && key->margin == GPKEY_RMARGIN)) {
@@ -408,11 +421,20 @@ boundary3d(struct surface_points *plots, int count)
     plot_bounds.ybot += t->ymax * yoffset;
     xmiddle = (plot_bounds.xright + plot_bounds.xleft) / 2;
     ymiddle = (plot_bounds.ytop + plot_bounds.ybot) / 2;
+
+    
     /* HBB 980308: sigh... another 16bit glitch: on term's with more than
      * 8000 pixels in either direction, these calculations produce garbage
      * results if done in (16bit) ints */
-    xscaler = ((plot_bounds.xright - plot_bounds.xleft) * 4L) / 7L;	/* HBB: Magic number alert! */
+    /* HBB: Magic number alert! */
+    xscaler = ((plot_bounds.xright - plot_bounds.xleft) * 4L) / 7L;
     yscaler = ((plot_bounds.ytop - plot_bounds.ybot) * 4L) / 7L;
+
+    /* EAM Aug 2006 - Allow explicit control via set {}margin screen */
+    if (tmargin.scalex == screen || bmargin.scalex == screen)
+	yscaler = (plot_bounds.ytop - plot_bounds.ybot) / surface_scale;
+    if (rmargin.scalex == screen || lmargin.scalex == screen)
+	xscaler = (plot_bounds.xright - plot_bounds.xleft) / surface_scale;
 
     /* HBB 20011011: 'set size {square|ratio}' for splots */
     if (aspect_ratio != 0.0) {

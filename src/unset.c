@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.98 2006/06/28 04:31:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.99 2006/06/29 19:36:44 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -102,7 +102,7 @@ static void unset_logscale __PROTO((void));
 static void unset_macros __PROTO((void));
 #endif
 static void unset_mapping __PROTO((void));
-static void unset_margin __PROTO((float *));
+static void unset_margin __PROTO((t_position *));
 static void unset_missing __PROTO((void));
 #ifdef USE_MOUSE
 static void unset_mouse __PROTO((void));
@@ -1076,9 +1076,10 @@ unset_mapping()
 
 /* process 'unset {blrt}margin' command */
 static void
-unset_margin(float *margin)
+unset_margin(t_position *margin)
 {
-    *margin = -1;
+    margin->scalex = character;
+    margin->x = -1;
 }
 
 /* process 'unset datafile' command */

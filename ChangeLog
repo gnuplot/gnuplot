@@ -1,3 +1,14 @@
+2006-10-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/gadgets.h src/graph3d.c src/graphics.c src/save.c
+	src/set.c src/show.c src/unset.c src/util3d.c:  Add option to specify
+	plot margins as an absolute position on the canvas (screen).
+		set {lrbt}margin screen <frac>
+	
+	* docs/gnuplot.doc demo/all.dem demo/html/index.save demo/margins.dem
+	demo/html/Makefile: Add demo illustrating use of absolute margins to
+	perfectly align 2D and 3D component plots within a multiplot.
+
 2006-10-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in: Rework the summary displayed at the end of the

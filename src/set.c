@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.235 2006/07/06 19:34:06 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.236 2006/07/06 23:12:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -102,7 +102,7 @@ static void set_logscale __PROTO((void));
 static void set_macros __PROTO((void));
 #endif
 static void set_mapping __PROTO((void));
-static void set_margin __PROTO((float *));
+static void set_margin __PROTO((t_position *));
 static void set_missing __PROTO((void));
 static void set_separator __PROTO((void));
 static void set_datafile_commentschars __PROTO((void));
@@ -2084,17 +2084,23 @@ set_mapping()
 
 /* process 'set {blrt}margin' command */
 static void
-set_margin(float *margin)
+set_margin(t_position *margin)
 {
+    struct value a;
+
+    margin->scalex = character;
+    margin->x = -1;
     c_token++;
+
     if (END_OF_COMMAND)
-	*margin = -1;
-    else {
-	struct value a;
-	*margin = real(const_express(&a));
-	if (*margin < 0)
-	    *margin = -1;
+	return;
+    if (almost_equals(c_token,"sc$reen")) {
+	margin->scalex = screen;
+	c_token++;
     }
+    margin->x = real(const_express(&a));
+    if (margin->x < 0)
+	margin->x = -1;
 }
 
 static void

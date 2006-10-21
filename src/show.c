@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.184 2006/08/08 21:41:42 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.185 2006/09/19 16:03:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1889,20 +1889,31 @@ show_margin()
 {
     SHOW_ALL_NL;
 
-    if (lmargin >= 0)
-	fprintf(stderr, "\tlmargin is set to %g\n", lmargin);
+    if (lmargin.scalex == screen)
+	fprintf(stderr, "\tlmargin is set to screen %g\n", lmargin.x);
+    else if (lmargin.x >= 0)
+	fprintf(stderr, "\tlmargin is set to %g\n", lmargin.x);
     else
 	fputs("\tlmargin is computed automatically\n", stderr);
-    if (bmargin >= 0)
-	fprintf(stderr, "\tbmargin is set to %g\n", bmargin);
+
+    if (bmargin.scalex == screen)
+	fprintf(stderr, "\tbmargin is set to screen %g\n", bmargin.x);
+    else if (bmargin.x >= 0)
+	fprintf(stderr, "\tbmargin is set to %g\n", bmargin.x);
     else
 	fputs("\tbmargin is computed automatically\n", stderr);
-    if (rmargin >= 0)
-	fprintf(stderr, "\trmargin is set to %g\n", rmargin);
+
+    if (rmargin.scalex == screen)
+	fprintf(stderr, "\trmargin is set to screen %g\n", rmargin.x);
+    else if (rmargin.x >= 0)
+	fprintf(stderr, "\trmargin is set to %g\n", rmargin.x);
     else
 	fputs("\trmargin is computed automatically\n", stderr);
-    if (tmargin >= 0)
-	fprintf(stderr, "\ttmargin is set to %g\n", tmargin);
+
+    if (tmargin.scalex == screen)
+	fprintf(stderr, "\ttmargin is set to screen %g\n", tmargin.x);
+    else if (tmargin.x >= 0)
+	fprintf(stderr, "\ttmargin is set to %g\n", tmargin.x);
     else
 	fputs("\ttmargin is computed automatically\n", stderr);
 }
