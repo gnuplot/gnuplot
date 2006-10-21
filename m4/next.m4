@@ -13,7 +13,9 @@ AC_EGREP_CPP(yes,
 #endif
 ], AC_MSG_RESULT(yes)
    LIBS="$LIBS -lsys_s -lNeXT_s"
-   CFLAGS="$CFLAGS -ObjC",
-   AC_MSG_RESULT(no))
+   CFLAGS="$CFLAGS -ObjC"
+   is_next=yes,
+   AC_MSG_RESULT(no)
+   is_next=no)
 ])
 

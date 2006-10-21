@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.202.2.1 2006/10/09 22:29:06 broeker Exp $
+dnl $Id: configure.in,v 1.202.2.2 2006/10/18 04:43:55 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -1023,187 +1023,329 @@ AC_OUTPUT([Makefile
            share/Makefile
            share/LaTeX/Makefile
            src/Makefile
-	   src/beos/Makefile
+           src/beos/Makefile
            src/wxterminal/Makefile
            term/Makefile
            tutorial/Makefile],
           [test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h])
 
 dnl Report configuration
-AC_MSG_RESULT([
-** Configuration summary for $PACKAGE $VERSION:
+dnl Rationale:
+dnl - if something is disabled by default, show arguments to use to enable.
+dnl - if something has particular dependencies, show them all when they are
+dnl missing (the detailed output will give more details anyway).
+dnl The goal is to give sensible and easily accessible information to users
+dnl and packagers.
 
-  Where is the help file?           $GIHDIR/gnuplot.gih
-])
+AC_MSG_RESULT([])
+AC_MSG_RESULT([** Configuration summary for $PACKAGE $VERSION:])
+AC_MSG_RESULT([])
 
-if test "$with_lasergnu" = yes; then
-  AC_MSG_RESULT([  Install lasergnu printer script])
-fi
+AC_MSG_RESULT([gnuplot will be compiled with the following terminals:])
+AC_MSG_RESULT([])
 
-if test "$with_linux_vga" = yes; then
-  AC_MSG_RESULT([  Use the Linux SVGA console driver
-    SECURITY NOTICE: SVGAlib requires that gnuplot is installed suid root!])
+AC_MSG_RESULT([  Standalone terminals: yes (always builtin)])
+AC_MSG_RESULT([    (aed512, aed767, aifm, bitgraph, cgm, corel, dumb, dxf, eepic, emf, emtex,])
+AC_MSG_RESULT([    epslatex, epson_180dpi, epson_60dpi, epson_lx800, fig, gpic, hp2623A,])
+AC_MSG_RESULT([    hp2648, hp500c, hpdj, hpgl, hpljii, hppj, imagen, kc_tek40xx, km_tek40xx,])
+AC_MSG_RESULT([    latex, metafont, metapost, mif, pbm, postscript, pslatex, nec_cp6, okidata,])
+AC_MSG_RESULT([    pcl5, pstex, pstricks, qms, regis, selanar, svg, starc, tandy_60dpi,])
+AC_MSG_RESULT([    tek40xx, tek410x, texdraw, tgif, tkcanvas, tpic, vttek)])
 
-  if test "$with_vgagl" = yes; then
-    AC_MSG_RESULT([  Enable vgagl terminal with mouse support])
-  fi
-fi
-
-if test "$GGI_SUPPORT" = yes; then
-  AC_MSG_RESULT([  Enable ggi terminal (EXPERIMENTAL)])
-fi
-
-if test "$ac_cv_header_ggi_xmi_h" = yes; then
-  AC_MSG_RESULT([  Enable ggi's xmi support for pm3d (EXPERIMENTAL)])
-fi
-
-if test "$with_readline" != no; then
-  if test "$with_readline" != yes; then
-    AC_MSG_RESULT([  Use GNU readline library])
-
-    if test -n "$gp_tcap"; then
-      AC_MSG_RESULT([    with $gp_tcap])
-    fi
-
+if test "$no_x" != yes; then
+  if test "$enable_mouse" = yes; then
+    AC_MSG_RESULT([  x11/xlib terminal: yes (with mouse support)])
   else
-    AC_MSG_RESULT([  Use builtin minimal readline])
+    AC_MSG_RESULT([  x11/xlib terminal: yes (without mouse support)])
   fi
-  if test "$enable_history_file" = yes; then
-    AC_MSG_RESULT([  Enable history file])
+  if test "$enable_x11_mbfonts" = yes; then
+    AC_MSG_RESULT([    (with multi-byte fonts)])
+  else
+    AC_MSG_RESULT([    (without multi-byte fonts, requires support in libX11)])
   fi
+  if test "$enable_binary_x11_polygon" = yes; then
+    AC_MSG_RESULT([    (with binary polygon protocol (EXPERIMENTAL))])
+  else
+    AC_MSG_RESULT([    (without binary polygon protocol (EXPERIMENTAL))])
+  fi
+else
+    AC_MSG_RESULT([  X Window System terminal: no (requires X libraries)])
+fi
+
+if test "$ac_cv_lib_gd_gdImageJpeg" = yes; then
+  AC_MSG_RESULT([  jpeg terminal: yes])
+else
+  AC_MSG_RESULT([  jpeg terminal: no (requires libgd with jpeg support)])
+fi
+
+if test "$ac_cv_lib_gd_gdImageGif" = yes; then
+  if test "$ac_cv_lib_gd_gdImageGifAnimBegin" = yes; then
+    AC_MSG_RESULT([  gif terminal: yes (with animated gif)])
+  else
+    AC_MSG_RESULT([  gif terminal: yes (without animated gif, requires libgd support)])
+  fi
+else
+  AC_MSG_RESULT([  gif terminal: no (requires libgd with gif support)])
+fi
+
+
+if test "$ac_cv_lib_gd_gdImagePng" = yes; then
+  AC_MSG_RESULT([  png terminal: yes])
+else
+  AC_MSG_RESULT([  png terminal: no (requires libgd with png support)])
+fi
+
+if test "$have_ttf" = yes; then
+  AC_MSG_RESULT([    (jpeg, gif and png terminals can use TTF fonts)])
+else
+  AC_MSG_RESULT([    (jpeg, gif and png terminals cannot use TTF fonts, requires libgd support)])
+fi
+
+if test "$ac_cv_header_pdflib_h" = yes; then
+  AC_MSG_RESULT([  pdf terminal: yes])
+  if test "$ac_cv_lib_pdf_PDF_begin_pattern" != yes; then
+    AC_MSG_RESULT([      (pattern fills not supported, libpdf too old)])
+  fi
+  if test "$ac_cv_lib_pdf_PDF_setdashpattern" != yes; then
+    AC_MSG_RESULT([      (dash patterns not supported, libpdf too old)])
+  fi
+else
+  AC_MSG_RESULT([  pdf terminal: no (requires libpdf)])
 fi
 
 if test x"$with_plot" != x; then
   if test "$with_plot" = yes; then
-    AC_MSG_RESULT([  Use the Unix plot library])
+    AC_MSG_RESULT([  plot library terminal: yes (unixplot - UNIX version)])
   elif test "$with_plot" != no; then
-    AC_MSG_RESULT([  Use the GNU plot library])
+    AC_MSG_RESULT([  plot library terminal: yes (gnugraph - GNU version)])
+  else
+    AC_MSG_RESULT([  plot library terminal: no (requires GNU plotutils or UNIX plot)])
   fi
+else
+    AC_MSG_RESULT([  plot library terminal: no (use --with-plot to enable, requires GNU plotutils])
+    AC_MSG_RESULT([                             or UNIX plot)])
 fi
 
-if test "$ac_cv_lib_gd_gdImageJpeg" = yes; then
-  AC_MSG_RESULT([  Enable generation of JPEG files])
-fi
-
-if test "$ac_cv_lib_gd_gdImageGif" = yes; then
-  AC_MSG_RESULT([  Enable generation of GIF files])
-fi
-
-if test "$ac_cv_lib_gd_gdImageGifAnimBegin" = yes; then
-  AC_MSG_RESULT([         (including animated GIF)])
-fi
-
-if test "$ac_cv_lib_gd_gdImagePng" = yes; then
-  AC_MSG_RESULT([  Enable generation of PNG files])
-fi
-
-if test "$have_ttf" = yes; then
-  AC_MSG_RESULT([  Enable TTF fonts with gd driver])
-fi
-
-if test "$ac_cv_header_pdflib_h" = yes; then
-  AC_MSG_RESULT([  Enable generation of PDF files])
-  if test "$ac_cv_lib_pdf_PDF_begin_pattern" != yes; then
-    AC_MSG_RESULT([    no support for pattern-fill])
+if test "$with_linux_vga" = yes; then
+    AC_MSG_RESULT([  linux terminal (vga console): yes])
+  if test "$with_vgagl" = yes; then
+    AC_MSG_RESULT([  vgagl terminal ((s)vga console): yes])
+  else
+    AC_MSG_RESULT([  vgagl terminal ((s)vga console): no (requires vgagl)])
   fi
-  if test "$ac_cv_lib_pdf_PDF_setdashpattern" != yes; then
-    AC_MSG_RESULT([    no support for dash patterns])
+  AC_MSG_RESULT([    SECURITY NOTICE: SVGAlib requires that gnuplot is installed suid root!])
+else
+  AC_MSG_RESULT([  linux terminal (vga console): no (use --with-linux-vga to enable,])
+  AC_MSG_RESULT([                                       requires SVGAlib)])
+  AC_MSG_RESULT([  vgagl terminal ((s)vga console): no (use --with-linux-vga to enable,])
+  AC_MSG_RESULT([                                       requires SVGAlib with vgagl)])
+fi
+
+if test "$GGI_SUPPORT" = yes; then
+  if test "$ac_cv_header_ggi_xmi_h" = yes; then
+    AC_MSG_RESULT([  ggi terminal: yes (EXPERIMENTAL) (with pm3d support)])
+  else
+    AC_MSG_RESULT([  ggi terminal: yes (EXPERIMENTAL) (without pm3d support, requires libxmi)])
   fi
-fi
-
-if test "$with_cwdrc" = yes; then
-  AC_MSG_RESULT([  Check current directory for .gnuplot file])
-fi
-
-if test "$with_lisp_files" != no; then
-  AC_MSG_RESULT([  Build gnuplot-mode for X/Emacs])
-fi
-
-if test "$with_row_help" = no; then
-  AC_MSG_RESULT([  Sort help/subtopic tables by column])
-fi
-
-if test "$TUTORIAL" = tutorial; then
-  AC_MSG_RESULT([  Build LaTeX tutorial])
-fi
-
-if test "$with_kpsexpand" = yes; then
-  AC_MSG_RESULT([  Use TeX component kpsexpand to search for fonts])
-fi
-
-if test "$no_x" != yes; then
-  AC_MSG_RESULT([  Use the X Window System ])
-  if test "$enable_mouse" = yes; then
-    AC_MSG_RESULT([  Enable mouse for X11])
-  fi
-  if test "$enable_x11_mbfonts" = yes; then
-    AC_MSG_RESULT([  Enable multi-byte font support for X11])
-  fi
-fi
-
-if test "$enable_thin_splines" = yes; then
-  AC_MSG_RESULT([  Enable thin plate splines])
-fi
-
-if test "$enable_h3d_quadtree" = yes; then
-  AC_MSG_RESULT([  Enable hidden3d quadtree optimization])
-fi
-
-if test "$enable_h3d_gridbox" = yes; then
-  AC_MSG_RESULT([  Enable hidden3d gridbox optimization])
-fi
-
-if test "$enable_fiterrvars" = yes; then
-  AC_MSG_RESULT([  Enable fitting error variables])
-fi
-
-if test "$enable_datastrings" = yes; then
-  AC_MSG_RESULT([  Enable string-handling in datafiles])
-fi
-
-if test "$enable_histograms" = yes; then
-  AC_MSG_RESULT([  Enable plot style histograms])
-fi
-
-if test "$enable_stringvariables" = yes; then
-  AC_MSG_RESULT([  Enable string variables])
-fi
-
-if test "$enable_macros" = yes; then
-  AC_MSG_RESULT([  Enable command line macros (EXPERIMENTAL)])
-fi
-
-if test "$enable_objects" = yes; then
-  AC_MSG_RESULT([  Enable placement of rectangles and other objects (EXPERIMENTAL)])
-fi
-
-if test "$enable_with_image" = yes; then
-  AC_MSG_RESULT([  Enable plot style image (EXPERIMENTAL)])
-fi
-
-if test "$enable_binary_data_file" = yes; then
-  AC_MSG_RESULT([  Enable general binary data file reading (EXPERIMENTAL)])
-fi
-
-if test "$enable_binary_x11_polygon" = yes; then
-  AC_MSG_RESULT([  Enable X11 polygon info in binary, not ascii (EXPERIMENTAL)])
+else
+  AC_MSG_RESULT([  ggi terminal: no (use --with-ggi to enable, requires libggi)])
 fi
 
 if test "$enable_iris" = yes; then
-  AC_MSG_RESULT([  Enable IRIS terminal])
+  AC_MSG_RESULT([  iris4d terminal: yes])
+else
+  AC_MSG_RESULT([  iris4d terminal: no (use --enable-iris to enable, requires libgl_s)])
 fi
 
 if test "$enable_mgr" = yes; then
-  AC_MSG_RESULT([  Enable MGR terminal])
+  AC_MSG_RESULT([  mgr terminal: yes])
+else
+  AC_MSG_RESULT([  mgr terminal: no (use --enable-mgr to enable, requires libpixrect)])
 fi
 
 if test "$enable_rgip" = yes ; then
-  AC_MSG_RESULT([  Enable RGIP terminal])
+  AC_MSG_RESULT([  rgip/uniplex terminal: yes])
+else
+  AC_MSG_RESULT([  rgip/uniplex terminal: no (use --enable-rgip to enable)])
+fi
+
+if test "$is_msdos" = yes; then
+  AC_MSG_RESULT([  svga terminal (MSDOS/djgpp): yes])
+else
+  AC_MSG_RESULT([  svga terminal (MSDOS/djgpp): no])
+fi
+
+if test "$build_src_beos_subdir" = yes; then
+  AC_MSG_RESULT([  be terminal (BeOS): yes])
+else
+  AC_MSG_RESULT([  be terminal (BeOS): no])
+fi
+
+if test "$is_next" = yes; then
+  AC_MSG_RESULT([  next terminal: yes])
+else
+  AC_MSG_RESULT([  next terminal: no])
+fi
+
+if test "$is_apple" = yes; then
+  AC_MSG_RESULT([  aqua terminal (MacOS X): yes])
+else
+  AC_MSG_RESULT([  aqua terminal (MacOS X): no])
 fi
 
 if test "$enable_wxwidgets_ok" = yes; then
-  AC_MSG_RESULT([  Enable wxWidgets interactive terminal (EXPERIMENTAL)])
+  AC_MSG_RESULT([  wxt terminal: yes (EXPERIMENTAL)])
+else
+  AC_MSG_RESULT([  wxt terminal: no (requires C++, wxWidgets>2.6, cairo>0.9, pango>1.10)])
 fi
+
+AC_MSG_RESULT([])
+AC_MSG_RESULT([  Additional terminals are availaible in platform-specific makefiles:])
+AC_MSG_RESULT([   amiga (makefile.amg and makefile.ami), apollo/gpr (makefile.unx), atari/vdi])
+AC_MSG_RESULT([   (makefile.st), cgi (makefile.unx), mtos (makefile.mto), pm (makefile.os2),])
+AC_MSG_RESULT([   sun (makefile.unx), unixpc (makefile.unx), windows (various Windows])
+AC_MSG_RESULT([   makefiles)])
+
+AC_MSG_RESULT([  Additional terminals are built automatically if possible at compile-time:])
+AC_MSG_RESULT([   vesa (MSDOS), emxvga (MSDOS, OS/2), ega/vga/svga/ssvga/hercules (Windows with])
+AC_MSG_RESULT([   Zortec compiler), macintosh])
+
+
+AC_MSG_RESULT([])
+AC_MSG_RESULT([gnuplot will be compiled with the following features:])
+AC_MSG_RESULT([])
+
+if test "$enable_fiterrvars" = yes; then
+  AC_MSG_RESULT([  Fitting error variables: yes])
+else
+  AC_MSG_RESULT([  Fitting error variables: no])
+fi
+
+if test "$enable_datastrings" = yes; then
+  AC_MSG_RESULT([  String-handling in datafiles: yes])
+else
+  AC_MSG_RESULT([  String-handling in datafiles: no])
+fi
+
+if test "$enable_histograms" = yes; then
+  AC_MSG_RESULT([  Plot style histograms: yes])
+else
+  AC_MSG_RESULT([  Plot style histograms: no (requires string-handling in datafiles)])
+fi
+
+if test "$enable_stringvariables" = yes; then
+  AC_MSG_RESULT([  String variables: yes])
+else
+  AC_MSG_RESULT([  String variables: no])
+fi
+
+if test "$enable_macros" = yes; then
+  AC_MSG_RESULT([  Command line macros: yes (EXPERIMENTAL)])
+else
+  AC_MSG_RESULT([  Command line macros: no (requires string variables)])
+fi
+
+if test "$enable_objects" = yes; then
+  AC_MSG_RESULT([  Placement of rectangles and other objects: yes (EXPERIMENTAL)])
+else
+  AC_MSG_RESULT([  Placement of rectangles and other objects: no])
+fi
+
+if test "$enable_with_image" = yes; then
+  AC_MSG_RESULT([  Plot style image: yes (EXPERIMENTAL)])
+else
+  AC_MSG_RESULT([  Plot style image: no])
+fi
+
+if test "$enable_binary_data_file" = yes; then
+  AC_MSG_RESULT([  General binary data file reading: yes (EXPERIMENTAL)])
+else
+  AC_MSG_RESULT([  General binary data file reading: no])
+fi
+
+AC_MSG_RESULT([])
+AC_MSG_RESULT([gnuplot will be compiled with the following options:])
+AC_MSG_RESULT([])
+
+if test "$with_readline" != no; then
+  if test "$with_readline" != yes; then
+    if test -n "$gp_tcap"; then
+      AC_MSG_RESULT([  Readline library: GNU readline library with $gp_tcap])
+    else
+      AC_MSG_RESULT([  Readline library: GNU readline library])
+    fi
+  else
+    AC_MSG_RESULT([  Readline library: builtin minimal readline (use --with-readline to override)])
+  fi
+else
+  AC_MSG_RESULT([  Readline library: builtin minimal readline (use --with-readline to override)])
+fi
+
+if test "$enable_history_file" = yes; then
+  AC_MSG_RESULT([  Command-line history file: yes])
+else
+  AC_MSG_RESULT([  Command-line history file: no])
+fi
+
+if test "$with_cwdrc" = yes; then
+  AC_MSG_RESULT([  Check current directory for .gnuplot file: yes])
+else
+  AC_MSG_RESULT([  Check current directory for .gnuplot file: no (use --with-cwdrc to enable)])
+fi
+
+if test "$with_row_help" = no; then
+  AC_MSG_RESULT([  Sort help/subtopic tables by column: yes])
+else
+  AC_MSG_RESULT([  Sort help/subtopic tables by column: no (use --without-row-help to enable)])
+fi
+
+if test "$with_kpsexpand" = yes; then
+  AC_MSG_RESULT([  Use TeX kpsexpand to search for fonts: yes])
+else
+  AC_MSG_RESULT([  Use TeX kpsexpand to search for fonts: no (use --with-kpsexpand to enable)])
+fi
+
+if test "$enable_thin_splines" = yes; then
+  AC_MSG_RESULT([  Thin plate splines: yes])
+else
+  AC_MSG_RESULT([  Thin plate splines: no (use --enable-thin-spline to enable)])
+fi
+
+if test "$enable_h3d_gridbox" = yes; then
+  AC_MSG_RESULT([  Hidden3d optimization: gridbox])
+else
+  if test "$enable_h3d_quadtree" = no; then
+    AC_MSG_RESULT([  Hidden3d optimization: none])
+  else
+    AC_MSG_RESULT([  Hidden3d optimization: quadtree])
+  fi
+fi
+
+AC_MSG_RESULT([])
+AC_MSG_RESULT([gnuplot will install the following additional materials:])
+AC_MSG_RESULT([])
+
+if test "$with_lasergnu" = yes; then
+  AC_MSG_RESULT([  lasergnu printer script: yes])
+else
+  AC_MSG_RESULT([  lasergnu printer script: no (use --with-lasergnu to enable)])
+fi
+
+if test "$with_lisp_files" != no; then
+  AC_MSG_RESULT([  gnuplot-mode for X/Emacs: yes])
+else
+  AC_MSG_RESULT([  gnuplot-mode for X/Emacs: no])
+fi
+
+if test "$TUTORIAL" = tutorial; then
+  AC_MSG_RESULT([  LaTeX tutorial: yes])
+else
+  AC_MSG_RESULT([  LaTeX tutorial: no])
+fi
+
+AC_MSG_RESULT([  Help file: yes (always), in $GIHDIR/gnuplot.gih])
+
+AC_MSG_RESULT([  PostScript prologue files: yes (always)])
 
 dnl end config report
 

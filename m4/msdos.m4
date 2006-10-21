@@ -28,8 +28,10 @@ AC_EGREP_CPP(yes,
       AC_DEFINE(GRX21, 1,
                 [ Define if you want to use a newer version of libgrx under MSDOS/djgpp. ])dnl
     )dnl
-  ),
+  )
+  is_msdos=yes,
   AC_MSG_RESULT(no)
+  is_msdos=no
   )dnl
 ])
 
