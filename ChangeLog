@@ -4,6 +4,9 @@
 	plot key label from the data file; now allow title subcommand:
 	    plot foo using 1:(column(N)) title column(N)
 
+	* src/plot2d.c (get_data): Add #ifdef EAM_HISTOGRAMS to a section that
+	prevented configuration with --disable-histograms
+
 2006-10-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in: Rework the summary displayed at the end of the

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.132 2006/07/18 05:24:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133 2006/09/27 04:24:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -445,12 +445,13 @@ get_data(struct curve_points *current_plot)
 
         case DF_MISSING:
             /* Plot type specific handling of missing points goes here. */
+#ifdef EAM_HISTOGRAMS
             if (current_plot->plot_style == HISTOGRAMS) {
         	current_plot->points[i].type = UNDEFINED;
         	i++;
 		continue;
 	    }
-
+#endif
             /* Jun 2006 - Return to behavior of 3.7 and current docs:
 	     *            do not interrupt plotted line because of missing data
 	     */
