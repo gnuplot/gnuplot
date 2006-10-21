@@ -51,7 +51,7 @@ set style histogram rowstacked
 set style fill solid border -1
 set boxwidth 0.75
 #
-plot 'immigration.dat' using 2:xtic(1), for [i=2:22] '' using i
+plot 'immigration.dat' using 2:xtic(1), for [i=3:22] '' using i
 #
 pause -1 "<cr> to rescale each stack to % of total"
 #
