@@ -1,0 +1,6 @@
+set title "Iteration within plot command"
+set xrange [0:3]
+set label 1 "plot for [n=2:10] sin(x*n)/n" at graph .95, graph .92 right
+plot for [n=2:10] sin(x*n)/n notitle lw (13-n)/2
+pause -1 "Hit return to continue"
+reset
