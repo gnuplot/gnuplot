@@ -1,3 +1,20 @@
+2006-10-22  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* src/graphics.c (plot_image_or_update_axes): Operator | is
+	forbidden on real C99 booleans.  Use || instead.
+
+	* src/datafile.c (df_readbinary): Operator | is forbidden on real
+	C99 booleans.  Use || instead.
+
+	* src/axis.c (setup_tics): Operator & is forbidden on real C99
+	booleans.  Use && instead.
+
+	* config/makefile.oww (WCFLAGS): Add -za99 to enable _Bool type in
+	recent versions of OpenWatcom.
+	(default): Mark .SYMBOLIC for wmake.
+	(texticon.ico): Avoid endless rebuild by copying the generation
+	command.
+
 2006-10-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_open): Fix bug limiting the options for reading a

@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.oww,v 1.7 2006/03/28 21:50:01 broeker Exp $
+# $Id: makefile.oww,v 1.9 2006/10/22 11:56:03 broeker Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -79,7 +79,7 @@ CPPFLAGS =  -D_Windows -DHAVE_CONFIG_H -DUSE_MOUSE -DEAM_OBJECTS
 # -j  : char is signed
 # -aa : allow non-const initializers for locals
 # -d2 : debug information
-WCFLAGS = -zlf -ei -zq -I. -zm -bm -5r -sg -orilt -j -aa -d2 $(CPPFLAGS)
+WCFLAGS = -zlf -ei -zq -I. -zm -bm -5r -sg -orilt -j -za99 -aa -d2 $(CPPFLAGS)
 
 
 # paths for external libs added here... 
@@ -100,7 +100,8 @@ BINARYFILES=$(M)binary1 $(M)binary2 $(M)binary3
 # makefile.all, because line continuation in WMake is different...
 !INCLUDE makefile.awc
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(BINARYFILES) pgnuplot.exe
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu &
+         $(BINARYFILES) pgnuplot.exe .SYMBOLIC
 
 OBJS = $(COREOBJS) version.obj
 
@@ -179,7 +180,8 @@ pgnuplot.exe: win\pgnuplot.c version.obj .AUTODEPEND
 
 
 # extract icons from wgnuplot.rc
-texticon.ico: grpicon.ico .SYMBOLIC
+texticon.ico: geticon.exe win\wgnuplot.rc
+        geticon win\wgnuplot.rc
 
 grpicon.ico: geticon.exe win\wgnuplot.rc
         geticon win\wgnuplot.rc
