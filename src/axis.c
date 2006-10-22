@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.59 2005/11/27 23:52:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.61 2006/10/22 11:54:39 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -777,8 +777,10 @@ setup_tics(AXIS_INDEX axis, int max)
 
     if (ticdef->type == TIC_SERIES) {
 	ticstep[axis] = tic = ticdef->def.series.incr;
-	autoextend_min &= (ticdef->def.series.start == -VERYLARGE);
-	autoextend_max &= (ticdef->def.series.end == VERYLARGE);
+	autoextend_min = autoextend_min
+	                 && (ticdef->def.series.start == -VERYLARGE);
+	autoextend_max = autoextend_max
+	                 && (ticdef->def.series.end == VERYLARGE);
     } else if (ticdef->type == TIC_COMPUTED) {
 	ticstep[axis] = tic = make_tics(axis, max);
     } else {
