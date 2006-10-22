@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.111 2006/10/19 04:00:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.112 2006/10/20 17:18:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4651,16 +4651,11 @@ df_readbinary(double v[], int max)
 	df_binary_file_record_struct *this_record
 	    = df_bin_record + df_bin_record_count;
 
-	translation_required = FALSE;
 	scan_size[0] = scan_size[1] = scan_size[2] = 0;
 
-	/* P */
-	translation_required |=
-	    rotation_matrix_3D(P, this_record->cart_p);
-
-	/* R */
-	translation_required |=
-	    rotation_matrix_2D(R, this_record->cart_alpha);
+	translation_required =
+	    rotation_matrix_3D(P, this_record->cart_p)
+	    || rotation_matrix_2D(R, this_record->cart_alpha);
 
 	if (df_matrix_file) {
 	    /* Dimensions */
@@ -4765,7 +4760,8 @@ df_readbinary(double v[], int max)
 
 	/* Check if c and o are the same. */
 	for (i = 0; i < 3; i++)
-	    translation_required |= (c[i] != o[i]);
+	    translation_required = translation_required
+	                           || (c[i] != o[i]);
 
 	/* Should data come from memory? */
 	memory_data = this_record->memory_data;

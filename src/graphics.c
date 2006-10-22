@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.196 2006/10/19 04:00:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.197 2006/10/21 22:58:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5570,10 +5570,15 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 
 		    /* Check if one of the corners is viewable */
 		    for (k=0; k < 4; k++) {
-			corner_in_range[k] = ( inrange(p_corners[k].x, view_port_x[0], view_port_x[1]) &&
-					       inrange(p_corners[k].y, view_port_y[0], view_port_y[1]) &&
-					       (!project_points || inrange(p_corners[k].z, view_port_z[0], view_port_z[1])) );
-			pixel_in_view |= corner_in_range[k];
+			corner_in_range[k] =
+			    inrange(p_corners[k].x,
+			            view_port_x[0], view_port_x[1])
+			    && inrange(p_corners[k].y,
+			               view_port_y[0], view_port_y[1])
+			    && (!project_points
+			        || inrange(p_corners[k].z,
+				           view_port_z[0], view_port_z[1]));
+			pixel_in_view = pixel_in_view || corner_in_range[k];
 		    }
 
 		    if (pixel_in_view || view_in_pixel) {
