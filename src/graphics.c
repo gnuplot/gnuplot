@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.197 2006/10/21 22:58:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.198 2006/10/22 11:54:39 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1356,7 +1356,7 @@ place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
 
 #ifdef EAM_OBJECTS
 void
-place_rectangles(struct object *listhead, int layer, BoundingBox *clip_area)
+place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox *clip_area)
 {
     t_object *this_object;
     t_rectangle *this_rect;
@@ -1387,6 +1387,8 @@ place_rectangles(struct object *listhead, int layer, BoundingBox *clip_area)
 		map3d_position_r(&this_rect->extent, &junkw, &junkh, "rect");
 		width = junkw;
 		height = junkh;
+	    } else if (dimensions == 3 && this_rect->center.scalex != screen) {
+		continue;
 	    } else {
 		map_position_double(&this_rect->center, &x1, &y1, "rect");
 		map_position_r(&this_rect->extent, &width, &height, "rect");
@@ -1407,6 +1409,9 @@ place_rectangles(struct object *listhead, int layer, BoundingBox *clip_area)
 	    if (splot_map) {
 		map3d_position_double(&this_rect->bl, &x1, &y1, "rect");
 		map3d_position_double(&this_rect->tr, &x2, &y2, "rect");
+	    } else if (dimensions == 3 
+		    && (this_rect->bl.scalex != screen || this_rect->tr.scalex != screen))
+		continue;
 	    } else {
 		map_position_double(&this_rect->bl, &x1, &y1, "rect");
 		map_position_double(&this_rect->tr, &x2, &y2, "rect");
@@ -1536,7 +1541,7 @@ do_plot(struct curve_points *plots, int pcount)
     boundary(plots, pcount);
 
     /* Give a chance for rectangles to be behind everything else*/
-    place_rectangles( first_object, -1, NULL );
+    place_rectangles( first_object, -1, 2, NULL );
 
     /* Add colorbox if appropriate. */
     if (is_plot_with_palette() && !make_palette() && is_plot_with_colorbox() && term->set_color)
@@ -1716,7 +1721,7 @@ do_plot(struct curve_points *plots, int pcount)
     }
 
     /* And rectangles */
-    place_rectangles( first_object, 0, clip_area );
+    place_rectangles( first_object, 0, 2, clip_area );
 
     /* PLACE LABELS */
     place_labels( first_label, 0, FALSE );
@@ -1978,7 +1983,7 @@ do_plot(struct curve_points *plots, int pcount)
 	plot_border();
 
     /* And rectangles */
-    place_rectangles( first_object, 1, clip_area );
+    place_rectangles( first_object, 1, 2, clip_area );
 
     /* PLACE LABELS */
     place_labels( first_label, 1, FALSE );

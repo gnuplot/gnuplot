@@ -1,3 +1,10 @@
+2006-10-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (place_rectangles do_plot) src/graph3d.c (do_3dplot)
+	src/graphics.h: Allow placement of rectangles in 3D (splot) regardless
+	of view angle, but only if the rectangle position is given in screen
+	coords. Placement in 2D and 3D "set view map" is unchanged.
+
 2006-10-22  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* src/graphics.c (plot_image_or_update_axes): Operator | is
