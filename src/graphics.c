@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.198 2006/10/22 11:54:39 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.199 2006/10/26 04:09:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1410,7 +1410,8 @@ place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox
 		map3d_position_double(&this_rect->bl, &x1, &y1, "rect");
 		map3d_position_double(&this_rect->tr, &x2, &y2, "rect");
 	    } else if (dimensions == 3 
-		    && (this_rect->bl.scalex != screen || this_rect->tr.scalex != screen))
+		       && (this_rect->bl.scalex != screen
+			   || this_rect->tr.scalex != screen)) {
 		continue;
 	    } else {
 		map_position_double(&this_rect->bl, &x1, &y1, "rect");
