@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.131 2006/06/30 02:22:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.132 2006/08/22 02:50:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -945,7 +945,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
         fprintf(fp, " font \"%s\"", axis_array[axis].ticdef.font);
 
     if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-        fprintf(fp, " textcolor lt %d", axis_array[axis].ticdef.textcolor.lt+1);
+        save_textcolor(fp, &axis_array[axis].ticdef.textcolor);
 
     putc('\n', fp);
 

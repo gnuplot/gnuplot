@@ -1,3 +1,9 @@
+2006-10-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/show.c (show_ticdef) src/save.c (save_tics): Sace/show textcolor
+	of tic labels correctly for cases other than a pure linetype (TC_LT).
+	Bug #1586427
+
 2006-10-22  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* src/graphics.c (plot_image_or_update_axes): Operator | is
