@@ -239,6 +239,7 @@ typedef struct {
     TBOOLEAN enhanced;		/* enable/disable enhanced text of key titles */
     struct lp_style_type box;	/* linetype of box around key:  */
     char title[MAX_LINE_LEN+1];	/* title line for the key as a whole */
+    char *font;			/* Will be used for both key title and plot titles */
 } legend_key;
 
 extern legend_key keyT;
@@ -257,7 +258,8 @@ extern legend_key keyT;
 		FILENAME_KEYTITLES, \
 		FALSE, FALSE, TRUE, \
 		DEFAULT_KEYBOX_LP, \
-		"" }
+		"", \
+		NULL }
 
 /* bounding box position, in terminal coordinates */
 typedef struct {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.236 2006/07/06 23:12:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.237 2006/10/21 22:58:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1517,8 +1517,8 @@ set_key()
 
 #ifdef BACKWARDS_COMPATIBLE
     if (END_OF_COMMAND) {
+	free(key->font);
 	reset_key();
-	key->title[0] = '\0';
 	if (interactive)
 	    int_warn(c_token, "deprecated syntax, use \"set key default\"");
     }
@@ -1533,8 +1533,8 @@ set_key()
 	    key->visible = FALSE;
 	    break;
 	case S_KEY_DEFAULT:
+	    free(key->font);
 	    reset_key();
-	    key->title[0] = '\0';
 	    break;
 	case S_KEY_TOP:
 	    if (vpos_set)
@@ -1735,6 +1735,19 @@ set_key()
 		c_token--;
 	    }
 	    break;
+
+	case S_KEY_FONT:
+	    c_token++;
+	    /* Make sure they've specified a font */
+	    if (!isstringvalue(c_token))
+		int_error(c_token,"expected font");
+	    else {
+		free(key->font);
+		key->font = try_to_get_string();
+		c_token--;
+	    }
+	    break;
+
 	case S_KEY_MANUAL:
 	    c_token++;
 #ifdef BACKWARDS_COMPATIBLE

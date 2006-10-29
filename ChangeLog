@@ -1,3 +1,16 @@
+2006-10-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h src/tables.h src/tables.c: Add font to key structure.
+
+	* src/set.c (set_key set_keytitle) src/save.c src/show.c
+	src/graphics.c (do_plot do_key_sample) docs/gnuplot.doc:
+	    set key {font "<face>,<size>"}
+
+	Add explicit font to be used for key title and key entries.  If you use
+	a font that is very different from the default, you may have to adject
+	the line spacing of the key entries.  For example:
+	    set key font "Times,18" spacing 1.5
+
 2006-10-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_ticdef) src/save.c (save_tics): Handle textcolor of

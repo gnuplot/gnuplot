@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.199 2006/10/26 04:09:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.200 2006/10/26 21:04:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1747,7 +1747,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
 		extra_height += 0.51;
 	    write_multiline(center, yl - (0.5 + extra_height/2.0) * t->v_char,
-			    key->title, CENTRE, JUST_TOP, 0, NULL);
+			    key->title, CENTRE, JUST_TOP, 0, key->font);
 	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
 		extra_height += 0.3;
 	    ktitl_lines += extra_height;
@@ -4966,16 +4966,16 @@ do_key_sample(
     (*t->linetype)(LT_BLACK);
 
     if (key->just == GPKEY_LEFT) {
-	write_multiline(xl + key_text_left, yl, title, LEFT, JUST_TOP, 0, NULL);
+	write_multiline(xl + key_text_left, yl, title, LEFT, JUST_TOP, 0, key->font);
     } else {
 	if ((*t->justify_text) (RIGHT)) {
-	    write_multiline(xl + key_text_right, yl, title, RIGHT, JUST_TOP, 0, NULL);
+	    write_multiline(xl + key_text_right, yl, title, RIGHT, JUST_TOP, 0, key->font);
 	} else {
 	    int x = xl + key_text_right - t->h_char * estimate_strlen(title);
 	    if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC ||	/* HBB 990327 */
 		key->region == GPKEY_AUTO_EXTERIOR_MARGIN ||
 		i_inrange(x, plot_bounds.xleft, plot_bounds.xright))
-		write_multiline(x, yl, title, LEFT, JUST_TOP, 0, NULL);
+		write_multiline(x, yl, title, LEFT, JUST_TOP, 0, key->font);
 	}
     }
 

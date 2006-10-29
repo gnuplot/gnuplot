@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.186 2006/10/21 22:58:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.187 2006/10/29 04:22:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -773,7 +773,6 @@ show_all()
     show_zeroaxis(FIRST_Z_AXIS);
     show_label(0);
     show_arrow(0);
-    show_keytitle();
     show_key();
     show_logscale();
     show_offsets();
@@ -1717,7 +1716,9 @@ show_keytitle()
     legend_key *key = &keyT;
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\tkeytitle is \"%s\"\n", conv_text(key->title));
+    fprintf(stderr, "\tkey title is \"%s\"\n", conv_text(key->title));
+    if (key->font && *(key->font))
+	fprintf(stderr,"\t  font \"%s\"\n", key->font);
 }
 
 
@@ -1809,8 +1810,7 @@ show_key()
 \tvertical spacing is %g characters\n\
 \twidth adjustment is %g characters\n\
 \theight adjustment is %g characters\n\
-\tcurves are%s automatically titled %s\n\
-\tkey title is \"%s\"\n",
+\tcurves are%s automatically titled %s\n",
 	    key->swidth,
 	    key->vert_factor,
 	    key->width_fix,
@@ -1818,8 +1818,8 @@ show_key()
 	    key->auto_titles ? "" : " not",
 	    key->auto_titles == FILENAME_KEYTITLES ? "with filename" :
 	    key->auto_titles == COLUMNHEAD_KEYTITLES
-	    ? "with column header" : "",
-	    key->title);
+	    ? "with column header" : "");
+    show_keytitle();
 }
 
 
