@@ -1,3 +1,8 @@
+2006-11-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Add an entry key for "help file", because otherwise
+	this takes you to a section on avs binary format (confusing).
+
 2006-10-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/tables.h src/tables.c: Add font to key structure.
@@ -7,7 +12,7 @@
 	    set key {font "<face>,<size>"}
 
 	Add explicit font to be used for key title and key entries.  If you use
-	a font that is very different from the default, you may have to adject
+	a font that is very different from the default, you may have to adjust
 	the line spacing of the key entries.  For example:
 	    set key font "Times,18" spacing 1.5
 
