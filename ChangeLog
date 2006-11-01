@@ -1,3 +1,8 @@
+2006-11-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Add an entry key for "help file", because otherwise
+	this takes you to a section on avs binary format (confusing).
+
 2006-10-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_ticdef) src/save.c (save_tics): Sace/show textcolor

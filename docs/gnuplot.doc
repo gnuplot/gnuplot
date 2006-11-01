@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.391 2006/10/12 21:20:41 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.4 2006/10/12 21:26:26 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3115,6 +3115,7 @@ C ... and restart the table:
 ?data-file
 ?datafile
 ?data
+?file
  Discrete data contained in a file can be displayed by specifying the name of
  the data file (enclosed in single or double quotes) on the `plot` command line.
 
