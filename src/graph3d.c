@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.158 2006/10/03 00:13:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.1 2006/10/03 00:40:22 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -918,6 +918,10 @@ do_3dplot(
 	     this_plot = this_plot->next_sp, surface++) {
 	    /* just an abbreviation */
 	    TBOOLEAN use_palette = can_pm3d && this_plot->lp_properties.use_palette;
+
+	    /* Skip over abortive data structures */
+	    if (this_plot->plot_type == NODATA)
+		continue;
 
 	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit) {
 		pm3d_draw_one(this_plot);
@@ -2186,8 +2190,11 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		 * 'explicit' surface datasets, i.e. z(x,y) */
 		for (; --plot_num >= 0; plot = plot->next_sp) {
 		    struct iso_curve *curve = plot->iso_crvs;
-		    int count = curve->p_count;
+		    int count;
 		    int iso;
+
+		    if (plot->plot_type == NODATA)
+			continue;
 		    if (plot->plot_type == DATA3D) {
 			if (!plot->has_grid_topology)
 			    continue;
@@ -2195,6 +2202,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		    } else
 			iso = iso_samples_2;
 
+		    count = curve->p_count;
 		    check_corner_height(curve->points, height, depth);
 		    check_corner_height(curve->points + count - 1, height, depth);
 		    while (--iso)

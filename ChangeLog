@@ -1,5 +1,23 @@
 2006-11-03  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/datafile.c (df_readline): If the datafile we are supposedly
+	reading from was never opened, simply return DF_EOF. This relieves the
+	caller from having to check this separately before calling df_readline.
+
+	* src/datafile.c (df_open); If the datafile cannot be opened, set
+	df_eof and return DF_EOF. FIXME: Having both methods is stupid; we
+	should just get rid of df_eof and use the return value.
+
+	* src/graph3d.c (do_3dplot draw_3d_graphbox) src/graphics.c (do_plot): 
+	* src/plot3d.c (eval_3dplots): 
+	Do a better job of skipping over plots marked NODATA.  In particular do
+	not try to scan their data for scaling or plot limits, and do not place
+	an entry in the key box.
+
+	Bug #1579867
+
+2006-11-03  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/datafile.c (df_readbinary): Fix error in logic of 2D and 3D
 	rotation matrix initialization.
 

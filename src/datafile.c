@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.2 2006/10/22 12:09:42 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.3 2006/11/04 05:55:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1280,9 +1280,9 @@ df_open(const char *cmd_filename, int max_using)
 	if ((data_fp = loadpath_fopen(df_filename, df_binary ? "rb" : "r")) ==
 #endif
 	    (FILE *) NULL) {
-	    /* os_error(name_token, "can't read data file \"%s\"", df_filename); */
 	    int_warn(NO_CARET, "Skipping unreadable file \"%s\"", df_filename);
-	    return -1;
+	    df_eof = 1;
+	    return DF_EOF;
 	}
     }
 /*}}} */
@@ -1641,6 +1641,9 @@ void plot_ticlabel_using(int axis)
 int
 df_readline(double v[], int max)
 {
+    if (!data_fp)
+	return DF_EOF;
+
 #ifdef BINARY_DATA_FILE
     if (df_read_binary)
 	/* General binary, matrix binary or matrix ascii
