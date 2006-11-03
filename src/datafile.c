@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.112 2006/10/20 17:18:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.113 2006/10/22 11:54:39 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4648,14 +4648,15 @@ df_readbinary(double v[], int max)
      * formula x' = P*R*(x - c) + o */
     if (!df_M_count && !df_N_count && !df_O_count) {
 	int i;
+	TBOOLEAN D2, D3;
 	df_binary_file_record_struct *this_record
 	    = df_bin_record + df_bin_record_count;
 
 	scan_size[0] = scan_size[1] = scan_size[2] = 0;
 
-	translation_required =
-	    rotation_matrix_3D(P, this_record->cart_p)
-	    || rotation_matrix_2D(R, this_record->cart_alpha);
+	D2 = rotation_matrix_2D(R, this_record->cart_alpha);
+	D3 = rotation_matrix_3D(P, this_record->cart_p);
+	translation_required = D2 || D3;
 
 	if (df_matrix_file) {
 	    /* Dimensions */
