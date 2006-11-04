@@ -1,3 +1,10 @@
+2006-11-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm (parse_driver): If this routine fails on first entry, we
+	must not call int_error() because the longjump has not been set up yet.
+	I.e. "setenv GNUPLOT_DRIVER_DIR illegal; setenv GNUTERM x11; gnuplot"
+	would segfault on entry. Just a print warning and hope the user notices.
+
 2006-11-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readline): If the datafile we are supposedly

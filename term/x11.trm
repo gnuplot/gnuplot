@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.159 2006/07/22 00:01:29 sfeam Exp $
+ * $Id: x11.trm,v 1.160 2006/09/01 09:58:44 mikulik Exp $
  *
  */
 
@@ -270,8 +270,11 @@ parse_driver(const char *cmd)
 	if (!dir)
 	    dir = X11_DRIVER_DIR;
 #ifndef OS2
-	if (dir[0] != '/' && dir[0] != '.')
-	    int_error(NO_CARET, "Illegal X11 driver directory name!");
+	if (dir[0] != '/' && dir[0] != '.') {
+	    /* Can't call int_error because longjump has not been set up yet */
+	    int_warn(NO_CARET, "Illegal X11 driver directory name! Using default");
+	    *dir = '\0';
+	}
 #endif
 	X11_full_command_path = gp_realloc(X11_full_command_path,
 					   strlen(dir) + strlen(optvec[0]) + 2,
