@@ -1,3 +1,12 @@
+2006-11-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (init_term): Normally we initialize the default terminal
+	immediately on program entry. However, if the default is x11 then defer
+	initialization until an actual plot command.  This mitigates problems
+	if gnuplot_x11 cannot be started normally, and allows the user to select
+	a different driver in the case that x11 is the default but is broken.
+	Bug #1530601
+
 2006-11-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Restore a few lines of code removed in
@@ -11,7 +20,7 @@
 	* term/x11.trm (parse_driver): If this routine fails on first entry, we
 	must not call int_error() because the longjump has not been set up yet.
 	I.e. "setenv GNUPLOT_DRIVER_DIR illegal; setenv GNUTERM x11; gnuplot"
-	would segfault on entry.  Just print warning and hope the users notices.
+	would segfault on entry. Just print a warning and hope the user notices.
 
 2006-11-03  Ethan Merritt  <merritt@u.washington.edu>
 
