@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.26 2006/09/11 21:48:38 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.30 2006/09/23 14:25:10 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -675,6 +675,10 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		dc.SetLogicalFunction( wxAND );
 		dc.DrawRectangle( zoom_x1, zoom_y1, mouse_x -zoom_x1, mouse_y -zoom_y1);
 		dc.SetLogicalFunction( wxCOPY );
+
+		dc.SetFont( wxFont( (int) plot.fontsize, wxFONTFAMILY_DEFAULT,
+			wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false,
+			wxString(plot.fontname, wxConvLocal) ) );
 
 		dc.DrawText( zoom_string1.BeforeFirst(wxT('\r')),
 			zoom_x1, zoom_y1 - term->v_char/plot.oversampling_scale);
