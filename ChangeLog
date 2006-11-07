@@ -1,3 +1,8 @@
+2006-11-07  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+        * src/wxterminal/wxt_gui.cpp (wxtPanel::DrawToDC): Draw the zoom
+        coordinates with the same font as the plot.
+
 2006-11-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (parse_driver): If this routine fails on first entry, we
