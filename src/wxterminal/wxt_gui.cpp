@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.30 2006/09/23 14:25:10 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.31 2006/11/07 12:30:38 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2726,7 +2726,6 @@ void wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 {
 	struct gp_event_t event;
 
-	/* add the event to the event list */
 	event.type = type;
 	event.mx = mx;
 	event.my = my;
@@ -2734,15 +2733,34 @@ void wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 	event.par2 = par2;
 	event.winid = id;
 
-#ifndef _Windows
+#ifdef _Windows
+	FPRINTF2((stderr,"Processing event\n"));
+	do_event( &event );
+	FPRINTF2((stderr,"Event processed\n"));
+	if (event.type == GE_buttonrelease && (paused_for_mouse & PAUSE_CLICK)) {
+		int button = event.par1;
+		if (button == 1 && (paused_for_mouse & PAUSE_BUTTON1))
+			paused_for_mouse = 0;
+		if (button == 2 && (paused_for_mouse & PAUSE_BUTTON2))
+			paused_for_mouse = 0;
+		if (button == 3 && (paused_for_mouse & PAUSE_BUTTON3))
+			paused_for_mouse = 0;
+	}
+	if (event.type == GE_keypress && (paused_for_mouse & PAUSE_KEYSTROKE)) {
+		/* Ignore NULL keycode */
+		if (event.par1 > '\0')
+			paused_for_mouse = 0;
+	}
+#else
+	/* add the event to the event list */
 	if (wxt_check_thread_state() == WAITING_FOR_STDIN)
-#endif /* ! _Windows */
 	{
 		FPRINTF2((stderr,"Gui thread adds an event to the list\n"));
 		mutexProtectingEventList.Lock();
 		EventList.push_back(event);
 		mutexProtectingEventList.Unlock();
 	}
+#endif /* ! _Windows */
 }
 
 
@@ -2796,26 +2814,10 @@ int wxt_process_events()
 
 #ifdef __WXMSW__
 /* Implements waitforinput used in wxt.trm
- * To avoid code duplication, the terminal events are directly
- * processed in TextGetCh(), which implements getch()
- * under Windows */
+ * the terminal events are directly processed when they are received */
 int wxt_waitforinput()
 {
 	return getch();
-}
-
-/* handles mouse events while the pause dialog is on,
- * if the wxWidgets is initialized and in use.
- * Used in wpause.c (PauseBox and win_sleep) .
- * It will return 1 if one event ends the pause */
-int wxt_terminal_events()
-{
-	int result = 0;
-	
-	if (!strcmp(term->name,"wxt") && wxt_status == STATUS_OK)
-		result = wxt_process_events();
-		
-	return 0;
 }
 
 #elif defined(__WXGTK__)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.12 2006/05/18 22:50:02 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.13 2006/06/13 20:26:35 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -52,10 +52,6 @@ static char *RCSid() { return RCSid("$Id: wpause.c,v 1.12 2006/05/18 22:50:02 tl
 #include "wresourc.h"
 #include "wcommon.h"
 
-#if defined(WXWIDGETS)&&defined(USE_MOUSE)
-# include "wxterminal/wxt_plot.h"
-#endif /* WXWIDGETS && USE_MOUSE */
-
 /* Pause Window */
 LRESULT CALLBACK WINEXPORT WndPauseProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK WINEXPORT PauseButtonProc(HWND, UINT, WPARAM, LPARAM);
@@ -89,9 +85,6 @@ win_sleep(DWORD dwMilliSeconds)
 	    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 		if (msg.message == WM_QUIT)
 		    return;
-#if defined(WXWIDGETS)&&defined(USE_MOUSE)
-		wxt_terminal_events();
-#endif /* WXWIDGETS && USE_MOUSE */
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	    }
@@ -198,9 +191,6 @@ PauseBox(LPPW lppw)
 	    /* HBB 20021211: Nigel Nunn found a better way to avoid
 	     * 100% CPU load --> use it */
 	    if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-#if defined(WXWIDGETS)&&defined(USE_MOUSE)
-		wxt_terminal_events();
-#endif /* WXWIDGETS && USE_MOUSE */
 		/* wait until window closed */
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
