@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.30.2.2 2006/11/10 22:33:34 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.30.2.3 2006/11/10 22:49:37 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -126,6 +126,7 @@
  */
 
 BEGIN_EVENT_TABLE( wxtFrame, wxFrame )
+	EVT_COMMAND( wxID_ANY, wxExitLoopEvent, wxtApp::OnExitLoop )
 	EVT_CLOSE( wxtFrame::OnClose )
 	EVT_SIZE( wxtFrame::OnSize )
 	EVT_TOOL( Toolbar_CopyToClipboard, wxtFrame::OnCopy )
@@ -287,6 +288,13 @@ int wxtApp::OnExit()
 	 * we want here!) */
 	delete wxConfigBase::Set((wxConfigBase *) NULL);
 	return 0;
+}
+
+/* will gently terminate the gui thread */
+void wxtApp::OnExitLoop( wxCommandEvent& WXUNUSED(event) )
+{
+	FPRINTF((stderr,"wxtApp::OnExitLoop\n"));
+	wxTheApp->ExitMainLoop();
 }
 
 /* ---------------------------------------------------------------------------
@@ -2952,35 +2960,72 @@ void wxt_atexit()
 		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
 		while (!com_line());
 	}
-#else /*_Windows*/
-
-# ifdef USE_MOUSE
-	wxt_change_thread_state(WAITING_FOR_STDIN);
-# endif /*USE_MOUSE*/
-
-	/* protect the following from interrupt */
-	wxt_sigint_init();
-
-	while (wxt_window_opened()) {
-# ifdef USE_MOUSE
-		if (!strcmp(term->name,"wxt"))
-			wxt_process_events();
-# endif /*USE_MOUSE*/
-		/* wait 10 microseconds and repeat */
-		wxMicroSleep(10);
-		wxt_sigint_check();
-	}
-
-	wxt_sigint_restore();
-
-# ifdef USE_MOUSE
-	wxt_change_thread_state(RUNNING);
-# endif /*USE_MOUSE*/
-
-#endif /* !_Windows */
 
 	/* cleanup and quit */
 	wxt_cleanup();
+#else /*_Windows*/
+
+	/* if fork() is available, use it so that the initial gnuplot process
+	 * exits (Maxima expects that since that's the way the x11 terminal
+	 * does it) and the child process continues in the background. */
+	/* FIXME: int_error() should be changed here, it causes crashes (for example,
+	 * zoom until an error occurs and then hit a key) */
+# ifdef HAVE_WORKING_FORK
+	/* send a message to exit the main loop */
+	wxCommandEvent event(wxExitLoopEvent);
+	std::vector<wxt_window_t>::iterator wxt_iter; /*declare the iterator*/
+	wxt_iter = wxt_window_list.begin();
+	wxt_iter->frame->GetEventHandler()->AddPendingEvent( event );
+
+	/* wait for the gui thread to exit */
+	thread->Wait();
+	delete thread;
+
+	/* fork */
+	pid_t pid = fork();
+
+	/* the parent just exits, the child keeps going */
+	if (!pid) {
+		/* create a new gui thread and run it */
+		/* have to close the previous main loop for this to succeed */
+		thread = new wxtThread();
+		thread->Create();
+		thread->Run();
+
+# endif /* HAVE_WORKING_FORK */
+
+# ifdef USE_MOUSE
+		wxt_change_thread_state(WAITING_FOR_STDIN);
+# endif /*USE_MOUSE*/
+
+		/* protect the following from interrupt */
+		wxt_sigint_init();
+
+		while (wxt_window_opened()) {
+# ifdef USE_MOUSE
+			if (!strcmp(term->name,"wxt"))
+				wxt_process_events();
+# endif /*USE_MOUSE*/
+			/* wait 10 microseconds and repeat */
+			/* such a polling is bad, putting the thread to sleep
+			 * would be better */
+			wxMicroSleep(10);
+			wxt_sigint_check();
+		}
+
+		wxt_sigint_restore();
+
+# ifdef USE_MOUSE
+		wxt_change_thread_state(RUNNING);
+# endif /*USE_MOUSE*/
+
+		/* cleanup and quit */
+		wxt_cleanup();
+
+# ifdef HAVE_WORKING_FORK
+	}
+# endif /* HAVE_WORKING_FORK */
+#endif /* !_Windows */
 }
 
 

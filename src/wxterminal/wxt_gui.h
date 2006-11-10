@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.14.2.1 2006/11/10 22:33:35 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.14.2.2 2006/11/10 22:49:37 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -199,6 +199,9 @@ static wxtThread * thread;
 # error "Not implemented"
 #endif /* __WXGTK__ */
 
+DECLARE_EVENT_TYPE(wxExitLoopEvent, -1)
+DEFINE_EVENT_TYPE(wxExitLoopEvent)
+
 /* Define a new application type, each gui should derive a class from wxApp */
 class wxtApp : public wxApp
 {
@@ -207,6 +210,8 @@ public:
 	bool OnInit();
 	/* cleanup on exit */
 	int OnExit();
+	/* event handler */
+	void OnExitLoop( wxCommandEvent &event );
 
 private:
 	/* load a toolbar icon */

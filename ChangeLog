@@ -22,6 +22,11 @@
         Use GP_ATEXIT() to register wxt_atexit().
         Rework "persist" behaviour on Windows.
 
+        * configure.in:
+        * wxt_gui.cpp (wxt_atexit):
+        * wxt_gui.h:
+        Use fork() to make the "persist" behaviour satisfying on UNIX.
+
 2006-11-07  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
         * src/wxterminal/wxt_gui.cpp (wxtPanel::DrawToDC): Draw the zoom
