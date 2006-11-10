@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.12 2006/07/19 06:07:43 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.14 2006/09/11 21:48:38 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -172,8 +172,6 @@ extern "C" {
 #include "wxt_term.h"
 /* drawing facility */
 #include "gp_cairo.h"
-/* 'persist' */
-#include "wxt_plot.h"
 
 /* ======================================================================
  * declarations
