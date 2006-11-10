@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.89 2006/08/05 21:33:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.90 2006/08/22 03:08:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -106,10 +106,6 @@ extern smg$create_key_table();
 # include "win/wcommon.h"
 #endif /* _Windows */
 
-#ifdef WXWIDGETS
-# include "wxterminal/wxt_plot.h"
-#endif
-
 /* GNU readline
  * Only required by two files directly,
  * so I don't put this into a header file. -lh
@@ -141,6 +137,7 @@ static void wrapper_for_write_history __PROTO((void));
 
 TBOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
 static TBOOLEAN noinputfiles = TRUE; /* FALSE if there are script files */
+TBOOLEAN persist_cl = FALSE; /* TRUE if -persist is parsed in the command line */
 
 /* user home directory */
 static const char *user_homedir = NULL;
@@ -285,9 +282,6 @@ main(int argc, char **argv)
 #endif
 {
     int i;
-#ifdef WXWIDGETS
-    TBOOLEAN persist = FALSE;
-#endif /* WXWIDGETS */
 
 #ifdef LINUXVGA
     LINUX_setup();		/* setup VGA before dropping privilege DBT 4/5/99 */
@@ -384,7 +378,6 @@ main(int argc, char **argv)
 	}
     }
 
-#ifdef WXWIDGETS
     /* the X11 terminal removes tokens that it recognizes from argv.
      * We have to parse -persist for the wxWidgets terminal before it happens, and
      * keep that value for later use */
@@ -396,7 +389,7 @@ main(int argc, char **argv)
 	}
 	if (!strcmp(argv[i], "-persist")) {
 	    FPRINTF((stderr,"'persist' command line option recognized"));
-	    persist = TRUE;
+	    persist_cl = TRUE;
 # ifdef X11
 	    ++i;
 # else
@@ -407,7 +400,6 @@ main(int argc, char **argv)
 	} else
 	    ++i;
     }
-#endif /* WXWIDGETS */
 
 #ifdef X11
     {
@@ -476,6 +468,11 @@ main(int argc, char **argv)
     interactive = FALSE;
     init_terminal();		/* can set term type if it likes */
     push_terminal(0);		/* remember the default terminal */
+
+    /* reset the terminal when exiting */
+    /* this is done through gp_atexit so that other terminal functions
+     * can be registered to be executed before the terminal is reset. */
+    GP_ATEXIT(term_reset);
 
 #ifdef AMIGA_SC_6_1
     if (IsInteractive(Input()) == DOSTRUE)
@@ -633,11 +630,7 @@ main(int argc, char **argv)
 
     if (argc > 1) {
 #ifdef _Windows
-# ifdef WXWIDGETS
-	TBOOLEAN noend = persist;
-# else
-	TBOOLEAN noend = FALSE;
-# endif
+	TBOOLEAN noend = persist_cl;
 #endif
 
 	/* load filenames given as arguments */
@@ -674,19 +667,12 @@ main(int argc, char **argv)
 	while (!com_line());
     }
 
-#ifdef WXWIDGETS
-    /* handle persist setting */
-    wxt_atexit(persist);
-#endif
-
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 #if !defined(HAVE_ATEXIT) && !defined(HAVE_ON_EXIT)
     /* You should be here if you neither have 'atexit()' nor 'on_exit()' */
     wrapper_for_write_history();
 #endif /* !HAVE_ATEXIT && !HAVE_ON_EXIT */
 #endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
-
-    term_reset();
 
 #ifdef OS2
     RexxDeregisterSubcom("GNUPLOT", NULL);

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.14 2006/09/11 21:48:38 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.15 2006/11/10 22:30:16 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -104,6 +104,8 @@
 #include <list>
 
 extern "C" {
+/* for interactive */
+# include "plot.h"
 /* for stdfn.h, JUSTIFY, encoding, *term definition, color.h */
 # include "term_api.h"
 /* for do_event declaration */
@@ -556,5 +558,8 @@ static void wxt_sigint_check();
 static void wxt_sigint_init();
 static void wxt_sigint_restore();
 static int wxt_sigint_counter = 0;
+
+/* cleanup at exit, and handle 'persist' setting */
+void wxt_atexit();
 
 #endif /*gnuplot_wxt_h*/

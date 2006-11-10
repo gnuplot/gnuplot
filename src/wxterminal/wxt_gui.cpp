@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.31 2006/11/07 12:30:38 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.32 2006/11/10 22:30:16 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1369,6 +1369,9 @@ void wxt_init()
 		 * we must revert it */
 		setlocale(LC_NUMERIC, "C");
 #endif /*have_locale_h*/
+
+		/* register call for "persist" effect and cleanup */
+		GP_ATEXIT(wxt_atexit);
 	}
 
 	wxt_sigint_check();
@@ -2908,7 +2911,7 @@ bool wxt_window_opened()
  * Handle the 'persist' setting, ie will continue
  * to handle events and will return when
  * all the plot windows are closed. */
-void wxt_atexit(TBOOLEAN persist)
+void wxt_atexit()
 {
 	int i;
 	int persist_setting;
@@ -2920,7 +2923,7 @@ void wxt_atexit(TBOOLEAN persist)
 		return;
 
 	/* first look for command_line setting */
-	if (wxt_persist==UNSET && persist)
+	if (wxt_persist==UNSET && persist_cl)
 		wxt_persist = TRUE;
 
 	wxConfigBase *pConfig = wxConfigBase::Get();
@@ -2942,24 +2945,27 @@ void wxt_atexit(TBOOLEAN persist)
 
 	FPRINTF((stderr,"wxWidgets terminal handles 'persist' setting\n"));
 
-#ifdef USE_MOUSE
+#ifdef _Windows
+	if (!interactive) {
+		interactive = TRUE;
+		/* be sure to show the text window */
+		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+		while (!com_line());
+	}
+#else /*_Windows*/
+
+# ifdef USE_MOUSE
 	wxt_change_thread_state(WAITING_FOR_STDIN);
-#endif /*USE_MOUSE*/
+# endif /*USE_MOUSE*/
 
 	/* protect the following from interrupt */
 	wxt_sigint_init();
 
 	while (wxt_window_opened()) {
-#ifdef USE_MOUSE
+# ifdef USE_MOUSE
 		if (!strcmp(term->name,"wxt"))
 			wxt_process_events();
-#endif /*USE_MOUSE*/
-#ifdef _Windows
-		/* continue to process gui messages */
-		GetMessage(&msg, 0, 0, 0);
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-#endif /*_Windows*/
+# endif /*USE_MOUSE*/
 		/* wait 10 microseconds and repeat */
 		wxMicroSleep(10);
 		wxt_sigint_check();
@@ -2967,9 +2973,11 @@ void wxt_atexit(TBOOLEAN persist)
 
 	wxt_sigint_restore();
 
-#ifdef USE_MOUSE
+# ifdef USE_MOUSE
 	wxt_change_thread_state(RUNNING);
-#endif /*USE_MOUSE*/
+# endif /*USE_MOUSE*/
+
+#endif /* !_Windows */
 
 	/* cleanup and quit */
 	wxt_cleanup();
