@@ -8,6 +8,20 @@
         Rework and simplify the event handling from the wxt terminal on
         Windows. Remove hooks from the wxt terminal in the Windows files.
 
+        * src/plot.c (main):
+        * src/plot.h:
+        Introduce a boolean to track the use of "-persist" on the command line.
+        Remove WXWIDGETS-specific code. Call term_reset() using GP_ATEXIT().
+
+        * src/wxterminal/Makefile.am:
+        * src/wxterminal/wxt_plot.h:
+        Remove the file wxt_plot.h, now unused.
+
+        * src/wxterminal/wxt_gui.cpp (wxt_init, wxt_atexit):
+        * src/wxterminal/wxt_gui.h:
+        Use GP_ATEXIT() to register wxt_atexit().
+        Rework "persist" behaviour on Windows.
+
 2006-11-07  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
         * src/wxterminal/wxt_gui.cpp (wxtPanel::DrawToDC): Draw the zoom

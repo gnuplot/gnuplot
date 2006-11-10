@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.42 2005/08/04 16:34:08 mikulik Exp $
+ * $Id: plot.h,v 1.43 2005/08/08 09:24:30 mikulik Exp $
  */
 
 /* GNUPLOT - plot.h */
@@ -51,6 +51,7 @@
 /* Variables of plot.c needed by other modules: */
 
 extern TBOOLEAN interactive;
+extern TBOOLEAN persist_cl;
 
 extern const char *user_shell;
 #if defined(ATARI) || defined(MTOS)
