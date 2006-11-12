@@ -6,6 +6,10 @@
 	infrequently used suboptions on a separate line. Also change saved
 	command to match documented command syntax 'set key nobox'.
 
+	* src/set.c (set_tics) src/show.c (show_tics) src/save.c (save_set_all)
+	docs/gnuplot.doc:  Allow tics to be set front/back without turning on
+	the whole grid.    Syntax:   set tics {front|back}
+
 2006-11-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	Transparent fill syltes (SourceForge patchset #1583199
