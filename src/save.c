@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.135 2006/10/30 00:08:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.136 2006/11/12 23:43:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -377,17 +377,23 @@ set y2data%s\n",
 		break;
 	    }
 	}
-	fprintf(fp, " %s %s %sreverse %sinvert %senhanced samplen %g spacing %g width %g height %g %s box",
+	fprintf(fp, " %s %s %sreverse %senhanced %s ",
 		key->stack_dir == GPKEY_VERTICAL ? "vertical" : "horizontal",
 		key->just == GPKEY_LEFT ? "Left" : "Right",
 		key->reverse ? "" : "no",
-		key->invert ? "" : "no",
 		key->enhanced ? "" : "no",
-		key->swidth, key->vert_factor, key->width_fix, key->height_fix,
 		key->auto_titles == COLUMNHEAD_KEYTITLES ? "autotitles columnhead"
 		: key->auto_titles == FILENAME_KEYTITLES ? "autotitles"
 		: "noautotitles" );
-	save_linetype(fp, &(key->box), FALSE);
+	if (key->box.l_type > LT_NODRAW) {
+	    fputs("box", fp);
+	    save_linetype(fp, &(key->box), FALSE);
+	} else
+	    fputs("nobox", fp);
+	/* Put less common options on a separate line*/
+	fprintf(fp, "\nset key %sinvert samplen %g spacing %g width %g height %g ",
+		key->invert ? "" : "no",
+		key->swidth, key->vert_factor, key->width_fix, key->height_fix);
 	fputc('\n', fp);
     }
 
@@ -699,6 +705,7 @@ set origin %g,%g\n",
     {									 \
 	fprintf(fp, "set %s%s \"%s\" ",					 \
 		name, suffix, lab.text ? conv_text(lab.text) : "");	 \
+	fprintf(fp, "\nset %s%s ", name, suffix);			 \
         save_position(fp, &(lab.offset), TRUE);				 \
 	fprintf(fp, " font \"%s\"", lab.font ? conv_text(lab.font) : "");\
 	save_textcolor(fp, &(lab.textcolor));				 \

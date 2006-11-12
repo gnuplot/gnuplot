@@ -1,5 +1,13 @@
 2006-11-12  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/save.c (save_set_all): The gpsavediff script strips out lines
+	from a gnuplot save file if the options they describe have not changed
+	from the default. We can help this simplification by writing
+	infrequently used suboptions on a separate line. Also change saved
+	command to match documented command syntax 'set key nobox'.
+
+2006-11-12  Ethan Merritt  <merritt@u.washington.edu>
+
 	Transparent fill syltes (SourceForge patchset #1583199
 
 	* src/term_api.h: Define new fill styles FS_TRANSPARENT_SOLID and
