@@ -1,3 +1,11 @@
+2006-11-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_set_all): The gpsavediff script strips out lines
+	from a gnuplot save file if the options they describe have not changed
+	from the default. We can help this simplification by writing
+	infrequently used suboptions on a separate line. Also change saved
+	command 'set key nobox' to match documented syntax.
+
 2006-11-10  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
         * src/win/wpause.c:
