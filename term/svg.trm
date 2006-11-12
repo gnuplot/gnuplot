@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.70 2006/10/15 21:53:11 sfeam Exp $
+ * $Id: svg.trm,v 1.71 2006/10/17 22:37:18 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1102,11 +1102,13 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 	    fputs(" fill = 'white'", gpoutfile);
 	    break;
 	case FS_SOLID: /* solid fill */
+	case FS_TRANSPARENT_SOLID:
 	    SVG_StyleFillColor();
 	    if (fillpar >= 0 && fillpar < 100)
 		fprintf(gpoutfile, " fill-opacity = '%f'", fillpar * 0.01);
 	    break;
 	case FS_PATTERN: /* pattern fill */
+	case FS_TRANSPARENT_PATTERN:
 	    fprintf(gpoutfile, " fill = 'url(#gpPat%d)'",
 		    SVG_fillPatternIndex);
 	    break;

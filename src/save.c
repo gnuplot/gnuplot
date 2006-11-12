@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.134 2006/10/29 04:22:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.135 2006/10/30 00:08:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1051,10 +1051,16 @@ save_fillstyle(FILE *fp, const struct fill_style_type *fs)
 {
     switch(fs->fillstyle) {
     case FS_SOLID:
-	fprintf(fp, " solid %.2f ", fs->filldensity / 100.0);
+    case FS_TRANSPARENT_SOLID:
+	fprintf(fp, " %s solid %.2f ", 
+		fs->fillstyle == FS_SOLID ? "" : "transparent",
+		fs->filldensity / 100.0);
 	break;
     case FS_PATTERN:
-	fprintf(fp, " pattern %d ", fs->fillpattern);
+    case FS_TRANSPARENT_PATTERN:
+	fprintf(fp, " %s pattern %d ", 
+		fs->fillstyle == FS_PATTERN ? "" : "transparent",
+		fs->fillpattern);
 	break;
     case FS_DEFAULT:
 	fprintf(fp, " default\n");

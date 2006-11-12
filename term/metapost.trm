@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.37 2006/07/21 02:35:47 sfeam Exp $
+ * $Id: metapost.trm,v 1.38 2006/08/04 20:35:32 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -834,11 +834,13 @@ fill (%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--(%.1fa,%.1fb)--cycle withcolor
 	    break;
 
 	case FS_PATTERN: /* pattern fill */
+	case FS_TRANSPARENT_PATTERN:
 	    /* FIXME: not yet implemented, dummy it up as fill density */
 	    fillpar *= 12;
 
 	default:
 	case FS_SOLID: /* solid fill */
+	case FS_TRANSPARENT_SOLID:
 	    if (fillpar < 100) {
 		double density = (100-fillpar) * 0.01;
 		fprintf(gpoutfile,"fillcolor:=currentcolor*%.2f+background*%.2f;\n",
@@ -926,8 +928,10 @@ MP_filled_polygon(int points, gpiPoint *corners)
 		fprintf(gpoutfile,"fillcolor:=background;\n");
 		break;
 	case FS_PATTERN: /* pattern fill implemented as partial density */
+	case FS_TRANSPARENT_PATTERN:
 		fillpar *= 12;
 	case FS_SOLID:	/* solid fill */
+	case FS_TRANSPARENT_SOLID:
 		if (fillpar < 100) {
 		    double density = (100-fillpar) * 0.01;
 		    fprintf(gpoutfile,"fillcolor:=currentcolor*%.2f+background*%.2f;\n",

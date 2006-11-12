@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.58 2006/04/29 00:37:42 tlecomte Exp $
+ * $Id: term_api.h,v 1.59 2006/06/14 00:25:04 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -134,7 +134,8 @@ typedef struct fill_style_type {
     int border_linetype;
 } fill_style_type;
 
-typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT }
+typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT, 
+			   FS_TRANSPARENT_SOLID, FS_TRANSPARENT_PATTERN }
 	     t_fillstyle;
 #define FS_OPAQUE (FS_SOLID + (100<<4))
 
@@ -395,6 +396,9 @@ void ignore_enhanced __PROTO((TBOOLEAN flag));
 
 /* Simple-minded test that point is with drawable area */
 TBOOLEAN on_page __PROTO((int x, int y));
+
+/* Convert a fill style into a backwards compatible packed form */
+int style_from_fill __PROTO((struct fill_style_type *));
 
 #ifdef LINUXVGA
 void LINUX_setup __PROTO((void));

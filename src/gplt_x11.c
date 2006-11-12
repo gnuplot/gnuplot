@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.168 2006/10/08 21:04:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.169 2006/10/13 19:50:51 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -6442,6 +6442,7 @@ x11_setfill(GC *gc, int style)
 
 	switch (style) {
 	case FS_SOLID:
+	case FS_TRANSPARENT_SOLID:
 	    /* filldensity is from 0..100 percent */
 	    if (fillpar >= 100)
 		break;
@@ -6462,13 +6463,17 @@ x11_setfill(GC *gc, int style)
 		XSetForeground(dpy, *gc, xcolor.pixel);
 	    break;
 	case FS_PATTERN:
+	case FS_TRANSPARENT_PATTERN:
 	    /* use fill pattern according to fillpattern */
 	    idx = (int) fillpar;	/* fillpattern is enumerated */
 	    if (idx < 0)
 		idx = 0;
 	    idx = idx % stipple_pattern_num;
 	    XSetStipple(dpy, *gc, stipple_pattern[idx]);
-	    XSetFillStyle(dpy, *gc, FillOpaqueStippled);
+	    if (style == FS_TRANSPARENT_PATTERN)
+		XSetFillStyle(dpy, *gc, FillStippled);
+	    else
+		XSetFillStyle(dpy, *gc, FillOpaqueStippled);
 	    XSetBackground(dpy, *gc, plot->cmap->colors[0]);
 	    break;
 	case FS_EMPTY:

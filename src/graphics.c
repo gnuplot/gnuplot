@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.201 2006/10/30 00:08:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.202 2006/11/04 21:18:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -164,8 +164,6 @@ static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *k
 
 static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
 				   char *title,  struct termentry *t, int xl, int yl));
-
-static int style_from_fill __PROTO((struct fill_style_type *));
 
 /* for plotting error bars
  * half the width of error bar tic mark
@@ -5068,36 +5066,6 @@ do_key_sample(
 
     /* Restore previous clipping area */
     clip_area = clip_save;
-}
-
-/* Squeeze all fill information into the old style parameter.
- * The terminal drivers know how to extract the information.
- * We assume that the style (int) has only 16 bit, therefore we take
- * 4 bits for the style and allow 12 bits for the corresponding fill parameter.
- * This limits the number of styles to 16 and the fill parameter's
- * values to the range 0...4095, which seems acceptable.
- */
-static int
-style_from_fill(struct fill_style_type *fs)
-{
-    int fillpar, style;
-
-    switch( fs->fillstyle ) {
-    case FS_SOLID:
-	fillpar = fs->filldensity;
-	style = ((fillpar & 0xfff) << 4) + FS_SOLID;
-	break;
-    case FS_PATTERN:
-	fillpar = fs->fillpattern;
-	style = ((fillpar & 0xfff) << 4) + FS_PATTERN;
-	break;
-    default:
-	/* solid fill with background color */
-	style = FS_EMPTY;
-	break;
-    }
-
-    return style;
 }
 
 

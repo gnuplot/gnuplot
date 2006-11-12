@@ -1,3 +1,30 @@
+2006-11-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	Transparent fill syltes (SourceForge patchset #1583199
+
+	* src/term_api.h: Define new fill styles FS_TRANSPARENT_SOLID and
+	FS_TRANSPARENT_PATTERN.  No new terminal entry points are added.
+	However, routines that handle fill styles must be prepared to do
+	something reasonable, perhaps ignore, the new transparent styles.
+
+	* src/graphics.c src/term_api.h src/term.c: Move routine style_from_fill
+	from graqphics.c to term.c and export it for general use.
+
+	* src/color.c src/misc.c (parse_fillstyle) src/plot2d.c (eval_plots)
+	src/save.c (save_fillstyle) src/show.c (show_fillstyle) 
+
+	* term/aquaterm.trm term/cgm.trm term/fig.trm term/metapost.trm
+	term/post.trm term/svg.trm src/os2/gclient.c src/win/wgraph.c: 
+	Insert place-holders for transparent fill styles.
+
+	* term/gd.trm term/pdf.trm src/gplt_x11.c src/wxterminal/gp_cairo.c:
+	Implement transparent fill styles, with varying degrees of completeness.
+
+	* demo/all.dem demo/transparent.dem demo/transparent_solids.dem
+	demo/html/index.save demo/html/Makefile:  New demos for transparency.
+
+	* docs/gnuplot.doc: Document transparency options for 'set style fill'. 
+
 2006-11-10  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/win/wpause.c:

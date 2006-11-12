@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.95 2006/08/27 22:13:13 sfeam Exp $
+ * $Id: gd.trm,v 1.96 2006/10/15 19:47:48 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -406,6 +406,7 @@ image_do_crop ()
 
 static int PNG_FillSolid __PROTO((int fillpar));
 static int PNG_FillPattern __PROTO((int fillpar));
+static int PNG_FillTransparent __PROTO((int fillpar));
 
 static int
 PNG_FillSolid(int fillpar)
@@ -437,10 +438,22 @@ PNG_FillSolid(int fillpar)
 }
 
 static int
-PNG_FillPattern(int fillpar)
+PNG_FillTransparent(int fillpar)
+{
+    int red   = (png_state.rgb >> 16) & 0xff;
+    int green = (png_state.rgb >> 8) & 0xff;
+    int blue  = png_state.rgb & 0xff;
+    int alpha = 127 * (float)(100-fillpar) / 100.;
+
+    return  gdImageColorExactAlpha(png_state.image, red, green, blue, alpha);
+}
+
+static int
+PNG_FillPattern(int style)
 {
     int rgb = png_state.rgb;
-    fillpar %= 8;
+    int fillpar = (style >> 4) % 8;
+    style = style & 0xf;
 
     if (!PNG_fill_tile.im || rgb != PNG_fill_tile.last_rgb || PNG_fill_tile.fillpar != fillpar) {
 
@@ -457,15 +470,19 @@ PNG_FillPattern(int fillpar)
 
 	/* create new tile */
 #if (GD2_VERS >= 2)
-	if (png_state.TrueColor)
+	if (png_state.TrueColor) {
 	    PNG_fill_tile.im = gdImageCreateTrueColor(8, 8);
-	else
+	    /* FIXME - Doesn't work right - background goes to black.  libgd bug? */
+	    background = gdImageColorAllocateAlpha(PNG_fill_tile.im, 255, 255, 255, 127);
+	} else
 #endif
+	{
 	    PNG_fill_tile.im = gdImageCreate(8, 8);
+	    background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255);
+	}
 
-	/* background */
-	background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255);
-	/* gdImageColorTransparent(PNG_fill_tile.im, background); */
+	if (style == FS_TRANSPARENT_PATTERN)
+	    gdImageColorTransparent(PNG_fill_tile.im, background);
 	gdImageFilledRectangle(PNG_fill_tile.im, 0, 0, 7, 7, background);
 
 	/* foreground */
@@ -1232,8 +1249,15 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
 	case FS_SOLID: /* solid fill */
 	    color = PNG_FillSolid(fillpar);
 	    break;
+	case FS_TRANSPARENT_SOLID:
+	    if (png_state.TrueColor)
+		color = PNG_FillTransparent(fillpar);
+	    else
+		color = PNG_FillSolid(fillpar);
+	    break;
 	case FS_PATTERN: /* pattern fill */
-	    color = PNG_FillPattern(fillpar);
+	case FS_TRANSPARENT_PATTERN:
+	    color = PNG_FillPattern(corners->style);
 	    break;
 	default:
 	    color = png_state.color;
@@ -1270,17 +1294,22 @@ PNG_boxfill(
      */
     int fillpar = style >> 4;
 
-    style &= 0xf;
-
-    switch (style) {
+    switch (style & 0xf) {
 	case FS_EMPTY: /* fill with background color */
 	    color = png_state.color_table[0];
 	    break;
 	case FS_SOLID: /* solid fill */
 	    color = PNG_FillSolid(fillpar);
 	    break;
+	case FS_TRANSPARENT_SOLID:
+	    if (png_state.TrueColor)
+		color = PNG_FillTransparent(fillpar);
+	    else
+		color = PNG_FillSolid(fillpar);
+	    break;
 	case FS_PATTERN: /* pattern fill */
-	    color = PNG_FillPattern(fillpar);
+	case FS_TRANSPARENT_PATTERN:
+	    color = PNG_FillPattern(style);
 	    break;
 	default:
 	    /* should never happen */

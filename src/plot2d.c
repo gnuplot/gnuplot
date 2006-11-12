@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.134 2006/10/13 06:15:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.135 2006/10/21 04:32:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1770,7 +1770,8 @@ eval_plots()
                                 default_fillstyle.filldensity,
                                 pattern_num,
                                 default_fillstyle.border_linetype);
-                if (this_plot->fill_properties.fillstyle == FS_PATTERN)
+                if ((this_plot->fill_properties.fillstyle == FS_PATTERN)
+		  ||(this_plot->fill_properties.fillstyle == FS_TRANSPARENT_PATTERN))
                     pattern_num = this_plot->fill_properties.fillpattern + 1;
                 if (this_plot->plot_style == FILLEDCURVES
                 && this_plot->fill_properties.fillstyle == FS_EMPTY)

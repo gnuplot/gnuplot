@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.80 2006/04/12 03:48:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.81 2006/07/28 20:48:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -909,6 +909,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
     struct value a;
     TBOOLEAN set_fill = FALSE;
     TBOOLEAN set_param = FALSE;
+    TBOOLEAN transparent = FALSE;
 
     /* Set defaults */
     fs->fillstyle = def_style;
@@ -923,15 +924,20 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
     c_token++;
 
     while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "trans$parent")) {
+	    transparent = TRUE;
+	    c_token++;
+	}
+
 	if (almost_equals(c_token, "e$mpty")) {
 	    fs->fillstyle = FS_EMPTY;
 	    c_token++;
 	} else if (almost_equals(c_token, "s$olid")) {
-	    fs->fillstyle = FS_SOLID;
+	    fs->fillstyle = transparent ? FS_TRANSPARENT_SOLID : FS_SOLID;
 	    set_fill = TRUE;
 	    c_token++;
 	} else if (almost_equals(c_token, "p$attern")) {
-	    fs->fillstyle = FS_PATTERN;
+	    fs->fillstyle = transparent ? FS_TRANSPARENT_PATTERN : FS_PATTERN;
 	    set_fill = TRUE;
 	    c_token++;
 	}
@@ -956,7 +962,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	else if (!set_fill || !isanumber(c_token) || set_param)
 	    break;
 
-	if (fs->fillstyle == FS_SOLID) {
+	if (fs->fillstyle == FS_SOLID || fs->fillstyle == FS_TRANSPARENT_SOLID) {
 	    /* user sets 0...1, but is stored as an integer 0..100 */
 	    fs->filldensity = 100.0 * real(const_express(&a)) + 0.5;
 	    if (fs->filldensity < 0)
@@ -964,7 +970,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	    if (fs->filldensity > 100)
 		fs->filldensity = 100;
 	    set_param = TRUE;
-	} else if (fs->fillstyle == FS_PATTERN) {
+	} else if (fs->fillstyle == FS_PATTERN || fs->fillstyle == FS_TRANSPARENT_PATTERN) {
 	    fs->fillpattern = real(const_express(&a));
 	    if (fs->fillpattern < 0)
 		fs->fillpattern = 0;

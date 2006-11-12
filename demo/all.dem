@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.27 2006/10/21 04:32:41 sfeam Exp $
+# $Id: all.dem,v 1.28 2006/10/21 22:58:22 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -222,4 +222,13 @@ reset
 
 print "********************** file rectangle.dem *********************"
 load "rectangle.dem"
+reset
+
+print "********************** file transparent.dem *********************"
+load "transparent.dem"
+reset
+
+print "********************** file transparent_tori.dem *********************"
+load "transparent_tori.dem"
+pause 5
 reset

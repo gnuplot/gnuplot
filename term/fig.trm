@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.55 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: fig.trm,v 1.56 2006/07/21 02:35:46 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1028,6 +1028,7 @@ FIG_boxfill(
 
     switch( style & 0xf ) {
     case FS_SOLID:
+    case FS_TRANSPARENT_SOLID:
 	/* style == 1 --> filled with intensity according to filldensity */
         pen_color = FIG_line.pen_color;
         fill_color = FIG_line.pen_color;
@@ -1042,6 +1043,7 @@ FIG_boxfill(
             fill_style = 40 - fill_dens / 5;
         break;
     case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
 	/* style == 2 --> filled with pattern according to fillpattern */
         pen_color = FIG_line.pen_color;
         fill_color = WHITE;

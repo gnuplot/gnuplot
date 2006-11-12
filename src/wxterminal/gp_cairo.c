@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.15 2006/07/14 18:25:41 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.16 2006/09/10 17:49:44 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -115,7 +115,7 @@ static void gp_cairo_add_shape( PangoRectangle rect,int position);
 
 /* set a cairo pattern or solid fill depending on parameters */
 static void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar);
-static void gp_cairo_fill_pattern(plot_struct *plot, int fillpar);
+static void gp_cairo_fill_pattern(plot_struct *plot, int fillstyle, int fillpar);
 
 /* array of colors
  * FIXME could be shared with all gnuplot terminals */
@@ -1414,6 +1414,12 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 	double red = 0, green = 0, blue = 0, fact = 0;
 
 	switch (fillstyle) {
+	case FS_TRANSPARENT_SOLID:
+		red   = plot->color.r;
+		green = plot->color.g;
+		blue  = plot->color.b;
+		cairo_set_source_rgba(plot->cr, red, green, blue, (double)fillpar/100.);
+		return;
 	case FS_SOLID: /* solid fill */
 		if (fillpar==100) /* treated as a special case to accelerate common situation */ {
 			cairo_set_source_rgb(plot->cr, plot->color.r, plot->color.g, plot->color.b);
@@ -1435,7 +1441,8 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 		FPRINTF((stderr,"transparent solid %lf %lf %lf\n",red, green, blue));
 		return;
 	case FS_PATTERN: /* pattern fill */
-		gp_cairo_fill_pattern(plot,fillpar);
+	case FS_TRANSPARENT_PATTERN:
+		gp_cairo_fill_pattern(plot, fillstyle, fillpar);
 		FPRINTF((stderr,"pattern fillpar = %d %lf %lf %lf\n",fillpar, plot->color.r, plot->color.g, plot->color.b));
 		return;
 	case FS_EMPTY: /* fill with background plot->color */
@@ -1453,7 +1460,7 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 #define PATTERN_SIZE 8
 
 /* return a pattern used for fillboxes and polygons */
-void gp_cairo_fill_pattern(plot_struct *plot, int fillpar)
+void gp_cairo_fill_pattern(plot_struct *plot, int fillstyle, int fillpar)
 {
 	cairo_surface_t *pattern_surface;
 	cairo_t *pattern_cr;
@@ -1472,7 +1479,11 @@ void gp_cairo_fill_pattern(plot_struct *plot, int fillpar)
 		PATTERN_SIZE);
 	cairo_set_matrix(pattern_cr,&context_matrix);
 
-	cairo_set_source_rgb( pattern_cr, 1.0, 1.0, 1.0);
+	if (fillstyle == FS_TRANSPARENT_PATTERN)
+	    cairo_set_source_rgba( pattern_cr, 1.0, 1.0, 1.0, 0.0);
+	else
+	    cairo_set_source_rgb( pattern_cr, 1.0, 1.0, 1.0);
+
 	cairo_paint(pattern_cr);
 	cairo_set_line_width(pattern_cr, 1.0/PATTERN_SIZE);
 	cairo_set_line_cap  (pattern_cr, CAIRO_LINE_CAP_BUTT);

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.204 2006/10/05 03:13:54 sfeam Exp $
+ * $Id: post.trm,v 1.205 2006/10/12 21:22:15 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2025,6 +2025,7 @@ PS_fillbox(
     switch(style & 0xf) {
 
     case FS_SOLID:
+    case FS_TRANSPARENT_SOLID:
 	/* style == 1 --> fill with intensity according to filldensity */
         filldens = (style >> 4) / 100.0;
         if(filldens < 0.0)
@@ -2036,6 +2037,7 @@ PS_fillbox(
         break;
 
     case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
 	/* style == 2 --> fill with pattern according to fillpattern */
 	/* the upper 3 nibbles of 'style' contain pattern number */
 	pattern = (style >> 4) % 8;
@@ -2622,16 +2624,20 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	/* General case for solid or pattern-filled polygons
 	 * gsave <x0> <y0> N <x1> <y1> ... <xn> <yn> density PolyFill
 	 */
+	int fillpar = style >> 4;
+	style = style &0xf;
+
 	fprintf(gppsfile, "gsave ");
 	fprintf(gppsfile, "%i %i N", corners[0].x, corners[0].y);
 	for (i = 1; i < points; i++)
 	    fprintf(gppsfile, " %i %i V",
 		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
 
-	switch(style & 0xf) {
+	switch(style) {
 	
 	case FS_SOLID:
-	    filldens = (style >> 4) / 100.0;
+	case FS_TRANSPARENT_SOLID:
+	    filldens = (fillpar) / 100.0;
 	    if(filldens < 0.0)
 		filldens = 0.0;
 	    if(filldens >= 1.0)
@@ -2640,8 +2646,10 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 		fprintf(gppsfile, " %.2f PolyFill\n", filldens);
 	    break;
 	    
+	case FS_TRANSPARENT_PATTERN:
+	    fprintf(gppsfile," /TransparentPatterns true def\n");
 	case FS_PATTERN:
-	    pattern = (style >> 4) % 8;
+	    pattern = (fillpar) % 8;
 	    if (pattern == 0)  {
 		filldens = 0.5;
 		fprintf(gppsfile, " %.1f PolyFill\n", filldens);

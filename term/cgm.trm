@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.76 2006/08/04 20:31:56 sfeam Exp $
+ * $Id: cgm.trm,v 1.77 2006/08/20 01:48:23 vanzandt Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -955,6 +955,7 @@ CGM_fillbox(
     switch( style & 0xf ) {
 
     case FS_SOLID:
+    case FS_TRANSPARENT_SOLID:
 	/* style == 1 --> fill with intensity according to filldensity */
         filldens = (style >> 4) / 100.0;
         if( filldens < 0.0 )
@@ -972,6 +973,7 @@ CGM_fillbox(
         break;
 
     case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
 	/* Fill with background, then go back and draw a hatched pattern */
 	cgm_next.fill_color = 0; /* index 0 is always the background color */
 	cgm_current.interior_style = -1; /* invalidate previouse style */

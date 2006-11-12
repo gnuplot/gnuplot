@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.187 2006/10/29 04:22:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.188 2006/10/30 00:08:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1220,13 +1220,17 @@ show_fillstyle()
 
     switch(default_fillstyle.fillstyle) {
     case FS_SOLID:
+    case FS_TRANSPARENT_SOLID:
         fprintf(stderr,
-	    "\tFill style is solid colour with density %f",
+	    "\tFill style uses %s solid colour with density %.3f",
+	    default_fillstyle.fillstyle == FS_SOLID ? "" : "transparent",
 	    default_fillstyle.filldensity/100.0);
         break;
     case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
         fprintf(stderr,
-	    "\tFill style uses patterns starting at %d",
+	    "\tFill style uses %s patterns starting at %d",
+	    default_fillstyle.fillstyle == FS_PATTERN ? "" : "transparent",
 	    default_fillstyle.fillpattern);
         break;
     default:

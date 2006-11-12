@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.395 2006/10/30 00:08:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.396 2006/11/02 04:10:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8313,7 +8313,9 @@ C ... and restart the table:
  histograms, candlesticks and filledcurves.
 
  Syntax:
-       set style fill {empty | solid {<density>} | pattern {<n>}}
+       set style fill {empty 
+                       | {transparent} solid {<density>} 
+                       | {transparent} pattern {<n>}}
                       {border {<linetype>} | noborder}
 
  The default fillstyle is `empty`.
@@ -8338,6 +8340,51 @@ C ... and restart the table:
  By default, `border`, the box is bounded by a solid line of the current
  linetype. `border <lt>` specifies that a border is to be drawn using
  linetype <lt>. `noborder` specifies that no bounding lines are drawn.
+5 set style fill transparent
+?commands set style fill transparent
+?set style fill transparent
+?fillstyle transparent
+?transparent
+ Some terminals support the attribute `transparent` for filled areas.
+ In the case of transparent solid fill areas, the `density` parameter is
+ interpreted as an alpha value; that is, density 0 is fully transparent,
+ density 1 is fully opaque.  In the case of transparent pattern fill, the
+ background of the pattern is either fully transparent or fully opaque.
+
+@start table - Driver support for transparency
+       terminal   solid pattern    pm3d
+       --------------------------------
+       gif           no     yes      no
+       jpeg         yes      no     yes
+       pdf          yes     yes     yes
+       png    TrueColor   index     yes
+       post          no     yes      no
+       svg          yes      no     yes
+       wxt          yes     yes     yes
+       x11           no     yes      no
+#\begin{tabular}{|cccl|} \hline
+#Terminal   &   solid & pattern &    pm3d \\ \hline
+#gif        &      no &     yes &      no \\
+#jpeg       &     yes &      no &     yes \\
+#pdf        &     yes &     yes &     yes \\
+#png        &TrueColor&   index &     yes \\
+#post       &      no &     yes &      no \\
+#svg        &     yes &      no &     yes \\
+#wxt        &     yes &     yes &     yes \\
+#x11        &      no &     yes &      no \\
+%c l .
+%Terminal@solid@pattern@pm3d
+%_
+%gif@no@yes@no
+%jpeg@yes@no@yes
+%pdf@yes@yes@yes
+%png@TrueColor@index@yes
+%post@no@yes@no
+%svg@yes@yes@yes
+%wxt@yes@yes@yes
+%x11@no@yes@no
+%_
+@end table
 4 set style function
 ?commands set style function
 ?commands show style function

@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.30 2006/08/02 17:12:40 persquare Exp $
+ * $Id: aquaterm.trm,v 1.31 2006/08/03 12:35:16 persquare Exp $
  *
  */
 
@@ -572,6 +572,7 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
     }
     break;
   case FS_SOLID: /* solid fill */
+  case FS_TRANSPARENT_SOLID:
     {
       /* Alpha channel? RGB -> HSV -> R'G'B'? */
       float density = (100 - fillpar)*0.01;
@@ -581,6 +582,7 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
     }
     break;
   case FS_PATTERN: /* pattern fill */
+  case FS_TRANSPARENT_PATTERN:
     /* Can't do pattern easily, using colors. */
     [adapter takeColorFromColormapEntry:(fillpar%CYCLIC_COLORS)+SPECIAL_COLORS];
     break;

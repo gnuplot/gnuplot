@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.154 2006/10/08 21:54:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.155 2006/11/06 01:24:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2797,3 +2797,37 @@ closepath()
     if (term->path)
 	(*term->path)(1);
 }
+
+/* Squeeze all fill information into the old style parameter.
+ * The terminal drivers know how to extract the information.
+ * We assume that the style (int) has only 16 bit, therefore we take
+ * 4 bits for the style and allow 12 bits for the corresponding fill parameter.
+ * This limits the number of styles to 16 and the fill parameter's
+ * values to the range 0...4095, which seems acceptable.
+ */
+int
+style_from_fill(struct fill_style_type *fs)
+{
+    int fillpar, style;
+
+    switch( fs->fillstyle ) {
+    case FS_SOLID:
+    case FS_TRANSPARENT_SOLID:
+	fillpar = fs->filldensity;
+	style = ((fillpar & 0xfff) << 4) + fs->fillstyle;
+	break;
+    case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
+	fillpar = fs->fillpattern;
+	style = ((fillpar & 0xfff) << 4) + fs->fillstyle;
+	break;
+    case FS_EMPTY:
+    default:
+	/* solid fill with background color */
+	style = FS_EMPTY;
+	break;
+    }
+
+    return style;
+}
+

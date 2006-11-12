@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.67 2006/08/03 22:24:55 sfeam Exp $
+ * $Id: pdf.trm,v 1.68 2006/08/04 20:31:56 sfeam Exp $
  */
 
 /*------------------------------
@@ -1249,6 +1249,26 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 	case FS_EMPTY: /* fill with white */
 	    PDF_setgray(myPDF, 1);
 	    break;
+	case FS_TRANSPARENT_SOLID:
+#if !HAVE_OLD_LIBPDF
+	    {
+		/* FIXME: This attribute will be in effect until the end of   */
+		/* the current page. We should explicitly reset it to restore */
+		/* opaque fill areas as the default. But when should it be?   */
+		char density[18];
+		double red   = PDF_current_rgb.r;
+		double green = PDF_current_rgb.g;
+		double blue  = PDF_current_rgb.b;
+		sprintf(density,"opacityfill=%4.2f", (double)fillpar*0.01);
+		i = PDF_create_gstate(myPDF, density);
+		PDF_set_gstate(myPDF, i);
+		if (PDF_monochrome)
+		    PDF_setgray_fill(myPDF, PDF_current_gray);
+		else
+		    PDF_setrgbcolor_fill(myPDF, red, green, blue);
+		break;
+	    }
+#endif
 	case FS_SOLID:
 	    {
 		double fact = (double)fillpar * 0.01;
@@ -1262,8 +1282,26 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 		    PDF_setrgbcolor_fill(myPDF, red, green, blue);
 	    }
 	    break;
+
 #if !HAVE_OLD_LIBPDF
 	case FS_PATTERN:
+	    fillpar = fillpar % (PDF_patterns + 1) /* 0 == white */;
+	    /* Fill in solid background before drawing pattern */
+	    /* NOTE:  kpdf/xpdf would accept this as part of the pattern definition */
+	    /*        but acroread does not. So for compatibility we do the fill in */
+	    /*        a separate step, despite its inefficiency.                    */
+	    if (fillpar != 0) {
+		PDF_setcolor(myPDF, "fill", "rgb", 1, 1, 1, 0 /* unused */);
+		PDF_moveto(myPDF, (int)(corners[0].x), (int)(corners[0].y));
+		for (i=1; i<points; i++)
+		    PDF_lineto(myPDF, (int)(corners[i].x), (int)(corners[i].y));
+		PDF_lineto(myPDF, (int)(corners[0].x), (int)(corners[0].y));
+		PDF_fill(myPDF);
+		PDF_restore(myPDF);
+		PDF_save(myPDF);
+	    }
+	    /* NOTE: Fall through to the actual pattern code */
+	case FS_TRANSPARENT_PATTERN:
 	    fillpar = fillpar % (PDF_patterns + 1) /* 0 == white */;
 	    switch (fillpar) {
 		case 0:
@@ -1275,6 +1313,7 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 	    }
 	    break;
 #endif
+
 	default:
 	    break;
     }

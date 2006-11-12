@@ -12,7 +12,7 @@ GNUPLOT_LIB = ..
 # Several of the demos need manual intervention:
 #	fontfile vector epslatex
 #
-html: airfoil.html arrowstyle.html binary.html bivariat.html candlesticks.html contours.html controls.html datastrings.html discrete.html electron.html enhancedtext.html epslatex.html fillbetween.html fillcrvs.html fillstyle.html finance.html fit.html hidden.html hidden2.html histograms.html histograms2.html image.html index.html iterate.html key.html layout.html margins.html mgr.html multimsh.html multiplt.html param.html pm3dcolors.html pm3d.html pm3dgamma.html pointsize.html polar.html poldat.html prob2.html prob.html rainbow.html random.html rectangle.html rgb_variable.html scatter.html simple.html singulr.html spline.html steps.html stringvar.html surface1.html surface2.html textcolor.html textrotate.html tics.html timedat.html using.html vector.html world.html world2.html dashcolor.html animate2.html
+html: airfoil.html arrowstyle.html binary.html bivariat.html candlesticks.html contours.html controls.html datastrings.html discrete.html electron.html enhancedtext.html epslatex.html fillbetween.html fillcrvs.html fillstyle.html finance.html fit.html hidden.html hidden2.html histograms.html histograms2.html image.html index.html iterate.html key.html layout.html margins.html mgr.html multimsh.html multiplt.html param.html pm3dcolors.html pm3d.html pm3dgamma.html pointsize.html polar.html poldat.html prob2.html prob.html rainbow.html random.html rectangle.html rgb_variable.html scatter.html simple.html singulr.html spline.html steps.html stringvar.html surface1.html surface2.html transparent.html transparent_solids.html textcolor.html textrotate.html tics.html timedat.html using.html vector.html world.html world2.html dashcolor.html animate2.html
 
 index.html: index.save
 	cp index.save index.html
@@ -25,6 +25,15 @@ finance.html: $(GNUPLOT_LIB)/finance.dem ./webify.pl
 
 multiplt.html: $(GNUPLOT_LIB)/multiplt.dem ./webify.pl
 	export DEMOTERM="png enhanced transparent font arial 8 size 610,480"; ./webify.pl multiplt
+
+transparent.html: $(GNUPLOT_LIB)/transparent.dem ./webify.pl
+	export DEMOTERM="png enhanced truecolor font arial 8 size 512,280"; ./webify.pl transparent
+	mv transparent.2.png temp.png
+	export DEMOTERM="png enhanced notruecolor font arial 8 size 512,280"; ./webify.pl transparent
+	mv temp.png transparent.2.png
+
+transparent_solids.html: $(GNUPLOT_LIB)/transparent_solids.dem ./webify.pl
+	export DEMOTERM="png enhanced truecolor font arial 9 size 512,384"; ./webify.pl transparent_solids
 
 # The png terminal does not support dashed lines, so we create an eps file and convert it.
 # Do this one last, so that if conversion fails everything else has already been done.

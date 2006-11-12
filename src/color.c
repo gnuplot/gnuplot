@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.70 2006/08/24 05:38:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.71 2006/10/19 17:43:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -202,7 +202,10 @@ set_rgbcolor(int rgblt)
 
 void ifilled_quadrangle(gpiPoint* icorners)
 {
-    icorners->style = FS_OPAQUE;
+    if (default_fillstyle.fillstyle == FS_EMPTY)
+	icorners->style = FS_OPAQUE;
+    else
+	icorners->style = style_from_fill(&default_fillstyle);
     term->filled_polygon(4, icorners);
 
     if (pm3d.hidden3d_tag) {
@@ -265,7 +268,10 @@ filled_polygon_3dcoords(int points, struct coordinate GPHUGE * coords)
 	icorners[0].spec.gray = -1;	/* force solid color */
     }
 #endif
-    icorners->style = FS_OPAQUE;
+    if (default_fillstyle.fillstyle == FS_EMPTY)
+	icorners->style = FS_OPAQUE;
+    else
+	icorners->style = style_from_fill(&default_fillstyle);
     term->filled_polygon(points, icorners);
     free(icorners);
 }
@@ -288,7 +294,10 @@ filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, do
 	icorners[0].spec.gray = -1;	/* force solid color */
     }
 #endif
-    icorners->style = FS_OPAQUE;
+    if (default_fillstyle.fillstyle == FS_EMPTY)
+	icorners->style = FS_OPAQUE;
+    else
+	icorners->style = style_from_fill(&default_fillstyle);
     term->filled_polygon(points, icorners);
     free(icorners);
 }
@@ -384,7 +393,10 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
 	}
 #endif
 	/* print the rectangle with the given colour */
-	corners->style = FS_OPAQUE;
+	if (default_fillstyle.fillstyle == FS_EMPTY)
+	    corners->style = FS_OPAQUE;
+	else
+	    corners->style = style_from_fill(&default_fillstyle);
 	term->filled_polygon(4, corners);
     }
 }
