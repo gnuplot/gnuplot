@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.202 2006/11/04 21:18:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.203 2006/11/12 23:43:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1398,18 +1398,18 @@ place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox
 	if (this_rect->type == 1) {
 	    double width, height;
 
-	    if (splot_map) {
+	    if (dimensions == 2) {
+		map_position_double(&this_rect->center, &x1, &y1, "rect");
+		map_position_r(&this_rect->extent, &width, &height, "rect");
+	    } else if (splot_map) {
 		int junkw, junkh;
 		map3d_position_double(&this_rect->center, &x1, &y1, "rect");
 		map3d_position_r(&this_rect->extent, &junkw, &junkh, "rect");
 		width = junkw;
 		height = junkh;
-	    } else if (dimensions == 3 && this_rect->center.scalex != screen) {
+	    } else if (this_rect->center.scalex != screen)
 		continue;
-	    } else {
-		map_position_double(&this_rect->center, &x1, &y1, "rect");
-		map_position_r(&this_rect->extent, &width, &height, "rect");
-	    }
+
 	    x1 -= width/2;
 	    y1 -= height/2;
 	    x2 = x1 + width;
@@ -1422,18 +1422,17 @@ place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox
 	    if (this_rect->extent.scaley == first_axes
 	    ||  this_rect->extent.scaley == second_axes)
 		clip_y = TRUE;
+
 	} else {
-	    if (splot_map) {
-		map3d_position_double(&this_rect->bl, &x1, &y1, "rect");
-		map3d_position_double(&this_rect->tr, &x2, &y2, "rect");
-	    } else if (dimensions == 3 
-		       && (this_rect->bl.scalex != screen
-			   || this_rect->tr.scalex != screen)) {
-		continue;
-	    } else {
+	    if (dimensions == 2) {
 		map_position_double(&this_rect->bl, &x1, &y1, "rect");
 		map_position_double(&this_rect->tr, &x2, &y2, "rect");
-	    }
+	    } else if (splot_map) {
+		map3d_position_double(&this_rect->bl, &x1, &y1, "rect");
+		map3d_position_double(&this_rect->tr, &x2, &y2, "rect");
+	    } else if ((this_rect->bl.scalex != screen || this_rect->tr.scalex != screen))
+		continue;
+
 	    if (x1 > x2) {double t=x1; x1=x2; x2=t;}
 	    if (y1 > y2) {double t=y1; y1=y2; y2=t;}
 	    if (this_rect->bl.scalex == first_axes

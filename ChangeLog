@@ -4,6 +4,10 @@
 	cleanly skip empty plots.  This fixes a segfault demonstrated by
 	running image.dem when the binary3 input file is missing. 
 
+	* graphics.c (place_rectangles): Change the order of testing for
+	2D and 3D cases; needed because 'set view map' was affecting 2D plots.
+	Bug #1596313
+
 2006-11-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_set_all): The gpsavediff script strips out lines
