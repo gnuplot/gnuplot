@@ -1,3 +1,9 @@
+2006-11-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* hidden3d.c (build_networks): Add checks in the hidden3d code to
+	cleanly skip empty plots.  This fixes a segfault demonstrated by
+	running image.dem when the binary3 input file is missing. 
+
 2006-11-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_set_all): The gpsavediff script strips out lines

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.55 2005/12/06 18:23:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.56 2006/03/17 15:36:26 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -926,9 +926,15 @@ build_networks(struct surface_points *plots, int pcount)
     max_crvlen = -1;
 
     for (this_plot = plots, surface = 0;
-	 surface < pcount;
-	 this_plot = this_plot->next_sp, surface++) {
-	long int crvlen = this_plot->iso_crvs->p_count;
+	surface < pcount;
+	this_plot = this_plot->next_sp, surface++) {
+	long int crvlen;
+	
+	/* Quietly skip empty plots */
+	if (this_plot->plot_type == NODATA)
+	    continue;
+
+	crvlen = this_plot->iso_crvs->p_count;
 
 	/* Allow individual plots to opt out of hidden3d calculations */
 	if (this_plot->opt_out_of_hidden3d)
@@ -997,6 +1003,10 @@ build_networks(struct surface_points *plots, int pcount)
 	} /* switch */
     } /* for (plots) */
 
+    /* Check for no data at all */
+    if (max_crvlen <= 0)
+	return;
+
     /* allocate all the lists to the size we need: */
     resize_dynarray(&vertices, nv);
     resize_dynarray(&edges, ne);
@@ -1020,9 +1030,15 @@ build_networks(struct surface_points *plots, int pcount)
     for (this_plot = plots, surface = 0;
 	 surface < pcount;
 	 this_plot = this_plot->next_sp, surface++) {
-	long int crvlen = this_plot->iso_crvs->p_count;
 	lp_style_type *lp_style = NULL;
 	TBOOLEAN color_from_column = this_plot->pm3d_color_from_column;
+	long int crvlen;
+
+	/* Quietly skip empty plots */
+	if (this_plot->plot_type == NODATA)
+	    continue;
+
+	crvlen = this_plot->iso_crvs->p_count;
 
 	/* Allow individual plots to opt out of hidden3d calculations */
 	if (this_plot->opt_out_of_hidden3d)
