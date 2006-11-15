@@ -781,9 +781,9 @@ set bmargin 0
 set rmargin 0
 set lmargin 0
 set view 60, 45, 1, 1
-set label 1 "\"Mirror mirror on the wall,\nwho's the GNUiest penguin of all?\"" at 140,0,40 center
-splot 'blutux.rgb' binary array=128x128 flip=y rot=90d origin=(0,0,0) perp = (1,0,0) format='%uchar' using ($1+$2+$3) with image, \
-      'blutux.rgb' binary array=128x128 flipy rot=90d origin=(+137,+137,0) perp=(0,1,0) format='%uchar' using ($1+$2+$3) with image
+set label 1 "Tux in a reflective mood" at 140,0,40 center
+splot 'blutux.rgb' binary array=128x128 flip=y rot=90d origin=(0,0,0) perp = (1,0,0) format='%uchar' with rgbimage, \
+      'blutux.rgb' binary array=128x128 flipy rot=90d origin=(+137,+137,0) perp=(0,1,0) format='%uchar' with rgbimage
 pause -1 "Hit return to continue"
 reset
 

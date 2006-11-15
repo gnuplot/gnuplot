@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.204 2006/11/14 19:38:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.205 2006/11/15 05:44:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5403,13 +5403,7 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 		else
 		    visible = FALSE;
 
-#define USE_CLIP_POINTS 0
-#if USE_CLIP_POINTS
-		if ( !clip_points ||
-#else
-		if (
-#endif
-		    visible ) {
+		if (visible) {
 		    if (pixel_1_1 < 0) {
 			/* First visible point. */
 			pixel_1_1 = i_image;
@@ -5431,9 +5425,9 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 		    if (pixel_planes == IC_PALETTE) {
 			image[i_sub_image++] = cb2gray( points[i_image].CRD_COLOR );
 		    } else {
-			image[i_sub_image++] = cb2gray( points[i_image].z );
-			image[i_sub_image++] = cb2gray( points[i_image].xlow );
-			image[i_sub_image++] = cb2gray( points[i_image].ylow );
+			image[i_sub_image++] = cb2gray( points[i_image].CRD_R );
+			image[i_sub_image++] = cb2gray( points[i_image].CRD_G );
+			image[i_sub_image++] = cb2gray( points[i_image].CRD_B );
 		    }
 
 		}
@@ -5500,8 +5494,6 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	}
 
     } else {
-
-	if (pixel_planes != IC_RGB) {
 
 	    /* Use sum of vectors to compute the pixel corners with respect to its center. */
 	    struct {double x; double y; double z;} delta_grid[2], delta_pixel[2];
@@ -5615,7 +5607,15 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 			}
 
 			if (N_corners >= 3) {
-			    set_color( cb2gray(points[i_image].CRD_COLOR) );
+			    if (pixel_planes == IC_PALETTE)
+				set_color( cb2gray(points[i_image].CRD_COLOR) );
+			    else {
+				int r = cb2gray(points[i_image].CRD_R) * 255. + 0.5;
+				int g = cb2gray(points[i_image].CRD_G) * 255. + 0.5;
+				int b = cb2gray(points[i_image].CRD_B) * 255. + 0.5;
+				int rgblt = (r << 16) + (g << 8) + b;
+				set_rgbcolor(rgblt);
+			    }
 			    (*term->filled_polygon) (N_corners, corners);
 			}
 		    }
@@ -5623,10 +5623,8 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 		    i_image++;
 		}
 	    }
-	} else {
-	    fprintf(stdout, ERROR_NOTICE("Color boxes cannot handle RGB components.\n\n"));
 	}
-    }}
+    }
 
 }
 

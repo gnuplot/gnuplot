@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.135 2006/10/21 04:32:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.136 2006/11/12 23:43:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -627,7 +627,7 @@ get_data(struct curve_points *current_plot)
 #endif
 
 #ifdef WITH_IMAGE
-                case IMAGE:  /* x_center y_center z_value */
+                case IMAGE:  /* x_center y_center color_value */
                     store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
                                   v[1], v[2]);
                     cp = &(current_plot->points[i]);
@@ -751,23 +751,15 @@ get_data(struct curve_points *current_plot)
 #ifdef WITH_IMAGE
                 case RGBIMAGE:  /* x_center y_center r_value g_value b_value (rgb) */
                     store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1], v[1], v[2]);
-                    /* A slight kludge, but it does in fact do what it is supposed to.
-                     * There is only one color axis, but we are storing components in
+                    
+		    /* There is only one color axis, but we are storing components in
                      * different variables.  Place all components on the same axis.
                      * (That will maintain a consistent mapping amongst the components.)
-                     * But then retrieve what was stored and break it back into its
-                     * components storing without updating any axes.
                      */
                     cp = &(current_plot->points[i]);
-                    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, v[2], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
-                    v[2] = cp->CRD_COLOR;
-                    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, v[3], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
-                    v[3] = cp->CRD_COLOR;
-                    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, v[4], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
-                    v[4] = cp->CRD_COLOR;
-                    cp->z = v[2];
-                    cp->xlow = v[3];
-                    cp->ylow = v[4];
+                    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_R, v[2], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+                    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_G, v[3], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+                    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_B, v[4], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
                     i++;
                     break;
 #endif

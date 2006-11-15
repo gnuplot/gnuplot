@@ -1,3 +1,20 @@
+2006-11-15  Ethan Merritt  <merritt@u.washington.edu>
+            Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/gp_types.h: Define overlaid fields in struct coordinate to hold
+	RGB components of IMAGE and RGBIMAGE plot styles.
+
+	* src/graphics.c (plot_image_or_update_axes) src/plot3d.c (get_3ddata)
+	src/plot2d.c (get_data):  Store RGB data into newly defined fields. 
+	This enables 'splot ... with rgbimage'.
+
+	* src/graphics. (plot_image_or_update_axes) docs/gnuplot.doc:
+	Remove restriction that rgb images could only be rendered as a 2D
+	rectangle facing the viewer. The general filled-polygon mechanism can
+	now be used for 3D rgbimages in arbitrary orientations.
+
+	* demo/imaage.dem:  Modify last plot to show rgbimage in 3D.
+
 2006-11-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* hidden3d.c (build_networks): Add checks in the hidden3d code to

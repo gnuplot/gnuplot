@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.132 2006/10/19 04:00:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.133 2006/10/21 04:32:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -869,6 +869,18 @@ get_3ddata(struct surface_points *this_plot)
 	    /* x,y,z into the text_label structure and add the actual text string.     */
 	    if (this_plot->plot_style == LABELPOINTS)
 		store_label(this_plot->labels, cp, xdatum, df_tokens[3], color);
+#endif
+
+#ifdef WITH_IMAGE
+	    if (this_plot->plot_style == RGBIMAGE) {
+		/* There is only one color axis, but we are storing components in
+		 * different variables.  Place all components on the same axis.
+		 * That will maintain a consistent mapping amongst the components.
+		 */
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_R, v[3], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_G, v[4], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_B, v[5], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+	    }
 #endif
 
 	come_here_if_undefined:

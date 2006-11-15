@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.397 2006/11/12 23:43:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.398 2006/11/13 00:01:25 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9142,10 +9142,7 @@ C ... and restart the table:
  The `rgbimage` style is intended for plotting 2D images and is similar
  in concept to `image`.  See `image` for details.  The difference is
  that 5D data (x,y,r,g,b) for `plot` and 6D data (x,y,z,r,g,b) for `splot`
- describe the coordinates and color components of an image.  Currently,
- color images are only possible when the sampling grid is rectangular and
- oriented with the view plane.  General orientations must be done with
- filled polygons which only support palette table lookup, not primary colors.
+ describe the coordinates and color components of an image.
 
  See also `image`.
 5 vectors
