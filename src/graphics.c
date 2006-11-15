@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.203 2006/11/12 23:43:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.204 2006/11/14 19:38:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1398,7 +1398,7 @@ place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox
 	if (this_rect->type == 1) {
 	    double width, height;
 
-	    if (dimensions == 2) {
+	    if (dimensions == 2 || this_rect->center.scalex == screen) {
 		map_position_double(&this_rect->center, &x1, &y1, "rect");
 		map_position_r(&this_rect->extent, &width, &height, "rect");
 	    } else if (splot_map) {
@@ -1407,7 +1407,7 @@ place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox
 		map3d_position_r(&this_rect->extent, &junkw, &junkh, "rect");
 		width = junkw;
 		height = junkh;
-	    } else if (this_rect->center.scalex != screen)
+	    } else
 		continue;
 
 	    x1 -= width/2;
@@ -1424,13 +1424,14 @@ place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox
 		clip_y = TRUE;
 
 	} else {
-	    if (dimensions == 2) {
+	    if ((dimensions == 2) 
+	    ||  (this_rect->bl.scalex == screen && this_rect->tr.scalex == screen)) {
 		map_position_double(&this_rect->bl, &x1, &y1, "rect");
 		map_position_double(&this_rect->tr, &x2, &y2, "rect");
 	    } else if (splot_map) {
 		map3d_position_double(&this_rect->bl, &x1, &y1, "rect");
 		map3d_position_double(&this_rect->tr, &x2, &y2, "rect");
-	    } else if ((this_rect->bl.scalex != screen || this_rect->tr.scalex != screen))
+	    } else
 		continue;
 
 	    if (x1 > x2) {double t=x1; x1=x2; x2=t;}
