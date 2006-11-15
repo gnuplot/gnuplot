@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.1 2006/10/22 12:09:42 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.2 2006/11/04 06:22:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1350,7 +1350,7 @@ place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
 
 #ifdef EAM_OBJECTS
 void
-place_rectangles(struct object *listhead, int layer, BoundingBox *clip_area)
+place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox *clip_area)
 {
     t_object *this_object;
     t_rectangle *this_rect;
@@ -1375,16 +1375,18 @@ place_rectangles(struct object *listhead, int layer, BoundingBox *clip_area)
 	if (this_rect->type == 1) {
 	    double width, height;
 
-	    if (splot_map) {
+	    if (dimensions == 2 || this_rect->center.scalex == screen) {
+		map_position_double(&this_rect->center, &x1, &y1, "rect");
+		map_position_r(&this_rect->extent, &width, &height, "rect");
+	    } else if (splot_map) {
 		int junkw, junkh;
 		map3d_position_double(&this_rect->center, &x1, &y1, "rect");
 		map3d_position_r(&this_rect->extent, &junkw, &junkh, "rect");
 		width = junkw;
 		height = junkh;
-	    } else {
-		map_position_double(&this_rect->center, &x1, &y1, "rect");
-		map_position_r(&this_rect->extent, &width, &height, "rect");
-	    }
+	    } else
+		continue;
+
 	    x1 -= width/2;
 	    y1 -= height/2;
 	    x2 = x1 + width;
@@ -1397,14 +1399,18 @@ place_rectangles(struct object *listhead, int layer, BoundingBox *clip_area)
 	    if (this_rect->extent.scaley == first_axes
 	    ||  this_rect->extent.scaley == second_axes)
 		clip_y = TRUE;
+
 	} else {
-	    if (splot_map) {
-		map3d_position_double(&this_rect->bl, &x1, &y1, "rect");
-		map3d_position_double(&this_rect->tr, &x2, &y2, "rect");
-	    } else {
+	    if ((dimensions == 2)
+	    ||  (this_rect->bl.scalex == screen && this_rect->tr.scalex == screen)) {
 		map_position_double(&this_rect->bl, &x1, &y1, "rect");
 		map_position_double(&this_rect->tr, &x2, &y2, "rect");
-	    }
+	    } else if (splot_map) {
+		map3d_position_double(&this_rect->bl, &x1, &y1, "rect");
+		map3d_position_double(&this_rect->tr, &x2, &y2, "rect");
+	    } else
+		continue;
+
 	    if (x1 > x2) {double t=x1; x1=x2; x2=t;}
 	    if (y1 > y2) {double t=y1; y1=y2; y2=t;}
 	    if (this_rect->bl.scalex == first_axes
@@ -1530,7 +1536,7 @@ do_plot(struct curve_points *plots, int pcount)
     boundary(plots, pcount);
 
     /* Give a chance for rectangles to be behind everything else*/
-    place_rectangles( first_object, -1, NULL );
+    place_rectangles( first_object, -1, 2, NULL );
 
     /* Add colorbox if appropriate. */
     if (is_plot_with_palette() && !make_palette() && is_plot_with_colorbox() && term->set_color)
@@ -1710,7 +1716,7 @@ do_plot(struct curve_points *plots, int pcount)
     }
 
     /* And rectangles */
-    place_rectangles( first_object, 0, clip_area );
+    place_rectangles( first_object, 0, 2, clip_area );
 
     /* PLACE LABELS */
     place_labels( first_label, 0, FALSE );
@@ -1972,7 +1978,7 @@ do_plot(struct curve_points *plots, int pcount)
 	plot_border();
 
     /* And rectangles */
-    place_rectangles( first_object, 1, clip_area );
+    place_rectangles( first_object, 1, 2, clip_area );
 
     /* PLACE LABELS */
     place_labels( first_label, 1, FALSE );

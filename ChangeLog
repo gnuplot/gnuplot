@@ -1,3 +1,12 @@
+2006-11-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* graphics.h graphics.c (place_rectangles) graph3d.c:
+	Add a parameter to place_rectangles that indicates with certainty
+	whether this is a 2D plot or a 3D plot.
+	Allow rectangles in splot if they are specified in screen coords.
+	Also, insure that 'set view map' does not affect 2D plots.
+	Bug #1596313
+
 2006-11-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_set_all): The gpsavediff script strips out lines
