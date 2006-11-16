@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133 2006/09/27 04:24:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.1 2006/10/22 05:52:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1313,7 +1313,7 @@ eval_plots()
 
                 /* Store title in temporary variable and then copy into the */
                 /* new histogram structure when it is allocated.            */
-                if (!histogram_title)
+                if (!histogram_title && !equals(c_token,","))
                     histogram_title = try_to_get_string();
 
                 /* Allow explicit starting color or pattern for this histogram */
