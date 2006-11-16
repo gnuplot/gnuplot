@@ -1,3 +1,9 @@
+2006-11-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots) docs/gnuplot.doc: The documented syntax
+	is 'newhistogram {"<title>"} {<linestyle>}' but in fact the code was
+	giving an error return if no title was present.  Fixed.
+
 2006-11-15  Ethan Merritt  <merritt@u.washington.edu>
             Daniel Sebald  <daniel.sebald@ieee.org>
 
