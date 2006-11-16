@@ -441,6 +441,13 @@ will show you all pre-defined targets.
 See other sections of the manuals for more information about installing/using
 gnuplot on OS/2.
 
+Ultrix
+------
+The mousing code requires a patch in order to compile properly under Ultrix.
+You can download this patch from the contributed scripts section of the
+gnuplot project pages on SourceForge: http://gnuplot.sourceforge.net/scripts/
+Or you can avoid the problem via        ./configure --disable-mouse
+
 
 More details about ./configure --with-PACKAGE[=OPTION]
 ======================================================

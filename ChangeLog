@@ -3,6 +3,8 @@
 	* src/plot2d.c (eval_plots): Giving a title for "newhistogram" is
 	documented as optional. Do not return an error if it is missing.
 
+	* INSTALL: Add mention of patches needed for Ultrix compilation.
+
 2006-11-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* graphics.h graphics.c (place_rectangles) graph3d.c:
