@@ -1,3 +1,7 @@
+2006-11-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/cgm.trm (CGM_set_color): Fix stupid typo in array bounds check.
+
 2006-11-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots): Giving a title for "newhistogram" is
