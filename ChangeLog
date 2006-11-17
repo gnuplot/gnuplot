@@ -1,3 +1,10 @@
+2006-11-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_image_or_update_axes): Split test for terminal
+	capabilities into two parts, palette and rgb. This allows the emf and
+	other terminal drivers to handle rgbimage even if they provide no
+	palette support.
+
 2006-11-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots) docs/gnuplot.doc: The documented syntax
@@ -19,7 +26,7 @@
 	rectangle facing the viewer. The general filled-polygon mechanism can
 	now be used for 3D rgbimages in arbitrary orientations.
 
-	* demo/imaage.dem:  Modify last plot to show rgbimage in 3D.
+	* demo/image.dem:  Modify last plot to show rgbimage in 3D.
 
 2006-11-14  Ethan Merritt  <merritt@u.washington.edu>
 

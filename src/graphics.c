@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.205 2006/11/15 05:44:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.206 2006/11/16 05:58:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5290,8 +5290,12 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 
     }
 
-    if (make_palette() || !term->set_color) {
-	fprintf(stderr, ERROR_NOTICE("Unable to make palette or set terminal color.\n\n"));
+    if (pixel_planes == IC_PALETTE && make_palette()) {
+	fprintf(stderr, ERROR_NOTICE("This terminal does not support palette-based images.\n\n"));
+	return;
+    }
+    if (pixel_planes == IC_RGB && !term->set_color) {
+	fprintf(stderr, ERROR_NOTICE("This terminal does not support rgb images.\n\n"));
 	return;
     }
 
