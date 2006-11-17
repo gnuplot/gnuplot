@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.77 2006/08/20 01:48:23 vanzandt Exp $
+ * $Id: cgm.trm,v 1.78 2006/11/12 23:43:46 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1137,7 +1137,7 @@ CGM_set_color(t_colorspec *colorspec)
 	    offset to get past the default colors */
 	 cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);
 	 if (cgm_next.fill_color >= cgm_smooth_colors)
-	      cgm_smooth_colors = cgm_smooth_colors - 1;
+	     cgm_next.fill_color = cgm_smooth_colors - 1;
 	 cgm_next.fill_color += CGM_COLORS;
 	 /* EAM - force color immediately so that lines and text can use it */
 	 if (cgm_color != cgm_next.fill_color) {

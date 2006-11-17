@@ -5,6 +5,8 @@
 	other terminal drivers to handle rgbimage even if they provide no
 	palette support.
 
+	* term/cgm.trm (CGM_set_color): Fix stupid typo in array bounds check.
+
 2006-11-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots) docs/gnuplot.doc: The documented syntax
