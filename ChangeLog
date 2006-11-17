@@ -7,6 +7,8 @@
 
 	* term/cgm.trm (CGM_set_color): Fix stupid typo in array bounds check.
 
+	* NEWS: update
+
 2006-11-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots) docs/gnuplot.doc: The documented syntax
@@ -54,7 +56,7 @@
 
 2006-11-12  Ethan Merritt  <merritt@u.washington.edu>
 
-	Transparent fill syltes (SourceForge patchset #1583199
+	Transparent fill styles (SourceForge patchset #1583199
 
 	* src/term_api.h: Define new fill styles FS_TRANSPARENT_SOLID and
 	FS_TRANSPARENT_PATTERN.  No new terminal entry points are added.
