@@ -1,5 +1,5 @@
 %
-% $Id: tutorial.tex,v 1.5 2006/07/07 00:49:19 sfeam Exp $
+% $Id: tutorial.tex,v 1.6 2006/08/05 18:17:57 sfeam Exp $
 %
 % Tutorial for gnuplot plotting program, for LaTeX users
 % David Kotz
@@ -168,9 +168,9 @@ some labels.  This input file produces Figure~\ref{eg2}.
     set output "eg2.tex"
     set size 5/5., 4/3.
     set format xy "$%g$"
-    set title "This is a plot of $y=\\sin(x)$"
-    set xlabel "This is the $x$ axis"
-    set ylabel "This is\\the\\$y$ axis"
+    set title 'This is a plot of $y=\sin(x)$'
+    set xlabel 'This is the $x$ axis'
+    set ylabel 'This is\\the\\$y$ axis'
     plot [0:6.28] [0:1] sin(x)
 \end{verbatim}
 \currentspace
@@ -281,9 +281,9 @@ the following example, shown in Figure~\ref{eg4}.
     set output "eg4.tex"
     set format y "$%g$"
     set format x "$%.2f$"
-    set title "This is $\sin(x)$"
+    set title 'This is $\sin(x)$'
     set xlabel "This is the $x$ axis"
-    set ylabel "$\sin(x)$"
+    set ylabel "$\\sin(x)$"
     unset key
     set xtics -pi, pi/4
     plot [-pi:pi] [-1:1] sin(x)
@@ -303,7 +303,12 @@ anywhere we may use an expression. The {\tt set xtics} command here
 specifies that the tics on the $x$ axis start at $-\pi$ and increment
 by $\pi/4$. Since no end point is given, the tics continue to the
 right edge. We have also turned off the key, and changed the format to
-restrict the $x$-axis tic labels to 2 decimal places.
+restrict the $x$-axis tic labels to 2 decimal places.  Note that the
+y axis label was delimited by double quotes, so the
+backslash had to be escaped.  Within single quotes, as in the title,
+gnuplot passes the backslashes through with no changes.
+(The exception: a backslash at the end of a line---even within single
+quotes---is used by gnuplot for line continuation.)
 
 With a little more work, the plot can look even better.  Another form
 of this command allows us to specify the label and position of each
@@ -314,11 +319,11 @@ command for readability.
 
 \singlespace
 \begin{verbatim}
-    set xtics ("$-\pi$" -pi,\
-     "$-\frac{\pi}{2}$" -pi/2,\
+    set xtics ('$-\pi$' -pi,\
+     '$-\frac{\pi}{2}$' -pi/2,\
      "0" 0,\
-     "$\frac{\pi}{2}$" pi/2,\
-     "$\pi$" pi)
+     '$\frac{\pi}{2}$' pi/2,\
+     '$\pi$' pi)
 \end{verbatim}
 \currentspace
 
@@ -343,16 +348,16 @@ self-explanatory. This is shown in Figure~\ref{eg6}.
     set output "eg6.tex"
     set size 3.5/5, 3/3.
     set format y "$%g$"
-    set format x "$%5.1f\mu$"
+    set format x '$%5.1f\mu$'
     set title "This is a title"
     set xlabel "This is the $x$ axis"
-    set ylabel "This is\\a longer\\version\\ of\\the $y$\\ axis"
+    set ylabel 'This is\\a longer\\version\\ of\\the $y$\\ axis'
     set label "Data" at -5,-5 right
     set arrow from -5,-5 to -3.3,-6.7
     set key at -4,8
     set xtic -10,5,10
-    plot [-10:10] [-10:10] "eg3.dat" title "Data File"  with linespoints 1 7,\
-       3*exp(-x*x)+1  title "$3e^{-x^{2}}+1$" with lines 4
+    plot [-10:10] [-10:10] "eg3.dat" title "Data File"  with linespoints lt 1 pt 7,\
+       3*exp(-x*x)+1  title '$3e^{-x^{2}}+1$' with lines lt 4
 \end{verbatim}
 \currentspace
 
@@ -477,7 +482,7 @@ postscript parts for text and lines, respectively, included by
 See helps of these terminals for more details about their usage.
 
 In addition, the \texttt{postscript eps enhanced} is the most useful for \TeX{}
-and \LaTeX{} if you don't insist of using \TeX{} fonts for the graph labels, and
+and \LaTeX{} if you don't insist on using \TeX{} fonts for the graph labels, and
 \texttt{pdf enhanced} and \texttt{png enhanced} for pdf\LaTeX{}.
 
 \section{Sample of epslatex terminal driver}
@@ -490,8 +495,25 @@ driver. The plot can use either color or grayscale.
 The driver produces two different files, one for the eps part of the figure
 and one for the \LaTeX{} part. The name of the \LaTeX{} file is taken from the
 `set output` command. The name of the eps file is derived by replacing
-the file extension (normally `.tex`) with `.eps` instead.
+the file extension (normally ``.tex'') with ``.eps'' instead.  
 
+With the epslatex terminal you cannot use ``\verb+\\+'' in a plain
+string to denote newline.  You can either put each line in a separate
+label and specify vertical spacing
+manually, or put the entire label in a \verb+\parbox+.
+For example, the labels in Figure~\ref{epslatex_test} were
+generated with the following commands:
+\begin{verbatim}
+    x=.10; y=.15; dy=.05
+    set label "left torus:"                           at screen x,y; y=y-dy
+    set label '$x=\cos u+\frac{1}{2}\cos u \cos v$'   at screen x,y; y=y-dy
+    set label '$y=\sin u+\frac{1}{2}\sin u \cos v$'   at screen x,y; y=y-dy
+    set label "$z=\\frac{1}{2}\\sin v$"               at screen x,y 
+    x=.65; y=.08
+    set label '\parbox{2.5in}{right torus:\\$x=1+\cos u+\fr\
+    ac{1}{2}\cos u \cos v$\\$y=\frac{1}{2}\sin v$\\\
+    $z=\sin u + \frac{1}{2}\sin u \cos v$}' at screen x,y left
+\end{verbatim}
 \boxfigure{htbp}{\fullboxwidth}{
   \begin{center}
     \input{eg7}

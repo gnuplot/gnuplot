@@ -1,3 +1,19 @@
+2006-11-18  James R. Van Zandt  <jrvz@comcast.net>
+
+	* tutorial/eg2.plt: Use \sin in title.
+
+	* tutorial/eg4.plt: delimit one label with double quotes, for
+	illustration.
+
+	* tutorial/eg7.plt: Add labels giving the equations for the tori,
+	using manual spacing for one and a \parbox for the other.
+	
+	* tutorial/tutorial.tex: Re-align the "verbatim" code with what's
+	actually used (especially: single quotes vs. double quotes).
+	Point out that backslashes need escaping in double quotes, and
+	that strings can be continued.  Show two ways to handle vertical
+	spacing of labels in the epslatex terminal.
+	
 2006-11-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/fig.trm (FIG_filled_polygon) term/tgif.trm (TGIF_filled_polygon)
