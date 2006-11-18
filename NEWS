@@ -4,6 +4,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW rgbimage style now works in 2D and 3D for all terminals that support RGB
 * NEW transparent fill styles
 * NEW 2D plots can read color information from an input data file
+* NEW iteration within a plot command; e.g.     plot for [i=1:10] foo(i)
 
 
 
