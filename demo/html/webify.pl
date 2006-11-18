@@ -76,7 +76,7 @@ require "ctime.pl";
 	print OUT "<pre>\n";
 
 	while (<IN>) {
-		if (/^pause -1/) {
+		if (/^ *pause -1/) {
 			if ($savescripts) {
 			    print OUT "<br><p>Click <a href=$ARGV[0].$plot.gnu>here</a> ",
 				  "for minimal script to generate this plot</p>\n";

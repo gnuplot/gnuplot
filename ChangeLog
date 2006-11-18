@@ -22,6 +22,9 @@
 	without a color palette having been initialized. It is perfectly fine
 	to fill a polygon with other types of colorspec.
 
+	* demo/margins.dem demo/html/webify.pl demo/html/index.save:  Update
+	to current version, and make webify less sensitive to extra whitespace.
+
 2006-11-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_image_or_update_axes): Split test for terminal
