@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  *
- * $Id: pstricks.trm,v 1.31 2006/07/07 03:51:23 sfeam Exp $
+ * $Id: pstricks.trm,v 1.32 2006/07/21 02:35:48 sfeam Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -631,10 +631,6 @@ TERM_PUBLIC void
 PSTRICKS_filled_polygon (int points, gpiPoint *corners)
 {
     int i;
-
-    if (PSTRICKS_palette_set == FALSE) {
-	 fprintf(stderr, "pstricks: Palette used before set!\n");
-    }
 
 #ifdef PSTRICKS_SHORTER_FILE
     /* using a macro for an abbreviation */

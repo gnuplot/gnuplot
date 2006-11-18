@@ -1,3 +1,11 @@
+2006-11-18  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/fig.trm (FIG_filled_polygon) term/tgif.trm (TGIF_filled_polygon)
+	term/pstricks.trm (PSTRICKS_filled_polygon):  These terminals were
+	issuing a spurious warning message if term->filled_polygon() was called
+	without a color palette having been initialized. It is perfectly fine
+	to fill a polygon with other types of colorspec.
+
 2006-11-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/cgm.trm (CGM_set_color): Fix stupid typo in array bounds check.

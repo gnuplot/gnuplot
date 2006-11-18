@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.40 2006/07/21 02:35:48 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.41 2006/08/27 22:13:13 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -1682,10 +1682,6 @@ TERM_PUBLIC void
 TGIF_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
-
-    if (TGIF_palette_set == FALSE) {
-	fprintf(stderr,"Palette used before set\n"); /* Error condition */
-    }
 
     if (eTgifState == INPOLY)
 	TGIF_flush_poly(); /* Clean up current data */
