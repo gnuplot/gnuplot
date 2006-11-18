@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.56 2006/07/21 02:35:46 sfeam Exp $
+ * $Id: fig.trm,v 1.57 2006/11/12 23:43:46 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1144,10 +1144,6 @@ TERM_PUBLIC void FIG_set_color(t_colorspec *colorspec)
 TERM_PUBLIC void FIG_filled_polygon(int points, gpiPoint *corners)
 {
     int i,j;
-
-    if (FIG_palette_set == FALSE) {
-	fprintf(stderr,"fig: Palette used before set\n"); /* Error condition */
-    }
 
     FIG_poly_clean(FIG_polyvec_stat); /* Clean up current data */
 
