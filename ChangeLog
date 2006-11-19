@@ -4,6 +4,8 @@
 	incorrectly.
 	Bug #1599346
 
+	* src/misc.c (lp_use_properties) Remove annoying warning message.
+
 2006-11-18  James R. Van Zandt  <jrvz@comcast.net>
 
 	* tutorial/eg2.plt: Use \sin in title.
