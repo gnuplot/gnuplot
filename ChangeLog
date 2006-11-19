@@ -1,3 +1,9 @@
+2006-11-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/fig.trm (FIG_set_color): The case of TC_LT was handled
+	incorrectly.
+	Bug #1599346
+
 2006-11-18  James R. Van Zandt  <jrvz@comcast.net>
 
 	* tutorial/eg2.plt: Use \sin in title.
