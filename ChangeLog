@@ -6,6 +6,8 @@
 	* term/fig.trm (FIG_set_color): TC_LT was handled incorrectly.
 	Bug #1599346
 
+	* src/misc.c (lp_use_properties): Remove annoying warning messages.
+
 2006-11-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/fig.trm (FIG_filled_polygon) term/tgif.trm (TGIF_filled_polygon)

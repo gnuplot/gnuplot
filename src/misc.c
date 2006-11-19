@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.80 2006/04/12 03:48:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.81 2006/07/28 20:48:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -738,8 +738,6 @@ lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
 
     /* tag not found: */
     /* Mar 2006 - This used to be a fatal error; now we fall back to line type */
-    if (tag > 1)
-	int_warn(NO_CARET, "linestyle not found", NO_CARET);
     lp->l_type = tag - 1;
     lp->pm3d_color.type = TC_LT;
     lp->pm3d_color.lt = lp->l_type;
