@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.56 2006/07/21 02:35:46 sfeam Exp $
+ * $Id: fig.trm,v 1.56.2.1 2006/11/18 17:27:02 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1118,8 +1118,7 @@ TERM_PUBLIC void FIG_set_color(t_colorspec *colorspec)
     int new_color;
 
     if (colorspec->type == TC_LT) {
-    	if (FIG_use_color)
-	    FIG_color = colorspec->lt % WHITE;
+    	FIG_linetype(colorspec->lt);
 	return;
     }
 

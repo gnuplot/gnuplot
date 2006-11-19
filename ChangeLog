@@ -3,6 +3,9 @@
 	* config/makefile.mgw term/PostScript/prologue.ps PostScript/prologues.h
 	term/post.h:  Update version number 4.1 -> 4.2 in several places.
 
+	* term/fig.trm (FIG_set_color): TC_LT was handled incorrectly.
+	Bug #1599346
+
 2006-11-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/fig.trm (FIG_filled_polygon) term/tgif.trm (TGIF_filled_polygon)
