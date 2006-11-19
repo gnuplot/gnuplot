@@ -1,3 +1,8 @@
+2006-11-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* config/makefile.mgw term/PostScript/prologue.ps PostScript/prologues.h
+	term/post.h:  Update version number 4.1 -> 4.2 in several places.
+
 2006-11-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/fig.trm (FIG_filled_polygon) term/tgif.trm (TGIF_filled_polygon)

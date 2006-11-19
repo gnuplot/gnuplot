@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.205 2006/10/12 21:22:15 mikulik Exp $
+ * $Id: post.trm,v 1.203.2.2 2006/10/12 21:27:17 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3391,7 +3391,7 @@ PS_COMMON_OPTS2
 " but transfers the texts to LaTeX instead of including in the PostScript",
 " code. Thus, many options are the same as in the `postscript terminal`.",
 "",
-" From version 4.0 to 4.1, some changes have been invoked into the default ",
+" From version 4.0 to 4.2, some changes have been invoked into the default ",
 " appearance of the epslatex terminal to reach better consistency with the",
 " postscript terminal:  The plot size has been changed from 5 x 3 inches to",
 " 5 x 3.5 inches;  the character width is now estimated to be 60% of the font",
@@ -3584,7 +3584,7 @@ PS_COMMON_DOC1
 " \\special{psfile=...} command.  Remember to close the `output file` before",
 " next plot unless in `multiplot` mode.",
 "",
-" Gnuplot versions prior version 4.1 have generated plots of the size",
+" Gnuplot versions prior version 4.2 have generated plots of the size",
 " 5 x 3 inches using the ps(la)tex terminal while the current version generates",
 " 5 x 3.5 inches to be consistent with the postscript eps terminal.  In",
 " addition, the character width is now estimated to be 60% of the font size",

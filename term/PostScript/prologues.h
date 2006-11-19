@@ -419,7 +419,7 @@ NULL
 
 static const char *prologue_prologue_ps[] = {
 "%\n",
-"% Gnuplot Prolog Version 4.1 (March 2006)\n",
+"% Gnuplot Prolog Version 4.2 (August 2006)\n",
 "%\n",
 "/M {moveto} bind def\n",
 "/L {lineto} bind def\n",
