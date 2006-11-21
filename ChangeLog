@@ -1,3 +1,22 @@
+2006-11-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	I ran the complete set of demos through the svg terminal, and judged the
+	result using ksvg via konqueror. This revealed several problems, which
+	are fixed by this set of patches. Other svg viewers (mozilla, inkscape,
+	OpenOffice) worked less well.
+
+	* term/svg.trm (SVG_PathLimit SVG_MoveForced):  Avoid ridiculously
+	long paths by limiting total path length to 512.
+	Allows konqueror to handle the last plot of vector.dem.
+
+	* term/svg.trm:  Avoid opening/closing new paths unnecessarily.
+	This prevents creating a new group for every filled_polygon, and
+	drastically reduces the size of output files containing pm3d objects
+	or pixel images.
+
+	*term/svg.trm:  Clipping in the core code is still not perfect.
+	Handle y coordinate overflow gracefully.
+
 2006-11-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/fig.trm (FIG_set_color): The case of TC_LT was handled
