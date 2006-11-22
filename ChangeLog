@@ -1,3 +1,9 @@
+2006-11-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	term/pdf.trm (PDF_graphics):  The multiplier from 'set size' was being
+	applied twice, so the resulting plot scaled as the square of the size.
+	Apply it only once, to the plot, not to the canvas.
+
 2006-11-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* config/makefile.mgw term/PostScript/prologue.ps PostScript/prologues.h

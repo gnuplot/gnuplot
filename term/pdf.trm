@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.67 2006/08/03 22:24:55 sfeam Exp $
+ * $Id: pdf.trm,v 1.68 2006/08/04 20:31:56 sfeam Exp $
  */
 
 /*------------------------------
@@ -541,8 +541,6 @@ PDF_graphics ()
 	term->xmax = PDF_XMAX;
 	term->ymax = PDF_YMAX;
     }
-    term->xmax *= xsize;
-    term->ymax *= ysize;
 
     PDF_begin_page(myPDF, (double)term->xmax / PDF_RESOLUTION,
 		   (double)term->ymax / PDF_RESOLUTION);
