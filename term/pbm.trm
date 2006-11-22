@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pbm.trm,v 1.25 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: pbm.trm,v 1.26 2006/07/21 02:35:47 sfeam Exp $
  *
  */
 
@@ -93,6 +93,11 @@ TERM_PUBLIC void PBM_point __PROTO((unsigned int x, unsigned int y, int point));
 static int pbm_font = 1;	/* small font */
 static int pbm_mode = 0;	/* 0:monochrome 1:gray 2:color */
 
+/* Only needed for dubious backwards compatibility with 'set size'
+ * in pre-4.2 versions that didn't support 'set term size'
+ */
+static TBOOLEAN PBM_explicit_size = FALSE;
+
 /* 7=black, 0=white */
 static int pgm_gray[] = { 7, 1, 6, 5, 4, 3, 2, 1, 7 };	/* grays  */
 /* bit3=!intensify, bit2=!red, bit1=!green, bit0=!blue */
@@ -159,12 +164,14 @@ PBM_options()
 	    if (END_OF_COMMAND) {
 		term->xmax = PBM_XMAX;
 		term->ymax = PBM_YMAX;
+		PBM_explicit_size = FALSE;
 	    } else {
 		xpixels = real(const_express(&a));
 		if (equals(c_token, ",")) {
 		    c_token++;
 		    ypixels = real(const_express(&a));
 		}
+		PBM_explicit_size = TRUE;
 	    }
 	    if (xpixels > 0)
 		term->xmax = xpixels;
@@ -207,7 +214,8 @@ PBM_options()
 	break;
     }
 
-    sprintf(term_options + strlen(term_options), " size %d,%d",
+    if (PBM_explicit_size)
+	sprintf(term_options + strlen(term_options), " size %d,%d",
 	    term->xmax, term->ymax);
 }
 
@@ -261,6 +269,16 @@ TERM_PUBLIC void
 PBM_graphics()
 {
     int numplanes = 1;
+    unsigned int xpixels = term->xmax;
+    unsigned int ypixels = term->ymax;
+
+    /* 'set size' should not affect the size of the canvas in pixels,
+     * but versions prior to 4.2 did not have a separate 'set term size'
+     */
+    if (!PBM_explicit_size) {
+ 	xpixels *= xsize;
+	ypixels *= ysize;
+    }
 
     switch (pbm_mode) {
     case 1:
@@ -277,8 +295,7 @@ PBM_graphics()
     /* PBMsetfont(); */
     /* rotate plot -90 degrees by reversing XMAX and YMAX and by
        setting b_rastermode to TRUE */
-    b_makebitmap((unsigned int) (term->ymax * ysize),
-		 (unsigned int) (term->xmax * xsize), numplanes);
+    b_makebitmap(ypixels, xpixels, numplanes);
     b_rastermode = TRUE;
 
     if (pbm_mode != 0)

@@ -1,8 +1,12 @@
 2006-11-22  Ethan Merritt  <merritt@u.washington.edu>
 
-	term/pdf.trm (PDF_graphics):  The multiplier from 'set size' was being
+	* term/pdf.trm (PDF_graphics):  The multiplier from 'set size' was being
 	applied twice, so the resulting plot scaled as the square of the size.
 	Apply it only once, to the plot, not to the canvas.
+
+	* term/pbm.trm (PBM_graphics PBM_options): Decouple 'set size' from
+	'set term pbm size XX,YY'. The latter will always yield an XX,YY image.
+	Maintain (pre-4.2) behaviour if no explicit terminal size is given.
 
 2006-11-19  Ethan Merritt  <merritt@u.washington.edu>
 
