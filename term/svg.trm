@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.73 2006/11/22 05:21:31 sfeam Exp $
+ * $Id: svg.trm,v 1.74 2006/11/22 05:24:04 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ TERM_PUBLIC void ENHsvg_writec __PROTO((int));
 TERM_PUBLIC void SVG_path __PROTO((int p));
 
 #define SVG_SCALE	10.
-#define Y(y) ((float)(term->ymax - y) / SVG_SCALE)
+#define Y(y) ((float)((int)term->ymax - (int)y) / SVG_SCALE)
 #define X(x) ((float)(x) / SVG_SCALE)
 
 #define SVG_XMAX	(600 * SVG_SCALE)
