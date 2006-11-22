@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.72 2006/11/12 23:43:47 sfeam Exp $
+ * $Id: svg.trm,v 1.73 2006/11/22 05:21:31 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -202,6 +202,7 @@ SVG_GroupOpen ()
 static void
 SVG_GroupClose ()
 {
+    SVG_GroupFilledClose();
     if (SVG_groupIsOpen) {
 	  fputs ("</g>\n", gpoutfile);
 	  SVG_groupIsOpen = FALSE;
@@ -215,8 +216,8 @@ SVG_GroupClose ()
 static void
 SVG_PathOpen ()
 {
-    SVG_GroupFilledClose();
     if (!SVG_pathIsOpen) {
+	SVG_GroupFilledClose();
 	if (SVG_use_pm3d_color) {
 	    fprintf(gpoutfile, "\t<path style='stroke:rgb(%3d, %3d, %3d)' d='",
 		    SVG_red, SVG_green, SVG_blue);
@@ -233,8 +234,8 @@ SVG_PathOpen ()
 static void
 SVG_PathClose ()
 {
-    SVG_GroupFilledClose();
     if (SVG_pathIsOpen) {
+	SVG_GroupFilledClose();
 	fputs ("'></path>\n", gpoutfile);
 	SVG_path_count = 0;
 	SVG_pathIsOpen = FALSE;
@@ -276,8 +277,8 @@ SVG_SetFont (const char *name, double size)
 static void
 SVG_GroupFilledOpen()
 {
-    SVG_PathClose();
     if (!SVG_groupFilledIsOpen) {
+	SVG_PathClose();
 	fputs("\t<g style = 'stroke:none; shape-rendering:crispEdges'>\n",
 	      gpoutfile);
 	SVG_groupFilledIsOpen = TRUE;
