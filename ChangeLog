@@ -1,4 +1,9 @@
-2006-11-25  Mike Sutton  <mws116@usa.com>
+2006-11-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* PATCHLEVEL configure.in src/version.c docs/gnuplot.texi:
+	Update in preparation for second release candidate               4.2-rc2
+
+2006-11-23  Mike Sutton  <mws116@usa.com>
 
 	* term/gd.trm (PNG_init PNG_vector PNG_point): Fix off-by-one error
 	in specifying brush definitions that control line width.

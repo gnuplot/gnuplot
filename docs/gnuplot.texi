@@ -471,7 +471,7 @@ See @ref{variables}.
 @node Macros, Auto-layout_of_multiple_plots_on_a_page, String_handling, New_features_introduced_in_version_4.2
 @subsection Macros
 
-Gnuplot support macro expansion  by '@@stringvariablename'. 
+Gnuplot supports command line macro expansion  by '@@stringvariablename'. 
 See @ref{macros}.
 
 
@@ -4270,6 +4270,8 @@ See also `show plot`.
 
 @cindex data
 
+@cindex file
+
 Discrete data contained in a file can be displayed by specifying the name of
 the data file (enclosed in single or double quotes) on the `plot` command line.
 
@@ -4369,11 +4371,11 @@ with ASCII matrix, in the using list, repetition of the coordinate row
 constitutes column 1, repetition of the coordinate column constitutes
 column 2, and the array of values constitutes column 3.
 
-The general binary format contains an arbitrary number of columns fow which
+The general binary format contains an arbitrary number of columns for which
 information must be specified at the command line.  For example, `array`,
 `record`, `format` and @ref{using} can indicate the size, format and dimension
-of data.  There are a variety of useful commands for skipping file headers,
-changing endianess.  There are a set of commands for positioning and
+of data.  There are a variety of useful commands for skipping file headers
+and changing endianess.  There are a set of commands for positioning and
 translating data since often coordinates are not part of the file when
 uniform sampling is inherent in the data.  Different from matrix binary or
 ASCII, general binary does not treat the generated columns as 1, 2 or 3 in
@@ -4464,7 +4466,7 @@ below.
 The keyword `filetype` in <binary list> controls the routine used to
 read the file, i.e., the format of the data.  For a list of the supported
 file types, type `show datafile binary filetypes`.  If no file type is
-given, the rule is that "traditional" gnuplot binary is assumed for `splot`
+given, the rule is that traditional gnuplot binary is assumed for `splot`
 if the `binary` keyword stands alone.  In all other circumstances, for
 `plot` or when one of the <binary list> keywords appears, a raw binary
 file is assumed whereby the keywords specify the binary format.
@@ -8480,7 +8482,7 @@ The keywords `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
 @ref{lmargin}, @ref{rmargin}, @ref{tmargin}, @ref{bmargin} (, `above`, `over`, `below` and
 `under`) may be used to automatically place the key in other positions of the
 graph.  Also an `at <position>` may be given to indicate precisely where the
-plot should be placed.  In this case, the keywords `left`, `right`, `center`,
+plot should be placed.  In this case, the keywords `left`, `right`, `top`,
 `bottom` and `center` serve an analogous purpose for alignment.
 
 To understand positioning, the best concept is to think of a region, i.e.,
@@ -10196,8 +10198,8 @@ Examples:
 
 To produce a gray palette (useless but instructive) use:
 @example
-     set palette model RGB
-     set palette defined ( 0 "black", 1 "white" )
+      set palette model RGB
+      set palette defined ( 0 "black", 1 "white" )
 
 @end example
 
@@ -10335,9 +10337,9 @@ For gray mappings gamma correction can be turned on by `set palette gamma
 <gamma>`.  <gamma> defaults to 1.5 which is quite suitable for most
 terminals.
 
-For color mappings no automatic gamma correction is done by gnuplot.  But
-you may easily implement gamma correction, here an example for a gray scale
-image by use of explicit functions for the red, green and blue component
+For color mappings no automatic gamma correction is done by gnuplot.  However,
+you may easily implement gamma correction.  Here is an example for a gray
+scale image by use of explicit functions for the red, green and blue component
 with slightly different values of gamma
 
 Example:
@@ -10358,7 +10360,7 @@ gray values with appropriate colors.  Instead of
 use e.g.
 
 @example
-     set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
+      set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
 
 @end example
 
@@ -11759,23 +11761,21 @@ using the same coloring for multiple histograms
 @cindex image
 
 The `image` style is intendend for plotting 2D images.  It may be used for
-both `plot` and `splot` provided the 3D data (x,y,value) or projected 4D
-data (x,y,z,value) forms a valid grid.  A valid grid is one in which the
-data in the viewing plane is equidistant along two, not necessarily
-orthogonal, directions.  In other words, groups of four adjacent points
-must form the same size parallelogram.  The variable `value` in the tuples
-represent a palette color (gray value) for indexing in the current palette.
+both `plot` and `splot` in the form of 3D data (x,y,value) or projected 4D
+data (x,y,z,value), respectively.  It is assumed that in the viewing plane
+the image data forms an equidistant sampling grid in the viewing plane along
+two, not necessarily  orthogonal, directions.  In other words, groups of
+four adjacent points are assumed to form the same size parallelogram.  The
+variable `value` in the tuples represent a palette color (gray value) for
+indexing in the current palette.
 
-If the data points form a valid rectangular grid, i.e., a valid grid for
-which the directions are orthogonal and lie along the x and y axes of the
-viewing plane, the `image` style will attempt to create a properly
-positioned and scaled data matrix to match the plot borders for those
-terminals supporting palettes and images.  The result is efficient storage
-and fast refresh.  However, for terminal drivers not supporting palettes
-and images, or those not yet implemented, the `image` style will revert
-to drawing filled rectangular boxes for pixels, which is not as efficient.
-Furthermore, general parallelogram-shaped images have filled parallelograms
-for pixels.
+The `image` style will attempt to create a properly positioned and scaled
+data matrix to match the plot borders for those terminals supporting palettes
+and images.  Such output is efficient and draws quickly.  However, when a
+terminal driver does not support palettes and images, or when image support
+is not implemented, the `image` style reverts to drawing filled rectangular
+boxes for pixels, which is not as efficient.  General parallelogram-shaped
+images currently always have filled parallelograms for pixels.
 
 The coordinate of each data point of an image will lie at the center of a
 pixel.  That is, an M x N set of data will form an image with M x N pixels.
@@ -11783,7 +11783,7 @@ This is slightly different than pm3d elements where an M x N set of data
 will form a surface of (M-1) x (N-1) elements.  The scan directions for the
 image data grid can be any of eight possible combinations.
 
-Currently only the following terminal drivers support data matrix images:
+Here are some specific comments about particular terminal drivers:
 
 x11 and wxt - Pixels are either repeated or decimated to fit the display
 @example
@@ -11806,9 +11806,6 @@ png - Output is dependent on the installed version of libgd.
       gd 2.0.9  Truecolor works, non-truecolor also works.
 
 @end example
-
-aqua
-pdf, svg
 
 See also `rgbimage`.
 
@@ -13848,12 +13845,13 @@ year. Please see @ref{xmtics} for details.
 @opindex cbrange
 
 
-The @ref{cbrange} command sets the range of values which are colored according
-to the current @ref{palette} by styles @ref{pm3d}, `with image` and @ref{palette}. Values outside of the color range use color of the nearest extreme.
+The @ref{cbrange} command sets the range of values which are colored using
+the current @ref{palette} by styles @ref{pm3d}, `with image` and @ref{palette}.
+Values outside of the color range use color of the nearest extreme.
 
-If the cb-axis is autoscaled in `splot`, then the range is taken from @ref{zrange}.
-Points drawn in `splot ... pm3d|palette` can be filtered by using different
-@ref{zrange} and @ref{cbrange}.
+If the cb-axis is autoscaled in `splot`, then the colorbox range is taken from
+@ref{zrange}.  Points drawn in `splot ... pm3d|palette` can be filtered by using
+different @ref{zrange} and @ref{cbrange}.
 
 Please see @ref{xrange} for details on @ref{cbrange} syntax. See also
 @ref{palette} and `set colorbox`.
@@ -17603,7 +17601,7 @@ This terminal produces files in the W3C Scalable Vector Graphics format.
 Syntax:
 @example
       set terminal svg @{size <x>,<y> @{|fixed|dynamic@}@}
-                       @{@{no@}enhanced@}
+                       @{@{no@}enhanced@} @{raw|escaped@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
                        @{font "<fontname>@{,<fontsize>@}"@}
                        @{fontfile <filename>@}
@@ -17635,7 +17633,13 @@ specifies a local file which is copied into the <defs> section of the
 resulting SVG output file.  This file may either itself contain a font,
 or may contain the records necessary to create a hypertext reference to
 the desired font. Gnuplot will look for the requested file using the
-directory list in the GNUPLOT_FONTPATH environmental variable."
+directory list in the GNUPLOT_FONTPATH environmental variable.
+
+By default the SVG driver passes non-ascii characters through to the output
+file with no processing, leaving it to the SVG viewer to interpret them
+according to the current character encoding. The `escaped` option tells
+gnuplot to replace each non-ascii character with a hexidecimal
+representation of the form &#xNN;"
 
 @node tek410x, tek410x_, svg, terminal_
 @subsubsection tek410x
