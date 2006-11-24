@@ -1,3 +1,7 @@
+2006-11-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/term-ja.diff: Update patch to match 4.2-rc2 driver source.
+
 2006-11-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
         * configure.in: Fix bug in --{en|dis}able-wxwidgets
