@@ -3,6 +3,8 @@
 	* PATCHLEVEL configure.in src/version.c docs/gnuplot.texi:
 	Update in preparation for second release candidate               4.2-rc2
 
+	* term/svg.trm: Back out the raw/escaped option. It needs more thought.
+
 2006-11-23  Mike Sutton  <mws116@usa.com>
 
 	* term/gd.trm (PNG_init PNG_vector PNG_point): Fix off-by-one error
