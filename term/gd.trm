@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.96 2006/10/15 19:47:48 sfeam Exp $
+ * $Id: gd.trm,v 1.95.2.1 2006/10/15 20:14:09 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1029,7 +1029,7 @@ int i;
     for (i=2; i<=MAXLINEWIDTH; i++) {
 	PNG_brush[i].im = gdImageCreate(i,i);
 	PNG_brush[i].bgnd = gdImageColorAllocate( PNG_brush[i].im, 255, 255, 255 );
-	gdImageFill( PNG_brush[i].im, 1, 1, PNG_brush[i].bgnd );
+	gdImageFill( PNG_brush[i].im, 0, 0, PNG_brush[i].bgnd );
 	gdImageColorTransparent( PNG_brush[i].im, PNG_brush[i].bgnd );
 	PNG_brush[i].fgnd = gdImageColorAllocate( PNG_brush[i].im, 0, 0, 0 );
 	PNG_brush[i].last_rgb = 0;
@@ -1038,7 +1038,7 @@ int i;
     /*       might be better to approximate a circular nib by selectively */
     /*       coloring the individual pixels of the brush image.           */
     for (i=2; i<=MAXLINEWIDTH; i++) {
-	gdImageFilledRectangle( PNG_brush[i].im, 1, 1, i, i, PNG_brush[i].fgnd );
+	gdImageFilledRectangle( PNG_brush[i].im, 0, 0, i-1, i-1, PNG_brush[i].fgnd );
     }
 
 }
@@ -1394,7 +1394,7 @@ PNG_vector(unsigned int x, unsigned int y)
     } else {
 	if (png_state.linewidth == 1) {
 #if (GD2_VERS >= 2) && defined(gdAntiAliased) 
-	    png_state.image->thick = 1;
+	    gdImageSetThickness(png_state.image,1);
 	    gdImageSetAntiAliased(png_state.image, png_state.color);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), gdAntiAliased);
@@ -1405,7 +1405,7 @@ PNG_vector(unsigned int x, unsigned int y)
 #if (GD2_VERS >= 2)
 	} else if (png_state.capbutt){
 
-	    png_state.image->thick = png_state.linewidth;
+	    gdImageSetThickness(png_state.image,png_state.linewidth);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), png_state.color);
 #endif
@@ -1421,7 +1421,7 @@ PNG_vector(unsigned int x, unsigned int y)
 		    gdImageBlue(png_state.image,png_state.color) );
 		PNG_brush[lw].last_rgb = png_state.color;
 	    }
-	    gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
+	    gdImageFilledRectangle( PNG_brush[lw].im, 0, 0, lw-1, lw-1, PNG_brush[lw].fgnd );
 	    gdImageSetBrush(png_state.image, PNG_brush[lw].im);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), gdBrushed );
@@ -1596,7 +1596,7 @@ PNG_point(unsigned int x, unsigned int y, int number)
 		gdImageBlue(png_state.image,png_state.color) );
 	    PNG_brush[lw].last_rgb = png_state.color;
 	}
-	gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
+	gdImageFilledRectangle( PNG_brush[lw].im, 0, 0, lw-1, lw-1, PNG_brush[lw].fgnd );
 	gdImageSetBrush(png_state.image, PNG_brush[lw].im);
 	png_state.color = gdBrushed;
     }

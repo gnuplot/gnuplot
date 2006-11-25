@@ -1,3 +1,8 @@
+2006-11-25  Mike Sutton  <mws116@usa.com>
+
+	* term/gd.trm (PNG_init PNG_vector PNG_point): Fix off-by-one error
+	in specifying brush definitions that control line width.
+
 2006-11-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm (PDF_graphics):  The multiplier from 'set size' was being
