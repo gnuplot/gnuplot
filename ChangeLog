@@ -1,3 +1,7 @@
+2006-11-26  James R. Van Zandt  <jrvz@comcast.net>
+
+	* term/README: tweak wording of _image documentation.
+
 2006-11-25  Mike Sutton  <mws116@usa.com>
 
 	* term/gd.trm (PNG_init PNG_vector PNG_point): Fix off-by-one error

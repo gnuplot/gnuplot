@@ -402,22 +402,22 @@ The following function should be conditioned on WITH_IMAGE.  See also:
 src/README for notes about image support.
 
 _image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
-   This routine is to plot a pixel-based image on the display device.
+   Plot a pixel-based image on the display device.
    'M' is the number of pixels along the y-dimension of the image and
    'N' is the number of pixels along the x-dimension of the image.  The
    coordval pointer 'image' is the pixel values normalized to the range
-   [0:1].  These values should be scaled accordingly for the output
-   device.  They 'image' data starts in the upper left corner and scans
+   [0:1].  These values should be scaled appropriately for the output
+   device.  The 'image' data starts in the upper left corner and scans
    along rows finishing in the lower right corner.  If 'color_mode' is
    IC_PALETTE, the terminal is to use palette lookup to generate color
    information.  In this scenario the size of 'image' is M*N.  If
    'color_mode' is IC_RGB, the terminal is to use RGB components.  In
    this scenario the size of 'image' is 3*M*N.  The data appears in RGB
-   tripples, i.e., image[0] = R(1,1), image[1] = G(1,1), image[2] =
+   triples, i.e., image[0] = R(1,1), image[1] = G(1,1), image[2] =
    B(1,1), image[3] = R(1,2), image[4] = G(1,2), ..., image[3*M*N-1] =
    B(M,N).  The 'image' is actually an "input" image in the sense that
    it must also be properly resampled for the output device.  Many output
-   mediums, e.g., PostScript, do this work via various driver functions.
+   media, e.g., PostScript, do this work via various driver functions.
    To determine the appropriate rescaling, the 'corner' information
    should be used.  There are four entries in the gpiPoint data array.
    'corner[0]' is the upper left corner (in terms of plot location) of
