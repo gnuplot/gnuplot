@@ -1,3 +1,8 @@
+2006-11-26  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* docs/gnuplot.doc: For filledcurves, the default variant depends
+	on the number of columns in the input data.
+
 2006-11-26  James R. Van Zandt  <jrvz@comcast.net>
 
 	* term/README: tweak wording of _image documentation.

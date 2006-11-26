@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.399 2006/11/16 05:58:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.400 2006/11/16 22:17:40 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8767,7 +8767,7 @@ C ... and restart the table:
  are possible. The first two variants require either a function or two columns
  of input data, and may be further modified by the options listed below.
  The first variant, `closed`, treats the curve itself as a closed polygon.
- This is the default.
+ This is the default if there are two columns of input data.
 
  The second variant is to fill the area between the curve and a given axis,
  a horizontal or vertical line, or a point.
@@ -8775,6 +8775,7 @@ C ... and restart the table:
  The third variant requires three columns of input data: the x coordinate and
  two y coordinates corresponding to two curves sampled at the same set of
  x coordinates; the area between the two curves is filled.
+ This is the default if there are three or more columns of input data.
 
  Syntax:
 
