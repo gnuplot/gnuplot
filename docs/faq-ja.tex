@@ -1,8 +1,8 @@
 %% Don't forget to change the paper format in the next line
 %
-% $Id: faq-ja.tex,v 1.12 2006-09-10 20:40:55+09 shige Exp $
+% $Id: faq-ja.tex,v 1.14 2006-11-23 19:05:31+09 shige Exp $
 % translated to Japanese by Shigeharu TAKENO 2005/03/14
-% Original: Id: faq.tex,v 1.23 2006/09/10 10:30:58 mikulik Exp $
+% Original: Id: faq.tex,v 1.25 2006/11/23 00:43:58 sfeam Exp $
 %
 %
 %\documentclass[a4paper,11pt]{article}
@@ -115,9 +115,13 @@
 この文書では、2006 年 9 月にリリースされた \gnuplot{} の正式最新版である %
 version 4.2 を取り扱っています。
         \\
+% Its version is
+% \verb+Revision: 1.25 +, dated
+% \verb+Date: 2006/11/23 00:43:58 +.
+% <== 本当は \verb++ の内側に $ がついている
 この文書のバージョンは %
-\verb+$+\verb+Revision: 1.23 $+,
-\verb+$+\verb+Date: 2006/09/10 10:30:58 $+ です。
+\verb+$+\verb+Revision: 1.25 $+,
+\verb+$+\verb+Date: 2006/11/23 00:43:58 $+ です。
 % 少し細工をしないと RCS に書き換えられてしまう。
 
 
@@ -1033,7 +1037,7 @@ gnuplot は、例えば色や太さや点の形などの、
 %% (\http{www.boutell.com/gd/}).
 %% Old versions of gd (versions 1.2 to 1.4) produce only GIF output. 
 %% Versions 1.6
-%% to 2.0.27 do not support GIF output because of patent concerns. However
+%% to 2.0.27 did not support GIF output because of patent concerns. However
 %% versions 1.6 and newer support PNG outputs, and 1.7 and newer support JPEG
 %% outputs. Version 2.0.28 of the Boutell gd library restored GIF 
 %% functionality,
@@ -1047,7 +1051,7 @@ GIF のサポートは外部のライブラリである libgd (\http{www.boutell.com/gd/})
 古いバージョンの gd (バージョン 1.2 から 1.4 まで) は GIF 出力のみ
 生成していましたが、
 バージョン 1.6 から 2.0.27 までは特許の問題で GIF 出力を
-サポートしませんでした。
+サポートしていませんでした。
 しかし、バージョン 1.6 以降は PNG 出力をサポートし、
 1.7 以降は JPEG 出力もサポートしています。
 Boutell の gd ライブラリのバージョン 2.0.28 では GIF 出力を復活し、
@@ -1535,43 +1539,30 @@ gnuplot は曲面や 3 次元の物体を仮想現実としては描画しません。
 %% \subsection{Does \gnuplot{} have hidden line removal?}
 \subsection{\gnuplot{} は隠線処理できますか}
 
-%% Version 3.7 supports hidden line removal on all platforms;
-%% use the command \verb+set hidden3d+.
-Version 3.7 からすべてのプラットホームで隠線処理がサポートされました。
-\verb+set hidden3d+ コマンドを使ってください。
-
-%% The 16-bit binaries of \gnuplot{} support the hidden line removal
-%% only partially as the hidden-line algorithm may hit
-%% the 640k memory limit.
-\gnuplot{} の 16-bit バイナリは 640KByte のメモリ制限のため、
-部分的にのみ隠線処理をサポートしています。
-
+%% Yes.
+ええ。
 
 %% \subsection{Does \gnuplot{} support bar-charts/histograms/boxes?}
 \subsection{\gnuplot{} は棒グラフ/ヒストグラム/箱型グラフが書けますか}
 
-%% Use the style \verb+with boxes+ for bar charts. To get filled boxes,
-%% use \verb+set style fill+.
-棒グラフは \verb+with boxes+ スタイルを使ってください。
-棒を塗りつぶすには、\verb+set style fill+ を使用してください。
+%% Various clustered and stacked histogram styles are supported in \gnuplot
+%% version 4.2 as separate style types.
+\gnuplot version 4.2 では、横並び型 (clustered) と積み上げ型 (stacked)
+のヒストグラムスタイルが、別々のスタイル型としてサポートされています。
 
+%% In older \gnuplot versions you can use the style \verb+with boxes+ 
+%% for bar charts.
+%% To get filled boxes, use \verb+set style fill+.
 %% Bernhard Reiter wrote an AWK script to post-process fig-terminal output.
-%% Please have a look at
-%% \http{www.usf.uni-osnabrueck.de/~breiter/tools/gnuplot/barcharts.en.html}.
+%% This may be useful with older versions of \gnuplot. Please have a look at
+%% \http{www.usf.uni-osnabrueck.de/~breiter/tools/gnuplot/barchart.en.html}.
+古いバージョンの \gnuplot では棒グラフ用に \verb+with boxes+ スタイルが
+利用できます。
+棒を塗りつぶすには、\verb+set style fill+ を使用してください。
 Bernhard Reiter は fig 出力形式の後処理用の AWK スクリプトを書きました。
+これは、古い版の \gnuplot では有用でしょう。
 \http{www.usf.uni-osnabrueck.de/~breiter/tools/gnuplot/barchart.en.html} %
 を見てください。
-
-%% There is a large patch (\#606169) against the development version 
-%% on SourceForge
-%% awaiting inclusion in a future release of \gnuplot{}. This adds a new
-%% plotting style \verb+with histograms+, and supports both clustered histograms
-%% and stacked histograms.
-将来 \gnuplot{} のリリース版に含まれる SourceForge の開発版には
-大きなパッチ (\#606169) が含まれています。
-これは、新しい描画スタイル \verb+with histograms+ を追加するもので、
-横並び型のヒストグラムと積み上げ型のヒストグラムの両方をサポートします。
-
 
 %% \subsection{Does \gnuplot{} support pie charts?}
 \subsection{\gnuplot{} は円グラフが書けますか}
@@ -1700,13 +1691,17 @@ gnuplot> plot "bier.dat" u 1:2
 %% Consequently, you can type labels in Czech, French, Hungarian, Russian... by
 %% means of an appropriate \texttt{set encoding}. However, you cannot mix two
 %% encodings in one file (e.g. accents for west and east latin encodings). 
-%% That you
-%% can only do with a \TeX{} output.
 これにより、適切な \texttt{set encoding} により、
 チェコ語、仏語、ハンガリー語、露語などのラベルを打ち出すことができます。
 しかし、2 種類のエンコード (例えば西ラテンエンコードと東ラテンエンコード) %
 を一つのファイルに混ぜることはできません。
-それは、\TeX{} 出力でのみ可能です。
+
+%% A more general solution is to use UTF-8 encoded fonts, and type the 
+%% UTF-8 characters directly into gnuplot. This works for many terminal types
+%% but not, unfortunately, PostScript.
+UTF-8 エンコーディングフォントを使うためのより一般的なやり方は、
+\gnuplot 内で直接 UTF-8 の文字を入力することです。
+これは多くの出力形式で動作しますが、残念ながら PostScript ではだめです。
 
 
 %% \subsection{Can I do 1:1 scaling of axes?}
@@ -1939,8 +1934,6 @@ gnuplot の今後の正式リリースに含ませるためのデバッグをしながら、
 %% Some extensions available:
 現在以下のような拡張がなされています:
 \begin{itemize}
-%% \item \texttt{barchart\_via\_fig}: awk scripts to produce barcharts with
-%% filled boxes.
 %% \item \texttt{date-errorbar}: allows dates in the hi/lo fields for 
 %% errorbars.
 %% \item \texttt{perltk}: A perl/tk canvas widget.
@@ -1950,8 +1943,6 @@ gnuplot の今後の正式リリースに含ませるためのデバッグをしながら、
 %% \item \texttt{Gnuplot.py}: A python package to create graphs from
 %% within python. More information at
 %% \http{gnuplot-py.sourceforge.net}.
-\item \texttt{barchart\_via\_fig}: 塗りつぶした棒グラフを生成する %
-awk スクリプト
 \item \texttt{date-errorbar}: エラーバーの上下の場所に日付データを使える
 \item \texttt{perltk}: perl/tk キャンバス用ウィジェット
 \item \texttt{polyg.patch}: 多角形描画スタイルの実装
@@ -2392,9 +2383,13 @@ M\$ Windows プラットフォームでは、GUI プログラムの標準入力 (stdin) %
 %% \subsection{What if I need h-bar (Planck's constant)?}
 \subsection{Planck 定数 (h に横線) が必要なときはどうしたらいいですか}
 
-%% There is no predefined variable like pi. However to put h-bar as
-%% a character into the label, you must use the PostScript terminal.
-%% You can play around with constructs like
+%% The most straightforward way is to use a UTF-8 font, and type in the
+%% $\hbar$ character (Unicode code point \#x210F) directly. 
+最も自然な方法は、UTF-8 フォントを使い、文字 $\hbar$ (Unicode コード
+ポイント \#x210F) を直接入力することです。
+
+%% This does not work in PostScript, however, so you must use approximations
+%% like
 %% \verb+ @{/=56 -} {/=24 h}+ or
 %% \verb+ {/=8 @{/Symbol=24 -} _{/=14 h}}+
 %% In the latter, the "-" (a long one in /Symbol) is non-spacing and 24-pt.
@@ -2402,12 +2397,12 @@ M\$ Windows プラットフォームでは、GUI プログラムの標準入力 (stdin) %
 %% the "\_") but smaller, since it's written as a subscript.
 %% But these don't look too much like the hbar we're used to, since the bar
 %% is horizontal instead of sloped.  I don't see a way to get that.  I
-%% tried using an accent (character 264 in iso-latin-1 encoding), but I haven't found a
+%% tried using an accent (character 264 in iso-latin-1 encoding), 
+%% but I haven't found a
 %% way to scale and position the pieces correctly.
-πのようにあらかじめ定義されている変数としてはありません。
-しかしラベルにプランク定数 (h に横線) の記号を出力したいならば %
-PostScript terminal を使う必要があります。
-次のようにすればそれを出力できます: 
+%% One more possibility would be \verb+{/=14 @^{/Symbol=10 -}{/=14 h}}+.
+しかし、これは PostScript ではうまくいきませんので、例えば次のような
+次善の策を用いる必要があります:
 \verb+ @{/=56 -} {/=24 h}+ または \verb+{/=8 @{/Symbol=24 -} _{/=14 h}}+ %
 後者では 24pt (ポイント) の "-" 
 (/Symbol フォントの中の長いハイフン) がスペースなしで使われます。
@@ -2419,14 +2414,39 @@ PostScript terminal を使う必要があります。
 アクセント記号なども使ってみましたが %
 (iso-latin-1 エンコーディングの文字 264 など)、
 その大きさと位置を正しくする方法を見つけることはできませんでした。
+もう一つの方法は \verb+{/=14 @^{/Symbol=10 -}{/=14 h}}+ とすることです。
 
-%% One more possibility would be
-%% \verb+{/=14 @^{/Symbol=10 -}{/=14 h}}+.
-もう一つの方法は %
-\verb+{/=14 @^{/Symbol=10 -}{/=14 h}}+ とすることです。
+%% The reduced Planck's constant can be set very easily by using the
+%% AMS-LaTeX PostScript fonts which are available from
+%% \http{www.ams.org/tex/amsfonts.html} (also included in many LaTeX
+%% distributions). \Gnuplot{} (confer the help about \verb+ fontpath+) and the
+%% PostScript interpreter (usually Ghostscript) have to know where the
+%% file \verb+ msbm10.pfb+ (or \verb+ msbm10.pfa+) resides. Use
+%% \verb+ {/MSBM10 \175}+ to produce \verb+ \hslash+ which is a "h"
+%% superimposed by a sloped bar. The standard \verb+ \hbar+ (horizontal
+%% bar) has the octal code 176. Please note that h-bar exists only as an
+%% italic type.
+AMS-LaTeX の PostScript フォント%
+(\http{www.ams.org/tex/amsfonts.html} にあり、
+そして多くの LaTeX 配布にも含まれています) を使えば、
+とても簡単に小さい Planck 定数をセットすることができますが、%
+\Gnuplot{} (\verb+ fontpath+ に関するヘルプを見てください) と、
+PostScript インタープリタ (通常 Ghostscript) が
+ファイル \verb+ msbm10.pfb+ (または \verb+ msbm10.pfa+) が
+どこにあるかを知る必要があります。%
+"h" に傾斜のついた横棒を重ねた \verb+ \hslash+ を生成するには%
+\verb+ {/MSBM10 \175}+ を使ってください。
+通常の \verb+ \hbar+ (水平の横棒) は 8 進数の 176 です。
+ただし、水平の横棒はイタリック体としてしか存在しないことに注意してください。
 
-%% (This is a hint by Richard Crawford).
-(Richard Crawford のヒントによります)
+%% \subsection{What if I need the Solar math symbol?}
+\subsection{太陽のような数学記号 (丸に点) が必要なときはどうしたらいいですか}
+
+%% As with Planck's constant, the most straightforward way is to use a 
+%% UTF-8 font, and type in the $\odot$ character (Unicode code point 
+%% \#x2299) directly. 
+Planck 定数と同様、最も自然な方法は UTF-8 フォントを使い、文字 $\odot$ 
+(Unicode コードポイント \#2299) を直接入力することです。
 
 
 %% \subsection{How do a produce blank output page?}

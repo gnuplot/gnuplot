@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.131 2006-09-17 20:12:12+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.387
+C RCS $Id: gnuplot-ja.doc,v 1.143 2006-11-17 12:36:43+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.400
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -39,7 +39,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ^   Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net <p>
 ^</h2><p>
 ^<h3> This manual was prepared by Dick Crawford</h3><p>
-^<h3> Last revised: 31 October 2004</h3><p>
+^<h3> Last revised: October 2006</h3><p>
 ^<hr>
 1 gnuplot
 2 Copyright
@@ -244,7 +244,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  gnuplot version 4.2 は、直前の公式バージョン 4.0 以降に追加されたたく
  さんの機能を提供します。この節では、主な追加機能の一覧と、変更や細かい
  新機能の一部を紹介します。より網羅的な一覧は、ファイル NEWS を参照して
- ください。l
+ ください。
 
 3 新しい描画スタイル
 
@@ -305,7 +305,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
  `string variables` 参照。
 
 3 マクロ
- gnuplot は '@stringvariablename' によるマクロの展開をサポートします。
+ gnuplot は '@stringvariablename' によるコマンドラインでのマクロの展開
+ をサポートします。
  `macros` 参照。
 
 3 複数グラフの 1 ページ自動配置描画
@@ -3158,6 +3159,7 @@ C ... and restart the table:
 
  書式:
      plot {<範囲 (ranges)>}
+          {<繰返し (iteration)>}
           { <関数 (function)>
             |  {"<データファイル (datafile)>" {データファイル修飾子}}}
           {axes <軸 (axes)>}{<表題 (title)>}{with <スタイル (style)>}
@@ -3191,6 +3193,7 @@ C ... and restart the table:
 ?data-file
 ?datafile
 ?data
+?file
  ファイルに納められた離散的なデータは、`plot` コマンドライン上で、その
  データファイル名 (単一引用符または二重引用符で囲まれた) を指定すること
  によって表示できます。
@@ -3364,8 +3367,8 @@ C ... and restart the table:
  使用されるルーチン、すなわちデータの形式の扱いを制御します。サポートし
  ている filetype の一覧を見るには、`show datafile binary filetypes` と
  してください。filetype を指定しない場合の規則は、`splot` 用に `binary`
- キーワードが単独で与えられた場合は "古典的な" gnuplot バイナリ形式だと
- 見なされ、その他全ての状況、すなわち `plot` 用かまたは少なくとも一つの
+ キーワードが単独で与えられた場合は古典的な gnuplot バイナリ形式だと見
+ なされ、その他全ての状況、すなわち `plot` 用かまたは少なくとも一つの
  <binary list> キーワードが与えられたような場合は、raw バイナリファイル
  とみなされ、そのキーワードによってバイナリ形式が指定されます。
 
@@ -4087,10 +4090,11 @@ C ... and restart the table:
  スの描画タイトルを与える文字列として使用できます。その指定を含む列と、
  描画自信に使用される列 (複数の列もありうる) は独立しています。
 
-    plot 'data' using 1:($2/$3) title 2
+    plot 'data' using 1:($2/$3) title column(N)
 
- この場合、最初の行の第 2 列が、2 列目を 3 列目で割ったデータから作られ
- る描画グラフの説明に使用されます。先頭行の 3 列目は無視されます。
+ この場合、最初の行の第 N 列が、2 列目を 3 列目で割ったデータから作られ
+ る描画グラフの説明に使用されます。先頭行の 2 列目、3 列目は無視されま
+ す。
 
 5 xticlabels
 ?using xticlabels
@@ -4332,6 +4336,39 @@ C ... and restart the table:
  以下は x の範囲を時系列データとして指定しています:
        set timefmt "%d/%m/%y %H:%M"
        plot ["1/6/93 12:00":"5/6/93 12:00"] 'timedata.dat'
+
+3 iteration
+?commands plot iteration
+?commands splot iteration
+?plot iteration
+?splot iteration
+?iteration
+ 多くの同等のファイルや関数を同時に描画する場合は、それぞれの plot コマ
+ ンドの繰り返し (iteration) でそれを行うのが便利です。
+
+ 書式:
+       plot for [<variable>=<start>:<end>{:<increment>}] 
+       splot for [<variable>=<start>:<end>{:<increment>}] 
+
+ 例:
+       file(n) = sprintf("dataset_%d.dat",n)
+       plot for [i=1:10] file(i) title sprintf("dataset %d",i)
+
+ この例は、ファイル名で生成される文字列値関数を定義し、そのような 10 個
+ のファイルを同時に描画します。繰り返しの変数 (この例では 'i') は一つの
+ 整数として扱われ、それを 2 度以上使用できます。この例では、それはファ
+ イル名とタイトルの生成の両方で使われています。
+
+ 例:
+       list = "a b c foo baz"
+       item(n) = word(list,n)
+       plot for [i=1:words(list)] item(i).".dat" title item(i)
+       list = "new stuff"
+       replot
+
+ この例では、リストに従って各ステップが進行し、その各項目に対して一つの
+ 描画が行われます。この各項目は動的に取得されますので、そのリストを変更
+ し、そのまま replot することができます。
 
 3 title
 ?commands plot title
@@ -5954,7 +5991,7 @@ C ... and restart the table:
  字まで、と制限されています。書式文字列 (<format-string>) を省略した場
  合、それはデフォルトの "% g" になります。LaTeX ユーザにはよく "$%g$"
  が好まれます。空の文字列 "" を指定した場合、刻み自身は表示されますが見
- 出しはつきません。すべての刻みを消すには、`unset xtics` や 
+ 出しはつきません。すべての刻みを消すには、`unset xtics` や
  `unset ytics` を使用してください。
 
  改行文字 (\n) も書式文字列で使えます。それを解釈させるには、単一引用符
@@ -6465,7 +6502,7 @@ C ... and restart the table:
                {width <width_increment>}
                {height <height_increment>}
                {{no}autotitles {columnheader}}
-               {title "<text>"} {{no}enhanced}
+               {title "<text>"} {{no}enhanced} {font "<face>,<size>"}
                {{no}box { {linestyle | ls <line_style>}
                           | {linetype | lt <line_type>}
                             {linewidth | lw <line_width>}}}
@@ -6486,7 +6523,7 @@ C ... and restart the table:
  `lmargin`, `rmargin`, `tmargin`, `bmargin` (, `above`, `over`, `below`,
  `under`) は、グラフ領域の他の場所への自動的な配置のために使用します。
  key の描画をどこに置くかをより詳しく指示するための `at <position>` も
- あります。この場合、キーワード `left`, `right`, `center`, `bottom`,
+ あります。この場合、キーワード `left`, `right`, `top`, `bottom`,
  `center` が同様の基準点合わせの設定の目的で使われます。
 
  配置の仕組みを理解ための最も重要な概念は、グラフ領域、すなわち内か外か
@@ -6943,16 +6980,20 @@ C ... and restart the table:
  きます。`show margin` は現在の設定を表示します。
 
  書式:
-       set bmargin {<margin>}
-       set lmargin {<margin>}
-       set rmargin {<margin>}
-       set tmargin {<margin>}
+       set bmargin {{screen} <margin>}
+       set lmargin {{screen} <margin>}
+       set rmargin {{screen} <margin>}
+       set tmargin {{screen} <margin>}
        show margin
 
- <margin> の単位には、適切と思われる、文字の高さと幅が使われます。正の
- 値は余白の絶対的な大きさを定義し、負の値 (または無指定) は `gnuplot`
- によって自動計算される値を使うことになります。3 次元描画では、今のとこ
- ろ、左の余白 (lmargin) の設定のみが効力を持ちます。
+ <margin> のデフォルトの単位には、適切と思われる、文字の高さと幅が使わ
+ れます。正の値は余白の絶対的な大きさを定義し、負の値 (または無指定) は
+ `gnuplot` によって自動計算される値を使うことになります。3 次元描画では
+ 左の余白 (lmargin) のみが文字の大きさを単位として設定できます。
+
+ キーワード `screen` は、その余白の指定が全体の描画領域に対する割合であ
+ ることを意味します。これは、多重描画 (multiplot) モードでの 2D, 3D グ
+ ラフの角を正確に揃えるのに使えます。
 
  描画の余白は通常目盛り、目盛りの見出し、軸の見出し、描画のタイトル、
  日付、そして境界の外にある場合の key (グラフ見出し) のサイズ等を元に計
@@ -7868,8 +7909,8 @@ C ... and restart the table:
  例:
 
  灰色のパレット (役に立たないが教訓的な) を生成するには:
-      set palette model RGB
-      set palette defined ( 0 "black", 1 "white" )
+       set palette model RGB
+       set palette defined ( 0 "black", 1 "white" )
 
  青黄赤のパレット (全てが等価の) を生成するには:
        set palette defined ( 0 "blue", 1 "yellow", 2 "red" )
@@ -7980,7 +8021,7 @@ C ... and restart the table:
 
  の代わりに例えば以下を指定してください:
 
-      set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
+       set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
 
  または、線形補間が "ガンマ補正" の補間に十分良く適合するまでより良い中
  間の点を探してください。
@@ -8423,7 +8464,9 @@ C ... and restart the table:
  filledcurves のスタイルの設定に使われます。
 
  書式:
-       set style fill {empty | solid {<density>} | pattern {<n>}}
+       set style fill {empty 
+                       | {transparent} solid {<density>} 
+                       | {transparent} pattern {<n>}}
                       {border {<linetype>} | noborder}
 
  デフォルトの塗りつぶしスタイル (fillstyle) は `empty` です。
@@ -8449,6 +8492,51 @@ C ... and restart the table:
  デフォルトの `border` は、現在の線の種類の実線で箱の境界を描きます。
  `border <lt>` はその境界が線の種類 (linetype) <lt> で描かれるようにし
  ます。`noborder` は境界の線が描かれないようにします。
+5 set style fill transparent
+?commands set style fill transparent
+?set style fill transparent
+?fillstyle transparent
+?transparent
+ いくつかの出力形式は、塗りつぶし領域の `transparent` (透明化) 属性をサ
+ ポートしています。transparent solid の領域塗りつぶしでは、`density` 
+ (密度) パラメータはアルファ値として使用されます。つまり、密度 0 は完全
+ な透明を、密度 1 は完全な不透明を意味します。transparent pattern の塗
+ りつぶしでは、パターンの背景が完全な透明か完全な不透明のいずれかです。
+
+@start table - 透明化のドライバのサポート
+       出力形式   solid pattern    pm3d
+       --------------------------------
+       gif           no     yes      no
+       jpeg         yes      no     yes
+       pdf          yes     yes     yes
+       png    TrueColor   index     yes
+       post          no     yes      no
+       svg          yes      no     yes
+       wxt          yes     yes     yes
+       x11           no     yes      no
+#\begin{tabular}{|cccl|} \hline
+#出力形式   &   solid & pattern &    pm3d \\ \hline
+#gif        &      no &     yes &      no \\
+#jpeg       &     yes &      no &     yes \\
+#pdf        &     yes &     yes &     yes \\
+#png        &TrueColor&   index &     yes \\
+#post       &      no &     yes &      no \\
+#svg        &     yes &      no &     yes \\
+#wxt        &     yes &     yes &     yes \\
+#x11        &      no &     yes &      no \\
+%c l .
+%出力形式@solid@pattern@pm3d
+%_
+%gif@no@yes@no
+%jpeg@yes@no@yes
+%pdf@yes@yes@yes
+%png@TrueColor@index@yes
+%post@no@yes@no
+%svg@yes@yes@yes
+%wxt@yes@yes@yes
+%x11@no@yes@no
+%_
+@end table
 4 set style function
 ?commands set style function
 ?commands show style function
@@ -9055,9 +9143,9 @@ C ... and restart the table:
 ?newhistogram
 ?histograms newhistogram
  一回の描画に 1 つより多くのヒストグラムの組を作ることもできます。この
- 場合、描画コマンド `newhistogram { "title" } { <linestyle> }` を使うこ
- とで、それらを強制的に分離し、またそれぞれのラベルを分離することができ
- ます。
+ 場合、描画コマンド `newhistogram {"<title>"} {<linestyle>}` を使うこと
+ で、それらを強制的に分離し、またそれぞれのラベルを分離することができま
+ す。
  例:
 
        set style histogram  cluster
@@ -9081,29 +9169,28 @@ C ... and restart the table:
 ?style image
 ?image
  スタイル `image` は 2 次元画像の描画用のものです。これは、3 次元データ
- (x,y,value) に対する `plot`、または適切な格子を生成する射影的 4 次元デ
- ータ (x,y,z,value) に対する `splot` の両方で使用できます。適切な格子と
- は、表示平面上で格子のデータが、2 方向 (必ずしも垂直でなくても良い) に
- 関して等距離になるものを意味し、それは言い換えれば、4 つの隣接点の組が
- 常に同じ大きさの平行四辺形を作ることを意味します。変数 `value` は、現
- 在のパレットに対するパレット色 (灰色値) を表します。
+ (x,y,value) に対する `plot`、または射影された 4 次元データ
+ (x,y,z,value) に対する `splot` の両方で使用できます。このとき、表示平
+ 面では、画像データは表示平面内の 2 方向 (必ずしも垂直でなくても良い)
+ に関して等間隔のサンプリング格子を形成していると仮定されます。それは言
+ い換えれば、4 つの隣接点の組が常に同じ大きさの平行四辺形を作ることを意
+ 味します。変数 `value` は、現在のパレットに対するパレット色 (灰色値)
+ を表します。
 
- データ点が適切な長方形格子を作るとき、つまり格子の 2 方向が垂直で表示
- 平面上の x 軸、y 軸に沿って配置されているとき、パレットと画像描画をサ
- ポートしている出力形式では、`image` スタイルは描画領域にぴったり合うよ
- うに適切に配置され伸縮されたデータ配列 (matrix) を作ろうとします。その
- 結果、記憶領域を効率的に使用し書き換えも速く行なわれます。しかし、パレ
- ットと画像描画をサポートしない、あるいはまだそれらが実装されていない出
- 力形式では、`image` スタイルは長方形をピクセル毎に塗りつぶそうとします
- ので、あまりいい効率は得られません。また、一般の平行四辺形の画像は、平
- 行四辺形がピクセル毎に塗りつぶされます。
+ パレットと画像描画をサポートしている出力形式では、`image` スタイルは描
+ 画領域にぴったり合うように適切に配置され伸縮されたデータ配列 (matrix)
+ を作ろうとします。そのような出力は効率的ですし、描画も速く行われます。
+ しかし、パレットと画像描画をサポートしない、あるいはまだそれらが実装さ
+ れていない出力形式では、`image` スタイルは長方形をピクセル毎に塗りつぶ
+ そうとしますので、あまり効率はよくありません。また、一般の平行四辺形の
+ 画像に対しては、現在は常に平行四辺形をピクセル毎に塗りつぶします。
 
  画像の各データ点の座標は 1 ピクセルの中心になります。すなわち、M x N
  個のデータ集合は M x N ピクセルの画像を生成します。これは、M x N 個の
  データ集合が (M-1) x (N-1) 要素を作成する pm3d の構造とはやや異なりま
  す。画像データの格子の走査方向は 8 つの組合せの任意の一つが可能です。
 
- 現在以下の出力形式のみがデータ配列画像をサポートしています:
+ 以下はいくつかの出力形式に関する特有の情報です:
 
  x11 と wxt - ピクセルはディスプレイの解像度に合うように繰り返されるか
        一定の割合で潰されるかされ、フィルタ用の処理は他に持っていませ
@@ -9119,9 +9206,6 @@ C ... and restart the table:
        gd 2.0.4  truecolor は動作しますが、truecolor を選択しないと画像
                  は空白になってしまいます。
        gd 2.0.9  truecolor も動作しますし、非 truecolor も動作します。
-
- aqua
- pdf, svg
 
  `rgbimage` も参照してください。
 5 impulses
@@ -9211,11 +9295,7 @@ C ... and restart the table:
  スタイル `rgbimage` は 2 次元画像の描画用で、概念上は `image` に似てい
  ます。詳細は `image` を参照してください。その違いは、`plot` では
  (x,y,r,g,b) の 5 次元データが、`splot` では (x,y,z,r,g,b) の 6 次元デ
- ータが必要で、それらが座標と画像のカラー成分を意味します。現在は、カラ
- ー画像は標本化格子が長方形でかつその面が表示面方向に向いている場合にの
- み機能します。一般的な方向の場合は多角形の塗りつぶしでなされるべきです
- が、それはパレット表から取り出すのみで、原色の配合はサポートしていませ
- ん。
+ ータが必要で、それらが座標と画像のカラー成分を意味します。
 
  `image` も参照してください。
 5 vectors
@@ -9477,10 +9557,16 @@ C ... and restart the table:
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
                 { font "name{,<size>}" }
                 { textcolor <colorspec> }
+       set tics {front | back}
        unset tics
+       show tics
 
- 指定されたオプションは、全ての軸、すなわち x, y, z, x2, y2, cb 軸に適
- 用されます。
+ 上の最初のオプションの形式は、別々に任意の、またはすべての軸 x, y, z,
+ x2, y2, cb に適用できます。
+
+ tics の `front` または `back` の設定は、2D 描画 (splot は不可) にのみ
+ すべての軸に 1 度適用されます。これは、目盛と描画要素が重なった場合に
+ 目盛を描画要素の前面に出すか、奥に置くかを制御します。
 
  `axis` と `border` は `gnuplot` に目盛り (目盛りの刻自身とその見出し)
  を、それぞれ軸につけるのか、境界につけるのかを指示します。軸が境界にと
@@ -10235,7 +10321,7 @@ C ... and restart the table:
 
  明示的な形式では 3 つ目のパラメータとして "レベル" (level) を与えるこ
  とができます。デフォルトのレベルは 0 で、これは大目盛りを意味し、レベ
- ルが 1 の場合小目盛りが生成されます。レベルが指定する場合はラベルも必
+ ルが 1 の場合小目盛りが生成されます。レベルを指定する場合はラベルも必
  ず指定する必要があります。
 
  例:
@@ -10363,7 +10449,7 @@ C ... and restart the table:
 ?set y2label
 ?show y2label
 ?y2label
- コマンド `set y2label` は y2 (右) 軸の見出しを設定します。詳細は 
+ コマンド `set y2label` は y2 (右) 軸の見出しを設定します。詳細は
  `set xlabel` を参照してください。
 3 y2mtics
 ?commands set y2mtics
@@ -10643,14 +10729,15 @@ C ... and restart the table:
 ?set cbrange
 ?show cbrange
 ?cbrange
- コマンド `set cbrange` は、スタイル `with pm3d`, `with image`, や
- `with ... palette` などによって現在のパレット (`palette`) に従って色付
- けされる値の範囲を設定します。その範囲外の値に対しては、最も近い限界の
- 値の色が使用されます。
+ コマンド `set cbrange` は、スタイル `with pm3d`, `with image` や
+ `with palette` などによって現在のパレット (`palette`) を使って色付けさ
+ れる値の範囲を設定します。その範囲外の値に対しては、最も近い限界の値の
+ 色が使用されます。
 
  カラーボックス軸 (cb-軸) が `splot` で自動縮尺されている場合は、その
- 範囲は `zrange` が使われます。`splot ... pm3d|palette` で描画される点
- は、異なる `zrange` と `cbrange` を使うことでフィルタリングできます。
+ カラーボックスの範囲は `zrange` が使われます。`splot ... pm3d|palette`
+ で描画される点は、異なる `zrange` と `cbrange` を使うことでフィルタリ
+ ングできます。
 
  `set cbrange` の書式に関する詳細は `set xrange` を参照してください。
  `set palette` と `set colorbox` も参照してください。
@@ -10708,6 +10795,7 @@ C ... and restart the table:
 
  書式:
        splot {<ranges>}
+             {<iteration>}
              <function> | "<datafile>" {datafile-modifiers}}
              {<title-spec>} {with <style>}
              {, {definitions,} <function> ...}
