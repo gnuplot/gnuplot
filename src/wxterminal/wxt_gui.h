@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.16 2006/11/10 22:46:48 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.17 2006/11/10 22:52:22 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -129,6 +129,11 @@ extern "C" {
 # define IMAGE_SURFACE
 #endif
 
+/* by default, enable IMAGE_SURFACE */
+#if !defined(GTK_SURFACE)&&!defined(IMAGE_SURFACE)&&!defined(__WXMSW__)
+# define IMAGE_SURFACE
+#endif
+
 /* temporarly undef GTK_SURFACE for two reasons :
  * - because of a CAIRO_OPERATOR_SATURATE bug,
  * - because as for now, it is slower than the pure image surface,
@@ -179,7 +184,7 @@ extern "C" {
  * declarations
  * ====================================================================*/
 
-#ifdef __WXGTK__
+#if defined(__WXGTK__)||defined(__WXMAC__)
 /* thread class, where the gui loop runs.
  * Not needed with Windows, where the main loop
  * already processes the gui messages */

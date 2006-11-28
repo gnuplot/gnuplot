@@ -2,6 +2,10 @@
 
 	* configure.in: Fix bug in --{en|dis}able-wxwidgets
 
+	* src/wxterminal/wxt_gui.cpp:
+	* src/wxterminal/wxt_gui.h:
+	Allow building with wxMac, in addition to wxMSW and wxGTK.
+
 2006-11-26  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
 	* docs/gnuplot.doc: For filledcurves, the default variant depends

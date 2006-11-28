@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.33 2006/11/10 22:46:48 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.34 2006/11/10 22:52:22 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -165,7 +165,7 @@ BEGIN_EVENT_TABLE( wxtConfigDialog, wxDialog )
 END_EVENT_TABLE()
 
 
-#ifdef __WXGTK__
+#if defined(__WXGTK__)||defined(__WXMAC__)
 /* ----------------------------------------------------------------------------
  *   gui thread
  * ----------------------------------------------------------------------------*/
@@ -1351,7 +1351,7 @@ void wxt_init()
 		/* app initialization */
 		wxTheApp->CallOnInit();
 
-#ifdef __WXGTK__
+#if defined(__WXGTK__)||defined(__WXMAC__)
 		/* Three commands to create the thread and run it.
 		 * We do this at first init only.
 		 * If the user sets another terminal and goes back to wxt,
@@ -2831,7 +2831,7 @@ int wxt_waitforinput()
 	return getch();
 }
 
-#elif defined(__WXGTK__)
+#elif defined(__WXGTK__)||defined(__WXMAC__)
 
 /* Implements waitforinput used in wxt.trm
  * Returns the next input charachter, meanwhile treats terminal events */
@@ -2888,7 +2888,7 @@ int wxt_waitforinput()
 	wxt_change_thread_state(RUNNING);
 	return getchar();
 }
-#else  /* !__WXMSW__ && !__WXGTK__ */
+#else  /* !__WXMSW__ && !__WXGTK__ && !__WXMAC__*/
 #error "Not implemented"
 #endif
 
@@ -3051,7 +3051,7 @@ void wxt_cleanup()
 		delete wxt_iter->frame;
 	wxt_MutexGuiLeave();
 
-#ifndef __WXMSW__
+#if defined(__WXGTK__)||defined(__WXMAC__)
 	FPRINTF((stderr,"waiting for gui thread to exit\n"));
 	FPRINTF((stderr,"gui thread status %d %d %d\n",
 			thread->IsDetached(),
@@ -3061,7 +3061,7 @@ void wxt_cleanup()
 	thread->Wait();
 	delete thread;
 	FPRINTF((stderr,"gui thread exited\n"));
-#endif /* !__WXMSW__*/
+#endif /* __WXGTK || __WXMAC__*/
 
 	wxTheApp->OnExit();
 	wxUninitialize();
@@ -3080,7 +3080,7 @@ void wxt_cleanup()
 void wxt_MutexGuiEnter()
 {
 	FPRINTF2((stderr,"locking gui mutex\n"));
-#ifdef __WXGTK__
+#if defined(__WXGTK__)||defined(__WXMAC__)
 	wxMutexGuiEnter();
 #elif defined(__WXMSW__)
 #else
@@ -3091,7 +3091,7 @@ void wxt_MutexGuiEnter()
 void wxt_MutexGuiLeave()
 {
 	FPRINTF2((stderr,"unlocking gui mutex\n"));
-#ifdef __WXGTK__
+#if defined(__WXGTK__)||defined(__WXMAC__)
 	wxMutexGuiLeave();
 #elif defined(__WXMSW__)
 #else
