@@ -81,4 +81,37 @@ plot 'immigration.dat' using 2 with histograms , \
 #
 unset multiplot
 pause -1 "<cr> to continue"
+#
+#          Stacked Plot Demo
+#
+# Set top and bottom margins to 0 so that there is no space between plots.
+# Fix left and right margins to make sure that the alignment is perfect.
+# Turn off xtics for all plots except the bottom one.
+# In order to leave room for axis and tic labels underneath, we ask for
+# a 4-plot layout but only use the top 3 slots.
+#
+set tmargin 0
+set bmargin 0
+set lmargin 3
+set rmargin 3
+unset xtics
+unset ytics
+
+set multiplot layout 4,1 title "Auto-layout of stacked plots\n"
+
+set key autotitle column nobox samplen 1
+unset title
+set style data boxes
+set yrange [0 : 800000]
+
+plot 'immigration.dat' using 3 lt 1
+plot 'immigration.dat' using 8 lt 3
+set xtics nomirror
+set tics scale 0
+set xlabel "Immigration to U.S. by Decade"
+plot 'immigration.dat' using 21:xtic(1) lt 4
+
+unset multiplot
+pause -1 "<cr> to continue"
+
 reset
