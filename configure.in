@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.202.2.4 2006/11/10 22:54:29 tlecomte Exp $
+dnl $Id: configure.in,v 1.202.2.5 2006/11/24 20:34:19 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -879,8 +879,8 @@ if test "x${cxxerror}" != "xyes"; then
 fi
 
 AC_ARG_ENABLE(wxwidgets,dnl
-[  --disable-wxwidgets      wxWidgets terminal (default enabled)],
-  enable_wxwidgets=no, enable_wxwidgets=yes)
+[  --disable-wxwidgets      wxWidgets terminal (default enabled)],,
+  [test -z "${enable_wxwidgets}" && enable_wxwidgets=yes])
 
 if test "${enable_wxwidgets}" = yes ; then
   dnl variable used to determine if all checks pass
