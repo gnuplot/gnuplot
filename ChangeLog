@@ -3,6 +3,10 @@
 	* demo/layout.dem: Add a 4th demo plot illustrating the creation of
 	stacked plots.
 
+	* src/graphics.c (do_key_sample): If a box plot sample has zero width,
+	do not draw a sample at all. This avoids drawing a visible border around
+	a zero-width box.
+
 2006-11-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in: Fix bug in --{en|dis}able-wxwidgets

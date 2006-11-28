@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.206 2006/11/16 05:58:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.207 2006/11/17 19:39:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5011,29 +5011,31 @@ do_key_sample(
 	unsigned int w = key_sample_right - key_sample_left;
 	unsigned int h = key_entry_height/2;
 
-	if (this_plot->lp_properties.use_palette && t->filled_polygon) {
-	    (*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
-	} else
-	    (*t->fillbox)(style,x,y,w,h);
+	if (w > 0) {
+	    if (this_plot->lp_properties.use_palette && t->filled_polygon)
+		(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
+	    else
+		(*t->fillbox)(style,x,y,w,h);
 
-	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
-	    (*t->linetype)(fs->border_linetype);
-	if (fs->border_linetype != LT_NODRAW) {
-	    newpath();
-	    draw_clip_line( xl + key_sample_left,  yl - key_entry_height/4,
+	    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
+		(*t->linetype)(fs->border_linetype);
+	    if (fs->border_linetype != LT_NODRAW) {
+		newpath();
+		draw_clip_line( xl + key_sample_left,  yl - key_entry_height/4,
 			    xl + key_sample_right, yl - key_entry_height/4);
-	    draw_clip_line( xl + key_sample_right, yl - key_entry_height/4,
+		draw_clip_line( xl + key_sample_right, yl - key_entry_height/4,
 			    xl + key_sample_right, yl + key_entry_height/4);
-	    draw_clip_line( xl + key_sample_right, yl + key_entry_height/4,
+		draw_clip_line( xl + key_sample_right, yl + key_entry_height/4,
 			    xl + key_sample_left,  yl + key_entry_height/4);
-	    draw_clip_line( xl + key_sample_left,  yl + key_entry_height/4,
+		draw_clip_line( xl + key_sample_left,  yl + key_entry_height/4,
 	    		    xl + key_sample_left,  yl - key_entry_height/4);
-	    closepath();
-	}
-	if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED) {
-	    (*t->linetype)(this_plot->lp_properties.l_type);
-	    if (this_plot->lp_properties.use_palette)
-		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
+		closepath();
+	    }
+	    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED) {
+		(*t->linetype)(this_plot->lp_properties.l_type);
+		if (this_plot->lp_properties.use_palette)
+		    apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
+	    }
 	}
 
     } else if (this_plot->plot_style == VECTOR && t->arrow) {
