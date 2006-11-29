@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.74 2006/11/22 05:24:04 sfeam Exp $
+ * $Id: svg.trm,v 1.75 2006/11/22 05:24:45 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -151,9 +151,6 @@ static void SVG_load_fontfile __PROTO((char *fontfile));
 
 /* Stuff for enhanced text mode */
 static int ENHsvg_string_state = 0;
-
-/* Flag whether non-ascii characters should be escaped or passed as binary */
-static TBOOLEAN SVG_escaped = FALSE;
 
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_Pen_RealID
@@ -511,18 +508,6 @@ SVG_options ()
 	    continue;
 	}
 									
-	if (equals (c_token, "raw")) {
-	    c_token++;
-	    SVG_escaped = FALSE;
-	    continue;
-	}
-									
-	if (almost_equals (c_token, "esc$aped")) {
-	    c_token++;
-	    SVG_escaped = TRUE;
-	    continue;
-	}
-									
 	int_error(c_token, "unrecognized terminal option");
     }
 
@@ -544,9 +529,6 @@ SVG_options ()
     sprintf(term_options + strlen(term_options),
 	SVG_rounded ? "rounded " : "butt ");
 
-    sprintf(term_options + strlen(term_options),
-	SVG_escaped ? "escaped" : "raw");
-
     if (SVG_linewidth_factor != 1.0) {
 	sprintf(term_options + strlen(term_options),
 	    "linewidth %3.1f ", SVG_linewidth_factor);
@@ -565,7 +547,6 @@ SVG_local_reset()
     if (SVG_embedded_font)
 	free(SVG_embedded_font);
     SVG_embedded_font = NULL;
-    SVG_escaped = FALSE;
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -961,22 +942,19 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
     if (!ENHsvg_string_state) {
 
 	while (*str) {
-	    int symb = (unsigned char) *str;
-
 	    /* Escape SVG reserved characters */
 	    switch (*str) {
 	    case '<':
 		fputs("&lt;", gpoutfile);
 		break;
 	    case '&':
-		fputs("&amp;", gpoutfile);
+		if (str[1] == '#' && str[2] == 'x')
+		    fputc(*str, gpoutfile);
+		else
+		    fputs("&amp;", gpoutfile);
 		break;
 	    default:
-		/* Some SVG viewers really dislike non-ascii characters */
-		if (SVG_escaped && (symb < ' ' || symb > '~'))
-		    fprintf(gpoutfile, "&#x%2.2x;", symb);
-		else
-		    fputc(*str, gpoutfile);
+		fputc(*str, gpoutfile);
 		break;
 	    }
 
@@ -1248,8 +1226,6 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
 TERM_PUBLIC void
 ENHsvg_writec(int c)
 {
-    int symb = (unsigned char)c;
-
     /* Kludge for phantom box accounting */
     ENHsvg_charcount++;
 
@@ -1268,13 +1244,14 @@ ENHsvg_writec(int c)
 		*enhanced_cur_text++ = 'p';
 		*enhanced_cur_text++ = ';';
 		break;
+    case '\376':
+		/* This is an illegal UTF-8 byte; we use it to escape the reserved '&' */
+		if (encoding == S_ENC_DEFAULT) {
+		    *enhanced_cur_text++ = '&';
+		    break;
+		} /* else fall through */
     default:
-		/* My SVG viewers really dislike non-ascii characters */
-		if (SVG_escaped && (symb < ' ' || symb > '~')) {
-		    sprintf(enhanced_cur_text, "&#x%2.2x;", symb);
-		    enhanced_cur_text += 6;
-		} else
-		    *enhanced_cur_text++ = c;
+		*enhanced_cur_text++ = c;
 		break;
     }
 }
@@ -1406,7 +1383,7 @@ START_HELP(svg)
 "",
 " Syntax:",
 "       set terminal svg {size <x>,<y> {|fixed|dynamic}}",
-"                        {{no}enhanced} {raw|escaped}",
+"                        {{no}enhanced}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
 "                        {font \"<fontname>{,<fontsize>}\"}",
 "                        {fontfile <filename>}",
@@ -1436,12 +1413,6 @@ START_HELP(svg)
 " resulting SVG output file.  This file may either itself contain a font,",
 " or may contain the records necessary to create a hypertext reference to",
 " the desired font. Gnuplot will look for the requested file using the",
-" directory list in the GNUPLOT_FONTPATH environmental variable.",
-"",
-" By default the SVG driver passes non-ascii characters through to the output",
-" file with no processing, leaving it to the SVG viewer to interpret them",
-" according to the current character encoding. The `escaped` option tells",
-" gnuplot to replace each non-ascii character with a hexidecimal",
-" representation of the form &#xNN;"
+" directory list in the GNUPLOT_FONTPATH environmental variable."
 END_HELP(svg)
 #endif

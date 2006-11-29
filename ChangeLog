@@ -1,3 +1,12 @@
+2006-11-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm src/term.c (enhanced_recursion): Re-think what is 
+	needed to pass an escaped Unicode character to svg. In normal text
+	mode treat the sequence &#x... as a special case and pass it through
+	as is.  In enhanced text mode & is already a special character, so in
+	this case we need to temporarily replace it with an octal value that
+	cannot be mistaken for something else, #xFE.
+
 2006-11-28  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/faq-ja.tex: Sync Japanese documentation,

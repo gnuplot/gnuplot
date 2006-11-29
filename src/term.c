@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.155 2006/11/06 01:24:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.156 2006/11/12 23:43:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2600,6 +2600,14 @@ enhanced_recursion(
                 fputs("enhanced text parser -- spurious backslash\n", stderr);
                 break;
             }
+
+	    /* SVG requires an escaped '&' to be passed as something else */
+	    /* FIXME: terminal-dependent code does not belong here */
+	    if (*p == '&' && encoding == S_ENC_DEFAULT && !strcmp(term->name, "svg")) {
+		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+		(term->enhanced_writec)('\376');
+		break;
+	    }
 
             /* just go and print it (fall into the 'default' case) */
             /*}}}*/
