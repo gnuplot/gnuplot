@@ -1,3 +1,9 @@
+2006-11-30  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (plot3d_impulses): Color values read from a file were
+	not being applied to impulse plots. Replicate the color assignment code
+	being used by plot3d_points.
+
 2006-11-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm src/term.c (enhanced_recursion): Re-think what is 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.160 2006/10/21 22:58:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.161 2006/10/26 04:09:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1393,19 +1393,38 @@ plot3d_impulses(struct surface_points *plot)
     int i;				/* point index */
     unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
     struct iso_curve *icrvs = plot->iso_crvs;
+    int colortype = plot->lp_properties.pm3d_color.type;
     TBOOLEAN rgb_from_column;
 
     rgb_from_column = can_pm3d && plot->pm3d_color_from_column
-			&& plot->lp_properties.pm3d_color.type == TC_RGB
 			&& plot->lp_properties.pm3d_color.value < 0.0;
+
+    if (colortype == TC_RGB && !rgb_from_column)
+	set_rgbcolor(plot->lp_properties.pm3d_color.lt);
 
     while (icrvs) {
 	struct coordinate GPHUGE *points = icrvs->points;
 
 	for (i = 0; i < icrvs->p_count; i++) {
 
-	    if (rgb_from_column)
-		set_rgbcolor((int)points[i].CRD_COLOR);
+	    switch (colortype) {
+	    case TC_RGB:
+		if (rgb_from_column)
+		    set_rgbcolor((int)points[i].CRD_COLOR);
+		break;
+	    case TC_Z:
+	    case TC_DEFAULT:
+		if (can_pm3d && plot->lp_properties.use_palette) {
+		    if (plot->pm3d_color_from_column)
+			set_color( cb2gray(points[i].CRD_COLOR) );
+		    else
+			set_color( cb2gray( z2cb(points[i].z) ) );
+		}
+		break;
+	    default:
+		/* The other cases were taken care of already */
+		break;
+	    }
 
 	    switch (points[i].type) {
 	    case INRANGE:
