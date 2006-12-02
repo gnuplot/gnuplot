@@ -2,14 +2,13 @@
 # Demo of reading color information from the data file itself
 #
 
-set border -1 front linetype -1 linewidth 1.000
-set ticslevel 0
-set xtics border
-set ytics border
-set ztics border
 #
 rgb(r,g,b) = int(r)*65536 + int(g)*256 + int(b)
 
+#
+set border 0
+unset xtics; unset ytics; unset ztics
+set rmargin 5; set lmargin 5; set bmargin 2
 
 set angle degrees
 xrgb(r,g,b) = (g-b)/255. * cos(30.)  
@@ -29,6 +28,12 @@ plot 'rgb_variable.dat' using (xrgb($1,$2,$3)):(yrgb($1,$2,$3)):(1.+2.*rand(0)):
      with points pt 7 ps var lc rgb variable notitle
 pause -1 "Hit return to continue"
 
+#
+set border -1 front linetype -1 linewidth 1.000
+set ticslevel 0
+set xtics border
+set ytics border
+set ztics border
 #
 unset arrow 1
 unset arrow 2
