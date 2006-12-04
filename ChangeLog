@@ -1,3 +1,12 @@
+2006-12-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_graphics PNG_FillPattern) demo/html/Makefile:
+	Reconcile use of truecolor and transparency options. 
+	Fill patterns apparently must not be defined as truecolor subimages.
+	"set term png truecolor transparent" should produce a transparent
+	background.  
+	Bug #1608488
+
 2006-12-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/all.dem: Refer to transparent_solids.dem by its proper name.

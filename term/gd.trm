@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.97 2006/11/12 23:43:46 sfeam Exp $
+ * $Id: gd.trm,v 1.98 2006/11/23 22:09:53 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -469,18 +469,9 @@ PNG_FillPattern(int style)
 	PNG_fill_tile.last_rgb = rgb;
 
 	/* create new tile */
-#if (GD2_VERS >= 2)
-	if (png_state.TrueColor) {
-	    PNG_fill_tile.im = gdImageCreateTrueColor(8, 8);
-	    /* FIXME - Doesn't work right - background goes to black.  libgd bug? */
-	    background = gdImageColorAllocateAlpha(PNG_fill_tile.im, 255, 255, 255, 127);
-	} else
-#endif
-	{
-	    PNG_fill_tile.im = gdImageCreate(8, 8);
-	    background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255);
-	}
+	PNG_fill_tile.im = gdImageCreate(8, 8);
 
+	background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255);
 	if (style == FS_TRANSPARENT_PATTERN)
 	    gdImageColorTransparent(PNG_fill_tile.im, background);
 	gdImageFilledRectangle(PNG_fill_tile.im, 0, 0, 7, 7, background);
@@ -1337,12 +1328,22 @@ PNG_graphics()
     unsigned int rgb;
 
 #if (GD2_VERS >= 2)
-    /* TrueColor images default to a black background; load white instead */
+    /* TrueColor images default to a black background; load white instead.	*/
+    /* If PNG_USE_TRANSPARENT, store the background alpha in the output file	*/
+    /* but apply alpha for the rest of the image internally. Otherwise you	*/
+    /* see only background through the topmost transparent layer.		*/
     if (png_state.TrueColor) {
 	png_state.image = gdImageCreateTrueColor(
 			(int) (xsize * PNG_XMAX), (int) (ysize * PNG_YMAX));
-	rgb = gdImageColorAllocate(png_state.image, 255, 255, 255);
+	if (png_state.flags & PNG_USE_TRANSPARENT) {
+	    rgb = gdImageColorAllocateAlpha(png_state.image, 255, 255, 255, 127);
+	    gdImageSaveAlpha(png_state.image, 1);
+	    gdImageAlphaBlending(png_state.image, 0);
+	} else {
+	    rgb = gdImageColorAllocate(png_state.image, 255, 255, 255);
+	}
 	gdImageFill(png_state.image, 1, 1, rgb);
+	gdImageAlphaBlending(png_state.image, 1);
     } else
 #endif
 	png_state.image = gdImageCreate(

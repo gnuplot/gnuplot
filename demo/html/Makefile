@@ -27,10 +27,7 @@ multiplt.html: $(GNUPLOT_LIB)/multiplt.dem ./webify.pl
 	export DEMOTERM="png enhanced transparent font arial 8 size 610,480"; ./webify.pl multiplt
 
 transparent.html: $(GNUPLOT_LIB)/transparent.dem ./webify.pl
-	export DEMOTERM="png enhanced truecolor font arial 8 size 512,280"; ./webify.pl transparent
-	mv transparent.2.png temp.png
-	export DEMOTERM="png enhanced notruecolor font arial 8 size 512,280"; ./webify.pl transparent
-	mv temp.png transparent.2.png
+	export DEMOTERM="png enhanced transparent truecolor font arial 8 size 512,280"; ./webify.pl transparent
 
 transparent_solids.html: $(GNUPLOT_LIB)/transparent_solids.dem ./webify.pl
 	export DEMOTERM="png enhanced truecolor font arial 9 size 512,384"; ./webify.pl transparent_solids
