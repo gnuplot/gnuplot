@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.202.2.5 2006/11/24 20:34:19 sfeam Exp $
+dnl $Id: configure.in,v 1.202.2.6 2006/11/28 20:16:30 tlecomte Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -38,8 +38,10 @@ AC_CHECK_PROGS(TROFF, troff, no)
 
 dnl Allow manual specification of kpsexpand 
 AC_ARG_WITH(kpsexpand,dnl
-  [--with-kpsexpand        search for kpsexpand at run-time ],
-   AC_DEFINE(HAVE_KPSEXPAND,1,[ Define if you use have kpsexpand (TeX). ]))
+  [--with-kpsexpand        search for kpsexpand at run-time (default disabled)],
+  [if test "$withval" = yes; then
+    AC_DEFINE(HAVE_KPSEXPAND,1,[ Define if you use have kpsexpand (TeX). ])
+  fi])
 
 dnl X Window System files.
 AC_SUBST(LIBRARIES_FOR_X)
