@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.41 2006/07/28 22:47:58 sfeam Exp $
+ * $Id: emf.trm,v 1.42 2006/08/04 20:31:56 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -124,6 +124,8 @@ TERM_PUBLIC int EMF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void EMF_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void EMF_set_pointsize __PROTO((double size));
 TERM_PUBLIC int EMF_set_font __PROTO((const char *));
+TERM_PUBLIC int EMF_make_palette __PROTO((t_sm_palette *palette));
+TERM_PUBLIC void EMF_previous_palette __PROTO((void));
 TERM_PUBLIC void EMF_set_color __PROTO((t_colorspec *colorspec));
 TERM_PUBLIC void EMF_filled_polygon __PROTO((int, gpiPoint *));
 TERM_PUBLIC void EMF_fillbox __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
@@ -155,7 +157,7 @@ TERM_PUBLIC void EMF_fillbox __PROTO((int, unsigned int, unsigned int, unsigned 
 #define EMF_VCHAR ((EMF_FONTSIZE * EMF_PT2HM) * 1.3)
 #define EMF_LINE_TYPES 5	/* number of line types we support */
 #define EMF_COLORS 15		/* number of colors we support */
-#define EMF_POINTS 8		/* number of markers we support */
+#define EMF_POINTS 13		/* number of markers we support */
 #define EMF_MAX_SEGMENTS 104	/* maximum # polyline coordinates */
 
 #define EMF_HANDLE_PEN		1
@@ -754,16 +756,37 @@ EMF_linecolor(int linecolor)
     EMF_flush_polyline();
 }
 
+TERM_PUBLIC int EMF_make_palette(t_sm_palette *palette)
+{
+    return 0; /* can do continous colors */
+}
+
+TERM_PUBLIC void EMF_previous_palette()
+{
+    /* do nothing */
+}
+
 TERM_PUBLIC void
 EMF_set_color(t_colorspec *colorspec)
 {
+    rgb255_color rgb255;
+
     if (colorspec->type == TC_LT) {
 	EMF_linecolor(colorspec->lt);
+    } else if (colorspec->type == TC_FRAC) {
+	rgb255maxcolors_from_gray(colorspec->value, &rgb255);
+	emf_color = RGB(rgb255.r, rgb255.g, rgb255.b);
     } else if (colorspec->type == TC_RGB) {
 	emf_color = RGB( colorspec->lt >> 16 & 0xff,
 			 colorspec->lt >> 8 & 0xff,
 			 colorspec->lt & 0xff );
     }
+
+    /*
+    else {
+	fprintf(stderr, "unhandled colorspec type %d\n", colorspec->type);
+    }
+    */
 
     /* Force reevaluation of dash type */
     emf_dashtype = LT_UNDEFINED;
@@ -776,7 +799,7 @@ EMF_filled_polygon(int points, gpiPoint *corners)
     int i;
     unsigned long color = emf_color;
     int fillpar = corners->style >> 4;
-    int style = corners->style &= 0xf;
+    int style = corners->style & 0xf;
 
 #define EMF_POLYGON 3
 
@@ -1078,6 +1101,8 @@ TERM_PUBLIC void
 EMF_point(unsigned int x, unsigned int y, int number)
 {
     int old_dashtype;
+    gpiPoint corners[12];
+    corners->style = FS_OPAQUE;
 
     EMF_flush_polyline();
     old_dashtype = emf_dashtype;
@@ -1093,39 +1118,19 @@ EMF_point(unsigned int x, unsigned int y, int number)
     number = number % EMF_POINTS;
 
     switch (number) {
-    case 0:			/* draw diamond */
-	EMF_move(x - emf_tic, y);
-	EMF_solid_vector(x, y - emf_tic);
-	EMF_solid_vector(x + emf_tic, y);
-	EMF_solid_vector(x, y + emf_tic);
-	EMF_flush_polygon();
-	break;
-    case 1:			/* draw plus */
+    case 0:			/* draw plus */
 	EMF_move(x - emf_tic, y);
 	EMF_solid_vector(x + emf_tic, y);
 	EMF_move(x, y - emf_tic);
 	EMF_solid_vector(x, y + emf_tic);
 	break;
-    case 2:			/* draw box */
-	EMF_move(x - emf_tic707, y - emf_tic707);
-	EMF_solid_vector(x + emf_tic707, y - emf_tic707);
-	EMF_solid_vector(x + emf_tic707, y + emf_tic707);
-	EMF_solid_vector(x - emf_tic707, y + emf_tic707);
-	EMF_flush_polygon();
-	break;
-    case 3:			/* draw X */
+    case 1:			/* draw X */
 	EMF_move(x - emf_tic707, y - emf_tic707);
 	EMF_solid_vector(x + emf_tic707, y + emf_tic707);
 	EMF_move(x - emf_tic707, y + emf_tic707);
 	EMF_solid_vector(x + emf_tic707, y - emf_tic707);
 	break;
-    case 4:			/* draw triangle (point up) */
-	EMF_move(x, y + emf_tic1241);
-	EMF_solid_vector(x - emf_tic1077, y - emf_tic621);
-	EMF_solid_vector(x + emf_tic1077, y - emf_tic621);
-	EMF_flush_polygon();
-	break;
-    case 5:			/* draw star (asterisk) */
+    case 2:			/* draw star (asterisk) */
 	EMF_move(x, y - emf_tic);
 	EMF_solid_vector(x, y + emf_tic);
 	EMF_move(x + emf_tic866, y - emf_tic500);
@@ -1133,13 +1138,21 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	EMF_move(x + emf_tic866, y + emf_tic500);
 	EMF_solid_vector(x - emf_tic866, y - emf_tic500);
 	break;
-    case 6:			/* draw triangle (point down) */
-	EMF_move(x, y - emf_tic1241);
-	EMF_solid_vector(x - emf_tic1077, y + emf_tic621);
-	EMF_solid_vector(x + emf_tic1077, y + emf_tic621);
+    case 3:			/* draw box */
+	EMF_move(x - emf_tic707, y - emf_tic707);
+	EMF_solid_vector(x + emf_tic707, y - emf_tic707);
+	EMF_solid_vector(x + emf_tic707, y + emf_tic707);
+	EMF_solid_vector(x - emf_tic707, y + emf_tic707);
 	EMF_flush_polygon();
 	break;
-    case 7:
+    case 4:			/* draw filled box */
+	corners[0].x = x - emf_tic707; corners[0].y = y - emf_tic707;
+	corners[1].x = x + emf_tic707; corners[1].y = y - emf_tic707;
+	corners[2].x = x + emf_tic707; corners[2].y = y + emf_tic707;
+	corners[3].x = x - emf_tic707; corners[3].y = y + emf_tic707;
+	EMF_filled_polygon(4, corners);
+	break;
+    case 5:
 	/* draw circle (actually, dodecagon) (WinWord 6 accepts the
 	 * CGM "circle" element, but the resulting circle is not
 	 * correctly centered!) */
@@ -1156,6 +1169,59 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	EMF_solid_vector(x - emf_tic866, y - emf_tic500);
 	EMF_solid_vector(x - emf_tic500, y - emf_tic866);
 	EMF_flush_polygon();
+	break;
+    case 6: /* filled circle */
+	corners [0].x = x             ; corners [0].y = y - emf_tic;
+	corners [1].x = x + emf_tic500; corners [1].y = y - emf_tic866;
+	corners [2].x = x + emf_tic866; corners [2].y = y - emf_tic500;
+	corners [3].x = x + emf_tic   ; corners [3].y = y;
+	corners [4].x = x + emf_tic866; corners [4].y = y + emf_tic500;
+	corners [5].x = x + emf_tic500; corners [5].y = y + emf_tic866;
+	corners [6].x = x             ; corners [6].y = y + emf_tic;
+	corners [7].x = x - emf_tic500; corners [7].y = y + emf_tic866;
+	corners [8].x = x - emf_tic866; corners [8].y = y + emf_tic500;
+	corners [9].x = x - emf_tic   ; corners [9].y = y;
+	corners[10].x = x - emf_tic866; corners[10].y = y - emf_tic500;
+	corners[11].x = x - emf_tic500; corners[11].y = y - emf_tic866;
+	EMF_filled_polygon(12, corners);
+	break;
+    case 7:			/* draw triangle (point up) */
+	EMF_move(x, y + emf_tic1241);
+	EMF_solid_vector(x - emf_tic1077, y - emf_tic621);
+	EMF_solid_vector(x + emf_tic1077, y - emf_tic621);
+	EMF_flush_polygon();
+	break;
+    case 8: /* filled triangle point up */
+	corners[0].x = x               ; corners[0].y = y + emf_tic1241;
+	corners[1].x = x - emf_tic1077 ; corners[1].y = y - emf_tic621;
+	corners[2].x = x + emf_tic1077 ; corners[2].y = y - emf_tic621;
+	EMF_filled_polygon(3, corners);
+	break;
+    case 9:			/* draw triangle (point down) */
+	EMF_move(x, y - emf_tic1241);
+	EMF_solid_vector(x - emf_tic1077, y + emf_tic621);
+	EMF_solid_vector(x + emf_tic1077, y + emf_tic621);
+	EMF_flush_polygon();
+	break;
+    case 10: /* filled triangle point down */
+	corners[0].x = x               ; corners[0].y = y - emf_tic1241;
+	corners[1].x = x - emf_tic1077 ; corners[1].y = y + emf_tic621;
+	corners[2].x = x + emf_tic1077 ; corners[2].y = y + emf_tic621;
+	EMF_filled_polygon(3, corners);
+	break;
+    case 11:			/* draw diamond */
+	EMF_move(x - emf_tic, y);
+	EMF_solid_vector(x, y - emf_tic);
+	EMF_solid_vector(x + emf_tic, y);
+	EMF_solid_vector(x, y + emf_tic);
+	EMF_flush_polygon();
+	break;
+    case 12: /* filled diamond */
+	corners[0].x = x - emf_tic ; corners[0].y = y;
+	corners[1].x = x           ; corners[1].y = y - emf_tic;
+	corners[2].x = x + emf_tic ; corners[2].y = y;
+	corners[3].x = x           ; corners[3].y = y + emf_tic;
+	EMF_filled_polygon(4, corners);
 	break;
     }
 /* end_points: */
@@ -1196,8 +1262,8 @@ TERM_TABLE_START(emf_driver)
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for emf */
 #endif
-   , NULL,		/* make_palette */
-   NULL,		/* previous_palette */
+   , EMF_make_palette,
+   EMF_previous_palette,
    EMF_set_color,
    EMF_filled_polygon
 #ifdef WITH_IMAGE
