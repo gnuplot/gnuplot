@@ -1,3 +1,7 @@
+2006-12-07  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in: Fix use of --without-kpsexpand
+
 2006-12-07  Johannes Zellner <johannes@zellner.org>
 
 	* term/emf.trm: implemented pm3d and point types according to the
