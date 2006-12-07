@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.133 2006/10/21 04:32:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.134 2006/11/16 05:58:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -918,17 +918,21 @@ get_3ddata(struct surface_points *this_plot)
         grid_nongrid_data(this_plot);
 
     /* This check used to be done in graph3d */
-	if (X_AXIS.min == VERYLARGE || X_AXIS.max == -VERYLARGE ||
-	    Y_AXIS.min == VERYLARGE || Y_AXIS.max == -VERYLARGE || 
-	    Z_AXIS.min == VERYLARGE || Z_AXIS.max == -VERYLARGE)
-		int_error(NO_CARET,
-		    "Axis range undefined due to improper data values. NaN? Inf?");
+    if (X_AXIS.min == VERYLARGE || X_AXIS.max == -VERYLARGE ||
+	Y_AXIS.min == VERYLARGE || Y_AXIS.max == -VERYLARGE || 
+	Z_AXIS.min == VERYLARGE || Z_AXIS.max == -VERYLARGE) {
+	    /* FIXME: Should we set plot type to NODATA? */
+	    /* But in the case of 'set view map' we may not care about Z */
+	    int_warn(NO_CARET,
+		"No usable data in this plot to auto-scale axis range");
+	    }
 
     if (this_plot->num_iso_read <= 1)
 	this_plot->has_grid_topology = FALSE;
     if (this_plot->has_grid_topology && !hidden3d) {
 	struct iso_curve *new_icrvs = NULL;
-	int num_new_iso = this_plot->iso_crvs->p_count, len_new_iso = this_plot->num_iso_read;
+	int num_new_iso = this_plot->iso_crvs->p_count;
+	int len_new_iso = this_plot->num_iso_read;
 	int i;
 
 	/* Now we need to set the other direction (pseudo) isolines. */
