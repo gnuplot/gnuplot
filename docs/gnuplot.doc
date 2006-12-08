@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.400 2006/11/16 22:17:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.401 2006/11/26 16:10:13 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7365,6 +7365,7 @@ C ... and restart the table:
      cgm
      pdf
      svg
+     emf
 
  Let us first describe how a map/surface is drawn.  The input data come from an
  evaluated function or from an `splot data file`.  Each surface consists of a
