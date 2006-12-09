@@ -3,6 +3,9 @@
 	* demo/all.dem demo/html/index.save demo/html/Makefile demo/image2.dem
 	demo/image.dem: Split image demo into two pieces.
 
+	* demo/image.dem demo/image2.dem docs/gnuplot.doc: Add emf to the list
+	of drivers supporting image plot styles.
+
 	* term/gd.trm (PNG_graphics): Ignore the current values of "set size"
 	when creating an output image.  Image size is controlled only by 
 	"set term {png|jpeg|gif} size XX,YY". 

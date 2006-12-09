@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.401 2006/11/26 16:10:13 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.402 2006/12/08 23:26:36 joze Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -270,7 +270,8 @@ C
  enhanced text.
 4 `emf`
  The `emf` terminal generates an Enhanced Metafile Format file. This file
- format is the metafile standard on MS Win32 Systems.
+ format is the metafile standard on MS Win32 Systems. The emf terminal 
+ supports pm3d, rgb color, and image plot modes.
 4 `gif`, `jpeg`, `png`
  The code for the terminals using the `gd` library has been consolidated.
  The `gif` terminal also knows how to produce an animated gif from a sequence
@@ -9050,12 +9051,6 @@ C ... and restart the table:
 
  postscript (pslatex, epslatex, pstex) - Image is copied in its original
        resolution, and sample interpolation is turned off.
-
- png - Output is dependent on the installed version of libgd.
-       gd 1.8.4  No truecolor support, but the driver function works.
-       gd 2.0.4  Truecolor works, but if truecolor is not selected
-                 the image comes out blank.
-       gd 2.0.9  Truecolor works, non-truecolor also works.
 
  See also `rgbimage`.
 5 impulses

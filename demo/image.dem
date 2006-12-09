@@ -2,7 +2,7 @@
 #
 # This demo can be used for terminals supporting image display.
 # Currently supported are:  X11, Aqua, postscript, png, pdf, svg,
-# (e)pslatex, pstex.
+# (e)pslatex, pstex, emf, wxt.
 
 # Prepared by Dan Sebald
 # History:
