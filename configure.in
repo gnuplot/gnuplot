@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.207 2006/11/28 20:12:39 tlecomte Exp $
+dnl $Id: configure.in,v 1.208 2006/12/07 22:38:03 tlecomte Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -996,7 +996,12 @@ AM_CONDITIONAL(BUILD_WXWIDGETS, test "${enable_wxwidgets_ok}" = yes)
 dnl  End wxWidgets terminal
 
 dnl Enable parsing of deprecated syntax
-  AC_DEFINE(BACKWARDS_COMPATIBLE, 1, [Define to enable parsing of deprecated syntax])
+AC_ARG_ENABLE(backwards-compatibility,dnl
+[  --enable-backwards-compatibility       enable deprecated syntax ],
+  [if test "$enableval" = yes; then
+    AC_DEFINE(BACKWARDS_COMPATIBILITY,1,
+               [ Define to allow use of deprecated syntax and terminal behaviour. ])
+  fi])
 
 dnl build lisp files
 if test "$with_lisp_files" != no; then
@@ -1325,6 +1330,13 @@ else
     AC_MSG_RESULT([  Hidden3d optimization: quadtree])
   fi
 fi
+
+if test "$enable_backwards_compatibility" = yes; then
+  AC_MSG_RESULT([  Deprecated syntax and terminal options : yes])
+else
+  AC_MSG_RESULT([  Deprecated syntax and terminal options : no (use --enable-backwards-compatibility to enable)])
+fi
+
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([gnuplot will install the following additional materials:])

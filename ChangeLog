@@ -9,6 +9,12 @@
 	* demo/borders.dem: Replace deprecated syntax `defined(bb)` with
 	`exists("bb")`.
 
+	* configure.in: Make backwards compatibility with deprecated syntax and
+	terminal options an explicit configuration choice. Defaults to 
+	--disable-backwards-compatibility
+	This should give us plenty of time to find any bugs exposed by 
+	dropping the deprecated code.
+
 	* term/gd.trm (PNG_graphics): Ignore the current values of "set size"
 	when creating an output image.  Image size is controlled only by 
 	"set term {png|jpeg|gif} size XX,YY". 
