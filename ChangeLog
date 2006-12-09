@@ -1,3 +1,10 @@
+2006-12-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (get_3ddata): If the first data file is non-empty but
+	has no usable data, then auto-scaling fails. Instead of a fatal error,
+	just print a warning and try to plot subsequent data files.
+	Bug #1610430
+
 2006-12-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_tic_prop) src/save.c (save_tics): NO_TICS is

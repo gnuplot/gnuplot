@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.131 2006/08/25 20:38:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.131.2.1 2006/11/04 06:22:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -909,7 +909,7 @@ get_3ddata(struct surface_points *this_plot)
 	if (X_AXIS.min == VERYLARGE || X_AXIS.max == -VERYLARGE ||
 	    Y_AXIS.min == VERYLARGE || Y_AXIS.max == -VERYLARGE || 
 	    Z_AXIS.min == VERYLARGE || Z_AXIS.max == -VERYLARGE)
-		int_error(NO_CARET,
+		int_warn(NO_CARET,
 		    "Axis range undefined due to improper data values. NaN? Inf?");
 
     if (this_plot->num_iso_read <= 1)
