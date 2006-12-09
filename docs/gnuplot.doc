@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.402 2006/12/08 23:26:36 joze Exp $
+C RCS $Id: gnuplot.doc,v 1.403 2006/12/09 19:41:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -290,6 +290,43 @@ C
  terminal.
 4 `windows`
  The `windows` terminal now supports the `enhanced text` mode.
+
+3 Canvas size
+?canvas size
+?canvas
+?set term size
+
+ In earlier versions of gnuplot, some terminal types used the values from
+ `set size` to control also the size of the output canvas; others did not.
+ In version 4.2 almost all terminals now follow the following convention:
+
+ `set term <terminal_type> size <XX>, <YY>` controls the size of the output
+ file, or "canvas". Please see individual terminal documentation for allowed
+ values of the size parameters.  By default, the plot will fill this canvas.
+
+ `set size <XX>, <YY>` scales the plot itself relative to the size of the
+ canvas.  Scale values less than 1 will cause the plot to not fill the entire
+ canvas.  Scale values larger than 1 will cause only a portion of the plot to
+ fit on the canvas.  Please be aware that setting scale values larger than 1
+ may cause problems on some terminal types.
+
+ The major exception to this convention is the PostScript driver, which
+ by default continues to act as it has in earlier versions. Be warned that
+ the next version of gnuplot may change the default behaviour of the 
+ PostScript driver as well.
+
+ Example:
+
+       set size 0.5, 0.5
+       set term png size 600, 400
+       set output "figure.png"
+       plot "data" using lines
+
+ These commands will produce an output file "figure.png" that is 600 pixels
+ wide and 400 pixels tall. The plot will fill the lower left quarter of this
+ canvas.  This is consistent with the way multiplot mode has always worked,
+ however it is a change in the way the png driver worked for single plots in
+ version 4.0.
 
 2 Features introduced in version 4.0
 ?version 4 features
@@ -7034,8 +7071,6 @@ C ... and restart the table:
  `set origin` and `set size` for details of their usage.
 
  Example:
-       set size 0.7,0.7
-       set origin 0.1,0.1
        set multiplot
        set size 0.4,0.4
        set origin 0.1,0.1
@@ -7045,20 +7080,15 @@ C ... and restart the table:
        plot cos(x)
        unset multiplot
 
- displays a plot of cos(x) stacked above a plot of sin(x).  Note the initial
- `set size` and `set origin`.  While these are not always required, their
- inclusion is recommended.  Some terminal drivers require that bounding box
- information be available before any plots can be made, and the form given
- above guarantees that the bounding box will include the entire plot array
- rather than just the bounding box of the first plot.
+ This displays a plot of cos(x) stacked above a plot of sin(x).
 
  `set size` and `set origin` refer to the entire plotting area used for each
- plot.  If you want to have the axes themselves line up, you can guarantee
- that the margins are the same size with the `set margin` commands.  See
- `set margin` for their use.  Note that the margin settings are absolute,
- in character units, so the appearance of the graph in the remaining space
- will depend on the screen size of the display device, e.g., perhaps quite
- different on a video display and a printer.
+ plot.  Please also see `set term size`.  If you want to have the axes
+ themselves line up, you can guarantee that the margins are the same size with
+ the `set margin` commands.  See `set margin` for their use.  Note that the
+ margin settings are absolute, in character units, so the appearance of the
+ graph in the remaining space will depend on the screen size of the display
+ device, e.g., perhaps quite different on a video display and a printer.
 
  With the `layout` option you can generate simple multiplots without having
  to give the `set size` and `set origin` commands before each plot:  Those
@@ -8130,14 +8160,27 @@ C ... and restart the table:
 ?show size
 ?size
 ?aspect ratio
- The `set size` command scales the displayed size of the plot.
-
  Syntax:
        set size {{no}square | ratio <r> | noratio} {<xscale>,<yscale>}
        show size
 
- The <xscale> and <yscale> values are the scaling factors for the size of the
- plot, which includes the graph and the margins.
+ The <xscale> and <yscale> values are scale factors for the size of the plot,
+ which includes the graph, labels, and margins.
+
+ Important note:
+       In earlier versions of gnuplot, some terminal types used the values from
+       `set size` to control also the size of the output canvas; others did not.
+       In version 4.2 almost all terminals now follow the following convention:
+
+ `set term <terminal_type> size <XX>, <YY>` controls the size of the output
+ file, or `canvas`. Please see individual terminal documentation for allowed
+ values of the size parameters.  By default, the plot will fill this canvas.
+
+ `set size <XX>, <YY>` scales the plot itself relative to the size of the
+ canvas.  Scale values less than 1 will cause the plot to not fill the entire
+ canvas.  Scale values larger than 1 will cause only a portion of the plot to
+ fit on the canvas.  Please be aware that setting scale values larger than 1
+ may cause problems on some terminal types.
 
  `ratio` causes `gnuplot` to try to create a graph with an aspect ratio of <r>
  (the ratio of the y-axis length to the x-axis length) within the portion of
@@ -8161,17 +8204,9 @@ C ... and restart the table:
 
  `ratio` and `square` have no effect on 3-d plots.
 
- `set size` is relative to the default size, which differs from terminal to
- terminal.  Since `gnuplot` fills as much of the available plotting area as
- possible by default, it is safer to use `set size` to decrease the size of
- a plot than to increase it.  See `set terminal` for the default sizes.
-
- On some terminals, changing the size of the plot will result in text being
- misplaced.
-
  Examples:
 
- To set the size to normal size use:
+ To set the size so that the plot fills the available canvas:
        set size 1,1
 
  To make the graph half size and square use:

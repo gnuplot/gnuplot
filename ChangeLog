@@ -15,6 +15,9 @@
 	"set size" scales the plot; "set term ... size"  changes the size of the
 	canvas on which the plot is drawn.
 
+	* docs/gnuplot.doc: Document the intended distinction between 
+	'set size' and 'set term <foo> size'
+
 2006-12-08  Johannes Zellner <johannes@zellner.org>
 
 	* docs/gnuplot.doc: added emf to the list of file formats which can do
