@@ -8,6 +8,11 @@
 	* demo/borders.dem: Replace deprecated syntax defined(bb) with 
 	exists("bb").
 
+	* configure.in: Make the selection of backwards-compatibility an 
+	explicit option.  We have been enabling it without even asking.
+	Now you can disable it if you want to.
+	Defaults to --enable-backwards-compatibiliy
+
 2006-12-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_tic_prop) src/save.c (save_tics): NO_TICS is
