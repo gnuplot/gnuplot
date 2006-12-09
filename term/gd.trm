@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.98 2006/11/23 22:09:53 sfeam Exp $
+ * $Id: gd.trm,v 1.99 2006/12/05 07:12:22 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1333,8 +1333,7 @@ PNG_graphics()
     /* but apply alpha for the rest of the image internally. Otherwise you	*/
     /* see only background through the topmost transparent layer.		*/
     if (png_state.TrueColor) {
-	png_state.image = gdImageCreateTrueColor(
-			(int) (xsize * PNG_XMAX), (int) (ysize * PNG_YMAX));
+	png_state.image = gdImageCreateTrueColor(PNG_XMAX, PNG_YMAX);
 	if (png_state.flags & PNG_USE_TRANSPARENT) {
 	    rgb = gdImageColorAllocateAlpha(png_state.image, 255, 255, 255, 127);
 	    gdImageSaveAlpha(png_state.image, 1);
@@ -1346,10 +1345,9 @@ PNG_graphics()
 	gdImageAlphaBlending(png_state.image, 1);
     } else
 #endif
-	png_state.image = gdImageCreate(
-			(int) (xsize * PNG_XMAX), (int) (ysize * PNG_YMAX));
+	png_state.image = gdImageCreate(PNG_XMAX, PNG_YMAX);
 
-    png_state.height = (int) (ysize * PNG_YMAX - 1);
+    png_state.height = PNG_YMAX - 1;
     png_state.charw = term->h_char;	/* png_state.font->w; */
     png_state.charh = term->v_char;	/* png_state.font->h; */
     png_state.font = png_state.default_font;

@@ -3,6 +3,15 @@
 	* demo/all.dem demo/html/index.save demo/html/Makefile demo/image2.dem
 	demo/image.dem: Split image demo into two pieces.
 
+	* term/gd.trm (PNG_graphics): Ignore the current values of "set size"
+	when creating an output image.  Image size is controlled only by 
+	"set term {png|jpeg|gif} size XX,YY". 
+	
+	This change brings all terminal types except PostScript into conformity
+	with the distinct meanings of "set size" and "set term ... size".
+	"set size" scales the plot; "set term ... size"  changes the size of the
+	canvas on which the plot is drawn.
+
 2006-12-08  Johannes Zellner <johannes@zellner.org>
 
 	* docs/gnuplot.doc: added emf to the list of file formats which can do
