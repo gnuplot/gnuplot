@@ -6,6 +6,9 @@
 	* demo/image.dem demo/image2.dem docs/gnuplot.doc: Add emf to the list
 	of drivers supporting image plot styles.
 
+	* demo/borders.dem: Replace deprecated syntax `defined(bb)` with
+	`exists("bb")`.
+
 	* term/gd.trm (PNG_graphics): Ignore the current values of "set size"
 	when creating an output image.  Image size is controlled only by 
 	"set term {png|jpeg|gif} size XX,YY". 

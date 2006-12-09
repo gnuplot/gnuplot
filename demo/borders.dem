@@ -1,12 +1,12 @@
 #
-# $Id: borders.dem,v 1.6 2004/09/14 22:54:57 sfeam Exp $
+# $Id: borders.dem,v 1.7 2006/10/03 13:20:00 mikulik Exp $
 #
 unset grid
 set xrange [0:10]
 set yrange [0:10]
 set format ""
 #
-if (!defined(bb)) bb = -1
+if (!exists("bb")) bb = -1
 #
 bb=(bb+1)%16
 if (bb==0) set multiplot
