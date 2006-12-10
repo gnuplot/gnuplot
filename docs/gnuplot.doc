@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.403 2006/12/09 19:41:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.404 2006/12/09 21:48:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -247,7 +247,7 @@ C
  See `string variables`.
 
 3 Macros
- Gnuplot supports command line macro expansion  by '@stringvariablename'. 
+ Gnuplot supports command line macro expansion  by '@stringvariablename'.
  See `macros`.
 
 3 Auto-layout of multiple plots on a page
@@ -270,7 +270,7 @@ C
  enhanced text.
 4 `emf`
  The `emf` terminal generates an Enhanced Metafile Format file. This file
- format is the metafile standard on MS Win32 Systems. The emf terminal 
+ format is the metafile standard on MS Win32 Systems. The emf terminal
  supports pm3d, rgb color, and image plot modes.
 4 `gif`, `jpeg`, `png`
  The code for the terminals using the `gd` library has been consolidated.
@@ -298,7 +298,8 @@ C
 
  In earlier versions of gnuplot, some terminal types used the values from
  `set size` to control also the size of the output canvas; others did not.
- In version 4.2 almost all terminals now follow the following convention:
+ The use of 'set size' for this purpose was deprecated in version 4.2.
+ In version 4.3 almost all terminals now behave as follows:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
  file, or "canvas". Please see individual terminal documentation for allowed
@@ -312,7 +313,7 @@ C
 
  The major exception to this convention is the PostScript driver, which
  by default continues to act as it has in earlier versions. Be warned that
- the next version of gnuplot may change the default behaviour of the 
+ the next version of gnuplot may change the default behaviour of the
  PostScript driver as well.
 
  Example:
@@ -327,6 +328,42 @@ C
  canvas.  This is consistent with the way multiplot mode has always worked,
  however it is a change in the way the png driver worked for single plots in
  version 4.0.
+
+2 Backwards compatibility
+?backwards compatibility
+?compatibility
+ Gnuplot version 4.0 deprecated certain syntax used in earlier versions, but
+ continued to recognize it.  This is now under the control of a configuration
+ option, and can be disabled as follows:
+
+       ./configure --disable-backwards-compatibility
+
+ Notice: Deprecated syntax items may be disabled permanently in some future
+ version of gnuplot.
+
+ One major difference is the introduction of keywords to disambiguate complex
+ commands, particularly commands containing string variables. A notable issue
+ was the use of bare numbers to specify offsets, line and point types.
+ Illustrative examples:
+
+ Deprecated:
+       set title "Old" 0,-1
+       set data linespoints
+       plot 1 2 4               # horizontal line at y=1
+ New:
+       TITLE = "New"
+       set title TITLE offset char 0, char -1
+       set style data linespoints
+       plot 1 linetype 2 pointtype 4
+
+ Another compatibility issue is the effect of the command `set size` outside
+ when not in multiplot mode.  In earlier versions, the command
+ `set size <xx>, <yy>` caused some terminals to change both the size of the plot
+ and the size of the canvas is was drawn on; other terminatls changed only the
+ plot size.  The use of `set size` to change the canvas size is now deprecated.
+
+ Please see `set size`, `set term size` and also the documentation for
+ individual terminals.
 
 2 Features introduced in version 4.0
 ?version 4 features
@@ -1297,7 +1334,7 @@ C
 %defined(X)@variable name@ [DEPRECATED] returns 1 if X is defined, 0 otherwise.
  `defined(X)` [DEPRECATED] returns 1 if a variable named X has been defined, otherwise
  it returns 0.
-4 exists 
+4 exists
 ?expressions functions exists
 ?functions exists
 ?exists
@@ -1638,7 +1675,7 @@ C ... and restart the table:
  Working with interactive terminals with `mouse` functionality defines
  variables with names that begin "MOUSE_", see `mouse variables` for details.
 
- Further, there are several "read-only" variables that begin "GPVAL_", like 
+ Further, there are several "read-only" variables that begin "GPVAL_", like
  GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN,... Type `show variables all`
  to display their list and values. Values related to axes parameters (ranges, log
  base) are values used during the last plot, not those currently `set`.
@@ -2349,8 +2386,8 @@ C ... and restart the table:
        cd 'subdir'
        cd ".."
 
- It is recommended for DOS and Windows users to use 
- single-quotes---backslash [\] has special significance inside 
+ It is recommended for DOS and Windows users to use
+ single-quotes---backslash [\] has special significance inside
  double-quotes and has to be escaped.  For example,
        cd "c:\newdata"
  fails, but
@@ -3481,7 +3518,7 @@ C ... and restart the table:
  Sometimes the scanning directions in a binary datafile are not consistent with
  that assumed by gnuplot.  These keywords can flip the scanning direction along
  dimensions x, y, z.
-6 origin 
+6 origin
 ?binary general keywords origin
  When gnuplot generates coordinates based upon transposition and flip, it
  attempts to always position the lower left point in the array at the origin,
@@ -4274,8 +4311,8 @@ C ... and restart the table:
  convenient to do so by iterating over a shared plot command.
 
  Syntax:
-       plot for [<variable>=<start>:<end>{:<increment>}] 
-       splot for [<variable>=<start>:<end>{:<increment>}] 
+       plot for [<variable>=<start>:<end>{:<increment>}]
+       splot for [<variable>=<start>:<end>{:<increment>}]
 
  Example:
        file(n) = sprintf("dataset_%d.dat",n)
@@ -5658,7 +5695,7 @@ C ... and restart the table:
  error message is printed and the decimal sign setting is unchanged.
  On linux systems you can get a list of the locales installed on your machine by
  typing "locale -a". A typical linux locale string is of the form "sl_SI.UTF-8".
- A typical Windows locale string is of the form "Slovenian_Slovenia.1250" or 
+ A typical Windows locale string is of the form "Slovenian_Slovenia.1250" or
  "slovenian". Please note that interpretation of the locale settings is done by
  the C library at runtime. Older C libraries may offer only partial support for
  locale settings such as the thousands grouping separator character.
@@ -6246,7 +6283,7 @@ C ... and restart the table:
  its contours drawn on the base (see `set contour`) as well as the grid will
  be hidden.  Each surface has its hidden parts removed with respect to itself
  and to other surfaces, if more than one surface is plotted.  Contours drawn
- on the surface (`set contour surface`) don't work.  
+ on the surface (`set contour surface`) don't work.
 
  Labels and arrows are always visible and are unaffected.  The key box is
  never hidden by the surface. As of gnuplot version 4.2, `set hidden3d` also
@@ -6255,7 +6292,7 @@ C ... and restart the table:
  graph may be explicitly excluded from this processing by appending the extra
  option `nohidden3d` to the `with` specifier.
 
- Hidden3d does not affect solid surfaces drawn using the pm3d mode. To 
+ Hidden3d does not affect solid surfaces drawn using the pm3d mode. To
  achieve a similar effect for pm3d surfaces, use instead set `pm3d depthorder`.
 
  Functions are evaluated at isoline intersections.  The algorithm interpolates
@@ -7875,7 +7912,7 @@ C ... and restart the table:
        1 0 0
        e
 
- Binary palette files are supported as well, see `binary general`. Example: 
+ Binary palette files are supported as well, see `binary general`. Example:
  put 64 triplets of R,G,B doubles into file palette.bin and load it by
        set palette file "palette.bin" binary record=64 using 1:2:3
 
@@ -8350,8 +8387,8 @@ C ... and restart the table:
  histograms, candlesticks and filledcurves.
 
  Syntax:
-       set style fill {empty 
-                       | {transparent} solid {<density>} 
+       set style fill {empty
+                       | {transparent} solid {<density>}
                        | {transparent} pattern {<n>}}
                       {border {<linetype>} | noborder}
 
@@ -9436,7 +9473,7 @@ C ... and restart the table:
        unset tics
        show tics
 
- The options in the first set above can be applied individually to 
+ The options in the first set above can be applied individually to
  any or all axes, i.e., x, y, z, x2, y2, and cb.
 
  Set tics `front` or `back` applies to all axes at once, but only for 2D plots
@@ -10211,7 +10248,7 @@ C ... and restart the table:
  Format (or omission) of the tic labels is controlled by `set format`, unless
  the explicit text of a label is included in the `set xtics ("<label>")` form.
 
- Minor (unlabelled) tics can be added automatically by the `set mxtics` 
+ Minor (unlabelled) tics can be added automatically by the `set mxtics`
  command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
 
  In case of timeseries data, position values must be given as quoted dates
@@ -10257,7 +10294,7 @@ C ... and restart the table:
        show xyplane
 
  The form `set ticslevel <frac>` places the xy plane below the range in Z, where
- the distance from the xy plane to Zmin is given as a fraction of the total 
+ the distance from the xy plane to Zmin is given as a fraction of the total
  range in z.  The default value is 0.5.  Negative values are permitted, but tic
  labels on the three axes may overlap.
 
@@ -10881,7 +10918,7 @@ C ... and restart the table:
      plot `a.dat` matrix
      plot `a.dat` matrix using 1:3
      plot 'a.gpbin' {matrix} binary using 1:3
- will plot rows of the matrix, while using 2:3 will plot matrix columns, and 
+ will plot rows of the matrix, while using 2:3 will plot matrix columns, and
  using 1:2 the point coordinates (rather useless). Applying the `every` option
  you can specify explicit rows and columns.
 
