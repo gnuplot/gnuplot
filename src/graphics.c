@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.2 2006/11/04 06:22:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.3 2006/11/16 03:04:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5152,11 +5152,11 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 
 
     if (project_points) {
-      points = ((struct surface_points *)plot)->iso_crvs->points;
-      p_count = ((struct surface_points *)plot)->iso_crvs->p_count;
+	points = ((struct surface_points *)plot)->iso_crvs->points;
+	p_count = ((struct surface_points *)plot)->iso_crvs->p_count;
     } else {
-      points = ((struct curve_points *)plot)->points;
-      p_count = ((struct curve_points *)plot)->p_count;
+	points = ((struct curve_points *)plot)->points;
+	p_count = ((struct curve_points *)plot)->p_count;
     }
 
     if (p_count < 1) {
@@ -5317,6 +5317,17 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	int pixel_1_1, pixel_M_N;
 	coordval *image;
 	int array_size;
+	float xsts, ysts;
+
+	if (!project_points) {
+	    /* Determine axis direction according to the sign of the terminal scale. */
+	    xsts = (axis_array[x_axis].term_scale > 0 ? +1 : -1);
+	    ysts = (axis_array[y_axis].term_scale > 0 ? +1 : -1);
+	} else {
+	    /* 3D plots do not use the term_scale mechanism AXIS_SETSCALE(). */
+	    xsts = 1;
+	    ysts = 1;
+	}
 
 	/* Set up parameters for indexing through the image matrix to transfer data.
 	 * These formulas were derived for a terminal image routine which uses the
@@ -5324,14 +5335,14 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	 */
 	if (fabs(delta_x_grid[0]) > fabs(delta_x_grid[1])) {
 	    line_length = K;
-	    i_start = (delta_y_grid[1] > 0 ? L : 1) * K - (delta_x_grid[0] > 0 ? K : 1);
-	    i_delta_pixel = (delta_x_grid[0] > 0 ? +1 : -1);
-	    i_delta_line = (delta_x_grid[0] > 0 ? -K : +K) + (delta_y_grid[1] > 0 ? -K : +K);
+	    i_start = (delta_y_grid[1]*ysts > 0 ? L : 1) * K - (delta_x_grid[0]*xsts > 0 ? K : 1);
+	    i_delta_pixel = (delta_x_grid[0]*xsts > 0 ? +1 : -1);
+	    i_delta_line = (delta_x_grid[0]*xsts > 0 ? -K : +K) + (delta_y_grid[1]*ysts > 0 ? -K : +K);
 	} else {
 	    line_length = L;
-	    i_start = (delta_x_grid[1] > 0 ? 1 : L) * K - (delta_y_grid[0] > 0 ? 1 : K);
-	    i_delta_pixel = (delta_x_grid[1] > 0 ? +K : -K);
-	    i_delta_line = K*L*(delta_x_grid[1] > 0 ? -1 : +1) + (delta_y_grid[0] > 0 ? -1 : +1);
+	    i_start = (delta_x_grid[1]*xsts > 0 ? 1 : L) * K - (delta_y_grid[0]*ysts > 0 ? 1 : K);
+	    i_delta_pixel = (delta_x_grid[1]*xsts > 0 ? +K : -K);
+	    i_delta_line = K*L*(delta_x_grid[1]*xsts > 0 ? -1 : +1) + (delta_y_grid[0]*ysts > 0 ? -1 : +1);
 	}
 
 	/* Assign enough memory for the maximum image size. */
@@ -5479,10 +5490,10 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 		    map3d_xy(view_port_x[0], view_port_y[0], view_port_z[0], &corners[2].x, &corners[2].y);
 		    map3d_xy(view_port_x[1], view_port_y[1], view_port_z[1], &corners[3].x, &corners[3].y);
 		} else {
-		    corners[0].x = map_x(points[pixel_1_1].x - fabs(delta_x_grid[0]+delta_x_grid[1])/2);
-		    corners[0].y = map_y(points[pixel_1_1].y + fabs(delta_y_grid[0]+delta_y_grid[1])/2);
-		    corners[1].x = map_x(points[pixel_M_N].x + fabs(delta_x_grid[0]+delta_x_grid[1])/2);
-		    corners[1].y = map_y(points[pixel_M_N].y - fabs(delta_y_grid[0]+delta_y_grid[1])/2);
+		    corners[0].x = map_x(points[pixel_1_1].x - xsts*fabs(d_x_o_2));
+		    corners[0].y = map_y(points[pixel_1_1].y + ysts*fabs(d_y_o_2));
+		    corners[1].x = map_x(points[pixel_M_N].x + xsts*fabs(d_x_o_2));
+		    corners[1].y = map_y(points[pixel_M_N].y - ysts*fabs(d_y_o_2));
 		    corners[2].x = map_x(view_port_x[0]);
 		    corners[2].y = map_y(view_port_y[1]);
 		    corners[3].x = map_x(view_port_x[1]);

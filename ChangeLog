@@ -1,3 +1,10 @@
+2006-12-10  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/README src/graphics.c (plot_image_or_update_axes): 
+	Augmented sign tests for determining image pixel orientation with the
+	terminal scales in the x and y dimensions.
+	Bug #1589589
+
 2006-12-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (get_3ddata): If the first data file is non-empty but
