@@ -10,7 +10,7 @@ TABLE OF CONTENTS:
   * TECHNICAL DETAILS FOR FAST MOUSE ROTATION OF 3D SURFACES
   * TECHNICAL DETAILS ABOUT PM3D
 
-Document version: "$Id: README,v 1.6 2003/01/22 08:47:55 mikulik Exp $"
+Document version: "$Id: README,v 1.7 2004/09/01 15:53:46 mikulik Exp $"
 
 
 *******************************************************************************
@@ -832,9 +832,11 @@ matrix
      .       .
    (1,N)...(M,N)
 
-The approach is to step through the plot points and copy each visible point to
-its appropriate spot in the image matrix array.  The routine that does this is
-fundamentally
+(Note that the terminal scale, positive or negative, has an influence on the
+orientation of pixels.  Ignore this temporarily for simplicity.  Formulas are
+augmented later to account for axes directions.)  The approach is to step
+through the plot points and copy each visible point to its appropriate spot in
+the image matrix array.  The routine that does this is fundamentally
 
   for (i=0, j=line_length, i_image=i_start; i < plot->p_count; i++) {
     image[i_image] = plot->points[i].CRD_COLOR;
@@ -907,15 +909,25 @@ i_delta_line:   K*L*(-1)^(dxg1 > 0) + (-1)^(dyg0 > 0)
 -------------------------------------------------------
 
 
-The above formulas are what appear preceding the for() loop in the actual code.
+The above formulas are what appear preceding the for() loop in the actual code
+except for one detail, the terminal scale, i.e., direction for which the axes
+are increasing.  Simply note that if terminal scale is negative the orientation
+swaps along the related direction.  Thus augmenting the sign tests in the above
+equations will account for the terminal scale.  For example, let xsts and ysts
+be the sign of the x and y terminal scale, respectively.  Then the formula for
+i_start when x is changing (dimension 0) becomes:
+
+i_start:           L^(dyg1*ysts > 0) * K - K^(dxg0*xsts > 0)
+
+and so on.
 
 
 /***** NOTE:  Info between starred comments was original method and now a
               simple, but less efficient, method of finding the corners by
               conditional tests while rearranging the points is done.  So
-              this is obsolete... but may come back to it at some point.
-              But if this has been sitting around for quite a while now,
-              feel free to delete what is between the stars.
+              the following is obsolete... but may come back to it at some
+              point.  But if this has been sitting around for quite a while
+              now, feel free to delete what is between the stars.
 
 There is also the matter of computing what points in the array of plot->point[]
 constitute pixels (1,1) and (N,M).  There are four grid corners determined on
