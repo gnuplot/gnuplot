@@ -1,3 +1,10 @@
+2006-12-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_tic_prop) src/save.c (save_tics): NO_TICS is a bitmask
+	value, not an integer constant. All tests for NO_TICS must be masked
+	through TICS_MASK.
+	Bug #1611764
+
 2006-12-10  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/README src/graphics.c (plot_image_or_update_axes): 

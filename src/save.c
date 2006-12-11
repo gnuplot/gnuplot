@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.137 2006/11/12 23:50:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.138 2006/11/13 00:01:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -914,7 +914,7 @@ set origin %g,%g\n",
 static void
 save_tics(FILE *fp, AXIS_INDEX axis)
 {
-    if (axis_array[axis].ticmode == NO_TICS) {
+    if ((axis_array[axis].ticmode & TICS_MASK) == NO_TICS) {
 	fprintf(fp, "set no%stics\n", axis_defaults[axis].name);
 	return;
     }

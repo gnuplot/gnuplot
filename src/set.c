@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.238 2006/10/30 00:08:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.239 2006/11/13 00:01:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3866,7 +3866,7 @@ set_tics()
 
     /* if tics are off and not set by axis, reset to default (border) */
     for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-	if ((axis_array[i].ticmode == NO_TICS) && (!axisset)) {
+	if (((axis_array[i].ticmode & TICS_MASK) == NO_TICS) && (!axisset)) {
 	    if ((i == SECOND_X_AXIS) || (i == SECOND_Y_AXIS))
 		continue; /* don't switch on secondary axes by default */
 	    axis_array[i].ticmode = TICS_ON_BORDER;
@@ -4338,7 +4338,7 @@ set_tic_prop(AXIS_INDEX axis)
 	} while (!END_OF_COMMAND);
 
 	/* if tics are off and not set by axis, reset to default (border) */
-	if ((axis_array[axis].ticmode == NO_TICS) && (!axisset)) {
+	if (((axis_array[axis].ticmode & TICS_MASK) == NO_TICS) && (!axisset)) {
 	    axis_array[axis].ticmode = TICS_ON_BORDER;
 	    if ((mirror_opt == FALSE) && ((axis == FIRST_X_AXIS) || (axis == FIRST_Y_AXIS) || (axis == COLOR_AXIS))) {
 		axis_array[axis].ticmode |= TICS_MIRROR;
@@ -4348,7 +4348,7 @@ set_tic_prop(AXIS_INDEX axis)
     }
 
     if (almost_equals(c_token, nocmd)) {	/* NOSTRING */
-	axis_array[axis].ticmode = NO_TICS;
+	axis_array[axis].ticmode &= ~TICS_MASK;
 	c_token++;
 	match = 1;
     }
