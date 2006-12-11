@@ -1,5 +1,9 @@
 2006-12-11  Ethan Merritt  <merritt@u.washington.edu>
 
+	* configure.in: Fix AC_DEFINE definition of BACKSWARDS_COMPATIBLE
+
+2006-12-11  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/set.c (set_tic_prop) src/save.c (save_tics): NO_TICS is a bitmask
 	value, not an integer constant. All tests for NO_TICS must be masked
 	through TICS_MASK.
