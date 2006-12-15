@@ -6,9 +6,9 @@ set object 1 rect from screen 0, 0, 0 to screen 1, 1, 0 behind
 set object 1 rect fc  rgb "gray"  fillstyle solid 1.0  border -1
 set view 64, 345, 1.24375, 0.995902
 set isosamples 50, 20
-set noxtics
-set noytics
-set noztics
+unset xtics
+unset ytics
+unset ztics
 set parametric
 set dummy u,v
 set urange [ -pi : pi ]
@@ -26,7 +26,7 @@ pause -1 "Hit return to continue"
 
 unset title
 set label 1 "Kuen's Surface" at screen 0.6, 0.9
-set label 1 font "frscript,30"
+set label 1 font "frscript,25"
 set style line 3  linetype -1 linewidth 0.5
 set pm3d depthorder hidden3d 3
 set style fill  transparent solid 0.65 border
@@ -34,7 +34,7 @@ set palette
 set hidden3d
 
 set ticslevel 0
-set noxtics ; set noytics ; set noztics
+unset xtics ; unset ytics ; unset ztics
 unset border ; unset colorbox ; unset key
 set lmargin screen 0.1
 set bmargin screen 0.1
