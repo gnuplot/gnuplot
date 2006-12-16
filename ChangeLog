@@ -4,6 +4,9 @@
 	strings in comma-separated value files.
 	Bug #1614424
 
+	* src/graph3d.c (draw_3d_graphbox): Honor 2D front/back settings
+	for axis, grid, and border elements in 3D plots with "set view map".
+
 2006-12-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Fix spelling of BACKWARDS_COMPATIBLE
