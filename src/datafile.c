@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.113 2006/10/22 11:54:39 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.114 2006/11/04 06:02:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -682,7 +682,7 @@ df_tokenise(char *s)
 
 #ifdef EAM_DATASTRINGS
 	/* Keep pointer to start of this token if user wanted it for
-	 * anything */
+	 * anything, particularly if it is a string */
 	for (i = 0; i<MAXDATACOLS; i++) {
 	    if (df_no_cols == use_spec[i].column-1) {
 		df_tokens[i] = s;
@@ -693,22 +693,13 @@ df_tokenise(char *s)
 	/* Particularly if it is supposed to be a key title */
 	if (df_no_cols == column_for_key_title-1)
 	    strncpy(df_key_title,s,sizeof(df_key_title)-1);
-	/* Trap string-value columns before trying to interpret them
-	   as numeric */
-	/* FIXME EAM - At this point we've marked the column DF_GOOD
-	 * if anyone wanted it as a string, but it will get marked
-	 * DF_BAD below if it doesn't also parse as a number. Is this
-	 * a problem???  */
 #endif
 
-	/* CSV files must accept numbers inside quotes also, so */
-	/* we step past the quote and any following whitespace. */
+	/* CSV files must accept numbers inside quotes also,
+	 * so we step past the quote */
 	if (*s == '"' && df_separator != '\0') {
 	    in_string = TRUE;
-	    do
-		++s;
-	    while (isspace((unsigned char) *s));
-	    df_column[df_no_cols].position = s;
+	    df_column[df_no_cols].position = ++s;
 	}
 
 	if (*s == '"') {
@@ -2702,8 +2693,8 @@ df_parse_string_field(char *string, char *field)
 	strncpy(temp_string,&(field[1]),sizeof(temp_string)-1);
 	temp_string[strcspn(temp_string,"\"")] = '\0';
     } else if (df_separator != '\0') {
-	char eor[2];
-	eor[0] = df_separator; eor[1] = '\0';
+	char eor[3];
+	eor[0] = df_separator; eor[1] = '"'; eor[2] = '\0';
 	strncpy(temp_string,field,sizeof(temp_string)-1);
 	temp_string[strcspn(temp_string,eor)] = '\0';
     } else {
