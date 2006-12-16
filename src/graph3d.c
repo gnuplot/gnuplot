@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.161 2006/10/26 04:09:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.162 2006/12/01 05:52:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -134,7 +134,7 @@ static void check_corner_height __PROTO((struct coordinate GPHUGE * point,
 static void setup_3d_box_corners __PROTO((void));
 static void draw_3d_graphbox __PROTO((struct surface_points * plot,
 				      int plot_count,
-				      WHICHGRID whichgrid));
+				      WHICHGRID whichgrid, int current_layer));
 /* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
 void xtick_callback __PROTO((AXIS_INDEX, double place, char *text,
 			     struct lp_style_type grid));
@@ -658,7 +658,7 @@ do_3dplot(
     /* Original behaviour: draw entire grid in back, if 'set grid back': */
     /* HBB 20040331: but not if in hidden3d mode */
     if (!hidden3d && grid_layer == 0)
-	draw_3d_graphbox(plots, pcount, ALLGRID);
+	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_BACK);
 
     /* Draw PM3D color key box */
     if (!quick) {
@@ -673,7 +673,7 @@ do_3dplot(
 	/* Default layering mode.  Draw the back part now, but not if
 	 * hidden3d is in use, because that relies on all isolated
 	 * lines being output after all surfaces have been defined. */
-	draw_3d_graphbox(plots, pcount, BACKGRID);
+	draw_3d_graphbox(plots, pcount, BACKGRID, LAYER_BACK);
 #endif /* USE_GRID_LAYERS */
 
     /* Clipping in 'set view map' mode should be like 2D clipping */
@@ -1326,17 +1326,17 @@ do_3dplot(
     /* Old behaviour: draw entire grid now, unless it was requested to
      * be in the back. */
     if (grid_layer != 0)
-	draw_3d_graphbox(plots, pcount, ALLGRID);
+	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
 #else
     /* HBB NEW 20040311: do front part now, after surfaces have been
      * output. If "set grid front", or hidden3d is active, must output
      * the whole shebang now, otherwise only the front part. */
     if (hidden3d || grid_layer == 1)
-	draw_3d_graphbox(plots, pcount, ALLGRID);
+	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
     else if (splot_map && (border_layer == 1))
-	draw_3d_graphbox(plots, pcount, ALLGRID);
+	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
     else if (grid_layer == -1)
-	draw_3d_graphbox(plots, pcount, FRONTGRID);
+	draw_3d_graphbox(plots, pcount, FRONTGRID, LAYER_FRONT);
 
 #endif /* USE_GRID_LAYERS */
 
@@ -2100,12 +2100,13 @@ setup_3d_box_corners()
 /* Draw all elements of the 3d graph box, including borders, zeroaxes,
  * tics, gridlines, ticmarks, axis labels and the base plane. */
 static void
-draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
+draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid, int current_layer)
 {
     unsigned int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
 
     if (draw_border && splot_map) {
+	if (border_layer == current_layer) {
 	    term_apply_lp_properties(&border_lp);
 	    if ((draw_border & 15) == 15)
 		newpath();
@@ -2133,6 +2134,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		term->move(x, y);
 	    if ((draw_border & 15) == 15)
 		closepath();
+	}
     } else
 
     if (draw_border) {
@@ -2307,6 +2309,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	    }
 	} /* else (surface is drawn) */
     } /* if (draw_border) */
+
+    /* In 'set view map' mode, treat grid as in 2D plots */
+    if (splot_map && current_layer != grid_layer)
+	return;
 
     /* Draw ticlabels and axis labels. x axis, first:*/
     if (X_AXIS.ticmode || X_AXIS.label.text) {
