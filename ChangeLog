@@ -1,6 +1,6 @@
 2006-12-16  Ethan Merritt  <merritt@u.washington.edu>
 
- 	* src/datafile.c (df_tokenise df_parse_string): Allow for quoted
+	* src/datafile.c (df_tokenise df_parse_string): Allow for quoted
 	strings in comma-separated value files.
 	Bug #1614424
 
@@ -42,7 +42,7 @@
 
 2006-12-07  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-        * configure.in: Fix use of --without-kpsexpand
+	* configure.in: Fix use of --without-kpsexpand
 
 2006-11-24  Ethan Merritt  <merritt@u.washington.edu>
 
@@ -50,16 +50,16 @@
 
 2006-11-28  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-        * configure.in: Fix bug in --{en|dis}able-wxwidgets
+	* configure.in: Fix bug in --{en|dis}able-wxwidgets
 
-        * src/wxterminal/wxt_gui.cpp:
-        * src/wxterminal/wxt_gui.h:
-        Allow building with wxMac, in addition to wxMSW and wxGTK.
+	* src/wxterminal/wxt_gui.cpp:
+	* src/wxterminal/wxt_gui.h:
+	Allow building with wxMac, in addition to wxMSW and wxGTK.
 
 2006-11-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL configure.in src/version.c docs/gnuplot.texi:
-	Update in preparation for second release candidate               4.2-rc2
+	Update in preparation for second release candidate 4.2-rc2.
 
 	* term/svg.trm: Back out the raw/escaped option. It needs more thought.
 
@@ -126,37 +126,37 @@
 
 2006-11-10  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-        * src/win/wpause.c:
-        * src/win/wtext.c:
-        * src/wxterminal/wxt_gui.cpp:
-        * src/wxterminal/wxt_gui.h:
-        * src/wxterminal/wxt_plot.h:
-        Rework and simplify the event handling from the wxt terminal on
-        Windows. Remove hooks from the wxt terminal in the Windows files.
+	* src/win/wpause.c:
+	* src/win/wtext.c:
+	* src/wxterminal/wxt_gui.cpp:
+	* src/wxterminal/wxt_gui.h:
+	* src/wxterminal/wxt_plot.h:
+	Rework and simplify the event handling from the wxt terminal on
+	Windows. Remove hooks from the wxt terminal in the Windows files.
 
-        * src/plot.c (main):
-        * src/plot.h:
-        Introduce a boolean to track the use of "-persist" on the command line.
-        Remove WXWIDGETS-specific code. Call term_reset() using GP_ATEXIT().
+	* src/plot.c (main):
+	* src/plot.h:
+	Introduce a boolean to track the use of "-persist" on the command line.
+	Remove WXWIDGETS-specific code. Call term_reset() using GP_ATEXIT().
 
-        * src/wxterminal/Makefile.am:
-        * src/wxterminal/wxt_plot.h:
-        Remove the file wxt_plot.h, now unused.
+	* src/wxterminal/Makefile.am:
+	* src/wxterminal/wxt_plot.h:
+	Remove the file wxt_plot.h, now unused.
 
-        * src/wxterminal/wxt_gui.cpp (wxt_init, wxt_atexit):
-        * src/wxterminal/wxt_gui.h:
-        Use GP_ATEXIT() to register wxt_atexit().
-        Rework "persist" behaviour on Windows.
+	* src/wxterminal/wxt_gui.cpp (wxt_init, wxt_atexit):
+	* src/wxterminal/wxt_gui.h:
+	Use GP_ATEXIT() to register wxt_atexit().
+	Rework "persist" behaviour on Windows.
 
-        * configure.in:
-        * wxt_gui.cpp (wxt_atexit):
-        * wxt_gui.h:
-        Use fork() to make the "persist" behaviour satisfying on UNIX.
+	* configure.in:
+	* wxt_gui.cpp (wxt_atexit):
+	* wxt_gui.h:
+	Use fork() to make the "persist" behaviour satisfying on UNIX.
 
 2006-11-07  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-        * src/wxterminal/wxt_gui.cpp (wxtPanel::DrawToDC): Draw the zoom
-        coordinates with the same font as the plot.
+	* src/wxterminal/wxt_gui.cpp (wxtPanel::DrawToDC): Draw the zoom
+	coordinates with the same font as the plot.
 
 2006-11-04  Ethan Merritt  <merritt@u.washington.edu>
 
