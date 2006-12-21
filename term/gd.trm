@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.95.2.1 2006/10/15 20:14:09 sfeam Exp $
+ * $Id: gd.trm,v 1.95.2.2 2006/11/23 22:23:33 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -265,6 +265,12 @@ enum PNG_id {
     GIF_ANIMATE, GIF_DELAY, GIF_LOOP, GIF_NOOPT, GIF_OPT,
     PNG_OTHER
 };
+
+/* Only needed for dubious backwards compatibility with 'set size'
+ * in pre-4.0 versions that didn't support 'set term size'
+ */
+static TBOOLEAN PNG_explicit_size = FALSE;
+
 
 #ifdef Y
 #   undef Y
@@ -758,6 +764,7 @@ PNG_options()
 	    if (END_OF_COMMAND) {
 		PNG_XMAX = GREG_XMAX;
 		PNG_YMAX = GREG_YMAX;
+		PNG_explicit_size = FALSE;
 	    } else {
 		PNG_XMAX = real(const_express(&s));
 		if (equals(c_token, ",")) {
@@ -768,6 +775,7 @@ PNG_options()
 		    PNG_XMAX = GREG_XMAX;
 		if (PNG_YMAX < 0)
 		    PNG_YMAX = GREG_YMAX;
+		PNG_explicit_size = TRUE;
 	    }
 	    term->ymax = PNG_YMAX;
 	    term->xmax = PNG_XMAX;
@@ -1002,7 +1010,8 @@ PNG_options()
 	    png_state.frame_optimization ? "" : "no");
     }
 
-    sprintf(term_options + strlen(term_options),
+    if (PNG_explicit_size)
+	sprintf(term_options + strlen(term_options),
 	    "size %d,%d ", PNG_XMAX, PNG_YMAX);
 
     for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN &&
@@ -1306,20 +1315,31 @@ PNG_graphics()
 {
     int i;
     unsigned int rgb;
+    double xscale = 1.;
+    double yscale = 1.;
+
+#ifdef BACKWARDS_COMPATIBLE
+    /* We are deprecating the use of 'set size' to change the actual	*/
+    /* canvas size, in this case the size of the output file in pixels.	*/
+    if (!PNG_explicit_size) {
+	xscale *= xsize;
+	yscale *= ysize;
+    }
+#endif
 
 #if (GD2_VERS >= 2)
     /* TrueColor images default to a black background; load white instead */
     if (png_state.TrueColor) {
 	png_state.image = gdImageCreateTrueColor(
-			(int) (xsize * PNG_XMAX), (int) (ysize * PNG_YMAX));
+			(int) (xscale * PNG_XMAX), (int) (yscale * PNG_YMAX));
 	rgb = gdImageColorAllocate(png_state.image, 255, 255, 255);
 	gdImageFill(png_state.image, 1, 1, rgb);
     } else
 #endif
 	png_state.image = gdImageCreate(
-			(int) (xsize * PNG_XMAX), (int) (ysize * PNG_YMAX));
+			(int) (xscale * PNG_XMAX), (int) (yscale * PNG_YMAX));
 
-    png_state.height = (int) (ysize * PNG_YMAX - 1);
+    png_state.height = (yscale * PNG_YMAX) - 1;
     png_state.charw = term->h_char;	/* png_state.font->w; */
     png_state.charh = term->v_char;	/* png_state.font->h; */
     png_state.font = png_state.default_font;

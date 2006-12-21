@@ -1,3 +1,13 @@
+2006-12-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_graphics) docs/gnuplot.doc:
+	Announce deprecation of "set size" to control output canvas size.
+	Document the intended difference:
+		set term ... size XX,YY    controls size of canvas
+		set size XX,YY             scales relative to the canvas
+	Warn that png/gif/jpeg (and pbm pdf) terminals honor old syntax for now,
+	but will require explicit 'set term size ...' in post-4.2 versions.
+
 2006-12-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_tokenise df_parse_string): Allow for quoted
