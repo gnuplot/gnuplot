@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.162 2006/12/01 05:52:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.163 2006/12/18 01:27:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -376,7 +376,9 @@ boundary3d(struct surface_points *plots, int count)
 
     if (bmargin.scalex == screen)
 	plot_bounds.ybot = bmargin.x * (float)t->ymax + 0.5;
-    else /* FIXME: How come no provision for bmargin in characters? */
+    else if (splot_map && bmargin.x >= 0)
+	plot_bounds.ybot = (float)t->v_char * bmargin.x;
+    else
 	plot_bounds.ybot = t->v_char * 2.5 + 1;
 
     if (key_rows && (key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
@@ -2311,7 +2313,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     } /* if (draw_border) */
 
     /* In 'set view map' mode, treat grid as in 2D plots */
-    if (splot_map && current_layer != grid_layer)
+    if (splot_map && current_layer != abs(grid_layer))
 	return;
 
     /* Draw ticlabels and axis labels. x axis, first:*/
