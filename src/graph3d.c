@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.3 2006/11/16 03:04:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.4 2006/12/18 01:29:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -369,8 +369,11 @@ boundary3d(struct surface_points *plots, int count)
     /* this should also consider the view and number of lines in
      * xformat || yformat || xlabel || ylabel */
 
-    /* an absolute 1, with no terminal-dependent scaling ? */
-    plot_bounds.ybot = t->v_char * 2.5 + 1;
+    if (splot_map && bmargin >= 0)
+	plot_bounds.ybot = t->v_char * bmargin;
+    else
+	plot_bounds.ybot = t->v_char * 2.5 + 1;
+
     if (key_rows && (key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
 	&& key->margin == GPKEY_BMARGIN)
 	plot_bounds.ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
@@ -2270,7 +2273,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     } /* if (draw_border) */
 
     /* In 'set view map' mode, treat grid as in 2D plots */
-    if (splot_map && current_layer != grid_layer)
+    if (splot_map && current_layer != abs(grid_layer))
 	return;
 
     /* Draw ticlabels and axis labels. x axis, first:*/
