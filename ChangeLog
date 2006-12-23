@@ -3,6 +3,8 @@
 	* src/graph3d.c (draw_3d_graphbox): Honor 2D setting for bmargin
 	in 3D plots with "set view map".
 
+	* configure.in: I still can't spell "COMPATIBLE"
+
 2006-12-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_graphics) docs/gnuplot.doc:
