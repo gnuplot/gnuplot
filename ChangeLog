@@ -1,3 +1,7 @@
+2006-12-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Remove unused variable to quiet compiler warnings.
+
 2006-12-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (draw_3d_graphbox): Honor 2D setting for bmargin

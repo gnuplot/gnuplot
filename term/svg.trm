@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.63.2.3 2006/10/17 22:39:05 sfeam Exp $
+ * $Id: svg.trm,v 1.63.2.4 2006/11/25 03:12:22 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -940,7 +940,6 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
     if (!ENHsvg_string_state) {
 
 	while (*str) {
-	    int symb = (unsigned char) *str;
 
 	    /* Escape SVG reserved characters */
 	    switch (*str) {
@@ -951,13 +950,7 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 		fputs("&amp;", gpoutfile);
 		break;
 	    default:
-#if 0
-		/* How is this compatible with utf-8? */
-		if (SVG_escaped && (symb < ' ' || symb > '~'))
-		    fprintf(gpoutfile, "&#x%2.2x;", symb);
-		else
-#endif
-		    fputc(*str, gpoutfile);
+		fputc(*str, gpoutfile);
 		break;
 	    }
 
@@ -1227,8 +1220,6 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
 TERM_PUBLIC void
 ENHsvg_writec(int c)
 {
-    int symb = (unsigned char)c;
-
     /* Kludge for phantom box accounting */
     ENHsvg_charcount++;
 
@@ -1248,13 +1239,7 @@ ENHsvg_writec(int c)
 		*enhanced_cur_text++ = ';';
 		break;
     default:
-#if 0
-		if (SVG_escaped && (symb < ' ' || symb > '~')) {
-		    sprintf(enhanced_cur_text, "&#x%2.2x;", symb);
-		    enhanced_cur_text += 6;
-		} else
-#endif
-		    *enhanced_cur_text++ = c;
+		*enhanced_cur_text++ = c;
 		break;
     }
 }
