@@ -1,3 +1,11 @@
+2006-12-27  Daniel Sebald <daniel.sebald@ieee.org>
+
+	* src/gplt_x11.c (display): Changed "if (!plot->pixmap)"
+	to "if (plot->pixmap == None)".
+	(UpdateWindow): Made similar change to above.  Also defined out what
+	I believe is cruft and listed a date.  If it doesn't fail, someday
+	someone	will notice the message and decide to remove.
+
 2006-12-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (draw_3d_graphbox): Honor 2D setting for bmargin

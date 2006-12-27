@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.169 2006/10/13 19:50:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.170 2006/11/12 23:43:45 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1081,6 +1081,7 @@ prepare_plot(plot_struct *plot, int term_number)
 	plot->y = gY;
 	plot->width = gW;
 	plot->height = gH;
+	plot->window = None;
 	plot->pixmap = None;
 #ifdef USE_MOUSE
 	plot->gheight = gH;
@@ -1089,7 +1090,7 @@ prepare_plot(plot_struct *plot, int term_number)
 	plot->zoombox_on = FALSE;
 #endif
     }
-    if (!plot->window) {
+    if (plot->window == None) {
 	plot->cmap = current_cmap;	/* color space */
 	RecolorWindow(plot);
 	pr_window(plot);
@@ -1103,7 +1104,8 @@ prepare_plot(plot_struct *plot, int term_number)
 	plot->x = NOT_AVAILABLE;
 	plot->y = NOT_AVAILABLE;
 	if (plot->str[0] != '\0') {
-	    /* if string was non-empty last time, initialize it as almost empty: one space, to prevent window resize */
+	    /* if string was non-empty last time, initialize it as
+	     * almost empty one space, to prevent window resize */
 	    plot->str[0] = ' ';
 	    plot->str[1] = '\0';
 	}
@@ -3111,7 +3113,7 @@ display(plot_struct *plot)
     plot->py = (int) (yscale * pointsize);
 
     /* create new pixmap & GC */
-    if (!plot->pixmap) {
+    if (plot->pixmap == None) {
 	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot->plot_number, plot->width, PIXMAP_HEIGHT(plot), dep));
 	plot->pixmap = XCreatePixmap(dpy, root, plot->width, PIXMAP_HEIGHT(plot), dep);
     }
@@ -3141,7 +3143,7 @@ display(plot_struct *plot)
     XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, PIXMAP_HEIGHT(plot) + vchar);
     XSetBackground(dpy, gc, plot->cmap->colors[0]);
 
-    if (!plot->window)
+    if (plot->window == None)
 	pr_window(plot);
 
     /* top the window but don't put keyboard or mouse focus into it. */
@@ -3188,11 +3190,16 @@ UpdateWindow(plot_struct * plot)
 #ifdef USE_MOUSE
     XEvent event;
 #endif
-    if (None == plot->window) {
+/* CRUFT CHECK 17jul2006.  I added a "None == plot->pixmap"
+ * to this test because I believe it may not be necessary
+ * to do anything if there is no Pixmap yet.
+ */
+    if (None == plot->window || None == plot->pixmap) {
 	return;
     }
 
-    if (!plot->pixmap) {
+#if 0 /* START OF CRUFT */
+    if (plot->pixmap == None) {
 	/* create a black background pixmap */
 	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot->plot_number, plot->width, PIXMAP_HEIGHT(plot), dep));
 	plot->pixmap = XCreatePixmap(dpy, root, plot->width, PIXMAP_HEIGHT(plot), dep);
@@ -3206,6 +3213,8 @@ UpdateWindow(plot_struct * plot)
 	XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, PIXMAP_HEIGHT(plot) + vchar);
 	XSetBackground(dpy, gc, plot->cmap->colors[0]);
     }
+#endif /* END OF CRUFT */
+
     XSetWindowBackgroundPixmap(dpy, plot->window, plot->pixmap);
     XClearWindow(dpy, plot->window);
 
@@ -5716,7 +5725,7 @@ pr_window(plot_struct *plot)
 					   plot->width, plot->height, BorderWidth, plot->cmap->colors[1], plot->cmap->colors[0]);
 
     /* Return if something wrong. */
-    if (!plot->window)
+    if (plot->window == None)
 	return;
 
     /* ask ICCCM-compliant window manager to tell us when close window
