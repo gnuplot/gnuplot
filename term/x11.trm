@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.161 2006/10/08 21:04:26 sfeam Exp $
+ * $Id: x11.trm,v 1.162 2006/11/05 04:26:28 sfeam Exp $
  *
  */
 
@@ -388,7 +388,6 @@ X11_options()
 
 #define NOT_PROCESS_IF_DUPLICATION 1
 
-    struct value a;
     int c_title_token = 0;
     int new_term_number = 0;
     TBOOLEAN duplication = FALSE;
@@ -498,7 +497,7 @@ X11_options()
 	case X11_OTHER:
 	default:
 	    /* let gnuplot_x11 check range */
-	    new_term_number = (int) real(const_express(&a));
+	    new_term_number = int_expression();
 	    if (set_number) duplication=TRUE;
 	    set_number = TRUE;
 	    break;

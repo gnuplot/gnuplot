@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.25 2006/07/21 02:35:45 sfeam Exp $
+ * $Id: dumb.trm,v 1.26 2006/07/29 05:40:41 sfeam Exp $
  *
  */
 
@@ -133,7 +133,6 @@ TERM_PUBLIC void
 DUMB_options()
 {
     int x, y;
-    struct value a;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&DUMB_opts[0],c_token)) {
@@ -159,9 +158,9 @@ DUMB_options()
 #endif
 	case DUMB_OTHER:
 	default:
-	    x = (int) real(const_express(&a));
+	    x = int_expression();
 	    if (!END_OF_COMMAND) {
-		y = (int) real(const_express(&a));
+		y = int_expression();
 		dumb_xmax = term->xmax = x;
 		dumb_ymax = term->ymax = y;
 	    }

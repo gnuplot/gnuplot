@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.42 2006/08/04 20:31:56 sfeam Exp $
+ * $Id: emf.trm,v 1.43 2006/12/07 21:02:43 joze Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -536,9 +536,8 @@ EMF_options()
 	    continue;
 	}
 	if (equals(c_token, "lw") || almost_equals(c_token, "linew$idth")) {
-	    struct value a;
 	    c_token++;
-	    emf_linewidth_factor = real(const_express(&a));
+	    emf_linewidth_factor = real_expression();
 	    if (emf_linewidth_factor < 0.1)
 		emf_linewidth_factor = 1.0;
 	    continue;
@@ -546,13 +545,12 @@ EMF_options()
 	if (almost_equals(c_token, "si$ze")) {
 	    int tempxmax = 1024;
 	    int tempymax = 768;
-	    struct value a;
 	    c_token++;
 	    if (!END_OF_COMMAND) {
-		tempxmax = real(const_express(&a));
+		tempxmax = real_expression();
 		if (equals(c_token, ",")) {
 		    c_token++;
-		    tempymax = real(const_express(&a));
+		    tempymax = real_expression();
 		}
 	    }
 	    if (tempxmax > 0)
@@ -575,8 +573,7 @@ EMF_options()
 		strncpy(emf_defaultfontname, s, sizeof(emf_defaultfontname));
 	    free(s);
 	    if (isanumber(c_token)) {
-		struct value a;
-		emf_defaultfontsize = (int) real(const_express(&a));
+		emf_defaultfontsize = int_expression();
 	    }
 	    continue;
 	}
@@ -585,8 +582,7 @@ EMF_options()
 
     if (!END_OF_COMMAND) {
 	/* We have old-style bare font size specified */
-	struct value a;
-	emf_defaultfontsize = (int) real(const_express(&a));
+	emf_defaultfontsize = int_expression();
     }
     EMF_set_font(NULL);		/* set default font */
     

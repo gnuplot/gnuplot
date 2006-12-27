@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.69 2006/11/12 23:43:47 sfeam Exp $
+ * $Id: pdf.trm,v 1.70 2006/11/23 03:40:17 sfeam Exp $
  */
 
 /*------------------------------
@@ -300,8 +300,6 @@ PDF_DefinePatterns()
 TERM_PUBLIC void
 PDF_options ()
 {
-    struct value a;
-
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal.                  */
     if (c_token != 2)
@@ -341,7 +339,7 @@ PDF_options ()
 
 	    if (END_OF_COMMAND)
 		int_error(c_token,"fsize: expecting font size");
-	    PDF_fontSizeDef = real (const_express (&a));
+	    PDF_fontSizeDef = real_expression();
 	    continue;
 	}
 
@@ -350,7 +348,7 @@ PDF_options ()
 
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expecting line width");
-	    PDF_linewidth_factor = real (const_express (&a));
+	    PDF_linewidth_factor = real_expression();
 	    if (PDF_linewidth_factor <= 0)
 		PDF_linewidth_factor = 0.1;
 	    continue;
@@ -383,7 +381,7 @@ PDF_options ()
 	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expecting dashlength multiplier");
-	    PDF_dashlength_factor = real(const_express(&a));
+	    PDF_dashlength_factor = real_expression();
 	    if (PDF_dashlength_factor < 0.0)
 		PDF_dashlength_factor = 1.0;
 	    continue;

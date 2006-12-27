@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.205 2006/10/12 21:22:15 mikulik Exp $
+ * $Id: post.trm,v 1.206 2006/11/12 23:43:47 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -506,7 +506,6 @@ static struct gen_table PS_opts[] =
 TERM_PUBLIC void
 PS_options()
 {
-    struct value a;
     char *s;
     char *ps_fontfile_char = NULL;
     char tmp_term_options[MAX_LINE_LEN+1] = "";
@@ -790,7 +789,7 @@ PS_options()
 			  "extraneous argument in set terminal %s",term->name);
 	    set_dashlen = TRUE;
 	    c_token++;
-	    ps_params->dash_length = real(const_express(&a));
+	    ps_params->dash_length = real_expression();
 	    if (ps_params->dash_length <= 0.0)
 		ps_params->dash_length = 1.0;
 	    break;
@@ -800,7 +799,7 @@ PS_options()
 			  "extraneous argument in set terminal %s",term->name);
 	    set_linewidth = TRUE;
 	    c_token++;
-	    ps_params->linewidth_factor = real(const_express(&a));
+	    ps_params->linewidth_factor = real_expression();
 	    if (ps_params->linewidth_factor <= 0.0)
 		ps_params->linewidth_factor = 1.0;
 	    break;
@@ -954,12 +953,12 @@ PS_options()
 			  "extraneous argument in set terminal %s",term->name);
 	    set_palfunc = TRUE;
 	    ++c_token;
-	    ps_params->palfunc_samples = (int)real(const_express(&a));
+	    ps_params->palfunc_samples = int_expression();
 	    if (ps_params->palfunc_samples < 2)
 		ps_params->palfunc_samples = 2;
 	    if (!END_OF_COMMAND && equals(c_token, ",")) {
 	        ++c_token;
-		ps_params->palfunc_deviation = fabs(real(const_express(&a)));
+		ps_params->palfunc_deviation = fabs(real_expression());
 		if (ps_params->palfunc_deviation >= 1)
 		    int_error(c_token-1,"allowed deviation must be < 1");
 	    }
@@ -1014,7 +1013,7 @@ PS_options()
 			      term->name);
 		set_fontsize = TRUE;
 		/* We have font size specified */
-		ps_params->fontsize = real(const_express(&a));
+		ps_params->fontsize = real_expression();
 	    }
 	    break;
 	}

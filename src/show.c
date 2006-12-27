@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.189 2006/11/12 23:43:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.190 2006/11/13 00:01:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -191,7 +191,6 @@ show_command()
 \t'[xyz,cb]{2}[md]tics', '{[xyz]{2}}zeroaxis', '[xyz,cb]data', 'zero'";
 
     enum set_id token_found;
-    struct value a;
     int tag =0;
     char *error_message = NULL;
 
@@ -286,7 +285,7 @@ show_command()
 
 #define CHECK_TAG_GT_ZERO					\
 	if (!END_OF_COMMAND) {					\
-	    tag = real(const_express(&a));			\
+	    tag = int_expression();				\
 	    if (tag <= 0) {					\
 		error_message =  "tag must be > zero";		\
 		break;						\
@@ -1428,12 +1427,11 @@ show_format()
 static void
 show_style()
 {
-    struct value a;
     int tag = 0;
 
 #define CHECK_TAG_GT_ZERO					\
 	if (!END_OF_COMMAND) {					\
-	    tag = real(const_express(&a));			\
+	    tag = real_expression();					\
 	    if (tag <= 0)					\
 		int_error(c_token,"tag must be > zero");	\
 	}
@@ -2055,7 +2053,6 @@ static void
 show_palette_palette()
 {
     int colors, i;
-    struct value a;
     double gray;
     rgb_color rgb1;
     rgb255_color rgb255;
@@ -2065,7 +2062,7 @@ show_palette_palette()
     c_token++;
     if (END_OF_COMMAND)
 	int_error(c_token,"palette size required");
-    colors = (int) real(const_express(&a));
+    colors = int_expression();
     if (colors<2) colors = 128;
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "f$loat")) /* option: print r,g,b floats 0..1 values */

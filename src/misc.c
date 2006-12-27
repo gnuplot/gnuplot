@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.82 2006/11/12 23:43:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.83 2006/11/19 23:21:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -39,7 +39,7 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.82 2006/11/12 23:43:46 sfea
 #include "alloc.h"
 #include "command.h"
 #include "graphics.h"
-#include "parse.h"		/* for const_express() */
+#include "parse.h"		/* for const_*() */
 #include "plot.h"
 #include "tables.h"
 #include "util.h"
@@ -633,7 +633,6 @@ void
 get_filledcurves_style_options(filledcurves_opts *fco)
 {
     int p;
-    struct value a;
     p = lookup_table(&filledcurves_opts_tbl[0], c_token);
 
     if (p == FILLEDCURVES_ABOVE) {
@@ -660,14 +659,14 @@ get_filledcurves_style_options(filledcurves_opts *fco)
     if (p != FILLEDCURVES_ATXY)
 	fco->closeto += 4;
     c_token++;
-    fco->at = real(const_express(&a));
+    fco->at = real_expression();
     if (p != FILLEDCURVES_ATXY)
 	return;
     /* two values required for FILLEDCURVES_ATXY */
     if (!equals(c_token, ","))
 	int_error(c_token, "syntax is xy=<x>,<y>");
     c_token++;
-    fco->aty = real(const_express(&a));
+    fco->aty = real_expression();
     return;
 }
 
@@ -749,12 +748,10 @@ lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
 void
 lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 {
-    struct value t;
-
     if (allow_ls &&
 	(almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
 	c_token++;
-	lp_use_properties(lp, (int) real(const_express(&t)), allow_point);
+	lp_use_properties(lp, int_expression(), allow_point);
     } else {
 	/* avoid duplicating options */
 	int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0;
@@ -786,7 +783,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    c_token++;
 #endif
 		} else {
-		    int lt = real(const_express(&t));
+		    int lt = int_expression();
 		    lp->l_type = lt - 1;
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles && allow_ls)
@@ -823,7 +820,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 #endif
 		} else {
 		    lp->pm3d_color.type = TC_LT;
-		    lp->pm3d_color.lt = (int) real(const_express(&t)) - 1;
+		    lp->pm3d_color.lt = int_expression() - 1;
 		}
 		continue;
 	    }
@@ -832,7 +829,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		if (set_lw++)
 		    break;
 		c_token++;
-		lp->l_width = real(const_express(&t));
+		lp->l_width = real_expression();
 		if (lp->l_width < 0)
 		    lp->l_width = 0;
 		continue;
@@ -853,7 +850,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    if (set_pt++)
 			break;
 		    c_token++;
-		    lp->p_type = (int) real(const_express(&t)) - 1;
+		    lp->p_type = int_expression() - 1;
 		} else {
 		    int_warn(c_token, "No pointtype specifier allowed, here");
 		    c_token += 2;
@@ -873,7 +870,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 			lp->p_size = PTSZ_DEFAULT;
 			c_token++;
 		    } else {
-			lp->p_size = real(const_express(&t));
+			lp->p_size = real_expression();
 			if (lp->p_size < 0)
 			    lp->p_size = 0;
 		    }
@@ -904,7 +901,6 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 void
 parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int def_pattern, int def_bordertype)
 {
-    struct value a;
     TBOOLEAN set_fill = FALSE;
     TBOOLEAN set_param = FALSE;
     TBOOLEAN transparent = FALSE;
@@ -948,7 +944,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	    /* FIXME EAM - isanumber really means `is a positive number` */
 	    if (isanumber(c_token) ||
 		(equals(c_token, "-") && isanumber(c_token + 1))) {
-		fs->border_linetype = (int) real(const_express(&a)) - 1;
+		fs->border_linetype = int_expression() - 1;
 	    }
 	    continue;
 	} else if (almost_equals(c_token, "nobo$rder")) {
@@ -962,14 +958,14 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 
 	if (fs->fillstyle == FS_SOLID || fs->fillstyle == FS_TRANSPARENT_SOLID) {
 	    /* user sets 0...1, but is stored as an integer 0..100 */
-	    fs->filldensity = 100.0 * real(const_express(&a)) + 0.5;
+	    fs->filldensity = 100.0 * real_expression() + 0.5;
 	    if (fs->filldensity < 0)
 		fs->filldensity = 0;
 	    if (fs->filldensity > 100)
 		fs->filldensity = 100;
 	    set_param = TRUE;
 	} else if (fs->fillstyle == FS_PATTERN || fs->fillstyle == FS_TRANSPARENT_PATTERN) {
-	    fs->fillpattern = real(const_express(&a));
+	    fs->fillpattern = int_expression();
 	    if (fs->fillpattern < 0)
 		fs->fillpattern = 0;
 	    set_param = TRUE;
@@ -989,8 +985,6 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 void
 parse_colorspec(struct t_colorspec *tc, int options)
 {
-    struct value a;
-
     c_token++;
     if (END_OF_COMMAND)
 	int_error(c_token, "expected colorspec");
@@ -1008,7 +1002,7 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	if (END_OF_COMMAND)
 	    int_error(c_token, "expected linetype");
 	tc->type = TC_LT;
-	tc->lt = (int)real(const_express(&a))-1;
+	tc->lt = int_expression()-1;
 	if (tc->lt < LT_BACKGROUND) {
 	    tc->type = TC_DEFAULT;
 	    int_warn(c_token,"illegal linetype");
@@ -1019,7 +1013,7 @@ parse_colorspec(struct t_colorspec *tc, int options)
     } else if (equals(c_token,"ls") || almost_equals(c_token,"lines$tyle")) {
 	c_token++;
 	tc->type = TC_LINESTYLE;
-	tc->lt = (int)real(const_express(&a));
+	tc->lt = real_expression();
     } else if (almost_equals(c_token,"rgb$color")) {
 	char *color;
 	int rgbtriple;
@@ -1059,13 +1053,13 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expected cb value");
-	    tc->value = real(const_express(&a));
+	    tc->value = real_expression();
 	} else if (almost_equals(c_token,"frac$tion")) {
 	    tc->type = TC_FRAC;
 	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expected palette fraction");
-	    tc->value = real(const_express(&a));
+	    tc->value = real_expression();
 	    if (tc->value < 0. || tc->value > 1.0)
 		int_error(c_token, "palette fraction out of range");
 	} else {
@@ -1110,12 +1104,10 @@ arrow_parse(
     struct arrow_style_type *arrow,
     TBOOLEAN allow_as)
 {
-    struct value t;
-
     if (allow_as && (almost_equals(c_token, "arrows$tyle") ||
 		     equals(c_token, "as"))) {
 	c_token++;
-	arrow_use_properties(arrow, (int) real(const_express(&t)));
+	arrow_use_properties(arrow, int_expression());
     } else {
 	/* avoid duplicating options */
 	int set_layer=0, set_line=0, set_head=0;

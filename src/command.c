@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.144 2006/09/01 19:58:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.145 2006/10/11 21:43:50 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -578,8 +578,7 @@ raise_lower_command(int lower)
 
 	if (negative || equals(c_token, "+")) c_token++;
 	if (!END_OF_COMMAND && isanumber(c_token)) {
-	    struct value a;
-	    number = real(const_express(&a));
+	    number = real_expression();
 	    if (negative)
 	    number = -number;
 	    if (lower) {
@@ -857,7 +856,6 @@ history_command()
 	c_token = c_token_copy + 1;
 
     } else {
-	struct value a;
 	int n = 0;		   /* print only <last> entries */
 	TBOOLEAN append = FALSE;   /* rewrite output file or append it */
 	static char *name = NULL;  /* name of the output file; NULL for stdout */
@@ -870,7 +868,7 @@ history_command()
 	}
 	/* show history entries */
 	if (!END_OF_COMMAND && isanumber(c_token)) {
-	    n = (int)real(const_express(&a));
+	    n = int_expression();
 	}
 	free(name);
 	if ((name = try_to_get_string())) {
@@ -916,13 +914,12 @@ void
 if_command()
 {
     double exprval;
-    struct value t;
 
     if_depth++;
 
     if (!equals(++c_token, "("))	/* no expression */
 	int_error(c_token, "expecting (expression)");
-    exprval = real(const_express(&t));
+    exprval = real_expression();
     if (exprval != 0.0) {
 	/* fake the condition of a ';' between commands */
 	int eolpos = token[num_tokens - 1].start_index + token[num_tokens - 1].length;
@@ -1013,7 +1010,6 @@ null_command()
 void
 pause_command()
 {
-    struct value a;
     int text = 0;
     double sleep_time;
     char *buf = gp_alloc(MAX_LINE_LEN+1, "pause argument");
@@ -1073,7 +1069,7 @@ pause_command()
 	    int_warn(NO_CARET,"Mousing not active");
     } else
 #endif
-	sleep_time = real(const_express(&a));
+	sleep_time = real_expression();
 
     if (!(END_OF_COMMAND)) {
 	if (!isstring(c_token))

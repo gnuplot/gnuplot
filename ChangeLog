@@ -1,3 +1,18 @@
+2006-12-27  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/parse.c src/parse.h:  New int_expression() real_expression()
+	* src/axis.h src/command.c src/datafile.c src/hidden3d.c src/misc.c
+	src/plot2d.c src/plot3d.c src/set.c src/show.c src/term.c src/unset.c
+	term/aquaterm.trm term/dumb.trm term/emf.trm term/fig.trm term/gd.trm
+	term/pdf.trm term/post.trm term/svg.trm term/win.trm term/wxt.trm
+	term/x11.trm:
+	Clean up code by replacing constructs such as
+		struct value a;
+		...
+		i = (int)(real(const_express(&a)));
+	with
+		i = int_expression();
+
 2006-12-27  Daniel Sebald <daniel.sebald@ieee.org>
 
 	* src/gplt_x11.c (display): Changed "if (!plot->pixmap)"

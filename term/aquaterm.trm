@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.31 2006/08/03 12:35:16 persquare Exp $
+ * $Id: aquaterm.trm,v 1.32 2006/11/12 23:43:46 sfeam Exp $
  *
  */
 
@@ -166,7 +166,6 @@ static NSString* AQUA_convert_using_encoding __PROTO((const char *string));
 TERM_PUBLIC void
 AQUA_options()
 {
-  struct value a;
   char *s;
   
   AQUA_title[0] = '\0'; /* Force re-interpretation of title string */
@@ -190,14 +189,14 @@ AQUA_options()
 
 	if (END_OF_COMMAND)
 	    int_error(c_token,"expecting x size");
-	value = real(const_express (&a));
+	value = real_expression();
 	if (value < 2 || value > 2048)
 	    int_error(c_token,"x size out of range");
 	AQUA_xSize = (unsigned int) value * AQUA_RESOLUTION;
 
 	if (END_OF_COMMAND)
 	    int_error(c_token,"expecting y size");
-	value = real(const_express (&a));
+	value = real_expression();
 	if (value < 2 || value > 2048)
 	    int_error(c_token,"y size out of range");
 	AQUA_ySize = (unsigned int) value * AQUA_RESOLUTION;
@@ -224,7 +223,7 @@ AQUA_options()
 
 	if (END_OF_COMMAND)
 	    int_error(c_token,"expecting font size");
-	AQUA_fontSizeCur = real (const_express (&a));
+	AQUA_fontSizeCur = real_expression();
 	continue;
     }
 
@@ -244,7 +243,7 @@ AQUA_options()
 	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expecting dashlength multiplier");
-	    AQUA_dashlength_factor = real(const_express(&a));
+	    AQUA_dashlength_factor = real_expression();
 	    if (AQUA_dashlength_factor < 0.0)
 		AQUA_dashlength_factor = AQUA_DEFAULT_DASHLENGTH_FACTOR;
 	    continue;
@@ -265,7 +264,7 @@ AQUA_options()
     }
 
     if (isanumber(c_token)) { /* plot ref number*/
-	AQUA_plotRef = (int) real (const_express (&a));
+	AQUA_plotRef = int_expression();
 	continue;
     }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.45 2005/09/12 23:51:36 sfeam Exp $
+ * $Id: axis.h,v 1.46 2005/09/18 06:20:58 sfeam Exp $
  *
  */
 
@@ -39,7 +39,7 @@
 #include "gp_types.h"		/* for TBOOLEAN */
 
 #include "gadgets.h"
-#include "parse.h"		/* for const_express() */
+#include "parse.h"		/* for const_*() */
 #include "tables.h"		/* for the axis name parse table */
 #include "term_api.h"		/* for lp_style_type */
 #include "util.h"		/* for int_error() */
@@ -493,8 +493,7 @@ do {									\
 	    (store) = (double) gtimegm(&tm);				\
 	free(ss);							\
     } else {								\
-	struct value value;						\
-	(store) = real(const_express(&value));				\
+	(store) = real_expression();						\
     }									\
 } while(0)
 

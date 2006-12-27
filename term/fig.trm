@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.58 2006/11/18 17:24:26 sfeam Exp $
+ * $Id: fig.trm,v 1.59 2006/11/19 22:21:19 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -277,7 +277,6 @@ FIG_options()
 
     int parse_error = FALSE;
     long temp_max;
-    struct value a;
     unsigned int tmax_t;
     double xsize_t = 0, ysize_t = 0;
     char text_flags[256]; /* for description only */
@@ -360,12 +359,12 @@ FIG_options()
 	    if (END_OF_COMMAND) {
 		int_error(c_token, "size: 2 numbers expected");
 	    } else {
-		xsize_t = real(const_express(&a));
+		xsize_t = real_expression();
 		if (END_OF_COMMAND) {
 		    int_error(c_token, "size: 2 numbers expected");
 		    xsize_t = 0.;
 		} else {
-		    ysize_t = real(const_express(&a));
+		    ysize_t = real_expression();
 		}
 		if (xsize_t < 2. || ysize_t < 2. || xsize_t > 99. || ysize_t > 99.) {
 		    if (xsize_t != 0. || ysize_t != 0.)
@@ -379,7 +378,7 @@ FIG_options()
 	    if (END_OF_COMMAND) {
 		int_error(c_token, "fontsize: number expected");
 	    } else {
-		FIG_font_s = (int) real(const_express(&a));
+		FIG_font_s = int_expression();
 		if (FIG_font_s < 5 || FIG_font_s > 36) {
 		    int_error(c_token - 1, "fontsize out of range");
 		    FIG_font_s = 0;
@@ -391,7 +390,7 @@ FIG_options()
 	    if (END_OF_COMMAND) {
 		int_error(c_token, "thickness: number expected");
 	    } else {
-		FIG_default_thickness = (int) real(const_express(&a));
+		FIG_default_thickness = int_expression();
 		if (FIG_default_thickness < 1 || FIG_default_thickness > 10) {
 		    int_error(c_token - 1, "thickness out of range");
 		    FIG_default_thickness = 1;
@@ -403,7 +402,7 @@ FIG_options()
 	    if (END_OF_COMMAND) {
 		int_error(c_token, "depth: number expected");
 	    } else {
-		FIG_depth = (int) real(const_express(&a));
+		FIG_depth = int_expression();
 		if (FIG_depth < 0 || FIG_depth > 99) {
 		    int_error(c_token - 1, "depth out of range");
 		    FIG_depth = 10;
@@ -418,7 +417,7 @@ FIG_options()
 		int_error(c_token,
 			  "max. points per polyline: number expected");
 	    } else {
-		temp_max = (long) real(const_express(&a));
+		temp_max = (long) real_expression();
 		/* Now check the range for the number */
 		if ((temp_max > 1) && (temp_max < (FIG_MAX_POINTS + 2))) {
 		    /* OK. subtract one to the right number! See other numbers... */

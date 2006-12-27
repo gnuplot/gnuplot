@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.114 2006/11/04 06:02:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.115 2006/12/17 18:27:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1182,11 +1182,10 @@ df_open(const char *cmd_filename, int max_using)
 #ifdef EAM_DATASTRINGS
 	/* Take key title from column head? */
 	if (almost_equals(c_token, "t$itle")) {
-	    struct value a;
 	    c_token++;
 	    if (equals(c_token, "column") && equals(c_token+1,"(")) {
 		c_token += 2;
-		column_for_key_title = (int)real(const_express(&a));
+		column_for_key_title = int_expression();
 		c_token++;
 	    } else if (almost_equals(c_token, "col$umn")) {
 		key_title_auto_col = TRUE;
@@ -1196,7 +1195,7 @@ df_open(const char *cmd_filename, int max_using)
 		    column_for_key_title = use_spec[1].column;
 		c_token++;
 	    } else if (!END_OF_COMMAND && isanumber(c_token)) {
-		column_for_key_title = (int)real(const_express(&a));
+		column_for_key_title = int_expression();
 	    } else /* Let the general case parser handle it */
 		c_token--;
 	    break;
@@ -1373,14 +1372,12 @@ df_showdata()
 static void
 plot_option_every()
 {
-    struct value a;
-
     fast_columns = 0;           /* corey@cac */
     /* allow empty fields - every a:b:c::e we have already established
      * the defaults */
 
     if (!equals(++c_token, ":")) {
-	everypoint = (int) real(const_express(&a));
+	everypoint = int_expression();
 	if (everypoint < 1)
 	    int_error(c_token, "Expected positive integer");
     }
@@ -1388,28 +1385,28 @@ plot_option_every()
      * fails on second test, next test will succeed with correct
      * c_token */
     if (equals(c_token, ":") && !equals(++c_token, ":")) {
-	everyline = (int) real(const_express(&a));
+	everyline = int_expression();
 	if (everyline < 1)
 	    int_error(c_token, "Expected positive integer");
     }
     if (equals(c_token, ":") && !equals(++c_token, ":")) {
-	firstpoint = (int) real(const_express(&a));
+	firstpoint = int_expression();
 	if (firstpoint < 0)
 	    int_error(c_token, "Expected non-negative integer");
     }
     if (equals(c_token, ":") && !equals(++c_token, ":")) {
-	firstline = (int) real(const_express(&a));
+	firstline = int_expression();
 	if (firstline < 0)
 	    int_error(c_token, "Expected non-negative integer");
     }
     if (equals(c_token, ":") && !equals(++c_token, ":")) {
-	lastpoint = (int) real(const_express(&a));
+	lastpoint = int_expression();
 	if (lastpoint < firstpoint)
 	    int_error(c_token, "Last point must not be before first point");
     }
     if (equals(c_token, ":")) {
 	++c_token;
-	lastline = (int) real(const_express(&a));
+	lastline = int_expression();
 	if (lastline < firstline)
 	    int_error(c_token, "Last line must not be before first line");
     }
@@ -1419,8 +1416,6 @@ plot_option_every()
 static void
 plot_option_index()
 {
-    struct value a;
-
 #ifdef BINARY_DATA_FILE
     if (df_binary_file && df_matrix_file)
 	int_error(c_token, "Binary matrix file format does not allow more than one surface per file");
@@ -1430,16 +1425,16 @@ plot_option_index()
 #endif
 
     ++c_token;
-    df_lower_index = (int) real(const_express(&a));
+    df_lower_index = int_expression();
     if (equals(c_token, ":")) {
 	++c_token;
-	df_upper_index = (int) magnitude(const_express(&a));
+	df_upper_index = abs(int_expression());
 	if (df_upper_index < df_lower_index)
 	    int_error(c_token, "Upper index should be bigger than lower index");
 
 	if (equals(c_token, ":")) {
 	    ++c_token;
-	    df_index_step = (int) magnitude(const_express(&a));
+	    df_index_step = abs(int_expression());
 	    if (df_index_step < 1)
 		int_error(c_token, "Index step must be positive");
 	}
@@ -1480,8 +1475,6 @@ plot_option_using(int max_using)
 #endif
 
     if (!END_OF_COMMAND && !isstring(++c_token)) {
-	struct value a;
-
 	do {                    /* must be at least one */
 	    if (df_no_use_specs >= max_using)
 		int_error(c_token, "Too many columns in using specification");
@@ -1548,7 +1541,7 @@ plot_option_using(int max_using)
 		plot_ticlabel_using(CT_KEYLABEL);
 #endif /* EAM_DATASTRINGS */
 	    } else {
-		int col = (int) real(const_express(&a));
+		int col = int_expression();
 		
 		if (col < -2)
 		    int_error(c_token, "Column must be >= -2");
@@ -1597,7 +1590,6 @@ plot_option_using(int max_using)
 static
 void plot_ticlabel_using(int axis)
 {
-    struct value a;
     int col = 0;
     
     c_token += 2;
@@ -1607,7 +1599,7 @@ void plot_ticlabel_using(int axis)
     /* opposed to a dummy expression. This is similar to the problem with */
     /* with parsing the first argument of the plot command itself.        */
     if (isanumber(c_token) || type_udv(c_token)==INTGR) {
-	col = (int) real(const_express(&a));
+	col = int_expression();
 	use_spec[df_no_use_specs+df_no_tic_specs].at = NULL;
     } else {
 	use_spec[df_no_use_specs+df_no_tic_specs].at = perm_at();
@@ -1615,7 +1607,7 @@ void plot_ticlabel_using(int axis)
 	col = 1;
     }
 #else
-    col = (int) real(const_express(&a));
+    col = int_expression();
 #endif
 
     if (col < 1)

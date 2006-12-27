@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.51 2006/07/07 03:51:23 sfeam Exp $
+ * $Id: win.trm,v 1.52 2006/07/21 02:35:48 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -167,7 +167,6 @@ static double ENHwin_base;
 TERM_PUBLIC void
 WIN_options()
 {
-    struct value a;
     char *s;
     TBOOLEAN set_font = FALSE, set_fontsize = FALSE;
 
@@ -230,7 +229,7 @@ WIN_options()
 			      term->name);
 		set_fontsize = TRUE;
 		/* We have font size specified */
-		graphwin.fontsize = (int) real(const_express(&a));
+		graphwin.fontsize = int_expression();
 		graphwin.deffontsize = graphwin.fontsize;
 	    }
 	    break;

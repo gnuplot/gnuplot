@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.156 2006/11/12 23:43:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.157 2006/11/30 04:04:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -644,7 +644,6 @@ term_start_multiplot()
 
     /* Parse options (new in version 4.1 */
     while (!END_OF_COMMAND) {
-        struct value a;
 	char *s;
 
 	if (almost_equals(c_token, "ti$tle")) {
@@ -668,14 +667,14 @@ term_start_multiplot()
 	    }
 	    
 	    /* read row,col */
-	    mp_layout.num_rows = (int) real(const_express(&a));
+	    mp_layout.num_rows = int_expression();
 	    if (END_OF_COMMAND || !equals(c_token,",") )
 	        int_error(c_token, "expecting ', <num_cols>'");
 
 	    c_token++;
 	    if (END_OF_COMMAND)
 	        int_error(c_token, "expecting <num_cols>");
-	    mp_layout.num_cols = (int) real(const_express(&a));
+	    mp_layout.num_cols = int_expression();
 	
 	    /* remember current values of the plot size */
 	    mp_layout.prev_xsize = xsize;
@@ -712,26 +711,26 @@ term_start_multiplot()
 		break;
 	    case S_MULTIPLOT_SCALE:
 		c_token++;
-		mp_layout.xscale = real(const_express(&a));
+		mp_layout.xscale = real_expression();
 		mp_layout.yscale = mp_layout.xscale;
 		if (!END_OF_COMMAND && equals(c_token,",") ) {
 		    c_token++;
 		    if (END_OF_COMMAND) {
 		        int_error(c_token, "expecting <yscale>");
 		    }
-		    mp_layout.yscale = real(const_express(&a));
+		    mp_layout.yscale = real_expression();
 		}
 		break;
 	    case S_MULTIPLOT_OFFSET:
 		c_token++;
-		mp_layout.xoffset = real(const_express(&a));
+		mp_layout.xoffset = real_expression();
 		mp_layout.yoffset = mp_layout.xoffset;
 		if (!END_OF_COMMAND && equals(c_token,",") ) {
 		    c_token++;
 		    if (END_OF_COMMAND) {
 		        int_error(c_token, "expecting <yoffset>");
 		    }
-		    mp_layout.yoffset = real(const_express(&a));
+		    mp_layout.yoffset = real_expression();
 		}
 		break;
 	    default:
@@ -2746,11 +2745,10 @@ size_units
 parse_term_size( float *xsize, float *ysize, size_units default_units )
 {
     size_units units = default_units;
-    struct value a;
 
     if (END_OF_COMMAND)
 	int_error(c_token, "size requires two numbers:  xsize, ysize");
-    *xsize = real(const_express(&a));
+    *xsize = real_expression();
     if (almost_equals(c_token,"in$ches")) {
 	c_token++;
 	units = INCHES;
@@ -2767,7 +2765,7 @@ parse_term_size( float *xsize, float *ysize, size_units default_units )
 
     if (!equals(c_token++,","))
 	int_error(c_token, "size requires two numbers:  xsize, ysize");
-    *ysize = real(const_express(&a));
+    *ysize = real_expression();
     if (almost_equals(c_token,"in$ches")) {
 	c_token++;
 	units = INCHES;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.56 2006/03/17 15:36:26 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.57 2006/11/14 18:49:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -307,7 +307,6 @@ static int in_front __PROTO((long int edgenum,
 void
 set_hidden3doptions()
 {
-    struct value t;
     int tmp;
 
     while (!END_OF_COMMAND) {
@@ -323,7 +322,7 @@ set_hidden3doptions()
 	    break;
 	case S_HI_OFFSET:
 	    c_token++;
-	    hiddenBacksideLinetypeOffset = (int) real(const_express(&t));
+	    hiddenBacksideLinetypeOffset = int_expression();
 	    c_token--;
 	    break;
 	case S_HI_NOOFFSET:
@@ -331,12 +330,12 @@ set_hidden3doptions()
 	    break;
 	case S_HI_TRIANGLEPATTERN:
 	    c_token++;
-	    hiddenTriangleLinesdrawnPattern = (int) real(const_express(&t));
+	    hiddenTriangleLinesdrawnPattern = int_expression();
 	    c_token--;
 	    break;
 	case S_HI_UNDEFINED:
 	    c_token++;
-	    tmp = (int) real(const_express(&t));
+	    tmp = int_expression();
 	    if (tmp <= 0 || tmp > UNHANDLED)
 		tmp = UNHANDLED;
 	    hiddenHandleUndefinedPoints = tmp;

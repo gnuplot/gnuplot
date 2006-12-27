@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.99 2006/12/05 07:12:22 sfeam Exp $
+ * $Id: gd.trm,v 1.100 2006/12/09 19:32:44 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -596,7 +596,6 @@ PNG_Diamond(
 TERM_PUBLIC void
 PNG_options()
 {
-    struct value s;
     int i;
     char *string;
     unsigned long color;
@@ -767,10 +766,10 @@ PNG_options()
 		PNG_XMAX = GREG_XMAX;
 		PNG_YMAX = GREG_YMAX;
 	    } else {
-		PNG_XMAX = real(const_express(&s));
+		PNG_XMAX = real_expression();
 		if (equals(c_token, ",")) {
 		    c_token++;
-		    PNG_YMAX = real(const_express(&s));
+		    PNG_YMAX = real_expression();
 		}
 		if (PNG_XMAX < 0)
 		    PNG_XMAX = GREG_XMAX;
@@ -805,7 +804,7 @@ PNG_options()
 	    break;
 	case PNG_LINEWIDTH:
 	    c_token++;
-	    PNG_linewidth_factor = real(const_express(&s));
+	    PNG_linewidth_factor = real_expression();
 	    if (PNG_linewidth_factor < 0)
 		PNG_linewidth_factor = 1.0;
 	    break;
@@ -825,7 +824,7 @@ PNG_options()
 	    if (strncmp("gif",term->name,3))
 		int_error(c_token,"Only the gif terminal supports animation");
 	    c_token++;
-	    png_state.frame_delay = (int)real(const_express(&s));
+	    png_state.frame_delay = int_expression();
 	    if (png_state.frame_delay <= 0)
 		png_state.frame_delay = 10;
 	    gif_anim_option = 1;
@@ -834,7 +833,7 @@ PNG_options()
 	    if (strncmp("gif",term->name,3))
 		int_error(c_token,"Only the gif terminal supports animation");
 	    c_token++;
-	    png_state.loop_count = (int)real(const_express(&s));
+	    png_state.loop_count = int_expression();
 	    gif_anim_option = 1;
 	    break;
 	case GIF_NOOPT:

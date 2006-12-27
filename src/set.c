@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.239 2006/11/13 00:01:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.240 2006/12/12 05:25:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -667,7 +667,6 @@ set_arrow()
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_start = FALSE;
     TBOOLEAN set_end = FALSE;
-    struct value a;
     int save_token;
     int tag;
     
@@ -683,7 +682,7 @@ set_arrow()
 	tag = assign_arrow_tag();
 
     } else
-	tag = (int) real(const_express(&a));
+	tag = int_expression();
 
     if (tag <= 0)
 	int_error(c_token, "tag must be > 0");
@@ -869,8 +868,6 @@ set_autoscale()
 static void
 set_bars()
 {
-    struct value a;
-
     c_token++;
     if(END_OF_COMMAND) {
 	bar_size = 1.0;
@@ -884,7 +881,7 @@ set_bars()
 	bar_size = -1.0;
 	++c_token;
     } else {
-	bar_size = real(const_express(&a));
+	bar_size = real_expression();
     }
 }
 
@@ -893,8 +890,6 @@ set_bars()
 static void
 set_border()
 {
-    struct value a;
-
     c_token++;
     if(END_OF_COMMAND){
 	draw_border = 31;
@@ -914,7 +909,7 @@ set_border()
 	    lp_parse(&border_lp, TRUE, FALSE);
 	    if (save_token != c_token)
 		continue;
-	    draw_border = (int)real(const_express(&a));
+	    draw_border = int_expression();
 	}
     }
 }
@@ -924,14 +919,12 @@ set_border()
 static void
 set_boxwidth()
 {
-    struct value a;
-
     c_token++;
     if (END_OF_COMMAND) {
 	boxwidth = -1.0;
 	boxwidth_is_absolute = TRUE;
     } else {
-	boxwidth = real(const_express(&a));
+	boxwidth = real_expression();
     }
     if (END_OF_COMMAND)
 	return;
@@ -985,8 +978,6 @@ set_clip()
 static void
 set_cntrparam()
 {
-    struct value a;
-
     c_token++;
     if (END_OF_COMMAND) {
 	/* assuming same as defaults */
@@ -997,7 +988,7 @@ set_cntrparam()
 	contour_levels_kind = LEVELS_AUTO;
     } else if (almost_equals(c_token, "p$oints")) {
 	c_token++;
-	contour_pts = (int) real(const_express(&a));
+	contour_pts = int_expression();
     } else if (almost_equals(c_token, "li$near")) {
 	c_token++;
 	contour_kind = CONTOUR_KIND_LINEAR;
@@ -1024,7 +1015,7 @@ set_cntrparam()
 		int_error(c_token, "expecting discrete level");
 	    else
 		*(double *)nextfrom_dynarray(&dyn_contour_levels_list) =
-		    real(const_express(&a));
+		    real_expression();
 
 	    while(!END_OF_COMMAND) {
 		if (!equals(c_token, ","))
@@ -1032,7 +1023,7 @@ set_cntrparam()
 			      "expecting comma to separate discrete levels");
 		c_token++;
 		*(double *)nextfrom_dynarray(&dyn_contour_levels_list) =
-		    real(const_express(&a));
+		    real_expression();
 	    }
 	    contour_levels = dyn_contour_levels_list.end;
 	} else if (almost_equals(c_token, "in$cremental")) {
@@ -1040,12 +1031,12 @@ set_cntrparam()
 
 	    contour_levels_kind = LEVELS_INCREMENTAL;
 	    c_token++;
-	    contour_levels_list[i++] = real(const_express(&a));
+	    contour_levels_list[i++] = real_expression();
 	    if (!equals(c_token, ","))
 		int_error(c_token,
 			  "expecting comma to separate start,incr levels");
 	    c_token++;
-	    if((contour_levels_list[i++] = real(const_express(&a))) == 0)
+	    if((contour_levels_list[i++] = real_expression()) == 0)
 		int_error(c_token, "increment cannot be 0");
 	    if(!END_OF_COMMAND) {
 		if (!equals(c_token, ","))
@@ -1056,22 +1047,22 @@ set_cntrparam()
 		 * but 10,10,49 is four
 		 */
 		dyn_contour_levels_list.end = i;
-		contour_levels = (int) ( (real(const_express(&a))-contour_levels_list[0])/contour_levels_list[1] + 1.0);
+		contour_levels = (int) ( (real_expression()-contour_levels_list[0])/contour_levels_list[1] + 1.0);
 	    }
 	} else if (almost_equals(c_token, "au$to")) {
 	    contour_levels_kind = LEVELS_AUTO;
 	    c_token++;
 	    if(!END_OF_COMMAND)
-		contour_levels = (int) real(const_express(&a));
+		contour_levels = int_expression();
 	} else {
 	    if(contour_levels_kind == LEVELS_DISCRETE)
 		int_error(c_token, "Levels type is discrete, ignoring new number of contour levels");
-	    contour_levels = (int) real(const_express(&a));
+	    contour_levels = int_expression();
 	}
     } else if (almost_equals(c_token, "o$rder")) {
 	int order;
 	c_token++;
-	order = (int) real(const_express(&a));
+	order = int_expression();
 	if ( order < 2 || order > MAX_BSPLINE_ORDER )
 	    int_error(c_token, "bspline order must be in [2..10] range.");
 	contour_order = order;
@@ -1106,7 +1097,6 @@ set_contour()
 static void
 set_dgrid3d()
 {
-    struct value a;
     int local_vals[3];
     int i;
     TBOOLEAN was_comma = TRUE;
@@ -1124,7 +1114,7 @@ set_dgrid3d()
 	} else {
 	    if (!was_comma)
 		int_error(c_token, "',' expected");
-	    local_vals[i] = real(const_express(&a));
+	    local_vals[i] = real_expression();
 	    i++;
 	    was_comma = FALSE;
 	}
@@ -1343,8 +1333,7 @@ set_grid()
 		polar_grid_angle = 30*DEG2RAD;
 	    } else {
 		/* get radial interval */
-		struct value a;
-		polar_grid_angle = ang2rad*real(const_express(&a));
+		polar_grid_angle = ang2rad*real_expression();
 	    }
 	} else if (almost_equals(c_token,"nopo$lar")) {
 	    polar_grid_angle = 0; /* not polar grid */
@@ -1363,12 +1352,11 @@ set_grid()
     }
 
     if (!END_OF_COMMAND) {
-	struct value a;
 	int old_token = c_token;
 
 	lp_parse(&grid_lp, TRUE, FALSE);
 	if (c_token == old_token) { /* nothing parseable found... */
-	    grid_lp.l_type = real(const_express(&a)) - 1;
+	    grid_lp.l_type = int_expression() - 1;
 	}
 
 	/* probably just  set grid <linetype> */
@@ -1381,7 +1369,7 @@ set_grid()
 	    old_token = c_token;
 	    lp_parse(&mgrid_lp, TRUE, FALSE);
 	    if (c_token == old_token) {
-		mgrid_lp.l_type = real(const_express(&a)) -1;
+		mgrid_lp.l_type = int_expression() - 1;
 	    }
 	}
     }
@@ -1414,11 +1402,9 @@ set_hidden3d()
 static void
 set_historysize()
 {
-    struct value a;
-
     c_token++;
 
-    gnuplot_history_size = (int) real(const_express(&a));
+    gnuplot_history_size = int_expression();
     if (gnuplot_history_size < 0) {
 	gnuplot_history_size = 0;
     }
@@ -1431,16 +1417,15 @@ static void
 set_isosamples()
 {
     int tsamp1, tsamp2;
-    struct value a;
 
     c_token++;
-    tsamp1 = (int)magnitude(const_express(&a));
+    tsamp1 = abs(int_expression());
     tsamp2 = tsamp1;
     if (!END_OF_COMMAND) {
 	if (!equals(c_token,","))
 	    int_error(c_token, "',' expected");
 	c_token++;
-	tsamp2 = (int)magnitude(const_express(&a));
+	tsamp2 = abs(int_expression());
     }
     if (tsamp1 < 2 || tsamp2 < 2)
 	int_error(c_token, "sampling rate must be > 1; sampling unchanged");
@@ -1509,7 +1494,6 @@ set_key()
     char *hpos_warn = "Multiple horizontal position settings";
     char *reg_warn = "Multiple location region settings";
     char *sdir_warn = "Multiple stack direction settings";
-    struct value a;
     legend_key *key = &keyT;
 
     c_token++;
@@ -1681,7 +1665,7 @@ set_key()
 		int old_token = c_token;
 		lp_parse(&key->box, TRUE, FALSE);
 		if (old_token == c_token && isanumber(c_token)) {
-		    key->box.l_type = real(const_express(&a)) - 1;
+		    key->box.l_type = int_expression() - 1;
 		    c_token++;
 		}
 	    }
@@ -1692,24 +1676,24 @@ set_key()
 	    break;
 	case S_KEY_SAMPLEN:
 	    c_token++;
-	    key->swidth = real(const_express(&a));
+	    key->swidth = real_expression();
 	    c_token--; /* it is incremented after loop */
 	    break;
 	case S_KEY_SPACING:
 	    c_token++;
-	    key->vert_factor = real(const_express(&a));
+	    key->vert_factor = real_expression();
 	    if (key->vert_factor < 0.0)
 		key->vert_factor = 0.0;
 	    c_token--; /* it is incremented after loop */
 	    break;
 	case S_KEY_WIDTH:
 	    c_token++;
-	    key->width_fix = real(const_express(&a));
+	    key->width_fix = real_expression();
 	    c_token--; /* it is incremented after loop */
 	    break;
 	case S_KEY_HEIGHT:
 	    c_token++;
-	    key->height_fix = real(const_express(&a));
+	    key->height_fix = real_expression();
 	    c_token--; /* it is incremented after loop */
 	    break;
 	case S_KEY_AUTOTITLES:
@@ -1848,7 +1832,7 @@ set_label()
 	} else
 	    tag = (int) real(&a);
 #else
-	tag = (int) real(const_express(&a));
+	tag = int_expression();
 #endif
 
     } else
@@ -2050,8 +2034,7 @@ set_logscale()
 	c_token++;
 
 	if (!END_OF_COMMAND) {
-	    struct value a;
-	    newbase = magnitude(const_express(&a));
+	    newbase = abs(real_expression());
 	    if (newbase < 1.1)
 		int_error(c_token,
 			  "log base must be >= 1.1; logscale unchanged");
@@ -2099,8 +2082,6 @@ set_mapping()
 static void
 set_margin(t_position *margin)
 {
-    struct value a;
-
     margin->scalex = character;
     margin->x = -1;
     c_token++;
@@ -2111,7 +2092,7 @@ set_margin(t_position *margin)
 	margin->scalex = screen;
 	c_token++;
     }
-    margin->x = real(const_express(&a));
+    margin->x = real_expression();
     if (margin->x < 0)
 	margin->x = -1;
 }
@@ -2176,9 +2157,8 @@ set_mouse()
 
     while (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "do$ubleclick")) {
-	    struct value a;
 	    ++c_token;
-	    mouse_setting.doubleclick = real(const_express(&a));
+	    mouse_setting.doubleclick = real_expression();
 	    if (mouse_setting.doubleclick < 0)
 		mouse_setting.doubleclick = 0;
 	} else if (almost_equals(c_token, "nodo$ubleclick")) {
@@ -2261,8 +2241,7 @@ set_mouse()
 		}
 		c_token++;
 	    } else {
-		struct value a;
-		int itmp = (int) real(const_express(&a));
+		int itmp = int_expression();
 		if (itmp >= MOUSE_COORDINATES_REAL
 		    && itmp <= MOUSE_COORDINATES_XDATETIME) {
 		    if (MOUSE_COORDINATES_ALT == itmp
@@ -2296,8 +2275,7 @@ set_mouse()
 		}
 		c_token++;
 	    } else {
-		struct value a;
-		int itmp = (int) real(const_express(&a));
+		int itmp = int_expression();
 		if (itmp >= MOUSE_COORDINATES_REAL
 		    && itmp <= MOUSE_COORDINATES_XDATETIME) {
 		    if (MOUSE_COORDINATES_ALT == itmp && !mouse_alt_string) {
@@ -2357,18 +2335,16 @@ set_offsets()
 static void
 set_origin()
 {
-    struct value a;
-
     c_token++;
     if (END_OF_COMMAND) {
 	xoffset = 0.0;
 	yoffset = 0.0;
     } else {
-	xoffset = real(const_express(&a));
+	xoffset = real_expression();
 	if (!equals(c_token,","))
 	    int_error(c_token, "',' expected");
 	c_token++;
-	yoffset = real(const_express(&a));
+	yoffset = real_expression();
     }
 }
 
@@ -2493,7 +2469,6 @@ reset_palette()
 static int
 set_palette_defined()
 {
-    struct value a;
     double p=0, r=0, g=0, b=0;
     int num, named_colors=0;
     int actual_size=8;
@@ -2529,7 +2504,7 @@ set_palette_defined()
     num = -1;
 
     while (!END_OF_COMMAND) {
-	p = real(const_express(&a));
+	p = real_expression();
 	if (isstring(c_token)) {
 	    /* either color name or X-styel rgb value "#rrggbb" */
 	    char col_buf[21];
@@ -2567,11 +2542,11 @@ set_palette_defined()
 	    }
 	} else {
 	    /* numerical rgb, hsv, xyz, ... values  [0,1] */
-	    r = real(const_express(&a));
+	    r = real_expression();
 	    if (r<0 || r>1 )  int_error(c_token-1,"Value out of range [0,1].");
-	    g = real(const_express(&a));
+	    g = real_expression();
 	    if (g<0 || g>1 )  int_error(c_token-1,"Value out of range [0,1].");
-	    b = real(const_express(&a));
+	    b = real_expression();
 	    if (b<0 || b>1 )  int_error(c_token-1,"Value out of range [0,1].");
 	}
 	++num;
@@ -2790,7 +2765,7 @@ check_palette_grayscale()
 
 #define SCAN_RGBFORMULA(formula) do {								       \
     c_token++;											       \
-    i = (int) real(const_express(&a));								       \
+    i = int_expression();										       \
     if (abs(i) >= sm_palette.colorFormulae)							       \
 	int_error(c_token,									       \
 		  "color formula out of range (use `show palette rgbformulae' to display the range)"); \
@@ -2808,7 +2783,6 @@ check_palette_grayscale()
 static void
 set_palette()
 {
-    struct value a;
     int transform_defined, named_color;
     transform_defined = named_color = 0;
     c_token++;
@@ -2832,7 +2806,7 @@ set_palette()
 		continue;
 	    case S_PALETTE_GAMMA: /* "gamma" */
 		++c_token;
-		sm_palette.gamma = real(const_express(&a));
+		sm_palette.gamma = real_expression();
 		--c_token;
 		continue;
 	    case S_PALETTE_COLOR: /* "col$or" */
@@ -2902,11 +2876,10 @@ set_palette()
 		continue;
 	    /* max colors used */
 	    case S_PALETTE_MAXCOLORS: { /* "maxc$olors" */
-		struct value a;
 		int i;
 
 		c_token++;
-		i = (int)real(const_express(&a));
+		i = int_expression();
 		if (i<0) int_error(c_token,"non-negative number required");
 		sm_palette.use_maxcolors = i;
 		--c_token;
@@ -2962,8 +2935,7 @@ set_colorbox()
 
 		if (!END_OF_COMMAND) {
 		    /* expecting a border line type */
-		    struct value a;
-		    color_box.border_lt_tag = real(const_express(&a));
+		    color_box.border_lt_tag = int_expression();
 		    if (color_box.border_lt_tag <= 0) {
 			color_box.border_lt_tag = 0;
 			int_error(c_token, "tag must be strictly positive (see `help set style line')");
@@ -3037,14 +3009,13 @@ set_pm3d()
 		if (END_OF_COMMAND) {
 		    int_error(c_token, "expecting step values i,j");
 		} else {
-		    struct value a;
-		    pm3d.interp_i = real(const_express(&a));
+		    pm3d.interp_i = int_expression();
 		    if(pm3d.interp_i < 1)
 			pm3d.interp_i = 1;
 		    if (!equals(c_token,","))
 			int_error(c_token, "',' expected");
 		    c_token++;
-		    pm3d.interp_j = real(const_express(&a));
+		    pm3d.interp_j = int_expression();
 		    if (pm3d.interp_j < 1)
 			pm3d.interp_j = 1;
 		    c_token--;
@@ -3098,9 +3069,8 @@ set_pm3d()
 		continue;
 	    /* pm3d-specific hidden line overwrite */
 	    case S_PM3D_HIDDEN: { /* "hi$dden3d" */
-		struct value a;
 		c_token++;
-		pm3d.hidden3d_tag = real(const_express(&a));
+		pm3d.hidden3d_tag = int_expression();
 		--c_token;
 		if (pm3d.hidden3d_tag <= 0) {
 		    pm3d.hidden3d_tag = 0;
@@ -3184,13 +3154,11 @@ set_pm3d()
 static void
 set_pointsize()
 {
-    struct value a;
-
     c_token++;
     if (END_OF_COMMAND)
 	pointsize = 1.0;
     else
-	pointsize = real(const_express(&a));
+	pointsize = real_expression();
     if(pointsize <= 0) pointsize = 1;
 }
 
@@ -3231,7 +3199,6 @@ set_polar()
 static void
 set_object()
 {
-    struct value a;
     int tag;
 
     /* The next token must either be a tag or the object type */
@@ -3239,7 +3206,7 @@ set_object()
     if (almost_equals(c_token, "rect$angle"))
 	tag = -1; /* We'll figure out what it really is later */
     else {
-	tag = (int) real(const_express(&a));
+	tag = int_expression();
 	if (tag <= 0)
 	    int_error(c_token, "tag must be > zero");
     }
@@ -3288,7 +3255,6 @@ set_rectangle(int tag)
     t_object *this_object = NULL;
     t_object *new_obj = NULL;
     t_object *prev_object = NULL;
-    struct value a;
     TBOOLEAN got_fill = FALSE;
     TBOOLEAN got_lt = FALSE;
     TBOOLEAN got_lw = FALSE;
@@ -3427,7 +3393,7 @@ set_rectangle(int tag)
 	if (!got_lw) {
 	    if (equals(c_token,"lw") || almost_equals(c_token,"linew$idth")) {
 		c_token++;
-		lw = real(const_express(&a));
+		lw = real_expression();
 	    }
 	    if (c_token != save_token) {
 		got_lw = TRUE;
@@ -3452,16 +3418,15 @@ static void
 set_samples()
 {
     int tsamp1, tsamp2;
-    struct value a;
 
     c_token++;
-    tsamp1 = (int)magnitude(const_express(&a));
+    tsamp1 = abs(int_expression());
     tsamp2 = tsamp1;
     if (!END_OF_COMMAND) {
 	if (!equals(c_token,","))
 	    int_error(c_token, "',' expected");
 	c_token++;
-	tsamp2 = (int)magnitude(const_express(&a));
+	tsamp2 = abs(int_expression());
     }
     if (tsamp1 < 2 || tsamp2 < 2)
 	int_error(c_token, "sampling rate must be > 1; sampling unchanged");
@@ -3481,8 +3446,6 @@ set_samples()
 static void
 set_size()
 {
-    struct value s;
-
     c_token++;
     if (END_OF_COMMAND) {
 	xsize = 1.0;
@@ -3493,17 +3456,17 @@ set_size()
 	    ++c_token;
 	} else if (almost_equals(c_token,"ra$tio")) {
 	    ++c_token;
-	    aspect_ratio = real(const_express(&s));
+	    aspect_ratio = real_expression();
 	} else if (almost_equals(c_token, "nora$tio") || almost_equals(c_token, "nosq$uare")) {
 	    aspect_ratio = 0.0;
 	    ++c_token;
 	}
 
 	if (!END_OF_COMMAND) {
-	    xsize = real(const_express(&s));
+	    xsize = real_expression();
 	    if (equals(c_token,",")) {
 		c_token++;
-		ysize = real(const_express(&s));
+		ysize = real_expression();
 	    } else {
 		ysize = xsize;
 	    }
@@ -3786,7 +3749,6 @@ set_tics()
 		axis_array[i].tic_in = FALSE;
 	    ++c_token;
 	} else if (almost_equals(c_token, "sc$ale")) {
-	    struct value a;
 	    ++c_token;
 	    if (almost_equals(c_token, "def$ault")) {
 		for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
@@ -3796,10 +3758,10 @@ set_tics()
 		++c_token;
 	    } else {
 		double lticscale, lminiticscale;
-		lticscale = real(const_express(&a));
+		lticscale = real_expression();
 		if (equals(c_token, ",")) {
 		    ++c_token;
-		    lminiticscale = real(const_express(&a));
+		    lminiticscale = real_expression();
 		} else
 		    lminiticscale = 0.5 * lticscale;
 		for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
@@ -3811,10 +3773,9 @@ set_tics()
 	    axis_array[i].tic_rotate = TEXT_VERTICAL;
 	    ++c_token;
 	    if (equals(c_token, "by")) {
-		struct value a;
 		int langle;
 		++c_token;
-		langle = (int)real(const_express(&a));
+		langle = int_expression();
 		for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
 		    axis_array[i].tic_rotate = langle;
 	    }
@@ -3882,7 +3843,6 @@ set_tics()
 static void
 set_ticscale()
 {
-    struct value tscl;
     double lticscale, lminiticscale;
     unsigned int i;
 
@@ -3894,13 +3854,13 @@ set_ticscale()
 	lticscale = 1.0;
 	lminiticscale = 0.5;
     } else {
-	lticscale = real(const_express(&tscl));
+	lticscale = real_expression();
 	if (END_OF_COMMAND) {
 	    lminiticscale = lticscale*0.5;
 	} else {
 	    if (equals(c_token, ","))
 		++c_token;
-	    lminiticscale = real(const_express(&tscl));
+	    lminiticscale = real_expression();
 	}
     }
     for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
@@ -3915,14 +3875,12 @@ set_ticscale()
 static void
 set_ticslevel()
 {
-    struct value a;
-
     if (equals(++c_token, "at")) {
 	c_token++;
-	xyplane.xyplane_z = real(const_express(&a));
+	xyplane.xyplane_z = real_expression();
 	xyplane.absolute = TRUE;
     } else {
-	xyplane.ticslevel = real(const_express(&a));
+	xyplane.ticslevel = real_expression();
 	xyplane.absolute = FALSE;
     }
 }
@@ -4043,7 +4001,6 @@ set_view()
     static const char errmsg1[] = "rot_%c must be in [0:%d] degrees range; view unchanged";
     static const char errmsg2[] = "%sscale must be > 0; view unchanged";
     double local_vals[4];
-    struct value a;
 
     c_token++;
     if (equals(c_token,"map")) {
@@ -4069,7 +4026,7 @@ set_view()
 	} else {
 	    if (!was_comma)
 		int_error(c_token, "',' expected");
-	    local_vals[i] = real(const_express(&a));
+	    local_vals[i] = real_expression();
 	    i++;
 	    was_comma = FALSE;
 	}
@@ -4168,12 +4125,11 @@ set_zeroaxis(AXIS_INDEX axis)
     if (END_OF_COMMAND)
 	axis_array[axis].zeroaxis.l_type = -1;
     else {
-	struct value a;
 	int old_token = c_token;
 	axis_array[axis].zeroaxis.l_type = LT_AXIS;
 	lp_parse(&axis_array[axis].zeroaxis, TRUE, FALSE);
 	if (old_token == c_token)
-	    axis_array[axis].zeroaxis.l_type = real(const_express(&a)) - 1;
+	    axis_array[axis].zeroaxis.l_type = int_expression() - 1;
 	}
 
 }
@@ -4270,18 +4226,16 @@ set_tic_prop(AXIS_INDEX axis)
 		axis_array[axis].tic_in = FALSE;
 		++c_token;
 	    } else if (almost_equals(c_token, "sc$ale")) {
-		struct value a;
 		++c_token;
 		if (almost_equals(c_token, "def$ault")) {
 		    axis_array[axis].ticscale = 1.0;
 		    axis_array[axis].miniticscale = 0.5;
 		    ++c_token;
 		} else {
-		    axis_array[axis].ticscale = real(const_express(&a));
+		    axis_array[axis].ticscale = real_expression();
 		    if (equals(c_token, ",")) {
 			++c_token;
-			axis_array[axis].miniticscale =
-			    real(const_express(&a));
+			axis_array[axis].miniticscale = real_expression();
 		    } else
 			axis_array[axis].miniticscale =
 			    0.5 * axis_array[axis].ticscale;
@@ -4290,10 +4244,8 @@ set_tic_prop(AXIS_INDEX axis)
 		axis_array[axis].tic_rotate = TEXT_VERTICAL;
 		++c_token;
 		if (equals(c_token, "by")) {
-		    struct value a;
 		    c_token++;
-		    axis_array[axis].tic_rotate =
-			(int)real(const_express(&a));
+		    axis_array[axis].tic_rotate = int_expression();
 		}
 	    } else if (almost_equals(c_token, "noro$tate")) {
 		axis_array[axis].tic_rotate = 0;
@@ -4389,7 +4341,6 @@ set_tic_prop(AXIS_INDEX axis)
     (void) strcat(cmdptr, "t$ics");	/* MINISTRING */
 
     if (almost_equals(c_token, cmdptr)) {
-	struct value freq;
 	c_token++;
 	match = 1;
 	if (END_OF_COMMAND) {
@@ -4398,7 +4349,7 @@ set_tic_prop(AXIS_INDEX axis)
 	    axis_array[axis].minitics = MINI_DEFAULT;
 	    ++c_token;
 	} else {
-	    axis_array[axis].mtic_freq = floor(real(const_express(&freq)));
+	    axis_array[axis].mtic_freq = floor(real_expression());
 	    axis_array[axis].minitics = MINI_USER;
 	}
     }
@@ -4451,7 +4402,6 @@ set_xyzlabel(text_label *label)
 static void
 set_linestyle()
 {
-    struct value a;
     struct linestyle_def *this_linestyle = NULL;
     struct linestyle_def *new_linestyle = NULL;
     struct linestyle_def *prev_linestyle = NULL;
@@ -4463,7 +4413,7 @@ set_linestyle()
     /* get tag */
     if (!END_OF_COMMAND) {
 	/* must be a tag expression! */
-	tag = (int) real(const_express(&a));
+	tag = int_expression();
 	if (tag <= 0)
 	    int_error(c_token, "tag must be > zero");
     } else
@@ -4554,7 +4504,6 @@ delete_linestyle(struct linestyle_def *prev, struct linestyle_def *this)
 static void
 set_arrowstyle()
 {
-    struct value a;
     struct arrowstyle_def *this_arrowstyle = NULL;
     struct arrowstyle_def *new_arrowstyle = NULL;
     struct arrowstyle_def *prev_arrowstyle = NULL;
@@ -4568,7 +4517,7 @@ set_arrowstyle()
     /* get tag */
     if (!END_OF_COMMAND) {
 	/* must be a tag expression! */
-	tag = (int) real(const_express(&a));
+	tag = int_expression();
 	if (tag <= 0)
 	    int_error(c_token, "tag must be > zero");
     } else
@@ -4683,8 +4632,7 @@ load_tic_user(AXIS_INDEX axis)
 	if (!END_OF_COMMAND &&
 	    !equals(c_token, ",") &&
 	    !equals(c_token, ")")) {
-	  struct value value;
-	  ticlevel = (int) real(const_express(&value)); /* tic level */
+	  ticlevel = int_expression(); /* tic level */
 	}
 
 	/* add to list */
@@ -4774,24 +4722,22 @@ load_tic_series(AXIS_INDEX axis)
 static void
 load_offsets(double *a, double *b, double *c, double *d)
 {
-    struct value t;
-
-    *a = real(const_express(&t));	/* loff value */
+    *a = real_expression();	/* loff value */
     if (!equals(c_token, ","))
 	return;
 
     c_token++;
-    *b = real(const_express(&t));	/* roff value */
+    *b = real_expression();	/* roff value */
     if (!equals(c_token, ","))
 	return;
 
     c_token++;
-    *c = real(const_express(&t));	/* toff value */
+    *c = real_expression();	/* toff value */
     if (!equals(c_token, ","))
 	return;
 
     c_token++;
-    *d = real(const_express(&t));	/* boff value */
+    *d = real_expression();	/* boff value */
 }
 
 /* return 1 if format looks like a numeric format
@@ -4824,7 +4770,6 @@ looks_like_numeric(char *format)
  */
 static void set_nolinestyle()
 {
-    struct value a;
     struct linestyle_def *this, *prev;
     int tag;
 
@@ -4834,7 +4779,7 @@ static void set_nolinestyle()
 	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
     } else {
 	/* get tag */
-	tag = (int) real(const_express(&a));
+	tag = int_expression();
 	if (!END_OF_COMMAND)
 	    int_error(c_token, "extraneous arguments to set nolinestyle");
 	for (this = first_linestyle, prev = NULL;
@@ -4860,7 +4805,6 @@ fill_numbers_into_string(char *pattern)
     size_t output_end = 0;
 
     do {			/* loop over string/value pairs */
-	struct value a;
 	double value;
 
 	if (isstring(++c_token)) {
@@ -4872,7 +4816,7 @@ fill_numbers_into_string(char *pattern)
 	/* assume it's a numeric expression, concatenate it to output
 	 * string: parse value, enlarge output buffer, and gprintf()
 	 * it. */
-	value = real(const_express(&a));
+	value = real_expression();
 	newlen += pattern_length + 30;
 	output = gp_realloc(output, newlen, "fill_numbers next number");
 	gprintf(output + output_end, newlen - output_end,
@@ -4950,7 +4894,6 @@ new_text_label(int tag)
 void
 parse_label_options( struct text_label *this_label )
 {
-    struct value a;
     struct position pos;
     char *font = NULL;
     enum JUSTIFY just = LEFT;
@@ -5004,7 +4947,7 @@ parse_label_options( struct text_label *this_label )
 		set_rot = TRUE;
 		if (equals(c_token, "by")) {
 		    c_token++;
-		    rotate = (int)real(const_express(&a));
+		    rotate = int_expression();
 		}
 		continue;
 	    } else if (almost_equals(c_token, "norot$ate")) {
@@ -5142,7 +5085,6 @@ parse_histogramstyle( histogram_style *hs,
 		t_histogram_type def_type,
 		int def_gap)
 {
-    struct value a;
     text_label title_specs = EMPTY_LABELSTRUCT;
 
     /* Set defaults */
@@ -5170,7 +5112,7 @@ parse_histogramstyle( histogram_style *hs,
 	    c_token++;
 	} else if (equals(c_token, "gap")) {
 	    if (isanumber(++c_token))
-		hs->gap = (int)real(const_express(&a));
+		hs->gap = int_expression();
 	    else
 		int_error(c_token,"expected gap value");
 	} else if (almost_equals(c_token, "ti$tle")) {
@@ -5183,7 +5125,7 @@ parse_histogramstyle( histogram_style *hs,
 	} else if ((equals(c_token,"lw") || almost_equals(c_token,"linew$idth"))
 		  && (hs->type == HT_ERRORBARS)) {
 	    c_token++;
-	    hs->bar_lw = real(const_express(&a));
+	    hs->bar_lw = real_expression();
 	    if (hs->bar_lw < 0)
 		hs->bar_lw = 0;
 	} else

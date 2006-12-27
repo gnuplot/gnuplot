@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.99 2006/06/29 19:36:44 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.100 2006/10/21 22:58:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -554,7 +554,6 @@ unset_angles()
 static void
 unset_arrow()
 {
-    struct value a;
     struct arrow_def *this_arrow;
     struct arrow_def *prev_arrow;
     int tag;
@@ -565,7 +564,7 @@ unset_arrow()
 	    delete_arrow((struct arrow_def *) NULL, first_arrow);
     } else {
 	/* get tag */
-	tag = (int) real(const_express(&a));
+	tag = int_expression();
 	if (!END_OF_COMMAND)
 	    int_error(c_token, "extraneous arguments to unset arrow");
 	for (this_arrow = first_arrow, prev_arrow = NULL;
@@ -905,7 +904,6 @@ unset_keytitle()
 static void
 unset_label()
 {
-    struct value a;
     struct text_label *this_label;
     struct text_label *prev_label;
     int tag;
@@ -916,7 +914,7 @@ unset_label()
 	    delete_label((struct text_label *) NULL, first_label);
     } else {
 	/* get tag */
-	tag = (int) real(const_express(&a));
+	tag = int_expression();
 	if (!END_OF_COMMAND)
 	    int_error(c_token, "extraneous arguments to unset label");
 	for (this_label = first_label, prev_label = NULL;
@@ -957,7 +955,6 @@ delete_label(struct text_label *prev, struct text_label *this)
 static void
 unset_object()
 {
-    struct value a;
     struct object *this_object;
     struct object *prev_object;
     int tag;
@@ -968,7 +965,7 @@ unset_object()
 	    delete_object((struct object *) NULL, first_object);
     } else {
 	/* get tag */
-	tag = (int) real(const_express(&a));
+	tag = int_expression();
 	if (!END_OF_COMMAND)
 	    int_error(c_token, "extraneous arguments to unset rectangle");
 	for (this_object = first_object, prev_object = NULL;

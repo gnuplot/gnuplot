@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.137 2006/11/16 05:58:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.138 2006/11/16 22:17:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1612,11 +1612,10 @@ eval_plots()
                  */
                 if (this_plot->plot_style == CANDLESTICKS) {
                     if (almost_equals(c_token,"whisker$bars")) {
-			struct value a;
                         this_plot->arrow_properties.head = BOTH_HEADS;
                         c_token++;
 			if (isanumber(c_token) || type_udv(c_token))
-			    this_plot->arrow_properties.head_length = real(const_express(&a));
+			    this_plot->arrow_properties.head_length = real_expression();
                     }
                 }
 
@@ -1731,14 +1730,10 @@ eval_plots()
 #ifdef BACKWARDS_COMPATIBLE
                 /* allow old-style syntax - ignore case lt 3 4 for example */
                 if (!END_OF_COMMAND && isanumber(c_token)) {
-                    struct value t;
                     this_plot->lp_properties.l_type =
-                        this_plot->lp_properties.p_type =
-                        (int) real(const_express(&t)) - 1;
-
+                        this_plot->lp_properties.p_type = int_expression() - 1;
                     if (isanumber(c_token))
-                        this_plot->lp_properties.p_type =
-                            (int) real(const_express(&t)) - 1;
+                        this_plot->lp_properties.p_type = int_expression() - 1;
                 }
 #endif /* BACKWARDS_COMPATIBLE */
 

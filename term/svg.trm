@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.75 2006/11/22 05:24:45 sfeam Exp $
+ * $Id: svg.trm,v 1.76 2006/11/30 04:04:18 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -387,8 +387,6 @@ SVG_MoveForced(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 SVG_options ()
 {
-    struct value a;
-
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal settings.         */
     if (c_token != 2)
@@ -402,7 +400,7 @@ SVG_options ()
 
 	    if (END_OF_COMMAND)
 		int_error(c_token,"expecting x size");
-	    value = real(const_express (&a));
+	    value = real_expression();
 	    if (value < 2 || value > 8192)
 		int_error(c_token,"x size out of range");
 	    SVG_xSize = value * SVG_SCALE;
@@ -411,7 +409,7 @@ SVG_options ()
 		c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token,"expecting y size");
-	    value = real(const_express (&a));
+	    value = real_expression();
 	    if (value < 2 || value > 8192)
 		int_error(c_token,"y size out of range");
 	    SVG_ySize = value * SVG_SCALE;
@@ -464,7 +462,7 @@ SVG_options ()
 
 	    if (END_OF_COMMAND)
 		int_error(c_token,"fsize: expecting font size");
-	    SVG_fontSizeDef = real (const_express (&a));
+	    SVG_fontSizeDef = real_expression();
 	    continue;
 	}
 
@@ -490,7 +488,7 @@ SVG_options ()
 
 	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw")) {
 	    c_token++;
-	    SVG_linewidth_factor = real(const_express(&a));
+	    SVG_linewidth_factor = real_expression();
 	    if (SVG_linewidth_factor <= 0.0)
 		SVG_linewidth_factor = 1.0;
 	    continue;

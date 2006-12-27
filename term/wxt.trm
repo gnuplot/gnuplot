@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.16 2006/07/24 17:13:25 tlecomte Exp $
+ * $Id: wxt.trm,v 1.17 2006/09/15 14:09:36 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -107,7 +107,6 @@ static struct gen_table wxt_opts[] = {
 * term_options[] is used by the save command.  Use options_null() if no options are available." */
 TERM_PUBLIC void wxt_options()
 {
-	struct value a;
 	char *s = NULL;
 	char *font_setting = NULL;
 	int sep;
@@ -209,7 +208,7 @@ TERM_PUBLIC void wxt_options()
 			break;
 		case WXT_OTHER:
 		default:
-			wxt_window_number = (int) real(const_express(&a));
+			wxt_window_number = int_expression();
 			if (set_number) duplication=TRUE;
 			set_number = TRUE;
 			/*int_error(c_token, "unrecognized terminal option");*/

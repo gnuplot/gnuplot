@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.47 2006/07/08 16:59:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.48 2006/10/21 04:32:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -94,6 +94,23 @@ static void
 convert(struct value *val_ptr, int t_num)
 {
     *val_ptr = token[t_num].l_val;
+}
+
+
+int
+int_expression()
+{
+    return (int)real_expression();
+}
+
+double
+real_expression()
+{
+   double result;
+   struct value a;
+   result = real(const_express(&a));
+   gpfree_string(&a);
+   return result;
 }
 
 
@@ -869,7 +886,6 @@ check_for_iteration()
     iteration_udv = NULL;
     iteration_increment = 1;
     if (equals(c_token, "for")) {
-	struct value a;
 	char *errormsg = "Expecting iterator of the form: for [<var> = <start> : <end>]";
 	c_token++;
 	if (!equals(c_token++, "["))
@@ -877,13 +893,13 @@ check_for_iteration()
 	iteration_udv = add_udv(c_token++);
 	if (!equals(c_token++, "="))
 	    int_error(c_token, errormsg);
-	iteration_start = (int) real(const_express(&a));
+	iteration_start = int_expression();
 	if (!equals(c_token++, ":"))
 	    int_error(c_token, errormsg);
-	iteration_end = (int) real(const_express(&a));
+	iteration_end = int_expression();
 	if (equals(c_token,":")) {
 	    c_token++;
-	    iteration_increment = (int) real(const_express(&a));
+	    iteration_increment = int_expression();
 	    if (iteration_increment <= 0)
 		iteration_increment = 1;
 	}
