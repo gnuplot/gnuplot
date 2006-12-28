@@ -328,7 +328,7 @@ print "\'array\' but does not generate coordinates.  The command is"
 print "displayed on the graph."
 print ""
 set title "2d binary data example where record length is part of command"
-splot 'scatter2.bin' binary endian=little record=30,30,29,26 using 1:2:3
+splot 'scatter2.bin' binary endian=little record=30:30:29:26 using 1:2:3
 pause -1 "Hit return to continue"
 reset
 
@@ -366,20 +366,20 @@ set origin 0.0,0.47
 unset key
 set label 1 "If plots in columns match, your compiler is little endian" at 100,1200,3.0 center
 set title 'Little endian' offset 0,-0.5
-splot 'scatter2.bin' binary record=30,30,29,26 endian=little using 1:2:3
+splot 'scatter2.bin' binary record=30:30:29:26 endian=little using 1:2:3
 unset label 1
 set size 0.5,0.48
 set origin 0.5,0.47
 set title 'Big endian'
-splot 'scatter2.bin' binary record=30,30,29,26 endian=big using 1:2:3
+splot 'scatter2.bin' binary record=30:30:29:26 endian=big using 1:2:3
 set size 0.5,0.48
 set origin 0.0,0.0
 set title 'Default'
-splot 'scatter2.bin' binary record=30,30,29,26 endian=default using 1:2:3
+splot 'scatter2.bin' binary record=30:30:29:26 endian=default using 1:2:3
 set size 0.5,0.48
 set origin 0.5,0.0
 set title 'Swapped'
-splot 'scatter2.bin' binary record=30,30,29,26 endian=swap using 1:2:3
+splot 'scatter2.bin' binary record=30:30:29:26 endian=swap using 1:2:3
 unset multiplot
 pause -1 "Hit return to continue"
 reset
@@ -506,7 +506,7 @@ set title "2d binary data example where x coordinate is ignored then generated"
 set xrange [20:100]
 set yrange [0:800]
 set zrange [0.2:1.8]
-splot 'scatter2.bin' binary endian=little record=30,30,29,26 origin=(25,0,0),(50,0,0),(75,0,0),(100,0,0) format='%f%f' using (0):2:3
+splot 'scatter2.bin' binary endian=little record=30:30:29:26 origin=(25,0,0):(50,0,0):(75,0,0):(100,0,0) format='%f%f' using (0):2:3
 pause -1 "Hit return to continue"
 reset
 
@@ -521,7 +521,7 @@ set title "The key word \'skip\' used to ignore some data"
 set xrange [20:100]
 set yrange [0:800]
 set zrange [0.2:1.8]
-splot 'scatter2.bin' binary endian=little record=30,26 skip=360,348 origin=(50,0,0),(100,0,0) format='%f%f' using (0):2:3
+splot 'scatter2.bin' binary endian=little record=30:26 skip=360:348 origin=(50,0,0):(100,0,0) format='%f%f' using (0):2:3
 pause -1 "Hit return to continue"
 reset
 

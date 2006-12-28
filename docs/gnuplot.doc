@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.5 2006/11/02 04:13:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.6 2006/12/21 20:32:50 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3390,9 +3390,9 @@ C ... and restart the table:
  `array=10x20` means the underlying sampling structure is two-dimensional with
  10 points along the first (x) dimension and 20 points along the second (y)
  dimension.  A special "number", `Inf`, can be used to indicate that data should
- be read until the end of file.  A comma can be used to separate the dimensions
- for multiple records.  For example, `array=25,35` indicates there are two
- one-dimensional records within the file.  The comma behavior applies to the
+ be read until the end of file.  A colon can be used to separate the dimensions
+ for multiple records.  For example, `array=25:35` indicates there are two
+ one-dimensional records within the file.  The colon behavior applies to the
  remaining keywords in this list for which it makes sense to be associated with
  individual records.
 
@@ -3527,7 +3527,7 @@ C ... and restart the table:
  To position the array somewhere else on the graph, the `origin` keyword directs
  gnuplot to position the lower left point of the array at a point specified by a
  tuple.  The tuple should be a double for `plot` and a triple for `splot`.
- For example, `origin=(100,100),(100,200)` is for two records in the file and
+ For example, `origin=(100,100):(100,200)` is for two records in the file and
  intended for plotting in two dimensions. A second example, `origin=(0,0,3.5)`,
  is for plotting in three dimensions.
 6 center
@@ -3587,13 +3587,13 @@ C ... and restart the table:
        # at top left corner) translates to the Cartesian plane.  Pixel
        # spacing is given and there are two images in the file.  One of them
        # is translated via origin.
-       plot '<file_name>' binary array=512x1024,1024x512 format='%uchar' \
-            dx=2,1 dy=1,2 origin=(0,0),(1024,1024) flipy u 1:2:3 w rgbimage
+       plot '<file_name>' binary array=512x1024:1024x512 format='%uchar' \
+            dx=2:1 dy=1:2 origin=(0,0):(1024,1024) flipy u 1:2:3 w rgbimage
 
        # Four separate records in which the coordinates are part of the
        # data file.  The file was created with a endianess different from
        # the system on which gnuplot is running.
-       splot '<file_name>' binary record=30,30,29,26 endian=swap u 1:2:3
+       splot '<file_name>' binary record=30:30:29:26 endian=swap u 1:2:3
 
  See also `binary matrix`.
 4 every

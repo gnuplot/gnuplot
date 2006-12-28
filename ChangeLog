@@ -1,3 +1,21 @@
+2006-12-28  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/datafile.c (isanumber_pn, isatuple, token2double):
+	Removed these functions as they repeat behavior of and somewhat
+	inconsistent with real(const_express()).
+	(plot_option_array): Use : instead of , for separator between elements.
+	(token2tuple): Use real(const_express()) to parse image parameters.
+	This allows variables to be used in image specs.
+	(plot_option_comma_separated): Changed "comma_separated" to
+	"multivalued" everywhere.  Changed the separator to a colon rather than
+	a comma since the comma conflicts with the separator between multiple
+	plots within a plot command.  The colon is also more consistent with the
+	separator used in other commands like "using".
+
+	* demo/image.dem: Replaced , with : in appropriate places.
+
+	Bug #1590658
+
 2006-12-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Remove unused variable to quiet compiler warnings.

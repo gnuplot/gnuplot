@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.4 2006/11/04 06:22:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.5 2006/12/17 18:26:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -340,14 +340,11 @@ static void plot_option_binary __PROTO((TBOOLEAN));
 static void plot_option_array __PROTO((void));
 static TBOOLEAN rotation_matrix_2D __PROTO((double R[][2], double));
 static TBOOLEAN rotation_matrix_3D __PROTO((double P[][3], double *));
-static int isanumber_pn __PROTO((int));
-static int isatuple __PROTO((int));
-static int token2double __PROTO((int, double *));
-static int token2tuple __PROTO((int, double *, int));
+static int token2tuple __PROTO((double *, int));
 static void df_determine_matrix_info __PROTO((FILE *));
 static void df_swap_bytes_by_endianess __PROTO((char *, int, int));
 
-typedef enum df_comma_separated_type {
+typedef enum df_multivalue_type {
     DF_DELTA,
     DF_FLIP_AXIS,
     DF_FLIP,
@@ -357,8 +354,8 @@ typedef enum df_comma_separated_type {
     DF_ROTATION,
     DF_PERPENDICULAR,
     DF_SKIP
-} df_comma_separated_type;
-static void plot_option_comma_separated __PROTO((df_comma_separated_type,int));
+} df_multivalue_type;
+static void plot_option_multivalued __PROTO((df_multivalue_type,int));
 
 char *df_endian[DF_ENDIAN_TYPE_LENGTH] = {
     "little",
@@ -3360,7 +3357,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 	if (equals(c_token, "dx") || equals(c_token, "dt")) {
 	    if (set_dx) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_DELTA, 0);
+	    plot_option_multivalued(DF_DELTA, 0);
 	    if (!set_dy) {
 		int i;
 		for (i = 0; i < df_num_bin_records; i++)
@@ -3380,7 +3377,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 	    if (!set_array && !df_bin_record)
 		int_error(c_token, "Must specify a sampling array size before indicating spacing in second dimension");
 	    c_token++;
-	    plot_option_comma_separated(DF_DELTA, 1);
+	    plot_option_multivalued(DF_DELTA, 1);
 	    if (!set_dz) {
 		int i;
 		for (i = 0; i < df_num_bin_records; i++)
@@ -3396,7 +3393,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 	    if (!set_array && !df_bin_record)
 		int_error(c_token, "Must specify a sampling array size before indicating spacing in third dimension");
 	    c_token++;
-	    plot_option_comma_separated(DF_DELTA, 2);
+	    plot_option_multivalued(DF_DELTA, 2);
 	    set_dz = TRUE;
 	    continue;
 	}
@@ -3415,7 +3412,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 		for (i = 0; i < df_num_bin_records; i++)
 		    df_bin_record[i].cart_dir[0] = -1;
 	    } else {
-		plot_option_comma_separated(DF_FLIP_AXIS, 0);
+		plot_option_multivalued(DF_FLIP_AXIS, 0);
 	    }
 	    set_flipx = TRUE;
 	    continue;
@@ -3436,7 +3433,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 		for (i = 0; i < df_num_bin_records; i++)
 		    df_bin_record[i].cart_dir[1] = -1;
 	    } else {
-		plot_option_comma_separated(DF_FLIP_AXIS, 1);
+		plot_option_multivalued(DF_FLIP_AXIS, 1);
 	    }
 	    set_flipy = TRUE;
 	    continue;
@@ -3458,7 +3455,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 		for (i=0; i < df_num_bin_records; i++)
 		    df_bin_record[i].cart_dir[2] = -1;
 	    } else {
-		plot_option_comma_separated(DF_FLIP_AXIS, 2);
+		plot_option_multivalued(DF_FLIP_AXIS, 2);
 	    }
 	    set_flipz = TRUE;
 	    continue;
@@ -3468,7 +3465,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 	if (equals(c_token, "flip")) {
 	    if (set_flip) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_FLIP, -1);
+	    plot_option_multivalued(DF_FLIP, -1);
 	    set_flip = TRUE;
 	    continue;
 	}
@@ -3477,7 +3474,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 	if (equals(c_token, "noflip")) {
 	    if (set_noflip) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_FLIP, 1);
+	    plot_option_multivalued(DF_FLIP, 1);
 	    set_noflip = TRUE;
 	    continue;
 	}
@@ -3486,7 +3483,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 	if (equals(c_token, "scan")) {
 	    if (set_scan) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_SCAN, 0);
+	    plot_option_multivalued(DF_SCAN, 0);
 	    set_scan = TRUE;
 	    continue;
 	}
@@ -3508,7 +3505,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 		int_error(c_token, origin_and_center_conflict_message);
 	    if (set_origin) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_ORIGIN, df_plot_mode);
+	    plot_option_multivalued(DF_ORIGIN, df_plot_mode);
 	    set_origin = TRUE;
 	    continue;
 	}
@@ -3519,7 +3516,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 		int_error(c_token, origin_and_center_conflict_message);
 	    if (set_center) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_CENTER, df_plot_mode);
+	    plot_option_multivalued(DF_CENTER, df_plot_mode);
 	    set_center = TRUE;
 	    continue;
 	}
@@ -3528,7 +3525,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 	if (almost_equals(c_token, "rot$ation") || almost_equals(c_token, "rot$ate")) {
 	    if (set_rotation) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_ROTATION, 0);
+	    plot_option_multivalued(DF_ROTATION, 0);
 	    set_rotation = TRUE;
 	    continue;
 	}
@@ -3539,7 +3536,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 		int_error(c_token, "Key word `perpendicular` is not allowed with `plot` command");
 	    if (set_perpendicular) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_PERPENDICULAR, 0);
+	    plot_option_multivalued(DF_PERPENDICULAR, 0);
 	    set_perpendicular = TRUE;
 	    continue;
 	}
@@ -3548,7 +3545,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 	if (almost_equals(c_token, "skip")) {
 	    if (set_skip) { duplication=TRUE; break; }
 	    c_token++;
-	    plot_option_comma_separated(DF_SKIP, 0);
+	    plot_option_multivalued(DF_SKIP, 0);
 	    set_skip = TRUE;
 	    continue;
 	}
@@ -3693,6 +3690,10 @@ clear_binary_records(df_records_type records_type)
 }
 
 
+#define TUPLE_SEPARATOR_CHAR ":"
+#define LEFT_TUPLE_CHAR "("   /* Parser problems with (#,#) considered complex. */
+#define RIGHT_TUPLE_CHAR ")"
+
 static void
 plot_option_array(void)
 {
@@ -3739,7 +3740,7 @@ plot_option_array(void)
 		     || !strncasecmp(token_string, "Inf", 3)))
 		break;
 
-	    if (*token_string == ',') {
+	    if (!strcmp(token_string, TUPLE_SEPARATOR_CHAR)) {
 		i_dimension = 0;
 		token_string++;
 		expecting_number = TRUE;
@@ -3766,7 +3767,7 @@ plot_option_array(void)
 		    int_error(c_token, "Currently do not support sampled array dimensions greater than 2");
 #else
 		/* Dimension symbol or comma required. */
-		int_error(c_token, "Use ',' between records or 'x' between dimensions");
+		int_error(c_token, "Use '" TUPLE_SEPARATOR_CHAR "' between records or 'x' between dimensions");
 #endif
 	    }
 
@@ -3799,131 +3800,51 @@ plot_option_array(void)
 }
 
 
-
-/* Check if positive or negative number.
- *
- *   -1 - negative number.
- *    0 - not a number.
- *    1 - positive number.
- */
+/* Evaluate a tuple of up to specified dimension. */
 int
-isanumber_pn(int c_tok)
+token2tuple(double *tuple, int dimension)
 {
-    if (equals(c_tok, "-"))
-	return (-1*isanumber(c_tok + 1));
-    else if (equals(c_tok, "+"))
-	return (isanumber(c_tok + 1));
-    else
-	return (isanumber(c_tok));
-}
-
-
-#define LEFT_TUPLE_CHAR "("   /* Parser problems with (#,#) considered complex. */
-#define RIGHT_TUPLE_CHAR ")"
-
-/* Check if a valid tuple.
- *
- *    0 - not a tuple.
- *    N - a valid tuple of dimension N.
- */
-int
-isatuple(int c_tok)
-{
-    if (equals(c_tok, LEFT_TUPLE_CHAR)) {
-
+    if (equals(c_token, LEFT_TUPLE_CHAR)) {
 	TBOOLEAN expecting_number = TRUE;
 	int N = 0;
 
-	c_tok++;
-	while (!END_OF_COMMAND) {
-	    if (expecting_number && isanumber_pn(c_tok)) {
-		N++;
-		if (equals(c_tok, "-") || equals(c_tok, "+")) c_tok++;
-		c_tok++;
-		expecting_number = FALSE;
-	    } else if (!expecting_number && equals(c_tok, ",")) {
-		c_tok++;
-		expecting_number = TRUE;
-	    } else if (!expecting_number && equals(c_tok, RIGHT_TUPLE_CHAR)) {
-		return N;
-	    } else {
-		return 0;
-	    }
-	}
-
-    }
-
-    return 0;
-}
-
-/* Evaluate a positive or negative number. Return token past tokens used. */
-int
-token2double(int c_tok, double *value)
-{
-    int negative = equals(c_tok, "-");
-
-    if (negative || equals(c_tok, "+")) c_tok++;
-    copy_str(df_format, c_tok, MAX_LINE_LEN);
-    c_tok++;
-    sscanf(df_format,"%lf",value);
-
-    if (negative)
-	*value = -*value;
-    return c_tok;
-}
-
-
-/* Evaluate a tuple of specified dimension. */
-int
-token2tuple(int c_tok, double *tuple, int dimension)
-{
-    if (equals(c_tok, LEFT_TUPLE_CHAR)) {
-	TBOOLEAN expecting_number = TRUE;
-	int N = 0;
-
-	c_tok++;
+	c_token++;
 	while (!END_OF_COMMAND) {
 	    if (expecting_number) {
-		if (isanumber_pn(c_tok)) {
-		    N++;
-		    if (N <= dimension) {
-			c_tok = token2double(c_tok, tuple);
-			tuple++;
-		    } else {
-			if (equals(c_tok, "-") || equals(c_tok, "+")) c_tok++;
-			c_tok++;
-		    }
-		    expecting_number = FALSE;
-		} else {
-		    int_error(c_tok, "Expecting a number");
-		}
+		struct value a;
+		double x;
+
+		x = real(const_express(&a));
+		N++;
+		if (N <= dimension)
+		    *tuple++ = x;
+		else
+		    int_error(c_token-1, "More than %d elements", N);
+		expecting_number = FALSE;
 	    } else {
-		if (equals(c_tok, ",")) {
-		    c_tok++;
+		if (equals(c_token, ",")) {
+		    c_token++;
 		    expecting_number = TRUE;
-		} else if (equals(c_tok, RIGHT_TUPLE_CHAR)) {
-		    c_tok++;
-		    break;
-		} else {
-		    int_error(c_tok, "Expecting ',' or '" RIGHT_TUPLE_CHAR "'");
-		}
+		} else if (equals(c_token, RIGHT_TUPLE_CHAR)) {
+		    c_token++;
+		    return N;
+		} else
+		    int_error(c_token, "Expecting ',' or '" RIGHT_TUPLE_CHAR "'");
 	    }
 	}
     }
 
-    return c_tok;
+    /* Not a tuple */
+    return 0;
 }
 
 
 /* Determine the 2D rotational matrix from the "rotation" qualifier. */
 void
-plot_option_comma_separated(df_comma_separated_type type, int arg)
+plot_option_multivalued(df_multivalue_type type, int arg)
 {
-    TBOOLEAN first_number = TRUE;  /* Set true to make sure a number (or tuple) appears first. */
-    TBOOLEAN comma_previous = FALSE;
     int bin_record_count = 0;
     int test_val;
-
 #if EQUAL_SYMBOL_NOT_REQUIRED
     /* Ignore or do not require equal symbol. */
     if (equals(c_token, "=")) c_token++;
@@ -3935,11 +3856,13 @@ plot_option_comma_separated(df_comma_separated_type type, int arg)
 #endif
 
     while (!END_OF_COMMAND) {
+	double tuple[3];
+
 	switch (type) {
 	    case DF_ORIGIN:
 	    case DF_CENTER:
 	    case DF_PERPENDICULAR:
-		test_val = isatuple(c_token);
+		test_val = token2tuple(tuple, sizeof(tuple)/sizeof(tuple[0]));
 		break;
 	    case DF_SCAN:
 	    case DF_FLIP:
@@ -3947,19 +3870,17 @@ plot_option_comma_separated(df_comma_separated_type type, int arg)
 		copy_str(df_format, c_token, MAX_LINE_LEN);
 		test_val = ( (strlen(df_format) == strspn(df_format, "xXyYzZ")) || (strlen(df_format) == strspn(df_format, "tTrRzZ")) );
 		break;
-	    default:
-		test_val = isanumber_pn(c_token);
+	    default: {
+		/* Check if a valid number. */
+		struct value a;
+		tuple[0] = real(const_express(&a));
+		test_val = 1;
+	    }
 	}
 
 	if (test_val) {
 	    char const * cannot_flip_msg
 		= "Cannot flip a non-existent dimension";
-	    double dval;
-
-	    if (!first_number && !comma_previous)
-		int_error(c_token, "Comma required between numbers");
-
-	    first_number = FALSE;
 
 	    if (bin_record_count >= df_num_bin_records)
 		int_error(c_token, "\
@@ -3969,8 +3890,7 @@ More parameters specified than data records specified");
 		case DF_DELTA:
 		    /* Set the spacing between grid points in the
 		     * specified dimension. */
-		    c_token = token2double(c_token,
-				   df_bin_record[bin_record_count].cart_delta + arg);
+		    *(df_bin_record[bin_record_count].cart_delta + arg) = tuple[0];
 		    if (df_bin_record[bin_record_count].cart_delta[arg] <= 0)
 			int_error(c_token - 2, "\
 Sample period must be positive. Try `flip` for changing direction");
@@ -3979,11 +3899,10 @@ Sample period must be positive. Try `flip` for changing direction");
 		case DF_FLIP_AXIS:
 		    /* Set the direction of grid points increment in
 		     * the specified dimension. */
-		    c_token = token2double(c_token, &dval);
 		    if (df_bin_record[bin_record_count].cart_dim[0] > 0) {
-			if (dval == 0.0)
+			if (tuple[0] == 0.0)
 			    df_bin_record[bin_record_count].cart_dir[arg] = 0;
-			else if (dval == 1.0)
+			else if (tuple[0] == 1.0)
 			    df_bin_record[bin_record_count].cart_dir[arg] = 1;
 			else
 			    int_error(c_token-1, "\
@@ -4023,7 +3942,6 @@ Invalid character in dimension string. Only x, X, y, Y, z, or Z acceptable");
 		    break;
 		
 		case DF_SCAN: {
-
 		    /* Set the method in which data is scanned from
 		     * file.  Compare against a set number of strings.  */
 		    int i;
@@ -4075,26 +3993,22 @@ Improper scanning string. Try 2 character string for 2D data");
 		    break;
 		}
 
-		case DF_SKIP:  {
+		case DF_SKIP:
 		    /* Set the number of bytes to skip before reading
 		     * record. */
-		    double dtemp;
-		    
-		    c_token = token2double(c_token, &dtemp);
-		    df_bin_record[bin_record_count].scan_skip[0] = dtemp;
-		    if (df_bin_record[bin_record_count].scan_skip[0] != dtemp)
+		    df_bin_record[bin_record_count].scan_skip[0] = tuple[0];
+		    if (df_bin_record[bin_record_count].scan_skip[0] != tuple[0])
 			int_error(c_token, "\
 The number of bytes to skip must be an integer");
 		    if (df_bin_record[bin_record_count].scan_skip[0] < 0)
 			int_error(c_token, "\
 The number of bytes to skip must be positive");
 		    break;
-		}
 
 		case DF_ORIGIN:
-		case DF_CENTER: {
-		    double tuple[3];
-		    
+		case DF_CENTER:
+		    /* Set the origin or center of the image based upon
+		     * the plot mode. */
 		    if (type == DF_ORIGIN)
 			df_bin_record[bin_record_count].cart_trans
 			    = DF_TRANSLATE_VIA_ORIGIN;
@@ -4105,18 +4019,15 @@ The number of bytes to skip must be positive");
 			if (test_val != 2)
 			    int_error(c_token, "\
 Two-dimensional tuple required for 2D plot");
-			c_token = token2tuple(c_token, tuple, 2);
 			tuple[2] = 0.0;
 		    } else if (arg == MODE_SPLOT) {
 			if (test_val != 3)
 			    int_error(c_token, "\
 Three-dimensional tuple required for 3D plot");
-			c_token = token2tuple(c_token, tuple, 3);
 		    } else if (arg == MODE_QUERY) {
 			if (test_val != 3)
 			    int_error(c_token, "\
 Three-dimensional tuple required for setting binary parameters");
-			c_token = token2tuple(c_token, tuple, 3);
 		    } else {
 			int_error(c_token, "\
 Internal error (datafile.c): Unknown plot mode");
@@ -4124,33 +4035,25 @@ Internal error (datafile.c): Unknown plot mode");
 		    memcpy(df_bin_record[bin_record_count].cart_cen_or_ori,
 			   tuple, sizeof(tuple));
 		    break;
-		}
 		
-		case DF_ROTATION: {
-		    double dval;
-		    
-		    c_token = token2double(c_token, &dval);
-
+		case DF_ROTATION:
 		    /* Allow user to enter angle in terms of pi or degrees. */
 		    if (equals(c_token, "pi")) {
-			dval *= M_PI;
+			tuple[0] *= M_PI;
 			c_token++;
 		    } else if (almost_equals(c_token, "d$egrees")) {
-			dval *= M_PI/180;
+			tuple[0] *= M_PI/180;
 			c_token++;
 		    }
-
 		    /* Construct 2D rotation matrix. */
-		    df_bin_record[bin_record_count].cart_alpha = dval;
+		    df_bin_record[bin_record_count].cart_alpha = tuple[0];
 		    break;
-		}
 
-		case DF_PERPENDICULAR: {
-		    double tuple[3];
-		    
+		case DF_PERPENDICULAR:
+		    /* Make sure in three dimensional plotting mode before
+		     * accepting the perpendicular vector for translation. */
 		    if (test_val != 3)
 			int_error(c_token, "Three-dimensional tuple required");
-		    c_token = token2tuple(c_token, tuple, 3);
 		    /* Compare vector length against variable precision
 		     * to determine if this is the null vector */
 		    if ((tuple[0]*tuple[0]
@@ -4162,32 +4065,24 @@ Perpendicular vector cannot be zero");
 			   tuple,
 			   sizeof(tuple));
 		    break;
-		}
 
 		default:
 		    int_error(NO_CARET, "\
 Internal error (datafile.c): Invalid comma separated type");
 	    } /* switch() */
 	} else {
-	    if (equals(c_token, LEFT_TUPLE_CHAR)) {
-		double tuple[3];
-
-		/* Let the conversion routine find the syntax error. */
-		token2tuple(c_token, tuple, 3);  
-	    } else if (comma_previous)
-		c_token--;  /* May be a portion of another plot. Back up. */
-
-	    return;
+	    int_error(c_token, "Invalid numeric or tuple form");
 	}
 
-	if (equals(c_token, ",")) {
+	if (equals(c_token, TUPLE_SEPARATOR_CHAR)) {
 	    bin_record_count++;
 	    c_token++;
-	    comma_previous = TRUE;
 	} else
-	    comma_previous = FALSE;
+	    break;
 
     } /* while(!EOC) */
+
+    return;
 }
 
 
