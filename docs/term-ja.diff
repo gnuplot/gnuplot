@@ -1775,8 +1775,8 @@ diff -rc term-4.1.0-20061018/gd.trm term-4.1.0-ja-20061018/gd.trm
 *** term-4.1.0-20061018/gd.trm	2006-10-16 08:45:53.000000000 +0900
 --- term-4.1.0-ja-20061018/gd.trm	2006-10-18 19:50:39.000000000 +0900
 ***************
-*** 2020,2025 ****
---- 2020,2026 ----
+*** 2040,2045 ****
+--- 2040,2046 ----
   #ifndef JPEG_HELP_ONLY
   #ifdef TERM_HELP
   START_HELP(png)
@@ -1785,8 +1785,8 @@ diff -rc term-4.1.0-20061018/gd.trm term-4.1.0-ja-20061018/gd.trm
   "?commands set terminal png",
   "?set terminal png",
 ***************
-*** 2118,2123 ****
---- 2119,2229 ----
+*** 2138,2143 ****
+--- 2139,2249 ----
   " which uses white for the transparent background, black for borders, dark",
   " gray for axes, and a gray-scale for the six plotting colors.",
   ""
@@ -1899,8 +1899,8 @@ diff -rc term-4.1.0-20061018/gd.trm term-4.1.0-ja-20061018/gd.trm
   #endif /* TERM_HELP */
   #endif /* JPEG_HELP_ONLY */
 ***************
-*** 2196,2201 ****
---- 2302,2308 ----
+*** 2216,2221 ****
+--- 2322,2328 ----
   
   #ifdef TERM_HELP
   START_HELP(jpeg)
@@ -1909,8 +1909,8 @@ diff -rc term-4.1.0-20061018/gd.trm term-4.1.0-ja-20061018/gd.trm
   "?commands set terminal jpeg",
   "?set terminal jpeg",
 ***************
-*** 2268,2273 ****
---- 2375,2457 ----
+*** 2288,2293 ****
+--- 2395,2477 ----
   " which searches for a TrueType font with face name 'arial' in the directory",
   " specified by the environment variable GDFONTPATH and large (14pt) font size.",
   ""
@@ -1995,8 +1995,8 @@ diff -rc term-4.1.0-20061018/gd.trm term-4.1.0-ja-20061018/gd.trm
   #endif /* TERM_HELP */
   #endif /* HAVE_GD_JPEG */
 ***************
-*** 2372,2377 ****
---- 2556,2562 ----
+*** 2392,2397 ****
+--- 2576,2582 ----
   
   #ifdef TERM_HELP
   START_HELP(gif)
@@ -2005,8 +2005,8 @@ diff -rc term-4.1.0-20061018/gd.trm term-4.1.0-ja-20061018/gd.trm
   "?commands set terminal gif",
   "?set terminal gif",
 ***************
-*** 2478,2483 ****
---- 2663,2782 ----
+*** 2498,2503 ****
+--- 2683,2802 ----
   " which searches for a TrueType font with face name 'arial' in the directory",
   " specified by the environment variable GDFONTPATH and 14pt font size.",
   ""
@@ -4716,8 +4716,8 @@ diff -rc term-4.1.0-20061018/svg.trm term-4.1.0-ja-20061018/svg.trm
 *** term-4.1.0-20061018/svg.trm	2006-10-18 19:38:34.000000000 +0900
 --- term-4.1.0-ja-20061018/svg.trm	2006-10-18 19:50:40.000000000 +0900
 ***************
-*** 1375,1380 ****
---- 1375,1381 ----
+*** 1360,1365 ****
+--- 1360,1366 ----
   
   #ifdef TERM_HELP
   START_HELP(svg)
@@ -4726,8 +4726,8 @@ diff -rc term-4.1.0-20061018/svg.trm term-4.1.0-ja-20061018/svg.trm
   "?commands set terminal svg",
   "?set terminal svg",
 ***************
-*** 1417,1421 ****
---- 1418,1468 ----
+*** 1402,1406 ****
+--- 1403,1453 ----
   " or may contain the records necessary to create a hypertext reference to",
   " the desired font. Gnuplot will look for the requested file using the",
   " directory list in the GNUPLOT_FONTPATH environmental variable."
