@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.135 2006/12/07 20:29:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.136 2006/12/27 21:40:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1544,6 +1544,9 @@ eval_3dplots()
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_POINT)
 		&&  (this_plot->lp_properties.p_size == PTSZ_VARIABLE))
 		    this_plot->lp_properties.p_size = 1;
+	    }
+	    if (this_plot->plot_style == LINES) {
+		this_plot->opt_out_of_hidden3d = FALSE;
 	    }
 
 	    if (crnt_param == 0

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.405 2006/12/10 16:56:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.406 2006/12/28 21:14:55 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4463,9 +4463,9 @@ C ... and restart the table:
  The keyword `nohidden3d` applies only to plots made with the `splot` command.
  Normally the global option `set hidden3d` applies to all plots in the graph.
  You can attach the `nohidden3d` option to any individual plots that you want
- to exclude from the hidden3d processing.  The individual elements
- (lines, dots, labels, ...) of a plot marked `nohidden3d` will all be drawn,
- even if they would normally be obscured by the elements of some other plot.
+ to exclude from the hidden3d processing.  The individual elements other than
+ surfaces (i.e. lines, dots, labels, ...) of a plot marked `nohidden3d` will all
+ be drawn, even if they would normally be obscured by other plot elements.
 
  The keywords may be abbreviated as indicated.
 
