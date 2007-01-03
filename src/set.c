@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.240 2006/12/12 05:25:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.241 2006/12/27 21:40:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -244,6 +244,18 @@ set_command()
 	if (interactive)
 	    int_warn(c_token, "deprecated syntax, use \"set datafile missing\"");
 	set_missing();
+    } else {
+
+#else	/* Milder form of backwards compatibility */
+	/* Allow "set no{foo}" rather than "unset foo" */ 
+    if (gp_input_line[token[c_token].start_index] == 'n' &&
+	       gp_input_line[token[c_token].start_index+1] == 'o') {
+	if (interactive)
+	    int_warn(c_token, "deprecated syntax, use \"unset\"");
+	token[c_token].start_index += 2;
+	token[c_token].length -= 2;
+	c_token--;
+	unset_command();
     } else {
 
 #endif /* BACKWARDS_COMPATIBLE */
@@ -622,9 +634,7 @@ set_command()
 	    break;
 	}
 
-#ifdef BACKWARDS_COMPATIBLE
     }
-#endif
     update_gpval_variables(0); /* update GPVAL_ inner variables */
 
 }
