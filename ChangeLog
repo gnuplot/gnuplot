@@ -5,6 +5,18 @@
 	apparently 2.0.34 will introduce serious sanity checking at the time of
 	image creation.
 
+2007-01-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c docs/gnuplot.doc: We do not support non-hidden3d
+	surfaces in a plot that is otherwise hidden3d (lines, points, labels,
+	etc are OK). So document this and do not allow this combination of plot
+	options.
+
+	Bug #1531432
+
+	* set.c (set_command): Default to a less strict rejection of 
+	deprecated syntax; allow "set no<foo>" instead of "unset <foo>".
+
 2006-12-28  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c (isanumber_pn, isatuple, token2double):
