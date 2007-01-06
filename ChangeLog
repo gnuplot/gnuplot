@@ -1,3 +1,9 @@
+2007-01-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm: Add error return check after calling gdImageCreate. This
+	was not a useful check in earlier versions of libgd, but 2.0.34 will
+	introduce serious sanity checking at the time of image creation.
+
 2006-12-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/term-ja.diff: Sync with current terminal source files.

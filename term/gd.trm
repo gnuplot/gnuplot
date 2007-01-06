@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.95.2.2 2006/11/23 22:23:33 sfeam Exp $
+ * $Id: gd.trm,v 1.95.2.3 2006/12/21 20:32:51 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -388,6 +388,10 @@ image_do_crop ()
 	    im_crop = gdImageCreateTrueColor(x,y);
 	else
 	    im_crop = gdImageCreate(x,y);
+	if (!im_crop) {
+	    int_warn(NO_CARET,"libgd: failed to create cropped image structure");
+	    return;
+	}
 	bg = gdImageColorAllocateAlpha(im_crop,255,255,255,127);
 #else
 	im_crop = gdImageCreate(x,y);
@@ -462,12 +466,9 @@ PNG_FillPattern(int fillpar)
 	PNG_fill_tile.last_rgb = rgb;
 
 	/* create new tile */
-#if (GD2_VERS >= 2)
-	if (png_state.TrueColor)
-	    PNG_fill_tile.im = gdImageCreateTrueColor(8, 8);
-	else
-#endif
-	    PNG_fill_tile.im = gdImageCreate(8, 8);
+	PNG_fill_tile.im = gdImageCreate(8, 8);
+	if (!PNG_fill_tile.im)
+	    int_error(NO_CARET,"libgd: failed to create pattern-fill tile");
 
 	/* background */
 	background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255);
@@ -1036,7 +1037,8 @@ int i;
     png_state.linewidth = 1;
     /* EAM - pre-define brushes to implement linewidth */
     for (i=2; i<=MAXLINEWIDTH; i++) {
-	PNG_brush[i].im = gdImageCreate(i,i);
+	if (!((PNG_brush[i].im = gdImageCreate(i,i))))
+	    int_error(NO_CARET,"libgd: failed to create brush structure");
 	PNG_brush[i].bgnd = gdImageColorAllocate( PNG_brush[i].im, 255, 255, 255 );
 	gdImageFill( PNG_brush[i].im, 0, 0, PNG_brush[i].bgnd );
 	gdImageColorTransparent( PNG_brush[i].im, PNG_brush[i].bgnd );
@@ -1332,12 +1334,16 @@ PNG_graphics()
     if (png_state.TrueColor) {
 	png_state.image = gdImageCreateTrueColor(
 			(int) (xscale * PNG_XMAX), (int) (yscale * PNG_YMAX));
+	if (!png_state.image)
+	    int_error(NO_CARET,"libgd: failed to create output image structure");
 	rgb = gdImageColorAllocate(png_state.image, 255, 255, 255);
 	gdImageFill(png_state.image, 1, 1, rgb);
     } else
 #endif
 	png_state.image = gdImageCreate(
 			(int) (xscale * PNG_XMAX), (int) (yscale * PNG_YMAX));
+	if (!png_state.image)
+	    int_error(NO_CARET,"libgd: failed to create output image structure");
 
     png_state.height = (yscale * PNG_YMAX) - 1;
     png_state.charw = term->h_char;	/* png_state.font->w; */
@@ -1948,14 +1954,18 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
     gdImagePtr im;
 
 #if (GD2_VERS >= 2)
-    if (png_state.TrueColor)
+    if (png_state.TrueColor) {
 	im = gdImageCreateTrueColor(M, N);
-    else
+	if (!im)
+	    int_error(NO_CARET,"libgd: failed to create image structure");
+    } else
 #endif
 	{
 	im = gdImageCreate(M, N);
+	if (!im)
+	    int_error(NO_CARET,"libgd: failed to create image structure");
 	gdImagePaletteCopy(im, png_state.image);
-	}
+    }
 
     /* TrueColor 24-bit color mode */
     if (color_mode == IC_RGB) {
