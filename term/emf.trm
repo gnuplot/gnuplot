@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.42.2.1 2007/11/21 23:07:32 sfeam Exp $
+ * $Id: emf.trm,v 1.42.2.2 2007/11/26 04:18:28 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -304,6 +304,15 @@ static void EMF_write_long __PROTO((unsigned long));
 static void EMF_write_float __PROTO((double)); 
 static void EMF_setfont __PROTO((void));
 
+#define ANSI_CHARSET         0
+#define DEFAULT_CHARSET      1
+#define GREEK_CHARSET      161
+#define TURKISH_CHARSET    162
+#define BALTIC_CHARSET     186
+#define RUSSIAN_CHARSET    204
+#define EASTEUROPE_CHARSET 238
+#define KOI8_CHARSET       242
+
 static void 
 EMF_setfont()
 {
@@ -349,18 +358,35 @@ EMF_setfont()
     EMF_write_emr(82, 332); 
     EMF_write_long(EMF_HANDLE_FONT);
     EMF_write_long((long) (-emf_fontsize * EMF_PT2HM));	/* height */
-    EMF_write_long(0);		/* width */
+    EMF_write_long(0);		        /* width */
     EMF_write_long(emf_vert_text);	/* escapement */
     EMF_write_long(emf_vert_text);	/* orientation */
-    EMF_write_long(bold);	/* weight */
-    EMF_write_byte(italic);	/* italic */
-    EMF_write_byte(underline);	/* underline */
-    EMF_write_byte(strikeout);	/* strikeout */
-    EMF_write_byte(1);		/* charset */
-    EMF_write_byte(0);		/* out precision */
-    EMF_write_byte(0);		/* clip precision */
-    EMF_write_byte(0);		/* quality */
-    EMF_write_byte(0);		/* pitch and family */
+    EMF_write_long(bold);	        /* weight */
+    EMF_write_byte(italic);	        /* italic */
+    EMF_write_byte(underline);	        /* underline */
+    EMF_write_byte(strikeout);	        /* strikeout */
+
+    /* charset: could be extended? */
+    switch (encoding) {
+    case S_ENC_CP1250:
+    case S_ENC_ISO8859_2:
+	EMF_write_byte(EASTEUROPE_CHARSET);
+	break;
+    case S_ENC_KOI8_R:
+    case S_ENC_KOI8_U:
+	EMF_write_byte(KOI8_CHARSET);
+	break;
+    case S_ENC_ISO8859_9:
+	EMF_write_byte(TURKISH_CHARSET);
+	break;
+    default:
+	EMF_write_byte(DEFAULT_CHARSET);
+    }
+
+    EMF_write_byte(0);		        /* out precision */
+    EMF_write_byte(0);		        /* clip precision */
+    EMF_write_byte(0);		        /* quality */
+    EMF_write_byte(0);		        /* pitch and family */
     for (i = 0; i < 32; i++) {
 	/* face name (max 32) */
 	EMF_write_byte((char) (i < strlen(font) ? font[i] : 0));
