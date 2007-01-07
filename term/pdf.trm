@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.76 2007/02/27 05:06:41 sfeam Exp $
+ * $Id: pdf.trm,v 1.77 2007/12/20 03:15:55 sfeam Exp $
  */
 
 /*------------------------------
@@ -180,16 +180,34 @@ static void
 PDF_SetFont ()
 {
     int font_handle;
+    const char *pdfenc = "host";
 
     /* Allow graceful failure */
     PDF_set_parameter(myPDF, "fontwarning", "false");
 
-    /* LCB : Symbol and ZapfDingbats should use "builtin" not "host" encoding */
+    /* LCB : Symbol and ZapfDingbats should use "builtin" encoding */
     if ( (strcmp(PDF_fontNameCur,"Symbol") == 0) ||
-	 (strcmp(PDF_fontNameCur,"ZapfDingbats") == 0) )
-	font_handle = PDF_findfont(myPDF, PDF_fontNameCur, "builtin", 0);
-    else
+	 (strcmp(PDF_fontNameCur,"ZapfDingbats") == 0) ) {
+	pdfenc = "builtin";
+    } else if (encoding == S_ENC_ISO8859_1) {
+        pdfenc = "iso8859-1";
+    } else if (encoding == S_ENC_ISO8859_2) {
+        pdfenc = "iso8859-2";
+    } else if (encoding == S_ENC_ISO8859_9) {
+        pdfenc = "iso8859-9";
+    } else if (encoding == S_ENC_ISO8859_15) {
+        pdfenc = "iso8859-15";
+    } else if (encoding == S_ENC_CP1250) {
+        pdfenc = "cp1250";
+    }
+        
+    font_handle = PDF_findfont(myPDF, PDF_fontNameCur, pdfenc, 0);
+    
+    if (font_handle == -1 && strcmp(pdfenc, "host")) {
+        fprintf(stderr,"Couldn't find font %s in encoding %s, trying \"host\"\n", 
+	        PDF_fontNameCur, pdfenc);
 	font_handle = PDF_findfont(myPDF, PDF_fontNameCur, "host", 0);
+    }
 
     if (font_handle == -1) {
 	font_handle = PDF_findfont(myPDF, "Times-Roman", "host", 0);

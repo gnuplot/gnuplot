@@ -12,7 +12,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW operators '=' and ',' in expression syntax
 * NEW pdf and png terminals based on cairo and pango
 * NEW error status variables GPVAL_ERRNO and GPVAL_ERRMSG
-* FIX better support for locale internationalization, UTF-8 encoding
+* FIX more complete support for locale internationalization, UTF-8 encoding
 * FIX various font-handling problems in postscript terminal driver
 * FIX avoid infinite loop on resizing x11 plot window under ion, fluxbox
 * CHANGE 'reset' does not affect locale, encoding, decimalsign settings
