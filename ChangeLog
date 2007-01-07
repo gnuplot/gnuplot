@@ -1,3 +1,13 @@
+2007-01-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_init PNG_init_brush PNG_vector PNG_point):
+	Instead of pre-initializing a fixed number of brushes (PNG_brush[]),
+	make this an array of pointers and allocated/initialize brushes on
+	demand. This allows us to increase the maximum line width with very
+	little cost in pre-allocated space.  Up MAXLINEWIDTH from 12 to 100.
+	Also increase optimization of brush coloring by making it conditional
+	on an actual change in color since the last use.
+
 2007-01-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Add error return check everywhere gdImageCreate is
