@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.406 2006/12/28 21:14:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.407 2007/01/03 06:14:14 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6701,10 +6701,9 @@ C ... and restart the table:
  `back` is given (the default), the label is written underneath the graphed
  data.  Using `front` will prevent a label from being obscured by dense data.
 
- `Textcolor <colorspec>` changes the color of the label text. `<colorspec>` is
- either a linetype or a mapping onto the pm3d color palette (available only in
- `splot`), see help for `set palette`.
-    `textcolor` may be abbreviated `tc`.
+ `textcolor <colorspec>` changes the color of the label text. <colorspec> can be
+ a linetype, an rgb color, or a palette mapping. See help for `colorspece` and
+ `palette`.  `textcolor` may be abbreviated `tc`.
     `tc default` resets the text color to its default state.
     `tc lt <n>` sets the text color to that of line type <n>.
     `tc ls <n>` sets the text color to that of line style <n>.
@@ -6712,6 +6711,7 @@ C ... and restart the table:
     `tc palette cb <val>` selects a color corresponding to <val> on the colorbar.
     `tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to
         the mapping [0:1] to grays/colors of the `palette`.
+    `tc rgb "#RRGGBB"` selects an arbitrary 24-bit RGB color.
 
  If a <pointstyle> is given, using keywords `lt`, `pt` and `ps`, see `style`,
  a point with the given style and color of the given line type is plotted at
@@ -9663,7 +9663,7 @@ C ... and restart the table:
 
  Syntax:
        set title {"<title-text>"} {offset <offset>} {font "<font>{,<size>}"}
-                 {{textcolor | tc} {lt <line_type> | default}} {{no}enhanced}
+                 {{textcolor | tc} {<colorspec> | default}} {{no}enhanced}
        show title
 
  If <offset> is specified by either x,y or x,y,z the title is moved by the
@@ -9677,7 +9677,9 @@ C ... and restart the table:
  <font> is used to specify the font with which the title is to be written;
  the units of the font <size> depend upon which terminal is used.
 
- `textcolor lt <n>` sets the text color to that of line type <n>.
+ `textcolor <colorspec>` changes the color of the text. <colorspec> can be a
+ linetype, an rgb color, or a palette mapping. See help for `colorspece` and
+ `palette`.
 
  `noenhanced` requests that the title not be processed by the enhanced text
  mode parser, even if enhanced text mode is currently active.
