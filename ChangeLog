@@ -1,3 +1,8 @@
+2007-01-07  Allin Cottrell  <cottrell@wfu.edu>
+
+	* term/pdf.trm (EMD_setfont):  Add support for encodings
+	iso_8859_1 iso_8859_2 iso_8859_9 iso_8859_15 cp1250
+
 2007-01-06  Allin Cottrell  <cottrell@wfu.edu>
 
 	* term/emf.trm (EMD_setfont):  Add support for encodings

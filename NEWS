@@ -2,6 +2,7 @@
 New features, changes and fixes in gnuplot version 4.2.3
 ===========================================================
 * NEW options front and back to "set colorbox"
+* NEW character encoding support for emf and pdf terminals
 * FIX minitics in log scale
 * FIX tweak installation scripts for OSX, nt
 * FIX minor bugfixes to terminals fig, emf, post, svg, x11
