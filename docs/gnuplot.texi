@@ -124,6 +124,7 @@ Johannes Zellner
 * Introduction::                
 * Seeking-assistance::          
 * New_features_introduced_in_version_4.2::  
+* Backwards_compatibility::     
 * Features_introduced_in_version_4.0::  
 * Batch/Interactive_Operation::  
 * Command-line-editing::        
@@ -333,7 +334,7 @@ you are subscribed to the list, so that users who use news will know to email
 a reply to you.  There is a form for such postings on the WWW site.
 
 
-@node New_features_introduced_in_version_4.2, Features_introduced_in_version_4.0, Seeking-assistance, gnuplot
+@node New_features_introduced_in_version_4.2, Backwards_compatibility, Seeking-assistance, gnuplot
 @section New features introduced in version 4.2
 
 @cindex new-features
@@ -354,6 +355,7 @@ NEWS file.
 * Auto-layout_of_multiple_plots_on_a_page::  
 * Internal_variables::          
 * New_or_revised_terminal_drivers::  
+* Canvas_size::                 
 @end menu
 
 @node New_plot_styles, Input_from_binary_data_files, New_features_introduced_in_version_4.2, New_features_introduced_in_version_4.2
@@ -491,7 +493,7 @@ GPVAL_X_MIN, etc.
 See @ref{variables}.
 
 
-@node New_or_revised_terminal_drivers,  , Internal_variables, New_features_introduced_in_version_4.2
+@node New_or_revised_terminal_drivers, Canvas_size, Internal_variables, New_features_introduced_in_version_4.2
 @subsection New or revised terminal drivers
 
 
@@ -555,7 +557,103 @@ terminal.
 The `windows` terminal now supports the `enhanced text` mode.
 
 
-@node Features_introduced_in_version_4.0, Batch/Interactive_Operation, New_features_introduced_in_version_4.2, gnuplot
+@node Canvas_size,  , New_or_revised_terminal_drivers, New_features_introduced_in_version_4.2
+@subsection Canvas size
+
+@c ?canvas size
+@cindex canvas
+
+@c ?set term size
+
+In earlier versions of gnuplot, some terminal types (but not all) used the
+values from @ref{size} to control also the size of the output canvas.
+This behaviour is now deprecated.  In future versions of gnuplot the options
+'set size' and 'set term <foo> size' will have complementary effects:
+
+`set term <terminal_type> size <XX>, <YY>` controls the size of the output
+file, or "canvas". Please see individual terminal documentation for allowed
+values of the size parameters.  By default, the plot will fill this canvas.
+
+`set size <XX>, <YY>` scales the plot itself relative to the size of the
+canvas.  Scale values less than 1 will cause the plot to not fill the entire
+canvas.  Scale values larger than 1 will cause only a portion of the plot to
+fit on the canvas.  Please be aware that setting scale values larger than 1
+may cause problems on some terminal types.
+
+Example:
+
+@example
+      set term pbm size 600, 400
+      set size 0.5, 0.5
+      set output "figure.pbm"
+      plot "data" with lines
+
+@end example
+
+These commands will produce an output file "figure.pbm" that is 600 pixels
+wide and 400 pixels tall. The plot will fill the lower left quarter of this
+canvas.  This is consistent with the way multiplot mode has always worked,
+however it is a change in the way some drivers worked for single plots in
+version 4.0.
+
+Most terminal drivers in 4.2 follow the new convention. However the behaviour
+of the png/jpeg/gif driver is under the control of a configuration option.
+See `backwards compatibility`.
+
+
+@node Backwards_compatibility, Features_introduced_in_version_4.0, New_features_introduced_in_version_4.2, gnuplot
+@section Backwards compatibility
+
+@c ?backwards compatibility
+@cindex compatibility
+
+Gnuplot version 4.0 deprecated certain syntax used in earlier versions, but
+continued to recognize it.  Version 4.2 also accepts the deprecated syntax
+by default, but this is now under the control of a configuration option, and
+can be disabled as follows:
+
+@example
+      ./configure --disable-backwards-compatibility
+
+@end example
+
+Notice: Deprecated syntax items may be disabled permanently in future versions.
+
+One major difference is the introduction of required keywords to disambiguate
+complicated commands. A notable issue was the use of bare numbers to specify
+offsets, line and point types.  Illustrative examples:
+
+Deprecated:
+@example
+      set data linespoints
+      plot <foo> 2 4
+@end example
+
+New:
+@example
+      set style data linespoints
+      plot <foo> linetype 2 pointtype 4
+
+@end example
+
+Another major compatibility issue is the interaction of the commands
+@ref{size} and @ref{size}.  In earlier versions of gnuplot the
+behaviour of various terminal types with respect to @ref{size} was very
+inconsistent.  In the future, all terminals will behave the same way.
+
+In version 4.2 most terminals follow the new convention (@ref{size} has
+no effect on the output canvas size). However, the png/gif/jpeg terminal
+still follows the older, deprecated behaviour unless you have configured with
+`--disable-backwards-compatibility`.  In the next version of gnuplot all
+terminal types will follow the new convention. You are strongly advised not
+to use @ref{size} to control the size in pixels of png/gif/jpeg output files.
+Instead use `set term png size <XX>,<YY>`.
+
+Please see @ref{size}, @ref{size} and the documentation for
+individual terminals.
+
+
+@node Features_introduced_in_version_4.0, Batch/Interactive_Operation, Backwards_compatibility, gnuplot
 @section Features introduced in version 4.0
 
 @c ?version 4 features
@@ -1761,10 +1859,6 @@ index rather than a string pointer. strstrt("hayneedlestack","needle") = 4.
 
 @c ?expressions functions substr
 @c ?functions substr
-@cindex substr
-@findex substr
-
-
 @cindex substring
 
 `substr("string",beg,end)` returns the substring consisting of characters
@@ -4505,9 +4599,9 @@ for each dimension, thereby calling out the size of the array.  For example,
 `array=10x20` means the underlying sampling structure is two-dimensional with
 10 points along the first (x) dimension and 20 points along the second (y)
 dimension.  A special "number", `Inf`, can be used to indicate that data should
-be read until the end of file.  A comma can be used to separate the dimensions
-for multiple records.  For example, `array=25,35` indicates there are two
-one-dimensional records within the file.  The comma behavior applies to the
+be read until the end of file.  A colon can be used to separate the dimensions
+for multiple records.  For example, `array=25:35` indicates there are two
+one-dimensional records within the file.  The colon behavior applies to the
 remaining keywords in this list for which it makes sense to be associated with
 individual records.
 
@@ -4687,7 +4781,7 @@ and flip.
 To position the array somewhere else on the graph, the @ref{origin} keyword directs
 gnuplot to position the lower left point of the array at a point specified by a
 tuple.  The tuple should be a double for `plot` and a triple for `splot`.
-For example, `origin=(100,100),(100,200)` is for two records in the file and
+For example, `origin=(100,100):(100,200)` is for two records in the file and
 intended for plotting in two dimensions. A second example, `origin=(0,0,3.5)`,
 is for plotting in three dimensions.
 
@@ -4767,8 +4861,8 @@ Examples:
       # at top left corner) translates to the Cartesian plane.  Pixel
       # spacing is given and there are two images in the file.  One of them
       # is translated via origin.
-      plot '<file_name>' binary array=512x1024,1024x512 format='%uchar' \
-           dx=2,1 dy=1,2 origin=(0,0),(1024,1024) flipy u 1:2:3 w rgbimage
+      plot '<file_name>' binary array=512x1024:1024x512 format='%uchar' \
+           dx=2:1 dy=1:2 origin=(0,0):(1024,1024) flipy u 1:2:3 w rgbimage
 
 @end example
 
@@ -4776,7 +4870,7 @@ Examples:
       # Four separate records in which the coordinates are part of the
       # data file.  The file was created with a endianess different from
       # the system on which gnuplot is running.
-      splot '<file_name>' binary record=30,30,29,26 endian=swap u 1:2:3
+      splot '<file_name>' binary record=30:30:29:26 endian=swap u 1:2:3
 
 @end example
 
@@ -9306,8 +9400,6 @@ each plot if no `layout` is specified or if fine tuning is desired.  See
 
 Example:
 @example
-      set size 0.7,0.7
-      set origin 0.1,0.1
       set multiplot
       set size 0.4,0.4
       set origin 0.1,0.1
@@ -9319,20 +9411,15 @@ Example:
 
 @end example
 
-displays a plot of cos(x) stacked above a plot of sin(x).  Note the initial
-@ref{size} and @ref{origin}.  While these are not always required, their
-inclusion is recommended.  Some terminal drivers require that bounding box
-information be available before any plots can be made, and the form given
-above guarantees that the bounding box will include the entire plot array
-rather than just the bounding box of the first plot.
+This displays a plot of cos(x) stacked above a plot of sin(x).
 
 @ref{size} and @ref{origin} refer to the entire plotting area used for each
-plot.  If you want to have the axes themselves line up, you can guarantee
-that the margins are the same size with the @ref{margin} commands.  See
-@ref{margin} for their use.  Note that the margin settings are absolute,
-in character units, so the appearance of the graph in the remaining space
-will depend on the screen size of the display device, e.g., perhaps quite
-different on a video display and a printer.
+plot.  Please also see @ref{size}.  If you want to have the axes
+themselves line up, you can guarantee that the margins are the same size with
+the @ref{margin} commands.  See @ref{margin} for their use.  Note that the
+margin settings are absolute, in character units, so the appearance of the
+graph in the remaining space will depend on the screen size of the display
+device, e.g., perhaps quite different on a video display and a printer.
 
 With the `layout` option you can generate simple multiplots without having
 to give the @ref{size} and @ref{origin} commands before each plot:  Those
@@ -10705,8 +10792,6 @@ line will have <sample_2> samples.  If you only specify <samples_1>,
 
 
 @c ?aspect ratio
-The @ref{size} command scales the displayed size of the plot.
-
 Syntax:
 @example
       set size @{@{no@}square | ratio <r> | noratio@} @{<xscale>,<yscale>@}
@@ -10714,8 +10799,27 @@ Syntax:
 
 @end example
 
-The <xscale> and <yscale> values are the scaling factors for the size of the
-plot, which includes the graph and the margins.
+The <xscale> and <yscale> values are scale factors for the size of the plot,
+which includes the graph, labels, and margins.
+
+Important note:
+@example
+      In earlier versions of gnuplot, some terminal types used the values from
+      @ref{size} to control also the size of the output canvas; others did not.
+      In version 4.2 most terminals now follow the convention described below.
+      However, see `backwards compatibility` for the png/gif/jpeg drivers.
+
+@end example
+
+`set term <terminal_type> size <XX>, <YY>` controls the size of the output
+file, or `canvas`. Please see individual terminal documentation for allowed
+values of the size parameters.  By default, the plot will fill this canvas.
+
+`set size <XX>, <YY>` scales the plot itself relative to the size of the
+canvas.  Scale values less than 1 will cause the plot to not fill the entire
+canvas.  Scale values larger than 1 will cause only a portion of the plot to
+fit on the canvas.  Please be aware that setting scale values larger than 1
+may cause problems on some terminal types.  See @ref{size}.
 
 `ratio` causes `gnuplot` to try to create a graph with an aspect ratio of <r>
 (the ratio of the y-axis length to the x-axis length) within the portion of
@@ -10739,17 +10843,9 @@ values (1.0).
 
 `ratio` and `square` have no effect on 3-d plots.
 
-@ref{size} is relative to the default size, which differs from terminal to
-terminal.  Since `gnuplot` fills as much of the available plotting area as
-possible by default, it is safer to use @ref{size} to decrease the size of
-a plot than to increase it.  See `set terminal` for the default sizes.
-
-On some terminals, changing the size of the plot will result in text being
-misplaced.
-
 Examples:
 
-To set the size to normal size use:
+To set the size so that the plot fills the available canvas:
 @example
       set size 1,1
 
@@ -17601,7 +17697,7 @@ This terminal produces files in the W3C Scalable Vector Graphics format.
 Syntax:
 @example
       set terminal svg @{size <x>,<y> @{|fixed|dynamic@}@}
-                       @{@{no@}enhanced@} @{raw|escaped@}
+                       @{@{no@}enhanced@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
                        @{font "<fontname>@{,<fontsize>@}"@}
                        @{fontfile <filename>@}
@@ -17633,13 +17729,7 @@ specifies a local file which is copied into the <defs> section of the
 resulting SVG output file.  This file may either itself contain a font,
 or may contain the records necessary to create a hypertext reference to
 the desired font. Gnuplot will look for the requested file using the
-directory list in the GNUPLOT_FONTPATH environmental variable.
-
-By default the SVG driver passes non-ascii characters through to the output
-file with no processing, leaving it to the SVG viewer to interpret them
-according to the current character encoding. The `escaped` option tells
-gnuplot to replace each non-ascii character with a hexidecimal
-representation of the form &#xNN;"
+directory list in the GNUPLOT_FONTPATH environmental variable."
 
 @node tek410x, tek410x_, svg, terminal_
 @subsubsection tek410x
