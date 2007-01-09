@@ -1,3 +1,7 @@
+2007-01-09  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* demo/borders.dem: Add a "pause -1" at the end
+
 2007-01-07  Mike Sutton  <mws116@usa.com>
 
 	* docs/gnuplot.doc: Update descriptions of <colorspec> as used in
