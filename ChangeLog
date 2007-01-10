@@ -1,3 +1,8 @@
+2007-01-10  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* term/pdf.trm (PDF_SetFont):  Catch error from font request, and fall
+	back to guaranteed font "Times-Roman".  Makes font errors non-fatal.
+
 2007-01-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (PaletteSetColor): Update current color in 

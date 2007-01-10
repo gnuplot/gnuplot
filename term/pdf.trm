@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.70 2006/11/23 03:40:17 sfeam Exp $
+ * $Id: pdf.trm,v 1.71 2006/12/27 21:40:28 sfeam Exp $
  */
 
 /*------------------------------
@@ -170,14 +170,19 @@ PDF_PathClose ()
     }
 }
 
-/* Helper function to deal with switching over to a newly selected
- * font.  For now, this does not try to embed fonts into the PDF
- * file. This relies on the user restricting herself to the 14
- * 'classical' fonts built into every valid PDF reader application */
+/* Helper function to deal with switching over to a newly selected font.
+ * For now, this does not try to embed fonts into the PDF file.
+ * We would like to allow UTF-8 fonts via
+	font_handle = PDF_findfont(myPDF, PDF_fontNameCur, "unicode", 0);
+ * but this is not supported by the free-as-in-beer PDFlib Lite.
+ */
 static void
 PDF_SetFont ()
 {
     int font_handle;
+
+    /* Allow graceful failure */
+    PDF_set_parameter(myPDF, "fontwarning", "false");
 
     /* LCB : Symbol and ZapfDingbats should use "builtin" not "host" encoding */
     if ( (strcmp(PDF_fontNameCur,"Symbol") == 0) ||
@@ -185,6 +190,11 @@ PDF_SetFont ()
 	font_handle = PDF_findfont(myPDF, PDF_fontNameCur, "builtin", 0);
     else
 	font_handle = PDF_findfont(myPDF, PDF_fontNameCur, "host", 0);
+
+    if (font_handle == -1) {
+	font_handle = PDF_findfont(myPDF, "Times-Roman", "host", 0);
+	fprintf(stderr,"Couldn't find font %s, falling back to Times-Roman\n", PDF_fontNameCur);
+    }
 
     PDF_setfont(myPDF, font_handle, PDF_fontSizeCur * PDF_RESOLUTION);
 
