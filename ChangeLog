@@ -1,3 +1,8 @@
+2007-01-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (PaletteSetColor): Update current color in 
+	plot->current_rgb when setting color from a Palette. Bugfix.
+
 2007-01-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.texi: Sync with current docs
