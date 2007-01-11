@@ -1,3 +1,9 @@
+2007-01-11  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* docs/gnuplot.texi docs/gnuplot.doc (line 3521):   Add trailing
+	whitespace at end of line "^6 origin".  For unknown reasons this works
+	around a problem with makeinfo. FIXME.
+
 2007-01-10  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* term/pdf.trm (PDF_SetFont):  Catch error from font request, and fall

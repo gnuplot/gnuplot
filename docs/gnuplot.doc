@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.407 2007/01/03 06:14:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.408 2007/01/08 00:48:48 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3518,7 +3518,7 @@ C ... and restart the table:
  Sometimes the scanning directions in a binary datafile are not consistent with
  that assumed by gnuplot.  These keywords can flip the scanning direction along
  dimensions x, y, z.
-6 origin
+6 origin 
 ?binary general keywords origin
  When gnuplot generates coordinates based upon transposition and flip, it
  attempts to always position the lower left point in the array at the origin,
