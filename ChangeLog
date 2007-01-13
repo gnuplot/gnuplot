@@ -7,6 +7,12 @@
 		set term <foo> font ",<newsize>"
 	Some terminals were not handling this correctly.
 
+	* src/gplt_x11.c (pr_encoding) term/x11.trm share/Gnuplot.app-defaults:
+	Gnuplot_x11 has been using a default encoding *-* for x11 fonts. There
+	is a bug in xorg-7.1 that does causes this to fail. So we now provide an
+	optional X-resource that can be used to set the default encoding to
+	something else.  E.g.:	gnuplot*encoding: iso8859-15
+
 2007-01-11  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* docs/gnuplot.texi docs/gnuplot.doc (line 3521):   Add trailing
