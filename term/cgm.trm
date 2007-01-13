@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.78 2006/11/12 23:43:46 sfeam Exp $
+ * $Id: cgm.trm,v 1.79 2006/11/18 02:54:09 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -97,6 +97,7 @@ TERM_PUBLIC void CGM_put_text __PROTO((unsigned int x, unsigned int y,
 				       const char *str));
 TERM_PUBLIC int CGM_text_angle __PROTO((int ang));
 TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC int CGM_set_font __PROTO((const char *font));
 TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
 				    int number));
 TERM_PUBLIC void CGM_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
@@ -131,7 +132,6 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 
 static int CGM_find_font __PROTO((const char *name, int len,
 				       double *relwidth));
-static int CGM_set_font __PROTO((const char *font));
 /*
  * on NeXTstep, id is an identifier (in ObjC) and causes a parse error
  * since some asserts below are mistaken as casts. datum is a type
@@ -456,37 +456,35 @@ CGM_options()
 	    } else {
 		if (equals(c_token,"font"))
 		    c_token++;
-		if (isstring(c_token)) {
-		      double relwidth;
-		      char *comma;
-		      quote_str(cgm_font, c_token, MAX_ID_LEN);
-		      comma = strchr(cgm_font,',');
-		      if (comma && (1 == sscanf(comma+1,"%d",&cgm_fontsize))) {
+		if (isstringvalue(c_token)) {
+		    double relwidth;
+		    int font_index;
+		    char *s = try_to_get_string();
+		    char *comma = strchr(s,',');
+		    if (comma && (1 == sscanf(comma+1,"%d",&cgm_fontsize)))
 			   *comma = '\0';
-		      }
-		      if (CGM_find_font(cgm_font, strlen(cgm_font),
-					&relwidth) == 0) {
-			   /* insert the font in the font table */
-			   size_t l = strlen(cgm_font);
-			   int n;
-			   for (n=0; cgm_font_data[n].name; n++)
+		    if (*s)
+		      	   font_index = CGM_find_font(s, strlen(s), &relwidth);
+		    else
+			   font_index = CGM_find_font(cgm_font, strlen(cgm_font), &relwidth);
+		    if (font_index == 0) {
+			/* insert the font in the font table */
+			int i, n;
+			for (n=0; cgm_font_data[n].name; n++)
 				;
-			   if (l <= 255) {
-				struct fontdata *new_font_data;
-				int i;
-				new_font_data =
-				     gp_alloc((n + 2)*sizeof(struct fontdata),
-					      "CGM font list");
-				new_font_data->name = gp_alloc(l+1,"CGM font list");
-				strcpy(new_font_data->name, cgm_font);
-				/* punt, since we don't know the real font width */
-				new_font_data->width = 1.0;
-				for (i = 0; i <= n; i++)
-				     new_font_data[i+1] = cgm_font_data[i];
-				cgm_font_data = new_font_data;
-			   }
-		      }
-		      c_token++;
+			struct fontdata *new_font_data =
+			     gp_alloc((n + 2)*sizeof(struct fontdata), "CGM font list");
+			new_font_data->name = s;
+			/* punt, since we don't know the real font width */
+			new_font_data->width = 1.0;
+			for (i = 0; i <= n; i++)
+			     new_font_data[i+1] = cgm_font_data[i];
+			cgm_font_data = new_font_data;
+			font_index = 1;
+		    } else
+			free(s);
+		    strncpy(cgm_font, cgm_font_data[font_index-1].name, sizeof(cgm_font));
+		    c_token++;
 		} else {
 		      /* the user is specifying the font size */
 		      cgm_fontsize = (int) real(const_express(&a));

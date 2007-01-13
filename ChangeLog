@@ -1,3 +1,12 @@
+2007-01-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/cgm.trm (CGM_options) term/gd.trm (PNG_options) 
+	term/metapost.trm (MP_options) term/tgif.trm (TGIF_options):
+	The "set termoption font <foo>" command was intended to allow changing
+	only font size, leaving the current font face intact, using the form
+		set term <foo> font ",<newsize>"
+	Some terminals were not handling this correctly.
+
 2007-01-11  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* docs/gnuplot.texi docs/gnuplot.doc (line 3521):   Add trailing

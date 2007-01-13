@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.38 2006/08/04 20:35:32 sfeam Exp $
+ * $Id: metapost.trm,v 1.39 2006/11/12 23:43:47 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -230,7 +230,8 @@ MP_options()
     }
 
     while (!END_OF_COMMAND) {
-	switch (lookup_table(&MP_opts[0], c_token)) {
+	int option = lookup_table(&MP_opts[0], c_token);
+	switch (option) {
 	case MP_OPT_MONOCHROME:
 	    MP_color = FALSE;
 	    c_token++;
@@ -308,22 +309,28 @@ MP_options()
 	    break;
 	case MP_OPT_FONT:
 	    c_token++;
-	    if (isstringvalue(c_token)) {
-		char *s = try_to_get_string();
-		strncpy(MP_fontname, s, sizeof(MP_fontname));
-	    }
-	    break;
 	case MP_OPT_OTHER:
 	default:
-	    if (isstring(c_token)) {	/* font name */
-		quote_str(MP_fontname, c_token, MAX_ID_LEN);
-		c_token++;
-	    }
-	    if (!END_OF_COMMAND) {	/*font size */
+	{
+	    char *s;
+	    if ((s = try_to_get_string())) {
+		int sep = strcspn(s,",");
+		if (sep > 0) {
+		    strncpy(MP_fontname, s, sizeof(MP_fontname));
+		    MP_fontname[sep] = '\0';
+		}
+		if (s[sep] == ',')
+		    sscanf(&s[sep+1],"%lf",&MP_fontsize);
+		free(s);
+	    } else if (option == MP_OPT_FONT) {
+		int_error(c_token,"expecting font name");
+	    } else if (!END_OF_COMMAND) {	/*font size */
 		MP_fontsize = (double) real(const_express(&a));
 		c_token++;
 	    }
 	    break;
+	}
+
 	}
     }
 
@@ -777,8 +784,8 @@ MP_set_font(const char *font)
 {
     if (*font) {
 	size_t sep = strcspn(font, ",");
-	strncpy(MP_fontname, font, sep);
-	MP_fontname[sep] = NUL;
+	if (sep < sizeof(MP_fontname))
+	    strncpy(MP_fontname, font, sizeof(MP_fontname));
 	sscanf(&(font[sep + 1]), "%lf", &MP_fontsize);
 	if (MP_fontsize < 5)
 	    MP_fontsize = 5.0;
