@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.160 2006/09/01 09:58:44 mikulik Exp $
+ * $Id: x11.trm,v 1.160.2.1 2006/11/05 04:28:49 sfeam Exp $
  *
  */
 
@@ -2113,6 +2113,8 @@ START_HELP(x11)
 " The <size>, <slant>, and <weight> specifications are all optional.",
 " If you do not specify <slant> or <weight> then you will get whatever font ",
 " variant the font server offers first.",
+" You may set a default enconding via the corresponding X11 resource. E.g.",
+"       gnuplot*encoding: iso8859-15",
 " The driver also recognizes some common PostScript font names and",
 " replaces them with possible X11 or TrueType equivalents.",
 " This same sequence is used to process font requests from `set label`.",

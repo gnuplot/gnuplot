@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.1 2006/10/13 19:47:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.2 2007/01/10 22:42:13 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -443,6 +443,7 @@ static void preset __PROTO((int, char **));
 static char *pr_GetR __PROTO((XrmDatabase, char *));
 static void pr_color __PROTO((cmap_t *));
 static void pr_dashes __PROTO((void));
+static void pr_encoding __PROTO((void));
 static void pr_font __PROTO((char *));
 static void pr_geometry __PROTO((void));
 static void pr_pointsize __PROTO((void));
@@ -488,6 +489,7 @@ static int gpXGetFontascent __PROTO((XFontStruct *cfont));
 
 enum set_encoding_id encoding = S_ENC_DEFAULT; /* EAM - mirrored from core code by 'QE' */
 static char default_font[64] = { '\0' };
+static char default_encoding[16] = { '\0' };
 
 #define Nwidths 10
 static unsigned int widths[Nwidths] = { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -5087,6 +5089,7 @@ gnuplot: X11 aborted.\n", ldisplay);
     }
 
     pr_geometry();
+    pr_encoding();		/* check for global default encoding */
     pr_font(NULL);		/* set current font to default font */
     pr_color(&default_cmap);	/* set colors for default colormap */
     pr_width();
@@ -5454,6 +5457,15 @@ int fontset_transsep(char *nfname, char *ofname, int n)
 #endif
 
 static void
+pr_encoding()
+{
+    char *encoding;
+    if ((encoding = pr_GetR(db, ".encoding"))) {
+	strncpy(default_encoding, encoding, sizeof(default_encoding)-1);
+    }
+}
+
+static void
 pr_font( fontname )
 char *fontname;
 {
@@ -5567,6 +5579,7 @@ char *fontname;
 		encoding == S_ENC_ISO8859_15 ? "iso8859-15" :
 		encoding == S_ENC_KOI8_R    ? "koi8-r" :
 		encoding == S_ENC_KOI8_U    ? "koi8-u" :
+		default_encoding[0] ? default_encoding :
 		"*-*" ) ;
 
 	sprintf(fontspec, "-*-%s-%s-%c-*-*-%d-*-*-*-*-*-%s",

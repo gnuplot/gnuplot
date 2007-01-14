@@ -11,8 +11,9 @@
 ! gnuplot*raise:        on
   gnuplot*dashed:       off
 
-! Default font
-! gnuplot*font:   verdana,11,bold
+! Default font and font encoding
+! gnuplot*font:        verdana,11,bold
+! gnuplot*encoding:    iso8859-15
 
 ! Default line colors
 ! gnuplot*background:  white
