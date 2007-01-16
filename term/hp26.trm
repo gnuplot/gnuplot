@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hp26.trm,v 1.17 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: hp26.trm,v 1.18 2006/07/21 02:35:46 sfeam Exp $
  */
 
 /* GNUPLOT - HP26.trm */
@@ -82,19 +82,15 @@ TERM_PUBLIC void HP26_line_and_point __PROTO((unsigned int x, unsigned int y, in
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
-/* include the stream compaction routines */
 
 #define HP26_XLAST (HP26_XMAX - 1)
 #define HP26_YLAST (HP26_XMAX - 1)
 
 static void HP26_do_point __PROTO((unsigned int x, unsigned int y, int number));
-static int compact_slope __PROTO((int xp[], int yp[], int isa_move[], int *sz, double delta));
 static struct _HP26_Buffer_Node *BN_create __PROTO((int index, int size, int linetype));
 static void BN_delete __PROTO((struct _HP26_Buffer_Node * the_node));
 static int HP26_flush __PROTO((struct _HP26_Buffer_Node * the_buff));
 static void HP26_handle_overflow __PROTO((void));
-
-#include "compact.c"
 
 typedef struct _HP26_Buffer_Node {
     int index;
@@ -111,20 +107,20 @@ static HP26_Buffer_Node *
 BN_create(int index, int size, int linetype)
 {
     HP26_Buffer_Node *the_node;
-    the_node = (HP26_Buffer_Node *) malloc(sizeof(HP26_Buffer_Node));
-    the_node->index = index;
-    the_node->linetype = linetype;
-    the_node->size = size;
-    the_node->next = 0;
-    the_node->x = (int *) calloc(the_node->size, sizeof(int));
-    the_node->y = (int *) calloc(the_node->size, sizeof(int));
-    the_node->isa_move = (TBOOLEAN *) calloc(the_node->size, sizeof(TBOOLEAN));
-    if (the_node->x == NULL
-	|| the_node->y == NULL
-	|| the_node->isa_move == NULL)
-	return (NULL);
-    else
-	return (the_node);
+    the_node = (HP26_Buffer_Node *) gp_alloc(sizeof(HP26_Buffer_Node), "HP26");
+    if (the_node) {
+	the_node->index = index;
+	the_node->linetype = linetype;
+	the_node->size = size;
+	the_node->next = 0;
+	the_node->x = (int *) gp_alloc(size*sizeof(int), "HP26");
+	the_node->y = (int *) gp_alloc(size*sizeof(int), "HP26");
+	the_node->isa_move = (TBOOLEAN *) gp_alloc(size*sizeof(TBOOLEAN), "HP26");
+	if (the_node->x == NULL || the_node->y == NULL || the_node->isa_move == NULL)
+	    return (NULL);
+    }
+    memset(the_node->isa_move, 0, size*sizeof(TBOOLEAN));
+    return (the_node);
 }
 
 /* destructor method */
@@ -234,10 +230,7 @@ HP26_flush(HP26_Buffer_Node *the_buff)
 	fprintf(gpoutfile, "\033*m%dB", the_buff->linetype);
 	HP26_linetype_current = the_buff->linetype;
     }
-    /* try to compress the stream */
-    if (the_buff->next > 30 && the_buff->linetype != POINT) {
-    	HP26_reduction_slope += compact_slope(buff_x, buff_y, (int *)isa_move, &(the_buff->next), 0.1);
-    }
+
     /* start escape sequence */
     fputs("\033*p", gpoutfile);
     /* initialize the state:  binary short incremental or binary absolute */

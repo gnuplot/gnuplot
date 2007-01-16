@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 AUTOMAKE_OPTIONS = foreign 1.2h
 
-EXTRA_DIST = README Makefile.am.in compact.c driver.h impcodes.h \
+EXTRA_DIST = README Makefile.am.in driver.h impcodes.h \
 object.h post.h $(CORETERM) PostScript
 
 # List of terminal drivers; must be created

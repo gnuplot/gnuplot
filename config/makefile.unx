@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.5 2002/02/21 12:27:37 lhecking Exp $
+# $Id: makefile.unx,v 1.6 2004/04/13 17:23:30 broeker Exp $
 #
 #
 ############################################################
@@ -467,7 +467,7 @@ CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm term/atariaes.trm term/atariv
 	term/emxvga.trm term/eepic.trm term/epson.trm term/excl.trm \
 	term/fig.trm term/grass.trm term/hp26.trm term/hp2648.trm term/hpgl.trm \
 	term/hp500c.trm term/hpljii.trm term/metafont.trm term/mgr.trm\
-	term/apollo.trm term/gpr.trm term/hppj.trm term/compact.c
+	term/apollo.trm term/gpr.trm term/hppj.trm
 CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
 	term/iris4d.trm term/kyo.trm term/latex.trm term/mif.trm \
 	term/pbm.trm term/pslatex.trm term/gpic.trm term/gnugraph.trm

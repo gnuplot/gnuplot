@@ -1,3 +1,16 @@
+2007-01-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/hp26.trm (BN_create): Use gp_alloc() rather than malloc/calloc.
+
+	* term/hp26.trm term/compact.c term/Makfile.am.in
+	term/makefile.amg term/makefile.dj2 term/makefile.unx:
+	Remove helper file compact.c from the distribution.  It contains a
+	broken file compaction routine that results in segfaults, memory leaks,
+	and buffer overflows.  The only caller is hp26.trm, and testing
+	indicates that even when the compaction works it only saves about 5%.
+
+	Bug #1540389
+
 2007-01-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/cgm.trm (CGM_options) term/gd.trm (PNG_options) 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.amg,v 1.10 2002/04/30 13:40:18 lhecking Exp $
+# $Id: makefile.amg,v 1.11 2005/03/25 21:01:58 sfeam Exp $
 #
 # GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
@@ -133,7 +133,7 @@ CSOURCE4 = bitmap.c term.c util.c util3d.c version.c interpol.c fit.c matrix.c
 CSOURCE5 = $(TERMDIR)/aed.trm $(TERMDIR)/ai.trm $(TERMDIR)/amiga.trm \
 	   $(TERMDIR)/apollo.trm $(TERMDIR)/atariaes.trm \
 	   $(TERMDIR)/atarivdi.trm $(TERMDIR)/cgi.trm $(TERMDIR)/cgm.trm \
-	   $(TERMDIR)/compact.c $(TERMDIR)/corel.trm $(TERMDIR)/debug.trm \
+	   $(TERMDIR)/corel.trm $(TERMDIR)/debug.trm \
 	   $(TERMDIR)/driver.h $(TERMDIR)/djsvga.trm $(TERMDIR)/dumb.trm \
 	   $(TERMDIR)/dxf.trm $(TERMDIR)/dxy.trm $(TERMDIR)/eepic.trm \
 	   $(TERMDIR)/emxvga.trm $(TERMDIR)/epson.trm $(TERMDIR)/excl.trm \

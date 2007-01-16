@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.dj2,v 1.9 2005/07/15 16:08:09 broeker Exp $
+# $Id: makefile.dj2,v 1.10 2005/08/30 09:50:10 broeker Exp $
 #
 # GNUPLOT Makefile for DJGPP version 2 on DOS
 #
@@ -84,7 +84,7 @@ CSOURCE5 = $(T)ai.trm $(T)amiga.trm $(T)aed.trm \
 	$(T)debug.trm $(T)eepic.trm $(T)epson.trm $(T)fig.trm  \
 	$(T)hp26.trm $(T)hp2648.trm $(T)hpgl.trm  \
 	$(T)hpljii.trm $(T)metafont.trm\
-	$(T)apollo.trm $(T)gpr.trm $(T)hppj.trm $(T)compact.c 
+	$(T)apollo.trm $(T)gpr.trm $(T)hppj.trm
 CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)next.trm $(T)object.h \
 	$(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)mif.trm \
 	$(T)pbm.trm $(T)pc.trm 
