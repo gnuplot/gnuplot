@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.136 2006/12/27 21:40:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.137 2007/01/03 06:14:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1379,6 +1379,10 @@ eval_3dplots()
 			}
 		    }
 
+#ifdef WITH_IMAGE
+		    if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)
+			get_image_options(&this_plot->image_properties);
+#endif
 		    set_with = TRUE;
 		    continue;
 		}

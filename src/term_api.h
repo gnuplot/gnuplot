@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.59 2006/06/14 00:25:04 sfeam Exp $
+ * $Id: term_api.h,v 1.60 2006/11/12 23:43:46 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -140,10 +140,14 @@ typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT,
 #define FS_OPAQUE (FS_SOLID + (100<<4))
 
 #ifdef WITH_IMAGE
-/* Color construction for an image, palette lookup or rgb components.
- */
+/* Color construction for an image, palette lookup or rgb components. */
 typedef enum t_imagecolor { IC_PALETTE, IC_RGB }
 	     t_imagecolor;
+/* Holder for various image properties */
+typedef struct t_image {
+    t_imagecolor type; /* See above */
+    TBOOLEAN fallback; /* true == don't use terminal-specific code */
+} t_image;
 #endif
 
 /* values for the optional flags field - choose sensible defaults

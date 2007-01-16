@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.34 2006/03/26 20:00:25 sfeam Exp $
+ * $Id: graphics.h,v 1.35 2006/10/26 04:09:13 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -74,6 +74,9 @@ typedef struct curve_points {
     struct histogram_style *histogram;	/* Only used if plot_style == HISTOGRAM */
     int histogram_sequence;	/* Ordering of this dataset within the histogram */
 #endif
+#ifdef WITH_IMAGE
+    struct t_image image_properties;	/* only used if plot_style is IMAGE or RGB_IMAGE */
+#endif
 } curve_points;
 
 /* From ESR's "Actual code patch" :) */
@@ -115,14 +118,13 @@ void free_histlist __PROTO((struct histogram_style *hist));
 #endif
 
 #ifdef WITH_IMAGE
-void plot_image_or_update_axes __PROTO((void *plot, t_imagecolor pixel_planes,
-					TBOOLEAN map_points, TBOOLEAN update_axes));
-#define PLOT_IMAGE(plot, pixel_planes) \
-	plot_image_or_update_axes(plot, pixel_planes, FALSE, FALSE)
-#define UPDATE_AXES_FOR_PLOT_IMAGE(plot, pixel_planes) \
-	plot_image_or_update_axes(plot, pixel_planes, FALSE, TRUE)
-#define SPLOT_IMAGE(plot, pixel_planes) \
-	plot_image_or_update_axes(plot, pixel_planes, TRUE, FALSE)
+void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN map_points, TBOOLEAN update_axes));
+#define PLOT_IMAGE(plot) \
+	plot_image_or_update_axes(plot, FALSE, FALSE)
+#define UPDATE_AXES_FOR_PLOT_IMAGE(plot) \
+	plot_image_or_update_axes(plot, FALSE, TRUE)
+#define SPLOT_IMAGE(plot) \
+	plot_image_or_update_axes(plot, TRUE, FALSE)
 #endif
 
 #ifdef EAM_OBJECTS

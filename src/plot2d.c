@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.138 2006/11/16 22:17:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.139 2006/12/27 21:40:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1567,6 +1567,10 @@ eval_plots()
                         /* read a possible option for 'with filledcurves' */
                         get_filledcurves_style_options(&this_plot->filledcurves_options);
                     }
+#ifdef WITH_IMAGE
+		    if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)
+			get_image_options(&this_plot->image_properties);
+#endif
                     if ((this_plot->plot_type == FUNC) &&
                         ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 #ifdef EAM_DATASTRINGS
@@ -1933,8 +1937,10 @@ eval_plots()
                  * Compensate for extent of the image so `set autoscale fix`
                  * uses outer edges of outer pixels in axes adjustment.
                  */
-                if ((this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE))
-                    UPDATE_AXES_FOR_PLOT_IMAGE(this_plot, IC_PALETTE);
+                if ((this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)) {
+		    this_plot->image_properties.type = IC_PALETTE;
+                    UPDATE_AXES_FOR_PLOT_IMAGE(this_plot);
+		}
 #endif
 
             }

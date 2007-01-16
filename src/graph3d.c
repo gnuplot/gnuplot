@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.163 2006/12/18 01:27:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.164 2006/12/23 22:44:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1097,12 +1097,14 @@ do_3dplot(
 #ifdef WITH_IMAGE
 	    case IMAGE:
 		/* Plot image using projection of 3D plot coordinates to 2D viewing coordinates. */
-		SPLOT_IMAGE(this_plot, IC_PALETTE);
+		this_plot->image_properties.type = IC_PALETTE;
+		SPLOT_IMAGE(this_plot);
 		break;
 
 	    case RGBIMAGE:
 		/* Plot image using projection of 3D plot coordinates to 2D viewing coordinates. */
-		SPLOT_IMAGE(this_plot, IC_RGB);
+		this_plot->image_properties.type = IC_RGB;
+		SPLOT_IMAGE(this_plot);
 		break;
 #endif
 	    }			/* switch(plot-style) */

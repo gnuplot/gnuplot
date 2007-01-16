@@ -1,5 +1,21 @@
 2007-01-16  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/graph3d.c src/graph3d.h src/graphics.c src/graphics.h 
+	src/plot2d.c src/plot3d.c src/term_api.h:  Define a struct t_image to
+	hold properties associated with any particular image.  We can put one
+	of these in each 2D or 3D plot structure, just as we do for other
+	specific plot types.  This reduces the number of parameters passed
+	down to rendering routines; now they only need a pointer to the one
+	structure, in which all other relevant information can be found.
+
+	* docs/gnuplot.doc src/misc.c (get_image_options) src/misc.h: Add an
+	image property "failsafe".  This causes the image to be rendered with
+	generic rgb rectangles, bypassing any terminal-specific image code.
+	This is useful for debugging problems in the customized terminal code,
+	e.g.  Bug #1612502
+
+2007-01-16  Ethan Merritt  <merritt@u.washington.edu>
+
 	* term/hp26.trm (BN_create): Use gp_alloc() rather than malloc/calloc.
 
 	* term/hp26.trm term/compact.c term/Makfile.am.in
@@ -22,7 +38,7 @@
 
 	* src/gplt_x11.c (pr_encoding) term/x11.trm share/Gnuplot.app-defaults:
 	Gnuplot_x11 has been using a default encoding *-* for x11 fonts. There
-	is a bug in xorg-7.1 that does causes this to fail. So we now provide an
+	is a bug in xorg-7.1 that causes this to fail. So we now provide an
 	optional X-resource that can be used to set the default encoding to
 	something else.  E.g.:	gnuplot*encoding: iso8859-15
 

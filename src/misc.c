@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.83 2006/11/19 23:21:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.84 2006/12/27 21:40:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1235,3 +1235,14 @@ arrow_parse(
     }
 }
 
+#ifdef WITH_IMAGE
+void
+get_image_options(t_image *image)
+{
+    if (equals(c_token, "failsafe")) {
+	c_token++;
+	image->fallback = TRUE;
+    }
+
+}
+#endif

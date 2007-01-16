@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.208 2006/11/29 02:31:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.209 2006/12/10 21:35:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1962,11 +1962,13 @@ do_plot(struct curve_points *plots, int pcount)
 #endif
 #ifdef WITH_IMAGE
 	    case IMAGE:
-		PLOT_IMAGE(this_plot, IC_PALETTE);
+		this_plot->image_properties.type = IC_PALETTE;
+		PLOT_IMAGE(this_plot);
 		break;
 
 	    case RGBIMAGE:
-		PLOT_IMAGE(this_plot, IC_RGB);
+		this_plot->image_properties.type = IC_RGB;
+		PLOT_IMAGE(this_plot);
 		break;
 #endif
 	    }
@@ -5132,7 +5134,7 @@ hyperplane_between_points(double *p1, double *p2, double *w, double *b)
  *  the axis ranges for `set autoscale`, do so and then return.
  */
 void
-plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN project_points, TBOOLEAN update_axes)
+plot_image_or_update_axes(void *plot, TBOOLEAN project_points, TBOOLEAN update_axes)
 {
 
     struct coordinate GPHUGE *points;
@@ -5148,14 +5150,17 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
     double view_port_x[2];                     /* Viewable portion of the image. */
     double view_port_y[2];
     double view_port_z[2] = {0,0};
+    t_imagecolor pixel_planes;
 
 
     if (project_points) {
 	points = ((struct surface_points *)plot)->iso_crvs->points;
 	p_count = ((struct surface_points *)plot)->iso_crvs->p_count;
+	pixel_planes = ((struct surface_points *)plot)->image_properties.type;
     } else {
 	points = ((struct curve_points *)plot)->points;
 	p_count = ((struct curve_points *)plot)->p_count;
+	pixel_planes = ((struct curve_points *)plot)->image_properties.type;
     }
 
     if (p_count < 1) {
@@ -5267,7 +5272,8 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
     /* Check if the pixel grid is orthogonal and oriented with axes.
      * If so, then can use efficient terminal image routines.
      */
-    {TBOOLEAN rectangular_image = FALSE;
+    {
+    TBOOLEAN rectangular_image = FALSE;
 
 #define SHIFT_TOLERANCE 0.01
     if ( ( (fabs(delta_x_grid[0]) < SHIFT_TOLERANCE*fabs(delta_x_grid[1]))
@@ -5275,21 +5281,14 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	&& ( (fabs(delta_y_grid[0]) < SHIFT_TOLERANCE*fabs(delta_y_grid[1]))
 	|| (fabs(delta_y_grid[1]) < SHIFT_TOLERANCE*fabs(delta_y_grid[0])) ) ) {
 
-	/* If the terminal does not have image support indicate so,
-	 * just once.  Then, use polygons to construct pixels.
+	/* If the terminal does not have image support then fall back to
+	 * using polygons to construct pixels.
 	 */
-	if (term->image) {
+	TBOOLEAN fallback = (project_points)
+		? ((struct surface_points *)plot)->image_properties.fallback
+		: ((struct curve_points *)plot)->image_properties.fallback;
+	if (term->image && !fallback)
 	    rectangular_image = TRUE;
-	} else {
-	    static short no_image_support_indicated = 0;
-	    if (!no_image_support_indicated) {
-		fprintf(stderr,"\n\nNOTICE:  Visible pixels form rectangular grid, but\n"
-			"         there is no image matrix support for the\n"
-			"         active terminal.  Reverting to color boxes.\n\n");
-		no_image_support_indicated = 1;
-	    }
-	}
-
     }
 
     if (pixel_planes == IC_PALETTE && make_palette()) {
