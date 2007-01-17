@@ -1,3 +1,8 @@
+2007-01-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/README: Update documentation of image code fallback to using
+	term->filled_polygon() for each pixel if term->image() is not usable.
+
 2007-01-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/graph3d.h src/graphics.c src/graphics.h 
