@@ -1,3 +1,8 @@
+2007-01-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/pm3d.dem: Better title for plots with scans forward and
+	backward.
+
 2007-01-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/README: Update documentation of image code fallback to using
@@ -133,7 +138,7 @@
 	with
 		i = int_expression();
 
-2006-12-27  Daniel Sebald <daniel.sebald@ieee.org>
+2006-12-27  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/gplt_x11.c (display): Changed "if (!plot->pixmap)"
 	to "if (plot->pixmap == None)".
@@ -209,7 +214,7 @@
 	* docs/gnuplot.doc: Document the intended distinction between 
 	'set size' and 'set term <foo> size'
 
-2006-12-08  Johannes Zellner <johannes@zellner.org>
+2006-12-08  Johannes Zellner  <johannes@zellner.org>
 
 	* docs/gnuplot.doc: added emf to the list of file formats which can do
 	pm3d.
@@ -218,7 +223,7 @@
 
 	* configure.in: Fix use of --without-kpsexpand
 
-2006-12-07  Johannes Zellner <johannes@zellner.org>
+2006-12-07  Johannes Zellner  <johannes@zellner.org>
 
 	* term/emf.trm: implemented pm3d and point types according to the
 	suggestion in term/README.
@@ -377,7 +382,7 @@
 	giving an error return if no title was present.  Fixed.
 
 2006-11-15  Ethan Merritt  <merritt@u.washington.edu>
-            Daniel Sebald  <daniel.sebald@ieee.org>
+	    Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/gp_types.h: Define overlaid fields in struct coordinate to hold
 	RGB components of IMAGE and RGBIMAGE plot styles.
@@ -2025,7 +2030,7 @@
 	* demo/all.dem demo/html/index.save demo/html/Makefile:
 	Add demo hidden2.dem illustrating 'set pm3d depthorder'.
 
-2006-06-15  Johannes Zellner <johannes@zellner.org>
+2006-06-15  Johannes Zellner  <johannes@zellner.org>
 
 	* src/save.c src/set.c src/show.c src/tables.c src/tables.h:
 	New option 'set p3md depthorder' to request depth-ordering of 
@@ -3597,7 +3602,7 @@
 	"nooptimize".  Disable optimization if the background is transparent,
 	as this combination is not handled well by most viewing programs.
 
-2006-01-02  Dennis Linse <djlinse37@yahoo.com>
+2006-01-02  Dennis Linse  <djlinse37@yahoo.com>
 
 	* term/x11.trm: Remove redundant #include <sys/select.h>
 
@@ -3975,7 +3980,7 @@
 	* term/tkcanvas.trm: Replace xright, xleft, ytop, ybut here to.
 	PLEASE FIX: But no terminal should be referring to these directly.
 
-2005-10-15   Hans Grobler  <grobh@users.sourceforge.net>
+2005-10-15  Hans Grobler  <grobh@users.sourceforge.net>
 
 	* src/gplt_x11.c: Fix buffer overflow caused by incorrect size
 	allocation for rdbuf.
@@ -4656,7 +4661,7 @@
 	(edge_struct, poly_struct, cntr_struct): Typedef'd these structs,
 	use typedef names all over the place to render source less wordy.
 
-2005-08-03  Ethan Merritt  <merritt@u.washington.edu
+2005-08-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	Move generation of html demo files into a separate subdirectory.
 
@@ -4693,7 +4698,7 @@
 
 	* config/config.mgw: Some more #(un)define for MingW >= 3.0.
 
-2005-08-01  Ethan Merritt  <merritt@u.washington.edu
+2005-08-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_position): OK, so maybe we have to print out
 	the full "offset ...." even if it specifies zero offset.
@@ -4721,7 +4726,7 @@
 
 	* config/config.mgw: Have HAVE_ERF, HAVE_ERFC for MingW >= 3.0.
 
-2005-07-30  Ethan Merritt  <merritt@u.washington.edu
+2005-07-30  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_position and its callers): Move printout of the
 	"offset" keyword into shared routine save_position().  That way we
@@ -4766,7 +4771,7 @@
 
 	* NEWS:  Added note about more versatile key placement.
 
-2005-07-28  Ethan Merritt  <merritt@u.washington.edu
+2005-07-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (term_start_multiplot mp_layout_size_and_offset):
 	`set multiplot {title "string"} {layout ... }`
@@ -4801,7 +4806,7 @@
 	maintain binary compatibility with programs using gnupmdrv like GP/ARI
 	or Term::Gnuplot (but I haven't acually checked that).
 
-2005-07-27  Ethan Merritt  <merritt@u.washington.edu
+2005-07-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_timestamp) docs/gnuplot.doc:
 	Drag the "set timestamp" code into the modern era by accepting options
@@ -4809,7 +4814,7 @@
 	but for backwards compatibility do not require it.  Update the
 	documentation to reflect current treatment of offset and font options.
 
-2005-07-26  Ethan Merritt  <merritt@u.washington.edu
+2005-07-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_xyzlabel): Check to see if next token is a valid
 	keyword before trying to parse it as a string. Fixes bug on, e.g.
@@ -4818,7 +4823,7 @@
 	* src/save.c (save_set_all): Write out keyword "offset" where 
 	appropriate.
 
-2005-07-25  Ethan Merritt  <merritt@u.washington.edu
+2005-07-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/stdfn.c src/stdfn.h: Add a private function gp_strtod() in case
 	there are platforms that do not have a working strtod().
@@ -4829,7 +4834,7 @@
 	(non-Fortran) used atof() rather than strtod(), but that does not
 	give a status return or character length consumed.
 
-2005-07-25  Ethan Merritt  <merritt@u.washington.edu
+2005-07-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm (PDF_options PDF_linewidth): libpdf does not like zero
 	linewidth. Limit linewidths to 0.1 or greater.
@@ -4840,7 +4845,7 @@
 	allows, for instance, binding a hotkey that can terminate gnuplot in
 	response to a keystroke in the plot window.
 
-2005-07-25  Ethan Merritt  <merritt@u.washington.edu
+2005-07-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/datafile.h src/save.c src/set.c src/show.c
 	src/unset.c docs/gnuplot.doc: 
@@ -4851,7 +4856,7 @@
 	is disabled by default, and only occurs if the fortran parsing option
 	is selected.  Addresses complaints of slow input from large files.
 
-2005-07-23  Ethan Merritt  <merritt@u.washington.edu
+2005-07-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (print_command): Re-arrange code so that an expression
 	being printed is only evaluated once, rather than twice.
@@ -4864,11 +4869,11 @@
 	* term/post.trm: Use a more foolproof method of estimating the width of
 	strings containing overprint characters.
 
-2005-07-22  Ethan Merritt  <merritt@u.washington.edu
+2005-07-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (string_or_express): Remove unused variable.
 
-2005-07-22  Ethan Merritt  <merritt@u.washington.edu
+2005-07-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	Introduce a new terminal API routine (term->layer)(int layer). This 
 	is used by the epslatex terminal (pslatex.trm) to handle the
@@ -4893,12 +4898,12 @@
 	* src/parse.c (string_or_express): Do not call int_error() for invalid
 	expressions. Fixes "(s)plot 1/0".
 
-2005-07-19  Ethan Merritt  <merritt@u.washington.edu
+2005-07-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/cgm.trm: Add a warning that Win2000 cannot handle filled
 	polygons with more than 50 vertices. Not our fault! Bug #955074.
 
-2005-07-18  Ethan Merritt  <merritt@u.washington.edu
+2005-07-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_parse_string_field): Fix tab-containing string
 	constant which was broken when indent replaced tabs with spaces.
@@ -4915,7 +4920,7 @@
 	tokens or further commands follow a "load <file>" command.
 	Sourceforge patch #1210835.
 
-2005-07-16  Ethan Merritt  <merritt@u.washington.edu
+2005-07-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/stringvar.dem: Add a demo showing a plot command that
 	generates datafile names via a string-valued function, now possible
@@ -7229,7 +7234,7 @@
 
 	* docs/gnuplot.doc Add aqua to list of terminals with enhanced option.
 
-2004-10-18  Volker Dobler  <v.dobler@web.de> 
+2004-10-18  Volker Dobler  <v.dobler@web.de>
 	    Ethan Merritt  <merritt@u.washington.edu>
 
 	New plot style variant that reads individual point sizes from specified
@@ -7347,7 +7352,7 @@
 	* src/graphics.c (do_plot): Better warning for trying to use pm3d in a
 	2d plot.
 
-2004-10-08  Petr Tobiska <tobiska@ure.cas.cz>
+2004-10-08  Petr Tobiska  <tobiska@ure.cas.cz>
 
 	* term/metapost.trm (MP_arrow): Handle double-ended arrows also.
 
@@ -7875,7 +7880,7 @@
 	altered to use the same scheme to reduce the amount of characters
 	inside the plot buffer.
 
-2004-08-27  Per Persson <persquare@mac.com>
+2004-08-27  Per Persson  <persquare@mac.com>
 
 	* src/term.c (init_terminal): Make aqua the default terminal on
 	Mac OS X if AquaTerm is installed.
@@ -7902,7 +7907,7 @@
 	This does not affect palette-based PNG images, so far as I can tell,
 	but does work for both JPEG and TrueColor PNG images.
 
-2004-08-25  Per Persson <persquare@mac.com>
+2004-08-25  Per Persson  <persquare@mac.com>
 
 	* term/aquaterm.trm (AQUA_options): make options order-independent;
 	replace isstring+quote_str with try_to_get_string();

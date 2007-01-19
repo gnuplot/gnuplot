@@ -1,5 +1,5 @@
 #
-# $Id: pm3d.dem,v 1.17 2005/09/05 19:36:59 mikulik Exp $
+# $Id: pm3d.dem,v 1.18.2.1 2007/01/19 17:44:14 mikulik Exp $
 #
 # demo for pm3d splotting
 #
@@ -115,7 +115,7 @@ set yrange [*:*] noreverse
 
 reset
 
-set title "surface at view 130,10 (viewed from below)"
+set title "set pm3d scansforward: wrong, because back overwrites front"
 set pm3d
 set palette
 set view 130,10
@@ -126,7 +126,7 @@ set pm3d at s scansforward
 splot sin(sqrt(x**2+y**2))/sqrt(x**2+y**2)
 pause -1 "Hit return to continue"
 
-set title '"set pm3d scansbackward" makes this as viewed from above'
+set title "set pm3d scansbackward: correctly looking surface"
 set xlabel
 set border 4095
 set pm3d scansbackward
