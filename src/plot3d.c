@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.137 2007/01/03 06:14:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.138 2007/01/17 05:34:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -257,11 +257,19 @@ plot3drequest()
     v_axis = (parametric ? V_AXIS : FIRST_Y_AXIS);
 
     PARSE_NAMED_RANGE(u_axis, dummy_token0);
+    if (splot_map == TRUE && !parametric) /* v_axis==FIRST_Y_AXIS */
+	splot_map_deactivate();
     PARSE_NAMED_RANGE(v_axis, dummy_token1);
+    if (splot_map == TRUE && !parametric) /* v_axis==FIRST_Y_AXIS */
+	splot_map_activate();
 
     if (parametric) {
 	PARSE_RANGE(FIRST_X_AXIS);
+	if (splot_map == TRUE)
+	    splot_map_deactivate();
 	PARSE_RANGE(FIRST_Y_AXIS);
+	if (splot_map == TRUE)
+	    splot_map_activate();
     }				/* parametric */
     PARSE_RANGE(FIRST_Z_AXIS);
     CHECK_REVERSE(FIRST_X_AXIS);
