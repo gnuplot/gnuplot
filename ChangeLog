@@ -1,3 +1,8 @@
+2007-01-20  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* plot3d.c (plot3drequest): Deactive splot_map when reading [y1:y2]
+	argument of splot. Fixes axis reversal of set view map;splot [] [y1:y2].
+
 2007-01-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/pm3d.dem: Better title for plots with scans forward and
