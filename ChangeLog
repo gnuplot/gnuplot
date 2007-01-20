@@ -1,3 +1,8 @@
+2007-01-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (boundary3d): Fix auto-placement of the key if the user
+	has forced absolute placement of the plot's right margin.
+
 2007-01-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* plot3d.c (plot3drequest): Deactive splot_map when reading [y1:y2]

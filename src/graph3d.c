@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.164 2006/12/23 22:44:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.165 2007/01/17 05:34:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -415,7 +415,9 @@ boundary3d(struct surface_points *plots, int count)
     }
     if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
 	&& key->margin == GPKEY_RMARGIN) {
-	plot_bounds.xright -= key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
+	int key_width = key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
+	if (rmargin.scalex != screen)
+	    plot_bounds.xright -= key_width;
     }
     plot_bounds.xleft += t->xmax * xoffset;
     plot_bounds.xright += t->xmax * xoffset;
@@ -796,13 +798,6 @@ do_3dplot(
 
     if (key->region != GPKEY_USER_PLACEMENT) {
 	if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_BMARGIN) {
-#if 0
-	    yl = yoffset * t->ymax + (key_rows) * key_entry_height + (ktitle_lines + 2) * t->v_char;
-	    xl = max_ptitl_len * 1000 / (key_sample_width / t->h_char + max_ptitl_len + 2);
-	    xl *= (plot_bounds.xright - plot_bounds.xleft) / key_cols;
-	    xl /= 1000;
-	    xl += plot_bounds.xleft;
-#else
 	    /* HBB 19990608: why calculate these again? boundary3d has already
 	     * done it... */
 	    if (ptitl_cnt > 0) {
@@ -825,7 +820,7 @@ do_3dplot(
 		yl = yoffset * t->ymax + (key_rows) * key_entry_height 
 		   + (ktitle_lines + 2) * t->v_char;
 	    }
-#endif
+
 	} else {
 	    if (key->vpos == JUST_TOP) {
 		yl = plot_bounds.ytop - t->v_tic - t->v_char;
@@ -837,6 +832,10 @@ do_3dplot(
 		xl = plot_bounds.xright + t->h_tic + key_size_left;
 	    } else if (key->hpos == LEFT) {
 		xl = plot_bounds.xleft + t->h_tic + key_size_left;
+	    } else if (rmargin.scalex == screen 
+		   && (key->region == GPKEY_AUTO_EXTERIOR_LRTBC 
+			|| key->region == GPKEY_AUTO_EXTERIOR_MARGIN)) {
+		xl = plot_bounds.xright -key_size_right + key_col_wth - 2 * t->h_char;
 	    } else {
 		xl = plot_bounds.xright - key_size_right - key_col_wth * (key_cols - 1);
 	    }
