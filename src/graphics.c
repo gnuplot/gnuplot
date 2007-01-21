@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.211 2007/01/22 00:43:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.212 2007/01/22 03:22:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5291,9 +5291,11 @@ plot_image_or_update_axes(void *plot, TBOOLEAN project_points, TBOOLEAN update_a
 	/* If the terminal does not have image support then fall back to
 	 * using polygons to construct pixels.
 	 */
-	TBOOLEAN fallback = (project_points)
-		? ((struct surface_points *)plot)->image_properties.fallback
-		: ((struct curve_points *)plot)->image_properties.fallback;
+	TBOOLEAN fallback;
+	if (project_points)
+	    fallback = !splot_map || ((struct surface_points *)plot)->image_properties.fallback;
+	else
+	    fallback = ((struct curve_points *)plot)->image_properties.fallback;
 	if (term->image && !fallback)
 	    rectangular_image = TRUE;
     }

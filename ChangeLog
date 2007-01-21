@@ -8,6 +8,10 @@
 	* src/plot2d.c (get_data) src/graphics.c (plot_impulses): Store and use
 	optional color info from 3rd column of input for style "dots".
 
+	* src/graphics.c (plot_image_or_update_axes): Don't try to optimize rare
+	case of rectangular image presentation in 3D except in splot_map mode.
+	Bug #1612502
+
 2007-01-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (boundary3d): Fix auto-placement of the key if the user
