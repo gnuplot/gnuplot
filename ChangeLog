@@ -1,3 +1,10 @@
+2007-01-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data) src/graphics.c (plot_impulses): Store and use
+	optional color info from 3rd column of input for style "impulses".
+	Example:
+	    plot "foo" using 1:2:(rgb($3)) with impulses lc rgb variable
+
 2007-01-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (boundary3d): Fix auto-placement of the key if the user
