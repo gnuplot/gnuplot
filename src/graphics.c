@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.210 2007/01/17 05:34:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.211 2007/01/22 00:43:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3574,6 +3574,9 @@ plot_dots(struct curve_points *plot)
 	if (plot->points[i].type == INRANGE) {
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
+	    if ((plot->lp_properties.pm3d_color.value < 0.0)
+		&& (plot->lp_properties.pm3d_color.type == TC_RGB))
+		set_rgbcolor( plot->points[i].yhigh);
 	    /* point type -1 is a dot */
 	    (*t->point) (x, y, -1);
 	}
