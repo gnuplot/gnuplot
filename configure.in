@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.209 2006/12/10 04:31:18 sfeam Exp $
+dnl $Id: configure.in,v 1.210 2006/12/15 17:03:07 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -273,11 +273,11 @@ AC_ARG_WITH(xmi,dnl
 
 dnl Use builtin readline or GNU readline
 AC_ARG_WITH(readline,dnl
-[  --with-readline         use the builtin minimal readline function (default)
-  --without-readline      do not use the builtin readline function
-  --with-readline=gnu     use the GNU readline library (4.2 or newer required)
-  --with-readline=DIR     Specify the location of GNU readline],,
-  test -z "$with_readline" && with_readline=yes)
+[  --with-readline=builtin  use the built-in minimal readline
+  --with-readline=gnu      use the GNU readline library (default; 4.2 or newer required)
+  --with-readline=DIR      specify the location of GNU readline],,
+  --without-readline       do not use any readline function
+  test -z "$with_readline" && with_readline=gnu)
 
 dnl Gnuplot history
 AC_ARG_ENABLE(history-file,dnl
@@ -286,7 +286,7 @@ AC_ARG_ENABLE(history-file,dnl
 
 dnl GNU readline and the required terminal library
 if test "$with_readline" != no; then
-  if test "$with_readline" != yes; then
+  if test "$with_readline" != builtin; then
     dnl check for terminal library
     dnl this is a very cool solution from octave's configure.in
     gp_tcap=""
@@ -336,9 +336,9 @@ please add path to history.h to CPPFLAGS in Makefile]))
 
     fi # ! ac_cv_lib_readline_readline = no
 
-  fi # ! with_readline != yes
+  fi # ! with_readline != builtin 
 
-  if test "$with_readline" = yes; then
+  if test "$with_readline" = builtin; then
     AC_DEFINE(READLINE,1,
               [ Define if you want to use the included readline function. ])
     if test "$enable_history_file" = yes; then
@@ -1278,17 +1278,17 @@ AC_MSG_RESULT([gnuplot will be compiled with the following options:])
 AC_MSG_RESULT([])
 
 if test "$with_readline" != no; then
-  if test "$with_readline" != yes; then
+  if test "$with_readline" != builtin; then
     if test -n "$gp_tcap"; then
       AC_MSG_RESULT([  Readline library: GNU readline library with $gp_tcap])
     else
       AC_MSG_RESULT([  Readline library: GNU readline library])
     fi
   else
-    AC_MSG_RESULT([  Readline library: builtin minimal readline (use --with-readline to override)])
+    AC_MSG_RESULT([  Readline library: builtin minimal (use --with-readline=gnu for GNU readline)])
   fi
 else
-  AC_MSG_RESULT([  Readline library: builtin minimal readline (use --with-readline to override)])
+  AC_MSG_RESULT([  Readline library: builtin minimal (use --with-readline=gnu for GNU readline)])
 fi
 
 if test "$enable_history_file" = yes; then
