@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.71 2006/12/27 21:40:28 sfeam Exp $
+ * $Id: pdf.trm,v 1.72 2007/01/11 05:26:07 sfeam Exp $
  */
 
 /*------------------------------
@@ -1423,10 +1423,18 @@ PDF_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
 			 3, 8,				/* 3 colors, 8 bits each */
 			 "");
 
-    /* Scale and copy into the main PDF image */
+    /* Clip to bounding box requested */
+	PDF_save(myPDF);
+	PDF_moveto(myPDF, corner[2].x, corner[2].y);
+	PDF_lineto(myPDF, corner[2].x, corner[3].y);
+	PDF_lineto(myPDF, corner[3].x, corner[3].y);
+	PDF_lineto(myPDF, corner[3].x, corner[2].y);
+	PDF_closepath(myPDF);
+	PDF_clip(myPDF);
+
+/* Scale and copy into the main PDF image */
 	xscale = fabs((float)corner[1].x - (float)corner[0].x) / (float)M;
 	yscale = fabs((float)corner[1].y - (float)corner[0].y) / (float)N;
-	PDF_save(myPDF);
 	PDF_translate(myPDF, corner[0].x, corner[0].y);
 	PDF_scale(myPDF, xscale, yscale);
 	PDF_translate(myPDF, 0, -(float)N);

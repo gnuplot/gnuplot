@@ -1,3 +1,12 @@
+2007-01-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_image) term/pdf.trm (PDF_image) term/post.trm
+	(PS_image) src/wxterminal/gp_cairo.c (gp_cairo_draw_image):  Implement
+	clipping in accordance with the bounding box passed to term->image()
+	via corner[2] and corner[3]. Up until now, only x11 implemented this
+	aspect of image rendering.   Not yet implemented: aquaterm pm win
+	Bug #1612502
+
 2007-01-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* configure.in: Let the GNU readline be the default instead of the

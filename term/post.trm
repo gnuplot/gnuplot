@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.206 2006/11/12 23:43:47 sfeam Exp $
+ * $Id: post.trm,v 1.207 2006/12/27 21:40:28 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2946,24 +2946,6 @@ print_five_operand_image(unsigned M, unsigned N, gpiPoint *corner, t_imagecolor 
 TERM_PUBLIC void
 PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
 {
-
-    /* There is an unaccounted for detail concerning "clipping" around the
-     * edges of the image when only the portion of a pixel is seen.  The
-     * corner[2].x, corner[2].y, corner[3].x and corner[3].y parameters
-     * indicate what portion of the image should be visible.  This was first
-     * used for the x11 routine in cases where the image is zoomed and
-     * plotting the full edge pixels would result in the image extending
-     * across the boundaries.  Is there some way to do this inside PostScript
-     * as well?  If not, fine.  In most cases the pixels won't extend out too
-     * far if the image is high resolution.
-     *
-     * Also, maybe one should consider if the image should be displayed in
-     * transparent mode so that the boundaries are all visible rather than the
-     * image covering up a portion of them.  What are the ramifications of this
-     * when something else is underneath the image when it is used as in an EPS
-     * file?
-     */
-
     char *encoded_image;
     int num_encoded_bytes;
     unsigned short bits_per_component = 0;
@@ -3016,6 +2998,10 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
     encoded_image = PS_encode_image(M, N, image, color_mode, bits_per_component, max_colors, (ps_params->level1 ? PS_ASCII_HEX : PS_ASCII85), &num_encoded_bytes);
 
     fputs("%%%%BeginImage\n", gppsfile);
+
+    /* Clip image to requested bounding box */
+    fprintf(gppsfile,"gsave %d %d N %d %d L %d %d L %d %d L Z clip\n",
+	corner[2].x, corner[2].y, corner[2].x, corner[3].y, corner[3].x, corner[3].y, corner[3].x, corner[2].y);
 
     /* Color and gray scale images do not need a palette and can use
      * the 5 operand form of the image routine.  For other types of
@@ -3116,6 +3102,7 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 	fputs("\nInterpretLevel1 not {\n"
 	      "  grestore\n"
 	      "} if\n", gppsfile);
+    fputs("grestore\n", gppsfile);
     fputs("%%%%EndImage\n", gppsfile);
 
     free(encoded_image);
