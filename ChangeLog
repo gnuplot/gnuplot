@@ -1,3 +1,8 @@
+2007-01-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* PATCHLEVEL src/version.c configure.in:
+	Tag and package as release candidate 4.2-rc3
+
 2007-01-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* configure.in: Let the GNU readline be the default instead of the
