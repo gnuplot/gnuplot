@@ -1,3 +1,8 @@
+2007-01-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* configure.in: The libreadline checks got mangled. Bad patch?
+	This fixes the breakage, and adds a warning if gd.h is not found.
+
 2007-01-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_image) term/pdf.trm (PDF_image) term/post.trm
