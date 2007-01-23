@@ -3,6 +3,9 @@
 	* configure.in: The libreadline checks got mangled. Bad patch?
 	This fixes the breakage, and adds a warning if gd.h is not found.
 
+	* PATCHLEVEL src/version.c configure.in:
+	Tag and package as release candidate 4.2-rc4
+
 2007-01-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in:
