@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.409 2007/01/11 17:08:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.410 2007/01/17 05:34:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8459,6 +8459,12 @@ C ... and restart the table:
 %x11@no@yes@no
 %_
 @end table
+ Note that there may be additional limitations on the creation or viewing of
+ graphs containing transparent fill areas.  For example, the png terminal can
+ only use transparent fill if the "truecolor" option is set.  Some pdf viewers
+ may not correctly display the fill areas even if they are correctly described
+ in the pdf file. Ghostscript/gv does not correctly display pattern-fill areas
+ even though actual PostScript printers generally have no problem.
 4 set style function
 ?commands set style function
 ?commands show style function

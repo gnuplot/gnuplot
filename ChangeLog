@@ -1,3 +1,8 @@
+2007-01-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc term/gd.trm: Mention that in order to use transparent
+	fill in png images, you must "set term png truecolor".
+
 2007-01-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/post.trm: Typo in docs.

@@ -2094,7 +2094,7 @@ TERM_TABLE_END(png_driver)
 #ifndef JPEG_HELP_ONLY
 #ifdef TERM_HELP
 START_HELP(png)
-"1 png (NEW)",
+"1 png",
 "?commands set terminal png",
 "?set terminal png",
 "?set term png",
@@ -2120,6 +2120,11 @@ START_HELP(png)
 "",
 " `interlace` instructs the driver to generate interlaced PNGs.",
 " Default is `nointerlace`.",
+"",
+" By default a 256-color png image is produced. The `truecolor` option instead",
+" creates a TrueColor output image with 24 bits of color information per pixel.",
+" The use of transparent fill areas requires use of the `truecolor` option.",
+" A transparent background is possible in either indexed or TrueColor images.",
 "",
 " `butt` instructs the driver to use a line drawing method that does",
 " not overshoot the desired end point of a line.  This setting is only",
