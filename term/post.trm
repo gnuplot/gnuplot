@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.203.2.2 2006/10/12 21:27:17 mikulik Exp $
+ * $Id: post.trm,v 1.203.2.3 2006/11/19 20:40:49 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3963,7 +3963,7 @@ PS_COMMON_DOC1
 " Each PostScript output file includes a %%Prolog section and possibly some",
 " additional user-defined sections containing, for example, character",
 " encodings. These sections are copied from a set of PostScript prologue files",
-" which are either compiled in the gnuplot exectable or stored elsewhere on your",
+" which are either compiled in the gnuplot executable or stored elsewhere on your",
 " computer. This behaviour and the default directory where these files live are",
 " controlled at the time gnuplot is built. However, you can control this",
 " either by defining an environment variable GNUPLOT_PS_DIR or by using the",
