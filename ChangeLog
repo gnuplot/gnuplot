@@ -1,3 +1,7 @@
+2007-01-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm: Typo in docs.
+
 2007-01-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in: The libreadline checks got mangled. Bad patch?
