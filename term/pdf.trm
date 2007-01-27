@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.72 2007/01/11 05:26:07 sfeam Exp $
+ * $Id: pdf.trm,v 1.73 2007/01/22 22:51:34 sfeam Exp $
  */
 
 /*------------------------------
@@ -1298,10 +1298,10 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 	    /*        a separate step, despite its inefficiency.                    */
 	    if (fillpar != 0) {
 		PDF_setcolor(myPDF, "fill", "rgb", 1, 1, 1, 0 /* unused */);
-		PDF_moveto(myPDF, (int)(corners[0].x), (int)(corners[0].y));
+		PDF_moveto(myPDF, corners[0].x, corners[0].y);
 		for (i=1; i<points; i++)
-		    PDF_lineto(myPDF, (int)(corners[i].x), (int)(corners[i].y));
-		PDF_lineto(myPDF, (int)(corners[0].x), (int)(corners[0].y));
+		    PDF_lineto(myPDF, corners[i].x, corners[i].y);
+		PDF_lineto(myPDF, corners[0].x, corners[0].y);
 		PDF_fill(myPDF);
 		PDF_restore(myPDF);
 		PDF_save(myPDF);
@@ -1324,12 +1324,10 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 	    break;
     }
 
-    /* The pdflib routines cannot handle unsigned int coords         */
-    /* that misrepresent negative numbers, so we cast back to (int). */
-    PDF_moveto(myPDF, (int)(corners[0].x), (int)(corners[0].y));
+    PDF_moveto(myPDF, corners[0].x, corners[0].y);
     for (i=1; i<points; i++)
-	PDF_lineto(myPDF, (int)(corners[i].x), (int)(corners[i].y));
-    PDF_lineto(myPDF, (int)(corners[0].x), (int)(corners[0].y));
+	PDF_lineto(myPDF, corners[i].x, corners[i].y);
+    PDF_lineto(myPDF, corners[0].x, corners[0].y);
     PDF_fill(myPDF);
     PDF_restore(myPDF);
 }

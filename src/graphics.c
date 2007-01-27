@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.212 2007/01/22 03:22:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.213 2007/01/22 04:10:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5492,8 +5492,12 @@ plot_image_or_update_axes(void *plot, TBOOLEAN project_points, TBOOLEAN update_a
 		    map3d_xy_double(points[pixel_M_N].x, points[pixel_M_N].y, points[pixel_M_N].z, &x, &y);
 		    corners[1].x = x + fabs(delta_x_grid[0]+delta_x_grid[1])/2;
 		    corners[1].y = y - fabs(delta_y_grid[0]+delta_y_grid[1])/2;
-		    map3d_xy(view_port_x[0], view_port_y[0], view_port_z[0], &corners[2].x, &corners[2].y);
-		    map3d_xy(view_port_x[1], view_port_y[1], view_port_z[1], &corners[3].x, &corners[3].y);
+		    map3d_xy_double(view_port_x[0], view_port_y[0], view_port_z[0], &x, &y);
+		    corners[2].x = x;
+		    corners[2].y = y;
+		    map3d_xy_double(view_port_x[1], view_port_y[1], view_port_z[1], &x, &y);
+		    corners[3].x = x;
+		    corners[3].y = y;
 		} else {
 		    corners[0].x = map_x(points[pixel_1_1].x - xsts*fabs(d_x_o_2));
 		    corners[0].y = map_y(points[pixel_1_1].y + ysts*fabs(d_y_o_2));
@@ -5606,8 +5610,10 @@ plot_image_or_update_axes(void *plot, TBOOLEAN project_points, TBOOLEAN update_a
 
 				for (i_corners=0; i_corners < N_corners; i_corners++) {
 				    if (project_points) {
-					map3d_xy(p_corners[i_corners].x, p_corners[i_corners].y, p_corners[i_corners].z,
-						 &corners[i_corners].x, &corners[i_corners].y);
+					map3d_xy_double(p_corners[i_corners].x, p_corners[i_corners].y, p_corners[i_corners].z,
+						 &x, &y);
+					corners[i_corners].x = x;
+					corners[i_corners].y = y;
 				    } else {
 					corners[i_corners].x = map_x(p_corners[i_corners].x);
 					corners[i_corners].y = map_y(p_corners[i_corners].y);

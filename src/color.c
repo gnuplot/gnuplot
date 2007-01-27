@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.71 2006/10/19 17:43:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.72 2006/11/12 23:43:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -240,11 +240,14 @@ filled_quadrangle(gpdPoint * corners)
 #endif
 {
     int i;
+    double x, y;
 #ifndef EXTENDED_COLOR_SPECS
     gpiPoint icorners[4];
 #endif
     for (i = 0; i < 4; i++) {
-	map3d_xy(corners[i].x, corners[i].y, corners[i].z, &icorners[i].x, &icorners[i].y);
+	map3d_xy_double(corners[i].x, corners[i].y, corners[i].z, &x, &y);
+	icorners[i].x = x;
+	icorners[i].y = y;
     }
 
     ifilled_quadrangle(icorners);
@@ -259,10 +262,14 @@ void
 filled_polygon_3dcoords(int points, struct coordinate GPHUGE * coords)
 {
     int i;
+    double x, y;
     gpiPoint *icorners;
     icorners = gp_alloc(points * sizeof(gpiPoint), "filled_polygon3d corners");
-    for (i = 0; i < points; i++)
-	map3d_xy(coords[i].x, coords[i].y, coords[i].z, &icorners[i].x, &icorners[i].y);
+    for (i = 0; i < points; i++) {
+	map3d_xy_double(coords[i].x, coords[i].y, coords[i].z, &x, &y);
+	icorners[i].x = x;
+	icorners[i].y = y;
+    }
 #ifdef EXTENDED_COLOR_SPECS
     if (supply_extended_color_specs) {
 	icorners[0].spec.gray = -1;	/* force solid color */
@@ -285,10 +292,14 @@ void
 filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, double z)
 {
     int i;
+    double x, y;
     gpiPoint *icorners;
     icorners = gp_alloc(points * sizeof(gpiPoint), "filled_polygon_zfix corners");
-    for (i = 0; i < points; i++)
-	map3d_xy(coords[i].x, coords[i].y, z, &icorners[i].x, &icorners[i].y);
+    for (i = 0; i < points; i++) {
+	map3d_xy_double(coords[i].x, coords[i].y, z, &x, &y);
+	icorners[i].x = x;
+	icorners[i].y = y;
+    }
 #ifdef EXTENDED_COLOR_SPECS
     if (supply_extended_color_specs) {
 	icorners[0].spec.gray = -1;	/* force solid color */
