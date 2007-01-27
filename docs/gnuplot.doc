@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.410 2007/01/17 05:34:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.411 2007/01/26 23:19:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -88,25 +88,26 @@ C
 ?introduction
 ?
  `gnuplot` is a command-driven interactive function and data plotting program.
- It is case sensitive (commands and function names written in lowercase are
- not the same as those written in CAPS).  All command names may be abbreviated
- as long as the abbreviation is not ambiguous.  Any number of commands may
- appear on a line (with the exception that `load` or `call` must be the final
- command), separated by semicolons (;).  Strings are indicated with quotes.
- They may be either single or double quotation marks, e.g.,
+
+ Any command-line arguments are assumed to be names of files containing
+ `gnuplot` commands, with the exception of standard X11 arguments, which are
+ processed first.  Each file is loaded with the `load` command, in the order
+ specified.  `gnuplot` exits after the last file is processed.  The special
+ filename "-" is used to denote standard input.  When no load files are named,
+ `gnuplot` enters into an interactive mode.  See help for `batch/interactive`
+ for more details.
+
+ `gnuplot` is case sensitive (commands and function names written in lowercase
+ are not the same as those written in CAPS).  All command names may be
+ abbreviated as long as the abbreviation is not ambiguous.  Any number of
+ commands may appear on a line (with the exception that `load` or `call` must
+ be the final command), separated by semicolons (;).  Strings are indicated
+ with quotes.  They may be either single or double quotation marks, e.g.,
 
        load "filename"
        cd 'dir'
 
  although there are some subtle differences (see `syntax` for more details).
-
- Any command-line arguments are assumed to be names of files containing
- `gnuplot` commands, with the exception of standard X11 arguments, which are
- processed first.  Each file is loaded with the `load` command, in the order
- specified.  `gnuplot` exits after the last file is processed.  When no load
- files are named, `gnuplot` enters into an interactive mode.  The special
- filename "-" is used to denote standard input.  See help for `batch/interactive`
- for more details.
 
  Many `gnuplot` commands have multiple options. Version 4 is less sensitive
  to the order of these options than earlier versions, but some order-dependence

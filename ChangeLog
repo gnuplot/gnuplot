@@ -1,3 +1,9 @@
+2007-01-27  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* docs/gnuplot.doc: Rearranged the introduction, so it discusses
+	command-line arguments before gnuplot commands, and command files
+	before interactive mode. 
+
 2007-01-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc term/gd.trm: Mention that in order to use transparent
