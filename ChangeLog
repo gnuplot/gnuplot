@@ -1,3 +1,9 @@
+2007-01-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (store_label): Only store color value for each label
+	in a "with labels" plot if "rgb variable" has been requested.
+	Bugfix.
+
 2007-01-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.h src/graphics.c (plot_image_or_update_axes)
