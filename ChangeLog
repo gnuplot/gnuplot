@@ -1,3 +1,8 @@
+2007-01-29  Per Persson <persquare@mac.com>
+
+	* configure.in: Testing libreadline for remove_history presence 
+	instead of readline to avoid incompatible libedit wrapper.
+	
 2007-01-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/post.trm: Typo in docs.
