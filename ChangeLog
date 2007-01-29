@@ -1,3 +1,14 @@
+2007-01-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (get_position_default): Because the same parsing routines
+	are used for both 2D and 3D positions, the trailing comma after a 2D
+	position can be ambiguous.  For example:
+	  plot "foo" with labels offset 1,1, "bar" with points
+	currently produces an error when the parsing routine tries to interpret
+	"bar" as a z component of the offset.  This patch fixes the common case
+	shown above, although more pathological cases are still possible.
+	E.g.  plot foo w labels offset 1,1,   4 with lines
+
 2007-01-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (store_label): Only store color value for each label
