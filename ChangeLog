@@ -1,3 +1,9 @@
+2007-01-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (ENHGD_FLUSH):  libgd 2.0.34 will allow explicit request
+	for Adobe Symbol font encoding.  Make use of this to handle transient
+	use of Symbol font in enhanced text.  Does not affect older gd versions.
+
 2007-01-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (get_position_default): Because the same parsing routines
