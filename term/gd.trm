@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.95.2.3 2006/12/21 20:32:51 sfeam Exp $
+ * $Id: gd.trm,v 1.95.2.4 2007/01/07 01:16:32 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -335,6 +335,11 @@ typedef struct {
 }   PNG_FILL_TILE;
 
 static PNG_FILL_TILE PNG_fill_tile = { (gdImagePtr)0, 0, 0 };
+
+/* To be used with libgd 2.0.34 to request Symbol encoding */
+#ifdef gdFTEX_Adobe_Custom
+static gdFTStringExtra PNG_FONT_INFO = {0,0,0,0,0,NULL,NULL};
+#endif
 
 #if defined(WIN32) && !defined(NONDLL)
 static void 
@@ -1831,12 +1836,31 @@ ENHGD_FLUSH()
 	    y += cos((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
 	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
 	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
+
+#ifdef gdFTEX_Adobe_Custom
+	    /* libgd defaults to UTF-8 encodings. We have limited options for	*/
+	    /* over-riding this, but we can try					*/
+	    if (ENHgd_font && !strcmp(ENHgd_font,"Symbol")) {
+		PNG_FONT_INFO.flags |= gdFTEX_CHARMAP;
+		PNG_FONT_INFO.charmap = gdFTEX_Adobe_Custom;
+	    } else {
+		PNG_FONT_INFO.flags &= ~gdFTEX_CHARMAP;
+		PNG_FONT_INFO.charmap = 0;   /* gdFTEX_Adobe_Custom */
+	    }
+	    err = gdImageStringFTEx(
+			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
+			brect, png_state.color,
+			ENHgd_font, ENHgd_fontsize,
+			(double)png_state.angle * M_PI_2/90.,
+			x, Y(y), enhanced_text, &PNG_FONT_INFO);
+#else
 	    err = gdImageStringFT(
 			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
 			brect, png_state.color,
 			ENHgd_font, ENHgd_fontsize,
 			(double)png_state.angle * M_PI_2/90.,
 			x, Y(y), enhanced_text);
+#endif
 	    if (err) 
 		fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
 		    err,enhanced_text,ENHgd_font);
