@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.107 2007/01/26 23:19:42 sfeam Exp $
+ * $Id: gd.trm,v 1.108 2007/02/01 04:50:01 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1879,7 +1879,7 @@ ENHGD_FLUSH()
 	    if (encoding != S_ENC_UTF8 && ENHgd_font && !strcmp(ENHgd_font,"Symbol")) {
 		PNG_FONT_INFO.flags |= gdFTEX_CHARMAP;
 		PNG_FONT_INFO.charmap = gdFTEX_Adobe_Custom;
-		fprintf(stderr,"PNG_set_font: requesting a special charmap\n");
+		/* fprintf(stderr,"PNG_set_font: requesting a special charmap\n"); */
 	    } else {
 		PNG_FONT_INFO.flags &= ~gdFTEX_CHARMAP;
 		PNG_FONT_INFO.charmap = 0;   /* gdFTEX_Adobe_Custom */
