@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.95.2.4 2007/01/07 01:16:32 sfeam Exp $
+ * $Id: gd.trm,v 1.95.2.5 2007/02/01 06:25:41 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2074,7 +2074,7 @@ TERM_TABLE_END(png_driver)
 #ifndef JPEG_HELP_ONLY
 #ifdef TERM_HELP
 START_HELP(png)
-"1 png (NEW)",
+"1 png",
 "?commands set terminal png",
 "?set terminal png",
 "?set term png",
