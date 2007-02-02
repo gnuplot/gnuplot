@@ -1,5 +1,12 @@
 2007-02-02  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
+	* configure.in (PKG_CHECK_MODULES):
+	* m4/pkg.m4:
+	Cleanup configure.in by defining PKG_CHECK_MODULES_NOFAIL in pkg.m4
+	instead of copying the default help messages by ourself.
+
+2007-02-02  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
 	* configure.in:
 	* src/Makefile.am:
 	Use autotools' name transformation mechanism to define GNUPLOT_X11 as
