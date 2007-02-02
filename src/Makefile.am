@@ -18,14 +18,13 @@ GNUPLOT_PS_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/PostScript
 
 # There is probably no need to edit anything below this line
 
-GNUPLOT_X11 = @GNUPLOT_X11@
-EXTRA_PROGRAMS = gnuplot_x11
 bin_PROGRAMS = gnuplot
-pkglibexec_PROGRAMS = $(GNUPLOT_X11)
 noinst_PROGRAMS = bf_test
 
-XLIBS = @LIBRARIES_FOR_X@
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
+transform = @program_transform_name@
+GNUPLOT_X11 = `echo gnuplot_x11 | sed '$(transform)'`$(EXEEXT)
+
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h \
 breaders.c breaders.h bitmap.c bitmap.h color.c color.h command.c \
@@ -47,12 +46,15 @@ endif
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS) $(WX_LIBS)
 
+if BUILD_GNUPLOT_X11
+pkglibexec_PROGRAMS = gnuplot_x11
 gnuplot_x11_SOURCES = gplt_x11.c gplt_x11.h gpexecute.c gpexecute.h mousecmn.h
+XLIBS = @LIBRARIES_FOR_X@
+gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
+endif
 
 getcolor_x11.o: getcolor.c
 	$(COMPILE) -c -DGPLT_X11_MODE -o getcolor_x11.o $(srcdir)/getcolor.c
-
-gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
 
 bf_test_SOURCES = bf_test.c binary.c binary.h alloc.c
 

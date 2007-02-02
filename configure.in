@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.212 2007/01/22 11:13:32 mikulik Exp $
+dnl $Id: configure.in,v 1.213 2007/01/24 05:22:11 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -57,13 +57,9 @@ fi
 if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   LIBRARIES_FOR_X="$X_LIBS -lX11 $X_EXTRA_LIBS"
-  GNUPLOT_X11='gnuplot_x11${EXEEXT}'
   AC_DEFINE(X11,1,[ Define if you are using the X11 window system. ])
-else
-  GNUPLOT_X11=
 fi
-
-AC_SUBST(GNUPLOT_X11)
+AM_CONDITIONAL(BUILD_GNUPLOT_X11, test "$no_x" != yes)
 
 dnl Operating systems.
 dnl FIXME AC_DEFINE(ISC22)
