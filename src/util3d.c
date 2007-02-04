@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.27 2005/09/28 00:19:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.28 2006/10/21 22:58:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -1101,9 +1101,7 @@ draw3d_line_unconditional(
 	if (linetype != lp->l_type)
 	    (term->linetype)(linetype);
 
-    /* FIXME HBB 20000621: should this call clip_line, instead? */
-    (term->move)(x1, y1);
-    (term->vector)(x2, y2);
+    draw_clip_line(x1,y1,x2,y2);
 }
 
 void
