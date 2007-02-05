@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.214 2007/02/02 22:30:36 tlecomte Exp $
+dnl $Id: configure.in,v 1.215 2007/02/04 18:58:06 tlecomte Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -296,7 +296,7 @@ if test "$with_readline" != no; then
     done
 
     if test "$with_readline" = gnu; then
-      AC_CHECK_LIB(readline, readline,
+      AC_CHECK_LIB(readline, remove_history,
         [TERMLIBS="-lreadline $gp_tcap $TERMLIBS"],, [${gp_tcap}])
     else
       if test -d $with_readline/include; then
@@ -306,12 +306,12 @@ if test "$with_readline" != no; then
         LDFLAGS="$LDFLAGS -L$with_readline/lib"
       fi
 
-      AC_CHECK_LIB(readline,readline,
+      AC_CHECK_LIB(readline, remove_history,
         [TERMLIBS="-lreadline $gp_tcap $TERMLIBS"],,[${gp_tcap}])
 
     fi
 
-    if test "$ac_cv_lib_readline_readline" = no; then
+    if test "$ac_cv_lib_readline_remove_history" = no; then
       AC_MSG_WARN([GNU readline not found - falling back to builtin readline])
       with_readline=builtin
     else
