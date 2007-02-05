@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.213 2007/01/22 04:10:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.214 2007/01/27 21:40:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2230,6 +2230,17 @@ finish_filled_curve(
 		break;
 	case FILLEDCURVES_BETWEEN:
 		side = (corners[points].x > 0) ? 1 : -1;
+
+		/* Prevent 1-pixel overlap of component rectangles, which */
+		/* causes vertical stripe artifacts for transparent fill  */
+		if (plot->fill_properties.fillstyle == FS_TRANSPARENT_SOLID) {
+		    int direction = (corners[2].x < corners[0].x) ? -1 : 1;
+		    if (points >= 4 && corners[2].x == corners[3].x) {
+			corners[2].x -= direction, corners[3].x -= direction;
+		    } else if (points >= 5 && corners[3].x == corners[4].x) {
+			corners[3].x -= direction, corners[4].x -= direction;
+		    }
+		}
 		break;
 	default: /* the polygon is closed by default */
 		break;

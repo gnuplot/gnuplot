@@ -1,3 +1,12 @@
+2007-02-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (finish_filled_curve):
+	Fill between curves is created by a sequence of quadrangles.
+	Unfortunately there is a 1-pixel overlap of adjacent quadrangles.
+	This causes a regular artifact (vertical stripes) if the fill style is
+	transparent solid. This patch tests for the special case and reduces
+	the width of each quadrangle by one pixel so that there is no overlap.
+
 2007-02-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c (draw3d_line_unconditional):  Clip line segment.
