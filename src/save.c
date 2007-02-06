@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.138 2006/11/13 00:01:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.139 2006/12/12 05:25:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1115,7 +1115,9 @@ save_pm3dcolor(FILE *fp, const struct t_colorspec *tc)
 		      break;
 	case TC_RGB:  {
 		      const char *color = reverse_table_lookup(pm3d_color_names_tbl, tc->lt);
-		      if (color)
+		      if (tc->value < 0)
+		  	fprintf(fp," rgb variable ");
+		      else if (color)
 	    		fprintf(fp," rgb \"%s\" ", color);
     		      else
 	    		fprintf(fp," rgb \"#%6.6x\" ", tc->lt);

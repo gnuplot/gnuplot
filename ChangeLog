@@ -3,6 +3,8 @@
 	* src/misc.c src/graphics.c: Update comments to match code handling
 	colorspec with "rgb variable".
 
+	* src/save.c (save_pm3dcolor): Save/show "rgb variable" when needed.
+
 2007-02-05  Per Persson <persquare@mac.com>
 
 	* configure.in: Testing libreadline for remove_history presence 
