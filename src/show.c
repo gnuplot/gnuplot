@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.190 2006/11/13 00:01:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.191 2006/12/27 21:40:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1721,6 +1721,11 @@ show_keytitle()
     fprintf(stderr, "\tkey title is \"%s\"\n", conv_text(key->title));
     if (key->font && *(key->font))
 	fprintf(stderr,"\t  font \"%s\"\n", key->font);
+    if (key->textcolor.type != TC_LT || key->textcolor.lt != LT_BLACK) {
+	fputs("\t ", stderr);
+	save_textcolor(stderr, &(key->textcolor));
+	fputs("\n", stderr);
+    }
 }
 
 

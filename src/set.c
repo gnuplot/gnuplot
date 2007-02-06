@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.241 2006/12/27 21:40:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.242 2007/01/03 06:14:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1740,6 +1740,14 @@ set_key()
 		key->font = try_to_get_string();
 		c_token--;
 	    }
+	    break;
+	case S_KEY_TEXTCOLOR:
+	    {
+	    struct t_colorspec lcolor = DEFAULT_COLORSPEC;
+	    parse_colorspec(&lcolor, TC_FRAC);
+	    key->textcolor = lcolor;
+	    }
+	    c_token--;
 	    break;
 
 	case S_KEY_MANUAL:

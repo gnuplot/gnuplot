@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.215 2007/02/05 19:30:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.216 2007/02/06 21:05:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1761,6 +1761,10 @@ do_plot(struct curve_points *plots, int pcount)
 	    int center = (keybox.xl + keybox.xr) / 2;
 	    double extra_height = 0.0;
 
+	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
+		apply_pm3dcolor(&(key->box.pm3d_color), t);
+	    else
+		apply_pm3dcolor(&(key->textcolor), t);
 	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
 		extra_height += 0.51;
 	    write_multiline(center, yl - (0.5 + extra_height/2.0) * t->v_char,
@@ -1770,6 +1774,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    ktitl_lines += extra_height;
 	    keybox.yb -= extra_height * t->v_char;
 	    yl -= t->v_char * ktitl_lines;
+	    (*t->linetype)(LT_BLACK);
 	}
 
 	yl -= (int)(0.5 * key->height_fix * t->v_char);
@@ -5002,8 +5007,15 @@ do_key_sample(
     else
 	clip_area = &canvas;
 
-    /* Draw key text in black */
-    (*t->linetype)(LT_BLACK);
+    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
+	/* Draw key text in same color as plot */
+	;
+    else if (key->textcolor.type != TC_DEFAULT)
+	/* Draw key text in same color as key title */
+	apply_pm3dcolor(&key->textcolor, t);
+    else
+	/* Draw key text in black */
+	(*t->linetype)(LT_BLACK);
 
     if (key->just == GPKEY_LEFT) {
 	write_multiline(xl + key_text_left, yl, title, LEFT, JUST_TOP, 0, key->font);

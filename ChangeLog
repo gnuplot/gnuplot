@@ -5,6 +5,15 @@
 
 	* src/save.c (save_pm3dcolor): Save/show "rgb variable" when needed.
 
+	* src/gadgets.h src/tables.c src/tables.h src/save.c (save_set_all) 
+	src/graphics.c (do_plot do_key_sample) src/show.c (show_keytitle)
+	src/set.c (set_key) : Add a textcolor field to legend_key structure.
+	The requested color is applied to the key title and to the plot titles
+	in the key.  Setting the color to "rgb variable" causes plot titles to
+	match the linetype color of the corresponding plot (as in version 3.7).
+
+	* demo/colorscheme.dem : New demo
+
 2007-02-05  Per Persson <persquare@mac.com>
 
 	* configure.in: Testing libreadline for remove_history presence 
