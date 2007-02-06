@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.84 2006/12/27 21:40:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.85 2007/01/17 05:34:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1020,7 +1020,6 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	c_token++;
 	tc->type = TC_RGB;
 	if (almost_equals(c_token, "var$iable")) {
-	    /* Flag to indicate "variable", not currently checked anywhere */
 	    tc->value = -1.0;
 	    c_token++;
 	    return;

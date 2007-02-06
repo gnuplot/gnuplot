@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.214 2007/01/27 21:40:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.215 2007/02/05 19:30:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2055,6 +2055,7 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 	    }
 	}
 
+	/* rgb variable  -  color read from data column */
 	if ((plot->lp_properties.pm3d_color.value < 0.0)
 	    && (plot->lp_properties.pm3d_color.type == TC_RGB))
 	    set_rgbcolor( plot->points[i].yhigh);
@@ -3558,6 +3559,7 @@ plot_points(struct curve_points *plot)
 		    && x <= plot_bounds.xright - p_width
 		    && y <= plot_bounds.ytop - p_height)) {
 
+		/* rgb variable  -  color read from data column */
 		if ((plot->lp_properties.pm3d_color.value < 0.0)
 		    && (plot->lp_properties.pm3d_color.type == TC_RGB))
 		    set_rgbcolor( plot->points[i].yhigh);
@@ -3585,6 +3587,7 @@ plot_dots(struct curve_points *plot)
 	if (plot->points[i].type == INRANGE) {
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
+	    /* rgb variable  -  color read from data column */
 	    if ((plot->lp_properties.pm3d_color.value < 0.0)
 		&& (plot->lp_properties.pm3d_color.type == TC_RGB))
 		set_rgbcolor( plot->points[i].yhigh);

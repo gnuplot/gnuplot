@@ -1,3 +1,8 @@
+2007-02-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c src/graphics.c: Update comments to match code handling
+	colorspec with "rgb variable".
+
 2007-02-05  Per Persson <persquare@mac.com>
 
 	* configure.in: Testing libreadline for remove_history presence 
