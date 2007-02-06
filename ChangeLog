@@ -14,6 +14,8 @@
 
 	* demo/colorscheme.dem : New demo
 
+	* docs/gnuplot.doc: Update section on "set key".
+
 2007-02-05  Per Persson <persquare@mac.com>
 
 	* configure.in: Testing libreadline for remove_history presence 
