@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.116 2006/12/27 21:40:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.117 2006/12/28 21:14:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -267,6 +267,10 @@ static int df_lower_index = 0;  /* first mesh required */
 static int df_upper_index = MAXINT;
 static int df_index_step = 1;   /* 'every' for indices */
 static int df_current_index;    /* current mesh */
+
+/* stuff for named index support */
+static char *indexname = NULL;
+static TBOOLEAN index_found = FALSE;
 
 /* stuff for every point:line */
 static int everypoint = 1;
@@ -1049,6 +1053,8 @@ df_open(const char *cmd_filename, int max_using)
     df_lower_index = 0;
     df_index_step = 1;
     df_upper_index = MAXINT;
+    free(indexname);
+    indexname = NULL;
 
     df_current_index = 0;
     blank_count = 2;
@@ -1422,6 +1428,13 @@ plot_option_index()
 #endif
 
     ++c_token;
+    /* Check for named index */
+    if ((indexname = try_to_get_string())) {
+	index_found = FALSE;
+	return;
+    }
+
+    /* Numerical index list */
     df_lower_index = int_expression();
     if (equals(c_token, ":")) {
 	++c_token;
@@ -1671,8 +1684,15 @@ df_readascii(double v[], int max)
 	/*}}} */
 
 	/*{{{  skip comments */
-	if (is_comment(*s))
+	if (is_comment(*s)) {
+	    if (indexname) { /* Look for index name in comment */
+		while (is_comment(*s) || isspace((int)*s))
+		    ++s;
+		if (*s && !strncmp(s, indexname, strlen(indexname)))
+		    index_found = TRUE;
+	    }
 	    continue;           /* ignore comments */
+	}
 	/*}}} */
 
 	/*{{{  check EOF on mixed data */
@@ -1704,6 +1724,13 @@ df_readascii(double v[], int max)
 		++df_current_index;
 		line_count = 0;
 		df_datum = -1;
+
+		/* Found two blank lines after a block of data with a named index */
+		if (indexname && index_found) {
+		    df_eof = 1;
+		    return DF_EOF;
+		}
+
 		/* ignore line if current_index has just become
 		 * first required one - client doesn't want this
 		 * blank line. While we're here, check for <=
@@ -1725,6 +1752,8 @@ df_readascii(double v[], int max)
 		}
 	    }
 	    /* dont tell client if we haven't reached first index */
+	    if (indexname && !index_found)
+		continue;
 	    if (df_current_index < df_lower_index)
 		continue;
 
@@ -1745,6 +1774,8 @@ df_readascii(double v[], int max)
 	 * but for mixed input stream, we must skip garbage
 	 */
 
+	if (indexname && !index_found)
+	    continue;
 	if (df_current_index < df_lower_index ||
 	    df_current_index > df_upper_index ||
 	    ((df_current_index - df_lower_index) % df_index_step) != 0)

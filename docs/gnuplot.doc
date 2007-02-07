@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.412 2007/01/27 17:58:33 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.413 2007/02/07 00:30:47 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3199,7 +3199,7 @@ C ... and restart the table:
  Syntax:
        plot '<file_name>' {binary <binary list>}
                           {matrix}
-                          {index <index list>}
+                          {index <index list> | index "<name>"}
                           {every <every list>}
                           {thru <thru expression>}
                           {using <using list>}
@@ -3685,7 +3685,7 @@ C ... and restart the table:
  file to be plotted.
 
  Syntax:
-       plot 'file' index <m>{{:<n>}:<p>}
+       plot 'file' index { <m>{{:<n>}:<p>} | "<name>" }
 
  Data sets are separated by pairs of blank records.  `index <m>` selects only
  set <m>; `index <m>:<n>` selects sets in the range <m> to <n>; and `index
@@ -3696,6 +3696,18 @@ C ... and restart the table:
 
  Example:
        plot 'file' index 4:5
+
+ `index '<name>'` selects the data set with name '<name>'.  Names are assigned
+ to data sets in comment lines.  The comment character and leading white space
+ are removed from the comment line.  If the resulting line starts with <name>,
+ the following data set is now named <name> and can be selected.
+
+ Example:
+       plot 'file' index 'Population'
+
+ Please note that every comment that starts with <name> will name the following
+ data set.  To avoid problems use a naming scheme like e.g. '== Popolation =='
+ or '[Population]'.
 
 ^ See also web page
 ^ <a href="http://www.gnuplot.info/demo/multimsh.html">
