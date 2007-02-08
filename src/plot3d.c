@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.131.2.2 2006/12/09 18:02:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.131.2.3 2007/01/20 19:34:36 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1872,7 +1872,7 @@ eval_3dplots()
 	    /* Make sure this one can be contoured. */
 	    if (!this_plot->has_grid_topology) {
 		this_plot->contours = NULL;
-		fputs("Notice: cannot contour non grid data!\n", stderr);
+		fputs("Notice: Cannot contour non grid data. Please use \"set dgrid3d\".\n", stderr);
 		/* changed from int_error by recommendation of
 		 * rkc@xn.ll.mit.edu
 		 */
