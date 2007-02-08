@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.108 2007/02/01 04:50:01 sfeam Exp $
+ * $Id: gd.trm,v 1.109 2007/02/01 04:51:29 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1440,14 +1440,14 @@ TERM_PUBLIC void
 PNG_vector(unsigned int x, unsigned int y)
 {
     int lw;
-    int png_linetype_dotted[5];
 
     if (png_state.linetype == -1) {
-	png_linetype_dotted[0] = png_state.color_table[2];
-	png_linetype_dotted[1] = png_state.color_table[2];
-	png_linetype_dotted[2] = png_state.color_table[0];
-	png_linetype_dotted[3] = png_state.color_table[0];
-	png_linetype_dotted[4] = png_state.color_table[0];
+	int png_linetype_dotted[5];
+	png_linetype_dotted[0] = png_state.color;
+	png_linetype_dotted[1] = png_state.color;
+	png_linetype_dotted[2] = gdTransparent;
+	png_linetype_dotted[3] = gdTransparent;
+	png_linetype_dotted[4] = gdTransparent;
 
 	gdImageSetStyle(png_state.image, png_linetype_dotted, 5);
 	gdImageLine(png_state.image, png_state.x, Y(png_state.y),

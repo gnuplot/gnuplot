@@ -1,3 +1,10 @@
+2007-02-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_vector): Grid lines (linetype 0) were always
+	treated as alternating black/white/black/white.  Change this to
+	alternating current_color/transparent/current_color/transparent.
+	Bug #1655001
+
 2007-02-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (test_palette_subcommand): Do not use deprecated
