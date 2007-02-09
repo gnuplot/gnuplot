@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.6 2006/12/21 20:32:50 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.7 2006/12/28 21:27:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5483,6 +5483,7 @@ C ... and restart the table:
  contours with user defined levels demo (discrete.dem).
 ^ </a>
 3 data style
+?DUMMYLABEL set style data
  This form of the command is deprecated. Please see `set style data`.
 3 datafile
 ?set datafile
