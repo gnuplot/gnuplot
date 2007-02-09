@@ -59,7 +59,7 @@ struct TERMENTRY {
                            unsigned int, TBOOLEAN));
    int (*set_font) __PROTO((const char *font));  /* "font,size" */
    void (*pointsize) __PROTO((double pointsize));
-                              int flags; /* various flags */
+   int flags;                       /* various flags */
    void (*suspend) __PROTO((void)); /* after one plot of multiplot */
    void (*resume) __PROTO((void));  /* before subsequent plot of multiplot */
    void (*fillbox) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
