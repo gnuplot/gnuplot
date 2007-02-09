@@ -1,3 +1,10 @@
+2007-02-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (do_3dplot draw_3d_graphbox):  Add special-case
+	tests to insure that the plot border is drawn either in back or
+	in front of the grid when splot_map is set.
+	Bug #1655001
+
 2007-02-09  Petr Mikulik  <mikulik@physics.muni.cz>
 	* docs/gnuplot.doc: Add a dummy label for "3 data style" to avoid
 	bug in doc2gih (try "help contour").
