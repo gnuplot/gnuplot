@@ -1,3 +1,10 @@
+2007-02-10  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/plot.c (main): Flag 'interactive' not reset to FALSE after running
+	command "gnuplot - nonExistingScript.gp". On some platforms, gnuplot
+	cannot 'exit' and goes to an infinite loop after Ctrl-D.
+	Bug #1612995 
+
 2007-02-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Add a dummy label for "3 data style" to avoid bug
