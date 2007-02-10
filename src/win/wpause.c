@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.13 2006/06/13 20:26:35 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.14 2006/11/10 22:30:16 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -180,9 +180,17 @@ PauseBox(LPPW lppw)
 		lppw->hWndParent, NULL, lppw->hInstance, lppw);
 
 	SendMessage(lppw->hCancel, BM_SETSTYLE, (WPARAM)BS_DEFPUSHBUTTON, (LPARAM)FALSE);
-	ShowWindow(lppw->hWndPause, SW_SHOWNORMAL);
-	BringWindowToTop(lppw->hWndPause);
-	UpdateWindow(lppw->hWndPause);
+
+	/* Don't show the pause "OK CANCEL" dialog for "pause mouse ..." -- well, show
+	   it only for "pause -1".
+	   Note: maybe to show in the window titlebar or somewhere else a message like 
+	   graphwin.Title = "gnuplot pausing (waiting for mouse click)";
+	*/
+	if (!paused_for_mouse) {
+	    ShowWindow(lppw->hWndPause, SW_SHOWNORMAL);
+	    BringWindowToTop(lppw->hWndPause);
+	    UpdateWindow(lppw->hWndPause);
+	}
 
 	lppw->bPause = TRUE;
 	lppw->bPauseCancel = IDCANCEL;
