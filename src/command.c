@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.146 2006/12/27 21:40:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.147 2007/02/07 23:06:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1090,10 +1090,15 @@ pause_command()
     }
     if (sleep_time < 0) {
 #ifdef _Windows
+    if (!graphwin.hWndGraph) {
+	char tmp[512];
+	fgets(tmp, 512, stdin); /* graphical window not yet initialized, wait for any key here */
+    } else { /* pausing via graphical windows */
 	if (!Pause(buf)) {
 	    free(buf);
 	    bail_to_command_line();
 	}
+    }
 #elif defined(OS2)
 	if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
 	    int rc;
