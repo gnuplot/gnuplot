@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.84 2006/07/06 23:11:09 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.85 2006/07/18 05:20:50 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1362,6 +1362,11 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
      * which is a bad thing if you are in the  middle of a mousing operation.
      */
 
+#ifdef _Windows
+    if (paused_for_mouse & PAUSE_KEYSTROKE)
+	kill_pending_Pause_dialog();
+#endif
+    
     if ((paused_for_mouse & PAUSE_KEYSTROKE) && (c > '\0') && current) {
 	load_mouse_variables(x, y, FALSE, c);
 	return;
