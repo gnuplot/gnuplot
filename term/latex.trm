@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: latex.trm,v 1.29 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: latex.trm,v 1.30 2006/07/21 02:35:47 sfeam Exp $
  *
  */
 
@@ -74,6 +74,10 @@
  * - drd, Sept 1996
  */
 
+/* E A Merritt Feb 2007 - change sequence of point types to match
+ * PostScript and other terminals. Uses symbols from amssymb package.
+ */
+
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -142,17 +146,24 @@ static int latex_angle = 0;
 #define LATEX_TINY_DOT "\\rule{1pt}{1pt}"	/* for dots plot style */
 
 /* POINTS */
-#define LATEX_POINT_TYPES 12	/* we supply more point types */
+#define LATEX_POINT_TYPES 15	/* we supply more point types */
 
 static const char GPFAR *GPFAR LATEX_points[] = {
-    "\\raisebox{-.8pt}{\\makebox(0,0){$\\Diamond$}}",
     "\\makebox(0,0){$+$}",
-    "\\raisebox{-.8pt}{\\makebox(0,0){$\\Box$}}",
     "\\makebox(0,0){$\\times$}",
+    "\\makebox(0,0){$\\ast$}",
+    "\\raisebox{-.8pt}{\\makebox(0,0){$\\Box$}}",
+    "\\makebox(0,0){$\\blacksquare$}",
+    "\\makebox(0,0){$\\circ$}",
+    "\\makebox(0,0){$\\bullet$}",
     "\\makebox(0,0){$\\triangle$}",
-    "\\makebox(0,0){$\\star$}",
-    "\\circle{12}", "\\circle{18}", "\\circle{24}",
-    "\\circle*{12}", "\\circle*{18}", "\\circle*{24}"
+    "\\makebox(0,0){$\\blacktriangle$}",
+    "\\makebox(0,0){$\\triangledown$}",
+    "\\makebox(0,0){$\\blacktriangledown$}",
+    "\\makebox(0,0){$\\lozenge$}",
+    "\\makebox(0,0){$\\blacklozenge$}",
+    "\\makebox(0,0){$\\heartsuit$}",
+    "\\makebox(0,0){$\\spadesuit$}",
 };
 
 /* LINES */
@@ -889,6 +900,7 @@ START_HELP(latex)
 " \"\\Box\".  These commands no longer belong to the LaTeX2e core; they are included",
 " in the latexsym package, which is part of the base distribution and thus part",
 " of any LaTeX implementation.  Please do not forget to use this package.",
+" Other point types use symbols from the amssymb package.",
 "",
 " Examples:",
 " About label positioning:",
