@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.79 2006/11/18 02:54:09 sfeam Exp $
+ * $Id: cgm.trm,v 1.80 2007/01/14 05:06:50 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -469,11 +469,11 @@ CGM_options()
 			   font_index = CGM_find_font(cgm_font, strlen(cgm_font), &relwidth);
 		    if (font_index == 0) {
 			/* insert the font in the font table */
+			struct fontdata *new_font_data;
 			int i, n;
 			for (n=0; cgm_font_data[n].name; n++)
 				;
-			struct fontdata *new_font_data =
-			     gp_alloc((n + 2)*sizeof(struct fontdata), "CGM font list");
+			new_font_data = gp_alloc((n + 2)*sizeof(struct fontdata), "CGM font list");
 			new_font_data->name = s;
 			/* punt, since we don't know the real font width */
 			new_font_data->width = 1.0;
