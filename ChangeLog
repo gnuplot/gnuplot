@@ -2,6 +2,11 @@
 
 	* term/cgm.trm (CGM_options): Remove C++-ism
 
+	* src/set.c (parse_label_options) : Make sure that there is
+	a default point type, so that 'set label <n> point' does in fact
+	draw an acceptable point.
+	Bug #1652654
+
 2007-02-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (pause_command): On Windows, wait for Enter in console

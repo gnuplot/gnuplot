@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.242 2007/01/03 06:14:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.243 2007/02/06 23:56:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4898,6 +4898,7 @@ new_text_label(int tag)
     new->font = (char *)NULL;
     new->textcolor.type = TC_DEFAULT;
     new->lp_properties.pointflag = 0;
+    new->lp_properties.p_type = 1;
     new->offset = default_offset;
     new->noenhanced = FALSE;
 
@@ -5004,16 +5005,12 @@ parse_label_options( struct text_label *this_label )
 	if (loc_lp.pointflag == -2 && !axis_label) {
 	    if (almost_equals(c_token, "po$int")) {
 		int stored_token = ++c_token;
-	    struct lp_style_type tmp_lp = loc_lp;
-
-	    tmp_lp.p_type = -2;
-	    lp_parse(&tmp_lp, TRUE, TRUE);
-	    if (stored_token != c_token) {
-		loc_lp = tmp_lp;
+		struct lp_style_type tmp_lp;
 		loc_lp.pointflag = 1;
-		if (loc_lp.p_type < -1)
-		    loc_lp.p_type = 0;
-		}
+		tmp_lp = loc_lp;
+		lp_parse(&tmp_lp, TRUE, TRUE);
+		if (stored_token != c_token)
+		    loc_lp = tmp_lp;
 		continue;
 	    } else if (almost_equals(c_token, "nopo$int")) {
 		loc_lp.pointflag = 0;
