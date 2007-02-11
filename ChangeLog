@@ -1,10 +1,15 @@
+2007-02-11  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (pause_command): On Windows, cannot wait for Enter
+	in "pause -1" in a non-interactive session without the graph window.
+
 2006-02-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff: Sync Japanese documentation.
 
 2007-02-10  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/cgm.trm (CGM_options): Remove C++-ism
+	* term/cgm.trm (CGM_options): Remove C++-ism.
 
 	* src/set.c (parse_label_options) : Make sure that there is
 	a default point type, so that 'set label <n> point' does in fact
