@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.414 2007/02/08 01:55:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.415 2007/02/08 23:20:34 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6858,20 +6858,17 @@ C ... and restart the table:
 ?unset logscale
 ?show logscale
 ?set log
-?set log cb
 ?logscale
 ?nologscale
- Log scaling may be set on the x, y, z, x2 and/or y2 axes.
-
  Syntax:
        set logscale <axes> <base>
        unset logscale <axes>
        show logscale
 
- where <axes> may be any combinations of `x`, `y`, `z`, and `cb` in any order,
- or `x2` or `y2` and where <base> is the base of the log scaling.  If <base> is
- not given, then 10 is assumed.  If <axes> is not given, then all axes are
- assumed.  `unset logscale` turns off log scaling for the specified axes.
+ where <axes> may be any combinations of `x`, `x2, `y`, `y2`, `z`, and `cb` in
+ any order, and where <base> is the base of the log scaling.  If <base> is not
+ given, then 10 is assumed.  If <axes> is not given, then all axes are assumed.
+ `unset logscale` turns off log scaling for the specified axes.
 
  Examples:
 

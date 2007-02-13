@@ -1,3 +1,12 @@
+2007-02-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary): Do not apply log scale range checks to
+	colorbar and palette unless these really are used in the plot.
+	Bug #1659059
+
+	* docs/gnuplot.doc: Clarify the section on 'set log', and remove an
+	empty entry point for 'set log cb'.
+
 2007-02-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (pause_command): On Windows, cannot wait for Enter
