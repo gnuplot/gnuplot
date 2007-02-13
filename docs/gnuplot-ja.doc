@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot-ja.doc,v 1.131 2006-09-17 20:12:12+09 shige Exp $
+C RCS $Id: gnuplot-ja.doc,v 1.13 2006/09/24 17:23:45 mikulik Exp $
 C corresponding original gnuplot.doc revision: 1.387
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
@@ -6844,11 +6844,8 @@ C ... and restart the table:
 ?unset logscale
 ?show logscale
 ?set log
-?set log cb
 ?logscale
 ?nologscale
- 対数スケールは，x, y, z, x2, y2 の各軸について設定できます。
-
  書式:
          set logscale <axes> <base>
          unset logscale <axes>
