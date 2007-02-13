@@ -1,3 +1,8 @@
+2007-02-13  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/graph3d.c (boundary3d): Move addition of title key title lines to
+	number key_rows outside conditional test.
+
 2007-02-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Do not apply log scale range checks to

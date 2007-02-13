@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.166 2007/01/21 00:12:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.167 2007/02/09 03:55:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -411,8 +411,8 @@ boundary3d(struct surface_points *plots, int count)
 	    /* now calculate actual no rows depending on no cols */
 	    key_rows = (int) ((ptitl_cnt - 1) / key_cols) + 1;
 	}
-	key_rows += ktitle_lines;
     }
+    key_rows += ktitle_lines;
     if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
 	&& key->margin == GPKEY_RMARGIN) {
 	int key_width = key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
