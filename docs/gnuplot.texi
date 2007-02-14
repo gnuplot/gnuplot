@@ -7454,6 +7454,7 @@ and
 @node data_style, datafile, contour, set-show
 @subsection data style
 
+@c ?DUMMYLABEL set style data
 This form of the command is deprecated. Please see `set style data`.
 
 @node datafile, decimalsign, data_style, set-show
@@ -9048,14 +9049,11 @@ To change the decimal point locale, see @ref{decimalsign}.
 @c ?unset logscale
 @c ?show logscale
 @c ?set log
-@c ?set log cb
 @cindex logscale
 @opindex logscale
 
 
 @cindex nologscale
-
-Log scaling may be set on the x, y, z, x2 and/or y2 axes.
 
 Syntax:
 @example
@@ -9065,10 +9063,10 @@ Syntax:
 
 @end example
 
-where <axes> may be any combinations of `x`, `y`, `z`, and `cb` in any order,
-or `x2` or `y2` and where <base> is the base of the log scaling.  If <base> is
-not given, then 10 is assumed.  If <axes> is not given, then all axes are
-assumed.  @ref{logscale} turns off log scaling for the specified axes.
+where <axes> may be any combination of `x`, `x2`, `y`, `y2`, `z`, and `cb` in
+any order, and where <base> is the base of the log scaling.  If <base> is not
+given, then 10 is assumed.  If <axes> is not given, then all axes are assumed.
+@ref{logscale} turns off log scaling for the specified axes.
 
 Examples:
 
@@ -18672,6 +18670,11 @@ So `set term x11 font "arial,15,italic"` will be translated to
 The <size>, <slant>, and <weight> specifications are all optional.
 If you do not specify <slant> or <weight> then you will get whatever font 
 variant the font server offers first.
+You may set a default enconding via the corresponding X11 resource. E.g.
+@example
+      gnuplot*encoding: iso8859-15
+@end example
+
 The driver also recognizes some common PostScript font names and
 replaces them with possible X11 or TrueType equivalents.
 This same sequence is used to process font requests from @ref{label}.
@@ -19167,6 +19170,11 @@ So `set term x11 font "arial,15,italic"` will be translated to
 The <size>, <slant>, and <weight> specifications are all optional.
 If you do not specify <slant> or <weight> then you will get whatever font 
 variant the font server offers first.
+You may set a default enconding via the corresponding X11 resource. E.g.
+@example
+      gnuplot*encoding: iso8859-15
+@end example
+
 The driver also recognizes some common PostScript font names and
 replaces them with possible X11 or TrueType equivalents.
 This same sequence is used to process font requests from @ref{label}.
