@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.415 2007/02/08 23:20:34 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.416 2007/02/13 17:57:13 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6729,7 +6729,7 @@ C ... and restart the table:
  data.  Using `front` will prevent a label from being obscured by dense data.
 
  `textcolor <colorspec>` changes the color of the label text. <colorspec> can be
- a linetype, an rgb color, or a palette mapping. See help for `colorspece` and
+ a linetype, an rgb color, or a palette mapping. See help for `colorspec` and
  `palette`.  `textcolor` may be abbreviated `tc`.
     `tc default` resets the text color to its default state.
     `tc lt <n>` sets the text color to that of line type <n>.
@@ -6865,10 +6865,10 @@ C ... and restart the table:
        unset logscale <axes>
        show logscale
 
- where <axes> may be any combinations of `x`, `x2, `y`, `y2`, `z`, and `cb` in
+ where <axes> may be any combinations of `x`, `x2`, `y`, `y2`, `z`, and `cb` in
  any order, and where <base> is the base of the log scaling.  If <base> is not
  given, then 10 is assumed.  If <axes> is not given, then all axes are assumed.
- `unset logscale` turns off log scaling for the specified axes.
+ The command `unset logscale` turns off log scaling for the specified axes.
 
  Examples:
 
@@ -7128,7 +7128,7 @@ C ... and restart the table:
  commands within the `set multiplot`/`unset multiplot` block.
 
  The commands `set origin` and `set size` must be used to correctly position
- each plot if no `layout` is specified or if fine tuning is desired.  See
+ each plot if no layout is specified or if fine tuning is desired.  See
  `set origin` and `set size` for details of their usage.
 
  Example:
@@ -9723,7 +9723,7 @@ C ... and restart the table:
  the units of the font <size> depend upon which terminal is used.
 
  `textcolor <colorspec>` changes the color of the text. <colorspec> can be a
- linetype, an rgb color, or a palette mapping. See help for `colorspece` and
+ linetype, an rgb color, or a palette mapping. See help for `colorspec` and
  `palette`.
 
  `noenhanced` requests that the title not be processed by the enhanced text
