@@ -2,6 +2,8 @@
 
 	* docs/gnuplot.doc docs/gnuplot.texi: Fix typos that cause TeX failure.
 
+	* tutorial/header.tex: Add \usepackage{amssymb}
+
 2007-02-13  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/graph3d.c (boundary3d): Move addition of title key title lines to
