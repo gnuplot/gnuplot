@@ -222,12 +222,21 @@ to the extent permitted by applicable law.
 
 @c ?
 `gnuplot` is a command-driven interactive function and data plotting program.
-It is case sensitive (commands and function names written in lowercase are
-not the same as those written in CAPS).  All command names may be abbreviated
-as long as the abbreviation is not ambiguous.  Any number of commands may
-appear on a line (with the exception that `load` or @ref{call} must be the final
-command), separated by semicolons (;).  Strings are indicated with quotes.
-They may be either single or double quotation marks, e.g.,
+
+Any command-line arguments are assumed to be names of files containing
+`gnuplot` commands, with the exception of standard X11 arguments, which are
+processed first.  Each file is loaded with the `load` command, in the order
+specified.  `gnuplot` exits after the last file is processed.  The special
+filename "-" is used to denote standard input.  When no load files are named,
+`gnuplot` enters into an interactive mode.  See help for `batch/interactive`
+for more details.
+
+`gnuplot` is case sensitive (commands and function names written in lowercase
+are not the same as those written in CAPS).  All command names may be
+abbreviated as long as the abbreviation is not ambiguous.  Any number of
+commands may appear on a line (with the exception that `load` or @ref{call} must
+be the final command), separated by semicolons (;).  Strings are indicated
+with quotes.  They may be either single or double quotation marks, e.g.,
 
 @example
       load "filename"
@@ -236,14 +245,6 @@ They may be either single or double quotation marks, e.g.,
 @end example
 
 although there are some subtle differences (see `syntax` for more details).
-
-Any command-line arguments are assumed to be names of files containing
-`gnuplot` commands, with the exception of standard X11 arguments, which are
-processed first.  Each file is loaded with the `load` command, in the order
-specified.  `gnuplot` exits after the last file is processed.  When no load
-files are named, `gnuplot` enters into an interactive mode.  The special
-filename "-" is used to denote standard input.  See help for `batch/interactive`
-for more details.
 
 Many `gnuplot` commands have multiple options. Version 4 is less sensitive
 to the order of these options than earlier versions, but some order-dependence
@@ -988,7 +989,7 @@ data files.
 
 @cindex coordinates
 
-The commands @ref{arrow}, @ref{key}, @ref{label} and @ref{object} allow you
+The commands @ref{arrow}, `set key`, @ref{label} and @ref{object} allow you
 to draw something at an arbitrary position on the graph.  This position is
 specified by the syntax:
 
@@ -3076,7 +3077,7 @@ few miscellaneous things are enclosed in parentheses.  Braces @{@} are used for
 a few special purposes.
 
 Commas are used to separate coordinates on the `set` commands @ref{arrow},
-@ref{key}, and @ref{label}; the list of variables being fitted (the list after the
+`key`, and @ref{label}; the list of variables being fitted (the list after the
 `via` keyword on the `fit` command); lists of discrete contours or the loop
 parameters which specify them on the @ref{cntrparam} command; the arguments
 of the `set` commands @ref{dgrid3d}, @ref{dummy}, @ref{isosamples}, @ref{offsets}, @ref{origin},
@@ -4382,7 +4383,7 @@ Syntax:
 @example
       plot '<file_name>' @{binary <binary list>@}
                          @{matrix@}
-                         @{index <index list>@}
+                         @{index <index list> | index "<name>"@}
                          @{every <every list>@}
                          @{thru <thru expression>@}
                          @{using <using list>@}
@@ -4993,7 +4994,7 @@ file to be plotted.
 
 Syntax:
 @example
-      plot 'file' index <m>@{@{:<n>@}:<p>@}
+      plot 'file' index @{ <m>@{@{:<n>@}:<p>@} | "<name>" @}
 
 @end example
 
@@ -5009,6 +5010,21 @@ Example:
       plot 'file' index 4:5
 
 @end example
+
+`index '<name>'` selects the data set with name '<name>'.  Names are assigned
+to data sets in comment lines.  The comment character and leading white space
+are removed from the comment line.  If the resulting line starts with <name>,
+the following data set is now named <name> and can be selected.
+
+Example:
+@example
+      plot 'file' index 'Population'
+
+@end example
+
+Please note that every comment that starts with <name> will name the following
+data set.  To avoid problems use a naming scheme like e.g. '== Popolation =='
+or '[Population]'.
 
 @c ^ See also web page
 @uref{http://www.gnuplot.info/demo/multimsh.html, splot with indices demo.
@@ -5875,7 +5891,7 @@ it appears on the `plot` command.  If it is a file name, any datafile modifiers
 specified will be included in the default title.
 
 The layout of the key itself (position, title justification, etc.) can be
-controlled by @ref{key}.  Please see @ref{key} for details.
+controlled by `set key`.  Please see `set key` for details.
 
 Examples:
 
@@ -7509,6 +7525,7 @@ and
 @node data_style, datafile, contour, set-show
 @subsection data style
 
+@c ?DUMMYLABEL set style data
 This form of the command is deprecated. Please see `set style data`.
 
 @node datafile, decimalsign, data_style, set-show
@@ -8589,7 +8606,7 @@ the resolution of a function surface/contour.
 
 @cindex legend
 
-The @ref{key} enables a key (or legend) describing plots on a plot.
+The `set key` command enables a key (or legend) describing plots on a plot.
 
 The contents of the key, i.e., the names given to each plotted data set and
 function and samples of the lines and/or symbols used to represent them, are
@@ -8608,7 +8625,8 @@ Syntax:
               @{width <width_increment>@}
               @{height <height_increment>@}
               @{@{no@}autotitle @{columnheader@}@}
-              @{title "<text>"@} @{@{no@}enhanced@} @{font "<face>,<size>"@}
+              @{title "<text>"@} @{@{no@}enhanced@}
+              @{font "<face>,<size>"@} @{textcolor <colorspec>@}
               @{@{no@}box @{ @{linestyle | ls <line_style>@}
                          | @{linetype | lt <line_type>@}
                            @{linewidth | lw <line_width>@}@}@}
@@ -8617,8 +8635,10 @@ Syntax:
 
 @end example
 
-Plots may be drawn with no visible key by requesting `set key off` or
-@ref{key}.
+The key contains a title and a sample (line, point, box) for each plot
+in the graph. The key may be turned off by requesting `set key off` or
+`unset key`.  Individual key entries may be turned off by using the
+`notitle` keyword in the corresponding plot command.
 
 Elements within the key are stacked according to `vertical` or `horizontal`.
 In the case of `vertical`, the key occupies as few columns as possible.  That
@@ -8633,7 +8653,115 @@ The keywords `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
 graph.  Also an `at <position>` may be given to indicate precisely where the
 plot should be placed.  In this case, the keywords `left`, `right`, `top`,
 `bottom` and `center` serve an analogous purpose for alignment.
+For more information, see `key placement`.
 
+Justification of the plot titles within the key is controlled by `Left` or
+`Right` (default).  The text and sample can be reversed (`reverse`) and a
+box can be drawn around the key (`box @{...@}`) in a specified `linetype`
+and `linewidth`, or a user-defined `linestyle`. 
+
+By default the first plot label is at the top of the key and successive labels
+are entered below it. The `invert` option causes the first label to be placed
+at the bottom of the key, with successive labels entered above it. This option
+is useful to force the vertical ordering of labels in the key to match the
+order of box types in a stacked histogram.
+
+The <height_increment> is a number of character heights to be added to or
+subtracted from the height of the key box.  This is useful mainly when you are
+putting a box around the key, otherwise it can be used to adjust the vertical
+shift of automatically chosen key position by <height_increment>/2.
+
+All plotted curves of `plot`s and `splot`s are titled according to the
+default option `autotitles`. The automatic generation of titles can be
+suppressed by `noautotitles`; then only those titles explicitly defined
+by `(s)plot ... title ...` will be drawn.
+
+The `set key autotitle columnheader` command causes the first entry in each
+column of input data to be interpreted as a text string and used as a title for
+the corresponding plot. If the quantity being plotted is a function of data
+from several columns, gnuplot may be confused as to which column to draw the
+title from. In this case it is necessary to specify the column explicitly in
+the plot command, e.g. `plot "datafile" using (($2+$3)/$4) title 3 with lines`.
+
+An overall title can be put on the key (`title "<text>"`)---see also `syntax`
+for the distinction between text in single- or double-quotes.  The key title
+uses the same justification as do the plot titles.
+
+The defaults for `set key` are `on`, `right`, `top`, `vertical`, `Right`,
+`noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and
+`nobox`.  The default <linetype> is the same as that used for the plot
+borders.  Entering `set key default` returns the key to its default
+configuration.
+
+The key is drawn as a sequence of lines, with one plot described on each
+line.  On the right-hand side (or the left-hand side, if `reverse` is
+selected) of each line is a representation that attempts to mimic the way the
+curve is plotted.  On the other side of each line is the text description
+(the line title), obtained from the `plot` command.  The lines are vertically
+arranged so that an imaginary straight line divides the left- and right-hand
+sides of the key.  It is the coordinates of the top of this line that are
+specified with the `set key` command.  In a `plot`, only the x and y
+coordinates are used to specify the line position.  For a `splot`, x, y and
+z are all used as a 3-d location mapped using the same mapping as the graph
+itself to form the required 2-d screen position of the imaginary line.
+
+When using the TeX or PostScript drivers, or similar drivers where formatting
+information is embedded in the string, `gnuplot` is unable to calculate
+correctly the width of the string for key positioning.  If the key is to be
+positioned at the left, it may be convenient to use the combination  `set key
+left Left reverse`.  The box and gap in the grid will be the width of the
+literal string.
+
+If `splot` is being used to draw contours, the contour labels will be listed
+in the key.  If the alignment of these labels is poor or a different number
+of decimal places is desired, the label format can be specified.  See
+@ref{clabel} for details.
+
+Examples:
+
+This places the key at the default location:
+@example
+      set key default
+
+@end example
+
+This disables the key:
+@example
+      unset key
+
+@end example
+
+This places a key at coordinates 2,3.5,2 in the default (first) coordinate
+system:
+@example
+      set key at 2,3.5,2
+
+@end example
+
+This places the key below the graph:
+@example
+      set key below
+
+@end example
+
+This places the key in the bottom left corner, left-justifies the text,
+gives it a title, and draws a box around it in linetype 3:
+@example
+      set key left bottom Left title 'Legend' box 3
+
+@end example
+
+@menu
+* key_placement::               
+* key_samples::                 
+@end menu
+
+@node key_placement, key_samples, key, key
+@subsubsection key placement
+
+@c ?commands set key placement
+@c ?set key placement
+@c ?key placement
 To understand positioning, the best concept is to think of a region, i.e.,
 inside/outside, or one of the margins.  Along with the region, keywords
 `left/center/right` (l/c/r) and `top/center/bottom` (t/c/b) control where
@@ -8719,17 +8847,20 @@ is given is to align the key as though it were text positioned using the
 label command, i.e., `left` means left align with key to the right of
 <position>, etc.
 
-Justification of the labels within the key is controlled by `Left` or `Right`
-(default is `Right`).  The text and sample can be reversed (`reverse`) and a
-box can be drawn around the key (`box @{...@}`) in a specified `linetype`
-and `linewidth`, or a user-defined `linestyle`. Note that not all
-terminal drivers support linewidth selection, though.
+@node key_samples,  , key_placement, key
+@subsubsection key samples
 
-By default the first plot label is at the top of the key and successive labels
-are entered below it. The `invert` option causes the first label to be placed
-at the bottom of the key, with successive labels entered above it. This option
-is useful to force the vertical ordering of labels in the key to match the
-order of box types in a stacked histogram.
+@c ?commands set key samples
+@c ?set key samples
+@c ?key samples
+By default, each plot on the graph generates a corresponding entry in the
+key. This entry contains a plot title and a sample line/point/box of the
+same color and fill properties as used in the plot itself.  The font and
+textcolor properties control the appearance of the individual plot titles
+that appear in the key. Setting the textcolor to "rgb variable" causes
+the text for each key entry to be the same color as the line or fill 
+color for that plot.  This was the default in some earlier versions of
+gnuplot.
 
 The length of the sample line can be controlled by `samplen`.  The sample
 length is computed as the sum of the tic length and <sample_length> times the
@@ -8747,96 +8878,6 @@ subtracted from the length of the string.  This is useful only when you are
 putting a box around the key and you are using control characters in the text.
 `gnuplot` simply counts the number of characters in the string when computing
 the box width; this allows you to correct it.
-
-The <height_increment> is a number of character heights to be added to or
-subtracted from the height of the key box.  This is useful mainly when you are
-putting a box around the key, otherwise it can be used to adjust the vertical
-shift of automatically chosen key position by <height_increment>/2.
-
-All plotted curves of `plot`s and `splot`s are titled according to the
-default option `autotitles`. The automatic generation of titles can be
-suppressed by `noautotitles`; then only those titles explicitly defined
-by `(s)plot ... title ...` will be drawn.
-
-The `set key autotitle columnheader` option is available if gnuplot was built
-with --enable-datastrings. This command causes the first entry in each column
-of plotted data to be interpreted as a text string and used as a title for
-the corresponding plot. If the quantity being plotted is a function of data
-from several columns, gnuplot may be confused as to which column to draw the
-title from. In this case it is necessary to specify the column explicitly in
-the plot command, e.g. `plot "datafile" using (($2+$3)/$4) title 3 with lines`.
-
-A title can be put on the key (`title "<text>"`)---see also `syntax` for the
-distinction between text in single- or double-quotes.  The key title uses the
-same justification as do the plot titles.
-
-An explicitly given title is typeset using enhanced text properties on
-terminals supporting this, see `enhanced text` for more details.
-This default behavior can be switched off by the `noenhanced` option.
-
-The defaults for @ref{key} are `on`, `right`, `top`, `vertical`, `Right`,
-`noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and
-`nobox`.  The default <linetype> is the same as that used for the plot
-borders.  Entering `set key default` returns the key to its default
-configuration.
-
-The key is drawn as a sequence of lines, with one plot described on each
-line.  On the right-hand side (or the left-hand side, if `reverse` is
-selected) of each line is a representation that attempts to mimic the way the
-curve is plotted.  On the other side of each line is the text description
-(the line title), obtained from the `plot` command.  The lines are vertically
-arranged so that an imaginary straight line divides the left- and right-hand
-sides of the key.  It is the coordinates of the top of this line that are
-specified with the @ref{key} command.  In a `plot`, only the x and y
-coordinates are used to specify the line position.  For a `splot`, x, y and
-z are all used as a 3-d location mapped using the same mapping as the graph
-itself to form the required 2-d screen position of the imaginary line.
-
-When using the TeX or PostScript drivers, or similar drivers where formatting
-information is embedded in the string, `gnuplot` is unable to calculate
-correctly the width of the string for key positioning.  If the key is to be
-positioned at the left, it may be convenient to use the combination  `set key
-left Left reverse`.  The box and gap in the grid will be the width of the
-literal string.
-
-If `splot` is being used to draw contours, the contour labels will be listed
-in the key.  If the alignment of these labels is poor or a different number
-of decimal places is desired, the label format can be specified.  See
-@ref{clabel} for details.
-
-Examples:
-
-This places the key at the default location:
-@example
-      set key default
-
-@end example
-
-This disables the key:
-@example
-      unset key
-
-@end example
-
-This places a key at coordinates 2,3.5,2 in the default (first) coordinate
-system:
-@example
-      set key at 2,3.5,2
-
-@end example
-
-This places the key below the graph:
-@example
-      set key below
-
-@end example
-
-This places the key in the bottom left corner, left-justifies the text,
-gives it a title, and draws a box around it in linetype 3:
-@example
-      set key left bottom Left title 'Legend' box 3
-
-@end example
 
 @node label, lmargin, key, set-show
 @subsection label
@@ -8911,7 +8952,7 @@ If `front` is given, the label is written on top of the graphed data. If
 data.  Using `front` will prevent a label from being obscured by dense data.
 
 `textcolor <colorspec>` changes the color of the label text. <colorspec> can be
-a linetype, an rgb color, or a palette mapping. See help for `colorspece` and
+a linetype, an rgb color, or a palette mapping. See help for @ref{colorspec} and
 @ref{palette}.  `textcolor` may be abbreviated `tc`.
 @example
    `tc default` resets the text color to its default state.
@@ -9103,14 +9144,11 @@ To change the decimal point locale, see @ref{decimalsign}.
 @c ?unset logscale
 @c ?show logscale
 @c ?set log
-@c ?set log cb
 @cindex logscale
 @opindex logscale
 
 
 @cindex nologscale
-
-Log scaling may be set on the x, y, z, x2 and/or y2 axes.
 
 Syntax:
 @example
@@ -9120,10 +9158,10 @@ Syntax:
 
 @end example
 
-where <axes> may be any combinations of `x`, `y`, `z`, and `cb` in any order,
-or `x2` or `y2` and where <base> is the base of the log scaling.  If <base> is
-not given, then 10 is assumed.  If <axes> is not given, then all axes are
-assumed.  @ref{logscale} turns off log scaling for the specified axes.
+where <axes> may be any combinations of `x`, `x2`, `y`, `y2`, `z`, and `cb` in
+any order, and where <base> is the base of the log scaling.  If <base> is not
+given, then 10 is assumed.  If <axes> is not given, then all axes are assumed.
+The command @ref{logscale} turns off log scaling for the specified axes.
 
 Examples:
 
@@ -9454,7 +9492,7 @@ time`/`unset time` pair around one of the `plot`, `splot` or @ref{replot}
 commands within the @ref{multiplot}/@ref{multiplot} block.
 
 The commands @ref{origin} and @ref{size} must be used to correctly position
-each plot if no `layout` is specified or if fine tuning is desired.  See
+each plot if no layout is specified or if fine tuning is desired.  See
 @ref{origin} and @ref{size} for details of their usage.
 
 Example:
@@ -11159,6 +11197,12 @@ background of the pattern is either fully transparent or fully opaque.
 
 @end example
 
+Note that there may be additional limitations on the creation or viewing of
+graphs containing transparent fill areas.  For example, the png terminal can
+only use transparent fill if the "truecolor" option is set.  Some pdf viewers
+may not correctly display the fill areas even if they are correctly described
+in the pdf file. Ghostscript/gv does not correctly display pattern-fill areas
+even though actual PostScript printers generally have no problem.
 
 @node set_style_function, set_style_increment, set_style_fill, style
 @subsubsection set style function
@@ -11970,6 +12014,28 @@ pixel.  That is, an M x N set of data will form an image with M x N pixels.
 This is slightly different than pm3d elements where an M x N set of data
 will form a surface of (M-1) x (N-1) elements.  The scan directions for the
 image data grid can be any of eight possible combinations.
+
+See also `rgbimage`.
+
+
+@noindent --- IMAGE FAILSAFE ---
+
+@c ?commands set style image failsafe
+@c ?set style image failsafe
+@c ?plotting styles image failsafe
+@c ?style image failsafe
+@c ?image failsafe
+@cindex failsafe
+
+Some terminal drivers provide code to optimize rendering of image data
+within a rectangular 2D area.  However this code is known to be imperfect
+(hence the label EXPERIMENTAL for image support in gnuplot version 4.2).
+This optimized code may be disabled by using the keyword `failsafe`. E.g.
+
+@example
+      plot 'data' with image failsafe
+
+@end example
 
 Here are some specific comments about particular terminal drivers:
 
@@ -14659,7 +14725,7 @@ with no modifiers.
 * excl::                        
 * hercules::                    
 * fig::                         
-* png_(NEW)::                   
+* png::                         
 * ggi::                         
 * Gnugraph(GNU_plotutils)::     
 * gpic::                        
@@ -15983,7 +16049,7 @@ printer and the 1590.  It has no options."
 These drivers supports PC monitors with autodetected graphics boards.  They
 can be used only when compiled with Zortech C/C++.  None have options."
 
-@node fig, png_(NEW), hercules, terminal_
+@node fig, png, hercules, terminal_
 @subsubsection fig
 
 @c ?commands set terminal fig
@@ -16097,8 +16163,8 @@ To plot the error bars on top of the circles use
 
 @end example
 
-@node png_(NEW), ggi, fig, terminal_
-@subsubsection png (NEW)
+@node png, ggi, fig, terminal_
+@subsubsection png
 
 @c ?commands set terminal png
 @c ?set terminal png
@@ -16131,6 +16197,11 @@ color will be the transparent one. Default is `notransparent`.
 
 `interlace` instructs the driver to generate interlaced PNGs.
 Default is `nointerlace`.
+
+By default a 256-color png image is produced. The `truecolor` option instead
+creates a TrueColor output image with 24 bits of color information per pixel.
+The use of transparent fill areas requires use of the `truecolor` option.
+A transparent background is possible in either indexed or TrueColor images.
 
 `butt` instructs the driver to use a line drawing method that does
 not overshoot the desired end point of a line.  This setting is only
@@ -16217,7 +16288,7 @@ which uses white for the transparent background, black for borders, dark
 gray for axes, and a gray-scale for the six plotting colors.
 
 
-@node ggi, Gnugraph(GNU_plotutils), png_(NEW), terminal_
+@node ggi, Gnugraph(GNU_plotutils), png, terminal_
 @subsubsection ggi
 
 @c ?commands set terminal ggi
@@ -16894,6 +16965,7 @@ Points, among other things, are drawn using the LaTeX commands "\\Diamond" and
 "\\Box".  These commands no longer belong to the LaTeX2e core; they are included
 in the latexsym package, which is part of the base distribution and thus part
 of any LaTeX implementation.  Please do not forget to use this package.
+Other point types use symbols from the amssymb package.
 
 Examples:
 About label positioning:
@@ -18761,6 +18833,11 @@ So `set term x11 font "arial,15,italic"` will be translated to
 The <size>, <slant>, and <weight> specifications are all optional.
 If you do not specify <slant> or <weight> then you will get whatever font 
 variant the font server offers first.
+You may set a default enconding via the corresponding X11 resource. E.g.
+@example
+      gnuplot*encoding: iso8859-15
+@end example
+
 The driver also recognizes some common PostScript font names and
 replaces them with possible X11 or TrueType equivalents.
 This same sequence is used to process font requests from @ref{label}.
@@ -19256,6 +19333,11 @@ So `set term x11 font "arial,15,italic"` will be translated to
 The <size>, <slant>, and <weight> specifications are all optional.
 If you do not specify <slant> or <weight> then you will get whatever font 
 variant the font server offers first.
+You may set a default enconding via the corresponding X11 resource. E.g.
+@example
+      gnuplot*encoding: iso8859-15
+@end example
+
 The driver also recognizes some common PostScript font names and
 replaces them with possible X11 or TrueType equivalents.
 This same sequence is used to process font requests from @ref{label}.
