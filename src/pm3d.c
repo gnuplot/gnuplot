@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.65 2006/06/15 15:42:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.66 2006/09/23 22:13:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -770,7 +770,25 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    corners[2].x, corners[2].y,
 			    corners[3].x, corners[3].y);
 #endif
-			set_color(cb2gray(z2cb(bl_point[i1][j1].z)));
+			cb1 = z2cb(corners[0].z);
+		    	cb2 = z2cb(corners[1].z);
+	    		cb3 = z2cb(corners[2].z);
+    			cb4 = z2cb(corners[3].z);
+			switch (pm3d.which_corner_color) {
+			    case PM3D_WHICHCORNER_MEAN: avgC = (cb1 + cb2 + cb3 + cb4) * 0.25; break;
+			    case PM3D_WHICHCORNER_GEOMEAN: avgC = geomean4(cb1, cb2, cb3, cb4); break;
+			    case PM3D_WHICHCORNER_MEDIAN: avgC = median4(cb1, cb2, cb3, cb4); break;
+			    case PM3D_WHICHCORNER_MIN: avgC = minimum4(cb1, cb2, cb3, cb4); break;
+			    case PM3D_WHICHCORNER_MAX: avgC = maximum4(cb1, cb2, cb3, cb4); break;
+			    case PM3D_WHICHCORNER_C1: avgC = cb1; break;
+			    case PM3D_WHICHCORNER_C2: avgC = cb2; break;
+			    case PM3D_WHICHCORNER_C3: avgC = cb3; break;
+			    case PM3D_WHICHCORNER_C4: avgC = cb4; break;
+			    default: int_error(NO_CARET, "cannot be here"); avgC = 0;
+			}
+			/* transform z value to gray, i.e. to interval [0,1] */
+			gray = cb2gray(avgC);
+			set_color(gray);
 			filled_quadrangle(corners);
 		    }
 		}
