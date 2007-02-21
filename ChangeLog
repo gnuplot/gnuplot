@@ -1,3 +1,8 @@
+2007-02-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h: Define S_ENC_UTF8 for completeness (used by gd.trm if
+	libgd.2.0.34 is found) even though no user command exists yet to set it.
+
 2007-02-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/image2.dem demo/image.dem demo/macros.dem demo/rainbow.dem
