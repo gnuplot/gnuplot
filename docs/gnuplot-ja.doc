@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.13 2006/09/24 17:23:45 mikulik Exp $
-C corresponding original gnuplot.doc revision: 1.387
+C RCS $Id: gnuplot-ja.doc,v 1.3 2007-02-11 16:30:12+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.387.2.7
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -39,7 +39,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ^   Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net <p>
 ^</h2><p>
 ^<h3> This manual was prepared by Dick Crawford</h3><p>
-^<h3> Last revised: 31 October 2004</h3><p>
+^<h3> Last revised: October 2006</h3><p>
 ^<hr>
 1 gnuplot
 2 Copyright
@@ -244,7 +244,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  gnuplot version 4.2 は、直前の公式バージョン 4.0 以降に追加されたたく
  さんの機能を提供します。この節では、主な追加機能の一覧と、変更や細かい
  新機能の一部を紹介します。より網羅的な一覧は、ファイル NEWS を参照して
- ください。l
+ ください。
 
 3 新しい描画スタイル
 
@@ -305,7 +305,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
  `string variables` 参照。
 
 3 マクロ
- gnuplot は '@stringvariablename' によるマクロの展開をサポートします。
+ gnuplot は '@stringvariablename' によるコマンドラインでのマクロの展開
+ をサポートします。
  `macros` 参照。
 
 3 複数グラフの 1 ページ自動配置描画
@@ -349,6 +350,85 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 `windows`
  `windows` 出力形式は、現在は拡張文字処理 (`enhanced text`) モードをサ
  ポートしています。
+
+3 Canvas size
+?canvas size
+?canvas
+?set term size
+
+ gnuplot の以前の版では、`set size` の値を、出力する描画領域 (キャンバ
+ ス) のサイズを制御するのにも使っていた出力形式もありました (すべての出
+ 力形式がそうだというわけではありません)。この仕様は現在は非推奨です。
+ gnuplot の将来の版では、オプション `set size` と `set term <foo> size`
+ は、お互いを補う効果を持つことになるでしょう:
+
+ `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
+ または "キャンバス" のサイズを制御します。サイズパラメータの有効な値に
+ ついては、個々の出力形式のヘルプを参照してください。デフォルトでは、グ
+ ラフはそのキャンバス全体に描画されます。
+
+ `set size <XX>, <YY>` は、描画自体をキャンバスのサイズに対して相対的に
+ 伸縮させます。1 より小さい伸縮値を指定すると、グラフはキャンバス全体を
+ 埋めず、1 より大きい伸縮値を指定すると、グラフの一部分のみがキャンバス
+ 全体に合うように描画されます。1 より大きい伸縮値を指定すると、ある出力
+ 形式では問題が起こるかもしれないことに注意してください。
+
+ 例:
+
+       set term pbm size 600, 400
+       set size 0.5, 0.5
+       set output "figure.pbm"
+       plot "data" with lines
+
+ このコマンドは、幅 600 ピクセル、高さ 400 ピクセルの出力ファイル
+ "figure.pbm" を生成します。グラフはキャンバスの中の左下に置かれます。
+ これは、multiplot モードが常に行ってきた方法とは矛盾していませんが、し
+ かし単一のグラフに対する version 4.0 のあるドライバの挙動とは異ってい
+ ます。
+
+ 4.2 のほとんどの出力形式は、この新しい規則に従っていますが、png/jpeg
+ /gif ドライバに関してはコンパイル時のオプションによって変わります。
+ `backwards compatibility` 参照。
+
+2 Backwards compatibility
+?backwards compatibility
+?compatibility
+ 以前の版で使われていたいくつかの書式は gnuplot 4.0 で非推奨となりまし
+ たが、それは今でも認識はされ続けています。バージョン 4.2 もデフォルト
+ では非推奨の書式を認識していますが、これは現在コンパイル時に制御され、
+ 以下のようにして無効にできます:
+
+       ./configure --disable-backwards-compatibility
+
+ 注意: 非推奨の書式は、将来の版では、完全に無効になってしまうかもしれま
+ せん。
+
+ 一つの主な違いは、複雑なコマンドのあいまいさを避けるような必須キーワー
+ ドの導入です。特に注意すべき点は、オフセット、線種、点種に対する生の数
+ の使用でした。具体例:
+
+ 非推奨:
+       set data linespoints
+       plot <foo> 2 4
+ 新:
+       set style data linespoints
+       plot <foo> linetype 2 pointtype 4
+
+ その他の主な互換性の部分は、`set size` と `set term <foo> size` の相互
+ 作用に関する部分です。gnuplot の以前の版では、`set size` に関するさま
+ ざまな出力形式の挙動には、不合理な点が含まれていました。今後、すべての
+ 出力形式で統一性が図られる予定です。
+
+ バージョン 4.2 では、ほとんどの出力形式が新しい規則 (`set size` は出力
+ される描画領域の大きさには影響を与えない) に従っていますが、png/gif
+ /jpeg 出力形式は、`--disable-backwards-compatibility` なしで configure
+ したのであれば、古い非推奨の仕様になります。gnuplot の次の版では、すべ
+ ての出力形式が新しい規則に従います。よって、`set size` を png/gif/jpeg
+ 出力ファイルのピクセルサイズを制御するのには使用しないことを強く勧めま
+ す。代わりに `set term png size <XX>,<YY>` を使ってください。
+
+ `set size`, `set term size`、および個々の出力形式のヘルプも参照してく
+ ださい。
 
 2 Features introduced in version 4.0
 ?version 4 features
@@ -1248,8 +1328,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 substr
 ?expressions functions substr
 ?functions substr
-?substr
-=substring
+?substring
 #substr("string",beg,end) & 複数個 & 文字列 "string"[beg:end] \\
 %substr("string",beg,end)@複数個@文字列 "string"[beg:end]
  `substr("string",beg,end)` は、元の文字列の beg から end 番目までの文
@@ -3191,6 +3270,7 @@ C ... and restart the table:
 ?data-file
 ?datafile
 ?data
+?file
  ファイルに納められた離散的なデータは、`plot` コマンドライン上で、その
  データファイル名 (単一引用符または二重引用符で囲まれた) を指定すること
  によって表示できます。
@@ -3364,8 +3444,8 @@ C ... and restart the table:
  使用されるルーチン、すなわちデータの形式の扱いを制御します。サポートし
  ている filetype の一覧を見るには、`show datafile binary filetypes` と
  してください。filetype を指定しない場合の規則は、`splot` 用に `binary`
- キーワードが単独で与えられた場合は "古典的な" gnuplot バイナリ形式だと
- 見なされ、その他全ての状況、すなわち `plot` 用かまたは少なくとも一つの
+ キーワードが単独で与えられた場合は古典的な gnuplot バイナリ形式だと見
+ なされ、その他全ての状況、すなわち `plot` 用かまたは少なくとも一つの
  <binary list> キーワードが与えられたような場合は、raw バイナリファイル
  とみなされ、そのキーワードによってバイナリ形式が指定されます。
 
@@ -3399,8 +3479,8 @@ C ... and restart the table:
  の次元方向 (x) には 10 点、2 番目の次元方向 (y) には 20 点の標本化デー
  タがあることを意味します。特別な "数字" として `Inf` を、ファイルの終
  了までデータが続くことを示すのに使えます。複数のデータのサイズ指定を分
- 離するのに、コンマを使うことができます。例えば `array=25,35` は 2 つの
- 1 次元データがファイルの中にあることを意味します。そのコンマの意味は他
+ 離するのに、コロンを使うことができます。例えば `array=25:35` は 2 つの
+ 1 次元データがファイルの中にあることを意味します。そのコロンの意味は他
  の <binary list> 内のキーワードにも影響を与え、それぞれが個々のデータ
  に対応するように意味を持つようになります。
 
@@ -3536,7 +3616,7 @@ C ... and restart the table:
  配列をグラフのその他の場所に配置したい場合、`origin` キーワードで指定
  した場所に gnuplot は配列の左下の点を合わせます。その指定は、`plot` で
  は 2 つの座標の組、`splot` では 3 つの座標の組を指定してください。例え
- ば `origin=(100,100),(100,200)` は、一つのファイルに含まれる 2 つのデ
+ ば `origin=(100,100):(100,200)` は、一つのファイルに含まれる 2 つのデ
  ータに対する指定で、2 次元の描画に対する指定です。2 つ目の例として
  `origin=(0,0,3.5)` をあげると、これは 3 次元描画用の指定です。
 6 center
@@ -3599,13 +3679,13 @@ C ... and restart the table:
        # する (左上が原点になるように)。ピクセルの間隔も指定し、ファイ
        # ルには 2 つの画像が含まれていて、そのうち一つは origin で平行
        # 移動する。
-       plot '<file_name>' binary array=512x1024,1024x512 format='%uchar' \
-            dx=2,1 dy=1,2 origin=(0,0),(1024,1024) flipy u 1:2:3 w rgbimage
+       plot '<file_name>' binary array=512x1024:1024x512 format='%uchar' \
+            dx=2:1 dy=1:2 origin=(0,0):(1024,1024) flipy u 1:2:3 w rgbimage
 
        # 4 つの別のデータからなり、座標情報もデータファイルに含まれてい
        # る。ファイルは gnuplot が実行されているシステムとは異なるエン
        # ディアンで生成されている。
-       splot '<file_name>' binary record=30,30,29,26 endian=swap u 1:2:3
+       splot '<file_name>' binary record=30:30:29:26 endian=swap u 1:2:3
 
  `binary matrix` も参照してください。
 4 every
@@ -5954,7 +6034,7 @@ C ... and restart the table:
  字まで、と制限されています。書式文字列 (<format-string>) を省略した場
  合、それはデフォルトの "% g" になります。LaTeX ユーザにはよく "$%g$"
  が好まれます。空の文字列 "" を指定した場合、刻み自身は表示されますが見
- 出しはつきません。すべての刻みを消すには、`unset xtics` や 
+ 出しはつきません。すべての刻みを消すには、`unset xtics` や
  `unset ytics` を使用してください。
 
  改行文字 (\n) も書式文字列で使えます。それを解釈させるには、単一引用符
@@ -6486,7 +6566,7 @@ C ... and restart the table:
  `lmargin`, `rmargin`, `tmargin`, `bmargin` (, `above`, `over`, `below`,
  `under`) は、グラフ領域の他の場所への自動的な配置のために使用します。
  key の描画をどこに置くかをより詳しく指示するための `at <position>` も
- あります。この場合、キーワード `left`, `right`, `center`, `bottom`,
+ あります。この場合、キーワード `left`, `right`, `top`, `bottom`,
  `center` が同様の基準点合わせの設定の目的で使われます。
 
  配置の仕組みを理解ための最も重要な概念は、グラフ領域、すなわち内か外か
@@ -6576,9 +6656,9 @@ C ... and restart the table:
  ます。
 
  <width_increment> は、文字列の長さに加えたり減らしたりする幅 (何文字分
- か) を表す数値です。これは、説明に外枠を書き、ラベル文字列の文字数を調
- 節するときには役立つでしょう。`gnuplot` は外枠の幅を計算するときは、ラ
- ベル文字列の文字数を単純に数えるだけなので、それを修正するのに使えます。
+ か) を表す数値です。これは、説明に外枠を書き、文字列に制御文字を使う場
+ 合にだけ有用でしょう。`gnuplot` は外枠の幅を計算するときは、ラベル文字
+ 列の文字数を単純に数えるだけなので、それを修正するのに使えます。
 
  <height_increment> は、説明の箱の高さに加えたり減らしたりする高さ (何
  文字分か) を表す数値です。これは主に、説明の回りに箱を描く場合のための
@@ -6844,8 +6924,11 @@ C ... and restart the table:
 ?unset logscale
 ?show logscale
 ?set log
+?set log cb
 ?logscale
 ?nologscale
+ 対数スケールは，x, y, z, x2, y2 の各軸について設定できます。
+
  書式:
          set logscale <axes> <base>
          unset logscale <axes>
@@ -7118,8 +7201,6 @@ C ... and restart the table:
  さい。
 
  例:
-       set size 0.7,0.7
-       set origin 0.1,0.1
        set multiplot
        set size 0.4,0.4
        set origin 0.1,0.1
@@ -7129,20 +7210,16 @@ C ... and restart the table:
        plot cos(x)
        unset multiplot
 
- は、cos(x) のグラフを、sin(x) の上に積み重ねて表示します。最初の
- `set size` と `set origin` に注意してください。これらはなくてもいいの
- ですがそれを入れておくことを勧めます。ある種の出力ドライバは、描画が一
- つでも作られる前に全体の外枠の情報が参照できることを要求します。そして、
- 上のやり方は、その外枠が最初の描画のための外枠ではなく、描画列全体を含
- む外枠であるということを保証しています。
+ これは、cos(x) のグラフを、sin(x) の上に積み重ねて表示します。
 
  `set size` と `set origin` は全体の描画領域を参照しそれは各描画で利用
- されます。描画境界を一列に揃えたいならば、`set margin` コマンドで、境
- 界の外の余白サイズを同じサイズに揃えることが出来ます。その使用に関して
- は `set margin` を参照してください。余白サイズは文字サイズ単位の絶対的
- な数値単位を使用することに注意してください。よって残ったスペースに描か
- れるグラフは表示するデバイスの表示サイズに依存します。例えば、プリンタ
- とディスプレイの表示は多分違ったものになるでしょう。
+ されます。`set term size` も参照してください。描画境界を一列に揃えたい
+ ならば、`set margin` コマンドで、境界の外の余白サイズを同じサイズに揃
+ えることが出来ます。その使用に関しては `set margin` を参照してください。
+ 余白サイズは文字サイズ単位の絶対的な数値単位を使用することに注意してく
+ ださい。よって残ったスペースに描かれるグラフは表示するデバイスの表示サ
+ イズに依存します。例えば、プリンタとディスプレイの表示は多分違ったもの
+ になるでしょう。
 
  オプション `layout` により、各描画の前にそれぞれ与えていた `set size`
  や `set origin` コマンドなしに、単純な複数グラフの描画を作成できます。
@@ -7865,8 +7942,8 @@ C ... and restart the table:
  例:
 
  灰色のパレット (役に立たないが教訓的な) を生成するには:
-      set palette model RGB
-      set palette defined ( 0 "black", 1 "white" )
+       set palette model RGB
+       set palette defined ( 0 "black", 1 "white" )
 
  青黄赤のパレット (全てが等価の) を生成するには:
        set palette defined ( 0 "blue", 1 "yellow", 2 "red" )
@@ -7977,7 +8054,7 @@ C ... and restart the table:
 
  の代わりに例えば以下を指定してください:
 
-      set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
+       set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
 
  または、線形補間が "ガンマ補正" の補間に十分良く適合するまでより良い中
  間の点を探してください。
@@ -8234,14 +8311,32 @@ C ... and restart the table:
 ?show size
 ?size
 ?aspect ratio
- コマンド `set size` は描画出力の大きさを伸縮します。
-
  書式:
        set size {{no}square | ratio <r> | noratio} {<xscale>,<yscale>}
        show size
 
- <xscale> と <yscale> は描画全体の拡大の倍率で、描画全体とはグラフと余
- 白の部分を含みます。
+ <xscale> と <yscale> は描画全体の拡大の倍率で、描画全体とはグラフとラ
+ ベルと余白の部分を含みます。
+
+ 重要な注意:
+       gnuplot の以前の版では、`set size` の値を、出力する描画領域
+       (キャンバス) のサイズを制御するのにも使っていた出力形式もありま
+       したが、すべての出力形式がそうだったわけではありませんでした。
+       version 4.2 では、ほとんどの出力形式が以下に述べるルールに従うよ
+       うになりましたが、png/gif/jpeg 出力形式については、
+       `backwards compatibility` を参照してください。
+
+ `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
+ または "キャンバス" のサイズを制御します。サイズパラメータの有効な値に
+ ついては、個々の出力形式のヘルプを参照してください。デフォルトでは、グ
+ ラフはそのキャンバス全体に描画されます。
+
+ `set size <XX>, <YY>` は、描画自体をキャンバスのサイズに対して相対的に
+ 伸縮させます。1 より小さい伸縮値を指定すると、グラフはキャンバス全体を
+ 埋めず、1 より大きい伸縮値を指定すると、グラフの一部分のみがキャンバス
+ 全体に合うように描画されます。1 より大きい伸縮値を指定すると、ある出力
+ 形式では問題が起こるかもしれないことに注意してください。
+ `set term size` 参照。
 
  `ratio` は、指定した <xscale>, <yscale> の描画範囲内で、グラフのアスペ
  クト比 (縦横比) を <r> にします (<r> は x 方向の長さに対する y 方向の
@@ -8265,17 +8360,9 @@ C ... and restart the table:
 
  `ratio` と `square` は 3 次元描画では意味を持ちません。
 
- `set size` はデフォルトサイズに対する相対的な指定で、デフォルトサイズ
- は出力形式毎に異なります。`gnuplot` はデフォルトで可能な限り使用可能な
- 描画領域内一杯を使おうとしますから、`set size` は拡大する、という使い
- 方でなくて縮小する、という使い方の方が安全です。
-
- 出力形式によっては、描画サイズの変更は、テキストの出力位置をおかしくさ
- せる可能性があります。
-
  例:
 
- 通常の大きさに設定します:
+ グラフが有効な描画領域全体を埋めるような大きさに設定します:
        set size 1,1
 
  グラフを通常の半分の大きさで正方形にします:
@@ -9078,29 +9165,28 @@ C ... and restart the table:
 ?style image
 ?image
  スタイル `image` は 2 次元画像の描画用のものです。これは、3 次元データ
- (x,y,value) に対する `plot`、または適切な格子を生成する射影的 4 次元デ
- ータ (x,y,z,value) に対する `splot` の両方で使用できます。適切な格子と
- は、表示平面上で格子のデータが、2 方向 (必ずしも垂直でなくても良い) に
- 関して等距離になるものを意味し、それは言い換えれば、4 つの隣接点の組が
- 常に同じ大きさの平行四辺形を作ることを意味します。変数 `value` は、現
- 在のパレットに対するパレット色 (灰色値) を表します。
+ (x,y,value) に対する `plot`、または射影された 4 次元データ
+ (x,y,z,value) に対する `splot` の両方で使用できます。このとき、表示平
+ 面では、画像データは表示平面内の 2 方向 (必ずしも垂直でなくても良い)
+ に関して等間隔のサンプリング格子を形成していると仮定されます。それは言
+ い換えれば、4 つの隣接点の組が常に同じ大きさの平行四辺形を作ることを意
+ 味します。変数 `value` は、現在のパレットに対するパレット色 (灰色値)
+ を表します。
 
- データ点が適切な長方形格子を作るとき、つまり格子の 2 方向が垂直で表示
- 平面上の x 軸、y 軸に沿って配置されているとき、パレットと画像描画をサ
- ポートしている出力形式では、`image` スタイルは描画領域にぴったり合うよ
- うに適切に配置され伸縮されたデータ配列 (matrix) を作ろうとします。その
- 結果、記憶領域を効率的に使用し書き換えも速く行なわれます。しかし、パレ
- ットと画像描画をサポートしない、あるいはまだそれらが実装されていない出
- 力形式では、`image` スタイルは長方形をピクセル毎に塗りつぶそうとします
- ので、あまりいい効率は得られません。また、一般の平行四辺形の画像は、平
- 行四辺形がピクセル毎に塗りつぶされます。
+ パレットと画像描画をサポートしている出力形式では、`image` スタイルは描
+ 画領域にぴったり合うように適切に配置され伸縮されたデータ配列 (matrix)
+ を作ろうとします。そのような出力は効率的ですし、描画も速く行われます。
+ しかし、パレットと画像描画をサポートしない、あるいはまだそれらが実装さ
+ れていない出力形式では、`image` スタイルは長方形をピクセル毎に塗りつぶ
+ そうとしますので、あまり効率はよくありません。また、一般の平行四辺形の
+ 画像に対しては、現在は常に平行四辺形をピクセル毎に塗りつぶします。
 
  画像の各データ点の座標は 1 ピクセルの中心になります。すなわち、M x N
  個のデータ集合は M x N ピクセルの画像を生成します。これは、M x N 個の
  データ集合が (M-1) x (N-1) 要素を作成する pm3d の構造とはやや異なりま
  す。画像データの格子の走査方向は 8 つの組合せの任意の一つが可能です。
 
- 現在以下の出力形式のみがデータ配列画像をサポートしています:
+ 以下はいくつかの出力形式に関する特有の情報です:
 
  x11 と wxt - ピクセルはディスプレイの解像度に合うように繰り返されるか
        一定の割合で潰されるかされ、フィルタ用の処理は他に持っていませ
@@ -9116,9 +9202,6 @@ C ... and restart the table:
        gd 2.0.4  truecolor は動作しますが、truecolor を選択しないと画像
                  は空白になってしまいます。
        gd 2.0.9  truecolor も動作しますし、非 truecolor も動作します。
-
- aqua
- pdf, svg
 
  `rgbimage` も参照してください。
 5 impulses
@@ -9475,6 +9558,7 @@ C ... and restart the table:
                 { font "name{,<size>}" }
                 { textcolor <colorspec> }
        unset tics
+       show tics
 
  指定されたオプションは、全ての軸、すなわち x, y, z, x2, y2, cb 軸に適
  用されます。
@@ -10232,7 +10316,7 @@ C ... and restart the table:
 
  明示的な形式では 3 つ目のパラメータとして "レベル" (level) を与えるこ
  とができます。デフォルトのレベルは 0 で、これは大目盛りを意味し、レベ
- ルが 1 の場合小目盛りが生成されます。レベルが指定する場合はラベルも必
+ ルが 1 の場合小目盛りが生成されます。レベルを指定する場合はラベルも必
  ず指定する必要があります。
 
  例:
@@ -10360,7 +10444,7 @@ C ... and restart the table:
 ?set y2label
 ?show y2label
 ?y2label
- コマンド `set y2label` は y2 (右) 軸の見出しを設定します。詳細は 
+ コマンド `set y2label` は y2 (右) 軸の見出しを設定します。詳細は
  `set xlabel` を参照してください。
 3 y2mtics
 ?commands set y2mtics
@@ -10640,14 +10724,15 @@ C ... and restart the table:
 ?set cbrange
 ?show cbrange
 ?cbrange
- コマンド `set cbrange` は、スタイル `with pm3d`, `with image`, や
- `with ... palette` などによって現在のパレット (`palette`) に従って色付
- けされる値の範囲を設定します。その範囲外の値に対しては、最も近い限界の
- 値の色が使用されます。
+ コマンド `set cbrange` は、スタイル `with pm3d`, `with image` や
+ `with palette` などによって現在のパレット (`palette`) を使って色付けさ
+ れる値の範囲を設定します。その範囲外の値に対しては、最も近い限界の値の
+ 色が使用されます。
 
  カラーボックス軸 (cb-軸) が `splot` で自動縮尺されている場合は、その
- 範囲は `zrange` が使われます。`splot ... pm3d|palette` で描画される点
- は、異なる `zrange` と `cbrange` を使うことでフィルタリングできます。
+ カラーボックスの範囲は `zrange` が使われます。`splot ... pm3d|palette`
+ で描画される点は、異なる `zrange` と `cbrange` を使うことでフィルタリ
+ ングできます。
 
  `set cbrange` の書式に関する詳細は `set xrange` を参照してください。
  `set palette` と `set colorbox` も参照してください。
