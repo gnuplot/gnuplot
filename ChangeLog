@@ -1,3 +1,9 @@
+2007-02-22  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* term/latex.trm (LATEX_fillbox): Add support for solid-fill boxes.
+	EAM: style parameter accepted, but density and fill patterns are limited
+	to solid white or solid black.
+
 2007-02-22  sobukus@users.sourceforge.net
 
 	* m4/apha.m4: Fix syntax of test for gcc on alpha

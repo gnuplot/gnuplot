@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: latex.trm,v 1.30 2006/07/21 02:35:47 sfeam Exp $
+ * $Id: latex.trm,v 1.31 2007/02/11 06:37:18 sfeam Exp $
  *
  */
 
@@ -101,6 +101,8 @@ TERM_PUBLIC void LATEX_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned
 TERM_PUBLIC int LATEX_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int LATEX_text_angle __PROTO((int ang));
 TERM_PUBLIC void LATEX_reset __PROTO((void));
+TERM_PUBLIC void LATEX_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, 
+					unsigned int width, unsigned int height));
 
 #ifdef EMTEX
 TERM_PUBLIC void EMTEX_init __PROTO((void));
@@ -778,6 +780,23 @@ LATEX_reset()
 }
 
 
+TERM_PUBLIC void
+LATEX_fillbox(int style, unsigned int x1, unsigned int y1, unsigned
+int width, unsigned int height)
+{
+    /* TODO: Something other than black/white */
+    if ((style & 0xf) == FS_EMPTY)
+	return;
+    if ((style & 0xf) == FS_SOLID && (style >> 4) < 50)
+	return;
+    if ((style & 0xf) == FS_PATTERN && ((style >> 4) & 1) == 0)
+	return;
+
+    fprintf(gpoutfile, "\\put(%d,%d){\\rule{%gpt}{%gpt}}\n", x1, y1,
+	    width*LATEX_UNIT, height*LATEX_UNIT);
+}
+
+
 #ifdef EMTEX
 
 TERM_PUBLIC void
@@ -836,9 +855,17 @@ TERM_TABLE_START(latex_driver)
     LATEX_VTIC, LATEX_HTIC, LATEX_options, LATEX_init, LATEX_reset,
     LATEX_text, null_scale, LATEX_graphics, LATEX_move, LATEX_vector,
     LATEX_linetype, LATEX_put_text, LATEX_text_angle,
-    LATEX_justify_text, LATEX_point, LATEX_arrow, set_font_null
+    LATEX_justify_text, LATEX_point, LATEX_arrow, set_font_null,
+    NULL,      /* pointsize */
+    0,         /* flags */
+    NULL, NULL, /* suspend, resume */
+    LATEX_fillbox, NULL, /* linewidth */
+#ifdef USE_MOUSE
+    NULL, NULL, NULL, NULL, NULL,
+#endif
+    NULL /* Color stuff */
 TERM_TABLE_END(latex_driver)
-
+ 
 #undef LAST_TERM
 #define LAST_TERM latex_driver
 
