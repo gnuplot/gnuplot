@@ -1,8 +1,8 @@
 %% Don't forget to change the paper format in the next line
 %
-% $Id: faq-ja.tex,v 1.14 2006-11-23 19:05:31+09 shige Exp $
+% $Id: faq-ja.tex,v 1.16 2007-02-18 17:53:11+09 shige Exp $
 % translated to Japanese by Shigeharu TAKENO 2005/03/14
-% Original: Id: faq.tex,v 1.25 2006/11/23 00:43:58 sfeam Exp $
+% Original: Id: faq.tex,v 1.28 2007/02/17 20:31:34 mikulik Exp
 %
 %
 %\documentclass[a4paper,11pt]{article}
@@ -29,7 +29,7 @@
 \else % *** pdflatex output
     \usepackage{times,mathptmx}
     \usepackage[
-        pdftex,
+%       pdftex,
         hyperindex,
         bookmarks,
         bookmarksnumbered=true,
@@ -116,12 +116,12 @@
 version 4.2 を取り扱っています。
         \\
 % Its version is
-% \verb+Revision: 1.25 +, dated
-% \verb+Date: 2006/11/23 00:43:58 +.
+% \verb+Revision: 1.28 +, dated
+% \verb+Date: 2007/02/17 20:31:34 +.
 % <== 本当は \verb++ の内側に $ がついている
 この文書のバージョンは %
-\verb+$+\verb+Revision: 1.25 $+,
-\verb+$+\verb+Date: 2006/11/23 00:43:58 $+ です。
+\verb+$+\verb+Revision: 1.28 $+,
+\verb+$+\verb+Date: 2007/02/17 20:31:34 $+ です。
 % 少し細工をしないと RCS に書き換えられてしまう。
 
 
@@ -874,13 +874,13 @@ Tiff 6 パックビットを選択すれば最もその増加を押えることができます。
 %% Windows world, you can insert vectorial images produces by the emf terminal
 %% type. OpenOffice.org can also read AutoCAD's dxf format, as well as SVG
 %% thanks to SVG Import Filter
-%% \http{http://www.ipd.uni-karlsruhe.de/~hauma/svg-import/}.
+%% \http{www.ipd.uni-karlsruhe.de/~hauma/svg-import/}.
 OpenOffice.org のようないくつかのオフィスアプリケーション、
 あるいは Windows の世界に持って行く場合は、
 emf 出力形式で生成されるベクトル画像を使用することができます。
 OpenOffice.org は AutoCAD の dxf 形式も読みこむこともでき、
 SVG 読み込みフィルタ
-\http{http://www.ipd.uni-karlsruhe.de/~hauma/svg-import/}
+\http{www.ipd.uni-karlsruhe.de/~hauma/svg-import/}
 によって SVG 形式も読み込むことができます。
 
 %% With \TeX, it depends on what you use to print your dvi files.
@@ -1034,7 +1034,7 @@ gnuplot は、例えば色や太さや点の形などの、
 \subsection{どうやったら GIF フォーマットの画像を作れますか}
 
 %% GIF support is provided by an external library, libgd
-%% (\http{www.boutell.com/gd/}).
+%% (\http{www.libgd.org}).
 %% Old versions of gd (versions 1.2 to 1.4) produce only GIF output. 
 %% Versions 1.6
 %% to 2.0.27 did not support GIF output because of patent concerns. However
@@ -1046,7 +1046,7 @@ gnuplot は、例えば色や太さや点の形などの、
 %% linked to the gd library, you will get support for whatever formats 
 %% (GIF, PNG,
 %% JPEG) are in that version of gd.
-GIF のサポートは外部のライブラリである libgd (\http{www.boutell.com/gd/})
+GIF のサポートは外部のライブラリである libgd (\http{www.libgd.org})
 で与えられています。
 古いバージョンの gd (バージョン 1.2 から 1.4 まで) は GIF 出力のみ
 生成していましたが、
@@ -1128,18 +1128,16 @@ mpeg フォーマットの動画像にまとめることもできるでしょう。
 \gnuplot{} では陰関数のグラフや曲線は直接は描画できません。
 しかし、次善の策はあります。
 %% \begin{verbatim}
-%% gnuplot> # as example. Place your definition in the following line
+%% gnuplot> # An example. Place your definition in the following line:
 \begin{verbatim}
 gnuplot> # 例: 次の行を適当な定義に置き換えてください。
 gnuplot> f(x,y) = y - x**2 / tan(y)
 gnuplot> set contour base
 gnuplot> set cntrparam levels discrete 0.0
-gnuplot> set nosurface
-gnuplot> set term table
-gnuplot> set out 'curve.dat'
+gnuplot> unset surface
+gnuplot> set table 'curve.dat'
 gnuplot> splot f(x,y)
-gnuplot> set out
-gnuplot> set term pop
+gnuplot> unset table
 gnuplot> plot 'curve.dat' w l
 \end{verbatim}
 %% The trick is to draw the single contour line z=0 of the surface
@@ -1289,15 +1287,29 @@ gnuplot> splot x with pm3d, x*y with points
 %% \subsection{How to draw black contour plot, and contours with labels}
 \subsection{黒の等高線描画、またはラベルつきの等高線を描画するには}
 
-%% Drawing contour plot in one colour requires to write contours into a temporary
-%% file using the table terminal:
-1 種類の色で等高線を書くには、
-table 出力形式を使って一時ファイルに等高線を書き出す必要があります:
+%% Well, it is very simple even though it is hard to discover: 
+%% \verb+unset clabel+.
+えっと、見つけるのは難しいかもしれませんが、それは実に簡単: 
+\verb+unset clabel+
+\begin{verbatim}
+set contour both; set cntr levels 100
+unset clabel
+unset surface
+splot x*y with line lt -1
+pause -1
+splot x*y with line palette
+\end{verbatim}
+
+%% Another solution requires to write contours into a temporary file using the
+%% table terminal:
+他のやり方としては、等高線を table 出力形式を利用して一時ファイルに書き出す
+手があります:
 \begin{verbatim}
 set contour base; set cntrparam levels 15; unset surface; set view map
 splot x*x+y*y; pause -1
-set term table; set out 'contour.dat'
-replot; set out; set term pop
+set table 'contour.dat'
+replot
+unset table
 \end{verbatim}
 %% Now, for drawing it in 2D, do
 この後で、2 次元描画するには次のようにします。
@@ -1305,7 +1317,7 @@ replot; set out; set term pop
 reset
 plot 'contour.dat' with line -1
 \end{verbatim}
-%% end for contours in 3D do
+%% and for contours in 3D do
 3 次元描画する場合は次のようにします。
 %% \begin{verbatim}
 %% reset
@@ -1339,23 +1351,23 @@ z の値による等高線のラベルは、
 %% \subsection{How to overlay contour plot over pm3d map/surface}
 \subsection{pm3d 色地図/曲面グラフに等高線を重ねるには}
 
-%% It is necessary to write contours into a temporary file using the table
+%% This requires you to write contours into a temporary file 
+%% using the table
 %% terminal, and then use this file in the final drawing without set contours.
 %% The following example demonstrates this for a map; for surface, remove 
 %% \verb+set pm3d map+ and put \verb+set ticslevel 0+.
-等高線を table 出力形式を利用して一時ファイルに書き出し、
+これは、等高線を table 出力形式を利用して一時ファイルに書き出し、
 そしてそれを set contours を使わずに描画する必要があります。
 次の例は色地図グラフのデモですが、
 曲面グラフの場合は %
 \verb+set pm3d map+ を削除して \verb+set ticslevel 0+ を入れます。
 %% \begin{verbatim}
 %% # Write contours of function  x*x-y*y  to a (temporary) file
-%% set term table
-%% set out 'contour.dat'
 %% set contour base; set cntrparam level 20
 %% unset surface
+%% set table 'contour.dat'
 %% splot x*x-y*y
-%% set out; set term pop
+%% unset table
 %% 
 %% # Change single blank lines to double blank lines
 %% !awk "NF<2{printf\"\n\"}{print}" <contour.dat >contour1.dat
@@ -1366,17 +1378,16 @@ z の値による等高線のラベルは、
 %% set palette gamma 2.5
 %% set pm3d map
 %% set pm3d explicit
-%% splot x*x+y*y with pm3d, 'contour1.dat' with line -1
+%% splot x*x+y*y with pm3d, 'contour1.dat' with line lt -1
 %% !rm contour.dat contour1.dat
 %% \end{verbatim}
 \begin{verbatim}
 # 関数 x*x-y*y の等高線を一時ファイルに書き出す
-set term table
-set out 'contour.dat'
 set contour base; set cntrparam level 20
 unset surface
+set table 'contour.dat'
 splot x*x-y*y
-set out; set term pop
+unset table
 
 # 1 行の空行を 2 行の空行に変換
 !awk "NF<2{printf\"\n\"}{print}" <contour.dat >contour1.dat
@@ -1387,7 +1398,7 @@ set palette gray
 set palette gamma 2.5
 set pm3d map
 set pm3d explicit
-splot x*x+y*y with pm3d, 'contour1.dat' with line -1
+splot x*x+y*y with pm3d, 'contour1.dat' with line lt -1
 !rm contour.dat contour1.dat
 \end{verbatim}
 %% The last command deletes the two temporary files.
@@ -1507,8 +1518,8 @@ gnuplot は曲面や 3 次元の物体を仮想現実としては描画しません。
 %% \section{Wanted features}
 \section{欲しい機能 (Wanted features)}
 
-%% \subsection{What's new in \gnuplot{} 3.7, 4.0 etc?}
-\subsection{\gnuplot{} 3.7, 4.0 等で新しくなったことは}
+%% \subsection{What's new in \gnuplot{} 3.7, 4.0, 4.2 etc?}
+\subsection{\gnuplot{} 3.7, 4.0, 4.2 等で新しくなったことは}
 
 %% Too many things to be named here.
 %% Please refer to the \texttt{NEWS} file in the source distribution, or the
@@ -2103,12 +2114,12 @@ x11 描画ウィンドウが起動する前に \texttt{set mouse} %
 
 %% There are several hotkeys available in interactive terminals.
 %% Currently the following interactive terminals support hotkeys and mousing:
-%% OS/2 Presentation Manager, X11, Windows, and GGI. Hit 'h' 
+%% OS/2 Presentation Manager, X11, Windows, WX, and GGI. Hit 'h' 
 %% in the terminal to get
 %% list of hotkeys. 
 対話型ターミナルではいくつかのホットキーが有効になっています。
 現在は次の対話型ターミナルがホットキーとマウス機能をサポートしています:
-OS/2 プレゼンテーションマネージャ (pm), X11, Windows, GGI。
+OS/2 プレゼンテーションマネージャ (pm), X11, Windows, WX, GGI。
 'h' をそのターミナルの中で打つと、ホットキーの一覧が表示されます。
 %% See \texttt{help new} or the \textbf{What is New in 4.0} section in the 
 %% docs for
