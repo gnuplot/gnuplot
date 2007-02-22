@@ -1,3 +1,7 @@
+2007-02-22  sobukus@users.sourceforge.net
+
+	* m4/apha.m4: Fix syntax of configuration test for gcc on alpha
+
 2007-02-21  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/faq-ja.tex: Sync Japanese documentation

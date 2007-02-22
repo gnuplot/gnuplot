@@ -13,7 +13,7 @@ AC_EGREP_CPP(yes,
   yes
 #endif
 ],AC_MSG_RESULT(yes)
-  if [ "$GCC"=="yes" ] ; then
+  if test "$GCC" = "yes" ; then
      CFLAGS="-mieee $CFLAGS"
   else
      CFLAGS="-ieee $CFLAGS"
