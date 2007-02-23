@@ -10,6 +10,9 @@
 	from int_error(). FIXME: Similar error_reset routines may be needed
 	by other modules.
 
+	* src/eval.c docs/gnuplot.doc: Allow "strcol(foo)" as shorthand form
+	of "stringcolumn(foo)".
+
 2007-02-22  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/latex.trm (LATEX_fillbox): Add support for solid-fill boxes.
