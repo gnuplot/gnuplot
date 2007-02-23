@@ -1,3 +1,15 @@
+2007-02-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.h src/datafile.c (df_reset_after_error)
+	src/util.c (int_error): The routines in datafile.c use local variables
+	to track the context of expression evaluation; e.g. expressions may
+	only reference data column values inside a `using` statement. But the
+	state of these context variables is corrupted if an error exit bails
+	directly to the command line, thus bypassing the normal execution path.
+	Therefore we provide a routine df_reset_after_error() to be called
+	from int_error(). FIXME: Similar error_reset routines may be needed
+	by other modules.
+
 2007-02-22  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/latex.trm (LATEX_fillbox): Add support for solid-fill boxes.
