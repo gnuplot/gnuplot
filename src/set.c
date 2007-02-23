@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.243 2007/02/06 23:56:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.244 2007/02/11 05:29:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -171,8 +171,9 @@ static void parse_histogramstyle __PROTO((histogram_style *hs,
 static struct position default_position
 	= {first_axes, first_axes, first_axes, 0., 0., 0.};
 
-/* Backwards compatibility ... */
+#ifdef BACKWARDS_COMPATIBLE
 static void set_nolinestyle __PROTO((void));
+#endif
 
 /******** The 'set' command ********/
 void
@@ -4782,7 +4783,7 @@ looks_like_numeric(char *format)
     return (*format == 'f' || *format == 'g' || *format == 'e');
 }
 
-
+#ifdef BACKWARDS_COMPATIBLE
 /*
  * Backwards compatibility ...
  */
@@ -4811,6 +4812,7 @@ static void set_nolinestyle()
 	int_error(c_token, "linestyle not found");
     }
 }
+#endif
 
 
 /* HBB 20001021: new function: make label texts decoratable with numbers */

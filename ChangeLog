@@ -13,7 +13,8 @@
 	* src/eval.c docs/gnuplot.doc: Allow "strcol(foo)" as shorthand form
 	of "stringcolumn(foo)".
 
-	* src/unset.c (unset_style): Add missing command "unset style line <n>".
+	* src/unset.c (unset_style) src/set.c (set_nolinestyle):
+	Add missing command "unset style line <n>".
 
 2007-02-22  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
