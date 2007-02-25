@@ -99,7 +99,7 @@ Johannes Zellner
 @c ^   Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net <p>
 @c ^</h2><p>
 @c ^<h3> This manual was prepared by Dick Crawford</h3><p>
-@c ^<h3> Last revised: October 2006</h3><p>
+@c ^<h3> Last revised: February 2007</h3><p>
 @c ^<hr>
 
 @menu
@@ -152,7 +152,7 @@ Johannes Zellner
 @cindex license
 
 @example
-      Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+    Copyright (C) 1986 - 1993, 1998, 2004, 2007  Thomas Williams, Colin Kelley
 
 @end example
 
@@ -7397,8 +7397,10 @@ See also help for @ref{pm3d}, @ref{palette}, @ref{pm3d}, and `set style line`.
 
 @cindex nocontour
 
-@ref{contour} enables contour drawing for surfaces. This option is available
-for `splot` only.
+@ref{contour} enables contour drawing for surfaces.  This option is available
+for `splot` only.  It requires grid data, see `grid_data` for more details.
+If contours are desired from non-grid data, @ref{dgrid3d} can be used to
+create an appropriate grid.
 
 Syntax:
 @example
@@ -7441,9 +7443,6 @@ containing no characters other than blank spaces and a carriage return and/or
 a line feed) separates one y-isoline from the next.
 See also @ref{datafile}.
 
-
-If contours are desired from non-grid data, @ref{dgrid3d} can be used to
-create an appropriate grid.  See @ref{dgrid3d} for more information.
 See also
 @uref{http://www.gnuplot.info/demo/contours.html,contours demo (contours.dem)
 }
@@ -7752,8 +7751,9 @@ formatted using gnuplot's internal gprintf() function.
 
 @cindex nodgrid3d
 
-The @ref{dgrid3d} command enables, and can set parameters for, non-grid
-to grid data mapping.
+The @ref{dgrid3d} command enables, and can set parameters for, non-grid to
+grid data mapping.  See `splot grid_data` for more details about the grid data
+structure.
 
 Syntax:
 @example
@@ -10870,6 +10870,7 @@ See also
 
 @c ?set style
 @c ?show style
+@c ?unset style
 @c ^ <a name="set style <style>"></a>
 Default plotting styles are chosen with the `set style data` and
 `set style function` commands.  See @ref{with} for information about how to

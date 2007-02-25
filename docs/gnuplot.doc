@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.10 2007/02/14 18:38:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.11 2007/02/17 18:26:07 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8219,6 +8219,7 @@ C ... and restart the table:
 3 style
 ?set style
 ?show style
+?unset style
 ^ <a name="set style <style>"></a>
  Default plotting styles are chosen with the `set style data` and
  `set style function` commands.  See `plot with` for information about how to
