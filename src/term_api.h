@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.61 2007/01/17 05:34:17 sfeam Exp $
+ * $Id: term_api.h,v 1.62 2007/02/21 19:45:39 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -360,7 +360,6 @@ extern char *enhanced_cur_text;
 extern double enhanced_fontscale;
 /* give array size to allow the use of sizeof */
 extern char enhanced_escape_format[16];
-extern double enhanced_max_height, enhanced_min_height;
 extern TBOOLEAN ignore_enhanced_text;
 
 

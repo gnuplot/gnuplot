@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.110 2007/02/08 19:29:07 sfeam Exp $
+ * $Id: gd.trm,v 1.111 2007/02/21 19:45:39 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1938,8 +1938,6 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
     PNG_move(x,y);
 
     /* set up the global variables needed by enhanced_recursion() */
-    enhanced_max_height = -1000;
-    enhanced_min_height = 1000;
     enhanced_fontscale = 1.0;
     strncpy(enhanced_escape_format,"&#x%2.2x;",sizeof(enhanced_escape_format));
 
@@ -1975,8 +1973,6 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
 
 	/* else carry on and process the rest of the string */
     }
-
-    enhanced_max_height += enhanced_min_height;
 
     /* We can do text justification by running the entire top level string */
     /* through 2 times, with the ENHgd_sizeonly flag set the first time.   */

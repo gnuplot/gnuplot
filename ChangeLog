@@ -2,6 +2,14 @@
 
 	* docs/gnuplot.doc: Add mention of "set multiplot title <page-title>".
 
+	* src/term_api.h term/aquaterm.c term/gd.trm term/pdf.trm:  Remove cruft
+	(enhanced_max_height, enhanced_min_height) used only be PostScript but
+	exported to everyone.
+	
+	* term/estimate.trm: Keep track in local variables instead, and return
+	the net height in term->ymax.  It was supposed to do this already.
+	Now it really is.
+
 2007-02-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.c (draw_color_smooth_box) src/plot3d.c (eval_3dplots):
