@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.419 2007/02/23 19:42:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.420 2007/02/23 20:35:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7108,6 +7108,7 @@ C ... and restart the table:
  Syntax:
        set multiplot { layout <rows>,<cols>
                        {rowsfirst|columnsfirst} {downwards|upwards}
+                       {title <page title>}
                        {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}}
                      }
        unset multiplot
@@ -7130,6 +7131,10 @@ C ... and restart the table:
  once on the page, for instance a single time stamp, you'll need to put a `set
  time`/`unset time` pair around one of the `plot`, `splot` or `replot`
  commands within the `set multiplot`/`unset multiplot` block.
+
+ The multiplot title is separate from the individual plot titles, if any.
+ Space is reserved for it at the top of the page, spanning the full width
+ of the canvas.
 
  The commands `set origin` and `set size` must be used to correctly position
  each plot if no layout is specified or if fine tuning is desired.  See
