@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.118 2007/02/08 01:55:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.119 2007/02/23 17:46:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1033,10 +1033,11 @@ df_open(const char *cmd_filename, int max_using)
 
     fast_columns = 1;           /* corey@cac */
 
-    /*{{{  close file if necessary */
-    if (data_fp)
+    /* close file if necessary */
+    if (data_fp) {
 	df_close();
-    /*}}} */
+	data_fp = NULL;
+    }
 
     /*{{{  initialise static variables */
     df_format[0] = NUL;         /* no format string */

@@ -4,6 +4,8 @@
 	when placing the x-axis label was masked by a spurious #ifdef.
 	Bug #1669038
 
+	* src/datafile.c: Avoid double-close of data_fp in pathological cases.
+
 2007-02-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Add mention of "set multiplot title <page-title>".
