@@ -1,3 +1,9 @@
+2007-02-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c: The code to allow room for subscripts/superscripts
+	when placing the x-axis label was masked by a spurious #ifdef.
+	Bug #1669038
+
 2007-02-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Add mention of "set multiplot title <page-title>".
@@ -6,9 +12,9 @@
 	(enhanced_max_height, enhanced_min_height) used only be PostScript but
 	exported to everyone.
 	
-	* term/estimate.trm: Keep track in local variables instead, and return
-	the net height in term->ymax.  It was supposed to do this already.
-	Now it really is.
+	* term/estimate.trm: Keep track of string height in local variables
+	instead, and return the net height in term->ymax.  It was supposedly
+	doing this already.  Now it really does.
 
 2007-02-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
