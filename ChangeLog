@@ -1,3 +1,9 @@
+2007-02-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c: Remove spurious #ifdef that was masking the code to
+	allow room for subscripts or superscripts when placing the x-axis label.
+	Bug #1669038
+
 2007-02-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Add mention of "set multiplot title <page-title>".
