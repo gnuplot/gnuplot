@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.111 2007/02/21 19:45:39 sfeam Exp $
+ * $Id: gd.trm,v 1.112 2007/02/27 05:06:41 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2007,6 +2007,7 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
 {
     int m, n, mout, nout;
     int x1,y1,x2,y2;
+    int xclip1, xclip2, yclip1, yclip2;
     int pixel;
     gdImagePtr im;
 
@@ -2053,8 +2054,12 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
     }
 
     /* Set clipping bound for area into which we will copy */
+    xclip1 = GPMIN(Y(corner[2].x), Y(corner[3].x));
+    xclip2 = GPMAX(Y(corner[2].x), Y(corner[3].x));
+    yclip1 = GPMIN(Y(corner[2].y), Y(corner[3].y));
+    yclip2 = GPMAX(Y(corner[2].y), Y(corner[3].y));
     gdImageGetClip(png_state.image, &x1, &y1, &x2, &y2);
-    gdImageSetClip(png_state.image, corner[2].x, Y(corner[2].y), corner[3].x, Y(corner[3].y));
+    gdImageSetClip(png_state.image, xclip1, yclip1, xclip2, yclip2);
 
     /* Copy and resize onto requested region of plot */
     /* FIXME - WOULD gdImageCopyResampled() do a nicer job ??? */
