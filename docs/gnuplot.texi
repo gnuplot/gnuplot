@@ -9367,6 +9367,7 @@ Syntax:
 @example
       set multiplot @{ layout <rows>,<cols>
                       @{rowsfirst|columnsfirst@} @{downwards|upwards@}
+                      @{title <page title>@}
                       @{scale <xscale>@{,<yscale>@}@} @{offset <xoff>@{,<yoff>@}@}
                     @}
       unset multiplot
@@ -9391,6 +9392,10 @@ defined in the `screen` system).  Just about everything else that can be
 once on the page, for instance a single time stamp, you'll need to put a `set
 time`/`unset time` pair around one of the `plot`, `splot` or @ref{replot}
 commands within the @ref{multiplot}/@ref{multiplot} block.
+
+The multiplot title is distinct from the individual plot titles, if any.
+Space is reserved for it at the top of the page, spanning the full width
+of the canvas.
 
 The commands @ref{origin} and @ref{size} must be used to correctly position
 each plot if no `layout` is specified or if fine tuning is desired.  See
@@ -14569,7 +14574,7 @@ with no modifiers.
 * excl::                        
 * hercules::                    
 * fig::                         
-* png_(NEW)::                   
+* png::                         
 * ggi::                         
 * Gnugraph(GNU_plotutils)::     
 * gpic::                        
@@ -15893,7 +15898,7 @@ printer and the 1590.  It has no options."
 These drivers supports PC monitors with autodetected graphics boards.  They
 can be used only when compiled with Zortech C/C++.  None have options."
 
-@node fig, png_(NEW), hercules, terminal_
+@node fig, png, hercules, terminal_
 @subsubsection fig
 
 @c ?commands set terminal fig
@@ -16007,8 +16012,8 @@ To plot the error bars on top of the circles use
 
 @end example
 
-@node png_(NEW), ggi, fig, terminal_
-@subsubsection png (NEW)
+@node png, ggi, fig, terminal_
+@subsubsection png
 
 @c ?commands set terminal png
 @c ?set terminal png
@@ -16127,7 +16132,7 @@ which uses white for the transparent background, black for borders, dark
 gray for axes, and a gray-scale for the six plotting colors.
 
 
-@node ggi, Gnugraph(GNU_plotutils), png_(NEW), terminal_
+@node ggi, Gnugraph(GNU_plotutils), png, terminal_
 @subsubsection ggi
 
 @c ?commands set terminal ggi

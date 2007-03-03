@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.202.2.14 2007/01/24 19:22:34 sfeam Exp $
+dnl $Id: configure.in,v 1.202.2.15 2007/01/29 19:47:18 persquare Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
 dnl remove the letter from VERSION
-AC_INIT(gnuplot, 4.2.rc4)
+AC_INIT(gnuplot, 4.2.0)
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ(2.58)
 AM_CONFIG_HEADER(config.h:config.hin)
