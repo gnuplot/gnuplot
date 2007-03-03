@@ -3,6 +3,8 @@
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:
 	Tag and package for release of 4.2 patchlevel 0
 
+	* docs/titlepage.tex: Update
+
 2007-02-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Remove spurious #ifdef that was masking the code to
