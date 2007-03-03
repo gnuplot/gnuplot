@@ -1,5 +1,5 @@
 #
-# $Id: pm3d.dem,v 1.18.2.1 2007/01/19 17:44:14 mikulik Exp $
+# $Id: pm3d.dem,v 1.19 2007/01/19 18:03:34 mikulik Exp $
 #
 # demo for pm3d splotting
 #
@@ -89,6 +89,10 @@ set palette color positive
 set pm3d map
 set samples 50; set isosamples 50
 replot
+pause -1 "Hit return to continue"
+
+set title "Show underlying rgbformulae contributing to palette"
+test palette
 pause -1 "Hit return to continue"
 
 set title "colour, rgbformulae 3,11,6 ... green-red-violet"

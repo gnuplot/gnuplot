@@ -4,6 +4,8 @@
 
 	* NEWS: Update
 
+	* demo/pm3d.dem: Add "test palette" to the demo series.
+
 2007-02-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_image): libgd is sensitive to the order of the bounds
