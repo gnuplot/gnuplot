@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.219 2007/02/27 17:29:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.220 2007/03/04 19:51:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3864,7 +3864,7 @@ plot_c_bars(struct curve_points *plot)
 	    ymax = map_y(yopen); ymin = map_y(yclose);
 	}
 
-	if (term->fillbox) {
+	if ((plot->fill_properties.fillstyle != FS_EMPTY) && term->fillbox) {
 	    int style = style_from_fill(&plot->fill_properties);
 	    unsigned int x = xlowM;
 	    unsigned int y = ymin;
@@ -3875,6 +3875,10 @@ plot_c_bars(struct curve_points *plot)
 		(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
 	    else
 		(*t->fillbox)(style, x, y, w, h);
+
+	    if ((plot->fill_properties.border_linetype != LT_NODRAW)
+	    &&  (plot->fill_properties.border_linetype != LT_UNDEFINED))
+		(*t->linetype)(plot->fill_properties.border_linetype);
 	}
 
 	/* Draw whiskers and an open box */
@@ -3900,6 +3904,16 @@ plot_c_bars(struct curve_points *plot)
 	    (*t->vector) (xhighM-d, yhighM);
 	    (*t->move)   (xlowM+d, ylowM);
 	    (*t->vector) (xhighM-d, ylowM);
+	}
+
+	/* Reset to original color, if we changed it for the border */
+	if ((plot->fill_properties.fillstyle != FS_EMPTY) && term->fillbox) {
+	    if ((plot->fill_properties.border_linetype != LT_NODRAW)
+	    &&  (plot->fill_properties.border_linetype != LT_UNDEFINED)) {
+		(*t->linetype)(plot->lp_properties.l_type);
+		if (plot->lp_properties.use_palette)
+		    apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
+	    }
 	}
 
 	/* draw two extra vertical bars to indicate open > close */
