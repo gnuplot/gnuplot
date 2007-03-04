@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.218 2007/02/13 17:57:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.219 2007/02/27 17:29:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3845,6 +3845,14 @@ plot_c_bars(struct curve_points *plot)
 	cliptorange(dxl, X_AXIS.min, X_AXIS.max);
 	xlowM = map_x(dxl);
 	xhighM = map_x(dxr);
+	}
+
+	/* EAM Feb 2007 Force width to be an odd number of pixels */
+	/* so that the center bar can be centered perfectly.	  */
+	if (((xhighM-xlowM) & 01) != 0) {
+	    xhighM++;
+	    if (xM-xlowM > xhighM-xM) xM--;
+	    if (xM-xlowM < xhighM-xM) xM++;
 	}
 
 	/* EAM Feb 2006 Clip to plot vertical extent */

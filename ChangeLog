@@ -1,3 +1,10 @@
+2007-03-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_c_bars):  For candlesticks whose width is equal
+	to a small even number of pixels, the central vertical bar is displaced
+	to one side or the other. This patch forces the width to be an odd
+	number of pixels so that the box is symmetric.
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/titlepag.tex: Update author list and copyright information.
