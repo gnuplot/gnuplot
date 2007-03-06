@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.112 2007/02/27 05:06:41 sfeam Exp $
+ * $Id: gd.trm,v 1.113 2007/03/01 04:10:24 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1070,7 +1070,7 @@ PNG_init_brush(int width)
     gdImageFill( PNG_brush[width]->im, 0, 0, PNG_brush[width]->bgnd );
     gdImageColorTransparent( PNG_brush[width]->im, PNG_brush[width]->bgnd );
     PNG_brush[width]->fgnd = gdImageColorAllocate( PNG_brush[width]->im, 0, 0, 0 );
-    PNG_brush[width]->last_rgb = 0;
+    PNG_brush[width]->last_rgb = -99;	/* Invalid, so 1st use will sync to main palette colors */
     
     /* EAM - quick and dirty is to fill the entire brush (square nib).		*/
     /*       It might be better to approximate a circular nib by selectively	*/

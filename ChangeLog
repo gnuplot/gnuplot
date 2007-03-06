@@ -1,3 +1,9 @@
+2007-03-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_init_brush): Flag initial color as invalid. The first
+	time the brush is used, it will be synced to the current palette color.
+	Bug #1673316 
+
 2007-03-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_c_bars):  For candlesticks whose width is equal
