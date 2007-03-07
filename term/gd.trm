@@ -1049,8 +1049,6 @@ int i;
     /* Clear brush array, then initialize a few small ones */
     for (i=2; i<=MAXLINEWIDTH; i++)
 	PNG_brush[i] = NULL;
-    for (i=2; i<=6; i++)
-	PNG_init_brush(i);
 }
 
 /*
@@ -1059,23 +1057,31 @@ int i;
 static void
 PNG_init_brush(int width)
 {
-    if (PNG_brush[width])
-	return;
-    else
-	PNG_brush[width] = gp_alloc(sizeof(PNG_BRUSH),"gd brush");
+    PNG_BRUSH *brush = PNG_brush[width];
 
-    if (!((PNG_brush[width]->im = gdImageCreate(width,width))))
-	int_error(NO_CARET,"libgd: failed to create brush structure");
-    PNG_brush[width]->bgnd = gdImageColorAllocate( PNG_brush[width]->im, 255, 255, 255 );
-    gdImageFill( PNG_brush[width]->im, 0, 0, PNG_brush[width]->bgnd );
-    gdImageColorTransparent( PNG_brush[width]->im, PNG_brush[width]->bgnd );
-    PNG_brush[width]->fgnd = gdImageColorAllocate( PNG_brush[width]->im, 0, 0, 0 );
-    PNG_brush[width]->last_rgb = -99;	/* Invalid, so 1st use will sync to main palette colors */
-    
-    /* EAM - quick and dirty is to fill the entire brush (square nib).		*/
-    /*       It might be better to approximate a circular nib by selectively	*/
-    /*       coloring the individual pixels of the brush image.          	*/
-    gdImageFilledRectangle( PNG_brush[width]->im, 0, 0, width-1, width-1, PNG_brush[width]->fgnd );
+    if (!brush) {
+	brush = gp_alloc(sizeof(PNG_BRUSH),"gd brush");
+	PNG_brush[width] = brush;
+	brush->last_rgb = -99;  /* Something invalid */
+	if (!((brush->im = gdImageCreate(width,width))))
+	    int_error(NO_CARET,"libgd: failed to create brush structure");
+	brush->bgnd = gdImageColorAllocate( brush->im, 255, 255, 255 );
+	gdImageFill(brush->im, 0, 0, brush->bgnd);
+	gdImageColorTransparent(brush->im, brush->bgnd);
+    }
+
+    if (png_state.color != brush->last_rgb) {
+	brush->fgnd = gdImageColorResolve(brush->im,
+	    gdImageRed(png_state.image,png_state.color),
+	    gdImageGreen(png_state.image,png_state.color),
+	    gdImageBlue(png_state.image,png_state.color) );
+	brush->last_rgb = png_state.color;
+
+	/* EAM - quick and dirty is to fill the entire brush (square nib)  */
+	/* It might be better to approximate a circular nib by selectively */
+	/* coloring the individual pixels of the brush image.          	   */
+	gdImageFilledRectangle(brush->im, 0, 0, width-1, width-1, brush->fgnd);
+    }
 }
 
 /*
@@ -1470,22 +1476,10 @@ PNG_vector(unsigned int x, unsigned int y)
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), png_state.color);
 #endif
-	}else{
-
-	    /* EAM - Implement linewidth by selecting a pre-defined brush */
-	    /* The tricky bit is re-coloring the brush to the current color */
+	} else {
+	    /* EAM - Implement linewidth by using a brush */
 	    lw   = png_state.linewidth;
-	    if (!PNG_brush[lw])
-		PNG_init_brush(lw);
-	    if (png_state.color != PNG_brush[lw]->last_rgb) {
-		PNG_brush[lw]->fgnd = gdImageColorResolve(PNG_brush[lw]->im,
-		    gdImageRed(png_state.image,png_state.color),
-		    gdImageGreen(png_state.image,png_state.color),
-		    gdImageBlue(png_state.image,png_state.color) );
-		PNG_brush[lw]->last_rgb = png_state.color;
-		gdImageFilledRectangle(PNG_brush[lw]->im, 0, 0, lw-1, lw-1,
-		    PNG_brush[lw]->fgnd);
-	    }
+	    PNG_init_brush(lw);
 	    gdImageSetBrush(png_state.image, PNG_brush[lw]->im);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), gdBrushed );
@@ -1650,20 +1644,9 @@ PNG_point(unsigned int x, unsigned int y, int number)
     }
     /* Use current linewidth to draw the point symbol */
     if (png_state.linewidth > 1) {
-	/* EAM - Implement linewidth by selecting a pre-defined brush */
-	/* The tricky bit is re-coloring the brush to the current color */
+	/* EAM - Implement linewidth by using a brush */
 	int lw   = png_state.linewidth;
-	if (!PNG_brush[lw])
-	    PNG_init_brush(lw);
-	if (png_state.color != PNG_brush[lw]->last_rgb) {
-	    PNG_brush[lw]->fgnd = gdImageColorResolve(PNG_brush[lw]->im,
-		gdImageRed(png_state.image,png_state.color),
-		gdImageGreen(png_state.image,png_state.color),
-		gdImageBlue(png_state.image,png_state.color) );
-	    PNG_brush[lw]->last_rgb = png_state.color;
-	    gdImageFilledRectangle(PNG_brush[lw]->im, 0, 0, lw-1, lw-1,
-		PNG_brush[lw]->fgnd);
-	}
+	PNG_init_brush(lw);
 	gdImageSetBrush(png_state.image, PNG_brush[lw]->im);
 	png_state.color = gdBrushed;
     }

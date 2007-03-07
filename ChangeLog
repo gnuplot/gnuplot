@@ -1,3 +1,9 @@
+2007-03-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_init_brush): Cleaner fix for Bug #1673316.
+	Consolidate duplicated code surrounding calls to PNG_init_brush() into
+	a single copy in the subroutine itself.
+
 2007-03-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_init_brush): Flag initial color as invalid. The first
