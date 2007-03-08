@@ -1,3 +1,22 @@
+2007-03-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm (X11_filled_polygon):
+	Fix read beyond end of buffer found by valgrind.
+
+	* src/datafile.c (df_tokenise):
+	Fix uninitialized variable found by valgrind.
+
+2007-03-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util3d.c (draw3d_line_unconditional): Check for user-defined
+	line styles when choosing colors for front/back of hidden surfaces.
+	Bugfix (back-ported from 4.3)
+
+	* src/color.c (draw_color_smooth) src/graph3d.c (do_3dplot cntr3d_lines)
+	src/misc.c (lp_use_properties):  Do not fail to initialize the structure
+	passed to lp_use_properties().
+	Bugfix (back-ported from 4.3)
+
 2008-03-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_gets): Revert patch from 2008-03-04 because of
