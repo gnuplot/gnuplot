@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.119 2007/02/23 17:46:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.120 2007/02/27 22:36:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -188,6 +188,7 @@ static void df_parse_string_field __PROTO((char *, char *));
 #ifdef EAM_HISTOGRAMS
 static void add_key_entry __PROTO((char *temp_string, int df_datum));
 #endif
+static char * df_generate_pseudodata __PROTO((void));
 
 /*}}} */
 
@@ -281,6 +282,11 @@ static int firstline = 0;
 static int lastline = MAXINT;
 static int point_count = -1;    /* point counter - preincrement and test 0 */
 static int line_count = 0;      /* line counter */
+
+/* for pseudo-data (filename = '+') */
+static TBOOLEAN df_pseudodata = FALSE;
+static int df_pseudorecord = 0;
+static int df_pseudospan = 0;
 
 /* parsing stuff */
 struct use_spec_s use_spec[MAXDATACOLS];
@@ -602,6 +608,10 @@ df_gets()
     /* HBB 20000526: prompt user for inline data, if in interactive mode */
     if (mixed_data_fp && interactive)
 	fputs("input data ('e' ends) > ", stderr);
+
+    /* Special pseudofile '+' returns x coord of sample */
+    if (df_pseudodata)
+	return df_generate_pseudodata();
 
     if (!fgets(line, max_line_len, data_fp))
 	return NULL;
@@ -1231,6 +1241,9 @@ df_open(const char *cmd_filename, int max_using)
     /*{{{  more variable inits */
     point_count = -1;           /* we preincrement */
     line_count = 0;
+    df_pseudodata = FALSE;
+    df_pseudorecord = 0;
+    df_pseudospan = 0;
 
     /* here so it's not done for every line in df_readline */
     if (max_line_len < DATA_LINE_BUFSIZ) {
@@ -1255,6 +1268,8 @@ df_open(const char *cmd_filename, int max_using)
 	if (!data_fp)
 	    data_fp = stdin;
 	mixed_data_fp = TRUE;   /* don't close command file */
+    } else if (*df_filename == '+' && strlen(df_filename) == 1) {
+	df_pseudodata = TRUE;
     } else {
 	/* filename cannot be static array! */
 	gp_expand_tilde(&df_filename);
@@ -1635,7 +1650,7 @@ void plot_ticlabel_using(int axis)
 int
 df_readline(double v[], int max)
 {
-    if (!data_fp)
+    if (!data_fp && !df_pseudodata)
 	return DF_EOF;
 
 #ifdef BINARY_DATA_FILE
@@ -1662,7 +1677,7 @@ df_readascii(double v[], int max)
 {
     char *s;
 
-    assert(data_fp != NULL);
+    assert(data_fp != NULL || df_pseudodata);
     assert(max_line_len);       /* alloc-ed in df_open() */
     assert(max <= MAXDATACOLS);
 
@@ -5099,3 +5114,80 @@ df_set_plot_mode(int mode)
 }
 #endif /* BINARY_DATA_FILE */
 
+/* Special pseudofile '+' returns x coord of sample for 2D plots,
+ * x and y coordinates of grid for 3D plots.
+ */
+static char *
+df_generate_pseudodata()
+{
+    /* This code copied from that in second pass through eval_plots() */
+    if (df_plot_mode == MODE_PLOT) {
+	static double t, t_min, t_max, t_step;
+	if (df_pseudorecord == 0) {
+	    if (parametric || polar)
+		int_error(NO_CARET,"Pseudodata not yet implemented for polar or parametric graphs");
+	    if (axis_array[FIRST_X_AXIS].max == -VERYLARGE)
+		axis_array[FIRST_X_AXIS].max = 10;
+	    if (axis_array[FIRST_X_AXIS].min == VERYLARGE)
+		axis_array[FIRST_X_AXIS].min = -10;
+	    t_min = X_AXIS.min;
+	    t_max = X_AXIS.max;
+	    axis_unlog_interval(x_axis, &t_min, &t_max, 1);
+	    t_step = (t_max - t_min) / (samples_1 - 1);
+	}
+	t = t_min + df_pseudorecord * t_step;
+	t = AXIS_DE_LOG_VALUE(x_axis, t);
+	sprintf(line,"%g",t);
+	if (++df_pseudorecord >= samples_1)
+	    return NULL;
+    }
+
+    /* This code copied from that in second pass through eval_3dplots */
+    if (df_plot_mode == MODE_SPLOT) {
+	static double u_min, u_max, u_step, v_min, v_max, v_step;
+	static double u_isostep, v_isostep;
+	static int nusteps, nvsteps;
+	double u, v;
+	AXIS_INDEX u_axis = FIRST_X_AXIS;
+	AXIS_INDEX v_axis = FIRST_Y_AXIS;
+
+	if (df_pseudospan == 0) {
+	    if (samples_1 < 2 || samples_2 < 2 || iso_samples_1 < 2 || iso_samples_2 < 2)
+		int_error(NO_CARET, "samples or iso_samples < 2. Must be at least 2.");
+	    axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
+	    axis_checked_extend_empty_range(FIRST_Y_AXIS, "y range is invalid");
+	    u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
+	    u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
+	    v_min = axis_log_value_checked(v_axis, axis_array[v_axis].min, "y range");
+	    v_max = axis_log_value_checked(v_axis, axis_array[v_axis].max, "y range");
+
+	    if (hidden3d) {
+		 u_step = (u_max - u_min) / (iso_samples_1 - 1);
+		 v_step = (v_max - v_min) / (iso_samples_2 - 1);
+		 nusteps = iso_samples_1;
+	    } else {
+		 u_step = (u_max - u_min) / (samples_1 - 1);
+		 v_step = (v_max - v_min) / (samples_2 - 1);
+		 nusteps = samples_1;
+	    }
+	    u_isostep = (u_max - u_min) / (iso_samples_1 - 1);
+	    v_isostep = (v_max - v_min) / (iso_samples_2 - 1);
+	    nvsteps = iso_samples_2;
+	}
+
+	/* Duplicate algorithm from calculate_set_of_isolines() */
+	u = u_min + df_pseudorecord * u_step;
+	v = v_max - df_pseudospan * v_isostep;
+	sprintf(line,"%g %g", u, v);
+
+	if (++df_pseudorecord > nusteps) {
+	    df_pseudorecord = 0;
+	    if (++df_pseudospan >= nvsteps)
+		return NULL;
+	    else
+		return ""; /* blank record for end of scan line */
+	}
+    }
+
+    return line;
+}

@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.31 2006/12/03 06:52:06 sfeam Exp $
+# $Id: all.dem,v 1.32 2006/12/09 18:25:43 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -151,6 +151,10 @@ print "********************** file pm3dcolors.dem *********************"
 load "pm3dcolors.dem"
 reset
 
+print "********************** file 4D-data.dem *********************"
+load "4D_data.dem"
+reset
+
 print "********************** file pm3dgamma.dem *********************"
 load "pm3dgamma.dem"
 reset
@@ -223,6 +227,10 @@ reset
 
 print "********************** file rectangle.dem *********************"
 load "rectangle.dem"
+reset
+
+print "********************** file approximate.dem *********************"
+load "approximate.dem"
 reset
 
 print "********************** file transparent.dem *********************"

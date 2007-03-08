@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.420 2007/02/23 20:35:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.421 2007/02/27 04:04:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3851,7 +3851,24 @@ C ... and restart the table:
 ?plot special-filenames
 ?datafile special-filenames
 ?special-filenames
- A special filename of `'-'` specifies that the data are inline; i.e., they
+ There are three filenames that have a special meaning:  '', '-', and '+'.
+
+ The empty filename '' tells gnuplot to re-use the previous input file in the
+ same plot command. So to plot two columns from the same input file:
+
+       plot 'filename' using 1:2, '' using 1:3
+
+ The special filename '+' is a mechanism to allow the full range of 
+ `using` specifiers and plot styles with in-line functions.  Normally a 
+ function plot can only have a single y (or z) value associated with each
+ sampled point.  The pseudo-file '+' treats the sampled points as columns
+ 1 (plot) or 1 and 2 (splot), and allows additional column values to be
+ specified via a `using` specification, just as for a true input file.
+ Example:
+
+       plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
+
+ The special filename `'-'` specifies that the data are inline; i.e., they
  follow the command.  Only the data follow the command; `plot` options like
  filters, titles, and line styles remain on the `plot` command line.  This is
  similar to << in unix shell script, and $DECK in VMS DCL.  The data are

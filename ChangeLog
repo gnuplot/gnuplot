@@ -1,3 +1,17 @@
+2007-03-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readline df_generate_pseudodata df_open df_gets):
+	Implement a function-plotting mode that allows 'using' options.
+	'+' is a pseudo-file that in 2D plots returns a stream of <samples>
+	values corresponding to x coordinates within the current xrange,
+	In 3D plots it returns a stream of x and y coordinates on the
+	<isosamples> grid.  In either case, additional columns of data can
+	be attached the x and y coordinates via a 'using' specification, 
+	just as for real data files.
+
+	* demo/4D-data.dem demo/all.dem demo/approximate.dem demo/html/Makefile
+	docs/gnuplot.doc:  Demos and documentation.
+
 2007-03-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_init_brush): Cleaner fix for Bug #1673316.
