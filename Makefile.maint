@@ -9,7 +9,7 @@ maintainer-check:
 	  exit 1; \
 	fi
 	$(MAKE) distcheck
-	$(MAKE) my-distcheck
+#	$(MAKE) my-distcheck
 
 # Tag before making distribution.  Also, don't make a distribution if
 # checks fail.  Also, make sure the NEWS file is up-to-date.

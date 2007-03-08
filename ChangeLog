@@ -1,5 +1,11 @@
 2007-03-08  Ethan Merritt  <merritt@u.washington.edu>
 
+	Version 4.2.3 release
+	Any further commits to this tree will be in 4.2.4 if such a version is
+	ever released.
+
+2007-03-08  Ethan Merritt  <merritt@u.washington.edu>
+
 	* term/x11.trm (X11_filled_polygon):
 	Fix read beyond end of buffer found by valgrind.
 
