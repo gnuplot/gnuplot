@@ -1,3 +1,11 @@
+2007-03-11  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* configure.in:
+	* INSTALL:
+	Report mouse support in the features section, not as an option of the
+	x11 terminal, since it is in fact true for other interactive terminals
+	such as wxt or vgagl.
+
 2007-03-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readline df_generate_pseudodata df_open df_gets):
