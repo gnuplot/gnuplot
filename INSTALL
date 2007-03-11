@@ -168,7 +168,7 @@ $ ./configure --help
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --mandir=DIR            Man documentation in DIR [PREFIX/man]
   --disable-history-file  do not use history file
-  --disable-mouse         disable mouse for the x11 terminal
+  --disable-mouse         disable mouse for interactive terminals
   --disable-x11-mbfonts   disable multi-byte font support for x11
   --disable-binary-data-file          disable binary_data_file
   --disable-with-image          disable image support
