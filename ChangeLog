@@ -1,3 +1,11 @@
+2007-03-11  Ethan Merritt  <merritt@u.washington.edu>
+	
+	* src/gadgets.c src/gadgets.h src/graph3d.c src/graphics.c src/save.c
+	src/set.c src/show.c src/unset.c src/util3d.c:  Add option to specify
+	plot margins as an absolute position on the canvas (screen).
+	    set {lrbt}margin screen <frac>
+	Back-port of CVS patches from 2006-10-21 2006-11-04 2008-03-06
+
 2007-03-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	Version 4.2.3 release

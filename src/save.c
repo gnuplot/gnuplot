@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.132.2.4 2007/06/18 01:33:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.132.2.5 2007/12/08 10:54:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -753,9 +753,15 @@ set origin %g,%g\n",
 #undef SAVE_AXISLABEL_OR_TITLE
 
     fprintf(fp, "set zero %g\n", zero);
-    fprintf(fp, "set lmargin %g\nset bmargin %g\n"
-	    "set rmargin %g\nset tmargin %g\n",
-	    lmargin, bmargin, rmargin, tmargin);
+
+    fprintf(fp, "set lmargin %s %g\n",
+	    lmargin.scalex == screen ? "screen" : "", lmargin.x);
+    fprintf(fp, "set bmargin %s %g\n",
+	    bmargin.scalex == screen ? "screen" : "", bmargin.x);
+    fprintf(fp, "set rmargin %s %g\n",
+	    rmargin.scalex == screen ? "screen" : "", rmargin.x);
+    fprintf(fp, "set tmargin %s %g\n",
+	    tmargin.scalex == screen ? "screen" : "", tmargin.x);
 
     fprintf(fp, "set locale \"%s\"\n", get_locale());
 

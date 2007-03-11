@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.22 2008/02/28 22:58:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.23 2008/03/04 18:12:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -452,7 +452,14 @@ boundary(struct curve_points *plots, int count)
     /* HBB 20010118: fix round-off bug */
     plot_bounds.ytop = (int) (0.5 + (ysize + yoffset) * t->ymax);
 
-    if (tmargin < 0) {
+    if (tmargin.scalex == screen) {
+	/* Specified as absolute position on the canvas */
+	plot_bounds.ytop -= (1.0 - tmargin.x) * (float)t->ymax + 0.5;
+    } else if (tmargin.x >=0) {
+	/* Specified in terms of character height */
+	plot_bounds.ytop -= tmargin.x * (float)t->v_char + 0.5;
+    } else {
+	/* Auto-calculation of space required */
 	int top_margin = x2label_textheight + title_textheight;
 
 	if (timetop_textheight + ylabel_textheight > top_margin)
@@ -472,21 +479,26 @@ boundary(struct curve_points *plots, int count)
 	    /* make room for the end of rotated ytics or y2tics */
 	    plot_bounds.ytop -= (int) (t->h_char * 2);
 	}
-    } else
-	plot_bounds.ytop -= (int) (t->v_char * tmargin);
+    }
 
     /*  end of preliminary plot_bounds.ytop calculation }}} */
 
 
-    /*{{{  tentative plot_bounds.xleft, needed for "under" */
-    plot_bounds.xleft = (int) (xoffset * t->xmax
-		   + t->h_char * (lmargin >= 0 ? lmargin : 2));
+    /*{{{  preliminary plot_bounds.xleft, needed for "under" */
+    if (lmargin.scalex == screen)
+	plot_bounds.xleft = (xoffset + lmargin.x) * (float)t->xmax + 0.5;
+    else
+	plot_bounds.xleft = xoffset * t->xmax
+			  + t->h_char * (lmargin.x >= 0 ? lmargin.x : 2);
     /*}}} */
 
 
     /*{{{  tentative plot_bounds.xright, needed for "under" */
-    plot_bounds.xright = (int) ((xsize + xoffset) * t->xmax
-		    - t->h_char * (rmargin >= 0 ? rmargin : 2));
+    if (rmargin.scalex == screen)
+	plot_bounds.xright = (xoffset + rmargin.x) * (float)t->xmax + 0.5;
+    else
+	plot_bounds.xright = (xsize + xoffset) * t->xmax
+			   - t->h_char * (rmargin.x >= 0 ? rmargin.x : 2);
     /*}}} */
 
 
@@ -494,9 +506,12 @@ boundary(struct curve_points *plots, int count)
 #define WIDEST_COLORBOX_TICTEXT 3
     /* Make room for the color box if anything in the graph uses a palette. */
     set_plot_with_palette(0, MODE_PLOT); /* EAM FIXME - 1st parameter is a dummy */
-    if (is_plot_with_palette() && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
-	plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
-	plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
+    if (rmargin.scalex != screen) {
+	if (is_plot_with_palette() && (color_box.where != SMCOLOR_BOX_NO)
+	&& (color_box.where != SMCOLOR_BOX_USER)) {
+	    plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
+	    plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
+	}
     }
 
     /*{{{  preliminary plot_bounds.ybot calculation
@@ -560,9 +575,15 @@ boundary(struct curve_points *plots, int count)
     /* compute plot_bounds.ybot from the various components
      *     unless bmargin is explicitly specified  */
 
-    plot_bounds.ybot = (int) (0.5 + t->ymax * yoffset);
+    plot_bounds.ybot = yoffset * (float)t->ymax + 0.5;
 
-    if (bmargin < 0) {
+    if (bmargin.scalex == screen) {
+	/* Absolute position for bottom of plot */
+	plot_bounds.ybot += bmargin.x * (float)t->ymax + 0.5;
+    } else if (bmargin.x >= 0) {
+	/* Position based on specified character height */
+	plot_bounds.ybot += bmargin.x * (float)t->v_char + 0.5;
+    } else {
 	plot_bounds.ybot += xtic_height + xtic_textheight;
 	if (xlabel_textheight > 0)
 	    plot_bounds.ybot += xlabel_textheight;
@@ -574,19 +595,19 @@ boundary(struct curve_points *plots, int count)
 	    /* make room for the end of rotated ytics or y2tics */
 	    plot_bounds.ybot += (int) (t->h_char * 2);
 	}
-    } else
-	plot_bounds.ybot += (int) (bmargin * t->v_char);
+    }
 
     /*  end of preliminary plot_bounds.ybot calculation }}} */
 
-    /* compute plot_bounds.xleft from the various components
-     *     unless lmargin is explicitly specified  */
-    plot_bounds.xleft = (int) (0.5 + t->xmax * xoffset);
-
-    /* compute plot_bounds.xright from the various components
-     *     unless rmargin is explicitly specified  */
-
-    plot_bounds.xright = (int) (0.5 + t->xmax * (xsize + xoffset));
+    /* EAM FIXME - 
+     * I don't understand why this is necessary, but it is.
+     * Didn't we already do this at line 488ff, and then add colorbox? */
+    if (lmargin.scalex != screen)
+	plot_bounds.xleft = xoffset * t->xmax
+			  + t->h_char * (lmargin.x >= 0 ? lmargin.x : 2);
+    if (rmargin.scalex != screen)
+	plot_bounds.xright = (xsize + xoffset) * t->xmax
+			   - t->h_char * (rmargin.x >= 0 ? rmargin.x : 2);
 
     if (lkey) {
 	TBOOLEAN key_panic = FALSE;
@@ -693,17 +714,17 @@ boundary(struct curve_points *plots, int count)
 	/* adjust for outside key, leave manually set margins alone */
 	if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC && (key->vpos != JUST_CENTRE || key->hpos != CENTRE))
 	    || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
-	    if (key->margin == GPKEY_BMARGIN && bmargin < 0) {
+	    if (key->margin == GPKEY_BMARGIN && bmargin.x < 0) {
 		plot_bounds.ybot += key_entry_height * key_rows
 		    + (int) (t->v_char * (ktitl_lines + 1));
 		plot_bounds.ybot += (int) (key->height_fix * t->v_char);
-	    } else if (key->margin == GPKEY_TMARGIN && tmargin < 0) {
+	    } else if (key->margin == GPKEY_TMARGIN && tmargin.x < 0) {
 		plot_bounds.ytop -= key_entry_height * key_rows
 		    + (int) (t->v_char * (ktitl_lines + 1));
 		plot_bounds.ytop += (int) (key->height_fix * t->v_char);
-	    } else if (key->margin == GPKEY_LMARGIN && lmargin < 0) {
+	    } else if (key->margin == GPKEY_LMARGIN && lmargin.x < 0) {
 		plot_bounds.xleft += key_col_wth * key_cols;
-	    } else if (key->margin == GPKEY_RMARGIN && rmargin < 0) {
+	    } else if (key->margin == GPKEY_RMARGIN && rmargin.x < 0) {
 		plot_bounds.xright -= key_col_wth * key_cols;
 	    }
   	}
@@ -787,8 +808,9 @@ boundary(struct curve_points *plots, int count)
     } else
 	timelabel_textwidth = 0;
 
-    if (lmargin < 0) {
-       double tmpx, tmpy;
+    if (lmargin.x < 0) {	
+	/* Auto-calculation */
+	double tmpx, tmpy;
 
 	plot_bounds.xleft += (timelabel_textwidth > ylabel_textwidth
 		  ? timelabel_textwidth : ylabel_textwidth)
@@ -807,8 +829,8 @@ boundary(struct curve_points *plots, int count)
 	}
 	/* DBT 12-3-98  extra margin just in case */
 	plot_bounds.xleft += 0.5 * t->v_char;
-    } else
-	plot_bounds.xleft += (int) (lmargin * t->h_char);
+    } else if (lmargin.scalex != screen)
+	plot_bounds.xleft += (int) (lmargin.x * t->h_char);
 
     /*  end of plot_bounds.xleft calculation }}} */
 
@@ -854,26 +876,28 @@ boundary(struct curve_points *plots, int count)
 	y2label_textwidth = 0;
 
     /* Make room for the color box if needed. */
-    if (is_plot_with_palette() && is_plot_with_colorbox() && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
-	plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
-	plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
-    }
-
-    if (rmargin < 0) {
-	/* plot_bounds.xright -= y2label_textwidth + y2tic_width + y2tic_textwidth; */
-	plot_bounds.xright -= y2tic_width + y2tic_textwidth;
-	if (y2label_textwidth > 0)
-	    plot_bounds.xright -= y2label_textwidth;
-
-	if (plot_bounds.xright == (int) (0.5 + t->xmax * (xsize + xoffset))) {
-	    /* make room for end of xtic or x2tic label */
-	    plot_bounds.xright -= (int) (t->h_char * 2);
+    if (rmargin.scalex != screen) {
+	if (is_plot_with_palette() && is_plot_with_colorbox()
+	&& (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
+	    plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
+	    plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
 	}
-	/* DBT 12-3-98  extra margin just in case */
-	plot_bounds.xright -= 0.5 * t->v_char;
 
-    } else
-	plot_bounds.xright -= (int) (rmargin * t->h_char);
+	if (rmargin.x < 0) {
+	    /* plot_bounds.xright -= y2label_textwidth + y2tic_width + y2tic_textwidth; */
+	    plot_bounds.xright -= y2tic_width + y2tic_textwidth;
+	    if (y2label_textwidth > 0)
+		plot_bounds.xright -= y2label_textwidth;
+
+	    if (plot_bounds.xright == (int) (0.5 + t->xmax * (xsize + xoffset))) {
+		/* make room for end of xtic or x2tic label */
+		plot_bounds.xright -= (int) (t->h_char * 2);
+	    }
+	    /* DBT 12-3-98  extra margin just in case */
+	    plot_bounds.xright -= 0.5 * t->v_char;
+	}
+	    plot_bounds.xright -= (int) (rmargin.x * t->h_char);
+    }
 
     /*  end of plot_bounds.xright calculation }}} */
 
@@ -904,34 +928,44 @@ boundary(struct curve_points *plots, int count)
 	} else
 	    current_aspect_ratio = aspect_ratio;
 
-	/*{{{  set aspect ratio if valid and sensible */
+	/* Set aspect ratio if valid and sensible */
+	/* EAM Mar 2008 - fixed borders take precedence over centering */
 	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
-	    double current = ((double) (plot_bounds.ytop - plot_bounds.ybot)) / (plot_bounds.xright - plot_bounds.xleft);
+	    double current = ((double) (plot_bounds.ytop - plot_bounds.ybot)) 
+			   / (plot_bounds.xright - plot_bounds.xleft);
 	    double required = (current_aspect_ratio * t->v_tic) / t->h_tic;
 
 	    if (current > required) {
 		/* too tall */
-		int height = plot_bounds.ytop - plot_bounds.ybot;
-		plot_bounds.ytop = plot_bounds.ybot + required * (plot_bounds.xright - plot_bounds.xleft);
-		height -= (plot_bounds.ytop - plot_bounds.ybot);
-		height /= 2;
-		plot_bounds.ytop += height;
-		plot_bounds.ybot += height;
+		int old_height = plot_bounds.ytop - plot_bounds.ybot;
+		int new_height = required * (plot_bounds.xright - plot_bounds.xleft);
+		if (bmargin.scalex == screen)
+		    plot_bounds.ytop = plot_bounds.ybot + new_height;
+		else if (tmargin.scalex == screen)
+		    plot_bounds.ybot = plot_bounds.ytop - new_height;
+		else {
+		    plot_bounds.ybot += (old_height - new_height) / 2;
+		    plot_bounds.ytop -= (old_height - new_height) / 2;
+		}
+
 	    } else {
-		int width = plot_bounds.xright - plot_bounds.xleft;
-		plot_bounds.xright = plot_bounds.xleft + (plot_bounds.ytop - plot_bounds.ybot) / required;
-		width -= (plot_bounds.xright - plot_bounds.xleft);
-		width /= 2;
-		plot_bounds.xright += width;
-		plot_bounds.xleft += width;
+		int old_width = plot_bounds.xright - plot_bounds.xleft;
+		int new_width = (plot_bounds.ytop - plot_bounds.ybot) / required;
+		if (lmargin.scalex == screen)
+		    plot_bounds.xright = plot_bounds.xleft + new_width;
+		else if (rmargin.scalex == screen)
+		    plot_bounds.xleft = plot_bounds.xright - new_width;
+		else {
+		    plot_bounds.xleft += (old_width - new_width) / 2;
+		    plot_bounds.xright -= (old_width - new_width) / 2;
+		}
 	    }
 	}
-	/*}}} */
     }
 
     /*  adjust top and bottom margins for tic label rotation */
 
-    if (tmargin < 0
+    if (tmargin.x < 0
 	&& axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER
 	&& vertical_x2tics) {
 	double projection = sin((double)axis_array[SECOND_X_AXIS].tic_rotate*DEG2RAD);
@@ -945,7 +979,7 @@ boundary(struct curve_points *plots, int count)
 	    x2tic_textheight = t->v_char;
 	plot_bounds.ytop -= x2tic_textheight;
     }
-    if (bmargin < 0
+    if (bmargin.x < 0
 	&& axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER
 	&& vertical_xtics) {
 	double projection;

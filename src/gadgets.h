@@ -307,7 +307,8 @@ extern float yoffset;		/* y origin setting */
 extern float aspect_ratio;	/* 1.0 for square */
 
 /* plot border autosizing overrides, in characters (-1: autosize) */
-extern float lmargin, bmargin, rmargin, tmargin;
+extern t_position lmargin, bmargin, rmargin, tmargin;
+#define DEFAULT_MARGIN_POSITION {character, character, character, -1, -1, -1}
 
 extern FILE *table_outfile;
 extern TBOOLEAN table_mode;

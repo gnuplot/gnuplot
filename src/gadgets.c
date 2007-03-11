@@ -76,14 +76,16 @@ float xoffset = 0.0;		/* x origin */
 float yoffset = 0.0;		/* y origin */
 float aspect_ratio = 0.0;	/* don't attempt to force it */
 
+/* EAM Augest 2006 - 
+   redefine margin as t_position so that absolute placement is possible */
 /* space between left edge and plot_bounds.xleft in chars (-1: computed) */
-float lmargin = -1;
+t_position lmargin = DEFAULT_MARGIN_POSITION;
 /* space between bottom and plot_bounds.ybot in chars (-1: computed) */
-float bmargin = -1;
+t_position bmargin = DEFAULT_MARGIN_POSITION;
 /* space between right egde and plot_bounds.xright in chars (-1: computed) */
-float rmargin = -1;
+t_position rmargin = DEFAULT_MARGIN_POSITION;
 /* space between top egde and plot_bounds.ytop in chars (-1: computed) */
-float tmargin = -1;
+t_position tmargin = DEFAULT_MARGIN_POSITION;
 
 /* File descriptor for output during 'set table' mode */
 FILE *table_outfile = NULL;
