@@ -6,6 +6,10 @@
 	    set {lrbt}margin screen <frac>
 	Back-port of CVS patches from 2006-10-21 2006-11-04 2008-03-06
 
+	* src/plot2d.c (get_data store2d_point) src/graphics.c (plot_boxes):
+	Alter processing of "with boxes" to handle specification of a column
+	containing variable color information.  Back-port from CVS.
+
 2007-03-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	Version 4.2.3 release
