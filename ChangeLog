@@ -1,3 +1,9 @@
+2007-03-13  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* demo/transparent.dem: Add messages to 'pause -1' commands to avoid
+	guessing that gnuplot is taking a lot of time to plot while it is just
+	waiting for user input.
+
 2007-03-11  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* configure.in:

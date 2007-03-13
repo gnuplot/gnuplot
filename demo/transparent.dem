@@ -30,21 +30,22 @@ plot d1(x) fs solid 1.0 lc rgb "forest-green" title "μ =  0.5 σ = 0.5", \
      d2(x) lc rgb "gold" title "μ =  2.0 σ = 0.5", \
      d3(x) lc rgb "red" title "μ = -1.0 σ = 2.0"
 
-pause -1
+pause -1 "Hit return to continue"
 
 set style fill transparent solid 0.5 noborder
 set title "Transparent filled curves"
 replot
 
-pause -1
+pause -1 "Hit return to continue"
 
 set style fill pattern 4 bo
 set title "Pattern-filled curves"
 replot
 
-pause -1
+pause -1 "Hit return to continue"
+
 set style fill transparent pattern 4 bo
 set title "Transparent pattern-filled curves"
 replot
 
-pause -1
+pause -1 "Hit return to continue"
