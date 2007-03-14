@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.167 2007/02/09 03:55:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.168 2007/02/14 04:12:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2350,7 +2350,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    /* label at xaxis_y + 1/4 of (xaxis_y-other_y) */
 #ifdef USE_GRID_LAYERS /* FIXME: still needed??? what for? */
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
-		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
+		(surface_rot_x > 90 && FRONTGRID != whichgrid) ||
+		splot_map) {
 #endif
 	    unsigned int x1, y1;
 	    int tmpx, tmpy;
@@ -2443,7 +2444,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	if (Y_AXIS.label.text) {
 #ifdef USE_GRID_LAYERS
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
-		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
+		(surface_rot_x > 90 && FRONTGRID != whichgrid) ||
+		splot_map) {
 #endif
 		unsigned int x1, y1;
 		int tmpx, tmpy;

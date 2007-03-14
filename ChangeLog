@@ -1,3 +1,8 @@
+2007-03-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (draw_3d_graphbox):  Fix bug that caused axis labels
+	not to be drawn in 'set view map' mode.
+
 2007-03-13  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* demo/transparent.dem: Add messages to 'pause -1' commands to avoid
