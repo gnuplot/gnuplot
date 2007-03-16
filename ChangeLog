@@ -1,3 +1,8 @@
+2007-03-16 Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c (appdata_directory): Prevent segfault if no
+	directory is given and the environmental variable APPDATA is not set.
+
 2007-03-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (draw_3d_graphbox):  Fix bug that caused axis labels
