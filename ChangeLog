@@ -57,6 +57,9 @@
 	line, thus bypassing the normal execution path. Therefore we provide a
 	routine df_reset_after_error() to be called from int_error().
 
+	* src/eval.c docs/gnuplot.doc:
+	Allow strcol() and shorthand for stringcolumn()
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:
