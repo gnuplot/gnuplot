@@ -77,6 +77,9 @@
 	that x11 is the default but is broken.
 	Bug #1530601
 
+	* src/win/winmain.c (appdata_directory):
+	WinNT can segfault if APPDATA is missing from the environment.
+
 
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 

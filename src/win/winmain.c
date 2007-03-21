@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.21 2005/10/10 19:07:08 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.22 2006/03/28 09:55:22 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -234,13 +234,19 @@ appdata_directory(void)
 	if (pSHGetSpecialFolderPath)
 	    (*pSHGetSpecialFolderPath)(NULL, dir, CSIDL_APPDATA, FALSE);
 	FreeModule(hShell32);
+	return dir;
     }
 
     /* use APPDATA environment variable as fallback */
-    if (dir[0] == '\0')
-	strcpy(dir, getenv("APPDATA"));
+    if (dir[0] == '\0') {
+	char *appdata = getenv("APPDATA");
+	if (appdata) {
+	    strcpy(dir, appdata);
+	    return dir;
+	}
+    }
 
-    return dir;
+    return NULL;
 }
 
 #endif /* WIN32 */
