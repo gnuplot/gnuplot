@@ -5,6 +5,12 @@
 	Allows a third column of data containing color info to be used in
 	2D plots (points/dots/impulses/labels),
 
+	* term/gd.trm (PNG_image) term/pdf.trm (PDF_image)
+	term/post.trm (PS_image) 
+	src/wxterminal/gp_cairo.c (gp_cairo_draw_fillbox gp_cairo_draw_image):
+	Teach gd pdf post and wxt terminals to clip images using the
+	bounding box info passed in corners[2] and corners[3] via term->image().
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:

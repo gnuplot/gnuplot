@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.15 2006/07/14 18:25:41 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.16 2006/09/10 17:49:44 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -904,13 +904,13 @@ void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int heigh
 
 
 #ifdef WITH_IMAGE
-/*	'corner[0]' is the upper left corner (in terms of plot location) of
- *	the outer edge of the image.  Similarly, 'corner[1]' is the lower
+/*	corner[0] = (x1,y1) is the upper left corner (in terms of plot location) of
+ *	the outer edge of the image.  Similarly, corner[1] = (x2,y2) is the lower
  *	right corner of the outer edge of the image.  (Outer edge means the
- *	outer extent of the corner pixels, not the middle of the corner
- *	pixels.)  'corner[2]' is the upper left corner of the visible part
- *	of the image, and 'corner[3]' is the lower right corner of the visible
- *	part of the image. */
+ *	outer extent of the corner pixels, not the middle of the corner pixels).
+ *	corner[2] and corner[3] = (x3,y3) and (x4,y4) define a clipping box in
+ *	the primary plot into which all or part of the image will be rendered.
+ */
 void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int M, int N, t_imagecolor color_mode)
 {
 	int m,n;
@@ -961,6 +961,16 @@ void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, in
 
 	FPRINTF((stderr,"M %d N %lf x1 %d y1 %d\n", M, N, x1, y1));
 	cairo_save( plot->cr );
+
+	/* Set clipping boundaries for image copy.
+	 * The bounds were originally possed in corners[2] and corners[3]
+	 */
+	cairo_move_to(plot->cr, x3, y3);
+	cairo_line_to(plot->cr, x3, y4);
+	cairo_line_to(plot->cr, x4, y4);
+	cairo_line_to(plot->cr, x4, y3);
+	cairo_close_path(plot->cr);
+	cairo_clip(plot->cr);
 
 	pattern = cairo_pattern_create_for_surface( image_surface );
 	/* scale and keep sharp edges */
