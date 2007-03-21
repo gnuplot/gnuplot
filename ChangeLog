@@ -19,7 +19,8 @@
 
 	* src/axis.c (get_position_default):  
 	Reduce the problem of trailing comma after 2D offset.
-	
+
+	* src/graph3d.c (plot3d_impulses): splot with impulses lt rgb variable.
 
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
