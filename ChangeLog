@@ -60,6 +60,9 @@
 	* src/eval.c docs/gnuplot.doc:
 	Allow strcol() and shorthand for stringcolumn()
 
+	* src/unset.c (unset_style):
+	Add missing command "unset style line <n>".
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:

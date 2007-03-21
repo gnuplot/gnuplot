@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.98 2006/06/28 04:31:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.99 2006/06/29 19:36:44 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1331,9 +1331,22 @@ unset_style()
 	c_token++;
 	break;
     case SHOW_STYLE_LINE:
-	while (first_linestyle != NULL)
-	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
 	c_token++;
+	if (END_OF_COMMAND) {
+	    while (first_linestyle != NULL)
+		delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
+	} else {
+	    struct value a;
+	    int tag = (int) real(const_express(&a));
+	    struct linestyle_def *this, *prev;
+	    for (this = first_linestyle, prev = NULL; this != NULL; 
+		 prev = this, this = this->next) {
+		if (this->tag == tag) {
+		    delete_linestyle(prev, this);
+		    break;
+		}
+	    }
+	}
 	break;
     case SHOW_STYLE_FILLING:
 	unset_fillstyle();
