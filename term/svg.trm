@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.63.2.4 2006/11/25 03:12:22 sfeam Exp $
+ * $Id: svg.trm,v 1.63.2.5 2006/12/24 18:51:26 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -244,10 +244,8 @@ SVG_PathClose ()
 static void
 SVG_PathLimit ()
 {
-    if (SVG_path_count >= 10) {	/* avoid excessive line length*/
+    if (SVG_path_count % 8 == 0)	/* avoid excessive line length*/
 	fputs ("\n\t\t", gpoutfile);
-	SVG_path_count = 0;
-    }
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -368,6 +366,9 @@ SVG_DefineFillPattern(int fillpat)
 static void
 SVG_MoveForced(unsigned int x, unsigned int y)
 {
+    if (SVG_path_count > 512)
+	SVG_PathClose();
+
     SVG_PathOpen ();
 
     fprintf (gpoutfile, "M%.1f,%.1f ", X(x), Y(y));

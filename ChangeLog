@@ -27,6 +27,9 @@
 	draw it at all.  Without this patch, a spurious vertical line appears
 	in the key if the fillstyle includes a border.
 
+	* term/svg.trm (SVG_PathLimit SVG_MoveForced): 
+	Avoid ridiculously long paths by limiting total path length to 512.
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:
