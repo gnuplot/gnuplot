@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.5 2006/12/24 00:03:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.6 2007/03/22 04:27:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -110,7 +110,7 @@ int iso_samples_2 = ISO_SAMPLES;
 
 double xscale3d, yscale3d, zscale3d;
 
-typedef enum { ALLGRID, FRONTGRID, BACKGRID } WHICHGRID;
+typedef enum { ALLGRID, FRONTGRID, BACKGRID, BORDERONLY } WHICHGRID;
 
 static void plot3d_impulses __PROTO((struct surface_points * plot));
 static void plot3d_lines __PROTO((struct surface_points * plot));
@@ -640,6 +640,8 @@ do_3dplot(
     /* HBB 20040331: but not if in hidden3d mode */
     if (!hidden3d && grid_layer == 0)
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_BACK);
+    else if (splot_map && border_layer == 0)
+	draw_3d_graphbox(plots, pcount, BORDERONLY, LAYER_BACK);
 
     /* Draw PM3D color key box */
     if (!quick) {
@@ -1314,10 +1316,10 @@ do_3dplot(
      * the whole shebang now, otherwise only the front part. */
     if (hidden3d || grid_layer == 1)
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
-    else if (splot_map && (border_layer == 1))
-	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
     else if (grid_layer == -1)
 	draw_3d_graphbox(plots, pcount, FRONTGRID, LAYER_FRONT);
+    if (splot_map && (border_layer == 1))
+	draw_3d_graphbox(plots, pcount, BORDERONLY, LAYER_FRONT);
 
 #endif /* USE_GRID_LAYERS */
 
@@ -2293,6 +2295,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 
     /* In 'set view map' mode, treat grid as in 2D plots */
     if (splot_map && current_layer != abs(grid_layer))
+	return;
+    if (whichgrid == BORDERONLY)
 	return;
 
     /* Draw ticlabels and axis labels. x axis, first:*/

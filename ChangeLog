@@ -34,6 +34,11 @@
 	Fixes segfault when line segment endpoint went negative in bitmap.c
 	Bug #1649887
 
+	* src/graph3d.c (do_3dplot draw_3d_graphbox):
+	Add special-case tests to insure that the plot border is drawn either 
+	back or front (in front of the grid) when splot_map is set.
+	Bug #1655001
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:
