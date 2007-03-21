@@ -1,5 +1,8 @@
 2007-03-21  Ethan Merritt  <merritt@u.washington.edu>
 
+	These are mostly trivial patches that went into CVS soon after the
+	code freeze for 4.2
+
 	* src/graphics.c (plot_impulses plot_points plot_dots) 
 	src/plot2d.c (get_data store_2dpoint store_label):
 	Allows a third column of data containing color info to be used in
@@ -13,6 +16,10 @@
 
 	* term/pdf.trm (PDF_SetFont): Trap errors from PDF font selection, 
 	making it non-fatal.
+
+	* src/axis.c (get_position_default):  
+	Reduce the problem of trailing comma after 2D offset.
+	
 
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
