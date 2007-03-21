@@ -30,6 +30,10 @@
 	* term/svg.trm (SVG_PathLimit SVG_MoveForced): 
 	Avoid ridiculously long paths by limiting total path length to 512.
 
+	* src/util3d.c (draw3d_line_unconditional):  Clip line segment.
+	Fixes segfault when line segment endpoint went negative in bitmap.c
+	Bug #1649887
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:
