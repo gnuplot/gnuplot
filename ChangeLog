@@ -22,6 +22,11 @@
 
 	* src/graph3d.c (plot3d_impulses): splot with impulses lt rgb variable.
 
+	* src/graphics.c (do_key_sample):
+	If the length of a boxplot sample in the key is set to zero,  do not
+	draw it at all.  Without this patch, a spurious vertical line appears
+	in the key if the fillstyle includes a border.
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:
