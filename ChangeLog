@@ -39,6 +39,11 @@
 	back or front (in front of the grid) when splot_map is set.
 	Bug #1655001
 
+	* term/gd.trm (PNG_vector):  Grid lines (linetype 0) were always
+	treated as alternating black/white/black/white.  Change this to
+	alternating current_color/transparent/current_color/transparent.
+	Bug #1655001
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:
