@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.5 2006/12/17 18:26:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.6 2006/12/28 21:27:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2437,6 +2437,13 @@ f_column(union argument *arg)
 	push(&a);               /* any objection to this ? */
     } else
 	push(Gcomplex(&a, df_column[column - 1].datum, 0.0));
+}
+
+/* Called from int_error() */
+void
+df_reset_after_error()
+{
+	evaluate_inside_using = FALSE;
 }
 
 #ifdef GP_STRING_VARS

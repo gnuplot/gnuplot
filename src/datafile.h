@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.19 2005/07/25 17:32:04 sfeam Exp $
+ * $Id: datafile.h,v 1.20 2006/03/24 16:23:02 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -121,6 +121,7 @@ void df_set_key_title __PROTO((struct curve_points *));
 int expect_string __PROTO((const char column ));
 #endif
 
+void df_reset_after_error __PROTO((void));
 void f_dollars __PROTO((union argument *x));
 void f_column  __PROTO((union argument *x));
 void f_valid   __PROTO((union argument *x));

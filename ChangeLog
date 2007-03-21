@@ -48,6 +48,15 @@
 	Make sure that there is a default point type, so that 
 	'set label <n> point' does in fact draw an acceptable point.
 
+	* src/datafile.h src/datafile.c (df_reset_after_error)
+	src/util.c (int_error):
+	The routines in datafile.c use local variables to track the context of
+	expression evaluation; e.g. expressions may only reference data column
+	values inside a `using` statement. But the state of these context
+	variables is corrupted if an error exit bails directly to the command
+	line, thus bypassing the normal execution path. Therefore we provide a
+	routine df_reset_after_error() to be called from int_error().
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:

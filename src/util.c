@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.64 2006/06/27 04:02:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.65 2006/08/22 03:08:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -38,7 +38,7 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.64 2006/06/27 04:02:17 sfea
 
 #include "alloc.h"
 #include "command.h"
-#include "datafile.h"		/* for df_showdata */
+#include "datafile.h"		/* for df_showdata and df_reset_after_error */
 #include "misc.h"
 #include "plot.h"
 /*  #include "setshow.h" */		/* for month names etc */
@@ -911,6 +911,10 @@ int_error(int t_num, const char str[], va_dcl)
     fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif
     fputs("\n\n", stderr);
+
+    /* We are bailing out of nested context without ever reaching */
+    /* the normal cleanup code. Reset any flags before bailing.   */
+    df_reset_after_error();
 
     update_gpval_variables(2);
 
