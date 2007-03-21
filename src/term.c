@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.151 2006/06/28 19:41:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.151.2.1 2006/10/05 23:52:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1725,12 +1725,15 @@ init_terminal()
 	if (strchr(term_name,' '))
 	    namelength = strchr(term_name,' ') - term_name;
 
-	/* Force the terminal to initialize default fonts, etc.	*/
-	/* This prevents segfaults and other strangeness if you */
-	/* set GNUTERM to "post" or "png" for example.          */
-	/* Note that gp_input_line[] is blank at this point.	*/
+	/* Force the terminal to initialize default fonts, etc.	This prevents */
+	/* segfaults and other strangeness if you set GNUTERM to "post" or    */
+	/* "png" for example. However, calling X11_options() is expensive due */
+	/* to the fork+execute of gnuplot_x11 and x11 can tolerate not being  */
+	/* initialized until later.                                           */
+	/* Note that gp_input_line[] is blank at this point.	              */
         if (change_term(term_name, namelength)) {
-            term->options();
+            if (strcmp(term->name,"x11"))
+        	term->options();
             return;
         }
         fprintf(stderr, "Unknown or ambiguous terminal name '%s'\n", term_name);

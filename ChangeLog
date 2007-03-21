@@ -69,6 +69,15 @@
 	that we force an update on first use.  
 	Bug #1673316
 
+	* src/term.c (init_term):
+	Normally we initialize the default terminal on program entry. However,
+	if the default is x11 then defer initialization until an actual plot
+	command.  This mitigates problems if gnuplot_x11 cannot be started
+	normally, and allows the user to select a different driver in the case
+	that x11 is the default but is broken.
+	Bug #1530601
+
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:
