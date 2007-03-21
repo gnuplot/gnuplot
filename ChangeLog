@@ -63,6 +63,12 @@
 	* src/unset.c (unset_style):
 	Add missing command "unset style line <n>".
 
+	* term/gd.trm (PNG_init):
+	The color palette indexing of the brush is not necessarily the same as
+	that of the main image.  Set initial color index to something invalid so
+	that we force an update on first use.  
+	Bug #1673316
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:

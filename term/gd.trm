@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.95.2.7 2007/03/22 04:20:05 sfeam Exp $
+ * $Id: gd.trm,v 1.95.2.8 2007/03/22 04:42:40 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1048,7 +1048,7 @@ int i;
 	gdImageFill( PNG_brush[i].im, 0, 0, PNG_brush[i].bgnd );
 	gdImageColorTransparent( PNG_brush[i].im, PNG_brush[i].bgnd );
 	PNG_brush[i].fgnd = gdImageColorAllocate( PNG_brush[i].im, 0, 0, 0 );
-	PNG_brush[i].last_rgb = 0;
+	PNG_brush[i].last_rgb = -99;  /* invalid index will force update on first use */
     }
     /* EAM - quick and dirty is to fill the entire brush (square nib).    */
     /*       might be better to approximate a circular nib by selectively */
