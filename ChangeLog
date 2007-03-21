@@ -44,6 +44,10 @@
 	alternating current_color/transparent/current_color/transparent.
 	Bug #1655001
 
+	* src/set.c (parse_label_options): 
+	Make sure that there is a default point type, so that 
+	'set label <n> point' does in fact draw an acceptable point.
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:
