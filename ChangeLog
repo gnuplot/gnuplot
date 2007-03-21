@@ -1,3 +1,10 @@
+2007-03-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_impulses plot_points plot_dots) 
+	src/plot2d.c (get_data store_2dpoint store_label):
+	Allows a third column of data containing color info to be used in
+	2D plots (points/dots/impulses/labels),
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.1 2006/10/22 05:52:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.2 2006/11/16 22:45:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -366,6 +366,8 @@ get_data(struct curve_points *current_plot)
         break;
 
     case FILLEDCURVES:
+    case IMPULSES:	/* 2 + possible variable color */
+    case DOTS:
         min_cols = 1;
         max_cols = 3;
         break;
@@ -373,8 +375,9 @@ get_data(struct curve_points *current_plot)
 #ifdef EAM_DATASTRINGS
     case LABELPOINTS:
         /* 3 column data: X Y Label */
+	/* 4th column allows rgb variable */
         min_cols = 3;
-        max_cols = 3;
+        max_cols = 4;
         expect_string( 3 );
         break;
 #endif
@@ -393,8 +396,9 @@ get_data(struct curve_points *current_plot)
 
     case POINTSTYLE:
         /* Allow 3rd column because of 'pointsize variable' */
+        /* Allow 4th column because of 'lc rgb variable' */
         min_cols = 1;
-        max_cols = 3;
+        max_cols = 4;
         break;
 
     default:
@@ -636,9 +640,11 @@ get_data(struct curve_points *current_plot)
                     break;
 #endif
 
-                case POINTSTYLE: /* x, y, variable point size */
+                case POINTSTYLE: /* x, y, variable point size or variable color */
+		case IMPULSES:
+		case DOTS:
                     store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], 
-                                  v[1], v[1], v[2]);
+                                  v[1], v[2], v[2]);
                     break;
 
                 }               /*inner switch */
@@ -700,6 +706,24 @@ get_data(struct curve_points *current_plot)
                 store2d_point(current_plot, i++, v[0], v[1], v[0], v[0] + v[2],
                               v[1], v[1] + v[3], -1.0);
                 break;
+
+            case POINTSTYLE: /* x, y, variable point size and variable color */
+                store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], 
+                                  v[1], v[3], v[2]);
+                break;
+
+#ifdef EAM_DATASTRINGS
+            case LABELPOINTS:
+                /* Load the coords just as we would have for a point plot */
+                store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
+			      v[1], -1.0);
+                /* Allocate and fill in a text_label structure to match it */
+                store_label(current_plot->labels,
+                            &(current_plot->points[i]), i, df_tokens[2], v[3]);
+                i++;
+                break;
+#endif
+
             }                   /*inner switch */
 
             break;
@@ -800,7 +824,6 @@ store2d_point(
     struct coordinate GPHUGE *cp = &(current_plot->points[i]);
     int dummy_type = INRANGE;   /* sometimes we dont care about outranging */
 
-
     /* jev -- pass data values thru user-defined function */
     /* div -- y is dummy variable 2 - copy value there */
     if (ydata_func.at) {
@@ -874,11 +897,32 @@ store2d_point(
      * explicitly store -VERYLARGE;
      */
     STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, current_plot->x_axis, NOOP, return);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, NOOP, cp->xlow = -VERYLARGE);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis, NOOP, cp->xhigh = -VERYLARGE);
     STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, current_plot->y_axis, NOOP, return);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->ylow, ylow, dummy_type, current_plot->y_axis, NOOP, cp->ylow = -VERYLARGE);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis, NOOP, cp->yhigh = -VERYLARGE);
+
+    switch (current_plot->plot_style) {
+    case POINTSTYLE:		/* Only x and y are relevant to axis scaling */
+    case LINES:
+    case LINESPOINTS:
+    case LABELPOINTS:
+    case DOTS:
+    case IMPULSES:
+	cp->xlow = xlow;
+	cp->xhigh = xhigh;
+	cp->ylow = ylow;
+	cp->yhigh = yhigh;
+	break;
+    default:			/* auto-scale to xlow xhigh ylow yhigh */
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, 
+					current_plot->x_axis, NOOP, cp->xlow = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type,
+					current_plot->x_axis, NOOP, cp->xhigh = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->ylow, ylow, dummy_type,
+					current_plot->y_axis, NOOP, cp->ylow = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type,
+					current_plot->y_axis, NOOP, cp->yhigh = -VERYLARGE);
+	break;
+    }
+
     /* HBB 20010214: if z is not used for some actual value, just
      * store 'width' to that axis and be done with it */
     if ((int)current_plot->z_axis != -1)
@@ -999,6 +1043,8 @@ store_label(
     /* Check for optional (textcolor palette ...) */
     if (tl->textcolor.type == TC_Z)
         tl->textcolor.value = colorval;
+    else if (tl->textcolor.type == TC_RGB)
+        tl->textcolor.lt = colorval;
 
     /* Check for null string (no label) */
     if (!string)
