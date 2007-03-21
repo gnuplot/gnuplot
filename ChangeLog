@@ -11,6 +11,9 @@
 	Teach gd pdf post and wxt terminals to clip images using the
 	bounding box info passed in corners[2] and corners[3] via term->image().
 
+	* term/pdf.trm (PDF_SetFont): Trap errors from PDF font selection, 
+	making it non-fatal.
+
 2007-03-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL src/version.c configure.in docs/gnuplot.texi:
