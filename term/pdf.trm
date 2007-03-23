@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.68.2.3 2007/03/22 04:20:05 sfeam Exp $
+ * $Id: pdf.trm,v 1.68.2.4 2007/03/22 04:21:59 sfeam Exp $
  */
 
 /*------------------------------
@@ -1287,12 +1287,10 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 	    break;
     }
 
-    /* The pdflib routines cannot handle unsigned int coords         */
-    /* that misrepresent negative numbers, so we cast back to (int). */
-    PDF_moveto(myPDF, (int)(corners[0].x), (int)(corners[0].y));
+    PDF_moveto(myPDF, corners[0].x, corners[0].y);
     for (i=1; i<points; i++)
-	PDF_lineto(myPDF, (int)(corners[i].x), (int)(corners[i].y));
-    PDF_lineto(myPDF, (int)(corners[0].x), (int)(corners[0].y));
+	PDF_lineto(myPDF, corners[i].x, corners[i].y);
+    PDF_lineto(myPDF, corners[0].x, corners[0].y);
     PDF_fill(myPDF);
     PDF_restore(myPDF);
 }
