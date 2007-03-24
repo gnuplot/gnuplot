@@ -353,7 +353,8 @@
 	Change gpiPoints to contain signed x,y values. This is what the
 	explanatory comment always implied ("same as in gd.h"), but it 
 	wasn't true.  The change fixes several image and polygon clipping
-	problems, including segfaults in the pdf driver.
+	problems, including segfaults in the pdf driver. Also fixes filled
+	curve accounting errors on 64-bit machines.
 	Bug #1612502
 
 2007-01-27  James R. Van Zandt  <jrv@vanzandt.comcast.net>
