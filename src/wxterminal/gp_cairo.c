@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.17 2006/11/12 23:43:46 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.18 2007/01/22 22:51:33 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -697,6 +697,9 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	/* Inform Pango to re-layout the text with the new transformation */
 	pango_cairo_update_layout (plot->cr, layout);
 	pango_cairo_show_layout (plot->cr, layout);
+	/* pango_cairo_show_layout does not clear the path (here a starting point)
+	 * Do it by ourselves, or we can get spurious lines on future calls. */
+	cairo_new_path(plot->cr);
 
 #if 0 /* helper boxes to understand how text is positionned */
 	cairo_rotate(plot->cr, arg);
@@ -1408,6 +1411,9 @@ void gp_cairo_draw_enhanced_text(plot_struct *plot, int x, int y, const char* st
 	/* Inform Pango to re-layout the text with the new transformation */
 	pango_cairo_update_layout (plot->cr, layout);
 	pango_cairo_show_layout (plot->cr, layout);
+	/* Pango_cairo_show_layout does not clear the path (here a starting point)
+	 * Do it by ourselved, or we can get spurious lines on future calls. */
+	cairo_new_path(plot->cr);
 
 	/* free the layout object */
 	pango_attr_list_unref( gp_cairo_enhanced_AttrList );
