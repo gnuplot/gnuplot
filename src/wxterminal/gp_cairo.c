@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.18 2007/01/22 22:51:33 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.19 2007/03/25 21:06:27 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -211,10 +211,10 @@ void gp_cairo_initialize_context(plot_struct *plot)
 
 void gp_cairo_set_color(plot_struct *plot, rgb_color color)
 {
-	FPRINTF((stderr,"set_color %lf %lf %lf\n",color.r, color.g, color.b));
-
 	/*stroke any open path */
 	gp_cairo_stroke(plot);
+
+	FPRINTF((stderr,"set_color %lf %lf %lf\n",color.r, color.g, color.b));
 
 	plot->color = color;
 }
@@ -222,12 +222,12 @@ void gp_cairo_set_color(plot_struct *plot, rgb_color color)
 
 void gp_cairo_set_linestyle(plot_struct *plot, int linestyle)
 {
-	FPRINTF((stderr,"set_linestyle %d\n",linestyle));
-
 	/*stroke any open path */
 	gp_cairo_stroke(plot);
 	/* draw any open polygon set */
 	gp_cairo_end_polygon(plot);
+
+	FPRINTF((stderr,"set_linestyle %d\n",linestyle));
 
 	plot->linestyle = linestyle;
 }
@@ -235,12 +235,12 @@ void gp_cairo_set_linestyle(plot_struct *plot, int linestyle)
 
 void gp_cairo_set_linetype(plot_struct *plot, int linetype)
 {
-	FPRINTF((stderr,"set_linetype %d\n",linetype));
-
 	/*stroke any open path */
 	gp_cairo_stroke(plot);
 	/* draw any open polygon set */
 	gp_cairo_end_polygon(plot);
+
+	FPRINTF((stderr,"set_linetype %d\n",linetype));
 
 	plot->linetype = linetype;
 }
@@ -273,12 +273,12 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
 
 void gp_cairo_set_linewidth(plot_struct *plot, double linewidth)
 {
-	FPRINTF((stderr,"set_linewidth %lf\n",linewidth));
-
 	/*stroke any open path */
 	gp_cairo_stroke(plot);
 	/* draw any open polygon set */
 	gp_cairo_end_polygon(plot);
+
+	FPRINTF((stderr,"set_linewidth %lf\n",linewidth));
 
 	plot->linewidth = linewidth;
 }
@@ -454,8 +454,10 @@ void gp_cairo_stroke(plot_struct *plot)
 {
 	double dashes[2] = {0,0};
 
-	if (!plot->opened_path)
+	if (!plot->opened_path) {
+		FPRINTF((stderr,"stroke with non-opened path !\n"));
 		return;
+	}
 
 	FPRINTF((stderr,"stroke - color %lf %lf %lf\n",plot->color.r, plot->color.g, plot->color.b));
 
@@ -486,12 +488,12 @@ void gp_cairo_stroke(plot_struct *plot)
 
 void gp_cairo_move(plot_struct *plot, int x, int y)
 {
-	FPRINTF((stderr,"move\n"));
-
 	/* begin by stroking any open path */
 	gp_cairo_stroke(plot);
 	/* also draw any open polygon set */
 	gp_cairo_end_polygon(plot);
+
+	FPRINTF((stderr,"move\n"));
 
 	plot->current_x = x;
 	plot->current_y = y;
@@ -507,10 +509,10 @@ void gp_cairo_vector(plot_struct *plot, int x, int y)
 	double weight1 = (double) plot->hinting/100;
 	double weight2 = 1.0 - weight1;
 
-	FPRINTF((stderr,"vector\n"));
-
 	/* begin by drawing any open polygon set */
 	gp_cairo_end_polygon(plot);
+
+	FPRINTF((stderr,"vector\n"));
 
 	/* hinting magic when we are using antialiasing+oversampling */
 	if (plot->antialiasing && plot->oversampling) {
@@ -627,6 +629,8 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	/* also draw any open polygon set */
 	gp_cairo_end_polygon(plot);
 
+	FPRINTF((stderr,"draw_text\n"));
+
 #ifdef MAP_SYMBOL
 	/* we have to treat Symbol font as a special case */
 	if (!strcmp(plot->fontname,"Symbol")) {
@@ -686,7 +690,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	}
 
 #if 0 /* helper point */
-	gp_cairo_cairo_draw_point( x1, y1, 0); 
+	gp_cairo_draw_point(plot, x1, y1, 0);
 #endif /* helper point */
 
 	cairo_save (plot->cr);
@@ -702,6 +706,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	cairo_new_path(plot->cr);
 
 #if 0 /* helper boxes to understand how text is positionned */
+	cairo_set_line_width(plot->cr, plot->linewidth*plot->oversampling_scale);
 	cairo_rotate(plot->cr, arg);
 	cairo_translate(plot->cr, x, y);
 	cairo_rotate(plot->cr, -arg);
@@ -746,6 +751,8 @@ void gp_cairo_draw_point(plot_struct *plot, int x1, int y1, int style)
 	gp_cairo_stroke(plot);
 	/* also draw any open polygon set */
 	gp_cairo_end_polygon(plot);
+
+	FPRINTF((stderr,"drawpoint\n"));
 
 	/* hinting magic when we are using antialiasing+oversampling */
 	if (plot->antialiasing && plot->oversampling) {
@@ -1411,8 +1418,8 @@ void gp_cairo_draw_enhanced_text(plot_struct *plot, int x, int y, const char* st
 	/* Inform Pango to re-layout the text with the new transformation */
 	pango_cairo_update_layout (plot->cr, layout);
 	pango_cairo_show_layout (plot->cr, layout);
-	/* Pango_cairo_show_layout does not clear the path (here a starting point)
-	 * Do it by ourselved, or we can get spurious lines on future calls. */
+	/* pango_cairo_show_layout does not clear the path (here a starting point)
+	 * Do it by ourselves, or we can get spurious lines on future calls. */
 	cairo_new_path(plot->cr);
 
 	/* free the layout object */
