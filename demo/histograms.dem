@@ -122,5 +122,5 @@ set yrange [0:900000]
 set xlabel "(Same plot using rowstacked rather than clustered histogram)"
 replot
 #
-pause -1
+pause -1 "<cr> to finish histogram demo"
 

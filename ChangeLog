@@ -1,5 +1,7 @@
 2007-03-25  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
+	* demo/histograms.dem: Add message to 'pause -1'.
+
 	* src/wxterminal/gp_cairo.c
 	(gp_cairo_draw_text, gp_cairo_draw_enhanced_text): Clear the path after
 	drawing a text layout since pango does not do it by itself. This is a
