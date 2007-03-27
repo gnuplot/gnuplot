@@ -3237,7 +3237,8 @@ C ... and restart the table:
        1.0 "second column" 3.0
 
  Data may be written in exponential format with the exponent preceded by the
- letter e, E, d, D, q, or Q.
+ letter e or E.  The fortran exponential specificiers d, D, q, and Q may also
+ be used if the command `set datafile fortran` is in effect.
 
  Only one column (the y value) need be provided.  If x is omitted, `gnuplot`
  provides integer values starting at 0.
