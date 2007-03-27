@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.13 2007/02/27 04:09:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.421 2007/02/27 04:04:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -88,25 +88,26 @@ C
 ?introduction
 ?
  `gnuplot` is a command-driven interactive function and data plotting program.
- It is case sensitive (commands and function names written in lowercase are
- not the same as those written in CAPS).  All command names may be abbreviated
- as long as the abbreviation is not ambiguous.  Any number of commands may
- appear on a line (with the exception that `load` or `call` must be the final
- command), separated by semicolons (;).  Strings are indicated with quotes.
- They may be either single or double quotation marks, e.g.,
+
+ Any command-line arguments are assumed to be names of files containing
+ `gnuplot` commands, with the exception of standard X11 arguments, which are
+ processed first.  Each file is loaded with the `load` command, in the order
+ specified.  `gnuplot` exits after the last file is processed.  The special
+ filename "-" is used to denote standard input.  When no load files are named,
+ `gnuplot` enters into an interactive mode.  See help for `batch/interactive`
+ for more details.
+
+ `gnuplot` is case sensitive (commands and function names written in lowercase
+ are not the same as those written in CAPS).  All command names may be
+ abbreviated as long as the abbreviation is not ambiguous.  Any number of
+ commands may appear on a line (with the exception that `load` or `call` must
+ be the final command), separated by semicolons (;).  Strings are indicated
+ with quotes.  They may be either single or double quotation marks, e.g.,
 
        load "filename"
        cd 'dir'
 
  although there are some subtle differences (see `syntax` for more details).
-
- Any command-line arguments are assumed to be names of files containing
- `gnuplot` commands, with the exception of standard X11 arguments, which are
- processed first.  Each file is loaded with the `load` command, in the order
- specified.  `gnuplot` exits after the last file is processed.  When no load
- files are named, `gnuplot` enters into an interactive mode.  The special
- filename "-" is used to denote standard input.  See help for `batch/interactive`
- for more details.
 
  Many `gnuplot` commands have multiple options. Version 4 is less sensitive
  to the order of these options than earlier versions, but some order-dependence
@@ -247,7 +248,7 @@ C
  See `string variables`.
 
 3 Macros
- Gnuplot supports command line macro expansion  by '@stringvariablename'. 
+ Gnuplot supports command line macro expansion  by '@stringvariablename'.
  See `macros`.
 
 3 Auto-layout of multiple plots on a page
@@ -270,7 +271,8 @@ C
  enhanced text.
 4 `emf`
  The `emf` terminal generates an Enhanced Metafile Format file. This file
- format is the metafile standard on MS Win32 Systems.
+ format is the metafile standard on MS Win32 Systems. The emf terminal
+ supports pm3d, rgb color, and image plot modes.
 4 `gif`, `jpeg`, `png`
  The code for the terminals using the `gd` library has been consolidated.
  The `gif` terminal also knows how to produce an animated gif from a sequence
@@ -295,10 +297,10 @@ C
 ?canvas
 ?set term size
 
- In earlier versions of gnuplot, some terminal types (but not all) used the
- values from `set size` to control also the size of the output canvas.
- This behaviour is now deprecated.  In future versions of gnuplot the options
- 'set size' and 'set term <foo> size' will have complementary effects:
+ In earlier versions of gnuplot, some terminal types used the values from
+ `set size` to control also the size of the output canvas; others did not.
+ The use of 'set size' for this purpose was deprecated in version 4.2.
+ In version 4.3 almost all terminals now behave as follows:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
  file, or "canvas". Please see individual terminal documentation for allowed
@@ -310,60 +312,58 @@ C
  fit on the canvas.  Please be aware that setting scale values larger than 1
  may cause problems on some terminal types.
 
+ The major exception to this convention is the PostScript driver, which
+ by default continues to act as it has in earlier versions. Be warned that
+ the next version of gnuplot may change the default behaviour of the
+ PostScript driver as well.
+
  Example:
 
-       set term pbm size 600, 400
        set size 0.5, 0.5
-       set output "figure.pbm"
-       plot "data" with lines
+       set term png size 600, 400
+       set output "figure.png"
+       plot "data" using lines
 
- These commands will produce an output file "figure.pbm" that is 600 pixels
+ These commands will produce an output file "figure.png" that is 600 pixels
  wide and 400 pixels tall. The plot will fill the lower left quarter of this
  canvas.  This is consistent with the way multiplot mode has always worked,
- however it is a change in the way some drivers worked for single plots in
+ however it is a change in the way the png driver worked for single plots in
  version 4.0.
-
- Most terminal drivers in 4.2 follow the new convention. However the behaviour
- of the png/jpeg/gif driver is under the control of a configuration option.
- See `backwards compatibility`.
 
 2 Backwards compatibility
 ?backwards compatibility
 ?compatibility
  Gnuplot version 4.0 deprecated certain syntax used in earlier versions, but
- continued to recognize it.  Version 4.2 also accepts the deprecated syntax
- by default, but this is now under the control of a configuration option, and
- can be disabled as follows:
- 
-       ./configure --disable-backwards-compatibility
- 
- Notice: Deprecated syntax items may be disabled permanently in future versions.
+ continued to recognize it.  This is now under the control of a configuration
+ option, and can be disabled as follows:
 
- One major difference is the introduction of required keywords to disambiguate
- complicated commands. A notable issue was the use of bare numbers to specify
- offsets, line and point types.  Illustrative examples:
+       ./configure --disable-backwards-compatibility
+
+ Notice: Deprecated syntax items may be disabled permanently in some future
+ version of gnuplot.
+
+ One major difference is the introduction of keywords to disambiguate complex
+ commands, particularly commands containing string variables. A notable issue
+ was the use of bare numbers to specify offsets, line and point types.
+ Illustrative examples:
 
  Deprecated:
+       set title "Old" 0,-1
        set data linespoints
-       plot <foo> 2 4
+       plot 1 2 4               # horizontal line at y=1
  New:
+       TITLE = "New"
+       set title TITLE offset char 0, char -1
        set style data linespoints
-       plot <foo> linetype 2 pointtype 4
+       plot 1 linetype 2 pointtype 4
 
- Another major compatibility issue is the interaction of the commands
- `set size` and `set term <foo> size`.  In earlier versions of gnuplot the
- behaviour of various terminal types with respect to `set size` was very
- inconsistent.  In the future, all terminals will behave the same way.
+ Another compatibility issue is the effect of the command `set size` outside
+ when not in multiplot mode.  In earlier versions, the command
+ `set size <xx>, <yy>` caused some terminals to change both the size of the plot
+ and the size of the canvas is was drawn on; other terminatls changed only the
+ plot size.  The use of `set size` to change the canvas size is now deprecated.
 
- In version 4.2 most terminals follow the new convention (`set size` has
- no effect on the output canvas size). However, the png/gif/jpeg terminal
- still follows the older, deprecated behaviour unless you have configured with
- `--disable-backwards-compatibility`.  In the next version of gnuplot all
- terminal types will follow the new convention. You are strongly advised not
- to use `set size` to control the size in pixels of png/gif/jpeg output files.
- Instead use `set term png size <XX>,<YY>`.
-
- Please see `set size`, `set term size` and the documentation for
+ Please see `set size`, `set term size` and also the documentation for
  individual terminals.
 
 2 Features introduced in version 4.0
@@ -1270,7 +1270,8 @@ C
 4 substr
 ?expressions functions substr
 ?functions substr
-?substring
+?substr
+=substring
 #substr("string",beg,end) & multiple & string "string"[beg:end] \\
 %substr("string",beg,end)@multiple@string "string"[beg:end]
  `substr("string",beg,end)` returns the substring consisting of characters
@@ -1334,7 +1335,7 @@ C
 %defined(X)@variable name@ [DEPRECATED] returns 1 if X is defined, 0 otherwise.
  `defined(X)` [DEPRECATED] returns 1 if a variable named X has been defined, otherwise
  it returns 0.
-4 exists 
+4 exists
 ?expressions functions exists
 ?functions exists
 ?exists
@@ -1679,7 +1680,7 @@ C ... and restart the table:
  Working with interactive terminals with `mouse` functionality defines
  variables with names that begin "MOUSE_", see `mouse variables` for details.
 
- Further, there are several "read-only" variables that begin "GPVAL_", like 
+ Further, there are several "read-only" variables that begin "GPVAL_", like
  GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN,... Type `show variables all`
  to display their list and values. Values related to axes parameters (ranges, log
  base) are values used during the last plot, not those currently `set`.
@@ -2390,8 +2391,8 @@ C ... and restart the table:
        cd 'subdir'
        cd ".."
 
- It is recommended for DOS and Windows users to use 
- single-quotes---backslash [\] has special significance inside 
+ It is recommended for DOS and Windows users to use
+ single-quotes---backslash [\] has special significance inside
  double-quotes and has to be escaped.  For example,
        cd "c:\newdata"
  fails, but
@@ -3161,6 +3162,7 @@ C ... and restart the table:
 
  Syntax:
        plot {<ranges>}
+            {<iteration>}
             {<function> | {"<datafile>" {datafile-modifiers}}}
             {axes <axes>} {<title-spec>} {with <style>}
             {, {definitions,} <function> ...}
@@ -3201,7 +3203,7 @@ C ... and restart the table:
  Syntax:
        plot '<file_name>' {binary <binary list>}
                           {matrix}
-                          {index <index list>}
+                          {index <index list> | index "<name>"}
                           {every <every list>}
                           {thru <thru expression>}
                           {using <using list>}
@@ -3235,7 +3237,8 @@ C ... and restart the table:
        1.0 "second column" 3.0
 
  Data may be written in exponential format with the exponent preceded by the
- letter e, E, d, D, q, or Q.
+ letter e or E.  The fortran exponential specificiers d, D, q, and Q may also
+ be used if the command `set datafile fortran` is in effect.
 
  Only one column (the y value) need be provided.  If x is omitted, `gnuplot`
  provides integer values starting at 0.
@@ -3687,7 +3690,7 @@ C ... and restart the table:
  file to be plotted.
 
  Syntax:
-       plot 'file' index <m>{{:<n>}:<p>}
+       plot 'file' index { <m>{{:<n>}:<p>} | "<name>" }
 
  Data sets are separated by pairs of blank records.  `index <m>` selects only
  set <m>; `index <m>:<n>` selects sets in the range <m> to <n>; and `index
@@ -3698,6 +3701,18 @@ C ... and restart the table:
 
  Example:
        plot 'file' index 4:5
+
+ `index '<name>'` selects the data set with name '<name>'.  Names are assigned
+ to data sets in comment lines.  The comment character and leading white space
+ are removed from the comment line.  If the resulting line starts with <name>,
+ the following data set is now named <name> and can be selected.
+
+ Example:
+       plot 'file' index 'Population'
+
+ Please note that every comment that starts with <name> will name the following
+ data set.  To avoid problems use a naming scheme like e.g. '== Popolation =='
+ or '[Population]'.
 
 ^ See also web page
 ^ <a href="http://www.gnuplot.info/demo/multimsh.html">
@@ -3837,7 +3852,24 @@ C ... and restart the table:
 ?plot special-filenames
 ?datafile special-filenames
 ?special-filenames
- A special filename of `'-'` specifies that the data are inline; i.e., they
+ There are three filenames that have a special meaning:  '', '-', and '+'.
+
+ The empty filename '' tells gnuplot to re-use the previous input file in the
+ same plot command. So to plot two columns from the same input file:
+
+       plot 'filename' using 1:2, '' using 1:3
+
+ The special filename '+' is a mechanism to allow the full range of 
+ `using` specifiers and plot styles with in-line functions.  Normally a 
+ function plot can only have a single y (or z) value associated with each
+ sampled point.  The pseudo-file '+' treats the sampled points as columns
+ 1 (plot) or 1 and 2 (splot), and allows additional column values to be
+ specified via a `using` specification, just as for a true input file.
+ Example:
+
+       plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
+
+ The special filename `'-'` specifies that the data are inline; i.e., they
  follow the command.  Only the data follow the command; `plot` options like
  filters, titles, and line styles remain on the `plot` command line.  This is
  similar to << in unix shell script, and $DECK in VMS DCL.  The data are
@@ -4063,11 +4095,11 @@ C ... and restart the table:
  to provide the plot title in the key box.  The column containing specified
  is independent of the column[s] used for the plot itself.
 
-    plot 'data' using 1:($2/$3) title 2
+    plot 'data' using 1:($2/$3) title column(N)
 
- In this case the entry in the first row of column 2 will be used for the
+ In this case the entry in the first row of column N will be used for the
  key entry of the plot constructed from dividing column 2 by column 3.
- The entry in the first row of column 3 will be ignored.
+ The entry in the first row of columns 2 and 3 will be ignored.
 
 5 xticlabels
 ?using xticlabels
@@ -4304,6 +4336,39 @@ C ... and restart the table:
        set timefmt "%d/%m/%y %H:%M"
        plot ["1/6/93 12:00":"5/6/93 12:00"] 'timedata.dat'
 
+3 iteration
+?commands plot iteration
+?commands splot iteration
+?plot iteration
+?splot iteration
+?iteration
+ If many similar files or functions are to be plotted together, it may be
+ convenient to do so by iterating over a shared plot command.
+
+ Syntax:
+       plot for [<variable>=<start>:<end>{:<increment>}]
+       splot for [<variable>=<start>:<end>{:<increment>}]
+
+ Example:
+       file(n) = sprintf("dataset_%d.dat",n)
+       plot for [i=1:10] file(i) title sprintf("dataset %d",i)
+
+ This example defines a string-valued function that generates file names,
+ and plots ten such files together. The iteration variable ('i' in this
+ example) is treated as an integer, and may be used more than once. In this
+ example it is used both to generate a file name and a corresponding title.
+
+ Example:
+       list = "a b c foo baz"
+       item(n) = word(list,n)
+       plot for [i=1:words(list)] item[i].".dat" title item(i)
+       list = "new stuff"
+       replot
+
+ This example steps through a list and plots once per item.
+ Because the items are retrieved dynamically, you can change the list
+ and then replot.
+
 3 title
 ?commands plot title
 ?commands splot title
@@ -4433,9 +4498,9 @@ C ... and restart the table:
  The keyword `nohidden3d` applies only to plots made with the `splot` command.
  Normally the global option `set hidden3d` applies to all plots in the graph.
  You can attach the `nohidden3d` option to any individual plots that you want
- to exclude from the hidden3d processing.  The individual elements
- (lines, dots, labels, ...) of a plot marked `nohidden3d` will all be drawn,
- even if they would normally be obscured by the elements of some other plot.
+ to exclude from the hidden3d processing.  The individual elements other than
+ surfaces (i.e. lines, dots, labels, ...) of a plot marked `nohidden3d` will all
+ be drawn, even if they would normally be obscured by other plot elements.
 
  The keywords may be abbreviated as indicated.
 
@@ -5665,7 +5730,7 @@ C ... and restart the table:
  error message is printed and the decimal sign setting is unchanged.
  On linux systems you can get a list of the locales installed on your machine by
  typing "locale -a". A typical linux locale string is of the form "sl_SI.UTF-8".
- A typical Windows locale string is of the form "Slovenian_Slovenia.1250" or 
+ A typical Windows locale string is of the form "Slovenian_Slovenia.1250" or
  "slovenian". Please note that interpretation of the locale settings is done by
  the C library at runtime. Older C libraries may offer only partial support for
  locale settings such as the thousands grouping separator character.
@@ -6254,7 +6319,7 @@ C ... and restart the table:
  its contours drawn on the base (see `set contour`) as well as the grid will
  be hidden.  Each surface has its hidden parts removed with respect to itself
  and to other surfaces, if more than one surface is plotted.  Contours drawn
- on the surface (`set contour surface`) don't work.  
+ on the surface (`set contour surface`) don't work.
 
  Labels and arrows are always visible and are unaffected.  The key box is
  never hidden by the surface. As of gnuplot version 4.2, `set hidden3d` also
@@ -6263,7 +6328,7 @@ C ... and restart the table:
  graph may be explicitly excluded from this processing by appending the extra
  option `nohidden3d` to the `with` specifier.
 
- Hidden3d does not affect solid surfaces drawn using the pm3d mode. To 
+ Hidden3d does not affect solid surfaces drawn using the pm3d mode. To
  achieve a similar effect for pm3d surfaces, use instead set `pm3d depthorder`.
 
  Functions are evaluated at isoline intersections.  The algorithm interpolates
@@ -6403,7 +6468,7 @@ C ... and restart the table:
 ?key
 ?nokey
 ?legend
- The `set key` enables a key (or legend) describing plots on a plot.
+ The `set key` command enables a key (or legend) describing plots on a plot.
 
  The contents of the key, i.e., the names given to each plotted data set and
  function and samples of the lines and/or symbols used to represent them, are
@@ -6422,14 +6487,17 @@ C ... and restart the table:
                {height <height_increment>}
                {{no}autotitle {columnheader}}
                {title "<text>"} {{no}enhanced}
+               {font "<face>,<size>"} {textcolor <colorspec>}
                {{no}box { {linestyle | ls <line_style>}
                           | {linetype | lt <line_type>}
                             {linewidth | lw <line_width>}}}
        unset key
        show key
 
- Plots may be drawn with no visible key by requesting `set key off` or
- `unset key`.
+ The key contains a title and a sample (line, point, box) for each plot
+ in the graph. The key may be turned off by requesting `set key off` or
+ `unset key`.  Individual key entries may be turned off by using the
+ `notitle` keyword in the corresponding plot command.
 
  Elements within the key are stacked according to `vertical` or `horizontal`.
  In the case of `vertical`, the key occupies as few columns as possible.  That
@@ -6444,7 +6512,92 @@ C ... and restart the table:
  graph.  Also an `at <position>` may be given to indicate precisely where the
  plot should be placed.  In this case, the keywords `left`, `right`, `top`,
  `bottom` and `center` serve an analogous purpose for alignment.
+ For more information, see `key placement`.
 
+ Justification of the plot titles within the key is controlled by `Left` or
+ `Right` (default).  The text and sample can be reversed (`reverse`) and a
+ box can be drawn around the key (`box {...}`) in a specified `linetype`
+ and `linewidth`, or a user-defined `linestyle`. 
+
+ By default the first plot label is at the top of the key and successive labels
+ are entered below it. The `invert` option causes the first label to be placed
+ at the bottom of the key, with successive labels entered above it. This option
+ is useful to force the vertical ordering of labels in the key to match the
+ order of box types in a stacked histogram.
+
+ The <height_increment> is a number of character heights to be added to or
+ subtracted from the height of the key box.  This is useful mainly when you are
+ putting a box around the key, otherwise it can be used to adjust the vertical
+ shift of automatically chosen key position by <height_increment>/2.
+
+ All plotted curves of `plot`s and `splot`s are titled according to the
+ default option `autotitles`. The automatic generation of titles can be
+ suppressed by `noautotitles`; then only those titles explicitly defined
+ by `(s)plot ... title ...` will be drawn.
+
+ The `set key autotitle columnheader` command causes the first entry in each
+ column of input data to be interpreted as a text string and used as a title for
+ the corresponding plot. If the quantity being plotted is a function of data
+ from several columns, gnuplot may be confused as to which column to draw the
+ title from. In this case it is necessary to specify the column explicitly in
+ the plot command, e.g. `plot "datafile" using (($2+$3)/$4) title 3 with lines`.
+
+ An overall title can be put on the key (`title "<text>"`)---see also `syntax`
+ for the distinction between text in single- or double-quotes.  The key title
+ uses the same justification as do the plot titles.
+
+ The defaults for `set key` are `on`, `right`, `top`, `vertical`, `Right`,
+ `noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and
+ `nobox`.  The default <linetype> is the same as that used for the plot
+ borders.  Entering `set key default` returns the key to its default
+ configuration.
+
+ The key is drawn as a sequence of lines, with one plot described on each
+ line.  On the right-hand side (or the left-hand side, if `reverse` is
+ selected) of each line is a representation that attempts to mimic the way the
+ curve is plotted.  On the other side of each line is the text description
+ (the line title), obtained from the `plot` command.  The lines are vertically
+ arranged so that an imaginary straight line divides the left- and right-hand
+ sides of the key.  It is the coordinates of the top of this line that are
+ specified with the `set key` command.  In a `plot`, only the x and y
+ coordinates are used to specify the line position.  For a `splot`, x, y and
+ z are all used as a 3-d location mapped using the same mapping as the graph
+ itself to form the required 2-d screen position of the imaginary line.
+
+ When using the TeX or PostScript drivers, or similar drivers where formatting
+ information is embedded in the string, `gnuplot` is unable to calculate
+ correctly the width of the string for key positioning.  If the key is to be
+ positioned at the left, it may be convenient to use the combination  `set key
+ left Left reverse`.  The box and gap in the grid will be the width of the
+ literal string.
+
+ If `splot` is being used to draw contours, the contour labels will be listed
+ in the key.  If the alignment of these labels is poor or a different number
+ of decimal places is desired, the label format can be specified.  See
+ `set clabel` for details.
+
+ Examples:
+
+ This places the key at the default location:
+       set key default
+
+ This disables the key:
+       unset key
+
+ This places a key at coordinates 2,3.5,2 in the default (first) coordinate
+ system:
+       set key at 2,3.5,2
+
+ This places the key below the graph:
+       set key below
+
+ This places the key in the bottom left corner, left-justifies the text,
+ gives it a title, and draws a box around it in linetype 3:
+       set key left bottom Left title 'Legend' box 3
+4 key placement
+?commands set key placement
+?set key placement
+?key placement
  To understand positioning, the best concept is to think of a region, i.e.,
  inside/outside, or one of the margins.  Along with the region, keywords
  `left/center/right` (l/c/r) and `top/center/bottom` (t/c/b) control where
@@ -6505,18 +6658,18 @@ C ... and restart the table:
  is given is to align the key as though it were text positioned using the
  label command, i.e., `left` means left align with key to the right of
  <position>, etc.
-
- Justification of the labels within the key is controlled by `Left` or `Right`
- (default is `Right`).  The text and sample can be reversed (`reverse`) and a
- box can be drawn around the key (`box {...}`) in a specified `linetype`
- and `linewidth`, or a user-defined `linestyle`. Note that not all
- terminal drivers support linewidth selection, though.
-
- By default the first plot label is at the top of the key and successive labels
- are entered below it. The `invert` option causes the first label to be placed
- at the bottom of the key, with successive labels entered above it. This option
- is useful to force the vertical ordering of labels in the key to match the
- order of box types in a stacked histogram.
+4 key samples
+?commands set key samples
+?set key samples
+?key samples
+ By default, each plot on the graph generates a corresponding entry in the
+ key. This entry contains a plot title and a sample line/point/box of the
+ same color and fill properties as used in the plot itself.  The font and
+ textcolor properties control the appearance of the individual plot titles
+ that appear in the key. Setting the textcolor to "rgb variable" causes
+ the text for each key entry to be the same color as the line or fill 
+ color for that plot.  This was the default in some earlier versions of
+ gnuplot.
 
  The length of the sample line can be controlled by `samplen`.  The sample
  length is computed as the sum of the tic length and <sample_length> times the
@@ -6534,81 +6687,6 @@ C ... and restart the table:
  putting a box around the key and you are using control characters in the text.
  `gnuplot` simply counts the number of characters in the string when computing
  the box width; this allows you to correct it.
-
- The <height_increment> is a number of character heights to be added to or
- subtracted from the height of the key box.  This is useful mainly when you are
- putting a box around the key, otherwise it can be used to adjust the vertical
- shift of automatically chosen key position by <height_increment>/2.
-
- All plotted curves of `plot`s and `splot`s are titled according to the
- default option `autotitles`. The automatic generation of titles can be
- suppressed by `noautotitles`; then only those titles explicitly defined
- by `(s)plot ... title ...` will be drawn.
-
- The `set key autotitle columnheader` option is available if gnuplot was built
- with --enable-datastrings. This command causes the first entry in each column
- of plotted data to be interpreted as a text string and used as a title for
- the corresponding plot. If the quantity being plotted is a function of data
- from several columns, gnuplot may be confused as to which column to draw the
- title from. In this case it is necessary to specify the column explicitly in
- the plot command, e.g. `plot "datafile" using (($2+$3)/$4) title 3 with lines`.
-
- A title can be put on the key (`title "<text>"`)---see also `syntax` for the
- distinction between text in single- or double-quotes.  The key title uses the
- same justification as do the plot titles.
-
- An explicitly given title is typeset using enhanced text properties on
- terminals supporting this, see `enhanced text` for more details.
- This default behavior can be switched off by the `noenhanced` option.
-
- The defaults for `set key` are `on`, `right`, `top`, `vertical`, `Right`,
- `noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and
- `nobox`.  The default <linetype> is the same as that used for the plot
- borders.  Entering `set key default` returns the key to its default
- configuration.
-
- The key is drawn as a sequence of lines, with one plot described on each
- line.  On the right-hand side (or the left-hand side, if `reverse` is
- selected) of each line is a representation that attempts to mimic the way the
- curve is plotted.  On the other side of each line is the text description
- (the line title), obtained from the `plot` command.  The lines are vertically
- arranged so that an imaginary straight line divides the left- and right-hand
- sides of the key.  It is the coordinates of the top of this line that are
- specified with the `set key` command.  In a `plot`, only the x and y
- coordinates are used to specify the line position.  For a `splot`, x, y and
- z are all used as a 3-d location mapped using the same mapping as the graph
- itself to form the required 2-d screen position of the imaginary line.
-
- When using the TeX or PostScript drivers, or similar drivers where formatting
- information is embedded in the string, `gnuplot` is unable to calculate
- correctly the width of the string for key positioning.  If the key is to be
- positioned at the left, it may be convenient to use the combination  `set key
- left Left reverse`.  The box and gap in the grid will be the width of the
- literal string.
-
- If `splot` is being used to draw contours, the contour labels will be listed
- in the key.  If the alignment of these labels is poor or a different number
- of decimal places is desired, the label format can be specified.  See
- `set clabel` for details.
-
- Examples:
-
- This places the key at the default location:
-       set key default
-
- This disables the key:
-       unset key
-
- This places a key at coordinates 2,3.5,2 in the default (first) coordinate
- system:
-       set key at 2,3.5,2
-
- This places the key below the graph:
-       set key below
-
- This places the key in the bottom left corner, left-justifies the text,
- gives it a title, and draws a box around it in linetype 3:
-       set key left bottom Left title 'Legend' box 3
 3 label
 ?commands set label
 ?commands unset label
@@ -6672,10 +6750,9 @@ C ... and restart the table:
  `back` is given (the default), the label is written underneath the graphed
  data.  Using `front` will prevent a label from being obscured by dense data.
 
- `Textcolor <colorspec>` changes the color of the label text. `<colorspec>` is
- either a linetype or a mapping onto the pm3d color palette (available only in
- `splot`), see help for `set palette`.
-    `textcolor` may be abbreviated `tc`.
+ `textcolor <colorspec>` changes the color of the label text. <colorspec> can be
+ a linetype, an rgb color, or a palette mapping. See help for `colorspec` and
+ `palette`.  `textcolor` may be abbreviated `tc`.
     `tc default` resets the text color to its default state.
     `tc lt <n>` sets the text color to that of line type <n>.
     `tc ls <n>` sets the text color to that of line style <n>.
@@ -6683,6 +6760,7 @@ C ... and restart the table:
     `tc palette cb <val>` selects a color corresponding to <val> on the colorbar.
     `tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to
         the mapping [0:1] to grays/colors of the `palette`.
+    `tc rgb "#RRGGBB"` selects an arbitrary 24-bit RGB color.
 
  If a <pointstyle> is given, using keywords `lt`, `pt` and `ps`, see `style`,
  a point with the given style and color of the given line type is plotted at
@@ -6809,10 +6887,10 @@ C ... and restart the table:
        unset logscale <axes>
        show logscale
 
- where <axes> may be any combination of `x`, `x2`, `y`, `y2`, `z`, and `cb` in
+ where <axes> may be any combinations of `x`, `x2`, `y`, `y2`, `z`, and `cb` in
  any order, and where <base> is the base of the log scaling.  If <base> is not
  given, then 10 is assumed.  If <axes> is not given, then all axes are assumed.
- `unset logscale` turns off log scaling for the specified axes.
+ The command `unset logscale` turns off log scaling for the specified axes.
 
  Examples:
 
@@ -6897,16 +6975,20 @@ C ... and restart the table:
  margin` shows the current settings.
 
  Syntax:
-       set bmargin {<margin>}
-       set lmargin {<margin>}
-       set rmargin {<margin>}
-       set tmargin {<margin>}
+       set bmargin {{screen} <margin>}
+       set lmargin {{screen} <margin>}
+       set rmargin {{screen} <margin>}
+       set tmargin {{screen} <margin>}
        show margin
 
- The units of <margin> are character heights or widths, as appropriate.  A
- positive value defines the absolute size of the margin.  A negative value
+ The default units of <margin> are character heights or widths, as appropriate.
+ A positive value defines the absolute size of the margin.  A negative value
  (or none) causes `gnuplot` to revert to the computed value.  For 3D plots,
- only the left margin setting has any effect so far.
+ only the left margin can be set using character units.
+
+ The keyword `screen` indicates that the margin is specified as a fraction of
+ the full drawing area. This can be used to precisely line up the corners of
+ individual 2D and 3D graphs in a multiplot.
 
  Normally the margins of a plot are automatically calculated based on tics,
  tic labels, axis labels, the plot title, the timestamp and the size of the
@@ -7068,12 +7150,12 @@ C ... and restart the table:
  time`/`unset time` pair around one of the `plot`, `splot` or `replot`
  commands within the `set multiplot`/`unset multiplot` block.
 
- The multiplot title is distinct from the individual plot titles, if any.
+ The multiplot title is separate from the individual plot titles, if any.
  Space is reserved for it at the top of the page, spanning the full width
  of the canvas.
 
  The commands `set origin` and `set size` must be used to correctly position
- each plot if no `layout` is specified or if fine tuning is desired.  See
+ each plot if no layout is specified or if fine tuning is desired.  See
  `set origin` and `set size` for details of their usage.
 
  Example:
@@ -7402,6 +7484,7 @@ C ... and restart the table:
      cgm
      pdf
      svg
+     emf
 
  Let us first describe how a map/surface is drawn.  The input data come from an
  evaluated function or from an `splot data file`.  Each surface consists of a
@@ -7880,7 +7963,7 @@ C ... and restart the table:
        1 0 0
        e
 
- Binary palette files are supported as well, see `binary general`. Example: 
+ Binary palette files are supported as well, see `binary general`. Example:
  put 64 triplets of R,G,B doubles into file palette.bin and load it by
        set palette file "palette.bin" binary record=64 using 1:2:3
 
@@ -8175,8 +8258,7 @@ C ... and restart the table:
  Important note:
        In earlier versions of gnuplot, some terminal types used the values from
        `set size` to control also the size of the output canvas; others did not.
-       In version 4.2 most terminals now follow the convention described below.
-       However, see `backwards compatibility` for the png/gif/jpeg drivers.
+       In version 4.2 almost all terminals now follow the following convention:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
  file, or `canvas`. Please see individual terminal documentation for allowed
@@ -8186,7 +8268,7 @@ C ... and restart the table:
  canvas.  Scale values less than 1 will cause the plot to not fill the entire
  canvas.  Scale values larger than 1 will cause only a portion of the plot to
  fit on the canvas.  Please be aware that setting scale values larger than 1
- may cause problems on some terminal types.  See `set term size`.
+ may cause problems on some terminal types.
 
  `ratio` causes `gnuplot` to try to create a graph with an aspect ratio of <r>
  (the ratio of the y-axis length to the x-axis length) within the portion of
@@ -8357,7 +8439,9 @@ C ... and restart the table:
  histograms, candlesticks and filledcurves.
 
  Syntax:
-       set style fill {empty | solid {<density>} | pattern {<n>}}
+       set style fill {empty
+                       | {transparent} solid {<density>}
+                       | {transparent} pattern {<n>}}
                       {border {<linetype>} | noborder}
 
  The default fillstyle is `empty`.
@@ -8382,6 +8466,57 @@ C ... and restart the table:
  By default, `border`, the box is bounded by a solid line of the current
  linetype. `border <lt>` specifies that a border is to be drawn using
  linetype <lt>. `noborder` specifies that no bounding lines are drawn.
+5 set style fill transparent
+?commands set style fill transparent
+?set style fill transparent
+?fillstyle transparent
+?transparent
+ Some terminals support the attribute `transparent` for filled areas.
+ In the case of transparent solid fill areas, the `density` parameter is
+ interpreted as an alpha value; that is, density 0 is fully transparent,
+ density 1 is fully opaque.  In the case of transparent pattern fill, the
+ background of the pattern is either fully transparent or fully opaque.
+
+@start table - Driver support for transparency
+       terminal   solid pattern    pm3d
+       --------------------------------
+       gif           no     yes      no
+       jpeg         yes      no     yes
+       pdf          yes     yes     yes
+       png    TrueColor   index     yes
+       post          no     yes      no
+       svg          yes      no     yes
+       wxt          yes     yes     yes
+       x11           no     yes      no
+#\begin{tabular}{|cccl|} \hline
+#Terminal   &   solid & pattern &    pm3d \\ \hline
+#gif        &      no &     yes &      no \\
+#jpeg       &     yes &      no &     yes \\
+#pdf        &     yes &     yes &     yes \\
+#png        &TrueColor&   index &     yes \\
+#post       &      no &     yes &      no \\
+#svg        &     yes &      no &     yes \\
+#wxt        &     yes &     yes &     yes \\
+#x11        &      no &     yes &      no \\
+%c l .
+%Terminal@solid@pattern@pm3d
+%_
+%gif@no@yes@no
+%jpeg@yes@no@yes
+%pdf@yes@yes@yes
+%png@TrueColor@index@yes
+%post@no@yes@no
+%svg@yes@yes@yes
+%wxt@yes@yes@yes
+%x11@no@yes@no
+%_
+@end table
+ Note that there may be additional limitations on the creation or viewing of
+ graphs containing transparent fill areas.  For example, the png terminal can
+ only use transparent fill if the "truecolor" option is set.  Some pdf viewers
+ may not correctly display the fill areas even if they are correctly described
+ in the pdf file. Ghostscript/gv does not correctly display pattern-fill areas
+ even though actual PostScript printers generally have no problem.
 4 set style function
 ?commands set style function
 ?commands show style function
@@ -8764,7 +8899,7 @@ C ... and restart the table:
  are possible. The first two variants require either a function or two columns
  of input data, and may be further modified by the options listed below.
  The first variant, `closed`, treats the curve itself as a closed polygon.
- This is the default.
+ This is the default if there are two columns of input data.
 
  The second variant is to fill the area between the curve and a given axis,
  a horizontal or vertical line, or a point.
@@ -8772,6 +8907,7 @@ C ... and restart the table:
  The third variant requires three columns of input data: the x coordinate and
  two y coordinates corresponding to two curves sampled at the same set of
  x coordinates; the area between the two curves is filled.
+ This is the default if there are three or more columns of input data.
 
  Syntax:
 
@@ -8991,7 +9127,7 @@ C ... and restart the table:
 ?histograms newhistogram
  More than one set of histograms can appear in a single plot. In this case you
  can force a gap between them, and a separate label for each set, by using the
- plot command `newhistogram { "title" } { <linestyle> }`.
+ plot command `newhistogram {"<title>"} {<linestyle>}`.
  For example
 
        set style histogram  cluster
@@ -9037,6 +9173,21 @@ C ... and restart the table:
  will form a surface of (M-1) x (N-1) elements.  The scan directions for the
  image data grid can be any of eight possible combinations.
 
+ See also `rgbimage`.
+6 image failsafe
+?commands set style image failsafe
+?set style image failsafe
+?plotting styles image failsafe
+?style image failsafe
+?image failsafe
+?failsafe
+ Some terminal drivers provide code to optimize rendering of image data
+ within a rectangular 2D area.  However this code is known to be imperfect
+ (hence the label EXPERIMENTAL for image support in gnuplot version 4.2).
+ This optimized code may be disabled by using the keyword `failsafe`. E.g.
+
+       plot 'data' with image failsafe
+ 
  Here are some specific comments about particular terminal drivers:
 
  x11 and wxt - Pixels are either repeated or decimated to fit the display
@@ -9045,12 +9196,6 @@ C ... and restart the table:
 
  postscript (pslatex, epslatex, pstex) - Image is copied in its original
        resolution, and sample interpolation is turned off.
-
- png - Output is dependent on the installed version of libgd.
-       gd 1.8.4  No truecolor support, but the driver function works.
-       gd 2.0.4  Truecolor works, but if truecolor is not selected
-                 the image comes out blank.
-       gd 2.0.9  Truecolor works, non-truecolor also works.
 
  See also `rgbimage`.
 5 impulses
@@ -9139,10 +9284,7 @@ C ... and restart the table:
  The `rgbimage` style is intended for plotting 2D images and is similar
  in concept to `image`.  See `image` for details.  The difference is
  that 5D data (x,y,r,g,b) for `plot` and 6D data (x,y,z,r,g,b) for `splot`
- describe the coordinates and color components of an image.  Currently,
- color images are only possible when the sampling grid is rectangular and
- oriented with the view plane.  General orientations must be done with
- filled polygons which only support palette table lookup, not primary colors.
+ describe the coordinates and color components of an image.
 
  See also `image`.
 5 vectors
@@ -9400,10 +9542,16 @@ C ... and restart the table:
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
                 { font "name{,<size>}" }
                 { textcolor <colorspec> }
+       set tics {front | back}
        unset tics
        show tics
 
- All specified options apply to all axes, i.e., x, y, z, x2, y2, and cb.
+ The options in the first set above can be applied individually to
+ any or all axes, i.e., x, y, z, x2, y2, and cb.
+
+ Set tics `front` or `back` applies to all axes at once, but only for 2D plots
+ (not splot).  It controls whether the tics are placed behind or in front of
+ the plot elements, in the case that there is overlap.
 
  `axis` or `border` tells `gnuplot` to put the tics (both the tics themselves
  and the accompanying labels) along the axis or the border, respectively.  If
@@ -9588,7 +9736,7 @@ C ... and restart the table:
 
  Syntax:
        set title {"<title-text>"} {offset <offset>} {font "<font>{,<size>}"}
-                 {{textcolor | tc} {lt <line_type> | default}} {{no}enhanced}
+                 {{textcolor | tc} {<colorspec> | default}} {{no}enhanced}
        show title
 
  If <offset> is specified by either x,y or x,y,z the title is moved by the
@@ -9602,7 +9750,9 @@ C ... and restart the table:
  <font> is used to specify the font with which the title is to be written;
  the units of the font <size> depend upon which terminal is used.
 
- `textcolor lt <n>` sets the text color to that of line type <n>.
+ `textcolor <colorspec>` changes the color of the text. <colorspec> can be a
+ linetype, an rgb color, or a palette mapping. See help for `colorspec` and
+ `palette`.
 
  `noenhanced` requests that the title not be processed by the enhanced text
  mode parser, even if enhanced text mode is currently active.
@@ -10173,7 +10323,7 @@ C ... and restart the table:
  Format (or omission) of the tic labels is controlled by `set format`, unless
  the explicit text of a label is included in the `set xtics ("<label>")` form.
 
- Minor (unlabelled) tics can be added automatically by the `set mxtics` 
+ Minor (unlabelled) tics can be added automatically by the `set mxtics`
  command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
 
  In case of timeseries data, position values must be given as quoted dates
@@ -10219,7 +10369,7 @@ C ... and restart the table:
        show xyplane
 
  The form `set ticslevel <frac>` places the xy plane below the range in Z, where
- the distance from the xy plane to Zmin is given as a fraction of the total 
+ the distance from the xy plane to Zmin is given as a fraction of the total
  range in z.  The default value is 0.5.  Negative values are permitted, but tic
  labels on the three axes may overlap.
 
@@ -10609,6 +10759,7 @@ C ... and restart the table:
 
  Syntax:
        splot {<ranges>}
+             {<iteration>}
              <function> | "<datafile>" {datafile-modifiers}}
              {<title-spec>} {with <style>}
              {, {definitions,} <function> ...}
@@ -10842,7 +10993,7 @@ C ... and restart the table:
      plot `a.dat` matrix
      plot `a.dat` matrix using 1:3
      plot 'a.gpbin' {matrix} binary using 1:3
- will plot rows of the matrix, while using 2:3 will plot matrix columns, and 
+ will plot rows of the matrix, while using 2:3 will plot matrix columns, and
  using 1:2 the point coordinates (rather useless). Applying the `every` option
  you can specify explicit rows and columns.
 

@@ -1,3 +1,7 @@
+2007-03-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Cross-reference 'set datafile fortran'.
+
 2007-03-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.h src/graphics.c (plot_image_or_update_axes)
