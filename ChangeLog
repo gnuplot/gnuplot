@@ -1,6 +1,11 @@
-2007-03-27  Ethan Merritt  <merritt@u.washington.edu>
+2007-03-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Cross-reference 'set datafile fortran'.
+
+	* plot2d.c (eval_plots) plot3d.c (eval_3dplots): Keep track of whether
+	we are in the midst of defining a parametric equation, so that the commas
+	separating parametric components do not trigger premature iteration of a
+	for [] specification.
 
 2007-03-25  Timothee Lecomte  <timothee.lecomte@ens.fr>
 

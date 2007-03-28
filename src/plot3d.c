@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.140 2007/02/08 21:15:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.141 2007/02/25 13:07:56 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1172,12 +1172,13 @@ eval_3dplots()
      * after the x/yrange is defined.
      */
     check_for_iteration();
-    start_token = c_token;
+
     while (TRUE) {
 	if (END_OF_COMMAND)
 	    int_error(c_token, "function to plot expected");
 
-	start_token = c_token;
+	if (crnt_param == 0)
+	    start_token = c_token;
 
 	if (is_definition(c_token)) {
 	    define();
@@ -1193,7 +1194,8 @@ eval_3dplots()
 #ifdef EAM_DATASTRINGS
 	    TBOOLEAN set_labelstyle = FALSE;
 #endif
-	    start_token = c_token;
+	    if (!parametric || crnt_param == 0)
+		start_token = c_token;
 
 	    dummy_func = &plot_func;
 	    /* WARNING: do NOT free name_str */
@@ -1672,6 +1674,14 @@ eval_3dplots()
 
 	}			/* !is_definition() : end of scope of this_plot */
 
+	if (crnt_param != 0) {
+	    if (equals(c_token, ",")) {
+		c_token++;
+		continue;
+	    } else
+		break;
+	}
+
 	/* Iterate-over-plot mechanisms */
 	if (next_iteration()) {
 	    c_token = start_token;
@@ -1784,7 +1794,9 @@ eval_3dplots()
 	    } else {
 		struct at_type *at_ptr;
 		char *name_str;
-		start_token = c_token;
+
+		if (crnt_param == 0)
+		    start_token = c_token;
 
 		dummy_func = &plot_func;
 		name_str = string_or_express(&at_ptr);
@@ -1841,14 +1853,15 @@ eval_3dplots()
 	    }			/* !is_definition */
 
 	    /* Iterate-over-plot mechanism */
-	    if (next_iteration()) {
+	    if (crnt_param == 0 && next_iteration()) {
 		c_token = start_token;
 		continue;
 	    }
 
 	    if (equals(c_token, ",")) {
 		c_token++;
-		check_for_iteration();
+		if (crnt_param == 0)
+		    check_for_iteration();
 	    } else
 		break;
 

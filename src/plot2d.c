@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.142 2007/01/22 03:22:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.143 2007/01/28 23:26:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1286,7 +1286,8 @@ eval_plots()
     struct curve_points *this_plot, **tp_ptr;
     t_uses_axis uses_axis[AXIS_ARRAY_SIZE];
     int some_functions = 0;
-    int plot_num, line_num, point_num, xparam = 0;
+    int plot_num, line_num, point_num;
+    TBOOLEAN in_parametric = FALSE;
     int pattern_num;
     char *xtitle = NULL;
     int begin_token = c_token;  /* so we can rewind for second pass */
@@ -1311,7 +1312,7 @@ eval_plots()
     /* Reset first_plot. This is usually done at the end of this function.
      * If there is an error within this function, the memory is left allocated,
      * since we cannot call cp_free if the list is incomplete. Making sure that
-     * the list structure is always vaild requires some rewriting */
+     * the list structure is always valid requires some rewriting */
     first_plot = NULL;
 
     tp_ptr = &(first_plot);
@@ -1331,8 +1332,10 @@ eval_plots()
     while (TRUE) {
         if (END_OF_COMMAND)
             int_error(c_token, "function to plot expected");
-	start_token = c_token;
+
 	this_plot = NULL;
+	if (!in_parametric)
+	    start_token = c_token;
 
 #ifdef EAM_HISTOGRAMS
         if (almost_equals(c_token,"newhist$ogram")) {
@@ -1394,7 +1397,7 @@ eval_plots()
             dummy_func = NULL;
 
             if (name_str) { /* data file to plot */
-                if (parametric && xparam)
+                if (parametric && in_parametric)
                     int_error(c_token, "previous parametric function not fully specified");
 
                 if (*tp_ptr)
@@ -1429,7 +1432,7 @@ eval_plots()
 
                 some_functions = 1;
                 if (parametric) /* working on x parametric function */
-                    xparam = 1 - xparam;
+                    in_parametric = !in_parametric;
                 if (*tp_ptr) {
                     this_plot = *tp_ptr;
                     cp_extend(this_plot, samples_1 + 1);
@@ -1489,7 +1492,7 @@ eval_plots()
                         duplication=TRUE;
                         break;
                     }
-                    if (parametric && xparam)
+                    if (parametric && in_parametric)
                         int_error(c_token, "previous parametric function not fully specified");
 
                     c_token++;
@@ -1532,7 +1535,7 @@ eval_plots()
                     this_plot->title_no_enhanced = !key->enhanced;
                         /* title can be enhanced if not explicitly disabled */
                     if (parametric) {
-                        if (xparam)
+                        if (in_parametric)
                             int_error(c_token, "\"title\" allowed only after parametric function fully specified");
                         else if (xtitle != NULL)
                             xtitle[0] = '\0';       /* Remove default title . */
@@ -1565,7 +1568,7 @@ eval_plots()
                         duplication=TRUE;
                         break;
                     }
-                    if (parametric && xparam)
+                    if (parametric && in_parametric)
                         int_error(c_token, "\"with\" allowed only after parametric function fully specified");
                     this_plot->plot_style = get_style();
                     if (this_plot->plot_style == FILLEDCURVES) {
@@ -1702,7 +1705,7 @@ eval_plots()
                 this_plot->title_no_enhanced = TRUE; /* filename or function cannot be enhanced */
                 if (key->auto_titles == FILENAME_KEYTITLES) {
                     m_capture(&(this_plot->title), start_token, end_token);
-                    if (xparam)
+                    if (in_parametric)
                         xtitle = this_plot->title;
                     this_plot->title_is_filename = TRUE;
                 } else if (xtitle != NULL)
@@ -1867,7 +1870,7 @@ eval_plots()
                 /* separate record of datafile and func */
                 uses_axis[x_axis] |= USES_AXIS_FOR_DATA;
                 uses_axis[y_axis] |= USES_AXIS_FOR_DATA;
-            } else if (!parametric || !xparam) {
+            } else if (!parametric || !in_parametric) {
                 /* for x part of a parametric function, axes are
                  * possibly wrong */
                 /* separate record of data and func */
@@ -1875,7 +1878,7 @@ eval_plots()
                 uses_axis[y_axis] |= USES_AXIS_FOR_FUNC;
             }
 
-            if (!xparam
+            if (!in_parametric
 #ifdef WITH_IMAGE
                 && this_plot->plot_style != IMAGE
                 && this_plot->plot_style != RGBIMAGE
@@ -1957,6 +1960,14 @@ eval_plots()
 
         } /* !is_defn */
 
+	if (in_parametric) {
+	    if (equals(c_token, ",")) {
+		c_token++;
+		continue;
+	    } else
+		break;
+	}
+
 	/* Iterate-over-plot mechanism */
 	if (empty_iteration() && this_plot) {
 	    this_plot->plot_type = NODATA;
@@ -1972,8 +1983,8 @@ eval_plots()
             break;
     }
 
-    if (parametric && xparam)
-        int_error(NO_CARET, "parametric function not fully specified");
+    if (parametric && in_parametric)
+	int_error(NO_CARET, "parametric function not fully specified");
 
 
 /*** Second Pass: Evaluate the functions ***/
@@ -2054,8 +2065,9 @@ eval_plots()
 
         /* Read through functions */
         while (TRUE) {
-	    start_token = c_token;
-	    
+	    if (!in_parametric)
+		start_token = c_token;
+
             if (is_definition(c_token)) {
                 define();
 
@@ -2076,7 +2088,7 @@ eval_plots()
 
                 if (!name_str) {            /* function to plot */
                     if (parametric) {   /* toggle parametric axes */
-                        xparam = 1 - xparam;
+			in_parametric = !in_parametric;
                     }
                     plot_func.at = at_ptr;
 
@@ -2166,7 +2178,7 @@ eval_plots()
                                 dmy_type = INRANGE;
                                 STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, xhigh, dmy_type, x_axis, NOOP, NOOP );
                             }
-                            STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, y_axis + (x_axis - y_axis) * xparam, NOOP, goto come_here_if_undefined);
+                            STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, in_parametric ? x_axis : y_axis, NOOP, goto come_here_if_undefined);
 
                             /* could not use a continue in this case */
                           come_here_if_undefined:
@@ -2185,14 +2197,15 @@ eval_plots()
             }
 
 	    /* Iterate-over-plot mechanism */
-	    if (next_iteration()) {
+	    if (!in_parametric && next_iteration()) {
 		c_token = start_token;
 		continue;
 	    }
 
             if (equals(c_token, ",")) {
                 c_token++;
-		check_for_iteration();
+		if (!in_parametric)
+		    check_for_iteration();
             } else
                 break;
         }
