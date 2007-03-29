@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.421 2007/02/27 04:04:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.423 2007/03/28 22:22:43 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1278,6 +1278,24 @@ C
  beg through end of the original string. This is exactly equivalent to the
  expression "string"[beg:end] except that you do not have the option of
  ommitting beg or end.
+4 strftime
+?expressions functions strftime
+?functions strftime
+?strftime
+#strftime("timeformat",t) & any & string result from applying gnuplot's time parser \\
+%strftime("timeformat",t)@any@string result from applying gnuplot's time parser
+ `strftime("timeformat",t)` applies the timeformat specifiers to the time t
+ given in seconds since the year 2000. 
+ See `time_specifiers` and `strptime`.
+4 strptime
+? expressions functions strptime
+?functions strptime
+?strptime
+#strptime("timeformat",s) & string & seconds since year 2000 as given in string s \\
+%strptime("timeformat",s)@string@seconds since year 2000 as given in string s
+ `strptime("timeformat",s)` reads the time from the string s using the
+ timeformat specifiers and converts it into seconds since the year 2000.
+ See `time_specifiers` and `strftime`.
 4 system
 ?expressions functions system
 ?functions system
@@ -6117,20 +6135,21 @@ C ... and restart the table:
        %A           full name of day of the week
        %b or %h     abbreviated name of the month
        %B           full name of the month
-       %d           day of the month, 1--31
-       %D           shorthand for "%m/%d/%y"
+       %d           day of the month, 01--31
+       %D           shorthand for "%m/%d/%y" (only output)
+       %F           shorthand for "%Y-%m-%d" (only output)
        %k           hour, 0--23 (one or two digits)
        %H           hour, 00--23 (always two digits)
-       *l           hour, 1--12 (one or two digits)
+       %l           hour, 1--12 (one or two digits)
        %I           hour, 01--12 (always two digits)
        %j           day of the year, 1--366
-       %m           month, 1--12
+       %m           month, 01--12
        %M           minute, 0--60
        %p           "am" or "pm"
-       %r           shorthand for "%I:%M:%S %p"
-       %R           shorthand for "%H:%M"
+       %r           shorthand for "%I:%M:%S %p" (only output)
+       %R           shorthand for "%H:%M" (only output)
        %S           second, 0--60
-       %T           shorthand for "%H:%M:%S"
+       %T           shorthand for "%H:%M:%S" (only output)
        %U           week of the year (week starts on Sunday)
        %w           day of the week, 0--6 (Sunday = 0)
        %W           week of the year (week starts on Monday)
@@ -6145,7 +6164,8 @@ C ... and restart the table:
 #\verb@%b@ or \verb@%h@ & abbreviated name of the month \\
 #\verb@%B@ & full name of the month \\
 #\verb@%d@ & day of the month, 1--31 \\
-#\verb@%D@ & shorthand for \verb@"%m/%d/%y"@ \\
+#\verb@%D@ & shorthand for \verb@"%m/%d/%y"@ (only output) \\
+#\verb@%F@ & shorthand for \verb@"%Y-%m-%d"@ (only output) \\
 #\verb@%k@ & hour, 0--23 (one or two digits)\\
 #\verb@%H@ & hour, 00--23 (always two digits)\\
 #\verb@%l@ & hour, 1--12  (one or two digits)\\
@@ -6154,10 +6174,10 @@ C ... and restart the table:
 #\verb@%m@ & month, 1--12 \\
 #\verb@%M@ & minute, 0--60 \\
 #\verb@%p@ & "am" or "pm" \\
-#\verb@%r@ & shorthand for \verb@"%I:%M:%S %p"@ \\
-#\verb@%R@ & shorthand for \verb@%H:%M"@ \\
+#\verb@%r@ & shorthand for \verb@"%I:%M:%S %p"@ (only output)\\
+#\verb@%R@ & shorthand for \verb@%H:%M"@ (only output)\\
 #\verb@%S@ & second, 0--60 \\
-#\verb@%T@ & shorthand for \verb@"%H:%M:%S"@ \\
+#\verb@%T@ & shorthand for \verb@"%H:%M:%S"@ (only output)\\
 #\verb@%U@ & week of the year (week starts on Sunday) \\
 #\verb@%w@ & day of the week, 0--6 (Sunday = 0) \\
 #\verb@%W@ & week of the year (week starts on Monday) \\
@@ -6171,7 +6191,8 @@ C ... and restart the table:
 %%b or %h@abbreviated name of the month
 %%B@full name of the month
 %%d@day of the month, 1--31
-%%D@shorthand for "%m/%d/%y"
+%%D@shorthand for "%m/%d/%y" (only output)
+%%F@shorthand for "%Y-%m-%d" (only output)
 %%k@hour, 0--23 (one or two digits)
 %%H@hour, 00--23 (always two digits)
 %%l@hour, 1--12 (one or two digits)
@@ -6180,10 +6201,10 @@ C ... and restart the table:
 %%m@month, 1--12
 %%M@minute, 0--60
 %%p@"am" or "pm"
-%%r@shorthand for "%I:%M:%S %p"
-%%R@shorthand for %H:%M"
+%%r@shorthand for "%I:%M:%S %p" (only output)
+%%R@shorthand for %H:%M" (only output)
 %%S@second, 0--60
-%%T@shorthand for "%H:%M:%S"
+%%T@shorthand for "%H:%M:%S" (only output)
 %%U@week of the year (week starts on Sunday)
 %%w@day of the week, 0--6 (Sunday = 0)
 %%W@week of the year (week starts on Monday)

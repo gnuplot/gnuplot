@@ -1,3 +1,12 @@
+2007-03-29  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/eval.c src/gp_time.h src/internal.c (f_strftime f_strptime)
+	src/internal.h demo/stringvar.dem docs/gnuplot.doc:
+	Introduce two new functions 'strftime' and 'strptime', which do
+	essentially the same as the standard C functions with the same names,
+	but use seconds since 2000 instead of struct tm.
+	(Patchset #1199186 July 2005). 
+
 2007-03-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/4D_data.dem demo/all.dem: Rename demo so that the filename is

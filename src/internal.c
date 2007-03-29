@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.39 2006/06/10 00:35:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.40 2006/06/11 17:42:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -40,6 +40,9 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.39 2006/06/10 00:35:26 
 #include "stdfn.h"
 #include "alloc.h"
 #include "util.h"		/* for int_error() */
+#ifdef GP_STRING_VARS
+# include "gp_time.h"           /* for str(p|f)time */
+#endif
 #include "command.h"            /* for do_system_func */
 
 #include <math.h>
@@ -1337,6 +1340,86 @@ f_gprintf(union argument *arg)
 
     gpfree_string(&fmt);
     free(buffer);
+}
+
+
+/* Output time given in seconds from year 2000 into string */
+void
+f_strftime(union argument *arg)
+{
+    struct value fmt, val;
+    char *fmtstr, *buffer;
+    int fmtlen, buflen, length;
+
+    (void) arg; /* Avoid compiler warnings */
+
+    /* Retrieve parameters from top of stack */
+    pop(&val);
+    pop(&fmt);
+    if ( fmt.type != STRING )
+	int_error(NO_CARET,
+		  "First parameter to strftime must be a format string");
+
+    /* Prepare format string.
+     * Make sure the resulting string not empty by adding a space.
+     * Otherwise, the return value of gstrftime doesn't give enough
+     * information.
+     */
+    fmtlen = strlen(fmt.v.string_val) + 1;
+    fmtstr = gp_alloc(fmtlen + 1, "f_strftime: fmt");
+    strncpy(fmtstr, fmt.v.string_val, fmtlen);
+    strncat(fmtstr, " ", fmtlen);
+    buflen = 80 + 2*fmtlen;
+    buffer = gp_alloc(buflen, "f_strftime: buffer");
+
+    /* Get time_str */
+    length = gstrftime(buffer, buflen, fmtstr, real(&val));
+    if (length == 0 || length >= buflen)
+	int_error(NO_CARET, "Resulting string is too long");
+
+    /* Remove trailing space */
+    assert(buffer[length-1] == ' ');
+    buffer[length-1] = NUL;
+    buffer = gp_realloc(buffer, strlen(buffer)+1, "f_strftime");
+    FPRINTF((stderr," strftime result = \"%s\"\n",buffer));
+
+    gpfree_string(&val);
+    gpfree_string(&fmt);
+    free(fmtstr);
+
+    push(Gstring(&val, buffer));
+}
+
+/* Convert string into seconds from year 2000 */
+void
+f_strptime(union argument *arg)
+{
+    struct value fmt, val;
+    struct tm time_tm;
+    double result;
+
+    (void) arg; /* Avoid compiler warnings */
+
+    pop(&val);
+    pop(&fmt);
+
+    if ( fmt.type != STRING || val.type != STRING )
+	int_error(NO_CARET,
+		  "Both parameters to strptime must be strings");
+    if ( !fmt.v.string_val || !val.v.string_val )
+	int_error(NO_CARET, "Internal error: string not allocated");
+
+
+    /* string -> time_tm */
+    gstrptime(val.v.string_val, fmt.v.string_val, &time_tm);
+
+    /* time_tm -> result */
+    result = gtimegm(&time_tm);
+    FPRINTF((stderr," strptime result = %g seconds \n", result));
+
+    gpfree_string(&val);
+    gpfree_string(&fmt);
+    push(Gcomplex(&val, result, 0.0));
 }
 
 
