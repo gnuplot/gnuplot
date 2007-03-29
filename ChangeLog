@@ -1,3 +1,8 @@
+2007-03-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/4D_data.dem demo/all.dem: Rename demo so that the filename is
+	consistent with the demo scripts.
+
 2007-03-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Cross-reference 'set datafile fortran'.
