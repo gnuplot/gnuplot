@@ -3,6 +3,9 @@
 	* demo/4D_data.dem demo/all.dem: Rename demo so that the filename is
 	consistent with the demo scripts.
 
+	* missing:  If makeinfo is not found, make the resulting error message
+	non-fatal.  Bug #1682491
+
 2007-03-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Cross-reference 'set datafile fortran'.
