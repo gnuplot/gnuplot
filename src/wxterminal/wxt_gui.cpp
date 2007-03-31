@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.34 2006/11/10 22:52:22 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.35 2006/11/28 20:25:47 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1510,6 +1510,10 @@ void wxt_graphics()
 	/* update the window scale factor first, cairo needs it */
 	wxt_current_plot->xscale = 1.0;
 	wxt_current_plot->yscale = 1.0;
+
+	/* set the line properties */
+	/* FIXME: should this be in wxt_settings_apply() ? */
+	wxt_current_plot->rounded = wxt_rounded;
 
 	/* apply the queued rendering settings */
 	wxt_current_panel->wxt_settings_apply();

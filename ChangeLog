@@ -1,3 +1,11 @@
+2007-03-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/wxt.trm (wxt_options) src/wxterminal/wxt_term.h 
+	src/wxterminal/gp_cairo.c (gp_cairo_initialize_context)
+	src/wxterminal/gp_cairo.h src/wxterminal/wxt_gui.cpp (wxt_graphics):
+	Add explicit line cap and join properties for cairo output.
+	Allows  "set term wxt {rounded|butt}"
+
 2007-03-29  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/eval.c src/gp_time.h src/internal.c (f_strftime f_strptime)

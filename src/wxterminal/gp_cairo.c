@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.19 2007/03/25 21:06:27 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.20 2007/03/25 21:15:39 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -204,8 +204,15 @@ void gp_cairo_initialize_context(plot_struct *plot)
 			0.5, 0.5);
 	cairo_set_matrix(plot->cr, &matrix);
 
-	/* square caps */
-	cairo_set_line_cap  (plot->cr, CAIRO_LINE_CAP_SQUARE/*BUTT*/);
+	/* Default is square caps, mitered joins */
+	if (plot->rounded) {
+	    cairo_set_line_cap  (plot->cr, CAIRO_LINE_CAP_ROUND);
+	    cairo_set_line_join (plot->cr, CAIRO_LINE_JOIN_ROUND);
+	} else {
+	    cairo_set_line_cap  (plot->cr, CAIRO_LINE_CAP_SQUARE);
+	    cairo_set_line_join (plot->cr, CAIRO_LINE_JOIN_MITER);
+	}
+
 }
 
 
