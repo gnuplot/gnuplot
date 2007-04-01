@@ -1,3 +1,10 @@
+2007-04-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (gprintf):  Accept the ' format specifier, which
+	asks for digits to be grouped and separated according to the current
+	locale.  We just pass it on to the C library for application.
+	Bug #1692550
+
 2007-03-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/wxt.trm (wxt_options) src/wxterminal/wxt_term.h 

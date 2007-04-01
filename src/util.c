@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.65 2006/08/22 03:08:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.66 2007/02/23 17:46:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -567,7 +567,8 @@ gprintf(
 	*t++ = '%';
 	/* dont put isdigit first since sideeffect in macro is bad */
 	while (*++format == '.' || isdigit((unsigned char) *format)
-	       || *format == '-' || *format == '+' || *format == ' ')
+	       || *format == '-' || *format == '+' || *format == ' '
+	       || *format == '\'')
 	    *t++ = *format;
 	/*}}} */
 
