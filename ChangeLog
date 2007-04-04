@@ -1,3 +1,13 @@
+2007-04-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: The counter for X11_GR_BINARY_POLYGON segments must
+	be static, so that the count continues after re-entry. Bug #1694162.
+
+	* term/x11.trm (X11_filled_polygon): Use X11_GR_BINARY_POLYGON as
+	tag for all segments of a binary filled polygon.  Continuation
+	segments were not being marked as binary. It wasn't causing obvious
+	problems, but...
+
 2007-04-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gprintf):  Accept the ' format specifier, which

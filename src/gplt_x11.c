@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.172 2007/01/10 22:39:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.173 2007/01/14 05:34:29 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2544,7 +2544,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    static TBOOLEAN code_detected = 0;
 	    static XPoint *points = NULL;
 	    static int st_npoints = 0;
-	    int npoints = 0, style = 0;
+	    static int npoints = 0, style = 0;
 
 	    /* The first value read will be the number of points or the number of
 	     * points followed by style.  Set up parameters to point to npoints.

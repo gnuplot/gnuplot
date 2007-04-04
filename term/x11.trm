@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.163 2006/12/27 21:40:29 sfeam Exp $
+ * $Id: x11.trm,v 1.164 2007/01/14 05:34:29 sfeam Exp $
  *
  */
 
@@ -1619,7 +1619,7 @@ X11_filled_polygon(int points, gpiPoint *corners)
 		if (!i_buffer) {
 		    fputc('\n', X11_ipc);  FFLUSH();               /* End of chunk. */
 		    i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
-		    fputc(X11_GR_FILLED_POLYGON, X11_ipc);         /* Will be another chunk. */
+		    fputc(X11_GR_BINARY_POLYGON, X11_ipc);         /* Will be another chunk. */
 		}
 	    }
 
