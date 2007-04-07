@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.66 2007/02/23 17:46:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.67 2007/04/02 04:04:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -43,6 +43,10 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.66 2007/02/23 17:46:17 sfea
 #include "plot.h"
 /*  #include "setshow.h" */		/* for month names etc */
 #include "term_api.h"		/* for term_end_plot() used by graph_error() */
+
+#if defined(HAVE_LOCALE_H)
+#include "variable.h"
+#endif
 
 #if defined(HAVE_DIRENT_H)
 # include <sys/types.h>
@@ -547,11 +551,21 @@ gprintf(
     int stored_power = 0;	/* power that matches the mantissa
                                    output earlier */
 
+#ifdef HAVE_LOCALE_H
+    if (numeric_locale)
+	setlocale(LC_NUMERIC,numeric_locale);
+#endif
+
     for (;;) {
 	/*{{{  copy to dest until % */
 	while (*format != '%')
-	    if (!(*dest++ = *format++))
+	    if (!(*dest++ = *format++)) {
+#ifdef HAVE_LOCALE_H
+		if (numeric_locale)
+		    setlocale(LC_NUMERIC,"C");
+#endif
 		return;		/* end of format */
+	    }
 	/*}}} */
 
 	/*{{{  check for %% */
@@ -725,6 +739,10 @@ gprintf(
 	    }
 	    /*}}} */
 	default:
+#ifdef HAVE_LOCALE_H
+ 	   if (numeric_locale)
+		setlocale(LC_NUMERIC,"C");
+#endif
 	    int_error(NO_CARET, "Bad format character");
 	} /* switch */
 	/*}}} */
@@ -765,6 +783,11 @@ gprintf(
 	dest += strlen(dest);
 	++format;
     } /* for ever */
+
+#ifdef HAVE_LOCALE_H
+    if (numeric_locale)
+	setlocale(LC_NUMERIC,"C");
+#endif
 }
 
 /*}}} */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.22 2005/09/26 04:19:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.23 2005/11/23 23:33:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -285,17 +285,7 @@ get_num(char str[])
 	    int_error(t_num, "integer overflow; change to floating point");
     } else {
 	token[t_num].l_val.v.cmplx_val.imag = 0.0;
-#ifdef HAVE_LOCALE_H
-	/* Always read numbers on command line as C locale */
-	if (strcmp(localeconv()->decimal_point,".")) {
-	    char *save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
-	    setlocale(LC_NUMERIC,"C");
-	    token[t_num].l_val.v.cmplx_val.real = atof(str);
-	    setlocale(LC_NUMERIC,save_locale);
-	    free(save_locale);
-	} else
-#endif
-	    token[t_num].l_val.v.cmplx_val.real = atof(str);
+	token[t_num].l_val.v.cmplx_val.real = atof(str);
     }
     return (count);
 }

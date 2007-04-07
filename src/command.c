@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.148 2007/02/10 08:18:03 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.149 2007/02/11 13:35:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -85,6 +85,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.148 2007/02/10 08:18:03 
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
+#include "variable.h"
 
 #ifdef USE_MOUSE
 # include "mouse.h"
@@ -1364,7 +1365,6 @@ save_command()
 {
     FILE *fp;
     char *save_file = NULL;
-    char *save_locale = NULL;
     int what;
 
     c_token++;
@@ -1397,14 +1397,6 @@ save_command()
     if (!fp)
 	os_error(c_token, "Cannot open save file");
 
-#ifdef HAVE_LOCALE_H
-    /* Make sure that numbers in the saved gnuplot commands use standard form */
-    if (strcmp(localeconv()->decimal_point,".")) {
-	save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
-	setlocale(LC_NUMERIC,"C");
-    }
-#endif
-
     switch (what) {
 	case SAVE_FUNCS:
 	    save_functions(fp);
@@ -1423,12 +1415,9 @@ save_command()
     }
 
 #ifdef HAVE_LOCALE_H
-    if (save_locale) {
-	setlocale(LC_NUMERIC,save_locale);
-	free(save_locale);
-	fprintf(fp, "set decimalsign locale \"%s\"\n", setlocale(LC_NUMERIC,NULL));
-	fprintf(fp, "set decimalsign '%s'\n", decimalsign);
-    }
+    if (numeric_locale)
+	fprintf(fp, "set decimalsign locale \"%s\"\n", numeric_locale);
+    fprintf(fp, "set decimalsign '%s'\n", decimalsign);
 #endif
 
     if (stdout != fp) {
@@ -1532,7 +1521,6 @@ se tit'R,G,B profiles of the current color palette';";
     TBOOLEAN save_is_cb_plot;
 #endif
     FILE *f = tmpfile();
-    char *save_locale = NULL;
 
     c_token++;
     /* parse optional option */
@@ -1551,14 +1539,6 @@ se tit'R,G,B profiles of the current color palette';";
     }
     if (!f)
 	int_error(NO_CARET, "cannot write temporary file");
-
-#ifdef HAVE_LOCALE_H
-    /* Make sure that numbers in the saved gnuplot commands use standard form */
-    if (strcmp(localeconv()->decimal_point,".")) {
-	save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
-	setlocale(LC_NUMERIC,"C");
-    }
-#endif
 
     /* generate r,g,b curves */
     for (i = 0; i < test_palette_colors; i++) {
@@ -1618,12 +1598,9 @@ se tit'R,G,B profiles of the current color palette';";
     save_set(f);
 
 #ifdef HAVE_LOCALE_H
-    if (save_locale) {
-	setlocale(LC_NUMERIC,save_locale);
-	free(save_locale);
-	fprintf(f, "set decimalsign locale \"%s\"\n", setlocale(LC_NUMERIC,NULL));
-	fprintf(f, "set decimalsign '%s'\n", decimalsign);
-    }
+    if (numeric_locale)
+	fprintf(f, "set decimalsign locale \"%s\"\n", numeric_locale);
+    fprintf(f, "set decimalsign '%s'\n", decimalsign);
 #endif
 
     /* execute all commands from the temporary file */

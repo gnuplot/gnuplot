@@ -1,3 +1,12 @@
+2007-04-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/mouse.c src/scanner.c src/set.c src/show.c
+	src.unset.c src/variable.c src/variable.h:  Instead of immediately
+	applying the locale requested by "set decimal locale {foo}", save the
+	requested locale string and apply it only during execution of gprintf().
+	This prevents leakage of the numeric locale into terminal driver code
+	(Bug #1692541), and simplifies the code used in save and show.
+
 2007-04-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: The counter for X11_GR_BINARY_POLYGON segments must

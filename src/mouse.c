@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.85 2006/07/18 05:20:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.86 2007/02/10 00:14:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -653,19 +653,7 @@ apply_zoom(struct t_zoom *z)
     }
 
     flip = (is_splot_map && zoom_now->was_splot_map);
-#ifdef HAVE_LOCALE_H
-    if (strcmp(localeconv()->decimal_point,".")) {
-	char *save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
-	setlocale(LC_NUMERIC,"C");
-	sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
-	       zoom_now->xmin, zoom_now->xmax, 
-	       (flip) ? zoom_now->ymax : zoom_now->ymin,
-	       (flip) ? zoom_now->ymin : zoom_now->ymax);
-	setlocale(LC_NUMERIC,save_locale);
-	free(save_locale);
-    } else
-#endif
-	sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
+    sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
 	       zoom_now->xmin, zoom_now->xmax, 
 	       (flip) ? zoom_now->ymax : zoom_now->ymin,
 	       (flip) ? zoom_now->ymin : zoom_now->ymax);
@@ -703,18 +691,7 @@ apply_zoom(struct t_zoom *z)
     }
 
     if (!is_3d_plot) {
-#ifdef HAVE_LOCALE_H
-	if (strcmp(localeconv()->decimal_point,".")) {
-	    char *save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
-	    setlocale(LC_NUMERIC,"C");
-	    sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
-		zoom_now->x2min, zoom_now->x2max,
-		zoom_now->y2min, zoom_now->y2max);
-	    setlocale(LC_NUMERIC,save_locale);
-	    free(save_locale);
-	} else
-#endif
-	    sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
+	sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
 		zoom_now->x2min, zoom_now->x2max,
 		zoom_now->y2min, zoom_now->y2max);
 	if (zoom_now == zoom_head) {

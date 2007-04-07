@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.26 2006/02/27 07:09:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.27 2006/06/27 02:36:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -44,6 +44,9 @@ static char *RCSid() { return RCSid("$Id: variable.c,v 1.26 2006/02/27 07:09:24 
 #include "command.h"
 #include "util.h"
 
+/* Holds the name of the current locale from LC_NUMERIC */
+/* as set by "set decimal locale" */
+char *numeric_locale = NULL;
 
 #define PATHSEP_TO_NUL(arg)			\
 do {						\

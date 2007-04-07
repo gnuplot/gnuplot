@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.191 2006/12/27 21:40:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.192 2007/02/06 23:56:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -164,8 +164,6 @@ static char *num_to_str __PROTO((double r));
 
 static int var_show_all = 0;
 
-static char *save_locale = NULL;
-
 /* following code segment appears over and over again */
 
 #define SHOW_NUM_OR_TIME(x, axis) SAVE_NUM_OR_TIME(stderr, x, axis)
@@ -197,12 +195,6 @@ show_command()
     c_token++;
 
     token_found = lookup_table(&set_tbl[0],c_token);
-
-#ifdef HAVE_LOCALE_H
-    /* Report internal values in C locale (dot for decimal sign) */
-       save_locale = gp_strdup(setlocale(LC_NUMERIC,NULL));
-       setlocale(LC_NUMERIC,"C");
-#endif
 
     /* rationalize c_token advancement stuff a bit: */
     if (token_found != S_INVALID)
@@ -639,14 +631,6 @@ show_command()
 	error_message = "invalid or deprecated syntax";
 	break;
     }
-
-#ifdef HAVE_LOCALE_H
-    if (save_locale) {
-       setlocale(LC_NUMERIC,save_locale);
-       free(save_locale);
-       save_locale = NULL;
-    }
-#endif
 
     if (error_message)
 	int_error(c_token,error_message);
@@ -2381,9 +2365,10 @@ show_decimalsign()
 {
     SHOW_ALL_NL;
 #ifdef HAVE_LOCALE_H
-    if (save_locale) {
-	setlocale(LC_NUMERIC,save_locale);
+    if (numeric_locale) {
+	setlocale(LC_NUMERIC,numeric_locale);
 	fprintf(stderr, "\tdecimalsign for input is  %s \n", localeconv()->decimal_point);
+	setlocale(LC_NUMERIC,"C");
     }
 #endif
     if (decimalsign!=NULL)
@@ -2764,8 +2749,8 @@ show_locale()
     SHOW_ALL_NL;
     locale_handler(ACTION_SHOW,NULL);
 #ifdef HAVE_LOCALE_H
-    /* We reset LC_NUMERIC locale explicitly to C, so we must undo it here */
-    fprintf(stderr, "\tLC_NUMERIC is %s\n", setlocale(LC_NUMERIC,save_locale));
+    if (numeric_locale)
+	fprintf(stderr, "\tLC_NUMERIC is %s\n", numeric_locale);
 #endif
 }
 
