@@ -7,6 +7,10 @@
 	This prevents leakage of the numeric locale into terminal driver code
 	(Bug #1692541), and simplifies the code used in save and show.
 
+	* src/command.c (save_command test_palette_subcommand)
+	src/save.c (save_set_all): Consolidate save of "set decimal locale"
+	into save_set_all rather than the multiple calling routines.
+
 2007-04-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: The counter for X11_GR_BINARY_POLYGON segments must

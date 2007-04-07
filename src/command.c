@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.149 2007/02/11 13:35:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.150 2007/04/07 22:31:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1414,12 +1414,6 @@ save_command()
 	    save_all(fp);
     }
 
-#ifdef HAVE_LOCALE_H
-    if (numeric_locale)
-	fprintf(fp, "set decimalsign locale \"%s\"\n", numeric_locale);
-    fprintf(fp, "set decimalsign '%s'\n", decimalsign);
-#endif
-
     if (stdout != fp) {
 #ifdef PIPES
 	if (save_file[0] == '|')
@@ -1596,12 +1590,6 @@ se tit'R,G,B profiles of the current color palette';";
      * for our temporary testing plot.
      */
     save_set(f);
-
-#ifdef HAVE_LOCALE_H
-    if (numeric_locale)
-	fprintf(f, "set decimalsign locale \"%s\"\n", numeric_locale);
-    fprintf(f, "set decimalsign '%s'\n", decimalsign);
-#endif
 
     /* execute all commands from the temporary file */
     rewind(f);
