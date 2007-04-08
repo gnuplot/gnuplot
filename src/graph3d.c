@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.168 2007/02/14 04:12:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.169 2007/03/14 15:58:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -353,6 +353,7 @@ boundary3d(struct surface_points *plots, int count)
 
     key_rows = ptitl_cnt;
     key_cols = 1;
+    if (key->visible)
     if ((key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
 	&& key->margin == GPKEY_BMARGIN) {
 	if (ptitl_cnt > 0) {
@@ -381,6 +382,7 @@ boundary3d(struct surface_points *plots, int count)
     else
 	plot_bounds.ybot = t->v_char * 2.5 + 1;
 
+    if (key->visible)
     if (key_rows && (key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
 	&& key->margin == GPKEY_BMARGIN)
 	plot_bounds.ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
@@ -398,6 +400,7 @@ boundary3d(struct surface_points *plots, int count)
     else /* FIXME: Why no provision for tmargin in terms of character height? */
 	plot_bounds.ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
 
+    if (key->visible)
     if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
 	|| ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
 	    && key->margin == GPKEY_RMARGIN)) {
@@ -413,6 +416,7 @@ boundary3d(struct surface_points *plots, int count)
 	}
     }
     key_rows += ktitle_lines;
+    if (key->visible)
     if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
 	&& key->margin == GPKEY_RMARGIN) {
 	int key_width = key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
@@ -798,6 +802,7 @@ do_3dplot(
     }
     key_point_offset = (key_sample_left + key_sample_right) / 2;
 
+    if (key->visible)
     if (key->region != GPKEY_USER_PLACEMENT) {
 	if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_BMARGIN) {
 	    /* HBB 19990608: why calculate these again? boundary3d has already

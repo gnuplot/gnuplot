@@ -1,3 +1,9 @@
+2007-04-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (boundary3d do_3dplot): Do not reserve space on the
+	canvas for a key if the key is disabled altogether.
+	Bug #1695643
+
 2007-04-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/mouse.c src/scanner.c src/set.c src/show.c
