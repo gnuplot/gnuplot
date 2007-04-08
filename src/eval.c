@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.52 2007/02/23 19:42:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.53 2007/03/30 05:18:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -77,7 +77,7 @@ static int jump_offset;		/* to be modified by 'jump' operators */
 
 /* The table of built-in functions */
 /* HBB 20010725: I've removed all the casts to type (FUNC_PTR) ---
- * According to ANSI/ISO C Standards it causes undefined behaviouf if
+ * According to ANSI/ISO C Standards it causes undefined behaviour if
  * you cast a function pointer to any other type, including a function
  * pointer with a different set of arguments, and then call the
  * function.  Instead, I made all these functions adhere to the common
@@ -267,7 +267,7 @@ apollo_pfm_catch()
 
 /* Exported functions */
 
-/* First, some functions tha help other modules use 'struct value' ---
+/* First, some functions that help other modules use 'struct value' ---
  * these might justify a separate module, but I'll stick with this,
  * for now */
 
@@ -576,7 +576,7 @@ f_jtern(union argument *x)
    at_ptr is a pointer to the action table which must be executed
    (evaluated).
 
-   so the iterated line exectues the function indexed by the at_ptr
+   so the iterated line executes the function indexed by the at_ptr
    and passes the address of the argument which is pointed to by the
    arg_ptr
 
@@ -774,7 +774,7 @@ update_gpval_variables(int context)
     /* These are set every time, which is kind of silly because they */
     /* only change after 'set term' 'set output' ...                 */
     else {
-	/* FIXME! This preventa a segfault if term==NULL, which can */
+	/* FIXME! This prevents a segfault if term==NULL, which can */
 	/* happen if set_terminal() exits via int_error().          */
 	if (!term)
 	    fill_gpval_string("GPVAL_TERM", "unknown");
