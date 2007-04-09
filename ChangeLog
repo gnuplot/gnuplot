@@ -1,3 +1,11 @@
+2007-04-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm (X11_filled_polygon):
+	Fix read beyond end of buffer found by valgrind.
+
+	* src/datafile.c (df_tokenise):
+	Fix uninitialized variable found by valgrind.
+
 2007-04-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (boundary3d do_3dplot): Do not reserve space on the

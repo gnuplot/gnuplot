@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.120 2007/02/27 22:36:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.121 2007/03/09 00:09:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -679,13 +679,14 @@ df_tokenise(char *s)
 
     while (*s) {
 	/* check store - double max cols or add 20, whichever is greater */
-	if (df_max_cols <= df_no_cols)
-	    df_column
-		= gp_realloc(df_column,
-			     (df_max_cols += (df_max_cols < 20
-				      ? 20 : df_max_cols))
-			     * sizeof(df_column_struct),
-			     "datafile column");
+	if (df_max_cols <= df_no_cols) {
+	    int new_max = df_max_cols + (df_max_cols < 20 ? 20 : df_max_cols);
+	    df_column = gp_realloc(df_column,
+				new_max * sizeof(df_column_struct),
+				"datafile column");
+	    while (df_max_cols < new_max)
+		df_column[df_max_cols++].datum = 0;
+	}
 
 	/* have always skipped spaces at this point */
 	df_column[df_no_cols].position = s;
