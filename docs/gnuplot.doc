@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.423 2007/03/28 22:22:43 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.424 2007/03/30 05:18:46 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7060,9 +7060,11 @@ C ... and restart the table:
  The option `zoomcoordinates` determines if the coordinates of the zoom box are
  drawn at the edges while zooming. This is on by default.
 
- The options `noruler` and `ruler` switch the ruler off and on, the latter
- optionally at given `coordinates`. This corresponds to the default key binding
- 'r'.
+ The options `noruler` and `ruler` switch the ruler off and on, the
+ latter optionally setting the origin at the given `coordinates. While
+ the ruler is on, the distance in user units from the ruler origin to
+ the mouse is displayed continuously. By default, toggling the ruler
+ has the key binding 'r'.
 
  The option `polardistance` determines if the distance between the mouse cursor
  and the ruler is also shown in polar coordinates (distance and angle in
