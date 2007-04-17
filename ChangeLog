@@ -1,3 +1,8 @@
+2007-04-17  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/graphics.c (plot_vectors):
+	Fix access of uninitialized variable found by valgrind.
+
 2007-04-14  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
 	* docs/gnuplot.doc: Clarify ruler documentation.

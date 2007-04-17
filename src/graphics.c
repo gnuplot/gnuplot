@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.221 2007/03/06 03:04:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.222 2007/03/22 03:49:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3622,12 +3622,13 @@ plot_vectors(struct curve_points *plot)
     apply_head_properties(&(plot->arrow_properties));
 
     for (i = 0; i < plot->p_count; i++) {
-	points[0] = plot->points[i];
-	points[1].x = plot->points[i].xhigh;
-	points[1].y = plot->points[i].yhigh;
 
+	points[0] = plot->points[i];
 	if (points[0].type == UNDEFINED)
 	    continue;
+
+	points[1].x = plot->points[i].xhigh;
+	points[1].y = plot->points[i].yhigh;
 
 	if (inrange(points[1].x, X_AXIS.min, X_AXIS.max)
 	    && inrange(points[1].y, Y_AXIS.min, Y_AXIS.max)) {
