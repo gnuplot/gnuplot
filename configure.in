@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.216 2007/02/05 20:02:14 sfeam Exp $
+dnl $Id: configure.in,v 1.217 2007/03/11 17:41:08 tlecomte Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -966,7 +966,7 @@ dnl Enable parsing of deprecated syntax
 AC_ARG_ENABLE(backwards-compatibility,dnl
 [  --enable-backwards-compatibility       enable deprecated syntax ],
   [if test "$enableval" = yes; then
-    AC_DEFINE(BACKWARDS_COMPATIBILE,1,
+    AC_DEFINE(BACKWARDS_COMPATIBLE,1,
                [ Define to allow use of deprecated syntax and terminal behaviour. ])
   fi])
 
