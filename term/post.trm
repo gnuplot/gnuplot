@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.203.2.4 2007/01/26 18:13:47 mikulik Exp $
+ * $Id: post.trm,v 1.203.2.5 2007/03/22 04:20:06 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -195,7 +195,7 @@ static const ps_params_t post_params_default = POST_PARAMS_DEFAULT;
 
 #define EPSLATEX_PARAMS_DEFAULT { \
     PSTERM_EPSLATEX, 50, 50, \
-    PSTERM_EPS, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
+    PSTERM_EPS, FALSE, FALSE, TRUE, FALSE, 1.0, 1.0, FALSE, \
     FALSE, FALSE, NULL, "", 11, TRUE, FALSE, 2000, 0.003, \
     FALSE, FALSE \
 }
@@ -204,7 +204,7 @@ static const ps_params_t epslatex_params_default = EPSLATEX_PARAMS_DEFAULT;
 
 #define PSLATEX_PARAMS_DEFAULT { \
     PSTERM_PSLATEX, 0, 0, \
-    PSTERM_EPS, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
+    PSTERM_EPS, FALSE, FALSE, TRUE, FALSE, 1.0, 1.0, FALSE, \
     FALSE, FALSE, NULL, "", 0, FALSE, TRUE, 2000, 0.003, \
     FALSE, FALSE \
 }
@@ -213,7 +213,7 @@ static const ps_params_t pslatex_params_default = PSLATEX_PARAMS_DEFAULT;
 
 #define PSTEX_PARAMS_DEFAULT { \
     PSTERM_PSTEX, 0, 0, \
-    PSTERM_EPS, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
+    PSTERM_EPS, FALSE, FALSE, TRUE, FALSE, 1.0, 1.0, FALSE, \
     FALSE, FALSE, NULL, "", 0, FALSE, TRUE, 2000, 0.003, \
     FALSE, FALSE \
 }

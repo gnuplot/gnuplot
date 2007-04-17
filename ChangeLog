@@ -1,3 +1,11 @@
+2007-04-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: Change the default to "blacktext" for the TeX-based
+	terminal variants (pstex pslatex epslatex). This is more in line with
+	the behaviour in versions 4.0 and earlier.  In particular it means that
+	the default settings do not require you to include the color.sty
+	package.
+
 2007-04-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gprintf):  Accept the ' format specifier, which
