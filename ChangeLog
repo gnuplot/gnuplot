@@ -1,3 +1,9 @@
+2007-04-17  Andrej Lajovic  <natrij@users.sourceforge.net>
+
+	* src/save.c (save_set_all):  Save all key options even if
+	key is not currently displayed.
+	Bug #1695643
+
 2007-04-17  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/graphics.c (plot_vectors):

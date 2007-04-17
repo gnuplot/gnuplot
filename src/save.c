@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.141 2007/02/06 23:56:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.142 2007/04/08 03:39:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -324,11 +324,8 @@ set y2data%s\n",
 	save_textcolor(fp, &key->textcolor);
     fputs("\n", fp);
 
-    if (!(key->visible))
-	fputs("unset key\n", fp);
-    else {
-	fputs("set key ", fp);
-	switch (key->region) {
+    fputs("set key ", fp);
+    switch (key->region) {
 	case GPKEY_AUTO_INTERIOR_LRTBC:
 	    fputs("inside", fp);
 	    break;
@@ -354,10 +351,10 @@ set y2data%s\n",
 	case GPKEY_USER_PLACEMENT:
 	    save_position(fp, &key->user_pos, FALSE);
 	    break;
-	}
-	if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
+    }
+    if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
 	      && (key->margin == GPKEY_LMARGIN || key->margin == GPKEY_RMARGIN))) {
-	    switch (key->hpos) {
+	switch (key->hpos) {
 	    case RIGHT:
 		fputs(" right", fp);
 		break;
@@ -367,11 +364,11 @@ set y2data%s\n",
 	    case CENTRE:
 		fputs(" center", fp);
 		break;
-	    }
 	}
-	if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
+    }
+    if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
 	      && (key->margin == GPKEY_TMARGIN || key->margin == GPKEY_BMARGIN))) {
-	    switch (key->vpos) {
+	switch (key->vpos) {
 	    case JUST_TOP:
 		fputs(" top", fp);
 		break;
@@ -381,9 +378,9 @@ set y2data%s\n",
 	    case JUST_CENTRE:
 		fputs(" center", fp);
 		break;
-	    }
 	}
-	fprintf(fp, " %s %s %sreverse %senhanced %s ",
+    }
+    fprintf(fp, " %s %s %sreverse %senhanced %s ",
 		key->stack_dir == GPKEY_VERTICAL ? "vertical" : "horizontal",
 		key->just == GPKEY_LEFT ? "Left" : "Right",
 		key->reverse ? "" : "no",
@@ -391,17 +388,20 @@ set y2data%s\n",
 		key->auto_titles == COLUMNHEAD_KEYTITLES ? "autotitles columnhead"
 		: key->auto_titles == FILENAME_KEYTITLES ? "autotitles"
 		: "noautotitles" );
-	if (key->box.l_type > LT_NODRAW) {
-	    fputs("box", fp);
-	    save_linetype(fp, &(key->box), FALSE);
-	} else
-	    fputs("nobox", fp);
-	/* Put less common options on a separate line*/
-	fprintf(fp, "\nset key %sinvert samplen %g spacing %g width %g height %g ",
+    if (key->box.l_type > LT_NODRAW) {
+	fputs("box", fp);
+	save_linetype(fp, &(key->box), FALSE);
+    } else
+	fputs("nobox", fp);
+
+    /* Put less common options on a separate line*/
+    fprintf(fp, "\nset key %sinvert samplen %g spacing %g width %g height %g ",
 		key->invert ? "" : "no",
 		key->swidth, key->vert_factor, key->width_fix, key->height_fix);
-	fputc('\n', fp);
-    }
+    fputc('\n', fp);
+
+    if (!(key->visible))
+	fputs("unset key\n", fp);
 
     fputs("unset label\n", fp);
     for (this_label = first_label; this_label != NULL;
