@@ -1366,7 +1366,6 @@ C
 ?expressions functions stringcolumn
 ?functions stringcolumn
 ?stringcolumn
-?strcol
 ?expressions functions strcol
 ?functions strcol
 ?strcol
