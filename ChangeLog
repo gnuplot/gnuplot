@@ -1,5 +1,11 @@
 2007-04-19  Ethan Merritt  <merritt@u.washington.edu>
 
+	* term/x11.trm (X11_text):  term_reset() tries to close down all files
+	and pipes cleanly. But it called on exit, the pipe to gnuplot_x11 may
+	already be closed. Don't try to write to it.  Bug #1706945.
+
+2007-04-19  Ethan Merritt  <merritt@u.washington.edu>
+
 	* docs/gnuplot.doc: Fix unterminated quote that causes emacs/makeinfo
 	to fail.
 
