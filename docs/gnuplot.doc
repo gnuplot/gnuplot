@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.424 2007/03/30 05:18:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.425 2007/04/14 15:35:21 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7061,7 +7061,7 @@ C ... and restart the table:
  drawn at the edges while zooming. This is on by default.
 
  The options `noruler` and `ruler` switch the ruler off and on, the
- latter optionally setting the origin at the given `coordinates. While
+ latter optionally setting the origin at the given coordinates. While
  the ruler is on, the distance in user units from the ruler origin to
  the mouse is displayed continuously. By default, toggling the ruler
  has the key binding 'r'.
