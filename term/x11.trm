@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.160.2.1 2006/11/05 04:28:49 sfeam Exp $
+ * $Id: x11.trm,v 1.160.2.2 2007/01/14 18:33:46 sfeam Exp $
  *
  */
 
@@ -1222,6 +1222,9 @@ X11_graphics()
 TERM_PUBLIC void
 X11_text()
 {
+    if (!X11_ipc)
+	return;
+
 #ifdef USE_MOUSE
     /* EAM July 2003:  send over a snapshot of the final axis scaling
      * so that subsequent mouse events can be transformed into plot
