@@ -1,3 +1,8 @@
+2007-04-25  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* src/specfun.c (f_normal): call erfc instead of erf, to avoid
+	underflow for -38 < arg < -8.
+
 2007-04-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (X11_text):  term_reset() tries to close down all files
