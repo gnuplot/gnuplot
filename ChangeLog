@@ -1,4 +1,4 @@
-2007-04-19  Ethan Merritt  <merritt@u.washington.edu>
+2007-04-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (X11_text):  term_reset() tries to close down all files
 	and pipes cleanly. But it called on exit, the pipe to gnuplot_x11 may
