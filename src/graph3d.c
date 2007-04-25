@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.6 2007/03/22 04:27:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.7 2007/03/22 04:39:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -596,7 +596,7 @@ do_3dplot(
 
     /* Allow an absolute setting of base_z via "set xyplane at <z>" */
     if (xyplane.absolute)
-	base_z = xyplane.xyplane_z;
+	base_z = AXIS_LOG_VALUE(0, xyplane.xyplane_z);
 
     /*  see comment accompanying similar tests of x_min/x_max and y_min/y_max
      *  in graphics.c:do_plot(), for history/rationale of these tests */

@@ -1,3 +1,8 @@
+2007-04-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (do_3dplot): Correct Z coordinate of xyplane for log
+	scale on Z.  Bug #1703370.
+
 2007-04-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (X11_text):  term_reset() tries to close down all files
