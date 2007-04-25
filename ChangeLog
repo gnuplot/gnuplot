@@ -3,6 +3,8 @@
 	* src/graph3d.c (do_3dplot): Correct Z coordinate of xyplane for log
 	scale on Z.  Bug #1703370.
 
+	* src/specfunc.c: Restore lost prototype for inverse_normal_func()
+
 2007-04-25  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
 	* src/specfun.c (f_normal): call erfc instead of erf, to avoid
