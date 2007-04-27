@@ -1,8 +1,9 @@
 2007-04-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c src/tabulate.h src/Makefile.am:  Consolidate the code
-	supporting "set table <foo>" into a new source file.  Add support for
-	tabular output of style LABELPOINTS in 2D.
+	supporting "set table <foo>" into a new source file.
+	Add support for tabular output of style LABELPOINTS in 2D and 3D.
+	Add support for tabular output of style VECTOR in 2D and 3D.
 
 	* src/plot2d.c (print_table) src/plot3d.c (print_3dtable):
 	Moved these routines into new file tabulate.c.

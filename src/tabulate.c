@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.1 2007/04/26 05:14:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.1 2007/04/27 20:35:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -50,12 +50,12 @@ static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.1 2007/04/26 05:14:18 s
 #include "plot3d.h"
 #include "tabulate.h"
 
-static void commentout_newline __PROTO((const char *in, FILE *outfile));
+static char *expand_newline __PROTO((const char *in));
 
 /* HBB 20020405: new macro to use 'set format' with full flexibility */
-#define OUTPUT_NUMBER(field, axis)			      \
+#define OUTPUT_NUMBER(coord, axis)			      \
 	    gprintf(buffer, 150, axis_array[axis].formatstring, \
-		    1.0, point->field);			 \
+		    1.0, coord);			 \
 	    fputs(buffer, outfile);			     \
 	    fputc(' ', outfile);
 
@@ -75,8 +75,11 @@ print_table(struct curve_points *current_plot, int plot_num)
 	fprintf(outfile, "\n# Curve %d of %d, %d points",
 		curve, plot_num, current_plot->p_count);
 
-	if ((current_plot->title) && (*current_plot->title))
-	    commentout_newline(current_plot->title, outfile);
+	if ((current_plot->title) && (*current_plot->title)) {
+	    char *title = expand_newline(current_plot->title);
+    	    fprintf(outfile, "\n# Curve title: \"%s\"", title);
+	    free(title);
+	}
 
 	fprintf(outfile, "\n# x y");
 	switch (current_plot->plot_style) {
@@ -99,6 +102,9 @@ print_table(struct curve_points *current_plot, int plot_num)
 	case LABELPOINTS:
 	    fputs(" label",outfile);
 	    break;
+	case VECTOR:
+	    fputs(" delta_x delta_y",outfile);
+	    break;
 	case LINES:
 	case POINTSTYLE:
 	case LINESPOINTS:
@@ -120,9 +126,11 @@ print_table(struct curve_points *current_plot, int plot_num)
 	    struct text_label *this_label;
 	    for (this_label = current_plot->labels->next; this_label != NULL;
 		 this_label = this_label->next) {
-		fprintf(outfile, axis_array[current_plot->x_axis].formatstring, this_label->place.x);
-		fprintf(outfile, axis_array[current_plot->y_axis].formatstring, this_label->place.y);
-		fprintf(outfile, " \"%s\"\n", this_label->text);
+		 char *label = expand_newline(this_label->text);
+		 OUTPUT_NUMBER(this_label->place.x, current_plot->x_axis);
+		 OUTPUT_NUMBER(this_label->place.y, current_plot->y_axis);
+		fprintf(outfile, " \"%s\"\n", label);
+		free(label);
 	    }
 
 	} else {
@@ -130,32 +138,37 @@ print_table(struct curve_points *current_plot, int plot_num)
 		i++, point++) {
 
 		/* FIXME HBB 20020405: had better use the real x/x2 axes of this plot */
-		OUTPUT_NUMBER(x, current_plot->x_axis);
-		OUTPUT_NUMBER(y, current_plot->y_axis);
+		OUTPUT_NUMBER(point->x, current_plot->x_axis);
+		OUTPUT_NUMBER(point->y, current_plot->y_axis);
 
 		switch (current_plot->plot_style) {
 		    case BOXES:
 		    case XERRORBARS:
-			OUTPUT_NUMBER(xlow, current_plot->x_axis);
-			OUTPUT_NUMBER(xhigh, current_plot->x_axis);
+			OUTPUT_NUMBER(point->xlow, current_plot->x_axis);
+			OUTPUT_NUMBER(point->xhigh, current_plot->x_axis);
 			/* Hmmm... shouldn't this write out width field of box
 			 * plots, too, if stored? */
 			break;
 		    case BOXXYERROR:
 		    case XYERRORBARS:
-			OUTPUT_NUMBER(xlow, current_plot->x_axis);
-			OUTPUT_NUMBER(xhigh, current_plot->x_axis);
+			OUTPUT_NUMBER(point->xlow, current_plot->x_axis);
+			OUTPUT_NUMBER(point->xhigh, current_plot->x_axis);
 			/* FALLTHROUGH */
 		    case BOXERROR:
 		    case YERRORBARS:
-			OUTPUT_NUMBER(ylow, current_plot->y_axis);
-			OUTPUT_NUMBER(yhigh, current_plot->y_axis);
+			OUTPUT_NUMBER(point->ylow, current_plot->y_axis);
+			OUTPUT_NUMBER(point->yhigh, current_plot->y_axis);
 			break;
 		    case FINANCEBARS:
 		    case CANDLESTICKS:
-			OUTPUT_NUMBER(ylow, current_plot->y_axis);
-			OUTPUT_NUMBER(yhigh, current_plot->y_axis);
-			OUTPUT_NUMBER(z, current_plot->y_axis);
+			OUTPUT_NUMBER(point->ylow, current_plot->y_axis);
+			OUTPUT_NUMBER(point->yhigh, current_plot->y_axis);
+			OUTPUT_NUMBER(point->z, current_plot->y_axis);
+			break;
+		    case VECTOR:
+			OUTPUT_NUMBER((point->xhigh - point->x), current_plot->x_axis);
+			OUTPUT_NUMBER((point->yhigh - point->y), current_plot->y_axis);
+			break;
 		    case LINES:
 		    case POINTSTYLE:
 		    case LINESPOINTS:
@@ -198,8 +211,25 @@ print_3dtable(int pcount)
 	 this_plot = this_plot->next_sp, surface++) {
 	fprintf(outfile, "\n# Surface %d of %d surfaces\n", surface, pcount);
 
-	if ((this_plot->title) && (*this_plot->title))
-	    commentout_newline(this_plot->title, outfile);
+	if ((this_plot->title) && (*this_plot->title)) {
+	    char *title = expand_newline(this_plot->title);
+    	    fprintf(outfile, "\n# Curve title: \"%s\"", title);
+	    free(title);
+	}
+
+	if (this_plot->plot_style == LABELPOINTS) {
+	    struct text_label *this_label;
+	    for (this_label = this_plot->labels->next; this_label != NULL;
+		 this_label = this_label->next) {
+		 char *label = expand_newline(this_label->text);
+		 OUTPUT_NUMBER(this_label->place.x, FIRST_X_AXIS);
+		 OUTPUT_NUMBER(this_label->place.y, FIRST_Y_AXIS);
+		 OUTPUT_NUMBER(this_label->place.z, FIRST_Z_AXIS);
+		fprintf(outfile, " \"%s\"\n", label);
+		free(label);
+	    }
+	    continue;
+	}
 
 	if (draw_surface) {
 	    struct iso_curve *icrvs;
@@ -209,14 +239,27 @@ print_3dtable(int pcount)
 	    for (curve = 0, icrvs = this_plot->iso_crvs;
 		 icrvs && curve < this_plot->num_iso_read;
 		 icrvs = icrvs->next, curve++) {
-		fprintf(outfile, "\n# IsoCurve %d, %d points\n# x y z type\n",
+
+		struct coordinate GPHUGE *tail = icrvs->next->points; /* Vector tails */
+
+		fprintf(outfile, "\n# IsoCurve %d, %d points\n# x y z",
 			curve, icrvs->p_count);
+		if (this_plot->plot_style == VECTOR)
+		     fprintf(outfile, " delta_x delta_y delta_z");
+		fprintf(outfile, " type\n");
+
 		for (i = 0, point = icrvs->points;
 		     i < icrvs->p_count;
 		     i++, point++) {
-		    OUTPUT_NUMBER(x, FIRST_X_AXIS);
-		    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
-		    OUTPUT_NUMBER(z, FIRST_Z_AXIS);
+		    OUTPUT_NUMBER(point->x, FIRST_X_AXIS);
+		    OUTPUT_NUMBER(point->y, FIRST_Y_AXIS);
+		    OUTPUT_NUMBER(point->z, FIRST_Z_AXIS);
+		    if (this_plot->plot_style == VECTOR) {
+			OUTPUT_NUMBER((tail->x - point->x), FIRST_X_AXIS);
+			OUTPUT_NUMBER((tail->y - point->y), FIRST_Y_AXIS);
+			OUTPUT_NUMBER((tail->z - point->z), FIRST_Z_AXIS);
+			tail++;
+		    }
 		    fprintf(outfile, "%c\n",
 			    point->type == INRANGE
 			    ? 'i' : point->type == OUTRANGE
@@ -242,9 +285,9 @@ print_3dtable(int pcount)
 			    number++, c->label);
 
 		for (; --count >= 0; ++point) {
-		    OUTPUT_NUMBER(x, FIRST_X_AXIS);
-		    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
-		    OUTPUT_NUMBER(z, FIRST_Z_AXIS);
+		    OUTPUT_NUMBER(point->x, FIRST_X_AXIS);
+		    OUTPUT_NUMBER(point->y, FIRST_Y_AXIS);
+		    OUTPUT_NUMBER(point->z, FIRST_Z_AXIS);
 		    putc('\n', outfile);
 		}
 
@@ -260,10 +303,10 @@ print_3dtable(int pcount)
     free(buffer);
 }
 
-static void
-commentout_newline(const char *in, FILE *outfile)
+static char *
+expand_newline(const char *in)
 {
-    char *tmpstr = gp_alloc(2*strlen(in),"comment");
+    char *tmpstr = gp_alloc(2*strlen(in),"enl");
     const char *s = in;
     char *t = tmpstr;
     do {
@@ -273,6 +316,5 @@ commentout_newline(const char *in, FILE *outfile)
 	} else
 	    *t++ = *s;
     } while (*s++);
-    fprintf(outfile, "\n# Curve title: \"%s\"", tmpstr);
-    free(tmpstr);
+    return tmpstr;
 }
