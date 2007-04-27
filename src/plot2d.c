@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.143 2007/01/28 23:26:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.144 2007/03/29 05:14:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -50,6 +50,7 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.143 2007/01/28 23:26:15 s
 #include "parse.h"
 #include "setshow.h"
 #include "tables.h"
+#include "tabulate.h"
 #include "term_api.h"
 #include "util.h"
 #ifdef BINARY_DATA_FILE
@@ -68,7 +69,6 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.143 2007/01/28 23:26:15 s
 static struct curve_points * cp_alloc __PROTO((int num));
 static int get_data __PROTO((struct curve_points *));
 static void store2d_point __PROTO((struct curve_points *, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
-static void print_table __PROTO((struct curve_points * first_plot, int plot_num));
 static void eval_plots __PROTO((void));
 static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
 #ifdef EAM_HISTOGRAMS
@@ -1165,103 +1165,6 @@ current points %d\n\n",
     }
 }
 #endif /* not used */
-
-
-
-static void
-print_table(struct curve_points *current_plot, int plot_num)
-{
-    int i, curve;
-    char *buffer = gp_alloc(150, "print_table: output buffer");
-    FILE *outfile = (table_outfile) ? table_outfile : gpoutfile;
-
-    for (curve = 0; curve < plot_num;
-         curve++, current_plot = current_plot->next) {
-        struct coordinate GPHUGE *point = NULL;
-
-        /* two blank lines between plots in table output by prepending
-         * a \n here */
-        fprintf(outfile, "\n#Curve %d of %d, %d points\n#x y",
-                curve, plot_num, current_plot->p_count);
-        switch (current_plot->plot_style) {
-        case BOXES:
-        case XERRORBARS:
-            fputs(" xlow xhigh", outfile);
-            break;
-        case BOXERROR:
-        case YERRORBARS:
-            fputs(" ylow yhigh", outfile);
-            break;
-        case BOXXYERROR:
-        case XYERRORBARS:
-            fputs(" xlow xhigh ylow yhigh", outfile);
-            break;
-        case FINANCEBARS:
-        case CANDLESTICKS:
-            fputs("open ylow yhigh yclose", outfile);
-        default:
-            /* ? */
-            break;
-        }
-
-        fputs(" type\n", outfile);
-        for (i = 0, point = current_plot->points;
-             i < current_plot->p_count;
-             i++, point++) {
-            /* HBB 20020405: new macro to use the 'set format' string
-             * specifiers, as it has been documented for ages, but
-             * never actually done. */
-#define OUTPUT_NUMBER(field, axis)                              \
-            gprintf(buffer, 150, axis_array[axis].formatstring, \
-                    1.0, point->field);                         \
-            fputs(buffer, outfile);                             \
-            fputc(' ', outfile);
-
-            /* FIXME HBB 20020405: had better use the real x/x2 axes
-               of this plot */
-            OUTPUT_NUMBER(x, current_plot->x_axis);
-            OUTPUT_NUMBER(y, current_plot->y_axis);
-
-            switch (current_plot->plot_style) {
-            case BOXES:
-            case XERRORBARS:
-                OUTPUT_NUMBER(xlow, current_plot->x_axis);
-                OUTPUT_NUMBER(xhigh, current_plot->x_axis);
-                /* Hmmm... shouldn't this write out width field of box
-                 * plots, too, if stored? */
-                break;
-            case BOXXYERROR:
-            case XYERRORBARS:
-                OUTPUT_NUMBER(xlow, current_plot->x_axis);
-                OUTPUT_NUMBER(xhigh, current_plot->x_axis);
-                /* FALLTHROUGH */
-            case BOXERROR:
-            case YERRORBARS:
-                OUTPUT_NUMBER(ylow, current_plot->y_axis);
-                OUTPUT_NUMBER(yhigh, current_plot->y_axis);
-                break;
-            case FINANCEBARS:
-            case CANDLESTICKS:
-                OUTPUT_NUMBER(ylow, current_plot->y_axis);
-                OUTPUT_NUMBER(yhigh, current_plot->y_axis);
-                OUTPUT_NUMBER(z, current_plot->y_axis);
-            default:
-                /* ? */
-                break;
-            } /* switch(plot type) */
-            fprintf(outfile, " %c\n",
-                    current_plot->points[i].type == INRANGE
-                    ? 'i' : current_plot->points[i].type == OUTRANGE
-                    ? 'o' : 'u');
-        } /* for(point i) */
-
-        putc('\n', outfile);
-    } /* for(curve) */
-
-    fflush(outfile);
-    free(buffer);
-}
-#undef OUTPUT_NUMBER
 
 /* HBB 20010610: mnemonic names for the bits stored in 'uses_axis' */
 typedef enum e_uses_axis {

@@ -1,3 +1,17 @@
+2007-04-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate.c src/tabulate.h src/Makefile.am:  Consolidate the code
+	supporting "set table <foo>" into a new source file.  Add support for
+	tabular output of style LABELPOINTS in 2D.
+
+	* src/plot2d.c (print_table) src/plot3d.c (print_3dtable):
+	Moved these routines into new file tabulate.c.
+
+2006-04-27  Harald Harders  <h.harders@tu-bs.de>
+
+	* src/tabulate.c:  For tabular output "set table <foo>", give plot
+	titles in a comment record.
+
 2007-04-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot): Correct Z coordinate of xyplane for log
@@ -13,7 +27,7 @@
 2007-04-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (X11_text):  term_reset() tries to close down all files
-	and pipes cleanly. But it called on exit, the pipe to gnuplot_x11 may
+	and pipes cleanly. But if called on exit, the pipe to gnuplot_x11 may
 	already be closed. Don't try to write to it.  Bug #1706945.
 
 2007-04-19  Ethan Merritt  <merritt@u.washington.edu>

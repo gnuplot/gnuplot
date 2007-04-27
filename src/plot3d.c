@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.141 2007/02/25 13:07:56 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.142 2007/03/29 05:14:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -49,6 +49,7 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.141 2007/02/25 13:07:56 m
 #include "parse.h"
 #include "setshow.h"
 #include "term_api.h"
+#include "tabulate.h"
 #include "util.h"
 #include "pm3d.h"
 #ifdef BINARY_DATA_FILE
@@ -83,7 +84,6 @@ static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN c
 					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
 					       TBOOLEAN need_palette));
 static void get_3ddata __PROTO((struct surface_points * this_plot));
-static void print_3dtable __PROTO((int pcount));
 static void eval_3dplots __PROTO((void));
 static void grid_nongrid_data __PROTO((struct surface_points * this_plot));
 static void parametric_3dfixup __PROTO((struct surface_points * start_plot, int *plot_num));
@@ -968,86 +968,6 @@ get_3ddata(struct surface_points *this_plot)
 	     this_iso = this_iso->next);
 	this_iso->next = new_icrvs;
     }
-}
-
-static void
-print_3dtable(int pcount)
-{
-    struct surface_points *this_plot;
-    int i, surface;
-    struct coordinate GPHUGE *point;
-    char *buffer = gp_alloc(150, "print_3dtable output buffer");
-    FILE *outfile = (table_outfile) ? table_outfile : gpoutfile;
-
-    for (surface = 0, this_plot = first_3dplot;
-	 surface < pcount;
-	 this_plot = this_plot->next_sp, surface++) {
-	fprintf(outfile, "\n#Surface %d of %d surfaces\n", surface, pcount);
-
-	if (draw_surface) {
-	    struct iso_curve *icrvs;
-	    int curve;
-
-	    /* only the curves in one direction */
-	    for (curve = 0, icrvs = this_plot->iso_crvs;
-		 icrvs && curve < this_plot->num_iso_read;
-		 icrvs = icrvs->next, curve++) {
-		fprintf(outfile, "\n#IsoCurve %d, %d points\n#x y z type\n",
-			curve, icrvs->p_count);
-		for (i = 0, point = icrvs->points;
-		     i < icrvs->p_count;
-		     i++, point++) {
-		    /* HBB 20020405: new macro to use the 'set format'
-		     * in their full flexibility */
-#define OUTPUT_NUMBER(field, axis)					\
-		    gprintf(buffer, 150, axis_array[axis].formatstring,	\
-			    1.0, point->field);				\
-		    fputs(buffer, outfile);				\
-		    fputc(' ', outfile);
-		    OUTPUT_NUMBER(x, FIRST_X_AXIS);
-		    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
-		    OUTPUT_NUMBER(z, FIRST_Z_AXIS);
-		    fprintf(outfile, "%c\n",
-			    point->type == INRANGE
-			    ? 'i' : point->type == OUTRANGE
-			    ? 'o' : 'u');
-		} /* for(point) */
-	    } /* for(icrvs) */
-	    putc('\n', outfile);
-	} /* if(draw_surface) */
-
-	if (draw_contour) {
-	    int number = 0;
-	    struct gnuplot_contours *c = this_plot->contours;
-
-	    while (c) {
-		int count = c->num_pts;
-		struct coordinate GPHUGE *point = c->coords;
-
-		if (c->isNewLevel)
-		    /* don't display count - contour split across chunks */
-		    /* put # in case user wants to use it for a plot */
-		    /* double blank line to allow plot ... index ... */
-		    fprintf(outfile, "\n# Contour %d, label: %s\n",
-			    number++, c->label);
-
-		for (; --count >= 0; ++point) {
-		    OUTPUT_NUMBER(x, FIRST_X_AXIS);
-		    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
-		    OUTPUT_NUMBER(z, FIRST_Z_AXIS);
-		    putc('\n', outfile);
-		}
-
-		/* blank line between segments of same contour */
-		putc('\n', outfile);
-		c = c->next;
-#undef OUTPUT_NUMBER
-	    } /* while (contour) */
-	} /* if (draw_contour) */
-    } /* for(surface) */
-    fflush(outfile);
-
-    free(buffer);
 }
 
 /* HBB 20000501: code isolated from eval_3dplots(), where practically
