@@ -527,8 +527,11 @@ static void wxt_command_push(gp_command command);
  * not if the window is not the current one. */
 static bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id);
 
-/* process the event list */
-static int wxt_process_events();
+/* process one event, returns true if it ends the pause */
+static bool wxt_process_one_event(struct gp_event_t *);
+
+/* process the event list, return true if one event ends the pause */
+static bool wxt_process_events();
 
 /* event queue and its mutex */
 static wxMutex mutexProtectingEventList;

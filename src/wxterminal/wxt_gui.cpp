@@ -2724,9 +2724,38 @@ void wxt_change_thread_state(wxt_thread_state_t state)
 	wxt_sigint_restore();
 }
 
+/* process one event, returns true if it ends the pause */
+bool wxt_process_one_event(struct gp_event_t *event)
+{
+	FPRINTF2((stderr,"Processing event\n"));
+	do_event( event );
+	FPRINTF2((stderr,"Event processed\n"));
+	if (event->type == GE_buttonrelease && (paused_for_mouse & PAUSE_CLICK)) {
+		int button = event->par1;
+		if (button == 1 && (paused_for_mouse & PAUSE_BUTTON1))
+			paused_for_mouse = 0;
+		if (button == 2 && (paused_for_mouse & PAUSE_BUTTON2))
+			paused_for_mouse = 0;
+		if (button == 3 && (paused_for_mouse & PAUSE_BUTTON3))
+			paused_for_mouse = 0;
+		if (paused_for_mouse == 0)
+			return true;
+	}
+	if (event->type == GE_keypress && (paused_for_mouse & PAUSE_KEYSTROKE)) {
+		/* Ignore NULL keycode */
+		if (event->par1 > '\0') {
+			paused_for_mouse = 0;
+			return true;
+		}
+	}
+	return false;
+}
+
 /* Similar to gp_exec_event(),
  * put the event sent by the terminal in a list,
- * to be processed by the main thread. */
+ * to be processed by the main thread.
+ * returns true if the event has really been processed - it will
+ * not if the window is not the current one. */
 bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 {
 	struct gp_event_t event;
@@ -2742,23 +2771,7 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 	event.winid = id;
 
 #ifdef _Windows
-	FPRINTF2((stderr,"Processing event\n"));
-	do_event( &event );
-	FPRINTF2((stderr,"Event processed\n"));
-	if (event.type == GE_buttonrelease && (paused_for_mouse & PAUSE_CLICK)) {
-		int button = event.par1;
-		if (button == 1 && (paused_for_mouse & PAUSE_BUTTON1))
-			paused_for_mouse = 0;
-		if (button == 2 && (paused_for_mouse & PAUSE_BUTTON2))
-			paused_for_mouse = 0;
-		if (button == 3 && (paused_for_mouse & PAUSE_BUTTON3))
-			paused_for_mouse = 0;
-	}
-	if (event.type == GE_keypress && (paused_for_mouse & PAUSE_KEYSTROKE)) {
-		/* Ignore NULL keycode */
-		if (event.par1 > '\0')
-			paused_for_mouse = 0;
-	}
+	wxt_process_one_event(&event);
 	return true;
 #else
 	/* add the event to the event list */
@@ -2787,8 +2800,8 @@ void wxt_clear_event_list()
 
 /* wxt_process_events will process the contents of the event list
  * until it is empty.
- * It will return 1 if one event ends the pause */
-int wxt_process_events()
+ * It will return true if one event ends the pause */
+bool wxt_process_events()
 {
 	struct gp_event_t wxt_event;
 	int button;
@@ -2799,29 +2812,10 @@ int wxt_process_events()
 		wxt_event = EventList.front();
 		EventList.pop_front();
 		mutexProtectingEventList.Unlock();
-		do_event( &wxt_event );
-		FPRINTF2((stderr,"Event processed\n"));
-		if (wxt_event.type == GE_buttonrelease && (paused_for_mouse & PAUSE_CLICK)) {
-			button = wxt_event.par1;
-			if (button == 1 && (paused_for_mouse & PAUSE_BUTTON1))
-				paused_for_mouse = 0;
-			if (button == 2 && (paused_for_mouse & PAUSE_BUTTON2))
-				paused_for_mouse = 0;
-			if (button == 3 && (paused_for_mouse & PAUSE_BUTTON3))
-				paused_for_mouse = 0;
-			if (paused_for_mouse == 0)
-				return 1;
-		}
-		if (wxt_event.type == GE_keypress && (paused_for_mouse & PAUSE_KEYSTROKE)) {
-			/* Ignore NULL keycode */
-			if (wxt_event.par1 > '\0') {
-				paused_for_mouse = 0;
-				return 1;
-			}
-		}
+		if (wxt_process_one_event(&wxt_event))
+			return true;
 	}
-	return 0;
-	
+	return false;
 }
 
 #ifdef __WXMSW__

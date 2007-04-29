@@ -3,6 +3,7 @@
 	* src/wxterminal/wxt_gui.cpp:
 	* src/wxterminal/wxt_gui.h:
 	Add a returned boolean to wxt_exec_event, to simplify callers.
+	Factorize some code in a new function: wxt_process_one_event
 
 2007-04-27  Ethan Merritt  <merritt@u.washington.edu>
 
