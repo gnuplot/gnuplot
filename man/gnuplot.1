@@ -1,5 +1,5 @@
 .\" dummy line
-.TH GNUPLOT 1 "03 January 2001"
+.TH GNUPLOT 1 "29 April 2007"
 .UC 4
 .SH NAME
 gnuplot \- an interactive plotting program
@@ -8,44 +8,51 @@ gnuplot \- an interactive plotting program
 [ X11 options ] [file ...]
 .br
 .SH DESCRIPTION
-.I Gnuplot
+.B Gnuplot
 is a command-driven interactive function plotting program.
 .PP
 If files are given,
-.I gnuplot
+gnuplot
 loads each file with the
-.I load
-command, in the order specified.
-.I Gnuplot
-exits after the last file is processed.
+.B load
+command, in the order specified, and exits after the last file is
+processed.  If no files are given, \fBgnuplot\fP prompts for
+interactive commands.
 .PP
 Here are some of its features:
 .PP
 Plots any number of functions, built up of C operators, C library
-functions, and some things C doesn't have like **, sgn(), etc.  Also
-support for plotting data files, to compare actual
-data to theoretical curves.
+functions, and some things C doesn't have like **, sgn(), etc.  
+.PP
+User-defined constants and functions.
+.PP
+All computations performed in the complex domain.  Just the real part is
+plotted by default, but functions like imag() and abs() and arg() are
+available to override this.
+.PP
+Also support for plotting data files, to compare actual data to
+theoretical curves.
+.PP
+Nonlinear least-squares fitting.
+.PP
+2D plots with mouse-controlled zooming.
+.PP
+3D plots with mouse-controlled point of view.
 .PP
 User-defined X and Y ranges (optional auto-ranging), smart axes scaling,
 smart tic marks.
 .PP
 Labelling of X and Y axes.
 .PP
-User-defined constants and functions.
-.PP
-Support for many output devices and file formats
-.PP
 Shell escapes and command line substitution.
 .PP
 Load and save capability.
 .PP
-Output redirection.
+Support for many output devices and file formats.
 .PP
-All computations performed in the complex domain.  Just the real part is
-plotted by default, but functions like imag() and abs() and arg() are
-available to override this.
+Output redirection.
 .SH X11 OPTIONS
-.I Gnuplot
+.B Gnuplot
 provides the \fIx11\fP terminal type for use
 with X servers. This terminal type is set automatically at startup if
 the \fBDISPLAY\fR environment variable is set, if the \fBTERM\fR environment
@@ -93,7 +100,7 @@ background colors. The default is black-on-white. \fB\-rv\fP or
 .PP
 For color displays \fIgnuplot\fP honors
 the following resources (shown here with default values). The values
-may be color names in the X11 rgb.txt file on your system, hexadecimal
+may be color names in the X11 \fIrgb.txt\fP file on your system, hexadecimal
 RGB color specifications (see X11 documentation), or a color name
 followed by a comma and an \fIintensity\fR value from 0 to 1. For example,
 \fBblue,.5\fR means a half intensity blue.
@@ -216,6 +223,73 @@ line.
 The size or aspect ratio of a plot may be changed by resizing the
 .I gnuplot
 window.
+.SH ENVIRONMENT
+A number of shell environment variables are understood by
+gnuplot.  None of these are required.
+.TP
+.B GNUTERM
+The name of the terminal type to be used.  This overrides any terminal
+type sensed by gnuplot on start-up, but is itself overridden by the
+.gnuplot (or equivalent) start-up file (see \fBFILES\fP and "help
+start-up") and, of course, by later explicit changes.
+.TP
+.B GNUHELP 
+The pathname of the HELP file (gnuplot.gih).
+.TP
+.B HOME
+The name of a directory to search for a .gnuplot file if none is found
+in the current directory.
+.TP
+.B PAGER
+An output filter for help messages.
+.TP
+.B SHELL
+The program used for the "shell" command.
+.TP
+.B FIT_SCRIPT
+Specifies a gnuplot command to be executed when a
+fit is interrupted---see "help fit".  
+.TP
+.B FIT_LOG
+The name of the logfile maintained by fit.
+.TP
+.B GNUPLOT_LIB
+Additional search directories for data and command files. The variable
+may contain a single directory name, or a list of directories
+separated by ':'. The contents of GNUPLOT_LIB are appended to the
+"loadpath" variable, but not saved with the "save" and "save set"
+commands.
+.TP
+.B GDFONTPATH
+Several gnuplot terminal drivers access TrueType fonts via the gd library.
+This variable gives the font search path for these drivers.
+.TP
+.B GNUPLOT_DEFAULT_GDFONT
+The default font for the terminal drivers that access TrueType fonts
+via the gd library.
+.TP
+.B GNUPLOT_FONTPATH
+The font search path used by the postscript terminal. The format is
+the same as for GNUPLOT_LIB. The contents of GNUPLOT_FONTPATH are
+appended to the "fontpath" variable, but not saved with the "save" and
+"save set" commands.
+.TP
+.B GNUPLOT_PS_DIR
+Used by the postscript driver to locate external prologue
+files. Depending on the build process, gnuplot contains either a
+builtin copy of those files or simply a default hardcoded path. Use
+this variable to test the postscript terminal with custom prologue
+files. See "help postscript prologue".
+.SH FILES
+.TP
+.I .gnuplot
+Gnuplot looks for this initialization file, first in the current
+directory, then in the HOME directory.  It may contain any legal
+gnuplot commands, but typically they are limited to setting the
+terminal and defining frequently-used functions or variables.
+.TP 
+.I fit.log
+The default name of the logfile maintained by fit.
 .SH AUTHORS
 Thomas Williams, Pixar Corporation,
 .br

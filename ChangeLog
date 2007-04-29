@@ -1,3 +1,9 @@
+2007-04-29  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* man/gnuplot.1: Document environment variables and the
+	initialization file.  Mention 3D plots and nonlinear least-squares
+	fitting.
+
 2007-04-29  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp:
