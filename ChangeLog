@@ -1,3 +1,9 @@
+2007-04-29  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp:
+	* src/wxterminal/wxt_gui.h:
+	Add a returned boolean to wxt_exec_event, to simplify callers.
+
 2007-04-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c src/tabulate.h src/Makefile.am:  Consolidate the code

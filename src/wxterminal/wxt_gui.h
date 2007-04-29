@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.17 2006/11/10 22:52:22 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.18 2006/11/28 20:25:47 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -522,8 +522,10 @@ static plot_struct *wxt_current_plot;
 static void wxt_command_push(gp_command command);
 
 #ifdef USE_MOUSE
-/* routine to send an event to gnuplot */
-static void wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id);
+/* routine to send an event to gnuplot
+ * returns true if the event has really been processed - it will
+ * not if the window is not the current one. */
+static bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id);
 
 /* process the event list */
 static int wxt_process_events();

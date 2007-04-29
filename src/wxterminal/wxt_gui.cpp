@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.35 2006/11/28 20:25:47 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.36 2007/03/31 23:33:15 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -388,36 +388,31 @@ void wxtFrame::OnCopy( wxCommandEvent& WXUNUSED( event ) )
 /* toolbar event : Replot */
 void wxtFrame::OnReplot( wxCommandEvent& WXUNUSED( event ) )
 {
-	if ( this->GetId()==wxt_window_number )
-		wxt_exec_event(GE_keypress, 0, 0, 'e' , 0, this->GetId());
+	wxt_exec_event(GE_keypress, 0, 0, 'e' , 0, this->GetId());
 }
 
 /* toolbar event : Toggle Grid */
 void wxtFrame::OnToggleGrid( wxCommandEvent& WXUNUSED( event ) )
 {
-	if ( this->GetId()==wxt_window_number )
-		wxt_exec_event(GE_keypress, 0, 0, 'g', 0, this->GetId());
+	wxt_exec_event(GE_keypress, 0, 0, 'g', 0, this->GetId());
 }
 
 /* toolbar event : Previous Zoom in history */
 void wxtFrame::OnZoomPrevious( wxCommandEvent& WXUNUSED( event ) )
 {
-	if ( this->GetId()==wxt_window_number )
-		wxt_exec_event(GE_keypress, 0, 0, 'p', 0, this->GetId());
+	wxt_exec_event(GE_keypress, 0, 0, 'p', 0, this->GetId());
 }
 
 /* toolbar event : Next Zoom in history */
 void wxtFrame::OnZoomNext( wxCommandEvent& WXUNUSED( event ) )
 {
-	if ( this->GetId()==wxt_window_number )
-		wxt_exec_event(GE_keypress, 0, 0, 'n', 0, this->GetId());
+	wxt_exec_event(GE_keypress, 0, 0, 'n', 0, this->GetId());
 }
 
 /* toolbar event : Autoscale */
 void wxtFrame::OnAutoscale( wxCommandEvent& WXUNUSED( event ) )
 {
-	if ( this->GetId()==wxt_window_number )
-		wxt_exec_event(GE_keypress, 0, 0, 'a', 0, this->GetId());
+	wxt_exec_event(GE_keypress, 0, 0, 'a', 0, this->GetId());
 }
 #endif /*USE_MOUSE*/
 
@@ -777,11 +772,10 @@ void wxtPanel::OnMotion( wxMouseEvent& event )
 		Draw();
 
 	/* informs gnuplot */
-	if ( this->GetId()==wxt_window_number )
-		wxt_exec_event(GE_motion,
-			(int)gnuplot_x( &plot, mouse_x ),
-			(int)gnuplot_y( &plot, mouse_y ),
-			0, 0, this->GetId());
+	wxt_exec_event(GE_motion,
+		(int)gnuplot_x( &plot, mouse_x ),
+		(int)gnuplot_y( &plot, mouse_y ),
+		0, 0, this->GetId());
 }
 
 /* mouse "click" event */
@@ -793,8 +787,7 @@ void wxtPanel::OnLeftDown( wxMouseEvent& event )
 
 	UpdateModifiers(event);
 
-	if ( this->GetId()==wxt_window_number )
-		wxt_exec_event(GE_buttonpress, x, y, 1, 0, this->GetId());
+	wxt_exec_event(GE_buttonpress, x, y, 1, 0, this->GetId());
 }
 
 /* mouse "click" event */
@@ -806,8 +799,8 @@ void wxtPanel::OnLeftUp( wxMouseEvent& event )
 
 	UpdateModifiers(event);
 
-	if ( this->GetId()==wxt_window_number ) {
-		wxt_exec_event(GE_buttonrelease, x, y, 1, (int) left_button_sw.Time(), this->GetId());
+	if ( wxt_exec_event(GE_buttonrelease, x, y, 1,
+				(int) left_button_sw.Time(), this->GetId()) ) {
 		/* start a watch to send the time elapsed between up and down */
 		left_button_sw.Start();
 	}
@@ -822,8 +815,7 @@ void wxtPanel::OnMiddleDown( wxMouseEvent& event )
 
 	UpdateModifiers(event);
 
-	if ( this->GetId()==wxt_window_number )
-		wxt_exec_event(GE_buttonpress, x, y, 2, 0, this->GetId());
+	wxt_exec_event(GE_buttonpress, x, y, 2, 0, this->GetId());
 }
 
 /* mouse "click" event */
@@ -835,9 +827,8 @@ void wxtPanel::OnMiddleUp( wxMouseEvent& event )
 
 	UpdateModifiers(event);
 
-	if ( this->GetId()==wxt_window_number ) {
-		wxt_exec_event(GE_buttonrelease, x, y, 2,
-			(int) middle_button_sw.Time(), this->GetId());
+	if ( wxt_exec_event(GE_buttonrelease, x, y, 2,
+				(int) middle_button_sw.Time(), this->GetId()) ) {
 		/* start a watch to send the time elapsed between up and down */
 		middle_button_sw.Start();
 	}
@@ -852,8 +843,7 @@ void wxtPanel::OnRightDown( wxMouseEvent& event )
 
 	UpdateModifiers(event);
 
-	if ( this->GetId()==wxt_window_number )
-		wxt_exec_event(GE_buttonpress, x, y, 3, 0, this->GetId());
+	wxt_exec_event(GE_buttonpress, x, y, 3, 0, this->GetId());
 }
 
 /* mouse "click" event */
@@ -865,8 +855,8 @@ void wxtPanel::OnRightUp( wxMouseEvent& event )
 
 	UpdateModifiers(event);
 
-	if ( this->GetId()==wxt_window_number ) {
-		wxt_exec_event(GE_buttonrelease, x, y, 3, (int) right_button_sw.Time(), this->GetId());
+	if ( wxt_exec_event(GE_buttonrelease, x, y, 3,
+				(int) right_button_sw.Time(), this->GetId()) ) {
 		/* start a watch to send the time elapsed between up and down */
 		right_button_sw.Start();
 	}
@@ -1015,10 +1005,10 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 	}
 
 	/* only send char events to gnuplot if we are the active window */
-	if ( this->GetId()==wxt_window_number ) {
+	if ( wxt_exec_event(GE_keypress, (int) gnuplot_x( &plot, mouse_x ),
+				(int) gnuplot_y( &plot, mouse_y ),
+				gp_keycode, 0, this->GetId()) ) {
 		FPRINTF((stderr,"sending char event\n"));
-		wxt_exec_event(GE_keypress, (int) gnuplot_x( &plot, mouse_x ),
-			(int) gnuplot_y( &plot, mouse_y ), gp_keycode, 0, this->GetId());
 	}
 
 	/* The following wxWidgets keycodes are not mapped :
@@ -2737,9 +2727,12 @@ void wxt_change_thread_state(wxt_thread_state_t state)
 /* Similar to gp_exec_event(),
  * put the event sent by the terminal in a list,
  * to be processed by the main thread. */
-void wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
+bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 {
 	struct gp_event_t event;
+
+	if ( id != wxt_window_number )
+		return false;
 
 	event.type = type;
 	event.mx = mx;
@@ -2766,6 +2759,7 @@ void wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 		if (event.par1 > '\0')
 			paused_for_mouse = 0;
 	}
+	return true;
 #else
 	/* add the event to the event list */
 	if (wxt_check_thread_state() == WAITING_FOR_STDIN)
@@ -2774,7 +2768,10 @@ void wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 		mutexProtectingEventList.Lock();
 		EventList.push_back(event);
 		mutexProtectingEventList.Unlock();
+		return true;
 	}
+	else
+		return false;
 #endif /* ! _Windows */
 }
 
