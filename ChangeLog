@@ -2,8 +2,12 @@
 
 	* src/wxterminal/wxt_gui.cpp:
 	* src/wxterminal/wxt_gui.h:
-	Add a returned boolean to wxt_exec_event, to simplify callers.
-	Factorize some code in a new function: wxt_process_one_event
+	(wxt_exec_event) Add a returned boolean, to simplify callers.
+	(wxt_process_one_event) Factorize some code in this new function.
+	(wxt_atexit) Rework the "persist" effect code, do not use threads
+	anymore, no more stupid loop either; this prevents gnuplot from
+	showing in `top` after exitting in "persist" mode, and prepares
+	for further improvements (wxMac included).
 
 2007-04-27  Ethan Merritt  <merritt@u.washington.edu>
 

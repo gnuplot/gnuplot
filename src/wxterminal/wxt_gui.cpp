@@ -452,13 +452,25 @@ void wxtFrame::OnHelp( wxCommandEvent& WXUNUSED( event ) )
 void wxtFrame::OnClose( wxCloseEvent& event )
 {
 	FPRINTF((stderr,"OnClose\n"));
-	if ( event.CanVeto() ) {
+	if ( event.CanVeto() && !wxt_handling_persist) {
 		/* Default behaviour when Quit is clicked, or the window cross X */
 		event.Veto();
 		this->Hide();
 	}
-	else /* Should not happen, but just in case */
+	else /* in "persist" mode */ {
+		/* declare the iterator */
+		std::vector<wxt_window_t>::iterator wxt_iter;
+
+		for(wxt_iter = wxt_window_list.begin();
+				wxt_iter != wxt_window_list.end(); wxt_iter++)
+		{
+			if (this == wxt_iter->frame) {
+				wxt_window_list.erase(wxt_iter);
+				break;
+			}
+		}
 		this->Destroy();
+	}
 }
 
 /* when the window is resized,
@@ -2774,17 +2786,25 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 	wxt_process_one_event(&event);
 	return true;
 #else
-	/* add the event to the event list */
-	if (wxt_check_thread_state() == WAITING_FOR_STDIN)
+	if (!wxt_handling_persist)
 	{
-		FPRINTF2((stderr,"Gui thread adds an event to the list\n"));
-		mutexProtectingEventList.Lock();
-		EventList.push_back(event);
-		mutexProtectingEventList.Unlock();
-		return true;
+		/* add the event to the event list */
+		if (wxt_check_thread_state() == WAITING_FOR_STDIN)
+		{
+			FPRINTF2((stderr,"Gui thread adds an event to the list\n"));
+			mutexProtectingEventList.Lock();
+			EventList.push_back(event);
+			mutexProtectingEventList.Unlock();
+			return true;
+		}
+		else
+			return false;
 	}
 	else
-		return false;
+	{
+		wxt_process_one_event(&event);
+		return true;
+	}
 #endif /* ! _Windows */
 }
 
@@ -2981,11 +3001,8 @@ void wxt_atexit()
 
 	/* the parent just exits, the child keeps going */
 	if (!pid) {
-		/* create a new gui thread and run it */
-		/* have to close the previous main loop for this to succeed */
-		thread = new wxtThread();
-		thread->Create();
-		thread->Run();
+		/* process events directly */
+		wxt_handling_persist = true;
 
 # endif /* HAVE_WORKING_FORK */
 
@@ -2993,26 +3010,8 @@ void wxt_atexit()
 		wxt_change_thread_state(WAITING_FOR_STDIN);
 # endif /*USE_MOUSE*/
 
-		/* protect the following from interrupt */
-		wxt_sigint_init();
-
-		while (wxt_window_opened()) {
-# ifdef USE_MOUSE
-			if (!strcmp(term->name,"wxt"))
-				wxt_process_events();
-# endif /*USE_MOUSE*/
-			/* wait 10 microseconds and repeat */
-			/* such a polling is bad, putting the thread to sleep
-			 * would be better */
-			wxMicroSleep(10);
-			wxt_sigint_check();
-		}
-
-		wxt_sigint_restore();
-
-# ifdef USE_MOUSE
-		wxt_change_thread_state(RUNNING);
-# endif /*USE_MOUSE*/
+		/* (re)start gui loop */
+		wxTheApp->OnRun();
 
 		/* cleanup and quit */
 		wxt_cleanup();
@@ -3042,8 +3041,9 @@ void wxt_cleanup()
 
 	/* Close all open terminal windows, this will make OnRun exit, and so will the gui thread */
 	wxt_MutexGuiEnter();
-	for(wxt_iter = wxt_window_list.begin(); wxt_iter != wxt_window_list.end(); wxt_iter++)
-		delete wxt_iter->frame;
+	for(wxt_iter = wxt_window_list.begin();
+			wxt_iter != wxt_window_list.end(); wxt_iter++)
+		wxt_iter->frame->Destroy();
 	wxt_MutexGuiLeave();
 
 #if defined(__WXGTK__)||defined(__WXMAC__)
@@ -3076,7 +3076,8 @@ void wxt_MutexGuiEnter()
 {
 	FPRINTF2((stderr,"locking gui mutex\n"));
 #if defined(__WXGTK__)||defined(__WXMAC__)
-	wxMutexGuiEnter();
+	if (!wxt_handling_persist)
+		wxMutexGuiEnter();
 #elif defined(__WXMSW__)
 #else
 # error "No implementation"
@@ -3087,7 +3088,8 @@ void wxt_MutexGuiLeave()
 {
 	FPRINTF2((stderr,"unlocking gui mutex\n"));
 #if defined(__WXGTK__)||defined(__WXMAC__)
-	wxMutexGuiLeave();
+	if (!wxt_handling_persist)
+		wxMutexGuiLeave();
 #elif defined(__WXMSW__)
 #else
 # error "No implementation"
