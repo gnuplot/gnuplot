@@ -9,6 +9,9 @@
 	(wxt_cleanup): Send an event to exit the main loop, destroying the
 	windows is not enough.
 
+	* src/wxterminal/gp_cairo.c (gp_cairo_initialize_plot):
+	Initialize plot->rounded to satisfy valgrind.
+
 2007-04-29  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 
 	* man/gnuplot.1: Document environment variables and the
