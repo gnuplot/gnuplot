@@ -6,6 +6,8 @@
 	Change the text of the status bar asynchronously by sending a message to
 	the GUI thread instead of doing it in a mutex. This particular GUI
 	change from a separate thread was crashing on wxMac.
+	(wxt_cleanup): Send an event to exit the main loop, destroying the
+	windows is not enough.
 
 2007-04-29  James R. Van Zandt  <jrv@vanzandt.comcast.net>
 

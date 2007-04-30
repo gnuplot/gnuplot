@@ -3050,7 +3050,15 @@ void wxt_cleanup()
 	/* protect the following from interrupt */
 	wxt_sigint_init();
 
-	/* Close all open terminal windows, this will make OnRun exit, and so will the gui thread */
+	/* send a message to exit the main loop */
+	wxCommandEvent event(wxExitLoopEvent);
+	if (wxt_window_list.size())
+	{
+		wxt_iter = wxt_window_list.begin();
+		wxt_iter->frame->GetEventHandler()->AddPendingEvent( event );
+	}
+
+	/* Close all open terminal windows */
 	wxt_MutexGuiEnter();
 	for(wxt_iter = wxt_window_list.begin();
 			wxt_iter != wxt_window_list.end(); wxt_iter++)
