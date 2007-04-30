@@ -136,6 +136,7 @@ BEGIN_EVENT_TABLE( wxtFrame, wxFrame )
 	EVT_TOOL( Toolbar_ZoomPrevious, wxtFrame::OnZoomPrevious )
 	EVT_TOOL( Toolbar_ZoomNext, wxtFrame::OnZoomNext )
 	EVT_TOOL( Toolbar_Autoscale, wxtFrame::OnAutoscale )
+	EVT_COMMAND( wxID_ANY, wxStatusTextEvent, wxtFrame::OnSetStatusText )
 #endif /*USE_MOUSE*/
 	EVT_TOOL( Toolbar_Config, wxtFrame::OnConfig )
 	EVT_TOOL( Toolbar_Help, wxtFrame::OnHelp )
@@ -413,6 +414,12 @@ void wxtFrame::OnZoomNext( wxCommandEvent& WXUNUSED( event ) )
 void wxtFrame::OnAutoscale( wxCommandEvent& WXUNUSED( event ) )
 {
 	wxt_exec_event(GE_keypress, 0, 0, 'a', 0, this->GetId());
+}
+
+/* set the status text from the event data */
+void wxtFrame::OnSetStatusText( wxCommandEvent& event )
+{
+	SetStatusText(event.GetString());
 }
 #endif /*USE_MOUSE*/
 
@@ -1984,7 +1991,11 @@ void wxt_put_tmptext(int n, const char str[])
 
 	switch ( n ) {
 	case 0:
-		wxt_current_window->frame->SetStatusText( wxString(str, wxConvLocal) );
+		{
+			wxCommandEvent event(wxStatusTextEvent);
+			event.SetString(wxString(str, wxConvLocal));
+			wxt_current_window->frame->GetEventHandler()->AddPendingEvent( event );
+		}
 		break;
 	case 1:
 		wxt_current_panel->zoom_x1 = wxt_current_panel->mouse_x;

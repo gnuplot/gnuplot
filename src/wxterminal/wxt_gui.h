@@ -207,6 +207,11 @@ static wxtThread * thread;
 DECLARE_EVENT_TYPE(wxExitLoopEvent, -1)
 DEFINE_EVENT_TYPE(wxExitLoopEvent)
 
+#ifdef USE_MOUSE
+DECLARE_EVENT_TYPE(wxStatusTextEvent, -1)
+DEFINE_EVENT_TYPE(wxStatusTextEvent)
+#endif /* USE_MOUSE */
+
 /* Define a new application type, each gui should derive a class from wxApp */
 class wxtApp : public wxApp
 {
@@ -428,6 +433,7 @@ public:
 	void OnZoomPrevious( wxCommandEvent& event );
 	void OnZoomNext( wxCommandEvent& event );
 	void OnAutoscale( wxCommandEvent& event );
+	void OnSetStatusText( wxCommandEvent& event );
 #endif /*USE_MOUSE*/
 	void OnConfig( wxCommandEvent& event );
 	void OnHelp( wxCommandEvent& event );
