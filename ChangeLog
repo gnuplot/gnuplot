@@ -1,3 +1,7 @@
+2007-05-04  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* term/gd.trm (PNG_image): Fixed an image clipping bug in x dimension.
+
 2007-05-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (key_sample_point_pm3d):  The sample point in the key

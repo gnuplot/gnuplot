@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.95.2.8 2007/03/22 04:42:40 sfeam Exp $
+ * $Id: gd.trm,v 1.95.2.9 2007/03/22 05:01:09 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2022,8 +2022,8 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
     }
 
     /* Set clipping bound for area into which we will copy */
-    xclip1 = GPMIN(Y(corner[2].x), Y(corner[3].x));
-    xclip2 = GPMAX(Y(corner[2].x), Y(corner[3].x));
+    xclip1 = GPMIN(corner[2].x, corner[3].x);
+    xclip2 = GPMAX(corner[2].x, corner[3].x);
     yclip1 = GPMIN(Y(corner[2].y), Y(corner[3].y));
     yclip2 = GPMAX(Y(corner[2].y), Y(corner[3].y));
     gdImageGetClip(png_state.image, &x1, &y1, &x2, &y2);
