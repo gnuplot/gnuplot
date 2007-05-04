@@ -1,3 +1,9 @@
+2007-05-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (key_sample_point_pm3d):  The sample point in the key
+	failed to note an explicit "lc rgb 'foo'" in the plot command, leading
+	to a color mismatch between the plot and the key.  Bugfix.
+
 2007-04-30  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp:
