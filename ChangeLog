@@ -1,3 +1,10 @@
+2007-05-05  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+        * src/wxterminal/wxt_gui.cpp (wxtThread::Entry):
+        Fix the initialization of a sigset_t. The structure is not meant to be
+        known, functions are provided instead. The previous code was
+        completely wrong on non GNU systems.
+
 2007-05-04  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* term/gd.trm (PNG_image): Fixed an image clipping bug in x dimension.
