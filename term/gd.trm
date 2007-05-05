@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.115 2007/03/08 04:02:53 sfeam Exp $
+ * $Id: gd.trm,v 1.116 2007/05/04 16:55:51 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2008,6 +2008,18 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
 	gdImagePaletteCopy(im, png_state.image);
     }
 
+    /* Set clipping bound for area into which we will copy */
+    xclip1 = GPMIN(corner[2].x, corner[3].x);
+    xclip2 = GPMAX(corner[2].x, corner[3].x);
+    yclip1 = GPMIN(Y(corner[2].y), Y(corner[3].y));
+    yclip2 = GPMAX(Y(corner[2].y), Y(corner[3].y));
+    gdImageGetClip(png_state.image, &x1, &y1, &x2, &y2);
+    gdImageSetClip(png_state.image, xclip1, yclip1, xclip2, yclip2);
+
+    /* Copy and resize onto requested region of plot */
+    mout = abs( (int)corner[1].x - (int)corner[0].x );
+    nout = abs( (int)corner[1].y - (int)corner[0].y );
+
     /* TrueColor 24-bit color mode */
     if (color_mode == IC_RGB) {
 	for (n=0; n<N; n++) {
@@ -2036,18 +2048,7 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
 	}
     }
 
-    /* Set clipping bound for area into which we will copy */
-    xclip1 = GPMIN(corner[2].x, corner[3].x);
-    xclip2 = GPMAX(corner[2].x, corner[3].x);
-    yclip1 = GPMIN(Y(corner[2].y), Y(corner[3].y));
-    yclip2 = GPMAX(Y(corner[2].y), Y(corner[3].y));
-    gdImageGetClip(png_state.image, &x1, &y1, &x2, &y2);
-    gdImageSetClip(png_state.image, xclip1, yclip1, xclip2, yclip2);
-
-    /* Copy and resize onto requested region of plot */
     /* FIXME - WOULD gdImageCopyResampled() do a nicer job ??? */
-    mout = abs( (int)corner[1].x - (int)corner[0].x );
-    nout = abs( (int)corner[1].y - (int)corner[0].y );
     gdImageCopyResized(png_state.image, im,
 	(corner[0].x), Y(corner[0].y),	/* Destination X, Y */
 	0, 0, 				/* Source X, Y */
