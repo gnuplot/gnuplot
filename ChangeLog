@@ -7,6 +7,8 @@
 	were not in the 3D structure but should be (e.g. fillstyle).
 	Impact: trivial increase in the size of the 3D plot structure.
 
+	* term/gd.trm: Remove long-dead code and associated comment.
+
 2007-05-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_image): Rearrange code slightly to facilitate later

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.116 2007/05/04 16:55:51 sfeam Exp $
+ * $Id: gd.trm,v 1.117 2007/05/05 21:39:09 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1291,14 +1291,6 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
     }
 
     gdImageFilledPolygon(png_state.image, gd_corners, points, color);
-
-    /* easy, since gdPointPtr is the same as (gdiPoint*) */
-    /* if someone someday needs this routine to be NON-DESTRUCTIVE, then change
-       the following line to #if 1 */
-#if 0
-    for (i = 0; i < points; i++)
-	corners[i].y = Y(corners[i].y);
-#endif
 }
 
 /*
