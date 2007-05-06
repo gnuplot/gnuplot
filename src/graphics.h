@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.35 2006/10/26 04:09:13 sfeam Exp $
+ * $Id: graphics.h,v 1.36 2007/01/17 05:34:17 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -47,10 +47,9 @@
 
 typedef struct curve_points {
     struct curve_points *next;	/* pointer to next plot in linked list */
-    int token;			/* last token nr., for second pass */
-    enum PLOT_TYPE plot_type;	/* data, function? 3D? */
-    enum PLOT_STYLE plot_style;	/* which "with" option in use? */
-    enum PLOT_SMOOTH plot_smooth; /* which "smooth" method to be used? */
+    int token;			/* last token used, for second parsing pass */
+    enum PLOT_TYPE plot_type;	/* DATA2D? DATA3D? FUNC2D FUNC3D? NODATA? */
+    enum PLOT_STYLE plot_style;	/* style set by "with" or by default */
     char *title;		/* plot title, a.k.a. key entry */
     TBOOLEAN title_no_enhanced;	/* don't typeset title in enhanced mode */
     TBOOLEAN title_is_filename;	/* TRUE if title was auto-generated from filename */
@@ -58,25 +57,27 @@ typedef struct curve_points {
     struct lp_style_type lp_properties;
     struct arrow_style_type arrow_properties;
     struct fill_style_type fill_properties;
-    int p_max;			/* how many points are allocated */
-    int p_count;		/* count of points in points */
-    int x_axis;			/* FIRST_X_AXIS or SECOND_X_AXIS */
-    int y_axis;			/* FIRST_Y_AXIS or SECOND_Y_AXIS */
-    /* HBB 20000504: new field */
-    int z_axis;			/* same as either x_axis or y_axis, for 5-column plot types */
-    /* pm 5.1.2002: new field */
-    filledcurves_opts filledcurves_options;
-    struct coordinate GPHUGE *points;
 #ifdef EAM_DATASTRINGS
     struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */
-#endif
-#ifdef EAM_HISTOGRAMS
-    struct histogram_style *histogram;	/* Only used if plot_style == HISTOGRAM */
-    int histogram_sequence;	/* Ordering of this dataset within the histogram */
 #endif
 #ifdef WITH_IMAGE
     struct t_image image_properties;	/* only used if plot_style is IMAGE or RGB_IMAGE */
 #endif
+
+    /* 2D and 3D plot structure fields overlay only to this point */
+
+    filledcurves_opts filledcurves_options;
+#ifdef EAM_HISTOGRAMS
+    struct histogram_style *histogram;	/* Only used if plot_style == HISTOGRAM */
+    int histogram_sequence;	/* Ordering of this dataset within the histogram */
+#endif
+    enum PLOT_SMOOTH plot_smooth; /* which "smooth" method to be used? */
+    int p_max;			/* how many points are allocated */
+    int p_count;		/* count of points in points */
+    int x_axis;			/* FIRST_X_AXIS or SECOND_X_AXIS */
+    int y_axis;			/* FIRST_Y_AXIS or SECOND_Y_AXIS */
+    int z_axis;			/* same as either x_axis or y_axis, for 5-column plot types */
+    struct coordinate GPHUGE *points;
 } curve_points;
 
 /* From ESR's "Actual code patch" :) */

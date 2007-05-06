@@ -1,3 +1,12 @@
+2007-05-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.h src/graph3d.h: Rearrange the order of fields in the
+	2D and 3D plot structures so that all fields they have in common are
+	aligned in parallel. This facilitates consolidation of code that can
+	apply to both 2D and 3D plots. It also points up several fields that
+	were not in the 3D structure but should be (e.g. fillstyle).
+	Impact: trivial increase in the size of the 3D plot structure.
+
 2007-05-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_image): Rearrange code slightly to facilitate later

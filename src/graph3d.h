@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.25 2006/10/21 04:32:41 sfeam Exp $
+ * $Id: graph3d.h,v 1.26 2007/01/17 05:34:17 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -79,31 +79,37 @@ typedef struct iso_curve {
 } iso_curve;
 
 typedef struct surface_points {
-    struct surface_points *next_sp; /* linked list */
-    int token;			/* last token nr, for second pass */
-    int plot_num;		/* needed for tracking iteration */
-    enum PLOT_TYPE plot_type;
-    enum PLOT_STYLE plot_style;
-    char *title;
+
+    struct surface_points *next_sp; /* pointer to next plot in linked list */
+    int token;			/* last token used, for second parsing pass */
+    enum PLOT_TYPE plot_type;	/* DATA2D? DATA3D? FUNC2D FUNC3D? NODATA? */
+    enum PLOT_STYLE plot_style;	/* style set by "with" or by default */
+    char *title;		/* plot title, a.k.a. key entry */
     TBOOLEAN title_no_enhanced;	/* don't typeset title in enhanced mode */
-    TBOOLEAN opt_out_of_hidden3d; /* set by "with nohidden" opeion */
+    TBOOLEAN title_is_filename;	/* not used in 3D */
+    TBOOLEAN title_is_suppressed;/* not used in 3D */
     struct lp_style_type lp_properties;
     struct arrow_style_type arrow_properties;
-    int has_grid_topology;
-
-    /* Data files only - num of isolines read from file. For
-     * functions, num_iso_read is the number of 'primary' isolines (in
-     * x direction) */
-    int num_iso_read;
-    struct gnuplot_contours *contours; /* NULL if not doing contours. */
-    struct iso_curve *iso_crvs;	/* the actual data */
+    struct fill_style_type fill_properties;	/* FIXME: ignored in 3D */
 #ifdef EAM_DATASTRINGS
     struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */
 #endif
 #ifdef WITH_IMAGE
     struct t_image image_properties;	/* only used if plot_style is IMAGE or RGB_IMAGE */
 #endif
+
+    /* 2D and 3D plot structure fields overlay only to this point */
+
+    TBOOLEAN opt_out_of_hidden3d; /* set by "with nohidden" opeion */
     TBOOLEAN pm3d_color_from_column;
+    int has_grid_topology;
+    int plot_num;		/* needed for tracking iteration */
+
+    /* Data files only - num of isolines read from file. For functions,  */
+    /* num_iso_read is the number of 'primary' isolines (in x direction) */
+    int num_iso_read;
+    struct gnuplot_contours *contours; /* NULL if not doing contours. */
+    struct iso_curve *iso_crvs;	/* the actual data */
     char pm3d_where[7];		/* explicitly given base, top, surface */
 
 } surface_points;
