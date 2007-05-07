@@ -9,6 +9,9 @@
 	format converter, it might be more reasonable just to drop this
 	driver option altogether.
 
+	* term/aquaterm.trm (AQUA_options): Allow terminal window ID to come
+	from a variable.  Bug #1714070
+
 2007-05-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.h src/graph3d.h: Rearrange the order of fields in the
