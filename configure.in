@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.217 2007/03/11 17:41:08 tlecomte Exp $
+dnl $Id: configure.in,v 1.218 2007/04/18 19:58:15 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -351,30 +351,30 @@ dnl Else use either GNU libplot from plotutils,
 dnl or ancient GNU graphics libplot
 AC_ARG_WITH(plot,dnl
 [  --with-plot[=DIR]       use the Unix plot library],
-  [if test "$withval" = yes; then
+  [if test "$withval" != no; then
      dnl Unix plot library
      AC_CHECK_LIB(plot,openpl,
        [AC_DEFINE(UNIXPLOT,1,
                   [ Define if you want to use the standard Unix plot library. ])
         TERMLIBS="-lplot $TERMLIBS"],
-       with_plot=no)
-   elif test "$withval" != no; then
-     dnl GNU plotutils 2.2 or better
-     if test -d $withval/include; then
-       CPPFLAGS="$CPPFLAGS -I$withval/include"
-     fi
-     if test -d $withval/lib; then
-       LDFLAGS="$LDFLAGS -L$withval/lib"
-     fi
-     TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
-     AC_CHECK_LIB(plot,pl_textangle,
-       [TERMLIBS="-lplot $TERMLIBS"
-        AC_DEFINE(GNUGRAPH,1,
-                  [ Define if you want to use the GNU version of the Unix plot library. ])],
-       [AC_MSG_WARN([GNU plotutils v2.2 or newer required -- disabling gnugraph terminal])
-        TERMXLIBS=
-        with_plot=no],
-       [$TERMXLIBS])
+       [
+	 dnl GNU plotutils 2.2 or better
+	 if test -d $withval/include; then
+	   CPPFLAGS="$CPPFLAGS -I$withval/include"
+	 fi
+	 if test -d $withval/lib; then
+	   LDFLAGS="$LDFLAGS -L$withval/lib"
+	 fi
+	 TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
+	 AC_CHECK_LIB(plot,pl_textangle,
+	   [TERMLIBS="-lplot $TERMLIBS"
+	    AC_DEFINE(GNUGRAPH,1,
+	              [ Define if you want to use the GNU version of the Unix plot library. ])],
+	   [AC_MSG_WARN([GNU plotutils v2.2 or newer required -- disabling gnugraph terminal])
+	    TERMXLIBS=
+	    with_plot=no],
+	   [$TERMXLIBS])
+	])
    fi])
 dnl end libplot
 

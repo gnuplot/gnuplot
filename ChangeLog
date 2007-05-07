@@ -1,3 +1,14 @@
+2007-05-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* configure.in: If the user specifies ./configure --with-plot but
+	gives no explicit directory then try anyway because the necessary
+	library may be in a standard place.  Bug #1654681
+
+	Given how out of date the gnugraph/unixplot driver is, and the fact
+	that gnuplot itself supports more output formats that the gnugraph
+	format converter, it might be more reasonable just to drop this
+	driver option altogether.
+
 2007-05-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.h src/graph3d.h: Rearrange the order of fields in the
