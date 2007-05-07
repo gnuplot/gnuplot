@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.30 2006/08/02 17:12:40 persquare Exp $
+ * $Id: aquaterm.trm,v 1.31 2006/08/03 12:35:16 persquare Exp $
  *
  */
 
@@ -168,6 +168,7 @@ AQUA_options()
 {
   struct value a;
   char *s;
+  TBOOLEAN set_number = FALSE;
   
   AQUA_title[0] = '\0'; /* Force re-interpretation of title string */
 
@@ -264,8 +265,9 @@ AQUA_options()
       continue;
     }
 
-    if (isanumber(c_token)) { /* plot ref number*/
+    if (!set_number) { /* plot ref number */
 	AQUA_plotRef = (int) real (const_express (&a));
+	set_number = TRUE;
 	continue;
     }
 
