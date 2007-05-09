@@ -1,3 +1,11 @@
+2007-05-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/color.d (ifilled_quadrangle): Initialize line style before
+	setting color.  Bug #1715480
+
+	* src/misc.c (lp_use_properties): Pay attention to the point flag
+	even if we fall through to a default line type. Bug #1715480
+
 2007-05-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in: If the user specifies ./configure --with-plot but
