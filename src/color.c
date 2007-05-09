@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.70.2.2 2007/02/25 13:04:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.70.2.3 2007/03/24 05:29:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -209,11 +209,12 @@ void ifilled_quadrangle(gpiPoint* icorners)
 
 	int i;
 
-	/* Colour has changed, thus must apply properties again. That's because
-	   gnuplot has no inner notion of color.
+	/* Colour has changed, so we must apply line properties again.
+	 * FIXME: It would be cleaner to apply the general line properties
+	 * outside this loop, and limit ourselves to apply_pm3dcolor().
 	 */
-	struct lp_style_type lp;
-	lp_use_properties(&lp, pm3d.hidden3d_tag, 1);
+	static struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
+	lp_use_properties(&lp, pm3d.hidden3d_tag, 0);
 	term_apply_lp_properties(&lp);
 
 	term->move(icorners[0].x, icorners[0].y);
