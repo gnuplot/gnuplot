@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.142 2007/03/29 05:14:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.143 2007/04/27 20:35:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -629,6 +629,13 @@ get_3ddata(struct surface_points *this_plot)
 	    local_this_iso->next->p_count = 0;
 	}
 
+#ifdef HAVE_LOCALE_H
+	/* If the user has set an explicit locale for numeric input, apply it */
+	/* here so that it affects data fields read from the input file.      */
+	if (numeric_locale)
+	    setlocale(LC_NUMERIC,numeric_locale);
+#endif
+
 	while ((j = df_readline(v,MAXDATACOLS)) != DF_EOF) {
 	    if (j == DF_SECOND_BLANK)
 		break;		/* two blank lines */
@@ -895,6 +902,12 @@ get_3ddata(struct surface_points *this_plot)
 	    /* some may complain, but I regard this as the correct use of goto */
 	    ++xdatum;
 	}			/* end of whileloop - end of surface */
+
+#ifdef HAVE_LOCALE_H
+	/* We are finished reading user input; return to C locale for internal use */
+	if (numeric_locale)
+	    setlocale(LC_NUMERIC,"C");
+#endif
 
 	if (pm3d_color_from_column) {
 	    this_plot->pm3d_color_from_column = pm3d_color_from_column;

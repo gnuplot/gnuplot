@@ -3,6 +3,12 @@
 	* src/util.c src/util.h src/variable.c src/variable.h
 	src/command.c:  Move numeric_locale from variable.c to util.c.
 
+	* src/fit.c (fit_command) src/plot2d.c (get_data)
+	src/plot3d.c (get_3ddata) src/datafile.c (df_reset_after_error):
+	Apply user-specified numeric locale just before any data is read in from
+	a data file.  Reset it to "C" afterwards.
+	Bugs #1692541 #1707916
+
 2007-05-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.d (ifilled_quadrangle): Initialize line style before

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.121 2007/03/09 00:09:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.122 2007/04/09 20:14:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2483,7 +2483,12 @@ f_column(union argument *arg)
 void
 df_reset_after_error()
 {
-	evaluate_inside_using = FALSE;
+#ifdef HAVE_LOCALE_H
+    /* We are finished reading user input; return to C locale for internal use */
+    if (numeric_locale)
+	setlocale(LC_NUMERIC,"C");
+#endif
+    evaluate_inside_using = FALSE;
 }
 
 #ifdef GP_STRING_VARS

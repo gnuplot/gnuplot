@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.55 2006/03/17 16:26:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.56 2006/07/16 00:21:28 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1406,6 +1406,13 @@ fit_command()
     err_data = vec(max_data);
     num_data = 0;
 
+#ifdef HAVE_LOCALE_H
+    /* If the user has set an explicit locale for numeric input, apply it */
+    /* here so that it affects data fields read from the input file.      */
+    if (numeric_locale)
+	setlocale(LC_NUMERIC,numeric_locale);
+#endif
+
     while ((i = df_readline(v, 4)) != DF_EOF) {
 	if (num_data >= max_data) {
 	    /* increase max_data by factor of 1.5 */
@@ -1491,6 +1498,12 @@ fit_command()
 	err_data[num_data++] = (columns > 2) ? v[3] : 1;
     }
     df_close();
+
+#ifdef HAVE_LOCALE_H
+    /* We are finished reading user input; return to C locale for internal use */
+    if (numeric_locale)
+	setlocale(LC_NUMERIC,"C");
+#endif
 
     if (num_data <= 1)
 	Eex("No data to fit ");
