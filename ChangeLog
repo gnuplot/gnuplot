@@ -1,3 +1,8 @@
+2007-05-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util.c src/util.h src/variable.c src/variable.h
+	src/command.c:  Move numeric_locale from variable.c to util.c.
+
 2007-05-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.d (ifilled_quadrangle): Initialize line style before
