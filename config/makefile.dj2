@@ -10,7 +10,7 @@
 #
 # AUTHORS : several ... including Edzer Pebesma <pebesma@metoor.frw.uva.nl>
 #           last mod. by Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
-# DATE of last mod :    2005 Jul 15
+# DATE of last mod: $Date: $
 #
 # 
 # removed atari reference and added binary demo bf_test
@@ -55,18 +55,7 @@ TERMLIBS = -Lc:/djgpp/contrib/grx246/lib/dj2 -lgrx20 # -lgd
 
 # HBB : added $(OPTS) so user can
 #   change CFLAGS easily, without having to change makefile
-CFLAGS = -DMSDOS -DDOS32 \
-	-DPROTOTYPES -DSTDC_HEADERS=1 -DHAVE_STRINGIZE \
-	-DHAVE_VALUES_H -DHAVE_UNISTD_H -DRETSIGTYPE=void \
-	-DHAVE_ERF -DHAVE_LGAMMA -DHAVE_GAMMA \
-	-DHAVE_GETCWD -DHAVE_SETLINEBUF -DHAVE_SLEEP \
-	-DHAVE_STRNCASECMP -DHAVE_STRNICMP -DHAVE_STRERROR \
-	-DHAVE_SETVBUF -DHAVE_ATEXIT \
-	-DHAVE_TEMPNAM -DPIPES -DREADLINE \
-	-DHAVE_STDBOOL_H -DHAVE_MEMCPY -DHAVE_TIME_H -DHAVE_TIME_T_IN_TIME_H \
-	-DHAVE_MATH_H -DHAVE_STRUCT_EXCEPTION_IN_MATH_H \
-	-DHAVE_STDLIB_H -DHAVE_FLOAT_H -DHAVE_ERRNO_H -DHAVE_LIMITS_H \
-	-DHAVE_DIRENT_H -DHAVE_SYS_STAT_H \
+CFLAGS = -DHAVE_CONFIG_H \
 	-O2 -g $(OPTS)
 
 LINKOPT = $(LDFLAGS) $(TERMLIBS) -lm -lpc
@@ -122,6 +111,9 @@ $(EXENAME).exe : $(OBJS)
 	objcopy --strip-all $(EXENAME) $(EXENAME).exe
 	stubify $(EXENAME).exe
 
+config.h: ../config/config.dj2
+	copy ..\config\config.dj2 config.h
+
 command.o: command.c plot.h setshow.h help.h
 	$(CC) -c $(CFLAGS) $(INCLUDE) -DHELPFILE=\"$(HELPFILE)\" command.c
 
@@ -131,7 +123,7 @@ show.o: show.c plot.h setshow.h
 term.o: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCES)
 	$(CC) -c $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -I$(T) term.c
 
-$(OBJS): plot.h
+$(OBJS): plot.h config.h
 
 command.o help.o misc.o: help.h
 
@@ -145,7 +137,7 @@ bitmap.o term.o: bitmap.h
 
 variable.o: variable.c plot.h variable.h
 
-EMAIL=broeker@physik.rwth-aachen.de
+EMAIL=gnuplot-info@lists.sourceforge.net
 version.o: version.c
 	$(CC) -c -DCONTACT=\"$(EMAIL)\" $(CFLAGS) $(INCLUDE) version.c
 
@@ -189,6 +181,7 @@ install: all
 # clean target - remove all temp files, but leave executable intact
 clean:
 	del *.o
+	rem del config.h
 	del $(EXENAME)
 	del doc2gih
 	del doc2gih.exe

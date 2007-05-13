@@ -1,3 +1,8 @@
+2007-05-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.dj2 config/makefile.dj2: Updated Makefile for djgpp
+	using a config.h file.
+
 2007-05-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util.c src/util.h src/variable.c src/variable.h
