@@ -5,6 +5,10 @@
 	processing based on the setting of "set key {no}enhanced".
 	Bug #1712560
 
+	* demo/histograms.dem demo/histograms2.dem: This change affects the
+	histogram demo, because some column headers contain an underscore.
+	Add an explicit "set key noenhanced".
+
 2007-05-14  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
         * src/command.c (fgets_ipc): Fix fgets_ipc so that it behaves like

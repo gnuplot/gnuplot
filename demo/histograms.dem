@@ -5,6 +5,7 @@ reset
 set title "US immigration from Europe by decade"
 set datafile missing "-"
 set xtics nomirror rotate by -45
+set key noenhanced
 #
 # First plot using linespoints
 set style data linespoints
