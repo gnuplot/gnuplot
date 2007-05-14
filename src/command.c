@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.144.2.2 2007/02/10 08:15:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.144.2.3 2007/02/11 13:30:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2416,6 +2416,7 @@ rlgets(char *s, size_t n, const char *prompt)
 	}
     }
     if (line) {
+	/* s will be NUL-terminated here */
 	safe_strncpy(s, line + leftover, n);
 	leftover += strlen(s);
 	if (line[leftover] == NUL)
@@ -2594,7 +2595,12 @@ cgets_emu(char *str, int len)
 /* this function is called for non-interactive operation. Its usage is
  * like fgets(), but additionally it checks for ipc events from the
  * terminals waitforinput() (if USE_MOUSE, and terminal is
- * mouseable). This function will be used when reading from a pipe. */
+ * mouseable). This function will be used when reading from a pipe.
+ * fgets() reads in at most one less than size characters from stream and
+ * stores them into the buffer pointed to by s.
+ * Reading stops after an EOF or a newline.  If a newline is read, it is
+ * stored into the buffer.  A '\0' is stored  after the last character in
+ * the buffer. */
 static char*
 fgets_ipc(
     char *dest,			/* string to fill */
@@ -2607,17 +2613,20 @@ fgets_ipc(
 	size_t i=0;		/* position inside dest */
 
 	dest[0] = '\0';
-	for (i=0; i < len; i++) {
+	for (i=0; i < len-1; i++) {
 	    c = term->waitforinput();
 	    if ('\n' == c) {
-		dest[i] = '\0';
-		return dest;
+		dest[i] = '\n';
+		i++;
+		break;
 	    } else if (EOF == c) {
+		dest[i] = '\0';
 		return (char*) 0;
 	    } else {
 		dest[i] = c;
 	    }
 	}
+	dest[i] = '\0';
 	return dest;
     } else
 #endif
@@ -2663,6 +2672,8 @@ read_line(const char *prompt)
 		return (1);	/* exit gnuplot */
 	} else {
 	    /* normal line input */
+	    /* gp_input_line must be NUL-terminated for strlen not to pass the
+	     * the bounds of this array */
 	    last = strlen(gp_input_line) - 1;
 	    if (last >= 0) {
 		if (gp_input_line[last] == '\n') {	/* remove any newline */

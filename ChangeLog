@@ -1,3 +1,9 @@
+2007-05-14  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/command.c (fgets_ipc): Fix fgets_ipc so that it behaves like
+	fgets (always NUL-terminate the returned string).
+	Bugs #1716556 and #1673352
+
 2007-05-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.d (ifilled_quadrangle): Initialize line style before
