@@ -1,3 +1,9 @@
+2007-05-14  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+        * src/command.c (fgets_ipc): Fix fgets_ipc so that it behaves like
+        fgets (always NUL-terminate the returned string).
+        Bugs #1716556 and #1673352
+
 2007-05-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.dj2 config/makefile.dj2: Updated Makefile for djgpp
