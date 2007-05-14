@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.122 2007/04/09 20:14:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.123 2007/05/10 22:52:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2727,6 +2727,7 @@ df_set_key_title(struct curve_points *plot)
 	free(plot->title);
 
     plot->title = gp_strdup(df_key_title);
+    plot->title_no_enhanced = !keyT.enhanced;
 }
 
 static void

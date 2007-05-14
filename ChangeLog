@@ -1,3 +1,10 @@
+2007-05-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_set_key_title): When a key title is loaded
+	from a datafile columnheader, apply or don't apply enhanced text
+	processing based on the setting of "set key {no}enhanced".
+	Bug #1712560
+
 2007-05-14  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
         * src/command.c (fgets_ipc): Fix fgets_ipc so that it behaves like
