@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.173 2007/01/14 05:34:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.174 2007/04/04 20:16:22 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1875,6 +1875,7 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
     memset((void*)data, 0, (size_t)dest_width * dest_height);
     image_dest = XCreateImage(dpy, vis, 1, XYBitmap,
 	    0, data, (unsigned int)dest_width, (unsigned int)dest_height, 8, 0);
+
 #define RotateX(_x, _y) (( (_x) * ca + (_y) * sa + dest_cen_x))
 #define RotateY(_x, _y) ((-(_x) * sa + (_y) * ca + dest_cen_y))
     /* copy & rotate from source --> dest */
@@ -2978,6 +2979,10 @@ exec_cmd(plot_struct *plot, char *command)
 			    /* Create an initialized image object. */
 			    image_dest = XCreateImage(dpy, vis, dep, ZPixmap, 0, sample_data, M_view, N_view,
 						      32, M_view*sample_data_size);
+			    if (!image_dest) {
+				fputs("gnuplot_x11: can't get memory for image object. X11 aborted.\n", stderr);
+				EXIT(1);
+			    }
 
 			    /* Fill in the output image data by decimating or repeating the input image data. */
 			    for (j_view=0; j_view < N_view; j_view++) {
