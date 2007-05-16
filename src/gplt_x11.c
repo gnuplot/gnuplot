@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.2 2007/01/10 22:42:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.3 2007/01/14 18:33:45 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3094,7 +3094,7 @@ exec_cmd(plot_struct *plot, char *command)
 
 			    /* Create an initialized image object. */
 			    image_dest = XCreateImage(dpy, vis, dep, ZPixmap, 0, sample_data, M_view, N_view,
-						      32, M_view*sample_data_size);
+						      8*sample_data_size, M_view*sample_data_size);
 
 			    /* Fill in the output image data by decimating or repeating the input image data. */
 			    for (j_view=0; j_view < N_view; j_view++) {
