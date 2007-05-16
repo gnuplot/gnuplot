@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.175 2007/05/15 19:52:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.176 2007/05/16 18:36:22 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2963,11 +2963,7 @@ exec_cmd(plot_struct *plot, char *command)
 			int i_view, j_view;
 
 			/* Determine if 2 bytes is sufficient or 4 bytes are necessary for color image data. */
-			if (dep > 16) {
-			    sample_data_size = 4;
-			} else {
-			    sample_data_size = 2;
-			}
+			sample_data_size = (dep > 16) ? 4 : 2;
 
 			/* Expand or compress the original image to the pixels it will occupy on the screen. */
 			sample_data = (char *) malloc(M_view*N_view*sample_data_size);
@@ -2980,7 +2976,7 @@ exec_cmd(plot_struct *plot, char *command)
 			    image_dest = XCreateImage(dpy, vis, dep, ZPixmap, 0, sample_data, M_view, N_view,
 						      8*sample_data_size, M_view*sample_data_size);
 			    if (!image_dest) {
-				fputs("gnuplot_x11: can't get memory for image object. X11 aborted.\n", stderr);
+				fputs("gnuplot_x11: can't get memory for image object.\n", stderr);
 				EXIT(1);
 			    }
 
