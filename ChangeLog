@@ -1,3 +1,10 @@
+2007-05-16  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/plot.c (main): Properly reset Readline when we come back from
+	the SIGINT handler calling longjmp. This avoids having the line
+	edition all broken in that precise situation (arrow keys will work
+	instead of giving '^[[A' for example)
+
 2007-05-16  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/gplt_x11.c (image creation): Adjust image line pad according to
