@@ -1,3 +1,10 @@
+2007-05-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data) src/graphics.c (plot_lines):
+	Allow 2D plots "with lines lc rgb variable".  This capability already
+	exists for points, dots, labels, impulses.
+	Bug #1720032
+
 2007-05-16  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/plot.c (main): Properly reset Readline when we come back from
