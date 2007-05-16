@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.174 2007/04/04 20:16:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.175 2007/05/15 19:52:22 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2978,7 +2978,7 @@ exec_cmd(plot_struct *plot, char *command)
 
 			    /* Create an initialized image object. */
 			    image_dest = XCreateImage(dpy, vis, dep, ZPixmap, 0, sample_data, M_view, N_view,
-						      32, M_view*sample_data_size);
+						      8*sample_data_size, M_view*sample_data_size);
 			    if (!image_dest) {
 				fputs("gnuplot_x11: can't get memory for image object. X11 aborted.\n", stderr);
 				EXIT(1);

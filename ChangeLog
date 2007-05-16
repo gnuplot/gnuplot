@@ -1,3 +1,8 @@
+2007-05-16  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/gplt_x11.c (image creation): Adjust image line pad according to
+	image data width in XCreateImage().  Bug #1716389.
+
 2007-05-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (image creation): Add an error check for allocation of
