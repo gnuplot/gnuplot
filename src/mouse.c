@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.86 2007/02/10 00:14:54 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.87 2007/04/07 22:31:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1812,6 +1812,14 @@ event_reset(struct gp_event_t *ge)
 	/* of input from being swallowed when the plot window is closed.    */
 	if (term && !strncmp("x11",term->name,3))
 	    ungetc('\n',stdin);
+    }
+
+    /* Dummy up a keystroke event so that we can conveniently check for a  */
+    /* binding to "Close". We only get these for the current window. */
+    if (ge != (void *)1) {
+	ge->par1 = GP_Cancel;	/* Dummy keystroke */
+	ge->par2 = 0;		/* Not used; could pass window id here? */
+	event_keypress(ge, TRUE);
     }
 }
 

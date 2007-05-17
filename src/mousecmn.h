@@ -1,5 +1,5 @@
 /*
- * $Id: mousecmn.h,v 1.14 2005/03/26 22:06:51 sfeam Exp $
+ * $Id: mousecmn.h,v 1.15 2006/06/16 19:55:56 mikulik Exp $
  */
 
 /* GNUPLOT - mousecnm.h */
@@ -80,7 +80,6 @@ enum {
 */
 enum { Mod_Shift = (1), Mod_Ctrl = (1 << 1), Mod_Alt = (1 << 2) };
 
-
 /* the below depends on the ascii character set lying in the
  * range from 0 to 255 (below 1000) */
 enum { /* special keys with "usual well-known" keycodes */
@@ -157,6 +156,7 @@ enum { /* other special keys */
     GP_F10,
     GP_F11,
     GP_F12,
+    GP_Cancel,
     GP_LAST_KEY
 };
 

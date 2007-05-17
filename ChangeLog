@@ -1,3 +1,18 @@
+2007-05-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/win/wgraph.c (GraphClose) src/wxterminal/wxt_gui.cpp (OnClose):
+	Pass window close event through to event_reset(). x11 already did this.
+
+	* src/mouse.c (event_reset): Dummy up a keystroke event containing a
+	synthetic keystroke GP_Cancel.  Pass this through to event_keypress()
+	so that it will check for a user-specified binding to the window close
+	event.
+
+	* src/mouse.h src/mousecmn.h: Define the synthetic keystroke CP_Cancel.
+
+	* docs/gnuplot.doc: Document that you can now bind a window close
+	event just as you would a real key:    bind Close 'print "\n\nAyiii!\n"'
+
 2007-05-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data) src/graphics.c (plot_lines):
