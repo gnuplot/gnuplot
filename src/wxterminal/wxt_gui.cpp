@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.42 2007/05/05 18:59:00 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.43 2007/05/18 06:15:32 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -125,8 +125,11 @@
  * simple menu events like this the static method is much simpler.
  */
 
-BEGIN_EVENT_TABLE( wxtFrame, wxFrame )
+BEGIN_EVENT_TABLE( wxtApp, wxApp )
 	EVT_COMMAND( wxID_ANY, wxExitLoopEvent, wxtApp::OnExitLoop )
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE( wxtFrame, wxFrame )
 	EVT_CLOSE( wxtFrame::OnClose )
 	EVT_SIZE( wxtFrame::OnSize )
 	EVT_TOOL( Toolbar_CopyToClipboard, wxtFrame::OnCopy )
@@ -3002,10 +3005,22 @@ void wxt_atexit()
 	 * zoom until an error occurs and then hit a key) */
 # ifdef HAVE_WORKING_FORK
 	/* send a message to exit the main loop */
+	/* protect the following from interrupt */
+	wxt_sigint_init();
+
+	wxt_MutexGuiEnter();
 	wxCommandEvent event(wxExitLoopEvent);
-	std::vector<wxt_window_t>::iterator wxt_iter; /*declare the iterator*/
-	wxt_iter = wxt_window_list.begin();
-	wxt_iter->frame->GetEventHandler()->AddPendingEvent( event );
+	wxTheApp->AddPendingEvent( event );
+	wxt_MutexGuiLeave();
+
+	/* handle eventual interrupt, and restore original sigint handler */
+	wxt_sigint_check();
+	wxt_sigint_restore();
+
+	FPRINTF((stderr,"gui thread status %d %d %d\n",
+			thread->IsDetached(),
+			thread->IsAlive(),
+			thread->IsRunning() ));
 
 	/* wait for the gui thread to exit */
 	thread->Wait();
@@ -3054,16 +3069,12 @@ void wxt_cleanup()
 	/* protect the following from interrupt */
 	wxt_sigint_init();
 
+	wxt_MutexGuiEnter();
 	/* send a message to exit the main loop */
 	wxCommandEvent event(wxExitLoopEvent);
-	if (wxt_window_list.size())
-	{
-		wxt_iter = wxt_window_list.begin();
-		wxt_iter->frame->GetEventHandler()->AddPendingEvent( event );
-	}
+	wxTheApp->AddPendingEvent( event );
 
 	/* Close all open terminal windows */
-	wxt_MutexGuiEnter();
 	for(wxt_iter = wxt_window_list.begin();
 			wxt_iter != wxt_window_list.end(); wxt_iter++)
 		wxt_iter->frame->Destroy();

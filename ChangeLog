@@ -1,3 +1,9 @@
+2007-05-18  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp:
+	* src/wxterminal/wxt_gui.h:
+	Cleanup the way wxExitLoop events are sent on exit.
+
 2007-05-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/win/wgraph.c (GraphClose) src/wxterminal/wxt_gui.cpp (OnClose):
