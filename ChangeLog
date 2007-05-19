@@ -3,6 +3,11 @@
 	* demo/fillcrvs.dem:  Add world map as demo of closed filled curves
 	from a file.
 
+	* src/set.c (set_decimal): Follow POSIX standard with regard to finding
+	the value of LC_NUMERIC from the environment. Use the first match to
+	LC_ALL, LC_NUMERIC, or LANG.
+	Bug #1692541
+
 2007-05-18  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp:
