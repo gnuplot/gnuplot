@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.9 2007/03/22 05:12:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.10 2007/03/24 05:29:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2059,6 +2059,13 @@ plot_lines(struct curve_points *plot)
     double lx[2], ly[2];	/* two edge points */
 
     for (i = 0; i < plot->p_count; i++) {
+
+	/* rgb variable  -  color read from data column */
+	if (plot->points[i].type != UNDEFINED)
+	if ((plot->lp_properties.pm3d_color.value < 0.0)
+	    && (plot->lp_properties.pm3d_color.type == TC_RGB))
+	    set_rgbcolor( plot->points[i].yhigh);
+
 	switch (plot->points[i].type) {
 	case INRANGE:{
 		x = map_x(plot->points[i].x);
