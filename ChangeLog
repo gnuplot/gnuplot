@@ -1,3 +1,8 @@
+2007-05-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/fillcrvs.dem:  Add world map as demo of closed filled curves
+	from a file.
+
 2007-05-18  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp:
@@ -14,7 +19,7 @@
 	so that it will check for a user-specified binding to the window close
 	event.
 
-	* src/mouse.h src/mousecmn.h: Define the synthetic keystroke CP_Cancel.
+	* src/mouse.h src/mousecmn.h: Define the synthetic keystroke GP_Cancel.
 
 	* docs/gnuplot.doc: Document that you can now bind a window close
 	event just as you would a real key:    bind Close 'print "\n\nAyiii!\n"'

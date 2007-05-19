@@ -1,5 +1,5 @@
 #
-# $Id: fillcrvs.dem,v 1.4 2004/06/01 16:18:47 broeker Exp $
+# $Id: fillcrvs.dem,v 1.5 2004/09/28 06:06:10 sfeam Exp $
 #
 ### Demo for 'with filledcurves'
 
@@ -59,6 +59,19 @@ plot [t=-pi:pi] \
 	sin(t)/8+0.5,cos(t)/8+0.4 with filledcurve lt 3,	\
 	t/5,abs(t/5)-0.8 with filledcurve xy=0.1,-0.5 lt 1, \
 	t/3,1.52-abs(t/pi) with filledcurve xy=0,1.8 lt -1
+pause -1 'Press Return to continue'
+
+reset
+
+set title "world.dat plotted with filledcurves"
+set format x ""
+set format y ""
+set grid layerdefault linewidth 0.5 
+set object  1 rect from graph 0, 0 to graph 1, 1 behind fc  rgb "#afffff" fillstyle solid 1.00 border -1
+set xrange [ -180.000 : 180.000 ]
+set yrange [ -70.0000 : 80.0000 ]
+set lmargin  1
+plot 'world.dat' with filledcurve notitle fs solid 1.0 lc rgb 'dark-goldenrod'
 pause -1 'Press Return to continue'
 
 reset
