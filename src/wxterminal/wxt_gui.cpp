@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.44 2007/05/18 08:55:21 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.45 2007/05/22 16:30:23 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -126,6 +126,7 @@
  */
 
 BEGIN_EVENT_TABLE( wxtApp, wxApp )
+	EVT_COMMAND( wxID_ANY, wxCreateWindowEvent, wxtApp::OnCreateWindow )
 	EVT_COMMAND( wxID_ANY, wxExitLoopEvent, wxtApp::OnExitLoop )
 END_EVENT_TABLE()
 
@@ -169,7 +170,7 @@ BEGIN_EVENT_TABLE( wxtConfigDialog, wxDialog )
 END_EVENT_TABLE()
 
 
-#if defined(__WXGTK__)||defined(__WXMAC__)
+#ifdef WXT_MULTITHREADED
 /* ----------------------------------------------------------------------------
  *   gui thread
  * ----------------------------------------------------------------------------*/
@@ -197,11 +198,7 @@ void *wxtThread::Entry()
 	FPRINTF((stderr,"gui_thread_entry finishing\n"));
 	return NULL;
 }
-#elif defined (__WXMSW__)
-/* nothing to do here */
-#else
-# error "Not implemented."
-#endif
+#endif /* WXT_MULTITHREADED */
 
 
 
@@ -301,6 +298,39 @@ void wxtApp::OnExitLoop( wxCommandEvent& WXUNUSED(event) )
 {
 	FPRINTF((stderr,"wxtApp::OnExitLoop\n"));
 	wxTheApp->ExitMainLoop();
+}
+
+void wxtApp::OnCreateWindow( wxCommandEvent& event )
+{
+    /* retrieve the pointer to wxt_window_t */
+	wxt_window_t *window = (wxt_window_t*) event.GetClientData();
+
+	FPRINTF((stderr,"wxtApp::OnCreateWindow\n"));
+	window->frame = new wxtFrame( window->title, window->id, 50, 50, 640, 480 );
+	window->frame->Show(true);
+	FPRINTF((stderr,"new plot window opened\n"));
+	/* make the panel able to receive keyboard input */
+	window->frame->panel->SetFocus();
+	/* set the default crosshair cursor */
+	window->frame->panel->SetCursor(wxt_cursor_cross);
+	/* creating the true context (at initialization, it may be a fake one).
+	 * Note : the frame must be shown for this to succeed */
+	if (!window->frame->panel->plot.success)
+		window->frame->panel->wxt_cairo_create_context();
+	
+	/* tell the other thread we have finished */
+	wxMutexLocker lock(*(window->mutex));
+	window->condition->Broadcast();
+}
+
+/* wrapper for AddPendingEvent or ProcessEvent */
+void wxtApp::SendEvent( wxEvent &event)
+{
+#ifdef WXT_MULTITHREADED
+	AddPendingEvent(event);
+#else /* !WXT_MULTITHREADED */
+	ProcessEvent(event);
+#endif /* !WXT_MULTITHREADED */
 }
 
 /* ---------------------------------------------------------------------------
@@ -498,6 +528,16 @@ void wxtFrame::OnSize( wxSizeEvent& event )
 	 * So we must check for the panel to be properly initialized before.*/
 	if (panel)
 		panel->SetSize( this->GetClientSize() );
+}
+
+/* wrapper for AddPendingEvent or ProcessEvent */
+void wxtFrame::SendEvent( wxEvent &event)
+{
+#ifdef WXT_MULTITHREADED
+	AddPendingEvent(event);
+#else /* !WXT_MULTITHREADED */
+	ProcessEvent(event);
+#endif /* !WXT_MULTITHREADED */
 }
 
 /* ---------------------------------------------------------------------------
@@ -1367,7 +1407,8 @@ void wxt_init()
 		/* app initialization */
 		wxTheApp->CallOnInit();
 
-#if defined(__WXGTK__)||defined(__WXMAC__)
+
+#ifdef WXT_MULTITHREADED
 		/* Three commands to create the thread and run it.
 		 * We do this at first init only.
 		 * If the user sets another terminal and goes back to wxt,
@@ -1375,12 +1416,7 @@ void wxt_init()
 		thread = new wxtThread();
 		thread->Create();
 		thread->Run();
-#elif defined (__WXMSW__)
-/* nothing to do */
-#else
-# error "Not implemented."
-#endif /*__WXMSW__*/
-
+#endif /* WXT_MULTITHREADED */
 
 #ifdef USE_MOUSE
 		/* initialize the gnuplot<->terminal event system state */
@@ -1407,30 +1443,33 @@ void wxt_init()
 	if ( wxt_current_window == NULL ) {
 		FPRINTF((stderr,"opening a new plot window\n"));
 
-		wxt_MutexGuiEnter();
+		/* create a new plot window and show it */
 		wxt_window_t window;
 		window.id = wxt_window_number;
-		/* create a new plot window and show it */
-		wxString title;
 		if (strlen(wxt_title))
 			/* NOTE : this assumes that the title is encoded in the locale charset.
 			 * This is probably a good assumption, but it is not guaranteed !
 			 * May be improved by using gnuplot encoding setting. */
-			title << wxString(wxt_title, wxConvLocal);
+			window.title << wxString(wxt_title, wxConvLocal);
 		else
-			title.Printf(wxT("Gnuplot (window id : %d)"), window.id);
-		window.frame = new wxtFrame( title, window.id, 50, 50, 640, 480 );
-		window.frame->Show(true);
-		FPRINTF((stderr,"new plot window opened\n"));
-		/* make the panel able to receive keyboard input */
-		window.frame->panel->SetFocus();
-		/* set the default crosshair cursor */
-		window.frame->panel->SetCursor(wxt_cursor_cross);
-		/* creating the true context (at initialization, it may be a fake one).
-		 * Note : the frame must be shown for this to succeed */
-		if (!window.frame->panel->plot.success)
-			window.frame->panel->wxt_cairo_create_context();
+			window.title.Printf(wxT("Gnuplot (window id : %d)"), window.id);
+
+		window.mutex = new wxMutex();
+		window.condition = new wxCondition(*(window.mutex));
+
+		wxCommandEvent event(wxCreateWindowEvent);
+		event.SetClientData((void*) &window);
+
+#ifdef WXT_MULTITHREADED
+		window.mutex->Lock();
+#endif /* WXT_MULTITHREADED */
+		wxt_MutexGuiEnter();
+		dynamic_cast<wxtApp*>(wxTheApp)->SendEvent( event );
 		wxt_MutexGuiLeave();
+#ifdef WXT_MULTITHREADED
+		window.condition->Wait();
+#endif /* WXT_MULTITHREADED */
+
 		/* store the plot structure in the list and keep shortcuts */
 		wxt_window_list.push_back(window);
 		wxt_current_window = &(wxt_window_list.back());
@@ -2001,7 +2040,7 @@ void wxt_put_tmptext(int n, const char str[])
 		{
 			wxCommandEvent event(wxStatusTextEvent);
 			event.SetString(wxString(str, wxConvLocal));
-			wxt_current_window->frame->GetEventHandler()->AddPendingEvent( event );
+			wxt_current_window->frame->SendEvent( event );
 		}
 		break;
 	case 1:
@@ -2856,16 +2895,7 @@ bool wxt_process_events()
 	return false;
 }
 
-#ifdef __WXMSW__
-/* Implements waitforinput used in wxt.trm
- * the terminal events are directly processed when they are received */
-int wxt_waitforinput()
-{
-	return getch();
-}
-
-#elif defined(__WXGTK__)||defined(__WXMAC__)
-
+#ifdef WXT_MULTITHREADED
 /* Implements waitforinput used in wxt.trm
  * Returns the next input charachter, meanwhile treats terminal events */
 int wxt_waitforinput()
@@ -2921,9 +2951,14 @@ int wxt_waitforinput()
 	wxt_change_thread_state(RUNNING);
 	return getchar();
 }
-#else  /* !__WXMSW__ && !__WXGTK__ && !__WXMAC__*/
-#error "Not implemented"
-#endif
+#else /* WXT_MONOTHREADED */
+/* Implements waitforinput used in wxt.trm
+ * the terminal events are directly processed when they are received */
+int wxt_waitforinput()
+{
+	return getch();
+}
+#endif /* WXT_MONOTHREADED || WXT_MULTITHREADED */
 
 #endif /*USE_MOUSE*/
 
@@ -3008,9 +3043,9 @@ void wxt_atexit()
 	/* protect the following from interrupt */
 	wxt_sigint_init();
 
-	wxt_MutexGuiEnter();
 	wxCommandEvent event(wxExitLoopEvent);
-	wxTheApp->AddPendingEvent( event );
+	wxt_MutexGuiEnter();
+	dynamic_cast<wxtApp*>(wxTheApp)->SendEvent( event );
 	wxt_MutexGuiLeave();
 
 	/* handle eventual interrupt, and restore original sigint handler */
@@ -3069,10 +3104,10 @@ void wxt_cleanup()
 	/* protect the following from interrupt */
 	wxt_sigint_init();
 
-	wxt_MutexGuiEnter();
 	/* send a message to exit the main loop */
 	wxCommandEvent event(wxExitLoopEvent);
-	wxTheApp->AddPendingEvent( event );
+	wxt_MutexGuiEnter();
+	dynamic_cast<wxtApp*>(wxTheApp)->SendEvent( event );
 
 	/* Close all open terminal windows */
 	for(wxt_iter = wxt_window_list.begin();
@@ -3080,7 +3115,7 @@ void wxt_cleanup()
 		wxt_iter->frame->Destroy();
 	wxt_MutexGuiLeave();
 
-#if defined(__WXGTK__)||defined(__WXMAC__)
+#ifdef WXT_MULTITHREADED
 	FPRINTF((stderr,"waiting for gui thread to exit\n"));
 	FPRINTF((stderr,"gui thread status %d %d %d\n",
 			thread->IsDetached(),
@@ -3090,7 +3125,7 @@ void wxt_cleanup()
 	thread->Wait();
 	delete thread;
 	FPRINTF((stderr,"gui thread exited\n"));
-#endif /* __WXGTK || __WXMAC__*/
+#endif /* WXT_MULTITHREADED */
 
 	wxTheApp->OnExit();
 	wxUninitialize();
@@ -3109,25 +3144,19 @@ void wxt_cleanup()
 void wxt_MutexGuiEnter()
 {
 	FPRINTF2((stderr,"locking gui mutex\n"));
-#if defined(__WXGTK__)||defined(__WXMAC__)
+#ifdef WXT_MULTITHREADED
 	if (!wxt_handling_persist)
 		wxMutexGuiEnter();
-#elif defined(__WXMSW__)
-#else
-# error "No implementation"
-#endif
+#endif /* WXT_MULTITHREADED */
 }
 
 void wxt_MutexGuiLeave()
 {
 	FPRINTF2((stderr,"unlocking gui mutex\n"));
-#if defined(__WXGTK__)||defined(__WXMAC__)
+#ifdef WXT_MULTITHREADED
 	if (!wxt_handling_persist)
 		wxMutexGuiLeave();
-#elif defined(__WXMSW__)
-#else
-# error "No implementation"
-#endif
+#endif /* WXT_MULTITHREADED */
 }
 
 /* ---------------------------------------------------

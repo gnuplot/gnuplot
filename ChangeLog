@@ -3,6 +3,17 @@
 	* src/wxterminal/wxt_gui.cpp (wxt_sigint_restore): properly pass a
 	pointer to signal()
 
+	* src/wxterminal/wxt_gui.cpp:
+	* src/wxterminal/wxt_gui.h:
+	Introduce macros WXT_MULTITHREADED and WXT_MONOTHREADED to simplify the
+	code here and there.
+	Introduce wxtApp::SendEvent and wxtFrame::SendEvent that are wrappers
+	to AddPendingEvent (asynchronous) or ProcessEvent (synchronous)
+	respectively in the multi- or monothreaded cases.
+	(wxt_init, wxtApp::OnCreateWindow): Do the window creation in the GUI
+	thread (in the multithreaded case) by sending an event.
+	This is preparatory work for wxMac support.
+
 2007-05-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/fillcrvs.dem:  Add world map as demo of closed filled curves

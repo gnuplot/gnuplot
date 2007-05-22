@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.23 2007/04/30 12:56:08 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.24 2007/05/18 08:55:21 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -144,6 +144,16 @@ extern "C" {
 # define IMAGE_SURFACE
 #endif
 
+/* depending on the platform, and mostly because of the Windows terminal which
+ * already has its event loop, we may or may not be multithreaded */
+#if defined(__WXGTK__) || defined(__WXMAC__)
+# define WXT_MULTITHREADED
+#elif defined(__WXMSW__)
+# define WXT_MONOTHREADED
+#else
+# error "Not implemented"
+#endif
+
 extern "C" {
 /* Windows native backend,
  * redefinition of fprintf, getch...
@@ -184,7 +194,7 @@ extern "C" {
  * declarations
  * ====================================================================*/
 
-#if defined(__WXGTK__)||defined(__WXMAC__)
+#ifdef WXT_MULTITHREADED
 /* thread class, where the gui loop runs.
  * Not needed with Windows, where the main loop
  * already processes the gui messages */
@@ -199,13 +209,13 @@ public:
 
 /* instance of the thread */
 static wxtThread * thread;
-#elif defined(__WXMSW__)
-#else
-# error "Not implemented"
-#endif /* __WXGTK__ */
+#endif /* WXT_MULTITHREADED */
 
 DECLARE_EVENT_TYPE(wxExitLoopEvent, -1)
 DEFINE_EVENT_TYPE(wxExitLoopEvent)
+
+DECLARE_EVENT_TYPE(wxCreateWindowEvent, -1)
+DEFINE_EVENT_TYPE(wxCreateWindowEvent)
 
 #ifdef USE_MOUSE
 DECLARE_EVENT_TYPE(wxStatusTextEvent, -1)
@@ -222,7 +232,10 @@ public:
 	int OnExit();
 	/* event handler */
 	void OnExitLoop( wxCommandEvent &event );
-
+	/* event handler */
+	void OnCreateWindow( wxCommandEvent &event );
+	/* wrapper for AddPendingEvent or ProcessEvent */
+	void SendEvent( wxEvent &event);
 private:
 	/* any class wishing to process wxWidgets events must use this macro */
 	DECLARE_EVENT_TABLE()
@@ -441,6 +454,9 @@ public:
 	void OnConfig( wxCommandEvent& event );
 	void OnHelp( wxCommandEvent& event );
 
+	/* wrapper for AddPendingEvent or ProcessEvent */
+	void SendEvent( wxEvent &event);
+
 	/* destructor*/
 	~wxtFrame() {};
 
@@ -514,10 +530,15 @@ static int wxt_status = STATUS_UNINITIALIZED;
  * separate threads. */
 static bool wxt_handling_persist = false;
 
-/* structure to store windows and their ID */
+/* structure to store windows and their ID
+ * also used to pass titles and waiting condition to the GUI thread on
+ * window creation */
 typedef struct wxt_window_t {
 	wxWindowID id;
 	wxtFrame * frame;
+	wxString title;
+	wxMutex * mutex;
+	wxCondition * condition;
 } wxt_window_t;
 
 /* list of already created windows */
