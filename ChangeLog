@@ -1,3 +1,8 @@
+2007-05-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (pause_command): On Windows, "pause -1" does not work
+	if it is the 1st command in a script. Bug #1713350.
+
 2007-05-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_sigint_restore): properly pass a
@@ -5,7 +10,7 @@
 
 2007-05-19  Ethan Merritt  <merritt@u.washington.edu>
 
-        * src/plot2d.c (get_data) src/graphics.c (plot_lines):
+	* src/plot2d.c (get_data) src/graphics.c (plot_lines):
 	Allow 2D plots "with lines lc rgb variable".
 	Bug #1720032
 
@@ -35,10 +40,10 @@
 
 2007-05-05  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-        * src/wxterminal/wxt_gui.cpp (wxtThread::Entry):
-        Fix the initialization of a sigset_t. The structure is not meant to be
-        known, functions are provided instead. The previous code was
-        completely wrong on non GNU systems.
+	* src/wxterminal/wxt_gui.cpp (wxtThread::Entry):
+	Fix the initialization of a sigset_t. The structure is not meant to be
+	known, functions are provided instead. The previous code was
+	completely wrong on non GNU systems.
 
 2007-05-04  Daniel Sebald  <daniel.sebald@ieee.org>
 
