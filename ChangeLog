@@ -1,3 +1,8 @@
+2007-05-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (pause_command): On Windows, "pause -1" does not work
+	if it is the 1st command in a script. Bug #1713350.
+
 2007-05-22  Matthias Habl  <mhabl@users.sourceforge.net>
 
 	* docs/gnuplot.doc: Clarify that all x and y axis labels may be 
