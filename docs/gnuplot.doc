@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.427 2007/04/19 17:28:53 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.428 2007/05/18 06:15:30 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10084,9 +10084,9 @@ C ... and restart the table:
  Note that double quotes must be used.  The same font will be used for both
  lines, of course.
 
- The y and y2 axis labels can be explicitly rotated from their default
- orientation, but this applies only to 2D plots and only on terminals
- that support text rotation.
+ The orientation (rotation angle) of the x, x2, y and y2 axis labels can be
+ explicitly changed from the default setting, but this applies only to 2D plots
+ and only on terminals that support text rotation.
 
  If you are not satisfied with the default position of an axis label, use `set
  label` instead--that command gives you much more control over where text is

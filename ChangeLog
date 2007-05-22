@@ -1,3 +1,8 @@
+2007-05-22  Matthias Habl  <mhabl@users.sourceforge.net>
+
+	* docs/gnuplot.doc: Clarify that all x and y axis labels may be 
+	rotated, but only in 2D and only for terminals that support it.
+
 2007-05-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_sigint_restore): properly pass a
