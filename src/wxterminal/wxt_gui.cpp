@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.30.2.5 2006/11/28 20:26:55 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.30.2.6 2007/05/05 19:01:41 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3162,7 +3162,7 @@ void wxt_sigint_init()
 void wxt_sigint_restore()
 {
 	if (wxt_sigint_counter==1)
-		signal(SIGINT, *original_siginthandler);
+		signal(SIGINT, original_siginthandler);
 	--wxt_sigint_counter;
 	FPRINTF2((stderr,"restore custom interrupt handler %d\n",wxt_sigint_counter));
 	if (wxt_sigint_counter<0)
