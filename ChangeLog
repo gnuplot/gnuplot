@@ -6,6 +6,11 @@
 	relative offsets, not absolute offset. Otherwise it prematurely 
 	terminates the scope of the surrounding "chunk" of text.
 
+	* Make a concession to non-compliant svg viewers and clean up the scope
+	of tspan elements.  Many current generation svg viewers do not implement
+	"em" space units.  To coddle these, we back off to approximating
+	1 em == (1.1 * fontsize)pt
+
 2007-05-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (pause_command): On Windows, "pause -1" does not work

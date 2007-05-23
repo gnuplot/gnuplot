@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.63.2.7 2007/05/23 18:52:40 sfeam Exp $
+ * $Id: svg.trm,v 1.63.2.8 2007/05/23 20:55:30 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -32,6 +32,7 @@
  * Added enhanced text support.
  * Additional line properties.
  * Increase resolution by adding a coordinate scale factor.
+ * CODDLE_NONCOMPLIANT_VIEWERS
  *
  *   Ethan Merritt  <merritt@u.washington.edu>
  */
@@ -151,6 +152,8 @@ static void SVG_load_fontfile __PROTO((char *fontfile));
 
 /* Stuff for enhanced text mode */
 static int ENHsvg_string_state = 0;
+static double ENHsvg_x_offset = 0;
+#define CODDLE_NONCOMPLIANT_VIEWERS 1	/* Use pt rather than em spacing */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_Pen_RealID
@@ -1124,14 +1127,26 @@ ENHsvg_OPEN(
      */
     switch (overprint) {
     case 2:
-	fprintf(gpoutfile, "<tspan dx=\"-%.1fem\"/>", 0.3 * ENHsvg_charcount);
+#ifdef CODDLE_NONCOMPLIANT_VIEWERS
+	fprintf(gpoutfile, "<tspan dx=\"-%.1fpt\" dy=\"%.1fpt\">", 
+		0.3 * ENHsvg_charcount * 1.1*SVG_fontSizeCur, ENHsvg_base-base);
+#else
+	fprintf(gpoutfile, "<tspan dx=\"-%.1fem\" dy=\"%.1fpt\">", 
+		0.3 * ENHsvg_charcount, ENHsvg_base-base);
+#endif
+	ENHsvg_base = base;
+	ENHsvg_x_offset = 0.0;
+	enhanced_cur_text = enhanced_text;
 	ENHsvg_charcount = 0;
+	ENHsvg_opened_string = TRUE;
 	break;
     case 3:
 	ENHsvg_charcount = 0;
 	return;
     case 4:
-	fprintf(gpoutfile, "<tspan dx=\"-%.1fem\"/>", 0.6 * ENHsvg_charcount);
+	/* Defer setting the offsets until the text arrives */
+	ENHsvg_x_offset = -0.6 * ENHsvg_charcount;
+	ENHsvg_base -= base;
 	ENHsvg_charcount = 0;
 	return;
     default:
@@ -1152,8 +1167,17 @@ ENHsvg_OPEN(
 	    SVG_fontSizeCur = fontsize;
 	    fprintf(gpoutfile, " font-size=\"%.1fpt\"", SVG_fontSizeCur);
 	}
+	if (ENHsvg_x_offset != 0) {
+#ifdef CODDLE_NONCOMPLIANT_VIEWERS
+	    fprintf(gpoutfile, " dx=\"%.2fpt\"",
+				ENHsvg_x_offset * 1.1*SVG_fontSizeCur);
+#else
+	    fprintf(gpoutfile, " dx=\"%.2fem\"", ENHsvg_x_offset);
+#endif
+	    ENHsvg_x_offset = 0.0;
+	}
 	if (ENHsvg_base != base) {
-	    fprintf(gpoutfile, " dy=\"%.2f\"", ENHsvg_base-base);
+	    fprintf(gpoutfile, " dy=\"%.2fpt\"", ENHsvg_base-base);
 	    ENHsvg_base = base;
 	}
 	if (!showflag) {
@@ -1324,7 +1348,7 @@ SVG_path(int p)
 
 #undef Y
 #undef X
-
+#undef CODDLE_NONCOMPLIANT_VIEWERS
 
 #endif /* TERM_BODY */
 
