@@ -1,3 +1,10 @@
+2007-05-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* Make a concession to non-compliant svg viewers and clean up the scope
+	of tspan elements.  Many current generation svg viewers do not implement
+	"em" space units.  To coddle these, we back off to approximating
+	1 em == 1.1 * fontsize in points.
+
 2007-05-23  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp:
