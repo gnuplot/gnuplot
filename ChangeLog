@@ -1,3 +1,10 @@
+2007-05-23  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp:
+	* src/wxterminal/wxt_gui.h:
+	Add/rewrite a few debugging messages.
+	(wxt_atexit, wxt_cleanup): Simplify "persist" and exit code.
+
 2007-05-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Give font sizes explicitly in pt units.

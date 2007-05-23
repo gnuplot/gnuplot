@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.45 2007/05/22 16:30:23 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.46 2007/05/22 17:30:51 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -179,7 +179,7 @@ END_EVENT_TABLE()
  * Just before it returns, wxEntry will call a whole bunch of wxWidgets-cleanup functions */
 void *wxtThread::Entry()
 {
-	FPRINTF((stderr,"gui_thread_entry\n"));
+	FPRINTF((stderr,"secondary thread entry\n"));
 
 	/* don't answer to SIGINT in this thread - avoids LONGJMP problems */
 	sigset_t set;
@@ -195,7 +195,7 @@ void *wxtThread::Entry()
 	 * main thread as wxWidgets was written for. */
 	wxt_MutexGuiLeave();
 
-	FPRINTF((stderr,"gui_thread_entry finishing\n"));
+	FPRINTF((stderr,"secondary thread finished\n"));
 	return NULL;
 }
 #endif /* WXT_MULTITHREADED */
@@ -214,6 +214,8 @@ bool wxtApp::OnInit()
 	/* Usually wxWidgets apps create their main window here.
 	 * However, in the context of multiple plot windows, the same code is written in wxt_init().
 	 * So, to avoid duplication of the code, we do only what is strictly necessary.*/
+
+	FPRINTF((stderr, "OnInit\n"));
 
 	/* initialize frames icons */
 	icon.AddIcon(wxIcon(icon16x16_xpm));
@@ -255,6 +257,8 @@ bool wxtApp::OnInit()
 	 * if they're not present in the config - this can give the user an idea
 	 * of all possible settings */
 	pConfig->SetRecordDefaults();
+
+	FPRINTF((stderr, "OnInit finished\n"));
 
 	return true; /* means that process must continue */
 }
@@ -3012,6 +3016,7 @@ void wxt_atexit()
 
 	/* and let's go ! */
 	if (wxt_persist==UNSET|| wxt_persist==no) {
+		FPRINTF((stderr,"wxt_atexit: no \"persist\" setting, exit\n"));
 		wxt_cleanup();
 		return;
 	}
@@ -3019,7 +3024,7 @@ void wxt_atexit()
 	/* if the user hits ctrl-c and quits again, really quit */
 	wxt_persist = no;
 
-	FPRINTF((stderr,"wxWidgets terminal handles 'persist' setting\n"));
+	FPRINTF((stderr,"wxt_atexit: handling \"persist\" setting\n"));
 
 #ifdef _Windows
 	if (!interactive) {
@@ -3028,17 +3033,8 @@ void wxt_atexit()
 		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
 		while (!com_line());
 	}
-
-	/* cleanup and quit */
-	wxt_cleanup();
 #else /*_Windows*/
 
-	/* if fork() is available, use it so that the initial gnuplot process
-	 * exits (Maxima expects that since that's the way the x11 terminal
-	 * does it) and the child process continues in the background. */
-	/* FIXME: int_error() should be changed here, it causes crashes (for example,
-	 * zoom until an error occurs and then hit a key) */
-# ifdef HAVE_WORKING_FORK
 	/* send a message to exit the main loop */
 	/* protect the following from interrupt */
 	wxt_sigint_init();
@@ -3061,30 +3057,46 @@ void wxt_atexit()
 	thread->Wait();
 	delete thread;
 
+	/* process events directly */
+	wxt_handling_persist = true;
+
+	/* if fork() is available, use it so that the initial gnuplot process
+	 * exits (Maxima expects that since that's the way the x11 terminal
+	 * does it) and the child process continues in the background. */
+	/* FIXME: int_error() should be changed here, it causes crashes (for example,
+	 * zoom until an error occurs and then hit a key) */
+# ifdef HAVE_WORKING_FORK
 	/* fork */
 	pid_t pid = fork();
 
 	/* the parent just exits, the child keeps going */
 	if (!pid) {
-		/* process events directly */
-		wxt_handling_persist = true;
-
+		FPRINTF((stderr,"child process: running\n"));
 # endif /* HAVE_WORKING_FORK */
 
 # ifdef USE_MOUSE
+		/* accept events */
 		wxt_change_thread_state(WAITING_FOR_STDIN);
 # endif /*USE_MOUSE*/
+
+		FPRINTF((stderr,"child process: restarting its event loop\n"));
 
 		/* (re)start gui loop */
 		wxTheApp->OnRun();
 
-		/* cleanup and quit */
-		wxt_cleanup();
-
+		FPRINTF((stderr,"child process: event loop exited\n"));
 # ifdef HAVE_WORKING_FORK
+	}
+	else
+	{
+		FPRINTF((stderr,"parent process: exiting, child process "\
+				  "has PID %d\n", pid));
 	}
 # endif /* HAVE_WORKING_FORK */
 #endif /* !_Windows */
+
+	/* cleanup and quit */
+	wxt_cleanup();
 }
 
 
@@ -3096,7 +3108,7 @@ void wxt_cleanup()
 	if (wxt_status == STATUS_UNINITIALIZED)
 		return;
 
-	FPRINTF((stderr,"cleanup before exit\n"));
+	FPRINTF((stderr,"wxt_cleanup: start\n"));
 
 	/* prevent wxt_reset (for example) from doing anything bad after that */
 	wxt_status = STATUS_UNINITIALIZED;
@@ -3104,28 +3116,10 @@ void wxt_cleanup()
 	/* protect the following from interrupt */
 	wxt_sigint_init();
 
-	/* send a message to exit the main loop */
-	wxCommandEvent event(wxExitLoopEvent);
-	wxt_MutexGuiEnter();
-	dynamic_cast<wxtApp*>(wxTheApp)->SendEvent( event );
-
 	/* Close all open terminal windows */
 	for(wxt_iter = wxt_window_list.begin();
 			wxt_iter != wxt_window_list.end(); wxt_iter++)
 		wxt_iter->frame->Destroy();
-	wxt_MutexGuiLeave();
-
-#ifdef WXT_MULTITHREADED
-	FPRINTF((stderr,"waiting for gui thread to exit\n"));
-	FPRINTF((stderr,"gui thread status %d %d %d\n",
-			thread->IsDetached(),
-			thread->IsAlive(),
-			thread->IsRunning() ));
-
-	thread->Wait();
-	delete thread;
-	FPRINTF((stderr,"gui thread exited\n"));
-#endif /* WXT_MULTITHREADED */
 
 	wxTheApp->OnExit();
 	wxUninitialize();
@@ -3134,7 +3128,7 @@ void wxt_cleanup()
 	wxt_sigint_check();
 	wxt_sigint_restore();
 
-	FPRINTF((stderr,"wxWidgets terminal properly cleaned-up\n"));
+	FPRINTF((stderr,"wxt_cleanup: finished\n"));
 }
 
 /* -------------------------------------
