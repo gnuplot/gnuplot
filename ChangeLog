@@ -1,3 +1,7 @@
+2007-05-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Give font sizes explicitly in pt units.
+
 2007-05-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (pause_command): On Windows, "pause -1" does not work
