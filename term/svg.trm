@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.63.2.6 2007/03/22 04:32:46 sfeam Exp $
+ * $Id: svg.trm,v 1.63.2.7 2007/05/23 18:52:40 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1153,7 +1153,7 @@ ENHsvg_OPEN(
 	    fprintf(gpoutfile, " font-size=\"%.1fpt\"", SVG_fontSizeCur);
 	}
 	if (ENHsvg_base != base) {
-	    fprintf(gpoutfile, " y=\"%.2f\"", -base);
+	    fprintf(gpoutfile, " dy=\"%.2f\"", ENHsvg_base-base);
 	    ENHsvg_base = base;
 	}
 	if (!showflag) {
