@@ -2,6 +2,10 @@
 
 	* term/svg.trm: Give font sizes explicitly in pt units.
 
+	* term/svg.trm: Subscript/superscripts position must be done using
+	relative offsets, not absolute offset. Otherwise it prematurely 
+	terminates the scope of the surrounding "chunk" of text.
+
 2007-05-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (pause_command): On Windows, "pause -1" does not work
