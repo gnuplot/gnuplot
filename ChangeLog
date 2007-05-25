@@ -1,3 +1,10 @@
+2007-05-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/latex.trm: Add an explicit size option; clarify documentation.
+	set terminal {latex | emtex} {default | {courier|roman} {<fontsize>}}
+		     {size <XX>{unit}, <YY>{unit}}
+	This brings the latex terminal into line with other terminals in 4.2
+
 2007-05-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* Make a concession to non-compliant svg viewers and clean up the scope
