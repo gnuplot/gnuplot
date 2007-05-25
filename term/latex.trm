@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: latex.trm,v 1.29 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: latex.trm,v 1.30 2006/07/21 02:35:47 sfeam Exp $
  *
  */
 
@@ -136,6 +136,9 @@ static char LATEX_font[MAX_ID_LEN+1] = "doc";
 static enum JUSTIFY latex_justify = LEFT;
 static int latex_angle = 0;
 
+static TBOOLEAN latex_explicit_size = FALSE;
+static size_units latex_explicit_units = INCHES;
+
 /* Default line-drawing character */
 /* the definition of plotpoint varies with linetype */
 #define LATEX_DOT "\\usebox{\\plotpoint}"
@@ -214,13 +217,14 @@ static struct vslope {
 /* figure out the best arrow */
 static void best_latex_arrow __PROTO((int, int, int, int, int, int));
 
-enum LATEX_id { LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT, LATEX_OTHER };
+enum LATEX_id { LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT, LATEX_SIZE, LATEX_OTHER };
 
 static struct gen_table LATEX_opts[] =
 {
     { "c$ourier", LATEX_COURIER },
     { "r$oman", LATEX_ROMAN },
     { "d$efault", LATEX_DEFAULT },
+    { "si$ze", LATEX_SIZE },
     { NULL, LATEX_OTHER }
 };
 
@@ -229,6 +233,7 @@ TERM_PUBLIC void
 LATEX_options()
 {
     struct value a;
+    latex_explicit_size = FALSE;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&LATEX_opts[0],c_token)) {
@@ -244,6 +249,16 @@ LATEX_options()
 	    strcpy(LATEX_font, "doc");
 	    c_token++;
 	    break;
+	case LATEX_SIZE:
+	    {
+	    float xmax_t = 5., ymax_t = 3.;
+	    c_token++;
+	    latex_explicit_size = TRUE;
+	    latex_explicit_units = parse_term_size(&xmax_t, &ymax_t, INCHES);
+	    term->xmax = xmax_t * DOTS_PER_INCH/72;
+	    term->ymax = ymax_t * DOTS_PER_INCH/72;
+	    break;
+	    }
 	case LATEX_OTHER:
 	default:
 	    /* if isannumber? */
@@ -262,6 +277,18 @@ LATEX_options()
     else
 	sprintf(term_options, "%s %d",
 		LATEX_font[2] == 't' ? "courier" : "roman", LATEX_fontsize);
+
+    if (latex_explicit_size) {
+	if (latex_explicit_units == CM)
+	    sprintf(&(term_options[strlen(term_options)]), "size %.2fcm, %.2fcm ",
+		2.54*(float)term->xmax/(DOTS_PER_INCH),
+		2.54*(float)term->ymax/(DOTS_PER_INCH));
+	else
+	    sprintf(&(term_options[strlen(term_options)]), "size %.2fin, %.2fin ",
+		(float)term->xmax/(DOTS_PER_INCH),
+		(float)term->ymax/(DOTS_PER_INCH));
+    }
+
 }
 
 
@@ -286,11 +313,17 @@ LATEX_init()
 TERM_PUBLIC void
 LATEX_graphics()
 {
-    register struct termentry *t = term;
+    int xscale, yscale;
+
+    /* set size of canvas */
+    if (!latex_explicit_size) {
+	term->xmax = LATEX_XMAX;
+	term->ymax = LATEX_YMAX;
+    }
 
     /* bounding box */
-    int xscale = xsize * t->xmax;
-    int yscale = ysize * t->ymax;
+    xscale = xsize * term->xmax;
+    yscale = ysize * term->ymax;
 
     fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n", xscale, yscale);
     if (strcmp(LATEX_font, "doc") != 0) {
@@ -864,14 +897,13 @@ START_HELP(latex)
 "?terminal latex",
 "?term latex",
 "?latex",
-" The `latex` and `emtex` drivers allow two options.",
-"",
 " Syntax:",
-"       set terminal latex | emtex {courier | roman | default} {<fontsize>}",
+"       set terminal {latex | emtex} {default | {courier|roman} {<fontsize>}}",
+"                    {size <XX>{unit}, <YY>{unit}}
 "",
-" `fontsize` may be any size you specify.  The default is for the plot to",
-" inherit its font setting from the embedding document.",
-"",
+" By default the plot will inherit font settings from the embedding document.",
+" You have the option of forcing either Courier (cmtt) or Roman (cmr) fonts",
+" instead. In this case you may also specify a fontsize.",
 " Unless your driver is capable of building fonts at any size (e.g. dvips),",
 " stick to the standard 10, 11 and 12 point sizes.",
 "",
@@ -889,6 +921,10 @@ START_HELP(latex)
 " \"\\Box\".  These commands no longer belong to the LaTeX2e core; they are included",
 " in the latexsym package, which is part of the base distribution and thus part",
 " of any LaTeX implementation.  Please do not forget to use this package.",
+"",
+" The default size for the plot is 5 inches by 3 inches. The `size` option",
+" changes this to whatever the user requests. By default the X and Y sizes",
+" are taken to be in inches, but other units are possible (currently only cm).",
 "",
 " Examples:",
 " About label positioning:",
