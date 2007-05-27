@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: latex.trm,v 1.32 2007/02/22 20:44:22 sfeam Exp $
+ * $Id: latex.trm,v 1.33 2007/05/26 04:02:09 sfeam Exp $
  *
  */
 
@@ -936,7 +936,7 @@ START_HELP(latex)
 "?latex",
 " Syntax:",
 "       set terminal {latex | emtex} {default | {courier|roman} {<fontsize>}}",
-"                    {size <XX>{unit}, <YY>{unit}}
+"                    {size <XX>{unit}, <YY>{unit}}",
 "",
 " By default the plot will inherit font settings from the embedding document.",
 " You have the option of forcing either Courier (cmtt) or Roman (cmr) fonts",
