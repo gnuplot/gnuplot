@@ -1,3 +1,10 @@
+2007-05-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_decimalsign):  Follow POSIX standard with regard to
+	finding the value of LC_NUMERIC from the environment. Use the first
+	match to LC_ALL, LC_NUMERIC, or LANG.
+	Bug #1692541
+
 2007-05-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/latex.trm: Add an explicit size option; clarify documentation.
