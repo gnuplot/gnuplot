@@ -1,3 +1,7 @@
+2007-05-30  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/makefile.all: Added tabulate.$(O).
+
 2007-05-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/latex.trm: Add an explicit size option; clarify documentation.
@@ -121,9 +125,9 @@
 
 2007-05-14  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
-        * src/command.c (fgets_ipc): Fix fgets_ipc so that it behaves like
-        fgets (always NUL-terminate the returned string).
-        Bugs #1716556 and #1673352
+	* src/command.c (fgets_ipc): Fix fgets_ipc so that it behaves like
+	fgets (always NUL-terminate the returned string).
+	Bugs #1716556 and #1673352
 
 2007-05-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -199,7 +203,7 @@
 2007-04-30  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp:
-        * src/wxterminal/wxt_gui.h:
+	* src/wxterminal/wxt_gui.h:
 	(wxt_put_tmptext, wxtFrame::OnSetStatusText):
 	Change the text of the status bar asynchronously by sending a message to
 	the GUI thread instead of doing it in a mutex. This particular GUI
@@ -955,7 +959,7 @@
 
 2006-12-16  Ethan Merritt  <merritt@u.washington.edu>
 
- 	* src/datafile.c (df_tokenise df_parse_string): Allow for quoted
+	* src/datafile.c (df_tokenise df_parse_string): Allow for quoted
 	strings in comma-separated value files.
 	Bug #1614424
 
