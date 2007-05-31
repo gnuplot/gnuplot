@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.144.2.4 2007/05/14 06:07:12 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.144.2.5 2007/05/22 20:38:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1097,12 +1097,20 @@ pause_command()
     if (paused_for_mouse && !graphwin.hWndGraph) {
 	if (interactive) { /* cannot wait for Enter in a non-interactive session without the graph window */
 	    char tmp[512];
+	    if (buf) fprintf(stderr,"%s\n", buf);
 	    fgets(tmp, 512, stdin); /* graphical window not yet initialized, wait for any key here */
 	}
     } else { /* pausing via graphical windows */
+	int tmp = paused_for_mouse;
+	if (buf && paused_for_mouse) fprintf(stderr,"%s\n", buf);
 	if (!Pause(buf)) {
-	    free(buf);
-	    bail_to_command_line();
+	    if (!tmp) {
+		free(buf);
+		bail_to_command_line();
+	    } else {
+		if (!graphwin.hWndGraph) 
+		    bail_to_command_line();
+	    }
 	}
     }
 #elif defined(OS2)
