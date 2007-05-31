@@ -1,3 +1,10 @@
+2007-05-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (pause_command): On Windows, Gnuplot always bailed to
+	command line after "pause mouse".
+	Print the message of "pause <message>" into the gnuplot terminal
+	unless for "pause -1 <message>" (message box).
+
 2007-05-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/makefile.all: Added tabulate.$(O).
