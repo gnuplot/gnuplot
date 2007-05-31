@@ -1,3 +1,10 @@
+2007-05-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Clean up the section on the 'bind' command.
+
+	* src/mouse.c: Update the dump of current hotkeys so that it doesn't
+	claim to apply only to x11.
+
 2007-05-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (pause_command): On Windows, Gnuplot always bailed to

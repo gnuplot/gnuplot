@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.87 2007/04/07 22:31:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.88 2007/05/18 06:15:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2107,7 +2107,7 @@ bind_display(char *lhs)
 	fprintf(stderr, fmt, "<Shift-B2-Motion>", "vertical motion -- change xyplane");
 	fprintf(stderr, "\n");
 	fprintf(stderr, " %-12s   %s\n", "Space", "raise gnuplot console window");
-	fprintf(stderr, " %-12s * %s\n", "q", "close this X11 plot window");
+	fprintf(stderr, " %-12s * %s\n", "q", "close this plot window");
 	fprintf(stderr, "\n");
 	for (ptr = bindings; ptr; ptr = ptr->next) {
 	    bind_display_one(ptr);
