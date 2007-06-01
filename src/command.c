@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.155 2007/05/31 16:53:43 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.156 2007/06/01 16:31:36 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2043,8 +2043,7 @@ do_system(const char *cmd)
 #endif /* VMS */
 
 
-#ifdef _Windows
-# ifdef NO_GIH
+#if defined(_Windows) && defined(NO_GIH)
 void
 help_command()
 {
@@ -2060,8 +2059,7 @@ help_command()
 	WinHelp(textwin.hWndParent, (LPSTR) winhelpname, HELP_PARTIALKEY, (DWORD) buf);
     }
 }
-# endif				/* NO_GIH */
-#endif /* _Windows */
+#endif /* _Windows && NO_GIH */
 
 
 /*

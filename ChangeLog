@@ -3,6 +3,7 @@
 	* src/command.c (read_line): Introduce a new static function
 	'gp_get_string' called by read_line(), so that #ifdefs are grouped and
 	read_line() is more readable.
+	(help_command)[_Windows && NO_GIH]: trivial cleanup of #ifdef.
 
 2007-05-31  Ethan Merritt  <merritt@u.washington.edu>
 
