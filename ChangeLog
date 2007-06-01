@@ -1,3 +1,9 @@
+2007-06-01  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/command.c (read_line): Introduce a new static function
+	'gp_get_string' called by read_line(), so that #ifdefs are grouped and
+	read_line() is more readable.
+
 2007-05-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Clean up the section on the 'bind' command.

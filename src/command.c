@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.154 2007/05/22 20:39:16 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.155 2007/05/31 16:53:43 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -141,6 +141,7 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 static void command __PROTO((void));
 static int changedir __PROTO((char *path));
 static char* fgets_ipc __PROTO((char* dest, int len));
+static char* gp_get_string __PROTO((char *, size_t, const char *));
 static int read_line __PROTO((const char *prompt));
 static void do_system __PROTO((const char *));
 static void test_palette_subcommand __PROTO((void));
@@ -2601,6 +2602,23 @@ fgets_ipc(
 	return fgets(dest, len, stdin);
 }
 
+/* get a line from stdin, and display a prompt if interactive */
+static char*
+gp_get_string(char * buffer, size_t len, const char * prompt)
+{
+# if defined(READLINE) || defined(HAVE_LIBREADLINE)
+    if (interactive)
+	return rlgets(buffer, len, prompt);
+    else
+	return fgets_ipc(buffer, len);
+# else /* !(READLINE || HAVE_LIBREADLINE) */
+    if (interactive)
+	PUT_STRING(prompt);
+
+    return GET_STRING(buffer, len);
+# endif /* !(READLINE || HAVE_LIBREADLINE) */
+}
+
 /* Non-VMS version */
 static int
 read_line(const char *prompt)
@@ -2611,23 +2629,11 @@ read_line(const char *prompt)
 
     current_prompt = prompt;	/* HBB NEW 20040727 */
 
-# if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
-    if (interactive)
-	PUT_STRING(prompt);
-# endif				/* no READLINE */
-
     do {
 	/* grab some input */
-# if defined(READLINE) || defined(HAVE_LIBREADLINE)
-	if (((interactive)
-	     ? rlgets(gp_input_line + start, gp_input_line_len - start,
-		     ((more) ? "> " : prompt))
-	     : fgets_ipc(gp_input_line + start, gp_input_line_len - start)
-	    ) == (char *) NULL)
-# else /* !(READLINE || HAVE_LIBREADLINE) */
-	if (GET_STRING(gp_input_line + start, gp_input_line_len - start)
+	if (gp_get_string(gp_input_line + start, gp_input_line_len - start,
+                         ((more) ? ">" : prompt))
 	    == (char *) NULL)
-# endif /* !(READLINE || HAVE_LIBREADLINE) */
 	{
 	    /* end-of-file */
 	    if (interactive)
@@ -2668,10 +2674,6 @@ read_line(const char *prompt)
 	    } else
 		more = FALSE;
 	}
-# if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
-	if (more && interactive)
-	    PUT_STRING("> ");
-# endif
     } while (more);
     return (0);
 }
