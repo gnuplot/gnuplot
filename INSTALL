@@ -223,31 +223,6 @@ options can have additional arguments:
    effect as `--without-PACKAGE'.
  o `--with-PACKAGE=DIR' checks for PACKAGE in DIR
 
-Unix, no configure
-------------------
-
-  The older, now strongly disfavoured way is to copy config/makefile.unx 
-  to Makefile, then look through the Makefile to see if you need to make 
-  any changes.  See especially the HELPDEST and TERMFLAGS variables.  Edit 
-  if needed.  Alternatively, all these variables may be set as command 
-  line arguments to 'make'. For example:
-
-   Next tune term.h to choose which terminal drivers you wish to
-   enable.  If you want to support gif output, you need to download,
-   compile and install the gd library : see term/gif.trm for details.
-
-   If you want to support png output (free gif alternative), you need
-png and z libraries : see term/png.trm for details.  Note that the
-png library will probably not compile without an ANSI/ISO C compiler.
-
-        make <MACHINE> HELPDEST='/usr/um/misc/lib' \
-                DEST='/usr/um/misc/bin' READLINE=
-
-  Type
-      make
-
-  If that works, try
-      make install
 
 VMS
 ---
@@ -288,6 +263,7 @@ the compiler you want to use (default DECC).
   To tell gnuplot where to find the help library:
      $ define gnuplot$help disk:[directory]gnuplot.hlb
   Alternatively, put the help in the main system help library.
+
 
 AmigaOS
 -------
@@ -442,6 +418,15 @@ See other sections of the manuals for more information about installing/using
 gnuplot on OS/2.
 
 
+Ultrix
+------
+
+The mousing code requires a patch in order to compile properly under Ultrix.
+You can download this patch from the contributed scripts section of the
+gnuplot project pages on SourceForge: http://gnuplot.sourceforge.net/scripts/
+Or you can avoid the problem via        ./configure --disable-mouse
+
+
 More details about ./configure --with-PACKAGE[=OPTION]
 ======================================================
 
@@ -576,12 +561,6 @@ whenever you re-run configure.
   `-ieee', for GCC, it's `-mieee'.  The configure script tries to
   automatically detect this situation and apply the flag, but you may want
   to double-check it.
-
- - IRIX 6.x
-   If you want to use the png terminal, you must install your own
-  versions of libpng and zlib. The versions supplied with the OS
-  are too old. Note that you need be very careful to select the
-  correct compiler options/ABI's.
 
  - SunOS 4.x
    An ANSI/ISO C compiler should be used to compile gnuplot. It is

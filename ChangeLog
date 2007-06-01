@@ -1,3 +1,8 @@
+2007-06-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* INSTALL: Remove obsolete instructions for unix builds without
+	./configure, old png driver.
+
 2007-06-01  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/command.c (read_line): Introduce a new static function
