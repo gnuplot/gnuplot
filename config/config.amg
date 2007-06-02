@@ -361,9 +361,6 @@
 /* Unix-type of Interprocess Communication is required for mouse support. */
 /* #undef PIPE_IPC */
 
-/* Define to have 'set term gif' produce PNG images instead */
-#undef PNG_FOR_GIF
-
 /* Define to 1 if the C compiler supports function prototypes. */
 #define PROTOTYPES 1
 
