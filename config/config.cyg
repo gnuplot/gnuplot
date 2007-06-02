@@ -405,10 +405,6 @@
 /* Unix-type of Interprocess Communication is required for mouse support. */
 /* #undef PIPE_IPC */
 
-/* Define to have 'set term gif' produce PNG images instead */
-/* #undef PNG_FOR_GIF */
-/* Don't change it here -- this define is set in config/makefile.cyg. */
-
 /* Define if compiler has function prototypes */
 #define PROTOTYPES 1
 
