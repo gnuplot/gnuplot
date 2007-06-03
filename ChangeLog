@@ -1,5 +1,10 @@
 2007-06-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/history.c (write_history_n): Cannot use int_error() when exiting
+	gnuplot.
+
+2007-06-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* config/config.amg config/config.cyg config/config.mgw: Removed
 	PNG_FOR_GIF.
 
