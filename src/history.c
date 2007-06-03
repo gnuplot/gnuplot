@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.20 2006/06/28 21:54:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.21 2006/08/05 20:54:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -189,25 +189,30 @@ write_history_n(const int n, const char *filename, const char *mode)
 #endif
 	out = fopen(filename, mode);
     }
-    if (!out)
-	int_error(NO_CARET, "cannot open file for saving the history");
-    while (entry != NULL) {
-	/* don't add line numbers when writing to file
-	 * to make file loadable */
-	if (filename) {
-	    if (filename[0]==0) fputs(" ", out);
-	    fprintf(out, "%s\n", entry->line);
-	} else
-	    fprintf(out, "%5i  %s\n", hist_index++, entry->line);
-	entry = entry->next;
-    }
-    if (filename != NULL && filename[0]) {
+    if (!out) {
+	/* cannot use int_error() because we are just exiting gnuplot:
+	   int_error(NO_CARET, "cannot open file for saving the history");
+	*/
+	fprintf(stderr, "Warning: cannot open file %s for saving the history.", filename);
+    } else {
+	while (entry != NULL) {
+	    /* don't add line numbers when writing to file
+	    * to make file loadable */
+	    if (filename) {
+		if (filename[0]==0) fputs(" ", out);
+		fprintf(out, "%s\n", entry->line);
+	    } else
+		fprintf(out, "%5i  %s\n", hist_index++, entry->line);
+	    entry = entry->next;
+	}
+	if (filename != NULL && filename[0]) {
 #ifdef PIPES
-	if (is_pipe)
-	    pclose(out);
-	else
+	    if (is_pipe)
+		pclose(out);
+	    else
 #endif
-	fclose(out);
+	    fclose(out);
+	}
     }
 }
 
