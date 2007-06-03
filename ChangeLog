@@ -1,3 +1,11 @@
+2007-06-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.amg config/config.cyg config/config.mgw: Removed
+	PNG_FOR_GIF.
+
+	* config/makefile.cyg config/makefile.mgw: Removed PNG_FOR_GIF and GIF.
+	Write requirement for gd 2.0 and newer. Enable GIF_ANIMATION and JPEG.
+
 2007-06-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* INSTALL: Remove obsolete instructions for unix builds without

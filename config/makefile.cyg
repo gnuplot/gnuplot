@@ -1,6 +1,6 @@
 # Hey, Emacs, this is a -*- Makefile -*-
 #
-# $Id: makefile.cyg,v 1.26 2005/08/07 09:43:27 mikulik Exp $
+# $Id: makefile.cyg,v 1.27.2.1 2007/06/02 22:21:16 mikulik Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -30,29 +30,15 @@
 # drivers for use in gnuplot, depending on the gd version. See README.1ST for
 # more details. 
 #
-# 1. You can use the following set of options for GD library v1.8 or newer. 
-# This library writes PNG and JPEG images, but not GIF. Therefore the option
-# PNG_FOR_GIF allows backwards compatibility with the old GIF driver, i.e.
-# 'set term gif ...' is still valid, but it actually writes out PNG files
-# instead of GIF.
+# You should compile gnuplot with GD library v2.0 or newer.
+# This library writes PNG, GIF and JPEG images.
 # If libgd has been compiled with TrueType font support, then you can use
 # scaled TrueType fonts in png images. If not, then uncomment FREETYPE.
 # Requires GD, PNG and Z libraries, optionally libfreetype.
 #
 NEWGD=1
-PNG_FOR_GIF=1
-#JPEG=1
+JPEG=1
 FREETYPE=1
-#
-# 2. You can use the following set of options for the old GD library
-# (v1.2 - v1.4), which supports GIF images only.
-# In this case the PNG driver is independent on GD driver, but there are
-# several functionality limitations of the old non-libgd png driver.
-# Required libraries: GD (GIF driver), PNG and Z (PNG driver).
-#
-#GD=1
-#GIF=1
-#PNG=1
 
 # PDF device driver
 # may require PNG and Z libraries based on particular PDF library used
@@ -161,28 +147,20 @@ ifdef GD
   TERMLIBS += -lgd
 endif
 
-ifdef GIF
-  CFLAGS += -DHAVE_GD_GIF
-endif
-
 ifdef PNG
   CFLAGS += -DHAVE_LIBPNG
   TERMLIBS += -lpng -lz
 endif
 
 ifdef NEWGD
-  CFLAGS += -DHAVE_GD_PNG
-ifdef FREETYPE
-  CFLAGS += -DHAVE_GD_TTF
-  TERMLIBS += -lfreetype
-endif
+  CFLAGS += -DHAVE_GD_GIF -DGIF_ANIMATION -DHAVE_GD_PNG
 ifdef JPEG
   CFLAGS += -DHAVE_GD_JPEG
   TERMLIBS += -ljpeg
 endif
-ifdef PNG_FOR_GIF
-  CFLAGS += -DPNG_FOR_GIF
-  CFLAGS += -DHAVE_GD_GIF
+ifdef FREETYPE
+  CFLAGS += -DHAVE_GD_TTF
+  TERMLIBS += -lfreetype
 endif
 endif
 

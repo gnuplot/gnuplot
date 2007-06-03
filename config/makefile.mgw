@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.40 2006/07/17 23:01:26 tlecomte Exp $
+# $Id: makefile.mgw,v 1.41.2.2 2007/06/02 22:21:16 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #  This assumes that MinGW32 is used via the MSYS toolkit
@@ -26,29 +26,15 @@
 # drivers for use in gnuplot, depending on the gd version. See README.1ST for
 # more details. 
 #
-# 1. You can use the following set of options for GD library v1.8 or newer. 
-# This library writes PNG and JPEG images, but not GIF. Therefore the option
-# PNG_FOR_GIF allows backwards compatibility with the old GIF driver, i.e.
-# 'set term gif ...' is still valid, but it actually writes out PNG files
-# instead of GIF.
+# You should compile gnuplot with GD library v2.0 or newer.
+# This library writes PNG, GIF and JPEG images.
 # If libgd has been compiled with TrueType font support, then you can use
-# scaled TrueType fonts in png images. If not, then uncomment FREETYPE.
+# scaled TrueType fonts. If not, then uncomment FREETYPE.
 # Requires GD, PNG and Z libraries, optionally libfreetype.
 #
 NEWGD=1
-PNG_FOR_GIF=1
-#JPEG=1
+JPEG=1
 FREETYPE=1
-#
-# 2. You can use the following set of options for the old GD library
-# (v1.2 - v1.4), which supports GIF images only.
-# In this case the PNG driver is independent on GD driver, but there are
-# several functionality limitations of the old non-libgd png driver.
-# Required libraries: GD (GIF driver), PNG and Z (PNG driver).
-#
-#GD=1
-#GIF=1
-#PNG=1
 
 # PDF device driver
 # Requires PNG and Z libraries based on particular PDF library used, and
@@ -94,7 +80,7 @@ HELPFILE = wgnuplot.hlp
 GNUPLOT_PS_DIR = share/PostScript
 
 # Destination directory, used in 'make install':
-DESTDIR = /c/Progra~1/Gnuplot4.1
+DESTDIR = /c/Progra~1/Gnuplot4.3
 
 # give here the path to MinGW compiler unless it is already in PATH
 #GCCPATH = g:/mingw32/bin/
@@ -176,28 +162,20 @@ ifdef GD
   TERMLIBS += -lgd
 endif
 
-ifdef GIF
-  CFLAGS += -DHAVE_GD_GIF
-endif
-
 ifdef PNG
   CFLAGS += -DHAVE_LIBPNG
   TERMLIBS += -lpng -lz
 endif
 
 ifdef NEWGD
-  CFLAGS += -DHAVE_GD_PNG
-ifdef FREETYPE
-  CFLAGS += -DHAVE_GD_TTF
-  TERMLIBS += -lfreetype
-endif
+  CFLAGS += -DHAVE_GD_GIF -DGIF_ANIMATION -DHAVE_GD_PNG
 ifdef JPEG
   CFLAGS += -DHAVE_GD_JPEG
   TERMLIBS += -ljpeg
 endif
-ifdef PNG_FOR_GIF
-  CFLAGS += -DPNG_FOR_GIF
-  CFLAGS += -DHAVE_GD_GIF
+ifdef FREETYPE
+  CFLAGS += -DHAVE_GD_TTF
+  TERMLIBS += -lfreetype
 endif
 endif
 
@@ -237,7 +215,7 @@ ifdef GNU_RC
   RCFLAGS = --include-dir /mingw32/include \
 	--include-dir=win \
 	--define __WIN32__ --define __WIN95__ --define MSRC \
-	--define __GNUWIN32__
+	--define __GNUWIN32__ --use-temp-file
   ifdef WXT
 	RCFLAGS += --define WXWIDGETS --include-dir=$(WX_LOCATION)
   endif
