@@ -1,3 +1,13 @@
+2007-06-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/djsvga.trm: Unify color sequence comply with other terminals.
+	Fix DJSVGA_set_font(fontname) for an empty fontname.
+
+	* src/plot.c (main): Avoid printing "??Unknow" as the System welcome
+	message under some versions of DOS (compilation by DJGPP).
+
+	* config/config.dj2: Define HAVE_STRINGS_H.
+
 2007-06-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/history.c (write_history_n): Cannot use int_error() when exiting

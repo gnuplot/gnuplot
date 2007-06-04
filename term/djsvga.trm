@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: djsvga.trm,v 1.19 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: djsvga.trm,v 1.20 2006/07/21 02:35:45 sfeam Exp $
  */
 
 /* GNUPLOT - djsvga.trm */
@@ -118,7 +118,21 @@ static int dj_xlast, dj_ylast;
 /* HBB: Let's just use long for GRX1 as well */
 static long dj_color;
 static long svga256color[DJNUMCOLOR] =
-{7, 8, 2, 3, 4, 5, 9, 14, 12, 15, 13, 10, 11, 1, 6};
+   /* old sequence: {7, 8, 2, 3, 4, 5, 9, 14, 12, 15, 13, 10, 11, 1, 6}; */
+{
+   7 /*black*/, 8 /*grey*/, 
+#if 0 /* prefer dark colors */
+   4 /*dark red*/, 2 /*dark green*/, 1 /*dark blue*/, 5 /*dark magenta*/, 3 /*dark cyan*/,
+   14 /*yellow*/, 15 /*white*/,
+   12 /*red*/, 9 /*blue*/, 13 /*magenta*/, 10 /*green*/, 11 /*cyan*/,
+   6 /*brown*/
+#else /* prefer light colors */
+   12 /*red*/, 10 /*green*/, 9 /*blue*/, 13 /*magenta*/, 11 /*cyan*/,
+   14 /*yellow*/, 15 /*white*/,
+   4 /*dark red*/, 1 /*dark blue*/, 5 /*dark magenta*/, 2 /*dark green*/, 3 /*dark cyan*/,
+   6 /*brown*/
+#endif
+};
 static long dj_colors[DJNUMCOLOR];
 #ifdef GRX20
 /* Save, Restore: for 16 color mode! */
@@ -350,7 +364,8 @@ DJSVGA_set_font(const char *fontname)
 {
     char *cp;
     GrFont *font;
-
+    if (!fontname || !fontname[0])
+	return FALSE;
     safe_strncpy(DJSVGA_fontname, fontname, sizeof(DJSVGA_fontname));
     cp = strstr(DJSVGA_fontname, ",");
     if (cp != NULL)
