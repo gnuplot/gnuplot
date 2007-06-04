@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.90.2.1 2006/11/10 22:49:37 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.90.2.2 2007/02/09 23:32:08 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -506,6 +506,13 @@ main(int argc, char **argv)
 # elif defined(SCO)
 	    strcpy(os_name, "SCO");
 	    strcpy(os_rel, uts.release);
+# elif defined(DJGPP)
+	    if (!strncmp(uts.sysname, "??Un", 4)) /* don't print ??Unknow" */
+		strcpy(os_name, "Unknown");
+	    else {
+		strcpy(os_name, uts.sysname);
+		strcpy(os_rel, uts.release);
+	    }
 # else
 	    strcpy(os_name, uts.sysname);
 	    strcpy(os_rel, uts.release);
