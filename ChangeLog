@@ -1,3 +1,7 @@
+2007-06-05  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp (wxt_atexit): Fix commit of 2007-05-23.
+
 2007-06-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_image_or_update_axes) src/graphics.h

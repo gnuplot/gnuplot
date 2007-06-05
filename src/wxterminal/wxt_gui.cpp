@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.46 2007/05/22 17:30:51 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.47 2007/05/23 21:51:18 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3002,6 +3002,30 @@ void wxt_atexit()
 	if (wxt_status == STATUS_UNINITIALIZED)
 		return;
 
+#ifdef WXT_MULTITHREADED
+	/* send a message to exit the main loop */
+	/* protect the following from interrupt */
+	wxt_sigint_init();
+
+	wxCommandEvent event(wxExitLoopEvent);
+	wxt_MutexGuiEnter();
+	dynamic_cast<wxtApp*>(wxTheApp)->SendEvent( event );
+	wxt_MutexGuiLeave();
+
+	/* handle eventual interrupt, and restore original sigint handler */
+	wxt_sigint_check();
+	wxt_sigint_restore();
+
+	FPRINTF((stderr,"gui thread status %d %d %d\n",
+			thread->IsDetached(),
+			thread->IsAlive(),
+			thread->IsRunning() ));
+
+	/* wait for the gui thread to exit */
+	thread->Wait();
+	delete thread;
+#endif /* WXT_MULTITHREADED */
+
 	/* first look for command_line setting */
 	if (wxt_persist==UNSET && persist_cl)
 		wxt_persist = TRUE;
@@ -3034,28 +3058,6 @@ void wxt_atexit()
 		while (!com_line());
 	}
 #else /*_Windows*/
-
-	/* send a message to exit the main loop */
-	/* protect the following from interrupt */
-	wxt_sigint_init();
-
-	wxCommandEvent event(wxExitLoopEvent);
-	wxt_MutexGuiEnter();
-	dynamic_cast<wxtApp*>(wxTheApp)->SendEvent( event );
-	wxt_MutexGuiLeave();
-
-	/* handle eventual interrupt, and restore original sigint handler */
-	wxt_sigint_check();
-	wxt_sigint_restore();
-
-	FPRINTF((stderr,"gui thread status %d %d %d\n",
-			thread->IsDetached(),
-			thread->IsAlive(),
-			thread->IsRunning() ));
-
-	/* wait for the gui thread to exit */
-	thread->Wait();
-	delete thread;
 
 	/* process events directly */
 	wxt_handling_persist = true;
