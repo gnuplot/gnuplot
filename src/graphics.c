@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.223 2007/04/17 16:41:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.224 2007/05/16 22:46:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1970,12 +1970,12 @@ do_plot(struct curve_points *plots, int pcount)
 #ifdef WITH_IMAGE
 	    case IMAGE:
 		this_plot->image_properties.type = IC_PALETTE;
-		PLOT_IMAGE(this_plot);
+		plot_image_or_update_axes(this_plot, FALSE);
 		break;
 
 	    case RGBIMAGE:
 		this_plot->image_properties.type = IC_RGB;
-		PLOT_IMAGE(this_plot);
+		plot_image_or_update_axes(this_plot, FALSE);
 		break;
 #endif
 	    }
@@ -5199,7 +5199,7 @@ hyperplane_between_points(double *p1, double *p2, double *w, double *b)
  *  the axis ranges for `set autoscale`, do so and then return.
  */
 void
-plot_image_or_update_axes(void *plot, TBOOLEAN project_points, TBOOLEAN update_axes)
+plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 {
 
     struct coordinate GPHUGE *points;
@@ -5216,7 +5216,11 @@ plot_image_or_update_axes(void *plot, TBOOLEAN project_points, TBOOLEAN update_a
     double view_port_y[2];
     double view_port_z[2] = {0,0};
     t_imagecolor pixel_planes;
+    TBOOLEAN project_points = FALSE;		/* True if 3D plot */
 
+
+    if (((struct surface_points *)plot)->plot_type == DATA3D)
+	project_points = TRUE;
 
     if (project_points) {
 	points = ((struct surface_points *)plot)->iso_crvs->points;

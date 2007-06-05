@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.146 2007/05/10 22:52:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.147 2007/05/16 22:46:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1865,7 +1865,7 @@ eval_plots()
                  */
                 if ((this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)) {
 		    this_plot->image_properties.type = IC_PALETTE;
-                    UPDATE_AXES_FOR_PLOT_IMAGE(this_plot);
+                    plot_image_or_update_axes(this_plot, TRUE);
 		}
 #endif
 

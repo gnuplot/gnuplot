@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.36 2007/01/17 05:34:17 sfeam Exp $
+ * $Id: graphics.h,v 1.37 2007/05/07 00:11:22 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -119,13 +119,7 @@ void free_histlist __PROTO((struct histogram_style *hist));
 #endif
 
 #ifdef WITH_IMAGE
-void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN map_points, TBOOLEAN update_axes));
-#define PLOT_IMAGE(plot) \
-	plot_image_or_update_axes(plot, FALSE, FALSE)
-#define UPDATE_AXES_FOR_PLOT_IMAGE(plot) \
-	plot_image_or_update_axes(plot, FALSE, TRUE)
-#define SPLOT_IMAGE(plot) \
-	plot_image_or_update_axes(plot, TRUE, FALSE)
+void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN update_axes));
 #endif
 
 #ifdef EAM_OBJECTS

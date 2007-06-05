@@ -1,3 +1,10 @@
+2007-06-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_image_or_update_axes) src/graphics.h
+	src/graph3d.c src/plot2d.c:  Remove the macros wrapping
+	plot_image_or_update_axes and simplify the API by removing an
+	unneeded parameter. This simplifies debugging.
+
 2007-06-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/djsvga.trm: Unify color sequence comply with other terminals.
