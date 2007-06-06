@@ -1,3 +1,7 @@
+2007-06-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Hotkey 'q' does not close the pm terminal.
+
 2007-06-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/djsvga.trm: Unify color sequence comply with other terminals.
