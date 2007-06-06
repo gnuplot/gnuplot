@@ -1,3 +1,7 @@
+2007-06-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* doc/gnuplot.doc: Hotkey 'q' does not close the pm terminal.
+
 2007-06-05  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_atexit): Fix commit of 2007-05-23.
