@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.203.2.5 2007/03/22 04:20:06 sfeam Exp $
+ * $Id: post.trm,v 1.203.2.6 2007/04/17 20:49:46 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1173,7 +1173,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 	cmd[0] = '\0';
 
 	if (doload)
-	    fprintf(gppsfile,"%%BeginProcSet: %s\n",
+	    fprintf(gppsfile,"%%%%BeginProcSet: %s\n",
 		    current_ps_fontfile->fontfile_name);
 
 	/* get filename extension if no pipe (if pipe *ext=='\0') */
