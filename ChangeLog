@@ -1,3 +1,8 @@
+2007-06-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/unset.c (unset_label): Do not treat "unset label <n>" as a fatal
+	error just because label <n> is not currently defined. Bug #1732706
+
 2007-06-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* doc/gnuplot.doc: Hotkey 'q' does not close the pm terminal.
