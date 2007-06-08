@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.48 2007/06/05 21:07:39 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.49 2007/06/08 07:14:18 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2512,17 +2512,21 @@ void wxt_close_terminal_window(int number)
 	if (wxt_status != STATUS_OK)
 		return;
 
-	wxt_sigint_init();
-
-	wxt_MutexGuiEnter();
 	if ((window = wxt_findwindowbyid(number))) {
 		FPRINTF((stderr,"wxt : close window %d\n",number));
-		window->frame->Close(false);
-	}
-	wxt_MutexGuiLeave();
 
-	wxt_sigint_check();
-	wxt_sigint_restore();
+		wxCloseEvent event(wxEVT_CLOSE_WINDOW, window->id);
+		event.SetCanVeto(true);
+
+		wxt_sigint_init();
+		wxt_MutexGuiEnter();
+
+		window->frame->SendEvent(event);
+
+		wxt_MutexGuiLeave();
+		wxt_sigint_check();
+		wxt_sigint_restore();
+	}
 }
 
 /* update the window title */
