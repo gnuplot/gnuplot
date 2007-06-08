@@ -1,3 +1,11 @@
+2007-06-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (do_event): Explicitly ignore mouse clicks from windows
+	other than the current plot window.
+
+	* src/wxterminal/wxt_gui.cpp (wxt_exec_event): Pass through events from
+	all plot windows. This is necessary in order for "bind all" to work.
+
 2007-06-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c (unset_label): Do not treat "unset label <n>" as a fatal

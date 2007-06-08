@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.47 2007/05/23 21:51:18 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.48 2007/06/05 21:07:39 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2827,14 +2827,23 @@ bool wxt_process_one_event(struct gp_event_t *event)
 /* Similar to gp_exec_event(),
  * put the event sent by the terminal in a list,
  * to be processed by the main thread.
- * returns true if the event has really been processed - it will
- * not if the window is not the current one. */
+ * returns true if the event has really been processed.
+ */
 bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 {
 	struct gp_event_t event;
 
-	if ( id != wxt_window_number )
-		return false;
+	/* Allow a distinction between keys attached to "bind" or "bind all" */
+	if ( id != wxt_window_number ) {
+	    if (type == GE_keypress)
+		type = GE_keypress_old;
+	    if (type == GE_buttonpress)
+		type = GE_buttonpress_old;
+	    if (type == GE_buttonrelease)
+		type = GE_buttonrelease_old;
+	/*  else
+		return false; */	/* Filter other events? */
+	}
 
 	event.type = type;
 	event.mx = mx;

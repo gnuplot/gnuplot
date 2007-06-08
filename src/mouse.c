@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.88 2007/05/18 06:15:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.89 2007/06/01 04:14:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1886,6 +1886,10 @@ do_event(struct gp_event_t *ge)
 	/*             but the existing code doesn't expect it to change.   */
 	FPRINTF((stderr, "mouse do_event: window size %d X %d, font hchar %d vchar %d\n",
 		ge->mx, ge->my, ge->par1,ge->par2));
+	break;
+    case GE_buttonpress_old:
+    case GE_buttonrelease_old:
+	/* ignore */
 	break;
     default:
 	fprintf(stderr, "%s:%d protocol error\n", __FILE__, __LINE__);
