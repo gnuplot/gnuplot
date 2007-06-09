@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.5 2006/06/18 07:45:43 tlecomte Exp $
+ * $Id: wxt_term.h,v 1.6 2007/03/31 23:33:15 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -104,6 +104,16 @@ extern char wxt_set_fontname[MAX_ID_LEN + 1];
 extern int wxt_set_fontsize;
 extern int wxt_rounded;
 extern char wxt_title[MAX_ID_LEN + 1];
+
+extern int wxt_axis_mask;
+typedef struct wxt_axis_state_t {
+	double min;
+	double term_lower;
+	double term_scale;
+	double logbase;
+} wxt_axis_state_t;
+extern wxt_axis_state_t wxt_axis_state[4];
+
 
 #ifdef __cplusplus
 }

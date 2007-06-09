@@ -1,3 +1,16 @@
+2007-06-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/wxt.trm (wxt_text_wrapper): At the end of a plot, save the final
+	axis scaling information so that mouse coordinates can be tracked.
+
+	* src/wxterminal/wxt_term.h src/wxterminal/wxt_gui.h:
+	Define data structures that hold axis scaling information.
+
+	* src/wxterminal/wxt_gui.cpp (wxt_update_mousecoords_in_window
+	mouse_to_axis wxt wxt_exec_event): Track mouse motion for all plots.
+	If the plot is not active, handle status line update locally rather
+	than calling back into gnuplot core code.
+
 2007-06-08  Timothee Lecomte <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_close_terminal_window): Send a

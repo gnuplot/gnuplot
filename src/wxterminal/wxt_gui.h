@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.25 2007/05/22 17:30:51 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.26 2007/05/23 21:51:18 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -539,6 +539,8 @@ typedef struct wxt_window_t {
 	wxString title;
 	wxMutex * mutex;
 	wxCondition * condition;
+	int axis_mask;
+	wxt_axis_state_t axis_state[4];
 } wxt_window_t;
 
 /* list of already created windows */

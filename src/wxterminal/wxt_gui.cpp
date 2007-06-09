@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.49 2007/06/08 07:14:18 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.50 2007/06/08 08:07:10 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1620,6 +1620,14 @@ void wxt_text()
 		return;
 	}
 
+#ifdef USE_MOUSE
+	/* Save a snapshot of the axis state so that we can continue
+	 * to update mouse cursor coordinates even though the plot is not active */
+	wxt_current_window->axis_mask = wxt_axis_mask;
+	memcpy( wxt_current_window->axis_state, 
+	 	wxt_axis_state, sizeof(wxt_axis_state) );
+#endif
+
 	wxt_sigint_init();
 
 	FPRINTF((stderr,"Text0 %d\n", sw.Time())); /*performance watch*/
@@ -2529,6 +2537,66 @@ void wxt_close_terminal_window(int number)
 	}
 }
 
+
+/* The following two routines allow us to update the cursor position 
+ * in the specified window even if the window is not active
+ */
+
+static double mouse_to_axis(int mouse_coord, wxt_axis_state_t *axis)
+{
+    double axis_coord;
+
+	if (axis->term_scale == 0.0)
+	    return 0;
+	axis_coord = axis->min 
+	           + ((double)mouse_coord - axis->term_lower) / axis->term_scale;
+	if (axis->logbase > 0)
+		axis_coord = exp(axis_coord * axis->logbase);
+
+    return axis_coord;
+}
+
+static void wxt_update_mousecoords_in_window(int number, int mx, int my)
+{
+	wxt_window_t *window;
+
+	if (wxt_status != STATUS_OK)
+		return;
+
+	if ((window = wxt_findwindowbyid(number))) {
+		
+		/* TODO: rescale mx and my using stored per-plot scale info */
+		char mouse_format[66];
+		char *m = mouse_format;
+		double x, y, x2, y2;
+
+		if (window->axis_mask & (1<<0)) {
+			x = mouse_to_axis(mx, &window->axis_state[0]);
+			sprintf(m, "x=  %10g   %c", x, '\0');
+			m += 17;
+		}
+		if (window->axis_mask & (1<<1)) {
+			y = mouse_to_axis(my, &window->axis_state[1]);
+			sprintf(m, "y=  %10g   %c", y, '\0');
+			m += 17;
+		}
+		if (window->axis_mask & (1<<2)) {
+			x2 = mouse_to_axis(mx, &window->axis_state[2]);
+			sprintf(m, "x2=  %10g   %c", x2, '\0');
+			m += 17;
+		}
+		if (window->axis_mask & (1<<3)) {
+			y2 = mouse_to_axis(my, &window->axis_state[3]);
+			sprintf(m, "y2=  %10g %c", y2, '\0');
+			m += 15;
+		}
+
+		FPRINTF((stderr,"wxt : update mouse coords in window %d\n",number));
+		window->frame->SetStatusText(wxString(mouse_format, wxConvLocal));
+	}
+
+}
+
 /* update the window title */
 void wxt_update_title(int number)
 {
@@ -2839,14 +2907,21 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 
 	/* Allow a distinction between keys attached to "bind" or "bind all" */
 	if ( id != wxt_window_number ) {
+
+	    if (type == GE_motion) {
+		/* Update mouse coordinates locally and echo back to originating window */
+		wxt_update_mousecoords_in_window(id, mx, my);
+		return true;
+	    }
+
 	    if (type == GE_keypress)
 		type = GE_keypress_old;
 	    if (type == GE_buttonpress)
 		type = GE_buttonpress_old;
 	    if (type == GE_buttonrelease)
 		type = GE_buttonrelease_old;
-	/*  else
-		return false; */	/* Filter other events? */
+	    else	/* Other special cases? */
+		return false;
 	}
 
 	event.type = type;
