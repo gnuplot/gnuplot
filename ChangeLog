@@ -11,6 +11,11 @@
 	If the plot is not active, handle status line update locally rather
 	than calling back into gnuplot core code.
 
+	* demo/multiaxis.dem: Split out 3rd plot of electron.dem into a 
+	separate file, where it can serve as a demo of using x2, y2 axes.
+
+	* demo/html/index.save demo/html/Makefile: Update html demo set.
+
 2007-06-08  Timothee Lecomte <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_close_terminal_window): Send a
