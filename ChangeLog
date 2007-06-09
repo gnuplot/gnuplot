@@ -7,7 +7,7 @@
 	Define data structures that hold axis scaling information.
 
 	* src/wxterminal/wxt_gui.cpp (wxt_update_mousecoords_in_window
-	mouse_to_axis wxt wxt_exec_event): Track mouse motion for all plots.
+	mouse_to_axis wxt_exec_event): Track mouse motion for all plots.
 	If the plot is not active, handle status line update locally rather
 	than calling back into gnuplot core code.
 
