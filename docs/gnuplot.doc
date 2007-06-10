@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.430 2007/06/01 04:14:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.431 2007/06/06 10:16:30 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -673,6 +673,7 @@ C
  data files.
 2 Coordinates
 ?coordinates
+=axes
  The commands `set arrow`, `set key`, `set label` and `set object` allow you
  to draw something at an arbitrary position on the graph.  This position is
  specified by the syntax:
@@ -1789,13 +1790,12 @@ C ... and restart the table:
  The word "title" occurs with multiple meanings in `gnuplot`.  In this
  document, it will always be preceded by the adjective "plot", "line", or
  "key" to differentiate among them.
+ A 2-d graph may have up to four labelled `axes`.  The names of the four axes
+ are "x" for the axis along the bottom border of the plot, "y" for the axis
+ along the left border, "x2" for the top border, and "y2" for the right border.
+ See `axes`.
 
- A 2-d graph may have up to four labelled axes.  The names of the four axes
- for these usages are "x" for the axis along the bottom border of the plot,
- "y" for the left border, "x2" for the top border, and "y2" for the right
- border.
-
- A 3-d graph may have up to three labelled axes -- "x", "y" and "z".  It is
+ A 3-d graph may have up to three labelled `axes` -- "x", "y" and "z".  It is
  not possible to say where on the graph any particular axis will fall because
  you can change the direction from which the graph is seen with `set view`.
 
@@ -2066,6 +2066,7 @@ C ... and restart the table:
  treated.  In addition, the `using` option allows both `plot` and `splot` to
  treat almost any coordinate system you'd care to define.
 
+=axes
  `plot` also lets you use each of the four borders -- x (bottom), x2 (top), y
  (left) and y2 (right) -- as an independent axis.  The `axes` option lets you
  choose which pair of axes a given function or data set is plotted against.  A
@@ -3184,7 +3185,7 @@ C ... and restart the table:
  `plot` and `splot` contain many common features; see `splot` for differences.
  Note specifically that although the `binary <binary list>` variation does
  work for both `plot` and `splot`, there are small differences between these
- modes.  Furthermore, `plot`'s `axes` option does not exist for `splot`.
+ modes.
 
  Syntax:
        plot {<ranges>}
@@ -3201,21 +3202,26 @@ C ... and restart the table:
  It is also possible to define functions and parameters on the `plot` command
  itself.  This is done merely by isolating them from other items with commas.
 
+ Examples:
+       plot sin(x)
+       plot sin(x), cos(x)
+       plot f(x) = sin(x*a), a = .2, f(x), a = .4, f(x)
+       plot "datafile.1" with lines, "datafile.2" with points
+       plot [t=1:10] [-pi:pi*2] tan(t), \
+            "data.1" using (tan($2)):($3/$4) smooth csplines \
+                     axes x1y2 notitle with lines 5
+
+ See also `show plot`.
+3 axes
+?commands plot axes
+?plot axes
+?axes
  There are four possible sets of axes available; the keyword <axes> is used to
  select the axes for which a particular line should be scaled.  `x1y1` refers
  to the axes on the bottom and left; `x2y2` to those on the top and right;
  `x1y2` to those on the bottom and right; and `x2y1` to those on the top and
  left.  Ranges specified on the `plot` command apply only to the first set of
  axes (bottom left).
-
- Examples:
-       plot sin(x)
-       plot f(x) = sin(x*a), a = .2, f(x), a = .4, f(x)
-       plot [t=1:10] [-pi:pi*2] tan(t), \
-            "data.1" using (tan($2)):($3/$4) smooth csplines \
-                     axes x1y2 notitle with lines 5
-
- See also `show plot`.
 3 data
 ?commands plot datafile
 ?plot datafile
@@ -10782,11 +10788,12 @@ C ... and restart the table:
 ?splot
  `splot` is the command for drawing 3-d plots (well, actually projections on
  a 2-d surface, but you knew that).  It can create a plot from functions or
- a data file in a manner very similar to the `plot` command.
+ data read from files in a manner very similar to the `plot` command.
+ `splot` provides only a single x, y, and z axis; there is no equivalent to the
+ x2 and y2 secondary axes provided by `plot`.
 
  See `plot` for features common to the `plot` command; only differences are
- discussed in detail here.  Note specifically `plot`'s `axes` option is not
- available for `splot`.
+ discussed in detail here.  
 
  Syntax:
        splot {<ranges>}

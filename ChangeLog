@@ -1,3 +1,8 @@
+2007-06-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Break out "axes" into its own subsection, and add
+	cross-references so that people can find it.
+
 2007-06-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/wxt.trm (wxt_text_wrapper): At the end of a plot, save the final
