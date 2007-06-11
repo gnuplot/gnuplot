@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.117 2007/05/05 21:39:09 sfeam Exp $
+ * $Id: gd.trm,v 1.118 2007/05/07 03:32:13 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -76,8 +76,8 @@
  *  Alfred Reibenschuh <alfred.reibenschuh@it-austria.com> or <fredo@blackbox.at>
  *  Ben Laurie <ben@algroup.co.uk>
  *
- * This version outputs either color or monochrome PNGs.
- * The default is 640x480 pixels.
+ * This version outputs either indexed or truecolor (24-bit RGB) images
+ * The default size is 640x480 pixels.
  *
  ******************************************************************************
  * PLEASE READ                                                                *
@@ -262,7 +262,7 @@ enum PNG_id {
     PNG_SIZE,
     PNG_ENHANCED, PNG_NOENHANCED,
     PNG_TRUECOLOR, PNG_NOTRUECOLOR,
-    PNG_LINEWIDTH, PNG_BUTT, PNG_ROUNDED,
+    PNG_LINEWIDTH, PNG_BUTT, PNG_ROUNDED, PNG_DASHLENGTH,
     GIF_ANIMATE, GIF_DELAY, GIF_LOOP, GIF_NOOPT, GIF_OPT,
     PNG_OTHER
 };
@@ -305,12 +305,15 @@ static struct gen_table PNG_opts[] =
     { "lw", PNG_LINEWIDTH },
     { "butt", PNG_BUTT},
     { "round$ed", PNG_ROUNDED},
+    { "dashl$ength", PNG_DASHLENGTH},
+    { "dl", PNG_DASHLENGTH},
     { NULL, PNG_OTHER }
 };
 
 #undef MAXLINEWIDTH
 #define MAXLINEWIDTH 100
 static double PNG_linewidth_factor = 1.0;
+static double PNG_dashlength_factor = 1.0;
 
 /* EAM - gdImage structure to hold brushes for linewidth */
 /* We will allocate and initialize these on demand */
@@ -626,6 +629,7 @@ PNG_options()
 	png_state.justify = CENTRE;
 	png_state.TrueColor = FALSE;
 	PNG_linewidth_factor = 1.0;
+	PNG_dashlength_factor = 1.0;
 	png_state.capbutt = FALSE; /* to preserve previous default behavior */
 #ifdef GD_NEED_LOCAL_FONT_POINTERS
 	gdFontSmall = gdFontGetSmall();
@@ -657,6 +661,8 @@ PNG_options()
 	/* And default font size */
 	term->h_char = PNG_HCHAR;
 	png_state.default_ttfsize = 0;
+	PNG_linewidth_factor = 1.0;
+	PNG_dashlength_factor = 1.0;
     }
 
     while (!END_OF_COMMAND) {
@@ -819,6 +825,12 @@ PNG_options()
 	    PNG_linewidth_factor = real_expression();
 	    if (PNG_linewidth_factor < 0)
 		PNG_linewidth_factor = 1.0;
+	    break;
+	case PNG_DASHLENGTH:
+	    c_token++;
+	    PNG_dashlength_factor = real_expression();
+	    if (PNG_dashlength_factor <= 0.2)
+		PNG_dashlength_factor = 1.0;
 	    break;
 
 	/* parse gif animation options */
@@ -1009,6 +1021,10 @@ PNG_options()
     if (PNG_linewidth_factor != 1.0)
 	sprintf(term_options + strlen(term_options),
 	    "linewidth %3.1f ", PNG_linewidth_factor);
+
+    if (PNG_dashlength_factor != 1.0)
+	sprintf(term_options + strlen(term_options),
+	    "dashlength %3.1f ", PNG_dashlength_factor);
 
     if (png_state.capbutt) {
 	sprintf(term_options + strlen(term_options),
@@ -1437,19 +1453,44 @@ PNG_move(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 PNG_vector(unsigned int x, unsigned int y)
 {
-    int lw;
+    int lw = png_state.linewidth;
 
+    /* Dashed line style; used only for the x/y grid */
     if (png_state.linetype == -1) {
-	int png_linetype_dotted[5];
-	png_linetype_dotted[0] = png_state.color;
-	png_linetype_dotted[1] = png_state.color;
-	png_linetype_dotted[2] = gdTransparent;
-	png_linetype_dotted[3] = gdTransparent;
-	png_linetype_dotted[4] = gdTransparent;
+	static int last_lw = -1;
+	static double last_dl = -1;
 
-	gdImageSetStyle(png_state.image, png_linetype_dotted, 5);
+	/* Adjust the style when linewidth or dashlength has changed. */
+	if (lw != last_lw || PNG_dashlength_factor != last_dl) {
+	    int i;
+	    int dashlength = 2 * PNG_dashlength_factor;
+	    int spacelength = 3 * PNG_dashlength_factor;
+	    int psize = lw*lw*dashlength;
+	    int ssize = lw*lw*(spacelength + dashlength);
+	    int *png_linetype_dotted = gp_alloc( ssize*sizeof(int), "dashes");
+
+	    /* Fill style with with color then transparent.
+	     * The style is 2 on / 3 off and scales with linewidth and dashlength.
+	     */
+	    for(i = 0;i < psize; i++)
+		png_linetype_dotted[i] = png_state.color;
+	    for (;i < ssize; i++)
+		png_linetype_dotted[i] = gdTransparent;
+	    gdImageSetStyle(png_state.image, png_linetype_dotted, ssize);
+	    free(png_linetype_dotted);
+	    last_lw = lw;
+	    last_dl = PNG_dashlength_factor;
+	}
+	/* This driver does not in general use gd's built-in SetThickness command,
+	 * because it only works right for purely horizontal or vertical lines.
+	 * But that's OK for a 2D grid.
+	 */
+	gdImageSetThickness(png_state.image,lw);
 	gdImageLine(png_state.image, png_state.x, Y(png_state.y),
-		    x, Y(y), gdStyled);
+		  x, Y(y), gdStyled);
+	gdImageSetThickness(png_state.image,1);
+
+    /* All other (not dashed) vectors */
     } else {
 	if (png_state.linewidth == 1) {
 #if (GD2_VERS >= 2) && defined(gdAntiAliased) 
@@ -1470,13 +1511,13 @@ PNG_vector(unsigned int x, unsigned int y)
 #endif
 	} else {
 	    /* EAM - Implement linewidth by using a brush */
-	    lw   = png_state.linewidth;
 	    PNG_init_brush(lw);
 	    gdImageSetBrush(png_state.image, PNG_brush[lw]->im);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), gdBrushed );
 	}
     }
+
     png_state.x = x;
     png_state.y = y;
 }
@@ -2106,6 +2147,7 @@ START_HELP(png)
 "       set terminal png ",
 "              {{no}transparent} {{no}interlace}",
 "              {{no}truecolor} {rounded|butt}",
+"              {linewidth <lw>} {dashlength <dl>}",
 "              {tiny | small | medium | large | giant}",
 "              {font <face> {<pointsize>}}",
 "              {size <x>,<y>} {{no}crop}",
@@ -2464,6 +2506,7 @@ START_HELP(gif)
 "       set terminal gif ",
 "                        {tiny | small | medium | large | giant}",
 "                        {{no}transparent} {{no}enhanced}",
+"                        {linewidth <lw>} {dashlength <dl>}",
 "                        {font <face> {<pointsize>}}",
 "                        {animate {delay <time>} {{no}optimize}}",
 "                        {size <x>,<y>} {{no}crop}",

@@ -1,3 +1,10 @@
+2007-06-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_options PNG_vector): Apply current linewidth and
+	dashlength to dotted lines. Of course, the only dotted line support
+	we have at this point is linetype 0, used for the grid and axes...
+	Based on Mike Sutton's patchset #1659135
+
 2007-06-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Break out "axes" into its own subsection, and add
