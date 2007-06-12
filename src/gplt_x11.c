@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.176 2007/05/16 18:36:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.177 2007/05/16 18:56:19 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -234,6 +234,14 @@ typedef struct cmap_t {
 /* always allocate a default colormap (done in preset()) */
 static cmap_t default_cmap;
 
+/* In order to get multiple palettes on a plot, i.e., multiplot mode,
+   we must keep track of all color maps on a plot so that a needed
+   color map is not discarded prematurely. */
+typedef struct cmap_struct {
+    cmap_t *cmap;
+    struct cmap_struct *next_cmap_struct;
+} cmap_struct;
+    
 /* information about one window/plot */
 typedef struct plot_struct {
     Window window;
@@ -275,6 +283,7 @@ typedef struct plot_struct {
      * This is always the default colormap, if not in pm3d.
      */
     cmap_t *cmap;
+    cmap_struct *first_cmap_struct;
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
     /* This array holds per-axis scaling information sufficient to reconstruct
      * plot coordinates of a mouse click.  It is a snapshot of the contents of
@@ -357,6 +366,7 @@ static char selection[SEL_LEN] = "";
 
 static void CmapClear __PROTO((cmap_t *));
 static void RecolorWindow __PROTO((plot_struct *));
+static void FreeColormapList __PROTO((plot_struct *plot));
 static void FreeColors __PROTO((cmap_t *));
 static void ReleaseColormap __PROTO((cmap_t *));
 static unsigned long *ReallocColors __PROTO((cmap_t *, int));
@@ -1054,13 +1064,8 @@ delete_plot(plot_struct *plot)
 	XFreePixmap(dpy, plot->pixmap);
 	plot->pixmap = None;
     }
-    /* Release the colormap here to free color resources, but only
-     * if this plot is using a colormap not used by another plot
-     * and is not using the current colormap.
-     */
-    if (plot->cmap != current_cmap && !Find_Plot_In_Linked_List_By_CMap(plot->cmap))
-	Remove_CMap_From_Linked_List(plot->cmap);
-    /* but preserve geometry */
+    /* Release the colormaps here to free color resources. */
+    FreeColormapList(plot);
 }
 
 
@@ -1091,10 +1096,10 @@ prepare_plot(plot_struct *plot, int term_number)
 	plot->str[0] = '\0';
 	plot->zoombox_on = FALSE;
 #endif
+	plot->first_cmap_struct = NULL;
     }
     if (plot->window == None) {
 	plot->cmap = current_cmap;	/* color space */
-	RecolorWindow(plot);
 	pr_window(plot);
 #ifdef USE_MOUSE
 	/*
@@ -1114,6 +1119,11 @@ prepare_plot(plot_struct *plot, int term_number)
 	plot->time = 0;		/* XXX how should we initialize this ? XXX */
 #endif
     }
+
+    /* Release the colormaps here to free color resources. */
+    FreeColormapList(plot);
+    /* Make the current colormap the first colormap in the plot. */
+    plot->cmap = current_cmap;	/* color space */
 
     /* We don't know that it is the same window as before, so we reset the
      * cursors for all windows and then define the cursor for the active
@@ -1486,28 +1496,24 @@ record()
 	    return 0;
 
 	case X11_GR_MAKE_PALETTE:
-	    if (have_pm3d)
+	    if (have_pm3d) {
+		char cmapidx[6] = "e";
+		int cm_index;
+	        cmap_struct *csp;
+		/* Get and process palette */
 		scan_palette_from_buf();
+		/* Compute and store the resulting colormap index as a command
+		 * so that a palette change can be made on the same plot. */
+	        csp = plot->first_cmap_struct;
+	        for (cm_index=0; csp; cm_index++) {
+		    if (csp->cmap == current_cmap)
+			break;
+		    csp = csp->next_cmap_struct;
+		}
+		sprintf(cmapidx+1, "%3u\0", cm_index);
+		store_command(cmapidx, plot);
+	    }
 	    return 1;
-#if 0
-/* (DJS 28sep2004)  Possibly remove.  Not sure this is useful for anything.
- * What gnuplot command would issue this?  When would gnuplot know it is OK to
- * release a palette inside gnuplot_x11?  I see no X11_GR_RELEASE_PALETTE
- * or 'e' inside x11.trm.
- *
- * Plots and colormaps are independent in new scheme, so the line below
- * "if (plot)" is outdated.  Also, sm_palette is a global, static structure.
- *  sm_palette.gradient should be set to NULL after freeing the memory.
- */
-	case X11_GR_RELEASE_PALETTE:
-	    /* turn pm3d off */
-	    FPRINTF((stderr, "X11_GR_RELEASE_PALETTE\n"));
-	    if (plot)
-		ReleaseColormap(plot);
-	    sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
-	    free( sm_palette.gradient );
-	    return 1;
-#endif
 
 #if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
 	case X11_GR_CHECK_ENDIANESS:
@@ -3089,6 +3095,19 @@ exec_cmd(plot_struct *plot, char *command)
 	}
     }
 #endif
+    /*   Switch to a different color map */
+    else if (*buffer == 'e') {
+	if (have_pm3d) {
+	    /* Get colormap index and choose find the appropriate cmap */
+	    int cm_index, i;
+	    cmap_struct *csp;
+	    sscanf(&buffer[1], "%u", &cm_index);
+	    csp = plot->first_cmap_struct;
+	    for (i=0; i < cm_index; i++)
+		csp = csp->next_cmap_struct;
+	    plot->cmap = csp->cmap;
+	}
+    }
     else {
 	fprintf(stderr, "gnuplot_x11: unknown command <%s>\n", buffer);
     }
@@ -3247,6 +3266,27 @@ CmapClear(cmap_t * cmap_ptr)
 static void
 RecolorWindow(plot_struct * plot)
 {
+    cmap_struct **cspp = &plot->first_cmap_struct;
+    cmap_struct *csp = plot->first_cmap_struct;
+    while (csp) {
+	if (csp->cmap == plot->cmap)
+	    break;
+	cspp = &(csp->next_cmap_struct);
+	csp = csp->next_cmap_struct;
+    }
+    if (!csp) {
+	/* This colormap is not in the list, add it. */
+	*cspp = (cmap_struct *) malloc(sizeof(cmap_struct));
+	if (*cspp) {
+	    /* Initialize structure variables. */
+	    memset((void*)*cspp, 0, sizeof(cmap_struct));
+	    (*cspp)->cmap = plot->cmap;
+	}
+	else {
+	    fprintf(stderr, ERROR_NOTICE("Could not allocate memory for cmap_struct.\n\n"));
+	    return;
+	}
+    }
     if (None != plot->window) {
 	XSetWindowColormap(dpy, plot->window, plot->cmap->colormap);
 	XSetWindowBackground(dpy, plot->window, plot->cmap->colors[0]);
@@ -3258,6 +3298,22 @@ RecolorWindow(plot_struct * plot)
 	    GetGCXor(plot, &gc_xor);	/* recreate gc_xor */
 	}
 #endif
+    }
+}
+
+static void
+FreeColormapList(plot_struct *plot)
+{
+    while (plot->first_cmap_struct != NULL) {
+	cmap_struct *freethis = plot->first_cmap_struct;
+	/* Release the colormap here to free color resources, but only
+	 * if this plot is using a colormap not used by another plot
+	 * and is not using the current colormap.
+	 */
+	if (plot->first_cmap_struct->cmap != current_cmap && !Find_Plot_In_Linked_List_By_CMap(plot->first_cmap_struct->cmap))
+	    Remove_CMap_From_Linked_List(plot->first_cmap_struct->cmap);
+	plot->first_cmap_struct = plot->first_cmap_struct->next_cmap_struct;
+	free(freethis);
     }
 }
 
@@ -6150,7 +6206,13 @@ Find_Plot_In_Linked_List_By_CMap(cmap_t *cmp)
     plot_struct *psp = plot_list_start;
 
     while (psp != NULL) {
-	if (psp->cmap == cmp)
+	cmap_struct *csp = psp->first_cmap_struct;
+	while (csp != NULL) {
+	    if (csp->cmap == cmp)
+		break;
+	    csp = csp->next_cmap_struct;
+	}
+	if (csp != NULL)
 	    break;
 	psp = psp->next_plot;
     }

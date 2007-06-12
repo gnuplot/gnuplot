@@ -1,3 +1,21 @@
+2007-06-12  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/gplt_x11.c:  Added a cmap_struct for linked list of colormaps for
+	plot_struct so that a needed colormap is not discarded.
+	(FreeColormapList):  New function to free all colormaps in linked list.
+	(delete_plot):  Call FreeColormapList().
+	(prepare_plot):  Initialize plot->first_cmap_struct to NULL at first
+	use.  Call FreeColormapList() and release no longer needed resources.
+	(record, case X11_GR_MAKE_PALETTE):  Stored a command into the plot
+	buffer to indicate a palette/colormap change.  Removed cruft.
+	(exec_cmd, case 'e'):  Switched to the recorded colormap.
+	(RecolorWindow):  Added the used colormap to the linked list so that
+	all colormaps for the plot are remembered.
+	(Find_Plot_In_Linked_List_By_CMap):  Search colormap linked list.
+	Bug #1447277
+
+	* demo/multipalette.dem:  Two palette multiplot script for debugging.
+
 2007-06-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_options PNG_vector): Apply current linewidth and
