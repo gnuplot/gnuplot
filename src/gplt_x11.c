@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.177 2007/05/16 18:56:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.178 2007/06/12 18:46:34 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2117,7 +2117,6 @@ exec_cmd(plot_struct *plot, char *command)
 		    }
 		    x = plot->xLast + x_offset;
 		    y = plot->yLast + y_offset;
-		    v_offset = 0;
 		    str = buffer + 10;
 		    break;
 	case 'p':	/* Push (Save) position for later use */

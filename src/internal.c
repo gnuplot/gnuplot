@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.40 2006/06/11 17:42:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.41 2007/03/30 05:18:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1286,7 +1286,15 @@ f_sprintf(union argument *arg)
     }
 
     /* Copy the trailing portion of the format, if any */
-    strncpy(outpos, next_start, bufsize-(outpos-buffer));
+    /* We could just call snprintf(), but it doesn't check for */
+    /* whether there really are more variables to handle.      */
+    i = bufsize - (outpos-buffer);
+    while (*next_start && --i > 0) {
+	if (*next_start == '%' && *(next_start+1) == '%')
+	    next_start++;
+	*outpos++ = *next_start++;
+    }
+    *outpos = '\0';
 
     FPRINTF((stderr," snprintf result = \"%s\"\n",buffer));
     push(Gstring(&result, buffer));
