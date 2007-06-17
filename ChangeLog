@@ -1,3 +1,9 @@
+2007-06-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_tics): save [xyz]tics must not follow the "offset"
+	info with a bare number, because a negative number will be mis-parsed.
+	Bugfix.
+
 2007-06-12  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/gplt_x11.c:  Added a cmap_struct for linked list of colormaps for

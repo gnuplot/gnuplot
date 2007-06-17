@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.142 2007/04/08 03:39:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.143 2007/04/17 19:22:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -933,7 +933,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
     if (axis_array[axis].tic_rotate)
     	fprintf(fp,"by %d ",axis_array[axis].tic_rotate);
     save_position(fp, &axis_array[axis].ticdef.offset, TRUE);
-    fprintf(fp," ");
+    fprintf(fp, "\nset %stics ", axis_defaults[axis].name);
     switch (axis_array[axis].ticdef.type) {
     case TIC_COMPUTED:{
 	    fputs("autofreq ", fp);
