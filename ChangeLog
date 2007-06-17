@@ -1,5 +1,12 @@
 2007-06-17  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/internal.c (f_sprintf): Remove any remaining escape sequences (%%)
+	from the tail of the format string after all of the input variables have
+	been processed.
+	Bug #1739625
+
+2007-06-17  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/save.c (save_tics): save [xyz]tics must not follow the "offset"
 	info with a bare number, because a negative number will be mis-parsed.
 	Bugfix.
