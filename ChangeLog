@@ -1,3 +1,16 @@
+2007-06-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	Fix two special cases where gnuplot auto-increments the line type, but
+	does not check whether the user has requested user-defined line styles
+	instead (via "set style increment user").
+
+	* src/graph3d.c (do_3dplot cntr3d_lines):  If the [default] option
+	`set clabel` is in effect then contours auto-increment over line types.
+	Check for prefer_line_styles at this point.
+
+	* src/graphics.c (do_plot plot_boxes): Columnstacked histograms auto-
+	increment over line types.  Check for prefer_line_styles at thie point.
+
 2007-06-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/readline.c (readline_ipc): Cleanup: do not use the so-called

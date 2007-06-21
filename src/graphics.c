@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.224 2007/05/16 22:46:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.225 2007/06/05 19:09:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1832,15 +1832,20 @@ do_plot(struct curve_points *plots, int pcount)
 	    text_label *key_entry;
 	    localkey = 0;
 	    if (this_plot->labels) {
+		struct lp_style_type save_lp = this_plot->lp_properties;
 		for (key_entry = this_plot->labels; key_entry; key_entry = key_entry->next) {
 		    key_count++;
 		    this_plot->lp_properties.l_type = key_entry->tag;
-		    if (key_entry->text)
+		    if (key_entry->text) {
+			if (prefer_line_styles)
+			    lp_use_properties(&this_plot->lp_properties, key_entry->tag + 1, FALSE);
 			do_key_sample(this_plot, key, key_entry->text, t, xl, yl);
+		    }
 		    yl = yl - key_entry_height;
 		}
 		free_labels(this_plot->labels);
 		this_plot->labels = NULL;
+		this_plot->lp_properties = save_lp;
 	    }
 	} else
 #endif
@@ -3444,7 +3449,12 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    case HT_STACKED_IN_TOWERS:
 			ix = 0;
 			/* Line type (color) must match row number */
-			(*t->linetype)(i);
+			if (prefer_line_styles) {
+			    struct lp_style_type ls;
+			    lp_use_properties(&ls, i+1, FALSE);
+			    apply_pm3dcolor(&ls.pm3d_color, term);
+			} else
+			    (*t->linetype)(i);
 		    case HT_STACKED_IN_LAYERS:
 			dyb = stackheight[ix].y;
 			dyt += stackheight[ix].y;
