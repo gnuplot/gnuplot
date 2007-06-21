@@ -19,6 +19,11 @@
 
 	* src/gpexecute.c (gp_exec_event): Cleanup: Use DEBUG and FPRINTF.
 
+	* src/help.c (ShowSubtopics): Do not print the list of available
+	subtopics with the external pager (the one from the PAGER variable).
+	When using 'less' as the pager, the list was not visible any longer
+	at the time the user is prompted for a subtopic.
+
 2007-06-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_sprintf): Remove any remaining escape sequences (%%)
