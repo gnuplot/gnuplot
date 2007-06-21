@@ -8,6 +8,7 @@ New features, changes and fixes since gnuplot version 4.2
 * FIX polygon clipping bugs
 * FIX key sample for plots with variable color
 * FIX wxt initialization on non-gnu systems
+* FIX Apply "set style incr user" to 3D contours and to columnstacked histograms
 * CHANGE clean up configuration files for amg, cyg, mgw, dj2
 * CHANGE modify SVG output to accommodate non-compliant viewers
 * CHANGE allow 'strcol()' as shorthand for 'stringcolumn()'

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.8 2007/04/26 06:08:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.9 2007/05/04 15:39:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1177,8 +1177,14 @@ do_3dplot(
 			if (use_palette && thiscontour_lp_properties.pm3d_color.type == TC_Z)
 			    set_color( cb2gray( z2cb(cntrs->z) ) );
 			else {
-			    (*t->linetype) (++thiscontour_lp_properties.l_type);
-			    thiscontour_lp_properties.use_palette = 0;
+			    if (prefer_line_styles && label_contours) {
+				struct lp_style_type ls;
+				lp_use_properties(&ls, ++thiscontour_lp_properties.l_type, FALSE);
+				term_apply_lp_properties(&ls);
+			    } else {
+				(*t->linetype) (++thiscontour_lp_properties.l_type);
+				thiscontour_lp_properties.use_palette = 0;
+			    }
 			}
 
 			if (key->visible) {
@@ -1851,6 +1857,13 @@ cntr3d_lines(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 {
     int i;			/* point index */
     vertex this_vertex;
+    struct lp_style_type ls;
+
+    /* user may prefer explicit line styles */
+    if (prefer_line_styles && label_contours) {
+	lp_use_properties(&ls, lp->l_type, FALSE);
+	lp = &ls;
+    }
 
     if (draw_contour & CONTOUR_SRF) {
 	map3d_xyz(cntr->coords[0].x, cntr->coords[0].y, cntr->coords[0].z,
