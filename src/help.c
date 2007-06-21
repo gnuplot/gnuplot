@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.19 2006/07/07 18:06:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.20 2007/06/21 21:55:23 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -156,6 +156,7 @@ static void OutLine_InternalPager __PROTO((const char *line));
 static FILE *outfile;		/* for unix pager, if any */
 #endif
 static int pagelines;		/* count for builtin pager */
+static int screensize;		/* lines on screen (got with env var) */
 #define SCREENSIZE 24		/* lines on screen (most have at least 24) */
 
 /* help:
@@ -669,6 +670,8 @@ ShowSubtopics(
 void
 StartOutput()
 {
+    char *line_count = NULL;
+
 #if defined(PIPES)
     char *pager_name = getenv("PAGER");
 
@@ -678,6 +681,14 @@ StartOutput()
     outfile = stderr;
     /* fall through to built-in pager */
 #endif
+
+    /* buit-in dumb pager: use the line count provided by the terminal */
+    line_count = getenv("LINES");
+
+    if (line_count != NULL)
+	screensize = (int) strtol(line_count, NULL, 0);
+    if (line_count == NULL || screensize < 3)
+	screensize = SCREENSIZE;
 
     /* built-in pager */
     pagelines = 0;
@@ -699,7 +710,7 @@ OutLine(const char *line)
 
     /* built-in dumb pager */
     /* leave room for prompt line */
-    if (pagelines >= SCREENSIZE - 2) {
+    if (pagelines >= screensize - 2) {
 	fputs("Press return for more: ", stderr);
 #if defined(ATARI) || defined(MTOS)
 	do
@@ -727,7 +738,7 @@ OutLine_InternalPager(const char *line)
 
     /* built-in dumb pager */
     /* leave room for prompt line */
-    if (outfile == stderr && pagelines >= SCREENSIZE - 2) {
+    if (outfile == stderr && pagelines >= screensize - 2) {
 	fputs("Press return for more: ", stderr);
 #if defined(ATARI) || defined(MTOS)
 	do

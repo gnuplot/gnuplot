@@ -23,6 +23,10 @@
 	subtopics with the external pager (the one from the PAGER variable).
 	When using 'less' as the pager, the list was not visible any longer
 	at the time the user is prompted for a subtopic.
+	(StartOutput, OutLine, OutLine_InternalPager): Built-in pager: try to
+	get the screensize with the LINES environment variable. It is a UNIX
+	standard. Fallback to the default size (24) if there is an error.
+	The help text is now nice to read even with the built-in dumb pager.
 
 2007-06-17  Ethan Merritt  <merritt@u.washington.edu>
 
