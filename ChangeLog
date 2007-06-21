@@ -1,3 +1,9 @@
+2007-06-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/readline.c (readline_ipc): Cleanup: do not use the so-called
+	"alternate interface" to GNU Readline, it is useless here. The only
+	required thing is setting rl_getc_function.
+
 2007-06-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_sprintf): Remove any remaining escape sequences (%%)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.40 2005/05/23 18:39:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.41 2006/04/28 16:54:03 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -58,25 +58,6 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.40 2005/05/23 18:39:09 
 #include "term_api.h"
 
 #if defined(HAVE_LIBREADLINE)
-/* #include <readline/readline.h> --- HBB 20000508: now included by readline.h*/
-/* #include <readline/history.h> --- HBB 20000508: now included by gp_hist */
-
-
-static char* line_buffer;
-static int line_complete;
-
-/**
- * called by libreadline if the input
- * was typed (not from the ipc).
- */
-static void
-LineCompleteHandler(char* ptr)
-{
-    rl_callback_handler_remove();
-    line_buffer = ptr;
-    line_complete = 1;
-}
-
 static int
 getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
 {
@@ -95,7 +76,6 @@ getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
 	return c;
     }
 }
-
 #endif /* HAVE_LIBREADLINE */
 
 #if defined(HAVE_LIBREADLINE) || defined(READLINE)
@@ -103,20 +83,9 @@ char*
 readline_ipc(const char* prompt)
 {
 #if defined(PIPE_IPC) && defined(HAVE_LIBREADLINE)
-    /* use readline's alternate interface.
-     * this requires rl_library_version > 2.2
-     * TODO: make a check in configure.in */
-
-    rl_callback_handler_install((char*) prompt, LineCompleteHandler);
     rl_getc_function = getc_wrapper;
-
-    for (line_complete = 0; !line_complete; /* EMPTY */) {
-	rl_callback_read_char(); /* stdin */
-    }
-    return line_buffer;
-#else
-    return readline((const char*) prompt);
 #endif
+    return readline((const char*) prompt);
 }
 #endif  /* defined(HAVE_LIBREADLINE) || define(READLINE) */
 
