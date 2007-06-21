@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.26 2007/01/17 05:34:17 sfeam Exp $
+ * $Id: graph3d.h,v 1.27 2007/05/07 00:11:22 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -137,8 +137,7 @@ extern float surface_zscale;
 extern int splot_map;
 
 typedef struct { 
-    double ticslevel; 
-    double xyplane_z; 
+    double z; 
     TBOOLEAN absolute;
 } t_xyplane;
 

@@ -1,3 +1,20 @@
+2007-06-21  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/graph3d.h: Remove fields 'ticslevel' and 'xyplane_z' from 
+	struct t_xyplane; replaceboth with 'z'.
+
+	* src/tables.h src/tables.c:  Added S_XYPLANE to better distinguish
+	between "set xyplane" and "set ticslevel", i.e., no need to move
+	token backward.
+
+	* src/mouse.c src/save.c src/show.c src/unset.c:  Minor mods for
+	variable name change and addition of S_XYPLANE.
+
+	* src/set.c:  Broke set_ticslevel into set_ticslevel and set_xyplane.
+
+	* src/graph3d.c: Fixed bug with drawing xyplane and z-axis line.
+	Bug #1488168
+
 2007-06-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	Fix two special cases where gnuplot auto-increments the line type, but

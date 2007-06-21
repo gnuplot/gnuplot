@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.103 2007/04/07 22:31:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.104 2007/06/07 16:20:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -163,7 +163,7 @@ unset_command()
 \t'origin', 'output', 'palette', 'parametric', 'pm3d', 'pointsize',\n\
 \t'polar', 'print', '[rtuv]range', 'samples', 'size', 'style', 'surface',\n\
 \t'terminal', 'tics', 'ticscale', 'ticslevel', 'timestamp', 'timefmt',\n\
-\t'title', 'view', '[xyz,cb]{2}data', '[xyz,cb]{2}label',\n\
+\t'title', 'view', 'xyplane', '[xyz,cb]{2}data', '[xyz,cb]{2}label',\n\
 \t'[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics', '[xyz,cb]{2}[md]tics',\n\
 \t'{[xyz]{2}}zeroaxis', 'zero'";
 
@@ -364,6 +364,7 @@ unset_command()
 	unset_ticscale();
 	break;
     case S_TICSLEVEL:
+    case S_XYPLANE:
 	unset_ticslevel();
 	break;
     case S_TIMEFMT:
@@ -1458,7 +1459,7 @@ unset_ticscale()
 static void
 unset_ticslevel()
 {
-    xyplane.ticslevel = 0.5;
+    xyplane.z = 0.5;
     xyplane.absolute = FALSE;
 }
 

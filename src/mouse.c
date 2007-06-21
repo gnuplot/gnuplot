@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.89 2007/06/01 04:14:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.90 2007/06/08 07:14:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1706,7 +1706,7 @@ event_motion(struct gp_event_t *ge)
 		return;
 # endif
 	    if (modifier_mask & Mod_Shift) {
-		xyplane.ticslevel += (1 + fabs(xyplane.ticslevel))
+		xyplane.z += (1 + fabs(xyplane.z))
 		    * (mouse_y - start_y) * 2.0 / term->ymax;
 	    } else {
 

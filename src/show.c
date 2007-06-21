@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.192 2007/02/06 23:56:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.193 2007/04/07 22:31:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -421,6 +421,7 @@ show_command()
     case S_TICS:
     case S_TICSLEVEL:
     case S_TICSCALE:
+    case S_XYPLANE:
 	show_tics(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 	break;
     case S_MXTICS:
@@ -2585,9 +2586,9 @@ show_tics(
     SHOW_ALL_NL;
 
     if (xyplane.absolute)
-	fprintf(stderr, "xyplane intercepts z axis at %g\n", xyplane.xyplane_z);
+	fprintf(stderr, "\txyplane intercepts z axis at %g\n", xyplane.z);
     else
-	fprintf(stderr, "xyplane ticslevel is %g\n", xyplane.ticslevel);
+	fprintf(stderr, "\txyplane ticslevel is %g\n", xyplane.z);
 
     if (grid_layer >= 0)
         fprintf(stderr, "tics are in %s of plot\n", (grid_layer==0) ? "back" : "front");

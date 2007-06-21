@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.246 2007/04/07 22:31:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.247 2007/05/19 22:21:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -132,13 +132,14 @@ static void set_terminal __PROTO((void));
 static void set_termoptions __PROTO((void));
 static void set_tics __PROTO((void));
 static void set_ticscale __PROTO((void));
-static void set_ticslevel __PROTO((void));
 static void set_timefmt __PROTO((void));
 static void set_timestamp __PROTO((void));
 static void set_view __PROTO((void));
 static void set_zero __PROTO((void));
 static void set_timedata __PROTO((AXIS_INDEX));
 static void set_range __PROTO((AXIS_INDEX));
+static void set_xyplane __PROTO((void));
+static void set_ticslevel __PROTO((void));
 static void set_zeroaxis __PROTO((AXIS_INDEX));
 static void set_allzeroaxis __PROTO((void));
 
@@ -457,9 +458,6 @@ set_command()
 	case S_TICSCALE:
 	    set_ticscale();
 	    break;
-	case S_TICSLEVEL:
-	    set_ticslevel();
-	    break;
 	case S_TIMEFMT:
 	    set_timefmt();
 	    break;
@@ -629,6 +627,12 @@ set_command()
 	    break;
 	case S_ZEROAXIS:
 	    set_allzeroaxis();
+	    break;
+	case S_XYPLANE:
+	    set_xyplane();
+	    break;
+	case S_TICSLEVEL:
+	    set_ticslevel();
 	    break;
 	default:
 	    int_error(c_token, setmess);
@@ -3900,19 +3904,28 @@ set_ticscale()
 }
 
 
-/* process 'set ticslevel' or 'set xyplane' command */
+/* process 'set ticslevel' command */
 /* is datatype 'time' relevant here ? */
 static void
 set_ticslevel()
 {
+    c_token++;
+    xyplane.z = real_expression();
+    xyplane.absolute = FALSE;
+}
+
+
+/* process 'set xyplane' command */
+/* is datatype 'time' relevant here ? */
+static void
+set_xyplane()
+{
     if (equals(++c_token, "at")) {
 	c_token++;
-	xyplane.xyplane_z = real_expression();
+	xyplane.z = real_expression();
 	xyplane.absolute = TRUE;
-    } else {
-	xyplane.ticslevel = real_expression();
-	xyplane.absolute = FALSE;
-    }
+    } else
+	int_error(c_token, "use 'ticslevel' for relative placement");
 }
 
 
