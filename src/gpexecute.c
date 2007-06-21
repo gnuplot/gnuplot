@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.13 2004/07/01 17:10:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.14 2005/03/26 22:06:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gpexecute.c */
@@ -223,11 +223,11 @@ gp_exec_event(char type, int mx, int my, int par1, int par2, int winid)
     static struct gpe_fifo_t *base = (gpe_fifo_t *) 0;
 #endif
 
-#if 0 /* DEBUGGING */
+#ifdef DEBUG
     char s[127];
     sprintf(s, "%%%c %d %d %d %d %d", type, mx, my, par1, par2, winid);
     gp_execute(s);
-#endif
+#endif /* DEBUG */
 
     ge.type = type;
     ge.mx = mx;
@@ -265,14 +265,10 @@ gp_exec_event(char type, int mx, int my, int par1, int par2, int winid)
 	    switch (errno) {
 	    case EAGAIN:
 		/* do nothing */
-#if 0
-		fprintf(stderr, "(gp_exec_event) EAGAIN\n");
-#endif
+		FPRINTF((stderr, "(gp_exec_event) EAGAIN\n"));
 		break;
 	    default:
-#if 0
-		fprintf(stderr, "(gp_exec_event) errno = %d\n", errno);
-#endif
+		FPRINTF((stderr, "(gp_exec_event) errno = %d\n", errno));
 		break;
 	    }
 	    break;
