@@ -99,7 +99,7 @@ Johannes Zellner
 @c ^   Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net <p>
 @c ^</h2><p>
 @c ^<h3> This manual was prepared by Dick Crawford</h3><p>
-@c ^<h3> Last revised: October 2006</h3><p>
+@c ^<h3> Last revised: February 2007</h3><p>
 @c ^<hr>
 
 @menu
@@ -152,7 +152,7 @@ Johannes Zellner
 @cindex license
 
 @example
-      Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+    Copyright (C) 1986 - 1993, 1998, 2004, 2007  Thomas Williams, Colin Kelley
 
 @end example
 
@@ -281,11 +281,11 @@ See the simple.dem demo, also available together with other demos on the web pag
 @node Seeking-assistance, New_features_introduced_in_version_4.2, Introduction, gnuplot
 @section Seeking-assistance
 
-@c ^ <a name="Seeking-assistance"></a>
 @cindex help-desk
 
 @cindex seeking-assistance
 
+@c ^ <a name="Seeking-assistance"></a>
 There is a mailing list for `gnuplot` users.  Note, however, that the
 newsgroup
 @example
@@ -556,7 +556,7 @@ terminal.
 @node `windows`,  , `epslatex`, New_or_revised_terminal_drivers
 @subsubsection `windows`
 
-The `windows` terminal now supports the `enhanced text` mode.
+The `windows` terminal now supports `enhanced text` mode.
 
 
 @node Canvas_size,  , New_or_revised_terminal_drivers, New_features_introduced_in_version_4.2
@@ -682,7 +682,7 @@ official version 3.7.  These are summarized here.
 
 Interaction with the current plot via mouse and hotkeys is supported for the
 X11, OS/2 Presentation Manager, ggi, Windows, and wxWidgets terminals. See
-`mouse input` for more information on mousing. See help for @ref{bind} for
+`mouse input` for more information on mousing. See help for `bind` for
 information on hotkeys. Also see the documentation for individual mousing
 terminals `ggi`, `pm`, `windows`, `wxt` and `x11`.
 
@@ -989,6 +989,8 @@ data files.
 
 @cindex coordinates
 
+@cindex axes
+
 The commands @ref{arrow}, `set key`, @ref{label} and @ref{object} allow you
 to draw something at an arbitrary position on the graph.  This position is
 specified by the syntax:
@@ -1275,6 +1277,8 @@ defaults to radians.
 * strlen::                      
 * strstrt::                     
 * substr::                      
+* strftime::                    
+* strptime::                    
 * system::                      
 * word::                        
 * words::                       
@@ -1854,7 +1858,7 @@ and returns the index to the first character of "key". If "key" is not found,
 returns 0. Similar to C library function strstr except that it returns an
 index rather than a string pointer. strstrt("hayneedlestack","needle") = 4.
 
-@node substr, system, strstrt, Functions
+@node substr, strftime, strstrt, Functions
 @subsubsection substr
 
 @c ?expressions functions substr
@@ -1870,7 +1874,33 @@ beg through end of the original string. This is exactly equivalent to the
 expression "string"[beg:end] except that you do not have the option of
 ommitting beg or end.
 
-@node system, word, substr, Functions
+@node strftime, strptime, substr, Functions
+@subsubsection strftime
+
+@c ?expressions functions strftime
+@c ?functions strftime
+@cindex strftime
+@findex strftime
+
+
+`strftime("timeformat",t)` applies the timeformat specifiers to the time t
+given in seconds since the year 2000. 
+See `time_specifiers` and @ref{strptime}.
+
+@node strptime, system, strftime, Functions
+@subsubsection strptime
+
+@c ? expressions functions strptime
+@c ?functions strptime
+@cindex strptime
+@findex strptime
+
+
+`strptime("timeformat",s)` reads the time from the string s using the
+timeformat specifiers and converts it into seconds since the year 2000.
+See `time_specifiers` and @ref{strftime}.
+
+@node system, word, strptime, Functions
 @subsubsection system
 
 @c ?expressions functions system
@@ -1968,6 +1998,10 @@ Otherwise the function returns 0.
 @cindex stringcolumn
 @findex stringcolumn
 
+
+@c ?expressions functions strcol
+@c ?functions strcol
+@cindex strcol
 
 `stringcolumn(x)` may be used only in expressions as part of @ref{using} manipulations
 to fits or datafile plots.  It returns the content of column x as a string variable.
@@ -2431,13 +2465,12 @@ the "key", sometimes also called the "legend".
 The word "title" occurs with multiple meanings in `gnuplot`.  In this
 document, it will always be preceded by the adjective "plot", "line", or
 "key" to differentiate among them.
+A 2-d graph may have up to four labelled @ref{axes}.  The names of the four axes
+are "x" for the axis along the bottom border of the plot, "y" for the axis
+along the left border, "x2" for the top border, and "y2" for the right border.
+See @ref{axes}.
 
-A 2-d graph may have up to four labelled axes.  The names of the four axes
-for these usages are "x" for the axis along the bottom border of the plot,
-"y" for the left border, "x2" for the top border, and "y2" for the right
-border.
-
-A 3-d graph may have up to three labelled axes -- "x", "y" and "z".  It is
+A 3-d graph may have up to three labelled @ref{axes} -- "x", "y" and "z".  It is
 not possible to say where on the graph any particular axis will fall because
 you can change the direction from which the graph is seen with @ref{view}.
 
@@ -2607,7 +2640,7 @@ to activate pre-defined functions by hitting a single key while the mouse
 focus is in the active plot window.  It is even possible to combine mouse
 input with `batch` command scripts, by invoking the command `pause mouse`
 and then using the mouse variables returned by mouse clicking as parameters
-for subsequent scripted actions. See @ref{bind} and @ref{variables}.
+for subsequent scripted actions. See `bind` and @ref{variables}.
 See also the command `set mouse`.
 
 @menu
@@ -2621,38 +2654,34 @@ See also the command `set mouse`.
 @c ?commands bind
 @cindex bind
 
-The @ref{bind} allows defining or redefining a hotkey, i.e. a sequence of gnuplot
-commands which will be executed when a certain key or key sequence is pressed
-while the driver's window has the input focus. Note that @ref{bind} is only
-available if gnuplot was compiled with `mouse` support and it is used by all
-mouse-capable terminals. Bindings overwrite the builtin bindings (like in
-every real editor), except <space> and 'q' which cannot be rebound (unless
-one exception, see below). Mouse buttons cannot be rebound.
+Syntax:
+@example
+      bind @{allwindows@} [<key-sequence>] ["<gnuplot commands>"]
+      bind <key-sequence> ""
+      bind!
 
-You get the list of all hotkeys by typing @ref{bind} or by hitting 'h' in the
+@end example
+
+The `bind` allows defining or redefining a hotkey, i.e. a sequence of gnuplot
+commands which will be executed when a certain key or key sequence is pressed
+while the driver's window has the input focus. Note that `bind` is only
+available if gnuplot was compiled with `mouse` support and it is used by all
+mouse-capable terminals. A user-specified binding supercedes any builtin
+bindings, except that <space> and 'q' cannot normally be rebound. For an
+exception, see `bind space`.
+
+Mouse buttons cannot be rebound.
+
+You get the list of all hotkeys by typing `bind` or by hitting 'h' in the
 graph window.
 
-Note that multikey-bindings with modifiers have to be quoted.
+Note that multikey-bindings with modifiers must be given in quotes.
 
 Normally hotkeys are only recognized when the currently active plot window
 has focus. `bind allwindows <key> ...` (short form: `bind all <key> ...`)
 causes the binding for <key> to apply to all gnuplot plot windows, active
 or not.  In this case gnuplot variable MOUSE_KEY_WINDOW is set to the ID
 of the originating window, and may be used by the bound command.
-
-By default, the <space> hotkey raises gnuplot's command window. On some
-terminals (e.g. x11, wx, pm), 'q' closes the graph window. These defaults can
-be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
-see `x11 command-line-options`, or by the X Resource 'gnuplot*ctrlq'.
-Note: if <space> (or ctrl-space) does not raise the gnuplot window under X11,
-see discussion in @ref{raise}.
-
-Syntax:
-@example
-      bind @{allwindows@} [<key-sequence>] ["<gnuplot commands>"]
-      bind!
-
-@end example
 
 Examples:
 
@@ -2725,7 +2754,30 @@ List of supported special keys:
 
 @end example
 
+The following are window events rather than actual keys
+
+@example
+   "Close"
+
+@end example
+
 See also help for `mouse` and @ref{if}.
+
+@menu
+* bind_space::                  
+@end menu
+
+@node bind_space,  , bind, bind
+@subsubsection bind space
+
+@c ?commands bind space
+@c ?bind space
+By default, the <space> hotkey raises gnuplot's command window. On some 
+terminals (e.g. x11, wx), 'q' closes the graph window. These defaults can
+be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
+see `x11 command-line-options`, or by the X Resource 'gnuplot*ctrlq'.
+Note: if <space> (or ctrl-space) does not raise the gnuplot window under X11,
+see discussion in @ref{raise}.
 
 
 @node Mouse_variables,  , bind, mouse_input
@@ -2791,8 +2843,10 @@ but the @ref{mapping} command allows for a few other coordinate systems to be
 treated.  In addition, the @ref{using} option allows both `plot` and `splot` to
 treat almost any coordinate system you'd care to define.
 
+@cindex axes
+
 `plot` also lets you use each of the four borders -- x (bottom), x2 (top), y
-(left) and y2 (right) -- as an independent axis.  The `axes` option lets you
+(left) and y2 (right) -- as an independent axis.  The @ref{axes} option lets you
 choose which pair of axes a given function or data set is plotted against.  A
 full complement of `set` commands exists to give you complete control over
 the scales and labelling of each axis.  Some commands have the name of an
@@ -2813,13 +2867,13 @@ have no effect whereas of course those controlling the z axis do take effect.
 @node Start-up, String_constants_and_string_variables, Plotting, gnuplot
 @section Start-up
 
-@c ^ <a name="start-up"></a>
 @cindex startup
 
 @cindex start
 
 @cindex .gnuplot
 
+@c ^ <a name="start-up"></a>
 When `gnuplot` is run, it looks for an initialization file to load.
 This file is called `.gnuplot` on Unix and AmigaOS systems, and
 `GNUPLOT.INI` on other systems.  If this file is not found in the
@@ -3172,10 +3226,10 @@ command line.  See `substitution`.
 @node Time/Date_data,  , Syntax, gnuplot
 @section Time/Date data
 
-@c ^ <a name="Time/Date data"></a>
-@c ^ <a name="Time/date"></a>
 @cindex time/date
 
+@c ^ <a name="Time/Date data"></a>
+@c ^ <a name="Time/date"></a>
 `gnuplot` supports the use of time and/or date information as input data.
 This feature is activated by the commands `set xdata time`, `set ydata time`,
 etc.
@@ -4311,7 +4365,7 @@ functions and data; `splot` draws 2-d projections of 3-d surfaces and data.
 `plot` and `splot` contain many common features; see `splot` for differences.
 Note specifically that although the `binary <binary list>` variation does
 work for both `plot` and `splot`, there are small differences between these
-modes.  Furthermore, `plot`'s `axes` option does not exist for `splot`.
+modes.
 
 Syntax:
 @example
@@ -4331,17 +4385,12 @@ in part earlier in the stream of `gnuplot` commands (see `user-defined`).
 It is also possible to define functions and parameters on the `plot` command
 itself.  This is done merely by isolating them from other items with commas.
 
-There are four possible sets of axes available; the keyword <axes> is used to
-select the axes for which a particular line should be scaled.  `x1y1` refers
-to the axes on the bottom and left; `x2y2` to those on the top and right;
-`x1y2` to those on the bottom and right; and `x2y1` to those on the top and
-left.  Ranges specified on the `plot` command apply only to the first set of
-axes (bottom left).
-
 Examples:
 @example
       plot sin(x)
+      plot sin(x), cos(x)
       plot f(x) = sin(x*a), a = .2, f(x), a = .4, f(x)
+      plot "datafile.1" with lines, "datafile.2" with points
       plot [t=1:10] [-pi:pi*2] tan(t), \
            "data.1" using (tan($2)):($3/$4) smooth csplines \
                     axes x1y2 notitle with lines 5
@@ -4351,6 +4400,7 @@ Examples:
 See also `show plot`.
 
 @menu
+* axes::                        
 * data::                        
 * errorbars::                   
 * errorlines::                  
@@ -4361,7 +4411,21 @@ See also `show plot`.
 * with::                        
 @end menu
 
-@node data, errorbars, plot, plot
+@node axes, data, plot, plot
+@subsection axes
+
+@c ?commands plot axes
+@c ?plot axes
+@cindex axes
+
+There are four possible sets of axes available; the keyword <axes> is used to
+select the axes for which a particular line should be scaled.  `x1y1` refers
+to the axes on the bottom and left; `x2y2` to those on the top and right;
+`x1y2` to those on the bottom and right; and `x2y1` to those on the top and
+left.  Ranges specified on the `plot` command apply only to the first set of
+axes (bottom left).
+
+@node data, errorbars, axes, plot
 @subsection data
 
 @c ?commands plot datafile
@@ -4422,7 +4486,8 @@ counting columns, so the following datafile line has three columns:
 @end example
 
 Data may be written in exponential format with the exponent preceded by the
-letter e, E, d, D, q, or Q.
+letter e or E.  The fortran exponential specificiers d, D, q, and Q may also
+be used if the command `set datafile fortran` is in effect.
 
 Only one column (the y value) need be provided.  If x is omitted, `gnuplot`
 provides integer values starting at 0.
@@ -5203,7 +5268,30 @@ resulting points are then connected by straight line segments.
 @c ?datafile special-filenames
 @cindex special-filenames
 
-A special filename of `'-'` specifies that the data are inline; i.e., they
+There are three filenames that have a special meaning:  '', '-', and '+'.
+
+The empty filename '' tells gnuplot to re-use the previous input file in the
+same plot command. So to plot two columns from the same input file:
+
+@example
+      plot 'filename' using 1:2, '' using 1:3
+
+@end example
+
+The special filename '+' is a mechanism to allow the full range of 
+@ref{using} specifiers and plot styles with in-line functions.  Normally a 
+function plot can only have a single y (or z) value associated with each
+sampled point.  The pseudo-file '+' treats the sampled points as columns
+1 (plot) or 1 and 2 (splot), and allows additional column values to be
+specified via a @ref{using} specification, just as for a true input file.
+Example:
+
+@example
+      plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
+
+@end example
+
+The special filename `'-'` specifies that the data are inline; i.e., they
 follow the command.  Only the data follow the command; `plot` options like
 filters, titles, and line styles remain on the `plot` command line.  This is
 similar to << in unix shell script, and $DECK in VMS DCL.  The data are
@@ -6314,12 +6402,12 @@ unchanged: the terminal set with `set term`, the output file set with @ref{outpu
 @node save, set-show, reset, Commands
 @section save
 
-@c ^ <a name="save set"></a>
 @c ?commands save
 @cindex save
 @cmindex save
 
 
+@c ^ <a name="save set"></a>
 The @ref{save} command saves user-defined functions, variables, the `set
 term` status, all `set` options, or all of these, plus the last `plot`
 (`splot`) command to the specified file.
@@ -7468,8 +7556,10 @@ See also help for @ref{pm3d}, @ref{palette}, @ref{pm3d}, and `set style line`.
 
 @cindex nocontour
 
-@ref{contour} enables contour drawing for surfaces. This option is available
-for `splot` only.
+@ref{contour} enables contour drawing for surfaces.  This option is available
+for `splot` only.  It requires grid data, see `grid_data` for more details.
+If contours are desired from non-grid data, @ref{dgrid3d} can be used to
+create an appropriate grid.
 
 Syntax:
 @example
@@ -7512,9 +7602,6 @@ containing no characters other than blank spaces and a carriage return and/or
 a line feed) separates one y-isoline from the next.
 See also @ref{datafile}.
 
-
-If contours are desired from non-grid data, @ref{dgrid3d} can be used to
-create an appropriate grid.  See @ref{dgrid3d} for more information.
 See also
 @uref{http://www.gnuplot.info/demo/contours.html,contours demo (contours.dem)
 }
@@ -7525,7 +7612,7 @@ and
 @node data_style, datafile, contour, set-show
 @subsection data style
 
-@c ?DUMMYLABEL set style data
+@c ?set data style
 This form of the command is deprecated. Please see `set style data`.
 
 @node datafile, decimalsign, data_style, set-show
@@ -7823,8 +7910,9 @@ formatted using gnuplot's internal gprintf() function.
 
 @cindex nodgrid3d
 
-The @ref{dgrid3d} command enables, and can set parameters for, non-grid
-to grid data mapping.
+The @ref{dgrid3d} command enables, and can set parameters for, non-grid to
+grid data mapping.  See `splot grid_data` for more details about the grid data
+structure.
 
 Syntax:
 @example
@@ -8246,20 +8334,21 @@ In time/date mode, the acceptable formats are:
       %A           full name of day of the week
       %b or %h     abbreviated name of the month
       %B           full name of the month
-      %d           day of the month, 1--31
-      %D           shorthand for "%m/%d/%y"
+      %d           day of the month, 01--31
+      %D           shorthand for "%m/%d/%y" (only output)
+      %F           shorthand for "%Y-%m-%d" (only output)
       %k           hour, 0--23 (one or two digits)
       %H           hour, 00--23 (always two digits)
-      *l           hour, 1--12 (one or two digits)
+      %l           hour, 1--12 (one or two digits)
       %I           hour, 01--12 (always two digits)
       %j           day of the year, 1--366
-      %m           month, 1--12
+      %m           month, 01--12
       %M           minute, 0--60
       %p           "am" or "pm"
-      %r           shorthand for "%I:%M:%S %p"
-      %R           shorthand for "%H:%M"
+      %r           shorthand for "%I:%M:%S %p" (only output)
+      %R           shorthand for "%H:%M" (only output)
       %S           second, 0--60
-      %T           shorthand for "%H:%M:%S"
+      %T           shorthand for "%H:%M:%S" (only output)
       %U           week of the year (week starts on Sunday)
       %w           day of the week, 0--6 (Sunday = 0)
       %W           week of the year (week starts on Monday)
@@ -8294,6 +8383,7 @@ Suppose the text is "98/07/06 05:04:03".  Then
 @node function_style, functions, format_, set-show
 @subsection function style
 
+@c ?set function style
 This form of the command is deprecated. Please see `set style function`.
 
 @node functions, grid, function_style, set-show
@@ -9360,9 +9450,11 @@ is 300 ms.
 The option `zoomcoordinates` determines if the coordinates of the zoom box are
 drawn at the edges while zooming. This is on by default.
 
-The options `noruler` and `ruler` switch the ruler off and on, the latter
-optionally at given `coordinates`. This corresponds to the default key binding
-'r'.
+The options `noruler` and `ruler` switch the ruler off and on, the
+latter optionally setting the origin at the given coordinates. While
+the ruler is on, the distance in user units from the ruler origin to
+the mouse is displayed continuously. By default, toggling the ruler
+has the key binding 'r'.
 
 The option `polardistance` determines if the distance between the mouse cursor
 and the ruler is also shown in polar coordinates (distance and angle in
@@ -9416,13 +9508,13 @@ driver's window. `verbose` is off by default.
 
 Press 'h' in the driver's window for a short summary of the mouse and key
 bindings.  This will also display user defined bindings or `hotkeys` which
-can be defined using the @ref{bind} command, see help for @ref{bind}.  Note, that user
+can be defined using the `bind` command, see help for `bind`.  Note, that user
 defined `hotkeys` may override the default bindings.
 
 Press 'q' in the driver's window to close the window. This key cannot be
-overridden with the @ref{bind} command.
+overridden with the `bind` command.
 
-See also help for @ref{bind} and @ref{label}.
+See also help for `bind` and @ref{label}.
 
 @menu
 * X11_mouse::                   
@@ -9466,6 +9558,7 @@ Syntax:
 @example
       set multiplot @{ layout <rows>,<cols>
                       @{rowsfirst|columnsfirst@} @{downwards|upwards@}
+                      @{title <page title>@}
                       @{scale <xscale>@{,<yscale>@}@} @{offset <xoff>@{,<yoff>@}@}
                     @}
       unset multiplot
@@ -9490,6 +9583,10 @@ defined in the `screen` system).  Just about everything else that can be
 once on the page, for instance a single time stamp, you'll need to put a `set
 time`/`unset time` pair around one of the `plot`, `splot` or @ref{replot}
 commands within the @ref{multiplot}/@ref{multiplot} block.
+
+The multiplot title is separate from the individual plot titles, if any.
+Space is reserved for it at the top of the page, spanning the full width
+of the canvas.
 
 The commands @ref{origin} and @ref{size} must be used to correctly position
 each plot if no layout is specified or if fine tuning is desired.  See
@@ -10969,6 +11066,7 @@ See also
 
 @c ?set style
 @c ?show style
+@c ?unset style
 @c ^ <a name="set style <style>"></a>
 Default plotting styles are chosen with the `set style data` and
 `set style function` commands.  See @ref{with} for information about how to
@@ -12562,6 +12660,11 @@ at a axis by axis basis.
 @node ticslevel, ticscale, tics, set-show
 @subsection ticslevel
 
+@c ?set ticslevel
+@cindex ticslevel
+@opindex ticslevel
+
+
 See @ref{xyplane}.
 
 @node ticscale, timestamp, ticslevel, set-show
@@ -12734,7 +12837,7 @@ size of a character depends on both the font and the terminal.
 the units of the font <size> depend upon which terminal is used.
 
 `textcolor <colorspec>` changes the color of the text. <colorspec> can be a
-linetype, an rgb color, or a palette mapping. See help for `colorspece` and
+linetype, an rgb color, or a palette mapping. See help for @ref{colorspec} and
 @ref{palette}.
 
 `noenhanced` requests that the title not be processed by the enhanced text
@@ -13166,9 +13269,9 @@ characters to make a multi-line plot title, e.g.,
 Note that double quotes must be used.  The same font will be used for both
 lines, of course.
 
-The y and y2 axis labels can be explicitly rotated from their default
-orientation, but this applies only to 2D plots and only on terminals
-that support text rotation.
+The orientation (rotation angle) of the x, x2, y and y2 axis labels can be
+explicitly changed from the default setting, but this applies only to 2D plots
+and only on terminals that support text rotation.
 
 If you are not satisfied with the default position of an axis label, use @ref{label} instead--that command gives you much more control over where text is
 placed.
@@ -14178,11 +14281,12 @@ and uses it, if available.  This is practical if `gnuplot` is run from
 
 `splot` is the command for drawing 3-d plots (well, actually projections on
 a 2-d surface, but you knew that).  It can create a plot from functions or
-a data file in a manner very similar to the `plot` command.
+data read from files in a manner very similar to the `plot` command.
+`splot` provides only a single x, y, and z axis; there is no equivalent to the
+x2 and y2 secondary axes provided by `plot`.
 
 See `plot` for features common to the `plot` command; only differences are
-discussed in detail here.  Note specifically `plot`'s `axes` option is not
-available for `splot`.
+discussed in detail here.  
 
 Syntax:
 @example
@@ -16180,6 +16284,7 @@ Syntax:
       set terminal png 
              @{@{no@}transparent@} @{@{no@}interlace@}
              @{@{no@}truecolor@} @{rounded|butt@}
+             @{linewidth <lw>@} @{dashlength <dl>@}
              @{tiny | small | medium | large | giant@}
              @{font <face> @{<pointsize>@}@}
              @{size <x>,<y>@} @{@{no@}crop@}
@@ -16937,17 +17042,16 @@ The only difference between the two is that `kyo` uses "Helvetica" whereas
 @tmindex latex
 
 
-The `latex` and `emtex` drivers allow two options.
-
 Syntax:
 @example
-      set terminal latex | emtex @{courier | roman | default@} @{<fontsize>@}
+      set terminal @{latex | emtex@} @{default | @{courier|roman@} @{<fontsize>@}@}
+                   @{size <XX>@{unit@}, <YY>@{unit@}@}
 
 @end example
 
-`fontsize` may be any size you specify.  The default is for the plot to
-inherit its font setting from the embedding document.
-
+By default the plot will inherit font settings from the embedding document.
+You have the option of forcing either Courier (cmtt) or Roman (cmr) fonts
+instead. In this case you may also specify a fontsize.
 Unless your driver is capable of building fonts at any size (e.g. dvips),
 stick to the standard 10, 11 and 12 point sizes.
 
@@ -16966,6 +17070,10 @@ Points, among other things, are drawn using the LaTeX commands "\\Diamond" and
 in the latexsym package, which is part of the base distribution and thus part
 of any LaTeX implementation.  Please do not forget to use this package.
 Other point types use symbols from the amssymb package.
+
+The default size for the plot is 5 inches by 3 inches. The @ref{size} option
+changes this to whatever the user requests. By default the X and Y sizes
+are taken to be in inches, but other units are possible (currently only cm).
 
 Examples:
 About label positioning:

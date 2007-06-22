@@ -5,6 +5,8 @@
 	beginning with '?'.  Not applied in the NEWS section, however.
 	Bug #1655632
 
+	*docs/gnuplot.texi: Sync to current doc file.
+
 2007-06-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/plot.c (inter): Cleanup: Use bail_to_command_line() instead of
