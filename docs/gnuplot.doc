@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.431 2007/06/06 10:16:30 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.432 2007/06/10 21:43:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -142,9 +142,9 @@ C
            http://www.gnuplot.info/demo/simple.html
 ^ </a>
 2 Seeking-assistance
-^ <a name="Seeking-assistance"></a>
 ?help-desk
 ?seeking-assistance
+^ <a name="Seeking-assistance"></a>
  There is a mailing list for `gnuplot` users.  Note, however, that the
  newsgroup
        comp.graphics.apps.gnuplot
@@ -290,7 +290,7 @@ C
  have been consolidated. Many options are the same as in the `postscript`
  terminal.
 4 `windows`
- The `windows` terminal now supports the `enhanced text` mode.
+ The `windows` terminal now supports `enhanced text` mode.
 
 3 Canvas size
 ?canvas size
@@ -2086,10 +2086,10 @@ C ... and restart the table:
  with `plot`, except that commands and options controlling the x2 and y2 axes
  have no effect whereas of course those controlling the z axis do take effect.
 2 Start-up
-^ <a name="start-up"></a>
 ?startup
 ?start
 ?.gnuplot
+^ <a name="start-up"></a>
  When `gnuplot` is run, it looks for an initialization file to load.
  This file is called `.gnuplot` on Unix and AmigaOS systems, and
  `GNUPLOT.INI` on other systems.  If this file is not found in the
@@ -2336,9 +2336,9 @@ C ... and restart the table:
  Back-quotes are used to enclose system commands for substitution into the
  command line.  See `substitution`.
 2 Time/Date data
+?time/date
 ^ <a name="Time/Date data"></a>
 ^ <a name="Time/date"></a>
-?time/date
  `gnuplot` supports the use of time and/or date information as input data.
  This feature is activated by the commands `set xdata time`, `set ydata time`,
  etc.
@@ -4722,9 +4722,9 @@ C ... and restart the table:
  unchanged: the terminal set with `set term`, the output file set with `set
  output` and directory paths set with `set loadpath` and `set fontpath`.
 2 save
-^ <a name="save set"></a>
 ?commands save
 ?save
+^ <a name="save set"></a>
  The `save` command saves user-defined functions, variables, the `set
  term` status, all `set` options, or all of these, plus the last `plot`
  (`splot`) command to the specified file.
@@ -5583,7 +5583,7 @@ C ... and restart the table:
  contours with user defined levels demo (discrete.dem).
 ^ </a>
 3 data style
-?DUMMYLABEL set style data
+?set data style
  This form of the command is deprecated. Please see `set style data`.
 3 datafile
 ?set datafile
@@ -6243,6 +6243,7 @@ C ... and restart the table:
  Suppose the text is "98/07/06 05:04:03".  Then
        set format x "%1y/%2m/%3d %01H:%02M:%03S"  # "98/ 7/  6 5:04:003"
 3 function style
+?set function style
  This form of the command is deprecated. Please see `set style function`.
 3 functions
 ?commands show functions
@@ -9628,6 +9629,8 @@ C ... and restart the table:
  `set mxtics` for control of minor tic marks.  These commands provide control
  at a axis by axis basis.
 3 ticslevel
+?set ticslevel
+?ticslevel
  See `set xyplane`.
 3 ticscale
 ?commands set ticscale

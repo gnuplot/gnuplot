@@ -1,3 +1,10 @@
+2007-06-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc:  Make sure a line beginning with a number
+	(i.e. a section heading) is followed immediately by a parallel entry
+	beginning with '?'.  Not applied in the NEWS section, however.
+	Bug #1655632
+
 2007-06-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/plot.c (inter): Cleanup: Use bail_to_command_line() instead of
