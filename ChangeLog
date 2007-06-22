@@ -1,3 +1,8 @@
+2007-06-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/plot.c (inter): Cleanup: Use bail_to_command_line() instead of
+	LONGJMP directly.
+
 2007-06-21  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/graph3d.h: Remove fields 'ticslevel' and 'xyplane_z' from 
