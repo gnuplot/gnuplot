@@ -7,6 +7,10 @@
 
 	*docs/gnuplot.texi: Sync to current doc file.
 
+	* src/internal.c (f_sprintf): Apply LC_NUMERIC setting to all strings
+	created via a call to sprintf during expression evaluation.
+	Bug #1740017
+
 2007-06-22  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/plot.c (inter): Cleanup: Use bail_to_command_line() instead of

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.41 2007/03/30 05:18:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.42 2007/06/19 21:13:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1204,6 +1204,13 @@ f_sprintf(union argument *arg)
     prev_pos = next_length;
     remaining = nargs - 1;
 
+#ifdef HAVE_LOCALE_H
+    /* If the user has set an explicit LC_NUMERIC locale, apply it */
+    /* to sprintf calls during expression evaluation.              */
+    if (numeric_locale)
+       setlocale(LC_NUMERIC,numeric_locale);
+#endif
+
     /* Each time we start this loop we are pointing to a % character */
     while (remaining-->0 && next_start[0] && next_start[1]) {
 	struct value *next_param = &a[remaining];
@@ -1303,6 +1310,13 @@ f_sprintf(union argument *arg)
     /* Free any strings from parameters we have now used */
     for (i=0; i<nargs; i++)
 	gpfree_string(&a[i]);
+
+#ifdef HAVE_LOCALE_H
+    /* Return to C locale for internal use */
+    if (numeric_locale)
+       setlocale(LC_NUMERIC,"C");
+#endif
+
 }
 
 /* EAM July 2004 - Gnuplot's own string formatting conventions.
