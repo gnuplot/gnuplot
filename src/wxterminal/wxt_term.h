@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.6 2007/03/31 23:33:15 sfeam Exp $
+ * $Id: wxt_term.h,v 1.7 2007/06/09 16:56:53 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -93,6 +93,7 @@ void wxt_lower_terminal_window __PROTO((int));
 void wxt_lower_terminal_group __PROTO((void));
 void wxt_close_terminal_window __PROTO((int number));
 void wxt_update_title __PROTO((int number));
+void wxt_update_size __PROTO((int number));
 
 /* state variables shared between wxt.trm and wxt_gui.cpp */
 extern int wxt_window_number;
@@ -104,6 +105,8 @@ extern char wxt_set_fontname[MAX_ID_LEN + 1];
 extern int wxt_set_fontsize;
 extern int wxt_rounded;
 extern char wxt_title[MAX_ID_LEN + 1];
+extern int wxt_width;
+extern int wxt_height;
 
 extern int wxt_axis_mask;
 typedef struct wxt_axis_state_t {

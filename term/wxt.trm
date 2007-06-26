@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.19 2007/03/31 23:33:15 sfeam Exp $
+ * $Id: wxt.trm,v 1.20 2007/06/09 16:56:53 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -71,6 +71,10 @@ char wxt_set_fontname[MAX_ID_LEN + 1] = "";
 int wxt_set_fontsize = 0;
 /* window title */
 char wxt_title[MAX_ID_LEN + 1] = "";
+/* size of the plot area, in pixels
+ * (window is bigger, includes toolbar and status bar) */
+int wxt_width = 640;
+int wxt_height = 384;
 
 /* These are used to pass axis scaling information at the end of each plot */
 int wxt_axis_mask;
@@ -80,6 +84,7 @@ enum WXT_id {
     WXT_FONT,
     WXT_ENHANCED,
     WXT_NOENHANCED,
+    WXT_SIZE,
     WXT_PERSIST,
     WXT_NOPERSIST,
     WXT_RAISE,
@@ -97,6 +102,7 @@ static struct gen_table wxt_opts[] = {
     {"font",   WXT_FONT},
     {"enh$anced", WXT_ENHANCED},
     {"noenh$anced", WXT_NOENHANCED},
+    {"s$ize", WXT_SIZE},
     {"per$sist", WXT_PERSIST},
     {"noper$sist", WXT_NOPERSIST},
     {"rai$se", WXT_RAISE},
@@ -125,7 +131,7 @@ TERM_PUBLIC void wxt_options()
 	TBOOLEAN set_persist = FALSE, set_number = FALSE;
 	TBOOLEAN set_raise = FALSE, set_ctrl = FALSE;
 	TBOOLEAN set_title = FALSE, set_close = FALSE;
-	TBOOLEAN set_capjoin = FALSE;
+	TBOOLEAN set_capjoin = FALSE, set_size = FALSE;
 
 	while (!END_OF_COMMAND) {
 		FPRINTF((stderr, "processing token\n"));
@@ -165,6 +171,19 @@ TERM_PUBLIC void wxt_options()
 			term->flags &= ~TERM_ENHANCED_TEXT;
 			if (set_enhanced) duplication=TRUE;
 			set_enhanced = TRUE;
+			break;
+		case WXT_SIZE:
+			c_token++;
+			if (END_OF_COMMAND)
+				int_error(c_token,"size requires 'width,heigth'");
+			wxt_width = real_expression();
+			if (!equals(c_token++,","))
+				int_error(c_token,"size requires 'width,heigth'");
+			wxt_height = real_expression();
+			if (wxt_width < 1 || wxt_height < 1)
+				int_error(c_token, "size is out of range");
+			if (set_size) duplication=TRUE;
+			set_size = TRUE;
 			break;
 		case WXT_PERSIST:
 			c_token++;
@@ -251,6 +270,14 @@ TERM_PUBLIC void wxt_options()
 		strncat(term_options, wxt_title, sizeof(term_options)-strlen(term_options));
 		strncat(term_options, "\"", sizeof(term_options)-strlen(term_options));
 		wxt_update_title(wxt_window_number);
+	}
+
+	if (set_size) {
+		char tmp_term_options[MAX_LINE_LEN+1] = "";
+		snprintf(tmp_term_options, sizeof(tmp_term_options),
+			  " size %d, %d", wxt_width, wxt_height);
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+		wxt_update_size(wxt_window_number);
 	}
 
 	if (set_enhanced)
@@ -363,6 +390,7 @@ START_HELP(wxt)
 "",
 " Syntax:",
 "         set term wxt {<n>}",
+"                      {size <width>,<height>}",
 "                      {{no}enhanced}",
 "                      {font <font>}",
 "                      {title \"title\"}",
@@ -382,6 +410,9 @@ START_HELP(wxt)
 " while that window has input focus, by choosing `close` from a window",
 " manager menu, or with `set term wxt <n> close`.",
 "",
+" The size of the plot area is given in pixels, it defaults to 640x384.",
+" In addition to that, the actual size of the window also includes the space",
+" reserved for the toolbar and the status bar.",
 " When you resize a window, the plot is immediately scaled to fit in the",
 " new size of the window. Unlike other interactive terminals, the `wxt`",
 " terminal scales the whole plot, including fonts and linewidths, and keeps",

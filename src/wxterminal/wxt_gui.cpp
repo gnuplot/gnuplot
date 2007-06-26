@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.50 2007/06/08 08:07:10 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.51 2007/06/09 16:56:52 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -390,6 +390,8 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id, int xpos, int ypos, in
 	toolbar->Realize();
 
 	FPRINTF((stderr,"wxtFrame constructor 2\n"));
+
+	SetClientSize( wxSize(wxt_width, wxt_height) );
 
 	/* build the panel, which will contain the visible device context */
 	panel = new wxtPanel( this, this->GetId(), this->GetClientSize() );
@@ -2621,6 +2623,29 @@ void wxt_update_title(int number)
 			title.Printf(wxT("Gnuplot (window id : %d)"), window->id);
 
 		window->frame->SetTitle(title);
+	}
+
+	wxt_MutexGuiLeave();
+
+	wxt_sigint_check();
+	wxt_sigint_restore();
+}
+
+/* update the size of the plot area, resizes the whole window consequently */
+void wxt_update_size(int number)
+{
+	wxt_window_t *window;
+
+	if (wxt_status != STATUS_OK)
+		return;
+
+	wxt_sigint_init();
+
+	wxt_MutexGuiEnter();
+
+	if ((window = wxt_findwindowbyid(number))) {
+		FPRINTF((stderr,"wxt : update size of window %d\n",number));
+		window->frame->SetClientSize( wxSize(wxt_width, wxt_height) );
 	}
 
 	wxt_MutexGuiLeave();

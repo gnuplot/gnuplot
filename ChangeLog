@@ -1,3 +1,10 @@
+2007-06-26  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp (wxt_update_size, wxtFrame::wxtFrame):
+	* src/wxterminal/wxt_term.h:
+	* term/wxt.trm:
+	Add option to set the window size: 'set term wxt size width,height'
+
 2007-06-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  Make sure a line beginning with a number
