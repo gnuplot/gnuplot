@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.86 2007/02/06 21:05:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.87 2007/05/09 22:13:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -85,6 +85,7 @@ iso_alloc(int num)
     struct iso_curve *ip;
     ip = (struct iso_curve *) gp_alloc(sizeof(struct iso_curve), "iso curve");
     ip->p_max = (num >= 0 ? num : 0);
+    ip->p_count = 0;
     if (num > 0) {
 	ip->points = (struct coordinate GPHUGE *)
 	    gp_alloc(num * sizeof(struct coordinate), "iso curve points");

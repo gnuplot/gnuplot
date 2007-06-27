@@ -1,3 +1,8 @@
+2007-06-27  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/misc.c (iso_alloc):  Set p_count to zero when structure is
+	initialized.
+
 2007-06-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Avoid a compiler warning about null bytes in a
