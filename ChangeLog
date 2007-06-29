@@ -1,7 +1,12 @@
+2007-06-29  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/datafile.c (df_generate_pseudodata): Correct for logscale
+	axes in splot.
+
 2007-06-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (load_range): Revert change of 2004-03-15. This means
-	that we do *not* clear the RANGE_REVERSE flag, even after applying the
+	that we do *not* clear the RANGE_REVERSE flag after applying the
 	reversal. This is necessary for the upcoming "refresh" support, but
 	also fixes a current bug:   
 	set xrange [*:*] reverse; plot <foo>;  <zoom; zoom; unzoom>

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.123 2007/05/10 22:52:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.124 2007/05/14 20:56:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5185,7 +5185,7 @@ df_generate_pseudodata()
 	/* Duplicate algorithm from calculate_set_of_isolines() */
 	u = u_min + df_pseudorecord * u_step;
 	v = v_max - df_pseudospan * v_isostep;
-	sprintf(line,"%g %g", u, v);
+	sprintf(line,"%g %g", AXIS_DE_LOG_VALUE(u_axis,u), AXIS_DE_LOG_VALUE(v_axis,v));
 
 	if (++df_pseudorecord > nusteps) {
 	    df_pseudorecord = 0;
