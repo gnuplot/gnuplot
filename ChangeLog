@@ -7,6 +7,10 @@
 	set xrange [*:*] reverse; plot <foo>;  <zoom; zoom; unzoom>
 	flag is now clear, and subsequent plots are drawn backwards
 
+	* src/mouse.c (apply_zoom): Rework the save/restore mechanism for 
+	axis ranges during zoom operations.  Preparation for "refresh"
+	support.
+
 2007-06-27  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/misc.c (iso_alloc):  Set p_count to zero when structure is

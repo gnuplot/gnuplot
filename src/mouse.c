@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.90 2007/06/08 07:14:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.91 2007/06/22 04:28:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -603,6 +603,8 @@ GetRulerString(char *p, double x, double y)
 
 
 static struct t_zoom *zoom_head = NULL, *zoom_now = NULL;
+static AXIS axis_array_copy[AXIS_ARRAY_SIZE];
+
 /* Applies the zoom rectangle of  z  by sending the appropriate command
    to gnuplot
 */
@@ -611,8 +613,6 @@ static void
 apply_zoom(struct t_zoom *z)
 {
     char s[1024];		/* HBB 20011005: made larger */
-    /* HBB 20011004: new variable, fixing 'unzoom' back to autoscaled range */
-    static t_autoscale autoscale_copies[AXIS_ARRAY_SIZE];
     int is_splot_map = (is_3d_plot && (splot_map == TRUE));
     int flip = 0;
 
@@ -636,14 +636,21 @@ apply_zoom(struct t_zoom *z)
 
     }
 
-    /* HBB 20011004: implement save/restore of autoscaling if returning to
-     * original setting */
-    if (zoom_now == zoom_head) {
-	/* previous current zoom is the head --> we're leaving
-	 * original non-moused status --> save autoscales */
-	AXIS_INDEX i;
-	for (i = 0; i < AXIS_ARRAY_SIZE; i++)
-	    autoscale_copies[i] = axis_array[i].set_autoscale;
+    /* EAM DEBUG - The autoscale save/restore was too complicated, and
+     * broke refresh. Just save the complete axis state and have done with it.
+     */
+    if (zoom_now == zoom_head && z != zoom_head) {
+	memcpy(axis_array_copy, axis_array, sizeof(axis_array));
+    }
+
+    /* If we are zooming, we don't want to autoscale the range.
+     * This wasn't necessary before we introduced "refresh".  Why?
+     */
+    if (zoom_now == zoom_head && z != zoom_head) {
+	axis_array[FIRST_X_AXIS].autoscale = AUTOSCALE_NONE;
+	axis_array[FIRST_Y_AXIS].autoscale = AUTOSCALE_NONE;
+	axis_array[SECOND_X_AXIS].autoscale = AUTOSCALE_NONE;
+	axis_array[SECOND_Y_AXIS].autoscale = AUTOSCALE_NONE;
     }
 
     zoom_now = z;
@@ -658,50 +665,28 @@ apply_zoom(struct t_zoom *z)
 	       (flip) ? zoom_now->ymax : zoom_now->ymin,
 	       (flip) ? zoom_now->ymin : zoom_now->ymax);
 
-    /* HBB 20011004: the final part of 'unzoom to autoscale mode'.
-     * Optionally appends 'set autoscale' commands to the string to be
-     * sent, to restore the saved settings. */
-#define OUTPUT_AUTOSCALE(axis)						     \
-    {					     \
-	t_autoscale autoscale = autoscale_copies[axis];			     \
-	t_autoscale fix = autoscale & (AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX); \
-									     \
-	autoscale &= AUTOSCALE_BOTH;					     \
-									     \
-	if (autoscale) {						     \
-	    sprintf(s + strlen(s), "; set au %s%s",			     \
-		    axis_defaults[axis].name,				     \
-		    autoscale == AUTOSCALE_MIN ? "min"			     \
-		    : autoscale == AUTOSCALE_MAX ? "max"		     \
-		    : "");						     \
-	    if (fix)							     \
-		sprintf(s + strlen(s), "; set au %sfix%s",		     \
-			axis_defaults[axis].name,			     \
-			fix == AUTOSCALE_FIXMIN ? "min"			     \
-			: fix == AUTOSCALE_FIXMAX ? "max"		     \
-			: "");						     \
-	}								     \
-    }
-
-    if (zoom_now == zoom_head) {
-	/* new current zoom is the head --> returning to unzoomed
-	 * settings --> restore autoscale */
-	OUTPUT_AUTOSCALE(FIRST_X_AXIS);
-	OUTPUT_AUTOSCALE(FIRST_Y_AXIS);
-    }
-
     if (!is_3d_plot) {
 	sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
 		zoom_now->x2min, zoom_now->x2max,
 		zoom_now->y2min, zoom_now->y2max);
-	if (zoom_now == zoom_head) {
-	    /* new current zoom is the head --> returning to unzoomed
-	     * settings --> restore autoscale */
-	    OUTPUT_AUTOSCALE(SECOND_X_AXIS);
-	    OUTPUT_AUTOSCALE(SECOND_Y_AXIS);
-	}
-#undef OUTPUT_AUTOSCALE
     }
+
+    /* EAM Jun 2007 - The autoscale save/restore was too complicated, and broke
+     * refresh. Just save/restore the complete axis state and have done with it.
+     * Well, not _quite_ the complete state.  The labels are maintained dynamically.
+     */
+    if (zoom_now == zoom_head) {
+	int i;
+	for (i=0; i<AXIS_ARRAY_SIZE; i++) {
+	    axis_array_copy[i].label = axis_array[i].label;
+	}
+	memcpy(axis_array, axis_array_copy, sizeof(axis_array));
+
+	/* Falling through to do_string_replot() does not work! */
+	replotrequest();
+	return;
+    }
+
     do_string_replot(s);
 }
 
