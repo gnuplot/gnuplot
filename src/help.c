@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.20 2007/06/21 21:55:23 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.21 2007/06/21 22:15:19 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -736,9 +736,17 @@ OutLine_InternalPager(const char *line)
 {
     int c;			/* dummy input char */
 
+#if defined(PIPES)
+    if (outfile != stderr) {
+	/* do not go through external pager */
+	fputs(line, stderr);
+	return;
+    }
+#endif /* PIPES */
+
     /* built-in dumb pager */
     /* leave room for prompt line */
-    if (outfile == stderr && pagelines >= screensize - 2) {
+    if (pagelines >= screensize - 2) {
 	fputs("Press return for more: ", stderr);
 #if defined(ATARI) || defined(MTOS)
 	do

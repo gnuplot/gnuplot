@@ -1,3 +1,8 @@
+2007-06-30  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/help.c (OutLine_InternalPager): Fix compilation when PIPES is not
+	defined. Thanks to Dietmar Warning for the report.
+
 2007-06-29  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c (df_generate_pseudodata): Correct for logscale
