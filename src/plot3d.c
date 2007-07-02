@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.143 2007/04/27 20:35:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.144 2007/05/10 22:52:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1065,7 +1065,7 @@ eval_3dplots()
 {
     int i;
     struct surface_points **tp_3d_ptr;
-    int start_token, end_token;
+    int start_token=0, end_token;
     int begin_token;
     TBOOLEAN some_data_files = FALSE, some_functions = FALSE;
     int plot_num, line_num, point_num;

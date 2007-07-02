@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.147 2007/05/16 22:46:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.148 2007/06/05 19:09:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1209,7 +1209,7 @@ eval_plots()
     int pattern_num;
     char *xtitle = NULL;
     int begin_token = c_token;  /* so we can rewind for second pass */
-    int start_token, end_token;
+    int start_token=0, end_token;
     legend_key *key = &keyT;
 
 #ifdef EAM_HISTOGRAMS
