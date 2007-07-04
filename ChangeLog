@@ -1,3 +1,8 @@
+2007-07-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (apply_zomm): Try an alternative path for replot after
+	unzoom. This may or may not fix the problem in bug report #1746902.
+
 2007-07-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots): Initialize

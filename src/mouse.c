@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.91 2007/06/22 04:28:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.92 2007/06/29 20:35:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -681,10 +681,7 @@ apply_zoom(struct t_zoom *z)
 	    axis_array_copy[i].label = axis_array[i].label;
 	}
 	memcpy(axis_array, axis_array_copy, sizeof(axis_array));
-
-	/* Falling through to do_string_replot() does not work! */
-	replotrequest();
-	return;
+	s[0] = '\0';	/* FIXME:  Is this better than calling replotrequest()? */
     }
 
     do_string_replot(s);
