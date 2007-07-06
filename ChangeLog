@@ -1,3 +1,9 @@
+2007-07-06  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* docs/gnuplot.doc: There are two entries for 'ticslevel' which is a
+	problem for more recent 'help'.  Remove one that says "see xyplane"
+	so that new help goes directly to 'xyplane' just like old help.
+
 2007-07-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (apply_zomm): Try an alternative path for replot after

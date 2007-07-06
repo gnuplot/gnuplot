@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.432 2007/06/10 21:43:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.433 2007/06/24 02:58:07 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9628,10 +9628,6 @@ C ... and restart the table:
  See also `set xtics` for more control of major (labelled) tic marks and
  `set mxtics` for control of minor tic marks.  These commands provide control
  at a axis by axis basis.
-3 ticslevel
-?set ticslevel
-?ticslevel
- See `set xyplane`.
 3 ticscale
 ?commands set ticscale
 ?commands show ticscale
