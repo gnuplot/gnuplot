@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.436 2007/07/11 05:15:11 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.437 2007/07/11 05:17:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1790,12 +1790,12 @@ C ... and restart the table:
  The word "title" occurs with multiple meanings in `gnuplot`.  In this
  document, it will always be preceded by the adjective "plot", "line", or
  "key" to differentiate among them.
- A 2-d graph may have up to four labelled `axes`.  The names of the four axes
+ A 2D graph may have up to four labelled `axes`.  The names of the four axes
  are "x" for the axis along the bottom border of the plot, "y" for the axis
  along the left border, "x2" for the top border, and "y2" for the right border.
  See `axes`.
 
- A 3-d graph may have up to three labelled `axes` -- "x", "y" and "z".  It is
+ A 3D graph may have up to three labelled `axes` -- "x", "y" and "z".  It is
  not possible to say where on the graph any particular axis will fall because
  you can change the direction from which the graph is seen with `set view`.
 
@@ -2061,13 +2061,13 @@ C ... and restart the table:
 2 Plotting
 ?plotting
  There are three `gnuplot` commands which actually create a plot: `plot`,
- `splot` and `replot`.  `plot` generates 2-d plots, `splot` generates 3-d
- plots (actually 2-d projections, of course), and `replot` appends its
+ `splot` and `replot`.  `plot` generates 2D plots, `splot` generates 3-d
+ plots (actually 2D projections, of course), and `replot` appends its
  arguments to the previous `plot` or `splot` and executes the modified
  command.
 
  Much of the general information about plotting can be found in the discussion
- of `plot`; information specific to 3-d can be found in the `splot` section.
+ of `plot`; information specific to 3D can be found in the `splot` section.
 
  `plot` operates in either rectangular or polar coordinates -- see `set polar`
  for details of the latter.  `splot` operates only in rectangular coordinates,
@@ -2083,12 +2083,12 @@ C ... and restart the table:
  the scales and labelling of each axis.  Some commands have the name of an
  axis built into their names, such as `set xlabel`.  Other commands have one
  or more axis names as options, such as `set logscale xy`.  Commands and
- options controlling the z axis have no effect on 2-d graphs.
+ options controlling the z axis have no effect on 2D graphs.
 
  `splot` can plot surfaces and contours in addition to points and/or lines.
  In addition to `splot`, see `set isosamples` for information about defining
- the grid for a 3-d function;  `splot datafile` for information about the
- requisite file structure for 3-d data values; and `set contour` and
+ the grid for a 3D function;  `splot datafile` for information about the
+ requisite file structure for 3D data values; and `set contour` and
  `set cntrparam` for information about contours.
 
  In `splot`, control over the scales and labels of the axes are the same as
@@ -2428,7 +2428,7 @@ C ... and restart the table:
 ?plotting styles boxerrorbars
 ?style boxerrorbars
 ?boxerrorbars
- The `boxerrorbars` style is only relevant to 2-d data plotting.  It is a
+ The `boxerrorbars` style is only relevant to 2D data plotting.  It is a
  combination of the `boxes` and `yerrorbars` styles.  It uses 3, 4, or 5
  columns of data:
  
@@ -2458,7 +2458,7 @@ C ... and restart the table:
 ?plotting styles boxes
 ?style boxes
 ?boxes
- The `boxes` style is only relevant to 2-d plotting.  It draws a box centered
+ The `boxes` style is only relevant to 2D plotting.  It draws a box centered
  about the given x coordinate that extends from the x axis (not from the graph
  border) to the given y coordinate.  It uses 2 or 3 columns of basic data.
  Additional input columns may be used to provide information such as
@@ -2542,7 +2542,7 @@ C ... and restart the table:
 ?plotting styles candlesticks
 ?style candlesticks
 ?candlesticks
- The `candlesticks` style can be used for 2-d data plotting of financial
+ The `candlesticks` style can be used for 2D data plotting of financial
  data or for generating box-and-whisker plots of statistical data.
  Five columns of basic data are required:
  
@@ -2610,7 +2610,7 @@ C ... and restart the table:
 ?plotting styles filledcurves
 ?style filledcurves
 ?filledcurves
- The `filledcurves` style is only relevant to 2-d plotting. Three variants
+ The `filledcurves` style is only relevant to 2D plotting. Three variants
  are possible. The first two variants require either a function or two columns
  of input data, and may be further modified by the options listed below.
 
@@ -2671,7 +2671,7 @@ C ... and restart the table:
 ?plotting styles financebars
 ?style financebars
 ?financebars
- The `financebars` style is only relevant for 2-d data plotting of financial
+ The `financebars` style is only relevant for 2D data plotting of financial
  data.  It requires 1 x coordinate (usually a date) and 4 y values (prices).
  
       5 columns:   date  open  low  high  close
@@ -2691,7 +2691,7 @@ C ... and restart the table:
 ?plotting styles fsteps
 ?style fsteps
 ?fsteps
- The `fsteps` style is only relevant to 2-d plotting.  It connects consecutive
+ The `fsteps` style is only relevant to 2D plotting.  It connects consecutive
  points with two line segments: the first from (x1,y1) to (x1,y2) and the
  second from (x1,y2) to (x2,y2).
  See also
@@ -2704,7 +2704,7 @@ C ... and restart the table:
 ?plotting styles histeps
 ?style histeps
 ?histeps
- The `histeps` style is only relevant to 2-d plotting.  It is intended for
+ The `histeps` style is only relevant to 2D plotting.  It is intended for
  plotting histograms.  Y-values are assumed to be centered at the x-values;
  the point at x1 is represented as a horizontal line from ((x0+x1)/2,y1) to
  ((x1+x2)/2,y1).  The lines representing the end points are extended so that
@@ -2726,7 +2726,7 @@ C ... and restart the table:
 ?style histograms
 ?plotting styles histograms
 ?histograms
- The `histograms` style is only relevant to 2-d plotting.  It produces a bar
+ The `histograms` style is only relevant to 2D plotting.  It produces a bar
  chart from a sequence of parallel data columns. Each element of the `plot`
  command must specify a single input data source (e.g. one column of the input
  file), possibly with associated tic values or key titles.
@@ -3014,7 +3014,7 @@ C ... and restart the table:
 ?plotting styles steps
 ?style steps
 ?steps
- The `steps` style is only relevant to 2-d plotting.  It connects consecutive
+ The `steps` style is only relevant to 2D plotting.  It connects consecutive
  points with two line segments: the first from (x1,y1) to (x2,y1) and the
  second from (x2,y1) to (x2,y2).
  See also
@@ -3078,7 +3078,7 @@ C ... and restart the table:
 ?plotting styles xyerrorbars
 ?style xyerrorbars
 ?xyerrorbars
- The `xyerrorbars` style is only relevant to 2-d data plots.  `xyerrorbars` is
+ The `xyerrorbars` style is only relevant to 2D data plots.  `xyerrorbars` is
  like `dots`, except that horizontal and vertical error bars are also drawn.
  At each point (x,y), lines are drawn from (x,y-ydelta) to (x,y+ydelta) and
  from (x-xdelta,y) to (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from
@@ -3104,7 +3104,7 @@ C ... and restart the table:
 ?style yerrorbars
 ?style errorbars
 ?yerrorbars
- The `yerrorbars` (or `errorbars`) style is only relevant to 2-d data plots.
+ The `yerrorbars` (or `errorbars`) style is only relevant to 2D data plots.
  `yerrorbars` is like `points`, except that a vertical error bar is also drawn.
  At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
  from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
@@ -3124,7 +3124,7 @@ C ... and restart the table:
 ?plotting styles xerrorlines
 ?style xerrorlines
 ?xerrorlines
- The `xerrorlines` style is only relevant to 2-d data plots.
+ The `xerrorlines` style is only relevant to 2D data plots.
  `xerrorlines` is like `linespoints`, except that a horizontal error
  line is also drawn. At each point (x,y), a line is drawn from (xlow,y)
  to (xhigh,y) or from (x-xdelta,y) to (x+xdelta,y), depending on how
@@ -3141,7 +3141,7 @@ C ... and restart the table:
 ?plotting styles xyerrorlines
 ?style xyerrorlines
 ?xyerrorlines
- The `xyerrorlines` style is only relevant to 2-d data plots.
+ The `xyerrorlines` style is only relevant to 2D data plots.
  `xyerrorlines` is like `linespoints`, except that horizontal and
  vertical error bars are also drawn. At each point (x,y), lines are
  drawn from (x,y-ydelta) to (x,y+ydelta) and from (x-xdelta,y) to
@@ -3168,7 +3168,7 @@ C ... and restart the table:
 ?style yerrorlines
 ?style errorlines
 ?yerrorlines
- The `yerrorlines` (or `errorlines`) style is only relevant to 2-d data
+ The `yerrorlines` (or `errorlines`) style is only relevant to 2D data
  plots. `yerrorlines` is like `linespoints`, except that a vertical
  error line is also drawn. At each point (x,y), a line is drawn from
  (x,y-ydelta) to (x,y+ydelta) or from (x,ylow) to (x,yhigh), depending
@@ -3973,7 +3973,7 @@ C ... and restart the table:
 ?plot
  `plot` is the primary command for drawing plots with `gnuplot`.  It creates
  plots of functions and data in many, many ways.  `plot` is used to draw 2-d
- functions and data; `splot` draws 2-d projections of 3-d surfaces and data.
+ functions and data; `splot` draws 2D projections of 3D surfaces and data.
  `plot` and `splot` contain many common features; see `splot` for differences.
  Note specifically that although the `binary <binary list>` variation does
  work for both `plot` and `splot`, there are small differences between these
@@ -4971,7 +4971,7 @@ C ... and restart the table:
 ?plot errorbars
 ?splot errorbars
 ?errorbars
- Error bars are supported for 2-d data file plots by reading one to four
+ Error bars are supported for 2D data file plots by reading one to four
  additional columns (or `using` entries); these additional values are used in
  different ways by the various errorbar styles.
 
@@ -5024,7 +5024,7 @@ C ... and restart the table:
 ?plot errorlines
 ?splot errorlines
 ?errorlines
- Lines with error bars are supported for 2-d data file plots by reading
+ Lines with error bars are supported for 2D data file plots by reading
  one to four additional columns (or `using` entries); these additional
  values are used in different ways by the various errorlines styles.
 
@@ -5593,7 +5593,7 @@ C ... and restart the table:
  units of radians.  If `set angles degrees` is specified before `set polar`,
  then the default range is [0:360] and the independent variable has units of
  degrees.  This is particularly useful for plots of data files.  The angle
- setting also applies to 3-d mapping as set via the `set mapping` command.
+ setting also applies to 3D mapping as set via the `set mapping` command.
 
  Syntax:
        set angles {degrees | radians}
@@ -6347,7 +6347,7 @@ C ... and restart the table:
  The surface can be switched off (see `set surface`), giving a contour-only
  graph.  Though it is possible to use `set size` to enlarge the plot to fill
  the screen, more control over the output format can be obtained by writing
- the contour information to a file, and rereading it as a 2-d datafile plot:
+ the contour information to a file, and rereading it as a 2D datafile plot:
 
        unset surface
        set contour
@@ -6582,7 +6582,7 @@ C ... and restart the table:
        unset dgrid3d
        show dgrid3d
 
- By default `dgrid3d` is disabled.  When enabled, 3-d data read from a file
+ By default `dgrid3d` is disabled.  When enabled, 3D data read from a file
  are always treated as a scattered data set.  A grid with dimensions derived
  from a bounding box of the scattered data and size as specified by the
  row/col_size parameters is created for plotting and contouring.  The grid
@@ -7087,7 +7087,7 @@ C ... and restart the table:
  for major and minor grid lines, also via a predefined linestyle, as
  far as the active terminal driver supports this.
 
- Additionally, a polar grid can be selected for 2-d plots---circles are drawn
+ Additionally, a polar grid can be selected for 2D plots---circles are drawn
  to intersect the selected tics, and radial lines are drawn at definable
  intervals.  (The interval is given in degrees or radians, depending on the
  `set angles` setting.)  Note that a polar grid is no longer automatically
@@ -7389,8 +7389,8 @@ C ... and restart the table:
  sides of the key.  It is the coordinates of the top of this line that are
  specified with the `set key` command.  In a `plot`, only the x and y
  coordinates are used to specify the line position.  For a `splot`, x, y and
- z are all used as a 3-d location mapped using the same mapping as the graph
- itself to form the required 2-d screen position of the imaginary line.
+ z are all used as a 3D location mapped using the same mapping as the graph
+ itself to form the required 2D screen position of the imaginary line.
 
  When using the TeX or PostScript drivers, or similar drivers where formatting
  information is embedded in the string, `gnuplot` is unable to calculate
@@ -8243,14 +8243,14 @@ C ... and restart the table:
        unset parametric
        show parametric
 
- For 2-d plotting, a parametric function is determined by a pair of parametric
- functions operating on a parameter.  An example of a 2-d parametric function
+ For 2D plotting, a parametric function is determined by a pair of parametric
+ functions operating on a parameter.  An example of a 2D parametric function
  would be `plot sin(t),cos(t)`, which draws a circle (if the aspect ratio is
  set correctly---see `set size`).  `gnuplot` will display an error message if
  both functions are not provided for a parametric `plot`.
 
- For 3-d plotting, the surface is described as x=f(u,v), y=g(u,v), z=h(u,v).
- Therefore a triplet of functions is required.  An example of a 3-d parametric
+ For 3D plotting, the surface is described as x=f(u,v), y=g(u,v), z=h(u,v).
+ Therefore a triplet of functions is required.  An example of a 3D parametric
  function would be `cos(u)*cos(v),cos(u)*sin(v),sin(u)`, which draws a sphere.
  `gnuplot` will display an error message if all three functions are not
  provided for a parametric `splot`.
@@ -8259,7 +8259,7 @@ C ... and restart the table:
  since the two functions can describe the x and y values to be computed
  separately.  In fact, plots of the type t,f(t) are equivalent to those
  produced with f(x) because the x values are computed using the identity
- function.  Similarly, 3-d plots of the type u,v,f(u,v) are equivalent to
+ function.  Similarly, 3D plots of the type u,v,f(u,v) are equivalent to
  f(x,y).
 
  Note that the order the parametric functions are specified is xfunction,
@@ -9060,10 +9060,10 @@ C ... and restart the table:
  By default, sampling is set to 100 points.  A higher sampling rate will
  produce more accurate plots, but will take longer.  This parameter has no
  effect on data file plotting unless one of the interpolation/approximation
- options is used.  See `plot smooth` re 2-d data and `set cntrparam` and
- `set dgrid3d` re 3-d data.
+ options is used.  See `plot smooth` re 2D data and `set cntrparam` and
+ `set dgrid3d` re 3D data.
 
- When a 2-d graph is being done, only the value of <samples_1> is relevant.
+ When a 2D graph is being done, only the value of <samples_1> is relevant.
 
  When a surface plot is being done without the removal of hidden lines, the
  value of samples specifies the number of samples that are to be evaluated for
@@ -9120,7 +9120,7 @@ C ... and restart the table:
  of the terminal, but do not return <xscale> or <yscale> to their default
  values (1.0).
 
- `ratio` and `square` have no effect on 3-d plots.
+ `ratio` and `square` have no effect on 3D plots.
 
  Examples:
 
@@ -9923,7 +9923,7 @@ C ... and restart the table:
 ?show view
 ?view
  The `set view` command sets the viewing angle for `splot`s.  It controls how
- the 3-d coordinates of the plot are mapped into the 2-d screen space.  It
+ the 3D coordinates of the plot are mapped into the 2D screen space.  It
  provides controls for both rotation and scaling of the plotted data, but
  supports orthographic projections only.  It supports both 3D projection or
  orthogonal 2D projection into a 2D plot-like map.
@@ -9933,7 +9933,7 @@ C ... and restart the table:
        show view
 
  where <rot_x> and <rot_z> control the rotation angles (in degrees) in a
- virtual 3-d coordinate system aligned with the screen such that initially
+ virtual 3D coordinate system aligned with the screen such that initially
  (that is, before the rotations are performed) the screen horizontal axis is
  x, screen vertical axis is y, and the axis perpendicular to the screen is z.
  The first rotation applied is <rot_x> around the x axis.  The second rotation
@@ -10849,8 +10849,8 @@ C ... and restart the table:
 2 splot
 ?commands splot
 ?splot
- `splot` is the command for drawing 3-d plots (well, actually projections on
- a 2-d surface, but you knew that).  It can create a plot from functions or
+ `splot` is the command for drawing 3D plots (well, actually projections on
+ a 2D surface, but you knew that).  It can create a plot from functions or
  data read from files in a manner very similar to the `plot` command.
  `splot` provides only a single x, y, and z axis; there is no equivalent to the
  x2 and y2 secondary axes provided by `plot`.
@@ -10998,7 +10998,7 @@ C ... and restart the table:
 ?commands splot datafile example
 ?splot datafile example
 ?splot example
- A simple example of plotting a 3-d data file is
+ A simple example of plotting a 3D data file is
 
        splot 'datafile.dat'
 

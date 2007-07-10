@@ -4,6 +4,8 @@
 
 	* docs/gnuplot.doc: Move plot style descriptions up by one major level.
 
+	* docs/gnuplot.doc: Consistent use of '2D' and '3D'.
+
 2007-07-06  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* docs/gnuplot.doc: There are two entries for 'ticslevel' which is a
