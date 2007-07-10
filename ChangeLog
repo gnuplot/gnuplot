@@ -2,6 +2,8 @@
 
 	* docs/gnuplot.doc: Add a section for 'rgbcolor variable'.
 
+	* docs/gnuplot.doc: Move plot style descriptions up by one major level.
+
 2007-07-06  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* docs/gnuplot.doc: There are two entries for 'ticslevel' which is a
