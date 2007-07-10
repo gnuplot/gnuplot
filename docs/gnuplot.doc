@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.433 2007/06/24 02:58:07 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.434 2007/07/10 09:50:51 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1881,7 +1881,7 @@ C ... and restart the table:
 
        rgbcolor "colorname"
        rgbcolor "#RRGGBB"
-       rgbcolor variable
+       rgbcolor variable       # color is read from input file
        palette frac <val>      # <val> runs from 0 to 1
        palette cb <value>      # <val> lies within cbrange
        palette z
@@ -1895,16 +1895,6 @@ C ... and restart the table:
  be represented by #FF00FF, which is the hexadecimal representation of
  (255 << 16) + (0 << 8) + (255).
 
- "rgb variable" requires an additional column in the `using` specifier, and
- is only available in 3D plotting mode (splot). The extra column is interpreted
- as a 24-bit packed RGB triple. These are most easily specified in a data file
- as hexidecimal values (see above).
-
- Example:
-
-       rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
-       splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
-
  The color palette is a linear gradient of colors that smoothly maps a
  single numerical value onto a particular color.  Two such mappings are always
  in effect. `palette frac`  maps a fractional value between 0 and 1 onto the
@@ -1916,6 +1906,25 @@ C ... and restart the table:
  "palette z" maps the z value of each plot segment or plot element into the
  cbrange mapping of the palette. This allows smoothly-varying color along a
  3d line or surface. This option applies only to 3D plots (splot).
+4 rgbcolor variable
+?rgbcolor variable
+ Most plot commands assign a single color (linetype) to each element of the
+ plot.  If there are multiple plots on a single graph, the default color
+ (linetype) is incremented sequentially.  Some plot stiles allow you to
+ bypass this mechanism altogether, and assign a separate color for each
+ data point, line segment, or label.  This is indicated by the colorspec
+ `rgbcolor variable`, and tells the program to take the color for each point
+ from a separate column in the data file. This requires an additional column
+ in the `using` specifier.  The extra column is interpreted as a 24-bit packed
+ RGB triple. These are most easily specified in a data file as hexidecimal
+ values (see `rgbcolor`).
+
+ Example:
+
+       # Place colored points in 3D at the x,y,z coordinates corresponding to
+       # their red, green, and blue components
+       rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
+       splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
 
 2 mouse input
 ?mouse input
