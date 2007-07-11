@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.437 2007/07/11 05:17:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.438 2007/07/11 05:23:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2433,7 +2433,7 @@ C ... and restart the table:
  columns of data:
  
       3 columns:  x  y  ydelta
-      4 columns:  x  y  ydelta xdelta      # boxwidth != -2
+      4 columns:  x  y  ydelta xdelta        # boxwidth != -2
       4 columns:  x  y  ylow  yhigh          # boxwidth == -2
       5 columns:  x  y  ylow  yhigh  xdelta
  
@@ -2544,16 +2544,16 @@ C ... and restart the table:
 ?candlesticks
  The `candlesticks` style can be used for 2D data plotting of financial
  data or for generating box-and-whisker plots of statistical data.
- Five columns of basic data are required:
- 
-       financial data:   date  open  low  high  close
-       whisker plot:     x  box_min  whisker_min  whisker_high  box_high
-
  The symbol is a rectangular box, centered horizontally at the x
  coordinate and limited vertically by the opening and closing prices.  A
  vertical line segment at the x coordinate extends up from the top of the
  rectangle to the high price and another down to the low.  The vertical line
  will be unchanged if the low and high prices are interchanged.
+ 
+ Five columns of basic data are required:
+ 
+       financial data:   date  open  low  high  close
+       whisker plot:     x  box_min  whisker_min  whisker_high  box_high
 
  The width of the rectangle can be controlled by the `set boxwidth` command.
  For backwards compatibility with earlier gnuplot versions, when the
@@ -2927,7 +2927,8 @@ C ... and restart the table:
 ?style impulses
 ?impulses
  The `impulses` style displays a vertical line from the x axis (2D) or from the
- xy plane (3D) to each input point.
+ xy plane (3D) to each input point.  To use this style effectively in 3D plots,
+ it is useful to use thick lines (linewidth > 1).
 
       1 column:   y        # implicit x coordinate from row number (2D)
       2 columns:  x  y     # line from [x,0] to [x,y]  (2D)
@@ -2994,8 +2995,9 @@ C ... and restart the table:
  small symbol at each point and then connects adjacent points with straight
  line segments.  The command `set pointsize` may be used to change the size of
  the points.  See `set pointsize` for its usage.
- Additional input columns may be used to provide information such as
- variable point size or line color.
+ 1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
+ required if 3D plots.  See `style lines`.  Additional input columns may be used
+ to provide information such as variable point size or line color.
 
  `linespoints` may be abbreviated `lp`.
 2 points
@@ -3006,8 +3008,9 @@ C ... and restart the table:
 ?points
  The `points` style displays a small symbol at each point.  The command `set
  pointsize` may be used to change the default size of the points.
- Additional input columns may be used to provide information such as
- variable point size or color.
+ 1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
+ required if 3D plots.  See `style lines`.  Additional input columns may be used
+ to provide information such as variable point size or line color.
 2 steps
 ?commands set style steps
 ?set style steps

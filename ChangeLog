@@ -1,3 +1,7 @@
+2007-07-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: More cleanup.
+
 2007-07-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Add a section for 'rgbcolor variable'.
