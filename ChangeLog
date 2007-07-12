@@ -5,6 +5,9 @@
 	test.  FIXME:  This entire routine should be rewritten to use
 	draw_clip_line().
 
+	* src/wxterminal.c (gp_cairo_draw_point):  Apply current linewidth to
+	the line making up a point symbol.
+
 2007-07-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: More cleanup.
