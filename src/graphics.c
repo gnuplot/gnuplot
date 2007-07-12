@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.225 2007/06/05 19:09:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.226 2007/06/21 18:56:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2910,7 +2910,9 @@ plot_histeps(struct curve_points *plot)
 
     xl = map_x(x);
     yl = map_y(y);
-    (*t->move) (xl, yl);
+
+    if (!clip_point(xl,yl))
+	(*t->move) (xl, yl);
 
     for (i = 0; i < goodcount - 1; i++) {	/* loop over all points except last  */
 	yn = plot->points[gl[i]].y;

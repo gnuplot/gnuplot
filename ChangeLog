@@ -1,3 +1,10 @@
+2007-07-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_histeps):  The initial move was not clipped to
+	the canvas, which caused segfaults in the pdf terminal. Add a clipping
+	test.  FIXME:  This entire routine should be rewritten to use
+	draw_clip_line().
+
 2007-07-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: More cleanup.
