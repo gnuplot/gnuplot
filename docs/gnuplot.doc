@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.438 2007/07/11 05:23:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.439 2007/07/11 23:24:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1286,7 +1286,7 @@ C
 #strftime("timeformat",t) & any & string result from applying gnuplot's time parser \\
 %strftime("timeformat",t)@any@string result from applying gnuplot's time parser
  `strftime("timeformat",t)` applies the timeformat specifiers to the time t
- given in seconds since the year 2000. 
+ given in seconds since the year 2000.
  See `time_specifiers` and `strptime`.
 4 strptime
 ? expressions functions strptime
@@ -1948,10 +1948,10 @@ C ... and restart the table:
  commands which will be executed when a certain key or key sequence is pressed
  while the driver's window has the input focus. Note that `bind` is only
  available if gnuplot was compiled with `mouse` support and it is used by all
- mouse-capable terminals. A user-specified binding supercedes any builtin
+ mouse-capable terminals. A user-specified binding supersedes any builtin
  bindings, except that <space> and 'q' cannot normally be rebound. For an
  exception, see `bind space`.
- 
+
  Mouse buttons cannot be rebound.
 
  You get the list of all hotkeys by typing `bind` or by hitting 'h' in the
@@ -2017,7 +2017,7 @@ C ... and restart the table:
 4 bind space
 ?commands bind space
 ?bind space
- By default, the <space> hotkey raises gnuplot's command window. On some 
+ By default, the <space> hotkey raises gnuplot's command window. On some
  terminals (e.g. x11, wx), 'q' closes the graph window. These defaults can
  be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
  see `x11 command-line-options`, or by the X Resource 'gnuplot*ctrlq'.
@@ -2431,12 +2431,12 @@ C ... and restart the table:
  The `boxerrorbars` style is only relevant to 2D data plotting.  It is a
  combination of the `boxes` and `yerrorbars` styles.  It uses 3, 4, or 5
  columns of data:
- 
+
       3 columns:  x  y  ydelta
       4 columns:  x  y  ydelta xdelta        # boxwidth != -2
       4 columns:  x  y  ylow  yhigh          # boxwidth == -2
       5 columns:  x  y  ylow  yhigh  xdelta
- 
+
  The boxwidth will come from the fourth column if the y errors are given as
  "ydelta" and the boxwidth was not previously set to -2.0 (`set boxwidth -2.0`)
  or from the fifth column if the y errors are in the form of "ylow yhigh".  The
@@ -2462,9 +2462,9 @@ C ... and restart the table:
  about the given x coordinate that extends from the x axis (not from the graph
  border) to the given y coordinate.  It uses 2 or 3 columns of basic data.
  Additional input columns may be used to provide information such as
- variable line or fill color (see `rgbcolor variable`). 
- 
-      2 columns:  x  y  
+ variable line or fill color (see `rgbcolor variable`).
+
+      2 columns:  x  y
       3 columns:  x  y  x_width
 
  The width of the box is obtained in one of three ways.  If the input data has a
@@ -2523,11 +2523,11 @@ C ... and restart the table:
  to the `xyerrorbars` style except that it draws rectangular areas rather than
  simple crosses.  It uses either 4 or 6 basic columns of input data.
  Additional input columns may be used to provide information such as
- variable line or fill color (see `rgbcolor variable`). 
- 
+ variable line or fill color (see `rgbcolor variable`).
+
       4 columns:  x  y  xdelta  ydelta
       6 columns:  x  y  xlow  xhigh  ylow  yhigh
- 
+
  The box width and height are determined from the x and y errors in the same
  way as they are for the `xyerrorbars` style---either from xlow to xhigh and
  from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
@@ -2549,9 +2549,9 @@ C ... and restart the table:
  vertical line segment at the x coordinate extends up from the top of the
  rectangle to the high price and another down to the low.  The vertical line
  will be unchanged if the low and high prices are interchanged.
- 
+
  Five columns of basic data are required:
- 
+
        financial data:   date  open  low  high  close
        whisker plot:     x  box_min  whisker_min  whisker_high  box_high
 
@@ -2601,7 +2601,7 @@ C ... and restart the table:
       1 column    y         # x is taken from row number
       2 columns:  x  y
       3 columns:  x  y  z   # 3D only (splot)
- 
+
  For some terminals (post, pdf) the size of the dot can be controlled by
  changing the linewidth.
 2 filledcurves
@@ -2673,7 +2673,7 @@ C ... and restart the table:
 ?financebars
  The `financebars` style is only relevant for 2D data plotting of financial
  data.  It requires 1 x coordinate (usually a date) and 4 y values (prices).
- 
+
       5 columns:   date  open  low  high  close
 
  The symbol is a vertical line segment, located horizontally at the x
@@ -2872,7 +2872,7 @@ C ... and restart the table:
  For example, to create stacked histograms of the data in columns 3 through 8
 
        set style histogram columnstacked
-       plot for [i=3:8] "datafile" using i title columnhead 
+       plot for [i=3:8] "datafile" using i title columnhead
 2 image
 ?commands set style image
 ?set style image
@@ -2889,10 +2889,10 @@ C ... and restart the table:
  (gray value) for indexing in the current palette.
 
  Each pixel (data point) of the input 2D image will become a rectangle or
- parallelipiped in theplot.  The coordinate of each data point will determine
- the center of the parallelipiped.  That is, an M x N set of data will form an
+ parallelogram in the plot.  The coordinate of each data point will determine
+ the center of the parallelogram.  That is, an M x N set of data will form an
  image with M x N pixels.  This is slightly different than pm3d elements where
- an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scanu
+ an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
  directions for the image data grid can be any of eight possible combinations.
 
  See also `rgbimage`.
@@ -2909,7 +2909,7 @@ C ... and restart the table:
  This optimized code may be disabled by using the keyword `failsafe`. E.g.
 
        plot 'data' with image failsafe
- 
+
  Here are some specific comments about particular terminal drivers:
 
  x11 and wxt - Pixels are either repeated or decimated to fit the display
@@ -2943,7 +2943,7 @@ C ... and restart the table:
  The `labels` style reads coordinates and text from a data file and places
  the text string at the corresponding 2D or 3D position.  3 or 4 input columns
  of basic data are required.  Additional input columns may be used to provide
- information such as variable text color (see `rgbcolor variable`). 
+ information such as variable text color (see `rgbcolor variable`).
 
       3 columns:  x  y  string    # 2D version
       4 columns:  x  y  z  string # 3D version
@@ -2971,7 +2971,7 @@ C ... and restart the table:
  It may be used in either 2D or 3D plots. The basic form requires 1, 2, or 3
  columns of input data.
  Additional input columns may be used to provide information such as
- variable line color (see `rgbcolor variable`). 
+ variable line color (see `rgbcolor variable`).
 
  2D form
       1 column:   y           # implicit x value from row number
@@ -3010,7 +3010,7 @@ C ... and restart the table:
  pointsize` may be used to change the default size of the points.
  1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
  required if 3D plots.  See `style lines`.  Additional input columns may be used
- to provide information such as variable point size or line color.
+ to provide information such as variable point size or color.
 2 steps
 ?commands set style steps
 ?set style steps
@@ -4351,7 +4351,7 @@ C ... and restart the table:
  Sometimes the scanning directions in a binary datafile are not consistent with
  that assumed by gnuplot.  These keywords can flip the scanning direction along
  dimensions x, y, z.
-6 origin 
+6 origin
 ?binary general keywords origin
  When gnuplot generates coordinates based upon transposition and flip, it
  attempts to always position the lower left point in the array at the origin,
@@ -4686,8 +4686,8 @@ C ... and restart the table:
 
        plot 'filename' using 1:2, '' using 1:3
 
- The special filename '+' is a mechanism to allow the full range of 
- `using` specifiers and plot styles with in-line functions.  Normally a 
+ The special filename '+' is a mechanism to allow the full range of
+ `using` specifiers and plot styles with in-line functions.  Normally a
  function plot can only have a single y (or z) value associated with each
  sampled point.  The pseudo-file '+' treats the sampled points as columns
  1 (plot) or 1 and 2 (splot), and allows additional column values to be
@@ -7348,7 +7348,7 @@ C ... and restart the table:
  Justification of the plot titles within the key is controlled by `Left` or
  `Right` (default).  The text and sample can be reversed (`reverse`) and a
  box can be drawn around the key (`box {...}`) in a specified `linetype`
- and `linewidth`, or a user-defined `linestyle`. 
+ and `linewidth`, or a user-defined `linestyle`.
 
  By default the first plot label is at the top of the key and successive labels
  are entered below it. The `invert` option causes the first label to be placed
@@ -7498,7 +7498,7 @@ C ... and restart the table:
  same color and fill properties as used in the plot itself.  The font and
  textcolor properties control the appearance of the individual plot titles
  that appear in the key. Setting the textcolor to "rgb variable" causes
- the text for each key entry to be the same color as the line or fill 
+ the text for each key entry to be the same color as the line or fill
  color for that plot.  This was the default in some earlier versions of
  gnuplot.
 
@@ -10859,7 +10859,7 @@ C ... and restart the table:
  x2 and y2 secondary axes provided by `plot`.
 
  See `plot` for features common to the `plot` command; only differences are
- discussed in detail here.  
+ discussed in detail here.
 
  Syntax:
        splot {<ranges>}
