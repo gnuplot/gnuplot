@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.158 2007-02-18 17:36:25+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.418
+C RCS $Id: gnuplot-ja.doc,v 1.177 2007-07-13 19:04:34+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.439
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -194,9 +194,9 @@ C Shigeharu Takeno et al (3.7, 4.X)
            http://www.gnuplot.info/demo/simple.html
 ^ </a>
 2 Seeking-assistance
-^ <a name="Seeking-assistance"></a>
 ?help-desk
 ?seeking-assistance
+^ <a name="Seeking-assistance"></a>
  `gnuplot` ユーザのためのメーリングリストがあります。しかし、ニュースグ
  ループ
        comp.graphics.apps.gnuplot
@@ -743,6 +743,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  を参照してください。
 2 Coordinates
 ?coordinates
+=axes
  コマンド `set arrow`, `set key`, `set label`, `set object` はグラフ上
  の任意の位置が指定できます。その位置は以下の書式で指定します:
 
@@ -1334,6 +1335,24 @@ C Shigeharu Takeno et al (3.7, 4.X)
  `substr("string",beg,end)` は、元の文字列の beg から end 番目までの文
  字からなる文字列を返します。これは、"string"[beg:end] という式とほぼ同
  じですが、こちらはオプション beg, end を省略できません。
+4 strftime
+?expressions functions strftime
+?functions strftime
+?strftime
+#strftime("timeformat",t) & 任意 & gnuplot による時刻解析結果の文字列 \\
+%strftime("timeformat",t)@任意@gnuplot による時刻解析結果の文字列
+ `strftime("timeformat",t)` は、2000 年からの秒数による時刻 t に、時刻
+ 書式指定 timeformat を適用します。
+ `time_specifiers` と `strptime` も参照してください。
+4 strptime
+? expressions functions strptime
+?functions strptime
+?strptime
+#strptime("timeformat",s) & 文字列 & 文字列を変換した 2000 年からの秒数 \\
+%strptime("timeformat",s)@文字列@文字列を変換した 2000 年からの秒数
+ `strptime("timeformat",s)` 書式指定 timeformat を使って文字列 s から時
+ 刻を読み込んで、それを 2000 年からの秒数に変換します。
+ `time_specifiers` と `strftime` も参照してください。
 4 system
 ?expressions functions system
 ?functions system
@@ -1402,6 +1421,9 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?expressions functions stringcolumn
 ?functions stringcolumn
 ?stringcolumn
+?expressions functions strcol
+?functions strcol
+?strcol
 #stringcolumn(x) & 整数 & 文字列としての $x$ 列目の内容 \\
 %stringcolumn(x)@整数@ 文字列としての $x$ 列目の内容
  `stringcolumn(x)` は fit あるいはデータファイルプロットでの `using` の
@@ -1831,16 +1853,15 @@ C ... and restart the table:
  用語 "タイトル (title)" は `gnuplot` では複数の意味で使われます。この
  ドキュメントではそれらを区別するために、形容詞として "描画の (plot)"、
  "曲線の (line)"、"説明の (key)" を頭につけたりもします。
-
  2 次元のグラフは 4 つまでの見出し付けされる軸を持つことができます。こ
- れらの使われ方の中の 4 つの軸の名前はそれぞれ、グラフ描画の下の境界に
- 沿う軸である "x"、左の境界に沿う軸 "y"、上の境界に沿う軸 "x2"、右の境
- 界に沿う軸 "y2" となっています。
+ れら 4 つの軸の名前はそれぞれ、グラフ描画の下の境界に沿う軸である "x"、
+ 左の境界に沿う軸 "y"、上の境界に沿う軸 "x2"、右の境界に沿う軸 "y2" と
+ なっています。`axes` 参照。
 
- 3 次元のグラフは  4 つまでの見出し付けされる軸 "x","y","z" を持つこと
- ができます。どの特定の軸に関してもそれがグラフ上でどこに書かれるかを述
- べることはできません。それは、`set view` でグラフを見る方向を変更でき
- るからです。
+ 3 次元のグラフは  3 つまでの見出し付けされる軸 (`axes`) "x","y","z" を
+ 持つことができます。どの特定の軸に関してもそれがグラフ上でどこに書かれ
+ るかを述べることはできません。それは、`set view` でグラフを見る方向を
+ 変更できるからです。
 
  データファイルに関する議論では、用語 "行 (record)" を復活し、ファイル
  の一行の文字列、すなわち、改行文字や行末文字同士の間の文字列、を指し示
@@ -1929,7 +1950,7 @@ C ... and restart the table:
 
        rgbcolor "colorname"
        rgbcolor "#RRGGBB"
-       rgbcolor variable
+       rgbcolor variable       # 色は入力ファイルから読み込む
        palette frac <val>      # <val> は 0 から 1 の値
        palette cb <value>      # <val> は cbrange の範囲の値
        palette z
@@ -1943,16 +1964,6 @@ C ... and restart the table:
  タ (紫) = 最も明るい赤 + 最も明るい青、なので、#FF00FF と表され、これ
  は 16 進数で、(255 << 16) + (0 << 8) + (255) を意味しています。
 
- "rgb variable" は、3D 描画モード (splot) のみで有効で、`using` 指定子
- に追加の列を要求します。その列は 24-bit 形式の RGB の 3 つ組であるとみ
- なされます。これはデータファイル中で 16 進値として (上を参照) 簡単に指
- 定できます。
-
- 例:
-
-       rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
-       splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
-
  カラーパレットとは、色の線型な勾配で、単一の数値を特定の色に滑らかに対
  応づけます。常にそのような 2 つの対応付けが効力を持ちます。
  `palette frac` は 0 から 1 までの小数値を、カラーパレットの全範囲に対
@@ -1965,6 +1976,25 @@ C ... and restart the table:
  れている cbrange の範囲に対応づけます。これにより、3 次元の曲線や曲面
  に沿って色を滑らかに変化させることができます。このオプションは 3D 描画
  (splot) のみに適用できます。
+4 rgbcolor variable
+?rgbcolor variable
+ 大抵の場合描画コマンドは、各描画要素に一つの色 (線種) を割り当て、一つ
+ のグラフに複数の描画を行う場合、デフォルトの色 (線種) が順番に使われて
+ いきます。いくつかの描画スタイルでは、必ずしもこの仕組みを使用せずに、
+ 各データ点、各線分、または各ラベルにそれぞれ異なる色を割り当てることも
+ 可能です。これは、色の指定として `rgbcolor variable` を使うことで可能
+ であり、そしてこれはプログラムに、各点に対する色をデータファイルの別の
+ 列から取得するよう指示します。よってこれは、`using` 指定子への列の指定
+ の追加を必要とし、その列は 24-bit 形式の RGB の 3 つ組であるとみなされ
+ ます。これはデータファイル中で 16 進値として (`rgbcolor` 参照) 簡単に
+ 指定できます。
+
+ 例:
+
+       # 3 次元描画で、各 x,y,z 座標に対応した赤、緑、青の成分を持つ色
+       # のついた点を配置
+       rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
+       splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
 
 2 mouse input
 ?mouse input
@@ -1980,15 +2010,21 @@ C ... and restart the table:
 3 bind
 ?commands bind
 ?bind
+ 書式:
+       bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
+       bind <key-sequence> ""
+       bind!
+
  `bind` は、ホットキーの定義、再定義に使用します。ホットキーとは、入力
  カーソルがドライバのウィンドウ内にあるときに、あるキー、または複数のキ
  ーを押すことで、gnuplot のコマンド列を実行させる機能のことを言います。
  `bind` は、gnuplot が `mouse` をサポートするようにコンパイルされていて
  かつマウスが有効な出力形式上で使われてる場合にのみ有効であることに注意
- してください。キー割当 (binding) は、組み込み (builtin) キー割当 (通常
- のエディタに似た形に設定されている) を上書きしますが、<space> と 'q'
- だけは再定義はできません (下で述べる 1 例を除いて)。マウスボタンも再定
- 義はできません。
+ してください。ユーザ指定のキー割当 (binding) は、組み込み (builtin) キ
+ ー割当を置き換えますが、<space> と 'q' は通常は再定義はできません。そ
+ の唯一の例外については、`bind space` を参照してください。
+
+ マウスボタンは再定義はできません。
 
  ホットキーの一覧を得るには `bind` とタイプするか、グラフウィンドウ上で
  'h' と入力してください。
@@ -2002,18 +2038,6 @@ C ... and restart the table:
  の gnuplot の描画ウィンドウ上で可能にします。この場合、gnuplot 変数
  MOUSE_KEY_WINDOW にそれが行なわれたウィンドウの ID が保存されるのでそ
  れをキーに割り当てたコマンドで使用することができます。
-
- デフォルトでは、<space> ホットキーは gnuplot のコマンドウィンドウを前
- 面に出します。いくつかの出力形式 (例えば x11, wxt, pm) では 'q' はグラ
- フウィンドウを閉じます。これらのデフォルトは、'gnuplot -ctrlq' のよう
- にして gnuplot を起動する (`x11 command-line-options` も参照)、または
- X リソースの 'gnuplot*ctrlq' で、ctrl-space や ctrl-q に変更できます。
- 注意: <space> (または ctrl-space) で X11 の gnuplot ウィンドウが前面に
- 出ない場合は `raise` の項をよく読んでください。
-
- 書式:
-       bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
-       bind!
 
  例:
 
@@ -2060,7 +2084,21 @@ C ... and restart the table:
 
     "KP_1" - "KP_9", "F1" - "F12"
 
+ 以下は、実際のキーではなく、ウィンドウに関するイベントです:
+
+    "Close"
+
  `mouse`, `if` の項目も参照してください。
+4 bind space
+?commands bind space
+?bind space
+ デフォルトでは、<space> ホットキーは gnuplot のコマンドウィンドウを前
+ 面に出します。いくつかの出力形式 (例えば x11, wxt) では 'q' はグラフウ
+ ィンドウを閉じます。これらのデフォルトは、'gnuplot -ctrlq' のようにし
+ て gnuplot を起動する (`x11 command-line-options` も参照)、または X リ
+ ソースの 'gnuplot*ctrlq' で、ctrl-space や ctrl-q に変更できます。
+ 注意: <space> (または ctrl-space) で X11 の gnuplot ウィンドウが前面に
+ 出ない場合は `raise` の項をよく読んでください。
 
 3 Mouse variables
 ?mouse variables
@@ -2114,6 +2152,7 @@ C ... and restart the table:
  出来ます。さらに、オプション `using` を使えば、`plot` でも `splot` で
  もほとんどどんな座標系でもそれを定義して使うことが出来ます。
 
+=axes
  `plot` では、4 つの境界 x (下), x2 (上), y (左), y2 (右) をそれぞれ独
  立な軸として扱うこともできます。オプション `axes` で、与えられた関数や
  データ集合をどの軸のペアで表示させるかを選べます。また、各軸の縮尺や見
@@ -2133,10 +2172,10 @@ C ... and restart the table:
  やオプションは効果がなく、z 軸を制御するものにはもちろん効果がある、と
  いうことを除けば `plot` と全く同じです。
 2 Start-up
-^ <a name="start-up"></a>
 ?startup
 ?start
 ?.gnuplot
+^ <a name="start-up"></a>
  `gnuplot` が起動されるとき，初期設定ファイルを読み込もうとします．この
  ファイルは Unix と AmigaOS では，`.gnuplot` であり，その他の処理系で
  は `GNUPLOT.INI` となっています．このファイルがカレントディレクトリに
@@ -2386,9 +2425,9 @@ C ... and restart the table:
  バッククォート (｀｀) はコマンドライン中の置換のためにシステムコマンド
  を囲むのに使います。`substitution` を参照。
 2 Time/Date data
+?time/date
 ^ <a name="Time/Date data"></a>
 ^ <a name="Time/date"></a>
-?time/date
  `gnuplot` は入力データとして時間/日付情報の使用をサポートしています。
  この機能は `set xdata time`, `set ydata time` などのコマンドによって有
  効になります。
@@ -2443,6 +2482,806 @@ C ... and restart the table:
  ここで、x 軸の目盛りの見出しは "03/21" のように表示されます。
 
  各コマンドの詳細はそれぞれの項の記述を参照してください。
+1 plotting styles
+?plotting styles
+
+ gnuplot では、たくさんの描画スタイルが利用できます。
+ それらは、アルファベット順に以下に紹介されています。
+ コマンド `set style data` と `set style function` は、それ以降の 
+ `plot` や `splot` コマンドに対してデフォルトの描画スタイルを変更
+ します。
+
+ 描画スタイルは、コマンド `plot` や `splot` の一部分として、明示的にオ
+ プション指定することもできます。一つの描画の中で、複数の描画スタイルを
+ 組み合わせたい場合は、各要素に対して描画スタイルを指定する必要がありま
+ す。
+
+ 例:
+
+      plot 'data' with boxes, sin(x) with lines
+
+ 各描画スタイルは、それ自体がデータファイルからのいくつかのデータの組
+ を期待します。例えば、デフォルトでは `lines` スタイルは、y の値だけの
+ 1 列のデータ (x の値は暗黙に順番に取られる)、または最初が x, 次が y の
+ 2 つの列を期待しています。ファイルの何列のデータを描画データと解釈させ
+ るうまい方法に関する情報については、`using` を参照してください。
+
+2 boxerrorbars
+?commands set style boxerrorbars
+?set style boxerrorbars
+?plotting styles boxerrorbars
+?style boxerrorbars
+?boxerrorbars
+ 描画スタイル `boxerrorbars` は 2 次元のデータ描画でのみ利用可能です。
+ これは `boxes` と `yerrorbars` スタイルの組合せです。これは、3 列、ま
+ たは 4 列、または 5 列のデータを使用します:
+
+      3 列:  x  y  ydelta
+      4 列:  x  y  ydelta xdelta        # 箱の幅 != -2
+      4 列:  x  y  ylow  yhigh          # 箱の幅 == -2
+      5 列:  x  y  ylow  yhigh  xdelta
+
+ y の誤差が "ydelta" の形式で与えられて、箱の横幅があらかじめ -2.0 に設
+ 定されて (`set boxwidth -2.0`) いなければ、箱の横幅は 4 列目の値で与え
+ られます。y の誤差が "ylow yhigh" の形式で与えられる場合は箱の横幅は 5
+ 列目の値で与えられます。特別な場合として、"ylow yhigh" の誤差形式の 4
+ 列のデータに対する `boxwidth = -2.0` という設定があります。この場合箱
+ の横幅は、隣接する箱にくっつくように自動的に計算されます。3 列のデータ
+ の場合も、横幅は自動的に計算されます。
+
+ 箱の高さは、`yerrorbars` スタイル同様に y の誤差の値から決定されます --
+ y-ydelta から y+ydelta まで、あるいは ylow から yhigh まで、これらは何
+ 列のデータが与えられているかによって決まります。
+ 以下も参照
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
+ errorbar デモ。
+^ </a>
+2 boxes
+?commands set style boxes
+?set style boxes
+?plotting styles boxes
+?style boxes
+?boxes
+ `boxes` スタイルは 2 次元描画でのみ利用可能です。これは与えられた x 座
+ 標を中心とし、x 軸から (グラフの境界から、ではありません) 与えられた y
+ 座標までの箱を書きます。これは基本的に、2 列、または 3 列のデータを使
+ 用します。余分な入力列は、variable 行や塗り潰し色の情報が提供されたも
+ のとして使用されます (`rgbcolor variable` 参照)。
+
+      2 列:  x  y
+      3 列:  x  y  x_width
+
+ 箱の幅は 3 つのうち一つの方法で決定されます。入力データが 3 列目のデー
+ タを持っている場合は、それが箱の幅にセットされます。そうでなくて
+ `set boxwidth` コマンドで箱の幅がセットされていた場合は、それが使われ
+ ます。そのどちらでもない場合、箱の幅は、隣接する箱がくっつくように自動
+ 的に計算されます。
+
+ 箱の中身は現在の塗りつぶしスタイル (fillstyle) に従って塗りつぶされま
+ す。詳細は `set style fill` を参照してください。新しい塗りつぶしスタイ
+ ルを plot コマンド上で指定することもできます。
+
+ 塗りつぶしスタイルが `empty` の場合は、箱は背景色で塗りつぶされます。
+
+ 塗りつぶしスタイルが `solid` の場合は、箱は現在の描画色でベタ塗りされ
+ ます。これには追加オプション <density> があり、それは塗りつぶし密度を
+ 意味し、0 は背景色、1 は描画色そのものになります。
+
+ 塗りつぶしスタイルが `pattern` の場合は、箱は現在の描画色であるパター
+ ンで塗りつぶされますが、出力ドライバがサポートしている必要があります。
+
+ 例:
+
+ データファイルを塗りつぶした箱で描画し、箱同士を少し垂直方向にスペース
+ を空ける (棒グラフ):
+
+       set boxwidth 0.9 relative
+       set style fill solid 1.0
+       plot 'file.dat' with boxes
+
+ パターンでの塗りつぶしスタイルの箱で sin と cos のグラフを描画:
+
+       set style fill pattern
+       plot sin(x) with boxes, cos(x) with boxes
+
+ sin はパターン 0 で、cos はパターン 1 で描画されます。追加される描画は
+ 出力ドライバがサポートするパターンを循環的に使用します。
+
+ それぞれのデータ集合で明示的に塗りつぶしスタイルを指定:
+
+      plot 'file1' with boxes fs solid 0.25, \
+           'file2' with boxes fs solid 0.50, \
+           'file3' with boxes fs solid 0.75, \
+           'file4' with boxes fill pattern 1, \
+           'file5' with boxes fill empty
+
+2 boxxyerrorbars
+?commands set style boxxyerrorbars
+?set style boxxyerrorbars
+?plotting styles boxxyerrorbars
+?style boxxyerrorbars
+?boxxyerrorbars
+ `boxxyerrorbars` スタイルは 2 次元のデータ描画でのみ利用可能です。これ
+ は、`xyerrorbars` スタイルが単に線分の交差で表現するところを長方形で表
+ 現することを除けば、ほぼ同じです。これは、入力データの 4 列、または 6
+ 列を使用します。余分な入力列は、variable 行や塗り潰し色の情報が提供さ
+ れたものとして使用されます (`rgbcolor variable` 参照)。
+
+      4 列:  x  y  xdelta  ydelta
+      6 列:  x  y  xlow  xhigh  ylow  yhigh
+
+ 箱の幅と高さは `xyerrorbars` スタイル同様 x, y の誤差から決定されます
+ つまり、xlow から xhigh までと ylow から yhigh まで、または x-xdelta
+ から x+xdelta までと y-ydelta から y+ydelta まで。これらは何列のデータ
+ が与えられているかによって決まります。
+
+ 箱の内部は現在の塗りつぶしスタイル (fillstyle) に従って塗られます。詳
+ 細は `set style fill` と `boxes` を参照してください。plot コマンド上で
+ 新しい塗りつぶしスタイルを指定することもできます。
+2 candlesticks
+?commands set style candlesticks
+?set style candlesticks
+?plotting styles candlesticks
+?style candlesticks
+?candlesticks
+ `candlesticks` スタイルは、金融データの 2 次元のデータ描画、および統計
+ データのひげ付きの棒グラフを生成するのに使えます。
+ 記号は、水平方向には x を中心とし、垂直方向には開始値 (open) と終値
+ (close) を境界とする長方形が使われます。そして、その x 座標のところに
+ 長方形のてっぺんから最高値 (high) までと、長方形の底から最安値 (low)
+ までの垂直線が引かれますが、この垂直線は最高値と最安値が入れ替わっても
+ 変更されません。
+
+ 基本的に 5 列のデータが必要です:
+
+       金融データ:   date  open  low  high  close
+       箱ひげ描画:   x  box_min  whisker_min  whisker_high  box_high
+
+ 長方形の幅はコマンド `set boxwidth` で制御できますが、以前の gnuplot
+ への後方互換性として、boxwidth パラメータが設定されていない場合は
+ `set bars <width>` で制御されるようになっています。
+
+ デフォルトでは、鉛直線分のてっぺんと底には垂直に交わる水平線は引かれま
+ せん。それを引きたい場合、例えば典型的な例は箱ひげ図 (box-and-whisker
+ plot) での使用ですが、描画コマンドにキーワード `whiskerbars` を追加し
+ てください。デフォルトでは、水平線は箱 (candlestick) の水平幅一杯に引
+ かれますが、それは全体の幅に対する割合を指定することで変更できます。
+
+ デフォルトでは長方形は (開始値)>(終値) の場合は空で、(開始値)<(終値)
+ の場合は 3 本の垂直線が入ります。箱の塗りつぶしが有効である場合、その
+ 長方形は `set style fill <fillstyle>` にしたがって塗りつぶされます。
+ `set bars`, `financebars` を参照してください。また、以下も参照してくだ
+ さい。
+^ <a href="http://gnuplot.sourceforge.net/demo/candlesticks.html">
+ 金融データのデモ
+^ </a>
+
+ 注意: 中央値を表すための記号などを追加したい場合、以下の例のように、ひ
+ げ付きの棒グラフに他の描画コマンドを追加する必要があります:
+
+   # データ列:  X '最小値' '1/4 位の値' '中央値' '3/4 位の値' '最大値'
+   set bars 4.0
+   set style fill empty
+   plot 'stat.dat' using 1:3:2:6:5 with candlesticks title 'Quartiles', \
+        ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
+
+   # ひげの上に水平線を伴う描画で、水平線の幅を全体幅の 50% にする
+   plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
+
+ `set boxwidth` と `set bars`, `set style fill` を参照してください。
+2 dots
+?commands set style dots
+?set style dots
+?plotting styles dots
+?style dots
+?dots
+ `dots` スタイルは各点に小さなドットを描画します。これはたくさんの点か
+ らなる散布図の描画に便利でしょう。2 次元描画では 1 列、または 2 列の入
+ 力データが、3 次元描画では 3 列のデータが必要です。
+
+      1 列:  y         # x は行番号から取得される
+      2 列:  x  y
+      3 列:  x  y  z   # 3D のみ (splot)
+
+ 出力形式によっては (post, pdf など)、ドットの大きさは linewidth を変更
+ することで制御できることもあります。
+2 filledcurves
+?commands set style filledcurves
+?set style filledcurves
+?plotting styles filledcurves
+?style filledcurves
+?filledcurves
+ スタイル `filledcurves` は 2 次元描画でのみ利用可能です。これは 3 種類
+ の異なる指定が可能です。最初の 2 種類は関数描画、あるいは 2 列の入力デ
+ ータ用のもので、後で紹介するようにオプションで更なる指定ができます。
+
+ 書式:
+
+     set style [data | function] filledcurves [option]
+     plot ... with filledcurves [option]
+
+ ここで、オプションは以下の通りです:
+
+     [closed | {above | below} {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
+
+ 最初のものは `closed` で、これは曲線それ自身を閉多角形と見なします。入
+ 力データが 2 列の場合にはこれがデフォルトです。
+
+ 2 種類目は指定された軸、あるいは水平線、垂直線、与えられた点などと、曲
+ 線との間に作られる領域を塗りつぶします。
+
+     filledcurves closed   ... 丁度閉曲線で囲まれる領域
+     filledcurves x1       ... x1 軸
+     filledcurves x2       ... x2 軸 (y1, y2 軸も同様)
+     filledcurves y1=0     ... (y1 軸での) 直線 y=0 i.e. x1 軸と平行
+     filledcurves y2=42    ... (y2 軸での) 直線 y=42 i.e. x2 軸と平行
+     filledcurves xy=10,20 ... x1,y1 軸での点 10,20 (扇型のような形状)
+
+ 3 種類目は 3 列の入力データを必要とし、それらは x 座標と、それに対する
+ 2 つの y 座標からなり、それらは同じ x 座標の集合に対する 2 つの曲線の
+ y 座標に対応します。そしてその 2 つの曲線の間の領域が塗りつぶされます。
+ 入力データが 3 列以上の場合にはこれがデフォルトです。
+
+      3 列:  x  y1  y2
+
+ 入力された 2 つの曲線の間の領域の塗りつぶしの例:
+^ <a href="http://www.gnuplot.info/demo/fillbetween.html">
+ 曲線間の塗りつぶしデモ。
+^ </a>
+
+     plot 'data' using 1:2:3 with filledcurves
+
+ `above` と `below` オプションは
+     ... filledcurves above {x1|x2|y1|y2}=<val>
+ および
+     ... using 1:2:3 with filledcurves below
+ の形のコマンドに適用可能です。どちらの場合でも、これらのオプションは
+ 塗りつぶし領域を、境界線、または境界曲線の片側に制限します。
+
+ 注意: この描画モードは全ての出力形式でサポートされるとは限りません。
+
+ データファイルから描かれた曲線の塗りつぶしを拡大すると、何もなくなった
+ り正しくない領域になることがありますが、それは gnuplot が、領域ではな
+ く点や線をクリッピングしているからです。
+
+ <a>, <x>, <y> が描画領域の外にある場合、それらはグラフの境界へ移動され
+ ます。よって、オプション xy=<x>,<y> を指定した場合の実際の塗りつぶし領
+ 域は、xrange や yrange に依存します。
+2 financebars
+?commands set style financebars
+?set style financebars
+?plotting styles financebars
+?style financebars
+?financebars
+ `financebars` スタイルは金融データの 2 次元のデータ描画でのみ利用可能
+ です。これは、x 座標 1 つ (通常日付) と、4 つの y 座標 (金額) を必要と
+ します。
+
+      5 列:   date  open  low  high  close
+
+ 記号は、水平方向にはその x 座標に置かれ、垂直方向には最高値 (high) と
+ 最安値 (low) を端とする線分が使われます。そして、その線分に水平左側の
+ 刻みが開始値 (open) の所に、水平右側の刻みが終り値 (close) の所につき
+ ます。その刻みの長さは `set bars` で変更できます。記号は最高値と最安値
+ が入れ替わっても変わりません。`set bars` と `candlesticks`、および以下
+ も参照してください。
+^ <a href="http://www.gnuplot.info/demo/finance.html">
+ 金融データデモ。
+^ </a>
+2 fsteps
+?commands set style fsteps
+?set style fsteps
+?plotting styles fsteps
+?style fsteps
+?fsteps
+ `fsteps` スタイルは 2 次元描画でのみ利用可能です。これは 2 本の線分で
+ 隣り合う点をつなぎます: 1 本目は (x1,y1) から (x1,y2) まで、2 本目は
+ (x1,y2) から (x2,y2) まで。
+ 以下も参照
+^ <a href="http://www.gnuplot.info/demo/steps.html">
+ steps デモ。
+^ </a>
+2 histeps
+?commands set style histeps
+?set style histeps
+?plotting styles histeps
+?style histeps
+?histeps
+ `histeps` スタイルは 2 次元描画でのみ利用可能です。これはヒストグラム
+ の描画での利用を意図しています。y の値は、x の値を中心に置くと考え、
+ x1 での点は ((x0+x1)/2,y1) から ((x1+x2)/2,y1) までの水平線として表現
+ されます。端の点では、その線はその x 座標が中心になるように延長されま
+ す。隣り合う点同士の水平線の端は、その両者の平均値のところでの鉛直線、
+ すなわち ((x1+x2)/2,y1) から ((x1+x2)/2,y2) の線分で結ばれます。
+
+ `autoscale` が有効である場合、x の範囲は、その延長された水平線の範囲で
+ はなく、データ点の範囲が選択されます。よって、端の点に関してはその水平
+ 線は半分しか描かれないことになります。
+ 以下も参照
+^ <a href="http://www.gnuplot.info/demo/steps.html">
+ steps デモ。
+^ </a>
+
+ `histeps` は単なる描画スタイルにすぎず、`gnuplot` には、ヒストグラムの
+ 箱を生成する能力や、データ集合から母集団を決定する能力などはありません。
+2 histograms
+?commands set style histogram
+?set style histogram
+?style histograms
+?plotting styles histograms
+?histograms
+ スタイル `histograms` は 2 次元描画でのみ有効です。これは、データの各
+ 列の並びから平行な棒グラフを作ります。`plot` コマンドの各要素は、それ
+ に関する目盛りの値や説明のタイトルが付属するかも知れませんが、単一の
+ 入力データを指定する必要があります (例えば入力ファイルの 1 つの列)。現
+ 在は、4 種類のヒストグラム形式のスタイルがサポートされています。
+
+       set style histogram clustered {gap <gapsize>}
+       set style histogram errorbars {gap <gapsize>} {<linewidth>}
+       set style histogram rowstacked
+       set style histogram columnstacked
+
+ デフォルトのスタイルは `set style histogram clustered gap 2` に対応し
+ ています。このスタイルでは、並列に指定されたデータの値の集合は、選択さ
+ れたデータ列のそのそれぞれの序列 (行番号) に対応する x 座標の場所に、
+ 各々箱のグループとして固められて置かれます。よって、<n> 個のデータ列を
+ 並列に指定した場合、最初の固まりは x=1 を中心とする <n> 個の箱の固まり
+ からなり、その各々の高さは、その <n> データ列各々の最初 (1 行目) の値
+ が取られます。その後に少し空白 (gap) が空けられ、次に各データ列の次 (2
+ 行目) の値に対応する箱の固まりが x=2 を中心として置かれます。以下同様
+ です。デフォルトの空白 (gap) 幅の 2 は、箱の固まり同士の間の空白が、箱
+ 2 つの幅に等しいことを意味します。同じ列に対する箱は全て同じ色または同
+ じパターンで与えられます (`set style fill` 参照)。
+
+ 箱の固まりそれぞれは、データファイルの 1 つの行から得られます。そのよ
+ うな入力ファイルの各行の最初の項目が見出し (ラベル) でることは良くある
+ ことです。その列にある見出し (ラベル) は、`using` に `xticlabels` オプ
+ ションをつけることで、それに対応する箱の固まりの真下の x 軸に沿ったと
+ ころに置くことができます。
+
+ `errorbars` スタイル は、各エントリに対して 2 列の入力を必要とする以外
+ は `clustered` スタイルにとても良く似ています。最初の列は `clustered`
+ スタイルの場合と全く同様に箱の高さ (y の値) として使われます。2 つ目の
+ 列は誤差の大きさとして扱われ、これは箱の天井に縦の誤差線を生成するのに
+ 使われます。誤差線の見た目は、現在の `set basrs` の値と <linewidth> オ
+ プション指定で制御できます。
+
+ 積み上げ型のヒストグラムも 2 つの形式がサポートされています。それらは
+ コマンド `set style histogram {rowstacked|columnstacked}` で選択できま
+ す。これらのスタイルにおいて、選択された列のデータの値は積み上げられた
+ 箱として集められます。デフォルトの積み上げモードは `rowstacked` です。
+
+ スタイル `rowstacked` は、まず最初に選択された列の各行の値を x 軸のそ
+ れぞれの位置に配置します: 1 行目の値は x=1 の箱、2 行目のは x=2、以下
+ 同様となります。2 番目以降に選択された列に対応する箱は、それらの上に積
+ み重ねられて行きます。そして結果として、x=1 にできる箱の積み重ねは、各
+ 列の最初の値 (1 行目の値) からなり、x=2 の箱の積み重ねは各列の 2 行目
+ の値、などのようになります。同じ列に対する箱は全て同じ色または同じパタ
+ ーンで与えられます (`set style fill` 参照)。
+
+ スタイル `columnstacked` も同様ですが、こちらは各箱の積み上げは (各行
+ のデータからではなく) 各列のデータからなります。最初に指定された列の各
+ 行のデータが x=1 の箱の積み上げを生成し、2 番目に指定した列の各行のデ
+ ータが x=2 の箱の積み上げ、などのようになります。このスタイルでは、各
+ 箱の色は、各データ項目の (列番号ではなく) 行番号から決定されます。
+
+ 箱の幅はコマンド `set boxwidth` で変更できます。
+ 箱の塗りつぶしスタイルはコマンド `set style fill` で設定できます。
+
+ histograms は x 軸は常に x1 軸を使いますが、y 軸に関しては y1 軸か y2
+ 軸かを選択できます。plot 命令が、histograms と他のスタイルの描画の両方
+ を含む場合、histogram でない方は、x1 軸を使うか x2 軸を使うかを選択で
+ きます。
+
+ 例:
+
+ 複数の列を持つデータファイルを箱の固まり型 (clustered) のヒストグラム
+ (デフォルトスタイル) で描画:
+
+       set boxwidth 0.9 relative
+       set style data histograms
+       set style fill solid 1.0 border -1
+       plot 'file.dat' using 2, '' using 4, '' using 6
+
+ これは、x 軸上の各整数値を中心とするそれぞれ 3 つの箱 (鉛直な棒) 毎の
+ 固まりによる描画を生成します。入力ファイルの最初の列にラベルが含まれて
+ いるならそれを、以下の少し変更したコマンドで x 軸に沿って配置できます。
+
+       plot 'file.dat' using 2, '' using 4, '' using 6:xticlabels(1)
+
+ ファイルが、各データの測定値と誤差評価の両方を含んでいる場合、描画に誤
+ 差線を追加することができます。以下のコマンドは誤差線を (y-<error>) か
+ ら (y+<error>) に引き、その頭に箱と同じ幅の水平線をつけます。誤差線と
+ 誤差線の端の線は、黒で線幅 2 で描画されます。
+
+       set bars fullwidth
+       set style histogram errorbars gap 2 lt -1 lw 2
+       plot 'file.dat' using 2:3, '' using 4:5, '' using 6:7:xticlabels(1)
+
+ 同じデータを行毎の積み上げ型 (rowstacked) のヒストグラムで描画:
+
+       set style histogram rows
+       plot 'file.dat' using 2, '' using 4, '' using 6:xtic(1)
+
+ これは、データファイルの 2,4,6 列目の値を高さに持つ 3 つの部分の積み上
+ げによる鉛直な棒からなる描画を生成します。
+
+ 最後に以下のコマンド
+
+       set style histogram columnstacked
+       plot 'file.dat' using 2, '' using 4, '' using 6
+
+ は、3 つの鉛直な積み重ねの棒を生成します。x=1 にある棒は、データファイ
+ ルの 2 列目の各行の値に対応する箱からなります。x=2 にある棒は、データ
+ ファイルの 4 列目の各行の値に対応する箱から、x=3 には 6 列目の各行の値
+ に対する箱からなります。これは、gnuplot の通常の入力の縦、横の解釈を入
+ れ換えることになりますので、key タイトルや x 軸の目盛りの見出しの指定
+ も変更する必要があります。
+
+       set style histogram columnstacked
+       plot '' u 5:key(1)            # 1 列目を key タイトルに使用
+       plot '' u 5 title columnhead  #
+3 newhistogram
+?newhistogram
+?histograms newhistogram
+?plotting style histograms newhistogram
+ 一回の描画に 1 つより多くのヒストグラムの組を作ることもできます。この
+ 場合、描画コマンド `newhistogram {"<title>"} {<linestyle>}` を使うこと
+ で、それらを強制的に分離し、またそれぞれのラベルを分離することができま
+ す。
+ 例:
+
+       set style histogram  cluster
+       plot newhistogram "Set A", 'a' using 1, '' using 2, '' using 3, \
+            newhistogram "Set B", 'b' using 1, '' using 2, '' using 3
+
+ ラベル "Set A" と "Set B" は、それぞれのヒストグラムの組の下、x 軸の全
+ てのラベルの下の位置に現われます。
+
+ コマンド newhistogram は、ヒストグラムの色付けを強制的に指定した色
+ (linetype) で始めるのにも使えます。デフォルトでは、色の番号はヒストグ
+ ラムの境界をまたいでさえも連続的に増加し続けます。次の例は、複数のヒス
+ トグラムに同じ色付けを施します。
+       plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
+            newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
+3 automated iteration over multiple columns
+?automated
+?histograms automated
+?styles histograms automated
+?plotting styles histograms automated
+ 一つのデータファイルのたくさんの列から、一つのヒストグラムを生成したい
+ 場合、plot の繰り返し (iteration) 機能を使うと便利でしょうから、
+ `iteration` を参照してください。例えば、3 列目から 8 列目までのデータ
+ を積み上げた形のヒストグラムを生成する例:
+
+       set style histogram columnstacked
+       plot for [i=3:8] "datafile" using i title columnhead
+2 image
+?commands set style image
+?set style image
+?plotting styles image
+?style image
+?image
+ スタイル `image` は 2 次元、または 3 次元描画グラフ上への 2 次元画像の
+ 射影用のものです。これは、3 次元データ (x,y,value) に対する `plot`、ま
+ たは射影された 4 次元データ (x,y,z,value) に対する `splot` の両方で使
+ 用できます。このとき、表示平面では、画像データは表示平面内の 2 方向
+ (必ずしも垂直でなくても良い) に関して等間隔のサンプリング格子を形成し
+ ていると仮定されます。それは言い換えれば、4 つの隣接点の組が常に同じ大
+ きさの平行四辺形を作ることを意味します。変数 `value` は、現在のパレッ
+ トに対するパレット色 (灰色値) を表します。
+
+ 入力 2 次元画像の各ピクセル (データ点) は、描画グラフ中では長方形、ま
+ たは平行六面体となります。画像の各データ点の座標は、平行六面体の中心を
+ 決定します。すなわち、M x N 個のデータ集合は M x N ピクセルの画像を生
+ 成します。これは、M x N 個のデータ集合が (M-1) x (N-1) 要素を作成する
+ pm3d の構造とはやや異なります。画像データの格子の走査方向は 8 つの組合
+ せの任意の一つが可能です。
+
+ `rgbimage` も参照してください。
+3 image failsafe
+?commands set style image failsafe
+?set style image failsafe
+?plotting styles image failsafe
+?style image failsafe
+?image failsafe
+?failsafe
+ 出力形式のドライバによっては、2 次元の長方形領域内での画像データのレン
+ ダリングを最適化するルーチンを提供している場合があります。しかし、その
+ ルーチンは不完全であることが知られています (それで、gnuplot version
+ 4.2 の画像サポートは「実験的な (EXPERIMENTAL)」というラベルがついてい
+ ます)。この最適化ルーチンは、キーワード `failsafe` を使うことで無効化
+ できます。例:
+
+       plot 'data' with image failsafe
+
+ 以下はいくつかの出力形式に関する特有の情報です:
+
+ x11 と wxt - ピクセルはディスプレイの解像度に合うように繰り返されるか
+       一定の割合で潰されるかされ、フィルタ用の処理は他に持っていませ
+       ん。よって、かなり高い面積の割合の画像が潰される場合、エイリアシ
+       ングが起こる可能性があります。
+
+ postscript (pslatex, epslatex, pstex) - 標本化補間機能は無効になり、画
+       像は元の解像度のままコピーされます。
+
+ `rgbimage` も参照してください。
+2 impulses
+?commands set style impulses
+?set style impulses
+?plotting styles impulses
+?style impulses
+?impulses
+ `impulses` スタイルは、x 軸 (2 次元)、または xy 平面 (3 次元) から各入
+ 力データ点への垂直な線分を表示します。このスタイルを 3 次元描画で使用
+ する場合、太い線 (linewidth > 1) を利用するとより効果的でしょう。
+
+      1 列:  y        # 行番号による暗黙の x 座標 (2D)
+      2 列:  x  y     # [x,0] から [x,y] への線 (2D)
+      3 列:  x  y  z  # [x,y,0] から [x,y,z] への線 (3D)
+
+2 labels
+?commands set style labels
+?set style labels
+?plotting styles labels
+?style labels
+?labels
+ スタイル `labels` は、データファイルから座標と文字列を読み込み、その文
+ 字列をその 2 次元、または 3 次元座標に置きます。これは基本的に 3 列、
+ または 4 列の入力を必要とします。余分な入力列は、文字色の変更などの情
+ 報が提供されたものとして使用されます (`rgbcolor variable` 参照)。
+
+      3 列:  x  y  string    # 2 次元版
+      4 列:  x  y  z  string # 3 次元版
+
+ フォント、色、回転角やその他の描画テキストの属性は追加オプションとして
+ 指定可能です (`set label` 参照)。次の例は、入力ファイルの 4 列目をテキ
+ ストラベルとして取り出して 2 次元描画を行ないます (`tc lt 2` は 
+ `textcolor linetype 2` の省略形で、これは緑です)。
+
+   plot 'datafile' using 1:(0.5 * $2):4 with labels font "arial,11" tc lt 2
+
+ スタイル `labels` は 3 次元描画でも使用できます。この場合 X,Y,Z と文字
+ 列、の 4 つの入力列指定が必要です。
+
+   splot 'datafile' using 1:2:3:4 with labels
+
+ `datastrings`, `set style data` も参照してください。
+2 lines
+?commands set style lines
+?set style lines
+?plotting styles lines
+?style lines
+?lines
+ `lines` スタイルは隣接する点を真直な線分で結びます。
+ これは、2 次元描画でも、3 次元描画でも使用でき、基本的には、1 列か 2
+ 列か 3 列かの入力データを必要とします。
+ 余分な入力列は、線の色の変更などの情報が提供されたものとして使用されま
+ す (`rgbcolor variable` 参照)。
+
+ 2 次元の場合
+      1 列:  y           # 行番号による暗黙の x の値
+      2 列:  x  y
+ 3 次元の場合
+      1 列:  z           # x は暗黙の行番号、y は index から
+      3 列:  x  y  z
+
+ `linetype`, `linewidth`, `linestyle` も参照してください。
+2 linespoints
+?commands set style linespoints
+?commands set style lp
+?set style linespoints
+?plotting styles linespoints
+?set style lp
+?style linespoints
+?style lp
+?linespoints
+?lp
+ `linespoints` スタイルは `lines` と `points` の両方を行ないます。すな
+ わち、各点に小さな記号をつけ、そして隣接する点を真直な線分で結びます。
+ コマンド `set pointsize` を使って点 (point) の記号の大きさを変更できま
+ す。その使い方については `set pointsize` を参照してください。
+ 基本的に 2 次元描画では 1 列、または 2 列の入力データが必要で、3 次元
+ 描画では 1 列、または 3 列のデータが必要です。`style lines` を参照して
+ ください。余分な入力列は、点のサイズや線の色の変更などの情報が提供され
+ たものとして使用されます。
+
+ `linespoints` は `lp` と略すことが出来ます。
+2 points
+?commands set style points
+?set style points
+?plotting styles points
+?style points
+?points
+ `points` スタイルは各点に小さな記号を表示します。その記号のデフォルト
+ の大きさを変更するにはコマンド `set pointsize` が使えます。
+ 基本的に 2 次元描画では 1 列、または 2 列の入力データが必要で、3 次元
+ 描画では 1 列、または 3 列のデータが必要です。`style lines` を参照して
+ ください。余分な入力列は、点のサイズや色の変更などの情報が提供されたも
+ のとして使用されます。
+2 steps
+?commands set style steps
+?set style steps
+?plotting styles steps
+?style steps
+?steps
+ `steps` スタイルは 2 次元描画でのみ利用可能です。これは 2 本の線分で
+ 隣り合う点をつなぎます: 1 本目は (x1,y1) から (x2,y1) まで、2 本目は
+ (x2,y1) から (x2,y2) まで。
+ 以下も参照
+^ <a href="http://www.gnuplot.info/demo/steps.html">
+ steps デモ。
+^ </a>
+2 rgbimage
+?commands set style rgbimage
+?set style rgbimage
+?plotting styles rgbimage
+?style rgbimage
+?rgbimage
+ スタイル `rgbimage` は 2 次元画像の描画用で、概念上は `image` に似てい
+ ます。詳細は `image` を参照してください。その違いは、`plot` では
+ (x,y,r,g,b) の 5 次元データが、`splot` では (x,y,z,r,g,b) の 6 次元デ
+ ータが必要で、それらが座標と画像のカラー成分を意味します。
+
+ `image` も参照してください。
+2 vectors
+?commands set style vectors
+?set style vectors
+?plotting styles vectors
+?style vectors
+?vectors
+ 2 次元の `vectors` スタイルは (x,y) から (x+xdelta,y+ydelta) までのベ
+ クトルを書きます。3 次元の `vectors` スタイルも同様ですが、データは基
+ 本的に 6 列必要です。各ベクトルの先端には小さな矢先も書かれます。
+
+      4 列:  x  y  xdelta  ydelta
+      6 列:  x  y  z  xdelta  ydelta  zdelta
+
+ vectors スタイルを使っての splot は `set mapping cartesian` のみでサポ
+ ートされています。キーワード "with vectors" は arrow スタイルの指定子
+ を後ろに伴うことができます。詳細は `arrowstyle` を参照してください。
+
+ 例:
+       plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
+       splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
+
+ `set clip one` と `set clip two` は 2 次元のベクトルの描画に影響を与え
+ ます。詳細は `set clip` と `arrowstyle` を参照してください。
+2 xerrorbars
+?commands set style xerrorbars
+?set style xerrorbars
+?plotting styles xerrorbars
+?style xerrorbars
+?xerrorbars
+ `xerrorbars` スタイルは 2 次元のデータ描画のみで利用可能です。
+ `xerrorbars` は、水平の誤差指示線 (error bar) が表示される以外は
+ `dots` と同じです。各点 (x,y) において (xlow,y) から (xhigh,y) まで、
+ または (x-xdelta,y) から (x+xdelta,y) までの線分が引かれますが、これら
+ はいくつのデータ列が与えられるかによって変わります。誤差指示線の端には
+ 刻みの印が付けられます (`set bars` が使われていなければ。詳細に関して
+ は `set bars` を参照してください)。このスタイルは基本的に、3 列か 4 列
+ のデータが必要です:
+
+      3 列:  x  y  xdelta
+      4 列:  x  y  xlow  xhigh
+
+2 xyerrorbars
+?commands set style xyerrorbars
+?set style xyerrorbars
+?plotting styles xyerrorbars
+?style xyerrorbars
+?xyerrorbars
+ `xyerrorbars` スタイルは 2 次元のデータ描画のみで利用可能です。
+ `xyerrorbars` は、水平、垂直の誤差指示線 (error bar) も表示される以外
+ は `dots` と同じです。各点 (x,y) において (x,y-ydelta) から (x,y+ydelta)
+ までと (x-xdelta,y) から (x+xdelta,y) まで、または (x,ylow) から
+ (x,yhigh) までと (xlow,y) から (xhigh,y) までの線分が引かれますが、こ
+ れらはいくつのデータ列が与えられるかによって変わります。誤差指示線の端
+ には刻みの印が付けられます (`set bars` が使われていなければ。詳細に関
+ しては `set bars` を参照してください)。これは 4 列か、6 列のデータが必
+ 要です。
+
+      4 列:  x  y  xdelta  ydelta
+      6 列:  x  y  xlow  xhigh  ylow  yhigh
+
+ データが、サポートされていない混合型の形式で与えられた場合、`plot` コ
+ マンドの `using` フィルタを使って適切な形に直さないといけません。例え
+ ばデータが (x,y,xdelta,ylow,yhigh) という形式である場合、以下のように
+ します:
+
+       plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
+2 yerrorbars
+?commands set style yerrorbars
+?commands set style errorbars
+?plotting styles yerrorbars
+?plotting styles errorbars
+?set style yerrorbars
+?set style errorbars
+?style yerrorbars
+?style errorbars
+?yerrorbars
+ `yerrorbars` (または `errorbars`) スタイルは 2 次元のデータ描画のみで
+ 利用可能です。`yerrorbars` は、垂直の誤差指示線 (error bar) が表示され
+ る以外は `points` に似ています。各点 (x,y) において (x,y-ydelta) から
+ (x,y+ydelta) まで、または (x,ylow) から (x,yhigh) までの線分が引かれま
+ すが、これらはいくつのデータ列が与えられるかによって変わります。誤差指
+ 示線の端には刻みの印が付けられます (`set bars` が使われていなければ。
+ 詳細に関しては `set bars` を参照してください)。これは、3 列か 4 列のデ
+ ータが必要です。
+
+      3 列:  x  y  ydelta
+      4 列:  x  y  ylow  yhigh
+
+ 以下も参照
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
+ errorbar デモ。
+^ </a>
+2 xerrorlines
+?commands set style xerrorlines
+?set style xerrorlines
+?plotting styles xerrorlines
+?style xerrorlines
+?xerrorlines
+ `xerrorlines` スタイルは 2 次元のデータ描画のみで利用可能です。
+ `xerrorlines` は `linespoints` に似ていますが、水平の誤差線が描かれる
+ ことが違います。各点 (x,y) で、データ列の個数に応じて (xlow,y) から
+ (xhigh,y) まで、または (x-xdelta,y) から (x+xdelta,y) までの線分が描か
+ れ、そして刻の印が誤差線の端に置かれます (`set bars` が使われていない
+ 場合 -- 詳細は `set bars` 参照)。基本的には、3 列か 4 列のデータが必要
+ です:
+
+      3 列:  x  y  xdelta
+      4 列:  x  y  xlow  xhigh
+
+2 xyerrorlines
+?commands set style xyerrorlines
+?set style xyerrorlines
+?plotting styles xyerrorlines
+?style xyerrorlines
+?xyerrorlines
+ `xyerrorlines` スタイルは 2 次元のデータ描画のみで利用可能です。
+ `xyerrorlines` は `linespoints` に似ていますが、水平と垂直の誤差線も描
+ かれることが違います。各点 (x,y) で、データ列の個数に応じて、
+ (x,y-ydelta) から (x,y+ydelta) までと (x-xdelta,y) から (x+xdelta,y)
+ まで、あるいは (x,ylow) から (x,yhigh) までと (xlow,y) から (xhigh,y)
+ までの線分が描かれ、そして刻の印が誤差線の端に置かれます (`set bars`
+ が使われていない場合 -- 詳細は `set bars` 参照)。これは、4 列か 6 列の
+ 入力データが必要です。
+
+      4 列:  x  y  xdelta  ydelta
+      6 列:  x  y  xlow  xhigh  ylow  yhigh
+
+ データが、サポートされていない混合型の形式で与えられた場合、`plot` コ
+ マンドの `using` フィルタを使って適切な形に直さないといけません。例え
+ ばデータが (x,y,xdelta,ylow,yhigh) という形式である場合、以下のように
+ します:
+
+       plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
+2 yerrorlines
+?commands set style yerrorlines
+?commands set style errorlines
+?plotting styles yerrorlines
+?plotting styles errorlines
+?set style yerrorlines
+?set style errorlines
+?style yerrorlines
+?style errorlines
+?yerrorlines
+ `yerrorlines` (または `errorlines`) スタイルは 2 次元のデータ描画のみ
+ で利用可能です。`yerrorlines` は `linespoints` に似ていますが、垂直の
+ 誤差線が描かれることが違います。各点 (x,y) で、データ列の個数に応じて
+ (x,y-ydelta) から (x,y+ydelta) まで、または (x,ylow) から (x,yhigh)
+ までの線分が描かれ、そして刻の印が誤差線の端に置かれます (詳細は
+ `set bars` 参照)。
+ これは、3 列か 4 列の入力が必要です。
+
+      3 列:  x  y  ydelta
+      4 列:  x  y  ylow  yhigh
+
+ 以下も参照。
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
+ エラーバーのデモ
+^ </a>
 1 Commands
 ?commands
  このセクションでは `gnuplot` が受け付けるコマンドをアルファベット順に
@@ -3232,8 +4071,7 @@ C ... and restart the table:
  `plot` と `splot` は多くの共通の特徴点を持ちますが、その違いについては
  `splot` の項を参照してください。特に注意しておきますが、
  `binary <binary list>` オプションは `plot`, `splot` の両方で動作します
- が、両者には小さな違いがありますし、`plot` の `axes` オプションは
- `splot` には存在しません。
+ が、両者には小さな違いがあります。
 
  書式:
      plot {<範囲 (ranges)>}
@@ -3251,20 +4089,25 @@ C ... and restart the table:
  関数とパラメータは `plot` コマンド自身の上で定義をすることも可能です。
  これは単に他の項目とコンマで分離して記述することでなされます。
 
- 軸は、4 種類の組が利用できます; キーワード <軸> は、特定の直線をどの軸
- に尺度を合わせるか、ということを選択するのに使われます。`x1y1` は下の
- 軸と左の軸を指定; `x2y2` は上と右の軸の指定; `x1y2` は下と右の軸の指定;
- `x2y1` は上と左の軸の指定です。`plot` コマンドで指定された範囲は、この
- 最初の軸の組 (下と左) にのみ適用されます。
-
  例:
        plot sin(x)
+       plot sin(x), cos(x)
        plot f(x) = sin(x*a), a = .2, f(x), a = .4, f(x)
+       plot "datafile.1" with lines, "datafile.2" with points
        plot [t=1:10] [-pi:pi*2] tan(t), \
             "data.1" using (tan($2)):($3/$4) smooth csplines \
                      axes x1y2 notitle with lines 5
 
  `show plot` も参照してください。
+3 axes
+?commands plot axes
+?plot axes
+?axes
+ 軸は、4 種類の組が利用できます; キーワード <軸> は、特定の直線をどの軸
+ に尺度を合わせるか、ということを選択するのに使われます。`x1y1` は下の
+ 軸と左の軸を指定; `x2y2` は上と右の軸の指定; `x1y2` は下と右の軸の指定;
+ `x2y1` は上と左の軸の指定です。`plot` コマンドで指定された範囲は、この
+ 最初の軸の組 (下と左) にのみ適用されます。
 3 data
 ?commands plot datafile
 ?plot datafile
@@ -3314,8 +4157,9 @@ C ... and restart the table:
  見なされます:
        1.0 "second column" 3.0
 
- データは、指数部に e, E, d, D, q, Q の文字をつけた指数表記で書かれてい
- ても構いません。
+ データは、指数部に e, E の文字をつけた指数表記で書かれていても構いませ
+ ん。コマンド `set datafile fortran` が有効な場合は、fortran の指数指定
+ 子 d, D, q, Q も使えます。
 
  必要であるのはただ一つの列 (y の値) のみです。もし x の値が省略された
  ら、`gnuplot` はそれを 0 で始まる整数値として用意します。
@@ -3944,6 +4788,24 @@ C ... and restart the table:
 ?plot special-filenames
 ?datafile special-filenames
 ?special-filenames
+ 特別な意味を持つファイル名として、次の 3 つがあります: '', '-', '+'
+
+ 空のファイル名 '' は、同じ plot コマンド上で、直前の入力ファイルを再び
+ 使用することを gnuplot に指示します。よって、同じ入力ファイルの 2 つの
+ データ列を描画するには以下のようにします:
+
+       plot 'filename' using 1:2, '' using 1:3
+
+ '+' という特別なファイル名は、`using` 指定の全体と描画スタイルにインラ
+ イン関数を使えるようにするための仕組みです。通常、関数描画はサンプル点
+ 毎に単一の y (または z) の値しか持てません。しかし疑似ファイル '+' は
+ それがあたかも実際の入力ファイルであるように、`using` 指定による 1 列
+ 目 (plot の場合) 又は 1,2 列目 (splot の場合) の値を標本点として扱い、
+ さらに追加の列の値を指定することも可能です。
+ 例:
+
+       plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
+
  `'-'` という特別なファイル名は、データがインラインであることを指示し
  ます。すなわち、データをコマンドの後に続けて指定します。このときはデ
  ータのみがコマンドに続き得ます。よって、`plot` コマンドに対するフィル
@@ -4794,9 +5656,9 @@ C ... and restart the table:
  による出力ファイルの指定、および `set loadpath` や `set fontpath` によ
  るディレクトリパスの設定。
 2 save
-^ <a name="save set"></a>
 ?commands save
 ?save
+^ <a name="save set"></a>
  `save` コマンドは、ユーザ定義関数、変数、`set term` の状態、`set` で設
  定する全てのオプションのいずれかか、あるいはこれらすべてと、それに加え
  て最後に実行した `plot` (または `splot`) コマンドを、指定したファイル
@@ -5664,7 +6526,7 @@ C ... and restart the table:
  ユーザ定義レベルの等高線のデモ (discrete.dem).
 ^ </a>
 3 data style
-?DUMMYLABEL set style data
+?set data style
  このコマンドの形式は現在は推奨されていません。`set style data` を参照
  してください。
 3 datafile
@@ -6230,20 +7092,21 @@ C ... and restart the table:
        %A           曜日名 (Sunday,Monday,...)
        %b, %h       月名の省略形 (Jan,Feb,...)
        %B           月名 (January,February,...)
-       %d           日 (1--31)
-       %D           "%m/%d/%y" の簡略形
+       %d           日 (01--31)
+       %D           "%m/%d/%y" の簡略形 (出力のみ)
+       %F           "%Y-%m-%d" の簡略形 (出力のみ)
        %k           時 (0--23; 1 桁または 2 桁)
        %H           時 (00--23; 常に 2 桁)
        %l           時 (1--12; 1 桁または 2 桁)
        %I           時 (01--12; 常に 2 桁)
        %j           その年の通算日 (1--366)
-       %m           月 (1--12)
+       %m           月 (01--12)
        %M           分 (0--60)
        %p           "am" または "pm"
-       %r           "%I:%M:%S %p" の簡略形
-       %R           "%H:%M" の簡略形
+       %r           "%I:%M:%S %p" の簡略形 (出力のみ)
+       %R           "%H:%M" の簡略形 (出力のみ)
        %S           秒 (0--60)
-       %T           "%H:%M:%S" の簡略形
+       %T           "%H:%M:%S" の簡略形 (出力のみ)
        %U           その年の通算週 (週は日曜日からと数える)
        %w           曜日番号 (0--6, 日曜 = 0)
        %W           その年の通算週 (週は月曜日からと数える)
@@ -6258,7 +7121,8 @@ C ... and restart the table:
 #\verb@%b@, \verb@%h@ & 月名の省略形 (Jan,Feb,...) \\
 #\verb@%B@ & 月名 (January,February,...) \\
 #\verb@%d@ & 日 (1--31) \\
-#\verb@%D@ & \verb@"%m/%d/%y"@ の簡略形 \\
+#\verb@%D@ & \verb@"%m/%d/%y"@ の簡略形 (出力のみ)\\
+#\verb@%F@ & \verb@"%Y-%m-%d"@ の簡略形 (出力のみ)\\
 #\verb@%k@ & 時 (0--23; 1 桁または 2 桁) \\
 #\verb@%H@ & 時 (00--23; 常に 2 桁) \\
 #\verb@%l@ & 時 (1--12; 1 桁または 2 桁) \\
@@ -6267,10 +7131,10 @@ C ... and restart the table:
 #\verb@%m@ & 月 (1--12) \\
 #\verb@%M@ & 分 (0--60) \\
 #\verb@%p@ & "am" または "pm" \\
-#\verb@%r@ & \verb@"%I:%M:%S %p"@ の簡略形 \\
-#\verb@%R@ & \verb@"%H:%M"@ の簡略形 \\
+#\verb@%r@ & \verb@"%I:%M:%S %p"@ の簡略形 (出力のみ)\\
+#\verb@%R@ & \verb@"%H:%M"@ の簡略形 (出力のみ)\\
 #\verb@%S@ & 秒 (0--60) \\
-#\verb@%T@ & \verb@"%H:%M:%S"@ の簡略形 \\
+#\verb@%T@ & \verb@"%H:%M:%S"@ の簡略形 (出力のみ)\\
 #\verb@%U@ & その年の通算週 (週は日曜日からと数える) \\
 #\verb@%w@ & 曜日番号 (0--6, 日曜 = 0) \\
 #\verb@%W@ & その年の通算週 (週は月曜日からと数える) \\
@@ -6284,7 +7148,8 @@ C ... and restart the table:
 %%b, %h@月名の省略形 (Jan,Feb,...)
 %%B@月名 (January,February,...)
 %%d@日 (1--31)
-%%D@"%m/%d/%y" の簡略形
+%%D@"%m/%d/%y" の簡略形 (出力のみ)
+%%F@"%Y-%m-%d" の簡略形 (出力のみ)
 %%k@時 (0--23; 1 桁または 2 桁)
 %%H@時 (00--23; 常に 2 桁)
 %%l@時 (1--12; 1 桁または 2 桁)
@@ -6293,10 +7158,10 @@ C ... and restart the table:
 %%m@月 (1--12)
 %%M@分 (0--60)
 %%p@"am" または "pm"
-%%r@"%I:%M:%S %p" の簡略形
-%%R@"%H:%M" の簡略形
+%%r@"%I:%M:%S %p" の簡略形 (出力のみ)
+%%R@"%H:%M" の簡略形 (出力のみ)
 %%S@秒 (0--60)
-%%T@"%H:%M:%S" の簡略形
+%%T@"%H:%M:%S" の簡略形 (出力のみ)
 %%U@その年の通算週 (週は日曜日からと数える)
 %%w@曜日番号 (0--6, 日曜 = 0)
 %%W@その年の通算週 (週は月曜日からと数える)
@@ -6322,6 +7187,7 @@ C ... and restart the table:
  日時のデータが "98/07/06 05:04:03" の場合
        set format x "%1y/%2m/%3d %01H:%02M:%03S"  # "98/ 7/  6 5:04:003"
 3 function style
+?set function style
  このコマンドの形式は現在は推奨されていません。`set style function` を
  参照してください。
 3 functions
@@ -7151,8 +8017,10 @@ C ... and restart the table:
  その座標を書くかどうかを決定し、デフォルトでは ON になっています。
 
  オプション `noruler` と `ruler` は、定規 (ruler) 機能を off, on にしま
- す。`ruler` には座標を与えることもできます。これは、デフォルトのキー割
- り当て 'r' に対応します。
+ す。`ruler` には座標を与えて原点を設定することもできます。`ruler` が
+ on の間、ruler の原点からマウスまでのユーザ単位での距離が連続的に表示
+ されます。デフォルトでは、ruler のトグルスイッチは 'r' にキー割り当て
+ されています。
 
  オプション `polardistance` は、マウスカーソルから定規 (ruler) までの距
  離を極座標でも表示 (距離、および角度または傾き) するかどうかを決定しま
@@ -7237,6 +8105,7 @@ C ... and restart the table:
  書式:
        set multiplot { layout <rows>,<cols>
                        {rowsfirst|columnsfirst} {downwards|upwards}
+                       {title <page title>}
                        {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}}
                      }
        unset multiplot
@@ -7260,6 +8129,10 @@ C ... and restart the table:
  (timestamp) だとしたら、`set multiplot` と `unset multiplot` で囲まれ
  たブロック内の `plot` (または `splot`, `replot`) 命令の一つを `set time`
  と `unset time` ではさんでください。
+
+ multiplot のタイトルは、個々の描画タイトルがあったとしても、それとは別
+ のもので、ページの上部にそのためのキャンバス全体の幅にわたるスペースが
+ 確保されます。
 
  layout が指定されていない場合、あるいはより良い位置合わせをしたい場合
  は、コマンド `set origin` と `set size` 各描画で正しい位置に設定する必
@@ -8443,6 +9316,7 @@ C ... and restart the table:
 3 style
 ?set style
 ?show style
+?unset style
 ^ <a name="set style <style>"></a>
  デフォルトの描画スタイルは、`set style data` と `set style function`
  で設定できます。関数やデータのデフォルトの描画スタイルを個々に変更す
@@ -8795,55 +9669,6 @@ C ... and restart the table:
  は、RGB カラーをサポートするすべての出力形式で、ラインスタイル 10 に実
  線の水色を割り当てます。
 
-4 plotting styles
-?plotting styles
-
- コマンド `set style data` と `set style function` は、その後の `plot`
- や `splot` コマンドのデフォルトの描画スタイルを変更します。
-
- 線 (line) や点 (point) スタイルで使われる種類 (線で言えば実線、点線、
- 色など、点で言えば丸、四角、バツなど) は、`plot` や `splot` コマンドで
- 明示的に指定されたものになるか、または使用している出力形式が利用可能な
- ものから順番に選ばれたものになります。どんなものが使えるかはコマンド
- `test` でチェックしてください。
-
- 2 列より多くの情報を必要とするスタイル (例えば `errorbars` や
- `errorlines`) はいずれも `splot` や 関数の `plot` には使うことはできま
- せん。`boxes`, `filledcurves`, およびいくつかある `steps` スタイルは
- `splot` で使うことはできません。適切でないスタイルが指定された場合、そ
- れは `points` に変更されます。
-
- 上の警告は、`plot with labels` には適用されず、この場合 3 列目のデータ
- は座標の情報ではなくデータの出典を指します。`set style labels` を参照。
-
- 2 列より多い 2 次元データに対しては、`gnuplot` は `errobars` か
- `errorlines` スタイルを選択しようとしますが、`plot` コマンドのオプショ
- ン `using` を使えば、使いたいスタイルにあわせて、適切な列のデータを使
- うように設定できます (この議論の中で、"列 (column)" は、データファイル
- の各行の列と、`using` リスト中の項目の 2 つの意味で使われています)。
-
- 3 列のデータは、`xerrorbars`, `yerrorbars` (または `errorbars`),
- `xerrorlines`, `yerrorlines` (または `errorlines`), `boxes`,
- `boxerrorbars` のみが扱えます。他の描画スタイルが指定された場合、それ
- は `yerrorbars` に変更されます。スタイル `boxerrorbars` の箱の横幅は自
- 動的に計算されます。
-
- 4 列のデータは、`xerrorbars`, `yerrorbars` (または `errorbars`),
- `xyerrorbars`, `xerrorlines`, `yerrorlines` (または `errorlines`),
- `xyerrorlines`, `boxxyerrorbars`, `boxerrorbars` のみが扱えます。不適
- 切な描画スタイルは `yerrorbars` に変更されます。
-
- 5 列のデータは、`boxerrorbars`, `financebars`, `candlesticks` スタイル
- のみが扱えます。不適切な描画スタイルは、描画の前に `boxerrorbars` に変
- 更されます。
-
- 6 列のデータは、`xyerrorbars`, `xyerrorlines`, `boxxyerrorbars` スタイ
- ルのみが扱えます。不適切な描画スタイルは、描画の前に `xyerrorbars` に
- 変更されます。
-
- 線を含む/含まない誤差線表示 (error bar) についてのより詳しい情報は、
- `plot errorlines` と `plot errorbars` を参照してください。
-
 4 set style rectangle
 ?commands set style rectangle
 ?commands unset style rectangle
@@ -8869,688 +9694,6 @@ C ... and restart the table:
 
  デフォルトの設定は、背景色での塗り潰しで、境界は黒になっています。
 
-5 boxerrorbars
-?commands set style boxerrorbars
-?set style boxerrorbars
-?plotting styles boxerrorbars
-?style boxerrorbars
-?boxerrorbars
- 描画スタイル `boxerrorbars` は 2 次元のデータ描画でのみ利用可能です。
- これは `boxes` と `yerrorbars` スタイルの組合せです。y の誤差が
- "ydelta" の形式で与えられて、箱の横幅があらかじめ -2.0 に設定されて
- (`set boxwidth -2.0`) いなければ、箱の横幅は 4 列目の値で与えられます。
- y の誤差が "ylow yhigh" の形式で与えられる場合は箱の横幅は 5 列目の値
- で与えられます。特別な場合として、"ylow yhigh" の誤差形式の 4 列のデー
- タに対する `boxwidth = -2.0` という設定があります。この場合箱の横幅は、
- 隣接する箱にくっつくように自動的に計算されます。3 列のデータの場合も、
- 横幅は自動的に計算されます。
-
- 箱の高さは、`yerrorbars` スタイル同様に y の誤差の値から決定されます --
- y-ydelta から y+ydelta まで、あるいは ylow から yhigh まで、これらは何
- 列のデータが与えられているかによって決まります。
- 以下も参照
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
- errorbar デモ。
-^ </a>
-5 boxes
-?commands set style boxes
-?set style boxes
-?plotting styles boxes
-?style boxes
-?boxes
- `boxes` スタイルは 2 次元描画でのみ利用可能です。これは与えられた x 座
- 標を中心とし、x 軸から (グラフの境界から、ではありません) 与えられた y
- 座標までの箱を書きます。箱の幅は 3 つのうち一つの方法で決定されます。
- それがデータの描画で、かつファイルが 3 列目のデータを持っている場合は
- それが箱の幅にセットされます。そうでなくて `set boxwidth` コマンドで箱
- の幅がセットされていた場合それが使われます。そのどちらでもない場合、箱
- の幅は、隣接する箱がくっつくように自動的に計算されます。
-
- 箱の中身は現在の塗りつぶしスタイル (fillstyle) に従って塗りつぶされま
- す。詳細は `set style fill` を参照してください。新しい塗りつぶしスタイ
- ルを plot コマンド上で指定することもできます。
-
- 塗りつぶしスタイルが `empty` の場合は、箱は背景色で塗りつぶされます。
-
- 塗りつぶしスタイルが `solid` の場合は、箱は現在の描画色でベタ塗りされ
- ます。これには追加オプション <density> があり、それは塗りつぶし密度を
- 意味し、0 は背景色、1 は描画色そのものになります。
-
- 塗りつぶしスタイルが `pattern` の場合は、箱は現在の描画色であるパター
- ンで塗りつぶされますが、出力ドライバがサポートしている必要があります。
-
- 例:
-
- データファイルを塗りつぶした箱で描画し、箱同士を少し垂直方向にスペース
- を空ける (棒グラフ):
-
-       set boxwidth 0.9 relative
-       set style fill solid 1.0
-       plot 'file.dat' with boxes
-
- パターンでの塗りつぶしスタイルの箱で sin と cos のグラフを描画:
-
-       set style fill pattern
-       plot sin(x) with boxes, cos(x) with boxes
-
- sin はパターン 0 で、cos はパターン 1 で描画されます。追加される描画は
- 出力ドライバがサポートするパターンを循環的に使用します。
-
- それぞれのデータ集合で明示的に塗りつぶしスタイルを指定:
-
-      plot 'file1' with boxes fs solid 0.25, \
-           'file2' with boxes fs solid 0.50, \
-           'file3' with boxes fs solid 0.75, \
-           'file4' with boxes fill pattern 1, \
-           'file5' with boxes fill empty
-
- 現在、以下の出力ドライバのみが `empty` 以外の塗りつぶしスタイルをサポ
- ートしています:
- x11, windows, pm, wxt, postscript, fig, pbm, png, gif, hpdj, hppj,
- hpljii, hp500c, jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800,
- okidata, starc, tandy_60dpi。BeOS ドライバ (`be`) はまだテストされてい
- ません。
-5 boxxyerrorbars
-?commands set style boxxyerrorbars
-?set style boxxyerrorbars
-?plotting styles boxxyerrorbars
-?style boxxyerrorbars
-?boxxyerrorbars
- `boxxyerrorbars` スタイルは 2 次元のデータ描画でのみ利用可能です。これ
- は `boxes` と `xyerrorbars` スタイルの組合せです。
-
- 箱の幅と高さは `xyerrorbars` スタイル同様 x, y の誤差から決定されます --
- xlow から xhigh までと ylow から yhigh まで、または x-xdelta から
- x+xdelta までと y-ydelta から y+ydelta まで。これらは何列のデータが与
- えられているかによって決まります。
-
- 箱の塗りつぶしが機能する場合、箱の内部は現在の塗りつぶしスタイル
- (fillstyle) に従って塗られます。詳細は `set style fill` と `boxes` を
- 参照してください。plot コマンド上で新しい塗りつぶしスタイルを指定する
- こともできます。
-5 candlesticks
-?commands set style candlesticks
-?set style candlesticks
-?plotting styles candlesticks
-?style candlesticks
-?candlesticks
- `candlesticks` スタイルは、金融データの 2 次元のデータ描画、および統計
- データのひげ付きの棒グラフを生成するのに使えます。5 列のデータが必要で、
- 順に x 座標 (多分日付)、開始値、最安値、最高値、終値、となります。記号
- は、水平方向には x を中心とし、垂直方向には開始値と終値を境界とする長
- 方形が使われます。そして、その x 座標のところに、長方形のてっぺんから
- 最高値までと、長方形の底から最安値までの垂直線が引かれますが、この垂直
- 線は最高値と最安値が入れ替わっても変更されません。
-
- 長方形の幅はコマンド `set boxwidth` で制御できますが、以前の gnuplot
- への後方互換性として、boxwidth パラメータが設定されていない場合は
- `set bars <width>` で制御されるようになっています。
-
- デフォルトでは、鉛直線分のてっぺんと底には垂直に交わる水平線は引かれま
- せん。それを引きたい場合、例えば典型的な例は箱ひげ図 (box-and-whisker
- plot) での使用ですが、描画コマンドにキーワード `whiskerbars` を追加し
- てください。デフォルトでは、水平線は箱 (candlestick) の水平幅一杯に引
- かれますが、それは全体の幅に対する割合を指定することで変更できます。
-
- デフォルトでは長方形は (開始値)>(終値) の場合は空で、(開始値)<(終値)
- の場合は 3 本の垂直線が入ります。箱の塗りつぶしが有効である場合、その
- 長方形は `set style fill <fillstyle>` にしたがって塗りつぶされます。
- `set bars`, `financebars` を参照してください。また、以下も参照してくだ
- さい。
-^ <a href="http://gnuplot.sourceforge.net/demo/candlesticks.html">
- 金融データのデモ
-^ </a>
-
- 注意: 中央値を表すための記号などを追加したい場合、以下の例のように、ひ
- げ付きの棒グラフに他の描画コマンドを追加する必要があります:
-
-   # データ列:  X '最小値' '1/4 位の値' '中央値' '3/4 位の値' '最大値'
-   set bars 4.0
-   set style fill empty
-   plot 'stat.dat' using 1:3:2:6:5 with candlesticks title 'Quartiles', \
-        ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
-
-   # ひげの上に水平線を伴う描画で、水平線の幅を全体幅の 50% にする
-   plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
-
- `set boxwidth` と `set bars`, `set style fill` を参照してください。
-5 dots
-?commands set style dots
-?set style dots
-?plotting styles dots
-?style dots
-?dots
- `dots` スタイルは各点に小さなドットを描画します。これはたくさんの点か
- らなる散布図の描画に便利でしょう。出力形式によっては (post, pdf など)
- ドットの大きさは linewidth を変更することで制御できることもあります。
-5 filledcurves
-?commands set style filledcurves
-?set style filledcurves
-?plotting styles filledcurves
-?style filledcurves
-?filledcurves
- スタイル `filledcurves` は 2 次元描画でのみ利用可能です。これは 3 種類
- の異なる指定が可能です。最初の 2 種類は関数描画、あるいは 2 列の入力デ
- ータ用のもので、後で紹介するようにオプションで更なる指定ができます。最
- 初のものは `closed` で、これは曲線それ自身を閉多角形と見なします。入力
- データが 2 列の場合にはこれがデフォルトです。
-
- 2 種類目は指定された軸、あるいは水平線、垂直線、与えられた点などと、曲
- 線との間に作られる領域を塗りつぶします。
-
- 3 種類目は 3 列の入力データを必要とし、それらは x 座標と、それに対する
- 2 つの y 座標からなり、それらは同じ x 座標の集合に対する 2 つの曲線の
- y 座標に対応します。そしてその 2 つの曲線の間の領域が塗りつぶされます。
- 入力データが 3 列以上の場合にはこれがデフォルトです。
-
- 書式:
-
-     set style [data | function] filledcurves [option]
-     plot ... with filledcurves [option]
-
- ここで、オプションは以下の通りです:
-
-     [closed | {above | below} {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
-
- 最初の 2 種類の塗りつぶしでは以下のようなオプションで更なる指定が可能
- です。
-
-     filledcurves closed   ... 丁度閉曲線で囲まれる領域
-     filledcurves x1       ... x1 軸
-     filledcurves x2       ... x2 軸 (y1, y2 軸も同様)
-     filledcurves y1=0     ... (y1 軸での) 直線 y=0 i.e. x1 軸と平行
-     filledcurves y2=42    ... (y2 軸での) 直線 y=42 i.e. x2 軸と平行
-     filledcurves xy=10,20 ... x1,y1 軸での点 10,20 (扇型のような形状)
-
- 入力された 2 つの曲線の間の領域の塗りつぶしの例:
-^ <a href="http://www.gnuplot.info/demo/fillbetween.html">
- 曲線間の塗りつぶしデモ。
-^ </a>
-
-     plot 'data' using 1:2:3 with filledcurves
-
- `above` と `below` オプションは
-     ... filledcurves above {x1|x2|y1|y2}=<val>
- および
-     ... using 1:2:3 with filledcurves below
- の形のコマンドに適用可能です。どちらの場合でも、これらのオプションは
- 塗りつぶし領域を、境界線、または境界曲線の片側に制限します。
-
- 注意: この描画モードは全ての出力形式でサポートされるとは限りません。
-
- データファイルから描かれた曲線の塗りつぶしを拡大すると、何もなくなった
- り正しくない領域になることがありますが、それは gnuplot が、領域ではな
- く点や線をクリッピングしているからです。
-
- <a>, <x>, <y> が描画領域の外にある場合、それらはグラフの境界へ移動され
- ます。よって、オプション xy=<x>,<y> を指定した場合の実際の塗りつぶし領
- 域は、xrange や yrange に依存します。
-5 financebars
-?commands set style financebars
-?set style financebars
-?plotting styles financebars
-?style financebars
-?financebars
- `financebars` スタイルは金融データの 2 次元のデータ描画でのみ利用可
- 能です。5 列のデータが必要で、順に x 座標 (多分日付)、開始値、最安値、
- 最高値、終値、となります。記号は、水平方向にはその x 座標に置かれ、垂
- 直方向には最高値と最安値を端とする線分が使われます。そして、その線分に
- 水平左側の刻みが開始値の所に、水平右側の刻みが終り値の所につきます。そ
- の刻みの長さは `set bars` で変更できます。記号は最高値と最安値が入れ替
- わっても変わりません。`set bars` と `candlesticks`、および以下も参照し
- てください。
-^ <a href="http://www.gnuplot.info/demo/finance.html">
- 金融データデモ。
-^ </a>
-5 fsteps
-?commands set style fsteps
-?set style fsteps
-?plotting styles fsteps
-?style fsteps
-?fsteps
- `fsteps` スタイルは 2 次元描画でのみ利用可能です。これは 2 本の線分で
- 隣り合う点をつなぎます: 1 本目は (x1,y1) から (x1,y2) まで、2 本目は
- (x1,y2) から (x2,y2) まで。
- 以下も参照
-^ <a href="http://www.gnuplot.info/demo/steps.html">
- steps デモ。
-^ </a>
-5 histeps
-?commands set style histeps
-?set style histeps
-?plotting styles histeps
-?style histeps
-?histeps
- `histeps` スタイルは 2 次元描画でのみ利用可能です。これはヒストグラム
- の描画での利用を意図しています。y の値は、x の値を中心に置くと考え、
- x1 での点は ((x0+x1)/2,y1) から ((x1+x2)/2,y1) までの水平線として表現
- されます。端の点では、その線はその x 座標が中心になるように延長されま
- す。隣り合う点同士の水平線の端は、その両者の平均値のところでの鉛直線、
- すなわち ((x1+x2)/2,y1) から ((x1+x2)/2,y2) の線分で結ばれます。
-
- `autoscale` が有効である場合、x の範囲は、その延長された水平線の範囲で
- はなく、データ点の範囲が選択されます。よって、端の点に関してはその水平
- 線は半分しか描かれないことになります。
- 以下も参照
-^ <a href="http://www.gnuplot.info/demo/steps.html">
- steps デモ。
-^ </a>
-
- `histeps` は単なる描画スタイルにすぎず、`gnuplot` には、ヒストグラムの
- 箱を生成する能力や、データ集合から母集団を決定する能力などはありません。
-5 histograms
-?commands set style histogram
-?set style histogram
-?style histograms
-?plotting styles histograms
-?histograms
- スタイル `histograms` は 2 次元描画でのみ有効です。これは、データの各
- 列の並びから平行な棒グラフを作ります。`plot` コマンドの各要素は、それ
- に関する目盛りの値や説明のタイトルが付属するかも知れませんが、単一の
- 入力データを指定する必要があります (例えば入力ファイルの 1 つの列)。現
- 在は、4 種類のヒストグラム形式のスタイルがサポートされています。
-
-       set style histogram clustered {gap <gapsize>}
-       set style histogram errorbars {gap <gapsize>} {<linewidth>}
-       set style histogram rowstacked
-       set style histogram columnstacked
-
- デフォルトのスタイルは `set style histogram clustered gap 2` に対応し
- ています。このスタイルでは、並列に指定されたデータの値の集合は、選択さ
- れたデータ列のそのそれぞれの序列 (行番号) に対応する x 座標の場所に、
- 各々箱のグループとして固められて置かれます。よって、<n> 個のデータ列を
- 並列に指定した場合、最初の固まりは x=1 を中心とする <n> 個の箱の固まり
- からなり、その各々の高さは、その <n> データ列各々の最初 (1 行目) の値
- が取られます。その後に少し空白 (gap) が空けられ、次に各データ列の次 (2
- 行目) の値に対応する箱の固まりが x=2 を中心として置かれます。以下同様
- です。デフォルトの空白 (gap) 幅の 2 は、箱の固まり同士の間の空白が、箱
- 2 つの幅に等しいことを意味します。同じ列に対する箱は全て同じ色または同
- じパターンで与えられます (`set style fill` 参照)。
-
- 箱の固まりそれぞれは、データファイルの 1 つの行から得られます。そのよ
- うな入力ファイルの各行の最初の項目が見出し (ラベル) でることは良くある
- ことです。その列にある見出し (ラベル) は、`using` に `xticlabels` オプ
- ションをつけることで、それに対応する箱の固まりの真下の x 軸に沿ったと
- ころに置くことができます。
-
- `errorbars` スタイル は、各エントリに対して 2 列の入力を必要とする以外
- は `clustered` スタイルにとても良く似ています。最初の列は `clustered`
- スタイルの場合と全く同様に箱の高さ (y の値) として使われます。2 つ目の
- 列は誤差の大きさとして扱われ、これは箱の天井に縦の誤差線を生成するのに
- 使われます。誤差線の見た目は、現在の `set basrs` の値と <linewidth> オ
- プション指定で制御できます。
-
- 積み上げ型のヒストグラムも 2 つの形式がサポートされています。それらは
- コマンド `set style histogram {rowstacked|columnstacked}` で選択できま
- す。これらのスタイルにおいて、選択された列のデータの値は積み上げられた
- 箱として集められます。デフォルトの積み上げモードは `rowstacked` です。
-
- スタイル `rowstacked` は、まず最初に選択された列の各行の値を x 軸のそ
- れぞれの位置に配置します: 1 行目の値は x=1 の箱、2 行目のは x=2、以下
- 同様となります。2 番目以降に選択された列に対応する箱は、それらの上に積
- み重ねられて行きます。そして結果として、x=1 にできる箱の積み重ねは、各
- 列の最初の値 (1 行目の値) からなり、x=2 の箱の積み重ねは各列の 2 行目
- の値、などのようになります。同じ列に対する箱は全て同じ色または同じパタ
- ーンで与えられます (`set style fill` 参照)。
-
- スタイル `columnstacked` も同様ですが、こちらは各箱の積み上げは (各行
- のデータからではなく) 各列のデータからなります。最初に指定された列の各
- 行のデータが x=1 の箱の積み上げを生成し、2 番目に指定した列の各行のデ
- ータが x=2 の箱の積み上げ、などのようになります。このスタイルでは、各
- 箱の色は、各データ項目の (列番号ではなく) 行番号から決定されます。
-
- 箱の幅はコマンド `set boxwidth` で変更できます。
- 箱の塗りつぶしスタイルはコマンド `set style fill` で設定できます。
-
- histograms は x 軸は常に x1 軸を使いますが、y 軸に関しては y1 軸か y2
- 軸かを選択できます。plot 命令が、histograms と他のスタイルの描画の両方
- を含む場合、histogram でない方は、x1 軸を使うか x2 軸を使うかを選択で
- きます。
-
- 例:
-
- 複数の列を持つデータファイルを箱の固まり型 (clustered) のヒストグラム
- (デフォルトスタイル) で描画:
-
-       set boxwidth 0.9 relative
-       set style data histograms
-       set style fill solid 1.0 border -1
-       plot 'file.dat' using 2, '' using 4, '' using 6
-
- これは、x 軸上の各整数値を中心とするそれぞれ 3 つの箱 (鉛直な棒) 毎の
- 固まりによる描画を生成します。入力ファイルの最初の列にラベルが含まれて
- いるならそれを、以下の少し変更したコマンドで x 軸に沿って配置できます。
-
-       plot 'file.dat' using 2, '' using 4, '' using 6:xticlabels(1)
-
- ファイルが、各データの測定値と誤差評価の両方を含んでいる場合、描画に誤
- 差線を追加することができます。以下のコマンドは誤差線を (y-<error>) か
- ら (y+<error>) に引き、その頭に箱と同じ幅の水平線をつけます。誤差線と
- 誤差線の端の線は、黒で線幅 2 で描画されます。
-
-       set bars fullwidth
-       set style histogram errorbars gap 2 lt -1 lw 2
-       plot 'file.dat' using 2:3, '' using 4:5, '' using 6:7:xticlabels(1)
-
- 同じデータを行毎の積み上げ型 (rowstacked) のヒストグラムで描画:
-
-       set style histogram rows
-       plot 'file.dat' using 2, '' using 4, '' using 6:xtic(1)
-
- これは、データファイルの 2,4,6 列目の値を高さに持つ 3 つの部分の積み上
- げによる鉛直な棒からなる描画を生成します。
-
- 最後に以下のコマンド
-
-       set style histogram columnstacked
-       plot 'file.dat' using 2, '' using 4, '' using 6
-
- は、3 つの鉛直な積み重ねの棒を生成します。x=1 にある棒は、データファイ
- ルの 2 列目の各行の値に対応する箱からなります。x=2 にある棒は、データ
- ファイルの 4 列目の各行の値に対応する箱から、x=3 には 6 列目の各行の値
- に対する箱からなります。これは、gnuplot の通常の入力の縦、横の解釈を入
- れ換えることになりますので、key タイトルや x 軸の目盛りの見出しの指定
- も変更する必要があります。
-
-       set style histogram columnstacked
-       plot '' u 5:key(1)            # 1 列目を key タイトルに使用
-       plot '' u 5 title columnhead  #
-6 newhistogram
-?newhistogram
-?histograms newhistogram
- 一回の描画に 1 つより多くのヒストグラムの組を作ることもできます。この
- 場合、描画コマンド `newhistogram {"<title>"} {<linestyle>}` を使うこと
- で、それらを強制的に分離し、またそれぞれのラベルを分離することができま
- す。
- 例:
-
-       set style histogram  cluster
-       plot newhistogram "Set A", 'a' using 1, '' using 2, '' using 3, \
-            newhistogram "Set B", 'b' using 1, '' using 2, '' using 3
-
- ラベル "Set A" と "Set B" は、それぞれのヒストグラムの組の下、x 軸の全
- てのラベルの下の位置に現われます。
-
- コマンド newhistogram は、ヒストグラムの色付けを強制的に指定した色
- (linetype) で始めるのにも使えます。デフォルトでは、色の番号はヒストグ
- ラムの境界をまたいでさえも連続的に増加し続けます。次の例は、複数のヒス
- トグラムに同じ色付けを施します。
-       plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
-            newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
-
-5 image
-?commands set style image
-?set style image
-?plotting styles image
-?style image
-?image
- スタイル `image` は 2 次元画像の描画用のものです。これは、3 次元データ
- (x,y,value) に対する `plot`、または射影された 4 次元データ
- (x,y,z,value) に対する `splot` の両方で使用できます。このとき、表示平
- 面では、画像データは表示平面内の 2 方向 (必ずしも垂直でなくても良い)
- に関して等間隔のサンプリング格子を形成していると仮定されます。それは言
- い換えれば、4 つの隣接点の組が常に同じ大きさの平行四辺形を作ることを意
- 味します。変数 `value` は、現在のパレットに対するパレット色 (灰色値)
- を表します。
-
- パレットと画像描画をサポートしている出力形式では、`image` スタイルは描
- 画領域にぴったり合うように適切に配置され伸縮されたデータ配列 (matrix)
- を作ろうとします。そのような出力は効率的ですし、描画も速く行われます。
- しかし、パレットと画像描画をサポートしない、あるいはまだそれらが実装さ
- れていない出力形式では、`image` スタイルは長方形をピクセル毎に塗りつぶ
- そうとしますので、あまり効率はよくありません。また、一般の平行四辺形の
- 画像に対しては、現在は常に平行四辺形をピクセル毎に塗りつぶします。
-
- 画像の各データ点の座標は 1 ピクセルの中心になります。すなわち、M x N
- 個のデータ集合は M x N ピクセルの画像を生成します。これは、M x N 個の
- データ集合が (M-1) x (N-1) 要素を作成する pm3d の構造とはやや異なりま
- す。画像データの格子の走査方向は 8 つの組合せの任意の一つが可能です。
-
- `rgbimage` も参照してください。
-6 image failsafe
-?commands set style image failsafe
-?set style image failsafe
-?plotting styles image failsafe
-?style image failsafe
-?image failsafe
-?failsafe
- 出力形式のドライバによっては、2 次元の長方形領域内での画像データのレン
- ダリングを最適化するルーチンを提供している場合があります。しかし、その
- ルーチンは不完全であることが知られています (それで、gnuplot version
- 4.2 の画像サポートは「実験的な (EXPERIMENTAL)」というラベルがついてい
- ます)。この最適化ルーチンは、キーワード `failsafe` を使うことで無効化
- できます。例:
-
-       plot 'data' with image failsafe
-
- 以下はいくつかの出力形式に関する特有の情報です:
-
- x11 と wxt - ピクセルはディスプレイの解像度に合うように繰り返されるか
-       一定の割合で潰されるかされ、フィルタ用の処理は他に持っていませ
-       ん。よって、かなり高い面積の割合の画像が潰される場合、エイリアシ
-       ングが起こる可能性があります。
-
- postscript (pslatex, epslatex, pstex) - 標本化補間機能は無効になり、画
-       像は元の解像度のままコピーされます。
-
- `rgbimage` も参照してください。
-5 impulses
-?commands set style impulses
-?set style impulses
-?plotting styles impulses
-?style impulses
-?impulses
- `impulses` スタイルは、x 軸 (グラフの境界ではなく) から、`splot` では
- 格子の土台からの垂直な線分を各点に対して表示します。
-5 labels
-?commands set style labels
-?set style labels
-?plotting styles labels
-?style labels
-?labels
- スタイル `labels` は、gnuplot が configure 時に --enable-datastrings
- オプションをつけてインストールされている場合にのみ有効です。2 次元描
- 画では labels スタイルは 3 つの入力データ列の指定が必要です。3 番目の
- 列として見つかるテキスト文字列を、最初の 2 列の指定子によって生成され
- る X,Y 座標の位置に表示します。フォント、色、回転角やその他の描画テキ
- ストの属性は追加オプションとして指定可能です (`set label` 参照)。次の
- 例は、入力ファイルの 4 列目をテキストラベルとして取り出して 2 次元描画
- を行ないます (`tc lt 2` は `textcolor linetype 2` の省略形で、これは緑
- です)。
-
-   plot 'datafile' using 1:(0.5 * $2):4 with labels font "arial,11" tc lt 2
-
- スタイル `labels` は 3 次元描画でも使用できます。この場合 X,Y,Z と文字
- 列、の 4 つの入力列指定が必要です。
-
-   splot 'datafile' using 1:2:3:4 with labels
-
- `datastrings`, `set style data` も参照してください。
-5 lines
-?commands set style lines
-?set style lines
-?plotting styles lines
-?style lines
-?lines
- `lines` スタイルは隣接する点を真直な線分で結びます。
- `linetype`, `linewidth`, `linestyle` も参照してください。
-5 linespoints
-?commands set style linespoints
-?commands set style lp
-?set style linespoints
-?plotting styles linespoints
-?set style lp
-?style linespoints
-?style lp
-?linespoints
-?lp
- `linespoints` スタイルは `lines` と `points` の両方を行ないます。すな
- わち、各点に小さな記号をつけ、そして隣接する点を真直な線分で結びます。
- コマンド `set pointsize` を使って点 (point) の記号の大きさを変更できま
- す。その使い方については `set pointsize` を参照してください。
-
- `linespoints` は `lp` と略すことが出来ます。
-5 points
-?commands set style points
-?set style points
-?plotting styles points
-?style points
-?points
- `points` スタイルは各点に小さな記号を表示します。その記号の大きさを変
- 更するにはコマンド `set pointsize` が使えます。その使用法については
- `set pointsize` の項を参照してください。
-5 steps
-?commands set style steps
-?set style steps
-?plotting styles steps
-?style steps
-?steps
- `steps` スタイルは 2 次元描画でのみ利用可能です。これは 2 本の線分で
- 隣り合う点をつなぎます: 1 本目は (x1,y1) から (x2,y1) まで、2 本目は
- (x2,y1) から (x2,y2) まで。
- 以下も参照
-^ <a href="http://www.gnuplot.info/demo/steps.html">
- steps デモ。
-^ </a>
-5 rgbimage
-?commands set style rgbimage
-?set style rgbimage
-?plotting styles rgbimage
-?style rgbimage
-?rgbimage
- スタイル `rgbimage` は 2 次元画像の描画用で、概念上は `image` に似てい
- ます。詳細は `image` を参照してください。その違いは、`plot` では
- (x,y,r,g,b) の 5 次元データが、`splot` では (x,y,z,r,g,b) の 6 次元デ
- ータが必要で、それらが座標と画像のカラー成分を意味します。
-
- `image` も参照してください。
-5 vectors
-?commands set style vectors
-?set style vectors
-?plotting styles vectors
-?style vectors
-?vectors
- 2 次元の `vectors` スタイルは (x,y) から (x+xdelta,y+ydelta) までのベ
- クトルを書きます。よって 4 列のデータが必要です。ベクトルの先端には小
- さな矢先も書きます。
- 3 次元の `vectors` スタイルも同様ですが、データは 6 列必要です。
- vectors スタイルを使っての splot は `set mapping cartesian` のみでサポ
- ートされています。キーワード "with vectors" は arrow スタイルの指定子
- を後ろに伴うことができます。詳細は `arrowstyle` を参照してください。
-
- 例:
-       plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
-       splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
-
- `set clip one` と `set clip two` は 2 次元のベクトルの描画に影響を与え
- ます。詳細は `set clip` と `arrowstyle` を参照してください。
-5 xerrorbars
-?commands set style xerrorbars
-?set style xerrorbars
-?plotting styles xerrorbars
-?style xerrorbars
-?xerrorbars
- `xerrorbars` スタイルは 2 次元のデータ描画のみで利用可能です。
- `xerrorbars` は、水平の誤差指示線 (error bar) が表示される以外は
- `dots` と同じです。各点 (x,y) において (xlow,y) から (xhigh,y) まで、
- または (x-xdelta,y) から (x+xdelta,y) までの線分が引かれますが、これら
- はいくつのデータ列が与えられるかによって変わります。誤差指示線の端には
- 刻みの印が付けられます (`set bars` が使われていなければ。詳細に関しては
- `set bars` を参照してください)。
-5 xyerrorbars
-?commands set style xyerrorbars
-?set style xyerrorbars
-?plotting styles xyerrorbars
-?style xyerrorbars
-?xyerrorbars
- `xyerrorbars` スタイルは 2 次元のデータ描画のみで利用可能です。
- `xyerrorbars` は、水平、垂直の誤差指示線 (error bar) も表示される以外
- は `dots` と同じです。各点 (x,y) において (x,y-ydelta) から (x,y+ydelta)
- までと (x-xdelta,y) から (x+xdelta,y) まで、または (x,ylow) から
- (x,yhigh) までと (xlow,y) から (xhigh,y) までの線分が引かれますが、こ
- れらはいくつのデータ列が与えられるかによって変わります。誤差指示線の端
- には刻みの印が付けられます (`set bars` が使われていなければ。詳細に関し
- ては `set bars` を参照してください)。
-
- データが、サポートされていない混合型の形式で与えられた場合、`plot` コ
- マンドの `using` フィルタを使って適切な形に直さないといけません。例え
- ばデータが (x,y,xdelta,ylow,yhigh) という形式である場合、以下のように
- します:
-
-       plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
-5 yerrorbars
-?commands set style yerrorbars
-?commands set style errorbars
-?plotting styles yerrorbars
-?plotting styles errorbars
-?set style yerrorbars
-?set style errorbars
-?style yerrorbars
-?style errorbars
-?yerrorbars
- `yerrorbars` (または `errorbars`) スタイルは 2 次元のデータ描画のみで
- 利用可能です。`yerrorbars` は、垂直の誤差指示線 (error bar) が表示され
- る以外は `points` に似ています。各点 (x,y) において (x,y-ydelta) から
- (x,y+ydelta) まで、または (x,ylow) から (x,yhigh) までの線分が引かれま
- すが、これらはいくつのデータ列が与えられるかによって変わります。誤差指
- 示線の端には刻みの印が付けられます (`set bars` が使われていなければ。詳
- 細に関しては `set bars` を参照してください)。
- 以下も参照
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
- errorbar デモ。
-^ </a>
-5 xerrorlines
-?commands set style xerrorlines
-?set style xerrorlines
-?plotting styles xerrorlines
-?style xerrorlines
-?xerrorlines
- `xerrorlines` スタイルは 2 次元のデータ描画のみで利用可能です。
- `xerrorlines` は `linespoints` に似ていますが、水平の誤差線が描かれる
- ことが違います。各点 (x,y) で、データ列の個数に応じて (xlow,y) から
- (xhigh,y) まで、または (x-xdelta,y) から (x+xdelta,y) までの線分が描か
- れ、そして刻の印が誤差線の端に置かれます (`set bars` が使われていない
- 場合 -- 詳細は `set bars` 参照)。
-5 xyerrorlines
-?commands set style xyerrorlines
-?set style xyerrorlines
-?plotting styles xyerrorlines
-?style xyerrorlines
-?xyerrorlines
- `xyerrorlines` スタイルは 2 次元のデータ描画のみで利用可能です。
- `xyerrorlines` は `linespoints` に似ていますが、水平と垂直の誤差線も描
- かれることが違います。各点 (x,y) で、データ列の個数に応じて、
- (x,y-ydelta) から (x,y+ydelta) までと (x-xdelta,y) から (x+xdelta,y)
- まで、あるいは (x,ylow) から (x,yhigh) までと (xlow,y) から (xhigh,y)
- までの線分が描かれ、そして刻の印が誤差線の端に置かれます (`set bars`
- が使われていない場合 -- 詳細は `set bars` 参照)。
-
- データが、サポートされていない混合型の形式で与えられた場合、`plot` コ
- マンドの `using` フィルタを使って適切な形に直さないといけません。例え
- ばデータが (x,y,xdelta,ylow,yhigh) という形式である場合、以下のように
- します:
-
-       plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
-5 yerrorlines
-?commands set style yerrorlines
-?commands set style errorlines
-?plotting styles yerrorlines
-?plotting styles errorlines
-?set style yerrorlines
-?set style errorlines
-?style yerrorlines
-?style errorlines
-?yerrorlines
- `yerrorlines` (または `errorlines`) スタイルは 2 次元のデータ描画のみ
- で利用可能です。`yerrorlines` は `linespoints` に似ていますが、垂直の
- 誤差線が描かれることが違います。各点 (x,y) で、データ列の個数に応じて
- (x,y-ydelta) から (x,y+ydelta) まで、または (x,ylow) から (x,yhigh)
- までの線分が描かれ、そして刻の印が誤差線の端に置かれます (`set bars`
- が使われていない場合 -- 詳細は `set bars` 参照)。
- 以下も参照。
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
- エラーバーのデモ
-^ </a>
 3 surface
 ?commands set surface
 ?commands unset surface
@@ -9735,7 +9878,12 @@ C ... and restart the table:
  の制御に関しては `set mxtics` もそれぞれ参照してください。これらのコマ
  ンドは、各軸毎にその一つの軸の制御を提供します。
 3 ticslevel
- `set xyplane` 参照。
+?commands set ticslevel
+?commands show ticslevel
+?set ticslevel
+?show ticslevel
+?ticslevel
+ 現在は推奨されていません。`set xyplane` を参照してください。
 3 ticscale
 ?commands set ticscale
 ?commands show ticscale
@@ -10208,9 +10356,9 @@ C ... and restart the table:
  これは二重引用符を使うべきであることに注意してください。この場合、もち
  ろん 2 つの行で同じフォントが使われます。
 
- y 軸と y2 軸のラベルは、デフォルトの方向に対して明示的に回転させること
- ができますが、これは 2 次元描画で、かつ文字列の回転をサポートする出力
- 形式のみで有効です。
+ x, x2, y, y2 軸のラベルの方向 (回転角) は、デフォルトの設定に対して明
+ 示的に変更することができますが、これは 2 次元描画で、かつ文字列の回転
+ をサポートする出力形式のみで有効です。
 
  もし軸の位置のデフォルトの位置が気に入らないならば、代わりに `set label`
  を使ってください。このコマンドは文字列をどこに配置するかをもっと自由に
@@ -10507,11 +10655,6 @@ C ... and restart the table:
  番目の例 "Dec 3" の目盛りは見出し付けされません。
 
 3 xyplane
-?commands set ticslevel
-?commands show ticslevel
-?set ticslevel
-?show ticslevel
-?ticslevel
 ?commands set xyplane
 ?commands show xyplane
 ?set xyplane
@@ -10914,12 +11057,13 @@ C ... and restart the table:
 ?commands splot
 ?splot
  `splot` は 3 次元描画のためのコマンドです (もちろんご存知でしょうが、
- 実際にはその 2 次元への射影です)。それは関数、またはデータファイルか
- ら、`plot` コマンドととても良く似た方法でその描画を作ります。
+ 実際にはその 2 次元への射影)。それは関数、またはファイルから読み込んだ
+ データから `plot` コマンドととても良く似た方法でその描画を作ります。
+ `splot` は、それぞれ単一の x, y, z 軸を提供するだけで、`plot` で用意さ
+ れている第 2 軸 x2, y2 のようなものはありません。
 
  `plot` コマンドと共通の仕様については `plot` を参照して下さい。ここでは
- それと異なるものだけ詳細に取り上げます。なお、`plot` の `axes` オプショ
- ンは `splot` では使えないことに特に注意して下さい。
+ それと異なるものだけ詳細に取り上げます。
 
  書式:
        splot {<ranges>}
