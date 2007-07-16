@@ -5,6 +5,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW transparent fill styles
 * NEW 2D plots can read color information from an input data file
 * NEW iteration within a plot command; e.g.     plot for [i=1:10] foo(i)
+* NEW pdf terminal based on cairo and pango
 * CHANGE fillstyle border type, if any, is applied to candlesticks
 * CHANGE 'set key textcolor rgb variable' will use plot colors for key entries
 
