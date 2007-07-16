@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.439 2007/07/11 23:24:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.440 2007/07/16 12:55:05 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1247,7 +1247,7 @@ C
 #sprintf("format",x,...) & multiple & string result from C-language sprintf \\
 %sprintf("format",x,...)@multiple@string result from C-language sprintf
  `sprintf("format",var1,var2,...)` applies standard C-language format specifiers
- to multiple arguments (10 max) and returns the resulting string. If you want to
+ to multiple arguments and returns the resulting string. If you want to
  use gnuplot's own format specifiers, you must instead call `gprintf()`.
  For information on sprintf format specifiers, please see standard C-language
  documentation or the unix sprintf man page.

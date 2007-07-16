@@ -1,3 +1,9 @@
+2007-07-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c (f_sprintf) docs/gnuplot.doc:
+	Remove limitation of 10 args max to internal function sprintf().
+	Bug #1753756.
+
 2007-07-16  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff: Sync Japanese documentation.
