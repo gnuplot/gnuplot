@@ -211,6 +211,7 @@ $ ./configure --help
   --without-tutorial      do not build LaTeX tutorial
   --with-wx-config=PATH   Use the given path to wx-config, the wxWidgets configuration program
     (default search in $PATH)
+  --without-cairopdf (*)  cairopdf terminal
 
 
 Options marked with (*) are enabled by default, ie. these features or

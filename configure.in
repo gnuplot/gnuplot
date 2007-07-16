@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.218 2007/04/18 19:58:15 sfeam Exp $
+dnl $Id: configure.in,v 1.219 2007/05/08 22:42:53 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -853,6 +853,10 @@ if test ! -f src/graphics.c ; then
   cp ${srcdir}/tutorial/eg3.dat tutorial
 fi
 
+dnl explicit call to PKG_PROG_PKG_CONFIG because the first call to
+dnl PKG_CHECK_MODULES may not happen
+PKG_PROG_PKG_CONFIG
+
 dnl  wxWidgets terminal
 
 dnl wxWidgets terminal needs C++
@@ -961,6 +965,35 @@ fi
 AM_CONDITIONAL(BUILD_WXWIDGETS, test "${enable_wxwidgets_ok}" = yes)
 
 dnl  End wxWidgets terminal
+
+AC_ARG_WITH(cairopdf,dnl
+[  --without-cairopdf      cairopdf terminal (default enabled)],,
+  [test -z "${with_cairopdf}" && with_cairopdf=yes])
+
+if test "${with_cairopdf}" = yes ; then
+  dnl cairopdf terminal
+  PKG_CHECK_MODULES_NOFAIL(CAIROPDF,dnl
+       [cairo >= 1.2 cairo-pdf >= 1.2 pango >= 1.10 pangocairo >= 1.10 glib-2.0])
+  if test $pkg_failed != no; then
+    AC_MSG_WARN([The cairopdf terminal will not be compiled.])
+    with_cairopdf=no
+  else
+    AC_DEFINE(HAVE_CAIROPDF,1, [ Define if you want the cairopdf terminal. ])
+    CPPFLAGS="$CPPFLAGS $CAIROPDF_CFLAGS"
+    LIBS="$LIBS $CAIROPDF_LIBS"
+    with_cairopdf=yes
+  fi
+fi
+
+build_gpcairo=no
+if test "${enable_wxwidgets_ok}" = yes; then
+  build_gpcairo=yes
+fi
+if test "${with_cairopdf}" = yes; then
+  build_gpcairo=yes
+fi
+
+AM_CONDITIONAL(BUILD_GPCAIRO, test "${build_gpcairo}" = yes)
 
 dnl Enable parsing of deprecated syntax
 AC_ARG_ENABLE(backwards-compatibility,dnl
@@ -1170,6 +1203,12 @@ if test "$enable_wxwidgets_ok" = yes; then
   AC_MSG_RESULT([  wxt terminal: yes (EXPERIMENTAL)])
 else
   AC_MSG_RESULT([  wxt terminal: no (requires C++, wxWidgets>2.6, cairo>0.9, pango>1.10)])
+fi
+
+if test "$with_cairopdf" = yes; then
+  AC_MSG_RESULT([  cairopdf terminal: yes (EXPERIMENTAL)])
+else
+  AC_MSG_RESULT([  cairopdf terminal: no (requires cairo>1.2, pango>1.10)])
 fi
 
 AC_MSG_RESULT([])

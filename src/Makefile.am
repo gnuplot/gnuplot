@@ -74,7 +74,11 @@ makefile.all makefile.awc os2 pcgraph.asm rgipgnu win x11.opt \
 $(EXTRA_gnuplot_SOURCES)
 
 if BUILD_WXWIDGETS
-gnuplot_SOURCES += wxterminal/gp_cairo.c wxterminal/wxt_gui.cpp
+gnuplot_SOURCES += wxterminal/wxt_gui.cpp
+endif
+
+if BUILD_GPCAIRO
+gnuplot_SOURCES += wxterminal/gp_cairo.c
 endif
 
 ## we don't need COREOBJS, but CORETERM

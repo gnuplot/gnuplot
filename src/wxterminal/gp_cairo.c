@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.22 2007/04/30 13:01:56 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.23 2007/07/12 23:44:52 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -461,7 +461,15 @@ void gp_cairo_end_polygon(plot_struct *plot)
 
 void gp_cairo_stroke(plot_struct *plot)
 {
-	double dashes[2] = {0,0};
+	double dashes[8];
+	static double dashpattern[4][8] =
+	{
+	    {5, 8, 5, 8, 5, 8, 5, 8},	/* Medium dash */
+	    {1, 4, 1, 4, 1, 4, 1, 4},	/* dots */
+	    {8, 4, 2, 4, 8, 4, 2, 4},	/* dash dot */
+	    {9, 4, 1, 4, 1, 4, 0, 0}	/* dash dot dot */
+	};
+	int lt = plot->linetype;
 
 	if (!plot->opened_path) {
 		FPRINTF((stderr,"stroke with non-opened path !\n"));
@@ -473,16 +481,25 @@ void gp_cairo_stroke(plot_struct *plot)
 	/* add last point */
 	cairo_line_to (plot->cr, plot->current_x, plot->current_y);
 
-	dashes[0] = 2.0*plot->oversampling_scale;
-	dashes[1] = 2.0*plot->oversampling_scale;
 
 	cairo_save(plot->cr);
 
 	if (plot->linetype == LT_NODRAW)
 		cairo_set_operator(plot->cr, CAIRO_OPERATOR_XOR);
 
-	if (plot->linestyle == GP_CAIRO_DASH)
+	else if (lt == -1) {
+		dashes[0] = 1.0*plot->oversampling_scale;
+		dashes[1] = 6.0*plot->oversampling_scale;
 		cairo_set_dash(plot->cr, dashes, 2 /*num_dashes*/, 0 /*offset*/);
+	}
+
+	else if (plot->linestyle == GP_CAIRO_DASH
+		&& lt >= 0 && (lt % 5 != 0)) {
+		int i;
+		for (i=0; i<8; i++)
+			dashes[i] = dashpattern[(lt-1) % 5][i] * plot->oversampling_scale;
+		cairo_set_dash(plot->cr, dashes, 8 /*num_dashes*/, 0 /*offset*/);
+	}
 
 	cairo_set_source_rgb(plot->cr, plot->color.r, plot->color.g, plot->color.b);
 	cairo_set_line_width(plot->cr, plot->linewidth*plot->oversampling_scale);

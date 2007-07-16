@@ -1,3 +1,17 @@
+2007-07-16  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* term/cairo.trm: 
+	* src/makefile.all:
+	* src/term.h
+	* configure.in:
+	* src/Makefile.am:
+	New pdf terminal based on cairo and pango. Shares most code with wxt.
+	Currently named 'cairopdf'.
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_stroke): more dash patterns.
+
+	Patch #1651015.
+
 2007-07-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_sprintf) docs/gnuplot.doc:
