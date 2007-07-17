@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.56 2006/07/16 00:21:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.57 2007/05/10 22:52:46 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1531,7 +1531,7 @@ fit_command()
 
     max_params = MAX_PARAMS;	/* HBB 971023: make this resizeable */
 
-    if (!equals(c_token, "via"))
+    if (!equals(c_token++, "via"))
 	int_error(c_token, "Need via and either parameter list or file");
 
     a = vec(max_params);
@@ -1539,22 +1539,24 @@ fit_command()
 				   "fit param");
     num_params = 0;
 
-    if (isstring(++c_token)) {	/* It's a parameter *file* */
+    if (isstringvalue(c_token)) {	/* It's a parameter *file* */
 	TBOOLEAN fixed;
 	double tmp_par;
 	char c, *s;
 	char sstr[MAX_LINE_LEN + 1];
 	FILE *f;
 
-	quote_str(sstr, c_token++, MAX_LINE_LEN);
+	static char *viafile = NULL;
+	free(viafile);			/* Free previous name, if any */
+	viafile = try_to_get_string();	/* Cannot fail since isstringvalue succeeded */
+	fprintf(log_f, "fitted parameters and initial values from file: %s\n\n", viafile);
+	if (!(f = loadpath_fopen(viafile, "r")))
+	    Eex2("could not read parameter-file %s", sstr);
 
 	/* get parameters and values out of file and ignore fixed ones */
 
-	fprintf(log_f, "fitted parameters and initial values from file: %s\n\n", sstr);
-	if (!(f = loadpath_fopen(sstr, "r")))
-	    Eex2("could not read parameter-file %s", sstr);
 	while (TRUE) {
-	    if (!fgets(s = sstr, (int) sizeof(sstr), f))	/* EOF found */
+	    if (!fgets(s = sstr, sizeof(sstr), f))	/* EOF found */
 		break;
 	    if ((tmp = strstr(s, GP_FIXED)) != NULL) {	/* ignore fixed params */
 		*tmp = NUL;

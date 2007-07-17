@@ -1,3 +1,9 @@
+2007-07-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c (fit_command):
+	Accept a string variable as the file name for "fit via <viafile>".
+	Bug #1755532
+
 2007-07-16  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/cairo.trm: 
