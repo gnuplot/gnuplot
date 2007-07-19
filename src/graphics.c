@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.226 2007/06/21 18:56:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.227 2007/07/12 18:02:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -125,7 +125,7 @@ static void plot_filledcurves __PROTO((struct curve_points * plot));
 static void finish_filled_curve __PROTO((int, gpiPoint *, struct curve_points *));
 static void plot_betweencurves __PROTO((struct curve_points * plot));
 static void fill_missing_corners __PROTO((gpiPoint *corners, int *points, int exit, int reentry, int updown, int leftright));
-static void fill_between __PROTO((double, double, double, double, double, double, struct curve_points *));
+static void fill_between __PROTO((double, double, double, double, double, double, double, double, struct curve_points *));
 static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey, filledcurves_opts *filledcurves_options));
 static gpiPoint *fill_corners __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
 static void plot_vectors __PROTO((struct curve_points * plot));
@@ -2573,6 +2573,7 @@ plot_betweencurves(struct curve_points *plot)
 {
     double x1, x2, yl1, yu1, yl2, yu2;
     double xmid, ymid;
+    double xu1, xu2;	/* For polar plots */
     int i;
 
     /* If terminal doesn't support filled polygons, approximate with bars */
@@ -2596,27 +2597,38 @@ plot_betweencurves(struct curve_points *plot)
 	    continue;
 
 	x1  = plot->points[i].x;
+	xu1 = plot->points[i].xhigh;
 	yl1 = plot->points[i].y;
 	yu1 = plot->points[i].yhigh;
 	x2  = plot->points[i+1].x;
+	xu2 = plot->points[i+1].xhigh;
 	yl2 = plot->points[i+1].y;
 	yu2 = plot->points[i+1].yhigh;
+
+	/* EAM 19-July-2007  Attempt to handle polar plots.
+	 * Options "above" and "below" don't do anything useful.
+	 * Curves that cross are not handled correctly.
+	 */
+	if (polar) {
+	    fill_between(x1,xu1,yl1,yu1,x2,xu2,yl2,yu2,plot);
+	} else
 
 	if ((yu1-yl1)*(yu2-yl2) < 0) {
 	    xmid = (x1*(yl2-yu2) + x2*(yu1-yl1))
 		 / ((yu1-yl1) + (yl2-yu2));
 	    ymid = yu1 + (yu2-yu1)*(xmid-x1)/(x2-x1);
-	    fill_between(x1,yl1,yu1,xmid,ymid,ymid,plot);
-	    fill_between(xmid,ymid,ymid,x2,yl2,yu2,plot);
+	    fill_between(x1,xu1,yl1,yu1,xmid,xmid,ymid,ymid,plot);
+	    fill_between(xmid,xmid,ymid,ymid,x2,xu2,yl2,yu2,plot);
 	} else
-	    fill_between(x1,yl1,yu1,x2,yl2,yu2,plot);
+	    fill_between(x1,xu1,yl1,yu1,x2,xu2,yl2,yu2,plot);
 
     }
 }
 
 static void
 fill_between(
-double x1, double yl1, double yu1, double x2, double yl2, double yu2,
+double x1, double xu1, double yl1, double yu1, 
+double x2, double xu2, double yl2, double yu2,
 struct curve_points *plot)
 {
     double xmin, xmax, ymin, ymax, dx, dy1, dy2;
@@ -2659,7 +2671,7 @@ struct curve_points *plot)
 	ic = 0;
 	corners[ic].x   = map_x(x1);
 	corners[ic++].y = map_y(yl1);
-	corners[ic].x   = map_x(x1);
+	corners[ic].x   = map_x(xu1);
 	corners[ic++].y = map_y(yu1);
 
 #define INTERPOLATE(Y1,Y2,YBOUND) do { \
@@ -2674,7 +2686,7 @@ struct curve_points *plot)
 	INTERPOLATE( yu1, yu2, ymin );
 	INTERPOLATE( yu1, yu2, ymax );
 	
-	corners[ic].x   = map_x(x2);
+	corners[ic].x   = map_x(xu2);
 	corners[ic++].y = map_y(yu2);
 	corners[ic].x   = map_x(x2);
 	corners[ic++].y = map_y(yl2);

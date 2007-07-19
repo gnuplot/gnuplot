@@ -1,3 +1,9 @@
+2007-07-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_betweencurves fill_between): 
+	Allow fill between curves to [sort of] work for polar coordinate plots.
+	Not implemented: "above" "below" intersecting curves, self-closure.
+
 2007-07-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (fit_command):
