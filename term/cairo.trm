@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cairo.trm,v 1.1 2007/07/16 21:58:44 tlecomte Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -82,6 +82,7 @@ TERM_PUBLIC void cairopdf_filled_polygon __PROTO ((int n, gpiPoint * corners));
 TBOOLEAN cairopdf_enhanced_enabled = FALSE;
 TBOOLEAN cairopdf_dashed = FALSE;
 TBOOLEAN cairopdf_mono = FALSE;
+TBOOLEAN cairopdf_rounded = FALSE;
 /* default text font family: */
 char cairopdf_set_fontname[MAX_ID_LEN + 1] = "";
 /* default text size*/
@@ -192,13 +193,13 @@ TERM_PUBLIC void cairopdf_options()
 		case CAIROPDF_ROUNDED:
 			c_token++;
 			if (set_capjoin) duplication=TRUE;
-			wxt_rounded = yes;
+			cairopdf_rounded = TRUE;
 			set_capjoin = TRUE;
 			break;
 		case CAIROPDF_BUTT:
 			c_token++;
 			if (set_capjoin) duplication=TRUE;
-			wxt_rounded = no;
+			cairopdf_rounded = FALSE;
 			set_capjoin = TRUE;
 			break;
 		case CAIROPDF_LINEWIDTH:
@@ -265,7 +266,7 @@ TERM_PUBLIC void cairopdf_options()
 	}
 
 	if (set_capjoin) {
-		strncat(term_options, wxt_rounded ? " rounded" : " butt",
+		strncat(term_options, cairopdf_rounded ? " rounded" : " butt",
 			sizeof(term_options)-strlen(term_options));
 	}
 
@@ -316,7 +317,7 @@ void cairopdf_graphics()
 	plot.yscale = 1.0;
 
 	/* update graphics state properties */
-	plot.rounded = wxt_rounded;
+	plot.rounded = cairopdf_rounded;
 
 	FPRINTF((stderr,"Graphics1\n"));
 
