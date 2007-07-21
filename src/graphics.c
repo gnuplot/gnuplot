@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.227 2007/07/12 18:02:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.228 2007/07/20 05:45:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2606,7 +2606,6 @@ plot_betweencurves(struct curve_points *plot)
 	yu2 = plot->points[i+1].yhigh;
 
 	/* EAM 19-July-2007  Attempt to handle polar plots.
-	 * Options "above" and "below" don't do anything useful.
 	 * Curves that cross are not handled correctly.
 	 */
 	if (polar) {
@@ -2706,7 +2705,20 @@ struct curve_points *plot)
     /* finish_filled_curve() will handle   */
     /* current fill style (stored in plot) */
     /* above/below (stored in box[ic].x)   */
-	box[ic].x = ((yu1-yl1) + (yu2-yl2) < 0) ? 1 : 0;
+	if (polar) {
+	    /* "above" or "below" evaluated in terms of radial distance from origin */
+	    double ox = map_x(0);
+	    double oy = map_y(0);
+	    double plx = map_x(x1);
+	    double ply = map_y(yl1);
+	    double pux = map_x(xu1);
+	    double puy = map_y(yu1);
+	    double drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
+	    double dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
+	    box[ic].x = (drl > dru) ? 1 : 0;
+	} else
+	    box[ic].x = ((yu1-yl1) + (yu2-yl2) < 0) ? 1 : 0;
+	
 	finish_filled_curve(ic, box, plot);
 }
 

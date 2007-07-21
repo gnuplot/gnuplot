@@ -1,3 +1,9 @@
+2007-07-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (fill_between): For polar plots using filledcurves,
+	interpret "above" and "below" in terms of relative radial distance
+	from the origin.
+
 2007-07-21  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp:
