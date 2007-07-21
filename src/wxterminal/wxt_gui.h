@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.26 2007/05/23 21:51:18 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.27 2007/06/09 16:56:52 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -114,6 +114,8 @@ extern "C" {
 # include "getcolor.h"
 /* for paused_for_mouse, PAUSE_BUTTON1 and friends */
 # include "command.h"
+/* for int_error */
+# include "util.h"
 }
 
 /* if the gtk headers are available, use them to tweak some behaviours */
@@ -567,24 +569,11 @@ static bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindo
 /* process one event, returns true if it ends the pause */
 static bool wxt_process_one_event(struct gp_event_t *);
 
-/* process the event list, return true if one event ends the pause */
-static bool wxt_process_events();
-
-/* event queue and its mutex */
-static wxMutex mutexProtectingEventList;
-static std::list<gp_event_t> EventList;
-static bool wxt_check_eventlist_empty();
-static void wxt_clear_event_list();
-
-/* state of the main thread, and its mutex, used to know when and how to wake it up */
-typedef enum wxt_thread_state_t {
-	RUNNING = 0,
-	WAITING_FOR_STDIN
-} wxt_thread_state_t;
-static wxt_thread_state_t wxt_thread_state;
-static wxMutex mutexProtectingThreadState;
-static wxt_thread_state_t wxt_check_thread_state();
-static void wxt_change_thread_state(wxt_thread_state_t state);
+# ifdef WXT_MULTITHREADED
+/* set of pipe file descriptors for event communication with the core */
+int wxt_event_fd = -1;
+int wxt_sendevent_fd = -1;
+# endif /* WXT_MULTITHREADED */
 #endif /*USE_MOUSE*/
 
 /* returns true if at least one plot window is opened.

@@ -1422,12 +1422,19 @@ void wxt_init()
 		thread = new wxtThread();
 		thread->Create();
 		thread->Run();
-#endif /* WXT_MULTITHREADED */
 
-#ifdef USE_MOUSE
-		/* initialize the gnuplot<->terminal event system state */
-		wxt_change_thread_state(RUNNING);
-#endif /*USE_MOUSE*/
+# ifdef USE_MOUSE
+		int filedes[2];
+		char buf;
+
+	       if (pipe(filedes) == -1) {
+			fprintf(stderr, "Pipe error, mousing will not work\n");
+		}
+
+		wxt_event_fd = filedes[0];
+		wxt_sendevent_fd = filedes[1];
+# endif /* USE_MOUSE */
+#endif /* WXT_MULTITHREADED */
 
  		FPRINTF((stderr,"First Init2\n"));
 #ifdef HAVE_LOCALE_H
@@ -1674,14 +1681,7 @@ void wxt_reset()
 		 * but not process it. */
 		FPRINTF((stderr,"send reset event to the mouse system\n"));
 		event_reset((gp_event_t *)1);   /* cancel zoombox etc. */
-
-		/* clear the event list */
-		wxt_clear_event_list();
 	}
-
-	/* stop sending mouse events */
-	FPRINTF((stderr,"change thread state\n"));
-	wxt_change_thread_state(RUNNING);
 #endif /*USE_MOUSE*/
 
 	FPRINTF((stderr,"wxt_reset ends\n"));
@@ -2863,37 +2863,6 @@ void wxtPanel::wxt_cairo_free_platform_context()
 #endif
 
 #ifdef USE_MOUSE
-/* protected check for the state of the event list */
-bool wxt_check_eventlist_empty()
-{
-	bool result;
-	mutexProtectingEventList.Lock();
-	result = EventList.empty();
-	mutexProtectingEventList.Unlock();
-	return result;
-}
-
-/* protected check for the state of the main thread (running or waiting for input) */
-wxt_thread_state_t wxt_check_thread_state()
-{
-	wxt_thread_state_t result;
-	mutexProtectingThreadState.Lock();
-	result = wxt_thread_state;
-	mutexProtectingThreadState.Unlock();
-	return result;
-}
-
-/* multithread safe method to change thread state */
-void wxt_change_thread_state(wxt_thread_state_t state)
-{
-	wxt_sigint_init();
-	mutexProtectingThreadState.Lock();
-	wxt_thread_state = state;
-	mutexProtectingThreadState.Unlock();
-	wxt_sigint_check();
-	wxt_sigint_restore();
-}
-
 /* process one event, returns true if it ends the pause */
 bool wxt_process_one_event(struct gp_event_t *event)
 {
@@ -2962,54 +2931,24 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 #else
 	if (!wxt_handling_persist)
 	{
-		/* add the event to the event list */
-		if (wxt_check_thread_state() == WAITING_FOR_STDIN)
-		{
-			FPRINTF2((stderr,"Gui thread adds an event to the list\n"));
-			mutexProtectingEventList.Lock();
-			EventList.push_back(event);
-			mutexProtectingEventList.Unlock();
-			return true;
-		}
-		else
+		if (wxt_sendevent_fd<0) {
+			FPRINTF((stderr,"not sending event, wxt_sendevent_fd error\n"));
 			return false;
+		}
+
+		if (write(wxt_sendevent_fd, (char*) &event, sizeof(event))<0) {
+			wxt_sendevent_fd = -1;
+			fprintf(stderr,"not sending event, write error on wxt_sendevent_fd\n");
+			return false;
+		}
 	}
 	else
 	{
 		wxt_process_one_event(&event);
-		return true;
 	}
+
+	return true;
 #endif /* ! _Windows */
-}
-
-
-/* clear the event list, caring for the mutex */
-void wxt_clear_event_list()
-{
-	mutexProtectingEventList.Lock();
-	EventList.clear();
-	mutexProtectingEventList.Unlock();
-}
-
-
-/* wxt_process_events will process the contents of the event list
- * until it is empty.
- * It will return true if one event ends the pause */
-bool wxt_process_events()
-{
-	struct gp_event_t wxt_event;
-	int button;
-
-	while ( !wxt_check_eventlist_empty() ) {
-		FPRINTF2((stderr,"Processing event\n"));
-		mutexProtectingEventList.Lock();
-		wxt_event = EventList.front();
-		EventList.pop_front();
-		mutexProtectingEventList.Unlock();
-		if (wxt_process_one_event(&wxt_event))
-			return true;
-	}
-	return false;
 }
 
 #ifdef WXT_MULTITHREADED
@@ -3027,45 +2966,52 @@ int wxt_waitforinput()
 	if (wxt_status == STATUS_UNINITIALIZED)
 		return getc(stdin);
 
-	int ierr;
-	int fd = fileno(stdin);
-	struct timeval timeout;
-	fd_set fds;
+	if (wxt_event_fd<0) {
+		if (paused_for_mouse)
+			int_error(NO_CARET, "wxt communication error, wxt_event_fd<0");
+		FPRINTF((stderr,"wxt communication error, wxt_event_fd<0\n"));
+		return getc(stdin);
+	}
 
-	wxt_change_thread_state(WAITING_FOR_STDIN);
+	int stdin_fd = fileno(stdin);
+	fd_set read_fds;
 
 	do {
-		if (wxt_process_events()) {
-			wxt_change_thread_state(RUNNING);
-			return '\0';
+		FD_ZERO(&read_fds);
+		FD_SET(wxt_event_fd, &read_fds);
+		if (!paused_for_mouse)
+			FD_SET(stdin_fd, &read_fds);
+
+		int n_changed_fds = select(wxt_event_fd+1, &read_fds,
+					      NULL /* not watching for write-ready */,
+					      NULL /* not watching for exceptions */,
+					      NULL /* no timeout */);
+
+		if (n_changed_fds<0) {
+			if (paused_for_mouse)
+				int_error(NO_CARET, "wxt communication error: select() error");
+			FPRINTF((stderr, "wxt communication error: select() error\n"));
+			break;
 		}
 
-		timeout.tv_sec = 0;
-		timeout.tv_usec = 10000;
-		FD_ZERO(&fds);
-		FD_SET(0/*fd*/,&fds);
-
-		ierr = select(1, &fds, NULL, NULL, &timeout);
-
-		/* check for error on select and return immediately if any */
-		if (ierr<0) {
-			wxt_change_thread_state(RUNNING);
-			return '\0';
-		}
-	} while (!FD_ISSET(fd,&fds));
-
-	/* if we are paused_for_mouse, we should continue to wait for a mouse click */
-	if (paused_for_mouse)
-		while (true) {
-			if (wxt_process_events()) {
-				wxt_change_thread_state(RUNNING);
+		if (FD_ISSET(wxt_event_fd, &read_fds)) {
+			/* terminal event coming */
+			struct gp_event_t wxt_event;
+			int n_bytes_read = read(wxt_event_fd, (void*) &wxt_event, sizeof(wxt_event));
+			if (n_bytes_read < sizeof(wxt_event)) {
+				if (paused_for_mouse)
+					int_error(NO_CARET, "wxt communication error, not enough bytes read");
+				FPRINTF((stderr, "wxt communication error, not enough bytes read\n"));
+				break;
+			}
+			if (wxt_process_one_event(&wxt_event)) {
+				/* exit from paused_for_mouse */
 				return '\0';
 			}
-			/* wait 10 microseconds */
-			wxMicroSleep(10);
 		}
+	} while ( paused_for_mouse
+		   || (!paused_for_mouse && !FD_ISSET(stdin_fd, &read_fds)) );
 
-	wxt_change_thread_state(RUNNING);
 	return getchar();
 }
 #else /* WXT_MONOTHREADED */
@@ -3188,11 +3134,6 @@ void wxt_atexit()
 	if (!pid) {
 		FPRINTF((stderr,"child process: running\n"));
 # endif /* HAVE_WORKING_FORK */
-
-# ifdef USE_MOUSE
-		/* accept events */
-		wxt_change_thread_state(WAITING_FOR_STDIN);
-# endif /*USE_MOUSE*/
 
 		FPRINTF((stderr,"child process: restarting its event loop\n"));
 
