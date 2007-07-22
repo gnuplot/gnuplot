@@ -1,3 +1,9 @@
+2007-07-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (fill_between): Calculate intersection points for
+	polar plots using filledcurves, split self-crossing quadrilaterals
+	into two pieces.
+
 2007-07-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (fill_between): For polar plots using filledcurves,

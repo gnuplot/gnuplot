@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.228 2007/07/20 05:45:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.229 2007/07/21 19:19:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2605,21 +2605,33 @@ plot_betweencurves(struct curve_points *plot)
 	yl2 = plot->points[i+1].y;
 	yu2 = plot->points[i+1].yhigh;
 
-	/* EAM 19-July-2007  Attempt to handle polar plots.
-	 * Curves that cross are not handled correctly.
-	 */
+	/* EAM 19-July-2007  Special case for polar plots. */
 	if (polar) {
-	    fill_between(x1,xu1,yl1,yu1,x2,xu2,yl2,yu2,plot);
-	} else
+	    /* Find intersection of the two lines.                   */
+	    /* Probably could use this code in the general case too. */
+	    double A = (yl2-yl1) / (x2-x1);
+	    double C = (yu2-yu1) / (xu2-xu1);
+	    double b = yl1 - x1 * A;
+	    double d = yu1 - xu1 * C;
+	    xmid = (d-b) / (A-C);
+	    ymid = A * xmid + b;
 
-	if ((yu1-yl1)*(yu2-yl2) < 0) {
+	    if ((x1-xmid)*(xmid-x2) > 0) {
+		fill_between(x1,xu1,yl1,yu1, xmid,xmid,ymid,ymid,plot);
+		fill_between(xmid,xmid,ymid,ymid, x2,xu2,yl2,yu2,plot);
+	    } else
+		fill_between(x1,xu1,yl1,yu1, x2,xu2,yl2,yu2,plot);
+
+	} else if ((yu1-yl1)*(yu2-yl2) < 0) {
+	    /* Cheap test for intersection in the general case */
 	    xmid = (x1*(yl2-yu2) + x2*(yu1-yl1))
 		 / ((yu1-yl1) + (yl2-yu2));
 	    ymid = yu1 + (yu2-yu1)*(xmid-x1)/(x2-x1);
-	    fill_between(x1,xu1,yl1,yu1,xmid,xmid,ymid,ymid,plot);
-	    fill_between(xmid,xmid,ymid,ymid,x2,xu2,yl2,yu2,plot);
+	    fill_between(x1,xu1,yl1,yu1, xmid,xmid,ymid,ymid,plot);
+	    fill_between(xmid,xmid,ymid,ymid, x2,xu2,yl2,yu2,plot);
+
 	} else
-	    fill_between(x1,xu1,yl1,yu1,x2,xu2,yl2,yu2,plot);
+	    fill_between(x1,xu1,yl1,yu1, x2,xu2,yl2,yu2,plot);
 
     }
 }
@@ -2707,6 +2719,7 @@ struct curve_points *plot)
     /* above/below (stored in box[ic].x)   */
 	if (polar) {
 	    /* "above" or "below" evaluated in terms of radial distance from origin */
+	    /* FIXME: Most of this should be offloaded to a separate subroutine */
 	    double ox = map_x(0);
 	    double oy = map_y(0);
 	    double plx = map_x(x1);
@@ -2715,7 +2728,18 @@ struct curve_points *plot)
 	    double puy = map_y(yu1);
 	    double drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
 	    double dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
-	    box[ic].x = (drl > dru) ? 1 : 0;
+	    double dx1 = dru - drl;
+
+	    double dx2;
+	    plx = map_x(x2);
+	    ply = map_y(yl2);
+	    pux = map_x(xu2);
+	    puy = map_y(yu2);
+	    drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
+	    dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
+	    dx2 = dru - drl;
+	    
+	    box[ic].x = (dx1+dx2 < 0) ? 1 : 0;
 	} else
 	    box[ic].x = ((yu1-yl1) + (yu2-yl2) < 0) ? 1 : 0;
 	
