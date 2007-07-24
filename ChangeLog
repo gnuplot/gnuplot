@@ -1,3 +1,8 @@
+2007-07-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/gnuplot.texi:  Add a trailing blank after
+	"^6 origin" to suppress error from makeinfo.  Update texi file.
+
 2007-07-24  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: Fixed misprint in "3 multi-branch".

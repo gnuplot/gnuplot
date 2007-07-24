@@ -104,6 +104,7 @@ Johannes Zellner
 
 @menu
 * gnuplot::                     
+* plotting_styles::             
 * Commands::                    
 * Terminal_types::              
 * Graphical_User_Interfaces::   
@@ -115,7 +116,7 @@ Johannes Zellner
 * Terminal_Index::              
 @end menu
 
-@node gnuplot, Commands, Top, Top
+@node gnuplot, plotting_styles, Top, Top
 @chapter gnuplot
 
 
@@ -376,7 +377,7 @@ NEWS file.
 @subsubsection Histogram
 
 Histograms, or bar charts, can be produced.
-See `histograms`.
+See @ref{histograms}.
 
 
 @node Label_plots, Image_data, Histogram, New_plot_styles
@@ -384,15 +385,15 @@ See `histograms`.
 
 In coordination with the new `datastrings` feature described below, gnuplot
 can draw a label at each vertex of a curve.
-See `labels`.
+See @ref{labels}.
 
 
 @node Image_data, Filled_curves, Label_plots, New_plot_styles
 @subsubsection Image data
 
-The `image` and `rgbimage` styles allow to plot 2D images (from ascii or
+The `image` and @ref{rgbimage} styles allow to plot 2D images (from ascii or
 `binary` files) and map them in a 2D or 3D plot.
-See `image` and `rgbimage`.
+See `image` and @ref{rgbimage}.
 
 
 @node Filled_curves, Vectors, Image_data, New_plot_styles
@@ -400,7 +401,7 @@ See `image` and `rgbimage`.
 
 The plot style `fillstyle` has been augmented to allow to fill the area
 between two input curves with a color or a pattern.
-See `filledcurves`.
+See @ref{filledcurves}.
 
 
 @node Vectors,  , Filled_curves, New_plot_styles
@@ -408,7 +409,7 @@ See `filledcurves`.
 
 Gnuplot can draw plots with vectors with a small arrowhead, requiring four or
 six columns of data for 2D or 3D, respectively.
-See `vectors`.
+See @ref{vectors}.
 
 
 @node Input_from_binary_data_files, New_plot_elements, New_plot_styles, New_features_introduced_in_version_4.2
@@ -417,7 +418,7 @@ See `vectors`.
 Gnuplot can now read a generic `binary` input, including matrix binary and
 `general binary` (until now gnuplot supported only its own `binary matrix`
 format). Several matrix file formats are autodetected (`gpbin`, `edf`, `avs`).
-Binary data files are mainly useful for `image` and `rgbimage` drawings.
+Binary data files are mainly useful for `image` and @ref{rgbimage} drawings.
 See `binary` and `binary general filetype`.
 
 
@@ -728,8 +729,8 @@ Sample scripts: pm3d.dem pm3dcolors.dem pm3dgamma.dem
 
 
 A solid color or patterned fill style can be set for any plot style that
-contains boxes. See `boxes`, `boxerrorbars`, `boxxyerrorbars`,
-`candlesticks`, `set style fill`.
+contains boxes. See @ref{boxes}, @ref{boxerrorbars}, @ref{boxxyerrorbars},
+@ref{candlesticks}, `set style fill`.
 
 Sample scripts: fillstyle.dem candlesticks.dem
 
@@ -749,7 +750,7 @@ Sample scripts: step.dem mgr.dem
 
 
 Most gnuplot plot commands that produce text labels now accept modifiers to
-specify text color, font, size, and rotation angle. See @ref{label}.
+specify text color, font, size, and rotation angle. See `set label`.
 Not all terminal types support these options, however.  The enhanced text
 mode previously available for the postscript and pm terminals has been
 extended to other terminal types as well.  Terminal types currently supported
@@ -774,8 +775,8 @@ miscellaneous codepages. See @ref{encoding} for more details.
 
 
 Single- or double-ended arrows can be placed on a plot individually from the
-command line or from a data file via the `plot with vectors` style.
-See @ref{arrow}, `plotting styles vectors`.
+command line or from a data file via the @ref{vectors} style.
+See @ref{arrow}, @ref{vectors}.
 
 Sample scripts: arrowstyle.dem vector.dem
 
@@ -991,7 +992,7 @@ data files.
 
 @cindex axes
 
-The commands @ref{arrow}, `set key`, @ref{label} and @ref{object} allow you
+The commands @ref{arrow}, `set key`, `set label` and @ref{object} allow you
 to draw something at an arbitrary position on the graph.  This position is
 specified by the syntax:
 
@@ -1087,7 +1088,7 @@ generate a title in the key box, while processing the remainder of columns
 
 @end example
 
-See `set style labels`, `using xticlabels`, `plot title`, @ref{using}.
+See @ref{labels}, `using xticlabels`, `plot title`, @ref{using}.
 
 @node Environment, Expressions, Datastrings, gnuplot
 @section Environment
@@ -1828,7 +1829,7 @@ See `format specifiers`.
 
 
 `sprintf("format",var1,var2,...)` applies standard C-language format specifiers
-to multiple arguments (10 max) and returns the resulting string. If you want to
+to multiple arguments and returns the resulting string. If you want to
 use gnuplot's own format specifiers, you must instead call `gprintf()`.
 For information on sprintf format specifiers, please see standard C-language
 documentation or the unix sprintf man page.
@@ -1884,7 +1885,7 @@ ommitting beg or end.
 
 
 `strftime("timeformat",t)` applies the timeformat specifiers to the time t
-given in seconds since the year 2000. 
+given in seconds since the year 2000.
 See `time_specifiers` and @ref{strptime}.
 
 @node strptime, system, strftime, Functions
@@ -2465,12 +2466,12 @@ the "key", sometimes also called the "legend".
 The word "title" occurs with multiple meanings in `gnuplot`.  In this
 document, it will always be preceded by the adjective "plot", "line", or
 "key" to differentiate among them.
-A 2-d graph may have up to four labelled @ref{axes}.  The names of the four axes
+A 2D graph may have up to four labelled @ref{axes}.  The names of the four axes
 are "x" for the axis along the bottom border of the plot, "y" for the axis
 along the left border, "x2" for the top border, and "y2" for the right border.
 See @ref{axes}.
 
-A 3-d graph may have up to three labelled @ref{axes} -- "x", "y" and "z".  It is
+A 3D graph may have up to three labelled @ref{axes} -- "x", "y" and "z".  It is
 not possible to say where on the graph any particular axis will fall because
 you can change the direction from which the graph is seen with @ref{view}.
 
@@ -2588,7 +2589,7 @@ where <colorspec> has one of the following forms:
 @example
       rgbcolor "colorname"
       rgbcolor "#RRGGBB"
-      rgbcolor variable
+      rgbcolor variable       # color is read from input file
       palette frac <val>      # <val> runs from 0 to 1
       palette cb <value>      # <val> lies within cbrange
       palette z
@@ -2604,19 +2605,6 @@ from 0 - 255.  For example, magenta = full-scale red + full-scale blue would
 be represented by #FF00FF, which is the hexadecimal representation of
 (255 << 16) + (0 << 8) + (255).
 
-"rgb variable" requires an additional column in the @ref{using} specifier, and
-is only available in 3D plotting mode (splot). The extra column is interpreted
-as a 24-bit packed RGB triple. These are most easily specified in a data file
-as hexidecimal values (see above).
-
-Example:
-
-@example
-      rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
-      splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
-
-@end example
-
 The color palette is a linear gradient of colors that smoothly maps a
 single numerical value onto a particular color.  Two such mappings are always
 in effect. `palette frac`  maps a fractional value between 0 and 1 onto the
@@ -2628,6 +2616,35 @@ palette.
 "palette z" maps the z value of each plot segment or plot element into the
 cbrange mapping of the palette. This allows smoothly-varying color along a
 3d line or surface. This option applies only to 3D plots (splot).
+
+@menu
+* rgbcolor_variable::           
+@end menu
+
+@node rgbcolor_variable,  , colorspec, colorspec
+@subsubsection rgbcolor variable
+
+@c ?rgbcolor variable
+Most plot commands assign a single color (linetype) to each element of the
+plot.  If there are multiple plots on a single graph, the default color
+(linetype) is incremented sequentially.  Some plot stiles allow you to
+bypass this mechanism altogether, and assign a separate color for each
+data point, line segment, or label.  This is indicated by the colorspec
+`rgbcolor variable`, and tells the program to take the color for each point
+from a separate column in the data file. This requires an additional column
+in the @ref{using} specifier.  The extra column is interpreted as a 24-bit packed
+RGB triple. These are most easily specified in a data file as hexidecimal
+values (see `rgbcolor`).
+
+Example:
+
+@example
+      # Place colored points in 3D at the x,y,z coordinates corresponding to
+      # their red, green, and blue components
+      rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
+      splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
+
+@end example
 
 
 @node mouse_input, Plotting, linetype, gnuplot
@@ -2666,7 +2683,7 @@ The `bind` allows defining or redefining a hotkey, i.e. a sequence of gnuplot
 commands which will be executed when a certain key or key sequence is pressed
 while the driver's window has the input focus. Note that `bind` is only
 available if gnuplot was compiled with `mouse` support and it is used by all
-mouse-capable terminals. A user-specified binding supercedes any builtin
+mouse-capable terminals. A user-specified binding supersedes any builtin
 bindings, except that <space> and 'q' cannot normally be rebound. For an
 exception, see `bind space`.
 
@@ -2772,7 +2789,7 @@ See also help for `mouse` and @ref{if}.
 
 @c ?commands bind space
 @c ?bind space
-By default, the <space> hotkey raises gnuplot's command window. On some 
+By default, the <space> hotkey raises gnuplot's command window. On some
 terminals (e.g. x11, wx), 'q' closes the graph window. These defaults can
 be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
 see `x11 command-line-options`, or by the X Resource 'gnuplot*ctrlq'.
@@ -2829,13 +2846,13 @@ GPVAL_X_MAX, GPVAL_Y_MIN, and GPVAL_Y_MAX, see @ref{variables}.
 @cindex plotting
 
 There are three `gnuplot` commands which actually create a plot: `plot`,
-`splot` and @ref{replot}.  `plot` generates 2-d plots, `splot` generates 3-d
-plots (actually 2-d projections, of course), and @ref{replot} appends its
+`splot` and @ref{replot}.  `plot` generates 2D plots, `splot` generates 3-d
+plots (actually 2D projections, of course), and @ref{replot} appends its
 arguments to the previous `plot` or `splot` and executes the modified
 command.
 
 Much of the general information about plotting can be found in the discussion
-of `plot`; information specific to 3-d can be found in the `splot` section.
+of `plot`; information specific to 3D can be found in the `splot` section.
 
 `plot` operates in either rectangular or polar coordinates -- see `set polar`
 for details of the latter.  `splot` operates only in rectangular coordinates,
@@ -2852,12 +2869,12 @@ full complement of `set` commands exists to give you complete control over
 the scales and labelling of each axis.  Some commands have the name of an
 axis built into their names, such as @ref{xlabel}.  Other commands have one
 or more axis names as options, such as `set logscale xy`.  Commands and
-options controlling the z axis have no effect on 2-d graphs.
+options controlling the z axis have no effect on 2D graphs.
 
 `splot` can plot surfaces and contours in addition to points and/or lines.
 In addition to `splot`, see @ref{isosamples} for information about defining
-the grid for a 3-d function;  @ref{datafile} for information about the
-requisite file structure for 3-d data values; and @ref{contour} and
+the grid for a 3D function;  @ref{datafile} for information about the
+requisite file structure for 3D data values; and @ref{contour} and
 @ref{cntrparam} for information about contours.
 
 In `splot`, control over the scales and labels of the axes are the same as
@@ -3131,7 +3148,7 @@ few miscellaneous things are enclosed in parentheses.  Braces @{@} are used for
 a few special purposes.
 
 Commas are used to separate coordinates on the `set` commands @ref{arrow},
-`key`, and @ref{label}; the list of variables being fitted (the list after the
+`key`, and `label`; the list of variables being fitted (the list after the
 `via` keyword on the `fit` command); lists of discrete contours or the loop
 parameters which specify them on the @ref{cntrparam} command; the arguments
 of the `set` commands @ref{dgrid3d}, @ref{dummy}, @ref{isosamples}, @ref{offsets}, @ref{origin},
@@ -3289,7 +3306,1077 @@ which will produce xtic labels that look like "03/21".
 
 See the descriptions of each command for more details.
 
-@node Commands, Terminal_types, gnuplot, Top
+@node plotting_styles, Commands, gnuplot, Top
+@chapter plotting styles
+
+@c ?plotting styles
+
+There are many plotting styles available in gnuplot.
+They are listed alphabetically below.
+The commands `set style data` and `set style function` change the
+default plotting style for subsequent `plot` and `splot` commands.
+
+You also have the option to specify the plot style explicitly as part of
+the `plot` or `splot` command.  If you want to mix plot styles within a
+single plot, you must specify the plot style for each component.
+
+Example:
+
+@example
+     plot 'data' with boxes, sin(x) with lines
+
+@end example
+
+Each plot style has its own expected set of data entries in a data file.
+For example by default the `lines` style expects either a single column of
+y values (with implicit x ordering) or a pair of columns with x in the first
+and y in the second.  For more information on how to fine-tune how columns in a
+file are interpreted as plot data, see @ref{using}.
+
+
+@menu
+* boxerrorbars::                
+* boxes::                       
+* boxxyerrorbars::              
+* candlesticks::                
+* dots::                        
+* filledcurves::                
+* financebars::                 
+* fsteps::                      
+* histeps::                     
+* histograms::                  
+* image::                       
+* impulses::                    
+* labels::                      
+* lines::                       
+* linespoints::                 
+* points::                      
+* steps::                       
+* rgbimage::                    
+* vectors::                     
+* xerrorbars::                  
+* xyerrorbars::                 
+* yerrorbars::                  
+* xerrorlines::                 
+* xyerrorlines::                
+* yerrorlines::                 
+@end menu
+
+@node boxerrorbars, boxes, plotting_styles, plotting_styles
+@section boxerrorbars
+
+@c ?commands set style boxerrorbars
+@c ?set style boxerrorbars
+@c ?plotting styles boxerrorbars
+@c ?style boxerrorbars
+@cindex boxerrorbars
+
+The @ref{boxerrorbars} style is only relevant to 2D data plotting.  It is a
+combination of the @ref{boxes} and @ref{yerrorbars} styles.  It uses 3, 4, or 5
+columns of data:
+
+@example
+     3 columns:  x  y  ydelta
+     4 columns:  x  y  ydelta xdelta        # boxwidth != -2
+     4 columns:  x  y  ylow  yhigh          # boxwidth == -2
+     5 columns:  x  y  ylow  yhigh  xdelta
+
+@end example
+
+The boxwidth will come from the fourth column if the y errors are given as
+"ydelta" and the boxwidth was not previously set to -2.0 (`set boxwidth -2.0`)
+or from the fifth column if the y errors are in the form of "ylow yhigh".  The
+special case  `boxwidth = -2.0` is for four-column data with y errors in the
+form "ylow yhigh".  In this case the boxwidth will be calculated so that each
+box touches the adjacent boxes.  The width will also be calculated in cases
+where three-column data are used.
+
+The box height is determined from the y error in the same way as it is for
+the @ref{yerrorbars} style---either from y-ydelta to y+ydelta or from ylow to
+yhigh, depending on how many data columns are provided.
+See also
+@uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
+}
+
+@node boxes, boxxyerrorbars, boxerrorbars, plotting_styles
+@section boxes
+
+@c ?commands set style boxes
+@c ?set style boxes
+@c ?plotting styles boxes
+@c ?style boxes
+@cindex boxes
+
+The @ref{boxes} style is only relevant to 2D plotting.  It draws a box centered
+about the given x coordinate that extends from the x axis (not from the graph
+border) to the given y coordinate.  It uses 2 or 3 columns of basic data.
+Additional input columns may be used to provide information such as
+variable line or fill color (see `rgbcolor variable`).
+
+@example
+     2 columns:  x  y
+     3 columns:  x  y  x_width
+
+@end example
+
+The width of the box is obtained in one of three ways.  If the input data has a
+third column, this will be used to set the width of the box.  If not, if a
+width has been set using the @ref{boxwidth} command, this will be used.
+If neither of these is available, the width of each box will be calculated
+automatically so that it touches the adjacent boxes.
+
+The interior of the boxes is drawn according to the current fillstyle.
+See `set style fill` for details.  Alternatively a new fillstyle
+may be specified in the plot command.
+
+For fillstyle `empty` the box is filled with the background color.
+
+For fillstyle `solid` the box is filled with a solid rectangle of the
+current drawing color. There is an optional parameter <density> that
+controls the fill density; it runs from 0 (background color) to 1
+(current drawing color).
+
+For fillstyle `pattern` the box is filled in the current drawing color with
+a pattern, if supported by the terminal driver.
+
+Examples:
+
+To plot a data file with solid filled boxes with a small vertical space
+separating them (bargraph):
+
+@example
+      set boxwidth 0.9 relative
+      set style fill solid 1.0
+      plot 'file.dat' with boxes
+
+@end example
+
+To plot a sine and a cosine curve in pattern-filled boxes style:
+
+@example
+      set style fill pattern
+      plot sin(x) with boxes, cos(x) with boxes
+
+@end example
+
+The sin plot will use pattern 0; the cos plot will use pattern 1.
+Any additional plots would cycle through the patterns supported by the
+terminal driver.
+
+To specify explicit fillstyles for each dataset:
+
+@example
+     plot 'file1' with boxes fs solid 0.25, \
+          'file2' with boxes fs solid 0.50, \
+          'file3' with boxes fs solid 0.75, \
+          'file4' with boxes fill pattern 1, \
+          'file5' with boxes fill empty
+
+@end example
+
+
+@node boxxyerrorbars, candlesticks, boxes, plotting_styles
+@section boxxyerrorbars
+
+@c ?commands set style boxxyerrorbars
+@c ?set style boxxyerrorbars
+@c ?plotting styles boxxyerrorbars
+@c ?style boxxyerrorbars
+@cindex boxxyerrorbars
+
+The @ref{boxxyerrorbars} style is only relevant to 2D data plotting.  It is similar
+to the @ref{xyerrorbars} style except that it draws rectangular areas rather than
+simple crosses.  It uses either 4 or 6 basic columns of input data.
+Additional input columns may be used to provide information such as
+variable line or fill color (see `rgbcolor variable`).
+
+@example
+     4 columns:  x  y  xdelta  ydelta
+     6 columns:  x  y  xlow  xhigh  ylow  yhigh
+
+@end example
+
+The box width and height are determined from the x and y errors in the same
+way as they are for the @ref{xyerrorbars} style---either from xlow to xhigh and
+from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
+y+ydelta, depending on how many data columns are provided.
+
+The interior of the boxes is drawn according to the current fillstyle.
+See `set style fill` and @ref{boxes} for details.  Alternatively a new fillstyle
+may be specified in the plot command.
+
+@node candlesticks, dots, boxxyerrorbars, plotting_styles
+@section candlesticks
+
+@c ?commands set style candlesticks
+@c ?set style candlesticks
+@c ?plotting styles candlesticks
+@c ?style candlesticks
+@cindex candlesticks
+
+The @ref{candlesticks} style can be used for 2D data plotting of financial
+data or for generating box-and-whisker plots of statistical data.
+The symbol is a rectangular box, centered horizontally at the x
+coordinate and limited vertically by the opening and closing prices.  A
+vertical line segment at the x coordinate extends up from the top of the
+rectangle to the high price and another down to the low.  The vertical line
+will be unchanged if the low and high prices are interchanged.
+
+Five columns of basic data are required:
+
+@example
+      financial data:   date  open  low  high  close
+      whisker plot:     x  box_min  whisker_min  whisker_high  box_high
+
+@end example
+
+The width of the rectangle can be controlled by the @ref{boxwidth} command.
+For backwards compatibility with earlier gnuplot versions, when the
+boxwidth parameter has not been set then the width of the candlestick
+rectangle is controlled by `set bars <width>`.
+
+By default the vertical line segments have no crossbars at the top and
+bottom. If you want crossbars, which are typically used for box-and-whisker
+plots, then add the keyword `whiskerbars` to the plot command.  By default
+these whiskerbars extend the full horizontal width of the candlestick, but
+you can modify this by specifying a fraction of the full width.
+
+By default the rectangle is empty if (open > close), and filled with three
+vertical bars if (close > open). If filled-boxes support is present, then
+the rectangle is colored according to `set style fill <fillstyle>`.
+See @ref{bars} and @ref{financebars}.  See also
+@uref{http://gnuplot.sourceforge.net/demo/candlesticks.html,finance demos
+}
+.
+
+Note: To place additional symbols, such as the median value, on a
+box-and-whisker plot requires additional plot commands as in this example:
+
+@example
+  # Data columns:X Min 1stQuartile Median 3rdQuartile Max
+  set bars 4.0
+  set style fill empty
+  plot 'stat.dat' using 1:3:2:6:5 with candlesticks title 'Quartiles', \
+       ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
+
+@end example
+
+@example
+  # Plot with crossbars on the whiskers, crossbars are 50% of full width
+  plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
+
+@end example
+
+@example
+ See @ref{boxwidth}, @ref{bars} and `set style fill`.
+
+@end example
+
+@node dots, filledcurves, candlesticks, plotting_styles
+@section dots
+
+@c ?commands set style dots
+@c ?set style dots
+@c ?plotting styles dots
+@c ?style dots
+@cindex dots
+
+The @ref{dots} style plots a tiny dot at each point; this is useful for scatter
+plots with many points.  Either 1 or 2 columns of input data are required in
+2D.  3 columns are required in 3D.
+
+@example
+     1 column    y         # x is taken from row number
+     2 columns:  x  y
+     3 columns:  x  y  z   # 3D only (splot)
+
+@end example
+
+For some terminals (post, pdf) the size of the dot can be controlled by
+changing the linewidth.
+
+@node filledcurves, financebars, dots, plotting_styles
+@section filledcurves
+
+@c ?commands set style filledcurves
+@c ?set style filledcurves
+@c ?plotting styles filledcurves
+@c ?style filledcurves
+@cindex filledcurves
+
+The @ref{filledcurves} style is only relevant to 2D plotting. Three variants
+are possible. The first two variants require either a function or two columns
+of input data, and may be further modified by the options listed below.
+
+Syntax:
+
+@example
+    set style [data | function] filledcurves [option]
+    plot ... with filledcurves [option]
+
+@end example
+
+where the option can be
+
+@example
+    [closed | @{above | below@} @{x1 | x2 | y1 | y2@}[=<a>] | xy=<x>,<y>]
+
+@end example
+
+The first variant, `closed`, treats the curve itself as a closed polygon.
+This is the default if there are two columns of input data.
+
+The second variant is to fill the area between the curve and a given axis,
+a horizontal or vertical line, or a point.
+
+@example
+    filledcurves closed   ... just filled closed curve,
+    filledcurves x1       ... x1 axis,
+    filledcurves x2       ... x2 axis, etc for y1 and y2 axes,
+    filledcurves y1=0     ... line y=0 (at y1 axis) ie parallel to x1 axis,
+    filledcurves y2=42    ... line y=42 (at y2 axis) ie parallel to x2, etc,
+    filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
+
+@end example
+
+The third variant requires three columns of input data: the x coordinate and
+two y coordinates corresponding to two curves sampled at the same set of
+x coordinates; the area between the two curves is filled.
+This is the default if there are three or more columns of input data.
+
+@example
+     3 columns:  x  y1  y2
+
+@end example
+
+Example of filling the area between two input curves.
+@uref{http://www.gnuplot.info/demo/fillbetween.html,fill between curves demo.
+}
+
+@example
+    plot 'data' using 1:2:3 with filledcurves
+
+@end example
+
+The `above` and `below` options apply both to commands of the form
+@example
+    ... filledcurves above @{x1|x2|y1|y2@}=<val>
+@end example
+
+and to commands of the form
+@example
+    ... using 1:2:3 with filledcurves below
+@end example
+
+In either case the option limits the filled area to one side of the bounding
+line or curve.
+
+Note: Not all terminal types support this plotting mode.
+
+Zooming a filled curve drawn from a datafile may produce empty or incorrect
+areas because gnuplot is clipping points and lines, and not areas.
+
+If the values of <a>, <x>, <y> are out of the drawing boundary, then they
+are moved to the graph boundary. Then the actually filled area in the case
+of option xy=<x>,<y> will depend on xrange and yrange.
+
+@node financebars, fsteps, filledcurves, plotting_styles
+@section financebars
+
+@c ?commands set style financebars
+@c ?set style financebars
+@c ?plotting styles financebars
+@c ?style financebars
+@cindex financebars
+
+The @ref{financebars} style is only relevant for 2D data plotting of financial
+data.  It requires 1 x coordinate (usually a date) and 4 y values (prices).
+
+@example
+     5 columns:   date  open  low  high  close
+
+@end example
+
+The symbol is a vertical line segment, located horizontally at the x
+coordinate and limited vertically by the high and low prices.  A horizontal
+tic on the left marks the opening price and one on the right marks the
+closing price.  The length of these tics may be changed by @ref{bars}.  The
+symbol will be unchanged if the high and low prices are interchanged.
+See @ref{bars} and @ref{candlesticks}, and also the
+@uref{http://www.gnuplot.info/demo/finance.html,finance demo.
+}
+
+@node fsteps, histeps, financebars, plotting_styles
+@section fsteps
+
+@c ?commands set style fsteps
+@c ?set style fsteps
+@c ?plotting styles fsteps
+@c ?style fsteps
+@cindex fsteps
+
+The @ref{fsteps} style is only relevant to 2D plotting.  It connects consecutive
+points with two line segments: the first from (x1,y1) to (x1,y2) and the
+second from (x1,y2) to (x2,y2).
+See also
+@uref{http://www.gnuplot.info/demo/steps.html,steps demo.
+}
+
+@node histeps, histograms, fsteps, plotting_styles
+@section histeps
+
+@c ?commands set style histeps
+@c ?set style histeps
+@c ?plotting styles histeps
+@c ?style histeps
+@cindex histeps
+
+The @ref{histeps} style is only relevant to 2D plotting.  It is intended for
+plotting histograms.  Y-values are assumed to be centered at the x-values;
+the point at x1 is represented as a horizontal line from ((x0+x1)/2,y1) to
+((x1+x2)/2,y1).  The lines representing the end points are extended so that
+the step is centered on at x.  Adjacent points are connected by a vertical
+line at their average x, that is, from ((x1+x2)/2,y1) to ((x1+x2)/2,y2).
+
+If @ref{autoscale} is in effect, it selects the xrange from the data rather than
+the steps, so the end points will appear only half as wide as the others.
+See also
+@uref{http://www.gnuplot.info/demo/steps.html,steps demo.
+}
+
+@ref{histeps} is only a plotting style; `gnuplot` does not have the ability to
+create bins and determine their population from some data set.
+
+@node histograms, image, histeps, plotting_styles
+@section histograms
+
+@c ?commands set style histogram
+@c ?set style histogram
+@c ?style histograms
+@c ?plotting styles histograms
+@cindex histograms
+
+The @ref{histograms} style is only relevant to 2D plotting.  It produces a bar
+chart from a sequence of parallel data columns. Each element of the `plot`
+command must specify a single input data source (e.g. one column of the input
+file), possibly with associated tic values or key titles.
+Four styles of histogram layout are currently supported.
+
+@example
+      set style histogram clustered @{gap <gapsize>@}
+      set style histogram errorbars @{gap <gapsize>@} @{<linewidth>@}
+      set style histogram rowstacked
+      set style histogram columnstacked
+
+@end example
+
+The default style corresponds to `set style histogram clustered gap 2`.
+In this style, each set of parallel data values is collected into a group of
+boxes clustered at the x-axis coordinate corresponding to their sequential
+position (row #) in the selected datafile columns.  Thus if <n> datacolumns are
+selected, the first cluster is centered about x=1, and contains <n> boxes whose
+heights are taken from the first entry in the corresponding <n> data columns.
+This is followed by a gap and then a second cluster of boxes centered about x=2
+corresponding to the second entry in the respective data columns, and so on.
+The default gap width of 2 indicates that the empty space between clusters is
+equivalent to the width of 2 boxes.  All boxes derived from any one column
+are given the same fill color and/or pattern (see `set style fill`).
+
+Each cluster of boxes is derived from a single row of the input data file.
+It is common in such input files that the first element of each row is a
+label. Labels from this column may be placed along the x-axis underneath
+the appropriate cluster of boxes with the `xticlabels` option to @ref{using}.
+
+The @ref{errorbars} style is very similar to the `clustered` style, except that
+it requires two columns of input for each entry. The first column is treated
+as the height (y-value) of that box, exactly as for the `clustered` style.
+The second column is treated as an error magnitude, and used to generate a
+vertical error bar at the top of the box. The appearance of the error bar is
+controlled by the current value of @ref{bars} and by the optional <linewidth>
+specification.
+
+Two styles of stacked histogram are supported, chosen by the command
+`set style histogram @{rowstacked|columnstacked@}`.  In these styles the data
+values from the selected columns are collected into stacks of boxes.
+The default stacking mode is `rowstacked`.
+
+The `rowstacked` style places a box resting on the x-axis for each
+data value in the first selected column; the first data value results in
+a box a x=1, the second at x=2, and so on.  Boxes corresponding to the
+second and subsequent data columns are layered on top of these, resulting
+in a stack of boxes at x=1 representing the first data value from each
+column, a stack of boxes at x=2 representing the second data value from
+each column, and so on.  All boxes derived from any one column are given the
+same fill color and/or pattern (see `set style fill`).
+
+The `columnstacked` style is similar, except that each stack of boxes is
+built up from a single data column. Each data value from the first specified
+column yields a box in the stack at x=1, each data value from the second
+specified column yields a box in the stack at x=2, and so on.  In this style
+the color of each box is taken from the row number, rather than the column
+number, of the corresponding data field.
+
+Box widths may be modified using the @ref{boxwidth} command.
+Box fill styles may be set using the `set style fill` command.
+
+Histograms always use the x1 axis, but may use either y1 or y2.
+If a plot contains both histograms and other plot styles, the non-histogram
+plot elements may use either the x1 or the x2 axis.
+
+Examples:
+
+To plot a data file containing multiple columns of data as a histogram
+of clustered boxes (the default style):
+
+@example
+      set boxwidth 0.9 relative
+      set style data histograms
+      set style fill solid 1.0 border -1
+      plot 'file.dat' using 2, '' using 4, '' using 6
+
+@end example
+
+This will produce a plot with clusters of three boxes (vertical bars) centered
+at each integral value on the x axis.  If the first column of the input file
+contains labels, they may be placed along the x-axis using the variant command
+
+@example
+      plot 'file.dat' using 2, '' using 4, '' using 6:xticlabels(1)
+
+@end example
+
+If the file contains both a magnitude and an error estimate for each value,
+then error bars can be added to the plot.  The following commands will add
+error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
+ends drawn the same width as the box itself. The error bars and bar ends are
+drawn in black with linewidth 2.
+
+@example
+      set bars fullwidth
+      set style histogram errorbars gap 2 lt -1 lw 2
+      plot 'file.dat' using 2:3, '' using 4:5, '' using 6:7:xticlabels(1)
+
+@end example
+
+To plot the same data as a rowstacked histogram:
+
+@example
+      set style histogram rows
+      plot 'file.dat' using 2, '' using 4, '' using 6:xtic(1)
+
+@end example
+
+This will produce a plot in which each vertical bar contains a stack of three
+segments, corresponding in height to the values found in columns 2, 4 and 6
+of the datafile.
+
+Finally, the commands
+
+@example
+      set style histogram columnstacked
+      plot 'file.dat' using 2, '' using 4, '' using 6
+
+@end example
+
+will produce three vertical stacks. The stack at x=1 will contain a box for
+each entry in column 2 of the datafile.  The stack at x=2 will contain a box
+for each parallel entry in column 4 of the datafile, and the stack at x=3 a
+box for each entry of column 6.  Because this interchanges gnuplot's usual
+interpretation of input rows and columns, the specification of key titles and
+x-axis tic labels must also be modified.
+
+@example
+      set style histogram columnstacked
+      plot '' u 5:key(1)            # uses first column to generate key titles
+      plot '' u 5 title columnhead  # uses first row to generate xtic labels
+
+@end example
+
+@menu
+* newhistogram::                
+* automated_iteration_over_multiple_columns::  
+@end menu
+
+@node newhistogram, automated_iteration_over_multiple_columns, histograms, histograms
+@subsection newhistogram
+
+@cindex newhistogram
+
+@c ?histograms newhistogram
+@c ?plotting style histograms newhistogram
+More than one set of histograms can appear in a single plot. In this case you
+can force a gap between them, and a separate label for each set, by using the
+plot command `newhistogram @{"<title>"@} @{<linestyle>@}`.
+For example
+
+@example
+      set style histogram  cluster
+      plot newhistogram "Set A", 'a' using 1, '' using 2, '' using 3, \
+           newhistogram "Set B", 'b' using 1, '' using 2, '' using 3
+
+@end example
+
+The labels "Set A" and "Set B" will appear beneath the respective sets of
+histograms, under the overall x axis label.
+
+The newhistogram command can also be used to force histogram coloring to
+begin with a specific color (linetype). By default colors will continue to
+increment successively even across histogram boundaries. Here is an example
+using the same coloring for multiple histograms
+@example
+      plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
+           newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
+
+@end example
+
+@node automated_iteration_over_multiple_columns,  , newhistogram, histograms
+@subsection automated iteration over multiple columns
+
+@cindex automated
+
+@c ?histograms automated
+@c ?styles histograms automated
+@c ?plotting styles histograms automated
+If you want to create a histogram from many columns of data in a single file,
+it is very convenient to use the plot iteration feature.  See @ref{iteration}.
+For example, to create stacked histograms of the data in columns 3 through 8
+
+@example
+      set style histogram columnstacked
+      plot for [i=3:8] "datafile" using i title columnhead
+
+@end example
+
+@node image, impulses, histograms, plotting_styles
+@section image
+
+@c ?commands set style image
+@c ?set style image
+@c ?plotting styles image
+@c ?style image
+@cindex image
+
+The `image` style is intendend for projecting 2D images onto either 2D or 3D
+plots.  It may be used for both `plot` and `splot` in the form of 3D data
+(x,y,value) or projected 4D data (x,y,z,value), respectively.  It is assumed
+that in the viewing plane the image data forms an equidistant sampling grid in
+the viewing plane along two, not necessarily  orthogonal, directions.  In other
+words, groups of four adjacent points are assumed to form the same size
+parallelogram.  The variable `value` in the tuples represent a palette color
+(gray value) for indexing in the current palette.
+
+Each pixel (data point) of the input 2D image will become a rectangle or
+parallelogram in the plot.  The coordinate of each data point will determine
+the center of the parallelogram.  That is, an M x N set of data will form an
+image with M x N pixels.  This is slightly different than pm3d elements where
+an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
+directions for the image data grid can be any of eight possible combinations.
+
+See also @ref{rgbimage}.
+
+@menu
+* image_failsafe::              
+@end menu
+
+@node image_failsafe,  , image, image
+@subsection image failsafe
+
+@c ?commands set style image failsafe
+@c ?set style image failsafe
+@c ?plotting styles image failsafe
+@c ?style image failsafe
+@c ?image failsafe
+@cindex failsafe
+
+Some terminal drivers provide code to optimize rendering of image data
+within a rectangular 2D area.  However this code is known to be imperfect
+(hence the label EXPERIMENTAL for image support in gnuplot version 4.2).
+This optimized code may be disabled by using the keyword `failsafe`. E.g.
+
+@example
+      plot 'data' with image failsafe
+
+@end example
+
+Here are some specific comments about particular terminal drivers:
+
+x11 and wxt - Pixels are either repeated or decimated to fit the display
+resolution; no other processing (filtering) is done.  Thus, aliasing may
+occur when decimating images having high spatial frequency content.
+
+postscript (pslatex, epslatex, pstex) - Image is copied in its original
+resolution, and sample interpolation is turned off.
+
+See also @ref{rgbimage}.
+
+@node impulses, labels, image, plotting_styles
+@section impulses
+
+@c ?commands set style impulses
+@c ?set style impulses
+@c ?plotting styles impulses
+@c ?style impulses
+@cindex impulses
+
+The @ref{impulses} style displays a vertical line from the x axis (2D) or from the
+xy plane (3D) to each input point.  To use this style effectively in 3D plots,
+it is useful to use thick lines (linewidth > 1).
+
+@example
+     1 column:   y        # implicit x coordinate from row number (2D)
+     2 columns:  x  y     # line from [x,0] to [x,y]  (2D)
+     3 columns:  x  y  z  # line from [x,y,0] to [x,y,z] (3D)
+
+@end example
+
+
+@node labels, lines, impulses, plotting_styles
+@section labels
+
+@c ?commands set style labels
+@c ?set style labels
+@c ?plotting styles labels
+@c ?style labels
+@cindex labels
+
+The @ref{labels} style reads coordinates and text from a data file and places
+the text string at the corresponding 2D or 3D position.  3 or 4 input columns
+of basic data are required.  Additional input columns may be used to provide
+information such as variable text color (see `rgbcolor variable`).
+
+@example
+     3 columns:  x  y  string    # 2D version
+     4 columns:  x  y  z  string # 3D version
+
+@end example
+
+The font, color, rotation angle and other properties of the printed text may be
+specified as additional command options (see `set label`). The example below
+will generate a 2D plot with text labels taken from column 4 of the input
+file (`tc lt 2` is shorthand for `textcolor linetype 2`, which is green).
+
+@example
+  plot 'datafile' using 1:(0.5 * $2):4 with labels font "arial,11" tc lt 2
+
+@end example
+
+The @ref{labels} style can also be used in 3D plots. In this case four input
+column specifiers are required, corresponding to X Y Z and text.
+
+@example
+  splot 'datafile' using 1:2:3:4 with labels
+
+@end example
+
+See also `datastrings`, `set style data`.
+
+@node lines, linespoints, labels, plotting_styles
+@section lines
+
+@c ?commands set style lines
+@c ?set style lines
+@c ?plotting styles lines
+@c ?style lines
+@cindex lines
+
+The `lines` style connects adjacent points with straight line segments.
+It may be used in either 2D or 3D plots. The basic form requires 1, 2, or 3
+columns of input data.
+Additional input columns may be used to provide information such as
+variable line color (see `rgbcolor variable`).
+
+2D form
+@example
+     1 column:   y           # implicit x value from row number
+     2 columns:  x  y
+@end example
+
+3D form
+@example
+     1 column:   z           # implicit x from row, y from index
+     3 columns:  x  y  z
+
+@end example
+
+See also `linetype`, `linewidth`, and `linestyle`.
+
+@node linespoints, points, lines, plotting_styles
+@section linespoints
+
+@c ?commands set style linespoints
+@c ?commands set style lp
+@c ?set style linespoints
+@c ?plotting styles linespoints
+@c ?set style lp
+@c ?style linespoints
+@c ?style lp
+@cindex linespoints
+
+@cindex lp
+
+The @ref{linespoints} style does both `lines` and `points`, that is, it draws a
+small symbol at each point and then connects adjacent points with straight
+line segments.  The command @ref{pointsize} may be used to change the size of
+the points.  See @ref{pointsize} for its usage.
+1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
+required if 3D plots.  See `style lines`.  Additional input columns may be used
+to provide information such as variable point size or line color.
+
+@ref{linespoints} may be abbreviated `lp`.
+
+@node points, steps, linespoints, plotting_styles
+@section points
+
+@c ?commands set style points
+@c ?set style points
+@c ?plotting styles points
+@c ?style points
+@cindex points
+
+The `points` style displays a small symbol at each point.  The command @ref{pointsize} may be used to change the default size of the points.
+1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
+required if 3D plots.  See `style lines`.  Additional input columns may be used
+to provide information such as variable point size or color.
+
+@node steps, rgbimage, points, plotting_styles
+@section steps
+
+@c ?commands set style steps
+@c ?set style steps
+@c ?plotting styles steps
+@c ?style steps
+@cindex steps
+
+The @ref{steps} style is only relevant to 2D plotting.  It connects consecutive
+points with two line segments: the first from (x1,y1) to (x2,y1) and the
+second from (x2,y1) to (x2,y2).
+See also
+@uref{http://www.gnuplot.info/demo/steps.html,steps demo.
+}
+
+@node rgbimage, vectors, steps, plotting_styles
+@section rgbimage
+
+@c ?commands set style rgbimage
+@c ?set style rgbimage
+@c ?plotting styles rgbimage
+@c ?style rgbimage
+@cindex rgbimage
+
+The @ref{rgbimage} style is intended for plotting 2D images and is similar
+in concept to `image`.  See `image` for details.  The difference is
+that 5D data (x,y,r,g,b) for `plot` and 6D data (x,y,z,r,g,b) for `splot`
+describe the coordinates and color components of an image.
+
+See also `image`.
+
+@node vectors, xerrorbars, rgbimage, plotting_styles
+@section vectors
+
+@c ?commands set style vectors
+@c ?set style vectors
+@c ?plotting styles vectors
+@c ?style vectors
+@cindex vectors
+
+The 2D @ref{vectors} style draws a vector from (x,y) to (x+xdelta,y+ydelta).
+The 3D @ref{vectors} style is similar, but requires six columns of basic data.
+A small arrowhead is drawn at the end of each vector.
+
+@example
+     4 columns:  x  y  xdelta  ydelta
+     6 columns:  x  y  z  xdelta  ydelta  zdelta
+
+@end example
+
+splot with vectors is supported only for `set mapping cartesian`.
+The keywords "with vectors" may be followed by arrow style specifications.
+See `arrowstyle` for more details.
+
+Example:
+@example
+      plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
+      splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
+
+@end example
+
+`set clip one` and `set clip two` affect vectors drawn in 2D.
+Please see @ref{clip} and `arrowstyle`.
+
+@node xerrorbars, xyerrorbars, vectors, plotting_styles
+@section xerrorbars
+
+@c ?commands set style xerrorbars
+@c ?set style xerrorbars
+@c ?plotting styles xerrorbars
+@c ?style xerrorbars
+@cindex xerrorbars
+
+The @ref{xerrorbars} style is only relevant to 2D data plots.  @ref{xerrorbars} is
+like @ref{dots}, except that a horizontal error bar is also drawn.  At each point
+(x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
+(x+xdelta,y), depending on how many data columns are provided.  A tic mark
+is placed at the ends of the error bar (unless @ref{bars} is used---see
+@ref{bars} for details).  The basic style requires either 3 or 4 columns:
+
+@example
+     3 columns:  x  y  xdelta
+     4 columns:  x  y  xlow  xhigh
+
+@end example
+
+
+@node xyerrorbars, yerrorbars, xerrorbars, plotting_styles
+@section xyerrorbars
+
+@c ?commands set style xyerrorbars
+@c ?set style xyerrorbars
+@c ?plotting styles xyerrorbars
+@c ?style xyerrorbars
+@cindex xyerrorbars
+
+The @ref{xyerrorbars} style is only relevant to 2D data plots.  @ref{xyerrorbars} is
+like @ref{dots}, except that horizontal and vertical error bars are also drawn.
+At each point (x,y), lines are drawn from (x,y-ydelta) to (x,y+ydelta) and
+from (x-xdelta,y) to (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from
+(xlow,y) to (xhigh,y), depending upon the number of data columns provided.  A
+tic mark is placed at the ends of the error bar (unless @ref{bars} is
+used---see @ref{bars} for details).  Either 4 or 6 input columns are required.
+
+@example
+     4 columns:  x  y  xdelta  ydelta
+     6 columns:  x  y  xlow  xhigh  ylow  yhigh
+
+@end example
+
+If data are provided in an unsupported mixed form, the @ref{using} filter on the
+`plot` command should be used to set up the appropriate form.  For example,
+if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
+
+@example
+      plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
+
+@end example
+
+@node yerrorbars, xerrorlines, xyerrorbars, plotting_styles
+@section yerrorbars
+
+@c ?commands set style yerrorbars
+@c ?commands set style errorbars
+@c ?plotting styles yerrorbars
+@c ?plotting styles errorbars
+@c ?set style yerrorbars
+@c ?set style errorbars
+@c ?style yerrorbars
+@c ?style errorbars
+@cindex yerrorbars
+
+The @ref{yerrorbars} (or @ref{errorbars}) style is only relevant to 2D data plots.
+@ref{yerrorbars} is like `points`, except that a vertical error bar is also drawn.
+At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
+from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
+A tic mark is placed at the ends of the error bar (unless @ref{bars} is
+used---see @ref{bars} for details).  Either 3 or 4 input columns are required.
+
+@example
+     3 columns:  x  y  ydelta
+     4 columns:  x  y  ylow  yhigh
+
+@end example
+
+See also
+@uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
+}
+
+@node xerrorlines, xyerrorlines, yerrorbars, plotting_styles
+@section xerrorlines
+
+@c ?commands set style xerrorlines
+@c ?set style xerrorlines
+@c ?plotting styles xerrorlines
+@c ?style xerrorlines
+@cindex xerrorlines
+
+The @ref{xerrorlines} style is only relevant to 2D data plots.
+@ref{xerrorlines} is like @ref{linespoints}, except that a horizontal error
+line is also drawn. At each point (x,y), a line is drawn from (xlow,y)
+to (xhigh,y) or from (x-xdelta,y) to (x+xdelta,y), depending on how
+many data columns are provided. A tic mark is placed at the ends of
+the error bar (unless @ref{bars} is used---see @ref{bars} for details).
+The basic style requires either 3 or 4 columns:
+
+@example
+     3 columns:  x  y  xdelta
+     4 columns:  x  y  xlow  xhigh
+
+@end example
+
+
+@node xyerrorlines, yerrorlines, xerrorlines, plotting_styles
+@section xyerrorlines
+
+@c ?commands set style xyerrorlines
+@c ?set style xyerrorlines
+@c ?plotting styles xyerrorlines
+@c ?style xyerrorlines
+@cindex xyerrorlines
+
+The @ref{xyerrorlines} style is only relevant to 2D data plots.
+@ref{xyerrorlines} is like @ref{linespoints}, except that horizontal and
+vertical error bars are also drawn. At each point (x,y), lines are
+drawn from (x,y-ydelta) to (x,y+ydelta) and from (x-xdelta,y) to
+(x+xdelta,y) or from (x,ylow) to (x,yhigh) and from (xlow,y) to
+(xhigh,y), depending upon the number of data columns provided. A tic
+mark is placed at the ends of the error bar (unless @ref{bars} is
+used---see @ref{bars} for details).  Either 4 or 6 input columns are required.
+
+@example
+     4 columns:  x  y  xdelta  ydelta
+     6 columns:  x  y  xlow  xhigh  ylow  yhigh
+
+@end example
+
+If data are provided in an unsupported mixed form, the @ref{using} filter on the
+`plot` command should be used to set up the appropriate form.  For example,
+if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
+
+@example
+      plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
+
+@end example
+
+@node yerrorlines,  , xyerrorlines, plotting_styles
+@section yerrorlines
+
+@c ?commands set style yerrorlines
+@c ?commands set style errorlines
+@c ?plotting styles yerrorlines
+@c ?plotting styles errorlines
+@c ?set style yerrorlines
+@c ?set style errorlines
+@c ?style yerrorlines
+@c ?style errorlines
+@cindex yerrorlines
+
+The @ref{yerrorlines} (or @ref{errorlines}) style is only relevant to 2D data
+plots. @ref{yerrorlines} is like @ref{linespoints}, except that a vertical
+error line is also drawn. At each point (x,y), a line is drawn from
+(x,y-ydelta) to (x,y+ydelta) or from (x,ylow) to (x,yhigh), depending
+on how many data columns are provided. A tic mark is placed at the
+ends of the error bar (see @ref{bars} for details).
+Either 3 or 4 input columns are required.
+
+@example
+     3 columns:  x  y  ydelta
+     4 columns:  x  y  ylow  yhigh
+
+@end example
+
+See also
+@uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
+}
+
+@node Commands, Terminal_types, plotting_styles, Top
 @chapter Commands
 
 @cindex commands
@@ -4361,7 +5448,7 @@ File "wait_for_tab" contains the lines
 
 `plot` is the primary command for drawing plots with `gnuplot`.  It creates
 plots of functions and data in many, many ways.  `plot` is used to draw 2-d
-functions and data; `splot` draws 2-d projections of 3-d surfaces and data.
+functions and data; `splot` draws 2D projections of 3D surfaces and data.
 `plot` and `splot` contain many common features; see `splot` for differences.
 Note specifically that although the `binary <binary list>` variation does
 work for both `plot` and `splot`, there are small differences between these
@@ -4659,7 +5746,7 @@ given in the `<using list>`.  For example, `using 1:3` will result in
 three columns being read, of which the second will be ignored.  There are
 default using lists based upon the typical number of parameters associated
 with a certain plot type.  For example, `with image` has a default of
-`using 1`, while `with rgbimage` has a default of `using 1:2:3`.  Note
+`using 1`, while @ref{rgbimage} has a default of `using 1:2:3`.  Note
 that the special characters for @ref{using} representing point/line/index
 generally should not be used for binary data.  There are keywords in
 <binary list> that control this.
@@ -5278,8 +6365,8 @@ same plot command. So to plot two columns from the same input file:
 
 @end example
 
-The special filename '+' is a mechanism to allow the full range of 
-@ref{using} specifiers and plot styles with in-line functions.  Normally a 
+The special filename '+' is a mechanism to allow the full range of
+@ref{using} specifiers and plot styles with in-line functions.  Normally a
 function plot can only have a single y (or z) value associated with each
 sampled point.  The pseudo-file '+' treats the sampled points as columns
 1 (plot) or 1 and 2 (splot), and allows additional column values to be
@@ -5655,7 +6742,7 @@ See `plot using xticlabels`.
 @c ?splot errorbars
 @cindex errorbars
 
-Error bars are supported for 2-d data file plots by reading one to four
+Error bars are supported for 2D data file plots by reading one to four
 additional columns (or @ref{using} entries); these additional values are used in
 different ways by the various errorbar styles.
 
@@ -5717,7 +6804,7 @@ See @ref{using}, @ref{with}, and @ref{style} for more information.
 @c ?splot errorlines
 @cindex errorlines
 
-Lines with error bars are supported for 2-d data file plots by reading
+Lines with error bars are supported for 2D data file plots by reading
 one to four additional columns (or @ref{using} entries); these additional
 values are used in different ways by the various errorlines styles.
 
@@ -6037,15 +7124,15 @@ Syntax:
 
 @end example
 
-where <style> is either `lines`, `points`, `linespoints`, `impulses`,
-`dots`, `steps`, `fsteps`, `histeps`, @ref{errorbars}, `labels`, `xerrorbars`,
-`yerrorbars`, `xyerrorbars`, @ref{errorlines}, `xerrorlines`, `yerrorlines`,
-`xyerrorlines`, `boxes`, `histograms`, `filledcurves`, `boxerrorbars`,
-`boxxyerrorbars`, `financebars`, `candlesticks`, `vectors`, `image`,
-`rgbimage` or @ref{pm3d}. Some of these styles require additional information.
+where <style> is either `lines`, `points`, @ref{linespoints}, @ref{impulses},
+@ref{dots}, @ref{steps}, @ref{fsteps}, @ref{histeps}, @ref{errorbars}, @ref{labels}, @ref{xerrorbars},
+@ref{yerrorbars}, @ref{xyerrorbars}, @ref{errorlines}, @ref{xerrorlines}, @ref{yerrorlines},
+@ref{xyerrorlines}, @ref{boxes}, @ref{histograms}, @ref{filledcurves}, @ref{boxerrorbars},
+@ref{boxxyerrorbars}, @ref{financebars}, @ref{candlesticks}, @ref{vectors}, `image`,
+@ref{rgbimage} or @ref{pm3d}. Some of these styles require additional information.
 See `plotting styles` for details of each style.  `fill` is relevant only
-to certain 2D plots (currently `boxes` `boxxyerrorbars` and `candlesticks`).
-Note that `filledcurves` and @ref{pm3d} can take an additional option not
+to certain 2D plots (currently @ref{boxes} @ref{boxxyerrorbars} and @ref{candlesticks}).
+Note that @ref{filledcurves} and @ref{pm3d} can take an additional option not
 listed above (the latter only when used in the `splot` command)---see
 their help or examples below for more details.
 
@@ -6625,7 +7712,7 @@ By default, `gnuplot` assumes the independent variable in polar graphs is in
 units of radians.  If `set angles degrees` is specified before `set polar`,
 then the default range is [0:360] and the independent variable has units of
 degrees.  This is particularly useful for plots of data files.  The angle
-setting also applies to 3-d mapping as set via the @ref{mapping} command.
+setting also applies to 3D mapping as set via the @ref{mapping} command.
 
 Syntax:
 @example
@@ -7182,7 +8269,7 @@ Draw only the top and right borders for a `plot` and label them as axes:
 
 
 The @ref{boxwidth} command is used to set the default width of boxes in the
-`boxes`, `boxerrorbars`, `candlesticks` and `histograms` styles.
+@ref{boxes}, @ref{boxerrorbars}, @ref{candlesticks} and @ref{histograms} styles.
 
 Syntax:
 @example
@@ -7204,10 +8291,10 @@ increases). If the range spanned by a log scale x axis is far from x=1,
 some experimentation may be required to find a useful value of boxwidth.
 
 The default is superseded by explicit width information taken from an extra
-data column in styles `boxes` or `boxerrorbars`.  In a four-column data set,
+data column in styles @ref{boxes} or @ref{boxerrorbars}.  In a four-column data set,
 the fourth column will be interpreted as the box width unless the width is set
 to -2.0, in which case the width will be calculated automatically.
-See `style boxes` and `style boxerrorbars` for more details.
+See @ref{boxes} and @ref{boxerrorbars} for more details.
 
 To set the box width to automatic use the command
 @example
@@ -7580,7 +8667,7 @@ contours, and @ref{clabel} for control of labelling of the contours.
 The surface can be switched off (see @ref{surface}), giving a contour-only
 graph.  Though it is possible to use @ref{size} to enlarge the plot to fill
 the screen, more control over the output format can be obtained by writing
-the contour information to a file, and rereading it as a 2-d datafile plot:
+the contour information to a file, and rereading it as a 2D datafile plot:
 
 @example
       unset surface
@@ -7832,7 +8919,7 @@ Examples:
 
 
 The @ref{decimalsign} command selects a decimal sign for numbers printed
-into tic labels or @ref{label} strings.
+into tic labels or `set label` strings.
 
 Syntax:
 @example
@@ -7922,7 +9009,7 @@ Syntax:
 
 @end example
 
-By default @ref{dgrid3d} is disabled.  When enabled, 3-d data read from a file
+By default @ref{dgrid3d} is disabled.  When enabled, 3D data read from a file
 are always treated as a scattered data set.  A grid with dimensions derived
 from a bounding box of the scattered data and size as specified by the
 row/col_size parameters is created for plotting and contouring.  The grid
@@ -8449,7 +9536,7 @@ marks on any axis, and the linetype and linewidth can be specified
 for major and minor grid lines, also via a predefined linestyle, as
 far as the active terminal driver supports this.
 
-Additionally, a polar grid can be selected for 2-d plots---circles are drawn
+Additionally, a polar grid can be selected for 2D plots---circles are drawn
 to intersect the selected tics, and radial lines are drawn at definable
 intervals.  (The interval is given in degrees or radians, depending on the
 @ref{angles} setting.)  Note that a polar grid is no longer automatically
@@ -8513,7 +9600,7 @@ In contrast to the usual display in gnuplot, hidden line removal actually
 treats the given function or data grids as real surfaces that can't be seen
 through, so parts behind the surface will be hidden by it.  For this to be
 possible, the surface needs to have 'grid structure' (see @ref{datafile}
-about this), and it has to be drawn `with lines` or `with linespoints`.
+about this), and it has to be drawn `with lines` or @ref{linespoints}.
 
 When @ref{hidden3d} is set, both the hidden portion of the surface and possibly
 its contours drawn on the base (see @ref{contour}) as well as the grid will
@@ -8523,7 +9610,7 @@ on the surface (@ref{surface}) don't work.
 
 Labels and arrows are always visible and are unaffected.  The key box is
 never hidden by the surface. As of gnuplot version 4.2, @ref{hidden3d} also
-affects 3D plotting styles `with points`, `with labels`, and `with vectors`,
+affects 3D plotting styles `with points`, @ref{labels}, and @ref{vectors},
 even if no surface is present in the graph.  Individual plots within the
 graph may be explicitly excluded from this processing by appending the extra
 option `nohidden3d` to the @ref{with} specifier.
@@ -8748,7 +9835,7 @@ For more information, see `key placement`.
 Justification of the plot titles within the key is controlled by `Left` or
 `Right` (default).  The text and sample can be reversed (`reverse`) and a
 box can be drawn around the key (`box @{...@}`) in a specified `linetype`
-and `linewidth`, or a user-defined `linestyle`. 
+and `linewidth`, or a user-defined `linestyle`.
 
 By default the first plot label is at the top of the key and successive labels
 are entered below it. The `invert` option causes the first label to be placed
@@ -8792,8 +9879,8 @@ arranged so that an imaginary straight line divides the left- and right-hand
 sides of the key.  It is the coordinates of the top of this line that are
 specified with the `set key` command.  In a `plot`, only the x and y
 coordinates are used to specify the line position.  For a `splot`, x, y and
-z are all used as a 3-d location mapped using the same mapping as the graph
-itself to form the required 2-d screen position of the imaginary line.
+z are all used as a 3D location mapped using the same mapping as the graph
+itself to form the required 2D screen position of the imaginary line.
 
 When using the TeX or PostScript drivers, or similar drivers where formatting
 information is embedded in the string, `gnuplot` is unable to calculate
@@ -8948,7 +10035,7 @@ key. This entry contains a plot title and a sample line/point/box of the
 same color and fill properties as used in the plot itself.  The font and
 textcolor properties control the appearance of the individual plot titles
 that appear in the key. Setting the textcolor to "rgb variable" causes
-the text for each key entry to be the same color as the line or fill 
+the text for each key entry to be the same color as the line or fill
 color for that plot.  This was the default in some earlier versions of
 gnuplot.
 
@@ -8984,7 +10071,7 @@ the box width; this allows you to correct it.
 
 @cindex nolabel
 
-Arbitrary labels can be placed on the plot using the @ref{label} command.
+Arbitrary labels can be placed on the plot using the `set label` command.
 
 Syntax:
 @example
@@ -9009,7 +10096,7 @@ system.  See `coordinates` for details.
 The tag is an integer that is used to identify the label. If no <tag>
 is given, the lowest unused tag value is assigned automatically.  The
 tag can be used to delete or modify a specific label.  To change any
-attribute of an existing label, use the @ref{label} command with the
+attribute of an existing label, use the `set label` command with the
 appropriate tag, and specify the parts of the label to be changed.
 
 The <label text> can be a string constant, a string variable, or a string-
@@ -9486,11 +10573,11 @@ format string was specified already):
 
 @end example
 
-Choose the option `labels` to get real gnuplot labels on Button 2. (The
+Choose the option @ref{labels} to get real gnuplot labels on Button 2. (The
 default is `nolabels` which makes Button 2 drawing only temporary annotations
 at the mouse positions). The labels are drawn with the current setting of
 `mouseformat`. `labeloptions` controls which options are passed to the
-@ref{label} command. The default is "pointstyle 1" which will plot a small
+`set label` command. The default is "pointstyle 1" which will plot a small
 plus at the label position.  Note that the pointsize is taken from the
 @ref{pointsize} command.
 Labels can be removed by holding the Ctrl-Key down while clicking with
@@ -9514,7 +10601,7 @@ defined `hotkeys` may override the default bindings.
 Press 'q' in the driver's window to close the window. This key cannot be
 overridden with the `bind` command.
 
-See also help for `bind` and @ref{label}.
+See also help for `bind` and `label`.
 
 @menu
 * X11_mouse::                   
@@ -9939,14 +11026,14 @@ Syntax:
 
 @end example
 
-For 2-d plotting, a parametric function is determined by a pair of parametric
-functions operating on a parameter.  An example of a 2-d parametric function
+For 2D plotting, a parametric function is determined by a pair of parametric
+functions operating on a parameter.  An example of a 2D parametric function
 would be `plot sin(t),cos(t)`, which draws a circle (if the aspect ratio is
 set correctly---see @ref{size}).  `gnuplot` will display an error message if
 both functions are not provided for a parametric `plot`.
 
-For 3-d plotting, the surface is described as x=f(u,v), y=g(u,v), z=h(u,v).
-Therefore a triplet of functions is required.  An example of a 3-d parametric
+For 3D plotting, the surface is described as x=f(u,v), y=g(u,v), z=h(u,v).
+Therefore a triplet of functions is required.  An example of a 3D parametric
 function would be `cos(u)*cos(v),cos(u)*sin(v),sin(u)`, which draws a sphere.
 `gnuplot` will display an error message if all three functions are not
 provided for a parametric `splot`.
@@ -9955,7 +11042,7 @@ The total set of possible plots is a superset of the simple f(x) style plots,
 since the two functions can describe the x and y values to be computed
 separately.  In fact, plots of the type t,f(t) are equivalent to those
 produced with f(x) because the x values are computed using the identity
-function.  Similarly, 3-d plots of the type u,v,f(u,v) are equivalent to
+function.  Similarly, 3D plots of the type u,v,f(u,v) are equivalent to
 f(x,y).
 
 Note that the order the parametric functions are specified is xfunction,
@@ -10143,7 +11230,7 @@ a look) produces only (4-1)x(4-1)=9 colored rectangles.
 Another drawing algorithm, which would draw quadrangles around a given node
 by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
 while using node's color, could be implemented in the future. This is already
-done for drawing images (2D grids) via `image` and `rgbimage` styles.
+done for drawing images (2D grids) via `image` and @ref{rgbimage} styles.
 
 Notice that ranges of z-values and color-values for surfaces are adjustable
 independently by @ref{zrange}, @ref{cbrange}, as well as `set log` for z or
@@ -10767,7 +11854,7 @@ y ranges can be controlled independently.  Other changes are:
 2) the grid, if selected, is not automatically polar
 ---use `set grid polar`;
 3) the grid is not labelled with angles
----use @ref{label} as necessary.
+---use `set label` as necessary.
 
 In polar coordinates, the dummy variable (t) is an angle.  The default range
 of t is [0:2*pi], or, if degree units have been selected, to [0:360] (see
@@ -10963,10 +12050,10 @@ Syntax:
 By default, sampling is set to 100 points.  A higher sampling rate will
 produce more accurate plots, but will take longer.  This parameter has no
 effect on data file plotting unless one of the interpolation/approximation
-options is used.  See @ref{smooth} re 2-d data and @ref{cntrparam} and
-@ref{dgrid3d} re 3-d data.
+options is used.  See @ref{smooth} re 2D data and @ref{cntrparam} and
+@ref{dgrid3d} re 3D data.
 
-When a 2-d graph is being done, only the value of <samples_1> is relevant.
+When a 2D graph is being done, only the value of <samples_1> is relevant.
 
 When a surface plot is being done without the removal of hidden lines, the
 value of samples specifies the number of samples that are to be evaluated for
@@ -11035,7 +12122,7 @@ Both `noratio` and `nosquare` return the graph to the default aspect ratio
 of the terminal, but do not return <xscale> or <yscale> to their default
 values (1.0).
 
-`ratio` and `square` have no effect on 3-d plots.
+`ratio` and `square` have no effect on 3D plots.
 
 Examples:
 
@@ -11101,7 +12188,6 @@ Syntax:
 * set_style_function::          
 * set_style_increment::         
 * set_style_line::              
-* plotting_styles::             
 * set_style_rectangle::         
 @end menu
 
@@ -11364,7 +12450,7 @@ linetype is used instead.  E.g. in the example above, f3(x) will be plotted
 using the default linetype 3.
 
 
-@node set_style_line, plotting_styles, set_style_increment, style
+@node set_style_line, set_style_rectangle, set_style_increment, style
 @subsubsection set style line
 
 @c ?commands set style line
@@ -11481,60 +12567,7 @@ will assign linestyle 10 to be a solid cyan line on any terminal that
 supports rgb colors.
 
 
-@node plotting_styles, set_style_rectangle, set_style_line, style
-@subsubsection plotting styles
-
-@c ?plotting styles
-
-The commands `set style data` and `set style function` change the
-default plotting style for subsequent `plot` and `splot` commands.
-
-The types used for all line and point styles (i.e., solid, dash-dot, color,
-etc. for lines; circles, squares, crosses, etc. for points) will be either
-those specified on the `plot` or `splot` command or will be chosen
-sequentially from the types available to the terminal in use.  Use the
-command @ref{test} to see what is available.
-
-None of the styles requiring more than two columns of information
-(e.g., @ref{errorbars} or @ref{errorlines}) can be used with `splot`s or
-function `plot`s. Neither `boxes`, `filledcurves` nor any
-of the `steps` styles can be used with `splot`s. If an inappropriate style
-is specified, it will be changed to `points`.
-
-The above caveat does not apply to `plot with labels`, for which the third
-column specifies a data source rather than coordinate information.
-See `set style labels`.
-
-For 2-d data with more than two columns, `gnuplot` is picky about the
-allowed @ref{errorbars} and @ref{errorlines} styles. The @ref{using} option on the
-`plot` command can be used to set up the correct columns for the style
-you want. (In this discussion, "column" will be used to refer both to
-a column in the data file and an entry in the @ref{using} list.)
-
-For three columns, only `xerrorbars`, `yerrorbars` (or @ref{errorbars}),
-`xerrorlines`, `yerrorlines` (or @ref{errorlines}), `boxes`,
-and `boxerrorbars` are allowed. If another plot style is used, the style
-will be changed to `yerrorbars`. The `boxerrorbars` style will
-calculate the boxwidth automatically.
-
-For four columns, only `xerrorbars`, `yerrorbars` (or @ref{errorbars}),
-`xyerrorbars`, `xerrorlines`, `yerrorlines` (or @ref{errorlines}), `xyerrorlines`,
-`boxxyerrorbars`, and `boxerrorbars` are allowed.  An illegal
-style will be changed to `yerrorbars`.
-
-Five-column data allow only the `boxerrorbars`, `financebars`, and
-`candlesticks` styles.  An illegal style will be changed to `boxerrorbars`
-before plotting.
-
-Six- and seven-column data only allow the `xyerrorbars`,
-`xyerrorlines`, and `boxxyerrorbars` styles. Illegal styles will be
-changed to `xyerrorbars` before plotting.
-
-For more information about error bars with and without lines,
-please see @ref{errorlines} and @ref{errorbars}.
-
-
-@node set_style_rectangle,  , plotting_styles, style
+@node set_style_rectangle,  , set_style_line, style
 @subsubsection set style rectangle
 
 @c ?commands set style rectangle
@@ -11567,871 +12600,6 @@ Examples:
 The default values correspond to solid fill with the background color and a
 black border.
 
-
-
-@noindent --- BOXERRORBARS ---
-
-@c ?commands set style boxerrorbars
-@c ?set style boxerrorbars
-@c ?plotting styles boxerrorbars
-@c ?style boxerrorbars
-@cindex boxerrorbars
-
-The `boxerrorbars` style is only relevant to 2-d data plotting.  It is a
-combination of the `boxes` and `yerrorbars` styles.  The boxwidth will come
-from the fourth column if the y errors are in the form of "ydelta" and the
-boxwidth was not previously set equal to -2.0 (`set boxwidth -2.0`) or from
-the fifth column if the y errors are in the form of "ylow yhigh".  The
-special case  `boxwidth = -2.0` is for four-column data with y errors in the
-form "ylow yhigh".  In this case the boxwidth will be calculated so that each
-box touches the adjacent boxes.  The width will also be calculated in cases
-where three-column data are used.
-
-The box height is determined from the y error in the same way as it is for
-the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
-yhigh, depending on how many data columns are provided.
-See also
-@uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
-}
-
-
-@noindent --- BOXES ---
-
-@c ?commands set style boxes
-@c ?set style boxes
-@c ?plotting styles boxes
-@c ?style boxes
-@cindex boxes
-
-The `boxes` style is only relevant to 2-d plotting.  It draws a box centered
-about the given x coordinate from the x axis (not the graph border) to the
-given y coordinate.  The width of the box is obtained in one of three ways.
-If it is a data plot and the data file has a third column, this will be used
-to set the width of the box.  If not, if a width has been set using the @ref{boxwidth} command, this will be used.  If neither of these is available, the
-width of each box will be calculated automatically so that it touches the
-adjacent boxes.
-
-The interior of the boxes is drawn according to the current fillstyle.
-See `set style fill` for details.  Alternatively a new fillstyle
-may be specified in the plot command.
-
-For fillstyle `empty` the box is filled with the background color.
-
-For fillstyle `solid` the box is filled with a solid rectangle of the
-current drawing color. There is an optional parameter <density> that
-controls the fill density; it runs from 0 (background color) to 1
-(current drawing color).
-
-For fillstyle `pattern` the box is filled in the current drawing color with
-a pattern, if supported by the terminal driver.
-
-Examples:
-
-To plot a data file with solid filled boxes with a small vertical space
-separating them (bargraph):
-
-@example
-      set boxwidth 0.9 relative
-      set style fill solid 1.0
-      plot 'file.dat' with boxes
-
-@end example
-
-To plot a sine and a cosine curve in pattern-filled boxes style:
-
-@example
-      set style fill pattern
-      plot sin(x) with boxes, cos(x) with boxes
-
-@end example
-
-The sin plot will use pattern 0; the cos plot will use pattern 1.
-Any additional plots would cycle through the patterns supported by the
-terminal driver.
-
-To specify explicit fillstyles for each dataset:
-
-@example
-     plot 'file1' with boxes fs solid 0.25, \
-          'file2' with boxes fs solid 0.50, \
-          'file3' with boxes fs solid 0.75, \
-          'file4' with boxes fill pattern 1, \
-          'file5' with boxes fill empty
-
-@end example
-
-Currently only the following terminal drivers support fillstyles other
-than `empty`:
-x11, windows, pm, wxt, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii,
-hp500c, jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc
-and tandy_60dpi. The BeOS driver (`be`) is untested.
-
-
-@noindent --- BOXXYERRORBARS ---
-
-@c ?commands set style boxxyerrorbars
-@c ?set style boxxyerrorbars
-@c ?plotting styles boxxyerrorbars
-@c ?style boxxyerrorbars
-@cindex boxxyerrorbars
-
-The `boxxyerrorbars` style is only relevant to 2-d data plotting.  It is a
-combination of the `boxes` and `xyerrorbars` styles.
-
-The box width and height are determined from the x and y errors in the same
-way as they are for the `xyerrorbars` style---either from xlow to xhigh and
-from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
-y+ydelta , depending on how many data columns are provided.
-
-If filled-box support is present, then the interior of the boxes is drawn
-according to the current fillstyle.  See `set style fill` and `boxes` for
-details.  Alternatively a new fillstyle may be specified in the plot command.
-
-
-@noindent --- CANDLESTICKS ---
-
-@c ?commands set style candlesticks
-@c ?set style candlesticks
-@c ?plotting styles candlesticks
-@c ?style candlesticks
-@cindex candlesticks
-
-The `candlesticks` style can be used for 2-d data plotting of financial
-data or for generating box-and-whisker plots of statistical data.
-Five columns of data are required; in order, these should be the x
-coordinate (most likely a date) and the opening, low, high, and closing
-prices.  The symbol is a rectangular box, centered horizontally at the x
-coordinate and limited vertically by the opening and closing prices.  A
-vertical line segment at the x coordinate extends up from the top of the
-rectangle to the high price and another down to the low.  The vertical line
-will be unchanged if the low and high prices are interchanged.
-
-The width of the rectangle can be controlled by the @ref{boxwidth} command.
-For backwards compatibility with earlier gnuplot versions, when the
-boxwidth parameter has not been set then the width of the candlestick
-rectangle is controlled by `set bars <width>`.
-
-By default the vertical line segments have no crossbars at the top and
-bottom. If you want crossbars, which are typically used for box-and-whisker
-plots, then add the keyword `whiskerbars` to the plot command.  By default
-these whiskerbars extend the full horizontal width of the candlestick, but
-you can modify this by specifying a fraction of the full width.
-
-By default the rectangle is empty if (open > close), and filled with three
-vertical bars if (close > open). If filled-boxes support is present, then
-the rectangle is colored according to `set style fill <fillstyle>`.
-See @ref{bars} and `financebars`.  See also
-@uref{http://gnuplot.sourceforge.net/demo/candlesticks.html,finance demos
-}
-.
-
-Note: To place additional symbols, such as the median value, on a
-box-and-whisker plot requires additional plot commands as in this example:
-
-@example
-  # Data columns: X Min 1stQuartile Median 3rdQuartile Max
-  set bars 4.0
-  set style fill empty
-  plot 'stat.dat' using 1:3:2:6:5 with candlesticks title 'Quartiles', \
-       ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
-
-@end example
-
-@example
-  # Plot with crossbars on the whiskers, crossbars are 50% of full width
-  plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
-
-@end example
-
-@example
- See @ref{boxwidth}, @ref{bars} and `set style fill`.
-
-@end example
-
-
-@noindent --- DOTS ---
-
-@c ?commands set style dots
-@c ?set style dots
-@c ?plotting styles dots
-@c ?style dots
-@cindex dots
-
-The `dots` style plots a tiny dot at each point; this is useful for scatter
-plots with many points. For some terminals (post, pdf) the size of the dot can
-be controlled by changing the linewidth.
-
-
-@noindent --- FILLEDCURVES ---
-
-@c ?commands set style filledcurves
-@c ?set style filledcurves
-@c ?plotting styles filledcurves
-@c ?style filledcurves
-@cindex filledcurves
-
-The `filledcurves` style is only relevant to 2-d plotting. Three variants
-are possible. The first two variants require either a function or two columns
-of input data, and may be further modified by the options listed below.
-The first variant, `closed`, treats the curve itself as a closed polygon.
-This is the default if there are two columns of input data.
-
-The second variant is to fill the area between the curve and a given axis,
-a horizontal or vertical line, or a point.
-
-The third variant requires three columns of input data: the x coordinate and
-two y coordinates corresponding to two curves sampled at the same set of
-x coordinates; the area between the two curves is filled.
-This is the default if there are three or more columns of input data.
-
-Syntax:
-
-@example
-    set style [data | function] filledcurves [option]
-    plot ... with filledcurves [option]
-
-@end example
-
-where the option can be
-
-@example
-    [closed | @{above | below@} @{x1 | x2 | y1 | y2@}[=<a>] | xy=<x>,<y>]
-
-@end example
-
-The first two plot variants can be further modified by the options
-
-@example
-    filledcurves closed   ... just filled closed curve,
-    filledcurves x1       ... x1 axis,
-    filledcurves x2       ... x2 axis, etc for y1 and y2 axes,
-    filledcurves y1=0     ... line y=0 (at y1 axis) ie parallel to x1 axis,
-    filledcurves y2=42    ... line y=42 (at y2 axis) ie parallel to x2, etc,
-    filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
-
-@end example
-
-Example of filling the area between two input curves.
-@uref{http://www.gnuplot.info/demo/fillbetween.html,fill between curves demo.
-}
-
-@example
-    plot 'data' using 1:2:3 with filledcurves
-
-@end example
-
-The `above` and `below` options apply both to commands of the form
-@example
-    ... filledcurves above @{x1|x2|y1|y2@}=<val>
-@end example
-
-and to commands of the form
-@example
-    ... using 1:2:3 with filledcurves below
-@end example
-
-In either case the option limits the filled area to one side of the bounding
-line or curve.
-
-Note: Not all terminal types support this plotting mode.
-
-Zoom of a filled curve drawn from a datafile may produce empty or incorrect
-area because gnuplot is clipping points and lines, and not areas.
-
-If the values of <a>, <x>, <y> are out of the drawing boundary, then they
-are moved to the graph boundary. Then the actually filled area in the case
-of option xy=<x>,<y> will depend on xrange and yrange.
-
-
-@noindent --- FINANCEBARS ---
-
-@c ?commands set style financebars
-@c ?set style financebars
-@c ?plotting styles financebars
-@c ?style financebars
-@cindex financebars
-
-The `financebars` style is only relevant for 2-d data plotting of financial
-data.  Five columns of data are required; in order, these should be the x
-coordinate (most likely a date) and the opening, low, high, and closing
-prices.  The symbol is a vertical line segment, located horizontally at the x
-coordinate and limited vertically by the high and low prices.  A horizontal
-tic on the left marks the opening price and one on the right marks the
-closing price.  The length of these tics may be changed by @ref{bars}.  The
-symbol will be unchanged if the high and low prices are interchanged.
-See @ref{bars} and `candlesticks`, and also the
-@uref{http://www.gnuplot.info/demo/finance.html,finance demo.
-}
-
-
-@noindent --- FSTEPS ---
-
-@c ?commands set style fsteps
-@c ?set style fsteps
-@c ?plotting styles fsteps
-@c ?style fsteps
-@cindex fsteps
-
-The `fsteps` style is only relevant to 2-d plotting.  It connects consecutive
-points with two line segments: the first from (x1,y1) to (x1,y2) and the
-second from (x1,y2) to (x2,y2).
-See also
-@uref{http://www.gnuplot.info/demo/steps.html,steps demo.
-}
-
-
-@noindent --- HISTEPS ---
-
-@c ?commands set style histeps
-@c ?set style histeps
-@c ?plotting styles histeps
-@c ?style histeps
-@cindex histeps
-
-The `histeps` style is only relevant to 2-d plotting.  It is intended for
-plotting histograms.  Y-values are assumed to be centered at the x-values;
-the point at x1 is represented as a horizontal line from ((x0+x1)/2,y1) to
-((x1+x2)/2,y1).  The lines representing the end points are extended so that
-the step is centered on at x.  Adjacent points are connected by a vertical
-line at their average x, that is, from ((x1+x2)/2,y1) to ((x1+x2)/2,y2).
-
-If @ref{autoscale} is in effect, it selects the xrange from the data rather than
-the steps, so the end points will appear only half as wide as the others.
-See also
-@uref{http://www.gnuplot.info/demo/steps.html,steps demo.
-}
-
-`histeps` is only a plotting style; `gnuplot` does not have the ability to
-create bins and determine their population from some data set.
-
-
-@noindent --- HISTOGRAMS ---
-
-@c ?commands set style histogram
-@c ?set style histogram
-@c ?style histograms
-@c ?plotting styles histograms
-@cindex histograms
-
-The `histograms` style is only relevant to 2-d plotting.  It produces a bar
-chart from a sequence of data columns in parallel. Each element of the
-`plot` command must specify a single input data source (e.g. one column of
-the input file), possibly with associated tic values or key titles.
-Four styles of histogram layout are currently supported.
-
-@example
-      set style histogram clustered @{gap <gapsize>@}
-      set style histogram errorbars @{gap <gapsize>@} @{<linewidth>@}
-      set style histogram rowstacked
-      set style histogram columnstacked
-
-@end example
-
-The default style corresponds to `set style histogram clustered gap 2`.
-In this style, each set of parallel data values is collected into a group of
-boxes clustered at the x-axis coordinate corresponding to their sequential
-position (row #) in the selected datafile columns.  Thus if <n> datacolumns are
-selected, the first cluster is centered about x=1, and contains <n> boxes whose
-heights are taken from the first entry in the corresponding <n> data columns.
-This is followed by a gap and then a second cluster of boxes centered about x=2
-corresponding to the second entry in the respective data columns, and so on.
-The default gap width of 2 indicates that the empty space between clusters is
-equivalent to the width of 2 boxes.  All boxes derived from any one column
-are given the same fill color and/or pattern (see `set style fill`).
-
-Each cluster of boxes is derived from a single row of the input data file.
-It is common in such input files that the first element of each row is a
-label. Labels from this column may be placed along the x-axis underneath
-the appropriate cluster of boxes with the `xticlabels` option to @ref{using}.
-
-The @ref{errorbars} style is very similar to the `clustered` style, except that
-it requires two columns of input for each entry. The first column is treated
-as the height (y-value) of that box, exactly as for the `clustered` style.
-The second column is treated as an error magnitude, and used to generate a
-vertical error bar at the top of the box. The appearance of the error bar is
-controlled by the current value of @ref{bars} and by the optional <linewidth>
-specification.
-
-Two styles of stacked histogram are supported, chosen by the command
-`set style histogram @{rowstacked|columnstacked@}`.  In these styles the data
-values from the selected columns are collected into stacks of boxes.
-The default stacking mode is `rowstacked`.
-
-The `rowstacked` style places a box resting on the x-axis for each
-data value in the first selected column; the first data value results in
-a box a x=1, the second at x=2, and so on.  Boxes corresponding to the
-second and subsequent data columns are layered on top of these, resulting
-in a stack of boxes at x=1 representing the first data value from each
-column, a stack of boxes at x=2 representing the second data value from
-each column, and so on.  All boxes derived from any one column are given the
-same fill color and/or pattern (see `set style fill`).
-
-The `columnstacked` style is similar, except that each stack of boxes is
-built up from a single data column. Each data value from the first specified
-column yields a box in the stack at x=1, each data value from the second
-specified column yields a box in the stack at x=2, and so on.  In this style
-the color of each box is taken from the row number, rather than the column
-number, of the corresponding data field.
-
-Box widths may be modified using the @ref{boxwidth} command.
-Box fill styles may be set using the `set style fill` command.
-
-Histograms always use the x1 axis, but may use either y1 or y2.
-If a plot contains both histograms and other plot styles, the non-histogram
-plot elements may use either the x1 or the x2 axis.
-
-Examples:
-
-To plot a data file containing multiple columns of data as a histogram
-of clustered boxes (the default style):
-
-@example
-      set boxwidth 0.9 relative
-      set style data histograms
-      set style fill solid 1.0 border -1
-      plot 'file.dat' using 2, '' using 4, '' using 6
-
-@end example
-
-This will produce a plot with clusters of three boxes (vertical bars) centered
-at each integral value on the x axis.  If the first column of the input file
-contains labels, they may be placed along the x-axis using the variant command
-
-@example
-      plot 'file.dat' using 2, '' using 4, '' using 6:xticlabels(1)
-
-@end example
-
-If the file contains both a magnitude and an error estimate for each value,
-then error bars can be added to the plot.  The following commands will add
-error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
-ends drawn the same width as the box itself. The error bars and bar ends are
-drawn in black with linewidth 2.
-
-@example
-      set bars fullwidth
-      set style histogram errorbars gap 2 lt -1 lw 2
-      plot 'file.dat' using 2:3, '' using 4:5, '' using 6:7:xticlabels(1)
-
-@end example
-
-To plot the same data as a rowstacked histogram:
-
-@example
-      set style histogram rows
-      plot 'file.dat' using 2, '' using 4, '' using 6:xtic(1)
-
-@end example
-
-This will produce a plot in which each vertical bar contains a stack of three
-segments, corresponding in height to the values found in columns 2, 4 and 6
-of the datafile.
-
-Finally, the commands
-
-@example
-      set style histogram columnstacked
-      plot 'file.dat' using 2, '' using 4, '' using 6
-
-@end example
-
-will produce three vertical stacks. The stack at x=1 will contain a box for
-each entry in column 2 of the datafile.  The stack at x=2 will contain a box
-for each parallel entry in column 4 of the datafile, and the stack at x=3 a
-box for each entry of column 6.  Because this interchanges gnuplot's usual
-interpretation of input rows and columns, the specification of key titles and
-x-axis tic labels must also be modified.
-
-@example
-      set style histogram columnstacked
-      plot '' u 5:key(1)            # uses first column to generate key titles
-      plot '' u 5 title columnhead  # uses first row to generate xtic labels
-
-@end example
-
-
-@noindent --- NEWHISTOGRAM ---
-
-@cindex newhistogram
-
-@c ?histograms newhistogram
-More than one set of histograms can appear in a single plot. In this case you
-can force a gap between them, and a separate label for each set, by using the
-plot command `newhistogram @{"<title>"@} @{<linestyle>@}`.
-For example
-
-@example
-      set style histogram  cluster
-      plot newhistogram "Set A", 'a' using 1, '' using 2, '' using 3, \
-           newhistogram "Set B", 'b' using 1, '' using 2, '' using 3
-
-@end example
-
-The labels "Set A" and "Set B" will appear beneath the respective sets of
-histograms, under the overall x axis label.
-
-The newhistogram command can also be used to force histogram coloring to
-begin with a specific color (linetype). By default colors will continue to
-increment successively even across histogram boundaries. Here is an example
-using the same coloring for multiple histograms
-@example
-      plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
-           newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
-
-@end example
-
-
-
-@noindent --- IMAGE ---
-
-@c ?commands set style image
-@c ?set style image
-@c ?plotting styles image
-@c ?style image
-@cindex image
-
-The `image` style is intendend for plotting 2D images.  It may be used for
-both `plot` and `splot` in the form of 3D data (x,y,value) or projected 4D
-data (x,y,z,value), respectively.  It is assumed that in the viewing plane
-the image data forms an equidistant sampling grid in the viewing plane along
-two, not necessarily  orthogonal, directions.  In other words, groups of
-four adjacent points are assumed to form the same size parallelogram.  The
-variable `value` in the tuples represent a palette color (gray value) for
-indexing in the current palette.
-
-The `image` style will attempt to create a properly positioned and scaled
-data matrix to match the plot borders for those terminals supporting palettes
-and images.  Such output is efficient and draws quickly.  However, when a
-terminal driver does not support palettes and images, or when image support
-is not implemented, the `image` style reverts to drawing filled rectangular
-boxes for pixels, which is not as efficient.  General parallelogram-shaped
-images currently always have filled parallelograms for pixels.
-
-The coordinate of each data point of an image will lie at the center of a
-pixel.  That is, an M x N set of data will form an image with M x N pixels.
-This is slightly different than pm3d elements where an M x N set of data
-will form a surface of (M-1) x (N-1) elements.  The scan directions for the
-image data grid can be any of eight possible combinations.
-
-See also `rgbimage`.
-
-
-@noindent --- IMAGE FAILSAFE ---
-
-@c ?commands set style image failsafe
-@c ?set style image failsafe
-@c ?plotting styles image failsafe
-@c ?style image failsafe
-@c ?image failsafe
-@cindex failsafe
-
-Some terminal drivers provide code to optimize rendering of image data
-within a rectangular 2D area.  However this code is known to be imperfect
-(hence the label EXPERIMENTAL for image support in gnuplot version 4.2).
-This optimized code may be disabled by using the keyword `failsafe`. E.g.
-
-@example
-      plot 'data' with image failsafe
-
-@end example
-
-Here are some specific comments about particular terminal drivers:
-
-x11 and wxt - Pixels are either repeated or decimated to fit the display
-@example
-      resolution; no other processing (filtering) is done.  Thus, aliasing may
-      occur when decimating images having high spatial frequency content.
-
-@end example
-
-postscript (pslatex, epslatex, pstex) - Image is copied in its original
-@example
-      resolution, and sample interpolation is turned off.
-
-@end example
-
-See also `rgbimage`.
-
-
-@noindent --- IMPULSES ---
-
-@c ?commands set style impulses
-@c ?set style impulses
-@c ?plotting styles impulses
-@c ?style impulses
-@cindex impulses
-
-The `impulses` style displays a vertical line from the x axis (not the graph
-border), or from the grid base for `splot`, to each point.
-
-
-@noindent --- LABELS ---
-
-@c ?commands set style labels
-@c ?set style labels
-@c ?plotting styles labels
-@c ?style labels
-@cindex labels
-
-The `labels` style is available only if gnuplot is built with configuration
-option --enable-datastrings. For a 2-D plot with labels you must specify
-3 input data columns; the text string found in the third column is printed at
-the X and Y coordinates generated by the first two column specifiers. The
-font, color, rotation angle and other properties of the printed text may be
-specified as additional command options (see @ref{label}). The example below
-will generate a 2-D plot with text labels taken from column 4 of the input
-file (`tc lt 2` is shorthand for `textcolor linetype 2`, which is green).
-
-@example
-  plot 'datafile' using 1:(0.5 * $2):4 with labels font "arial,11" tc lt 2
-
-@end example
-
-The `labels` style can also be used in 3-D plots. In this case four input
-column specifiers are required, corresponding to X Y Z and text.
-
-@example
-  splot 'datafile' using 1:2:3:4 with labels
-
-@end example
-
-See also `datastrings`, `set style data`.
-
-
-@noindent --- LINES ---
-
-@c ?commands set style lines
-@c ?set style lines
-@c ?plotting styles lines
-@c ?style lines
-@cindex lines
-
-The `lines` style connects adjacent points with straight line segments.
-See also `linetype`, `linewidth`, and `linestyle`.
-
-
-@noindent --- LINESPOINTS ---
-
-@c ?commands set style linespoints
-@c ?commands set style lp
-@c ?set style linespoints
-@c ?plotting styles linespoints
-@c ?set style lp
-@c ?style linespoints
-@c ?style lp
-@cindex linespoints
-
-@cindex lp
-
-The `linespoints` style does both `lines` and `points`, that is, it draws a
-small symbol at each point and then connects adjacent points with straight
-line segments.  The command @ref{pointsize} may be used to change the size of
-the points.  See @ref{pointsize} for its usage.
-
-`linespoints` may be abbreviated `lp`.
-
-
-@noindent --- POINTS ---
-
-@c ?commands set style points
-@c ?set style points
-@c ?plotting styles points
-@c ?style points
-@cindex points
-
-The `points` style displays a small symbol at each point.  The command @ref{pointsize} may be used to change the size of the points.  See @ref{pointsize}
-for its usage.
-
-
-@noindent --- STEPS ---
-
-@c ?commands set style steps
-@c ?set style steps
-@c ?plotting styles steps
-@c ?style steps
-@cindex steps
-
-The `steps` style is only relevant to 2-d plotting.  It connects consecutive
-points with two line segments: the first from (x1,y1) to (x2,y1) and the
-second from (x2,y1) to (x2,y2).
-See also
-@uref{http://www.gnuplot.info/demo/steps.html,steps demo.
-}
-
-
-@noindent --- RGBIMAGE ---
-
-@c ?commands set style rgbimage
-@c ?set style rgbimage
-@c ?plotting styles rgbimage
-@c ?style rgbimage
-@cindex rgbimage
-
-The `rgbimage` style is intended for plotting 2D images and is similar
-in concept to `image`.  See `image` for details.  The difference is
-that 5D data (x,y,r,g,b) for `plot` and 6D data (x,y,z,r,g,b) for `splot`
-describe the coordinates and color components of an image.
-
-See also `image`.
-
-
-@noindent --- VECTORS ---
-
-@c ?commands set style vectors
-@c ?set style vectors
-@c ?plotting styles vectors
-@c ?style vectors
-@cindex vectors
-
-The 2D `vectors` style draws a vector from (x,y) to (x+xdelta,y+ydelta).
-Thus it requires four columns of data.  It also draws a small arrowhead at the
-end of the vector.
-The 3D `vectors` style is similar, but requires six columns of data.
-splot with vectors is supported only for `set mapping cartesian`.
-The keywords "with vectors" may be followed by arrow style specifications.
-See `arrowstyle` for more details.
-
-Example:
-@example
-      plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
-      splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
-
-@end example
-
-`set clip one` and `set clip two` affect vectors drawn in 2D.
-Please see @ref{clip} and `arrowstyle`.
-
-
-@noindent --- XERRORBARS ---
-
-@c ?commands set style xerrorbars
-@c ?set style xerrorbars
-@c ?plotting styles xerrorbars
-@c ?style xerrorbars
-@cindex xerrorbars
-
-The `xerrorbars` style is only relevant to 2-d data plots.  `xerrorbars` is
-like `dots`, except that a horizontal error bar is also drawn.  At each point
-(x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
-(x+xdelta,y), depending on how many data columns are provided.  A tic mark
-is placed at the ends of the error bar (unless @ref{bars} is used---see
-@ref{bars} for details).
-
-
-@noindent --- XYERRORBARS ---
-
-@c ?commands set style xyerrorbars
-@c ?set style xyerrorbars
-@c ?plotting styles xyerrorbars
-@c ?style xyerrorbars
-@cindex xyerrorbars
-
-The `xyerrorbars` style is only relevant to 2-d data plots.  `xyerrorbars` is
-like `dots`, except that horizontal and vertical error bars are also drawn.
-At each point (x,y), lines are drawn from (x,y-ydelta) to (x,y+ydelta) and
-from (x-xdelta,y) to (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from
-(xlow,y) to (xhigh,y), depending upon the number of data columns provided.  A
-tic mark is placed at the ends of the error bar (unless @ref{bars} is
-used---see @ref{bars} for details).
-
-If data are provided in an unsupported mixed form, the @ref{using} filter on the
-`plot` command should be used to set up the appropriate form.  For example,
-if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
-
-@example
-      plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
-
-@end example
-
-
-@noindent --- YERRORBARS ---
-
-@c ?commands set style yerrorbars
-@c ?commands set style errorbars
-@c ?plotting styles yerrorbars
-@c ?plotting styles errorbars
-@c ?set style yerrorbars
-@c ?set style errorbars
-@c ?style yerrorbars
-@c ?style errorbars
-@cindex yerrorbars
-
-The `yerrorbars` (or @ref{errorbars}) style is only relevant to 2-d data plots.
-`yerrorbars` is like `points`, except that a vertical error bar is also drawn.
-At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
-from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
-A tic mark is placed at the ends of the error bar (unless @ref{bars} is
-used---see @ref{bars} for details).
-See also
-@uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
-}
-
-
-@noindent --- XERRORLINES ---
-
-@c ?commands set style xerrorlines
-@c ?set style xerrorlines
-@c ?plotting styles xerrorlines
-@c ?style xerrorlines
-@cindex xerrorlines
-
-The `xerrorlines` style is only relevant to 2-d data plots.
-`xerrorlines` is like `linespoints`, except that a horizontal error
-line is also drawn. At each point (x,y), a line is drawn from (xlow,y)
-to (xhigh,y) or from (x-xdelta,y) to (x+xdelta,y), depending on how
-many data columns are provided. A tic mark is placed at the ends of
-the error bar (unless @ref{bars} is used---see @ref{bars} for details).
-
-
-@noindent --- XYERRORLINES ---
-
-@c ?commands set style xyerrorlines
-@c ?set style xyerrorlines
-@c ?plotting styles xyerrorlines
-@c ?style xyerrorlines
-@cindex xyerrorlines
-
-The `xyerrorlines` style is only relevant to 2-d data plots.
-`xyerrorlines` is like `linespoints`, except that horizontal and
-vertical error bars are also drawn. At each point (x,y), lines are
-drawn from (x,y-ydelta) to (x,y+ydelta) and from (x-xdelta,y) to
-(x+xdelta,y) or from (x,ylow) to (x,yhigh) and from (xlow,y) to
-(xhigh,y), depending upon the number of data columns provided. A tic
-mark is placed at the ends of the error bar (unless @ref{bars} is
-used---see @ref{bars} for details).
-
-If data are provided in an unsupported mixed form, the @ref{using} filter on the
-`plot` command should be used to set up the appropriate form.  For example,
-if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
-
-@example
-      plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
-
-@end example
-
-
-@noindent --- YERRORLINES ---
-
-@c ?commands set style yerrorlines
-@c ?commands set style errorlines
-@c ?plotting styles yerrorlines
-@c ?plotting styles errorlines
-@c ?set style yerrorlines
-@c ?set style errorlines
-@c ?style yerrorlines
-@c ?style errorlines
-@cindex yerrorlines
-
-The `yerrorlines` (or @ref{errorlines}) style is only relevant to 2-d data
-plots. `yerrorlines` is like `linespoints`, except that a vertical
-error line is also drawn. At each point (x,y), a line is drawn from
-(x,y-ydelta) to (x,y+ydelta) or from (x,ylow) to (x,yhigh), depending
-on how many data columns are provided. A tic mark is placed at the
-ends of the error bar (unless @ref{bars} is used---see @ref{bars} for
-details).
-See also
-@uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
-}
 
 @node surface, table, style, set-show
 @subsection surface
@@ -12660,12 +12828,15 @@ at a axis by axis basis.
 @node ticslevel, ticscale, tics, set-show
 @subsection ticslevel
 
+@c ?commands set ticslevel
+@c ?commands show ticslevel
 @c ?set ticslevel
+@c ?show ticslevel
 @cindex ticslevel
 @opindex ticslevel
 
 
-See @ref{xyplane}.
+Deprecated. See @ref{xyplane}.
 
 @node ticscale, timestamp, ticslevel, set-show
 @subsection ticscale
@@ -12815,7 +12986,7 @@ See also
 
 
 The `set title` command produces a plot title that is centered at the top of
-the plot.  `set title` is a special case of @ref{label}.
+the plot.  `set title` is a special case of `set label`.
 
 Syntax:
 @example
@@ -12940,7 +13111,7 @@ help file, and (again) the useful email addresses.
 
 
 The @ref{view} command sets the viewing angle for `splot`s.  It controls how
-the 3-d coordinates of the plot are mapped into the 2-d screen space.  It
+the 3D coordinates of the plot are mapped into the 2D screen space.  It
 provides controls for both rotation and scaling of the plotted data, but
 supports orthographic projections only.  It supports both 3D projection or
 orthogonal 2D projection into a 2D plot-like map.
@@ -12953,7 +13124,7 @@ Syntax:
 @end example
 
 where <rot_x> and <rot_z> control the rotation angles (in degrees) in a
-virtual 3-d coordinate system aligned with the screen such that initially
+virtual 3D coordinate system aligned with the screen such that initially
 (that is, before the rotations are performed) the screen horizontal axis is
 x, screen vertical axis is y, and the axis perpendicular to the screen is z.
 The first rotation applied is <rot_x> around the x axis.  The second rotation
@@ -13273,7 +13444,8 @@ The orientation (rotation angle) of the x, x2, y and y2 axis labels can be
 explicitly changed from the default setting, but this applies only to 2D plots
 and only on terminals that support text rotation.
 
-If you are not satisfied with the default position of an axis label, use @ref{label} instead--that command gives you much more control over where text is
+If you are not satisfied with the default position of an axis label, use `set
+label` instead--that command gives you much more control over where text is
 placed.
 
 Please see `syntax` for further information about backslash processing
@@ -13639,14 +13811,6 @@ second example the tic at "Dec 3" will be unlabelled.
 
 @node xyplane, xzeroaxis, xtics, set-show
 @subsection xyplane
-
-@c ?commands set ticslevel
-@c ?commands show ticslevel
-@c ?set ticslevel
-@c ?show ticslevel
-@cindex ticslevel
-@opindex ticslevel
-
 
 @c ?commands set xyplane
 @c ?commands show xyplane
@@ -14279,14 +14443,14 @@ and uses it, if available.  This is practical if `gnuplot` is run from
 @cmindex splot
 
 
-`splot` is the command for drawing 3-d plots (well, actually projections on
-a 2-d surface, but you knew that).  It can create a plot from functions or
+`splot` is the command for drawing 3D plots (well, actually projections on
+a 2D surface, but you knew that).  It can create a plot from functions or
 data read from files in a manner very similar to the `plot` command.
 `splot` provides only a single x, y, and z axis; there is no equivalent to the
 x2 and y2 secondary axes provided by `plot`.
 
 See `plot` for features common to the `plot` command; only differences are
-discussed in detail here.  
+discussed in detail here.
 
 Syntax:
 @example
@@ -14313,7 +14477,7 @@ The syntax for setting ranges on the `splot` command is the same as for
 
 The `title` option is the same as in `plot`.  The operation of @ref{with} is also
 the same as in `plot`, except that the plotting styles available to `splot`
-are limited to `lines`, `points`, `linespoints`, `dots`, and `impulses`;  the
+are limited to `lines`, `points`, @ref{linespoints}, @ref{dots}, and @ref{impulses};  the
 error-bar capabilities of `plot` are not available for `splot`.
 
 The @ref{datafile} options have more differences.
@@ -14467,7 +14631,7 @@ See also `binary general` and
 @c ?commands splot datafile example
 @c ?splot datafile example
 @c ?splot example
-A simple example of plotting a 3-d data file is
+A simple example of plotting a 3D data file is
 
 @example
       splot 'datafile.dat'
@@ -15524,7 +15688,7 @@ Example:
 
 @end example
 
-You cannot introduce a new font in a @ref{label} command.
+You cannot introduce a new font in a `set label` command.
 
 
 
@@ -16518,7 +16682,7 @@ A simple graph can be formatted using
 @end example
 
 The output from pic can be pipe-lined into eqn, so it is possible to put
-complex functions in a graph with the @ref{label} and `set @{x/y@}label`
+complex functions in a graph with the `set label` and `set @{x/y@}label`
 commands.  For instance,
 
 @example
@@ -16606,7 +16770,7 @@ A simple graph can be formatted using
 @end example
 
 The output from pic can be pipe-lined into eqn, so it is possible to put
-complex functions in a graph with the @ref{label} and `set @{x/y@}label`
+complex functions in a graph with the `set label` and `set @{x/y@}label`
 commands.  For instance,
 
 @example
@@ -17410,7 +17574,7 @@ LaTeX packages: amsfonts, amsmath(intlimits). By default these packages are not
 included.
 
 A name in quotes selects the font that will be used when no explicit font is
-given in a @ref{label} or `set title`.  A name recognized by TeX (a TFM file
+given in a `set label` or `set title`.  A name recognized by TeX (a TFM file
 exists) must be used.  The default is "cmr10" unless `notex` is selected,
 then it is "pcrr8r" (Courier).  Even under `notex`, a TFM file is needed by
 Metapost. The file `pcrr8r.tfm` is the name given to Courier in LaTeX's psnfss
@@ -17570,7 +17734,7 @@ Syntax:
 
 `colour` plots lines with line types >= 0 in colour (MIF sep. 2--7) and
 `monochrome` plots all line types in black (MIF sep. 0).
-`polyline` plots curves as continuous curves and `vectors` plots curves as
+`polyline` plots curves as continuous curves and @ref{vectors} plots curves as
 collections of vectors.
 @ref{help} and `?` print online help on standard error output---both print a
 short description of the usage; @ref{help} also lists the options.
@@ -18948,7 +19112,7 @@ You may set a default enconding via the corresponding X11 resource. E.g.
 
 The driver also recognizes some common PostScript font names and
 replaces them with possible X11 or TrueType equivalents.
-This same sequence is used to process font requests from @ref{label}.
+This same sequence is used to process font requests from `set label`.
 
 If your gnuplot was built with configuration option --enable-x11-mbfonts,
 you can specify multi-byte fonts by using the prefix "mbfont:" on the font
@@ -19448,7 +19612,7 @@ You may set a default enconding via the corresponding X11 resource. E.g.
 
 The driver also recognizes some common PostScript font names and
 replaces them with possible X11 or TrueType equivalents.
-This same sequence is used to process font requests from @ref{label}.
+This same sequence is used to process font requests from `set label`.
 
 If your gnuplot was built with configuration option --enable-x11-mbfonts,
 you can specify multi-byte fonts by using the prefix "mbfont:" on the font
