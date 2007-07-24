@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.15 2007/03/28 22:23:50 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.16 2007/06/06 10:17:56 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2872,7 +2872,7 @@ C ... and restart the table:
  a different data set but having a common decay time, estimate the values of
  the parameters.  If the datafile has the format x:z:s, then
       f(x,y) = (y==0) ? a*exp(-x/tau) : b*exp(-x/tau)
-      fit f(x,y) 'datafile' using  1:-1:2:3  via a, b, tau
+      fit f(x,y) 'datafile' using  1:-2:2:3  via a, b, tau
 
  For a more complicated example, see the file "hexa.fnc" used by the
  "fit.dem" demo.
