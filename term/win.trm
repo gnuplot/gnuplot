@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.52 2006/07/21 02:35:48 sfeam Exp $
+ * $Id: win.trm,v 1.53 2006/12/27 21:40:29 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -1042,7 +1042,7 @@ START_HELP(windows)
 "?windows wgnuplot.ini",
 "?wgnuplot.ini",
 " Windows `gnuplot` will read some of its options from the `[WGNUPLOT]` section",
-" of `WGNUPLOT.INI` in the Windows directory.  A sample `WGNUPLOT.INI` file:",
+" of `WGNUPLOT.INI` in user's %APPDATA% directory.  A sample `WGNUPLOT.INI` file:",
 "",
 "       [WGNUPLOT]",
 "       TextOrigin=0 0",

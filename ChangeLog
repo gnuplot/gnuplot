@@ -1,3 +1,8 @@
+2007-07-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/win.trm: Document reading of wgnuplot.ini in user's %APPDATA%
+	directory.
+
 2007-07-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (fill_between): Calculate intersection points for
