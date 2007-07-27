@@ -1,3 +1,7 @@
+2007-07-27  Dietmar Warning  <dietmar.warning@arcor.de>
+
+	* term/win.c (WIN_enhanced_open): Avoid compiler warning.
+
 2007-07-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/gnuplot.texi:  Add a trailing blank after
