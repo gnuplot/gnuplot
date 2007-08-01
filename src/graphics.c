@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.229 2007/07/21 19:19:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.230 2007/07/23 04:56:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2668,6 +2668,10 @@ struct curve_points *plot)
 	    yl2 += (yl2-yl1) * (xmax - x2) / dx;
 	    yu2 += (yu2-yu1) * (xmax - x2) / dx;
 	    x2 = xmax;
+	}
+	if (!polar) {
+	    xu1 = x1;
+	    xu2 = x2;
 	}
 
     /* Clip against y-axis range */
