@@ -1,3 +1,10 @@
+2007-08-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (read_line): Treat line extension consistently
+	for both interactive and non-interactive input paths. This is 
+	Timothee Lecomte's version of the fix.
+	Bug #1753069.
+
 2007-08-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (fill_between): Fix clipping bug introduced by

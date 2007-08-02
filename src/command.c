@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.156 2007/06/01 16:31:36 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.157 2007/06/01 16:56:44 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2655,12 +2655,10 @@ read_line(const char *prompt)
 			--last;
 		} else if (last + 2 >= gp_input_line_len) {
 		    extend_input_line();
-		    if (gp_input_line[last] != '\\') {
-			/* read rest of line, don't print "> " */
-			start = last + 1;
-			more = TRUE;
-			continue;
-		    }
+		    /* read rest of line, don't print "> " */
+		    start = last + 1;
+		    more = TRUE;
+		    continue;
 		    /* else fall through to continuation handling */
 		} /* if(grow buffer?) */
 		if (gp_input_line[last] == '\\') {
