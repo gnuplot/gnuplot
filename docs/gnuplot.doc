@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.441 2007/07/16 20:37:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.442 2007/07/24 12:05:51 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6827,8 +6827,9 @@ C ... and restart the table:
  The string function gprintf("format",x) uses gnuplot's own format specifiers,
  as do the gnuplot commands `set format`, `set timestamp`, and others. These
  format specifiers are not the same as those used by the standard C-language
- routine sprintf(). Gnuplot also provides an sprintf("format",x,...) routine
- if you prefer. For a list of gnuplot's format options, see `format specifiers`.
+ routine sprintf(). gprintf() accepts only a single variable to be formatted. 
+ Gnuplot also provides an sprintf("format",x1,x2,...) routine if you prefer.
+ For a list of gnuplot's format options, see `format specifiers`.
 4 format specifiers
 ?commands set format specifiers
 ?set format specifiers

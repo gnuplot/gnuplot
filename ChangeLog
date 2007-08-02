@@ -18,6 +18,8 @@
 	Timothee Lecomte's version of the fix.
 	Bug #1753069.
 
+	* docs/gnuplot.doc: Clarify gprintf() description.
+
 2007-08-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (fill_between): Fix clipping bug introduced by
