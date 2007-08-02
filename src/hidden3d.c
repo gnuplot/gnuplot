@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.57 2006/11/14 18:49:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.58 2006/12/27 21:40:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -274,6 +274,9 @@ static long int store_edge __PROTO((long int vnum1, edge_direction direction,
 				    long int crvlen, struct lp_style_type *lp,
 				    int style));
 static GP_INLINE double eval_plane_equation __PROTO((t_plane p, p_vertex v));
+static GP_INLINE double intersect_line_plane __PROTO((p_vertex v1, p_vertex v2, t_plane p));
+static double intersect_line_line __PROTO((p_vertex v1, p_vertex v2, p_vertex w1, p_vertex w2));
+static int cover_point_poly __PROTO((p_vertex v1, p_vertex v2, double u, p_polygon poly));
 static long int store_polygon __PROTO((long int vnum1,
 				       polygon_direction direction,
 				       long int crvlen));
@@ -681,6 +684,94 @@ static GP_INLINE double
 eval_plane_equation(t_plane p, p_vertex v)
 {
     return (p[0]*v->x + p[1]*v->y + p[2]*v->z + p[3]);
+}
+
+
+/* Find the intersection of a line and plane in 3d space in
+ * terms of parameterization u where v = v1 + u * (v2 - v1) */
+static GP_INLINE double
+intersect_line_plane(p_vertex v1, p_vertex v2, t_plane p)
+{
+    double numerator = eval_plane_equation(p, v1);
+    if (numerator == 0)
+	return 0;
+    else {
+	double denominator = p[0]*(v1->x - v2->x) + p[1]*(v1->y - v2->y) + p[2]*(v1->z - v2->z);
+	return numerator/denominator;
+    }
+}
+
+
+/* Find the intersection of two lines in 2d space in terms
+ * of parameterization u where v = v1 + u * (v2 - v1) */
+static double
+intersect_line_line(p_vertex v1, p_vertex v2, p_vertex w1, p_vertex w2)
+{
+    double numerator = (w2->x - w1->x)*(v1->y - w1->y) - (w2->y - w1->y)*(v1->x - w1->x);
+    if (numerator == 0)
+	return 0;
+    else {
+	double denominator = (w2->y - w1->y)*(v2->x - v1->x) - (w2->x - w1->x)*(v2->y - v1->y);
+	return numerator/denominator;
+    }
+}
+
+
+/* Check whether the point is covered by the plane in 3d space
+ *
+ * 0 - point not covered
+ * 1 - point covered and does not lie in plane
+ * 2 - point covered and lies in plane
+ */
+static int
+cover_point_poly(p_vertex v1, p_vertex v2, double u, p_polygon poly)
+{
+    /* Using EQ() test seemed to have no effect on results */
+    if (poly->plane[2] == 0) {
+	/* The element is "vertical" so treat as infitesimally small for now.
+	 * An alternative would be to interpolate the edge closest to the
+	 * viewer plane.  However, there may be tests previous to this that
+	 * rule out this case. */
+	return 0;
+    }
+    else {
+	p_vertex w1 = vlist + poly->vertex[0];
+	p_vertex w2 = vlist + poly->vertex[1];
+	p_vertex w3 = vlist + poly->vertex[2];
+	double p_side[3];  /* Signed areas */
+	vertex p;
+	p.x = v1->x + u * (v2->x - v1->x);
+	p.y = v1->y + u * (v2->y - v1->y);
+	p.z = v1->z + u * (v2->z - v1->z);
+	/* Check if point is inside triangular element */
+	p_side[0] = area2D(w1, w2, &p);
+	p_side[1] = area2D(w2, w3, &p);
+	p_side[2] = area2D(w3, w1, &p);
+	if (0
+	    || (GE(p_side[0], 0)
+		&& GE(p_side[1], 0)
+		&& GE(p_side[2], 0)
+		)
+	    || (GE(0 , p_side[0])
+		&& GE(0 , p_side[1])
+		&& GE(0 , p_side[2])
+		)
+	    ) {
+	    /* Point inside closed triangle, now check z value */
+	    double z_plane = -(poly->plane[0]*p.x + poly->plane[1]*p.y + poly->plane[3]) / poly->plane[2];
+	    if (GE(z_plane, p.z)) {
+		/* Covered, but is it on the plane? */
+		if (GE(p.z, z_plane))
+		    return 2;
+		else
+		    return 1;
+	    }
+	    else
+		return 0;
+	}
+	else
+	    return 0;
+    }
 }
 
 
@@ -1461,8 +1552,6 @@ sort_polys_by_z()
 }
 
 
-#define LASTBITS (USHRT_BITS -1)	/* ????? */
-
 /************************************************/
 /*******            Drawing the polygons ********/
 /************************************************/
@@ -1549,11 +1638,6 @@ split_line_at_ratio(
 {
     p_vertex v;
 
-    if (EQ(w, 0.0))
-	return vnum1;
-    if (EQ(w, 1.0))
-	return vnum2;
-
     /* Create a new vertex */
     v = nextfrom_dynarray(&vertices);
 
@@ -1627,9 +1711,7 @@ handle_edge_fragment(long edgenum, long vnum1, long vnum2, long firstpoly)
 /* HBB 20001108: changed to now take the vertex numbers as additional
  * arguments. The idea is to not overwrite the endpoint stored with
  * the edge, so Test 2 will catch on even after the subject edge has
- * been split up before one of its two polygons is tested against
- * it. FIXME: allocates new vertices when splitting, but never frees
- * them, currently. */
+ * been split up before one of its two polygons is tested against it. */
 
 static int
 in_front(
@@ -1667,6 +1749,10 @@ in_front(
      * allow modifying '*firstpoly', without moving it too far to the
      * front. */
     coordval first_zmin;
+
+    /* Keep track of number of vertices before the process and compare
+     * at end of process to know how many vertices to remove. */
+    long enter_vertices;
 
     /* macro for eliminating tail-recursion inside in_front: when the
      * current edge is modified, recompute all function-wide status
@@ -1707,6 +1793,8 @@ in_front(
 
     first_zmin = zmin;
 
+    enter_vertices = vertices.end;
+
 #if HIDDEN3D_QUADTREE
     grid_x_low = COORD_TO_TREECELL(xmin);
     grid_x_high = COORD_TO_TREECELL(xmax);
@@ -1720,45 +1808,28 @@ in_front(
 		 listhead = qlist[listhead].next)
 #else /* HIDDEN3D_QUADTREE */
     /* loop over all the polygons in the sorted list, starting at the
-     * currently first (i.e. furthest, from the viewer) polgon. */
+     * currently first (i.e. furthest, from the viewer) polygon. */
     for (polynum = *firstpoly; polynum >=0; polynum = p->next)
 #endif /* HIDDEN3D_QUADTREE */
 	{
 	    /* shortcut variables for the three vertices of 'p':*/
 	    p_vertex w1, w2, w3;
-	    /* signed areas of each of e's vertices wrt. the edges of
-	     * p. I store them explicitly, because they are used more
-	     * than once, eventually */
-	    double e_side[2][POLY_NVERT];
-	    /* signed areas of each of p's vertices wrt. to edge e. Stored
-	     * for re-use in intersection calculations, as well */
-	    double p_side[POLY_NVERT];
-	    /* values got from throwing the edge vertices into the plane
-	     * equation of the polygon. Used for testing if the vertices are
-	     * in front of or behind the plane, and also to determine the
-	     * point where the edge goes through the polygon, by
-	     * interpolation. */
-	    double v1_rel_pplane, v2_rel_pplane;
-	    /* Orientation of polygon wrt. to the eye: front or back side
-	     * visible? */
-	    coordval polyfacing;
-	    int whichside;
-	    /* stores classification of cases as 4 2-bit patterns, mainly */
-	    unsigned int classification[POLY_NVERT + 1];
 
 #if HIDDEN3D_QUADTREE
 	    polynum = qlist[listhead].p;
 #endif
 	    p = plist + polynum;
 
-	    /* OK, off we go with the real work. This algo is mainly
-	     * following the one of 'HLines.java', as described in the
-	     * book 'Computer Graphics for Java Programmers', by Dutch
-	     * professor Leen Ammeraal, published by J.Wiley & Sons,
-	     * ISBN 0 471 98142 7. It happens to the only(!) actual
-	     * code or algorithm example I got out of a question to
-	     * the Newsgroup comp.graphics.algorithms, asking for a
-	     * hidden *line* removal algorithm. */
+	    /* OK, off we go with the real work. This algorithm had its
+	     * beginnings as the one of 'HLines.java', as described in
+	     * the book 'Computer Graphics for Java Programmers', by
+	     * Dutch professor Leen Ammeraal, published by J. Wiley &
+	     * Sons, ISBN 0 471 98142 7.
+	     *
+	     * However, it was revamped with an approach that breaks
+	     * up the edge into five possible subsegments and removes
+	     * the one contiguous subsegment, if any, that is hidden.
+	     */
 
 	    /* Test 1 (2D): minimax tests. Do x/y ranges of polygon
 	     * and edge have any overlap? */
@@ -1812,535 +1883,130 @@ in_front(
 	    w3 = vlist + p->vertex[2];
 
 
-	    /* Test 4 (2D): Is edge fully on the 'wrong side' of one of the
-	     * polygon edges?
-	     *
-	     * Done by comparing signed areas (cross-product z components of
-	     * both edge endpoints) to that of the polygon itself (as given by
-	     * the plane normal z component). If both v1 and v2 are found on
-	     * the 'outside' side of a polygon edge (interpreting it as
-	     * infinite line), the polygon can't obscure this edge. All the
-	     * signed areas are remembered, for later tests. */
-	    polyfacing = p->plane[2];
-	    whichside = SIGN(polyfacing);
-	    if (!whichside)
-		/* We're looking at the border of this polygon. It
-		 * looks like an infitisemally thin line, i.e. it'll
-		 * be practically invisible*/
-		/* FIXME: should such a polygon have been stored in the plist,
-		 * in the first place??? */
-		continue;
-
-	    /* p->plane[2] is now forced >=0, so it doesn't tell anything
-	     * about which side the polygon is facing */
-	    whichside = (p->frontfacing) ? -1 : 1;
-
-#if 0
-	    /* Just make sure I got this the right way round: */
-	    if (p->frontfacing)
-		assert (GE(area2D(w1, w2, w3),0));
-	    else
-		assert (GE(0,area2D(w1, w2, w3)));
-#endif
-
-	    /* classify both endpoints of the test edge, by their
-	     * position relative to some plane that defines the volume
-	     * shadowed by a triangle. Used both by macro 'checkside',
-	     * and for individual checking, below --> put this into a
-	     * macro */
-#define classify(par1, par2, classnum)					\
-	    do {							\
-		if (GR(par1, 0)) {					\
-		    /* v1 strictly outside --> v2 in-plane is enough,	\
-                       already : */					\
-		    classification[classnum]				\
-			= (1 << 0) | ((GE(par2, 0)) << 1);		\
-		} else if (GR(par2, 0)) {				\
-		    /* v2 strictly outside --> v1 in-plane is enough,	\
-                       already : */					\
-		    classification[classnum]				\
-			= ((GE(par1, 0)) << 0) | (1 << 1);		\
-		} else {						\
-		    /* as neither one of them is strictly outside,	\
-		     * there's no need for any edge-splitting, at all.	\
-		     * */						\
-		    classification[classnum] = 0;			\
-		}							\
-	    } while (0)
-
-	    /* code block used thrice, so put into a macro. The
-	     * 'area2D' calls return <0, ==0 or >0 if the three
-	     * vertices passed to it are in clockwise order, colinear,
-	     * or in conter-clockwise order, respectively. So the sign
-	     * of this can be used to determine if a point is inside
-	     * or outside the shadow volume. */
-#define checkside(a,b,s)					\
-	    e_side[0][s] = whichside * area2D((a), (b), v1);	\
-	    e_side[1][s] = whichside * area2D((a), (b), v2);	\
-	    classify(e_side[0][s], e_side[1][s], s);		\
-	    if (classification[s] == 3)				\
-		continue;
-
-	    checkside(w1, w2, 0);
-	    checkside(w2, w3, 1);
-	    checkside(w3, w1, 2);
-#undef checkside		/* get rid of that macro, again */
-
-
-	    /* Test 5 (2D): Does the whole polygon lie on one and the same
-	     * side of the tested edge? Again, area2D is used to determine on
-	     * which side of a given edge a vertex lies. */
-	    /* HBB 20000621: this test only makes sense if this is a
-	     * 'real' edge, not just a single point */
-	    /* HBB 20051206: but p_side[] may still have to be computed, to be used
-	     * by Test 9 */
-	    p_side[0] = area2D(v1, v2, w1);
-	    p_side[1] = area2D(v1, v2, w2);
-	    p_side[2] = area2D(v1, v2, w3);
-	    if (v1 != v2) {
-		/* HBB 20001104: made this more restrictive: only
-		 * reject p if areas are greater than 0, i.e. don't
-		 * allow EQ(..,0). Otherwise, edges coincident with a
-		 * polygon edge in 2D will not be hidden by it. */
-		/* FIXME HBB 20001108: some more code will be needed
-		 * here or further down below. It will currently fail
-		 * if two edges fall exactly on top of each other
-		 * (like the crossover line in the Klein-bottle demo):
-		 * both edges will be hidden by the other's polygon,
-		 * essentially */
-#if 0
-		if (0
-		    || (GR(p_side[0], 0)
-			&& GR(p_side[1], 0)
-			&& GR(p_side[2], 0)
-			)
-		    || (GR(0 , p_side[0])
-			&& GR(0 , p_side[1])
-			&& GR(0 , p_side[2])
-			)
-		    )
-		    continue;
-#else
-		/* HBB 20020406: try to repair this */
-		if (0
-		    || (GE(p_side[0], 0)
-			&& GE(p_side[1], 0)
-			&& GE(p_side[2], 0)
-			)
-		    || (GE(0 , p_side[0])
-			&& GE(0 , p_side[1])
-			&& GE(0 , p_side[2])
-			)
-		    )
-		    continue;
-#endif
-	    }
-
-	    /* Test 6 (3D): does the whole edge lie on the viewer's
-	     * side of the polygon's plane? */
-	    v1_rel_pplane = eval_plane_equation(p->plane, v1);
-	    v2_rel_pplane = eval_plane_equation(p->plane, v2);
-
-	    /* Condense into classification bit pattern for v1 and v2
-	     * wrt.  this plane, and store into entry 'POLY_NVERT' of
-	     * the classification array, following the three edges of
-	     * the polygon. */
-	    classify(v1_rel_pplane, v2_rel_pplane, POLY_NVERT);
-
-	    if (classification[POLY_NVERT] == 3)
-		continue;									/* edge completely in front of polygon */
-
-	    /* Test 7 (2D): is edge completely inside the triangle?
-	     * The stored results from Test 4 make this rather easy to
-	     * check: if a point is oriented equally wrt. all three
-	     * edges, and also to the triangle itself, the point is
-	     * inside the 2D triangle: */
-
-	    /* search for any one bits (--> they mean 'outside') */
-	    if (! (classification[0]
-		   | classification[1]
-		   | classification[2])) {
-
-		/* Edge is completely inside the polygon's 2D
-		 * projection. Unlike Ammeraal, I have to check for
-		 * edges penetrating polygons, as well. */
-
-		/* Check if edge really doesn't intersect the triangle
-		 * (this happens in roughly one third of the
-		 * cases). If both vertices have been classified as
-		 * 'behind', the result is true even in the case of
-		 * possibly intersecting polygons */
-		/* HBB 20020408: softened this check to allow edges
-		 * not to be hidden by polygons they're fully inside.
-		 * I.e. only declare the edge invisible if at least
-		 * one of its endpoints is truly behind, not inside
-		 * the polygon's plane. ---> FIXME 20001108 above */
-		if (!classification[POLY_NVERT]
-		    && (GR(0, v1_rel_pplane) || GR(0, v2_rel_pplane)))
-		    return 0;
-	    }
-
-
-	    /* Test 8 (3D): If no edge intersects any polygon, the edge must
-	     * lie infront of the poly if the 'inside' vertex in front of it.
-	     * This test doesn't work if lines might intersect polygons, so I
-	     * took it out of my version of Ammeraal's algorithm. */
-
-
-	    /* Test 9 (3D): The final 'catch-all' handler. We now know
-	     * that the edges passes through the walls of the
-	     * semifinite polygonal cylinder of invisible space
-	     * stamped out by the polygon, somewhere, so we have to
-	     * compute the intersection points with the 2D projection
-	     * of the polygon and check whether they are infront of or
-	     * behind the polygon, to isolate the visible fragments of
-	     * the line. Method is to calc. the [0..1] parameter that
-	     * describes the way from V1 to V2, for all intersections
-	     * of the edge with any of the planes that define the
-	     * 'shadow volume' of this polygon, and deciding what to
-	     * do, with all this.
-	     *
-	     * The remaining work can be classified by the values of
-	     * the variables calculated in previous tests:
-	     * v{1/2}_rel_pplane, e_side[2][POLY_NVERT],
-	     * p_side[POLY_NVERT]. Setting aside cases where one of
-	     * them is zero, this leaves a total of 2^11 = 2048
-	     * separate cases, in principal. Several of those have
-	     * been sorted out, already, by the previous tests. That
-	     * leaves us with 3*27 cases, essentially. The '3' cases
-	     * differ by which of the three vertices of the polygon is
-	     * alone on its side of the test edge.  That already fixes
-	     * which two edges might intersect the test edge.  The 27
-	     * cases differ by which of the edge points lies on which
-	     * of the three planes in space (two sides, and the
-	     * polygon plane) that remain interesting for the tests.
-	     * That would normally make 2^2 = 4 cases per plane. But
-	     * the 'both outside' cases for all three planes have
-	     * already been taken care of, earlier, leaving 3 of those
-	     * cases to be handled. This is the same for all three
-	     * relevant planes, so we get 3^3 = 27 cases. */
+	    /* The final 'catch-all' handler: [was Test 4-9 (3D)]
+	     * Daniel Sebald 2007
+	     * ---------------------------------------------------
+	     * If one examines the possible scenarios for an edge (v1,v2)
+	     * passing through a triangular 3D element in 2D space, it
+	     * is evident that at most 4 breaks in the edge are possible,
+	     * one for each infinite triangle side intersection and
+	     * one for the edge possibly passing directly through the
+	     * polygon.  We first compute all these intersections in terms
+	     * of parameterization v = v1 + u * (v2 - v1).  That gives us
+	     * four values of u.  They likely will not all be in the range
+	     * (0,1), i.e., between v1 and v2.  We discard all those not
+	     * in the range, and the remaining associated points along with
+	     * endpoint v1 and v2 describe a series of subsegements that are
+	     * considered individually.  If any contiguous subgroup is
+	     * hidden (there can only be at most one for a convex polygon),
+	     * it is removed.
+	     * 
+	     * This routine is general in the sense that the earlier tests
+	     * it are only need for speed.
+	     * 
+	     * The following website illustrates geometrical concepts and
+	     * formulas:  http://local.wasp.uwa.edu.au/~pbourke/geometry/
+	     */
 
 	    {
-		/* the interception point parameters: */
-		double front_hit, this_hit, hit_in_poly;
-		long newvert[2];
-		int side1, side2;
-		double hit1, hit2;
-		unsigned int full_class;
+		double u_int[4];   /* Intersection points along edge v1, v2 */
+		double u_seg[6];   /* Sorted subsegment points */
+		int segs;	   /* Number of segments */
+		int i;
 
-		/* find out which of the three edges would be intersected: */
-		if ((p_side[0] > 0) == (p_side[1] > 0)) {
-		    /* first two vertices on the same side, the third
-		     * is on the 'other' side of the test edge */
-		    side1 = 1;
-		    side2 = 2;
-		} else if ((p_side[0] > 0) == (p_side[2] > 0)) {
-		    /* vertex '1' on the other side */
-		    side1 = 0;
-		    side2 = 1;
-		} else {
-		    /* we now know that it must be the first vertex
-		     * that is on the 'other' side, as not all three
-		     * can be on different sides. */
-		    side1 = 0;
-		    side2 = 2;
-		}
+		u_int[0] = intersect_line_plane(v1, v2, p->plane);
+		u_int[1] = intersect_line_line(v1, v2, w1, w2);
+		u_int[2] = intersect_line_line(v1, v2, w2, w3);
+		u_int[3] = intersect_line_line(v1, v2, w3, w1);
 
-		/* Carry out the classification into those 27 cases,
-		 * based upon classification bits precomputed above,
-		 * and calculate the intersection parameters, as
-		 * appropriate. Start by regarding the polygon's
-		 * plane: '1' means point is in front of plane.
-		 *
-		 * First, some utility macros: */
-#define cleanup_hit(hit)			\
-		do {				\
-		    if (EQ(hit,0))		\
-			hit=0;			\
-		    else if (EQ(hit,1))		\
-			hit=1;			\
-		} while (0)
-
-#define hit_in_edge(hit) ((hit >= 0) && (hit <= 1))
-
-		/* find the intersection point through the front
-		 * plane, if any: */
-		front_hit = 1e10;
-		if (classification[3]) {
-		    if (SIGN(v1_rel_pplane - v2_rel_pplane)) {
-			front_hit = v1_rel_pplane / (v1_rel_pplane - v2_rel_pplane);
-			cleanup_hit(front_hit);
+		/* Check if between v1 and v2 */
+		u_seg[0] = 0;
+		segs = 1;
+		for (i=0; i < 4; i++) {
+		    if ((0 < u_int[i]) && (u_int[i] < 1)) {
+			u_seg[segs] = u_int[i];
+			segs++;
 		    }
-		    if (!hit_in_edge(front_hit)) {
-			front_hit = 1e10;
-			classification[3] = 0;	/* not really intersecting */
+		}
+		u_seg[segs] = 1;
+
+		/* Sort the points.  First and last point already in order. */
+		for (i=1; i < segs; i++) {
+		    int j = i+1;
+		    for (; j < segs; j++) {
+			if (u_seg[i] > u_seg[j]) {
+			    double temp = u_seg[i];
+			    u_seg[i] = u_seg[j];
+			    u_seg[j] = temp;
+			}
 		    }
 		}
 
-
-		/* Find intersection points with the two relevant side
-		 * planes of the shadow volume. A macro contains the
-		 * code, to be used for both side1 and side2, to
-		 * reduce code overhead: */
-#define check_out_hit(hit, side)					\
-		do {							\
-		    hit = 1e10;	/* default is 'way off' */		\
-		    if (classification[side]) {				\
-			/* Not both inside, i.e. there has to be an	\
-			 * intersection point: */			\
-			hit_in_poly = - whichside * p_side[side]	\
-			    / (e_side[0][side] - e_side[1][side]);	\
-			cleanup_hit(hit_in_poly);			\
-			if (hit_in_edge(hit_in_poly))	{		\
-			    this_hit = e_side[0][side]			\
-				/ (e_side[0][side] - e_side[1][side]);	\
-			    cleanup_hit(this_hit);			\
-			    if (hit_in_edge(this_hit)) {		\
-				hit = this_hit;				\
-			    }						\
-			}						\
-		    }							\
-		    if (hit == 1e10)					\
-			/* doesn't really intersect */			\
-			classification[side] = 0; 			\
-		} while (0)
-
-		check_out_hit(hit1, side1);
-		check_out_hit(hit2, side2);
-#undef check_out_hit
-
-		/* OK, now we know the position of all the hits that
-		 * might be needed, given by their positions between
-		 * the test edge's vertices. */
-
-		/* Macro: combine all the classifications into a
-		 * single classification bitpattern, for easier
-		 * listing of cases */
-#define makeclass(s2, s1, p) (16 * s2 + 4 * s1 + p)
-
-		full_class = makeclass(classification[side2],
-				       classification[side1],
-				       classification[3]);
-
-		if (!full_class)
-		    /* all suspected intersections cleared, already! */
-		    continue;
-
-		/* First sort out all cases where one endpoint is
-		 * attributed to more than one intersecting
-		 * plane. Only one of those can be 'the real'
-		 * intersection of the edge with the surface of the
-		 * shadow volume surface. The others are intersections
-		 * with the planes defining the volumes, but outside
-		 * the actual faces.
-		 *
-		 * This cuts down the 27 to 13 cases (000, 001, 002,
-		 * 012, and their permutations). Start with v1: */
-		switch (full_class & makeclass(1, 1, 1)) {
-		case makeclass(0,1,1):
-		    /* v1 is out 'side1' and infront of 'p' */
-		    if (front_hit < hit1)
-			classification[3] = 0;
-		    else
-			classification[side1] = 0;
-		    break;
-
-		case makeclass(1,0,1):
-		    /* v1 is out 'side2' and infront of 'p' */
-		    if (front_hit < hit2)
-			classification[3] = 0;
-		    else
-			classification[side2] = 0;
-		    break;
-
-		    /* The following two cases never trigger, even in
-		     * a full run through all.dem. Neither do the
-		     * corresponding 2 cases for the vertex2
-		     * classification. I think this is so because the
-		     * determination of 'side1' and 'side2' already
-		     * took care of this: if the edge vertex is out
-		     * two sides, those two will _not_ be chosen as
-		     * 'side1' and 'side2', because one of them is
-		     * completely on one side of the edge.  */
-		case makeclass(1,1,0):
-		    /* v1 out both sides, but behind the front */
-		    if (hit1 < hit2)
-			/* hit2 is closer to the hidden vertex v2, so
-			 * it's the relevant intersection: */
-			classification[side1] = 0;
-		    else
-			classification[side2] = 0;
-		    break;
-
-		case makeclass(1,1,1):
-		    /* v1 out both sides, and in front of p (--> v2 is
-		     * hidden) */
-		    if (front_hit < hit1) {
-			classification[3] = 0;
-			if (hit1 < hit2)
-			    classification[side1] = 0;
-			else
-			    classification[side2] = 0;
-		    } else {
-			classification[side1] = 0;
-			if (front_hit < hit2)
-			    classification[3] = 0;
-			else
-			    classification[side2] = 0;
+		/* Check if contiguous segments or segment is covered */
+		for (i=0; i < segs; i++) {
+		    int covA = cover_point_poly(v1, v2, u_seg[i], p);
+		    if (covA) {
+			/* First covered point, now look for last covered point */
+			int j, covB = 0;
+			for (j=i; j < segs; j++) {
+			    int cover = cover_point_poly(v1, v2, u_seg[j+1], p);
+			    if (!cover)
+				break;
+			    covB = cover;
+			}
+			if (i == j)
+			    break;  /* Only one covered point, no segment covered */
+			if (covA == 2 && covB == 2)
+			    break;  /* Points covered, but both are on the plane */
+			else {
+			    /* This is the hidden segment */
+			    if (i == 0) {
+				/* Missing segment is at start of v1, v2 */
+				if (j == segs) {
+				    /* Whole edge is hidden */
+				    while (vertices.end > enter_vertices)
+					droplast_dynarray(&vertices);
+				    return 0;
+				}
+				else {
+				    /* Shrink the edge and continue */
+				    long newvert = split_line_at_ratio(vnum1, vnum2, u_seg[j]);
+				    setup_edge(newvert, vnum2);
+				    break;
+				}
+			    }
+			    else if (j == segs) {
+				/* Missing segment is at end of v1, v2.  The i = 0
+				 * case already tested, so shrink edge and continue */
+				long newvert = split_line_at_ratio(vnum1, vnum2, u_seg[i]);
+				setup_edge(vnum1, newvert);
+				break;
+			    }
+			    else {
+				/* Handle new edge then shrink edge */
+				long newvert[2];
+				newvert[0] = split_line_at_ratio(vnum1, vnum2, u_seg[i]);
+				newvert[1] = split_line_at_ratio(vnum1, vnum2, u_seg[j]);
+				/* If the newvert[1] is vnum1 this would be an infinite
+				 * loop and stack overflow if not checked since in_front()
+				 * was just called with vnum1 and vnum2 and got to this
+				 * point.  This is the equivalent of snipping out a tiny
+				 * segment near end of an edge.  Simply ignore.
+				 */
+				if (newvert[1] != vnum1) {
+				    handle_edge_fragment(edgenum, newvert[1], vnum2, polynum);
+				    setup_edge(vnum1, newvert[0]);
+				}
+				break;
+			    }
+			}
 		    }
-		    break;
+		}
 
-		default:
-		    ; /* do nothing */
-		} /* switch(v1 classes) */
+		/* Nothing is covered */
+		continue;
 
-
-		/* And the same, for v2 */
-		switch (full_class & makeclass(2, 2, 2)) {
-		case makeclass(0,2,2):
-		    /* v2 is out 'side1' and infront of 'p' */
-		    if (front_hit > hit1)
-			classification[3] = 0;
-		    else
-			classification[side1] = 0;
-		    break;
-
-		case makeclass(2,0,2):
-		    /* v2 out side 'side2' and infront of 'p' */
-		    if (front_hit > hit2)
-			classification[3] = 0;
-		    else
-			classification[side2] = 0;
-		    break;
-
-		    /* See note in v1 handling about these two cases
-		     * being impossible... */
-		case makeclass(2,2,0):
-		    /* v2 out both sides, but behind the front */
-		    if (hit1 > hit2)
-			/* hit2 is closer to the hidden vertex v2, so
-			 * it's the relevant intersection: */
-			classification[side1] = 0;
-		    else
-			classification[side2] = 0;
-		    break;
-
-		case makeclass(2,2,2):
-		    /* v2 out both sides, and in front of p (--> v1 is
-		     * hidden) */
-		    if (front_hit > hit1) {
-			classification[3] = 0;
-			if (hit1 > hit2)
-			    classification[side1] = 0;
-			else
-			    classification[side2] = 0;
-		    } else {
-			classification[side1] = 0;
-			if (front_hit > hit2)
-			    classification[3] = 0;
-			else
-			    classification[side2] = 0;
-		    }
-		    break;
-
-		default:
-		    ; /* do nothing */
-		} /* switch(v2 classes) */
-
-
-		/* recalculate full_class after all these possible changes: */
-		full_class = makeclass(classification[side2],
-				       classification[side1],
-				       classification[3]);
-
-		/* This monster switch catches all the 13 remaining cases
-		 * individually. */
-		switch (full_class) {
-		default:
-		    printf("in_front: (T9) class %d is illegal. Should never happen.\n",
-			   full_class);
-		    break;
-		case makeclass(0,0,0):
-		    /* can happen, by resetting of classification bits
-		     * inside this test */
-		    break;
-
-/*--------- The simplest cases first: only one intersection point -----*/
-		    /* Code is the same for all six cases, or nearly so: */
-#define handle_singleplane_hit(vert, hitpar)				    \
-		    newvert[0] = split_line_at_ratio(vnum1, vnum2, hitpar); \
-		    setup_edge(vert, newvert[0]);			    \
-		    break;
-
-		case makeclass(0,0,1): /* v1 is in front of poly: */
-		    handle_singleplane_hit(vnum1, front_hit);
-		case makeclass(0,0,2): /* v2 is in front of poly: */
-		    handle_singleplane_hit(vnum2, front_hit);
-		case makeclass(0,1,0): /* v1 is out side1: */
-		    handle_singleplane_hit(vnum1,hit1);
-		case makeclass(0,2,0): /* v2 is out side1: */
-		    handle_singleplane_hit(vnum2,hit1);
-		case makeclass(1,0,0): /* v1 is out side2 */
-		    handle_singleplane_hit(vnum1,hit2);
-		case makeclass(2,0,0): /* v2 is out side2 */
-		    handle_singleplane_hit(vnum2,hit2);
-
-/*----------- cases with 2 certain intersections: --------------*/
-		case makeclass(1,2,0):
-		case makeclass(2,1,0):
-		    /* Both behind the front, v1 out one side, v2 out
-		     * the other.  These two cases can be handled by
-		     * common code: */
-		    newvert[0] = split_line_at_ratio(vnum1, vnum2, hit1);
-		    newvert[1] = split_line_at_ratio(vnum1, vnum2, hit2);
-		    if (hit1 < hit2) {
-			/* the fragments are v1--hit1 and hit2--v2 */
-			handle_edge_fragment(edgenum, newvert[1], vnum2, polynum);
-			setup_edge(vnum1, newvert[0]);
-		    } else {
-			/* the fragments are v2--hit1 and hit2--v1 */
-			handle_edge_fragment(edgenum, vnum1, newvert[1], polynum);
-			setup_edge(newvert[0], vnum2);
-		    }
-		    break;
-
-/*----------- cases with either 2 or no intersections: --------------*/
-
-		    /* Mainly identical code block to be used 4 times
-		     * --> macro */
-		    /* HBB 20001108: up until today, this part of the
-		     * was severely buggy. But I do think I've got it
-		     * fixed up, this time */
-#define handle_outside_behind_vs_infront(hitvar1, hitvar2)			   \
-		    /* vnum1 out plane of 'hitvar1' and in back, vnum2		   \
-                     * in front */						   \
-		    if ((hitvar1) < (hitvar2)) {				   \
-			newvert[0] = split_line_at_ratio(vnum1, vnum2, (hitvar1)); \
-			newvert[1] = split_line_at_ratio(vnum1, vnum2, (hitvar2)); \
-			handle_edge_fragment(edgenum, newvert[1], vnum2, polynum); \
-			setup_edge(vnum1, newvert[0]);				   \
-		    }								   \
-		    /* otherwise, the edge missed the shadow volume		   \
-		     * --> nothing to do */					   \
-		    break;
-
-		case makeclass(0,1,2): /* v1 out side1 and in back, v2 in front */
-		    handle_outside_behind_vs_infront(hit1, front_hit);
-
-		case makeclass(0,2,1): /* v2 out side1 and in back, v1 in front */
-		    handle_outside_behind_vs_infront(front_hit, hit1);
-
-		case makeclass(1,0,2): /* v1 out side2 and in back, v2 in front */
-		    handle_outside_behind_vs_infront(hit2, front_hit);
-
-		case makeclass(2,0,1): /* v2 out side2 and in back, v1 in front */
-		    handle_outside_behind_vs_infront(front_hit, hit2);
-
-#undef handle_outside_behind_vs_infront
-
-		} /* end of switch through the cases */
-
-	    } /* end of part 'T9' */
+	    } /* end of part 'T4-9' */
 	} /* for (polygons in list) */
 
     /* Came here, so there's something left of this edge, which needs
@@ -2348,6 +2014,9 @@ in_front(
      * new vertices back into 'e' */
 
     draw_edge(elist + edgenum, vlist + vnum1, vlist + vnum2);
+
+    while (vertices.end > enter_vertices)
+	droplast_dynarray(&vertices);
 
     return 1;
 }

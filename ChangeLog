@@ -1,3 +1,16 @@
+2007-08-02  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/hidden3d.c (intersect_line_plane intersect_line_line
+	cover_point_poly): New helper routines.
+
+	* src/hidden3d.c (in_front): Replaced occlusion tests 4-9 by a more
+	general approach that handles all of these cases jointly. This results
+	in substantial code reduction, and fixes several reported cases where
+	occluded line fragments 'leaked through' the occluding surface.
+	Bugs #1718109 #1726773 #1727198
+
+	EAM - code reviewed and bug fixes confirmed.
+
 2007-08-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (read_line): Treat line extension consistently
