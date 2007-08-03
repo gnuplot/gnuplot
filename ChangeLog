@@ -1,3 +1,9 @@
+2007-08-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_encoding) docs/gnuplot.doc:  New command
+	`set encoding locale` attempts to query the runtime environment for
+	the character encoding of the current locale setting (LC_CTYPE).
+
 2007-08-02  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/hidden3d.c (intersect_line_plane intersect_line_line

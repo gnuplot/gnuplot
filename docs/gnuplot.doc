@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.442 2007/07/24 12:05:51 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.443 2007/08/03 04:52:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6675,6 +6675,7 @@ C ... and restart the table:
  The `set encoding` command selects a character encoding.
  Syntax:
        set encoding {<value>}
+       set encoding locale
        show encoding
 
  Valid values are
@@ -6691,11 +6692,18 @@ C ... and restart the table:
     cp852       - codepage for OS/2, Central and Eastern Europe
     cp1250      - codepage for MS Windows, Central and Eastern Europe
 
+ The command `set encoding locale` is different from the other options.
+ It attempts to determine the current locale from the runtime environment.
+ On most systems this is controlled by the environmental variables
+ LC_ALL, LC_CTYPE, or LANG.  This mechanism is necessary, for example, to
+ pass multibyte character encodings such as UTF-8 or EUC_JP to the wxt
+ and cairopdf terminals.  This command does not affect the locale-specific
+ representation of dates or numbers.
+ See also `set locale` and `set decimalsign`.
+
  Generally you must set the encoding before setting the terminal type.
  Note that encoding is not supported by all terminal drivers and that
  the device must be able to produce the desired non-standard characters.
- The PostScript, X11 and wxt terminals support all encodings. OS/2 Presentation
- Manager switches automatically to codepage 912 for `iso_8859_2`.
 3 fit
 ?commands set fit
 ?commands show fit
@@ -7704,6 +7712,7 @@ C ... and restart the table:
  is determined from the LC_TIME, LC_ALL, or LANG environment variables.
 
  To change the decimal point locale, see `set decimalsign`.
+ To change the character encoding to the current locale, see `set encoding`.
 3 logscale
 ?commands set logscale
 ?commands unset logscale

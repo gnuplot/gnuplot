@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.247 2007/05/19 22:21:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.248 2007/06/22 04:28:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1211,20 +1211,23 @@ set_dummy()
 static void
 set_encoding()
 {
-    int temp;
-
     c_token++;
 
-    if(END_OF_COMMAND)
-	temp = S_ENC_DEFAULT;
-    else {
-	temp = lookup_table(&set_encoding_tbl[0],c_token);
+    if (END_OF_COMMAND) {
+	encoding = S_ENC_DEFAULT;
+#ifdef HAVE_LOCALE_H
+    } else if (equals(c_token,"locale")) {
+	setlocale(LC_CTYPE,"");
+	c_token++;
+#endif
+    } else {
+	int temp = lookup_table(&set_encoding_tbl[0],c_token);
 
 	if (temp == S_ENC_INVALID)
-	    int_error(c_token, "expecting one of 'default', 'iso_8859_1', 'iso_8859_2', 'iso_8859_15', 'cp437', 'cp850', 'cp852', 'koi8r' or 'koi8u'");
+	    int_error(c_token, "expecting one of 'default', 'iso_8859_1', 'iso_8859_2', 'iso_8859_15', 'cp437', 'cp850', 'cp852', 'koi8r', 'koi8u', or 'locale'");
+	encoding = temp;
 	c_token++;
     }
-    encoding = temp;
 }
 
 
