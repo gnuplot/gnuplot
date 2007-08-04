@@ -4,6 +4,8 @@
 	cvs branch (4.3) documentation into 4.2 documentation. In 
 	particular, 4.2 does not support transparency or iteration.
 
+	* PATCHLEVEL src/version.c:  Update version to 4.2.1
+
 2007-08-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (read_line): Treat line extension consistently
