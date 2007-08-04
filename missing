@@ -302,7 +302,9 @@ WARNING: \`$1' is $msg.  You should only need it if
     fi
     # If the file does not exist, the user really needs makeinfo;
     # let's fail without touching anything.
-    test -f $file || exit 0
+# EAM Aug 2007 - nobody "really needs" makeinfo.  Allow installs without it.
+#   test -f $file || exit 1
+
     touch $file
     ;;
 

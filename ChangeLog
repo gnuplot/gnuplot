@@ -1,3 +1,7 @@
+2007-08-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* missing:  Nobody "really needs" makeinfo.  Allow installs without it.
+
 2007-08-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_encoding) docs/gnuplot.doc:  New command
