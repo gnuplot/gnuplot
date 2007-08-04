@@ -1,3 +1,9 @@
+2007-08-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/gnuplot.texi:  Revert leakage from 
+	cvs branch (4.3) documentation into 4.2 documentation. In 
+	particular, 4.2 does not support transparency or iteration.
+
 2007-08-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (read_line): Treat line extension consistently
