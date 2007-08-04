@@ -1,3 +1,8 @@
+2007-08-04  Matthias Habl  <mhabl@users.sourceforge.net>
+
+	* configure.in: Allow to configure from inside an emacs script.
+	Bug #1741156
+
 2007-08-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* missing:  Nobody "really needs" makeinfo.  Allow installs without it.

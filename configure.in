@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.219 2007/05/08 22:42:53 sfeam Exp $
+dnl $Id: configure.in,v 1.220 2007/07/16 21:58:43 tlecomte Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -29,6 +29,9 @@ AC_C_STRINGIZE
 
 dnl Various programs
 dnl X/Emacs for building lisp packages and creating .texi version of docs
+# If set to t, that means we are running in a shell under Emacs.
+# If you have an Emacs named "t", then use the full path.
+test x"$EMACS" = xt && EMACS=
 AC_CHECK_PROGS(EMACS, emacs xemacs, no)
 AC_CHECK_PROGS(PLAINTEX, tex, no)
 AC_CHECK_PROGS(LATEX, latex latex2e, no)
