@@ -1,5 +1,8 @@
 2007-08-04  Ethan Merritt  <merritt@u.washington.edu>
 
+	* Tagged using command
+		cvs tag -c "Release_4_2_1-pre1"
+
 	* PATCHLEVEL src/version.c configure.in:
 	Increment version to Version 4.2.1
 
