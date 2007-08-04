@@ -9,6 +9,8 @@
 
 	* Makefile.am: Remove reference to obsolete README.exp
 
+	* missing:  Nobody "really needs" makeinfo.  Allow installs without it.
+
 2007-08-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (read_line): Treat line extension consistently
