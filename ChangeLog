@@ -1,10 +1,13 @@
 2007-08-04  Ethan Merritt  <merritt@u.washington.edu>
 
+	* PATCHLEVEL src/version.c configure.in:
+	Increment version to Version 4.2.1
+
 	* docs/gnuplot.doc docs/gnuplot.texi:  Revert leakage from 
 	cvs branch (4.3) documentation into 4.2 documentation. In 
 	particular, 4.2 does not support transparency or iteration.
 
-	* PATCHLEVEL src/version.c:  Update version to 4.2.1
+	* Makefile.am: Remove reference to obsolete README.exp
 
 2007-08-02  Ethan Merritt  <merritt@u.washington.edu>
 
