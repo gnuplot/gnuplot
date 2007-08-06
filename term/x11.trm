@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.160.2.2 2007/01/14 18:33:46 sfeam Exp $
+ * $Id: x11.trm,v 1.160.2.3 2007/04/25 01:49:20 sfeam Exp $
  *
  */
 
@@ -1231,8 +1231,9 @@ X11_text()
      * coordinates even though the plot is no longer active.
      */
 #ifdef PIPE_IPC
-    if (ipc_back_fd >= 0) {
+    if (ipc_back_fd >= 0)
 #endif
+	{
 	/* Construct a mask showing which axes are active */
 	int axis_mask = 0;
 	int i;
@@ -1262,9 +1263,7 @@ X11_text()
 		axis_array[SECOND_Y_AXIS].term_lower,
 		axis_array[SECOND_Y_AXIS].term_scale,
 		axis_array[SECOND_Y_AXIS].log ? axis_array[SECOND_Y_AXIS].log_base : 0);
-#ifdef PIPE_IPC
     }
-#endif
 #endif
 
     PRINT0("E\n");
