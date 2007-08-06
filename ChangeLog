@@ -1,3 +1,7 @@
+2007-08-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/x11.trm (X11_text): Fix conditionally missing {.
+
 2007-08-04  Matthias Habl  <mhabl@users.sourceforge.net>
 
 	* configure.in: Allow to configure from inside an emacs script.
