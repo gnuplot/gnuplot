@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.4 2006/06/08 17:59:50 tlecomte Exp $
+ * $Id: gp_cairo.h,v 1.5 2007/03/31 23:33:15 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -125,6 +125,7 @@ typedef struct plot_struct {
 	double linewidth;
 	int linestyle;
 	double pointsize;
+	double dashlength;
 	double text_angle;
 	rgb_color color;
 

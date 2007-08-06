@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.23 2007/07/12 23:44:52 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.24 2007/07/16 21:58:43 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -155,6 +155,7 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 	plot->linewidth = 1.0;
 	plot->linestyle = 1;
 	plot->pointsize = 1.0;
+	plot->dashlength = 1.0;
 	plot->text_angle = 0.0;
 	plot->color.r = 0.0; plot->color.g = 0.0; plot->color.b = 0.0;
 
@@ -488,8 +489,8 @@ void gp_cairo_stroke(plot_struct *plot)
 		cairo_set_operator(plot->cr, CAIRO_OPERATOR_XOR);
 
 	else if (lt == -1) {
-		dashes[0] = 1.0*plot->oversampling_scale;
-		dashes[1] = 6.0*plot->oversampling_scale;
+		dashes[0] = 0.5*plot->oversampling_scale;
+		dashes[1] = 1.5*plot->oversampling_scale;
 		cairo_set_dash(plot->cr, dashes, 2 /*num_dashes*/, 0 /*offset*/);
 	}
 
@@ -497,7 +498,9 @@ void gp_cairo_stroke(plot_struct *plot)
 		&& lt >= 0 && (lt % 5 != 0)) {
 		int i;
 		for (i=0; i<8; i++)
-			dashes[i] = dashpattern[(lt-1) % 5][i] * plot->oversampling_scale;
+			dashes[i] = dashpattern[(lt-1) % 5][i] 
+				* plot->dashlength
+				* plot->oversampling_scale;
 		cairo_set_dash(plot->cr, dashes, 8 /*num_dashes*/, 0 /*offset*/);
 	}
 

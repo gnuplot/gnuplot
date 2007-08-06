@@ -1,3 +1,11 @@
+2007-08-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_stroke): Make the dots in lt 0
+	look more like dots.
+
+	* term/cairo.trm src/wxterminal/gp_cairo.c src/wxterminal/gp_cairo.h:
+	Add dashlength option to cairopdf terminal.
+
 2007-08-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/x11.trm (X11_text): Fix conditionally missing {.

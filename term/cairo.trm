@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.1 2007/07/16 21:58:44 tlecomte Exp $
+ * $Id: cairo.trm,v 1.2 2007/07/20 19:12:50 tlecomte Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -91,8 +91,9 @@ int cairopdf_set_fontsize = 0;
 float cairopdf_width = CAIROPDF_DEFAULT_WIDTH;
 /* default height, in points */
 float cairopdf_height = CAIROPDF_DEFAULT_HEIGHT;
-/* Default multiplier for linewidths */
+/* Default multipliers for linewidths and dashlengths */
 float cairopdf_lw = 1.0;
+float cairopdf_dl = 1.0;
 
 
 plot_struct plot;
@@ -109,6 +110,7 @@ enum CAIROPDF_id {
     CAIROPDF_SOLID,
     CAIROPDF_MONO,
     CAIROPDF_COLOR,
+    CAIROPDF_DASHLENGTH,
     CAIROPDF_OTHER
 };
 
@@ -125,6 +127,8 @@ static struct gen_table cairopdf_opts[] = {
     {"solid", CAIROPDF_SOLID},
     {"mono$chrome", CAIROPDF_MONO},
     {"color", CAIROPDF_COLOR},
+    {"dl", CAIROPDF_DASHLENGTH},
+    {"dashlen$gth", CAIROPDF_DASHLENGTH},
     {NULL, CAIROPDF_OTHER}
 };
 
@@ -224,6 +228,12 @@ TERM_PUBLIC void cairopdf_options()
 			c_token++;
 			cairopdf_mono = FALSE;
 			break;
+		case CAIROPDF_DASHLENGTH:
+			c_token++;
+			cairopdf_dl = real_expression();
+			if (cairopdf_dl < 0.0)
+			    cairopdf_dl = 1.0;
+			break;
 		case CAIROPDF_OTHER:
 		default:
 			int_error(c_token, "unrecognized terminal option");
@@ -274,6 +284,11 @@ TERM_PUBLIC void cairopdf_options()
 		snprintf(tmp_term_options,sizeof(tmp_term_options), " linewidth %g", cairopdf_lw);
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
 	}
+
+	if (cairopdf_dl != 1.0) {
+		snprintf(tmp_term_options,sizeof(tmp_term_options), " dashlength %g", cairopdf_dl);
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+	}
 }
 
 /* "Called once, when the device is first selected."
@@ -288,6 +303,7 @@ void cairopdf_init()
 	gp_cairo_initialize_plot(&plot);
 	plot.device_xmax = (double) cairopdf_width;
 	plot.device_ymax = (double) cairopdf_height;
+	plot.dashlength = cairopdf_dl;
 	/* it is up to the pdf viewer to do the hinting */
 	plot.hinting = 0;
 
@@ -631,7 +647,7 @@ START_HELP(cairopdf)
 "         set term cairopdf",
 "                      {{no}enhanced} {mono|color} {solid|dashed}",
 "                      {font <font>}",
-"                      {linewidth <lw>} {rounded|butt}",
+"                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
 "                      {size <XX>{unit},<YY>{unit}}",
 "",
 " This terminal supports an enhanced text mode, which allows font and other",
