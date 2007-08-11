@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.148 2007/06/05 19:09:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.149 2007/07/02 20:13:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -71,6 +71,7 @@ static int get_data __PROTO((struct curve_points *));
 static void store2d_point __PROTO((struct curve_points *, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
 static void eval_plots __PROTO((void));
 static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
+static void box_range_fiddling __PROTO((struct curve_points *plot));
 #ifdef EAM_HISTOGRAMS
 static void histogram_range_fiddling __PROTO((struct curve_points *plot));
 #endif
@@ -936,6 +937,31 @@ store2d_point(
     else
         cp->z = width;
 }                               /* store2d_point */
+
+
+/* Autoscaling of box plots cuts off half of the box on each end. */
+/* Add a half-boxwidth to the range in this case.  EAM Aug 2007   */
+static void
+box_range_fiddling(struct curve_points *plot)
+{
+    double xlow, xhigh;
+
+    if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MIN) {
+	if (plot->points[0].type != UNDEFINED && plot->points[1].type != UNDEFINED) {
+	    xlow = plot->points[0].x - (plot->points[1].x - plot->points[0].x) / 2.;
+	    if (axis_array[plot->x_axis].min > xlow)
+		axis_array[plot->x_axis].min = xlow;
+	}
+    }
+    if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MAX) {
+	int i = plot->p_count -1;
+	if (plot->points[i].type != UNDEFINED && plot->points[i-1].type != UNDEFINED) {
+	    xhigh = plot->points[i].x + (plot->points[i].x - plot->points[i-1].x) / 2.;
+	    if (axis_array[plot->x_axis].max < xhigh)
+		axis_array[plot->x_axis].max = xhigh;
+	}
+    }
+}
 
 #ifdef EAM_HISTOGRAMS
 /* Since the stored x values for histogrammed data do not correspond exactly */
@@ -1822,6 +1848,8 @@ eval_plots()
                 if (this_plot->plot_style == HISTOGRAMS)
                     histogram_range_fiddling(this_plot);
 #endif /* EAM_HISTOGRAMS */
+                if (this_plot->plot_style == BOXES)
+                    box_range_fiddling(this_plot);
 
                 /* sort */
                 switch (this_plot->plot_smooth) {

@@ -1,3 +1,9 @@
+2007-08-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (box_range_fiddline):  Add a check to prevent auto-scaled
+	boxes from being cut off by a half-box width at each end of the range.
+	Bug #1638190
+
 2007-08-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_stroke): Make the dots in lt 0
