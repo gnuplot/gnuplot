@@ -1,5 +1,5 @@
 #
-# $Id: electron.dem,v 1.6 2004/02/20 17:51:46 broeker Exp $
+# $Id: electron.dem,v 1.7 2005/07/29 07:54:32 mikulik Exp $
 #
 # Electronics demo
 #
@@ -45,7 +45,7 @@ Vg = 0
 set dummy Vd
 unset grid
 unset key
-set offsets 0, 1, 0, 0
+#set offsets 0, 1, 0, 0
 set title "JFET Mutual Characteristic"
 set xlabel "Drain voltage Vd (V)"
 set xrange [0 : 4]
@@ -68,10 +68,11 @@ p1 = 10
 p2 = 10000
 set dummy jw
 set grid x y2
-set key default
 set logscale xy
 set log x2
 unset log y2
+set key default
+set key bottom center box
 set title "Amplitude and Phase Frequency Response"
 set xlabel "jw (radians)"
 set xrange [1.1 : 90000.0]

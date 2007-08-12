@@ -7,6 +7,10 @@
 	(colorspec.lt instead of colorspec.type).
 	Bug #1771240
 
+	* demo/electron.dem:  Remove the "offset command", which is buggy, and
+	use a consistent x axis.  Still need to fix the bug in offset, however.
+	Bug #1744139
+
 2007-08-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (box_range_fiddline):  Add a check to prevent auto-scaled
