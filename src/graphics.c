@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.11 2007/05/20 04:42:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.12 2007/06/21 19:00:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4585,7 +4585,7 @@ xtick2d_callback(
 	map_position_r(&(axis_array[axis].ticdef.offset),
 		       &offsetx_d, &offsety_d, "xtics");
 	/* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	write_multiline(x+(int)offsetx_d, tic_text+(int)offsety_d, text,
 			tic_hjust, tic_vjust, rotate_tics,
@@ -4664,7 +4664,7 @@ ytick2d_callback(
 	map_position_r(&(axis_array[axis].ticdef.offset),
 		       &offsetx_d, &offsety_d, "ytics");
 	/* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	write_multiline(tic_text+(int)offsetx_d, y+(int)offsety_d, text,
 			tic_hjust, tic_vjust, rotate_tics,
