@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.174 2007/06/21 18:56:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.175 2007/06/22 04:28:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2708,7 +2708,7 @@ xtick_callback(
 	}
 	TERMCOORD(&v2, x2, y2);
         /* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	angle = axis_array[axis].tic_rotate;
 	if (!(splot_map && angle && term->text_angle(angle)))
@@ -2785,7 +2785,7 @@ ytick_callback(
 	    v2.y -= tic_unity * t->v_tic * axis_array[axis].ticscale;
 	}
         /* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	TERMCOORD(&v2, x2, y2);
 	angle = axis_array[axis].tic_rotate;
@@ -2849,7 +2849,7 @@ ztick_callback(
 	if (!axis_array[axis].tic_in)
 	    x1 -= (term->h_tic) * axis_array[axis].ticscale;
         /* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
 	write_multiline(x1+offsetx, y1+offsety, text, RIGHT, JUST_CENTRE,
 			0, axis_array[axis].ticdef.font);

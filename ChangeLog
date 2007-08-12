@@ -1,3 +1,12 @@
+2007-08-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/color.c (cbtick_callback)
+	src/graph3d.c (xtick_callback ytick_callback ztick_callback)
+	src/graphics.c (xtick2d_callback ytick2d_callback):
+	The callback routines were testing for TC_DEFAULT in the wrong field
+	(colorspec.lt instead of colorspec.type).
+	Bug #1771240
+
 2007-08-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (box_range_fiddline):  Add a check to prevent auto-scaled

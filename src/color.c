@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.74 2007/02/25 13:07:56 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.75 2007/05/09 22:13:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -468,7 +468,7 @@ cbtick_callback(
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
 			 &offsetx, &offsety, "cbtics");
 	/* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
 	if (color_box.rotation == 'h') {
 	    int y3 = cb_y_from - (term->v_char);
