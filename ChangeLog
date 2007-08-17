@@ -1,3 +1,8 @@
+2007-08-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Remove extraneous {} from entry for 'set timestamp'.
+	The offset must not begin with a leading comma.
+
 2007-08-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (cbtick_callback)
