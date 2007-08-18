@@ -1,3 +1,10 @@
+2007-08-18  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/save.c (save_range):  The output of "show <foo>range" lists the
+	current value in a comment.  However, up until now the value listed was
+	not really the current value.  Fix this.
+	Bug #1731160
+
 2007-08-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Remove extraneous {} from entry for 'set timestamp'.

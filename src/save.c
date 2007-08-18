@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.144 2007/06/18 01:31:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.145 2007/06/22 04:28:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1037,11 +1037,11 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	/* add current (hidden) range as comments */
 	fputs("  # (currently [", fp);
 	if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].set_min, axis);
+	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min, axis);
 	}
 	putc(':', fp);
 	if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].set_max, axis);
+	    SAVE_NUM_OR_TIME(fp, axis_array[axis].max, axis);
 	}
 	fputs("] )\n", fp);
 
