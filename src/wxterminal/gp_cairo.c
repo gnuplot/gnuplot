@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.25 2007/08/07 04:55:22 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.26 2007/08/20 07:48:00 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1553,116 +1553,75 @@ void gp_cairo_fill_pattern(plot_struct *plot, int fillstyle, int fillpar)
 	    cairo_set_source_rgb( pattern_cr, 1.0, 1.0, 1.0);
 
 	cairo_paint(pattern_cr);
-	cairo_set_line_width(pattern_cr, 1.0/PATTERN_SIZE);
+	cairo_set_line_width(pattern_cr, PATTERN_SIZE/50.);
 	cairo_set_line_cap  (pattern_cr, CAIRO_LINE_CAP_BUTT);
 	cairo_set_source_rgb(pattern_cr, plot->color.r, plot->color.g, plot->color.b);
 
 	switch (fillpar%8) {
 	case 0: /* no fill */
 	default:
-		cairo_set_source_rgb(pattern_cr, 1.0, 1.0, 1.0);
-		cairo_paint(pattern_cr);
 		break;
-	case 1: /* plot->cross-hatch */
+	case 1: /* cross-hatch */
+	case 2: /* double cross-hatch */
 		cairo_move_to(pattern_cr, 0,0);
 		cairo_line_to(pattern_cr, 1.0,1.0);
 		cairo_stroke(pattern_cr);
 		cairo_move_to(pattern_cr, 0,1.0);
 		cairo_line_to(pattern_cr, 1.0,0);
-		cairo_stroke(pattern_cr);
-		break;
-	case 2: /* double plot->cross-hatch */
-		cairo_move_to(pattern_cr, 0,0);
-		cairo_line_to(pattern_cr, 1.0,1.0);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 0,1.0);
-		cairo_line_to(pattern_cr, 1.0,0);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 0,1.0/2.);
-		cairo_line_to(pattern_cr, 1.0/2.,0);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 1.0,1.0/2.);
-		cairo_line_to(pattern_cr, 1.0/2.,1.0);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 1.0/2.,0);
-		cairo_line_to(pattern_cr, 1.0,1.0/2.);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 0,1.0/2.);
-		cairo_line_to(pattern_cr, 1.0/2.,1.0);
 		cairo_stroke(pattern_cr);
 		break;
 	case 3: /* solid */
 		cairo_paint(pattern_cr);
 		break;
-	case 4:
-		cairo_move_to(pattern_cr, 0,0);
-		cairo_line_to(pattern_cr, 1.0,1.0);
-		cairo_stroke(pattern_cr);
-		/* take care of the corners */
-		cairo_move_to(pattern_cr, -1.0,0);
-		cairo_line_to(pattern_cr, 1.0,2*1.0);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 0,-1.0);
-		cairo_line_to(pattern_cr, 2*1.0,1.0);
-		cairo_stroke(pattern_cr);
-		break;
+	case 4: /* diagonal hatch */
 	case 5:
-		cairo_move_to(pattern_cr, 0,1.0);
-		cairo_line_to(pattern_cr, 1.0,0);
-		cairo_stroke(pattern_cr);
-		/* take care of the corners */
-		cairo_move_to(pattern_cr, -1.0,1.0);
-		cairo_line_to(pattern_cr, 1.0,-1.0);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 0,2*1.0);
-		cairo_line_to(pattern_cr, 2*1.0,0);
-		cairo_stroke(pattern_cr);
-		break;
 	case 6:
-		cairo_move_to(pattern_cr, 0,0);
-		cairo_line_to(pattern_cr, 1.0/2.,1.0);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 1.0/2.,0);
-		cairo_line_to(pattern_cr, 1.0,1.0);
-		cairo_stroke(pattern_cr);
-		/* take care of the corners */
-		cairo_move_to(pattern_cr, -1.0/2.,0);
-		cairo_line_to(pattern_cr, 1.0/2.,2*1.0);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 1.0/2.,-1.0);
-		cairo_line_to(pattern_cr, 3/2.*1.0,1.0);
-		cairo_stroke(pattern_cr);
-		break;
 	case 7:
-		cairo_move_to(pattern_cr, 0,1.0);
-		cairo_line_to(pattern_cr, 1.0/2.,0);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 1.0/2.,1.0);
-		cairo_line_to(pattern_cr, 1.0,0);
-		cairo_stroke(pattern_cr);
-		/* take care of the corners */
-		cairo_move_to(pattern_cr, -1.0/2.,1.0);
-		cairo_line_to(pattern_cr, 1.0/2.,-1.0);
-		cairo_stroke(pattern_cr);
-		cairo_move_to(pattern_cr, 1.0/2.,2*1.0);
-		cairo_line_to(pattern_cr, 3/2.*1.0,0);
+		cairo_move_to(pattern_cr, 0.5,0.);
+		cairo_line_to(pattern_cr, 0.5,1.);
 		cairo_stroke(pattern_cr);
 		break;
 	}
 
 	pattern = cairo_pattern_create_for_surface( pattern_surface );
 	cairo_pattern_set_extend( pattern, CAIRO_EXTEND_REPEAT );
-	cairo_destroy( pattern_cr );
 
 	/* compensate the transformation matrix of the main context */
 	cairo_matrix_init_scale(&matrix,
 		1.0/plot->oversampling_scale,
 		1.0/plot->oversampling_scale);
+
+	switch (fillpar%8) {
+	case 0: /* no fill */
+	case 1: /* cross-hatch */
+	case 3: /* solid */
+	default:
+		break;
+	case 2: /* double cross-hatch */
+		cairo_matrix_scale( &matrix, 2.,2.);
+		break;
+	case 4: /* diagonal hatch */
+		cairo_matrix_rotate( &matrix, M_PI/4);
+		break;
+	case 5:
+		cairo_matrix_rotate( &matrix, -M_PI/4);
+		break;
+	case 6:
+		cairo_matrix_rotate( &matrix, M_PI/4);
+		cairo_matrix_scale( &matrix, 2.,2.);
+		break;
+	case 7:
+		cairo_matrix_rotate( &matrix, -M_PI/4);
+		cairo_matrix_scale( &matrix, 2.,2.);
+		break;
+	}
+
 	cairo_pattern_set_matrix(pattern,&matrix);
 
-	cairo_surface_destroy( pattern_surface );
+	cairo_destroy( pattern_cr );
 	cairo_set_source( plot->cr, pattern );
 	cairo_pattern_destroy( pattern );
+	cairo_surface_destroy( pattern_surface );
 }
 
 

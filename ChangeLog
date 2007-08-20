@@ -4,7 +4,13 @@
 	gp_cairo_end_polygon): Introduce a small piece of code, unused, but
 	illustrative of the way the "saturate" operator is used to draw pm3d
 	polygons without seams.
-	
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_fill_pattern): Do not use
+	negative coordinates to create hash patterns. This gives corruption
+	with recent cairo versions (1.4.10 for example). Instead create them
+	with rotations and scaling.
+	Also scale the linewidth of the patterns with PATTERN_SIZE instead
+	of its inverse.
 
 2007-08-18  Daniel Sebald  <daniel.sebald@ieee.org>
 
