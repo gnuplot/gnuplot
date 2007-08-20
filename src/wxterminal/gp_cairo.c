@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.24 2007/07/16 21:58:43 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.25 2007/08/07 04:55:22 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -320,11 +320,14 @@ void gp_cairo_set_textangle(plot_struct *plot, double angle)
  * on a separate context and then copy back to this one.
  * Time-consuming but probably less than stroking all the edges.
  *
- * The last solution is implemented here.
- * We will only use the method when more than 2 successice polygons are drawn.
+ * The last solution is implemented if POLYGONS_SATURATE is defined to 1
+ * Otherwise the default (antialiasing but seams) is used.
  */
+#define POLYGONS_SATURATE 1
+
 void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 {
+#if POLYGONS_SATURATE
 	int i;
 	path_item *path;
 
@@ -349,11 +352,23 @@ void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 		path->previous = plot->polygon_path_last;
 		plot->polygon_path_last = path;
 	}
+#else /* !POLYGONS_SATURATE */
+	int i;
+	/* draw the polygon directly */
+	FPRINTF((stderr,"processing one polygon\n"));
+	cairo_move_to(plot->cr, corners[0].x, corners[0].y);
+	for (i=1;i<n;++i)
+		cairo_line_to(plot->cr, corners[i].x, corners[i].y);
+	cairo_close_path(plot->cr);
+	gp_cairo_fill( plot, corners->style & 0xf, corners->style >> 4 );
+	cairo_fill(plot->cr);
+#endif /* !POLYGONS_SATURATE */
 }
 
 
 void gp_cairo_end_polygon(plot_struct *plot)
 {
+#if POLYGONS_SATURATE
 	int i;
 	path_item *path;
 	path_item *path2;
@@ -458,6 +473,7 @@ void gp_cairo_end_polygon(plot_struct *plot)
 	cairo_set_source( plot->cr, pattern );
 	cairo_pattern_destroy( pattern );
 	cairo_paint( plot->cr );
+#endif /* POLYGONS_SATURATE */
 }
 
 void gp_cairo_stroke(plot_struct *plot)
