@@ -176,6 +176,8 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 
 	plot->hinting = 100;
 
+	plot->polygons_saturate = TRUE;
+
 	plot->cr = NULL;
 
 	plot->polygon_path_last = NULL;
@@ -320,55 +322,58 @@ void gp_cairo_set_textangle(plot_struct *plot, double angle)
  * on a separate context and then copy back to this one.
  * Time-consuming but probably less than stroking all the edges.
  *
- * The last solution is implemented if POLYGONS_SATURATE is defined to 1
+ * The last solution is implemented if plot->polygons_saturate is set to TRUE
  * Otherwise the default (antialiasing but seams) is used.
  */
-#define POLYGONS_SATURATE 1
 
 void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 {
-#if POLYGONS_SATURATE
-	int i;
-	path_item *path;
-
-	/* begin by stroking any open path */
-	gp_cairo_stroke(plot);
-
-	path = (path_item*) gp_alloc(sizeof(path_item), "gp_cairo : polygon path");
-
-	path->n = n;
-	path->corners = (gpiPoint*) gp_alloc(n*sizeof(gpiPoint), "gp_cairo : polygon corners");
-	for(i=0;i<n;i++)
-		*(path->corners + i) = *corners++;
-
-	path->color = plot->color;
-
-	if (plot->polygon_path_last == NULL) {
-		FPRINTF((stderr,"creating a polygon path\n"));
-		path->previous = NULL;
-		plot->polygon_path_last = path;
+	if (plot->polygons_saturate) {
+		int i;
+		path_item *path;
+	
+		/* begin by stroking any open path */
+		gp_cairo_stroke(plot);
+	
+		path = (path_item*) gp_alloc(sizeof(path_item), "gp_cairo : polygon path");
+	
+		path->n = n;
+		path->corners = (gpiPoint*) gp_alloc(n*sizeof(gpiPoint), "gp_cairo : polygon corners");
+		for(i=0;i<n;i++)
+			*(path->corners + i) = *corners++;
+	
+		path->color = plot->color;
+	
+		if (plot->polygon_path_last == NULL) {
+			FPRINTF((stderr,"creating a polygon path\n"));
+			path->previous = NULL;
+			plot->polygon_path_last = path;
+		} else {
+			FPRINTF((stderr,"adding a polygon to the polygon path\n"));
+			path->previous = plot->polygon_path_last;
+			plot->polygon_path_last = path;
+		}
 	} else {
-		FPRINTF((stderr,"adding a polygon to the polygon path\n"));
-		path->previous = plot->polygon_path_last;
-		plot->polygon_path_last = path;
+		int i;
+		/* draw the polygon directly */
+		FPRINTF((stderr,"processing one polygon\n"));
+		cairo_move_to(plot->cr, corners[0].x, corners[0].y);
+		for (i=1;i<n;++i)
+			cairo_line_to(plot->cr, corners[i].x, corners[i].y);
+		cairo_close_path(plot->cr);
+		gp_cairo_fill( plot, corners->style & 0xf, corners->style >> 4 );
+		cairo_fill(plot->cr);
 	}
-#else /* !POLYGONS_SATURATE */
-	int i;
-	/* draw the polygon directly */
-	FPRINTF((stderr,"processing one polygon\n"));
-	cairo_move_to(plot->cr, corners[0].x, corners[0].y);
-	for (i=1;i<n;++i)
-		cairo_line_to(plot->cr, corners[i].x, corners[i].y);
-	cairo_close_path(plot->cr);
-	gp_cairo_fill( plot, corners->style & 0xf, corners->style >> 4 );
-	cairo_fill(plot->cr);
-#endif /* !POLYGONS_SATURATE */
 }
 
 
 void gp_cairo_end_polygon(plot_struct *plot)
 {
-#if POLYGONS_SATURATE
+	/* when we are not using OPERATOR_SATURATE, the polygons are drawn
+	 * directly in gp_cairo_draw_polygon */
+	if (!plot->polygons_saturate)
+		return;
+
 	int i;
 	path_item *path;
 	path_item *path2;
@@ -473,7 +478,6 @@ void gp_cairo_end_polygon(plot_struct *plot)
 	cairo_set_source( plot->cr, pattern );
 	cairo_pattern_destroy( pattern );
 	cairo_paint( plot->cr );
-#endif /* POLYGONS_SATURATE */
 }
 
 void gp_cairo_stroke(plot_struct *plot)

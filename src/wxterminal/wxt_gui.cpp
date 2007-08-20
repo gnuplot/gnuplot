@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.51 2007/06/09 16:56:52 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.53 2007/07/21 09:30:27 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -560,6 +560,7 @@ wxtPanel::wxtPanel( wxWindow *parent, wxWindowID id, const wxSize& size )
 	/* initialisations */
 	gp_cairo_initialize_plot(&plot);
 	GetSize(&(plot.device_xmax),&(plot.device_ymax));
+	plot.polygons_saturate = TRUE;
 
 	settings_queued = false;
 

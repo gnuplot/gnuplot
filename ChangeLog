@@ -12,6 +12,15 @@
 	Also scale the linewidth of the patterns with PATTERN_SIZE instead
 	of its inverse.
 
+	* src/wxterminal/gp_cairo.c:
+	* src/wxterminal/gp_cairo.h:
+	* src/wxterminal/wxt_gui.cpp:
+	* term/cairo.trm:
+	Disable the use of the SATURATE operator for the cairopdf terminal,
+	keep using it for wxt. That way no bitmap fallbacks are used for pm3d
+	polygons in the	pdf, however they are rendered with seams as in the
+	current libpdf terminal or in the svg terminal.
+
 2007-08-18  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/save.c (save_range):  The output of "show <foo>range" lists the

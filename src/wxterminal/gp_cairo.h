@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.5 2007/03/31 23:33:15 sfeam Exp $
+ * $Id: gp_cairo.h,v 1.6 2007/08/07 04:55:22 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -154,6 +154,8 @@ typedef struct plot_struct {
 	 * hinting = 100 means full hinting
 	 * hinting = 0 means no hinting */
 	int hinting;
+
+	TBOOLEAN polygons_saturate;
 
 	/* cairo drawing context */
 	cairo_t *cr;

@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.2 2007/07/20 19:12:50 tlecomte Exp $
+ * $Id: cairo.trm,v 1.3 2007/08/07 04:55:22 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -306,6 +306,10 @@ void cairopdf_init()
 	plot.dashlength = cairopdf_dl;
 	/* it is up to the pdf viewer to do the hinting */
 	plot.hinting = 0;
+	/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
+	 * results in bitmap fallback. However, polygons are drawn with seams
+	 * between each other. */
+	plot.polygons_saturate = FALSE;
 
 	/* is supposed to be done in cairopdf_reset */
 	if ( plot.cr )
