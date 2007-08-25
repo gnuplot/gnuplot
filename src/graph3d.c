@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.175 2007/06/22 04:28:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.176 2007/08/12 17:45:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -55,10 +55,8 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.175 2007/06/22 04:28:16 
 #include "alloc.h"
 #include "axis.h"
 #include "gadgets.h"
-/*  #include "graphics.h" */		/* HBB 20000506: put in again, for label_width() */
 #include "hidden3d.h"
 #include "misc.h"
-/*  #include "setshow.h" */
 #include "term_api.h"
 #include "util3d.h"
 #include "util.h"
@@ -208,7 +206,7 @@ static int ptitl_cnt;
 static int max_ptitl_len;
 static int titlelin;
 static int key_sample_width, key_rows, key_cols, key_col_wth, yl_ref;
-static int ktitle_lines = 0;
+static double ktitle_lines = 0;
 
 
 /* Boundary and scale factors, in user coordinates */
@@ -335,7 +333,9 @@ boundary3d(struct surface_points *plots, int count)
     }
     /* count max_len key and number keys (plot-titles and contour labels) with len > 0 */
     max_ptitl_len = find_maxl_keys3d(plots, count, &ptitl_cnt);
-    if ((ytlen = label_width(key->title, &ktitle_lines)) > max_ptitl_len)
+    ytlen = label_width(key->title, &i) - (key->swidth + 2);
+    ktitle_lines = i;
+    if (ytlen > max_ptitl_len)
 	max_ptitl_len = ytlen;
     key_col_wth = (max_ptitl_len + 4) * t->h_char + key_sample_width;
 
@@ -367,7 +367,6 @@ boundary3d(struct surface_points *plots, int count)
 	    /* now calculate actual no cols depending on no rows */
 	    key_cols = (int) ((ptitl_cnt - 1)/ key_rows) + 1;
 	    key_col_wth = (int) (plot_bounds.xright - plot_bounds.xleft) / key_cols;
-	    /* key_rows += ktitle_lines; - messes up key - div */
 	} else {
 	    key_rows = key_cols = key_col_wth = 0;
 	}
@@ -415,7 +414,6 @@ boundary3d(struct surface_points *plots, int count)
 	    key_rows = (int) ((ptitl_cnt - 1) / key_cols) + 1;
 	}
     }
-    key_rows += ktitle_lines;
     if (key->visible)
     if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
 	&& key->margin == GPKEY_RMARGIN) {
@@ -578,8 +576,8 @@ do_3dplot(
     transform_matrix mat;
     int key_count;
     legend_key *key = &keyT;
-    char *s, *e;
     TBOOLEAN pm3d_order_depth = 0;
+    double extra_height = 0.0;
 
     /* Initiate transformation matrix using the global view variables. */
     mat_rot_z(surface_rot_z, trans_mat);
@@ -840,7 +838,7 @@ do_3dplot(
 	    } else if (rmargin.scalex == screen 
 		   && (key->region == GPKEY_AUTO_EXTERIOR_LRTBC 
 			|| key->region == GPKEY_AUTO_EXTERIOR_MARGIN)) {
-		xl = plot_bounds.xright -key_size_right + key_col_wth - 2 * t->h_char;
+		xl = plot_bounds.xright - key_size_right + key_col_wth - 2 * t->h_char;
 	    } else {
 		xl = plot_bounds.xright - key_size_right - key_col_wth * (key_cols - 1);
 	    }
@@ -850,28 +848,52 @@ do_3dplot(
     if (key->region == GPKEY_USER_PLACEMENT) {
 	map3d_position(&key->user_pos, &xl, &yl, "key");
     }
+    
+    /* KEY TITLE */
+    if (key->visible && (*key->title)) {
+	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
+	int key_xl = xl - key_size_left;
+	int center = (key_xr + key_xl) / 2;
+
+	if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
+	    apply_pm3dcolor(&(key->box.pm3d_color), t);
+	else
+	    apply_pm3dcolor(&(key->textcolor), t);
+	if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
+	    extra_height += 0.51;
+	write_multiline(center, yl - (0.5 + extra_height/2.0) * t->v_char,
+			key->title, CENTRE, JUST_TOP, 0, key->font);
+	if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
+	    extra_height += 0.3;
+	ktitle_lines += extra_height;
+	(*t->linetype)(LT_BLACK);
+    }
+
     if (key->visible && key->box.l_type > LT_NODRAW) {
 	int yt = yl;
-	int yb = yl - key_entry_height * (key_rows - ktitle_lines) - ktitle_lines * t->v_char;
+	int yb = yl - key_entry_height * key_rows - ktitle_lines * t->v_char;
 	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
+	int key_xl = xl - key_size_left;
 	int tmp = (int)(0.5 * key->height_fix * t->v_char);
 	yt += 2 * tmp;
 	yl += tmp;
+	yl -= t->v_char * ktitle_lines;
 
-	/* key_rows seems to contain title at this point ??? */
 	term_apply_lp_properties(&key->box);
 	newpath();
-	(*t->move) (xl - key_size_left, yb);
-	(*t->vector) (xl - key_size_left, yt);
+	(*t->move) (key_xl, yb);
+	(*t->vector) (key_xl, yt);
 	(*t->vector) (key_xr, yt);
 	(*t->vector) (key_xr, yb);
-	(*t->vector) (xl - key_size_left, yb);
+	(*t->vector) (key_xl, yb);
 	closepath();
 
 	/* draw a horizontal line between key title and first entry  JFi */
-	(*t->move) (xl - key_size_left, yt - (ktitle_lines) * t->v_char);
-	(*t->vector) (xl + key_size_right, yt - (ktitle_lines) * t->v_char);
+	(*t->move) (key_xl, yt - (ktitle_lines) * t->v_char);
+	(*t->vector) (key_xr, yt - (ktitle_lines) * t->v_char);
     }
+
+
     /* DRAW SURFACES AND CONTOURS */
 
 #ifndef LITE
@@ -879,46 +901,15 @@ do_3dplot(
 	plot3d_hidden(plots, pcount);
 #endif /* not LITE */
 
-    /* KEY TITLE */
-    if (key->visible && strlen(key->title)) {
-	char *ss = gp_alloc(strlen(key->title) + 2, "tmp string ss");
-	int tmp = (int)(0.5 * key->height_fix * t->v_char);
-	strcpy(ss, key->title);
-	strcat(ss, "\n");
-	s = ss;
-	yl -= t->v_char / 2;
-	yl += tmp;
 
-	while ((e = (char *) strchr(s, '\n')) != NULL) {
-	    *e = '\0';
-	    if (key->just == GPKEY_LEFT) {
-		(*t->justify_text) (LEFT);
-		(*t->put_text) (xl + key_text_left, yl, s);
-	    } else {
-		if ((*t->justify_text) (RIGHT)) {
-		    (*t->put_text) (xl + key_text_right,
-				    yl, s);
-		} else {
-		    int x = xl + key_text_right - t->h_char * estimate_strlen(s);
-		    if (inrange(x, plot_bounds.xleft, plot_bounds.xright))
-			(*t->put_text) (x, yl, s);
-		}
-	    }
-	    s = ++e;
-	    yl -= t->v_char;
-	}
-	yl += t->v_char / 2;
-	yl -= tmp;
-	free(ss);
-    }
-    key_count = 0;
-    yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
-
+    /* Set up bookkeeping for the individual key titles */
 #define NEXT_KEY_LINE()					\
     if ( ++key_count >= key_rows ) {			\
 	yl = yl_ref; xl += key_col_wth; key_count = 0;	\
     } else						\
 	yl -= key_entry_height
+    key_count = 0;
+    yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 
 
     /* PM January 2005: The mistake of missing blank lines in the data file is
@@ -1832,7 +1823,7 @@ plot3d_points(struct surface_points *plot, int p_type)
 			}
 			break;
 		    default:
-		    	/* The other cases were taken care of already */
+			/* The other cases were taken care of already */
 			break;
 		    }
 
@@ -2707,7 +2698,7 @@ xtick_callback(
 	    v2.y -= tic_unity * t->v_tic * axis_array[axis].ticscale;
 	}
 	TERMCOORD(&v2, x2, y2);
-        /* User-specified different color for the tics text */
+	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	angle = axis_array[axis].tic_rotate;
@@ -2784,7 +2775,7 @@ ytick_callback(
 	    v2.x -= tic_unitx * t->h_tic * axis_array[axis].ticscale;
 	    v2.y -= tic_unity * t->v_tic * axis_array[axis].ticscale;
 	}
-        /* User-specified different color for the tics text */
+	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	TERMCOORD(&v2, x2, y2);
@@ -2848,7 +2839,7 @@ ztick_callback(
 	x1 -= (term->h_tic) * 2;
 	if (!axis_array[axis].tic_in)
 	    x1 -= (term->h_tic) * axis_array[axis].ticscale;
-        /* User-specified different color for the tics text */
+	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
 	write_multiline(x1+offsetx, y1+offsety, text, RIGHT, JUST_CENTRE,
@@ -3097,7 +3088,7 @@ get_surface_cbminmax(struct surface_points *plot, double *cbmin, double *cbmax)
 
     while (icrvs && curve < plot->num_iso_read) {
 	/* fprintf(stderr,"**** NEW ISOCURVE - nb of pts: %i ****\n", icrvs->p_count); */
-        for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
+	for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
 		/* fprintf(stderr,"  point i=%i => x=%4g y=%4g z=%4lg cb=%4lg\n",i, points[i].x,points[i].y,points[i].z,points[i].CRD_COLOR); */
 		if (points[i].type == INRANGE) {
 		    /* ?? if (!clip_point(x, y)) ... */
@@ -3120,8 +3111,7 @@ key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
 {
     legend_key *key = &keyT;
     int steps = GPMIN(24, abs(key_sample_right - key_sample_left));
-        /* don't multiply by key->swidth --- could be >> palette.maxcolors */
-    /* int x_from = xl + key_sample_left; */
+    /* don't multiply by key->swidth --- could be >> palette.maxcolors */
     int x_to = xl + key_sample_right;
     double step = ((double)(key_sample_right - key_sample_left)) / steps;
     int i = 1, x1 = xl + key_sample_left, x2;
@@ -3175,7 +3165,6 @@ key_sample_point_pm3d(
     int pointtype)
 {
     BoundingBox *clip_save = clip_area;
-    /* int x_from = xl + key_sample_left; */
     int x_to = xl + key_sample_right;
     int i = 0, x1 = xl + key_sample_left, x2;
     double cbmin, cbmax;
