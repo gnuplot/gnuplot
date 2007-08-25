@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: version.c,v 1.69.2.10 2007/08/04 20:57:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: version.c,v 1.69.2.11 2007/08/04 21:10:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - version.c */
@@ -41,14 +41,14 @@ static char *RCSid() { return RCSid("$Id: version.c,v 1.69.2.10 2007/08/04 20:57
 
 const char gnuplot_version[] = "4.2";
 const char gnuplot_patchlevel[] = "1 ";
-const char gnuplot_date[] = " 4 Aug 2007";
+const char gnuplot_date[] = "27 Aug 2007";
 const char gnuplot_copyright[] = "Copyright (C) 1986 - 1993, 1998, 2004, 2007";
 
 const char faq_location[] = FAQ_LOCATION;
 
 char *compile_options = (void *)0;	/* Will be loaded at runtime */
 
-/* #define RELEASE_VERSION 1 */
+#define RELEASE_VERSION 1
 
 /* mustn't forget to activate this before the release ... */
 #ifdef RELEASE_VERSION
@@ -56,7 +56,8 @@ char *compile_options = (void *)0;	/* Will be loaded at runtime */
 #  define HELPMAIL "gnuplot-info@lists.sourceforge.net";
 # endif
 # ifndef CONTACT
-#  define CONTACT "gnuplot-bugs@lists.sourceforge.ent";
+/* #  define CONTACT "gnuplot-bugs@lists.sourceforge.net"; */
+#  define CONTACT "http://sourceforge.net/projects/gnuplot";
 # endif
 
 const char bug_email[] = CONTACT;
