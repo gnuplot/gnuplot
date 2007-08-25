@@ -4,6 +4,9 @@
 	the 2D code.  Honor key title font, fix incomplete horizontal line in
 	key box if there are multiple columns of key entries.
 
+	* term/gd.trm (PNG_vector):  Better accounting of when the grid linetype
+	needs to be refreshed.
+
 2007-08-20  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_polygon,

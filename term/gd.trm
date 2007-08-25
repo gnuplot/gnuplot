@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.118 2007/05/07 03:32:13 sfeam Exp $
+ * $Id: gd.trm,v 1.119 2007/06/11 20:05:32 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1459,15 +1459,19 @@ PNG_vector(unsigned int x, unsigned int y)
     if (png_state.linetype == -1) {
 	static int last_lw = -1;
 	static double last_dl = -1;
+	static int last_color = -1;
+	static int *png_linetype_dotted = NULL;
+	static int ssize;
 
 	/* Adjust the style when linewidth or dashlength has changed. */
-	if (lw != last_lw || PNG_dashlength_factor != last_dl) {
+	if (lw != last_lw || PNG_dashlength_factor != last_dl || last_color != png_state.color) {
 	    int i;
 	    int dashlength = 2 * PNG_dashlength_factor;
 	    int spacelength = 3 * PNG_dashlength_factor;
 	    int psize = lw*lw*dashlength;
-	    int ssize = lw*lw*(spacelength + dashlength);
-	    int *png_linetype_dotted = gp_alloc( ssize*sizeof(int), "dashes");
+	    
+	    ssize = lw*lw*(spacelength + dashlength);
+	    png_linetype_dotted = gp_realloc( png_linetype_dotted, ssize*sizeof(int), "dashes");
 
 	    /* Fill style with with color then transparent.
 	     * The style is 2 on / 3 off and scales with linewidth and dashlength.
@@ -1476,18 +1480,17 @@ PNG_vector(unsigned int x, unsigned int y)
 		png_linetype_dotted[i] = png_state.color;
 	    for (;i < ssize; i++)
 		png_linetype_dotted[i] = gdTransparent;
-	    gdImageSetStyle(png_state.image, png_linetype_dotted, ssize);
-	    free(png_linetype_dotted);
 	    last_lw = lw;
 	    last_dl = PNG_dashlength_factor;
+	    last_color = png_state.color;
 	}
 	/* This driver does not in general use gd's built-in SetThickness command,
 	 * because it only works right for purely horizontal or vertical lines.
 	 * But that's OK for a 2D grid.
 	 */
+	gdImageSetStyle(png_state.image, png_linetype_dotted, ssize);
 	gdImageSetThickness(png_state.image,lw);
-	gdImageLine(png_state.image, png_state.x, Y(png_state.y),
-		  x, Y(y), gdStyled);
+	gdImageLine(png_state.image, png_state.x, Y(png_state.y), x, Y(y), gdStyled);
 	gdImageSetThickness(png_state.image,1);
 
     /* All other (not dashed) vectors */
