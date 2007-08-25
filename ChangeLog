@@ -5,7 +5,8 @@
 	key box if there are multiple columns of key entries.
 
 	* term/gd.trm (PNG_vector):  Better accounting of when the grid linetype
-	needs to be refreshed.
+	needs to be refreshed. 
+	Bug #1780449
 
 2007-08-20  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
