@@ -1,3 +1,23 @@
+
+New features, changes and fixes in gnuplot version 4.2.1
+===========================================================
+* NEW allow extra column in 2D plots containing color information
+* NEW set term latex {size XX,YY}
+* FIX buffering of very long input lines
+* FIX clipping of image data against plot boundary
+* FIX polygon clipping bugs
+* FIX key sample for plots with variable color
+* FIX wxt initialization on non-gnu systems
+* FIX escape sequence %% handling in sprintf() format strings
+* FIX Apply "set style incr user" to 3D contours and to columnstacked histograms
+* FIX Apply "set key {no}enhanced" to key titles read from a file
+* FIX Allow string variable as filename for "fit via <filename>"
+* CHANGE defer x11 initialization
+* CHANGE clean up configuration files for amg, cyg, mgw, dj2
+* CHANGE modify SVG output to accommodate non-compliant viewers
+* CHANGE allow 'strcol()' as shorthand for 'stringcolumn()'
+* CHANGE default to "blacktext" for TeX-based PostScript variants
+
 New features, changes and fixes since gnuplot version 4.2
 =========================================================
 * NEW allow extra column in 2D plots containing color information
