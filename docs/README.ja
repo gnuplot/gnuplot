@@ -1,4 +1,4 @@
-# $Id: README.ja,v 1.6 2006-03-25 20:28:20+09 shige Exp $
+# $Id: README.ja,v 1.7 2007-08-08 17:10:06+09 shige Exp $
 # The Japanese translations of gnuplot manuals
 # Shigeharu TAKENO <shige@iee.niit.ac.jp>
 #
@@ -53,7 +53,7 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 現在 gnuplot を展開したディレクトリにいるとします。
 
 % cd term
-% patch -p1 < ../japanese/term-ja.diff
+% patch -p1 < ../docs/term-ja.diff
 % cd ..
 
 これで、terminal ドライバのマニュアル部分が日本語化されました。
@@ -71,7 +71,7 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 
 [4] gnuplot のオンラインヘルプファイル (.gih) を作成する
 
-% ./doc2gih ../japanese/gnuplot-ja.doc gnuplot-ja.gih
+% ./doc2gih gnuplot-ja.doc gnuplot-ja.gih
 
 [5] できたヘルプファイルを適当なところに置く
 
@@ -85,7 +85,7 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 もちろん、gnuplot.gih を上書きしてインストールすることもできます。
 その場合は、[4],[5] は、
 
-% cp ../japanese/gnuplot-ja.doc gnuplot.doc
+% cp gnuplot-ja.doc gnuplot.doc
 % make install-gih
 
 とすれば済みます。
@@ -104,7 +104,7 @@ LaTeX 形式のファイルは以下のように作成します。
 
 % cd docs
 % make doc2tex 
-% ./doc2tex ../japanese/gnuplot-ja.gih gnuplot-ja.tex
+% ./doc2tex gnuplot-ja.gih gnuplot-ja.tex
 
 これは platex でほぼコンパイルできるのですが、platex だと
 

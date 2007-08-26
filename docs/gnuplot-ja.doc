@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.13.2.2 2007/02/22 04:30:33 sfeam Exp $
-C corresponding original gnuplot.doc revision: 1.387.2.7
+C RCS $Id: gnuplot-ja.doc,v 1.5 2007-08-09 10:21:42+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.387.2.18
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -39,13 +39,13 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ^   Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net <p>
 ^</h2><p>
 ^<h3> This manual was prepared by Dick Crawford</h3><p>
-^<h3> Last revised: October 2006</h3><p>
+^<h3> Last revised: February 2007</h3><p>
 ^<hr>
 1 gnuplot
 2 Copyright
 ?copyright
 ?license
-       Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+     Copyright (C) 1986 - 1993, 1998, 2004, 2007  Thomas Williams, Colin Kelley
 
  Permission to use, copy, and distribute this software and its
  documentation for any purpose with or without fee is hereby granted,
@@ -134,26 +134,27 @@ C Shigeharu Takeno et al (3.7, 4.X)
 2 Introduction
 ?introduction
 ?
- `gnuplot` は，コマンド入力方式の対話的な関数描画プログラムです．コマン
- ドや関数名は大文字小文字を区別します．いずれのコマンドも，あいまいさ
- の無い限りにおいて省略することができます．1行中にはセミコロン(;)で区
- 切って複数のコマンドを書くことができます (ただし、`load` と `call` は
- 最後のコマンドでなければなりません)．文字列は引用符を使って表します．
- 引用符は，一重でも，二重でも構いません．例えば
+ `gnuplot` は、コマンド入力方式の対話的な関数描画プログラムです。
+
+ コマンドラインでの引数は `gnuplot` 用のコマンドの書かれたファイルの名
+ 前であるものとします。但し標準の X11 の引数は例外で、まず最初に処理さ
+ れます。各ファイルはコマンドライン上で指定された順に `load` コマンドで
+ ロードされます。`gnuplot` は、最後に指定されたファイルを処理し終ると終
+ 了します。特別なファイル名 "-" は標準入力を表します。ファイルが 1 つも
+ 指定されていない場合は、`gnuplot` は対話モードになります。詳細について
+ は、`batch/interactive` に関するヘルプを参照してください。
+
+ `gnuplot` は、コマンドや関数名は大文字小文字を区別します。いずれのコマ
+ ンドも、あいまいさの無い限りにおいて省略することができます。1 行中には
+ セミコロン (;) で区切って複数のコマンドを書くことができます (ただし、
+ `load` と `call` は最後のコマンドでなければなりません)。文字列は引用符
+ を使って表します。引用符は、一重でも、二重でも構いません。例えば
 
           load "filename"
           cd 'dir'
 
  しかし、両者には微妙な違いがあります (詳細は `syntax` を参照してくだ
  さい)。
-
- コマンドラインでの引数は `gnuplot` 用のコマンドの書かれたファイルの名前
- であるものとします．但し標準の X11 の引数は例外で，まず最初に処理され
- ます．各ファイルはコマンドライン上で指定された順に `load` コマンドで
- ロードされます．`gnuplot` は，最後に指定されたファイルを処理し終ると終
- 了します．ファイルが1つも指定されていない場合は，`gnuplot` は対話モー
- ドになります．特別なファイル名 "-" は標準入力を表します。詳細は
- `batch/interactive` に関するヘルプを参照してください。
 
  `gnuplot` のコマンドの多くは複数のオプションを持っています。Version 4
  は以前の版に比べて、それらのオプションの順序に関しては許容的になってい
@@ -330,6 +331,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 `emf`
  `emf` 出力形式は Enhanced Metafile Format (EMF) ファイルを生成します。
  このファイル形式は MS Win32 システムでは標準的なメタファイル形式です。
+ emf 出力形式は、pm3d, rgb 色指定、画像描画モードをサポートしています。
 4 `gif`, `jpeg`, `png`
  `gd` ライブラリを利用するこれらの出力形式のソースコードは統合されまし
  た。`gif` 出力形式には、複数のグラフからアニメーション GIF を作成する
@@ -357,10 +359,10 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?set term size
 
  gnuplot の以前の版では、`set size` の値を、出力する描画領域 (キャンバ
- ス) のサイズを制御するのにも使っていた出力形式もありました (すべての出
- 力形式がそうだというわけではありません)。この仕様は現在は非推奨です。
- gnuplot の将来の版では、オプション `set size` と `set term <foo> size`
- は、お互いを補う効果を持つことになるでしょう:
+ ス) のサイズを制御するのにも使っていた出力形式もありましたが、すべての
+ 出力形式がそうだったわけではありませんでした。この目的のために
+ `set size` を使用することは version 4.2 で非推奨となり、version 4.3 で
+ は、ほとんどの出力形式が以下のルールに従うようになりました:
 
  `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
  または "キャンバス" のサイズを制御します。サイズパラメータの有効な値に
@@ -373,59 +375,56 @@ C Shigeharu Takeno et al (3.7, 4.X)
  全体に合うように描画されます。1 より大きい伸縮値を指定すると、ある出力
  形式では問題が起こるかもしれないことに注意してください。
 
+ このルールに沿わない主な例外は PostScript ドライバで、デフォルトでは以
+ 前の版のと同じ振舞いをします。gnuplot の次の版では、PostScript ドライ
+ バも同様にデフォルトの振舞いを変更することになるでしょう。
+
  例:
 
-       set term pbm size 600, 400
        set size 0.5, 0.5
-       set output "figure.pbm"
-       plot "data" with lines
+       set term png size 600, 400
+       set output "figure.png"
+       plot "data" using lines
 
  このコマンドは、幅 600 ピクセル、高さ 400 ピクセルの出力ファイル
- "figure.pbm" を生成します。グラフはキャンバスの中の左下に置かれます。
+ "figure.png" を生成します。グラフはキャンバスの中の左下に置かれます。
  これは、multiplot モードが常に行ってきた方法とは矛盾していませんが、し
- かし単一のグラフに対する version 4.0 のあるドライバの挙動とは異ってい
+ かし単一のグラフに対する version 4.0 の png ドライバの挙動とは異ってい
  ます。
-
- 4.2 のほとんどの出力形式は、この新しい規則に従っていますが、png/jpeg
- /gif ドライバに関してはコンパイル時のオプションによって変わります。
- `backwards compatibility` 参照。
 
 2 Backwards compatibility
 ?backwards compatibility
 ?compatibility
  以前の版で使われていたいくつかの書式は gnuplot 4.0 で非推奨となりまし
- たが、それは今でも認識はされ続けています。バージョン 4.2 もデフォルト
- では非推奨の書式を認識していますが、これは現在コンパイル時に制御され、
- 以下のようにして無効にできます:
+ たが、それは今でも認識はされ続けています。これは現在コンパイル時に制御
+ され、以下のようにして無効にできます:
 
        ./configure --disable-backwards-compatibility
 
- 注意: 非推奨の書式は、将来の版では、完全に無効になってしまうかもしれま
- せん。
+ 注意: 非推奨の書式は、未来の gnuplot のある版からは、完全に無効になっ
+ てしまうかもしれません。
 
- 一つの主な違いは、複雑なコマンドのあいまいさを避けるような必須キーワー
- ドの導入です。特に注意すべき点は、オフセット、線種、点種に対する生の数
- の使用でした。具体例:
+ 一つの主な違いは、複雑なコマンド (特に文字列変数を含むコマンド) のあい
+ まいさを避けるようなキーワードの導入です。特に注意すべき点は、オフセッ
+ ト、線種、点種に対する生の数の使用でした。
+ 具体例:
 
  非推奨:
+       set title "Old" 0,-1
        set data linespoints
-       plot <foo> 2 4
+       plot 1 2 4               # horizontal line at y=1
  新:
+       TITLE = "New"
+       set title TITLE offset char 0, char -1
        set style data linespoints
-       plot <foo> linetype 2 pointtype 4
+       plot 1 linetype 2 pointtype 4
 
- その他の主な互換性の部分は、`set size` と `set term <foo> size` の相互
- 作用に関する部分です。gnuplot の以前の版では、`set size` に関するさま
- ざまな出力形式の挙動には、不合理な点が含まれていました。今後、すべての
- 出力形式で統一性が図られる予定です。
-
- バージョン 4.2 では、ほとんどの出力形式が新しい規則 (`set size` は出力
- される描画領域の大きさには影響を与えない) に従っていますが、png/gif
- /jpeg 出力形式は、`--disable-backwards-compatibility` なしで configure
- したのであれば、古い非推奨の仕様になります。gnuplot の次の版では、すべ
- ての出力形式が新しい規則に従います。よって、`set size` を png/gif/jpeg
- 出力ファイルのピクセルサイズを制御するのには使用しないことを強く勧めま
- す。代わりに `set term png size <XX>,<YY>` を使ってください。
+ その他の互換性の部分は、multiplot モード以外でのコマンド `set size` の
+ 外側への影響です。以前の版では、コマンド `set size <xx>, <yy>` は、出
+ 力形式によっては、グラフのサイズとそれが書かれるキャンバスのサイズの両
+ 方を変更し、一方でグラフサイズのみを変更する出力形式もありました。キャ
+ ンバスサイズを変更するための `set size` の使用は、現在では非推奨となっ
+ ています。
 
  `set size`, `set term size`、および個々の出力形式のヘルプも参照してく
  ださい。
@@ -1328,7 +1327,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 substr
 ?expressions functions substr
 ?functions substr
-?substring
+?substr
+=substring
 #substr("string",beg,end) & 複数個 & 文字列 "string"[beg:end] \\
 %substr("string",beg,end)@複数個@文字列 "string"[beg:end]
  `substr("string",beg,end)` は、元の文字列の beg から end 番目までの文
@@ -1402,6 +1402,9 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?expressions functions stringcolumn
 ?functions stringcolumn
 ?stringcolumn
+?expressions functions strcol
+?functions strcol
+?strcol
 #stringcolumn(x) & 整数 & 文字列としての $x$ 列目の内容 \\
 %stringcolumn(x)@整数@ 文字列としての $x$ 列目の内容
  `stringcolumn(x)` は fit あるいはデータファイルプロットでの `using` の
@@ -2004,10 +2007,10 @@ C ... and restart the table:
  れをキーに割り当てたコマンドで使用することができます。
 
  デフォルトでは、<space> ホットキーは gnuplot のコマンドウィンドウを前
- 面に出します。いくつかの出力形式 (例えば x11, wxt, pm) では 'q' はグラ
- フウィンドウを閉じます。これらのデフォルトは、'gnuplot -ctrlq' のよう
- にして gnuplot を起動する (`x11 command-line-options` も参照)、または
- X リソースの 'gnuplot*ctrlq' で、ctrl-space や ctrl-q に変更できます。
+ 面に出します。いくつかの出力形式 (例えば x11, wxt) では 'q' はグラフウ
+ ィンドウを閉じます。これらのデフォルトは、'gnuplot -ctrlq' のようにし
+ て gnuplot を起動する (`x11 command-line-options` も参照)、または X リ
+ ソースの 'gnuplot*ctrlq' で、ctrl-space や ctrl-q に変更できます。
  注意: <space> (または ctrl-space) で X11 の gnuplot ウィンドウが前面に
  出ない場合は `raise` の項をよく読んでください。
 
@@ -2938,7 +2941,7 @@ C ... and restart the table:
  データファイルが x:z:s の形式であったとすると、この場合以下のようにす
  ればよい。
       f(x,y) = (y==0) ? a*exp(-x/tau) : b*exp(-x/tau)
-      fit f(x,y) 'datafile' using  1:-1:2:3  via a, b, tau
+      fit f(x,y) 'datafile' using  1:-2:2:3  via a, b, tau
 
  より複雑な例については、デモファイル "fit.dem" で使われる "hexa.fnc"
  を参照してください。
@@ -3313,8 +3316,9 @@ C ... and restart the table:
  見なされます:
        1.0 "second column" 3.0
 
- データは、指数部に e, E, d, D, q, Q の文字をつけた指数表記で書かれてい
- ても構いません。
+ データは、指数部に e, E の文字をつけた指数表記で書かれていても構いませ
+ ん。コマンド `set datafile fortran` が有効な場合は、fortran の指数指定
+ 子 d, D, q, Q も使えます。
 
  必要であるのはただ一つの列 (y の値) のみです。もし x の値が省略された
  ら、`gnuplot` はそれを 0 で始まる整数値として用意します。
@@ -3607,7 +3611,7 @@ C ... and restart the table:
  バイナリデータファイルの走査方向が gnuplot の走査方向と一致しないこと
  がたまにあります。これらのキーワードは、それぞれ x, y, z 方向のデータ
  の走査方向を逆向きにします。
-6 origin
+6 origin 
 ?binary general keywords origin
  gnuplot は転置 (transpose) や反転 (flip) において座標を生成する場合、
  常に配列の左下の点が原点になるようにします。すなわち、データが、転置や
@@ -4167,10 +4171,11 @@ C ... and restart the table:
  スの描画タイトルを与える文字列として使用できます。その指定を含む列と、
  描画自信に使用される列 (複数の列もありうる) は独立しています。
 
-    plot 'data' using 1:($2/$3) title 2
+    plot 'data' using 1:($2/$3) title column(N)
 
- この場合、最初の行の第 2 列が、2 列目を 3 列目で割ったデータから作られ
- る描画グラフの説明に使用されます。先頭行の 3 列目は無視されます。
+ この場合、最初の行の第 N 列が、2 列目を 3 列目で割ったデータから作られ
+ る描画グラフの説明に使用されます。先頭行の 2 列目、3 列目は無視されま
+ す。
 
 5 xticlabels
 ?using xticlabels
@@ -4547,8 +4552,8 @@ C ... and restart the table:
  されます。通常、グローバルなオプション `set hidden3d` はグラフ上の全て
  の描画に適用されますが、各々の描画に `nohidden3d` オプションをつけるこ
  とで、それを hidden3d の処理から除外することができます。`nohidden3d`
- がマークされた個々の描画要素 (線分、点、ラベル等) は、通常は他の何らか
- の描画要素で隠されてしまう場合も全て描画されます。
+ がマークされた曲面以外の個々の描画要素 (線分、点、ラベル等) は、通常は
+ 他の何らかの描画要素で隠されてしまう場合も全て描画されます。
 
  キーワードは暗示するような形で省略可能です。
 
@@ -5566,7 +5571,9 @@ C ... and restart the table:
 ?contour
 ?nocontour
  コマンド `set contour` は曲面の等高線を引くことを指示します。このオプ
- ションは `splot` でのみ有効です。
+ ションは `splot` でのみ有効です。これは、格子状データ (grid data) を必
+ 要とします。詳細は、`grid data` を参照してください。非格子状データで等
+ 高線を描きたい場合は、格子を生成するために `set dgrid3d` を使用します。
 
  書式:
        set contour {base | surface | both}
@@ -5604,8 +5611,6 @@ C ... and restart the table:
  行以外の文字を含まない行) を挟みます。`splot datafile` も参照してくだ
  さい。
 
- 非格子上データで等高線を描きたい場合は、格子を生成するために `set dgrid3d`
- を使用します。詳しいことは `set dgrid3d` の項目を参照してください。
  以下も参照してください。
 ^ <a href="http://www.gnuplot.info/demo/contours.html">
  等高線のデモ (contours.dem)
@@ -5815,7 +5820,8 @@ C ... and restart the table:
 ?dgrid3d
 ?nodgrid3d
  コマンド `set dgrid3d` は、非格子状データから格子状データへの写像機能を
- 有効にし、そのためのパラメータを設定します。
+ 有効にし、そのためのパラメータを設定します。格子状データの構造について
+ の詳細は、`splot grid_data` を参照してください。
 
  書式:
        set dgrid3d {<row_size>} {,{<col_size>} {,<norm>}}
@@ -6795,9 +6801,10 @@ C ... and restart the table:
  を使うことで、密なデータによって見出しが隠されてしまうことを避けること
  が出来ます。
 
- `textcolor <colorspec>` は文字列の色を変更します。`<colorspec>` は線種
- か、あるいは pm3d カラーパレット (`splot` でのみ有効) への割当 のいず
- れかです。`set palette` を参照してください。
+ `textcolor <colorspec>` は文字列の色を変更します。`<colorspec>` は、線
+ 種、rgb 色、またはパレットへの割当のいずれかが指定できます。
+ `colorspec`, `palette` を参照してください。`textcolor` は、`tc` と省略
+ 可能です。
     `textcolor` は、`tc` と省略可能です。
     `tc default` は、文字色をデフォルトにします。
     `tc lt <n>` は、文字色を線種 <n> (line type)と同じものにします。
@@ -6806,6 +6813,7 @@ C ... and restart the table:
     `tc palette cb <val>` は、色見本 (colorbar) の <val> の色になります。
     `tc palette fraction <val>` (0<=val<=1) は、[0:1] から `palette` の
         灰色階調/カラーへの写像に対応した色になります。
+    `tc rgb "#RRGGBB"` は、任意の 24-bit RGB 色を選択します。
 
  <pointstyle> がキーワード `lt`, `pt`, `ps` とともに与えられると
  (`style` 参照)、与えられたスタイルと、与えられた線種の色で見出し位置に
@@ -6924,21 +6932,18 @@ C ... and restart the table:
 ?unset logscale
 ?show logscale
 ?set log
-?set log cb
 ?logscale
 ?nologscale
- 対数スケールは，x, y, z, x2, y2 の各軸について設定できます。
-
  書式:
          set logscale <axes> <base>
          unset logscale <axes>
          show logscale
 
- ここで、<axes> (軸) は、`x`, `y`, `z`, `cb` の任意の順序、または `x2`,
- `y2` による組み合せが可能です。また、<base> は、対数スケールの底です。
- <base> が指定されなかった場合は 10 になります。もし、<axes> が指定され
- なかった場合は、全部が指定されたことになります。`unset logscale` は、
- 指定した軸の対数スケールを解除します。
+ ここで、<axes> (軸) は、`x`, `x2`, `y`, `y2`, `z`, `cb` の任意の順序の
+ 組み合せが可能です。また、<base> は、対数スケールの底です。<base> が指
+ 定されなかった場合は 10 になります。もし、<axes> が指定されなかった場
+ 合は、全部が指定されたことになります。`unset logscale` は、指定した軸
+ の対数スケールを解除します。
 
  例:
 
@@ -7171,6 +7176,7 @@ C ... and restart the table:
  書式:
        set multiplot { layout <rows>,<cols>
                        {rowsfirst|columnsfirst} {downwards|upwards}
+                       {title <page title>}
                        {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}}
                      }
        unset multiplot
@@ -7195,10 +7201,14 @@ C ... and restart the table:
  たブロック内の `plot` (または `splot`, `replot`) 命令の一つを `set time`
  と `unset time` ではさんでください。
 
- `layout` が指定されていない場合、あるいはより良い位置合わせをしたい場
- 合は、コマンド `set origin` と `set size` 各描画で正しい位置に設定する
- 必要があります。詳細は `set origin` と `set size` の項目を参照してくだ
- さい。
+ multiplot のタイトルは、個々の描画タイトルがあったとしても、それとは別
+ のもので、ページの上部にそのためのキャンバス全体の幅にわたるスペースが
+ 確保されます。
+
+ layout が指定されていない場合、あるいはより良い位置合わせをしたい場合
+ は、コマンド `set origin` と `set size` 各描画で正しい位置に設定する必
+ 要があります。詳細は `set origin` と `set size` の項目を参照してくださ
+ い。
 
  例:
        set multiplot
@@ -7212,14 +7222,14 @@ C ... and restart the table:
 
  これは、cos(x) のグラフを、sin(x) の上に積み重ねて表示します。
 
- `set size` と `set origin` は全体の描画領域を参照しそれは各描画で利用
- されます。`set term size` も参照してください。描画境界を一列に揃えたい
- ならば、`set margin` コマンドで、境界の外の余白サイズを同じサイズに揃
- えることが出来ます。その使用に関しては `set margin` を参照してください。
- 余白サイズは文字サイズ単位の絶対的な数値単位を使用することに注意してく
- ださい。よって残ったスペースに描かれるグラフは表示するデバイスの表示サ
- イズに依存します。例えば、プリンタとディスプレイの表示は多分違ったもの
- になるでしょう。
+ `set size` と `set origin` は全体の描画領域を参照し、それは各描画で利
+ 用されます。`set term size` も参照してください。描画境界を一列に揃えた
+ いならば、`set margin` コマンドで、境界の外の余白サイズを同じサイズに
+ 揃えることが出来ます。その使用に関しては `set margin` を参照してくださ
+ い。余白サイズは文字サイズ単位の絶対的な数値単位を使用することに注意し
+ てください。よって残ったスペースに描かれるグラフは表示するデバイスの表
+ 示サイズに依存します。例えば、プリンタとディスプレイの表示は多分違った
+ ものになるでしょう。
 
  オプション `layout` により、各描画の前にそれぞれ与えていた `set size`
  や `set origin` コマンドなしに、単純な複数グラフの描画を作成できます。
@@ -7532,6 +7542,7 @@ C ... and restart the table:
      cgm
      pdf
      svg
+     emf
 
  まず、地図/曲面がどのように描かれるのかについて記述します。入力データ
  は、関数を評価して得られるかまたは `splot data file` から得られます。
@@ -8322,9 +8333,8 @@ C ... and restart the table:
        gnuplot の以前の版では、`set size` の値を、出力する描画領域
        (キャンバス) のサイズを制御するのにも使っていた出力形式もありま
        したが、すべての出力形式がそうだったわけではありませんでした。
-       version 4.2 では、ほとんどの出力形式が以下に述べるルールに従うよ
-       うになりましたが、png/gif/jpeg 出力形式については、
-       `backwards compatibility` を参照してください。
+       version 4.2 では、ほとんどの出力形式が以下のルールに従うようにな
+       りました:
 
  `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
  または "キャンバス" のサイズを制御します。サイズパラメータの有効な値に
@@ -8336,7 +8346,6 @@ C ... and restart the table:
  埋めず、1 より大きい伸縮値を指定すると、グラフの一部分のみがキャンバス
  全体に合うように描画されます。1 より大きい伸縮値を指定すると、ある出力
  形式では問題が起こるかもしれないことに注意してください。
- `set term size` 参照。
 
  `ratio` は、指定した <xscale>, <yscale> の描画範囲内で、グラフのアスペ
  クト比 (縦横比) を <r> にします (<r> は x 方向の長さに対する y 方向の
@@ -8914,8 +8923,8 @@ C ... and restart the table:
  スタイル `filledcurves` は 2 次元描画でのみ利用可能です。これは 3 種類
  の異なる指定が可能です。最初の 2 種類は関数描画、あるいは 2 列の入力デ
  ータ用のもので、後で紹介するようにオプションで更なる指定ができます。最
- 初のものは `closed` で、これは曲線それ自身を閉多角形と見なし、これがデ
- フォルトです。
+ 初のものは `closed` で、これは曲線それ自身を閉多角形と見なします。入力
+ データが 2 列の場合にはこれがデフォルトです。
 
  2 種類目は指定された軸、あるいは水平線、垂直線、与えられた点などと、曲
  線との間に作られる領域を塗りつぶします。
@@ -8923,6 +8932,7 @@ C ... and restart the table:
  3 種類目は 3 列の入力データを必要とし、それらは x 座標と、それに対する
  2 つの y 座標からなり、それらは同じ x 座標の集合に対する 2 つの曲線の
  y 座標に対応します。そしてその 2 つの曲線の間の領域が塗りつぶされます。
+ 入力データが 3 列以上の場合にはこれがデフォルトです。
 
  書式:
 
@@ -9140,9 +9150,9 @@ C ... and restart the table:
 ?newhistogram
 ?histograms newhistogram
  一回の描画に 1 つより多くのヒストグラムの組を作ることもできます。この
- 場合、描画コマンド `newhistogram { "title" } { <linestyle> }` を使うこ
- とで、それらを強制的に分離し、またそれぞれのラベルを分離することができ
- ます。
+ 場合、描画コマンド `newhistogram {"<title>"} {<linestyle>}` を使うこと
+ で、それらを強制的に分離し、またそれぞれのラベルを分離することができま
+ す。
  例:
 
        set style histogram  cluster
@@ -9196,13 +9206,6 @@ C ... and restart the table:
 
  postscript (pslatex, epslatex, pstex) - 標本化補間機能は無効になり、画
        像は元の解像度のままコピーされます。
-
- png - 出力はインストールされている libgd のバージョンに依存します。
-       gd 1.8.4  truecolor はサポートされていませんがドライバの関数は動
-                 作します。
-       gd 2.0.4  truecolor は動作しますが、truecolor を選択しないと画像
-                 は空白になってしまいます。
-       gd 2.0.9  truecolor も動作しますし、非 truecolor も動作します。
 
  `rgbimage` も参照してください。
 5 impulses
@@ -9292,11 +9295,7 @@ C ... and restart the table:
  スタイル `rgbimage` は 2 次元画像の描画用で、概念上は `image` に似てい
  ます。詳細は `image` を参照してください。その違いは、`plot` では
  (x,y,r,g,b) の 5 次元データが、`splot` では (x,y,z,r,g,b) の 6 次元デ
- ータが必要で、それらが座標と画像のカラー成分を意味します。現在は、カラ
- ー画像は標本化格子が長方形でかつその面が表示面方向に向いている場合にの
- み機能します。一般的な方向の場合は多角形の塗りつぶしでなされるべきです
- が、それはパレット表から取り出すのみで、原色の配合はサポートしていませ
- ん。
+ ータが必要で、それらが座標と画像のカラー成分を意味します。
 
  `image` も参照してください。
 5 vectors
@@ -9752,7 +9751,7 @@ C ... and restart the table:
 
  書式:
        set title {"<title-text>"} {offset <offset>} {font "<font>{,<size>}"}
-                 {{textcolor | tc} {lt <line_type> | default}} {{no}enhanced}
+                 {{textcolor | tc} {<colorspec> | default}} {{no}enhanced}
        show title
 
  <offset> を x,y かまたは x,y,z の形式で指定した場合は、タイトルは与え
@@ -9767,7 +9766,9 @@ C ... and restart the table:
  <font> はタイトルが書かれるフォントを指定するのに使われます。<size> の
  単位は、どの出力形式 (terminal) を使っているかによって変わります。
 
- `textcolor lt <n>` は文字の色を線種 (line type) <n> と同じものにします。
+ `textcolor <colorspec>` は見出し文字列の色を変更します。<colorspec> は
+ 線種、rgb 色、またはパレットへの割当のいずれかが指定できます。
+ `colorspec`, `palette` を参照してください。
 
  `noenhanced` は、拡張文字列処理 (enhanced text) モードが有効になってい
  る場合でも、タイトルを拡張文字列処理させないようにします。
@@ -10782,8 +10783,8 @@ C ... and restart the table:
 ?commands splot
 ?splot
  `splot` は 3 次元描画のためのコマンドです (もちろんご存知でしょうが、
- 実際にはその 2 次元への射影です)。それは関数、またはデータファイルか
- ら、`plot` コマンドととても良く似た方法でその描画を作ります。
+ 実際にはその 2 次元への射影)。それは関数、またはデータファイルから、
+ `plot` コマンドととても良く似た方法でその描画を作ります。
 
  `plot` コマンドと共通の仕様については `plot` を参照して下さい。ここでは
  それと異なるものだけ詳細に取り上げます。なお、`plot` の `axes` オプショ
@@ -11085,7 +11086,7 @@ C ... and restart the table:
  `set hidden3d` で不透明にもできます。3 次元曲面を眺める向きは、`set view`
  で変更できます。
 
- さらに、格子上のデータ点に対しては、`splot` は同じ高さを持つ点を補間す
+ さらに、格子状のデータ点に対しては、`splot` は同じ高さを持つ点を補間す
  ることができ (`set contour` 参照)、そしてそれらを結んで等高線を描くこ
  とができます。さらに、その結び方には真直な線分や滑らかな線を使うことが
  できます (`set cntrparam` 参照)。関数は、常に `set isosamples` と
