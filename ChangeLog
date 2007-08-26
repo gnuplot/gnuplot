@@ -1,3 +1,8 @@
+2007-08-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	Tag version 4.2.1 using command
+		cvs tag -c "Release_4_2_1"
+
 2007-08-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/version.c src/syscfg.h src/Makefile.am src/win/pgnuplot.c
