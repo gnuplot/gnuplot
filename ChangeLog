@@ -2,7 +2,7 @@
 
 	* src/axis.c src/gadgets.c (apply_pm3dcolor): Remove dead code.
 
-	* src/plot.c src/plot2d.c src/plot3d.c: Whitespace cleanup.
+	* src/plot.c src/plot2d.c src/plot3d.c src/term.c: Whitespace cleanup.
 
 	* docs/titlepag.tex: Add URL for SourceForge site.
 

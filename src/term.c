@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.157 2006/11/30 04:04:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.158 2006/12/27 21:40:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -276,7 +276,7 @@ static struct {
     double xoffset;        /* horizontal shift */
     double yoffset;        /* horizontal shift */
     double prev_xsize, prev_ysize, prev_xoffset, prev_yoffset;
-                           /* values before 'set multiplot layout' */
+			   /* values before 'set multiplot layout' */
     text_label title;    /* goes above complete set of plots */
     double title_height;   /* fractional height reserved for title */
 } mp_layout = MP_LAYOUT_DEFAULT;
@@ -357,28 +357,28 @@ term_close_output()
     opened_binary = FALSE;
 
     if (!outstr)                /* ie using stdout */
-        return;
+	return;
 
 #if defined(PIPES)
     if (output_pipe_open) {
-        (void) pclose(gpoutfile);
-        output_pipe_open = FALSE;
+	(void) pclose(gpoutfile);
+	output_pipe_open = FALSE;
     } else
 #endif /* PIPES */
 #ifdef _Windows
     if (stricmp(outstr, "PRN") == 0)
-        close_printer(gpoutfile);
+	close_printer(gpoutfile);
     else
 #endif
     if (gpoutfile != gppsfile)
-        fclose(gpoutfile);
+	fclose(gpoutfile);
 
     gpoutfile = stdout;         /* Don't dup... */
     free(outstr);
     outstr = NULL;
 
     if (gppsfile)
-        fclose(gppsfile);
+	fclose(gppsfile);
     gppsfile = NULL;
 }
 
@@ -400,74 +400,74 @@ term_set_output(char *dest)
     assert(dest == NULL || dest != outstr);
 
     if (multiplot) {
-        fputs("In multiplotmode you can't change the output\n", stderr);
-        return;
+	fputs("In multiplotmode you can't change the output\n", stderr);
+	return;
     }
     if (term && term_initialised) {
-        (*term->reset) ();
-        term_initialised = FALSE;
-        /* switch off output to special postscript file (if used) */
-        gppsfile = NULL;
+	(*term->reset) ();
+	term_initialised = FALSE;
+	/* switch off output to special postscript file (if used) */
+	gppsfile = NULL;
     }
     if (dest == NULL) {         /* stdout */
-        UP_redirect(4);
-        term_close_output();
+	UP_redirect(4);
+	term_close_output();
     } else {
 
 #if defined(PIPES)
-        if (*dest == '|') {
-            if ((f = popen(dest + 1, POPEN_MODE)) == (FILE *) NULL)
-                os_error(c_token, "cannot create pipe; output not changed");
-            else
-                output_pipe_open = TRUE;
-        } else {
+	if (*dest == '|') {
+	    if ((f = popen(dest + 1, POPEN_MODE)) == (FILE *) NULL)
+		os_error(c_token, "cannot create pipe; output not changed");
+	    else
+		output_pipe_open = TRUE;
+	} else {
 #endif /* PIPES */
 
 #ifdef _Windows
-        if (outstr && stricmp(outstr, "PRN") == 0) {
-            /* we can't call open_printer() while printer is open, so */
-            close_printer(gpoutfile);   /* close printer immediately if open */
-            gpoutfile = stdout; /* and reset output to stdout */
-            free(outstr);
-            outstr = NULL;
-        }
-        if (stricmp(dest, "PRN") == 0) {
-            if ((f = open_printer()) == (FILE *) NULL)
-                os_error(c_token, "cannot open printer temporary file; output may have changed");
-        } else
+	if (outstr && stricmp(outstr, "PRN") == 0) {
+	    /* we can't call open_printer() while printer is open, so */
+	    close_printer(gpoutfile);   /* close printer immediately if open */
+	    gpoutfile = stdout; /* and reset output to stdout */
+	    free(outstr);
+	    outstr = NULL;
+	}
+	if (stricmp(dest, "PRN") == 0) {
+	    if ((f = open_printer()) == (FILE *) NULL)
+		os_error(c_token, "cannot open printer temporary file; output may have changed");
+	} else
 #endif
 
-        {
+	{
 #if defined (MSDOS)
-            if (outstr && (0 == stricmp(outstr, dest))) {
-                /* On MSDOS, you cannot open the same file twice and
-                 * then close the first-opened one and keep the second
-                 * open, it seems. If you do, you get lost clusters
-                 * (connection to the first version of the file is
-                 * lost, it seems). */
-                /* FIXME: this is not yet safe enough. You can fool it by
-                 * specifying the same output file in two different ways
-                 * (relative vs. absolute path to file, e.g.) */
-                term_close_output();
-            }
+	    if (outstr && (0 == stricmp(outstr, dest))) {
+		/* On MSDOS, you cannot open the same file twice and
+		 * then close the first-opened one and keep the second
+		 * open, it seems. If you do, you get lost clusters
+		 * (connection to the first version of the file is
+		 * lost, it seems). */
+		/* FIXME: this is not yet safe enough. You can fool it by
+		 * specifying the same output file in two different ways
+		 * (relative vs. absolute path to file, e.g.) */
+		term_close_output();
+	    }
 #endif
-            if (term && (term->flags & TERM_BINARY))
-                f = FOPEN_BINARY(dest);
-            else
-                f = fopen(dest, "w");
+	    if (term && (term->flags & TERM_BINARY))
+		f = FOPEN_BINARY(dest);
+	    else
+		f = fopen(dest, "w");
 
-            if (f == (FILE *) NULL)
-                os_error(c_token, "cannot open file; output not changed");
-        }
+	    if (f == (FILE *) NULL)
+		os_error(c_token, "cannot open file; output not changed");
+	}
 #if defined(PIPES)
-        }
+	}
 #endif
 
-        term_close_output();
-        gpoutfile = f;
-        outstr = dest;
-        opened_binary = (term && (term->flags & TERM_BINARY));
-        UP_redirect(1);
+	term_close_output();
+	gpoutfile = f;
+	outstr = dest;
+	opened_binary = (term && (term->flags & TERM_BINARY));
+	UP_redirect(1);
     }
 }
 
@@ -477,7 +477,7 @@ term_init()
     FPRINTF((stderr, "term_init()\n"));
 
     if (!term)
-        int_error(NO_CARET, "No terminal defined");
+	int_error(NO_CARET, "No terminal defined");
 
     /* check if we have opened the output file in the wrong mode
      * (text/binary), if set term comes after set output
@@ -486,33 +486,33 @@ term_init()
      */
 
     if (outstr && (term->flags & TERM_NO_OUTPUTFILE)) {
-        if (interactive)
-            fprintf(stderr,"Closing %s\n",outstr);
-        term_close_output();
+	if (interactive)
+	    fprintf(stderr,"Closing %s\n",outstr);
+	term_close_output();
     }
 
     if (outstr &&
-        (((term->flags & TERM_BINARY) && !opened_binary) ||
-         ((!(term->flags & TERM_BINARY) && opened_binary)))) {
-        /* this is nasty - we cannot just term_set_output(outstr)
-         * since term_set_output will first free outstr and we
-         * end up with an invalid pointer. I think I would
-         * prefer to defer opening output file until first plot.
-         */
-        char *temp = gp_alloc(strlen(outstr) + 1, "temp file string");
-        if (temp) {
-            FPRINTF((stderr, "term_init: reopening \"%s\" as %s\n",
-                     outstr, term->flags & TERM_BINARY ? "binary" : "text"));
-            strcpy(temp, outstr);
-            term_set_output(temp);      /* will free outstr */
-            if (temp != outstr) {
-                if (temp)
-                    free(temp);
-                temp = outstr;
-            }
-        } else
-            fputs("Cannot reopen output file in binary", stderr);
-        /* and carry on, hoping for the best ! */
+	(((term->flags & TERM_BINARY) && !opened_binary) ||
+	 ((!(term->flags & TERM_BINARY) && opened_binary)))) {
+	/* this is nasty - we cannot just term_set_output(outstr)
+	 * since term_set_output will first free outstr and we
+	 * end up with an invalid pointer. I think I would
+	 * prefer to defer opening output file until first plot.
+	 */
+	char *temp = gp_alloc(strlen(outstr) + 1, "temp file string");
+	if (temp) {
+	    FPRINTF((stderr, "term_init: reopening \"%s\" as %s\n",
+		     outstr, term->flags & TERM_BINARY ? "binary" : "text"));
+	    strcpy(temp, outstr);
+	    term_set_output(temp);      /* will free outstr */
+	    if (temp != outstr) {
+		if (temp)
+		    free(temp);
+		temp = outstr;
+	    }
+	} else
+	    fputs("Cannot reopen output file in binary", stderr);
+	/* and carry on, hoping for the best ! */
     }
 #if defined(MSDOS) || defined (_Windows) || defined(OS2)
 # ifdef _Windows
@@ -520,18 +520,18 @@ term_init()
 # else
     else if (!outstr && !interactive && (term->flags & TERM_BINARY))
 # endif
-        {
-            /* binary to stdout in non-interactive session... */
-            fflush(stdout);
-            setmode(fileno(stdout), O_BINARY);
-        }
+	{
+	    /* binary to stdout in non-interactive session... */
+	    fflush(stdout);
+	    setmode(fileno(stdout), O_BINARY);
+	}
 #endif
 
 
     if (!term_initialised || term_force_init) {
-        FPRINTF((stderr, "- calling term->init()\n"));
-        (*term->init) ();
-        term_initialised = TRUE;
+	FPRINTF((stderr, "- calling term->init()\n"));
+	(*term->init) ();
+	term_initialised = TRUE;
     }
 }
 
@@ -542,18 +542,18 @@ term_start_plot()
     FPRINTF((stderr, "term_start_plot()\n"));
 
     if (!term_initialised)
-        term_init();
+	term_init();
 
     if (!term_graphics) {
-        FPRINTF((stderr, "- calling term->graphics()\n"));
-        (*term->graphics) ();
-        term_graphics = TRUE;
+	FPRINTF((stderr, "- calling term->graphics()\n"));
+	(*term->graphics) ();
+	term_graphics = TRUE;
     } else if (multiplot && term_suspended) {
-        if (term->resume) {
-            FPRINTF((stderr, "- calling term->resume()\n"));
-            (*term->resume) ();
-        }
-        term_suspended = FALSE;
+	if (term->resume) {
+	    FPRINTF((stderr, "- calling term->resume()\n"));
+	    (*term->resume) ();
+	}
+	term_suspended = FALSE;
     }
 
     /* Sync point for epslatex text positioning */
@@ -566,10 +566,10 @@ term_start_plot()
 	invalidate_palette();
 
     /* Set canvas size to full range of current terminal coordinates */
-        canvas.xleft  = 0;
-        canvas.xright = term->xmax;
-        canvas.ybot   = 0;
-        canvas.ytop   = term->ymax;
+	canvas.xleft  = 0;
+	canvas.xright = term->xmax;
+	canvas.ybot   = 0;
+	canvas.ytop   = term->ymax;
 
 }
 
@@ -579,49 +579,49 @@ term_end_plot()
     FPRINTF((stderr, "term_end_plot()\n"));
 
     if (!term_initialised)
-        return;
+	return;
 
     /* Sync point for epslatex text positioning */
     if (term->layer)
 	(term->layer)(TERM_LAYER_END_TEXT);
     
     if (!multiplot) {
-        FPRINTF((stderr, "- calling term->text()\n"));
-        (*term->text) ();
-        term_graphics = FALSE;
+	FPRINTF((stderr, "- calling term->text()\n"));
+	(*term->text) ();
+	term_graphics = FALSE;
     } else {
-        if (mp_layout.auto_layout) {
-            if (mp_layout.row_major) {
-                mp_layout.act_row++;
-                if (mp_layout.act_row == mp_layout.num_rows ) {
-                    mp_layout.act_row = 0;
-                    mp_layout.act_col++;
-                    if (mp_layout.act_col == mp_layout.num_cols ) {
-                        /* int_warn(NO_CARET,"will overplot first plot"); */
-                        mp_layout.act_col = 0;
-                    }
-                }
-            } else { /* column-major */
-                mp_layout.act_col++;
-                if (mp_layout.act_col == mp_layout.num_cols ) {
-                    mp_layout.act_col = 0;
-                    mp_layout.act_row++;
-                    if (mp_layout.act_row == mp_layout.num_rows ) {
-                        /* int_warn(NO_CARET,"will overplot first plot"); */
-                        mp_layout.act_col = 0;
-                    }
-                }
-            }
-            mp_layout_size_and_offset();
-        }
+	if (mp_layout.auto_layout) {
+	    if (mp_layout.row_major) {
+		mp_layout.act_row++;
+		if (mp_layout.act_row == mp_layout.num_rows ) {
+		    mp_layout.act_row = 0;
+		    mp_layout.act_col++;
+		    if (mp_layout.act_col == mp_layout.num_cols ) {
+			/* int_warn(NO_CARET,"will overplot first plot"); */
+			mp_layout.act_col = 0;
+		    }
+		}
+	    } else { /* column-major */
+		mp_layout.act_col++;
+		if (mp_layout.act_col == mp_layout.num_cols ) {
+		    mp_layout.act_col = 0;
+		    mp_layout.act_row++;
+		    if (mp_layout.act_row == mp_layout.num_rows ) {
+			/* int_warn(NO_CARET,"will overplot first plot"); */
+			mp_layout.act_col = 0;
+		    }
+		}
+	    }
+	    mp_layout_size_and_offset();
+	}
     }
 #ifdef VMS
     if (opened_binary)
-        fflush_binary();
+	fflush_binary();
     else
 #endif /* VMS */
 
-        (void) fflush(gpoutfile);
+	(void) fflush(gpoutfile);
 
 #ifdef USE_MOUSE
     recalc_statusline();
@@ -636,7 +636,7 @@ term_start_multiplot()
 
     c_token++;
     if (multiplot)
-        term_end_multiplot();
+	term_end_multiplot();
 
     term_start_plot();
 
@@ -663,17 +663,17 @@ term_start_multiplot()
 
 	    c_token++;
 	    if (END_OF_COMMAND) {
-	        int_error(c_token,"expecting '<num_cols>,<num_rows>'");
+		int_error(c_token,"expecting '<num_cols>,<num_rows>'");
 	    }
 	    
 	    /* read row,col */
 	    mp_layout.num_rows = int_expression();
 	    if (END_OF_COMMAND || !equals(c_token,",") )
-	        int_error(c_token, "expecting ', <num_cols>'");
+		int_error(c_token, "expecting ', <num_cols>'");
 
 	    c_token++;
 	    if (END_OF_COMMAND)
-	        int_error(c_token, "expecting <num_cols>");
+		int_error(c_token, "expecting <num_cols>");
 	    mp_layout.num_cols = int_expression();
 	
 	    /* remember current values of the plot size */
@@ -716,7 +716,7 @@ term_start_multiplot()
 		if (!END_OF_COMMAND && equals(c_token,",") ) {
 		    c_token++;
 		    if (END_OF_COMMAND) {
-		        int_error(c_token, "expecting <yscale>");
+			int_error(c_token, "expecting <yscale>");
 		    }
 		    mp_layout.yscale = real_expression();
 		}
@@ -728,7 +728,7 @@ term_start_multiplot()
 		if (!END_OF_COMMAND && equals(c_token,",") ) {
 		    c_token++;
 		    if (END_OF_COMMAND) {
-		        int_error(c_token, "expecting <yoffset>");
+			int_error(c_token, "expecting <yoffset>");
 		    }
 		    mp_layout.yoffset = real_expression();
 		}
@@ -762,8 +762,8 @@ term_start_multiplot()
 	/* Calculate fractional height of title compared to entire page */
 	/* If it would fill the whole page, forget it! */
 	for (y=2; *p; p++)
-            if (*p == '\n')
-                y++;
+	    if (*p == '\n')
+		y++;
 	mp_layout.title_height = (double)(y * term->v_char) / (double)term->ymax;
 	if (mp_layout.title_height > 0.9)
 	    mp_layout.title_height = 0.05;
@@ -788,20 +788,20 @@ term_end_multiplot()
 {
     FPRINTF((stderr, "term_end_multiplot()\n"));
     if (!multiplot)
-        return;
+	return;
 
     if (term_suspended) {
-        if (term->resume)
-            (*term->resume) ();
-        term_suspended = FALSE;
+	if (term->resume)
+	    (*term->resume) ();
+	term_suspended = FALSE;
     }
     multiplot = FALSE;
     /* reset plot size and origin to values before 'set multiplot layout' */
     if (mp_layout.auto_layout) {
-        xsize = mp_layout.prev_xsize;
-        ysize = mp_layout.prev_ysize;
-        xoffset = mp_layout.prev_xoffset;
-        yoffset = mp_layout.prev_yoffset;
+	xsize = mp_layout.prev_xsize;
+	ysize = mp_layout.prev_ysize;
+	xoffset = mp_layout.prev_xoffset;
+	yoffset = mp_layout.prev_yoffset;
     }
     /* reset automatic multiplot layout */
     mp_layout.auto_layout = FALSE;
@@ -829,9 +829,9 @@ term_suspend()
 {
     FPRINTF((stderr, "term_suspend()\n"));
     if (term_initialised && !term_suspended && term->suspend) {
-        FPRINTF((stderr, "- calling term->suspend()\n"));
-        (*term->suspend) ();
-        term_suspended = TRUE;
+	FPRINTF((stderr, "- calling term->suspend()\n"));
+	(*term->suspend) ();
+	term_suspended = TRUE;
     }
 }
 
@@ -846,24 +846,24 @@ term_reset()
 #endif
 
     if (!term_initialised)
-        return;
+	return;
 
     if (term_suspended) {
-        if (term->resume) {
-            FPRINTF((stderr, "- calling term->resume()\n"));
-            (*term->resume) ();
-        }
-        term_suspended = FALSE;
+	if (term->resume) {
+	    FPRINTF((stderr, "- calling term->resume()\n"));
+	    (*term->resume) ();
+	}
+	term_suspended = FALSE;
     }
     if (term_graphics) {
-        (*term->text) ();
-        term_graphics = FALSE;
+	(*term->text) ();
+	term_graphics = FALSE;
     }
     if (term_initialised) {
-        (*term->reset) ();
-        term_initialised = FALSE;
-        /* switch off output to special postscript file (if used) */
-        gppsfile = NULL;
+	(*term->reset) ();
+	term_initialised = FALSE;
+	/* switch off output to special postscript file (if used) */
+	gppsfile = NULL;
     }
 }
 
@@ -879,15 +879,15 @@ term_apply_lp_properties(struct lp_style_type *lp)
      */
 
     if (lp->pointflag) {
-        /* change points, too
-         * Currently, there is no 'pointtype' function.  For points
-         * there is a special function also dealing with (x,y) co-
-         * ordinates.
-         */
+	/* change points, too
+	 * Currently, there is no 'pointtype' function.  For points
+	 * there is a special function also dealing with (x,y) co-
+	 * ordinates.
+	 */
 	if (lp->p_size < 0)
-            (*term->pointsize) (pointsize);
+	    (*term->pointsize) (pointsize);
 	else
-            (*term->pointsize) (lp->p_size);
+	    (*term->pointsize) (lp->p_size);
     }
     /*  _first_ set the line width, _then_ set the line type !
 
@@ -899,7 +899,7 @@ term_apply_lp_properties(struct lp_style_type *lp)
     (*term->linetype) (lp->l_type);
     /* Possibly override the linetype color with a fancier colorspec */
     if (lp->use_palette)
-        apply_pm3dcolor(&lp->pm3d_color, term);
+	apply_pm3dcolor(&lp->pm3d_color, term);
 }
 
 
@@ -910,7 +910,7 @@ term_check_multiplot_okay(TBOOLEAN f_interactive)
     FPRINTF((stderr, "term_multiplot_okay(%d)\n", f_interactive));
 
     if (!term_initialised)
-        return;                 /* they've not started yet */
+	return;                 /* they've not started yet */
 
     /* make sure that it is safe to issue an interactive prompt
      * it is safe if
@@ -920,11 +920,11 @@ term_check_multiplot_okay(TBOOLEAN f_interactive)
      *     refuse multiplot outright
      */
     if (!f_interactive || (term->flags & TERM_CAN_MULTIPLOT) ||
-        ((gpoutfile != stdout) && !(term->flags & TERM_CANNOT_MULTIPLOT))
-        ) {
-        /* it's okay to use multiplot here, but suspend first */
-        term_suspend();
-        return;
+	((gpoutfile != stdout) && !(term->flags & TERM_CANNOT_MULTIPLOT))
+	) {
+	/* it's okay to use multiplot here, but suspend first */
+	term_suspend();
+	return;
     }
     /* uh oh: they're not allowed to be in multiplot here */
 
@@ -936,9 +936,9 @@ term_check_multiplot_okay(TBOOLEAN f_interactive)
      */
 
     if (term->flags & TERM_CANNOT_MULTIPLOT)
-        int_error(NO_CARET, "This terminal does not support multiplot");
+	int_error(NO_CARET, "This terminal does not support multiplot");
     else
-        int_error(NO_CARET, "Must set output to a file or put all multiplot commands on one input line");
+	int_error(NO_CARET, "Must set output to a file or put all multiplot commands on one input line");
 }
 
 
@@ -955,63 +955,63 @@ write_multiline(
     char *p = text;
 
     if (!p)
-        return;
+	return;
 
     /* EAM 9-Feb-2003 - Set font before calculating sizes */
     if (font && *font && t->set_font)
-        (*t->set_font) (font);
+	(*t->set_font) (font);
 
     if (vert != JUST_TOP) {
-        /* count lines and adjust y */
-        int lines = 0;          /* number of linefeeds - one fewer than lines */
-        while (*p) {
-            if (*p++ == '\n')
-                ++lines;
-        }
-        if (angle)
-            x -= (vert * lines * t->v_char) / 2;
-        else
-            y += (vert * lines * t->v_char) / 2;
+	/* count lines and adjust y */
+	int lines = 0;          /* number of linefeeds - one fewer than lines */
+	while (*p) {
+	    if (*p++ == '\n')
+		++lines;
+	}
+	if (angle)
+	    x -= (vert * lines * t->v_char) / 2;
+	else
+	    y += (vert * lines * t->v_char) / 2;
     }
 
     for (;;) {                  /* we will explicitly break out */
 
-        if ((text != NULL) && (p = strchr(text, '\n')) != NULL)
-            *p = 0;             /* terminate the string */
+	if ((text != NULL) && (p = strchr(text, '\n')) != NULL)
+	    *p = 0;             /* terminate the string */
 
-        if ((*t->justify_text) (hor)) {
+	if ((*t->justify_text) (hor)) {
 	    if (on_page(x, y))
-        	(*t->put_text) (x, y, text);
-        } else {
+		(*t->put_text) (x, y, text);
+	} else {
 	    int fix = hor * t->h_char * estimate_strlen(text) / 2;
-            if (angle) {
+	    if (angle) {
 		if (on_page(x, y - fix))
 		    (*t->put_text) (x, y - fix, text);
 	    }
-            else {
+	    else {
 		if (on_page(x - fix, y))
 		    (*t->put_text) (x - fix, y, text);
 	    }
-        }
-        if (angle == TEXT_VERTICAL)
-            x += t->v_char;
-        else if (-angle == TEXT_VERTICAL)
-            x -= t->v_char;
-        else
-            y -= t->v_char;
+	}
+	if (angle == TEXT_VERTICAL)
+	    x += t->v_char;
+	else if (-angle == TEXT_VERTICAL)
+	    x -= t->v_char;
+	else
+	    y -= t->v_char;
 
-        if (!p)
-            break;
-        else {
-            /* put it back */
-            *p = '\n';
-        }
+	if (!p)
+	    break;
+	else {
+	    /* put it back */
+	    *p = '\n';
+	}
 
-        text = p + 1;
+	text = p + 1;
     }                           /* unconditional branch back to the for(;;) - just a goto ! */
 
     if (font && *font && t->set_font)
-        (*t->set_font) ("");
+	(*t->set_font) ("");
 
 }
 
@@ -1023,9 +1023,9 @@ do_point(unsigned int x, unsigned int y, int number)
     struct termentry *t = term;
 
     if (number < 0) {           /* do dot */
-        (*t->move) (x, y);
-        (*t->vector) (x, y);
-        return;
+	(*t->move) (x, y);
+	(*t->vector) (x, y);
+	return;
     }
     number %= POINT_TYPES;
     /* should be in term_tbl[] in later version */
@@ -1038,62 +1038,62 @@ do_point(unsigned int x, unsigned int y, int number)
     */
     switch (number) {
     case 4:                     /* do diamond */
-        (*t->move) (x - htic, y);
-        (*t->vector) (x, y - vtic);
-        (*t->vector) (x + htic, y);
-        (*t->vector) (x, y + vtic);
-        (*t->vector) (x - htic, y);
-        (*t->move) (x, y);
-        (*t->vector) (x, y);
-        break;
+	(*t->move) (x - htic, y);
+	(*t->vector) (x, y - vtic);
+	(*t->vector) (x + htic, y);
+	(*t->vector) (x, y + vtic);
+	(*t->vector) (x - htic, y);
+	(*t->move) (x, y);
+	(*t->vector) (x, y);
+	break;
     case 0:                     /* do plus */
-        (*t->move) (x - htic, y);
-        (*t->vector) (x - htic, y);
-        (*t->vector) (x + htic, y);
-        (*t->move) (x, y - vtic);
-        (*t->vector) (x, y - vtic);
-        (*t->vector) (x, y + vtic);
-        break;
+	(*t->move) (x - htic, y);
+	(*t->vector) (x - htic, y);
+	(*t->vector) (x + htic, y);
+	(*t->move) (x, y - vtic);
+	(*t->vector) (x, y - vtic);
+	(*t->vector) (x, y + vtic);
+	break;
     case 3:                     /* do box */
-        (*t->move) (x - htic, y - vtic);
-        (*t->vector) (x - htic, y - vtic);
-        (*t->vector) (x + htic, y - vtic);
-        (*t->vector) (x + htic, y + vtic);
-        (*t->vector) (x - htic, y + vtic);
-        (*t->vector) (x - htic, y - vtic);
-        (*t->move) (x, y);
-        (*t->vector) (x, y);
-        break;
+	(*t->move) (x - htic, y - vtic);
+	(*t->vector) (x - htic, y - vtic);
+	(*t->vector) (x + htic, y - vtic);
+	(*t->vector) (x + htic, y + vtic);
+	(*t->vector) (x - htic, y + vtic);
+	(*t->vector) (x - htic, y - vtic);
+	(*t->move) (x, y);
+	(*t->vector) (x, y);
+	break;
     case 1:                     /* do X */
-        (*t->move) (x - htic, y - vtic);
-        (*t->vector) (x - htic, y - vtic);
-        (*t->vector) (x + htic, y + vtic);
-        (*t->move) (x - htic, y + vtic);
-        (*t->vector) (x - htic, y + vtic);
-        (*t->vector) (x + htic, y - vtic);
-        break;
+	(*t->move) (x - htic, y - vtic);
+	(*t->vector) (x - htic, y - vtic);
+	(*t->vector) (x + htic, y + vtic);
+	(*t->move) (x - htic, y + vtic);
+	(*t->vector) (x - htic, y + vtic);
+	(*t->vector) (x + htic, y - vtic);
+	break;
     case 5:                     /* do triangle */
-        (*t->move) (x, y + (4 * vtic / 3));
-        (*t->vector) (x - (4 * htic / 3), y - (2 * vtic / 3));
-        (*t->vector) (x + (4 * htic / 3), y - (2 * vtic / 3));
-        (*t->vector) (x, y + (4 * vtic / 3));
-        (*t->move) (x, y);
-        (*t->vector) (x, y);
-        break;
+	(*t->move) (x, y + (4 * vtic / 3));
+	(*t->vector) (x - (4 * htic / 3), y - (2 * vtic / 3));
+	(*t->vector) (x + (4 * htic / 3), y - (2 * vtic / 3));
+	(*t->vector) (x, y + (4 * vtic / 3));
+	(*t->move) (x, y);
+	(*t->vector) (x, y);
+	break;
     case 2:                     /* do star */
-        (*t->move) (x - htic, y);
-        (*t->vector) (x - htic, y);
-        (*t->vector) (x + htic, y);
-        (*t->move) (x, y - vtic);
-        (*t->vector) (x, y - vtic);
-        (*t->vector) (x, y + vtic);
-        (*t->move) (x - htic, y - vtic);
-        (*t->vector) (x - htic, y - vtic);
-        (*t->vector) (x + htic, y + vtic);
-        (*t->move) (x - htic, y + vtic);
-        (*t->vector) (x - htic, y + vtic);
-        (*t->vector) (x + htic, y - vtic);
-        break;
+	(*t->move) (x - htic, y);
+	(*t->vector) (x - htic, y);
+	(*t->vector) (x + htic, y);
+	(*t->move) (x, y - vtic);
+	(*t->vector) (x, y - vtic);
+	(*t->vector) (x, y + vtic);
+	(*t->move) (x - htic, y - vtic);
+	(*t->vector) (x - htic, y - vtic);
+	(*t->vector) (x + htic, y + vtic);
+	(*t->move) (x - htic, y + vtic);
+	(*t->vector) (x - htic, y + vtic);
+	(*t->vector) (x + htic, y - vtic);
+	break;
     }
 }
 
@@ -1134,7 +1134,7 @@ line_and_point(unsigned int x, unsigned int y, int number)
 
 #define HEAD_LONG_LIMIT  (2.0)  /* long  limit of arrowhead length */
 #define HEAD_SHORT_LIMIT (0.3)  /* short limit of arrowhead length */
-                                /* their units are the "tic" length */
+				/* their units are the "tic" length */
 
 #define HEAD_COEFF  (0.3)       /* default value of head/line length ratio */
 
@@ -1181,44 +1181,44 @@ do_arrow(
      * length < DBL_EPSILON, because len_arrow will almost always be != 0.
      */
     if ((head != NOHEAD) && fabs(len_arrow) >= DBL_EPSILON) {
-        int x1, y1, x2, y2;
-        if (curr_arrow_headlength <= 0) {
-            /* arrow head with the default size */
-            /* now calc the head_coeff */
-            double coeff_shortest = len_tic * HEAD_SHORT_LIMIT / len_arrow;
-            double coeff_longest = len_tic * HEAD_LONG_LIMIT / len_arrow;
-            double head_coeff = GPMAX(coeff_shortest,
-                                      GPMIN(HEAD_COEFF, coeff_longest));
-            /* we put the arrowhead marks at 15 degrees to line */
-            x1 = (int) ((COS15 * dx - SIN15 * dy) * head_coeff);
-            y1 = (int) ((SIN15 * dx + COS15 * dy) * head_coeff);
-            x2 = (int) ((COS15 * dx + SIN15 * dy) * head_coeff);
-            y2 = (int) ((-SIN15 * dx + COS15 * dy) * head_coeff);
-            /* backangle defaults to 90 deg */
-            xm = (int) ((x1 + x2)/2);
-            ym = (int) ((y1 + y2)/2);
-        } else {
-            /* the arrow head with the length + angle specified explicitly */
-            double alpha = curr_arrow_headangle * DEG2RAD;
-            double beta = curr_arrow_headbackangle * DEG2RAD;
-            double phi = atan2(-dy,-dx); /* azimuthal angle of the vector */
-            double backlen = curr_arrow_headlength * sin(alpha) / sin(beta);
-            double dx2, dy2;
-            /* anticlock-wise head segment */
-            x1 = -(int)(curr_arrow_headlength * cos( alpha - phi ));
-            y1 =  (int)(curr_arrow_headlength * sin( alpha - phi ));
-            /* clock-wise head segment */
-            dx2 = -curr_arrow_headlength * cos( phi + alpha );
-            dy2 = -curr_arrow_headlength * sin( phi + alpha );
-            x2 = (int) (dx2);
-            y2 = (int) (dy2);
-            /* back point */
-            xm = (int) (dx2 + backlen * cos( phi + beta ));
-            ym = (int) (dy2 + backlen * sin( phi + beta ));
-        }
+	int x1, y1, x2, y2;
+	if (curr_arrow_headlength <= 0) {
+	    /* arrow head with the default size */
+	    /* now calc the head_coeff */
+	    double coeff_shortest = len_tic * HEAD_SHORT_LIMIT / len_arrow;
+	    double coeff_longest = len_tic * HEAD_LONG_LIMIT / len_arrow;
+	    double head_coeff = GPMAX(coeff_shortest,
+				      GPMIN(HEAD_COEFF, coeff_longest));
+	    /* we put the arrowhead marks at 15 degrees to line */
+	    x1 = (int) ((COS15 * dx - SIN15 * dy) * head_coeff);
+	    y1 = (int) ((SIN15 * dx + COS15 * dy) * head_coeff);
+	    x2 = (int) ((COS15 * dx + SIN15 * dy) * head_coeff);
+	    y2 = (int) ((-SIN15 * dx + COS15 * dy) * head_coeff);
+	    /* backangle defaults to 90 deg */
+	    xm = (int) ((x1 + x2)/2);
+	    ym = (int) ((y1 + y2)/2);
+	} else {
+	    /* the arrow head with the length + angle specified explicitly */
+	    double alpha = curr_arrow_headangle * DEG2RAD;
+	    double beta = curr_arrow_headbackangle * DEG2RAD;
+	    double phi = atan2(-dy,-dx); /* azimuthal angle of the vector */
+	    double backlen = curr_arrow_headlength * sin(alpha) / sin(beta);
+	    double dx2, dy2;
+	    /* anticlock-wise head segment */
+	    x1 = -(int)(curr_arrow_headlength * cos( alpha - phi ));
+	    y1 =  (int)(curr_arrow_headlength * sin( alpha - phi ));
+	    /* clock-wise head segment */
+	    dx2 = -curr_arrow_headlength * cos( phi + alpha );
+	    dy2 = -curr_arrow_headlength * sin( phi + alpha );
+	    x2 = (int) (dx2);
+	    y2 = (int) (dy2);
+	    /* back point */
+	    xm = (int) (dx2 + backlen * cos( phi + beta ));
+	    ym = (int) (dy2 + backlen * sin( phi + beta ));
+	}
 
 	if (head & END_HEAD) {
-            if (curr_arrow_headfilled==2 && !clip_point(ex,ey)) {
+	    if (curr_arrow_headfilled==2 && !clip_point(ex,ey)) {
 		/* draw filled forward arrow head */
 		filledhead[0].x = ex + xm;
 		filledhead[0].y = ey + ym;
@@ -1232,51 +1232,51 @@ do_arrow(
 		filledhead[4].y = ey + ym;
 		filledhead->style = FS_OPAQUE;
 		if (t->filled_polygon)
-                    (*t->filled_polygon) (5, filledhead);
-            }
-            /* draw outline of forward arrow head */
+		    (*t->filled_polygon) (5, filledhead);
+	    }
+	    /* draw outline of forward arrow head */
 	    if (clip_point(ex,ey))
 		;
-            else if (curr_arrow_headfilled!=0) {
+	    else if (curr_arrow_headfilled!=0) {
 		draw_clip_line(ex+xm, ey+ym, ex+x1, ey+y1);
 		draw_clip_line(ex+x1, ey+y1, ex, ey);
 		draw_clip_line(ex, ey, ex+x2, ey+y2);
 		draw_clip_line(ex+x2, ey+y2, ex+xm, ey+ym);
-            } else {
+	    } else {
 		draw_clip_line(ex+x1, ey+y1, ex, ey);
 		draw_clip_line(ex, ey, ex+x2, ey+y2);
-            }
-        }
+	    }
+	}
 
 	/* backward arrow head */
-        if ((head & BACKHEAD) && !clip_point(sx,sy)) { 
-            if (curr_arrow_headfilled==2) {
-                /* draw filled backward arrow head */
-                filledhead[0].x = sx - xm;
-                filledhead[0].y = sy - ym;
-                filledhead[1].x = sx - x1;
-                filledhead[1].y = sy - y1;
-                filledhead[2].x = sx;
-                filledhead[2].y = sy;
-                filledhead[3].x = sx - x2;
-                filledhead[3].y = sy - y2;
-                filledhead[4].x = sx - xm;
-                filledhead[4].y = sy - ym;
-                filledhead->style = FS_OPAQUE;
-                if (t->filled_polygon)
-                    (*t->filled_polygon) (5, filledhead);
-            }
-            /* draw outline of backward arrow head */
-            if (curr_arrow_headfilled!=0) {
+	if ((head & BACKHEAD) && !clip_point(sx,sy)) { 
+	    if (curr_arrow_headfilled==2) {
+		/* draw filled backward arrow head */
+		filledhead[0].x = sx - xm;
+		filledhead[0].y = sy - ym;
+		filledhead[1].x = sx - x1;
+		filledhead[1].y = sy - y1;
+		filledhead[2].x = sx;
+		filledhead[2].y = sy;
+		filledhead[3].x = sx - x2;
+		filledhead[3].y = sy - y2;
+		filledhead[4].x = sx - xm;
+		filledhead[4].y = sy - ym;
+		filledhead->style = FS_OPAQUE;
+		if (t->filled_polygon)
+		    (*t->filled_polygon) (5, filledhead);
+	    }
+	    /* draw outline of backward arrow head */
+	    if (curr_arrow_headfilled!=0) {
 		draw_clip_line(sx-xm, sy-ym, sx-x2, sy-y2);
 		draw_clip_line(sx-x2, sy-y2, sx, sy);
 		draw_clip_line(sx, sy, sx-x1, sy-y1);
 		draw_clip_line(sx-x1, sy-y1, sx-xm, sy-ym);
-            } else {
+	    } else {
 		draw_clip_line(sx-x2, sy-y2, sx, sy);
 		draw_clip_line(sx, sy, sx-x1, sy-y1);
-            }
-        }
+	    }
+	}
     }
 
     /* Draw the line for the arrow. */
@@ -1431,7 +1431,7 @@ list_terms()
 
     /* sort terminal types alphabetically */
     for( i = 0; i < TERMCOUNT; i++ )
-        sort_idxs[i] = i;
+	sort_idxs[i] = i;
     qsort( sort_idxs, TERMCOUNT, sizeof(int), termcomp );
     /* now sort_idxs[] contains the sorted indices */
 
@@ -1440,10 +1440,10 @@ list_terms()
     OutLine(line_buffer);
 
     for (i = 0; i < TERMCOUNT; i++) {
-        sprintf(line_buffer, "  %15s  %s\n",
-                term_tbl[sort_idxs[i]].name,
-                term_tbl[sort_idxs[i]].description);
-        OutLine(line_buffer);
+	sprintf(line_buffer, "  %15s  %s\n",
+		term_tbl[sort_idxs[i]].name,
+		term_tbl[sort_idxs[i]].description);
+	OutLine(line_buffer);
     }
 
     EndOutput();
@@ -1469,11 +1469,11 @@ set_term(int c_token_arg)
     char *input_name;
 
     if (!token[c_token_arg].is_token)
-        int_error(c_token_arg, "terminal name expected");
+	int_error(c_token_arg, "terminal name expected");
     input_name = gp_input_line + token[c_token_arg].start_index;
     t = change_term(input_name, token[c_token_arg].length);
     if (!t)
-        int_error(c_token_arg, "unknown or ambiguous terminal type; type just 'set terminal' for a list");
+	int_error(c_token_arg, "unknown or ambiguous terminal type; type just 'set terminal' for a list");
 
     /* otherwise the type was changed */
 
@@ -1499,15 +1499,15 @@ change_term(const char *origname, int length)
     }
 
     for (i = 0; i < TERMCOUNT; i++) {
-        if (!strncmp(name, term_tbl[i].name, length)) {
-            if (t)
-                return (NULL);  /* ambiguous */
-            t = term_tbl + i;
-        }
+	if (!strncmp(name, term_tbl[i].name, length)) {
+	    if (t)
+		return (NULL);  /* ambiguous */
+	    t = term_tbl + i;
+	}
     }
 
     if (!t)                     /* unknown */
-        return (NULL);
+	return (NULL);
 
     /* Success: set terminal type now */
 
@@ -1515,30 +1515,30 @@ change_term(const char *origname, int length)
     term_initialised = FALSE;
 
     if (term->scale != null_scale)
-        fputs("Warning: scale interface is not null_scale - may not work with multiplot\n", stderr);
+	fputs("Warning: scale interface is not null_scale - may not work with multiplot\n", stderr);
 
     /* check that optional fields are initialised to something */
     if (term->text_angle == 0)
-        term->text_angle = null_text_angle;
+	term->text_angle = null_text_angle;
     if (term->justify_text == 0)
-        term->justify_text = null_justify_text;
+	term->justify_text = null_justify_text;
     if (term->point == 0)
-        term->point = do_point;
+	term->point = do_point;
     if (term->arrow == 0)
-        term->arrow = do_arrow;
+	term->arrow = do_arrow;
     if (term->pointsize == 0)
-        term->pointsize = do_pointsize;
+	term->pointsize = do_pointsize;
     if (term->linewidth == 0)
-        term->linewidth = null_linewidth;
+	term->linewidth = null_linewidth;
 
     /* Special handling for unixplot term type */
     if (!strncmp("unixplot", term->name, 8)) {
-        UP_redirect(2);         /* Redirect actual stdout for unixplots */
+	UP_redirect(2);         /* Redirect actual stdout for unixplots */
     } else if (unixplot) {
-        UP_redirect(3);         /* Put stdout back together again. */
+	UP_redirect(3);         /* Put stdout back together again. */
     }
     if (interactive)
-        fprintf(stderr, "Terminal type set to '%s'\n", term->name);
+	fprintf(stderr, "Terminal type set to '%s'\n", term->name);
 
     /* Invalidate any terminal-specific structures that may be active */
     invalidate_palette();
@@ -1572,36 +1572,36 @@ init_terminal()
     /* GNUTERM environment variable is primary */
     gnuterm = getenv("GNUTERM");
     if (gnuterm != (char *) NULL) {
-        term_name = gnuterm;
+	term_name = gnuterm;
     } else {
 
 #ifdef __ZTC__
-        term_name = ztc_init();
+	term_name = ztc_init();
 #endif
 
 #ifdef VMS
-        term_name = vms_init();
+	term_name = vms_init();
 #endif /* VMS */
 
 #ifdef NEXT
-        env_term = getenv("TERM");
-        if (term_name == (char *) NULL
-            && env_term != (char *) NULL && strcmp(env_term, "next") == 0)
-            term_name = "next";
+	env_term = getenv("TERM");
+	if (term_name == (char *) NULL
+	    && env_term != (char *) NULL && strcmp(env_term, "next") == 0)
+	    term_name = "next";
 #endif /* NeXT */
 
 #ifdef __BEOS__
-        env_term = getenv("TERM");
-        if (term_name == (char *) NULL
-            && env_term != (char *) NULL && strcmp(env_term, "beterm") == 0)
-            term_name = "be";
+	env_term = getenv("TERM");
+	if (term_name == (char *) NULL
+	    && env_term != (char *) NULL && strcmp(env_term, "beterm") == 0)
+	    term_name = "be";
 #endif /* BeOS */
 
 #ifdef SUN
-        env_term = getenv("TERM");      /* try $TERM */
-        if (term_name == (char *) NULL
-            && env_term != (char *) NULL && strcmp(env_term, "sun") == 0)
-            term_name = "sun";
+	env_term = getenv("TERM");      /* try $TERM */
+	if (term_name == (char *) NULL
+	    && env_term != (char *) NULL && strcmp(env_term, "sun") == 0)
+	    term_name = "sun";
 #endif /* SUN */
 
 #ifdef WXWIDGETS
@@ -1611,64 +1611,64 @@ init_terminal()
 
 #ifdef _Windows
 	/* let the wxWidgets terminal be the default when available */
-        if (term_name == (char *) NULL)
+	if (term_name == (char *) NULL)
 		term_name = "win";
 #endif /* _Windows */
 
 #ifdef GPR
-        /* find out whether stdout is a DM pad. See term/gpr.trm */
-        if (gpr_isa_pad())
-            term_name = "gpr";
+	/* find out whether stdout is a DM pad. See term/gpr.trm */
+	if (gpr_isa_pad())
+	    term_name = "gpr";
 #else
 # ifdef APOLLO
-        /* find out whether stdout is a DM pad. See term/apollo.trm */
-        if (apollo_isa_pad())
-            term_name = "apollo";
+	/* find out whether stdout is a DM pad. See term/apollo.trm */
+	if (apollo_isa_pad())
+	    term_name = "apollo";
 # endif                         /* APOLLO */
 #endif /* GPR    */
 
 #if defined(__APPLE__) && defined(__MACH__) && defined(HAVE_LIBAQUATERM)
-        /* Mac OS X with AquaTerm installed */
-        term_name = "aqua";
+	/* Mac OS X with AquaTerm installed */
+	term_name = "aqua";
 #endif
 
 #ifdef X11
-        env_term = getenv("TERM");      /* try $TERM */
-        if (term_name == (char *) NULL
-            && env_term != (char *) NULL && strcmp(env_term, "xterm") == 0)
-            term_name = "x11";
-        display = getenv("DISPLAY");
-        if (term_name == (char *) NULL && display != (char *) NULL)
-            term_name = "x11";
-        if (X11_Display)
-            term_name = "x11";
+	env_term = getenv("TERM");      /* try $TERM */
+	if (term_name == (char *) NULL
+	    && env_term != (char *) NULL && strcmp(env_term, "xterm") == 0)
+	    term_name = "x11";
+	display = getenv("DISPLAY");
+	if (term_name == (char *) NULL && display != (char *) NULL)
+	    term_name = "x11";
+	if (X11_Display)
+	    term_name = "x11";
 #endif /* x11 */
 
 #ifdef AMIGA
-        term_name = "amiga";
+	term_name = "amiga";
 #endif
 
 #if defined(ATARI) || defined(MTOS)
-        term_name = "atari";
+	term_name = "atari";
 #endif
 
 #ifdef UNIXPC
-        if (iswind() == 0) {
-            term_name = "unixpc";
-        }
+	if (iswind() == 0) {
+	    term_name = "unixpc";
+	}
 #endif /* unixpc */
 
 #ifdef CGI
-        if (getenv("CGIDISP") || getenv("CGIPRNT"))
-            term_name = "cgi";
+	if (getenv("CGIDISP") || getenv("CGIPRNT"))
+	    term_name = "cgi";
 #endif /*CGI */
 
 #ifdef DJGPP
-        term_name = "svga";
+	term_name = "svga";
 #endif
 
 #ifdef GRASS
-        term_name = "grass";
+	term_name = "grass";
 #endif
 
 #ifdef OS2
@@ -1677,23 +1677,23 @@ init_terminal()
 #ifdef X11
 /* WINDOWID is set in sessions like xterm, etc.
    DISPLAY is also mandatory. */
-        env_term = getenv("WINDOWID");
-        display  = getenv("DISPLAY");
-        if ((env_term != (char *) NULL) && (display != (char *) NULL))
-            term_name = "x11";
-        else
+	env_term = getenv("WINDOWID");
+	display  = getenv("DISPLAY");
+	if ((env_term != (char *) NULL) && (display != (char *) NULL))
+	    term_name = "x11";
+	else
 #endif          /* X11 */
-            term_name = "pm";
+	    term_name = "pm";
 #endif /*OS2 */
 
 /* set linux terminal only if LINUX_setup was successfull, if we are on X11
    LINUX_setup has failed, also if we are logged in by network */
 #ifdef LINUXVGA
-        if (LINUX_graphics_allowed)
+	if (LINUX_graphics_allowed)
 #ifdef VGAGL
-            term_name = "vgagl";
+	    term_name = "vgagl";
 #else
-            term_name = "linux";
+	    term_name = "linux";
 #endif
 #endif /* LINUXVGA */
     }
@@ -1715,12 +1715,12 @@ init_terminal()
 	/* to the fork+execute of gnuplot_x11 and x11 can tolerate not being  */
 	/* initialized until later.                                           */
 	/* Note that gp_input_line[] is blank at this point.	              */
-        if (change_term(term_name, namelength)) {
-            if (strcmp(term->name,"x11"))
-        	term->options();
-            return;
-        }
-        fprintf(stderr, "Unknown or ambiguous terminal name '%s'\n", term_name);
+	if (change_term(term_name, namelength)) {
+	    if (strcmp(term->name,"x11"))
+		term->options();
+	    return;
+	}
+	fprintf(stderr, "Unknown or ambiguous terminal name '%s'\n", term_name);
     }
     change_term("unknown", 7);
 }
@@ -1737,29 +1737,29 @@ ztc_init()
 
     switch (g_mode) {
     case FG_NULL:
-        fputs("Graphics card not detected or not supported.\n", stderr);
-        exit(1);
+	fputs("Graphics card not detected or not supported.\n", stderr);
+	exit(1);
     case FG_HERCFULL:
-        term_name = "hercules";
-        break;
+	term_name = "hercules";
+	break;
     case FG_EGAMONO:
-        term_name = "egamono";
-        break;
+	term_name = "egamono";
+	break;
     case FG_EGAECD:
-        term_name = "egalib";
-        break;
+	term_name = "egalib";
+	break;
     case FG_VGA11:
-        term_name = "vgamono";
-        break;
+	term_name = "vgamono";
+	break;
     case FG_VGA12:
-        term_name = "vgalib";
-        break;
+	term_name = "vgalib";
+	break;
     case FG_VESA6A:
-        term_name = "svgalib";
-        break;
+	term_name = "svgalib";
+	break;
     case FG_VESA5:
-        term_name = "ssvgalib";
-        break;
+	term_name = "ssvgalib";
+	break;
     }
     fg_term();
     return (term_name);
@@ -1784,32 +1784,32 @@ UP_redirect(int caller)
 #if defined(UNIXPLOT) && !defined(GNUGRAPH)
     switch (caller) {
     case 1:
-        /* Don't save, just replace stdout w/gpoutfile (save was already done). */
-        if (unixplot)
-            *(stdout) = *(gpoutfile);   /* Copy FILE structure */
-        break;
+	/* Don't save, just replace stdout w/gpoutfile (save was already done). */
+	if (unixplot)
+	    *(stdout) = *(gpoutfile);   /* Copy FILE structure */
+	break;
     case 2:
-        if (!unixplot) {
-            fflush(stdout);
-            save_stdout = *(stdout);
-            *(stdout) = *(gpoutfile);   /* Copy FILE structure */
-            unixplot = 1;
-        }
-        break;
+	if (!unixplot) {
+	    fflush(stdout);
+	    save_stdout = *(stdout);
+	    *(stdout) = *(gpoutfile);   /* Copy FILE structure */
+	    unixplot = 1;
+	}
+	break;
     case 3:
-        /* New terminal in use--put stdout back to original. */
-        /* closepl(); */ /* This is called by the term. */
-        fflush(stdout);
-        *(stdout) = save_stdout;        /* Copy FILE structure */
-        unixplot = 0;
-        break;
+	/* New terminal in use--put stdout back to original. */
+	/* closepl(); */ /* This is called by the term. */
+	fflush(stdout);
+	*(stdout) = save_stdout;        /* Copy FILE structure */
+	unixplot = 0;
+	break;
     case 4:
-        /*  User really wants to go to normal output... */
-        if (unixplot) {
-            fflush(stdout);
-            *(stdout) = save_stdout;    /* Copy FILE structure */
-        }
-        break;
+	/*  User really wants to go to normal output... */
+	if (unixplot) {
+	    fflush(stdout);
+	    *(stdout) = save_stdout;    /* Copy FILE structure */
+	}
+	break;
     } /* switch() */
 #else /* !UNIXPLOT || GNUGRAPH */
     (void) caller;              /* avoid -Wunused warning */
@@ -1837,7 +1837,7 @@ test_term()
     p_width = pointsize * t->h_tic;
     key_entry_height = pointsize * t->v_tic * 1.25;
     if (key_entry_height < t->v_char)
-        key_entry_height = t->v_char;
+	key_entry_height = t->v_char;
 
     /* Sync point for epslatex text positioning */
     if (term->layer)
@@ -1856,7 +1856,7 @@ test_term()
     (*t->put_text) (t->h_char * 5, ymax_t - t->v_char * 1.5, "Terminal Test");
 #ifdef USE_MOUSE
     if (t->set_ruler) {
-        (*t->put_text) (t->h_char * 5, ymax_t - t->v_char * 3, "Mouse and hotkeys are supported, hit: h r m 6");
+	(*t->put_text) (t->h_char * 5, ymax_t - t->v_char * 3, "Mouse and hotkeys are supported, hit: h r m 6");
     }
 #endif
     (*t->linetype)(LT_BLACK);
@@ -1873,55 +1873,55 @@ test_term()
     (*t->vector) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 - t->v_char / 2);
     (*t->vector) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char / 2);
     (*t->put_text) (xmax_t / 2 - t->h_char * 10, ymax_t / 2,
-                    "12345678901234567890");
+		    "12345678901234567890");
     (*t->put_text) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char * 1.4,
-                    "test of character width:");
+		    "test of character width:");
     (*t->linetype) (LT_BLACK);
     /* test justification */
     (void) (*t->justify_text) (LEFT);
     (*t->put_text) (xmax_t / 2, ymax_t / 2 + t->v_char * 6, "left justified");
     str = "centre+d text";
     if ((*t->justify_text) (CENTRE))
-        (*t->put_text) (xmax_t / 2,
-                        ymax_t / 2 + t->v_char * 5, str);
+	(*t->put_text) (xmax_t / 2,
+			ymax_t / 2 + t->v_char * 5, str);
     else
-        (*t->put_text) (xmax_t / 2 - strlen(str) * t->h_char / 2,
-                        ymax_t / 2 + t->v_char * 5, str);
+	(*t->put_text) (xmax_t / 2 - strlen(str) * t->h_char / 2,
+			ymax_t / 2 + t->v_char * 5, str);
     str = "right justified";
     if ((*t->justify_text) (RIGHT))
-        (*t->put_text) (xmax_t / 2,
-                        ymax_t / 2 + t->v_char * 4, str);
+	(*t->put_text) (xmax_t / 2,
+			ymax_t / 2 + t->v_char * 4, str);
     else
-        (*t->put_text) (xmax_t / 2 - strlen(str) * t->h_char,
-                        ymax_t / 2 + t->v_char * 4, str);
+	(*t->put_text) (xmax_t / 2 - strlen(str) * t->h_char,
+			ymax_t / 2 + t->v_char * 4, str);
     /* test text angle */
     (*t->linetype)(1);
     str = "rotated ce+ntred text";
     if ((*t->text_angle) (TEXT_VERTICAL)) {
-        if ((*t->justify_text) (CENTRE))
-            (*t->put_text) (t->v_char,
-                            ymax_t / 2, str);
-        else
-            (*t->put_text) (t->v_char,
-                            ymax_t / 2 - strlen(str) * t->h_char / 2, str);
-        (*t->justify_text) (LEFT);
-        str = " rotated by +45 deg";
-        (*t->text_angle)(45);
-        (*t->put_text)(t->v_char * 3, ymax_t / 2, str);
-        (*t->justify_text) (LEFT);
-        str = " rotated by -45 deg";
-        (*t->text_angle)(-45);
-        (*t->put_text)(t->v_char * 2, ymax_t / 2, str);
+	if ((*t->justify_text) (CENTRE))
+	    (*t->put_text) (t->v_char,
+			    ymax_t / 2, str);
+	else
+	    (*t->put_text) (t->v_char,
+			    ymax_t / 2 - strlen(str) * t->h_char / 2, str);
+	(*t->justify_text) (LEFT);
+	str = " rotated by +45 deg";
+	(*t->text_angle)(45);
+	(*t->put_text)(t->v_char * 3, ymax_t / 2, str);
+	(*t->justify_text) (LEFT);
+	str = " rotated by -45 deg";
+	(*t->text_angle)(-45);
+	(*t->put_text)(t->v_char * 2, ymax_t / 2, str);
 #ifdef HAVE_GD_PNG
-        if (!strcmp(t->name, "png") || !strcmp(t->name, "gif") || !strcmp(t->name, "jpeg")) {
-            (*t->text_angle)(0);
-            str = "this terminal supports text rotation only for truetype fonts";
-            (*t->put_text)(t->v_char * 2 + t->h_char * 4, ymax_t / 2 - t->v_char * 2, str);
-        }
+	if (!strcmp(t->name, "png") || !strcmp(t->name, "gif") || !strcmp(t->name, "jpeg")) {
+	    (*t->text_angle)(0);
+	    str = "this terminal supports text rotation only for truetype fonts";
+	    (*t->put_text)(t->v_char * 2 + t->h_char * 4, ymax_t / 2 - t->v_char * 2, str);
+	}
 #endif
     } else {
-        (void) (*t->justify_text) (LEFT);
-        (*t->put_text) (t->h_char * 2, ymax_t / 2 - t->v_char * 2, "can't rotate text");
+	(void) (*t->justify_text) (LEFT);
+	(*t->put_text) (t->h_char * 2, ymax_t / 2 - t->v_char * 2, "can't rotate text");
     }
     (void) (*t->justify_text) (LEFT);
     (void) (*t->text_angle) (0);
@@ -1931,20 +1931,20 @@ test_term()
     (*t->linetype)(4);
     (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)), (unsigned int) ymax_t - 1);
     (*t->vector) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)),
-                  (unsigned int) (ymax_t - axis_array[FIRST_X_AXIS].ticscale * t->v_tic));
+		  (unsigned int) (ymax_t - axis_array[FIRST_X_AXIS].ticscale * t->v_tic));
     (*t->move) ((unsigned int) (xmax_t / 2), (unsigned int) (ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
     (*t->vector) ((unsigned int) (xmax_t / 2 + axis_array[FIRST_X_AXIS].ticscale * t->h_tic),
-                  (unsigned int) (ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
+		  (unsigned int) (ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
     /* HBB 19990530: changed this to use right-justification, if possible... */
     str = "show ticscale";
     if ((*t->justify_text) (RIGHT))
-        (*t->put_text) ((unsigned int) (xmax_t / 2 - 1* t->h_char),
-                        (unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
-                    str);
+	(*t->put_text) ((unsigned int) (xmax_t / 2 - 1* t->h_char),
+			(unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
+		    str);
     else
-        (*t->put_text) ((unsigned int) (xmax_t / 2 - (strlen(str)+1)     * t->h_char),
-                        (unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
-                        str);
+	(*t->put_text) ((unsigned int) (xmax_t / 2 - (strlen(str)+1)     * t->h_char),
+			(unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
+			str);
     (void) (*t->justify_text) (LEFT);
     (*t->linetype)(LT_BLACK);
 
@@ -1953,19 +1953,19 @@ test_term()
     y = ymax_t - key_entry_height;
     (*t->pointsize) (pointsize);
     for (i = -2; y > key_entry_height; i++) {
-        (*t->linetype) (i);
-        /*      (void) sprintf(label,"%d",i);  Jorgen Lippert
-           lippert@risoe.dk */
-        (void) sprintf(label, "%d", i + 1);
-        if ((*t->justify_text) (RIGHT))
-            (*t->put_text) (x, y, label);
-        else
-            (*t->put_text) (x - strlen(label) * t->h_char, y, label);
-        (*t->move) (x + t->h_char, y);
-        (*t->vector) (x + t->h_char * 4, y);
-        if (i >= -1)
-            (*t->point) (x + t->h_char * 5 + p_width / 2, y, i);
-        y -= key_entry_height;
+	(*t->linetype) (i);
+	/*      (void) sprintf(label,"%d",i);  Jorgen Lippert
+	   lippert@risoe.dk */
+	(void) sprintf(label, "%d", i + 1);
+	if ((*t->justify_text) (RIGHT))
+	    (*t->put_text) (x, y, label);
+	else
+	    (*t->put_text) (x - strlen(label) * t->h_char, y, label);
+	(*t->move) (x + t->h_char, y);
+	(*t->vector) (x + t->h_char * 4, y);
+	if (i >= -1)
+	    (*t->point) (x + t->h_char * 5 + p_width / 2, y, i);
+	y -= key_entry_height;
     }
 
     /* test some arrows */
@@ -2000,11 +2000,11 @@ test_term()
     y = yl;
 
     for (i=1; i<7; i++) {
-        (*t->linewidth) ((float)(i)); (*t->linetype)(LT_BLACK);
-        (*t->move) (x, y); (*t->vector) (x+xl, y);
-        sprintf(label,"  lw %1d%c",i,0);
-        (*t->put_text) (x+xl, y, label);
-        y += yl;
+	(*t->linewidth) ((float)(i)); (*t->linetype)(LT_BLACK);
+	(*t->move) (x, y); (*t->vector) (x+xl, y);
+	sprintf(label,"  lw %1d%c",i,0);
+	(*t->put_text) (x+xl, y, label);
+	y += yl;
     }
     (*t->put_text) (x, y, "linewidth");
 
@@ -2018,48 +2018,48 @@ test_term()
     (*t->justify_text) (CENTRE);
     (*t->put_text)(x+xl*7, yl+t->v_char*1.5, "pattern fill");
     for (i=0; i<10; i++) {
-        int style = ((i<<4) + FS_PATTERN);
-        if (t->fillbox)
-            (*t->fillbox) ( style, x, y, xl, yl );
-        (*t->move)  (x,y);
-        (*t->vector)(x,y+yl);
-        (*t->vector)(x+xl,y+yl);
-        (*t->vector)(x+xl,y);
-        (*t->vector)(x,y);
-        sprintf(label,"%2d",i);
-        (*t->put_text)(x+xl/2, y+yl+t->v_char*0.5, label);
-        x += xl * 1.5;
+	int style = ((i<<4) + FS_PATTERN);
+	if (t->fillbox)
+	    (*t->fillbox) ( style, x, y, xl, yl );
+	(*t->move)  (x,y);
+	(*t->vector)(x,y+yl);
+	(*t->vector)(x+xl,y+yl);
+	(*t->vector)(x+xl,y);
+	(*t->vector)(x,y);
+	sprintf(label,"%2d",i);
+	(*t->put_text)(x+xl/2, y+yl+t->v_char*0.5, label);
+	x += xl * 1.5;
     }
 
     {
-        int cen_x = (int)(0.75 * xmax_t);
-        int cen_y = (int)(0.83 * ymax_t);
-        int radius = xmax_t / 20;
+	int cen_x = (int)(0.75 * xmax_t);
+	int cen_y = (int)(0.83 * ymax_t);
+	int radius = xmax_t / 20;
 
-        (*t->linetype)(2);
-        /* test pm3d -- filled_polygon(), but not set_color() */
-        if (t->filled_polygon) {
+	(*t->linetype)(2);
+	/* test pm3d -- filled_polygon(), but not set_color() */
+	if (t->filled_polygon) {
 #define NUMBER_OF_VERTICES 6
-            int n = NUMBER_OF_VERTICES;
-            gpiPoint corners[NUMBER_OF_VERTICES+1];
+	    int n = NUMBER_OF_VERTICES;
+	    gpiPoint corners[NUMBER_OF_VERTICES+1];
 #undef  NUMBER_OF_VERTICES
-            int i;
+	    int i;
 
-            for (i = 0; i < n; i++) {
-                corners[i].x = cen_x + radius * cos(2*M_PI*i/n);
-                corners[i].y = cen_y + radius * sin(2*M_PI*i/n);
-            }
-            corners[n].x = corners[0].x;
-            corners[n].y = corners[0].y;
-            corners->style = FS_OPAQUE;
-            term->filled_polygon(n+1, corners);
-            str = "(color) filled polygon:";
-        } else
-            str = "filled polygons not supported";
-        (*t->linetype)(LT_BLACK);
-        i = ((*t->justify_text) (CENTRE)) ? 0 : t->h_char * strlen(str) / 2;
-        (*t->put_text) (cen_x + i, cen_y + radius + t->v_char * 0.5, str);
-        (*t->linetype)(LT_BLACK);
+	    for (i = 0; i < n; i++) {
+		corners[i].x = cen_x + radius * cos(2*M_PI*i/n);
+		corners[i].y = cen_y + radius * sin(2*M_PI*i/n);
+	    }
+	    corners[n].x = corners[0].x;
+	    corners[n].y = corners[0].y;
+	    corners->style = FS_OPAQUE;
+	    term->filled_polygon(n+1, corners);
+	    str = "(color) filled polygon:";
+	} else
+	    str = "filled polygons not supported";
+	(*t->linetype)(LT_BLACK);
+	i = ((*t->justify_text) (CENTRE)) ? 0 : t->h_char * strlen(str) / 2;
+	(*t->put_text) (cen_x + i, cen_y + radius + t->v_char * 0.5, str);
+	(*t->linetype)(LT_BLACK);
     }
 
     term_end_plot();
@@ -2076,35 +2076,35 @@ void
 reopen_binary()
 {
     if (outstr) {
-        (void) fclose(gpoutfile);
+	(void) fclose(gpoutfile);
 #  ifdef _Windows
-        if (!stricmp(outstr, "PRN")) {
-            /* use temp file for windows */
-            (void) strcpy(filename, win_prntmp);
-        }
+	if (!stricmp(outstr, "PRN")) {
+	    /* use temp file for windows */
+	    (void) strcpy(filename, win_prntmp);
+	}
 #  endif
-        if ((gpoutfile = fopen(filename, "wb")) == (FILE *) NULL) {
-            if ((gpoutfile = fopen(filename, "w")) == (FILE *) NULL) {
-                os_error(NO_CARET, "cannot reopen file with binary type; output unknown");
-            } else {
-                os_error(NO_CARET, "cannot reopen file with binary type; output reset to ascii");
-            }
-        }
+	if ((gpoutfile = fopen(filename, "wb")) == (FILE *) NULL) {
+	    if ((gpoutfile = fopen(filename, "w")) == (FILE *) NULL) {
+		os_error(NO_CARET, "cannot reopen file with binary type; output unknown");
+	    } else {
+		os_error(NO_CARET, "cannot reopen file with binary type; output reset to ascii");
+	    }
+	}
 #  if defined(__TURBOC__) && defined(MSDOS)
 #   ifndef _Windows
-        if (!stricmp(outstr, "PRN")) {
-            /* Put the printer into binary mode. */
-            union REGS regs;
-            regs.h.ah = 0x44;   /* ioctl */
-            regs.h.al = 0;      /* get device info */
-            regs.x.bx = fileno(gpoutfile);
-            intdos(&regs, &regs);
-            regs.h.dl |= 0x20;  /* binary (no ^Z intervention) */
-            regs.h.dh = 0;
-            regs.h.ah = 0x44;   /* ioctl */
-            regs.h.al = 1;      /* set device info */
-            intdos(&regs, &regs);
-        }
+	if (!stricmp(outstr, "PRN")) {
+	    /* Put the printer into binary mode. */
+	    union REGS regs;
+	    regs.h.ah = 0x44;   /* ioctl */
+	    regs.h.al = 0;      /* get device info */
+	    regs.x.bx = fileno(gpoutfile);
+	    intdos(&regs, &regs);
+	    regs.h.dl |= 0x20;  /* binary (no ^Z intervention) */
+	    regs.h.dh = 0;
+	    regs.h.ah = 0x44;   /* ioctl */
+	    regs.h.al = 1;      /* set device info */
+	    intdos(&regs, &regs);
+	}
 #   endif /* !_Windows */
 #  endif /* TURBOC && MSDOS */
     }
@@ -2144,17 +2144,17 @@ vms_init()
        initialise cur_char_buf to current settings. */
     int i;
     if (getenv("DECW$DISPLAY"))
-        return ("x11");
+	return ("x11");
     atexit(vms_reset);
     sys$assign(&sysoutput_desc, &chan, 0, 0);
     sys$qiow(0, chan, IO$_SENSEMODE, 0, 0, 0, old_char_buf, 12, 0, 0, 0, 0);
     for (i = 0; i < 3; ++i)
-        cur_char_buf[i] = old_char_buf[i];
+	cur_char_buf[i] = old_char_buf[i];
     sys$dassgn(chan);
 
     /* Test if terminal is regis */
     if ((cur_char_buf[2] & TT2$M_REGIS) == TT2$M_REGIS)
-        return ("regis");
+	return ("regis");
     return (NULL);
 }
 
@@ -2167,7 +2167,7 @@ vms_reset()
     sys$assign(&sysoutput_desc, &chan, 0, 0);
     sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, old_char_buf, 12, 0, 0, 0, 0);
     for (i = 0; i < 3; ++i)
-        cur_char_buf[i] = old_char_buf[i];
+	cur_char_buf[i] = old_char_buf[i];
     sys$dassgn(chan);
 }
 
@@ -2178,7 +2178,7 @@ term_mode_tek()
     long status;
 
     if (gpoutfile != stdout)
-        return;                 /* don't modify if not stdout */
+	return;                 /* don't modify if not stdout */
     sys$assign(&sysoutput_desc, &chan, 0, 0);
     cur_char_buf[0] = 0x004A0000 | DC$_TERM | (TT$_TEK401X << 8);
     cur_char_buf[1] = (cur_char_buf[1] & 0x00FFFFFF) | 0x18000000;
@@ -2221,12 +2221,12 @@ term_mode_tek()
 
     status = sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, cur_char_buf, 12, 0, 0, 0, 0);
     if (status == SS$_BADPARAM) {
-        /* terminal fallback utility not installed on system */
-        cur_char_buf[2] &= ~TT2$M_FALLBACK;
-        sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, cur_char_buf, 12, 0, 0, 0, 0);
+	/* terminal fallback utility not installed on system */
+	cur_char_buf[2] &= ~TT2$M_FALLBACK;
+	sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, cur_char_buf, 12, 0, 0, 0, 0);
     } else {
-        if (status != SS$_NORMAL)
-            lib$signal(status, 0, 0);
+	if (status != SS$_NORMAL)
+	    lib$signal(status, 0, 0);
     }
     sys$dassgn(chan);
 }
@@ -2238,11 +2238,11 @@ term_mode_native()
     int i;
 
     if (gpoutfile != stdout)
-        return;                 /* don't modify if not stdout */
+	return;                 /* don't modify if not stdout */
     sys$assign(&sysoutput_desc, &chan, 0, 0);
     sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, old_char_buf, 12, 0, 0, 0, 0);
     for (i = 0; i < 3; ++i)
-        cur_char_buf[i] = old_char_buf[i];
+	cur_char_buf[i] = old_char_buf[i];
     sys$dassgn(chan);
 }
 
@@ -2251,7 +2251,7 @@ void
 term_pasthru()
 {
     if (gpoutfile != stdout)
-        return;                 /* don't modify if not stdout */
+	return;                 /* don't modify if not stdout */
     sys$assign(&sysoutput_desc, &chan, 0, 0);
     cur_char_buf[2] |= TT2$M_PASTHRU;
     sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, cur_char_buf, 12, 0, 0, 0, 0);
@@ -2263,7 +2263,7 @@ void
 term_nopasthru()
 {
     if (gpoutfile != stdout)
-        return;                 /* don't modify if not stdout */
+	return;                 /* don't modify if not stdout */
     sys$assign(&sysoutput_desc, &chan, 0, 0);
     cur_char_buf[2] &= ~TT2$M_PASTHRU;
     sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, cur_char_buf, 12, 0, 0, 0, 0);
@@ -2277,12 +2277,12 @@ fflush_binary()
     INT16 k;            /* loop index */
 
     if (gpoutfile != stdout) {
-        /* Stupid VMS fflush() raises error and loses last data block
-           unless it is full for a fixed-length record binary file.
-           Pad it here with NULL characters. */
-        for (k = (INT16) ((*gpoutfile)->_cnt); k > 0; --k)
-            putc('\0', gpoutfile);
-        fflush(gpoutfile);
+	/* Stupid VMS fflush() raises error and loses last data block
+	   unless it is full for a fixed-length record binary file.
+	   Pad it here with NULL characters. */
+	for (k = (INT16) ((*gpoutfile)->_cnt); k > 0; --k)
+	    putc('\0', gpoutfile);
+	fflush(gpoutfile);
     }
 }
 #endif /* VMS */
@@ -2364,241 +2364,241 @@ enhanced_recursion(
     (term->enhanced_flush)();
 
     if (base + fontsize > enhanced_max_height) {
-        enhanced_max_height = base + fontsize;
-        ENH_DEBUG(("Setting max height to %.1f\n", enhanced_max_height));
+	enhanced_max_height = base + fontsize;
+	ENH_DEBUG(("Setting max height to %.1f\n", enhanced_max_height));
     }
 
     if (base < enhanced_min_height) {
-        enhanced_min_height = base;
-        ENH_DEBUG(("Setting min height to %.1f\n", enhanced_min_height));
+	enhanced_min_height = base;
+	ENH_DEBUG(("Setting min height to %.1f\n", enhanced_min_height));
     }
 
     while (*p) {
-        float shift;
+	float shift;
 
-        switch (*p) {
-        case '}'  :
-            /*{{{  deal with it*/
-            if (brace)
-                return (p);
+	switch (*p) {
+	case '}'  :
+	    /*{{{  deal with it*/
+	    if (brace)
+		return (p);
 
-            fputs("enhanced text parser - spurious }\n", stderr);
-            break;
-            /*}}}*/
+	    fputs("enhanced text parser - spurious }\n", stderr);
+	    break;
+	    /*}}}*/
 
-        case '_'  :
-        case '^'  :
-            /*{{{  deal with super/sub script*/
-            shift = (*p == '^') ? 0.5 : -0.3;
-            (term->enhanced_flush)();
-            p = enhanced_recursion(p + 1, FALSE, fontname, fontsize * 0.8,
-                              base + shift * fontsize, widthflag,
-                              showflag, overprint);
-            break;
-            /*}}}*/
-        case '{'  :
-            {
-                char *savepos = NULL, save = 0;
-                char *localfontname = fontname, ch;
-                int recode = 1;
-                float f = fontsize, ovp;
+	case '_'  :
+	case '^'  :
+	    /*{{{  deal with super/sub script*/
+	    shift = (*p == '^') ? 0.5 : -0.3;
+	    (term->enhanced_flush)();
+	    p = enhanced_recursion(p + 1, FALSE, fontname, fontsize * 0.8,
+			      base + shift * fontsize, widthflag,
+			      showflag, overprint);
+	    break;
+	    /*}}}*/
+	case '{'  :
+	    {
+		char *savepos = NULL, save = 0;
+		char *localfontname = fontname, ch;
+		int recode = 1;
+		float f = fontsize, ovp;
 
-                /*{{{  recurse (possibly with a new font) */
+		/*{{{  recurse (possibly with a new font) */
 
-                ENH_DEBUG(("Dealing with {\n"));
+		ENH_DEBUG(("Dealing with {\n"));
 
-                /* get vertical offset (if present) for overprinted text */
-                while (*++p == ' ');
-                if (overprint == 2) {
-                    ovp = (float)strtod(p,&p);
-                    if (term->flags & TERM_IS_POSTSCRIPT)
-                        base = ovp*f;
-                    else
-                        base += ovp*f;
-                }
-                --p;            /* HBB 20001021: bug fix: 10^{2} broken */
+		/* get vertical offset (if present) for overprinted text */
+		while (*++p == ' ');
+		if (overprint == 2) {
+		    ovp = (float)strtod(p,&p);
+		    if (term->flags & TERM_IS_POSTSCRIPT)
+			base = ovp*f;
+		    else
+			base += ovp*f;
+		}
+		--p;            /* HBB 20001021: bug fix: 10^{2} broken */
 
-                if (*++p == '/') {
-                    /* then parse a fontname, optional fontsize */
-                    while (*++p == ' ')
-                        ;       /* do nothing */
-                    if (*p=='-') {
-                        recode = 0;
-                        while (*++p == ' ')
-                            ;   /* do nothing */
-                    }
-                    localfontname = p;
-                    while ((ch = *p) > ' ' && ch != '=' && ch != '*')
-                        ++p;
-                    save = *(savepos=p);
-                    if (ch == '=') {
-                        *p++ = '\0';
-                        /*{{{  get optional font size*/
-                        ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
-                        f = (float)strtod(p, &p);
-                        ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
+		if (*++p == '/') {
+		    /* then parse a fontname, optional fontsize */
+		    while (*++p == ' ')
+			;       /* do nothing */
+		    if (*p=='-') {
+			recode = 0;
+			while (*++p == ' ')
+			    ;   /* do nothing */
+		    }
+		    localfontname = p;
+		    while ((ch = *p) > ' ' && ch != '=' && ch != '*')
+			++p;
+		    save = *(savepos=p);
+		    if (ch == '=') {
+			*p++ = '\0';
+			/*{{{  get optional font size*/
+			ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
+			f = (float)strtod(p, &p);
+			ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
 
-                        if (f == 0)
-                            f = fontsize;
-                        else
-                            f *= enhanced_fontscale;  /* remember the scaling */
+			if (f == 0)
+			    f = fontsize;
+			else
+			    f *= enhanced_fontscale;  /* remember the scaling */
 
-                        ENH_DEBUG(("Font size %.1f\n", f));
-                        /*}}}*/
-                    } else if (ch == '*') {
-                        *p++ = '\0';
-                        /*{{{  get optional font size scale factor*/
-                        ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
-                        f = (float)strtod(p, &p);
-                        ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
+			ENH_DEBUG(("Font size %.1f\n", f));
+			/*}}}*/
+		    } else if (ch == '*') {
+			*p++ = '\0';
+			/*{{{  get optional font size scale factor*/
+			ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
+			f = (float)strtod(p, &p);
+			ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
 
-                        if (f)
-                            f *= fontsize;  /* apply the scale factor */
-                        else
-                            f = fontsize;
+			if (f)
+			    f *= fontsize;  /* apply the scale factor */
+			else
+			    f = fontsize;
 
-                        ENH_DEBUG(("Font size %.1f\n", f));
-                        /*}}}*/
-                    } else {
-                        *p++ = '\0';
-                        f = fontsize;
-                    }
+			ENH_DEBUG(("Font size %.1f\n", f));
+			/*}}}*/
+		    } else {
+			*p++ = '\0';
+			f = fontsize;
+		    }
 
-                    while (*p == ' ')
-                        ++p;
-                    if (! *localfontname) {
-                        localfontname = fontname;
+		    while (*p == ' ')
+			++p;
+		    if (! *localfontname) {
+			localfontname = fontname;
 #ifdef POSTSCRIPT_DRIVER
-                    } else if (!strncmp("postscript",term->name,9)) {
-                        /* FIXME - This cruft is left over from when the code */
-                        /* was part of post.trm.  No one else needs it!       */
-                        char *recodestring = (PS_RememberFont)(localfontname,
-                                                 recode && !ENHps_opened_string);
-                        if (recode && recodestring) {
-                            (term->enhanced_flush)();
-                            fprintf(gpoutfile, "/%s %s",
-                                    localfontname, recodestring);
-                        }
+		    } else if (!strncmp("postscript",term->name,9)) {
+			/* FIXME - This cruft is left over from when the code */
+			/* was part of post.trm.  No one else needs it!       */
+			char *recodestring = (PS_RememberFont)(localfontname,
+				                 recode && !ENHps_opened_string);
+			if (recode && recodestring) {
+			    (term->enhanced_flush)();
+			    fprintf(gpoutfile, "/%s %s",
+				    localfontname, recodestring);
+			}
 #endif
-                    }
-                }
-                /*}}}*/
+		    }
+		}
+		/*}}}*/
 
-                ENH_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p));
+		ENH_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p));
 
-                p = enhanced_recursion(p, TRUE, localfontname, f, base,
-                                  widthflag, showflag, overprint);
+		p = enhanced_recursion(p, TRUE, localfontname, f, base,
+				  widthflag, showflag, overprint);
 
-                ENH_DEBUG(("BACK WITH \"%s\"\n", p));
+		ENH_DEBUG(("BACK WITH \"%s\"\n", p));
 
-                (term->enhanced_flush)();
+		(term->enhanced_flush)();
 
-                if (savepos)
-                    /* restore overwritten character */
-                    *savepos = save;
-                break;
-            } /* case '{' */
-        case '@' :
-            /*{{{  phantom box - prints next 'char', then restores currentpoint */
-            (term->enhanced_flush)();
-            (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, 3);
-            p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
-                              widthflag, showflag, overprint);
-            (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, 4);
-            break;
-            /*}}}*/
+		if (savepos)
+		    /* restore overwritten character */
+		    *savepos = save;
+		break;
+	    } /* case '{' */
+	case '@' :
+	    /*{{{  phantom box - prints next 'char', then restores currentpoint */
+	    (term->enhanced_flush)();
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, 3);
+	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
+			      widthflag, showflag, overprint);
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, 4);
+	    break;
+	    /*}}}*/
 
-        case '&' :
-            /*{{{  character skip - skips space equal to length of character(s) */
-            (term->enhanced_flush)();
+	case '&' :
+	    /*{{{  character skip - skips space equal to length of character(s) */
+	    (term->enhanced_flush)();
 
-            p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
-                              widthflag, FALSE, overprint);
-            break;
-            /*}}}*/
+	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
+			      widthflag, FALSE, overprint);
+	    break;
+	    /*}}}*/
 
-        case '~' :
-            /*{{{ overprinted text */
-            /* the second string is overwritten on the first, centered
-             * horizontally on the first and (optionally) vertically
-             * shifted by an amount specified (as a fraction of the
-             * current fontsize) at the beginning of the second string
+	case '~' :
+	    /*{{{ overprinted text */
+	    /* the second string is overwritten on the first, centered
+	     * horizontally on the first and (optionally) vertically
+	     * shifted by an amount specified (as a fraction of the
+	     * current fontsize) at the beginning of the second string
 
-             * Note that in this implementation neither the under- nor
-             * overprinted string can contain syntax that would result
-             * in additional recursions -- no subscripts,
-             * superscripts, or anything else, with the exception of a
-             * font definition at the beginning of the text */
+	     * Note that in this implementation neither the under- nor
+	     * overprinted string can contain syntax that would result
+	     * in additional recursions -- no subscripts,
+	     * superscripts, or anything else, with the exception of a
+	     * font definition at the beginning of the text */
 
-            (term->enhanced_flush)();
-            p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
-                              widthflag, showflag, 1);
-            (term->enhanced_flush)();
-            p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
-                              FALSE, showflag, 2);
+	    (term->enhanced_flush)();
+	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
+			      widthflag, showflag, 1);
+	    (term->enhanced_flush)();
+	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
+			      FALSE, showflag, 2);
 
-            overprint = 0;   /* may not be necessary, but just in case . . . */
-            break;
-            /*}}}*/
+	    overprint = 0;   /* may not be necessary, but just in case . . . */
+	    break;
+	    /*}}}*/
 
-        case '('  :
-        case ')'  :
-            /*{{{  an escape and print it */
-            /* special cases */
-            (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
-            if (term->flags & TERM_IS_POSTSCRIPT)
-                (term->enhanced_writec)('\\');
-            (term->enhanced_writec)(*p);
-            break;
-            /*}}}*/
+	case '('  :
+	case ')'  :
+	    /*{{{  an escape and print it */
+	    /* special cases */
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+	    if (term->flags & TERM_IS_POSTSCRIPT)
+		(term->enhanced_writec)('\\');
+	    (term->enhanced_writec)(*p);
+	    break;
+	    /*}}}*/
 
-        case '\\'  :
-            if (p[1]=='\\' || p[1]=='(' || p[1]==')') {
-                (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
-                (term->enhanced_writec)('\\');
+	case '\\'  :
+	    if (p[1]=='\\' || p[1]=='(' || p[1]==')') {
+		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+		(term->enhanced_writec)('\\');
 
-            /*{{{  The enhanced mode always uses \xyz as an octal character representation
-                   but each terminal type must give us the actual output format wanted.
-                   pdf.trm wants the raw character code, which is why we use strtol();
-                   most other terminal types want some variant of "\\%o". */
-            } else if (p[1] >= '0' && p[1] <= '7') {
-                char *e, escape[16], octal[4] = {'\0','\0','\0','\0'};
+	    /*{{{  The enhanced mode always uses \xyz as an octal character representation
+		   but each terminal type must give us the actual output format wanted.
+		   pdf.trm wants the raw character code, which is why we use strtol();
+		   most other terminal types want some variant of "\\%o". */
+	    } else if (p[1] >= '0' && p[1] <= '7') {
+		char *e, escape[16], octal[4] = {'\0','\0','\0','\0'};
 
-                (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
-                octal[0] = *(++p);
-                if (p[1] >= '0' && p[1] <= '7') {
-                    octal[1] = *(++p);
-                    if (p[1] >= '0' && p[1] <= '7')
-                        octal[2] = *(++p);
-                }
-                sprintf(escape, enhanced_escape_format, strtol(octal,NULL,8));
-                for (e=escape; *e; e++) {
-                    (term->enhanced_writec)(*e);
-                }
-                break;
-            } else if (term->flags & TERM_IS_POSTSCRIPT) {
-                /* Shigeharu TAKENO  Aug 2004 - Needed in order for shift-JIS */
-                /* encoding to work. If this change causes problems then we   */
-                /* need a separate flag for shift-JIS and certain other 8-bit */
-                /* character sets.                                            */
-                /* EAM Nov 2004 - Nevertheless we must allow \ to act as an   */
-                /* escape for the 5 enhanced mode formatting characters even  */
-                /* though it corrupts certain Shift-JIS character sequences.  */
-                if (strchr("^_@&~",p[1]) == NULL) {
-                    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
-                    (term->enhanced_writec)('\\');
-                    (term->enhanced_writec)('\\');
-                    break;
-                }
-            }
-            ++p;
+		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+		octal[0] = *(++p);
+		if (p[1] >= '0' && p[1] <= '7') {
+		    octal[1] = *(++p);
+		    if (p[1] >= '0' && p[1] <= '7')
+			octal[2] = *(++p);
+		}
+		sprintf(escape, enhanced_escape_format, strtol(octal,NULL,8));
+		for (e=escape; *e; e++) {
+		    (term->enhanced_writec)(*e);
+		}
+		break;
+	    } else if (term->flags & TERM_IS_POSTSCRIPT) {
+		/* Shigeharu TAKENO  Aug 2004 - Needed in order for shift-JIS */
+		/* encoding to work. If this change causes problems then we   */
+		/* need a separate flag for shift-JIS and certain other 8-bit */
+		/* character sets.                                            */
+		/* EAM Nov 2004 - Nevertheless we must allow \ to act as an   */
+		/* escape for the 5 enhanced mode formatting characters even  */
+		/* though it corrupts certain Shift-JIS character sequences.  */
+		if (strchr("^_@&~",p[1]) == NULL) {
+		    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+		    (term->enhanced_writec)('\\');
+		    (term->enhanced_writec)('\\');
+		    break;
+		}
+	    }
+	    ++p;
 
-            /* HBB 20030122: Avoid broken output if there's a \
-             * exactly at the end of the line */
-            if (*p == '\0') {
-                fputs("enhanced text parser -- spurious backslash\n", stderr);
-                break;
-            }
+	    /* HBB 20030122: Avoid broken output if there's a \
+	     * exactly at the end of the line */
+	    if (*p == '\0') {
+		fputs("enhanced text parser -- spurious backslash\n", stderr);
+		break;
+	    }
 
 	    /* SVG requires an escaped '&' to be passed as something else */
 	    /* FIXME: terminal-dependent code does not belong here */
@@ -2608,26 +2608,26 @@ enhanced_recursion(
 		break;
 	    }
 
-            /* just go and print it (fall into the 'default' case) */
-            /*}}}*/
-        default:
-            /*{{{  print it */
-            (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
-            (term->enhanced_writec)(*p);
-            /*}}}*/
-        } /* switch (*p) */
+	    /* just go and print it (fall into the 'default' case) */
+	    /*}}}*/
+	default:
+	    /*{{{  print it */
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+	    (term->enhanced_writec)(*p);
+	    /*}}}*/
+	} /* switch (*p) */
 
-        /* like TeX, we only do one character in a recursion, unless it's
-         * in braces
-         */
+	/* like TeX, we only do one character in a recursion, unless it's
+	 * in braces
+	 */
 
-        if (!brace) {
-            (term->enhanced_flush)();
-            return(p);  /* the ++p in the outer copy will increment us */
-        }
+	if (!brace) {
+	    (term->enhanced_flush)();
+	    return(p);  /* the ++p in the outer copy will increment us */
+	}
 
-        if (*p) /* only not true if { not terminated, I think */
-            ++p;
+	if (*p) /* only not true if { not terminated, I think */
+	    ++p;
     } /* while (*p) */
 
     (term->enhanced_flush)();
@@ -2639,10 +2639,10 @@ void
 enh_err_check(const char *str)
 {
     if (*str == '}')
-        fputs("enhanced text mode parser - ignoring spurious }\n", stderr);
+	fputs("enhanced text mode parser - ignoring spurious }\n", stderr);
     else
-        fprintf(stderr, "enhanced text mode parsing error - *str=0x%x\n",
-                *str);
+	fprintf(stderr, "enhanced text mode parsing error - *str=0x%x\n",
+		*str);
 }
 
 /* Helper function for multiplot auto layout to issue size and offest cmds */
@@ -2659,9 +2659,9 @@ mp_layout_size_and_offset(void)
     /* the 'set origin' command */
     xoffset = (double)(mp_layout.act_col) / mp_layout.num_cols;
     if (mp_layout.downwards)
-        yoffset = 1.0 - (double)(mp_layout.act_row+1) / mp_layout.num_rows;
+	yoffset = 1.0 - (double)(mp_layout.act_row+1) / mp_layout.num_rows;
     else
-        yoffset = (double)(mp_layout.act_row) / mp_layout.num_rows;
+	yoffset = (double)(mp_layout.act_row) / mp_layout.num_rows;
     /* fprintf(stderr,"xoffset==%g  yoffset==%g\n", xoffset,yoffset); */
 
     /* Allow a little space at the top for a title */
@@ -2696,15 +2696,15 @@ int len;
 
 #ifdef GP_ENH_EST
     if (term->flags & TERM_ENHANCED_TEXT) {
-        struct termentry *tsave = term;
-        term = &ENHest;
-        term->put_text(0,0,text);
-        len = term->xmax;
-        term = tsave;
-        FPRINTF((stderr,"Estimating length %d for enhanced text string \"%s\"\n",len,text));
+	struct termentry *tsave = term;
+	term = &ENHest;
+	term->put_text(0,0,text);
+	len = term->xmax;
+	term = tsave;
+	FPRINTF((stderr,"Estimating length %d for enhanced text string \"%s\"\n",len,text));
     } else
 #endif
-        len = strlen(text);
+	len = strlen(text);
 
     return len;
 }
@@ -2714,9 +2714,9 @@ ignore_enhanced(TBOOLEAN flag)
 {
     /* Force a return to the default font */
     if (flag && !ignore_enhanced_text) {
-        ignore_enhanced_text = TRUE;
-        if (term->set_font)
-            term->set_font("");
+	ignore_enhanced_text = TRUE;
+	if (term->set_font)
+	    term->set_font("");
     }
     ignore_enhanced_text = flag;
 }
