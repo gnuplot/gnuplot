@@ -1,5 +1,5 @@
 /*
- * $Id: internal.h,v 1.15 2006/06/10 00:35:26 sfeam Exp $
+ * $Id: internal.h,v 1.16 2007/03/30 05:18:46 sfeam Exp $
  */
 
 /* GNUPLOT - internal.h */
@@ -75,7 +75,6 @@ void f_mod __PROTO((union argument *x));
 void f_power __PROTO((union argument *x));
 void f_factorial __PROTO((union argument *x));
 
-#ifdef GP_STRING_VARS
 void f_concatenate __PROTO((union argument *x));
 void f_eqs __PROTO((union argument *x));
 void f_nes __PROTO((union argument *x));
@@ -88,6 +87,5 @@ void f_system __PROTO((union argument *x));
 void f_words __PROTO((union argument *x));
 void f_strftime __PROTO((union argument *x));
 void f_strptime __PROTO((union argument *x));
-#endif
 
 #endif /* GNUPLOT_INTERNAL_H */

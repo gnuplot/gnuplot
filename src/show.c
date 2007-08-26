@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.193 2007/04/07 22:31:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.194 2007/06/22 04:28:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -981,9 +981,7 @@ show_version(FILE *fp)
 #ifdef EAM_OBJECTS
 		"+OBJECTS  "
 #endif
-#ifdef GP_STRING_VARS
 		"+STRINGVARS  "
-#endif
 #ifdef GP_MACROS
 		"+MACROS  "
 #endif
@@ -3132,7 +3130,6 @@ disp_value(FILE *fp, struct value *val, TBOOLEAN need_quotes)
 	    fprintf(fp, "%s",
 		    num_to_str(val->v.cmplx_val.real));
 	break;
-#ifdef GP_STRING_VARS
     case STRING:
     	if (val->v.string_val) {
 	    if (need_quotes)
@@ -3141,7 +3138,6 @@ disp_value(FILE *fp, struct value *val, TBOOLEAN need_quotes)
 		fprintf(fp, "%s", val->v.string_val);
 	}
 	break;
-#endif
     default:
 	int_error(NO_CARET, "unknown type in disp_value()");
     }

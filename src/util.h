@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.27 2005/10/22 05:50:13 sfeam Exp $
+ * $Id: util.h,v 1.28 2007/05/10 22:49:37 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -82,12 +82,8 @@ char *try_to_get_string __PROTO((void));
 void parse_esc __PROTO((char *));
 int type_udv __PROTO((int));
 
-#ifdef GP_STRING_VARS
 char *gp_stradd __PROTO((const char *, const char *));
 #define isstringvalue(c_token) (isstring(c_token) || type_udv(c_token)==STRING)
-#else
-#define isstringvalue(c_token) isstring(c_token)
-#endif
 
 /* HBB 20010726: IMHO this one belongs into alloc.c: */
 char *gp_strdup __PROTO((const char *));

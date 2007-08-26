@@ -1,5 +1,17 @@
 2007-08-26  Ethan Merritt  <merritt@u.washington.edu>
 
+	* config/config.cyg config/config.mgw config/config.nt config/config.os2
+	config/config.oww config/config.wc config/config.dj2 configure.in 
+	src/command.c src/datafile.c src/datafile.h src/eval.c src/eval.h
+	src/gp_types.h src/internal.c src/internal.h src/mouse.c src/parse.c
+	src/parse.h src/scanner.c src/set.c src/show.c src/standard.c src/term.c
+	src/util.c src/util.h
+
+	Remove the conditional compilation flag GP_STRING_VARS.  This means that
+	string variables are always supported.
+
+2007-08-26  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/axis.c src/gadgets.c (apply_pm3dcolor): Remove dead code.
 
 	* src/plot.c src/plot2d.c src/plot3d.c src/term.c: Whitespace cleanup.

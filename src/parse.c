@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.48 2006/10/21 04:32:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.49 2006/12/27 21:40:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -169,14 +169,12 @@ string_or_express(struct at_type **atptr)
     if (END_OF_COMMAND)
 	int_error(c_token, "expression expected");
 
-#ifndef GP_STRING_VARS
     if (isstring(c_token)) {
 	if (atptr)
 	    *atptr = NULL;
 	str = try_to_get_string();
 	return str;
     }
-#endif
 
     /* parse expression */
     temp_at();
@@ -196,10 +194,8 @@ string_or_express(struct at_type **atptr)
 	struct value val;
 
 	evaluate_at(at, &val);
-#ifdef GP_STRING_VARS
 	if (!undefined && val.type == STRING)
 	    str = val.v.string_val;
-#endif
     }
 
     /* prepare return */
@@ -416,7 +412,6 @@ parse_primary_expression()
 		    int_error(c_token, "')' expected");
 		c_token++;
 
-#ifdef GP_STRING_VARS
 		/* So far sprintf is the only built-in function */
 		/* with a variable number of arguments.         */
 		if (!strcmp(ft[whichfunc].f_name,"sprintf"))
@@ -426,7 +421,7 @@ parse_primary_expression()
 		    num_params.v.int_val = -1;
 		    add_action(PUSHC)->v_arg = num_params;
 		}
-#endif
+
 		(void) add_action(whichfunc);
 
 	    } else {
@@ -487,7 +482,6 @@ parse_primary_expression()
     }
     /* end if letter */
 
-#ifdef GP_STRING_VARS
     /* Maybe it's a string constant */
     else if (isstring(c_token)) {
 	union argument *foo = add_action(PUSHC);
@@ -496,10 +490,7 @@ parse_primary_expression()
 	/* this dynamically allocated string will be freed by free_at() */
 	m_quote_capture(&(foo->v_arg.v.string_val), c_token, c_token);
 	c_token++;
-    }
-#endif
-
-    else
+    } else
 	int_error(c_token, "invalid expression ");
 
     /* add action code for ! (factorial) operator */
@@ -513,7 +504,7 @@ parse_primary_expression()
 	parse_unary_expression();
 	(void) add_action(POWER);
     }
-#ifdef GP_STRING_VARS
+
     /* Parse and add actions for range specifier applying to previous entity.
      * Currently only used to generate substrings, but could also be used to
      * extract vector slices.
@@ -544,7 +535,6 @@ parse_primary_expression()
 	c_token++;
 	(void) add_action(RANGE);
     }
-#endif
 }
 
 
@@ -676,7 +666,6 @@ parse_equality_expression()
 	    c_token++;
 	    accept_relational_expression();
 	    (void) add_action(NE);
-#ifdef GP_STRING_VARS
 	} else if (equals(c_token, "eq")) {
 	    c_token++;
 	    accept_relational_expression();
@@ -685,7 +674,6 @@ parse_equality_expression()
 	    c_token++;
 	    accept_relational_expression();
 	    (void) add_action(NES);
-#endif
 	} else
 	    break;
     }
@@ -729,7 +717,6 @@ parse_additive_expression()
 {
     /* create action codes for +, - and . operators */
     while (TRUE) {
-#ifdef GP_STRING_VARS
 	if (equals(c_token, ".")) {
 	    c_token++;
 	    accept_multiplicative_expression();
@@ -738,9 +725,7 @@ parse_additive_expression()
 	 * do not accept '-' or '+' at the top level. */
 	} else if (string_result_only && parse_recursion_level == 1)
 	    break;
-	else
-#endif
-	if (equals(c_token, "+")) {
+	else if (equals(c_token, "+")) {
 	    c_token++;
 	    accept_multiplicative_expression();
 	    (void) add_action(PLUS);

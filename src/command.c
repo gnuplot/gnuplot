@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.157 2007/06/01 16:56:44 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.158 2007/08/02 16:50:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -510,11 +510,9 @@ define()
 	c_token += 2;
 	udv = add_udv(start_token);
 	(void) const_express(&result);
-#ifdef GP_STRING_VARS
 	/* Prevents memory leak if the variable name is re-used */
 	if (!udv->udv_undef)
 	    gpfree_string(&udv->udv_value);
-#endif
 	udv->udv_value = result;
 	udv->udv_undef = FALSE;
     }
@@ -1276,7 +1274,6 @@ print_command()
     }
     screen_ok = FALSE;
     do {
-#ifdef GP_STRING_VARS
 	++c_token;
 	const_express(&a);
 	if (a.type == STRING) {
@@ -1289,22 +1286,6 @@ print_command()
 	    disp_value(print_out, &a, FALSE);
 	    need_space = 1;
 	}
-#else
-	char *s;
-	++c_token;
-	s = try_to_get_string();
-	if (s) {
-	    fputs(s, print_out);
-	    free(s);
-	    need_space = 0;
-	} else {
-	    (void) const_express(&a);
-	    if (need_space)
-		putc(' ', print_out);
-	    disp_value(print_out, &a, FALSE);
-	    need_space = 1;
-	}
-#endif
     } while (!END_OF_COMMAND && equals(c_token, ","));
 
     (void) putc('\n', print_out);

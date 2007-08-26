@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.43 2007/06/24 04:31:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.44 2007/07/16 20:37:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -40,9 +40,7 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.43 2007/06/24 04:31:58 
 #include "stdfn.h"
 #include "alloc.h"
 #include "util.h"		/* for int_error() */
-#ifdef GP_STRING_VARS
 # include "gp_time.h"           /* for str(p|f)time */
-#endif
 #include "command.h"            /* for do_system_func */
 
 #include <math.h>
@@ -57,9 +55,7 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.43 2007/06/24 04:31:58 
  *   matherr() in their programs.
  */
 
-#ifdef GP_STRING_VARS
 static enum DATA_TYPES sprintf_specifier __PROTO((const char *format));
-#endif
 
 
 int
@@ -298,13 +294,11 @@ f_band(union argument *arg)
 }
 
 
-#if (GP_STRING_VARS > 1)
 /*
  * Make all the following internal routines perform autoconversion
  * from string to numeric value.
  */
 #define pop(x) pop_or_convert_from_string(x)
-#endif
 
 void
 f_uminus(union argument *arg)
@@ -971,7 +965,6 @@ f_factorial(union argument *arg)
 
 }
 
-#ifdef GP_STRING_VARS
 /*
  * Terminate the autoconversion from string to numeric values
  */
@@ -1534,4 +1527,3 @@ f_system(union argument *arg)
     gpfree_string(&result); /* free output */
     gpfree_string(&val);    /* free command string */
 }
-#endif

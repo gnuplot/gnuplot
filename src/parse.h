@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.15 2006/10/21 04:32:41 sfeam Exp $
+ * $Id: parse.h,v 1.16 2006/12/27 21:40:27 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -59,9 +59,7 @@ extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 
 int int_expression __PROTO(());
 double real_expression __PROTO(());
-#ifdef GP_STRING_VARS
 struct value * const_string_express __PROTO((struct value *valptr));
-#endif
 struct value * const_express __PROTO((struct value *valptr));
 char* string_or_express __PROTO((struct at_type **atptr));
 struct at_type * temp_at __PROTO((void));

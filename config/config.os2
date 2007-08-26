@@ -59,9 +59,6 @@
 /* Define to allow command line macros. EXPERIMENTAL */
 #define GP_MACROS 1
 
-/* Define to allow string variables. EXPERIMENTAL */
-#define GP_STRING_VARS 2
-
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
 /* #undef GRX21 */
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.24 2006/06/10 00:35:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.25 2006/07/14 00:30:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -480,13 +480,11 @@ static double GPFAR qyone[] = {
 
 #endif /* (ATARI || MTOS) && __PUREC__ */
 
-#if (GP_STRING_VARS > 1)
 /*
  * Make all the following internal routines perform autoconversion
  * from string to numeric value.
  */
 #define pop(x) pop_or_convert_from_string(x)
-#endif
 
 void
 f_real(union argument *arg)
@@ -967,10 +965,8 @@ f_ceil(union argument *arg)
     }
 }
 
-#if (GP_STRING_VARS > 1)
 /* Terminate the autoconversion from string to numeric values */
 #undef pop
-#endif
 
 /* EAM - replacement for defined(foo) + f_pushv + f_isvar
  *       implements      exists("foo") instead
@@ -978,7 +974,6 @@ f_ceil(union argument *arg)
 void
 f_exists(union argument *arg)
 {
-#ifdef GP_STRING_VARS
     struct value a;
 
     (void) arg;			/* avoid -Wunused warning */
@@ -991,7 +986,6 @@ f_exists(union argument *arg)
     } else {
 	push(Ginteger(&a, 0));
     }
-#endif
 }
 
 /* bessel function approximations */

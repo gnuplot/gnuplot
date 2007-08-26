@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.92 2007/06/29 20:35:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.93 2007/07/05 04:13:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2447,7 +2447,6 @@ load_mouse_variables(double x, double y, TBOOLEAN button, int c)
 	current->udv_undef = FALSE;
 	Ginteger(&current->udv_value,c);
     }
-#ifdef GP_STRING_VARS
     if ((current = add_udv_by_name("MOUSE_CHAR"))) {
 	char *keychar = gp_alloc(2,"key_char");
 	keychar[0] = c;
@@ -2457,8 +2456,6 @@ load_mouse_variables(double x, double y, TBOOLEAN button, int c)
 	current->udv_undef = FALSE;
 	Gstring(&current->udv_value,keychar);
     }
-#endif
-
     if ((current = add_udv_by_name("MOUSE_X"))) {
 	current->udv_undef = FALSE;
 	Gcomplex(&current->udv_value,real_x,0);

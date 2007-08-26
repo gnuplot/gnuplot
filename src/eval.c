@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.53 2007/03/30 05:18:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.54 2007/04/08 20:06:01 vanzandt Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -115,12 +115,10 @@ const struct ft_entry GPFAR ft[] =
     {"factorial",  f_factorial},
     {"bool",  f_bool},
     {"dollars",  f_dollars},	/* for using extension */
-#ifdef GP_STRING_VARS
     {"concatenate",  f_concatenate},	/* for string variables only */
     {"eqs",  f_eqs},			/* for string variables only */
     {"nes",  f_nes},			/* for string variables only */
     {"[]",  f_range},			/* for string variables only */
-#endif
     {"jump",  f_jump},
     {"jumpz",  f_jumpz},
     {"jumpnz",  f_jumpnz},
@@ -186,7 +184,6 @@ const struct ft_entry GPFAR ft[] =
     {"tm_wday",  f_tmwday},	/* for timeseries */
     {"tm_yday",  f_tmyday},	/* for timeseries */
 
-#ifdef GP_STRING_VARS
     {"stringcolumn",  f_stringcolumn},	/* for using specs */
     {"strcol",  f_stringcolumn},	/* shorthand form */
     {"sprintf",  f_sprintf},	/* for string variables only */
@@ -201,7 +198,6 @@ const struct ft_entry GPFAR ft[] =
     {"system", f_system},       /* "dynamic backtics" */
     {"exist", f_exists},	/* exists("foo") replaces defined(foo) */
     {"exists", f_exists},	/* exists("foo") replaces defined(foo) */
-#endif
 
     {NULL, NULL}
 };
@@ -280,10 +276,8 @@ real(struct value *val)
 	return ((double) val->v.int_val);
     case CMPLX:
 	return (val->v.cmplx_val.real);
-#ifdef GP_STRING_VARS
     case STRING:              /* is this ever used? */
 	return (atof(val->v.string_val));
-#endif
     default:
 	int_error(NO_CARET, "unknown type in real()");
     }
@@ -301,13 +295,11 @@ imag(struct value *val)
 	return (0.0);
     case CMPLX:
 	return (val->v.cmplx_val.imag);
-#ifdef GP_STRING_VARS
     case STRING:
 	/* This is where we end up if the user tries: */
 	/*     x = 2;  plot sprintf(format,x)         */
 	int_warn(NO_CARET, "encountered a string when expecting a number");
 	int_error(NO_CARET, "Did you try to generate a file name using dummy variable x or y?");
-#endif
     default:
 	int_error(NO_CARET, "unknown type in imag()");
     }
@@ -380,7 +372,6 @@ Ginteger(struct value *a, int i)
     return (a);
 }
 
-#ifdef GP_STRING_VARS
 struct value *
 Gstring(struct value *a, char *s)
 {
@@ -388,7 +379,6 @@ Gstring(struct value *a, char *s)
     a->v.string_val = s;
     return (a);
 }
-#endif
 
 /* It is always safe to call gpfree_string with a->type is INTGR or CMPLX.
  * However it would be fatal to call it with a->type = STRING if a->string_val
@@ -398,13 +388,11 @@ Gstring(struct value *a, char *s)
 struct value *
 gpfree_string(struct value *a)
 {
-#ifdef GP_STRING_VARS
     if (a->type == STRING) {
 	free(a->v.string_val);
 	/* I would have set it to INVALID if such a type existed */
 	a->type = INTGR;
     }
-#endif
     return a;
 }
 
@@ -461,7 +449,6 @@ pop(struct value *x)
     return (x);
 }
 
-#if (GP_STRING_VARS > 1)
 /*
  * Allow autoconversion of string variables to floats if they
  * are dereferenced in a numeric context.
@@ -478,7 +465,6 @@ pop_or_convert_from_string(struct value *v)
     }
     return(v);
 }
-#endif
 
 void
 push(struct value *x)
@@ -486,11 +472,9 @@ push(struct value *x)
     if (s_p == STACK_DEPTH - 1)
 	int_error(NO_CARET, "stack overflow");
     stack[++s_p] = *x;
-#ifdef GP_STRING_VARS
     /* WARNING - This is a memory leak if the string is not later freed */
     if (x->type == STRING && x->v.string_val)
 	stack[s_p].v.string_val = gp_strdup(x->v.string_val);
-#endif
 }
 
 
@@ -628,9 +612,7 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 	(void) pop(val_ptr);
 	check_stack();
 	/* At least one machine (ATT 3b1) computes Inf without a SIGFPE */
-#if (GP_STRING_VARS > 1)
 	if (val_ptr->type != STRING)
-#endif
 	temp = real(val_ptr);
 	if (temp > VERYLARGE || temp < -VERYLARGE) {
 	    undefined = TRUE;
@@ -654,7 +636,6 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 void
 free_at(struct at_type *at_ptr)
 {
-#ifdef GP_STRING_VARS
     int i;
     /* All string constants belonging to this action table have to be
      * freed before destruction. */
@@ -666,7 +647,6 @@ free_at(struct at_type *at_ptr)
 	if ( a->index == PUSHC || a->index == DOLLARS )
 	    gpfree_string(&(a->arg.v_arg));
     }
-#endif
     free(at_ptr);
 }
 
@@ -731,7 +711,6 @@ fill_gpval_axis(AXIS_INDEX axis)
 static void
 fill_gpval_string(char *var, const char *stringvalue)
 {
-#ifdef GP_STRING_VARS
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
@@ -742,7 +721,6 @@ fill_gpval_string(char *var, const char *stringvalue)
     else
 	gpfree_string(&v->udv_value);
     Gstring(&v->udv_value, gp_strdup(stringvalue));
-#endif
 }
 
 /*
@@ -793,14 +771,8 @@ update_gpval_variables(int context)
 	    Gcomplex(&v->udv_value, atof(gnuplot_version), 0);
 	}
 	v = add_udv_by_name("GPVAL_PATCHLEVEL");
-	if (v && v->udv_undef == TRUE) {
-#ifdef GP_STRING_VARS
+	if (v && v->udv_undef == TRUE)
 	    fill_gpval_string("GPVAL_PATCHLEVEL", gnuplot_patchlevel);
-#else
-	    v->udv_undef = FALSE; 
-	    Ginteger(&v->udv_value, atoi(gnuplot_patchlevel));
-#endif
-	}
 	v = add_udv_by_name("GPVAL_COMPILE_OPTIONS");
 	if (v && v->udv_undef == TRUE)
 	    fill_gpval_string("GPVAL_COMPILE_OPTIONS", compile_options);

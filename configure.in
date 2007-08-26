@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.220 2007/07/16 21:58:43 tlecomte Exp $
+dnl $Id: configure.in,v 1.221 2007/08/04 22:32:03 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -759,29 +759,13 @@ AC_ARG_ENABLE(objects,dnl
                [ Define to allow placement of rectangles and other objects ])
   fi
 
-dnl string variables
-AC_ARG_ENABLE(stringvariables,dnl
-[  --disable-stringvariables   disable string variables],,
-  test -z "$enable_stringvariables" && enable_stringvariables=yes)
-  if test "$enable_stringvariables" = yes; then
-  AC_DEFINE(GP_STRING_VARS,2,
-               [ Define to allow string variables. ])
-  fi
-
 dnl command line macros
 AC_ARG_ENABLE(macros,dnl
 [  --disable-macros        disable command line macros],,
   test -z "$enable_macros" && enable_macros=yes)
   if test "$enable_macros" = yes; then
-
-    if test "$enable_stringvariables" = yes; then
       AC_DEFINE(GP_MACROS,1,
                [ Define to allow command line macros. EXPERIMENTAL ])
-    else
-      enable_macros=no
-      AC_MSG_WARN( [The --enable-macros option requires --enable-stringvariables. ])
-    fi
-
   fi
 
 dnl IRIS terminal on IRIS4D series computer
@@ -1252,12 +1236,6 @@ if test "$enable_histograms" = yes; then
   AC_MSG_RESULT([  Plot style histograms: yes])
 else
   AC_MSG_RESULT([  Plot style histograms: no (requires string-handling in datafiles)])
-fi
-
-if test "$enable_stringvariables" = yes; then
-  AC_MSG_RESULT([  String variables: yes])
-else
-  AC_MSG_RESULT([  String variables: no])
 fi
 
 if test "$enable_macros" = yes; then

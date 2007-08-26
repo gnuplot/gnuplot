@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.25 2006/06/29 19:36:43 mikulik Exp $
+ * $Id: eval.h,v 1.26 2006/07/21 05:19:51 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -57,9 +57,7 @@ enum operators {
     LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
     DIV, MOD, POWER, FACTORIAL, BOOLE,
     DOLLARS, /* for using extension - div */
-#ifdef GP_STRING_VARS
     CONCATENATE, EQS, NES, RANGE,
-#endif
     /* only jump operators go between jump and sf_start, for is_jump() */
     JUMP, JUMPZ, JUMPNZ, JTERN, SF_START
 };
@@ -141,10 +139,8 @@ double magnitude __PROTO((struct value *));
 double angle __PROTO((struct value *));
 struct value * Gcomplex __PROTO((struct value *, double, double));
 struct value * Ginteger __PROTO((struct value *, int));
-#ifdef GP_STRING_VARS
 struct value * Gstring __PROTO((struct value *, char *));
 struct value * pop_or_convert_from_string __PROTO((struct value *));
-#endif
 struct value * gpfree_string __PROTO((struct value *a));
 
 void reset_stack __PROTO((void));

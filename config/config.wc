@@ -8,7 +8,6 @@
 #define GP_FIT_ERRVARS		1
 #define GP_ISVAR		1
 #define GP_MACROS		1
-#define GP_STRING_VARS		2
 #define HIDDEN3D_QUADTREE	1
 #define USE_ULIG_FILLEDBOXES	   1
 #define USE_ULIG_RELATIVE_BOXWIDTH 1

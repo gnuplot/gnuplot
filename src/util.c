@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.68 2007/04/07 22:31:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.69 2007/05/10 22:49:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -352,10 +352,9 @@ char *
 try_to_get_string()
 {
     char *newstring = NULL;
-
-#ifdef GP_STRING_VARS
     struct value a;
     int save_token = c_token;
+
     if (END_OF_COMMAND)
 	return NULL;
     const_string_express(&a);
@@ -363,7 +362,8 @@ try_to_get_string()
 	newstring = a.v.string_val;
     else
 	c_token = save_token;
-#else
+
+#if (0) /* Old pre-string handling alternative code */
     if (!END_OF_COMMAND && isstring(c_token)) {
 	m_quote_capture(&newstring, c_token, c_token);
 	c_token++;

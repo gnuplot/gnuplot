@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.248 2007/06/22 04:28:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.249 2007/08/03 07:39:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1859,7 +1859,6 @@ set_label()
 	&& !equals(c_token, "font")) {
 
 	/* must be an expression, but is it a tag or is it the label itself? */
-#ifdef GP_STRING_VARS
 	int save_token = c_token;
 	const_express(&a);
 	if (a.type == STRING) {
@@ -1868,9 +1867,6 @@ set_label()
 	    gpfree_string(&a);
 	} else
 	    tag = (int) real(&a);
-#else
-	tag = int_expression();
-#endif
 
     } else
 	tag = assign_label_tag();	/* default next tag */
@@ -1899,21 +1895,13 @@ set_label()
 	this_label = new_label;
     }
 
-#ifdef GP_STRING_VARS
     if (!END_OF_COMMAND) {
 	char* text;
 	parse_label_options( this_label );
 	text = try_to_get_string();
 	if (text)
 	    this_label->text = text;
-#else
-    /* get text from string */
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	char *text = gp_alloc (token_len(c_token), "text_label->text");
-	quote_str(text, c_token, token_len(c_token));
-	c_token++;
-	this_label->text = text;
-#endif
+
 	/* HBB 20001021: new functionality. If next token is a ','
 	 * treat it as a numeric expression whose value is to be
 	 * sprintf()ed into the label string (which contains an
@@ -5079,14 +5067,7 @@ parse_label_options( struct text_label *this_label )
 	 * line is forbidden by the 'set label' command syntax.
 	 * On the other hand, 'plot with labels' may have additional stuff coming up.
 	 */
-#ifdef GP_STRING_VARS
 	break;
-#else
-	if (this_label->tag == -1 || this_label->tag == -2)
-	    break;
-	else
-	    int_error(c_token, "extraneous or contradicting arguments in label options");
-#endif
 
     } /* while(!END_OF_COMMAND) */
 

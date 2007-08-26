@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.23 2005/11/23 23:33:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.24 2007/04/07 22:31:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -136,10 +136,8 @@ scanner(char **expressionp, size_t *expressionlenp)
 	    token[t_num].is_token = FALSE;
 	    token[t_num].length = get_num(&expression[current]);
 	    current += (token[t_num].length - 1);
-#ifdef GP_STRING_VARS
 	    if (token[t_num].length == 1 && expression[current] == '.')
 		token[t_num].is_token = TRUE;
-#endif
 	} else if (expression[current] == LBRACE) {
 	    token[t_num].is_token = FALSE;
 	    token[t_num].l_val.type = CMPLX;
