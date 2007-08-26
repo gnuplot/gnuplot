@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.62 2007/01/29 20:02:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.63 2007/06/29 18:33:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -977,8 +977,6 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		if (minifreq <= 0)
 		    minitics = 0;	/* not much else we can do */
  		else if (axis_array[axis].log) {
-		    /* Sep 2005 - This case has been commented out since v3.7 */
-		    /* but in fact it seems correct, and fixes but #1223149 */
  		    ministart = ministep = step / minifreq * axis_array[axis].base;
  		    miniend = step * axis_array[axis].base;
  		} else {

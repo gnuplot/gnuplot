@@ -446,10 +446,6 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 				tc->value : 1-tc->value);
 		      break;
     }
-    if (tc->type == TC_LT) {
-	(*t->linetype)(tc->lt);
-	return;
-    }
 }
 
 void
