@@ -2,6 +2,8 @@
 
 	* src/axis.c src/gadgets.c (apply_pm3dcolor): Remove dead code.
 
+	* src/plot.c src/plot2d.c src/plot3d.c: Whitespace cleanup.
+
 2007-08-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot):  Revise handling of the key title to match

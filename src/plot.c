@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.94 2007/06/04 20:54:26 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.95 2007/06/22 17:53:33 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -115,7 +115,7 @@ extern smg$create_key_table();
 #  include <readline/tilde.h>
 # endif
 extern int rl_complete_with_tilde_expansion;
-#endif 
+#endif
 
 /* enable gnuplot history with readline */
 #ifdef GNUPLOT_HISTORY
@@ -200,11 +200,11 @@ inter(int anint)
 
 #ifdef OS2
     if (!strcmp(term->name,"pm")) {
-        PM_intc_cleanup();
-        /* ??
-          putc('\n', stderr);
-          LONGJMP(command_line_env, TRUE);
-         */
+	PM_intc_cleanup();
+	/* ??
+	  putc('\n', stderr);
+	  LONGJMP(command_line_env, TRUE);
+	 */
     } else
 #endif
     {
@@ -911,14 +911,14 @@ ExecuteMacro(char *argv, int namelength)
       The positive ones are somehow referenced in REXXPG
    */
     if (rc < 0) {
-        /* REXX error */
+	/* REXX error */
     } else if (rc > 0) {
-        /* Interpreter couldn't be started */
-        if (rc == -4)
-           /* run was cancelled, but don't give error message */
-            rc = 0;
+	/* Interpreter couldn't be started */
+	if (rc == -4)
+	   /* run was cancelled, but don't give error message */
+	    rc = 0;
     } else if (rc==0) {
-        /* all was fine */
+	/* all was fine */
     }
 
 /* We don't we try to use rxRc ?
@@ -926,7 +926,7 @@ ExecuteMacro(char *argv, int namelength)
    and not in our executable using the EMX libraries */
    if (RXSTRPTR(rxRc))
        /* I guess it's NULL if something major went wrong,
-          NULL strings are usually not part of the REXX language ... */
+	  NULL strings are usually not part of the REXX language ... */
        DosFreeMem(rxRc.strptr);
 
    return rc;

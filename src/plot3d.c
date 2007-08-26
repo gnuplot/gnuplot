@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.144 2007/05/10 22:52:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.145 2007/07/02 20:13:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -852,7 +852,7 @@ get_3ddata(struct surface_points *this_plot)
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, x_axis, NOOP, goto come_here_if_undefined);
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, y_axis, NOOP, goto come_here_if_undefined);
 	    if (this_plot->plot_style == VECTOR) {
-		cptail->type = INRANGE;	    
+		cptail->type = INRANGE;
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->x, xtail, cp->type, x_axis, NOOP, goto come_here_if_undefined);
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->y, ytail, cp->type, y_axis, NOOP, goto come_here_if_undefined);
 	    }
@@ -936,11 +936,11 @@ get_3ddata(struct surface_points *this_plot)
     }
 
     if (dgrid3d && this_plot->num_iso_read > 0)
-        grid_nongrid_data(this_plot);
+	grid_nongrid_data(this_plot);
 
     /* This check used to be done in graph3d */
     if (X_AXIS.min == VERYLARGE || X_AXIS.max == -VERYLARGE ||
-	Y_AXIS.min == VERYLARGE || Y_AXIS.max == -VERYLARGE || 
+	Y_AXIS.min == VERYLARGE || Y_AXIS.max == -VERYLARGE ||
 	Z_AXIS.min == VERYLARGE || Z_AXIS.max == -VERYLARGE) {
 	    /* FIXME: Should we set plot type to NODATA? */
 	    /* But in the case of 'set view map' we may not care about Z */
@@ -1189,7 +1189,7 @@ eval_3dplots()
 		    if (axis_array[FIRST_Y_AXIS].is_timedata) {
 			int_error(c_token, "Need full using spec for y time data");
 		    }
-		} 
+		}
 		df_axis[0] = FIRST_X_AXIS;
 		df_axis[1] = FIRST_Y_AXIS;
 		df_axis[2] = FIRST_Z_AXIS;
@@ -1397,7 +1397,7 @@ eval_3dplots()
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
 			lp_use_properties(&lp, line_num+1, TRUE);
-		    
+
  		    lp_parse(&lp, TRUE,
 			     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 		    checked_once = TRUE;
@@ -1779,7 +1779,7 @@ eval_3dplots()
 		i = this_plot->plot_num;
 		do
 		    this_plot = this_plot->next_sp;
-		while (this_plot 
+		while (this_plot
 			&& this_plot->token == c_token
 			&& this_plot->plot_num == i);
 
@@ -1904,10 +1904,10 @@ eval_3dplots()
 	do_3dplot(first_3dplot, plot_num, 0);
 	END_LEAK_CHECK();
 
-        /* after do_3dplot(), axis_array[] and max_array[].min
-         * contain the plotting range actually used (rounded
-         * to tic marks, not only the min/max data values)
-         * --> save them now for writeback if requested
+	/* after do_3dplot(), axis_array[] and max_array[].min
+	 * contain the plotting range actually used (rounded
+	 * to tic marks, not only the min/max data values)
+	 * --> save them now for writeback if requested
 	 */
 	SAVE_WRITEBACK_ALL_AXES;
 	/* update GPVAL_ variables available to user */
