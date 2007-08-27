@@ -1,5 +1,11 @@
 2007-08-27  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/parse.c (parse_primary_expression) src/internal.c (f_pop)
+	internal.h eval.c eval.h docs/gnuplot.doc: 
+	Extend expression parsing to accept ',' separating two expressions.
+
+2007-08-27  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/parse.c (parse_expression parse_assignment_expression):
 	Extend expression parsing to accept '=' as an assignment operator.
 

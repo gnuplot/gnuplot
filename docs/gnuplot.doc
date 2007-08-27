@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.446 2007/08/17 20:25:21 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.447 2007/08/28 05:56:29 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1580,6 +1580,7 @@ C ... and restart the table:
        &&          a&&b        * logical AND
        ||          a||b        * logical OR
        =           a = b         assignment
+       ,           (a,b)         serial evaluation
        .           A.B           string concatenation
        eq          A eq B        string equality
        ne          A ne B        string inequality
@@ -1608,6 +1609,7 @@ C ... and restart the table:
 #\verb~&&~ & \verb~a&&b~ & * logical AND\\
 #\verb~||~ & \verb~a||b~ & * logical OR\\
 #\verb~=~ & \verb~a = b~ & assignment\\
+#\verb~,~ & \verb~(a,b)~ & serial evaluation\\
 #\verb~.~ & \verb~A.B~ & string concatenation\\
 #\verb~eq~ & \verb~A eq B~ & string equality\\
 #\verb~ne~ & \verb~A ne B~ & string inequality\\
@@ -1632,6 +1634,7 @@ C ... and restart the table:
 %&&@a&&b@* logical AND
 %||@a||b@* logical OR
 %=@a = b@assignment
+%,@(a,b)@serial evaluation
 %.@a.b@string concatenation
 %eq@A eq B@string equality
 %ne@A ne B@string inequality
@@ -1644,6 +1647,9 @@ C ... and restart the table:
  Logical AND (&&) and OR (||) short-circuit the way they do in C.  That is,
  the second `&&` operand is not evaluated if the first is false; the second
  `||` operand is not evaluated if the first is true.
+
+ Serial evaluation occurs only in parentheses and is guaranteed to proceed
+ in left to right order.  The value of the rightmost subexpression is returned.
 4 Ternary
 ?expressions operators ternary
 ?operators ternary

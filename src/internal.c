@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.45 2007/08/27 04:33:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.46 2007/08/28 05:56:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -125,6 +125,13 @@ f_pushd1(union argument *x)
     push(&(x->udf_arg->dummy_values[0]));
 }
 
+void
+f_pop(union argument *x)
+{
+    struct value dummy;
+    pop(&dummy);
+    gpfree_string(&dummy);
+}
 
 void
 f_pushd2(union argument *x)

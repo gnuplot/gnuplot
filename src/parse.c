@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.50 2007/08/27 04:33:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.51 2007/08/28 05:56:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -384,6 +384,14 @@ parse_primary_expression()
     if (equals(c_token, "(")) {
 	c_token++;
 	parse_expression();
+
+	/* Expressions may be separated by a comma */
+	while (equals(c_token,",")) {
+	    c_token++;
+	    (void) add_action(POP);
+	    parse_expression();
+	}
+
 	if (!equals(c_token, ")"))
 	    int_error(c_token, "')' expected");
 	c_token++;
