@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.49 2006/12/27 21:40:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.50 2007/08/27 04:33:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -83,6 +83,7 @@ static void parse_relational_expression __PROTO((void));
 static void parse_additive_expression __PROTO((void));
 static void parse_multiplicative_expression __PROTO((void));
 static void parse_unary_expression __PROTO((void));
+static int  parse_assignment_expression __PROTO((void));
 static int is_builtin_function __PROTO((int t_num));
 
 /* Internal variables: */
@@ -270,6 +271,10 @@ add_action(enum operators sf_index)
 static void
 parse_expression()
 {				/* full expressions */
+
+    if (parse_assignment_expression())
+	return;
+
     parse_recursion_level++;
     accept_logical_OR_expression();
     parse_conditional_expression();
@@ -345,6 +350,27 @@ accept_multiplicative_expression()
 {
     parse_unary_expression();			/* - things */
     parse_multiplicative_expression();			/* * / % */
+}
+
+static int
+parse_assignment_expression()
+{
+    /* Check for assignment operator */
+    if (isletter(c_token) && (c_token + 1 < num_tokens) && equals(c_token + 1, "=")) {
+	/* push the variable name */
+	union argument *foo = add_action(PUSHC);
+	char *varname = NULL;
+	m_capture(&varname,c_token,c_token);
+	foo->v_arg.type = STRING;
+	foo->v_arg.v.string_val = varname;
+	c_token += 2;
+	/* and the expression whose value it will get */
+	parse_expression();
+	/* and the actual assignment operation */
+	(void) add_action(ASSIGN);
+	return 1;
+    }
+    return 0;
 }
 
 

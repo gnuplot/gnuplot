@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.44 2007/07/16 20:37:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.45 2007/08/27 04:33:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1527,3 +1527,27 @@ f_system(union argument *arg)
     gpfree_string(&result); /* free output */
     gpfree_string(&val);    /* free command string */
 }
+
+
+/* Variable assignment operator */
+void
+f_assign(union argument *arg)
+{
+    struct value a, b;
+    (void) arg;
+    (void) pop(&b);	/* new value */
+    (void) pop(&a);	/* name of variable */
+    
+    if (a.type == STRING) {
+	struct udvt_entry *udv = add_udv_by_name(a.v.string_val);
+	gpfree_string(&a);
+	if (!udv->udv_undef)
+	    gpfree_string(&(udv->udv_value));
+	udv->udv_value = b;
+	udv->udv_undef = FALSE;
+	push(&b);
+    } else {
+	int_error(NO_CARET, "attempt to assign to something other than a named variable");
+    }
+}
+

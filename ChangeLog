@@ -1,3 +1,13 @@
+2007-08-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/parse.c (parse_expression parse_assignment_expression):
+	Extend expression parsing to accept '=' as an assignment operator.
+
+	* src/internal.h src/internal.c (f_assign): New internal function.
+	src/eval.h src/eval.c:  table entry for f_assign()
+
+	NEWS, docs/gnuplot.doc: Document assignment operator '='
+
 2007-08-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* config/config.cyg config/config.mgw config/config.nt config/config.os2

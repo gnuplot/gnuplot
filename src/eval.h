@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.26 2006/07/21 05:19:51 sfeam Exp $
+ * $Id: eval.h,v 1.27 2007/08/27 04:33:47 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -58,6 +58,7 @@ enum operators {
     DIV, MOD, POWER, FACTORIAL, BOOLE,
     DOLLARS, /* for using extension - div */
     CONCATENATE, EQS, NES, RANGE,
+    ASSIGN,
     /* only jump operators go between jump and sf_start, for is_jump() */
     JUMP, JUMPZ, JUMPNZ, JTERN, SF_START
 };
