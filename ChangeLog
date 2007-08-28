@@ -1,6 +1,13 @@
 2007-08-28  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.s (plot_c_bars): Apply border color from 
+	* src/graph3d.c (draw_3d_graphbox):  Fix bug that caused axis labels
+	not to be drawn in 'set view map' mode.  This was supposed to have been
+	applied 2007-03-14 but somehow never made it into cvs.
+	Serious bug in 4.2.1
+
+2007-08-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_c_bars): Apply border color from 
 	'set style fill' to filled candlesticks.
 
 2007-08-26  Ethan Merritt  <merritt@u.washington.edu>
