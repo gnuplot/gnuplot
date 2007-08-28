@@ -1,7 +1,15 @@
+2007-08-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.s (plot_c_bars): Apply border color from 
+	'set style fill' to filled candlesticks.
+
 2007-08-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	Tag version 4.2.1 using command
 		cvs tag -c "Release_4_2_1"
+	
+	Version 4.2.1 released via SourceForge.  Any further commits to
+	this tree will be in 4.2.2 if such a version is ever released.
 
 2007-08-25  Ethan Merritt  <merritt@u.washington.edu>
 
