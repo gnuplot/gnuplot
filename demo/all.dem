@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.33 2007/03/09 00:09:12 sfeam Exp $
+# $Id: all.dem,v 1.34 2007/03/29 21:31:22 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -207,6 +207,10 @@ reset
 
 print "********************** file stringvar.dem *********************"
 load "stringvar.dem"
+reset
+
+print "********************** file running_avg.dem *********************"
+load "running_avg.dem"
 reset
 
 print "********************** file pointsize.dem *********************"

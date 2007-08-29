@@ -98,6 +98,7 @@ scripts are not included on this page.
     <!--- <li><a href="electron.html">electron</a></li> --->
     <li><a href="finance.html">financial data</a></li>
     <li><a href="scatter.html">non-gridded data</a></li>
+    <li><a href="running_avg.html">running averages</a></li>
     </ul>
 
     <h4>Text options</h4>
@@ -149,7 +150,7 @@ scripts are not included on this page.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>June 2007</i>
+    <i>This page created by Ethan Merritt<br>August 2007</i>
     </td>
 
     <td>

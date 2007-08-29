@@ -1,3 +1,8 @@
+2007-08-29  Ethan Merritt  <merritt@u.washington.edu>
+	* demo/all.dem demo/running_avg.dem demo/html/index.save:
+	Demonstrate use of new syntax operators = and , as part of a using
+	statement.  The demo plots a running average and a sliding average.
+
 2007-08-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (parse_primary_expression) src/internal.c (f_pop)
