@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.93 2007/07/05 04:13:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.94 2007/08/27 04:33:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -682,6 +682,21 @@ apply_zoom(struct t_zoom *z)
 	}
 	memcpy(axis_array, axis_array_copy, sizeof(axis_array));
 	s[0] = '\0';	/* FIXME:  Is this better than calling replotrequest()? */
+
+#ifdef VOLATILE_REFRESH
+	/* Falling through to do_string_replot() does not work! */
+	if (volatile_data) {
+	    if (refresh_ok == 2) {
+		refresh_request();
+		return;
+	    }
+	    if (is_splot_map && refresh_ok == 3) {
+		refresh_request();
+		return;
+	    }
+	}
+#endif
+
     }
 
     do_string_replot(s);
@@ -968,7 +983,10 @@ builtin_toggle_log(struct gp_event_t *ge)
 {
     if (!ge)
 	return "`builtin-toggle-log` y logscale for plots, z and cb logscale for splots";
-    if (is_3d_plot) {
+
+    if (volatile_data) {
+	int_warn(NO_CARET, "Cannot toggle log scale for volatile data");
+    } else if (is_3d_plot) {
 	if (Z_AXIS.log || CB_AXIS.log)
 	    do_string_replot("unset log zcb");
 	else
@@ -1429,7 +1447,9 @@ event_buttonpress(struct gp_event_t *ge)
 		/* not bound in 2d graphs */
 	    } else if (2 == b) {
 		/* not bound in 2d graphs */
-	    } else if (3 == b && !replot_disabled && !(paused_for_mouse & PAUSE_CLICK)) {
+	    } else if (3 == b && 
+	    	(!replot_disabled || refresh_ok)	/* Use refresh if available */
+		&& !(paused_for_mouse & PAUSE_CLICK)) {
 		/* start zoom; but ignore it when
 		 *   - replot is disabled, e.g. with inline data, or
 		 *   - during 'pause mouse'

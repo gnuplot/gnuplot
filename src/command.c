@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.158 2007/08/02 16:50:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.159 2007/08/27 04:33:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -64,6 +64,8 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.158 2007/08/02 16:50:22 
  */
 
 #include "command.h"
+
+#include "axis.h"
 
 #include "alloc.h"
 #include "eval.h"
@@ -445,8 +447,19 @@ do_string_replot(char *s)
 	fprintf(stderr, "%s\n", s);
 
     do_line();
+
+#ifdef VOLATILE_REFRESH
+    if (volatile_data && refresh_ok) {
+	if (display_ipc_commands())
+	    fprintf(stderr, "refresh\n");
+	refresh_request();
+    } else
+#endif
+
     if (!replot_disabled)
 	replotrequest();
+    else
+	int_warn(NO_CARET, "refresh not possible and replot is disabled");
 
     strcpy(gp_input_line, orig_input_line);
     free(orig_input_line);
@@ -1309,6 +1322,80 @@ pwd_command()
 }
 
 
+#ifdef VOLATILE_REFRESH
+/* EAM April 2007
+ * The "refresh" command replots the previous graph without going back to read
+ * the original data. This allows zooming or other operations on data that was
+ * only transiently available in the input stream.
+ */
+void
+refresh_command()
+{
+    c_token++;
+    refresh_request();
+}
+
+void
+refresh_request()
+{
+    FPRINTF((stderr,"refresh_request\n"));
+
+    if ((first_plot == NULL && refresh_ok == 2)
+    ||  (first_3dplot == NULL && refresh_ok == 3))
+	int_error(NO_CARET, "no active plot; cannot refresh");
+
+    if (refresh_ok == 0) {
+	int_warn(NO_CARET, "cannot refresh from this state. trying full replot");
+	replotrequest();
+	return;
+    }
+
+    /* If the state has been reset to autoscale since the last plot,
+     * initialize the axis limits.
+     */
+    AXIS_INIT2D(FIRST_X_AXIS,TRUE);
+    AXIS_INIT2D(FIRST_Y_AXIS,TRUE);
+    AXIS_INIT2D(SECOND_X_AXIS,TRUE);
+    AXIS_INIT2D(SECOND_Y_AXIS,TRUE);
+
+    AXIS_UPDATE2D(T_AXIS);	/* Possibly T and R want INIT2D?? */
+    AXIS_UPDATE2D(R_AXIS);
+
+    AXIS_UPDATE2D(COLOR_AXIS);
+
+    if (refresh_ok == 2)
+	refresh_bounds(first_plot, refresh_nplots);
+    else if (refresh_ok == 3)
+	refresh_3dbounds(first_3dplot, refresh_nplots);
+
+/* FIXME EAM
+ * The existing mechanism defined in axis.h does not work here for some reason.
+ * The following defined check works empirically.  Most of the time.  Maybe.
+ */
+#undef CHECK_REVERSE
+#define CHECK_REVERSE(axis) do {		\
+    AXIS *ax = axis_array + axis;		\
+    if ((ax->range_flags & RANGE_REVERSE)) {	\
+        double temp = ax->max;			\
+	ax->max = ax->min; ax->min = temp;	\
+    } } while (0)
+
+    CHECK_REVERSE(FIRST_X_AXIS);
+    CHECK_REVERSE(FIRST_Y_AXIS);
+    CHECK_REVERSE(SECOND_X_AXIS);
+    CHECK_REVERSE(SECOND_Y_AXIS);
+#undef CHECK_REVERSE
+
+    if (refresh_ok == 2)
+	do_plot(first_plot, refresh_nplots);
+    else if (refresh_ok == 3)
+	do_3dplot(first_3dplot, refresh_nplots, 0);
+    else
+	int_error(NO_CARET, "Internal error - refresh of unknown plot type");
+}
+
+
+#endif
 /* process the 'replot' command */
 void
 replot_command()
@@ -1814,6 +1901,7 @@ replotrequest()
     screen_ok = FALSE;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);
     c_token = 1;		/* skip the 'plot' part */
+
     if (is_3d_plot)
 	plot3drequest();
     else

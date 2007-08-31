@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.145 2007/07/02 20:13:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.146 2007/08/26 19:20:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -289,6 +289,72 @@ plot3drequest()
 
     eval_3dplots();
 }
+
+
+#ifdef VOLATILE_REFRESH
+/* Helper function for refresh command.  Reexamine each data point and update the
+ * flags for INRANGE/OUTRANGE/UNDEFINED based on the current limits for that axis.
+ * Normally the axis limits are already known at this point. But if the user has
+ * forced "set autoscale" since the previous plot or refresh, we need to reset the
+ * axis limits and try to approximate the full auto-scaling behaviour.
+ */
+void
+refresh_3dbounds(struct surface_points *first_plot, int nplots)
+{
+    struct surface_points *this_plot = first_plot;
+    int iplot;		/* plot index */
+
+    for (iplot = 0;  iplot < nplots; iplot++, this_plot = this_plot->next_sp) {
+	int i;		/* point index */
+	struct axis *x_axis = &axis_array[FIRST_X_AXIS];
+	struct axis *y_axis = &axis_array[FIRST_Y_AXIS];
+	struct iso_curve *this_curve;
+
+	/* IMAGE clipping is done elsewhere, so we don't need INRANGE/OUTRANGE
+	 * checks.  
+	 */
+	if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE) {
+	    if (x_axis->set_autoscale)
+		plot_image_or_update_axes(this_plot,TRUE);
+	    continue;
+	}
+
+	for ( this_curve = this_plot->iso_crvs; this_curve; this_curve = this_curve->next) {
+
+	for (i=0; i<this_curve->p_count; i++) {
+	    struct coordinate GPHUGE *point = &this_curve->points[i];
+
+	    if (point->type == UNDEFINED)
+		continue;
+	    else
+		point->type = INRANGE;
+
+	    /* If the state has been set to autoscale since the last plot,
+	     * mark everything INRANGE and re-evaluate the axis limits now.
+	     * Otherwise test INRANGE/OUTRANGE against previous axis limits.
+	     */
+	    if (x_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX)) {
+		if (point->x > x_axis->max) x_axis->max = point->x;
+		if (point->x < x_axis->min) x_axis->min = point->x;
+	    } else if (!inrange(point->x, x_axis->min, x_axis->max)) {
+		point->type = OUTRANGE;
+		continue;
+	    }
+
+	    if (y_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX)) {
+		if (point->y > y_axis->max) y_axis->max = point->y;
+		if (point->y < y_axis->min) y_axis->min = point->y;
+	    } else if (!inrange(point->y, y_axis->min, y_axis->max)) {
+		point->type = OUTRANGE;
+		continue;
+	    }
+	}	/* End of this curve */
+	}	/* End of this plot */
+
+    }
+}
+#endif
+
 
 #ifdef THIN_PLATE_SPLINES_GRID
 
@@ -1075,7 +1141,7 @@ eval_3dplots()
     char *ytitle;
     legend_key *key = &keyT;
 
-    /* Reset first_3dplot. This is usually done at the end of this function.
+    /* Free memory from previous splot.
      * If there is an error within this function, the memory is left allocated,
      * since we cannot call sp_free if the list is incomplete
      */
@@ -1092,6 +1158,9 @@ eval_3dplots()
     plot_num = 0;
     line_num = 0;		/* default line type */
     point_num = 0;		/* default point type */
+
+    /* Assume that the input data can be re-read later */
+    volatile_data = FALSE;
 
     xtitle = NULL;
     ytitle = NULL;
@@ -1912,6 +1981,12 @@ eval_3dplots()
 	SAVE_WRITEBACK_ALL_AXES;
 	/* update GPVAL_ variables available to user */
 	update_gpval_variables(1);
+
+#ifdef VOLATILE_REFRESH
+	/* Mark these plots as safe for quick refresh */
+	refresh_nplots = plot_num;
+	refresh_ok = 3;
+#endif
     }
 }
 
@@ -1987,12 +2062,6 @@ parametric_3dfixup(struct surface_points *start_plot, int *plot_num)
 		yicrvs = yicrvs->next;
 		zicrvs = zicrvs->next;
 	    }
-
-#if 0 /* FIXME HBB 20001101: seems to cause a crash */
-	    if (first_3dplot)
-		sp_free(first_3dplot);
-	    first_3dplot = NULL;
-#endif
 
 	    /* Ok, fix up the title to include xp and yp plots. */
 	    if (((xp->title && xp->title[0] != '\0') ||

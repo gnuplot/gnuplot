@@ -159,6 +159,15 @@ TBOOLEAN is_3d_plot = FALSE;
 TBOOLEAN is_cb_plot = FALSE;
 #endif
 
+#ifdef VOLATILE_REFRESH
+/* Flag to signal that the existing data is valid for a quick refresh */
+int refresh_ok = 0;		/* 0 = no;  2 = 2D ok;  3 = 3D ok */
+/* FIXME: do_plot should be able to figure this out on its own! */
+int refresh_nplots = 0;
+#endif
+/* Flag to show that volatile input data is present */
+TBOOLEAN volatile_data = FALSE;
+
 fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, LT_UNDEFINED } ;
 
 #ifdef EAM_OBJECTS

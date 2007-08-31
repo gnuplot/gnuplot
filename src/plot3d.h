@@ -1,5 +1,5 @@
 /*
- * $Id: plot3d.h,v 1.15 2004/11/21 05:40:19 sfeam Exp $
+ * $Id: plot3d.h,v 1.16 2004/11/22 00:43:05 sfeam Exp $
  */
 
 /* GNUPLOT - plot3d.h */
@@ -62,6 +62,7 @@ extern TBOOLEAN	dgrid3d;
 /* prototypes from plot3d.c */
 
 void plot3drequest __PROTO((void));
+void refresh_3dbounds __PROTO((struct surface_points *first_plot, int nplots));
 void sp_free __PROTO((struct surface_points *sp));
 
 #endif /* GNUPLOT_PLOT3D_H */

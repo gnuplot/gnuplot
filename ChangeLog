@@ -1,4 +1,58 @@
+2007-08-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	Version 2.9.? of Octave switched to piping all data to gnuplot in-line
+	rather than via a temporary file.  This broke mouse zooming and replot.
+
+	This patchset is an imperfect fix with several known problems:
+	- Clipping of zoomed 3D contour plots is not correct.
+	- splot volatile with image + zoom + unzoom is flaky
+	- plot -> zoom -> set grid -> unzoom   loses the grid setting.
+	- you cannot toggle log scaling on/off while using refresh.
+
+	Introduce a new command "refresh" that acts like replot except that it
+	does not re-read the input data.  Refresh is always needed in order to
+	zoom or replot in-line data (input file '-'), but may optionally applied
+	to normal data files also by appending the attribute 'volatile'.
+
+	* src/plot2d.c (eval_plots): This is the core change. Instead of 
+	freeing stored data after each plot, keep it around in case of a
+	refresh command. The old data storage is freed at the start of the next
+	"plot" or "replot" command.  This is parallel to what the 3D code was
+	already doing. Set refresh_ok = 2  at the end of a successful plot.
+
+	* src/plot3d.c (eval_3dplots): Update comments and remove dead code.
+	Set refresh_ok = 3  at the end of a successful plot.
+
+	* src/plot2d.c (refresh_bounds) src/plot2d.h
+	* src/plot3d.c (refresh_3dbounds) src/plot3d.h:
+	Provide a mechanism to recheck the INBOUNDS/OUTBOUNDS status of 
+	existing data points after changing the current axis limits.
+
+	* src/command.c (refresh_command refresh_request) src/command.h
+	src/gadgets.c src/gadgets.h src/tables.c:  New command "refresh" that
+	acts similarly to "replot" except that it does not re-read input data.
+
+	* src/axis.h (AXIS_UPDATE2D): Save/restore axis limits for zooming.
+
+	* src/mouse.c (apply_zoom): Choose between refresh or replot depending
+	on whether the current plot contain volatile data.
+
+	* src/mouse.c (builtin_toggle_log): Ignore 'l' and 'L' for volatile data
+
+	* src/set.c (set_logscale) src/unset.c (unset_logscale):
+	Because setting or unsetting log scale changes the way input data is
+	stored, "refresh" cannot work if the log setting has changed.
+	Set a flag indicating that a full replot is necessary.
+
+	* src/datafile.c (df_open): Accept a "volatile" keyword to indicate
+	that data in the input file may change. If data is input from pseudo-
+	device '-' or from a file marked "volatile", set a global flag so
+	that mousing/zooming/etc can choose to refresh rather than replot.
+
+	* docs/gnuplot.doc configure.in
+
 2007-08-29  Ethan Merritt  <merritt@u.washington.edu>
+
 	* demo/all.dem demo/running_avg.dem demo/html/index.save:
 	Demonstrate use of new syntax operators = and , as part of a using
 	statement.  The demo plots a running average and a sliding average.

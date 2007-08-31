@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.447 2007/08/28 05:56:29 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.448 2007/08/28 06:13:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4033,6 +4033,7 @@ C ... and restart the table:
 ?datafile
 ?data
 ?file
+?volatile
  Discrete data contained in a file can be displayed by specifying the name of
  the data file (enclosed in single or double quotes) on the `plot` command line.
 
@@ -4044,6 +4045,7 @@ C ... and restart the table:
                           {thru <thru expression>}
                           {using <using list>}
                           {smooth <option>}
+                          {volatile}
 
  The modifiers `binary`, `index`, `every`, `thru`, `using`, and `smooth` are
  discussed separately.  In brief, `binary` allows data entry from a binary
@@ -4053,6 +4055,10 @@ C ... and restart the table:
  record are to be interpreted (`thru` is a special case of `using`), and
  `smooth` allows for simple interpolation and approximation.  (`splot` has a
  similar syntax, but does not support the `smooth` and `thru` options.)
+
+ The `volatile` keyword indicates that the contents of the data file may be
+ different if the file is re-read.  This tells the program to use `refresh`
+ rather than `replot` commands whenever possible.  See `refresh`.
 
 
  ASCII DATA FILES:
@@ -5438,6 +5444,27 @@ C ... and restart the table:
   by your window manager. On KDE, you may like to go to the KDE Control Center
   => Desktop => Window Behaviour => Advanced and set the "Focus stealing
   prevention level" to None (default is Low).
+2 refresh
+?commands refresh
+?refresh
+ The `refresh` command is similar to `replot`, with two major differences.
+ `refresh` reformats and redraws the current plot using the data already read
+ in. This means that you can use `refresh` for plots with in-line data
+ (pseudo-device '-') and for plots from datafiles whose contents are volatile.
+ You cannot use the `refresh` command to add new data to an existing plot.
+
+ Mousing operations, in particular zoom and unzoom, will use `refresh` rather
+ than `replot` if appropriate.  Example:
+
+       plot 'datafile' volatile with lines, '-' with labels
+       100 200 "Special point"
+       e
+       # Various mousing operations go here
+       set title "Zoomed in view"
+       set term post
+       set output 'zoom.ps'
+       refresh
+
 2 replot
 ?commands replot
 ?replot
@@ -5456,10 +5483,9 @@ C ... and restart the table:
 
        plot '-' ; ... ; replot
 
- is not recommended.  `gnuplot` does not store the inline data internally, so
- since `replot` appends new information to the previous `plot` and then
- executes the modified command, the `'-'` from the initial `plot` will expect
- to read inline data again.
+ is not recommended, because it will require that you type in the data all 
+ over again.  In most cases you can use the `refresh` command instead, which
+ will redraw the plot using the data previously read in.
 
  Note that `replot` does not work in `multiplot` mode, since it reproduces
  only the last plot rather than the entire screen.

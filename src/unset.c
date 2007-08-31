@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.104 2007/06/07 16:20:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.105 2007/06/22 04:28:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1054,6 +1054,12 @@ unset_logscale()
 	}
 	++c_token;
     }
+
+#ifdef VOLATILE_REFRESH
+    /* Because the log scaling is applied during data input, a quick refresh */
+    /* using existing stored data will not work if the log setting changes.  */
+    refresh_ok = 0;
+#endif
 }
 
 #ifdef GP_MACROS
@@ -1677,6 +1683,10 @@ reset_command()
     mgrid_lp = default_grid_lp;
     polar_grid_angle = 0;
     grid_layer = -1;
+
+#ifdef VOLATILE_REFRESH
+    refresh_ok = 0;
+#endif
 
     reset_hidden3doptions();
     hidden3d = FALSE;

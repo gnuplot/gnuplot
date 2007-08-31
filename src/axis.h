@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.46 2005/09/18 06:20:58 sfeam Exp $
+ * $Id: axis.h,v 1.47 2006/12/27 21:40:26 sfeam Exp $
  *
  */
 
@@ -400,6 +400,21 @@ do {									\
     this->log_base = this->log ? log(this->base) : 0;			\
 } while(0)
 
+#ifdef VOLATILE_REFRESH
+#define AXIS_UPDATE2D(axis)						\
+do {									\
+    AXIS *this_axis = axis_array + axis;				\
+    if ((this_axis->set_autoscale & AUTOSCALE_MIN) == 0)		\
+	this_axis->min = this_axis->set_min;				\
+    if ((this_axis->set_autoscale & AUTOSCALE_MAX) == 0)		\
+	this_axis->max = this_axis->set_max;				\
+    if (this_axis->log)  						\
+	this_axis->max = log(this_axis->max) / this_axis->log_base;	\
+    if (this_axis->log)  						\
+	this_axis->min = log(this_axis->min) / this_axis->log_base;	\
+} while (0)
+
+#endif
 /* handle reversed ranges */
 #define CHECK_REVERSE(axis) do {					\
     AXIS *this = axis_array + axis;					\

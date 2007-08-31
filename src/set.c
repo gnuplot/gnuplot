@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.249 2007/08/03 07:39:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.250 2007/08/27 04:33:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2071,6 +2071,12 @@ set_logscale()
 		axis_array[axis].base = newbase;
 	}
     }
+
+#ifdef VOLATILE_REFRESH
+    /* Because the log scaling is applied during data input, a quick refresh */
+    /* using existing stored data will not work if the log setting changes.  */
+    refresh_ok = 0;
+#endif
 }
 
 #ifdef GP_MACROS

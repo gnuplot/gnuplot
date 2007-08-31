@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.40 2006/04/29 05:30:06 tlecomte Exp $
+ * $Id: command.h,v 1.41 2006/06/16 17:28:43 tlecomte Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -145,6 +145,7 @@ extern void wxt_lower_terminal_group __PROTO((void));
 #ifdef USE_MOUSE
 void bind_command __PROTO((void));
 void restore_prompt __PROTO((void));
+void refresh_request __PROTO((void));
 #endif
 void call_command __PROTO((void));
 void changedir_command __PROTO((void));
@@ -161,6 +162,7 @@ void pause_command __PROTO((void));
 void plot_command __PROTO((void));
 void print_command __PROTO((void));
 void pwd_command __PROTO((void));
+void refresh_command __PROTO((void));
 void replot_command __PROTO((void));
 void reread_command __PROTO((void));
 void save_command __PROTO((void));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.125 2007/06/30 00:38:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.126 2007/08/27 04:33:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1192,6 +1192,13 @@ df_open(const char *cmd_filename, int max_using)
 	    continue;
     }
 
+	/* deal with volatile */
+    if (almost_equals(c_token, "volatile")) {
+	    c_token++;
+	    volatile_data = TRUE;
+	    continue;
+    }
+
 #ifdef EAM_DATASTRINGS
 	/* Take key title from column head? */
 	if (almost_equals(c_token, "t$itle")) {
@@ -1263,6 +1270,7 @@ df_open(const char *cmd_filename, int max_using)
 	/* I don't want to call strcmp(). Does it make a difference? */
     if (*df_filename == '-' && strlen(df_filename) == 1) {
 	plotted_data_from_stdin = TRUE;
+	volatile_data = TRUE;
 	data_fp = lf_top();
 	if (!data_fp)
 	    data_fp = stdin;

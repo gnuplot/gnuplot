@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.149 2007/07/02 20:13:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.151 2007/08/26 19:20:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -223,7 +223,7 @@ plotrequest()
     AXIS_INIT2D(SECOND_Y_AXIS, 1);
     AXIS_INIT2D(T_AXIS, 0);
     AXIS_INIT2D(R_AXIS, 1);
-    AXIS_INIT2D(COLOR_AXIS, 1);
+    AXIS_INIT2D(COLOR_AXIS, 0);
 
     t_axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
 
@@ -250,6 +250,68 @@ plotrequest()
 
     eval_plots();
 }
+
+
+#ifdef VOLATILE_REFRESH
+/* Helper function for refresh command.  Reexamine each data point and update the
+ * flags for INRANGE/OUTRANGE/UNDEFINED based on the current limits for that axis.
+ * Normally the axis limits are already known at this point. But if the user has
+ * forced "set autoscale" since the previous plot or refresh, we need to reset the
+ * axis limits and try to approximate the full auto-scaling behaviour.
+ */
+void
+refresh_bounds(struct curve_points *first_plot, int nplots)
+{
+    struct curve_points *this_plot = first_plot;
+    int iplot;		/* plot index */
+
+    for (iplot = 0;  iplot < nplots; iplot++, this_plot = this_plot->next) {
+	int i;		/* point index */
+	struct axis *x_axis = &axis_array[this_plot->x_axis];
+	struct axis *y_axis = &axis_array[this_plot->y_axis];
+
+	/* IMAGE clipping is done elsewhere, so we don't need INRANGE/OUTRANGE
+	 * checks.  
+	 */
+	if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE) {
+	    if (x_axis->set_autoscale)
+		plot_image_or_update_axes(this_plot,TRUE);
+	    continue;
+	}
+
+	for (i=0; i<this_plot->p_count; i++) {
+	    struct coordinate GPHUGE *point = &this_plot->points[i];
+
+	    if (point->type == UNDEFINED)
+		continue;
+	    else
+		point->type = INRANGE;
+
+	    /* If the state has been set to autoscale since the last plot,
+	     * mark everything INRANGE and re-evaluate the axis limits now.
+	     * Otherwise test INRANGE/OUTRANGE against previous axis limits.
+	     */
+	    if (x_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX)) {
+		if (point->x > x_axis->max) x_axis->max = point->x;
+		if (point->x < x_axis->min) x_axis->min = point->x;
+	    } else if (!inrange(point->x, x_axis->min, x_axis->max)) {
+		point->type = OUTRANGE;
+		continue;
+	    }
+
+	    if (y_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX)) {
+		if (point->y > y_axis->max) y_axis->max = point->y;
+		if (point->y < y_axis->min) y_axis->min = point->y;
+	    } else if (!inrange(point->y, y_axis->min, y_axis->max)) {
+		point->type = OUTRANGE;
+		continue;
+	    }
+	}
+
+    }
+}
+#endif
+
 
 /* A quick note about boxes style. For boxwidth auto, we cannot
  * calculate widths yet, since it may be sorted, etc. But if
@@ -1253,10 +1315,16 @@ eval_plots()
 	uses_axis[SECOND_X_AXIS] =
 	uses_axis[SECOND_Y_AXIS] = 0;
 
+    /* Original Comment follows: */
     /* Reset first_plot. This is usually done at the end of this function.
      * If there is an error within this function, the memory is left allocated,
      * since we cannot call cp_free if the list is incomplete. Making sure that
      * the list structure is always valid requires some rewriting */
+    /* EAM Apr 2007 - but we need to keep the previous structures around in 
+     * order to be able to refresh/zoom them without re-reading all the data.
+     */
+    if (first_plot)
+	cp_free(first_plot);
     first_plot = NULL;
 
     tp_ptr = &(first_plot);
@@ -1266,6 +1334,9 @@ eval_plots()
     pattern_num = default_fillstyle.fillpattern;        /* default fill pattern */
 
     xtitle = NULL;
+
+    /* Assume that the input data can be re-read later */
+    volatile_data = FALSE;
 
     /* ** First Pass: Read through data files ***
      * This pass serves to set the xrange and to parse the command, as well
@@ -2168,10 +2239,6 @@ eval_plots()
 	    }
 	}
     }   /* some_functions */
-    /* throw out all curve_points at end of list, that we don't need  */
-    cp_free(*tp_ptr);
-    *tp_ptr = NULL;
-
 
     /* if first_plot is NULL, we have no functions or data at all. This can
      * happen, if you type "plot x=5", since x=5 is a variable assignment */
@@ -2281,10 +2348,14 @@ eval_plots()
 	SAVE_WRITEBACK_ALL_AXES;
 	/* update GPVAL_ variables available to user */
 	update_gpval_variables(1);
+
+#ifdef VOLATILE_REFRESH
+	/* Mark these plots as safe for quick refresh */
+	refresh_nplots = plot_num;
+	refresh_ok = 2;
+#endif
     }
 
-    cp_free(first_plot);
-    first_plot = NULL;
 }                               /* eval_plots */
 
 

@@ -380,6 +380,14 @@ extern TBOOLEAN is_3d_plot;
 extern TBOOLEAN is_cb_plot;
 #endif
 
+#ifdef VOLATILE_REFRESH
+extern int refresh_ok;		/* 0 = no;  2 = 2D ok;  3 = 3D ok */
+extern int refresh_nplots;
+#else
+#define refresh_ok FALSE
+#endif
+extern TBOOLEAN volatile_data;
+
 /* Plot layer definitions are collected here. */
 /* Someday they might actually be used.       */
 #define LAYER_BEHIND     -1
