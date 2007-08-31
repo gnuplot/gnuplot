@@ -1,3 +1,12 @@
+2007-08-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	The axis label bug is serious enough to warrant an updated release
+	IMHO.  Obviously the release candidate for 4.2.1 didn't get enough
+	testing.
+
+	src/version.c PATCHLEVEL configure.in docs/titlepag.tex
+	Increment patchlevel to 2
+
 2007-08-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (draw_3d_graphbox):  Fix bug that caused axis labels
