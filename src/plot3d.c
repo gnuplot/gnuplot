@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.146 2007/08/26 19:20:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.147 2007/08/31 20:03:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -83,7 +83,7 @@ static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN c
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
 					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
 					       TBOOLEAN need_palette));
-static void get_3ddata __PROTO((struct surface_points * this_plot));
+static int get_3ddata __PROTO((struct surface_points * this_plot));
 static void eval_3dplots __PROTO((void));
 static void grid_nongrid_data __PROTO((struct surface_points * this_plot));
 static void parametric_3dfixup __PROTO((struct surface_points * start_plot, int *plot_num));
@@ -620,7 +620,7 @@ grid_nongrid_data(struct surface_points *this_plot)
  *
  * Notice: this_plot->token is end of datafile spec, before title etc
  * will be moved past title etc after we return */
-static void
+static int
 get_3ddata(struct surface_points *this_plot)
 {
     int xdatum = 0;
@@ -629,6 +629,7 @@ get_3ddata(struct surface_points *this_plot)
     double v[MAXDATACOLS];
     int pt_in_iso_crv = 0;
     struct iso_curve *this_iso;
+    int retval = 0;
 
     if (mapping3d == MAP3D_CARTESIAN) {
 	/* do this check only, if we have PM3D / PM3D-COLUMN not compiled in */
@@ -702,7 +703,8 @@ get_3ddata(struct surface_points *this_plot)
 	    setlocale(LC_NUMERIC,numeric_locale);
 #endif
 
-	while ((j = df_readline(v,MAXDATACOLS)) != DF_EOF) {
+	while ((retval = df_readline(v,MAXDATACOLS)) != DF_EOF) {
+	    j = retval;
 	    if (j == DF_SECOND_BLANK)
 		break;		/* two blank lines */
 	    if (j == DF_FIRST_BLANK) {
@@ -851,7 +853,7 @@ get_3ddata(struct surface_points *this_plot)
 
 	    default:
 		int_error(NO_CARET, "Internal error: Unknown mapping type");
-		return;
+		return retval;
 	    }
 
 	    if (j < df_no_use_specs)
@@ -1047,6 +1049,8 @@ get_3ddata(struct surface_points *this_plot)
 	     this_iso = this_iso->next);
 	this_iso->next = new_icrvs;
     }
+
+    return retval;
 }
 
 /* HBB 20000501: code isolated from eval_3dplots(), where practically
@@ -1134,6 +1138,7 @@ eval_3dplots()
     int start_token=0, end_token;
     int begin_token;
     TBOOLEAN some_data_files = FALSE, some_functions = FALSE;
+    int df_return = 0;
     int plot_num, line_num, point_num;
     /* part number of parametric function triplet: 0 = z, 1 = y, 2 = x */
     int crnt_param = 0;
@@ -1622,7 +1627,7 @@ eval_3dplots()
 		    /* used by get_3ddata() */
 		    this_plot->token = this_token;
 
-		    get_3ddata(this_plot);
+		    df_return = get_3ddata(this_plot);
 		    /* for second pass */
 		    this_plot->token = c_token;
 		    this_plot->plot_num = plot_num;
@@ -1637,7 +1642,7 @@ eval_3dplots()
 		    /* okay, we have read a surface */
 		    ++plot_num;
 		    tp_3d_ptr = &(this_plot->next_sp);
-		    if (df_eof)
+		    if (df_return == DF_EOF)
 			break;
 
 		    /* there might be another surface so allocate
@@ -1660,7 +1665,7 @@ eval_3dplots()
 		    this_plot->plot_style = this_style;
 		    /* Struct copy */
 		    this_plot->lp_properties = *these_props;
-		} while (!df_eof);
+		} while (df_return != DF_EOF);
 
 		df_close();
 		/*}}} */

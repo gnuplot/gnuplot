@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.126 2007/08/27 04:33:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.127 2007/08/31 20:03:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -208,7 +208,6 @@ struct curve_points *df_current_plot; /* set before calling df_readline() */
 #endif
 int df_line_number;
 int df_datum;                   /* suggested x value if none given */
-int df_eof = 0;
 AXIS_INDEX df_axis[MAXDATACOLS];
 TBOOLEAN df_matrix = FALSE;     /* indicates if data originated from a 2D or 3D format */
 TBOOLEAN df_binary = FALSE;     /* this is a binary file */
@@ -248,6 +247,7 @@ static TBOOLEAN df_pipe_open = FALSE;
 #endif
 static TBOOLEAN mixed_data_fp = FALSE; /* inline data */
 char *df_filename;      /* name of data file */
+static int df_eof = 0;
 
 #ifdef EAM_DATASTRINGS
 static int df_no_tic_specs;     /* ticlabel columns not counted in df_no_use_specs */

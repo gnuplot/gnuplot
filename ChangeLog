@@ -1,3 +1,9 @@
+2007-09-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.h src/datafile.c: make df_eof static rather than global.
+	* src/plot3d.c (eval_3dplots get_3ddata): Track return code from df_readline
+	directly rather than relying on a global df_eof that mirrors it.
+
 2007-08-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	Version 2.9.? of Octave switched to piping all data to gnuplot in-line
