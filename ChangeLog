@@ -1,3 +1,13 @@
+2007-09-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics): On log scale plots with very large range,
+	the minitic interval can overflow integer representation.
+	Bug #1797500
+
+	* term/gd.trm (PNG_image):  gdImageGetClip was introduced in libgd
+	version 2.0.12.  Don't try to use it if version is less than 2.
+	Bug #1790171
+
 2007-09-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	Tag version 4.2.2 using command
