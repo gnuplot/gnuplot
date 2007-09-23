@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.119 2007/06/11 20:05:32 sfeam Exp $
+ * $Id: gd.trm,v 1.120 2007/08/25 23:07:58 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2044,6 +2044,7 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
 	gdImagePaletteCopy(im, png_state.image);
     }
 
+#if (GD2_VERS >= 2)
     /* Set clipping bound for area into which we will copy */
     xclip1 = GPMIN(corner[2].x, corner[3].x);
     xclip2 = GPMAX(corner[2].x, corner[3].x);
@@ -2051,6 +2052,7 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
     yclip2 = GPMAX(Y(corner[2].y), Y(corner[3].y));
     gdImageGetClip(png_state.image, &x1, &y1, &x2, &y2);
     gdImageSetClip(png_state.image, xclip1, yclip1, xclip2, yclip2);
+#endif
 
     /* Copy and resize onto requested region of plot */
     mout = abs( (int)corner[1].x - (int)corner[0].x );
@@ -2093,8 +2095,10 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
 	);
     gdImageDestroy(im);
 
+#if (GD2_VERS >= 2)
     /* Restore previous clipping, if any */
     gdImageSetClip(png_state.image, x1, y1, x2, y2);
+#endif
 
 }
 

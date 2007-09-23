@@ -4,6 +4,10 @@
 	the minitic interval can overflow integer representation.
 	Bug #1797500
 
+	* term/gd.trm (PNG_image): gdImageGetClip was introduced in libgd
+	version 2.0.12.  Don't try to use it if GD2_VERS is less than 2.
+	Bug #1790171
+
 2007-09-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.h src/datafile.c: make df_eof static rather than global.
