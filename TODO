@@ -5,10 +5,7 @@
 COMMANDS:
 =========
 
--- (EAM) Iterate over plot commands:   plot for [i=1,n] ....
 -- (EAM) Everything on command line after "load <foo>" is lost; it shouldn't be
--- (EAM) Fill between curves for functions (already works for data)
--- (EAM) set object <tag> {circle|ellipse}
 
 
 DOCUMENTATION:
@@ -140,7 +137,6 @@ longer term
 
 Lars' list
 
-- much-requested feature: read text/commands from data files
 - provide library of replacement functions instead of stdfn.c
 - fully switch to automake [docs left to do, won't do lisp]
 - completely rewrite the parser. Use yacc/bison if possible.
@@ -159,8 +155,7 @@ Lars' list
   [PARTIALLY DONE] works for all cmds now; plot key shows "~" instead
   of path (-> fix); does not accept "~" and "~user". Maybe implement
   former, latter requires reading passwd file (-> not!)
-- general expansion of user defined and environment vars in
-  labels?
+- general expansion of user defined and environment vars in labels?
 - [Lucas] fix axis ranges, overwritten labels in demos
 - write or organise a portable version of snprintf(3) with a copyright
   compatible with the gnuplot copyright (ie. no GPL) (Apache?)
@@ -179,9 +174,7 @@ HBB:
 [Optional:] See if 16-bit compilations can be made to work again.
 
 Ethan's List:
-- transparency (alpha channel) for fill areas and images
 - separate out the handling of junk, NaN, Inf, and missing data entries
-- 2D plot styles should accept color info from an extra input column
 - you should be able to set a default style for arrows and labels
 - isosurfaces (3D contour of 4D data)
 
