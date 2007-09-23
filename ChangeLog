@@ -1,3 +1,9 @@
+2007-09-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics): On log scale plots with very large range,
+	the minitic interval can overflow integer representation.
+	Bug #1797500
+
 2007-09-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.h src/datafile.c: make df_eof static rather than global.
