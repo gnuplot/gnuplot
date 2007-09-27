@@ -1,3 +1,19 @@
+2007-09-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c src/set.c(set_encoding) src/show.c(show_encoding)
+	src/gplt_x11.c:
+
+	Add "utf8" to the list of options accepted by "set encoding".
+	Modify "show encoding" to report the current environmental locale as
+	well as the encoding that gnuplot thinks it is using. Resolving any
+	conflict is left to the user.
+
+	Most terminal drivers need take no special action if the encoding is
+	UTF-8. PostScript is a major exception.  It is also useful for the
+	libgd-based terminals if you want to force UTF-8 encoding lookup in
+	the Adobe Symbol font. This patchset implements the command itself.
+	Actual libgd and PostScript support will be added separately.
+
 2007-09-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (do_save_3dplot): If the log scale setting has changed

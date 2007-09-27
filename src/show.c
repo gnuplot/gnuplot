@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.194 2007/06/22 04:28:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.195 2007/08/27 04:33:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2354,7 +2354,10 @@ static void
 show_encoding()
 {
     SHOW_ALL_NL;
-    fprintf(stderr, "\tencoding is %s\n", encoding_names[encoding]);
+    fprintf(stderr, "\tnominal character encoding is %s\n", encoding_names[encoding]);
+#ifdef HAVE_LOCALE_H
+    fprintf(stderr, "\thowever LC_CTYPE in current locale is %s\n", setlocale(LC_CTYPE,NULL));
+#endif
 }
 
 
