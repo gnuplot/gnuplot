@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.231 2007/08/01 15:42:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.232 2007/08/12 17:45:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2027,6 +2027,10 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* PLACE ARROWS */
     place_arrows( 1 );
+
+    /* Release the palette if we have used one (PostScript only?) */
+    if (is_plot_with_palette() && term->previous_palette)
+	term->previous_palette();
 
     term_end_plot();
 }

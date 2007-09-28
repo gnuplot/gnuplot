@@ -1,3 +1,10 @@
+2007-09-28  Hanno Hoffstadt  <hannoh@users.sourceforge.net>
+
+	* src/graphics.c (do_plot) src/graph3d.c (do_3dplot):  It is necessary
+	to call term->previous_palette() at the end of any 2D plot or 3D plot
+	that used custom rgb colors.
+	Bug #1803337
+
 2007-09-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c src/set.c(set_encoding) src/show.c(show_encoding)

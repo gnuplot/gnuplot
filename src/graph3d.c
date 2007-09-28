@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.176 2007/08/12 17:45:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.177 2007/08/25 21:24:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1370,12 +1370,7 @@ do_3dplot(
     }
 #endif
 
-    /* Release the palette we have made use of. Actually, now it is used only
-     * in postscript terminals which write all pm3d plots in between
-     * gsave/grestore. Thus, now I'm wondering whether term->previous_palette()
-     * is really needed anymore, for any terminal, or could this termentry
-     * be removed completely? Any future driver won't need it?
-     */
+    /* Release the palette if we have used one (PostScript only?) */
     if (is_plot_with_palette() && term->previous_palette)
 	term->previous_palette();
 
