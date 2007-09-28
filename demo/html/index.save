@@ -63,7 +63,7 @@ scripts are not included on this page.
     <li><a href="pm3d.html">pm3d coloring</a></li>
     <li><a href="hidden2.html">pm3d hidden surfaces</a></li>
     <li><a href="world2.html">3D mapping</a></li>
-    <li><a href="4D-data.html">4D mapping</a></li>
+    <li><a href="4D_data.html">4D mapping</a></li>
     </ul>
 
     <h4>Coordinate and<br> axis transforms</h4>
