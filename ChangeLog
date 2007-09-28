@@ -1,3 +1,7 @@
+2007-09-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/html/Makefile: Update to include latest demos
+
 2007-09-28  Hanno Hoffstadt  <hannoh@users.sourceforge.net>
 
 	* src/graphics.c (do_plot) src/graph3d.c (do_3dplot):  It is necessary
