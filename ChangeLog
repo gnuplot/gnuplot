@@ -1,3 +1,10 @@
+2007-09-28  Hanno Hoffstadt  <hannoh@users.sourceforge.net>
+
+	* src/graphics.c (do_plot):  It is necessary to call
+	term->previous_palette() at the end of any 2D plot or 3D plot
+	that used custom rgb colors.
+	Bug #1803337
+
 2007-09-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics): On log scale plots with very large range,
