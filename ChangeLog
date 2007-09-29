@@ -1,3 +1,10 @@
+2007-09-29  Hanno Hoffstadt  <hannoh@users.sourceforge.net>
+
+	* term/Postscript/prologue.ps: Add an explicit 'closepath' before
+	filling a rectangle. This is not required by the language spec, but
+	works around a bug in Adobe Distiller 7 and Apple's Quartz Preview.
+	Bug #1771533
+
 2007-09-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/html/Makefile demo/html/index.save:
