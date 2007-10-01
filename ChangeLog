@@ -1,3 +1,9 @@
+2007-10-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (bound_intersect):  Fix a degenerate case in the
+	intersection test that caused a divide by zero.
+	Bug #1805697
+
 2007-09-29  Hanno Hoffstadt  <hannoh@users.sourceforge.net>
 
 	* term/Postscript/prologue.ps: Add an explicit 'closepath' before
