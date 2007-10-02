@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.15 2007/09/29 00:06:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.16 2007/10/01 20:49:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4494,9 +4494,7 @@ filledcurves_opts *filledcurves_options)
 	    dx1 = filledcurves_options->at - points[i-1].x;
 	    dx2 = filledcurves_options->at - points[i].x;
 	    dy1 = points[i].y - points[i-1].y;
-	    if (dx1 == dx2)
-		return FALSE;
-	    if (dx1*dx2 <= 0) {
+	    if (dx1*dx2 < 0) {
 		*ex = filledcurves_options->at;
 		*ey = points[i-1].y + dy1 * dx1 / (dx1-dx2);
 		return TRUE;
@@ -4507,9 +4505,7 @@ filledcurves_opts *filledcurves_options)
 	    dy1 = filledcurves_options->at - points[i-1].y;
 	    dy2 = filledcurves_options->at - points[i].y;
 	    dx1 = points[i].x - points[i-1].x;
-	    if (dy1 == dy2)
-		return FALSE;
-	    if (dy1*dy2 <= 0) {
+	    if (dy1*dy2 < 0) {
 		*ex = points[i-1].x + dx1 * dy1 / (dy1-dy2);
 		*ey = filledcurves_options->at;
 		return TRUE;
