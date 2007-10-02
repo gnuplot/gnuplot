@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.8 2004/02/23 13:35:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.9 2004/07/01 17:10:03 broeker Exp $"); }
 #endif
 
 
@@ -110,8 +110,8 @@ main(void)
 	xsize = (TheRange[plot].xmax - TheRange[plot].xmin) * ISOSAMPLES + 1;
 	ysize = (TheRange[plot].ymax - TheRange[plot].ymin) * ISOSAMPLES + 1;
 
-	rt = vector(0, xsize - 1);
-	ct = vector(0, ysize - 1);
+	rt = alloc_vector(0, xsize - 1);
+	ct = alloc_vector(0, ysize - 1);
 	m = matrix(0, xsize - 1, 0, ysize - 1);
 
 	for (y = TheRange[plot].ymin, j = 0; j < ysize; j++, y += 1.0 / (double) ISOSAMPLES) {
@@ -140,8 +140,8 @@ main(void)
     xsize = (TheRange[plot].xmax - TheRange[plot].xmin) * ISOSAMPLES + 1;
     ysize = (TheRange[plot].ymax - TheRange[plot].ymin) * ISOSAMPLES + 1;
 
-    rt = vector(0, xsize - 1);
-    ct = vector(0, ysize - 1);
+    rt = alloc_vector(0, xsize - 1);
+    ct = alloc_vector(0, ysize - 1);
     m = matrix(0, xsize - 1, 0, ysize - 1);
 
     for (y = TheRange[plot].ymin, j = 0; j < ysize; j++, y += 1.0 / (double) ISOSAMPLES) {

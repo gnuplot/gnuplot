@@ -1,3 +1,10 @@
+2007-10-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/binary.c src/binary.h src/bf_test.c: Rename the routine vector()
+	to alloc_vector().  This avoids a conflict with the "vector" keyword on
+	PowerPC OSX with Altivec compiler options enabled.
+	Bug #1754164
+
 2007-10-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (bound_intersect):  Fix a degenerate case in the
