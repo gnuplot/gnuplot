@@ -1,5 +1,5 @@
 /*
- * $Id: binary.h,v 1.9 2004/04/13 17:23:51 broeker Exp $
+ * $Id: binary.h,v 1.10 2004/07/01 17:10:03 broeker Exp $
  */
 
 /* GNUPLOT - binary.h */
@@ -41,7 +41,7 @@
 #include "stdfn.h"
 
 /* Routines for interfacing with command.c */
-float GPFAR *vector __PROTO(( int nl, int nh));
+float GPFAR *alloc_vector __PROTO(( int nl, int nh));
 float GPFAR *extend_vector __PROTO((float GPFAR *vec, int old_nl, int new_nh));
 float GPFAR *retract_vector __PROTO((float GPFAR *v, int old_nl, int new_nh));
 float GPFAR * GPFAR *matrix __PROTO(( int nrl, int nrh, int ncl, int nch));

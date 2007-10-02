@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.11 2004/07/01 17:10:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.12 2004/07/25 12:25:00 broeker Exp $"); }
 #endif
 
 /*
@@ -119,10 +119,10 @@ fread_matrix(
     /* Choose a reasonable number of rows, allocate space for it and
      * continue until this space runs out, then extend the matrix as
      * necessary. */
-    ct = vector(0, num_cols - 1);
+    ct = alloc_vector(0, num_cols - 1);
     fread(ct, sizeof(*ct), num_cols, fin);
 
-    rt = vector(0, num_rows - 1);
+    rt = alloc_vector(0, num_rows - 1);
     m = matrix(0, num_rows - 1, 0, num_cols - 1);
 
     while (fread(&rt[current_row], sizeof(rt[current_row]), 1, fin) == 1) {
@@ -180,7 +180,7 @@ fwrite_matrix(
 	return (FALSE);
     }
     if (!column_title) {
-	column_title = title = vector(ncl, nch);
+	column_title = title = alloc_vector(ncl, nch);
 	for (j = ncl; j <= nch; j++)
 	    title[j] = (float) j;
     }
@@ -190,7 +190,7 @@ fwrite_matrix(
 	title = NULL;
     }
     if (!row_title) {
-	row_title = title = vector(nrl, nrh);
+	row_title = title = alloc_vector(nrl, nrh);
 	for (j = nrl; j <= nrh; j++)
 	    title[j] = (float) j;
     }
@@ -216,7 +216,7 @@ fwrite_matrix(
  *
  */
 float GPFAR *
-vector(int nl, int nh)
+alloc_vector(int nl, int nh)
 {
     float GPFAR *vec;
 
