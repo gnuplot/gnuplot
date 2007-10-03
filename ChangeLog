@@ -1,3 +1,8 @@
+2007-10-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/cgm.trm (CGM_options): Remove spurious c_token++, which caused
+	parsing to skip the font size in:  set term cgm "fontname" fontsize
+
 2007-10-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/binary.c src/binary.h src/bf_test.c: Rename the routine vector()
