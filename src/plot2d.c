@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.3 2007/03/22 04:14:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.4 2007/05/20 04:42:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1781,10 +1781,16 @@ eval_plots()
 
 #ifdef EAM_DATASTRINGS
             /* If we got this far without initializing the label list, do it now */
-            if (this_plot->plot_style == LABELPOINTS && this_plot->labels == NULL) {
-                this_plot->labels = new_text_label(-1);
-                this_plot->labels->pos = JUST_CENTRE;
-                this_plot->labels->layer = LAYER_PLOTLABELS;
+            if (this_plot->plot_style == LABELPOINTS) {
+		if (this_plot->labels == NULL) {
+		    this_plot->labels = new_text_label(-1);
+		    this_plot->labels->pos = JUST_CENTRE;
+		    this_plot->labels->layer = LAYER_PLOTLABELS;
+		}
+		this_plot->labels->place.scalex =
+		    (x_axis == SECOND_X_AXIS) ? second_axes : first_axes;
+		this_plot->labels->place.scaley =
+		    (y_axis == SECOND_Y_AXIS) ? second_axes : first_axes;
             }
 #endif /* EAM_DATASTRINGS */
 

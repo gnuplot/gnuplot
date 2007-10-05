@@ -1,3 +1,9 @@
+2007-10-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots): Load first/second axis information into 
+	the head of the label list for plot mode LABELPOINTS.
+	Bug #1807015
+
 2007-10-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/binary.c src/binary.h src/bf_test.c: Rename the routine vector()
