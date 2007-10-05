@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.151 2007/08/26 19:20:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.152 2007/08/31 20:03:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1792,17 +1792,23 @@ eval_plots()
 		    this_plot->fill_properties.fillstyle = FS_SOLID;
 	    }
 
-#ifdef EAM_DATASTRINGS
-	    /* If we got this far without initializing the label list, do it now */
-	    if (this_plot->plot_style == LABELPOINTS && this_plot->labels == NULL) {
-		this_plot->labels = new_text_label(-1);
-		this_plot->labels->pos = JUST_CENTRE;
-		this_plot->labels->layer = LAYER_PLOTLABELS;
-	    }
-#endif /* EAM_DATASTRINGS */
-
 	    this_plot->x_axis = x_axis;
 	    this_plot->y_axis = y_axis;
+
+#ifdef EAM_DATASTRINGS
+	    /* If we got this far without initializing the label list, do it now */
+	    if (this_plot->plot_style == LABELPOINTS) {
+		if (this_plot->labels == NULL) {
+		    this_plot->labels = new_text_label(-1);
+		    this_plot->labels->pos = JUST_CENTRE;
+		    this_plot->labels->layer = LAYER_PLOTLABELS;
+		}
+		this_plot->labels->place.scalex =
+		    (x_axis == SECOND_X_AXIS) ? second_axes : first_axes;
+		this_plot->labels->place.scaley =
+		    (y_axis == SECOND_Y_AXIS) ? second_axes : first_axes;
+	    }
+#endif /* EAM_DATASTRINGS */
 
 #ifdef EAM_HISTOGRAMS
 	    /* Initialize histogram data structure */
