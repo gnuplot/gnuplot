@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.81 2007/02/10 22:00:01 sfeam Exp $
+ * $Id: cgm.trm,v 1.82 2007/10/03 18:35:27 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1761,7 +1761,7 @@ START_HELP(cgm)
 " Syntax:",
 "       set terminal cgm {<mode>} {<color>} {<rotation>} {solid | dashed}",
 "                        {width <plot_width>} {linewidth <line_width>}",
-"                        {\"<font>\"} {<fontsize>}",
+"                        {font \"<fontname>,<fontsize>\"}",
 "                        {<color0> <color1> <color2> ...}",
 "",
 " where <mode> is `landscape`, `portrait`, or `default`;",
@@ -1770,7 +1770,7 @@ START_HELP(cgm)
 " `solid` draws all curves with solid lines, overriding any dashed patterns;",
 " <plot_width> is the assumed width of the plot in points; ",
 " <line_width> is the line width in points (default 1); ",
-" <font> is the name of a font; and ",
+" <fontname> is the name of a font (see list of fonts below)",
 " <fontsize> is the size of the font in points (default 12).",
 "",
 " By default, `cgm` uses rotated text for the Y axis label.",
