@@ -1,3 +1,15 @@
+2007-10-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (change_term):  Always accept the full name of a terminal,
+	even if it is a leading substring of a longer name.  E.g. accept
+	"set term pdf" even if there are both pdf and pdfcairo terminals.
+
+	* term/cairo.trm configure.in:  Convert cairo.trm to be shared by
+	more than one cairo-based terminal type.  Change the pdf terminal name
+	from "cairopdf" to "pdfcairo".  Add a parallel terminal entry table for
+	"pngcairo".  Test for output type (pdf or png) in term->init() and
+	term->reset().  All other code is shared at this point.
+
 2007-10-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots): Load first/second axis information into 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.160 2007/08/27 04:33:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.161 2007/09/27 18:14:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1504,6 +1504,8 @@ change_term(const char *origname, int length)
 	    if (t)
 		return (NULL);  /* ambiguous */
 	    t = term_tbl + i;
+	    if (strlen(name) == strlen(term_tbl[i].name))
+		break;
 	}
     }
 

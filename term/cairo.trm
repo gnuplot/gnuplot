@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.3 2007/08/07 04:55:22 sfeam Exp $
+ * $Id: cairo.trm,v 1.4 2007/08/20 09:46:06 tlecomte Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -35,7 +35,7 @@
 ]*/
 
 #ifdef TERM_REGISTER
-register_term (cairopdf)
+register_term (pdfcairo)
 #endif
 
 #ifdef TERM_PROTO
@@ -168,7 +168,7 @@ TERM_PUBLIC void cairopdf_options()
 				if (s[sep] == ',')
 					sscanf(&(s[sep+1]), "%d", &cairopdf_set_fontsize);
 			}
-			font_setting = (char*) gp_alloc(strlen(s) + 1,"cairopdf font");
+			font_setting = (char*) gp_alloc(strlen(s) + 1,"cairo terminal font");
 			strcpy(font_setting,s);
 			free(s);
 			if (set_font) duplication=TRUE;
@@ -241,7 +241,7 @@ TERM_PUBLIC void cairopdf_options()
 		}
 
 		if (duplication)
-			int_error(c_token-1, "Duplicated or contradicting arguments in cairopdf term options.");
+			int_error(c_token-1, "Duplicated or contradicting arguments in cairo terminal options.");
 	}
 
 	/* Save options back into options string in normalized format */
@@ -315,9 +315,17 @@ void cairopdf_init()
 	if ( plot.cr )
 		cairo_destroy(plot.cr);
 
-	surface = cairo_pdf_surface_create   (outstr /* output file name */,
-                                             plot.device_xmax /*double width_in_points*/,
-                                             plot.device_ymax /*double height_in_points*/);
+	if (!strcmp(term->name,"pdfcairo"))
+		surface = cairo_pdf_surface_create(outstr,
+				plot.device_xmax /*double width_in_points*/,
+				plot.device_ymax /*double height_in_points*/);
+	else if (!strcmp(term->name,"pngcairo"))
+		surface = cairo_image_surface_create( CAIRO_FORMAT_ARGB32,
+				plot.device_xmax /*double width_in_points*/,
+				plot.device_ymax /*double height_in_points*/);
+	else
+		int_error(c_token,"Unrecognized cairo terminal");
+
 	plot.cr = cairo_create(surface);
 	cairo_surface_destroy( surface );
 
@@ -385,6 +393,9 @@ void cairopdf_text()
 void cairopdf_reset()
 {
 	/* finish the document */
+	if (!strcmp(term->name,"pngcairo"))
+		cairo_surface_write_to_png(cairo_get_target(plot.cr), outstr);
+
 	cairo_destroy(plot.cr);
 
 	FPRINTF((stderr,"cairopdf_reset\n"));
@@ -608,8 +619,8 @@ void cairopdf_image(unsigned M, unsigned N, coordval * image, gpiPoint * corner,
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
-TERM_TABLE_START (cairopdf_driver)
-    "cairopdf", "pdf terminal based on cairo",
+TERM_TABLE_START (pdfcairo_driver)
+    "pdfcairo", "pdf terminal based on cairo",
     /* the following values are overriden by cairopdf_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,
@@ -630,25 +641,50 @@ TERM_TABLE_START (cairopdf_driver)
 TERM_TABLE_END (cairopdf_driver)
 
 #undef LAST_TERM
-#define LAST_TERM cairopdf_driver
+#define LAST_TERM pdfcairo_driver
+
+
+TERM_TABLE_START (pngcairo_driver)
+    "pngcairo", "png terminal based on cairo",
+    /* the following values are overriden by cairopdf_graphics */
+    1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
+    1 /* vtic */ , 1 /* htic */ ,
+    cairopdf_options, cairopdf_init, cairopdf_reset, cairopdf_text, null_scale, cairopdf_graphics,
+    cairopdf_move, cairopdf_vector, cairopdf_linetype, cairopdf_put_text,
+    cairopdf_text_angle, cairopdf_justify_text,
+    cairopdf_point, do_arrow, cairopdf_set_font,
+    cairopdf_pointsize, TERM_CAN_MULTIPLOT|TERM_BINARY,
+    cairopdf_text /* suspend */, 0 /* resume */, cairopdf_fillbox, cairopdf_linewidth
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0
+#endif
+    , cairopdf_make_palette, 0 /* cairopdf_previous_palette */, cairopdf_set_color, cairopdf_filled_polygon
+#ifdef WITH_IMAGE
+    , cairopdf_image
+#endif
+    , gp_cairo_enhanced_open, gp_cairo_enhanced_flush, do_enh_writec
+TERM_TABLE_END (pngcairo_driver)
+
+#undef LAST_TERM
+#define LAST_TERM pngcairo_driver
 
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
-START_HELP(cairopdf)
-"1 cairopdf",
-"?set terminal cairopdf",
-"?terminal cairopdf",
-"?set term cairopdf",
-"?term cairopdf",
-"?cairopdf",
-" The `cairopdf` terminal device generates output in pdf. The actual",
+START_HELP(pdfcairo)
+"1 pdfcairo",
+"?set terminal pdfcairo",
+"?terminal pdfcairo",
+"?set term pdfcairo",
+"?term pdfcairo",
+"?pdfcairo",
+" The `pdfcairo` terminal device generates output in pdf. The actual",
 " drawing is done via cairo, a 2D graphics library, and pango, a library for",
 " laying out and rendering text.",
 "",
 " Syntax:",
-"         set term cairopdf",
+"         set term pdfcairo",
 "                      {{no}enhanced} {mono|color} {solid|dashed}",
 "                      {font <font>}",
 "                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
@@ -674,27 +710,27 @@ START_HELP(cairopdf)
 "",
 " <font> is in the format \"FontFace,FontSize\", i.e. the face and the size",
 " comma-separated in a single string. FontFace is a usual font face name, such",
-" as \'Arial\'. If you do not provide FontFace, the cairopdf terminal will use",
+" as \'Arial\'. If you do not provide FontFace, the pdfcairo terminal will use",
 " \'Sans\'. FontSize is the font size, in points. If you do not provide it,",
-" the cairopdf terminal will use a size of 6 points.",
+" the pdfcairo terminal will use a size of 6 points.",
 "    For example :",
-"       set term cairopdf font \"Arial,12\"",
-"       set term cairopdf font \"Arial\" # to change the font face only",
-"       set term cairopdf font \",12\" # to change the font size only",
-"       set term cairopdf font \"\" # to reset the font name and size",
+"       set term pdfcairo font \"Arial,12\"",
+"       set term pdfcairo font \"Arial\" # to change the font face only",
+"       set term pdfcairo font \",12\" # to change the font size only",
+"       set term pdfcairo font \"\" # to reset the font name and size",
 "",
 " The fonts are retrieved from the usual fonts subsystems. Under Windows,",
 " those fonts are to be found and configured in the entry \"Fonts\" of the",
 " control panel. Under UNIX, they are handled by \"fontconfig\".",
 "",
-" Pango, the library used to layout the text, is based on utf-8. Thus, the cairopdf",
+" Pango, the library used to layout the text, is based on utf-8. Thus, the pdfcairo",
 " terminal has to convert from your encoding to utf-8. The default input",
 " encoding is based on your \'locale\'. If you want to use another encoding,",
 " make sure gnuplot knows which one you are using. See `encoding` for more",
 " details.",
 "",
 " Pango may give unexpected results with fonts that do not respect the unicode",
-" mapping. With the Symbol font, for example, the cairopdf terminal will use the map",
+" mapping. With the Symbol font, for example, the pdfcairo terminal will use the map",
 " provided by http://www.unicode.org/ to translate character codes to unicode.",
 " Note that \"the Symbol font\" is to be understood as the Adobe",
 " Symbol font, distributed with Acrobat Reader as \"SY______.PFB\".",
@@ -716,6 +752,90 @@ START_HELP(cairopdf)
 " so that gnuplot can draw a line from non-integer coordinates. This avoids",
 " wobbling effects on diagonal lines ('plot x' for example).",
 ""
-END_HELP(cairopdf)
+END_HELP(pdfcairo)
+#endif /* TERM_HELP */
+
+#ifdef TERM_HELP
+START_HELP(pngcairo)
+"1 pngcairo",
+"?set terminal pngcairo",
+"?terminal pngcairo",
+"?set term pngcairo",
+"?term pngcairo",
+"?pngcairo",
+" The `pngcairo` terminal device generates output in png. The actual",
+" drawing is done via cairo, a 2D graphics library, and pango, a library for",
+" laying out and rendering text.",
+"",
+" Syntax:",
+"         set term pngcairo",
+"                      {{no}enhanced} {mono|color} {solid|dashed}",
+"                      {font <font>}",
+"                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
+"                      {size <XX>{unit},<YY>{unit}}",
+"",
+" This terminal supports an enhanced text mode, which allows font and other",
+" formatting commands (subscripts, superscripts, etc.) to be embedded in labels",
+" and other text strings. The enhanced text mode syntax is shared with other",
+" gnuplot terminal types. See `enhanced` for more details.",
+"",
+" The width of all lines in the plot can be modified by the factor <lw>",
+" specified in `linewidth`. The default linewidth is 0.25 points.",
+" (1 \"PostScript\" point = 1/72 inch = 0.353 cm)",
+"",
+" `rounded` sets line caps and line joins to be rounded; `butt` is the",
+" default, butt caps and mitered joins.",
+"",
+" The default size for the output is 5 inches x 3 inches. The `size` option",
+" changes this to whatever the user requests. By default the X and Y sizes are",
+" taken to be in inches, but other units are possibly (currently only cm).",
+" Screen coordinates always run from 0.0 to 1.0 along the full length of the",
+" plot edges as specified by the `size` option.",
+"",
+" <font> is in the format \"FontFace,FontSize\", i.e. the face and the size",
+" comma-separated in a single string. FontFace is a usual font face name, such",
+" as \'Arial\'. If you do not provide FontFace, the pngcairo terminal will use",
+" \'Sans\'. FontSize is the font size, in points. If you do not provide it,",
+" the pngcairo terminal will use a size of 6 points.",
+"    For example :",
+"       set term pngcairo font \"Arial,12\"",
+"       set term pngcairo font \"Arial\" # to change the font face only",
+"       set term pngcairo font \",12\" # to change the font size only",
+"       set term pngcairo font \"\" # to reset the font name and size",
+"",
+" The fonts are retrieved from the usual fonts subsystems. Under Windows,",
+" those fonts are to be found and configured in the entry \"Fonts\" of the",
+" control panel. Under UNIX, they are handled by \"fontconfig\".",
+"",
+" Pango, the library used to layout the text, is based on utf-8. Thus, the pngcairo",
+" terminal has to convert from your encoding to utf-8. The default input",
+" encoding is based on your \'locale\'. If you want to use another encoding,",
+" make sure gnuplot knows which one you are using. See `encoding` for more",
+" details.",
+"",
+" Pango may give unexpected results with fonts that do not respect the unicode",
+" mapping. With the Symbol font, for example, the pngcairo terminal will use the map",
+" provided by http://www.unicode.org/ to translate character codes to unicode.",
+" Note that \"the Symbol font\" is to be understood as the Adobe",
+" Symbol font, distributed with Acrobat Reader as \"SY______.PFB\".",
+" Alternatively, the OpenSymbol font, distributed with OpenOffice.org as",
+" \"opens___.ttf\", offers the same characters. Microsoft has distributed a",
+" Symbol font (\"symbol.ttf\"), but it has a different character set with",
+" several missing or moved mathematic characters. If you experience problems",
+" with your default setup (if the demo enhancedtext.dem is not displayed",
+" properly for example), you probably have to install one of the Adobe or",
+" OpenOffice Symbol fonts, and remove the Microsoft one.",
+" Other non-conform fonts, such as \"wingdings\" have been observed working.",
+"",
+" The rendering of the plot cannot be altered yet. To obtain the best output",
+" possible, the rendering involves two mechanisms : antialiasing and",
+" oversampling.",
+" Antialiasing allows to display non-horizontal and non-vertical lines",
+" smoother.",
+" Oversampling combined with antialiasing provides subpixel accuracy,",
+" so that gnuplot can draw a line from non-integer coordinates. This avoids",
+" wobbling effects on diagonal lines ('plot x' for example).",
+""
+END_HELP(pngcairo)
 #endif /* TERM_HELP */
 
