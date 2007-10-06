@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.5 2007/10/06 02:57:58 sfeam Exp $
+ * $Id: cairo.trm,v 1.6 2007/10/06 06:04:06 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -39,28 +39,28 @@ register_term (pdfcairo)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void cairopdf_options __PROTO ((void));
-TERM_PUBLIC void cairopdf_init __PROTO ((void));
-TERM_PUBLIC void cairopdf_graphics __PROTO ((void));
-TERM_PUBLIC void cairopdf_text __PROTO ((void));
-TERM_PUBLIC void cairopdf_linetype __PROTO ((int linetype));
-TERM_PUBLIC void cairopdf_move __PROTO ((unsigned int x, unsigned int y));
-TERM_PUBLIC void cairopdf_vector __PROTO ((unsigned int x, unsigned int y));
-TERM_PUBLIC void cairopdf_put_text __PROTO ((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void cairopdf_reset __PROTO ((void));
-TERM_PUBLIC int cairopdf_justify_text __PROTO ((enum JUSTIFY mode));
-TERM_PUBLIC void cairopdf_point __PROTO ((unsigned int x, unsigned int y, int pointstyle));
-TERM_PUBLIC void cairopdf_linewidth __PROTO ((double linewidth));
-TERM_PUBLIC int cairopdf_text_angle __PROTO ((int ang));
-TERM_PUBLIC void cairopdf_fillbox __PROTO ((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
-TERM_PUBLIC int cairopdf_set_font __PROTO ((const char *font));
-TERM_PUBLIC void cairopdf_pointsize __PROTO ((double ptsize));
+TERM_PUBLIC void cairotrm_options __PROTO ((void));
+TERM_PUBLIC void cairotrm_init __PROTO ((void));
+TERM_PUBLIC void cairotrm_graphics __PROTO ((void));
+TERM_PUBLIC void cairotrm_text __PROTO ((void));
+TERM_PUBLIC void cairotrm_linetype __PROTO ((int linetype));
+TERM_PUBLIC void cairotrm_move __PROTO ((unsigned int x, unsigned int y));
+TERM_PUBLIC void cairotrm_vector __PROTO ((unsigned int x, unsigned int y));
+TERM_PUBLIC void cairotrm_put_text __PROTO ((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void cairotrm_reset __PROTO ((void));
+TERM_PUBLIC int cairotrm_justify_text __PROTO ((enum JUSTIFY mode));
+TERM_PUBLIC void cairotrm_point __PROTO ((unsigned int x, unsigned int y, int pointstyle));
+TERM_PUBLIC void cairotrm_linewidth __PROTO ((double linewidth));
+TERM_PUBLIC int cairotrm_text_angle __PROTO ((int ang));
+TERM_PUBLIC void cairotrm_fillbox __PROTO ((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
+TERM_PUBLIC int cairotrm_set_font __PROTO ((const char *font));
+TERM_PUBLIC void cairotrm_pointsize __PROTO ((double ptsize));
 #ifdef WITH_IMAGE
-TERM_PUBLIC void cairopdf_image __PROTO ((unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode));
+TERM_PUBLIC void cairotrm_image __PROTO ((unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode));
 #endif /*WITH_IMAGE*/
-TERM_PUBLIC int cairopdf_make_palette __PROTO ((t_sm_palette *palette));
-TERM_PUBLIC void cairopdf_set_color __PROTO ((t_colorspec *colorspec));
-TERM_PUBLIC void cairopdf_filled_polygon __PROTO ((int n, gpiPoint * corners));
+TERM_PUBLIC int cairotrm_make_palette __PROTO ((t_sm_palette *palette));
+TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
+TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -72,71 +72,71 @@ TERM_PUBLIC void cairopdf_filled_polygon __PROTO ((int n, gpiPoint * corners));
 /* for enhanced text mode */
 #include "wxterminal/gp_cairo_term.h"
 
-#define CAIROPDF_DEFAULT_FONTNAME "Sans"
-#define CAIROPDF_DEFAULT_FONTSIZE 6 /* in points */
-#define CAIROPDF_DEFAULT_LINEWIDTH 0.25 /* in points */
-#define CAIROPDF_DEFAULT_WIDTH 5*72 /* in points, 5 inches */
-#define CAIROPDF_DEFAULT_HEIGHT 3*72 /* in points, 3 inches */
+#define CAIROTRM_DEFAULT_FONTNAME "Sans"
+#define CAIROTRM_DEFAULT_FONTSIZE 6 /* in points */
+#define CAIROTRM_DEFAULT_LINEWIDTH 0.25 /* in points */
+#define CAIROTRM_DEFAULT_WIDTH 5*72 /* in points, 5 inches */
+#define CAIROTRM_DEFAULT_HEIGHT 3*72 /* in points, 3 inches */
 
 /* terminal state */
-TBOOLEAN cairopdf_enhanced_enabled = FALSE;
-TBOOLEAN cairopdf_dashed = FALSE;
-TBOOLEAN cairopdf_mono = FALSE;
-TBOOLEAN cairopdf_rounded = FALSE;
+TBOOLEAN cairotrm_enhanced_enabled = FALSE;
+TBOOLEAN cairotrm_dashed = FALSE;
+TBOOLEAN cairotrm_mono = FALSE;
+TBOOLEAN cairotrm_rounded = FALSE;
 /* default text font family: */
-char cairopdf_set_fontname[MAX_ID_LEN + 1] = "";
+char cairotrm_set_fontname[MAX_ID_LEN + 1] = "";
 /* default text size*/
-int cairopdf_set_fontsize = 0;
+int cairotrm_set_fontsize = 0;
 /* default width, in points */
-float cairopdf_width = CAIROPDF_DEFAULT_WIDTH;
+float cairotrm_width = CAIROTRM_DEFAULT_WIDTH;
 /* default height, in points */
-float cairopdf_height = CAIROPDF_DEFAULT_HEIGHT;
+float cairotrm_height = CAIROTRM_DEFAULT_HEIGHT;
 /* Default multipliers for linewidths and dashlengths */
-float cairopdf_lw = 1.0;
-float cairopdf_dl = 1.0;
+float cairotrm_lw = 1.0;
+float cairotrm_dl = 1.0;
 
 
 plot_struct plot;
 
-enum CAIROPDF_id {
-    CAIROPDF_FONT,
-    CAIROPDF_ENHANCED,
-    CAIROPDF_NOENHANCED,
-    CAIROPDF_SIZE,
-    CAIROPDF_ROUNDED,
-    CAIROPDF_BUTT,
-    CAIROPDF_LINEWIDTH,
-    CAIROPDF_DASHED,
-    CAIROPDF_SOLID,
-    CAIROPDF_MONO,
-    CAIROPDF_COLOR,
-    CAIROPDF_DASHLENGTH,
-    CAIROPDF_OTHER
+enum CAIROTRM_id {
+    CAIROTRM_FONT,
+    CAIROTRM_ENHANCED,
+    CAIROTRM_NOENHANCED,
+    CAIROTRM_SIZE,
+    CAIROTRM_ROUNDED,
+    CAIROTRM_BUTT,
+    CAIROTRM_LINEWIDTH,
+    CAIROTRM_DASHED,
+    CAIROTRM_SOLID,
+    CAIROTRM_MONO,
+    CAIROTRM_COLOR,
+    CAIROTRM_DASHLENGTH,
+    CAIROTRM_OTHER
 };
 
-static struct gen_table cairopdf_opts[] = {
-    {"f$ont",   CAIROPDF_FONT},
-    {"enh$anced", CAIROPDF_ENHANCED},
-    {"noenh$anced", CAIROPDF_NOENHANCED},
-    {"s$ize", CAIROPDF_SIZE},
-    {"round$ed", CAIROPDF_ROUNDED},
-    {"butt", CAIROPDF_BUTT},
-    {"lw", CAIROPDF_LINEWIDTH},
-    {"linewidth", CAIROPDF_LINEWIDTH},
-    {"dash$ed", CAIROPDF_DASHED},
-    {"solid", CAIROPDF_SOLID},
-    {"mono$chrome", CAIROPDF_MONO},
-    {"color", CAIROPDF_COLOR},
-    {"dl", CAIROPDF_DASHLENGTH},
-    {"dashlen$gth", CAIROPDF_DASHLENGTH},
-    {NULL, CAIROPDF_OTHER}
+static struct gen_table cairotrm_opts[] = {
+    {"f$ont",   CAIROTRM_FONT},
+    {"enh$anced", CAIROTRM_ENHANCED},
+    {"noenh$anced", CAIROTRM_NOENHANCED},
+    {"s$ize", CAIROTRM_SIZE},
+    {"round$ed", CAIROTRM_ROUNDED},
+    {"butt", CAIROTRM_BUTT},
+    {"lw", CAIROTRM_LINEWIDTH},
+    {"linewidth", CAIROTRM_LINEWIDTH},
+    {"dash$ed", CAIROTRM_DASHED},
+    {"solid", CAIROTRM_SOLID},
+    {"mono$chrome", CAIROTRM_MONO},
+    {"color", CAIROTRM_COLOR},
+    {"dl", CAIROTRM_DASHLENGTH},
+    {"dashlen$gth", CAIROTRM_DASHLENGTH},
+    {NULL, CAIROTRM_OTHER}
 };
 
 /* "Called when terminal type is selected. This procedure should parse options on the command line.
 * A list of the currently selected options should be stored in term_options[],
 * in a form suitable for use with the set term command.
 * term_options[] is used by the save command.  Use options_null() if no options are available." */
-TERM_PUBLIC void cairopdf_options()
+TERM_PUBLIC void cairotrm_options()
 {
 	char *s = NULL;
 	char *font_setting = NULL;
@@ -144,29 +144,29 @@ TERM_PUBLIC void cairopdf_options()
 	TBOOLEAN duplication = FALSE;
 	TBOOLEAN set_enhanced = FALSE, set_font = FALSE, set_size = FALSE;
 	TBOOLEAN set_capjoin = FALSE;
-	size_units cairopdf_explicit_units = INCHES;
+	size_units cairotrm_explicit_units = INCHES;
 	char tmp_term_options[MAX_LINE_LEN+1] = "";
-	cairopdf_dashed = FALSE;	/* Dashed lines? (default is solid) */
-	cairopdf_mono = FALSE;  	/* Mono? (default is color) */
+	cairotrm_dashed = FALSE;	/* Dashed lines? (default is solid) */
+	cairotrm_mono = FALSE;  	/* Mono? (default is color) */
 
 	while (!END_OF_COMMAND) {
 		FPRINTF((stderr, "processing token\n"));
-		switch (lookup_table(&cairopdf_opts[0], c_token)) {
-		case CAIROPDF_FONT:
+		switch (lookup_table(&cairotrm_opts[0], c_token)) {
+		case CAIROTRM_FONT:
 			c_token++;
 			if (!(s = try_to_get_string()))
 				int_error(c_token,"font: expecting string");
 			if (!(*s)) {
-				strcpy (cairopdf_set_fontname, "");
-				cairopdf_set_fontsize = 0;
+				strcpy (cairotrm_set_fontname, "");
+				cairotrm_set_fontsize = 0;
 			} else {
 				sep = strcspn(s,",");
 				if (sep > 0) {
-					strncpy(cairopdf_set_fontname, s, sep);
-					cairopdf_set_fontname[sep] = '\0';
+					strncpy(cairotrm_set_fontname, s, sep);
+					cairotrm_set_fontname[sep] = '\0';
 				}
 				if (s[sep] == ',')
-					sscanf(&(s[sep+1]), "%d", &cairopdf_set_fontsize);
+					sscanf(&(s[sep+1]), "%d", &cairotrm_set_fontsize);
 			}
 			font_setting = (char*) gp_alloc(strlen(s) + 1,"cairo terminal font");
 			strcpy(font_setting,s);
@@ -174,67 +174,67 @@ TERM_PUBLIC void cairopdf_options()
 			if (set_font) duplication=TRUE;
 			set_font = TRUE;
 			break;
-		case CAIROPDF_ENHANCED:
+		case CAIROTRM_ENHANCED:
 			c_token++;
-			cairopdf_enhanced_enabled = TRUE;
+			cairotrm_enhanced_enabled = TRUE;
 			term->flags |= TERM_ENHANCED_TEXT;
 			if (set_enhanced) duplication=TRUE;
 			set_enhanced = TRUE;
 			break;
-		case CAIROPDF_NOENHANCED:
+		case CAIROTRM_NOENHANCED:
 			c_token++;
-			cairopdf_enhanced_enabled = FALSE;
+			cairotrm_enhanced_enabled = FALSE;
 			term->flags &= ~TERM_ENHANCED_TEXT;
 			if (set_enhanced) duplication=TRUE;
 			set_enhanced = TRUE;
 			break;
-		case CAIROPDF_SIZE:
+		case CAIROTRM_SIZE:
 			c_token++;
-			cairopdf_explicit_units = parse_term_size(&cairopdf_width, &cairopdf_height, INCHES);
+			cairotrm_explicit_units = parse_term_size(&cairotrm_width, &cairotrm_height, INCHES);
 			if (set_size) duplication=TRUE;
 			set_size = TRUE;
 			break;
-		case CAIROPDF_ROUNDED:
+		case CAIROTRM_ROUNDED:
 			c_token++;
 			if (set_capjoin) duplication=TRUE;
-			cairopdf_rounded = TRUE;
+			cairotrm_rounded = TRUE;
 			set_capjoin = TRUE;
 			break;
-		case CAIROPDF_BUTT:
+		case CAIROTRM_BUTT:
 			c_token++;
 			if (set_capjoin) duplication=TRUE;
-			cairopdf_rounded = FALSE;
+			cairotrm_rounded = FALSE;
 			set_capjoin = TRUE;
 			break;
-		case CAIROPDF_LINEWIDTH:
+		case CAIROTRM_LINEWIDTH:
 			c_token++;
-			cairopdf_lw = real_expression();
-			if (cairopdf_lw < 0.0)
-			    cairopdf_lw = 1.0;
+			cairotrm_lw = real_expression();
+			if (cairotrm_lw < 0.0)
+			    cairotrm_lw = 1.0;
 			break;
-		case CAIROPDF_DASHED:
+		case CAIROTRM_DASHED:
 			c_token++;
-			cairopdf_dashed = TRUE;
+			cairotrm_dashed = TRUE;
 			break;
-		case CAIROPDF_SOLID:
+		case CAIROTRM_SOLID:
 			c_token++;
-			cairopdf_dashed = FALSE;
+			cairotrm_dashed = FALSE;
 			break;
-		case CAIROPDF_MONO:
+		case CAIROTRM_MONO:
 			c_token++;
-			cairopdf_mono = TRUE;
+			cairotrm_mono = TRUE;
 			break;
-		case CAIROPDF_COLOR:
+		case CAIROTRM_COLOR:
 			c_token++;
-			cairopdf_mono = FALSE;
+			cairotrm_mono = FALSE;
 			break;
-		case CAIROPDF_DASHLENGTH:
+		case CAIROTRM_DASHLENGTH:
 			c_token++;
-			cairopdf_dl = real_expression();
-			if (cairopdf_dl < 0.0)
-			    cairopdf_dl = 1.0;
+			cairotrm_dl = real_expression();
+			if (cairotrm_dl < 0.0)
+			    cairotrm_dl = 1.0;
 			break;
-		case CAIROPDF_OTHER:
+		case CAIROTRM_OTHER:
 		default:
 			int_error(c_token, "unrecognized terminal option");
 			break;
@@ -247,7 +247,7 @@ TERM_PUBLIC void cairopdf_options()
 	/* Save options back into options string in normalized format */
 	if (set_enhanced)
 		snprintf(term_options, sizeof(term_options)-strlen(term_options),
-			cairopdf_enhanced_enabled ? " enhanced" : " noenhanced");
+			cairotrm_enhanced_enabled ? " enhanced" : " noenhanced");
 
 	if (set_font) {
 		snprintf(tmp_term_options, sizeof(tmp_term_options), " font \"%s\"", font_setting);
@@ -255,45 +255,45 @@ TERM_PUBLIC void cairopdf_options()
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
 	}
 
-	if (cairopdf_mono)
+	if (cairotrm_mono)
 		strncat(term_options, " monochrome", sizeof(term_options)-strlen(term_options));
 
-	if (cairopdf_dashed)
+	if (cairotrm_dashed)
 		strncat(term_options, " dashed", sizeof(term_options)-strlen(term_options));
 
 	if (set_size) {
-		if (cairopdf_explicit_units == CM)
+		if (cairotrm_explicit_units == CM)
 			snprintf(tmp_term_options,
 				sizeof(tmp_term_options),
 				" size %.2fcm, %.2fcm ",
-				2.54*cairopdf_width/72., 2.54*cairopdf_height/72.);
+				2.54*cairotrm_width/72., 2.54*cairotrm_height/72.);
 		else
 			snprintf(tmp_term_options,
 				sizeof(tmp_term_options),
 				" size %.2fin, %.2fin ",
-				cairopdf_width/72., cairopdf_height/72.);
+				cairotrm_width/72., cairotrm_height/72.);
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
 	}
 
 	if (set_capjoin) {
-		strncat(term_options, cairopdf_rounded ? " rounded" : " butt",
+		strncat(term_options, cairotrm_rounded ? " rounded" : " butt",
 			sizeof(term_options)-strlen(term_options));
 	}
 
-	if (cairopdf_lw != 1.0) {
-		snprintf(tmp_term_options,sizeof(tmp_term_options), " linewidth %g", cairopdf_lw);
+	if (cairotrm_lw != 1.0) {
+		snprintf(tmp_term_options,sizeof(tmp_term_options), " linewidth %g", cairotrm_lw);
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
 	}
 
-	if (cairopdf_dl != 1.0) {
-		snprintf(tmp_term_options,sizeof(tmp_term_options), " dashlength %g", cairopdf_dl);
+	if (cairotrm_dl != 1.0) {
+		snprintf(tmp_term_options,sizeof(tmp_term_options), " dashlength %g", cairotrm_dl);
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
 	}
 }
 
 /* "Called once, when the device is first selected."
  * Is the 'main' function of the terminal. */
-void cairopdf_init()
+void cairotrm_init()
 {
 	cairo_surface_t *surface;
 
@@ -301,9 +301,9 @@ void cairopdf_init()
 
 	/* initialisations */
 	gp_cairo_initialize_plot(&plot);
-	plot.device_xmax = (double) cairopdf_width;
-	plot.device_ymax = (double) cairopdf_height;
-	plot.dashlength = cairopdf_dl;
+	plot.device_xmax = (double) cairotrm_width;
+	plot.device_ymax = (double) cairotrm_height;
+	plot.dashlength = cairotrm_dl;
 	/* it is up to the pdf viewer to do the hinting */
 	plot.hinting = 0;
 	/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
@@ -311,7 +311,7 @@ void cairopdf_init()
 	 * between each other. */
 	plot.polygons_saturate = FALSE;
 
-	/* is supposed to be done in cairopdf_reset */
+	/* is supposed to be done in cairotrm_reset */
 	if ( plot.cr )
 		cairo_destroy(plot.cr);
 
@@ -335,7 +335,7 @@ void cairopdf_init()
 
 /* "Called just before a plot is going to be displayed."
  * Should clear the terminal. */
-void cairopdf_graphics()
+void cairotrm_graphics()
 {
 	/* Initialize background to solid white */
 	gp_cairo_solid_background(&plot);
@@ -345,7 +345,7 @@ void cairopdf_graphics()
 	plot.yscale = 1.0;
 
 	/* update graphics state properties */
-	plot.rounded = cairopdf_rounded;
+	plot.rounded = cairotrm_rounded;
 
 	FPRINTF((stderr,"Graphics1\n"));
 
@@ -363,13 +363,13 @@ void cairopdf_graphics()
 	plot.encoding = encoding;
 
 	/* set font details (hchar, vchar, h_tic, v_tic) according to settings */
-	cairopdf_set_font("");
+	cairotrm_set_font("");
 
 	FPRINTF((stderr,"Graphics xmax %d ymax %d v_char %d h_char %d\n",
 		term->xmax, term->ymax, term->v_char, term->h_char));
 }
 
-void cairopdf_text()
+void cairotrm_text()
 {
 	FPRINTF((stderr,"Text0\n"));
 
@@ -390,7 +390,7 @@ void cairopdf_text()
 }
 
 /* sent when gnuplot exits and when the terminal or the output change.*/
-void cairopdf_reset()
+void cairotrm_reset()
 {
 	/* finish the document */
 	if (!strcmp(term->name,"pngcairo"))
@@ -398,39 +398,39 @@ void cairopdf_reset()
 
 	cairo_destroy(plot.cr);
 
-	FPRINTF((stderr,"cairopdf_reset\n"));
+	FPRINTF((stderr,"cairotrm_reset\n"));
 }
 
-void cairopdf_move(unsigned int x, unsigned int y)
+void cairotrm_move(unsigned int x, unsigned int y)
 {
 	gp_cairo_move(&plot, x, term->ymax - y);
 }
 
-void cairopdf_vector(unsigned int x, unsigned int y)
+void cairotrm_vector(unsigned int x, unsigned int y)
 {
 	gp_cairo_vector(&plot, x, term->ymax - y);
 }
 
-void cairopdf_put_text(unsigned int x, unsigned int y, const char * string)
+void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 {
 	/* if ignore_enhanced_text is set, draw with the normal routine.
 	 * This is meant to avoid enhanced syntax when the enhanced mode is on */
-	if (cairopdf_enhanced_enabled && !ignore_enhanced_text)
+	if (cairotrm_enhanced_enabled && !ignore_enhanced_text)
 		gp_cairo_draw_enhanced_text(&plot, x, term->ymax - y, string);
 	else
 		gp_cairo_draw_text(&plot, x, term->ymax - y, string);
 }
 
-void cairopdf_linetype(int lt)
+void cairotrm_linetype(int lt)
 {
 	gp_cairo_set_linetype(&plot, lt);
 
-	if (cairopdf_dashed || lt == -1)
+	if (cairotrm_dashed || lt == -1)
 	    gp_cairo_set_linestyle(&plot,  GP_CAIRO_DASH);
 	else
 	    gp_cairo_set_linestyle(&plot,  GP_CAIRO_SOLID);
 
-        if (cairopdf_mono && lt >= -1)
+        if (cairotrm_mono && lt >= -1)
 	    gp_cairo_set_color(&plot, gp_cairo_linetype2color( -1 ));
 	else
 	    gp_cairo_set_color(&plot, gp_cairo_linetype2color( lt ));
@@ -440,7 +440,7 @@ void cairopdf_linetype(int lt)
 
 /* - fonts are selected as strings "name,size".
  * - _set_font("") restores the terminal's default font.*/
-int cairopdf_set_font (const char *font)
+int cairotrm_set_font (const char *font)
 {
 	char fontname[MAX_ID_LEN + 1] = "";
 	int fontsize = 0;
@@ -461,17 +461,17 @@ int cairopdf_set_font (const char *font)
 	}
 
 	if ( strlen(fontname) == 0 ) {
-		if ( strlen(cairopdf_set_fontname) == 0 )
-			strncpy(fontname, CAIROPDF_DEFAULT_FONTNAME, sizeof(fontname));
+		if ( strlen(cairotrm_set_fontname) == 0 )
+			strncpy(fontname, CAIROTRM_DEFAULT_FONTNAME, sizeof(fontname));
 		else
-			strncpy(fontname, cairopdf_set_fontname, sizeof(fontname));
+			strncpy(fontname, cairotrm_set_fontname, sizeof(fontname));
 	}
 
 	if ( fontsize == 0 ) {
-		if ( cairopdf_set_fontsize == 0 )
-			fontsize = CAIROPDF_DEFAULT_FONTSIZE;
+		if ( cairotrm_set_fontsize == 0 )
+			fontsize = CAIROTRM_DEFAULT_FONTSIZE;
 		else
-			fontsize = cairopdf_set_fontsize;
+			fontsize = cairotrm_set_fontsize;
 	}
 
 
@@ -485,19 +485,19 @@ int cairopdf_set_font (const char *font)
 }
 	
 
-int cairopdf_justify_text(enum JUSTIFY mode)
+int cairotrm_justify_text(enum JUSTIFY mode)
 {
 	gp_cairo_set_justify(&plot,mode);
 
 	return 1; /* we can justify */
 }
 
-void cairopdf_point(unsigned int x, unsigned int y, int pointstyle)
+void cairotrm_point(unsigned int x, unsigned int y, int pointstyle)
 {
 	gp_cairo_draw_point(&plot, x, term->ymax - y, pointstyle);
 }
 
-void cairopdf_pointsize(double ptsize)
+void cairotrm_pointsize(double ptsize)
 {
 	/* same behaviour as x11 terminal */
 	if (ptsize<0) ptsize = 1;
@@ -505,13 +505,13 @@ void cairopdf_pointsize(double ptsize)
 	gp_cairo_set_pointsize(&plot, ptsize);
 }
 
-void cairopdf_linewidth(double lw)
+void cairotrm_linewidth(double lw)
 {
-	lw *= cairopdf_lw * CAIROPDF_DEFAULT_LINEWIDTH;
+	lw *= cairotrm_lw * CAIROTRM_DEFAULT_LINEWIDTH;
 	gp_cairo_set_linewidth(&plot, lw);
 }
 
-int cairopdf_text_angle(int angle)
+int cairotrm_text_angle(int angle)
 {
 	/* a double is needed to compute cos, sin, etc. */
 	gp_cairo_set_textangle(&plot, (double) angle);
@@ -519,27 +519,27 @@ int cairopdf_text_angle(int angle)
 	return 1; /* 1 means we can rotate */
 }
 
-void cairopdf_fillbox(int style, unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+void cairotrm_fillbox(int style, unsigned int x, unsigned int y, unsigned int width, unsigned int height)
 {
 	gp_cairo_draw_fillbox(&plot, x, term->ymax - y,
 				width, height,
 				style);
 }
 
-int cairopdf_make_palette(t_sm_palette * palette)
+int cairotrm_make_palette(t_sm_palette * palette)
 {
 	/* we can do continuous colors */
 	return 0;
 }
 
-void cairopdf_set_color(t_colorspec *colorspec)
+void cairotrm_set_color(t_colorspec *colorspec)
 {
 	rgb_color rgb1;
 
 	if (colorspec->type == TC_LT) {
-		cairopdf_linetype(colorspec->lt);
+		cairotrm_linetype(colorspec->lt);
 		return;
-	} else if (colorspec->type == TC_FRAC && cairopdf_mono) {
+	} else if (colorspec->type == TC_FRAC && cairotrm_mono) {
 		int save_colorMode = sm_palette.colorMode;
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRAY;
 		rgb1_from_gray( colorspec->value, &rgb1 );
@@ -557,7 +557,7 @@ void cairopdf_set_color(t_colorspec *colorspec)
 
 
 /* here we send the polygon command */
-void cairopdf_filled_polygon(int n, gpiPoint *corners)
+void cairotrm_filled_polygon(int n, gpiPoint *corners)
 {
 	gpiPoint *mirrored_corners = (gpiPoint*) gp_alloc(n*sizeof(gpiPoint),"mirrored_corners");
 	/* can't use memcpy() here, as we have to mirror the y axis */
@@ -572,7 +572,7 @@ void cairopdf_filled_polygon(int n, gpiPoint *corners)
 }
 
 #ifdef WITH_IMAGE
-void cairopdf_image(unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
+void cairotrm_image(unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
 {
 	/* This routine is to plot a pixel-based image on the display device.
 	'M' is the number of pixels along the y-dimension of the image and
@@ -621,24 +621,24 @@ void cairopdf_image(unsigned M, unsigned N, coordval * image, gpiPoint * corner,
 #ifdef TERM_TABLE
 TERM_TABLE_START (pdfcairo_driver)
     "pdfcairo", "pdf terminal based on cairo",
-    /* the following values are overriden by cairopdf_graphics */
+    /* the following values are overriden by cairotrm_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,
-    cairopdf_options, cairopdf_init, cairopdf_reset, cairopdf_text, null_scale, cairopdf_graphics,
-    cairopdf_move, cairopdf_vector, cairopdf_linetype, cairopdf_put_text,
-    cairopdf_text_angle, cairopdf_justify_text,
-    cairopdf_point, do_arrow, cairopdf_set_font,
-    cairopdf_pointsize, TERM_CAN_MULTIPLOT|TERM_BINARY,
-    cairopdf_text /* suspend */, 0 /* resume */, cairopdf_fillbox, cairopdf_linewidth
+    cairotrm_options, cairotrm_init, cairotrm_reset, cairotrm_text, null_scale, cairotrm_graphics,
+    cairotrm_move, cairotrm_vector, cairotrm_linetype, cairotrm_put_text,
+    cairotrm_text_angle, cairotrm_justify_text,
+    cairotrm_point, do_arrow, cairotrm_set_font,
+    cairotrm_pointsize, TERM_CAN_MULTIPLOT|TERM_BINARY,
+    cairotrm_text /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
 #endif
-    , cairopdf_make_palette, 0 /* cairopdf_previous_palette */, cairopdf_set_color, cairopdf_filled_polygon
+    , cairotrm_make_palette, 0 /* cairotrm_previous_palette */, cairotrm_set_color, cairotrm_filled_polygon
 #ifdef WITH_IMAGE
-    , cairopdf_image
+    , cairotrm_image
 #endif
     , gp_cairo_enhanced_open, gp_cairo_enhanced_flush, do_enh_writec
-TERM_TABLE_END (cairopdf_driver)
+TERM_TABLE_END (pdfcairo_driver)
 
 #undef LAST_TERM
 #define LAST_TERM pdfcairo_driver
@@ -646,21 +646,21 @@ TERM_TABLE_END (cairopdf_driver)
 
 TERM_TABLE_START (pngcairo_driver)
     "pngcairo", "png terminal based on cairo",
-    /* the following values are overriden by cairopdf_graphics */
+    /* the following values are overriden by cairotrm_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,
-    cairopdf_options, cairopdf_init, cairopdf_reset, cairopdf_text, null_scale, cairopdf_graphics,
-    cairopdf_move, cairopdf_vector, cairopdf_linetype, cairopdf_put_text,
-    cairopdf_text_angle, cairopdf_justify_text,
-    cairopdf_point, do_arrow, cairopdf_set_font,
-    cairopdf_pointsize, TERM_CAN_MULTIPLOT|TERM_BINARY,
-    cairopdf_text /* suspend */, 0 /* resume */, cairopdf_fillbox, cairopdf_linewidth
+    cairotrm_options, cairotrm_init, cairotrm_reset, cairotrm_text, null_scale, cairotrm_graphics,
+    cairotrm_move, cairotrm_vector, cairotrm_linetype, cairotrm_put_text,
+    cairotrm_text_angle, cairotrm_justify_text,
+    cairotrm_point, do_arrow, cairotrm_set_font,
+    cairotrm_pointsize, TERM_CAN_MULTIPLOT|TERM_BINARY,
+    cairotrm_text /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
 #endif
-    , cairopdf_make_palette, 0 /* cairopdf_previous_palette */, cairopdf_set_color, cairopdf_filled_polygon
+    , cairotrm_make_palette, 0 /* cairotrm_previous_palette */, cairotrm_set_color, cairotrm_filled_polygon
 #ifdef WITH_IMAGE
-    , cairopdf_image
+    , cairotrm_image
 #endif
     , gp_cairo_enhanced_open, gp_cairo_enhanced_flush, do_enh_writec
 TERM_TABLE_END (pngcairo_driver)
