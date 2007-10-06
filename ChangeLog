@@ -1,9 +1,12 @@
 2007-10-06  Ethan Merritt  <merritt@u.washington.edu>
 
-	term/cairo.trm: Change all internal variable names from cairopdf_* to
+	* term/cairo.trm: Change all internal variable names from cairopdf_* to
 	cairotrm_* since the code now supports multiple cairo-based terminals.
 	Later we will introduce parallel variables cairopdf_*, cairopng_*, etc
 	wherever there is a need to distinguish different terminals.
+
+	* demo/html/Makefile demo/html/webify.pl:  Update syntax for font
+	specifications.
 
 2007-10-06  Ethan Merritt  <merritt@u.washington.edu>
 

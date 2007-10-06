@@ -18,22 +18,22 @@ index.html: index.save
 	cp index.save index.html
 
 image.html: $(GNUPLOT_LIB)/image.dem ./webify.pl
-	export DEMOTERM="png truecolor font arial 8 size 420,320"; ./webify.pl image
+	export DEMOTERM="png truecolor font 'arial,8' size 420,320"; ./webify.pl image
 
 image2.html: $(GNUPLOT_LIB)/image2.dem ./webify.pl
-	export DEMOTERM="png truecolor font arial 8 size 420,320"; ./webify.pl image2
+	export DEMOTERM="png truecolor font 'arial,8' size 420,320"; ./webify.pl image2
 
 finance.html: $(GNUPLOT_LIB)/finance.dem ./webify.pl
-	export DEMOTERM="png enhanced transparent font arial 8 size 660,320"; ./webify.pl finance
+	export DEMOTERM="png enhanced transparent font 'arial,8' size 660,320"; ./webify.pl finance
 
 multiplt.html: $(GNUPLOT_LIB)/multiplt.dem ./webify.pl
-	export DEMOTERM="png enhanced transparent font arial 8 size 610,480"; ./webify.pl multiplt
+	export DEMOTERM="png enhanced transparent font 'arial,8' size 610,480"; ./webify.pl multiplt
 
 transparent.html: $(GNUPLOT_LIB)/transparent.dem ./webify.pl
-	export DEMOTERM="png enhanced transparent truecolor font arial 8 size 512,280"; ./webify.pl transparent
+	export DEMOTERM="png enhanced transparent truecolor font 'arial,8' size 512,280"; ./webify.pl transparent
 
 transparent_solids.html: $(GNUPLOT_LIB)/transparent_solids.dem ./webify.pl
-	export DEMOTERM="png enhanced truecolor font arial 9 size 512,384"; ./webify.pl transparent_solids
+	export DEMOTERM="png enhanced truecolor font 'arial,9' size 512,384"; ./webify.pl transparent_solids
 
 # The png terminal does not support dashed lines, so we create an eps file and convert it.
 # Do this one last, so that if conversion fails everything else has already been done.
