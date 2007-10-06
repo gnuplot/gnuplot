@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.79 2007/05/23 20:53:55 sfeam Exp $
+ * $Id: svg.trm,v 1.80 2007/05/24 04:45:11 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -516,7 +516,7 @@ SVG_options ()
     SVG_set_font("");
 
     /* Save options back into options string in normalized format */
-    sprintf(term_options, "size %d %d%s %s fname '%s'  fsize %g ",
+    sprintf(term_options, "size %d,%d%s %s fname '%s'  fsize %g ",
 	    (int)(SVG_xSize/SVG_SCALE), (int)(SVG_ySize/SVG_SCALE),
         SVG_fixed_size ? " fixed": " dynamic",
 	term->put_text == ENHsvg_put_text ? "enhanced" : "",
