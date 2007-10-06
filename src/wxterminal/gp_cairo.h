@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.6 2007/08/07 04:55:22 sfeam Exp $
+ * $Id: gp_cairo.h,v 1.7 2007/08/20 09:46:06 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -211,7 +211,8 @@ void gp_cairo_set_linewidth(plot_struct *plot, double linewidth);
 void gp_cairo_set_textangle(plot_struct *plot, double angle);
 
 /* erase the contents of the cairo drawing context */
-void gp_cairo_clear(plot_struct *plot);
+void gp_cairo_solid_background(plot_struct *plot);
+void gp_cairo_clear_background(plot_struct *plot);
 
 /* fill term->h_char, v_char, h_tic, v_tic
  * Depends on plot->fontsize and fontname */

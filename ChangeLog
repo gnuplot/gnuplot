@@ -1,5 +1,12 @@
 2007-10-06  Ethan Merritt  <merritt@u.washington.edu>
 
+	* term/cairo.trm src/wxterminal/gp_cairo.c (gp_cairo_solid_background 
+	gp_cairo_clear_background) wxterminal/gp_cairo.h wxterminal/wxt_gui.cpp:
+	Provide alternative routines to initialize the background to either
+	solid white or transparent.
+
+2007-10-06  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/term.c (change_term):  Always accept the full name of a terminal,
 	even if it is a leading substring of a longer name.  E.g. accept
 	"set term pdf" even if there are both pdf and pdfcairo terminals.
