@@ -1,3 +1,11 @@
+2007-10-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm:  Differentiate cairo png and pdf terminals.
+	Set separate defaults for canvas size, font size, and linewidth.
+	Output png to a stream so that it can be piped for interactive display.
+	Ignore irrelevant keywords used by libgd-based png terminal.
+	Add "transparent" keyword for png.
+
 2007-10-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm: Change all internal variable names from cairopdf_* to

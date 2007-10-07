@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.6 2007/10/06 06:04:06 sfeam Exp $
+ * $Id: cairo.trm,v 1.7 2007/10/06 16:53:20 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -33,6 +33,11 @@
  * This software is provided "as is" without express or implied warranty
  * to the extent permitted by applicable law.
 ]*/
+
+/*
+ * Modifications:
+ *	Peter Danenberg, Ethan Merritt	- handle png output as well as pdf
+ */
 
 #ifdef TERM_REGISTER
 register_term (pdfcairo)
@@ -73,24 +78,34 @@ TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
 #include "wxterminal/gp_cairo_term.h"
 
 #define CAIROTRM_DEFAULT_FONTNAME "Sans"
-#define CAIROTRM_DEFAULT_FONTSIZE 6 /* in points */
-#define CAIROTRM_DEFAULT_LINEWIDTH 0.25 /* in points */
-#define CAIROTRM_DEFAULT_WIDTH 5*72 /* in points, 5 inches */
-#define CAIROTRM_DEFAULT_HEIGHT 3*72 /* in points, 3 inches */
 
 /* terminal state */
 TBOOLEAN cairotrm_enhanced_enabled = FALSE;
 TBOOLEAN cairotrm_dashed = FALSE;
 TBOOLEAN cairotrm_mono = FALSE;
 TBOOLEAN cairotrm_rounded = FALSE;
+TBOOLEAN cairotrm_transparent = FALSE;
 /* default text font family: */
 char cairotrm_set_fontname[MAX_ID_LEN + 1] = "";
 /* default text size*/
 int cairotrm_set_fontsize = 0;
-/* default width, in points */
-float cairotrm_width = CAIROTRM_DEFAULT_WIDTH;
-/* default height, in points */
-float cairotrm_height = CAIROTRM_DEFAULT_HEIGHT;
+
+/* default sizes vary with the terminal type */
+#define CAIROPDF_DEFAULT_WIDTH  5*72 /* PDF  5x3 inches */
+#define CAIROPDF_DEFAULT_HEIGHT 3*72
+#define CAIROPNG_DEFAULT_WIDTH  640  /* PNG 640x480 pixels */
+#define CAIROPNG_DEFAULT_HEIGHT 480
+float cairopdf_width = CAIROPDF_DEFAULT_WIDTH;
+float cairopdf_height = CAIROPDF_DEFAULT_HEIGHT;
+float cairopng_width = CAIROPNG_DEFAULT_WIDTH;
+float cairopng_height = CAIROPNG_DEFAULT_HEIGHT;
+float cairotrm_width, cairotrm_height;
+float cairotrm_default_fontsize;
+
+float cairopdf_base_linewidth = 0.25;
+float cairopng_base_linewidth = 1.0;
+float cairotrm_base_linewidth;
+
 /* Default multipliers for linewidths and dashlengths */
 float cairotrm_lw = 1.0;
 float cairotrm_dl = 1.0;
@@ -111,6 +126,7 @@ enum CAIROTRM_id {
     CAIROTRM_MONO,
     CAIROTRM_COLOR,
     CAIROTRM_DASHLENGTH,
+    CAIROTRM_TRANSPARENT,
     CAIROTRM_OTHER
 };
 
@@ -118,17 +134,19 @@ static struct gen_table cairotrm_opts[] = {
     {"f$ont",   CAIROTRM_FONT},
     {"enh$anced", CAIROTRM_ENHANCED},
     {"noenh$anced", CAIROTRM_NOENHANCED},
-    {"s$ize", CAIROTRM_SIZE},
+    {"si$ze", CAIROTRM_SIZE},
     {"round$ed", CAIROTRM_ROUNDED},
     {"butt", CAIROTRM_BUTT},
     {"lw", CAIROTRM_LINEWIDTH},
-    {"linewidth", CAIROTRM_LINEWIDTH},
+    {"linew$idth", CAIROTRM_LINEWIDTH},
     {"dash$ed", CAIROTRM_DASHED},
     {"solid", CAIROTRM_SOLID},
     {"mono$chrome", CAIROTRM_MONO},
     {"color", CAIROTRM_COLOR},
+    {"col$our", CAIROTRM_COLOR},
     {"dl", CAIROTRM_DASHLENGTH},
-    {"dashlen$gth", CAIROTRM_DASHLENGTH},
+    {"dashl$ength", CAIROTRM_DASHLENGTH},
+    {"transp$arent", CAIROTRM_TRANSPARENT},
     {NULL, CAIROTRM_OTHER}
 };
 
@@ -144,10 +162,20 @@ TERM_PUBLIC void cairotrm_options()
 	TBOOLEAN duplication = FALSE;
 	TBOOLEAN set_enhanced = FALSE, set_font = FALSE, set_size = FALSE;
 	TBOOLEAN set_capjoin = FALSE;
-	size_units cairotrm_explicit_units = INCHES;
+	size_units cairotrm_explicit_units;
 	char tmp_term_options[MAX_LINE_LEN+1] = "";
 	cairotrm_dashed = FALSE;	/* Dashed lines? (default is solid) */
 	cairotrm_mono = FALSE;  	/* Mono? (default is color) */
+	cairotrm_transparent = FALSE;
+
+	/* Initialize terminal-dependent values */
+	if (!strcmp(term->name,"pngcairo")) {
+		cairotrm_explicit_units = PIXELS;
+		cairotrm_default_fontsize = 12;
+	} else {
+		cairotrm_explicit_units = INCHES;
+		cairotrm_default_fontsize = 6;
+	}
 
 	while (!END_OF_COMMAND) {
 		FPRINTF((stderr, "processing token\n"));
@@ -190,7 +218,10 @@ TERM_PUBLIC void cairotrm_options()
 			break;
 		case CAIROTRM_SIZE:
 			c_token++;
-			cairotrm_explicit_units = parse_term_size(&cairotrm_width, &cairotrm_height, INCHES);
+			if (!strcmp(term->name,"pngcairo"))
+			    cairotrm_explicit_units = parse_term_size(&cairopng_width, &cairopng_height, PIXELS);
+			else
+			    cairotrm_explicit_units = parse_term_size(&cairopdf_width, &cairopdf_height, INCHES);
 			if (set_size) duplication=TRUE;
 			set_size = TRUE;
 			break;
@@ -234,7 +265,19 @@ TERM_PUBLIC void cairotrm_options()
 			if (cairotrm_dl < 0.0)
 			    cairotrm_dl = 1.0;
 			break;
+		case CAIROTRM_TRANSPARENT:
+			c_token++;
+			cairotrm_transparent = TRUE;
+			break;
 		case CAIROTRM_OTHER:
+			/* Ignore irrelevant keywords used by other png/pdf drivers */
+			if (almost_equals(c_token,"true$color")
+			||  almost_equals(c_token,"crop")
+			||  !strncmp(&gp_input_line[token[c_token].start_index],"no",2)
+			||  almost_equals(c_token,"inter$lace")) {
+			    c_token++;
+			    break;
+			}
 		default:
 			int_error(c_token, "unrecognized terminal option");
 			break;
@@ -244,7 +287,23 @@ TERM_PUBLIC void cairotrm_options()
 			int_error(c_token-1, "Duplicated or contradicting arguments in cairo terminal options.");
 	}
 
+	/* Copy terminal-dependent values to the generic equivalent */
+	if (!strcmp(term->name,"pngcairo")) {
+		cairotrm_width = cairopng_width;
+		cairotrm_height = cairopng_height;
+		cairotrm_base_linewidth = cairopng_base_linewidth;
+	} else {
+		cairotrm_width = cairopdf_width;
+		cairotrm_height = cairopdf_height;
+		cairotrm_base_linewidth = cairopdf_base_linewidth;
+	}
+
+
 	/* Save options back into options string in normalized format */
+	if (cairotrm_transparent)
+		snprintf(term_options, sizeof(term_options)-strlen(term_options),
+			" transparent");
+
 	if (set_enhanced)
 		snprintf(term_options, sizeof(term_options)-strlen(term_options),
 			cairotrm_enhanced_enabled ? " enhanced" : " noenhanced");
@@ -261,12 +320,17 @@ TERM_PUBLIC void cairotrm_options()
 	if (cairotrm_dashed)
 		strncat(term_options, " dashed", sizeof(term_options)-strlen(term_options));
 
-	if (set_size) {
+	if (1 || set_size) {
 		if (cairotrm_explicit_units == CM)
 			snprintf(tmp_term_options,
 				sizeof(tmp_term_options),
 				" size %.2fcm, %.2fcm ",
 				2.54*cairotrm_width/72., 2.54*cairotrm_height/72.);
+		else if (cairotrm_explicit_units == PIXELS)
+			snprintf(tmp_term_options,
+				sizeof(tmp_term_options),
+				" size %d, %d ",
+				(int)cairotrm_width, (int)cairotrm_height);
 		else
 			snprintf(tmp_term_options,
 				sizeof(tmp_term_options),
@@ -338,7 +402,11 @@ void cairotrm_init()
 void cairotrm_graphics()
 {
 	/* Initialize background to solid white */
-	gp_cairo_solid_background(&plot);
+	if (cairotrm_transparent)
+		gp_cairo_clear_background(&plot);
+	else
+		gp_cairo_solid_background(&plot);
+		
 
 	/* update the window scale factor first, cairo needs it */
 	plot.xscale = 1.0;
@@ -369,6 +437,17 @@ void cairotrm_graphics()
 		term->xmax, term->ymax, term->v_char, term->h_char));
 }
 
+
+/* cairo mechanism to allow writing to an output stream */
+cairo_status_t
+cairopng_write(void *closure, unsigned char *data, unsigned int length)
+{
+	if (length != fwrite(data, 1, length, gpoutfile))
+		return CAIRO_STATUS_WRITE_ERROR;
+	return CAIRO_STATUS_SUCCESS;
+}
+
+
 void cairotrm_text()
 {
 	FPRINTF((stderr,"Text0\n"));
@@ -383,6 +462,11 @@ void cairotrm_text()
 	/* finish the page - cairo_destroy still has to be called for the whole documentation
 	 * to be written */
 	cairo_show_page(plot.cr);
+	if (!strcmp(term->name,"pngcairo")) {
+		int error_data[1];
+		cairo_surface_write_to_png_stream(cairo_get_target(plot.cr),
+			(cairo_write_func_t)cairopng_write, error_data);
+	}
 
 	FPRINTF((stderr,"status = %s\n",cairo_status_to_string(cairo_status(plot.cr))));
 
@@ -393,9 +477,6 @@ void cairotrm_text()
 void cairotrm_reset()
 {
 	/* finish the document */
-	if (!strcmp(term->name,"pngcairo"))
-		cairo_surface_write_to_png(cairo_get_target(plot.cr), outstr);
-
 	cairo_destroy(plot.cr);
 
 	FPRINTF((stderr,"cairotrm_reset\n"));
@@ -469,7 +550,7 @@ int cairotrm_set_font (const char *font)
 
 	if ( fontsize == 0 ) {
 		if ( cairotrm_set_fontsize == 0 )
-			fontsize = CAIROTRM_DEFAULT_FONTSIZE;
+			fontsize = cairotrm_default_fontsize;
 		else
 			fontsize = cairotrm_set_fontsize;
 	}
@@ -507,7 +588,7 @@ void cairotrm_pointsize(double ptsize)
 
 void cairotrm_linewidth(double lw)
 {
-	lw *= cairotrm_lw * CAIROTRM_DEFAULT_LINEWIDTH;
+	lw *= cairotrm_lw * cairotrm_base_linewidth;
 	gp_cairo_set_linewidth(&plot, lw);
 }
 
@@ -653,8 +734,8 @@ TERM_TABLE_START (pngcairo_driver)
     cairotrm_move, cairotrm_vector, cairotrm_linetype, cairotrm_put_text,
     cairotrm_text_angle, cairotrm_justify_text,
     cairotrm_point, do_arrow, cairotrm_set_font,
-    cairotrm_pointsize, TERM_CAN_MULTIPLOT|TERM_BINARY,
-    cairotrm_text /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
+    cairotrm_pointsize, TERM_BINARY,
+    0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
 #endif
@@ -770,7 +851,7 @@ START_HELP(pngcairo)
 " Syntax:",
 "         set term pngcairo",
 "                      {{no}enhanced} {mono|color} {solid|dashed}",
-"                      {font <font>}",
+"                      {transparent} {font <font>}",
 "                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
 "                      {size <XX>{unit},<YY>{unit}}",
 "",
