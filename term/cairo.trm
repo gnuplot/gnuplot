@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.8 2007/10/07 06:06:44 sfeam Exp $
+ * $Id: cairo.trm,v 1.9 2007/10/10 20:57:30 tlecomte Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -372,25 +372,31 @@ void cairotrm_init()
 	plot.device_xmax = (double) cairotrm_width;
 	plot.device_ymax = (double) cairotrm_height;
 	plot.dashlength = cairotrm_dl;
-	/* it is up to the pdf viewer to do the hinting */
-	plot.hinting = 0;
-	/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
-	 * results in bitmap fallback. However, polygons are drawn with seams
-	 * between each other. */
-	plot.polygons_saturate = FALSE;
 
 	/* is supposed to be done in cairotrm_reset */
 	if ( plot.cr )
 		cairo_destroy(plot.cr);
 
-	if (!strcmp(term->name,"pdfcairo"))
+	if (!strcmp(term->name,"pdfcairo")) {
 		surface = cairo_pdf_surface_create(outstr,
 				plot.device_xmax /*double width_in_points*/,
 				plot.device_ymax /*double height_in_points*/);
-	else if (!strcmp(term->name,"pngcairo"))
+		/* it is up to the pdf viewer to do the hinting */
+		plot.hinting = 0;
+		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
+		 * results in bitmap fallback. However, polygons are drawn with seams
+		 * between each other. */
+		plot.polygons_saturate = FALSE;
+	} else if (!strcmp(term->name,"pngcairo")) {
 		surface = cairo_image_surface_create( CAIRO_FORMAT_ARGB32,
 				plot.device_xmax /*double width_in_points*/,
 				plot.device_ymax /*double height_in_points*/);
+		/* png is bitmapped, let's do the full hinting */
+		plot.hinting = 100;
+		/* png is produced by cairo "image" backend, which has full support
+		 * of OPERATOR_SATURATE */
+		plot.polygons_saturate = TRUE;
+	}
 
 	plot.cr = cairo_create(surface);
 	cairo_surface_destroy( surface );

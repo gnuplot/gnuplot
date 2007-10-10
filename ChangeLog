@@ -2,6 +2,10 @@
 
 	* term/cairo.trm (cairotrm_init): Do the sanity check for an existing
 	*cairo terminal once and for all.
+	Apply hinting in the pngcairo terminal: pngs are bitmapped, so they
+	look much better with lines at integer positions.
+	Also apply the "saturate" technique to get seamless polygons in pm3d
+	mode.
 
 2007-10-07  Ethan Merritt  <merritt@u.washington.edu>
 
