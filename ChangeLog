@@ -1,3 +1,8 @@
+2007-10-10  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* term/cairo.trm (cairotrm_init): Do the sanity check for an existing
+	*cairo terminal once and for all.
+
 2007-10-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm:  Differentiate cairo png and pdf terminals.

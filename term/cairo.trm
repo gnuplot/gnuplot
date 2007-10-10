@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.7 2007/10/06 16:53:20 sfeam Exp $
+ * $Id: cairo.trm,v 1.8 2007/10/07 06:06:44 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -363,6 +363,10 @@ void cairotrm_init()
 
 	FPRINTF((stderr,"Init\n"));
 
+	/* do a sanity check for once */
+	if (strcmp(term->name,"pdfcairo") && strcmp(term->name,"pngcairo"))
+		int_error(c_token,"Unrecognized cairo terminal");
+
 	/* initialisations */
 	gp_cairo_initialize_plot(&plot);
 	plot.device_xmax = (double) cairotrm_width;
@@ -387,8 +391,6 @@ void cairotrm_init()
 		surface = cairo_image_surface_create( CAIRO_FORMAT_ARGB32,
 				plot.device_xmax /*double width_in_points*/,
 				plot.device_ymax /*double height_in_points*/);
-	else
-		int_error(c_token,"Unrecognized cairo terminal");
 
 	plot.cr = cairo_create(surface);
 	cairo_surface_destroy( surface );
