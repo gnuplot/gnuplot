@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.9 2007/10/10 20:57:30 tlecomte Exp $
+ * $Id: cairo.trm,v 1.10 2007/10/10 21:14:24 tlecomte Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -267,7 +267,8 @@ TERM_PUBLIC void cairotrm_options()
 			break;
 		case CAIROTRM_TRANSPARENT:
 			c_token++;
-			cairotrm_transparent = TRUE;
+			if (!strcmp(term->name,"pngcairo"))
+			    cairotrm_transparent = TRUE;
 			break;
 		case CAIROTRM_OTHER:
 			/* Ignore irrelevant keywords used by other png/pdf drivers */
