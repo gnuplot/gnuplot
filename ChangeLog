@@ -1,3 +1,9 @@
+2007-10-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (change_term): Fix stupid error that caused 
+	'set term png <any options>' to fail.
+	Bug #1810957
+
 2007-10-10  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* term/cairo.trm (cairotrm_init): Do the sanity check for an existing
