@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.69 2007/05/10 22:49:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.70 2007/08/27 04:33:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -908,6 +908,8 @@ int_error(int t_num, const char str[], va_dcl)
     va_list args;
 #endif
 
+    char error_message[80] = {'\0'};
+
     /* reprint line if screen has been written to */
 
     if (t_num == DATAFILE) {
@@ -927,12 +929,14 @@ int_error(int t_num, const char str[], va_dcl)
     VA_START(args, str);
 # if defined(HAVE_VFPRINTF) || _LIBC
     vfprintf(stderr, str, args);
+    vsnprintf(error_message, sizeof(error_message), str, args);
 # else
     _doprnt(str, args, stderr);
 # endif
     va_end(args);
 #else
     fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
+    snprintf(error_message, sizeof(error_message), str, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif
     fputs("\n\n", stderr);
 
@@ -940,7 +944,9 @@ int_error(int t_num, const char str[], va_dcl)
     /* the normal cleanup code. Reset any flags before bailing.   */
     df_reset_after_error();
 
+    /* Load error state variables */
     update_gpval_variables(2);
+    fill_gpval_string("GPVAL_ERRMSG", error_message);
 
     bail_to_command_line();
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.105 2007/06/22 04:28:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.106 2007/08/31 20:03:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1599,6 +1599,13 @@ reset_command()
 	= AXIS_ARRAY_INITIALIZER(TRUE);
 
     c_token++;
+
+    /* Reset error state (only?) */
+    update_gpval_variables(4);
+    if (almost_equals(c_token,"err$orstate")) {
+	c_token++;
+	return;
+    }
 
     /* Kludge alert, HBB 20000506: set to noninteractive mode, to
      * suppress some of the commentary output by the individual

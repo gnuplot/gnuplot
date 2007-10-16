@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.448 2007/08/28 06:13:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.449 2007/08/31 20:03:40 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1702,15 +1702,22 @@ C ... and restart the table:
  The variable `pi` is defined to be pi, see
        print pi
 
- Additionally, gnuplot may define some variables under various operations.
+ Additionally, gnuplot maintains a number of read-only variables that reflect
+ the current internal state of the program and the most recent plot. These
+ variables begin with the prefix "GPVAL_".  Examples include GPVAL_TERM,
+ GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN. Type `show variables all` to display the
+ complete list and current values. Values related to axes parameters (ranges,
+ log base) are values used during the last plot, not those currently `set`.
 
- Working with interactive terminals with `mouse` functionality defines
- variables with names that begin "MOUSE_", see `mouse variables` for details.
-
- Further, there are several "read-only" variables that begin "GPVAL_", like
- GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN,... Type `show variables all`
- to display their list and values. Values related to axes parameters (ranges, log
- base) are values used during the last plot, not those currently `set`.
+=errors
+=error state
+ The read-only variable GPVAL_ERRNO is set to a non-zero value if any gnuplot
+ command terminates early due to an error.  The most recent error message is
+ stored in the string variable GPVAL_ERRMSG.  Both GPVAL_ERRNO and GPVAL_ERRMSG
+ can be cleared using the command `reset errors`.
+ 
+ Interactive terminals with `mouse` functionality maintain read-only variables
+ with the prefix "MOUSE_".  See `mouse variables` for details.
 
  The `fit` mechanism uses several variables with names that begin "FIT_".  It
  is safest to avoid using such names.  "FIT_LIMIT", however, is one that you
@@ -1718,7 +1725,7 @@ C ... and restart the table:
  fitted parameter will be stored in a variable named like the parameter, but
  with "_err" appended. See the documentation on `fit` for details.
 
- See `user-defined variables`, `mouse variables`, and `fit`.
+ See `user-defined variables`, `reset errors`, `mouse variables`, and `fit`.
 
 3 User-defined variables and functions
 ?expressions user-defined
@@ -5541,6 +5548,7 @@ C ... and restart the table:
 2 reset
 ?commands reset
 ?reset
+?reset errors
  The `reset` command causes all graph-related options that can be set with the
  `set` command to take on their default values.  This command is useful, e.g.,
  to restore the default graph settings at the end of a command file, or to
@@ -5548,9 +5556,12 @@ C ... and restart the table:
  command file.  Please refer to the `set` command to see the default values
  that the various options take.
 
- The following `set` commands do not change the graph status and are thus left
- unchanged: the terminal set with `set term`, the output file set with `set
- output` and directory paths set with `set loadpath` and `set fontpath`.
+ The values of `set term`, `set output`, `set loadpath`, and `set fontpath` are
+ not altered by the `reset` command.
+
+=error state
+ `reset errors` clears only the error state variables GPVAL_ERRNO and
+ GPVAL_ERRMSG.
 2 save
 ?commands save
 ?save

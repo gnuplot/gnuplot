@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.56 2007/08/28 05:56:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.57 2007/08/28 06:13:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -679,7 +679,6 @@ add_udv_by_name(char *key)
 
 static void fill_gpval_axis __PROTO((AXIS_INDEX axis));
 static void set_gpval_axis_sth_double __PROTO((AXIS_INDEX axis, const char *suffix, double value, int is_int));
-static void fill_gpval_string __PROTO((char *var, const char *value));
 
 static void 
 set_gpval_axis_sth_double(AXIS_INDEX axis, const char *suffix, double value, int is_int)
@@ -710,7 +709,7 @@ fill_gpval_axis(AXIS_INDEX axis)
 #undef A
 }
 
-static void
+void
 fill_gpval_string(char *var, const char *stringvalue)
 {
     struct udvt_entry *v = add_udv_by_name(var);
@@ -732,6 +731,7 @@ fill_gpval_string(char *var, const char *stringvalue)
  * 1: following a successful plot/splot
  * 2: following an unsuccessful command (int_error)
  * 3: program entry
+ * 4: explicit reset of error status
  */
 void
 update_gpval_variables(int context)
@@ -751,9 +751,9 @@ update_gpval_variables(int context)
 	return;
     }
     
-    /* These are set every time, which is kind of silly because they */
-    /* only change after 'set term' 'set output' ...                 */
-    else {
+    /* These are set after every "set" command, which is kind of silly */
+    /* because they only change after 'set term' 'set output' ...      */
+    if (context == 0 || context == 2 || context == 3) {
 	/* FIXME! This prevents a segfault if term==NULL, which can */
 	/* happen if set_terminal() exits via int_error().          */
 	if (!term)
@@ -763,6 +763,12 @@ update_gpval_variables(int context)
 	
 	fill_gpval_string("GPVAL_TERMOPTIONS", term_options);
 	fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : "");
+    }
+
+    /* If we are called from int_error() then set the error state */
+    if (context == 2) {
+	struct udvt_entry *v = add_udv_by_name("GPVAL_ERRNO");
+	Ginteger(&v->udv_value, 1);
     }
 
     /* These initializations need only be done once, on program entry */
@@ -778,6 +784,14 @@ update_gpval_variables(int context)
 	v = add_udv_by_name("GPVAL_COMPILE_OPTIONS");
 	if (v && v->udv_undef == TRUE)
 	    fill_gpval_string("GPVAL_COMPILE_OPTIONS", compile_options);
+    }
+
+    if (context == 3 || context == 4) {
+	struct udvt_entry *v = add_udv_by_name("GPVAL_VERSION");
+	v = add_udv_by_name("GPVAL_ERRNO");
+	v->udv_undef = FALSE; 
+	Ginteger(&v->udv_value, 0);
+	fill_gpval_string("GPVAL_ERRMSG","");
     }
 
 }

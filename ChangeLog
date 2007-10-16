@@ -1,3 +1,14 @@
+2007-10-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/eval.h src/eval.c (update_gpval_variables) src/util.c (int_error)
+	src/unset.c (reset_command): Maintain error state variables.
+	GPVAL_ERRNO is set to a non-zero value whenever an error occurs.
+	GPVAL_ERRMSG holds the corresponding error message string.
+	Both are reset by the new command 'reset errors'.
+
+	* docs/gnuplot.doc: Revise the section on internal variables, adding
+	mention of the new error state variables.
+
 2007-10-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (change_term): Fix stupid error that caused 
