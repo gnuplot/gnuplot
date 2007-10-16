@@ -326,7 +326,6 @@ $ SUN = 0
 $ NOCWDRC = 0
 $ THIN_PLATE_SPLINES_GRID = 0
 $ COLUMN_HELP = 0
-$ IRIS = 0
 $ MGR = 0
 $ RGIP = 0
 $ ! USE_MOUSE = 0   ! USE_MOUSE is defined above         
@@ -375,7 +374,7 @@ $ !
 $ ! List of terminal files; all are in [.term] and have an extension of .trm.
 $ !
 $ CORETERM = "aed cgi dumb dxf dxy eepic epson fig hp26 hp2648 hpgl hpljii " -
-           + "imagen iris4d kyo latex pbm pc post qms regis sun t410x tek " -
+           + "imagen kyo latex pbm pc post qms regis sun t410x tek " -
            + "unixpc unixplot v384 x11"
 $ OTHERTERM = "[-.term]impcodes.h [-.term]object.h gplt_x11.c"
 $ !

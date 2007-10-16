@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.35 2006/04/29 05:30:07 tlecomte Exp $
+ * $Id: term.h,v 1.36 2007/07/16 21:58:43 tlecomte Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -207,12 +207,6 @@
 #   include "gpr.trm"
 #  endif
 #endif /* Apollo */
-
-/* Iris */
-#ifdef IRIS
-# include "iris4d.trm"
-#endif
-
 
 /* Linux VGA */
 #ifdef LINUXVGA

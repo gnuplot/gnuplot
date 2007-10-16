@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vws.trm,v 1.17 2006/07/07 03:51:23 sfeam Exp $
+ * $Id: vws.trm,v 1.18 2006/07/21 02:35:48 sfeam Exp $
  *
  */
 
@@ -37,9 +37,6 @@
 
 /*
  * This file is included by ../term.c.
- *
- * This terminal driver supports:
- *   IRIS terminals
  *
  * AUTHORS
  *   Walter Speth

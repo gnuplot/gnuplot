@@ -1,5 +1,5 @@
 #
-# $Id: makefile.tc,v 1.7 1999/12/01 22:07:57 lhecking Exp $
+# $Id: makefile.tc,v 1.8 2002/03/07 16:20:15 lhecking Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.x
 #
@@ -107,7 +107,7 @@ CSOURCE5 = $(T)aed.trm $(T)cgi.trm $(T)dumb.trm $(T)dxy.trm \
 	$(T)eepic.trm $(T)epson.trm $(T)fig.trm $(T)hp26.trm \
 	$(T)hp2648.trm $(T)hpgl.trm $(T)hpljii.trm
 CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)object.h \
-	$(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)pc.trm
+	$(T)kyo.trm $(T)latex.trm $(T)pc.trm
 CSOURCE7 = $(T)post.trm $(T)qms.trm $(T)regis.trm $(T)sun.trm \
 	$(T)t410x.trm $(T)tek.trm $(T)unixpc.trm $(T)unixplot.trm \
 	$(T)v384.trm $(T)x11.trm

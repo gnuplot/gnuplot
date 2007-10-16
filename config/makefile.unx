@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.6 2004/04/13 17:23:30 broeker Exp $
+# $Id: makefile.unx,v 1.7 2007/01/16 23:11:54 sfeam Exp $
 #
 #
 ############################################################
@@ -163,7 +163,6 @@ CFLAGS = $(COPTS) $(OPTIONS)
 # -DAPOLLO      Apollo Graphics Primitive Resource (window resize after replot)
 # -DGPR         Apollo Graphics Primitive Resource (fixed-size window)
 # -DCGI         SCO CGI
-# -DIRIS        IRIS4D series computer
 # -DSUN         Sun Microsystems Workstation
 # -DLINUXVGA	Linux PC with SuperVGA library
 # -DUNIXPC      unixpc (ATT 3b1 or ATT 7300)
@@ -180,7 +179,6 @@ TERMFLAGS = -I. -Iterm $(PLOTXFLAG)
 #
 #  -lplot if you have -DUNIXPLOT in TERMFLAGS
 #  -lsuntool -lsunwindow -lpixrect  if you have -DSUN in TERMFLAGS
-#  -lgl_s if -DIRIS4D in TERMFLAGS
 #  -lccgi if -DCGI in TERMFLAGS
 #  -lvga if -DLINUXVGA in TERMFLAGS
 #  -lmgr -lpixrect if -DMGR in TERMFLAGS. (conflicts with SunView)
@@ -290,23 +288,6 @@ SUN_X11_MGR_FLAGS = \
            PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11=$(GNUPLOT_X11) \
            X11INSTALL="$(X11INSTALL)" \
            TERMFLAGS="-I/usr/mgr/include -I. -Iterm -DMGR $(TERMFLAGS)"
-
-SGI_FLAGS = \
-           CFLAGS="-xansi $(COPTS) $(OPTIONS) -DHAVE_GETCWD" \
-           LIBS="-lgl_s -lm -lX11_s $(LIBS)" X11FLAGS=" " X11INCLUDES=" " \
-           X11LIBS=" " \
-           PLOTXFLAG=" " GNUPLOT_X11=" " X11INSTALL=x11_noinstall \
-           TERMFLAGS="-I. -Iterm -DIRIS4D -DANSI" INSTALL="cp"
-
-SGIX11_FLAGS = \
-           CFLAGS="-xansi $(COPTS) $(OPTIONS) -DHAVE_GETCWD" \
-           LIBS="-lgl_s -lm -lc_s -lX11_s $(LIBS)" X11FLAGS="$(X11FLAGS)" \
-           X11INCLUDES="$(X11INCLUDES)" \
-           X11LIBS="-lX11_s" \
-           PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11=$(GNUPLOT_X11) \
-           X11INSTALL="$(X11INSTALL)" \
-           TERMFLAGS="-I. -Iterm -DX11 -DIRIS4D -DANSI" INSTALL="cp"
-#           TERMFLAGS="-I. -Iterm -DX11 -DIRIS4D -cckr" INSTALL="cp"
 
 CGI_FLAGS = \
            CFLAGS="$(COPTS) $(OPTIONS) -Dunix" \
@@ -469,7 +450,7 @@ CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm term/atariaes.trm term/atariv
 	term/hp500c.trm term/hpljii.trm term/metafont.trm term/mgr.trm\
 	term/apollo.trm term/gpr.trm term/hppj.trm
 CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
-	term/iris4d.trm term/kyo.trm term/latex.trm term/mif.trm \
+	term/kyo.trm term/latex.trm term/mif.trm \
 	term/pbm.trm term/pslatex.trm term/gpic.trm term/gnugraph.trm
 CSOURCE7 = term/post.trm term/pstricks.trm term/qms.trm term/regis.trm \
 	term/rgip.trm term/sun.trm\
@@ -548,8 +529,6 @@ info:
 	@echo "sun          for Sun sparcstation running SunOS 4.1 with suntools (no X11) "
 	@echo "sun_x11      for Sun sparcstation running SunOS 4.1 with suntools and X11 "
 	@echo "solaris_x11  for Sun Sparcstation running Solaris 2 with X11 "
-	@echo "sgi          for Silicon Graphics IRIS4D machines (no X11) "
-	@echo "sgix11       for Silicon Graphics IRIS4D machines (X11) "
 	@echo "next         for NeXT Cube and Slab running NeXTOS 2.0+ (no X11)"
 	@echo "next_x11     for NeXT Cube and Slab running NeXTOS 2.0+ with X11"
 	@echo "3b1          for ATT 3b1 machines (no X11) "

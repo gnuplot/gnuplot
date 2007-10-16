@@ -282,7 +282,6 @@ Major contributors (alphabetic order):
 	"hpljii"
 	"hppj"
 	"imagen"
-	"iris4d"
 	"jpeg"
 	"kyo"
 	"latex"
@@ -433,9 +432,6 @@ particular conversion chore."
     (if (string-match "os2" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("pm" "emxvga"))))
-    (if (string-match "irix" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("iris4d"))))
     (if (string-match "sco" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("cgi"))))

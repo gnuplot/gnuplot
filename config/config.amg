@@ -322,9 +322,6 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #define HAVE__BOOL 1
 
-/* Define if you want to use the IRIS terminal on IRIS4D series computers. */
-/* #undef IRIS */
-
 /* Define if this is a Linux system with SuperVGA library. */
 /* #undef LINUXVGA */
 

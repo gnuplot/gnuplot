@@ -179,7 +179,6 @@ $ ./configure --help
   --disable-objects       disable rectangles and other objects
   --disable-stringvariables   disable string variables
   --disable-macros        disable command line macros
-  --enable-iris           enable IRIS terminal (IRIS4D only)
   --enable-mgr            enable MGR terminal
   --disable-fiterrvars    enable fitting error variables
   --enable-rgip           enable Redwood Graphics Interface Protocol

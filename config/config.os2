@@ -395,9 +395,6 @@
 /* Define to enable handling point size in hidden3d code. */
 #define HIDDEN3D_VAR_PTSIZE 1
 
-/* Define if you want to use the IRIS terminal on IRIS4D series computers. */
-/* #undef IRIS */
-
 /* Define if this is a Linux system with SuperVGA library. */
 /* #undef LINUXVGA */
 

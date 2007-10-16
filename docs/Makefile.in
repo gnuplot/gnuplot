@@ -117,7 +117,7 @@ $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm \
 $(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm $(T)gd.trm \
 $(T)ggi.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
 $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm \
-$(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm $(T)iris4d.trm $(T)kyo.trm \
+$(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm $(T)kyo.trm \
 $(T)latex.trm $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)metapost.trm \
 $(T)mgr.trm $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)openstep.trm \
 $(T)pbm.trm $(T)pc.trm $(T)pdf.trm $(T)pm.trm $(T)post.trm \

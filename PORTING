@@ -137,7 +137,6 @@ of devices that may be selected/deselected by editing term.h.
    HPLJII      HP Laserjet II
    HPPJ        HP PaintJet
    IMAGEN      Imagen laser printers (300dpi) (requires -Iterm also)
-   IRIS        IRIS4D series computer
    KERMIT      MS-DOS Kermit Tektronix 4010 emulator
    LATEX       LaTeX picture environment
    LINUXVGA    Linux PC with (s)vgalib

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.ami,v 1.6 2002/02/21 12:27:37 lhecking Exp $
+# $Id: makefile.ami,v 1.7 2004/04/13 17:23:30 broeker Exp $
 #
 # GNUPLOT Makefile for Manx Aztec C 5.2 beta of better on the Amiga
 # 
@@ -58,7 +58,7 @@ CSOURCE6 = term/amiga.trm term/aed.trm term/cgi.trm term/dumb.trm term/dxf.trm \
 	term/hp26.trm term/hp2648.trm term/hpgl.trm term/hpljii.trm \
 	term/apollo.trm term/gpr.trm
 CSOURCE7 = term/impcodes.h term/imagen.trm term/object.h \
-	term/iris4d.trm term/kyo.trm term/latex.trm term/pbm.trm term/pc.trm 
+	term/kyo.trm term/latex.trm term/pbm.trm term/pc.trm 
 CSOURCE8 = term/post.trm term/qms.trm term/regis.trm term/sun.trm \
 	term/t410x.trm term/tek.trm term/unixpc.trm term/unixplot.trm \
 	term/v384.trm term/x11.trm term/bigfig.trm term/vws.trm gplt_x11.c

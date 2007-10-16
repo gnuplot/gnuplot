@@ -1,6 +1,11 @@
 2007-10-16  Ethan Merritt  <merritt@u.washington.edu>
 
-	* Remove the long-obsolete IRIS4D terminal.  This terminal never was the
+	* INSTALL NEWS PORTING README configure.in configure.vms
+	config/* docs/doc2texi.el docs/gpcard.tex docs/Makefile.in
+	src/makefile.all src/makefile.awc src/term.h term/iris4d.trm
+	term/vws.trm:
+
+	Remove the long-obsolete IRIS4D terminal.  This terminal never was the
 	preferred option even on a real IRIS4D (I had one!), and would no longer
 	compile and link on SGI descendents of the IRIS4D as of 3 years ago.
 

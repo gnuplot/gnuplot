@@ -1,5 +1,5 @@
 #
-# $Id: makefile.286,v 1.4 1999/11/08 19:20:57 lhecking Exp $
+# $Id: makefile.286,v 1.5 1999/12/01 22:07:56 lhecking Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.x
 #   and Phar Lap LITE286 DOS extender
@@ -50,7 +50,7 @@ CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
 	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
 CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
-	term\iris4d.trm term\kyo.trm term\latex.trm term\pc.trm 
+	term\kyo.trm term\latex.trm term\pc.trm 
 CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm \
 	term\t410x.trm term\tek.trm term\unixpc.trm term\unixplot.trm \
 	term\v384.trm term\x11.trm

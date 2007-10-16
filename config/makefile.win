@@ -1,5 +1,5 @@
 #
-# $Id: makefile.win,v 1.13 2002/03/07 17:58:11 broeker Exp $
+# $Id: makefile.win,v 1.14 2005/08/07 09:43:27 mikulik Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.1 Windows version
 # and Win32 using Borland C++ 4 (or 5? --- 4.52 is known to work)
@@ -116,7 +116,7 @@ CSOURCE5 = $(T)aed.trm $(T)cgi.trm $(T)cgm.trm $(T)debug.trm \
 	$(T)eepic.trm $(T)epson.trm $(T)fig.trm $(T)hp26.trm \
 	$(T)hp2648.trm $(T)hpgl.trm $(T)hpljii.trm
 CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)object.h \
-	$(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)pbm.trm $(T)win.trm
+	$(T)kyo.trm $(T)latex.trm $(T)pbm.trm $(T)win.trm
 CSOURCE7 = $(T)post.trm $(T)qms.trm $(T)regis.trm $(T)sun.trm \
 	$(T)t410x.trm $(T)tek.trm $(T)unixpc.trm $(T)unixplot.trm \
 	$(T)v384.trm $(T)x11.trm
