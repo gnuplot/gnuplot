@@ -2258,6 +2258,8 @@ The following is a list of all the binary operators and their usages:
       |           a|b         * bitwise inclusive OR
       &&          a&&b        * logical AND
       ||          a||b        * logical OR
+      =           a = b         assignment
+      ,           (a,b)         serial evaluation
       .           A.B           string concatenation
       eq          A eq B        string equality
       ne          A ne B        string inequality
@@ -2280,6 +2282,9 @@ Capital letters A and B indicate that the operator requires string arguments.
 Logical AND (&&) and OR (||) short-circuit the way they do in C.  That is,
 the second `&&` operand is not evaluated if the first is false; the second
 `||` operand is not evaluated if the first is true.
+
+Serial evaluation occurs only in parentheses and is guaranteed to proceed
+in left to right order.  The value of the rightmost subexpression is returned.
 
 @node Ternary,  , Binary, Operators
 @subsubsection Ternary
@@ -2343,15 +2348,24 @@ The variable `pi` is defined to be pi, see
 
 @end example
 
-Additionally, gnuplot may define some variables under various operations.
+Additionally, gnuplot maintains a number of read-only variables that reflect
+the current internal state of the program and the most recent plot. These
+variables begin with the prefix "GPVAL_".  Examples include GPVAL_TERM,
+GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN. Type `show variables all` to display the
+complete list and current values. Values related to axes parameters (ranges,
+log base) are values used during the last plot, not those currently `set`.
 
-Working with interactive terminals with `mouse` functionality defines
-variables with names that begin "MOUSE_", see @ref{variables} for details.
+@cindex errors
 
-Further, there are several "read-only" variables that begin "GPVAL_", like
-GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN,... Type `show variables all`
-to display their list and values. Values related to axes parameters (ranges, log
-base) are values used during the last plot, not those currently `set`.
+@cindex error state
+
+The read-only variable GPVAL_ERRNO is set to a non-zero value if any gnuplot
+command terminates early due to an error.  The most recent error message is
+stored in the string variable GPVAL_ERRMSG.  Both GPVAL_ERRNO and GPVAL_ERRMSG
+can be cleared using the command `reset errors`.
+
+Interactive terminals with `mouse` functionality maintain read-only variables
+with the prefix "MOUSE_".  See @ref{variables} for details.
 
 The `fit` mechanism uses several variables with names that begin "FIT_".  It
 is safest to avoid using such names.  "FIT_LIMIT", however, is one that you
@@ -2359,7 +2373,7 @@ may wish to redefine. Under `set fit errorvariables`, the error for each
 fitted parameter will be stored in a variable named like the parameter, but
 with "_err" appended. See the documentation on `fit` for details.
 
-See @ref{variables}, @ref{variables}, and `fit`.
+See @ref{variables}, `reset errors`, @ref{variables}, and `fit`.
 
 
 @node User-defined_variables_and_functions,  , Gnuplot-defined_variables, Expressions
@@ -4410,6 +4424,7 @@ vertical bar (|) separates mutually exclusive choices.
 * pwd::                         
 * quit::                        
 * raise::                       
+* refresh::                     
 * replot::                      
 * reread::                      
 * reset::                       
@@ -5072,7 +5087,7 @@ a different data set but having a common decay time, estimate the values of
 the parameters.  If the datafile has the format x:z:s, then
 @example
      f(x,y) = (y==0) ? a*exp(-x/tau) : b*exp(-x/tau)
-     fit f(x,y) 'datafile' using  1:-1:2:3  via a, b, tau
+     fit f(x,y) 'datafile' using  1:-2:2:3  via a, b, tau
 
 @end example
 
@@ -5527,6 +5542,8 @@ axes (bottom left).
 
 @cindex file
 
+@cindex volatile
+
 Discrete data contained in a file can be displayed by specifying the name of
 the data file (enclosed in single or double quotes) on the `plot` command line.
 
@@ -5539,6 +5556,7 @@ Syntax:
                          @{thru <thru expression>@}
                          @{using <using list>@}
                          @{smooth <option>@}
+                         @{volatile@}
 
 @end example
 
@@ -5550,6 +5568,10 @@ set are to be plotted, @ref{using} determines how the columns within a single
 record are to be interpreted (@ref{thru} is a special case of @ref{using}), and
 @ref{smooth} allows for simple interpolation and approximation.  (`splot` has a
 similar syntax, but does not support the @ref{smooth} and @ref{thru} options.)
+
+The `volatile` keyword indicates that the contents of the data file may be
+different if the file is re-read.  This tells the program to use @ref{refresh}
+rather than @ref{replot} commands whenever possible.  See @ref{refresh}.
 
 
 ASCII DATA FILES:
@@ -7331,7 +7353,7 @@ The @ref{exit} and @ref{quit} commands and END-OF-FILE character will exit `gnup
 Each of these commands will clear the output device (as does the @ref{clear}
 command) before exiting.
 
-@node raise, replot, quit, Commands
+@node raise, refresh, quit, Commands
 @section raise
 
 @c ?commands raise
@@ -7367,7 +7389,37 @@ and `win`.
 
 @end example
 
-@node replot, reread, raise, Commands
+@node refresh, replot, raise, Commands
+@section refresh
+
+@c ?commands refresh
+@cindex refresh
+@cmindex refresh
+
+
+The @ref{refresh} command is similar to @ref{replot}, with two major differences.
+@ref{refresh} reformats and redraws the current plot using the data already read
+in. This means that you can use @ref{refresh} for plots with in-line data
+(pseudo-device '-') and for plots from datafiles whose contents are volatile.
+You cannot use the @ref{refresh} command to add new data to an existing plot.
+
+Mousing operations, in particular zoom and unzoom, will use @ref{refresh} rather
+than @ref{replot} if appropriate.  Example:
+
+@example
+      plot 'datafile' volatile with lines, '-' with labels
+      100 200 "Special point"
+      e
+      # Various mousing operations go here
+      set title "Zoomed in view"
+      set term post
+      set output 'zoom.ps'
+      refresh
+
+@end example
+
+
+@node replot, reread, refresh, Commands
 @section replot
 
 @c ?commands replot
@@ -7393,10 +7445,9 @@ N.B.---use of
 
 @end example
 
-is not recommended.  `gnuplot` does not store the inline data internally, so
-since @ref{replot} appends new information to the previous `plot` and then
-executes the modified command, the `'-'` from the initial `plot` will expect
-to read inline data again.
+is not recommended, because it will require that you type in the data all 
+over again.  In most cases you can use the @ref{refresh} command instead, which
+will redraw the plot using the data previously read in.
 
 Note that @ref{replot} does not work in @ref{multiplot} mode, since it reproduces
 only the last plot rather than the entire screen.
@@ -7476,6 +7527,7 @@ See animate.dem in demo directory for an animated example.
 @cmindex reset
 
 
+@c ?reset errors
 The @ref{reset} command causes all graph-related options that can be set with the
 `set` command to take on their default values.  This command is useful, e.g.,
 to restore the default graph settings at the end of a command file, or to
@@ -7483,8 +7535,13 @@ return to a defined state after lots of settings have been changed within a
 command file.  Please refer to the `set` command to see the default values
 that the various options take.
 
-The following `set` commands do not change the graph status and are thus left
-unchanged: the terminal set with `set term`, the output file set with @ref{output} and directory paths set with @ref{loadpath} and @ref{fontpath}.
+The values of `set term`, @ref{output}, @ref{loadpath}, and @ref{fontpath} are
+not altered by the @ref{reset} command.
+
+@cindex error state
+
+`reset errors` clears only the error state variables GPVAL_ERRNO and
+GPVAL_ERRMSG.
 
 @node save, set-show, reset, Commands
 @section save
@@ -9124,6 +9181,7 @@ The @ref{encoding} command selects a character encoding.
 Syntax:
 @example
       set encoding @{<value>@}
+      set encoding locale
       show encoding
 
 @end example
@@ -9145,11 +9203,18 @@ Valid values are
 
 @end example
 
+The command @ref{locale} is different from the other options.
+It attempts to determine the current locale from the runtime environment.
+On most systems this is controlled by the environmental variables
+LC_ALL, LC_CTYPE, or LANG.  This mechanism is necessary, for example, to
+pass multibyte character encodings such as UTF-8 or EUC_JP to the wxt
+and cairopdf terminals.  This command does not affect the locale-specific
+representation of dates or numbers.
+See also @ref{locale} and @ref{decimalsign}.
+
 Generally you must set the encoding before setting the terminal type.
 Note that encoding is not supported by all terminal drivers and that
 the device must be able to produce the desired non-standard characters.
-The PostScript, X11 and wxt terminals support all encodings. OS/2 Presentation
-Manager switches automatically to codepage 912 for `iso_8859_2`.
 
 @node fit_, fontpath, encoding, set-show
 @subsection fit
@@ -9319,8 +9384,9 @@ See also
 The string function gprintf("format",x) uses gnuplot's own format specifiers,
 as do the gnuplot commands `set format`, @ref{timestamp}, and others. These
 format specifiers are not the same as those used by the standard C-language
-routine sprintf(). Gnuplot also provides an sprintf("format",x,...) routine
-if you prefer. For a list of gnuplot's format options, see `format specifiers`.
+routine sprintf(). gprintf() accepts only a single variable to be formatted. 
+Gnuplot also provides an sprintf("format",x1,x2,...) routine if you prefer.
+For a list of gnuplot's format options, see `format specifiers`.
 
 @node format_specifiers, time/date_specifiers, gprintf_, format_
 @subsubsection format specifiers
@@ -10310,6 +10376,7 @@ See your system documentation for the available options.  The default value
 is determined from the LC_TIME, LC_ALL, or LANG environment variables.
 
 To change the decimal point locale, see @ref{decimalsign}.
+To change the character encoding to the current locale, see @ref{encoding}.
 
 @node logscale, macros, locale, set-show
 @subsection logscale
@@ -12872,7 +12939,7 @@ margin.
 Syntax:
 @example
       set timestamp @{"<format>"@} @{top|bottom@} @{@{no@}rotate@}
-                    @{offset @{<xoff>@}@{,<yoff>@}@} @{font "<fontspec>"@}
+                    @{offset <xoff>@{,<yoff>@}@} @{font "<fontspec>"@}
       unset timestamp
       show timestamp
 
@@ -15007,7 +15074,6 @@ with no modifiers.
 * hpljii::                      
 * hppj::                        
 * imagen::                      
-* iris4d::                      
 * kyo::                         
 * latex::                       
 * linux::                       
@@ -15564,7 +15630,7 @@ Syntax:
 @example
       set terminal cgm @{<mode>@} @{<color>@} @{<rotation>@} @{solid | dashed@}
                        @{width <plot_width>@} @{linewidth <line_width>@}
-                       @{"<font>"@} @{<fontsize>@}
+                       @{font "<fontname>,<fontsize>"@}
                        @{<color0> <color1> <color2> ...@}
 
 @end example
@@ -15575,7 +15641,7 @@ where <mode> is `landscape`, `portrait`, or `default`;
 `solid` draws all curves with solid lines, overriding any dashed patterns;
 <plot_width> is the assumed width of the plot in points; 
 <line_width> is the line width in points (default 1); 
-<font> is the name of a font; and 
+<fontname> is the name of a font (see list of fonts below)
 <fontsize> is the size of the font in points (default 12).
 
 By default, `cgm` uses rotated text for the Y axis label.
@@ -17077,7 +17143,7 @@ Syntax:
 
 with the middle-sized font (FNT9X17) being the default."
 
-@node imagen, iris4d, hppj, terminal_
+@node imagen, kyo, hppj, terminal_
 @subsubsection imagen
 
 @c ?commands set terminal imagen
@@ -17111,56 +17177,7 @@ Example:
 
 puts six graphs on the page in three rows of two in portrait orientation."
 
-@node iris4d, kyo, imagen, terminal_
-@subsubsection iris4d
-
-@c ?commands set terminal iris4d
-@c ?set terminal iris4d
-@c ?set term iris4d
-@c ?terminal iris4d
-@c ?term iris4d
-@cindex iris4d
-@tmindex iris4d
-
-
-The `iris4d` terminal driver supports Silicon Graphics IRIS 4D computers.
-Its only option is 8- or 24-bit color depth.  The default is 8.
-
-Syntax:
-@example
-      set terminal iris4d @{8 | 24@}
-
-@end example
-
-The color depth is not really a choice -- the value appropriate for the
-hardware should be selected.
-
-When using 24-bit mode, the colors can be directly specified via the file
-.gnuplot_iris4d that is searched in the current directory and then in the
-home directory specified by the HOME environment variable.  This file holds
-RGB values for the background, border, labels and nine plotting colors, in
-that order.  For example, here is a file containing the default colors:
-
-@example
-      85   85   85     Background   (dark gray)
-      0    0    0      Boundary     (black)
-      170  0    170    Labeling     (magenta)
-      85   255  255    Plot Color 1 (light cyan)
-      170  0    0      Plot Color 2 (red)
-      0    170  0      Plot Color 3 (green)
-      255  85   255    Plot Color 4 (light magenta)
-      255  255  85     Plot Color 5 (yellow)
-      255  85   85     Plot Color 6 (light red)
-      85   255  85     Plot Color 7 (light green)
-      0    170  170    Plot Color 8 (cyan)
-      170  170  0      Plot Color 9 (brown)
-
-@end example
-
-This file must have exactly 12 lines of RGB triples.  No empty lines are
-allowed, and anything after the third number on a line is ignored."
-
-@node kyo, latex, iris4d, terminal_
+@node kyo, latex, imagen, terminal_
 @subsubsection kyo
 
 @c ?commands set terminal kyo
@@ -18899,7 +18916,7 @@ Macros are limited to 256 characters after expansion.
 
 
 Windows `gnuplot` will read some of its options from the `[WGNUPLOT]` section
-of `WGNUPLOT.INI` in the Windows directory.  A sample `WGNUPLOT.INI` file:
+of `WGNUPLOT.INI` in user's %APPDATA% directory.  A sample `WGNUPLOT.INI` file:
 
 @example
       [WGNUPLOT]

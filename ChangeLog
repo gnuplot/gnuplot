@@ -9,6 +9,8 @@
 	preferred option even on a real IRIS4D (I had one!), and would no longer
 	compile and link on SGI descendents of the IRIS4D as of 3 years ago.
 
+	* docs/gnuplot.texi:  Sync to current gnuplot.doc
+
 2007-10-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/eval.h src/eval.c (update_gpval_variables) src/util.c (int_error)
