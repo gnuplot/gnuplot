@@ -1,5 +1,11 @@
 2007-10-16  Ethan Merritt  <merritt@u.washington.edu>
 
+	* Remove the long-obsolete IRIS4D terminal.  This terminal never was the
+	preferred option even on a real IRIS4D (I had one!), and would no longer
+	compile and link on SGI descendents of the IRIS4D as of 3 years ago.
+
+2007-10-16  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/eval.h src/eval.c (update_gpval_variables) src/util.c (int_error)
 	src/unset.c (reset_command): Maintain error state variables.
 	GPVAL_ERRNO is set to a non-zero value whenever an error occurs.
