@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.159 2007/08/27 04:33:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.160 2007/08/31 20:03:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1024,11 +1024,9 @@ pause_command()
 {
     int text = 0;
     double sleep_time;
-    char *buf = gp_alloc(MAX_LINE_LEN+1, "pause argument");
+    static char *buf = NULL;
 
     c_token++;
-
-    *buf = NUL;
 
 #ifdef USE_MOUSE
     paused_for_mouse = 0;
@@ -1084,11 +1082,11 @@ pause_command()
 	sleep_time = real_expression();
 
     if (!(END_OF_COMMAND)) {
-	if (!isstring(c_token))
+	free(buf);
+	buf = try_to_get_string();
+	if (!buf)
 	    int_error(c_token, "expecting string");
 	else {
-	    quote_str(buf, c_token, MAX_LINE_LEN);
-	    ++c_token;
 #ifdef _Windows
 	    if (sleep_time >= 0)
 #elif defined(OS2)
@@ -1113,7 +1111,6 @@ pause_command()
 	if (buf && paused_for_mouse) fprintf(stderr,"%s\n", buf);
 	if (!Pause(buf)) {
 	    if (!tmp) {
-		free(buf);
 		bail_to_command_line();
 	    } else {
 		if (!graphwin.hWndGraph) 
@@ -1129,7 +1126,6 @@ pause_command()
 		 * would help to stop REXX programs w/o raising an error message
 		 * in RexxInterface() ...
 		 */
-		free(buf);
 		bail_to_command_line();
 	    } else if (rc == 2) {
 		fputs(buf, stderr);
@@ -1145,8 +1141,7 @@ pause_command()
 	    int MTOS_pause(char *buf);
 	    int rc;
 	    if ((rc = MTOS_pause(buf)) == 0)
-		free(buf);
-	    bail_to_command_line();
+	    	bail_to_command_line();
 	    else if (rc == 2) {
 		fputs(buf, stderr);
 		text = 1;
@@ -1186,8 +1181,6 @@ pause_command()
     if (text != 0 && sleep_time >= 0)
 	fputc('\n', stderr);
     screen_ok = FALSE;
-
-    free(buf);
 
 }
 

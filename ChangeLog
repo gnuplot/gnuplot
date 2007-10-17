@@ -1,3 +1,8 @@
+2007-10-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (pause_command): Accept a string expression as the
+	final parameter to "pause" commands.
+
 2007-10-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* INSTALL NEWS PORTING README configure.in configure.vms
