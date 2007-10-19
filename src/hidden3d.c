@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.58 2006/12/27 21:40:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.59 2007/08/03 03:49:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1139,7 +1139,7 @@ build_networks(struct surface_points *plots, int pcount)
 	below = this_plot->lp_properties.l_type + hiddenBacksideLinetypeOffset;
 
 	/* calculate the point symbol type: */
-	/* Assumest hat upstream functions have made sure this is
+	/* Assumes that upstream functions have made sure this is
 	 * initialized sensibly --- thou hast been warned */
 	lp_style = &(this_plot->lp_properties);
 

@@ -1,3 +1,11 @@
+2007-10-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util3d.c (draw3d_line_unconditional): Check for user-defined
+	line styles when choosing colors for front/back of hidden surfaces.
+
+	* src/misc.c src/hidden3d.c: Clean up comments emphasizing that basic
+	line properties must be initilized before calling lp_use_properties().
+
 2007-10-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (pause_command): Accept a string expression as the
