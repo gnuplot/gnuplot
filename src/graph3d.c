@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.177 2007/08/25 21:24:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.178 2007/09/28 20:21:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1194,7 +1194,7 @@ do_3dplot(
 			    set_color( cb2gray( z2cb(cntrs->z) ) );
 			else {
 			    if (prefer_line_styles && label_contours) {
-				struct lp_style_type ls;
+				struct lp_style_type ls = thiscontour_lp_properties;
 				lp_use_properties(&ls, ++thiscontour_lp_properties.l_type, FALSE);
 				term_apply_lp_properties(&ls);
 			    } else {
@@ -1868,10 +1868,10 @@ cntr3d_lines(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 {
     int i;			/* point index */
     vertex this_vertex;
-    struct lp_style_type ls;
 
     /* user may prefer explicit line styles */
     if (prefer_line_styles && label_contours) {
+	struct lp_style_type ls = *lp;
 	lp_use_properties(&ls, lp->l_type, FALSE);
 	lp = &ls;
     }

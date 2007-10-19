@@ -6,6 +6,11 @@
 	* src/misc.c src/hidden3d.c: Clean up comments emphasizing that basic
 	line properties must be initilized before calling lp_use_properties().
 
+	* src/color.c (draw_color_smooth) src/graph3d.c (do_3dplot cntr3d_lines)
+	src/misc.c (lp_use_properties):  Failure to initialize structure passed
+	to lp_use_properties().
+	Bugfix.
+
 2007-10-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (pause_command): Accept a string expression as the

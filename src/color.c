@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.75 2007/05/09 22:13:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.76 2007/08/12 17:45:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -616,7 +616,7 @@ draw_color_smooth_box(int plot_mode)
 	/* now make boundary around the colour box */
 	if (color_box.border_lt_tag >= 0) {
 	    /* user specified line type */
-	    struct lp_style_type lp;
+	    struct lp_style_type lp = border_lp;
 	    lp_use_properties(&lp, color_box.border_lt_tag, 1);
 	    term_apply_lp_properties(&lp);
 	} else {
