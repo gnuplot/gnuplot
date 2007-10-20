@@ -1,3 +1,20 @@
+2007-10-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	Patch 1 of 2: Rationalize use of the pointflag Boolean in lp_style_type.
+	The current code relies on lp_parse() to set this flag as a side effect,
+	but this is not correct. lp_parse() uses the flag to determine whether
+	point style options are legal in the current context. This is not always
+	the same thing as saying that the current plot will have points.
+	In particular, it is reasonable to set point properties in linestyles,
+	yet not all plots using that linestyle will actually contain points.
+	This caused some plots with lines to be drawn as linespoints.
+
+	* src/misc.c (lp_parse lp_use_properties): Do not set the pointflag.
+
+	* src/plot2d.c src/plot3d.c: At the end of parsing plot options, set 
+	lp_properties.pointflag based on the PLOT_STYLE_HAS_POINT flag in the
+	plot_style field of the plot structure.
+
 2007-10-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c (draw3d_line_unconditional): Check for user-defined

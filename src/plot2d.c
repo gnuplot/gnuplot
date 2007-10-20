@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.152 2007/08/31 20:03:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.153 2007/10/05 22:19:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1765,6 +1765,11 @@ eval_plots()
 #endif /* BACKWARDS_COMPATIBLE */
 
 	    }
+
+	    /* Some low-level routines expect to find the pointflag attribute */
+	    /* in lp_properties (they don't have access to the full header.   */
+	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
+		this_plot->lp_properties.pointflag = TRUE;
 
 	    /* Rule out incompatible line/point/style options */
 	    if (this_plot->plot_type == FUNC) {

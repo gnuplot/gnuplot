@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.89 2007/10/19 21:55:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.90 2007/10/20 03:01:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -701,10 +701,6 @@ filledcurves_options_tofile(filledcurves_opts *fco, FILE *fp)
 
 /* line/point parsing...
  *
- * allow_ls controls whether we are allowed to accept linestyle in
- * the current context [ie not when doing a  set linestyle command]
- * allow_point is whether we accept a point command
- * We assume compiler will optimise away if(0) or if(1)
  */
 
 void
@@ -712,10 +708,6 @@ lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
 {
     /*  This function looks for a linestyle defined by 'tag' and copies
      *  its data into the structure 'lp'.
-     *
-     *  If 'pointflag' equals ZERO, the properties belong to a linestyle
-     *  used with arrows.  In this case no point properties will be
-     *  passed to the terminal (cf. function 'term_apply_lp_properties' below).
      */
 
     struct linestyle_def *this;
@@ -729,7 +721,6 @@ lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
 		lp->pm3d_color.type = TC_LT;
 		lp->pm3d_color.lt = lp->l_type;
 	    }
-	    lp->pointflag = pointflag;
 	    return;
 	} else {
 	    this = this->next;
@@ -745,8 +736,13 @@ lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
 }
 
 
-/* allow any order of options - pm 24.11.2001 */
-/* EAM Oct 2005 - Require that default values have been placed in lp by the caller */
+/*
+ * allow_ls controls whether we are allowed to accept linestyle in
+ * the current context [ie not when doing a  set linestyle command]
+ * allow_point is whether we accept a point command
+ * allow any order of options - pm 24.11.2001
+ * EAM Oct 2005 - Require that default values have been placed in lp by the caller
+ */
 void
 lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 {
@@ -757,8 +753,6 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
     } else {
 	/* avoid duplicating options */
 	int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0;
-
-	lp->pointflag = allow_point;
 
 	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
