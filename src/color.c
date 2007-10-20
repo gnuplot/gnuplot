@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.76 2007/08/12 17:45:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.77 2007/10/20 03:01:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -217,7 +217,7 @@ void ifilled_quadrangle(gpiPoint* icorners)
 	 * outside this loop, and limit ourselves to apply_pm3dcolor().
 	 */
 	static struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
-	lp_use_properties(&lp, pm3d.hidden3d_tag, 0);
+	lp_use_properties(&lp, pm3d.hidden3d_tag);
 	term_apply_lp_properties(&lp);
 
 	term->move(icorners[0].x, icorners[0].y);
@@ -617,7 +617,7 @@ draw_color_smooth_box(int plot_mode)
 	if (color_box.border_lt_tag >= 0) {
 	    /* user specified line type */
 	    struct lp_style_type lp = border_lp;
-	    lp_use_properties(&lp, color_box.border_lt_tag, 1);
+	    lp_use_properties(&lp, color_box.border_lt_tag);
 	    term_apply_lp_properties(&lp);
 	} else {
 	    /* black solid colour should be chosen, so it's border linetype */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.90 2007/10/20 03:01:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.91 2007/10/21 04:12:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -704,7 +704,7 @@ filledcurves_options_tofile(filledcurves_opts *fco, FILE *fp)
  */
 
 void
-lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
+lp_use_properties(struct lp_style_type *lp, int tag)
 {
     /*  This function looks for a linestyle defined by 'tag' and copies
      *  its data into the structure 'lp'.
@@ -749,7 +749,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
     if (allow_ls &&
 	(almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
 	c_token++;
-	lp_use_properties(lp, int_expression(), allow_point);
+	lp_use_properties(lp, int_expression());
     } else {
 	/* avoid duplicating options */
 	int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0;
@@ -783,7 +783,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    lp->l_type = lt - 1;
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles && allow_ls)
-			lp_use_properties(lp, lt, TRUE);
+			lp_use_properties(lp, lt);
 		}
 	    } /* linetype, lt */
 

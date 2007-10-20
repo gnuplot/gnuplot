@@ -15,6 +15,12 @@
 	lp_properties.pointflag based on the PLOT_STYLE_HAS_POINT flag in the
 	plot_style field of the plot structure.
 
+	Patch 2 of 2: Remove 3rd parameter of lp_use_properties(), which is no
+	longer used.
+
+	* src/color.c src/gadgets.c src/graph3d.c src/graphics.c src/misc.c
+	src/misc.h src/plot2d.c src/plot3d.c src/term_api.h src/util3d.c
+
 2007-10-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c (draw3d_line_unconditional): Check for user-defined

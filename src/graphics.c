@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.233 2007/09/28 20:21:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.235 2007/10/02 16:20:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1838,7 +1838,7 @@ do_plot(struct curve_points *plots, int pcount)
 		    this_plot->lp_properties.l_type = key_entry->tag;
 		    if (key_entry->text) {
 			if (prefer_line_styles)
-			    lp_use_properties(&this_plot->lp_properties, key_entry->tag + 1, FALSE);
+			    lp_use_properties(&this_plot->lp_properties, key_entry->tag + 1);
 			do_key_sample(this_plot, key, key_entry->text, t, xl, yl);
 		    }
 		    yl = yl - key_entry_height;
@@ -3509,7 +3509,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			/* Line type (color) must match row number */
 			if (prefer_line_styles) {
 			    struct lp_style_type ls;
-			    lp_use_properties(&ls, i+1, FALSE);
+			    lp_use_properties(&ls, i+1);
 			    apply_pm3dcolor(&ls.pm3d_color, term);
 			} else
 			    (*t->linetype)(i);

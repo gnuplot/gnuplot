@@ -424,7 +424,7 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
     /* Replace colorspec with that of the requested line style */
     struct lp_style_type style;
     if (tc->type == TC_LINESTYLE) {
-	lp_use_properties(&style, tc->lt, 0);
+	lp_use_properties(&style, tc->lt);
 	(*t->linetype)(style.l_type);
 	tc = &style.pm3d_color;
     }
