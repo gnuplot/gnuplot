@@ -1,3 +1,11 @@
+2007-10-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lp_use_properties): Do not overwrite previously set
+	value of pointflag. (Missed one code path in yesterday's patch).
+
+	* src/save.c (save_linetype): Save point properties whether or not
+	pointflag is set.
+
 2007-10-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	Patch 1 of 2: Rationalize use of the pointflag Boolean in lp_style_type.

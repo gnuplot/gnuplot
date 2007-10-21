@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.91 2007/10/21 04:12:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.92 2007/10/21 04:17:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -711,11 +711,13 @@ lp_use_properties(struct lp_style_type *lp, int tag)
      */
 
     struct linestyle_def *this;
+    int save_pointflag = lp->pointflag;
 
     this = first_linestyle;
     while (this != NULL) {
 	if (this->tag == tag) {
 	    *lp = this->lp_properties;
+	    lp->pointflag = save_pointflag;
 	    /* FIXME - It would be nicer if this were always true already */
 	    if (!lp->use_palette) {
 		lp->pm3d_color.type = TC_LT;
