@@ -1,5 +1,11 @@
 2007-10-23  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/graph3d.c (do3d_plot): Fix bug in space allocation for
+	key title.
+	Bug #1817873
+
+2007-10-23  Ethan Merritt  <merritt@u.washington.edu>
+
 	Add a mechanism to embed figures in TeX-based documentation
 
 	* docs/README docs/doc2???.c: 'F' in first column of gnuplot.gih

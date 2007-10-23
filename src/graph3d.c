@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.179 2007/10/20 03:01:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.180 2007/10/21 04:17:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -867,17 +867,17 @@ do_3dplot(
 	    extra_height += 0.3;
 	ktitle_lines += extra_height;
 	(*t->linetype)(LT_BLACK);
+	yl -= t->v_char * ktitle_lines;
     }
 
     if (key->visible && key->box.l_type > LT_NODRAW) {
-	int yt = yl;
-	int yb = yl - key_entry_height * key_rows - ktitle_lines * t->v_char;
+	int yt = yl + t->v_char * ktitle_lines;
+	int yb = yl - key_entry_height * key_rows;
 	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
 	int key_xl = xl - key_size_left;
 	int tmp = (int)(0.5 * key->height_fix * t->v_char);
 	yt += 2 * tmp;
 	yl += tmp;
-	yl -= t->v_char * ktitle_lines;
 
 	term_apply_lp_properties(&key->box);
 	newpath();
