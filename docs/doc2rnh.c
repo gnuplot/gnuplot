@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.15 2004/07/01 17:10:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.16 2005/06/03 05:11:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2rnh.c */
@@ -169,6 +169,7 @@ process_line(char *line, FILE *b)
 	    break;		/* ignore */
 	}
     case '=':			/* latex index entry */
+    case 'F':			/* latex embedded figure */
     case '#':{			/* latex table entry */
 	    break;		/* ignore */
 	}

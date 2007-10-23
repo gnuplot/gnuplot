@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.451 2007/10/24 00:41:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.452 2007/10/24 00:44:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2453,6 +2453,7 @@ C ... and restart the table:
       4 columns:  x  y  ylow  yhigh          # boxwidth == -2
       5 columns:  x  y  ylow  yhigh  xdelta
 
+Ffigure_boxerrorbars
  The boxwidth will come from the fourth column if the y errors are given as
  "ydelta" and the boxwidth was not previously set to -2.0 (`set boxwidth -2.0`)
  or from the fifth column if the y errors are in the form of "ylow yhigh".  The
@@ -2474,6 +2475,7 @@ C ... and restart the table:
 ?plotting styles boxes
 ?style boxes
 ?boxes
+Ffigure_boxes
  The `boxes` style is only relevant to 2D plotting.  It draws a box centered
  about the given x coordinate that extends from the x axis (not from the graph
  border) to the given y coordinate.  It uses 2 or 3 columns of basic data.
@@ -2535,6 +2537,7 @@ C ... and restart the table:
 ?plotting styles boxxyerrorbars
 ?style boxxyerrorbars
 ?boxxyerrorbars
+Ffigure_boxxyerrorbars
  The `boxxyerrorbars` style is only relevant to 2D data plotting.  It is similar
  to the `xyerrorbars` style except that it draws rectangular areas rather than
  simple crosses.  It uses either 4 or 6 basic columns of input data.
@@ -2558,6 +2561,7 @@ C ... and restart the table:
 ?plotting styles candlesticks
 ?style candlesticks
 ?candlesticks
+Ffigure_candlesticks
  The `candlesticks` style can be used for 2D data plotting of financial
  data or for generating box-and-whisker plots of statistical data.
  The symbol is a rectangular box, centered horizontally at the x
@@ -2610,29 +2614,31 @@ C ... and restart the table:
 ?plotting styles dots
 ?style dots
 ?dots
+Ffigure_dots
  The `dots` style plots a tiny dot at each point; this is useful for scatter
  plots with many points.  Either 1 or 2 columns of input data are required in
- 2D.  3 columns are required in 3D.
+ 2D.  Three columns are required in 3D.
+
+ For some terminals (post, pdf) the size of the dot can be controlled by
+ changing the linewidth.
 
       1 column    y         # x is taken from row number
       2 columns:  x  y
       3 columns:  x  y  z   # 3D only (splot)
 
- For some terminals (post, pdf) the size of the dot can be controlled by
- changing the linewidth.
 2 filledcurves
 ?commands set style filledcurves
 ?set style filledcurves
 ?plotting styles filledcurves
 ?style filledcurves
 ?filledcurves
+Ffigure_filledcurves
  The `filledcurves` style is only relevant to 2D plotting. Three variants
  are possible. The first two variants require either a function or two columns
  of input data, and may be further modified by the options listed below.
 
  Syntax:
 
-     set style [data | function] filledcurves [option]
      plot ... with filledcurves [option]
 
  where the option can be
@@ -2692,6 +2698,7 @@ C ... and restart the table:
 
       5 columns:   date  open  low  high  close
 
+Ffigure_financebars
  The symbol is a vertical line segment, located horizontally at the x
  coordinate and limited vertically by the high and low prices.  A horizontal
  tic on the left marks the opening price and one on the right marks the
@@ -2707,9 +2714,14 @@ C ... and restart the table:
 ?plotting styles fsteps
 ?style fsteps
 ?fsteps
+Ffigure_fsteps
  The `fsteps` style is only relevant to 2D plotting.  It connects consecutive
  points with two line segments: the first from (x1,y1) to (x1,y2) and the
- second from (x1,y2) to (x2,y2).
+ second from (x1,y2) to (x2,y2).  The input column requires are the same as for
+ plot styles `lines` and `points`.  The difference between `fsteps` and `steps`
+ is that `fsteps` traces first the change in y and then the change in x.
+ `steps` traces first the change in x and then the change in y.
+
  See also
 ^ <a href="http://www.gnuplot.info/demo/steps.html">
  steps demo.
@@ -2720,12 +2732,14 @@ C ... and restart the table:
 ?plotting styles histeps
 ?style histeps
 ?histeps
+Ffigure_histeps
  The `histeps` style is only relevant to 2D plotting.  It is intended for
  plotting histograms.  Y-values are assumed to be centered at the x-values;
  the point at x1 is represented as a horizontal line from ((x0+x1)/2,y1) to
  ((x1+x2)/2,y1).  The lines representing the end points are extended so that
  the step is centered on at x.  Adjacent points are connected by a vertical
  line at their average x, that is, from ((x1+x2)/2,y1) to ((x1+x2)/2,y2).
+ The input column requires are the same as for plot styles `lines` and `points`.
 
  If `autoscale` is in effect, it selects the xrange from the data rather than
  the steps, so the end points will appear only half as wide as the others.
@@ -2807,20 +2821,22 @@ C ... and restart the table:
  plot elements may use either the x1 or the x2 axis.
 
  Examples:
-
+Ffigure_histclust
  To plot a data file containing multiple columns of data as a histogram
  of clustered boxes (the default style):
 
        set boxwidth 0.9 relative
        set style data histograms
+       set style histogram cluster
        set style fill solid 1.0 border -1
-       plot 'file.dat' using 2, '' using 4, '' using 6
+       plot 'file.dat' using 2, '' using 4
+       
 
- This will produce a plot with clusters of three boxes (vertical bars) centered
+ This will produce a plot with clusters of two boxes (vertical bars) centered
  at each integral value on the x axis.  If the first column of the input file
  contains labels, they may be placed along the x-axis using the variant command
 
-       plot 'file.dat' using 2, '' using 4, '' using 6:xticlabels(1)
+       plot 'file.dat' using 2, '' using 4:xticlabels(1)
 
  If the file contains both a magnitude and an error estimate for each value,
  then error bars can be added to the plot.  The following commands will add
@@ -2830,28 +2846,30 @@ C ... and restart the table:
 
        set bars fullwidth
        set style histogram errorbars gap 2 lt -1 lw 2
-       plot 'file.dat' using 2:3, '' using 4:5, '' using 6:7:xticlabels(1)
+       plot 'file.dat' using 2:3, '' using 4:5:xticlabels(1)
 
  To plot the same data as a rowstacked histogram:
 
-       set style histogram rows
-       plot 'file.dat' using 2, '' using 4, '' using 6:xtic(1)
+       set style histogram rowstacked
+       plot 'file.dat' using 2, '' using 4:xtic(1)
 
- This will produce a plot in which each vertical bar contains a stack of three
- segments, corresponding in height to the values found in columns 2, 4 and 6
- of the datafile.
+Ffigure_histrows
+ This will produce a plot in which each vertical bar corresponds to one row of
+ data.  Each vertical bar contains a stack of two segments, corresponding in
+ height to the values found in columns 2 and 4 of the datafile.
 
  Finally, the commands
 
        set style histogram columnstacked
-       plot 'file.dat' using 2, '' using 4, '' using 6
+       plot 'file.dat' using 2, '' using 4
 
- will produce three vertical stacks. The stack at x=1 will contain a box for
- each entry in column 2 of the datafile.  The stack at x=2 will contain a box
- for each parallel entry in column 4 of the datafile, and the stack at x=3 a
- box for each entry of column 6.  Because this interchanges gnuplot's usual
- interpretation of input rows and columns, the specification of key titles and
- x-axis tic labels must also be modified.
+Ffigure_histcols
+ will produce two vertical stacks, one for each column of data.  The stack at
+ x=1 will contain a box for each entry in column 2 of the datafile.  The stack
+ at x=2 will contain a box for each parallel entry in column 4 of the datafile.
+ Because this interchanges gnuplot's usual interpretation of input rows and
+ columns, the specification of key titles and x-axis tic labels must also be
+ modified.
 
        set style histogram columnstacked
        plot '' u 5:key(1)            # uses first column to generate key titles
@@ -2888,7 +2906,7 @@ C ... and restart the table:
  For example, to create stacked histograms of the data in columns 3 through 8
 
        set style histogram columnstacked
-       plot for [i=3:8] "datafile" using i title columnhead
+       plot for [i=3:8] "datafile" using i title columnhead 
 2 image
 ?commands set style image
 ?set style image
@@ -2905,8 +2923,8 @@ C ... and restart the table:
  (gray value) for indexing in the current palette.
 
  Each pixel (data point) of the input 2D image will become a rectangle or
- parallelogram in the plot.  The coordinate of each data point will determine
- the center of the parallelogram.  That is, an M x N set of data will form an
+ parallelipiped in theplot.  The coordinate of each data point will determine
+ the center of the parallelipiped.  That is, an M x N set of data will form an
  image with M x N pixels.  This is slightly different than pm3d elements where
  an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
  directions for the image data grid can be any of eight possible combinations.
@@ -2942,6 +2960,7 @@ C ... and restart the table:
 ?plotting styles impulses
 ?style impulses
 ?impulses
+Ffigure_impulses
  The `impulses` style displays a vertical line from the x axis (2D) or from the
  xy plane (3D) to each input point.  To use this style effectively in 3D plots,
  it is useful to use thick lines (linewidth > 1).
@@ -2956,6 +2975,7 @@ C ... and restart the table:
 ?plotting styles labels
 ?style labels
 ?labels
+Ffigure_labels
  The `labels` style reads coordinates and text from a data file and places
  the text string at the corresponding 2D or 3D position.  3 or 4 input columns
  of basic data are required.  Additional input columns may be used to provide
@@ -2983,6 +3003,7 @@ C ... and restart the table:
 ?plotting styles lines
 ?style lines
 ?lines
+Ffigure_lines
  The `lines` style connects adjacent points with straight line segments.
  It may be used in either 2D or 3D plots. The basic form requires 1, 2, or 3
  columns of input data.
@@ -2990,10 +3011,10 @@ C ... and restart the table:
  variable line color (see `rgbcolor variable`).
 
  2D form
-      1 column:   y           # implicit x value from row number
+      1 column:   y       # implicit x from row number
       2 columns:  x  y
  3D form
-      1 column:   z           # implicit x from row, y from index
+      1 column:   z       # implicit x from row, y from index
       3 columns:  x  y  z
 
  See also `linetype`, `linewidth`, and `linestyle`.
@@ -3007,6 +3028,7 @@ C ... and restart the table:
 ?style lp
 ?linespoints
 ?lp
+Ffigure_linespoints
  The `linespoints` style does both `lines` and `points`, that is, it draws a
  small symbol at each point and then connects adjacent points with straight
  line segments.  The command `set pointsize` may be used to change the size of
@@ -3022,24 +3044,30 @@ C ... and restart the table:
 ?plotting styles points
 ?style points
 ?points
+Ffigure_points
  The `points` style displays a small symbol at each point.  The command `set
  pointsize` may be used to change the default size of the points.
  1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
  required if 3D plots.  See `style lines`.  Additional input columns may be used
- to provide information such as variable point size or color.
+ to provide information such as variable point size or line color.
 2 steps
 ?commands set style steps
 ?set style steps
 ?plotting styles steps
 ?style steps
 ?steps
+Ffigure_steps
  The `steps` style is only relevant to 2D plotting.  It connects consecutive
  points with two line segments: the first from (x1,y1) to (x2,y1) and the
- second from (x2,y1) to (x2,y2).
+ second from (x2,y1) to (x2,y2).  The input column requires are the same as for
+ plot styles `lines` and `points`.  The difference between `fsteps` and `steps`
+ is that `fsteps` traces first the change in y and then the change in x.
+ `steps` traces first the change in x and then the change in y.
  See also
 ^ <a href="http://www.gnuplot.info/demo/steps.html">
  steps demo.
 ^ </a>
+
 2 rgbimage
 ?commands set style rgbimage
 ?set style rgbimage
@@ -3081,6 +3109,7 @@ C ... and restart the table:
 ?plotting styles xerrorbars
 ?style xerrorbars
 ?xerrorbars
+Ffigure_xerrorbars
  The `xerrorbars` style is only relevant to 2D data plots.  `xerrorbars` is
  like `dots`, except that a horizontal error bar is also drawn.  At each point
  (x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
@@ -3097,6 +3126,7 @@ C ... and restart the table:
 ?plotting styles xyerrorbars
 ?style xyerrorbars
 ?xyerrorbars
+Ffigure_xyerrorbars
  The `xyerrorbars` style is only relevant to 2D data plots.  `xyerrorbars` is
  like `dots`, except that horizontal and vertical error bars are also drawn.
  At each point (x,y), lines are drawn from (x,y-ydelta) to (x,y+ydelta) and
@@ -3123,6 +3153,7 @@ C ... and restart the table:
 ?style yerrorbars
 ?style errorbars
 ?yerrorbars
+Ffigure_yerrorbars
  The `yerrorbars` (or `errorbars`) style is only relevant to 2D data plots.
  `yerrorbars` is like `points`, except that a vertical error bar is also drawn.
  At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
@@ -3143,6 +3174,7 @@ C ... and restart the table:
 ?plotting styles xerrorlines
 ?style xerrorlines
 ?xerrorlines
+Ffigure_xerrorlines
  The `xerrorlines` style is only relevant to 2D data plots.
  `xerrorlines` is like `linespoints`, except that a horizontal error
  line is also drawn. At each point (x,y), a line is drawn from (xlow,y)
@@ -3160,6 +3192,7 @@ C ... and restart the table:
 ?plotting styles xyerrorlines
 ?style xyerrorlines
 ?xyerrorlines
+Ffigure_xyerrorlines
  The `xyerrorlines` style is only relevant to 2D data plots.
  `xyerrorlines` is like `linespoints`, except that horizontal and
  vertical error bars are also drawn. At each point (x,y), lines are
@@ -3187,6 +3220,7 @@ C ... and restart the table:
 ?style yerrorlines
 ?style errorlines
 ?yerrorlines
+Ffigure_yerrorlines
  The `yerrorlines` (or `errorlines`) style is only relevant to 2D data
  plots. `yerrorlines` is like `linespoints`, except that a vertical
  error line is also drawn. At each point (x,y), a line is drawn from
@@ -3202,6 +3236,34 @@ C ... and restart the table:
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
  errorbar demo.
 ^ </a>
+2 3D (surface) plots
+?3D (surface) plots
+?plotting styles 3d (surface) plots
+Ffigure_surface
+ Surface plots are generated using the `splot` command rather than the `plot`
+ command. The style `with lines` draws a surface made from a grid of lines.
+ Solid surfaces can be drawn using the style `with pm3d`.
+ Usually the surface is displayed at some arbitrary viewing angle,
+ such that it clearly represents a 3D surface.  In this case the X, Y, and Z
+ axes are all visible in the plot. The illusion of 3D is enhanced by choosing
+ hidden line removal or depth-sorted surface elements.
+ See `hidden3d` and the `depthorder` option of `set pm3d`.
+Ffigure_surface+contours
+ The `splot` command can also calculate and draw contour lines corresponding
+ to constant Z values. These contour lines may be drawn onto the surface 
+ itself, or projected onto the XY plane. See `set contour`.
+    
+    
+    
+    
+    
+
+Ffigure_mapcontours
+ An important special case of the `splot` command is to map the Z coordinate
+ onto a 2D surface by projecting the plot along the Z axis.  See `set view map`.
+ This plot mode can be used to generate contour plots and heat maps.
+    
+
 1 Commands
 ?commands
  This section lists the commands acceptable to `gnuplot` in alphabetical

@@ -1,0 +1,211 @@
+#
+#  Generate a set of figures to illustrate the various plot styles
+#  EAM - July 2007
+#
+#
+set term pdfcairo mono font "Times,7" size 3.5,2.0 dashlength 0.2
+#
+# Line and point type plots  (same data plotted)
+# ==============================================
+#
+set output 'figure_lines.pdf'
+set xrange [270:370]
+unset xtics
+unset ytics
+set offset 10,10,4,2
+set xzeroaxis
+set lmargin screen 0.05
+set rmargin screen 0.95
+set bmargin screen 0.05
+set tmargin screen 0.95
+
+plot '../demo/silver.dat' u 1:($2-10.) title 'with lines' with lines
+#
+set output 'figure_points.pdf'
+plot '../demo/silver.dat' u 1:($2-10.):(1+rand(0)) title 'with points ps variable' \
+     with points ps variable pt 6
+#
+set output 'figure_linespoints.pdf'
+plot '../demo/silver.dat' u 1:($2-10.) title 'with linespoints' \
+     with linespoints pt 6 ps 1
+#
+set output 'figure_fsteps.pdf'
+plot '../demo/silver.dat' u 1:($2-10.) title 'with fsteps' with fsteps
+#
+set output 'figure_steps.pdf'
+plot '../demo/silver.dat' u 1:($2-10.) title 'with steps' with steps
+#
+set output 'figure_histeps.pdf'
+plot '../demo/silver.dat' u 1:($2-10.) title 'with histeps' with histeps
+#
+set output 'figure_labels.pdf'
+unset xzeroaxis
+plot '../demo/silver.dat' u 1:($2-10.):("ABCDEFGHIJKLMNOPQRSTUVWXYZ"[int($0-20):int($0-20)+int(4*rand(0))]) \
+     title 'with labels' with labels font ",8"
+#
+# Simple bar charts  (same data plotted)
+# ======================================
+#
+set output 'figure_boxes.pdf'
+set xzeroaxis
+set boxwidth 0.8 relative
+plot '../demo/silver.dat' u 1:($2-10.) with boxes title 'with boxes' fs pattern 2
+#
+set output 'figure_boxerrorbars.pdf'
+set boxwidth 0.8 relative
+plot '../demo/silver.dat' u 1:($2-10.):(3*rand(0)) with boxerrorbars title 'with boxerrorbars' fs empty
+#
+set output 'figure_impulses.pdf'
+plot '../demo/silver.dat' u 1:($2-10.) with impulses title 'with impulses'
+#
+# Error bars and whisker plots
+# ============================
+#
+set xrange [0:11]
+set yrange [0:10]
+set boxwidth 0.2
+unset xzeroaxis
+unset offset
+#
+set output 'figure_candlesticks.pdf'
+plot '../demo/candlesticks.dat' using 1:3:2:6:5 title 'with candlesticks' with candlesticks whiskerbar fs empty
+#
+set output 'figure_financebars.pdf'
+set bars 4
+plot '../demo/candlesticks.dat' using 1:3:2:6:5 title 'with financebars' with financebars
+set bars 1
+#
+set output 'figure_yerrorbars.pdf'
+plot '../demo/candlesticks.dat' using 1:4:3:5 with yerrorbars title 'with yerrorbars'
+#
+set output 'figure_yerrorlines.pdf'
+plot '../demo/candlesticks.dat' using 1:4:3:5 with yerrorlines title 'with yerrorlines'
+#
+set output 'figure_boxxyerrorbars.pdf'
+plot '../demo/candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
+     with boxxyerrorbars title 'with boxxyerrorbars' fs empty
+#
+set output 'figure_xyerrorbars.pdf'
+plot '../demo/candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
+     with xyerrorbars title 'with xyerrorbars'
+#
+set output 'figure_xyerrorlines.pdf'
+plot '../demo/candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
+     with xyerrorlines title 'with xyerrorlines'
+#
+set output 'figure_xerrorbars.pdf'
+plot '../demo/candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
+     with xerrorbars title 'with xerrorbars'
+#
+set output 'figure_xerrorlines.pdf'
+plot '../demo/candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
+     with xerrorlines title 'with xerrorlines'
+#
+# Filled curves
+# =============
+#
+set output 'figure_filledcurves.pdf'
+set style fill pattern 1 border -1
+set xrange [250:500]
+set auto y
+set key box title "with filledcurves"
+plot '../demo/silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above', \
+               '' u 1:2:($3+$1/50.) w filledcurves below title 'below', \
+               '' u 1:2 w lines lt -1 lw 1 title 'curve 1', \
+               '' u 1:($3+$1/50.) w lines lt -1 lw 3 title 'curve 2'
+#
+# Dots
+# ====
+#
+set output 'figure_dots.pdf'
+reset
+set parametric
+set samples 1000
+set isosamples 2,2 # Smallest possible
+set view map
+set lmargin screen 0.05
+set rmargin screen 0.95
+set tmargin screen 0.95
+set bmargin screen 0.05
+unset xtics
+unset ytics
+set xrange [-3:3]
+set yrange [-4:4]
+splot invnorm(rand(0)),invnorm(rand(0)),invnorm(rand(0)) with dots notitle
+#
+# Histograms
+# ==========
+#
+reset
+set style data histogram
+set boxwidth 0.9 rel
+set key auto column invert
+set yrange [0:*]
+set offset 0,0,2,0
+unset xtics
+set tmargin 1
+#
+set output 'figure_histclust.pdf'
+set style histogram clustered
+plot 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
+#
+set output 'figure_histrows.pdf'
+set style histogram rows
+set title "Rowstacked" offset 0,-1
+plot 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
+#
+set output 'figure_histcols.pdf'
+set style histogram columns
+set title "Columnstacked" offset 0,-1
+set boxwidth 0.8 rel
+set xtics
+plot 'histopt.dat' using 1 ti col fs pattern 0, '' using 2 ti col fs pattern 0
+
+#
+# 3D Plot styles
+# ==============
+#
+reset
+set view 75, 33, 1.0, 0.82
+set bmargin screen 0.18
+unset key
+set samples 20, 20
+set isosamples 21, 21
+set xlabel "X axis" 
+set ylabel "Y axis" 
+set zlabel "Z axis" 
+set zlabel  offset 2,0 rotate by -90
+unset xtics
+unset ytics
+unset ztics
+set border lw 2.0
+set xrange [-3:3]
+set yrange [-3:3]
+set zrange [-1.5:1]
+set hidden3d offset 1
+
+set title "3D surface plot with hidden line removal"  offset 0,1
+set output 'figure_surface.pdf'
+splot sin(x) * cos(y) with lines lt -1
+
+set contour base
+set cntrparam levels auto 9
+unset key
+set title "3D surface with projected contours" 
+
+set output 'figure_surface+contours.pdf'
+splot sin(x) * cos(y) with lines lt -1
+
+unset view
+set view map
+unset surface
+unset grid
+set bmargin screen 0.15
+set xlabel "X axis" offset 0,2 
+set tmargin
+set rmargin
+set lmargin
+set title "projected contours using 'set view map'" offset 0,-1
+
+set output 'figure_mapcontours.pdf'
+splot sin(x) * cos(y)

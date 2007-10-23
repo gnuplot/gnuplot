@@ -152,6 +152,7 @@ Control characters in first column:
 @    used by doc2{tex,ms,rnh} to define table start/end
 #    used by doc2tex: table entry
 =    used by doc2tex: index entry
+F    used by doc2tex: embedded figure (followed by base name of the pdf file)
 %    used by doc2ms: table entry
 ^    used by doc2html : hypertext link
 <    the help from the terminal driver files is inserted at this point.

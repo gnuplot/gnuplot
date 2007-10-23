@@ -140,13 +140,14 @@ HEADERS = doc2x.h xref.h
 
 EXTRA_DIST = doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex makefile.ami \
 makefile.dst titlepag.ipf titlepag.ms titlepag.tex toc_entr.sty old psdoc \
-faq-ja.tex gnuplot-ja.doc README.ja term-ja.diff
+faq-ja.tex gnuplot-ja.doc README.ja term-ja.diff plotstyles.gnu
 
 CLEANFILES = doc2tex gnuplot.tex gnuplot.dvi gnuplot.aux gnuplot.log \
 gnuplot.toc gnuplot.pdf gnuplot.ps gpcard.dvi gpcard.log gpcard.ps alldoc2gih \
 doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.idx gnuplot.ilg gnuplot.ind \
 gnuplot.info* gnuplot.out doc2ipf gnuplot.ipf doc2ms gnuplot.ms doc2rnh \
-gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff checkdoc gnuplot.txt
+gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff checkdoc gnuplot.txt \
+figure*.pdf
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
@@ -242,6 +243,12 @@ htmldocs/gnuplot.html: $(srcdir)/gnuplot.tex
 	latex2html -dir htmldocs -local_icons gnuplot
 
 ### PDF documentation
+pdffigures: figures gnuplot.pdf figures
+
+figures: doc2tex
+	../src/gnuplot plotstyles.gnu
+	./doc2tex -figures $(srcdir)/gnuplot.doc gnuplot.tex
+
 pdf: gnuplot.pdf
 
 gnuplot.pdf: gnuplot.tex

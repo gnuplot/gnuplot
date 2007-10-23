@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.20 2006/08/11 20:37:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.21 2006/08/13 17:23:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -73,6 +73,7 @@ static TBOOLEAN intable = FALSE;
 static TBOOLEAN verb = FALSE;
 static TBOOLEAN see = FALSE;
 static TBOOLEAN inhref = FALSE;
+static TBOOLEAN figures = FALSE;
 
 int
 main (int argc, char **argv)
@@ -80,24 +81,31 @@ main (int argc, char **argv)
     FILE *infile;
     FILE *outfile;
 
+    int inarg = 1;
+
     infile = stdin;
     outfile = stdout;
 
-    if (argc > 3) {
-	fprintf(stderr, "Usage: %s [infile [outfile]]\n", argv[0]);
+    if (argc > 1 && !strcmp(argv[1],"-figures")) {
+	figures = TRUE;
+	inarg = 2;
+    }
+
+    if (argc > (figures ? 4 : 3)) {
+	fprintf(stderr, "Usage: %s [-figures] [infile [outfile]]\n", argv[0]);
 	exit(EXIT_FAILURE);
     }
-    if (argc >= 2) {
-	if ((infile = fopen(argv[1], "r")) == (FILE *) NULL) {
+    if (argc > inarg) {
+	if ((infile = fopen(argv[inarg], "r")) == (FILE *) NULL) {
 	    fprintf(stderr, "%s: Can't open %s for reading\n",
-		    argv[0], argv[1]);
+		    argv[0], argv[inarg]);
 	    exit(EXIT_FAILURE);
 	}
     }
-    if (argc == 3) {
-	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
+    if (argc == inarg+2) {
+	if ((outfile = fopen(argv[inarg+1], "w")) == (FILE *) NULL) {
 	    fprintf(stderr, "%s: Can't open %s for writing\n",
-		    argv[0], argv[2]);
+		    argv[0], argv[inarg+1]);
 	    exit(EXIT_FAILURE);
 	}
     }
@@ -157,6 +165,15 @@ process_line( char *line, FILE *b)
 		*ind = ' ';
 	    fputs(line+1, b);
 	    (void) fputs("}\n",b);
+	    break;
+
+    case 'F':			/* embedded figure */
+	    if (figures) {
+		line[strlen(line)-1]=NUL;
+		(void) fputs("\\parpic[r][rt]{\\includegraphics[width=3in,keepaspectratio]{",b);
+		fputs(line+1, b);
+		(void) fputs("}}\n",b);
+	    }
 	    break;
 
     case '@':{			/* start/end table */

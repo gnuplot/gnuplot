@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.18 2005/06/03 05:11:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.19 2006/05/13 09:05:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -358,6 +358,9 @@ process_line(char *line, FILE *b)
     case '=':{			/* index entry */
 	    fprintf(b, ":i1.%s", line+1);
 	    break;
+	}
+    case 'F':{			/* latex embedded figure */
+	    break;		/* ignore */
 	}
     case '#':{			/* latex table entry */
 	    break;		/* ignore */

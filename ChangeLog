@@ -1,5 +1,22 @@
 2007-10-23  Ethan Merritt  <merritt@u.washington.edu>
 
+	Add a mechanism to embed figures in TeX-based documentation
+
+	* docs/README docs/doc2???.c: 'F' in first column of gnuplot.gih
+	indicates an embedded figure. The text immediately following is the 
+	filename of the (pdf) figure. doc2tex emits a suitable \includegraphics
+	call, everyone else ignores the whole line.
+
+	* docs/titlpage.tex: Include packages graphicx and picins.
+
+	* docs/plotstyles.gnu docs/histopt.dat: Script to create figures
+	illustrating various plot styles.
+
+	* docs/Makefile.in:  New target "make pdffigures".
+
+	* docs/gnuplot.doc:  Expand the section on plot styles, and embed
+	suitable figures to illustrate.
+
 	* docs/gnuplot.doc:  Document `set pm3d depthorder`.
 
 2007-10-21  Ethan Merritt  <merritt@u.washington.edu>

@@ -661,11 +661,12 @@ comment out the multi-word ? entries."
 
 (defun d2t-comments ()
   "Delete comments and lines beginning with # or %.
-# and % lines are used in converting tables into various formats."
+# and % lines are used in converting tables into various formats.
+Also ignore F lines denoting figures."
   (and d2t-verbose (message "  Doing d2t-comments ..."))
   (save-excursion
     (while (not (eobp))
-      (re-search-forward "^[C#%]" (point-max) "to_end")
+      (re-search-forward "^[C#%F]" (point-max) "to_end")
       (unless (eobp)
 	(let ((eol  (save-excursion (end-of-line)
 				    (forward-char 1)
