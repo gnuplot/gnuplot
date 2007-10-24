@@ -3374,6 +3374,7 @@ file are interpreted as plot data, see @ref{using}.
 * xerrorlines::                 
 * xyerrorlines::                
 * yerrorlines::                 
+* 3D_(surface)_plots::          
 @end menu
 
 @node boxerrorbars, boxes, plotting_styles, plotting_styles
@@ -3597,7 +3598,10 @@ box-and-whisker plot requires additional plot commands as in this example:
 
 The @ref{dots} style plots a tiny dot at each point; this is useful for scatter
 plots with many points.  Either 1 or 2 columns of input data are required in
-2D.  3 columns are required in 3D.
+2D.  Three columns are required in 3D.
+
+For some terminals (post, pdf) the size of the dot can be controlled by
+changing the linewidth.
 
 @example
      1 column    y         # x is taken from row number
@@ -3606,8 +3610,6 @@ plots with many points.  Either 1 or 2 columns of input data are required in
 
 @end example
 
-For some terminals (post, pdf) the size of the dot can be controlled by
-changing the linewidth.
 
 @node filledcurves, financebars, dots, plotting_styles
 @section filledcurves
@@ -3625,7 +3627,6 @@ of input data, and may be further modified by the options listed below.
 Syntax:
 
 @example
-    set style [data | function] filledcurves [option]
     plot ... with filledcurves [option]
 
 @end example
@@ -3731,7 +3732,11 @@ See @ref{bars} and @ref{candlesticks}, and also the
 
 The @ref{fsteps} style is only relevant to 2D plotting.  It connects consecutive
 points with two line segments: the first from (x1,y1) to (x1,y2) and the
-second from (x1,y2) to (x2,y2).
+second from (x1,y2) to (x2,y2).  The input column requires are the same as for
+plot styles `lines` and `points`.  The difference between @ref{fsteps} and @ref{steps}
+is that @ref{fsteps} traces first the change in y and then the change in x.
+@ref{steps} traces first the change in x and then the change in y.
+
 See also
 @uref{http://www.gnuplot.info/demo/steps.html,steps demo.
 }
@@ -3751,6 +3756,7 @@ the point at x1 is represented as a horizontal line from ((x0+x1)/2,y1) to
 ((x1+x2)/2,y1).  The lines representing the end points are extended so that
 the step is centered on at x.  Adjacent points are connected by a vertical
 line at their average x, that is, from ((x1+x2)/2,y1) to ((x1+x2)/2,y2).
+The input column requires are the same as for plot styles `lines` and `points`.
 
 If @ref{autoscale} is in effect, it selects the xrange from the data rather than
 the steps, so the end points will appear only half as wide as the others.
@@ -3838,24 +3844,25 @@ If a plot contains both histograms and other plot styles, the non-histogram
 plot elements may use either the x1 or the x2 axis.
 
 Examples:
-
 To plot a data file containing multiple columns of data as a histogram
 of clustered boxes (the default style):
 
 @example
       set boxwidth 0.9 relative
       set style data histograms
+      set style histogram cluster
       set style fill solid 1.0 border -1
-      plot 'file.dat' using 2, '' using 4, '' using 6
+      plot 'file.dat' using 2, '' using 4
+      
 
 @end example
 
-This will produce a plot with clusters of three boxes (vertical bars) centered
+This will produce a plot with clusters of two boxes (vertical bars) centered
 at each integral value on the x axis.  If the first column of the input file
 contains labels, they may be placed along the x-axis using the variant command
 
 @example
-      plot 'file.dat' using 2, '' using 4, '' using 6:xticlabels(1)
+      plot 'file.dat' using 2, '' using 4:xticlabels(1)
 
 @end example
 
@@ -3868,36 +3875,36 @@ drawn in black with linewidth 2.
 @example
       set bars fullwidth
       set style histogram errorbars gap 2 lt -1 lw 2
-      plot 'file.dat' using 2:3, '' using 4:5, '' using 6:7:xticlabels(1)
+      plot 'file.dat' using 2:3, '' using 4:5:xticlabels(1)
 
 @end example
 
 To plot the same data as a rowstacked histogram:
 
 @example
-      set style histogram rows
-      plot 'file.dat' using 2, '' using 4, '' using 6:xtic(1)
+      set style histogram rowstacked
+      plot 'file.dat' using 2, '' using 4:xtic(1)
 
 @end example
 
-This will produce a plot in which each vertical bar contains a stack of three
-segments, corresponding in height to the values found in columns 2, 4 and 6
-of the datafile.
+This will produce a plot in which each vertical bar corresponds to one row of
+data.  Each vertical bar contains a stack of two segments, corresponding in
+height to the values found in columns 2 and 4 of the datafile.
 
 Finally, the commands
 
 @example
       set style histogram columnstacked
-      plot 'file.dat' using 2, '' using 4, '' using 6
+      plot 'file.dat' using 2, '' using 4
 
 @end example
 
-will produce three vertical stacks. The stack at x=1 will contain a box for
-each entry in column 2 of the datafile.  The stack at x=2 will contain a box
-for each parallel entry in column 4 of the datafile, and the stack at x=3 a
-box for each entry of column 6.  Because this interchanges gnuplot's usual
-interpretation of input rows and columns, the specification of key titles and
-x-axis tic labels must also be modified.
+will produce two vertical stacks, one for each column of data.  The stack at
+x=1 will contain a box for each entry in column 2 of the datafile.  The stack
+at x=2 will contain a box for each parallel entry in column 4 of the datafile.
+Because this interchanges gnuplot's usual interpretation of input rows and
+columns, the specification of key titles and x-axis tic labels must also be
+modified.
 
 @example
       set style histogram columnstacked
@@ -3957,7 +3964,7 @@ For example, to create stacked histograms of the data in columns 3 through 8
 
 @example
       set style histogram columnstacked
-      plot for [i=3:8] "datafile" using i title columnhead
+      plot for [i=3:8] "datafile" using i title columnhead 
 
 @end example
 
@@ -3980,8 +3987,8 @@ parallelogram.  The variable `value` in the tuples represent a palette color
 (gray value) for indexing in the current palette.
 
 Each pixel (data point) of the input 2D image will become a rectangle or
-parallelogram in the plot.  The coordinate of each data point will determine
-the center of the parallelogram.  That is, an M x N set of data will form an
+parallelipiped in theplot.  The coordinate of each data point will determine
+the center of the parallelipiped.  That is, an M x N set of data will form an
 image with M x N pixels.  This is slightly different than pm3d elements where
 an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
 directions for the image data grid can be any of eight possible combinations.
@@ -4101,13 +4108,13 @@ variable line color (see `rgbcolor variable`).
 
 2D form
 @example
-     1 column:   y           # implicit x value from row number
+     1 column:   y       # implicit x from row number
      2 columns:  x  y
 @end example
 
 3D form
 @example
-     1 column:   z           # implicit x from row, y from index
+     1 column:   z       # implicit x from row, y from index
      3 columns:  x  y  z
 
 @end example
@@ -4150,7 +4157,7 @@ to provide information such as variable point size or line color.
 The `points` style displays a small symbol at each point.  The command @ref{pointsize} may be used to change the default size of the points.
 1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
 required if 3D plots.  See `style lines`.  Additional input columns may be used
-to provide information such as variable point size or color.
+to provide information such as variable point size or line color.
 
 @node steps, rgbimage, points, plotting_styles
 @section steps
@@ -4163,10 +4170,14 @@ to provide information such as variable point size or color.
 
 The @ref{steps} style is only relevant to 2D plotting.  It connects consecutive
 points with two line segments: the first from (x1,y1) to (x2,y1) and the
-second from (x2,y1) to (x2,y2).
+second from (x2,y1) to (x2,y2).  The input column requires are the same as for
+plot styles `lines` and `points`.  The difference between @ref{fsteps} and @ref{steps}
+is that @ref{fsteps} traces first the change in y and then the change in x.
+@ref{steps} traces first the change in x and then the change in y.
 See also
 @uref{http://www.gnuplot.info/demo/steps.html,steps demo.
 }
+
 
 @node rgbimage, vectors, steps, plotting_styles
 @section rgbimage
@@ -4359,7 +4370,7 @@ if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
 @end example
 
-@node yerrorlines,  , xyerrorlines, plotting_styles
+@node yerrorlines, 3D_(surface)_plots, xyerrorlines, plotting_styles
 @section yerrorlines
 
 @c ?commands set style yerrorlines
@@ -4389,6 +4400,34 @@ Either 3 or 4 input columns are required.
 See also
 @uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
 }
+
+@node 3D_(surface)_plots,  , yerrorlines, plotting_styles
+@section 3D (surface) plots
+
+@c ?3D (surface) plots
+@c ?plotting styles 3d (surface) plots
+Surface plots are generated using the `splot` command rather than the `plot`
+command. The style `with lines` draws a surface made from a grid of lines.
+Solid surfaces can be drawn using the style @ref{pm3d}.
+Usually the surface is displayed at some arbitrary viewing angle,
+such that it clearly represents a 3D surface.  In this case the X, Y, and Z
+axes are all visible in the plot. The illusion of 3D is enhanced by choosing
+hidden line removal or depth-sorted surface elements.
+See @ref{hidden3d} and the @ref{depthorder} option of @ref{pm3d}.
+The `splot` command can also calculate and draw contour lines corresponding
+to constant Z values. These contour lines may be drawn onto the surface 
+itself, or projected onto the XY plane. See @ref{contour}.
+   
+   
+   
+   
+   
+
+An important special case of the `splot` command is to map the Z coordinate
+onto a 2D surface by projecting the plot along the Z axis.  See `set view map`.
+This plot mode can be used to generate contour plots and heat maps.
+   
+
 
 @node Commands, Terminal_types, plotting_styles, Top
 @chapter Commands
@@ -9682,7 +9721,7 @@ graph may be explicitly excluded from this processing by appending the extra
 option `nohidden3d` to the @ref{with} specifier.
 
 Hidden3d does not affect solid surfaces drawn using the pm3d mode. To
-achieve a similar effect for pm3d surfaces, use instead set `pm3d depthorder`.
+achieve a similar effect for pm3d surfaces, use instead set @ref{depthorder}.
 
 Functions are evaluated at isoline intersections.  The algorithm interpolates
 linearly between function points or data points when determining the visible
@@ -11391,6 +11430,33 @@ altitudes:
 See also help for @ref{palette}, @ref{cbrange}, `set colorbox`, @ref{pm3d}
 and definitely the demo file `demo/pm3d.dem`.
 
+@menu
+* depthorder::                  
+@end menu
+
+@node depthorder,  , pm3d, pm3d
+@subsubsection depthorder
+
+@c ?commands set pm3d depthorder
+@c ?set pm3d depthorder
+@c ?pm3d depthorder
+@cindex depthorder
+
+By default the quadrangles making up a pm3d solid surface are rendered in the
+order they are encountered along the surface grid points.  This order may be
+controlled by the options @{ scansautomatic | scansforward | scansbackward @}.
+These scan options are not in general compatible with hidden-surface removal.
+
+Gnuplot does not do true hidden surface removal for solid surfaces, but often
+it is sufficient to render the component quadrangles in order from furthest
+to closest.  This mode may be selected using the options
+@example
+      set pm3d depthorder hidden3d
+@end example
+
+The @ref{depthorder} option orders the solid quadrangles; the @ref{hidden3d} option
+similarly orders the bounding lines (if drawn).  Note that the global option
+@ref{hidden3d} does not affect pm3d surfaces.
 
 @node palette, pointsize, pm3d, set-show
 @subsection palette
