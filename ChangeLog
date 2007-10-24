@@ -19,6 +19,8 @@
 
 	* docs/gnuplot.doc:  Document `set pm3d depthorder`.
 
+	* docs/gnuplot.texi: Sync.
+
 2007-10-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (lp_use_properties): Do not overwrite previously set
