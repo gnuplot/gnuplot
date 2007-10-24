@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.449 2007/08/31 20:03:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.450 2007/10/16 21:03:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8569,7 +8569,23 @@ C ... and restart the table:
 
  See also help for `set palette`, `set cbrange`, `set colorbox`, `x11 pm3d`
  and definitely the demo file `demo/pm3d.dem`.
+4 depthorder
+?commands set pm3d depthorder
+?set pm3d depthorder
+?pm3d depthorder
+?depthorder
+ By default the quadrangles making up a pm3d solid surface are rendered in the
+ order they are encountered along the surface grid points.  This order may be
+ controlled by the options { scansautomatic | scansforward | scansbackward }.
+ These scan options are not in general compatible with hidden-surface removal.
 
+ Gnuplot does not do true hidden surface removal for solid surfaces, but often
+ it is sufficient to render the component quadrangles in order from furthest
+ to closest.  This mode may be selected using the options
+       set pm3d depthorder hidden3d
+ The `hidden3d` option orders the solid quadrangles; the `hidden3d` option
+ similarly orders the bounding lines (if drawn).  Note that the global option
+ `set hidden3d` does not affect pm3d surfaces.
 3 palette
 ?commands set palette
 ?commands show palette
