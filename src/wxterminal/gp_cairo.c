@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.28 2007/08/20 09:46:06 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.29 2007/10/06 06:04:04 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -369,11 +369,6 @@ void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 
 void gp_cairo_end_polygon(plot_struct *plot)
 {
-	/* when we are not using OPERATOR_SATURATE, the polygons are drawn
-	 * directly in gp_cairo_draw_polygon */
-	if (!plot->polygons_saturate)
-		return;
-
 	int i;
 	path_item *path;
 	path_item *path2;
@@ -384,6 +379,11 @@ void gp_cairo_end_polygon(plot_struct *plot)
 	cairo_matrix_t matrix;
 	cairo_matrix_t matrix2;
 	cairo_pattern_t *pattern;
+
+	/* when we are not using OPERATOR_SATURATE, the polygons are drawn
+	 * directly in gp_cairo_draw_polygon */
+	if (!plot->polygons_saturate)
+		return;
 
 	if (plot->polygon_path_last == NULL)
 		return;

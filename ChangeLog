@@ -8,6 +8,9 @@
 	to strtod() so that we can trap errors in auto-conversion from string
 	to number during expression evaluation.
 
+	* src/wxterminal/gp_cairo.c (gp_cairo_end_polygon): Re-order code to
+	quiet an annoying compiler warning.
+
 2007-10-23  Christer Lundberg  <ssslub@users.sourceforge.net>
 
 	* term/post.trm: A font name containing spaces must be protected by
