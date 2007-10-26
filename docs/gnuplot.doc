@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.452 2007/10/24 00:44:53 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.453 2007/10/24 00:47:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7475,8 +7475,7 @@ Ffigure_mapcontours
 
  The <height_increment> is a number of character heights to be added to or
  subtracted from the height of the key box.  This is useful mainly when you are
- putting a box around the key, otherwise it can be used to adjust the vertical
- shift of automatically chosen key position by <height_increment>/2.
+ putting a box around the key and want larger borders around the key entries.
 
  All plotted curves of `plot`s and `splot`s are titled according to the
  default option `autotitles`. The automatic generation of titles can be

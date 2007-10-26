@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.180 2007/10/21 04:17:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.181 2007/10/25 05:14:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -577,7 +577,6 @@ do_3dplot(
     int key_count;
     legend_key *key = &keyT;
     TBOOLEAN pm3d_order_depth = 0;
-    double extra_height = 0.0;
 
     /* Initiate transformation matrix using the global view variables. */
     mat_rot_z(surface_rot_z, trans_mat);
@@ -854,6 +853,7 @@ do_3dplot(
 	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
 	int key_xl = xl - key_size_left;
 	int center = (key_xr + key_xl) / 2;
+	double extra_height = 0.0;
 
 	if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
 	    apply_pm3dcolor(&(key->box.pm3d_color), t);
@@ -876,8 +876,8 @@ do_3dplot(
 	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
 	int key_xl = xl - key_size_left;
 	int tmp = (int)(0.5 * key->height_fix * t->v_char);
-	yt += 2 * tmp;
-	yl += tmp;
+	yb -= 2*tmp;
+	yl -= tmp;
 
 	term_apply_lp_properties(&key->box);
 	newpath();

@@ -1,3 +1,9 @@
+2007-10-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (do3d_plot): Fix (another) bug in space allocation
+	for key title.  This one was also present in 4.2
+	Bug #1817873
+
 2007-10-23  Christer Lundberg  <ssslub@users.sourceforge.net>
 
 	* term/post.trm: A font name containing spaces must be protected by
