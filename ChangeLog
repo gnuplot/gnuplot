@@ -4,6 +4,10 @@
 	for key title.  This one was also present in 4.2
 	Bug #1817873
 
+	* src/eval.c (pop_or_convert_from_string): Switch from use of atof()
+	to strtod() so that we can trap errors in auto-conversion from string
+	to number during expression evaluation.
+
 2007-10-23  Christer Lundberg  <ssslub@users.sourceforge.net>
 
 	* term/post.trm: A font name containing spaces must be protected by
