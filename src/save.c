@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.146 2007/08/19 21:10:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.147 2007/10/22 19:11:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -200,11 +200,11 @@ save_set_all(FILE *fp)
 %sset clip points\n\
 %sset clip one\n\
 %sset clip two\n\
-set bar %f\n",
+set bar %f %s\n",
 	    (clip_points) ? "" : "un",
 	    (clip_lines1) ? "" : "un",
 	    (clip_lines2) ? "" : "un",
-	    bar_size);
+	    bar_size, (bar_layer == LAYER_BACK) ? "back" : "front");
 
     if (draw_border) {
 	fprintf(fp, "set border %d %s", draw_border, border_layer == 0 ? "back" : "front");

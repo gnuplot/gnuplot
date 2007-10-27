@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.37 2007/05/07 00:11:22 sfeam Exp $
+ * $Id: graphics.h,v 1.38 2007/06/05 19:09:37 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -99,6 +99,7 @@ extern double loff, roff, toff, boff;
 
 /* 'set bar' status */
 extern double bar_size;
+extern int bar_layer;
 
 /* function prototypes */
 

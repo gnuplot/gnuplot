@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.195 2007/08/27 04:33:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.196 2007/09/27 18:14:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1155,8 +1155,8 @@ show_bars()
 
     /* I really like this: "terrorbars" ;-) */
     if (bar_size > 0.0)
-	fprintf(stderr, "\terrorbars are plotted with bars of size %f\n",
-		bar_size);
+	fprintf(stderr, "\terrorbars are plotted in %s with bars of size %f\n",
+		(bar_layer == LAYER_BACK) ? "back" : "front", bar_size);
     else
 	fputs("\terrors are plotted without bars\n", stderr);
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.251 2007/08/31 20:03:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.252 2007/09/27 18:14:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -883,21 +883,33 @@ set_autoscale()
 static void
 set_bars()
 {
-    c_token++;
-    if(END_OF_COMMAND) {
-	bar_size = 1.0;
-    } else if(almost_equals(c_token,"s$mall")) {
-	bar_size = 0.0;
-	++c_token;
-    } else if(almost_equals(c_token,"l$arge")) {
-	bar_size = 1.0;
-	++c_token;
-    } else if(almost_equals(c_token,"full$width")) {
-	bar_size = -1.0;
-	++c_token;
-    } else {
-	bar_size = real_expression();
+
+    int save_token = ++c_token;
+
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"s$mall")) {
+	    bar_size = 0.0;
+	    ++c_token;
+	} else if (almost_equals(c_token,"l$arge")) {
+	    bar_size = 1.0;
+	    ++c_token;
+	} else if (almost_equals(c_token,"full$width")) {
+	    bar_size = -1.0;
+	    ++c_token;
+	} else if (equals(c_token,"front")) {
+	    bar_layer = LAYER_FRONT;
+	    ++c_token;
+	} else if (equals(c_token,"back")) {
+	    bar_layer = LAYER_BACK;
+	    ++c_token;
+	} else {
+	    bar_size = real_expression();
+	}
     }
+
+    if (save_token == c_token)
+	bar_size = 1.0;
+	
 }
 
 

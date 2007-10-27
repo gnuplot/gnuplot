@@ -1,3 +1,10 @@
+2007-10-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc src/graphics.c src/graphics.h src/save.c src/show.c
+	src/set.c (set_bars) src/unset.c:  Add {front|back} options to the
+	'set bars' command. This controls whether or not a solid-fill box or
+	histogram bar obscures the lower errorbar.
+
 2007-10-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do3d_plot): Fix (another) bug in space allocation
@@ -5162,7 +5169,7 @@
 	not. Therefore test index against firstpoint before trying to parse
 	it as a number.
 
-2005-01-23  Daniel Sebald  <daniel.sebald@ieee.org>
+2006-01-23  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/graphics.c (plot_image_or_update_axes): Fix for
 	"plot [from:to] [from:to] ... with image".
@@ -5222,7 +5229,7 @@
 	* src/plot3d.c (get3d_data):  Fix initialization code for 3D plot
 	style `with vectors`.
 
-2005-01-07  Mike Sutton  <mws116@usa.com>
+2006-01-07  Mike Sutton  <mws116@usa.com>
 
 	* term/gd.trm: New terminal option {rounded|butt} controls line caps.
 
@@ -5230,7 +5237,7 @@
 	the colorbox extend the full height of the y axis by default. Placement
 	in 3D plots is not affected. This was the old (pre-4.0) behaviour.
 
-2005-01-07  Daniel Sebald  <daniel.sebald@ieee.org>
+2006-01-07  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* term/gd.trm: Addtional processing of animated gifs to bring
 	output file into compliance with the Gif89a standard.
@@ -5244,7 +5251,7 @@
 	* src/term.c (term_end_multiplot): Free title string and clear
 	multiplot title.
 
-2005-01-07  Daniel Sebald  <daniel.sebald@ieee.org>
+2006-01-07  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/gplt_x11.c (record):  Incorrect nesting of parentheses.
 

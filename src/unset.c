@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.106 2007/08/31 20:03:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.107 2007/10/16 21:03:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1684,6 +1684,7 @@ reset_command()
     func_style = LINES;
 
     bar_size = 1.0;
+    bar_layer = LAYER_FRONT;
 
     unset_grid();
     grid_lp = default_grid_lp;

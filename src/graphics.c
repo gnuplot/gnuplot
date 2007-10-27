@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.235 2007/10/02 16:20:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.236 2007/10/21 04:17:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -67,6 +67,7 @@ double boff = 0.0;
 
 /* set bars */
 double bar_size = 1.0;
+int    bar_layer = LAYER_FRONT;
 
 /* key placement is calculated in boundary, so we need file-wide variables
  * To simplify adjustments to the key, we set all these once [depends on
@@ -1921,6 +1922,8 @@ do_plot(struct curve_points *plots, int pcount)
 
 #ifdef EAM_HISTOGRAMS
 	    case HISTOGRAMS:
+		if (bar_layer == LAYER_FRONT)
+		    plot_boxes(this_plot, Y_AXIS.term_zero);
 		/* Draw the bars first, so that the box will cover the bottom half */
 		if (histogram_opts.type == HT_ERRORBARS) {
 		    (term->linewidth)(histogram_opts.bar_lw);
@@ -1931,13 +1934,17 @@ do_plot(struct curve_points *plots, int pcount)
 		    plot_bars(this_plot);
 		    term_apply_lp_properties(&(this_plot->lp_properties));
 		}
-		plot_boxes(this_plot, Y_AXIS.term_zero);
+		if (bar_layer != LAYER_FRONT)
+		    plot_boxes(this_plot, Y_AXIS.term_zero);
 		break;
 #endif
 
 	    case BOXERROR:
+		if (bar_layer != LAYER_FRONT)
+		    plot_bars(this_plot);
 		plot_boxes(this_plot, Y_AXIS.term_zero);
-		plot_bars(this_plot);
+		if (bar_layer == LAYER_FRONT)
+		    plot_bars(this_plot);
 		break;
 
 	    case FILLEDCURVES:

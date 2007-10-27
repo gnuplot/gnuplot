@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.453 2007/10/24 00:47:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.454 2007/10/26 22:55:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6005,7 +6005,7 @@ Ffigure_mapcontours
  financebars.
 
  Syntax:
-       set bars {small | large | fullwidth | <size>}
+       set bars {small | large | fullwidth | <size>} {front | back}
        unset bars
        show bars
 
@@ -6016,6 +6016,9 @@ Ffigure_mapcontours
  It sets the width of the errorbar ends to be the same as the width of the
  associated box in the histogram.  It does not change the width of the box
  itself.
+
+ The `front` and `back` keywords are relevant only to errorbars attached
+ to filled rectangles (boxes, candlesticks, histograms).
 3 bmargin
 ?commands set bmargin
 ?set bmargin
