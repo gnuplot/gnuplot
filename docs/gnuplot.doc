@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.454 2007/10/26 22:55:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.455 2007/10/28 05:48:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8516,7 +8516,10 @@ Ffigure_mapcontours
  polygon meshes.)  You may try to switch between `scansforward` and
  `scansbackward` to force the first scan of the data to be plotted first or
  last.  The default is `scansautomatic` where gnuplot makes a guess about scans
- order.
+ order.  On the other hand, the `depthorder` option completely reorders the
+ qudrangles. The rendering is performed after a depth sorting, which allows to
+ visualize even complicated surfaces; see `help pm3d depthorder` for more
+ details.
 
  If two subsequent scans do not have same number of points, then it has to be
  decided whether to start taking points for quadrangles from the beginning of
@@ -8640,7 +8643,7 @@ Ffigure_mapcontours
 ?depthorder
  By default the quadrangles making up a pm3d solid surface are rendered in the
  order they are encountered along the surface grid points.  This order may be
- controlled by the options { scansautomatic | scansforward | scansbackward }.
+ controlled by the options `scansautomatic`|`scansforward`|`scansbackward`.
  These scan options are not in general compatible with hidden-surface removal.
 
  Gnuplot does not do true hidden surface removal for solid surfaces, but often

@@ -1,3 +1,8 @@
+2007-10-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Document option "pm3d depthorder" within
+	"help pm3d".
+
 2007-10-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src/graphics.c src/graphics.h src/save.c src/show.c
