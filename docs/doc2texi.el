@@ -758,7 +758,7 @@ This must be run after `d2t-first-column'."
 	      ;(insert "@c fix me!!  ")
 	      (beginning-of-line)
 	      (if (looking-at (concat "\\^\\s-*<a\\s-+href=" ; opening tag
-				      "\"\\([^\"]+\\)\">\\s-*" ; url
+				      "\"\\([^\"]+\\)\">\\s-*\n*\\s-*" ; url
 				      "\\([^<]+\\)" ; text
 				      "[ \t]*\\^?</a>" ; closing tag
 				      ))
