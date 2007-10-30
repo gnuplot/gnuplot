@@ -1,3 +1,10 @@
+2007-10-30  Christian Faulhammer (v-li@users.sourceforge.net)
+
+	* docs/doc2texi.el: Gentoo patch to allow for changed handling of
+	newlines in up-coming version of XEmacs. Needed in order to 
+	regenerate gnuplot.texi on such a system.
+	Bug #1822610
+
 2007-10-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Document option "pm3d depthorder" within
