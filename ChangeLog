@@ -1,3 +1,8 @@
+2007-10-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm term/pslatex.trm: To forestall confusion, add a comment
+	that ISO8859-15 is the same thing as Latin9.
+
 2007-10-30  Christian Faulhammer (v-li@users.sourceforge.net)
 
 	* docs/doc2texi.el: Gentoo patch to allow for changed handling of
