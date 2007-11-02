@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.40 2006/06/11 17:42:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.40.2.1 2007/06/19 21:15:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1154,12 +1154,11 @@ f_words(union argument *arg)
  * go wrong if the user mis-matches arguments and format strings
  * in the call to sprintf, but I hope none will do worse than
  * result in a garbage output string.
- * FIXME: 10 is a purely arbitrary upper limit on args
  */
 void
 f_sprintf(union argument *arg)
 {
-    struct value a[10];
+    struct value a[10], *args;
     struct value num_params;
     struct value result;
     char *buffer;
@@ -1175,21 +1174,26 @@ f_sprintf(union argument *arg)
     /* Retrieve number of parameters from top of stack */
     pop(&num_params);
     nargs = num_params.v.int_val;
+    if (nargs > 10) {	/* Fall back to slow but sure allocation */
+	args = gp_alloc(sizeof(struct value)*nargs, "sprintf args");
+    } else
+	args = a;
+
     for (i=0; i<nargs; i++)
-	pop(&a[i]);  /* pop next argument */
+	pop(&args[i]);  /* pop next argument */
 
     /* Make sure we got a format string of some sort */
-    if (a[nargs-1].type != STRING)
+    if (args[nargs-1].type != STRING)
 	int_error(NO_CARET,"First parameter to sprintf must be a format string");
 
     /* Allocate space for the output string. If this isn't */
     /* long enough we can reallocate a larger space later. */
-    bufsize = 80 + strlen(a[nargs-1].v.string_val);
+    bufsize = 80 + strlen(args[nargs-1].v.string_val);
     buffer = gp_alloc(bufsize, "f_sprintf");
 
     /* Copy leading fragment of format into output buffer */
     outpos = buffer;
-    next_start  = a[nargs-1].v.string_val;
+    next_start  = args[nargs-1].v.string_val;
     next_length = strcspn(next_start,"%");
     strncpy(outpos, next_start, next_length);
 
@@ -1203,7 +1207,7 @@ f_sprintf(union argument *arg)
 
     /* Each time we start this loop we are pointing to a % character */
     while (remaining-->0 && next_start[0] && next_start[1]) {
-	struct value *next_param = &a[remaining];
+	struct value *next_param = &args[remaining];
 
 	/* Check for %%; print as literal and don't consume a parameter */
 	if (!strncmp(next_start,"%%",2)) {
@@ -1299,7 +1303,10 @@ f_sprintf(union argument *arg)
 
     /* Free any strings from parameters we have now used */
     for (i=0; i<nargs; i++)
-	gpfree_string(&a[i]);
+	gpfree_string(&args[i]);
+
+    if (args != a)
+	free(args);
 }
 
 /* EAM July 2004 - Gnuplot's own string formatting conventions.
