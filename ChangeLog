@@ -1,3 +1,8 @@
+2007-11-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnClose): Fix compilation when
+	USE_MOUSE is not defined.
+
 2007-10-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm term/pslatex.trm: To forestall confusion, add a comment

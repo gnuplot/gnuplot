@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.54 2007/08/20 09:46:06 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.55 2007/10/06 06:04:05 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -504,8 +504,10 @@ void wxtFrame::OnClose( wxCloseEvent& event )
 		/* Default behaviour when Quit is clicked, or the window cross X */
 		event.Veto();
 		this->Hide();
+#ifdef USE_MOUSE
 		/* Pass it through mouse handling to check for "bind Close" */
 		wxt_exec_event(GE_reset, 0, 0, 0, 0, this->GetId());
+#endif /* USE_MOUSE */
 	}
 	else /* in "persist" mode */ {
 		/* declare the iterator */
