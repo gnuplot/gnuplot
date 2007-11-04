@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.29 2007/10/06 06:04:04 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.30 2007/10/27 06:53:57 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1631,12 +1631,16 @@ void gp_cairo_fill_pattern(plot_struct *plot, int fillstyle, int fillpar)
 
 /* Sets term vars v_char, h_char, v_tic, h_tic
  * Depends on plot->fontsize and fontname */
-void gp_cairo_set_termvar(plot_struct *plot)
+void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
+                                             unsigned int *h_char,
+                                             unsigned int *v_tic,
+                                             unsigned int *h_tic)
 {
 	PangoLayout *layout;
 	PangoFontDescription *desc;
 	PangoRectangle ink_rect;
 	PangoRectangle logical_rect;
+	unsigned int tmp_v_char, tmp_h_char, tmp_v_tic, tmp_h_tic;
 
 	/* Create a PangoLayout, set the font and text */
 	layout = pango_cairo_create_layout (plot->cr);
@@ -1653,10 +1657,19 @@ void gp_cairo_set_termvar(plot_struct *plot)
 	 * as the scale should have just been updated to 1.
 	 * Although PANGO works with integer, it scales them via a huge number (usually ~1000).
 	 * That's why I use ceil() instead of direct division result */
-	term->v_char = (int) ceil( (double) logical_rect.height/PANGO_SCALE) - 1;
-	term->h_char = (int) ceil( (double) logical_rect.width/(10*PANGO_SCALE));
-	term->v_tic = term->v_char/2.5;
-	term->h_tic = term->v_char/2.5;
+	tmp_v_char = (int) ceil( (double) logical_rect.height/PANGO_SCALE) - 1;
+	tmp_h_char = (int) ceil( (double) logical_rect.width/(10*PANGO_SCALE));
+	tmp_v_tic = tmp_v_char/2.5;
+	tmp_h_tic = tmp_h_char/2.5;
+
+	if (v_char)
+		*v_char = tmp_v_char;
+	if (h_char)
+		*h_char = tmp_h_char;
+	if (v_tic)
+		*v_tic = tmp_v_tic;
+	if (h_tic)
+		*h_tic = tmp_h_tic;
 }
 
 void gp_cairo_solid_background(plot_struct *plot)

@@ -3,6 +3,12 @@
 	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnClose): Fix compilation when
 	USE_MOUSE is not defined.
 
+	* src/wxterminal/gp_cairo.h (gp_cairo_set_termvar)
+	src/wxterminal/gp_cairo.c
+	src/wxterminal/wxt_gui.cpp
+	term/cairo.trm:
+	Do not use the global "term" pointer, but pass valued by address.
+
 2007-10-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm term/pslatex.trm: To forestall confusion, add a comment

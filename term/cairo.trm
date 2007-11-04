@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.10 2007/10/10 21:14:24 tlecomte Exp $
+ * $Id: cairo.trm,v 1.11 2007/10/11 21:46:20 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -568,7 +568,10 @@ int cairotrm_set_font (const char *font)
 	/* Reset the term variables (hchar, vchar, h_tic, v_tic).
 	 * They may be taken into account in next plot commands */
 	gp_cairo_set_font(&plot, fontname, fontsize);
-	gp_cairo_set_termvar(&plot);
+	gp_cairo_set_termvar(&plot, &(term->v_char),
+	                            &(term->h_char),
+	                            &(term->v_tic),
+	                            &(term->h_tic));
 
 	/* the returned int is not used anywhere */
 	return 1;

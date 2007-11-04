@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.55 2007/10/06 06:04:05 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.56 2007/11/04 22:37:01 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1814,7 +1814,10 @@ int wxt_set_font (const char *font)
 	/* Reset the term variables (hchar, vchar, h_tic, v_tic).
 	 * They may be taken into account in next plot commands */
 	gp_cairo_set_font(wxt_current_plot, fontname, fontsize);
-	gp_cairo_set_termvar(wxt_current_plot);
+	gp_cairo_set_termvar(wxt_current_plot, &(term->v_char),
+	                                       &(term->h_char),
+	                                       &(term->v_tic),
+	                                       &(term->h_tic));
 	wxt_MutexGuiLeave();
 	wxt_sigint_check();
 	wxt_sigint_restore();
