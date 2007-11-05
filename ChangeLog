@@ -1,3 +1,11 @@
+2007-11-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: Place general postscript prolog in front of special
+	encodings (if any).
+
+	* term/PostScript/*.ps: Place a comment at the start of included
+	encoding vectors.
+
 2007-11-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnClose): Fix compilation when

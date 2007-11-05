@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.212 2007/10/26 21:32:02 sfeam Exp $
+ * $Id: post.trm,v 1.213 2007/10/31 17:31:19 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1518,6 +1518,9 @@ end\n\
 	    free(outstr2);
     }
 
+    /* Dump the body of the prologue */
+    PS_dump_prologue_file("prologue.ps");
+
     /* insert font encoding vector */
     if (uses_fonts) {
 	switch (encoding) {
@@ -1534,9 +1537,6 @@ end\n\
 	    default:		    break;
 	}
     }
-
-    /* Dump the body of the prologue */
-    PS_dump_prologue_file("prologue.ps");
 
     /* Redefine old epslatex linetypes if requested */
     if ((ps_params->terminal == PSTERM_EPSLATEX) && ps_params->oldstyle) {
