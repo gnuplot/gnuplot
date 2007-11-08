@@ -16,24 +16,33 @@
 #    set term wxt
 #
 #
+set encoding utf8
+#
 set label 100 at screen 0.5, 0.95 center 
-set label 100 "Dump 7-bit characters and a selection of UTF-8 unicode characters"
+set label 100 "Dump all 7-bit characters and a selection of UTF-8 unicode characters\nCharacters that are missing from your current font will not appear in the output below\nOnly a portion of the characters on a unicode page are dumped"
 #
 set border 0
 unset xtics
 unset ytics
 #
-set label 101 "001-040:" at screen 0.05, 0.80
-set label 102 "041-100:" at screen 0.05, 0.75
-set label 103 "101-140:" at screen 0.05, 0.70
-set label 104 "141-177:" at screen 0.05, 0.65
+#set label 101 "001-040:" at screen 0.05, 0.80
+set label 102 "0020-0040:" at screen 0.05, 0.75
+set label 103 "0041-0060:" at screen 0.05, 0.70
+set label 104 "0061-007E:" at screen 0.05, 0.65
+set label 105 "page 0:" at screen 0.05, 0.60
+set label 107 "page 3:" at screen 0.05, 0.45
+set label 108 "page 4:" at screen 0.05, 0.40
+set label 109 "pages 33,34:" at screen 0.05, 0.35
+set label 110 "pages 37,38:" at screen 0.05, 0.30
+set label 111 "Japanese:" at screen 0.05, 0.25
+set label 112 "Hebrew:" at screen 0.05, 0.20
 #
 set label 1  at screen 0.2, 0.80
 set label 2  at screen 0.2, 0.75
 set label 3  at screen 0.2, 0.70
 set label 4  at screen 0.2, 0.65
-set label 5  at screen 0.2, 0.55
-set label 6  at screen 0.2, 0.50
+set label 5  at screen 0.2, 0.60
+set label 6  at screen 0.2, 0.55
 set label 7  at screen 0.2, 0.45
 set label 8  at screen 0.2, 0.40
 set label 9  at screen 0.2, 0.35
@@ -41,7 +50,7 @@ set label 10 at screen 0.2, 0.30
 set label 11 at screen 0.2, 0.25
 set label 12 at screen 0.2, 0.20
 #
-set label 1 "\001\002\003\004\005\006\007\010\011 \013\014\015\016\017\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037\040"
+#set label 1 "\001\002\003\004\005\006\007\010\011 \013\014\015\016\017\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037\040"
 set label 2 "\041\042\043\044\045\046\047\050\051\052\053\054\055\056\057\060\061\062\063\064\065\066\067\070\071\072\073\074\075\076\077\100"
 set label 3 "\101\102\103\104\105\106\107\110\111\112\113\114\115\116\117\120\121\122\123\124\125\126\127\130\131\132\133\134\135\136\137\140"
 set label 4 "\141\142\143\144\145\146\147\150\151\152\153\154\155\156\157\160\161\162\163\164\165\166\167\170\171\172\173\174\175\176\177"
@@ -50,7 +59,7 @@ set label 5  "¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿   �
 set label 6  "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑ   àáâãäåæçèéêëìíîïðñ"
 set label 7  "αβγδεζηθικλμνξοπρςστυφχψωϑϖ"
 set label 8  "абвгдежзийклмнопрстуфхцчшщъыьэюяѐёђѓєѕіїјљњћќѝўџ"
-set label 9  "∀∂∃∇∈∋√∞∧∨∩∪∫⊂⊃⊆⊇⊥"
+set label 9  "ℎℏℋℓℛÅ∀∂∃∇∈∋√∞∧∨∩∪∫⊂⊃⊆⊇⊥⊗⊙"
 set label 10 "◎▲△▼▽☉☿♀♁♂♃♄♅♆♇♈♉♊♋♌♍♎♏♐♑"
 set label 11 "日本語フォント  かな　漢字"
 set label 12 "אבגדהוזחטיךכלםמןנסעףפץצקרשת"

@@ -1,3 +1,8 @@
+2007-11-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/utf8.dem demo/enhanced_utf8.dem demo/all.dem:
+	Update utf8 demo, and add a new one for enhanced text mode.
+
 2007-11-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Place general postscript prolog in front of special
