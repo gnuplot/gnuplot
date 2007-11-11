@@ -1,3 +1,11 @@
+2007-11-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_options PS_load_fontfile PS_load_fontfiles):
+	Add a field to the fontfile structure to hold the font name.
+	Use this to reencode the font immediately after it is read in, rather
+	than the first time of use.  This fixes a bug if the first use is at
+	the start of enhanced text processing.
+
 2007-11-11  Philipp K Janert
 
 	* docs/gnuplot.doc: Correct an error in "help show palette".

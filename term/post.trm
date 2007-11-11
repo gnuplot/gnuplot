@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.214 2007/11/05 18:21:55 sfeam Exp $
+ * $Id: post.trm,v 1.215 2007/11/11 19:22:21 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -144,11 +144,12 @@ static TBOOLEAN PS_newpath = FALSE;
     }						\
 } while (0)
 
-/* Datastructure implementing inclusion of font files */
+/* Data structure implementing inclusion of font files */
 struct ps_fontfile_def {
     struct ps_fontfile_def *next;/* pointer to next fontfile in linked list */
     char *fontfile_name;
     char *fontfile_fullname;
+    char *fontname;
 };
 
 /* Terminal type of postscript dialect */
@@ -885,6 +886,7 @@ PS_options()
                 quote_str(new_ps_fontfile->fontfile_name,
                           c_token, token_len(c_token));
                 gp_expand_tilde(&(new_ps_fontfile->fontfile_name));
+		new_ps_fontfile->fontname = NULL;
 		if (!deleteentry) {
 #if defined(PIPES)
 		    if (*(new_ps_fontfile->fontfile_name) != '<') {
@@ -1313,6 +1315,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 		strcpy(fontname,strstr(line+1,"/")+1);
 		fnende = strstr(fontname," ");
 		*fnende = '\0';
+		current_ps_fontfile->fontname = gp_strdup(fontname);
 		/* Print font name */
 		if (!doload) {
 		    if (current_ps_fontfile->fontfile_fullname)
@@ -1393,6 +1396,8 @@ PS_load_fontfiles(TBOOLEAN doload)
 
     while (current_ps_fontfile) {
 	PS_load_fontfile(current_ps_fontfile,doload);
+	if (current_ps_fontfile->fontname)
+		PS_RememberFont(current_ps_fontfile->fontname, 1);
 	current_ps_fontfile = current_ps_fontfile->next;
     }
 }
@@ -1723,11 +1728,6 @@ PS_reset()
 {
     fputs("%%Trailer\n", gppsfile);
 
-    /* I think the following commands should be executed
-       `if (ps_common_uses_fonts)`. So I changed the next line.
-       Please see "PS_RememberFont", too.                       */  /* JFi */
-
-    /*	if (!ps_common_uses_fonts) {  */                             /* JFi */
     if (ps_common_uses_fonts) {
 	fputs("%%DocumentFonts: ", gppsfile);
 	while (PS_DocFonts) {
@@ -2867,6 +2867,7 @@ delete_ps_fontfile(struct ps_fontfile_def *prev, struct ps_fontfile_def *this)
 	    ps_params->first_fontfile = this->next;
 	free(this->fontfile_name);
 	free(this->fontfile_fullname);
+	free(this->fontname);
 	free(this);
 	this = NULL;
     }
