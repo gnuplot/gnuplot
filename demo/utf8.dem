@@ -25,11 +25,12 @@ set border 0
 unset xtics
 unset ytics
 #
-#set label 101 "001-040:" at screen 0.05, 0.80
+set label 101 "page 0 (Latin1)" at screen 0.05, 0.80
 set label 102 "0020-0040:" at screen 0.05, 0.75
 set label 103 "0041-0060:" at screen 0.05, 0.70
 set label 104 "0061-007E:" at screen 0.05, 0.65
-set label 105 "page 0:" at screen 0.05, 0.60
+set label 105 ""        at screen 0.05, 0.60
+set label 106 "page 1:" at screen 0.05, 0.50
 set label 107 "page 3:" at screen 0.05, 0.45
 set label 108 "page 4:" at screen 0.05, 0.40
 set label 109 "pages 33,34:" at screen 0.05, 0.35
@@ -42,7 +43,7 @@ set label 2  at screen 0.2, 0.75
 set label 3  at screen 0.2, 0.70
 set label 4  at screen 0.2, 0.65
 set label 5  at screen 0.2, 0.60
-set label 6  at screen 0.2, 0.55
+set label 6  at screen 0.2, 0.50
 set label 7  at screen 0.2, 0.45
 set label 8  at screen 0.2, 0.40
 set label 9  at screen 0.2, 0.35
@@ -55,8 +56,8 @@ set label 2 "\041\042\043\044\045\046\047\050\051\052\053\054\055\056\057\060\06
 set label 3 "\101\102\103\104\105\106\107\110\111\112\113\114\115\116\117\120\121\122\123\124\125\126\127\130\131\132\133\134\135\136\137\140"
 set label 4 "\141\142\143\144\145\146\147\150\151\152\153\154\155\156\157\160\161\162\163\164\165\166\167\170\171\172\173\174\175\176\177"
 
-set label 5  "¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿   €" 
-set label 6  "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑ   àáâãäåæçèéêëìíîïðñ"
+set label 5  "¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿" . "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑñòóôõö÷øùúûüýþÿ"
+set label 6  "ĀāĂăĄąĆćĈĉĊċČčŚśŜŝŞşŠšŴŵŶŷŸŹźŻżŽž"
 set label 7  "αβγδεζηθικλμνξοπρςστυφχψωϑϖ"
 set label 8  "абвгдежзийклмнопрстуфхцчшщъыьэюяѐёђѓєѕіїјљњћќѝўџ"
 set label 9  "ℎℏℋℓℛÅ∀∂∃∇∈∋√∞∧∨∩∪∫⊂⊃⊆⊇⊥⊗⊙"
