@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.455 2007/10/28 05:48:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.456 2007/10/29 21:42:12 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8701,14 +8701,14 @@ Ffigure_mapcontours
  color transformation formulae.  `show palette colornames` prints the
  implemented color names.
 
- `show palette palette <n>` prints to screen or to the file given by
- `set output` table of RGB triplets calculated for the current palette settings
+ `show palette palette <n>` prints to the screen or to the file given by
+ `set print` a table of RGB triplets calculated for the current palette settings
  and a palette having <n> discrete colors.  The default wide table can be
  limited to 3 columns of r,g,b float values [0..1] or integer values [0..255]
  by options float or int, respectively.  This way, the current gnuplot color
  palette can be loaded into other imaging applications, for example Octave.
- Additionally to this textual list of RGB table, you can enjoy command `test
- palette` to draw graphically the R,G,B profiles for the current palette.
+ Additionally to this textual list of RGB table, you can use the `test palette`
+ command to plot the R,G,B profiles for the current palette.
 
  The following options determine the coloring properties.
 
