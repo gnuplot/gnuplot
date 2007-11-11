@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.28 2007/05/10 22:49:37 sfeam Exp $
+ * $Id: util.h,v 1.29 2007/08/27 04:33:49 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -114,5 +114,8 @@ void squash_spaces __PROTO((char *));
 TBOOLEAN existdir __PROTO((const char *));
 
 char *getusername __PROTO((void));
+
+TBOOLEAN contains8bit __PROTO((const char *s));
+TBOOLEAN utf8toulong __PROTO((unsigned long * wch, const char ** str));
 
 #endif /* GNUPLOT_UTIL_H */

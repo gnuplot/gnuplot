@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.70 2007/08/27 04:33:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.71 2007/10/16 21:03:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1225,4 +1225,86 @@ getusername ()
 #endif /* HAVE_PWD_H */
 
     return fullname;
+}
+
+TBOOLEAN contains8bit(const char *s)
+{
+    while (*s) {
+	if ((*s++ & 0x80))
+	    return TRUE;
+    }
+    return FALSE;
+}
+
+#define INVALID_UTF8 0xfffful
+
+/* Read from second byte to end of UTF-8 sequence.
+   used by utftoulong() */
+TBOOLEAN
+utf8_getmore (unsigned long * wch, const char **str, int nbytes)
+{
+  int i;
+  unsigned char c;
+  unsigned long minvalue[] = {0x80, 0x800, 0x10000, 0x200000, 0x4000000};
+
+  for (i = 0; i < nbytes; i++) {
+    c = (unsigned char) **str;
+  
+    if ((c & 0xc0) != 0x80) {
+      *wch = INVALID_UTF8;
+      return FALSE;
+    }
+    *wch = (*wch << 6) | (c & 0x3f);
+    (*str)++;
+  }
+
+  /* check for overlong UTF-8 sequences */
+  if (*wch < minvalue[nbytes-1]) {
+    *wch = INVALID_UTF8;
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/* Convert UTF-8 multibyte sequence from string to unsigned long character.
+   Returns TRUE on success.
+*/
+TBOOLEAN
+utf8toulong (unsigned long * wch, const char ** str)
+{
+  unsigned char c;
+
+  c =  (unsigned char) *(*str)++;
+  if ((c & 0x80) == 0) {
+    *wch = (unsigned long) c;
+    return TRUE;
+  }
+
+  if ((c & 0xe0) == 0xc0) {
+    *wch = c & 0x1f;
+    return utf8_getmore(wch, str, 1);
+  }
+
+  if ((c & 0xf0) == 0xe0) {
+    *wch = c & 0x0f;
+    return utf8_getmore(wch, str, 2);
+  }
+
+  if ((c & 0xf8) == 0xf0) {
+    *wch = c & 0x07;
+    return utf8_getmore(wch, str, 3);
+  }
+
+  if ((c & 0xfc) == 0xf8) {
+    *wch = c & 0x03;
+    return utf8_getmore(wch, str, 4);
+  }
+
+  if ((c & 0xfe) == 0xfc) {
+    *wch = c & 0x01;
+    return utf8_getmore(wch, str, 5);
+  }
+
+  *wch = INVALID_UTF8;
+  return FALSE;
 }

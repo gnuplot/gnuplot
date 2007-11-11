@@ -1,5 +1,5 @@
 %
-% Gnuplot Prolog Version 4.1 (March 2006)
+% Gnuplot Prolog Version 4.2 (November 2007)
 %
 /M {moveto} bind def
 /L {lineto} bind def
@@ -9,6 +9,7 @@
 /Z {closepath} bind def
 /C {setrgbcolor} bind def
 /f {rlineto fill} bind def
+/Gshow {show} def   % May be redefined later in the file to support UTF-8
 /vpt2 vpt 2 mul def
 /hpt2 hpt 2 mul def
 /Lshow {currentpoint stroke M 0 vshift R 

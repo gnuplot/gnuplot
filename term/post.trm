@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.213 2007/10/31 17:31:19 sfeam Exp $
+ * $Id: post.trm,v 1.214 2007/11/05 18:21:55 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -61,14 +61,18 @@
  *
  * Dan Sebald, 7 March 2003: terminal entry for image functionality
  *
- *  Harald Harders (h.harders@tu-bs.de), 2004-12-02:
- *  Moved all terminal settings into a single structure.
+ * Harald Harders (h.harders@tu-bs.de), 2004-12-02:
+ * Moved all terminal settings into a single structure.
  *
- *  Harald Harders (h.harders@tu-bs.de), 2005-02-08:
- *  Merged functionality of postscript, pslatex, pstex, and epslatex terminals.
+ * Harald Harders (h.harders@tu-bs.de), 2005-02-08:
+ * Merged functionality of postscript, pslatex, pstex, and epslatex terminals.
  *
- *  Ethan Merritt Mar 2006:   Break out prolog and character encodings into
- *  separate files loaded at runtime
+ * Ethan Merritt Mar 2006:   Break out prolog and character encodings into
+ * separate files loaded at runtime
+ *
+ * Thomas Henlich Sep 2007:   Add support for UTF-8 encoding via the glyphshow
+ * operator.  It supports PostScript Type1 fonts that use glyph names according
+ * to the Adobe Glyph List For New Fonts.
  */
 
 #include "driver.h"
@@ -280,20 +284,21 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 /* For MFshow and MFwidth the tos is an array with the string and font info:  */
 /*	[<fontname (a string)> <fontsize> <vertical offset> <width significant?> <printed?> <overprint> <text string>]  */
 /* EAM Mar 2004 - Add in a special case overprint 3 = save, overprint 4 = restore */
+/* EAM Nov 2007 - Accommodate UTF-8 support (Gshow) */
 
 "/MFshow {\n",
 "   { dup 5 get 3 ge\n",	/* EAM test for overprint 3 or 4 */
 "     { 5 get 3 eq {gsave} {grestore} ifelse }\n", /* EAM */
 "     {dup dup 0 get findfont exch 1 get scalefont setfont\n",
 "     [ currentpoint ] exch dup 2 get 0 exch R dup 5 get 2 ne {dup dup 6\n",
-"     get exch 4 get {show} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq\n",
+"     get exch 4 get {Gshow} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq\n",
 "     {dup 3 get {2 get neg 0 exch R pop} {pop aload pop M} ifelse} {dup 5\n",
 "     get 1 eq {dup 2 get exch dup 3 get exch 6 get stringwidth pop -2 div\n",
 "     dup 0 R} {dup 6 get stringwidth pop -2 div 0 R 6 get\n",
 "     show 2 index {aload pop M neg 3 -1 roll neg R pop pop} {pop pop pop\n",
 "     pop aload pop M} ifelse }ifelse }ifelse }\n",
 "     ifelse }\n", /* EAM */
-"   forall} bind def\n",
+"   forall} def\n",
 
 /* get the width of the text */
 /* HH 2005-07-24 - Add in a special case overprint 3 = save, 4 = restore
@@ -301,9 +306,12 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
  * additional value on the stack. between XYsave and XYrestore,
  * this number is increased by the strings. By pop'ing this number, all
  * strings between XYsave and XYrestore are ignored. */
+/* EAM Nov 2007 - GSwidth is to allow the operator to work either with a string
+ * or with a glyph.  Needed for UTF-8 support. Gwidth may do it better. */
+"/Gswidth {dup type /stringtype eq {stringwidth} {pop (n) stringwidth} ifelse} def\n",
 "/MFwidth {0 exch { dup 5 get 3 ge { 5 get 3 eq { 0 } { pop } ifelse }\n",
 " {dup 3 get{dup dup 0 get findfont exch 1 get scalefont setfont\n",
-"     6 get stringwidth pop add} {pop} ifelse} ifelse} forall} bind def\n",
+"     6 get Gswidth pop add} {pop} ifelse} ifelse} forall} def\n",
 
 /* flush left show */
 "/MLshow { currentpoint stroke M\n",
@@ -376,6 +384,7 @@ PS_RememberFont(char *fname, int can_reencode)
 
     switch(encoding) {
     case S_ENC_ISO8859_1:
+    case S_ENC_UTF8:
 	recode = "reencodeISO def\n";
 	break;
     case S_ENC_ISO8859_2:
@@ -1152,6 +1161,25 @@ PS_options()
 static TBOOLEAN ps_common_uses_fonts;
 static unsigned int ps_common_xoff, ps_common_yoff;
 
+/* The default UTF8 code will use glyph identifiers uniXXXX for all glyphs above 0x0100.
+ * If you define LATIN1_ENCODING_NAMES, then it will instead use the names recommended
+ * by Adobe for characters in the range 0x0100 - 0x01FF.  These names correspond to those
+ * used by the Latin1 encoding scheme.  This unicode code pages deliberately uses the
+ * same character mapping as Latin1.
+ */
+#define LATIN1_ENCODING_NAMES 1
+
+#if (LATIN1_ENCODING_NAMES)
+#include "aglfn.h"
+
+typedef struct ps_glyph {
+  unsigned long unicode;
+  char * glyphname;
+} ps_glyph;
+
+static ps_glyph aglist[] = AGL;
+static int psglyphs = sizeof(aglist)/sizeof(ps_glyph);
+#endif
 
 TERM_PUBLIC void
 PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
@@ -1206,7 +1234,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 			  current_ps_fontfile->fontfile_name + 1);
 #endif
 	}
-	else if (strcmp(ext,"ttf") == 0) {
+	else if (!strcmp(ext,"ttf") || !strcmp(ext,"otf")) {
 	    /* TrueType */
 #if defined(PIPES)
 	    ispipe = TRUE;
@@ -1533,6 +1561,7 @@ end\n\
 	    case S_ENC_CP1250:	    PS_dump_prologue_file("cp1250.ps"); break;
 	    case S_ENC_KOI8_R:	    PS_dump_prologue_file("koi8r.ps"); break;
 	    case S_ENC_KOI8_U:	    PS_dump_prologue_file("koi8u.ps"); break;
+	    case S_ENC_UTF8:   	    PS_dump_prologue_file("utf-8.ps"); break;
 	    case S_ENC_DEFAULT:
 	    default:		    break;
 	}
@@ -1875,38 +1904,97 @@ PS_vector(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 PS_put_text(unsigned int x, unsigned int y, const char *str)
 {
-    char ch;
+#define PS_NONE 0
+#define PS_TEXT 1
+#define PS_GLYPH 2
+    unsigned long ch;
 
     if (!str && !strlen(str))
 	return;
     PS_move(x,y);
     if (ps_ang != 0)
-	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 M\n",
-		ps_ang);
-    putc('(',gppsfile);
-    ch = *str++;
-    while(ch!='\0') {
-	if ((ch=='(') || (ch==')') || (ch=='\\'))
-	    putc('\\', gppsfile);
-	putc(ch, gppsfile);
-	ch = *str++;
+	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 M\n", ps_ang);
+
+    if (encoding == S_ENC_UTF8 && contains8bit(str)) {
+	/* UTF-8 encoding with multibyte characters present */
+	int mode = PS_NONE;
+
+	putc('[', gppsfile);
+
+	for (utf8toulong(&ch, &str); ch != '\0'; utf8toulong(&ch, &str)) {
+	    if (ch < 0x100) {
+		if (mode != PS_TEXT)
+		    putc('(', gppsfile);
+		if (ch == '(' || ch == ')' || ch == '\\')
+		    putc('\\', gppsfile);
+		putc((char)ch, gppsfile);
+		mode = PS_TEXT;
+	    } else {
+		int i;
+		if (mode == PS_TEXT)
+		    putc(')', gppsfile);
+		putc('/', gppsfile);
+#if (LATIN1_ENCODING_NAMES)
+		for (i = 0; i < psglyphs; i++) {
+		    if (aglist[i].unicode == ch) {
+		    	fputs(aglist[i].glyphname, gppsfile);
+			break;
+		    }
+		}
+		if (i >= psglyphs) /* Must not have found a glyph name */
+#endif
+		    fprintf(gppsfile, (ch > 0xffff) ? "u%lX" : "uni%04lX", ch);
+		mode = PS_GLYPH;
+	    }
+	}
+
+	if (mode == PS_TEXT)
+            putc(')', gppsfile);
+
+	switch(ps_justify) {
+	    case LEFT :
+		fputs("] GLshow\n", gppsfile);
+		break;
+	    case CENTRE :
+		fputs("] GCshow\n", gppsfile);
+		break;
+	    case RIGHT :
+		fputs("] GRshow\n", gppsfile);
+		break;
+	}
+
+    } else {
+	/* plain old 8-bit mode (not UTF-8), or UTF-8 string with only 7-bit characters */
+	putc('(',gppsfile);
+	ch = (char) *str++;
+	while(ch!='\0') {
+	    if ((ch=='(') || (ch==')') || (ch=='\\'))
+		putc('\\', gppsfile);
+	    putc((char) ch, gppsfile);
+	    ch = (char) *str++;
+	}
+
+	switch(ps_justify) {
+	    case LEFT :
+		fputs(") Lshow\n", gppsfile);
+		break;
+	    case CENTRE :
+		fputs(") Cshow\n", gppsfile);
+		break;
+	    case RIGHT :
+		fputs(") Rshow\n", gppsfile);
+		break;
+	}
     }
 
-    switch(ps_justify) {
-    case LEFT :
-	fputs(") Lshow\n", gppsfile);
-	break;
-    case CENTRE :
-	fputs(") Cshow\n", gppsfile);
-	break;
-    case RIGHT :
-	fputs(") Rshow\n", gppsfile);
-	break;
-    }
     if (ps_ang != 0)
 	fputs("grestore\n", gppsfile);
     ps_path_count = 0;
     PS_relative_ok = FALSE;
+
+#undef PS_NONE
+#undef PS_TEXT
+#undef PS_GLYPH
 }
 
 
@@ -2103,6 +2191,8 @@ ENHPS_FLUSH()
     }
 }
 
+static char *ENHps_opensequence = NULL;
+
 /*
  * open a postscript string
  */
@@ -2126,22 +2216,90 @@ ENHPS_OPEN(
     }
 
 	if (!ENHps_opened_string) {
-	    fprintf(gppsfile, "[(%s) %.1f %.1f %s %s %d (",
+	    int safelen = strlen(fontname) + 40;
+	    free(ENHps_opensequence);
+	    ENHps_opensequence = gp_alloc(safelen,"ENHPS_opensequence");
+#ifdef HAVE_SNPRINTF
+	    snprintf(ENHps_opensequence, safelen, "[(%s) %.1f %.1f %s %s %d ",
 		    fontname, fontsize, base,
 		    widthflag ? "true" : "false",
 		    showflag ? "true" : "false",
 		    overprint);
+#else
+	    sprintf(ENHps_opensequence, "[(%s) %.1f %.1f %s %s %d ",
+		    fontname, fontsize, base,
+		    widthflag ? "true" : "false",
+		    showflag ? "true" : "false",
+		    overprint);
+#endif
+	    fprintf(gppsfile, "%s(", ENHps_opensequence);
 	    ENHps_opened_string = TRUE;
 	}
 }
 
 /*
- * write one or more characters from inside enhanced text processing
+ * Write one character from inside enhanced text processing.
+ * This is trivial except in the case of multi-byte encoding.
  */
 TERM_PUBLIC void
 ENHPS_WRITEC(int c)
 {
-    fputc(c, gppsfile);
+    static int in_utf8 = 0; /* nonzero means we are inside a multibyte sequence */
+    static char utf8[6];    /* holds the multibyte sequence being accumulated   */
+    static int nbytes = 0;  /* number of bytes expected in the sequence */
+
+    /* UTF-8 Encoding */
+    if (encoding == S_ENC_UTF8 && (c & 0x80) != 0) {
+	if (in_utf8 == 0) {
+	    nbytes = (c & 0xE0) == 0xC0 ? 2
+		   : (c & 0xF0) == 0xE0 ? 3
+		   : (c & 0xF8) == 0xF0 ? 4
+		   : 0;
+	    if (!nbytes) /* Illegal UTF8 char; hope it's printable  */
+		fputc(c, gppsfile);
+	    else
+		utf8[in_utf8++] = c;
+	} else {
+	    utf8[in_utf8++] = c;
+	    if (in_utf8 >= nbytes) {
+		unsigned long wch = '\0';
+		const char *str = &utf8[0];
+		int i;
+
+		utf8[nbytes] = '\0';
+		in_utf8 = 0;
+		utf8toulong(&wch, &str);
+
+		if (wch < 0x100) { /* Single byte ISO8859-1 character */
+		    fputc(wch, gppsfile);
+		    return;
+		}
+
+		/* Finish off previous partial string, if any */
+		ENHPS_FLUSH();
+
+		/* Write a new partial string for this glyph */
+		fprintf(gppsfile, "%s/", ENHps_opensequence);
+#if (LATIN1_ENCODING_NAMES)
+		for (i = 0; i < psglyphs; i++) {
+		    if (aglist[i].unicode == wch) {
+			fputs(aglist[i].glyphname, gppsfile);
+			break;
+		    }
+		}
+		if (i >= psglyphs) /* Must not have found a glyph name */
+#endif
+		    fprintf(gppsfile, (wch > 0xffff) ? "u%lX" : "uni%04lX", wch);
+		fprintf(gppsfile, "]\n");
+
+		/* Mark string closed */
+		ENHps_opened_string = FALSE;
+	    }
+	}
+    } else
+
+    /* Single byte character */
+	fputc(c, gppsfile);
 }
 
 /* a set-font routine for enhanced post : simply copies
@@ -2190,7 +2348,7 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
 
     PS_FLUSH_PATH;
 
-    /* if there are no magic characters, we should just be able
+    /* FIXME: if there are no magic characters, we should just be able
      * punt the string to PS_put_text(), which will give shorter
      * ps output [eg tics and stuff rarely need extra processing],
      * but we need to make sure that the current font is the

@@ -1,3 +1,27 @@
+2007-11-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_options): Accept *.otf fonts.
+
+	* term/post.trm (ENHPS_OPEN ENHPS_WRITEC) term/PostScript/prologue.ps):
+	Add UTF-8 encoding support for enhanced text mode.
+
+	* term/PostScript/unicode_small.map term/PostScript/unicode_big.map
+	term/PostScript/unicode_maps.README:  Provide sample files and a README
+	for constructing UTF-8 encoded Type 1 fonts for the postscript terminal
+	to use.  Many thanks to Thomas Henlich for the initial example and
+	explanation.
+
+2007-11-11  Thomas Henlich  <thenlich@users.sourceforge.net>
+
+	* term/post.trm (PS_put_text) term/aglfn.h term/PostScript/utf-8.ps
+	src/util.h src/util.c (utf8_getmore utf8toulong):
+
+	Add UTF-8 encoding support for PostScript terminal. This implementation
+	supports PostScript Type1 fonts that use glyph names conforming to the
+	Adobe Glyph List For New Fonts. Code points above 0x00FF are displayed
+	PostScript glyphshow operator.  Code points above 0x01FF are assumed to
+	be accessible as /uniXXXX glyphshow.
+
 2007-11-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/utf8.dem demo/enhanced_utf8.dem demo/all.dem:
