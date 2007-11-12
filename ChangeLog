@@ -2,6 +2,8 @@
 
 	* docs/Makefile.in: Include cairo.trm in CORETERM list
 
+	* docs/gnuplot-ja.doc docs/term-ja.diff:  Sync to version 1.457
+
 2007-11-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_options PS_load_fontfile PS_load_fontfiles):
