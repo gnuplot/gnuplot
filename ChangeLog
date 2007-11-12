@@ -1,3 +1,7 @@
+2007-11-12  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/Makefile.in: Include cairo.trm in CORETERM list
+
 2007-11-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_options PS_load_fontfile PS_load_fontfiles):
