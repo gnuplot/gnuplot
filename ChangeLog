@@ -1,3 +1,12 @@
+2007-11-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_options PS_dump_prologue_file PS_open_prologue_file
+	PS_load_glyphlist) term/PostScript/aglfn.txt:  Move the list of Adobe-
+	recommended glyph names (aglfn) to an external file.  Add an option
+	'set term post {{no}adobeglyphnames}' to control whether UTF-8 
+	characters outside of the Latin1 set are refered to by their generic
+	name (e.g. /uni03B1) or their aglfn name (e.g. /alpha). 
+
 2007-11-12  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/Makefile.in: Include cairo.trm in CORETERM list

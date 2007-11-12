@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.215 2007/11/11 19:22:21 sfeam Exp $
+ * $Id: post.trm,v 1.216 2007/11/11 23:21:49 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -186,6 +186,7 @@ typedef struct ps_params_t {
     double palfunc_deviation;         /* terminal option */
     TBOOLEAN oldstyle;
     TBOOLEAN epslatex_standalone;
+    TBOOLEAN adobeglyphnames;         /* Choice of output names for UTF8 */
 } ps_params_t;
 
 #define POST_PARAMS_DEFAULT { \
@@ -266,7 +267,9 @@ static int eps_explicit_y = 0;
 static char *pslatex_auxname = NULL;
 
 /* Routine to copy pre-existing prolog files into output stream */
+static FILE *PS_open_prologue_file __PROTO((char *));
 static void PS_dump_prologue_file __PROTO((char *));
+static void PS_load_glyphlist __PROTO((void));
 
 static const char GPFAR * GPFAR OldEPSL_linetypes[] = {
 /* Line Types */
@@ -464,6 +467,7 @@ enum PS_id {
     PSLATEX_ROTATE, PSLATEX_NOROTATE, PSLATEX_AUXFILE, PSLATEX_NOAUXFILE,
     PSLATEX_OLDSTYLE, PSLATEX_NEWSTYLE, EPSLATEX_HEADER, EPSLATEX_NOHEADER,
     PS_SIZE,
+    PS_ADOBEGLYPHNAMES, PS_NOADOBEGLYPHNAMES,
     PS_OTHER
 };
 
@@ -509,6 +513,8 @@ static struct gen_table PS_opts[] =
     { "noa$uxfile", PSLATEX_NOAUXFILE },
     { "old$style", PSLATEX_OLDSTYLE },
     { "new$style", PSLATEX_NEWSTYLE },
+    { "adobe$glyphnames", PS_ADOBEGLYPHNAMES },
+    { "noadobe$glyphnames", PS_NOADOBEGLYPHNAMES },
     { NULL, PS_OTHER }
 };
 
@@ -958,6 +964,14 @@ PS_options()
 				   ps_params->first_fontfile);
 	    ++c_token;
 	    break;
+	case PS_ADOBEGLYPHNAMES:
+	    ps_params->adobeglyphnames = TRUE;
+	    ++c_token;
+	    break;
+	case PS_NOADOBEGLYPHNAMES:
+	    ps_params->adobeglyphnames = FALSE;
+	    ++c_token;
+	    break;
 	case PS_PALFUNCPARAM:
 	    if (set_palfunc)
 		int_error(c_token,
@@ -1129,6 +1143,12 @@ PS_options()
     }
 #endif
 
+    if ((encoding == S_ENC_UTF8) && (ps_params->terminal == PSTERM_POSTSCRIPT)) {
+	sprintf(tmp_term_options," %sadobeglyphnames \\\n   ",
+	    ps_params->adobeglyphnames ? "" : "no");
+	strcat(term_options,tmp_term_options);
+    }
+
     if (ps_explicit_size) {
 	if (ps_explicit_units == CM)
 	    sprintf(tmp_term_options,"size %.2fcm, %.2fcm ",
@@ -1164,23 +1184,27 @@ static TBOOLEAN ps_common_uses_fonts;
 static unsigned int ps_common_xoff, ps_common_yoff;
 
 /* The default UTF8 code will use glyph identifiers uniXXXX for all glyphs above 0x0100.
- * If you define LATIN1_ENCODING_NAMES, then it will instead use the names recommended
- * by Adobe for characters in the range 0x0100 - 0x01FF.  These names correspond to those
- * used by the Latin1 encoding scheme.  This unicode code pages deliberately uses the
- * same character mapping as Latin1.
+ * If you define ADOBE_ENCODING_NAMES, then it will instead use the glyph names from the
+ * file aglfn.txt.  Names in the range 0x0100 - 0x01FF correspond to those used by the
+ * Latin1 encoding scheme.  This unicode code page deliberately uses the same character
+ * mapping as Latin1.  Adobe also recommends names for many characters outside this 
+ * range, but not all fonts adhere to this.  You can substitute a different aglfn.txt
+ * file at run time if you want to use a different scheme.
  */
-#define LATIN1_ENCODING_NAMES 1
+#define ADOBE_ENCODING_NAMES 1
 
-#if (LATIN1_ENCODING_NAMES)
-#include "aglfn.h"
+#if (ADOBE_ENCODING_NAMES)
 
 typedef struct ps_glyph {
   unsigned long unicode;
   char * glyphname;
 } ps_glyph;
 
-static ps_glyph aglist[] = AGL;
-static int psglyphs = sizeof(aglist)/sizeof(ps_glyph);
+static ps_glyph *aglist = NULL;
+static int aglist_alloc = 0;
+static int aglist_size = 0;
+static int psglyphs = 0;
+
 #endif
 
 TERM_PUBLIC void
@@ -1566,7 +1590,9 @@ end\n\
 	    case S_ENC_CP1250:	    PS_dump_prologue_file("cp1250.ps"); break;
 	    case S_ENC_KOI8_R:	    PS_dump_prologue_file("koi8r.ps"); break;
 	    case S_ENC_KOI8_U:	    PS_dump_prologue_file("koi8u.ps"); break;
-	    case S_ENC_UTF8:   	    PS_dump_prologue_file("utf-8.ps"); break;
+	    case S_ENC_UTF8:   	    PS_dump_prologue_file("utf-8.ps");
+				    if (!aglist) PS_load_glyphlist();
+				    break;
 	    case S_ENC_DEFAULT:
 	    default:		    break;
 	}
@@ -1934,7 +1960,7 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
 		if (mode == PS_TEXT)
 		    putc(')', gppsfile);
 		putc('/', gppsfile);
-#if (LATIN1_ENCODING_NAMES)
+#if (ADOBE_ENCODING_NAMES)
 		for (i = 0; i < psglyphs; i++) {
 		    if (aglist[i].unicode == ch) {
 		    	fputs(aglist[i].glyphname, gppsfile);
@@ -2280,7 +2306,7 @@ ENHPS_WRITEC(int c)
 
 		/* Write a new partial string for this glyph */
 		fprintf(gppsfile, "%s/", ENHps_opensequence);
-#if (LATIN1_ENCODING_NAMES)
+#if (ADOBE_ENCODING_NAMES)
 		for (i = 0; i < psglyphs; i++) {
 		    if (aglist[i].unicode == wch) {
 			fputs(aglist[i].glyphname, gppsfile);
@@ -3275,13 +3301,12 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
  * If unsuccessful, look for hardcoded absolute path on UNIX,
  * or hardcoded relative path on Windows and OS2,
  * or files included at compile time. */
-static void
-PS_dump_prologue_file(char *name)
+static FILE *
+PS_open_prologue_file(char *name)
 {
     char *fullname;
     char *ps_prologue_dir;
     FILE *prologue_fd;
-    char buf[256];
 
     if ((ps_prologue_dir = getenv("GNUPLOT_PS_DIR")) == NULL) {
 #ifdef GNUPLOT_PS_DIR
@@ -3385,8 +3410,57 @@ PS_dump_prologue_file(char *name)
 	int_error(NO_CARET,"Plot failed!");
     }
     free(fullname);
+    return prologue_fd;
+}
+    
+static void
+PS_dump_prologue_file(char *name)
+{
+    char buf[256];
+    FILE *prologue_fd = PS_open_prologue_file(name);
+
     while (fgets(buf, sizeof(buf), prologue_fd))
 	fputs(buf, gppsfile);
+    fclose(prologue_fd);
+}
+
+static void
+PS_load_glyphlist()
+{
+    char buf[256];
+    char *next = NULL;
+    unsigned code;
+    int  len;
+    char glyph_name[32];
+    FILE *prologue_fd = PS_open_prologue_file("aglfn.txt");
+
+    while (fgets(buf, sizeof(buf), prologue_fd)) {
+	if (*buf == '#' || *buf == '\n')
+	    continue;
+	code = strtol(buf,&next,16);
+
+	/* User control over whether Adobe glyph names are used for unicode   */
+	/* entries above 0x0100.  I.e. when we see a UTF-8 alpha, do we write */
+	/* /alpha rather than /uni03B1?   Some fonts want one or the other.   */
+	/* This is controlled by 'set term post adobeglyphnames'.             */
+	if (code >= 0x0100 && !ps_params->adobeglyphnames)
+	    continue;
+	
+	next++;
+	len = strchr(next,';') - next;
+	strncpy(glyph_name, next, len);
+	glyph_name[len] = '\0';
+	FPRINTF((stderr, "%04X   %s\n", code, glyph_name));
+	if (aglist_size + sizeof(ps_glyph) > aglist_alloc) {
+	    aglist_alloc += 2048;
+	    aglist = gp_realloc(aglist, aglist_alloc, "aglist");
+	}
+	aglist[psglyphs].unicode = code;
+	aglist[psglyphs].glyphname = gp_strdup(glyph_name);
+	aglist_size += sizeof(ps_glyph);
+	psglyphs++;
+    }
+
     fclose(prologue_fd);
 }
 
@@ -3790,7 +3864,7 @@ START_HELP(post)
 "                               {enhanced | noenhanced}",
 "                               {defaultplex | simplex | duplex}",
 "                               {fontfile [add | delete] \"<filename>\"",
-"                                | nofontfiles}",
+"                                | nofontfiles} {{no}adobeglyphnames}",
 PS_COMMON_OPTS1
 PS_COMMON_OPTS2
 PS_COMMON_PROLOG_INFO
@@ -4121,6 +4195,27 @@ PS_COMMON_DOC1
 " controlled at the time gnuplot is built. However, you can control this",
 " either by defining an environment variable GNUPLOT_PS_DIR or by using the",
 " gnuplot command `set loadpath`. See `set loadpath`.",
+"2 postscript adobeglyphnames",
+"?commands set terminal postscript adobeglyphnames",
+"?set terminal postscript adobeglyphnames",
+"?terminal postscript adobeglyphnames",
+"?postscript adobeglyphnames",
+"?adobeglyphnames",
+"=UTF-8",
+" This setting is only relevant to PostScript output with UTF-8 encoding.",
+" It controls the names used to describe characters with Unicode entry points",
+" higher than 0x00FF.  That is, all characters outside of the Latin1 set.",
+" In general unicode characters do not have a unique name; they have only a",
+" unicode identification code.  However, Adobe have a recommended scheme for",
+" assigning names to certain ranges of characters (extended Latin, Greek, etc).",
+" Some fonts use this scheme, others do not.  By default, gnuplot will output",
+" glyph names like /uni03B1 to describe the character with unicode 03B1 (the",
+" lower case Greek letter alpha). The 'adobeglyphnames' option will first look",
+" to see if there is a recommended alternative name for this character. In this",
+" case its recommended name is /alpha.  If you get this setting wrong, the",
+" character may not be found even if it is present in the font.",
+" It is probably always correct to set this option for Adobe fonts, but for",
+" other fonts you may have to try both settings.  See also `fontfile`.",
 "",
 ""
 END_HELP(post)
