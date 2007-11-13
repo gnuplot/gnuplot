@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.457 2007/11/11 20:48:44 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.458 2007/11/13 20:50:07 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -749,6 +749,103 @@ C
    plot 'datafile' using 1:(f($2)/$4) title 2 with lines
 
  See `set style labels`, `using xticlabels`, `plot title`, `using`.
+2 Enhanced text mode
+?enhanced text
+?enhanced
+ Many terminal types support an enhanced text mode in which additional
+ formatting information is embedded in the text string.  For example, "x^2"
+ will write x-squared as we are used to seeing it, with a superscript 2.
+ This mode is normally selected when you set the terminal, e.g. 
+ "set term png enhanced", but may also be toggled afterwards using 
+ "set termoption enhanced", or by marking individual strings as in
+ "set label 'x_2' noenhanced".
+ 
+@start table - first is interactive cleartext form
+  Control      Examples        Explanation
+   ^           a^x             superscript
+   _           a_x             subscript
+   @           @x or a@^b_{cd} phantom box (occupies no width)
+   &           &{space}        inserts space of specified length
+   ~           ~a{.8-}         overprints '-' on 'a', raised by .8
+                               times the current fontsize
+#\begin{tabular}{|cccl|} \hline
+#\multicolumn{4}{|c|}{Enhanced Text Control Codes} \\ \hline
+#Control & Example & Result & Explanation \\ \hline
+#\verb~^~ & \verb~a^x~ & $a^x$ & superscript\\
+#\verb~_~ & \verb~a_x~ & $a_x$ & subscript\\
+#\verb~@~ & \verb~a@^b_{cd}~ & $a^b_{cd}$ &phantom box (occupies no width)\\
+#\verb~&~ & \verb~d&{space}b~ & d\verb*+     +b & inserts space of specified length\\
+#\verb|~| & \verb|~a{.8-}| & $\tilde{a}$ & overprints '-' on 'a', raised by .8\\
+#\verb~ ~ & \verb~ ~ & ~ ~ & times the current fontsize\\
+%c c l .
+%.TE", /* ugly - doc2ms uses @ for column separator, but here we */
+%.TS", /* need @ in table, so end and restart the table ! */
+%center box tab ($) ;
+%c c l .
+%Control$Examples$Explanation
+%_
+%^$a^x$superscript
+%\&_$a\&_x$subscript
+% @ $ @x or a\&@^b\&_{cd}$phantom box (occupies no width)
+% & $ &{space}$inserts space of specified length
+% ~ $ ~a{.8-}$overprints '-' on 'a', raised by .8
+%   $   $times the current fontsize
+@end table
+
+ Braces can be used to place multiple-character text where a single character
+ is expected (e.g., 2^{10}).  To change the font and/or size, use the full form:
+ {/[fontname][=fontsize | *fontscale] text}.  Thus {/Symbol=20 G} is a 20 pt
+ GAMMA and {/*0.75 K} is a K at three-quarters of whatever fontsize is currently
+ in effect.  (The '/' character MUST be the first character after the '{'.)
+
+ The phantom box is useful for a@^b_c to align superscripts and subscripts
+ but does not work well for overwriting an accent on a letter.  For the latter,
+ it is much better to use an encoding  (e.g. iso_8859_1 or utf8) that contains
+ a large variety of letters with accents or other diacritical marks.  See
+ `set encoding`. Since the box is non-spacing, it is sensible to put the shorter
+ of the subscript or superscript in the box (that is, after the @).
+ 
+ Space equal in length to a string can be inserted using the '&' character.
+ Thus
+         'abc&{def}ghi'
+ would produce
+         'abc   ghi'.
+
+ The '~' character causes the next character or bracketed text to be
+ overprinted by the following character or bracketed text.  The second text
+ will be horizontally centered on the first.  Thus '~a/' will result in an 'a'
+ with a slash through it.  You can also shift the second text vertically by
+ preceding the second text with a number, which will define the fraction of the
+ current fontsize by which the text will be raised or lowered.  In this case
+ the number and text must be enclosed in brackets because more than one
+ character is necessary.  If the overprinted text begins with a number, put a
+ space between the vertical offset and the text ('~{abc}{.5 000}'); otherwise
+ no space is needed ('~{abc}{.5---}').  You can change the font for one or
+ both strings ('~a{.5 /*.2 o}'---an 'a' with a one-fifth-size 'o' on top---and
+ the space between the number and the slash is necessary), but you can't
+ change it after the beginning of the string.  Neither can you use any other
+ special syntax within either string.  You can, of course, use control
+ characters by escaping them (see below), such as '~a{\^}'
+
+ You can access special symbols numerically by specifying \character-code (in
+ octal), e.g., {/Symbol \245} is the symbol for infinity. This does not work
+ for multibyte encodings like UTF-8, however.  In a UTF-8 environment, you
+ should be able to enter multibyte sequences implicitly by typing or otherwise
+ selecting the character you want.
+
+ You can escape control characters using \, e.g.,  \\, \{, and so on.
+
+ But be aware that strings in double-quotes are parsed differently than those
+ enclosed in single-quotes.  The major difference is that backslashes may need
+ to be doubled when in double-quoted strings.
+
+ Examples (these are hard to describe in words---try them!):
+       set xlabel 'Time (10^6 {/Symbol m}s)'
+       set title '{/Symbol=18 \\362@_{/=9.6 0}^{/=12 x}} \\
+                  {/Helvetica e^{-{/Symbol m}^2/2} d}{/Symbol m}'
+
+ The file "ps_guide.ps" in the /docs/psdoc subdirectory of the gnuplot source
+ distribution contains more examples of the enhanced syntax.
 2 Environment
 ?environment
  A number of shell environment variables are understood by `gnuplot`.  None of
@@ -9542,7 +9639,8 @@ Ffigure_mapcontours
 ?unset style line
 ?show style line
 ?linestyle
-^ <a name="linewidth"></a>
+?linewidth
+=linewidth
  Each terminal has a default set of line and point types, which can be seen
  by using the command `test`.  `set style line` defines a set of line types
  and widths and point types and sizes so that you can refer to them later by

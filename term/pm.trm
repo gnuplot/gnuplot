@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.52 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: pm.trm,v 1.53 2006/07/21 02:35:47 sfeam Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -1308,10 +1308,10 @@ START_HELP(pm)
 " same time.",
 "",
 " If `widelines` is specified, all plots will be drawn with wide lines.  If",
-" `enhanced` is specified, sub- and superscripts and multiple fonts are",
-" enabled using the same syntax as the `enhanced postscript` option (see",
-" `set terminal postscript enhanced` for details).  Font names for the basic",
-" PostScript fonts may be abbreviated to single letters.",
+" `enhanced` is specified, sub- and superscripts and multiple fonts are enabled",
+" (see `enhanced text` for details).  Font names for the core PostScript fonts",
+" may be abbreviated to a single letter ",
+" (T/H/C/S for Times/Helvetica/Courier/Symbol).",
 "",
 " If `title` is specified, it will be used as the title of the plot window.",
 " It will also be used as the name of the server instance, and will override",

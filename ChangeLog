@@ -1,5 +1,11 @@
 2007-11-13  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* docs/gnuplot.doc term/post.trm term/pm.trm:  Move description of
+	enhanced text mode out of the postscript terminal and into the main
+	documentation.
+
+2007-11-13  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* docs/checkdoc.c:  Teach checkdoc to ignore embedded figures.
 
 	* docs/psdoc/ps_symbols.gpi:  Update to current syntax.
