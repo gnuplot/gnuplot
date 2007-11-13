@@ -13,7 +13,8 @@ postscriptdir = $(pkgdatadir)/$(VERSION_MAJOR)/PostScript
 postscript_DATA = PostScript/8859-15.ps PostScript/8859-1.ps\
 	PostScript/8859-2.ps PostScript/cp1250.ps PostScript/cp437.ps\
 	PostScript/cp850.ps PostScript/cp852.ps PostScript/koi8r.ps PostScript/koi8u.ps\
-	PostScript/prologue.ps
+	PostScript/prologue.ps\
+	PostScript/aglfn.txt
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t

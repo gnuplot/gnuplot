@@ -2,6 +2,8 @@
 
 	* docs/checkdoc.c:  Teach checkdoc to ignore embedded figures.
 
+	* term/Makefile.am.in:  Add aglfn.txt to list of installed files.
+
 2007-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_options PS_dump_prologue_file PS_open_prologue_file
