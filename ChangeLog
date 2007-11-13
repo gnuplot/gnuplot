@@ -2,6 +2,10 @@
 
 	* docs/checkdoc.c:  Teach checkdoc to ignore embedded figures.
 
+	* docs/psdoc/ps_symbols.gpi:  Update to current syntax.
+
+	* docs/gnuplot.doc:  Various minor indexing typos; mention UTF-8.
+
 	* term/Makefile.am.in:  Add aglfn.txt to list of installed files.
 
 2007-11-12  Ethan A Merritt  <merritt@u.washington.edu>

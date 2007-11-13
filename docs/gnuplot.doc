@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.456 2007/10/29 21:42:12 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.457 2007/11/11 20:48:44 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1715,7 +1715,7 @@ C ... and restart the table:
  command terminates early due to an error.  The most recent error message is
  stored in the string variable GPVAL_ERRMSG.  Both GPVAL_ERRNO and GPVAL_ERRMSG
  can be cleared using the command `reset errors`.
- 
+
  Interactive terminals with `mouse` functionality maintain read-only variables
  with the prefix "MOUSE_".  See `mouse variables` for details.
 
@@ -2830,8 +2830,7 @@ Ffigure_histclust
        set style histogram cluster
        set style fill solid 1.0 border -1
        plot 'file.dat' using 2, '' using 4
-       
-
+ 
  This will produce a plot with clusters of two boxes (vertical bars) centered
  at each integral value on the x axis.  If the first column of the input file
  contains labels, they may be placed along the x-axis using the variant command
@@ -6783,6 +6782,7 @@ Ffigure_mapcontours
 ?show encoding
 ?encoding
 ?encodings
+=UTF-8
  The `set encoding` command selects a character encoding.
  Syntax:
        set encoding {<value>}
@@ -6791,7 +6791,7 @@ Ffigure_mapcontours
 
  Valid values are
     default     - tells a terminal to use its default encoding
-    iso_8859_1  - the most common Western European font used by many
+    iso_8859_1  - the most common Western European encoding used by many
                   Unix workstations and by MS-Windows. This encoding is
                   known in the PostScript world as 'ISO-Latin1'.
     iso_8859_2  - used in Central and Eastern Europe
@@ -6802,6 +6802,8 @@ Ffigure_mapcontours
     cp850       - codepage for OS/2, Western Europe
     cp852       - codepage for OS/2, Central and Eastern Europe
     cp1250      - codepage for MS Windows, Central and Eastern Europe
+    utf8        - variable-length (multibyte) representation of Unicode
+                  entry point for each character
 
  The command `set encoding locale` is different from the other options.
  It attempts to determine the current locale from the runtime environment.
@@ -8518,8 +8520,7 @@ Ffigure_mapcontours
  last.  The default is `scansautomatic` where gnuplot makes a guess about scans
  order.  On the other hand, the `depthorder` option completely reorders the
  qudrangles. The rendering is performed after a depth sorting, which allows to
- visualize even complicated surfaces; see `help pm3d depthorder` for more
- details.
+ visualize even complicated surfaces; see `pm3d depthorder` for more details.
 
  If two subsequent scans do not have same number of points, then it has to be
  decided whether to start taking points for quadrangles from the beginning of
