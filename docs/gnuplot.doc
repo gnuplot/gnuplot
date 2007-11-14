@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.458 2007/11/13 20:50:07 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.459 2007/11/13 22:44:46 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -360,7 +360,7 @@ C
  Another compatibility issue is the effect of the command `set size` outside
  when not in multiplot mode.  In earlier versions, the command
  `set size <xx>, <yy>` caused some terminals to change both the size of the plot
- and the size of the canvas is was drawn on; other terminatls changed only the
+ and the size of the canvas is was drawn on; other terminals changed only the
  plot size.  The use of `set size` to change the canvas size is now deprecated.
 
  Please see `set size`, `set term size` and also the documentation for
@@ -756,7 +756,7 @@ C
  formatting information is embedded in the text string.  For example, "x^2"
  will write x-squared as we are used to seeing it, with a superscript 2.
  This mode is normally selected when you set the terminal, e.g. 
- "set term png enhanced", but may also be toggled afterwards using 
+ "set term png enhanced", but may also be toggled afterward using 
  "set termoption enhanced", or by marking individual strings as in
  "set label 'x_2' noenhanced".
  
@@ -1332,7 +1332,7 @@ C
 ?expressions functions gprintf
 ?functions gprintf
 #gprintf("format",x) & any & string result from applying gnuplot's format parser \\
-%gprintf("format",x)@any@string result from applysing gnuplot's format parser
+%gprintf("format",x)@any@string result from applying gnuplot's format parser
  `gprintf("format",x)` applies gnuplot's own format specifiers to the single
  variable x and returns the resulting string. If you want standard C-language
  format specifiers, you must instead use `sprintf("format",x)`.
@@ -1375,7 +1375,7 @@ C
  `substr("string",beg,end)` returns the substring consisting of characters
  beg through end of the original string. This is exactly equivalent to the
  expression "string"[beg:end] except that you do not have the option of
- ommitting beg or end.
+ omitting beg or end.
 4 strftime
 ?expressions functions strftime
 ?functions strftime
@@ -3009,7 +3009,7 @@ Ffigure_histcols
 ?plotting styles image
 ?style image
 ?image
- The `image` style is intendend for projecting 2D images onto either 2D or 3D
+ The `image` style is intended for projecting 2D images onto either 2D or 3D
  plots.  It may be used for both `plot` and `splot` in the form of 3D data
  (x,y,value) or projected 4D data (x,y,z,value), respectively.  It is assumed
  that in the viewing plane the image data forms an equidistant sampling grid in
@@ -4244,7 +4244,7 @@ Ffigure_mapcontours
        1.0 "second column" 3.0
 
  Data may be written in exponential format with the exponent preceded by the
- letter e or E.  The fortran exponential specificiers d, D, q, and Q may also
+ letter e or E.  The fortran exponential specifiers d, D, q, and Q may also
  be used if the command `set datafile fortran` is in effect.
 
  Only one column (the y value) need be provided.  If x is omitted, `gnuplot`
@@ -8616,7 +8616,7 @@ Ffigure_mapcontours
  `scansbackward` to force the first scan of the data to be plotted first or
  last.  The default is `scansautomatic` where gnuplot makes a guess about scans
  order.  On the other hand, the `depthorder` option completely reorders the
- qudrangles. The rendering is performed after a depth sorting, which allows to
+ quadrangles. The rendering is performed after a depth sorting, which allows to
  visualize even complicated surfaces; see `pm3d depthorder` for more details.
 
  If two subsequent scans do not have same number of points, then it has to be
@@ -11513,7 +11513,7 @@ Ffigure_mapcontours
 
  The sections below list problems known to be present in gnuplot version 4.2 at
  the time of release.  Some of these are actually bugs in external support
- libraries and may have been fixed indepently of any changes in gnuplot.
+ libraries and may have been fixed independent of any changes in gnuplot.
 
 2 Gnuplot limitations
 ?bugs gnuplot
