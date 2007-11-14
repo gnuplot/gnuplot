@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.224 2007/10/06 02:57:58 sfeam Exp $
+dnl $Id: configure.in,v 1.225 2007/10/16 21:19:43 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -404,6 +404,7 @@ if test "$with_gd" != no; then
   if test -n "$GDLIB_CONFIG"; then
     libgd_CPPFLAGS=`gdlib-config --cflags`
     libgd_LDFLAGS=`gdlib-config --ldflags`
+    libgd_LIBS=`gdlib-config --libs`
   elif test -d "$with_gd"; then
     libgd_CPPFLAGS="-I$with_gd/include"
     libgd_LDFLAGS="-L$with_gd/lib"
@@ -458,10 +459,6 @@ if test "$with_gd" != no; then
     ],[dnl gd library not found
        with_gd=no
     ])
-
-  if test -n "$GDLIB_CONFIG"; then
-    libgd_LIBS=`gdlib-config --libs`
-  fi
 
   dnl piece it all together
   if test "$with_gd" = no; then
