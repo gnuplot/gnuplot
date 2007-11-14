@@ -1,6 +1,8 @@
 New features, changes and fixes since gnuplot version 4.2
 =========================================================
 
+* NEW optional 3 columns of data to generate histogram errorbars
+* NEW 'volatile' data, including inline data, can be replotted without rereading
 * NEW rgbimage style now works in 2D and 3D for all terminals that support RGB
 * NEW transparent fill styles
 * NEW 2D plots can read color information from an input data file
@@ -9,6 +11,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW pdf and png terminals based on cairo and pango
 * NEW error status variables GPVAL_ERRNO and GPVAL_ERRMSG
 * FIX better support for locale internationalization, UTF-8 encoding
+* FIX various font-handling problems in postscript terminal driver
 * CHANGE fillstyle border type, if any, is applied to candlesticks
 * CHANGE 'set key textcolor rgb variable' will use plot colors for key entries
 * CHANGE Remove obsolete IRIS4D terminal type
@@ -17,7 +20,7 @@ New features, changes and fixes since gnuplot version 4.2
 Features, changes and fixes in gnuplot version 4.2
 ==================================================
 
-Below you find list of news, changes and fixes in gnuplot version 4.2.
+Below you find a list of news, changes and fixes in gnuplot version 4.2.
 
 Please see also section "What is New in Version 4.2" in gnuplot documentation
 (files gnuplot.gih, gnuplot.hlp, gnuplot.inf, etc.) available by the command
