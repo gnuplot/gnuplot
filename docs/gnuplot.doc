@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.459 2007/11/13 22:44:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.460 2007/11/14 01:41:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2881,13 +2881,13 @@ Ffigure_histeps
  label. Labels from this column may be placed along the x-axis underneath
  the appropriate cluster of boxes with the `xticlabels` option to `using`.
 
- The `errorbars` style is very similar to the `clustered` style, except that
- it requires two columns of input for each entry. The first column is treated
- as the height (y-value) of that box, exactly as for the `clustered` style.
- The second column is treated as an error magnitude, and used to generate a
- vertical error bar at the top of the box. The appearance of the error bar is
- controlled by the current value of `set bars` and by the optional <linewidth>
- specification.
+ The `errorbars` style is very similar to the `clustered` style, except that it
+ requires additional columns of input for each entry. The first column holds
+ the height (y value) of that box, exactly as for the `clustered` style.
+      2 columns:	y yerr          bar extends from y-yerr to y+err
+      3 columns:        y ymin yman     bar extends from ymin to ymax
+ The appearance of the error bars is controlled by the current value of
+ `set bars` and by the optional <linewidth> specification.
 
  Two styles of stacked histogram are supported, chosen by the command
  `set style histogram {rowstacked|columnstacked}`.  In these styles the data
@@ -2934,7 +2934,7 @@ Ffigure_histclust
 
        plot 'file.dat' using 2, '' using 4:xticlabels(1)
 
- If the file contains both a magnitude and an error estimate for each value,
+ If the file contains both magnitude and range information for each value,
  then error bars can be added to the plot.  The following commands will add
  error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
  ends drawn the same width as the box itself. The error bars and bar ends are

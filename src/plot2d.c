@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.154 2007/10/21 04:12:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.155 2007/10/21 04:17:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -418,7 +418,7 @@ get_data(struct curve_points *current_plot)
 #ifdef EAM_HISTOGRAMS
     case HISTOGRAMS:
 	min_cols = 1;
-	max_cols = 2;
+	max_cols = 3;
 	break;
 #endif
 
@@ -588,16 +588,25 @@ get_data(struct curve_points *current_plot)
 
 	case 2:
 #ifdef EAM_HISTOGRAMS
+	    H_ERR_BARS:
 	    if (current_plot->plot_style == HISTOGRAMS) {
 		if (histogram_opts.type == HT_ERRORBARS) {
+		    /* The code is a tangle, but we can get here with j = 1, 2, or 3 */
 		    if (j == 1)
 			int_error(c_token, "Not enough columns in using specification");
-		    v[2] = v[1];
+		    else if (j == 2) {
+		 	v[3] = v[0] + v[1];
+			v[2] = v[0] - v[1];
+		    } else {
+		 	v[3] = v[2];
+			v[2] = v[1];
+		    }
 		    v[1] = v[0];
 		    v[0] = df_datum;
-		} else if (j == 2)
+		} else if (j >= 2)
 		    int_error(c_token, "Too many columns in using specification");
-		else v[2] = 0.0;
+		else
+		    v[2] = v[3] = v[1];
 
 		if (histogram_opts.type == HT_STACKED_IN_TOWERS) {
 		    histogram_rightmost = current_plot->histogram_sequence
@@ -611,11 +620,11 @@ get_data(struct curve_points *current_plot)
 		if (boxwidth > 0)
 		    store2d_point(current_plot, i++, v[0], v[1],
 				  v[0] - boxwidth / 2, v[0] + boxwidth / 2,
-				  v[1]-v[2], v[1]+v[2], 0.0);
+				  v[2], v[3], 0.0);
 		else
 		    store2d_point(current_plot, i++, v[0], v[1],
 				  v[0] - 0.5, v[0] + 0.5,
-				  v[1]-v[2], v[1]+v[2], 0.0);       /* EAM DEBUG -1.0 ?? */
+				  v[2], v[3], 0.0);
 	    } else
 #endif
 		/* x, y */
@@ -654,6 +663,12 @@ get_data(struct curve_points *current_plot)
 			      v[1], v[2]);
 	    else
 		switch (current_plot->plot_style) {
+
+		case HISTOGRAMS:
+		    if (histogram_opts.type == HT_ERRORBARS)
+			goto H_ERR_BARS;
+		    else
+			/* fall through */
 		default:
 		    int_warn(storetoken, "This plot style does not work with 3 cols. Setting to yerrorbars");
 		    current_plot->plot_style = YERRORBARS;

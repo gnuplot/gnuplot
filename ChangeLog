@@ -1,3 +1,10 @@
+2007-11-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data) docs/gnuplot.doc:
+	Allow 3 columns of data for plot style "histogram errorbars".
+	2 column data:   y err          error bar from y-err to y+err
+	3 column data:   y ymin ymax    error bar from ymin to ymax
+
 2007-11-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc term/post.trm term/pm.trm:  Move description of
