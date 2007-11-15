@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.217 2007/11/13 03:46:13 sfeam Exp $
+ * $Id: post.trm,v 1.218 2007/11/13 22:44:47 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -641,9 +641,9 @@ PS_options()
 	    ++c_token;
 	    break;
 	case PS_NOENHANCED:
-            if (set_enhanced || ps_params->terminal != PSTERM_POSTSCRIPT)
-                int_error(c_token,
-                          "extraneous argument in set terminal %s",term->name);
+	   if (set_enhanced || ps_params->terminal != PSTERM_POSTSCRIPT)
+	        int_error(c_token,
+	                  "extraneous argument in set terminal %s",term->name);
 	    set_enhanced = TRUE;
 	    term->put_text = PS_put_text;
 	    term->set_font = PS_set_font;
@@ -783,7 +783,7 @@ PS_options()
 	    ps_params->blacktext = FALSE;
 	    c_token++;
 	    break;
-        case PS_SOLIDE:
+	case PS_SOLIDE:
 	    if (set_dashed)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
@@ -861,37 +861,37 @@ PS_options()
 	    ps_params->rounded = FALSE;
 	    c_token++;
 	    break;
-        case PS_FONTFILE: {
-            TBOOLEAN deleteentry = FALSE;
-            c_token++;
+	case PS_FONTFILE: {
+	    TBOOLEAN deleteentry = FALSE;
+	    char *fontfilename = NULL;
+	    c_token++;
 	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
 
-            if (!isstring(c_token)) {
-                if (equals(c_token, "add"))
-                    c_token++;
-                else if (almost_equals(c_token, "del$ete")) {
-                    deleteentry = TRUE;
-                    c_token++;
-                } else
-                    int_error(c_token, "Font filename expected");
-            }
-            if (isstring(c_token)) {
-                TBOOLEAN filename_doubled = FALSE;
-                struct ps_fontfile_def *curr_ps_fontfile = 
-		    ps_params->first_fontfile;
-                struct ps_fontfile_def *prev_ps_fontfile = NULL;
-                struct ps_fontfile_def *new_ps_fontfile =
-                     gp_alloc(sizeof(struct ps_fontfile_def),
-                             "new_ps_fontfile");
+	    if (equals(c_token, "add"))
+		c_token++;
+	    else if (almost_equals(c_token, "del$ete")) {
+		deleteentry = TRUE;
+		c_token++;
+	    }
 
-                new_ps_fontfile->fontfile_name =
-                    gp_alloc (token_len(c_token),
-                              "new_ps_fontfile->fontfile_name");
-                quote_str(new_ps_fontfile->fontfile_name,
-                          c_token, token_len(c_token));
-                gp_expand_tilde(&(new_ps_fontfile->fontfile_name));
+	    if (!(fontfilename = try_to_get_string())) {
+		int_error(c_token, "Font filename expected");
+	    } else {
+		TBOOLEAN filename_doubled = FALSE;
+		struct ps_fontfile_def *curr_ps_fontfile = 
+		    ps_params->first_fontfile;
+		struct ps_fontfile_def *prev_ps_fontfile = NULL;
+		struct ps_fontfile_def *new_ps_fontfile =
+		     gp_alloc(sizeof(struct ps_fontfile_def),
+			     "new_ps_fontfile");
+
+		new_ps_fontfile->fontfile_name =
+		    gp_alloc (token_len(c_token),
+			      "new_ps_fontfile->fontfile_name");
+		gp_expand_tilde(&fontfilename);
+		new_ps_fontfile->fontfile_name = fontfilename;
 		new_ps_fontfile->fontname = NULL;
 		if (!deleteentry) {
 #if defined(PIPES)
@@ -900,7 +900,7 @@ PS_options()
 			new_ps_fontfile->fontfile_fullname =
 			    fontpath_fullname(new_ps_fontfile->fontfile_name);
 			if (!new_ps_fontfile->fontfile_fullname)
-			    int_error(c_token, "Font file '%s' not found",
+			    int_error(c_token-1, "Font file '%s' not found",
 				      new_ps_fontfile->fontfile_name);
 #if defined(PIPES)
 		    } else
@@ -908,7 +908,7 @@ PS_options()
 #endif
 
 		}
-                new_ps_fontfile->next = NULL;
+		new_ps_fontfile->next = NULL;
 
 		if (!deleteentry) {
 		    LFS *lf=lf_head;
@@ -917,45 +917,43 @@ PS_options()
 			    lf=lf->prev;
 		    }
 		    if ((lf && lf->interactive) || interactive)
-			/* if (interactive) { */
 			PS_load_fontfile(new_ps_fontfile,FALSE);
 		}
 
-                if (ps_params->first_fontfile) {
-                    while (curr_ps_fontfile) {
-                        if (strcmp(curr_ps_fontfile->fontfile_name,
-                                   new_ps_fontfile->fontfile_name) == 0) {
-                            filename_doubled = TRUE;
-                            if (deleteentry) {
+		if (ps_params->first_fontfile) {
+		    while (curr_ps_fontfile) {
+			if (strcmp(curr_ps_fontfile->fontfile_name,
+				   new_ps_fontfile->fontfile_name) == 0) {
+			    filename_doubled = TRUE;
+			    if (deleteentry) {
 				delete_ps_fontfile(prev_ps_fontfile,
 						   curr_ps_fontfile);
-                                curr_ps_fontfile = NULL;
-                                break;
-                            }
-                        }
-                        prev_ps_fontfile = curr_ps_fontfile;
-                        curr_ps_fontfile = curr_ps_fontfile->next;
-                    }
-                    if (!filename_doubled) {
-                        if (!deleteentry)
-                            prev_ps_fontfile->next = new_ps_fontfile;
-                        else
-                            int_warn(c_token,"Can't delete Font filename '%s'",
-                                     new_ps_fontfile->fontfile_name);
-                    }
-                } else {
-                    if (!deleteentry)
-                        ps_params->first_fontfile = new_ps_fontfile;
-                    else
-                        int_warn(c_token, "Can't delete Font filename '%s'",
-                                 new_ps_fontfile->fontfile_name);
-                }
-                c_token++;
-            } else
-                int_error(c_token, "Font filename expected");
-            break;
-        }
-        case PS_NOFONTFILES:
+				curr_ps_fontfile = NULL;
+				break;
+			    }
+			}
+			prev_ps_fontfile = curr_ps_fontfile;
+			curr_ps_fontfile = curr_ps_fontfile->next;
+		    }
+		    if (!filename_doubled) {
+			if (!deleteentry)
+			    prev_ps_fontfile->next = new_ps_fontfile;
+			else
+			    int_warn(c_token,"Can't delete Font filename '%s'",
+				     new_ps_fontfile->fontfile_name);
+		    }
+		} else {
+		    if (!deleteentry)
+			ps_params->first_fontfile = new_ps_fontfile;
+		    else
+			int_warn(c_token, "Can't delete Font filename '%s'",
+				 new_ps_fontfile->fontfile_name);
+		}
+		c_token++;
+	    }
+	    break;
+	}
+	case PS_NOFONTFILES:
 	    if (ps_params->terminal != PSTERM_POSTSCRIPT)
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
@@ -982,7 +980,7 @@ PS_options()
 	    if (ps_params->palfunc_samples < 2)
 		ps_params->palfunc_samples = 2;
 	    if (!END_OF_COMMAND && equals(c_token, ",")) {
-	        ++c_token;
+		++c_token;
 		ps_params->palfunc_deviation = fabs(real_expression());
 		if (ps_params->palfunc_deviation >= 1)
 		    int_error(c_token-1,"allowed deviation must be < 1");
@@ -1975,7 +1973,7 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
 	}
 
 	if (mode == PS_TEXT)
-            putc(')', gppsfile);
+	    putc(')', gppsfile);
 
 	switch(ps_justify) {
 	    case LEFT :
@@ -2140,14 +2138,14 @@ PS_fillbox(
     case FS_SOLID:
     case FS_TRANSPARENT_SOLID:
 	/* style == 1 --> fill with intensity according to filldensity */
-        filldens = (style >> 4) / 100.0;
-        if(filldens < 0.0)
+	filldens = (style >> 4) / 100.0;
+	if(filldens < 0.0)
 	    filldens = 0.0;
-        if(filldens > 1.0)
+	if(filldens > 1.0)
 	    filldens = 1.0;
-        fprintf(gppsfile, "%.3f %d %d %d %d BoxColFill\n",
+	fprintf(gppsfile, "%.3f %d %d %d %d BoxColFill\n",
 		filldens, x1,y1, width,height);
-        break;
+	break;
 
     case FS_PATTERN:
     case FS_TRANSPARENT_PATTERN:
@@ -2190,10 +2188,10 @@ PS_fillbox(
 			x1, y1, width, height, 40, -30);
 		break;
 	}
-        break; /* end of pattern filling part */
+	break; /* end of pattern filling part */
 
     default: /* style == 0 or unknown --> fill with background color */
-        fprintf(gppsfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
+	fprintf(gppsfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
     }
 
     PS_relative_ok = FALSE;
@@ -2548,12 +2546,12 @@ make_color_model_code()
 	"/SelectSpace {ColorSpace (HSV) eq {HSV2RGB}{ColorSpace (XYZ) eq {\n",
 	"  XYZ2RGB}{ColorSpace (CMY) eq {CMY2RGB}{ColorSpace (YIQ) eq {YIQ2RGB}\n",
 	"  if} ifelse} ifelse} ifelse} def\n",
-        NULL,
+	NULL,
     };
     int i;
 
     for(i=0; header[i]!=NULL; ++i) {
-        fputs(header[i], gppsfile);
+	fputs(header[i], gppsfile);
     }
 }
 
@@ -2568,9 +2566,9 @@ static char
     gray = 0.0001*(int)(gray*10000+0.5); /* round it to 4 digits */
     sprintf(s, "%.4g", gray);
     if (s[0] == '0' && s[1] == '.')
-        return &(s[1]);  /* strip leading 0 */
+	return &(s[1]);  /* strip leading 0 */
     else
-        return s;
+	return s;
 }
 
 
@@ -2621,10 +2619,10 @@ write_component_array(const char *text, gradient_struct *grad,
     fprintf(gppsfile, "/%s [", text);
     len = strlen(text) + 4;
     for(i=0; i<cnt; ++i) {
-        char *ref = (char*)(&(grad[i]));
+	char *ref = (char*)(&(grad[i]));
 
 	ref += offset;
-        val = save_space(*((double*) (ref)));
+	val = save_space(*((double*) (ref)));
 	len += strlen(val) + 1;
 	if(len > 77) {
 	    fputs("\n  ",gppsfile);
@@ -2734,7 +2732,7 @@ PS_make_header(t_sm_palette *palette)
 TERM_PUBLIC int PS_make_palette (t_sm_palette *palette)
 {
     if (palette == NULL) {
-        return 0;  /* postscript can do continuous colors */
+	return 0;  /* postscript can do continuous colors */
     }
 
     PS_make_header(palette);
@@ -2889,7 +2887,7 @@ delete_ps_fontfile(struct ps_fontfile_def *prev, struct ps_fontfile_def *this)
 	if (prev != NULL)	/* there is a previous ps_fontfile */
 	    prev->next = this->next;
 	else			/* this = ps_params->first_fontfile */
-	                        /* so change ps_params->first_fontfile */
+		                /* so change ps_params->first_fontfile */
 	    ps_params->first_fontfile = this->next;
 	free(this->fontfile_name);
 	free(this->fontfile_fullname);
@@ -3117,7 +3115,7 @@ print_five_operand_image(unsigned M, unsigned N, gpiPoint *corner, t_imagecolor 
     fprintf(gppsfile, "%s[ %d 0 0 %d 0 0 ]\n", space, M, N);
     if (ps_params->level1) {
 	fprintf(gppsfile, "/imagebuf %d string def\n", (M*N*bits_per_component*((color_mode == IC_RGB && ps_params->color) ? 3 : 1) + 7)/8);
-        fputs("{currentfile imagebuf readhexstring pop}\n", gppsfile);
+	fputs("{currentfile imagebuf readhexstring pop}\n", gppsfile);
     } else
 	fprintf(gppsfile, "  currentfile /ASCII85Decode filter\n");
     if (color_mode == IC_RGB && ps_params->color) {
@@ -3157,19 +3155,19 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
     }
 
     if (bits_per_component > 8)
-        bits_per_component = 12;
+	bits_per_component = 12;
     else if (bits_per_component > 4)
-        bits_per_component = 8;
+	bits_per_component = 8;
     else if (bits_per_component > 2)
-        bits_per_component = 4;
+	bits_per_component = 4;
 
     /* Color and gray scale images do not need a palette and can use
      * the 5 operand form of the image routine.
      */
     if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) || !ps_params->color)
-        five_operand_image = TRUE;
+	five_operand_image = TRUE;
     else
-        five_operand_image = FALSE;
+	five_operand_image = FALSE;
 
     /* The five operand image doesn't have a palette and the values are
      * such that 0 maps to 0.0 and 2^bits_per_component - 1 maps to 1.0
@@ -3178,7 +3176,7 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
      * translating so that the new max colors is 2^bits_per_component.
      */
     if (five_operand_image)
-        max_colors = (1 << bits_per_component);
+	max_colors = (1 << bits_per_component);
 
     encoded_image = PS_encode_image(M, N, image, color_mode, bits_per_component, max_colors, (ps_params->level1 ? PS_ASCII_HEX : PS_ASCII85), &num_encoded_bytes);
 

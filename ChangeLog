@@ -1,3 +1,8 @@
+2007-11-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_options):  Allow a string variable for a
+	font file name.  Whitespace cleanup.
+
 2007-11-14  Arve Knudsen  <arve_knudsen@users.sourceforge.net>
 
 	* configure.in: Move test for libgd libraries to earlier in script
