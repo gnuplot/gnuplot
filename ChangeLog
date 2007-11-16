@@ -1,3 +1,10 @@
+2007-11-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (enhanced_recursion):  Do not allow the '}' character in a
+	font name.  Prevents PostScript badness from the following user error:
+	set label "Foo{/Symbol}Baz".
+	Bug #1833457.
+
 2007-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_options):  Allow a string variable for a
