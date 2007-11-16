@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.151.2.1 2006/10/05 23:52:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.151.2.2 2007/03/22 05:05:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2444,7 +2444,7 @@ enhanced_recursion(
                             ;   /* do nothing */
                     }
                     localfontname = p;
-                    while ((ch = *p) > ' ' && ch != '=' && ch != '*')
+                    while ((ch = *p) > ' ' && ch != '=' && ch != '*' && ch != '}')
                         ++p;
                     save = *(savepos=p);
                     if (ch == '=') {
