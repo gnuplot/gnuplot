@@ -10,21 +10,27 @@
    you can just run config/djconfig.sh
 
  - Other platforms, copy the relevant makefile from config/
-   to src, cd to src and make. See config/README for what
-   each of those files is for.  Note: some of those files
-   haven't been updated in ages, so they may no longer be
-   usable.
+   to src, cd to src and make. See config/README for what each
+   of those files is for.  Note: some of those files haven't been
+   updated in ages, so they may no longer be usable.
 
 
- An important about the PDFlib Lite library:
+ IMPORTANT NOTE ON PDF SUPPORT
  ===========================================
 
- The 'pdf' terminal driver uses an external library provided by 
- PDFlib GmbH, Germany ( http://www.pdflib.de/ ).  This library
- is available under two strictly separate licencing models.
- Depending on the environment you use gnuplot in, you may have to
- purchase a commercial licence for PDFlib even though gnuplot itself
- is free software.  
+ PDF support in gnuplot is provided by an external library.
+ Two options are currently possible.  It is possible to have both
+ PDF terminal drivers in the same gnuplot executable.
+ 
+ The newer "pdfcairo" terminal uses the pango and cairo libraries.
+ This driver will be built if the configure script detects suitable
+ versions of cairo and pango on your machine.
+ 
+ The older "pdf" terminal uses a library provided by PDFlib GmbH,
+ Germany ( http://www.pdflib.de/ ).  This library is available under
+ two strictly separate licencing models.  Depending on the environment
+ you use gnuplot in, you may have to purchase a commercial licence for
+ PDFlib even though gnuplot itself is free software.  
 
  There's a special version of PDFlib, called ``PDFlib Lite'', which
  is freely redistrutable, but programs linked to that are strictly for
@@ -51,35 +57,4 @@
  outputs. Versions 1.6.2 and newer also support TrueType fonts. Version 2.0.28
  of the Boutell gd library restored GIF functionality, 2.0.29 added support
  for GIF animation.
-
- Note 1 - UNISYS patent (why no more GIF images)
- -----------------------------------------------
- The UNISYS patent covers the LZW technology which is used to create
- gifs. To my knowledge, only gd library version 1.3, and possibly
- version 1.4 are free of LZW code and should therefore be used with
- gnuplot.  Versions 1.2 and 1.5 should not be used unless you have a 
- license from Unisys to use LZW code or are in a country where the
- UNISYS patent does not apply.
-
- Note 2 - Open source programs for PNG to GIF conversion
- -------------------------------------------------------
-
- ImageMagick ( www.ImageMagick.org ) 
- This is an open source package for general image manipulation and file 
- conversion, supported on a wide variety of platforms.  For example the 
- command "convert file.png file.gif" will convert a PNG image file to an 
- equivalent GIF image file.
- On platforms that allow pipes in the "set output" command, you can
- generate and convert the images at the same time from gnuplot, as in this
- example:
-
- 	set terminal png font "arial,12" size 500,300
-	set output '| convert png:- image.tiff'
-
- Utah Raster Toolkit ( http://www.cs.utah.edu/gdc/projects/urt/ )
- A general image file conversion library and associated file conversion
- utilities. Distributed as C source code. 
- To convert from PNG to GIF, use the commands
-        pngtorle -o temp.rle image.png
-        rletogif -o image.gif temp.rle
 

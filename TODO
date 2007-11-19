@@ -145,7 +145,6 @@ Lars' list
   only worthwhile if the parser is rewritten at the same time.
 - maybe use PD hash code for table-lookup (SNIPPETS code). Tables for
   builtin and user functions, variables, commands. What else? aliases
-- [Robert S. Maier] rewrite term.c to provide an interface to GNU plotutils
 - standardise float/double comparisons around the suggestion in the
   comp.lang.c FAQ (What's a good way to check for "close enough"
   floating-point equality?) and symbolic constants from standard header files.
@@ -156,7 +155,6 @@ Lars' list
   of path (-> fix); does not accept "~" and "~user". Maybe implement
   former, latter requires reading passwd file (-> not!)
 - general expansion of user defined and environment vars in labels?
-- [Lucas] fix axis ranges, overwritten labels in demos
 - write or organise a portable version of snprintf(3) with a copyright
   compatible with the gnuplot copyright (ie. no GPL) (Apache?)
 - add more maintainer checks (eg. file permissions)
@@ -177,4 +175,8 @@ Ethan's List:
 - separate out the handling of junk, NaN, Inf, and missing data entries
 - you should be able to set a default style for arrows and labels
 - isosurfaces (3D contour of 4D data)
+- terminal-independent escape sequence to print a given Unicode character
+- fix emf text handling to match other terminals (vertical centering, enhanced)
+- javascript mousing support integrated with svg output
+- provide a unicode-compatible Type 1 font containing math symbols
 
