@@ -35,6 +35,7 @@ specfun.obj
 standard.obj
 stdfn.obj
 tables.obj
+tabulate.obj
 term.obj
 time.obj
 unset.obj

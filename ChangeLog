@@ -3,7 +3,7 @@
 	/config/makefile.ami /config/makefile.emx /config/makefile.g  
 	/config/makefile.msc /config/makefile.msw /config/makefile.mto
 	/config/makefile.st /config/makefile.tc /config/makefile.unx
-	/config/makefile.win /config/makefile.ztc:
+	/config/makefile.win /config/makefile.ztc src/gnuplot.opt:
 
 	Add tabulate.{c|o|obj} to dependencies.  
 	Pointed out by <mortenmacfly@users.sourceforge.net>
