@@ -1,3 +1,13 @@
+2007-11-19  Ethan A Merritt  <merritt@u.washington.edu>
+	* /config/buildvms.com /config/makefile.286 /config/makefile.amg
+	/config/makefile.ami /config/makefile.emx /config/makefile.g  
+	/config/makefile.msc /config/makefile.msw /config/makefile.mto
+	/config/makefile.st /config/makefile.tc /config/makefile.unx
+	/config/makefile.win /config/makefile.ztc:
+
+	Add tabulate.{c|o|obj} to dependencies.  
+	Pointed out by <mortenmacfly@users.sourceforge.net>
+
 2007-11-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (enhanced_recursion):  Do not allow the '}' character in a

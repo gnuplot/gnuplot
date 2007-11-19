@@ -1,5 +1,5 @@
 #
-# $Id: makefile.emx,v 1.5 2002/03/07 16:20:15 lhecking Exp $
+# $Id: makefile.emx,v 1.6 2007/10/16 21:19:44 sfeam Exp $
 #
 # GNUPLOT Makefile for use with emx-0.8f/gcc and ndmake 4.5 on MS-DOS
 #
@@ -26,7 +26,7 @@ OBJS = 	alloc.o binary.o bitmap.o command.o contour.o datafile.o dynarray.o \
 	eval.o fit.o graphics.o graph3d.o help.o hidden3d.o history.o \
 	internal.o interpol.o matrix.o misc.o parse.o plot.o plot2d.o \
 	plot3d.o readline.o save.o specfun.o scanner.o set.o show.o \
-	standard.o stdfn.o tables.o term.o time.o unset.o util.o util3d.o \
+	standard.o stdfn.o tables.o tabulate.o term.o time.o unset.o util.o util3d.o \
 	variable.o version.o
 
 CSOURCE5 = term\aed.trm term\cgi.trm term/dumb.trm term/dxf.trm term\dxy.trm \
@@ -72,6 +72,7 @@ emxlink.rsp: makefile.emx
 	echo show.o>> emxlink.rsp
 	echo standard.o>> emxlink.rsp
 	echo stdfn.o>> emxlink.rsp
+	echo tabulate.o>> emxlink.rsp
 	echo term.o>> emxlink.rsp
 	echo time.o>> emxlink.rsp
 	echo util.o>> emxlink.rsp

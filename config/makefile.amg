@@ -1,5 +1,5 @@
 #
-# $Id: makefile.amg,v 1.12 2007/01/16 23:11:54 sfeam Exp $
+# $Id: makefile.amg,v 1.13 2007/10/16 21:19:43 sfeam Exp $
 #
 # GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
@@ -122,7 +122,7 @@ OBJS = alloc.o amiga.o axis.o binary.o bitmap.o color.o command.o contour.o \
        datafile.o dynarray.o eval.o fit.o gadgets.o getcolor.o graph3d.o \
        graphics.o help.o hidden3d.o history.o internal.o interpol.o matrix.o \
        misc.o mouse.o parse.o plot.o plot2d.o plot3d.o pm3d.o save.o scanner.o \
-       set.o show.o specfun.o standard.o stdfn.o tables.o term.o time.o \
+       set.o show.o specfun.o standard.o stdfn.o tables.o tabulate.o term.o time.o \
        unset.o util.o util3d.o variable.o version.o
 
 CSOURCE1 = alloc.c bf_test.c binary.c bitmap.c command.c set.c show.c
@@ -308,6 +308,7 @@ standard.o: standard.c standard.h gadgets.h gp_time.h util.h syscfg.h eval.h \
 stdfn.o: stdfn.c stdfn.h syscfg.h 
 tables.o: tables.c tables.h command.h fit.h setshow.h term_api.h util.h \
 	syscfg.h gp_types.h stdfn.h gadgets.h color.h 
+tabulate.o: tabulate.c tabulate.h alloc.h axis.h graphics.h graph3d.h plot3d.h
 time.o: time.c gp_time.h util.h variable.h syscfg.h stdfn.h gp_types.h \
 	national.h 
 unset.o: unset.c setshow.h axis.h command.h contour.h datafile.h misc.h plot.h \

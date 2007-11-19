@@ -1,5 +1,5 @@
 #
-# $Id: makefile.st,v 1.5 1999/12/01 22:07:57 lhecking Exp $
+# $Id: makefile.st,v 1.6 2002/02/21 12:27:37 lhecking Exp $
 #
 # GNUPLOT Makefile for GCC-ST 1.x and 2.x
 # in a cross development environment (unix) or a native TOS environment
@@ -71,7 +71,7 @@ OBJS   = bitmap.o command.o contour.o eval.o graphics.o graph3d.o \
          plot.o readline.o scanner.o set.o show.o specfun.o \
          standard.o stdfn.o term.o util.o version.o binary.o fit.o \
          matrix.o alloc.o datafile.o plot2d.o plot3d.o interpol.o \
-         variable.o save.o unset.o time.o dynarray.o history.o
+         tabulate.o variable.o save.o unset.o time.o dynarray.o history.o
 
 # path prefix for the term subdirectory
 TERM=term$(SL)

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.win,v 1.14 2005/08/07 09:43:27 mikulik Exp $
+# $Id: makefile.win,v 1.15 2007/10/16 21:19:44 sfeam Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.1 Windows version
 # and Win32 using Borland C++ 4 (or 5? --- 4.52 is known to work)
@@ -105,7 +105,7 @@ OBJS =  alloc.obj axis.obj binary.obj bitmap.obj color.obj command.obj contour.o
 	dynarray.obj eval.obj fit.obj gadgets.obj getcolor.obj graphics.obj graph3d.obj help.obj \
 	hidden3d.obj history.obj internal.obj interpol.obj matrix.obj misc.obj mouse.obj parse.obj \
 	plot.obj plot2d.obj plot3d.obj pm3d.obj readline.obj save.obj scanner.obj \
-	set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj \
+	set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj tabulate.obj \
 	term.obj time.obj unset.obj util.obj util3d.obj variable.obj \
 	history.obj version.obj winmain.obj
 
@@ -245,6 +245,8 @@ standard.obj: standard.c plot.h
 stdfn.obj: stdfn.c stdfn.h
 
 interpol.obj: interpol.c plot.h setshow.h
+
+tabulate.obj: tabulate.c tabulate.h alloc.h axis.h graphics.h graph3d.h plot3d.h
 
 term.obj: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7) win\wgnuplib.h
 	$(BIN)$(CC) @&&!

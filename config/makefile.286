@@ -1,5 +1,5 @@
 #
-# $Id: makefile.286,v 1.5 1999/12/01 22:07:56 lhecking Exp $
+# $Id: makefile.286,v 1.6 2007/10/16 21:19:43 sfeam Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.x
 #   and Phar Lap LITE286 DOS extender
@@ -39,7 +39,7 @@ OBJ2 = dynarray.obj eval.obj fit.obj graph3d.obj graphics.obj help.obj
 OBJ3 = history.obj hidden3d.obj internal.obj interpol.obj matrix.obj misc.obj
 OBJ4 = parse.obj plot.obj plot2d.obj plot3d.obj readline.obj save.obj
 OBJ5 = scanner.obj set.obj show.obj specfun.obj standard.obj stdfn.obj
-OBJ6 = tables.obj term.obj time.obj unset.obj util.obj util3d.obj
+OBJ6 = tables.obj tabulate.obj term.obj time.obj unset.obj util.obj util3d.obj
 OBJ7 = variable.obj version.obj
 
 BGIFILES = cga.bgi egavga.bgi herc.bgi att.bgi

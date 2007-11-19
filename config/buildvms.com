@@ -150,7 +150,7 @@ alloc.obj,binary.obj,bitmap.obj,command.obj,contour.obj,dynarray.obj,-
 datafile.obj,eval.obj,fit.obj,graphics.obj,graph3d.obj,help.obj,hidden3d.obj,-
 history.obj,internal.obj,interpol.obj,matrix.obj,misc.obj,parse.obj,plot.obj,-
 plot2d.obj,plot3d.obj,save.obj,scanner.obj,set.obj,show.obj,specfun.obj,-
-standard.obj,stdfn.obj,tables.obj,term.obj,time.obj,util.obj,util3d.obj,-
+standard.obj,stdfn.obj,tables.obj,tabulate.obj,term.obj,time.obj,util.obj,util3d.obj,-
 unset.obj,variable.obj,version.obj,vms.obj'extralib''LINKOPT'
 $!
 $ cc 'CFLAGS' bf_test.c

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.7 2007/01/16 23:11:54 sfeam Exp $
+# $Id: makefile.unx,v 1.8 2007/10/16 21:19:44 sfeam Exp $
 #
 #
 ############################################################
@@ -440,7 +440,7 @@ DIRS = term demo docs docs/latextut
 CSOURCE1 = bf_test.c binary.c command.c set.c show.c
 CSOURCE2 = help.c graphics.c graph3d.c internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.o plot3d.o readline.c scanner.c standard.c stdfn.c
-CSOURCE4 = bitmap.c term.c time.c util.c version.c fit.c matrix.c variable.c
+CSOURCE4 = bitmap.c term.c time.c util.c version.c fit.c matrix.c variable.c tabulate.c
 CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm term/atariaes.trm term/atarivdi.trm \
 	term/cgi.trm term/corel.trm \
 	term/djsvga.trm term/dumb.trm \

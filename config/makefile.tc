@@ -1,5 +1,5 @@
 #
-# $Id: makefile.tc,v 1.8 2002/03/07 16:20:15 lhecking Exp $
+# $Id: makefile.tc,v 1.9 2007/10/16 21:19:44 sfeam Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.x
 #
@@ -96,7 +96,7 @@ OBJ2 = dynarray.obj eval.obj fit.obj graph3d.obj graphics.obj help.obj time.obj
 OBJ3 = hidden3d.obj internal.obj interpol.obj matrix.obj misc.obj parse.obj
 OBJ4 = plot.obj plot2d.obj plot3d.obj readline.obj save.obj scanner.obj
 OBJ5 = set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj term.obj
-OBJ6 = history.obj unset.obj util.obj util3d.obj variable.obj version.obj
+OBJ6 = history.obj unset.obj util.obj util3d.obj variable.obj version.obj tabulate.obj
 
 # uncomment svgaf.obj if you wish to include Super VGA support
 OBJBGI= cgaf.obj egavgaf.obj hercf.obj attf.obj pc3270f.obj svgaf.obj
@@ -211,6 +211,8 @@ standard.obj: standard.c plot.h
 stdfn.obj: stdfn.c stdfn.h
 
 interpol.obj: interpol.c plot.h setshow.h
+
+tabulate.obj: tabulate.c tabulate.h alloc.h axis.h graphics.h graph3d.h plot3d.h
 
 # the CSOURCE? dependencies are not up to date (but who cares)
 term.obj: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)

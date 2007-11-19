@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mto,v 1.4 1999/11/08 19:20:59 lhecking Exp $
+# $Id: makefile.mto,v 1.5 1999/12/01 22:07:57 lhecking Exp $
 #
 # GNUPLOT Makefile for GCC-ST 1.x and 2.x
 # in a cross development environment (unix) or a native TOS environment
@@ -76,15 +76,15 @@ OBJS   = bitmap.o command.o contour.o eval.o graphics.o graph3d.o \
          plot.o readline.o scanner.o set.o show.o specfun.o \
          standard.o stdfn.o term.o util.o version.o binary.o fit.o \
          matrix.o alloc.o datafile.o plot2d.o plot3d.o interpol.o \
-         variable.o save.o tables.o unset.o time.o dynarray.o history.o
+         variable.o save.o tables.o tabulate.o unset.o time.o dynarray.o history.o
 
 OBJS30 = bitmap.o0 command.o0 contour.o0 eval.o0 graphics.o0 graph3d.o0 \
          hidden3d.o0 util3d.o0 help.o0 internal.o0 misc.o0 parse.o0 \
          plot.o0 readline.o0 scanner.o0 set.o0 show.o0 specfun.o0 \
          standard.o0 stdfn.o0 term.o0 util.o0 version.o0 binary.o0 fit.o0 \
          matrix.o0 alloc.o0 datafile.o0 plot2d.o0 plot3d.o0 interpol.o0 \
-         variable.o0 save.o0 tables.o0 unset.o0 time.o0 dynarray.o0 \
-         hostory.o0
+         variable.o0 save.o0 tables.o0 tabulate.o0 unset.o0 time.o0 dynarray.o0 \
+         history.o0
 	
 # path prefix for the term subdirectory
 TERM  = term$(SL)
@@ -157,6 +157,7 @@ specfun.o:   plot.h specfun.c
 standard.o:  standard.c plot.h
 stdfn.o:     stdfn.c stdfn.h
 tables.o:    tables.c plot.h tables.h
+tabulate.o:  tabulate.c tabulate.h alloc.h axis.h graphics.h graph3d.h plot3d.h
 term.o:      term.c term.h plot.h set.c show.c bitmap.h $(TERMS)
 	        $(CC) -o $@ $(CFLAGS) $(TERMFLAGS) -Iterm term.c
 unset.o:     unset.c plot.h setshow.h tables.h

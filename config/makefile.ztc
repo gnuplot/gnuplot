@@ -1,5 +1,5 @@
 #
-# $Id: makefile.ztc,v 1.5 1999/12/01 22:07:58 lhecking Exp $
+# $Id: makefile.ztc,v 1.6 2007/10/16 21:19:44 sfeam Exp $
 #
 # GNUPLOT Makefile for Zortech C++ 3.x
 #
@@ -24,7 +24,7 @@ OBJ1 = alloc.obj binary.obj bitmap.obj command.obj contour.obj datafile.obj
 OBJ2 = dynarray.obj eval.obj fit.obj graph3d.obj graphics.obj help.obj
 OBJ3 = hidden3d.obj internal.obj interpol.obj matrix.obj misc.obj parse.obj
 OBJ4 = plot.obj plot2d.obj plot3d.obj readline.obj save.obj scanner.obj
-OBJ5 = set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj term.obj
+OBJ5 = set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj tabulate.obj term.obj
 OBJ6 = time.obj unset.obj util.obj util3d.obj variable.obj version.obj history.obj
 
 OBJS =	$(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5) $(OBJ6)
@@ -98,6 +98,8 @@ standard.obj: standard.c plot.h
 stdfn.obj: stdfn.c stdfn.h
 
 tables.obj: tables.c plot.h tables.h
+
+tabulate.obj: tabulate.c tabulate.h alloc.h axis.h graphics.h graph3d.h plot3d.h
 
 # the CSOURCE? dependencies are not up to date (but who cares)
 term.obj: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)

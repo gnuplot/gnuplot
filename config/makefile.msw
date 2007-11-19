@@ -1,5 +1,5 @@
 #
-# $Id: makefile.msw,v 1.5 1999/12/01 22:07:56 lhecking Exp $
+# $Id: makefile.msw,v 1.6 2007/10/16 21:19:44 sfeam Exp $
 #
 # GNUPLOT Makefile for Microsoft C  Version 7.0 Windows Version
 #  and Microsoft Program Maintenance Utility  Version 1.20
@@ -38,7 +38,7 @@ OBJS =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
 	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
 	stdfn.obj term.obj util.obj version.obj binary.obj winmain.obj \
 	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj variable.obj \
-	save.obj tables.obj unset.obj dynarray.obj time.obj history.obj
+	save.obj tables.obj tabulate.obj unset.obj dynarray.obj time.obj history.obj
 
 CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
@@ -138,6 +138,8 @@ specfun.obj: specfun.c plot.h
 interpol.obj: interpol.c plot.h setshow.h
 
 tables.obj: tables.c plot.h tables.h
+
+tabulate.obj: tabulate.c tabulate.h alloc.h axis.h graphics.h graph3d.h plot3d.h
 
 term.obj: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	cl $(CFLAGS) $(TERMFLAGS) /Iterm term.c
