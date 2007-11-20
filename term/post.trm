@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.218 2007/11/13 22:44:47 sfeam Exp $
+ * $Id: post.trm,v 1.219 2007/11/16 04:54:20 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -121,12 +121,14 @@ TERM_PUBLIC void ENHPS_OPEN __PROTO((char * fontname, double fontsize,
 			int overprint));
 TERM_PUBLIC void ENHPS_FLUSH __PROTO((void));
 TERM_PUBLIC void ENHPS_WRITEC __PROTO((int c));
-TERM_PUBLIC char *PS_RememberFont __PROTO((char *fname, int reencode));
+static void PS_RememberFont __PROTO((char *fname));
 
 TERM_PUBLIC char *PS_escape_string __PROTO((char *origstr, char *escapelist));
 
 TERM_PUBLIC void PS_path __PROTO((int p));
 static TBOOLEAN PS_newpath = FALSE;
+static TBOOLEAN ENHps_opened_string = FALSE;  /* try to cut out empty ()'s */
+
 
 #endif /* TERM_PROTO */
 
@@ -364,8 +366,8 @@ static char PS_default_font[MAX_ID_LEN+1] = {'H','e','l','v','e','t','i','c','a'
  * return an appropriate re-encode string
  */
 
-TERM_PUBLIC char *
-PS_RememberFont(char *fname, int can_reencode)
+static void
+PS_RememberFont(char *fname)
 {
     struct PS_FontName *fnp;
     char *recode = NULL;
@@ -376,10 +378,13 @@ PS_RememberFont(char *fname, int can_reencode)
 
     for (fnp = PS_DocFonts; fnp ; fnp = fnp->next)
 	if (strcmp(fnp->name, myfname) == 0)
-	    return NULL;
+	    return;
 
-    /* we did not find the name */
+    /* Ignore it if illegal characters will corrupt the PostScript syntax */
+    if (strpbrk(myfname, "{}[]() "))
+	return;
 
+    /* we have not seen this font before; store name and apply encoding */
     fnp = (struct PS_FontName *)gp_alloc(sizeof(struct PS_FontName),
 					 "PostScript Font record");
     fnp->name = gp_strdup(myfname);
@@ -420,11 +425,13 @@ PS_RememberFont(char *fname, int can_reencode)
 	break;
     }
 
-    if (can_reencode && recode) {
-	fprintf(gppsfile,"/(%s) %s", myfname, recode);
-	return NULL;
-    } else
-	return recode;
+    if (recode) {
+	if (ENHps_opened_string)
+	    ENHPS_FLUSH();
+	fprintf(gppsfile,"/%s %s", fnp->name, recode);
+    }
+
+    return;
 }
 
 char *
@@ -1022,8 +1029,16 @@ PS_options()
 			set_fontsize = TRUE;
 			*comma = '\0';
 		    }
-		    if (*s)
+		    if (*s) {
+			/* Filter out characters that would confuse PostScript */
+			if (strpbrk(s, "()[]{}| ")) {
+			    int_warn(c_token-1,"Illegal characters in PostScript font name.");
+			    int_warn(NO_CARET,"I will try to fix it but this may not work.");
+			    while (strpbrk(s, "()[]{}| "))
+				*(strpbrk(s, "()[]{}| ")) = '-';
+			}
 			strncpy(ps_params->font, s, sizeof(ps_params->font));
+		    }
 		    free(s);
 		} else
 		    int_error(c_token-1,
@@ -1419,7 +1434,7 @@ PS_load_fontfiles(TBOOLEAN doload)
     while (current_ps_fontfile) {
 	PS_load_fontfile(current_ps_fontfile,doload);
 	if (current_ps_fontfile->fontname)
-		PS_RememberFont(current_ps_fontfile->fontname, 1);
+		PS_RememberFont(current_ps_fontfile->fontname);
 	current_ps_fontfile = current_ps_fontfile->next;
     }
 }
@@ -1612,7 +1627,7 @@ end\n\
 
     if (uses_fonts) {
 	PS_load_fontfiles(TRUE);
-	PS_RememberFont(ps_params->font, 1);
+	PS_RememberFont(ps_params->font);
     }
 
     fputs("end\n%%EndProlog\n", gppsfile);
@@ -2060,7 +2075,7 @@ PS_set_font(const char *font)
     /* If TeX is doing the font handling, we don't need to */
     /* write anything into the postscript stream */
     if (ps_params->terminal == PSTERM_POSTSCRIPT) {
-	PS_RememberFont(name,1);
+	PS_RememberFont(name);
 	fprintf(gppsfile, "/%s findfont %g scalefont setfont\n",
 		name, size*PS_SC);
     }
@@ -2201,8 +2216,6 @@ PS_fillbox(
 
 /* ENHPOST */
 
-static TBOOLEAN ENHps_opened_string;  /* try to cut out empty ()'s */
-
 /*
  * close a postscript string if it has been opened
  */
@@ -2243,6 +2256,8 @@ ENHPS_OPEN(
 	    int safelen = strlen(fontname) + 40;
 	    free(ENHps_opensequence);
 	    ENHps_opensequence = gp_alloc(safelen,"ENHPS_opensequence");
+	    /* EAM November 2007 - moved here from enhanced_recursion() */
+	    PS_RememberFont(fontname);
 #ifdef HAVE_SNPRINTF
 	    snprintf(ENHps_opensequence, safelen, "[(%s) %.1f %.1f %s %s %d ",
 		    fontname, fontsize, base,
@@ -2342,7 +2357,7 @@ ENHPS_set_font(const char *font)
 	if (sep > 0) {
 	    strncpy(ps_enh_font,font,sep);
 	    ps_enh_font[sep] = NUL;
-	    PS_RememberFont(ps_enh_font, 1);
+	    PS_RememberFont(ps_enh_font);
 	}
 	ps_enh_fontsize = ps_fontsize;
 	sscanf (font+sep+1,"%f",&ps_enh_fontsize);

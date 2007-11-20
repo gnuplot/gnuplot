@@ -1,3 +1,11 @@
+2007-11-20  Ethan A Merritt  <merritt@u.washington.edu>
+	* term/post.trm (PS_options PS_RememberFont ENHPS_OPEN)
+	src/term.c (enhanced_recursion): Move the PostScript-specific
+	RememberFont() cruft out of enhanced_recursion() and into ENHPS_OPEN.
+	This both cleans up the generic enhanced recursion code and removes
+	code duplication.  Filter out blatently improper font names.
+	Bugs #1820912 #1833457
+
 2007-11-20  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_set_termvar): Fix typo in

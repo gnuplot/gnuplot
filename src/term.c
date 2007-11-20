@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.163 2007/10/11 18:51:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.164 2007/11/17 04:20:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2314,9 +2314,8 @@ fflush_binary()
  *
  * I bent over backwards to make the output of the revised code identical
  * to the output of the original postscript version.  That means there is
- * some cruft left in here (enhanced_max_height for one thing, and all
- * the code relating to RememberFont) that is probably irrelevant to any
- * new drivers using the code.
+ * some cruft left in here (enhanced_max_height for one thing) that is
+ * probably irrelevant to any new drivers using the code.
  *
  * Ethan A Merritt - November 2003
  */
@@ -2404,7 +2403,6 @@ enhanced_recursion(
 	    {
 		char *savepos = NULL, save = 0;
 		char *localfontname = fontname, ch;
-		int recode = 1;
 		float f = fontsize, ovp;
 
 		/*{{{  recurse (possibly with a new font) */
@@ -2427,7 +2425,6 @@ enhanced_recursion(
 		    while (*++p == ' ')
 			;       /* do nothing */
 		    if (*p=='-') {
-			recode = 0;
 			while (*++p == ' ')
 			    ;   /* do nothing */
 		    }
@@ -2470,21 +2467,8 @@ enhanced_recursion(
 
 		    while (*p == ' ')
 			++p;
-		    if (! *localfontname) {
+		    if (! *localfontname)
 			localfontname = fontname;
-#ifdef POSTSCRIPT_DRIVER
-		    } else if (!strncmp("postscript",term->name,9)) {
-			/* FIXME - This cruft is left over from when the code */
-			/* was part of post.trm.  No one else needs it!       */
-			char *recodestring = (PS_RememberFont)(localfontname,
-				                 recode && !ENHps_opened_string);
-			if (recode && recodestring) {
-			    (term->enhanced_flush)();
-			    fprintf(gpoutfile, "/%s %s",
-				    localfontname, recodestring);
-			}
-#endif
-		    }
 		}
 		/*}}}*/
 
