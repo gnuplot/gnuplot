@@ -1,3 +1,9 @@
+2007-11-20  Christos Gourdoupis  <achaios@users.sourceforge.net>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_get_encoding):
+	Allow "set encoding utf8" to override whatever the environment claims.
+	Bug #1834525
+
 2007-11-19  Ethan A Merritt  <merritt@u.washington.edu>
 	* /config/buildvms.com /config/makefile.286 /config/makefile.amg
 	/config/makefile.ami /config/makefile.emx /config/makefile.g  
