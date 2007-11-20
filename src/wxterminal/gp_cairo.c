@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.31 2007/11/04 22:56:31 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.32 2007/11/20 19:23:38 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1660,7 +1660,7 @@ void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
 	tmp_v_char = (int) ceil( (double) logical_rect.height/PANGO_SCALE) - 1;
 	tmp_h_char = (int) ceil( (double) logical_rect.width/(10*PANGO_SCALE));
 	tmp_v_tic = tmp_v_char/2.5;
-	tmp_h_tic = tmp_h_char/2.5;
+	tmp_h_tic = tmp_v_char/2.5;
 
 	if (v_char)
 		*v_char = tmp_v_char;

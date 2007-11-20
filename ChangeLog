@@ -1,3 +1,8 @@
+2007-11-20  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_set_termvar): Fix typo in
+	commit dated 2007-11-04.
+
 2007-11-20  Christos Gourdoupis  <achaios@users.sourceforge.net>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_get_encoding):
@@ -126,7 +131,7 @@
 	src/wxterminal/gp_cairo.c
 	src/wxterminal/wxt_gui.cpp
 	term/cairo.trm:
-	Do not use the global "term" pointer, but pass valued by address.
+	Do not use the global "term" pointer, but pass values by addresses.
 
 2007-10-31  Ethan Merritt  <merritt@u.washington.edu>
 
