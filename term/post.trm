@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.203.2.7 2007/06/07 18:49:29 sfeam Exp $
+ * $Id: post.trm,v 1.203.2.8 2007/10/26 21:34:09 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -408,7 +408,7 @@ PS_RememberFont(char *fname, int can_reencode)
     }
 
     if (can_reencode && recode) {
-	fprintf(gppsfile,"/(%s) %s", myfname, recode);
+	fprintf(gppsfile,"/%s %s", myfname, recode);
 	return NULL;
     } else
 	return recode;
