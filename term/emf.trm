@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.41 2006/07/28 22:47:58 sfeam Exp $
+ * $Id: emf.trm,v 1.42 2006/08/04 20:31:56 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -814,7 +814,6 @@ EMF_filled_polygon(int points, gpiPoint *corners)
 	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 
     /* Force re-evaluation of linetype next time we draw a line */
-    emf_color = color;
     emf_linetype = LT_UNDEFINED;
     emf_dashtype = LT_UNDEFINED;
 }

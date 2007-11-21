@@ -1,3 +1,8 @@
+2007-11-21  Allin Cottrell <cottrell@wfu.edu>
+
+	* term/emf.trm (EMF_filled_polygon): Do not alter original color
+	when processing filled areas with opacity < 1.0
+
 2007-11-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (RememberFont): Revert patch of 2007-10-23
