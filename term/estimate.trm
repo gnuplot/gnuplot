@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: estimate.trm,v 1.4 2006/05/22 13:01:51 lhecking Exp $
+ * $Id: estimate.trm,v 1.5 2007/02/27 05:06:41 sfeam Exp $
  *
  */
 
@@ -90,7 +90,7 @@ ENHest_OPEN(
 TERM_PUBLIC void
 ENHest_FLUSH()
 {
-    int len = ENHest_fragment_width;
+    double len = ENHest_fragment_width;
 
     if (ENHest_opened_string) {
 	ENHest_fragment_width = 0;
@@ -138,6 +138,8 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
 	    break; /* end of string */
     }
 
+    if (ENHest_x > 0.0 && ENHest_x < 1.0)
+	ENHest_x = 1;
     term->xmax = ENHest_x;
     term->ymax = 10. * (ENHest_max_height - ENHest_min_height) + 0.5;
 }
