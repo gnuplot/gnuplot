@@ -1,3 +1,7 @@
+2007-11-22  Morten MacFly  <mortenmacfly@users.sourceforge.net>
+
+	* config/config.nt: #define vsnprintf
+
 2007-11-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/estimate.trm: Never return a zero size estimate for a 

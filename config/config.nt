@@ -525,6 +525,7 @@
 #define GP_EXCEPTION_NAME _exception
 #define GP_MATHERR _matherr
 #define snprintf _snprintf
+#define vsnprintf _vsnprintf
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1
