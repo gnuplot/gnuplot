@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.56.2.1 2006/11/18 17:27:02 sfeam Exp $
+ * $Id: fig.trm,v 1.56.2.2 2006/11/19 22:24:01 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1025,6 +1025,8 @@ FIG_boxfill(
     int pen_color, fill_color, fill_style, fill_dens;
 
     FIG_poly_clean(FIG_polyvec_stat);
+
+    FIG_line.pen_color = FIG_color;
 
     switch( style & 0xf ) {
     case FS_SOLID:

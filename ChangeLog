@@ -1,3 +1,8 @@
+2007-11-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/fig.trm (FIG_boxfill):  Update current color before drawing.
+	Bug #1837187
+
 2007-11-22  Morten MacFly  <mortenmacfly@users.sourceforge.net>
 
 	* config/config.nt: #define vsnprintf
