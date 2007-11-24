@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.460 2007/11/14 01:41:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.461 2007/11/14 18:57:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7917,8 +7917,9 @@ Ffigure_mapcontours
        set locale {"<locale>"}
 
  <locale> may be any language designation acceptable to your installation.
- See your system documentation for the available options.  The default value
- is determined from the LC_TIME, LC_ALL, or LANG environment variables.
+ See your system documentation for the available options.  The command
+ `set locale ""` will try to determine the locale from the LC_TIME, LC_ALL,
+ or LANG environment variables.
 
  To change the decimal point locale, see `set decimalsign`.
  To change the character encoding to the current locale, see `set encoding`.

@@ -1,3 +1,9 @@
+2007-11-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/variable.c (locale_handler):  Set the character encoding during
+	initialization (LC_CTYPE).  This was happening anyway for interactive
+	sessions using libreadline, and for default terminal type wxt.
+
 2007-11-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/fig.trm (FIG_boxfill):  Update current color before drawing.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.28 2007/04/07 22:31:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.29 2007/05/10 22:49:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -549,9 +549,12 @@ locale_handler(int action, char *newlocale)
     case ACTION_INIT:
 	if (current_locale) free(current_locale);
 	current_locale = gp_strdup(INITIAL_LOCALE);
+#ifdef HAVE_LOCALE_H
+	setlocale(LC_CTYPE, "");
+#endif
 	break;
+
     case ACTION_SET:
-/* FIXME: configure test for setlocale() */
 #ifdef HAVE_LOCALE_H
 	if (setlocale(LC_TIME, newlocale)) {
 	    current_locale = gp_realloc(current_locale, strlen(newlocale) + 1, "locale");
