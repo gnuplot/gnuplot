@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.32 2007/11/20 19:23:38 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.33 2007/11/20 22:02:02 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -623,9 +623,12 @@ gchar * gp_cairo_convert(plot_struct *plot, const char* string)
 	const char *charset = NULL;
 	gchar * string_utf8;
 
-	charset = gp_cairo_get_encoding(plot);
-
-	string_utf8 = g_convert(string, -1, "UTF-8", charset, &bytes_read, NULL, &error);
+	if (g_utf8_validate(string, -1, NULL)) {
+	    string_utf8 = g_strdup(string);
+	} else {
+	    charset = gp_cairo_get_encoding(plot);
+	    string_utf8 = g_convert(string, -1, "UTF-8", charset, &bytes_read, NULL, &error);
+	}
 
 	/* handle error case */
 	if (error != NULL) {

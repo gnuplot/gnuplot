@@ -1,3 +1,8 @@
+2007-11-24  Allin Cottrell <cottrell@wfu.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_convert): Test input for validity
+	as a UTF-8 string. If it is already UTF-8, don't try to convert it.
+
 2007-11-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/variable.c (locale_handler):  Set the character encoding during
