@@ -1,3 +1,8 @@
+2007-11-25  Vladimir  <qva@users.sourceforge.net>
+
+	* term/svg.trm (SVG_init): Correct encoding names to koi8-r, koi8-u.
+	Bug #1838066
+
 2007-11-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/fig.trm (FIG_boxfill):  Update current color before drawing.
@@ -7,7 +12,7 @@
 
 	* config/config.nt: #define vsnprintf
 
-2007-11-21  Allin Cottrell <cottrell@wfu.edu>
+2007-11-21  Allin Cottrell  <cottrell@wfu.edu>
 
 	* term/emf.trm (EMF_filled_polygon): Do not alter original color
 	when processing filled areas with opacity < 1.0
