@@ -1,5 +1,13 @@
 
-New features, changes and fixes in gnuplot version 4.2.1
+New features, changes and fixes in gnuplot version 4.2.3
+===========================================================
+* FIX minitics in log scale
+* FIX tweak installation scripts for OSX, nt
+* FIX minor bugfixes to terminals fig, emf, post, svg
+* FIX never estimate zero size for a non-empty string
+* CHANGE Remove limitation of 10 args max to internal function sprintf()
+
+New features, changes and fixes in gnuplot version 4.2.2
 ===========================================================
 * NEW allow extra column in 2D plots containing color information
 * NEW set term latex {size XX,YY}
