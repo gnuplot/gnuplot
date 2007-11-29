@@ -4,17 +4,12 @@ AUTOMAKE_OPTIONS = foreign 1.2h
 EXTRA_DIST = README Makefile.am.in driver.h impcodes.h \
 object.h post.h $(CORETERM) PostScript
 
-# List of terminal drivers; must be created
-# prior to running automake
+postscriptdir = $(pkgdatadir)/$(VERSION_MAJOR)/PostScript
+
+# List of terminal drivers, and list of postscript installation files
+# must be created prior to running automake
 ##trm-files-begin
 ##trm-files-end
-
-postscriptdir = $(pkgdatadir)/$(VERSION_MAJOR)/PostScript
-postscript_DATA = PostScript/8859-15.ps PostScript/8859-1.ps\
-	PostScript/8859-2.ps PostScript/cp1250.ps PostScript/cp437.ps\
-	PostScript/cp850.ps PostScript/cp852.ps PostScript/koi8r.ps PostScript/koi8u.ps\
-	PostScript/prologue.ps\
-	PostScript/aglfn.txt
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t
@@ -22,6 +17,10 @@ Makefile.am: Makefile.am.in
 	echo CORETERM = *.trm | fmt | (tr '\012' @; echo) \
 	  |sed 's/@$$/%/;s/@/ \\@/g' | tr @% '\012 ' \
 	  >> $@t
+	echo '#' >> $@t
+	echo postscript_DATA = PostScript/*.ps PostScript/*.txt | fmt \
+	  | (tr '\012' @; echo) |sed 's/@$$/%/;s/@/ \\@/g' \
+	  | tr @% '\012 ' >> $@t
 	sed -n '/^##trm-files-end/,$$p' Makefile.am.in >> $@t
 	chmod a-w $@t
 	mv $@t $@

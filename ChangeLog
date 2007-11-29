@@ -1,3 +1,8 @@
+2007-11-29  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* term/Makefile.am.in: Generate postscript_DATA from .ps and .txt
+	files in PostScript subdir.
+
 2007-11-25  Vladimir  <qva@users.sourceforge.net>
 
 	* term/svg.trm (SVG_init): Correct encoding names to koi8-r, koi8-u.
