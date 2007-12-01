@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.34 2007/02/27 05:06:41 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.35 2007/05/09 00:19:10 sfeam Exp $
  *
  */
 
@@ -307,6 +307,9 @@ AQUA_convert_using_encoding(const char *string)
     break;
   case S_ENC_ISO8859_2:
     currentEncoding = NSISOLatin2StringEncoding;
+    break;
+  case S_ENC_ISO8859_9:
+    currentEncoding = NSISOLatin5StringEncoding;
     break;
   case S_ENC_CP1250:
     currentEncoding = NSWindowsCP1250StringEncoding;

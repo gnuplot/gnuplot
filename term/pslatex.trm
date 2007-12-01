@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.69 2006/07/28 04:41:05 sfeam Exp $
+ * $Id: pslatex.trm,v 1.70 2007/10/31 17:31:20 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -440,6 +440,9 @@ EPSLATEX_common_init()
             break;
         case S_ENC_ISO8859_2:
             inputenc = "latin2";
+            break;
+        case S_ENC_ISO8859_9:	/* ISO8859-9 is Latin5 */
+            inputenc = "latin5";
             break;
         case S_ENC_ISO8859_15:	/* ISO8859-15 is Latin9 */
             inputenc = "latin9";

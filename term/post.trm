@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.219 2007/11/16 04:54:20 sfeam Exp $
+ * $Id: post.trm,v 1.220 2007/11/21 05:05:19 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -398,6 +398,9 @@ PS_RememberFont(char *fname)
 	break;
     case S_ENC_ISO8859_2:
 	recode = "reencodeISO2 def\n";
+	break;
+    case S_ENC_ISO8859_9: /* ISO8859-9 is Latin5 */
+	recode = "reencodeISO9 def\n";
 	break;
     case S_ENC_ISO8859_15: /* ISO8859-15 is Latin9 */
 	recode = "reencodeISO15 def\n";
@@ -1596,6 +1599,7 @@ end\n\
 	switch (encoding) {
 	    case S_ENC_ISO8859_1:   PS_dump_prologue_file("8859-1.ps"); break;
 	    case S_ENC_ISO8859_2:   PS_dump_prologue_file("8859-2.ps"); break;
+	    case S_ENC_ISO8859_9:   PS_dump_prologue_file("8859-9.ps"); break;
 	    case S_ENC_ISO8859_15:  PS_dump_prologue_file("8859-15.ps"); break;
 	    case S_ENC_CP437:	    PS_dump_prologue_file("cp437.ps"); break;
 	    case S_ENC_CP850:	    PS_dump_prologue_file("cp850.ps"); break;
@@ -3371,6 +3375,8 @@ PS_open_prologue_file(char *name)
 		dump = prologue_8859_1_ps;
 	else if (!strcmp(name,"8859-2.ps"))
 		dump = prologue_8859_2_ps;
+	else if (!strcmp(name,"8859-9.ps"))
+		dump = prologue_8859_9_ps;
 	else if (!strcmp(name,"cp1250.ps"))
 		dump = prologue_cp1250_ps;
 	else if (!strcmp(name,"cp437.ps"))

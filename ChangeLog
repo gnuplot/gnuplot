@@ -1,3 +1,9 @@
+2007-12-01  Allin Cottrell  <cottrell@wfu.edu>
+
+	* src/set.c src/term_api.h src/term.c docs/gnuplot.doc
+	term/aquaterm.trm  term/post.trm term/pslatex.trm term/svg.trm
+	term/PostScript/8859-9.ps:  Add encoding ISO_8859_9 (Latin5).
+
 2007-12-01  Thomas Orgis  <sobukus@users.sourceforge.net>
 
 	* src/gplt_x11.c (process_configure_notify_event):  Test for failure of

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.461 2007/11/14 18:57:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.462 2007/11/24 21:26:01 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6891,8 +6891,9 @@ Ffigure_mapcontours
     iso_8859_1  - the most common Western European encoding used by many
                   Unix workstations and by MS-Windows. This encoding is
                   known in the PostScript world as 'ISO-Latin1'.
-    iso_8859_2  - used in Central and Eastern Europe
     iso_8859_15 - a variant of iso_8859_1 that includes the Euro symbol
+    iso_8859_2  - used in Central and Eastern Europe
+    iso_8859_9  - used in Turkey (also known as Latin5)
     koi8r       - popular Unix cyrillic encoding
     koi8u       - ukrainian Unix cyrillic encoding
     cp437       - codepage for MS-DOS
