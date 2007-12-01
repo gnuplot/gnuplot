@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.165 2007/11/21 05:05:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.166 2007/12/02 01:48:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2461,6 +2461,9 @@ enhanced_recursion(
 
 			ENH_DEBUG(("Font size %.1f\n", f));
 			/*}}}*/
+		    } else if (ch == '}') {
+			int_warn(NO_CARET,"bad syntax in enhanced text string");
+			*p++ = '\0';
 		    } else {
 			*p++ = '\0';
 			f = fontsize;

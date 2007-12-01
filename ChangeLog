@@ -1,3 +1,8 @@
+2007-12-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (enhanced_recursion):  Give a warning if the 
+	enhanced text mode parser encounters an error.
+
 2007-12-01  Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/set.c src/term_api.h src/term.c docs/gnuplot.doc
