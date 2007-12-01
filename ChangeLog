@@ -1,3 +1,10 @@
+2007-12-01  Thomas Orgis  <sobukus@users.sourceforge.net>
+
+	* src/gplt_x11.c (process_configure_notify_event):  Test for failure of
+	window resize, and do not loop indefinitely trying to resize. Fixes
+	infinite loop problem on ion and fluxbox window managers.
+	Bug #1836959 #1614928
+
 2007-12-25  Johannes Zellner  <johannes@zellner.org>
 
 	* term/emf.trm: implemented pm3d and point types according to the

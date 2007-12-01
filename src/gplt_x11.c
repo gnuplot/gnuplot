@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.3 2007/01/14 18:33:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.4 2007/05/16 18:47:16 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -4220,6 +4220,7 @@ static void
 process_configure_notify_event(XEvent *event)
 {
     plot_struct *plot;
+    int force_redraw = 0;
 
     /* Filter down to the last ConfigureNotify event */
     XSync(dpy, False);
@@ -4251,24 +4252,26 @@ process_configure_notify_event(XEvent *event)
 	     * ourselves: */
 	    if (w == plot->width
 	    && (h == plot->gheight || h == plot->gheight + vchar)) {
-		/* most likely, it's a resize for showing/hiding
-		 * the status line: test whether the height is now
-		 * correct; if not, start another resize: */
+		/* most likely, it's a resize for showing/hiding the status line.
+		 * Test whether the height is now correct; if not, start another resize. */
+		plot->resizing = FALSE;
 		if (w == plot->width
 		&& h == plot->gheight + (plot->str[0] ? vchar : 0)) {
-		    plot->resizing = FALSE;
+			/* Was successful, status line can be drawn without rescaling plot. */
+			plot->height = h;
+			return;
 		} else {
-		    XResizeWindow(dpy, plot->window, plot->width,
-				plot->gheight + (plot->str[0] ? vchar : 0));
+			/* Possibly, a resize attempt _failed_ because window manager denied it.
+			   Resizing again goes into a vicious endless loop!
+			   (Seen with fluxbox-1.0.0 and a tab group of gnuplot windows.) */
+			/* Instead of just appending the status line, redraw/scale the plot. */
+			force_redraw = TRUE;
 		}
-		plot->height = h;
-		return;
-		}
-	    plot->resizing = FALSE;
+	    }
 	}
 #endif
 
-	if (w > 1 && h > 1 && (w != plot->width || h != plot->height)) {
+	if (w > 1 && h > 1 && (force_redraw || w != plot->width || h != plot->height)) {
 
 	    plot->width = w;
 	    plot->height = h;
