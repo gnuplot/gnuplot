@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.107 2007/10/16 21:03:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.108 2007/10/28 05:48:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1724,8 +1724,6 @@ reset_command()
     unset_margin(&rmargin);
     unset_margin(&tmargin);
     unset_pointsize();
-    unset_encoding();
-    unset_decimalsign();
     pm3d_reset();
     reset_colorbox();
     reset_palette();
@@ -1742,7 +1740,13 @@ reset_command()
     free(df_commentschars);
     df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
 
+#if 0
+    /* 'reset' is documented as only affecting the graphics state. */
+    /* 01-Dec-2007: Don't reset things related to locale. */
+    unset_encoding();
+    unset_decimalsign();
     unset_locale();
+#endif
 #if 0
     /* 2003-18-04: Don't reset non-graphics settings, like set term, out,
      * loadpath and fontpath. */

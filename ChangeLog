@@ -1,7 +1,11 @@
 2007-12-01  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/term.c (enhanced_recursion):  Give a warning if the 
-	enhanced text mode parser encounters an error.
+	* src/term.c (enhanced_recursion):  Give a warning if the enhanced text
+	mode parser encounters an error.
+
+	* src/unset.c (reset_command) docs/gnuplot.doc:  The `reset` command is
+	documented to affect only the graphics output state.  Do not reset user
+	interactions settings (locale, encoding, decimalsign).
 
 2007-12-01  Allin Cottrell  <cottrell@wfu.edu>
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.462 2007/11/24 21:26:01 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.463 2007/12/02 01:48:14 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5714,8 +5714,9 @@ Ffigure_mapcontours
  command file.  Please refer to the `set` command to see the default values
  that the various options take.
 
- The values of `set term`, `set output`, `set loadpath`, and `set fontpath` are
- not altered by the `reset` command.
+ The following are _not_ affected by `reset`.
+      `set term` `set output` `set loadpath` `set fontpath`
+      `set encoding` `set decimalsign` `set locale`
 
 =error state
  `reset errors` clears only the error state variables GPVAL_ERRNO and
