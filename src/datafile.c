@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.127 2007/08/31 20:03:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.128 2007/09/02 03:41:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1157,47 +1157,47 @@ df_open(const char *cmd_filename, int max_using)
 #endif
 	    fast_columns = 0;
 	    continue;
-    }
+	}
 
 	/* deal with index */
-    if (almost_equals(c_token, "i$ndex")) {
+	if (almost_equals(c_token, "i$ndex")) {
 	    if (set_index) { duplication=TRUE; break; }
-	plot_option_index();
+	    plot_option_index();
 	    set_index = TRUE;
 	    continue;
-    }
+        }
 
 	/* deal with every */
-    if (almost_equals(c_token, "ev$ery")) {
+        if (almost_equals(c_token, "ev$ery")) {
 	    if (set_every) { duplication=TRUE; break; }
-	plot_option_every();
+	    plot_option_every();
 	    set_every = TRUE;
 	    continue;
-    }
+	}
 
 	/* deal with thru */
-    /* jev -- support for passing data from file thru user function */
-    if (almost_equals(c_token, "thru$")) {
+	/* jev -- support for passing data from file thru user function */
+	if (almost_equals(c_token, "thru$")) {
 	    if (set_thru) { duplication=TRUE; break; }
-	plot_option_thru();
+	    plot_option_thru();
 	    set_thru = TRUE;
 	    continue;
-    }
+	}
 
 	/* deal with using */
-    if (almost_equals(c_token, "u$sing")) {
+	if (almost_equals(c_token, "u$sing")) {
 	    if (set_using) { duplication=TRUE; break; }
-	plot_option_using(max_using);
+	    plot_option_using(max_using);
 	    set_using = TRUE;
 	    continue;
-    }
+	}
 
 	/* deal with volatile */
-    if (almost_equals(c_token, "volatile")) {
+	if (almost_equals(c_token, "volatile")) {
 	    c_token++;
 	    volatile_data = TRUE;
 	    continue;
-    }
+	}
 
 #ifdef EAM_DATASTRINGS
 	/* Take key title from column head? */
