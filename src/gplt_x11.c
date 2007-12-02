@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.181 2007/09/27 18:14:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.182 2007/12/01 22:39:43 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -245,6 +245,9 @@ typedef struct cmap_struct {
 /* information about one window/plot */
 typedef struct plot_struct {
     Window window;
+#ifdef EXTERNAL_X11_WINDOW
+    Window external_container;
+#endif
     Pixmap pixmap;
     unsigned int posn_flags;
     int x, y;
@@ -311,6 +314,7 @@ static plot_struct *Find_Plot_In_Linked_List_By_Window __PROTO((Window));
 static plot_struct *Find_Plot_In_Linked_List_By_CMap __PROTO((cmap_t *));
 
 static struct plot_struct *current_plot = NULL;
+static int most_recent_plot_number = 0;
 static struct plot_struct *plot_list_start = NULL;
 
 static void x11_setfill __PROTO((GC *gc, int style));
@@ -409,7 +413,7 @@ char byteswap_char;
 #endif
 
 static void store_command __PROTO((char *, plot_struct *));
-static void prepare_plot __PROTO((plot_struct *, int));
+static void prepare_plot __PROTO((plot_struct *));
 static void delete_plot __PROTO((plot_struct *));
 
 static int record __PROTO((void));
@@ -461,7 +465,6 @@ static void pr_geometry __PROTO((void));
 static void pr_pointsize __PROTO((void));
 static void pr_width __PROTO((void));
 static void pr_window __PROTO((plot_struct *));
-static void ProcessEvents __PROTO((Window));
 static void pr_raise __PROTO((void));
 static void pr_persist __PROTO((void));
 static void pr_feedback __PROTO((void));
@@ -1071,7 +1074,7 @@ delete_plot(plot_struct *plot)
 
 /* prepare the plot structure */
 static void
-prepare_plot(plot_struct *plot, int term_number)
+prepare_plot(plot_struct *plot)
 {
     int i;
 
@@ -1329,7 +1332,10 @@ scan_palette_from_buf(void)
 /*
  * record - record new plot from gnuplot inboard X11 driver (Unix)
  */
-static struct plot_struct *plot = NULL;
+/* Would like to change "plot" in this function to "current_plot".
+ * "plot" is somewhat general, as though it were a local variable.
+ * However, do a redefinition for now. */
+#define plot current_plot
 static int
 record()
 {
@@ -1343,22 +1349,17 @@ record()
 	switch (*buf) {
 	case 'G':		/* enter graphics mode */
 	    {
-		int plot_number;
-#ifndef USE_MOUSE
-		sscanf(buf, "G%d", &plot_number);
-#else
+#ifdef USE_MOUSE
 #ifdef OS2_IPC
-		sscanf(buf, "G%d %lu %li", &plot_number, &gnuplotXID, &ppidGnu);
+		sscanf(buf, "G%lu %li", &gnuplotXID, &ppidGnu);
 #else
-		sscanf(buf, "G%d %lu", &plot_number, &gnuplotXID);
+		sscanf(buf, "G%lu", &gnuplotXID);
 #endif
 #endif
-		FPRINTF((stderr, "plot for window number %d\n", plot_number));
-		if (!(plot = Find_Plot_In_Linked_List_By_Number(plot_number)))
-		    plot = Add_Plot_To_Linked_List(plot_number);
-		if (plot)
-		    prepare_plot(plot, plot_number);
-		current_plot = plot;
+		if (!current_plot)
+		    current_plot = Add_Plot_To_Linked_List(most_recent_plot_number);
+		if (current_plot)
+		    prepare_plot(current_plot);
 #ifdef OS2_IPC
 		if (!input_from_PM_Terminal) {	/* get shared memory */
 		    sprintf(mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input", (int) ppidGnu);
@@ -1375,19 +1376,17 @@ record()
 		 * string is reset to the default at the end of
 		 * display(). We should make this configurable!
 		 */
-		if (plot) {
-		    if (plot->window) {
-			char *msg;
-			char *added_text = " drawing ...";
-			int orig_len = (plot->titlestring ? strlen(plot->titlestring) : 0);
-			if (msg = (char *) malloc(orig_len + strlen(added_text) + 1)) {
-			    strcpy(msg, plot->titlestring);
-			    strcat(msg, added_text);
-			    XStoreName(dpy, plot->window, msg);
-			    free(msg);
-			} else
-			    XStoreName(dpy, plot->window, added_text + 1);
-		    }
+		if (plot && plot->window) {
+		    char *msg;
+		    char *added_text = " drawing ...";
+		    int orig_len = (plot->titlestring ? strlen(plot->titlestring) : 0);
+		    if (msg = (char *) malloc(orig_len + strlen(added_text) + 1)) {
+			strcpy(msg, plot->titlestring);
+			strcat(msg, added_text);
+			XStoreName(dpy, plot->window, msg);
+			free(msg);
+		    } else
+			XStoreName(dpy, plot->window, added_text + 1);
 		}
 #else
 		if (!button_pressed) {
@@ -1405,20 +1404,47 @@ record()
 	case 'N':		/* just update the plot number */
 	    {
 		int itmp;
-		if (strcspn(buf+1, " \n") && sscanf(buf, "N%d", &itmp))
-		    current_plot = Add_Plot_To_Linked_List(itmp);
+		if (strcspn(buf+1, " \n") && sscanf(buf, "N%d", &itmp)) {
+		    if (itmp >= 0) {
+			most_recent_plot_number = itmp;
+			current_plot = Add_Plot_To_Linked_List(itmp);
+		    }
+		}
 		return 1;
 	    }
 	    break;
+#ifdef EXTERNAL_X11_WINDOW
+	case X11_GR_SET_WINDOW_ID:	/* X11 window ID */
+	    {
+		unsigned long ultmp;
+		if (strcspn(buf+1," \n") && sscanf(buf+1, "%lx", &ultmp)) {
+		    Window window_id = (Window) ultmp;
+		    plot_struct *tmpplot = Find_Plot_In_Linked_List_By_Window(window_id);
+		    if (tmpplot) {
+			current_plot = tmpplot;
+			most_recent_plot_number = tmpplot->plot_number;
+		    }
+		    else {
+			current_plot = Add_Plot_To_Linked_List(-1); /* Use invalid plot number. */
+			if (current_plot) {
+			    current_plot->external_container = window_id;
+			    prepare_plot(current_plot);
+			}
+		    }
+		}
+		return 1;
+	    }
+	    break;
+#endif
 	case 'C':		/* close the plot with given number */
 	    {
 		int itmp;
 		if (strcspn(buf+1, " \n") && sscanf(buf, "C%d", &itmp)) {
-		  plot_struct *psp;
-		  if ((psp = Find_Plot_In_Linked_List_By_Number(itmp)))
-		    Remove_Plot_From_Linked_List(psp->window);
+		    plot_struct *psp;
+		    if ((psp = Find_Plot_In_Linked_List_By_Number(itmp)))
+			Remove_Plot_From_Linked_List(psp->window);
 		} else if (current_plot) {
-		  Remove_Plot_From_Linked_List(current_plot->window);
+		    Remove_Plot_From_Linked_List(current_plot->window);
 		}
 		return 1;
 	    }
@@ -1467,7 +1493,7 @@ record()
 	case 'n':		/* update the plot name (title) */
 	    {
 		if (!current_plot)
-		    current_plot = Add_Plot_To_Linked_List(0);
+		    current_plot = Add_Plot_To_Linked_List(most_recent_plot_number);
 		if (current_plot) {
 		    char *cp;
 		    if (current_plot->titlestring)
@@ -1487,7 +1513,7 @@ record()
 	    if (plot)
 		display(plot);
 #ifdef USE_MOUSE
-	    if (plot == current_plot)
+	    if (current_plot)
 		gp_exec_event(GE_plotdone, 0, 0, 0, 0, 0);	/* notify main program */
 #endif
 	    return 1;
@@ -1738,6 +1764,7 @@ record()
     else
 	return 1;
 }
+#undef plot
 
 #else /* VMS */
 
@@ -1757,12 +1784,10 @@ record()
     switch (*buf) {
     case 'G':			/* enter graphics mode */
 	{
-	    int plot_number = atoi(buf + 1);	/* 0 if none specified */
-	    FPRINTF((stderr, "plot for window number %d\n", plot_number));
-	    if (!(plot = Find_Plot_In_Linked_List_By_Number(plot_number)))
-		plot = Add_Plot_To_Linked_List(plot_number);
+	    if (!plot)
+		plot = Add_Plot_To_Linked_List(most_recent_plot_number);
 	    if (plot)
-		prepare_plot(plot, plot_number);
+		prepare_plot(plot);
 	    current_plot = plot;
 	    break;
 	}
@@ -3970,6 +3995,13 @@ DisplayCoords(plot_struct * plot, const char *s)
 	if (plot->height > plot->gheight) {
 	    /* and window has space for text? then make it smaller, unless we're already doing a resize: */
 	    if (!plot->resizing) {
+#ifdef EXTERNAL_X11_WINDOW
+		if (plot->external_container != None) {
+		    plot->gheight = plot->height;
+		    display(plot);
+		}
+		else
+#endif
 		XResizeWindow(dpy, plot->window, plot->width, plot->gheight);
 		plot->resizing = TRUE;
 	    }
@@ -3979,6 +4011,12 @@ DisplayCoords(plot_struct * plot, const char *s)
 	if (plot->height == plot->gheight) {
 	    /* window not large enough? then make it larger, unless we're already doing a resize: */
 	    if (!plot->resizing) {
+#ifdef EXTERNAL_X11_WINDOW
+		if (plot->external_container != None) {
+		    plot->gheight = plot->height - vchar;
+		    display(plot);
+		} else
+#endif
 		XResizeWindow(dpy, plot->window, plot->width, plot->gheight + vchar);
 		plot->resizing = TRUE;
 	    }
@@ -4244,6 +4282,22 @@ process_configure_notify_event(XEvent *event)
 		XFreePixmap(dpy, plot->pixmap);
 		plot->pixmap = None;
 	    }
+
+#ifdef EXTERNAL_X11_WINDOW
+	    if (plot->external_container != None) {
+		/* Resize so that all parts of plot remain visible
+		 * when the plot is expanded. */
+		XResizeWindow(dpy, plot->window,
+			      plot->width, plot->height);
+		/* This may be redundant because the application might
+		 * handle resizing the external window.  However, this
+		 * probably isn't necessarily true, so resize the
+		 * external window as well. */
+		XResizeWindow(dpy, plot->external_container,
+			      plot->width, plot->height);
+	    }
+#endif
+
 	    display(plot);
 	}
     }
@@ -5768,14 +5822,6 @@ pr_width()
 /*-----------------------------------------------------------------------------
  *   pr_window - create window
  *---------------------------------------------------------------------------*/
-static void
-ProcessEvents(Window win)
-{
-    XSelectInput(dpy, win, KeyPressMask | KeyReleaseMask
-		 | StructureNotifyMask | PointerMotionMask | PointerMotionHintMask
-		 | ButtonPressMask | ButtonReleaseMask | ExposureMask | EnterWindowMask);
-    XSync(dpy, 0);
-}
 
 static void
 pr_window(plot_struct *plot)
@@ -5783,8 +5829,26 @@ pr_window(plot_struct *plot)
     char *title = pr_GetR(db, ".title");
     static XSizeHints hints;
     int Tvtwm = 0;
+    long event_mask = KeyPressMask | KeyReleaseMask | StructureNotifyMask
+	| PointerMotionMask | PointerMotionHintMask | ButtonPressMask
+	| ButtonReleaseMask | ExposureMask | EnterWindowMask;
 
     FPRINTF((stderr, "(pr_window) \n"));
+
+#ifdef EXTERNAL_X11_WINDOW
+    if (plot->external_container != None) {
+	XWindowAttributes gattr;
+	XGetWindowAttributes(dpy, plot->external_container, &gattr);
+	plot->x = 0;
+	plot->y = 0;
+	plot->width = gattr.width;
+	plot->height = gattr.height;
+	plot->gheight = gattr.height;
+	if (!plot->window)
+	    plot->window = XCreateWindow(dpy, plot->external_container, plot->x, plot->y, plot->width,
+					 plot->height, 0, dep, InputOutput, vis, 0, NULL);
+    }
+#endif /* EXTERNAL_X11_WINDOW */
 
     if (have_pm3d) {
 	XSetWindowAttributes attr;
@@ -5792,11 +5856,17 @@ pr_window(plot_struct *plot)
 	attr.background_pixel = plot->cmap->colors[0];
 	attr.border_pixel = plot->cmap->colors[1];
 	attr.colormap = plot->cmap->colormap;
-	plot->window = XCreateWindow(dpy, root, plot->x, plot->y, plot->width,
-				     plot->height, BorderWidth, dep, InputOutput, vis, mask, &attr);
+	if (!plot->window)
+	    plot->window = XCreateWindow(dpy, root, plot->x, plot->y, plot->width,
+					 plot->height, BorderWidth, dep, InputOutput, vis, mask, &attr);
+	else
+	    XChangeWindowAttributes(dpy, plot->window, mask, &attr);
     } else
-	plot->window = XCreateSimpleWindow(dpy, root, plot->x, plot->y,
-					   plot->width, plot->height, BorderWidth, plot->cmap->colors[1], plot->cmap->colors[0]);
+#ifdef EXTERNAL_X11_WINDOW
+    if (!plot->window)
+#endif
+	plot->window = XCreateSimpleWindow(dpy, root, plot->x, plot->y, plot->width, plot->height,
+					   BorderWidth, plot->cmap->colors[1], plot->cmap->colors[0]);
 
     /* Return if something wrong. */
     if (plot->window == None)
@@ -5839,7 +5909,16 @@ pr_window(plot_struct *plot)
     }
 #endif
 
-    ProcessEvents(plot->window);
+    /* Set up the events to process */
+    XSelectInput(dpy, plot->window, event_mask);
+#ifdef EXTERNAL_X11_WINDOW
+    /* Two clients of an X window cannot share ButtonPress events at the same time.
+     * The outside application may still have ButtonPress selected, and that is the
+     * reason for using the external window as a container. */
+    if (plot->external_container != None)
+	XSelectInput(dpy, plot->external_container, event_mask & (~(ButtonPressMask|ButtonReleaseMask)));
+#endif
+    XSync(dpy, 0);
 
     /* If title doesn't exist, create one. */
 #if 1
@@ -5848,7 +5927,7 @@ pr_window(plot_struct *plot)
     {
     /* append the X11 terminal number (if greater than zero) */
     char numstr[sizeof(ICON_TEXT)+TEMP_NUM_LEN+1]; /* space for text, number and terminating \0 */
-    if (plot->plot_number)
+    if (plot->plot_number > 0)
 	sprintf(numstr, "%s%d%c", ICON_TEXT, plot->plot_number, '\0');
     else
 	sprintf(numstr, "%s%c", ICON_TEXT, '\0');
@@ -5860,9 +5939,9 @@ pr_window(plot_struct *plot)
 	if (!title) title = X_Class;
 	orig_len = strlen(title);
 	/* memory for text, white space, number and terminating \0 */
-	if ((plot->titlestring = (char *) malloc(orig_len + ((orig_len && plot->plot_number) ? 1 : 0) + strlen(numstr) - strlen(ICON_TEXT) + 1))) {
+	if ((plot->titlestring = (char *) malloc(orig_len + ((orig_len && (plot->plot_number > 0)) ? 1 : 0) + strlen(numstr) - strlen(ICON_TEXT) + 1))) {
 	    strcpy(plot->titlestring, title);
-	    if (orig_len && plot->plot_number)
+	    if (orig_len && (plot->plot_number > 0))
 		plot->titlestring[orig_len++] = ' ';
 	    strcpy(plot->titlestring + orig_len, numstr + strlen(ICON_TEXT));
 	    XStoreName(dpy, plot->window, plot->titlestring);
@@ -5876,6 +5955,10 @@ pr_window(plot_struct *plot)
 #endif
 
     XMapWindow(dpy, plot->window);
+#ifdef EXTERNAL_X11_WINDOW
+    if (plot->external_container != None)
+	XMapWindow(dpy, plot->external_container);
+#endif
 
     windows_open++;
 }
@@ -6094,8 +6177,12 @@ mouse_to_axis(int mouse_coord, axis_scale_t *axis)
 static plot_struct *
 Add_Plot_To_Linked_List(int plot_number)
 {
-    /* Make sure plot does not already exist in the list. */
-    plot_struct *psp = Find_Plot_In_Linked_List_By_Number(plot_number);
+    plot_struct *psp;
+    if (plot_number >= 0)
+	/* Make sure plot does not already exist in the list. */
+	psp = Find_Plot_In_Linked_List_By_Number(plot_number);
+    else
+	psp = NULL;
 
     if (psp == NULL) {
 	psp = (plot_struct *) malloc(sizeof(plot_struct));
@@ -6103,6 +6190,11 @@ Add_Plot_To_Linked_List(int plot_number)
 	    /* Initialize structure variables. */
 	    memset((void*)psp, 0, sizeof(plot_struct));
 	    psp->plot_number = plot_number;
+#if EXTERNAL_X11_WINDOW
+	    /* Number and container methods are mutually exclusive. */
+	    if (plot_number >= 0)
+		psp->external_container = None;
+#endif
 	    /* Add link to beginning of the list. */
 	    psp->prev_plot = NULL;
 	    if (plot_list_start != NULL) {
@@ -6152,8 +6244,6 @@ Remove_Plot_From_Linked_List(Window plot_window)
 	    current_plot = NULL;
 #endif
 	}
-	if (plot == psp)
-	    plot = current_plot;
 	/* Deallocate memory.  Make sure plot removed from list first. */
 	delete_plot(psp);
 	free(psp);
@@ -6195,7 +6285,23 @@ Find_Plot_In_Linked_List_By_Window(Window window)
 	psp = psp->next_plot;
     }
 
+#ifdef EXTERNAL_X11_WINDOW
+    if (psp != NULL)
+	return psp;
+
+    /* Search through the containers, but do so as a separate loop to not
+     * effect performance for normal numbered plot window searches. */
+    psp = plot_list_start;
+
+    while (psp != NULL) {
+	if (psp->external_container != None && psp->external_container == window)
+	    break;
+	psp = psp->next_plot;
+    }
+#endif
+
     return psp;
+
 }
 
 
@@ -6519,6 +6625,7 @@ cmaps_differ(cmap_t *cmap1, cmap_t *cmap2)
 /*
  * Shared code for setting fill style
  */
+#define plot current_plot
 static void
 x11_setfill(GC *gc, int style)
 {
@@ -6576,3 +6683,4 @@ x11_setfill(GC *gc, int style)
 	    break;
 	}
 }
+#undef plot

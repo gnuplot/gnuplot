@@ -1,3 +1,25 @@
+2007-12-02  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* configure.in, src/show.c (show_version) NEWS:  Added new feature
+	--disable-x11-external. If selected, long versions shows +X11_EXTERNAL.
+
+	* demo/gpdemos.tcl demo/Makefile.am.in: Added a wish/TCL demo that 
+	displays gnuplot x11 output embedded in a tcl paneled window. The demo
+	includes a minimal file browser that defaults to listing the contents of
+	GNUPLOT_LIB.
+
+	* src/gplt_x11.c (prepare_plot): Removed an integer argument that isn't
+	necessary anymore after having implemented a linked list approach
+	rather than a fixed number of possible plots.  Also, a plot number can
+	no longer be negative.
+	(record): Added an argument to the plot number command containing info
+	about an external system X11 window ID.
+
+	* src/gplt_x11.h: Added a control value for setting the X11 window ID.
+
+	* term/x11.trm (X11_options): Added code for setting X11 window ID as
+	string option.  Also, do not send command if window number is negative.
+
 2007-12-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (enhanced_recursion):  Give a warning if the enhanced text

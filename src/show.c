@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.196 2007/09/27 18:14:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.197 2007/10/28 05:48:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -940,6 +940,9 @@ show_version(FILE *fp)
 #endif
 #ifdef USE_X11_MULTIBYTE
 		"+MULTIBYTE  "
+#endif
+#ifdef EXTERNAL_X11_WINDOW
+		"+X11_EXTERNAL "
 #endif
 		"";
 

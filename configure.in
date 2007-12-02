@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.225 2007/10/16 21:19:43 sfeam Exp $
+dnl $Id: configure.in,v 1.226 2007/11/15 00:42:13 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -608,24 +608,6 @@ if test "$enable_mouse" = yes; then
             [ Unix-type of Interprocess Communication is required for mouse support. ])
 fi
 
-dnl enable multi-byte font support in x11 terminal
-AC_ARG_ENABLE(x11-mbfonts,dnl
-[  --disable-x11-mbfonts   disable multi-byte font support for x11 ],,
-  test -z "$enable_x11_mbfonts" && enable_x11_mbfonts=yes)
-  if test "$enable_x11_mbfonts" = yes; then
-
-    _ldflags="$LDFLAGS"
-    LDFLAGS="$LDFLAGS $LIBRARIES_FOR_X"
-
-    AC_MSG_CHECKING([for multi-byte support in x11])
-    AC_CHECK_LIB(X11, XmbDrawString,
-      AC_DEFINE(USE_X11_MULTIBYTE,1,[ Define to enable multi-byte font support for x11 ]),
-      enable_x11_mbfonts=no )
-    
-    LDFLAGS="$_ldflags"
-  
-  fi
-
 dnl binary_data_file
 AC_ARG_ENABLE(binary_data_file,dnl
 [  --disable-binary-data-file          disable binary_data_file],,
@@ -651,13 +633,40 @@ if test "$enable_with_image" = yes; then
   fi
 fi
 
+dnl enable multi-byte font support in x11 terminal
+AC_ARG_ENABLE(x11-mbfonts,dnl
+[  --disable-x11-mbfonts   disable multi-byte font support for x11 ],,
+  test -z "$enable_x11_mbfonts" && enable_x11_mbfonts=yes)
+  if test "$enable_x11_mbfonts" = yes; then
+
+    _ldflags="$LDFLAGS"
+    LDFLAGS="$LDFLAGS $LIBRARIES_FOR_X"
+
+    AC_MSG_CHECKING([for multi-byte support in x11])
+    AC_CHECK_LIB(X11, XmbDrawString,
+      AC_DEFINE(USE_X11_MULTIBYTE,1,[ Define to enable multi-byte font support for x11 ]),
+      enable_x11_mbfonts=no )
+    
+    LDFLAGS="$_ldflags"
+  
+  fi
+
 dnl binary_x11_polygon
 AC_ARG_ENABLE(binary_x11_polygon,dnl
-[  --disable-binary-x11-polygon        disable binary_x11_polygon],,
+[  --disable-binary-x11-polygon  disable binary_x11_polygon],,
   test -z "$enable_binary_x11_polygon" && enable_binary_x11_polygon=yes)
 
 if test "$enable_binary_x11_polygon" = yes; then
   AC_DEFINE(BINARY_X11_POLYGON,1,[ Define if you want the x11 driver to transfer polygon information in binary format. ])
+fi
+
+dnl x11_external
+AC_ARG_ENABLE(x11_external,dnl
+[  --disable-x11-external        disable drawing to windows belonging to external apps],,
+  test -z "$enable_x11_external" && enable_x11_external=yes)
+
+if test "$enable_x11_external" = yes; then
+  AC_DEFINE(EXTERNAL_X11_WINDOW,1,[ Define if you want to supply pre-existing X11 windows. ])
 fi
 
 dnl check for installed linux vgagl lib if
@@ -1051,6 +1060,13 @@ if test "$no_x" != yes; then
   else
     AC_MSG_RESULT([    (without multi-byte fonts, requires support in libX11)])
   fi
+
+  if test "$enable_x11_external" = yes; then
+    AC_MSG_RESULT([    (enable plotting to windows opened by external apps (EXPERIMENTAL)])
+  else
+    AC_MSG_RESULT([    (disable plotting to windows opened by external apps (EXPERIMENTAL)])
+  fi
+
   if test "$enable_binary_x11_polygon" = yes; then
     AC_MSG_RESULT([    (with binary polygon protocol (EXPERIMENTAL))])
   else

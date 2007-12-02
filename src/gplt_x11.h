@@ -65,6 +65,10 @@
 #define X11_GR_IMAGE 'i'
 #endif
 
+#ifdef EXTERNAL_X11_WINDOW
+#define X11_GR_SET_WINDOW_ID    'w'
+#endif
+
 #if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
 /* One character for function code, and perhaps one or two for the core
  * routine to do something strange with end of buffer.  So shorten by a

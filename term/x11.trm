@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.167 2007/04/25 01:45:55 sfeam Exp $
+ * $Id: x11.trm,v 1.168 2007/08/06 14:35:12 mikulik Exp $
  *
  */
 
@@ -342,8 +342,6 @@ X11_args(int argc, char *argv[])
 }
 
 
-static unsigned int X11_plot_number;
-
 enum X11_id {
     X11_RESET,
     X11_CLOSE,
@@ -359,6 +357,9 @@ enum X11_id {
     X11_DASHED,
     X11_CTRLQ,
     X11_NOCTRLQ,
+#ifdef EXTERNAL_X11_WINDOW
+    X11_WINDOW,
+#endif
     X11_OTHER
 };
 
@@ -378,6 +379,9 @@ static struct gen_table X11_opts[] = {
     {"dash$ed", X11_DASHED},
     {"ctrl$q", X11_CTRLQ},
     {"noctrl$q", X11_NOCTRLQ},
+#ifdef EXTERNAL_X11_WINDOW
+    {"w$indow", X11_WINDOW},
+#endif
     {NULL, X11_OTHER}
 };
 
@@ -394,6 +398,10 @@ X11_options()
     TBOOLEAN set_reset = FALSE, set_persist = FALSE, set_raise = FALSE, set_font = FALSE;
     TBOOLEAN set_ctrlq = FALSE;
     TBOOLEAN set_title = FALSE, set_number = FALSE, set_close = FALSE, set_solid = FALSE;
+#ifdef EXTERNAL_X11_WINDOW
+    unsigned long existing_X11_window_id = 0;
+    TBOOLEAN set_window = FALSE;
+#endif
 
     persist = do_raise = dashedlines = ctrlq = UNSET;
 
@@ -494,11 +502,29 @@ X11_options()
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    c_token++;
 	    break;
+#ifdef EXTERNAL_X11_WINDOW
+	case X11_WINDOW:
+	{
+	    char *windowid;
+	    c_token++;
+	    if (!(windowid = try_to_get_string()))
+		int_error(c_token, "expecting X window ID as string in hex");
+	    sscanf(windowid,"%lx",&existing_X11_window_id);
+	    free(windowid);
+	    if (!existing_X11_window_id)
+		int_error(c_token, "expecting X window ID as string in hex");
+	    if (set_window) duplication=TRUE;
+	    set_window = TRUE;
+	    break;
+	}
+#endif
 	case X11_OTHER:
 	default:
+	    if (set_number) duplication=TRUE;
 	    /* let gnuplot_x11 check range */
 	    new_term_number = int_expression();
-	    if (set_number) duplication=TRUE;
+	    if (new_term_number < 0)
+		int_error(c_token, "plot number must be non-negative");
 	    set_number = TRUE;
 	    break;
 	}
@@ -515,20 +541,33 @@ X11_options()
 	X11_atexit();	/* tell gnuplot_x11 to shut down */
 
     /* Leave the current window unchanged when closing an old window */
-    if (set_close) {
-	if (X11_ipc) {
+    if (X11_ipc) {
+	if (set_close) {
 	    fprintf(X11_ipc, (set_number ? "C%d\n" : "C\n"), new_term_number);
 	    fflush(X11_ipc);
-	}
-    } else if (set_number) {
-	X11_plot_number = new_term_number;
-	if (X11_ipc) {
-	    fprintf(X11_ipc, "N%d\n", X11_plot_number);
+	} else if (set_number) {
+#ifdef EXTERNAL_X11_WINDOW
+	    if (set_window)
+		int_error(NO_CARET,"an existing X11 window cannot be asigned to a plot number");
+#endif
+	    fprintf(X11_ipc, "N%d\n", new_term_number);
 	    fflush(X11_ipc);
+#ifdef EXTERNAL_X11_WINDOW
+	} else if (set_window) {
+	    fprintf(X11_ipc, "%c%lx\n", X11_GR_SET_WINDOW_ID, existing_X11_window_id);
+	    fflush(X11_ipc);
+#endif
 	}
     }
 
-    sprintf(term_options, "%d", X11_plot_number);
+#ifdef EXTERNAL_X11_WINDOW
+    if (set_window) {
+	sprintf(term_options, "XID 0x%lX", existing_X11_window_id);
+    } else
+#endif
+    if (set_number && new_term_number >= 0) {
+	sprintf(term_options, "%d", new_term_number);
+    }
     if (UNSET != do_raise) {
 	strcat(term_options, (yes == do_raise ? " raise" : " noraise"));
     }
@@ -1164,7 +1203,7 @@ X11_graphics()
 
 #ifndef USE_MOUSE
     /* for VMS sake, keep as separate prints */
-    PRINT1("G%d\n", X11_plot_number);
+    PRINT0("G\n");
 #else
 #ifdef PIPE_IPC
     /* if we know the outboard driver has stopped, restart it */
@@ -1181,9 +1220,9 @@ X11_graphics()
 	    sscanf(window_env, "%lu", &windowid);
     }
 #ifndef OS2
-    PRINT2("G%d %lu\n", X11_plot_number, windowid);
+    PRINT1("G%lu\n", windowid);
 #else
-    PRINT3("G%d %lu %i\n", X11_plot_number, windowid, getpid());
+    PRINT2("G%lu %i\n", windowid, getpid());
 #endif
 #endif /* USE_MOUSE */
 
@@ -2014,7 +2053,7 @@ START_HELP(x11)
 " if the `-display` command line option is used.",
 "",
 " Syntax:",
-"    set terminal x11 {<n>}",
+"    set terminal x11 {<n> | window \"<string>\"}",
 "                     {title \"<string>\"}",
 "                     {{no}enhanced}",
 "                     {font <fontspec>}",
@@ -2028,7 +2067,16 @@ START_HELP(x11)
 " and the icon will be labeled `Gnuplot <n>`.  The active window may be",
 " distinguished by a change in cursor (from default to crosshair).",
 "",
-" The x11 terminal support enhanced text mode (see `enhanced`), subject",
+" The `x11` terminal can connect to X windows previously created by an outside",
+" application via the option `window` followed by a string containing the",
+" X ID for the window in hexadecimal format.  Gnuplot uses that external X",
+" window as a container since X does not allow for multiple clients selecting",
+" the ButtonPress event.  In this way, gnuplot's mouse features work within",
+" the contained plot window.",
+"",
+"    set term x11 window \"220001e\"",
+"",
+" The x11 terminal supports enhanced text mode (see `enhanced`), subject",
 " to the available fonts. In order for font size commands embedded in text",
 " to have any effect, the default x11 font must be scalable. Thus the first",
 " example below will work as expected, but the second will not.",
