@@ -13,6 +13,8 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW error status variables GPVAL_ERRNO and GPVAL_ERRMSG
 * FIX better support for locale internationalization, UTF-8 encoding
 * FIX various font-handling problems in postscript terminal driver
+* FIX avoid infinite loop on resizing x11 plot window under ion, fluxbox
+* CHANGE 'reset' does not affect locale, encoding, decimalsign settings
 * CHANGE fillstyle border type, if any, is applied to candlesticks
 * CHANGE 'set key textcolor rgb variable' will use plot colors for key entries
 * CHANGE Remove obsolete IRIS4D terminal type
