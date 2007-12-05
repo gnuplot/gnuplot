@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.155 2007/10/21 04:17:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.156 2007/11/14 18:57:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -484,15 +484,6 @@ get_data(struct curve_points *current_plot)
 	int_error(NO_CARET, "Not enough columns for this style");
 
     i = 0;
-
-#ifdef EAM_HISTOGRAMS
-    /* EAM FIXME - There are places in df_readline where it would be really */
-    /* nice to know what kind of plot we are making, so I think that        */
-    /* current_plot should be a parameter to df_readline. For now, however, */
-    /* I am using a global variable, and only for HISTOGRAMS.               */
-    df_current_plot = (current_plot->plot_style == HISTOGRAMS)
-	? current_plot : NULL;
-#endif
 
 #ifdef HAVE_LOCALE_H
     /* If the user has set an explicit locale for numeric input, apply it */
@@ -1445,7 +1436,7 @@ eval_plots()
 
 		/* up to MAXDATACOLS cols */
 		df_set_plot_mode(MODE_PLOT);    /* Needed for binary datafiles */
-		specs = df_open(name_str, MAXDATACOLS);
+		specs = df_open(name_str, MAXDATACOLS, this_plot);
 
 #ifndef BINARY_DATA_FILE
 		/* this parses data-file-specific modifiers only */

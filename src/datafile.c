@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.128 2007/09/02 03:41:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.129 2007/12/02 03:59:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -79,9 +79,10 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.128 2007/09/02 03:41:32
  *    int df_eof          - end of file
  *
  * functions
- *   int df_open(char *file_name, int max_using)
+ *   int df_open(char *file_name, int max_using, plot_header *plot)
  *      parses thru / index / using on command line
- *      max_using is max no of 'using' columns allowed
+ *      max_using is max no of 'using' columns allowed (obsolete?)
+ *	plot_header is NULL if called from fit or set_palette code
  *      returns number of 'using' cols specified, or -1 on error (?)
  *
  *   int df_readline(double vector[], int max)
@@ -203,9 +204,6 @@ enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL,
 /* public variables client might access */
 
 int df_no_use_specs;            /* how many using columns were specified */
-#ifdef EAM_HISTOGRAMS
-struct curve_points *df_current_plot; /* set before calling df_readline() */
-#endif
 int df_line_number;
 int df_datum;                   /* suggested x value if none given */
 AXIS_INDEX df_axis[MAXDATACOLS];
@@ -317,6 +315,7 @@ static char *df_stringexpression[MAXDATACOLS] = {NULL,NULL,NULL,NULL,NULL,NULL,N
 static int column_for_key_title = NO_COLUMN_HEADER;
 static TBOOLEAN key_title_auto_col = FALSE;
 static char df_key_title[MAX_TOKEN_LENGTH];     /* filled in from <col> in 1st row by df_tokenise */
+static struct curve_points *df_current_plot;	/* used to process histogram labels + key entries */
 #endif
 
 #ifdef BINARY_DATA_FILE
@@ -1024,13 +1023,13 @@ initialize_use_spec()
 }
 
 
-/*{{{  int df_open(char *file_name, max_using) */
+/*{{{  int df_open(char *file_name, int max_using, plot_header *plot) */
 
 /* open file, parsing using/thru/index stuff return number of using
  * specs [well, we have to return something !]
  */
 int
-df_open(const char *cmd_filename, int max_using)
+df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 {
     int name_token = c_token - 1;
     TBOOLEAN duplication = FALSE;
@@ -1081,6 +1080,9 @@ df_open(const char *cmd_filename, int max_using)
     df_eof = 0;
 
 #ifdef EAM_DATASTRINGS
+    /* Save for use by df_readline(). */
+    /* Perhaps it should be a parameter to df_readline? */
+    df_current_plot = plot;
     column_for_key_title = NO_COLUMN_HEADER;
     key_title_auto_col = FALSE;
 #endif
@@ -1211,6 +1213,8 @@ df_open(const char *cmd_filename, int max_using)
 		key_title_auto_col = TRUE;
 		if (df_no_use_specs == 1)
 		    column_for_key_title = use_spec[0].column;
+		else if (plot && plot->plot_type == DATA3D)
+		    column_for_key_title = use_spec[2].column;
 		else
 		    column_for_key_title = use_spec[1].column;
 		c_token++;
@@ -1238,6 +1242,8 @@ df_open(const char *cmd_filename, int max_using)
 	    key_title_auto_col = TRUE;
 	    if (df_no_use_specs == 1)
 		column_for_key_title = use_spec[0].column;
+	    else if (plot && plot->plot_type == DATA3D)
+		column_for_key_title = use_spec[2].column;
 	    else
 		column_for_key_title = use_spec[1].column;
 	}

@@ -1,4 +1,12 @@
-2007-12-14  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+2007-12-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c src/datafile.h src/fit.c src/plot2d.c src/plot3d.c
+	src/set.c:  Pass a pointer to the current plot header into df_open() so
+	that the 'using' options can be parsed in 2D/3D context.  This has the
+	side benefit of removing an ugly hack whereby df_current_plot (used by
+	the histogram and key title processing) was a global. Now it is static.
+
+2007-12-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/plot3d.c (eval3d_plots get3d_data): Implement taking key entry
 	titles from datafile column headers.   'splot <foo> using 1:2:3 title 3'
@@ -32,7 +40,7 @@
 
 	* src/unset.c (reset_command) docs/gnuplot.doc:  The `reset` command is
 	documented to affect only the graphics output state.  Do not reset user
-	interactions settings (locale, encoding, decimalsign).
+	interaction settings (locale, encoding, decimalsign).
 
 2007-12-01  Allin Cottrell  <cottrell@wfu.edu>
 

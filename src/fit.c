@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.57 2007/05/10 22:52:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.58 2007/07/17 19:58:06 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1288,7 +1288,7 @@ fit_command()
 
     /* use datafile module to parse the datafile and qualifiers */
     df_set_plot_mode(MODE_QUERY);  /* Does nothing except for binary datafiles */
-    columns = df_open(file_name, 4);	/* up to 4 using specs allowed */
+    columns = df_open(file_name, 4, NULL);	/* up to 4 using specs allowed */
     free(file_name);
     if (columns < 0)
 	int_error(NO_CARET,"Can't read data file");

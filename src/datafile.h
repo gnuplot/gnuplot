@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.22 2007/08/27 04:33:47 sfeam Exp $
+ * $Id: datafile.h,v 1.23 2007/09/02 03:41:32 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -53,10 +53,6 @@
 #define DF_FOUND_KEY_TITLE   (-6)
 #define DF_KEY_TITLE_MISSING (-7)
 #define DF_STRINGDATA	(-8)
-#ifdef EAM_HISTOGRAMS
-/* should really be a parameter to df_readline rather than a global */
-extern struct curve_points *df_current_plot;
-#endif
 
 
 #ifndef MAXINT			/* should there be one already defined ? */
@@ -109,7 +105,7 @@ extern TBOOLEAN df_fortran_constants;
 
 /* Prototypes of functions exported by datafile.c */
 
-int df_open __PROTO((const char *, int));
+int df_open __PROTO((const char *, int, struct curve_points *));
 int df_readline __PROTO((double [], int));
 void df_close __PROTO((void));
 void df_showdata __PROTO((void));
