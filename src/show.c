@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.197 2007/10/28 05:48:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.198 2007/12/03 21:30:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2258,22 +2258,26 @@ show_colorbox()
     } else {
 	fputs("\tcolor box without border is ", stderr);
     }
+    if (color_box.where != SMCOLOR_BOX_NO) {
+	if (color_box.layer == LAYER_FRONT) fputs("drawn front\n\t", stderr);
+	else fputs("drawn back\n\t", stderr);
+    }
     switch (color_box.where) {
 	case SMCOLOR_BOX_NO:
 	    fputs("NOT drawn\n", stderr);
 	    break;
 	case SMCOLOR_BOX_DEFAULT:
-	    fputs("drawn at DEFAULT position\n", stderr);
+	    fputs("at DEFAULT position\n", stderr);
 	    break;
 	case SMCOLOR_BOX_USER:
-	    fputs("drawn at USER position: ", stderr);
+	    fputs("at USER position: ", stderr);
 	    show_position(&color_box.origin);
 	    fputs("\n\t          size: ", stderr);
 	    show_position(&color_box.size);
 	    fputs("\n", stderr);
 	    break;
 	default: /* should *never* happen */
-	    int_error(NO_CARET, "Argh !");
+	    int_error(NO_CARET, "Argh!");
     }
     fprintf(stderr,"\tcolor gradient is %s in the color box\n",
 	color_box.rotation == 'v' ? "VERTICAL" : "HORIZONTAL");

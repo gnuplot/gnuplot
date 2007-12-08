@@ -1,3 +1,15 @@
+2007-12-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	New options "front" and "back" to "set colorbox" to let the box be
+	drawn either after or below the image or surface.
+
+	* src/gadgets.h src/gadgets.c: New "layer" field in color_box_struct.
+
+	* src/graphics.c src/graph3d.c: Draw the colorbox at expected layers.
+
+	* src/save.c src/set.c src/show.c src/tables.h src/tables.c
+	docs/gnuplot.doc: The other necessary changes.
+
 2007-12-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/datafile.h src/fit.c src/plot2d.c src/plot3d.c

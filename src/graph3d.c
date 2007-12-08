@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.181 2007/10/25 05:14:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.182 2007/10/26 22:55:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -667,10 +667,7 @@ do_3dplot(
 
     /* Draw PM3D color key box */
     if (!quick) {
-	can_pm3d = is_plot_with_palette() && !make_palette()
-	    && term->set_color;
-	if (can_pm3d && is_plot_with_colorbox())
-	    draw_color_smooth_box(MODE_SPLOT);
+	can_pm3d = is_plot_with_palette() && !make_palette() && term->set_color;
     }
 
 #ifdef USE_GRID_LAYERS
@@ -757,6 +754,10 @@ do_3dplot(
 		write_multiline(x, y, str, LEFT, JUST_TOP, 0, timelabel.font);
 	}
     }
+
+    /* Add 'back' color box */
+    if (!quick && can_pm3d && is_plot_with_colorbox() && color_box.layer == LAYER_BACK)
+	draw_color_smooth_box(MODE_SPLOT);
 
     /* Add 'back' rectangles */
     place_rectangles(first_object, 0, 3, &clip_splot_map);
@@ -1344,6 +1345,10 @@ do_3dplot(
 	draw_3d_graphbox(plots, pcount, BORDERONLY, LAYER_FRONT);
 
 #endif /* USE_GRID_LAYERS */
+
+    /* Add 'front' color box */
+    if (!quick && can_pm3d && is_plot_with_colorbox() && color_box.layer == LAYER_FRONT)
+	draw_color_smooth_box(MODE_SPLOT);
 
     /* Add 'front' rectangles */
     place_rectangles(first_object, 1, 3, &clip_splot_map);

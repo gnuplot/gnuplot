@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.236 2007/10/21 04:17:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.237 2007/10/28 05:48:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1561,12 +1561,12 @@ do_plot(struct curve_points *plots, int pcount)
      */
     boundary(plots, pcount);
 
-    /* Give a chance for rectangles to be behind everything else*/
+    /* Give a chance for rectangles to be behind everything else */
     place_rectangles( first_object, -1, 2, NULL );
 
-    /* Add colorbox if appropriate. */
-    if (is_plot_with_palette() && !make_palette() && is_plot_with_colorbox() && term->set_color)
-	draw_color_smooth_box(MODE_PLOT);
+    /* Make palette */
+    if (is_plot_with_palette())
+	make_palette();
 
     screen_ok = FALSE;
 
@@ -1740,6 +1740,11 @@ do_plot(struct curve_points *plots, int pcount)
 	}
 	free(str);
     }
+
+    /* Add back colorbox if appropriate */
+    if (is_plot_with_palette() && is_plot_with_colorbox() && term->set_color
+	&& color_box.layer == LAYER_BACK)
+	    draw_color_smooth_box(MODE_PLOT);
 
     /* And rectangles */
     place_rectangles( first_object, 0, 2, clip_area );
@@ -2020,6 +2025,11 @@ do_plot(struct curve_points *plots, int pcount)
     /* REDRAW PLOT BORDER */
     if (draw_border && border_layer == 1)
 	plot_border();
+
+    /* Add front colorbox if appropriate */
+    if (is_plot_with_palette() && is_plot_with_colorbox() && term->set_color
+	&& color_box.layer == LAYER_FRONT)
+	    draw_color_smooth_box(MODE_PLOT);
 
     /* And rectangles */
     place_rectangles( first_object, 1, 2, clip_area );

@@ -290,6 +290,7 @@ typedef struct {
   char rotation; /* 'v' or 'h' vertical or horizontal box */
   char border; /* if non-null, a border will be drawn around the box (default) */
   int border_lt_tag;
+  int layer; /* front or back */
   struct position origin;
   struct position size;
 } color_box_struct;

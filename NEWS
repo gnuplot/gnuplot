@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.2
 =========================================================
 
+* NEW options front and back to "set colorbox"
 * NEW x11 can plot into a window opened and managed by an external application
 * NEW optional 3 columns of data to generate histogram errorbars
 * NEW 'volatile' data, including inline data, can be replotted without rereading

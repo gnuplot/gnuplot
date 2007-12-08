@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.463 2007/12/02 01:48:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.464 2007/12/02 05:47:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6490,16 +6490,18 @@ Ffigure_mapcontours
                   { default | user }
                   { origin x, y }
                   { size x, y }
+                  { front | back }
                   { noborder | bdefault | border [line style] }
                 }
        show colorbox
        unset colorbox
 
- Colorbox position can be `default` or `user`.  If the latter is specified the
- values as given with the `origin` and `size` subcommands are used.
+ Color box position can be `default` or `user`.  If the latter is specified the
+ values as given with the `origin` and `size` subcommands are used. The box
+ can be drawn after (`front`) or before (`back`) the graph or the surface.
 
- `vertical` and `horizontal` switches the orientation of the color
- gradient.
+ The orientation of the color gradient can be switched by options `vertical`
+ and `horizontal`.
 
  `origin x, y` and `size x, y` are used only in combination with the `user`
  option. The x and y values are interpreted as screen coordinates by default,

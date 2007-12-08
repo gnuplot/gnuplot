@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.254 2007/12/02 01:48:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.255 2007/12/06 06:27:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2969,6 +2969,13 @@ set_colorbox()
 	    /* color box where: position by user */
 	    case S_COLORBOX_USER: /* "u$ser" */
 		color_box.where = SMCOLOR_BOX_USER;
+		continue;
+	    /* color box layer: front or back */
+	    case S_COLORBOX_FRONT: /* "fr$ont" */
+		color_box.layer = LAYER_FRONT;
+		continue;
+	    case S_COLORBOX_BACK: /* "ba$ck" */
+		color_box.layer = LAYER_BACK;
 		continue;
 	    /* border of the color box */
 	    case S_COLORBOX_BORDER: /* "bo$rder" */

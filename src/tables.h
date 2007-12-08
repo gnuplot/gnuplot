@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.59 2007/02/06 23:56:39 sfeam Exp $
+ * $Id: tables.h,v 1.60 2007/06/22 04:28:17 sfeam Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -143,7 +143,8 @@ enum set_colorbox_id {
     S_COLORBOX_VERTICAL, S_COLORBOX_HORIZONTAL,
     S_COLORBOX_DEFAULT, S_COLORBOX_USER,
     S_COLORBOX_BORDER, S_COLORBOX_BDEFAULT, S_COLORBOX_NOBORDER,
-    S_COLORBOX_ORIGIN, S_COLORBOX_SIZE
+    S_COLORBOX_ORIGIN, S_COLORBOX_SIZE,
+    S_COLORBOX_FRONT, S_COLORBOX_BACK
 };
 
 enum set_palette_id {
