@@ -1,3 +1,9 @@
+2007-12-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Command line options -bw and -borderwidth were 
+	being mapped to X Resource "borderwidth".  It should be "borderWidth".
+	Also remove limitation that maximum linewidth is 4 pixels.
+
 2007-12-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	New options "front" and "back" to "set colorbox" to let the box be
