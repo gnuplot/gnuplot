@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.237 2007/10/28 05:48:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.238 2007/12/08 10:55:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1385,7 +1385,7 @@ place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox
     int style;
 
     for (this_object = listhead; this_object != NULL; this_object = this_object->next) {
-	struct lp_style_type *lpstyle;
+	struct lp_style_type lpstyle;
 	struct fill_style_type *fillstyle;
 	TBOOLEAN clip_x = FALSE;
 	TBOOLEAN clip_y = FALSE;
@@ -1472,19 +1472,21 @@ place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox
 	    continue;
 
 	if (this_object->lp_properties.l_type == LT_DEFAULT)
-	    lpstyle = &default_rectangle.lp_properties;
+	    lpstyle = default_rectangle.lp_properties;
 	else
-	    lpstyle = &this_object->lp_properties;
+	    lpstyle = this_object->lp_properties;
+	if (lpstyle.l_width > 0)
+	    lpstyle.l_width = this_object->lp_properties.l_width;
 	
 	if (this_object->fillstyle.fillstyle == FS_DEFAULT)
 	    fillstyle = &default_rectangle.fillstyle;
 	else
 	    fillstyle = &this_object->fillstyle;
-	
-	term_apply_lp_properties(lpstyle);
+
+	term_apply_lp_properties(&lpstyle);
 	style = style_from_fill(fillstyle);
 
-	if (lpstyle->use_palette && term->filled_polygon) {
+	if (lpstyle.use_palette && term->filled_polygon) {
 	    (*term->filled_polygon)(4, fill_corners(style,x,y,w,h));
 	} else if (term->fillbox)
 	    (*term->fillbox) (style, x, y, w, h);

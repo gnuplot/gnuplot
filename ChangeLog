@@ -7,6 +7,10 @@
 	* share/Makefile.am: Rename Gnuplot.app-defaults to Gnuplot before
 	installing it.   Bug #1784379
 
+	* src/graphics.c (place_rectangles):  If the linestyle is LT_DEFAULT,
+	nevertheless check for an explicit linewidth for this rectangle.
+	Bug #1833429
+
 2007-12-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	New options "front" and "back" to "set colorbox" to let the box be
