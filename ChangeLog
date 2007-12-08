@@ -4,6 +4,9 @@
 	being mapped to X Resource "borderwidth".  It should be "borderWidth".
 	Also remove limitation that maximum linewidth is 4 pixels.
 
+	* share/Makefile.am: Rename Gnuplot.app-defaults to Gnuplot before
+	installing it.   Bug #1784379
+
 2007-12-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	New options "front" and "back" to "set colorbox" to let the box be
