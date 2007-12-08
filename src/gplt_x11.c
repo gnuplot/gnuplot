@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.4 2007/05/16 18:47:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.5 2007/12/01 22:49:08 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -4812,8 +4812,8 @@ static XrmOptionDescRec options[] = {
     {"-fg", "*foreground", XrmoptionSepArg, (XPointer) NULL},
     {"-bordercolor", "*bordercolor", XrmoptionSepArg, (XPointer) NULL},
     {"-bd", "*bordercolor", XrmoptionSepArg, (XPointer) NULL},
-    {"-borderwidth", ".borderwidth", XrmoptionSepArg, (XPointer) NULL},
-    {"-bw", ".borderwidth", XrmoptionSepArg, (XPointer) NULL},
+    {"-borderwidth", ".borderWidth", XrmoptionSepArg, (XPointer) NULL},
+    {"-bw", ".borderWidth", XrmoptionSepArg, (XPointer) NULL},
     {"-font", "*font", XrmoptionSepArg, (XPointer) NULL},
     {"-fn", "*font", XrmoptionSepArg, (XPointer) NULL},
     {"-reverse", "*reverseVideo", XrmoptionNoArg, (XPointer) "on"},
@@ -5809,7 +5809,7 @@ pr_width()
 	strcat(option, width_keys[n]);
 	strcat(option, "Width");
 	if ((v = pr_GetR(db, option)) != NULL) {
-	    if (*v < '0' || *v > '4' || strlen(v) > 1)
+	    if (*v < '0' || *v > '10' || strlen(v) > 2)
 		fprintf(stderr, "gnuplot: illegal width value %s:%s\n", option, v);
 	    else
 		widths[n] = (unsigned int) atoi(v);
