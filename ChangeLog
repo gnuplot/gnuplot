@@ -1,3 +1,7 @@
+2007-12-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: More parsing problems with borderWidth
+
 2007-12-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Command line options -bw and -borderwidth were 
