@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.160.2.3 2007/04/25 01:49:20 sfeam Exp $
+ * $Id: x11.trm,v 1.160.2.4 2007/08/06 14:37:51 mikulik Exp $
  *
  */
 
@@ -216,6 +216,9 @@ static int do_raise = UNSET;
 static int dashedlines = UNSET;
 static int ctrlq = UNSET;
 
+/* driver properties managed by x11.trm rather than gnuplot_x11 */
+static double X11_linewidth_multiplier = 1.0;
+
 #ifdef USE_MOUSE
 /* Interlock to prevent the mouse channel from being coopted more than
  * once per plot by the gnuplot_x11<->x11.trm font information query.
@@ -357,6 +360,7 @@ enum X11_id {
     X11_NOENHANCED,
     X11_SOLID,
     X11_DASHED,
+    X11_LINEWIDTH,
     X11_CTRLQ,
     X11_NOCTRLQ,
     X11_OTHER
@@ -376,6 +380,8 @@ static struct gen_table X11_opts[] = {
     {"noenh$anced", X11_NOENHANCED},
     {"solid", X11_SOLID},
     {"dash$ed", X11_DASHED},
+    {"linew$idth", X11_LINEWIDTH},
+    {"lw", X11_LINEWIDTH},
     {"ctrl$q", X11_CTRLQ},
     {"noctrl$q", X11_NOCTRLQ},
     {NULL, X11_OTHER}
@@ -445,6 +451,12 @@ X11_options()
 	    c_token++;
 	    if (set_solid) duplication=TRUE;
 	    set_solid = TRUE;
+	    break;
+	case X11_LINEWIDTH:
+	    c_token++;
+	    X11_linewidth_multiplier = real_expression();
+	    if (X11_linewidth_multiplier <= 0)
+		X11_linewidth_multiplier = 1.0;
 	    break;
 	case X11_RAISE:
 	    do_raise = yes;
@@ -544,6 +556,10 @@ X11_options()
     }
     if (term->put_text == ENHX11_put_text) {
 	strcat(term_options, " enhanced");
+    }
+    if (X11_linewidth_multiplier != 1.0) {
+	sprintf(term_options + strlen(term_options),
+		" linewidth %.2g", X11_linewidth_multiplier);
     }
     if (*X11_default_font) {
 	strcat(term_options, " font \"");
@@ -1300,7 +1316,7 @@ X11_pointsize(double ps)
 TERM_PUBLIC void
 X11_linewidth(double lw)
 {
-    PRINT1("W%04d\n", (int) lw);
+    PRINT1("W%04d\n", (int) (lw * X11_linewidth_multiplier + 0.5));
 }
 
 TERM_PUBLIC void
@@ -2014,9 +2030,9 @@ START_HELP(x11)
 " Syntax:",
 "    set terminal x11 {<n>}",
 "                     {title \"<string>\"}",
-"                     {{no}enhanced}",
-"                     {font <fontspec>}",
-"                     {{no}persist} {{no}raise} {solid|dashed} {{no}ctrlq}",
+"                     {{no}enhanced} {font <fontspec>}",
+"                     {linewidth LW} {solid|dashed}",
+"                     {{no}persist} {{no}raise} {{no}ctrlq}",
 "                     {close}",
 "    set terminal x11 {reset}",
 "",
