@@ -3,6 +3,9 @@
 	* src/graphics.c (boundary):  Missing "else" in bounds calculation.
 	Also fix trivial typo of v_char instead of h_char.
 
+	* term/svg.trm (SVG_SetFont) term/gd.trm (PNG_options): Use strncpy so
+	that overly long font names do not generate a setfault.
+
 2007-12-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: More parsing problems with borderWidth

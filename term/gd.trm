@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.120 2007/08/25 23:07:58 sfeam Exp $
+ * $Id: gd.trm,v 1.121 2007/09/24 17:19:50 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -754,14 +754,13 @@ PNG_options()
 			*comma = '\0';
 		    }
 		    if (*s)
-			strncpy(png_state.ttffont, s, sizeof(png_state.ttffont));
+			strncpy(png_state.ttffont, s, sizeof(png_state.ttffont)-1);
 		    free(s);
 		} else {
-		    copy_str(png_state.ttffont, c_token,
-			     sizeof(png_state.ttffont));
+		    copy_str(png_state.ttffont, c_token, sizeof(png_state.ttffont)-1);
 		    c_token++;
 		}
-		strcpy(png_state.default_ttffont, png_state.ttffont);
+		strncpy(png_state.default_ttffont, png_state.ttffont, sizeof(png_state.ttffont));
 		err = gdImageStringFT(NULL, &brect[0], 0,
 			png_state.ttffont, (double)png_state.ttfsize,
 			0.0, 0, 0, "test");
@@ -935,7 +934,7 @@ PNG_options()
 		int brect[8];
 		char *err;
 		strncpy(png_state.ttffont, external_default, sizeof(png_state.ttffont));
-		strcpy(png_state.default_ttffont, png_state.ttffont);
+		strncpy(png_state.default_ttffont, png_state.ttffont, sizeof(png_state.default_ttffont));
 		if (png_state.default_ttfsize == 0)
 			png_state.default_ttfsize = 2 * term->h_char - 2;
 		err = gdImageStringFT(NULL, &brect[0], 0,
@@ -1777,7 +1776,7 @@ PNG_set_font(const char *fontname)
 	png_state.ttfsize = size;
     } else {
 	/* Restore initial default font */
-	strcpy(png_state.ttffont,png_state.default_ttffont);
+	strncpy(png_state.ttffont,png_state.default_ttffont,sizeof(png_state.ttffont));
 	png_state.ttfsize = png_state.default_ttfsize;
     }
 
