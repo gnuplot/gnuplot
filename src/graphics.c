@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.238 2007/12/08 10:55:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.239 2007/12/09 06:57:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -602,11 +602,9 @@ boundary(struct curve_points *plots, int count)
      * I don't understand why this is necessary, but it is.
      * Didn't we already do this at line 488ff, and then add colorbox? */
     if (lmargin.scalex != screen)
-	plot_bounds.xleft = xoffset * t->xmax
-			  + t->h_char * (lmargin.x >= 0 ? lmargin.x : 2);
+	plot_bounds.xleft = xoffset * t->xmax + 0.5;
     if (rmargin.scalex != screen)
-	plot_bounds.xright = (xsize + xoffset) * t->xmax
-			   - t->h_char * (rmargin.x >= 0 ? rmargin.x : 2);
+	plot_bounds.xright = (xsize + xoffset) * t->xmax + 0.5;
 
     if (lkey) {
 	TBOOLEAN key_panic = FALSE;
@@ -827,7 +825,7 @@ boundary(struct curve_points *plots, int count)
 	    plot_bounds.xleft += (int) (t->h_char * 2);
 	}
 	/* DBT 12-3-98  extra margin just in case */
-	plot_bounds.xleft += 0.5 * t->v_char;
+	plot_bounds.xleft += 0.5 * t->h_char;
     } else if (lmargin.scalex != screen)
 	plot_bounds.xleft += (int) (lmargin.x * t->h_char);
 
@@ -893,8 +891,8 @@ boundary(struct curve_points *plots, int count)
 		plot_bounds.xright -= (int) (t->h_char * 2);
 	    }
 	    /* DBT 12-3-98  extra margin just in case */
-	    plot_bounds.xright -= 0.5 * t->v_char;
-	}
+	    plot_bounds.xright -= 0.5 * t->h_char;
+	} else
 	    plot_bounds.xright -= (int) (rmargin.x * t->h_char);
     }
 

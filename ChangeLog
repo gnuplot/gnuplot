@@ -1,3 +1,8 @@
+2007-12-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary):  Missing "else" in bounds calculation.
+	Also fix trivial typo of v_char instead of h_char.
+
 2007-12-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: More parsing problems with borderWidth
