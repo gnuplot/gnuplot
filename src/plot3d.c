@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.151 2007/12/05 05:48:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.152 2007/12/06 06:27:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1375,11 +1375,11 @@ eval_3dplots()
 		    c_token++;
 		    if (isstringvalue(c_token))
 			try_to_get_string(); /* ignore optionally given title string */
+		    this_plot->title_is_suppressed = TRUE;
 		    if (xtitle != NULL)
 			xtitle[0] = '\0';
 		    if (ytitle != NULL)
 			ytitle[0] = '\0';
-		    /*   this_plot->title = NULL;   */
 		    set_title = TRUE;
 		    continue;
 		}

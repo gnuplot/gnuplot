@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.182 2007/10/26 22:55:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.183 2007/12/08 10:55:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -267,8 +267,8 @@ find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
 	/* we draw a main entry if there is one, and we are
 	 * drawing either surface, or unlabelled contours
 	 */
-	if (this_plot->title && *this_plot->title &&
-	    (draw_surface || (draw_contour && !label_contours))) {
+	if (this_plot->title && *this_plot->title && !this_plot->title_is_suppressed
+	    && (draw_surface || (draw_contour && !label_contours))) {
 	    ++cnt;
 	    len = estimate_strlen(this_plot->title);
 	    if (len > mlen)
@@ -950,7 +950,8 @@ do_3dplot(
 	    }
 
 	    if (draw_surface) {
-		TBOOLEAN lkey = (key->visible && this_plot->title && this_plot->title[0]);
+		TBOOLEAN lkey = (key->visible && this_plot->title && this_plot->title[0]
+				&& !this_plot->title_is_suppressed);
 		term_apply_lp_properties(&(this_plot->lp_properties));
 
 
@@ -1121,6 +1122,7 @@ do_3dplot(
 		term_apply_lp_properties(&(thiscontour_lp_properties));
 
 		if (key->visible && this_plot->title && this_plot->title[0]
+		    && !this_plot->title_is_suppressed
 		    && !draw_surface && !label_contours) {
 		    /* unlabelled contours but no surface : put key entry in now */
 		    /* EAM - force key text to black, then restore */

@@ -3,6 +3,10 @@
 	* configure.in:  Increase the chance that ./configure will correctly
 	find all the pieces of gnu libreadline under OSX 1.4.
 
+	* src/plot3d.c src/graph3d.c src/graph3d.h:
+	Make 3D code use the same mechanism as 2D (plot->title_is_suppressed)
+	to control whether a key title is generated. 
+
 2007-12-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary):  Missing "else" in bounds calculation.
