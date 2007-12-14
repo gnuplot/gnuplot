@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.95.2.10 2007/05/04 16:59:53 sfeam Exp $
+ * $Id: gd.trm,v 1.95.2.11 2007/09/24 03:19:04 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -741,11 +741,10 @@ PNG_options()
 			png_state.ttfsize = png_state.default_ttfsize;
 			*comma = '\0';
 		    }
-		    strncpy(png_state.ttffont, s, sizeof(png_state.ttffont));
+		    strncpy(png_state.ttffont, s, sizeof(png_state.ttffont)-1);
 		    free(s);
 		} else {
-		    copy_str(png_state.ttffont, c_token,
-			     sizeof(png_state.ttffont));
+		    copy_str(png_state.ttffont, c_token, sizeof(png_state.ttffont)-1);
 		    c_token++;
 		}
 		strcpy(png_state.default_ttffont, png_state.ttffont);
