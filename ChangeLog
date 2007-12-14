@@ -1,3 +1,8 @@
+2007-12-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in:  Increase the chance that ./configure will correctly
+	find all the pieces of gnu libreadline under OSX 1.4.
+
 2007-12-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: New option 'set term x11 linewidth LW'
