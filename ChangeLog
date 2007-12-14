@@ -1,10 +1,15 @@
+2007-12-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in:  Increase the chance that ./configure will correctly
+	find all the pieces of gnu libreadline under OSX 1.4.
+
 2007-12-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary):  Missing "else" in bounds calculation.
 	Also fix trivial typo of v_char instead of h_char.
 
 	* term/svg.trm (SVG_SetFont) term/gd.trm (PNG_options): Use strncpy so
-	that overly long font names do not generate a setfault.
+	that overly long font names do not generate a segfault.
 
 2007-12-09  Ethan A Merritt  <merritt@u.washington.edu>
 
