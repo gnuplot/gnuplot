@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.149 2007/10/21 04:12:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.150 2007/10/21 04:17:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -746,6 +746,20 @@ get_3ddata(struct surface_points *this_plot)
 		}
 		continue;
 	    }
+
+#ifdef EAM_DATASTRINGS
+	    else if (j == DF_FOUND_KEY_TITLE){
+		/* only the shared part of the 2D and 3D headers is used */
+		df_set_key_title((struct curve_points *)this_plot);
+		continue;
+	    }
+	    else if (j == DF_KEY_TITLE_MISSING){
+		fprintf(stderr,
+			"get_data: key title not found in requested column\n"
+		    );
+		continue;
+	    }
+#endif
 
 	    /* its a data point or undefined */
 	    if (xdatum >= local_this_iso->p_max) {
@@ -1495,6 +1509,7 @@ eval_3dplots()
 		int_error(c_token, "duplicated or contradicting arguments in plot options");
 
 	    /* set default values for title if this has not been specified */
+	    this_plot->title_is_filename = FALSE;
 	    if (!set_title) {
 		this_plot->title_no_enhanced = TRUE; /* filename or function cannot be enhanced */
 		if (key->auto_titles == FILENAME_KEYTITLES) {
@@ -1515,6 +1530,7 @@ eval_3dplots()
 			xtitle = this_plot->title;
 		    else if (crnt_param == 1)
 			ytitle = this_plot->title;
+		    this_plot->title_is_filename = TRUE;
 		} else {
 		    if (xtitle != NULL)
 			xtitle[0] = '\0';

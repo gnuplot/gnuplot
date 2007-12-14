@@ -1,3 +1,8 @@
+2007-12-14  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/plot3d.c (eval3d_plots get3d_data): Implement taking key entry
+	titles from datafile column headers.   'splot <foo> using 1:2:3 title 3'
+
 2007-12-02  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* configure.in, src/show.c (show_version) NEWS:  Added new feature
