@@ -1,3 +1,7 @@
+2007-12-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (int_error): Fix incorrect handling of va_list.
+
 2007-12-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  Increase the chance that ./configure will correctly
