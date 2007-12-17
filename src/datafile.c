@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.129 2007/12/02 03:59:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.130 2007/12/06 06:27:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1958,13 +1958,13 @@ df_readascii(double v[], int max)
 			evaluate_at(use_spec[output].at, &a);
 			evaluate_inside_using = FALSE;
 			if (a.type == STRING) {
-			    add_tic_user(axis,a.v.string_val,xpos,0);
+			    add_tic_user(axis, a.v.string_val, xpos, -1);
 			    gpfree_string(&a);
 			} else
 			    fprintf(stderr,"Tic label does not evaluate as string!\n");
 		    } else {
 			df_parse_string_field(temp_string,df_tokens[output]);
-			add_tic_user(axis,temp_string,xpos,0);
+			add_tic_user(axis, temp_string, xpos, -1);
 		    }
 #ifdef EAM_HISTOGRAMS
 		} else if (use_spec[output].expected_type == CT_KEYLABEL) {
@@ -2715,7 +2715,7 @@ df_set_key_title(struct curve_points *plot)
 	/* way, so we assume that it is supposed to be an xtic label.      */
 	/* FIXME EAM - This style should default to notitle!               */
 	double xpos = plot->histogram_sequence + plot->histogram->start;
-	add_tic_user(FIRST_X_AXIS,df_key_title,xpos,0);
+	add_tic_user(FIRST_X_AXIS, df_key_title, xpos, -1);
 	df_key_title[0] = '\0';
 	return;
     }

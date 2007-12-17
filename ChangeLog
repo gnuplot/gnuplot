@@ -2,6 +2,13 @@
 
 	* src/util.c (int_error): Fix incorrect handling of va_list.
 
+	* src/datafile.c: Call add_tic_user with a tick type of -1 (a new flag
+	value) rather than 0 (major tick).  This allows to distinguish between
+	tick labels read from a data file and those entered from the
+	command line.
+
+	* src/axis.c (gen_tics): Treat tick type -1 the same as major ticks.
+
 2007-12-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  Increase the chance that ./configure will correctly
