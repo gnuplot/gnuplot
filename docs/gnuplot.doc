@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.464 2007/12/02 05:47:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.465 2007/12/08 10:55:16 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2131,7 +2131,7 @@ C ... and restart the table:
 ?commands bind space
 ?bind space
  By default, the <space> hotkey raises gnuplot's command window. On some
- terminals (e.g. x11, wx), 'q' closes the graph window. These defaults can
+ terminals (e.g. x11, wxt), 'q' closes the graph window. These defaults can
  be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
  see `x11 command-line-options`, or by the X Resource 'gnuplot*ctrlq'.
  Note: if <space> (or ctrl-space) does not raise the gnuplot window under X11,
@@ -4137,7 +4137,7 @@ Ffigure_mapcontours
  plot window. If you want to wait for a particular key to be pressed, you can
  use a reread loop such as:
 
-       printf "I will resume after you hit the Tab key in the plot window"
+       print "I will resume after you hit the Tab key in the plot window"
        load "wait_for_tab"
 
  File "wait_for_tab" contains the lines
