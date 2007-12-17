@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.72 2007/11/11 19:22:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.73 2007/12/17 21:43:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -929,7 +929,7 @@ int_error(int t_num, const char str[], va_dcl)
     VA_START(args, str);
 # if defined(HAVE_VFPRINTF) || _LIBC
     vsnprintf(error_message, sizeof(error_message), str, args);
-    fputs(error_message, stderr);
+    fprintf(stderr,"%.80s",error_message);
 # else
     _doprnt(str, args, stderr);
 # endif
