@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.465 2007/12/08 10:55:16 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.466 2007/12/17 06:23:29 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4210,7 +4210,7 @@ Ffigure_mapcontours
                           {thru <thru expression>}
                           {using <using list>}
                           {smooth <option>}
-                          {volatile}
+                          {volatile} {noautoscale}
 
  The modifiers `binary`, `index`, `every`, `thru`, `using`, and `smooth` are
  discussed separately.  In brief, `binary` allows data entry from a binary
@@ -4224,6 +4224,9 @@ Ffigure_mapcontours
  The `volatile` keyword indicates that the contents of the data file may be
  different if the file is re-read.  This tells the program to use `refresh`
  rather than `replot` commands whenever possible.  See `refresh`.
+
+ The `noautoscale` keyword means that the points making up this plot will be
+ ignored when automatically determining axis range limits.
 
 
  ASCII DATA FILES:
@@ -5972,7 +5975,9 @@ Ffigure_mapcontours
 ?autoscale
 ?noautoscale
  Autoscaling may be set individually on the x, y or z axis or globally on all
- axes. The default is to autoscale all axes.
+ axes. The default is to autoscale all axes.  If you want to autoscale based on
+ a subset of the plots in the figure, you can mark the other ones with the flag
+ `noautoscale`.  See `datafile`.
 
  Syntax:
        set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix | keepfix}

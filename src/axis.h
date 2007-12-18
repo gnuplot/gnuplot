@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.47 2006/12/27 21:40:26 sfeam Exp $
+ * $Id: axis.h,v 1.48 2007/08/31 20:03:41 sfeam Exp $
  *
  */
 
@@ -68,6 +68,7 @@ typedef enum AXIS_INDEX {
     U_AXIS,			/* ditto */
     V_AXIS			/* ditto */
     ,COLOR_AXIS
+#define NO_AXIS 99
 } AXIS_INDEX;
 
 # define AXIS_ARRAY_SIZE 11
@@ -526,11 +527,12 @@ do {							\
  * Do OUT_ACTION or UNDEF_ACTION as appropriate
  * adjust range provided type is INRANGE (ie dont adjust y if x is outrange
  * VALUE must not be same as STORE
+ * NOAUTOSCALE is per-plot property, whereas AUTOSCALE_XXX is per-axis.
  * Note: see the particular implementation for COLOR AXIS below.
  */
 
 #define STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
-				       OUT_ACTION, UNDEF_ACTION)	  \
+			        NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
 do {									  \
     /* HBB 20000726: new check, to avoid crashes with axis index -1 */	  \
     if (AXIS==-1)							  \
@@ -556,6 +558,8 @@ do {									  \
 	}								  \
     } else								  \
 	STORE = VALUE;							  \
+    if (NOAUTOSCALE)							  \
+	break;  /* this plot is not being used for autoscaling */	  \
     if (TYPE != INRANGE)						  \
 	break;  /* don't set y range if x is outrange, for example */	  \
     if ((int)AXIS < 0)							  \
@@ -584,11 +588,11 @@ do {									  \
  * of the min or max color value).
  */
 #define COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
-				       OUT_ACTION, UNDEF_ACTION)	  \
+			       NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
 {									  \
     int c_type_tmp = TYPE;						  \
     STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, AXIS,	  \
-				       OUT_ACTION, UNDEF_ACTION);	  \
+			       NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION);	  \
 }
 
 /* Empty macro arguments triggered NeXT cpp bug       */

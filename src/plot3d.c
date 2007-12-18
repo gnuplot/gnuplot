@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.152 2007/12/06 06:27:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.153 2007/12/15 04:01:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -591,12 +591,14 @@ grid_nongrid_data(struct surface_points *this_plot)
 	    z = z / w;
 #endif
 
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis,
+	    				this_plot->noautoscale, NOOP, continue);
 
 	    if (this_plot->pm3d_color_from_column)
 		int_error(NO_CARET, "Gridding of the color column is not implemented");
 	    else {
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points->CRD_COLOR, z, points->type, COLOR_AXIS, NOOP, continue);
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points->CRD_COLOR, z, points->type, COLOR_AXIS,
+					this_plot->noautoscale, NOOP, continue);
 	    }
 	}
     }
@@ -931,12 +933,12 @@ get_3ddata(struct surface_points *this_plot)
 	     * I regard this as correct goto use
 	     */
 	    cp->type = INRANGE;
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, x_axis, NOOP, goto come_here_if_undefined);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, y_axis, NOOP, goto come_here_if_undefined);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, x_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, y_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 	    if (this_plot->plot_style == VECTOR) {
 		cptail->type = INRANGE;
-		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->x, xtail, cp->type, x_axis, NOOP, goto come_here_if_undefined);
-		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->y, ytail, cp->type, y_axis, NOOP, goto come_here_if_undefined);
+		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->x, xtail, cp->type, x_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->y, ytail, cp->type, y_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 	    }
 
 	    if (dgrid3d) {
@@ -948,15 +950,15 @@ get_3ddata(struct surface_points *this_plot)
 		if (this_plot->plot_style == VECTOR)
 		    cptail->z = ztail;
 	    } else {
-		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
+		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 		if (this_plot->plot_style == VECTOR)
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->z, ztail, cp->type, z_axis, NOOP, goto come_here_if_undefined);
+		    STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->z, ztail, cp->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 
 		if (NEED_PALETTE(this_plot)) {
 		    if (pm3d_color_from_column) {
-			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, color, cp->type, COLOR_AXIS, NOOP, goto come_here_if_undefined);
+			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, color, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 		    } else {
-			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, z, cp->type, COLOR_AXIS, NOOP, goto come_here_if_undefined);
+			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, z, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 		    }
 		}
 	    }
@@ -974,9 +976,9 @@ get_3ddata(struct surface_points *this_plot)
 		 * different variables.  Place all components on the same axis.
 		 * That will maintain a consistent mapping amongst the components.
 		 */
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_R, v[3], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_G, v[4], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_B, v[5], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_R, v[3], cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_G, v[4], cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_B, v[5], cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
 	    }
 #endif
 
@@ -1122,9 +1124,10 @@ calculate_set_of_isolines(
 	    temp = real(&a);
 	    points[i].type = INRANGE;
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].z, temp, points[i].type,
-					    value_axis, NOOP, NOOP);
+					    value_axis, FALSE, NOOP, NOOP);
 	    if (do_update_color) {
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].CRD_COLOR, temp, points[i].type, COLOR_AXIS, NOOP, NOOP);
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].CRD_COLOR, temp, points[i].type, 
+					    COLOR_AXIS, FALSE, NOOP, NOOP);
 	    }
 	}
 	(*this_iso)->p_count = num_sam_to_use;

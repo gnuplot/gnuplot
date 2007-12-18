@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.156 2007/11/14 18:57:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.157 2007/12/06 06:27:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -291,7 +291,8 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	     * mark everything INRANGE and re-evaluate the axis limits now.
 	     * Otherwise test INRANGE/OUTRANGE against previous axis limits.
 	     */
-	    if (x_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX)) {
+	    if (!this_plot->noautoscale
+	    &&  (x_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX))) {
 		if (point->x > x_axis->max) x_axis->max = point->x;
 		if (point->x < x_axis->min) x_axis->min = point->x;
 	    } else if (!inrange(point->x, x_axis->min, x_axis->max)) {
@@ -299,7 +300,8 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 		continue;
 	    }
 
-	    if (y_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX)) {
+	    if (!this_plot->noautoscale
+	    &&  (y_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX))) {
 		if (point->y > y_axis->max) y_axis->max = point->y;
 		if (point->y < y_axis->min) y_axis->min = point->y;
 	    } else if (!inrange(point->y, y_axis->min, y_axis->max)) {
@@ -336,11 +338,11 @@ get_data(struct curve_points *current_plot)
 
     /* eval_plots has already opened file */
 
-    /* HBB 2000504: For most plot styles, the 'z' coordinate is
-     * unused.  set it to -1, to account for that. For styles that use
+    /* HBB 2000504: For most 2D plot styles the 'z' coordinate is unused.
+     * Set it to NO_AXIS to account for that. For styles that use
      * the z coordinate as a real coordinate (i.e. not a width or
      * 'delta' component, change the setting inside the switch: */
-    current_plot->z_axis = -1;
+    current_plot->z_axis = NO_AXIS;
 
     /* HBB NEW 20060427: if there's only one, explicit using column,
      * it's y data.  df_axis[] has to reflect that, so df_readline()
@@ -711,7 +713,7 @@ get_data(struct curve_points *current_plot)
 				  v[1], v[2]);
 		    cp = &(current_plot->points[i]);
 		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, v[2], cp->type,
-							  COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+			COLOR_AXIS, current_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
 		    i++;
 		    break;
 #endif
@@ -839,9 +841,12 @@ get_data(struct curve_points *current_plot)
 		     * (That will maintain a consistent mapping amongst the components.)
 		     */
 		    cp = &(current_plot->points[i]);
-		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_R, v[2], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
-		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_G, v[3], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
-		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_B, v[4], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_R, v[2], cp->type, COLOR_AXIS, 
+		    			current_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_G, v[3], cp->type, COLOR_AXIS,
+		    			current_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_B, v[4], cp->type, COLOR_AXIS,
+		    			current_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
 		    i++;
 		    break;
 #endif
@@ -971,8 +976,10 @@ store2d_point(
      * but graphics.c doesn't know.
      * explicitly store -VERYLARGE;
      */
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, current_plot->x_axis, NOOP, return);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, current_plot->y_axis, NOOP, return);
+    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, current_plot->x_axis,
+    			current_plot->noautoscale, NOOP, return);
+    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, current_plot->y_axis,
+    			current_plot->noautoscale, NOOP, return);
 
     switch (current_plot->plot_style) {
     case POINTSTYLE:		/* Only x and y are relevant to axis scaling */
@@ -987,21 +994,22 @@ store2d_point(
 	cp->yhigh = yhigh;
 	break;
     default:			/* auto-scale to xlow xhigh ylow yhigh */
-	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type,
-					current_plot->x_axis, NOOP, cp->xlow = -VERYLARGE);
-	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type,
-					current_plot->x_axis, NOOP, cp->xhigh = -VERYLARGE);
-	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->ylow, ylow, dummy_type,
-					current_plot->y_axis, NOOP, cp->ylow = -VERYLARGE);
-	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type,
-					current_plot->y_axis, NOOP, cp->yhigh = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
+					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
+					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->ylow, ylow, dummy_type, current_plot->y_axis,
+					current_plot->noautoscale, NOOP, cp->ylow = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis,
+					current_plot->noautoscale, NOOP, cp->yhigh = -VERYLARGE);
 	break;
     }
 
     /* HBB 20010214: if z is not used for some actual value, just
      * store 'width' to that axis and be done with it */
-    if ((int)current_plot->z_axis != -1)
-	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, width, dummy_type, current_plot->z_axis, NOOP, cp->z = -VERYLARGE);
+    if ((int)current_plot->z_axis != NO_AXIS)
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, width, dummy_type, current_plot->z_axis, 
+					current_plot->noautoscale, NOOP, cp->z = -VERYLARGE);
     else
 	cp->z = width;
 }                               /* store2d_point */
@@ -2185,13 +2193,17 @@ eval_plots()
 				    xlow = x - boxwidth/2;
 				    xhigh = x + boxwidth/2;
 				}
-				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, xlow, dmy_type, x_axis, NOOP, NOOP );
+				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, xlow, dmy_type, x_axis, 
+								 this_plot->noautoscale, NOOP, NOOP );
 				dmy_type = INRANGE;
-				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, xhigh, dmy_type, x_axis, NOOP, NOOP );
+				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, xhigh, dmy_type, x_axis,
+								 this_plot->noautoscale, NOOP, NOOP );
 			    }
 			    temp = y;
-			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].x, x, this_plot->points[i].type, x_axis, NOOP, goto come_here_if_undefined);
-			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, y, this_plot->points[i].type, y_axis, NOOP, goto come_here_if_undefined);
+			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].x, x, this_plot->points[i].type, x_axis,
+			    				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, y, this_plot->points[i].type, y_axis,
+			    				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 			} else {        /* neither parametric or polar */
 			    /* If non-para, it must be INRANGE */
 			    /* logscale ? log(x) : x */
@@ -2208,11 +2220,14 @@ eval_plots()
 				    xlow = x - boxwidth/2;
 				    xhigh = x + boxwidth/2;
 				}
-				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, xlow, dmy_type, x_axis, NOOP, NOOP );
+				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, xlow, dmy_type, x_axis,
+								    this_plot->noautoscale, NOOP, NOOP );
 				dmy_type = INRANGE;
-				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, xhigh, dmy_type, x_axis, NOOP, NOOP );
+				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, xhigh, dmy_type, x_axis,
+								    this_plot->noautoscale, NOOP, NOOP );
 			    }
-			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, in_parametric ? x_axis : y_axis, NOOP, goto come_here_if_undefined);
+			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, in_parametric ? x_axis : y_axis,
+			    				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 
 			    /* could not use a continue in this case */
 			  come_here_if_undefined:
@@ -2445,25 +2460,33 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 		    y = r * sin(t);
 		    if (boxwidth >= 0 && boxwidth_is_absolute) {
 			int dmy_type = INRANGE;
-			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, xp->x_axis, NOOP, NOOP );
+			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, xp->x_axis,
+							 xp->noautoscale, NOOP, NOOP );
 			dmy_type = INRANGE;
-			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xhigh, x + boxwidth/2, dmy_type, xp->x_axis, NOOP, NOOP );
+			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xhigh, x + boxwidth/2, dmy_type, xp->x_axis,
+							 xp->noautoscale, NOOP, NOOP );
 		    }
 		    /* we hadn't done logs when we stored earlier */
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, xp->x_axis, NOOP, NOOP);
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, xp->y_axis, NOOP, NOOP);
+		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, xp->x_axis,
+		    				 xp->noautoscale, NOOP, NOOP);
+		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, xp->y_axis,
+		    				 xp->noautoscale, NOOP, NOOP);
 		} else {
 		    double x = xp->points[i].y;
 		    double y = yp->points[i].y;
 
 		    if (boxwidth >= 0 && boxwidth_is_absolute) {
 			int dmy_type = INRANGE;
-			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, yp->x_axis, NOOP, NOOP );
+			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, yp->x_axis,
+							 xp->noautoscale, NOOP, NOOP );
 			dmy_type = INRANGE;
-			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xhigh, x + boxwidth/2, dmy_type, yp->x_axis, NOOP, NOOP );
+			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xhigh, x + boxwidth/2, dmy_type, yp->x_axis,
+							 xp->noautoscale, NOOP, NOOP );
 		    }
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, yp->x_axis, NOOP, NOOP);
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, yp->y_axis, NOOP, NOOP);
+		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, yp->x_axis,
+		    				 xp->noautoscale, NOOP, NOOP);
+		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, yp->y_axis,
+		    				 xp->noautoscale, NOOP, NOOP);
 		}
 	    }
 

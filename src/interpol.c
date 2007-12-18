@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.30 2004/07/01 17:10:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.31 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -136,10 +136,6 @@ static char *RCSid() { return RCSid("$Id: interpol.c,v 1.30 2004/07/01 17:10:06 
 /*
  * IMHO, code is getting too cluttered with repeated chunks of
  * code. Some macros to simplify, I hope.
- *
- * do { } while(0) is comp.lang.c recommendation for complex macros
- * also means that break can be specified as an action, and it will
- *
  */
 
 

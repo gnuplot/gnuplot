@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.28 2007/06/22 04:28:16 sfeam Exp $
+ * $Id: graph3d.h,v 1.29 2007/12/15 04:01:27 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -88,6 +88,7 @@ typedef struct surface_points {
     TBOOLEAN title_no_enhanced;	/* don't typeset title in enhanced mode */
     TBOOLEAN title_is_filename;	/* not used in 3D */
     TBOOLEAN title_is_suppressed;/* TRUE if 'notitle' was specified */
+    TBOOLEAN noautoscale;	/* ignore data from this plot during autoscaling */
     struct lp_style_type lp_properties;
     struct arrow_style_type arrow_properties;
     struct fill_style_type fill_properties;	/* FIXME: ignored in 3D */

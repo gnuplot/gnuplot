@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.38 2007/06/05 19:09:37 sfeam Exp $
+ * $Id: graphics.h,v 1.39 2007/10/28 05:48:35 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -54,6 +54,7 @@ typedef struct curve_points {
     TBOOLEAN title_no_enhanced;	/* don't typeset title in enhanced mode */
     TBOOLEAN title_is_filename;	/* TRUE if title was auto-generated from filename */
     TBOOLEAN title_is_suppressed;/* TRUE if 'notitle' was specified */
+    TBOOLEAN noautoscale;	/* ignore data from this plot during autoscaling */
     struct lp_style_type lp_properties;
     struct arrow_style_type arrow_properties;
     struct fill_style_type fill_properties;

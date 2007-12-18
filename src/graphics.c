@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.239 2007/12/09 06:57:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.240 2007/12/13 21:27:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -115,6 +115,7 @@ static void place_histogram_titles __PROTO((void));
 #endif
 
 /*{{{  static fns and local macros */
+static void recheck_ranges __PROTO((struct curve_points * plot));
 static void plot_border __PROTO((void));
 static void plot_impulses __PROTO((struct curve_points * plot, int yaxis_x, int xaxis_y));
 static void plot_lines __PROTO((struct curve_points * plot));
@@ -1872,6 +1873,11 @@ do_plot(struct curve_points *plots, int pcount)
 	    ignore_enhanced(FALSE);
 	}
 
+	/* If any plots have opted out of autoscaling, we need to recheck */
+	/* whether their points are INRANGE or not.                       */
+	if (this_plot->noautoscale)
+	    recheck_ranges(this_plot);
+
 	/* and now the curves, plus any special key requirements */
 	/* be sure to draw all lines before drawing any points */
 	/* Skip missing/empty curves */
@@ -2050,6 +2056,26 @@ do_plot(struct curve_points *plots, int pcount)
 	term->previous_palette();
 
     term_end_plot();
+}
+
+
+/*
+ * Plots marked "noautoscale" do not yet have INRANGE/OUTRANGE flags set.
+ */
+static void
+recheck_ranges(struct curve_points *plot)
+{
+    int i;			/* point index */
+
+    for (i = 0; i < plot->p_count; i++) {
+	if (plot->noautoscale) {
+	    plot->points[i].type = INRANGE;
+	    if (!inrange(plot->points[i].x, axis_array[plot->x_axis].min, axis_array[plot->x_axis].max))
+		plot->points[i].type = OUTRANGE;
+	    if (!inrange(plot->points[i].y, axis_array[plot->y_axis].min, axis_array[plot->y_axis].max))
+		plot->points[i].type = OUTRANGE;
+	}
+    }
 }
 
 
@@ -5417,8 +5443,10 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	    x -= (points[grid_corner[(i+2)%4]].x - points[grid_corner[i]].x)/(2*(L-1));
 	    y -= (points[grid_corner[(i+2)%4]].y - points[grid_corner[i]].y)/(2*(L-1));
 	    /* Update range and store value back into itself. */
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(x, x, dummy_type, ((struct curve_points *)plot)->x_axis, NOOP, x = -VERYLARGE);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(y, y, dummy_type, ((struct curve_points *)plot)->y_axis, NOOP, y = -VERYLARGE);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(x, x, dummy_type, ((struct curve_points *)plot)->x_axis,
+				((struct curve_points *)plot)->noautoscale, NOOP, x = -VERYLARGE);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(y, y, dummy_type, ((struct curve_points *)plot)->y_axis,
+				((struct curve_points *)plot)->noautoscale, NOOP, y = -VERYLARGE);
 	}
 	return;
     }

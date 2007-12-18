@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.130 2007/12/06 06:27:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.131 2007/12/17 23:09:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1201,6 +1201,13 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    continue;
 	}
 
+	/* Allow this plot not to affect autoscaling */
+	if (almost_equals(c_token, "noauto$scale")) {
+	    c_token++;
+	    plot->noautoscale = TRUE;
+	    continue;
+	}
+
 #ifdef EAM_DATASTRINGS
 	/* Take key title from column head? */
 	if (almost_equals(c_token, "t$itle")) {
@@ -2283,11 +2290,15 @@ df_3dmatrix(struct surface_points *this_plot, int need_palette)
 
 	    point->type = INRANGE;      /* so far */
 
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->x, used[0], point->type, FIRST_X_AXIS, NOOP, goto skip);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->y, used[1], point->type, FIRST_Y_AXIS, NOOP, goto skip);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->z, used[2], point->type, FIRST_Z_AXIS, NOOP, goto skip);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->x, used[0], point->type, FIRST_X_AXIS,
+					    this_plot->noautoscale, NOOP, goto skip);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->y, used[1], point->type, FIRST_Y_AXIS,
+					    this_plot->noautoscale, NOOP, goto skip);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->z, used[2], point->type, FIRST_Z_AXIS,
+					    this_plot->noautoscale, NOOP, goto skip);
 	    if (need_palette) {
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(point->CRD_COLOR, used[3], point->type, COLOR_AXIS, NOOP, goto skip);
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(point->CRD_COLOR, used[3], point->type, COLOR_AXIS,
+					    this_plot->noautoscale, NOOP, goto skip);
 	    }
 
 	    /* some of you won't like this, but I say goto is for this */
