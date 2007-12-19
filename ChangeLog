@@ -1,3 +1,10 @@
+2007-12-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Implement dashed lines. Extend color support to
+	include TC_LT. Assign color and dash attributes to individual paths,
+	rather than inheriting them from the style of the surrounding group
+	environment. 
+
 2007-12-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE): Add a new parameter

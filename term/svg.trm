@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.83 2007/12/02 01:48:14 sfeam Exp $
+ * $Id: svg.trm,v 1.84 2007/12/14 05:17:50 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -28,13 +28,17 @@
  * Wilhelm Braunschober <Wilhelm.Braunschober@t-online.de>, Feb-21-2002 */
 
 /*
- * Tweaked code for compatibility with Sodipodi svg viewer/editor.
- * Added enhanced text support.
- * Additional line properties.
- * Increase resolution by adding a coordinate scale factor.
- * CODDLE_NONCOMPLIANT_VIEWERS
+ * Additional code for gnuplot versions 4.2 and 4.3
  *
- *   Ethan Merritt  <merritt@u.washington.edu>
+ *   Tweaked code for compatibility with Sodipodi svg viewer/editor.
+ *   Added enhanced text support.
+ *   Additional line properties.
+ *   Increase resolution by adding a coordinate scale factor.
+ *   CODDLE_NONCOMPLIANT_VIEWERS
+ *   Support dashed lines, TC_* color model.
+ *   Change path markup from    style='attribute: foo'  to   attribute='foo'
+ *
+ * Ethan Merritt  <merritt@u.washington.edu>
  */
 
 #include "driver.h"
@@ -88,7 +92,8 @@ static t_sm_palette SVG_palette;
 static unsigned char SVG_red = 0;
 static unsigned char SVG_green = 0;
 static unsigned char SVG_blue = 0;
-static unsigned char SVG_use_pm3d_color = 0;
+static unsigned char SVG_color_mode = TC_DEFAULT;
+static char *SVG_linecolor = NULL;
 
 static TBOOLEAN SVG_groupFilledIsOpen = FALSE; /* open pm3d group flag*/
 
@@ -155,6 +160,13 @@ static int ENHsvg_string_state = 0;
 static double ENHsvg_x_offset = 0;
 #define CODDLE_NONCOMPLIANT_VIEWERS 1	/* Use pt rather than em spacing */
 
+/* Support for dashed lines */
+#define SVG_dashtypes 5
+static TBOOLEAN SVG_dashed = FALSE;
+static char *SVG_dashpattern[SVG_dashtypes] = {
+    "", " 5,8", " 1,4", " 8,4,2,4", " 9,4,1,4,1,4"
+    };
+
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_Pen_RealID
 ------------------------------------------------------------------------------------------------------------------------------------*/
@@ -182,15 +194,19 @@ SVG_GroupOpen ()
 	fprintf (gpoutfile, "<g style=\"fill:none; color:%s; stroke:",
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
 
-	if (SVG_use_pm3d_color)
+	if (SVG_color_mode == TC_RGB)
 	    fprintf(gpoutfile, "rgb(%3d, %3d, %3d)", SVG_red, SVG_green, SVG_blue);
+	else if (SVG_color_mode == TC_LT)
+	    fprintf(gpoutfile, "%s", SVG_linecolor);
 	else
 	    fprintf(gpoutfile, "currentColor");
 
-	fprintf (gpoutfile, "; stroke-width:%.2f; stroke-linecap:%s; stroke-linejoin:%s\">\n",
+	fprintf (gpoutfile, "; stroke-width:%.2f; stroke-linecap:%s; stroke-linejoin:%s",
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width * SVG_linewidth_factor,
 		 SVG_rounded ? "round" : "butt",
 		 SVG_rounded ? "round" : "miter");
+
+	fprintf (gpoutfile, "\">\n");
 
 	SVG_groupIsOpen = TRUE;
     }
@@ -218,12 +234,23 @@ SVG_PathOpen ()
 {
     if (!SVG_pathIsOpen) {
 	SVG_GroupFilledClose();
-	if (SVG_use_pm3d_color) {
-	    fprintf(gpoutfile, "\t<path style='stroke:rgb(%3d, %3d, %3d)' d='",
+	    
+	fputs ("\t<path ", gpoutfile);
+
+	/* Line color */
+	if (SVG_color_mode == TC_RGB)
+	    fprintf(gpoutfile, "stroke='rgb(%3d, %3d, %3d)' ",
 		    SVG_red, SVG_green, SVG_blue);
-	} else {
-	    fputs ("\t<path d='", gpoutfile);
-	}
+	else if (SVG_color_mode == TC_LT)
+	    fprintf(gpoutfile, "stroke='%s' ", SVG_linecolor);
+	
+	/* Dash patterns */
+	if (SVG_dashed && SVG_LineType % SVG_dashtypes > 0)
+	    fprintf(gpoutfile, "stroke-dasharray='%s' ",
+	 	    SVG_dashpattern[SVG_LineType % SVG_dashtypes]);
+	
+	fputs (" d='", gpoutfile);
+
 	SVG_pathIsOpen = TRUE;
     }
 }
@@ -297,8 +324,10 @@ SVG_GroupFilledClose()
 static void
 SVG_StyleColor(const char* paint)
 {
-    if (SVG_use_pm3d_color)
+    if (SVG_color_mode == TC_RGB)
 	fprintf(gpoutfile, "%s = 'rgb(%3d, %3d, %3d)'", paint, SVG_red, SVG_green, SVG_blue);
+    else if (SVG_color_mode == TC_LT)
+	fprintf(gpoutfile, "%s = '%s'", paint, SVG_linecolor);
     else
 	fprintf(gpoutfile, "%s = 'currentColor'", paint);
 }
@@ -354,13 +383,14 @@ SVG_DefineFillPattern(int fillpat)
 		    break;
 	}
 	if (*path) {
-	    if (SVG_use_pm3d_color)
-		fprintf(gpoutfile,"\
-\t\t\t<path style=\"fill:none; %s:rgb(%d,%d,%d)\" d='%s'/>\n",
-		    style, SVG_red, SVG_green, SVG_blue, path);
+	    if (SVG_color_mode == TC_RGB)
+		fprintf(gpoutfile,"\t\t\t<path style=\"fill:none; %s:rgb(%d,%d,%d)\" d='%s'/>\n",
+			style, SVG_red, SVG_green, SVG_blue, path);
+	    else if (SVG_color_mode == TC_LT)
+		fprintf(gpoutfile, "\t\t\t<path style = '%s:%s' d= '%s'/>\n",
+			style, SVG_linecolor, path);
 	    else
-		fprintf(gpoutfile, "\
-\t\t\t<path style = '%s:currentColor' d='%s'/>\n",
+		fprintf(gpoutfile, "\t\t\t<path style = '%s:currentColor' d='%s'/>\n",
 			style, path);
 	}
 	fputs("\t\t</pattern>\n" "\t</defs>\n", gpoutfile);
@@ -508,6 +538,18 @@ SVG_options ()
 	    SVG_rounded = FALSE;
 	    continue;
 	}
+
+	if (equals(c_token, "solid")) {
+	    c_token++;
+	    SVG_dashed = FALSE;
+	    continue;
+	}
+									
+	if (almost_equals(c_token, "dash$ed")) {
+	    c_token++;
+	    SVG_dashed = TRUE;
+	    continue;
+	}
 									
 	int_error(c_token, "unrecognized terminal option");
     }
@@ -529,6 +571,9 @@ SVG_options ()
 
     sprintf(term_options + strlen(term_options),
 	SVG_rounded ? "rounded " : "butt ");
+
+    sprintf(term_options + strlen(term_options),
+	SVG_dashed ? "dashed " : "solid ");
 
     if (SVG_linewidth_factor != 1.0) {
 	sprintf(term_options + strlen(term_options),
@@ -723,7 +768,7 @@ SVG_graphics ()
     SVG_fillPattern = -1;
     SVG_fillPatternIndex = 0;
     SVG_groupFilledIsOpen = FALSE;
-    SVG_use_pm3d_color = 0;
+    SVG_color_mode = TC_DEFAULT;
     SVG_pathIsOpen = FALSE;
 
 /* reset position*/
@@ -756,7 +801,7 @@ SVG_reset ()
 TERM_PUBLIC void
 SVG_linetype (int linetype)
 {
-    SVG_use_pm3d_color = 0;
+    SVG_color_mode = TC_DEFAULT;
     if (linetype != SVG_LineType) {
 	SVG_PathClose ();
 	SVG_GroupClose ();
@@ -840,12 +885,13 @@ TERM_PUBLIC void
 SVG_point (unsigned int x, unsigned int y, int number)
 {
     char color_spec[0x40];
-    if (SVG_use_pm3d_color) {
-       	sprintf(color_spec, " style='color:rgb(%3d, %3d, %3d)'",
+    if (SVG_color_mode == TC_RGB)
+   	sprintf(color_spec, " style='color:rgb(%3d, %3d, %3d)'",
 		SVG_red, SVG_green, SVG_blue);
-    } else {
+    else if (SVG_color_mode == TC_LT)
+	sprintf(color_spec, " style='color:%s'", SVG_linecolor);
+    else
 	*color_spec = '\0';
-    }
 
     SVG_PathClose ();
 
@@ -929,11 +975,13 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 	fprintf (gpoutfile, " rotate(%i)", -SVG_TextAngle);
     fprintf (gpoutfile, "\" style=\"stroke:none; fill:");
 
-    if (!SVG_use_pm3d_color)
-	fprintf (gpoutfile, "%s",
-		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
-    else
+    if (SVG_color_mode == TC_RGB)
 	fprintf (gpoutfile, "rgb(%d,%d,%d)", SVG_red, SVG_green, SVG_blue);
+    else if (SVG_color_mode == TC_LT)
+	fprintf (gpoutfile, "%s", SVG_linecolor);
+    else
+	fprintf (gpoutfile, "%s", SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
+
     fprintf (gpoutfile,
 	     "; font-family:%s; font-size:%.2fpt; text-anchor:%s\">\n",
 	     SVG_fontNameCur, SVG_fontSizeCur, alignment);
@@ -1022,7 +1070,8 @@ SVG_set_color(t_colorspec *colorspec)
     rgb255_color rgb255;
 
     if (colorspec->type == TC_LT) {
-	SVG_linetype(colorspec->lt);
+	SVG_linecolor = SVG_pens[SVG_Pen_RealID (colorspec->lt)].color;
+	SVG_color_mode = TC_LT;
 	return;
     } else if (colorspec->type == TC_FRAC)
 	rgb255maxcolors_from_gray( colorspec->value, &rgb255 );
@@ -1033,7 +1082,7 @@ SVG_set_color(t_colorspec *colorspec)
     } else
 	return;
 
-    SVG_use_pm3d_color = 1;
+    SVG_color_mode = TC_RGB;
 
     if (rgb255.r != SVG_red || rgb255.g != SVG_green || rgb255.b != SVG_blue) {
 	/* pm3d color has changed. We've to start a new path
@@ -1229,7 +1278,7 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
     strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
 
     while (*(str = enhanced_recursion((char *)str, TRUE,
-    			fontname, fontsize, 0.0, TRUE, TRUE, 0))) {
+			fontname, fontsize, 0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 	enh_err_check(str);
 	if (!*++str)
@@ -1410,7 +1459,7 @@ START_HELP(svg)
 "                        {fname \"<font>\"} {fsize <fontsize>}",
 "                        {font \"<fontname>{,<fontsize>}\"}",
 "                        {fontfile <filename>}",
-"                        {rounded|butt} {linewidth <lw>}",
+"                        {rounded|butt} {solid|dashed} {linewidth <lw>}",
 "",
 " where <x> and <y> are the size of the SVG plot to generate,",
 " `dynamic` allows a svg-viewer to resize plot, whereas the default",
