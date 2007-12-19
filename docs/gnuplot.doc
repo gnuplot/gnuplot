@@ -9869,6 +9869,7 @@ Ffigure_mapcontours
 
       set termoption {no}enhanced
       set termoption font "<fontname>{,<fontsize>}"
+      set termoption {solid|dashed}
 
 3 tics
 ?commands set tics

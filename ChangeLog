@@ -5,6 +5,8 @@
 	rather than inheriting them from the style of the surrounding group
 	environment. 
 
+	* src/set.c (set_termoptions):  Allow set termoption {dashed|solid}.
+
 2007-12-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE): Add a new parameter
