@@ -17,6 +17,9 @@
 	term/fig.trm term/metapost.trm term/pdf.trm term/post.trm term/svg.trm
 	term/tgif.trm term/x11.trm term/xlib.trm:  Add flag TERM_CAN_DASH
 
+	* term/cairo.trm (cairotrm_set_color): When switching color via
+	TC_LT, be careful not to change the dash pattern also.
+
 2007-12-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE): Add a new parameter

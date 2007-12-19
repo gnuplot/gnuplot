@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.12 2007/11/04 22:56:31 tlecomte Exp $
+ * $Id: cairo.trm,v 1.13 2007/12/20 03:15:55 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -630,16 +630,15 @@ void cairotrm_set_color(t_colorspec *colorspec)
 	rgb_color rgb1;
 
 	if (colorspec->type == TC_LT) {
-		cairotrm_linetype(colorspec->lt);
-		return;
+		rgb1 = gp_cairo_linetype2color(colorspec->lt);
 	} else if (colorspec->type == TC_FRAC && cairotrm_mono) {
 		int save_colorMode = sm_palette.colorMode;
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRAY;
 		rgb1_from_gray( colorspec->value, &rgb1 );
 		sm_palette.colorMode = save_colorMode;
-	} else if (colorspec->type == TC_FRAC)
+	} else if (colorspec->type == TC_FRAC) {
 		rgb1_from_gray( colorspec->value, &rgb1 );
-	else if (colorspec->type == TC_RGB) {
+	} else if (colorspec->type == TC_RGB) {
 		rgb1.r = (double) ((colorspec->lt >> 16) & 0xff)/255;
 		rgb1.g = (double) ((colorspec->lt >> 8) & 0xff)/255;
 		rgb1.b = (double) ((colorspec->lt) & 0xff)/255;
