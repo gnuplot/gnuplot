@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.64 2007/10/21 04:17:23 sfeam Exp $
+ * $Id: term_api.h,v 1.65 2007/12/02 01:48:14 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -164,6 +164,7 @@ typedef struct t_image {
 #define TERM_ENHANCED_TEXT   32  /* enhanced text mode is enabled   */
 #define TERM_NO_OUTPUTFILE   64  /* terminal doesnt write to a file */
 #define TERM_CAN_CLIP       128  /* terminal does its own clipping  */
+#define TERM_CAN_DASH       256  /* terminal supports dashed lines  */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *

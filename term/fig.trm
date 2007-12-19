@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.60 2006/12/27 21:40:28 sfeam Exp $
+ * $Id: fig.trm,v 1.61 2007/11/24 00:12:00 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1183,7 +1183,8 @@ TERM_TABLE_START(fig_driver)
     FIG_text, null_scale, FIG_graphics, FIG_move, FIG_vector,
     FIG_linetype, FIG_put_text, FIG_text_angle, FIG_justify_text,
     FIG_lpoint, FIG_arrow, set_font_null, FIG_pointsize,
-    TERM_BINARY /*flags */ , 0 /*suspend */ , 0 /*resume */ ,
+    TERM_BINARY|TERM_CAN_DASH /*flags */ ,
+    0 /*suspend */ , 0 /*resume */ ,
     FIG_boxfill, FIG_linewidth
 #ifdef USE_MOUSE
     ,0, 0, 0, 0, 0 /* no mouse support for the fig terminal */

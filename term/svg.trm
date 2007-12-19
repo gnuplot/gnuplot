@@ -723,7 +723,7 @@ SVG_init ()
 	     /*  3 box */
 	     "\t<rect id='gpPt3' style='stroke-width:%.3f' x='-1' y='-1' width='2' height='2'/>\n"
 	     /*  4 box                   filled */
-	     "\t<use xlink:href='#gpPt3' id='gpPt4' style='fill:currentColor; stroke:none'/>\n"
+	     "\t<rect id='gpPt4' style='stroke-width:%.3f fill:currentColor' x='-1' y='-1' width='2' height='2'/>\n"
 	     /*  5 circle */
 	     "\t<circle id='gpPt5' style='stroke-width:%.3f' cx='0' cy='0' r='1'/>\n"
 	     /*  6 circle (disk)         filled */
@@ -746,6 +746,7 @@ SVG_init ()
 	      * define fill patterns here. */
 
 	     "</defs>\n"
+	     , stroke_width
 	     , stroke_width
 	     , stroke_width
 	     , stroke_width
@@ -1419,7 +1420,7 @@ TERM_TABLE_START (svg_driver)
     SVG_options, SVG_init, SVG_reset, SVG_text, null_scale, SVG_graphics,
     SVG_move, SVG_vector, SVG_linetype, SVG_put_text, SVG_text_angle,
     SVG_justify_text, SVG_point, do_arrow, SVG_set_font, do_pointsize,
-    TERM_CAN_MULTIPLOT | TERM_BINARY,
+    TERM_CAN_MULTIPLOT | TERM_BINARY | TERM_CAN_DASH,
     0 /* suspend */, 0 /* resume */ , SVG_fillbox, SVG_linewidth
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for svg */

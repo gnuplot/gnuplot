@@ -7,6 +7,16 @@
 
 	* src/set.c (set_termoptions):  Allow set termoption {dashed|solid}.
 
+	* src/term_api.h:  Add an explicit terminal flag TERM_CAN_DASH
+	to indicate that the terminal can toggle between solid and dashed lines.
+
+	* src/set.c (set_termoptions): Check flag before trying to call
+	current terminal with either dashed or solid.
+
+	* term/aquaterm.trm term/cairo.trm term/cgm.trm term/emf.trm
+	term/fig.trm term/metapost.trm term/pdf.trm term/post.trm term/svg.trm
+	term/tgif.trm term/x11.trm term/xlib.trm:  Add flag TERM_CAN_DASH
+
 2007-12-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE): Add a new parameter

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.256 2007/12/08 10:55:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.257 2007/12/20 00:25:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3742,6 +3742,10 @@ set_termoptions()
 	} else
 	    c_token += 2;
     } else if (almost_equals(c_token,"dash$ed") || equals(c_token,"solid")) {
+	if (!(term->flags & TERM_CAN_DASH)) {
+	    c_token++;
+	    return;   /* Silently ignore the request */
+	}
 	*term_options = 0;
 	(term->options)();
     } else if (!strcmp(term->name,"gif") && equals(c_token,"delay") && num_tokens==4) {

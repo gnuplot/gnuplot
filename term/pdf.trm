@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.75 2007/02/10 00:00:15 sfeam Exp $
+ * $Id: pdf.trm,v 1.76 2007/02/27 05:06:41 sfeam Exp $
  */
 
 /*------------------------------
@@ -1653,7 +1653,7 @@ TERM_TABLE_START (pdf_driver)
     PDF_options, PDF_init, PDF_reset, PDF_text, null_scale, PDF_graphics,
     PDF_move, PDF_vector, PDF_linetype, PDF_put_text, PDF_text_angle,
     PDF_justify_text, PDF_point, do_arrow, PDF_set_font, do_pointsize,
-    TERM_BINARY,
+    TERM_BINARY|TERM_CAN_DASH,
     0 /* suspend */, 0 /* resume */ , PDF_boxfill, PDF_linewidth
 #   ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for pdf */

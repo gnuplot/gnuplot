@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.42 2006/11/18 17:24:26 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.43 2007/01/14 05:06:50 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -1717,10 +1717,11 @@ TERM_TABLE_START(tgif_driver)
     TGIF_text, null_scale, TGIF_graphics, TGIF_move, TGIF_vector,
     TGIF_linetype, TGIF_put_text, TGIF_text_angle,
     TGIF_justify_text, TGIF_point, TGIF_arrow, TGIF_set_font,
-#ifndef USE_LINEWIDTH
-    TGIF_set_pointsize, TERM_CAN_MULTIPLOT, 0, 0, 0, 0
+    TGIF_set_pointsize, TERM_CAN_MULTIPLOT|TERM_CAN_DASH, 0, 0, 0,
+#ifdef USE_LINEWIDTH
+    TGIF_set_linewidth
 #else
-    TGIF_set_pointsize, TERM_CAN_MULTIPLOT, 0, 0, 0, TGIF_set_linewidth
+    0
 #endif
 #ifdef USE_MOUSE
     ,0, 0, 0, 0, 0 /* no mouse support for the tgif terminal */
