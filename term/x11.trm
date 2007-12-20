@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.160.2.4 2007/08/06 14:37:51 mikulik Exp $
+ * $Id: x11.trm,v 1.160.2.5 2007/12/10 00:05:25 sfeam Exp $
  *
  */
 
@@ -454,7 +454,7 @@ X11_options()
 	    break;
 	case X11_LINEWIDTH:
 	    c_token++;
-	    X11_linewidth_multiplier = real_expression();
+	    X11_linewidth_multiplier = real(const_express(&a));
 	    if (X11_linewidth_multiplier <= 0)
 		X11_linewidth_multiplier = 1.0;
 	    break;
