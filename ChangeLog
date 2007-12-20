@@ -1,3 +1,8 @@
+2007-12-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm:  #define PASTEL_PALETTE and associated comments to
+	allow palette-based plots to use a partially saturated fill style.
+
 2007-12-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Implement dashed lines. Extend color support to

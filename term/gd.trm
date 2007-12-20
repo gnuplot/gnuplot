@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.121 2007/09/24 17:19:50 sfeam Exp $
+ * $Id: gd.trm,v 1.122 2007/12/14 05:17:50 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -100,6 +100,9 @@
  * Ethan Merritt, May 2001: modified gd/gif driver to produce png instead;
  *                          added support for line width and TrueType fonts
  */
+
+/* Approximate "fillstyle solid FRAC " for indexed palettes */
+#define PASTEL_PALETTE
 
 #include "driver.h"
 
@@ -1158,9 +1161,9 @@ from ColorAllocate
 */
 static int png_smooth_color[gdMaxColors];
 
-#if (0)
+#ifdef PASTEL_PALETTE
 /*
- * This is only needed in order to maintain png_state_rgb for pattern-fill,
+ * This is only needed in order to maintain png_state_rgb for fillstyle variants,
  * and only for palette-based coloring. It doesn't seem worth the space or effort.
  * EAM November 2004
  */
@@ -1201,7 +1204,7 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 	    (int)( palette->color[i].r * 255 + 0.5 ), /* r,g,b values for png */
 	    (int)( palette->color[i].g * 255 + 0.5 ), /* terminal are [0;255] */
 	    (int)( palette->color[i].b * 255 + 0.5 ) );
-#if (0)
+#ifdef PASTEL_PALETTE
 	png_smooth_rgb[i] = (((int)(palette->color[i].r * 255.) & 0xff) << 16)
 	                  + (((int)(palette->color[i].g * 255.) & 0xff) << 8)
 			  +  ((int)(palette->color[i].b * 255.) & 0xff);
@@ -1254,7 +1257,7 @@ void PNG_set_color (t_colorspec *colorspec)
 	    png_color = sm_palette.colors - 1;
 	/* map [0;1] to interval [0;png_smooth_colors-1] */
 	png_state.color = png_smooth_color[ png_color ];
-#if (0)
+#ifdef PASTEL_PALETTE
 	png_state.rgb = png_smooth_rgb[ png_color ];
 #endif
     }
