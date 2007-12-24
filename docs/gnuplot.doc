@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.466 2007/12/17 06:23:29 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.468 2007/12/20 00:27:54 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5684,7 +5684,7 @@ Ffigure_mapcontours
  and from within `gnuplot` you submit the commands
        a=0
        load 'looper'
- The result will be four plots (separated by the `pause` message).
+ The result will be five plots (separated by the `pause` message).
 
  Suppose the file "data" contains six columns of numbers with a total yrange
  from 0 to 10; the first is x and the next are five different functions of x.
