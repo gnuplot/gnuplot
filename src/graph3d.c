@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.183 2007/12/08 10:55:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.184 2007/12/15 04:01:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -90,6 +90,7 @@ TBOOLEAN draw_surface = TRUE;
 
 /* Was hidden3d display selected by user? */
 TBOOLEAN hidden3d = FALSE;
+int hidden3d_layer = LAYER_FRONT;
 
 /* Rotation and scale of the 3d view, as controlled by 'set view': */
 float surface_rot_z = 30.0;
@@ -898,10 +899,9 @@ do_3dplot(
     /* DRAW SURFACES AND CONTOURS */
 
 #ifndef LITE
-    if (hidden3d && draw_surface && !quick)
+    if (hidden3d && (hidden3d_layer == LAYER_BACK) && draw_surface && !quick)
 	plot3d_hidden(plots, pcount);
 #endif /* not LITE */
-
 
     /* Set up bookkeeping for the individual key titles */
 #define NEXT_KEY_LINE()					\
@@ -1328,6 +1328,10 @@ do_3dplot(
 	pm3d_depth_queue_flush(); /* draw pending plots */
     }
 
+#ifndef LITE
+    if (hidden3d && (hidden3d_layer == LAYER_FRONT) && draw_surface && !quick)
+	plot3d_hidden(plots, pcount);
+#endif /* not LITE */
 
     /* DRAW GRID AND BORDER */
 #ifndef USE_GRID_LAYERS

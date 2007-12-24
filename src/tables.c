@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.75 2007/08/31 20:03:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.76 2007/12/08 10:55:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -337,6 +337,8 @@ const struct gen_table set_hidden3d_tbl[] =
     { "noalt$diagonal", S_HI_NOALTDIAGONAL },
     { "bent$over", S_HI_BENTOVER },
     { "nobent$over", S_HI_NOBENTOVER },
+    { "front", S_HI_FRONT },
+    { "back", S_HI_BACK },
     { NULL, S_HI_INVALID }
 };
 

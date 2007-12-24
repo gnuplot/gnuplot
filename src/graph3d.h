@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.29 2007/12/15 04:01:27 sfeam Exp $
+ * $Id: graph3d.h,v 1.30 2007/12/18 19:02:55 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -130,6 +130,7 @@ extern TBOOLEAN	draw_surface;
 
 /* is hidden3d display wanted? */
 extern TBOOLEAN	hidden3d;
+extern int hidden3d_layer;	/* LAYER_FRONT or LAYER_BACK */
 
 extern float surface_rot_z;
 extern float surface_rot_x;

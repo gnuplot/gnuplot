@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.59 2007/08/03 03:49:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.60 2007/10/19 21:55:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -359,6 +359,12 @@ set_hidden3doptions()
 	case S_HI_NOBENTOVER:
 	    hiddenHandleBentoverQuadrangles = 0;
 	    break;
+	case S_HI_BACK:
+	    hidden3d_layer = LAYER_BACK;
+	    break;
+	case S_HI_FRONT:
+	    hidden3d_layer = LAYER_FRONT;
+	    break;
 	case S_HI_INVALID:
 	    int_error(c_token, "No such option to hidden3d (or wrong order)");
 	default:
@@ -371,6 +377,8 @@ set_hidden3doptions()
 void
 show_hidden3doptions()
 {
+    fprintf(stderr,"\t  Hidden3d elements will be drawn in %s of non-hidden3d elements\n",
+	    hidden3d_layer == LAYER_BACK ? "back" : "front");
     fprintf(stderr,"\
 \t  Back side of surfaces has linestyle offset of %d\n\
 \t  Bit-Mask of Lines to draw in each triangle is %ld\n\
@@ -412,7 +420,8 @@ save_hidden3doptions(FILE *fp)
 	fputs("unset hidden3d\n", fp);
 	return;
     }
-    fprintf(fp, "set hidden3d offset %d trianglepattern %ld undefined %d %saltdiagonal %sbentover\n",
+    fprintf(fp, "set hidden3d %s offset %d trianglepattern %ld undefined %d %saltdiagonal %sbentover\n",
+	    hidden3d_layer == LAYER_BACK ? "back" : "front",
 	    hiddenBacksideLinetypeOffset,
 	    hiddenTriangleLinesdrawnPattern,
 	    hiddenHandleUndefinedPoints,
@@ -2129,6 +2138,7 @@ reset_hidden3doptions()
     hiddenHandleUndefinedPoints = HANDLE_UNDEFINED_POINTS;
     hiddenShowAlternativeDiagonal = SHOW_ALTERNATIVE_DIAGONAL;
     hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
+    hidden3d_layer = LAYER_FRONT;
 }
 
 /* Emacs editing help for HBB:

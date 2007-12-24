@@ -17,6 +17,9 @@ html: airfoil.html approximate.html arrowstyle.html binary.html bivariat.html ca
 index.html: index.save
 	cp index.save index.html
 
+hidden2.html: $(GNUPLOT_LIB)/hidden2.dem ./webify.pl
+	export DEMOTERM="png truecolor font 'arial,8' size 420,320"; ./webify.pl hidden2
+
 image.html: $(GNUPLOT_LIB)/image.dem ./webify.pl
 	export DEMOTERM="png truecolor font 'arial,8' size 420,320"; ./webify.pl image
 

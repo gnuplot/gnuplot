@@ -1,5 +1,30 @@
 #
-# Another example of hidden surface removal,
+# PM3D surfaces are not included in the calculation of hidden line removal.
+# However, you can approximate this by drawing the surface twice,
+# once "with pm3d" to produce the surface you want to show, and once 
+# "with lines lt -3" to include the same surface in hidden3d calculations.
+# The "lt -3" tries to make the lines as invisible as possible.
+#
+set hidden3d front
+set isosamples 25,25
+set xyplane at 0
+unset key
+
+set palette rgbformulae 31,-11,32
+set style fill solid 0.5
+set cbrange [-1:1]
+
+set title "Mixing pm3d surfaces with hidden-line plots"
+
+f(x,y) = sin(-sqrt((x+5)**2+(y-7)**2)*0.5)
+splot f(x,y) with pm3d, x*x-y*y with lines lt 1 lc rgb "#000000", \
+      f(x,y) with lines lt -3 notitle
+
+pause -1 "Hit return to continue"
+reset
+
+#
+# Another example of pm3d hidden surface removal,
 # this time using pm3d depth-ordering
 #
 
@@ -11,6 +36,10 @@ set vrange [-pi:pi]
 set isosamples 50,20
 
 unset key
+unset xtics
+unset ytics
+unset ztics
+set border 0
 set view 60, 30, 1.1, 1.33
 
 set pm3d scansbackward

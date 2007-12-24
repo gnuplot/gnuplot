@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.60 2007/06/22 04:28:17 sfeam Exp $
+ * $Id: tables.h,v 1.61 2007/12/08 10:55:17 mikulik Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -119,7 +119,8 @@ enum set_hidden3d_id {
     S_HI_INVALID,
     S_HI_DEFAULTS, S_HI_OFFSET, S_HI_NOOFFSET, S_HI_TRIANGLEPATTERN,
     S_HI_UNDEFINED, S_HI_NOUNDEFINED, S_HI_ALTDIAGONAL, S_HI_NOALTDIAGONAL,
-    S_HI_BENTOVER, S_HI_NOBENTOVER
+    S_HI_BENTOVER, S_HI_NOBENTOVER,
+    S_HI_FRONT, S_HI_BACK
 };
 
 enum set_key_id {

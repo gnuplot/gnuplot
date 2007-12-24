@@ -1,3 +1,13 @@
+2007-12-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (do_3dplot) src/graph3d.h 
+	src/tables.c src/tables.h demo/hidden2.dem demo/html/Makefile
+	src/hidden3d.c (set_hidden3doptions show_hidden3doptions
+	                save_hidden3doptions reset_hidden3doptions):
+	New option 'set hidden3d {front|back}'
+	controls whether the hidden3d plot elements are drawn before or after
+	other plot elements such as pm3d surface or image.
+
 2007-12-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm:  #define PASTEL_PALETTE and associated comments to
