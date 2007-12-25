@@ -1,3 +1,8 @@
+2007-12-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc demo/hidden2.dem:
+	Documentation and comments for 'set hidden3d {back|front}.
+
 2007-12-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot) src/graph3d.h 

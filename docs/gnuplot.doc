@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.468 2007/12/20 00:27:54 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.469 2007/12/24 18:20:34 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7360,7 +7360,8 @@ Ffigure_mapcontours
 
  Syntax:
        set hidden3d {defaults} |
-                    { {{offset <offset>} | {nooffset}}
+                    { {front|back}
+                      {{offset <offset>} | {nooffset}}
                       {trianglepattern <bitpattern>}
                       {{undefined <level>} | {noundefined}}
                       {{no}altdiagonal}
@@ -7370,8 +7371,8 @@ Ffigure_mapcontours
 
  In contrast to the usual display in gnuplot, hidden line removal actually
  treats the given function or data grids as real surfaces that can't be seen
- through, so parts behind the surface will be hidden by it.  For this to be
- possible, the surface needs to have 'grid structure' (see `splot datafile`
+ through, so plot elements behind the surface will be hidden by it.  For this
+ to work, the surface needs to have 'grid structure' (see `splot datafile`
  about this), and it has to be drawn `with lines` or `with linespoints`.
 
  When `hidden3d` is set, both the hidden portion of the surface and possibly
@@ -7387,8 +7388,14 @@ Ffigure_mapcontours
  graph may be explicitly excluded from this processing by appending the extra
  option `nohidden3d` to the `with` specifier.
 
- Hidden3d does not affect solid surfaces drawn using the pm3d mode. To
- achieve a similar effect for pm3d surfaces, use instead set `pm3d depthorder`.
+ Hidden3d does not affect solid surfaces drawn using the pm3d mode. To achieve
+ a similar effect purely for pm3d surfaces, use instead set `pm3d depthorder`.
+ To mix pm3d surfaces with normal `hidden3d` processing, use the option
+ `set hidden3d front` to force all elements included in hidden3d processing to
+ be drawn after any remaining plot elements. Then draw the surface twice, once
+ `with lines lt -2` and a second time `with pm3d`. The first instance will
+ include the surface during calculation of occluded elements but will not draw
+ the surface itself.
 
  Functions are evaluated at isoline intersections.  The algorithm interpolates
  linearly between function points or data points when determining the visible
