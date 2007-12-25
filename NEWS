@@ -6,6 +6,7 @@ New features, changes and fixes in gnuplot version 4.2.3
 * FIX minor bugfixes to terminals fig, emf, post, svg
 * FIX never estimate zero size for a non-empty string
 * CHANGE Remove limitation of 10 args max to internal function sprintf()
+* CHANGE Bring emf point types into conformity with other terminals
 
 New features, changes and fixes in gnuplot version 4.2.2
 ===========================================================
