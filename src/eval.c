@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.58 2007/10/16 21:03:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.59 2007/10/26 23:45:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -686,6 +686,7 @@ add_udv_by_name(char *key)
 }
 
 
+static void update_plot_bounds __PROTO((void));
 static void fill_gpval_axis __PROTO((AXIS_INDEX axis));
 static void set_gpval_axis_sth_double __PROTO((AXIS_INDEX axis, const char *suffix, double value, int is_int));
 
@@ -734,6 +735,32 @@ fill_gpval_string(char *var, const char *stringvalue)
 }
 
 /*
+ * Export axis bounds in terminal coordinates from previous plot.
+ * This allows offline mapping of pixel coordinates onto plot coordinates.
+ */
+static void
+update_plot_bounds(void)
+{
+    struct udvt_entry *v;
+    
+    v = add_udv_by_name("TERM_XMIN");
+    Ginteger(&v->udv_value, axis_array[FIRST_X_AXIS].term_lower / term->tscale);
+    v->udv_undef = FALSE; 
+
+    v = add_udv_by_name("TERM_XMAX");
+    Ginteger(&v->udv_value, axis_array[FIRST_X_AXIS].term_upper / term->tscale);
+    v->udv_undef = FALSE; 
+
+    v = add_udv_by_name("TERM_YMIN");
+    Ginteger(&v->udv_value, axis_array[FIRST_Y_AXIS].term_lower / term->tscale);
+    v->udv_undef = FALSE; 
+
+    v = add_udv_by_name("TERM_YMAX");
+    Ginteger(&v->udv_value, axis_array[FIRST_Y_AXIS].term_upper / term->tscale);
+    v->udv_undef = FALSE; 
+}
+
+/*
  * Put all the handling for GPVAL_* variables in this one routine.
  * We call it from one of several contexts:
  * 0: following a successful set/unset command
@@ -757,6 +784,7 @@ update_gpval_variables(int context)
 	fill_gpval_axis(T_AXIS);
 	fill_gpval_axis(U_AXIS);
 	fill_gpval_axis(V_AXIS);
+	update_plot_bounds();
 	return;
     }
     

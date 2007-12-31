@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.221 2007/12/02 01:48:14 sfeam Exp $
+ * $Id: post.trm,v 1.222 2007/12/20 03:15:55 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1659,6 +1659,7 @@ PS_init()
 	xmax_t = term->xmax * (xsize + xoffset) / (2*PS_SC);
 	ymin_t = term->ymax * yoffset / (2*PS_SC);
 	ymax_t = term->ymax * (ysize + yoffset) / (2*PS_SC);
+	term->tscale = PS_SC * 2;
 	break;
     case PSTERM_PORTRAIT:
 	if (!ps_explicit_size) {
@@ -1669,6 +1670,7 @@ PS_init()
 	xmax_t = term->xmax * (xsize + xoffset) / PS_SC;
 	ymin_t = term->ymax * yoffset / PS_SC;
 	ymax_t = term->ymax * (ysize + yoffset) / PS_SC;
+	term->tscale = PS_SC;
 	break;
     case PSTERM_LANDSCAPE:
 	if (!ps_explicit_size) {
@@ -1679,6 +1681,7 @@ PS_init()
 	ymax_t = term->xmax * (xsize+xoffset) / PS_SC;
 	xmin_t = term->ymax * (1-ysize-yoffset) / PS_SC;
 	xmax_t = term->ymax * (1-yoffset) / PS_SC;
+	term->tscale = PS_SC;
 	break;
     default:
 	int_error(NO_CARET, "invalid postscript format used");
@@ -3527,6 +3530,7 @@ TERM_TABLE_START(post_driver)
     , ENHPS_OPEN, ENHPS_FLUSH, ENHPS_WRITEC
     , 0		/* layer control */
     , PS_path
+    , PS_SC		/* terminal to pixel coord scale factor */
 TERM_TABLE_END(post_driver)
 
 #undef LAST_TERM

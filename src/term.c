@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.166 2007/12/02 01:48:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.167 2007/12/02 04:21:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1535,6 +1535,8 @@ change_term(const char *origname, int length)
 	term->pointsize = do_pointsize;
     if (term->linewidth == 0)
 	term->linewidth = null_linewidth;
+    if (term->tscale <= 0)
+	term->tscale = 1.0;
 
     /* Special handling for unixplot term type */
     if (!strncmp("unixplot", term->name, 8)) {

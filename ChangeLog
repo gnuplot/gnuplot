@@ -1,7 +1,19 @@
+2007-12-31  Allin Cottrell  <cottrell@wfu.edu>
+
+	* src/term_api.h src/term.c (change_term):  Add a field to TERM_TABLE.
+	term->tscale is a scaling factor between internal terminal coordinates
+	and the output pixel coordinates. Intended to support external mousing.
+
+	* term/cairo.trm term/post.trm term/svg.trm: Initialize term->tscale.
+
+	* src/eval.c (update_gpval_variables update_plot_bounds):
+	Export pixel coordinates of plot boundary as seen in output image.
+	TERM_XMIN TERM_XMAX TERM_YMIN TERM_YMAX
+
 2007-12-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc demo/hidden2.dem:
-	Documentation and comments for 'set hidden3d {back|front}.
+	Documentation and comments for 'set hidden3d {back|front}'.
 
 2007-12-24  Ethan A Merritt  <merritt@u.washington.edu>
 

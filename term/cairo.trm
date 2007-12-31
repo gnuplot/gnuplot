@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.13 2007/12/20 03:15:55 sfeam Exp $
+ * $Id: cairo.trm,v 1.14 2007/12/20 03:39:29 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -434,6 +434,7 @@ void cairotrm_graphics()
 	/* oversampling_scale is updated in gp_cairo_initialize_context */
 	term->xmax = (unsigned int) plot.device_xmax*plot.oversampling_scale;
 	term->ymax = (unsigned int) plot.device_ymax*plot.oversampling_scale;
+	term->tscale = plot.oversampling_scale;
 	plot.xmax = term->xmax;
 	plot.ymax = term->ymax;
 	/* initialize encoding */
@@ -730,6 +731,7 @@ TERM_TABLE_START (pdfcairo_driver)
     , cairotrm_image
 #endif
     , gp_cairo_enhanced_open, gp_cairo_enhanced_flush, do_enh_writec
+    , 0, 0, 1.0
 TERM_TABLE_END (pdfcairo_driver)
 
 #undef LAST_TERM
@@ -755,6 +757,7 @@ TERM_TABLE_START (pngcairo_driver)
     , cairotrm_image
 #endif
     , gp_cairo_enhanced_open, gp_cairo_enhanced_flush, do_enh_writec
+    , 0, 0, 1.0
 TERM_TABLE_END (pngcairo_driver)
 
 #undef LAST_TERM
