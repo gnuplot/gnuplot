@@ -10,6 +10,12 @@
 	Export pixel coordinates of plot boundary as seen in output image.
 	TERM_XMIN TERM_XMAX TERM_YMIN TERM_YMAX
 
+2007-12-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/show.c (show_variables) docs/gnuplot.doc:  Provide a mechanism
+	for listed only select variables.  E.g. `show variables MOUSE` will
+	list only variables whose name begins with the string "MOUSE".
+
 2007-12-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc demo/hidden2.dem:

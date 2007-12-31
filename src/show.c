@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.198 2007/12/03 21:30:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.199 2007/12/08 10:55:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2905,26 +2905,33 @@ show_variables()
 {
     struct udvt_entry *udv = first_udv;
     int len;
-    int show_gpval = 0;
+    TBOOLEAN show_all = FALSE;
+    char leading_string[MAX_ID_LEN+1] = {'\0'};
 
     SHOW_ALL_NL;
 
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "all"))
-	    show_gpval = 1;
-	else 
-	    int_error(c_token, "Required no option or 'all'");
+	    show_all = TRUE;
+	else
+	    copy_str(leading_string, c_token, MAX_ID_LEN);
 	c_token++;
     }
 
-    if (show_gpval)
+    if (show_all)
 	fputs("\n\tAll available variables:\n", stderr);
+    else if (*leading_string)
+	fprintf(stderr,"\n\tVariables beginning with %s:\n", leading_string);
     else
 	fputs("\n\tUser and default variables:\n", stderr);
 
     while (udv) {
 	len = strcspn(udv->udv_name, " ");
-	if (!show_gpval && !strncmp(udv->udv_name,"GPVAL_",6)) { /* skip GPVAL_ variables */
+	if (*leading_string && strncmp(udv->udv_name,leading_string,strlen(leading_string))) {
+	    udv = udv->next_udv;
+	    continue;
+	} else if (!show_all && !strncmp(udv->udv_name,"GPVAL_",6) && !(*leading_string)) {
+	    /* In the default case skip GPVAL_ variables */
 	    udv = udv->next_udv;
 	    continue;
 	}
