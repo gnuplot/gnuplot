@@ -1,3 +1,7 @@
+2008-01-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Missing semicolon in definition of gpPt4.
+
 2007-12-31  Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/term_api.h src/term.c (change_term):  Add a field to TERM_TABLE.
