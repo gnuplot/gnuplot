@@ -1,3 +1,8 @@
+2008-01-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (plotrequest):  Revert inadvertent change to handling of
+	'set log cb' introduced 2007-08-31.
+
 2008-01-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Missing semicolon in definition of gpPt4.
