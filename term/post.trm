@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.222 2007/12/20 03:15:55 sfeam Exp $
+ * $Id: post.trm,v 1.223 2007/12/31 17:51:27 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -195,7 +195,7 @@ typedef struct ps_params_t {
     PSTERM_POSTSCRIPT, 50, 50, \
     PSTERM_LANDSCAPE, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
     FALSE, FALSE, NULL, "Helvetica", 14, FALSE, FALSE, 2000, 0.003, \
-    FALSE, FALSE \
+    FALSE, TRUE \
 }
 
 static ps_params_t post_params = POST_PARAMS_DEFAULT;
@@ -4125,13 +4125,12 @@ PS_COMMON_DOC1
 " In general unicode characters do not have a unique name; they have only a",
 " unicode identification code.  However, Adobe have a recommended scheme for",
 " assigning names to certain ranges of characters (extended Latin, Greek, etc).",
-" Some fonts use this scheme, others do not.  By default, gnuplot will output",
-" glyph names like /uni03B1 to describe the character with unicode 03B1 (the",
-" lower case Greek letter alpha). The 'adobeglyphnames' option will first look",
-" to see if there is a recommended alternative name for this character. In this",
-" case its recommended name is /alpha.  If you get this setting wrong, the",
+" Some fonts use this scheme, others do not.  By default, gnuplot will use",
+" the Adobe glyph names.  E.g. the lower case Greek letter alpha will be called",
+" /alpha.  If you specific `noadobeglyphnames` then instead gnuplot will use",
+" /uni03B1 to describe this character.  If you get this setting wrong, the",
 " character may not be found even if it is present in the font.",
-" It is probably always correct to set this option for Adobe fonts, but for",
+" It is probably always correct to use the default for Adobe fonts, but for",
 " other fonts you may have to try both settings.  See also `fontfile`.",
 "",
 ""
