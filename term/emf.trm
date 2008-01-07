@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.42.2.2 2007/11/26 04:18:28 sfeam Exp $
+ * $Id: emf.trm,v 1.42.2.3 2008/01/07 06:29:40 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -375,9 +375,6 @@ EMF_setfont()
     case S_ENC_KOI8_R:
     case S_ENC_KOI8_U:
 	EMF_write_byte(KOI8_CHARSET);
-	break;
-    case S_ENC_ISO8859_9:
-	EMF_write_byte(TURKISH_CHARSET);
 	break;
     default:
 	EMF_write_byte(DEFAULT_CHARSET);
