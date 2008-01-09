@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.66 2007/12/20 03:15:54 sfeam Exp $
+ * $Id: term_api.h,v 1.67 2007/12/31 17:51:27 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -277,7 +277,7 @@ enum set_encoding_id {
    S_ENC_DEFAULT, S_ENC_ISO8859_1, S_ENC_ISO8859_2, S_ENC_ISO8859_9, S_ENC_ISO8859_15,
    S_ENC_CP437, S_ENC_CP850, S_ENC_CP852, S_ENC_CP1250,
    S_ENC_KOI8_R, S_ENC_KOI8_U,
-   S_ENC_UTF8,  /* Not yet visible as a user command */
+   S_ENC_UTF8,
    S_ENC_INVALID
 };
 

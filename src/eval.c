@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.59 2007/10/26 23:45:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.60 2007/12/31 17:51:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -743,19 +743,19 @@ update_plot_bounds(void)
 {
     struct udvt_entry *v;
     
-    v = add_udv_by_name("TERM_XMIN");
+    v = add_udv_by_name("GPVAL_TERM_XMIN");
     Ginteger(&v->udv_value, axis_array[FIRST_X_AXIS].term_lower / term->tscale);
     v->udv_undef = FALSE; 
 
-    v = add_udv_by_name("TERM_XMAX");
+    v = add_udv_by_name("GPVAL_TERM_XMAX");
     Ginteger(&v->udv_value, axis_array[FIRST_X_AXIS].term_upper / term->tscale);
     v->udv_undef = FALSE; 
 
-    v = add_udv_by_name("TERM_YMIN");
+    v = add_udv_by_name("GPVAL_TERM_YMIN");
     Ginteger(&v->udv_value, axis_array[FIRST_Y_AXIS].term_lower / term->tscale);
     v->udv_undef = FALSE; 
 
-    v = add_udv_by_name("TERM_YMAX");
+    v = add_udv_by_name("GPVAL_TERM_YMAX");
     Ginteger(&v->udv_value, axis_array[FIRST_Y_AXIS].term_upper / term->tscale);
     v->udv_undef = FALSE; 
 }

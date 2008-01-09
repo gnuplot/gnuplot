@@ -1,3 +1,8 @@
+2008-01-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (update_plot_bounds): Rename exported variables TERM_* to
+	GPVAL_TERM_* so that they match other internally maintained variables.
+
 2007-01-07  Allin Cottrell  <cottrell@wfu.edu>
 
 	* term/pdf.trm (EMD_setfont):  Add support for encodings
