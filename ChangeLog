@@ -1,3 +1,8 @@
+2008-01-10  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/hidden3d.c (store_polygon): Discard degenerate polygons.
+	Bug #1727198
+
 2008-01-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (update_plot_bounds): Rename exported variables TERM_* to

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.60 2007/10/19 21:55:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.61 2007/12/24 19:39:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -828,6 +828,10 @@ store_polygon(long vnum1, polygon_direction direction, long crvlen)
 	|| VERTEX_IS_UNDEFINED(*v2)
 	|| VERTEX_IS_UNDEFINED(*v3)
 	)
+	return (-2);
+
+    /* Check if polygon is degenerate */
+    if (V_EQUAL(v1,v2) || V_EQUAL(v2,v3) || V_EQUAL(v3,v1))
 	return (-2);
 
     /* All else OK, fill in the polygon: */
