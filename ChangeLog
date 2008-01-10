@@ -1,3 +1,8 @@
+2008-01-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm (PS_encode_image): Fix for maxcolors in "plot with
+	image".
+
 2008-01-10  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/hidden3d.c (store_polygon): Discard degenerate polygons.
