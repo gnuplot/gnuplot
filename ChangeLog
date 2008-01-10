@@ -17,14 +17,14 @@
 	* src/eval.c (update_plot_bounds): Rename exported variables TERM_* to
 	GPVAL_TERM_* so that they match other internally maintained variables.
 
-2007-01-07  Allin Cottrell  <cottrell@wfu.edu>
+2008-01-07  Allin Cottrell  <cottrell@wfu.edu>
 
-	* term/pdf.trm (EMD_setfont):  Add support for encodings
+	* term/pdf.trm (EMF_setfont):  Add support for encodings
 	iso_8859_1 iso_8859_2 iso_8859_9 iso_8859_15 cp1250
 
-2007-01-06  Allin Cottrell  <cottrell@wfu.edu>
+2008-01-06  Allin Cottrell  <cottrell@wfu.edu>
 
-	* term/emf.trm (EMD_setfont):  Add support for encodings
+	* term/emf.trm (EMF_setfont):  Add support for encodings
 	iso_8859_2 iso_8859_9 cp1250 koi8r koi8u
 
 2008-01-06  Ethan A Merritt  <merritt@u.washington.edu>
