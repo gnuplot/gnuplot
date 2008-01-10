@@ -9,6 +9,7 @@ New features, changes and fixes in gnuplot version 4.2.3
 * FIX protect against overly long font names in gd, svg
 * FIX infinite loop from x11 plot window resizing under ion, fluxbox
 * FIX never estimate zero size for a non-empty string
+* FIX discard degenerate polygons during hidden3d processing
 * CHANGE install Xresource file as Gnuplot, not Gnuplot.app-defaults
 * CHANGE Remove limitation of 10 args max to internal function sprintf()
 * CHANGE Bring emf point types into conformity with other terminals
