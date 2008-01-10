@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.158 2007/12/18 19:02:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.159 2008/01/06 05:11:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -241,6 +241,15 @@ plotrequest()
     CHECK_REVERSE(SECOND_X_AXIS);
     PARSE_RANGE(SECOND_Y_AXIS);
     CHECK_REVERSE(SECOND_Y_AXIS);
+
+    /* Clear out any tick labels read from data files in previous plot */
+    for (t_axis=0; t_axis<AXIS_ARRAY_SIZE; t_axis++) {
+	struct ticdef *ticdef = &axis_array[t_axis].ticdef;
+	if (ticdef->def.user)
+	    ticdef->def.user = prune_dataticks(ticdef->def.user);
+	if (!ticdef->def.user && ticdef->type == TIC_USER)
+	    ticdef->type = TIC_COMPUTED;
+    }
 
     /* use the default dummy variable unless changed */
     if (dummy_token >= 0)

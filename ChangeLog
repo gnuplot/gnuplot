@@ -1,3 +1,12 @@
+2008-01-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (prune_dataticks) src/setshow.h: New routine to purge any
+	axis tick labels left over from 'using xtics(n)' option during previous
+	plot command.  Manually entered tick labels are kept.
+	Bug #1850588
+
+	* plot2d.c (plotrequest): Call prune_dataticks() before each new plot.
+
 2008-01-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (replot_command): Fix for replot with unknown terminal.
