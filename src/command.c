@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.160 2007/08/31 20:03:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.161 2007/10/17 06:39:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1407,6 +1407,9 @@ replot_command()
 	int_error(c_token, "cannot replot data coming from stdin");
 #endif
     }
+    if (!term) /* unknown terminal */
+	int_error(c_token, "use 'set term' to set terminal type first");
+
     c_token++;
     SET_CURSOR_WAIT;
     if (term->flags & TERM_INIT_ON_REPLOT)
