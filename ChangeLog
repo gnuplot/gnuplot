@@ -1,5 +1,9 @@
 2008-01-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/command.c (replot_command): Fix for replot with unknown terminal.
+
+2008-01-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* term/post.trm (PS_encode_image): Fix for maxcolors in "plot with
 	image".
 
