@@ -7,6 +7,10 @@
 
 	* plot2d.c (plotrequest): Call prune_dataticks() before each new plot.
 
+	* src/pm3d.c (pm3d_plot): When color information is given in a separate
+	column, we must not use the interpolated z coordinate as for color.
+	Bug #1783405
+
 2008-01-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (replot_command): Fix for replot with unknown terminal.

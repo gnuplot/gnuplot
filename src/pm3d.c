@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.66 2006/09/23 22:13:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.67 2007/02/17 23:56:26 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -770,10 +770,13 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    corners[2].x, corners[2].y,
 			    corners[3].x, corners[3].y);
 #endif
-			cb1 = z2cb(corners[0].z);
-		    	cb2 = z2cb(corners[1].z);
-	    		cb3 = z2cb(corners[2].z);
-    			cb4 = z2cb(corners[3].z);
+			/* If the colors are given separately, we already loaded them above */
+			if (!color_from_column) {
+			    cb1 = z2cb(corners[0].z);
+			    cb2 = z2cb(corners[1].z);
+			    cb3 = z2cb(corners[2].z);
+			    cb4 = z2cb(corners[3].z);
+			}
 			switch (pm3d.which_corner_color) {
 			    case PM3D_WHICHCORNER_MEAN: avgC = (cb1 + cb2 + cb3 + cb4) * 0.25; break;
 			    case PM3D_WHICHCORNER_GEOMEAN: avgC = geomean4(cb1, cb2, cb3, cb4); break;
