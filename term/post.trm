@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.203.2.8 2007/10/26 21:34:09 sfeam Exp $
+ * $Id: post.trm,v 1.203.2.9 2007/11/21 05:19:08 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2801,7 +2801,7 @@ PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode
 	    c_tmp += *coord_ptr++;
 	    us_tmp = (unsigned short) (c_tmp*(max_colors-1)/3.0 + 0.5);
 	} else
-	    us_tmp = (unsigned short) ((*coord_ptr++)*(max_colors-1) + 0.5);
+	    us_tmp = (unsigned short) ((*coord_ptr++) * max_colors);
 	if (us_tmp > (max_colors-1)) us_tmp = max_colors-1;
 	if (bits_remaining < bits_per_component) {
 	    tuple4 <<= bits_remaining;
