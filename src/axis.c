@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.60.2.2 2007/03/22 04:25:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.60.2.3 2007/09/24 03:17:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -871,7 +871,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    else
 		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log10_base, mark->position);
 	    /* use NULL instead of label for minitic */
-	    (*callback) (axis, internal, mark->level?NULL:label, mark->level?mgrd:lgrd);
+	    (*callback) (axis, internal, (mark->level>0)?NULL:label, (mark->level>0)?mgrd:lgrd);
 	}
 	if (def->type == TIC_USER)
 	    return;
@@ -1630,8 +1630,8 @@ get_position_default(struct position *pos, enum position_type default_type)
  * Add a single tic mark, with label, to the list for this axis.
  * To avoid duplications and overprints, sort the list and allow
  * only one label per position.
- * EAM - called from set.c during `set xtics`
- *       called from datafile.c during `plot using ::xtic()`
+ * EAM - called from set.c during `set xtics` (level = 0 or 1)
+ *       called from datafile.c during `plot using ::xtic()` (level = -1)
  */
 void
 add_tic_user(AXIS_INDEX axis, char *label, double position, int level)

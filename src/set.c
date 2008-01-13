@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.3 2007/05/28 23:43:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.4 2007/12/08 10:54:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4703,6 +4703,28 @@ free_marklist(struct ticmark *list)
 	    free(freeable->label);
 	free(freeable);
     }
+}
+
+/* Remove tic labels that were read from a datafile during a previous plot
+ * via the 'using xtics(n)' mechanism.  These have tick level < 0.
+ */
+struct ticmark *
+prune_dataticks(struct ticmark *list)
+{
+    struct ticmark a = {0.0,NULL,0,NULL};
+    struct ticmark *b = &a;
+
+    while (list) {
+	if (list->level < 0)
+	    free(list->label);
+	else {
+	    b->next = list;
+	    b = list;
+	}
+	list = list->next;
+    }
+    b->next = NULL;
+    return a.next;
 }
 
 /* load TIC_SERIES definition */
