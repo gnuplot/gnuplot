@@ -1,3 +1,10 @@
+2008-01-13  Allin Cottrell  <cottrell@wfu.edu>
+
+	* src/term_api.h src/term.c term/emf.trm term/PostScript/8859-9.ps
+	term/post.trm docs/gnuplot.doc:   Add encoding option for Microsoft
+	Codepage 1254 (Turkish).  This is the same as latin5 (iso8859-9) except
+	that it also assigns characters to code points x80 - x9F.
+
 2008-01-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (prune_dataticks) src/setshow.h: New routine to purge any

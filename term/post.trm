@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.224 2008/01/07 05:47:42 sfeam Exp $
+ * $Id: post.trm,v 1.225 2008/01/10 07:26:41 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -400,6 +400,7 @@ PS_RememberFont(char *fname)
 	recode = "reencodeISO2 def\n";
 	break;
     case S_ENC_ISO8859_9: /* ISO8859-9 is Latin5 */
+    case S_ENC_CP1254:
 	recode = "reencodeISO9 def\n";
 	break;
     case S_ENC_ISO8859_15: /* ISO8859-15 is Latin9 */
@@ -1599,6 +1600,7 @@ end\n\
 	switch (encoding) {
 	    case S_ENC_ISO8859_1:   PS_dump_prologue_file("8859-1.ps"); break;
 	    case S_ENC_ISO8859_2:   PS_dump_prologue_file("8859-2.ps"); break;
+	    case S_ENC_CP1254:
 	    case S_ENC_ISO8859_9:   PS_dump_prologue_file("8859-9.ps"); break;
 	    case S_ENC_ISO8859_15:  PS_dump_prologue_file("8859-15.ps"); break;
 	    case S_ENC_CP437:	    PS_dump_prologue_file("cp437.ps"); break;
