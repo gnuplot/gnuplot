@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.87 2007/12/31 17:51:28 sfeam Exp $
+ * $Id: svg.trm,v 1.88 2008/01/04 23:13:38 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -384,7 +384,7 @@ SVG_DefineFillPattern(int fillpat)
 	}
 	if (*path) {
 	    if (SVG_color_mode == TC_RGB)
-		fprintf(gpoutfile,"\t\t\t<path style=\"fill:none; %s:rgb(%d,%d,%d)\" d='%s'/>\n",
+		fprintf(gpoutfile,"\t\t\t<path style='fill:none; %s:rgb(%d,%d,%d)' d='%s'/>\n",
 			style, SVG_red, SVG_green, SVG_blue, path);
 	    else if (SVG_color_mode == TC_LT)
 		fprintf(gpoutfile, "\t\t\t<path style = '%s:%s' d= '%s'/>\n",
@@ -698,7 +698,7 @@ SVG_init ()
 	     gnuplot_version, gnuplot_patchlevel);
 
     /* Start prologue section of output file, and load fonts if requested */
-    fprintf(gpoutfile,"<defs>\n\n");
+    fprintf(gpoutfile,"<defs>\n");
     if (SVG_embedded_font)
 	SVG_load_fontfile(SVG_embedded_font);
 
@@ -707,39 +707,39 @@ SVG_init ()
      * there seems to be no way to avoid that without copying the
      * marker definition into the file, rather than referencing a
      * defined one :-( That would make for much larger files */
-    /* "\t<path id='gpPt3' style='stroke-width:%.3f' d='M-1,-1 h2 v2 h-2 z'/>\n" */
+    /* "\t<path id='gpPt3' stroke-width='%.3f' d='M-1,-1 h2 v2 h-2 z'/>\n" */
 
     stroke_width = 2.0 *SVG_SCALE / term->h_tic;
     fprintf (gpoutfile,
 	     "\n"
 	     /* dot: */
-	     "\t<circle id='gpDot' r='1'/>\n"
+	     "\t<circle id='gpDot' r='0.5' stroke-width='0.5'/>\n"
 	     /*  0 plus */
-	     "\t<path id='gpPt0' style='stroke-width:%.3f' d='M-1,0 h2 M0,-1 v2'/>\n"
+	     "\t<path id='gpPt0' stroke-width='%.3f' stroke='currentColor' d='M-1,0 h2 M0,-1 v2'/>\n"
 	     /*  1 X */
-	     "\t<path id='gpPt1' style='stroke-width:%.3f' d='M-1,-1 L1,1 M1,-1 L-1,1'/>\n"
+	     "\t<path id='gpPt1' stroke-width='%.3f' stroke='currentColor' d='M-1,-1 L1,1 M1,-1 L-1,1'/>\n"
 	     /*  2 star */
-	     "\t<path id='gpPt2' style='stroke-width:%.3f' d='M-1,0 L1,0 M0,-1 L0,1 M-1,-1 L1,1 M-1,1 L1,-1'/>\n"
+	     "\t<path id='gpPt2' stroke-width='%.3f' stroke='currentColor' d='M-1,0 L1,0 M0,-1 L0,1 M-1,-1 L1,1 M-1,1 L1,-1'/>\n"
 	     /*  3 box */
-	     "\t<rect id='gpPt3' style='stroke-width:%.3f' x='-1' y='-1' width='2' height='2'/>\n"
+	     "\t<rect id='gpPt3' stroke-width='%.3f' stroke='currentColor' x='-1' y='-1' width='2' height='2'/>\n"
 	     /*  4 box                   filled */
-	     "\t<rect id='gpPt4' style='stroke-width:%.3f; fill:currentColor' x='-1' y='-1' width='2' height='2'/>\n"
+	     "\t<rect id='gpPt4' stroke-width='%.3f' fill='currentColor' x='-1' y='-1' width='2' height='2'/>\n"
 	     /*  5 circle */
-	     "\t<circle id='gpPt5' style='stroke-width:%.3f' cx='0' cy='0' r='1'/>\n"
+	     "\t<circle id='gpPt5' stroke-width='%.3f' stroke='currentColor' cx='0' cy='0' r='1'/>\n"
 	     /*  6 circle (disk)         filled */
-	     "\t<use xlink:href='#gpPt5' id='gpPt6' style='fill:currentColor; stroke:none'/>\n"
+	     "\t<use xlink:href='#gpPt5' id='gpPt6' fill='currentColor' stroke='none'/>\n"
 	     /*  7 triangle */
-	     "\t<path id='gpPt7' style='stroke-width:%.3f' d='M0,-1.33 L-1.33,0.67 L1.33,0.67 z'/>\n"
+	     "\t<path id='gpPt7' stroke-width='%.3f' stroke='currentColor' d='M0,-1.33 L-1.33,0.67 L1.33,0.67 z'/>\n"
 	     /*  8 triangle  filled */
-	     "\t<use xlink:href='#gpPt7' id='gpPt8' style='fill:currentColor; stroke:none'/>\n"
+	     "\t<use xlink:href='#gpPt7' id='gpPt8' fill='currentColor' stroke='none'/>\n"
 	     /*  9 upside down triangle */
-	     "\t<use xlink:href='#gpPt7' id='gpPt9' transform='rotate(180)'/>\n"
+	     "\t<use xlink:href='#gpPt7' id='gpPt9' stroke='currentColor' transform='rotate(180)'/>\n"
 	     /*  10 upside down triangle filled */
-	     "\t<use xlink:href='#gpPt9' id='gpPt10' style='fill:currentColor; stroke:none'/>\n"
+	     "\t<use xlink:href='#gpPt9' id='gpPt10' fill='currentColor' stroke='none'/>\n"
 	     /* 11 diamond */
-	     "\t<use xlink:href='#gpPt3' id='gpPt11' transform='rotate(45)'/>\n"
+	     "\t<use xlink:href='#gpPt3' id='gpPt11' stroke='currentColor' transform='rotate(45)'/>\n"
 	     /* 12 diamond               filled */
-	     "\t<use xlink:href='#gpPt11' id='gpPt12' style='fill:currentColor; stroke:none'/>\n"
+	     "\t<use xlink:href='#gpPt11' id='gpPt12' fill='currentColor' stroke='none'/>\n"
 
 	     /* NOTE: Fill patterns must be defined after the stroke color has been
 	      * set to use the correct (current) stroke color. Therefore we can't
@@ -887,10 +887,10 @@ SVG_point (unsigned int x, unsigned int y, int number)
 {
     char color_spec[0x40];
     if (SVG_color_mode == TC_RGB)
-   	sprintf(color_spec, " style='color:rgb(%3d, %3d, %3d)'",
+   	sprintf(color_spec, " color='rgb(%3d, %3d, %3d)'",
 		SVG_red, SVG_green, SVG_blue);
     else if (SVG_color_mode == TC_LT)
-	sprintf(color_spec, " style='color:%s'", SVG_linecolor);
+	sprintf(color_spec, " color='%s'", SVG_linecolor);
     else
 	*color_spec = '\0';
 

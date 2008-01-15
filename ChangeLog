@@ -1,3 +1,9 @@
+2008-01-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Rework the inheritance of color and stroke properties
+	applied to points. This allows the Firefox svg engine to handle our
+	point styles.
+
 2008-01-13  Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/term_api.h src/term.c term/emf.trm term/PostScript/8859-9.ps
