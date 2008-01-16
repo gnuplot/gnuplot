@@ -1,3 +1,8 @@
+2008-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* share/Makefile.am (Gnuplot): Fix rule to allow builds outside
+	the source tree.
+
 2008-01-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Rework the inheritance of color and stroke properties
