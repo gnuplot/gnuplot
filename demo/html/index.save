@@ -8,8 +8,8 @@
 <p>
 Gnuplot is distributed with a large set of scripts that demonstrate
 various features.  Collected below are the results of running
-most of these scripts using gnuplot version 4.3. Interactive demo 
-scripts are not included on this page.
+many of these scripts through the CVS version of gnuplot.
+Interactive demo scripts are not included on this page.
 
 
 
@@ -63,7 +63,6 @@ scripts are not included on this page.
     <li><a href="pm3d.html">pm3d coloring</a></li>
     <li><a href="hidden2.html">pm3d hidden surfaces</a></li>
     <li><a href="world2.html">3D mapping</a></li>
-    <li><a href="4D_data.html">4D mapping</a></li>
     </ul>
 
     <h4>Coordinate and<br> axis transforms</h4>
@@ -99,6 +98,7 @@ scripts are not included on this page.
     <li><a href="finance.html">financial data</a></li>
     <li><a href="scatter.html">non-gridded data</a></li>
     <li><a href="running_avg.html">running averages</a></li>
+    <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
     </ul>
 
     <h4>Text options</h4>
@@ -150,7 +150,7 @@ scripts are not included on this page.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>August 2007</i>
+    <i>This page created by Ethan Merritt<br>January 2008</i>
     </td>
 
     <td>

@@ -7,6 +7,10 @@
 	* src/graphics.c (plot_image_or_update_axes):  Do not clip 3D image data
 	against Z range if the plot mode is "set view map".
 
+	* demo/heatmaps.dem demo/4D_data.dem demo/all.dem demo/html/index.save
+	demo/html/Makefile: Replace the 4D_data demo script with a more general
+	demonstration of 2D and 3D heat maps.
+
 2008-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* share/Makefile.am (Gnuplot): Fix rule to allow builds outside
