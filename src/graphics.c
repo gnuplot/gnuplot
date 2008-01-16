@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.18 2007/12/08 10:54:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.19 2007/12/09 06:58:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5579,7 +5579,7 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	    return;
 	}
 
-    } else {
+    } else {	/* !rectangular_image */
 
 	if (pixel_planes != IC_RGB) {
 
@@ -5641,16 +5641,13 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 		    p_corners[3].y = y - delta_pixel[1].y;
 		    p_corners[3].z = z - delta_pixel[1].z;
 
-		    /* Check if one of the corners is viewable */
+		    /* Check if any of the corners are viewable */
 		    for (k=0; k < 4; k++) {
 			corner_in_range[k] =
-			    inrange(p_corners[k].x,
-			            view_port_x[0], view_port_x[1])
-			    && inrange(p_corners[k].y,
-			               view_port_y[0], view_port_y[1])
-			    && (!project_points
-			        || inrange(p_corners[k].z,
-				           view_port_z[0], view_port_z[1]));
+			    inrange(p_corners[k].x, view_port_x[0], view_port_x[1])
+			    && inrange(p_corners[k].y, view_port_y[0], view_port_y[1])
+			    && (!project_points || splot_map ||
+			        inrange(p_corners[k].z, view_port_z[0], view_port_z[1]));
 			pixel_in_view = pixel_in_view || corner_in_range[k];
 		    }
 

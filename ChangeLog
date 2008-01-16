@@ -1,3 +1,8 @@
+2008-01-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_image_or_update_axes):  Do not clip 3D image data
+	against Z range if the plot mode is "set view map".
+
 2008-01-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Backport fix for Bug #1850588
