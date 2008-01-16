@@ -1,3 +1,9 @@
+2008-01-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate.c (print_3dtable):  Prevent possible segfault from
+	attempt to initialize vector tail pointer in a plot that contains
+	no vectors.
+
 2008-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* share/Makefile.am (Gnuplot): Fix rule to allow builds outside

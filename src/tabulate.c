@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.1 2007/04/27 20:35:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.2 2007/04/28 03:42:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -203,6 +203,7 @@ print_3dtable(int pcount)
     struct surface_points *this_plot;
     int i, surface;
     struct coordinate GPHUGE *point;
+    struct coordinate GPHUGE *tail;
     char *buffer = gp_alloc(150, "print_3dtable output buffer");
     FILE *outfile = (table_outfile) ? table_outfile : gpoutfile;
 
@@ -240,12 +241,13 @@ print_3dtable(int pcount)
 		 icrvs && curve < this_plot->num_iso_read;
 		 icrvs = icrvs->next, curve++) {
 
-		struct coordinate GPHUGE *tail = icrvs->next->points; /* Vector tails */
-
 		fprintf(outfile, "\n# IsoCurve %d, %d points\n# x y z",
 			curve, icrvs->p_count);
-		if (this_plot->plot_style == VECTOR)
-		     fprintf(outfile, " delta_x delta_y delta_z");
+		if (this_plot->plot_style == VECTOR) {
+		    tail = icrvs->next->points;
+		    fprintf(outfile, " delta_x delta_y delta_z");
+		} else tail = NULL;  /* Just to shut up a compiler warning */
+
 		fprintf(outfile, " type\n");
 
 		for (i = 0, point = icrvs->points;
