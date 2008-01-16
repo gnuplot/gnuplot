@@ -4,6 +4,9 @@
 	attempt to initialize vector tail pointer in a plot that contains
 	no vectors.
 
+	* src/graphics.c (plot_image_or_update_axes):  Do not clip 3D image data
+	against Z range if the plot mode is "set view map".
+
 2008-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* share/Makefile.am (Gnuplot): Fix rule to allow builds outside
@@ -32,7 +35,7 @@
 	* plot2d.c (plotrequest): Call prune_dataticks() before each new plot.
 
 	* src/pm3d.c (pm3d_plot): When color information is given in a separate
-	column, we must not use the interpolated z coordinate as for color.
+	column, we must not use the interpolated z coordinate for color.
 	Bug #1783405
 
 2008-01-10  Petr Mikulik  <mikulik@physics.muni.cz>
