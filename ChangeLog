@@ -1,3 +1,8 @@
+2008-01-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm (SVG_filled_polygon): Fix bug that causes
+	FS_TRANSPARENT_PATTERN to create a blank fill area.
+
 2008-01-21  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm: Apple calls iso8859-9 NSWindowsCP1254StringEncoding

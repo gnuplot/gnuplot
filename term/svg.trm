@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.88 2008/01/04 23:13:38 sfeam Exp $
+ * $Id: svg.trm,v 1.89 2008/01/16 05:26:46 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1118,7 +1118,7 @@ SVG_filled_polygon(int points, gpiPoint* corners)
     int fillpar = corners->style >> 4;
     int style = corners->style &= 0xf;
 
-    if (style == FS_PATTERN) {
+    if (style == FS_PATTERN || style == FS_TRANSPARENT_PATTERN) {
 	/* make sure the pattern is defined (with the current stroke color)
 	 * must be defined AFTER the current group is opened with the color
 	 * attribute set, as the patterns use 'currentColor' */
