@@ -1,3 +1,8 @@
+2008-01-21  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* term/aquaterm.c: The "size xx,yy" option should have a comma between
+	xx and yy for consistency with other terminals.
+
 2009-06-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_c_bars): Candlestick boxes that were entirely out
