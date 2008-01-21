@@ -1,3 +1,8 @@
+2008-01-21  Allin Cottrell  <cottrell@wfu.edu>
+
+	* src/command.c (pause_command): Provide a default "paused" message so
+	that Windows does not segfault if no message is provided for pause -1.
+
 2008-01-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c (print_3dtable):  Prevent possible segfault from
