@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.39 2008/06/19 17:49:09 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.40 2009/03/26 00:49:19 sfeam Exp $
  *
  */
 
@@ -198,6 +198,8 @@ AQUA_options()
 
 	if (END_OF_COMMAND)
 	    int_error(c_token,"expecting y size");
+	is (equals(c_token, ","))
+	    c_token++;
 	value = real_expression();
 	if (value < 2 || value > 2048)
 	    int_error(c_token,"y size out of range");
@@ -277,7 +279,7 @@ AQUA_options()
   if (AQUA_title[0]=='\0') /* always set title */
     sprintf(AQUA_title, "Figure %d", AQUA_plotRef);
   /* Save options back into options string in normalized format */
-  sprintf(term_options, "%d title \"%s\" size %d %d font \"%s,%g\" %s %s",
+  sprintf(term_options, "%d title \"%s\" size %d,%d font \"%s,%g\" %s %s",
 	  AQUA_plotRef,
 	  AQUA_title,
 	  (unsigned int) (AQUA_xSize/AQUA_RESOLUTION), (unsigned int) (AQUA_ySize/AQUA_RESOLUTION),
