@@ -1,3 +1,12 @@
+2008-01-23  Morten MacFly  <mortenmacfly@users.sourceforge.net>
+
+	* term/post.trm (PS_open_prologue_file PS_dump_prologue_file
+	PS_load_glyphlist) term/PostScript/prologues.h: Update built-in
+	prologues to match the external ones. Prevent a segfault if the
+	appropriate prologue file is not found at run time.  Add utf-8
+	to the internal list of available prologues.
+	Bug #1878095.
+
 2008-01-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm (SVG_filled_polygon): Fix bug that causes

@@ -2,6 +2,9 @@
  * in a form suitable to inclusion in a C source code */
 
 static const char *prologue_8859_1_ps[] = {
+"%\n",
+"% Encoding for ISO-8859-1 (also called Latin1)\n",
+"%\n",
 "/reencodeISO {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -46,6 +49,9 @@ NULL
 };
 
 static const char *prologue_8859_15_ps[] = {
+"%\n",
+"% Encoding for ISO-8859-15 (also called Latin9)\n",
+"%\n",
 "/reencodeISO15 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -90,7 +96,8 @@ NULL
 };
 
 static const char *prologue_8859_2_ps[] = {
-"% Encoding for ISO-8859-2 (also called as Latin-2), with\n",
+"%\n",
+"% Encoding for ISO-8859-2 (also called Latin2), with\n",
 "% minor differences to \"true\" ISO-8859-2 (*commaaccent \n",
 "% instead of *cedilla for sStT -> incorrect in ISO-8859-2,\n",
 "% the standard will probably be modified in this respect)\n",
@@ -138,7 +145,58 @@ static const char *prologue_8859_2_ps[] = {
 NULL
 };
 
+static const char *prologue_8859_9_ps[] = {
+"%\n",
+"% Encoding for ISO_8859_9 (also called Latin5)\n",
+"% Plus code points 80-9F used in Codepage 1254\n",
+"%\n",
+"/reencodeISO9 {\n",
+"dup dup findfont dup length dict begin\n",
+"{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
+"currentdict /CharStrings known {\n",
+"\tCharStrings /Idieresis known {\n",
+"\t\t/Encoding ISOLatin5Encoding def } if\n",
+"} if\n",
+"currentdict end definefont\n",
+"} def\n",
+"/ISOLatin5Encoding [\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright\n",
+"/parenleft/parenright/asterisk/plus/comma/minus/period/slash\n",
+"/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon\n",
+"/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N\n",
+"/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright\n",
+"/asciicircum/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m\n",
+"/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde\n",
+"/Euro/.notdef/quotesinglbase/florin/quotedblbase/ellipsis/dagger/daggerdbl\n",
+"/circumflex/perthousand/Scaron/guilsinglleft/OE/.notdef/.notdef/.notdef\n",
+"/.notdef/quoteleft/quoteright/quotedblleft/quotedblright/bullet/endash/emdash\n",
+"/tilde/trademark/scaron/guilsinglright/oe/.notdef/.notdef/Ydieresis\n",
+"/.notdef/space/exclamdown/cent/sterling/currency/yen/brokenbar\n",
+"/section/dieresis/copyright/ordfeminine/guillemotleft/logicalnot\n",
+"/hyphen/registered/macron/degree/plusminus/twosuperior/threesuperior\n",
+"/acute/mu/paragraph/bullet/cedilla/onesuperior/ordmasculine\n",
+"/guillemotright/onequarter/onehalf/threequarters/questiondown\n",
+"/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla\n",
+"/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex\n",
+"/Idieresis/Gbreve/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis\n",
+"/multiply/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Idotaccent\n",
+"/Scedilla/germandbls/agrave/aacute/acircumflex/atilde/adieresis\n",
+"/aring/ae/ccedilla/egrave/eacute/ecircumflex/edieresis/igrave\n",
+"/iacute/icircumflex/idieresis/gbreve/ntilde/ograve/oacute/ocircumflex\n",
+"/otilde/odieresis/divide/oslash/ugrave/uacute/ucircumflex/udieresis\n",
+"/dotlessi/scedilla/ydieresis\n",
+"] def\n",
+NULL
+};
+
 static const char *prologue_cp1250_ps[] = {
+"%\n",
+"% Encoding for code page 1250 (Microsoft Windows Central and Eastern European)\n",
+"%\n",
 "/reencodeCP1250 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -181,7 +239,8 @@ NULL
 };
 
 static const char *prologue_cp437_ps[] = {
-"% encoding for code page 437\n",
+"%\n",
+"% encoding for code page 437 (original MSDOS)\n",
 "% version 1.0:\t- Mainly letters are mapped. The following positions\n",
 "% (JFi)\t\t  are left blank (undefined):\n",
 "%\t\t-- first 32 positions,\n",
@@ -233,7 +292,8 @@ NULL
 };
 
 static const char *prologue_cp850_ps[] = {
-"% encoding for code page 850\n",
+"%\n",
+"% encoding for code page 850 (obsolete MSDOS Western Europe)\n",
 "% version 1.0:  - Mainly letters are mapped. The following positions\n",
 "% (JFi)\t\t  are left blank (undefined):\n",
 "%\t\t-- first 32 positions,\n",
@@ -282,7 +342,8 @@ NULL
 };
 
 static const char *prologue_cp852_ps[] = {
-"% encoding for code page 852\n",
+"%\n",
+"% encoding for code page 852 (MSDOS Central European)\n",
 "/reencodeCP852 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -326,7 +387,8 @@ NULL
 };
 
 static const char *prologue_koi8r_ps[] = {
-"% encoding for code page koi8r\n",
+"%\n",
+"% encoding for code page koi8r (8-bit Russian)\n",
 "% version 1.0:\t- Mainly letters are mapped. The following positions\n",
 "% (JFi)\t\t  are left blank (undefined):\n",
 "%\t\t-- first 32 positions,\n",
@@ -376,6 +438,7 @@ NULL
 
 static const char *prologue_koi8u_ps[] = {
 "%\n",
+"% encoding for code page koi8r (8-bit Ukrainian)\n",
 "/reencodeKOI8U {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -419,7 +482,7 @@ NULL
 
 static const char *prologue_prologue_ps[] = {
 "%\n",
-"% Gnuplot Prolog Version 4.1 (March 2006)\n",
+"% Gnuplot Prolog Version 4.2 (November 2007)\n",
 "%\n",
 "/M {moveto} bind def\n",
 "/L {lineto} bind def\n",
@@ -429,6 +492,7 @@ static const char *prologue_prologue_ps[] = {
 "/Z {closepath} bind def\n",
 "/C {setrgbcolor} bind def\n",
 "/f {rlineto fill} bind def\n",
+"/Gshow {show} def   % May be redefined later in the file to support UTF-8\n",
 "/vpt2 vpt 2 mul def\n",
 "/hpt2 hpt 2 mul def\n",
 "/Lshow {currentpoint stroke M 0 vshift R \n",
@@ -669,7 +733,7 @@ static const char *prologue_prologue_ps[] = {
 "  ColR ColG ColB setrgbcolor} def\n",
 "/BoxColFill {gsave Rec PolyFill} def\n",
 "/PolyFill {gsave Density fill grestore grestore} def\n",
-"/h {rlineto rlineto rlineto gsave fill grestore} bind def\n",
+"/h {rlineto rlineto rlineto gsave closepath fill grestore} bind def\n",
 "%\n",
 "% PostScript Level 1 Pattern Fill routine for rectangles\n",
 "% Usage: x y w h s a XX PatternFill\n",
@@ -786,6 +850,68 @@ static const char *prologue_prologue_ps[] = {
 "/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont\n",
 "dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall\n",
 "currentdict end definefont pop\n",
+NULL
+};
+
+static const char *prologue_utf_8_ps[] = {
+"%\n",
+"% Base ISO8859-1 character encoding plus support macros for UTF-8 encoding\n",
+"% via the glyphshow operator\n",
+"%\n",
+"/reencodeISO {\n",
+"dup dup findfont dup length dict begin\n",
+"{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
+"currentdict /CharStrings known {\n",
+"\tCharStrings /Idieresis known {\n",
+"\t\t/Encoding ISOLatin1Encoding def } if\n",
+"} if\n",
+"currentdict end definefont\n",
+"} def\n",
+"/ISOLatin1Encoding [\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright\n",
+"/parenleft/parenright/asterisk/plus/comma/minus/period/slash\n",
+"/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon\n",
+"/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N\n",
+"/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright\n",
+"/asciicircum/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m\n",
+"/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/dotlessi/grave/acute/circumflex/tilde/macron/breve\n",
+"/dotaccent/dieresis/.notdef/ring/cedilla/.notdef/hungarumlaut\n",
+"/ogonek/caron/space/exclamdown/cent/sterling/currency/yen/brokenbar\n",
+"/section/dieresis/copyright/ordfeminine/guillemotleft/logicalnot\n",
+"/hyphen/registered/macron/degree/plusminus/twosuperior/threesuperior\n",
+"/acute/mu/paragraph/periodcentered/cedilla/onesuperior/ordmasculine\n",
+"/guillemotright/onequarter/onehalf/threequarters/questiondown\n",
+"/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla\n",
+"/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex\n",
+"/Idieresis/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis\n",
+"/multiply/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute\n",
+"/Thorn/germandbls/agrave/aacute/acircumflex/atilde/adieresis\n",
+"/aring/ae/ccedilla/egrave/eacute/ecircumflex/edieresis/igrave\n",
+"/iacute/icircumflex/idieresis/eth/ntilde/ograve/oacute/ocircumflex\n",
+"/otilde/odieresis/divide/oslash/ugrave/uacute/ucircumflex/udieresis\n",
+"/yacute/thorn/ydieresis\n",
+"] def\n",
+"\n",
+"/Gshow { dup type /stringtype eq { show } { glyphshow } ifelse } def\n",
+"\n",
+"/Gsall { {Gshow} forall } def\n",
+"/Gwidth {\n",
+"\tdup currentpoint pop exch\n",
+"\tgsave 6 array currentmatrix nulldevice setmatrix Gsall currentpoint pop grestore sub\n",
+"\t} def\n",
+"/GLshow {currentpoint stroke M 0 vshift R \n",
+"\tBlacktext {gsave 0 setgray Gsall grestore} {Gsall} ifelse} def\n",
+"/GRshow {currentpoint stroke M dup Gwidth vshift R\n",
+"\tBlacktext {gsave 0 setgray Gsall grestore} {Gsall} ifelse} def\n",
+"/GCshow {currentpoint stroke M dup Gwidth 2 div vshift R \n",
+"\tBlacktext {gsave 0 setgray Gsall grestore} {Gsall} ifelse} def\n",
 NULL
 };
 

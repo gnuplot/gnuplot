@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.225 2008/01/10 07:26:41 mikulik Exp $
+ * $Id: post.trm,v 1.226 2008/01/14 06:38:25 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3394,16 +3394,18 @@ PS_open_prologue_file(char *name)
 		dump = prologue_koi8r_ps;
 	else if (!strcmp(name,"koi8u.ps"))
 		dump = prologue_koi8u_ps;
+	else if (!strcmp(name,"utf-8.ps"))
+		dump = prologue_utf_8_ps;
 	else if (!strcmp(name,"prologue.ps"))
 		dump = prologue_prologue_ps;
 	else
-		int_error(NO_CARET,"Requested Postscript prologue is not included");
+		int_warn(NO_CARET,"Requested Postscript prologue %s not found",name);
 
 	if (dump) {
 		for (i = 0; dump[i] != NULL; ++i)
 		fprintf(gppsfile, "%s", dump[i]);
 	}
-	return;
+	return NULL;
 #endif /* GNUPLOT_PS_DIR */
     }
 
@@ -3443,9 +3445,11 @@ PS_dump_prologue_file(char *name)
     char buf[256];
     FILE *prologue_fd = PS_open_prologue_file(name);
 
-    while (fgets(buf, sizeof(buf), prologue_fd))
-	fputs(buf, gppsfile);
-    fclose(prologue_fd);
+    if (prologue_fd) {
+	while (fgets(buf, sizeof(buf), prologue_fd))
+	    fputs(buf, gppsfile);
+	fclose(prologue_fd);
+    }
 }
 
 static void
@@ -3457,6 +3461,9 @@ PS_load_glyphlist()
     int  len;
     char glyph_name[32];
     FILE *prologue_fd = PS_open_prologue_file("aglfn.txt");
+    
+    if (!prologue_fd)
+	return;
 
     while (fgets(buf, sizeof(buf), prologue_fd)) {
 	if (*buf == '#' || *buf == '\n')
