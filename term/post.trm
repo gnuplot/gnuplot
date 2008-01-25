@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.226 2008/01/14 06:38:25 sfeam Exp $
+ * $Id: post.trm,v 1.227 2008/01/23 23:05:49 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -129,6 +129,7 @@ TERM_PUBLIC void PS_path __PROTO((int p));
 static TBOOLEAN PS_newpath = FALSE;
 static TBOOLEAN ENHps_opened_string = FALSE;  /* try to cut out empty ()'s */
 
+TERM_PUBLIC void PS_layer __PROTO((t_termlayer syncpoint));
 
 #endif /* TERM_PROTO */
 
@@ -3512,6 +3513,32 @@ PS_path(int p)
 
 }
 
+TERM_PUBLIC void
+PS_layer(t_termlayer syncpoint)
+{
+    static int plotno = 0;
+
+    /* We must ignore all syncpoints that we don't recognize */
+    switch (syncpoint) {
+
+	default:
+		break;
+	
+	case TERM_LAYER_BEFORE_PLOT:
+		fprintf(gppsfile, "%% Begin plot #%d\n", ++plotno);
+		break;
+	
+	case TERM_LAYER_AFTER_PLOT:
+		fprintf(gppsfile, "%% End plot #%d\n", plotno);
+		break;
+	
+	case TERM_LAYER_RESET:
+		plotno = 0;
+		break;
+
+    }
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -3537,7 +3564,7 @@ TERM_TABLE_START(post_driver)
     , PS_image
 #endif
     , ENHPS_OPEN, ENHPS_FLUSH, ENHPS_WRITEC
-    , 0		/* layer control */
+    , PS_layer		/* used only to insert comments */
     , PS_path
     , PS_SC		/* terminal to pixel coord scale factor */
 TERM_TABLE_END(post_driver)

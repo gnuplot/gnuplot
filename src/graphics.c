@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.241 2007/12/18 19:02:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.242 2008/01/17 20:38:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1815,6 +1815,10 @@ do_plot(struct curve_points *plots, int pcount)
     for (curve = 0; curve < pcount; this_plot = this_plot->next, curve++) {
 	TBOOLEAN localkey = lkey;	/* a local copy */
 
+	/* Sync point for start of new curve (used by svg, post, ...) */
+	if (term->layer)
+	    (term->layer)(TERM_LAYER_BEFORE_PLOT);
+
 	/* set scaling for this plot's axes */
 	x_axis = this_plot->x_axis;
 	y_axis = this_plot->y_axis;
@@ -2022,6 +2026,11 @@ do_plot(struct curve_points *plots, int pcount)
 	    } else
 		yl = yl - key_entry_height;
 	}
+
+	/* Sync point for end of this curve (used by svg, post, ...) */
+	if (term->layer)
+	    (term->layer)(TERM_LAYER_AFTER_PLOT);
+
     }
 
     /* DRAW TICS AND GRID */

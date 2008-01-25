@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.61 2007/11/24 00:12:00 sfeam Exp $
+ * $Id: fig.trm,v 1.62 2007/12/20 03:15:55 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -90,6 +90,7 @@ TERM_PUBLIC int FIG_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void FIG_previous_palette (void); */
 TERM_PUBLIC void FIG_set_color (t_colorspec *);
 TERM_PUBLIC void FIG_filled_polygon (int, gpiPoint *);
+TERM_PUBLIC void FIG_layer __PROTO((t_termlayer syncpoint));
 
 #define GOT_FIG_PROTO
 #endif /* TERM_PROTO */
@@ -1172,6 +1173,36 @@ TERM_PUBLIC void FIG_filled_polygon(int points, gpiPoint *corners)
     }
 }
 
+TERM_PUBLIC void
+FIG_layer(t_termlayer syncpoint)
+{
+    static int plotno = 0;
+
+    /* We must ignore all syncpoints that we don't recognize */
+    switch (syncpoint) {
+
+	default:
+		break;
+	
+	case TERM_LAYER_BEFORE_PLOT:
+		FIG_poly_clean(FIG_polyvec_stat);
+		fputs("6\n", gpoutfile);
+		fprintf(gpoutfile, "# Begin plot #%d\n", ++plotno);
+		break;
+	
+	case TERM_LAYER_AFTER_PLOT:
+		FIG_poly_clean(FIG_polyvec_stat);
+		fprintf(gpoutfile, "# End plot #%d\n", plotno);
+		fputs("-6\n", gpoutfile);
+		break;
+	
+	case TERM_LAYER_RESET:
+		plotno = 0;
+		break;
+
+    }
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -1190,6 +1221,11 @@ TERM_TABLE_START(fig_driver)
     ,0, 0, 0, 0, 0 /* no mouse support for the fig terminal */
 #endif
     , FIG_make_palette, 0 /*previous_palette*/, FIG_set_color, FIG_filled_polygon
+#ifdef WITH_IMAGE
+    , 0
+#endif
+    , 0, 0, 0	/* no enhanced text support */
+    , FIG_layer
 TERM_TABLE_END(fig_driver)
 
 #undef LAST_TERM

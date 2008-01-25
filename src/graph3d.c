@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.184 2007/12/15 04:01:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.185 2007/12/24 19:39:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -945,6 +945,10 @@ do_3dplot(
 		pm3d_draw_one(this_plot);
 	    }
 
+	    /* Sync point for start of new curve (used by svg, post, ...) */
+	    if (term->layer)
+		(term->layer)(TERM_LAYER_BEFORE_PLOT);
+
 	    if (pm3d_order_depth && this_plot->plot_style != PM3DSURFACE) {
 		pm3d_depth_queue_flush(); /* draw pending plots */
 	    }
@@ -1322,6 +1326,11 @@ do_3dplot(
 		    cntrs = cntrs->next;
 		} /* loop over contours */
 	    } /* draw contours */
+	    
+	    /* Sync point for end of this curve (used by svg, post, ...) */
+	    if (term->layer)
+		(term->layer)(TERM_LAYER_AFTER_PLOT);
+
 	} /* loop over surfaces */
 
     if (pm3d_order_depth) {

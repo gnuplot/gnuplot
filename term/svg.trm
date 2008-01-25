@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.89 2008/01/16 05:26:46 sfeam Exp $
+ * $Id: svg.trm,v 1.90 2008/01/22 06:46:17 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -68,6 +68,7 @@ TERM_PUBLIC int SVG_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void SVG_previous_palette __PROTO((void));
 TERM_PUBLIC void SVG_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void SVG_filled_polygon __PROTO((int, gpiPoint *));
+TERM_PUBLIC void SVG_layer __PROTO((t_termlayer syncpoint));
 
 TERM_PUBLIC void ENHsvg_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
 TERM_PUBLIC void ENHsvg_FLUSH __PROTO((void));
@@ -1157,6 +1158,38 @@ SVG_filled_polygon(int points, gpiPoint* corners)
     fputs("'/>\n", gpoutfile);
 }
 
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_layer
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_layer(t_termlayer syncpoint)
+{
+    static int plotno = 0;
+
+    /* We must ignore all syncpoints that we don't recognize */
+    switch (syncpoint) {
+
+    	default:
+		break;
+
+	case TERM_LAYER_BEFORE_PLOT:
+		SVG_PathClose();
+		SVG_GroupClose();
+		fprintf(gpoutfile, "\t<a xlink:title=\"Plot #%d\">\n", ++plotno);
+		break;
+
+	case TERM_LAYER_AFTER_PLOT:
+		SVG_PathClose();
+		SVG_GroupClose();
+		fprintf(gpoutfile, "\t</a>\n");
+		break;
+
+	case TERM_LAYER_RESET:
+		plotno = 0;
+		break;
+    }
+}
+
 
 /* Enhanced text mode support starts here */
 
@@ -1433,7 +1466,7 @@ TERM_TABLE_START (svg_driver)
     , NULL
 #endif
    , ENHsvg_OPEN, ENHsvg_FLUSH, ENHsvg_writec
-   , 0		/* layer */
+   , SVG_layer	/* layer */
    , SVG_path 	/* path */
    , SVG_SCALE	/* pixel oversampling scale */
 TERM_TABLE_END (svg_driver)

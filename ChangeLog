@@ -1,5 +1,22 @@
 2008-01-25  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/term_api.h src/graphics.c (do_plot) src/graph3d.c (do_3dplot):
+	Bracket each individual plot within a figure by a pair of calls to
+	term->layer(TERM_LAYER_BEFORE_PLOT) term->layer(TERM_LAYER_AFTER_PLOT).
+
+	* term/svg.trm (SVG_layer): Use the notification to encapsulate each
+	plot into an <a xlink:title="Plot #N"> ... </a>  context.
+	SourceForge tracker ref #1359667
+
+	* term/post.trm (PS_layer): Use the notification to insert comments
+	before and after the code for each plot.
+
+	* term/fig.trm (FIG_layer): Use the notification to wrap each plot
+	as a separate compound object for later editing.
+	SourceForge tracker ref #1683173
+
+2008-01-25  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/help.c src/command.c:  The old compile option NO_GIH allowed
 	bypassing gnuplot's internal help code on systems that have other help
 	mechanisms (Windows, VMS). Clean this up so that it compiles correctly
