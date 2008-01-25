@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.2 2007/04/28 03:42:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.3 2008/01/17 16:33:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -95,6 +95,9 @@ print_table(struct curve_points *current_plot, int plot_num)
 	case XYERRORBARS:
 	    fputs(" xlow xhigh ylow yhigh", outfile);
 	    break;
+	case FILLEDCURVES:
+	    fputs("1 y2", outfile);
+	    break;
 	case FINANCEBARS:
 	case CANDLESTICKS:
 	    fputs(" open ylow yhigh yclose", outfile);
@@ -157,6 +160,9 @@ print_table(struct curve_points *current_plot, int plot_num)
 		    case BOXERROR:
 		    case YERRORBARS:
 			OUTPUT_NUMBER(point->ylow, current_plot->y_axis);
+			OUTPUT_NUMBER(point->yhigh, current_plot->y_axis);
+			break;
+		    case FILLEDCURVES:
 			OUTPUT_NUMBER(point->yhigh, current_plot->y_axis);
 			break;
 		    case FINANCEBARS:
