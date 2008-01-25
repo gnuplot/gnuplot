@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.471 2007/12/31 20:20:20 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.472 2008/01/14 06:38:25 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4862,22 +4862,32 @@ Ffigure_mapcontours
 ?plot special-filenames
 ?datafile special-filenames
 ?special-filenames
- There are three filenames that have a special meaning:  '', '-', and '+'.
+ There are a few filenames that have a special meaning:  '', '-', '+' and '++'.
 
  The empty filename '' tells gnuplot to re-use the previous input file in the
  same plot command. So to plot two columns from the same input file:
 
        plot 'filename' using 1:2, '' using 1:3
 
- The special filename '+' is a mechanism to allow the full range of
- `using` specifiers and plot styles with in-line functions.  Normally a
- function plot can only have a single y (or z) value associated with each
- sampled point.  The pseudo-file '+' treats the sampled points as columns
- 1 (plot) or 1 and 2 (splot), and allows additional column values to be
- specified via a `using` specification, just as for a true input file.
+ The special filenames '+' and '++' are a mechanism to allow the full range of
+ `using` specifiers and plot styles with in-line functions.  Normally a function
+ plot can only have a single y (or z) value associated with each sampled point.
+ The pseudo-file '+' treats the sampled points as column 1, and allows
+ additional column values to be specified via a `using` specification, just as
+ for a true input file.  The number of samples returned is controlled by
+ `set samples`.
  Example:
 
        plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
+
+ Similarly the pseudo-file '++' returns 2 columns of data forming a regular
+ grid of [x,y] coordinates with the number of points along x controlled by
+ `set samples` and the number of points along y controlled by `set isosamples`.
+ You must set xrange and yrange before plotting '++'.
+ Examples:
+
+       splot '++' using 1:2:(sin($1)*sin($2)) with pm3d
+       plot '++' using 1:2:(sin($1)*sin($2)) with image
 
  The special filename `'-'` specifies that the data are inline; i.e., they
  follow the command.  Only the data follow the command; `plot` options like

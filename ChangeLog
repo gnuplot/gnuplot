@@ -1,3 +1,19 @@
+2008-01-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/help.c src/command.c:  The old compile option NO_GIH allowed
+	bypassing gnuplot's internal help code on systems that have other help
+	mechanisms (Windows, VMS). Clean this up so that it compiles correctly
+	on all platforms, and make the unneeded internal help code conditional.
+
+	* src/tabulate.c:  Handle plot style "with filledcurves".
+
+	* src/datafile.c (df_open df_generate_pseudodata) docs/gnuplot.doc
+	demo/heatmaps.dem:  Instead of trying to guess based on the plot type
+	whether the user wants a one-dimensional set of samples or a 2D grid,
+	split the pseudo- file name into two variants.
+	'+' generates 1D (samples), '++' generates 2D (samples, isosamples).
+	See #1872528  Peter Danenberg  <danenberg@users.sourceforge.net>
+
 2008-01-23  Morten MacFly  <mortenmacfly@users.sourceforge.net>
 
 	* term/post.trm (PS_open_prologue_file PS_dump_prologue_file

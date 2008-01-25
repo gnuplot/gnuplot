@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.131 2007/12/17 23:09:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.132 2007/12/18 19:02:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -281,8 +281,8 @@ static int lastline = MAXINT;
 static int point_count = -1;    /* point counter - preincrement and test 0 */
 static int line_count = 0;      /* line counter */
 
-/* for pseudo-data (filename = '+') */
-static TBOOLEAN df_pseudodata = FALSE;
+/* for pseudo-data (1 if filename = '+'; 2 if filename = '++') */
+static int df_pseudodata = 0;
 static int df_pseudorecord = 0;
 static int df_pseudospan = 0;
 
@@ -606,7 +606,7 @@ df_gets()
     if (mixed_data_fp && interactive)
 	fputs("input data ('e' ends) > ", stderr);
 
-    /* Special pseudofile '+' returns x coord of sample */
+    /* Special pseudofiles '+' and '++' return coords of sample */
     if (df_pseudodata)
 	return df_generate_pseudodata();
 
@@ -1260,7 +1260,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     /*{{{  more variable inits */
     point_count = -1;           /* we preincrement */
     line_count = 0;
-    df_pseudodata = FALSE;
+    df_pseudodata = 0;
     df_pseudorecord = 0;
     df_pseudospan = 0;
 
@@ -1288,8 +1288,11 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	if (!data_fp)
 	    data_fp = stdin;
 	mixed_data_fp = TRUE;   /* don't close command file */
-    } else if (*df_filename == '+' && strlen(df_filename) == 1) {
-	df_pseudodata = TRUE;
+    } else if (df_filename[0] == '+') {
+	if (strlen(df_filename) == 1)
+	    df_pseudodata = 1;
+	else if (df_filename[1] == '+' && strlen(df_filename) == 2)
+	    df_pseudodata = 2;
     } else {
 	/* filename cannot be static array! */
 	gp_expand_tilde(&df_filename);
@@ -5136,13 +5139,14 @@ df_set_plot_mode(int mode)
 #endif /* BINARY_DATA_FILE */
 
 /* Special pseudofile '+' returns x coord of sample for 2D plots,
- * x and y coordinates of grid for 3D plots.
+ * Special pseudofile '++' returns x and y coordinates of grid for 3D plots.
  */
 static char *
 df_generate_pseudodata()
 {
+    /* Pseudofile '+' returns a set of (samples) x coordinates */
     /* This code copied from that in second pass through eval_plots() */
-    if (df_plot_mode == MODE_PLOT) {
+    if (df_pseudodata == 1) {
 	static double t, t_min, t_max, t_step;
 	if (df_pseudorecord == 0) {
 	    if (parametric || polar)
@@ -5163,8 +5167,9 @@ df_generate_pseudodata()
 	    return NULL;
     }
 
+    /* Pseudofile '++' returns a (samples X isosamples) grid of x,y coordinates */
     /* This code copied from that in second pass through eval_3dplots */
-    if (df_plot_mode == MODE_SPLOT) {
+    if (df_pseudodata == 2) {
 	static double u_min, u_max, u_step, v_min, v_max, v_step;
 	static double u_isostep, v_isostep;
 	static int nusteps, nvsteps;

@@ -68,7 +68,7 @@ reset
 
 #
 # Demonstrate use of 4th data column to color a 3D surface.
-# Also demonstrate use of the pseudodata special file '+'.
+# Also demonstrate use of the pseudodata special file '++'.
 #
 set view 49, 28, 1, 1.48
 set xrange [ -15 : 15 ] noreverse nowriteback
@@ -92,7 +92,7 @@ set pm3d implicit at s
 Z(x,y) = sin(sqrt(x**2+y**2))/sqrt(x**2+y**2)
 color(x,y) = sin(x/5.)*cos(y/10.)
 
-splot '+' using 1:2:(Z($1,$2)):(color($1,$2)) with pm3d title "4 data columns x/y/z/color"
+splot '++' using 1:2:(Z($1,$2)):(color($1,$2)) with pm3d title "4 data columns x/y/z/color"
 
 pause -1 "Hit return to continue"
 
