@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.162 2008/01/10 16:08:26 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.163 2008/01/21 22:17:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2112,7 +2112,8 @@ do_system(const char *cmd)
 #endif /* VMS */
 
 
-#if defined(_Windows) && defined(NO_GIH)
+#ifdef NO_GIH
+#if defined(_Windows)
 void
 help_command()
 {
@@ -2128,7 +2129,16 @@ help_command()
 	WinHelp(textwin.hWndParent, (LPSTR) winhelpname, HELP_PARTIALKEY, (DWORD) buf);
     }
 }
-#endif /* _Windows && NO_GIH */
+#else  /* !_Windows */
+void
+help_command()
+{
+    while (!(END_OF_COMMAND))
+	c_token++;
+    fputs("This gnuplot was not built with inline help\n", stderr);
+}
+#endif /* _Windows */
+#endif /* NO_GIH */
 
 
 /*
