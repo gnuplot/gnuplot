@@ -1,3 +1,9 @@
+2008-01-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary): Be more precise in estimating the vertical
+	space required to accommodate rotated tick labels on x and x2 axes.
+	Bug #1879907
+
 2008-01-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/graphics.c (do_plot) src/graph3d.c (do_3dplot):

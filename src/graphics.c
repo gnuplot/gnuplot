@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.242 2008/01/17 20:38:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.243 2008/01/26 05:06:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -957,20 +957,31 @@ boundary(struct curve_points *plots, int count)
     if (tmargin.x < 0
 	&& axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER
 	&& vertical_x2tics) {
+	double projection = sin((double)axis_array[SECOND_X_AXIS].tic_rotate*DEG2RAD);
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(SECOND_X_AXIS, /* 0, */ widest_tic_callback);
 	plot_bounds.ytop += x2tic_textheight;
 	/* Now compute a new one and use that instead: */
-	x2tic_textheight = (int) (t->h_char * (widest_tic_strlen));
+	if (projection > 0.0)
+	    x2tic_textheight = (int) (t->h_char * (widest_tic_strlen)) * projection;
+	else
+	    x2tic_textheight = t->v_char;
 	plot_bounds.ytop -= x2tic_textheight;
     }
     if (bmargin.x < 0
 	&& axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER
 	&& vertical_xtics) {
+	double projection;
+	if (axis_array[FIRST_X_AXIS].tic_rotate == 90)
+	    projection = 1.0;
+	else
+	    projection = -sin((double)axis_array[FIRST_X_AXIS].tic_rotate*DEG2RAD);
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(FIRST_X_AXIS, /* 0, */ widest_tic_callback);
 	plot_bounds.ybot -= xtic_textheight;
-	xtic_textheight = (int) (t->h_char * widest_tic_strlen);
+	if (projection > 0.0)
+	    xtic_textheight = (int) (t->h_char * widest_tic_strlen) * projection
+			    + t->v_char;
 	plot_bounds.ybot += xtic_textheight;
     }
 
