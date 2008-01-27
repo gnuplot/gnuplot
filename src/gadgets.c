@@ -228,13 +228,6 @@ draw_clip_line(int x1, int y1, int x2, int y2)
 {
     struct termentry *t = term;
 
-#if defined(ATARI) || defined(MTOS)
-    /* HBB 20000522: why would this test be particular to ATARIs? And
-     * what was the bug this is supposed to fix? */
-    if (x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0)
-	return;			/* temp bug fix */
-#endif
-
     /* HBB 20000522: I've made this routine use the clippling in
      * clip_line(), in a movement to reduce code duplication. There
      * was one very small difference between these two routines. See
@@ -296,8 +289,6 @@ clip_put_text(unsigned int x, unsigned y, char *str)
  *   This routine uses the cohen & sutherland bit mapping for fast clipping -
  * see "Principles of Interactive Computer Graphics" Newman & Sproull page 65.
  */
-/* FIXME HBB 20000521: the parameters of this routine should become
- * unsigned ints. */
 int
 clip_line(int *x1, int *y1, int *x2, int *y2)
 {

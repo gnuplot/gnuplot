@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.31 2007/10/20 05:14:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.32 2007/10/21 04:17:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -1157,14 +1157,16 @@ polyline3d_start(p_vertex v1)
 	return;
 #endif /* LITE */
 
+    /* EAM - This may now be unneeded. But I'm not sure. */
+    /*       Perhaps the hidden3d code needs the move.   */
     TERMCOORD(v1, x1, y1);
-    /* HBB FIXME 20031219: no clipping!? */
     term->move(x1, y1);
 }
 
 void
 polyline3d_next(p_vertex v2, struct lp_style_type *lp)
 {
+    unsigned int x1, y1;
     unsigned int x2, y2;
 
     /* Copied from draw3d_line(): */
@@ -1189,9 +1191,8 @@ polyline3d_next(p_vertex v2, struct lp_style_type *lp)
 
     }
 
+    TERMCOORD(&polyline3d_previous_vertex, x1, y1);
     TERMCOORD(v2, x2, y2);
-    /* FIXME HBB 20031219: no clipping?! */
-    term->vector(x2, y2);
-
+    draw_clip_line(x1,y1,x2,y2);
     polyline3d_previous_vertex = *v2;
 }

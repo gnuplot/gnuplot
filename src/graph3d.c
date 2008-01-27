@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.185 2007/12/24 19:39:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.186 2008/01/26 05:06:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -97,6 +97,7 @@ float surface_rot_z = 30.0;
 float surface_rot_x = 60.0;
 float surface_scale = 1.0;
 float surface_zscale = 1.0;
+
 /* Set by 'set view map': */
 int splot_map = FALSE;
 
@@ -562,7 +563,6 @@ static int key_text_right;	/* offset from x for right-justified text */
 static int key_size_left;	/* distance from x to left edge of box */
 static int key_size_right;	/* distance from x to right edge of box */
 
-
 void
 do_3dplot(
     struct surface_points *plots,
@@ -573,7 +573,6 @@ do_3dplot(
     int surface;
     struct surface_points *this_plot = NULL;
     int xl, yl;
-    BoundingBox clip_splot_map;	/* FIXME: Not hooked up to anything yet! */
     transform_matrix mat;
     int key_count;
     legend_key *key = &keyT;
@@ -684,10 +683,10 @@ do_3dplot(
 	unsigned int map_x1, map_y1, map_x2, map_y2;
 	map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &map_x1, &map_y1);
 	map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
-	clip_splot_map.xleft = map_x1;
-	clip_splot_map.xright = map_x2;
-	clip_splot_map.ybot = map_y2;
-	clip_splot_map.ytop = map_y1;
+	plot_bounds.xleft = map_x1;
+	plot_bounds.xright = map_x2;
+	plot_bounds.ybot = map_y2;
+	plot_bounds.ytop = map_y1;
     }
 
     /* PLACE TITLE */
@@ -761,7 +760,7 @@ do_3dplot(
 	draw_color_smooth_box(MODE_SPLOT);
 
     /* Add 'back' rectangles */
-    place_rectangles(first_object, 0, 3, &clip_splot_map);
+    place_rectangles(first_object, 0, 3, &plot_bounds);
 
     /* PLACE LABELS */
     place_labels3d(first_label, 0);
@@ -1366,7 +1365,7 @@ do_3dplot(
 	draw_color_smooth_box(MODE_SPLOT);
 
     /* Add 'front' rectangles */
-    place_rectangles(first_object, 1, 3, &clip_splot_map);
+    place_rectangles(first_object, 1, 3, &plot_bounds);
 
     /* PLACE LABELS */
     place_labels3d(first_label, 1);
@@ -1889,6 +1888,11 @@ cntr3d_lines(struct gnuplot_contours *cntr, struct lp_style_type *lp)
     int i;			/* point index */
     vertex this_vertex;
 
+    /* In the case of "set view map" (only) clip the contour lines to the graph */
+    BoundingBox *clip_save = clip_area;
+    if (splot_map)
+	clip_area = &plot_bounds;
+
     /* user may prefer explicit line styles */
     if (prefer_line_styles && label_contours) {
 	struct lp_style_type ls = *lp;
@@ -1932,63 +1936,10 @@ cntr3d_lines(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 	    polyline3d_next(&this_vertex, lp);
 	}
     }
+
+    if (splot_map)
+	clip_area = clip_save;
 }
-
-#if 0 /* HBB UNUSED 20031219 */
-/* cntr3d_linespoints:
- * Plot a surface contour in LINESPOINTS style */
-static void
-cntr3d_linespoints(struct gnuplot_contours *cntr, struct lp_style_type *lp)
-{
-    int i;			/* point index */
-    vertex previous_vertex, this_vertex;
-
-    if (draw_contour & CONTOUR_SRF) {
-	map3d_xyz(cntr->coords[0].x, cntr->coords[0].y, cntr->coords[0].z,
-		  &previous_vertex);
-	/* move slightly frontward, to make sure the contours are
-	 * visible in front of the the triangles they're in, if this
-	 * is a hidden3d plot */
-	if (hidden3d && !VERTEX_IS_UNDEFINED(previous_vertex))
-	    previous_vertex.z += 1e-2;
-	draw3d_point(&previous_vertex, lp);
-
-	for (i = 1; i < cntr->num_pts; i++) {
-	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, cntr->coords[i].z,
-		      &this_vertex);
-	    /* move slightly frontward, to make sure the contours are
-	     * visible in front of the the triangles they're in, if this
-	     * is a hidden3d plot */
-	    if (hidden3d && !VERTEX_IS_UNDEFINED(this_vertex))
-		this_vertex.z += 1e-2;
-	    draw3d_line(&previous_vertex, &this_vertex, lp);
-	    draw3d_point(&this_vertex, lp);
-	    previous_vertex = this_vertex;
-	}
-    }
-
-    if (draw_contour & CONTOUR_BASE) {
-	map3d_xyz(cntr->coords[0].x, cntr->coords[0].y, base_z,
-		  &previous_vertex);
-	/* HBB 20010822: in "linetype palette" mode,
-	 * draw3d_line_unconditional() will look at real_z to
-	 * determine the contour line's color --> override base_z by
-	 * the actual z position of the contour line */
-	previous_vertex.real_z = cntr->coords[0].z;
-	draw3d_point(&previous_vertex, lp);
-
-	for (i = 1; i < cntr->num_pts; i++) {
-	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
-		      &this_vertex);
-	    /* HBB 20010822: see above */
-	    this_vertex.real_z = cntr->coords[i].z;
-	    draw3d_line(&previous_vertex, &this_vertex, lp);
-	    draw3d_point(&this_vertex, lp);
-	    previous_vertex=this_vertex;
-	}
-    }
-}
-#endif
 
 /* cntr3d_points:
  * Plot a surface contour in POINTSTYLE style

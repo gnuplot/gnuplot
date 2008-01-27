@@ -1,3 +1,10 @@
+2008-01-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* graph3d.c (cntr3d_lines) util3d.c (polyline3d_next) gadgets.c:
+	Clip contour lines to the plot boundary in "set view map" mode.
+	Remove dead code related to these routines.
+	Bug #1745598
+
 2008-01-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Be more precise in estimating the vertical
