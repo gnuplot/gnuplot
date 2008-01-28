@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.12 2007/08/30 19:24:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.13 2007/12/08 10:54:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2883,7 +2883,10 @@ map3d_getposition(
 	plot_coords = TRUE;
 	break;
     case graph:
-	*ypos = Y_AXIS.min + *ypos * (Y_AXIS.max - Y_AXIS.min);
+	if (splot_map)
+	    *ypos = Y_AXIS.max - *ypos * (Y_AXIS.max - Y_AXIS.min);
+	else
+	    *ypos = Y_AXIS.min + *ypos * (Y_AXIS.max - Y_AXIS.min);
 	plot_coords = TRUE;
 	break;
     case screen:
@@ -2977,9 +2980,9 @@ map3d_position_r(
 	else
 	    xpos = 0;
 	if (pos->scaley == graph)
-	    ypos = Y_AXIS.min;
+	    ypos = (splot_map) ? Y_AXIS.max : Y_AXIS.min;
 	else
-	    ypos = 0;
+	    ypos = (splot_map) ? Y_AXIS.max : 0;
 	if (pos->scalez == graph)
 	    zpos = Z_AXIS.min;
 	else
@@ -2989,8 +2992,8 @@ map3d_position_r(
 	*y -= yoriginlocal;
     } else {
     /* endpoint `screen' or 'character' coordinates */
-	    *x = xpos;
-	    *y = ypos;
+	*x = xpos;
+	*y = ypos;
     }
     return;
 }
