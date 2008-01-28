@@ -1,3 +1,8 @@
+2008-01-28  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* graph3d.c (map3d_getposition, map3d_position_r): Fix case of y graph
+	coordinate and splot_map.
+
 2008-01-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* graph3d.c (cntr3d_lines) util3d.c (polyline3d_next) gadgets.c:
