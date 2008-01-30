@@ -10,6 +10,9 @@
 	In general, 'splot ... with {labels|vectors|image|rgbimage}'
 	now ignores both "{un}set contour" and "{un}set surface"
 
+	* src/plot3d.c (eval_3dplots): Don't bother to check for non-grid data
+	in plot types 'with {labels|vectors|image|rgbimage}'.
+
 2008-01-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* graph3d.c (map3d_getposition, map3d_position_r): Fix case of y graph

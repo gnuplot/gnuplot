@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.153 2007/12/15 04:01:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.154 2007/12/18 19:02:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1960,7 +1960,14 @@ eval_3dplots()
 		    free(cntr);
 		}
 	    }
+
 	    /* Make sure this one can be contoured. */
+	    if (this_plot->plot_style == LABELPOINTS
+	    ||  this_plot->plot_style == VECTOR
+	    ||  this_plot->plot_style == IMAGE
+	    ||  this_plot->plot_style == RGBIMAGE)
+		continue;
+
 	    if (!this_plot->has_grid_topology) {
 		this_plot->contours = NULL;
 		fputs("Notice: Cannot contour non grid data. Please use \"set dgrid3d\".\n", stderr);
