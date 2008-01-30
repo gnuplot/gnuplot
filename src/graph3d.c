@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.187 2008/01/27 18:47:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.188 2008/01/27 23:16:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -904,10 +904,12 @@ do_3dplot(
 
     /* Set up bookkeeping for the individual key titles */
 #define NEXT_KEY_LINE()					\
+    do {                                                \
     if ( ++key_count >= key_rows ) {			\
 	yl = yl_ref; xl += key_col_wth; key_count = 0;	\
     } else						\
-	yl -= key_entry_height
+	yl -= key_entry_height;                         \
+    } while (0)
     key_count = 0;
     yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 
@@ -935,28 +937,24 @@ do_3dplot(
 	     this_plot = this_plot->next_sp, surface++) {
 	    /* just an abbreviation */
 	    TBOOLEAN use_palette = can_pm3d && this_plot->lp_properties.use_palette;
+	    TBOOLEAN lkey;
 
 	    /* Skip over abortive data structures */
 	    if (this_plot->plot_type == NODATA)
 		continue;
 
-	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit) {
+	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit)
 		pm3d_draw_one(this_plot);
-	    }
 
 	    /* Sync point for start of new curve (used by svg, post, ...) */
 	    if (term->layer)
 		(term->layer)(TERM_LAYER_BEFORE_PLOT);
 
-	    if (pm3d_order_depth && this_plot->plot_style != PM3DSURFACE) {
+	    if (pm3d_order_depth && this_plot->plot_style != PM3DSURFACE)
 		pm3d_depth_queue_flush(); /* draw pending plots */
-	    }
 
-	    if (draw_surface) {
-		TBOOLEAN lkey = (key->visible && this_plot->title && this_plot->title[0]
-				&& !this_plot->title_is_suppressed);
-		term_apply_lp_properties(&(this_plot->lp_properties));
-
+	    lkey = (key->visible && this_plot->title && this_plot->title[0]
+				 && !this_plot->title_is_suppressed);
 
 	    if (lkey) {
 		/* EAM - force key text to black, then restore */
@@ -964,8 +962,8 @@ do_3dplot(
 		ignore_enhanced(this_plot->title_no_enhanced);
 		key_text(xl, yl, this_plot->title);
 		ignore_enhanced(FALSE);
-		term_apply_lp_properties(&(this_plot->lp_properties));
 	    }
+	    term_apply_lp_properties(&(this_plot->lp_properties));
 
 	    switch (this_plot->plot_style) {
 	    case BOXES:	/* can't do boxes in 3d yet so use impulses */
@@ -983,21 +981,21 @@ do_3dplot(
 	    case FSTEPS:
 	    case HISTEPS:
 	    case LINES:
-		{
+		if (draw_surface) {
 		    if (lkey) {
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_line_pm3d(this_plot, xl, yl);
 			else
 			    key_sample_line(xl, yl);
 		    }
-		    if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d) {
+		    if (!hidden3d || this_plot->opt_out_of_hidden3d) {
 			if (use_palette)
 			    plot3d_lines_pm3d(this_plot);
 			else
 			    plot3d_lines(this_plot);
 		    }
-		    break;
 		}
+		break;
 	    case YERRORLINES:	/* ignored; treat like points */
 	    case XERRORLINES:	/* ignored; treat like points */
 	    case XYERRORLINES:	/* ignored; treat like points */
@@ -1009,84 +1007,87 @@ do_3dplot(
 	    case CANDLESTICKS:	/* HBB: dito */
 	    case FINANCEBARS:
 	    case POINTSTYLE:
-		if (lkey) {
-		    if (this_plot->lp_properties.use_palette)
-			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
-		    else
-			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
-		}
-		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d) {
-		    plot3d_points(this_plot, this_plot->lp_properties.p_type);
+		if (draw_surface) {
+		    if (lkey) {
+			if (this_plot->lp_properties.use_palette)
+			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
+			else
+			    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
+		    }
+		    if (!hidden3d || this_plot->opt_out_of_hidden3d)
+			plot3d_points(this_plot, this_plot->lp_properties.p_type);
 		}
 		break;
 
 	    case LINESPOINTS:
-		/* put lines */
-		if (lkey) {
-		    if (this_plot->lp_properties.use_palette)
-			key_sample_line_pm3d(this_plot, xl, yl);
-		    else
-			key_sample_line(xl, yl);
-		}
+		if (draw_surface) {
 
-		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d) {
-		    if (use_palette)
-			plot3d_lines_pm3d(this_plot);
-		    else
-			plot3d_lines(this_plot);
-		}
+		    /* put lines */
+		    if (lkey) {
+			if (this_plot->lp_properties.use_palette)
+			    key_sample_line_pm3d(this_plot, xl, yl);
+			else
+			    key_sample_line(xl, yl);
+		    }
 
-		/* put points */
-		if (lkey) {
-		    if (this_plot->lp_properties.use_palette)
-			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
-		    else
-			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
-		}
+		    if (!hidden3d || this_plot->opt_out_of_hidden3d) {
+			if (use_palette)
+			    plot3d_lines_pm3d(this_plot);
+			else
+			    plot3d_lines(this_plot);
+		    }
 
-		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d) {
-		    plot3d_points(this_plot, this_plot->lp_properties.p_type);
-		}
+		    /* put points */
+		    if (lkey) {
+			if (this_plot->lp_properties.use_palette)
+			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
+			else
+			    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
+		     }
 
+		    if (!hidden3d || this_plot->opt_out_of_hidden3d)
+			plot3d_points(this_plot, this_plot->lp_properties.p_type);
+
+		}
 		break;
 
 	    case DOTS:
-		if (lkey) {
-		    if (this_plot->lp_properties.use_palette)
-			key_sample_point_pm3d(this_plot, xl, yl, -1);
-		    else
-			key_sample_point(xl, yl, -1);
+		if (draw_surface) {
+		    if (lkey) {
+			if (this_plot->lp_properties.use_palette)
+			    key_sample_point_pm3d(this_plot, xl, yl, -1);
+			else
+			    key_sample_point(xl, yl, -1);
+		    }
+		    if (!hidden3d || this_plot->opt_out_of_hidden3d)
+			plot3d_points(this_plot, -1);
 		}
-
-		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d) {
-		    plot3d_points(this_plot, -1);
-		}
-
 		break;
 
 	    case VECTOR:
-		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d)
-		    plot3d_vectors(this_plot);
 		if (lkey) {
 		    if (this_plot->lp_properties.use_palette)
 			key_sample_line_pm3d(this_plot, xl, yl);
 		    else
 			key_sample_line(xl, yl);
 		}
+		if (!hidden3d || this_plot->opt_out_of_hidden3d)
+		    plot3d_vectors(this_plot);
 		break;
 
 	    case PM3DSURFACE:
-		if (can_pm3d && PM3D_IMPLICIT != pm3d.implicit) {
-		    pm3d_draw_one(this_plot);
-		    if (!pm3d_order_depth) {
-			pm3d_depth_queue_flush(); /* draw plot immediately */
+		if (draw_surface) {
+		    if (can_pm3d && PM3D_IMPLICIT != pm3d.implicit) {
+			pm3d_draw_one(this_plot);
+			if (!pm3d_order_depth)
+			    pm3d_depth_queue_flush(); /* draw plot immediately */
 		    }
 		}
 		break;
 
 #ifdef EAM_DATASTRINGS
 	    case LABELPOINTS:
-		if (!hidden3d || !draw_surface || this_plot->opt_out_of_hidden3d)
+		if (!hidden3d || this_plot->opt_out_of_hidden3d)
 		    place_labels3d(this_plot->labels->next, LAYER_PLOTLABELS);
 		break;
 #endif
@@ -1109,11 +1110,9 @@ do_3dplot(
 #endif
 	    }			/* switch(plot-style) */
 
-		/* move key on a line */
-		if (lkey) {
-		    NEXT_KEY_LINE();
-		}
-	    }			/* draw_surface */
+	    /* move key on a line */
+	    if (lkey)
+		NEXT_KEY_LINE();
 
 	    if (draw_contour && this_plot->contours != NULL) {
 		struct gnuplot_contours *cntrs = this_plot->contours;
@@ -1172,21 +1171,9 @@ do_3dplot(
 			else
 			key_sample_point(xl, yl, -1);
 			break;
-		    case PM3DSURFACE: /* ignored */
+
+		    default:
 			break;
-#ifdef EAM_HISTOGRAMS
-		    case HISTOGRAMS: /* ignored */
-			break;
-#endif
-#ifdef EAM_DATASTRINGS
-		    case LABELPOINTS: /* Already handled above */
-			break;
-#endif
-#ifdef WITH_IMAGE
-		    case IMAGE:
-		    case RGBIMAGE:
-			break;
-#endif
 		    }
 		    NEXT_KEY_LINE();
 		}
@@ -1245,21 +1232,9 @@ do_3dplot(
 				else
 				    key_sample_point(xl, yl, -1);
 				break;
-			    case PM3DSURFACE: /* ignored */
+
+			    default:
 				break;
-#ifdef EAM_HISTOGRAMS
-			    case HISTOGRAMS: /* ignored */
-				break;
-#endif
-#ifdef EAM_DATASTRINGS
-			    case LABELPOINTS: /* Already handled above */
-				break;
-#endif
-#ifdef WITH_IMAGE
-			    case IMAGE:
-			    case RGBIMAGE:
-				break;
-#endif
 			    }	/* switch */
 
 			    NEXT_KEY_LINE();
@@ -1305,21 +1280,9 @@ do_3dplot(
 		    case DOTS:
 			cntr3d_dots(cntrs);
 			break;
-		    case PM3DSURFACE: /* ignored */
+
+		    default:
 			break;
-#ifdef WITH_IMAGE
-		    case IMAGE:
-		    case RGBIMAGE:
-			break;
-#endif
-#ifdef EAM_HISTOGRAMS
-		    case HISTOGRAMS: /* ignored */
-			break;
-#endif
-#ifdef EAM_DATASTRINGS
-		    case LABELPOINTS: /* Already handled above */
-			break;
-#endif
 		    } /*switch */
 
 		    cntrs = cntrs->next;

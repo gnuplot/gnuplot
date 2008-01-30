@@ -1,3 +1,15 @@
+2008-01-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (do_3dplot): Revamp main loop over 3D plots.
+	Previously "unset surface" would bypass all plot types except contours.
+	Now we have many 3D plot types other than surfaces that should not be
+	bypassed simply because the surfaces are turned off.
+	The old logic was bogus anyhow, since there were many tests for
+	"if (!draw_surface)" inside the main "if (draw_surface)" block.
+	The result: now I can plot labels and vectors on top of my contours.
+	In general, 'splot ... with {labels|vectors|image|rgbimage}'
+	now ignores both "{un}set contour" and "{un}set surface"
+
 2008-01-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* graph3d.c (map3d_getposition, map3d_position_r): Fix case of y graph
