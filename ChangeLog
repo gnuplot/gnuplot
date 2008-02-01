@@ -1,3 +1,8 @@
+2008-02-01  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/datafile.c (df_readbinary): Fix off-by-one error in the implicit
+	"column 0" of non-matrix binary data files.
+
 2008-01-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot): Revamp main loop over 3D plots.

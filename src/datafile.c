@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.132 2007/12/18 19:02:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.133 2008/01/25 20:59:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4937,7 +4937,7 @@ df_readbinary(double v[], int max)
 		}
 	    }
 	} else { /* Not matrix file, general binray. */
-	    df_datum = point_count;
+	    df_datum = point_count + 1;
 	    if (i != df_no_bin_cols) {
 		if (feof(data_fp)) {
 		    if (i != 0) 
