@@ -1,3 +1,8 @@
+2008-02-01  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/datafile.c (df_readbinary): Fix off-by-one error in the implicit
+	"column 0" of non-matrix binary data files.
+
 2008-01-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* graph3d.c (map3d_getposition, map3d_position_r): Fix case of y graph

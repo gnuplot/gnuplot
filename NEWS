@@ -13,6 +13,7 @@ New features, changes and fixes in gnuplot version 4.2.3
 * FIX segfault if replot is called while terminal type is unknown
 * FIX discard axis ticks read from previous data file
 * FIX Do not clip image against Z range in 3D splot with "set view map"
+* FIX off-by-one error in implicit column 0 for binary data files
 * CHANGE install Xresource file as Gnuplot, not Gnuplot.app-defaults
 * CHANGE Remove limitation of 10 args max to internal function sprintf()
 * CHANGE Bring emf point types into conformity with other terminals
