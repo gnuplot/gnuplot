@@ -1,3 +1,8 @@
+2008-02-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate.c: More informative error message if the current plot
+	style is not fully output to a table.
+
 2008-02-01  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c (df_readbinary): Fix off-by-one error in the implicit
