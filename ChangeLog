@@ -1,3 +1,9 @@
+2008-02-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/hidden3d.c (draw_vertex):
+	Remove cntr3d_dots() as a special case routine. Use cntr3d_points() to
+	treat dots as pointtype 0. This allows hidden3d to handle dot surfaces.
+
 2008-02-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c: More informative error message if the current plot

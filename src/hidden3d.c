@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.61 2007/12/24 19:39:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.62 2008/01/10 05:30:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1577,7 +1577,7 @@ draw_vertex(p_vertex v)
     unsigned int x, y;
 
     TERMCOORD(v, x, y);
-    if (v->lp_style && v->lp_style->p_type >= 0 && !clip_point(x,y)) {
+    if (v->lp_style && v->lp_style->p_type >= -1 && !clip_point(x,y)) {
 	int colortype = v->lp_style->pm3d_color.type;
 
 #ifdef EAM_DATASTRINGS

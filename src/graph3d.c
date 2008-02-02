@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.188 2008/01/27 23:16:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.189 2008/01/30 18:35:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -128,7 +128,6 @@ static void cntr3d_lines __PROTO((struct gnuplot_contours * cntr,
 /* 					struct lp_style_type * lp)); */
 static void cntr3d_points __PROTO((struct gnuplot_contours * cntr,
 				   struct lp_style_type * lp));
-static void cntr3d_dots __PROTO((struct gnuplot_contours * cntr));
 static void check_corner_height __PROTO((struct coordinate GPHUGE * point,
 					 double height[2][2], double depth[2][2]));
 static void setup_3d_box_corners __PROTO((void));
@@ -1053,6 +1052,8 @@ do_3dplot(
 
 	    case DOTS:
 		if (draw_surface) {
+		    this_plot->lp_properties.p_type = -1;
+		    this_plot->lp_properties.pointflag = TRUE;
 		    if (lkey) {
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_point_pm3d(this_plot, xl, yl, -1);
@@ -1274,11 +1275,9 @@ do_3dplot(
 		    case CANDLESTICKS:
 		    case FINANCEBARS:
 			/* treat all the above like points */
+		    case DOTS:
 		    case POINTSTYLE:
 			cntr3d_points(cntrs, &thiscontour_lp_properties);
-			break;
-		    case DOTS:
-			cntr3d_dots(cntrs);
 			break;
 
 		    default:
@@ -1935,39 +1934,6 @@ cntr3d_points(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 	}
     }
 }
-
-/* cntr3d_dots:
- * Plot a surface contour in DOTS style
- */
-/* FIXME HBB 20000621: this is the only contour output routine left
- * without hiddenlining. It should probably deleted altogether, and
- * its call replaced by one of cntr3d_points */
-static void
-cntr3d_dots(struct gnuplot_contours *cntr)
-{
-    int i;
-    unsigned int x, y;
-    struct termentry *t = term;
-
-    if (draw_contour & CONTOUR_SRF) {
-	for (i = 0; i < cntr->num_pts; i++) {
-	    map3d_xy(cntr->coords[i].x, cntr->coords[i].y, cntr->coords[i].z, &x, &y);
-
-	    if (!clip_point(x, y))
-		(*t->point) (x, y, -1);
-	}
-    }
-    if (draw_contour & CONTOUR_BASE) {
-	for (i = 0; i < cntr->num_pts; i++) {
-	    map3d_xy(cntr->coords[i].x, cntr->coords[i].y, base_z,
-		     &x, &y);
-
-	    if (!clip_point(x, y))
-		(*t->point) (x, y, -1);
-	}
-    }
-}
-
 
 /* map xmin | xmax to 0 | 1 and same for y
  * 0.1 avoids any rounding errors
