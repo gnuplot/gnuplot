@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.56 2007/11/04 22:37:01 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.57 2007/11/04 22:56:31 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1607,8 +1607,11 @@ void wxt_graphics()
 
 	wxt_MutexGuiLeave();
 
-	/* set font details (hchar, vchar, h_tic, v_tic) according to settings */
+	/* set font details (h_char, v_char) according to settings */
 	wxt_set_font("");
+
+	term->v_tic = (unsigned int) (term->v_char/2.5);
+	term->h_tic = (unsigned int) (term->v_char/2.5);
 
 	/* clear the command list, and free the allocated memory */
 	wxt_current_panel->ClearCommandlist();
@@ -1815,9 +1818,7 @@ int wxt_set_font (const char *font)
 	 * They may be taken into account in next plot commands */
 	gp_cairo_set_font(wxt_current_plot, fontname, fontsize);
 	gp_cairo_set_termvar(wxt_current_plot, &(term->v_char),
-	                                       &(term->h_char),
-	                                       &(term->v_tic),
-	                                       &(term->h_tic));
+	                                       &(term->h_char));
 	wxt_MutexGuiLeave();
 	wxt_sigint_check();
 	wxt_sigint_restore();

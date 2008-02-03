@@ -1,3 +1,18 @@
+2008-02-03  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.h:
+	* src/wxterminal/wxt_gui.cpp (LoadCursor):
+	* src/wxterminal/bitmaps/xpm/cross.xpm:
+	* src/wxterminal/bitmaps/xpm/icon16x16.xpm:
+	* src/wxterminal/bitmaps/xpm/icon32x32.xpm:
+	* src/wxterminal/bitmaps/xpm/icon64x64.xpm:
+	* src/wxterminal/bitmaps/xpm/notfound.xpm:
+	* src/wxterminal/bitmaps/xpm/right.xpm:
+	* src/wxterminal/bitmaps/xpm/rotate.xpm:
+	* src/wxterminal/bitmaps/xpm/size.xpm:
+	Recent gcc versions are stricter with strings. Define xpm char arrays
+	as const.
+
 2008-02-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/hidden3d.c (draw_vertex):

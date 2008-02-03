@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.14 2007/12/20 03:39:29 sfeam Exp $
+ * $Id: cairo.trm,v 1.15 2007/12/31 17:51:27 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -440,8 +440,11 @@ void cairotrm_graphics()
 	/* initialize encoding */
 	plot.encoding = encoding;
 
-	/* set font details (hchar, vchar, h_tic, v_tic) according to settings */
+	/* set font details (h_char, v_char) according to settings */
 	cairotrm_set_font("");
+
+	term->v_tic = (unsigned int) (term->v_char/2.5);
+	term->h_tic = (unsigned int) (term->v_char/2.5);
 
 	FPRINTF((stderr,"Graphics xmax %d ymax %d v_char %d h_char %d\n",
 		term->xmax, term->ymax, term->v_char, term->h_char));
@@ -570,9 +573,7 @@ int cairotrm_set_font (const char *font)
 	 * They may be taken into account in next plot commands */
 	gp_cairo_set_font(&plot, fontname, fontsize);
 	gp_cairo_set_termvar(&plot, &(term->v_char),
-	                            &(term->h_char),
-	                            &(term->v_tic),
-	                            &(term->h_tic));
+	                            &(term->h_char));
 
 	/* the returned int is not used anywhere */
 	return 1;

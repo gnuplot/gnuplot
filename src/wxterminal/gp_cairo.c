@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.33 2007/11/20 22:02:02 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.34 2007/11/24 23:19:53 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1635,15 +1635,13 @@ void gp_cairo_fill_pattern(plot_struct *plot, int fillstyle, int fillpar)
 /* Sets term vars v_char, h_char, v_tic, h_tic
  * Depends on plot->fontsize and fontname */
 void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
-                                             unsigned int *h_char,
-                                             unsigned int *v_tic,
-                                             unsigned int *h_tic)
+                                             unsigned int *h_char)
 {
 	PangoLayout *layout;
 	PangoFontDescription *desc;
 	PangoRectangle ink_rect;
 	PangoRectangle logical_rect;
-	unsigned int tmp_v_char, tmp_h_char, tmp_v_tic, tmp_h_tic;
+	unsigned int tmp_v_char, tmp_h_char;
 
 	/* Create a PangoLayout, set the font and text */
 	layout = pango_cairo_create_layout (plot->cr);
@@ -1662,17 +1660,11 @@ void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
 	 * That's why I use ceil() instead of direct division result */
 	tmp_v_char = (int) ceil( (double) logical_rect.height/PANGO_SCALE) - 1;
 	tmp_h_char = (int) ceil( (double) logical_rect.width/(10*PANGO_SCALE));
-	tmp_v_tic = tmp_v_char/2.5;
-	tmp_h_tic = tmp_v_char/2.5;
 
 	if (v_char)
 		*v_char = tmp_v_char;
 	if (h_char)
 		*h_char = tmp_h_char;
-	if (v_tic)
-		*v_tic = tmp_v_tic;
-	if (h_tic)
-		*h_tic = tmp_h_tic;
 }
 
 void gp_cairo_solid_background(plot_struct *plot)
