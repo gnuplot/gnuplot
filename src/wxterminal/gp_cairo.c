@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.34 2007/11/24 23:19:53 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.35 2008/02/03 22:04:57 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -71,7 +71,6 @@
  * ------------------------------------------------------*/
 
 #include "gp_cairo.h"
-#include "gp_cairo_term.h"
 
 #include "alloc.h"
 
@@ -84,15 +83,15 @@
 /* ========  enhanced text mode ======== */
 /* copies of internal variables */
 static char gp_cairo_enhanced_font[100] = "";
-static const char* gp_cairo_enhanced_get_fontname();
+static const char* gp_cairo_enhanced_get_fontname(plot_struct *plot);
 static double gp_cairo_enhanced_fontsize = 0;
 static double gp_cairo_enhanced_base = 0;
 static TBOOLEAN gp_cairo_enhanced_widthflag = TRUE;
 static TBOOLEAN gp_cairo_enhanced_showflag = TRUE;
 static int gp_cairo_enhanced_overprint = FALSE;
 static TBOOLEAN gp_cairo_enhanced_opened_string  = FALSE;  /* try to cut out empty ()'s */
-/* pointer to the plot structure */
-static plot_struct *gp_cairo_enhanced_plot = NULL;
+static char *gp_cairo_enhanced_string;
+static char *gp_cairo_enhanced_char;
 /* utf8 text to draw and its attributes */
 static gchar gp_cairo_utf8[2048] = "";
 static PangoAttrList *gp_cairo_enhanced_AttrList = NULL;
@@ -108,10 +107,9 @@ static PangoAttrList *gp_cairo_enhanced_underprinted_AttrList = NULL;
 static gchar* gp_cairo_convert_symbol_to_unicode(plot_struct *plot, const char* string);
 /* add standard attributes (fontsize,fontfamily, rise) to
  * the specified characters in a PangoAttrList */
-static void gp_cairo_add_attr( PangoAttrList * AttrList, int start, int end );
+static void gp_cairo_add_attr(plot_struct *plot, PangoAttrList * AttrList, int start, int end );
 /* add a blank character to the text string and an associated custom shape to the attribute list */
 static void gp_cairo_add_shape( PangoRectangle rect,int position);
-
 
 /* set a cairo pattern or solid fill depending on parameters */
 static void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar);
@@ -1060,7 +1058,7 @@ void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, in
  * Enhanced text mode support
  * =====================================================================*/
 
-void gp_cairo_add_attr( PangoAttrList * AttrList, int start, int end )
+void gp_cairo_add_attr(plot_struct *plot, PangoAttrList * AttrList, int start, int end )
 {
 	PangoAttribute *p_attr_rise, *p_attr_size, *p_attr_family;
 
@@ -1074,7 +1072,7 @@ void gp_cairo_add_attr( PangoAttrList * AttrList, int start, int end )
 	p_attr_rise->end_index = end;
 	pango_attr_list_insert (AttrList, p_attr_rise);
 
-	p_attr_family = pango_attr_family_new (gp_cairo_enhanced_get_fontname());
+	p_attr_family = pango_attr_family_new (gp_cairo_enhanced_get_fontname(plot));
 	p_attr_family->start_index = start;
 	p_attr_family->end_index = end;
 	pango_attr_list_insert (AttrList, p_attr_family);
@@ -1095,7 +1093,7 @@ void gp_cairo_add_shape( PangoRectangle rect,int position)
 }
 
 /* gp_cairo_enhanced_flush() draws enhanced_text, which has been filled by _writec()*/
-void gp_cairo_enhanced_flush()
+void gp_cairo_enhanced_flush(plot_struct *plot)
 {
 	PangoRectangle save_logical_rect;
 	PangoLayout *save_layout;
@@ -1131,9 +1129,6 @@ void gp_cairo_enhanced_flush()
 	if (!gp_cairo_enhanced_opened_string)
 		return;
 
-	/* mark the end of the string */
-	*enhanced_cur_text = '\0';
-
 	FPRINTF((stderr, "enhanced flush str=\"%s\" font=%s op=%d sf=%d wf=%d base=%f os=%d\n",
 		enhanced_text,
 		gp_cairo_enhanced_font,
@@ -1150,11 +1145,11 @@ void gp_cairo_enhanced_flush()
 	if (!strcmp(gp_cairo_enhanced_font,"Symbol")) {
 		FPRINTF((stderr,"Parsing a Symbol string\n"));
 
-		enhanced_text_utf8 = gp_cairo_convert_symbol_to_unicode(gp_cairo_enhanced_plot, enhanced_text);
+		enhanced_text_utf8 = gp_cairo_convert_symbol_to_unicode(plot, gp_cairo_enhanced_string);
 
-		if (!strcmp(gp_cairo_enhanced_plot->fontname,"Symbol")) {
+		if (!strcmp(plot->fontname,"Symbol")) {
 			strncpy(gp_cairo_enhanced_font,
-				gp_cairo_enhanced_plot->fontname,
+				plot->fontname,
 				sizeof(gp_cairo_enhanced_font));
 		} else {
 			strncpy(gp_cairo_enhanced_font,
@@ -1165,7 +1160,7 @@ void gp_cairo_enhanced_flush()
 #endif /*MAP_SYMBOL*/
 	{
 		/* convert the input string to utf8 */
-		enhanced_text_utf8 = gp_cairo_convert(gp_cairo_enhanced_plot, enhanced_text);
+		enhanced_text_utf8 = gp_cairo_convert(plot, gp_cairo_enhanced_string);
 	}
 
 	start = strlen(gp_cairo_utf8);
@@ -1178,7 +1173,7 @@ void gp_cairo_enhanced_flush()
 
 		/* Create a PangoLayout, set the font and text
 		 * with the saved attributes list, get extents */
-		save_layout = pango_cairo_create_layout (gp_cairo_enhanced_plot->cr);
+		save_layout = pango_cairo_create_layout (plot->cr);
 		pango_layout_set_text (save_layout, gp_cairo_save_utf8, -1);
 		pango_layout_set_attributes (save_layout, gp_cairo_enhanced_save_AttrList);
 		pango_layout_get_extents(save_layout, NULL, &save_logical_rect);
@@ -1201,7 +1196,7 @@ void gp_cairo_enhanced_flush()
 
 		/* Create a PangoLayout, set the font and text with
 		 * the saved attributes list, get extents */
-		underprinted_layout = pango_cairo_create_layout (gp_cairo_enhanced_plot->cr);
+		underprinted_layout = pango_cairo_create_layout (plot->cr);
 		pango_layout_set_text (underprinted_layout, gp_cairo_underprinted_utf8, -1);
 		pango_layout_set_attributes (underprinted_layout, gp_cairo_enhanced_underprinted_AttrList);
 		pango_layout_get_extents(underprinted_layout, NULL, &underprinted_logical_rect);
@@ -1211,10 +1206,10 @@ void gp_cairo_enhanced_flush()
 		/* compute the size of the text to overprint*/
 
 		/* Create a PangoLayout, set the font and text */
-		current_layout = pango_cairo_create_layout (gp_cairo_enhanced_plot->cr);
+		current_layout = pango_cairo_create_layout (plot->cr);
 		pango_layout_set_text (current_layout, enhanced_text_utf8, -1);
 		current_desc = pango_font_description_new ();
-		pango_font_description_set_family (current_desc, gp_cairo_enhanced_get_fontname());
+		pango_font_description_set_family (current_desc, gp_cairo_enhanced_get_fontname(plot));
 		pango_font_description_set_size(current_desc,(int) gp_cairo_enhanced_fontsize*PANGO_SCALE);
 		pango_layout_set_font_description (current_layout, current_desc);
 		pango_font_description_free (current_desc);
@@ -1238,13 +1233,13 @@ void gp_cairo_enhanced_flush()
 		end = strlen(gp_cairo_utf8);
 
 		/* add text attributes to the main list */
-		gp_cairo_add_attr( gp_cairo_enhanced_AttrList, start, end);
+		gp_cairo_add_attr(plot, gp_cairo_enhanced_AttrList, start, end);
 
 	} else {
 		/* position must be modified, but text not actually drawn */
 		/* the idea is to use a blank character, drawn with the width of the text*/
 
-		current_layout = pango_cairo_create_layout (gp_cairo_enhanced_plot->cr);
+		current_layout = pango_cairo_create_layout (plot->cr);
 		pango_layout_set_text (current_layout, gp_cairo_utf8, -1);
 		pango_layout_set_attributes (current_layout, gp_cairo_enhanced_AttrList);
 		pango_layout_get_extents(current_layout, &current_ink_rect, &current_logical_rect);
@@ -1252,10 +1247,10 @@ void gp_cairo_enhanced_flush()
 
 		/* we first compute the size of the text */
 		/* Create a PangoLayout, set the font and text */
-		hide_layout = pango_cairo_create_layout (gp_cairo_enhanced_plot->cr);
+		hide_layout = pango_cairo_create_layout (plot->cr);
 		pango_layout_set_text (hide_layout, enhanced_text_utf8, -1);
 		hide_desc = pango_font_description_new ();
-		pango_font_description_set_family (hide_desc, gp_cairo_enhanced_get_fontname());
+		pango_font_description_set_family (hide_desc, gp_cairo_enhanced_get_fontname(plot));
 		pango_font_description_set_size(hide_desc,(int) gp_cairo_enhanced_fontsize*PANGO_SCALE);
 		pango_layout_set_font_description (hide_layout, hide_desc);
 		pango_font_description_free (hide_desc);
@@ -1279,10 +1274,10 @@ void gp_cairo_enhanced_flush()
 		/* we first compute the size of the text */
 	
 		/* Create a PangoLayout, set the font and text */
-		zerowidth_layout = pango_cairo_create_layout (gp_cairo_enhanced_plot->cr);
+		zerowidth_layout = pango_cairo_create_layout (plot->cr);
 		pango_layout_set_text (zerowidth_layout, enhanced_text_utf8, -1);
 		zerowidth_desc = pango_font_description_new ();
-		pango_font_description_set_family (zerowidth_desc, gp_cairo_enhanced_get_fontname());
+		pango_font_description_set_family (zerowidth_desc, gp_cairo_enhanced_get_fontname(plot));
 		pango_font_description_set_size(zerowidth_desc,(int) gp_cairo_enhanced_fontsize*PANGO_SCALE);
 		pango_layout_set_font_description (zerowidth_layout, zerowidth_desc);
 		pango_font_description_free (zerowidth_desc);
@@ -1311,7 +1306,7 @@ void gp_cairo_enhanced_flush()
 		save_end = strlen( gp_cairo_save_utf8);
 
 		/* add text attributes to the save list */
-		gp_cairo_add_attr( gp_cairo_enhanced_save_AttrList, save_start, save_end);
+		gp_cairo_add_attr(plot, gp_cairo_enhanced_save_AttrList, save_start, save_end);
 	}
 
 	if (gp_cairo_enhanced_overprint==1) /* save underprinted text with its attributes */{
@@ -1324,7 +1319,7 @@ void gp_cairo_enhanced_flush()
 		gp_cairo_enhanced_underprinted_AttrList = pango_attr_list_new();
 
 		/* add text attributes to the underprinted list */
-		gp_cairo_add_attr( gp_cairo_enhanced_underprinted_AttrList,
+		gp_cairo_add_attr(plot, gp_cairo_enhanced_underprinted_AttrList,
 			underprinted_start, underprinted_end);
 	}
 
@@ -1350,7 +1345,7 @@ void gp_cairo_enhanced_flush()
  *              (overprinted text is centered horizontally on underprinted text)
  *              3 means "save current position",
  *              4 means "restore saved position" */
-void gp_cairo_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint)
+void gp_cairo_enhanced_open(plot_struct *plot, char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint)
 {
 	if (overprint == 3) {
 		gp_cairo_enhanced_save = TRUE;
@@ -1367,67 +1362,44 @@ void gp_cairo_enhanced_open(char* fontname, double fontsize, double base, TBOOLE
 
 	if (!gp_cairo_enhanced_opened_string) {
 		gp_cairo_enhanced_opened_string = TRUE;
-		enhanced_cur_text = &enhanced_text[0];
+		gp_cairo_enhanced_char = gp_cairo_enhanced_string;
 		strncpy(gp_cairo_enhanced_font, fontname, sizeof(gp_cairo_enhanced_font));
-		gp_cairo_enhanced_fontsize = fontsize*gp_cairo_enhanced_plot->oversampling_scale;
-		gp_cairo_enhanced_base = base*gp_cairo_enhanced_plot->oversampling_scale;
+		gp_cairo_enhanced_fontsize = fontsize*plot->oversampling_scale;
+		gp_cairo_enhanced_base = base*plot->oversampling_scale;
 		gp_cairo_enhanced_showflag = showflag;
 		gp_cairo_enhanced_overprint = overprint;
 		gp_cairo_enhanced_widthflag = widthflag;
 	}
 }
 
-
-
-/* gp_cairo_cairo_draw_enhanced_text() uses enhanced_recursion() to analyse the string to print.
- * enhanced_recursion() calls _enhanced_open() to initialize the text drawing,
- * then it calls _enhanced_writec() which buffers the characters to draw,
- * and finally _enhanced_flush() to draw the buffer with the correct justification. */
-void gp_cairo_draw_enhanced_text(plot_struct *plot, int x, int y, const char* string)
+void gp_cairo_enhanced_writec(plot_struct *plot, int character)
 {
-	PangoRectangle ink_rect, logical_rect;
-	PangoLayout *layout;
-	double vert_just, arg, enh_x, enh_y, delta, deltax, deltay;
+	*gp_cairo_enhanced_char++ = character;
+	*gp_cairo_enhanced_char = '\0';
+}
 
+void gp_cairo_enhanced_init(plot_struct *plot, int len)
+{
 	/* begin by stroking any open path */
 	gp_cairo_stroke(plot);
 	/* also draw any open polygon set */
 	gp_cairo_end_polygon(plot);
 
-	/* flush any pending graphics */
-	if (!strlen(string))
-		return;
-
-	/* set up the global variables needed by enhanced_recursion() */
-	enhanced_fontscale = 1.0;
-	strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
-
-	gp_cairo_enhanced_plot = plot;
+	
+	gp_cairo_enhanced_string = (char*) malloc(len+1);
 	gp_cairo_enhanced_opened_string = FALSE;
 	gp_cairo_enhanced_overprint = FALSE;
 	gp_cairo_enhanced_showflag = TRUE;
 	gp_cairo_enhanced_fontsize = plot->fontsize*plot->oversampling_scale;
 	strncpy(gp_cairo_enhanced_font, plot->fontname, sizeof(gp_cairo_enhanced_font));
 	gp_cairo_enhanced_AttrList = pango_attr_list_new();
+}
 
-	/* Set the recursion going. We say to keep going until a
-	* closing brace, but we don't really expect to find one.
-	* If the return value is not the nul-terminator of the
-	* string, that can only mean that we did find an unmatched
-	* closing brace in the string. We inplot->crement past it (else
-	* we get stuck in an infinite loop) and try again. */
-
-	while (*(string = enhanced_recursion((char*)string, TRUE, plot->fontname,
-			plot->fontsize, 0.0, TRUE, TRUE, 0))) {
-		(term->enhanced_flush)();
-
-		/* we can only get here if *str == '}' */
-		enh_err_check(string);
-
-		if (!*++string)
-			break; /* end of string */
-		/* else carry on and process the rest of the string */
-	}
+void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
+{
+	PangoRectangle ink_rect, logical_rect;
+	PangoLayout *layout;
+	double vert_just, arg, enh_x, enh_y, delta, deltax, deltay;
 
 	/* Create a PangoLayout, set the font and text */
 	layout = pango_cairo_create_layout (plot->cr);
@@ -1479,8 +1451,8 @@ void gp_cairo_draw_enhanced_text(plot_struct *plot, int x, int y, const char* st
 	g_object_unref (layout);
 	cairo_restore(plot->cr);
 	strncpy(gp_cairo_utf8, "", sizeof(gp_cairo_utf8));
+	free(gp_cairo_enhanced_string);
 }
-
 
 /* obtain the right pattern or solid fill from fillstyle and fillpar.
  * Used to draw fillboxes and polygons */
@@ -1696,10 +1668,10 @@ void gp_cairo_clear_background(plot_struct *plot)
 
 /* in enhanced text mode, look if enhanced mode has set the font,
  * otherwise return the default */
-const char* gp_cairo_enhanced_get_fontname()
+const char* gp_cairo_enhanced_get_fontname(plot_struct *plot)
 {
 	if ( strlen(gp_cairo_enhanced_font)==0 )
-		return gp_cairo_enhanced_plot->fontname;
+		return plot->fontname;
 	else
 		return gp_cairo_enhanced_font;
 }

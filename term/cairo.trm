@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.15 2007/12/31 17:51:27 sfeam Exp $
+ * $Id: cairo.trm,v 1.16 2008/02/03 22:04:58 tlecomte Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -52,6 +52,9 @@ TERM_PUBLIC void cairotrm_linetype __PROTO ((int linetype));
 TERM_PUBLIC void cairotrm_move __PROTO ((unsigned int x, unsigned int y));
 TERM_PUBLIC void cairotrm_vector __PROTO ((unsigned int x, unsigned int y));
 TERM_PUBLIC void cairotrm_put_text __PROTO ((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void cairotrm_enhanced_flush();
+TERM_PUBLIC void cairotrm_enhanced_writec(int c);
+TERM_PUBLIC void cairotrm_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
 TERM_PUBLIC void cairotrm_reset __PROTO ((void));
 TERM_PUBLIC int cairotrm_justify_text __PROTO ((enum JUSTIFY mode));
 TERM_PUBLIC void cairotrm_point __PROTO ((unsigned int x, unsigned int y, int pointstyle));
@@ -74,8 +77,6 @@ TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
 
 #include "cairo-pdf.h"
 #include "wxterminal/gp_cairo.h"
-/* for enhanced text mode */
-#include "wxterminal/gp_cairo_term.h"
 
 #define CAIROTRM_DEFAULT_FONTNAME "Sans"
 
@@ -509,10 +510,58 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 {
 	/* if ignore_enhanced_text is set, draw with the normal routine.
 	 * This is meant to avoid enhanced syntax when the enhanced mode is on */
-	if (cairotrm_enhanced_enabled && !ignore_enhanced_text)
-		gp_cairo_draw_enhanced_text(&plot, x, term->ymax - y, string);
-	else
-		gp_cairo_draw_text(&plot, x, term->ymax - y, string);
+	if (cairotrm_enhanced_enabled && !ignore_enhanced_text) {
+		/* Uses enhanced_recursion() to analyse the string to print.
+		 * enhanced_recursion() calls _enhanced_open() to initialize the text drawing,
+		 * then it calls _enhanced_writec() which buffers the characters to draw,
+		 * and finally _enhanced_flush() to draw the buffer with the correct justification. */
+
+		gp_cairo_enhanced_init(&plot, strlen(string));
+
+		/* set up the global variables needed by enhanced_recursion() */
+		enhanced_fontscale = 1.0;
+		strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
+
+		/* Set the recursion going. We say to keep going until a
+		* closing brace, but we don't really expect to find one.
+		* If the return value is not the nul-terminator of the
+		* string, that can only mean that we did find an unmatched
+		* closing brace in the string. We inplot->crement past it (else
+		* we get stuck in an infinite loop) and try again. */
+
+		while (*(string = enhanced_recursion((char*)string, TRUE, plot.fontname,
+				plot.fontsize, 0.0, TRUE, TRUE, 0))) {
+			cairotrm_enhanced_flush();
+
+			/* we can only get here if *str == '}' */
+			enh_err_check(string);
+
+			if (!*++string)
+				break; /* end of string */
+			/* else carry on and process the rest of the string */
+		}
+
+		/* finish */
+		gp_cairo_enhanced_finish(&plot, x, term->ymax - y);
+		return;
+	}
+
+	gp_cairo_draw_text(&plot, x, term->ymax - y, string);
+}
+
+void cairotrm_enhanced_flush()
+{
+	gp_cairo_enhanced_flush(&plot);
+}
+
+void cairotrm_enhanced_writec(int c)
+{
+	gp_cairo_enhanced_writec(&plot, c);
+}
+
+void cairotrm_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint)
+{
+	gp_cairo_enhanced_open(&plot, fontname, fontsize, base, widthflag, showflag, overprint);
 }
 
 void cairotrm_linetype(int lt)
@@ -731,7 +780,7 @@ TERM_TABLE_START (pdfcairo_driver)
 #ifdef WITH_IMAGE
     , cairotrm_image
 #endif
-    , gp_cairo_enhanced_open, gp_cairo_enhanced_flush, do_enh_writec
+    , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0
 TERM_TABLE_END (pdfcairo_driver)
 
@@ -757,7 +806,7 @@ TERM_TABLE_START (pngcairo_driver)
 #ifdef WITH_IMAGE
     , cairotrm_image
 #endif
-    , gp_cairo_enhanced_open, gp_cairo_enhanced_flush, do_enh_writec
+    , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0
 TERM_TABLE_END (pngcairo_driver)
 

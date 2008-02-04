@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.28 2007/07/21 09:30:27 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.29 2008/02/04 22:34:15 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -257,6 +257,11 @@ typedef enum wxt_gp_command_t {
 	command_vector,
 	command_put_text,
 	command_enhanced_put_text,
+	command_enhanced_init,
+	command_enhanced_open,
+	command_enhanced_writec,
+	command_enhanced_flush,
+	command_enhanced_finish,
 	command_set_font,
 	command_justify,
 	command_point,
@@ -284,6 +289,7 @@ typedef struct gp_command {
 	int integer_value;
 	int integer_value2;
 	double double_value;
+	double double_value2;
 	char *string;
 	gpiPoint *corners;
 	enum JUSTIFY mode;

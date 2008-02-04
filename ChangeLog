@@ -1,3 +1,20 @@
+2008-02-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
+
+	* src/wxterminal/wxt_gui.cpp:
+        * src/wxterminal/wxt_gui.h:
+        * src/wxterminal/wxt_term.h:
+        * src/wxterminal/gp_cairo.c:
+        * src/wxterminal/gp_cairo.h:
+        * src/wxterminal/gp_cairo_term.h:
+	* term/cairo.trm:
+	* term/wxt.trm:
+	Rework the cairo code for 'enhanced text' to make it more independant
+	from the parsing code. Now the parser loop is directly in the terminals
+	code, instead of being in gp_cairo.*. This is a preliminary work for
+	wxt-as-a-separate-process. It has the advantage of killing some global
+	variables in cairo code, although this particular aspect of the work is
+	not complete. gp_cairo_term.h is now useless and removed.
+
 2008-02-03  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.h:

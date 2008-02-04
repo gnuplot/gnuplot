@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.9 2007/11/04 22:56:31 tlecomte Exp $
+ * $Id: gp_cairo.h,v 1.10 2008/02/03 22:04:58 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -194,6 +194,11 @@ void gp_cairo_vector(plot_struct *plot, int x, int y);
 void gp_cairo_stroke(plot_struct *plot);
 void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* str);
 void gp_cairo_draw_enhanced_text(plot_struct *plot, int x1, int y1, const char* str);
+void gp_cairo_enhanced_init(plot_struct *plot, int len);
+void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y);
+void gp_cairo_enhanced_open(plot_struct *plot, char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
+void gp_cairo_enhanced_flush(plot_struct *plot);
+void gp_cairo_enhanced_writec(plot_struct *plot, int character);
 void gp_cairo_draw_point(plot_struct *plot, int x1, int y1, int style);
 void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int height, int style);
 void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners);

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.20 2007/06/09 16:56:53 sfeam Exp $
+ * $Id: wxt.trm,v 1.21 2007/06/26 10:20:34 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -55,8 +55,6 @@ TERM_PUBLIC void wxt_text_wrapper __PROTO ((void));
 #ifdef TERM_BODY
 
 #include "wxterminal/wxt_term.h"
-/* for enhanced text mode */
-#include "wxterminal/gp_cairo_term.h"
 
 /* terminal state, defined extern in wxt_term.h */
 int wxt_window_number = 0;
@@ -366,7 +364,7 @@ TERM_TABLE_START (wxt_driver)
 #ifdef WITH_IMAGE
     , wxt_image
 #endif
-    , gp_cairo_enhanced_open, gp_cairo_enhanced_flush, do_enh_writec
+    , wxt_enhanced_open, wxt_enhanced_flush, wxt_enhanced_writec
 TERM_TABLE_END (wxt_driver)
 
 #undef LAST_TERM

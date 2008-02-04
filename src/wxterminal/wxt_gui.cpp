@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.58 2008/02/03 22:04:58 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.59 2008/02/04 22:34:14 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1721,6 +1721,46 @@ void wxt_vector(unsigned int x, unsigned int y)
 	wxt_command_push(temp_command);
 }
 
+void wxt_enhanced_flush()
+{
+	if (wxt_status != STATUS_OK)
+		return;
+
+	gp_command temp_command;
+	temp_command.command = command_enhanced_flush;
+
+	wxt_command_push(temp_command);
+}
+
+void wxt_enhanced_writec(int c)
+{
+	if (wxt_status != STATUS_OK)
+		return;
+
+	gp_command temp_command;
+	temp_command.command = command_enhanced_writec;
+	temp_command.integer_value = c;
+
+	wxt_command_push(temp_command);
+}
+
+void wxt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint)
+{
+	if (wxt_status != STATUS_OK)
+		return;
+
+	gp_command temp_command;
+	temp_command.command = command_enhanced_open;
+	temp_command.string = new char[strlen(fontname)+1];
+	strcpy(temp_command.string, fontname);
+	temp_command.double_value = fontsize;
+	temp_command.double_value2 = base;
+	temp_command.integer_value = overprint;
+	temp_command.integer_value2 = widthflag + (showflag << 1);
+
+	wxt_command_push(temp_command);
+}
+
 void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 {
 	if (wxt_status != STATUS_OK)
@@ -1728,14 +1768,51 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 
 	gp_command temp_command;
 
-	/* note : this test must be here, not when processing the command list,
-	 * because the user may have toggled the terminal option between two window resizing.*/
 	/* if ignore_enhanced_text is set, draw with the normal routine.
 	 * This is meant to avoid enhanced syntax when the enhanced mode is on */
-	if (wxt_enhanced_enabled && !ignore_enhanced_text)
-		temp_command.command = command_enhanced_put_text;
-	else
-		temp_command.command = command_put_text;
+	if (wxt_enhanced_enabled && !ignore_enhanced_text) {
+		/* Uses enhanced_recursion() to analyse the string to print.
+		 * enhanced_recursion() calls _enhanced_open() to initialize the text drawing,
+		 * then it calls _enhanced_writec() which buffers the characters to draw,
+		 * and finally _enhanced_flush() to draw the buffer with the correct justification. */
+
+		/* init */
+		temp_command.command = command_enhanced_init;
+		temp_command.integer_value = strlen(string);
+		wxt_command_push(temp_command);
+
+		/* set up the global variables needed by enhanced_recursion() */
+		enhanced_fontscale = 1.0;
+		strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
+
+		/* Set the recursion going. We say to keep going until a
+		* closing brace, but we don't really expect to find one.
+		* If the return value is not the nul-terminator of the
+		* string, that can only mean that we did find an unmatched
+		* closing brace in the string. We inplot->crement past it (else
+		* we get stuck in an infinite loop) and try again. */
+
+		while (*(string = enhanced_recursion((char*)string, TRUE, wxt_current_plot->fontname,
+				wxt_current_plot->fontsize, 0.0, TRUE, TRUE, 0))) {
+			wxt_enhanced_flush();
+
+			/* we can only get here if *str == '}' */
+			enh_err_check(string);
+
+			if (!*++string)
+				break; /* end of string */
+			/* else carry on and process the rest of the string */
+		}
+
+		/* finish */
+		temp_command.command = command_enhanced_finish;
+		temp_command.x1 = x;
+		temp_command.y1 = term->ymax - y;
+		wxt_command_push(temp_command);
+		return;
+	}
+
+	temp_command.command = command_put_text;
 
 	temp_command.x1 = x;
 	temp_command.y1 = term->ymax - y;
@@ -2353,8 +2430,20 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 	case command_put_text :
 		gp_cairo_draw_text(&plot, command.x1, command.y1, command.string);
 		return;
-	case command_enhanced_put_text :
-		gp_cairo_draw_enhanced_text(&plot, command.x1, command.y1, command.string);
+	case command_enhanced_init :
+		gp_cairo_enhanced_init(&plot, command.integer_value);
+		return;
+	case command_enhanced_finish :
+		gp_cairo_enhanced_finish(&plot, command.x1, command.y1);
+		return;
+	case command_enhanced_flush :
+		gp_cairo_enhanced_flush(&plot);
+		return;
+	case command_enhanced_open :
+		gp_cairo_enhanced_open(&plot, command.string, command.double_value, command.double_value2, command.integer_value2 & 1, (command.integer_value2 & 2) >> 1, command.integer_value);
+		return;
+	case command_enhanced_writec :
+		gp_cairo_enhanced_writec(&plot, command.integer_value);
 		return;
 	case command_set_font :
 		gp_cairo_set_font(&plot, command.string, command.integer_value);

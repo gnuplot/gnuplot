@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.7 2007/06/09 16:56:53 sfeam Exp $
+ * $Id: wxt_term.h,v 1.8 2007/06/26 10:20:34 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -86,6 +86,10 @@ void wxt_set_clipboard(const char s[]);
 int wxt_make_palette(t_sm_palette *palette);
 void wxt_set_color(t_colorspec *colorspec);
 void wxt_filled_polygon(int n, gpiPoint * corners);
+
+void wxt_enhanced_flush();
+void wxt_enhanced_writec(int c);
+void wxt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
 
 void wxt_raise_terminal_window __PROTO((int));
 void wxt_raise_terminal_group __PROTO((void));
