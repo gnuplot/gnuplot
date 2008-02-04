@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.151.2.2 2007/03/22 05:05:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.151.2.3 2007/11/17 04:22:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1506,6 +1506,7 @@ change_term(const char *origname, int length)
 {
     int i;
     struct termentry *t = NULL;
+    TBOOLEAN ambiguous = FALSE;
 
     /* For backwards compatibility only */
     char *name = (char *)origname;
@@ -1517,12 +1518,17 @@ change_term(const char *origname, int length)
     for (i = 0; i < TERMCOUNT; i++) {
         if (!strncmp(name, term_tbl[i].name, length)) {
             if (t)
-                return (NULL);  /* ambiguous */
+                ambiguous = TRUE;
             t = term_tbl + i;
+	    /* Exact match is always accepted */
+	    if (length == strlen(term_tbl[i].name)) {
+		ambiguous = FALSE;
+		break;
+	    }
         }
     }
 
-    if (!t)                     /* unknown */
+    if (!t || ambiguous)
         return (NULL);
 
     /* Success: set terminal type now */
