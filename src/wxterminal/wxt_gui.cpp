@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.57 2007/11/04 22:56:31 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.58 2008/02/03 22:04:58 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -271,7 +271,7 @@ void wxtApp::LoadPngIcon(const unsigned char *embedded_png, int length, int icon
 }
 
 /* load a cursor */
-void wxtApp::LoadCursor(wxCursor &cursor, char* xpm_bits[])
+void wxtApp::LoadCursor(wxCursor &cursor, const char* xpm_bits[])
 {
 	int hotspot_x, hotspot_y;
 	wxBitmap cursor_bitmap = wxBitmap(xpm_bits);

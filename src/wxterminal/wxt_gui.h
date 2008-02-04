@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.27 2007/06/09 16:56:52 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.28 2007/07/21 09:30:27 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -245,7 +245,7 @@ private:
 	/* load a toolbar icon */
 	void LoadPngIcon(const unsigned char *embedded_png, int length, int icon_number);
 	/* load a cursor */
-	void LoadCursor(wxCursor &cursor, char* xpm_bits[]);
+	void LoadCursor(wxCursor &cursor, const char* xpm_bits[]);
 };
 
 /* IDs for gnuplot commands */
