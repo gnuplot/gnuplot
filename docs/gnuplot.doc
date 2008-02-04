@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.472 2008/01/14 06:38:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.473 2008/01/25 20:59:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -759,7 +759,7 @@ C
  "set term png enhanced", but may also be toggled afterward using 
  "set termoption enhanced", or by marking individual strings as in
  "set label 'x_2' noenhanced".
- 
+
 @start table - first is interactive cleartext form
   Control      Examples        Explanation
    ^           a^x             superscript
@@ -804,7 +804,7 @@ C
  a large variety of letters with accents or other diacritical marks.  See
  `set encoding`. Since the box is non-spacing, it is sensible to put the shorter
  of the subscript or superscript in the box (that is, after the @).
- 
+
  Space equal in length to a string can be inserted using the '&' character.
  Thus
          'abc&{def}ghi'
@@ -2884,7 +2884,7 @@ Ffigure_histeps
  The `errorbars` style is very similar to the `clustered` style, except that it
  requires additional columns of input for each entry. The first column holds
  the height (y value) of that box, exactly as for the `clustered` style.
-      2 columns:	y yerr          bar extends from y-yerr to y+err
+      2 columns:        y yerr          bar extends from y-yerr to y+err
       3 columns:        y ymin yman     bar extends from ymin to ymax
  The appearance of the error bars is controlled by the current value of
  `set bars` and by the optional <linewidth> specification.
@@ -2927,7 +2927,7 @@ Ffigure_histclust
        set style histogram cluster
        set style fill solid 1.0 border -1
        plot 'file.dat' using 2, '' using 4
- 
+
  This will produce a plot with clusters of two boxes (vertical bars) centered
  at each integral value on the x axis.  If the first column of the input file
  contains labels, they may be placed along the x-axis using the variant command
@@ -10168,7 +10168,7 @@ Ffigure_mapcontours
  with GPVAL_, MOUSE_, FIT_, and TERM_.
 
  Syntax:
-       show variables	   # show variables that do not begin with GPVAL_
+       show variables      # show variables that do not begin with GPVAL_
        show variables all  # show all variables including those beginning GPVAL_
        show variables NAME # show only variables beginning with NAME
 
