@@ -1,5 +1,5 @@
 /* XPM */
-static char *right[]={
+static const char *right[]={
 "16 16 3 1 15 0",
 ". c None",
 "a c #000000",

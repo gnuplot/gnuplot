@@ -1,5 +1,5 @@
 /* XPM */
-static char *cross[]={
+static const char *cross[]={
 "16 16 3 1 7 7",
 ". c None",
 "a c #000000",
