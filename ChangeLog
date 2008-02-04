@@ -1,3 +1,9 @@
+2008-02-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (change_term): Insure that 'set term foo' will always
+	succeed if there is a terminal named "foo", even if there are also
+	terminals named "foobaz" and "foodstuff".  Bugfix (svg/svga)
+
 2008-02-04  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp:
