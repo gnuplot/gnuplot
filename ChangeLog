@@ -1,3 +1,9 @@
+2008-02-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/hidden3d.c (reset_hidden3doptions):  Change default
+	setting of "set hidden3d {front|back}" to "back" so that it matches the
+	behavior of earlier versions.
+
 2008-02-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (change_term): Insure that 'set term foo' will always
