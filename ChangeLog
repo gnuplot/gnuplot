@@ -1,3 +1,10 @@
+2008-02-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (adjust_binary_use_spec):  This whole routine is
+	garbage. Patch it lightly so that at least it can handle more than one
+	plot per graph.  But really it needs to be re-written from scratch.
+	Bugfix.
+
 2008-02-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/hidden3d.c (reset_hidden3doptions):  Change default

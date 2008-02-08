@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.133 2008/01/25 20:59:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.134 2008/02/01 20:08:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3090,6 +3090,14 @@ df_bin_default_columns default_style_cols[LAST_PLOT_STYLE + 1] = {
 };
 
 
+/* FIXME!!!
+ * EAM Feb 2008:
+ * This whole routine is a disaster.  It makes so many broken assumptions it's not funny.
+ * Other than filling in the first two columns of an implicit matrix, I suspect we can
+ * do away with it altogether. Frankly, we _don't care_ how many columns there are,
+ * so long as the ones that are present are mapped to the right ordering.
+ */
+
 static void
 adjust_binary_use_spec()
 {
@@ -3108,7 +3116,8 @@ adjust_binary_use_spec()
     df_matrix_binary = (df_matrix_file && df_binary_file);
 
     c_token_copy = c_token;
-    for (c_token = 0; !END_OF_COMMAND; c_token++)
+ 
+    for ( ; !END_OF_COMMAND; c_token++)
 	if (almost_equals(c_token, "w$ith"))
 	    break;
     if (!END_OF_COMMAND)
