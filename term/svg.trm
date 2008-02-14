@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.90 2008/01/22 06:46:17 sfeam Exp $
+ * $Id: svg.trm,v 1.91 2008/01/26 05:06:33 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1176,6 +1176,7 @@ SVG_layer(t_termlayer syncpoint)
 		SVG_PathClose();
 		SVG_GroupClose();
 		fprintf(gpoutfile, "\t<a xlink:title=\"Plot #%d\">\n", ++plotno);
+		SVG_GroupOpen();
 		break;
 
 	case TERM_LAYER_AFTER_PLOT:
