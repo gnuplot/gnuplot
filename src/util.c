@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.73 2007/12/17 21:43:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.74 2007/12/17 21:50:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -384,6 +384,9 @@ char *
 gp_strdup(const char *s)
 {
     char *d;
+
+    if (!s)
+	return NULL;
 
 #ifndef HAVE_STRDUP
     d = gp_alloc(strlen(s) + 1, "gp_strdup");

@@ -1,3 +1,9 @@
+2008-02-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (gd_strdup) src/set.c (set_decimalsign): Fix segfault due
+	to trying to free a string returned by getenv().
+	Bugfix.
+
 2008-02-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (adjust_binary_use_spec):  This whole routine is
