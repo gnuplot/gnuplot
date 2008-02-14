@@ -1,3 +1,9 @@
+2008-02-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (gd_strdup) src/set.c (set_decimalsign): Fix segfault due
+	to trying to free a string returned by getenv().
+	Bugfix.
+
 2008-02-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (change_term):  Allow terminals with similar names to

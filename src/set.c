@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.4 2007/12/08 10:54:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.5 2008/01/14 07:27:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1162,11 +1162,11 @@ set_decimalsign()
 	c_token++;
 	newlocale = try_to_get_string();
 	if (!newlocale)
-	    newlocale = getenv("LC_ALL");
+	    newlocale = gp_strdup(getenv("LC_ALL"));
 	if (!newlocale)
-	    newlocale = getenv("LC_NUMERIC");
+	    newlocale = gp_strdup(getenv("LC_NUMERIC"));
 	if (!newlocale)
-	    newlocale = getenv("LANG");
+	    newlocale = gp_strdup(getenv("LANG"));
 	if (!setlocale(LC_NUMERIC, newlocale ? newlocale : ""))
 	    int_error(c_token-1, "Could not find requested locale");
 	decimalsign = gp_strdup(localeconv()->decimal_point);
