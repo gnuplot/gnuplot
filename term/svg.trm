@@ -1176,7 +1176,7 @@ SVG_layer(t_termlayer syncpoint)
 		SVG_PathClose();
 		SVG_GroupClose();
 		fprintf(gpoutfile, "\t<a xlink:title=\"Plot #%d\">\n", ++plotno);
-		SVG_GroupOpen();
+		SVG_LineType = LT_UNDEFINED; /* Force a new group on next stroke */
 		break;
 
 	case TERM_LAYER_AFTER_PLOT:
