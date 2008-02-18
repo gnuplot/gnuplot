@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.134 2008/02/01 20:08:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.135 2008/02/09 03:57:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1300,8 +1300,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	{
 	    struct stat statbuf;
 	    if ((stat(df_filename, &statbuf) > -1) &&
-		!S_ISREG(statbuf.st_mode) && !S_ISFIFO(statbuf.st_mode)) {
-		os_error(name_token, "\"%s\" is not a regular file or pipe",
+		S_ISDIR(statbuf.st_mode)) {
+		os_error(name_token, "\"%s\" is a directory",
 			df_filename);
 	    }
 	}

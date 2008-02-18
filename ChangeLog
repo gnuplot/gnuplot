@@ -1,3 +1,8 @@
+2008-02-18  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* src/datafile.c: Allow all types of files as data files except for
+	directories.
+
 2008-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gd_strdup) src/set.c (set_decimalsign): Fix segfault due
