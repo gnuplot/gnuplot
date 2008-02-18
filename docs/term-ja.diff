@@ -1,13 +1,189 @@
-diff -rc term-4.3.0-20071011/aed.trm term-4.3.0-ja-20071011/aed.trm
-*** term-4.3.0-20071011/aed.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/aed.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc docs/doc2rtf.c.ORG docs/doc2rtf.c
+*** docs/doc2rtf.c.ORG	2008-01-08 13:03:42.000000000 +0900
+--- docs/doc2rtf.c	2008-01-08 13:04:30.000000000 +0900
+***************
+*** 108,114 ****
+--- 108,118 ----
+      fprintf(b, "{\\rtf1\\ansi ");	/* vers 1 rtf, ansi char set */
+      fprintf(b, "\\deff0");	/* default font font 0 */
+      /* font table: font 0 proportional, font 1 fixed */
++ #ifdef JAPANESE_DOC
++     fprintf(b,"{\\fonttbl{\\f0\\fnil\\fcharset128 \\\'82\\\'6c\\\'82\\\'72\\\'82\\\'6f\\\'83\\\'53\\\'83\\\'56\\\'83\\\'62\\\'83\\\'4e;}{\\f1\\fnil\\fcharset128 \\\'82\\\'6c\\\'82\\\'72\\\'82\\\'6f\\\'83\\\'53\\\'83\\\'56\\\'83\\\'62\\\'83\\\'4e;}{\\f2\\fnil\\fprq2\\fcharset128 System;}{\\f3\\fnil\\fcharset128 \\\'82\\\'6c\\\'82\\\'72\\\'82\\\'6f\\\'83\\\'53\\\'83\\\'56\\\'83\\\'62\\\'83\\\'4e;}}\n");
++ #else
+      fprintf(b, "{\\fonttbl{\\f0\\fswiss Arial;}{\\f1\\fmodern Courier New;}}\n");
++ #endif
+  
+      /* process each line of the file */
+      while (get_line(line, sizeof(line), a)) {
+***************
+*** 117,126 ****
+  
+      /* close final page and generate trailer */
+      fprintf(b, "}{\\plain \\page}\n");
+!     /* fprintf(b,"}\n"); */ /* HBB: HACK ALERT: only without this, hc31 works */
+      list_free();
+  }
+  
+  void
+  process_line(char *line, FILE *b)
+  {
+--- 121,142 ----
+  
+      /* close final page and generate trailer */
+      fprintf(b, "}{\\plain \\page}\n");
+! #ifndef JAPANESE_DOC
+!     fprintf(b,"}\n"); /* HBB: HACK ALERT: only without this, hc31 works */
+! #endif
+      list_free();
+  }
+  
++ #ifdef JAPANESE_DOC
++ char filtrated_char(char *str, int nbyte)
++ {
++     char c;
++     c=*(str+nbyte);
++     if(c&0x80) return (char)0xff;
++     else return c;
++ }
++ #endif
++ 
+  void
+  process_line(char *line, FILE *b)
+  {
+***************
+*** 145,151 ****
+--- 161,171 ----
+      i = 0;
+      j = 0;
+      while (line[i] != NUL) {
++ #ifdef JAPANESE_DOC
++ 	switch (filtrated_char(line,i)) {
++ #else
+  	switch (line[i]) {
++ #endif
+  	case '\\':
+  	case '{':
+  	case '}':
+***************
+*** 157,168 ****
+--- 177,196 ----
+  	case '\n':
+  	    break;
+  	case '`':		/* backquotes mean boldface or link */
++ #ifdef JAPANESE_DOC
++ 	if (filtrated_char(line,i) == ' ') /* tabular line */
++ #else
+  	    if (line[1] == ' ')	/* tabular line */
++ #endif
+  		line2[j] = line[i];
+  	    else if ((!inref) && (!inquote)) {
+  		k = i + 1;	/* index into current string */
+  		l = 0;		/* index into topic string */
++ #ifdef JAPANESE_DOC
++ 		while ((filtrated_char(line,k) != '`') && (line[k] != NUL))
++ #else
+  		while ((line[k] != '`') && (line[k] != NUL))
++ #endif
+  		    topic[l++] = line[k++];
+  		topic[l] = NUL;
+  		klist = lookup(topic);
+***************
+*** 220,228 ****
+--- 248,264 ----
+  
+      i = 1;
+  
++ #ifdef JAPANESE_DOC
++     switch (filtrated_char(line, 0)) {	/* control character */
++ #else
+      switch (line[0]) {		/* control character */
++ #endif
+      case '?':{			/* interactive help entry */
++ #ifdef JAPANESE_DOC
++ 	    if ((line2[1] != NUL) && (filtrated_char(line2, 1) != ' '))
++ #else
+  	    if ((line2[1] != NUL) && (line2[1] != ' '))
++ #endif
+  		footnote('K', &(line2[1]), b);
+  	    break;
+  	}
+***************
+*** 247,259 ****
+--- 283,303 ----
+  	tabl = 0;
+  	break;
+      case ' ':{			/* normal text line */
++ #ifdef JAPANESE_DOC
++ 	    if ((line2[1] == NUL) || (filtrated_char(line2, 1) == '\n')) {
++ #else
+  	    if ((line2[1] == NUL) || (line2[1] == '\n')) {
++ #endif
+  		fprintf(b, "\\par\n");
+  		llpara = para;
+  		para = 0;
+  		tabl = 0;
+  	    }
++ #ifdef JAPANESE_DOC
++ 	    if (filtrated_char(line2, 1) == ' ') {
++ #else
+  	    if (line2[1] == ' ') {
++ #endif
+  		if (!tabl) {
+  		    fprintf(b, "\\par\n");
+  		}
+***************
+*** 277,283 ****
+--- 321,331 ----
+  	    break;
+  	}
+      default:{
++ #ifdef JAPANESE_DOC
++ 	    if (isdigit((int)filtrated_char(line, 0))) { /* start of section */
++ #else
+  	    if (isdigit((int)line[0])) {	/* start of section */
++ #endif
+  		if (startpage) {	/* use new level 0 item */
+  		    refs(0, b, "\\par", NULL, "\\par{\\uldb %s}{\\v loc%d}\n");
+  		    fprintf(b, "}{\\plain \\page}\n");
+diff -rc docs/sjisenc.c.ORG docs/sjisenc.c
+*** docs/sjisenc.c.ORG	2008-01-11 11:23:00.000000000 +0900
+--- docs/sjisenc.c	2008-01-11 11:22:27.000000000 +0900
+***************
+*** 0 ****
+--- 1,23 ----
++ /* doc2rtf の日本語変換用ツール
++  * sjisenc.c
++  * shige
++  * 06/02 2003
++  * 単に Shift_JIS の code を \'aa の様に encode するだけ
++  */
++ #include <stdio.h>
++ #include <stdlib.h>
++ 
++ int main(void)
++ {
++     int c;
++ 
++     while((c=getchar())!=EOF && c!=0){
++ 	if(c>=0x80){
++ 	    printf("\\'%02x",c);
++ 	    printf("\\'%02x",getchar());
++ 	}
++ 	else putchar(c);
++     }
++     if(c==0) putchar(0);
++     return 0;
++ }
+diff -rc term/aed.trm.ORG term/aed.trm
+*** term/aed.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/aed.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
 *** 203,208 ****
 --- 203,209 ----
   
   #ifdef TERM_HELP
   START_HELP(aed767)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 aed767",
   "?commands set terminal aed767",
   "?set terminal aed767",
@@ -17,7 +193,7 @@ diff -rc term-4.3.0-20071011/aed.trm term-4.3.0-ja-20071011/aed.trm
   " The two drivers differ only in their horizontal ranges, which are 512 and",
   " 768 pixels, respectively.  Their vertical range is 575 pixels.  There are",
   " no options for these drivers."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 aed767",
 + "?commands set terminal aed767",
 + "?set terminal aed767",
@@ -35,19 +211,19 @@ diff -rc term-4.3.0-20071011/aed.trm term-4.3.0-ja-20071011/aed.trm
 + " ます。この 2 つのドライバは、水平方向の範囲のみが違っていて、それぞれ",
 + " 512 ピクセルと 767 ピクセルです。垂直方向はいずれも 575 ピクセルです。",
 + " これらのドライバにはオプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(aed767)
   #endif
-diff -rc term-4.3.0-20071011/ai.trm term-4.3.0-ja-20071011/ai.trm
-*** term-4.3.0-20071011/ai.trm	2006-07-30 20:04:05.000000000 +0900
---- term-4.3.0-ja-20071011/ai.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc term/ai.trm.ORG term/ai.trm
+*** term/ai.trm.ORG	2006-07-30 20:04:05.000000000 +0900
+--- term/ai.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
 *** 528,533 ****
 --- 528,534 ----
   
   #ifdef TERM_HELP
   START_HELP(aifm)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 aifm",
   "?commands set terminal aifm",
   "?set terminal aifm",
@@ -57,7 +233,7 @@ diff -rc term-4.3.0-20071011/ai.trm term-4.3.0-ja-20071011/ai.trm
   "       set term aifm",
   "       set term aifm 22",
   "       set size 0.7,1.4; set term aifm color \"Times-Roman\" 14"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 aifm",
 + "?commands set terminal aifm",
 + "?set terminal aifm",
@@ -91,19 +267,19 @@ diff -rc term-4.3.0-20071011/ai.trm term-4.3.0-ja-20071011/ai.trm
 + "       set term aifm",
 + "       set term aifm 22",
 + "       set size 0.7,1.4; set term aifm color \"Times-Roman\" 14"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(ai)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/amiga.trm term-4.3.0-ja-20071011/amiga.trm
-*** term-4.3.0-20071011/amiga.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/amiga.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc term/amiga.trm.ORG term/amiga.trm
+*** term/amiga.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/amiga.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
 *** 809,814 ****
 --- 809,815 ----
   
   #ifdef TERM_HELP
   START_HELP(amiga)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 amiga",
   "?commands set terminal amiga",
   "?set terminal amiga",
@@ -113,7 +289,7 @@ diff -rc term-4.3.0-20071011/amiga.trm term-4.3.0-ja-20071011/amiga.trm
   "",
   " The screen option uses a virtual screen, so it is possible that the graph",
   " will be larger than the screen."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 amiga",
 + "?commands set terminal amiga",
 + "?set terminal amiga",
@@ -133,19 +309,19 @@ diff -rc term-4.3.0-20071011/amiga.trm term-4.3.0-ja-20071011/amiga.trm
 + "",
 + " screen オプションは、仮想スクリーンを使うので、スクリーンより大きいグ",
 + " ラフを作ることも可能です。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(amiga)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/apollo.trm term-4.3.0-ja-20071011/apollo.trm
-*** term-4.3.0-20071011/apollo.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/apollo.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc term/apollo.trm.ORG term/apollo.trm
+*** term/apollo.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/apollo.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
 *** 595,600 ****
 --- 595,601 ----
   
   #ifdef TERM_HELP
   START_HELP(apollo)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 apollo",
   "?commands set terminal apollo",
   "?set terminal apollo",
@@ -155,7 +331,7 @@ diff -rc term-4.3.0-20071011/apollo.trm term-4.3.0-ja-20071011/apollo.trm
   " with rescaling after window resizing.  It has no options.",
   "",
   " If a fixed-size window is desired, the `gpr` terminal may be used instead."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 apollo",
 + "?commands set terminal apollo",
 + "?set terminal apollo",
@@ -169,29 +345,29 @@ diff -rc term-4.3.0-20071011/apollo.trm term-4.3.0-ja-20071011/apollo.trm
 + "",
 + " 固定サイズのウィンドウが必要ならば、`gpr` 出力を代わりに使用してくださ",
 + " い。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(apollo)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/aquaterm.trm term-4.3.0-ja-20071011/aquaterm.trm
-*** term-4.3.0-20071011/aquaterm.trm	2007-05-10 09:41:06.000000000 +0900
---- term-4.3.0-ja-20071011/aquaterm.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc term/aquaterm.trm.ORG term/aquaterm.trm
+*** term/aquaterm.trm.ORG	2007-12-21 08:49:16.000000000 +0900
+--- term/aquaterm.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
-*** 858,863 ****
---- 858,864 ----
+*** 861,866 ****
+--- 861,867 ----
   
   #ifdef TERM_HELP
   START_HELP(aqua)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 aqua",
   "?commands set terminal aqua",
   "?set terminal aqua",
 ***************
-*** 889,894 ****
---- 890,930 ----
+*** 892,897 ****
+--- 893,933 ----
   " Lines can be drawn either solid or dashed, (default is solid) and the dash",
   " spacing can be modified by <dashlength> which is a multiplier > 0.",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 aqua",
 + "?commands set terminal aqua",
 + "?set terminal aqua",
@@ -225,20 +401,20 @@ diff -rc term-4.3.0-20071011/aquaterm.trm term-4.3.0-ja-20071011/aquaterm.trm
 + " 曲線は、実線か点線 (デフォルトは実線) のいずれかで描画でき、点線の間隔は",
 + " 倍率 <dashlength> (>0) で変更できます。",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(aqua)
   #endif /* TERM_HELP */
   
-diff -rc term-4.3.0-20071011/atariaes.trm term-4.3.0-ja-20071011/atariaes.trm
-*** term-4.3.0-20071011/atariaes.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/atariaes.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc term/atariaes.trm.ORG term/atariaes.trm
+*** term/atariaes.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/atariaes.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
 *** 754,759 ****
 --- 754,760 ----
   
   #ifdef TERM_HELP
   START_HELP(atari)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 atari ST (via AES)",
   "?commands set terminal atari",
   "?set terminal atari",
@@ -248,7 +424,7 @@ diff -rc term-4.3.0-20071011/atariaes.trm term-4.3.0-ja-20071011/atariaes.trm
   " Additionally, if an environment variable GNUCOLORS exists, its contents are",
   " interpreted as an options string, but an explicit terminal option takes",
   " precedence."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 atari ST (via AES)",
 + "?commands set terminal atari",
 + "?set terminal atari",
@@ -277,19 +453,19 @@ diff -rc term-4.3.0-20071011/atariaes.trm term-4.3.0-ja-20071011/atariaes.trm
 + "",
 + " また、環境変数 GNUCOLORS が設定されていれば、それもオプション文字列と",
 + " して解釈されますが、明示的なターミナルオプションの方が優先されます。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(atari)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/atarivdi.trm term-4.3.0-ja-20071011/atarivdi.trm
-*** term-4.3.0-20071011/atarivdi.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/atarivdi.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc term/atarivdi.trm.ORG term/atarivdi.trm
+*** term/atarivdi.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/atarivdi.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
 *** 452,457 ****
 --- 452,458 ----
   
   #ifdef TERM_HELP
   START_HELP(vdi)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 atari ST (via VDI)",
   "?commands set terminal vdi",
   "?set terminal vdi",
@@ -299,7 +475,7 @@ diff -rc term-4.3.0-20071011/atarivdi.trm term-4.3.0-ja-20071011/atarivdi.trm
   " Additionally, if an environment variable GNUCOLORS exists, its contents are",
   " interpreted as an options string, but an explicit terminal option takes",
   " precedence."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 atari ST (via VDI)",
 + "?commands set terminal vdi",
 + "?set terminal vdi",
@@ -331,19 +507,19 @@ diff -rc term-4.3.0-20071011/atarivdi.trm term-4.3.0-ja-20071011/atarivdi.trm
 + "",
 + " また、環境変数 GNUCOLORS が設定されていれば、それもオプション文字列と",
 + " して解釈されますが、明示的なターミナルオプションの方が優先されます。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(vdi)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/be.trm term-4.3.0-ja-20071011/be.trm
-*** term-4.3.0-20071011/be.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/be.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc term/be.trm.ORG term/be.trm
+*** term/be.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/be.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
 *** 390,395 ****
 --- 390,396 ----
   
   #ifdef TERM_HELP
   START_HELP(be)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 be",
   "?commands set terminal be",
   "?set terminal be",
@@ -353,7 +529,7 @@ diff -rc term-4.3.0-20071011/be.trm term-4.3.0-ja-20071011/be.trm
   "%@gnuplot*line7Dashes: 42",
   "%@gnuplot*line8Dashes: 13",
   "@end table"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 be",
 + "?commands set terminal be",
 + "?set terminal be",
@@ -647,29 +823,29 @@ diff -rc term-4.3.0-20071011/be.trm term-4.3.0-ja-20071011/be.trm
 + "%@gnuplot*line7Dashes: 42",
 + "%@gnuplot*line8Dashes: 13",
 + "@end table"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(be)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/cairo.trm term-4.3.0-ja-20071011/cairo.trm
-*** term-4.3.0-20071011/cairo.trm	2007-10-11 08:50:21.000000000 +0900
---- term-4.3.0-ja-20071011/cairo.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc term/cairo.trm.ORG term/cairo.trm
+*** term/cairo.trm.ORG	2008-01-04 18:20:49.000000000 +0900
+--- term/cairo.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
-*** 762,767 ****
---- 762,768 ----
+*** 768,773 ****
+--- 768,774 ----
   
   #ifdef TERM_HELP
   START_HELP(pdfcairo)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 pdfcairo",
   "?set terminal pdfcairo",
   "?terminal pdfcairo",
 ***************
-*** 841,851 ****
---- 842,937 ----
+*** 847,857 ****
+--- 848,943 ----
   " so that gnuplot can draw a line from non-integer coordinates. This avoids",
   " wobbling effects on diagonal lines ('plot x' for example).",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 pdfcairo",
 + "?set terminal pdfcairo",
 + "?terminal pdfcairo",
@@ -752,23 +928,23 @@ diff -rc term-4.3.0-20071011/cairo.trm term-4.3.0-ja-20071011/cairo.trm
 + " ズでの精度を提供し、gnuplot が非整数座標の直線を書けるようになります。",
 + " これは、対角方向の直線 (例えば 'plot x') が左右に揺れるのを避けます。",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(pdfcairo)
   #endif /* TERM_HELP */
   
   #ifdef TERM_HELP
   START_HELP(pngcairo)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 pngcairo",
   "?set terminal pngcairo",
   "?terminal pngcairo",
 ***************
-*** 925,930 ****
---- 1011,1100 ----
+*** 931,936 ****
+--- 1017,1106 ----
   " so that gnuplot can draw a line from non-integer coordinates. This avoids",
   " wobbling effects on diagonal lines ('plot x' for example).",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 pngcairo",
 + "?set terminal pngcairo",
 + "?terminal pngcairo",
@@ -851,20 +1027,20 @@ diff -rc term-4.3.0-20071011/cairo.trm term-4.3.0-ja-20071011/cairo.trm
 + " ズでの精度を提供し、gnuplot が非整数座標の直線を書けるようになります。",
 + " これは、対角方向の直線 (例えば 'plot x') が左右に揺れるのを避けます。",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(pngcairo)
   #endif /* TERM_HELP */
   
-diff -rc term-4.3.0-20071011/cgi.trm term-4.3.0-ja-20071011/cgi.trm
-*** term-4.3.0-20071011/cgi.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/cgi.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc term/cgi.trm.ORG term/cgi.trm
+*** term/cgi.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/cgi.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
 *** 319,324 ****
 --- 319,325 ----
   
   #ifdef TERM_HELP
   START_HELP(cgi)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 cgi",
   "?commands set terminal cgi",
   "?set terminal cgi",
@@ -874,7 +1050,7 @@ diff -rc term-4.3.0-20071011/cgi.trm term-4.3.0-ja-20071011/cgi.trm
   " then that display is used.  Otherwise CGIPRNT is used.",
   "",
   " These terminals have no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 cgi",
 + "?commands set terminal cgi",
 + "?set terminal cgi",
@@ -894,19 +1070,19 @@ diff -rc term-4.3.0-20071011/cgi.trm term-4.3.0-ja-20071011/cgi.trm
 + " ていればディスプレイを使用し、そうでなければ CGIPRNT を使用します。",
 + "",
 + " これらの出力ドライバにはオプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(cgi)
   #endif
-diff -rc term-4.3.0-20071011/cgm.trm term-4.3.0-ja-20071011/cgm.trm
-*** term-4.3.0-20071011/cgm.trm	2007-10-07 17:05:57.000000000 +0900
---- term-4.3.0-ja-20071011/cgm.trm	2007-10-11 13:36:40.000000000 +0900
+diff -rc term/cgm.trm.ORG term/cgm.trm
+*** term/cgm.trm.ORG	2007-12-21 08:49:16.000000000 +0900
+--- term/cgm.trm	2008-01-08 10:59:19.000000000 +0900
 ***************
 *** 1745,1750 ****
 --- 1745,1751 ----
   
   #ifdef TERM_HELP
   START_HELP(cgm)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 cgm",
   "?commands set terminal cgm",
   "?set terminal cgm",
@@ -916,7 +1092,7 @@ diff -rc term-4.3.0-20071011/cgm.trm term-4.3.0-ja-20071011/cgm.trm
   " `nofontlist`.  The problems involving the color and font tables that",
   " the `winword6` option was intended to work around turned out to be",
   " gnuplot bugs which have now been fixed."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 cgm",
 + "?commands set terminal cgm",
 + "?set terminal cgm",
@@ -1214,20 +1390,20 @@ diff -rc term-4.3.0-20071011/cgm.trm term-4.3.0-ja-20071011/cgm.trm
 + " した。`winword6` オプションが回避策として使われていた、色やフォントリ",
 + " ストに関する問題は、結局 gnuplot のバグであるとわかり、それは今では修",
 + " 正されています。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   
   END_HELP(cgm)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/corel.trm term-4.3.0-ja-20071011/corel.trm
-*** term-4.3.0-20071011/corel.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/corel.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/corel.trm.ORG term/corel.trm
+*** term/corel.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/corel.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 431,436 ****
 --- 431,437 ----
   
   #ifdef TERM_HELP
   START_HELP(corel)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 corel",
   "?commands set terminal corel",
   "?set terminal corel",
@@ -1237,7 +1413,7 @@ diff -rc term-4.3.0-20071011/corel.trm term-4.3.0-ja-20071011/corel.trm
   "",
   " where the fontsize and linewidth are specified in points and the sizes in",
   " inches.  The defaults are monochrome, \"SwitzerlandLight\", 22, 8.2, 10 and 1.2."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 corel",
 + "?commands set terminal corel",
 + "?set terminal corel",
@@ -1256,19 +1432,19 @@ diff -rc term-4.3.0-20071011/corel.trm term-4.3.0-ja-20071011/corel.trm
 + " ここで、フォントサイズ (`fontsize`) と線幅 (`linewidth`) はポイント単",
 + " 位、横幅 (`xsize`) と縦幅 (`ysize`) はインチ単位です。デフォルトの値は",
 + " それぞれ、monochrome, \"SwitzerlandLight\", 22, 8.2, 10, 1.2 です。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(corel)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/debug.trm term-4.3.0-ja-20071011/debug.trm
-*** term-4.3.0-20071011/debug.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/debug.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/debug.trm.ORG term/debug.trm
+*** term/debug.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/debug.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 309,314 ****
 --- 309,315 ----
   
   #ifdef TERM_HELP
   START_HELP(debug)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 debug",
   "?commands set terminal debug",
   "?set terminal debug",
@@ -1278,7 +1454,7 @@ diff -rc term-4.3.0-20071011/debug.trm term-4.3.0-ja-20071011/debug.trm
   "?debug",
   " This terminal is provided to allow for the debugging of `gnuplot`.  It is",
   " likely to be of use only for users who are modifying the source code."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 debug",
 + "?commands set terminal debug",
 + "?set terminal debug",
@@ -1288,19 +1464,19 @@ diff -rc term-4.3.0-20071011/debug.trm term-4.3.0-ja-20071011/debug.trm
 + "?debug",
 + " このドライバは `gnuplot` のデバッグのために提供されているものです。お",
 + " そらくソースコードを修正するユーザのみが使用するものでしょう。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(debug)
   #endif
-diff -rc term-4.3.0-20071011/djsvga.trm term-4.3.0-ja-20071011/djsvga.trm
-*** term-4.3.0-20071011/djsvga.trm	2007-06-06 11:26:08.000000000 +0900
---- term-4.3.0-ja-20071011/djsvga.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/djsvga.trm.ORG term/djsvga.trm
+*** term/djsvga.trm.ORG	2007-06-06 11:26:08.000000000 +0900
+--- term/djsvga.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 471,476 ****
 --- 471,477 ----
   */
   #ifdef TERM_HELP
   START_HELP(svga)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 svga",
   "?commands set terminal svga",
   "?set terminal svga",
@@ -1310,7 +1486,7 @@ diff -rc term-4.3.0-20071011/djsvga.trm term-4.3.0-ja-20071011/djsvga.trm
   "",
   " Syntax:",
   "       set terminal svga {\"<fontname>\"}"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 svga",
 + "?commands set terminal svga",
 + "?set terminal svga",
@@ -1324,19 +1500,19 @@ diff -rc term-4.3.0-20071011/djsvga.trm term-4.3.0-ja-20071011/djsvga.trm
 + "",
 + " 書式:",
 + "       set terminal svga {\"<fontname>\"}"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(svga)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/dumb.trm term-4.3.0-ja-20071011/dumb.trm
-*** term-4.3.0-20071011/dumb.trm	2006-12-28 10:16:55.000000000 +0900
---- term-4.3.0-ja-20071011/dumb.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/dumb.trm.ORG term/dumb.trm
+*** term/dumb.trm.ORG	2006-12-28 10:16:55.000000000 +0900
+--- term/dumb.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 559,564 ****
 --- 559,565 ----
   
   #ifdef TERM_HELP
   START_HELP(dumb)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 dumb",
   "?commands set terminal dumb",
   "?set terminal dumb",
@@ -1346,7 +1522,7 @@ diff -rc term-4.3.0-20071011/dumb.trm term-4.3.0-ja-20071011/dumb.trm
   " Examples:",
   "       set term dumb nofeed",
   "       set term dumb 79 49 # VGA screen---why would anyone do that?"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 dumb",
 + "?commands set terminal dumb",
 + "?set terminal dumb",
@@ -1370,19 +1546,19 @@ diff -rc term-4.3.0-20071011/dumb.trm term-4.3.0-ja-20071011/dumb.trm
 + " 例:",
 + "       set term dumb nofeed",
 + "       set term dumb 79 49 # VGA screen---何故こうしたい人がいるんだろう ?"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(dumb)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/dxf.trm term-4.3.0-ja-20071011/dxf.trm
-*** term-4.3.0-20071011/dxf.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/dxf.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/dxf.trm.ORG term/dxf.trm
+*** term/dxf.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/dxf.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 404,409 ****
 --- 404,410 ----
   
   #ifdef TERM_HELP
   START_HELP(dxf)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 dxf",
   "?commands set terminal dxf",
   "?set terminal dxf",
@@ -1392,7 +1568,7 @@ diff -rc term-4.3.0-20071011/dxf.trm term-4.3.0-ja-20071011/dxf.trm
   " modifying the source file.  If a black-and-white plotting device is used, the",
   " colors are mapped to differing line thicknesses.  See the description of the",
   " AutoCad print/plot command."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 dxf",
 + "?commands set terminal dxf",
 + "?set terminal dxf",
@@ -1408,19 +1584,19 @@ diff -rc term-4.3.0-20071011/dxf.trm term-4.3.0-ja-20071011/dxf.trm
 + " イバソースファイルを修正する必要があります。白黒の出力装置を使う場合、",
 + " それらの色は線の太さの違いで表現されます。詳細は AutoCad の印刷/プロッ",
 + " タ出力コマンドに関する記述を参照してください。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(dxf)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/dxy.trm term-4.3.0-ja-20071011/dxy.trm
-*** term-4.3.0-20071011/dxy.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/dxy.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/dxy.trm.ORG term/dxy.trm
+*** term/dxy.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/dxy.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 191,196 ****
 --- 191,197 ----
   
   #ifdef TERM_HELP
   START_HELP(dxy800a)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 dxy800a",
   "?commands set terminal dxy800a",
   "?set terminal dxy800a",
@@ -1430,7 +1606,7 @@ diff -rc term-4.3.0-20071011/dxy.trm term-4.3.0-ja-20071011/dxy.trm
   "?term dxy800a",
   "?dxy800a",
   " This terminal driver supports the Roland DXY800A plotter.  It has no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 dxy800a",
 + "?commands set terminal dxy800a",
 + "?set terminal dxy800a",
@@ -1440,19 +1616,19 @@ diff -rc term-4.3.0-20071011/dxy.trm term-4.3.0-ja-20071011/dxy.trm
 + "?dxy800a",
 + " このドライバは Roland DXY800A プロッタをサポートします。オプションはあ",
 + " りません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(dxy800a)
   #endif
-diff -rc term-4.3.0-20071011/eepic.trm term-4.3.0-ja-20071011/eepic.trm
-*** term-4.3.0-20071011/eepic.trm	2006-07-22 17:39:07.000000000 +0900
---- term-4.3.0-ja-20071011/eepic.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/eepic.trm.ORG term/eepic.trm
+*** term/eepic.trm.ORG	2006-07-22 17:39:07.000000000 +0900
+--- term/eepic.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 556,561 ****
 --- 556,562 ----
   
   #ifdef TERM_HELP
   START_HELP(eepic)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 eepic",
   "?commands set terminal eepic",
   "?set terminal eepic",
@@ -1462,7 +1638,7 @@ diff -rc term-4.3.0-20071011/eepic.trm term-4.3.0-ja-20071011/eepic.trm
   "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
   " The other label -- account for long ticlabels:",
   "        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 eepic",
 + "?commands set terminal eepic",
 + "?set terminal eepic",
@@ -1548,29 +1724,29 @@ diff -rc term-4.3.0-20071011/eepic.trm term-4.3.0-ja-20071011/eepic.trm
 + "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
 + " 他の見出し -- 目盛りの長い見出しに対する見積り:",
 + "        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(eepic)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/emf.trm term-4.3.0-ja-20071011/emf.trm
-*** term-4.3.0-20071011/emf.trm	2006-12-28 10:16:55.000000000 +0900
---- term-4.3.0-ja-20071011/emf.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/emf.trm.ORG term/emf.trm
+*** term/emf.trm.ORG	2008-01-07 16:32:06.000000000 +0900
+--- term/emf.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
-*** 1275,1280 ****
---- 1275,1281 ----
+*** 1300,1305 ****
+--- 1300,1306 ----
   
   #ifdef TERM_HELP
   START_HELP(emf)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 emf",
   "?commands set terminal emf",
   "?set terminal emf",
 ***************
-*** 1306,1310 ****
---- 1307,1345 ----
+*** 1331,1335 ****
+--- 1332,1370 ----
   " Examples:",
   "       set terminal emf 'Times Roman Italic' 12",
   "       set terminal emf color solid    # no pesky dashes!"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 emf",
 + "?commands set terminal emf",
 + "?set terminal emf",
@@ -1603,19 +1779,19 @@ diff -rc term-4.3.0-20071011/emf.trm term-4.3.0-ja-20071011/emf.trm
 + " 例:",
 + "       set terminal emf 'Times Roman Italic' 12",
 + "       set terminal emf color solid    # 面倒な点線など消えてしまえ !"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(emf)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/emxvga.trm term-4.3.0-ja-20071011/emxvga.trm
-*** term-4.3.0-20071011/emxvga.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/emxvga.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/emxvga.trm.ORG term/emxvga.trm
+*** term/emxvga.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/emxvga.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 475,480 ****
 --- 475,481 ----
   #endif /* TERM_PROTO_ONLY */
   #ifdef TERM_HELP
   START_HELP(emxvga)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 emxvga",
   "?commands set terminal emxvga",
   "?set terminal emxvga",
@@ -1625,7 +1801,7 @@ diff -rc term-4.3.0-20071011/emxvga.trm term-4.3.0-ja-20071011/emxvga.trm
   "       set terminal vgal",
   "",
   " The only option is the vesa mode for `emxvesa`, which defaults to G640x480x256."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 emxvga",
 + "?commands set terminal emxvga",
 + "?set terminal emxvga",
@@ -1659,19 +1835,19 @@ diff -rc term-4.3.0-20071011/emxvga.trm term-4.3.0-ja-20071011/emxvga.trm
 + "",
 + " 唯一のオプションは `emxvesa` に対する vesa のモードで、デフォルトでは",
 + " それは G640x480x256 となっています。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(emxvga)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/epson.trm term-4.3.0-ja-20071011/epson.trm
-*** term-4.3.0-20071011/epson.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/epson.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/epson.trm.ORG term/epson.trm
+*** term/epson.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/epson.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 884,889 ****
 --- 884,890 ----
   
   #ifdef TERM_HELP
   START_HELP(epson_180dpi)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 epson-180dpi",
   "?commands set terminal epson-180dpi",
   "?set terminal epson-180dpi",
@@ -1681,7 +1857,7 @@ diff -rc term-4.3.0-20071011/epson.trm term-4.3.0-ja-20071011/epson.trm
   "",
   " With each of these drivers, a binary copy is required on a PC to print.  Do",
   " not use `print`---use instead `copy file /b lpt1:`."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 epson-180dpi",
 + "?commands set terminal epson-180dpi",
 + "?set terminal epson-180dpi",
@@ -1754,19 +1930,19 @@ diff -rc term-4.3.0-20071011/epson.trm term-4.3.0-ja-20071011/epson.trm
 + " これらのドライバのそれぞれで PC 上で印刷する場合はバイナリコピーが必要",
 + " です。`print` を使ってはいけません。その代わりに `copy file /b lpt1:`",
 + " としてください。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(epson_180dpi)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/excl.trm term-4.3.0-ja-20071011/excl.trm
-*** term-4.3.0-20071011/excl.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/excl.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/excl.trm.ORG term/excl.trm
+*** term/excl.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/excl.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 273,278 ****
 --- 273,279 ----
   
   #ifdef TERM_HELP
   START_HELP(excl)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 excl",
   "?commands set terminal excl",
   "?set terminal excl",
@@ -1776,7 +1952,7 @@ diff -rc term-4.3.0-20071011/excl.trm term-4.3.0-ja-20071011/excl.trm
   "?excl",
   " The `excl` terminal driver supports Talaris printers such as the EXCL Laser",
   " printer and the 1590.  It has no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 excl",
 + "?commands set terminal excl",
 + "?set terminal excl",
@@ -1786,19 +1962,19 @@ diff -rc term-4.3.0-20071011/excl.trm term-4.3.0-ja-20071011/excl.trm
 + "?excl",
 + " `excl` ドライバは EXCL レーザープリンターや 1590 のような Talaris プリ",
 + " ンタをサポートします。オプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(excl)
   #endif
-diff -rc term-4.3.0-20071011/fg.trm term-4.3.0-ja-20071011/fg.trm
-*** term-4.3.0-20071011/fg.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/fg.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/fg.trm.ORG term/fg.trm
+*** term/fg.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/fg.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
 *** 414,419 ****
 --- 414,420 ----
   
   #ifdef TERM_HELP
   START_HELP(hercules)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 hercules",
   "?commands set terminal hercules",
   "?set terminal hercules",
@@ -1808,7 +1984,7 @@ diff -rc term-4.3.0-20071011/fg.trm term-4.3.0-ja-20071011/fg.trm
   "?ssvgalib",
   " These drivers supports PC monitors with autodetected graphics boards.  They",
   " can be used only when compiled with Zortech C/C++.  None have options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 hercules",
 + "?commands set terminal hercules",
 + "?set terminal hercules",
@@ -1855,29 +2031,29 @@ diff -rc term-4.3.0-20071011/fg.trm term-4.3.0-ja-20071011/fg.trm
 + " これらのドライバは  PC のモニタをサポートし、グラフィックボードを自動",
 + " 検出します。これらは、gcc, または Zortec C/C++ でコンパイルされた場合",
 + " のみ利用可能です。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(hercules)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/fig.trm term-4.3.0-ja-20071011/fig.trm
-*** term-4.3.0-20071011/fig.trm	2006-12-28 10:16:55.000000000 +0900
---- term-4.3.0-ja-20071011/fig.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/fig.trm.ORG term/fig.trm
+*** term/fig.trm.ORG	2007-12-21 08:49:16.000000000 +0900
+--- term/fig.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
-*** 1196,1201 ****
---- 1196,1202 ----
+*** 1199,1204 ****
+--- 1199,1205 ----
   
   #ifdef TERM_HELP
   START_HELP(fig)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 fig",
   "?commands set terminal fig",
   "?set terminal fig",
 ***************
-*** 1287,1292 ****
---- 1288,1389 ----
+*** 1290,1295 ****
+--- 1291,1392 ----
   "",
   " To plot the error bars on top of the circles use",
   "       plot 'file.dat' using 1:2:3 with err linetype 1 pointtype 2554"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 fig",
 + "?commands set terminal fig",
 + "?set terminal fig",
@@ -1972,30 +2148,30 @@ diff -rc term-4.3.0-20071011/fig.trm term-4.3.0-ja-20071011/fig.trm
 + "",
 + " 円の上にエラーバーを書くには以下のようにしてください。",
 + "       plot 'file.dat' using 1:2:3 with err linetype 1 pointtype 2554"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(fig)
   #endif /* TERM_HELP */
   
-diff -rc term-4.3.0-20071011/gd.trm term-4.3.0-ja-20071011/gd.trm
-*** term-4.3.0-20071011/gd.trm	2007-09-25 11:09:54.000000000 +0900
---- term-4.3.0-ja-20071011/gd.trm	2007-10-11 13:36:41.000000000 +0900
+diff -rc term/gd.trm.ORG term/gd.trm
+*** term/gd.trm.ORG	2007-12-23 16:22:46.000000000 +0900
+--- term/gd.trm	2008-01-08 10:59:20.000000000 +0900
 ***************
-*** 2143,2148 ****
---- 2143,2149 ----
+*** 2145,2150 ****
+--- 2145,2151 ----
   #ifndef JPEG_HELP_ONLY
   #ifdef TERM_HELP
   START_HELP(png)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 png",
   "?commands set terminal png",
   "?set terminal png",
 ***************
-*** 2247,2252 ****
---- 2248,2365 ----
+*** 2249,2254 ****
+--- 2250,2367 ----
   " which uses white for the transparent background, black for borders, dark",
   " gray for axes, and a gray-scale for the six plotting colors.",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 png",
 + "?commands set terminal png",
 + "?set terminal png",
@@ -2106,27 +2282,27 @@ diff -rc term-4.3.0-20071011/gd.trm term-4.3.0-ja-20071011/gd.trm
 + " これは透明化される背景が白で、境界は黒、軸は暗い灰色、描画色はグレイス",
 + " ケールで 6 色を使うことになります。",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(png)
   #endif /* TERM_HELP */
   #endif /* JPEG_HELP_ONLY */
 ***************
-*** 2325,2330 ****
---- 2438,2444 ----
+*** 2327,2332 ****
+--- 2440,2446 ----
   
   #ifdef TERM_HELP
   START_HELP(jpeg)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 jpeg",
   "?commands set terminal jpeg",
   "?set terminal jpeg",
 ***************
-*** 2397,2402 ****
---- 2511,2593 ----
+*** 2399,2404 ****
+--- 2513,2595 ----
   " which searches for a TrueType font with face name 'arial' in the directory",
   " specified by the environment variable GDFONTPATH and large (14pt) font size.",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 jpeg",
 + "?commands set terminal jpeg",
 + "?set terminal jpeg",
@@ -2202,27 +2378,27 @@ diff -rc term-4.3.0-20071011/gd.trm term-4.3.0-ja-20071011/gd.trm
 + " これは、環境変数 GDFONTPATH で指定されたディレクトリにある 'arial' と",
 + " いう名前で大きいサイズ (14pt) TrueType フォントを検索します。",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(jpeg)
   #endif /* TERM_HELP */
   #endif /* HAVE_GD_JPEG */
 ***************
-*** 2501,2506 ****
---- 2692,2698 ----
+*** 2503,2508 ****
+--- 2694,2700 ----
   
   #ifdef TERM_HELP
   START_HELP(gif)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 gif",
   "?commands set terminal gif",
   "?set terminal gif",
 ***************
-*** 2608,2613 ****
---- 2800,2920 ----
+*** 2610,2615 ****
+--- 2802,2923 ----
   " which searches for a TrueType font with face name 'arial' in the directory",
   " specified by the environment variable GDFONTPATH and 14pt font size.",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 gif",
 + "?commands set terminal gif",
 + "?set terminal gif",
@@ -2253,6 +2429,7 @@ diff -rc term-4.3.0-20071011/gd.trm term-4.3.0-ja-20071011/gd.trm
 + " を打つことで見てください。その中から特定の一つをディスクに保存するには",
 + " display ウィンドウ上でマウス左ボタンをクリックして `save` を選択してく",
 + " ださい。",
++ "",
 + " gd library によって次の 5 つの基本フォントが直接サポートされています:",
 + " `tiny` (5x8 ピクセル), `small` (6x12 ピクセル), `medium`, (7x13 Bold),",
 + " `large` (8x16), `giant` (9x15 ピクセル)。これらのフォントは大きさを変",
@@ -2336,20 +2513,20 @@ diff -rc term-4.3.0-20071011/gd.trm term-4.3.0-ja-20071011/gd.trm
 + " これは、環境変数 GDFONTPATH で指定されたディレクトリにある 'arial' と",
 + " いう名前で 14pt のフォントサイズの TrueType フォントを検索します。",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(gif)
   #endif /* TERM_HELP */
   #endif /* HAVE_GD_GIF */
-diff -rc term-4.3.0-20071011/ggi.trm term-4.3.0-ja-20071011/ggi.trm
-*** term-4.3.0-20071011/ggi.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/ggi.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/ggi.trm.ORG term/ggi.trm
+*** term/ggi.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/ggi.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 1504,1509 ****
 --- 1504,1510 ----
   
   #ifdef TERM_HELP
   START_HELP(ggi)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 ggi",
   "?commands set terminal ggi",
   "?set terminal ggi",
@@ -2359,7 +2536,7 @@ diff -rc term-4.3.0-20071011/ggi.trm term-4.3.0-ja-20071011/ggi.trm
   "    set term ggi acc 10",
   "    set term ggi acc 1 mode V1024x768",
   "    set term ggi V1024x768"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 ggi",
 + "?commands set terminal ggi",
 + "?set terminal ggi",
@@ -2394,19 +2571,19 @@ diff -rc term-4.3.0-20071011/ggi.trm term-4.3.0-ja-20071011/ggi.trm
 + "    set term ggi acc 10",
 + "    set term ggi acc 1 mode V1024x768",
 + "    set term ggi V1024x768"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(ggi)
   #endif
-diff -rc term-4.3.0-20071011/gnugraph.trm term-4.3.0-ja-20071011/gnugraph.trm
-*** term-4.3.0-20071011/gnugraph.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/gnugraph.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/gnugraph.trm.ORG term/gnugraph.trm
+*** term/gnugraph.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/gnugraph.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 422,427 ****
 --- 422,428 ----
   #define TERM_HELP_GNUGRAPH
   #ifdef TERM_HELP
   START_HELP(gnugraph)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 Gnugraph(GNU plotutils)",
   "?commands set terminal gnugraph",
   "?set terminal gnugraph",
@@ -2416,7 +2593,7 @@ diff -rc term-4.3.0-20071011/gnugraph.trm term-4.3.0-ja-20071011/gnugraph.trm
   "",
   " There is a non-GNU version of the `gnugraph` driver which cannot be compiled",
   " unless this version is left out."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 Gnugraph(GNU plotutils)",
 + "?commands set terminal gnugraph",
 + "?set terminal gnugraph",
@@ -2447,19 +2624,19 @@ diff -rc term-4.3.0-20071011/gnugraph.trm term-4.3.0-ja-20071011/gnugraph.trm
 + "",
 + " 非 GNU 版の `gnugraph` ドライバもありますが、それは GNU 版のを取り除か",
 + " ないとコンパイルはされません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(gnugraph)
   #endif
-diff -rc term-4.3.0-20071011/gpic.trm term-4.3.0-ja-20071011/gpic.trm
-*** term-4.3.0-20071011/gpic.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/gpic.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/gpic.trm.ORG term/gpic.trm
+*** term/gpic.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/gpic.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 294,299 ****
 --- 294,300 ----
   
   #ifdef TERM_HELP
   START_HELP(gpic)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 gpic",
   "?commands set terminal gpic",
   "?set terminal gpic",
@@ -2469,7 +2646,7 @@ diff -rc term-4.3.0-20071011/gpic.trm term-4.3.0-ja-20071011/gpic.trm
   "       .PS 6.0",
   "       copy \"trig.pic\"",
   "       .PE"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 gpic",
 + "?commands set terminal gpic",
 + "?set terminal gpic",
@@ -2533,19 +2710,19 @@ diff -rc term-4.3.0-20071011/gpic.trm term-4.3.0-ja-20071011/gpic.trm
 + "       .PS 6.0",
 + "       copy \"trig.pic\"",
 + "       .PE"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(gpic)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/gpr.trm term-4.3.0-ja-20071011/gpr.trm
-*** term-4.3.0-20071011/gpr.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/gpr.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/gpr.trm.ORG term/gpr.trm
+*** term/gpr.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/gpr.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 462,467 ****
 --- 462,468 ----
   
   #ifdef TERM_HELP
   START_HELP(gpr)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 gpr",
   "?commands set terminal gpr",
   "?set terminal gpr",
@@ -2555,7 +2732,7 @@ diff -rc term-4.3.0-20071011/gpr.trm term-4.3.0-ja-20071011/gpr.trm
   " for a fixed-size window.  It has no options.",
   "",
   " If a variable window size is desired, use the `apollo` terminal instead."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 gpr",
 + "?commands set terminal gpr",
 + "?set terminal gpr",
@@ -2568,19 +2745,19 @@ diff -rc term-4.3.0-20071011/gpr.trm term-4.3.0-ja-20071011/gpr.trm
 + "",
 + " 色々なサイズのウィンドウが必要なら、`apollo` ドライバを代わりに使用し",
 + " てください。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(gpr)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/grass.trm term-4.3.0-ja-20071011/grass.trm
-*** term-4.3.0-20071011/grass.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/grass.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/grass.trm.ORG term/grass.trm
+*** term/grass.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/grass.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 624,629 ****
 --- 624,630 ----
   
   #ifdef TERM_HELP
   START_HELP(grass)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 grass",
   "?commands set terminal grass",
   "?set terminal grass",
@@ -2590,7 +2767,7 @@ diff -rc term-4.3.0-20071011/grass.trm term-4.3.0-ja-20071011/grass.trm
   " GRASS geographic information system.  Contact grassp-list@moon.cecer.army.mil",
   " for more information.  Pages are written to the current frame of the GRASS",
   " Graphics Window.  There are no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 grass",
 + "?commands set terminal grass",
 + "?set terminal grass",
@@ -2602,19 +2779,19 @@ diff -rc term-4.3.0-20071011/grass.trm term-4.3.0-ja-20071011/grass.trm
 + " ることを可能にします。詳しい情報については grassp-list@moon.cecer.army.mil",
 + " に連絡を取ってください。ページは GRASS グラフウィンドウの現在のフレー",
 + " ムに書かれます。オプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(grass)
   #endif
-diff -rc term-4.3.0-20071011/hp26.trm term-4.3.0-ja-20071011/hp26.trm
-*** term-4.3.0-20071011/hp26.trm	2007-01-17 19:53:34.000000000 +0900
---- term-4.3.0-ja-20071011/hp26.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/hp26.trm.ORG term/hp26.trm
+*** term/hp26.trm.ORG	2007-01-17 19:53:34.000000000 +0900
+--- term/hp26.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 691,696 ****
 --- 691,697 ----
   
   #ifdef TERM_HELP
   START_HELP(hp2623a)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 hp2623a",
   "?commands set terminal hp2623a",
   "?set terminal hp2623a",
@@ -2624,7 +2801,7 @@ diff -rc term-4.3.0-20071011/hp26.trm term-4.3.0-ja-20071011/hp26.trm
   "?hp2623a",
   " The `hp2623a` terminal driver supports the Hewlett Packard HP2623A.  It has",
   " no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 hp2623a",
 + "?commands set terminal hp2623a",
 + "?set terminal hp2623a",
@@ -2634,19 +2811,19 @@ diff -rc term-4.3.0-20071011/hp26.trm term-4.3.0-ja-20071011/hp26.trm
 + "?hp2623a",
 + " `hp2623a` ドライバはヒューレットパッカード (Hewlett Packard) HP2623A",
 + " をサポートします。オプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(hp2623a)
   #endif
-diff -rc term-4.3.0-20071011/hp2648.trm term-4.3.0-ja-20071011/hp2648.trm
-*** term-4.3.0-20071011/hp2648.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/hp2648.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/hp2648.trm.ORG term/hp2648.trm
+*** term/hp2648.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/hp2648.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 188,193 ****
 --- 188,194 ----
   
   #ifdef TERM_HELP
   START_HELP(hp2648)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 hp2648",
   "?commands set terminal hp2648",
   "?set terminal hp2648",
@@ -2656,7 +2833,7 @@ diff -rc term-4.3.0-20071011/hp2648.trm term-4.3.0-ja-20071011/hp2648.trm
   "?hp2648",
   " The `hp2648` terminal driver supports the Hewlett Packard HP2647 and HP2648.",
   " It has no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 hp2648",
 + "?commands set terminal hp2648",
 + "?set terminal hp2648",
@@ -2666,19 +2843,19 @@ diff -rc term-4.3.0-20071011/hp2648.trm term-4.3.0-ja-20071011/hp2648.trm
 + "?hp2648",
 + " `hp2648` ドライバはヒューレットパッカード (Hewlett Packard) HP2647 と",
 + " HP2648 をサポートします。オプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(hp2648)
   #endif
-diff -rc term-4.3.0-20071011/hp500c.trm term-4.3.0-ja-20071011/hp500c.trm
-*** term-4.3.0-20071011/hp500c.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/hp500c.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/hp500c.trm.ORG term/hp500c.trm
+*** term/hp500c.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/hp500c.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 527,532 ****
 --- 527,533 ----
   
   #ifdef TERM_HELP
   START_HELP(hp500c)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 hp500c",
   "?commands set terminal hp500c",
   "?set terminal hp500c",
@@ -2688,7 +2865,7 @@ diff -rc term-4.3.0-20071011/hp500c.trm term-4.3.0-ja-20071011/hp500c.trm
   " or \"tiff\".  Any other inputs are replaced by the defaults, which are 75 dpi",
   " and no compression.  Rasterization at the higher resolutions may require a",
   " large amount of memory."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 hp500c",
 + "?commands set terminal hp500c",
 + "?set terminal hp500c",
@@ -2707,19 +2884,19 @@ diff -rc term-4.3.0-20071011/hp500c.trm term-4.3.0-ja-20071011/hp500c.trm
 + " inch) で、`comp` は \"rle\" か \"tiff\" です。他の設定をするとそれはデフォ",
 + " ルトの値になります。デフォルトは 75 dpi で圧縮はなしです。高解像度での",
 + " ラスタライズはたくさんのメモリを必要とします。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(hp500c)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/hpgl.trm term-4.3.0-ja-20071011/hpgl.trm
-*** term-4.3.0-20071011/hpgl.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/hpgl.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/hpgl.trm.ORG term/hpgl.trm
+*** term/hpgl.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/hpgl.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 2610,2615 ****
 --- 2610,2616 ----
   #endif /* TERM_PROTO_ONLY */
   #ifdef TERM_HELP
   START_HELP(hpgl)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 hpgl",
   "?commands set terminal hpgl",
   "?set terminal hpgl",
@@ -2729,7 +2906,7 @@ diff -rc term-4.3.0-20071011/hpgl.trm term-4.3.0-ja-20071011/hpgl.trm
   " to bother with `set encoding`.",
   "",
   " HPGL graphics can be imported by many software packages."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 hpgl",
 + "?commands set terminal hpgl",
 + "?set terminal hpgl",
@@ -2809,19 +2986,19 @@ diff -rc term-4.3.0-20071011/hpgl.trm term-4.3.0-ja-20071011/hpgl.trm
 + "",
 + " HPGL グラフィックは多くのソフトウェアパッケージで取り込むことが可能で",
 + " す。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(hpgl)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/hpljii.trm term-4.3.0-ja-20071011/hpljii.trm
-*** term-4.3.0-20071011/hpljii.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/hpljii.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/hpljii.trm.ORG term/hpljii.trm
+*** term/hpljii.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/hpljii.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 401,406 ****
 --- 401,407 ----
   
   #ifdef TERM_HELP
   START_HELP(hpljii)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 hpljii",
   "?commands set terminal hpljii",
   "?set terminal hpljii",
@@ -2831,7 +3008,7 @@ diff -rc term-4.3.0-20071011/hpljii.trm term-4.3.0-ja-20071011/hpljii.trm
   "",
   " The `hp500c` terminal is similar to `hpdj`; `hp500c` additionally supports",
   " color and compression."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 hpljii",
 + "?commands set terminal hpljii",
 + "?set terminal hpljii",
@@ -2858,19 +3035,19 @@ diff -rc term-4.3.0-20071011/hpljii.trm term-4.3.0-ja-20071011/hpljii.trm
 + "",
 + " `hp500c` ドライバは `hpdj` とほぼ同じですが、`hp500c` は加えてカラーと",
 + " 圧縮もサポートしています。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(hpljii)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/hppj.trm term-4.3.0-ja-20071011/hppj.trm
-*** term-4.3.0-20071011/hppj.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/hppj.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/hppj.trm.ORG term/hppj.trm
+*** term/hppj.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/hppj.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 273,278 ****
 --- 273,279 ----
   
   #ifdef TERM_HELP
   START_HELP(hppj)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 hppj",
   "?commands set terminal hppj",
   "?set terminal hppj",
@@ -2880,7 +3057,7 @@ diff -rc term-4.3.0-20071011/hppj.trm term-4.3.0-ja-20071011/hppj.trm
   "       set terminal hppj {FNT5X9 | FNT9X17 | FNT13X25}",
   "",
   " with the middle-sized font (FNT9X17) being the default."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 hppj",
 + "?commands set terminal hppj",
 + "?set terminal hppj",
@@ -2895,19 +3072,19 @@ diff -rc term-4.3.0-20071011/hppj.trm term-4.3.0-ja-20071011/hppj.trm
 + "       set terminal hppj {FNT5X9 | FNT9X17 | FNT13X25}",
 + "",
 + " 中間サイズフォント (FNT9X17) がデフォルトです。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(hppj)
   #endif
-diff -rc term-4.3.0-20071011/imagen.trm term-4.3.0-ja-20071011/imagen.trm
-*** term-4.3.0-20071011/imagen.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/imagen.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/imagen.trm.ORG term/imagen.trm
+*** term/imagen.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/imagen.trm	2008-01-08 10:59:21.000000000 +0900
 ***************
 *** 886,891 ****
 --- 886,892 ----
   
   #ifdef TERM_HELP
   START_HELP(imagen)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 imagen",
   "?commands set terminal imagen",
   "?set terminal imagen",
@@ -2917,7 +3094,7 @@ diff -rc term-4.3.0-20071011/imagen.trm term-4.3.0-ja-20071011/imagen.trm
   "       set terminal imagen portrait [2,3]",
   "",
   " puts six graphs on the page in three rows of two in portrait orientation."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 imagen",
 + "?commands set terminal imagen",
 + "?set terminal imagen",
@@ -2941,19 +3118,19 @@ diff -rc term-4.3.0-20071011/imagen.trm term-4.3.0-ja-20071011/imagen.trm
 + "",
 + " これは、1 ページに 6 つのグラフを横に 2 列、縦に 3 列、縦置き (portrait)",
 + " で配置します。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(imagen)
   #endif
-diff -rc term-4.3.0-20071011/kyo.trm term-4.3.0-ja-20071011/kyo.trm
-*** term-4.3.0-20071011/kyo.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/kyo.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/kyo.trm.ORG term/kyo.trm
+*** term/kyo.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/kyo.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 204,209 ****
 --- 204,210 ----
   
   #ifdef TERM_HELP
   START_HELP(kyo)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 kyo",
   "?commands set terminal kyo",
   "?set terminal kyo",
@@ -2963,7 +3140,7 @@ diff -rc term-4.3.0-20071011/kyo.trm term-4.3.0-ja-20071011/kyo.trm
   " The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.",
   " The only difference between the two is that `kyo` uses \"Helvetica\" whereas",
   " `prescribe` uses \"Courier\".  There are no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 kyo",
 + "?commands set terminal kyo",
 + "?set terminal kyo",
@@ -2981,19 +3158,19 @@ diff -rc term-4.3.0-20071011/kyo.trm term-4.3.0-ja-20071011/kyo.trm
 + " サポートします。この両者の唯一の違いは、`kyo` が \"Helvetica\" を使うの",
 + " に対して `prescribe` が \"Courier\" を使うことだけです。オプションはあり",
 + " ません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(kyo)
   #endif
-diff -rc term-4.3.0-20071011/latex.trm term-4.3.0-ja-20071011/latex.trm
-*** term-4.3.0-20071011/latex.trm	2007-05-28 09:17:19.000000000 +0900
---- term-4.3.0-ja-20071011/latex.trm	2007-10-11 13:36:42.000000000 +0900
+diff -rc term/latex.trm.ORG term/latex.trm
+*** term/latex.trm.ORG	2007-05-28 09:17:19.000000000 +0900
+--- term/latex.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 921,926 ****
 --- 921,927 ----
   
   #ifdef TERM_HELP
   START_HELP(latex)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 latex",
   "?commands set terminal emtex",
   "?set terminal emtex",
@@ -3003,7 +3180,7 @@ diff -rc term-4.3.0-20071011/latex.trm term-4.3.0-ja-20071011/latex.trm
   "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
   " The other label -- account for long ticlabels:",
   "        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 latex",
 + "?commands set terminal emtex",
 + "?set terminal emtex",
@@ -3060,19 +3237,19 @@ diff -rc term-4.3.0-20071011/latex.trm term-4.3.0-ja-20071011/latex.trm
 + "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
 + " 他の見出し -- 目盛りの長い見出しに対する見積り:",
 + "        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(latex)
   #endif /* TERM_TABLE */
-diff -rc term-4.3.0-20071011/linux.trm term-4.3.0-ja-20071011/linux.trm
-*** term-4.3.0-20071011/linux.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/linux.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/linux.trm.ORG term/linux.trm
+*** term/linux.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/linux.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 336,341 ****
 --- 336,342 ----
   
   #ifdef TERM_HELP
   START_HELP(linux)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 linux",
   "?commands set terminal linux",
   "?set terminal linux",
@@ -3082,7 +3259,7 @@ diff -rc term-4.3.0-20071011/linux.trm term-4.3.0-ja-20071011/linux.trm
   " environment variable GSVGAMODE for the default mode; if not set, it uses",
   " 1024x768x256 as default mode or, if that is not possible, 640x480x16",
   " (standard VGA)."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 linux",
 + "?commands set terminal linux",
 + "?set terminal linux",
@@ -3094,19 +3271,19 @@ diff -rc term-4.3.0-20071011/linux.trm term-4.3.0-ja-20071011/linux.trm
 + " トのモード用に環境変数 GSVGAMODE を参照します。もしそれが設定されてい",
 + " なければ 1024x768x256 をデフォルトとして使用しますが、それができなけれ",
 + " ば 640x480x16 (標準の VGA) とします。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(linux)
   #endif
-diff -rc term-4.3.0-20071011/mac.trm term-4.3.0-ja-20071011/mac.trm
-*** term-4.3.0-20071011/mac.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/mac.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/mac.trm.ORG term/mac.trm
+*** term/mac.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/mac.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 137,142 ****
 --- 137,143 ----
   
   #ifdef TERM_HELP
   START_HELP(mac)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 macintosh",
   "?set terminal macintosh",
   "?set term macintosh",
@@ -3116,7 +3293,7 @@ diff -rc term-4.3.0-20071011/mac.trm term-4.3.0-ja-20071011/mac.trm
   "  to multiwin, generate some graphs, and then switch to singlewin again, the",
   "  orginal 'singlewin' window will be resused if it is still open. Otherwise",
   "  a new 'singlewin' window will be created. The 'singlewin' window is not numbered."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 macintosh",
 + "?set terminal macintosh",
 + "?set term macintosh",
@@ -3151,19 +3328,19 @@ diff -rc term-4.3.0-20071011/mac.trm term-4.3.0-ja-20071011/mac.trm
 + "  もし元の 'singlewin' ウィンドウがまだ開いていればそれが使われ、そうで",
 + "  なければ新しい 'singlewin' ウィンドウが作られます。'singlewin' ウィン",
 + "  ドウは番号付けはされません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(mac)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/metafont.trm term-4.3.0-ja-20071011/metafont.trm
-*** term-4.3.0-20071011/metafont.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/metafont.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/metafont.trm.ORG term/metafont.trm
+*** term/metafont.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/metafont.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 540,545 ****
 --- 540,546 ----
   
   #ifdef TERM_HELP
   START_HELP(mf)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 mf",
   "?commands set terminal mf",
   "?set terminal mf",
@@ -3173,7 +3350,7 @@ diff -rc term-4.3.0-20071011/metafont.trm term-4.3.0-ja-20071011/metafont.trm
   " saves a lot of TeX memory.  One last advantage of using the METAFONT driver",
   " is that the DVI file really remains device independent, because no \\special",
   " commands are used as in the eepic and tpic drivers."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 mf",
 + "?commands set terminal mf",
 + "?set terminal mf",
@@ -3270,19 +3447,19 @@ diff -rc term-4.3.0-20071011/metafont.trm term-4.3.0-ja-20071011/metafont.trm
 + " う最後の一つの利点は、生成される DVI ファイルが本来のデバイス非依存な",
 + " 形になるということです。それは eepic や tpic ドライバのような \\special",
 + " コマンドを全く使わないからです。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(mf)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/metapost.trm term-4.3.0-ja-20071011/metapost.trm
-*** term-4.3.0-20071011/metapost.trm	2007-02-23 10:02:32.000000000 +0900
---- term-4.3.0-ja-20071011/metapost.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/metapost.trm.ORG term/metapost.trm
+*** term/metapost.trm.ORG	2007-12-21 08:49:16.000000000 +0900
+--- term/metapost.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 992,997 ****
 --- 992,998 ----
   
   #ifdef TERM_HELP
   START_HELP(mp)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 mp",
   "?commands set terminal mpost",
   "?set terminal mp",
@@ -3292,7 +3469,7 @@ diff -rc term-4.3.0-20071011/metapost.trm term-4.3.0-ja-20071011/metapost.trm
   " built-in size changing commands can be used for maximum flexibility. Be sure",
   " to set the appropriate MP configuration variable to force Metapost to run",
   " LaTeX instead of plainTeX."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 mp",
 + "?commands set terminal mpost",
 + "?set terminal mp",
@@ -3486,19 +3663,19 @@ diff -rc term-4.3.0-20071011/metapost.trm term-4.3.0-ja-20071011/metapost.trm
 + " 最大の柔軟性を発揮できるでしょう。ただし、Metapost に plainTeX でなく",
 + " LaTeX を実行させるよう、適切な MP 設定変数を設定することを忘れないでく",
 + " ださい。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(mp)
   #endif				/* TERM_HELP */
-diff -rc term-4.3.0-20071011/mgr.trm term-4.3.0-ja-20071011/mgr.trm
-*** term-4.3.0-20071011/mgr.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/mgr.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/mgr.trm.ORG term/mgr.trm
+*** term/mgr.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/mgr.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 232,237 ****
 --- 232,238 ----
   
   #ifdef TERM_HELP
   START_HELP(mgr)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 mgr",
   "?commands set terminal mgr",
   "?set terminal mgr",
@@ -3508,7 +3685,7 @@ diff -rc term-4.3.0-20071011/mgr.trm term-4.3.0-ja-20071011/mgr.trm
   "?term mgr",
   "?mgr",
   " The `mgr` terminal driver supports the Mgr Window system.  It has no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 mgr",
 + "?commands set terminal mgr",
 + "?set terminal mgr",
@@ -3518,19 +3695,19 @@ diff -rc term-4.3.0-20071011/mgr.trm term-4.3.0-ja-20071011/mgr.trm
 + "?mgr",
 + " `mgr` ドライバは Mgr ウィンドウシステムをサポートします。オプションは",
 + " ありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(mgr)
   #endif
-diff -rc term-4.3.0-20071011/mif.trm term-4.3.0-ja-20071011/mif.trm
-*** term-4.3.0-20071011/mif.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/mif.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/mif.trm.ORG term/mif.trm
+*** term/mif.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/mif.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 965,970 ****
 --- 965,971 ----
   
   #ifdef TERM_HELP
   START_HELP(mif)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 mif",
   "?commands set terminal mif",
   "?set terminal mif",
@@ -3540,7 +3717,7 @@ diff -rc term-4.3.0-20071011/mif.trm term-4.3.0-ja-20071011/mif.trm
   "       set term mif                     # defaults",
   "       set term mif vectors",
   "       set term mif help"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 mif",
 + "?commands set terminal mif",
 + "?set terminal mif",
@@ -3573,19 +3750,19 @@ diff -rc term-4.3.0-20071011/mif.trm term-4.3.0-ja-20071011/mif.trm
 + "       set term mif                     # デフォルト",
 + "       set term mif vectors",
 + "       set term mif help"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(mif)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/multitos.trm term-4.3.0-ja-20071011/multitos.trm
-*** term-4.3.0-20071011/multitos.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/multitos.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/multitos.trm.ORG term/multitos.trm
+*** term/multitos.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/multitos.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 407,412 ****
 --- 407,413 ----
   
   #ifdef TERM_HELP
   START_HELP(mtos)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 mtos",
   "?commands set terminal mtos",
   "?set terminal mtos",
@@ -3595,7 +3772,7 @@ diff -rc term-4.3.0-20071011/multitos.trm term-4.3.0-ja-20071011/multitos.trm
   " The `mtos` terminal has no options.  It sends data via a pipe to an external",
   " program called GPCLIENT.  It runs under MULTITOS, Magic 3.x, MagicMAC. and",
   " MiNT.  If you cannot find GPCLIENT, than mail to dirk@lstm.uni-erlangen.de."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 mtos",
 + "?commands set terminal mtos",
 + "?set terminal mtos",
@@ -3607,19 +3784,19 @@ diff -rc term-4.3.0-20071011/multitos.trm term-4.3.0-ja-20071011/multitos.trm
 + " いう外部プログラムにパイプ経由で渡します。それは MULTIOS, Magic 3.x,",
 + " MagicMAC, MiNT 上で動作します。もし GPCLIENT を見つけられなかったら、",
 + " dirk@lstm.uni-erlangen.de へメールしてください。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(mtos)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/next.trm term-4.3.0-ja-20071011/next.trm
-*** term-4.3.0-20071011/next.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/next.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/next.trm.ORG term/next.trm
+*** term/next.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/next.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 1501,1506 ****
 --- 1501,1507 ----
   
   #ifdef TERM_HELP
   START_HELP(next)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 next",
   "?commands set terminal next",
   "?set terminal next",
@@ -3629,7 +3806,7 @@ diff -rc term-4.3.0-20071011/next.trm term-4.3.0-ja-20071011/next.trm
   "       set term next old",
   "",
   " Pointsizes may be changed with `set linestyle`."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 next",
 + "?commands set terminal next",
 + "?set terminal next",
@@ -3661,20 +3838,20 @@ diff -rc term-4.3.0-20071011/next.trm term-4.3.0-ja-20071011/next.trm
 + "       set term next old",
 + "",
 + " 点の大きさは `set linestyle` で変更できます。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(next)
   #endif /* TERM_HELP */
   
-diff -rc term-4.3.0-20071011/openstep.trm term-4.3.0-ja-20071011/openstep.trm
-*** term-4.3.0-20071011/openstep.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/openstep.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/openstep.trm.ORG term/openstep.trm
+*** term/openstep.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/openstep.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 1373,1378 ****
 --- 1373,1379 ----
   
   #ifdef TERM_HELP
   START_HELP(openstep)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 Openstep (next)",
   #ifndef TERM_HELP_OPENSTEP
   "?commands set terminal openstep",
@@ -3684,7 +3861,7 @@ diff -rc term-4.3.0-20071011/openstep.trm term-4.3.0-ja-20071011/openstep.trm
   "       set term openstep old",
   "",
   " Pointsizes may be changed with `set linestyle`."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 Openstep (next)",
 + #ifndef TERM_HELP_OPENSTEP
 + "?commands set terminal openstep",
@@ -3723,20 +3900,20 @@ diff -rc term-4.3.0-20071011/openstep.trm term-4.3.0-ja-20071011/openstep.trm
 + "       set term openstep old",
 + "",
 + " 点の大きさは `set linestyle` で変更できます。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(openstep)
   #endif /* TERM_HELP */
   
-diff -rc term-4.3.0-20071011/pbm.trm term-4.3.0-ja-20071011/pbm.trm
-*** term-4.3.0-20071011/pbm.trm	2006-11-24 08:28:58.000000000 +0900
---- term-4.3.0-ja-20071011/pbm.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/pbm.trm.ORG term/pbm.trm
+*** term/pbm.trm.ORG	2006-11-24 08:28:58.000000000 +0900
+--- term/pbm.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 482,487 ****
 --- 482,488 ----
   
   #ifdef TERM_HELP
   START_HELP(pbm)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 pbm",
   "?commands set terminal pbm",
   "?set terminal pbm",
@@ -3746,7 +3923,7 @@ diff -rc term-4.3.0-20071011/pbm.trm term-4.3.0-ja-20071011/pbm.trm
   "       set terminal pbm small monochrome                # defaults",
   "       set terminal pbm color medium size 800,600",
   "       set output '| pnmrotate 45 | pnmtopng > tilted.png'  # uses NETPBM"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 pbm",
 + "?commands set terminal pbm",
 + "?set terminal pbm",
@@ -3779,19 +3956,19 @@ diff -rc term-4.3.0-20071011/pbm.trm term-4.3.0-ja-20071011/pbm.trm
 + "       set terminal pbm small monochrome                # デフォルト",
 + "       set terminal pbm color medium size 800,600",
 + "       set output '| pnmrotate 45 | pnmtopng > tilted.png'  # NETPBM を利用"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(pbm)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/pc.trm term-4.3.0-ja-20071011/pc.trm
-*** term-4.3.0-20071011/pc.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/pc.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/pc.trm.ORG term/pc.trm
+*** term/pc.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/pc.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 546,551 ****
 --- 546,552 ----
   
   #ifdef TERM_HELP
   START_HELP(dospc)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 dospc",
   "?commands set terminal dospc",
   "?set terminal dospc",
@@ -3801,7 +3978,7 @@ diff -rc term-4.3.0-20071011/pc.trm term-4.3.0-ja-20071011/pc.trm
   " The `dospc` terminal driver supports PCs with arbitrary graphics boards,",
   " which will be automatically detected.  It should be used only if you are",
   " not using the gcc or Zortec C/C++ compilers."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 dospc",
 + "?commands set terminal dospc",
 + "?set terminal dospc",
@@ -3812,29 +3989,29 @@ diff -rc term-4.3.0-20071011/pc.trm term-4.3.0-ja-20071011/pc.trm
 + " `dospc` ドライバは  PC の任意のグラフィックボードをサポートし、それら",
 + " を自動検出します。これは、gcc, または Zortec C/C++ コンパイラを使って",
 + " いないときのみ利用可能です。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(dospc)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/pdf.trm term-4.3.0-ja-20071011/pdf.trm
-*** term-4.3.0-20071011/pdf.trm	2007-02-28 09:53:25.000000000 +0900
---- term-4.3.0-ja-20071011/pdf.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/pdf.trm.ORG term/pdf.trm
+*** term/pdf.trm.ORG	2008-01-08 08:47:56.000000000 +0900
+--- term/pdf.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
-*** 1675,1680 ****
---- 1675,1681 ----
+*** 1693,1698 ****
+--- 1693,1699 ----
   
   #ifdef TERM_HELP
   START_HELP(pdf)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 pdf",
   "?commands set terminal pdf",
   "?set terminal pdf",
 ***************
-*** 1718,1722 ****
---- 1719,1769 ----
+*** 1736,1740 ****
+--- 1737,1787 ----
   " changes this to whatever the user requests. By default the X and Y sizes",
   " are taken to be in inches, but other units are possible (currently only cm).",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 pdf",
 + "?commands set terminal pdf",
 + "?set terminal pdf",
@@ -3879,19 +4056,19 @@ diff -rc term-4.3.0-20071011/pdf.trm term-4.3.0-ja-20071011/pdf.trm
 + " は、これをユーザの指定するものへ変更します。デフォルトの X, Y サイズの",
 + " 単位はインチですが、他の単位も使用可能です (現在は cm のみ)。",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(pdf)
   #endif
-diff -rc term-4.3.0-20071011/pm.trm term-4.3.0-ja-20071011/pm.trm
-*** term-4.3.0-20071011/pm.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/pm.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/pm.trm.ORG term/pm.trm
+*** term/pm.trm.ORG	2007-11-15 09:00:06.000000000 +0900
+--- term/pm.trm	2008-01-08 10:59:22.000000000 +0900
 ***************
 *** 1284,1289 ****
 --- 1284,1290 ----
   
   #ifdef TERM_HELP
   START_HELP(pm)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 pm",
   "?commands set terminal pm",
   "?set terminal pm",
@@ -3901,7 +4078,7 @@ diff -rc term-4.3.0-20071011/pm.trm term-4.3.0-ja-20071011/pm.trm
   " the optional numerical argument.",
   "",
   " Linewidths may be changed with `set linestyle`."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 pm",
 + "?commands set terminal pm",
 + "?set terminal pm",
@@ -3918,47 +4095,47 @@ diff -rc term-4.3.0-20071011/pm.trm term-4.3.0-ja-20071011/pm.trm
 + " 書式:",
 + "       set terminal pm {server {n}} {persist} {widelines} {enhanced} {\"title\"}",
 + "",
-+ " `persist` が指定されると、各グラフはそれぞれ自身のウィンドウを持ち、そ",
-+ " のすべてのウィンドウは `gnuplot` が終了した後も開いたままになります。",
-+ " `server` が指定されると、全てのグラフは同じウィンドウ内に現われ、それ",
-+ " は `gnuplot` 終了後も開いたままになります。このオプションは、さらに追",
-+ " 加の数引数を取り、その数字はサーバプロセスのインスタンスになります。よ",
-+ " って、同時に複数のサーバウィンドウを使うことができます。",
++ " `persist` を指定すると、各グラフはそれぞれ自身のウィンドウを持ち、その",
++ " すべてのウィンドウは `gnuplot` が終了した後も開いたままになります。",
++ " `server` を指定すると、全てのグラフは同じウィンドウ内に現われ、それは",
++ " `gnuplot` 終了後も開いたままになります。このオプションは、さらに追加の",
++ " 数引数を取り、その数字はサーバプロセスのインスタンスになります。よって",
++ " 同時に複数のサーバウィンドウを使うことができます。",
 + "",
-+ " `widelines` が指定されると、全てのグラフは幅の広い線で描かれます。",
-+ " `enhanced` が指定されると `enhanced postscript` オプション (詳細は",
-+ " `set terminal postscript enhanced` 参照) と同じ書式で上付き文字や下付",
-+ " き文字、複数のフォントを使うことができます。基本的な PostScript フォン",
-+ " トのフォント名は 1 文字に省略できます。",
++ " `widelines` を指定すると、全てのグラフは幅の広い線で描かれます。",
++ " `enhanced` を指定すると、上付き文字や下付き文字、複数のフォントを使う",
++ " ことができます (詳細は `enhanced text` を参照)。コア PostScript フォン",
++ " トのフォント名は 1 文字に省略できます",
++ " (T/H/C/S はそれぞれ Times/Helvetica/Courier/Symbol を意味します)。",
 + "",
-+ " `title` が指定されると、それは描画ウィンドウのタイトルとして使われます。",
++ " `title` を指定すると、それは描画ウィンドウのタイトルとして使われます。",
 + " それはサーバインスタンス名としても使われ、それは追加の数引数を上書きし",
 + " ます。",
 + "",
 + " 線の幅は `set linestyle` で変更できます。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(pm)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/post.trm term-4.3.0-ja-20071011/post.trm
-*** term-4.3.0-20071011/post.trm	2007-06-08 14:31:39.000000000 +0900
---- term-4.3.0-ja-20071011/post.trm	2007-10-11 13:36:43.000000000 +0900
+diff -rc term/post.trm.ORG term/post.trm
+*** term/post.trm.ORG	2008-01-07 16:32:07.000000000 +0900
+--- term/post.trm	2008-01-08 10:59:23.000000000 +0900
 ***************
-*** 3295,3300 ****
---- 3295,3301 ----
+*** 3551,3556 ****
+--- 3551,3557 ----
    * of "text" that is necessary to avoid errors.
    */
   START_HELP(00psglobal)
-+ #if 0
++ #ifndef JAPANESE_DOC
   #define PS_COMMON_OPTS1 \
   "                               {level1 | leveldefault}",\
   "                               {color | colour | monochrome}",\
 ***************
-*** 3361,3369 ****
---- 3362,3441 ----
+*** 3617,3625 ****
+--- 3618,3697 ----
   " actual limits of the plot.",\
   "",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + #define PS_COMMON_OPTS1 \
 + "                               {level1 | leveldefault}",\
 + "                               {color | colour | monochrome}",\
@@ -4027,21 +4204,21 @@ diff -rc term-4.3.0-20071011/post.trm term-4.3.0-ja-20071011/post.trm
 + " 画の限界に対応していませんでした。",\
 + "",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(00psglobal)
   
   START_HELP(epslatex)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 epslatex",
   "?commands set terminal epslatex",
   "?set terminal epslatex",
 ***************
-*** 3531,3539 ****
---- 3603,3787 ----
+*** 3787,3795 ****
+--- 3859,4043 ----
   " by the `header` command.  Thus, you can use `header` to overwrite some of",
   " settings performed using \"gnuplot.cfg\"",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 epslatex",
 + "?commands set terminal epslatex",
 + "?set terminal epslatex",
@@ -4215,21 +4392,21 @@ diff -rc term-4.3.0-20071011/post.trm term-4.3.0-ja-20071011/post.trm
 + " に読み込まれます。よって、\"gnuplot.cfg\" で行なわれる設定のいくつかを",
 + " `header` を使って上書きすることができます。",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(epslatex)
   
   START_HELP(pslatex)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 pslatex and pstex",
   "?commands set terminal pslatex",
   "?set terminal pslatex",
 ***************
-*** 3613,3621 ****
---- 3861,3949 ----
+*** 3869,3877 ****
+--- 4117,4205 ----
   "",
   " Linewidths and pointsizes may be changed with `set style line`."
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 pslatex and pstex",
 + "?commands set terminal pslatex",
 + "?set terminal pslatex",
@@ -4307,21 +4484,21 @@ diff -rc term-4.3.0-20071011/post.trm term-4.3.0-ja-20071011/post.trm
 + "",
 + " 線幅と点の大きさは `set style line` で変更できます。",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(pslatex)
   
   START_HELP(post)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 postscript",
   "?commands set terminal postscript",
   "?set terminal postscript",
 ***************
-*** 3964,3968 ****
---- 4292,4644 ----
-  " gnuplot command `set loadpath`. See `set loadpath`.",
+*** 4134,4138 ****
+--- 4462,4729 ----
+  " other fonts you may have to try both settings.  See also `fontfile`.",
   "",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 postscript",
 + "?commands set terminal postscript",
 + "?set terminal postscript",
@@ -4406,112 +4583,6 @@ diff -rc term-4.3.0-20071011/post.trm term-4.3.0-ja-20071011/post.trm
 + " PostScript ファイルは編集可能で、一度 `gnuplot` でそれを作れば、それを",
 + " 望むように修正することは自由に行なえます。`editing postscript` の節を",
 + " 参照すればそのためのヒントがいくつか得られるでしょう。",
-+ "2 enhanced postscript",
-+ "?commands set terminal postscript enhanced",
-+ "?set terminal postscript enhanced",
-+ "?set term postscript enhanced",
-+ "?terminal postscript enhanced",
-+ "?term postscript enhanced",
-+ "?enhanced_postscript",
-+ "?enhanced postscript",
-+ "?Enhanced postscript",
-+ "?enhanced text",
-+ "?Enhanced text",
-+ "?enhanced",
-+ " いくつかの出力形式では拡張テキストモードをサポートしていて、これはテキ",
-+ " スト文字列中に文書整形情報を追加して埋め込みます。",
-+ "",
-+ "@start table - 最初は対話型テキスト形式",
-+ "  制御記号     例              説明",
-+ "   ^           a^x             上付き文字",
-+ "   _           a_x             下付き文字",
-+ "   @           @x or a@^b_c    空ボックス (幅がない)",
-+ "   &           &{space}        指定した長さのスペースを挿入",
-+ "   ~           ~a{.8-}         'a' の上に '-' を、現在のフォントサイズの",
-+ "                               .8 倍持ち上げた位置に重ね書き",
-+ "#\\begin{tabular}{|ccl|} \\hline",
-+ "#\\multicolumn{3}{|c|}{拡張テキスト制御記号} \\\\ \\hline",
-+ "#制御記号 & 例 & 説明 \\\\ \\hline",
-+ "#\\verb~^~ & \\verb~a^x~ & 上付き文字\\\\",
-+ "#\\verb~_~ & \\verb~a_x~ & 下付き文字\\\\",
-+ "#\\verb~@~ & \\verb~@x or a@^b_c~ & 空ボックス (幅がない)\\\\",
-+ "#\\verb~&~ & \\verb~&{space}~ & 指定した長さのスペースを挿入\\\\",
-+ "#\\verb|~| & \\verb|~a{.8-}| & 'a' の上に '-' を、現在のフォントサイズの\\\\",
-+ "#\\verb~ ~ & \\verb~ ~ & .8 倍持ち上げた位置に重ね書き\\\\",
-+ "%c c l .",
-+ "%.TE", /* ugly - doc2ms uses @ for column separator, but here we */
-+ "%.TS", /* need @ in table, so end and restart the table ! */
-+ "%center box tab ($) ;",
-+ "%c c l .",
-+ "%制御記号$例$説明",
-+ "%_",
-+ "%^$a^x$上付き文字",
-+ "%\\&_$a\\&_x$下付き文字",
-+ "% @ $ @x or a\\&@^b\\&_c$空ボックス (幅がない)",
-+ "% & $ &{space}$指定した長さのスペースを挿入",
-+ "% ~ $ ~a{.8-}$'a' の上に '-' を、現在のフォントサイズの",
-+ "%   $   $.8 倍持ち上げた位置に重ね書き",
-+ "@end table",
-+ "",
-+ " 中カッコは一文字が期待される箇所に複数の文字を書く場合に使われます (例",
-+ " えば 2^{10})。フォント、およびそのサイズを変更するには、以下の形式を使",
-+ " ってください: {/[fontname][=fontsize | *fontscale] text} よって、例え",
-+ " ば {/Symbol=20 G} は 20 ポイントのガンマに、{/*0.75 K} は現在の有効な",
-+ " フォントサイズの 3/4 の大きさの K になります (文字 '/' は、必ず '{' の",
-+ " 後ろの最初の文字でなくてはなりません)。",
-+ "",
-+ " `set encoding` によって文字エンコード系が変更されている場合、'/' の次",
-+ " に '-' を書くとデフォルトの文字エンコード系が代わりに使われます。しか",
-+ " し、これは Symbol フォントを使う場合は必要ありません。それは /Symbol",
-+ " は自分自身のエンコード系を使い、`gnuplot` は他のエンコーディング系をそ",
-+ " れには適用しないからです。",
-+ "",
-+ " 空ボックス (phantom box) は a@^b_c の上付き文字と下付き文字を揃えると",
-+ " きに有用ですが、文字にアクセント記号を重ねる場合にはうまく働きません",
-+ " (後者を行なうには `set encoding iso_8859_1` で ISO Latin-1 エンコーデ",
-+ " ィング系に変更し、そこに含まれるたくさんの種類のアクセントや他のダイア",
-+ " クリティカルマークのついた文字を利用する方がいいでしょう)。そのボック",
-+ " スはスペーシングが行なわれないので、ボックス内 (つまり @ の後ろ) の上",
-+ " 付き文字や下付き文字を短く出力するのに適しています。",
-+ "",
-+ " ある文字列と同じ長さのスペースを文字 '&' を使うことで入れることができ",
-+ " ます。すなわち、",
-+ "         'abc&{def}ghi'",
-+ " は以下を生成します (abc と ghi の間は 3 文字分の空白):",
-+ "         'abc   ghi'",
-+ "",
-+ " 文字 '~' は、次の文字、またはカッコで囲まれた文字列に、それに続く文字",
-+ " またはカッコで囲まれた文字列を重ね書きします。2 番目の文字は最初の文字",
-+ " にあわせて水平方向にセンタリングされます。よって '~a/' は 'a' を貫くよ",
-+ " うなスラッシュが得られます。2 番目の文字は、その前に数字を置くことで垂",
-+ " 直方向に移動させることができます。その数字は現在のフォントサイズに対す",
-+ " る割合を意味し、それに従って文字が上がったり下がったりします。この場合",
-+ " 数字と文字列は 1 文字より長くなるのでカッコで囲む必要があります。重ね",
-+ " 書きされる文字列が数字から始まっている場合は、垂直にずらす値と文字列と",
-+ " の間にスペースを入れてください ('~{abc}{.5 000}')。それ以外はスペース",
-+ " は不要です ('~{abc}{.5---}')。一方、あるいは両方のフォントを変更するこ",
-+ " ともできます ('~a{.5 /*.2 o}' --- 'a' その 1/5 の大きさの 'o' --- この",
-+ " 場合数字とスラッシュの間のスペースは必要です) が、その文字列が始まった",
-+ " 後で変更することはできません。それぞれの文字列内で、他の特殊な書式を使",
-+ " うこともできません。もちろん、'~a{\\^}' のように特殊な文字をエスケープ",
-+ " すること (下記参照) は可能です。",
-+ "",
-+ " \\文字コード (8 進数) を指定することで特殊な記号を指定することができま",
-+ " す。例えば、{/Symbol \\245} は無限大の記号になります。",
-+ "",
-+ " 制御文字は、 \\\\ や \\{ などのように \\ を使ってエスケープできます。",
-+ "",
-+ " しかし、二重引用符内の文字列は単一引用符内の文字列とは異なって解釈され",
-+ " ることを知っておいてください。主な違いは、二重引用符内の文字列ではバッ",
-+ " クスラッシュは 2 つ重ねる必要があることです。",
-+ "",
-+ " 例 (これらは言葉で説明するのは難しいのでとりあえずやってみてください):",
-+ "       set xlabel 'Time (10^6 {/Symbol m}s)'",
-+ "       set title '{/Symbol=18 \\362@_{/=9.6 0}^{/=12 x}} \\",
-+ "                  {/Helvetica e^{-{/Symbol m}^2/2} d}{/Symbol m}'",
-+ "",
-+ " `gnuplot` ソース配布物内の /docs/psdoc サブディレクトリにあるファイル",
-+ " \"ps_guide.ps\" に、拡張された書式に関する例が更に載っています。",
 + "2 editing postscript",
 + "?commands set terminal postscript editing",
 + "?set terminal postscript editing",
@@ -4666,21 +4737,42 @@ diff -rc term-4.3.0-20071011/post.trm term-4.3.0-ja-20071011/post.trm
 + " 時にセットされます。しかしこれは、環境変数 GNUPLOT_PS_DIR を定義するか",
 + " または gnuplot コマンドの `set loadpath` を使うことで制御できます。詳",
 + " 細は `set loadpath` を参照してください。",
++ "2 postscript adobeglyphnames",
++ "?commands set terminal postscript adobeglyphnames",
++ "?set terminal postscript adobeglyphnames",
++ "?terminal postscript adobeglyphnames",
++ "?postscript adobeglyphnames",
++ "?adobeglyphnames",
++ "=UTF-8",
++ " この設定は、UTF-8 エンコーディングでの PostScript 出力にのみ関係します。",
++ " これは、0x00FF より大きい Unicode エントリポイント (つまり Latin1 集合",
++ " 外のすべて) の文字を記述するのに使われる名前を制御します。一般に、",
++ " unicode 文字は一意の名前を持たず、それは unicode 識別番号しか持ちませ",
++ " ん。しかし、Adobe は、ある範囲の文字 (拡張ラテン文字、ギリシャ文字等)",
++ " に名前を割り当てる推奨規則を持っています。フォントによってはこの規則を",
++ " 利用しているものありますし、そうでないものもあります。gnuplot はデフォ",
++ " ルトでは Adobe グリフ名を使用します。例えば、ギリシャ文字の小文字のア",
++ " ルファは /alpha となります。`noadobeglyphnames` を指定した場合、この文",
++ " 字に対して gnuplot は代わりに /uni03B1 を使おうとします。",
++ " この設定でおかしくなったとすれば、それはその文字がフォント内にあるにも",
++ " かかわらずそれが見つからない場合です。Adobe フォントに対しては、デフォ",
++ " ルトを使うのが常に正しいかもしれませんが、他のフォントでは両方の設定を",
++ " 試してみないといけないかもしれません。`fontfile` も参照してください。",
 + "",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(post)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/pstricks.trm term-4.3.0-ja-20071011/pstricks.trm
-*** term-4.3.0-20071011/pstricks.trm	2006-11-19 15:16:13.000000000 +0900
---- term-4.3.0-ja-20071011/pstricks.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/pstricks.trm.ORG term/pstricks.trm
+*** term/pstricks.trm.ORG	2006-11-19 15:16:13.000000000 +0900
+--- term/pstricks.trm	2008-01-08 10:59:23.000000000 +0900
 ***************
 *** 673,678 ****
 --- 673,679 ----
   
   #ifdef TERM_HELP
   START_HELP(pstricks)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 pstricks",
   "?commands set terminal pstricks",
   "?set terminal pstricks",
@@ -4690,7 +4782,7 @@ diff -rc term-4.3.0-20071011/pstricks.trm term-4.3.0-ja-20071011/pstricks.trm
   "",
   " The first option invokes an ugly hack that gives nicer numbers; the second",
   " has to do with plot scaling.  The defaults are `hacktext` and `nounit`."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 pstricks",
 + "?commands set terminal pstricks",
 + "?set terminal pstricks",
@@ -4713,19 +4805,19 @@ diff -rc term-4.3.0-20071011/pstricks.trm term-4.3.0-ja-20071011/pstricks.trm
 + " 最初のオプションは、あまり綺麗ではない方法で数字のより良い出力を生成す",
 + " るもので、2 つ目のオプションはグラフを縮尺する際には必要です。デフォル",
 + " トでは `hacktext` と `nounit` です。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(pstricks)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/qms.trm term-4.3.0-ja-20071011/qms.trm
-*** term-4.3.0-20071011/qms.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/qms.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/qms.trm.ORG term/qms.trm
+*** term/qms.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/qms.trm	2008-01-08 10:59:23.000000000 +0900
 ***************
 *** 225,230 ****
 --- 225,231 ----
   
   #ifdef TERM_HELP
   START_HELP(qms)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 qms",
   "?commands set terminal qms",
   "?set terminal qms",
@@ -4735,7 +4827,7 @@ diff -rc term-4.3.0-20071011/qms.trm term-4.3.0-ja-20071011/qms.trm
   "?qms",
   " The `qms` terminal driver supports the QMS/QUIC Laser printer, the Talaris",
   " 1200 and others.  It has no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 qms",
 + "?commands set terminal qms",
 + "?set terminal qms",
@@ -4745,19 +4837,19 @@ diff -rc term-4.3.0-20071011/qms.trm term-4.3.0-ja-20071011/qms.trm
 + "?qms",
 + " `qms` ドライバは QMS/QUIC レーザープリンタ、Talaris 1200、その他をサポ",
 + " ートします。オプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(qms)
   #endif
-diff -rc term-4.3.0-20071011/regis.trm term-4.3.0-ja-20071011/regis.trm
-*** term-4.3.0-20071011/regis.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/regis.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/regis.trm.ORG term/regis.trm
+*** term/regis.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/regis.trm	2008-01-08 10:59:23.000000000 +0900
 ***************
 *** 258,263 ****
 --- 258,264 ----
   
   #ifdef TERM_HELP
   START_HELP(regis)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 regis",
   "?commands set terminal regis",
   "?set terminal regis",
@@ -4767,7 +4859,7 @@ diff -rc term-4.3.0-20071011/regis.trm term-4.3.0-ja-20071011/regis.trm
   "",
   " Syntax:",
   "       set terminal regis {4 | 16}"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 regis",
 + "?commands set terminal regis",
 + "?set terminal regis",
@@ -4781,19 +4873,19 @@ diff -rc term-4.3.0-20071011/regis.trm term-4.3.0-ja-20071011/regis.trm
 + "",
 + " 書式:",
 + "       set terminal regis {4 | 16}"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(regis)
   #endif
-diff -rc term-4.3.0-20071011/rgip.trm term-4.3.0-ja-20071011/rgip.trm
-*** term-4.3.0-20071011/rgip.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/rgip.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/rgip.trm.ORG term/rgip.trm
+*** term/rgip.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/rgip.trm	2008-01-08 10:59:23.000000000 +0900
 ***************
 *** 585,590 ****
 --- 585,591 ----
   
   #ifdef TERM_HELP
   START_HELP(rgip)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 rgip",
   "?commands set terminal rgip",
   "?set terminal rgip",
@@ -4803,7 +4895,7 @@ diff -rc term-4.3.0-20071011/rgip.trm term-4.3.0-ja-20071011/rgip.trm
   "       set terminal uniplex portrait [2,3]",
   "",
   " puts six graphs on a page in three rows of two in portrait orientation."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 rgip",
 + "?commands set terminal rgip",
 + "?set terminal rgip",
@@ -4834,19 +4926,19 @@ diff -rc term-4.3.0-20071011/rgip.trm term-4.3.0-ja-20071011/rgip.trm
 + "",
 + " これは 1 ページ 6 つのグラフを横に 2 つ縦に 3 つ並べ、縦置き (portrait)",
 + " に出力します。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(rgip)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/sun.trm term-4.3.0-ja-20071011/sun.trm
-*** term-4.3.0-20071011/sun.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/sun.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/sun.trm.ORG term/sun.trm
+*** term/sun.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/sun.trm	2008-01-08 10:59:23.000000000 +0900
 ***************
 *** 360,365 ****
 --- 360,366 ----
   
   #ifdef TERM_HELP
   START_HELP(sun)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 sun",
   "?commands set terminal sun",
   "?set terminal sun",
@@ -4856,7 +4948,7 @@ diff -rc term-4.3.0-20071011/sun.trm term-4.3.0-ja-20071011/sun.trm
   "?sun",
   " The `sun` terminal driver supports the SunView window system.  It has no",
   " options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 sun",
 + "?commands set terminal sun",
 + "?set terminal sun",
@@ -4866,29 +4958,29 @@ diff -rc term-4.3.0-20071011/sun.trm term-4.3.0-ja-20071011/sun.trm
 + "?sun",
 + " `sun` ドライバは SunView ウィンドウシステムをサポートしています。オプ",
 + " ションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(sun)
   #endif
-diff -rc term-4.3.0-20071011/svg.trm term-4.3.0-ja-20071011/svg.trm
-*** term-4.3.0-20071011/svg.trm	2007-10-07 17:05:57.000000000 +0900
---- term-4.3.0-ja-20071011/svg.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/svg.trm.ORG term/svg.trm
+*** term/svg.trm.ORG	2008-01-06 15:44:31.000000000 +0900
+--- term/svg.trm	2008-01-08 10:59:23.000000000 +0900
 ***************
-*** 1394,1399 ****
---- 1394,1400 ----
+*** 1446,1451 ****
+--- 1446,1452 ----
   
   #ifdef TERM_HELP
   START_HELP(svg)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 svg",
   "?commands set terminal svg",
   "?set terminal svg",
 ***************
-*** 1436,1440 ****
---- 1437,1487 ----
+*** 1488,1492 ****
+--- 1489,1539 ----
   " or may contain the records necessary to create a hypertext reference to",
   " the desired font. Gnuplot will look for the requested file using the",
   " directory list in the GNUPLOT_FONTPATH environmental variable."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 svg",
 + "?commands set terminal svg",
 + "?set terminal svg",
@@ -4933,19 +5025,19 @@ diff -rc term-4.3.0-20071011/svg.trm term-4.3.0-ja-20071011/svg.trm
 + " リンクを生成するための行を含むもののどちらかです。gnuplot は、環境変",
 + " 数 GNUPLOT_FONTPATH のディレクトリリストから要求されたファイルを探し",
 + " ます。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(svg)
   #endif
-diff -rc term-4.3.0-20071011/t410x.trm term-4.3.0-ja-20071011/t410x.trm
-*** term-4.3.0-20071011/t410x.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/t410x.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/t410x.trm.ORG term/t410x.trm
+*** term/t410x.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/t410x.trm	2008-01-08 10:59:23.000000000 +0900
 ***************
 *** 315,320 ****
 --- 315,321 ----
   
   #ifdef TERM_HELP
   START_HELP(tek410x)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 tek410x",
   "?commands set terminal tek410x",
   "?set terminal tek410x",
@@ -4955,7 +5047,7 @@ diff -rc term-4.3.0-20071011/t410x.trm term-4.3.0-ja-20071011/t410x.trm
   "?tek410x",
   " The `tek410x` terminal driver supports the 410x and 420x family of Tektronix",
   " terminals.  It has no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 tek410x",
 + "?commands set terminal tek410x",
 + "?set terminal tek410x",
@@ -4965,19 +5057,19 @@ diff -rc term-4.3.0-20071011/t410x.trm term-4.3.0-ja-20071011/t410x.trm
 + "?tek410x",
 + " `tek410x` ドライバは Tektronix 410x, 420x ファミリーをサポートしていま",
 + " す。オプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(tek410x)
   #endif
-diff -rc term-4.3.0-20071011/tek.trm term-4.3.0-ja-20071011/tek.trm
-*** term-4.3.0-20071011/tek.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/tek.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/tek.trm.ORG term/tek.trm
+*** term/tek.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/tek.trm	2008-01-08 10:59:23.000000000 +0900
 ***************
 *** 725,730 ****
 --- 725,731 ----
   
   #ifdef TERM_HELP
   START_HELP(tek40)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 tek40",
   "?commands set terminal tek40xx",
   "?set terminal tek40xx",
@@ -4987,7 +5079,7 @@ diff -rc term-4.3.0-20071011/tek.trm term-4.3.0-ja-20071011/tek.trm
   " MS-DOS Kermit Tek4010 terminal emulators in color: `km-tek40xx` supports them",
   " in monochrome; `selanar` supports Selanar graphics; and `bitgraph` supports",
   " BBN Bitgraph terminals.  None have any options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 tek40",
 + "?commands set terminal tek40xx",
 + "?set terminal tek40xx",
@@ -5032,19 +5124,19 @@ diff -rc term-4.3.0-20071011/tek.trm term-4.3.0-ja-20071011/tek.trm
 + " を、`km-tek40xx` はその白黒版をサポートします。`selanar` は Selanar グ",
 + " ラフィック端末をサポートします。`bitgraph` は BBN Bitgraph 端末をサポ",
 + " ートします。いずれもオプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(tek40)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/texdraw.trm term-4.3.0-ja-20071011/texdraw.trm
-*** term-4.3.0-20071011/texdraw.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/texdraw.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/texdraw.trm.ORG term/texdraw.trm
+*** term/texdraw.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/texdraw.trm	2008-01-08 10:59:23.000000000 +0900
 ***************
 *** 368,373 ****
 --- 368,374 ----
   
   #ifdef TERM_HELP
   START_HELP(texdraw)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 texdraw",
   "?commands set terminal texdraw",
   "?set terminal texdraw",
@@ -5054,7 +5146,7 @@ diff -rc term-4.3.0-20071011/texdraw.trm term-4.3.0-ja-20071011/texdraw.trm
   " of any LaTeX implementation.  Please do not forget to use this package.",
   "",
   " It has no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 texdraw",
 + "?commands set terminal texdraw",
 + "?set terminal texdraw",
@@ -5073,29 +5165,29 @@ diff -rc term-4.3.0-20071011/texdraw.trm term-4.3.0-ja-20071011/texdraw.trm
 + " ジを使うことを忘れないでください。",
 + "",
 + " オプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(texdraw)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/tgif.trm term-4.3.0-ja-20071011/tgif.trm
-*** term-4.3.0-20071011/tgif.trm	2007-01-15 08:57:53.000000000 +0900
---- term-4.3.0-ja-20071011/tgif.trm	2007-10-11 13:36:45.000000000 +0900
+diff -rc term/tgif.trm.ORG term/tgif.trm
+*** term/tgif.trm.ORG	2007-12-21 08:49:17.000000000 +0900
+--- term/tgif.trm	2008-01-08 10:59:25.000000000 +0900
 ***************
-*** 1737,1742 ****
---- 1737,1743 ----
+*** 1738,1743 ****
+--- 1738,1744 ----
   
   #ifdef TERM_HELP
   START_HELP(tgif)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 tgif",
   "?commands set terminal tgif",
   "?set terminal tgif",
 ***************
-*** 1807,1812 ****
---- 1808,1886 ----
+*** 1808,1813 ****
+--- 1809,1887 ----
   "                                         # and 2 in the y-direction",
   "       set terminal tgif landscape [3,3] # landscape; 3 plots in both",
   "                                         # directions"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 tgif",
 + "?commands set terminal tgif",
 + "?set terminal tgif",
@@ -5167,20 +5259,20 @@ diff -rc term-4.3.0-20071011/tgif.trm term-4.3.0-ja-20071011/tgif.trm
 + "                                         # に 2 つのグラフ描画",
 + "       set terminal tgif landscape [3,3] # 横置、両方の方向に 3 つのグ",
 + "                                         # ラフ描画"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(tgif)
   #endif
   /*{{{}}}*/
-diff -rc term-4.3.0-20071011/tkcanvas.trm term-4.3.0-ja-20071011/tkcanvas.trm
-*** term-4.3.0-20071011/tkcanvas.trm	2006-08-28 09:12:27.000000000 +0900
---- term-4.3.0-ja-20071011/tkcanvas.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/tkcanvas.trm.ORG term/tkcanvas.trm
+*** term/tkcanvas.trm.ORG	2006-08-28 09:12:27.000000000 +0900
+--- term/tkcanvas.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
 *** 611,616 ****
 --- 611,617 ----
   
   #ifdef TERM_HELP
   START_HELP(tkcanvas)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 tkcanvas",
   "?commands set terminal tkcanvas",
   "?set terminal tkcanvas",
@@ -5190,7 +5282,7 @@ diff -rc term-4.3.0-20071011/tkcanvas.trm term-4.3.0-ja-20071011/tkcanvas.trm
   " coordinates of the midpoint are only filled for logarithmic axes.",
   "",
   " The current version of `tkcanvas` supports neither `multiplot` nor `replot`."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 tkcanvas",
 + "?commands set terminal tkcanvas",
 + "?set terminal tkcanvas",
@@ -5243,19 +5335,19 @@ diff -rc term-4.3.0-20071011/tkcanvas.trm term-4.3.0-ja-20071011/tkcanvas.trm
 + "",
 + " `tkcanvas` の現在の版では `multiplot` も `replot` もサポートしていませ",
 + " ん。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(tkcanvas)
   #endif
-diff -rc term-4.3.0-20071011/tpic.trm term-4.3.0-ja-20071011/tpic.trm
-*** term-4.3.0-20071011/tpic.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/tpic.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/tpic.trm.ORG term/tpic.trm
+*** term/tpic.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/tpic.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
 *** 928,933 ****
 --- 928,934 ----
   
   #ifdef TERM_HELP
   START_HELP(tpic)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 tpic",
   "?commands set terminal tpic",
   "?set terminal tpic",
@@ -5265,7 +5357,7 @@ diff -rc term-4.3.0-20071011/tpic.trm term-4.3.0-ja-20071011/tpic.trm
   "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
   " The other label -- account for long ticlabels:",
   "        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 tpic",
 + "?commands set terminal tpic",
 + "?set terminal tpic",
@@ -5303,19 +5395,19 @@ diff -rc term-4.3.0-20071011/tpic.trm term-4.3.0-ja-20071011/tpic.trm
 + "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
 + " 他の見出し -- 目盛りの長い見出しに対する見積り:",
 + "        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(tpic)
   #endif /* TERM_TABLE */
-diff -rc term-4.3.0-20071011/unixpc.trm term-4.3.0-ja-20071011/unixpc.trm
-*** term-4.3.0-20071011/unixpc.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/unixpc.trm	2007-10-11 13:36:44.000000000 +0900
+diff -rc term/unixpc.trm.ORG term/unixpc.trm
+*** term/unixpc.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/unixpc.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
 *** 615,620 ****
 --- 615,621 ----
   
   #ifdef TERM_HELP
   START_HELP(unixpc)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 unixpc",
   "?commands set terminal unixpc",
   "?set terminal unixpc",
@@ -5325,7 +5417,7 @@ diff -rc term-4.3.0-20071011/unixpc.trm term-4.3.0-ja-20071011/unixpc.trm
   "?unixpc",
   " The `unixpc` terminal driver supports AT&T 3b1 and AT&T 7300 Unix PC.  It has",
   " no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 unixpc",
 + "?commands set terminal unixpc",
 + "?set terminal unixpc",
@@ -5335,19 +5427,19 @@ diff -rc term-4.3.0-20071011/unixpc.trm term-4.3.0-ja-20071011/unixpc.trm
 + "?unixpc",
 + " `unixpc` ドライバは AT&T 3b1 と AT&T 7300 Unix PC をサポートします。オ",
 + " プションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(unixpc)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/unixplot.trm term-4.3.0-ja-20071011/unixplot.trm
-*** term-4.3.0-20071011/unixplot.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/unixplot.trm	2007-10-11 13:36:45.000000000 +0900
+diff -rc term/unixplot.trm.ORG term/unixplot.trm
+*** term/unixplot.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/unixplot.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
 *** 176,181 ****
 --- 176,182 ----
   #ifdef TERM_HELP
   #ifndef TERM_HELP_GNUGRAPH
   START_HELP(unixplot)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 unixplot",
   "?commands set terminal unixplot",
   "?set terminal unixplot",
@@ -5357,7 +5449,7 @@ diff -rc term-4.3.0-20071011/unixplot.trm term-4.3.0-ja-20071011/unixplot.trm
   "",
   " This terminal cannot be compiled if the GNU version of plot is to be used;",
   " in that case, use the `gnugraph` terminal instead."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 unixplot",
 + "?commands set terminal unixplot",
 + "?set terminal unixplot",
@@ -5370,20 +5462,20 @@ diff -rc term-4.3.0-20071011/unixplot.trm term-4.3.0-ja-20071011/unixplot.trm
 + "",
 + " このドライバは、GNU 版の plot を使っている環境ではコンパイルされません。",
 + " その場合は代わりに `gnugraph` ドライバ (terminal) を利用してください。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(unixplot)
   #endif
   #endif
-diff -rc term-4.3.0-20071011/v384.trm term-4.3.0-ja-20071011/v384.trm
-*** term-4.3.0-20071011/v384.trm	2006-07-22 17:39:08.000000000 +0900
---- term-4.3.0-ja-20071011/v384.trm	2007-10-11 13:36:45.000000000 +0900
+diff -rc term/v384.trm.ORG term/v384.trm
+*** term/v384.trm.ORG	2006-07-22 17:39:08.000000000 +0900
+--- term/v384.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
 *** 194,199 ****
 --- 194,200 ----
   
   #ifdef TERM_HELP
   START_HELP(vx384)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 vx384",
   "?commands set terminal vx384",
   "?set terminal vx384",
@@ -5393,7 +5485,7 @@ diff -rc term-4.3.0-20071011/v384.trm term-4.3.0-ja-20071011/v384.trm
   "?vx384",
   " The `vx384` terminal driver supports the Vectrix 384 and Tandy color",
   " printers.  It has no options."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 vx384",
 + "?commands set terminal vx384",
 + "?set terminal vx384",
@@ -5403,19 +5495,19 @@ diff -rc term-4.3.0-20071011/v384.trm term-4.3.0-ja-20071011/v384.trm
 + "?vx384",
 + " `vx384` ドライバは Vectrix 384 と Tandy カラープリンタをサポートしま",
 + " す。オプションはありません。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(vx384)
   #endif
-diff -rc term-4.3.0-20071011/vgagl.trm term-4.3.0-ja-20071011/vgagl.trm
-*** term-4.3.0-20071011/vgagl.trm	2006-07-22 17:39:09.000000000 +0900
---- term-4.3.0-ja-20071011/vgagl.trm	2007-10-11 13:36:45.000000000 +0900
+diff -rc term/vgagl.trm.ORG term/vgagl.trm
+*** term/vgagl.trm.ORG	2006-07-22 17:39:09.000000000 +0900
+--- term/vgagl.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
 *** 1550,1555 ****
 --- 1550,1556 ----
   
   #ifdef TERM_HELP
   START_HELP(vgagl)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 vgagl",
   "?commands set terminal vgagl",
   "?set terminal vgagl",
@@ -5425,7 +5517,7 @@ diff -rc term-4.3.0-20071011/vgagl.trm term-4.3.0-ja-20071011/vgagl.trm
   "  - G1360x768x256",
   "  - G1600x1200x256",
   ""
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 vgagl",
 + "?commands set terminal vgagl",
 + "?set terminal vgagl",
@@ -5482,30 +5574,30 @@ diff -rc term-4.3.0-20071011/vgagl.trm term-4.3.0-ja-20071011/vgagl.trm
 + "  - G1360x768x256",
 + "  - G1600x1200x256",
 + ""
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(vgagl)
   #endif
   #endif /* defined(USE_MOUSE) */
-diff -rc term-4.3.0-20071011/vws.trm term-4.3.0-ja-20071011/vws.trm
-*** term-4.3.0-20071011/vws.trm	2006-07-22 17:39:09.000000000 +0900
---- term-4.3.0-ja-20071011/vws.trm	2007-10-11 13:36:45.000000000 +0900
+diff -rc term/vws.trm.ORG term/vws.trm
+*** term/vws.trm.ORG	2007-10-18 09:02:14.000000000 +0900
+--- term/vws.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
-*** 480,485 ****
---- 480,486 ----
+*** 477,482 ****
+--- 477,483 ----
   
   #ifdef TERM_HELP
   START_HELP(VWS)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 VWS",
   "?commands set terminal VWS",
   "?set terminal VWS",
 ***************
-*** 490,494 ****
---- 491,507 ----
+*** 487,491 ****
+--- 488,504 ----
   " The `VWS` terminal driver supports the VAX Windowing System.  It has",
   " no options.  It will sense the display type (monochrome, gray scale,",
   " or color.)  All line styles are plotted as solid lines."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 VWS",
 + "?commands set terminal VWS",
 + "?set terminal VWS",
@@ -5516,19 +5608,19 @@ diff -rc term-4.3.0-20071011/vws.trm term-4.3.0-ja-20071011/vws.trm
 + " `VWS` ドライバは VAX ウィンドウシステムをサポートします。オプションは",
 + " ありません。このドライバはディスプレイの状態 (白黒か、グレイスケールか",
 + " カラーか) を自動検知します。全ての線種は実線で描画されます。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(VWS)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/win.trm term-4.3.0-ja-20071011/win.trm
-*** term-4.3.0-20071011/win.trm	2007-07-30 10:36:04.000000000 +0900
---- term-4.3.0-ja-20071011/win.trm	2007-10-11 13:36:45.000000000 +0900
+diff -rc term/win.trm.ORG term/win.trm
+*** term/win.trm.ORG	2007-07-30 10:36:04.000000000 +0900
+--- term/win.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
 *** 879,884 ****
 --- 879,885 ----
   
   #ifdef TERM_HELP
   START_HELP(windows)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 windows",
   "?commands set terminal windows",
   "?set terminal windows",
@@ -5538,7 +5630,7 @@ diff -rc term-4.3.0-20071011/win.trm term-4.3.0-ja-20071011/win.trm
   " `4.` TrueType fonts are not available in the graph window.",
   "",
   " `5.` Drag-drop does not work."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 windows",
 + "?commands set terminal windows",
 + "?set terminal windows",
@@ -5751,19 +5843,19 @@ diff -rc term-4.3.0-20071011/win.trm term-4.3.0-ja-20071011/win.trm
 + " `4.` TrueType フォントはグラフウィンドウ内では利用できない",
 + "",
 + " `5.` ドラッグ-ドロップは働かない"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(windows)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/wxt.trm term-4.3.0-ja-20071011/wxt.trm
-*** term-4.3.0-20071011/wxt.trm	2007-06-28 10:28:24.000000000 +0900
---- term-4.3.0-ja-20071011/wxt.trm	2007-10-11 13:36:45.000000000 +0900
+diff -rc term/wxt.trm.ORG term/wxt.trm
+*** term/wxt.trm.ORG	2007-06-28 10:28:24.000000000 +0900
+--- term/wxt.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
 *** 377,382 ****
 --- 377,383 ----
   
   #ifdef TERM_HELP
   START_HELP(wxt)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 wxt",
   "?set terminal wxt",
   "?terminal wxt",
@@ -5773,7 +5865,7 @@ diff -rc term-4.3.0-20071011/wxt.trm term-4.3.0-ja-20071011/wxt.trm
   " bindings by <ctrl>+<space> and <ctrl>+'q', respectively.",
   " These three keywords (raise, persist and ctrl) can also be set and remembered",
   " between sessions through the configuration dialog."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 wxt",
 + "?set terminal wxt",
 + "?terminal wxt",
@@ -5891,29 +5983,29 @@ diff -rc term-4.3.0-20071011/wxt.trm term-4.3.0-ja-20071011/wxt.trm
 + " のキー割り当てを、それぞれ <ctrl>+<space> と <ctrl>+'q' に変更します。",
 + " これらの 3 つのキーワード (raise, persist, ctrl) は、設定ダイアログ上",
 + " のやりとりでも設定し、記憶させることができます。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(wxt)
   #endif /* TERM_HELP */
-diff -rc term-4.3.0-20071011/x11.trm term-4.3.0-ja-20071011/x11.trm
-*** term-4.3.0-20071011/x11.trm	2007-08-07 10:00:55.000000000 +0900
---- term-4.3.0-ja-20071011/x11.trm	2007-10-11 13:36:45.000000000 +0900
+diff -rc term/x11.trm.ORG term/x11.trm
+*** term/x11.trm.ORG	2007-12-21 08:49:17.000000000 +0900
+--- term/x11.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
-*** 2000,2005 ****
---- 2000,2006 ----
+*** 2056,2061 ****
+--- 2056,2062 ----
   
   #ifdef TERM_HELP
   START_HELP(x11)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 x11",
   "?commands set terminal x11",
   "?set terminal x11",
 ***************
-*** 2541,2546 ****
---- 2542,3091 ----
+*** 2606,2611 ****
+--- 2607,3166 ----
   "%@gnuplot*fastrotate:  on",
   "%@gnuplot*ctrlq:  off",
   "@end table"
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 x11",
 + "?commands set terminal x11",
 + "?set terminal x11",
@@ -5928,11 +6020,11 @@ diff -rc term-4.3.0-20071011/x11.trm term-4.3.0-ja-20071011/x11.trm
 + " `-display` が使われていれば起動時に自動的に選択されます。",
 + "",
 + " 書式:",
-+ "    set terminal x11 {<n>}",
++ "    set terminal x11 {<n> | window \"<string>\"}",
 + "                     {title \"<string>\"}",
-+ "                     {{no}enhanced}",
-+ "                     {font <fontspec>}",
-+ "                     {{no}persist} {{no}raise} {solid|dashed} {{no}ctrlq}",
++ "                     {{no}enhanced} {font <fontspec>}",
++ "                     {linewidth LW} {solid|dashed}",
++ "                     {{no}persist} {{no}raise} {{no}ctrlq}",
 + "                     {close}",
 + "    set terminal x11 {reset}",
 + "",
@@ -5942,6 +6034,15 @@ diff -rc term-4.3.0-20071011/x11.trm term-4.3.0-ja-20071011/x11.trm
 + " アイコンには `Gnuplot <n>` とラベル付けされます。現在有効なウィンドウ",
 + " はカーソル記号の変化で区別できます (デフォルトカーソルから十字カーソル",
 + " へ)。",
++ "",
++ " `x11` 出力形式は、外部のアプリケーションによって生成されている X のウィ",
++ " ンドウの X ID (16 進表記) をオプション `window` の後に文字列として指定",
++ " することで、そのウィンドウと接続できます。X は複数のクライアントにイベ",
++ " ント ButtonPress の選択を認めないため、gnuplot その外部ウィンドウをコン",
++ " テナとして使用します。この方法により、gnuplot のマウス機能はとりこまれ",
++ " た描画ウィンドウ内でも作動します。",
++ "",
++ "    set term x11 window \"220001e\"",
 + "",
 + " x11 出力形式は、利用可能なフォントの元で拡張テキストモード (`enhanced`",
 + " 参照) をサポートしています。文字列に埋め込まれ、様々な効果を与えるフォ",
@@ -6213,6 +6314,7 @@ diff -rc term-4.3.0-20071011/x11.trm term-4.3.0-ja-20071011/x11.trm
 + " す。",
 + "",
 + " 例:",
++ "",
 + " 背景色を変更するには",
 + "       gnuplot -background coral",
 + "",
@@ -6456,20 +6558,20 @@ diff -rc term-4.3.0-20071011/x11.trm term-4.3.0-ja-20071011/x11.trm
 + "%@gnuplot*fastrotate:  on",
 + "%@gnuplot*ctrlq:  off",
 + "@end table"
-+ #endif
++ #endif /* JAPANESE_DOC */
   
   END_HELP(x11)
   #endif				/* TERM_HELP */
-diff -rc term-4.3.0-20071011/xlib.trm term-4.3.0-ja-20071011/xlib.trm
-*** term-4.3.0-20071011/xlib.trm	2006-07-22 17:39:09.000000000 +0900
---- term-4.3.0-ja-20071011/xlib.trm	2007-10-11 13:36:45.000000000 +0900
+diff -rc term/xlib.trm.ORG term/xlib.trm
+*** term/xlib.trm.ORG	2007-12-21 08:49:17.000000000 +0900
+--- term/xlib.trm	2008-01-08 10:59:24.000000000 +0900
 ***************
 *** 91,96 ****
 --- 91,97 ----
   
   #ifdef TERM_HELP
   START_HELP(xlib)
-+ #if 0
++ #ifndef JAPANESE_DOC
   "1 xlib",
   "?commands set terminal xlib",
   "?set terminal xlib",
@@ -6479,7 +6581,7 @@ diff -rc term-4.3.0-20071011/xlib.trm term-4.3.0-ja-20071011/xlib.trm
   " `set output '<filename>'`. `set term x11` is equivalent to",
   " `set terminal xlib; set output \"|gnuplot_x11 -noevents\"`.",
   " `xlib` takes the same set of options as `x11`."
-+ #else
++ #else /* JAPANESE_DOC */
 + "1 xlib",
 + "?commands set terminal xlib",
 + "?set terminal xlib",
@@ -6492,6 +6594,6 @@ diff -rc term-4.3.0-20071011/xlib.trm term-4.3.0-ja-20071011/xlib.trm
 + " 指定するとそれらをファイルに書き出します。`set term x11` は、",
 + " `set terminal xlib; set output \"|gnuplot_x11 -noevents\"` と同値です。",
 + " `xlib` には `x11` と同じオプションの組を与えることができます。"
-+ #endif
++ #endif /* JAPANESE_DOC */
   END_HELP(xlib)
   #endif

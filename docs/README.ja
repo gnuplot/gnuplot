@@ -1,4 +1,4 @@
-# $Id: README.ja,v 1.6 2006-03-25 20:28:20+09 shige Exp $
+# $Id: README.ja,v 1.9 2008-01-11 11:44:27+09 shige Exp $
 # The Japanese translations of gnuplot manuals
 # Shigeharu TAKENO <shige@iee.niit.ac.jp>
 #
@@ -13,7 +13,7 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 明を行います。
 
 [a] gnuplot-ja.doc: docs/gnuplot.doc の日本語訳
-[b] term-ja.diff:   term/*.trm のドキュメントの日本語訳への差分
+[b] term-ja.diff:   term/*.trm のドキュメント等の日本語訳への差分
 [c] README.ja:      このファイル (主に Unix ユーザへの説明書)
 
 なお、これらのファイルは日本語テキストファイルですが、その漢字コ
@@ -48,17 +48,23 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 最初から日本語オンラインヘルプしか作らないようにすることも可能で
 すが、英語版を作った後でやる方が無難です。
 
-[2] term/ にパッチを当てる
+[2] term/ 等にパッチを当てる
 
 現在 gnuplot を展開したディレクトリにいるとします。
 
-% cd term
-% patch -p1 < ../japanese/term-ja.diff
-% cd ..
+% patch -p0 < docs/term-ja.diff
 
-これで、terminal ドライバのマニュアル部分が日本語化されました。
+これで、terminal ドライバのマニュアル部分が日本語訳が追加され、
+docs/doc2rtf.c に日本語化パッチが適用され、docs/sjisenc.c が追加
+されます。
 
-[3] docs ディレクトリのツールを作り直す
+[3] docs/Makefile の修正
+
+docs/Makefile の CFLAGS に、その日本語訳を有効にするために、
+-DJAPANESE_DOC を追加します。適当なエディタで docs/Makefile を修
+正してください。
+
+[4] docs ディレクトリのツールを作り直す
 
 % cd docs
 % make clean
@@ -69,11 +75,11 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 ていますので、日本語マニュアルを作る場合はツールの作り直しが必要
 です。
 
-[4] gnuplot のオンラインヘルプファイル (.gih) を作成する
+[5] gnuplot のオンラインヘルプファイル (.gih) を作成する
 
-% ./doc2gih ../japanese/gnuplot-ja.doc gnuplot-ja.gih
+% ./doc2gih gnuplot-ja.doc gnuplot-ja.gih
 
-[5] できたヘルプファイルを適当なところに置く
+[6] できたヘルプファイルを適当なところに置く
 
 できあがったファイルを適当な場所に置いて、そのパスを GNUHELP で設
 定すれば、gnuplot はそのファイルをオンラインヘルプとして使用する
@@ -83,9 +89,9 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 % setenv GNUHELP /usr/local/share/gnuplot/gnuplot-ja.gih
 
 もちろん、gnuplot.gih を上書きしてインストールすることもできます。
-その場合は、[4],[5] は、
+その場合は、[5],[6] は、
 
-% cp ../japanese/gnuplot-ja.doc gnuplot.doc
+% cp gnuplot-ja.doc gnuplot.doc
 % make install-gih
 
 とすれば済みます。
@@ -104,7 +110,7 @@ LaTeX 形式のファイルは以下のように作成します。
 
 % cd docs
 % make doc2tex 
-% ./doc2tex ../japanese/gnuplot-ja.gih gnuplot-ja.tex
+% ./doc2tex gnuplot-ja.gih gnuplot-ja.tex
 
 これは platex でほぼコンパイルできるのですが、platex だと
 
@@ -246,20 +252,26 @@ Format) 形式は、docs/ にあるツール doc2rtf を使えばいいのですが、
 日本語の RTF 形式のファイルは、これだけではうまく作れませんので、
 注意が必要です。
 
-まず、doc2rtf に日本語用のパッチ (doc2rtf-38j0.diff) を当て、コン
-パイルし直して、日本語 RTF 形式用の doc2rtf を作成します。
+term-ja.diff には、doc2rtf.c に対する日本語用のパッチも含まれてお
+り、「2.1. 日本語オンラインヘルプの作成」[2] の作業で、それも適用
+されていて、さらに sjisenc.c というファイルも作られていると思いま
+す。
 
-% patch -p1 < doc2rtf-38j0.diff
+まず doc2rtf を作り直し、sjisenc.c もコンパイルしておきます。
+
 % make clean
-% make 'CFLAGS=-g -O2 -DJAPANESE -DALL_TERM_DOC' doc2rtf
+% make 'CFLAGS=-g -O2 -DALL_TERM_DOC' doc2rtf
+% gcc -o sjisenc sjisenc.c
+
+なお、-DALL_TERM_DOC をつけないと、MS-Windows に関連するドライバ
+のヘルプが組み込まれませんので注意してください。
 
 次に、この doc2rtf を用いて RTF 形式のファイル (中途半端なもの) 
-を作成し、漢字コード変換して、さらに 8bit を RTF 用にエンコードし
-ます。最後の 8bit のエンコードは、testrtf1.c を使います。
+を作成し、nkf 等で漢字コード変換して、さらに sjisenc で 8bit を 
+RTF 用にエンコードします。
 
-% gcc -o testrtf1 testrtf1.c
 % ./doc2rtf gnuplot-ja.doc tmpf
-% nkf -s -Lw tmpf | ./testrtf1 > gnuplot-ja.rtf
+% nkf -s -Lw tmpf | ./sjisenc > gnuplot-ja.rtf
 
 漢字コード変換ツールとして nkf 以外、または改行コード変換をサポー
 トしていない古い nkf を使用している場合は、最初のコマンド 
@@ -271,14 +283,9 @@ Format) 形式は、docs/ にあるツール doc2rtf を使えばいいのですが、
 ルを MS-Windows 上のヘルプコンパイラにかければ hlp 形式のファイル
 が作られます。
 
-上記の、doc2rtf-38j0.diff と testrtf1.c は、以下のページで見つか
-ります。
-
- http://takeno.iee.niit.ac.jp/~foo/gp-jman/
-
-また、MS-Windows 上のヘルプコンパイラは、MS-Windows 上の C 開発環
-境についている場合もありますし、以下のサイトからもダウンロードで
-きるようです。
+MS-Windows 上のヘルプコンパイラは、MS-Windows 上の C 開発環境につ
+いている場合もありますし、以下のサイトからもダウンロードできるよ
+うです。
 
  ftp://ftp.microsoft.com/Softlib/MSLFILES/
  HC505.exe : Microsoft Help Compiler (version 3.10.505)

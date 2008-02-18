@@ -1,3 +1,8 @@
+2008-02-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc docs/term-ja.diff docs/README.ja:
+	Sync Japanese documentation to gnuplot.doc revision 1.473
+
 2008-02-18  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* src/datafile.c: Allow all types of files as data files except for

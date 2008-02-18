@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.192 2007-11-12 14:12:37+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.457
+C RCS $Id: gnuplot-ja.doc,v 1.204 2008-01-27 15:14:58+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.473
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -338,8 +338,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
  機能もあります。
 4 `postscript`
  `postscript` 出力形式は、prologue ファイルを読みこむことができます。
- prologue ファイルには、ユーザ定義セクション、例えば文字エンコーディン
- グに関するものを追加することができます。
+ prologue ファイルには、ユーザ定義セクション、例えば文字エンコードに関
+ するものを追加することができます。
  `postscript prologue` 参照。
 4 `ai`
  Adobe Illustrator 用のドライバ `ai` は時代遅れです。Adobe Illustrator
@@ -501,9 +501,9 @@ C Shigeharu Takeno et al (3.7, 4.X)
 
  サンプルスクリプト: textcolor.dem textrotate.dem
 
-3 文字コード化 (encodings) のサポートの追加
+3 文字エンコード (encodings) のサポートの追加
 
- `postscript`, `x11`, `pm` などのいくつかの出力形式で、文字コード化
+ `postscript`, `x11`, `pm` などのいくつかの出力形式で、文字エンコード
  (`encodings`) のサポートがいくつか追加されています: ISO 8859-1 (Latin
  1), ISO 8859-2 (Latin 2), ISO 8859-15 (ユーロ記号を含む 8859-1 の亜種),
  KOI8-R と KOI8-U (キリル文字), および幾つかのコードページ。詳細は
@@ -557,8 +557,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
 3 付属ドキュメント
 
  docs/psdocs/ ディレクトリには、gnuplot の PostScript 出力ガイドといく
- つかのコード化 (encoding) におけるポストスクリプトの記号の一覧がありま
- すが、そこからも新しい情報を得ることができます。
+ つかのエンコード (encoding) におけるポストスクリプトの記号の一覧があり
+ ますが、そこからも新しい情報を得ることができます。
 
  FAQ も改良されています。公の場で質問する前に、是非それを一読してくださ
  い。
@@ -817,6 +817,105 @@ C Shigeharu Takeno et al (3.7, 4.X)
    plot 'datafile' using 1:(f($2)/$4) title 2 with lines
 
  `set style labels`, `using xticlabels`, `plot title`, `using` 参照。
+2 Enhanced text mode
+?enhanced text
+?enhanced
+ 多くの出力形式が、拡張テキストモード (enhanced text mode) をサポートし
+ ています。これは、文字列に追加の書式情報を埋めこみます。例えば、"x^2"
+ は x の自乗を、通常我々が見る上付きの 2 がついた形で書き出します。この
+ モードは、例えば、"set term png enhanced" のように普通は出力形式を設定
+ するときに選択しますが、後で "set termoption enhanced" を使ってその機
+ 能を有効/無効にもできますし、"set label 'x_2' noenhanced" のように個々
+ の文字列に適用することもできます。
+
+@start table - まずは対話型テキスト形式
+  制御記号     例              説明
+   ^           a^x             上付き文字
+   _           a_x             下付き文字
+   @           @x or a@^b_{cd} 空ボックス (幅がない)
+   &           &{space}        指定した長さのスペースを挿入
+   ~           ~a{.8-}         'a' の上に '-' を、現在のフォントサ
+                               イズの .8 倍持ち上げた位置に重ね書き
+#\begin{tabular}{|cccl|} \hline
+#\multicolumn{4}{|c|}{拡張テキスト制御記号} \\ \hline
+#制御記号 & 例 & 結果 & 説明 \\ \hline
+#\verb~^~ & \verb~a^x~ & $a^x$ & 上付き文字\\
+#\verb~_~ & \verb~a_x~ & $a_x$ & 下付き文字\\
+#\verb~@~ & \verb~a@^b_{cd}~ & $a^b_{cd}$ & 空ボックス (幅がない)\\
+#\verb~&~ & \verb~d&{space}b~ & d\verb*+     +b & 指定した長さのスペースを挿入\\
+#\verb|~| & \verb|~a{.8-}| & $\tilde{a}$ & 'a' の上に '-' を、現在のフォントサ\\
+#\verb~ ~ & \verb~ ~ & ~ ~ & イズの .8 倍持ち上げた位置に重ね書き\\
+%c c l .
+%.TE", /* ugly - doc2ms uses @ for column separator, but here we */
+%.TS", /* need @ in table, so end and restart the table ! */
+%center box tab ($) ;
+%c c l .
+%制御記号$例$説明
+%_
+%^$a^x$上付き文字
+%\&_$a\&_x$下付き文字
+% @ $ @x or a\&@^b\&_{cd}$空ボックス (幅がない)
+% & $ &{space}$指定した長さのスペースを挿入
+% ~ $ ~a{.8-}$'a' の上に '-' を、現在のフォントサ
+%   $   $イズの .8 倍持ち上げた位置に重ね書き
+@end table
+
+ 中カッコは一文字が期待される箇所に複数の文字を書く場合に使われます (例
+ えば 2^{10})。フォント、およびそのサイズを変更するには、以下の形式を使
+ ってください: {/[fontname][=fontsize | *fontscale] text} よって、例え
+ ば {/Symbol=20 G} は 20 ポイントのΓ (ガンマ)に、{/*0.75 K} は現在の有
+ 効なフォントサイズの 3/4 の大きさの K になります (文字 '/' は、'{' の
+ 直後の文字でなくてはなりません)。
+
+ 空ボックス (phantom box) は a@^b_c の上付き文字と下付き文字を揃えると
+ きに有用ですが、文字にアクセント記号を重ねる場合にはうまく働きません
+ 後者の目的のためには、色々なアクセントやその他のダイアクリティカルマ
+ ークのある多くの文字を持つエンコーディング (例えば iso_8859_1 や utf8)
+ を使用する方がいいでしょう。そのボックスはスペーシングが行なわれないの
+ で、ボックス内 (つまり @ の後ろ) の上付き文字や下付き文字を短く出力す
+ るのに適しています。
+
+ ある文字列と同じ長さのスペースを文字 '&' を使うことで入れることができ
+ ます。すなわち、
+         'abc&{def}ghi'
+ は以下を生成します (abc と ghi の間は 3 文字分の空白):
+         'abc   ghi'
+
+ 文字 '~' は、次の文字、またはカッコで囲まれた文字列に、それに続く文字
+ またはカッコで囲まれた文字列を重ね書きします。2 番目の文字は最初の文字
+ にあわせて水平方向にセンタリングされます。よって '~a/' は 'a' を貫くよ
+ うなスラッシュが得られます。2 番目の文字は、その前に数字を置くことで垂
+ 直方向に移動させることができます。その数字は現在のフォントサイズに対す
+ る割合を意味し、それに従って文字が上がったり下がったりします。この場合
+ 数字と文字列は 1 文字より長くなるのでカッコで囲む必要があります。重ね
+ 書きされる文字列が数字から始まっている場合は、垂直にずらす値と文字列と
+ の間にスペースを入れてください ('~{abc}{.5 000}')。それ以外はスペース
+ は不要です ('~{abc}{.5---}')。一方、あるいは両方のフォントを変更するこ
+ ともできます ('~a{.5 /*.2 o}' --- 'a' その 1/5 の大きさの 'o' --- この
+ 場合数字とスラッシュの間のスペースは必要です) が、その文字列が始まった
+ 後で変更することはできません。それぞれの文字列内で、他の特殊な書式を使
+ うこともできません。もちろん、'~a{\^}' のように特殊な文字をエスケープ
+ すること (下記参照) は可能です。
+
+ \文字コード (8 進数) を指定することで特殊な記号を指定することができま
+ す。例えば、{/Symbol \245} は無限大の記号になります。しかし、これは、
+ UTF-8 のようなマルチバイトエンコーディングの場合にはうまくいきません。
+ UTF-8 環境では、タイプ入力するかまたは別のやり方であなたが望む文字を選
+ 択することでマルチバイト列を入力できるようにすべきです。
+
+ 制御文字は、 \\ や \{ などのように \ を使ってエスケープできます。
+
+ しかし、二重引用符内の文字列は単一引用符内の文字列とは異なって解釈され
+ ることを知っておいてください。主な違いは、二重引用符内の文字列ではバッ
+ クスラッシュは 2 つ重ねる必要があることです。
+
+ 例 (これらは言葉で説明するのは難しいのでとりあえずやってみてください):
+       set xlabel 'Time (10^6 {/Symbol m}s)'
+       set title '{/Symbol=18 \\362@_{/=9.6 0}^{/=12 x}} \\
+                  {/Helvetica e^{-{/Symbol m}^2/2} d}{/Symbol m}'
+
+ gnuplot ソース配布物内の /docs/psdoc サブディレクトリにあるファイル
+ "ps_guide.ps" に、拡張された書式に関する例が更に載っています。
 2 Environment
 ?environment
  `gnuplot` は多くのシェル環境変数を認識します。必須のものはありませんが、
@@ -1766,7 +1865,7 @@ C ... and restart the table:
  読み出し専用変数 GPVAL_ERRNO は、任意の gnuplot コマンドがあるエラーの
  ために早く終わってしまった場合に 0 でない値にセットされ、直前のエラー
  メッセージは文字列変数 GPVAL_ERRMSG に保存されます。GPVAL_ERRNO と
- GPVAL_ERRMSG は、コマンド `reset errors` を使ってクリアできます。 
+ GPVAL_ERRMSG は、コマンド `reset errors` を使ってクリアできます。
 
  `mouse` 機能が使える対話型入出力形式は、"MOUSE_" で始まる読み出し専用
  変数をいくつか持っています。詳細は `mouse variables` を参照してくださ
@@ -2869,12 +2968,14 @@ Ffigure_histeps
  ションをつけることで、それに対応する箱の固まりの真下の x 軸に沿ったと
  ころに置くことができます。
 
- `errorbars` スタイル は、各エントリに対して 2 列の入力を必要とする以外
- は `clustered` スタイルにとても良く似ています。最初の列は `clustered`
- スタイルの場合と全く同様に箱の高さ (y の値) として使われます。2 つ目の
- 列は誤差の大きさとして扱われ、これは箱の天井に縦の誤差線を生成するのに
- 使われます。誤差線の見た目は、現在の `set basrs` の値と <linewidth> オ
- プション指定で制御できます。
+ `errorbars` スタイル は、各エントリに対して追加の入力列を必要とする以
+ 外は `clustered` スタイルにとても良く似ています。最初の列は、
+ `clustered` スタイルの場合と全く同様に箱の高さ (y の値) として保持され
+ ます。
+      2 列:       y yerr          # 線は y-yerr から y+err へ伸びる
+      3 列:       y ymin yman     # 線は ymin から ymax へ伸びる
+ 誤差線の見た目は、現在の `set basrs` の値と <linewidth> オプション指定
+ で制御できます。
 
  積み上げ型のヒストグラムも 2 つの形式がサポートされています。それらは
  コマンド `set style histogram {rowstacked|columnstacked}` で選択できま
@@ -2914,17 +3015,16 @@ Ffigure_histclust
        set style fill solid 1.0 border -1
        plot 'file.dat' using 2, '' using 4
 
-
  これは、x 軸上の各整数値を中心とするそれぞれ 2 つの箱 (鉛直な棒) 毎の
  固まりによる描画を生成します。入力ファイルの最初の列にラベルが含まれて
  いるならそれを、以下の少し変更したコマンドで x 軸に沿って配置できます。
 
        plot 'file.dat' using 2, '' using 4:xticlabels(1)
 
- ファイルが、各データの測定値と誤差評価の両方を含んでいる場合、描画に誤
- 差線を追加することができます。以下のコマンドは誤差線を (y-<error>) か
- ら (y+<error>) に引き、その頭に箱と同じ幅の水平線をつけます。誤差線と
- 誤差線の端の線は、黒で線幅 2 で描画されます。
+ ファイルが、各データの測定値と範囲の情報の両方を含んでいる場合、描画に
+ 誤差線を追加することができます。以下のコマンドは誤差線を (y-<error>)
+ から (y+<error>) に引き、その頭に箱と同じ幅の水平線をつけます。誤差線
+ と誤差線の端の線は、黒で線幅 2 で描画されます。
 
        set bars fullwidth
        set style histogram errorbars gap 2 lt -1 lw 2
@@ -2990,7 +3090,7 @@ Ffigure_histcols
  を積み上げた形のヒストグラムを生成する例:
 
        set style histogram columnstacked
-       plot for [i=3:8] "datafile" using i title columnhead 
+       plot for [i=3:8] "datafile" using i title columnhead
 2 image
 ?commands set style image
 ?set style image
@@ -4133,7 +4233,7 @@ Ffigure_mapcontours
  入力によって再開されます。特別なキー入力まで待つようにしたい場合は、以
  下のような reread によるループを使うことができます:
 
-       printf "描画ウィンドウ内で Tab キーを打つと復帰します。"
+       print "描画ウィンドウ内で Tab キーを打つと復帰します。"
        load "wait_for_tab"
 
  ファイル "wait_for_tab" は以下のようなものです:
@@ -4207,8 +4307,8 @@ Ffigure_mapcontours
                           {thru <thru expression>}
                           {using <using list>}
                           {smooth <option>}
-                          {volatile}
- 
+                          {volatile} {noautoscale}
+
  修正子の `binary`, `index`, `every`, `thru`, `using`, `smooth` は、そ
  れぞれに分けて説明します。簡単に言うと、`binary` はデータ列をバイナリ
  ファイルから取得できるようにし (デフォルトは ASCII ファイル)、`index`
@@ -4222,6 +4322,10 @@ Ffigure_mapcontours
  キーワード `volatile` は、データファイルの内容が、再読み込み時には変化
  しうることを意味します。これは、可能な限りプログラムに、`replot` コマ
  ンドの代わりに `refresh` コマンドを使わせようとします。`refresh` 参照。
+
+ キーワード `noautoscale` は、自動的に軸の範囲が決定される機能が有効で
+ ある場合に、この描画を構成するデータ点については、それを無視させる (自
+ 動縮尺機能の計算対象から外す) ようにします。
 
 
  ASCII データファイル:
@@ -4876,7 +4980,8 @@ Ffigure_mapcontours
 ?plot special-filenames
 ?datafile special-filenames
 ?special-filenames
- 特別な意味を持つファイル名として、次の 3 つがあります: '', '-', '+'
+ 特別な意味を持つファイル名として、次のものがあります: '', '-', '+',
+ '++'
 
  空のファイル名 '' は、同じ plot コマンド上で、直前の入力ファイルを再び
  使用することを gnuplot に指示します。よって、同じ入力ファイルの 2 つの
@@ -4884,15 +4989,24 @@ Ffigure_mapcontours
 
        plot 'filename' using 1:2, '' using 1:3
 
- '+' という特別なファイル名は、`using` 指定の全体と描画スタイルにインラ
- イン関数を使えるようにするための仕組みです。通常、関数描画はサンプル点
- 毎に単一の y (または z) の値しか持てません。しかし疑似ファイル '+' は
- それがあたかも実際の入力ファイルであるように、`using` 指定による 1 列
- 目 (plot の場合) 又は 1,2 列目 (splot の場合) の値を標本点として扱い、
- さらに追加の列の値を指定することも可能です。
+ '+' と '++' という特別なファイル名は、`using` 指定の全体と描画スタイル
+ にインライン関数を使えるようにするための仕組みです。通常、関数描画はサ
+ ンプル点毎に単一の y (または z) の値しか持てません。しかし疑似ファイル
+ '+' はそれがあたかも実際の入力ファイルであるように、`using` 指定による
+ 1 列目の値を標本点として扱い、さらに追加の列の値を指定することも可能で
+ す。返される標本点の数は、`set samples` で制御できます。
  例:
 
        plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
+
+ 同様に、疑似ファイル '++' は、x 方向は `set samples` で制御される点の
+ 数、y 方向は `set isosamples` で制御される点の数の、標準的な [x,y] 座
+ 標の格子を生成する 2 列のデータを返します。'++' の描画の前に、xrange
+ と yrange を設定する必要があります。 
+ 例:
+
+       splot '++' using 1:2:(sin($1)*sin($2)) with pm3d
+       plot '++' using 1:2:(sin($1)*sin($2)) with image
 
  `'-'` という特別なファイル名は、データがインラインであることを指示し
  ます。すなわち、データをコマンドの後に続けて指定します。このときはデ
@@ -5611,7 +5725,7 @@ Ffigure_mapcontours
  じです。<式> は、数を生成する `gnuplot` の数式か、または文字列です。
 
  書式:
-         print <式>
+         print <式> {, <式>, ...}
 
  `expressions` を参照して下さい。出力ファイルは `set print` で設定でき
  ます。
@@ -5727,7 +5841,7 @@ Ffigure_mapcontours
  そして、`gnuplot` から次のように実行するとします。
        a=0
        load 'looper'
- すると、pause のメッセージで分割された 4 回のプロットが行われることに
+ すると、pause のメッセージで分割された 5 回のプロットが行われることに
  なります。
 
  ファイル "data" が、各行に、0 から 10 までの範囲 (yrange) の 6 つのデ
@@ -5762,8 +5876,9 @@ Ffigure_mapcontours
  様々なオプションの取るデフォルトの値を知るには、`set` コマンドの項を参
  照してください。
 
- `set term`, `set output`, `set loadpath`, `set fontpath` の値は、コマ
- ンド `reset` では変更されません。
+ 以下のものは、`reset` の影響を受けません。
+      `set term` `set output` `set loadpath` `set fontpath`
+      `set encoding` `set decimalsign` `set locale`
 
 =error state
  `reset errors` は、エラー状態変数 GPVAL_ERRNO と GPVAL_ERRMSG のみをク
@@ -6021,8 +6136,11 @@ Ffigure_mapcontours
 ?show autoscale
 ?autoscale
 ?noautoscale
- 自動縮尺機能 (autoscale) は x, y, z の各軸に対して独立に、または一括して
- 指定できます。デフォルトでは全ての軸に対して自動縮尺設定を行います。
+ 自動縮尺機能 (autoscale) は x, y, z の各軸に対して独立に、または一括し
+ て指定できます。デフォルトでは全ての軸に対して自動縮尺設定を行います。
+ 図の中の一部の描画 (`plot`) の組のみを元に autoscale したい場合は、そ
+ の対象でない `plot` にフラグ `noautoscale` をつけることができます。
+ `datafile` 参照。
 
  書式:
        set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix | keepfix}
@@ -6542,15 +6660,19 @@ Ffigure_mapcontours
                   { default | user }
                   { origin x, y }
                   { size x, y }
+                  { front | back }
                   { noborder | bdefault | border [line style] }
                 }
        show colorbox
        unset colorbox
 
  カラーボックスの位置は、`default` または `user` で指定でき、後者の場合
- その位置や大きさを `origin` や `size` コマンドで設定します。
+ その位置や大きさを `origin` や `size` コマンドで設定します。カラーボッ
+ クスは、グラフや曲面の後 (`front`) あるいは先 (`back`) に描画させるこ
+ ともできます。
 
- `vertical` と `horizontal` は色勾配の方向を切替えます。
+ 色勾配の方向は、オプション `vertical` と `horizontal` で切替えることが
+ 可能です。
 
  `origin x, y` と `size x, y` は `user` オプションとの組でのみ使用され
  ます。x, y の値は、デフォルトではスクリーン座標と解釈されますが、これ
@@ -6932,38 +7054,43 @@ Ffigure_mapcontours
 ?show encoding
 ?encoding
 ?encodings
- コマンド `set encoding` は文字のコード化 (encoding) を選択します。
+=UTF-8
+ コマンド `set encoding` は文字のエンコード (encoding) を選択します。
  書式:
        set encoding {<value>}
        set encoding locale
        show encoding
 
  有効な値 (value) は以下の通りです。
-    default     - 出力形式にデフォルトのコード化の使用を命令
+    default     - 出力形式にデフォルトのエンコードの使用を命令
     iso_8859_1  - 多くの Unix ワークステーションや MS-Windows で使用可
-                  能な最も一般的な西ヨーロッパフォント。このコード化は
-                  PostScript の世界で 'ISO-Latin1' として知られているも
-                  のです。
-    iso_8859_2  - 中央/東ヨーロッパで使用されるフォント
+                  能な最も一般的な西ヨーロッパエンコード。このエンコー
+                  ドは PostScript の世界で 'ISO-Latin1' として知られて
+                  いるものです。
     iso_8859_15 - ユーロ記号を含む iso_8859_1 の亜種
-    koi8r       - 良く使われる Unix のキリル文字コード化
-    koi8u       - Unix のウクライナ地方のキリル文字コード化
+    iso_8859_2  - 中央/東ヨーロッパで使用されるエンコード
+    iso_8859_9  - (Latin5 として知られる) トルコで使用されるエンコード
+    koi8r       - 良く使われる Unix のキリル文字エンコード
+    koi8u       - Unix のウクライナ地方のキリル文字エンコード
     cp437       - MS-DOS のコードページ
     cp850       - 西ヨーロッパの OS/2 のコードページ
     cp852       - 中央/東ヨーロッパの OS/2 のコードページ
     cp1250      - 中央/東ヨーロッパの MS Windows のコードページ
+    cp1254      - トルコの MS Windows のコードページ (Latin5 の拡張)
+    utf8        - 各文字の Unicode エントリポイントの、可変長 (マルチバ
+                  イト) 表現
 
  コマンド `set encoding locale` は、他のオプションとは違い、これは現在
  のロカールを実行時の環境から決定しようとします。たいていのシステムでは
  これは環境変数 LC_ALL, LC_CTYPE, LANG のいずれかによって制御されます。
  この仕組みは、例えば wxt, cairopdf 出力形式で、UTF-8 や EUC-JP のよう
- なマルチバイト文字エンコーディングを通すために必要です。このコマンドは
- 日付や数字などのロカール特有の表現には影響を与えません。
+ なマルチバイト文字エンコードを通すために必要です。このコマンドは日付や
+ 数字などのロカール特有の表現には影響を与えません。
  `set locale` や `set decimalsign` も参照。
 
- 一般に、コード化の設定は出力形式の設定の前に行なう必要があります。この
- コード化はどんな出力形式でもサポートされているとは限らず、そして出力形
- 式は要求されたどんな非標準文字も生成できなければいけません。
+ 一般に、エンコードの設定は出力形式の設定の前に行なう必要があります。こ
+ のエンコードはどんな出力形式でもサポートされているとは限らず、そして出
+ 力形式は要求されたどんな非標準文字も生成できなければいけません。
 3 fit
 ?commands set fit
 ?commands show fit
@@ -7400,7 +7527,8 @@ Ffigure_mapcontours
 
  書式:
        set hidden3d {defaults} |
-                    { {{offset <offset>} | {nooffset}}
+                    { {front|back}
+                      {{offset <offset>} | {nooffset}}
                       {trianglepattern <bitpattern>}
                       {{undefined <level>} | {noundefined}}
                       {{no}altdiagonal}
@@ -7409,10 +7537,10 @@ Ffigure_mapcontours
        show hidden3d
 
  gnuplot の通常の表示とは異なり、隠線処理では与えられた関数、またはデー
- タの格子線を、実際の曲面がその曲面の背後にあって隠されている部分は見せ
- ないのと同じように処理します。これを可能にするためには、曲面は '格子状'
- (`splot datafile` 参照) である必要があり、またそれらは `with lines` か
- `with linespoints` で描かれていなければいけません。
+ タの格子線を、実際の曲面がその曲面の背後にあって隠されている描画要素は
+ 見せないのと同じように処理します。これが機能するためには、その曲面が
+ '格子状' (`splot datafile` 参照) である必要があり、またそれらは
+ `with lines` か `with linespoints` で描かれていなければいけません。
 
  `hidden3d` が有効なときは、格子線だけでなく、面部分や土台の上の等高線
  (`set contour` 参照) も隠されます。複数の面を描画している場合は、各曲
@@ -7427,8 +7555,14 @@ Ffigure_mapcontours
  ション `nohidden3d` を追加してください。
 
  hidden3d は、pm3d モードで描画された、塗り潰された曲面には影響を与えま
- せん。pm3d の曲面に対して同様の効果を得るには、これの代わりに
- set `pm3d depthorder` を使ってください。
+ せん。pm3d の曲面に対して同様の効果を純粋に得たいならば、これの代わり
+ に `set pm3d depthorder` を使ってください。複数の pm3d 曲面に通常の
+ `hidden3d` 処理を組み合わせるには、hidden3d 処理の全ての要素を強制的に
+ 残りの他の描画要素の後に描画するためのオプション `set hidden3d front`
+ を使用し、そして曲面を 2 度描画してください。最初は `with lines lt -2`
+ で、2 度目は `with pm3d` で描画します。最初の方では、隠される描画要素
+ の計算を行っている間は隠す方の曲面も含まれているのですが、実際にはその
+ 曲面自体は描画されません。
 
  関数値は格子孤立線の交点で評価されます。見ることの出来る線分を求めると
  きは個々の関数値、あるいはデータ点の間はそのアルゴリズムによって線形補
@@ -7963,11 +8097,11 @@ Ffigure_mapcontours
 
  <locale> にはインストールされたシステムで使うことの出来る任意の言語を
  指定できます。可能なオプションについてはシステムのドキュメントを参照し
- てください。デフォルトの値は環境変数 LC_TIME, LC_ALL, または LANG から
- 決定されます。
+ てください。コマンド `set locale ""` は、環境変数 LC_TIME, LC_ALL, ま
+ たは LANG からロカールの値を決定しようとします。
 
  小数点に関する locale を変更したい場合は `set decimalsign` を参照して
- ください。文字エンコーディングを現在のロカールのものに変更したい場合は
+ ください。文字エンコードを現在のロカールのものに変更したい場合は
  `set encoding` を参照してください。
 3 logscale
 ?commands set logscale
@@ -8679,7 +8813,7 @@ Ffigure_mapcontours
  推測させます。一方で、オプション `depthorder` は四辺形の順序を完全に再
  構成します。塗りつぶしは深さ順に並び変えされた後で行われ、これによりか
  なり複雑な曲面でも視覚的なものにすることができます。詳細は、
- `help pm3d depthorder` を参照してください。
+ `pm3d depthorder` を参照してください。
 
  2 回の連続する走査で点の数が同じでなかった場合、四辺形の点の取り始めを、
  両方の走査の最初から (`flush begin`) にするか、最後から (`flush end`)
@@ -9720,7 +9854,8 @@ Ffigure_mapcontours
 ?unset style line
 ?show style line
 ?linestyle
-^ <a name="linewidth"></a>
+?linewidth
+=linewidth
  出力装置にはおのおのデフォルトの線種と点種の集合があり、それらはコマン
  ド `test` で見ることができます。`set style line` は線種と線幅、点種と
  点の大きさを、個々の呼び出しで、それらの情報を全部指定する代わりに、単
@@ -9945,6 +10080,7 @@ Ffigure_mapcontours
 
       set termoption {no}enhanced
       set termoption font "<fontname>{,<fontsize>}"
+      set termoption {solid|dashed}
 
 3 tics
 ?commands set tics
@@ -10210,29 +10346,29 @@ Ffigure_mapcontours
 ?set trange
 ?show trange
 ?trange
- コマンド `set trange` は、媒介変数モード、あるいは極座標モードでの x, y の
- 値を計算するのに使われる媒介変数の範囲を設定します。詳細は `set xrange` を
- 参照してください。
+ コマンド `set trange` は、媒介変数モード、あるいは極座標モードでの
+ x,y の値を計算するのに使われる媒介変数の範囲を設定します。詳細は
+ `set xrange` を参照してください。
 3 urange
 ?commands set urange
 ?commands show urange
 ?set urange
 ?show urange
 ?urange
- `set urange` と `set vrange` は、`splot` の媒介変数モードで x, y, z の値を
- 計算するのに使われる媒介変数の範囲を設定します。詳細は `set xrange` を参照
- してください。
+ `set urange` と `set vrange` は、`splot` の媒介変数モードで x,y,z の値
+ を計算するのに使われる媒介変数の範囲を設定します。詳細は `set xrange`
+ を参照してください。
 3 variables
 ?commands show variables
 ?show variables
- `show variables` コマンドは全てのユーザ定義変数とその値の一覧を表示し
- ます．
+ `show variables` コマンドはユーザ定義変数と内部変数の現在の値の一覧を
+ 表示します。gnuplot は、GPVAL_, MOUSE_, FIT_, TERM_ で始まる名前を持つ
+ 変数を内部で定義しています。
 
  書式:
-         show variables {all}
-
- 追加キーワードの "all" は、`GPVAL_` で始まる `gnuplot 定義変数` の一覧
- も表示します。
+       show variables      # GPVAL_ で始まるもの以外の変数を表示
+       show variables all  # GPVAL_ で始まるものも含め全ての変数を表示
+       show variables NAME # NAME で始まる変数のみを表示
 
 3 version
 ?show version
