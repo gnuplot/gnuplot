@@ -37,8 +37,8 @@
 
 
 
-  $Date: 2008-12-20 15:15:44 +0100 (Sa, 20. Dez 2008) $
-  $Author: peter $
+  $Date: 2008/12/22 21:44:39 $
+  $Author: sfeam $
   $Rev: 90 $
 
 ]]--
@@ -74,8 +74,8 @@ pgf.DEFAULT_RESOLUTION = 1000
 pgf.LATEX_STYLE_FILE = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 90 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2008-12-20 15:15:44 +0100 (Sa, 20. Dez 2008) $",
-                                "$Date: ([0-9]+)-([0-9]+)-([0-9]+) .*","%1/%2/%3")
+pgf.REVISION_DATE = string.gsub("$Date: 2008/12/22 21:44:39 $",
+                                "$Date: ([^ ]+) .*","%1")
 
 pgf.styles = {}
 

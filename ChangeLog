@@ -1,7 +1,7 @@
 2008-02-19  Peter Hedwig  <peter@affenbande.org>
 
-	* term/lua/gnuplot-lua-tikz.sty:  More forgiving regexp to catch
-	the version/date string.
+	* term/lua/gnuplot-lua:  More forgiving regexp to catch the
+	version/date string.
 
 2009-02-19  Manfred Schwarb  <manfred99@gmx.ch>
 
