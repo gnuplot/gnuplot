@@ -1,3 +1,7 @@
+2008-02-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_timestamp): Do not spin on unrecognized option. Bugfix.
+
 2008-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gd_strdup) src/set.c (set_decimalsign): Fix segfault due

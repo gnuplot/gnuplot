@@ -11,6 +11,7 @@ New features, changes and fixes in gnuplot version 4.2.3
 * FIX never estimate zero size for a non-empty string
 * FIX discard degenerate polygons during hidden3d processing
 * FIX segfault if replot is called while terminal type is unknown
+* FIX segfault if locale obtained by getenv() is freed
 * FIX discard axis ticks read from previous data file
 * FIX Do not clip image against Z range in 3D splot with "set view map"
 * FIX off-by-one error in implicit column 0 for binary data files
