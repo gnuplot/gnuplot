@@ -1,3 +1,7 @@
+2008-02-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_timestamp): Do not spin on unrecognized option. Bugfix.
+
 2008-02-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff docs/README.ja:
@@ -11,12 +15,10 @@
 2008-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gd_strdup) src/set.c (set_decimalsign): Fix segfault due
-	to trying to free a string returned by getenv().
-	Bugfix.
+	to trying to free a string returned by getenv().  Bugfix.
 
 	* term/svg.trm (SVG_layer): Force each plot to have its own bracketing
-	group.
-	Bugfix.
+	group.  Bugfix.
 
 2008-02-08  Ethan A Merritt  <merritt@u.washington.edu>
 
