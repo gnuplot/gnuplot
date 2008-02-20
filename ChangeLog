@@ -1,3 +1,13 @@
+2008-02-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (place_arrows3d): Save/restore the clipping area so
+	that splot doesn't trash the current clipping state.  Bugfix.
+
+	* src/graphics.c (boundary): Reset the default clipping area to the
+	plot boundary at the start of every 'plot' command.  This should not
+	be necessary, but it provides protection against a hypothetical instance
+	of int_error() in the middle of a save/draw/restore sequence.
+
 2008-02-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_timestamp): Do not spin on unrecognized option. Bugfix.

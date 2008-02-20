@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.19 2007/12/09 06:58:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.20 2008/01/17 20:44:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1166,6 +1166,9 @@ boundary(struct curve_points *plots, int count)
 	keybox.yb = keybox.yt - key_h;
     }
     /*}}} */
+
+    /* Set default clipping to the plot boundary */
+    clip_area = &plot_bounds;
 
 }
 
