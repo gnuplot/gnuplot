@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.190 2008/02/02 22:12:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.191 2008/02/06 18:04:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -526,9 +526,9 @@ static void
 place_arrows3d(int layer)
 {
     struct arrow_def *this_arrow;
+    BoundingBox *clip_save = clip_area;
 
-    /* Allow arrows to run off the plot, so long as they are still on
-     * the canvas */
+    /* Allow arrows to run off the plot, so long as they are still on the canvas */
     if (term->flags & TERM_CAN_CLIP)
       clip_area = NULL;
     else
@@ -548,6 +548,7 @@ place_arrows3d(int layer)
 	    FPRINTF((stderr,"place_arrows3d: skipping out-of-bounds arrow\n"));
 	}
     }
+    clip_area = clip_save;
 }
 
 /* we precalculate features of the key, to save lots of nested
