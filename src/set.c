@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.260 2008/02/14 17:05:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.261 2008/02/20 06:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -121,7 +121,7 @@ static void set_polar __PROTO((void));
 static void set_print __PROTO((void));
 #ifdef EAM_OBJECTS
 static void set_object __PROTO((void));
-static void set_rectangle __PROTO((int));
+static void set_rectangle __PROTO((int, int));
 #endif
 static void set_samples __PROTO((void));
 static void set_size __PROTO((void));
@@ -3237,7 +3237,7 @@ set_polar()
 
 #ifdef EAM_OBJECTS
 /* 
- * Process 'set object <tag> rectangle' command
+ * Process command     'set object <tag> {rectangle|ellipse|circle}'
  * set object {tag} rectangle {from <bottom_left> {to|rto} <top_right>}
  *                     {{at|center} <xcen>,<ycen> size <w>,<h>}
  *                     {fc|fillcolor <colorspec>} {lw|linewidth <lw>}
@@ -3253,7 +3253,8 @@ set_object()
 
     /* The next token must either be a tag or the object type */
     c_token++;
-    if (almost_equals(c_token, "rect$angle"))
+    if (almost_equals(c_token, "rect$angle")
+	|| equals(c_token, "ellipse") || equals(c_token, "circle"))
 	tag = -1; /* We'll figure out what it really is later */
     else {
 	tag = int_expression();
@@ -3262,7 +3263,13 @@ set_object()
     }
 
     if (almost_equals(c_token, "rect$angle")) {
-	set_rectangle(tag);
+	set_rectangle(tag, OBJ_RECTANGLE);
+
+    } else if (equals(c_token, "ellipse")) {
+	set_rectangle(tag, OBJ_ELLIPSE);
+
+    } else if (equals(c_token, "circle")) {
+	set_rectangle(tag, OBJ_CIRCLE);
 
     } else if (tag > 0) {
 	/* Look for existing object with this tag */
@@ -3270,10 +3277,9 @@ set_object()
 	for (; this_object != NULL; this_object = this_object->next)
 	     if (tag == this_object->tag)
 		break;
-	if (this_object && tag == this_object->tag
-			&& this_object->object_type == OBJ_RECTANGLE) {
+	if (this_object && tag == this_object->tag) {
 	    c_token--;
-	    set_rectangle(tag);
+	    set_rectangle(tag, this_object->object_type);
 	} else
 	    int_error(c_token, "unknown object");
 
@@ -3283,25 +3289,37 @@ set_object()
 }
 
 static t_object *
-new_object(int tag, int object_type)
+new_object(int tag, int object_type, t_object *new)
 {
-    t_object *new = gp_alloc(sizeof(struct object), "object");
-    if (object_type == OBJ_RECTANGLE) {
-	t_object def = DEFAULT_RECTANGLE_STYLE;
-	*new = def;
-	new->tag = tag;
-	new->object_type = object_type;
-	new->lp_properties.l_type = LT_DEFAULT; /* Use default rectangle color */
-	new->fillstyle.fillstyle = FS_DEFAULT;  /* and default fill style */
-    } else
-	fprintf(stderr,"object initialization failure\n");
+    t_object def_rect = DEFAULT_RECTANGLE_STYLE;
+    t_object def_ellipse = DEFAULT_ELLIPSE_STYLE;
+    t_object def_circle = DEFAULT_CIRCLE_STYLE;
+
+    if (!new)
+	new = gp_alloc(sizeof(struct object), "object");
+    if (object_type == OBJ_RECTANGLE)
+	*new = def_rect;
+    else if (object_type == OBJ_ELLIPSE)
+	*new = def_ellipse;
+    else if (object_type == OBJ_CIRCLE)
+	*new = def_circle;
+    else
+	int_error(NO_CARET,"object initialization failure");
+
+    new->tag = tag;
+    new->object_type = object_type;
+    new->lp_properties.l_type = LT_DEFAULT; /* Use default rectangle color */
+    new->fillstyle.fillstyle = FS_DEFAULT;  /* and default fill style */
+
     return new;
 }
 
 static void
-set_rectangle(int tag)
+set_rectangle(int tag, int obj_type)
 {
     t_rectangle *this_rect = NULL;
+    t_ellipse *this_ellipse = NULL;
+    t_circle *this_circle = NULL;
     t_object *this_object = NULL;
     t_object *new_obj = NULL;
     t_object *prev_object = NULL;
@@ -3316,15 +3334,18 @@ set_rectangle(int tag)
     
     /* We are setting the default, not any particular rectangle */
     if (tag < -1) {
-	this_object = &default_rectangle;
-	this_rect = &default_rectangle.o.rectangle;
 	c_token--;
+	if (obj_type == OBJ_RECTANGLE) {
+	    this_object = &default_rectangle;
+	    this_rect = &this_object->o.rectangle;
+	} else
+	    int_error(c_token, "Unknown object type");
 
     } else {
-	/* Look for existing rectangle with this tag */
+	/* Look for existing object with this tag */
 	for (this_object = first_object; this_object != NULL;
 	     prev_object = this_object, this_object = this_object->next)
-	     /* is this the rect we want? */
+	     /* is this the one we want? */
 	     if (0 < tag  &&  tag <= this_object->tag)
 		break;
 
@@ -3332,7 +3353,7 @@ set_rectangle(int tag)
 	if (this_object == NULL || tag != this_object->tag) {
 	    if (tag == -1)
 		tag = (prev_object) ? prev_object->tag+1 : 1;
-	    new_obj = new_object(tag, OBJ_RECTANGLE);
+	    new_obj = new_object(tag, obj_type, NULL);
 	    if (prev_object == NULL)
 		first_object = new_obj;
 	    else
@@ -3340,49 +3361,119 @@ set_rectangle(int tag)
 	    new_obj->next = this_object;
 	    this_object = new_obj;
 	}
+
+	/* Over-write old object if the type has changed */
+	else if (this_object->object_type != obj_type) {
+	    t_object *save_link = this_object->next;
+	    new_obj = new_object(tag, obj_type, this_object);
+	    this_object->next = save_link;
+	}
+
 	this_rect = &this_object->o.rectangle;
+	this_ellipse = &this_object->o.ellipse;
+	this_circle = &this_object->o.circle;
+
     }
 
     while (!END_OF_COMMAND) {
 	int save_token = c_token;
 
-	if (equals(c_token,"from")) {
-	    /* Read in the bottom left and upper right corners */
-	    c_token++;
-	    get_position(&this_rect->bl);
-	    if (equals(c_token,"to")) {
-		c_token++;
-		get_position(&this_rect->tr);
-	    } else if (equals(c_token,"rto")) {
-		c_token++;
-		get_position_default(&this_rect->tr,this_rect->bl.scalex);
-		if (this_rect->bl.scalex != this_rect->tr.scalex
-		||  this_rect->bl.scaley != this_rect->tr.scaley)
-		    int_error(c_token,"relative coordinates must match in type");
-		this_rect->tr.x += this_rect->bl.x;
-		this_rect->tr.y += this_rect->bl.y;
-	    } else
-		int_error(c_token,"Expecting to or rto");
-	    got_corners = TRUE;
-	    this_rect->type = 0;
-	    continue;
+	switch (obj_type) {
+	case OBJ_RECTANGLE:
+		if (equals(c_token,"from")) {
+		    /* Read in the bottom left and upper right corners */
+		    c_token++;
+		    get_position(&this_rect->bl);
+		    if (equals(c_token,"to")) {
+			c_token++;
+			get_position(&this_rect->tr);
+		    } else if (equals(c_token,"rto")) {
+			c_token++;
+			get_position_default(&this_rect->tr,this_rect->bl.scalex);
+			if (this_rect->bl.scalex != this_rect->tr.scalex
+			||  this_rect->bl.scaley != this_rect->tr.scaley)
+			    int_error(c_token,"relative coordinates must match in type");
+			this_rect->tr.x += this_rect->bl.x;
+			this_rect->tr.y += this_rect->bl.y;
+		    } else
+			int_error(c_token,"Expecting to or rto");
+		    got_corners = TRUE;
+		    this_rect->type = 0;
+		    continue;
+	
+		} else if (equals(c_token,"at") || almost_equals(c_token,"cen$ter")) {
+		    /* Read in the center position */
+		    c_token++;
+		    get_position(&this_rect->center);
+		    got_center = TRUE;
+		    this_rect->type = 1;
+		    continue;
+	
+		} else if (equals(c_token,"size")) {
+		    /* Read in the width and height */
+		    c_token++;
+		    get_position(&this_rect->extent);
+		    got_center = TRUE;
+		    this_rect->type = 1;
+		    continue;
+		}
+		break;
 
-	} else if (equals(c_token,"at") || almost_equals(c_token,"cen$ter")) {
-	    /* Read in the center position */
-	    c_token++;
-	    get_position(&this_rect->center);
-	    got_center = TRUE;
-	    this_rect->type = 1;
-	    continue;
-	} else if (equals(c_token,"size")) {
-	    /* Read in the width and height */
-	    c_token++;
-	    get_position(&this_rect->extent);
-	    got_center = TRUE;
-	    this_rect->type = 1;
-	    continue;
+	case OBJ_CIRCLE:
+		if (equals(c_token,"at") || almost_equals(c_token,"cen$ter")) {
+		    /* Read in the center position */
+		    c_token++;
+		    get_position(&this_circle->center);
+		    continue;
+	
+		} else if (equals(c_token,"size") || equals(c_token,"radius")) {
+		    /* Read in the radius */
+		    c_token++;
+		    get_position(&this_circle->extent);
+		    continue;
+	
+		} else if (equals(c_token, "arc")) {
+		    /* Start and end angle for arc */
+		    if (equals(++c_token,"[")) {
+			c_token++;
+			this_circle->arc_begin = real_expression();
+			if (equals(c_token++, ":")) {
+			    this_circle->arc_end = real_expression();
+			    if (equals(c_token++,"]"))
+				continue;
+			}
+		    }
+		    int_error(--c_token, "Expecting arc [<begin>:<end>]");
+		}
+		break;
 
-	} else if (equals(c_token,"front")) {
+	case OBJ_ELLIPSE:
+		if (equals(c_token,"at") || almost_equals(c_token,"cen$ter")) {
+		    /* Read in the center position */
+		    c_token++;
+		    get_position(&this_ellipse->center);
+		    continue;
+	
+		} else if (equals(c_token,"size")) {
+		    /* Read in the width and height */
+		    c_token++;
+		    get_position(&this_ellipse->extent);
+		    continue;
+	
+		} else if (equals(c_token,"angle")) {
+		    c_token++;
+		    this_ellipse->orientation = real_expression();
+		    continue;
+		}
+		break;
+
+	default:
+		int_error(c_token, "Unrecoginized object type");
+	} /* End of object-specific options */
+
+	/* The rest of the options apply to any type of object */
+
+	if (equals(c_token,"front")) {
 	    this_object->layer = 1;
 	    c_token++;
 	    continue;
@@ -3409,10 +3500,16 @@ set_rectangle(int tag)
 
 	/* Now parse the style options; default to whatever the global style is  */
 	if (!got_fill) {
+	    fill_style_type *default_style;
+	    if (this_object->object_type == OBJ_RECTANGLE)
+		default_style = &default_rectangle.fillstyle;
+	    else
+		default_style = &default_fillstyle;
+
 	    if (new_obj)
-		parse_fillstyle(&this_object->fillstyle, default_rectangle.fillstyle.fillstyle,
-			default_rectangle.fillstyle.filldensity, default_rectangle.fillstyle.fillpattern,
-			default_rectangle.fillstyle.border_linetype);
+		parse_fillstyle(&this_object->fillstyle, default_style->fillstyle,
+			default_style->filldensity, default_style->fillpattern,
+			default_style->border_linetype);
 	    else
 		parse_fillstyle(&this_object->fillstyle, this_object->fillstyle.fillstyle,
 			this_object->fillstyle.filldensity, this_object->fillstyle.fillpattern,
@@ -3582,7 +3679,7 @@ set_style()
 #ifdef EAM_OBJECTS
     case SHOW_STYLE_RECTANGLE:
 	c_token++;
-	set_rectangle(-2);
+	set_rectangle(-2, OBJ_RECTANGLE);
 	break;
 #endif
 #ifdef EAM_HISTOGRAMS
@@ -3600,7 +3697,7 @@ set_style()
 	break;
     default:
 	int_error(c_token,
-		  "expecting 'data', 'function', 'line', 'fill' or 'arrow'" );
+		  "expecting 'data', 'function', 'line', 'fill', 'rectangle', or 'arrow'" );
     }
 }
 

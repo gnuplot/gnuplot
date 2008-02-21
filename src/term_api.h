@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.69 2008/01/14 06:38:25 sfeam Exp $
+ * $Id: term_api.h,v 1.70 2008/01/26 05:06:32 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -411,6 +411,12 @@ TBOOLEAN on_page __PROTO((int x, int y));
 
 /* Convert a fill style into a backwards compatible packed form */
 int style_from_fill __PROTO((struct fill_style_type *));
+
+#ifdef EAM_OBJECTS
+/* Terminal-independent routine to draw a circle or arc */
+void do_arc __PROTO(( unsigned int cx, unsigned int cy, double radius,
+                      double arc_start, double arc_end, int style));
+#endif
 
 #ifdef LINUXVGA
 void LINUX_setup __PROTO((void));

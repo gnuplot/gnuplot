@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.169 2008/01/14 06:38:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.170 2008/02/05 02:42:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1303,6 +1303,64 @@ do_arrow(
     clip_area = clip_save;
 	
 }
+
+#ifdef EAM_OBJECTS
+/* Generic routine for drawing circles or circular arcs.          */
+/* If this feature proves useful, we can add a new terminal entry */
+/* point term->arc() to the API and let termials either provide a */
+/* private implemenation or use this generic one.                 */
+
+void
+do_arc( 
+    unsigned int cx, unsigned int cy, /* Center */
+    double radius, /* Radius */
+    double arc_start, double arc_end, /* Limits of arc in degress */
+    int style)
+{
+    gpiPoint vertex[120];
+    int i, segments;
+    double aspect;
+
+    /* Always draw counterclockwise */
+    while (arc_end < arc_start)
+	arc_end += 360.;
+
+    /* Choose how many segments to draw for this arc */
+#   define INC 5.
+    segments = (arc_end - arc_start) / INC;
+
+    /* Calculate the vertices */
+    aspect = (double)term->v_tic / (double)term->h_tic;
+    vertex[0].style = style;
+    for (i=0; i<segments; i++) {
+	vertex[i].x = cx + cos(DEG2RAD * (arc_start + i*INC)) * radius;
+	vertex[i].y = cy + sin(DEG2RAD * (arc_start + i*INC)) * radius * aspect;
+    }
+#   undef INC
+    vertex[segments].x = cx + cos(DEG2RAD * arc_end) * radius;
+    vertex[segments].y = cy + sin(DEG2RAD * arc_end) * radius * aspect;
+    if (fabs(arc_end - arc_start) > .1 
+    &&  fabs(arc_end - arc_start) < 359.9) {
+	vertex[++segments].x = cx;
+	vertex[segments].y = cy;
+	vertex[++segments].x = vertex[0].x;
+	vertex[segments].y = vertex[0].y;
+    }
+
+    if (style) {
+	/* Fill in the center */
+	if (term->filled_polygon)
+	    term->filled_polygon(segments+1, vertex);
+    } else {
+	/* Draw the arc */
+	for (i=0; i<segments; i++)
+	    draw_clip_line( vertex[i].x, vertex[i].y,
+		vertex[i+1].x, vertex[i+1].y );
+    }
+}
+#endif /* EAM_OBJECTS */
+
+
 
 #define TERM_PROTO
 #define TERM_BODY

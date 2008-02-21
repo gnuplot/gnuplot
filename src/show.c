@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.199 2007/12/08 10:55:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.200 2007/12/31 20:20:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -365,7 +365,7 @@ show_command()
 	if (almost_equals(c_token,"rect$angle"))
 	    c_token++;
 	CHECK_TAG_GT_ZERO;
-	save_rectangle(stderr,tag);
+	save_object(stderr,tag);
 #endif
 	break;
     case S_ANGLES:
@@ -774,7 +774,7 @@ show_all()
     show_polar();
     show_angles();
 #ifdef EAM_OBJECTS
-    save_rectangle(stderr,0);
+    save_object(stderr,0);
 #endif
     show_samples();
     show_isosamples();

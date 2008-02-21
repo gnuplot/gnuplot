@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.473 2008/01/25 20:59:41 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.474 2008/02/04 16:56:25 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -232,10 +232,10 @@ C
  specifying a predefined linetype.
  See `colorspec`.
 
-4 Arbitrary rectangles
- You can place rectangles with desired fill style and border anywhere in a 2D
- plot.
- See `set object rectangle`.
+4 Arbitrary rectangles and other shapes
+ You can place rectangles, cicles, and ellipses  with desired fill style and
+ border anywhere in a 2D plot.
+ See `set object`.
 
 3 String handling
 4 String and text data read from datafiles
@@ -8389,6 +8389,125 @@ Ffigure_mapcontours
 ?nomztics
  Minor tic marks along the z axis are controlled by `set mztics`.  Please
  see `set mxtics`.
+3 object
+?object
+?commands set object
+?commands show object
+?set object
+?show object
+ The `set object` command defines a single object which will appear in all
+ subsequent 2D plots. You may define as many objects as you like. Currently the
+ supported object types are `rectangle`, `cirlce`, and `ellipse`.
+ Rectangles inherit a default set of style properties (fill, color, border) from
+ those set by the command `set style rectangle`, but each object can also be
+ given individual style properties. Circles and ellipses inherit the fill style
+ from `set style fill`.
+
+ Syntax:
+     set object <index>
+         <object-type> <object-properties>
+         {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
+         {default} {lw|linewidth <width>}
+
+ <object-type> is either `rectangle`, `ellipse`, or `circle`. Each object type
+ has its own set of characteristic properties.
+ 
+ Setting `front` will draw the object in front of all plot elements, but
+ behind any labels that are also marked `front`. Setting `back` will place the
+ object behind all plot curves and labels. Setting `behind` will place the
+ object behind everything including the axes and `back` rectangles, thus
+     `set object rectangle from screen 0,0 to screen 1,1 behind`
+ can be used to provide a colored background for the entire graph or page.
+
+ The fill color of the object is taken from the <colorspec>. `fillcolor`
+ may be abbreviated `fc`.  The fill style is taken from <fillstyle>.
+ See `colorspec` and `fillstyle`.  If the keyword `default` is given,
+ these properties are inherited from the default settings of at the time a plot
+ is drawn. See `set style rectangle`.
+4 rectangle
+?rectangle
+?commands set object rectangle
+?commands show object rectangle
+?set object rectangle
+?show object rectangle
+ Syntax:
+     set object <index> rectangle
+         {from <position> {to|rto} <position> |
+          center <position> size <w>,<h> |
+          at <position> size <w>,<h>}
+
+ The position of the rectangle may be specified by giving the position of two
+ diagonal corners (bottom left and top right) or by giving the position of the
+ center followed by the width and the height.  In either case the positions
+ may be given in axis, graph, or screen coordinates. See `coordinates`.
+ The options `at` and `center` are synonyms.
+
+ Examples:
+     # Force the entire area enclosed by the axes to have background color cyan
+     set object 1 rect from graph 0, graph 0 to graph 1, graph 1 back
+     set object 1 rect fc rgb "cyan" fillstyle solid 1.0
+
+     # Position a red square with lower left at 0,0 and upper right at 2,3
+     set object 2 rect from 0,0 to 2,3 fc lt 1
+
+     # Position an empty rectangle (no fill) with a blue border
+     set object 3 rect from 0,0 to 2,3 fs empty border 3
+
+     # Return fill and color to the default style but leave vertices unchanged
+     set object 2 rect default
+4 ellipse
+?ellipse
+?commands set object ellipse
+?commands show object ellipse
+?set object ellipse
+?show object ellipse
+ Syntax:
+     set object <index> ellipse {at|center} <position> size <w>,<h>
+         {angle <orientation>}
+         {<other-object-properties>}
+
+ The position of the ellipse is specified by giving the center followed by
+ the width and the height (actually the major and minor axes). The keywords
+ `at` and `center` are synonyms.  The center position may be given in axis,
+ graph, or screen coordinates. See `coordinates`. The major and minor axis
+ lengths must be given in axis coordinates.  The orientation of the ellipse
+ is specified by the angle between the horizontal axis and the first axis
+ of the ellipse.  NB: If the x and y axis scales are not equal, then the
+ major/minor axis ratio will no longer be correct after rotation. This may
+ be fixed in a later gnuplot version.
+
+ Note that `set object ellipse size <2r>,<2r>` does not in general produce
+ the same result as `set object circle <r>`.  The circle radius is always
+ interpreted in terms of units along the x axis, and will always produce a
+ circle even if the x and y axis scales are different and even if the aspect
+ ratio of your plot is not 1.  'Set object ellipse' interprets the first '2r'
+ in terms of x axis units and the second '2r' in terms of y axis units.
+ This will only produce a circle if the x and y axis scales are identical and
+ the plot aspect ratio is 1.
+
+4 circle
+?circle
+?commands set object circle
+?commands show object circle
+?set object circle
+?show object circle
+ Syntax:
+     set object <index> circle {at|center} <position> size <radius>
+         {arc [<begin>:<end>]}
+         {<other-object-properties>}
+
+ The position of the circle is specified by giving the position of the center
+ center followed by the radius.  The keywords `at` and `center` are synonyms.
+ The position and radius may be given in x-axis, graph, or canvas
+ coordinates. See `coordinates`. In all cases the radius is calculated 
+ relative to the horizontal scale of the axis, graph, or canvas.  Any
+ disparity between the horizontal and vertical scaling will be corrected for
+ so that the result is always a circle.
+
+ By default a full circle is drawn. The optional qualifier `arc` specifies
+ a starting angle and ending angle, in degrees, for one arc of the circle.
+ The arc is always drawn counterclockwise.
+
 3 offsets
 ?commands set offsets
 ?commands unset offsets
@@ -9239,65 +9358,6 @@ Ffigure_mapcontours
  "-" means <STDOUT>. The `append` flag causes the file to be opened in append
  mode.  A <filename> starting with "|" is opened as a pipe to the
  <shell_command> on platforms that support piping.
-3 object
-?object
-?rectangle
-?commands set object
-?commands show object
-?commands set object rectangle
-?commands show object rectangle
-?set object
-?show object
-?set object rectangle
-?show object rectangle
- This command defines a single object, which will appear in all subsequent
- 2D plots. You may define as many objects as you like. Currently the only
- object type supported is `rectangle`.
- Each rectangle is specified by a pair of points that define diagonal vertices.
- A default set of style properties (fill, color, border) are inherited from
- those set by the command `set style rectangle`, but each rectangle can also be
- given individual style properties.
-
- Syntax:
-     set object <index> rectangle
-         {from <position> {to|rto} <position> |
-          center <position> size <w>,<h> |
-          at <position> size <w>,<h>}
-         {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
-         {default} {lw|linewidth <width>}
-
- The position of the rectangle may be specified by giving the position of two
- diagonal corners (bottom left and top right) or by giving the position of the
- center followed by the width and the height.  In either case the positions
- may be given in axis, graph, or screen coordinates. See `coordinates`.
- The options `at` and `center` are synonyms.
-
- Setting `front` will draw the rectangle in front of all plot elements, but
- behind any labels that are also marked `front`. Setting `back` will place the
- rectangle behind all plot curves and labels. Setting `behind` will place the
- rectangle behind everything including the axes and `back` rectangles, and can
- be used to provide a colored background for the entire graph or page.
-
- The fill color of the rectangle is taken from the <colorspec>. `fillcolor`
- may be abbreviated `fc`.  The fill style is taken from <fillstyle>.
- See `colorspec` and `fillstyle`.  If the keyword `default` is given,
- these properties are inherited from the default settings of at the time a plot
- is drawn. See `set style rectangle`.
-
- Examples:
-     # Force the entire area enclosed by the axes to have background color cyan
-     set object 1 rect from graph 0, graph 0 to graph 1, graph 1 back
-     set object 1 rect fc rgb "cyan" fillstyle solid 1.0
-
-     # Position a red square with lower left at 0,0 and upper right at 2,3
-     set object 2 rect from 0,0 to 2,3 fc lt 1
-
-     # Position an empty rectangle (no fill) with a blue border
-     set object 3 rect from 0,0 to 2,3 fs empty border 3
-
-     # Return fill and color to the default style but leave vertices unchanged
-     set object 2 rect default
-
 3 rmargin
 ?commands set rmargin
 ?set rmargin
@@ -9533,8 +9593,10 @@ Ffigure_mapcontours
 ?set style fill
 ?show style fill
 ?fillstyle
- The `set style fill` command is used to set the style of boxes,
- histograms, candlesticks and filledcurves.
+ The `set style fill` command is used to set the default style of the plot
+ elements in plots with boxes, histograms, candlesticks and filledcurves.
+ This default can be superceeded by fillstyles attached to individual plots.
+ See also 'set style rectangle'.
 
  Syntax:
        set style fill {empty
@@ -9763,13 +9825,13 @@ Ffigure_mapcontours
 ?unset style rectangle
 ?show style rectangle
 
- Rectangles defined with the `set object rectangle` command can have individual
- styles. However, if a rectangle is not assigned a private style then it
- inherits a default that is taken from the `set style rectangle` command.
+ Rectangles defined with the `set object` command can have individual styles.
+ However, if the object is not assigned a private style then it inherits a
+ default that is taken from the `set style rectangle` command.
 
  Syntax:
-     set style rectangle {front|back} {fillcolor <colorspec>} {fs <fillstyle>}
-                         {lw|linewidth <lw>}
+     set style rectangle {front|back} {lw|linewidth <lw>}
+                         {fillcolor <colorspec>} {fs <fillstyle>}
 
  See `colorspec` and `fillstyle`.  `fillcolor` may be abbreviated as `fc`.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.244 2008/01/27 01:28:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.245 2008/02/20 20:48:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1389,7 +1389,7 @@ place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
 
 #ifdef EAM_OBJECTS
 void
-place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox *clip_area)
+place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *clip_area)
 {
     t_object *this_object;
     t_rectangle *this_rect;
@@ -1403,12 +1403,75 @@ place_rectangles(struct object *listhead, int layer, int dimensions, BoundingBox
 	TBOOLEAN clip_x = FALSE;
 	TBOOLEAN clip_y = FALSE;
     
+	if (this_object->layer != layer)
+	    continue;
+
+	/* Extract line and fill style, but don't apply it yet */
+	if (this_object->lp_properties.l_type == LT_DEFAULT
+	    && this_object->object_type == OBJ_RECTANGLE)
+	    lpstyle = default_rectangle.lp_properties;
+	else
+	    lpstyle = this_object->lp_properties;
+	
+	if (this_object->fillstyle.fillstyle == FS_DEFAULT
+	    && this_object->object_type == OBJ_RECTANGLE)
+	    fillstyle = &default_rectangle.fillstyle;
+	else
+	    fillstyle = &this_object->fillstyle;
+	style = style_from_fill(fillstyle);
+	
+	if (this_object->object_type == OBJ_CIRCLE) {
+	    t_circle *e = &this_object->o.circle;
+	    double radius, junk;
+
+	    if (dimensions == 2 || e->center.scalex == screen) {
+		map_position_double(&e->center, &x1, &y1, "rect");
+		map_position_r(&e->extent, &radius, &junk, "rect");
+	    } else if (splot_map) {
+		int junkw, junkh;
+		map3d_position_double(&e->center, &x1, &y1, "rect");
+		map3d_position_r(&e->extent, &junkw, &junkh, "rect");
+		radius = junkw;
+	    } else
+		continue;
+
+	    term_apply_lp_properties(&lpstyle);
+
+	    do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, style);
+
+	    /* Retrace the border if the style requests it */
+	    if (fillstyle->border_linetype != LT_NODRAW
+	    &&  fillstyle->border_linetype != LT_UNDEFINED) {
+		(*term->linetype)(fillstyle->border_linetype);
+		do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, 0);
+	    }
+	}
+
+	if (this_object->object_type == OBJ_ELLIPSE) {
+	    term_apply_lp_properties(&lpstyle);
+
+	    if (dimensions == 2)
+		do_ellipse(2, &this_object->o.ellipse, style);
+	    else if (splot_map)
+		do_ellipse(3, &this_object->o.ellipse, style);
+	    else
+		continue;
+
+	    /* Retrace the border if the style requests it */
+	    if (fillstyle->border_linetype != LT_NODRAW
+	    &&  fillstyle->border_linetype != LT_UNDEFINED) {
+		(*term->linetype)(fillstyle->border_linetype);
+		if (dimensions == 2)
+		    do_ellipse(2, &this_object->o.ellipse, 0);
+		else
+		    do_ellipse(3, &this_object->o.ellipse, 0);
+	    }
+	}
+
+	/* Must be a rectangle */    
 	if (this_object->object_type == OBJ_RECTANGLE)
 	    this_rect = &this_object->o.rectangle;
 	else
-	    continue;
-
-	if (this_object->layer != layer)
 	    continue;
 
 	if (this_rect->type == 1) {
@@ -1577,7 +1640,7 @@ do_plot(struct curve_points *plots, int pcount)
     boundary(plots, pcount);
 
     /* Give a chance for rectangles to be behind everything else */
-    place_rectangles( first_object, -1, 2, NULL );
+    place_objects( first_object, -1, 2, NULL );
 
     /* Make palette */
     if (is_plot_with_palette())
@@ -1762,7 +1825,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    draw_color_smooth_box(MODE_PLOT);
 
     /* And rectangles */
-    place_rectangles( first_object, 0, 2, clip_area );
+    place_objects( first_object, 0, 2, clip_area );
 
     /* PLACE LABELS */
     place_labels( first_label, 0, FALSE );
@@ -2061,7 +2124,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    draw_color_smooth_box(MODE_PLOT);
 
     /* And rectangles */
-    place_rectangles( first_object, 1, 2, clip_area );
+    place_objects( first_object, 1, 2, clip_area );
 
     /* PLACE LABELS */
     place_labels( first_label, 1, FALSE );
@@ -5294,6 +5357,60 @@ fill_corners(int style, unsigned int x, unsigned int y, unsigned int w, unsigned
     return corner;
 }
 
+#ifdef EAM_OBJECTS
+void
+do_ellipse( int dimensions, t_ellipse *e, int style )
+{
+    gpiPoint vertex[120];
+    int i;
+    double angle;
+    double cx, cy;
+    double xoff, yoff;
+    int junkw, junkh;
+    double cosO = cos(DEG2RAD * e->orientation);
+    double sinO = sin(DEG2RAD * e->orientation);
+    double A = e->extent.x / 2.0;	/* Major axis radius */
+    double B = e->extent.y / 2.0;	/* Minor axis radius */
+    struct position pos = e->extent;	/* working copy with axis info attached */
+
+    /* Choose how many segments to draw for this ellipse */
+    int segments = 72;
+    double ang_inc  =  M_PI / 36.;
+
+    /* Find the center of the ellipse */
+    if (dimensions == 2)
+	map_position_double(&e->center, &cx, &cy, "ellipse");
+    else
+	map3d_position_double(&e->center, &cx, &cy, "ellipse");
+
+    /* Calculate the vertices */
+    vertex[0].style = style;
+    for (i=0, angle = 0.0; i<=segments; i++, angle += ang_inc) {
+	pos.x = A * cosO * cos(angle) - B * sinO * sin(angle);
+	pos.y = A * sinO * cos(angle) + B * cosO * sin(angle);
+	if (dimensions == 2)
+	    map_position_r(&pos, &xoff, &yoff, "ellipse");
+	else {
+	    map3d_position_r(&pos, &junkw, &junkh, "ellipse");
+	    xoff = junkw;
+	    yoff = junkh;
+	}
+	vertex[i].x = cx + xoff;
+	vertex[i].y = cy + yoff;
+    }
+
+    if (style) {
+	/* Fill in the center */
+	if (term->filled_polygon)
+	    term->filled_polygon(segments, vertex);
+    } else {
+	/* Draw the arc */
+	for (i=0; i<segments; i++)
+	    draw_clip_line( vertex[i].x, vertex[i].y,
+		vertex[i+1].x, vertex[i+1].y );
+    }
+}
+#endif
 
 #ifdef WITH_IMAGE
 

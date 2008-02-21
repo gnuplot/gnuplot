@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.148 2007/10/28 05:48:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.149 2007/12/08 10:55:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -516,7 +516,7 @@ set y2data%s\n",
 #endif
 
 #ifdef EAM_OBJECTS
-    save_rectangle(fp, 0);
+    save_object(fp, 0);
 #endif
 
     fputs("unset logscale\n", fp);
@@ -994,12 +994,11 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 
 }
 
+static const char *coord_msg[] = { "first ", "second ", "graph ", "screen ",
+				 "character "};
 static void
 save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 {
-    static const char *msg[] = { "first ", "second ", "graph ", "screen ",
-				 "character "};
- 
     assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
 	   character == 4);
 
@@ -1007,9 +1006,9 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 	fprintf(fp, " offset ");
 
     fprintf(fp, "%s%g, %s%g, %s%g",
-	    pos->scalex == first_axes ? "" : msg[pos->scalex], pos->x,
-	    pos->scaley == pos->scalex ? "" : msg[pos->scaley], pos->y,
-	    pos->scalez == pos->scaley ? "" : msg[pos->scalez], pos->z);
+	    pos->scalex == first_axes ? "" : coord_msg[pos->scalex], pos->x,
+	    pos->scaley == pos->scalex ? "" : coord_msg[pos->scaley], pos->y,
+	    pos->scalez == pos->scaley ? "" : coord_msg[pos->scalez], pos->z);
 }
 
 
@@ -1260,18 +1259,18 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 
 /* Save/show rectangle <tag> (0 means show all) */
 void
-save_rectangle(FILE *fp, int tag)
+save_object(FILE *fp, int tag)
 {
     t_object *this_object;
     t_rectangle *this_rect;
+    t_circle *this_circle;
+    t_ellipse *this_ellipse;
     TBOOLEAN showed = FALSE;
 
     for (this_object = first_object; this_object != NULL; this_object = this_object->next) {
-	if (this_object->object_type == OBJ_RECTANGLE)
+	if ((this_object->object_type == OBJ_RECTANGLE)
+	    && (tag == 0 || tag == this_object->tag)) {
 	    this_rect = &this_object->o.rectangle;
-	else
-	    continue;
-	if (tag == 0 || tag == this_object->tag) {
 	    showed = TRUE;
 	    fprintf(fp, "%sobject %2d rect ", (fp==stderr) ? "\t" : "set ",this_object->tag);
 
@@ -1300,9 +1299,64 @@ save_rectangle(FILE *fp, int tag)
 	    fprintf(fp, " fillstyle ");
 	    save_fillstyle(fp, &this_object->fillstyle);
 	}
+
+	else if ((this_object->object_type == OBJ_CIRCLE)
+	    && (tag == 0 || tag == this_object->tag)) {
+	    struct position *e = &this_object->o.circle.extent;
+	    this_circle = &this_object->o.circle;
+	    showed = TRUE;
+	    fprintf(fp, "%sobject %2d circle ", (fp==stderr) ? "\t" : "set ",this_object->tag);
+
+	    fprintf(fp, "center ");
+	    save_position(fp, &this_circle->center, FALSE);
+	    fprintf(fp, " size ");
+	    fprintf(fp, "%s%g", e->scalex == first_axes ? "" : coord_msg[e->scalex], e->x);
+	    fprintf(fp, " arc [%g:%g] ", this_circle->arc_begin, this_circle->arc_end);
+
+	    fprintf(fp, " %s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
+	    if (this_object->lp_properties.l_width)
+		fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
+	    fprintf(fp, "fc ");
+	    if (this_object->lp_properties.l_type == LT_DEFAULT)
+		fprintf(fp,"default");
+	    else if (this_object->lp_properties.use_palette)
+		save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
+	    else
+		fprintf(fp, "lt %d",this_object->lp_properties.l_type+1);
+	    fprintf(fp, " fillstyle ");
+	    save_fillstyle(fp, &this_object->fillstyle);
+	}
+
+	else if ((this_object->object_type == OBJ_ELLIPSE)
+	    && (tag == 0 || tag == this_object->tag)) {
+	    struct position *e = &this_object->o.ellipse.extent;
+	    this_ellipse = &this_object->o.ellipse;
+	    showed = TRUE;
+	    fprintf(fp, "%sobject %2d ellipse ", (fp==stderr) ? "\t" : "set ",this_object->tag);
+	    fprintf(fp, "center ");
+	    save_position(fp, &this_ellipse->center, FALSE);
+	    fprintf(fp, " size ");
+	    fprintf(fp, "%s%g", e->scalex == first_axes ? "" : coord_msg[e->scalex], e->x);
+	    fprintf(fp, ", %s%g", e->scaley == e->scalex ? "" : coord_msg[e->scaley], e->y);
+	    fprintf(fp, "  angle %g", this_ellipse->orientation);
+
+	    fprintf(fp, " %s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
+	    if (this_object->lp_properties.l_width)
+		fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
+	    fprintf(fp, "fc ");
+	    if (this_object->lp_properties.l_type == LT_DEFAULT)
+		fprintf(fp,"default");
+	    else if (this_object->lp_properties.use_palette)
+		save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
+	    else
+		fprintf(fp, "lt %d",this_object->lp_properties.l_type+1);
+	    fprintf(fp, " fillstyle ");
+	    save_fillstyle(fp, &this_object->fillstyle);
+	}
+
     }
     if (tag > 0 && !showed)
-	int_error(c_token, "rect not found");
+	int_error(c_token, "object not found");
 }
 
 #endif

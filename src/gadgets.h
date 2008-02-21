@@ -106,26 +106,43 @@ typedef struct arrow_def {
 } arrow_def;
 
 #ifdef EAM_OBJECTS
-/* The only object type supported so far is OBJ_RECTANGLE */
+/* The object types supported so far are OBJ_RECTANGLE, OBJ_CIRCLE, and OBJ_ELLIPSE */
 typedef struct rectangle {
     int type;			/* 0 = corners;  1 = center + size */
-    t_position bl;		/* bottom left */
-    t_position tr;		/* top right */
     t_position center;		/* center */
     t_position extent;		/* width and height */
+    t_position bl;		/* bottom left */
+    t_position tr;		/* top right */
 } t_rectangle;
+
+typedef struct circle {
+    int type;			/* not used */
+    t_position center;		/* center */
+    t_position extent;		/* radius */
+    double arc_begin;
+    double arc_end;
+} t_circle;
+
+typedef struct ellipse {
+    int type;			/* not used */
+    t_position center;		/* center */
+    t_position extent;		/* major and minor axes */
+    double orientation;		/* angle of first axis to horizontal */
+} t_ellipse;
 
 /* Datastructure for 'set object' */
 typedef struct object {
     struct object *next;
     int tag;
     int layer;			/* behind or back or front */
-    int object_type;	/* OBJ_RECTANGLE */
+    int object_type;		/* OBJ_RECTANGLE */
     fill_style_type fillstyle;
     lp_style_type lp_properties;
-    union o {t_rectangle rectangle;} o;
+    union o {t_rectangle rectangle; t_circle circle; t_ellipse ellipse;} o;
 } t_object;
 #define OBJ_RECTANGLE (1)
+#define OBJ_CIRCLE (2)
+#define OBJ_ELLIPSE (3)
 #endif
 
 /* Datastructure implementing 'set style line' */
@@ -416,11 +433,24 @@ void reset_textcolor __PROTO((const struct t_colorspec *tc, const struct terment
 extern fill_style_type default_fillstyle;
 
 #ifdef EAM_OBJECTS
+/*       Warning: C89 does not like the union initializers     */
 extern struct object default_rectangle;
 #define DEFAULT_RECTANGLE_STYLE { NULL, -1, 0, OBJ_RECTANGLE,	\
 	{FS_SOLID, 100, 0, LT_BLACK},   			\
 	{1, LT_BACKGROUND, 0, 1.0, 0.0},			\
-	{{0, {0,0.,0.,0.}, {0,0.,0.,0.}, {0,0.,0.,0.}, {0,0.,0.,0.}}} }
+	{.rectangle = {0, {0,0.,0.,0.}, {0,0.,0.,0.}, {0,0.,0.,0.}, {0,0.,0.,0.}}} }
+
+extern struct object default_circle;
+#define DEFAULT_CIRCLE_STYLE { NULL, -1, 0, OBJ_CIRCLE,       \
+	{FS_SOLID, 100, 0, LT_BLACK},   			\
+	{1, LT_BACKGROUND, 0, 1.0, 0.0},			\
+	{.circle = {1, {0,0.,0.,0.}, {0,0.,0.,0.}, 0., 360. }} }
+
+#define DEFAULT_ELLIPSE_STYLE { NULL, -1, 0, OBJ_CIRCLE,       \
+	{FS_SOLID, 100, 0, LT_BLACK},   			\
+	{1, LT_BACKGROUND, 0, 1.0, 0.0},			\
+	{.ellipse = {1, {0,0.,0.,0.}, {0,0.,0.,0.}, 0. }} }
+
 #endif
 
 /* filledcurves style options set by 'set style [data|func] filledcurves opts' */

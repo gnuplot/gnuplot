@@ -1,3 +1,18 @@
+2008-02-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/term.c (do_arc):  New terminal-independent routine
+	to draw all or part of a circle, possibly filled.  Terminal-specific
+	versions can be added later if desirable, with this one serving as a 
+	default fallback for terminals with no private routine.
+
+	* src/set.c (set_object) src/show.c src/save.h src/save.c src/gadgets.h:
+	Generalize all the support routines for "set obj rectangle" to handle
+	circles and ellipses also.
+
+	* src/graphics.h src/graphics.c(place_objects do_ellipse) src/graph3d.c
+	demo/ellipse.dem docs/gnuplot.doc:  Implement, document, and demonstrate
+	"set obj {circle|ellipse}".
+
 2008-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (place_arrows3d): Save/restore the clipping area so
