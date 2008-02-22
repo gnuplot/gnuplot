@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.192 2008/02/20 20:48:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.193 2008/02/22 06:13:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1006,6 +1006,7 @@ do_3dplot(
 	    case BOXERROR:
 	    case CANDLESTICKS:	/* HBB: dito */
 	    case FINANCEBARS:
+	    case CIRCLES:
 	    case POINTSTYLE:
 		if (draw_surface) {
 		    if (lkey) {
@@ -1155,6 +1156,7 @@ do_3dplot(
 		    case BOXXYERROR:
 		    case CANDLESTICKS:	/* HBB: dito */
 		    case FINANCEBARS:
+		    case CIRCLES:
 		    case POINTSTYLE:
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
@@ -1222,6 +1224,7 @@ do_3dplot(
 			    case BOXXYERROR:
 			    case CANDLESTICKS:	/* HBB: ditto */
 			    case FINANCEBARS:
+			    case CIRCLES:
 			    case POINTSTYLE:
 				if (this_plot->lp_properties.use_palette)
 				    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
@@ -1275,6 +1278,7 @@ do_3dplot(
 		    case BOXXYERROR:
 		    case CANDLESTICKS:
 		    case FINANCEBARS:
+		    case CIRCLES:
 			/* treat all the above like points */
 		    case DOTS:
 		    case POINTSTYLE:

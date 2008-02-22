@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.135 2008/02/09 03:57:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.136 2008/02/18 16:48:39 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3048,7 +3048,7 @@ df_insert_scanned_use_spec(int uspec)
 /* Not the most elegant way of defining the default columns, but I prefer
  * this to switch and conditional statements when there are so many styles.
  */
-#define LAST_PLOT_STYLE 26
+#define LAST_PLOT_STYLE 27
 typedef struct df_bin_default_columns {
     PLOT_STYLE plot_style;
     short excluding_gen_coords; /* Number of columns of information excluding generated coordinates. */
@@ -3086,6 +3086,9 @@ df_bin_default_columns default_style_cols[LAST_PLOT_STYLE + 1] = {
 #ifdef WITH_IMAGE
     {IMAGE, 1, 2},
     {RGBIMAGE, 3, 2}
+#endif
+#ifdef EAM_OBJECTS
+    , {CIRCLES, 2, 1}
 #endif
 };
 

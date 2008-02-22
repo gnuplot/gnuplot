@@ -1,3 +1,17 @@
+2008-02-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c src/gp_types.h src/graph3d.c src/plot2d.c src/tables.c 
+	src/graphics.c (plot_circles): New plot style 'plot ... with circles'.
+
+	* docs/gnuplot.doc docs/plotstyles.gnu:
+	Documentation for 'plot ... with circles'
+
+2008-02-22  Ralf Juengling
+
+	* demo/circles.dem demo/delaunay-edges.dat demo/empty-circles.dat
+	demo/optimize.dat demo/lena.rgb demo/lena-keypoints.bin:
+	Demo script and associated data files for 'plot ... with circles'.
+
 2008-02-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/term.c (do_arc):  New terminal-independent routine

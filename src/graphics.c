@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.245 2008/02/20 20:48:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.246 2008/02/22 06:13:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -166,6 +166,10 @@ static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *k
 
 static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
 				   char *title,  struct termentry *t, int xl, int yl));
+
+#ifdef EAM_OBJECTS
+static void plot_circles __PROTO((struct curve_points *plot));
+#endif
 
 /* for plotting error bars
  * half the width of error bar tic mark
@@ -2082,6 +2086,11 @@ do_plot(struct curve_points *plots, int pcount)
 		plot_image_or_update_axes(this_plot, FALSE);
 		break;
 #endif
+#ifdef EAM_OBJECTS
+	    case CIRCLES:
+		plot_circles(this_plot);
+		break;
+#endif
 	    }
 	}
 
@@ -3784,6 +3793,52 @@ plot_points(struct curve_points *plot)
     }
 }
 
+#ifdef EAM_OBJECTS
+/* plot_circles:
+ * Plot the curves in CIRCLES style
+ */
+static void
+plot_circles(struct curve_points *plot)
+{
+    int i;
+    int x, y;
+    double radius;
+    struct fill_style_type *fillstyle = &plot->fill_properties;
+    int style = style_from_fill(fillstyle);
+
+    for (i = 0; i < plot->p_count; i++) {
+	if (plot->points[i].type == INRANGE) {
+	    x = map_x(plot->points[i].x);
+	    y = map_y(plot->points[i].y);
+	    radius = x - map_x(plot->points[i].xlow);
+
+	    /* rgb variable  -  color read from data column */
+	    if ((plot->lp_properties.pm3d_color.value < 0.0)
+		&& (plot->lp_properties.pm3d_color.type == TC_RGB))
+		set_rgbcolor( plot->points[i].yhigh);
+	   
+	    do_arc(x,y, radius, 0., 360., style);
+	}
+    }
+
+    /* Retrace the border if the style requests it */
+    if (fillstyle->border_linetype != LT_NODRAW
+    &&  fillstyle->border_linetype != LT_UNDEFINED) {
+	(*term->linetype)(fillstyle->border_linetype);
+
+	for (i = 0; i < plot->p_count; i++) {
+	    if (plot->points[i].type == INRANGE) {
+		x = map_x(plot->points[i].x);
+		y = map_y(plot->points[i].y);
+		radius = x - map_x(plot->points[i].xlow);
+		do_arc(x,y, radius, 0., 360., 0);
+	    }
+	}
+    }
+
+}
+#endif
+
 /* plot_dots:
  * Plot the curves in DOTS style
  */
@@ -5275,7 +5330,12 @@ do_key_sample(
 	unsigned int w = key_sample_right - key_sample_left;
 	unsigned int h = key_entry_height/2;
 
-	if (w > 0) {
+#ifdef EAM_OBJECTS
+	if (this_plot->plot_style == CIRCLES && w > 0) {
+	    do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., style);
+	} else
+#endif
+	if (w > 0) {    /* All other plot types with fill */
 	    if (this_plot->lp_properties.use_palette && t->filled_polygon)
 		(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
 	    else

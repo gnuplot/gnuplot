@@ -160,6 +160,17 @@ set title "Columnstacked" offset 0,-1
 set boxwidth 0.8 rel
 set xtics
 plot 'histopt.dat' using 1 ti col fs pattern 0, '' using 2 ti col fs pattern 0
+#
+# Circles
+#
+reset
+set output 'figure_circles.pdf'
+set xrange [-1:1]
+unset key
+unset xtics
+unset ytics
+set samples 10
+plot '+' using 1:(rand(0)):(rand(0)/2.) with circles fs empty
 
 #
 # 3D Plot styles

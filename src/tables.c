@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.76 2007/12/08 10:55:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.77 2007/12/24 19:39:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -628,6 +628,9 @@ const struct gen_table plotstyle_tbl[] =
 #ifdef WITH_IMAGE
     { "ima$ge", IMAGE },
     { "rgbima$ge", RGBIMAGE },
+#endif
+#ifdef EAM_OBJECTS
+    { "cir$cles", CIRCLES },
 #endif
     { NULL, -1 }
 };

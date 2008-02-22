@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.159 2008/01/06 05:11:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.160 2008/01/10 21:37:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -469,6 +469,13 @@ get_data(struct curve_points *current_plot)
 	break;
 #endif
 
+#ifdef EAM_OBJECTS
+    case CIRCLES:	/* 3 + possible variable color */
+        min_cols = 3;
+        max_cols = 4;
+        break;
+#endif
+
     case POINTSTYLE:
 	/* Allow 3rd column because of 'pointsize variable' */
 	/* Allow 4th column because of 'lc rgb variable' */
@@ -735,6 +742,12 @@ get_data(struct curve_points *current_plot)
 				  v[1], v[2], v[2]);
 		    break;
 
+#ifdef EAM_OBJECTS
+		case CIRCLES:	/* x, y, radius */
+		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
+		    		  v[1], v[1], v[2]);
+		    break;
+#endif
 		}               /*inner switch */
 
 	    break;
@@ -810,6 +823,13 @@ get_data(struct curve_points *current_plot)
 			    &(current_plot->points[i]), i, df_tokens[2], v[3]);
 		i++;
 		break;
+#endif
+
+#ifdef EAM_OBJECTS
+		case CIRCLES:	/* x, y, radius, variable color */
+		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
+		    		  v[1], v[1], v[3]);
+		    break;
 #endif
 
 	    }                   /*inner switch */
