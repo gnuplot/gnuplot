@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.70 2007/10/31 17:31:20 sfeam Exp $
+ * $Id: pslatex.trm,v 1.71 2007/12/02 01:48:14 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -952,7 +952,8 @@ TERM_TABLE_START(epslatex_driver)
     PS_image,
 #endif
     0, 0, 0, /* Enhanced text mode not used */
-    EPSLATEX_layer /* Used to signal front/back text */
+    EPSLATEX_layer, /* Used to signal front/back text */
+    PS_path
 TERM_TABLE_END(epslatex_driver)
 #undef LAST_TERM
 #define LAST_TERM epslatex_driver
@@ -976,6 +977,9 @@ TERM_TABLE_START(pslatex_driver)
    PS_filled_polygon
 #ifdef WITH_IMAGE
     , PS_image
+    , 0, 0, 0	/* No enhanced text mode because this is LaTeX */
+    , 0         /* layer */
+    , PS_path
 #endif
 TERM_TABLE_END(pslatex_driver)
 #undef LAST_TERM
@@ -1001,6 +1005,9 @@ TERM_TABLE_START(pstex_driver)
 #ifdef WITH_IMAGE
     , PS_image
 #endif
+    , 0, 0, 0	/* No enhanced text mode because this is LaTeX */
+    , 0         /* layer */
+    , PS_path
 TERM_TABLE_END(pstex_driver)
 #undef LAST_TERM
 #define LAST_TERM pstex_driver
