@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.474 2008/02/04 16:56:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.475 2008/02/22 06:13:48 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8416,7 +8416,7 @@ Ffigure_mapcontours
  behind any labels that are also marked `front`. Setting `back` will place the
  object behind all plot curves and labels. Setting `behind` will place the
  object behind everything including the axes and `back` rectangles, thus
-     `set object rectangle from screen 0,0 to screen 1,1 behind`
+     set object rectangle from screen 0,0 to screen 1,1 behind
  can be used to provide a colored background for the entire graph or page.
 
  The fill color of the object is taken from the <colorspec>. `fillcolor`
