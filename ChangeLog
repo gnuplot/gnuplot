@@ -1,3 +1,10 @@
+2008-02-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pslatex.trm:  Include entry point PS_path in the terminal tables
+	for epslatex, pslatex, and pstex.  This fixes a bug due to the code in
+	color.c:draw_inside_color_smooth_box_postscript() not being able to sync
+	with the code in the terminal driver.
+
 2008-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (place_arrows3d): Save/restore the clipping area so
