@@ -5,6 +5,9 @@
 	color.c:draw_inside_color_smooth_box_postscript() not being able to sync
 	with the code in the terminal driver.
 
+	* src/datafile.c (df_gets): Use readline() for readline inline data from
+	pseudofile '-'.
+
 2008-02-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/gp_types.h src/graph3d.c src/plot2d.c src/tables.c 
