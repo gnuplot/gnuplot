@@ -6,7 +6,7 @@
 if ((GPVAL_VERSION == 4.3 || GPVAL_VERSION == 4.2) \
 &&  (!strstrt(GPVAL_COMPILE_OPTIONS,"+OBJECTS"))) \
     print ">>> Skipping demo <<<\n" ; \
-    print "This copy of gnuplot was built without support for placing rectangles\n" ; \
+    print "This copy of gnuplot was built without support for circles\n" ; \
     exit ;
 
 set style fill solid 1.0 border -1
@@ -18,12 +18,12 @@ set obj 13 circle   arc [ 90 : 120] fc rgb "forest-green"
 set obj 14 circle   arc [120 : 190] fc rgb "dark-turquoise" 
 set obj 15 circle   arc [190 : 360] fc rgb "dark-magenta" 
 
-set obj 10 circle at screen .18,.32   size screen .10  front lw 2.0
-set obj 11 circle at screen .18,.32   size screen .10  front lw 2.0
-set obj 12 circle at screen .18,.32   size screen .10  front lw 2.0
-set obj 13 circle at screen .18,.32   size screen .10  front lw 2.0
-set obj 14 circle at screen .18,.32   size screen .10  front lw 2.0
-set obj 15 circle at screen .18,.32   size screen .10  front lw 2.0
+set obj 10 circle at screen .18,.32   size screen .10  front
+set obj 11 circle at screen .18,.32   size screen .10  front
+set obj 12 circle at screen .18,.32   size screen .10  front
+set obj 13 circle at screen .1767,.342   size screen .10  front
+set obj 14 circle at screen .18,.32   size screen .10  front
+set obj 15 circle at screen .18,.32   size screen .10  front
 
 set obj 20 rect from graph 0,0 to graph 1,1 behind fc rgb "cyan" fs solid 0.2
 

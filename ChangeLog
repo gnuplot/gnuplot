@@ -6,6 +6,9 @@
 
 	* src/datafile.c: #include "readline.h"
 
+	* demo/circles.dem demo/html/Makefile demo/html/index.save:
+	Include circles.dem in the set of web demos.
+
 2008-02-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gclient.c: Use the font palette dialog instead of the standard
