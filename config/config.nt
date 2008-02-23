@@ -40,7 +40,8 @@
 /* #undef EXTERN_ERRNO */
 
 /* Define if libgd supports animated gifs. */
-#define GIF_ANIMATION 1
+/* #undef GIF_ANIMATION */
+/* Don't change it here -- this define is set in config/makefile.nt. */
 
 /* Define if you want to use the GNU version of the Unix plot library. */
 /* #undef GNUGRAPH */
