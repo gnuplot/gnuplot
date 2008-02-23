@@ -153,6 +153,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.137 2008/02/22 19:40:44
 #include "misc.h"
 #include "parse.h"
 #include "plot.h"
+#include "readline.h"
 #include "util.h"
 #ifdef BINARY_DATA_FILE
 #include "breaders.h"

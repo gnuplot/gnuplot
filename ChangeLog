@@ -1,3 +1,7 @@
+2008-02-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c: #include "readline.h"
+
 2008-02-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gclient.c: Use the font palette dialog instead of the standard
@@ -26,7 +30,7 @@
 	color.c:draw_inside_color_smooth_box_postscript() not being able to sync
 	with the code in the terminal driver.
 
-	* src/datafile.c (df_gets): Use readline() for readline inline data from
+	* src/datafile.c (df_gets): Use readline() for reading inline data from
 	pseudofile '-'.
 
 2008-02-22  Ethan A Merritt  <merritt@u.washington.edu>
