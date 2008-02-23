@@ -1,6 +1,6 @@
 # Hey, Emacs, this is a -*- Makefile -*-
 #
-# $Id: makefile.cyg,v 1.27.2.1 2007/06/02 22:21:16 mikulik Exp $
+# $Id: makefile.cyg,v 1.28 2007/06/02 22:27:50 mikulik Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -62,6 +62,10 @@ MOUSE=1
 
 # Where to place gnuplot.gih helpfile:
 HELPFILE = wgnuplot.hlp
+
+# Where to install the PostScript prologue files, relatively to the executable
+# wgnuplot.exe
+GNUPLOT_PS_DIR = share/PostScript
 
 # Destination directory, used in 'make install':
 DESTDIR = /cygdrive/c/Apps/gnuplot
@@ -125,7 +129,7 @@ ifdef PIPES
 endif
 
 TOP = ..
-TERMFLAGS = -I$(TOP)/term
+TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -I$(TOP)/term
 TERMLIBS =
 
 CFLAGS += -I. -D_Windows -DCYGWIN -mno-cygwin -DHAVE_CONFIG_H\
@@ -134,7 +138,7 @@ CFLAGS += -I. -D_Windows -DCYGWIN -mno-cygwin -DHAVE_CONFIG_H\
 # -I/usr/local/include
 
 ifdef MOUSE
-  CFLAGS += -DUSE_MOUSE=1
+  CFLAGS += -DUSE_MOUSE=1 -DWIN_IPC
 endif
 
 ifdef NEWGD
@@ -169,8 +173,10 @@ ifdef PDF
   TERMLIBS += -lpdf-w -ltiff-w
 ifndef PNG
   NEED_PNG_W = 1
-elseifndef NEWGD
+else
+ifndef NEWGD
   NEED_PNG_W = 1
+endif
 endif
 ifdef NEED_PNG_W
   CFLAGS += -DHAVE_LIBPNG
