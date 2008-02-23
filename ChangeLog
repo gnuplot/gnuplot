@@ -1,3 +1,7 @@
+2008-02-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/faq-ja.tex:  Translation of revision 1.37
+
 2008-02-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: #include "readline.h"
