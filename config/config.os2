@@ -1,9 +1,12 @@
 /* config.h for makefile.os2
  *
- * Prepared according to config.hin in Mai 2006
- * (config.hin generated from configure.in by autoheader).
+ * Prepared according to config.h from ./configure and by means of
+ * config_strip.sh as of gnuplot 4.3 in February 2008.
  */
 
+
+/* Define to allow use of deprecated syntax and terminal behaviour. */
+#define BACKWARDS_COMPATIBLE 1
 
 /* Define if you want to support files in binary format. */
 #define BINARY_DATA_FILE 1
@@ -36,6 +39,9 @@
 /* Define if color information should be passed for each vertex. */
 /* #undef EXTENDED_COLOR_SPECS */
 
+/* Define if you want to supply pre-existing X11 windows. */
+#define EXTERNAL_X11_WINDOW 1
+
 /* Define if <errno.h> declares errno. */
 /* #undef EXTERN_ERRNO */
 
@@ -49,9 +55,6 @@
 /* Define if you want to use a gnuplot history file. */
 /* #undef GNUPLOT_HISTORY */
 /* Don't change it here -- this define is set in config/makefile.os2. */
-
-/* Directory for PostScript prolog and associated files */
-#define GNUPLOT_PS_DIR "share/PostScript"
 
 /* Define to allow 'fit' to create parameter error variables. */
 #define GP_FIT_ERRVARS 1
@@ -74,6 +77,9 @@
 /* Define to 1 if you have the `bzero' function. */
 #define HAVE_BZERO 1
 
+/* Define if you want the cairo-based terminals. */
+/* #undef HAVE_CAIROPDF */
+
 /* Define to 1 if you have the declaration of `signgam', and to 0 if you
    don't. */
 /* #undef HAVE_DECL_SIGNGAM */
@@ -95,6 +101,9 @@
 
 /* Define to 1 if you have the <float.h> header file. */
 #define HAVE_FLOAT_H 1
+
+/* Define to 1 if you have the `fork' function. */
+#define HAVE_FORK 1
 
 /* Define to 1 if you have the `gamma' function. */
 /* #undef HAVE_GAMMA */
@@ -128,11 +137,23 @@
 /* Define to 1 if you have the <ggi/xmi.h> header file. */
 /* #undef HAVE_GGI_XMI_H */
 
+/* Define to use gtk/gdk tweaks */
+/* #undef HAVE_GTK */
+
+/* Define to use gtk+ functions to handle cairo */
+/* #undef HAVE_GTK28 */
+
 /* Define to 1 if you have the `index' function. */
 #define HAVE_INDEX 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 /* #undef HAVE_INTTYPES_H */
+
+/* Define to 1 if you have the `isnan' function. */
+#define HAVE_ISNAN 1
+
+/* Define if you use have kpsexpand (TeX). */
+/* #undef HAVE_KPSEXPAND */
 
 /* Define to 1 if you have the `lgamma' function. */
 /* #undef HAVE_LGAMMA */
@@ -156,14 +177,6 @@
 
 /* Define if your pdf library is too old to use PDF_begin_document. */
 /* #undef HAVE_LIBPDF_OPEN_FILE */
-/* Don't change it here -- this define is set in config/makefile.os2. */
-
-/* Define if you have the png library. */
-/* #undef HAVE_LIBPNG */
-/* Don't change it here -- this define is set in config/makefile.os2. */
-
-/* Define to 1 if you have the <libpng/png.h> header file. */
-/* #undef HAVE_LIBPNG_PNG_H */
 /* Don't change it here -- this define is set in config/makefile.os2. */
 
 /* Define if you are using the GNU readline library. */
@@ -214,10 +227,6 @@
 
 /* Define to 1 if you have the <pdflib.h> header file. */
 /* #undef HAVE_PDFLIB_H */
-/* Don't change it here -- this define is set in config/makefile.os2. */
-
-/* Define to 1 if you have the <png.h> header file. */
-/* #undef HAVE_PNG_H */
 /* Don't change it here -- this define is set in config/makefile.os2. */
 
 /* Define to 1 if you have the `poll' function. */
@@ -377,11 +386,23 @@
 /* Define to 1 if you have the <values.h> header file. */
 /* #undef HAVE_VALUES_H */
 
+/* Define to 1 if you have the `vfork' function. */
+/* #undef HAVE_VFORK */
+
+/* Define to 1 if you have the <vfork.h> header file. */
+/* #undef HAVE_VFORK_H */
+
 /* Define to 1 if you have the `vfprintf' function. */
 #define HAVE_VFPRINTF 1
 
 /* Define to 1 if you have the <vgagl.h> header file. */
 /* #undef HAVE_VGAGL_H */
+
+/* Define to 1 if `fork' works. */
+#define HAVE_WORKING_FORK 1
+
+/* Define to 1 if `vfork' works. */
+/* #undef HAVE_WORKING_VFORK */
 
 /* Define to 1 if the system has the type `_Bool'. */
 /* #undef HAVE__BOOL */
@@ -431,7 +452,7 @@
 /* Unix-type of Interprocess Communication is required for mouse support. */
 /* #undef PIPE_IPC */
 
-/* Define if compiler has function prototypes */
+/* Define to 1 if the C compiler supports function prototypes. */
 #define PROTOTYPES  1
 
 /* Define if you want to use the included readline function. */
@@ -474,7 +495,7 @@
 /* Define if you want to use the experimental ggi driver. */
 /* #undef USE_GGI_DRIVER */
 
-/* Define if you want to have mouse support. */
+/* Define if you want to have mouse support in interactive terminals. */
 /* #undef USE_MOUSE */
 /* Don't change it here -- this define is set in config/makefile.os2. */
 
@@ -487,8 +508,14 @@
 /* Define if the vgagl libray is present. */
 /* #undef VGAGL */
 
+/* Define to allow zooming or refresh of volatile data. EXPERIMENTAL */
+#define VOLATILE_REFRESH 1
+
 /* Define if you want to have image plotting support. */
 #define WITH_IMAGE 1
+
+/* Define if you want the wxwidgets terminal. */
+/* #undef WXWIDGETS */
 
 /* Define if you are using the X11 window system. */
 /* #undef X11 */
@@ -512,8 +539,14 @@
 /* #undef inline */
 #endif
 
+/* Define to `int' if <sys/types.h> does not define. */
+/* #define pid_t int */
+
 /* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */
+
+/* Define as `fork' if `vfork' does not work. */
+/* #undef vfork */
 
 
 /*
@@ -550,7 +583,4 @@
 #if defined(PM_OLD_ENHANCED_TEXT) && !defined(PM_KEEP_OLD_ENHANCED_TEXT)
 #define PM_KEEP_OLD_ENHANCED_TEXT 1
 #endif
-
-/* Define to enable parsing of deprecated syntax */
-#define BACKWARDS_COMPATIBLE 1
 
