@@ -1,3 +1,17 @@
+2008-02-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/os2/gclient.c: Use the font palette dialog instead of the standard
+	font selection dialog. Still switcheable via #define STANDARD_FONT_DIALOG.
+	SF #1773922 OS/2 PM-Termial broken font selection by Franz Bakan.
+
+	* config/makefile.cyg: Added GNUPLOT_PS_DIR and WIN_IPC.
+
+	* config/makefile.dj2 config/makefile.os2: Added GNUPLOT_PS_DIR.
+
+	* config/makefile.mgw: Added WIN_IPC.
+
+	* config/config.nt config/makefile.nt: Moved GIF_ANIMATION.
+
 2008-02-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm:  Include entry point PS_path in the terminal tables
