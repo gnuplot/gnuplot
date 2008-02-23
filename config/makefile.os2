@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.49 2006/04/08 13:21:48 mikulik Exp $
+# $Id: makefile.os2,v 1.50 2006/05/15 10:36:31 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -118,6 +118,10 @@ TERMDIR = ..\term
 # where to place gnuplot.gih helpfile
 HELPFILE = $(DOCDIR)\gnuplot.gih
 
+# Where to install the PostScript prologue files, relatively to the executable
+# gnuplot.exe
+GNUPLOT_PS_DIR = share/PostScript
+
 #
 # 3 sets of variables are defined and used to create
 #   1: gnuplot.exe, and utilities
@@ -164,7 +168,7 @@ endif
 #
 # Settings for the terminals to be included
 #
-TERMFLAGS = -I. -I.. -I$(T)
+TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -I. -I.. -I$(T)
 
 ifdef GD
   CFLAGS += -DHAVE_LIBGD -DHAVE_GD_H
