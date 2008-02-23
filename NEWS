@@ -5,7 +5,6 @@ New features, changes and fixes in gnuplot version 4.2.3
 * NEW character encoding support for emf and pdf terminals
 * FIX direction of y axis in graph coords for "set view map"
 * FIX minitics in log scale
-* FIX tweak installation scripts for OSX, nt
 * FIX minor bugfixes to terminals fig, emf, post, svg, x11
 * FIX protect against overly long font names in gd, svg
 * FIX infinite loop from x11 plot window resizing under ion, fluxbox
@@ -17,6 +16,7 @@ New features, changes and fixes in gnuplot version 4.2.3
 * FIX Do not clip image against Z range in 3D splot with "set view map"
 * FIX off-by-one error in implicit column 0 for binary data files
 * FIX splot was trashing the default clipping boundaries for 2D plots
+* CHANGE tweak installation scripts for OSX nt cyg dj2 mgw
 * CHANGE install Xresource file as Gnuplot, not Gnuplot.app-defaults
 * CHANGE Remove limitation of 10 args max to internal function sprintf()
 * CHANGE Bring emf point types into conformity with other terminals
