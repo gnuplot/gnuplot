@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.47 2006/05/15 10:34:07 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.48 2006/11/12 23:43:46 sfeam Exp $";
 #endif
 
 /****************************************************************************
@@ -105,6 +105,16 @@ static char RCSid[]="$Id: gclient.c,v 1.47 2006/05/15 10:34:07 mikulik Exp $";
 #include "pm_msgs.h"
 #define GNUPMDRV
 #include "mousecmn.h"
+
+
+/*==== m i s c e l l a n e o u s =============================================*/
+
+/* February 2008, according to the gnuplot bugs report #1773922
+   The standard font selection dialog is somehow broken after saving options.
+   Use the font palette dialog instead.
+*/
+/* #define STANDARD_FONT_DIALOG 1 */
+#undef STANDARD_FONT_DIALOG
 
 /*==== d e b u g g i n g =====================================================*/
 
@@ -982,6 +992,9 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    WinInvalidateRect(hWnd, NULL, TRUE);
 	}
 	free(pp);
+#ifndef STANDARD_FONT_DIALOG
+	gp_execute("refresh");
+#endif
 	break;
     }
 
@@ -3335,6 +3348,8 @@ BufRead(HFILE hfile, void *buf, int nBytes, ULONG *pcbR)
 }
 
 
+#ifdef STANDARD_FONT_DIALOG
+
 /*
 ** Get a new font using standard font dialog
 */
@@ -3385,6 +3400,28 @@ GetNewFont(HWND hwnd, HPS hps)
     } else
 	return 0;
 }
+
+#else
+
+/*
+** Get a new font using standard font palette
+*/
+int
+GetNewFont(HWND hwnd, HPS hps)
+{
+ HOBJECT hObject;
+ ULONG ulView = 0; /* OPEN_DEFAULT */
+ BOOL fSuccess = FALSE;
+
+ hObject = WinQueryObject("<WP_FNTPAL>");
+ if (hObject != NULL)
+  { fSuccess = WinOpenObject(hObject, ulView, TRUE); }
+  if (fSuccess) return 1;
+  else return 0;
+}
+
+#endif /* STANDARD_FONT_DIALOG */
+
 
 /*
 **  Handle termination signal to free up resources before
