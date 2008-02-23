@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.19 2006/07/05 17:41:30 sfeam Exp $
+# $Id: makefile.nt,v 1.20 2006/08/11 16:35:29 tlecomte Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -54,7 +54,7 @@ LD = link
 
 # compiler flags
 OPTIONS = /DUSE_MOUSE
-OPTIONS = $(OPTIONS) /DHAVE_LIBGD /DHAVE_GD_GIF /DHAVE_GD_PNG /DHAVE_GD_JPEG /DHAVE_GD_TTF
+OPTIONS = $(OPTIONS) /DHAVE_LIBGD /DHAVE_GD_GIF /DGIF_ANIMATION /DHAVE_GD_PNG /DHAVE_GD_JPEG /DHAVE_GD_TTF
 OPTIONS = $(OPTIONS) /DHAVE_LIBPDF
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
 CBASEFLAGS = /G5 /GX /GR /MD /O2 /nologo
