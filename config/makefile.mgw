@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.41.2.2 2007/06/02 22:21:16 mikulik Exp $
+# $Id: makefile.mgw,v 1.42 2007/06/02 22:27:50 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #  This assumes that MinGW32 is used via the MSYS toolkit
@@ -149,7 +149,7 @@ CFLAGS += -I$(TOP) -I. -D_Windows -DHAVE_CONFIG_H\
 	$(OPTS)
 
 ifdef MOUSE
-  CFLAGS += -DUSE_MOUSE=1
+  CFLAGS += -DUSE_MOUSE=1 -DWIN_IPC
 endif
 
 ifdef NEWGD
@@ -189,8 +189,10 @@ else
 endif
 ifndef PNG
   NEED_PNG_W = 1
-elseifndef NEWGD
+else
+ifndef NEWGD
   NEED_PNG_W = 1
+endif
 endif
 ifdef NEED_PNG_W
   CFLAGS += -DHAVE_LIBPNG
