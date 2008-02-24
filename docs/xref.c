@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: xref.c,v 1.10 2004/07/01 17:10:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: xref.c,v 1.11 2005/04/22 21:40:37 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - xref.c */
@@ -120,9 +120,8 @@ parse(FILE *a)
     list->prev = NULL;
     list->line = 0;
     list->level = 0;
-    /* I would prefer list->string = NULL, but don't know if free(NULL) is OK
-     * with all supported plattforms. */
     list->string = (char *) xmalloc(1);
+    list->string[0] = NUL;
     list->next = NULL;
 
     while (get_line(line, sizeof(line), a)) {
