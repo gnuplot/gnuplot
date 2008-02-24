@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.83 2007/10/05 00:27:10 sfeam Exp $
+ * $Id: cgm.trm,v 1.84 2007/12/20 03:15:55 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1303,7 +1303,7 @@ CGM_write_mixed_record(
 static void
 CGM_write_code(int class, int cgm_id, int length)
 {
-    unsigned code;
+    unsigned int code;
 
     assert((0 <= class) &&(class <16));
     assert((0 <= cgm_id) && (cgm_id < 128));

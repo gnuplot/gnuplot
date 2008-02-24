@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.170 2008/02/05 02:42:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.171 2008/02/22 06:13:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -948,7 +948,7 @@ term_check_multiplot_okay(TBOOLEAN f_interactive)
 
 void
 write_multiline(
-    unsigned int x, unsigned y,
+    unsigned int x, unsigned int y,
     char *text,
     JUSTIFY hor,                /* horizontal ... */
     VERT_JUSTIFY vert,          /* ... and vertical just - text in hor direction despite angle */

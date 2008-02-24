@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.59 2008/02/04 22:34:14 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.60 2008/02/04 22:52:28 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2055,7 +2055,7 @@ void wxt_filled_polygon(int n, gpiPoint *corners)
 }
 
 #ifdef WITH_IMAGE
-void wxt_image(unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
+void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
 {
 	/* This routine is to plot a pixel-based image on the display device.
 	'M' is the number of pixels along the y-dimension of the image and

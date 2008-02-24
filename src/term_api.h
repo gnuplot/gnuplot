@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.70 2008/01/26 05:06:32 sfeam Exp $
+ * $Id: term_api.h,v 1.71 2008/02/22 06:13:49 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -239,7 +239,7 @@ typedef struct TERMENTRY {
      */
     void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
 #ifdef WITH_IMAGE
-    void (*image) __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
+    void (*image) __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
 #endif
 
 /* Enhanced text mode driver call-backs */

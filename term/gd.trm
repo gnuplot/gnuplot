@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.122 2007/12/14 05:17:50 sfeam Exp $
+ * $Id: gd.trm,v 1.123 2007/12/21 07:57:33 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -132,7 +132,7 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *);
 TERM_PUBLIC void PNG_set_color (t_colorspec *);
 TERM_PUBLIC void PNG_filled_polygon (int, gpiPoint *);
 #ifdef WITH_IMAGE
-TERM_PUBLIC void PNG_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
+TERM_PUBLIC void PNG_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
 #endif
 
 /* To support "set term png enhanced" */
@@ -2024,7 +2024,7 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
 #ifdef WITH_IMAGE
 
 TERM_PUBLIC void
-PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
+PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
 {
     int m, n, mout, nout;
     int x1,y1,x2,y2;

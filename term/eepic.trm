@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.28 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: eepic.trm,v 1.29 2006/07/21 02:35:46 sfeam Exp $
  *
  */
 
@@ -370,7 +370,7 @@ EEPIC_arrow(
 
 
 TERM_PUBLIC void
-EEPIC_put_text(unsigned int x, unsigned y, const char str[])
+EEPIC_put_text(unsigned int x, unsigned int y, const char str[])
 {
     int i, l;
 

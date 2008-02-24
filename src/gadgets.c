@@ -274,7 +274,7 @@ draw_clip_arrow( int sx, int sy, int ex, int ey, int head)
 
 /* And text clipping routine. */
 void
-clip_put_text(unsigned int x, unsigned y, char *str)
+clip_put_text(unsigned int x, unsigned int y, char *str)
 {
     struct termentry *t = term;
 

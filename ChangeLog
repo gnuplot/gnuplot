@@ -1,3 +1,15 @@
+2008-02-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/datafile.c src/gadgets.c src/term.c src/gplt_x11.c
+	term/cairo.trm term/cgm.trm term/dumb.trm term/eepic.trm term/gd.trm
+	term/pdf.trm term/post.trm term/x11.trm src/wxterminal/wxt_term.h
+	src/wxterminal/wxt_gui.cpp:  A user has reported problems on ia64 that
+	may arise from improper casting between signed and unsigned numbers.
+	To facilitate debugging, change "unsigned" to explicit "unsigned int".
+
+	* src/hidden3d.c (sort_edges_by_z sort_polys_by_z):
+	Remove incorrect cast to (unsigned long).
+
 2008-02-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/faq-ja.tex:  Translation of revision 1.37

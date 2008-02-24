@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.63 2008/02/02 22:12:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.64 2008/02/06 18:04:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1118,14 +1118,10 @@ build_networks(struct surface_points *plots, int pcount)
     /* allocate the storage for polygons and edges of the isoline just
      * above the current one, to allow easy access to them from the
      * current isoline */
-    north_polygons = gp_alloc(2 * max_crvlen * sizeof (long int),
-			      "hidden north_polys");
-    these_polygons = gp_alloc(2 * max_crvlen * sizeof (long int),
-			      "hidden these_polys");
-    north_edges = gp_alloc(3 * max_crvlen * sizeof (long int),
-			   "hidden north_edges");
-    these_edges = gp_alloc(3 * max_crvlen * sizeof (long int),
-			   "hidden these_edges");
+    north_polygons = gp_alloc(2 * max_crvlen * sizeof(long), "hidden north_polys");
+    these_polygons = gp_alloc(2 * max_crvlen * sizeof(long), "hidden these_polys");
+    north_edges = gp_alloc(3 * max_crvlen * sizeof(long), "hidden north_edges");
+    these_edges = gp_alloc(3 * max_crvlen * sizeof(long), "hidden these_edges");
 
     /* initialize the lists, all in one large loop. This is different
      * from the previous approach, which went over the vertices,
@@ -1465,8 +1461,7 @@ sort_edges_by_z()
     if (!edges.end)
 	return;
 
-    sortarray = gp_alloc((unsigned long) sizeof(long) * edges.end,
-			 "hidden sort edges");
+    sortarray = gp_alloc(sizeof(long) * edges.end, "hidden sort edges");
     /* initialize sortarray with an identity mapping */
     for (i = 0; i < edges.end; i++)
 	sortarray[i] = i;
@@ -1505,8 +1500,7 @@ sort_polys_by_z()
     if (!polygons.end)
 	return;
 
-    sortarray = gp_alloc((unsigned long) sizeof(long) * polygons.end,
-			 "hidden sortarray");
+    sortarray = gp_alloc(sizeof(long) * polygons.end, "hidden sortarray");
 
     /* initialize sortarray with an identity mapping */
     for (i = 0; i < polygons.end; i++)

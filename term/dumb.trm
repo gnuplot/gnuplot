@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.26 2006/07/29 05:40:41 sfeam Exp $
+ * $Id: dumb.trm,v 1.27 2006/12/27 21:40:28 sfeam Exp $
  *
  */
 
@@ -178,8 +178,8 @@ DUMB_options()
 static void
 dumb_set_pixel(int x, int y, int v, int p)
 {
-    if ((unsigned) x <= dumb_xmax &&	/* ie x>=0 && x<=dumb_xmax */
-	(unsigned) y <= dumb_ymax &&
+    if ((unsigned int) x <= dumb_xmax &&	/* ie x>=0 && x<=dumb_xmax */
+	(unsigned int) y <= dumb_ymax &&
 	p > dumb_priority[dumb_xmax * y + x]) {
 	dumb_matrix[dumb_xmax * y + x] = v;
 	dumb_priority[dumb_xmax * y + x] = p;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.184 2007/12/08 23:53:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.185 2007/12/09 23:41:44 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -104,6 +104,16 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.184 2007/12/08 23:53:59
  * patches by Masahito Yamaga <ma@yama-ga.com>
  */
 
+#include <X11/Xos.h>
+#include <X11/Xlib.h>
+#include <X11/Xresource.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
+#include <X11/keysym.h>
+#ifdef USE_X11_MULTIBYTE
+# include <X11/Xlocale.h>
+#endif
+
 #include "syscfg.h"
 #include "stdfn.h"
 #include "gp_types.h"
@@ -124,16 +134,6 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.184 2007/12/08 23:53:59
 
 #if defined(VMS) && defined(CRIPPLED_SELECT)
 Error. Incompatible options.
-#endif
-
-#include <X11/Xos.h>
-#include <X11/Xlib.h>
-#include <X11/Xresource.h>
-#include <X11/Xutil.h>
-#include <X11/Xatom.h>
-#include <X11/keysym.h>
-#ifdef USE_X11_MULTIBYTE
-# include <X11/Xlocale.h>
 #endif
 
 #include <math.h>
@@ -1149,7 +1149,7 @@ store_command(char *buffer, plot_struct *plot)
 	    ? (char **) realloc(plot->commands, plot->max_commands * sizeof(char *))
 	    : (char **) malloc(sizeof(char *));
     }
-    p = (char *) malloc((unsigned) strlen(buffer) + 1);
+    p = (char *) malloc(strlen(buffer) + 1);
     if (!plot->commands || !p) {
 	fputs("gnuplot: can't get memory. X11 aborted.\n", stderr);
 	EXIT(1);
@@ -2455,7 +2455,7 @@ exec_cmd(plot_struct *plot, char *command)
 	     */
 	    unsigned char *iptr;
 	    float gray;
-	    unsigned i_remaining;
+	    unsigned int i_remaining;
 	    char *bptr;
 	    TBOOLEAN code_detected = 0;
 
@@ -2569,7 +2569,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    static TBOOLEAN transferring = 0;
 	    static unsigned char *iptr;
 	    static int int_cache[2];
-	    static unsigned i_remaining;
+	    static unsigned int i_remaining;
 	    unsigned short i_buffer;
 	    char *bptr;
 	    static TBOOLEAN code_detected = 0;
@@ -2676,7 +2676,7 @@ exec_cmd(plot_struct *plot, char *command)
 	static int pixel_1_1_x, pixel_1_1_y, pixel_M_N_x, pixel_M_N_y;
 	static int visual_1_1_x, visual_1_1_y, visual_M_N_x, visual_M_N_y;
 	static int color_mode;
-	static unsigned i_remaining;
+	static unsigned int i_remaining;
 
 	/* ignore, if your X server is not supported */
 	if (!have_pm3d)

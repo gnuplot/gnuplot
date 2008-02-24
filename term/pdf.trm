@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.77 2007/12/20 03:15:55 sfeam Exp $
+ * $Id: pdf.trm,v 1.78 2008/01/07 20:39:01 sfeam Exp $
  */
 
 /*------------------------------
@@ -58,7 +58,7 @@ TERM_PUBLIC int PDF_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void PDF_previous_palette __PROTO((void));
 TERM_PUBLIC void PDF_set_color __PROTO((t_colorspec *));
 #ifdef WITH_IMAGE
-TERM_PUBLIC void PDF_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
+TERM_PUBLIC void PDF_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
 #endif
 
 TERM_PUBLIC void PDF_filled_polygon __PROTO((int, gpiPoint *));
@@ -1401,7 +1401,7 @@ PDF_previous_palette()
  
 #ifdef WITH_IMAGE
 TERM_PUBLIC void
-PDF_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
+PDF_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
 {
     unsigned char *pixel;
     float xscale, yscale;

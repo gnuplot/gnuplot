@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.16 2008/02/03 22:04:58 tlecomte Exp $
+ * $Id: cairo.trm,v 1.17 2008/02/04 22:52:28 tlecomte Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -64,7 +64,7 @@ TERM_PUBLIC void cairotrm_fillbox __PROTO ((int style, unsigned int x1, unsigned
 TERM_PUBLIC int cairotrm_set_font __PROTO ((const char *font));
 TERM_PUBLIC void cairotrm_pointsize __PROTO ((double ptsize));
 #ifdef WITH_IMAGE
-TERM_PUBLIC void cairotrm_image __PROTO ((unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode));
+TERM_PUBLIC void cairotrm_image __PROTO ((unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode));
 #endif /*WITH_IMAGE*/
 TERM_PUBLIC int cairotrm_make_palette __PROTO ((t_sm_palette *palette));
 TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
@@ -715,7 +715,7 @@ void cairotrm_filled_polygon(int n, gpiPoint *corners)
 }
 
 #ifdef WITH_IMAGE
-void cairotrm_image(unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
+void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
 {
 	/* This routine is to plot a pixel-based image on the display device.
 	'M' is the number of pixels along the y-dimension of the image and

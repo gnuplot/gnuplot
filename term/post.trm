@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.227 2008/01/23 23:05:49 sfeam Exp $
+ * $Id: post.trm,v 1.228 2008/01/26 05:06:32 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -110,7 +110,7 @@ TERM_PUBLIC void PS_previous_palette (void);
 TERM_PUBLIC void PS_set_color (t_colorspec *);
 TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
 #ifdef WITH_IMAGE
-TERM_PUBLIC void PS_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
+TERM_PUBLIC void PS_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
 #endif
 
 /* To support "set term post enhanced" */
@@ -2953,13 +2953,13 @@ enum PS_ENCODING {
  * routine.
  */
 static char *
-PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode, int bits_per_component, int max_colors, enum PS_ENCODING encoding, int *return_num_bytes)
+PS_encode_image(unsigned int M, unsigned int N, coordval *image, t_imagecolor color_mode, int bits_per_component, int max_colors, enum PS_ENCODING encoding, int *return_num_bytes)
 {
-    unsigned coord_remaining;
+    unsigned int coord_remaining;
     coordval *coord_ptr;
     unsigned short i_line;
-    unsigned i_element;
-    unsigned end_of_line;
+    unsigned int i_element;
+    unsigned int end_of_line;
     unsigned short bits_remaining, bits_start;
 
     unsigned long tuple4;
@@ -3127,7 +3127,7 @@ PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode
 
 
 static void
-print_five_operand_image(unsigned M, unsigned N, gpiPoint *corner, t_imagecolor color_mode, unsigned short bits_per_component)
+print_five_operand_image(unsigned int M, unsigned int N, gpiPoint *corner, t_imagecolor color_mode, unsigned short bits_per_component)
 {
     char *space = ps_params->level1 ? "" : "  ";
 
@@ -3152,7 +3152,7 @@ print_five_operand_image(unsigned M, unsigned N, gpiPoint *corner, t_imagecolor 
 
 
 TERM_PUBLIC void
-PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
+PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
 {
     char *encoded_image;
     int num_encoded_bytes;
@@ -3458,7 +3458,7 @@ PS_load_glyphlist()
 {
     char buf[256];
     char *next = NULL;
-    unsigned code;
+    unsigned int code;
     int  len;
     char glyph_name[32];
     FILE *prologue_fd = PS_open_prologue_file("aglfn.txt");
