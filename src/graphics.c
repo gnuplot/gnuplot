@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.246 2008/02/22 06:13:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.247 2008/02/22 19:40:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4827,7 +4827,7 @@ xtick2d_callback(
     struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
     int ticsize = tic_direction * (int) t->v_tic * (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale);
-    unsigned int x = map_x(place);
+    int x = map_x(place);
 
     (void) axis;		/* avoid "unused parameter" warning */
 
@@ -4915,7 +4915,7 @@ ytick2d_callback(
     struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
     int ticsize = tic_direction * (int) t->h_tic * (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale);
-    unsigned int y = map_y(place);
+    int y = map_y(place);
 
     (void) axis;		/* avoid "unused parameter" warning */
 
@@ -5518,7 +5518,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     int i;
     double w_hyp[2], b_hyp;                    /* Hyperlane vector and constant */
     double p_start_corner[2], p_end_corner[2]; /* Points used for computing hyperplane. */
-    unsigned int K = 0, L = 0;                 /* Dimensions of image grid. K = <scan line length>, L = <number of scan lines>. */
+    int K = 0, L = 0;                          /* Dimensions of image grid. K = <scan line length>, L = <number of scan lines>. */
     double p_mid_corner[2];                    /* Point representing first corner found, i.e. p(K-1) */
     double delta_x_grid[2] = {0, 0};           /* Spacings between points, two non-orthogonal directions. */
     double delta_y_grid[2] = {0, 0};
@@ -5635,7 +5635,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 
     if (update_axes) {
 	for (i=0; i < 4; i++) {
-	    int dummy_type = INRANGE;
+	    coord_type dummy_type = INRANGE;
 	    double x = points[grid_corner[i]].x;
 	    double y = points[grid_corner[i]].y;
 	    x -= (points[grid_corner[(5-i)%4]].x - points[grid_corner[i]].x)/(2*(K-1));

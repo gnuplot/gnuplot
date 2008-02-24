@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.160 2008/01/10 21:37:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.161 2008/02/22 19:40:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -931,7 +931,7 @@ store2d_point(
 				 * use xlow/xhigh */
 {
     struct coordinate GPHUGE *cp = &(current_plot->points[i]);
-    int dummy_type = INRANGE;   /* sometimes we dont care about outranging */
+    coord_type dummy_type = INRANGE;   /* sometimes we dont care about outranging */
 
     /* jev -- pass data values thru user-defined function */
     /* div -- y is dummy variable 2 - copy value there */
@@ -2212,7 +2212,7 @@ eval_plots()
 			    x = temp * cos(x * ang2rad);
 			    if (boxwidth >= 0 &&  boxwidth_is_absolute) {
 				double xlow, xhigh;
-				int dmy_type = INRANGE;
+				coord_type dmy_type = INRANGE;
 				this_plot->points[i].z = 0;
 				if (axis_array[this_plot->x_axis].log) {
 				    double base = axis_array[this_plot->x_axis].base;

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.48 2007/08/31 20:03:41 sfeam Exp $
+ * $Id: axis.h,v 1.49 2007/12/18 19:02:53 sfeam Exp $
  *
  */
 
@@ -534,9 +534,8 @@ do {							\
 #define STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
 			        NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
 do {									  \
-    /* HBB 20000726: new check, to avoid crashes with axis index -1 */	  \
-    if (AXIS==-1)							  \
-	break;								  \
+    if (AXIS == NO_AXIS)                                                  \
+	break;                                                            \
     /* HBB 20040304: new check to avoid storing infinities and NaNs */	  \
     if (! (VALUE > -VERYLARGE && VALUE < VERYLARGE)) {			  \
 	TYPE = UNDEFINED;						  \
@@ -590,7 +589,7 @@ do {									  \
 #define COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
 			       NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
 {									  \
-    int c_type_tmp = TYPE;						  \
+    coord_type c_type_tmp = TYPE;						  \
     STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, AXIS,	  \
 			       NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION);	  \
 }

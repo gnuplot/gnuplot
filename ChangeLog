@@ -10,6 +10,10 @@
 	* src/hidden3d.c (sort_edges_by_z sort_polys_by_z):
 	Remove incorrect cast to (unsigned long).
 
+	* src/axis.h src/graphics.c src/plot2d.c(store2d_point eval_plots):
+	Remove a few more signed/unsigned incompatibilities. Declare variables
+	as coord_type rather than int when appropriate.
+
 2008-02-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/faq-ja.tex:  Translation of revision 1.37
