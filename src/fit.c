@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.58 2007/07/17 19:58:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.59 2007/12/06 06:27:07 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1311,8 +1311,8 @@ fit_command()
     df_axis[0] = FIRST_X_AXIS;
     df_axis[1] = (is_a_3d_fit) ? FIRST_Y_AXIS : FIRST_Z_AXIS;
     /* don't parse delta_z as times */
-    df_axis[2] = (is_a_3d_fit) ? FIRST_Z_AXIS : -1;
-    df_axis[3] = -1;
+    df_axis[2] = (is_a_3d_fit) ? FIRST_Z_AXIS : NO_AXIS;
+    df_axis[3] = NO_AXIS;
 
     /* HBB 20000430: No need for such a check for the z axis. That
      * axis is only used iff columns==4, i.e. the detection method for

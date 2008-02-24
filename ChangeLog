@@ -14,6 +14,10 @@
 	Remove a few more signed/unsigned incompatibilities. Declare variables
 	as coord_type rather than int when appropriate.
 
+	* src/datafile.c src/fit.c:  Use defined enum valur NO_AXIS rather
+	than the magic number -1 to mark an axis not in use.  Cleaner, and
+	avoids signed/unsigned comparisons.
+
 	* docs/href.c(parse) docs/doc2ipf.c(process_line): Null-terminate
 	allocated string. Do not walk off the end of a null-terminated string.
 	Bug #1900987
