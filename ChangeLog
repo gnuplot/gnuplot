@@ -1,3 +1,11 @@
+2008-02-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (map_position place_objects) src/graphics.h src/mouse.c
+	src/color.c:  Change map_position() to return (int) x,y rather than
+	(unsigned int). Callers are modified accordingly.  This avoids implicit
+	casting that breaks clipping calculations on ia64 and PPC.
+	This patchset fixes clipping of labels and rectangles.  Bugfix.
+
 2008-02-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gclient.c: Use the font palette dialog instead of the standard

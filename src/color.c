@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.70.2.4 2007/05/09 22:16:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.70.2.5 2007/08/12 18:01:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -54,7 +54,7 @@ int supply_extended_color_specs = 0;
 #endif
 
 /* Corners of the colour box. */
-static unsigned int cb_x_from, cb_x_to, cb_y_from, cb_y_to;
+static int cb_x_from, cb_x_to, cb_y_from, cb_y_to;
 
 /* Internal prototype declarations: */
 
