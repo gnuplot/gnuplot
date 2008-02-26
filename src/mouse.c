@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.95 2007/08/31 20:03:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.96 2007/09/24 20:05:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2377,7 +2377,7 @@ nearest_label_tag(int xref, int yref, struct termentry *t)
     double min = -1;
     int min_tag = -1;
     double diff_squared;
-    unsigned int x, y;
+    int x, y;
     struct text_label *this_label;
     int xd;
     int yd;
@@ -2389,8 +2389,8 @@ nearest_label_tag(int xref, int yref, struct termentry *t)
 	    yd -= yref;
 	} else {
 	    map_position(&this_label->place, &x, &y, "label");
-	    xd = (int) x - (int) xref;
-	    yd = (int) y - (int) yref;
+	    xd = x - xref;
+	    yd = y - yref;
 	}
 	diff_squared = xd * xd + yd * yd;
 	if (-1 == min || min > diff_squared) {

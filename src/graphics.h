@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.40 2007/12/18 19:02:56 sfeam Exp $
+ * $Id: graphics.h,v 1.41 2008/02/22 06:13:49 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -106,8 +106,7 @@ extern int bar_layer;
 
 void do_plot __PROTO((struct curve_points *, int));
 int label_width __PROTO((const char *, int *));
-void map_position __PROTO((struct position * pos, unsigned int *x,
-				  unsigned int *y, const char *what));
+void map_position __PROTO((struct position * pos, int *x, int *y, const char *what));
 void map_position_r __PROTO((struct position* pos, double* x, double* y,
 			     const char* what));
 #if defined(sun386) || defined(AMIGA_SC_6_1)

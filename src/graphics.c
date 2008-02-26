@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.247 2008/02/22 19:40:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.248 2008/02/25 01:34:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1175,7 +1175,7 @@ boundary(struct curve_points *plots, int count)
 	}
 
     } else {
-	unsigned int x, y;
+	int x, y;
 
 	map_position(&key->user_pos, &x, &y, "key");
 #if 0
@@ -1246,7 +1246,7 @@ apply_head_properties(struct arrow_style_type *arrow_properties)
     curr_arrow_headlength = 0;
     if (arrow_properties->head_length > 0) {
 	/* set head length+angle for term->arrow */
-	unsigned int itmp, x1, x2;
+	int itmp, x1, x2;
 	struct position headsize = {0,0,0,0.,0.,0.};
 
 	headsize.x = arrow_properties->head_length;
@@ -1355,7 +1355,7 @@ static void
 place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
 {
     struct text_label *this_label;
-    unsigned int x, y;
+    int x, y;
 
     if (term->pointsize)
 	(*term->pointsize)(pointsize);
@@ -1398,7 +1398,8 @@ place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *c
     t_object *this_object;
     t_rectangle *this_rect;
     double x1, y1, x2, y2;
-    unsigned int x, y, w, h;
+    int x, y;
+    unsigned int w, h;
     int style;
 
     for (this_object = listhead; this_object != NULL; this_object = this_object->next) {
@@ -5019,7 +5020,7 @@ label_width(const char *str, int *lines)
 void
 map_position(
     struct position *pos,
-    unsigned int *x, unsigned int *y,
+    int *x, int *y,
     const char *what)
 {
     double xx, yy;

@@ -1,3 +1,14 @@
+2008-02-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (map_position place_objects) src/graphics.h src/mouse.c
+	src/color.c:  Change map_position() to return (int) x,y rather than
+	(unsigned int). Callers are modified accordingly.  Bugfix.
+
+	Rationale: This avoids implicit casting that breaks clipping
+	calculations on ia64 and PPC.  This patchset fixes clipping of labels
+	and rectangles.  Similar clean-up should be done everywhere,
+	It is a mistake to use unsigned coordinates before clipping.
+
 2008-02-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/datafile.c src/gadgets.c src/term.c src/gplt_x11.c
