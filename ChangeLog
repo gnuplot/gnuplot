@@ -1,3 +1,11 @@
+2008-02-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_format set_tics set_tic_prop) docs/gnuplot.doc:
+	Allow the tic format to be provided as a string variable.
+	Also introduce a format keyword for "set tics" and "set {axis} tics".
+	"set tics format 'foo'"  is equivalent to "set format 'foo'"
+	"set ytics format 'baz'" is equivalent to "set format y 'baz'"
+
 2008-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (map_position place_objects) src/graphics.h src/mouse.c
