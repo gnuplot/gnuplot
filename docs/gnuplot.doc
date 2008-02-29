@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.476 2008/02/22 06:19:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.477 2008/02/22 19:40:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2486,8 +2486,8 @@ C ... and restart the table:
  deactivation command (like `set xdata`), the quantity will be shown in its
  numerical form.
 
- The command `set format` defines the format that will be used for tic labels,
- whether or not the specified axis is time/date.
+ The commands `set format` or `set tics format`	define the format that will be
+ used for tic labels, whether or not the specified axis is time/date.
 
  If time/date information is to be plotted from a file, the `using` option
  _must_ be used on the `plot` or `splot` command.  These commands simply use
@@ -7044,7 +7044,8 @@ Ffigure_mapcontours
 ?show format
 ?format
 ?format cb
- The format of the tic-mark labels can be set with the `set format` command.
+ The format of the tic-mark labels can be set with the `set format` command
+ or with the `set tics format` or individual `set {axis}tics format` commands.
 
  Syntax:
        set format {<axes>} {"<format-string>"}
@@ -8366,7 +8367,7 @@ Ffigure_mapcontours
        set mxtics 5
  Major tics at 0,5,7.5,10, minor tics at 1,2,3,4,6,7,8,9
        set logscale y
-       set format y ""
+       set ytics format ""
        set ytics 1e-6, 10, 1
        set ytics add ("1" 1, ".1" 0.1, ".01" 0.01, "10^-3" 0.001, \
                       "10^-4" 0.0001)
@@ -9992,7 +9993,7 @@ Ffigure_mapcontours
        set tics {axis | border} {{no}mirror}
                 {in | out} {scale {default | <major> {,<minor>}}}
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
-                { font "name{,<size>}" }
+                { format "formatstring" } { font "name{,<size>}" }
                 { textcolor <colorspec> }
        set tics {front | back}
        unset tics
@@ -10651,7 +10652,7 @@ Ffigure_mapcontours
                   | <incr>
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
-                 { font "name{,<size>}" }
+                 { formt "formatstring" } { font "name{,<size>}" }
                  { textcolor <colorspec> }
        unset xtics
        show xtics
@@ -10792,13 +10793,13 @@ Ffigure_mapcontours
  Examples:
        set xdata time
        set timefmt "%d/%m"
-       set format x "%b %d"
+       set xtics format "%b %d"
        set xrange ["01/12":"06/12"]
        set xtics "01/12", 172800, "05/12"
 
        set xdata time
        set timefmt "%d/%m"
-       set format x "%b %d"
+       set xtics format "%b %d"
        set xrange ["01/12":"06/12"]
        set xtics ("01/12", "" "03/12", "05/12")
  Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the

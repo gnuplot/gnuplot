@@ -1,8 +1,17 @@
+2008-02-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_format set_tics set_tic_prop) docs/gnuplot.doc:
+	Allow string variables to specify the tic format. Also introduce
+	a format keyword for "set tics" and "set {axis} tics".
+	"set tics format 'foo'"  is equivalent to "set format 'foo'"
+	"set ytics format 'baz'" is equivalent to "set format y 'baz'"
+
 2008-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (map_position place_objects) src/graphics.h src/mouse.c
 	src/color.c:  Change map_position() to return (int) x,y rather than
-	(unsigned int). Callers are modified accordingly.  Bugfix.
+	(unsigned int). Callers are modified accordingly.
+	Bug #1903131
 
 	Rationale: This avoids implicit casting that breaks clipping
 	calculations on ia64 and PPC.  This patchset fixes clipping of labels
@@ -25,7 +34,7 @@
 	Remove a few more signed/unsigned incompatibilities. Declare variables
 	as coord_type rather than int when appropriate.
 
-	* src/datafile.c src/fit.c:  Use defined enum valur NO_AXIS rather
+	* src/datafile.c src/fit.c:  Use defined enum value NO_AXIS rather
 	than the magic number -1 to mark an axis not in use.  Cleaner, and
 	avoids signed/unsigned comparisons.
 
