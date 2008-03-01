@@ -1,3 +1,12 @@
+2008-03-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cgm.trm (CGM_fillbox CGM_filled_polygon):  Move the
+	management of fill styles and pm3d fill from CGM_fillbox() to 
+	CGM_filled_polygon().  This is necessary because while boxes and
+	histograms call filled_polygon via term->fillbox(), the pm3d code
+	calls term->filled_polygon directly.
+	Bugfix.
+
 2008-02-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_format set_tics set_tic_prop) docs/gnuplot.doc:
