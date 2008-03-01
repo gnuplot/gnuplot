@@ -9,6 +9,7 @@ New features, changes and fixes in gnuplot version 4.2.3
 * FIX direction of y axis in graph coords for "set view map"
 * FIX minitics in log scale
 * FIX minor bugfixes to terminals fig, emf, post, svg, x11
+* FIX cgm terminal now produces correct pm3d and pattern fill output
 * FIX protect against overly long font names in gd, svg
 * FIX infinite loop from x11 plot window resizing under ion, fluxbox
 * FIX never estimate zero size for a non-empty string
