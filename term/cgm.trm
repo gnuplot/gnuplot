@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.86 2008/03/01 21:11:58 sfeam Exp $
+ * $Id: cgm.trm,v 1.87 2008/03/02 21:36:21 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -403,7 +403,7 @@ CGM_options()
 	    if (!END_OF_COMMAND) {
 		cgm_plotwidth = int_expression();
 		if (cgm_plotwidth < 0 || cgm_plotwidth > 10000) {
-		    int_warn(c_token,"width out of range\n");
+		    int_warn(c_token,"width out of range");
 		    cgm_plotwidth = 6 * 72;
 		}
 	    }
@@ -1033,8 +1033,6 @@ TERM_PUBLIC void
 CGM_set_color(t_colorspec *colorspec)
 {
     if (colorspec->type == TC_LT) {
-	/* EAM FIXME: This loses the current dot/dash pattern,    */
-	/* but switching to CGM_linecolor() instead breaks things */
 	 CGM_linecolor(colorspec->lt);
 	 cgm_linetype = colorspec->lt;
 	 return;
