@@ -7,6 +7,9 @@
 	Don't over-write user colors with each new palette.
 	Decouple dash pattern from line color.
 
+	* src/command.h:  refresh_request() depends on VOLATILE_REFRESH, not
+	USE_MOUSE.
+
 2008-03-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cgm.trm (CGM_fillbox CGM_filled_polygon):  Move the
