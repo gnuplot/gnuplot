@@ -1,3 +1,8 @@
+2008-03-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cgm.trm (CGM_set_color): Decouple dash type from line color.
+	Code clean-up. Use shared routines int_warn(), gp_alloc().
+
 2008-03-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cgm.trm (CGM_fillbox CGM_filled_polygon):  Move the

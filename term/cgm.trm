@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.77.2.1 2006/11/18 02:56:02 sfeam Exp $
+ * $Id: cgm.trm,v 1.77.2.2 2008/03/01 23:25:55 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -97,6 +97,7 @@ TERM_PUBLIC void CGM_put_text __PROTO((unsigned int x, unsigned int y,
 				       const char *str));
 TERM_PUBLIC int CGM_text_angle __PROTO((int ang));
 TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC int CGM_set_font __PROTO((const char *font));
 TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
 				    int number));
 TERM_PUBLIC void CGM_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
@@ -129,9 +130,7 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
-static int CGM_find_font __PROTO((const char *name, int len,
-				       double *relwidth));
-static int CGM_set_font __PROTO((const char *font));
+static int CGM_find_font __PROTO((const char *name, int len, double *relwidth));
 /*
  * on NeXTstep, id is an identifier (in ObjC) and causes a parse error
  * since some asserts below are mistaken as casts. datum is a type
@@ -347,6 +346,7 @@ static struct gen_table CGM_opts[] =
     { "da$shed", CGM_DASHED },
     { "s$olid", CGM_SOLID },
     { "li$newidth", CGM_LINEWIDTH },
+    { "lw", CGM_LINEWIDTH },
     { "wid$th", CGM_WIDTH },
     { NULL, CGM_OTHER }
 };
@@ -410,8 +410,7 @@ CGM_options()
 	    if (!END_OF_COMMAND) {
 		cgm_linewidth_pt = (unsigned int) real(const_express(&a));
 		if (cgm_linewidth_pt == 0 || cgm_linewidth_pt > 10000) {
-		    fputs("gnuplot(cgm.trm): linewidth out of range\n",
-			  stderr);
+		    int_warn(c_token,"linewidth out of range");
 		    cgm_linewidth_pt = 1;
 		}
 	    }
@@ -421,7 +420,7 @@ CGM_options()
 	    if (!END_OF_COMMAND) {
 		cgm_plotwidth = (int) real(const_express(&a));
 		if (cgm_plotwidth < 0 || cgm_plotwidth > 10000) {
-		    fputs("gnuplot(cgm.trm): width out of range\n", stderr);
+		    int_warn(c_token,"width out of range");
 		    cgm_plotwidth = 6 * 72;
 		}
 	    }
@@ -585,9 +584,7 @@ CGM_init()
     cgm_next.angle = 0;
     cgm_next.interior_style = 1;
     cgm_next.hatch_index = 1;
-    
-    if (!(cgm_polyline=malloc(CGM_MAX_SEGMENTS*sizeof(int))))
-	 FATAL("Cannot malloc space");
+    cgm_polyline = gp_alloc(CGM_MAX_SEGMENTS*sizeof(int), "cgm_polylines");
 }
 
 TERM_PUBLIC void
@@ -901,8 +898,6 @@ CGM_linetype(int linetype)
 	/* dashes for gridlines, solid for everything else */
 	CGM_dashtype(linetype == -1 ? 2 : 0);
     }
-    /* CGM_dashtype(cgm_monochrome ? linetype : 0); first fix, color->no dashes */
-    /* CGM_dashtype(linetype);  orig distribution              */
 }
 
 TERM_PUBLIC void
@@ -1054,8 +1049,8 @@ CGM_make_palette(t_sm_palette *palette)
 	      cgm_user_color_table[k++] = palette->color[i].r*255.9;
 	      cgm_user_color_table[k++] = palette->color[i].g*255.9;
 	      cgm_user_color_table[k++] = palette->color[i].b*255.9;
-	      cgm_user_color_count = CGM_COLORS + cgm_smooth_colors;
 	 }
+	 cgm_user_color_count = CGM_COLORS + cgm_smooth_colors;
 	 CGM_write_int_record(5, 34, (cgm_user_color_count*3+1)*
 			      sizeof(cgm_user_color_table[0])/CGM_ADJ,
 			      cgm_user_color_table);
@@ -1068,14 +1063,13 @@ CGM_make_palette(t_sm_palette *palette)
 TERM_PUBLIC void
 CGM_set_color(t_colorspec *colorspec)
 {
-    double gray;
-
     if (colorspec->type == TC_LT) {
-	 CGM_linetype(colorspec->lt);
+	 CGM_linecolor(colorspec->lt);
+	 cgm_linetype = colorspec->lt;
+	 return;
 
-    } else if (colorspec->type == TC_FRAC){
-
-	 gray = colorspec->value;
+    } else if (colorspec->type == TC_FRAC) {
+	 double gray = colorspec->value;
 	 /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
 	    offset to get past the default colors */
 	 cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);
