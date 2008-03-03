@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.99.2.1 2007/03/22 04:58:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.99.2.2 2007/06/07 16:27:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1572,7 +1572,7 @@ unset_axislabel(AXIS_INDEX axis)
 {
     unset_axislabel_or_title(&axis_array[axis].label);
     axis_array[axis].label = default_axis_label;
-    if (axis == FIRST_Y_AXIS || axis == SECOND_Y_AXIS)
+    if (axis == FIRST_Y_AXIS || axis == SECOND_Y_AXIS || axis == COLOR_AXIS)
 	axis_array[axis].label.rotate = TEXT_VERTICAL;
 }
 

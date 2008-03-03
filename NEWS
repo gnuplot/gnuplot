@@ -4,6 +4,7 @@ New features, changes and fixes in gnuplot version 4.2.3
 * NEW options front and back to "set colorbox"
 * NEW character encoding support for emf and pdf terminals
 * NEW "format" keyword for "set tics" and "set {x|y|...}tics"
+* NEW allow user to set colorbar label rotatation if the bar is vertical
 * FIX allow tic format to be given as a string variable
 * FIX handling of negative screen coordinates on ia64, PPC
 * FIX direction of y axis in graph coords for "set view map"
