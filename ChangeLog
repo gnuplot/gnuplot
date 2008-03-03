@@ -1,6 +1,6 @@
-2008-03-04  Ethan A Merritt  <merritt@u.washington.edu>
+2008-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
-	src/color.c (draw_color_smooth_box) src/unset.c (unset_axislabel):
+	* src/color.c (draw_color_smooth_box) src/unset.c (unset_axislabel):
 	Allow user to set colorbar label rotatation if the bar is vertical.
 
 	* term/cgm.trm:  Adjust palette size based on actual number of
