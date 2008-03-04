@@ -7,6 +7,10 @@
 	space required to accommodate rotated tick labels on x and x2 axes.
 	Bug #1879907
 
+	* PATCHLEVEL configure.in src/version.c:  Mark as patchlevel 3
+
+	* NEWS: Update in preparation for 4.2.3
+
 2008-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (draw_color_smooth_box) src/unset.c (unset_axislabel):

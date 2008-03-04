@@ -26,6 +26,7 @@ New features, changes and fixes in gnuplot version 4.2.3
 * CHANGE install Xresource file as Gnuplot, not Gnuplot.app-defaults
 * CHANGE Remove limitation of 10 args max to internal function sprintf()
 * CHANGE Bring emf point types into conformity with other terminals
+* CHANGE estimate the vertical space for rotated tick labels on x and x2 axes
 
 New features, changes and fixes in gnuplot version 4.2.2
 ===========================================================
