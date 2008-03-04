@@ -11,7 +11,7 @@ APPDEFAULTFILES = Gnuplot
 
 appdefault_DATA = $(APPDEFAULTFILES)
 
-Gnuplot: Gnuplot.app-defaults
-	cp -p Gnuplot.app-defaults $@
+Gnuplot: $(srcdir)/Gnuplot.app-defaults
+	cp -p $(srcdir)/Gnuplot.app-defaults $@
 
 CLEANFILES = $(APPDEFAULTFILES)

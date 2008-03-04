@@ -11,6 +11,8 @@
 
 	* NEWS docs/gnuplot.texi: Update in preparation for 4.2.3
 
+	* share/Makefile.am: Correct error in generating distribution package.
+
 2008-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (draw_color_smooth_box) src/unset.c (unset_axislabel):
