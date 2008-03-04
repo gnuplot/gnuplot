@@ -5,6 +5,10 @@
 	present; give it the bounding box of the full plot.
 	Bug #1906855
 
+	* src/graph3d.c (draw3d_graph_box):  Turn off clipping while drawing
+	the border + ticks, since we don't want to clip "out" ticks.
+	Bug #1906933
+
 2008-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (draw_color_smooth_box) src/unset.c (unset_axislabel):

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.193 2008/02/22 06:13:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.194 2008/02/22 19:40:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2016,6 +2016,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 {
     unsigned int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
+    BoundingBox *clip_save;
 
     if (draw_border && splot_map) {
 	if (border_layer == current_layer) {
@@ -2227,6 +2228,11 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	return;
     if (whichgrid == BORDERONLY)
 	return;
+
+    if (splot_map) {
+	clip_save = clip_area;
+	clip_area = NULL;
+    }
 
     /* Draw ticlabels and axis labels. x axis, first:*/
     if (X_AXIS.ticmode || X_AXIS.label.text) {
@@ -2536,6 +2542,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	reset_textcolor(&(Z_AXIS.label.textcolor),t);
 	ignore_enhanced(FALSE);
     }
+
+    if (splot_map)
+	clip_area = clip_save;
 }
 
 /* HBB 20010118: all the *_callback() functions made non-static. This
