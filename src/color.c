@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.78 2007/10/21 04:17:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.79 2008/02/27 03:20:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -677,9 +677,9 @@ draw_color_smooth_box(int plot_mode)
 	    y += (cb_y_from + cb_y_to) / 2;
 	    if (x<0) x = 0;
 	    if (y<0) y = 0;
-	    if ((*term->text_angle)(TEXT_VERTICAL)) {
+	    if ((*term->text_angle)(CB_AXIS.label.rotate)) {
 		write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_TOP,
-				TEXT_VERTICAL, CB_AXIS.label.font);
+				CB_AXIS.label.rotate, CB_AXIS.label.font);
 		(*term->text_angle)(0);
 	    } else {
 		write_multiline(x, y, CB_AXIS.label.text, LEFT, JUST_TOP, 0, CB_AXIS.label.font);
