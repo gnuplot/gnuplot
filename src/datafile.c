@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.10 2008/02/01 20:12:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.11 2008/03/04 06:12:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -152,6 +152,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.10 2008/02/01 20:
 #include "misc.h"
 #include "parse.h"
 #include "plot.h"
+#include "readline.h"
 #include "util.h"
 #ifdef BINARY_DATA_FILE
 #include "breaders.h"
@@ -595,9 +596,20 @@ df_gets()
 {
     int len = 0;
 
+#if (!defined(HAVE_LIBREADLINE) && !defined(READLINE))
     /* HBB 20000526: prompt user for inline data, if in interactive mode */
     if (mixed_data_fp && interactive)
 	fputs("input data ('e' ends) > ", stderr);
+#else
+    if (mixed_data_fp && interactive) {
+	char *in = readline("input data ('e' ends) > ");
+	if (!in)
+	    return NULL;
+	strncpy(line,in,max_line_len-1);
+	strcat(line,"\n");
+	free(in);
+    } else
+#endif
 
     if (!fgets(line, max_line_len, data_fp))
 	return NULL;

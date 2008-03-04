@@ -1,3 +1,8 @@
+2008-03-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_gets): Use readline() for reading inline data from
+	pseudofile '-'.
+
 2008-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (draw_color_smooth_box) src/unset.c (unset_axislabel):
