@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.87 2008/03/02 21:36:21 sfeam Exp $
+ * $Id: cgm.trm,v 1.88 2008/03/02 22:32:13 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -117,7 +117,7 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 				/* convert from plot units to pt */
 #define CGM_PT ((term->xmax + CGM_MARGIN)/cgm_plotwidth)
 #define CGM_LINE_TYPES 9	/* number of line types we support */
-#define CGM_COLORS 99		/* sizeof(web_color_rgbs)  currently in bitmap.c */
+#define CGM_COLORS WEB_N_COLORS	/* sizeof(web_color_rgbs)  currently in bitmap.c */
 #define CGM_POINTS 13		/* number of markers we support */
 #define CGM_MAX_SEGMENTS 16382	/* maximum # polyline coordinates */
 #define CGM_VCHAR (CGM_SMALL/360*12)
@@ -202,6 +202,7 @@ static int cgm_user_color_count = 0;
 static int cgm_user_color_max = 0;
 static int cgm_smooth_colors = 0;
 static int GPFAR *cgm_user_color_table = (int GPFAR*)0;
+static int cgm_maximum_color_index = 255;	/* Size of color table we will write */
 
 struct fontdata {
   char *name;			/* the name of the font */
@@ -683,13 +684,7 @@ Gnuplot version %s patchlevel %s,\
     CGM_write_int_record(1, 6, 2, index_precision_data);
     CGM_write_int_record(1, 7, 2, color_precision_data);
     CGM_write_int_record(1, 8, 2, color_index_precision_data);
-    {
-      /* we usually do not use 255 colors.  However, we may need to
-	 enlarge the color table after the picture descriptor is
-	 written (for PM3D) */
-      static int cgm_maximum_color_index[] = { 255 };
-      CGM_write_int_record(1, 9, 2, cgm_maximum_color_index);
-    }
+    CGM_write_int_record(1, 9, 2, &cgm_maximum_color_index);
     CGM_write_int_record(1, 10, sizeof(color_value_extent_data) / CGM_ADJ,
 			 color_value_extent_data);
     if (cgm_nofontlist_mode == FALSE)
@@ -1025,7 +1020,7 @@ CGM_make_palette(t_sm_palette *palette)
 			      cgm_user_color_table);
 	 return 0;
     } else {
-      return 200;
+      return (cgm_maximum_color_index - CGM_COLORS);
     }
 }
 

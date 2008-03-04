@@ -3,6 +3,9 @@
 	src/color.c (draw_color_smooth_box) src/unset.c (unset_axislabel):
 	Allow user to set colorbar label rotatation if the bar is vertical.
 
+	* term/cgm.trm:  Adjust palette size based on actual number of
+	color slots remaining in the table.
+
 2008-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cgm.trm:  Clean up terminal code.
