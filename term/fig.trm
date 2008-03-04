@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.62 2007/12/20 03:15:55 sfeam Exp $
+ * $Id: fig.trm,v 1.63 2008/01/26 05:06:32 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -761,8 +761,7 @@ FIG_vector(unsigned int ux, unsigned int uy)
 	/* allocate memory for the first point */
 	FIG_points = (F_point *) gp_realloc(FIG_points, sizeof(F_point), "FIG_points");		/* JFS */
 	FIG_points[FIG_poly_vec_cnt].x = FIG_xoff + FIG_posx;
-	FIG_points[FIG_poly_vec_cnt].y = term->ymax
-	    + FIG_yoff - FIG_posy;
+	FIG_points[FIG_poly_vec_cnt].y = term->ymax + FIG_yoff - FIG_posy;
 
 	FIG_poly_vec_cnt = 1;
 	FIG_polyvec_stat = FIG_poly_part;
@@ -1186,7 +1185,13 @@ FIG_layer(t_termlayer syncpoint)
 	
 	case TERM_LAYER_BEFORE_PLOT:
 		FIG_poly_clean(FIG_polyvec_stat);
-		fputs("6\n", gpoutfile);
+		fputs("6", gpoutfile);
+		/* Bounding box?  Give it the entire plot area */
+		fprintf(gpoutfile, " %d %d %d %d\n",
+			FIG_xoff + plot_bounds.xleft, 
+			term->ymax + FIG_yoff - plot_bounds.ytop,
+			FIG_xoff + plot_bounds.xright, 
+			term->ymax + FIG_yoff - plot_bounds.ybot);
 		fprintf(gpoutfile, "# Begin plot #%d\n", ++plotno);
 		break;
 	
