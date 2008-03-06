@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.248 2008/02/25 01:34:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.249 2008/02/27 03:20:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -930,7 +930,8 @@ boundary(struct curve_points *plots, int count)
 	} else
 	    current_aspect_ratio = aspect_ratio;
 
-	/*{{{  set aspect ratio if valid and sensible */
+	/* Set aspect ratio if valid and sensible */
+	/* EAM Mar 2008 - fixed borders take precedence over centering */
 	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
 	    double current = ((double) (plot_bounds.ytop - plot_bounds.ybot)) 
 			   / (plot_bounds.xright - plot_bounds.xleft);
@@ -938,22 +939,30 @@ boundary(struct curve_points *plots, int count)
 
 	    if (current > required) {
 		/* too tall */
-		int height = plot_bounds.ytop - plot_bounds.ybot;
-		plot_bounds.ytop = plot_bounds.ybot + required * (plot_bounds.xright - plot_bounds.xleft);
-		height -= (plot_bounds.ytop - plot_bounds.ybot);
-		height /= 2;
-		plot_bounds.ytop += height;
-		plot_bounds.ybot += height;
+		int old_height = plot_bounds.ytop - plot_bounds.ybot;
+		int new_height = required * (plot_bounds.xright - plot_bounds.xleft);
+		if (bmargin.scalex == screen)
+		    plot_bounds.ytop = plot_bounds.ybot + new_height;
+		else if (tmargin.scalex == screen)
+		    plot_bounds.ybot = plot_bounds.ytop - new_height;
+		else {
+		    plot_bounds.ybot += (old_height - new_height) / 2;
+		    plot_bounds.ytop -= (old_height - new_height) / 2;
+		}
+
 	    } else {
-		int width = plot_bounds.xright - plot_bounds.xleft;
-		plot_bounds.xright = plot_bounds.xleft + (plot_bounds.ytop - plot_bounds.ybot) / required;
-		width -= (plot_bounds.xright - plot_bounds.xleft);
-		width /= 2;
-		plot_bounds.xright += width;
-		plot_bounds.xleft += width;
+		int old_width = plot_bounds.xright - plot_bounds.xleft;
+		int new_width = (plot_bounds.ytop - plot_bounds.ybot) / required;
+		if (lmargin.scalex == screen)
+		    plot_bounds.xright = plot_bounds.xleft + new_width;
+		else if (rmargin.scalex == screen)
+		    plot_bounds.xleft = plot_bounds.xright - new_width;
+		else {
+		    plot_bounds.xleft += (old_width - new_width) / 2;
+		    plot_bounds.xright -= (old_width - new_width) / 2;
+		}
 	    }
 	}
-	/*}}} */
     }
 
     /*  adjust top and bottom margins for tic label rotation */

@@ -1,6 +1,13 @@
+2008-03-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary): Handle the case of a fixed aspect ratio and
+	fixed plot margins. Fixed left margin takes precedence over right. Fixed
+	bottom margin takes precedence over top. If no margins are fixed, center
+	the plot.
+
 2008-03-04  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/fig.trm (FIG_layer): We don't know a real boudning box at the
+	* term/fig.trm (FIG_layer): We don't know a true bounding box at the
 	time a new plot is started, but fig2dev insists that some numbers be
 	present; give it the bounding box of the full plot.
 	Bug #1906855
