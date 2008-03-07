@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.17 2008/02/04 22:52:28 tlecomte Exp $
+ * $Id: cairo.trm,v 1.18 2008/02/24 19:49:37 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -389,6 +389,8 @@ void cairotrm_init()
 		 * results in bitmap fallback. However, polygons are drawn with seams
 		 * between each other. */
 		plot.polygons_saturate = FALSE;
+		/* Empirical correction to make pdf output look more like wxt and png */
+		plot.dashlength /= 2;
 	} else if (!strcmp(term->name,"pngcairo")) {
 		surface = cairo_image_surface_create( CAIRO_FORMAT_ARGB32,
 				plot.device_xmax /*double width_in_points*/,

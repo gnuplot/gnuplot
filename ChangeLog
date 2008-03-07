@@ -1,3 +1,11 @@
+2008-03-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c src/wxterminal/gp_cairo.h
+	src/wxterminal/wxt_gui.cpp:  Treated dotted lines (LT_AXIS) differently
+	from the general cycle of dash patterns.
+
+	* term/cairo.trm: Scale dashlength down by a factor of 2 for pdfcairo.
+
 2008-03-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Handle the case of a fixed aspect ratio and

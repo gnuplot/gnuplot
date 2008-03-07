@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.60 2008/02/04 22:52:28 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.61 2008/02/24 19:49:37 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1836,7 +1836,7 @@ void wxt_linetype(int lt)
 
 	temp_command2.command = command_linestyle;
 	if (lt == -1)
-		temp_command2.integer_value = GP_CAIRO_DASH;
+		temp_command2.integer_value = GP_CAIRO_DOTS;
 	else
 		temp_command2.integer_value = GP_CAIRO_SOLID;
 

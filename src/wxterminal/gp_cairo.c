@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.35 2008/02/03 22:04:57 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.36 2008/02/04 22:52:26 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -489,13 +489,12 @@ void gp_cairo_stroke(plot_struct *plot)
 	    {9, 4, 1, 4, 1, 4, 0, 0}	/* dash dot dot */
 	};
 	int lt = plot->linetype;
+	double lw = plot->linewidth * plot->oversampling_scale;
 
 	if (!plot->opened_path) {
 		FPRINTF((stderr,"stroke with non-opened path !\n"));
 		return;
 	}
-
-	FPRINTF((stderr,"stroke - color %lf %lf %lf\n",plot->color.r, plot->color.g, plot->color.b));
 
 	/* add last point */
 	cairo_line_to (plot->cr, plot->current_x, plot->current_y);
@@ -506,10 +505,12 @@ void gp_cairo_stroke(plot_struct *plot)
 	if (plot->linetype == LT_NODRAW)
 		cairo_set_operator(plot->cr, CAIRO_OPERATOR_XOR);
 
-	else if (lt == -1) {
-		dashes[0] = 0.5*plot->oversampling_scale;
-		dashes[1] = 1.5*plot->oversampling_scale;
+	else if (lt == LT_AXIS || plot->linestyle == GP_CAIRO_DOTS) {
+		/* Grid lines (lt 0) */
+		dashes[0] = 0.4 * plot->oversampling_scale * plot->dashlength;
+		dashes[1] = 4.0 * plot->oversampling_scale * plot->dashlength;
 		cairo_set_dash(plot->cr, dashes, 2 /*num_dashes*/, 0 /*offset*/);
+		lw *= 0.6;
 	}
 
 	else if (plot->linestyle == GP_CAIRO_DASH
@@ -523,7 +524,7 @@ void gp_cairo_stroke(plot_struct *plot)
 	}
 
 	cairo_set_source_rgb(plot->cr, plot->color.r, plot->color.g, plot->color.b);
-	cairo_set_line_width(plot->cr, plot->linewidth*plot->oversampling_scale);
+	cairo_set_line_width(plot->cr, lw);
 
 	cairo_stroke(plot->cr);
 
