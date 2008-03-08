@@ -1,5 +1,10 @@
 2008-03-08  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* docs/gnuplot.doc: Update section on plot styles to include circles
+	and to separate out the plot styles affected by "set style fill".
+
+2008-03-08  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/datafile.c (df_gets): Revert patch of 2008-02-22 because testing
 	for "if (interactive)" is not a sufficient guarantee that it is safe to
 	call readline();   Example:  "load foo" where "foo" contains a plot

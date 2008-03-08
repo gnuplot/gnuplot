@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.477 2008/02/22 19:40:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.478 2008/02/29 17:34:54 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5478,28 +5478,29 @@ Ffigure_mapcontours
                          {palette}}
                     }
 
- where <style> is either `lines`, `points`, `linespoints`, `impulses`,
- `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `labels`, `xerrorbars`,
- `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
- `xyerrorlines`, `boxes`, `histograms`, `filledcurves`, `boxerrorbars`,
- `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors`, `image`,
- `rgbimage` or `pm3d`. Some of these styles require additional information.
- See `plotting styles` for details of each style.  `fill` is relevant only
- to certain 2D plots (currently `boxes` `boxxyerrorbars` and `candlesticks`).
- Note that `filledcurves` and `pm3d` can take an additional option not
- listed above (the latter only when used in the `splot` command)---see
- their help or examples below for more details.
 
- Default styles are chosen with the `set style function` and `set style data`
- commands.
+ where <style> is one of
+
+      lines        dots       steps     errorbars     xerrorbar    xyerrorliness
+      points       impulses   fsteps    errorlines    xerrorlines  yerrorbars
+      linespoints  labels     histeps   financebars   xyerrorbars  yerrorlines    
+                                        vectors
+ or
+       boxes            candlesticks   image      circles
+       boxerrorbars     filledcurves   rgbimage 
+       boxxyerrorbars   histograms     pm3d     
+ 
+ The first group of styles have associated line, point, and test properties.
+ The second group of style also have fill properties.  See `fillstyle`.  Some
+ styles have further sub-styles.  See `plotting styles` for details of each.
+ 
+ A default style may be chosen by `set style function` and `set style data`.
 
  By default, each function and data file will use a different line type and
  point type, up to the maximum number of available types.  All terminal
  drivers support at least six different point types, and re-use them, in
- order, if more are required.  The LaTeX driver supplies an additional six
- point types (all variants of a circle), and thus will only repeat after 12
- curves are plotted with points.  The PostScript drivers (`postscript`)
- supplies a total of 64.
+ order, if more are required.  To see the complete set of line and point
+ types available for the current terminal, type `test`.
 
  If you wish to choose the line or point type for a single plot, <line_type>
  and <point_type> may be specified.  These are positive integer constants (or
