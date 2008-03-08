@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.160.2.5 2007/12/10 00:05:25 sfeam Exp $
+ * $Id: x11.trm,v 1.160.2.6 2007/12/20 17:14:41 sfeam Exp $
  *
  */
 
@@ -1655,16 +1655,19 @@ X11_filled_polygon(int points, gpiPoint *corners)
 
 	}
 
-	int_cache[0] = corners[i_corner].x;
-	int_cache[1] = corners[i_corner].y;
 	byte_remaining = 2*sizeof(int);
-	point_remaining--;
-	i_corner++;
-
+	if (--point_remaining) {
+	    int_cache[0] = corners[i_corner].x;
+	    int_cache[1] = corners[i_corner].y;
+	    i_corner++;
+	}
     }
 
     /* Check if some characters were put in the buffer that need to be flushed. */
-    if (i_buffer != BINARY_MAX_CHAR_PER_TRANSFER) {fputc('\n', X11_ipc);  FFLUSH();}
+    if (i_buffer != BINARY_MAX_CHAR_PER_TRANSFER) {
+	fputc('\n', X11_ipc);
+	FFLUSH();
+    }
 
     return;
 #endif
