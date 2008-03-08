@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.140 2008/02/24 19:49:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.141 2008/02/25 03:17:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -603,24 +603,16 @@ df_gets()
 {
     int len = 0;
 
+    /* HBB 20000526: prompt user for inline data, if in interactive mode */
+    /* EAM 08mar2008: we'd like to call readline(), but this only works
+     * if isatty(stdin). Do all platforms have an equivalent to isatty()?
+     */
+    if (mixed_data_fp && interactive)
+	fputs("input data ('e' ends) > ", stderr);
+
     /* Special pseudofiles '+' and '++' return coords of sample */
     if (df_pseudodata)
 	return df_generate_pseudodata();
-
-#if (!defined(HAVE_LIBREADLINE) && !defined(READLINE))
-    /* HBB 20000526: prompt user for inline data, if in interactive mode */
-    if (mixed_data_fp && interactive)
-	fputs("input data ('e' ends) > ", stderr);
-#else
-    if (mixed_data_fp && interactive) {
-	char *in = readline("input data ('e' ends) > ");
-	if (!in)
-	    return NULL;
-	strncpy(line,in,max_line_len-1);
-	strcat(line,"\n");
-	free(in);
-    } else
-#endif
 
     if (!fgets(line, max_line_len, data_fp))
 	return NULL;
