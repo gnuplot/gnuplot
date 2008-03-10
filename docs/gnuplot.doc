@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.478 2008/02/29 17:34:54 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.479 2008/03/10 03:26:22 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -755,8 +755,8 @@ C
  Many terminal types support an enhanced text mode in which additional
  formatting information is embedded in the text string.  For example, "x^2"
  will write x-squared as we are used to seeing it, with a superscript 2.
- This mode is normally selected when you set the terminal, e.g. 
- "set term png enhanced", but may also be toggled afterward using 
+ This mode is normally selected when you set the terminal, e.g.
+ "set term png enhanced", but may also be toggled afterward using
  "set termoption enhanced", or by marking individual strings as in
  "set label 'x_2' noenhanced".
 
@@ -3022,7 +3022,7 @@ Ffigure_histcols
  For example, to create stacked histograms of the data in columns 3 through 8
 
        set style histogram columnstacked
-       plot for [i=3:8] "datafile" using i title columnhead 
+       plot for [i=3:8] "datafile" using i title columnhead
 2 image
 ?commands set style image
 ?set style image
@@ -3366,7 +3366,7 @@ Ffigure_surface
  See `hidden3d` and the `depthorder` option of `set pm3d`.
 Ffigure_surface+contours
  The `splot` command can also calculate and draw contour lines corresponding
- to constant Z values. These contour lines may be drawn onto the surface 
+ to constant Z values. These contour lines may be drawn onto the surface
  itself, or projected onto the XY plane. See `set contour`.
     
     
@@ -5481,19 +5481,19 @@ Ffigure_mapcontours
 
  where <style> is one of
 
-      lines        dots       steps     errorbars     xerrorbar    xyerrorliness
+      lines        dots       steps     errorbars     xerrorbar    xyerrorlines
       points       impulses   fsteps    errorlines    xerrorlines  yerrorbars
-      linespoints  labels     histeps   financebars   xyerrorbars  yerrorlines    
+      linespoints  labels     histeps   financebars   xyerrorbars  yerrorlines
                                         vectors
  or
        boxes            candlesticks   image      circles
-       boxerrorbars     filledcurves   rgbimage 
-       boxxyerrorbars   histograms     pm3d     
- 
+       boxerrorbars     filledcurves   rgbimage
+       boxxyerrorbars   histograms     pm3d
+
  The first group of styles have associated line, point, and test properties.
  The second group of style also have fill properties.  See `fillstyle`.  Some
  styles have further sub-styles.  See `plotting styles` for details of each.
- 
+
  A default style may be chosen by `set style function` and `set style data`.
 
  By default, each function and data file will use a different line type and
@@ -5682,7 +5682,7 @@ Ffigure_mapcontours
 
        plot '-' ; ... ; replot
 
- is not recommended, because it will require that you type in the data all 
+ is not recommended, because it will require that you type in the data all
  over again.  In most cases you can use the `refresh` command instead, which
  will redraw the plot using the data previously read in.
 
@@ -7087,7 +7087,7 @@ Ffigure_mapcontours
  The string function gprintf("format",x) uses gnuplot's own format specifiers,
  as do the gnuplot commands `set format`, `set timestamp`, and others. These
  format specifiers are not the same as those used by the standard C-language
- routine sprintf(). gprintf() accepts only a single variable to be formatted. 
+ routine sprintf(). gprintf() accepts only a single variable to be formatted.
  Gnuplot also provides an sprintf("format",x1,x2,...) routine if you prefer.
  For a list of gnuplot's format options, see `format specifiers`.
 4 format specifiers
@@ -7422,7 +7422,7 @@ Ffigure_mapcontours
  option `nohidden3d` to the `with` specifier.
 
  Hidden3d does not affect solid surfaces drawn using the pm3d mode. To achieve
- a similar effect purely for pm3d surfaces, use instead set `pm3d depthorder`.
+ a similar effect purely for pm3d surfaces, use instead `set pm3d depthorder`.
  To mix pm3d surfaces with normal `hidden3d` processing, use the option
  `set hidden3d front` to force all elements included in hidden3d processing to
  be drawn after any remaining plot elements. Then draw the surface twice, once
@@ -8419,7 +8419,7 @@ Ffigure_mapcontours
 ?show object
  The `set object` command defines a single object which will appear in all
  subsequent 2D plots. You may define as many objects as you like. Currently the
- supported object types are `rectangle`, `cirlce`, and `ellipse`.
+ supported object types are `rectangle`, `circle`, and `ellipse`.
  Rectangles inherit a default set of style properties (fill, color, border) from
  those set by the command `set style rectangle`, but each object can also be
  given individual style properties. Circles and ellipses inherit the fill style
@@ -8433,7 +8433,7 @@ Ffigure_mapcontours
 
  <object-type> is either `rectangle`, `ellipse`, or `circle`. Each object type
  has its own set of characteristic properties.
- 
+
  Setting `front` will draw the object in front of all plot elements, but
  behind any labels that are also marked `front`. Setting `back` will place the
  object behind all plot curves and labels. Setting `behind` will place the
@@ -8521,7 +8521,7 @@ Ffigure_mapcontours
  The position of the circle is specified by giving the position of the center
  center followed by the radius.  The keywords `at` and `center` are synonyms.
  The position and radius may be given in x-axis, graph, or canvas
- coordinates. See `coordinates`. In all cases the radius is calculated 
+ coordinates. See `coordinates`. In all cases the radius is calculated
  relative to the horizontal scale of the axis, graph, or canvas.  Any
  disparity between the horizontal and vertical scaling will be corrected for
  so that the result is always a circle.
@@ -9617,7 +9617,7 @@ Ffigure_mapcontours
 ?fillstyle
  The `set style fill` command is used to set the default style of the plot
  elements in plots with boxes, histograms, candlesticks and filledcurves.
- This default can be superceeded by fillstyles attached to individual plots.
+ This default can be superseded by fillstyles attached to individual plots.
  See also 'set style rectangle'.
 
  Syntax:

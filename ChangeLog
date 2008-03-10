@@ -1,3 +1,7 @@
+2008-03-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc: Fix typos.
+
 2008-03-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Update section on plot styles to include circles
