@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.171 2007/12/20 03:15:55 sfeam Exp $
+ * $Id: x11.trm,v 1.172 2008/02/24 19:49:42 sfeam Exp $
  *
  */
 
@@ -2313,12 +2313,12 @@ START_HELP(x11)
 "?x11 color_resources",
 "?color_resources",
 "=X resources",
-" For color displays, `gnuplot` honors the following resources (shown here",
-" with their default values) or the greyscale resources.  The values may be",
-" color names as listed in the X11 rgb.txt file on your system, hexadecimal",
-" RGB color specifications (see X11 documentation), or a color name followed",
-" by a comma and an `intensity` value from 0 to 1.  For example, `blue, 0.5`",
-" means a half intensity blue.",
+" The X11 terminal honors the following resources (shown here with their",
+" default values) or the greyscale resources.  The values may be color names",
+" as listed in the X11 rgb.txt file on your system, hexadecimal RGB color",
+" specifications (see X11 documentation), or a color name followed by a comma",
+" and an `intensity` value from 0 to 1.  For example, `blue, 0.5` means a half",
+" intensity blue.",
 "@start table - first is interactive cleartext form",
 "  gnuplot*background:  white",
 "  gnuplot*textColor:   black",
