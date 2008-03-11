@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.161 2008/02/22 19:40:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.162 2008/02/25 01:34:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -345,6 +345,14 @@ get_data(struct curve_points *current_plot)
     struct coordinate GPHUGE *cp;
 #endif
 
+    TBOOLEAN variable_color;
+    double   variable_color_value;
+    if ((current_plot->lp_properties.pm3d_color.type == TC_RGB)
+    &&  (current_plot->lp_properties.pm3d_color.value < 0))
+	variable_color = TRUE;
+    else
+	variable_color = FALSE;
+
     /* eval_plots has already opened file */
 
     /* HBB 2000504: For most 2D plot styles the 'z' coordinate is unused.
@@ -519,7 +527,15 @@ get_data(struct curve_points *current_plot)
 	     * needlessly small steps. */
 	    cp_extend(current_plot, i + i + 1000);
 	}
-	/* Limitation: No xerrorbars with boxes */
+
+	/* Allow for optional columns.  Currently only used for BOXES and */
+	/* CIRCLES, but should be extended to a more general mechanism.   */
+	if (j > 1 && variable_color
+	&& (current_plot->plot_style == BOXES || current_plot->plot_style == CIRCLES)) {
+		variable_color_value = v[--j];
+	} else
+		variable_color_value = 0;
+
 	switch (j) {
 	default:
 	    {
@@ -646,11 +662,11 @@ get_data(struct curve_points *current_plot)
 			double base = axis_array[current_plot->x_axis].base;
 			store2d_point(current_plot, i++, v[0], v[1],
 				      v[0] * pow(base, -boxwidth/2.), v[0] * pow(base, boxwidth/2.),
-				      v[1], v[1], 0.0);
+				      v[1], variable_color_value, 0.0);
 		    } else
 			store2d_point(current_plot, i++, v[0], v[1],
 				      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
-				      v[1], v[1], 0.0);
+				      v[1], variable_color_value, 0.0);
 		} else {
 		    if (current_plot->plot_style == CANDLESTICKS
 			|| current_plot->plot_style == FINANCEBARS) {
@@ -704,11 +720,10 @@ get_data(struct curve_points *current_plot)
 		    break;
 
 		case BOXES:
-		    /* calculate xmin and xmax here, so that logs are
-		     * taken if if necessary */
+		    /* calculate xmin and xmax here, so that logs are taken if if necessary */
 		    store2d_point(current_plot, i++, v[0], v[1],
 				  v[0] - v[2] / 2, v[0] + v[2] / 2,
-				  v[1], v[1], 0.0);
+				  v[1], variable_color_value, 0.0);
 		    break;
 
 #ifdef EAM_DATASTRINGS
@@ -745,7 +760,7 @@ get_data(struct curve_points *current_plot)
 #ifdef EAM_OBJECTS
 		case CIRCLES:	/* x, y, radius */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
-		    		  v[1], v[1], v[2]);
+		    		  v[1], variable_color_value, v[2]);
 		    break;
 #endif
 		}               /*inner switch */
@@ -783,6 +798,11 @@ get_data(struct curve_points *current_plot)
 
 
 	    case BOXES:
+		/* x, y, xmin, xmax */
+		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3],
+			      v[1], variable_color_value, 0.0);
+		break;
+
 	    case XERRORLINES:
 	    case XERRORBARS:
 		/* x, y, xmin, xmax */
@@ -823,13 +843,6 @@ get_data(struct curve_points *current_plot)
 			    &(current_plot->points[i]), i, df_tokens[2], v[3]);
 		i++;
 		break;
-#endif
-
-#ifdef EAM_OBJECTS
-		case CIRCLES:	/* x, y, radius, variable color */
-		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
-		    		  v[1], v[1], v[3]);
-		    break;
 #endif
 
 	    }                   /*inner switch */
@@ -927,8 +940,7 @@ store2d_point(
     double x, double y,
     double xlow, double xhigh,
     double ylow, double yhigh,
-    double width)               /* BOXES widths: -1 -> autocalc, 0 ->
-				 * use xlow/xhigh */
+    double width)               /* BOXES widths: -1 -> autocalc, 0 ->  use xlow/xhigh */
 {
     struct coordinate GPHUGE *cp = &(current_plot->points[i]);
     coord_type dummy_type = INRANGE;   /* sometimes we dont care about outranging */
@@ -942,6 +954,8 @@ store2d_point(
 	ydata_func.dummy_values[2] = ydata_func.dummy_values[0];
 	evaluate_at(ydata_func.at, &val);
 	y = undefined ? 0.0 : real(&val);
+
+	/* EAM FIXME - filtering ylow and yhigh is nonsense for many plot styles */
 
 	(void) Gcomplex(&ydata_func.dummy_values[0], ylow, 0.0);
 	ydata_func.dummy_values[2] = ydata_func.dummy_values[0];
@@ -1021,6 +1035,15 @@ store2d_point(
 	cp->xhigh = xhigh;
 	cp->ylow = ylow;
 	cp->yhigh = yhigh;
+	break;
+    case BOXES:			/* auto-scale to xlow xhigh */
+    case CIRCLES:
+	cp->ylow = y;
+	cp->yhigh = yhigh;	/* really variable_color_data */
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
+					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
+					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);
 	break;
     default:			/* auto-scale to xlow xhigh ylow yhigh */
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 

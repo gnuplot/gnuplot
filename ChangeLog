@@ -1,3 +1,11 @@
+2008-03-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data store2d_point) src/graphics.c (plot_boxes):
+	Alter processing of "with boxes" to handle specification of a column
+	containing variable color information.  Modify "with circles" to use
+	the same mechanism.
+	Bug #1910587
+
 2008-03-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: Fix typos.

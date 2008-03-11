@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.479 2008/03/10 03:26:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.480 2008/03/11 05:02:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5490,8 +5490,8 @@ Ffigure_mapcontours
        boxerrorbars     filledcurves   rgbimage
        boxxyerrorbars   histograms     pm3d
 
- The first group of styles have associated line, point, and test properties.
- The second group of style also have fill properties.  See `fillstyle`.  Some
+ The first group of styles have associated line, point, and text properties.
+ The second group of styles also have fill properties.  See `fillstyle`.  Some
  styles have further sub-styles.  See `plotting styles` for details of each.
 
  A default style may be chosen by `set style function` and `set style data`.

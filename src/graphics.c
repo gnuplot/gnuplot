@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.249 2008/02/27 03:20:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.250 2008/03/06 17:55:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3696,6 +3696,14 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    || histogram_opts.type == HT_STACKED_IN_TOWERS))
 			yb = map_y(dyb);
 #endif
+
+		/* Variable color */
+		if (plot->plot_style == BOXES) {
+		    if ((plot->lp_properties.pm3d_color.type == TC_RGB)
+		    &&  (plot->lp_properties.pm3d_color.value < 0))
+			set_rgbcolor(plot->points[i].yhigh);
+		}
+
 		if ((plot->fill_properties.fillstyle != FS_EMPTY) && t->fillbox) {
 		    int x, y, w, h;
 		    int style;
