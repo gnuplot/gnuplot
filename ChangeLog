@@ -6,6 +6,10 @@
 	the same mechanism.
 	Bug #1910587
 
+	* src/set.c (parse_histogramstyle) src/tabulate.c (print_table):
+	Default to non-zero linewidth for histogram errorbars.
+	Handle histogram error bars in tabular output.
+
 2008-03-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: Fix typos.

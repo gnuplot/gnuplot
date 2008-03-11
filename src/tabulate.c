@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.4 2008/01/25 20:56:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.5 2008/02/01 21:35:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -142,6 +142,10 @@ print_table(struct curve_points *current_plot, int plot_num)
 	    }
 
 	} else {
+	    int plotstyle = current_plot->plot_style;
+	    if (plotstyle == HISTOGRAMS && current_plot->histogram->type == HT_ERRORBARS)
+		plotstyle = YERRORBARS;
+
 	    for (i = 0, point = current_plot->points; i < current_plot->p_count;
 		i++, point++) {
 
@@ -149,7 +153,7 @@ print_table(struct curve_points *current_plot, int plot_num)
 		OUTPUT_NUMBER(point->x, current_plot->x_axis);
 		OUTPUT_NUMBER(point->y, current_plot->y_axis);
 
-		switch (current_plot->plot_style) {
+		switch (plotstyle) {
 		    case BOXES:
 		    case XERRORBARS:
 			OUTPUT_NUMBER(point->xlow, current_plot->x_axis);
