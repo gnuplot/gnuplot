@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.203.2.9 2007/11/21 05:19:08 sfeam Exp $
+ * $Id: post.trm,v 1.203.2.10 2008/01/10 07:31:25 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2624,9 +2624,14 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	 */
 	fprintf(gppsfile, "gsave ");
 	fprintf(gppsfile, "%i %i N", corners[0].x, corners[0].y);
-	for (i = 1; i < points; i++)
-	    fprintf(gppsfile, " %i %i V",
-		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
+	for (i = 1; i < points; i++) {
+	    /* The rationale for mixing V and L is given in PS_vector */
+	    if (i % 105)
+		fprintf(gppsfile, " %i %i V", corners[i].x-corners[i-1].x,
+		    corners[i].y-corners[i-1].y);
+	    else
+		fprintf(gppsfile, " %i %i L", corners[i].x, corners[i].y);
+	}
 
 	switch(style & 0xf) {
 	
