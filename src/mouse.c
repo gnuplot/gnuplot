@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.96 2007/09/24 20:05:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.97 2008/02/27 03:20:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -306,9 +306,9 @@ static void
 MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double *y2)
 {
     if (!is_3d_plot) {
-# if 0
-	printf("POS: plot_bounds.xleft=%i, plot_bounds.xright=%i, plot_bounds.ybot=%i, plot_bounds.ytop=%i\n", plot_bounds.xleft, plot_bounds.xright, plot_bounds.ybot, plot_bounds.ytop);
-# endif
+	FPRINTF(("POS: plot_bounds.xleft=%i, plot_bounds.xright=%i, plot_bounds.ybot=%i, plot_bounds.ytop=%i\n",
+		 plot_bounds.xleft, plot_bounds.xright, plot_bounds.ybot, plot_bounds.ytop));
+
 	if (plot_bounds.xright == plot_bounds.xleft)
 	    *x = *x2 = 1e38;	/* protection */
 	else {
@@ -321,9 +321,8 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	    *y = AXIS_MAPBACK(FIRST_Y_AXIS, yy);
 	    *y2 = AXIS_MAPBACK(SECOND_Y_AXIS, yy);
 	}
-#if 0
-	printf("POS: xx=%i, yy=%i  =>  x=%g  y=%g\n", xx, yy, *x, *y);
-#endif
+	FPRINTF(("POS: xx=%i, yy=%i  =>  x=%g  y=%g\n", xx, yy, *x, *y));
+
     } else {
 	/* for 3D plots, we treat the mouse position as if it is
 	 * in the bottom plane, i.e., the plane of the x and y axis */
@@ -1676,20 +1675,12 @@ event_motion(struct gp_event_t *ge)
 
 	if (button & (1 << 1)) {
 	    /* dragging with button 1 -> rotate */
-#if 0				/* HBB 20001109: what's rint()? */
-	    surface_rot_x = rint(zero_rot_x + 180.0 * mouse_y / term->ymax);
-#else
 	    surface_rot_x = floor(0.5 + zero_rot_x + 180.0 * mouse_y / term->ymax);
-#endif
 	    if (surface_rot_x < 0)
 		surface_rot_x = 0;
 	    if (surface_rot_x > 180)
 		surface_rot_x = 180;
-#if 0				/* HBB 20001109: what's rint()? */
-	    surface_rot_z = rint(fmod(zero_rot_z - 360.0 * mouse_x / term->xmax, 360));
-#else
 	    surface_rot_z = floor(0.5 + fmod(zero_rot_z - 360.0 * mouse_x / term->xmax, 360));
-#endif
 	    if (surface_rot_z < 0)
 		surface_rot_z += 360;
 	    redraw = TRUE;

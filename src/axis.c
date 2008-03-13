@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.65 2007/09/24 16:56:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.66 2007/12/17 23:09:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1084,9 +1084,6 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    if (internal > internal_max)
 		break;		/* gone too far - end of series = VERYLARGE perhaps */
 	    if (internal >= internal_min) {
-#if 0 /* maybe minitics!!!. user series starts below min ? */
-		continue;
-#endif
 		/* {{{  draw tick via callback */
 		switch (def->type) {
 		case TIC_DAY:{
@@ -1110,17 +1107,9 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			    gstrftime(label, 24, ticfmt[axis], (double) user);
 			} else if (polar) {
 			    /* if rmin is set, we stored internally with r-rmin */
-			    /* HBB 990327: reverted to 'pre-Igor' version... */
-#if 1				/* Igor's polar-grid patch */
 			    double r = fabs(user) +
 				((axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)
 				 ? 0 : axis_array[R_AXIS].min);
-#else
-			    /* Igor removed fabs to allow -ve labels */
-			    double r = user +
-				((axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)
-				 ? 0 : axis_array[R_AXIS].min);
-#endif
 			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, r);
 			} else {
 			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, user);
@@ -1506,10 +1495,6 @@ some_grid_selected()
 int
 set_cbminmax()
 {
-#if 0
-    printf("ENTER set_cbminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
-    printf("ENTER set_cbminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
-#endif
     if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
 	/* -VERYLARGE according to AXIS_INI3D */
 	if (CB_AXIS.min >= VERYLARGE)
@@ -1524,22 +1509,13 @@ set_cbminmax()
     }
     CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.max, "color axis");
 
-#if 0
-    if (CB_AXIS.min == CB_AXIS.max) {
-	int_error(NO_CARET, "cannot display empty color axis range");
-	return 0;
-    }
-#endif
     if (CB_AXIS.min > CB_AXIS.max) {
 	/* exchange min and max values */
 	double tmp = CB_AXIS.max;
 	CB_AXIS.max = CB_AXIS.min;
 	CB_AXIS.min = tmp;
     }
-#if 0
-    printf("EXIT  set_cbminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
-    printf("EXIT  set_cbminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
-#endif
+
     return 1;
 }
 

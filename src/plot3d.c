@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.155 2008/01/30 19:13:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.156 2008/03/13 19:53:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -357,14 +357,7 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 static double
 splines_kernel(double h)
 {
-#if 0
-    /* this is normaly not useful ... */
-    h = fabs(h);
-
-    if (h != 0.0) {
-#else
     if (h > 0) {
-#endif
 	return h * h * log(h);
     } else {
 	return 0;

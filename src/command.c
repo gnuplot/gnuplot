@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.163 2008/01/21 22:17:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.164 2008/01/25 20:55:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1405,11 +1405,7 @@ replot_command()
     */
     if (replot_disabled) {
 	replot_disabled = FALSE;
-#if 1
 	bail_to_command_line(); /* be silent --- don't mess the screen */
-#else
-	int_error(c_token, "cannot replot data coming from stdin");
-#endif
     }
     if (!term) /* unknown terminal */
 	int_error(c_token, "use 'set term' to set terminal type first");
@@ -1742,12 +1738,7 @@ test_command()
 	case TEST_PALETTE: test_palette_subcommand(); break;
 	case TEST_TIME: test_time_subcommand(); break;
 	default:
-#if 1
-	    int_error(c_token, "none or keyword 'terminal' or 'palette' expected");
-#else
-	    /* don't document undocumented command :-) */
-	    int_error(c_token, "none or keyword 'terminal', 'palette' or 'time' expected");
-#endif
+	    int_error(c_token, "only keywords are 'terminal' and 'palette'");
     }
 }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.142 2008/03/09 04:59:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.143 2008/03/13 19:53:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3791,15 +3791,8 @@ plot_option_array(void)
 	    if (!expecting_number
 		&& (isdigit(*token_string)
 		    || !strncasecmp(token_string, "Inf", 3))) {
-#if 0
-		/* No dimension symbol required. */
-		i_dimension++;
-		if (i_dimension >= 2)
-		    int_error(c_token, "Currently do not support sampled array dimensions greater than 2");
-#else
 		/* Dimension symbol or comma required. */
 		int_error(c_token, "Use '" TUPLE_SEPARATOR_CHAR "' between records or 'x' between dimensions");
-#endif
 	    }
 
 	    if (!isdigit(*token_string) && strncasecmp(token_string, "Inf", 3)) break;

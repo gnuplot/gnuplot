@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.79 2008/02/27 03:20:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.80 2008/03/03 18:02:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -427,11 +427,6 @@ cbtick_callback(
     double cb_place = (place - CB_AXIS.min) / (CB_AXIS.max - CB_AXIS.min);
 	/* relative z position along the colorbox axis */
     unsigned int x1, y1, x2, y2;
-
-#if 0
-    printf("cbtick_callback:  place=%g\ttext=\"%s\"\tgrid.l_type=%i\n",place,text,grid.l_type);
-#endif
-    (void) axis;		/* to avoid 'unused' warning */
 
     /* calculate tic position */
     if (color_box.rotation == 'h') {

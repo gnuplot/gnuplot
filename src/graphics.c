@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.251 2008/03/11 16:21:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.252 2008/03/13 19:53:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1083,7 +1083,6 @@ boundary(struct curve_points *plots, int count)
     axis_set_graphical_range(SECOND_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
     axis_set_graphical_range(SECOND_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
 
-#define ALIGN_BORDERS 1
     /* Calculate space for keys (do_plot will use these to position key). */
     key_w = key_col_wth * key_cols;
     key_h = (ktitl_lines) * t->v_char + key_rows * key_entry_height;
@@ -1126,11 +1125,7 @@ boundary(struct curve_points *plots, int count)
 	} else {
 	    if (key->vpos == JUST_TOP) {
 		/* align top first since tmargin may be manual */
-#if ALIGN_BORDERS
 		keybox.yt = plot_bounds.ytop;
-#else
-		keybox.yt = (ysize + yoffset) * t->ymax - t->v_tic;
-#endif
 		keybox.yb = keybox.yt - key_h;
 	    } else if (key->vpos == CENTRE) {
 		int key_box_half = key_h / 2;
@@ -1138,11 +1133,7 @@ boundary(struct curve_points *plots, int count)
 		keybox.yt = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
 	    } else {
 		/* align bottom first since bmargin may be manual */
-#if ALIGN_BORDERS
 		keybox.yb = plot_bounds.ybot;
-#else
-		keybox.yb = yoffset * t->ymax + t->v_tic;
-#endif
 		keybox.yt = keybox.yb + key_h;
 	    }
 	}
@@ -1159,11 +1150,7 @@ boundary(struct curve_points *plots, int count)
 	} else {
 	    if (key->hpos == LEFT) {
 		/* align left first since lmargin may be manual */
-#if ALIGN_BORDERS
 		keybox.xl = plot_bounds.xleft;
-#else
-		keybox.xl = xoffset * t->xmax + t->h_char;
-#endif
 		keybox.xr = keybox.xl + key_w;
 	    } else if (key->hpos == CENTRE) {
 		int key_box_half = key_w / 2;
@@ -1171,11 +1158,7 @@ boundary(struct curve_points *plots, int count)
 		keybox.xr = (plot_bounds.xright + plot_bounds.xleft) / 2 + key_box_half;
 	    } else {
 		/* align right first since rmargin may be manual */
-#if ALIGN_BORDERS
 		keybox.xr = plot_bounds.xright;
-#else
-		keybox.xr = (xsize + xoffset) * t->xmax - t->h_char;
-#endif
 		keybox.xl = keybox.xr - key_w;
 	    }
 	}

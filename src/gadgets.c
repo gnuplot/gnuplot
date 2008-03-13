@@ -235,20 +235,7 @@ draw_clip_line(int x1, int y1, int x2, int y2)
 	 * bounding box */
 	return;
 
-    /* HBB 20000617: there was a design error, here. By nature, this
-     * is a 2D routine. It should never have to check for hidden3d
-     * related variables, or call the hidden3d routine
-     * draw_line_hidden, like this. I've thrown this out. */
-
-    /* FIXME HBB 20000522: I strongly doubt this can work as
-     * advertised.  It's supposed to allow for continuous contour
-     * curves, but as soon as the contour curve moves outside the
-     * boundary, you get overpainting instead, as the contour curve
-     * walks along the border. Or worse artefacts.  */
-#if 0 /* UNUSED */
-    if (!suppressMove)
-#endif
-	(*t->move) (x1, y1);
+    (*t->move) (x1, y1);
     (*t->vector) (x2, y2);
 }
 

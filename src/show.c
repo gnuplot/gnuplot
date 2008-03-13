@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.201 2008/02/22 06:13:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.202 2008/03/13 19:53:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1089,11 +1089,6 @@ DRIVER_DIR     = \"%s\"\n", driverdir);
 #endif
 
 	fprintf(stderr, "HELPFILE       = \"%s\"\n", helpfile);
-#if 0
-	/* These are redundant. We just printed them 5 lines ago. */
-	fprintf(stderr, "CONTACT        = <%s>\n", bug_email);
-	fprintf(stderr, "HELPMAIL       = <%s>\n", help_email);
-#endif
 
     }
 }
@@ -1518,24 +1513,6 @@ show_grid()
 	return;
     }
 
-#if 0
-    /* Old method of accessing grid choices */
-    fprintf(stderr, "\t%s grid drawn at%s%s%s%s%s%s%s%s%s%s%s%s tics\n",
-	    (polar_grid_angle != 0) ? "Polar" : "Rectangular",
-	    grid_selection & GRID_X ? " x" : "",
-	    grid_selection & GRID_Y ? " y" : "",
-	    grid_selection & GRID_Z ? " z" : "",
-	    grid_selection & GRID_X2 ? " x2" : "",
-	    grid_selection & GRID_Y2 ? " y2" : "",
-	    grid_selection & GRID_MX ? " mx" : "",
-	    grid_selection & GRID_MY ? " my" : "",
-	    grid_selection & GRID_MZ ? " mz" : "",
-	    grid_selection & GRID_MX2 ? " mx2" : "",
-	    grid_selection & GRID_MY2 ? " my2" : "",
-	    grid_selection & GRID_CB ? " cb" : "",
-	    grid_selection & GRID_MCB ? " mcb" : ""
-	    );
-#else
     /* HBB 20010806: new storage method for grid options: */
     fprintf(stderr, "\t%s grid drawn at",
 	    (polar_grid_angle != 0) ? "Polar" : "Rectangular");
@@ -1552,7 +1529,7 @@ show_grid()
     SHOW_GRID(COLOR_AXIS);
 #undef SHOW_GRID
     fputs(" tics\n", stderr);
-#endif /* 0/1 */
+
 
     fprintf(stderr, "\tMajor grid drawn with");
     save_linetype(stderr, &(grid_lp), FALSE);
@@ -2123,11 +2100,6 @@ show_palette_colornames()
     int i=0;
     fputs( "\tList of known color names:", stderr );
     while (tbl->key) {
-#if 0
-	/* Print only color names, table with 4 columns */
-	if (i%4 == 0) fputs( "\n  ", stderr );
-	fprintf( stderr, "%-18s ", tbl->key );
-#else
 	/* Print color names and their rgb values, table with 1 column */
 	int r = ((tbl->value >> 16 ) & 255);
 	int g = ((tbl->value >> 8 ) & 255);
@@ -2135,7 +2107,6 @@ show_palette_colornames()
 
 	fprintf( stderr, "\n  %-18s ", tbl->key );
 	fprintf(stderr, "#%02x%02x%02x = %3i %3i %3i", r,g,b, r,g,b);
-#endif
 	++tbl;
 	++i;
     }
