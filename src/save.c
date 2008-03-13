@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.149 2007/12/08 10:55:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.150 2008/02/22 06:13:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -497,7 +497,6 @@ set y2data%s\n",
 	fprintf(fp, "\n");
     }
 
-#ifdef EAM_HISTOGRAMS
     fprintf(fp, "set style histogram ");
     switch (histogram_opts.type) {
 	default:
@@ -513,7 +512,6 @@ set y2data%s\n",
     fprintf(fp,"title ");
     save_position(fp, &histogram_opts.title.offset, TRUE);
     fprintf(fp, "\n");
-#endif
 
 #ifdef EAM_OBJECTS
     save_object(fp, 0);
@@ -1171,11 +1169,9 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
     case BOXES:
 	fputs("boxes\n", fp);
 	break;
-#ifdef EAM_HISTOGRAMS
     case HISTOGRAMS:
 	fputs("histograms\n", fp);
 	break;
-#endif
     case FILLEDCURVES:
 	fputs("filledcurves ", fp);
 	if (!strcmp(which, "data") || !strcmp(which, "Data"))
@@ -1211,11 +1207,9 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
     case PM3DSURFACE:
 	fputs("pm3d\n", fp);
 	break;
-#ifdef EAM_DATASTRINGS
     case LABELPOINTS:
 	fputs("labels\n", fp);
 	break;
-#endif
 #ifdef WITH_IMAGE
     case IMAGE:
 	fputs("image\n", stderr);

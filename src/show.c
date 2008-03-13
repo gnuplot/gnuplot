@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.200 2007/12/31 20:20:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.201 2008/02/22 06:13:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -123,9 +123,7 @@ static void show_view __PROTO((void));
 static void show_surface __PROTO((void));
 static void show_hidden3d __PROTO((void));
 static void show_increment __PROTO((void));
-#ifdef EAM_HISTOGRAMS
 static void show_histogram __PROTO((void));
-#endif
 #ifdef GNUPLOT_HISTORY
 static void show_historysize __PROTO((void));
 #endif
@@ -975,12 +973,8 @@ show_version(FILE *fp)
 		"";
 
 	    const char *plotoptions=
-#ifdef EAM_DATASTRINGS
 		"+DATASTRINGS  "
-#endif
-#ifdef EAM_HISTOGRAMS
 		"+HISTOGRAMS  "
-#endif
 #ifdef EAM_OBJECTS
 		"+OBJECTS  "
 #endif
@@ -1446,12 +1440,10 @@ show_style()
 	show_increment();
 	c_token++;
 	break;
-#ifdef EAM_HISTOGRAMS
     case SHOW_STYLE_HISTOGRAM:
 	show_histogram();
 	c_token++;
 	break;
-#endif
     case SHOW_STYLE_ARROW:
 	c_token++;
 	CHECK_TAG_GT_ZERO;
@@ -1464,9 +1456,7 @@ show_style()
 	show_linestyle(0);
 	show_fillstyle();
 	show_increment();
-#ifdef EAM_HISTOGRAMS
 	show_histogram();
-#endif
 	show_arrowstyle(0);
 #ifdef EAM_OBJECTS
 	/* Fall through (FIXME: this is ugly) */
@@ -2508,7 +2498,6 @@ show_increment()
 	fprintf(stderr, "default linetypes\n");
 }
 
-#ifdef EAM_HISTOGRAMS
 static void
 show_histogram()
 {
@@ -2528,7 +2517,6 @@ show_histogram()
 	fprintf(stderr," textcolor lt %d", histogram_opts.title.textcolor.lt+1); 
     fprintf(stderr, "\n");
 }
-#endif
 
 #ifdef GNUPLOT_HISTORY
 /* process 'show historysize' command */

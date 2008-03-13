@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.227 2007/12/03 21:30:37 sfeam Exp $
+dnl $Id: configure.in,v 1.228 2007/12/14 23:57:55 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -735,16 +735,6 @@ AC_ARG_ENABLE(thin-splines,dnl
                [ Define to use thin plate spines. ])
    fi])
 
-dnl strings in datafile
-AC_ARG_ENABLE(datastrings,dnl
-[  --disable-datastrings   disable reading strings from datafiles],,
-  test -z "$enable_datastrings" && enable_datastrings=yes)
-
-  if test "$enable_datastrings" = yes; then
-  AC_DEFINE(EAM_DATASTRINGS,1,
-               [ Define to allow reading strings from datafiles ])
-  fi
-
 dnl zooming of volatile data
 AC_ARG_ENABLE(volatile-data,dnl
 [  --disable-volatile-data        disable zooming of volatile data],,
@@ -752,22 +742,6 @@ AC_ARG_ENABLE(volatile-data,dnl
   if test "$enable_volatile_data" = yes; then
       AC_DEFINE(VOLATILE_REFRESH,1,
                [ Define to allow zooming or refresh of volatile data. EXPERIMENTAL ])
-  fi
-
-dnl histograms
-AC_ARG_ENABLE(histograms,dnl
-[  --disable-histograms    disable histograms plot style ],,
-  test -z "$enable_histograms" && enable_histograms=yes)
-  if test "$enable_histograms" = yes; then
-
-    if test "$enable_datastrings" = yes; then
-      AC_DEFINE(EAM_HISTOGRAMS, 1,
-               [ Define to enable histograms plot style. ])
-    else
-      enable_histograms=no
-      AC_MSG_WARN( [The --enable-histograms option requires --enable-datastrings. ])
-    fi
-
   fi
 
 dnl rectangles and other objects
@@ -1237,22 +1211,10 @@ else
   AC_MSG_RESULT([  Fitting error variables: no])
 fi
 
-if test "$enable_datastrings" = yes; then
-  AC_MSG_RESULT([  String-handling in datafiles: yes])
-else
-  AC_MSG_RESULT([  String-handling in datafiles: no])
-fi
-
 if test "$enable_volatile_data" = yes; then
   AC_MSG_RESULT([  Zooming or refresh of volatile data: yes (EXPERIMENTAL)])
 else
   AC_MSG_RESULT([  Zooming or refresh of volatile data: no])
-fi
-
-if test "$enable_histograms" = yes; then
-  AC_MSG_RESULT([  Plot style histograms: yes])
-else
-  AC_MSG_RESULT([  Plot style histograms: no (requires string-handling in datafiles)])
 fi
 
 if test "$enable_macros" = yes; then

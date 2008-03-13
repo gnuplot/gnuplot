@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.109 2007/12/02 05:47:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.110 2008/03/03 18:02:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -80,9 +80,7 @@ static void unset_fit __PROTO((void));
 static void unset_format __PROTO((void));
 static void unset_grid __PROTO((void));
 static void unset_hidden3d __PROTO((void));
-#ifdef EAM_HISTOGRAMS
 static void unset_histogram __PROTO((void));
-#endif
 static void unset_historysize __PROTO((void));
 static void unset_isosamples __PROTO((void));
 static void unset_key __PROTO((void));
@@ -841,14 +839,12 @@ unset_hidden3d()
 #endif
 }
 
-#ifdef EAM_HISTOGRAMS
 static void
 unset_histogram()
 {
     histogram_opts.type = HT_CLUSTERED;
     histogram_opts.gap = 2;
 }
-#endif
 
 /* process 'unset historysize' command */
 static void
@@ -1320,9 +1316,7 @@ unset_style()
 #ifdef EAM_OBJECTS
 	unset_style_rectangle();
 #endif
-#ifdef EAM_HISTOGRAMS
 	unset_histogram();
-#endif
 	c_token++;
 	return;
     }
@@ -1357,12 +1351,10 @@ unset_style()
 	unset_fillstyle();
 	c_token++;
 	break;
-#ifdef EAM_HISTOGRAMS
     case SHOW_STYLE_HISTOGRAM:
 	unset_histogram();
 	c_token++;
 	break;
-#endif
     case SHOW_STYLE_ARROW:
 	unset_arrowstyles();
 	c_token++;
@@ -1731,9 +1723,7 @@ reset_command()
     df_unset_datafile_binary();
 #endif
     unset_fillstyle();
-#ifdef EAM_HISTOGRAMS
     unset_histogram();
-#endif
 
     unset_missing();
     df_separator = '\0';

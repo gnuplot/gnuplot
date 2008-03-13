@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.162 2008/02/25 01:34:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.163 2008/03/11 16:21:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -72,9 +72,7 @@ static void store2d_point __PROTO((struct curve_points *, int i, double x, doubl
 static void eval_plots __PROTO((void));
 static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
 static void box_range_fiddling __PROTO((struct curve_points *plot));
-#ifdef EAM_HISTOGRAMS
 static void histogram_range_fiddling __PROTO((struct curve_points *plot));
-#endif
 
 /* internal and external variables */
 
@@ -87,12 +85,10 @@ double   boxwidth              = -1.0;
 /* whether box width is absolute (default) or relative */
 TBOOLEAN boxwidth_is_absolute  = TRUE;
 
-#ifdef EAM_HISTOGRAMS
 static double histogram_rightmost = 0.0;        /* Highest x-coord of histogram so far */
 static char *histogram_title = NULL;            /* Subtitle for this histogram */
 static struct coordinate GPHUGE *stackheight = NULL; /* Scratch space for y autoscale */
 static int stack_count = 0;                     /* counter for stackheight */
-#endif
 
 /* function implementations */
 
@@ -179,12 +175,10 @@ cp_free(struct curve_points *cp)
 	    free(cp->title);
 	if (cp->points)
 	    free(cp->points);
-#ifdef EAM_DATASTRINGS
 	if (cp->labels) {
 	    free_labels(cp->labels);
 	    cp->labels = (struct text_label *)NULL;
 	}
-#endif
 	free(cp);
 	cp = next;
     }
@@ -434,12 +428,10 @@ get_data(struct curve_points *current_plot)
 	    df_axis[2] = df_axis[3] = df_axis[1];
 	break;
 
-#ifdef EAM_HISTOGRAMS
     case HISTOGRAMS:
 	min_cols = 1;
 	max_cols = 3;
 	break;
-#endif
 
     case BOXES:
 	min_cols = 1;
@@ -455,7 +447,6 @@ get_data(struct curve_points *current_plot)
 	max_cols = 3;
 	break;
 
-#ifdef EAM_DATASTRINGS
     case LABELPOINTS:
 	/* 3 column data: X Y Label */
 	/* 4th column allows rgb variable */
@@ -463,7 +454,6 @@ get_data(struct curve_points *current_plot)
 	max_cols = 4;
 	expect_string( 3 );
 	break;
-#endif
 
 #ifdef WITH_IMAGE
     case IMAGE:
@@ -588,14 +578,13 @@ get_data(struct curve_points *current_plot)
 	     */
 	    continue;
 
-#ifdef EAM_DATASTRINGS
 	case DF_FOUND_KEY_TITLE:
 	    df_set_key_title(current_plot);
 	    continue;
 	case DF_KEY_TITLE_MISSING:
 	    fprintf(stderr,"get_data: key title not found in requested column\n");
 	    continue;
-#endif
+
 	case 0:         /* not blank line, but df_readline couldn't parse it */
 	    {
 		df_close();
@@ -612,7 +601,6 @@ get_data(struct curve_points *current_plot)
 	    }
 
 	case 2:
-#ifdef EAM_HISTOGRAMS
 	    H_ERR_BARS:
 	    if (current_plot->plot_style == HISTOGRAMS) {
 		if (histogram_opts.type == HT_ERRORBARS) {
@@ -650,12 +638,11 @@ get_data(struct curve_points *current_plot)
 		    store2d_point(current_plot, i++, v[0], v[1],
 				  v[0] - 0.5, v[0] + 0.5,
 				  v[2], v[3], 0.0);
-	    } else
-#endif
+
 		/* x, y */
 		/* ylow and yhigh are same as y */
 
-		if ( (current_plot->plot_style == BOXES)
+	    } else if ( (current_plot->plot_style == BOXES)
 		     && boxwidth > 0 && boxwidth_is_absolute) {
 		    /* calculate width now */
 		    if (axis_array[current_plot->x_axis].log) {
@@ -667,7 +654,8 @@ get_data(struct curve_points *current_plot)
 			store2d_point(current_plot, i++, v[0], v[1],
 				      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
 				      v[1], variable_color_value, 0.0);
-		} else {
+
+	    } else {
 		    if (current_plot->plot_style == CANDLESTICKS
 			|| current_plot->plot_style == FINANCEBARS) {
 			int_warn(storetoken, "This plot style does not work with 1 or 2 cols. Setting to points");
@@ -677,7 +665,7 @@ get_data(struct curve_points *current_plot)
 		    /* auto width if boxes, else ignored */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1],
 				  v[1], -1.0);
-		}
+	    }
 	    break;
 
 
@@ -726,7 +714,6 @@ get_data(struct curve_points *current_plot)
 				  v[1], variable_color_value, 0.0);
 		    break;
 
-#ifdef EAM_DATASTRINGS
 		case LABELPOINTS:
 		    /* Load the coords just as we would have for a point plot */
 		    store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
@@ -736,7 +723,6 @@ get_data(struct curve_points *current_plot)
 				&(current_plot->points[i]), i, df_tokens[2], 0.0);
 		    i++;
 		    break;
-#endif
 
 #ifdef WITH_IMAGE
 		case IMAGE:  /* x_center y_center color_value */
@@ -833,7 +819,6 @@ get_data(struct curve_points *current_plot)
 				  v[1], v[3], v[2]);
 		break;
 
-#ifdef EAM_DATASTRINGS
 	    case LABELPOINTS:
 		/* Load the coords just as we would have for a point plot */
 		store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
@@ -843,7 +828,6 @@ get_data(struct curve_points *current_plot)
 			    &(current_plot->points[i]), i, df_tokens[2], v[3]);
 		i++;
 		break;
-#endif
 
 	    }                   /*inner switch */
 
@@ -1091,7 +1075,6 @@ box_range_fiddling(struct curve_points *plot)
     }
 }
 
-#ifdef EAM_HISTOGRAMS
 /* Since the stored x values for histogrammed data do not correspond exactly */
 /* to the eventual x coordinates, we need to modify the x axis range bounds. */
 /* Also the two stacked histogram modes need adjustment of the y axis bounds.*/
@@ -1169,9 +1152,7 @@ histogram_range_fiddling(struct curve_points *plot)
 		break;
     }
 }
-#endif
 
-#ifdef EAM_DATASTRINGS
 /* store_label() is called by get_data for each point */
 /* This routine is exported so it can be shared by plot3d */
 void
@@ -1246,7 +1227,6 @@ store_label(
     FPRINTF((stderr,"LABELPOINT %f %f \"%s\" \n", tl->place.x, tl->place.y, tl->text));
 }
 
-#endif
 
 /*
  * print_points: a debugging routine to print out the points of a curve, and
@@ -1366,7 +1346,6 @@ eval_plots()
     int start_token=0, end_token;
     legend_key *key = &keyT;
 
-#ifdef EAM_HISTOGRAMS
     double newhist_start = 0.0;
     int histogram_sequence = -1;
     int newhist_color = LT_UNDEFINED;
@@ -1374,7 +1353,6 @@ eval_plots()
     histogram_rightmost = 0.0;
     free_histlist(&histogram_opts);
     init_histogram(NULL,NULL);
-#endif
 
     uses_axis[FIRST_X_AXIS] =
 	uses_axis[FIRST_Y_AXIS] =
@@ -1418,7 +1396,6 @@ eval_plots()
 	if (!in_parametric)
 	    start_token = c_token;
 
-#ifdef EAM_HISTOGRAMS
 	if (almost_equals(c_token,"newhist$ogram")) {
 	    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
 	    struct fill_style_type fs;
@@ -1451,7 +1428,6 @@ eval_plots()
 	    newhist_color = lp.l_type;
 	    newhist_pattern = fs.fillpattern;
 	} else
-#endif /* EAM_DATASTRINGS */
 
 	if (is_definition(c_token)) {
 	    define();
@@ -1466,9 +1442,7 @@ eval_plots()
 	    TBOOLEAN set_smooth = FALSE, set_axes = FALSE, set_title = FALSE;
 	    TBOOLEAN set_with = FALSE, set_lpstyle = FALSE;
 	    TBOOLEAN set_fillstyle = FALSE;
-#ifdef EAM_DATASTRINGS
 	    TBOOLEAN set_labelstyle = FALSE;
-#endif
 
 	    plot_num++;
 
@@ -1662,9 +1636,7 @@ eval_plots()
 #endif
 		    if ((this_plot->plot_type == FUNC) &&
 			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
-#ifdef EAM_DATASTRINGS
 			|| (this_plot->plot_style == LABELPOINTS)
-#endif
 			))
 			{
 			    int_warn(c_token, "This plot style is only for datafiles, reverting to \"points\"");
@@ -1674,7 +1646,6 @@ eval_plots()
 		    continue;
 		}
 
-#ifdef EAM_DATASTRINGS
 		/* Labels can have font and text property info as plot options */
 		/* In any case we must allocate one instance of the text style */
 		/* that all labels in the plot will share.                     */
@@ -1697,7 +1668,6 @@ eval_plots()
 			}
 		    }
 		}
-#endif /* EAM_DATASTRINGS */
 
 		/* pick up line/point specs and other style-specific keywords
 		 * - point spec allowed if style uses points, ie style&2 != 0
@@ -1866,7 +1836,6 @@ eval_plots()
 	    this_plot->x_axis = x_axis;
 	    this_plot->y_axis = y_axis;
 
-#ifdef EAM_DATASTRINGS
 	    /* If we got this far without initializing the label list, do it now */
 	    if (this_plot->plot_style == LABELPOINTS) {
 		if (this_plot->labels == NULL) {
@@ -1879,9 +1848,7 @@ eval_plots()
 		this_plot->labels->place.scaley =
 		    (y_axis == SECOND_Y_AXIS) ? second_axes : first_axes;
 	    }
-#endif /* EAM_DATASTRINGS */
 
-#ifdef EAM_HISTOGRAMS
 	    /* Initialize histogram data structure */
 	    if (this_plot->plot_style == HISTOGRAMS) {
 		if (axis_array[x_axis].log)
@@ -1918,7 +1885,6 @@ eval_plots()
 		    this_plot->fill_properties.fillpattern = this_plot->histogram_sequence
 						    + this_plot->histogram->startpattern;
 	    }
-#endif /* EAM_HISTOGRAMS */
 
 #ifdef WITH_IMAGE
 	    /* Styles that use palette */
@@ -1991,11 +1957,9 @@ eval_plots()
 		    goto SKIPPED_EMPTY_FILE;
 		}
 
-#ifdef EAM_HISTOGRAMS
 		/* Fiddle the auto-scaling data for histograms */
 		if (this_plot->plot_style == HISTOGRAMS)
 		    histogram_range_fiddling(this_plot);
-#endif /* EAM_HISTOGRAMS */
 		if (this_plot->plot_style == BOXES)
 		    box_range_fiddling(this_plot);
 

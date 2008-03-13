@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.67 2007/02/17 23:56:26 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.68 2008/01/11 04:41:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -1000,11 +1000,9 @@ set_plot_with_palette(int plot_num, int plot_mode)
 		else
 		    return;
 	    }
-#ifdef EAM_DATASTRINGS
 	    if (this_2dplot->labels &&
 		this_2dplot->labels->textcolor.type >= TC_CB)
 		return;
-#endif
 	    this_2dplot = this_2dplot->next;
 	}
     }
@@ -1028,11 +1026,9 @@ set_plot_with_palette(int plot_num, int plot_mode)
 		    /* TC_DEFAULT: splot x with line|lp|dot palette */
 		    return;
 	    }
-#ifdef EAM_DATASTRINGS
 	    if (this_3dplot->labels &&
 		this_3dplot->labels->textcolor.type >= TC_CB)
 		return;
-#endif
 	    this_3dplot = this_3dplot->next_sp;
 	}
     }

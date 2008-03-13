@@ -200,7 +200,6 @@ typedef struct {
 } filledcurves_opts;
 #define EMPTY_FILLEDCURVES_OPTS { 0, 0, 0.0, 0.0, 0 }
 
-#ifdef EAM_HISTOGRAMS
 typedef struct histogram_style {
     int type;		/* enum t_histogram_type */
     int gap;		/* set style hist gap <n> (space between clusters) */
@@ -222,7 +221,6 @@ typedef enum histogram_type {
 } t_histogram_type;
 #define DEFAULT_HISTOGRAM_STYLE { HT_NONE, 2, 1, 0.0, 0.0, LT_UNDEFINED, LT_UNDEFINED, 0, NULL, EMPTY_LABELSTRUCT }
 
-#endif
 
 /***********************************************************/
 /* Variables defined by gadgets.c needed by other modules. */
@@ -460,15 +458,11 @@ extern filledcurves_opts filledcurves_opts_func;
 /* Prefer line styles over plain line types */
 extern TBOOLEAN prefer_line_styles;
 
-#ifdef EAM_HISTOGRAMS
 extern histogram_style histogram_opts;
-#endif
 
 void default_arrow_style __PROTO((struct arrow_style_type *arrow));
 
-#ifdef EAM_DATASTRINGS
 void free_labels __PROTO((struct text_label *tl));
-#endif
 
 void get_offsets __PROTO((struct text_label *this_label,
 	struct termentry *t, int *htic, int *vtic));

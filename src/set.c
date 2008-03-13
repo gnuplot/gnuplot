@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.263 2008/02/29 17:34:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.264 2008/03/11 18:49:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -164,10 +164,8 @@ static void check_palette_grayscale __PROTO((void));
 static int set_palette_defined __PROTO((void));
 static void set_palette_file __PROTO((void));
 static void set_palette_function __PROTO((void));
-#ifdef EAM_HISTOGRAMS
 static void parse_histogramstyle __PROTO((histogram_style *hs, 
 		t_histogram_type def_type, int def_gap));
-#endif
 
 static struct position default_position
 	= {first_axes, first_axes, first_axes, 0., 0., 0.};
@@ -219,10 +217,8 @@ set_command()
 
 	    if (temp_style & PLOT_STYLE_HAS_ERRORBAR)
 		int_error(c_token, "style not usable for function plots, left unchanged");
-#ifdef EAM_HISTOGRAMS
 	    else if (temp_style == HISTOGRAMS)
 		int_error(c_token, "style not usable for function plots, left unchanged");
-#endif
 	    else
 		func_style = temp_style;
 	}
@@ -3646,14 +3642,8 @@ set_style()
 	{
 	    enum PLOT_STYLE temp_style = get_style();
 
-	    if (temp_style & PLOT_STYLE_HAS_ERRORBAR
-#ifdef EAM_DATASTRINGS
-	       || (temp_style == LABELPOINTS)
-#endif
-#ifdef EAM_HISTOGRAMS
-		|| (temp_style == HISTOGRAMS)
-#endif
-	        )
+	    if ((temp_style & PLOT_STYLE_HAS_ERRORBAR)
+	    ||  (temp_style == LABELPOINTS) || (temp_style == HISTOGRAMS))
 		int_error(c_token, "style not usable for function plots, left unchanged");
 	    else
 		func_style = temp_style;
@@ -3683,11 +3673,9 @@ set_style()
 	set_rectangle(-2, OBJ_RECTANGLE);
 	break;
 #endif
-#ifdef EAM_HISTOGRAMS
     case SHOW_STYLE_HISTOGRAM:
 	parse_histogramstyle(&histogram_opts,HT_CLUSTERED,histogram_opts.gap);
 	break;
-#endif
     case SHOW_STYLE_INCREMENT:
 	c_token++;
 	if (END_OF_COMMAND || almost_equals(c_token,"def$ault"))
@@ -5266,7 +5254,6 @@ parse_label_options( struct text_label *this_label )
 }
 
 
-#ifdef EAM_HISTOGRAMS
 /* <histogramstyle> = {clustered {gap <n>} | rowstacked | columnstacked */
 /*                     errorbars {gap <n>} {linewidth <lw>}}            */
 /*                    {title <title_options>}                           */
@@ -5323,4 +5310,3 @@ parse_histogramstyle( histogram_style *hs,
 	    break;
     }
 }
-#endif /* EAM_HISTOGRAMS */

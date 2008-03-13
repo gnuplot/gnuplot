@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.141 2008/02/25 03:17:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.142 2008/03/09 04:59:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -183,24 +183,18 @@ static void plot_option_index __PROTO((void));
 static void plot_option_thru __PROTO((void));
 static void plot_option_using __PROTO((int));
 static TBOOLEAN valid_format __PROTO((const char *));
-#ifdef EAM_DATASTRINGS
 static void plot_ticlabel_using __PROTO((int));
 static void df_parse_string_field __PROTO((char *, char *));
-#endif
-#ifdef EAM_HISTOGRAMS
 static void add_key_entry __PROTO((char *temp_string, int df_datum));
-#endif
 static char * df_generate_pseudodata __PROTO((void));
 
 /*}}} */
 
 /*{{{  variables */
 
-#ifdef EAM_DATASTRINGS
 enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL,
 		CT_XTICLABEL, CT_X2TICLABEL, CT_YTICLABEL, CT_Y2TICLABEL,
 		CT_ZTICLABEL, CT_CBTICLABEL };
-#endif
 
 /* public variables client might access */
 
@@ -248,10 +242,8 @@ static TBOOLEAN mixed_data_fp = FALSE; /* inline data */
 char *df_filename;      /* name of data file */
 static int df_eof = 0;
 
-#ifdef EAM_DATASTRINGS
 static int df_no_tic_specs;     /* ticlabel columns not counted in df_no_use_specs */
 #define MAX_TOKEN_LENGTH 64
-#endif
 
 #ifndef MAXINT                  /* should there be one already defined ? */
 # ifdef INT_MAX                 /* in limits.h ? */
@@ -309,7 +301,6 @@ static int df_max_cols = 0;     /* space allocated */
 static int df_no_cols;          /* cols read */
 static int fast_columns;        /* corey@cac optimization */
 
-#ifdef EAM_DATASTRINGS
 char *df_tokens[MAXDATACOLS];           /* filled in by df_tokenise */
 static char *df_stringexpression[MAXDATACOLS] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 #define NO_COLUMN_HEADER (-99)  /* some value that can never be a real column */
@@ -317,7 +308,6 @@ static int column_for_key_title = NO_COLUMN_HEADER;
 static TBOOLEAN key_title_auto_col = FALSE;
 static char df_key_title[MAX_TOKEN_LENGTH];     /* filled in from <col> in 1st row by df_tokenise */
 static struct curve_points *df_current_plot;	/* used to process histogram labels + key entries */
-#endif
 
 #ifdef BINARY_DATA_FILE
 
@@ -657,22 +647,17 @@ df_tokenise(char *s)
      * and can understand fortran quad format
      */
     TBOOLEAN in_string;
-#ifdef EAM_DATASTRINGS
     int i;
 
     for (i = 0; i<MAXDATACOLS; i++)
 	df_tokens[i] = NULL;
 
-#ifdef EAM_HISTOGRAMS
     /* Auto-titling of histograms is a bit tricky because the x coord did not come */
     /* from an explicit input column. This means our previous guess of what column */
     /* to take the title from was probably wrong.                                  */
     if (key_title_auto_col && df_current_plot
     &&  (df_current_plot->plot_style == HISTOGRAMS))
 	column_for_key_title = use_spec[0].column;
-#endif
-#endif
-
 
 #define NOTSEP (*s != df_separator)
 
@@ -693,7 +678,6 @@ df_tokenise(char *s)
 	df_column[df_no_cols].position = s;
 	in_string = FALSE;
 
-#ifdef EAM_DATASTRINGS
 	/* Keep pointer to start of this token if user wanted it for
 	 * anything, particularly if it is a string */
 	for (i = 0; i<MAXDATACOLS; i++) {
@@ -706,7 +690,6 @@ df_tokenise(char *s)
 	/* Particularly if it is supposed to be a key title */
 	if (df_no_cols == column_for_key_title-1)
 	    strncpy(df_key_title,s,sizeof(df_key_title)-1);
-#endif
 
 	/* CSV files must accept numbers inside quotes also,
 	 * so we step past the quote */
@@ -1015,9 +998,7 @@ initialize_use_spec()
     df_no_use_specs = 0;
     for (i = 0; i < MAXDATACOLS; ++i) {
 	use_spec[i].column = i + 1; /* default column */
-#ifdef EAM_DATASTRINGS
 	use_spec[i].expected_type = CT_DEFAULT; /* no particular expectation */
-#endif
 	if (use_spec[i].at) {
 	    free_at(use_spec[i].at);
 	    use_spec[i].at = NULL;  /* no expression */
@@ -1054,9 +1035,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     /*{{{  initialise static variables */
     df_format[0] = NUL;         /* no format string */
 
-#ifdef EAM_DATASTRINGS
     df_no_tic_specs = 0;
-#endif
 
     initialize_use_spec();
 
@@ -1083,13 +1062,11 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 
     df_eof = 0;
 
-#ifdef EAM_DATASTRINGS
     /* Save for use by df_readline(). */
     /* Perhaps it should be a parameter to df_readline? */
     df_current_plot = plot;
     column_for_key_title = NO_COLUMN_HEADER;
     key_title_auto_col = FALSE;
-#endif
     /*}}} */
 
     assert(max_using <= MAXDATACOLS);
@@ -1212,7 +1189,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    continue;
 	}
 
-#ifdef EAM_DATASTRINGS
 	/* Take key title from column head? */
 	if (almost_equals(c_token, "t$itle")) {
 	    c_token++;
@@ -1235,7 +1211,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		c_token--;
 	    break;
 	}
-#endif
+
 	break; /* unknown option */
 
     } /* while (!END_OF_COMMAND) */
@@ -1244,7 +1220,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	int_error(c_token,
 		  "duplicated or contradicting arguments in datafile options");
 
-#ifdef EAM_DATASTRINGS
     /* Check for auto-generation of key title from column header  */
     if (column_for_key_title == NO_COLUMN_HEADER) {
 	legend_key *key = &keyT;
@@ -1259,7 +1234,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		column_for_key_title = use_spec[1].column;
 	}
     }
-#endif
 
     /*{{{  more variable inits */
     point_count = -1;           /* we preincrement */
@@ -1575,7 +1549,6 @@ plot_option_using(int max_using)
 		/* this will match ()'s: */
 		use_spec[df_no_use_specs++].at = perm_at();     
 
-#ifdef EAM_DATASTRINGS
 	    /* FIXME EAM - It would be nice to handle these like any other */
 	    /* internal function via perm_at() but there are problems.     */
 	    } else if (almost_equals(c_token, "xtic$labels")) {
@@ -1592,7 +1565,6 @@ plot_option_using(int max_using)
 		plot_ticlabel_using(CT_CBTICLABEL);
 	    } else if (almost_equals(c_token, "key")) {
 		plot_ticlabel_using(CT_KEYLABEL);
-#endif /* EAM_DATASTRINGS */
 	    } else {
 		int col = int_expression();
 		
@@ -1639,7 +1611,6 @@ plot_option_using(int max_using)
 }
 
 
-#ifdef EAM_DATASTRINGS
 static
 void plot_ticlabel_using(int axis)
 {
@@ -1666,7 +1637,6 @@ void plot_ticlabel_using(int axis)
     use_spec[df_no_use_specs+df_no_tic_specs].column = col;
     df_no_tic_specs++;
 }
-#endif /* EAM_DATASTRINGS */
 
 
 /*{{{  int df_readline(v, max) */
@@ -1873,7 +1843,6 @@ df_readascii(double v[], int max)
 	} else
 	    df_tokenise(s);
 
-#ifdef EAM_DATASTRINGS
 	/* If we are supposed to read plot or key titles from the
 	 * first line of the data then do that and nothing else.  */
 	if (column_for_key_title != NO_COLUMN_HEADER) {
@@ -1891,29 +1860,21 @@ df_readascii(double v[], int max)
 	    key_title_auto_col = FALSE;
 	    return(DF_FOUND_KEY_TITLE);
 	}
-#endif
 
 	/*{{{  copy column[] to v[] via use[] */
 	{
-#ifdef EAM_DATASTRINGS
 	    int limit = (df_no_use_specs
 			 ? df_no_use_specs + df_no_tic_specs
 			 : MAXDATACOLS);
 	    
 	    if (limit > max + df_no_tic_specs)
 		limit = max + df_no_tic_specs;
-#else
-	    int limit = (df_no_use_specs ? df_no_use_specs : MAXDATACOLS);
-	    if (limit > max)
-		limit = max;
-#endif
 
 	    for (output = 0; output < limit; ++output) {
 		/* if there was no using spec, column is output+1 and
 		 * at=NULL */
 		int column = use_spec[output].column;
 
-#ifdef EAM_DATASTRINGS
 		/* Handle cases where column holds a meta-data string */
 		/* Axis labels, plot titles, etc.                     */
 		if (use_spec[output].expected_type >= CT_XTICLABEL) {
@@ -1956,14 +1917,13 @@ df_readascii(double v[], int max)
 			xpos = (axcol == 0) ? df_datum : v[axcol-1];
 		    else
 			xpos = v[axcol];
-#ifdef EAM_HISTOGRAMS
+
 		    if (df_current_plot
 			&& df_current_plot->plot_style == HISTOGRAMS) {
 			if (output == 2) /* Can only happen for HT_ERRORBARS */
 			    xpos = (axcol == 0) ? df_datum : v[axcol-1];
 			xpos += df_current_plot->histogram->start;
 		    }
-#endif
 
 		    /* Tic label is generated by a string-valued function */
 		    if (use_spec[output].at) {
@@ -1980,15 +1940,15 @@ df_readascii(double v[], int max)
 			df_parse_string_field(temp_string,df_tokens[output]);
 			add_tic_user(axis, temp_string, xpos, -1);
 		    }
-#ifdef EAM_HISTOGRAMS
+
 		} else if (use_spec[output].expected_type == CT_KEYLABEL) {
 		    char temp_string[MAX_TOKEN_LENGTH];
 		    df_parse_string_field(temp_string,df_tokens[output]);
 		    if (df_current_plot)
 			add_key_entry(temp_string,df_datum);
-#endif
+
 		} else
-#endif
+
 		if (use_spec[output].at) {
 		    struct value a;
 		    /* no dummy values to set up prior to... */
@@ -1998,7 +1958,6 @@ df_readascii(double v[], int max)
 		    if (undefined)
 			return DF_UNDEFINED;    /* store undefined point in plot */
 
-#if defined(EAM_DATASTRINGS)
 		    if (a.type == STRING) {
 			/* This string value will get parsed as if it were a data column */
 			/* so put it in quotes to allow embedded whitespace.             */
@@ -2023,7 +1982,6 @@ df_readascii(double v[], int max)
 			}
 			gpfree_string(&a);
 		    } else
-#endif
 			v[output] = real(&a);
 
 		} else if (column == -2) {
@@ -2051,11 +2009,11 @@ df_readascii(double v[], int max)
 			break;
 		    }
 		    v[output] = (double) gtimegm(&tm);
-#ifdef EAM_DATASTRINGS
+
 		} else if (use_spec[output].expected_type == CT_STRING) {
 		    /* Do nothing. */
 		    /* String tokens were loaded into df_tokens already. */
-#endif
+
 		} else {
 		    /* column > 0 */
 		    if ((column <= df_no_cols)
@@ -2087,13 +2045,11 @@ df_readascii(double v[], int max)
 
 	/* output == df_no_use_specs if using was specified -
 	 * actually, smaller of df_no_use_specs and max */
-#ifdef EAM_DATASTRINGS
 	/* FIXME EAM - In theory it might be useful for the caller to
 	 * know whether or not tic specs were read from this line, but
 	 * all callers would have to be modified to deal with it one
 	 * way or the other. */
 	output -= df_no_tic_specs;
-#endif
 	assert(df_no_use_specs == 0
 	       || output == df_no_use_specs
 	       || output == max);
@@ -2703,7 +2659,6 @@ valid_format(const char *format)
     }
 }
 
-#ifdef EAM_DATASTRINGS
 /*
  * Plotting routines can call this prior to invoking df_readline() to indicate
  * that they expect a certain column to contain an ascii string rather than a
@@ -2726,7 +2681,6 @@ expect_string(const char column)
 void
 df_set_key_title(struct curve_points *plot)
 {
-#ifdef EAM_HISTOGRAMS
     if (plot->plot_style == HISTOGRAMS
     &&  histogram_opts.type == HT_STACKED_IN_TOWERS) {
 	/* In this case it makes no sense to treat key titles in the usual */
@@ -2737,7 +2691,6 @@ df_set_key_title(struct curve_points *plot)
 	df_key_title[0] = '\0';
 	return;
     }
-#endif
 
     /* What if there was already a title specified? */
     if (plot->title && !plot->title_is_filename)
@@ -2776,7 +2729,6 @@ df_parse_string_field(char *string, char *field)
     strcpy(string,temp_string);
 }
 
-#ifdef EAM_HISTOGRAMS
 static void
 add_key_entry(char *temp_string, int df_datum)
 {
@@ -2795,9 +2747,6 @@ add_key_entry(char *temp_string, int df_datum)
     new_entry->next = df_current_plot->labels->next;
     df_current_plot->labels->next = new_entry;
 }
-#endif
-
-#endif /* EAM_DATASTRINGS */
 
 
 #ifdef BINARY_DATA_FILE
@@ -3081,12 +3030,8 @@ df_bin_default_columns default_style_cols[LAST_PLOT_STYLE + 1] = {
     {XYERRORLINES, 3, 1},
     {FILLEDCURVES, 1, 1},
     {PM3DSURFACE, 1, 2},
-#ifdef EAM_DATASTRINGS
     {LABELPOINTS, 2, 1},
-#endif
-#ifdef EAM_HISTOGRAMS
     {HISTOGRAMS, 1, 0},
-#endif
 #ifdef WITH_IMAGE
     {IMAGE, 1, 2},
     {RGBIMAGE, 3, 2}

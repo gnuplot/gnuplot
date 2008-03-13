@@ -1,3 +1,18 @@
+2008-03-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* config/config.cyg config/config.dj2 config/config.mgw config/config.nt
+	config/config.os2 config/config.oww config/config.wc configure.in
+	src/datafile.c src/datafile.h src/gadgets.c src/gadgets.h src/gp_types.h
+	src/graph3d.c src/graph3d.h src/graphics.c src/graphics.h src/hidden3d.c
+	src/plot2d.c src/plot2d.h src/plot3d.c src/pm3d.c src/save.c src/set.c
+	src/show.c src/tables.c src/tables.h src/unset.c src/util3d.c
+	src/util3d.h:  Code cleanup of options no longer marked EXPERIMENTAL.
+
+	Remove conditional build flags EAM_HISTOGRAMS and EAM_DATASTRINGS.
+	Due to bit rot, it was not possible to build current cvs without these
+	anyhow.  When last measured, the change in code size due to joint
+	omission of these options was 1.5%.
+
 2008-03-13  Carl Troein  <troein@users.sourceforge.net>
 
 	* term/post.trm (PS_filled_polygon): Limit the number of consecutive

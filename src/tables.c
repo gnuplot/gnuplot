@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.77 2007/12/24 19:39:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.78 2008/02/22 19:40:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -585,9 +585,7 @@ const struct gen_table show_style_tbl[] =
     { "fs", SHOW_STYLE_FILLING },
     { "ar$row", SHOW_STYLE_ARROW },
     { "incr$ement", SHOW_STYLE_INCREMENT },
-#ifdef EAM_HISTOGRAMS
     { "hist$ogram", SHOW_STYLE_HISTOGRAM },
-#endif
     { "rect$angle", SHOW_STYLE_RECTANGLE },
     { NULL, SHOW_STYLE_INVALID }
 };
@@ -609,9 +607,7 @@ const struct gen_table plotstyle_tbl[] =
     { "xe$rrorbars", XERRORBARS },
     { "xye$rrorbars", XYERRORBARS },
     { "boxes", BOXES },
-#ifdef EAM_HISTOGRAMS
     { "hist$ograms", HISTOGRAMS },
-#endif
     { "filledc$urves", FILLEDCURVES },
     { "boxer$rorbars", BOXERROR },
     { "boxx$yerrorbars", BOXXYERROR },
@@ -622,9 +618,7 @@ const struct gen_table plotstyle_tbl[] =
     { "fin$ancebars", FINANCEBARS },
     { "can$dlesticks", CANDLESTICKS },
     { "pm$3d", PM3DSURFACE },
-#ifdef EAM_DATASTRINGS
     { "labels", LABELPOINTS },
-#endif
 #ifdef WITH_IMAGE
     { "ima$ge", IMAGE },
     { "rgbima$ge", RGBIMAGE },

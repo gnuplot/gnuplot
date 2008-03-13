@@ -182,9 +182,7 @@ filledcurves_opts filledcurves_opts_func = EMPTY_FILLEDCURVES_OPTS;
 /* Prefer line styles over plain line types */
 TBOOLEAN prefer_line_styles = FALSE;
 
-#ifdef EAM_HISTOGRAMS
 histogram_style histogram_opts = DEFAULT_HISTOGRAM_STYLE;
-#endif
 
 /*****************************************************************/
 /* Routines that deal with global objects defined in this module */
@@ -471,7 +469,6 @@ default_arrow_style(struct arrow_style_type *arrow)
     arrow->head_filled = 0;
 }
 
-#ifdef EAM_DATASTRINGS
 void
 free_labels(struct text_label *label)
 {
@@ -493,7 +490,6 @@ char *master_font = label->font;
     }
 
 }
-#endif
 
 void
 get_offsets(

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.154 2007/12/18 19:02:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.155 2008/01/30 19:13:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -56,9 +56,7 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.154 2007/12/18 19:02:58 s
 #include "plot.h"
 #endif
 
-#ifdef EAM_DATASTRINGS
 #include "plot2d.h" /* Only for store_label() */
-#endif
 
 #ifdef THIN_PLATE_SPLINES_GRID
 # include "matrix.h"
@@ -203,12 +201,10 @@ sp_free(struct surface_points *sp)
 	    sp->iso_crvs = next_icrvs;
 	}
 
-#ifdef EAM_DATASTRINGS
 	if (sp->labels) {
 	    free_labels(sp->labels);
 	    sp->labels = (struct text_label *)NULL;
 	}
-#endif
 
 	free(sp);
 	sp = next;
@@ -688,10 +684,8 @@ get_3ddata(struct surface_points *this_plot)
 	int pm3d_color_from_column = FALSE;
 #define color_from_column(x) pm3d_color_from_column = x
 
-#ifdef EAM_DATASTRINGS
 	if (this_plot->plot_style == LABELPOINTS)
 	    expect_string( 4 );
-#endif
 
 	if (this_plot->plot_style == VECTOR) {
 	    local_this_iso->next = iso_alloc(samples_1);
@@ -749,7 +743,6 @@ get_3ddata(struct surface_points *this_plot)
 		continue;
 	    }
 
-#ifdef EAM_DATASTRINGS
 	    else if (j == DF_FOUND_KEY_TITLE){
 		/* only the shared part of the 2D and 3D headers is used */
 		df_set_key_title((struct curve_points *)this_plot);
@@ -761,7 +754,6 @@ get_3ddata(struct surface_points *this_plot)
 		    );
 		continue;
 	    }
-#endif
 
 	    /* its a data point or undefined */
 	    if (xdatum >= local_this_iso->p_max) {
@@ -887,14 +879,14 @@ get_3ddata(struct surface_points *this_plot)
 		    color = z;
 		    color_from_column(FALSE);
 		}
-#ifdef EAM_DATASTRINGS
+
 		else if (this_plot->plot_style == LABELPOINTS) {
 		/* 4th column holds label text rather than color */
 		/* text = df_tokens[3]; */
 		    color = z;
 		    color_from_column(FALSE);
 		}
-#endif
+
 		else {
 		    color = v[3];
 		    color_from_column(TRUE);
@@ -908,13 +900,13 @@ get_3ddata(struct surface_points *this_plot)
 		    color = v[4];
 		    color_from_column(TRUE);
 		}
-#ifdef EAM_DATASTRINGS
+
 		if (this_plot->plot_style == LABELPOINTS) {
 		    /* take color from an explicitly given 5th column */
 		    color = v[4];
 		    color_from_column(TRUE);
 		}
-#endif
+
 	    }
 
 	    if (j >= 6) {
@@ -963,12 +955,10 @@ get_3ddata(struct surface_points *this_plot)
 		}
 	    }
 
-#ifdef EAM_DATASTRINGS
 	    /* At this point we have stored the point coordinates. Now we need to copy */
 	    /* x,y,z into the text_label structure and add the actual text string.     */
 	    if (this_plot->plot_style == LABELPOINTS)
 		store_label(this_plot->labels, cp, xdatum, df_tokens[3], color);
-#endif
 
 #ifdef WITH_IMAGE
 	    if (this_plot->plot_style == RGBIMAGE) {
@@ -1215,9 +1205,7 @@ eval_3dplots()
 	    TBOOLEAN set_title = FALSE, set_with = FALSE;
 	    TBOOLEAN set_lpstyle = FALSE;
 	    TBOOLEAN checked_once = FALSE;
-#ifdef EAM_DATASTRINGS
 	    TBOOLEAN set_labelstyle = FALSE;
-#endif
 	    if (!parametric || crnt_param == 0)
 		start_token = c_token;
 
@@ -1396,10 +1384,7 @@ eval_3dplots()
 		    this_plot->plot_style = get_style();
 		    if ((this_plot->plot_type == FUNC3D) &&
 			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
-#ifdef EAM_DATASTRINGS
-			|| (this_plot->plot_style == LABELPOINTS)
-#endif
-			)) {
+			|| (this_plot->plot_style == LABELPOINTS))) {
 			int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
 			this_plot->plot_style = POINTSTYLE;
 		    }
@@ -1430,7 +1415,6 @@ eval_3dplots()
 		    continue;
 		}
 
-#ifdef EAM_DATASTRINGS
 		/* Labels can have font and text property info as plot options */
 		/* In any case we must allocate one instance of the text style */
 		/* that all labels in the plot will share.                     */
@@ -1453,7 +1437,6 @@ eval_3dplots()
 			}
 		    }
 		}
-#endif
 
 		/* pick up line/point specs
 		 * - point spec allowed if style uses points, ie style&2 != 0

@@ -27,12 +27,6 @@
 /* Define if this system uses a 32-bit DOS extender (djgpp/emx). */
 #define DOS32 1
 
-/* Define to allow reading strings from datafiles */
-#define EAM_DATASTRINGS 1
-
-/* Define to enable histograms plot style. */
-#define EAM_HISTOGRAMS 1
-
 /* Define to allow placement of rectangles and other objects */
 #define EAM_OBJECTS 1
 

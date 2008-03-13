@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.61 2007/12/08 10:55:17 mikulik Exp $
+ * $Id: tables.h,v 1.62 2007/12/24 19:39:13 sfeam Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -182,10 +182,7 @@ enum show_style_id {
     SHOW_STYLE_INVALID,
     SHOW_STYLE_DATA, SHOW_STYLE_FUNCTION, SHOW_STYLE_LINE,
     SHOW_STYLE_FILLING, SHOW_STYLE_ARROW, SHOW_STYLE_RECTANGLE,
-    SHOW_STYLE_INCREMENT
-#ifdef EAM_HISTOGRAMS
-    , SHOW_STYLE_HISTOGRAM
-#endif
+    SHOW_STYLE_INCREMENT, SHOW_STYLE_HISTOGRAM
 };
 
 enum filledcurves_opts_id {

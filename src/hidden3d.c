@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.64 2008/02/06 18:04:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.65 2008/02/24 19:49:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1162,7 +1162,6 @@ build_networks(struct surface_points *plots, int pcount)
 		struct coordinate GPHUGE *points = icrvs->points;
 		long int previousvertex = -1;
 
-#ifdef EAM_DATASTRINGS
 		/* To handle labels we must look inside a separate list */
 		/* rather than just walking through the points arrays.  */
 		if (this_plot->plot_style == LABELPOINTS) {
@@ -1182,10 +1181,8 @@ build_networks(struct surface_points *plots, int pcount)
 			(vlist+thisvertex)->label = label;
 			store_edge(thisvertex, edir_point, crvlen, lp, above);
 		    }
-		} else
-#endif
 
-		for (i = 0; i < icrvs->p_count; i++) {
+		} else for (i = 0; i < icrvs->p_count; i++) {
 		    long int thisvertex, basevertex;
 
 		    thisvertex = store_vertex(points + i, lp_style,
@@ -1574,13 +1571,11 @@ draw_vertex(p_vertex v)
     if (v->lp_style && v->lp_style->p_type >= -1 && !clip_point(x,y)) {
 	int colortype = v->lp_style->pm3d_color.type;
 
-#ifdef EAM_DATASTRINGS
 	if (v->label)  {
 	    write_label(x,y, v->label);
 	    v->lp_style = NULL;
 	    return;
 	}
-#endif
 
 	/* EAM DEBUG - Check for extra point properties */
 	if (colortype == TC_LT)

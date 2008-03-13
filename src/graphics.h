@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.41 2008/02/22 06:13:49 sfeam Exp $
+ * $Id: graphics.h,v 1.42 2008/02/27 03:20:43 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -58,9 +58,7 @@ typedef struct curve_points {
     struct lp_style_type lp_properties;
     struct arrow_style_type arrow_properties;
     struct fill_style_type fill_properties;
-#ifdef EAM_DATASTRINGS
     struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */
-#endif
 #ifdef WITH_IMAGE
     struct t_image image_properties;	/* only used if plot_style is IMAGE or RGB_IMAGE */
 #endif
@@ -68,10 +66,8 @@ typedef struct curve_points {
     /* 2D and 3D plot structure fields overlay only to this point */
 
     filledcurves_opts filledcurves_options;
-#ifdef EAM_HISTOGRAMS
     struct histogram_style *histogram;	/* Only used if plot_style == HISTOGRAM */
     int histogram_sequence;	/* Ordering of this dataset within the histogram */
-#endif
     enum PLOT_SMOOTH plot_smooth; /* which "smooth" method to be used? */
     int p_max;			/* how many points are allocated */
     int p_count;		/* count of points in points */
@@ -114,10 +110,8 @@ double CheckLog __PROTO((TBOOLEAN, double, double));
 #endif
 void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));
 
-#ifdef EAM_HISTOGRAMS
 void init_histogram __PROTO((struct histogram_style *hist, char *title));
 void free_histlist __PROTO((struct histogram_style *hist));
-#endif
 
 #ifdef WITH_IMAGE
 void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN update_axes));

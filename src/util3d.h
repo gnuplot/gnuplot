@@ -1,5 +1,5 @@
 /*
- * $Id: util3d.h,v 1.12 2005/08/07 09:43:32 mikulik Exp $
+ * $Id: util3d.h,v 1.13 2005/12/05 04:25:18 sfeam Exp $
  */
 
 /* GNUPLOT - util3d.h */
@@ -49,9 +49,7 @@ typedef struct vertex {
     coordval x, y, z;		/* vertex coordinates */
     lp_style_type *lp_style;	/* where to find point symbol type (if any) */
     coordval real_z;
-#ifdef EAM_DATASTRINGS
     struct text_label *label;
-#endif
 #ifdef HIDDEN3D_VAR_PTSIZE	/* Needed for variable pointsize, but takes space */
     struct coordinate *original;
 #endif

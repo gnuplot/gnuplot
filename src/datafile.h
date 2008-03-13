@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.23 2007/09/02 03:41:32 sfeam Exp $
+ * $Id: datafile.h,v 1.24 2007/12/06 06:27:07 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -82,10 +82,8 @@ extern int df_line_number;
 extern AXIS_INDEX df_axis[];
 extern struct udft_entry ydata_func; /* HBB 990829: moved from command.h */
 
-#ifdef EAM_DATASTRINGS
 /* Returned to caller by df_readline() */
 extern char *df_tokens[];
-#endif
 
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;
@@ -111,10 +109,8 @@ void df_close __PROTO((void));
 void df_showdata __PROTO((void));
 int df_2dbinary __PROTO((struct curve_points *));
 int df_3dmatrix __PROTO((struct surface_points *, int));
-#ifdef EAM_DATASTRINGS
 void df_set_key_title __PROTO((struct curve_points *));
 int expect_string __PROTO((const char column ));
-#endif
 
 void df_reset_after_error __PROTO((void));
 void f_dollars __PROTO((union argument *x));
@@ -125,9 +121,7 @@ void f_stringcolumn   __PROTO((union argument *x));
 
 struct use_spec_s {
     int column;
-#ifdef EAM_DATASTRINGS
     int expected_type;
-#endif
     struct at_type *at;
 };
 

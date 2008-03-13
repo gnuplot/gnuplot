@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.250 2008/03/06 17:55:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.251 2008/03/11 16:21:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -107,12 +107,10 @@ static int ylabel_x, y2label_x, xlabel_y, x2label_y, title_y, time_y, time_x;
 static int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
 /*}}} */
 
-#ifdef EAM_HISTOGRAMS
 /* Status information for stacked histogram plots */
 static struct coordinate GPHUGE *stackheight = NULL;	/* top of previous row */
 static int stack_count;					/* points actually used */
 static void place_histogram_titles __PROTO((void));
-#endif
 
 /*{{{  static fns and local macros */
 static void recheck_ranges __PROTO((struct curve_points * plot));
@@ -254,7 +252,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	    }
 	    ignore_enhanced(FALSE);
 	}
-#ifdef EAM_HISTOGRAMS
+
 	/* Check for new histogram here and save space for divider */
 	if (this_plot->plot_style == HISTOGRAMS
 	&&  this_plot->histogram_sequence == 0 && cnt > 1)
@@ -269,7 +267,6 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 		    mlen = len;
 	    }
 	}
-#endif
     }
 
 
@@ -1916,7 +1913,6 @@ do_plot(struct curve_points *plots, int pcount)
 
 	term_apply_lp_properties(&(this_plot->lp_properties));
 
-#ifdef EAM_HISTOGRAMS
 	/* Skip a line in the key between histogram clusters */
 	if (this_plot->plot_style == HISTOGRAMS
 	&&  this_plot->histogram_sequence == 0 && yl != yl_ref) {
@@ -1949,10 +1945,8 @@ do_plot(struct curve_points *plots, int pcount)
 		this_plot->labels = NULL;
 		this_plot->lp_properties = save_lp;
 	    }
-	} else
-#endif
 
-	if (this_plot->title && !*this_plot->title) {
+	} else if (this_plot->title && !*this_plot->title) {
 	    localkey = FALSE;
 	} else if (this_plot->plot_type == NODATA) {
 	    localkey = FALSE;
@@ -2026,7 +2020,6 @@ do_plot(struct curve_points *plots, int pcount)
 		plot_boxes(this_plot, Y_AXIS.term_zero);
 		break;
 
-#ifdef EAM_HISTOGRAMS
 	    case HISTOGRAMS:
 		if (bar_layer == LAYER_FRONT)
 		    plot_boxes(this_plot, Y_AXIS.term_zero);
@@ -2043,7 +2036,6 @@ do_plot(struct curve_points *plots, int pcount)
 		if (bar_layer != LAYER_FRONT)
 		    plot_boxes(this_plot, Y_AXIS.term_zero);
 		break;
-#endif
 
 	    case BOXERROR:
 		if (bar_layer != LAYER_FRONT)
@@ -2080,11 +2072,10 @@ do_plot(struct curve_points *plots, int pcount)
 		fprintf(stderr, "** warning: can't use pm3d for 2d plots -- please unset pm3d\n");
 		break;
 
-#ifdef EAM_DATASTRINGS
 	    case LABELPOINTS:
 		place_labels( this_plot->labels->next, LAYER_PLOTLABELS, TRUE);
 		break;
-#endif
+
 #ifdef WITH_IMAGE
 	    case IMAGE:
 		this_plot->image_properties.type = IC_PALETTE;
@@ -2148,10 +2139,8 @@ do_plot(struct curve_points *plots, int pcount)
     /* PLACE LABELS */
     place_labels( first_label, 1, FALSE );
 
-#ifdef EAM_HISTOGRAMS
-/* PLACE HISTOGRAM TITLES */
+    /* PLACE HISTOGRAM TITLES */
     place_histogram_titles();
-#endif
 
     /* PLACE ARROWS */
     place_arrows( 1 );
@@ -3285,9 +3274,7 @@ plot_bars(struct curve_points *plot)
     unsigned int yM, xlowM, xhighM;
     TBOOLEAN low_inrange, high_inrange;
     int tic = ERRORBARTIC;
-#ifdef EAM_HISTOGRAMS
     double halfwidth = 0;		/* Used to calculate full box width */
-#endif
 
     /* Limitation: no boxes with x errorbars */
 
@@ -3296,9 +3283,7 @@ plot_bars(struct curve_points *plot)
 	|| (plot->plot_style == BOXERROR)
 	|| (plot->plot_style == YERRORLINES)
 	|| (plot->plot_style == XYERRORLINES)
-#ifdef EAM_HISTOGRAMS
 	|| (plot->plot_style == HISTOGRAMS)
-#endif
 	|| (plot->plot_style == FILLEDCURVES) /* Only if term has no filled_polygon! */
 	) {
 	/* Draw the vertical part of the bar */
@@ -3309,7 +3294,7 @@ plot_bars(struct curve_points *plot)
 
 	    /* check to see if in xrange */
 	    x = plot->points[i].x;
-#ifdef EAM_HISTOGRAMS
+
 	    if (plot->plot_style == HISTOGRAMS) {
 		/* Shrink each cluster to fit within one unit along X axis,   */
 		/* centered about the integer representing the cluster number */
@@ -3324,7 +3309,7 @@ plot_bars(struct curve_points *plot)
 		halfwidth = (plot->points[i].xhigh - plot->points[i].xlow)
 			  / (2. * clustersize);
 	    }
-#endif
+
 	    if (!inrange(x, X_AXIS.min, X_AXIS.max))
 		continue;
 	    xM = map_x(x);
@@ -3366,37 +3351,33 @@ plot_bars(struct curve_points *plot)
 	    xhigh = plot->points[i].xhigh;
 	    xlow = plot->points[i].xlow;
 
-#ifdef EAM_HISTOGRAMS
 	    if (plot->plot_style == HISTOGRAMS) {
 		xlowM = map_x(x-halfwidth);
 		xhighM = map_x(x+halfwidth);
 	    } else {
-#endif
-	    high_inrange = inrange(xhigh, X_AXIS.min, X_AXIS.max);
-	    low_inrange = inrange(xlow, X_AXIS.min, X_AXIS.max);
+		high_inrange = inrange(xhigh, X_AXIS.min, X_AXIS.max);
+		low_inrange = inrange(xlow, X_AXIS.min, X_AXIS.max);
 
-	    /* compute the plot position of xhigh */
-	    if (high_inrange)
-		xhighM = map_x(xhigh);
-	    else if (samesign(xhigh - X_AXIS.max, X_AXIS.max - X_AXIS.min))
-		xhighM = map_x(X_AXIS.max);
-	    else
-		xhighM = map_x(X_AXIS.min);
+		/* compute the plot position of xhigh */
+		if (high_inrange)
+		    xhighM = map_x(xhigh);
+		else if (samesign(xhigh - X_AXIS.max, X_AXIS.max - X_AXIS.min))
+		    xhighM = map_x(X_AXIS.max);
+		else
+		    xhighM = map_x(X_AXIS.min);
 
-	    /* compute the plot position of xlow */
-	    if (low_inrange)
-		xlowM = map_x(xlow);
-	    else if (samesign(xlow - X_AXIS.max, X_AXIS.max - X_AXIS.min))
-		xlowM = map_x(X_AXIS.max);
-	    else
-		xlowM = map_x(X_AXIS.min);
+		/* compute the plot position of xlow */
+		if (low_inrange)
+		    xlowM = map_x(xlow);
+		else if (samesign(xlow - X_AXIS.max, X_AXIS.max - X_AXIS.min))
+		    xlowM = map_x(X_AXIS.max);
+		else
+		    xlowM = map_x(X_AXIS.min);
 
-	    if (!high_inrange && !low_inrange && xlowM == xhighM)
-		/* both out of range on the same side */
-		continue;
-#ifdef EAM_HISTOGRAMS
+		if (!high_inrange && !low_inrange && xlowM == xhighM)
+		    /* both out of range on the same side */
+		    continue;
 	    }
-#endif
 
 	    /* by here everything has been mapped */
 	    if (!polar) {
@@ -3542,9 +3523,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
     double dxl, dxr, dyt;
     struct termentry *t = term;
     enum coord_type prev = UNDEFINED;	/* type of previous point */
-
-#ifdef EAM_HISTOGRAMS
     double dyb = 0.0;
+
     /* The stackheight[] array contains the y coord of the top   */
     /* of the stack so far for each point.                       */
     if (plot->plot_style == HISTOGRAMS) {
@@ -3569,7 +3549,6 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 	    stack_count = newsize;
 	}
     }
-#endif
 
     for (i = 0; i < plot->p_count; i++) {
 
@@ -3623,7 +3602,6 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    dyt = plot->points[i].y;
 		}
 
-#ifdef EAM_HISTOGRAMS
 		if (plot->plot_style == HISTOGRAMS) {
 		    int ix = i;
 		    /* Shrink each cluster to fit within one unit along X axis,   */
@@ -3678,7 +3656,6 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			break;
 		    }
 		}
-#endif
 
 		/* clip to border */
 		cliptorange(dyt, Y_AXIS.min, Y_AXIS.max);
@@ -3690,12 +3667,10 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		yt = map_y(dyt);
 		yb = xaxis_y;
 
-#ifdef EAM_HISTOGRAMS
 		if (plot->plot_style == HISTOGRAMS
 		&& (histogram_opts.type == HT_STACKED_IN_LAYERS
 		    || histogram_opts.type == HT_STACKED_IN_TOWERS))
 			yb = map_y(dyb);
-#endif
 
 		/* Variable color */
 		if (plot->plot_style == BOXES) {
@@ -3723,13 +3698,12 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    }
 
 		    style = style_from_fill(&plot->fill_properties);
-#ifdef EAM_HISTOGRAMS
+
 		    /* FIXME EAM - broken, and doesn't match key entries */
 		    if (plot->plot_style == HISTOGRAMS
 		    && plot->fill_properties.fillstyle == FS_PATTERN
 		    && histogram_opts.type == HT_STACKED_IN_TOWERS)
 			style += (i<<4);
-#endif
 
 		    if (plot->lp_properties.use_palette) {
 			(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
@@ -5233,7 +5207,6 @@ plot_border()
 }
 
 
-#ifdef EAM_HISTOGRAMS
 void
 init_histogram(struct histogram_style *histogram, char *title)
 {
@@ -5285,7 +5258,6 @@ place_histogram_titles()
     }
 }
 
-#endif
 
 /*
  * Make this code a subroutine, rather than in-line, so that it can
