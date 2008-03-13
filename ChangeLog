@@ -1,3 +1,8 @@
+2008-03-13  Carl Troein  <troein@users.sourceforge.net>
+
+	* term/post.trm (PS_filled_polygon): Limit the number of consecutive
+	relative moves in order to avoid accumulated round-off error.
+
 2008-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data store2d_point) src/graphics.c (plot_boxes):
