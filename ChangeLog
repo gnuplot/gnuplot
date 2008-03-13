@@ -13,9 +13,10 @@
 	anyhow.  When last measured, the change in code size due to joint
 	omission of these options was 1.5%.
 
-	* src/axis.c src/breaders.c src/color.c src/command.c src/datafile.c
-	src/gadgets.c src/graphics.c src/mouse.c src/plot3d.c src/show.c
-	src/unset.c:  Remove dead code, obsolete comments, leftover debug code.
+	* src/axis.c src/breaders.c src/datafile.c src/color.c src/command.c
+	src/datafile.c src/gadgets.c src/graphics.c src/mouse.c src/plot3d.c
+	src/pm3d.c src/pm3d.h src/save.c src/set.c src/show.c src/unset.c:
+	Remove dead code, obsolete comments, leftover debug code.
 
 2008-03-13  Carl Troein  <troein@users.sourceforge.net>
 

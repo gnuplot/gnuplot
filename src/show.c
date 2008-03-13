@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.202 2008/03/13 19:53:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.203 2008/03/13 20:02:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2287,13 +2287,7 @@ show_pm3d()
     } else {
 	fputs("\tpm3d-hidden3d is off\n", stderr);
     }
-#if PM3D_HAVE_SOLID
-    if (pm3d.solid) {
-	fputs("\tborders, tics and labels may be hidden by the surface\n", stderr);
-    } else {
-	fputs("\tsurface is transparent for borders, tics and labels\n", stderr);
-    }
-#endif
+
     fprintf(stderr,"\tsteps for bilinear interpolation: %d,%d\n",
 	 pm3d.interp_i, pm3d.interp_j);
     fprintf(stderr,"\tquadrangle color according to ");

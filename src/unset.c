@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.111 2008/03/13 19:53:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.112 2008/03/13 20:02:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -108,9 +108,6 @@ static void unset_mouse __PROTO((void));
 
 static void unset_month_day_tics __PROTO((AXIS_INDEX));
 static void unset_minitics __PROTO((AXIS_INDEX));
-#ifdef OLDUNSETTICS
-static void unset_tics_in __PROTO((void));
-#endif /* OLDUNSETTICS */
 
 static void unset_offsets __PROTO((void));
 static void unset_origin __PROTO((void));
@@ -349,11 +346,7 @@ unset_command()
 	unset_terminal();
 	break;
     case S_TICS:
-#ifdef OLDUNSETTICS
-	unset_tics_in();
-#else
 	unset_tics(AXIS_ARRAY_SIZE);
-#endif /* OLDUNSETTICS */
 	break;
     case S_TICSCALE:
 	unset_ticscale();
@@ -1401,39 +1394,6 @@ unset_terminal()
 }
 
 
-#ifdef OLDUNSETTICS
-/* process 'unset tics' command */
-static void
-unset_tics_in()
-{
-    unsigned int i = AXIS_ARRAY_SIZE;
-    c_token++;
-
-    if (equals(c_token,"x"))
-	i = FIRST_X_AXIS;
-    else if (equals(c_token,"y"))
-	i = FIRST_Y_AXIS;
-    else if (equals(c_token,"z"))
-	i = FIRST_Z_AXIS;
-    else if (equals(c_token,"x2"))
-	i = SECOND_X_AXIS;
-    else if (equals(c_token,"y2"))
-	i = SECOND_Y_AXIS;
-    else if (equals(c_token,"cb"))
-	i = COLOR_AXIS;
-    if (i < AXIS_ARRAY_SIZE)
-	c_token++;
-
-    if (i < AXIS_ARRAY_SIZE)
-	axis_array[i].tic_in = TRUE;
-    else {
-	for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-	    axis_array[i].tic_in = TRUE;
-    }
-}
-#endif /* OLDUNSETTICS */
-
-
 /* process 'unset ticscale' command */
 static void
 unset_ticscale()
@@ -1705,9 +1665,6 @@ reset_command()
     unset_zero();
     unset_dgrid3d();
     unset_ticslevel();
-#ifdef OLDUNSETTICS
-    unset_tics_in();
-#endif /* OLDUNSETTICS */
     unset_margin(&bmargin);
     unset_margin(&lmargin);
     unset_margin(&rmargin);

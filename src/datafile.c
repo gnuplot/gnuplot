@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.143 2008/03/13 19:53:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.144 2008/03/13 20:02:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3265,16 +3265,11 @@ plot_option_binary(TBOOLEAN set_matrix)
 
 	    if (almost_equals(c_token, "file$type")) {
 		c_token++;
-#define EQUAL_SYMBOL_NOT_REQUIRED 0
-#if EQUAL_SYMBOL_NOT_REQUIRED
-		/* Ignore or do not require equal symbol. */
-		if (equals(c_token, "=")) c_token++;
-#else
-		/* else equal symbol. */
+
 		if (!equals(c_token, "="))
 		    int_error(c_token, equal_symbol_msg);
 		c_token++;
-#endif
+
 		copy_str(file_ext, c_token, MAX_FILE_EXT_LEN);
 
 		for (i=0; i < (sizeof(df_bin_filetype_table)/sizeof(df_bin_filetype_table_struct)); i++) {
@@ -3434,11 +3429,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 	    if (set_flipx) { duplication=TRUE; break; }
 	    c_token++;
 	    /* If no equal sign, then set flip true for all records. */
-#if EQUAL_SYMBOL_NOT_REQUIRED
-	    if (!equals(c_token, "=") && !isanumber(c_token)) {
-#else
 	    if (!equals(c_token, "=")) {
-#endif
 		int i;
 		for (i = 0; i < df_num_bin_records; i++)
 		    df_bin_record[i].cart_dir[0] = -1;
@@ -3455,11 +3446,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 		int_error(c_token, "Must specify a sampling array size before indicating flip in second dimension");
 	    c_token++;
 	    /* If no equal sign, then set flip true for all records. */
-#if EQUAL_SYMBOL_NOT_REQUIRED
-	    if (!equals(c_token, "=") && !isanumber(c_token)) {
-#else
 	    if (!equals(c_token, "=")) {
-#endif
 		int i;
 		for (i = 0; i < df_num_bin_records; i++)
 		    df_bin_record[i].cart_dir[1] = -1;
@@ -3477,11 +3464,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 		int_error(c_token, "Must specify a sampling array size before indicating spacing in third dimension");
 	    c_token++;
 	    /* If no equal sign, then set flip true for all records. */
-#if EQUAL_SYMBOL_NOT_REQUIRED
-	    if (!equals(c_token, "=") && !isanumber(c_token)) {
-#else
 	    if (!equals(c_token, "=")) {
-#endif
 		int i;
 		for (i=0; i < df_num_bin_records; i++)
 		    df_bin_record[i].cart_dir[2] = -1;
@@ -3585,15 +3568,12 @@ plot_option_binary(TBOOLEAN set_matrix)
 	if (almost_equals(c_token, "end$ian")) {
 	    if (set_endian) { duplication=TRUE; break; }
 	    c_token++;
-#if EQUAL_SYMBOL_NOT_REQUIRED
-	    /* Ignore or do not require equal symbol. */
-	    if (equals(c_token, "=")) c_token++;
-#else
+
 	    /* Require equal symbol. */
 	    if (!equals(c_token, "="))
 		int_error(c_token, equal_symbol_msg);
 	    c_token++;
-#endif
+
 	    if (almost_equals(c_token, "def$ault"))
 		df_bin_file_endianess = THIS_COMPILER_ENDIAN;
 	    else if (equals(c_token, "swap") || equals(c_token, "swab"))
@@ -3625,15 +3605,12 @@ plot_option_binary(TBOOLEAN set_matrix)
 	    if (set_matrix)
 		int_error(c_token, matrix_general_binary_conflict_msg);
 	    df_matrix_file = FALSE;
-#if EQUAL_SYMBOL_NOT_REQUIRED
-	    /* Ignore or do not require equal symbol. */
-	    if (equals(c_token, "=")) c_token++;
-#else
-	    /* Require equal symbol. */
+
+	    /* Require equal sign */
 	    if (!equals(c_token, "="))
 		int_error(c_token, equal_symbol_msg);
 	    c_token++;
-#endif
+
 	    if (isstring(c_token))
 		plot_option_binary_format();
 	    else
@@ -3736,16 +3713,10 @@ plot_option_array(void)
 	int ival;
 	int i_dimension = 0;
 
-#if EQUAL_SYMBOL_NOT_REQUIRED
-	/* Ignore or do not require equal symbol. */
-	if (equals(c_token, "="))
-	    c_token++;
-#else
 	/* Require equal symbol. */
 	if (!equals(c_token, "="))
 	    int_error(c_token, equal_symbol_msg);
 	c_token++;
-#endif
 
 	/* Set true in case user starts string with a comma. */
 	expecting_number = TRUE;
@@ -3868,15 +3839,11 @@ plot_option_multivalued(df_multivalue_type type, int arg)
 {
     int bin_record_count = 0;
     int test_val;
-#if EQUAL_SYMBOL_NOT_REQUIRED
-    /* Ignore or do not require equal symbol. */
-    if (equals(c_token, "=")) c_token++;
-#else
+
     /* Require equal symbol. */
     if (!equals(c_token, "="))
 	int_error(c_token, equal_symbol_msg);
     c_token++;
-#endif
 
     while (!END_OF_COMMAND) {
 	double tuple[3];

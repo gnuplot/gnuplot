@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.68 2008/01/11 04:41:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.69 2008/03/13 19:53:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -43,9 +43,6 @@ pm3d_struct pm3d = {
     PM3D_SCANS_AUTOMATIC,	/* scans direction is determined automatically */
     PM3D_CLIP_4IN,		/* clipping: all 4 points in ranges */
     0,				/* no pm3d hidden3d is drawn */
-#if PM3D_HAVE_SOLID
-    0,				/* solid (off by default, that means `transparent') */
-#endif /* PM3D_HAVE_SOLID */
     PM3D_EXPLICIT,		/* implicit */
     PM3D_WHICHCORNER_MEAN,	/* color from which corner(s) */
     1,				/* interpolate along scanline */
@@ -873,9 +870,6 @@ pm3d_reset()
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
     pm3d.clip = PM3D_CLIP_4IN;
     pm3d.hidden3d_tag = 0;
-#if PM3D_HAVE_SOLID
-    pm3d.solid = 0;
-#endif /* PM3D_HAVE_SOLID */
     pm3d.implicit = PM3D_EXPLICIT;
     pm3d.which_corner_color = PM3D_WHICHCORNER_MEAN;
     pm3d.interp_i = 1;
