@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.228 2007/12/14 23:57:55 sfeam Exp $
+dnl $Id: configure.in,v 1.229 2008/03/13 19:53:25 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -614,16 +614,6 @@ if test "$enable_mouse" = yes; then
             [ Unix-type of Interprocess Communication is required for mouse support. ])
 fi
 
-dnl binary_data_file
-AC_ARG_ENABLE(binary_data_file,dnl
-[  --disable-binary-data-file          disable binary_data_file],,
-  test -z "$enable_binary_data_file" && enable_binary_data_file=yes)
-
-if test "$enable_binary_data_file" = yes; then
-  AC_DEFINE(BINARY_DATA_FILE,1,[ Define if you want to support files in binary format. ])
-fi
-
-AM_CONDITIONAL(INCLUDE_BINARY_C, test "$enable_binary_data_file" = no)
 
 dnl with_image
 AC_ARG_ENABLE(with_image,dnl
@@ -631,12 +621,7 @@ AC_ARG_ENABLE(with_image,dnl
   test -z "$enable_with_image" && enable_with_image=yes)
 
 if test "$enable_with_image" = yes; then
-  if test "$enable_binary_data_file" = yes; then
-    AC_DEFINE(WITH_IMAGE,1,[ Define if you want to have image plotting support. ])
-  else
-    enable_with_image=no
-    AC_MSG_WARN( [The with-image option requires --enable-binary-data-file. ])
-  fi
+  AC_DEFINE(WITH_IMAGE,1,[ Define if you want to have image plotting support. ])
 fi
 
 dnl enable multi-byte font support in x11 terminal
@@ -1233,12 +1218,6 @@ if test "$enable_with_image" = yes; then
   AC_MSG_RESULT([  Plot style image: yes (EXPERIMENTAL)])
 else
   AC_MSG_RESULT([  Plot style image: no])
-fi
-
-if test "$enable_binary_data_file" = yes; then
-  AC_MSG_RESULT([  General binary data file reading: yes (EXPERIMENTAL)])
-else
-  AC_MSG_RESULT([  General binary data file reading: no])
 fi
 
 AC_MSG_RESULT([])

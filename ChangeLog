@@ -17,6 +17,13 @@
 	src/datafile.c src/gadgets.c src/graphics.c src/mouse.c src/plot3d.c
 	src/pm3d.c src/pm3d.h src/save.c src/set.c src/show.c src/unset.c:
 	Remove dead code, obsolete comments, leftover debug code.
+	No more PM3D_HAVE_SOLID EQUAL_SYMBOL_NOT_REQUIRED OLDUNSETTICS
+
+	* configure.in src/breaders.c src/breaders.h src/datafile.c
+	src/datafile.h src/plot2d.c src/plot3d.c src/set.c src/show.c
+	src/unset.c src/Makefile.am: No more BINARY_DATA_FILE conditionals.
+	Due to bit rot, one could not build with this disabled, and other
+	options depend on it.
 
 	* demo/all.dem: Add circles.dem to the set of "all" demos.
 

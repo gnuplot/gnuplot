@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.163 2008/03/11 16:21:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.164 2008/03/13 19:53:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -53,9 +53,6 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.163 2008/03/11 16:21:20 s
 #include "tabulate.h"
 #include "term_api.h"
 #include "util.h"
-#ifdef BINARY_DATA_FILE
-#include "plot.h"
-#endif
 
 #ifndef _Windows
 # include "help.h"
@@ -554,7 +551,7 @@ get_data(struct curve_points *current_plot)
 	    continue;
 
 	case DF_FIRST_BLANK:
-#if defined(WITH_IMAGE) && defined(BINARY_DATA_FILE)
+#if defined(WITH_IMAGE)
 	    /* The binary input routines generate DF_FIRST_BLANK at the end
 	     * of scan lines, so that the data may be used for the isometric
 	     * splots.  Rather than turning that off inside the binary
@@ -1472,12 +1469,6 @@ eval_plots()
 		df_set_plot_mode(MODE_PLOT);    /* Needed for binary datafiles */
 		specs = df_open(name_str, MAXDATACOLS, this_plot);
 
-#ifndef BINARY_DATA_FILE
-		/* this parses data-file-specific modifiers only */
-		/* we'll sort points when we know style, if necessary */
-		if (df_binary)
-		    int_error(c_token, "This copy of gnuplot was not built with support for 2d binary files");
-#endif
 		/* include modifiers in default title */
 		this_plot->token = end_token = c_token - 1;
 

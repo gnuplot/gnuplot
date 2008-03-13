@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.144 2008/03/13 20:02:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.145 2008/03/13 21:00:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -155,9 +155,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.144 2008/03/13 20:02:11
 #include "plot.h"
 #include "readline.h"
 #include "util.h"
-#ifdef BINARY_DATA_FILE
 #include "breaders.h"
-#endif
 
 /* test to see if the end of an inline datafile is reached */
 #define is_EOF(c) ((c) == 'e' || (c) == 'E')
@@ -171,13 +169,11 @@ static int get_time_cols __PROTO((char *fmt));
 static void mod_def_usespec __PROTO((int specno, int jump));
 #endif
 static int check_missing __PROTO((char *s));
+
 static char *df_gets __PROTO((void));
 static int df_tokenise __PROTO((char *s));
-#ifdef BINARY_DATA_FILE
 static float *df_read_matrix __PROTO((int *rows, int *columns));
-#else
-static float **df_read_matrix __PROTO((int *rows, int *columns));
-#endif
+
 static void plot_option_every __PROTO((void));
 static void plot_option_index __PROTO((void));
 static void plot_option_thru __PROTO((void));
@@ -309,7 +305,6 @@ static TBOOLEAN key_title_auto_col = FALSE;
 static char df_key_title[MAX_TOKEN_LENGTH];     /* filled in from <col> in 1st row by df_tokenise */
 static struct curve_points *df_current_plot;	/* used to process histogram labels + key entries */
 
-#ifdef BINARY_DATA_FILE
 
 /* Binary *read* variables used by df_readbinary().  The difference between matrix
  * binary and general binary is that matrix binary requires an extra first column
@@ -386,17 +381,6 @@ static long long_0x2468 = 0x2468;
 #define TEST_BIG_PDP         ( (((char *)&long_0x2468)[0] < 3) ? DF_BIG_ENDIAN : DF_PDP_ENDIAN )
 #define THIS_COMPILER_ENDIAN ( (((char *)&long_0x2468)[0] < 5) ? TEST_BIG_PDP : DF_LITTLE_ENDIAN )
 
-#else /* ifdef BINARY_DATA_FILE */
-
-typedef enum df_byte_read_order_type {
-    DF_01,
-    DF_10
-} df_byte_read_order_type;
-
-static int int_1 = 1;
-#define THIS_COMPILER_ENDIAN ( ((char *)&int_1)[0] ? DF_LITTLE_ENDIAN : DF_BIG_ENDIAN )
-
-#endif /* ifdef BINARY_DATA_FILE */
 
 /* Argument is file's endianess type. */
 static df_byte_read_order_type byte_read_order __PROTO((df_endianess_type));
@@ -835,7 +819,6 @@ df_tokenise(char *s)
 
 /*}}} */
 
-#ifdef BINARY_DATA_FILE
 /*{{{  static float *df_read_matrix() */
 /* Reads a matrix from a text file and stores it as floats in allocated
  * memory.
@@ -917,78 +900,6 @@ df_read_matrix(int *rows, int *cols)
 }
 /*}}} */
 
-#else /* BINARY_DATA_FILE */
-
-/*{{{  static float **df_read_matrix() */
-/* reads a matrix from a text file stores in same storage format as
- * fread_matrix */
-/* FIXME HBB 20001207: doesn't respect 'index' at all, even though it
- * could, and probably should. */
-static float **
-df_read_matrix(int *rows, int *cols)
-{
-    int max_rows = 0;
-    int c;
-    float **rmatrix = NULL;
-    char *s;
-
-    *rows = 0;
-    *cols = 0;
-
-    for (;;) {
-	if (!(s = df_gets())) {
-	    df_eof = 1;
-	    return rmatrix;     /* NULL if we have not read anything yet */
-	}
-	while (isspace((unsigned char) *s))
-	    ++s;
-
-	if (!*s || is_comment(*s)) {
-	    if (rmatrix)
-		return rmatrix;
-	    else
-		continue;
-	}
-	if (mixed_data_fp && is_EOF(*s)) {
-	    df_eof = 1;
-	    return rmatrix;
-	}
-	c = df_tokenise(s);
-
-	if (!c)
-	    return rmatrix;
-
-	if (*cols && c != *cols) {
-	    /* its not regular */
-	    int_error(NO_CARET, "Matrix does not represent a grid");
-	}
-	*cols = c;
-
-	if (*rows >= max_rows) {
-	    rmatrix = gp_realloc(rmatrix,
-				 (max_rows += 10) * sizeof(float *),
-				 "df_matrix");
-	}
-	
-	/* allocate a row and store data */
-	{
-	    int i;
-	    float *row = rmatrix[*rows] = gp_alloc(c * sizeof(float),
-				           "df_matrix row");
-
-	    for (i = 0; i < c; ++i) {
-		if (df_column[i].good != DF_GOOD && i >= firstpoint)
-		    int_error(NO_CARET, "Bad number in matrix");
-
-		row[i] = (float) df_column[i].datum;
-	    }
-	    ++*rows;
-	}
-    }
-}
-/*}}} */
-#endif /* BINARY_DATA_FILE */
-
 
 static void
 initialize_use_spec()
@@ -1020,9 +931,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_index = FALSE, set_every = FALSE, set_thru = FALSE;
     TBOOLEAN set_using = FALSE;
-#ifdef BINARY_DATA_FILE
     TBOOLEAN set_matrix = FALSE;
-#endif
 
     fast_columns = 1;           /* corey@cac */
 
@@ -1056,9 +965,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     firstpoint = firstline = 0;
     lastpoint = lastline = MAXINT;
 
-#ifdef BINARY_DATA_FILE
     df_binary_file = df_matrix_file = FALSE;
-#endif
 
     df_eof = 0;
 
@@ -1095,7 +1002,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	/* look for binary / matrix */
 	if (almost_equals(c_token, "bin$ary")) {
 	    c_token++;
-#ifdef BINARY_DATA_FILE
 	    if (df_binary_file) {
 		duplication=TRUE;
 		break;
@@ -1107,21 +1013,12 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    df_matrix_file = TRUE;
 	    initialize_binary_vars();
 	    plot_option_binary(set_matrix);
-#else
-	    if (df_matrix) {
-		duplication=TRUE;
-		break;
-	    }
-	    df_binary = TRUE;
-	    df_matrix = TRUE;
-#endif
 	    continue;
 	}
 
 	/* deal with matrix */
 	if (almost_equals(c_token, "mat$rix")) {
 	    c_token++;
-#ifdef BINARY_DATA_FILE
 	    if (set_matrix) {
 		duplication=TRUE;
 		break;
@@ -1134,10 +1031,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		int_error(c_token, matrix_general_binary_conflict_msg);
 	    df_matrix_file = TRUE;
 	    set_matrix = TRUE;
-#else
-	    if (df_matrix) { duplication=TRUE; break; }
-	    df_matrix = TRUE;
-#endif
 	    fast_columns = 0;
 	    continue;
 	}
@@ -1284,12 +1177,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    }
 	}
 #endif /* HAVE_SYS_STAT_H */
-#ifdef BINARY_DATA_FILE
-	if ((data_fp = loadpath_fopen(df_filename, df_binary_file ? "rb" : "r")) ==
-#else
-	if ((data_fp = loadpath_fopen(df_filename, df_binary ? "rb" : "r")) ==
-#endif
-	    (FILE *) NULL) {
+
+	if ((data_fp = loadpath_fopen(df_filename, df_binary_file ? "rb" : "r")) == NULL) {
 	    int_warn(NO_CARET, "Skipping unreadable file \"%s\"", df_filename);
 	    df_eof = 1;
 	    return DF_EOF;
@@ -1297,7 +1186,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     }
 /*}}} */
 
-#ifdef BINARY_DATA_FILE
+
     /* If the data is in binary matrix form, read in some values
      * to determine the nubmer of columns and rows.  If data is in
      * ASCII matrix form, read in all the data to memory in preparation
@@ -1326,7 +1215,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
      * important for the rest of the program to know if if the data
      * came from a binary file. (DJS 20 Aug 2004) */
     df_binary = df_binary_file;
-#endif /* BINARY_DATA_FILE */
 
     return df_no_use_specs;
 }
@@ -1436,13 +1324,8 @@ plot_option_every()
 static void
 plot_option_index()
 {
-#ifdef BINARY_DATA_FILE
     if (df_binary_file && df_matrix_file)
 	int_error(c_token, "Binary matrix file format does not allow more than one surface per file");
-#else
-    if (df_binary)
-	int_error(c_token, "Binary file format does not allow more than one surface per file");
-#endif
 
     ++c_token;
     /* Check for named index */
@@ -1491,15 +1374,12 @@ plot_option_thru()
 static void
 plot_option_using(int max_using)
 {
-
-#ifdef BINARY_DATA_FILE
     int no_cols = 0;  /* For general binary only. */
 
     /* The filetype function may have set the using specs, so reset
      * them before processing tokens. */
     if (df_binary_file)
 	initialize_use_spec();
-#endif
 
     if (!END_OF_COMMAND && !isstring(++c_token)) {
 	do {                    /* must be at least one */
@@ -1509,14 +1389,12 @@ plot_option_using(int max_using)
 	    if (equals(c_token, ":")) {
 		/* empty specification - use default */
 		use_spec[df_no_use_specs].column = df_no_use_specs;
-#ifdef BINARY_DATA_FILE
 		if (df_no_use_specs > no_cols)
 		    no_cols = df_no_use_specs;
-#endif
 		++df_no_use_specs;
 		/* do not increment c+token ; let while() find the : */
+
 	    } else if (equals(c_token, "(")) {
-#ifdef BINARY_DATA_FILE
 		if (df_binary_file || df_matrix_file) {
 		    /* Scan through the tokens looking for largest
 		     * column reference. */
@@ -1543,7 +1421,7 @@ plot_option_using(int max_using)
 			}
 		    } /* for(j) */
 		} /* if(binary|matrix file) */
-#endif /* BINARY_DATA_FILE */
+
 		fast_columns = 0;       /* corey@cac */
 		dummy_func = NULL;      /* no dummy variables active */
 		/* this will match ()'s: */
@@ -1571,14 +1449,14 @@ plot_option_using(int max_using)
 		if (col < -2)
 		    int_error(c_token, "Column must be >= -2");
 		use_spec[df_no_use_specs++].column = col;
-#ifdef BINARY_DATA_FILE
+
+		/* Supposed only happens for binary files, but don't bet on it */
 		if (col > no_cols)
 		    no_cols = col;
-#endif
 	    }
 	} while (equals(c_token, ":") && ++c_token);
     }
-#ifdef BINARY_DATA_FILE
+
     if (df_binary_file) {
 	/* If the highest user column number is greater than number of binary
 	 * columns, set the unitialized columns binary info to that of the last
@@ -1586,9 +1464,9 @@ plot_option_using(int max_using)
 	 */
 	df_extend_binary_columns(no_cols);
     }
-#endif
+
     if (!END_OF_COMMAND && isstring(c_token)) {
-#ifdef BINARY_DATA_FILE
+
 	if (df_binary_file)
 # if BINARY_HAS_OWN_FORMAT_STRING
 	    int_error(NO_CARET, "Place format string with `binary` keyword, i.e., \"binary format='...'\"\n\t or use \"binary filetype=...\" for in-file format if supported");
@@ -1597,10 +1475,7 @@ plot_option_using(int max_using)
 		int_error(c_token, matrix_general_binary_conflict_msg);
 	    plot_option_binary_format();
 # endif /* BINARY_HAS_OWN_FORMAT_STRING */
-#else /* BINARY_DATA_FILE */
-	if (df_binary)
-	    int_error(NO_CARET, "Format string meaningless with binary data");
-#endif /* BINARY_DATA_FILE */
+
 	quote_str(df_format, c_token, MAX_LINE_LEN);
 	if (!valid_format(df_format))
 	    int_error(c_token,
@@ -1646,14 +1521,12 @@ df_readline(double v[], int max)
     if (!data_fp && !df_pseudodata)
 	return DF_EOF;
 
-#ifdef BINARY_DATA_FILE
     if (df_read_binary)
 	/* General binary, matrix binary or matrix ascii
 	 * that's been converted to binary.
 	 */
 	return df_readbinary(v, max);
     else
-#endif
 	return df_readascii(v, max);
 }
 /*}}} */
@@ -2070,228 +1943,6 @@ df_readascii(double v[], int max)
 /*}}} */
 
 
-#ifndef BINARY_DATA_FILE
-/*{{{  int df_2dbinary(this_plot) */
-int
-df_2dbinary(struct curve_points *this_plot)
-{
-    (void) this_plot;           /* avoid -Wunused warning */
-    int_error(NO_CARET, "Binary file format for 2d data not yet defined");
-    return 0;                   /* keep compiler happy */
-}
-/*}}} */
-#endif
-
-
-#ifndef BINARY_DATA_FILE /* NO LONGER REQUIRED FOR GENERAL BINARY DATA */
-/*{{{  int df_3dmatrix(this_plot, ret_this_iso) */
-/*
- * formerly in gnubin.c
- *
- * modified by div for 3.6
- *   obey the 'every' field from df_open
- *   outrange points are marked as such, not omitted
- *   obey using - treat x as column 1, y as col 2 and z as col 3
- *   ( ie $1 gets x, $2 gets y, $3 gets z)
- *
- *  we are less optimal for case of log plot and no using spec,
- * (call log too often) but that is price for flexibility
- * I suspect it didn't do autoscaling of x and y for log scale
- * properly ?
- *
- * Trouble figuring out file format ! Is it
-
- width  x1  x2  x3  x4  x5 ...
- y1   z11 z12 z13 z14 z15 ...
- y2   x21 z22 z23 .....
- .    .
- .        .
- .             .
-
- * with perhaps x and y swapped...
- *
- * - presumably rows continue to end of file, hence no indexing...
- *
- * Last update: 3/3/92 for Gnuplot 3.24.
- * Created from code for written by RKC for gnuplot 2.0b.
- *
- * 19 September 1992  Lawrence Crowl  (crowl@cs.orst.edu)
- * Added user-specified bases for log scaling.
- *
- * Copyright (c) 1991,1992 Robert K. Cunningham, MIT Lincoln Laboratory
- *
- */
-
-/*
- * Here we keep putting new plots onto the end of the linked list
- *
- * We assume the data's x,y values have x1<x2, x2<x3... and
- * y1<y2, y2<y3... .
- * Actually, I think the assumption is less strong than that--it looks like
- * the direction just has to be the same.
- *
- * This routine expects all the 'axis array' variables (now gathered
- * in axis.h) to be properly initialized
- *
- * does the autoscaling into the array versions (min_array[], max_array[]) */
-
-int
-df_3dmatrix(struct surface_points *this_plot, int need_palette)
-{
-    float GPFAR * GPFAR * dmatrix, GPFAR * rt, GPFAR * ct;
-    int nr, nc;
-    int width, height;
-    int row, col;
-    struct iso_curve *this_iso;
-    double used[4];             /* output from using manip */
-    /* evaluate used[0..use_spec_34] */
-    int use_spec_34 = (need_palette && df_no_use_specs == 4) ? 4 : 3; 
-    struct coordinate GPHUGE *point;    /* HBB 980308: added 'GPHUGE' flag */
-
-    assert(df_matrix);
-
-    if (df_eof)
-	return 0;               /* hope caller understands this */
-
-    if (df_binary) {
-	if (!fread_matrix(data_fp, &dmatrix, &nr, &nc, &rt, &ct))
-	    int_error(NO_CARET, "Binary file read error: format unknown!");
-	/* fread_matrix() drains the file */
-	df_eof = 1;
-    } else {
-	if (!(dmatrix = df_read_matrix(&nr, &nc))) {
-	    df_eof = 1;
-	    return 0;
-	}
-	/* HBB 20001208: implement 'index' for matrix files: don't return
-	 * the data to caller if index is not among of the selected
-	 * ones */
-	if (df_current_index < df_lower_index
-	    || df_current_index > df_upper_index
-	    || (df_current_index - df_lower_index) % df_index_step != 0
-	    ) {
-	    free_matrix(dmatrix, 0, nr - 1, 0);
-	    df_current_index ++;
-	    return 0;
-	}
-
-	rt = NULL;
-	ct = NULL;
-    }
-
-    if (nc == 0 || nr == 0)
-	int_error(NO_CARET, "Read grid of zero height or zero width");
-
-    this_plot->plot_type = DATA3D;
-    this_plot->has_grid_topology = TRUE;
-
-    if (df_no_use_specs != 0
-	&& df_no_use_specs != 3
-	&& df_no_use_specs != use_spec_34 /*3 or 4*/)
-	int_error(NO_CARET, "Current implementation requires full `using` spec");
-
-    if (need_palette && df_no_use_specs == 4)
-	this_plot->pm3d_color_from_column = 1;
-
-    /* columns are those in the binary data file, not those of `using` spec */
-    if (df_max_cols < 3) {
-	df_max_cols = 3;
-	df_column = gp_realloc(df_column,
-			       df_max_cols * sizeof(df_column_struct),
-			       "datafile columns");
-    }
-
-    df_no_cols = 3;
-    df_column[0].good = df_column[1].good = df_column[2].good = DF_GOOD;
-
-    assert(everyline > 0);
-    assert(everypoint > 0);
-    width = (nc - firstpoint + everypoint - 1) / everypoint;    /* ? ? ? ? ? */
-    height = (nr - firstline + everyline - 1) / everyline;      /* ? ? ? ? ? */
-
-    for (row = firstline; row < nr; row += everyline) {
-	df_column[1].datum = rt ? rt[row] : row;
-
-	/* Allocate the correct number of entries */
-	this_iso = iso_alloc(width);
-
-	point = this_iso->points;
-
-	/* Cycle through data */
-	for (col = firstpoint; col < nc; col += everypoint, ++point) {
-	    /*{{{  process one point */
-	    int i;
-
-	    df_column[0].datum = ct ? ct[col] : col;
-	    df_column[2].datum = dmatrix[row][col];
-
-	    /*{{{  pass through using spec */
-	    for (i = 0; i < use_spec_34; ++i) {
-		int column = use_spec[i].column;
-
-		if (df_no_use_specs == 0)
-		    used[i] = df_column[i].datum;
-		else if (use_spec[i].at) {
-		    struct value a;
-		    evaluate_inside_using = TRUE;
-		    evaluate_at(use_spec[i].at, &a);
-		    evaluate_inside_using = FALSE;
-		    if (undefined) {
-			point->type = UNDEFINED;
-			goto skip;      /* continue _outer_ loop */
-		    }
-		    used[i] = real(&a);
-		} else if (column < 1 || column > df_no_cols) {
-		    point->type = UNDEFINED;
-		    goto skip;
-		} else
-		    used[i] = df_column[column - 1].datum;
-	    }
-	    /*}}} */
-	    if (df_no_use_specs != 4)
-		used[3] = used[2]; /* 3 parameters of `using` => 4th color-value equals z-value */
-
-	    point->type = INRANGE;      /* so far */
-
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->x, used[0], point->type, FIRST_X_AXIS,
-					    this_plot->noautoscale, NOOP, goto skip);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->y, used[1], point->type, FIRST_Y_AXIS,
-					    this_plot->noautoscale, NOOP, goto skip);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->z, used[2], point->type, FIRST_Z_AXIS,
-					    this_plot->noautoscale, NOOP, goto skip);
-	    if (need_palette) {
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(point->CRD_COLOR, used[3], point->type, COLOR_AXIS,
-					    this_plot->noautoscale, NOOP, goto skip);
-	    }
-
-	    /* some of you won't like this, but I say goto is for this */
-
-	  skip:
-	    ;                   /* ansi requires this */
-	    /*}}} */
-	}
-	this_iso->p_count = width;
-	this_iso->next = this_plot->iso_crvs;
-	this_plot->iso_crvs = this_iso;
-	this_plot->num_iso_read++;
-    }
-
-    free_matrix(dmatrix, 0, nr - 1, 0);
-    if (rt)
-	free_vector(rt, 0);
-    if (ct)
-	free_vector(ct, 0);
-
-    /* HBB 20001208: implement 'index' for matrix datafiles */
-    df_current_index ++;
-
-    return (nc);
-}
-
-/*}}} */
-
-#else /* REPLACED BY df_readbinary() READING JUST THE FIRST ROW AND SAVING FOR LATER USE. */
-
 char *read_error_msg = "Data file read error";
 double df_matrix_corner[2][2]; /* First argument is corner, second argument is x (0) or y(1). */
 
@@ -2402,7 +2053,6 @@ df_determine_matrix_info(FILE *fin)
     }
 
 }
-#endif
 
 
 /* stuff for implementing the call-backs for picking up data values
@@ -2748,8 +2398,6 @@ add_key_entry(char *temp_string, int df_datum)
     df_current_plot->labels->next = new_entry;
 }
 
-
-#ifdef BINARY_DATA_FILE
 
 /* Construct 2D rotation matrix. */
 /* R - Matrix to construct. */
@@ -5056,7 +4704,6 @@ df_set_plot_mode(int mode)
 {
     df_plot_mode = mode;
 }
-#endif /* BINARY_DATA_FILE */
 
 /* Special pseudofile '+' returns x coord of sample for 2D plots,
  * Special pseudofile '++' returns x and y coordinates of grid for 3D plots.

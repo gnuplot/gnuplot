@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.265 2008/03/13 19:53:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.266 2008/03/13 21:00:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -371,10 +371,8 @@ set_command()
 		set_separator();
 	    else if (almost_equals(c_token,"com$mentschars"))
 		set_datafile_commentschars();
-#ifdef BINARY_DATA_FILE
 	    else if (almost_equals(c_token,"bin$ary"))
 		df_set_datafile_binary();
-#endif
 	    else if (almost_equals(c_token,"fort$ran")) {
 		df_fortran_constants = TRUE;
 		c_token++;

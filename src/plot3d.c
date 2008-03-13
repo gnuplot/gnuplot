@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.156 2008/03/13 19:53:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.157 2008/03/13 20:02:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -52,9 +52,6 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.156 2008/03/13 19:53:35 s
 #include "tabulate.h"
 #include "util.h"
 #include "pm3d.h"
-#ifdef BINARY_DATA_FILE
-#include "plot.h"
-#endif
 
 #include "plot2d.h" /* Only for store_label() */
 
@@ -656,17 +653,10 @@ get_3ddata(struct surface_points *this_plot)
     }
     /* data file is already open */
 
-#ifndef BINARY_DATA_FILE /* NO LONGER REQUIRED FOR GENERAL BINARY OR MATRIX BINARY DATA */
     if (df_matrix)
-	xdatum = df_3dmatrix(this_plot, NEED_PALETTE(this_plot));
-    else {
-#else
-    if (df_matrix) {
 	this_plot->has_grid_topology = TRUE;
-    }
 
     {
-#endif
 	/*{{{  read surface from text file */
 	struct iso_curve *local_this_iso = iso_alloc(samples_1);
 	struct coordinate GPHUGE *cp;
@@ -698,7 +688,7 @@ get_3ddata(struct surface_points *this_plot)
 		break;		/* two blank lines */
 	    if (j == DF_FIRST_BLANK) {
 
-#if defined(WITH_IMAGE) && defined(BINARY_DATA_FILE)
+#if defined(WITH_IMAGE)
 		/* Images are in a sense similar to isocurves.
 		 * However, the routine for images is written to
 		 * compute the two dimensions of coordinates by
@@ -1240,10 +1230,9 @@ eval_3dplots()
 
 		df_set_plot_mode(MODE_SPLOT);
 		specs = df_open(name_str, MAXDATACOLS, (struct curve_points *)this_plot);
-#ifdef BINARY_DATA_FILE
+
 		if (df_matrix)
 		    this_plot->has_grid_topology = TRUE;
-#endif
 
 		/* parses all datafile-specific modifiers */
 		/* we will load the data after parsing title,with,... */
@@ -1492,19 +1481,7 @@ eval_3dplots()
 	    if (!set_title) {
 		this_plot->title_no_enhanced = TRUE; /* filename or function cannot be enhanced */
 		if (key->auto_titles == FILENAME_KEYTITLES) {
-#ifdef BINARY_DATA_FILE
-		    /* DJS (20 Aug 2004) I'd prefer that the df_binary flag be discarded.  There
-		     * is nothing special about the file being binary that its title should be
-		     * different.  Can't the decision to do this be based on some other criteria,
-		     * like the presence of a nonconventional `using`?
-		     */
-#endif
-		    if (this_plot->plot_type == DATA3D && df_binary==TRUE && end_token==start_token+1)
-			/* let default title for  splot 'a.dat' binary  is 'a.dat'
-			 * while for  'a.dat' binary using 2:1:3  will be all 4 words */
-			m_capture(&(this_plot->title), start_token, start_token);
-		    else
-			m_capture(&(this_plot->title), start_token, end_token);
+		    m_capture(&(this_plot->title), start_token, end_token);
 		    if (crnt_param == 2)
 			xtitle = this_plot->title;
 		    else if (crnt_param == 1)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: breaders.c,v 1.3 2006/06/30 07:33:05 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: breaders.c,v 1.4 2008/03/13 20:02:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - breaders.c */
@@ -45,9 +45,6 @@ static char *RCSid() { return RCSid("$Id: breaders.c,v 1.3 2006/06/30 07:33:05 m
  */
 
 #include "breaders.h"
-
-#ifdef BINARY_DATA_FILE
-
 #include "datafile.h"
 #include "alloc.h"
 #include "misc.h"
@@ -257,5 +254,3 @@ edf_filetype_function(void)
     free(header);
 
 }
-
-#endif /* BINARY_DATA_FILE */

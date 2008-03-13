@@ -26,7 +26,7 @@ GNUPLOT_X11 = `echo gnuplot_x11 | sed '$(transform)'`$(EXEEXT)
 
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\"
 
-gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h \
+gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
 breaders.c breaders.h bitmap.c bitmap.h color.c color.h command.c \
 command.h contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h \
 eval.c eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c getcolor.h gp_hist.h \
@@ -40,10 +40,6 @@ standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h \
 tabulate.c tabulate.h \
 template.h term_api.h term.c term.h time.c unset.c util.c util.h \
 util3d.c util3d.h variable.c variable.h version.c version.h
-
-if INCLUDE_BINARY_C
-gnuplot_SOURCES += binary.c
-endif
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS) $(WX_LIBS)
 

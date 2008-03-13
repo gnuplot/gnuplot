@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.203 2008/03/13 20:02:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.204 2008/03/13 21:00:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -916,9 +916,7 @@ show_version(FILE *fp)
 		"";
 
 	    const char *binary_files =
-#ifdef BINARY_DATA_FILE
 		"+BINARY_DATA  "
-#endif
 		"";
 
 	    const char *nocwdrc =
@@ -2768,7 +2766,7 @@ show_datafile()
     }
     if (df_fortran_constants)
 	fputs("\tdatafile parsing will accept Fortran D or Q constants\n",stderr);
-#if BINARY_DATA_FILE
+
     if (END_OF_COMMAND || almost_equals(c_token,"bin$ary")) {
 	if (!END_OF_COMMAND)
 	    c_token++;
@@ -2786,7 +2784,7 @@ show_datafile()
 	    /* 'show datafile binary filetypes' */
 	    df_show_filetypes(stderr);
     }
-#endif
+
     if (!END_OF_COMMAND)
 	c_token++;
 }

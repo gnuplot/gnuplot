@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.112 2008/03/13 20:02:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.113 2008/03/13 21:00:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -53,9 +53,6 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.112 2008/03/13 20:02:13 sf
 #include "util.h"
 #include "variable.h"
 #include "pm3d.h"
-#ifdef BINARY_DATA_FILE
-#  include "datafile.h"
-#endif
 
 static void unset_angles __PROTO((void));
 static void unset_arrow __PROTO((void));
@@ -279,9 +276,7 @@ unset_command()
 	df_separator = '\0';
 	free(df_commentschars);
 	df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
-#ifdef BINARY_DATA_FILE
 	df_unset_datafile_binary();
-#endif
 	break;
 #ifdef USE_MOUSE
     case S_MOUSE:
@@ -1673,9 +1668,7 @@ reset_command()
     pm3d_reset();
     reset_colorbox();
     reset_palette();
-#ifdef BINARY_DATA_FILE
     df_unset_datafile_binary();
-#endif
     unset_fillstyle();
     unset_histogram();
 

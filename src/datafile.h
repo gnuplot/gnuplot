@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.24 2007/12/06 06:27:07 sfeam Exp $
+ * $Id: datafile.h,v 1.25 2008/03/13 19:53:27 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -125,11 +125,7 @@ struct use_spec_s {
     struct at_type *at;
 };
 
-#ifndef BINARY_DATA_FILE
-#define df_set_plot_mode(mode)	/* Not needed except for binary data files */
-#endif
 
-#ifdef BINARY_DATA_FILE
 /* Details about the records contained in a binary data file. */
 
 typedef enum df_translation_type {
@@ -254,6 +250,5 @@ df_data_type df_get_read_type __PROTO((int col));                     /* Type of
 int df_get_read_size __PROTO((int col));                              /* Size of data in the binary column. */
 int df_get_num_matrix_cols __PROTO((void));
 void df_set_plot_mode __PROTO((int));
-#endif /* BINARY_DATA_FILE */
 
 #endif /* GNUPLOT_DATAFILE_H */
