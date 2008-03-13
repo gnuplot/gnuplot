@@ -18,6 +18,8 @@
 	src/pm3d.c src/pm3d.h src/save.c src/set.c src/show.c src/unset.c:
 	Remove dead code, obsolete comments, leftover debug code.
 
+	* demo/all.dem: Add circles.dem to the set of "all" demos.
+
 2008-03-13  Carl Troein  <troein@users.sourceforge.net>
 
 	* term/post.trm (PS_filled_polygon): Limit the number of consecutive
