@@ -1,3 +1,9 @@
+2008-03-14  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/graphics.c (do_circles): Instead of drawing all the circle
+	interiors, followed by all of the circle boundaries, draw both the
+	interior and the boundary for each circle in succession.
+
 2008-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/config.cyg config/config.dj2 config/config.mgw config/config.nt

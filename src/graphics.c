@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.252 2008/03/13 19:53:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.253 2008/03/13 20:02:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3780,6 +3780,11 @@ plot_circles(struct curve_points *plot)
     double radius;
     struct fill_style_type *fillstyle = &plot->fill_properties;
     int style = style_from_fill(fillstyle);
+    TBOOLEAN withborder = FALSE;
+
+    if (fillstyle->border_linetype != LT_NODRAW
+    &&  fillstyle->border_linetype != LT_UNDEFINED)
+	withborder = TRUE;
 
     for (i = 0; i < plot->p_count; i++) {
 	if (plot->points[i].type == INRANGE) {
@@ -3788,29 +3793,18 @@ plot_circles(struct curve_points *plot)
 	    radius = x - map_x(plot->points[i].xlow);
 
 	    /* rgb variable  -  color read from data column */
-	    if ((plot->lp_properties.pm3d_color.value < 0.0)
-		&& (plot->lp_properties.pm3d_color.type == TC_RGB))
+	    if ((plot->lp_properties.pm3d_color.type == TC_RGB)
+	    &&  (plot->lp_properties.pm3d_color.value < 0.0))
 		set_rgbcolor( plot->points[i].yhigh);
-	   
+	    else if (withborder)
+		term_apply_lp_properties(&plot->lp_properties);
 	    do_arc(x,y, radius, 0., 360., style);
-	}
-    }
-
-    /* Retrace the border if the style requests it */
-    if (fillstyle->border_linetype != LT_NODRAW
-    &&  fillstyle->border_linetype != LT_UNDEFINED) {
-	(*term->linetype)(fillstyle->border_linetype);
-
-	for (i = 0; i < plot->p_count; i++) {
-	    if (plot->points[i].type == INRANGE) {
-		x = map_x(plot->points[i].x);
-		y = map_y(plot->points[i].y);
-		radius = x - map_x(plot->points[i].xlow);
+	    if (withborder) {
+		(*term->linetype)(fillstyle->border_linetype);
 		do_arc(x,y, radius, 0., 360., 0);
 	    }
 	}
     }
-
 }
 #endif
 
