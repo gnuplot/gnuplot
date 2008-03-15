@@ -1,6 +1,6 @@
 2008-03-15  Thomas Sefzick  <thse@users.sourceforge.net>
 
-	* src/axis.c (setup_tics):  It the user specified an explicit
+	* src/axis.c (setup_tics):  If the user specified an explicit
 	tic interval on a timefmt axis, do not change this by calling
 	quantize_time_tics().
 	Bug #1908019
