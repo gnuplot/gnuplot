@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.66 2007/12/17 23:09:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.67 2008/03/13 20:02:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -788,15 +788,19 @@ setup_tics(AXIS_INDEX axis, int max)
 	autoextend_min = autoextend_max = FALSE;
     }
 
-    /* BUGFIX HBB 20010831: for time/date axes, if an explicit
-     * stepsize was set, timelevel[axis] wasn't defined, leading to
-     * strange misbehaviours of minor tics on time axes. This would
-     * usually be used to redefine the 'tic' interval, but as a side
-     * effect, it defines timelevel[axis]. */
-    /* HBB 20011204: moved this up --- round_outward() needs
-     * timelevel[axis], too */
-    if (this->is_timedata && ticdef->type == TIC_SERIES)
-	quantize_time_tics(axis, tic, fabs(this->max - this->min), 20);
+    /* If an explicit stepsize was set, timelevel[axis] wasn't defined,
+     * leading to strange misbehaviours of minor tics on time axes.
+     * We used to call quantize_time_tics, but that also caused strangeness.
+     */
+    if (this->is_timedata && ticdef->type == TIC_SERIES) {
+	if      (tic >= 365*24*60*60.) timelevel[axis] = TIMELEVEL_YEARS;
+	else if (tic >=  28*24*60*60.) timelevel[axis] = TIMELEVEL_MONTHS;
+	else if (tic >=   7*24*60*60.) timelevel[axis] = TIMELEVEL_WEEKS;
+	else if (tic >=     24*60*60.) timelevel[axis] = TIMELEVEL_DAYS;
+	else if (tic >=        60*60.) timelevel[axis] = TIMELEVEL_HOURS;
+	else if (tic >=           60.) timelevel[axis] = TIMELEVEL_MINUTES;
+	else                           timelevel[axis] = TIMELEVEL_SECONDS;
+    }
 
     if (autoextend_min)
 	this->min = round_outward(axis, ! (this->min < this->max), this->min);

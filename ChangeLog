@@ -1,3 +1,10 @@
+2008-03-15  Thomas Sefzick  <thse@users.sourceforge.net>
+
+	* src/axis.c (setup_tics):  It the user specified an explicit
+	tic interval on a timefmt axis, do not change this by calling
+	quantize_time_tics().
+	Bug #1908019
+
 2008-03-14  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/graphics.c (do_circles): Instead of drawing all the circle
