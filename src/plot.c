@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.95 2007/06/22 17:53:33 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.96 2007/08/26 19:20:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -554,10 +554,6 @@ main(int argc, char **argv)
 	 * something like init_set() maybe */
 	get_user_env();
 	init_loadpath();
-	/*
-	 * Now, init_fontpath is invoked when it is used first.
-	init_fontpath();
-	*/
 	init_locale();
 	/* HBB: make sure all variables start in the same mode 'reset'
 	 * would set them to. Since the axis variables aren't in

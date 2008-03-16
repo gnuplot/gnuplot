@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.151 2008/03/13 19:53:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.152 2008/03/13 21:00:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -543,10 +543,8 @@ set encoding %s\n\
 	    (polar) ? "" : "un",
 	    (parametric) ? "" : "un");
 
-#ifdef HAVE_LOCALE_H
     if (numeric_locale)
 	fprintf(fp, "set decimalsign locale \"%s\"\n", numeric_locale);
-#endif
     if (decimalsign != NULL)
 	fprintf(fp, "set decimalsign '%s'\n", decimalsign);
     if (!numeric_locale && !decimalsign)
@@ -773,7 +771,7 @@ set origin %g,%g\n",
     fprintf(fp, "set tmargin %s %g\n",
 	    tmargin.scalex == screen ? "screen" : "", tmargin.x);
 
-    fprintf(fp, "set locale \"%s\"\n", get_locale());
+    fprintf(fp, "set locale \"%s\"\n", get_numeric_locale());
 
     fputs("set pm3d ", fp);
     fputs((PM3D_IMPLICIT == pm3d.implicit ? "implicit" : "explicit"), fp);

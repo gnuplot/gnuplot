@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.74 2007/12/17 21:50:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.75 2008/02/14 17:05:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -41,8 +41,8 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.74 2007/12/17 21:50:38 sfea
 #include "datafile.h"		/* for df_showdata and df_reset_after_error */
 #include "misc.h"
 #include "plot.h"
-/*  #include "setshow.h" */		/* for month names etc */
 #include "term_api.h"		/* for term_end_plot() used by graph_error() */
+#include "variable.h" /* For locale handling */
 
 #if defined(HAVE_DIRENT_H)
 # include <sys/types.h>
@@ -554,19 +554,13 @@ gprintf(
     int stored_power = 0;	/* power that matches the mantissa
                                    output earlier */
 
-#ifdef HAVE_LOCALE_H
-    if (numeric_locale)
-	setlocale(LC_NUMERIC,numeric_locale);
-#endif
+    set_numeric_locale();
 
     for (;;) {
 	/*{{{  copy to dest until % */
 	while (*format != '%')
 	    if (!(*dest++ = *format++)) {
-#ifdef HAVE_LOCALE_H
-		if (numeric_locale)
-		    setlocale(LC_NUMERIC,"C");
-#endif
+		reset_numeric_locale();
 		return;		/* end of format */
 	    }
 	/*}}} */
@@ -742,11 +736,8 @@ gprintf(
 	    }
 	    /*}}} */
 	default:
-#ifdef HAVE_LOCALE_H
- 	   if (numeric_locale)
-		setlocale(LC_NUMERIC,"C");
-#endif
-	    int_error(NO_CARET, "Bad format character");
+	   reset_numeric_locale();
+	   int_error(NO_CARET, "Bad format character");
 	} /* switch */
 	/*}}} */
 
@@ -757,11 +748,7 @@ gprintf(
 	    int dot;
 
 	    /* dot is the default decimalsign we will be replacing */
-#ifdef HAVE_LOCALE_H
-	    dot = *(localeconv()->decimal_point);
-#else
-	    dot = '.';
-#endif
+	    dot = *get_decimal_locale();
 
 	    /* replace every dot by the contents of decimalsign */
 	    while ((dotpos2 = strchr(dotpos1,dot)) != NULL) {
@@ -787,10 +774,7 @@ gprintf(
 	++format;
     } /* for ever */
 
-#ifdef HAVE_LOCALE_H
-    if (numeric_locale)
-	setlocale(LC_NUMERIC,"C");
-#endif
+    reset_numeric_locale();
 }
 
 /*}}} */

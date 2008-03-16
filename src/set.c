@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.266 2008/03/13 21:00:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.267 2008/03/14 02:56:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -467,7 +467,7 @@ set_command()
 	case S_ZERO:
 	    set_zero();
 	    break;
-/* FIXME */
+
 	case S_MXTICS:
 	case S_NOMXTICS:
 	case S_XTICS:
@@ -1166,10 +1166,10 @@ set_decimalsign()
 	decimalsign=NULL;
 
     if (END_OF_COMMAND) {
-#ifdef HAVE_LOCALE_H
+	reset_numeric_locale();
 	free(numeric_locale);
 	numeric_locale = NULL;
-	setlocale(LC_NUMERIC,"C");
+#ifdef HAVE_LOCALE_H
     } else if (equals(c_token,"locale")) {
 	char *newlocale = NULL;
 	c_token++;
@@ -1182,7 +1182,7 @@ set_decimalsign()
 	    newlocale = gp_strdup(getenv("LANG"));
 	if (!setlocale(LC_NUMERIC, newlocale ? newlocale : ""))
 	    int_error(c_token-1, "Could not find requested locale");
-	decimalsign = gp_strdup(localeconv()->decimal_point);
+	decimalsign = gp_strdup(get_decimal_locale());
 	fprintf(stderr,"decimal_sign in locale is %s\n", decimalsign);
 	/* Save this locale for later use, but return to "C" for now */
 	free(numeric_locale);
@@ -1223,7 +1223,9 @@ set_encoding()
 	encoding = S_ENC_DEFAULT;
 #ifdef HAVE_LOCALE_H
     } else if (equals(c_token,"locale")) {
-	setlocale(LC_CTYPE,"");
+	char *l = setlocale(LC_CTYPE,"");
+	if (l && (strstr(l,"utf") || strstr(l,"UTF")))
+	    encoding = S_ENC_UTF8;
 	c_token++;
 #endif
     } else {
@@ -5188,8 +5190,6 @@ parse_label_options( struct text_label *this_label )
 	    continue;
 	}
 
-	/* EAM FIXME: Option to disable enhanced text processing currently not */
-	/* documented for ordinary labels. */
 	if (almost_equals(c_token,"noenh$anced")) {
 	    this_label->noenhanced = TRUE;
 	    c_token++;

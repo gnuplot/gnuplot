@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.113 2008/03/13 21:00:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.114 2008/03/14 02:56:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -744,10 +744,8 @@ unset_decimalsign()
     if (decimalsign != NULL)
 	free(decimalsign);
     decimalsign = NULL;
-#ifdef HAVE_LOCALE_H
     free(numeric_locale);
     numeric_locale = NULL;
-#endif
 }
 
 

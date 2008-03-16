@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.204 2008/03/13 21:00:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.205 2008/03/14 02:56:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2326,13 +2326,11 @@ static void
 show_decimalsign()
 {
     SHOW_ALL_NL;
-#ifdef HAVE_LOCALE_H
-    if (numeric_locale) {
-	setlocale(LC_NUMERIC,numeric_locale);
-	fprintf(stderr, "\tdecimalsign for input is  %s \n", localeconv()->decimal_point);
-	setlocale(LC_NUMERIC,"C");
-    }
-#endif
+
+    set_numeric_locale();
+    fprintf(stderr, "\tdecimalsign for input is  %s \n", get_decimal_locale());
+    reset_numeric_locale();
+
     if (decimalsign!=NULL)
         fprintf(stderr, "\tdecimalsign for output is %s \n", decimalsign);
     else
@@ -2708,10 +2706,6 @@ show_locale()
 {
     SHOW_ALL_NL;
     locale_handler(ACTION_SHOW,NULL);
-#ifdef HAVE_LOCALE_H
-    if (numeric_locale)
-	fprintf(stderr, "\tLC_NUMERIC is %s\n", numeric_locale);
-#endif
 }
 
 
@@ -3127,9 +3121,6 @@ num_to_str(double r)
 
     sprintf(s[j], "%.15g", r);
     if (strchr(s[j], '.') == NULL &&
-#ifdef HAVE_LOCALE_H
-	strchr(s[j], ',') == NULL &&
-#endif
 	strchr(s[j], 'e') == NULL &&
 	strchr(s[j], 'E') == NULL)
 	strcat(s[j], ".0");

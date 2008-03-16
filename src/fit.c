@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.59 2007/12/06 06:27:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.60 2008/02/25 03:17:57 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -59,6 +59,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.59 2007/12/06 06:27:07 sfeam
 #include "plot.h"
 #include "misc.h"
 #include "util.h"
+#include "variable.h" /* For locale handling */
 
 /* Just temporary */
 #if defined(VA_START) && defined(STDC_HEADERS)
@@ -1406,12 +1407,9 @@ fit_command()
     err_data = vec(max_data);
     num_data = 0;
 
-#ifdef HAVE_LOCALE_H
     /* If the user has set an explicit locale for numeric input, apply it */
     /* here so that it affects data fields read from the input file.      */
-    if (numeric_locale)
-	setlocale(LC_NUMERIC,numeric_locale);
-#endif
+    set_numeric_locale();
 
     while ((i = df_readline(v, 4)) != DF_EOF) {
 	if (num_data >= max_data) {
@@ -1499,11 +1497,8 @@ fit_command()
     }
     df_close();
 
-#ifdef HAVE_LOCALE_H
     /* We are finished reading user input; return to C locale for internal use */
-    if (numeric_locale)
-	setlocale(LC_NUMERIC,"C");
-#endif
+    reset_numeric_locale();
 
     if (num_data <= 1)
 	Eex("No data to fit ");

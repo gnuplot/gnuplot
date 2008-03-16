@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.29 2007/05/10 22:49:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.30 2007/11/24 21:26:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -43,6 +43,7 @@ static char *RCSid() { return RCSid("$Id: variable.c,v 1.29 2007/05/10 22:49:37 
 #include "alloc.h"
 #include "command.h"
 #include "util.h"
+#include "term_api.h"
 
 #define PATHSEP_TO_NUL(arg)			\
 do {						\
@@ -547,21 +548,23 @@ locale_handler(int action, char *newlocale)
     switch(action) {
     case ACTION_CLEAR:
     case ACTION_INIT:
-	if (current_locale) free(current_locale);
-	current_locale = gp_strdup(INITIAL_LOCALE);
+	free(current_locale);
 #ifdef HAVE_LOCALE_H
-	setlocale(LC_CTYPE, "");
+	setlocale(LC_TIME, "");
+	current_locale = gp_strdup(setlocale(LC_TIME,NULL));
+#else
+	current_locale = gp_strdup(INITIAL_LOCALE);
 #endif
 	break;
 
     case ACTION_SET:
 #ifdef HAVE_LOCALE_H
 	if (setlocale(LC_TIME, newlocale)) {
-	    current_locale = gp_realloc(current_locale, strlen(newlocale) + 1, "locale");
-	    strcpy(current_locale, newlocale);
-	}
-	else
+	    free(current_locale);
+	    current_locale = gp_strdup(setlocale(LC_TIME,NULL));
+	} else {
 	    int_error(c_token, "Locale not available");
+	}
 
 	/* we can do a *lot* better than this ; eg use system functions
 	 * where available; create values on first use, etc
@@ -582,19 +585,20 @@ locale_handler(int action, char *newlocale)
 	strcpy(current_locale, newlocale);
 #endif /* HAVE_LOCALE_H */
 	break;
+
     case ACTION_SHOW:
 #ifdef HAVE_LOCALE_H
-	fprintf(stderr, "\tLC_CTYPE is %s\n", setlocale(LC_CTYPE,NULL));
-	fprintf(stderr, "\tLC_TIME is %s\n", setlocale(LC_TIME,NULL));
+	fprintf(stderr, "\tgnuplot LC_CTYPE   %s\n", setlocale(LC_CTYPE,NULL));
+	fprintf(stderr, "\tgnuplot encoding   %s\n", encoding_names[encoding]);
+	fprintf(stderr, "\tgnuplot LC_TIME    %s\n", setlocale(LC_TIME,NULL));
+	fprintf(stderr, "\tgnuplot LC_NUMERIC %s\n", numeric_locale ? numeric_locale : "C");
 #else
 	fprintf(stderr, "\tlocale is \"%s\"\n", current_locale);
 #endif
 	break;
-    case ACTION_SAVE:
+    
     case ACTION_GET:
-    case ACTION_NULL:
     default:
-	/* just return */
 	break;
     }
 

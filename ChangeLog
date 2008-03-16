@@ -1,3 +1,13 @@
+2008-03-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	"set locale" was taking the encoding (LC_CTYPE) from the environment,
+	but not the time/date usage (LC_TIME). This is exactly backwards from
+	what the documentation says. Change behavior to match the docs. However,
+	if the current locale is UTF8 then also set the encoding to utf8.
+
+	Move almost all of the code conditioned on HAVE_LOCALE_H into
+	variable.h and variable.c.
+
 2008-03-15  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* src/axis.c (setup_tics):  If the user specified an explicit

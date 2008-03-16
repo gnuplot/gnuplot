@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.46 2007/08/28 05:56:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.47 2007/08/28 06:13:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -42,6 +42,7 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.46 2007/08/28 05:56:30 
 #include "util.h"		/* for int_error() */
 # include "gp_time.h"           /* for str(p|f)time */
 #include "command.h"            /* for do_system_func */
+#include "variable.h" /* For locale handling */
 
 #include <math.h>
 
@@ -1208,12 +1209,9 @@ f_sprintf(union argument *arg)
     prev_pos = next_length;
     remaining = nargs - 1;
 
-#ifdef HAVE_LOCALE_H
     /* If the user has set an explicit LC_NUMERIC locale, apply it */
     /* to sprintf calls during expression evaluation.              */
-    if (numeric_locale)
-       setlocale(LC_NUMERIC,numeric_locale);
-#endif
+    set_numeric_locale();
 
     /* Each time we start this loop we are pointing to a % character */
     while (remaining-->0 && next_start[0] && next_start[1]) {
@@ -1318,11 +1316,8 @@ f_sprintf(union argument *arg)
     if (args != a)
 	free(args);
 
-#ifdef HAVE_LOCALE_H
     /* Return to C locale for internal use */
-    if (numeric_locale)
-       setlocale(LC_NUMERIC,"C");
-#endif
+    reset_numeric_locale();
 
 }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.145 2008/03/13 21:00:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.146 2008/03/14 02:56:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -156,6 +156,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.145 2008/03/13 21:00:36
 #include "readline.h"
 #include "util.h"
 #include "breaders.h"
+#include "variable.h" /* For locale handling */
 
 /* test to see if the end of an inline datafile is reached */
 #define is_EOF(c) ((c) == 'e' || (c) == 'E')
@@ -2112,11 +2113,7 @@ f_column(union argument *arg)
 void
 df_reset_after_error()
 {
-#ifdef HAVE_LOCALE_H
-    /* We are finished reading user input; return to C locale for internal use */
-    if (numeric_locale)
-	setlocale(LC_NUMERIC,"C");
-#endif
+    reset_numeric_locale();
     evaluate_inside_using = FALSE;
 }
 

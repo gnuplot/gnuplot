@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.157 2008/03/13 20:02:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.158 2008/03/14 02:56:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -47,11 +47,12 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.157 2008/03/13 20:02:13 s
 #include "graph3d.h"
 #include "misc.h"
 #include "parse.h"
+#include "pm3d.h"
 #include "setshow.h"
 #include "term_api.h"
 #include "tabulate.h"
 #include "util.h"
-#include "pm3d.h"
+#include "variable.h" /* For locale handling */
 
 #include "plot2d.h" /* Only for store_label() */
 
@@ -675,12 +676,9 @@ get_3ddata(struct surface_points *this_plot)
 	    local_this_iso->next->p_count = 0;
 	}
 
-#ifdef HAVE_LOCALE_H
 	/* If the user has set an explicit locale for numeric input, apply it */
 	/* here so that it affects data fields read from the input file.      */
-	if (numeric_locale)
-	    setlocale(LC_NUMERIC,numeric_locale);
-#endif
+	set_numeric_locale();
 
 	while ((retval = df_readline(v,MAXDATACOLS)) != DF_EOF) {
 	    j = retval;
@@ -960,11 +958,8 @@ get_3ddata(struct surface_points *this_plot)
 	    ++xdatum;
 	}			/* end of whileloop - end of surface */
 
-#ifdef HAVE_LOCALE_H
 	/* We are finished reading user input; return to C locale for internal use */
-	if (numeric_locale)
-	    setlocale(LC_NUMERIC,"C");
-#endif
+	reset_numeric_locale();
 
 	if (pm3d_color_from_column) {
 	    this_plot->pm3d_color_from_column = pm3d_color_from_column;
