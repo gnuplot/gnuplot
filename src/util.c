@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.75 2008/02/14 17:05:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.76 2008/03/16 20:03:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -66,9 +66,11 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.75 2008/02/14 17:05:20 sfea
 /* decimal sign */
 char *decimalsign = NULL;
 
-/* Holds the name of the current locale from LC_NUMERIC */
-/* as set by "set decimal locale" */
+/* Holds the name of the current LC_NUMERIC as set by "set decimal locale" */
 char *numeric_locale = NULL;
+
+/* Holds the name of the current LC_TIME as set by "set locale" */
+char *current_locale = NULL;
 
 const char *current_prompt = NULL; /* to be set by read_line() */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.61 2008/02/24 19:49:37 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.62 2008/03/08 06:37:17 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1440,11 +1440,6 @@ void wxt_init()
 #endif /* WXT_MULTITHREADED */
 
  		FPRINTF((stderr,"First Init2\n"));
-#ifdef HAVE_LOCALE_H
-		/* when wxGTK is initialised, GTK+ also sets the locale of the program itself;
-		 * we must revert it */
-		setlocale(LC_NUMERIC, "C");
-#endif /*have_locale_h*/
 
 		/* register call for "persist" effect and cleanup */
 		GP_ATEXIT(wxt_atexit);
@@ -1483,6 +1478,8 @@ void wxt_init()
 		dynamic_cast<wxtApp*>(wxTheApp)->SendEvent( event );
 		wxt_MutexGuiLeave();
 #ifdef WXT_MULTITHREADED
+		/* While we are waiting, the other thread is busy mangling  */
+		/* our locale settings. We will have to restore them later. */
 		window.condition->Wait();
 #endif /* WXT_MULTITHREADED */
 
@@ -1499,7 +1496,7 @@ void wxt_init()
 	wxt_sigint_check();
 
 	bool raise_setting;
-       bool persist_setting;
+	bool persist_setting;
 	bool ctrl_setting;
 	int rendering_setting;
 	int hinting_setting;
@@ -1550,6 +1547,16 @@ void wxt_init()
 		hinting_setting = 100;
 	}
 	wxt_current_plot->hinting = hinting_setting;
+
+#ifdef HAVE_LOCALE_H
+	/* when wxGTK was initialised above, GTK+ also set the locale of the 
+	 * program itself;  we must revert it */
+	if (wxt_status == STATUS_UNINITIALIZED) {
+		extern char *current_locale;
+		setlocale(LC_NUMERIC, "C");
+		setlocale(LC_TIME, current_locale);
+	}
+#endif
 
 	/* accept the following commands from gnuplot */
 	wxt_status = STATUS_OK;

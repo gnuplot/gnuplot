@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.152 2008/03/13 21:00:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.153 2008/03/16 20:03:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -771,7 +771,7 @@ set origin %g,%g\n",
     fprintf(fp, "set tmargin %s %g\n",
 	    tmargin.scalex == screen ? "screen" : "", tmargin.x);
 
-    fprintf(fp, "set locale \"%s\"\n", get_numeric_locale());
+    fprintf(fp, "set locale \"%s\"\n", get_time_locale());
 
     fputs("set pm3d ", fp);
     fputs((PM3D_IMPLICIT == pm3d.implicit ? "implicit" : "explicit"), fp);

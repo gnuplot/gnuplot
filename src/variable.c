@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.30 2007/11/24 21:26:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.31 2008/03/16 20:03:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -541,7 +541,6 @@ char abbrev_day_names[7][8] =
 char *
 locale_handler(int action, char *newlocale)
 {
-    static char *current_locale = NULL;
     struct tm tm;
     int i;
 

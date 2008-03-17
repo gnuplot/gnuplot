@@ -1,3 +1,15 @@
+2008-03-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/variable.c src/variable.c src/util.c src/util.h src/save.c:
+	Make current_locale a global. Don't reset locale to "C" unnecessarily.
+	Rename get_numeric_locale() to get_time_locale(), since that's what it
+	really does.
+
+	* src/wxterminal/wxt_gui.cpp (wxt_init): Restore the locale settings
+	for both LC_TIME and LC_NUMERIC, but only after the GTK+ thread has
+	finished mangling them.
+	Bug #1916190
+
 2008-03-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	"set locale" was taking the encoding (LC_CTYPE) from the environment,
