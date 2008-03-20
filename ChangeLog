@@ -4,6 +4,8 @@
 	keyword "nocontours".  This overrides the global "set contour", so
 	that you can contour a single surface from a plot with many.
 
+	* docs/Makefile.in: Note an external dependency for "make html"
+
 2008-03-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/variable.c src/variable.c src/util.c src/util.h src/save.c:

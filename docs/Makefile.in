@@ -236,8 +236,11 @@ html: htmldocs/gnuplot.html
 # htmldocs/gnuplot.html: $(srcdir)/gnuplot.texi 
 #	$(MAKEINFO) --html -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
-# TeX itself does a better job these days, and doesn't depend on having
-# emacs around to do lisp pre-processing
+# TeX itself does a better job these days,
+# and doesn't depend on having emacs around to do lisp pre-processing.
+# However, it does require help finding a set of color names:
+#     setenv RGBDEF /usr/lib/latex2html/styles/rgb.txt
+#
 htmldocs/gnuplot.html: $(srcdir)/gnuplot.tex
 	mkdir -p htmldocs
 	latex2html -dir htmldocs -local_icons gnuplot
