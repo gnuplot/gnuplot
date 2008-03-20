@@ -1,3 +1,9 @@
+2008-03-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.h src/plot3d.c docs/gnuplot.doc: Add a per-plot splot
+	keyword "nocontours".  This overrides the global "set contour", so
+	that you can contour a single surface from a plot with many.
+
 2008-03-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/variable.c src/variable.c src/util.c src/util.h src/save.c:

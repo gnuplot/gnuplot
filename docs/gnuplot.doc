@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.480 2008/03/11 05:02:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.481 2008/03/11 16:21:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5474,7 +5474,7 @@ Ffigure_mapcontours
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}
                          {fill | fs <fillstyle>}
-                         {nohidden3d}
+                         {nohidden3d | nocontours}
                          {palette}}
                     }
 
@@ -5542,6 +5542,9 @@ Ffigure_mapcontours
  to exclude from the hidden3d processing.  The individual elements other than
  surfaces (i.e. lines, dots, labels, ...) of a plot marked `nohidden3d` will all
  be drawn, even if they would normally be obscured by other plot elements.
+
+ Similarly, the keyword `nocontours` will turn off contouring for an individual
+ plot even if the global property "set contour" is active.
 
  The keywords may be abbreviated as indicated.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.158 2008/03/14 02:56:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.159 2008/03/16 20:03:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1383,12 +1383,19 @@ eval_3dplots()
 		    continue;
 		}
 
-		/* EAM Dec 2005 - Hidden3D code by default includes points,  */
-		/* labels and vectors in the hidden3d processing. Check here */
-		/* if this particular plot wants to be excluded.             */
+		/* Hidden3D code by default includes points, labels and vectors	*/
+		/* in the hidden3d processing. Check here if this particular	*/
+		/* plot wants to be excluded.					*/
 		if (almost_equals(c_token, "nohidden$3d")) {
 		    c_token++;
 		    this_plot->opt_out_of_hidden3d = TRUE;
+		    continue;
+		}
+
+		/* "set contour" is global.  Allow individual plots to opt out */
+		if (almost_equals(c_token, "nocon$tours")) {
+		    c_token++;
+		    this_plot->opt_out_of_contours = TRUE;
 		    continue;
 		}
 
@@ -1907,6 +1914,7 @@ eval_3dplots()
 		    free(cntr->coords);
 		    free(cntr);
 		}
+		this_plot->contours = NULL;
 	    }
 
 	    /* Make sure this one can be contoured. */
@@ -1916,12 +1924,12 @@ eval_3dplots()
 	    ||  this_plot->plot_style == RGBIMAGE)
 		continue;
 
+	    /* Allow individual surfaces to opt out of contouring */
+	    if (this_plot->opt_out_of_contours)
+		continue;
+
 	    if (!this_plot->has_grid_topology) {
-		this_plot->contours = NULL;
-		fputs("Notice: Cannot contour non grid data. Please use \"set dgrid3d\".\n", stderr);
-		/* changed from int_error by recommendation of
-		 * rkc@xn.ll.mit.edu
-		 */
+		int_warn(NO_CARET,"Cannot contour non grid data. Please use \"set dgrid3d\".");
 	    } else if (this_plot->plot_type == DATA3D) {
 		this_plot->contours = contour(this_plot->num_iso_read,
 					      this_plot->iso_crvs);
@@ -1953,9 +1961,7 @@ eval_3dplots()
     if (table_mode)
 	print_3dtable(plot_num);
     else {
-	START_LEAK_CHECK();	/* assert no memory leaks here ! */
 	do_3dplot(first_3dplot, plot_num, 0);
-	END_LEAK_CHECK();
 
 	/* after do_3dplot(), axis_array[] and max_array[].min
 	 * contain the plotting range actually used (rounded

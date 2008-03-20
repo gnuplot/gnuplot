@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.31 2007/12/24 19:39:12 sfeam Exp $
+ * $Id: graph3d.h,v 1.32 2008/03/13 19:53:28 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -99,7 +99,8 @@ typedef struct surface_points {
 
     /* 2D and 3D plot structure fields overlay only to this point */
 
-    TBOOLEAN opt_out_of_hidden3d; /* set by "with nohidden" opeion */
+    TBOOLEAN opt_out_of_hidden3d; /* set by "nohidden" option to splot command */
+    TBOOLEAN opt_out_of_contours; /* set by "nocontours" option to splot command */
     TBOOLEAN pm3d_color_from_column;
     int has_grid_topology;
     int plot_num;		/* needed for tracking iteration */
