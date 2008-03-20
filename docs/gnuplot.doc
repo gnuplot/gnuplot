@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.23 2008/02/29 17:53:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.24 2008/03/12 03:09:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3522,7 +3522,7 @@ C ... and restart the table:
  Sometimes the scanning directions in a binary datafile are not consistent with
  that assumed by gnuplot.  These keywords can flip the scanning direction along
  dimensions x, y, z.
-6 origin 
+6 origin
 ?binary general keywords origin
  When gnuplot generates coordinates based upon transposition and flip, it
  attempts to always position the lower left point in the array at the origin,
@@ -4370,7 +4370,7 @@ C ... and restart the table:
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}
                          {fill | fs <fillstyle>}
-                         {nohidden3d}
+                         {nohidden3d | nocontours}
                          {palette}}
                     }
 
@@ -4437,6 +4437,9 @@ C ... and restart the table:
  to exclude from the hidden3d processing.  The individual elements other than
  surfaces (i.e. lines, dots, labels, ...) of a plot marked `nohidden3d` will all
  be drawn, even if they would normally be obscured by other plot elements.
+
+ Similarly, the keyword `nocontours` will turn off contouring for an individual
+ plot even if the global property "set contour" is active.
 
  The keywords may be abbreviated as indicated.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.131.2.4 2007/02/08 21:15:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.131.2.5 2007/02/25 13:04:50 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1380,6 +1380,13 @@ eval_3dplots()
 		    continue;
 		}
 
+		/* "set contour" is global. Allow individual plots to opt out */
+		if (almost_equals(c_token, "nocon$tours")) {
+		    c_token++;
+		    this_plot->opt_out_of_contours = TRUE;
+		    continue;
+		}
+
 #ifdef EAM_DATASTRINGS
 		/* Labels can have font and text property info as plot options */
 		/* In any case we must allocate one instance of the text style */
@@ -1869,14 +1876,16 @@ eval_3dplots()
 		    free(cntr->coords);
 		    free(cntr);
 		}
+		this_plot->contours = NULL;
 	    }
+
+	    /* Allow individual surfaces to opt out of contouring */
+	    if (this_plot->opt_out_of_contours)
+		continue;
+	    
 	    /* Make sure this one can be contoured. */
 	    if (!this_plot->has_grid_topology) {
-		this_plot->contours = NULL;
-		fputs("Notice: Cannot contour non grid data. Please use \"set dgrid3d\".\n", stderr);
-		/* changed from int_error by recommendation of
-		 * rkc@xn.ll.mit.edu
-		 */
+		int_warn(NO_CARET, "Notice: Cannot contour non grid data. Please use \"set dgrid3d\".");
 	    } else if (this_plot->plot_type == DATA3D) {
 		this_plot->contours = contour(this_plot->num_iso_read,
 					      this_plot->iso_crvs);

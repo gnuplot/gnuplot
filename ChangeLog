@@ -1,3 +1,9 @@
+2008-03-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.h src/plot3d.c docs/gnuplot.doc: Add a per-plot splot
+	keyword "nocontours".  This overrides the global "set contour", so
+	that you can contour a single surface from a plot with many.
+
 2008-03-13  Carl Troein  <troein@users.sourceforge.net>
 
 	* term/post.trm (PS_filled_polygon): Limit the number of consecutive
