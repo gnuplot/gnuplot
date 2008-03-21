@@ -1,3 +1,8 @@
+2008-03-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_format): Remove superfluous c_token++.
+	Bug #1922288
+
 2008-03-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.h src/plot3d.c docs/gnuplot.doc: Add a per-plot splot

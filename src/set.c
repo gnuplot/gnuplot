@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.8 2008/02/29 17:53:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.9 2008/03/12 03:09:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1298,7 +1298,6 @@ set_format()
 #undef SET_FORMATSTRING
 
 	    free(format);
-	    c_token++;
 	}
     }
 }
