@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.481 2008/03/11 16:21:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.482 2008/03/20 09:05:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7056,24 +7056,21 @@ Ffigure_mapcontours
        set format {<axes>} {'<format-string>'}
        show format
 
- where <axes> is either `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb` or
- nothing (which refers to all axes at once).  The length of the string
- representing a tic mark (after formatting with 'printf') is restricted
- to 100 characters.  If the format string is omitted, the format will
- be returned to the default "% g".  For LaTeX users, the format "$%g$"
- is often desirable.  If the empty string "" is used, no label will be
- plotted with each tic, though the tic mark will still be plotted.  To
- eliminate all tic marks, use `unset xtics` or `unset ytics`.
+ where <axes> is either `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb` or nothing
+ (which applies the format to all axes). The following two commands are
+ equivalent:
+       set format y "%.2f"
+       set ytics format "%.2f"
+ 
+ The length of the string is restricted to 100 characters.  The default format
+ is "% g", but other formats such as "%.2f" or "%3.0em" are often desirable.
+ The format "$%g$" is often desirable for LaTeX.  If no format string is given,
+ the format will be returned to the default.  If the empty string "" is given,
+ tics will have no labels, although the tic mark will still be plotted.
+ To eliminate the tic marks, use `unset xtics` or `set tics scale 0`.
 
- Newline (\n) is accepted in the format string.  Use double-quotes rather than
- single-quotes to enable such interpretation.  See also `syntax`.
-
- The default format for both axes is "% g", but other formats such as "%.2f" or
- "%3.0em" are often desirable.  Anything accepted by 'printf' when given a
- double precision number, and accepted by the terminal, will work.  Some other
- options have been added.  If the format string looks like a floating point
- format, then `gnuplot` tries to construct a reasonable format.
-
+ Newline (\n) and enhanced text markup is accepted in the format string.
+ Use double-quotes rather than single-quotes in this case.  See also `syntax`.
  Characters not preceded by "%" are printed verbatim.  Thus you can include
  spaces and labels in your format string, such as "%g m", which will put " m"
  after each number.  If you want "%" itself, double it: "%g %%".

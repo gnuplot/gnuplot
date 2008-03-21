@@ -132,6 +132,7 @@ Johannes Zellner
 * Comments::                    
 * Coordinates::                 
 * Datastrings::                 
+* Enhanced_text_mode::          
 * Environment::                 
 * Expressions::                 
 * Glossary::                    
@@ -429,10 +430,10 @@ See `binary` and `binary general filetype`.
 
 @menu
 * RGB_colors::                  
-* Arbitrary_rectangles::        
+* Arbitrary_rectangles_and_other_shapes::  
 @end menu
 
-@node RGB_colors, Arbitrary_rectangles, New_plot_elements, New_plot_elements
+@node RGB_colors, Arbitrary_rectangles_and_other_shapes, New_plot_elements, New_plot_elements
 @subsubsection RGB colors
 
 Explicit RGB colors can be specified for all plot elements instead of
@@ -440,12 +441,12 @@ specifying a predefined linetype.
 See @ref{colorspec}.
 
 
-@node Arbitrary_rectangles,  , RGB_colors, New_plot_elements
-@subsubsection Arbitrary rectangles
+@node Arbitrary_rectangles_and_other_shapes,  , RGB_colors, New_plot_elements
+@subsubsection Arbitrary rectangles and other shapes
 
-You can place rectangles with desired fill style and border anywhere in a 2D
-plot.
-See `set object rectangle`.
+You can place rectangles, cicles, and ellipses  with desired fill style and
+border anywhere in a 2D plot.
+See @ref{object}.
 
 
 @node String_handling, Macros, New_plot_elements, New_features_introduced_in_version_4.2
@@ -647,7 +648,7 @@ New:
 Another compatibility issue is the effect of the command @ref{size} outside
 when not in multiplot mode.  In earlier versions, the command
 `set size <xx>, <yy>` caused some terminals to change both the size of the plot
-and the size of the canvas is was drawn on; other terminatls changed only the
+and the size of the canvas is was drawn on; other terminals changed only the
 plot size.  The use of @ref{size} to change the canvas size is now deprecated.
 
 Please see @ref{size}, @ref{size} and also the documentation for
@@ -1038,7 +1039,7 @@ be given as a quoted time string according to the @ref{timefmt} format string.
 See @ref{xdata} and @ref{timefmt}.  `gnuplot` will also accept an integer
 expression, which will be interpreted as seconds from 1 January 2000.
 
-@node Datastrings, Environment, Coordinates, gnuplot
+@node Datastrings, Enhanced_text_mode, Coordinates, gnuplot
 @section Datastrings
 
 @cindex datastrings
@@ -1090,7 +1091,98 @@ generate a title in the key box, while processing the remainder of columns
 
 See @ref{labels}, `using xticlabels`, `plot title`, @ref{using}.
 
-@node Environment, Expressions, Datastrings, gnuplot
+@node Enhanced_text_mode, Environment, Datastrings, gnuplot
+@section Enhanced text mode
+
+@c ?enhanced text
+@cindex enhanced
+
+Many terminal types support an enhanced text mode in which additional
+formatting information is embedded in the text string.  For example, "x^2"
+will write x-squared as we are used to seeing it, with a superscript 2.
+This mode is normally selected when you set the terminal, e.g.
+"set term png enhanced", but may also be toggled afterward using
+"set termoption enhanced", or by marking individual strings as in
+"set label 'x_2' noenhanced".
+
+
+@example
+ Control      Examples        Explanation
+  ^           a^x             superscript
+  _           a_x             subscript
+  @@           @@x or a@@^b_@{cd@} phantom box (occupies no width)
+  &           &@{space@}        inserts space of specified length
+  ~           ~a@{.8-@}         overprints '-' on 'a', raised by .8
+                              times the current fontsize
+
+@end example
+
+
+Braces can be used to place multiple-character text where a single character
+is expected (e.g., 2^@{10@}).  To change the font and/or size, use the full form:
+@{/[fontname][=fontsize | *fontscale] text@}.  Thus @{/Symbol=20 G@} is a 20 pt
+GAMMA and @{/*0.75 K@} is a K at three-quarters of whatever fontsize is currently
+in effect.  (The '/' character MUST be the first character after the '@{'.)
+
+The phantom box is useful for a@@^b_c to align superscripts and subscripts
+but does not work well for overwriting an accent on a letter.  For the latter,
+it is much better to use an encoding  (e.g. iso_8859_1 or utf8) that contains
+a large variety of letters with accents or other diacritical marks.  See
+@ref{encoding}. Since the box is non-spacing, it is sensible to put the shorter
+of the subscript or superscript in the box (that is, after the @@).
+
+Space equal in length to a string can be inserted using the '&' character.
+Thus
+@example
+        'abc&@{def@}ghi'
+@end example
+
+would produce
+@example
+        'abc   ghi'.
+
+@end example
+
+The '~' character causes the next character or bracketed text to be
+overprinted by the following character or bracketed text.  The second text
+will be horizontally centered on the first.  Thus '~a/' will result in an 'a'
+with a slash through it.  You can also shift the second text vertically by
+preceding the second text with a number, which will define the fraction of the
+current fontsize by which the text will be raised or lowered.  In this case
+the number and text must be enclosed in brackets because more than one
+character is necessary.  If the overprinted text begins with a number, put a
+space between the vertical offset and the text ('~@{abc@}@{.5 000@}'); otherwise
+no space is needed ('~@{abc@}@{.5---@}').  You can change the font for one or
+both strings ('~a@{.5 /*.2 o@}'---an 'a' with a one-fifth-size 'o' on top---and
+the space between the number and the slash is necessary), but you can't
+change it after the beginning of the string.  Neither can you use any other
+special syntax within either string.  You can, of course, use control
+characters by escaping them (see below), such as '~a@{\^@}'
+
+You can access special symbols numerically by specifying \character-code (in
+octal), e.g., @{/Symbol \245@} is the symbol for infinity. This does not work
+for multibyte encodings like UTF-8, however.  In a UTF-8 environment, you
+should be able to enter multibyte sequences implicitly by typing or otherwise
+selecting the character you want.
+
+You can escape control characters using \, e.g.,  \\, \@{, and so on.
+
+But be aware that strings in double-quotes are parsed differently than those
+enclosed in single-quotes.  The major difference is that backslashes may need
+to be doubled when in double-quoted strings.
+
+Examples (these are hard to describe in words---try them!):
+@example
+      set xlabel 'Time (10^6 @{/Symbol m@}s)'
+      set title '@{/Symbol=18 \\362@@_@{/=9.6 0@}^@{/=12 x@}@} \\
+                 @{/Helvetica e^@{-@{/Symbol m@}^2/2@} d@}@{/Symbol m@}'
+
+@end example
+
+The file "ps_guide.ps" in the /docs/psdoc subdirectory of the gnuplot source
+distribution contains more examples of the enhanced syntax.
+
+@node Environment, Expressions, Enhanced_text_mode, gnuplot
 @section Environment
 
 @cindex environment
@@ -1873,7 +1965,7 @@ index rather than a string pointer. strstrt("hayneedlestack","needle") = 4.
 `substr("string",beg,end)` returns the substring consisting of characters
 beg through end of the original string. This is exactly equivalent to the
 expression "string"[beg:end] except that you do not have the option of
-ommitting beg or end.
+omitting beg or end.
 
 @node strftime, strptime, substr, Functions
 @subsubsection strftime
@@ -2804,7 +2896,7 @@ See also help for `mouse` and @ref{if}.
 @c ?commands bind space
 @c ?bind space
 By default, the <space> hotkey raises gnuplot's command window. On some
-terminals (e.g. x11, wx), 'q' closes the graph window. These defaults can
+terminals (e.g. x11, wxt), 'q' closes the graph window. These defaults can
 be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
 see `x11 command-line-options`, or by the X Resource 'gnuplot*ctrlq'.
 Note: if <space> (or ctrl-space) does not raise the gnuplot window under X11,
@@ -3286,8 +3378,8 @@ will be displayed in the new @ref{timefmt}.  For that matter, if you give the
 deactivation command (like @ref{xdata}), the quantity will be shown in its
 numerical form.
 
-The command `set format` defines the format that will be used for tic labels,
-whether or not the specified axis is time/date.
+The commands `set format` or `set tics format`	define the format that will be
+used for tic labels, whether or not the specified axis is time/date.
 
 If time/date information is to be plotted from a file, the @ref{using} option
 _must_ be used on the `plot` or `splot` command.  These commands simply use
@@ -3353,6 +3445,7 @@ file are interpreted as plot data, see @ref{using}.
 * boxes::                       
 * boxxyerrorbars::              
 * candlesticks::                
+* circles::                     
 * dots::                        
 * filledcurves::                
 * financebars::                 
@@ -3520,7 +3613,7 @@ The interior of the boxes is drawn according to the current fillstyle.
 See `set style fill` and @ref{boxes} for details.  Alternatively a new fillstyle
 may be specified in the plot command.
 
-@node candlesticks, dots, boxxyerrorbars, plotting_styles
+@node candlesticks, circles, boxxyerrorbars, plotting_styles
 @section candlesticks
 
 @c ?commands set style candlesticks
@@ -3587,7 +3680,33 @@ box-and-whisker plot requires additional plot commands as in this example:
 
 @end example
 
-@node dots, filledcurves, candlesticks, plotting_styles
+@node circles, dots, candlesticks, plotting_styles
+@section circles
+
+@c ?commands set style circles
+@c ?set style circles
+@c ?plotting styles circles
+@c ?style circles
+@cindex circles
+
+The @ref{circles} style plots a circle with an explicit radius at each data point.
+Three columns of data are required: x, y, radius.  An optional 4th column may
+be used to specify color information.  The radius is always interpreted in the
+units of the plot's horizontal axis (x or x2).  The scale on y and the aspect
+ratio of the plot are both ignored.
+
+Example (draws circles whose area is proportional to the value in column 3):
+
+@example
+    plot 'data' using 1:2:(sqrt($3)) with circles fillstyle empty
+
+@end example
+
+The result is similar to using a `points` plot with variable size points and
+pointstyle 6, except that the circles will scale with the x axis range.
+See also `set object circle` and `fillstyle`.
+
+@node dots, filledcurves, circles, plotting_styles
 @section dots
 
 @c ?commands set style dots
@@ -3807,13 +3926,16 @@ It is common in such input files that the first element of each row is a
 label. Labels from this column may be placed along the x-axis underneath
 the appropriate cluster of boxes with the `xticlabels` option to @ref{using}.
 
-The @ref{errorbars} style is very similar to the `clustered` style, except that
-it requires two columns of input for each entry. The first column is treated
-as the height (y-value) of that box, exactly as for the `clustered` style.
-The second column is treated as an error magnitude, and used to generate a
-vertical error bar at the top of the box. The appearance of the error bar is
-controlled by the current value of @ref{bars} and by the optional <linewidth>
-specification.
+The @ref{errorbars} style is very similar to the `clustered` style, except that it
+requires additional columns of input for each entry. The first column holds
+the height (y value) of that box, exactly as for the `clustered` style.
+@example
+     2 columns:        y yerr          bar extends from y-yerr to y+err
+     3 columns:        y ymin yman     bar extends from ymin to ymax
+@end example
+
+The appearance of the error bars is controlled by the current value of
+@ref{bars} and by the optional <linewidth> specification.
 
 Two styles of stacked histogram are supported, chosen by the command
 `set style histogram @{rowstacked|columnstacked@}`.  In these styles the data
@@ -3853,7 +3975,6 @@ of clustered boxes (the default style):
       set style histogram cluster
       set style fill solid 1.0 border -1
       plot 'file.dat' using 2, '' using 4
-      
 
 @end example
 
@@ -3866,7 +3987,7 @@ contains labels, they may be placed along the x-axis using the variant command
 
 @end example
 
-If the file contains both a magnitude and an error estimate for each value,
+If the file contains both magnitude and range information for each value,
 then error bars can be added to the plot.  The following commands will add
 error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
 ends drawn the same width as the box itself. The error bars and bar ends are
@@ -3964,7 +4085,7 @@ For example, to create stacked histograms of the data in columns 3 through 8
 
 @example
       set style histogram columnstacked
-      plot for [i=3:8] "datafile" using i title columnhead 
+      plot for [i=3:8] "datafile" using i title columnhead
 
 @end example
 
@@ -3977,7 +4098,7 @@ For example, to create stacked histograms of the data in columns 3 through 8
 @c ?style image
 @cindex image
 
-The `image` style is intendend for projecting 2D images onto either 2D or 3D
+The `image` style is intended for projecting 2D images onto either 2D or 3D
 plots.  It may be used for both `plot` and `splot` in the form of 3D data
 (x,y,value) or projected 4D data (x,y,z,value), respectively.  It is assumed
 that in the viewing plane the image data forms an equidistant sampling grid in
@@ -4415,7 +4536,7 @@ axes are all visible in the plot. The illusion of 3D is enhanced by choosing
 hidden line removal or depth-sorted surface elements.
 See @ref{hidden3d} and the @ref{depthorder} option of @ref{pm3d}.
 The `splot` command can also calculate and draw contour lines corresponding
-to constant Z values. These contour lines may be drawn onto the surface 
+to constant Z values. These contour lines may be drawn onto the surface
 itself, or projected onto the XY plane. See @ref{contour}.
    
    
@@ -5478,7 +5599,7 @@ plot window. If you want to wait for a particular key to be pressed, you can
 use a reread loop such as:
 
 @example
-      printf "I will resume after you hit the Tab key in the plot window"
+      print "I will resume after you hit the Tab key in the plot window"
       load "wait_for_tab"
 
 @end example
@@ -5595,7 +5716,7 @@ Syntax:
                          @{thru <thru expression>@}
                          @{using <using list>@}
                          @{smooth <option>@}
-                         @{volatile@}
+                         @{volatile@} @{noautoscale@}
 
 @end example
 
@@ -5611,6 +5732,9 @@ similar syntax, but does not support the @ref{smooth} and @ref{thru} options.)
 The `volatile` keyword indicates that the contents of the data file may be
 different if the file is re-read.  This tells the program to use @ref{refresh}
 rather than @ref{replot} commands whenever possible.  See @ref{refresh}.
+
+The `noautoscale` keyword means that the points making up this plot will be
+ignored when automatically determining axis range limits.
 
 
 ASCII DATA FILES:
@@ -5634,7 +5758,7 @@ counting columns, so the following datafile line has three columns:
 @end example
 
 Data may be written in exponential format with the exponent preceded by the
-letter e or E.  The fortran exponential specificiers d, D, q, and Q may also
+letter e or E.  The fortran exponential specifiers d, D, q, and Q may also
 be used if the command `set datafile fortran` is in effect.
 
 Only one column (the y value) need be provided.  If x is omitted, `gnuplot`
@@ -6416,7 +6540,7 @@ resulting points are then connected by straight line segments.
 @c ?datafile special-filenames
 @cindex special-filenames
 
-There are three filenames that have a special meaning:  '', '-', and '+'.
+There are a few filenames that have a special meaning:  '', '-', '+' and '++'.
 
 The empty filename '' tells gnuplot to re-use the previous input file in the
 same plot command. So to plot two columns from the same input file:
@@ -6426,16 +6550,29 @@ same plot command. So to plot two columns from the same input file:
 
 @end example
 
-The special filename '+' is a mechanism to allow the full range of
-@ref{using} specifiers and plot styles with in-line functions.  Normally a
-function plot can only have a single y (or z) value associated with each
-sampled point.  The pseudo-file '+' treats the sampled points as columns
-1 (plot) or 1 and 2 (splot), and allows additional column values to be
-specified via a @ref{using} specification, just as for a true input file.
+The special filenames '+' and '++' are a mechanism to allow the full range of
+@ref{using} specifiers and plot styles with in-line functions.  Normally a function
+plot can only have a single y (or z) value associated with each sampled point.
+The pseudo-file '+' treats the sampled points as column 1, and allows
+additional column values to be specified via a @ref{using} specification, just as
+for a true input file.  The number of samples returned is controlled by
+@ref{samples}.
 Example:
 
 @example
       plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
+
+@end example
+
+Similarly the pseudo-file '++' returns 2 columns of data forming a regular
+grid of [x,y] coordinates with the number of points along x controlled by
+@ref{samples} and the number of points along y controlled by @ref{isosamples}.
+You must set xrange and yrange before plotting '++'.
+Examples:
+
+@example
+      splot '++' using 1:2:(sin($1)*sin($2)) with pm3d
+      plot '++' using 1:2:(sin($1)*sin($2)) with image
 
 @end example
 
@@ -7179,34 +7316,41 @@ Syntax:
                         @{pointtype | pt <point_type>@}
                         @{pointsize | ps <point_size>@}
                         @{fill | fs <fillstyle>@}
-                        @{nohidden3d@}
+                        @{nohidden3d | nocontours@}
                         @{palette@}@}
                    @}
 
 @end example
 
-where <style> is either `lines`, `points`, @ref{linespoints}, @ref{impulses},
-@ref{dots}, @ref{steps}, @ref{fsteps}, @ref{histeps}, @ref{errorbars}, @ref{labels}, @ref{xerrorbars},
-@ref{yerrorbars}, @ref{xyerrorbars}, @ref{errorlines}, @ref{xerrorlines}, @ref{yerrorlines},
-@ref{xyerrorlines}, @ref{boxes}, @ref{histograms}, @ref{filledcurves}, @ref{boxerrorbars},
-@ref{boxxyerrorbars}, @ref{financebars}, @ref{candlesticks}, @ref{vectors}, `image`,
-@ref{rgbimage} or @ref{pm3d}. Some of these styles require additional information.
-See `plotting styles` for details of each style.  `fill` is relevant only
-to certain 2D plots (currently @ref{boxes} @ref{boxxyerrorbars} and @ref{candlesticks}).
-Note that @ref{filledcurves} and @ref{pm3d} can take an additional option not
-listed above (the latter only when used in the `splot` command)---see
-their help or examples below for more details.
 
-Default styles are chosen with the `set style function` and `set style data`
-commands.
+where <style> is one of
+
+@example
+     lines        dots       steps     errorbars     xerrorbar    xyerrorlines
+     points       impulses   fsteps    errorlines    xerrorlines  yerrorbars
+     linespoints  labels     histeps   financebars   xyerrorbars  yerrorlines
+                                       vectors
+@end example
+
+or
+@example
+      boxes            candlesticks   image      circles
+      boxerrorbars     filledcurves   rgbimage
+      boxxyerrorbars   histograms     pm3d
+
+@end example
+
+The first group of styles have associated line, point, and text properties.
+The second group of styles also have fill properties.  See `fillstyle`.  Some
+styles have further sub-styles.  See `plotting styles` for details of each.
+
+A default style may be chosen by `set style function` and `set style data`.
 
 By default, each function and data file will use a different line type and
 point type, up to the maximum number of available types.  All terminal
 drivers support at least six different point types, and re-use them, in
-order, if more are required.  The LaTeX driver supplies an additional six
-point types (all variants of a circle), and thus will only repeat after 12
-curves are plotted with points.  The PostScript drivers (@ref{postscript})
-supplies a total of 64.
+order, if more are required.  To see the complete set of line and point
+types available for the current terminal, type @ref{test}.
 
 If you wish to choose the line or point type for a single plot, <line_type>
 and <point_type> may be specified.  These are positive integer constants (or
@@ -7248,6 +7392,9 @@ You can attach the `nohidden3d` option to any individual plots that you want
 to exclude from the hidden3d processing.  The individual elements other than
 surfaces (i.e. lines, dots, labels, ...) of a plot marked `nohidden3d` will all
 be drawn, even if they would normally be obscured by other plot elements.
+
+Similarly, the keyword `nocontours` will turn off contouring for an individual
+plot even if the global property "set contour" is active.
 
 The keywords may be abbreviated as indicated.
 
@@ -7484,7 +7631,7 @@ N.B.---use of
 
 @end example
 
-is not recommended, because it will require that you type in the data all 
+is not recommended, because it will require that you type in the data all
 over again.  In most cases you can use the @ref{refresh} command instead, which
 will redraw the plot using the data previously read in.
 
@@ -7529,7 +7676,7 @@ and from within `gnuplot` you submit the commands
       load 'looper'
 @end example
 
-The result will be four plots (separated by the @ref{pause} message).
+The result will be five plots (separated by the @ref{pause} message).
 
 Suppose the file "data" contains six columns of numbers with a total yrange
 from 0 to 10; the first is x and the next are five different functions of x.
@@ -7574,8 +7721,12 @@ return to a defined state after lots of settings have been changed within a
 command file.  Please refer to the `set` command to see the default values
 that the various options take.
 
-The values of `set term`, @ref{output}, @ref{loadpath}, and @ref{fontpath} are
-not altered by the @ref{reset} command.
+The following are _not_ affected by @ref{reset}.
+@example
+     `set term` @ref{output} @ref{loadpath} @ref{fontpath}
+     @ref{encoding} @ref{decimalsign} @ref{locale}
+
+@end example
 
 @cindex error state
 
@@ -7709,6 +7860,7 @@ when the variable was initially defined.
 * my2tics::                     
 * mytics::                      
 * mztics::                      
+* object::                      
 * offsets::                     
 * origin::                      
 * output::                      
@@ -7719,7 +7871,6 @@ when the variable was initially defined.
 * pointsize::                   
 * polar::                       
 * print_::                      
-* object::                      
 * rmargin::                     
 * rrange::                      
 * samples::                     
@@ -8036,7 +8187,9 @@ To show all arrows (in tag order), use:
 @cindex noautoscale
 
 Autoscaling may be set individually on the x, y or z axis or globally on all
-axes. The default is to autoscale all axes.
+axes. The default is to autoscale all axes.  If you want to autoscale based on
+a subset of the plots in the figure, you can mark the other ones with the flag
+`noautoscale`.  See @ref{datafile}.
 
 Syntax:
 @example
@@ -8207,7 +8360,7 @@ financebars.
 
 Syntax:
 @example
-      set bars @{small | large | fullwidth | <size>@}
+      set bars @{small | large | fullwidth | <size>@} @{front | back@}
       unset bars
       show bars
 
@@ -8220,6 +8373,9 @@ The keyword `fullwidth` is relevant only to histograms with errorbars.
 It sets the width of the errorbar ends to be the same as the width of the
 associated box in the histogram.  It does not change the width of the box
 itself.
+
+The `front` and `back` keywords are relevant only to errorbars attached
+to filled rectangles (boxes, candlesticks, histograms).
 
 @node bmargin, border, bars, set-show
 @subsection bmargin
@@ -8677,6 +8833,7 @@ colorbox`.
                  @{ default | user @}
                  @{ origin x, y @}
                  @{ size x, y @}
+                 @{ front | back @}
                  @{ noborder | bdefault | border [line style] @}
                @}
       show colorbox
@@ -8684,11 +8841,12 @@ colorbox`.
 
 @end example
 
-Colorbox position can be `default` or `user`.  If the latter is specified the
-values as given with the @ref{origin} and @ref{size} subcommands are used.
+Color box position can be `default` or `user`.  If the latter is specified the
+values as given with the @ref{origin} and @ref{size} subcommands are used. The box
+can be drawn after (`front`) or before (`back`) the graph or the surface.
 
-`vertical` and `horizontal` switches the orientation of the color
-gradient.
+The orientation of the color gradient can be switched by options `vertical`
+and `horizontal`.
 
 `origin x, y` and `size x, y` are used only in combination with the `user`
 option. The x and y values are interpreted as screen coordinates by default,
@@ -9216,6 +9374,8 @@ The second example sets the second variable to s.
 
 @cindex encodings
 
+@cindex UTF-8
+
 The @ref{encoding} command selects a character encoding.
 Syntax:
 @example
@@ -9228,17 +9388,21 @@ Syntax:
 Valid values are
 @example
    default     - tells a terminal to use its default encoding
-   iso_8859_1  - the most common Western European font used by many
+   iso_8859_1  - the most common Western European encoding used by many
                  Unix workstations and by MS-Windows. This encoding is
                  known in the PostScript world as 'ISO-Latin1'.
-   iso_8859_2  - used in Central and Eastern Europe
    iso_8859_15 - a variant of iso_8859_1 that includes the Euro symbol
+   iso_8859_2  - used in Central and Eastern Europe
+   iso_8859_9  - used in Turkey (also known as Latin5)
    koi8r       - popular Unix cyrillic encoding
    koi8u       - ukrainian Unix cyrillic encoding
    cp437       - codepage for MS-DOS
    cp850       - codepage for OS/2, Western Europe
    cp852       - codepage for OS/2, Central and Eastern Europe
    cp1250      - codepage for MS Windows, Central and Eastern Europe
+   cp1254      - codepage for MS Windows, Turkish (superset of Latin5)
+   utf8        - variable-length (multibyte) representation of Unicode
+                 entry point for each character
 
 @end example
 
@@ -9368,7 +9532,8 @@ variable GDFONTPATH.
 
 
 @c ?format cb
-The format of the tic-mark labels can be set with the `set format` command.
+The format of the tic-mark labels can be set with the `set format` command
+or with the `set tics format` or individual `set @{axis@}tics format` commands.
 
 Syntax:
 @example
@@ -9378,24 +9543,24 @@ Syntax:
 
 @end example
 
-where <axes> is either `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb` or
-nothing (which refers to all axes at once).  The length of the string
-representing a tic mark (after formatting with 'printf') is restricted
-to 100 characters.  If the format string is omitted, the format will
-be returned to the default "% g".  For LaTeX users, the format "$%g$"
-is often desirable.  If the empty string "" is used, no label will be
-plotted with each tic, though the tic mark will still be plotted.  To
-eliminate all tic marks, use @ref{xtics} or @ref{ytics}.
+where <axes> is either `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb` or nothing
+(which applies the format to all axes). The following two commands are
+equivalent:
+@example
+      set format y "%.2f"
+      set ytics format "%.2f"
 
-Newline (\n) is accepted in the format string.  Use double-quotes rather than
-single-quotes to enable such interpretation.  See also `syntax`.
+@end example
 
-The default format for both axes is "% g", but other formats such as "%.2f" or
-"%3.0em" are often desirable.  Anything accepted by 'printf' when given a
-double precision number, and accepted by the terminal, will work.  Some other
-options have been added.  If the format string looks like a floating point
-format, then `gnuplot` tries to construct a reasonable format.
+The length of the string is restricted to 100 characters.  The default format
+is "% g", but other formats such as "%.2f" or "%3.0em" are often desirable.
+The format "$%g$" is often desirable for LaTeX.  If no format string is given,
+the format will be returned to the default.  If the empty string "" is given,
+tics will have no labels, although the tic mark will still be plotted.
+To eliminate the tic marks, use @ref{xtics} or `set tics scale 0`.
 
+Newline (\n) and enhanced text markup is accepted in the format string.
+Use double-quotes rather than single-quotes in this case.  See also `syntax`.
 Characters not preceded by "%" are printed verbatim.  Thus you can include
 spaces and labels in your format string, such as "%g m", which will put " m"
 after each number.  If you want "%" itself, double it: "%g %%".
@@ -9423,7 +9588,7 @@ See also
 The string function gprintf("format",x) uses gnuplot's own format specifiers,
 as do the gnuplot commands `set format`, @ref{timestamp}, and others. These
 format specifiers are not the same as those used by the standard C-language
-routine sprintf(). gprintf() accepts only a single variable to be formatted. 
+routine sprintf(). gprintf() accepts only a single variable to be formatted.
 Gnuplot also provides an sprintf("format",x1,x2,...) routine if you prefer.
 For a list of gnuplot's format options, see `format specifiers`.
 
@@ -9691,7 +9856,8 @@ be controlled using this command.
 Syntax:
 @example
       set hidden3d @{defaults@} |
-                   @{ @{@{offset <offset>@} | @{nooffset@}@}
+                   @{ @{front|back@}
+                     @{@{offset <offset>@} | @{nooffset@}@}
                      @{trianglepattern <bitpattern>@}
                      @{@{undefined <level>@} | @{noundefined@}@}
                      @{@{no@}altdiagonal@}
@@ -9703,8 +9869,8 @@ Syntax:
 
 In contrast to the usual display in gnuplot, hidden line removal actually
 treats the given function or data grids as real surfaces that can't be seen
-through, so parts behind the surface will be hidden by it.  For this to be
-possible, the surface needs to have 'grid structure' (see @ref{datafile}
+through, so plot elements behind the surface will be hidden by it.  For this
+to work, the surface needs to have 'grid structure' (see @ref{datafile}
 about this), and it has to be drawn `with lines` or @ref{linespoints}.
 
 When @ref{hidden3d} is set, both the hidden portion of the surface and possibly
@@ -9720,8 +9886,14 @@ even if no surface is present in the graph.  Individual plots within the
 graph may be explicitly excluded from this processing by appending the extra
 option `nohidden3d` to the @ref{with} specifier.
 
-Hidden3d does not affect solid surfaces drawn using the pm3d mode. To
-achieve a similar effect for pm3d surfaces, use instead set @ref{depthorder}.
+Hidden3d does not affect solid surfaces drawn using the pm3d mode. To achieve
+a similar effect purely for pm3d surfaces, use instead @ref{depthorder}.
+To mix pm3d surfaces with normal @ref{hidden3d} processing, use the option
+`set hidden3d front` to force all elements included in hidden3d processing to
+be drawn after any remaining plot elements. Then draw the surface twice, once
+`with lines lt -2` and a second time @ref{pm3d}. The first instance will
+include the surface during calculation of occluded elements but will not draw
+the surface itself.
 
 Functions are evaluated at isoline intersections.  The algorithm interpolates
 linearly between function points or data points when determining the visible
@@ -9950,8 +10122,7 @@ order of box types in a stacked histogram.
 
 The <height_increment> is a number of character heights to be added to or
 subtracted from the height of the key box.  This is useful mainly when you are
-putting a box around the key, otherwise it can be used to adjust the vertical
-shift of automatically chosen key position by <height_increment>/2.
+putting a box around the key and want larger borders around the key entries.
 
 All plotted curves of `plot`s and `splot`s are titled according to the
 default option `autotitles`. The automatic generation of titles can be
@@ -10411,8 +10582,9 @@ Syntax:
 @end example
 
 <locale> may be any language designation acceptable to your installation.
-See your system documentation for the available options.  The default value
-is determined from the LC_TIME, LC_ALL, or LANG environment variables.
+See your system documentation for the available options.  The command
+`set locale ""` will try to determine the locale from the LC_TIME, LC_ALL,
+or LANG environment variables.
 
 To change the decimal point locale, see @ref{decimalsign}.
 To change the character encoding to the current locale, see @ref{encoding}.
@@ -10919,7 +11091,7 @@ Examples:
 Major tics at 0,5,7.5,10, minor tics at 1,2,3,4,6,7,8,9
 @example
       set logscale y
-      set format y ""
+      set ytics format ""
       set ytics 1e-6, 10, 1
       set ytics add ("1" 1, ".1" 0.1, ".01" 0.01, "10^-3" 0.001, \
                      "10^-4" 0.0001)
@@ -10967,7 +11139,7 @@ Minor tic marks along the y2 (right-hand) axis are controlled by @ref{my2tics}. 
 Minor tic marks along the y axis are controlled by @ref{mytics}.  Please
 see @ref{mxtics}.
 
-@node mztics, offsets, mytics, set-show
+@node mztics, object, mytics, set-show
 @subsection mztics
 
 @c ?commands set mztics
@@ -10985,7 +11157,177 @@ see @ref{mxtics}.
 Minor tic marks along the z axis are controlled by @ref{mztics}.  Please
 see @ref{mxtics}.
 
-@node offsets, origin, mztics, set-show
+@node object, offsets, mztics, set-show
+@subsection object
+
+@cindex object
+@opindex object
+
+
+@c ?commands set object
+@c ?commands show object
+@c ?set object
+@c ?show object
+The @ref{object} command defines a single object which will appear in all
+subsequent 2D plots. You may define as many objects as you like. Currently the
+supported object types are @ref{rectangle}, `circle`, and @ref{ellipse}.
+Rectangles inherit a default set of style properties (fill, color, border) from
+those set by the command @ref{rectangle}, but each object can also be
+given individual style properties. Circles and ellipses inherit the fill style
+from `set style fill`.
+
+Syntax:
+@example
+    set object <index>
+        <object-type> <object-properties>
+        @{front|back|behind@} @{fc|fillcolor <colorspec>@} @{fs <fillstyle>@}
+        @{default@} @{lw|linewidth <width>@}
+
+@end example
+
+<object-type> is either @ref{rectangle}, @ref{ellipse}, or `circle`. Each object type
+has its own set of characteristic properties.
+
+Setting `front` will draw the object in front of all plot elements, but
+behind any labels that are also marked `front`. Setting `back` will place the
+object behind all plot curves and labels. Setting `behind` will place the
+object behind everything including the axes and `back` rectangles, thus
+@example
+    set object rectangle from screen 0,0 to screen 1,1 behind
+@end example
+
+can be used to provide a colored background for the entire graph or page.
+
+The fill color of the object is taken from the <colorspec>. `fillcolor`
+may be abbreviated `fc`.  The fill style is taken from <fillstyle>.
+See @ref{colorspec} and `fillstyle`.  If the keyword `default` is given,
+these properties are inherited from the default settings of at the time a plot
+is drawn. See @ref{rectangle}.
+
+@menu
+* rectangle::                   
+* ellipse::                     
+* circle::                      
+@end menu
+
+@node rectangle, ellipse, object, object
+@subsubsection rectangle
+
+@cindex rectangle
+
+@c ?commands set object rectangle
+@c ?commands show object rectangle
+@c ?set object rectangle
+@c ?show object rectangle
+Syntax:
+@example
+    set object <index> rectangle
+        @{from <position> @{to|rto@} <position> |
+         center <position> size <w>,<h> |
+         at <position> size <w>,<h>@}
+
+@end example
+
+The position of the rectangle may be specified by giving the position of two
+diagonal corners (bottom left and top right) or by giving the position of the
+center followed by the width and the height.  In either case the positions
+may be given in axis, graph, or screen coordinates. See `coordinates`.
+The options `at` and `center` are synonyms.
+
+Examples:
+@example
+    # Force the entire area enclosed by the axes to have background color cyan
+    set object 1 rect from graph 0, graph 0 to graph 1, graph 1 back
+    set object 1 rect fc rgb "cyan" fillstyle solid 1.0
+
+@end example
+
+@example
+    # Position a red square with lower left at 0,0 and upper right at 2,3
+    set object 2 rect from 0,0 to 2,3 fc lt 1
+
+@end example
+
+@example
+    # Position an empty rectangle (no fill) with a blue border
+    set object 3 rect from 0,0 to 2,3 fs empty border 3
+
+@end example
+
+@example
+    # Return fill and color to the default style but leave vertices unchanged
+    set object 2 rect default
+
+@end example
+
+@node ellipse, circle, rectangle, object
+@subsubsection ellipse
+
+@cindex ellipse
+
+@c ?commands set object ellipse
+@c ?commands show object ellipse
+@c ?set object ellipse
+@c ?show object ellipse
+Syntax:
+@example
+    set object <index> ellipse @{at|center@} <position> size <w>,<h>
+        @{angle <orientation>@}
+        @{<other-object-properties>@}
+
+@end example
+
+The position of the ellipse is specified by giving the center followed by
+the width and the height (actually the major and minor axes). The keywords
+`at` and `center` are synonyms.  The center position may be given in axis,
+graph, or screen coordinates. See `coordinates`. The major and minor axis
+lengths must be given in axis coordinates.  The orientation of the ellipse
+is specified by the angle between the horizontal axis and the first axis
+of the ellipse.  NB: If the x and y axis scales are not equal, then the
+major/minor axis ratio will no longer be correct after rotation. This may
+be fixed in a later gnuplot version.
+
+Note that `set object ellipse size <2r>,<2r>` does not in general produce
+the same result as `set object circle <r>`.  The circle radius is always
+interpreted in terms of units along the x axis, and will always produce a
+circle even if the x and y axis scales are different and even if the aspect
+ratio of your plot is not 1.  'Set object ellipse' interprets the first '2r'
+in terms of x axis units and the second '2r' in terms of y axis units.
+This will only produce a circle if the x and y axis scales are identical and
+the plot aspect ratio is 1.
+
+
+@node circle,  , ellipse, object
+@subsubsection circle
+
+@cindex circle
+
+@c ?commands set object circle
+@c ?commands show object circle
+@c ?set object circle
+@c ?show object circle
+Syntax:
+@example
+    set object <index> circle @{at|center@} <position> size <radius>
+        @{arc [<begin>:<end>]@}
+        @{<other-object-properties>@}
+
+@end example
+
+The position of the circle is specified by giving the position of the center
+center followed by the radius.  The keywords `at` and `center` are synonyms.
+The position and radius may be given in x-axis, graph, or canvas
+coordinates. See `coordinates`. In all cases the radius is calculated
+relative to the horizontal scale of the axis, graph, or canvas.  Any
+disparity between the horizontal and vertical scaling will be corrected for
+so that the result is always a circle.
+
+By default a full circle is drawn. The optional qualifier `arc` specifies
+a starting angle and ending angle, in degrees, for one arc of the circle.
+The arc is always drawn counterclockwise.
+
+
+@node offsets, origin, object, set-show
 @subsection offsets
 
 @c ?commands set offsets
@@ -11297,7 +11639,9 @@ Colored quadrangles are plotted one after another.  When plotting surfaces
 polygon meshes.)  You may try to switch between `scansforward` and
 `scansbackward` to force the first scan of the data to be plotted first or
 last.  The default is `scansautomatic` where gnuplot makes a guess about scans
-order.
+order.  On the other hand, the @ref{depthorder} option completely reorders the
+quadrangles. The rendering is performed after a depth sorting, which allows to
+visualize even complicated surfaces; see @ref{depthorder} for more details.
 
 If two subsequent scans do not have same number of points, then it has to be
 decided whether to start taking points for quadrangles from the beginning of
@@ -11444,7 +11788,7 @@ and definitely the demo file `demo/pm3d.dem`.
 
 By default the quadrangles making up a pm3d solid surface are rendered in the
 order they are encountered along the surface grid points.  This order may be
-controlled by the options @{ scansautomatic | scansforward | scansbackward @}.
+controlled by the options `scansautomatic`|`scansforward`|`scansbackward`.
 These scan options are not in general compatible with hidden-surface removal.
 
 Gnuplot does not do true hidden surface removal for solid surfaces, but often
@@ -11514,13 +11858,14 @@ appropriate).  @ref{rgbformulae} prints the available fixed gray -->
 color transformation formulae.  @ref{colornames} prints the
 implemented color names.
 
-`show palette palette <n>` prints to screen or to the file given by
-@ref{output} table of RGB triplets calculated for the current palette settings
+`show palette palette <n>` prints to the screen or to the file given by
+`set print` a table of RGB triplets calculated for the current palette settings
 and a palette having <n> discrete colors.  The default wide table can be
 limited to 3 columns of r,g,b float values [0..1] or integer values [0..255]
 by options float or int, respectively.  This way, the current gnuplot color
 palette can be loaded into other imaging applications, for example Octave.
-Additionally to this textual list of RGB table, you can enjoy command @ref{palette} to draw graphically the R,G,B profiles for the current palette.
+Additionally to this textual list of RGB table, you can use the @ref{palette}
+command to plot the R,G,B profiles for the current palette.
 
 The following options determine the coloring properties.
 
@@ -12028,7 +12373,7 @@ and
 @uref{http://www.gnuplot.info/demo/poldat.html,polar data plot (poldat.dem).
 }
 
-@node print_, object, polar, set-show
+@node print_, rmargin, polar, set-show
 @subsection print
 
 @c ?commands set print
@@ -12052,88 +12397,7 @@ Without "<filename>", the output file is restored to <STDERR>.  The <filename>
 mode.  A <filename> starting with "|" is opened as a pipe to the
 <shell_command> on platforms that support piping.
 
-@node object, rmargin, print_, set-show
-@subsection object
-
-@cindex object
-@opindex object
-
-
-@cindex rectangle
-
-@c ?commands set object
-@c ?commands show object
-@c ?commands set object rectangle
-@c ?commands show object rectangle
-@c ?set object
-@c ?show object
-@c ?set object rectangle
-@c ?show object rectangle
-This command defines a single object, which will appear in all subsequent
-2D plots. You may define as many objects as you like. Currently the only
-object type supported is `rectangle`.
-Each rectangle is specified by a pair of points that define diagonal vertices.
-A default set of style properties (fill, color, border) are inherited from
-those set by the command `set style rectangle`, but each rectangle can also be
-given individual style properties.
-
-Syntax:
-@example
-    set object <index> rectangle
-        @{from <position> @{to|rto@} <position> |
-         center <position> size <w>,<h> |
-         at <position> size <w>,<h>@}
-        @{front|back|behind@} @{fc|fillcolor <colorspec>@} @{fs <fillstyle>@}
-        @{default@} @{lw|linewidth <width>@}
-
-@end example
-
-The position of the rectangle may be specified by giving the position of two
-diagonal corners (bottom left and top right) or by giving the position of the
-center followed by the width and the height.  In either case the positions
-may be given in axis, graph, or screen coordinates. See `coordinates`.
-The options `at` and `center` are synonyms.
-
-Setting `front` will draw the rectangle in front of all plot elements, but
-behind any labels that are also marked `front`. Setting `back` will place the
-rectangle behind all plot curves and labels. Setting `behind` will place the
-rectangle behind everything including the axes and `back` rectangles, and can
-be used to provide a colored background for the entire graph or page.
-
-The fill color of the rectangle is taken from the <colorspec>. `fillcolor`
-may be abbreviated `fc`.  The fill style is taken from <fillstyle>.
-See @ref{colorspec} and `fillstyle`.  If the keyword `default` is given,
-these properties are inherited from the default settings of at the time a plot
-is drawn. See `set style rectangle`.
-
-Examples:
-@example
-    # Force the entire area enclosed by the axes to have background color cyan
-    set object 1 rect from graph 0, graph 0 to graph 1, graph 1 back
-    set object 1 rect fc rgb "cyan" fillstyle solid 1.0
-
-@end example
-
-@example
-    # Position a red square with lower left at 0,0 and upper right at 2,3
-    set object 2 rect from 0,0 to 2,3 fc lt 1
-
-@end example
-
-@example
-    # Position an empty rectangle (no fill) with a blue border
-    set object 3 rect from 0,0 to 2,3 fs empty border 3
-
-@end example
-
-@example
-    # Return fill and color to the default style but leave vertices unchanged
-    set object 2 rect default
-
-@end example
-
-
-@node rmargin, rrange, object, set-show
+@node rmargin, rrange, print_, set-show
 @subsection rmargin
 
 @c ?commands set rmargin
@@ -12450,8 +12714,10 @@ listed.  `show style data` shows the current default data plotting style.
 @c ?show style fill
 @cindex fillstyle
 
-The `set style fill` command is used to set the style of boxes,
-histograms, candlesticks and filledcurves.
+The `set style fill` command is used to set the default style of the plot
+elements in plots with boxes, histograms, candlesticks and filledcurves.
+This default can be superseded by fillstyles attached to individual plots.
+See also 'set style rectangle'.
 
 Syntax:
 @example
@@ -12594,7 +12860,10 @@ using the default linetype 3.
 @c ?show style line
 @cindex linestyle
 
-@c ^ <a name="linewidth"></a>
+@cindex linewidth
+
+@cindex linewidth
+
 Each terminal has a default set of line and point types, which can be seen
 by using the command @ref{test}.  `set style line` defines a set of line types
 and widths and point types and sizes so that you can refer to them later by
@@ -12710,14 +12979,14 @@ supports rgb colors.
 @c ?unset style rectangle
 @c ?show style rectangle
 
-Rectangles defined with the `set object rectangle` command can have individual
-styles. However, if a rectangle is not assigned a private style then it
-inherits a default that is taken from the `set style rectangle` command.
+Rectangles defined with the @ref{object} command can have individual styles.
+However, if the object is not assigned a private style then it inherits a
+default that is taken from the @ref{rectangle} command.
 
 Syntax:
 @example
-    set style rectangle @{front|back@} @{fillcolor <colorspec>@} @{fs <fillstyle>@}
-                        @{lw|linewidth <lw>@}
+    set style rectangle @{front|back@} @{lw|linewidth <lw>@}
+                        @{fillcolor <colorspec>@} @{fs <fillstyle>@}
 
 @end example
 
@@ -12874,6 +13143,7 @@ be changed this way. Currently the only options accepted are
 @example
      set termoption @{no@}enhanced
      set termoption font "<fontname>@{,<fontsize>@}"
+     set termoption @{solid|dashed@}
 
 @end example
 
@@ -12905,7 +13175,7 @@ Syntax:
       set tics @{axis | border@} @{@{no@}mirror@}
                @{in | out@} @{scale @{default | <major> @{,<minor>@}@}@}
                @{@{no@}rotate @{by <ang>@}@} @{offset <offset> | nooffset@}
-               @{ font "name@{,<size>@}" @}
+               @{ format "formatstring" @} @{ font "name@{,<size>@}" @}
                @{ textcolor <colorspec> @}
       set tics @{front | back@}
       unset tics
@@ -13199,17 +13469,17 @@ Please see @ref{xrange} for details.
 
 @c ?commands show variables
 @c ?show variables
-The @ref{variables} command lists all user-defined variables and their
-values.
+The @ref{variables} command lists the current value of user-defined and
+internal variables. Gnuplot internally defines variables whose names begin
+with GPVAL_, MOUSE_, FIT_, and TERM_.
 
 Syntax:
 @example
-      show variables @{all@}
+      show variables      # show variables that do not begin with GPVAL_
+      show variables all  # show all variables including those beginning GPVAL_
+      show variables NAME # show only variables beginning with NAME
 
 @end example
-
-With the optional keyword "all", also the @ref{variables} that
-begin with `GPVAL_` are listed.
 
 
 @node version, view, variables, set-show
@@ -13753,7 +14023,7 @@ Syntax:
                  | <incr>
                  | <start>, <incr> @{,<end>@}
                  | (@{"<label>"@} <pos> @{<level>@} @{,@{"<label>"@}...) @}
-                @{ font "name@{,<size>@}" @}
+                @{ formt "formatstring" @} @{ font "name@{,<size>@}" @}
                 @{ textcolor <colorspec> @}
       unset xtics
       show xtics
@@ -13924,7 +14194,7 @@ Examples:
 @example
       set xdata time
       set timefmt "%d/%m"
-      set format x "%b %d"
+      set xtics format "%b %d"
       set xrange ["01/12":"06/12"]
       set xtics "01/12", 172800, "05/12"
 
@@ -13933,7 +14203,7 @@ Examples:
 @example
       set xdata time
       set timefmt "%d/%m"
-      set format x "%b %d"
+      set xtics format "%b %d"
       set xrange ["01/12":"06/12"]
       set xtics ("01/12", "" "03/12", "05/12")
 @end example
@@ -15690,27 +15960,22 @@ The `cgm` terminal generates a Computer Graphics Metafile, Version 1.
 This file format is a subset of the ANSI X3.122-1986 standard entitled
 "Computer Graphics - Metafile for the Storage and Transfer of Picture
 Description Information".
-Several options may be set in `cgm`.
 
 Syntax:
 @example
-      set terminal cgm @{<mode>@} @{<color>@} @{<rotation>@} @{solid | dashed@}
-                       @{width <plot_width>@} @{linewidth <line_width>@}
+      set terminal cgm @{color | monochrome@} @{solid | dashed@} @{@{no@}rotate@}
+                       @{<mode>@} @{width <plot_width>@} @{linewidth <line_width>@}
                        @{font "<fontname>,<fontsize>"@}
                        @{<color0> <color1> <color2> ...@}
 
 @end example
 
-where <mode> is `landscape`, `portrait`, or `default`;
-<color> is either `color` or `monochrome`; 
-<rotation> is either `rotate` or `norotate`;
 `solid` draws all curves with solid lines, overriding any dashed patterns;
+<mode> is `landscape`, `portrait`, or `default`;
 <plot_width> is the assumed width of the plot in points; 
 <line_width> is the line width in points (default 1); 
 <fontname> is the name of a font (see list of fonts below)
 <fontsize> is the size of the font in points (default 12).
-
-By default, `cgm` uses rotated text for the Y axis label.
 
 The first six options can be in any order.  Selecting `default` sets all
 options to their default values.
@@ -15876,7 +16141,7 @@ The `solid` option may be used to disable dashed line styles in the
 plots.  This is useful when color is enabled and the dashing of the
 lines detracts from the appearance of the plot. The `dashed` option
 confirms the default behavior, which gives a different dash pattern to
-each curve.
+each line type.
 
 
 
@@ -15922,7 +16187,6 @@ Example:
 @c ?set terminal cgm nofontlist
 @c ?set term cgm nofontlist
 @c ?cgm nofontlist
-@c ?commands set terminal cgm winword6
 @c ?set terminal cgm winword6
 @c ?set term cgm winword6
 @c ?cgm winword6
@@ -15930,17 +16194,13 @@ The default font table includes the fonts recommended for WebCGM, which
 are compatible with the Computer Graphics Metafile input filter for
 Microsoft Office and Corel Draw.  Another application might use
 different fonts and/or different font names, which may not be
-documented.  As a workaround, the `nofontlist` option deletes the font
+documented.  The `nofontlist` (synonym `winword6`) option deletes the font
 table from the CGM file.  In this case, the reading application should
 use a default table.  Gnuplot will still use its own default font table
 to select font indices.  Thus, 'Helvetica' will give you an index of 1,
 which should get you the first entry in your application's default font
 table. 'Helvetica Bold' will give you its second entry, etc.
 
-The former `winword6` option is now a deprecated synonym for
-`nofontlist`.  The problems involving the color and font tables that
-the `winword6` option was intended to work around turned out to be
-gnuplot bugs which have now been fixed."
 
 
 @node corel, debug, cgm, terminal_
@@ -18217,7 +18477,7 @@ Syntax:
                        @{fname "<font>"@} @{fsize <fontsize>@}
                        @{font "<fontname>@{,<fontsize>@}"@}
                        @{fontfile <filename>@}
-                       @{rounded|butt@} @{linewidth <lw>@}
+                       @{rounded|butt@} @{solid|dashed@} @{linewidth <lw>@}
 
 @end example
 
@@ -19059,11 +19319,11 @@ if the `-display` command line option is used.
 
 Syntax:
 @example
-   set terminal x11 @{<n>@}
+   set terminal x11 @{<n> | window "<string>"@}
                     @{title "<string>"@}
-                    @{@{no@}enhanced@}
-                    @{font <fontspec>@}
-                    @{@{no@}persist@} @{@{no@}raise@} @{solid|dashed@} @{@{no@}ctrlq@}
+                    @{@{no@}enhanced@} @{font <fontspec>@}
+                    @{linewidth LW@} @{solid|dashed@}
+                    @{@{no@}persist@} @{@{no@}raise@} @{@{no@}ctrlq@}
                     @{close@}
    set terminal x11 @{reset@}
 
@@ -19075,7 +19335,19 @@ appended to the window title (unless a title has been supplied manually)
 and the icon will be labeled `Gnuplot <n>`.  The active window may be
 distinguished by a change in cursor (from default to crosshair).
 
-The x11 terminal support enhanced text mode (see `enhanced`), subject
+The `x11` terminal can connect to X windows previously created by an outside
+application via the option `window` followed by a string containing the
+X ID for the window in hexadecimal format.  Gnuplot uses that external X
+window as a container since X does not allow for multiple clients selecting
+the ButtonPress event.  In this way, gnuplot's mouse features work within
+the contained plot window.
+
+@example
+   set term x11 window "220001e"
+
+@end example
+
+The x11 terminal supports enhanced text mode (see `enhanced`), subject
 to the available fonts. In order for font size commands embedded in text
 to have any effect, the default x11 font must be scalable. Thus the first
 example below will work as expected, but the second will not.
@@ -19316,12 +19588,12 @@ requests white-on-black.
 
 @cindex X resources
 
-For color displays, `gnuplot` honors the following resources (shown here
-with their default values) or the greyscale resources.  The values may be
-color names as listed in the X11 rgb.txt file on your system, hexadecimal
-RGB color specifications (see X11 documentation), or a color name followed
-by a comma and an `intensity` value from 0 to 1.  For example, `blue, 0.5`
-means a half intensity blue.
+The X11 terminal honors the following resources (shown here with their
+default values) or the greyscale resources.  The values may be color names
+as listed in the X11 rgb.txt file on your system, hexadecimal RGB color
+specifications (see X11 documentation), or a color name followed by a comma
+and an `intensity` value from 0 to 1.  For example, `blue, 0.5` means a half
+intensity blue.
 
 @example
  gnuplot*background:  white
@@ -19559,11 +19831,11 @@ if the `-display` command line option is used.
 
 Syntax:
 @example
-   set terminal x11 @{<n>@}
+   set terminal x11 @{<n> | window "<string>"@}
                     @{title "<string>"@}
-                    @{@{no@}enhanced@}
-                    @{font <fontspec>@}
-                    @{@{no@}persist@} @{@{no@}raise@} @{solid|dashed@} @{@{no@}ctrlq@}
+                    @{@{no@}enhanced@} @{font <fontspec>@}
+                    @{linewidth LW@} @{solid|dashed@}
+                    @{@{no@}persist@} @{@{no@}raise@} @{@{no@}ctrlq@}
                     @{close@}
    set terminal x11 @{reset@}
 
@@ -19575,7 +19847,19 @@ appended to the window title (unless a title has been supplied manually)
 and the icon will be labeled `Gnuplot <n>`.  The active window may be
 distinguished by a change in cursor (from default to crosshair).
 
-The x11 terminal support enhanced text mode (see `enhanced`), subject
+The `x11` terminal can connect to X windows previously created by an outside
+application via the option `window` followed by a string containing the
+X ID for the window in hexadecimal format.  Gnuplot uses that external X
+window as a container since X does not allow for multiple clients selecting
+the ButtonPress event.  In this way, gnuplot's mouse features work within
+the contained plot window.
+
+@example
+   set term x11 window "220001e"
+
+@end example
+
+The x11 terminal supports enhanced text mode (see `enhanced`), subject
 to the available fonts. In order for font size commands embedded in text
 to have any effect, the default x11 font must be scalable. Thus the first
 example below will work as expected, but the second will not.
@@ -19816,12 +20100,12 @@ requests white-on-black.
 
 @cindex X resources
 
-For color displays, `gnuplot` honors the following resources (shown here
-with their default values) or the greyscale resources.  The values may be
-color names as listed in the X11 rgb.txt file on your system, hexadecimal
-RGB color specifications (see X11 documentation), or a color name followed
-by a comma and an `intensity` value from 0 to 1.  For example, `blue, 0.5`
-means a half intensity blue.
+The X11 terminal honors the following resources (shown here with their
+default values) or the greyscale resources.  The values may be color names
+as listed in the X11 rgb.txt file on your system, hexadecimal RGB color
+specifications (see X11 documentation), or a color name followed by a comma
+and an `intensity` value from 0 to 1.  For example, `blue, 0.5` means a half
+intensity blue.
 
 @example
  gnuplot*background:  white
@@ -20124,7 +20408,7 @@ See @ref{Seeking-assistance}.
 
 The sections below list problems known to be present in gnuplot version 4.2 at
 the time of release.  Some of these are actually bugs in external support
-libraries and may have been fixed indepently of any changes in gnuplot.
+libraries and may have been fixed independent of any changes in gnuplot.
 
 
 @menu

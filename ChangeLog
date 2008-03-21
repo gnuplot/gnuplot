@@ -3,6 +3,10 @@
 	* src/set.c (set_format): Remove superfluous c_token++.
 	Bug #1922288
 
+	* docs/gnuplot.doc: Update section on "set format".
+
+	* docs/gnuplot.texi: Sync to today's gnuplot.doc
+
 2008-03-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.h src/plot3d.c docs/gnuplot.doc: Add a per-plot splot
