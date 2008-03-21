@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.267 2008/03/14 02:56:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.268 2008/03/16 20:03:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1303,24 +1303,21 @@ set_format()
 	char *format = try_to_get_string();
 	if (!format)
 	    int_error(c_token, "expecting format string");
-	else {
 
 #define SET_FORMATSTRING(axis)							\
-	    if (set_for_axis[axis]) {						\
+	if (set_for_axis[axis]) {						\
 		strncpy(axis_array[axis].formatstring, format, MAX_ID_LEN);	\
 		axis_array[axis].format_is_numeric = looks_like_numeric(format);\
-	    }
-	    SET_FORMATSTRING(FIRST_X_AXIS);
-	    SET_FORMATSTRING(FIRST_Y_AXIS);
-	    SET_FORMATSTRING(FIRST_Z_AXIS);
-	    SET_FORMATSTRING(SECOND_X_AXIS);
-	    SET_FORMATSTRING(SECOND_Y_AXIS);
-	    SET_FORMATSTRING(COLOR_AXIS);
+	}
+	SET_FORMATSTRING(FIRST_X_AXIS);
+	SET_FORMATSTRING(FIRST_Y_AXIS);
+	SET_FORMATSTRING(FIRST_Z_AXIS);
+	SET_FORMATSTRING(SECOND_X_AXIS);
+	SET_FORMATSTRING(SECOND_Y_AXIS);
+	SET_FORMATSTRING(COLOR_AXIS);
 #undef SET_FORMATSTRING
 
-	    free(format);
-	    c_token++;
-	}
+	free(format);
     }
 }
 
