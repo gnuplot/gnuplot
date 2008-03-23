@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.164 2008/01/25 20:55:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.165 2008/03/13 20:02:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1350,15 +1350,16 @@ refresh_request()
     /* If the state has been reset to autoscale since the last plot,
      * initialize the axis limits.
      */
-    AXIS_INIT2D(FIRST_X_AXIS,TRUE);
-    AXIS_INIT2D(FIRST_Y_AXIS,TRUE);
-    AXIS_INIT2D(SECOND_X_AXIS,TRUE);
-    AXIS_INIT2D(SECOND_Y_AXIS,TRUE);
+    AXIS_INIT2D_REFRESH(FIRST_X_AXIS,TRUE);
+    AXIS_INIT2D_REFRESH(FIRST_Y_AXIS,TRUE);
+    AXIS_INIT2D_REFRESH(SECOND_X_AXIS,TRUE);
+    AXIS_INIT2D_REFRESH(SECOND_Y_AXIS,TRUE);
 
-    AXIS_UPDATE2D(T_AXIS);	/* Possibly T and R want INIT2D?? */
-    AXIS_UPDATE2D(R_AXIS);
+    AXIS_UPDATE2D_REFRESH(T_AXIS);  /* Untested: T and R want INIT2D or UPDATE2D?? */
+    AXIS_UPDATE2D_REFRESH(R_AXIS);  /* It doesn't matter, they are used for functions, not for data */
 
-    AXIS_UPDATE2D(COLOR_AXIS);
+    AXIS_UPDATE2D_REFRESH(FIRST_Z_AXIS);
+    AXIS_UPDATE2D_REFRESH(COLOR_AXIS);
 
     if (refresh_ok == 2)
 	refresh_bounds(first_plot, refresh_nplots);
@@ -1377,6 +1378,7 @@ refresh_request()
 	ax->max = ax->min; ax->min = temp;	\
     } } while (0)
 
+
     CHECK_REVERSE(FIRST_X_AXIS);
     CHECK_REVERSE(FIRST_Y_AXIS);
     CHECK_REVERSE(SECOND_X_AXIS);
@@ -1389,6 +1391,7 @@ refresh_request()
 	do_3dplot(first_3dplot, refresh_nplots, 0);
     else
 	int_error(NO_CARET, "Internal error - refresh of unknown plot type");
+
 }
 
 

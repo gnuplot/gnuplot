@@ -1,3 +1,11 @@
+2008-03-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/axis.h: Fixed macros AXIS_INIT2D_REFRESH and
+	AXIS_UPDATE2D_REFRESH.
+
+	* src/command.c (refresh_request): Use these macros so that the refresh
+	command for volatile data works correctly for log axes (SF 1916494).
+
 2008-03-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c (output_number):  Replace macro OUTPUT_NUMBER

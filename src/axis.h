@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.49 2007/12/18 19:02:53 sfeam Exp $
+ * $Id: axis.h,v 1.50 2008/02/25 01:34:51 sfeam Exp $
  *
  */
 
@@ -402,17 +402,28 @@ do {									\
 } while(0)
 
 #ifdef VOLATILE_REFRESH
-#define AXIS_UPDATE2D(axis)						\
+#define AXIS_INIT2D_REFRESH(axis, infinite)				\
+do {									\
+    AXIS *this = axis_array + axis;					\
+									\
+    this->autoscale = this->set_autoscale;				\
+    this->min = (infinite && (this->set_autoscale & AUTOSCALE_MIN))	\
+	? VERYLARGE*1e-3 : AXIS_LOG_VALUE(axis, this->set_min);		\
+    this->max = (infinite && (this->set_autoscale & AUTOSCALE_MAX))	\
+	? -VERYLARGE*1e-3 : AXIS_LOG_VALUE(axis, this->set_max);	\
+    this->log_base = this->log ? log(this->base) : 0;			\
+} while(0)
+/* why multiply by 1e-3: if an already VERYLARGE x2 and y2 ranges are
+   calculated after zoom-out by mouse, then they would become even larger
+*/
+
+#define AXIS_UPDATE2D_REFRESH(axis)					\
 do {									\
     AXIS *this_axis = axis_array + axis;				\
     if ((this_axis->set_autoscale & AUTOSCALE_MIN) == 0)		\
-	this_axis->min = this_axis->set_min;				\
+	this_axis->min = AXIS_LOG_VALUE(axis, this_axis->set_min);	\
     if ((this_axis->set_autoscale & AUTOSCALE_MAX) == 0)		\
-	this_axis->max = this_axis->set_max;				\
-    if (this_axis->log)  						\
-	this_axis->max = log(this_axis->max) / this_axis->log_base;	\
-    if (this_axis->log)  						\
-	this_axis->min = log(this_axis->min) / this_axis->log_base;	\
+	this_axis->max = AXIS_LOG_VALUE(axis, this_axis->set_max);				\
 } while (0)
 
 #endif
