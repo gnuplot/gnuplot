@@ -5,6 +5,9 @@
 	usual case.
 	Bug #1880565
 
+	* configure.in: Fix help message for --disable-fiterrvars
+	Bug #1923468
+
 2008-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_format): Remove superfluous c_token++.
