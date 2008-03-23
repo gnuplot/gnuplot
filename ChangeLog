@@ -1,3 +1,10 @@
+2008-03-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate.c (output_number):  Replace macro OUTPUT_NUMBER
+	with a routine that can handle time format axes as well as the
+	usual case.
+	Bug #1880565
+
 2008-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_format): Remove superfluous c_token++.

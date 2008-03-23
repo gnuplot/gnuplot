@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.5 2008/02/01 21:35:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.6 2008/03/11 18:49:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -45,6 +45,7 @@ static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.5 2008/02/01 21:35:46 s
 
 #include "alloc.h"
 #include "axis.h"
+#include "gp_time.h"
 #include "graphics.h"
 #include "graph3d.h"
 #include "plot.h"
@@ -53,12 +54,23 @@ static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.5 2008/02/01 21:35:46 s
 
 static char *expand_newline __PROTO((const char *in));
 
-/* HBB 20020405: new macro to use 'set format' with full flexibility */
-#define OUTPUT_NUMBER(coord, axis)			      \
-	    gprintf(buffer, 150, axis_array[axis].formatstring, \
-		    1.0, coord);			 \
-	    fputs(buffer, outfile);			     \
-	    fputc(' ', outfile);
+static FILE *outfile;
+
+/* This routine got longer than is reasonable for a macro */
+#define OUTPUT_NUMBER(x,y) output_number(x,y,buffer)
+
+static void
+output_number(double coord, int axis, char *buffer) {
+    if (axis_array[axis].is_timedata) {
+	buffer[0] = '"';
+	gstrftime(buffer+1, 150, axis_array[axis].formatstring, coord);
+	while (strchr(buffer,'\n')) {*(strchr(buffer,'\n')) = ' ';}
+	strcat(buffer,"\"");
+    } else
+    	gprintf(buffer, 150, axis_array[axis].formatstring, 1.0, coord);
+    fputs(buffer, outfile);
+    fputc(' ', outfile);
+}
 
 
 void
@@ -66,7 +78,7 @@ print_table(struct curve_points *current_plot, int plot_num)
 {
     int i, curve;
     char *buffer = gp_alloc(150, "print_table: output buffer");
-    FILE *outfile = (table_outfile) ? table_outfile : gpoutfile;
+    outfile = (table_outfile) ? table_outfile : gpoutfile;
 
     for (curve = 0; curve < plot_num;
 	 curve++, current_plot = current_plot->next) {
@@ -220,7 +232,7 @@ print_3dtable(int pcount)
     struct coordinate GPHUGE *point;
     struct coordinate GPHUGE *tail;
     char *buffer = gp_alloc(150, "print_3dtable output buffer");
-    FILE *outfile = (table_outfile) ? table_outfile : gpoutfile;
+    outfile = (table_outfile) ? table_outfile : gpoutfile;
 
     for (surface = 0, this_plot = first_3dplot;
 	 surface < pcount;
