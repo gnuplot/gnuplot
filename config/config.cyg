@@ -522,7 +522,7 @@
 /* #undef inline */
 
 /* Define to `int' if <sys/types.h> does not define. */
-#define pid_t 1
+/* #define pid_t 1 */
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */

@@ -1,3 +1,7 @@
+2008-03-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.cyg: pid_t is defined in types.h.
+
 2008-03-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/axis.h: Fixed macros AXIS_INIT2D_REFRESH and
