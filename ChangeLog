@@ -1,3 +1,7 @@
+2008-03-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/save.c (save_set_all): Fixed saving negative palette.
+
 2008-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_format): Remove superfluous c_token++.
