@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.482 2008/03/20 09:05:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.483 2008/03/21 20:37:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1052,6 +1052,18 @@ C
 %atanh(x)@any@$tanh sup -1 x$ (inverse hyperbolic tangent) in radians
  The `atanh(x)` function returns the inverse hyperbolic tangent of its
  argument in radians.
+4 EllipticK
+#EllipticK(k) & real k $\in$ (-1:1) & $K(k)$ complete elliptic integral of the first kind \\
+%EllipticK(k)@real k in (-1:1)@$K k$ complete elliptic integral of the first kind
+ See `elliptic integrals`.
+4 EllipticE
+#EllipticE(k) & real k $\in$ [-1:1] & $E(k)$ complete elliptic integral of the second kind \\
+%EllipticE(k)@real k in [-1:1]@ $E k$ complete elliptic integral of the second kind
+ See `elliptic integrals`.
+4 EllipticPi
+#EllipticPi(n,k) & real n$<$1, real k $\in$ (-1:1) & $\Pi(n,k)$ complete elliptic integral of the third kind \\
+%EllipticPi(n,k)@ real n<1, real k in (-1:1)@ $Pi n,k$ complete elliptic integral of the third kind
+ See `elliptic integrals`.
 4 besj0
 ?expressions functions besj0
 ?functions besj0
@@ -1565,11 +1577,25 @@ C
  `valid(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  See `plot datafile using`.
 @end table
- See also
-^ <a href="http://www.gnuplot.info/demo/airfoil.html">
- airfoil.dem: use of functions and complex variables for airfoils demo.
-^ </a>
 
+4 elliptic integrals
+?expressions functions elliptic integrals
+?functions elliptic integrals
+?elliptic integrals
+=elliptic integrals
+ The `EllipticK(k)` function returns the complete elliptic integral of the first
+ kind, i.e. the definite integral between 0 and pi/2 of the function
+ `(1-(k*sin(p))**2)**(-0.5)`.  The domain of `k` is -1 to 1 (exclusive).
+
+ The `EllipticE(k)` function returns the complete elliptic integral of the
+ second kind, i.e. the definite integral between 0 and pi/2 of the function
+ `(1-(k*sin(p))**2)**0.5`.  The domain of `k` is -1 to 1 (inclusive).
+
+ The `EllipticPi(n,k)` function returns the complete elliptic integral of the
+ third kind, i.e. the definite integral between 0 and pi/2 of the function 
+ `(1-(k*sin(p))**2)**(-0.5)/(1-n*sin(p)**2)`.  The parameter `n` must be less
+ than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
+ definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
 4 Random number generator
 ?expressions random
 ?functions random

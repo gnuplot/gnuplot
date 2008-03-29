@@ -1,3 +1,13 @@
+2008-03-29  Andras Pal <apal@szofi.elte.hu>
+
+	* src/standard.c (f_ellip_first f_ellip_second f_ellip_third)
+	src/standard.h src/eval.c:  New functions `EllipticK`, `EllipticE` and
+	`EllipticPi` have been introduced for complete elliptic integrals of the
+	first, second and third kind.
+
+	* docs/gnuplot.doc: 
+	Documentation accordingly updated.
+
 2008-03-29  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/command.c (test_palette_subcommand):  Clean up the layout of the

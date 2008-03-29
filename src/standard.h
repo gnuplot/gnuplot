@@ -1,5 +1,5 @@
 /*
- * $Id: standard.h,v 1.10 2006/06/10 00:35:26 sfeam Exp $
+ * $Id: standard.h,v 1.11 2006/07/14 00:30:41 sfeam Exp $
  */
 
 /* GNUPLOT - standard.h */
@@ -67,6 +67,9 @@ void f_tanh __PROTO((union argument *x));
 void f_asinh __PROTO((union argument *x));
 void f_acosh __PROTO((union argument *x));
 void f_atanh __PROTO((union argument *x));
+void f_ellip_first __PROTO((union argument *x));
+void f_ellip_second __PROTO((union argument *x));
+void f_ellip_third __PROTO((union argument *x));
 void f_void __PROTO((union argument *x));
 void f_abs __PROTO((union argument *x));
 void f_sgn __PROTO((union argument *x));
