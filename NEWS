@@ -29,6 +29,7 @@ New features, changes and fixes since gnuplot version 4.2
 * CHANGE fillstyle border type, if any, is applied to candlesticks
 * CHANGE 'set key textcolor rgb variable' will use plot colors for key entries
 * CHANGE Remove obsolete IRIS4D terminal type
+* CHANGE Remove obsolete atari terminal types (atariaes atarivdi multitos)
 
 
 Features, changes and fixes in gnuplot version 4.2

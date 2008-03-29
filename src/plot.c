@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.96 2007/08/26 19:20:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.97 2008/03/16 20:03:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -145,10 +145,6 @@ static const char *user_homedir = NULL;
 /* user shell */
 const char *user_shell = NULL;
 
-#if defined(ATARI) || defined(MTOS)
-const char *user_gnuplotpath = NULL;
-#endif
-
 #ifdef X11
 extern int X11_args __PROTO((int, char **)); /* FIXME: defined in term/x11.trm */
 #endif
@@ -179,14 +175,6 @@ static int exit_status = EXIT_SUCCESS;
 static ULONG RexxInterface(PRXSTRING, PUSHORT, PRXSTRING);
 TBOOLEAN CallFromRexx = FALSE;
 #endif /* OS2 */
-
-#if defined(ATARI) || defined(MTOS)
-/* For findfile () (?) */
-# include <support.h>
-void appl_exit(void);
-void MTOS_open_pipe(void);
-extern int aesid;
-#endif
 
 static RETSIGTYPE
 inter(int anint)
@@ -413,16 +401,6 @@ main(int argc, char **argv)
     apollo_pfm_catch();
 #endif
 
-/* moved to ATARI_init in atariaes.trm */
-/* #ifdef ATARI
-   void application_init(void);
-   application_init();
-   #endif */
-
-#ifdef MTOS
-    MTOS_open_pipe();
-#endif
-
     setbuf(stderr, (char *) NULL);
 
 #ifdef HAVE_SETVBUF
@@ -630,10 +608,6 @@ main(int argc, char **argv)
 #endif /* VMS */
 	if (!interactive && !noinputfiles) {
 	    term_reset();
-#if defined(ATARI) || defined(MTOS)
-	    if (aesid > -1)
-		atexit(appl_exit);
-#endif
 	    exit(EXIT_FAILURE);	/* exit on non-interactive error */
 	}
     }
@@ -688,10 +662,6 @@ main(int argc, char **argv)
     RexxDeregisterSubcom("GNUPLOT", NULL);
 #endif
 
-#if defined(ATARI) || defined(MTOS)
-    if (aesid > -1)
-	atexit(appl_exit);
-#endif
     /* HBB 20040223: Not all compilers like exit() to end main() */
     /* exit(exit_status); */
     return exit_status;
@@ -735,16 +705,6 @@ load_rcfile()
 	    strcpy(rcfile, user_homedir);
 	    PATH_CONCAT(rcfile, PLOTRC);
 	    plotrc = fopen(rcfile, "r");
-
-#if defined(ATARI) || defined(MTOS)
-	    if (plotrc == NULL) {
-		char const *const ext[] = { NULL };
-		char *ini_ptr = findfile(PLOTRC, user_gnuplotpath, ext);
-
-		if (ini_ptr)
-		    plotrc = fopen(ini_ptr, "r");
-	    }
-#endif /* ATARI || MTOS */
 	}
     }
     if (plotrc) {
@@ -786,14 +746,6 @@ get_user_env()
 
 	user_shell = (const char *) gp_strdup(env_shell);
     }
-#if defined(ATARI) || defined(MTOS)
-    if (user_gnuplotpath == NULL) {
-	char *env_gpp;
-
-	if (env_gpp = getenv("GNUPLOTPATH"))
-	    user_gnuplotpath = (const char *) gp_strdup(env_gpp);
-    }
-#endif
 }
 
 /* expand tilde in path

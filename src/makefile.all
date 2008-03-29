@@ -12,7 +12,7 @@ time.$(O) unset.$(O) util.$(O) util3d.$(O) variable.$(O)
 
 # List of terminal driver sources
 CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
-$(T)aquaterm.trm $(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm \
+$(T)aquaterm.trm $(T)be.trm $(T)cgi.trm \
 $(T)cgm.trm $(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm \
 $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm \
 $(T)epson.trm $(T)estimate.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm \
@@ -20,7 +20,7 @@ $(T)gd.trm $(T)ggi.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
 $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm \
 $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm $(T)kyo.trm \
 $(T)latex.trm $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)metapost.trm \
-$(T)mgr.trm $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)openstep.trm \
+$(T)mgr.trm $(T)mif.trm $(T)next.trm $(T)openstep.trm \
 $(T)pbm.trm $(T)pc.trm $(T)pdf.trm $(T)pm.trm $(T)post.trm $(T)pslatex.trm \
 $(T)pstricks.trm $(T)qms.trm $(T)regis.trm $(T)rgip.trm $(T)sun.trm \
 $(T)svg.trm $(T)t410x.trm $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm \

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.483 2008/03/21 20:37:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.484 2008/03/30 03:03:29 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -532,7 +532,7 @@ C
 ?line-editing
 ?editing
 ?command-line-editing
- Command-line editing is supported by the Unix, Atari, VMS, MS-DOS and OS/2
+ Command-line editing is supported by the Unix, VMS, MS-DOS and OS/2
  versions of `gnuplot`.  Also, a history mechanism allows previous commands to
  be edited and re-executed.  After the command line has been edited, a newline
  or carriage return will enter the entire line without regard to where the
@@ -605,7 +605,7 @@ C
  default `gnuplot` will be compiled with no line-editing capability.  If you
  want to use `gnuplot`'s line editing, set READLINE in the makefile and add
  readline.obj to the link file.  The following arrow keys may be used on the
- IBM PC and Atari versions if readline is used:
+ IBM PC versions if readline is used:
 
 @start table - first is interactive cleartext form
        Left  Arrow      - same as ^B.
@@ -631,35 +631,6 @@ C
 %Ctrl Right Arrow@same as ^E.
 %Up Arrow@same as ^P.
 %Down Arrow@same as ^N.
-%_
-@end table
-
- The Atari version of readline defines some additional key aliases:
-
-@start table - first is interactive cleartext form
-       Undo            - same as ^L.
-       Home            - same as ^A.
-       Ctrl Home       - same as ^E.
-       Esc             - same as ^U.
-       Help            - `help` plus return.
-       Ctrl Help       - `help`.
-#\begin{tabular}{|cl|} \hline
-#Key & Function \\ \hline
-#Undo      & same as \verb~^L~. \\
-#Home      & same as \verb~^A~. \\
-#Ctrl Home & same as \verb~^E~. \\
-#Esc       & same as \verb~^U~. \\
-#Help      & `{\bf help}` plus return. \\
-#Ctrl Help & `{\bf help}`. \\
-%c l .
-%Key@Function
-%_
-%Undo@same as ^L.
-%Home@same as ^A.
-%Ctrl Home@same as ^E.
-%Esc@same as ^U.
-%Help@help plus return.
-%Ctrl Help@help .
 %_
 @end table
 2 Comments
@@ -856,7 +827,7 @@ C
  is itself overridden by the .gnuplot (or equivalent) start-up file
  (see `start-up`) and, of course, by later explicit changes.
 
- On Unix, AmigaOS, AtariTOS, MS-DOS and OS/2, GNUHELP may be defined to be the
+ On Unix, AmigaOS, MS-DOS and OS/2, GNUHELP may be defined to be the
  pathname of the HELP file (gnuplot.gih).
 
  On VMS, the logical name GNUPLOT$HELP should be defined as the name of the
@@ -865,14 +836,14 @@ C
  if desired.
 
  On Unix, HOME is used as the name of a directory to search for a .gnuplot
- file if none is found in the current directory.  On AmigaOS, AtariTOS,
+ file if none is found in the current directory.  On AmigaOS,
  MS-DOS, Windows and OS/2, GNUPLOT is used.  On Windows, the NT-specific
  variable USERPROFILE is tried, too. VMS, SYS$LOGIN: is used. Type `help
  start-up`.
 
  On Unix, PAGER is used as an output filter for help messages.
 
- On Unix, AtariTOS and AmigaOS, SHELL is used for the `shell` command.  On
+ On Unix and AmigaOS, SHELL is used for the `shell` command.  On
  MS-DOS and OS/2, COMSPEC is used for the `shell` command.
 
  On MS-DOS, if the BGI or Watcom interface is used, PCTRM is used to tell
@@ -2242,7 +2213,7 @@ C ... and restart the table:
  This file is called `.gnuplot` on Unix and AmigaOS systems, and
  `GNUPLOT.INI` on other systems.  If this file is not found in the
  current directory, the program will look for it in the HOME directory
- (under AmigaOS, Atari(single)TOS, MS-DOS, Windows and OS/2, the
+ (under AmigaOS, MS-DOS, Windows and OS/2, the
  environment variable `GNUPLOT` should contain the name of this
  directory; on Windows NT, it will use `USERPROFILE` if GNUPLOT isn't
  defined).  Note: if NOCWDRC is defined during the installation,
@@ -3595,13 +3566,12 @@ Ffigure_mapcontours
  errors can be used as input for further computations.
 
  The fit may be interrupted by pressing Ctrl-C (any key but Ctrl-C under
- MSDOS and Atari Multitasking Systems).  After the current iteration
- completes, you have the option to (1) stop the fit and accept the current
- parameter values, (2) continue the fit, (3) execute a `gnuplot` command
- as specified by the environment variable FIT_SCRIPT.  The default for
- FIT_SCRIPT is `replot`, so if you had previously plotted both the data
- and the fitting function in one graph, you can display the current state
- of the fit.
+ MSDOS).  After the current iteration completes, you have the option to
+ (1) stop the fit and accept the current parameter values,
+ (2) continue the fit, (3) execute a `gnuplot` command as specified by the
+ environment variable FIT_SCRIPT.  The default for FIT_SCRIPT is `replot`,
+ so if you had previously plotted both the data and the fitting function in
+ one graph, you can display the current state of the fit.
 
  Once `fit` has finished, the `update` command may be used to store final
  values in a file for subsequent use as a parameter file.   See `update`
@@ -11215,17 +11185,11 @@ Ffigure_mapcontours
  or
        system "dir"
 
-
  prints a directory listing and then returns to `gnuplot`.
-
 
  Other examples of the former syntax:
         system "date"; set time; plot "a.dat"
         print=1; if (print) replot; set out; system "lpr x.ps"
-
- On an Atari, the `!` command first checks whether a shell is already loaded
- and uses it, if available.  This is practical if `gnuplot` is run from
- `gulam`, for example.
 2 splot
 ?commands splot
 ?splot

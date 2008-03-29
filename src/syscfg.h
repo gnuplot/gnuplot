@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.32 2005/10/06 18:21:10 mikulik Exp $
+ * $Id: syscfg.h,v 1.33 2006/03/06 17:42:29 broeker Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -80,22 +80,6 @@
 #  define S_IFIFO S_IREAD
 # endif
 #endif /* Amiga */
-
-#ifdef ATARI
-# define OS      "TOS"
-# define HOME     "GNUPLOT"
-# define PLOTRC   "gnuplot.ini"
-# define SHELL    "gulam.prg"
-# define DIRSEP1  '\\'
-# ifdef MTOS
-#  define DIRSEP2 '/'
-# endif
-#endif /* Atari */
-/* FIXME: may need to be ifdef'd for ATARI/MTOS */
-#ifdef __PUREC__
-# define sscanf purec_sscanf
-# define GP_MATHERR purec_matherr
-#endif
 
 #ifdef DOS386
 # define OS       "DOS 386"
@@ -181,9 +165,6 @@
 #  define DOS16
 # endif
 /* should this be here ? */
-# ifdef MTOS
-#  define OS "TOS & MiNT & MULTITOS & Magic - "
-# endif /* MTOS */
 # define OS       "MS-DOS"
 # undef HELPFILE
 # define HELPFILE "gnuplot.gih"
@@ -253,20 +234,6 @@
 #else
 # define __PROTO(proto) ()
 #endif
-
-/* Atari stuff. Moved here from command.c, plot2d.c, readline.c */
-#if defined(ATARI) || defined(MTOS)
-# ifdef __PUREC__
-#  include <ext.h>
-#  include <tos.h>
-#  include <aes.h>
-# else
-#  include <osbind.h>
-#  include <aesbind.h>
-#  include <support.h>
-# endif                         /* __PUREC__ */
-#endif /* ATARI || MTOS */
-
 
 /* DOS/Windows stuff. Moved here from command.c */
 #if defined(MSDOS) || defined(DOS386)

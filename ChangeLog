@@ -1,3 +1,22 @@
+2008-03-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* NEWS config/README config/makefile.amg config/makefile.mto
+	config/makefile.st config/makefile.unx config/term_pc.h configure.in
+	docs/Makefile.in docs/doc2texi.el docs/gnuplot.doc docs/gpcard.tex
+	src/command.c src/corplot.c src/fit.c src/gnuplot.prj src/gp_types.h
+	src/help.c src/internal.c src/makefile.all src/makefile.awc src/plot.c
+	src/plot.h src/readline.c src/readline.h src/show.c src/standard.c
+	src/syscfg.h src/term.c src/term.h src/variable.c term/atariaes.trm
+	term/atarivdi.trm term/multitos.trm:
+
+	Remove code specific to atari platforms.  The most recent serious
+	mention of gnuplot that I could find on an atari newsgroup was a 1997
+	post by Theo Hopman that gnuplot 3.6beta could be compiled.
+	The state of atari interest seems to be captured by this notice, all
+	that is left of a once active group:
+	    "Due to declining membership, The Ol' Hackers Atari Users Group
+	     closed its doors after its final meeting in December 2000" 
+
 2008-03-29  Andras Pal <apal@szofi.elte.hu>
 
 	* src/standard.c (f_ellip_first f_ellip_second f_ellip_third)
@@ -21,7 +40,7 @@
 	error messages were not being printed anyhow due to length restrictions
 	in int_error().
 
-	* src/graphics.c (boundary):  Fix bug in caluculating the column width
+	* src/graphics.c (boundary):  Fix bug in calculating the column width
 	of a horizontal key with a long title.
 
 2008-03-24  Petr Mikulik  <mikulik@physics.muni.cz>

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.206 2008/03/16 20:03:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.207 2008/03/29 23:39:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1045,15 +1045,8 @@ show_version(FILE *fp)
 	c_token++;
 	fprintf(stderr, "Compile options:\n%s\n", compile_options);
 
-	if ((helpfile = getenv("GNUHELP")) == NULL) {
-#if defined(ATARI) || defined(MTOS)
-	    if ((helpfile = user_gnuplotpath) == NULL) {
-		helpfile = HELPFILE;
-	    }
-#else
+	if ((helpfile = getenv("GNUHELP")) == NULL)
 	    helpfile = HELPFILE;
-#endif
-	}
 
 #ifdef X11
 	{

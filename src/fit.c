@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.60 2008/02/25 03:17:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.61 2008/03/16 20:03:49 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -84,11 +84,6 @@ static void Dblfn __PROTO(());
 #  include <fcntl.h>
 # endif				/* !VMS */
 #endif /* !(MSDOS || DOS386) */
-
-#if defined(ATARI) || defined(MTOS)
-# define getchx() Crawcin()
-static int kbhit(void);
-#endif
 
 enum marq_res {
     OK, ML_ERROR, BETTER, WORSE
@@ -251,7 +246,7 @@ ctrlc_setup()
  *
  *  I hope that other OSes do it better, if not... add #ifdefs :-(
  */
-#if (defined(__EMX__) || !defined(MSDOS) && !defined(DOS386)) && !defined(ATARI) && !defined(MTOS)
+#if (defined(__EMX__) || !defined(MSDOS) && !defined(DOS386))
     (void) signal(SIGINT, (sigfunc) ctrlc_handle);
 #endif
 }
@@ -300,9 +295,7 @@ error_ex()
 	func.at = (struct at_type *) NULL;
     }
     /* restore original SIGINT function */
-#if !defined(ATARI) && !defined(MTOS)
     interrupt_setup();
-#endif
 
     bail_to_command_line();
 }
@@ -619,7 +612,7 @@ regress(double a[])
  *  HBB: I think this can be enabled for DJGPP V2. SIGINT is actually
  *  handled there, AFAIK.
  */
-#if ((defined(MSDOS) || defined(DOS386)) && !defined(__EMX__)) || defined(ATARI) || defined(MTOS)
+#if ((defined(MSDOS) || defined(DOS386)) && !defined(__EMX__))
 	if (kbhit()) {
 	    do {
 		getchx();
@@ -652,10 +645,8 @@ regress(double a[])
 
     /* fit done */
 
-#if !defined(ATARI) && !defined(MTOS)
     /* restore original SIGINT function */
     interrupt_setup();
-#endif
 
     /* HBB 970304: the maxiter patch: */
     if ((maxiter > 0) && (iter > maxiter)) {
@@ -1660,20 +1651,6 @@ fit_command()
     }
     safe_strncpy(last_fit_command, gp_input_line, sizeof(last_fit_command));
 }
-
-#if defined(ATARI) || defined(MTOS)
-static int
-kbhit()
-{
-    fd_set rfds;
-    struct timeval timeout;
-
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 0;
-    rfds = (fd_set) (1L << fileno(stdin));
-    return ((select(0, SELECT_TYPE_ARG234 &rfds, NULL, NULL, SELECT_TYPE_ARG5 &timeout) > 0) ? 1 : 0);
-}
-#endif
 
 /*
  * Print msg to stderr and log file

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.166 2008/03/23 21:39:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.167 2008/03/29 23:52:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1094,8 +1094,6 @@ pause_command()
 	    if (sleep_time >= 0)
 #elif defined(OS2)
 		if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
-#elif defined(MTOS)
-		    if (strcmp(term->name, "mtos") != 0 || sleep_time >= 0)
 #endif /* _Windows */
 			fputs(buf, stderr);
 	    text = 1;
@@ -1140,31 +1138,7 @@ pause_command()
 #elif defined(_Macintosh)
 	if (strcmp(term->name, "macintosh") == 0 && sleep_time < 0)
 	    Pause( (int)sleep_time );
-#elif defined(MTOS)
-	if (strcmp(term->name, "mtos") == 0) {
-	    int MTOS_pause(char *buf);
-	    int rc;
-	    if ((rc = MTOS_pause(buf)) == 0)
-	    	bail_to_command_line();
-	    else if (rc == 2) {
-		fputs(buf, stderr);
-		text = 1;
-		(void) fgets(buf, strlen(buf), stdin);
-	    }
-	} else if (strcmp(term->name, "atari") == 0) {
-	    char *line = readline("");
-	    if (line)
-		free(line);
-	} else
-	    (void) fgets(buf, strlen(buf), stdin);
-#elif defined(ATARI)
-	if (strcmp(term->name, "atari") == 0) {
-	    char *line = readline("");
-	    if (line)
-		free(line);
-	} else
-	    (void) fgets(buf, strlen(buf), stdin);
-#else /* !(_Windows || OS2 || _Macintosh || MTOS || ATARI) */
+#else /* !(_Windows || OS2 || _Macintosh) */
 #ifdef USE_MOUSE
 	if (term && term->waitforinput) {
 	    /* term->waitforinput() will return,
@@ -1177,7 +1151,7 @@ pause_command()
 #ifdef USE_MOUSE
 	}
 #endif /* USE_MOUSE */
-#endif /* !(_Windows || OS2 || _Macintosh || MTOS || ATARI) */
+#endif /* !(_Windows || OS2 || _Macintosh) */
     }
     if (sleep_time > 0)
 	GP_SLEEP(sleep_time);
@@ -1799,7 +1773,7 @@ invalid_command()
 static int
 changedir(char *path)
 {
-#if defined(MSDOS) || defined(WIN16) || defined(ATARI) || defined(DOS386)
+#if defined(MSDOS) || defined(WIN16) || defined(DOS386)
 # if defined(__ZTC__)
     unsigned dummy;		/* it's a parameter needed for dos_setdrive */
 # endif
@@ -1808,10 +1782,6 @@ changedir(char *path)
 
     if (isalpha(path[0]) && (path[1] == ':')) {
 	int driveno = toupper(path[0]) - 'A';	/* 0=A, 1=B, ... */
-
-# if defined(ATARI)
-	(void) Dsetdrv(driveno);
-# endif
 
 # if defined(__ZTC__)
 	(void) dos_setdrive(driveno + 1, &dummy);
@@ -1842,7 +1812,7 @@ changedir(char *path)
     return _chdir2(path);
 #else
     return chdir(path);
-#endif /* MSDOS, ATARI etc. */
+#endif /* MSDOS etc. */
 }
 
 
@@ -2173,10 +2143,6 @@ help_command()
     static char help_fname[256] = "";	/* keep helpfilename across calls */
 # endif
 
-# if defined(ATARI) || defined(MTOS)
-    char const *const ext[] = { NULL };
-# endif
-
     if ((help_ptr = getenv("GNUHELP")) == (char *) NULL)
 # ifndef SHELFIND
 	/* if can't find environment variable then just use HELPFILE */
@@ -2184,18 +2150,6 @@ help_command()
 /* patch by David J. Liu for getting GNUHELP from home directory */
 #  if (defined(__TURBOC__) && (defined(MSDOS) || defined(DOS386))) || defined(__DJGPP__)
 	help_ptr = HelpFile;
-#  else
-#   if defined(ATARI) || defined(MTOS)
-    {
-	/* I hope findfile really can accept a NULL argument ... */
-	if ((help_ptr = findfile(HELPFILE, user_gnuplotpath, ext)) == NULL)
-	    help_ptr = findfile(HELPFILE, getenv("PATH"), ext);
-	if (!help_ptr)
-	    help_ptr = HELPFILE;
-    }
-#   else
-    help_ptr = HELPFILE;
-#   endif			/* ATARI || MTOS */
 #  endif			/* __TURBOC__ */
 #ifdef OS2
   {
@@ -2337,29 +2291,11 @@ do_system(const char *cmd)
 	return;
     getparms(input_line + 1, parms);
     fexecv(parms[0], parms);
-# elif (defined(ATARI) && defined(__GNUC__))
-/* || (defined(MTOS) && defined(__GNUC__)) */
-    /* use preloaded shell, if available */
-    short (*shell_p) (char *command);
-    void *ssp;
-
-    if (!cmd)
-	return;
-
-    ssp = (void *) Super(NULL);
-    shell_p = *(short (**)(char *)) 0x4f6;
-    Super(ssp);
-
-    /* this is a bit strange, but we have to have a single if */
-    if (shell_p)
-	(*shell_p) (cmd);
-    else
-	system(cmd);
 # elif defined(_Windows) && defined(USE_OWN_WINSYSTEM_FUNCTION)
     if (!cmd)
 	return;
     winsystem(cmd);
-# else /* !(AMIGA_AC_5 || ATARI && __GNUC__ || _Windows) */
+# else /* !(AMIGA_AC_5 || _Windows) */
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
  * i.e. calling a shell by "!" will always end with an error message.
@@ -2369,7 +2305,7 @@ do_system(const char *cmd)
     if (!cmd)
 	return;
     system(cmd);
-# endif /* !(AMIGA_AC_5 || ATARI&&__GNUC__ || _Windows) */
+# endif /* !(AMIGA_AC_5 || _Windows) */
 }
 
 
@@ -2913,7 +2849,7 @@ int
 do_system_func(const char *cmd, char **output)
 {
 
-#if defined(VMS) || defined(PIPES) || (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
+#if defined(VMS) || defined(PIPES)
     int c;
     FILE *f;
     size_t cmd_len;
@@ -2922,8 +2858,6 @@ do_system_func(const char *cmd, char **output)
     int ierr = 0;
 # ifdef AMIGA_AC_5
     int fd;
-# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-    char *atari_tmpfile, *atari_cmd;
 # elif defined(VMS)
     int chan, one = 1;
     struct dsc$descriptor_s pgmdsc = {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, 0};
@@ -2944,18 +2878,6 @@ do_system_func(const char *cmd, char **output)
 
     if ((f = fopen("PLOT$MAILBOX", "r")) == NULL)
 	os_error(NO_CARET, "mailbox open failed");
-# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-    if (system(NULL) == 0)
-	os_error(NO_CARET, "no command shell");
-    atari_tmpfile = tmpnam(NULL);
-    atari_cmd = gp_alloc(cmd_len + 5 + strlen(atari_tmpfile),
-			 "command string");
-    strcpy(atari_cmd, cmd);
-    strcat(atari_cmd, " >> ");
-    strcat(atari_cmd, atari_tmpfile);
-    system(atari_cmd);
-    free(atari_cmd);
-    if ((f = fopen(atari_tmpfile, "r")) == NULL)
 # elif defined(AMIGA_AC_5)
 	if ((fd = open(cmd, "O_RDONLY")) == -1)
 # else	/* everyone else */
@@ -2998,9 +2920,6 @@ do_system_func(const char *cmd, char **output)
     /* close stream */
 # ifdef AMIGA_AC_5
     (void) close(fd);
-# elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-    (void) fclose(f);
-    (void) unlink(atari_tmpfile);
 # else				/* Rest of the world */
     ierr = pclose(f);
 # endif
@@ -3009,12 +2928,12 @@ do_system_func(const char *cmd, char **output)
     *output = result;
     return ierr;
 
-#else /* VMS || PIPES || ATARI && PUREC */
+#else /* VMS || PIPES */
 
     int_warn(NO_CARET, "system evaluation not supported by %s", OS);
     *output = gp_strdup("");
     return 0;
 
-#endif /* VMS || PIPES || ATARI && PUREC */
+#endif /* VMS || PIPES */
 
 }

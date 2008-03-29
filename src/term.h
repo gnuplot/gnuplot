@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.36 2007/07/16 21:58:43 tlecomte Exp $
+ * $Id: term.h,v 1.37 2007/10/16 21:19:45 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -100,16 +100,6 @@
 /* Amiga */
 #ifdef AMIGA
 # include "amiga.trm"
-#endif
-
-
-/* Atari ST and MTOS */
-#if defined(ATARI) || defined(MTOS)
-# include "atarivdi.trm"
-# ifdef MTOS
-#  include "multitos.trm"
-# endif
-# include "atariaes.trm"
 #endif
 
 
@@ -252,8 +242,8 @@
 #endif
 
 /****************************************************************************/
-/* Terminals not relevant for MSDOS, MS-Windows, ATARI or Amiga             */
-#if !(defined(MSDOS) || defined(_Windows) || defined(ATARI) || defined(MTOS) || defined(AMIGA))
+/* Terminals not relevant for MSDOS, MS-Windows, Amiga             */
+#if !(defined(MSDOS) || defined(_Windows) || defined(AMIGA))
 
 /* AED 512 and AED 767 graphics terminals */
 # include "aed.trm"
@@ -279,7 +269,7 @@
 # include "tek.trm"
 
 
-#endif /* !MSDOS && !_Windows && !_ATARI && !_MTOS && !AMIGA */
+#endif /* !MSDOS && !_Windows && !AMIGA */
 /****************************************************************************/
 
 

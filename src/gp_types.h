@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.35 2008/02/22 19:40:44 sfeam Exp $
+ * $Id: gp_types.h,v 1.36 2008/03/13 19:53:28 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -121,11 +121,9 @@ typedef enum PLOT_SMOOTH {
  * into one of scanner/internal/standard/util .h, but I've yet to
  * decide which of them */
 
-#if !(defined(ATARI)&&defined(__GNUC__)&&defined(_MATH_H)) &&  !(defined(MTOS)&&defined(__GNUC__)&&defined(_MATH_H)) /* FF's math.h has the type already */
 struct cmplx {
 	double real, imag;
 };
-#endif
 
 typedef struct value {
     enum DATA_TYPES type;

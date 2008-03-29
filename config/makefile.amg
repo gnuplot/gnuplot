@@ -1,5 +1,5 @@
 #
-# $Id: makefile.amg,v 1.13 2007/10/16 21:19:43 sfeam Exp $
+# $Id: makefile.amg,v 1.14 2007/11/19 21:17:12 sfeam Exp $
 #
 # GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
@@ -131,8 +131,7 @@ CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c save.c scanner.c \
 	standard.c stdfn.c tables.c variable.c
 CSOURCE4 = bitmap.c term.c util.c util3d.c version.c interpol.c fit.c matrix.c
 CSOURCE5 = $(TERMDIR)/aed.trm $(TERMDIR)/ai.trm $(TERMDIR)/amiga.trm \
-	   $(TERMDIR)/apollo.trm $(TERMDIR)/atariaes.trm \
-	   $(TERMDIR)/atarivdi.trm $(TERMDIR)/cgi.trm $(TERMDIR)/cgm.trm \
+	   $(TERMDIR)/apollo.trm $(TERMDIR)/cgi.trm $(TERMDIR)/cgm.trm \
 	   $(TERMDIR)/corel.trm $(TERMDIR)/debug.trm \
 	   $(TERMDIR)/driver.h $(TERMDIR)/djsvga.trm $(TERMDIR)/dumb.trm \
 	   $(TERMDIR)/dxf.trm $(TERMDIR)/dxy.trm $(TERMDIR)/eepic.trm \
@@ -145,7 +144,7 @@ CSOURCE6 = $(TERMDIR)/gpic.trm $(TERMDIR)/gpr.trm $(TERMDIR)/grass.trm \
 	   $(TERMDIR)/imagen.trm $(TERMDIR)/impcodes.h \
 	   $(TERMDIR)/kyo.trm $(TERMDIR)/latex.trm $(TERMDIR)/linux.trm \
 	   $(TERMDIR)/mac.trm $(TERMDIR)/metafont.trm $(TERMDIR)/mgr.trm \
-	   $(TERMDIR)/mif.trm $(TERMDIR)/multitos.trm $(TERMDIR)/next.trm \
+	   $(TERMDIR)/mif.trm $(TERMDIR)/next.trm \
 	   $(TERMDIR)/object.h $(TERMDIR)/pbm.trm $(TERMDIR)/pc.trm
 CSOURCE7 = $(TERMDIR)/pm.trm $(TERMDIR)/png.trm $(TERMDIR)/post.trm \
 	   $(TERMDIR)/pslatex.trm $(TERMDIR)/pstricks.trm $(TERMDIR)/qms.trm \

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.47 2007/08/28 06:13:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.48 2008/03/16 20:03:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -62,41 +62,7 @@ static enum DATA_TYPES sprintf_specifier __PROTO((const char *format));
 int
 GP_MATHERR( STRUCT_EXCEPTION_P_X )
 {
-#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-    char *c;
-    switch (e->type) {
-    case DOMAIN:
-	c = "domain error";
-	break;
-    case SING:
-	c = "argument singularity";
-	break;
-    case OVERFLOW:
-	c = "overflow range";
-	break;
-    case UNDERFLOW:
-	c = "underflow range";
-	break;
-    default:
-	c = "(unknown error)";
-	break;
-    }
-    fprintf(stderr, "\
-math exception : %s\n\
-    name : %s\n\
-    arg 1: %e\n\
-    arg 2: %e\n\
-    ret  : %e\n",
-	    c,
-	    e->name,
-	    e->arg1,
-	    e->arg2,
-	    e->retval);
-
-    return 1;
-#else
     return (undefined = TRUE);	/* don't print error message */
-#endif
 }
 
 #define BAD_DEFAULT default: int_error(NO_CARET, "internal error : type neither INT or CMPLX"); return;

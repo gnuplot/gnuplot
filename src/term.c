@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.171 2008/02/22 06:13:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.172 2008/02/24 19:49:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -333,10 +333,6 @@ void fflush_binary();
 static FILE save_stdout;
 #endif
 static int unixplot = 0;
-
-#if defined(MTOS) || defined(ATARI)
-int aesid = -1;
-#endif
 
 #define NICE_LINE               0
 #define POINT_TYPES             6
@@ -1718,10 +1714,6 @@ init_terminal()
 	term_name = "amiga";
 #endif
 
-#if defined(ATARI) || defined(MTOS)
-	term_name = "atari";
-#endif
-
 #ifdef UNIXPC
 	if (iswind() == 0) {
 	    term_name = "unixpc";
@@ -2136,7 +2128,7 @@ test_term()
 }
 
 #if 0
-# if defined(MSDOS)||defined(g)||defined(MTOS)||defined(OS2)||defined(_Windows)||defined(DOS386)
+# if defined(MSDOS)||defined(g)||defined(OS2)||defined(_Windows)||defined(DOS386)
 
 /* output for some terminal types must be binary to stop non Unix computers
    changing \n to \r\n.
@@ -2180,7 +2172,7 @@ reopen_binary()
     }
 }
 
-# endif /* MSDOS || g || MTOS || ... */
+# endif /* MSDOS || g || ... */
 #endif /* 0 */
 
 #ifdef VMS

@@ -249,8 +249,6 @@ Major contributors (alphabetic order):
 	"amiga"
 	"apollo"
 	"aquaterm"
-	"atariaes"
-	"atarivdi"
 	"be"
 	"cgi"
 	"cgm"
@@ -291,7 +289,6 @@ Major contributors (alphabetic order):
 	"metapost"
 	"mgr"
 	"mif"
-	"multitos"
 	"next"
 	"openstep"
 	"pbm"
@@ -411,9 +408,6 @@ particular conversion chore."
     (if (string-match "amiga" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("amiga"))))
-    (if (string-match "atari" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("atarivdi" "multitos" "atariaes"))))
     (if (string-match "mac" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("mac" "openstep"))))
@@ -441,7 +435,7 @@ particular conversion chore."
     (if (string-match "vms" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("vws"))))
-    (unless (member* system-configuration '("dos" "windows" "atari" "amiga")
+    (unless (member* system-configuration '("dos" "windows" "amiga")
 		     :test 'string-match)
       (setq d2t-terminal-list
 	    (append d2t-terminal-list

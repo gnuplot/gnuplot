@@ -1,4 +1,4 @@
-README
+README  (EAM Oct 2007; give up on Atari platforms)
 buildvms.com
 make_vms.com
 makefile.unx
@@ -13,11 +13,9 @@ makefile.g: Makefile for GRASS, a geographic information system.
 makefile.mgw: Makefile for MinGW32 on 32bit MS Windows 
 makefile.msc: Makefile for use with Microsoft C  Version 5.10
 makefile.msw: Makefile for Microsoft C  Version 7.0 Windows Version
-makefile.mto: Makefile for GCC-ST 1.x and 2.x
 makefile.nt: Makefile to compile gnuplot for WinNT and Win95/98
 makefile.os2: Makefile for gcc/emx on OS/2 3.x and above (might also work on OS/2 2.x)
 makefile.os9: Makefile for OS-9 and Ultra C, with X11 support
-makefile.st: Makefile for GCC-ST 1.x and 2.x
 makefile.tc: Makefile for Borland C++ 3.x DOS version
 makefile.vms: Makefile for VMS
 makefile.wc: Makefile for Watcom C 9.5a
