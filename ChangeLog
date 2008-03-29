@@ -1,3 +1,11 @@
+2008-03-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_command) src/show.c (show_command)
+	src/unset.c (unset_command):  Replace overly long error messages that
+	list all available options with a suggestion to use 'help'.  The long
+	error messages were not being printed anyhow due to length restrictions
+	in int_error().
+
 2008-03-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.cyg: pid_t is defined in types.h.

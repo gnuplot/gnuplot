@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.268 2008/03/16 20:03:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.269 2008/03/21 17:26:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -178,20 +178,6 @@ static void set_nolinestyle __PROTO((void));
 void
 set_command()
 {
-    static char GPFAR setmess[] =
-    "valid set options:  [] = choose one, {} means optional\n\n\
-\t'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
-\t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign',\n\
-\t'dgrid3d', 'dummy', 'encoding', 'fit', 'format', 'grid',\n\
-\t'hidden3d', 'historysize', 'isosamples', 'key', 'label', 'locale',\n\
-\t'logscale', 'macros', '[blrt]margin', 'mapping', 'mouse', 'multiplot',\n\
-\t'offsets', 'origin', 'output', 'palette', 'parametric', 'pm3d',\n\
-\t'pointsize', 'polar', 'print', '[rtuv]range', 'samples', 'size',\n\
-\t'style', 'surface', 'terminal', 'tics', 'ticscale', 'ticslevel',\n\
-\t'timestamp', 'timefmt', 'title', 'view', 'xyplane', '[xyz]{2}data',\n\
-\t'[xyz]{2}label', '[xyz]{2}range', '{no}{m}[xyz]{2}tics',\n\
-\t'[xyz]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
-
     c_token++;
 
 #ifdef BACKWARDS_COMPATIBLE
@@ -629,7 +615,7 @@ set_command()
 	    set_ticslevel();
 	    break;
 	default:
-	    int_error(c_token, setmess);
+	    int_error(c_token, "Unrecognized option.  See 'help set'.");
 	    break;
 	}
 

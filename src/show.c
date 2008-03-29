@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.205 2008/03/14 02:56:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.206 2008/03/16 20:03:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -172,20 +172,6 @@ static int var_show_all = 0;
 void
 show_command()
 {
-    /* show at is undocumented/hidden... */
-    static char GPFAR showmess[] =
-    "valid set options:  [] = choose one, {} means optional\n\n\
-\t'all', 'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth', 'clip',\n\
-\t'cntrparam', 'colorbox', 'contour', 'datafile', 'decimalsign','dgrid3d',\n\
-\t'dummy', 'encoding', 'fit', 'fontpath', 'format', 'functions', 'grid',\n\
-\t'hidden', 'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
-\t'mapping', 'margin', 'offsets', 'origin', 'output', 'plot',\n\
-\t'palette', 'parametric', 'pm3d', 'pointsize', 'polar', 'print', '[rtuv]range',\n\
-\t'samples', 'size', 'style', 'terminal', 'tics', 'timestamp',\n\
-\t'timefmt', 'title', 'variables', 'version', 'view',\n\
-\t'[xyz,cb]{2}label', '[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics',\n\
-\t'[xyz,cb]{2}[md]tics', '{[xyz]{2}}zeroaxis', '[xyz,cb]data', 'zero'";
-
     enum set_id token_found;
     int tag =0;
     char *error_message = NULL;
@@ -624,7 +610,7 @@ show_command()
     /* --- such case now, all implemented. */
 
     case S_INVALID:
-	error_message = showmess;
+	error_message = "Unrecognized option. See 'help show'.";
 	break;
     default:
 	error_message = "invalid or deprecated syntax";

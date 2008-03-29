@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.114 2008/03/14 02:56:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.115 2008/03/16 20:03:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -142,20 +142,6 @@ static void unset_axislabel __PROTO((AXIS_INDEX));
 void
 unset_command()
 {
-    static char GPFAR unsetmess[] =
-    "valid unset options:  [] = choose one, {} means optional\n\n\
-\t'angles', 'arrow', 'autoscale', 'bar', 'border', 'boxwidth', 'clabel',\n\
-\t'clip', 'cntrparam', 'colorbox', 'contour', 'dgrid3d', 'decimalsign',\n\
-\t'dummy', 'encoding', 'fit', 'format', 'grid', 'hidden3d', 'historysize',\n\
-\t'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
-\t'[blrt]margin', 'mapping', 'missing', 'mouse', 'multiplot', 'offsets',\n\
-\t'origin', 'output', 'palette', 'parametric', 'pm3d', 'pointsize',\n\
-\t'polar', 'print', '[rtuv]range', 'samples', 'size', 'style', 'surface',\n\
-\t'terminal', 'tics', 'ticscale', 'ticslevel', 'timestamp', 'timefmt',\n\
-\t'title', 'view', 'xyplane', '[xyz,cb]{2}data', '[xyz,cb]{2}label',\n\
-\t'[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics', '[xyz,cb]{2}[md]tics',\n\
-\t'{[xyz]{2}}zeroaxis', 'zero'";
-
     int found_token;
 
     c_token++;
@@ -519,7 +505,7 @@ unset_command()
 	break;
     case S_INVALID:
     default:
-	int_error(c_token, unsetmess);
+	int_error(c_token, "Unrecognized option.  See 'help unset'.");
 	break;
     }
     update_gpval_variables(0); /* update GPVAL_ inner variables */
