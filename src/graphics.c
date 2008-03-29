@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.253 2008/03/13 20:02:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.254 2008/03/14 19:53:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -635,7 +635,8 @@ boundary(struct curve_points *plots, int count)
 	    int ytlen, ytheight;
 	    ytlen = label_width(key->title, &ytheight);
 	    ytlen -= key->swidth + 2;
-	    if (ytlen > max_ptitl_len)
+	    /* EAM FIXME */
+	    if ((ytlen > max_ptitl_len) && (key->stack_dir != GPKEY_HORIZONTAL))
 		max_ptitl_len = ytlen;
 	    ktitl_lines = (int)ytheight;
 	}
