@@ -1,3 +1,8 @@
+2008-03-29  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/command.c (test_palette_subcommand):  Clean up the layout of the
+	'test palette' output on the displayed page.
+
 2008-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_command) src/show.c (show_command)
@@ -5,6 +10,9 @@
 	list all available options with a suggestion to use 'help'.  The long
 	error messages were not being printed anyhow due to length restrictions
 	in int_error().
+
+	* src/graphics.c (boundary):  Fix bug in caluculating the column width
+	of a horizontal key with a long title.
 
 2008-03-24  Petr Mikulik  <mikulik@physics.muni.cz>
 

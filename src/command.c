@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.165 2008/03/13 20:02:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.166 2008/03/23 21:39:30 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1570,18 +1570,20 @@ test_palette_subcommand()
     int i;
     static const char pre1[] = "\
 reset;set multi;\
-uns border;uns key;set tic out;uns xtics;uns ytics;\
-se cbtic 0,0.1,1;se cbtic nomirr;\
+uns border;uns key;set tic in;uns xtics;uns ytics;\
+se cbtic 0,0.1,1 mirr format '';\
 se xr[0:1];se yr[0:1];se zr[0:1];se cbr[0:1];\
-se pm3d map;set colorbox hor user orig 0.08,0.07 size 0.79,0.12;";
+se pm3d map;set colorbox hor user orig 0.05,0.02 size 0.925,0.12;";
     static const char pre2[] = "splot 1/0;\n\n\n";
 	/* note: those \n's are because of x11 terminal problems with blocking pipe */
     static const char pre3[] = "\
-se size 1,0.8;se orig 0,0.2;uns pm3d;\
-se key outside;se grid;se tics in;se xtics 0,0.1;se ytics 0,0.1;\
-se tit'R,G,B profiles of the current color palette';";
+uns pm3d;\
+se lmarg scre 0.05;se rmarg scre 0.975; se bmarg scre 0.22; se tmarg scre 0.86;\
+se grid;se tics scale 0; se xtics 0,0.1;se ytics 0,0.1;\
+se key top right at scre 0.975,0.975 horizontal \
+title 'R,G,B profiles of the current color palette';";
     static const char post[] = "\
-\n\n\nuns multi;se orig 0,0;se size 1,1;\n"; /* no final 'reset' in favour of mousing */
+\n\n\nuns multi;\n"; /* no final 'reset' in favour of mousing */
     int can_pm3d = (term->make_palette && term->set_color);
     char *order = "rgb";
     char *save_replot_line;
