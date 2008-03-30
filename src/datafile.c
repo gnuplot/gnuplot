@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.146 2008/03/14 02:56:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.147 2008/03/16 20:03:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -723,10 +723,11 @@ df_tokenise(char *s)
 		    )
 		) {
 
-#if (0)
-		/* This was the [slow] code used through version 4.0 */
-		count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
-#else
+
+		/* This was the [slow] code used through version 4.0
+		 *   count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
+		 */
+
 		/* Use strtod() because
 		 *  - it is faster than sscanf()
 		 *  - sscanf(... %n ...) may not be portable
@@ -737,7 +738,7 @@ df_tokenise(char *s)
 		 df_column[df_no_cols].datum = gp_strtod(s, &next);
 		 used = next - s;
 		 count = (used) ? 1 : 0;
-#endif
+
 	    } else {
 		/* skip any space at start of column */
 		/* HBB tells me that the cast must be to
@@ -1042,10 +1043,10 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    plot_option_index();
 	    set_index = TRUE;
 	    continue;
-        }
+	}
 
 	/* deal with every */
-        if (almost_equals(c_token, "ev$ery")) {
+	if (almost_equals(c_token, "ev$ery")) {
 	    if (set_every) { duplication=TRUE; break; }
 	    plot_option_every();
 	    set_every = TRUE;
@@ -2602,14 +2603,14 @@ initialize_binary_vars()
      */
     clear_binary_records(DF_CURRENT_RECORDS);
     if (df_num_bin_records_default) {
-      df_bin_filetype = df_bin_filetype_default;
-      df_bin_file_endianess = df_bin_file_endianess_default;
-      df_add_binary_records(df_num_bin_records_default, DF_CURRENT_RECORDS);
-      memcpy(df_bin_record, df_bin_record_default, df_num_bin_records*sizeof(df_binary_file_record_struct));
+	df_bin_filetype = df_bin_filetype_default;
+	df_bin_file_endianess = df_bin_file_endianess_default;
+	df_add_binary_records(df_num_bin_records_default, DF_CURRENT_RECORDS);
+	memcpy(df_bin_record, df_bin_record_default, df_num_bin_records*sizeof(df_binary_file_record_struct));
     } else {
-      df_bin_filetype = df_bin_filetype_reset;
-      df_bin_file_endianess = DF_BIN_FILE_ENDIANESS_RESET;
-      df_add_binary_records(1, DF_CURRENT_RECORDS);
+	df_bin_filetype = df_bin_filetype_reset;
+	df_bin_file_endianess = DF_BIN_FILE_ENDIANESS_RESET;
+	df_add_binary_records(1, DF_CURRENT_RECORDS);
     }
 }
 

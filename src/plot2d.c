@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.165 2008/03/14 02:56:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.166 2008/03/16 20:03:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -467,9 +467,9 @@ get_data(struct curve_points *current_plot)
 
 #ifdef EAM_OBJECTS
     case CIRCLES:	/* 3 + possible variable color */
-        min_cols = 3;
-        max_cols = 4;
-        break;
+	min_cols = 3;
+	max_cols = 4;
+	break;
 #endif
 
     case POINTSTYLE:
@@ -956,11 +956,6 @@ store2d_point(
 	}
 	newx = y * cos(x * ang2rad);
 	newy = y * sin(x * ang2rad);
-#if 0                           /* HBB 981118: added polar errorbars */
-	/* only lines and points supported with polar */
-	y = ylow = yhigh = newy;
-	x = xlow = xhigh = newx;
-#else
 	y = newy;
 	x = newx;
 
@@ -987,7 +982,6 @@ store2d_point(
 	newy = ylow * sin(xlow * ang2rad);
 	ylow = newy;
 	xlow = newx;
-#endif
     }
     /* return immediately if x or y are undefined
      * we dont care if outrange for high/low.
@@ -2340,16 +2334,6 @@ eval_plots()
 	if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MAX)
 	    axis_array[FIRST_Y_AXIS].max = axis_array[SECOND_Y_AXIS].max;
     }
-
-#if 0
-    /* FIXME HBB 20000502: this seems to have been replaced by newer code,
-     * in the meantime? --> disable it */
-    AXIS_WRITEBACK(FIRST_X_AXIS);
-    AXIS_WRITEBACK(FIRST_Y_AXIS);
-    AXIS_WRITEBACK(SECOND_X_AXIS);
-    AXIS_WRITEBACK(SECOND_Y_AXIS);
-#endif
-
 
     /* the following ~5 lines were moved from the end of the
      * function to here, as do_plot calles term->text, which

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.69 2008/03/13 19:53:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.70 2008/03/13 21:00:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -272,10 +272,8 @@ pm3d_rearrange_part(
 	}
     }
 
-#if 0
-    fprintf(stderr, "(pm3d_rearrange_part) invert       = %d\n", *invert);
-    fprintf(stderr, "(pm3d_rearrange_part) invert_order = %d\n", invert_order);
-#endif
+    FPRINTF((stderr, "(pm3d_rearrange_part) invert       = %d\n", *invert));
+    FPRINTF((stderr, "(pm3d_rearrange_part) invert_order = %d\n", invert_order));
 
     for (scanA = src, scan = len - 1, i = 0; scan >= 0; --scan, i++) {
 	if (pm3d.direction == PM3D_SCANS_AUTOMATIC) {
@@ -520,9 +518,10 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     for (scan = 0; scan < this_plot->num_iso_read - 1; scan++) {
 	scanA = scan_array[scan];
 	scanB = scan_array[scan + 1];
-#if 0
-	printf("\n#IsoCurveA = scan nb %d has %d points   ScanB has %d points\n", scan, scanA->p_count, scanB->p_count);
-#endif
+
+	FPRINTF((stderr,"\n#IsoCurveA = scan nb %d has %d points   ScanB has %d points\n",
+		scan, scanA->p_count, scanB->p_count));
+
 	pointsA = scanA->points;
 	pointsB = scanB->points;
 	/* if the number of points in both scans is not the same, then the
@@ -584,9 +583,10 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		i1 = ii1;
 		ii1 = itmp;
 	    }
-#if 0
-	    fprintf(stderr,"j=%i:  i=%i i1=%i  [%i]   ii=%i ii1=%i  [%i]\n",j,i,i1,scanA->p_count,ii,ii1,scanB->p_count);
-#endif
+
+	    FPRINTF((stderr,"j=%i:  i=%i i1=%i  [%i]   ii=%i ii1=%i  [%i]\n",
+	    		j,i,i1,scanA->p_count,ii,ii1,scanB->p_count));
+
 	    /* choose the clipping method */
 	    if (pm3d.clip == PM3D_CLIP_4IN) {
 		/* (1) all 4 points of the quadrangle must be in x and y range */
@@ -634,14 +634,12 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		}
 		/* transform z value to gray, i.e. to interval [0,1] */
 		gray = cb2gray(avgC);
-#if 0
+
 		/* print the quadrangle with the given color */
-		printf("averageColor %g\tgray=%g\tM %g %g L %g %g L %g %g L %g %g\n",
-		       avgC,
-		       gray,
-		       pointsA[i].x, pointsA[i].y, pointsB[ii].x, pointsB[ii].y,
-		       pointsB[ii1].x, pointsB[ii1].y, pointsA[i1].x, pointsA[i1].y);
-#endif
+		FPRINTF((stderr, "averageColor %g\tgray=%g\tM %g %g L %g %g L %g %g L %g %g\n",
+		       avgC, gray, pointsA[i].x, pointsA[i].y, pointsB[ii].x, pointsB[ii].y,
+		       pointsB[ii1].x, pointsB[ii1].y, pointsA[i1].x, pointsA[i1].y));
+
 		/* set the color */
 		set_color(gray);
 #ifdef EXTENDED_COLOR_SPECS
@@ -760,13 +758,11 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			corners[3].x = bl_point[i1][j1+1].x;
 			corners[3].y = bl_point[i1][j1+1].y;
 			corners[3].z = bl_point[i1][j1+1].z;
-#if 0
-			printf("(%g,%g),(%g,%g),(%g,%g),(%g,%g)\n",
-			    corners[0].x, corners[0].y,
-			    corners[1].x, corners[1].y,
-			    corners[2].x, corners[2].y,
-			    corners[3].x, corners[3].y);
-#endif
+
+			FPRINTF((stderr,"(%g,%g),(%g,%g),(%g,%g),(%g,%g)\n",
+			    corners[0].x, corners[0].y, corners[1].x, corners[1].y,
+			    corners[2].x, corners[2].y, corners[3].x, corners[3].y));
+
 			/* If the colors are given separately, we already loaded them above */
 			if (!color_from_column) {
 			    cb1 = z2cb(corners[0].z);

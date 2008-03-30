@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.51 2007/08/28 05:56:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.52 2007/08/28 06:13:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -876,24 +876,6 @@ is_builtin_function(int t_num)
 	    return (i);
     }
     return (0);
-}
-
-void
-cleanup_udvlist()
-{
-    struct udvt_entry *udv_ptr = first_udv;
-    struct udvt_entry *udv_dead;
-
-    while (udv_ptr->next_udv) {
-        if (udv_ptr->next_udv->udv_undef) {
-	    udv_dead = udv_ptr->next_udv;
-	    udv_ptr->next_udv = udv_dead->next_udv;
-	    FPRINTF((stderr,"cleanup_udvlist: deleting %s\n",udv_dead->udv_name));
-	    free(udv_dead->udv_name);
-	    free(udv_dead);
-	} else
-	    udv_ptr = udv_ptr->next_udv;
-    }
 }
 
 /* Look for an iterate-over-plot construct, of the form

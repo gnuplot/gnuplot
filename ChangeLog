@@ -1,3 +1,8 @@
+2008-03-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/contour.c src/pm3d.c src/plot2d.c src/datafile.c src/parse.c:
+	Yet more cleanup of dead code and outdated comments.
+
 2008-03-30  Allin Cottrell <cottrell@wfu.edu>
 
 	* src/command.c (help_command): Fix incorrect nesting of #if clauses
