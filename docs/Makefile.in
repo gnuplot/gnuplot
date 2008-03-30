@@ -240,6 +240,8 @@ html: htmldocs/gnuplot.html
 # and doesn't depend on having emacs around to do lisp pre-processing.
 # However, it does require help finding a set of color names:
 #     setenv RGBDEF /usr/lib/latex2html/styles/rgb.txt
+# Also it messes up on adding html escape sequences to the characters < and >
+# particularly inside the verbatim text segments.  Manual cleanup is necessary.
 #
 htmldocs/gnuplot.html: $(srcdir)/gnuplot.tex
 	mkdir -p htmldocs
