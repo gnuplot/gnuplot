@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.92 2007/10/21 04:17:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.93 2007/10/22 19:11:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -737,6 +737,21 @@ lp_use_properties(struct lp_style_type *lp, int tag)
     lp->p_type = tag - 1;
 }
 
+TBOOLEAN
+need_fill_border(struct fill_style_type *fillstyle)
+{
+    if (fillstyle->border_linetype != LT_NODRAW
+    &&  fillstyle->border_linetype != LT_UNDEFINED) {
+	struct lp_style_type ls = DEFAULT_LP_STYLE_TYPE;
+	if (prefer_line_styles) {
+	    lp_use_properties(&ls, fillstyle->border_linetype+1);
+	    term_apply_lp_properties(&ls);
+	} else
+	    (*term->linetype)(fillstyle->border_linetype);
+	return TRUE;
+    }
+    return FALSE;
+}
 
 /*
  * allow_ls controls whether we are allowed to accept linestyle in

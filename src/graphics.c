@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.254 2008/03/14 19:53:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.255 2008/03/29 23:50:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -47,6 +47,7 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.254 2008/03/14 19:53:51
 #include "alloc.h"
 #include "axis.h"
 #include "command.h"
+#include "misc.h"
 #include "gp_time.h"
 #include "gadgets.h"
 /* FIXME HBB 20010822: this breaks the plan of disentangling graphics
@@ -1435,11 +1436,8 @@ place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *c
 	    do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, style);
 
 	    /* Retrace the border if the style requests it */
-	    if (fillstyle->border_linetype != LT_NODRAW
-	    &&  fillstyle->border_linetype != LT_UNDEFINED) {
-		(*term->linetype)(fillstyle->border_linetype);
+	    if (need_fill_border(fillstyle))
 		do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, 0);
-	    }
 	}
 
 	if (this_object->object_type == OBJ_ELLIPSE) {
@@ -1453,14 +1451,8 @@ place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *c
 		continue;
 
 	    /* Retrace the border if the style requests it */
-	    if (fillstyle->border_linetype != LT_NODRAW
-	    &&  fillstyle->border_linetype != LT_UNDEFINED) {
-		(*term->linetype)(fillstyle->border_linetype);
-		if (dimensions == 2)
-		    do_ellipse(2, &this_object->o.ellipse, 0);
-		else
-		    do_ellipse(3, &this_object->o.ellipse, 0);
-	    }
+	    if (need_fill_border(fillstyle))
+		    do_ellipse(dimensions, &this_object->o.ellipse, 0);
 	}
 
 	/* Must be a rectangle */    
@@ -1562,9 +1554,7 @@ place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *c
 	} else if (term->fillbox)
 	    (*term->fillbox) (style, x, y, w, h);
 
-	if (fillstyle->border_linetype != LT_NODRAW
-	&&  fillstyle->border_linetype != LT_UNDEFINED) {
-	    (*term->linetype)(fillstyle->border_linetype);
+	if (need_fill_border(fillstyle)) {
 	    (*term->move)   (x, y);
 	    (*term->vector) (x, y+h);
 	    (*term->vector) (x+w, y+h);
@@ -2010,9 +2000,7 @@ do_plot(struct curve_points *plots, int pcount)
 		/* Draw the bars first, so that the box will cover the bottom half */
 		if (histogram_opts.type == HT_ERRORBARS) {
 		    (term->linewidth)(histogram_opts.bar_lw);
-		    if (default_fillstyle.border_linetype > LT_NODRAW)
-			(term->linetype)(default_fillstyle.border_linetype);
-		    else
+		    if (!need_fill_border(&default_fillstyle))
 			(term->linetype)(this_plot->lp_properties.l_type);
 		    plot_bars(this_plot);
 		    term_apply_lp_properties(&(this_plot->lp_properties));
@@ -2034,11 +2022,8 @@ do_plot(struct curve_points *plots, int pcount)
 		    plot_betweencurves(this_plot);
 		else {
 		    plot_filledcurves(this_plot);
-		    if (this_plot->fill_properties.border_linetype == LT_NODRAW)
-			break;
-		    if (this_plot->fill_properties.border_linetype != LT_UNDEFINED)
-			(*t->linetype)(this_plot->fill_properties.border_linetype);
-		    plot_lines(this_plot);
+		    if (need_fill_border(&this_plot->fill_properties))
+			plot_lines(this_plot);
 		}
 		break;
 
@@ -3697,10 +3682,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    /* FIXME EAM - Is this still correct??? */
 		    if (strcmp(t->name, "fig") == 0) break;
 
-		    if (plot->fill_properties.border_linetype == LT_NODRAW)
-			break;
-		    if (plot->fill_properties.border_linetype != LT_UNDEFINED)
-			(*t->linetype)(plot->fill_properties.border_linetype);
+		    need_fill_border(&plot->fill_properties);
 		}
 
 		newpath();
@@ -3801,7 +3783,7 @@ plot_circles(struct curve_points *plot)
 		term_apply_lp_properties(&plot->lp_properties);
 	    do_arc(x,y, radius, 0., 360., style);
 	    if (withborder) {
-		(*term->linetype)(fillstyle->border_linetype);
+		need_fill_border(&plot->fill_properties);
 		do_arc(x,y, radius, 0., 360., 0);
 	    }
 	}
@@ -4107,9 +4089,7 @@ plot_c_bars(struct curve_points *plot)
 	    else
 		(*t->fillbox)(style, x, y, w, h);
 
-	    if ((plot->fill_properties.border_linetype != LT_NODRAW)
-	    &&  (plot->fill_properties.border_linetype != LT_UNDEFINED))
-		(*t->linetype)(plot->fill_properties.border_linetype);
+	    need_fill_border(&plot->fill_properties);
 	}
 
 	/* Draw whiskers and an open box */
@@ -5309,9 +5289,7 @@ do_key_sample(
 	    else
 		(*t->fillbox)(style,x,y,w,h);
 
-	    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
-		(*t->linetype)(fs->border_linetype);
-	    if (fs->border_linetype != LT_NODRAW) {
+	    if (need_fill_border(fs)) {
 		newpath();
 		draw_clip_line( xl + key_sample_left,  yl - key_entry_height/4,
 			    xl + key_sample_right, yl - key_entry_height/4);

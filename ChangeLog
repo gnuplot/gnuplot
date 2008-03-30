@@ -3,6 +3,11 @@
 	* src/contour.c src/pm3d.c src/plot2d.c src/datafile.c src/parse.c:
 	Yet more cleanup of dead code and outdated comments.
 
+	* src/misc.c (need_fill_border) src/misc.h src/graphics.c:
+	When "set style increment user" is in effect, apply it to the "border"
+	linetype of a fillstyle.  New helper routine need_fill_border() to
+	determine when this is needed and simplify the call sites.
+
 2008-03-30  Allin Cottrell <cottrell@wfu.edu>
 
 	* src/command.c (help_command): Fix incorrect nesting of #if clauses
