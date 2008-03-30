@@ -1,3 +1,8 @@
+2008-03-30  Allin Cottrell <cottrell@wfu.edu>
+
+	* src/command.c (help_command): Fix incorrect nesting of #if clauses
+	from removal of atari support.
+
 2008-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* NEWS config/README config/makefile.amg config/makefile.mto

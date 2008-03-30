@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.167 2008/03/29 23:52:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.168 2008/03/30 03:27:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2150,7 +2150,9 @@ help_command()
 /* patch by David J. Liu for getting GNUHELP from home directory */
 #  if (defined(__TURBOC__) && (defined(MSDOS) || defined(DOS386))) || defined(__DJGPP__)
 	help_ptr = HelpFile;
-#  endif			/* __TURBOC__ */
+#  else			/* __TURBOC__ */
+        help_ptr = HELPFILE;
+#  endif
 #ifdef OS2
   {
   /* look in the path where the executable lives */
