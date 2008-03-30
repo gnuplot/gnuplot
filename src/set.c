@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.269 2008/03/21 17:26:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.270 2008/03/29 23:39:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2051,7 +2051,7 @@ set_logscale()
 	c_token++;
 
 	if (!END_OF_COMMAND) {
-	    newbase = abs(real_expression());
+	    newbase = fabs(real_expression());
 	    if (newbase < 1.1)
 		int_error(c_token,
 			  "log base must be >= 1.1; logscale unchanged");
