@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.484 2008/03/30 03:03:29 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.485 2008/03/30 03:27:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2680,8 +2680,8 @@ Ffigure_candlesticks
  these whiskerbars extend the full horizontal width of the candlestick, but
  you can modify this by specifying a fraction of the full width.
 
- By default the rectangle is empty if (open > close), and filled with three
- vertical bars if (close > open). If filled-boxes support is present, then
+ By default the rectangle is empty if (open < close), and filled with three
+ vertical bars if (close < open). If filled-boxes support is present, then
  the rectangle is colored according to `set style fill <fillstyle>`.
  See `set bars` and `financebars`.  See also
 ^ <a href="http://gnuplot.sourceforge.net/demo/candlesticks.html">

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.255 2008/03/29 23:50:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.256 2008/03/31 01:47:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4117,6 +4117,14 @@ plot_c_bars(struct curve_points *plot)
 	    (*t->vector) (xhighM-d, ylowM);
 	}
 
+	/* draw two extra vertical bars to indicate open > close */
+	if (yopen > yclose) {
+	    (*t->move)   ( (xM + xlowM) / 2, ymin);
+	    (*t->vector) ( (xM + xlowM) / 2, ymax);
+	    (*t->move)   ( (xM + xhighM) / 2, ymin);
+	    (*t->vector) ( (xM + xhighM) / 2, ymax);
+	}
+
 	/* Reset to original color, if we changed it for the border */
 	if ((plot->fill_properties.fillstyle != FS_EMPTY) && term->fillbox) {
 	    if ((plot->fill_properties.border_linetype != LT_NODRAW)
@@ -4125,14 +4133,6 @@ plot_c_bars(struct curve_points *plot)
 		if (plot->lp_properties.use_palette)
 		    apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
 	    }
-	}
-
-	/* draw two extra vertical bars to indicate open > close */
-	if (yopen > yclose) {
-	    (*t->move)   ( (xM + xlowM) / 2, ymin);
-	    (*t->vector) ( (xM + xlowM) / 2, ymax);
-	    (*t->move)   ( (xM + xhighM) / 2, ymin);
-	    (*t->vector) ( (xM + xhighM) / 2, ymax);
 	}
 
 	prev = plot->points[i].type;
