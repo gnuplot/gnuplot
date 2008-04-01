@@ -8,7 +8,7 @@
 
 	* src/eval.c (update_gpval_variables) docs/gnuplot.doc:  Users can
 	clobber the pre-defined variables pi and NaN.  Provide permanent,
-	non-clobberable versions GPVAL_PI and GPVAL_NaN so that they can be
+	non-clobberable versions GPVAL_pi and GPVAL_NaN so that they can be
 	restored if necessary.
 
 2008-03-27  Petr Mikulik  <mikulik@physics.muni.cz>
