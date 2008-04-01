@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.48 2008/03/16 20:03:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.49 2008/03/30 03:27:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1507,7 +1507,10 @@ f_assign(union argument *arg)
     (void) pop(&a);	/* name of variable */
     
     if (a.type == STRING) {
-	struct udvt_entry *udv = add_udv_by_name(a.v.string_val);
+	struct udvt_entry *udv;
+	if (!strncmp(a.v.string_val,"GPVAL_",6) || !strncmp(a.v.string_val,"MOUSE_",6))
+	    int_error(NO_CARET,"Attempt to assign to a read-only variable");
+	udv = add_udv_by_name(a.v.string_val);
 	gpfree_string(&a);
 	if (!udv->udv_undef)
 	    gpfree_string(&(udv->udv_value));

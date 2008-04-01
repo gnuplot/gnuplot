@@ -11,6 +11,9 @@
 	non-clobberable versions GPVAL_PI and GPVAL_NaN so that they can be
 	restored if necessary.
 
+	* src/internal.c (f_assign):  Don't let the user assign new values to
+	internal variables GPVAL_* and MOUSE_*.
+
 2008-03-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_c_bars) docs/gnuplot.doc:  The docs state that if
