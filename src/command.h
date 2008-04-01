@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.40 2006/04/29 05:30:06 tlecomte Exp $
+ * $Id: command.h,v 1.41 2006/06/16 17:28:43 tlecomte Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -170,6 +170,7 @@ void system_command __PROTO((void));
 void test_command __PROTO((void));
 void update_command __PROTO((void));
 void do_shell __PROTO((void));
+void undefine_command __PROTO((void));
 
 /* Prototypes for functions exported by command.c */
 void extend_input_line __PROTO((void));

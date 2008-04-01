@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.144.2.7 2007/08/03 02:55:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.144.2.8 2008/01/10 16:08:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -516,6 +516,30 @@ define()
 #endif
 	udv->udv_value = result;
 	udv->udv_undef = FALSE;
+    }
+}
+
+
+void
+undefine_command()
+{
+    char key[MAX_ID_LEN+1];
+    struct udvt_entry **udv_ptr = &first_udv;
+    c_token++;
+    while (!END_OF_COMMAND) {
+	copy_str(key, c_token, MAX_ID_LEN);
+	if (strncmp(key, "GPVAL_", 6) && strncmp(key, "MOUSE_", 6)) {
+	    udv_ptr = &first_udv;
+	    while (*udv_ptr) {
+		if (!strcmp(key, (*udv_ptr)->udv_name)) {
+		    (*udv_ptr)->udv_undef = TRUE;
+		    gpfree_string(&((*udv_ptr)->udv_value));
+		    break;
+		}
+		udv_ptr = &((*udv_ptr)->next_udv);
+	    }
+	}
+	c_token++;
     }
 }
 

@@ -2,6 +2,7 @@ New features, changes and fixes in gnuplot version 4.2.4
 ===========================================================
 * NEW set absolute plot margins in screen coordinates
 * NEW "nocontours" keyword for splot
+* NEW "undefine foo" clears previously define user variable foo
 * FIX allow variable color from input file for "with boxes"
 * FIX don't run off the end of "set format" commands
 

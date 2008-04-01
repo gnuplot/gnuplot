@@ -1,3 +1,9 @@
+2008-04-01  Thomas Sefzick  <thse@users.sourceforge.net>
+
+	* src/tables.c src/command.c (undefine_command) src/command.h
+	docs/gnuplot.doc:  Introduce a new command 'undefine foo baz [...]'
+	that clears previously defined user variables "foo", "baz", ...
+
 2008-04-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (update_gpval_variables) docs/gnuplot.doc:  Users can
