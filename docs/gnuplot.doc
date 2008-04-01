@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.25 2008/03/20 09:39:34 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.26 2008/04/01 04:28:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -832,6 +832,8 @@ C
 
  The integer expression "1/0" may be used to generate an "undefined" flag,
  which causes a point to ignored; the `ternary` operator gives an example.
+ Or you can use the pre-defined variable NaN to achieve the same result.
+=NaN
 
  The real and imaginary parts of complex expressions are always real, whatever
  the form in which they are entered: in {3,2} the "3" and "2" are reals, not
@@ -1727,10 +1729,17 @@ C ... and restart the table:
  The final two examples illustrate a user-defined string variable and a
  user-defined string function.
 
- Note that the variable `pi` is already defined.  But it is in no way magic;
- you may redefine it to be whatever you like. Some other variables may be
- defined under various gnuplot operations like mousing in interactive terminals
- or fitting; see `gnuplot-defined variables` for details.
+=NaN
+=pi
+ Note that the variables `pi` (3.14159...) and `NaN` (IEEE "Not a Number") are
+ already defined.  You can redefine these to something else if you really need
+ to. The original values can be recovered by setting:
+
+       NaN = GPVAL_NaN
+       pi  = GPVAL_PI
+ 
+ Other variables may be defined under various gnuplot operations like mousing in
+ interactive terminals or fitting; see `gnuplot-defined variables` for details.
 
  You can check for existence of a given variable V by the exists("V")
  expression. For example
@@ -4019,6 +4028,8 @@ C ... and restart the table:
  which plots the datum in column two against that in column one provided
  the datum in column three exceeds ten.  `1/0` is undefined; `gnuplot`
  quietly ignores undefined points, so unsuitable points are suppressed.
+ Or you can use the pre-defined variable NaN to achieve the same result.
+=NaN
 
  In fact, you can use a constant expression for the column number, provided it
  doesn't start with an opening parenthesis; constructs like `using
@@ -10935,8 +10946,13 @@ C ... and restart the table:
 2 system
 ?commands system
 ?system
- `system` spawns shell to execute a command. Please type `help shell` for
- more details.
+ `system "command"` executes "command" using the standard shell. See `shell`.
+ If called as a function, `system("command")` returns the resulting character
+ stream from stdout as a string.  One optional trailing newline is ignored.
+
+ This can be used to import external functions into gnuplot scripts:
+ 
+       f(x) = real(system(sprintf("somecommand %f", x)))
 2 test
 ?commands test
 ?test palette
