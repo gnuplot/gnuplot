@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.168 2008/03/30 03:27:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.169 2008/03/30 15:53:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -528,6 +528,30 @@ define()
 	    gpfree_string(&udv->udv_value);
 	udv->udv_value = result;
 	udv->udv_undef = FALSE;
+    }
+}
+
+
+void
+undefine_command()
+{
+    char key[MAX_ID_LEN+1];
+    struct udvt_entry **udv_ptr = &first_udv;
+    c_token++;
+    while (!END_OF_COMMAND) {
+	copy_str(key, c_token, MAX_ID_LEN);
+	if (strncmp(key, "GPVAL_", 6) && strncmp(key, "MOUSE_", 6)) {
+	    udv_ptr = &first_udv;
+	    while (*udv_ptr) {
+		if (!strcmp(key, (*udv_ptr)->udv_name)) {
+		    (*udv_ptr)->udv_undef = TRUE;
+		    gpfree_string(&((*udv_ptr)->udv_value));
+		    break;
+		}
+		udv_ptr = &((*udv_ptr)->next_udv);
+	    }
+	}
+	c_token++;
     }
 }
 
@@ -1254,7 +1278,7 @@ print_command()
     int need_space = 0;
 
     if (!print_out) {
-        print_out = stderr;
+	print_out = stderr;
     }
     screen_ok = FALSE;
     do {
@@ -1348,7 +1372,7 @@ refresh_request()
 #define CHECK_REVERSE(axis) do {		\
     AXIS *ax = axis_array + axis;		\
     if ((ax->range_flags & RANGE_REVERSE)) {	\
-        double temp = ax->max;			\
+	double temp = ax->max;			\
 	ax->max = ax->min; ax->min = temp;	\
     } } while (0)
 
@@ -1756,8 +1780,8 @@ invalid_command()
       rc = ExecuteMacro(gp_input_line + token[c_token].start_index,
 	      token[c_token].length);
       if (rc == 0) {
-         c_token = num_tokens = 0;
-         return;
+	 c_token = num_tokens = 0;
+	 return;
       }
     }
 #endif
@@ -2151,7 +2175,7 @@ help_command()
 #  if (defined(__TURBOC__) && (defined(MSDOS) || defined(DOS386))) || defined(__DJGPP__)
 	help_ptr = HelpFile;
 #  else			/* __TURBOC__ */
-        help_ptr = HELPFILE;
+	help_ptr = HELPFILE;
 #  endif
 #ifdef OS2
   {
