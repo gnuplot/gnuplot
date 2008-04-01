@@ -1,3 +1,10 @@
+2008-04-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (update_gpval_variables) docs/gnuplot.doc:  Users can
+	clobber the pre-defined variables pi and NaN.  Provide permanent,
+	non-clobberable versions GPVAL_PI and GPVAL_NaN so that they can be
+	restored if necessary.
+
 2008-03-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_c_bars) docs/gnuplot.doc:  The docs state that if

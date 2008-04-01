@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.61 2008/01/10 04:37:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.62 2008/03/30 03:03:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -824,6 +824,16 @@ update_gpval_variables(int context)
 	v = add_udv_by_name("GPVAL_COMPILE_OPTIONS");
 	if (v && v->udv_undef == TRUE)
 	    fill_gpval_string("GPVAL_COMPILE_OPTIONS", compile_options);
+
+	/* Permanent copy of user-clobberable variables pi and NaN */
+	v = add_udv_by_name("GPVAL_PI");
+	v->udv_undef = FALSE; 
+	Gcomplex(&v->udv_value, M_PI, 0);
+#ifdef HAVE_ISNAN
+	v = add_udv_by_name("GPVAL_NaN");
+	v->udv_undef = FALSE; 
+	Gcomplex(&v->udv_value, atof("NaN"), 0);
+#endif
     }
 
     if (context == 3 || context == 4) {
