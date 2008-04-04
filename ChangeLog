@@ -1,3 +1,7 @@
+2008-04-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary): Yet one more place ymax -> ymax-1.
+
 2008-04-05  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/graphics.c (boundary): Missing cast to (int) for ytop.
