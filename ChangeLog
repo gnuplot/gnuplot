@@ -1,3 +1,17 @@
+2008-04-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary) src/color.c (draw_color_smooth_box):
+	The coding guide for terminals in term/README clearly states:
+	    xmax is the maximum number of points in the x direction.
+	    The range of points used by gnuplot is 0 to xmax-1.
+	The boundary calculations were instead scaling the right and top edges
+	to term->xmax and term->ymax, so in the absence of margins these two
+	border lines would lie off the edge of the plot.  This fix replaces
+	term-xmax with term->xmax-1 in the boundary calculations, similarly for
+	ymax. It does not work perfectly for terminals with down-sampling
+	(wxt, cairo), but the previous code wasn't working either.
+	Bug #1929002
+
 2008-04-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c docs/gnuplot.doc: Change name from GPVAL_PI to GPVAL_pi

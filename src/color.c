@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.80 2008/03/03 18:02:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.81 2008/03/13 20:02:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -544,8 +544,8 @@ draw_color_smooth_box(int plot_mode)
 	    /* But in full 3D mode we only allow screen coordinates */
 	    cb_x_from = color_box.origin.x * (term->xmax) + 0.5;
 	    cb_y_from = color_box.origin.y * (term->ymax) + 0.5;
-	    cb_x_to = color_box.size.x * (term->xmax) + 0.5;
-	    cb_y_to = color_box.size.y * (term->ymax) + 0.5;
+	    cb_x_to = color_box.size.x * (term->xmax-1) + 0.5;
+	    cb_y_to = color_box.size.y * (term->ymax-1) + 0.5;
 	}
 	cb_x_to += cb_x_from;
 	cb_y_to += cb_y_from;

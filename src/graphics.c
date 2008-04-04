@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.256 2008/03/31 01:47:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.257 2008/04/01 04:22:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -451,12 +451,11 @@ boundary(struct curve_points *plots, int count)
     /* compute plot_bounds.ytop from the various components
      *     unless tmargin is explicitly specified  */
 
-    /* HBB 20010118: fix round-off bug */
-    plot_bounds.ytop = (int) (0.5 + (ysize + yoffset) * t->ymax);
+    plot_bounds.ytop = (int) (0.5 + (ysize + yoffset) * (t->ymax-1));
 
     if (tmargin.scalex == screen) {
 	/* Specified as absolute position on the canvas */
-	plot_bounds.ytop -= (1.0 - tmargin.x) * (float)t->ymax + 0.5;
+	plot_bounds.ytop -= (1.0 - tmargin.x) * (float)(t->ymax-1);
     } else if (tmargin.x >=0) {
 	/* Specified in terms of character height */
 	plot_bounds.ytop -= tmargin.x * (float)t->v_char + 0.5;
@@ -477,7 +476,7 @@ boundary(struct curve_points *plots, int count)
 	    top_margin += (int) t->v_char;
 
 	plot_bounds.ytop -= top_margin;
-	if (plot_bounds.ytop == (int) (0.5 + (ysize + yoffset) * t->ymax)) {
+	if (plot_bounds.ytop >= (ysize + yoffset) * t->ymax) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    plot_bounds.ytop -= (int) (t->h_char * 2);
 	}
@@ -488,7 +487,7 @@ boundary(struct curve_points *plots, int count)
 
     /*{{{  preliminary plot_bounds.xleft, needed for "under" */
     if (lmargin.scalex == screen)
-	plot_bounds.xleft = (xoffset + lmargin.x) * (float)t->xmax + 0.5;
+	plot_bounds.xleft = (xoffset + lmargin.x) * (float)t->xmax;
     else
 	plot_bounds.xleft = xoffset * t->xmax
 			  + t->h_char * (lmargin.x >= 0 ? lmargin.x : 2);
@@ -497,9 +496,9 @@ boundary(struct curve_points *plots, int count)
 
     /*{{{  tentative plot_bounds.xright, needed for "under" */
     if (rmargin.scalex == screen)
-	plot_bounds.xright = (xoffset + rmargin.x) * (float)t->xmax + 0.5;
+	plot_bounds.xright = (xoffset + rmargin.x) * (float)(t->xmax - 1);
     else
-	plot_bounds.xright = (xsize + xoffset) * t->xmax
+	plot_bounds.xright = (xsize + xoffset) * (t->xmax - 1)
 			   - t->h_char * (rmargin.x >= 0 ? rmargin.x : 2);
     /*}}} */
 
@@ -577,11 +576,11 @@ boundary(struct curve_points *plots, int count)
     /* compute plot_bounds.ybot from the various components
      *     unless bmargin is explicitly specified  */
 
-    plot_bounds.ybot = yoffset * (float)t->ymax + 0.5;
+    plot_bounds.ybot = yoffset * (float)t->ymax;
 
     if (bmargin.scalex == screen) {
 	/* Absolute position for bottom of plot */
-	plot_bounds.ybot += bmargin.x * (float)t->ymax + 0.5;
+	plot_bounds.ybot += bmargin.x * (float)t->ymax;
     } else if (bmargin.x >= 0) {
 	/* Position based on specified character height */
 	plot_bounds.ybot += bmargin.x * (float)t->v_char + 0.5;
@@ -593,7 +592,7 @@ boundary(struct curve_points *plots, int count)
 	    plot_bounds.ybot += timebot_textheight;
 	/* HBB 19990616: round to nearest integer, required to escape
 	 * floating point inaccuracies */
-	if (plot_bounds.ybot == (int) (0.5 + t->ymax * yoffset)) {
+	if (plot_bounds.ybot == (int) (t->ymax * yoffset)) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    plot_bounds.ybot += (int) (t->h_char * 2);
 	}
@@ -605,9 +604,9 @@ boundary(struct curve_points *plots, int count)
      * I don't understand why this is necessary, but it is.
      * Didn't we already do this at line 488ff, and then add colorbox? */
     if (lmargin.scalex != screen)
-	plot_bounds.xleft = xoffset * t->xmax + 0.5;
+	plot_bounds.xleft = xoffset * t->xmax;
     if (rmargin.scalex != screen)
-	plot_bounds.xright = (xsize + xoffset) * t->xmax + 0.5;
+	plot_bounds.xright = (xsize + xoffset) * (t->xmax-1) + 0.5;
 
     if (lkey) {
 	TBOOLEAN key_panic = FALSE;
@@ -824,7 +823,7 @@ boundary(struct curve_points *plots, int count)
 	if (!vertical_timelabel
 	    && plot_bounds.xleft - ytic_width - ytic_textwidth < -(int) (tmpx))
 	    plot_bounds.xleft = ytic_width + ytic_textwidth - (int) (tmpx);
-	if (plot_bounds.xleft == (int) (0.5 + t->xmax * xoffset)) {
+	if (plot_bounds.xleft == (int) (t->xmax * xoffset)) {
 	    /* make room for end of xtic or x2tic label */
 	    plot_bounds.xleft += (int) (t->h_char * 2);
 	}
@@ -890,7 +889,7 @@ boundary(struct curve_points *plots, int count)
 	    if (y2label_textwidth > 0)
 		plot_bounds.xright -= y2label_textwidth;
 
-	    if (plot_bounds.xright == (int) (0.5 + t->xmax * (xsize + xoffset))) {
+	    if (plot_bounds.xright == (int) (0.5 + (t->xmax - 1) * (xsize + xoffset))) {
 		/* make room for end of xtic or x2tic label */
 		plot_bounds.xright -= (int) (t->h_char * 2);
 	    }
@@ -1147,7 +1146,7 @@ boundary(struct curve_points *plots, int count)
 	    keybox.xr = keybox.xl + key_w;
 	} else if (key->margin == GPKEY_RMARGIN) {
 	    /* align right first since rmargin may be manual */
-	    keybox.xr = (xsize + xoffset) * t->xmax - t->h_char;
+	    keybox.xr = (xsize + xoffset) * (t->xmax-1) - t->h_char;
 	    keybox.xl = keybox.xr - key_w;
 	} else {
 	    if (key->hpos == LEFT) {
@@ -5008,8 +5007,6 @@ map_position_double(
     case screen:
 	{
 	    struct termentry *t = term;
-	    /* HBB 20000914: Off-by-one bug. Max. allowable result is
-	     * t->xmax - 1, not t->xmax ! */
 	    *x = pos->x * (t->xmax - 1);
 	    break;
 	}
@@ -5041,8 +5038,6 @@ map_position_double(
     case screen:
 	{
 	    struct termentry *t = term;
-	    /* HBB 20000914: Off-by-one bug. Max. allowable result is
-	     * t->ymax - 1, not t->ymax ! */
 	    *y = pos->y * (t->ymax -1);
 	    break;
 	}
@@ -5118,8 +5113,6 @@ map_position_r(
     case screen:
 	{
 	    struct termentry *t = term;
-	    /* HBB 20000914: Off-by-one bug. Max. allowable result is
-	     * t->ymax - 1, not t->ymax ! */
 	    *y = pos->y * (t->ymax -1);
 	    return;
 	}
