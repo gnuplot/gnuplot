@@ -18,6 +18,12 @@
 	rather than fixed arrays.
 	Bug #1935919
 
+	* src/datafile.c (expect_string):  Dead code (test is invariably false)
+	* docs/gnuplot.doc: Remove redundant links to shell/system section
+	* term/emf.trm: Remove dead code
+	* term/pbm.trm: Document that output image size is padded to nearest
+	  multiple of 8 pixels on both x and y.
+
 2008-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Yet one more place ymax -> ymax-1.
