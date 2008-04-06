@@ -1,3 +1,14 @@
+2008-04-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_set_font): Avoid segfault if the font name is longer
+	than 32 characters.  The {ai grass next openstep} terminals suffer from
+	this same problem, but since they are moribund just let it go.
+	Bug #1935919
+
+	* term/gd.trm: Track ttf font names using dynamically-allocated strings
+	rather than fixed arrays.
+	Bug #1935919
+
 2008-04-01  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* src/tables.c src/command.c (undefine_command) src/command.h
