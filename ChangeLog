@@ -14,6 +14,10 @@
 	the same problem, but since they are moribund just let it go.
 	Bug #1935919
 
+	* term/gd.trm: Track ttf font names using dynamically-allocated strings
+	rather than fixed arrays.
+	Bug #1935919
+
 2008-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Yet one more place ymax -> ymax-1.

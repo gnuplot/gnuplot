@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.123 2007/12/21 07:57:33 sfeam Exp $
+ * $Id: gd.trm,v 1.124 2008/02/24 19:49:38 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -237,9 +237,9 @@ static struct {
     int linewidth;
     TBOOLEAN capbutt;  /* use capbutt on lines with GD2, 20051205 MWS*/
     int ttfsize;
-    char ttffont[64];
+    char *ttffont;
     gdFontPtr default_font;
-    char      default_ttffont[64];
+    char *    default_ttffont;
     int       default_ttfsize;
     TBOOLEAN  TrueColor;
     /* Variables for animated gif support: */
@@ -626,8 +626,8 @@ PNG_options()
 	png_state.default_font = gdfont;
 	png_state.n_colors = 0;
 	png_state.flags = 0;
-	png_state.ttffont[0] = '\0';
-	png_state.default_ttffont[0] = '\0';
+	png_state.ttffont = NULL;
+	png_state.default_ttffont = NULL;
 	png_state.default_ttfsize = 0;
 	png_state.justify = CENTRE;
 	png_state.TrueColor = FALSE;
@@ -697,7 +697,8 @@ PNG_options()
 	case PNG_TINY:
 #ifdef HAVE_GD_TTF
 # define UNSET_TTF_FONT \
-	    png_state.ttffont[0] = png_state.default_ttffont[0] = '\0'; \
+	    free(png_state.ttffont); \
+	    png_state.ttffont = NULL; \
 	    png_state.default_ttfsize = 2 * term->h_char - 2;
 #else
 # define UNSET_TTF_FONT \
@@ -741,7 +742,8 @@ PNG_options()
 	    c_token++;
 #ifdef HAVE_GD_TTF
 	    if (END_OF_COMMAND) {
-		png_state.ttffont[0] = '\0';
+		free(png_state.ttffont);
+		png_state.ttffont = NULL;
 		png_state.default_ttfsize = 0;
 	    } else {
 		int brect[8];
@@ -756,14 +758,18 @@ PNG_options()
 			png_state.ttfsize = png_state.default_ttfsize;
 			*comma = '\0';
 		    }
-		    if (*s)
-			strncpy(png_state.ttffont, s, sizeof(png_state.ttffont)-1);
-		    free(s);
+		    if (*s) {
+			free(png_state.ttffont);
+			png_state.ttffont = s;
+		    }
 		} else {
-		    copy_str(png_state.ttffont, c_token, sizeof(png_state.ttffont)-1);
+		    free(png_state.ttffont);
+		    png_state.ttffont = gp_alloc(token_len(c_token)+1,"new font");
+		    copy_str(png_state.ttffont, c_token, token_len(c_token)+1);
 		    c_token++;
 		}
-		strncpy(png_state.default_ttffont, png_state.ttffont, sizeof(png_state.ttffont));
+		free(png_state.default_ttffont);
+		png_state.default_ttffont = gp_strdup(png_state.ttffont);
 		err = gdImageStringFT(NULL, &brect[0], 0,
 			png_state.ttffont, (double)png_state.ttfsize,
 			0.0, 0, 0, "test");
@@ -771,8 +777,10 @@ PNG_options()
 			fprintf(stderr,
 				"%s when opening font %s, using default\n",
 				err, png_state.ttffont);
-			png_state.ttffont[0] = png_state.default_ttffont[0]
-			    = '\0';
+			free(png_state.ttffont);
+			free(png_state.default_ttffont);
+			png_state.ttffont = NULL;
+			png_state.default_ttffont = NULL;
 		}
 	    }
 #else
@@ -931,13 +939,14 @@ PNG_options()
 #ifdef HAVE_GD_TTF
     /* If no font has been chosen but there is a default, use it */
     /* EAM FIXME - this is a duplication of code from above */
-    if (!png_state.ttffont[0]) {
+    if (!png_state.ttffont) {
 	char *external_default = getenv("GNUPLOT_DEFAULT_GDFONT");
 	if (external_default) {
 		int brect[8];
 		char *err;
-		strncpy(png_state.ttffont, external_default, sizeof(png_state.ttffont));
-		strncpy(png_state.default_ttffont, png_state.ttffont, sizeof(png_state.default_ttffont));
+		png_state.ttffont = gp_strdup(external_default);
+		free(png_state.default_ttffont);
+		png_state.default_ttffont = gp_strdup(png_state.ttffont);
 		if (png_state.default_ttfsize == 0)
 			png_state.default_ttfsize = 2 * term->h_char - 2;
 		err = gdImageStringFT(NULL, &brect[0], 0,
@@ -946,7 +955,10 @@ PNG_options()
 		if (err) {
 			fprintf(stderr,"%s when opening font %s, using default\n",
 				err, png_state.ttffont);
-			png_state.ttffont[0] = png_state.default_ttffont[0] = '\0';
+			free(png_state.ttffont);
+			free(png_state.default_ttffont);
+			png_state.ttffont = NULL;
+			png_state.default_ttffont = NULL;
 		}
 	}
     }
@@ -958,7 +970,7 @@ PNG_options()
 
     /* Find approximate character width of selected TTF font   */
     /* This is needed in order to set appropriate border width */
-    if (png_state.default_ttffont[0]) {
+    if (png_state.default_ttffont) {
 	int brect[8];
 	char *err;
 	err = gdImageStringFT(NULL, &brect[0], 0,
@@ -998,7 +1010,7 @@ PNG_options()
 	strcat(term_options, "enhanced ");
     }
 
-    if (png_state.ttffont[0]) {
+    if (png_state.ttffont) {
 	sprintf(term_options + strlen(term_options),
 		"font %s %d ", png_state.ttffont, png_state.ttfsize);
     } else switch (term->h_char) {
@@ -1569,7 +1581,7 @@ PNG_linewidth(double linewidth)
 TERM_PUBLIC void
 PNG_put_text(unsigned int x, unsigned int y, const char *string)
 {
-    if (*png_state.ttffont) {
+    if (png_state.ttffont) {
 	int brect[8]; char *err;
 	/* Draw once with a NULL image to get the bounding rectangle */
 	/* then draw it again, centered.                             */
@@ -1752,10 +1764,10 @@ PNG_point(unsigned int x, unsigned int y, int number)
 TERM_PUBLIC int
 PNG_set_font(const char *fontname)
 {
-    char name[32];
     int  sep;
     int  size;
     gdFontPtr font = png_state.default_font;
+    char *name = gp_strdup(fontname);
 
     sep = strcspn(fontname,",");
     strncpy(name,fontname,sep);
@@ -1775,13 +1787,16 @@ PNG_set_font(const char *fontname)
 	font = gdFontTiny;
     else if (*name) {
 	/* New ttf font */
-	strncpy(png_state.ttffont, name, sizeof(png_state.ttffont));
+	free(png_state.ttffont);
+	png_state.ttffont = gp_strdup(name);
 	png_state.ttfsize = size;
     } else {
 	/* Restore initial default font */
-	strncpy(png_state.ttffont,png_state.default_ttffont,sizeof(png_state.ttffont));
+	free(png_state.ttffont);
+	png_state.ttffont = gp_strdup(png_state.default_ttffont);
 	png_state.ttfsize = png_state.default_ttfsize;
     }
+    free(name);
 
     png_state.font  = font;
     png_state.charw = font->w;
@@ -1792,7 +1807,7 @@ PNG_set_font(const char *fontname)
     term->v_char = font->h;
 #ifdef HAVE_GD_TTF
     /* Find approximate character width and height of selected TTF font */
-    if (*png_state.ttffont) {
+    if (png_state.ttffont) {
 	int brect[8];
 	char *err;
 	err = gdImageStringFT(NULL, &brect[0], 0,
