@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.229 2008/02/24 19:49:41 sfeam Exp $
+ * $Id: post.trm,v 1.230 2008/03/13 18:01:27 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2066,7 +2066,7 @@ PS_justify_text(enum JUSTIFY mode)
 TERM_PUBLIC int
 PS_set_font(const char *font)
 {
-    char name[32];
+    char *name;
     unsigned int  i;
     float size;
     size_t sep;
@@ -2074,7 +2074,7 @@ PS_set_font(const char *font)
     if (!font || !(*font))
 	font = PS_default_font;
     sep = strcspn(font,",");
-    strncpy(name,font,sep);
+    name = gp_strdup(font);
     name[sep] = NUL;
     for (i=0; i<sep; i++)
 	if (name[i] == ' ') name[i] = '-';
@@ -2089,6 +2089,7 @@ PS_set_font(const char *font)
 	fprintf(gppsfile, "/%s findfont %g scalefont setfont\n",
 		name, size*PS_SC);
     }
+    free(name);
 
     term->v_char = (unsigned int)(size*PS_SC);
     term->h_char = (unsigned int)(size*PS_SC*6/10);

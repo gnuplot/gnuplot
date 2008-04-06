@@ -9,6 +9,11 @@
 	Deletion previous ugly code to approximate this for binary files.
 	Bug #1929227
 
+	* term/post.trm (PS_set_font): Avoid segfault if the font name is longer
+	than 32 characters.  The {ai grass next openstep} terminals suffer from
+	the same problem, but since they are moribund just let it go.
+	Bug #1935919
+
 2008-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Yet one more place ymax -> ymax-1.
