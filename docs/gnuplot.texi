@@ -895,7 +895,7 @@ followed by another command file "trailer":
 
 @cindex command-line-editing
 
-Command-line editing is supported by the Unix, Atari, VMS, MS-DOS and OS/2
+Command-line editing is supported by the Unix, VMS, MS-DOS and OS/2
 versions of `gnuplot`.  Also, a history mechanism allows previous commands to
 be edited and re-executed.  After the command line has been edited, a newline
 or carriage return will enter the entire line without regard to where the
@@ -945,7 +945,7 @@ for line editing.  The default makefile assumes that this is the case;  by
 default `gnuplot` will be compiled with no line-editing capability.  If you
 want to use `gnuplot`'s line editing, set READLINE in the makefile and add
 readline.obj to the link file.  The following arrow keys may be used on the
-IBM PC and Atari versions if readline is used:
+IBM PC versions if readline is used:
 
 
 @example
@@ -955,20 +955,6 @@ IBM PC and Atari versions if readline is used:
       Ctrl Right Arrow - same as ^E.
       Up    Arrow      - same as ^P.
       Down  Arrow      - same as ^N.
-
-@end example
-
-
-The Atari version of readline defines some additional key aliases:
-
-
-@example
-      Undo            - same as ^L.
-      Home            - same as ^A.
-      Ctrl Home       - same as ^E.
-      Esc             - same as ^U.
-      Help            - @ref{help} plus return.
-      Ctrl Help       - @ref{help}.
 
 @end example
 
@@ -1195,7 +1181,7 @@ used.  This overrides any terminal type sensed by `gnuplot` on start-up, but
 is itself overridden by the .gnuplot (or equivalent) start-up file
 (see `start-up`) and, of course, by later explicit changes.
 
-On Unix, AmigaOS, AtariTOS, MS-DOS and OS/2, GNUHELP may be defined to be the
+On Unix, AmigaOS, MS-DOS and OS/2, GNUHELP may be defined to be the
 pathname of the HELP file (gnuplot.gih).
 
 On VMS, the logical name GNUPLOT$HELP should be defined as the name of the
@@ -1204,14 +1190,14 @@ help library, allowing access to help from both within and outside `gnuplot`
 if desired.
 
 On Unix, HOME is used as the name of a directory to search for a .gnuplot
-file if none is found in the current directory.  On AmigaOS, AtariTOS,
+file if none is found in the current directory.  On AmigaOS,
 MS-DOS, Windows and OS/2, GNUPLOT is used.  On Windows, the NT-specific
 variable USERPROFILE is tried, too. VMS, SYS$LOGIN: is used. Type `help
 start-up`.
 
 On Unix, PAGER is used as an output filter for help messages.
 
-On Unix, AtariTOS and AmigaOS, SHELL is used for the @ref{shell} command.  On
+On Unix and AmigaOS, SHELL is used for the @ref{shell} command.  On
 MS-DOS and OS/2, COMSPEC is used for the @ref{shell} command.
 
 On MS-DOS, if the BGI or Watcom interface is used, PCTRM is used to tell
@@ -1276,6 +1262,9 @@ determine if your system chooses -2 or -3 as the answer.
 
 The integer expression "1/0" may be used to generate an "undefined" flag,
 which causes a point to ignored; the `ternary` operator gives an example.
+Or you can use the pre-defined variable NaN to achieve the same result.
+@cindex NaN
+
 
 The real and imaginary parts of complex expressions are always real, whatever
 the form in which they are entered: in @{3,2@} the "3" and "2" are reals, not
@@ -1334,6 +1323,9 @@ defaults to radians.
 * atan::                        
 * atan2::                       
 * atanh::                       
+* EllipticK::                   
+* EllipticE::                   
+* EllipticPi::                  
 * besj0::                       
 * besj1::                       
 * besy0::                       
@@ -1389,6 +1381,7 @@ defaults to radians.
 * tm_yday::                     
 * tm_year::                     
 * valid::                       
+* elliptic_integrals::          
 * Random_number_generator::     
 @end menu
 
@@ -1494,7 +1487,7 @@ The `atan2(y,x)` function returns the arc tangent (inverse tangent) of the
 ratio of the real parts of its arguments.  @ref{atan2} returns its argument in
 radians or degrees, as selected by @ref{angles}, in the correct quadrant.
 
-@node atanh, besj0, atan2, Functions
+@node atanh, EllipticK, atan2, Functions
 @subsubsection atanh
 
 @c ?expressions functions atanh
@@ -1506,7 +1499,22 @@ radians or degrees, as selected by @ref{angles}, in the correct quadrant.
 The `atanh(x)` function returns the inverse hyperbolic tangent of its
 argument in radians.
 
-@node besj0, besj1, atanh, Functions
+@node EllipticK, EllipticE, atanh, Functions
+@subsubsection EllipticK
+
+See `elliptic integrals`.
+
+@node EllipticE, EllipticPi, EllipticK, Functions
+@subsubsection EllipticE
+
+See `elliptic integrals`.
+
+@node EllipticPi, besj0, EllipticE, Functions
+@subsubsection EllipticPi
+
+See `elliptic integrals`.
+
+@node besj0, besj1, EllipticPi, Functions
 @subsubsection besj0
 
 @c ?expressions functions besj0
@@ -1998,7 +2006,6 @@ See `time_specifiers` and @ref{strftime}.
 
 @c ?expressions functions system
 @c ?functions system
-@c ?system function
 @cindex system
 @cmindex system
 
@@ -2228,7 +2235,7 @@ as a real.
 The @ref{tm_year} function interprets its argument as a time, in seconds from
 1 Jan 2000.  It returns the year (an integer) as a real.
 
-@node valid, Random_number_generator, tm_year, Functions
+@node valid, elliptic_integrals, tm_year, Functions
 @subsubsection valid
 
 @c ?expressions functions valid
@@ -2240,12 +2247,33 @@ The @ref{tm_year} function interprets its argument as a time, in seconds from
 `valid(x)` may be used only in expressions as part of @ref{using} manipulations
 to fits or datafile plots.  See @ref{using}.
 
-See also
-@uref{http://www.gnuplot.info/demo/airfoil.html,airfoil.dem: use of functions and complex variables for airfoils demo.
-}
 
 
-@node Random_number_generator,  , valid, Functions
+@node elliptic_integrals, Random_number_generator, valid, Functions
+@subsubsection elliptic integrals
+
+@c ?expressions functions elliptic integrals
+@c ?functions elliptic integrals
+@c ?elliptic integrals
+@cindex elliptic integrals
+@findex elliptic integrals
+
+
+The `EllipticK(k)` function returns the complete elliptic integral of the first
+kind, i.e. the definite integral between 0 and pi/2 of the function
+`(1-(k*sin(p))**2)**(-0.5)`.  The domain of `k` is -1 to 1 (exclusive).
+
+The `EllipticE(k)` function returns the complete elliptic integral of the
+second kind, i.e. the definite integral between 0 and pi/2 of the function
+`(1-(k*sin(p))**2)**0.5`.  The domain of `k` is -1 to 1 (inclusive).
+
+The `EllipticPi(n,k)` function returns the complete elliptic integral of the
+third kind, i.e. the definite integral between 0 and pi/2 of the function 
+`(1-(k*sin(p))**2)**(-0.5)/(1-n*sin(p)**2)`.  The parameter `n` must be less
+than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
+definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
+
+@node Random_number_generator,  , elliptic_integrals, Functions
 @subsubsection Random number generator
 
 @c ?expressions random
@@ -2521,10 +2549,22 @@ Examples:
 The final two examples illustrate a user-defined string variable and a
 user-defined string function.
 
-Note that the variable `pi` is already defined.  But it is in no way magic;
-you may redefine it to be whatever you like. Some other variables may be
-defined under various gnuplot operations like mousing in interactive terminals
-or fitting; see @ref{variables} for details.
+@cindex NaN
+
+@cindex pi
+
+Note that the variables `pi` (3.14159...) and `NaN` (IEEE "Not a Number") are
+already defined.  You can redefine these to something else if you really need
+to. The original values can be recovered by setting:
+
+@example
+      NaN = GPVAL_NaN
+      pi  = GPVAL_pi
+
+@end example
+
+Other variables may be defined under various gnuplot operations like mousing in
+interactive terminals or fitting; see @ref{variables} for details.
 
 You can check for existence of a given variable V by the exists("V")
 expression. For example
@@ -3001,7 +3041,7 @@ When `gnuplot` is run, it looks for an initialization file to load.
 This file is called `.gnuplot` on Unix and AmigaOS systems, and
 `GNUPLOT.INI` on other systems.  If this file is not found in the
 current directory, the program will look for it in the HOME directory
-(under AmigaOS, Atari(single)TOS, MS-DOS, Windows and OS/2, the
+(under AmigaOS, MS-DOS, Windows and OS/2, the
 environment variable `GNUPLOT` should contain the name of this
 directory; on Windows NT, it will use `USERPROFILE` if GNUPLOT isn't
 defined).  Note: if NOCWDRC is defined during the installation,
@@ -3101,7 +3141,7 @@ preceded by @@ (ascii character 64).
 @c ?substitution backquotes
 @cindex backquotes
 
-@c ?system commands
+@c ?shell commands
 Command-line substitution is specified by a system command enclosed in
 backquotes.  This command is spawned and the output it produces replaces
 the backquoted text on the command line.  Some implementations also support
@@ -3649,8 +3689,8 @@ plots, then add the keyword `whiskerbars` to the plot command.  By default
 these whiskerbars extend the full horizontal width of the candlestick, but
 you can modify this by specifying a fraction of the full width.
 
-By default the rectangle is empty if (open > close), and filled with three
-vertical bars if (close > open). If filled-boxes support is present, then
+By default the rectangle is empty if (open < close), and filled with three
+vertical bars if (close < open). If filled-boxes support is present, then
 the rectangle is colored according to `set style fill <fillstyle>`.
 See @ref{bars} and @ref{financebars}.  See also
 @uref{http://gnuplot.sourceforge.net/demo/candlesticks.html,finance demos
@@ -4594,6 +4634,7 @@ vertical bar (|) separates mutually exclusive choices.
 * splot::                       
 * system_::                     
 * test::                        
+* undefine::                    
 * unset::                       
 * update::                      
 @end menu
@@ -4843,13 +4884,12 @@ a variable named like the parameter, but with "_err" appended.  Thus the
 errors can be used as input for further computations.
 
 The fit may be interrupted by pressing Ctrl-C (any key but Ctrl-C under
-MSDOS and Atari Multitasking Systems).  After the current iteration
-completes, you have the option to (1) stop the fit and accept the current
-parameter values, (2) continue the fit, (3) execute a `gnuplot` command
-as specified by the environment variable FIT_SCRIPT.  The default for
-FIT_SCRIPT is @ref{replot}, so if you had previously plotted both the data
-and the fitting function in one graph, you can display the current state
-of the fit.
+MSDOS).  After the current iteration completes, you have the option to
+(1) stop the fit and accept the current parameter values,
+(2) continue the fit, (3) execute a `gnuplot` command as specified by the
+environment variable FIT_SCRIPT.  The default for FIT_SCRIPT is @ref{replot},
+so if you had previously plotted both the data and the fitting function in
+one graph, you can display the current state of the fit.
 
 Once `fit` has finished, the @ref{update} command may be used to store final
 values in a file for subsequent use as a parameter file.   See @ref{update}
@@ -6810,6 +6850,9 @@ One trick is to use the ternary `?:` operator to filter data:
 which plots the datum in column two against that in column one provided
 the datum in column three exceeds ten.  `1/0` is undefined; `gnuplot`
 quietly ignores undefined points, so unsuitable points are suppressed.
+Or you can use the pre-defined variable NaN to achieve the same result.
+@cindex NaN
+
 
 In fact, you can use a constant expression for the column number, provided it
 doesn't start with an opening parenthesis; constructs like `using
@@ -14823,9 +14866,7 @@ or
 
 @end example
 
-
 prints a directory listing and then returns to `gnuplot`.
-
 
 Other examples of the former syntax:
 @example
@@ -14833,10 +14874,6 @@ Other examples of the former syntax:
        print=1; if (print) replot; set out; system "lpr x.ps"
 
 @end example
-
-On an Atari, the `!` command first checks whether a shell is already loaded
-and uses it, if available.  This is practical if `gnuplot` is run from
-`gulam`, for example.
 
 @node splot, system_, shell, Commands
 @section splot
@@ -15261,10 +15298,18 @@ formatting capabilities.
 @cmindex system
 
 
-`system` spawns shell to execute a command. Please type @ref{shell} for
-more details.
+`system "command"` executes "command" using the standard shell. See @ref{shell}.
+If called as a function, `system("command")` returns the resulting character
+stream from stdout as a string.  One optional trailing newline is ignored.
 
-@node test, unset, system_, Commands
+This can be used to import external functions into gnuplot scripts:
+
+@example
+      f(x) = real(system(sprintf("somecommand %f", x)))
+
+@end example
+
+@node test, undefine, system_, Commands
 @section test
 
 @c ?commands test
@@ -15287,12 +15332,32 @@ using.
 
 @ref{palette} draws graphically profiles R(z),G(z),B(z), where 0<=z<=1, as
 calculated by the current color @ref{palette}. In other words, it is a beautiful
-plot you would have to do yourself with the result of `show palette palette 256 float`.
+plot you would have to construct from the result of `show palette palette 256 float`.
 The optional parameter, a permutation of letters rgb, determines the sequence of
 r,g,b profiles drawn one after the other --- try this yourself for `set palette
 gray`. The default sequence is rgb.
 
-@node unset, update, test, Commands
+@node undefine, unset, test, Commands
+@section undefine
+
+@c ?commands undefine
+@cindex undefine
+@cmindex undefine
+
+
+Clear one or more previously defined user variables.  This is useful in order
+to reset the state of a script containing an initialization test.
+
+Example:
+
+@example
+      undefine foo foo1 foo2
+      if (!exists("foo")) load "initialize.gp"
+
+@end example
+
+
+@node unset, update, undefine, Commands
 @section unset
 
 @c ?commands unset
@@ -15378,8 +15443,6 @@ with no modifiers.
 * amiga::                       
 * apollo::                      
 * aqua::                        
-* atari_ST_(via_AES)::          
-* atari_ST_(via_VDI)::          
 * be::                          
 * cgi::                         
 * cgm::                         
@@ -15419,7 +15482,6 @@ with no modifiers.
 * mp::                          
 * mgr::                         
 * mif::                         
-* mtos::                        
 * next::                        
 * Openstep_(next)::             
 * pbm::                         
@@ -15564,7 +15626,7 @@ with rescaling after window resizing.  It has no options.
 
 If a fixed-size window is desired, the `gpr` terminal may be used instead."
 
-@node aqua, atari_ST_(via_AES), apollo, terminal_
+@node aqua, be, apollo, terminal_
 @subsubsection aqua
 
 @c ?commands set terminal aqua
@@ -15603,92 +15665,7 @@ Lines can be drawn either solid or dashed, (default is solid) and the dash
 spacing can be modified by <dashlength> which is a multiplier > 0.
 
 
-@node atari_ST_(via_AES), atari_ST_(via_VDI), aqua, terminal_
-@subsubsection atari ST (via AES)
-
-@c ?commands set terminal atari
-@c ?set terminal atari
-@c ?set term atari
-@c ?terminal atari
-@c ?term atari
-@cindex atari
-@tmindex atari
-
-
-The `atari` terminal has options to set the character size and the screen
-colors.
-
-Syntax:
-@example
-      set terminal atari @{<fontsize>@} @{<col0> <col1> ... <col15>@}
-
-@end example
-
-The character size must appear if any colors are to be specified.  Each of
-the (up to 16) colors is given as a three-digit hex number, where the digits
-represent RED, GREEN and BLUE (in that order).  The range of 0--15 is scaled
-to whatever color range the screen actually has.  On a normal ST screen, odd
-and even intensities are the same.
-
-Examples:
-@example
-      set terminal atari 4    # use small (6x6) font
-      set terminal atari 6 0  # set monochrome screen to white on black
-      set terminal atari 13 0 fff f00 f0 f ff f0f
-                 # set first seven colors to black, white, red, green,
-                 # blue, cyan, and purple and use large font (8x16).
-
-@end example
-
-Additionally, if an environment variable GNUCOLORS exists, its contents are
-interpreted as an options string, but an explicit terminal option takes
-precedence."
-
-@node atari_ST_(via_VDI), be, atari_ST_(via_AES), terminal_
-@subsubsection atari ST (via VDI)
-
-@c ?commands set terminal vdi
-@c ?set terminal vdi
-@c ?set term vdi
-@c ?terminal vdi
-@c ?term vdi
-@cindex vdi
-@tmindex vdi
-
-
-The `vdi` terminal is the same as the `atari` terminal, except that it sends
-output to the screen via the VDI and not into AES-Windows.
-
-The `vdi` terminal has options to set the character size and the screen
-colors.
-
-Syntax:
-@example
-      set terminal vdi @{<fontsize>@} @{<col0> <col1> ... <col15>@}
-
-@end example
-
-The character size must appear if any colors are to be specified.  Each of
-the (up to 16) colors is given as a three-digit hex number, where the digits
-represent RED, GREEN and BLUE (in that order).  The range of 0--15 is scaled
-to whatever color range the screen actually has.  On a normal ST screen, odd
-and even intensities are the same.
-
-Examples:
-@example
-      set terminal vdi 4    # use small (6x6) font
-      set terminal vdi 6 0  # set monochrome screen to white on black
-      set terminal vdi 13 0 fff f00 f0 f ff f0f
-                 # set first seven colors to black, white, red, green,
-                 # blue, cyan, and purple and use large font (8x16).
-
-@end example
-
-Additionally, if an environment variable GNUCOLORS exists, its contents are
-interpreted as an options string, but an explicit terminal option takes
-precedence."
-
-@node be, cgi, atari_ST_(via_VDI), terminal_
+@node be, cgi, aqua, terminal_
 @subsubsection be
 
 @c ?commands set terminal be
@@ -18048,7 +18025,7 @@ LaTeX instead of plainTeX."
 
 The `mgr` terminal driver supports the Mgr Window system.  It has no options."
 
-@node mif, mtos, mgr, terminal_
+@node mif, next, mgr, terminal_
 @subsubsection mif
 
 @c ?commands set terminal mif
@@ -18091,23 +18068,7 @@ Examples:
 
 @end example
 
-@node mtos, next, mif, terminal_
-@subsubsection mtos
-
-@c ?commands set terminal mtos
-@c ?set terminal mtos
-@c ?set term mtos
-@c ?terminal mtos
-@c ?term mtos
-@cindex mtos
-@tmindex mtos
-
-
-The `mtos` terminal has no options.  It sends data via a pipe to an external
-program called GPCLIENT.  It runs under MULTITOS, Magic 3.x, MagicMAC. and
-MiNT.  If you cannot find GPCLIENT, than mail to dirk@@lstm.uni-erlangen.de."
-
-@node next, Openstep_(next), mtos, terminal_
+@node next, Openstep_(next), mif, terminal_
 @subsubsection next
 
 @c ?commands set terminal next
@@ -18211,8 +18172,6 @@ Pointsizes may be changed with `set linestyle`."
 @tmindex pbm
 
 
-Several options may be set in the `pbm` terminal---the driver for PBMplus.
-
 Syntax:
 @example
       set terminal pbm @{<fontsize>@} @{<mode>@} @{size <x>,<y>@}
@@ -18221,7 +18180,8 @@ Syntax:
 
 where <fontsize> is `small`, `medium`, or `large` and <mode> is `monochrome`,
 `gray` or `color`.  The default plot size is 640 pixels wide and 480 pixels
-high.
+high. The output size is white-space padded to the nearest multiple of
+8 pixels on both x and y. This empty space may be cropped later if needed.
 
 The output of the `pbm` driver depends upon <mode>: `monochrome` produces a
 portable bitmap (one bit per pixel), `gray` a portable graymap (three bits

@@ -24,6 +24,8 @@
 	* term/pbm.trm: Document that output image size is padded to nearest
 	  multiple of 8 pixels on both x and y.
 
+	* docs/gnuplot.texi:  Sync to current docs
+
 2008-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Yet one more place ymax -> ymax-1.
