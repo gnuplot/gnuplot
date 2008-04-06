@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.147 2008/03/16 20:03:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.148 2008/03/30 18:08:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1397,37 +1397,15 @@ plot_option_using(int max_using)
 		/* do not increment c+token ; let while() find the : */
 
 	    } else if (equals(c_token, "(")) {
-		if (df_binary_file || df_matrix_file) {
-		    /* Scan through the tokens looking for largest
-		     * column reference. */
-		    int j;
-		    
-		    for (j=c_token;
-			 !equals(j, ")")
-			     && !(j >= num_tokens || equals(j, ";"));
-			 j++) {
-			copy_str(df_format, j, MAX_LINE_LEN);
-
-			if (equals(j, "$")) {
-			    if(isanumber(j+1)) {
-				int ival;
-
-				j++;
-				copy_str(df_format, j, MAX_LINE_LEN);
-				sscanf(df_format,"%d",&ival);
-				if (ival > no_cols)
-				    no_cols = ival;
-			    } else
-				int_error(c_token,
-				  "$ must be followed by a number");
-			}
-		    } /* for(j) */
-		} /* if(binary|matrix file) */
-
 		fast_columns = 0;       /* corey@cac */
 		dummy_func = NULL;      /* no dummy variables active */
 		/* this will match ()'s: */
-		use_spec[df_no_use_specs++].at = perm_at();     
+		at_highest_column_used = -1;
+		use_spec[df_no_use_specs].at = perm_at();
+		if (no_cols < at_highest_column_used)
+		    no_cols = at_highest_column_used;
+		/* Catch at least the simplest case of 'autotitle columnhead' using an expression */
+		use_spec[df_no_use_specs++].column = at_highest_column_used;
 
 	    /* FIXME EAM - It would be nice to handle these like any other */
 	    /* internal function via perm_at() but there are problems.     */

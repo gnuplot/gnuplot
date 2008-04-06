@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.52 2007/08/28 06:13:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.53 2008/03/30 18:08:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -49,6 +49,9 @@ static TBOOLEAN string_result_only = FALSE;
 /* Exported globals: the current 'dummy' variable names */
 char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 char set_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1] = { "x", "y" };
+
+/* This is used by plot_option_using() */
+int at_highest_column_used = -1;
 
 /* These are used by the iterate-over-plot code */
 static struct udvt_entry *iteration_udv = NULL;
@@ -403,6 +406,8 @@ parse_primary_expression()
 	convert(&a, c_token++);
 	if (a.type != INTGR || a.v.int_val < 0)
 	    int_error(c_token, "Positive integer expected");
+	if (at_highest_column_used < a.v.int_val)
+	    at_highest_column_used = a.v.int_val;
 	add_action(DOLLARS)->v_arg = a;
     } else if (isanumber(c_token)) {
 	/* work around HP 9000S/300 HP-UX 9.10 cc limitation ... */

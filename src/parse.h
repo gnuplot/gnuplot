@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.16 2006/12/27 21:40:27 sfeam Exp $
+ * $Id: parse.h,v 1.17 2007/08/27 04:33:47 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -54,6 +54,8 @@ extern char set_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
  * containing an explicit range (--> 'plot [phi=0..pi]') */
 extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 
+/* This is used by the using_spec parsing code in plot_option_using() */
+extern int at_highest_column_used;
 
 /* Prototypes of exported functions in parse.c */
 
