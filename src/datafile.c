@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.148 2008/03/30 18:08:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.149 2008/04/06 17:23:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2293,10 +2293,7 @@ valid_format(const char *format)
 int
 expect_string(const char column)
 {
-    if (!use_spec)
-	int_error(NO_CARET,"use_spec not yet initialized");
     use_spec[column-1].expected_type = CT_STRING;
-    FPRINTF((stderr,"expecting to find string in input column %d\n",use_spec[column-1].column));
     return(use_spec[column-1].column);
 }
 

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.47 2008/01/07 06:05:53 sfeam Exp $
+ * $Id: emf.trm,v 1.48 2008/01/14 06:38:25 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -447,16 +447,6 @@ EMF_flush_polyline()
 	EMF_LineTo(emf_polyline[2], term->ymax - emf_polyline[3]);
     } else {
 	int i = 0;
-
-#if 0 /* was commented out */
-	/* Polyline works for NT4 but not on W9x */
-	EMF_write_emr(4,(7+emf_coords*2)*4);
-	EMF_write_rectl(0,0,0,0);
-	EMF_write_long(emf_coords);
-	while(i < emf_coords*2)
-	    EMF_write_pointl(emf_polyline[i++],term->ymax-emf_polyline[i++]);
-#endif /* 0 */
-
 	EMF_MoveToEx(emf_polyline[i++], term->ymax - emf_polyline[i++]);
 	while (i < emf_coords * 2)
 	    EMF_LineTo(emf_polyline[i++], term->ymax - emf_polyline[i++]);
