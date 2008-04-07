@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.149 2008/04/06 17:23:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.150 2008/04/07 03:53:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -947,6 +947,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_format[0] = NUL;         /* no format string */
 
     df_no_tic_specs = 0;
+    df_key_title[0] = '\0';
 
     initialize_use_spec();
 
@@ -1400,7 +1401,7 @@ plot_option_using(int max_using)
 		fast_columns = 0;       /* corey@cac */
 		dummy_func = NULL;      /* no dummy variables active */
 		/* this will match ()'s: */
-		at_highest_column_used = -1;
+		at_highest_column_used = NO_COLUMN_HEADER;
 		use_spec[df_no_use_specs].at = perm_at();
 		if (no_cols < at_highest_column_used)
 		    no_cols = at_highest_column_used;

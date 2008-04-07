@@ -1,3 +1,9 @@
+2008-04-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_open): Clear auto-generated key title from previous
+	plot, if any.
+	Bug #1929227
+
 2008-04-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (parse_primary_expression) src/parse.h:
