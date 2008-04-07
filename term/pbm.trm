@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pbm.trm,v 1.26 2006/07/21 02:35:47 sfeam Exp $
+ * $Id: pbm.trm,v 1.27 2006/11/23 05:33:30 sfeam Exp $
  *
  */
 
@@ -489,14 +489,13 @@ START_HELP(pbm)
 "?terminal pbm",
 "?term pbm",
 "?pbm",
-" Several options may be set in the `pbm` terminal---the driver for PBMplus.",
-"",
 " Syntax:",
 "       set terminal pbm {<fontsize>} {<mode>} {size <x>,<y>}",
 "",
 " where <fontsize> is `small`, `medium`, or `large` and <mode> is `monochrome`,",
 " `gray` or `color`.  The default plot size is 640 pixels wide and 480 pixels",
-" high.",
+" high. The output size is white-space padded to the nearest multiple of",
+" 8 pixels on both x and y. This empty space may be cropped later if needed.",
 "",
 " The output of the `pbm` driver depends upon <mode>: `monochrome` produces a",
 " portable bitmap (one bit per pixel), `gray` a portable graymap (three bits",
