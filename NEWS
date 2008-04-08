@@ -4,6 +4,7 @@ New features, changes and fixes in gnuplot version 4.2.4
 * NEW "nocontours" keyword for splot
 * NEW "undefine foo" clears previously define user variable foo
 * CHANGE gd.trm: use dynamically-allocated TTF font names
+* CHANGE try harder to autotitle columns in using specs with expressions
 * FIX (gd post) don't segfault on very long font names
 * FIX allow variable color from input file for "with boxes"
 * FIX don't run off the end of "set format" commands
