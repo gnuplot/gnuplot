@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.53 2006/11/12 23:43:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.54 2007/05/18 06:15:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -2093,6 +2093,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_CHAR:
 			/* All 'normal' keys (letters, digits and the likes) end up
 			 * here... */
+#ifndef DISABLE_SPACE_RAISES_CONSOLE
 			if (wParam == VK_SPACE) {
 				/* HBB 20001023: implement the '<space> in graph returns to
 				 * text window' --- feature already present in OS/2 and X11 */
@@ -2102,6 +2103,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				BringWindowToTop(lpgw->lptw->hWndParent);
 				return 0;
 			}
+#endif /* DISABLE_SPACE_RAISES_CONSOLE */
+
 #ifdef USE_MOUSE
 			Wnd_exec_event(lpgw, lParam, GE_keypress, (TCHAR)wParam);
 #endif

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.97 2008/02/27 03:20:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.98 2008/03/13 20:02:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2105,7 +2105,9 @@ bind_display(char *lhs)
 	fprintf(stderr, fmt, "<B2-Motion>", "change view (scaling). Use <ctrl> to scale the axes only.");
 	fprintf(stderr, fmt, "<Shift-B2-Motion>", "vertical motion -- change xyplane");
 	fprintf(stderr, "\n");
+#ifndef DISABLE_SPACE_RAISES_CONSOLE
 	fprintf(stderr, " %-12s   %s\n", "Space", "raise gnuplot console window");
+#endif
 	fprintf(stderr, " %-12s * %s\n", "q", "close this plot window");
 	fprintf(stderr, "\n");
 	for (ptr = bindings; ptr; ptr = ptr->next) {

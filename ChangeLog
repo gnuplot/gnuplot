@@ -1,3 +1,12 @@
+2008-04-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c src/mouse.c src/os2/gclient.c src/win/wgraph.c
+	src/wxterminal/wxt_gui.cpp configure.in docs/gnuplot.doc:
+	New configure option  --disable-raise-console
+	If, like me, you hate the program messing with your desktop state and
+	also want to be able to type <space> while the cursor is over the plot
+	window, then this option is for you.
+
 2008-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_open): Clear auto-generated key title from previous
@@ -12,7 +21,7 @@
 	* src/datafile.c (plot_option_using): Use info returned by perm_at()
 	to update the highest data column used.  This allows us to catch at
 	least the simple case of autotitle columnheader for 'using 1:($3)'.
-	Deletion previous ugly code to approximate this for binary files.
+	Delete previous ugly code to approximate this for binary files.
 	Bug #1929227
 
 	* term/post.trm (PS_set_font): Avoid segfault if the font name is longer

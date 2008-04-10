@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.48 2006/11/12 23:43:46 sfeam Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.49 2008/02/23 10:11:11 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -814,7 +814,9 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 #endif
 
 	switch (key) {
+
 	case VK_SPACE: {
+#ifndef DISABLE_SPACE_RAISES_CONSOLE
 	    /* raise gnuplot's window */
 	    HWND hw = WinQueryWindow(swGnu.hwnd, QW_BOTTOM);
 	    WinSetFocus(HWND_DESKTOP, hw);
@@ -823,6 +825,9 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 		       0 /* MPFROMSHORT(key) */
 		);
 	    WinSwitchToProgram(hSwitch);
+#else
+	    key = ' ';
+#endif /* DISABLE_SPACE_RAISES_CONSOLE */
 	    break;
 	}
 	    /* remap virtual keys to gnuplot's codes: */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.185 2007/12/09 23:41:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.186 2008/02/24 19:49:35 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -171,7 +171,6 @@ Error. Incompatible options.
 # include <unistd.h>
 # include <fcntl.h>
 # include <errno.h>
-static unsigned long gnuplotXID = 0; /* WINDOWID of gnuplot */
 
 #ifdef MOUSE_ALL_WINDOWS
 # include "axis.h" /* Just to pick up FIRST_X_AXIS enums */
@@ -445,7 +444,12 @@ static void DrawCoords __PROTO((plot_struct *, const char *));
 static void DisplayCoords __PROTO((plot_struct *, const char *));
 
 static TBOOLEAN is_meta __PROTO((KeySym));
+
+#ifndef DISABLE_SPACE_RAISES_CONSOLE
+static unsigned long gnuplotXID = 0; /* WINDOWID of gnuplot */
 static char* getMultiTabConsoleSwitchCommand __PROTO((unsigned long *));
+#endif /* DISABLE_SPACE_RAISES_CONSOLE */
+
 #endif /* USE_MOUSE */
 
 static void DrawRotated __PROTO((plot_struct *, Display *, GC,
@@ -1349,6 +1353,8 @@ record()
 	switch (*buf) {
 	case 'G':		/* enter graphics mode */
 	    {
+
+#ifndef DISABLE_SPACE_RAISES_CONSOLE
 #ifdef USE_MOUSE
 #ifdef OS2_IPC
 		sscanf(buf, "G%lu %li", &gnuplotXID, &ppidGnu);
@@ -1356,6 +1362,8 @@ record()
 		sscanf(buf, "G%lu", &gnuplotXID);
 #endif
 #endif
+#endif /* DISABLE_SPACE_RAISES_CONSOLE */
+
 		if (!current_plot)
 		    current_plot = Add_Plot_To_Linked_List(most_recent_plot_number);
 		if (current_plot)
@@ -4055,6 +4063,7 @@ is_meta(KeySym mod)
     }
 }
 
+#ifndef DISABLE_SPACE_RAISES_CONSOLE
 /* It returns NULL if we are not running in any known (=implemented) multitab
  * console.
  * Otherwise it returns a command to be executed in order to switch to the
@@ -4150,6 +4159,7 @@ getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
 }
 
 #endif
+#endif	/* DISABLE_SPACE_RAISES_CONSOLE */
 
 
 /*---------------------------------------------------------------------------
@@ -4330,6 +4340,8 @@ process_event(XEvent *event)
 #endif
 	    switch (keysym) {
 #ifdef USE_MOUSE
+
+#ifndef DISABLE_SPACE_RAISES_CONSOLE
 	    case ' ': {
 		static int cmd_tried = 0;
 		static char *cmd = NULL;
@@ -4353,6 +4365,8 @@ process_event(XEvent *event)
 		    XFlush(dpy);
 		}
 		return;
+#endif	/* DISABLE_SPACE_RAISES_CONSOLE */
+
 	    case 'm': /* Toggle mouse display, but only if we control the window here */
 		if (((plot != current_plot) && (!modifier_mask))
 #ifdef PIPE_IPC

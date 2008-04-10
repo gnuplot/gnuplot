@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.489 2008/04/02 18:12:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.490 2008/04/07 03:56:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2135,13 +2135,10 @@ C ... and restart the table:
 4 bind space
 ?commands bind space
 ?bind space
- By default, the <space> hotkey raises gnuplot's command window. On some
- terminals (e.g. x11, wxt), 'q' closes the graph window. These defaults can
- be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
- see `x11 command-line-options`, or by the X Resource 'gnuplot*ctrlq'.
- Note: if <space> (or ctrl-space) does not raise the gnuplot window under X11,
- see discussion in `raise`.
-
+ If gnuplot was built with configuration option --enable-raise-console, then
+ typing <space> in the plot window raises gnuplot's command window. This hotkey
+ can be changed to ctrl-space by starting gnuplot as 'gnuplot -ctrlq', or by
+ setting the XResource 'gnuplot*ctrlq'.  See `x11 command-line-options`.
 3 Mouse variables
 ?mouse variables
  When mousing is active, clicking in the active window will set several user

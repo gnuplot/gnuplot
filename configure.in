@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.231 2008/03/23 19:10:50 sfeam Exp $
+dnl $Id: configure.in,v 1.232 2008/03/30 03:27:51 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -729,6 +729,15 @@ AC_ARG_ENABLE(volatile-data,dnl
                [ Define to allow zooming or refresh of volatile data. EXPERIMENTAL ])
   fi
 
+dnl disable the "space raises console" behaviour
+AC_ARG_ENABLE(raise-console,dnl
+[  --disable-raise-console        spacebar in plot window does not raise console],,
+  test -z "$enable_raise_console" && enable_raise_console=yes)
+  if test "$enable_raise_console" != yes; then
+      AC_DEFINE(DISABLE_SPACE_RAISES_CONSOLE,1,
+                [ Define to treat spacebar like any other keystroke. ])
+  fi
+
 dnl rectangles and other objects
 AC_ARG_ENABLE(objects,dnl
 [  --disable-objects       disable rectangles and other objects ],,
@@ -1200,6 +1209,12 @@ if test "$enable_volatile_data" = yes; then
   AC_MSG_RESULT([  Zooming or refresh of volatile data: yes (EXPERIMENTAL)])
 else
   AC_MSG_RESULT([  Zooming or refresh of volatile data: no])
+fi
+
+if test "$enable_raise_console" = yes; then
+  AC_MSG_RESULT([  Typing <space> in plot window raises console])
+else
+  AC_MSG_RESULT([  Treat <space> in plot window like any other key: yes])
 fi
 
 if test "$enable_macros" = yes; then

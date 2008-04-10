@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.62 2008/03/08 06:37:17 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.63 2008/03/18 00:16:34 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -984,6 +984,8 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 
 	if (keycode<256) {
 		switch (keycode) {
+
+#ifndef DISABLE_SPACE_RAISES_CONSOLE
 		case WXK_SPACE :
 			if ((wxt_ctrl==yes && event.ControlDown())
 				|| wxt_ctrl!=yes) {
@@ -993,6 +995,8 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 				gp_keycode = ' ';
 				break;
 			}
+#endif /* DISABLE_SPACE_RAISES_CONSOLE */
+
 		case 'q' :
 		/* ctrl+q does not send 113 but 17 */
 		/* WARNING : may be the same for other combinations */
@@ -1102,6 +1106,7 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 }
 #endif /*USE_MOUSE*/
 
+#ifndef DISABLE_SPACE_RAISES_CONSOLE
 /* ====license information====
  * The following code originates from other gnuplot files,
  * and is not subject to the alternative license statement.
@@ -1209,6 +1214,7 @@ void wxtPanel::RaiseConsoleWindow()
 /* ====license information====
  * End of the non-relicensable portion.
  */
+#endif /* DISABLE_SPACE_RAISES_CONSOLE */
 
 
 /* ------------------------------------------------------
