@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.93 2007/10/22 19:11:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.94 2008/03/31 01:47:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -344,6 +344,7 @@ lf_push(FILE *fp)
 	lf->call_args[argindex] = call_args[argindex];
 	call_args[argindex] = NULL;	/* initially no args */
     }
+    lf->depth = lf_head ? lf_head->depth+1 : 0;	/* recursion depth */
     lf->prev = lf_head;		/* link to stack */
     lf_head = lf;
 }
