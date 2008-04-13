@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.25 2008/03/31 01:47:58 sfeam Exp $
+ * $Id: misc.h,v 1.26 2008/04/11 22:42:04 sfeam Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -47,7 +47,6 @@
 
 /* Variables of misc.c needed by other modules: */
 
-extern char *infile_name;
 
 /* Prototypes from file "misc.c" */
 

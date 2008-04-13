@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.94 2008/03/31 01:47:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.95 2008/04/11 22:42:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -52,9 +52,6 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.94 2008/03/31 01:47:55 sfea
 #elif defined(_Windows)
 # include <windows.h>
 #endif
-
-/* name of command file; NULL if terminal */
-char *infile_name = NULL;
 
 static TBOOLEAN lf_pop __PROTO((void));
 static void lf_push __PROTO((FILE *));
@@ -170,7 +167,7 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 	int argc = 0; /* number arguments passed by "call" */
 	interactive = FALSE;
 	inline_num = 0;
-	infile_name = name;
+	lf_head->name = name;
 
 	if (can_do_args) {
 	    while (c_token < num_tokens && argc <= 9) {
@@ -313,8 +310,8 @@ lf_pop()
 	do_load_arg_substitution = lf->do_load_arg_substitution;
 	interactive = lf->interactive;
 	inline_num = lf->inline_num;
-	infile_name = lf->name;
 	lf_head = lf->prev;
+	free(lf->name);
 	free((char *) lf);
 	return (TRUE);
     }
@@ -336,7 +333,6 @@ lf_push(FILE *fp)
 	int_error(c_token, "not enough memory to load file");
     }
     lf->fp = fp;		/* save this file pointer */
-    lf->name = infile_name;	/* save current name */
     lf->interactive = interactive;	/* save current state */
     lf->inline_num = inline_num;	/* save current line number */
     lf->do_load_arg_substitution = do_load_arg_substitution;

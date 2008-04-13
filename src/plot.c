@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.97 2008/03/16 20:03:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.98 2008/03/30 03:27:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -638,7 +638,7 @@ main(int argc, char **argv)
 		interactive = FALSE;
 
 	    } else
-		load_file(loadpath_fopen(*argv, "r"), *argv, FALSE);
+		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), FALSE);
 	}
 #ifdef _Windows
 	if (noend) {
@@ -708,7 +708,8 @@ load_rcfile()
 	}
     }
     if (plotrc) {
-	load_file(plotrc, (rcfile==NULL) ? PLOTRC : rcfile, FALSE);
+	char *rc = gp_strdup(rcfile ? rcfile : PLOTRC);
+	load_file(plotrc, rc, FALSE);
 	push_terminal(0); /* needed if terminal or its options were changed */
     }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.169 2008/03/30 15:53:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.170 2008/04/01 19:37:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -773,7 +773,6 @@ call_command()
     /* gp_input_line[] and token[] now destroyed! */
     c_token = 0;
     num_tokens = 0;
-    free(save_file);
 }
 
 
@@ -1029,7 +1028,6 @@ load_command()
     load_file(fp, save_file, FALSE);
     /* gp_input_line[] and token[] now destroyed! */
     c_token = num_tokens = 0;
-    free(save_file);
 }
 
 

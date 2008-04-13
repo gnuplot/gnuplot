@@ -1,3 +1,13 @@
+2008-04-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (load_file)  src/misc.h src/util.c (PRINT_FILE_AND_LINE)
+	src/plot.c (main load_rcfile) src/command.c (call_command load_command):
+	Keeping infile_name in a global causes a memory leak.  Keep it in the
+	dynamic structure list maintained by lf_push() and lf_pop().
+	The callers in plot.c and command.c must pass a gp_alloc()ed string for
+	the plot name, but need not worry about freeing it later. lf_push()
+	and lf_pop() will handle this automatically, including error recovery.
+
 2008-04-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.h src/misc.c(lf_push): Track recursion depth for load_file().

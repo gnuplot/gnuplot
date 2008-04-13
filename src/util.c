@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.76 2008/03/16 20:03:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.77 2008/03/18 00:16:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -816,8 +816,8 @@ do {									\
 
 #define PRINT_FILE_AND_LINE						\
 if (!interactive) {							\
-    if (infile_name != NULL)						\
-	fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num);	\
+    if (lf_head && lf_head->name)                                       \
+	fprintf(stderr, "\"%s\", line %d: ", lf_head->name, inline_num);\
     else fprintf(stderr, "line %d: ", inline_num);			\
 }
 
