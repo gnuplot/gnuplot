@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.490 2008/04/07 03:56:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.491 2008/04/10 18:09:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3434,8 +3434,6 @@ Ffigure_mapcontours
  parameter that was not provided substitutes as nothing.  Files being `call`ed
  may themselves contain `call` or `load` commands.
 
- The `call` command _must_ be the last command on a multi-command line.
-
  Syntax:
        call "<input-file>" <parameter-0> <parm-1> ... <parm-9>
 
@@ -4066,8 +4064,6 @@ Ffigure_mapcontours
  and then executed by the `load` command.  Files being `load`ed may themselves
  contain `load` or `call` commands.  See `comments` for information about
  comments in commands.  To `load` with arguments, see `call`.
-
- The `load` command _must_ be the last command on a multi-command line.
 
  Syntax:
        load "<input-file>"

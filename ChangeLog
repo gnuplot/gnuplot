@@ -1,8 +1,18 @@
+2008-04-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (load_file lf_push lf_pop) src/misc.h docs/gnuplot.doc
+	src/command.c (load_command call_command):
+	Save and restore the input line and token parsing structures in
+	lf_push() and lf_pop().  This allows both the 'call' and 'load'
+	functions to be used recursively without destroying the previous
+	input line and parsing context.  So 'load' no longer needs to be the
+	last command on a line.
+
 2008-04-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (load_file)  src/misc.h src/util.c (PRINT_FILE_AND_LINE)
 	src/plot.c (main load_rcfile) src/command.c (call_command load_command):
-	Keeping infile_name in a global causes a memory leak.  Keep it in the
+	Keeping infile_name in a global causes a memory leak.  Move it to the
 	dynamic structure list maintained by lf_push() and lf_pop().
 	The callers in plot.c and command.c must pass a gp_alloc()ed string for
 	the plot name, but need not worry about freeing it later. lf_push()

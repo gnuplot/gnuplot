@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.95 2008/04/11 22:42:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.96 2008/04/13 19:25:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -170,21 +170,25 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 	lf_head->name = name;
 
 	if (can_do_args) {
-	    while (c_token < num_tokens && argc <= 9) {
+	    /* Gnuplot "call" command can have up to 10 arguments "$0" to "$9" */
+	    while (!END_OF_COMMAND && argc <= 9) {
 		if (isstring(c_token))
 		    m_quote_capture(&call_args[argc++], c_token, c_token);
 		else
 		    m_capture(&call_args[argc++], c_token, c_token);
 		c_token++;
 	    }
-	    /* Gnuplot "call" command can have up to 10 arguments named "$0"
-	       to "$9". After reading the 10th argument (i.e., "$9") the
-	       variable 'argc' equals 10.
-	       Also, "call" must be the last command on the command line.
-	    */
-	    if (c_token < num_tokens)
+	    if (!END_OF_COMMAND)
 		int_error(++c_token, "too many arguments for 'call <file>'");
 	}
+
+	/* These were initialized to NULL in lf_push(); will be freed in lf_pop() */
+	lf_head->c_token = c_token;
+	lf_head->num_tokens = num_tokens;
+	lf_head->tokens = gp_alloc(num_tokens * sizeof(struct lexical_unit), "lf tokens");
+	memcpy(lf_head->tokens, token, num_tokens * sizeof(struct lexical_unit));
+	lf_head->input_line = gp_strdup(gp_input_line);
+	
 	while (!stop) {		/* read all commands in file */
 	    /* read one command */
 	    left = gp_input_line_len;
@@ -310,8 +314,22 @@ lf_pop()
 	do_load_arg_substitution = lf->do_load_arg_substitution;
 	interactive = lf->interactive;
 	inline_num = lf->inline_num;
+
+	/* Restore saved input state and free the copy */
+	if (lf->tokens) {
+	    num_tokens = lf->num_tokens;
+	    c_token = lf->c_token;
+	    memcpy(token, lf->tokens, lf->num_tokens * sizeof(struct lexical_unit));
+	    free(lf->tokens);
+	}
+	if (lf->input_line) {
+	    strcpy(gp_input_line, lf->input_line);
+	    free(lf->input_line);
+	}
+	if (lf->name)
+	    free(lf->name);
+	
 	lf_head = lf->prev;
-	free(lf->name);
 	free((char *) lf);
 	return (TRUE);
     }
@@ -341,6 +359,11 @@ lf_push(FILE *fp)
 	call_args[argindex] = NULL;	/* initially no args */
     }
     lf->depth = lf_head ? lf_head->depth+1 : 0;	/* recursion depth */
+    lf->c_token = c_token;	/* Will be updated by caller */
+    lf->num_tokens = num_tokens;/* Will be updated by caller */
+    lf->input_line = NULL;	/* Will be filled in by caller */
+    lf->tokens = NULL;		/* Will be filled in by caller */
+    lf->name = NULL;		/* Will be filled in by caller */
     lf->prev = lf_head;		/* link to stack */
     lf_head = lf;
 }
