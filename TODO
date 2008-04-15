@@ -40,10 +40,6 @@ Pstricks:
   -- Patch 559611 color + variable pointsize in pstricks
 	Can somebody comment on this?
 
-{eps|ps}latex:
-  -- none of the latex terminal variants support pattern-fill, but
-	they return no error if you try it.
-
 Windows:
   -- update its docs from docs/old/README.win, then delete this file
   -- windows driver does not report font size to windows.trm, thus
