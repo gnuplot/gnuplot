@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.150 2008/04/07 03:53:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.151 2008/04/07 16:16:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -184,6 +184,7 @@ static void plot_ticlabel_using __PROTO((int));
 static void df_parse_string_field __PROTO((char *, char *));
 static void add_key_entry __PROTO((char *temp_string, int df_datum));
 static char * df_generate_pseudodata __PROTO((void));
+static int df_skip_bytes __PROTO((int nbytes));
 
 /*}}} */
 
@@ -3786,39 +3787,34 @@ plot_option_binary_format(void)
 {
 
     int prev_read_type = DF_DEFAULT_TYPE; /* Defaults when none specified. */
-    int i, no_fields = 0;
+    int no_fields = 0;
+    char *substr;
 
-    /* Copy the token for our own analysis. */
+    /* Copy the token for our own analysis.  Parser makes just one token
+     * for whole string. */
     copy_str(df_format, c_token, MAX_LINE_LEN);
-    
-    for (i=1;
-	 df_format[i] != '\0'
-	     && df_format[i] != '\"'
-	     && df_format[i] != '\''
-	     && i <= MAX_LINE_LEN;
+
+    for (substr = df_format + 1;
+	 *substr != '\0'
+	     && *substr != '\"'
+	     && *substr != '\''
+	     && substr <= (df_format + MAX_LINE_LEN);
 	 ) {
-	if (df_format[i] == ' ') {
-	    i++;
+	if (*substr == ' ') {
+	    substr++;
 	    continue;
 	}  /* Ignore spaces. */
 
-	if (df_format[i] == '%') {
-	    int ignore, field_repeat, j = 0, k = 0, m = 0, breakout;
+	if (*substr == '%') {
+	    int ignore, field_repeat, j=0, k=0, m=0, breakout;
 	    
-	    i++;
-	    ignore = (df_format[i] == '*');
+	    substr++;
+	    ignore = (*substr == '*');
 	    if(ignore)
-		i++;
+		substr++;
 
-	    /* Number of columns is less than a single digit, so check
-	     * only a single digit.  If the user enters more than one
-	     * digit, the routine fails on the next pass.  */
-	    if (isdigit(df_format[i])) {
-		/* Convert to a number.  Let zero be a valid entry. */
-		field_repeat = df_format[i] - '0';
-		i++;
-	    } else
-		field_repeat = 1;
+	    /* Check for field repeat number. */
+	    field_repeat = isdigit(*substr) ? strtol(substr, &substr, 10) : 1;
 
 	    /* Try finding the word among the valid type names. */
 	    for (j = 0, breakout = 0;
@@ -3833,12 +3829,14 @@ plot_option_binary_format(void)
 			 m++) {
 			int strl
 			    = strlen(df_binary_tables[j].group[k].name[m]);
-			
-			if (!strncmp(df_format + i,
+
+			/* Check for exact match, which includes character
+			 * after the substring being non-alphanumeric. */
+			if (!strncmp(substr,
 				     df_binary_tables[j].group[k].name[m],
 				     strl)
-			    && strchr("%\'\" ", df_format[i + strl]) ) {
-			    i += strl;  /* Advance pointer in array to next text. */
+			    && strchr("%\'\" ", *(substr + strl)) ) {
+			    substr += strl;  /* Advance pointer in array to next text. */
 			    if (!ignore) {
 				int n;
 				
@@ -4092,6 +4090,25 @@ df_swap_bytes_by_endianess(char *data, int read_order, int read_size)
 }
 
 
+static int
+df_skip_bytes(int nbytes)
+{
+    char cval;
+
+    while (nbytes--) {
+	if (1 == fread(&cval, 1, 1, data_fp))
+	    continue;
+	if (feof(data_fp)) {
+	    df_eof = 1;
+	    return DF_EOF;
+	}
+	int_error(NO_CARET, read_error_msg);
+    }
+
+    return 0;
+}
+
+
 /*{{{  int df_readbinary(v, max) */
 /* do the hard work... read lines from file,
  * - use blanks to get index number
@@ -4211,26 +4228,21 @@ df_readbinary(double v[], int max)
 		if (this_record->cart_dim[i] || this_record->scan_dim[i]) {
 		    if (this_record->scan_generate_coord)
 			use_spec[i].column = this_record->cart_scan[i];
-		    
 		}
 		/* Dimensions */
 		map = DF_SCAN_POINT - this_record->cart_scan[i];
 		if (this_record->cart_dim[i] > 0)
 		    scan_size[map] = this_record->cart_dim[i];
 		else
-		    scan_size[map]
-			= this_record->scan_dim[map];
+		    scan_size[map] = this_record->scan_dim[map];
 		/* Sample periods */
 		if (this_record->cart_delta[i])
 		    delta[map] = this_record->cart_delta[i];
 		else
 		    delta[map] = this_record->scan_delta[map];
-		delta[map] = delta[map]
-		    * this_record->scan_dir[map]
-		    * this_record->cart_dir[i];
+		delta[map] *= this_record->scan_dir[map] * this_record->cart_dir[i];
 		/* o */
-		if (this_record->cart_trans
-		    != DF_TRANSLATE_DEFAULT)
+		if (this_record->cart_trans != DF_TRANSLATE_DEFAULT)
 		    o[i] = this_record->cart_cen_or_ori[i];
 		else if (this_record->scan_trans != DF_TRANSLATE_DEFAULT)
 		    o[i] = this_record->scan_cen_or_ori[map];
@@ -4258,8 +4270,7 @@ df_readbinary(double v[], int max)
 
 	/* Check if c and o are the same. */
 	for (i = 0; i < 3; i++)
-	    translation_required = translation_required
-	                           || (c[i] != o[i]);
+	    translation_required = translation_required || (c[i] != o[i]);
 
 	/* Should data come from memory? */
 	memory_data = this_record->memory_data;
@@ -4315,21 +4326,13 @@ df_readbinary(double v[], int max)
 	}
 
 	/* Possibly skip bytes before starting to read record. */
-	while (record_skip) {
-	    if (memory_data) {
-		memory_data++;
-	    } else if ((fread_ret = fread(&io_val.ch,
-					  sizeof(io_val.ch),
-					  1, data_fp))
-		       != 1) {
-		if (feof(data_fp)) {
-		    df_eof = 1;
-		    return DF_EOF;
-		} else
-		    int_error(NO_CARET, read_error_msg);
-	    }
-	    record_skip--;
-	} /* while(record_skip) */
+	if (record_skip) {
+	    if (memory_data)
+		memory_data += record_skip;
+	    else if (df_skip_bytes(record_skip))
+		return DF_EOF;
+	    record_skip = 0;
+	}
 
 	/* Bring in variables as described by the field parameters.
 	 * If less than than the appropriate number of bytes have been
@@ -4338,17 +4341,10 @@ df_readbinary(double v[], int max)
 	    int skip_bytes = df_column_bininfo[i].skip_bytes;
 
 	    if (skip_bytes) {
-		if (memory_data) {
+		if (memory_data)
 		    memory_data += skip_bytes;
-		} else if ((fread_ret = fread(&io_val.ch, sizeof(io_val.ch),
-					      skip_bytes, data_fp))
-			   != skip_bytes) {
-		    if (feof(data_fp)) {
-			df_eof = 1;
-			return DF_EOF;
-		    } else
-			int_error(NO_CARET, read_error_msg);
-		}
+		else if (df_skip_bytes(skip_bytes))
+		    return DF_EOF;
 	    }
 
 	    /* Last entry only has skip bytes, no data. */
@@ -4412,9 +4408,8 @@ df_readbinary(double v[], int max)
 	    df_column[i].good = DF_GOOD;
 	    df_column[i].position = NULL;   /* cant get a time */
 
-	    /* Matrix file data is a special case. After reading
-	     * in just one binary value, stop then decide on what
-	     * to do with it. */
+	    /* Matrix file data is a special case. After reading in just
+	     * one binary value, stop and decide on what to do with it. */
 	    if (df_matrix_file)
 		break;
 
@@ -4438,11 +4433,10 @@ df_readbinary(double v[], int max)
 					 scan_size[0]*sizeof(float),
 					 "gpbinary matrix row")))
 			int_error(NO_CARET, "not enough memory to create vector");
-		    scanned_matrix_row[first_matrix_row_col_count]
-			= df_column[i].datum;
+		    scanned_matrix_row[first_matrix_row_col_count] = df_column[i].datum;
 		    first_matrix_row_col_count++;
 		    if (first_matrix_row_col_count == scan_size[0]) {
-				/* Start of the second row. */
+			/* Start of the second row. */
 			saved_first_matrix_column = FALSE;
 		    }
 		    continue;
@@ -4464,15 +4458,9 @@ df_readbinary(double v[], int max)
 		 * overwritten. */
 		for (j = df_no_bin_cols-1; j >= 0; j--) {
 		    if (j == 0)
-			df_column[j].datum
-			    = df_matrix_binary
-			    ? scanned_matrix_row[df_M_count]
-			    : df_M_count;
+			df_column[j].datum = df_matrix_binary ? scanned_matrix_row[df_M_count] : df_M_count;
 		    else if (j == 1)
-			df_column[j].datum
-			    = df_matrix_binary
-			    ? first_matrix_column
-			    : df_N_count;
+			df_column[j].datum = df_matrix_binary ? first_matrix_column : df_N_count;
 		    else
 			df_column[j].datum = df_column[i].datum;
 		    df_column[j].good = DF_GOOD;
@@ -4484,8 +4472,7 @@ df_readbinary(double v[], int max)
 	    if (i != df_no_bin_cols) {
 		if (feof(data_fp)) {
 		    if (i != 0) 
-			int_error(NO_CARET, "\
-Last point in the binary file did not match the specified `using` columns");
+			int_error(NO_CARET, "Last point in the binary file did not match the specified `using` columns");
 		    df_eof = 1;
 		    return DF_EOF;
 		} else {
@@ -4566,13 +4553,10 @@ Last point in the binary file did not match the specified `using` columns");
 		    evaluate_at(use_spec[output].at, &a);
 		    evaluate_inside_using = FALSE;
 		    if (undefined)
-			/* store undefined point in plot */
 			return DF_UNDEFINED; 
 
 		    v[output] = real(&a);
 		} else if (column == -5) {
-		    /* Perhaps try using a switch statement to
-		     * avoid so many tests. */
 		    v[output] = o_value*delta[2];
 		} else if (column == -4) {
 		    v[output] = n_value*delta[1];
@@ -4619,8 +4603,7 @@ Last point in the binary file did not match the specified `using` columns");
 			 && (df_column[column - 1].good == DF_MISSING))
 		    return DF_MISSING;
 		else {
-		    /* line bad only if user explicitly asked
-		     * for this column */
+		    /* line bad only if user explicitly asked for this column */
 		    if (df_no_use_specs)
 			line_okay = 0;
 		    break;  /* return or ignore depending on line_okay */

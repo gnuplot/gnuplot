@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.491 2008/04/10 18:09:03 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.492 2008/04/15 05:01:07 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4447,13 +4447,13 @@ Ffigure_mapcontours
  specifications is less than the greatest column number, the size is implicitly
  taken to be similar to the last given variable size.
 
- Furthermore, the format specification can include "discarded" terms via the `*`
- character.  For example, to skip the middle column of the previous example, one
- could write `format="%uchar%*int%float"` and gnuplot will discard the middle
- integer.  To list variable sizes, type `show datafile binary datasizes`.  There
- are a group of names that are machine dependent along with their sizes in bytes
- for the particular compilation.  There is also a group of names which attempt
- to be machine independent.
+ Furthermore, similar to the `using` specification, the format can include
+ discarded columns via the `*` character and have implicit repetition via a
+ numerical repeat-field.  For example, `format="%*2int%3float"` causes gnuplot
+ to discard two ints before reading three floats.  To list variable sizes, type
+ `show datafile binary datasizes`.  There are a group of names that are machine
+ dependent along with their sizes in bytes for the particular compilation.
+ There is also a group of names which attempt to be machine independent.
 5 endian
 ?binary general endian
  Often the endianess of binary data in the file does not agree with the
