@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.160.2.6 2007/12/20 17:14:41 sfeam Exp $
+ * $Id: x11.trm,v 1.160.2.7 2008/03/08 17:48:17 sfeam Exp $
  *
  */
 
@@ -1472,7 +1472,7 @@ X11_make_palette(t_sm_palette *palette)
     case SMPAL_COLOR_MODE_FUNCTIONS: {
         int cnt=0;
 	gradient_struct *gradient;
-	gradient = approximate_palette(palette, 500, 0.01, &cnt);
+	gradient = approximate_palette(palette, -1, 0.01, &cnt);
 	transmit_gradient(gradient, cnt);
 	free(gradient);
 	break;
