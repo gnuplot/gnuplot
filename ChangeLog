@@ -1,3 +1,10 @@
+2008-04-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm:  Use a more finely sampled palette to generate colors.
+	It was using only 500 samples; change it to use the default (=5000) in
+	approximate_palette().
+	Bug #1906502
+
 2008-04-15  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c (plot_option_binary_format df_readbinary): Allow repeat
