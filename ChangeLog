@@ -61,7 +61,7 @@
 	* term/post.trm (PS_filled_polygon): Limit the number of consecutive
 	relative moves in order to avoid accumulated round-off error.
 
-2007-03-11  Ethan Merritt  <merritt@u.washington.edu>
+2008-03-11  Ethan Merritt  <merritt@u.washington.edu>
 	
 	* src/gadgets.c src/gadgets.h src/graph3d.c src/graphics.c src/save.c
 	src/set.c src/show.c src/unset.c src/util3d.c:  Add option to specify
@@ -73,13 +73,13 @@
 	Alter processing of "with boxes" to handle specification of a column
 	containing variable color information.  Back-port from CVS.
 
-2007-03-08  Ethan Merritt  <merritt@u.washington.edu>
+2008-03-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	Version 4.2.3 release
 	Any further commits to this tree will be in 4.2.4 if such a version is
 	ever released.
 
-2007-03-08  Ethan Merritt  <merritt@u.washington.edu>
+2008-03-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (X11_filled_polygon):
 	Fix read beyond end of buffer found by valgrind.
@@ -87,7 +87,7 @@
 	* src/datafile.c (df_tokenise):
 	Fix uninitialized variable found by valgrind.
 
-2007-03-07  Ethan Merritt  <merritt@u.washington.edu>
+2008-03-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c (draw3d_line_unconditional): Check for user-defined
 	line styles when choosing colors for front/back of hidden surfaces.
