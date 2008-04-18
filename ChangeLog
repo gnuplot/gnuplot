@@ -1,3 +1,15 @@
+2008-04-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/sun.trm:  Rename local static variable "canvas" to "SUN_canvas"
+	to avoid conflict with global of the same name.
+
+	* src/util.c (int_error):  We really want to use snprintf(), but if the
+	platform doesn't provide it (SunOS 4.1) what can you do?
+
+	To build on SunOS 4.1.4 I needed the above two changes,
+	application of the sprintf patch (on the web site) originally developed
+	for ultrix, and hand-editing of config.h to include #undef HAVE_VFPRINTF 
+
 2008-04-18  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c (df_skip_bytes): Skip bytes from a file using fseek;
