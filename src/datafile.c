@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.151 2008/04/07 16:16:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.152 2008/04/15 17:39:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4095,9 +4095,20 @@ df_skip_bytes(int nbytes)
 {
     char cval;
 
-    while (nbytes--) {
-	if (1 == fread(&cval, 1, 1, data_fp))
-	    continue;
+#if defined(PIPES)
+    if (df_pipe_open || plotted_data_from_stdin) {
+	while (nbytes--) {
+	    if (1 == fread(&cval, 1, 1, data_fp))
+		continue;
+	    if (feof(data_fp)) {
+		df_eof = 1;
+		return DF_EOF;
+	    }
+	    int_error(NO_CARET, read_error_msg);
+	}
+    } else
+#endif
+    if (fseek(data_fp, nbytes, SEEK_CUR)) {
 	if (feof(data_fp)) {
 	    df_eof = 1;
 	    return DF_EOF;

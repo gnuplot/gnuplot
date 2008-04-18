@@ -1,3 +1,8 @@
+2008-04-18  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/datafile.c (df_skip_bytes): Skip bytes from a file using fseek;
+	skip bytes from a pipe or stdin using repeated reading of single bytes.
+
 2008-04-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm:  Use a more finely sampled palette to generate colors.
@@ -7,14 +12,9 @@
 
 2008-04-15  Daniel Sebald  <daniel.sebald@ieee.org>
 
-	* src/datafile.c (plot_option_binary_format df_readbinary): Allow repeat
-	field greater than a single digit for skipping many columns.  Advance
-	file pointer with seek rather than inefficiently read and discard bytes.
-	(df_advance_bytes): Skip bytes either in the file using fseek or from a
-	pipe or stdin using repeated reading of single byte.
-
-	* src/datafile.h: Change binary column info skip_bytes to long for very
-	large number of bytes (i.e., columns) to skip.
+	* src/datafile.c (plot_option_binary_format df_readbinary df_skip_bytes)
+	src/datafile.h: Allow repeat field in binary format greater to be more
+	than a single digit.
 
 	* docs/gnuplot.doc: Document that the binary format string allows
 	"discard" symbol and numerical repeat-field.
