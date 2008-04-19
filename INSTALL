@@ -602,6 +602,8 @@ whenever you re-run configure.
   not necessary to "install" unproto, one can just create a subdirectory
   in gnuplot's source directory and use it from there.
 
+  SunOS 4.1 also needs the Ultrix mousing code patch mentioned above.
+
 Environment variables
 =====================
 
