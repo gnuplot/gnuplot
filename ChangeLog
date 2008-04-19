@@ -1,3 +1,11 @@
+2008-04-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/sun.trm:  Rename local static variable "canvas" to "SUN_canvas"
+	to avoid conflict with global of the same name.
+
+	* src/util.c (int_error):  We really want to use snprintf(), but if the
+	platform doesn't provide it (SunOS 4.1) what can you do?
+
 2008-04-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm:  Use a more finely sampled palette to generate colors.

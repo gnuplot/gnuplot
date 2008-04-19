@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: sun.trm,v 1.12 2006/07/07 03:51:23 sfeam Exp $
+ * $Id: sun.trm,v 1.14 2008/04/19 04:07:51 sfeam Exp $
  *
  */
 
@@ -92,7 +92,7 @@ static Notify_value local_notice_destroy __PROTO((Frame frame, Destroy_status st
 #define MINWIN 128
 
 static Frame frame;
-static Canvas canvas;
+static Canvas SUN_canvas;
 static Pixwin *pw;
 static struct pixfont *sun_font = NULL;
 
@@ -122,13 +122,13 @@ SUN_init()
 			  FRAME_LABEL, "Gnuplot",
 			  0);
     notify_interpose_destroy_func(frame, local_notice_destroy);
-    canvas = window_create(frame, CANVAS,
+    SUN_canvas = window_create(frame, CANVAS,
 			   CANVAS_AUTO_EXPAND, TRUE,
 			   CANVAS_AUTO_SHRINK, TRUE,
 			   CANVAS_MARGIN, MARGIN,
 			   0);
     notify_do_dispatch();
-    pw = canvas_pixwin(canvas);
+    pw = canvas_pixwin(SUN_canvas);
     window_set(frame, WIN_SHOW, TRUE, 0);
 
     /* figure out font and rough size */
@@ -143,8 +143,8 @@ SUN_init()
 TERM_PUBLIC void
 SUN_graphics()
 {
-    term->xmax = (int) window_get(canvas, CANVAS_WIDTH);
-    term->ymax = (int) window_get(canvas, CANVAS_HEIGHT);
+    term->xmax = (int) window_get(SUN_canvas, CANVAS_WIDTH);
+    term->ymax = (int) window_get(SUN_canvas, CANVAS_HEIGHT);
     pw_writebackground(pw, 0, 0, term->xmax, term->ymax, PIX_SRC);
     notify_dispatch();
     /* do not let the user make the window too small */
@@ -200,7 +200,7 @@ SUN_vector(unsigned int x, unsigned int y)
     if ((x >= term->xmax) || (y >= term->ymax))
 	return;
     sun_line(sun_lastx, x, sun_lasty, y);
-    canvas_pixwin(canvas);
+    canvas_pixwin(SUN_canvas);
     notify_dispatch();
     return;
 }
@@ -227,7 +227,7 @@ SUN_put_text(unsigned int x, unsigned int y, const char *str)
 	break;
     }
     pw_text(pw, x, y, PIX_SRC | PIX_DST, 0, str);
-    canvas_pixwin(canvas);
+    canvas_pixwin(SUN_canvas);
     notify_dispatch();
     return;
 }
