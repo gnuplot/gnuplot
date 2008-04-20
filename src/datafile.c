@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.152 2008/04/15 17:39:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.153 2008/04/19 03:35:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1451,7 +1451,7 @@ plot_option_using(int max_using)
 
 	if (df_binary_file)
 # if BINARY_HAS_OWN_FORMAT_STRING
-	    int_error(NO_CARET, "Place format string with `binary` keyword, i.e., \"binary format='...'\"\n\t or use \"binary filetype=...\" for in-file format if supported");
+	    int_error(NO_CARET, "Expecting \"binary format='...'\" or \"binary filetype=...\"");
 # else
 	    if (df_matrix_file)
 		int_error(c_token, matrix_general_binary_conflict_msg);
@@ -1958,7 +1958,7 @@ df_determine_matrix_info(FILE *fin)
 	if (nc == 0)
 	    int_error(NO_CARET, "Read grid of zero width");
 	else if (nc > 1e8)
-	    int_error(NO_CARET, "Read grid width too large"); /* A sanity check on reading absurd numbers. */
+	    int_error(NO_CARET, "Read grid width too large");
 
 	/* Read second value for corner_0 x. */
 	fdummy = df_read_a_float(fin);
@@ -3376,7 +3376,7 @@ plot_option_array(void)
 		i_dimension++;
 		if (i_dimension >= 2)
 		    int_error(c_token,
-			      "Currently do not support sampled array dimensions greater than 2");
+			      "No support for sampled array dimensions greater than 2");
 		expecting_number = TRUE;
 		token_string++;
 		continue;
@@ -3495,8 +3495,7 @@ plot_option_multivalued(df_multivalue_type type, int arg)
 		= "Cannot flip a non-existent dimension";
 
 	    if (bin_record_count >= df_num_bin_records)
-		int_error(c_token, "\
-More parameters specified than data records specified");
+		int_error(c_token, "More parameters specified than data records specified");
 
 	    switch (type) {
 		case DF_DELTA:
@@ -3504,8 +3503,7 @@ More parameters specified than data records specified");
 		     * specified dimension. */
 		    *(df_bin_record[bin_record_count].cart_delta + arg) = tuple[0];
 		    if (df_bin_record[bin_record_count].cart_delta[arg] <= 0)
-			int_error(c_token - 2, "\
-Sample period must be positive. Try `flip` for changing direction");
+			int_error(c_token - 2, "Sample period must be positive. Try `flip` for changing direction");
 		    break;
 
 		case DF_FLIP_AXIS:
@@ -3517,8 +3515,7 @@ Sample period must be positive. Try `flip` for changing direction");
 			else if (tuple[0] == 1.0)
 			    df_bin_record[bin_record_count].cart_dir[arg] = 1;
 			else
-			    int_error(c_token-1, "\
-Flipping dimension direction must be 1 or 0");
+			    int_error(c_token-1, "Flipping dimension direction must be 1 or 0");
 		    } else
 			int_error(c_token, cannot_flip_msg);
 		    break;
@@ -3529,8 +3526,7 @@ Flipping dimension direction must be 1 or 0");
 		     * any characters in string that shouldn't be. */
 		    copy_str(df_format, c_token, MAX_LINE_LEN);
 		    if (strlen(df_format) != strspn(df_format, "xXyYzZ"))
-			int_error(c_token, "\
-Invalid character in dimension string. Only x, X, y, Y, z, or Z acceptable");
+			int_error(c_token, "Only x, X, y, Y, z, or Z acceptable in dimension string");
 		    /* Check for valid dimensions. */
 		    if (strpbrk(df_format, "xX")) {
 			if (df_bin_record[bin_record_count].cart_dim[0] > 0)
@@ -3559,43 +3555,36 @@ Invalid character in dimension string. Only x, X, y, Y, z, or Z acceptable");
 		    int i;
 		
 		    if (!(df_bin_record[bin_record_count].cart_dim[0]
-			  || df_bin_record[bin_record_count].scan_dim[0])
+			|| df_bin_record[bin_record_count].scan_dim[0])
 			|| !(df_bin_record[bin_record_count].cart_dim[1]
-			     || df_bin_record[bin_record_count].scan_dim[1]))
-			int_error(c_token, "\
-Cannot alter scanning method for one-dimensional data");
+			|| df_bin_record[bin_record_count].scan_dim[1]))
+			int_error(c_token, "Cannot alter scanning method for one-dimensional data");
 		    else if (df_bin_record[bin_record_count].cart_dim[2]
 			     || df_bin_record[bin_record_count].scan_dim[2]) {
 			for (i = 0;
 			     i < sizeof(df_bin_scan_table_3D)
 				 /sizeof(df_bin_scan_table_3D_struct);
 			     i++)
-			    if (equals(c_token,
-				       df_bin_scan_table_3D[i].string)) {
+			    if (equals(c_token, df_bin_scan_table_3D[i].string)) {
 				memcpy(df_bin_record[bin_record_count].cart_scan,
 				       df_bin_scan_table_3D[i].scan,
 				       sizeof(df_bin_record[0].cart_scan));
 				break;
 			    }
-			if (i == sizeof(df_bin_scan_table_3D)
-			    /sizeof(df_bin_scan_table_3D_struct))
-			    int_error(c_token, "\
-Improper scanning string. Try 3 character string for 3D data");
+			if (i == sizeof(df_bin_scan_table_3D) / sizeof(df_bin_scan_table_3D_struct))
+			    int_error(c_token, "Improper scanning string. Try 3 character string for 3D data");
 		    } else {
 			for (i = 0;
 			     i < sizeof(df_bin_scan_table_2D)
 				 /sizeof(df_bin_scan_table_2D_struct); i++)
-			    if (equals(c_token,
-				       df_bin_scan_table_2D[i].string)) {
+			    if (equals(c_token, df_bin_scan_table_2D[i].string)) {
 				memcpy(df_bin_record[bin_record_count].cart_scan,
 				       df_bin_scan_table_2D[i].scan,
 				       sizeof(df_bin_record[0].cart_scan));
 				break;
 			    }
-			if (i == sizeof(df_bin_scan_table_2D)
-			    /sizeof(df_bin_scan_table_2D_struct))
-			    int_error(c_token, "\
-Improper scanning string. Try 2 character string for 2D data");
+			if (i == sizeof(df_bin_scan_table_2D) / sizeof(df_bin_scan_table_2D_struct))
+			    int_error(c_token, "Improper scanning string. Try 2 character string for 2D data");
 		    }
 		    /* Remove the file supplied scan direction. */
 		    memcpy(df_bin_record[bin_record_count].scan_dir,
@@ -3609,12 +3598,9 @@ Improper scanning string. Try 2 character string for 2D data");
 		    /* Set the number of bytes to skip before reading
 		     * record. */
 		    df_bin_record[bin_record_count].scan_skip[0] = tuple[0];
-		    if (df_bin_record[bin_record_count].scan_skip[0] != tuple[0])
-			int_error(c_token, "\
-The number of bytes to skip must be an integer");
-		    if (df_bin_record[bin_record_count].scan_skip[0] < 0)
-			int_error(c_token, "\
-The number of bytes to skip must be positive");
+		    if ((df_bin_record[bin_record_count].scan_skip[0] != tuple[0])
+		    ||  (df_bin_record[bin_record_count].scan_skip[0] < 0))
+			int_error(c_token, "Number of bytes to skip must be positive integer");
 		    break;
 
 		case DF_ORIGIN:
@@ -3629,20 +3615,16 @@ The number of bytes to skip must be positive");
 			    = DF_TRANSLATE_VIA_CENTER;
 		    if (arg == MODE_PLOT) {
 			if (test_val != 2)
-			    int_error(c_token, "\
-Two-dimensional tuple required for 2D plot");
+			    int_error(c_token, "Two-dimensional tuple required for 2D plot");
 			tuple[2] = 0.0;
 		    } else if (arg == MODE_SPLOT) {
 			if (test_val != 3)
-			    int_error(c_token, "\
-Three-dimensional tuple required for 3D plot");
+			    int_error(c_token, "Three-dimensional tuple required for 3D plot");
 		    } else if (arg == MODE_QUERY) {
 			if (test_val != 3)
-			    int_error(c_token, "\
-Three-dimensional tuple required for setting binary parameters");
+			    int_error(c_token, "Three-dimensional tuple required for setting binary parameters");
 		    } else {
-			int_error(c_token, "\
-Internal error (datafile.c): Unknown plot mode");
+			int_error(c_token, "Internal error (datafile.c): Unknown plot mode");
 		    }
 		    memcpy(df_bin_record[bin_record_count].cart_cen_or_ori,
 			   tuple, sizeof(tuple));
@@ -3671,16 +3653,14 @@ Internal error (datafile.c): Unknown plot mode");
 		    if ((tuple[0]*tuple[0]
 			 + tuple[1]*tuple[1]
 			 + tuple[2]*tuple[2]) < 100.*DBL_EPSILON)
-			int_error(c_token, "\
-Perpendicular vector cannot be zero");
+			int_error(c_token, "Perpendicular vector cannot be zero");
 		    memcpy(df_bin_record[bin_record_count].cart_p,
 			   tuple,
 			   sizeof(tuple));
 		    break;
 
 		default:
-		    int_error(NO_CARET, "\
-Internal error (datafile.c): Invalid comma separated type");
+		    int_error(NO_CARET, "Internal error: Invalid comma separated type");
 	    } /* switch() */
 	} else {
 	    int_error(c_token, "Invalid numeric or tuple form");

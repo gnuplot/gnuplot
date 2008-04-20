@@ -1,3 +1,11 @@
+2008-04-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c src/set.c src/show.c src/util.c (int_error):
+	The worst-case fallback for int_error() uses a fixed length character
+	array. This can be overrun by long error messages (it's a fallback
+	for lack of snprintf).  Increase the size of the character array and
+	also trim some very long error messages to a more reasonable size.
+
 2008-04-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/sun.trm:  Rename local static variable "canvas" to "SUN_canvas"

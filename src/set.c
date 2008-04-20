@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.270 2008/03/29 23:39:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.271 2008/03/30 17:34:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1218,7 +1218,7 @@ set_encoding()
 	int temp = lookup_table(&set_encoding_tbl[0],c_token);
 
 	if (temp == S_ENC_INVALID)
-	    int_error(c_token, "expecting one of 'default', 'utf8', 'iso_8859_1', 'iso_8859_2', 'iso_8859_9', 'iso_8859_15', 'cp437', 'cp850', 'cp852', 'koi8r', 'koi8u', or 'locale'");
+	    int_error(c_token, "unrecognized encoding specification; see 'help encoding'.");
 	encoding = temp;
 	c_token++;
     }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.78 2008/04/13 19:25:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.79 2008/04/19 04:07:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -897,7 +897,7 @@ int_error(int t_num, const char str[], va_dcl)
     va_list args;
 #endif
 
-    char error_message[80] = {'\0'};
+    char error_message[128] = {'\0'};
 
     /* reprint line if screen has been written to */
 
@@ -931,6 +931,7 @@ int_error(int t_num, const char str[], va_dcl)
     sprintf(error_message, str, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif
 #endif
+
     fputs("\n\n", stderr);
 
     /* We are bailing out of nested context without ever reaching */

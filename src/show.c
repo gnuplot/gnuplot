@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.207 2008/03/29 23:39:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.208 2008/03/30 03:27:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2178,7 +2178,7 @@ show_palette()
 	return;
     }
     else { /* wrong option to "show palette" */
-        int_error( c_token, "Required 'show palette' or 'show palette gradient' or\n\t 'show palette palette <n>' or 'show palette rgbformulae' or\n\t 'show palette colornames'.");
+        int_error( c_token, "Expecting 'gradient' or 'palette <n>' or 'rgbformulae' or 'colornames'");
     }
 }
 
