@@ -1,7 +1,7 @@
 2008-04-20  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/util.c (int_error):  Yesterday's backport from 4.3 missed a
-	required char error_message[];
+	* src/util.c (int_error):  Revert patch of 2008-04-19; it is not needed
+	for 4.2
 
 2008-04-19  Ethan A Merritt  <merritt@u.washington.edu>
 
