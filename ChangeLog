@@ -1,3 +1,8 @@
+2008-04-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (int_error):  Yesterday's backport from 4.3 missed a
+	required char error_message[];
+
 2008-04-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/sun.trm:  Rename local static variable "canvas" to "SUN_canvas"
