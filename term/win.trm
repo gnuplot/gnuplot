@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.54 2007/07/24 11:57:37 mikulik Exp $
+ * $Id: win.trm,v 1.55 2007/07/27 06:55:53 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -534,12 +534,13 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 TERM_PUBLIC int
 WIN_make_palette(t_sm_palette *palette)
 {
-    /* Win can do continuous colors. However, we round them only to 256 levels
+    /* Win can do continuous colors. However, we round them only to WIN_PAL_COLORS levels
      * in order to pass an integer to GraphOp; it also reasonably limits
-     * the number of colors if "copy to clipboard" is used. Don't change this
-     * number unless you change it also in WIN_set_color() and in wgraph.c.
+     * the number of colors if "copy to clipboard" is used.
+     * EAM: Would it be better to use the approximate_palette() mechanism instead,
+     * like the x11 terminal?
      */
-    return 256;
+    return WIN_PAL_COLORS;
 }
 
 TERM_PUBLIC void
@@ -548,7 +549,7 @@ WIN_set_color(t_colorspec *colorspec)
     switch (colorspec->type ) {
 	case TC_FRAC:
     WIN_last_linetype = LT_NODRAW;      /* invalidate cached linetype */
-    GraphOp(&graphwin, W_pm3d_setcolor, (int)(256*colorspec->value), 0, NULL);
+	    GraphOp(&graphwin, W_pm3d_setcolor, (int)(WIN_PAL_COLORS*colorspec->value), 0, NULL);
 	    break;
 	case TC_RGB:
 	    GraphOp(&graphwin, W_pm3d_setcolor, (colorspec->lt) & 0xffff, 0xff00 | ((colorspec->lt >> 16) & 0x00ff), NULL);

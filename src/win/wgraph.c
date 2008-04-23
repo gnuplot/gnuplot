@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.54 2007/05/18 06:15:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.55 2008/04/10 18:09:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1047,7 +1047,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		/* distinguish gray values and RGB colors */
 		if (curptr->y == 0) {
 		    rgb255_color rgb255;
-		    rgb255maxcolors_from_gray( curptr->x / 256.0, &rgb255 );
+		    rgb255maxcolors_from_gray(curptr->x / (double)WIN_PAL_COLORS, &rgb255);
 		    c = RGB(rgb255.r, rgb255.g, rgb255.b);
 		}
 		else {

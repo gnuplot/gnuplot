@@ -26,7 +26,6 @@ New features, changes and fixes since gnuplot version 4.2
 * FIX handle addition plot styles in mode 'set table'
 * FIX purge tick labels read from a datafile at the end of each plot
 * CHANGE 'reset' does not affect locale, encoding, decimalsign settings
-* CHANGE fillstyle border type, if any, is applied to candlesticks
 * CHANGE 'set key textcolor rgb variable' will use plot colors for key entries
 * CHANGE Remove obsolete IRIS4D terminal type
 * CHANGE Remove obsolete atari terminal types (atariaes atarivdi multitos)

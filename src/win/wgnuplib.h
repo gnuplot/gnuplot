@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.23 2006/03/04 22:40:11 broeker Exp $
+ * $Id: wgnuplib.h,v 1.24 2006/03/05 01:15:56 broeker Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -252,6 +252,9 @@ void WDPROC AboutBox(HWND hwnd, LPSTR str);
 /* number of different 'basic' pens supported (the ones you can modify
  * by the 'Line styles...' dialog, and save to/from wgnuplot.ini). */
 #define WGNUMPENS 15
+
+/* maximum number of different colors per palette, used to be hardcoded (256) */
+#define WIN_PAL_COLORS 4096
 
 /* Information about one graphical operation to be stored by the
  * driver for the sake of redraws. Array of GWOP kept in global block */

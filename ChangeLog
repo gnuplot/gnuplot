@@ -1,3 +1,10 @@
+2008-04-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm:
+	I have defined a new constant in wgnuplib.h WIN_PAL_COLORS.
+	I don't know if the new value of 4096 is reasonable or not.
+	Bug #1847768
+
 2008-04-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/set.c src/show.c src/util.c (int_error):
