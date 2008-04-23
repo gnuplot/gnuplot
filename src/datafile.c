@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.153 2008/04/19 03:35:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.154 2008/04/21 03:50:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -693,6 +693,7 @@ df_tokenise(char *s)
 		df_column[df_no_cols].good = DF_STRINGDATA;
 	} else if (check_missing(s)) {
 	    df_column[df_no_cols].good = DF_MISSING;
+	    df_column[df_no_cols].datum = atof("NaN");
 	} else {
 	    int used;
 	    int count;
@@ -733,7 +734,7 @@ df_tokenise(char *s)
 		 *  - it is faster than sscanf()
 		 *  - sscanf(... %n ...) may not be portable
 		 *  - it allows error checking
-		 *  - atod() does not return a count or new position
+		 *  - atof() does not return a count or new position
 		 */
 		 char *next;
 		 df_column[df_no_cols].datum = gp_strtod(s, &next);
@@ -836,6 +837,7 @@ df_read_matrix(int *rows, int *cols)
     int max_rows = 0;
     int c;
     float *linearized_matrix = NULL;
+    int bad_data = 0;
     char *s;
     int index = 0;
 
@@ -891,12 +893,13 @@ df_read_matrix(int *rows, int *cols)
 		if (i < firstpoint && df_column[i].good != DF_GOOD) {
 		    /* It's going to be skipped anyhow, so... */
 		    linearized_matrix[index++] = 0;
-		} else if (df_column[i].good != DF_GOOD) {
-		    if (linearized_matrix)
-			free(linearized_matrix);
-		    int_error(NO_CARET, "Bad number in matrix");
 		} else
 		    linearized_matrix[index++] = (float) df_column[i].datum;
+
+		if (df_column[i].good != DF_GOOD) {
+		    if (bad_data++ == 0)
+			int_warn(NO_CARET,"matrix contains missing or undefined values");
+		}
 	    }
 	}
     }
