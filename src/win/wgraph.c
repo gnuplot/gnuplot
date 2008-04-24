@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.55 2008/04/10 18:09:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.56 2008/04/23 21:38:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -348,6 +348,8 @@ GraphInit(LPGW lpgw)
 	HMENU sysmenu;
 	WNDCLASS wndclass;
 	char buf[80];
+	HDC hdc;
+	TEXTMETRIC metric;
 
 	if (!lpgw->hPrevInstance) {
 		wndclass.style = CS_HREDRAW | CS_VREDRAW;
@@ -370,6 +372,12 @@ GraphInit(LPGW lpgw)
 		lpgw->Origin.x, lpgw->Origin.y,
 		lpgw->Size.x, lpgw->Size.y,
 		NULL, NULL, lpgw->hInstance, lpgw);
+
+	// determine height of status line
+	hdc = GetDC(lpgw->hWndGraph);
+	GetTextMetrics(hdc, &metric);
+	lpgw->statuslineheight = metric.tmHeight * 1.2;
+	ReleaseDC(lpgw->hWndGraph, hdc);
 
 	lpgw->hPopMenu = CreatePopupMenu();
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->graphtotop ? MF_CHECKED : MF_UNCHECKED),
@@ -614,6 +622,16 @@ Wnd_GetTextSize(HDC hdc, LPCSTR str, size_t len, int *cx, int *cy)
 	*cy = HIWORD(extent);
 #endif
 }
+
+
+void 
+GetPlotRect(LPGW lpgw, LPRECT rect)
+{
+	GetClientRect(lpgw->hWndGraph, rect);
+	rect->bottom -= lpgw->statuslineheight; // leave some room for the status line
+	if (rect->bottom < rect->top) rect->bottom = rect->top;
+}
+
 
 static void
 MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
@@ -1290,7 +1308,7 @@ CopyClip(LPGW lpgw)
 
 	/* get the context */
 	hdc = GetDC(hwnd);
-	GetClientRect(hwnd, &rect);
+	GetPlotRect(lpgw, &rect);
 
 	/* make a bitmap and copy it there */
 	mem = CreateCompatibleDC(hdc);
@@ -1362,7 +1380,7 @@ CopyClip(LPGW lpgw)
 	hGMem = GlobalAlloc(GMEM_MOVEABLE, (DWORD)sizeof(METAFILEPICT));
 	lpMFP = (LPMETAFILEPICT) GlobalLock(hGMem);
 	hdc = GetDC(hwnd);	/* get window size */
-	GetClientRect(hwnd, &rect);
+	GetPlotRect(lpgw, &rect);
 	/* in MM_ANISOTROPIC, xExt & yExt give suggested size in 0.01mm units */
 	lpMFP->mm = MM_ANISOTROPIC;
 	lpMFP->xExt = MulDiv(rect.right-rect.left, 2540, GetDeviceCaps(hdc, LOGPIXELSX));
@@ -2287,7 +2305,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					DestroyFonts(lpgw);
 					hdc = GetDC(hwnd);
 					MakePens(lpgw, hdc);
-					GetClientRect(hwnd, &rect);
+					GetPlotRect(lpgw, &rect);
 					MakeFonts(lpgw, (LPRECT)&rect, hdc);
 					ReleaseDC(hwnd, hdc);
 					GetClientRect(hwnd, &rect);
@@ -2318,7 +2336,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 #ifdef USE_MOUSE
 			LoadCursors(lpgw);
 #endif
-			GetClientRect(hwnd, &rect);
+			GetPlotRect(lpgw, &rect);
 			MakeFonts(lpgw, (LPRECT)&rect, hdc);
 			ReleaseDC(hwnd, hdc);
 #if WINVER >= 0x030a
@@ -2335,7 +2353,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			hdc = BeginPaint(hwnd, &ps);
 			SetMapMode(hdc, MM_TEXT);
 			SetBkMode(hdc,OPAQUE);
-			GetClientRect(hwnd, &rect);
+			GetPlotRect(lpgw, &rect);
 #ifdef WIN32
 			SetViewportExtEx(hdc, rect.right, rect.bottom, NULL);
 #else
@@ -2432,7 +2450,7 @@ GraphGetFontScaling(LPGW lpgw, LPCSTR font, int fontsize)
     int shift = 35;
 
     hdc = GetDC(lpgw->hWndGraph);
-    GetClientRect(lpgw->hWndGraph, &rect);
+	GetPlotRect(lpgw, &rect);
     GraphChangeFont(lpgw, font, fontsize, hdc, rect);
     hprevfont = SelectObject(hdc, lpgw->hfonth);
     if (GetOutlineTextMetrics(hdc, sizeof(otm), &otm) != 0) {
@@ -2456,7 +2474,7 @@ GraphGetTextLength(LPGW lpgw, LPCSTR text, LPCSTR fontname, int fontsize)
     HGDIOBJ hprevfont;
 
     hdc = GetDC(lpgw->hWndGraph);
-    GetClientRect(lpgw->hWndGraph, &rect);
+	GetPlotRect(lpgw, &rect);
 
     GraphChangeFont(lpgw, fontname, fontsize, hdc, rect);
 
@@ -2503,7 +2521,7 @@ Graph_set_cursor (LPGW lpgw, int c, int x, int y )
 			RECT rc;
 			POINT pt;
 
-			GetClientRect(lpgw->hWndGraph, &rc);
+			GetPlotRect(lpgw, &rc);
 			pt.x = MulDiv(x, rc.right - rc.left, lpgw->xmax);
 			pt.y = rc.bottom - MulDiv(y, rc.bottom - rc.top, lpgw->ymax);
 
@@ -2632,7 +2650,7 @@ GetMousePosViewport (LPGW lpgw, int *mx, int *my)
 	POINT pt;
 	RECT rc;
 
-	GetClientRect(lpgw->hWndGraph,&rc);
+	GetPlotRect(lpgw, &rc);
 
 	/* HBB: has to be done this way. The simpler method by taking apart LPARM
 	 * only works for mouse, but not for keypress events. */
@@ -2700,35 +2718,64 @@ Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y)
 /* Saved text currently contained in status line */
 static char *sl_curr_text = NULL;
 
-/* Display the status line by the text (and remove it again by calling this
- * same routine a second time --- thanks to XOR mode) */
+/* Display the status line text */
 static void
-DisplayStatusLine (LPGW lpgw)
+DisplayStatusLine(LPGW lpgw)
 {
 	RECT rc;
+	HDC hdc;
 
 	if (!sl_curr_text || !sl_curr_text[0])
-	       return; /* no text to be displayed */
+	       return; // no text to be displayed
 
+	hdc = GetDC(lpgw->hWndGraph);
+	SetBkMode(hdc, OPAQUE);
 	GetClientRect(lpgw->hWndGraph, &rc);
-	Draw_XOR_Text(lpgw, sl_curr_text, strlen(sl_curr_text), 0, rc.bottom);
+	TextOut(hdc,  0, rc.bottom - lpgw->statuslineheight, sl_curr_text, strlen(sl_curr_text));
+	ReleaseDC(lpgw->hWndGraph, hdc);
 }
 
-
 /*
- * Update the status line by the text; firstly erase the previous text
+ * Update the status line by the text; erase the previous text
  */
 static void
-UpdateStatusLine (LPGW lpgw, const char text[] )
+UpdateStatusLine (LPGW lpgw, const char text[])
 {
-	DisplayStatusLine(lpgw); /* erase previous text */
-	free(sl_curr_text);
+	RECT rc;
+	HDC hdc;
+	SIZE size, size2;
+
+	hdc = GetDC(lpgw->hWndGraph);
+	GetClientRect(lpgw->hWndGraph, &rc);
+
+	// determine length of previous text
+	size.cx = 0;
+	if (sl_curr_text) {
+		GetTextExtentPoint(hdc, sl_curr_text, strlen(sl_curr_text), &size);
+		free(sl_curr_text);
+	}
+
+	// determine length of new text
 	if (!text || !*text) {
 		sl_curr_text = 0;
-	} else { /* display new text */
+		size2.cx = 0;
+	} else { // display new text 
 		sl_curr_text = strdup(text);
-		DisplayStatusLine(lpgw);
+		GetTextExtentPoint(hdc, sl_curr_text, strlen(sl_curr_text), &size2);
+		// overwrite previous text
+		SetBkMode(hdc, OPAQUE);
+		TextOut(hdc,  0, rc.bottom - lpgw->statuslineheight, sl_curr_text, strlen(sl_curr_text));
 	}
+
+	// erase rest
+	if (size.cx > size2.cx) {
+		rc.left = size2.cx;
+		rc.right = size.cx;
+		rc.top  = rc.bottom - lpgw->statuslineheight;
+		FillRect(hdc, &rc, (HBRUSH) (COLOR_WINDOW+1));
+	}
+
+	ReleaseDC(lpgw->hWndGraph, hdc);
 }
 
 /* Draw the ruler.
@@ -2745,7 +2792,7 @@ DrawRuler (LPGW lpgw)
 		return;
 
 	hdc = GetDC(lpgw->hWndGraph);
-	GetClientRect(lpgw->hWndGraph, &rc);
+	GetPlotRect(lpgw, &rc);
 
 	rx = MulDiv(ruler.x, rc.right - rc.left, lpgw->xmax);
 	ry = rc.bottom - MulDiv(ruler.y, rc.bottom - rc.top, lpgw->ymax);
@@ -2773,7 +2820,7 @@ DrawRulerLineTo (LPGW lpgw)
 		return;
 
 	hdc = GetDC(lpgw->hWndGraph);
-	GetClientRect(lpgw->hWndGraph, &rc);
+	GetPlotRect(lpgw, &rc);
 
 	rx  = MulDiv(ruler.x, rc.right - rc.left, lpgw->xmax);
 	ry  = rc.bottom - MulDiv(ruler.y, rc.bottom - rc.top, lpgw->ymax);
@@ -2802,7 +2849,7 @@ DrawZoomBox (LPGW lpgw)
 		return;
 
 	hdc = GetDC(lpgw->hWndGraph);
-	GetClientRect(lpgw->hWndGraph, &rc);
+	GetPlotRect(lpgw, &rc);
 
 	fx = MulDiv(zoombox.from.x, rc.right - rc.left, lpgw->xmax);
 	fy = rc.bottom - MulDiv(zoombox.from.y, rc.bottom - rc.top, lpgw->ymax);
