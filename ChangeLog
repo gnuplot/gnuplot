@@ -1,3 +1,10 @@
+2008-04-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_encode_image PS_image):  If the palette size is
+	limited by "set palette maxcolors" then we need to rescale [0:maxcolors]
+	to [0:bitwidth] for the packed representation of the image in PostScript
+	Bug #1869824
+
 2008-04-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/win/wgraph.c:  Separate the status line from
@@ -12,8 +19,8 @@
 
 	* src/datafile.c (df_tokenise df_read_matrix): If missing or bad data is
 	found in a matrix data file, print an int_warn() message, set the value
-	to NaN if it isn't already, and return to the caller normal. 
-	This allows to leave holes in a matrix data file.
+	to NaN if it isn't already, and return to the caller normally. 
+	This allows one to leave holes in a matrix data file.
 
 2008-04-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
