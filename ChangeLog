@@ -1,3 +1,10 @@
+2008-04-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_encode_image PS_image):  If the palette size is
+	limited by "set palette maxcolors" then we need to rescale [0:maxcolors]
+	to [0:bitwidth] for the packed representation of the image in PostScript
+	Bug #1869824
+
 2008-04-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (int_error):  Revert patch of 2008-04-19; it is not needed
