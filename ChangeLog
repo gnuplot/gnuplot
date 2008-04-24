@@ -5,6 +5,9 @@
 	Status line no longer contains garbled text.
 	Bug #1520692
 
+	* config/config.nt: Disable many thousand compiler warnings from 
+	Microsoft Visual Express C++ 2005.
+
 2008-04-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_tokenise df_read_matrix): If missing or bad data is
