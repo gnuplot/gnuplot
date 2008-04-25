@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.231 2008/04/06 20:36:32 sfeam Exp $
+ * $Id: post.trm,v 1.232 2008/04/25 00:13:52 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -951,17 +951,16 @@ PS_options()
 			if (!deleteentry)
 			    prev_ps_fontfile->next = new_ps_fontfile;
 			else
-			    int_warn(c_token,"Can't delete Font filename '%s'",
+			    int_warn(c_token-1,"Can't delete Font filename '%s'",
 				     new_ps_fontfile->fontfile_name);
 		    }
 		} else {
 		    if (!deleteentry)
 			ps_params->first_fontfile = new_ps_fontfile;
 		    else
-			int_warn(c_token, "Can't delete Font filename '%s'",
+			int_warn(c_token-1, "Can't delete Font filename '%s'",
 				 new_ps_fontfile->fontfile_name);
 		}
-		c_token++;
 	    }
 	    break;
 	}

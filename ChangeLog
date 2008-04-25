@@ -1,3 +1,9 @@
+2008-04-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_options):  "set term post ..." was losing options on
+	the command that appeared after "fontfile 'foo' ".  Remove extraneous
+	c_token++.
+
 2008-04-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_encode_image PS_image):  If the palette size is
