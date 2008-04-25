@@ -4,6 +4,11 @@
 	the command that appeared after "fontfile 'foo' ".  Remove extraneous
 	c_token++.
 
+	* src/graphics.c (plot_points) src/plot2d.c (get_data):  Allow the
+	points in "with linespoints" to accept all the extra properties that
+	"with points" already allows.  "pointsize variable" reads data from
+	a 3rd column, "lc rgb variable" reads from a 3rd or 4th column.
+
 2008-04-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_encode_image PS_image):  If the palette size is

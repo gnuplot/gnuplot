@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.259 2008/04/05 16:19:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.260 2008/04/05 23:16:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2206,10 +2206,11 @@ plot_lines(struct curve_points *plot)
     for (i = 0; i < plot->p_count; i++) {
 
 	/* rgb variable  -  color read from data column */
-	if (plot->points[i].type != UNDEFINED)
-	if ((plot->lp_properties.pm3d_color.value < 0.0)
-	    && (plot->lp_properties.pm3d_color.type == TC_RGB))
-	    set_rgbcolor( plot->points[i].yhigh);
+	if (plot->points[i].type != UNDEFINED) {
+	    if ((plot->lp_properties.pm3d_color.value < 0.0)
+	    &&  (plot->lp_properties.pm3d_color.type == TC_RGB))
+		set_rgbcolor( plot->points[i].yhigh);
+	}
 
 	switch (plot->points[i].type) {
 	case INRANGE:{
@@ -3741,7 +3742,7 @@ plot_points(struct curve_points *plot)
 		    && (plot->lp_properties.pm3d_color.type == TC_RGB))
 		    set_rgbcolor( plot->points[i].yhigh);
 
-		if (plot->plot_style == POINTSTYLE
+		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		&&  plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize * plot->points[i].z);
 		(*t->point) (x, y, plot->lp_properties.p_type);
