@@ -9,6 +9,8 @@
 	"with points" already allows.  "pointsize variable" reads data from
 	a 3rd column, "lc rgb variable" reads from a 3rd or 4th column.
 
+	* docs/gnuplot.doc:  Wording changes suggested on newsgroup.
+
 2008-04-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_encode_image PS_image):  If the palette size is

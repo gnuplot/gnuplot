@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.492 2008/04/15 05:01:07 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.493 2008/04/15 17:39:28 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -131,15 +131,15 @@ C
  omitted, but these cases are not always denoted with braces around the angle
  brackets.
 
- For on-line help on any topic, type `help` followed by the name of the topic
- or just `help` or `?` to get a menu of available topics.
+ For built-in help on any topic, type `help` followed by the name of the topic
+ or `help ?` to get a menu of available topics.
 
- The new `gnuplot` user should begin by reading about `plotting` (if on-line,
- type `help plotting`).
+ The new `gnuplot` user should begin by reading about `plotting` (if in an
+ interactive session, type `help plotting`).
 
  See the simple.dem demo, also available together with other demos on the web page
-^ <a href="http://www.gnuplot.info/demo/simple.html">
-           http://www.gnuplot.info/demo/simple.html
+^ <a href="http://www.gnuplot.info/demo/">
+           http://www.gnuplot.info/demo/
 ^ </a>
 2 Seeking-assistance
 ?help-desk
@@ -159,8 +159,8 @@ C
  The address for mailing to list members is:
        gnuplot-info@lists.sourceforge.net
 
- Bug reports and code contributions should be mailed to:
-       gnuplot-bugs@lists.sourceforge.net
+ Bug reports and code contributions should be uploaded to the trackers at
+       http://sourceforge.net/projects/gnuplot
 
  The list of those interested in beta-test versions is:
        gnuplot-beta@lists.sourceforge.net
@@ -890,6 +890,7 @@ C
  must be numerical constants.  For example, {3,2} represents 3 + 2i; {0,1}
  represents 'i' itself.  The curly braces are explicitly required here.
 
+=division
  Note that gnuplot uses both "real" and "integer" arithmetic, like FORTRAN and
  C.  Integers are entered as "1", "-10", etc; reals as "1.0", "-10.0", "1e1",
  3.5e-1, etc.  The most important difference between the two forms is in
@@ -3385,9 +3386,9 @@ Ffigure_mapcontours
 1 Commands
 ?commands
  This section lists the commands acceptable to `gnuplot` in alphabetical
- order.  Printed versions of this document contain all commands; on-line
- versions may not be complete.  Indeed, on some systems there may be no
- commands at all listed under this heading.
+ order.  Printed versions of this document contain all commands; the text
+ available interactively may not be complete.  Indeed, on some systems there may
+ be no commands at all listed under this heading.
 
  Note that in most cases unambiguous abbreviations for command names and their
  options are permissible, i.e., "`p f(x) w li`" instead of "`plot f(x) with
@@ -3986,7 +3987,7 @@ Ffigure_mapcontours
 2 help
 ?commands help
 ?help
- The `help` command displays on-line help. To specify information on a
+ The `help` command displays built-in help. To specify information on a
  particular topic use the syntax:
 
        help {<topic>}
