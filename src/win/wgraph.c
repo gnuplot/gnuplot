@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.56 2008/04/23 21:38:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.57 2008/04/24 16:30:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -373,7 +373,7 @@ GraphInit(LPGW lpgw)
 		lpgw->Size.x, lpgw->Size.y,
 		NULL, NULL, lpgw->hInstance, lpgw);
 
-	// determine height of status line
+	/* determine height of status line */
 	hdc = GetDC(lpgw->hWndGraph);
 	GetTextMetrics(hdc, &metric);
 	lpgw->statuslineheight = metric.tmHeight * 1.2;
@@ -628,7 +628,7 @@ void
 GetPlotRect(LPGW lpgw, LPRECT rect)
 {
 	GetClientRect(lpgw->hWndGraph, rect);
-	rect->bottom -= lpgw->statuslineheight; // leave some room for the status line
+	rect->bottom -= lpgw->statuslineheight; /* leave some room for the status line */
 	if (rect->bottom < rect->top) rect->bottom = rect->top;
 }
 
@@ -909,21 +909,35 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    break;
 	case W_line_type:
 	    {
+		LOGBRUSH lb;
+		LOGPEN cur_penstruct;
+
 		short cur_pen = ((curptr->x < (WORD)(-2))
 				 ? (curptr->x % WGNUMPENS) + 2
 				 : curptr->x + 2);
-		LOGPEN cur_penstruct = (lpgw->color && isColor) ?
-		    lpgw->colorpen[cur_pen] : lpgw->monopen[cur_pen];
+		/* set color only when second parameter to W_line_type equals 1 */
+		if (curptr->y != 1)
+		    pen = cur_pen;
+		cur_penstruct = (lpgw->color && isColor) ?
+		    lpgw->colorpen[pen] : lpgw->monopen[pen];
+		cur_penstruct.lopnColor = ((lpgw->color && isColor) ?
+		    lpgw->colorpen[cur_pen] : lpgw->monopen[cur_pen]).lopnColor;
 
 		if (line_width != 1)
 		    cur_penstruct.lopnWidth.x *= line_width;
-		lpgw->hapen = CreatePenIndirect((LOGPEN FAR *) &cur_penstruct);
+	
+		/* use ExtCreatePeninstead of CreatePen/CreatePenIndirect to support
+		 * dashed lines if line_width > 1 */
+		lb.lbStyle = BS_SOLID;
+		lb.lbColor = cur_penstruct.lopnColor;
+		lpgw->hapen = ExtCreatePen(
+		        (line_width==1 ? PS_COSMETIC : PS_GEOMETRIC) | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
+			cur_penstruct.lopnWidth.x, &lb, 0, 0);
 		DeleteObject(SelectObject(hdc, lpgw->hapen));
 
-		pen = cur_pen;
-		SelectObject(hdc, lpgw->colorbrush[pen]);
+		SelectObject(hdc, lpgw->colorbrush[cur_pen]);
 		/* PM 7.7.2002: support color text */
-		SetTextColor(hdc, lpgw->colorpen[pen].lopnColor);
+		SetTextColor(hdc, cur_penstruct.lopnColor);
 	    }
 	break;
 
@@ -1061,6 +1075,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		static HBRUSH last_pm3d_brush = NULL;
 		HBRUSH this_brush;
 		COLORREF c;
+		LOGPEN cur_penstruct;
+		LOGBRUSH lb;
 
 		/* distinguish gray values and RGB colors */
 		if (curptr->y == 0) {
@@ -1072,13 +1088,23 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    c = RGB(curptr->y & 0xff, (curptr->x >> 8) & 0xff, curptr->x & 0xff);
 		}
 
+		/* FIXME: always a _solid_ brush?? */
 		this_brush = CreateSolidBrush(c);
 		SelectObject(hdc, this_brush);
 		if (last_pm3d_brush != NULL)
 		    DeleteObject(last_pm3d_brush);
 		last_pm3d_brush = this_brush;
 		/* create new pen, too: */
-		DeleteObject(SelectObject(hdc, CreatePen(PS_SOLID, line_width, c)));
+		cur_penstruct = (lpgw->color && isColor) ?
+		    lpgw->colorpen[pen] : lpgw->monopen[pen];	
+		if (line_width != 1)
+		    cur_penstruct.lopnWidth.x *= line_width;
+		lb.lbStyle = BS_SOLID;
+		lb.lbColor = c;
+		lpgw->hapen = ExtCreatePen(
+		    (line_width==1 ? PS_COSMETIC : PS_GEOMETRIC) | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
+		    cur_penstruct.lopnWidth.x, &lb, 0, 0);
+		DeleteObject(SelectObject(hdc, lpgw->hapen));
 		/* finally set text color */
 		SetTextColor(hdc, c);
 	    }
@@ -2726,7 +2752,7 @@ DisplayStatusLine(LPGW lpgw)
 	HDC hdc;
 
 	if (!sl_curr_text || !sl_curr_text[0])
-	       return; // no text to be displayed
+	       return; /* no text to be displayed */
 
 	hdc = GetDC(lpgw->hWndGraph);
 	SetBkMode(hdc, OPAQUE);
@@ -2748,26 +2774,26 @@ UpdateStatusLine (LPGW lpgw, const char text[])
 	hdc = GetDC(lpgw->hWndGraph);
 	GetClientRect(lpgw->hWndGraph, &rc);
 
-	// determine length of previous text
+	/* determine length of previous text */
 	size.cx = 0;
 	if (sl_curr_text) {
 		GetTextExtentPoint(hdc, sl_curr_text, strlen(sl_curr_text), &size);
 		free(sl_curr_text);
 	}
 
-	// determine length of new text
+	/* determine length of new text */
 	if (!text || !*text) {
 		sl_curr_text = 0;
 		size2.cx = 0;
-	} else { // display new text 
+	} else {
 		sl_curr_text = strdup(text);
 		GetTextExtentPoint(hdc, sl_curr_text, strlen(sl_curr_text), &size2);
-		// overwrite previous text
+		/* overwrite previous text */
 		SetBkMode(hdc, OPAQUE);
 		TextOut(hdc,  0, rc.bottom - lpgw->statuslineheight, sl_curr_text, strlen(sl_curr_text));
 	}
 
-	// erase rest
+	/* erase the rest */
 	if (size.cx > size2.cx) {
 		rc.left = size2.cx;
 		rc.right = size.cx;

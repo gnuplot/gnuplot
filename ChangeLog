@@ -1,8 +1,15 @@
+2008-04-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c term/win.trm (WIN_set_color):  Preserve setting of
+	dash type and linewidth when a new color is selected.
+	Allow dash types with linewidth > 1.
+	Bug #1863361
+
 2008-04-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_options):  "set term post ..." was losing options on
-	the command that appeared after "fontfile 'foo' ".  Remove extraneous
-	c_token++.
+	the command line that appeared after "fontfile 'foo' ".
+	Remove extraneous an c_token++.
 
 	* src/graphics.c (plot_points) src/plot2d.c (get_data):  Allow the
 	points in "with linespoints" to accept all the extra properties that
