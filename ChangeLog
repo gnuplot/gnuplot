@@ -5,6 +5,14 @@
 	to NaN if it isn't already, and return to the caller normally.
 	This allows one to leave holes in a matrix data file.
 
+	* src/graphics.c (boundary): The windows and postscript terminals place
+	the xlabel text with the character baseline on the bottom edge of the
+	canvas.  This causes any descenders to be clipped.  This patch leaves an
+	extra 1/5 line height of empty space at the bottom.  This fixes windows
+	and postscript, but introduces a small waste of space on most other
+	terminal types.
+	Bug #1918293
+
 2008-04-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_encode_image PS_image):  If the palette size is

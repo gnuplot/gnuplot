@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.24 2008/03/12 03:09:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.25 2008/03/12 03:21:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -554,7 +554,8 @@ boundary(struct curve_points *plots, int count)
 	map_position_r(&(axis_array[FIRST_X_AXIS].label.offset),
 		       &tmpx, &tmpy, "boundary");
 	/* offset is subtracted because if > 0, the margin is smaller */
-	xlabel_textheight = (xlablin * t->v_char - tmpy);
+	/* textheight is inflated by 0.2 to allow descenders to clear bottom of canvas */
+	xlabel_textheight = (((float)xlablin + 0.2) * t->v_char - tmpy);
 	if (!axis_array[FIRST_X_AXIS].ticmode)
 	    xlabel_textheight += 0.5 * t->v_char;
     } else
@@ -1020,8 +1021,9 @@ boundary(struct curve_points *plots, int count)
 
     y2label_y = plot_bounds.ytop + x2tic_height + x2tic_textheight + y2label_textheight;
 
+    /* Shift upward by 0.2 line to allow for descenders in xlabel text */
     xlabel_y = plot_bounds.ybot - xtic_height - xtic_textheight - xlabel_textheight
-	+ xlablin * t->v_char;
+	+ ((float)xlablin+0.2) * t->v_char;
     ylabel_x = plot_bounds.xleft - ytic_width - ytic_textwidth;
     if (axis_array[FIRST_Y_AXIS].label.text && can_rotate)
 	ylabel_x -= ylabel_textwidth;
