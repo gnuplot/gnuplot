@@ -1,3 +1,10 @@
+2008-04-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_tokenise df_read_matrix): If missing or bad data is
+	found in a matrix data file, print an int_warn() message, set the value
+	to NaN if it isn't already, and return to the caller normally.
+	This allows one to leave holes in a matrix data file.
+
 2008-04-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_encode_image PS_image):  If the palette size is
