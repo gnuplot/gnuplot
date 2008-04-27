@@ -1,3 +1,13 @@
+2008-04-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary): The windows and postscript terminals place
+	the xlabel text with the character baseline on the bottom edge of the
+	canvas.  This causes any descenders to be clipped.  This patch leaves an
+	extra 1/5 line height of empty space at the bottom.  This fixes windows
+	and postscript, but introduces a small waste of space on most other
+	terminal types.
+	Bug #1918293
+
 2008-04-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c term/win.trm (WIN_set_color):  Preserve setting of
