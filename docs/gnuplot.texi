@@ -1181,6 +1181,9 @@ determine if your system chooses -2 or -3 as the answer.
 
 The integer expression "1/0" may be used to generate an "undefined" flag,
 which causes a point to ignored; the `ternary` operator gives an example.
+Or you can use the pre-defined variable NaN to achieve the same result.
+@cindex NaN
+
 
 The real and imaginary parts of complex expressions are always real, whatever
 the form in which they are entered: in @{3,2@} the "3" and "2" are reals, not
@@ -2384,10 +2387,22 @@ Examples:
 The final two examples illustrate a user-defined string variable and a
 user-defined string function.
 
-Note that the variable `pi` is already defined.  But it is in no way magic;
-you may redefine it to be whatever you like. Some other variables may be
-defined under various gnuplot operations like mousing in interactive terminals
-or fitting; see @ref{variables} for details.
+@cindex NaN
+
+@cindex pi
+
+Note that the variables `pi` (3.14159...) and `NaN` (IEEE "Not a Number") are
+already defined.  You can redefine these to something else if you really need
+to. The original values can be recovered by setting:
+
+@example
+      NaN = GPVAL_NaN
+      pi  = GPVAL_pi
+
+@end example
+
+Other variables may be defined under various gnuplot operations like mousing in
+interactive terminals or fitting; see @ref{variables} for details.
 
 You can check for existence of a given variable V by the exists("V")
 expression. For example
@@ -3282,6 +3297,7 @@ vertical bar (|) separates mutually exclusive choices.
 * splot::                       
 * system_::                     
 * test::                        
+* undefine::                    
 * unset::                       
 * update::                      
 @end menu
@@ -4783,7 +4799,7 @@ that assumed by gnuplot.  These keywords can flip the scanning direction along
 dimensions x, y, z.
 
 
-@noindent --- ORIGIN  ---
+@noindent --- ORIGIN ---
 
 @c ?binary general keywords origin
 When gnuplot generates coordinates based upon transposition and flip, it
@@ -5425,6 +5441,9 @@ One trick is to use the ternary `?:` operator to filter data:
 which plots the datum in column two against that in column one provided
 the datum in column three exceeds ten.  `1/0` is undefined; `gnuplot`
 quietly ignores undefined points, so unsuitable points are suppressed.
+Or you can use the pre-defined variable NaN to achieve the same result.
+@cindex NaN
+
 
 In fact, you can use a constant expression for the column number, provided it
 doesn't start with an opening parenthesis; constructs like `using
@@ -5885,7 +5904,7 @@ Syntax:
                         @{pointtype | pt <point_type>@}
                         @{pointsize | ps <point_size>@}
                         @{fill | fs <fillstyle>@}
-                        @{nohidden3d@}
+                        @{nohidden3d | nocontours@}
                         @{palette@}@}
                    @}
 
@@ -5954,6 +5973,9 @@ You can attach the `nohidden3d` option to any individual plots that you want
 to exclude from the hidden3d processing.  The individual elements other than
 surfaces (i.e. lines, dots, labels, ...) of a plot marked `nohidden3d` will all
 be drawn, even if they would normally be obscured by other plot elements.
+
+Similarly, the keyword `nocontours` will turn off contouring for an individual
+plot even if the global property "set contour" is active.
 
 The keywords may be abbreviated as indicated.
 
@@ -6381,7 +6403,7 @@ when the variable was initially defined.
 * mytics::                      
 * mztics::                      
 * offsets::                     
-* origin::                      
+* origin::                     
 * output::                      
 * parametric_::                 
 * plot_::                       
@@ -9205,18 +9227,22 @@ The computed margins can be overridden by the @ref{margin} commands.  @ref{margi
 
 Syntax:
 @example
-      set bmargin @{<margin>@}
-      set lmargin @{<margin>@}
-      set rmargin @{<margin>@}
-      set tmargin @{<margin>@}
+      set bmargin @{@{screen@} <margin>@}
+      set lmargin @{@{screen@} <margin>@}
+      set rmargin @{@{screen@} <margin>@}
+      set tmargin @{@{screen@} <margin>@}
       show margin
 
 @end example
 
-The units of <margin> are character heights or widths, as appropriate.  A
-positive value defines the absolute size of the margin.  A negative value
+The default units of <margin> are character heights or widths, as appropriate.
+A positive value defines the absolute size of the margin.  A negative value
 (or none) causes `gnuplot` to revert to the computed value.  For 3D plots,
-only the left margin setting has any effect so far.
+only the left margin can be set using character units.
+
+The keyword `screen` indicates that the margin is specified as a fraction of
+the full drawing area. This can be used to precisely line up the corners of
+individual 2D and 3D graphs in a multiplot.
 
 Normally the margins of a plot are automatically calculated based on tics,
 tic labels, axis labels, the plot title, the timestamp and the size of the
@@ -9670,7 +9696,6 @@ will be autoscaled to [-1:1] and the vertical offsets are each two.
 @c ?set origin
 @c ?show origin
 @cindex origin
-@opindex origin
 
 
 The @ref{origin} command is used to specify the origin of a plotting surface
@@ -11534,8 +11559,8 @@ plots, then add the keyword `whiskerbars` to the plot command.  By default
 these whiskerbars extend the full horizontal width of the candlestick, but
 you can modify this by specifying a fraction of the full width.
 
-By default the rectangle is empty if (open > close), and filled with three
-vertical bars if (close > open). If filled-boxes support is present, then
+By default the rectangle is empty if (open < close), and filled with three
+vertical bars if (close < open). If filled-boxes support is present, then
 the rectangle is colored according to `set style fill <fillstyle>`.
 See @ref{bars} and `financebars`.  See also
 @uref{http://gnuplot.sourceforge.net/demo/candlesticks.html,finance demos
@@ -14476,10 +14501,18 @@ formatting capabilities.
 @cmindex system
 
 
-`system` spawns shell to execute a command. Please type @ref{shell} for
-more details.
+`system "command"` executes "command" using the standard shell. See @ref{shell}.
+If called as a function, `system("command")` returns the resulting character
+stream from stdout as a string.  One optional trailing newline is ignored.
 
-@node test, unset, system_, Commands
+This can be used to import external functions into gnuplot scripts:
+
+@example
+      f(x) = real(system(sprintf("somecommand %f", x)))
+
+@end example
+
+@node test, undefine, system_, Commands
 @section test
 
 @c ?commands test
@@ -14507,7 +14540,27 @@ The optional parameter, a permutation of letters rgb, determines the sequence of
 r,g,b profiles drawn one after the other --- try this yourself for `set palette
 gray`. The default sequence is rgb.
 
-@node unset, update, test, Commands
+@node undefine, unset, test, Commands
+@section undefine
+
+@c ?commands undefine
+@cindex undefine
+@cmindex undefine
+
+
+Clear one or more previously defined user variables.  This is useful in order
+to reset the state of a script containing an initialization test.
+
+Example:
+
+@example
+      undefine foo foo1 foo2
+      if (!exists("foo")) load "initialize.gp"
+
+@end example
+
+
+@node unset, update, undefine, Commands
 @section unset
 
 @c ?commands unset
@@ -18345,11 +18398,7 @@ superscripts and mixed fonts). See `enhanced` for more information.
 `"<fontname>"` is the name of a valid Windows font, and `<fontsize>`
 is the size of the font in points.
 
-Other options may be set with the graph-menu, the initialization file,
-and `set linestyle`.  Note that there is one restriction imposed by
-the classic Windows GDI interface: modifiable linewidth only works with
-solid lines, not with dotted or dashed ones.
-/* Does this really belong here? If not, someone move it where it does. */
+Other options may be set with the graph-menu or the initialization file.
 
 The Windows version normally terminates immediately as soon as the end of
 any files given as command line arguments is reached (i.e. in non-interactive
@@ -18478,7 +18527,7 @@ the macro on the second line.  Leading spaces are ignored.  Macro commands:
 
 [OPEN] --- Get name of file to open from list box, with title of list box
 terminated by [EOS], followed by default filename terminated by [EOS] or
-@{ENTER@}.  This uses COMMDLG.DLL from Windows 3.1.
+@{ENTER@}.
 
 [SAVE] --- Get name of file to save.  Similar to [OPEN]
 
@@ -18541,32 +18590,7 @@ and `Mono Linestyle`.  `Linestyles` are 0=SOLID, 1=DASH, 2=DOT, 3=DASHDOT,
 solid line in color mode, or a dashed line in monochrome mode.  The default
 line width is 1 pixel.  If `Linestyle` is negative, it specifies the width of
 a SOLID line in pixels.  Line1 and any linestyle used with the `points` style
-must be SOLID with unit width.
-
-
-@noindent --- WINDOWS3.0 ---
-
-@c ?commands set terminal windows windows3.0
-@c ?set terminal windows windows3.0
-@c ?set term windows windows3.0
-@c ?windows windows3.0
-@cindex windows3.0
-@tmindex windows3.0
-
-
-Windows 3.1 is preferred, but WGNUPLOT will run under Windows 3.0 with the
-following restrictions:
-`1.` COMMDLG.DLL and SHELL.DLL (available with Windows 3.1 or Borland C++
-3.1) must be in the windows directory.
-
-`2.` WGNUPLOT.HLP produced by Borland C++ 3.1 is in Windows 3.1 format.
-You need to use the WINHELP.EXE supplied with Borland C++ 3.1.
-
-`3.` It will not run in real mode due to lack of memory.
-
-`4.` TrueType fonts are not available in the graph window.
-
-`5.` Drag-drop does not work."
+must be SOLID with unit width."
 
 @node x11, x11_, windows, terminal_
 @subsubsection x11
