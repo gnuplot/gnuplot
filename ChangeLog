@@ -1,3 +1,14 @@
+2008-04-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h src/graphics.c (adjust_offsets do_plot) src/graphics.h
+	src/save.c (save_offsets) src/save.h src/set.c (set_offsets)
+	src/show.c (show_offsets) src/unset.c (unset_offsets) docs/gnuplot.doc:
+	Allow graph offsets to be given in graph coordinates.
+	Feature Request #1849366
+
+	* demo/electron.dem:  Do not pretend x2 is a separately scaled axis.
+	Bug #1744139
+
 2008-04-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm: Remove specific references to Windows 3.1

@@ -1,5 +1,5 @@
 #
-# $Id: electron.dem,v 1.7 2005/07/29 07:54:32 mikulik Exp $
+# $Id: electron.dem,v 1.8 2007/08/12 18:36:02 sfeam Exp $
 #
 # Electronics demo
 #
@@ -76,15 +76,15 @@ set key bottom center box
 set title "Amplitude and Phase Frequency Response"
 set xlabel "jw (radians)"
 set xrange [1.1 : 90000.0]
-set x2range [1.1 : 90000.0]
 set ylabel "magnitude of A(jw)"
 set y2label "Phase of A(jw) (degrees)"
-set ytics nomirror
-set y2tics
+set ytics nomirror tc lt 1
+set y2tics nomirror tc lt 3
+set xtics mirror
 set tics out
 set autoscale  y
 set autoscale y2
-plot abs(A(jw)), 180/pi*arg(A(jw)) axes x2y2
+plot abs(A(jw)) lt 1, 180/pi*arg(A(jw)) axes x1y2 lt 3
 
 pause -1 "Hit return to continue"
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.208 2008/03/30 03:27:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.209 2008/04/21 03:50:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1816,7 +1816,7 @@ show_offsets()
 {
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\toffsets are %g, %g, %g, %g\n", loff, roff, toff, boff);
+    save_offsets(stderr,"\toffsets are");
 }
 
 

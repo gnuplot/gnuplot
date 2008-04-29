@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.42 2008/02/27 03:20:43 sfeam Exp $
+ * $Id: graphics.h,v 1.43 2008/03/13 19:53:34 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -92,7 +92,7 @@ struct clipbox {
 /* externally visible variables of graphics.h */
 
 /* 'set offset' status variables */
-extern double loff, roff, toff, boff;
+extern t_position loff, roff, toff, boff;
 
 /* 'set bar' status */
 extern double bar_size;

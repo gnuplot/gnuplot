@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.261 2008/04/26 04:52:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.262 2008/04/27 20:55:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -61,10 +61,10 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.261 2008/04/26 04:52:58
 
 /* 'set offset' --- artificial buffer zone between coordinate axes and
  * the area actually covered by the data */
-double loff = 0.0;
-double roff = 0.0;
-double toff = 0.0;
-double boff = 0.0;
+t_position loff = {first_axes, 0.0};
+t_position roff = {first_axes, 0.0};
+t_position toff = {first_axes, 0.0};
+t_position boff = {first_axes, 0.0};
 
 /* set bars */
 double bar_size = 1.0;
@@ -1566,6 +1566,38 @@ place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *c
 }
 #endif
 
+/*
+ * Apply axis range expansions from "set offsets" command
+ */
+static void
+adjust_offsets()
+{
+    double b = boff.scaley == graph ? fabs(Y_AXIS.max - Y_AXIS.min)*boff.y : boff.y;
+    double t = toff.scaley == graph ? fabs(Y_AXIS.max - Y_AXIS.min)*toff.y : toff.y;
+    double l = loff.scalex == graph ? fabs(X_AXIS.max - X_AXIS.min)*loff.x : loff.x;
+    double r = roff.scalex == graph ? fabs(X_AXIS.max - X_AXIS.min)*roff.x : roff.x;
+
+    if (Y_AXIS.min < Y_AXIS.max) {
+	Y_AXIS.min -= b;
+	Y_AXIS.max += t;
+    } else {
+	Y_AXIS.max -= b;
+	Y_AXIS.min += t;
+    }
+    if (X_AXIS.min < X_AXIS.max) {
+	X_AXIS.min -= l;
+	X_AXIS.max += r;
+    } else {
+	X_AXIS.max -= l;
+	X_AXIS.min += r;
+    }
+
+    if (X_AXIS.min == X_AXIS.max)
+	int_error(NO_CARET, "x_min should not equal x_max!");
+    if (Y_AXIS.min == Y_AXIS.max)
+	int_error(NO_CARET, "y_min should not equal y_max!");
+}
+
 void
 do_plot(struct curve_points *plots, int pcount)
 {
@@ -1578,36 +1610,7 @@ do_plot(struct curve_points *plots, int pcount)
 
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
-
-    /* Apply the desired viewport offsets. */
-    if (Y_AXIS.min < Y_AXIS.max) {
-	Y_AXIS.min -= boff;
-	Y_AXIS.max += toff;
-    } else {
-	Y_AXIS.max -= boff;
-	Y_AXIS.min += toff;
-    }
-    if (X_AXIS.min < X_AXIS.max) {
-	X_AXIS.min -= loff;
-	X_AXIS.max += roff;
-    } else {
-	X_AXIS.max -= loff;
-	X_AXIS.min += roff;
-    }
-
-    /*
-     * In the beginning, this "empty range" test was for exact
-     * equality, eg y_min == y_max , but that caused an infinite loop
-     * once.  Then the test was changed to check for being within the
-     * 'zero' threshold, fabs(y_max - y_min) < zero) , but that
-     * prevented plotting data with ranges below 'zero'.  Now it's an
-     * absolute equality test again, since
-     * axis_checked_extend_empty_range() should have widened empty
-     * ranges before we get here.  */
-    if (X_AXIS.min == X_AXIS.max)
-	int_error(NO_CARET, "x_min should not equal x_max!");
-    if (Y_AXIS.min == Y_AXIS.max)
-	int_error(NO_CARET, "y_min should not equal y_max!");
+    adjust_offsets();
 
     /* EAM June 2003 - Although the comment below implies that font dimensions
      * are known after term_init(), this is not true at least for the X11

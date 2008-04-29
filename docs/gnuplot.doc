@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.493 2008/04/15 17:39:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.494 2008/04/26 05:17:02 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8539,29 +8539,34 @@ Ffigure_mapcontours
 ?show offsets
 ?offsets
 ?nooffsets
- Offsets provide a mechanism to put a boundary around the data inside of an
- autoscaled graph.
+ Offsets provide a mechanism to put an empty boundary around the data inside
+ an autoscaled graph.  The offsets only affect the x1 and y1 axes, and only in
+ 2D `plot` commands.
 
  Syntax:
        set offsets <left>, <right>, <top>, <bottom>
        unset offsets
        show offsets
 
- Each offset may be a constant or an expression.  Each defaults to 0.  Left
- and right offsets are given in units of the x axis, top and bottom offsets in
- units of the y axis.  A positive offset expands the graph in the specified
+ Each offset may be a constant or an expression.  Each defaults to 0.
+ By default, the left and right offsets are given in units of the first x axis,
+ the top and bottom offsets in units of the first y axis.  Alternatively, you
+ may specify the offsets as a fraction of the total axis range by using the
+ keyword "graph".  A positive offset expands the axis range in the specified
  direction, e.g., a positive bottom offset makes ymin more negative.  Negative
  offsets, while permitted, can have unexpected interactions with autoscaling
- and clipping.
-
- Offsets are ignored in `splot`s.
+ and clipping.  To prevent the auto-scaling from further adjusting your axis
+ ranges, it is useful to also specify "set auto fix".
 
  Example:
-       set offsets 0, 0, 2, 2
+       set auto fix
+       set offsets graph 0.05, 0, 2, 2
        plot sin(x)
 
  This graph of sin(x) will have a y range [-3:3] because the function
  will be autoscaled to [-1:1] and the vertical offsets are each two.
+ The x range will be [-11:10] because the default is [-10:10] and it has
+ been expanded to the left by 0.05 of that total range.
 3 origin
 ?commands set origin
 ?commands show origin

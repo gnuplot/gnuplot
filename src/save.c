@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.154 2008/03/18 00:16:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.155 2008/03/27 22:09:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -530,14 +530,14 @@ set y2data%s\n",
     SAVE_LOG(COLOR_AXIS );
 #undef SAVE_LOG
 
+    save_offsets(fp, "set offsets");
+
     /* FIXME */
     fprintf(fp, "\
-set offsets %g, %g, %g, %g\n\
 set pointsize %g\n\
 set encoding %s\n\
 %sset polar\n\
 %sset parametric\n",
-	    loff, roff, toff, boff,
 	    pointsize,
 	    encoding_names[encoding],
 	    (polar) ? "" : "un",
@@ -1243,6 +1243,17 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 	    fprintf(fp, " pointsize %.3f", lp->p_size);
     }
 	
+}
+
+
+void
+save_offsets(FILE *fp, char *lead)
+{
+    fprintf(fp, "%s %s%g, %s%g, %s%g, %s%g\n", lead,
+	loff.scalex == graph ? "graph " : "", loff.x,
+	roff.scalex == graph ? "graph " : "", roff.x,
+	toff.scaley == graph ? "graph " : "", toff.y,
+	boff.scaley == graph ? "graph " : "", boff.y);
 }
 
 #ifdef EAM_OBJECTS

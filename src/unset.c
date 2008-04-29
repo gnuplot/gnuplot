@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.115 2008/03/16 20:03:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.116 2008/03/29 23:40:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1127,7 +1127,8 @@ unset_month_day_tics(AXIS_INDEX axis)
 static void
 unset_offsets()
 {
-    loff = roff = toff = boff = 0.0;
+    loff.x = roff.x = 0.0;
+    toff.y = boff.y = 0.0;
 }
 
 

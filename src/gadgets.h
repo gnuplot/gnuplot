@@ -65,8 +65,9 @@ typedef enum position_type {
     character
 } position_type;
 
-/* A full 3D position, with all 3 coordinates of different axes,
- * possibly. Used for 'set label' and 'set arrow' positions: */
+/* A full 3D position, with all 3 coordinates of possible using different axes.
+ * Used for 'set label', 'set arrow' positions and various offsets.
+ */
 typedef struct position {
     enum position_type scalex,scaley,scalez;
     double x,y,z;

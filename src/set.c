@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.271 2008/03/30 17:34:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.272 2008/04/21 03:50:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -150,7 +150,6 @@ static void set_xyzlabel __PROTO((text_label * label));
 static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
-static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
 
 static void set_linestyle __PROTO((void));
 static int assign_linestyle_tag __PROTO((void));
@@ -2347,10 +2346,43 @@ set_offsets()
 {
     c_token++;
     if (END_OF_COMMAND) {
-	loff = roff = toff = boff = 0.0;  /* Reset offsets */
-    } else {
-	load_offsets (&loff,&roff,&toff,&boff);
+	loff.x = roff.x = toff.y = boff.y = 0.0;
+	return;
     }
+
+    loff.scalex = first_axes;
+    if (almost_equals(c_token,"gr$aph")) {
+	loff.scalex = graph;
+	c_token++;
+    }
+    loff.x = real_expression();
+    if (!equals(c_token, ","))
+	return;
+
+    roff.scalex = first_axes;
+    if (almost_equals(++c_token,"gr$aph")) {
+	roff.scalex = graph;
+	c_token++;
+    }
+    roff.x = real_expression();
+    if (!equals(c_token, ","))
+	return;
+
+    toff.scaley = first_axes;
+    if (almost_equals(++c_token,"gr$aph")) {
+	toff.scaley = graph;
+	c_token++;
+    }
+    toff.y = real_expression();
+    if (!equals(c_token, ","))
+	return;
+
+    boff.scaley = first_axes;
+    if (almost_equals(++c_token,"gr$aph")) {
+	boff.scaley = graph;
+	c_token++;
+    }
+    boff.y = real_expression();
 }
 
 
@@ -4876,26 +4908,6 @@ load_tic_series(AXIS_INDEX axis)
     tdef->def.series.end = end;
 }
 
-static void
-load_offsets(double *a, double *b, double *c, double *d)
-{
-    *a = real_expression();	/* loff value */
-    if (!equals(c_token, ","))
-	return;
-
-    c_token++;
-    *b = real_expression();	/* roff value */
-    if (!equals(c_token, ","))
-	return;
-
-    c_token++;
-    *c = real_expression();	/* toff value */
-    if (!equals(c_token, ","))
-	return;
-
-    c_token++;
-    *d = real_expression();	/* boff value */
-}
 
 /* return 1 if format looks like a numeric format
  * ie more than one %{efg}, or %something-else
