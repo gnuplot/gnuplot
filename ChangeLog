@@ -1,3 +1,9 @@
+2008-05-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: Add a user-editable definition of Gamma at the head of
+	PostScript output files.  This currently affects only grayscale images.
+	Bug #1869824
+
 2008-04-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/graphics.c (adjust_offsets do_plot) src/graphics.h
