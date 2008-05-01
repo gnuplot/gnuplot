@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.204 2008-01-27 15:14:58+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.473
+C RCS $Id: gnuplot-ja.doc,v 1.220 2008-05-01 13:54:14+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.495
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -182,16 +182,16 @@ C Shigeharu Takeno et al (3.7, 4.X)
  必ずしも角括弧が中括弧で囲まれて書かれているわけではありません。
 
  ある項目についてのヘルプが必要なときには，`help` に続けてその項目名を
- 入力して下さい．または単に `help` や `?` でもヘルプの項目のメニューが
+ 入力して下さい．または単に `help ?` でもヘルプの項目のメニューが
  現われます。
 
  初めて `gnuplot` を使う方は，`plotting` に関する説明から読みはじめると
- 良いでしょう (現在使用中であれば `help plotting` と入力して下さい)．
+ 良いでしょう (対話型で使用中ならば `help plotting` と入力して下さい)。
 
  simple.dem デモを参照してください。あるいは以下の Web ページにも他のデ
  モと一緒にあります。
-^ <a href="http://www.gnuplot.info/demo/simple.html">
-           http://www.gnuplot.info/demo/simple.html
+^ <a href="http://www.gnuplot.info/demo/">
+           http://www.gnuplot.info/demo/
 ^ </a>
 2 Seeking-assistance
 ?help-desk
@@ -212,8 +212,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
  メーリングリストメンバーへのメールアドレス:
        gnuplot-info@lists.sourceforge.net
 
- バグリポート、ソースの改良等は次のところへ:
-       gnuplot-bugs@lists.sourceforge.net
+ バグリポート、ソースの改良等は以下の trackers に upload してください:
+       http://sourceforge.net/projects/gnuplot
 
  βテスト版に関するメーリングリスト:
        gnuplot-beta@lists.sourceforge.net
@@ -290,10 +290,10 @@ C Shigeharu Takeno et al (3.7, 4.X)
  的に RGB の色を指定することが可能です。
  `colorspec` 参照。
 
-4 任意の長方形描画
+4 任意の長方形、その他の形状の描画
  2 次元グラフ内の任意の位置に、お好みの塗り潰しスタイルや境界を持つ長方
- 形を描画することができます。
- `set object rectangle` 参照。
+ 形、円、楕円を描画することができます。
+ `set object` 参照。
 
 3 文字列処理
 4 データファイルからの文字列や文字データの入力
@@ -602,10 +602,10 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?line-editing
 ?editing
 ?command-line-editing
- コマンドライン編集は Unix, Atari, VMS, MS-DOS and OS/2 上の `gnuplot`
- でサポートされています。履歴 (ヒストリ) 機能で、以前のコマンドを編集し
- 再実行することも出来ます。コマンドラインの編集後は、カーソルがどこにい
- ても改行や復帰キーによって行全体が入力されます。
+ コマンドライン編集は Unix, VMS, MS-DOS and OS/2 上の `gnuplot` でサポ
+ ートされています。履歴 (ヒストリ) 機能で、以前のコマンドを編集し再実行
+ することも出来ます。コマンドラインの編集後は、カーソルがどこにいても改
+ 行や復帰キーによって行全体が入力されます。
 
  (`gnuplot` における readline 関数は、GNU Bash や GNU Emacs で使われる
  readline 関数と全く同じではありません。もし、GNU 版を望むなら、コンパ
@@ -673,8 +673,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
  を使いたいと思うかも知れません。デフォルトの makefile はこれを仮定して
  いて、`gnuplot` はデフォルトでは行編集機能無しでコンパイルされます。も
  し `gnuplot` の行編集機能を使用したければ、makefile の READLINE をセッ
- トしてリンクファイルとして readline.obj を追加してください。IBM PC と
- Atari 版で readline を使う場合は以下のキーも使えます。
+ トしてリンクファイルとして readline.obj を追加してください。IBM PC 版
+ で readline を使う場合は以下のキーも使えます。
 
 @start table - まずは対話型テキスト形式
        左矢印 (←)      - ^B と同じ
@@ -700,35 +700,6 @@ C Shigeharu Takeno et al (3.7, 4.X)
 %Ctrl + 右@^E と同じ
 %上 (↑)@^P と同じ
 %下 (↓)@^N と同じ
-%_
-@end table
-
- Atari 版の readline は更にいくつかのエイリアスが定義されています:
-
-@start table - まずは対話型テキスト形式
-       Undo            - ^L と同じ
-       Home            - ^A と同じ
-       Ctrl Home       - ^E と同じ
-       Esc             - ^U と同じ
-       Help            - `help` + return.
-       Ctrl Help       - `help`.
-#\begin{tabular}{|cl|} \hline
-#キー & 機能 \\ \hline
-#Undo      & \verb~^L~ と同じ\\
-#Home      & \verb~^A~ と同じ\\
-#Ctrl Home & \verb~^E~ と同じ\\
-#Esc       & \verb~^U~ と同じ\\
-#Help      & `{\bf help}` + return\\
-#Ctrl Help & `{\bf help }`\\
-%c l .
-%キー@機能
-%_
-%Undo@^L と同じ
-%Home@^A と同じ
-%Ctrl Home@^E と同じ
-%Esc@^U と同じ
-%Help@help + return
-%Ctrl Help@help
 %_
 @end table
 2 Comments
@@ -927,7 +898,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  イル (`start-up` 参照) による指定や、当り前のことですが、その後に明示
  的に指定した物の方が優先されます。
 
- Unix, AmigaOS, AtariTOS, MS-DOS, OS/2 では、GNUHELP にヘルプファイル
+ Unix, AmigaOS, MS-DOS, OS/2 では、GNUHELP にヘルプファイル
  (gnuplot.gih) のパス名を定義しておくことができます。
 
  VMS では、論理名 GNUPLOT$HELP を `gnuplot` のヘルプライブラリの名前と
@@ -936,16 +907,16 @@ C Shigeharu Takeno et al (3.7, 4.X)
  ん。
 
  Unix においては、カレントディレクトリに .gnuplot というファイルがない
- 場合には、HOME に定義されたディレクトリを探します。AmigaOS, AtariTOS,
- MS-DOS, Windows, OS/2 では GNUPLOT がその役割に使われます。Windows で
- は、NT 専用の変数 USERPROFILE も参照されます。VMS では SYS$LOGIN です。
+ 場合には、HOME に定義されたディレクトリを探します。AmigaOS, MS-DOS,
+ Windows, OS/2 では GNUPLOT がその役割に使われます。Windows では、NT 専
+ 用の変数 USERPROFILE も参照されます。VMS では SYS$LOGIN です。
  `help start-up` と打ってみてください。
 
  Unix においては、PAGER がヘルプメッセージの出力用のフィルタとして使わ
  れます。
 
- Unix, AtariTOS, AmigaOS では、SHELL が `shell` コマンドの際に使われま
- す。MS-DOS, OS/2 では COMSPEC が `shell` コマンドの際に使われます。
+ Unix, AmigaOS では、SHELL が `shell` コマンドの際に使われます。MS-DOS,
+ OS/2 では COMSPEC が `shell` コマンドの際に使われます。
 
  MS-DOS で BGI または Watcom インターフェースが使われている場合、PCTRM
  が、使用するモニタがサポートする最大解像度を指示するのに使われます。
@@ -992,6 +963,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  あらわし、{0,1} は 'i' 自身を表します。これらには明示的に中カッコを使
  う必要があります。
 
+=division
  gnuplot は "実数" と "整数" 演算を FORTRAN や C のように扱うということ
  に注意してください。"1", "-10" などは整数と見なされ、"1.0", "-10.0",
  "1e1", 3.5e-1 などは実数と見なされます。 これら 2 つのもっとも重要な違
@@ -1003,6 +975,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
 
  数式 "1/0" は "未定義値 (undefined)" フラグを生成し、それによりその点
  は無視されます。`ternary` 演算子 (三項演算子) の項にその例があります。
+ または、あらかじめ定義されている値 NaN を使っても同じことになります。
+=NaN
 
  複素数表現の実数部分、虚数部分は、どんな形で入力されても常に実数です:
  {3,2} の "3" と "2" は実数であり、整数ではありません。
@@ -1120,6 +1094,18 @@ C Shigeharu Takeno et al (3.7, 4.X)
 %atanh(x)@任意@ラジアンでの $tanh sup -1 x$ (逆双曲正接)
  関数 `atanh(x)` は逆ハイパボリックタンジェント (逆双曲正接) の値をラジ
  アンで返します。
+4 EllipticK
+#EllipticK(k) & 実数 k $\in$ (-1:1) & $K(k)$ 第 1 種完全楕円積分\\
+%EllipticK(k)@実数 k in (-1:1)@$K k$ 第 1 種完全楕円積分
+ `elliptic integrals` 参照。
+4 EllipticE
+#EllipticE(k) & 実数 k $\in$ [-1:1] & $E(k)$ 第 2 種完全楕円積分\\
+%EllipticE(k)@実数 k in [-1:1]@ $E k$ 第 2 種完全楕円積分
+ `elliptic integrals` 参照。
+4 EllipticPi
+#EllipticPi(n,k) & 実数 n$<$1, 実数 k $\in$ (-1:1) & $\Pi(n,k)$ 第 3 種完全楕円積分\\
+%EllipticPi(n,k)@ 実数 n<1, 実数 k in (-1:1)@ $Pi n,k$ 第 3 種完全楕円積分
+ `elliptic integrals` 参照。
 4 besj0
 ?expressions functions besj0
 ?functions besj0
@@ -1455,7 +1441,6 @@ C Shigeharu Takeno et al (3.7, 4.X)
 4 system
 ?expressions functions system
 ?functions system
-?system function
 =system
 #system("command") & 文字列 & 出力を持つシェルコマンド文字列\\
 %system("command")@文字列@出力を持つシェルコマンド文字列
@@ -1619,11 +1604,25 @@ C Shigeharu Takeno et al (3.7, 4.X)
  `valid(x)` は、データ描画か fit における `using` の式の中でしか使われ
  ません。`plot datafile using` を参照してください。
 @end table
- 以下も参照してください。
-^ <a href="http://www.gnuplot.info/demo/airfoil.html">
- airfoil.dem: 関数と複素変数を翼に使ったデモ
-^ </a>
 
+4 elliptic integrals
+?expressions functions elliptic integrals
+?functions elliptic integrals
+?elliptic integrals
+=elliptic integrals
+ 関数 `EllipticK(k)` は、第 1 種完全楕円積分、すなわち、関数
+ `(1-(k*sin(p))**2)**(-0.5)` の 0 からπ/2 までの範囲の広義積分の値を返
+ します。`k` の定義域は -1 から 1 です (両端は含まない)。
+
+ 関数 `EllipticE(k)` は、第 2 種完全楕円積分、すなわち、関数
+ `(1-(k*sin(p))**2)**0.5` の 0 からπ/2 までの範囲の広義積分の値を返し
+ ます。`k` の定義域は -1 から 1 です (両端も含む)。
+
+ 関数 `EllipticPi(n,k)` は、第 3 種完全楕円積分、すなわち関数
+ `(1-(k*sin(p))**2)**(-0.5)/(1-n*sin(p)**2)` の 0 からπ/2 までの範囲の
+ 広義積分の値を返します。パラメータ `n` は 1 より小さく、`k` は -1 と 1
+ の間 (両端は含まない) でなければいけません。定義より、すべての正の `k`
+ に対し EllipticPi(0,k) == EllipticK(k) であることに注意してください。
 4 Random number generator
 ?expressions random
 ?functions random
@@ -1917,11 +1916,18 @@ C ... and restart the table:
  最後の 2 行の例は、ユーザ定義文字列変数と、ユーザ定義文字列関数を意味
  しています。
 
- 円周率 `pi` は既に定義されています。しかしこれは決して手品のようなもの
- ではなく、好きなように再定義することができます。他にもいくつかの変数が、
- 例えば対話型入出力形式でのマウス操作や当てはめ (fit) などの gnuplot の
- 動作状態に応じて定義されます。詳細は `gnuplot-defined variables` を参
- 照してください。
+=NaN
+=pi
+ 変数 `pi` (3.14159...) と `NaN` (IEEE 非数 ("Not a Number")) はあらか
+ じめ定義されています。これらが必要なければ、他のものに再定義することも
+ 可能ですし、以下のようにして元の値に復帰することもできます:
+
+       NaN = GPVAL_NaN
+       pi  = GPVAL_pi
+
+ 他にもいくつかの変数が、例えば対話型入出力形式でのマウス操作や当てはめ
+ (fit) などの gnuplot の動作状態に応じて定義されます。詳細は
+ `gnuplot-defined variables` を参照してください。
 
  ある変数 V が既に定義されているかどうかは、式 exists("V") でチェックで
  きます。例:
@@ -2207,14 +2213,12 @@ C ... and restart the table:
 4 bind space
 ?commands bind space
 ?bind space
- デフォルトでは、<space> ホットキーは gnuplot のコマンドウィンドウを前
- 面に出します。いくつかの出力形式 (例えば x11, wxt) では 'q' はグラフウ
- ィンドウを閉じます。これらのデフォルトは、'gnuplot -ctrlq' のようにし
- て gnuplot を起動する (`x11 command-line-options` も参照)、または X リ
- ソースの 'gnuplot*ctrlq' で、ctrl-space や ctrl-q に変更できます。
- 注意: <space> (または ctrl-space) で X11 の gnuplot ウィンドウが前面に
- 出ない場合は `raise` の項をよく読んでください。
-
+ gnuplot が、configure 時にオプション --enable-rase-console をつけてイ
+ ンストールされた場合は、描画ウィンドウ内で <space> をタイプすると
+ gnuplot のコマンドウィンドウが前面に出ます。このホットキーは、
+ 'gnuplot -ctrlq' のようにして gnuplot を起動するか、または X リソース
+ の 'gnuplot*ctrlq' を設定することで ctrl-space に変更できます。
+ `x11 command-line-options` 参照。
 3 Mouse variables
 ?mouse variables
  マウス機能が有効な場合、現在のウィンドウ上でのマウスクリックによって
@@ -2294,12 +2298,11 @@ C ... and restart the table:
  `gnuplot` が起動されるとき，初期設定ファイルを読み込もうとします．この
  ファイルは Unix と AmigaOS では，`.gnuplot` であり，その他の処理系で
  は `GNUPLOT.INI` となっています．このファイルがカレントディレクトリに
- 無い場合，`gnuplot` はホームディレクトリを検索します (AmigaOS, Atari
- (single)TOS, MS-DOS, Windows, OS/2 では，環境変数 `GNUPLOT` にホームデ
- ィレクトリに対応するディレクトリを指定します; Windows NT では、GNUPLOT
- が定義されていなければ `USERPROFILE` が使われます)．注意: インストール
- の時に NOCWDRC を定義した場合には，`gnuplot` はカレントディレクトリか
- らは読みません．
+ 無い場合，`gnuplot` はホームディレクトリを検索します (AmigaOS, MS-DOS,
+ Windows, OS/2 では，環境変数 `GNUPLOT` にホームディレクトリに対応する
+ ディレクトリを指定します; Windows NT では、GNUPLOT が定義されていなけ
+ れば `USERPROFILE` が使われます)．注意: インストールの時に NOCWDRC を
+ 定義した場合には，`gnuplot` はカレントディレクトリからは読みません．
 
  初期設定ファイルが見つかると，`gnuplot` はこのファイルに書かれているコ
  マンドを実行します．ここには任意の正しい `gnuplot` コマンドを書くこと
@@ -2360,7 +2363,7 @@ C ... and restart the table:
 3 Substitution of system commands in backquotes
 ?substitution backquotes
 ?backquotes
-?system commands
+?shell commands
  シェルコマンドをバッククォートで囲むことによってコマンド置換を行うこ
  とができます。このコマンドは子プロセスで実行され、その出力結果でコマ
  ンドラインのバッククォートで囲まれたコマンドを置き換えます。処理系に
@@ -2569,8 +2572,8 @@ C ... and restart the table:
  させるコマンド (`set xdata` のような) を与えると、その値は整数値として
  表示されることになります。
 
- コマンド `set format` は、指定された軸が時間/日付であるなしに関わらず
- 目盛りの見出しに使われる書式を定義します。
+ コマンド `set format` または `set tics format` は、指定された軸が時間/
+ 日付であるなしに関わらず目盛りの見出しに使われる書式を定義します。
 
  時間/日付情報がファイルから描画される場合、`plot`, `splot` コマンドで
  は `using` オプションを「必ず」使う必要があります。`plot`, `splot` で
@@ -2766,7 +2769,7 @@ Ffigure_candlesticks
  てください。デフォルトでは、水平線は箱 (candlestick) の水平幅一杯に引
  かれますが、それは全体の幅に対する割合を指定することで変更できます。
 
- デフォルトでは長方形は (開始値)>(終値) の場合は空で、(開始値)<(終値)
+ デフォルトでは長方形は (開始値)<(終値) の場合は空で、(終値)<(開始値)
  の場合は 3 本の垂直線が入ります。箱の塗りつぶしが有効である場合、その
  長方形は `set style fill <fillstyle>` にしたがって塗りつぶされます。
  `set bars`, `financebars` を参照してください。また、以下も参照してくだ
@@ -2788,6 +2791,25 @@ Ffigure_candlesticks
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
 
  `set boxwidth` と `set bars`, `set style fill` を参照してください。
+2 circles
+?commands set style circles
+?set style circles
+?plotting styles circles
+?style circles
+?circles
+Ffigure_circles
+ スタイル `circles` は、各データ点に明示された半径の円を描画します。こ
+ れは、x, y, 半径、の 3 列のデータが必要です。4 列目のデータを追加して
+ 色の情報の指定とすることもできます。半径は、常に描画の水平軸 (x または
+ x2) の単位で解釈されます。y 方向の縮尺と描画のアスペクト比は、いずれも
+ 無視されます。
+
+ 例 (面積が 3 列目の値に比例するような円を描画):
+
+     plot 'data' using 1:2:(sqrt($3)) with circles fillstyle empty
+
+ これは、pointstyle 6 で点のサイズを variable とした `points` による描
+ 画と似ていますが、circles は x 軸の範囲で縮尺される点が異なります。
 2 dots
 ?commands set style dots
 ?set style dots
@@ -3465,8 +3487,9 @@ Ffigure_mapcontours
 ?commands
  このセクションでは `gnuplot` が受け付けるコマンドをアルファベット順に
  並べています。このドキュメントを紙に印刷したものは全てのコマンドを含ん
- でいますが、オンラインドキュメントの方は完全ではない可能性があります。
- 実際、この見出しの下に何のコマンドも表示されないシステムがあります。
+ でいますが、対話型で参照できるドキュメントの方は完全ではない可能性があ
+ ります。実際、この見出しの下に何のコマンドも表示されないシステムがあり
+ ます。
 
  ほとんどの場合、コマンド名とそのオプションは、紛らわしくない範囲で省略
  することが可能です。すなわち、"`plot f(x) with lines`" の代わりに
@@ -3513,9 +3536,6 @@ Ffigure_mapcontours
  ます。与えられなかったパラメータは、何も無しとして扱われます。`call`
  中のファイルの中にさらに `load` または `call` コマンドがあっても構いま
  せん。
-
- `call` コマンドは，複数のコマンドからなる行の中では最後のコマンドでな
- ければなりません．
 
  書式:
          call "<入力ファイル>" <パラメータ 0> <パ 1> ... <パ 9>
@@ -3653,13 +3673,13 @@ Ffigure_mapcontours
  ラメータと似た名前 ("_err" が追加された名前) の変数に保存されます。よ
  ってその誤差を更なる計算の入力として使用することができます。
 
- 当てはめの反復は Ctrl-C を押すことで中断できます (MSDOS と Atari マル
- チタスクシステムでは Ctrl-C 以外の任意のキー)。現在の反復が正常に終了
- した後、(1) 当てはめを止めて現在のパラメータの値を採用する, (2) 当ては
- めを続行する, (3) 環境変数 FIT_SCRIPT で指定した `gnuplot` コマンドを
- 実行する、のいずれかを選ぶことができます。FIT_SCRIPT のデフォルトは
- `replot` であり、よってもしデータと当てはめ関数を一つのグラフにあらか
- じめ描画してあれば、現在の当てはめの状態を表示することができます。
+ 当てはめの反復は Ctrl-C を押すことで中断できます (MSDOS では Ctrl-C 以
+ 外の任意のキー)。現在の反復が正常に終了した後、(1) 当てはめを止めて現
+ 在のパラメータの値を採用する, (2) 当てはめを続行する, (3) 環境変数
+ FIT_SCRIPT で指定した `gnuplot` コマンドを実行する、のいずれかを選ぶこ
+ とができます。FIT_SCRIPT のデフォルトは `replot` であり、よってもしデ
+ ータと当てはめ関数を一つのグラフにあらかじめ描画してあれば、現在の当て
+ はめの状態を表示することができます。
 
  `fit` が終了した後は、最後のパラメータの値を保存するのに `update` コマ
  ンドを使います。その値は再びパラメータの値として使うことができます。
@@ -4058,7 +4078,7 @@ Ffigure_mapcontours
 2 help
 ?commands help
 ?help
- `help`コマンドは，オンラインヘルプを表示します．ある項についての説明
+ `help`コマンドは，組み込みヘルプを表示します．ある項についての説明
  を指定したいときには，次の書式を使って下さい:
 
          help {<項目名>}
@@ -4139,9 +4159,6 @@ Ffigure_mapcontours
  も構いません。コマンド中のコメントについては、`comments` を参照して下
  さい。`load` するときに引数を与える方法については `call` を参照してく
  ださい。
-
- `load` コマンドは、複数のコマンドからなる行の中では最後のコマンドでな
- ければなりません。
 
  書式:
          load "<入力ファイル名>"
@@ -4536,13 +4553,14 @@ Ffigure_mapcontours
  サイズ指定子の数が最大列数より小さい場合は、残りの列の変数サイズは暗黙
  のうちに最後に与えた変数サイズに等しく取られます。
 
- さらに、`*` 文字がついた、"読み捨てられる" 列を書式に含めることも可能
- です。例えば前の例で真中の列のデータを飛ばすのに
- `format="%uchar%*int%float"` と書いて gnuplot は真中の整数データを読み
- 捨てさせることができます。使用できる変数サイズの一覧は、
- `show datafile binary datasizes` で見ることができます。それらは、それ
- ぞれのコンパイルによってそのバイトサイズとともにマシンに依存する変数名
- のグループと、マシンに依存しない変数名のグループに分かれています。
+ さらに `using` 指定同様、`*` 文字がついた読み捨てる列を書式に指定する
+ こともできますし、繰り返しフィールドへの回数指定によって暗黙の繰り返し
+ を指定することもできます。例えば、`format="%*2int%3float"` は、3 つの
+ 実数データを読む前に、2 つの整数データを読み捨てます。使用できる変数サ
+ イズの一覧は、`show datafile binary datasizes` で見ることができます。
+ それらは、それぞれのコンパイルによってそのバイトサイズとともにマシンに
+ 依存する変数名のグループと、マシンに依存しない変数名のグループに分かれ
+ ています。
 5 endian
 ?binary general endian
  ファイルのバイナリデータのエンディアンは、gnuplot が動作するプラットホ
@@ -5002,7 +5020,7 @@ Ffigure_mapcontours
  同様に、疑似ファイル '++' は、x 方向は `set samples` で制御される点の
  数、y 方向は `set isosamples` で制御される点の数の、標準的な [x,y] 座
  標の格子を生成する 2 列のデータを返します。'++' の描画の前に、xrange
- と yrange を設定する必要があります。 
+ と yrange を設定する必要があります。
  例:
 
        splot '++' using 1:2:(sin($1)*sin($2)) with pm3d
@@ -5196,7 +5214,9 @@ Ffigure_mapcontours
 
  これは、1 列目のデータに対して、3 列目のデータが 10 以上であるような
  2 列目のデータを plot します。`1/0` は未定義値であり、`gnuplot` は未定
- 義の点を無視するので、よって適切でない点は隠されることになります
+ 義の点を無視するので、よって適切でない点は隠されることになります。
+ または、あらかじめ定義されている値 NaN を使っても同じことになります。
+=NaN
 
  カッコで始まっていない限りは定数式を列番号として使うことができます。
  例えば `using 0+(複雑な式)` の様なことができます。そして、その数式は、
@@ -5592,33 +5612,34 @@ Ffigure_mapcontours
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}
                          {fill | fs <fillstyle>}
-                         {nohidden3d}
+                         {nohidden3d | nocontours}
                          {palette}}
                     }
 
- ここで、<style> は `lines`, `points`, `linespoints`, `impulses`, `dots`,
- `steps`, `fsteps`, `histeps`, `errorbars`, `labels`, `xerrorbars`,
- `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
- `xyerrorlines`, `boxes`, `histograms`, `filledcurves`, `boxerrorbars`,
- `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors`, `image`,
- `rgbimage`, `pm3d` の中のいずれかです。これらのいくつかに対してはデー
- タを付け足す必要があります。それぞれのスタイルの詳細については
- `plotting styles` をご覧ください。`fill` は 2 次元描画のみに関係があり
- ます (今のところは `boxes`, `boxxyerrorbars` と `candlesticks` のみ)。
- `filledcurves` と `pm3d` (`pm3d` は `splot` でのみ使用される) には、上
- には書かれていない追加のオプションを与えることもできます。詳細は、それ
- らのヘルプや下にある例を参照してください。
+ ここで、<style> は以下のいずれか:
 
- デフォルトのスタイルは `set style function` や `set style data` コマン
- ドで決定されます。
+      lines        dots       steps     errorbars     xerrorbar    xyerrorlines
+      points       impulses   fsteps    errorlines    xerrorlines  yerrorbars
+      linespoints  labels     histeps   financebars   xyerrorbars  yerrorlines
+                                        vectors
+ または、
+       boxes            candlesticks   image      circles
+       boxerrorbars     filledcurves   rgbimage
+       boxxyerrorbars   histograms     pm3d
+
+ 最初のグループのスタイルは、線、点、文字の属性を持ち、第 2 のグループ
+ のスタイルは、さらに塗り潰し属性も持っています。`fillstyle` 参照。さら
+ にサブスタイルを持つスタイルもあります。個々のスタイルの詳細については
+ `plotting styles` 参照。
+
+ デフォルトのスタイルは、`set style function` と `set style data` で選
+ 択できます。
 
  デフォルトでは、それぞれの関数やデータファイルは、使うことができる型の
  最大数に達するまで異なる線種、点種を使います。すべての端末用ドライバは
  最低 6 つの異なる点種をサポートしていて、もしたくさん要求された場合、
- それらを順に再利用していきます。LaTeX ドライバは、それより 6 つ多く点種
- (いずれも円の変種) を持っていて、よって点での曲線の描画は 12 種類の曲線
- が繰り返されるのみです。PostScript ドライバは (`postscript`) 全部で 64
- 種類の 点種を持っています。
+ それらを順に再利用していきます。使用中の出力形式での線種、点種の集合全
+ 体を見たければ、`test` としてください。
 
  一つの描画で線種や点種を選びたいならば、<line_type> や <point_type> を
  指定してください。これらの値は、その描画で使われる線種や点種を指定する
@@ -5661,6 +5682,9 @@ Ffigure_mapcontours
  とで、それを hidden3d の処理から除外することができます。`nohidden3d`
  がマークされた曲面以外の個々の描画要素 (線分、点、ラベル等) は、通常は
  他の何らかの描画要素で隠されてしまう場合も全て描画されます。
+
+ 同様に、キーワード `nocontours` は、グローバルに "set contour" 指定が
+ 有効な場合でも、個別の plot に対する等高線描画機能をオフにします。
 
  キーワードは暗示するような形で省略可能です。
 
@@ -7180,31 +7204,30 @@ Ffigure_mapcontours
 ?show format
 ?format
 ?format cb
- 座標軸の刻みの見出しは、コマンド `set format` で書式を設定できます。
+ 座標軸の刻みの見出しは、コマンド `set format` または `set tics format`
+ または個別にコマンド `set {軸}tics format` で書式を設定できます。
 
  書式:
        set format {<axes>} {"<format-string>"}
        set format {<axes>} {'<format-string>'}
        show format
 
- ここで、<axes> (軸) は `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb`、または
- 何も指定しない (その場合、一度にすべての軸を参照します) のいずれかで
- す。刻みの見出しの文字列の長さ ('printf' で整形された後の) は 100 文
- 字まで、と制限されています。書式文字列 (<format-string>) を省略した場
- 合、それはデフォルトの "% g" になります。LaTeX ユーザにはよく "$%g$"
- が好まれます。空の文字列 "" を指定した場合、刻み自身は表示されますが見
- 出しはつきません。すべての刻みを消すには、`unset xtics` や
- `unset ytics` を使用してください。
+ ここで、<axes> (軸) は `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb`、または何
+ も指定しないか (その場合その書式はすべての軸に適用されます) のいずれか
+ です。以下の 2 つのコマンドは全く同等です:
+       set format y "%.2f"
+       set ytics format "%.2f"
 
- 改行文字 (\n) も書式文字列で使えます。それを解釈させるには、単一引用符
- (') でなく (") を使ってください。`syntax` の項も参照してください。
+ 書式文字列の長さは 100 文字まで、と制限されています。デフォルトの書式
+ 文字列は "% g" ですが、、"%.2f" や "%3.0em" などの書式が好まれることも
+ 多いでしょう。。LaTeX 用にはよく "$%g$" が好まれます。書式文字列を何も
+ 与えない場合は、format はデフォルトに戻ります。空文字列 "" を指定した
+ 場合、刻み自身は表示されますが見出しはつきません。刻み自身を消すには、
+ `unset xtics` または `set tics scale 0` を使用してください。
 
- デフォルトの書式文字列は両軸とも "% g" ですが、"%.2f" や "%3.0em" など
- の書式が好まれることも多いでしょう。倍精度小数に対して 'printf' と出力
- 形式が受けつけることができる書式であればそれは正しく動作するでしょう。
- 他にもいくつかのオプションが追加されています。書式文字列が浮動小数に対
- するもののようであれば `gnuplot` は妥当な文字列に変換しようとします。
-
+ 書式文字列では、改行文字 (\n) や拡張文字処理 (enhanced text) 用のマー
+ クアップも使えます。 この場合は、単一引用符 (') でなく (") を使ってく
+ ださい。`syntax` の項も参照してください。
  "%" が頭につかない文字はそのまま表示されます。よって、書式文字列内に
  スペースや文字列などを入れることができます。例えば "%g m" とすれば、
  数値の後に " m" が表示されます。"%" 自身を表示する場合には "%g %%" の
@@ -8506,7 +8529,7 @@ Ffigure_mapcontours
        set mxtics 5
  この場合、大目盛りは 0,5,7.5,10、小目盛は 1,2,3,4,6,7,8,9 の場所
        set logscale y
-       set format y ""
+       set ytics format ""
        set ytics 1e-6, 10, 1
        set ytics add ("1" 1, ".1" 0.1, ".01" 0.01, "10^-3" 0.001, \
                       "10^-4" 0.0001)
@@ -8550,6 +8573,124 @@ Ffigure_mapcontours
 ?nomztics
  z 軸の小目盛り刻みの印は `set mztics` で制御されます。`set mxtics` を
  参照してください。
+3 object
+?object
+?commands set object
+?commands show object
+?set object
+?show object
+ コマンド `set object` は、その後の 2 次元描画すべてに表われる単一のオ
+ ブジェクトを定義します。オブジェクトはいくつでも定義できます。オブジェ
+ クトの型は、現在は `rectangle` (長方形)、`circle` (円)、`ellipse`
+ (楕円) をサポートしています。長方形は、コマンド `set style rectangle`
+ によって設定されたスタイルの属性の組 (塗り潰し、色、境界) をデフォルト
+ として受け継ぎますが、個々のオジェクトを別々のスタイル属性で描画するこ
+ とももちろん可能です。円と楕円は、`set style fill` による塗り潰しスタ
+ イルを受け継ぎます。
+
+ 書式:
+     set object <index>
+         <object-type> <object-properties>
+         {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
+         {default} {lw|linewidth <width>}
+
+ <object-type> は、`rectangle`, `ellipse`, `circle` のいずれかです。個
+ 々のオブジェクトの型は、その型に特有の性質もいくつか持っています。
+
+ `front` を指定すると、オブジェクトはすべての描画要素の前 (上) に描画さ
+ れますが、`front` と指定されたラベルよりは後ろ (下) になります。`back`
+ を指定すると、すべての描画要素、すべてのラベルの後ろに配置されます。
+ `behind` は、軸や `back` の長方形を含むすべてのものの後ろに配置されま
+ す。よって、
+     set object rectangle from screen 0,0 to screen 1,1 behind
+ は、グラフやページ全体の背景に色をつけるのに利用できます。
+
+ オブジェクトの塗り潰しの色は <colorspec> で指定します。`fillcolor` は
+ `fc` と省略できます。塗り潰しスタイルは <fillstyle> で指定します。詳細
+ は `colorspec` と `fillstyle` を参照してください。キーワード `default`
+ を指定すると、これらの属性は描画が実際に行われるときのデフォルトの設定
+ を受け継ぎます。`set style rectangle` 参照。
+4 rectangle
+?rectangle
+?commands set object rectangle
+?commands show object rectangle
+?set object rectangle
+?show object rectangle
+ 書式:
+     set object <index> rectangle
+         {from <position> {to|rto} <position> |
+          center <position> size <w>,<h> |
+          at <position> size <w>,<h>}
+
+ 長方形の位置は、対角に向かい合う 2 つの頂点 (左下と右上) の位置、ある
+ いは中心点の位置と横幅 (<w>) と縦幅 (<h>) で指定できます。いずれの場合
+ も点の位置は、軸の座標 (`first`, `second`)、グラフ領域内の相対座標
+ (`graph`)、スクリーン座標 (`screen`) のいずれかを使用できます
+ (`coordinates` 参照)。オプション `at` と `center` は同じ意味です。
+
+ 例:
+     # 座標軸で囲まれた領域全体の背景を水色に
+     set object 1 rect from graph 0, graph 0 to graph 1, graph 1 back
+     set object 1 rect fc rgb "cyan" fillstyle solid 1.0
+
+     # 左下角が 0,0, 右上角が 2,3 の赤い四角を一つ置く
+     set object 2 rect from 0,0 to 2,3 fc lt 1
+
+     # 青い境界の空 (塗り潰さない) 長方形を置く
+     set object 3 rect from 0,0 to 2,3 fs empty border 3
+
+     # 頂点は移動しないまま、塗り潰しと色をデフォルトに変更
+     set object 2 rect default
+4 ellipse
+?ellipse
+?commands set object ellipse
+?commands show object ellipse
+?set object ellipse
+?show object ellipse
+ 書式:
+     set object <index> ellipse {at|center} <position> size <w>,<h>
+         {angle <orientation>}
+         {<other-object-properties>}
+
+ 楕円の位置は、中心を指定し、その後ろに幅と高さ (長軸と短軸) を指定しま
+ す。キーワード `at` と `center` は同じ意味です。中心の位置の指定には、
+ 軸の座標 (`first`, `second`)、グラフ領域内の相対座標 (`graph`)、スクリ
+ ーン座標 (`screen`) のいずれかを使用できます (`coordinates` 参照)。長
+ 軸と短軸の長さは、軸の座標で与えなければいけません。楕円の向き
+ (orientation) は、水平軸と楕円の最初の軸との間の角度で指定します。
+ 注意: x 軸と y 軸の縮尺が合っていない場合、回転後の長軸と短軸の比は正
+ しくはなりません。これは、gnuplot の今後の版で修正されるでしょう。
+
+ `set object ellipse size <2r>,<2r>` と `set object circle <r>` とは、
+ 一般には同じことにはならないことに注意してください。circle の半径は常
+ に x 軸の単位で計られ、よって x 軸と y 軸の縮尺が違ったり、描画のアス
+ ペクト比が 1 でなくても、常に円が生成されます。`set object ellipse` で
+ は、最初の '2r' は x 軸の単位で、後ろの '2r' は y 軸の単位で計られます
+ ので、こちらは x 軸と y 軸の縮尺が同じで、かつ描画のアスペクト比が 1
+ である場合のみ円が生成されることになります。
+
+4 circle
+?circle
+?commands set object circle
+?commands show object circle
+?set object circle
+?show object circle
+ 書式:
+     set object <index> circle {at|center} <position> size <radius>
+         {arc [<begin>:<end>]}
+         {<other-object-properties>}
+
+ 円の位置は、中心を指定し、その後ろに半径を指定します。キーワード `at`
+ と `center` は同じ意味です。その位置と半径には、x 軸の座標、グラフ領域
+ 内の相対座標 (`graph`)、スクリーン座標 (`screen`) のいずれかを使用でき
+ ます (`coordinates` 参照)。そのいずれの場合でも、半径は軸、グラフ、ス
+ クリーンの水平方向の縮尺に対して計られ、水平方向と垂直方向の縮尺にずれ
+ があっても、結果が常に正しく円になるように直されます。
+
+ デフォルトでは、完全な円が描画されます。オプションの `arc` に開始角と
+ 終了角を度を単位として指定すると円弧を描画します。円弧は、常に反時計回
+ りに描かれます。
+
 3 offsets
 ?commands set offsets
 ?commands unset offsets
@@ -8559,8 +8700,9 @@ Ffigure_mapcontours
 ?show offsets
 ?offsets
 ?nooffsets
- オフセットは、自動縮尺されたグラフの中のデータの周りに境界を置く仕組み
- を提供します。
+ オフセットは、自動縮尺されたグラフの中のデータの周りに空の境界を置く仕
+ 組みを提供します。オフセットは、x1,y1 軸と 2 次元の `plot` コマンドの
+ みで意味を持ちます。
 
  書式:
        set offsets <left>, <right>, <top>, <bottom>
@@ -8568,21 +8710,24 @@ Ffigure_mapcontours
        show offsets
 
  各オフセットは定数、または数式が使え、それらのデフォルトの値は 0 です。
- 左右のオフセットは x 軸と同じ単位で指定し、上下のオフセットは y 軸と同
- じ単位で指定します。正のオフセットの値はグラフを指定された方向へ伸ばし
- ます。例えば正の下方向のオフセットは y の最小値をより小さな値にします。
- 許されている範囲での負のオフセットは、自動縮尺、あるいはクリッピングと
- の思いもよらぬ結果を生む可能性があります。
-
- オフセットは `splot` では無視されます。
+ デフォルトでは、左右のオフセットは x1 軸と同じ単位で指定し、上下のオフ
+ セットは y1 軸と同じ単位で指定しますが、キーワード "graph" を用いるこ
+ とで軸の全範囲に対する割合としてオフセットを指定することもできます。正
+ のオフセットの値は、軸の範囲を指定された方向へ伸ばします。例えば正の下
+ 方向のオフセットは y の最小値をより小さな値にします。許されている範囲
+ での負のオフセットは、自動縮尺、あるいはクリッピングとの思いもよらぬ結
+ 果を生む可能性があります。自動縮尺機能から軸の範囲の調節を守りたい場合
+ は、"set auto fix" も指定するといいでしょう。
 
  例:
-       set offsets 0, 0, 2, 2
+       set auto fix
+       set offsets graph 0.05, 0, 2, 2
        plot sin(x)
 
  この sin(x) のグラフの y の範囲は [-3:3] になります。それは、関数の
  y の範囲は [-1:1] に自動縮尺されますが、垂直方向のオフセットがそれぞ
- れ 2 であるためです。
+ れ 2 であるためです。x の範囲は [-11:10] になりますが、これはデフォ
+ ルトが [-10:10] でその全範囲が左に 0.05 の割合だけ伸ばされるためです。
 3 origin
 ?commands set origin
 ?commands show origin
@@ -9421,65 +9566,6 @@ Ffigure_mapcontours
  (append) モードで開くことを意味します。パイプをサポートするプラットホ
  ーム上では、<filename> が "|" で始まっていたら、<shell_command> へのパ
  イプが開かれます。
-3 object
-?object
-?rectangle
-?commands set object
-?commands show object
-?commands set object rectangle
-?commands show object rectangle
-?set object
-?show object
-?set object rectangle
-?show object rectangle
- このコマンドはその後の 2 次元描画すべてに表われる単一のオブジェクトを
- 定義します。オブジェクトはいくつでも定義できます。オブジェクトの型は、
- 現在は `rectangle` (長方形) のみをサポートしています。
- 個々の長方形は、対角に向かい合う 2 つの頂点の組を定める点の組で指定し
- ます。デフォルトのスタイルの属性の組 (塗り潰し、色、境界) は、コマンド
- `set style rectangle` の設定を受け継ぎますが、個々の長方形を別々のスタ
- イル属性で描画することももちろん可能です。
-
- 書式:
-     set object <index> rectangle
-         {from <position> {to|rto} <position> |
-          center <position> size <w>,<h> |
-          at <position> size <w>,<h>}
-         {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
-         {default} {lw|linewidth <width>}
-
- 長方形の位置は、対角に向かい合う 2 つの頂点 (左下と右上) の位置、ある
- いは中心点の位置と横幅 (<w>) と縦幅 (<h>) で指定できます。いずれの場合
- も、点の位置は、軸の座標 (`first`, `second`)、グラフ領域内の相対座標
- (`graph`)、またはスクリーン座標 (`screen`) のいずれかを使用できます
- (`coordinates` 参照)。オプション `at` と `center` は同じ意味です。
-
- `front` を指定すると、長方形はすべての描画要素の前 (上) に描画されます
- が、`front` と指定されたラベルよりは後ろ (下) になります。`back` を指
- 定するとすべての描画要素、すべてのラベルの後ろに配置されます。`behind`
- は軸や `back` の長方形を含むすべてのものの後ろに配置されます。これは、
- グラフやページ全体の背景に色をつけるのに利用できます。
-
- 長方形の塗り潰しの色は <colorspec> で指定します。`fillcolor` は `fc`
- と省略できます。塗り潰しパターンは <fillstyle> で指定します。詳細は
- `colorspec` と `fillstyle` を参照してください。キーワード `default` を
- 指定すると、これらの属性は描画が実際に行われるときのデフォルトの設定を
- 受け継ぎます。`set style rectangle` 参照。
-
- 例:
-     # 座標軸で囲まれた領域全体の背景を水色に
-     set object 1 rect from graph 0, graph 0 to graph 1, graph 1 back
-     set object 1 rect fc rgb "cyan" fillstyle solid 1.0
-
-     # 左下角が 0,0, 右上角が 2,3 の赤い四角を一つ置く
-     set object 2 rect from 0,0 to 2,3 fc lt 1
-
-     # 青い境界の空 (塗り潰さない) 長方形を置く
-     set object 3 rect from 0,0 to 2,3 fs empty border 3
-
-     # 頂点は移動しないまま、塗り潰しと色をデフォルトに変更
-     set object 2 rect default
-
 3 rmargin
 ?commands set rmargin
 ?set rmargin
@@ -9718,8 +9804,10 @@ Ffigure_mapcontours
 ?set style fill
 ?show style fill
 ?fillstyle
- コマンド `set style fill` は boxes, histograms, candlesticks,
- filledcurves のスタイルの設定に使われます。
+ コマンド `set style fill` は、boxes, histograms, candlesticks,
+ filledcurves での描画における描画要素のデフォルトのスタイルの設定に使
+ われます。このデフォルトは、個々の描画に塗り潰しスタイル (fillstyle)
+ を指定することで上書きできます。`set style rectangle` も参照。
 
  書式:
        set style fill {empty
@@ -9954,13 +10042,13 @@ Ffigure_mapcontours
 ?unset style rectangle
 ?show style rectangle
 
- コマンド `set object rectangle` で定義された長方形には別々のスタイルを
- 設定できます。しかし、特別なスタイルの指定をしなければ、その長方形はコ
- マンド `set style rectangle` によるデフォルトを受け継ぎます。
+ コマンド `set object` で定義された長方形には別々のスタイルを設定できま
+ す。しかし、個別のスタイル指定をしなければ、そのオブジェクトはコマンド
+ `set style rectangle` によるデフォルトを受け継ぎます。
 
  書式:
-     set style rectangle {front|back} {fillcolor <colorspec>} {fs <fillstyle>}
-                         {lw|linewidth <lw>}
+     set style rectangle {front|back} {lw|linewidth <lw>}
+                         {fillcolor <colorspec>} {fs <fillstyle>}
 
  `colorspec` と `fillstyle` を参照してください。`fillcolor` は `fc` と
  省略できます。
@@ -10102,7 +10190,7 @@ Ffigure_mapcontours
        set tics {axis | border} {{no}mirror}
                 {in | out} {scale {default | <major> {,<minor>}}}
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
-                { font "name{,<size>}" }
+                { format "formatstring" } { font "name{,<size>}" }
                 { textcolor <colorspec> }
        set tics {front | back}
        unset tics
@@ -10771,7 +10859,7 @@ Ffigure_mapcontours
                   | <incr>
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
-                 { font "name{,<size>}" }
+                 { formt "formatstring" } { font "name{,<size>}" }
                  { textcolor <colorspec> }
        unset xtics
        show xtics
@@ -10920,13 +11008,13 @@ Ffigure_mapcontours
  例:
        set xdata time
        set timefmt "%d/%m"
-       set format x "%b %d"
+       set xtics format "%b %d"
        set xrange ["01/12":"06/12"]
        set xtics "01/12", 172800, "05/12"
 
        set xdata time
        set timefmt "%d/%m"
-       set format x "%b %d"
+       set xtics format "%b %d"
        set xrange ["01/12":"06/12"]
        set xtics ("01/12", "" "03/12", "05/12")
  これらは両方とも "Dec 1", "Dec 3", "Dec 5", の目盛りを生成しますが、2
@@ -11321,17 +11409,11 @@ Ffigure_mapcontours
  または
       system "dir"
 
-
  とするとディレクトリの一覧を表示して `gnuplot` に戻ってきます。
-
 
  `system` を使う他の例:
         system "date"; set time; plot "a.dat"
         print=1; if (print) replot; set out; system "lpr x.ps"
-
- Atari では、`!` コマンドは、最初にシェルが既にロードされているか調べて、
- 有効ならばそれを使います。例えば、`gnuplot` が `gulam` から起動されて
- いる場合に、これは実用的です。
 2 splot
 ?commands splot
 ?splot
@@ -11656,8 +11738,14 @@ Ffigure_mapcontours
 2 system
 ?commands system
 ?system
- `system` はコマンドを実行するためにシェルを起動します。詳細は `help shell`
- を参照してください。
+ `system "command"` は、標準的なシェルを使って "command" を実行します。
+ `shell` 参照。関数として呼ばれた場合、`system("command")` は結果として
+ 標準出力に流れる文字列を文字列値として返します。一つ追加される改行文字
+ は無視されます。
+
+ これは、gnuplot スクリプト内に外部関数を取り込むのに使えます:
+
+       f(x) = real(system(sprintf("somecommand %f", x)))
 2 test
 ?commands test
 ?test palette
@@ -11673,11 +11761,22 @@ Ffigure_mapcontours
  成します。
 
  `test palette` は、現在のカラーパレット (`palette`) で計算した R(z),
- G(z),B(z) (0<=z<=1) の状態を画像で描画します。それは実際には、本来あな
- たが `show palette palette 256 float` として得るべき綺麗な描画です。
- 追加のパラメータは、r,g,b の文字の組合せで、それにより描画する順番が
- 決定されます。`set palette gray` で色々試してみてください。デフォルト
- の順番は rgb です。
+ G(z),B(z) (0<=z<=1) の状態を画像で描画します。それは実際には、本来はあ
+ なたが `show palette palette 256 float` の結果から作るべき綺麗な描画で
+ す。追加のパラメータは、r,g,b の文字の組合せで、それにより描画する順番
+ が決定されます。`set palette gray` で色々試してみてください。デフォル
+ トの順番は rgb です。
+2 undefine
+?commands undefine
+?undefine
+ 1 つ、または複数の定義済みのユーザ変数を削除します。これは、初期化テス
+ トを含むようなスクリプトの状態をリセットするのに便利でしょう。
+
+ 例:
+
+       undefine foo foo1 foo2
+       if (!exists("foo")) load "initialize.gp"
+
 2 unset
 ?commands unset
 ?unset

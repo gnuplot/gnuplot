@@ -1,3 +1,8 @@
+2008-05-01  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc docs/term-ja.diff:
+	Sync Japanese documentation to gnuplot.doc revision 1.495
+
 2008-05-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Add a user-editable definition of Gamma at the head of
