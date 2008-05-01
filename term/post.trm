@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.232 2008/04/25 00:13:52 sfeam Exp $
+ * $Id: post.trm,v 1.233 2008/04/25 22:38:42 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1462,8 +1462,8 @@ PS_common_init(
 %%%%BeginProlog\n\
 /gnudict 256 dict def\ngnudict begin\n\
 %%\n\
-%% The following 6 true/false flags may be edited by hand if required\n\
-%% The unit line width may also be changed\n\
+%% The following 7 true/false flags may be edited by hand if required.\n\
+%% The unit line width and grayscale image gamma correction may also be changed.\n\
 %%\n\
 /Color %s def\n\
 /Blacktext %s def\n\
@@ -1475,6 +1475,7 @@ PS_common_init(
 /TransparentPatterns false def\n\
 /gnulinewidth %.3f def\n\
 /userlinewidth gnulinewidth def\n\
+/Gamma 1.0 def\n\
 %%\n\
 /vshift %d def\n\
 /dl1 {\n\
@@ -2714,7 +2715,7 @@ PS_make_header(t_sm_palette *palette)
     fputs("/pm3dround {maxcolors 0 gt {dup 1 ge\n", gppsfile);
     fputs("\t{pop 1} {maxcolors mul floor maxcolors 1 sub div} ifelse} if} def\n",
 	  gppsfile);
-    fprintf(gppsfile, "/pm3dGamma 1.0 %g div def\n", sm_palette.gamma);
+    fprintf(gppsfile, "/pm3dGamma 1.0 %g Gamma mul div def\n", sm_palette.gamma);
     write_color_space(palette);
 
 /* Now print something like
