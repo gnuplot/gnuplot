@@ -7,6 +7,14 @@
 	Don't over-write user colors with each new palette.
 	Decouple dash pattern from line color.
 
+	* term/fig.trm:  Extend point types to match standard sequence for the
+	the first 13 types.  Accept option syntax "set term fig ... size xx,yy".
+	Add a table lookup for font names known to fig, so that the terminal
+	accepts for example 'set term fig font "Palatino Italic, 11"'.
+
+	* src/tables.h src/tables.c (lookup_table_entry):  New utility routine
+	for table lookup of a string, as opposed to a token index.
+
 2008-04-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm: Remove specific references to Windows 3.1

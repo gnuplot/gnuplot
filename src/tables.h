@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.57 2006/06/15 15:42:34 sfeam Exp $
+ * $Id: tables.h,v 1.57.2.1 2007/12/08 10:54:36 mikulik Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -224,6 +224,7 @@ extern const struct gen_table filledcurves_opts_tbl[];
 /* Function prototypes */
 int lookup_table __PROTO((const struct gen_table *, int));
 parsefuncp_t lookup_ftable __PROTO((const struct gen_ftable *, int));
+int lookup_table_entry __PROTO((const struct gen_table *tbl, const char *search_str));
 int lookup_table_nth __PROTO((const struct gen_table *tbl, const char *search_str));
 int lookup_table_nth_reverse __PROTO((const struct gen_table *tbl, int table_len, const char *search_str));
 const char * reverse_table_lookup __PROTO((const struct gen_table *tbl, int entry));

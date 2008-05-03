@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.56.2.2 2006/11/19 22:24:01 sfeam Exp $
+ * $Id: fig.trm,v 1.56.2.3 2007/11/24 00:12:52 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -61,6 +61,8 @@
  * Added PM3D functionality Ian MacPhedran, April 15 1999
  * Take into account 'set palette maxcolors' Petr Mikulik, June 11 2002
  * Don't reset options when 'set term fig <new options>', Petr Mikulik, Aug 24 2002
+ * Ethan A Merritt - May 2008:
+ *   Bring into line with other terminals for point types, size syntax, font spec
  */
 
 #include "driver.h"
@@ -208,6 +210,7 @@ static int FIG_is_big = FALSE;	/* big plot ? */
 static int FIG_color = DEFAULT;	/* which color to use */
 static int FIG_xoff = FIG_XOFF(INCH);
 static int FIG_yoff = FIG_YOFF(INCH);
+static int FIG_font_id = FIG_ROMAN_FONT;
 static int FIG_font_s = FIG_FONT_S;
 static int FIG_portrait = FALSE;
 static int FIG_inches = INCH;
@@ -221,15 +224,12 @@ static int FIG_fill_style = 20;		/* Full saturation */
 
 static void FIG_poly_clean __PROTO((enum FIG_poly_stat fig_stat));
 
-/* we use the same points */
-#define FIG_POINT_TYPES POINT_TYPES
-
 enum FIG_id {
     FIG_MONOCHROME, FIG_COLOR,
     FIG_SMALL, FIG_BIG,
     FIG_INCHES, FIG_METRIC,
     FIG_PORTRAIT, FIG_LANDSCAPE,
-    FIG_SIZE, FIG_FONTSIZE,
+    FIG_SIZE, FIG_FONT, FIG_FONTSIZE,
     FIG_THICKNESS, FIG_DEPTH, FIG_POINTSMAX,
     FIG_SOLID, FIG_DASHED,
     FIG_NORMALTEXT, FIG_SPECIALTEXT, FIG_HIDDENTEXT, FIG_RIGIDTEXT,
@@ -243,6 +243,7 @@ static struct gen_table FIG_opts[] =
     { "c$olour", FIG_COLOR },
     { "da$shed", FIG_DASHED },
     { "de$pth", FIG_DEPTH },
+    { "font", FIG_FONT },
     { "f$ontsize", FIG_FONTSIZE },
     { "in$ches", FIG_INCHES },
     { "l$andscape", FIG_LANDSCAPE },
@@ -263,18 +264,49 @@ static struct gen_table FIG_opts[] =
     { NULL, FIG_OTHER }
 };
 
+const struct gen_table FIG_fonts[] =
+{
+    { "Times Roman",  0 },
+    { "Times Italic",  1 },
+    { "Times Bold",  2 },
+    { "Times Bold Italic",  3 },
+    { "AvantGarde Book",  4 },
+    { "AvantGarde Book Oblique",  5 },
+    { "AvantGarde Demi",  6 },
+    { "AvantGarde Demi Oblique",  7 },
+    { "Bookman Light",  8 },
+    { "Bookman Light Italic",  9 },
+    { "Bookman Demi", 10 },
+    { "Bookman Demi Italic", 11 },
+    { "Courier", 12 },
+    { "Courier Oblique", 13 },
+    { "Courier Bold", 14 },
+    { "Courier Bold Oblique", 15 },
+    { "Helvetica", 16 },
+    { "Helvetica Oblique", 17 },
+    { "Helvetica Bold", 18 },
+    { "Helvetica Bold Oblique", 19 },
+    { "Helvetica Narrow", 20 },
+    { "Helvetica Narrow Oblique", 21 },
+    { "Helvetica Narrow Bold", 22 },
+    { "Helvetica Narrow Bold Oblique", 23 },
+    { "New Century Schoolbook Roman", 24 },
+    { "New Century Schoolbook Italic", 25 },
+    { "New Century Schoolbook Bold", 26 },
+    { "New Century Schoolbook Bold Italic", 27 },
+    { "Palatino Roman", 28 },
+    { "Palatino Italic", 29 },
+    { "Palatino Bold", 30 },
+    { "Palatino Bold Italic", 31 },
+    { "Symbol", 32 },
+    { "Zapf Chancery Medium Italic", 33 },
+    { "Zapf Dingbats", 34 },
+    { NULL, -1}
+};
 
 TERM_PUBLIC void
 FIG_options()
 {
-    /* sun cc does not concat strings */
-    static const char *options_list =
-    "expecting monochrome, color, small, big, portrait, landscape,\n\
- \t inches, metric, size <number> <number>,  fontsize <number>,\n\
- \t solid, dashed, textnormal, textspecial, texthidden, textrigid,\n\
- \t thickness <number>, depth <number>, pointsmax <number> or\n\
- \t version <number>";
-
     int parse_error = FALSE;
     long temp_max;
     struct value a;
@@ -287,6 +319,7 @@ FIG_options()
     FIG_use_color = FALSE;	/* default */
     FIG_is_big = FALSE;		/* default */
     FIG_portrait = FALSE;
+    FIG_font_id = FIG_ROMAN_FONT;
     FIG_font_s = 0;
     FIG_default_thickness = 1;
     xsize_t = ysize_t = 0.;
@@ -337,6 +370,7 @@ FIG_options()
 	case FIG_SPECIALTEXT:
 	    FIG_text_flags |= FIG_TEXT_SPECIAL;
             FIG_text_flags &= ~FIG_TEXT_POSTSCRIPT;
+	    FIG_font_id = 0;
 	    c_token++;
 	    break;
 	case FIG_HIDDENTEXT:
@@ -361,6 +395,8 @@ FIG_options()
 		int_error(c_token, "size: 2 numbers expected");
 	    } else {
 		xsize_t = real(const_express(&a));
+		if (equals(c_token,","))
+		    c_token++;
 		if (END_OF_COMMAND) {
 		    int_error(c_token, "size: 2 numbers expected");
 		    xsize_t = 0.;
@@ -374,17 +410,25 @@ FIG_options()
 		}
 	    }
 	    break;
+	case FIG_FONT:
+	    {
+	    char *fontname = NULL;
+	    int sep;
+	    c_token++;
+	    if (END_OF_COMMAND || !((fontname = try_to_get_string())))
+		int_error(c_token, "expecting font name");
+	    sep = strcspn(fontname,",");
+	    sscanf (&(fontname[sep+1]),"%d",&FIG_font_s);
+	    fontname[sep] = '\0';
+	    FIG_font_id = lookup_table_entry(FIG_fonts, fontname);
+	    if (FIG_font_id < 0)
+		FIG_font_id = FIG_ROMAN_FONT;
+	    free(fontname);
+	    break;
+	    }
 	case FIG_FONTSIZE:
 	    c_token++;
-	    if (END_OF_COMMAND) {
-		int_error(c_token, "fontsize: number expected");
-	    } else {
-		FIG_font_s = (int) real(const_express(&a));
-		if (FIG_font_s < 5 || FIG_font_s > 36) {
-		    int_error(c_token - 1, "fontsize out of range");
-		    FIG_font_s = 0;
-		}
-	    }
+	    FIG_font_s = (int) real(const_express(&a));
 	    break;
 	case FIG_THICKNESS:
 	    c_token++;
@@ -446,7 +490,7 @@ FIG_options()
 	case FIG_OTHER:
 	default:
 	    parse_error = TRUE;
-	    int_error(c_token, options_list);
+	    int_error(c_token, "unrecognized option");
 	    break;
 	}
     }
@@ -461,7 +505,7 @@ FIG_options()
                );
     }
 
-    sprintf(term_options, "%s %s %s %d %s %s %s%s %s %d %s %d %s %d %s %s",
+    sprintf(term_options, "%s %s %s %d %s %s %s%s %s \"%s\" %s %d %s %d %s %d %s %s",
 	    FIG_use_color ? "color" : "monochrome",
 	    FIG_is_big ? "big" : "small",
 	    "pointsmax",
@@ -470,6 +514,7 @@ FIG_options()
 	    FIG_inches ? "inches" : "metric",
             FIG_solid ? "solid" : "dashed",
 	    text_flags,
+	    "font", FIG_fonts[FIG_font_id].key,
 	    "fontsize", (FIG_font_s > 0 ? FIG_font_s :
 			 (FIG_is_big ? BFIG_FONT_S : FIG_FONT_S)),
 	    "linewidth", FIG_default_thickness, "depth", FIG_depth,
@@ -483,7 +528,7 @@ FIG_options()
 		    " size %f %f", xsize_t, ysize_t);
     }
     if (!FIG_is_big) {
-	if (FIG_font_s == 0)	/* KB */
+	if (FIG_font_s <= 0)	/* KB */
 	    FIG_font_s = FIG_FONT_S;
 	term->xmax = FIG_XMAX(FIG_inches);
 	term->ymax = FIG_YMAX(FIG_inches);
@@ -492,7 +537,7 @@ FIG_options()
 	FIG_xoff = FIG_XOFF(FIG_inches);
 	FIG_yoff = FIG_YOFF(FIG_inches);
     } else {
-	if (FIG_font_s == 0)	/* KB */
+	if (FIG_font_s <= 0)	/* KB */
 	    FIG_font_s = BFIG_FONT_S;
 	term->xmax = BFIG_XMAX(FIG_inches);
 	term->ymax = BFIG_YMAX(FIG_inches);
@@ -514,7 +559,7 @@ FIG_options()
     term->h_char = FIG_to_pixel_h(FIG_inches, FIG_font_s);
     FIG_thickness = FIG_default_thickness;
     if (parse_error) {		/* JFS, KB */
-	int_error(c_token, options_list);
+	int_error(c_token, "unrecognized option");
     }
 }
 
@@ -871,16 +916,9 @@ FIG_put_text(unsigned int x, unsigned int y, const char *str)
 	y -= (int)(term->v_char*cos(FIG_angle)/4.);
     }
 
-    /* (old: we assume that a string contains LaTeX commands if it contains */
-    /* a backslash) --> obsoleted by 'textspecial' option (ULIG) */
-    /* (it is not nice to mix LaTeX and Postscript fonts) */
-
-    /* HBB 990329: quick hack: 'O_TEXT' is in use by POSIX header
-     * <fcntl.h>. Renamed to OBJ_TEXT */
-    fprintf(gpoutfile, "\
-%d %d %d %d %d %d %6.3f %6.3f %d %6.3f %6.3f %d %d %s\\001\n",
+    fprintf(gpoutfile, "%d %d %d %d %d %d %6.3f %6.3f %d %6.3f %6.3f %d %d %s\\001\n",
 	    OBJ_TEXT, FIG_justify, FIG_color, 0, FIG_DEFAULT,
-	    FIG_ROMAN_FONT, (float) FIG_font_s,
+	    FIG_font_id, (float) FIG_font_s,
 	    FIG_angle, FIG_text_flags, (float) term->v_char,
 	    (float) term->h_char * strlen(str),
 	    FIG_xoff + x, term->ymax + FIG_yoff - y, output_string);
@@ -990,8 +1028,22 @@ FIG_lpoint(unsigned int x, unsigned int y, int number)
 			xpc - d, ypc - h, xpc, ypc + 2 * h, xpc + d, ypc - h, xpc - d, ypc - h);
 	    }
 	}
-    } else
-	do_point(x, y, number);
+    } else {
+	int pt = number % 13;
+	switch (pt) {
+	default:	do_point(x, y, pt); break;
+	case 3: 	FIG_lpoint(x, y, 64); break;
+	case 4: 	FIG_lpoint(x, y, 68); break;
+	case 5: 	FIG_lpoint(x, y, 54); break;
+	case 6: 	FIG_lpoint(x, y, 58); break;
+	case 7: 	FIG_lpoint(x, y, 84); break;
+	case 8: 	FIG_lpoint(x, y, 88); break;
+	case 9: 	FIG_lpoint(x, y, 94); break;
+	case 10:	FIG_lpoint(x, y, 98); break;
+	case 11: 	FIG_lpoint(x, y, 74); break;
+	case 12:	FIG_lpoint(x, y, 78); break;
+	}
+    }
 }
 
 TERM_PUBLIC void
@@ -1214,7 +1266,7 @@ START_HELP(fig)
 "                        {metric | inches}",
 "                        {pointsmax <max_points>}",
 "                        {solid | dashed}",
-"                        {fontsize <fsize>}",
+"                        {font <fontname>} {fontsize <fsize>}",
 "                        {textnormal | {textspecial texthidden textrigid}}",
 "                        {{thickness|linewidth} <units>}",
 "                        {depth <layer>}",
