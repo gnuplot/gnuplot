@@ -1,3 +1,13 @@
+2008-05-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tables.h src/tables.c (lookup_table_entry):  New utility routine
+	for table lookup of a string, as opposed to a token index.
+
+	* term/fig.trm:  Extend point types to match standard sequence for the
+	the first 13 types.  Accept option syntax "set term fig ... size xx,yy".
+	Add a table lookup for font names known to fig, so that the terminal
+	accepts for example 'set term fig font "Palatino Italic, 11"'.
+
 2008-05-01  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:
