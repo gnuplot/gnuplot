@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.77.2.2 2008/03/01 23:25:55 sfeam Exp $
+ * $Id: cgm.trm,v 1.77.2.3 2008/03/02 22:13:37 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -117,8 +117,7 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 				/* convert from plot units to pt */
 #define CGM_PT ((term->xmax + CGM_MARGIN)/cgm_plotwidth)
 #define CGM_LINE_TYPES 9	/* number of line types we support */
-#define CGM_COLORS 12		/* number of line colors we support in
-                                   the default color table */
+#define CGM_COLORS WEB_N_COLORS	/* sizeof(web_color_rgbs)  currently in bitmap.c */
 #define CGM_POINTS 13		/* number of markers we support */
 #define CGM_MAX_SEGMENTS 16382	/* maximum # polyline coordinates */
 #define CGM_VCHAR (CGM_SMALL/360*12)
@@ -131,6 +130,7 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 #ifdef TERM_BODY
 
 static int CGM_find_font __PROTO((const char *name, int len, double *relwidth));
+static int CGM_find_nearest_color __PROTO((t_colorspec *colorspec));
 /*
  * on NeXTstep, id is an identifier (in ObjC) and causes a parse error
  * since some asserts below are mistaken as casts. datum is a type
@@ -165,7 +165,7 @@ static int CGM_find_font __PROTO((const char *name, int len, double *relwidth));
 static unsigned int cgm_posx;
 static unsigned int cgm_posy;
 static unsigned int cgm_linetype = 1;
-static unsigned int cgm_linetypes = CGM_COLORS;
+static unsigned int cgm_linetypes = CGM_LINE_TYPES + 3;
 static unsigned int cgm_dashtype = 0;
 static unsigned int cgm_color = 0;
 static int *cgm_polyline; /* stored polyline coordinates */
@@ -202,22 +202,7 @@ static int cgm_user_color_count = 0;
 static int cgm_user_color_max = 0;
 static int cgm_smooth_colors = 0;
 static int GPFAR *cgm_user_color_table = (int GPFAR*)0;
-static int GPFAR cgm_default_color_table[] =
-{
-     0,				/* starting index */
-     255,255,255,		/* white (the background color) */
-     0,0,0,			/* black -2,  lt = -1 */
-     160,160,160,		/* gray -1,   lt = 0 */
-     255,0,0,			/* red 0,     lt = 1 */
-     0,221,0,			/* green,     lt = 2 */
-     0,0,255,			/* blue,      lt = 3 */
-     221,0,221,			/* magenta,   lt = 4 */
-     0,221,221,			/* cyan,      lt = 5 */
-     160,82,45,			/* sienna,    lt = 6 */
-     0,0,0,			/* black,     lt = 7 */
-     255,165,0,			/* orange,    lt = 8 */
-     128,128,128,		/* gray,      lt = 9 */
-};
+static int cgm_maximum_color_index = 255;	/* Size of color table we will write */
 
 struct fontdata {
   char *name;			/* the name of the font */
@@ -446,11 +431,7 @@ CGM_options()
 		cgm_user_color_table[1 + 3*cgm_user_color_count] = red;
 		cgm_user_color_table[2 + 3*cgm_user_color_count] = green;
 		cgm_user_color_table[3 + 3*cgm_user_color_count] = blue;
-		/* usually, there is one more color than there are
-                   linetypes (the extra color is for the background).
-                   However, the smooth colors used for PM3D are not
-                   used for lines. */
-		cgm_linetypes = cgm_user_color_count++;
+		cgm_user_color_count++;
 		++c_token;
 	    } else {
 		if (equals(c_token,"font"))
@@ -532,28 +513,28 @@ CGM_options()
 	      sprintf(term_options + strlen(term_options),
 		      " x%02x%02x%02x", red, green, blue);
 	 }
-	 if (cgm_user_color_count < CGM_COLORS) {
-
-	     int j;
-
-	     /* fill the colors which were not set by the user with
-	      * the default colors */
-
-	     /* 1st table entry is the minimum color index value */
-	     gp_realloc(cgm_user_color_table,
-		     (CGM_COLORS * 3 + 1) * sizeof (int), "CGM color table");
-
-	     for (i = cgm_user_color_count, j = cgm_user_color_count * 3 + 1;
-		     i < CGM_COLORS; i++, j+=3) {
-		 cgm_user_color_table[j]   = cgm_default_color_table[j];
-		 cgm_user_color_table[j+1] = cgm_default_color_table[j+1];
-		 cgm_user_color_table[j+2] = cgm_default_color_table[j+2];
-	     }
-
-	     cgm_user_color_count = CGM_COLORS;
-	     cgm_linetypes = CGM_COLORS;
-	 }
     }
+
+    if (cgm_user_color_count < CGM_COLORS) {
+	int i, j;
+
+	/* fill in colors not set by the user with the default colors */
+
+	/* 1st table entry is the minimum color index value */
+	cgm_user_color_table = gp_realloc(cgm_user_color_table,
+		(CGM_COLORS * 3 + 1) * sizeof (int), "CGM color table");
+	cgm_user_color_table[0] = 0;
+
+	for (i = cgm_user_color_count, j = cgm_user_color_count * 3;
+		     i < CGM_COLORS; i++, j+=3) {
+		cgm_user_color_table[j+1] = web_color_rgbs[i].r;
+		cgm_user_color_table[j+2] = web_color_rgbs[i].g;
+		cgm_user_color_table[j+3] = web_color_rgbs[i].b;
+	}
+
+	cgm_user_color_count = CGM_COLORS;
+    }
+
 }
 
 static void
@@ -605,7 +586,6 @@ CGM_graphics()
     static int edge_width_specification_mode_data[] = { 0 };
     static int marker_size_specification_mode_data[] = { 0 };
     static int vdc_extent_data[] = { 0, 0, 0, 0 };
-/*  static int line_color_data[] = { 1 }; */
     static int line_type_data[] = { 1 };
     static int interior_style_data[] = { 1 }; /* 0=hollow 1=filled
 					       * 2=pattern 3=hatch
@@ -707,13 +687,7 @@ Gnuplot version %s patchlevel %s,\
     CGM_write_int_record(1, 6, 2, index_precision_data);
     CGM_write_int_record(1, 7, 2, color_precision_data);
     CGM_write_int_record(1, 8, 2, color_index_precision_data);
-    {
-      /* we usually do not use 255 colors.  However, we may need to
-	 enlarge the color table after the picture descriptor is
-	 written (for PM3D) */
-      static int cgm_maximum_color_index[] = { 255 };
-      CGM_write_int_record(1, 9, 2, cgm_maximum_color_index);
-    }
+    CGM_write_int_record(1, 9, 2, &cgm_maximum_color_index);
     CGM_write_int_record(1, 10, sizeof(color_value_extent_data) / CGM_ADJ,
 			 color_value_extent_data);
     if (cgm_nofontlist_mode == FALSE)
@@ -766,15 +740,10 @@ Gnuplot version %s patchlevel %s,\
 			   clip_indicator_data);
     }
 #endif
-    if (!cgm_monochrome) {
-      if (cgm_user_color_count) {
+    if (!cgm_monochrome)
 	CGM_write_int_record(5, 34, (cgm_user_color_count*3+1)*
 			     sizeof(cgm_user_color_table[0])/CGM_ADJ,
 			     cgm_user_color_table);
-      } else
-	CGM_write_int_record(5, 34, sizeof(cgm_default_color_table)/CGM_ADJ,
-			   cgm_default_color_table);
-    }
     CGM_write_int_record(5, 2, sizeof(line_type_data) / CGM_ADJ,
 			 line_type_data); /* line type 1=SOLID */
     cgm_linewidth = cgm_linewidth_pt * CGM_PT;
@@ -1040,9 +1009,6 @@ CGM_make_palette(t_sm_palette *palette)
 		   gp_realloc(cgm_user_color_table,
 			      (cgm_user_color_max*3+1)*sizeof(int),
 			      "CGM color table");
-	      /* include default colors */
-	      memcpy(cgm_user_color_table, cgm_default_color_table,
-		     sizeof(cgm_default_color_table));
 	 }
 	 k = 1 + (CGM_COLORS)*3;
 	 for (i = 0; i < cgm_smooth_colors; i++) {
@@ -1056,7 +1022,7 @@ CGM_make_palette(t_sm_palette *palette)
 			      cgm_user_color_table);
 	 return 0;
     } else {
-      return 200;
+      return (cgm_maximum_color_index - CGM_COLORS);
     }
 }
 
@@ -1076,15 +1042,25 @@ CGM_set_color(t_colorspec *colorspec)
 	 if (cgm_next.fill_color >= cgm_smooth_colors)
 	     cgm_next.fill_color = cgm_smooth_colors - 1;
 	 cgm_next.fill_color += CGM_COLORS;
-	 /* EAM - force color immediately so that lines and text can use it */
-	 if (cgm_color != cgm_next.fill_color) {
-	      cgm_color = cgm_next.fill_color;
-	      cgm_linetype = cgm_color;
-	      CGM_flush_polyline();
-	      CGM_write_int_record(5,  4, 2, (int *) &cgm_color); /* line color */
-	      CGM_write_int_record(5, 14, 2, (int *) &cgm_color); /* text color */
-	 }
-    }
+
+    } else if (colorspec->type == TC_RGB) {
+	/* To truly support RGB we would have to write a new color table to the */
+	/* output file every time the RGB matched no previous color. That seems */
+	/* prohibitive, so instead we just look for the closest match.          */
+	 cgm_next.fill_color = CGM_find_nearest_color(colorspec);
+
+    } else
+	/* Should not happen! */
+	return;
+
+     /* EAM - force color immediately so that lines and text can use it */
+     if (cgm_color != cgm_next.fill_color) {
+	    cgm_color = cgm_next.fill_color;
+	    cgm_linetype = cgm_color;
+	    CGM_flush_polyline();
+	    CGM_write_int_record(5,  4, 2, (int *) &cgm_color); /* line color */
+	    CGM_write_int_record(5, 14, 2, (int *) &cgm_color); /* text color */
+     }
 }
 
 TERM_PUBLIC void
@@ -1279,7 +1255,7 @@ CGM_write_mixed_record(
 static void
 CGM_write_code(int class, int cgm_id, int length)
 {
-    unsigned code;
+    unsigned int code;
 
     assert((0 <= class) &&(class <16));
     assert((0 <= cgm_id) && (cgm_id < 128));
@@ -1675,6 +1651,44 @@ CGM_flush_polygon()
     cgm_coords = 0;
 }
 
+/*
+ * This terminal driver does not support true RGB color,
+ * but we can at least try to find some reasonable approximation.
+ */
+#define CLOSE_ENOUGH 32		/* 0 would require a perfect match */
+static int
+CGM_find_nearest_color(t_colorspec *colorspec)
+{
+    int red   = (colorspec->lt >> 16) & 0xff;
+    int green = (colorspec->lt >> 8) & 0xff;
+    int blue  = colorspec->lt & 0xff;
+    int closest = 0;
+    int howclose = 1<<16;
+    int i = 0;
+    int k;
+    int dr, dg, db, distance;
+
+    for (k=0; k<cgm_user_color_max; k++) {
+	dr = cgm_user_color_table[++i] - red;
+	dg = cgm_user_color_table[++i] - green;
+	db = cgm_user_color_table[++i] - blue;
+	distance = (dr*dr + dg*dg + db*db);
+	if (distance < howclose) {
+	    closest = k;
+	    howclose = distance;
+	}
+	if (distance < CLOSE_ENOUGH)
+	    break;
+    }
+
+    FPRINTF((stderr,"CGM_find_nearest_color:  asked for %d %d %d\n",red,green,blue));
+    FPRINTF((stderr,"         got index %3d             %d %d %d\n", closest,
+	    cgm_user_color_table[closest*3], cgm_user_color_table[closest*3+1],
+	    cgm_user_color_table[closest*3+2]));
+
+    return closest;
+}
+#undef CLOSE_ENOUGH
 
 #ifdef DEFEAT_ASSERTIONS
 #define NDEBUG
@@ -1732,24 +1746,19 @@ START_HELP(cgm)
 " This file format is a subset of the ANSI X3.122-1986 standard entitled",
 " \"Computer Graphics - Metafile for the Storage and Transfer of Picture",
 " Description Information\".",
-" Several options may be set in `cgm`.",
 "",
 " Syntax:",
-"       set terminal cgm {<mode>} {<color>} {<rotation>} {solid | dashed}",
-"                        {width <plot_width>} {linewidth <line_width>}",
-"                        {\"<font>\"} {<fontsize>}",
+"       set terminal cgm {color | monochrome} {solid | dashed} {{no}rotate}",
+"                        {<mode>} {width <plot_width>} {linewidth <line_width>}",
+"                        {font \"<fontname>,<fontsize>\"}",
 "                        {<color0> <color1> <color2> ...}",
 "",
-" where <mode> is `landscape`, `portrait`, or `default`;",
-" <color> is either `color` or `monochrome`; ",
-" <rotation> is either `rotate` or `norotate`;",
 " `solid` draws all curves with solid lines, overriding any dashed patterns;",
+" <mode> is `landscape`, `portrait`, or `default`;",
 " <plot_width> is the assumed width of the plot in points; ",
 " <line_width> is the line width in points (default 1); ",
-" <font> is the name of a font; and ",
+" <fontname> is the name of a font (see list of fonts below)",
 " <fontsize> is the size of the font in points (default 12).",
-"",
-" By default, `cgm` uses rotated text for the Y axis label.",
 "",
 " The first six options can be in any order.  Selecting `default` sets all",
 " options to their default values.",
@@ -1960,7 +1969,7 @@ START_HELP(cgm)
 " plots.  This is useful when color is enabled and the dashing of the",
 " lines detracts from the appearance of the plot. The `dashed` option",
 " confirms the default behavior, which gives a different dash pattern to",
-" each curve.",
+" each line type.",
 
 "2 size",
 "?commands set terminal cgm size",
@@ -1994,7 +2003,6 @@ START_HELP(cgm)
 "?set terminal cgm nofontlist",
 "?set term cgm nofontlist",
 "?cgm nofontlist",
-"?commands set terminal cgm winword6",
 "?set terminal cgm winword6",
 "?set term cgm winword6",
 "?cgm winword6",
@@ -2002,17 +2010,13 @@ START_HELP(cgm)
 " are compatible with the Computer Graphics Metafile input filter for",
 " Microsoft Office and Corel Draw.  Another application might use",
 " different fonts and/or different font names, which may not be",
-" documented.  As a workaround, the `nofontlist` option deletes the font",
+" documented.  The `nofontlist` (synonym `winword6`) option deletes the font",
 " table from the CGM file.  In this case, the reading application should",
 " use a default table.  Gnuplot will still use its own default font table",
 " to select font indices.  Thus, 'Helvetica' will give you an index of 1,",
 " which should get you the first entry in your application's default font",
 " table. 'Helvetica Bold' will give you its second entry, etc.",
-"",
-" The former `winword6` option is now a deprecated synonym for",
-" `nofontlist`.  The problems involving the color and font tables that",
-" the `winword6` option was intended to work around turned out to be",
-" gnuplot bugs which have now been fixed."
+""
 
 END_HELP(cgm)
 #endif /* TERM_HELP */

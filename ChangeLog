@@ -1,3 +1,12 @@
+2008-05-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cgm.trm:  Clean up terminal code.
+	Use shared routines gp_alloc(), int_expression().
+	Switch to using same set of colors as other terminals (web_color_rgbs).
+	Handle RGB color request by returning closest match to a known color.
+	Don't over-write user colors with each new palette.
+	Decouple dash pattern from line color.
+
 2008-04-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm: Remove specific references to Windows 3.1
