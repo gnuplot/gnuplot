@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.64 2008/03/04 23:45:35 sfeam Exp $
+ * $Id: fig.trm,v 1.65 2008/05/03 22:19:23 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1309,7 +1309,7 @@ START_HELP(fig)
 "                        {metric | inches}",
 "                        {pointsmax <max_points>}",
 "                        {solid | dashed}",
-"                        {font "fontname"} {fontsize <fsize>}",
+"                        {font <fontname>} {fontsize <fsize>}",
 "                        {textnormal | {textspecial texthidden textrigid}}",
 "                        {{thickness|linewidth} <units>}",
 "                        {depth <layer>}",
