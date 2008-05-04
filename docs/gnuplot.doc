@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.28 2008/04/02 02:08:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.29 2008/04/02 18:13:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7505,7 +7505,7 @@ C ... and restart the table:
  last.  The default is `scansautomatic` where gnuplot makes a guess about scans
  order.  On the other hand, the `depthorder` option completely reorders the
  qudrangles. The rendering is performed after a depth sorting, which allows to
- visualize even complicated surfaces; see `help pm3d depthorder` for more
+ visualize even complicated surfaces; see `pm3d depthorder` for more
  details.
 
  If two subsequent scans do not have same number of points, then it has to be
