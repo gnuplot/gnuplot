@@ -1,3 +1,12 @@
+2008-05-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_set_font)
+	src/wxterminal/gp_cairo.h:
+	Look for "Bold" and "Italic" in requested font name, and translate
+	this into a request for the corresponding variant of the base font.
+	Accept standard Adobe font names by treating hyphens as spaces.
+	Tracker item #1958227
+
 2008-05-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tables.h src/tables.c (lookup_table_entry):  New utility routine

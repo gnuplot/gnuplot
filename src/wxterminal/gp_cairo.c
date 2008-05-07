@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.36 2008/02/04 22:52:26 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.37 2008/03/08 06:37:17 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -274,10 +274,30 @@ void gp_cairo_set_justify(plot_struct *plot, JUSTIFY mode)
 
 void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
 {
+    char *c;
+    char *fname;
+
 	FPRINTF((stderr,"set_font\n"));
 
-	strncpy( plot->fontname, name, sizeof(plot->fontname) );
+	/* Split out Bold and Italic attributes from font name */
+	fname = strdup(name);
+	for (c=fname; *c; c++)
+	    if (*c == '-') *c = ' ';
+	if ((c = strstr(fname, " Bold"))) {
+	    do { *c = *(c+5); } while (*c++);
+	    plot->fontweight = PANGO_WEIGHT_BOLD;
+	} else
+	    plot->fontweight = 0;
+	if ((c = strstr(fname, " Italic"))) {
+	    do { *c = *(c+7); } while (*c++);
+	    plot->fontstyle = PANGO_STYLE_ITALIC;
+	} else
+	    plot->fontstyle = 0;
+
+	strncpy( plot->fontname, fname, sizeof(plot->fontname) );
 	plot->fontsize = fontsize;
+
+	free(fname);
 }
 
 
@@ -709,6 +729,11 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 		strncpy(plot->fontname, "Symbol", sizeof(plot->fontname));
 #endif /*MAP_SYMBOL*/
 	pango_font_description_set_size (desc, (int) (plot->fontsize*PANGO_SCALE*plot->oversampling_scale) );
+
+	pango_font_description_set_weight (desc, 
+		plot->fontweight ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
+	pango_font_description_set_style (desc, 
+		plot->fontstyle ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
 	pango_layout_set_font_description (layout, desc);
 	pango_font_description_free (desc);
 
@@ -1212,6 +1237,11 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		current_desc = pango_font_description_new ();
 		pango_font_description_set_family (current_desc, gp_cairo_enhanced_get_fontname(plot));
 		pango_font_description_set_size(current_desc,(int) gp_cairo_enhanced_fontsize*PANGO_SCALE);
+		pango_font_description_set_weight (current_desc, 
+			plot->fontweight ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
+		pango_font_description_set_style (current_desc, 
+			plot->fontstyle ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
+
 		pango_layout_set_font_description (current_layout, current_desc);
 		pango_font_description_free (current_desc);
 		pango_layout_get_extents(current_layout, &current_ink_rect, &current_logical_rect);
@@ -1253,6 +1283,10 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		hide_desc = pango_font_description_new ();
 		pango_font_description_set_family (hide_desc, gp_cairo_enhanced_get_fontname(plot));
 		pango_font_description_set_size(hide_desc,(int) gp_cairo_enhanced_fontsize*PANGO_SCALE);
+		pango_font_description_set_weight (hide_desc, 
+			plot->fontweight ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
+		pango_font_description_set_style (hide_desc, 
+			plot->fontstyle ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
 		pango_layout_set_font_description (hide_layout, hide_desc);
 		pango_font_description_free (hide_desc);
 
@@ -1280,6 +1314,10 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		zerowidth_desc = pango_font_description_new ();
 		pango_font_description_set_family (zerowidth_desc, gp_cairo_enhanced_get_fontname(plot));
 		pango_font_description_set_size(zerowidth_desc,(int) gp_cairo_enhanced_fontsize*PANGO_SCALE);
+		pango_font_description_set_weight (zerowidth_desc, 
+			plot->fontweight ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
+		pango_font_description_set_style (zerowidth_desc, 
+			plot->fontstyle ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
 		pango_layout_set_font_description (zerowidth_layout, zerowidth_desc);
 		pango_font_description_free (zerowidth_desc);
 		pango_layout_get_extents(zerowidth_layout, NULL, &zerowidth_logical_rect);
@@ -1622,6 +1660,10 @@ void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
 	desc = pango_font_description_new ();
 	pango_font_description_set_family (desc, plot->fontname);
 	pango_font_description_set_size(desc,(int) (plot->fontsize*PANGO_SCALE*plot->oversampling_scale));
+	pango_font_description_set_weight (desc, 
+		plot->fontweight ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
+	pango_font_description_set_style (desc, 
+		plot->fontstyle ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
 	pango_layout_set_font_description (layout, desc);
 	pango_font_description_free (desc);
 	pango_layout_get_extents(layout, &ink_rect, &logical_rect);
