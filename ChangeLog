@@ -1,3 +1,9 @@
+2008-05-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm (ENHPDF_FLUSH ENHPDF_put_text):  We correctly issue 
+	save/restore requests to PDFlib, but we need to mirror these in the
+	terminal code so that we track what font is currently selected.
+
 2008-05-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_set_font)

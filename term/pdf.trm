@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.78 2008/01/07 20:39:01 sfeam Exp $
+ * $Id: pdf.trm,v 1.79 2008/02/24 19:49:41 sfeam Exp $
  */
 
 /*------------------------------
@@ -1540,9 +1540,16 @@ ENHPDF_FLUSH()
 	    x += sin((double)PDF_TextAngle * M_PI_2/90.) * (double)PDF_fontAvWidth/2.;
 	    y -= cos((double)PDF_TextAngle * M_PI_2/90.) * (double)PDF_fontAvWidth/2.;
 
-	    /* Select current font */
-	    PDF_fontSizeCur = ENHpdf_fontsize;
-	    PDF_set_font(ENHpdf_font);
+	    /* Select current font for enhanced text fragment, then restore context */
+	    if (1) {
+		char save_fontname[MAX_ID_LEN + 1];
+		double save_fontsize = PDF_fontSizeCur;
+		    strcpy(save_fontname,PDF_fontNameCur);
+		    PDF_fontSizeCur = ENHpdf_fontsize;
+		    PDF_set_font(ENHpdf_font);
+		    strcpy(PDF_fontNameCur,save_fontname);
+		    PDF_fontSizeCur = save_fontsize;
+	    }
 
 	    /* Find length of string in current font */
 	    stringlength = PDF_stringwidth(myPDF, enhanced_text,
@@ -1622,7 +1629,7 @@ ENHPDF_put_text(unsigned int x, unsigned int y, const char *str)
      * we get stuck in an infinite loop) and try again.
      */
     while (*(str = enhanced_recursion((char *)str, TRUE,
-			PDF_fontNameDef, PDF_fontSizeDef,
+			PDF_fontNameCur, PDF_fontSizeCur,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
