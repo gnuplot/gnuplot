@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.154 2008/04/21 03:50:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.155 2008/04/24 05:38:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -181,7 +181,7 @@ static void plot_option_thru __PROTO((void));
 static void plot_option_using __PROTO((int));
 static TBOOLEAN valid_format __PROTO((const char *));
 static void plot_ticlabel_using __PROTO((int));
-static void df_parse_string_field __PROTO((char *, char *));
+static char * df_parse_string_field __PROTO((char *));
 static void add_key_entry __PROTO((char *temp_string, int df_datum));
 static char * df_generate_pseudodata __PROTO((void));
 static int df_skip_bytes __PROTO((int nbytes));
@@ -241,7 +241,6 @@ char *df_filename;      /* name of data file */
 static int df_eof = 0;
 
 static int df_no_tic_specs;     /* ticlabel columns not counted in df_no_use_specs */
-#define MAX_TOKEN_LENGTH 64
 
 #ifndef MAXINT                  /* should there be one already defined ? */
 # ifdef INT_MAX                 /* in limits.h ? */
@@ -304,7 +303,7 @@ static char *df_stringexpression[MAXDATACOLS] = {NULL,NULL,NULL,NULL,NULL,NULL,N
 #define NO_COLUMN_HEADER (-99)  /* some value that can never be a real column */
 static int column_for_key_title = NO_COLUMN_HEADER;
 static TBOOLEAN key_title_auto_col = FALSE;
-static char df_key_title[MAX_TOKEN_LENGTH];     /* filled in from <col> in 1st row by df_tokenise */
+static char *df_key_title = NULL;     /* filled in from <col> in 1st row by df_tokenise */
 static struct curve_points *df_current_plot;	/* used to process histogram labels + key entries */
 
 
@@ -674,8 +673,10 @@ df_tokenise(char *s)
 	    }
 	}
 	/* Particularly if it is supposed to be a key title */
-	if (df_no_cols == column_for_key_title-1)
-	    strncpy(df_key_title,s,sizeof(df_key_title)-1);
+	if (df_no_cols == column_for_key_title-1) {
+	    free(df_key_title);
+	    df_key_title = gp_strdup(s);
+	}
 
 	/* CSV files must accept numbers inside quotes also,
 	 * so we step past the quote */
@@ -951,7 +952,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_format[0] = NUL;         /* no format string */
 
     df_no_tic_specs = 0;
-    df_key_title[0] = '\0';
+    free(df_key_title);
+    df_key_title = NULL;
 
     initialize_use_spec();
 
@@ -1704,13 +1706,15 @@ df_readascii(double v[], int max)
 	/* If we are supposed to read plot or key titles from the
 	 * first line of the data then do that and nothing else.  */
 	if (column_for_key_title != NO_COLUMN_HEADER) {
+	    char *temp_string = df_key_title;
 	    df_datum--;
-	    if (!(*df_key_title)) {
+	    if (!df_key_title) {
 		FPRINTF((stderr,
 			 "df_readline: missing column head for key title\n"));
 		return(DF_KEY_TITLE_MISSING);
 	    }
-	    df_parse_string_field(df_key_title, df_key_title);
+	    df_key_title = df_parse_string_field(df_key_title);
+	    free(temp_string);
 	    FPRINTF((stderr,
 		     "df_readline: Found key title in col %d %s\n",
 		     column_for_key_title, df_key_title));
@@ -1736,7 +1740,6 @@ df_readascii(double v[], int max)
 		/* Handle cases where column holds a meta-data string */
 		/* Axis labels, plot titles, etc.                     */
 		if (use_spec[output].expected_type >= CT_XTICLABEL) {
-		    char temp_string[MAX_TOKEN_LENGTH];
 		    int axis, axcol;
 		    float xpos;
 		    
@@ -1795,15 +1798,16 @@ df_readascii(double v[], int max)
 			} else
 			    fprintf(stderr,"Tic label does not evaluate as string!\n");
 		    } else {
-			df_parse_string_field(temp_string,df_tokens[output]);
+			char *temp_string = df_parse_string_field(df_tokens[output]);
 			add_tic_user(axis, temp_string, xpos, -1);
+			free(temp_string);
 		    }
 
 		} else if (use_spec[output].expected_type == CT_KEYLABEL) {
-		    char temp_string[MAX_TOKEN_LENGTH];
-		    df_parse_string_field(temp_string,df_tokens[output]);
+		    char *temp_string = df_parse_string_field(df_tokens[output]);
 		    if (df_current_plot)
 			add_key_entry(temp_string,df_datum);
+		    free(temp_string);
 
 		} else
 
@@ -2118,9 +2122,9 @@ f_stringcolumn(union argument *arg)
 	undefined = TRUE;
 	push(&a);               /* any objection to this ? */
     } else {
-	static char temp_string[MAX_TOKEN_LENGTH];
-	df_parse_string_field(temp_string, df_column[column-1].position);
+	char *temp_string = df_parse_string_field(df_column[column-1].position);
 	push(Gstring(&a, temp_string ));
+	free(temp_string);
     }
 }
 
@@ -2316,7 +2320,8 @@ df_set_key_title(struct curve_points *plot)
 	/* FIXME EAM - This style should default to notitle!               */
 	double xpos = plot->histogram_sequence + plot->histogram->start;
 	add_tic_user(FIRST_X_AXIS, df_key_title, xpos, -1);
-	df_key_title[0] = '\0';
+	free(df_key_title);
+	df_key_title = NULL;
 	return;
     }
 
@@ -2328,33 +2333,33 @@ df_set_key_title(struct curve_points *plot)
     if (plot->title)
 	free(plot->title);
 
-    plot->title = gp_strdup(df_key_title);
     plot->title_no_enhanced = !keyT.enhanced;
+    plot->title = df_key_title;
+    df_key_title = NULL;
 }
 
-static void
-df_parse_string_field(char *string, char *field)
+static char *
+df_parse_string_field(char *field)
 {
-    char temp_string[MAX_TOKEN_LENGTH];
-    temp_string[sizeof(temp_string)-1] = '\0';
+    char *temp_string;
 
     if (!field) {
-	*string = '\0';
-	return;
+	return NULL;
     } else if (*field == '"') {
-	strncpy(temp_string,&(field[1]),sizeof(temp_string)-1);
+	temp_string = gp_strdup(&field[1]);
 	temp_string[strcspn(temp_string,"\"")] = '\0';
     } else if (df_separator != '\0') {
 	char eor[3];
 	eor[0] = df_separator; eor[1] = '"'; eor[2] = '\0';
-	strncpy(temp_string,field,sizeof(temp_string)-1);
+	temp_string = gp_strdup(field);
 	temp_string[strcspn(temp_string,eor)] = '\0';
     } else {
-	strncpy(temp_string,field,sizeof(temp_string)-1);
+	temp_string = gp_strdup(field);
 	temp_string[strcspn(temp_string,"\t ")] = '\0';
     }
     parse_esc(temp_string);
-    strcpy(string,temp_string);
+
+    return temp_string;
 }
 
 static void

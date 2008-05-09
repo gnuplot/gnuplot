@@ -1,3 +1,8 @@
+2008-05-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c: Switch to dynamic allocation of strings read from a
+	data file. This removes the limit of 64 characters per string.
+
 2008-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm (ENHPDF_FLUSH ENHPDF_put_text):  We correctly issue 
