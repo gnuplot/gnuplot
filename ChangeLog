@@ -1,3 +1,9 @@
+2008-05-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm (SVG_layer):  Under some conditions a "front" grid or
+	border could cause a spurious black-fill of the entire plot. Fix this
+	by forcing a new group after the plot body, which will have fill:none.
+
 2008-05-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: Switch to dynamic allocation of strings read from a

@@ -11,7 +11,6 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW 'refresh' command replots without rereading data if possible
 * NEW rgbimage style now works in 2D and 3D for all terminals that support RGB
 * NEW transparent fill styles
-* NEW 2D plots can read color information from an input data file
 * NEW iteration within a plot command; e.g.     plot for [i=1:10] foo(i)
 * NEW operators '=' and ',' in expression syntax
 * NEW builtin functions 'strftime' and 'strptime'
@@ -20,6 +19,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW support for dashed linetypes in additional terminals
 * NEW the 'bind' command accepts non-keyboard triggers, e.g. 'close'
 * NEW individual plots can be omitted from autoscaling of axis ranges
+* FIX remainder of command line is not lost after a "load" command
 * FIX more complete support for locale internationalization, UTF-8 encoding
 * FIX various font-handling problems in postscript terminal driver
 * FIX avoid infinite loop on resizing x11 plot window under ion, fluxbox
