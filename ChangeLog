@@ -1,3 +1,10 @@
+2008-05-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/scanner.c (get_num):  Parse integer constants on the command line
+	using strtol() rather than atol().  This allows catching overflows and
+	has the side benefit of handling hexadecimal and octal constants.
+	Fixes bug from mouse+zoom with very large coordinate values.
+
 2008-05-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm (SVG_layer):  Under some conditions a "front" grid or

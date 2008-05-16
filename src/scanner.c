@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.24 2007/04/07 22:31:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.25 2007/08/27 04:33:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -252,7 +252,6 @@ static int
 get_num(char str[])
 {
     int count = 0;
-    long lval;
 
     token[t_num].is_token = FALSE;
     token[t_num].l_val.type = INTGR;	/* assume unless . or E found */
@@ -266,8 +265,6 @@ get_num(char str[])
     }
     if (str[count] == 'e' || str[count] == 'E') {
 	token[t_num].l_val.type = CMPLX;
-/* modified if statement to allow + sign in exponent
-   rjl 26 July 1988 */
 	count++;
 	if (str[count] == '-' || str[count] == '+')
 	    count++;
@@ -278,13 +275,17 @@ get_num(char str[])
 	while (isdigit((unsigned char) str[++count]));
     }
     if (token[t_num].l_val.type == INTGR) {
-	lval = atol(str);
-	if ((token[t_num].l_val.v.int_val = lval) != lval)
-	    int_error(t_num, "integer overflow; change to floating point");
-    } else {
-	token[t_num].l_val.v.cmplx_val.imag = 0.0;
-	token[t_num].l_val.v.cmplx_val.real = atof(str);
+	char *endptr;
+	errno = 0;
+	token[t_num].l_val.v.int_val = strtol(str, &endptr, 0);
+	if (!errno)
+	    return(endptr-str);
+	int_warn(t_num, "integer overflow; changing to floating point");
+	token[t_num].l_val.type = CMPLX;
+	/* Fall through */
     }
+    token[t_num].l_val.v.cmplx_val.imag = 0.0;
+    token[t_num].l_val.v.cmplx_val.real = atof(str);
     return (count);
 }
 
