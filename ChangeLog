@@ -1,3 +1,9 @@
+2008-05-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/winmain.c term/win.trm:
+	Allow 'set term win ... title "foo"' to change the title displayed for
+	the plot window.
+
 2008-05-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/scanner.c (get_num):  Parse integer constants on the command line

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.57 2008/04/26 18:12:28 sfeam Exp $
+ * $Id: win.trm,v 1.58 2008/04/28 16:04:17 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -125,7 +125,7 @@ TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiP
 
 /* Interface routines - create list of actions for Windows */
 
-enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR,
+enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR, WIN_GTITLE,
 	      WIN_ENHANCED, WIN_NOENHANCED, WIN_FONT, WIN_OTHER };
 
 static struct gen_table WIN_opts[] =
@@ -137,8 +137,11 @@ static struct gen_table WIN_opts[] =
     { "noenh$anced", WIN_NOENHANCED },
     { "enh$anced", WIN_ENHANCED },
     { "font", WIN_FONT },
+    { "ti$tle", WIN_GTITLE },
     { NULL, WIN_OTHER }
 };
+
+static char WIN_gtitle[MAXTITLELEN] = WINGRAPHTITLE;
 
 static int WIN_last_linetype = LT_NODRAW; /* HBB 20000813: linetype caching */
 
@@ -168,6 +171,9 @@ WIN_options()
 {
     char *s;
     TBOOLEAN set_font = FALSE, set_fontsize = FALSE;
+    TBOOLEAN set_title=FALSE;
+
+    graphwin.Title = WIN_gtitle;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&WIN_opts[0],c_token)) {
@@ -177,6 +183,8 @@ WIN_options()
 	    graphwin.fontsize = WINFONTSIZE;
 	    strcpy(graphwin.deffontname, WINFONT);
 	    graphwin.deffontsize = WINFONTSIZE;
+	    graphwin.Title = WINGRAPHTITLE;
+	    set_title = TRUE;
 	    c_token++;
 	    break;
 	case WIN_MONOCHROME:
@@ -196,6 +204,18 @@ WIN_options()
 	    c_token++;
 	    term->put_text = WIN_put_text;
 	    term->flags &= ~TERM_ENHANCED_TEXT;
+	    break;
+	case WIN_GTITLE:
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "expecting title text");
+	    if (isstring(c_token))
+		quote_str( WIN_gtitle, c_token, MAXTITLELEN );
+	    else
+ 		copy_str( WIN_gtitle, c_token, MAXTITLELEN );
+	    c_token++;
+	    set_title = TRUE;
+	    graphwin.Title = WIN_gtitle;
 	    break;
 	case WIN_FONT:
 	    c_token++;
@@ -247,6 +267,8 @@ WIN_options()
 
     if (IsWindow(graphwin.hWndGraph) && IsIconic(graphwin.hWndGraph))
 	ShowWindow(graphwin.hWndGraph, SW_SHOWNORMAL);
+    /* shige */
+    if (set_title) GraphChangeTitle(&graphwin);
 
     GraphRedraw(&graphwin);
 }
@@ -894,6 +916,7 @@ START_HELP(windows)
 "       set terminal windows {color | monochrome}",
 "                            {enhanced | noenhanced}",
 "                            {{font} \"fontname{,fontsize}\" {<fontsize>}}",
+"                            {title \"Plot Window Title\"}",
 "",
 " where `color` and `monochrome` select colored or mono output,", 
 " `enhanced` enables enhanced text mode features (subscripts,",

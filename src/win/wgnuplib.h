@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.25 2008/04/23 21:38:44 sfeam Exp $
+ * $Id: wgnuplib.h,v 1.26 2008/04/24 16:30:51 sfeam Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -358,6 +358,9 @@ typedef GW FAR*  LPGW;
 #define WIN30FONT "Courier"
 #define WINFONT "Arial"
 
+#define MAXTITLELEN 120
+#define WINGRAPHTITLE "gnuplot graph"
+
 #if 0
 enum JUSTIFY {
 	LEFT, CENTRE, RIGHT
@@ -368,6 +371,7 @@ void WDPROC GraphInit(LPGW lpgw);
 void WDPROC GraphClose(LPGW lpgw);
 void WDPROC GraphStart(LPGW lpgw, double pointsize);
 void WDPROC GraphEnd(LPGW lpgw);
+void WDPROC GraphChangeTitle(LPGW lpgw);
 void WDPROC GraphResume(LPGW lpgw);
 void WDPROC GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str);
 void WDPROC GraphOpSize(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str, DWORD size);
