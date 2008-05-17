@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.159 2008/03/16 20:03:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.160 2008/03/20 09:05:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -56,9 +56,7 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.159 2008/03/16 20:03:55 s
 
 #include "plot2d.h" /* Only for store_label() */
 
-#ifdef THIN_PLATE_SPLINES_GRID
-# include "matrix.h"
-#endif
+#include "matrix.h" /* Used by thin-plate-splines in dgrid3d */
 
 #ifndef _Windows
 # include "help.h"
@@ -71,6 +69,9 @@ t_data_mapping mapping3d = MAP3D_CARTESIAN;
 int dgrid3d_row_fineness = 10;
 int dgrid3d_col_fineness = 10;
 int dgrid3d_norm_value = 1;
+int dgrid3d_mode = DGRID3D_QNORM;
+double dgrid3d_x_scale = 1.0;
+double dgrid3d_y_scale = 1.0;
 TBOOLEAN dgrid3d = FALSE;
 
 /* static prototypes */
@@ -85,9 +86,12 @@ static void grid_nongrid_data __PROTO((struct surface_points * this_plot));
 static void parametric_3dfixup __PROTO((struct surface_points * start_plot, int *plot_num));
 static struct surface_points * sp_alloc __PROTO((int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2));
 static void sp_replace __PROTO((struct surface_points *sp, int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2));
-#ifdef THIN_PLATE_SPLINES_GRID
+
+/* helper functions for grid_nongrid_data() */
 static double splines_kernel __PROTO((double h));
-#endif
+static void thin_plate_splines_setup __PROTO(( struct iso_curve *old_iso_crvs, double **p_xx, int *p_numpoints ));
+static double qnorm __PROTO(( double dist_x, double dist_y, int q ));
+static double pythag __PROTO(( double dx, double dy ));
 
 /* the curves/surfaces of the plot */
 struct surface_points *first_3dplot = NULL;
@@ -350,19 +354,145 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 #endif
 
 
-#ifdef THIN_PLATE_SPLINES_GRID
-
 static double
 splines_kernel(double h)
 {
-    if (h > 0) {
-	return h * h * log(h);
-    } else {
-	return 0;
-    }
+    if (h > 0.0) { return h * h * log(h); }
+    return 0.0;
 }
 
-#endif
+/* PKJ:
+   This function has been hived off out of the original grid_nongrid_data().
+   No changes have been made, but variables only needed locally have moved
+   out of grid_nongrid_data() into this functin. */
+static void 
+thin_plate_splines_setup( struct iso_curve *old_iso_crvs,
+			  double **p_xx, int *p_numpoints )
+{
+    int i, j, k;
+    double *xx, *yy, *zz, *b, **K, d;
+    int numpoints, *indx;
+    struct iso_curve *oicrv;
+    
+    numpoints = 0;
+    for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
+        numpoints += oicrv->p_count;
+    }
+    xx = gp_alloc(sizeof(xx[0]) * (numpoints + 3) * (numpoints + 8),
+                  "thin plate splines in dgrid3d");
+    /* the memory needed is not really (n+3)*(n+8) for now,
+       but might be if I take into account errors ... */
+    K = gp_alloc(sizeof(K[0]) * (numpoints + 3),
+                 "matrix : thin plate splines 2d");
+    yy = xx + numpoints;
+    zz = yy + numpoints;
+    b = zz + numpoints;
+    
+    /* HBB 20010424: Count actual input points without the UNDEFINED
+     * ones, as we copy them */
+    numpoints = 0;
+    for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
+        struct coordinate GPHUGE *opoints = oicrv->points;
+        
+        for (k = 0; k < oicrv->p_count; k++, opoints++) {
+            /* HBB 20010424: avoid crashing for undefined input */
+            if (opoints->type == UNDEFINED)
+                continue;
+            xx[numpoints] = opoints->x;
+            yy[numpoints] = opoints->y;
+            zz[numpoints] = opoints->z;
+            numpoints++;
+        }
+    }
+    
+    for (i = 0; i < numpoints + 3; i++) {
+        K[i] = b + (numpoints + 3) * (i + 1);
+    }
+    
+    for (i = 0; i < numpoints; i++) {
+        for (j = i + 1; j < numpoints; j++) {
+            double dx = xx[i] - xx[j], dy = yy[i] - yy[j];
+            K[i][j] = K[j][i] = -splines_kernel(sqrt(dx * dx + dy * dy));
+        }
+        K[i][i] = 0.0;		/* here will come the weights for errors */
+        b[i] = zz[i];
+    }
+    for (i = 0; i < numpoints; i++) {
+        K[i][numpoints] = K[numpoints][i] = 1.0;
+        K[i][numpoints + 1] = K[numpoints + 1][i] = xx[i];
+        K[i][numpoints + 2] = K[numpoints + 2][i] = yy[i];
+    }
+    b[numpoints] = 0.0;
+    b[numpoints + 1] = 0.0;
+    b[numpoints + 2] = 0.0;
+    K[numpoints][numpoints] = 0.0;
+    K[numpoints][numpoints + 1] = 0.0;
+    K[numpoints][numpoints + 2] = 0.0;
+    K[numpoints + 1][numpoints] = 0.0;
+    K[numpoints + 1][numpoints + 1] = 0.0;
+    K[numpoints + 1][numpoints + 2] = 0.0;
+    K[numpoints + 2][numpoints] = 0.0;
+    K[numpoints + 2][numpoints + 1] = 0.0;
+    K[numpoints + 2][numpoints + 2] = 0.0;
+    indx = gp_alloc(sizeof(indx[0]) * (numpoints + 3), "indexes lu");
+    /* actually, K is *not* positive definite, but
+       has only non zero real eigenvalues ->
+       we can use an lu_decomp safely */
+    lu_decomp(K, numpoints + 3, indx, &d);
+    lu_backsubst(K, numpoints + 3, indx, b);
+    
+    free( K );
+    free( indx );
+    
+    *p_xx = xx;
+    *p_numpoints = numpoints;
+}
+
+static double
+qnorm( double dist_x, double dist_y, int q ) 
+{
+    double dist = 0.0;
+    switch (q) {
+    case 1:
+        dist = dist_x + dist_y;
+        break;
+    case 2:
+        dist = dist_x * dist_x + dist_y * dist_y;
+        break;
+    case 4:
+        dist = dist_x * dist_x + dist_y * dist_y;
+        dist *= dist;
+        break;
+    case 8:
+        dist = dist_x * dist_x + dist_y * dist_y;
+        dist *= dist;
+        dist *= dist;
+        break;
+    case 16:
+        dist = dist_x * dist_x + dist_y * dist_y;
+        dist *= dist;
+        dist *= dist;
+        dist *= dist;
+        break;
+    default:
+        dist = pow(dist_x, (double)q ) + pow(dist_y, (double)q );
+        break;
+    }
+    return dist;
+}
+
+/* This is from Numerical Recipes in C, 2nd ed, p70 */
+static double
+pythag( double dx, double dy )
+{
+    double x, y;
+    x = fabs(dx);
+    y = fabs(dy);
+    
+    if( x > y  ) { return x*sqrt(1.0 + (y*y)/(x*x)); }
+    if( y==0.0 ) { return 0.0; }
+    return y*sqrt(1.0 + (x*x)/(y*y));
+}
 
 static void
 grid_nongrid_data(struct surface_points *this_plot)
@@ -371,12 +501,12 @@ grid_nongrid_data(struct surface_points *this_plot)
     double x, y, z, w, dx, dy, xmin, xmax, ymin, ymax;
     struct iso_curve *old_iso_crvs = this_plot->iso_crvs;
     struct iso_curve *icrv, *oicrv, *oicrvs;
-
-#ifdef THIN_PLATE_SPLINES_GRID
-    double *b, **K, *xx, *yy, *zz, d;
-    int *indx, numpoints;
-#endif
-
+    
+    /* these are only needed for thin_plate_splines */
+    double *xx, *yy, *zz, *b;
+    int numpoints;
+    xx = NULL; /* save to call free() on NULL if xx has never been used */
+    
     /* Compute XY bounding box on the original data. */
     /* FIXME HBB 20010424: Does this make any sense? Shouldn't we just
      * use whatever the x and y ranges have been found to be, and
@@ -388,7 +518,7 @@ grid_nongrid_data(struct surface_points *this_plot)
     ymin = ymax = old_iso_crvs->points[0].y;
     for (icrv = old_iso_crvs; icrv != NULL; icrv = icrv->next) {
 	struct coordinate GPHUGE *points = icrv->points;
-
+        
 	for (i = 0; i < icrv->p_count; i++, points++) {
 	    /* HBB 20010424: avoid crashing for undefined input */
 	    if (points->type == UNDEFINED)
@@ -413,76 +543,14 @@ grid_nongrid_data(struct surface_points *this_plot)
     this_plot->iso_crvs = NULL;
     this_plot->num_iso_read = dgrid3d_col_fineness;
     this_plot->has_grid_topology = TRUE;
-
-#ifdef THIN_PLATE_SPLINES_GRID
-    numpoints = 0;
-    for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
-	numpoints += oicrv->p_count;
+    
+    if( dgrid3d_mode == DGRID3D_SPLINES ) {
+        thin_plate_splines_setup( old_iso_crvs, &xx, &numpoints );
+        yy = xx + numpoints;
+        zz = yy + numpoints;
+        b  = zz + numpoints;
     }
-    xx = gp_alloc(sizeof(xx[0]) * (numpoints + 3) * (numpoints + 8),
-		  "thin plate splines in dgrid3d");
-    /* the memory needed is not really (n+3)*(n+8) for now,
-       but might be if I take into account errors ... */
-    K = gp_alloc(sizeof(K[0]) * (numpoints + 3),
-		 "matrix : thin plate splines 2d");
-    yy = xx + numpoints;
-    zz = yy + numpoints;
-    b = zz + numpoints;
-
-    /* HBB 20010424: Count actual input points without the UNDEFINED
-     * ones, as we copy them */
-    numpoints = 0;
-    for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
-	struct coordinate GPHUGE *opoints = oicrv->points;
-
-	for (k = 0; k < oicrv->p_count; k++, opoints++) {
-	    /* HBB 20010424: avoid crashing for undefined input */
-	    if (opoints->type == UNDEFINED)
-		continue;
-	    xx[numpoints] = opoints->x;
-	    yy[numpoints] = opoints->y;
-	    zz[numpoints] = opoints->z;
-	    numpoints++;
-	}
-    }
-
-    for (i = 0; i < numpoints + 3; i++) {
-	K[i] = b + (numpoints + 3) * (i + 1);
-    }
-
-    for (i = 0; i < numpoints; i++) {
-	for (j = i + 1; j < numpoints; j++) {
-	    double dx = xx[i] - xx[j], dy = yy[i] - yy[j];
-	    K[i][j] = K[j][i] = -splines_kernel(sqrt(dx * dx + dy * dy));
-	}
-	K[i][i] = 0.0;		/* here will come the weights for errors */
-	b[i] = zz[i];
-    }
-    for (i = 0; i < numpoints; i++) {
-	K[i][numpoints] = K[numpoints][i] = 1.0;
-	K[i][numpoints + 1] = K[numpoints + 1][i] = xx[i];
-	K[i][numpoints + 2] = K[numpoints + 2][i] = yy[i];
-    }
-    b[numpoints] = 0.0;
-    b[numpoints + 1] = 0.0;
-    b[numpoints + 2] = 0.0;
-    K[numpoints][numpoints] = 0.0;
-    K[numpoints][numpoints + 1] = 0.0;
-    K[numpoints][numpoints + 2] = 0.0;
-    K[numpoints + 1][numpoints] = 0.0;
-    K[numpoints + 1][numpoints + 1] = 0.0;
-    K[numpoints + 1][numpoints + 2] = 0.0;
-    K[numpoints + 2][numpoints] = 0.0;
-    K[numpoints + 2][numpoints + 1] = 0.0;
-    K[numpoints + 2][numpoints + 2] = 0.0;
-    indx = gp_alloc(sizeof(indx[0]) * (numpoints + 3), "indexes lu");
-    /* actually, K is *not* positive definite, but
-       has only non zero real eigenvalues ->
-       we can use an lu_decomp safely */
-    lu_decomp(K, numpoints + 3, indx, &d);
-    lu_backsubst(K, numpoints + 3, indx, b);
-#endif /* THIN_PLATE_SPLINES_GRID */
-
+    
     for (i = 0, x = xmin; i < dgrid3d_col_fineness; i++, x += dx) {
 	struct coordinate GPHUGE *points;
 
@@ -492,110 +560,111 @@ grid_nongrid_data(struct surface_points *this_plot)
 	this_plot->iso_crvs = icrv;
 	points = icrv->points;
 
-	for (j = 0, y = ymin; j < dgrid3d_row_fineness; j++, y += dy, points++) {
+	for(j=0, y=ymin; j<dgrid3d_row_fineness; j++, y+=dy, points++) {
 	    z = w = 0.0;
 
 	    /* as soon as ->type is changed to UNDEFINED, break out of
 	     * two inner loops! */
 	    points->type = INRANGE;
 
-#ifdef THIN_PLATE_SPLINES_GRID
-	    z = b[numpoints];
-	    for (k = 0; k < numpoints; k++) {
-		double dx = xx[k] - x, dy = yy[k] - y;
-		z = z - b[k] * splines_kernel(sqrt(dx * dx + dy * dy));
-	    }
-	    z = z + b[numpoints + 1] * x + b[numpoints + 2] * y;
-#else
-	    for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
-		struct coordinate GPHUGE *opoints = oicrv->points;
-		for (k = 0; k < oicrv->p_count; k++, opoints++) {
-		    double dist, dist_x = fabs(opoints->x - x), dist_y = fabs(opoints->y - y);
-		    switch (dgrid3d_norm_value) {
-		    case 1:
-			dist = dist_x + dist_y;
-			break;
-		    case 2:
-			dist = dist_x * dist_x + dist_y * dist_y;
-			break;
-		    case 4:
-			dist = dist_x * dist_x + dist_y * dist_y;
-			dist *= dist;
-			break;
-		    case 8:
-			dist = dist_x * dist_x + dist_y * dist_y;
-			dist *= dist;
-			dist *= dist;
-			break;
-		    case 16:
-			dist = dist_x * dist_x + dist_y * dist_y;
-			dist *= dist;
-			dist *= dist;
-			dist *= dist;
-			break;
-		    default:
-			dist = pow(dist_x, (double) dgrid3d_norm_value) +
-			    pow(dist_y, (double) dgrid3d_norm_value);
-			break;
-		    }
+	    if( dgrid3d_mode == DGRID3D_SPLINES ) {
+                z = b[numpoints];
+                for (k = 0; k < numpoints; k++) {
+                    double dx = xx[k] - x, dy = yy[k] - y;
+                    z = z - b[k] * splines_kernel(sqrt(dx * dx + dy * dy));
+                }
+                z = z + b[numpoints + 1] * x + b[numpoints + 2] * y;
+	    } else { /* everything, except splines */
+                for(oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
+                    struct coordinate GPHUGE *opoints = oicrv->points;
+                    for (k = 0; k < oicrv->p_count; k++, opoints++) {
+                        
+                        if( dgrid3d_mode == DGRID3D_QNORM ) {
+                            double dist = qnorm( fabs(opoints->x - x),
+                                                 fabs(opoints->y - y),
+                                                 dgrid3d_norm_value );
 
-		    /* The weight of this point is inverse proportional
-		     * to the distance.
-		     */
-		    if (dist == 0.0) {
-			/* HBB 981209: revised flagging as undefined */
-			/* Supporting all those infinities on various
-			 * platforms becomes tiresome, to say the least :-(
-			 * Let's just return the first z where this happens,
-			 * unchanged, and be done with this, period. */
-			points->type = UNDEFINED;
-			z = opoints->z;
-			w = 1.0;
-			break;	/* out of inner loop */
-		    } else {
-			dist = 1.0 / dist;
-			z += opoints->z * dist;
-			w += dist;
-		    }
-		}
-		if (points->type != INRANGE)
-		    break;	/* out of the second-inner loop as well ... */
-	    }
-#endif /* THIN_PLATE_SPLINES_GRID */
+                            if( dist == 0.0 ) {
+                                /* HBB 981209: revised flagging as undefined */
+                                /* Supporting all those infinities on various
+                                 * platforms becomes tiresome, 
+                                 * to say the least :-(
+                                 * Let's just return the first z where this 
+                                 * happens unchanged, and be done with this,
+                                 * period. */
+                                points->type = UNDEFINED;
+                                z = opoints->z;
+                                w = 1.0;
+                                break;	/* out of inner loop */
+                            } else {
+                                z += opoints->z / dist;
+                                w += 1.0/dist;
+                            }
 
-	    /* Now that we've escaped the loops safely, we know that we
-	     * do have a good value in z and w, so we can proceed just as
-	     * if nothing had happened at all. Nice, isn't it? */
+                        } else { /* ALL else: not spline, not qnorm! */
+                            double weight = 0.0;                       
+                            double dist=pythag((opoints->x-x)/dgrid3d_x_scale, 
+                                               (opoints->y-y)/dgrid3d_y_scale);
+
+                            if( dgrid3d_mode == DGRID3D_GAUSS ) {
+                                weight = exp( -dist*dist );
+                            } else if( dgrid3d_mode == DGRID3D_CAUCHY ) {
+                                weight = 1.0/(1.0 + dist*dist );
+                            } else if( dgrid3d_mode == DGRID3D_EXP ) {
+                                weight = exp( -dist );
+                            } else if( dgrid3d_mode == DGRID3D_BOX ) {
+                                weight = (dist<1.0) ? 1.0 : 0.0;
+                            } else if( dgrid3d_mode == DGRID3D_HANN ) {
+                                if( dist < 1.0 ) {
+                                    weight = 0.5*(1-cos(2.0*M_PI*dist));
+                                }
+                            }
+                            z += opoints->z * weight;
+                            w += weight;
+                        }
+                    }
+                    
+                    /* PKJ: I think this is only relevant for qnorm */
+                    if (points->type != INRANGE)
+                        break;	/* out of the second-inner loop as well ... */
+                }
+	    } /* endif( dgrid3d_mode == DGRID3D_SPLINES ) */
+                 
+              /* Now that we've escaped the loops safely, we know that we
+               * do have a good value in z and w, so we can proceed just as
+               * if nothing had happened at all. Nice, isn't it? */
 	    points->type = INRANGE;
-
+            
 	    /* HBB 20010424: if log x or log y axis, we don't want to
 	     * log() the value again --> just store it, and trust that
 	     * it's always inrange */
 	    points->x = x;
 	    points->y = y;
 
-#ifndef THIN_PLATE_SPLINES_GRID
-	    z = z / w;
-#endif
-
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis,
-	    				this_plot->noautoscale, NOOP, continue);
-
+	    if( dgrid3d_mode != DGRID3D_SPLINES ) { 
+                z = z / w;
+	    } 
+            
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, 
+					    points->type, z_axis,
+					    this_plot->noautoscale,
+					    NOOP, continue);
+            
 	    if (this_plot->pm3d_color_from_column)
-		int_error(NO_CARET, "Gridding of the color column is not implemented");
+		int_error(NO_CARET, 
+			  "Gridding of the color column is not implemented");
 	    else {
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points->CRD_COLOR, z, points->type, COLOR_AXIS,
-					this_plot->noautoscale, NOOP, continue);
+		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points->CRD_COLOR, z, 
+						      points->type, 
+						      COLOR_AXIS, 
+						      this_plot->noautoscale,
+						      NOOP, continue);
 	    }
 	}
     }
-
-#ifdef THIN_PLATE_SPLINES_GRID
-    free(K);
-    free(xx);
-    free(indx);
-#endif
-
+    
+    free(xx); /* save to call free on NULL pointer if splines not used */
+    
     /* Delete the old non grid data. */
     for (oicrvs = old_iso_crvs; oicrvs != NULL;) {
 	oicrv = oicrvs;

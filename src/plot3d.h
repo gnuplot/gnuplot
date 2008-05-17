@@ -1,5 +1,5 @@
 /*
- * $Id: plot3d.h,v 1.16 2004/11/22 00:43:05 sfeam Exp $
+ * $Id: plot3d.h,v 1.17 2007/08/31 20:03:44 sfeam Exp $
  */
 
 /* GNUPLOT - plot3d.h */
@@ -57,6 +57,9 @@ extern t_data_mapping mapping3d;
 extern int dgrid3d_row_fineness;
 extern int dgrid3d_col_fineness;
 extern int dgrid3d_norm_value;
+extern int dgrid3d_mode;
+extern double dgrid3d_x_scale;
+extern double dgrid3d_y_scale;
 extern TBOOLEAN	dgrid3d;
 
 /* prototypes from plot3d.c */

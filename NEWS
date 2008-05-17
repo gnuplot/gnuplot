@@ -19,6 +19,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW support for dashed linetypes in additional terminals
 * NEW the 'bind' command accepts non-keyboard triggers, e.g. 'close'
 * NEW individual plots can be omitted from autoscaling of axis ranges
+* NEW more smoothing options: new kernels for dgrid3d
 * FIX remainder of command line is not lost after a "load" command
 * FIX more complete support for locale internationalization, UTF-8 encoding
 * FIX various font-handling problems in postscript terminal driver

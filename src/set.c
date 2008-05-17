@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.272 2008/04/21 03:50:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.273 2008/04/30 04:16:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -78,6 +78,7 @@ static void set_clabel __PROTO((void));
 static void set_clip __PROTO((void));
 static void set_cntrparam __PROTO((void));
 static void set_contour __PROTO((void));
+static void classic_set_dgrid3d __PROTO((void));
 static void set_dgrid3d __PROTO((void));
 static void set_decimalsign __PROTO((void));
 static void set_dummy __PROTO((void));
@@ -1100,8 +1101,10 @@ set_contour()
 
 
 /* process 'set dgrid3d' command */
+/* PKJ: this is the original version, which is called by the new
+   set_dgrid3d() to handle the old syntax of this command. */
 static void
-set_dgrid3d()
+classic_set_dgrid3d()
 {
     int local_vals[3];
     int i;
@@ -1127,15 +1130,154 @@ set_dgrid3d()
     }
 
     if (local_vals[0] < 2 || local_vals[0] > 1000)
-	int_error(c_token, "Row size must be in [2:1000] range; size unchanged");
+	int_error(c_token, 
+		  "Row size must be in [2:1000] range; size unchanged");
     if (local_vals[1] < 2 || local_vals[1] > 1000)
-	int_error(c_token, "Col size must be in [2:1000] range; size unchanged");
+	int_error(c_token,
+		  "Col size must be in [2:1000] range; size unchanged");
     if (local_vals[2] < 1 || local_vals[2] > 100)
 	int_error(c_token, "Norm must be in [1:100] range; norm unchanged");
 
     dgrid3d_row_fineness = local_vals[0];
     dgrid3d_col_fineness = local_vals[1];
     dgrid3d_norm_value = local_vals[2];
+    dgrid3d = TRUE;
+}
+
+
+/* process 'set dgrid3d' command */
+static void
+set_dgrid3d()
+{
+    int tmp = c_token;
+    int t, ft, mt, token_cnt; /* tokens, first_token, mode_token */
+  
+    double gridx  = (double)dgrid3d_row_fineness;
+    double gridy  = (double)dgrid3d_col_fineness;
+    double norm   = (double)dgrid3d_norm_value;
+    double scalex = dgrid3d_x_scale;
+    double scaley = dgrid3d_y_scale;
+
+    /* dgrid3d has two different syntax alternatives: classic and new.
+       If there is a "mode" token, the syntax is new, otherwise it's classic.*/
+
+    /* look for mode as first string token - remember its token number */
+    c_token++;
+    mt = -1;                           /* no string found among tokens */
+    while( !(END_OF_COMMAND) ) { 
+        if( mt == -1 && !isanumber(c_token) && !equals( c_token, "," ) ) {
+            mt = c_token;
+        }
+        c_token++;
+    }
+    token_cnt = c_token - (tmp+1);
+    c_token = tmp;     /* reset token counter to its original position */
+
+    /* no mode token found: classic format - reset counter and call old fct */
+    if( mt == -1 ) { 
+        classic_set_dgrid3d();
+        dgrid3d_mode = DGRID3D_QNORM; /* only set if classic succeeds */
+        return; 
+    }
+
+    /* determine the mode - fail if not recognized */
+    if(      equals( mt, "splines" ) ) { dgrid3d_mode = DGRID3D_SPLINES; }
+    else if( equals( mt, "qnorm"   ) ) { dgrid3d_mode = DGRID3D_QNORM; }
+    else if( equals( mt, "gauss"   ) ) { dgrid3d_mode = DGRID3D_GAUSS; }
+    else if( equals( mt, "cauchy"  ) ) { dgrid3d_mode = DGRID3D_CAUCHY; }
+    else if( equals( mt, "exp"     ) ) { dgrid3d_mode = DGRID3D_EXP; }
+    else if( equals( mt, "box"     ) ) { dgrid3d_mode = DGRID3D_BOX; }
+    else if( equals( mt, "hann"    ) ) { dgrid3d_mode = DGRID3D_HANN; }
+    else {
+        int_error( mt,
+        "Expecting one of: splines, qnorm, gauss, cauchy, exp, box, hann" );
+    }
+  
+    /* handle tokens before the mode argument */
+    c_token++;
+    t = mt-c_token; /* number of tokens before the mode argument */
+    ft = c_token;   /* position of the first token after 'dgrid3d' */
+
+    if( t > 3 )
+        int_error( ft+3, "At most two numeric arguments before mode" );
+
+    if( t > 0 ) {
+        if( !isanumber(ft+0) ) 
+            int_error(ft+0, "Expecting number of grid points");
+
+        gridx = real_expression();
+        gridy = gridx; /* gridy defaults to gridx, unless overridden below */
+
+        if( t > 1 ) {
+            if( !equals(ft+1, ",") ) int_error( ft+1, "Expecting comma" );
+            c_token++; /* consume the comma */
+
+            if( t > 2 ) {
+                if( !isanumber(ft+2) )
+                    int_error( ft+2, "Expecting number of grid points" );
+
+                gridy = real_expression();
+            }
+        }
+    }
+    /* we could warn here about floating point values being truncated... */  
+    if( gridx < 2 || gridx > 1000 || gridy < 2 || gridy > 1000 )
+        int_error( ft, 
+                   "Number of grid points must be in [2:1000] - not changed!");
+
+
+    /* skip the mode token */
+    c_token++; 
+
+
+    /* handle tokens after the mode argument */
+    t = token_cnt - (t+1); /* after is all minus before minus mode itself*/
+    ft = c_token;          /* pos of first token after the mode token */
+
+    if( dgrid3d_mode == DGRID3D_SPLINES && t > 0 )
+        int_error( mt, "No arguments expected for splines" );
+    if( dgrid3d_mode == DGRID3D_QNORM && t > 1 )
+        int_error( mt, "Only one argument expected for qnorm" );
+
+    if( t > 0 ) {
+        if( dgrid3d_mode == DGRID3D_QNORM ) {
+            if( !isanumber(ft+0) ) 
+                int_error( ft+0, "Expecting q-value for norm" );
+
+            tmp = (int)real_expression();
+            if( tmp < 1 || tmp > 100 ) 
+                int_error( ft, 
+                           "Norm parameter must be in [1:100] - not changed!");
+            dgrid3d_norm_value = tmp;
+
+        } else {
+            if( !isanumber(ft+0) ) 
+                int_error( ft+0, "Expecting numeric scale factor" );
+
+            scalex = real_expression();
+            scaley = scalex;  /* default,unless overridden below */
+        }
+
+        if( t > 1 ) {
+            if( !equals(ft+1, ",") ) int_error( ft+1, "Expecting comma" );
+            c_token++; /* consume comma */
+
+            if( t > 2 ) {
+                if( !isanumber(ft+2) ) 
+                    int_error( ft+2, "Expecting numeric scale factor" );
+
+                scaley = real_expression();
+            }
+        }
+    }
+    if( scalex < 0.0 || scaley < 0.0 )
+        int_error( ft, 
+                   "Scale factors must be greater than zero - not changed!" );
+
+    dgrid3d_row_fineness = (int)gridx;
+    dgrid3d_col_fineness = (int)gridy;
+    dgrid3d_x_scale = scalex;
+    dgrid3d_y_scale = scaley;
     dgrid3d = TRUE;
 }
 

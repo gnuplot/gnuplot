@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.32 2008/03/13 19:53:28 sfeam Exp $
+ * $Id: graph3d.h,v 1.33 2008/03/20 09:05:33 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -51,6 +51,16 @@
 #define map_z3d(z) ((z-floor_z)*zscale3d-1.0)
 
 /* Type definitions */
+
+typedef enum en_dgrid3d_mode {
+    DGRID3D_QNORM,
+    DGRID3D_SPLINES,
+    DGRID3D_GAUSS,
+    DGRID3D_EXP,
+    DGRID3D_CAUCHY,
+    DGRID3D_BOX,
+    DGRID3D_HANN
+} t_dgrid3d_mode;
 
 typedef enum en_contour_placement {
     /* Where to place contour maps if at all. */

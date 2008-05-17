@@ -1,3 +1,9 @@
+2008-05-17  Philipp Janert  <janert@ieee.org>
+	
+	* src/graph3d.h src/plot3d.c src/plot3d.h src/save.c src/set.c
+	src/show.c src/unset.c docs/gnuplot.doc
+	Adding new smoothing kernels to the dgrid3d logic.
+
 2008-05-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/win/wgnuplib.h src/win/wgraph.c src/win/winmain.c term/win.trm:
