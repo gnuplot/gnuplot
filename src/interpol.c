@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.31 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.32 2007/12/18 19:02:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -863,17 +863,32 @@ do_freq(
 void
 gen_interp_frequency(struct curve_points *plot)
 {
-
-    int i, curves;
+    int i, j, curves;
     int first_point, num_points;
+    double y;
 
     curves = num_curves(plot);
 
     first_point = 0;
     for (i = 0; i < curves; i++) {
-	num_points = next_curve(plot, &first_point);
-	do_freq(plot, first_point, num_points);
-	first_point += num_points + 1;
+        num_points = next_curve(plot, &first_point);
+
+        /* If cumulative, replace the current y-value with the
+           sum of all previous y-values. This assumes that the
+           data has already been sorted by x-values. */
+        if( plot->plot_smooth == SMOOTH_CUMULATIVE ) {
+            y = 0;
+            for (j = first_point; j < first_point + num_points; j++) {
+                if (plot->points[j].type == UNDEFINED) 
+                    continue;
+
+                y += plot->points[j].y;
+                plot->points[j].y = y;
+            }
+        }
+
+        do_freq(plot, first_point, num_points);
+        first_point += num_points + 1;
     }
     return;
 }
@@ -1028,7 +1043,8 @@ cp_implode(struct curve_points *cp)
 		k++;
 	    } else {
 		cp->points[j].x = x;
- 		if ( cp->plot_smooth == SMOOTH_FREQUENCY )
+ 		if ( cp->plot_smooth == SMOOTH_FREQUENCY ||
+ 		     cp->plot_smooth == SMOOTH_CUMULATIVE )
 		    k = 1;
 		cp->points[j].y = y /= (double) k;
 		cp->points[j].xhigh = sux / (double) k;
@@ -1078,7 +1094,8 @@ cp_implode(struct curve_points *cp)
 
 	if (k) {
 	    cp->points[j].x = x;
-	    if ( cp->plot_smooth == SMOOTH_FREQUENCY )
+	    if ( cp->plot_smooth == SMOOTH_FREQUENCY ||
+		 cp->plot_smooth == SMOOTH_CUMULATIVE )
 		k = 1;
 	    cp->points[j].y = y /= (double) k;
 	    cp->points[j].xhigh = sux / (double) k;

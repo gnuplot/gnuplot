@@ -1,8 +1,13 @@
-2008-05-17  Philipp Janert  <janert@ieee.org>
+2008-05-17  Philipp K Janert  <janert@ieee.org>
 	
 	* src/graph3d.h src/plot3d.c src/plot3d.h src/save.c src/set.c
 	src/show.c src/unset.c docs/gnuplot.doc
 	Adding new smoothing kernels to the dgrid3d logic.
+
+	* src/gp_types.h src/interpol.c src/plot2d.c src/tables.c
+	docs/gnuplot.doc
+	New smoothing algorithm: 'smooth cumulative', which plots a
+	cumulative distribution function of a random collection of points.
 
 2008-05-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
