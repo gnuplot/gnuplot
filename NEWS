@@ -20,6 +20,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW the 'bind' command accepts non-keyboard triggers, e.g. 'close'
 * NEW individual plots can be omitted from autoscaling of axis ranges
 * NEW more smoothing options: new kernels (for dgrid3d) and 'smooth cumulative'
+* FIX remove the limit of 64 characters read as string data from a data file
 * FIX remainder of command line is not lost after a "load" command
 * FIX more complete support for locale internationalization, UTF-8 encoding
 * FIX various font-handling problems in postscript terminal driver

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.497 2008/05/18 03:49:10 janert Exp $
+C RCS $Id: gnuplot.doc,v 1.498 2008/05/19 17:34:43 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -186,7 +186,6 @@ C
 
 2 New features introduced in version 4.2
 ?new-features
-?version 4.2 features
  Gnuplot version 4.2 offers many new features introduced since the preceding
  official version 4.0. This section lists major additions and gives a partial
  list of changes and minor new features. For a more exhaustive list, see the
@@ -367,7 +366,6 @@ C
  individual terminals.
 
 2 Features introduced in version 4.0
-?version 4 features
  Gnuplot version 4.0 contained many features introduced since the preceding
  official version 3.7.  These are summarized here.
 
