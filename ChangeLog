@@ -7,6 +7,9 @@
 	for binary data options. Simplify default output of "show datafile".
 	"show datafile binary" will dump full list of options.
 
+	* src/scanner.c (get_num):  Add back previous test for truncation
+	of long to int on 64-bit machines.
+
 2008-05-17  Philipp K Janert  <janert@ieee.org>
 	
 	* src/graph3d.h src/plot3d.c src/plot3d.h src/save.c src/set.c
