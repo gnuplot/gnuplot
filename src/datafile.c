@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.155 2008/04/24 05:38:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.156 2008/05/10 03:00:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -424,26 +424,23 @@ df_binary_file_record_struct df_bin_record_reset = {
 int df_max_num_bin_records = 0, df_num_bin_records, df_bin_record_count;
 int df_max_num_bin_records_default = 0, df_num_bin_records_default;
 
-typedef struct df_bin_filetype_table_struct {
-    char *extension;
-    void (*function)(void);
-} df_bin_filetype_table_struct;
-
 static void gpbin_filetype_function __PROTO((void));
 static void raw_filetype_function __PROTO((void));
 static void avs_filetype_function __PROTO((void));
 
-df_bin_filetype_table_struct df_bin_filetype_table[] = {
+static void (*binary_input_function)(void);	/* Will point to one of the above */
+static void auto_filetype_function(void){};	/* Just a placeholder for auto    */
+
+struct gen_ftable df_bin_filetype_table[] = {
     {"gpbin", gpbin_filetype_function},
     {"raw", raw_filetype_function},
     {"rgb", raw_filetype_function},
     {"bin", raw_filetype_function},
-#if 1
     {"avs", avs_filetype_function},
     {"edf", edf_filetype_function},
     {"ehf", edf_filetype_function},
-#endif
-    {"auto", raw_filetype_function}  /* "auto" is trapped, but if the actual file extension is "auto" then use raw. */
+    {"auto", auto_filetype_function},
+    {NULL,   auto_filetype_function}
 };
 #define RAW_FILETYPE 1
 
@@ -2869,9 +2866,6 @@ char *equal_symbol_msg = "Equal ('=') symbol required";
 static void
 plot_option_binary(TBOOLEAN set_matrix)
 {
-#define MAX_FILE_EXT_LEN 10
-    char file_ext[MAX_FILE_EXT_LEN+1];
-
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_record = FALSE;
     TBOOLEAN set_array = FALSE, set_dx = FALSE, set_dy = FALSE, set_dz = FALSE;
@@ -2895,63 +2889,28 @@ plot_option_binary(TBOOLEAN set_matrix)
 	    df_matrix_file = FALSE;
 
 	    if (almost_equals(c_token, "file$type")) {
-		c_token++;
-
-		if (!equals(c_token, "="))
+		if (!equals(++c_token, "="))
 		    int_error(c_token, equal_symbol_msg);
+
+		binary_input_function = lookup_ftable(df_bin_filetype_table, ++c_token);
 		c_token++;
-
-		copy_str(file_ext, c_token, MAX_FILE_EXT_LEN);
-
-		for (i=0; i < (sizeof(df_bin_filetype_table)/sizeof(df_bin_filetype_table_struct)); i++) {
-		    if (!strcasecmp(file_ext, df_bin_filetype_table[i].extension)) {
-			df_bin_filetype = i;
-			break;
-		    }
-		}
-		if (i == (sizeof(df_bin_filetype_table)/sizeof(df_bin_filetype_table_struct)))
-		    int_error(c_token, "Unsupported file type");
-		c_token++;
-
 	    }
 
-	    /* This section of code entails being able to read various types of
-	     * binary data files.  Some decisions need to be made on exactly what
-	     * type or how many kinds should be allowed.  Perhaps some system
-	     * similar to the terminal scheme can be devised so that volunteers
-	     * can provide code to read their favorite file type.
-	     *
-	     * My suggestion for a good scheme would be to have short little
-	     * routines that look into the file in question and pull from the
-	     * header the necessary information to fill in the details about
-	     * "record", "array", "skip", etc.  Then just let the current gnuplot
-	     * code continue on.  If the data file in question has compressed
-	     * or encoded data, perhaps the data could be uncompressed or decoded
-	     * into an intermediate, temporary file.  In that case, the file name
-	     * could be changed to the temporary file name and, again, just let
-	     * gnuplot continue.  Other approaches are possible.
-	     */
-	    if (!strcasecmp("auto", df_bin_filetype_table[df_bin_filetype].extension) && (df_plot_mode != MODE_QUERY)) {
+	    if (df_plot_mode != MODE_QUERY && binary_input_function == auto_filetype_function) {
 		int i;
-		char *ext_start = strrchr (df_filename, '.');
-		if (!ext_start)
-		    df_bin_filetype = RAW_FILETYPE;
-		else {
-		    strncpy(file_ext, (ext_start+1), MAX_FILE_EXT_LEN);
-		    for (i=0; i < (sizeof(df_bin_filetype_table)/sizeof(df_bin_filetype_table_struct)); i++) {
-			if (!strcasecmp(file_ext, df_bin_filetype_table[i].extension)) {
-			    df_bin_filetype = i;
-			    break;
-			}
-		    }
-		    if (i == (sizeof(df_bin_filetype_table)/sizeof(df_bin_filetype_table_struct)))
-			int_error(c_token, "Unsupported file type");
+		char *file_ext = strrchr(df_filename, '.');
+		if (file_ext++) {
+		    for (i=0; df_bin_filetype_table[i].key; i++)
+			if (!strcasecmp(file_ext, df_bin_filetype_table[i].key))
+			    binary_input_function = df_bin_filetype_table[i].value;
 		}
+		if (binary_input_function == auto_filetype_function)
+		    int_warn(NO_CARET, "Unrecognized binary file type");
 	    }
 
 	    /* Unless only querying settings, call the routine to prep binary data parameters. */
 	    if (df_plot_mode != MODE_QUERY)
-		df_bin_filetype_table[df_bin_filetype].function();
+		(*binary_input_function)();
 
 	    /* Now, at this point anything that was filled in for "scan" should
 	     * override the "cart" variables.
@@ -3882,8 +3841,7 @@ df_show_binary(FILE *fp)
     int i, num_record;
     df_binary_file_record_struct *bin_record;
 
-    fprintf(fp, "\
-\tDefault binary data file settings (in-file settings may override):\n");
+    fprintf(fp, "\tDefault binary data file settings (in-file settings may override):\n");
 
     if (!df_num_bin_records_default) {
 	bin_record = &df_bin_record_reset;
@@ -3895,10 +3853,10 @@ df_show_binary(FILE *fp)
 
     fprintf(fp, "\n\t  File Type: ");
     if (df_bin_filetype_default >= 0)
-	fprintf(fp, "%s",
-		df_bin_filetype_table[df_bin_filetype_default].extension);
+	fprintf(fp, "%s", df_bin_filetype_table[df_bin_filetype_default].key);
     else
 	fprintf(fp, "none");
+
     fprintf(fp, "\n\t  File Endianess: %s",
 	    df_endian[df_bin_file_endianess_default]);
 
@@ -4032,15 +3990,12 @@ df_show_datasizes(FILE *fp)
 void
 df_show_filetypes(FILE *fp)
 {
-    int i;
+    int i = 0;
     
-    fprintf(fp,"\tThe following binary file types are understood by gnuplot:\n\n");
-    for (i = 0;
-	 i < sizeof(df_bin_filetype_table)
-	     /sizeof(df_bin_filetype_table_struct);
-	 i++) {
-	fprintf(fp, "\t  %s\n", df_bin_filetype_table[i].extension);
-    }
+    fprintf(fp,"\tThis version of gnuplot understands the following binary file types:\n");
+    while (df_bin_filetype_table[i].key)
+	fprintf(fp, "\t  %s", df_bin_filetype_table[i++].key);
+    fputs("\n",fp);
 }
 
 

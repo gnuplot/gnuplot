@@ -1,3 +1,12 @@
+2008-05-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (plot_option_binary df_show_binary df_show_datasizes)
+	src/show.c (show_datafile) docs/gnuplot.doc:
+	Clean up option handling for binary data files by using the standard
+	option lookup routines. Add missing entry points to the documentation
+	for binary data options. Simplify default output of "show datafile".
+	"show datafile binary" will dump full list of options.
+
 2008-05-17  Philipp K Janert  <janert@ieee.org>
 	
 	* src/graph3d.h src/plot3d.c src/plot3d.h src/save.c src/set.c

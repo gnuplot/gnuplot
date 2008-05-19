@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.495 2008/04/30 04:16:07 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.497 2008/05/18 03:49:10 janert Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -221,9 +221,9 @@ C
 3 Input from binary data files
  Gnuplot can now read a generic `binary` input, including matrix binary and
  `general binary` (until now gnuplot supported only its own `binary matrix`
- format). Several matrix file formats are autodetected (`gpbin`, `edf`, `avs`).
- Binary data files are mainly useful for `image` and `rgbimage` drawings.
- See `binary` and `binary general filetype`.
+ format). Several matrix file formats are autodetected by filename extension
+ (`gpbin`, `edf`, `avs`).  Binary data files are mainly useful for `image` and
+ `rgbimage` drawings.  See `binary` and `binary general filetype`.
 
 3 New plot elements
 
@@ -6652,6 +6652,7 @@ Ffigure_mapcontours
  options are currently implemented.
 4 set datafile fortran
 ?set datafile fortran
+?show datafile fortran
 ?fortran
  The `set datafile fortran` command enables a special check for values in the
  input file expressed as Fortran D or Q constants. This extra check slows down
@@ -6660,6 +6661,7 @@ Ffigure_mapcontours
  `unset datafile fortran`.
 4 set datafile missing
 ?set datafile missing
+?show datafile missing
 ?set missing
 ?missing
  The `set datafile missing` command allows you to tell `gnuplot` what character
@@ -6718,6 +6720,7 @@ Ffigure_mapcontours
 
 4 set datafile separator
 ?set datafile separator
+?show datafile separator
 ?separator
  The command `set datafile separator "<char>"` tells `gnuplot` that data fields
  in subsequent input files are separated by <char> rather than by whitespace.
@@ -6774,6 +6777,9 @@ Ffigure_mapcontours
  Examples:
        set datafile binary filetype=auto
        set datafile binary array=512x512 format="%uchar"
+
+?show datafile binary
+       show datafile binary   # list current settings
 3 decimalsign
 ?commands set decimalsign
 ?commands show decimalsign
