@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.168 2008/04/26 04:52:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.169 2008/05/18 03:49:13 janert Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1711,7 +1711,7 @@ eval_plots()
 
 		/* Some plots have a fill style as well */
 		if (this_plot->plot_style & PLOT_STYLE_HAS_FILL){
-		    if (equals(c_token,"fs") || equals(c_token,"fill")) {
+		    if (equals(c_token,"fs") || almost_equals(c_token,"fill$style")) {
 			int stored_token = c_token;
 			parse_fillstyle(&this_plot->fill_properties,
 				default_fillstyle.fillstyle,

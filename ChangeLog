@@ -2,6 +2,15 @@
 
 	* term/emf.trm (EMF_dashtype):  Don't ignore linetype LT_AXIS.
 
+2008-05-20  Ethan A Merritt  <merritt@u.washington.edu>
+	
+	* src/misc.c (parse_fillstyle):  Accept variables for fill density and
+	border line type.
+
+	* src/plot2d.c (eval_plots): Accept full keyword "fillstyle".
+
+	* src/graphics.c (plot_boxes): Restore missing test for no fill border.
+
 2008-05-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (plot_option_binary df_show_binary df_show_datasizes)

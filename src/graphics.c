@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.262 2008/04/27 20:55:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.263 2008/04/30 04:16:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2022,9 +2022,11 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 	    case FILLEDCURVES:
-		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN)
+		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN) {
 		    plot_betweencurves(this_plot);
-		else {
+		    /* FIXME: would like to call plot_lines() here twice, once for the lower */
+		    /* curve and once for the upper curve(), conditional on need_fill_border */
+		} else {
 		    plot_filledcurves(this_plot);
 		    if (need_fill_border(&this_plot->fill_properties))
 			plot_lines(this_plot);
@@ -3687,9 +3689,10 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    /* FIXME EAM - Is this still correct??? */
 		    if (strcmp(t->name, "fig") == 0) break;
 
+		    if (plot->fill_properties.border_linetype == LT_NODRAW)
+			break;
 		    need_fill_border(&plot->fill_properties);
 		}
-
 		newpath();
 		(*t->move) (xl, yb);
 		(*t->vector) (xl, yt);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.96 2008/04/13 19:25:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.97 2008/04/15 05:01:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -974,19 +974,19 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	else if (almost_equals(c_token, "bo$rder")) {
 	    fs->border_linetype = LT_UNDEFINED;
 	    c_token++;
-	    /* FIXME EAM - isanumber really means `is a positive number` */
-	    if (isanumber(c_token) ||
-		(equals(c_token, "-") && isanumber(c_token + 1))) {
+	    if (!END_OF_COMMAND)
 		fs->border_linetype = int_expression() - 1;
-	    }
 	    continue;
 	} else if (almost_equals(c_token, "nobo$rder")) {
 	    fs->border_linetype = LT_NODRAW;
 	    c_token++;
 	    continue;
 	}
+
 	/* We hit something unexpected */
-	else if (!set_fill || !isanumber(c_token) || set_param)
+	if (!set_fill || set_param)
+	    break;
+	if (!(isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX))
 	    break;
 
 	if (fs->fillstyle == FS_SOLID || fs->fillstyle == FS_TRANSPARENT_SOLID) {
