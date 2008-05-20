@@ -1,3 +1,7 @@
+2008-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/emf.trm (EMF_dashtype):  Don't ignore linetype LT_AXIS.
+
 2008-05-08  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* src/axis.c (setup_tics):  If the user specified an explicit
