@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.48 2008/01/14 06:38:25 sfeam Exp $
+ * $Id: emf.trm,v 1.49 2008/04/07 03:53:36 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -901,9 +901,6 @@ EMF_dashtype(int dashtype)
 	4, 8, 4, 2, 4, 8, 4, 2,	/* 3 - dash-dot          */
 	4, 9, 4, 2, 4, 2, 0, 0,	/* 4 - dash-dot-dot      */
     };
-
-    if (dashtype < 0)
-	dashtype = 0;
 
     emf_dashtype = dashtype;
 
