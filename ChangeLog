@@ -6,6 +6,8 @@
 	Also add one more cycle of Newton-Raphson.
 	Bug #1962800
 
+	* docs/doc2texi.el docs/gnuplot.texi:  Update
+
 2008-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm (EMF_dashtype):  Don't ignore linetype LT_AXIS.

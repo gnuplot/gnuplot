@@ -172,15 +172,17 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
 
             An Interactive Plotting Program
              Thomas Williams & Colin Kelley
-          Version 4.2 organized by: Hans-Bernhard Broeker
+                Version 4.3 organized by:
+    Hans-Bernhard Broeker, Ethan A Merritt, and others
 
- Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+   Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+           Copyright (C) 2004 - 2008  various authors
 
        Mailing list for comments: gnuplot-info@@lists.sourceforge.net
      Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net
 
          This manual was originally prepared by Dick Crawford
-                   Version 4.2 - 1 Oct 2006
+                   Version 4.3 - 21 May 2008
 
 
 Major contributors (alphabetic order):
@@ -250,6 +252,7 @@ Major contributors (alphabetic order):
 	"apollo"
 	"aquaterm"
 	"be"
+	"cairo"
 	"cgi"
 	"cgm"
 	"corel"
@@ -316,6 +319,7 @@ Major contributors (alphabetic order):
 	"vgagl"
 	"vws"
 	"win"
+	"wxt"
 	"x11"
 	"xlib"))
 
@@ -435,7 +439,7 @@ particular conversion chore."
     (if (string-match "vms" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("vws"))))
-    (unless (member* system-configuration '("dos" "windows" "amiga")
+    (unless (member* system-configuration '("pc" "windows" "amiga")
 		     :test 'string-match)
       (setq d2t-terminal-list
 	    (append d2t-terminal-list

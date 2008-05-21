@@ -26,15 +26,17 @@
 
             An Interactive Plotting Program
              Thomas Williams & Colin Kelley
-          Version 4.2 organized by: Hans-Bernhard Broeker
+                Version 4.3 organized by:
+    Hans-Bernhard Broeker, Ethan A Merritt, and others
 
- Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+   Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+           Copyright (C) 2004 - 2008  various authors
 
        Mailing list for comments: gnuplot-info@@lists.sourceforge.net
      Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net
 
          This manual was originally prepared by Dick Crawford
-                   Version 4.2 - 1 Oct 2006
+                   Version 4.3 - 21 May 2008
 
 
 Major contributors (alphabetic order):
@@ -270,14 +272,14 @@ value of the token will be taken for optional arguments if the token is
 omitted, but these cases are not always denoted with braces around the angle
 brackets.
 
-For on-line help on any topic, type @ref{help} followed by the name of the topic
-or just @ref{help} or `?` to get a menu of available topics.
+For built-in help on any topic, type @ref{help} followed by the name of the topic
+or `help ?` to get a menu of available topics.
 
-The new `gnuplot` user should begin by reading about `plotting` (if on-line,
-type `help plotting`).
+The new `gnuplot` user should begin by reading about `plotting` (if in an
+interactive session, type `help plotting`).
 
 See the simple.dem demo, also available together with other demos on the web page
-@uref{http://www.gnuplot.info/demo/simple.html,http://www.gnuplot.info/demo/simple.html
+@uref{http://www.gnuplot.info/demo/,http://www.gnuplot.info/demo/
 }
 
 @node Seeking-assistance, New_features_introduced_in_version_4.2, Introduction, gnuplot
@@ -307,9 +309,9 @@ The address for mailing to list members is:
 
 @end example
 
-Bug reports and code contributions should be mailed to:
+Bug reports and code contributions should be uploaded to the trackers at
 @example
-      gnuplot-bugs@@lists.sourceforge.net
+      http://sourceforge.net/projects/gnuplot
 
 @end example
 
@@ -1250,6 +1252,8 @@ is ignored inside expressions.
 Complex constants are expressed as @{<real>,<imag>@}, where <real> and <imag>
 must be numerical constants.  For example, @{3,2@} represents 3 + 2i; @{0,1@}
 represents 'i' itself.  The curly braces are explicitly required here.
+
+@cindex division
 
 Note that gnuplot uses both "real" and "integer" arithmetic, like FORTRAN and
 C.  Integers are entered as "1", "-10", etc; reals as "1.0", "-10.0", "1e1",
@@ -2935,13 +2939,10 @@ See also help for `mouse` and @ref{if}.
 
 @c ?commands bind space
 @c ?bind space
-By default, the <space> hotkey raises gnuplot's command window. On some
-terminals (e.g. x11, wxt), 'q' closes the graph window. These defaults can
-be changed to ctrl-space and ctrl-q by starting gnuplot as 'gnuplot -ctrlq',
-see `x11 command-line-options`, or by the X Resource 'gnuplot*ctrlq'.
-Note: if <space> (or ctrl-space) does not raise the gnuplot window under X11,
-see discussion in @ref{raise}.
-
+If gnuplot was built with configuration option --enable-raise-console, then
+typing <space> in the plot window raises gnuplot's command window. This hotkey
+can be changed to ctrl-space by starting gnuplot as 'gnuplot -ctrlq', or by
+setting the XResource 'gnuplot*ctrlq'.  See `x11 command-line-options`.
 
 @node Mouse_variables,  , bind, mouse_input
 @subsection Mouse variables
@@ -4596,9 +4597,9 @@ This plot mode can be used to generate contour plots and heat maps.
 @cindex commands
 
 This section lists the commands acceptable to `gnuplot` in alphabetical
-order.  Printed versions of this document contain all commands; on-line
-versions may not be complete.  Indeed, on some systems there may be no
-commands at all listed under this heading.
+order.  Printed versions of this document contain all commands; the text
+available interactively may not be complete.  Indeed, on some systems there may
+be no commands at all listed under this heading.
 
 Note that in most cases unambiguous abbreviations for command names and their
 options are permissible, i.e., "`p f(x) w li`" instead of "`plot f(x) with
@@ -4700,8 +4701,6 @@ will be that character; e.g. use `$$` to get a single `$`.  Providing more
 than ten parameters on the @ref{call} command line will cause an error.  A
 parameter that was not provided substitutes as nothing.  Files being @ref{call}ed
 may themselves contain @ref{call} or `load` commands.
-
-The @ref{call} command _must_ be the last command on a multi-command line.
 
 Syntax:
 @example
@@ -5402,7 +5401,7 @@ that kind of summarizes all these issues:  "Nonlinear fitting is an art!"
 @cmindex help
 
 
-The @ref{help} command displays on-line help. To specify information on a
+The @ref{help} command displays built-in help. To specify information on a
 particular topic use the syntax:
 
 @example
@@ -5519,8 +5518,6 @@ later be `load`ed.  Any text file containing valid commands can be created
 and then executed by the `load` command.  Files being `load`ed may themselves
 contain `load` or @ref{call} commands.  See `comments` for information about
 comments in commands.  To `load` with arguments, see @ref{call}.
-
-The `load` command _must_ be the last command on a multi-command line.
 
 Syntax:
 @example
@@ -6015,13 +6012,13 @@ second column and a float with the third column.  If the number of size
 specifications is less than the greatest column number, the size is implicitly
 taken to be similar to the last given variable size.
 
-Furthermore, the format specification can include "discarded" terms via the `*`
-character.  For example, to skip the middle column of the previous example, one
-could write `format="%uchar%*int%float"` and gnuplot will discard the middle
-integer.  To list variable sizes, type `show datafile binary datasizes`.  There
-are a group of names that are machine dependent along with their sizes in bytes
-for the particular compilation.  There is also a group of names which attempt
-to be machine independent.
+Furthermore, similar to the @ref{using} specification, the format can include
+discarded columns via the `*` character and have implicit repetition via a
+numerical repeat-field.  For example, `format="%*2int%3float"` causes gnuplot
+to discard two ints before reading three floats.  To list variable sizes, type
+`show datafile binary datasizes`.  There are a group of names that are machine
+dependent along with their sizes in bytes for the particular compilation.
+There is also a group of names which attempt to be machine independent.
 
 
 @noindent --- ENDIAN ---
@@ -6424,16 +6421,17 @@ externally or by using `fit` with an appropriate model.
 
 Syntax:
 @example
-      smooth @{unique | frequency | csplines | acsplines | bezier | sbezier@}
+      smooth @{unique | frequency | cumulative | csplines | acsplines | bezier | sbezier@}
 
 @end example
 
-`unique` and `frequency` plot the data after making them monotonic.  Each of
-the other routines uses the data to determine the coefficients of a
-continuous curve between the endpoints of the data.  This curve is then
-plotted in the same manner as a function, that is, by finding its value at
-uniform intervals along the abscissa (see @ref{samples}) and connecting these
-points with straight line segments (if a line style is chosen).
+`unique`, `frequency`, and `cumulative` plot the data after making them 
+monotonic.  Each of the other routines uses the data to determine the 
+coefficients of a continuous curve between the endpoints of the data.  
+This curve is then plotted in the same manner as a function, that is, 
+by finding its value at uniform intervals along the abscissa 
+(see @ref{samples}) and connecting these points with straight line 
+segments (if a line style is chosen).
 
 If @ref{autoscale} is in effect, the ranges will be computed such that the
 plotted curve lies within the borders of the graph.
@@ -6570,6 +6568,24 @@ resulting points are then connected by straight line segments.
 The `frequency` option makes the data monotonic in x; points with the same
 x-value are replaced by a single point having the summed y-values.  The
 resulting points are then connected by straight line segments.
+
+
+@noindent --- CUMULATIVE ---
+
+@c ?commands plot datafile smooth cumulative
+@c ?plot datafile smooth cumulative
+@c ?plot smooth cumulative
+@c ?data-file smooth cumulative
+@c ?datafile smooth cumulative
+@c ?plot cumulative
+@c ?smooth cumulative
+@cindex cumulative
+
+The `cumulative` option makes the data monotonic in x; points with the same
+x-value are replaced by a single point containing the cumulative sum of 
+y-values of all data points with lower x-values (i.e. to the left of the
+current data point). This can be used to obtain a cumulative distribution 
+function from data.
 
 @node special-filenames, thru, smooth, data
 @subsubsection special-filenames
@@ -11385,8 +11401,9 @@ The arc is always drawn counterclockwise.
 
 @cindex nooffsets
 
-Offsets provide a mechanism to put a boundary around the data inside of an
-autoscaled graph.
+Offsets provide a mechanism to put an empty boundary around the data inside
+an autoscaled graph.  The offsets only affect the x1 and y1 axes, and only in
+2D `plot` commands.
 
 Syntax:
 @example
@@ -11396,24 +11413,28 @@ Syntax:
 
 @end example
 
-Each offset may be a constant or an expression.  Each defaults to 0.  Left
-and right offsets are given in units of the x axis, top and bottom offsets in
-units of the y axis.  A positive offset expands the graph in the specified
+Each offset may be a constant or an expression.  Each defaults to 0.
+By default, the left and right offsets are given in units of the first x axis,
+the top and bottom offsets in units of the first y axis.  Alternatively, you
+may specify the offsets as a fraction of the total axis range by using the
+keyword "graph".  A positive offset expands the axis range in the specified
 direction, e.g., a positive bottom offset makes ymin more negative.  Negative
 offsets, while permitted, can have unexpected interactions with autoscaling
-and clipping.
-
-Offsets are ignored in `splot`s.
+and clipping.  To prevent the auto-scaling from further adjusting your axis
+ranges, it is useful to also specify "set auto fix".
 
 Example:
 @example
-      set offsets 0, 0, 2, 2
+      set auto fix
+      set offsets graph 0.05, 0, 2, 2
       plot sin(x)
 
 @end example
 
 This graph of sin(x) will have a y range [-3:3] because the function
 will be autoscaled to [-1:1] and the vertical offsets are each two.
+The x range will be [-11:10] because the default is [-10:10] and it has
+been expanded to the left by 0.05 of that total range.
 
 @node origin, output, offsets, set-show
 @subsection origin
@@ -15444,6 +15465,7 @@ with no modifiers.
 * apollo::                      
 * aqua::                        
 * be::                          
+* pdfcairo::                    
 * cgi::                         
 * cgm::                         
 * corel::                       
@@ -15508,6 +15530,7 @@ with no modifiers.
 * vgagl::                       
 * VWS::                         
 * windows::                     
+* wxt::                         
 * x11::                         
 * x11_::                        
 * xlib::                        
@@ -15665,7 +15688,7 @@ Lines can be drawn either solid or dashed, (default is solid) and the dash
 spacing can be modified by <dashlength> which is a multiplier > 0.
 
 
-@node be, cgi, aqua, terminal_
+@node be, pdfcairo, aqua, terminal_
 @subsubsection be
 
 @c ?commands set terminal be
@@ -15893,7 +15916,98 @@ to a '16' dotted line.
 @end example
 
 
-@node cgi, cgm, be, terminal_
+@node pdfcairo, cgi, be, terminal_
+@subsubsection pdfcairo
+
+@c ?set terminal pdfcairo
+@c ?terminal pdfcairo
+@c ?set term pdfcairo
+@c ?term pdfcairo
+@cindex pdfcairo
+@tmindex pdfcairo
+
+
+The `pdfcairo` terminal device generates output in pdf. The actual
+drawing is done via cairo, a 2D graphics library, and pango, a library for
+laying out and rendering text.
+
+Syntax:
+@example
+        set term pdfcairo
+                     @{@{no@}enhanced@} @{mono|color@} @{solid|dashed@}
+                     @{font <font>@}
+                     @{linewidth <lw>@} @{rounded|butt@} @{dashlength <dl>@}
+                     @{size <XX>@{unit@},<YY>@{unit@}@}
+
+@end example
+
+This terminal supports an enhanced text mode, which allows font and other
+formatting commands (subscripts, superscripts, etc.) to be embedded in labels
+and other text strings. The enhanced text mode syntax is shared with other
+gnuplot terminal types. See `enhanced` for more details.
+
+The width of all lines in the plot can be modified by the factor <lw>
+specified in `linewidth`. The default linewidth is 0.25 points.
+(1 "PostScript" point = 1/72 inch = 0.353 cm)
+
+`rounded` sets line caps and line joins to be rounded; `butt` is the
+default, butt caps and mitered joins.
+
+The default size for the output is 5 inches x 3 inches. The @ref{size} option
+changes this to whatever the user requests. By default the X and Y sizes are
+taken to be in inches, but other units are possibly (currently only cm).
+Screen coordinates always run from 0.0 to 1.0 along the full length of the
+plot edges as specified by the @ref{size} option.
+
+<font> is in the format "FontFace,FontSize", i.e. the face and the size
+comma-separated in a single string. FontFace is a usual font face name, such
+as \'Arial\'. If you do not provide FontFace, the pdfcairo terminal will use
+\'Sans\'. FontSize is the font size, in points. If you do not provide it,
+the pdfcairo terminal will use a size of 6 points.
+@example
+   For example :
+      set term pdfcairo font "Arial,12"
+      set term pdfcairo font "Arial" # to change the font face only
+      set term pdfcairo font ",12" # to change the font size only
+      set term pdfcairo font "" # to reset the font name and size
+
+@end example
+
+The fonts are retrieved from the usual fonts subsystems. Under Windows,
+those fonts are to be found and configured in the entry "Fonts" of the
+control panel. Under UNIX, they are handled by "fontconfig".
+
+Pango, the library used to layout the text, is based on utf-8. Thus, the pdfcairo
+terminal has to convert from your encoding to utf-8. The default input
+encoding is based on your \'locale\'. If you want to use another encoding,
+make sure gnuplot knows which one you are using. See @ref{encoding} for more
+details.
+
+Pango may give unexpected results with fonts that do not respect the unicode
+mapping. With the Symbol font, for example, the pdfcairo terminal will use the map
+provided by http://www.unicode.org/ to translate character codes to unicode.
+Note that "the Symbol font" is to be understood as the Adobe
+Symbol font, distributed with Acrobat Reader as "SY______.PFB".
+Alternatively, the OpenSymbol font, distributed with OpenOffice.org as
+"opens___.ttf", offers the same characters. Microsoft has distributed a
+Symbol font ("symbol.ttf"), but it has a different character set with
+several missing or moved mathematic characters. If you experience problems
+with your default setup (if the demo enhancedtext.dem is not displayed
+properly for example), you probably have to install one of the Adobe or
+OpenOffice Symbol fonts, and remove the Microsoft one.
+Other non-conform fonts, such as "wingdings" have been observed working.
+
+The rendering of the plot cannot be altered yet. To obtain the best output
+possible, the rendering involves two mechanisms : antialiasing and
+oversampling.
+Antialiasing allows to display non-horizontal and non-vertical lines
+smoother.
+Oversampling combined with antialiasing provides subpixel accuracy,
+so that gnuplot can draw a line from non-integer coordinates. This avoids
+wobbling effects on diagonal lines ('plot x' for example).
+
+
+@node cgi, cgm, pdfcairo, terminal_
 @subsubsection cgi
 
 @c ?commands set terminal cgi
@@ -16708,7 +16822,7 @@ Syntax:
                        @{metric | inches@}
                        @{pointsmax <max_points>@}
                        @{solid | dashed@}
-                       @{fontsize <fsize>@}
+                       @{font <fontname>@} @{fontsize <fsize>@}
                        @{textnormal | @{textspecial texthidden textrigid@}@}
                        @{@{thickness|linewidth@} <units>@}
                        @{depth <layer>@}
@@ -19009,7 +19123,7 @@ The `VWS` terminal driver supports the VAX Windowing System.  It has
 no options.  It will sense the display type (monochrome, gray scale,
 or color.)  All line styles are plotted as solid lines."
 
-@node windows, x11, VWS, terminal_
+@node windows, wxt, VWS, terminal_
 @subsubsection windows
 
 @c ?commands set terminal windows
@@ -19028,6 +19142,7 @@ Syntax:
       set terminal windows @{color | monochrome@}
                            @{enhanced | noenhanced@}
                            @{@{font@} "fontname@{,fontsize@}" @{<fontsize>@}@}
+                           @{title "Plot Window Title"@}
 
 @end example
 
@@ -19037,11 +19152,7 @@ superscripts and mixed fonts). See `enhanced` for more information.
 `"<fontname>"` is the name of a valid Windows font, and `<fontsize>`
 is the size of the font in points.
 
-Other options may be set with the graph-menu, the initialization file,
-and `set linestyle`.  Note that there is one restriction imposed by
-the classic Windows GDI interface: modifiable linewidth only works with
-solid lines, not with dotted or dashed ones.
-/* Does this really belong here? If not, someone move it where it does. */
+Other options may be set with the graph-menu or the initialization file.
 
 The Windows version normally terminates immediately as soon as the end of
 any files given as command line arguments is reached (i.e. in non-interactive
@@ -19170,7 +19281,7 @@ the macro on the second line.  Leading spaces are ignored.  Macro commands:
 
 [OPEN] --- Get name of file to open from list box, with title of list box
 terminated by [EOS], followed by default filename terminated by [EOS] or
-@{ENTER@}.  This uses COMMDLG.DLL from Windows 3.1.
+@{ENTER@}.
 
 [SAVE] --- Get name of file to save.  Similar to [OPEN]
 
@@ -19233,34 +19344,133 @@ and `Mono Linestyle`.  `Linestyles` are 0=SOLID, 1=DASH, 2=DOT, 3=DASHDOT,
 solid line in color mode, or a dashed line in monochrome mode.  The default
 line width is 1 pixel.  If `Linestyle` is negative, it specifies the width of
 a SOLID line in pixels.  Line1 and any linestyle used with the `points` style
-must be SOLID with unit width.
+must be SOLID with unit width."
+
+@node wxt, x11, windows, terminal_
+@subsubsection wxt
+
+@c ?set terminal wxt
+@c ?terminal wxt
+@c ?set term wxt
+@c ?term wxt
+@cindex wxt
+@tmindex wxt
 
 
-@noindent --- WINDOWS3.0 ---
+The `wxt` terminal device generates output in a separate window. The window
+is created by the wxWidgets library, where the 'wxt' comes from. The actual
+drawing is done via cairo, a 2D graphics library, and pango, a library for
+laying out and rendering text.
 
-@c ?commands set terminal windows windows3.0
-@c ?set terminal windows windows3.0
-@c ?set term windows windows3.0
-@c ?windows windows3.0
-@cindex windows3.0
-@tmindex windows3.0
+Syntax:
+@example
+        set term wxt @{<n>@}
+                     @{size <width>,<height>@}
+                     @{@{no@}enhanced@}
+                     @{font <font>@}
+                     @{title "title"@}
+                     @{@{no@}persist@}
+                     @{@{no@}raise@}
+                     @{@{no@}ctrl@}
+                     @{close@}
 
+@end example
 
-Windows 3.1 is preferred, but WGNUPLOT will run under Windows 3.0 with the
-following restrictions:
-`1.` COMMDLG.DLL and SHELL.DLL (available with Windows 3.1 or Borland C++
-3.1) must be in the windows directory.
+Multiple plot windows are supported: `set terminal wxt <n>` directs the
+output to plot window number n.
 
-`2.` WGNUPLOT.HLP produced by Borland C++ 3.1 is in Windows 3.1 format.
-You need to use the WINHELP.EXE supplied with Borland C++ 3.1.
+The default window title is based on the window number. This title can also
+be specified with the keyword "title".
 
-`3.` It will not run in real mode due to lack of memory.
+Plot windows remain open even when the `gnuplot` driver is changed to a
+different device.  A plot window can be closed by pressing the letter 'q'
+while that window has input focus, by choosing `close` from a window
+manager menu, or with `set term wxt <n> close`.
 
-`4.` TrueType fonts are not available in the graph window.
+The size of the plot area is given in pixels, it defaults to 640x384.
+In addition to that, the actual size of the window also includes the space
+reserved for the toolbar and the status bar.
+When you resize a window, the plot is immediately scaled to fit in the
+new size of the window. Unlike other interactive terminals, the `wxt`
+terminal scales the whole plot, including fonts and linewidths, and keeps
+its global aspect ratio constant, leaving an empty space painted in gray.
+If you type @ref{replot}, click the @ref{replot} icon in the terminal toolbar or
+type a new `plot` command, the new plot will completely fit in the window
+and the font size and the linewidths will be reset to their defaults.
 
-`5.` Drag-drop does not work."
+The active plot window (the one selected by `set term wxt <n>`) is
+interactive. Its behaviour is shared with other terminal types. See `mouse`
+for details. It also has some extra icons, which are supposed to be
+self-explanatory.
 
-@node x11, x11_, windows, terminal_
+This terminal supports an enhanced text mode, which allows font and other
+formatting commands (subscripts, superscripts, etc.) to be embedded in labels
+and other text strings. The enhanced text mode syntax is shared with other
+gnuplot terminal types. See `enhanced` for more details.
+
+<font> is in the format "FontFace,FontSize", i.e. the face and the size
+comma-separated in a single string. FontFace is a usual font face name, such
+as \'Arial\'. If you do not provide FontFace, the wxt terminal will use
+\'Sans\'. FontSize is the font size, in points. If you do not provide it,
+the wxt terminal will use a size of 10 points.
+@example
+   For example :
+      set term wxt font "Arial,12"
+      set term wxt font "Arial" # to change the font face only
+      set term wxt font ",12" # to change the font size only
+      set term wxt font "" # to reset the font name and size
+
+@end example
+
+The fonts are retrieved from the usual fonts subsystems. Under Windows,
+those fonts are to be found and configured in the entry "Fonts" of the
+control panel. Under UNIX, they are handled by "fontconfig".
+
+Pango, the library used to layout the text, is based on utf-8. Thus, the wxt
+terminal has to convert from your encoding to utf-8. The default input
+encoding is based on your \'locale\'. If you want to use another encoding,
+make sure gnuplot knows which one you are using. See @ref{encoding} for more
+details.
+
+Pango may give unexpected results with fonts that do not respect the unicode
+mapping. With the Symbol font, for example, the wxt terminal will use the map
+provided by http://www.unicode.org/ to translate character codes to unicode.
+Pango will do its best to find a font containing this character, looking for
+your Symbol font, or other fonts with a broad unicode coverage, like the
+DejaVu fonts. Note that "the Symbol font" is to be understood as the Adobe
+Symbol font, distributed with Acrobat Reader as "SY______.PFB".
+Alternatively, the OpenSymbol font, distributed with OpenOffice.org as
+"opens___.ttf", offers the same characters. Microsoft has distributed a
+Symbol font ("symbol.ttf"), but it has a different character set with
+several missing or moved mathematic characters. If you experience problems
+with your default setup (if the demo enhancedtext.dem is not displayed
+properly for example), you probably have to install one of the Adobe or
+OpenOffice Symbol fonts, and remove the Microsoft one.
+Other non-conform fonts, such as "wingdings" have been observed working.
+
+The rendering of the plot can be altered with a dialog available from the
+toolbar. To obtain the best output possible, the rendering involves three
+mechanisms : antialiasing, oversampling and hinting.
+Antialiasing allows to display non-horizontal and non-vertical lines
+smoother.
+Oversampling combined with antialiasing provides subpixel accuracy,
+so that gnuplot can draw a line from non-integer coordinates. This avoids
+wobbling effects on diagonal lines ('plot x' for example).
+Hinting avoids the blur on horizontal and vertical lines caused by
+oversampling. The terminal will snap these lines to integer coordinates so
+that a one-pixel-wide line will actually be drawn on one and only one pixel.
+
+By default, the window is raised to the top of your desktop when a plot is
+drawn. This can be controlled with the keyword "raise".
+The keyword "persist" will prevent gnuplot from exiting before you
+explicitely close all the plot windows.
+Finally, by default the key <space> raises the gnuplot console window, and
+'q' closes the plot window. The keyword "ctrl" allows you to replace those
+bindings by <ctrl>+<space> and <ctrl>+'q', respectively.
+These three keywords (raise, persist and ctrl) can also be set and remembered
+between sessions through the configuration dialog."
+
+@node x11, x11_, wxt, terminal_
 @subsubsection x11
 
 @c ?commands set terminal x11
