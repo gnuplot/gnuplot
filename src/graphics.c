@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.263 2008/04/30 04:16:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.264 2008/05/21 04:32:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -708,27 +708,43 @@ boundary(struct curve_points *plots, int count)
 	    }
 	}
 
+	/* adjust for outside key, leave manually set margins alone */
+	if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC && (key->vpos != JUST_CENTRE || key->hpos != CENTRE))
+	    || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
+	    int more = 0;
+	    if (key->margin == GPKEY_BMARGIN && bmargin.x < 0) {
+		more = key_entry_height * key_rows + (int) (t->v_char * (ktitl_lines + 1))
+			+ (int) (key->height_fix * t->v_char);
+		if (plot_bounds.ybot + more > plot_bounds.ytop)
+		    key_panic = TRUE;
+		else
+		    plot_bounds.ybot += more;
+	    } else if (key->margin == GPKEY_TMARGIN && tmargin.x < 0) {
+		more = key_entry_height * key_rows + (int) (t->v_char * (ktitl_lines + 1))
+			- (int) (key->height_fix * t->v_char);
+		if (plot_bounds.ytop - more < plot_bounds.ybot)
+		    key_panic = TRUE;
+		else
+		    plot_bounds.ytop -= more;
+	    } else if (key->margin == GPKEY_LMARGIN && lmargin.x < 0) {
+		more = key_col_wth * key_cols;
+		if (plot_bounds.xleft + more > plot_bounds.xright)
+		    key_panic = TRUE;
+		else
+		    plot_bounds.xleft += more;
+	    } else if (key->margin == GPKEY_RMARGIN && rmargin.x < 0) {
+		more = key_col_wth * key_cols;
+		if (plot_bounds.xright - more < plot_bounds.xleft)
+		    key_panic = TRUE;
+		else
+		    plot_bounds.xright -= more;
+	    }
+  	}
+
 	/* warn if we had to punt on key size calculations */
 	if (key_panic)
 	    int_warn(NO_CARET, "Warning - difficulty fitting plot titles into key");
 
-	/* adjust for outside key, leave manually set margins alone */
-	if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC && (key->vpos != JUST_CENTRE || key->hpos != CENTRE))
-	    || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
-	    if (key->margin == GPKEY_BMARGIN && bmargin.x < 0) {
-		plot_bounds.ybot += key_entry_height * key_rows
-		    + (int) (t->v_char * (ktitl_lines + 1));
-		plot_bounds.ybot += (int) (key->height_fix * t->v_char);
-	    } else if (key->margin == GPKEY_TMARGIN && tmargin.x < 0) {
-		plot_bounds.ytop -= key_entry_height * key_rows
-		    + (int) (t->v_char * (ktitl_lines + 1));
-		plot_bounds.ytop += (int) (key->height_fix * t->v_char);
-	    } else if (key->margin == GPKEY_LMARGIN && lmargin.x < 0) {
-		plot_bounds.xleft += key_col_wth * key_cols;
-	    } else if (key->margin == GPKEY_RMARGIN && rmargin.x < 0) {
-		plot_bounds.xright -= key_col_wth * key_cols;
-	    }
-  	}
 	/*}}} */
     }
 

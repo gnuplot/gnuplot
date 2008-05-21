@@ -8,6 +8,11 @@
 
 	* docs/doc2texi.el docs/gnuplot.texi:  Update
 
+	* src/graphics.c (boundary): If it is impossible to reserve as much
+	space as needed for the key, print a warning and leave the plot borders
+	where they are.  The prevents the plot border from being pushed entirely
+	off the canvas.
+
 2008-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm (EMF_dashtype):  Don't ignore linetype LT_AXIS.
