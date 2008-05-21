@@ -1,3 +1,11 @@
+2008-05-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/specfun.c (inverse_error_func):  The piecewise numerical 
+	approximation failed to handle the case where x was exactly the join
+	point for the pieces.  Include +/- 0.7 in the central piece.
+	Also add one more cycle of Newton-Raphson.
+	Bug #1962800
+
 2008-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm (EMF_dashtype):  Don't ignore linetype LT_AXIS.
