@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.156 2008/04/30 04:16:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.157 2008/05/18 03:31:17 janert Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -259,25 +259,26 @@ set y2data%s\n",
     save_fillstyle(fp, &default_rectangle.fillstyle);
 #endif
 
-    if (dgrid3d)
+    if (dgrid3d) {
       if( dgrid3d_mode == DGRID3D_QNORM ) {
 	fprintf(fp, "set dgrid3d %d,%d, %d\n",
-		dgrid3d_row_fineness,
-		dgrid3d_col_fineness,
-		dgrid3d_norm_value);
+          	dgrid3d_row_fineness,
+          	dgrid3d_col_fineness,
+          	dgrid3d_norm_value);
       } else if( dgrid3d_mode == DGRID3D_SPLINES ) {
 	fprintf(fp, "set dgrid3d %d,%d splines\n",
-		dgrid3d_row_fineness, dgrid3d_col_fineness );
+          	dgrid3d_row_fineness, dgrid3d_col_fineness );
       } else {
 	char *modes[] = { "qnorm", "splines", 
-			  "gauss", "exp", "cauchy", "box", "hann" };
+          		  "gauss", "exp", "cauchy", "box", "hann" };
 	fprintf(fp, "set dgrid3d %d,%d %s %f,%f\n",
-		dgrid3d_row_fineness,
-		dgrid3d_col_fineness,
-		modes[dgrid3d_mode],
-		dgrid3d_x_scale,
-		dgrid3d_y_scale );
+          	dgrid3d_row_fineness,
+          	dgrid3d_col_fineness,
+          	modes[dgrid3d_mode],
+          	dgrid3d_x_scale,
+          	dgrid3d_y_scale );
       }
+    }
 
     fprintf(fp, "set dummy %s,%s\n", set_dummy_var[0], set_dummy_var[1]);
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.273 2008/04/30 04:16:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.274 2008/05/18 03:31:17 janert Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1154,7 +1154,7 @@ set_dgrid3d()
   
     double gridx  = (double)dgrid3d_row_fineness;
     double gridy  = (double)dgrid3d_col_fineness;
-    double norm   = (double)dgrid3d_norm_value;
+    /* dgrid3d_norm_value is not used by 'new' syntax, only 'classic' */
     double scalex = dgrid3d_x_scale;
     double scaley = dgrid3d_y_scale;
 
