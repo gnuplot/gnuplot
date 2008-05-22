@@ -1,3 +1,10 @@
+2008-05-22  Thomas Sefzick  <thse@users.sourceforge.net>
+
+	* src/bitmap.c (b_vector): If either end of a vector would fall outside
+	the canvas area, don't draw it.  This prevents segfaults and memory
+	access problems if the terminal coordinates overflow or go negative.
+	Bug #1969415
+
 2008-05-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c (inverse_error_func):  The piecewise numerical 
@@ -10,7 +17,7 @@
 
 	* src/graphics.c (boundary): If it is impossible to reserve as much
 	space as needed for the key, print a warning and leave the plot borders
-	where they are.  The prevents the plot border from being pushed entirely
+	where they are. This prevents the plot border from being pushed entirely
 	off the canvas.
 
 2008-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>

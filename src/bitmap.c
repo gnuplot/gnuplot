@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.23 2005/03/03 04:09:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.24 2005/04/22 21:40:37 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -1186,7 +1186,10 @@ b_move(unsigned int x, unsigned int y)
 void
 b_vector(unsigned int x, unsigned int y)
 {
-    b_line(b_currx, b_curry, x, y);
+    /* We can't clip properly, but we can refuse to draw out of bounds */
+    if (x < term->xmax && y < term->ymax 
+    &&  b_currx < term->xmax && b_curry < term->ymax)
+	b_line(b_currx, b_curry, x, y);
     b_currx = x;
     b_curry = y;
 }
