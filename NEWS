@@ -13,6 +13,7 @@ New features, changes and fixes since previous release
 * FIX allow variable color from input file for "with boxes"
 * FIX don't run off the end of "set format" commands
 * FIX Fix discontinuity in piecewise approximation of inverse error function
+* FIX discard out of range vectors in the bitmap terminals (pbm, epson, etc)
 
 
 New features, changes and fixes in gnuplot version 4.2.3
