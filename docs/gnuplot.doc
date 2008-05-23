@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.498 2008/05/19 17:34:43 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.499 2008/05/19 20:53:00 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6849,7 +6849,10 @@ Ffigure_mapcontours
  structure.
 
  Syntax:
-       set dgrid3d {<row_size>} {,{<col_size>} {,<norm>}}
+       set dgrid3d {<rows>} {,{<cols>}}
+                   { splines |
+                     qnorm {<norm>} |
+                     gauss | cauchy | exp | box | hann {<dx>} {,{dy}} }
        unset dgrid3d
        show dgrid3d
 
@@ -6858,44 +6861,69 @@ Ffigure_mapcontours
  from a bounding box of the scattered data and size as specified by the
  row/col_size parameters is created for plotting and contouring.  The grid
  is equally spaced in x (rows) and in y (columns); the z values are computed
- as weighted averages of the scattered points' z values.
+ as weighted averages or spline interpolations of the scattered points' z 
+ values. In other words, a regularly spaced grid is created and the a smooth
+ approximation to the raw data is evaluated for all grid points. Only this
+ approximation is plotted, but not the raw data.
 
- The third parameter, norm, controls the weighting:  Each data point is
+ The number of columns defaults to the number of rows, which defaults to 10.
+
+ Several algorithms are available to calculate the approximation from the
+ raw data. Some of these algorithms can take additional parameters.
+ These interpolations are such the closer the data point is to a grid point, 
+ the more effect it has on that grid point.
+
+ The `splines` algorithm calculates an interpolation based on "thin plate
+ splines". It does not take additional paramaters.
+
+ The `qnorm` algorithm calculates a weighted average of the input data at
+ each grid point. Each data point is
  weighted inversely by its distance from the grid point raised to the norm
  power.  (Actually, the weights are given by the inverse of dx^norm + dy^norm,
  where dx and dy are the components of the separation of the grid point from
  each data point.  For some norms that are powers of two, specifically 4, 8,
  and 16, the computation is optimized by using the Euclidean distance in the
  weight calculation, (dx^2+dy^2)^norm/2.  However, any non-negative integer
- can be used.)
+ can be used.) The power of the norm can be specified as a single optional
+ parameter. This algorithm is the default.
 
- The closer the data point is to a grid point, the more effect it has on
- that grid point and the larger the value of norm the less effect more
- distant data points have on that grid point.
+ Finally, several smoothing kernels are available to calculate weighted
+ averages: z = Sum_i w(d_i) * z_i / Sum_i w(d_i), where z_i is the value
+ of the i-th data point and d_i is the distance between the current grid
+ point and the location of the i-th data point. All kernels assign higher
+ weights to data points that are close to the current grid point and lower
+ weights to data points further away.
 
- The `dgrid3d` option is a simple low pass filter that converts scattered
- data to a grid data set.  More sophisticated approaches to this problem
- exist and should be used to preprocess the data outside `gnuplot` if this
- simple solution is found inadequate.
+ The following kernels are available:
+       gauss :     w(d) = exp(-d*d)
+       cauchy :    w(d) = 1/(1 + d*d)
+       exp :       w(d) = exp(-d)
+       box :       w(d) = 1                     if d<1
+                        = 0                     otherwise
+       hann :      w(d) = 0.5*(1-cos(2*pi*d))   if d<1
+                   w(d) = 0                     otherwise
 
- (The z values are found by weighting all data points, not by interpolating
- between nearby data points;  also edge effects may produce unexpected and/or
- undesired results.  In some cases, small norm values produce a grid point
- reflecting the average of distant data points rather than a local average,
- while large values of norm may produce "steps" with several grid points
- having the same value as the closest data point, rather than making a smooth
- transition between adjacent data points.  Some areas of a grid may be filled
- by extrapolation, to an arbitrary boundary condition.  The variables are
- not normalized; consequently the units used for x and y will affect the
- relative weights of points in the x and y directions.)
+ When using one of these five smoothing kernels, up to two additional
+ parameter can be specified: dx and dy. These are used to rescale the
+ coordinate differences when calculating the distance: 
+ d_i = sqrt( ((x-x_i)/dx)**2 + ((y-y_i)/dy)**2 ), where x,y are the
+ coordinates of the current grid point and x_i,y_i are the coordinates
+ of the i-th data point. The value of dy defaults to the value of dx,
+ which defaults to 1. The parameters dx and dy make it possible to 
+ control the radius over which data points contribute to a grid point
+ IN THE UNITS OF THE DATA ITSELF.
 
- Examples:
-       set dgrid3d 10,10,1     # defaults
-       set dgrid3d ,,4
+ A slightly different syntax is also supported for reasons of backwards
+ compatibility. If no interpolation algorithm has been explicitly selected,
+ the `qnorm` algorithm is assumed. Up to three comma-separated, optional
+ paramaters can be specified, which are interpreted as the the number of
+ rows, the number of columns, and the norm value, respectively.
 
- The first specifies that a grid of size 10 by 10 is to be constructed using
- a norm value of 1 in the weight computation.  The second only modifies the
- norm, changing it to 4.
+ The `dgrid3d` option is a simple scheme which replaces scattered data
+ with weighted averages on a regular grid.More sophisticated approaches
+ to this problem exist and should be used to preprocess the data outside
+ `gnuplot` if this simple solution is found inadequate.
+
  See also
 ^ <a href="http://www.gnuplot.info/demo/scatter.html">
  scatter.dem: dgrid3d demo.
