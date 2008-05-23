@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.37 2008/01/18 00:43:47 sfeam Exp $
+# $Id: all.dem,v 1.38 2008/03/13 21:57:54 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -37,6 +37,10 @@ print "******************** file mgr.dem ********************"
 load "mgr.dem"
 reset
 
+print "******************** file smooth.dem ********************"
+load "smooth.dem"
+reset
+
 print "******************** file fit.dem ********************"
 load "fit.dem"
 reset
@@ -68,6 +72,10 @@ reset
 
 print "******************** file hidden.dem ********************"
 load "hidden.dem"
+reset
+
+print "******************** file dgrid3d.dem ********************"
+load "dgrid3d.dem"
 reset
 
 print "******************** file world.dem ********************"

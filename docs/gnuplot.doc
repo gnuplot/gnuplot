@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.499 2008/05/19 20:53:00 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.500 2008/05/23 17:29:24 janert Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4873,6 +4873,10 @@ Ffigure_mapcontours
  The `frequency` option makes the data monotonic in x; points with the same
  x-value are replaced by a single point having the summed y-values.  The
  resulting points are then connected by straight line segments.
+ See also
+^ <a href="http://www.gnuplot.info/demo/smooth.html">
+ smooth.dem
+^ </a>
 5 cumulative
 ?commands plot datafile smooth cumulative
 ?plot datafile smooth cumulative
@@ -4887,6 +4891,10 @@ Ffigure_mapcontours
  y-values of all data points with lower x-values (i.e. to the left of the
  current data point). This can be used to obtain a cumulative distribution 
  function from data.
+ See also
+^ <a href="http://www.gnuplot.info/demo/smooth.html">
+ smooth.dem
+^ </a>
 4 special-filenames
 ?commands plot datafile special-filenames
 ?plot datafile special-filenames
@@ -6925,6 +6933,10 @@ Ffigure_mapcontours
  `gnuplot` if this simple solution is found inadequate.
 
  See also
+^ <a href="http://www.gnuplot.info/demo/dgrid3d.html">
+ dgrid3d.dem: dgrid3d demo.
+^ </a>
+ and
 ^ <a href="http://www.gnuplot.info/demo/scatter.html">
  scatter.dem: dgrid3d demo.
 ^ </a>
