@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.49 2008/04/07 03:53:36 sfeam Exp $
+ * $Id: emf.trm,v 1.50 2008/05/20 17:33:05 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -576,7 +576,7 @@ EMF_options()
 		term->ymax = tempymax * EMF_PX2HM;
 	    term->h_tic = term->xmax / 160;
 	    term->v_tic = term->h_tic;
-	    break;
+	    continue;
 	}
 	if (equals(c_token, "font"))
 	    c_token++;
