@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.37 2008/03/30 03:27:54 sfeam Exp $
+ * $Id: gp_types.h,v 1.38 2008/05/18 03:49:12 janert Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -163,12 +163,10 @@ typedef struct coordinate {
     coordval ylow, yhigh;	/* ignored in 3d */
     coordval xlow, xhigh;	/* also ignored in 3d */
 #if 0
-    /* color as a separate field can be only useful if colors are really
-     * used everywhere, but not in 3D, where CRD_COLOR maps it to the first
-     * 2D field unused by 3D. This saves 8 B, which may be finally a lot of
-     * memory for large surfaces.
-     * Another proposal is to completely separate 2d and 3d coordinates and
-     * change the data storage.
+    /* Currently color information is overloaded onto yhigh by the defintion
+     * of CRD_COLOR. This saves 8 bytes, but limits the use of variable color
+     * data to plot styles that do not already use the full set of coordinate
+     * fields (e.g. candlesticks, boxxyerror).
      */
     coordval color;		/* PM3D's color value to be used */
 				/* Note: accessed only if NEED_PALETTE(this_plot) */
