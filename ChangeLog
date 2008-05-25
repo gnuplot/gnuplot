@@ -1,3 +1,14 @@
+2008-05-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (check_for_variable_color):  Consolidate all the checks
+	for deriving color from a data column into a single subroutine.
+
+	* src/plot2d.c (eval_plots) docs/gnuplot.doc:  Do not prevent the user
+	from requesting palette colors for a 2D plot.  Reading a palette color
+	value from an additional data column works fine for any plot style that
+	isn't already using the full set of column assignments (candlesticks,
+	boxxyerror).
+
 2008-05-25  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
 
 	* term/emf.trm (EMF_options): Option 'size' broke out of parsing

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.264 2008/05/21 04:32:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.265 2008/05/22 05:57:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -165,6 +165,8 @@ static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *k
 
 static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
 				   char *title,  struct termentry *t, int xl, int yl));
+
+static TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, struct coordinate *point));
 
 #ifdef EAM_OBJECTS
 static void plot_circles __PROTO((struct curve_points *plot));
@@ -2199,10 +2201,8 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 	    }
 	}
 
-	/* rgb variable  -  color read from data column */
-	if ((plot->lp_properties.pm3d_color.value < 0.0)
-	    && (plot->lp_properties.pm3d_color.type == TC_RGB))
-	    set_rgbcolor( plot->points[i].yhigh);
+	/* variable color read from data column */
+	check_for_variable_color(plot, &plot->points[i]);
 
 	if (polar)
 	    (*t->move) (yaxis_x, xaxis_y);
@@ -2229,11 +2229,7 @@ plot_lines(struct curve_points *plot)
     for (i = 0; i < plot->p_count; i++) {
 
 	/* rgb variable  -  color read from data column */
-	if (plot->points[i].type != UNDEFINED) {
-	    if ((plot->lp_properties.pm3d_color.value < 0.0)
-	    &&  (plot->lp_properties.pm3d_color.type == TC_RGB))
-		set_rgbcolor( plot->points[i].yhigh);
-	}
+	check_for_variable_color(plot, &plot->points[i]);
 
 	switch (plot->points[i].type) {
 	case INRANGE:{
@@ -3666,9 +3662,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 
 		/* Variable color */
 		if (plot->plot_style == BOXES) {
-		    if ((plot->lp_properties.pm3d_color.type == TC_RGB)
-		    &&  (plot->lp_properties.pm3d_color.value < 0))
-			set_rgbcolor(plot->points[i].yhigh);
+		    check_for_variable_color(plot, &plot->points[i]);
 		}
 
 		if ((plot->fill_properties.fillstyle != FS_EMPTY) && t->fillbox) {
@@ -3762,9 +3756,7 @@ plot_points(struct curve_points *plot)
 		    && y <= plot_bounds.ytop - p_height)) {
 
 		/* rgb variable  -  color read from data column */
-		if ((plot->lp_properties.pm3d_color.value < 0.0)
-		    && (plot->lp_properties.pm3d_color.type == TC_RGB))
-		    set_rgbcolor( plot->points[i].yhigh);
+		check_for_variable_color(plot, &plot->points[i]);
 
 		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		&&  plot->lp_properties.p_size == PTSZ_VARIABLE)
@@ -3800,10 +3792,7 @@ plot_circles(struct curve_points *plot)
 	    radius = x - map_x(plot->points[i].xlow);
 
 	    /* rgb variable  -  color read from data column */
-	    if ((plot->lp_properties.pm3d_color.type == TC_RGB)
-	    &&  (plot->lp_properties.pm3d_color.value < 0.0))
-		set_rgbcolor( plot->points[i].yhigh);
-	    else if (withborder)
+	    if (!check_for_variable_color(plot, &plot->points[i]) && withborder)
 		term_apply_lp_properties(&plot->lp_properties);
 	    do_arc(x,y, radius, 0., 360., style);
 	    if (withborder) {
@@ -3830,9 +3819,7 @@ plot_dots(struct curve_points *plot)
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
 	    /* rgb variable  -  color read from data column */
-	    if ((plot->lp_properties.pm3d_color.value < 0.0)
-		&& (plot->lp_properties.pm3d_color.type == TC_RGB))
-		set_rgbcolor( plot->points[i].yhigh);
+	    check_for_variable_color(plot, &plot->points[i]);
 	    /* point type -1 is a dot */
 	    (*t->point) (x, y, -1);
 	}
@@ -5436,6 +5423,20 @@ do_ellipse( int dimensions, t_ellipse *e, int style )
 }
 #endif
 
+static TBOOLEAN
+check_for_variable_color(struct curve_points *plot, struct coordinate *point)
+{
+    if ((plot->lp_properties.pm3d_color.value < 0.0)
+    &&  (plot->lp_properties.pm3d_color.type == TC_RGB)) {
+	set_rgbcolor(point->yhigh);
+	return TRUE;
+    } else if (plot->lp_properties.pm3d_color.type == TC_Z) {
+	set_color( cb2gray(point->yhigh) );
+	return TRUE;
+    } else
+	return FALSE;
+}
+	    
 #ifdef WITH_IMAGE
 
 /* Similar to HBB's comment above, this routine is shared with

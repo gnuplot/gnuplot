@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.500 2008/05/23 17:29:24 janert Exp $
+C RCS $Id: gnuplot.doc,v 1.501 2008/05/23 17:56:44 janert Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2022,7 +2022,8 @@ C ... and restart the table:
 
  "palette z" maps the z value of each plot segment or plot element into the
  cbrange mapping of the palette. This allows smoothly-varying color along a
- 3d line or surface. This option applies only to 3D plots (splot).
+ 3d line or surface. It also allows coloring 2D plots by palette values read
+ from an extra column of data (not all 2D plot styles allow an extra column).
 4 rgbcolor variable
 ?rgbcolor variable
  Most plot commands assign a single color (linetype) to each element of the
@@ -5554,8 +5555,9 @@ Ffigure_mapcontours
  point coordinates or to the color coordinate if specified by the 4th parameter
  in `using`. Both 2d and 3d plots (`plot` and `splot` commands) can use palette
  colors as specified by either their fractional value or the corresponding value
- mapped to the colorbox range. 2d plots can not use palette colors mapped by
- Z value. See `colors`, `set palette`, `linetype`.
+ mapped to the colorbox range.  A palette color value can also be read from an
+ explicitly specified input column in the `using` specifier.
+ See `colors`, `set palette`, `linetype`.
 
  The keyword `nohidden3d` applies only to plots made with the `splot` command.
  Normally the global option `set hidden3d` applies to all plots in the graph.
@@ -7819,14 +7821,13 @@ Ffigure_mapcontours
 ?commands set key samples
 ?set key samples
 ?key samples
- By default, each plot on the graph generates a corresponding entry in the
- key. This entry contains a plot title and a sample line/point/box of the
- same color and fill properties as used in the plot itself.  The font and
- textcolor properties control the appearance of the individual plot titles
- that appear in the key. Setting the textcolor to "rgb variable" causes
- the text for each key entry to be the same color as the line or fill
- color for that plot.  This was the default in some earlier versions of
- gnuplot.
+ By default, each plot on the graph generates a corresponding entry in the key.
+ This entry contains a plot title and a sample line/point/box of the same color
+ and fill properties as used in the plot itself.  The font and textcolor
+ properties control the appearance of the individual plot titles that appear in
+ the key. Setting the textcolor to "rgb variable" causes the text for each key
+ entry to be the same color as the line or fill color for that plot.
+ This was the default in some earlier versions of gnuplot.
 
  The length of the sample line can be controlled by `samplen`.  The sample
  length is computed as the sum of the tic length and <sample_length> times the

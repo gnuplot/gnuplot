@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.169 2008/05/18 03:49:13 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.170 2008/05/21 04:32:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1797,9 +1797,6 @@ eval_plots()
 		&&  (this_plot->lp_properties.p_size == PTSZ_VARIABLE))
 		    this_plot->lp_properties.p_size = 1;
 	    }
-	    if (this_plot->lp_properties.use_palette
-	    &&  this_plot->lp_properties.pm3d_color.type >= TC_Z)
-		int_error(NO_CARET,"2D plots cannot color by Z value; please use splot instead");
 
 	    /* Similar argument for check that all fill styles were set */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL) {
