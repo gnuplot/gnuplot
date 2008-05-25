@@ -1,3 +1,8 @@
+2008-05-25  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
+
+	* term/emf.trm (EMF_options): Option 'size' broke out of parsing
+	loop prematurely.
+
 2008-05-22  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* src/bitmap.c (b_vector): If either end of a vector would fall outside
