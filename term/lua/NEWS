@@ -1,3 +1,21 @@
+2009-03-29
+
+  * Providing a script or target name is now mandatory. The new syntax:
+       set terminal lua <target name> | "<file name>"
+                        {<script_args> ...}
+    This will look for a script named `gnuplot-<target name>.lua' or
+    a script named "<file name>" (in quotes!).
+  * Support for script names via the environmental variable
+    GNUPLOT_LUA_SCRIPT is dropped.
+  * The option "script" is obsolete and also removed.
+  * Via the environmental variable GNUPLOT_DRIVER_DIR the default search
+    directory for driver scripts can be changed.
+  * The TikZ driver help is now included as a subsection of the Lua
+    terminal.
+  * minor bugfixes (see ChangeLog)
+
+  This version drops backward compatibility again!
+
 2008-12-20
 
   * Removed all underscrores in style and color names.

@@ -1,3 +1,17 @@
+2008-05-25  Peter Hedwig  <peter@affenbande.org>
+
+	* src/Makefile.am term/lua/ChangeLog term/lua/gnuplot.lua
+	 term/lua/gnuplot-lua-tikz.sty term/lua/gnuplot-tikz.help
+	 term/lua/gnuplot-tikz.lua term/lua/NEWS term/lua.trm:
+
+	Rearrange internal documentation, improved error handling,
+	remove the "script" keyword (script name is now mandatory).
+
+	EAM: term/lua.trm: Create a dummy terminal table for 'tikz' so that
+	'set term tikz' can act as a short form of 'set term lua tikz', the
+	auto-generated documentation knows about tikz, and GPVAL_TERMINALS
+	lists tikz as an available terminal type (requested by Octave).
+
 2009-05-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm:  Test for libgd version 2.0.36 or newer.  These allow

@@ -6,7 +6,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{gnuplot-lua-tikz}%
-          [2008/12/20 (rev. 90) GNUPLOT Lua terminal style]
+          [2009/03/29 (rev. 96) GNUPLOT Lua terminal style]
 
 \RequirePackage{tikz,xxcolor,ifpdf,ifxetex}
 
@@ -146,44 +146,48 @@
 %
 %    \begin{tikzpicture}[gnuplot]
 %      \begin{gnuplot}[terminal=lua,%
-%          terminaloptions={solid nopic charsize \the\gphcharsize,\the\gpvcharsize}]
+%          terminaloptions={tikz solid nopic charsize \the\gphcharsize,\the\gpvcharsize}]
 %        test
 %      \end{gnuplot}
 %    \end{tikzpicture}
 %
 %%%
-% The `\gpcalccharsize' command fills the lengths with the values of the current font and
-% is meant to be called within a tikzpicture environment. Feel free to define your own!
+% The `\gpcalccharsize' command fills the lengths \gpvcharsize and \gphcharsize with
+% the values of the current default font used within nodes and is meant to be called
+% within a tikzpicture environment.
 % 
 \newdimen\gpvcharsize
 \newdimen\gphcharsize
 \def\gpcalccharsize{%
+  \pgfinterruptboundingbox%
   \pgfsys@begininvisible%
   \node at (0,0) {%
     \global\gphcharsize=1.05\fontcharwd\font`0%
     \global\gpvcharsize=1.05\fontcharht\font`0%
     \global\advance\gpvcharsize by 1.05\fontchardp\font`g%
-  };
-  \pgfsys@endinvisible
+  };%
+  \pgfsys@endinvisible%
+  \endpgfinterruptboundingbox%
 }
 
 %
 %  define a rectangular node in tikz e.g. for the plot area
+%  FIXME: this is done globally to work with gnuplottex.sty
 %
 %  #1 node name
 %  #2 coordinate of "south west"
 %  #3 coordinate of "north east"
 %
 \def\gpdefrectangularnode#1#2#3{%
-  \expandafter\def\csname pgf@sh@ns@#1\endcsname{rectangle}
-  \expandafter\def\csname pgf@sh@np@#1\endcsname{%
+  \expandafter\gdef\csname pgf@sh@ns@#1\endcsname{rectangle}
+  \expandafter\gdef\csname pgf@sh@np@#1\endcsname{%
     \def\southwest{#2}%
     \def\northeast{#3}%
   }
   \pgfgettransform\pgf@temp%
   % once it is defined, no more transformations will be applied, I hope
-  \expandafter\edef\csname pgf@sh@nt@#1\endcsname{\pgf@temp}%
-  \expandafter\edef\csname pgf@sh@pi@#1\endcsname{\pgfpictureid}%
+  \expandafter\xdef\csname pgf@sh@nt@#1\endcsname{\pgf@temp}%
+  \expandafter\xdef\csname pgf@sh@pi@#1\endcsname{\pgfpictureid}%
 }
 
 

@@ -1,3 +1,42 @@
+2009-03-29  peter
+
+	* [r96] /gnuplot-tikz.lua, /lua.trm: removed duplicate line in docs
+	  minor changes to keep pace with recent the cvs version
+
+2009-03-11  peter
+
+	* [r95] /gnuplot-tikz.lua: fixed revision date parsing again to
+	  work with CVS and SVN
+	* [r94] /gnuplot-tikz.lua: * make plot nodes globally available to
+	  work with gnuplottex
+	  * dummy node for character size calculation was changing the
+	  bounding box
+
+2009-03-02  peter
+
+	* [r93] /INSTALL, /README, /gnuplot-tikz.lua, /lua.trm:
+	  Documentation update.
+	  The TikZ driver help is now included as a subsection of the Lua
+	  terminal.
+	  The help file is generated via 'lua gnuplot-tikz.lua termhelp >
+	  gnuplot-tikz.help'.
+
+2009-02-22  peter
+
+	* [r92] /gnuplot-tikz.lua, /gnuplot.lua, /lua.trm: improved error
+	  handling
+	  gnuplot.lua renamed to gnuplot-tikz.lua
+	  removed option "script" from gnuplot-tikz.lua
+
+2009-02-20  peter
+
+	* [r91] /lua.trm: * Providing a script name is now mandatory, like
+	  set term lua tikz {<term options>}
+	  * Support for script names via the environmental variable
+	  GNUPLOT_LUA_SCRIPT is dropped
+	  * The environmental variable GNUPLOT_DRIVER_DIR can now be
+	  used to change the default search dir
+
 2008-12-20  peter
 
 	* [r90] /Copyright, /gnuplot.lua, /lua.trm: style and color name

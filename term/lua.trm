@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.3 2009/03/16 22:18:14 sfeam Exp $
- *  $Date: 2009/03/16 22:18:14 $
+ *  $Id: lua.trm,v 1.4 2009/03/26 00:49:21 sfeam Exp $
+ *  $Date: 2009/03/26 00:49:21 $
  *  $Rev: 90 $
  */
 
@@ -43,8 +43,7 @@
 
 #include "driver.h"
 
-#define LUA_SCRIPT  "gnuplot.lua"
-#define LUA_TERM_REVISON "$Rev: 90 $"
+#define LUA_TERM_REVISON "$Rev: 96 $"
 /* FIXME: this is only valid on "X11" systems, we need our own definition here */
 #define GNUPLOT_LUA_DIR X11_DRIVER_DIR
 
@@ -115,6 +114,11 @@ static char *LUA_script = NULL;
 static int lua_term_status, lua_term_result;
 static int tb, luaterm;
 
+/*
+ * static buffer, because we cannot free memory after
+ * calling int_error that never returns
+ */
+static char last_error_msg[MAX_LINE_LEN+1] = "";
 
 /*
  * Handle Lua functions
@@ -144,7 +148,7 @@ LUA_GP_get_boundingbox() {
 }
 
 /* gp.term_options(char *str) */
-int
+static int
 LUA_GP_term_options(lua_State *L) {
   int n = lua_gettop(L);  /* Number of arguments */
   const char *opt_str;
@@ -157,8 +161,22 @@ LUA_GP_term_options(lua_State *L) {
     return luaL_error(L, "Option string consists of %d characters but only %d are allowed", n, MAX_LINE_LEN);
 
   strncpy(term_options, opt_str, MAX_LINE_LEN);
-
+  term_options[MAX_LINE_LEN] = '\0';
   return(0);
+}
+
+
+/* close Lua context and clean up */
+static void
+LUA_close(void) {
+  if (L) {
+    lua_close(L);
+    L = NULL;
+  }
+  if (LUA_script) {
+    free(LUA_script);
+    LUA_script = NULL;
+  }
 }
 
 /* gp.write(char *str) */
@@ -198,7 +216,13 @@ LUA_GP_int_error(lua_State *L) {
       return luaL_error(L, "Got %d arguments expected 1 or 2", n);
       break;
   }
-  int_error(t_num, msg);
+
+  snprintf(last_error_msg, MAX_LINE_LEN, "%s Lua context closed.", msg);
+
+  /* close Lua context on fatal errors */
+  LUA_close();
+
+  int_error(t_num, last_error_msg);
   
   return(0);
 }
@@ -475,13 +499,13 @@ LUA_set_term_vars() {
 static int
 LUA_init_luaterm_function(const char *fnc) {
   if (!L)
-    int_error(NO_CARET, "missing lua context, no script?");
+    int_error(NO_CARET, "Missing Lua context! No script?");
 
   lua_getfield(L, luaterm, fnc);
   if(lua_isfunction(L, -1)) {
     return(1);
   } else {
-    int_warn(NO_CARET, "script lacks function `%s'!", fnc);
+    int_warn(NO_CARET, "Script lacks function `%s'!", fnc);
     lua_pop(L, 1); /* clean stack */
   }
   return(0);
@@ -494,53 +518,52 @@ LUA_call_report (int status)
   if (status) {
     const char *msg = lua_tostring(L, -1);
     if (msg == NULL) msg = "(error with no message)";
-    int_error(NO_CARET, "Lua error: %s", msg);
-    lua_pop(L, 1);
+    snprintf(last_error_msg, MAX_LINE_LEN, "%s. Lua context closed.", msg);
+    LUA_close();
+    int_error(NO_CARET, last_error_msg);
   }
   return status;
 }
 
     
-static void
+static int
 LUA_init_lua(void)
 {
   int sf; /* Lua script "function" */
-
-  if (L)
-    lua_close(L);
+  struct stat stat_buf;
+  char *script_fqn;
+  char *gp_lua_dir;
 
   /*
-    * All Lua contexts are held in this structure.
+   * Close old Lua context and open a new one.
     */
+  if (L)
+    lua_close(L);
   L = lua_open();
 
   luaL_openlibs(L); /* Load Lua libraries */
   luaopen_debug(L);
 
-  /* fallback */
-  if(!LUA_script) {
-    struct stat stat_buf;
-    char *envscript = NULL;
+  gp_lua_dir = getenv("GNUPLOT_DRIVER_DIR");
+  if (!gp_lua_dir)
+    gp_lua_dir = GNUPLOT_LUA_DIR;
 
-    envscript = getenv("GNUPLOT_LUA_SCRIPT");
-
-    /* first use GNUPLOT_LUA_SCRIPT if available, if not
-      search in the working directory and in GNUPLOT_LUA_DIR */
-    if (envscript)
-      LUA_script = envscript;
-    else if (!stat(LUA_SCRIPT, &stat_buf) && S_ISREG(stat_buf.st_mode))
-      LUA_script = LUA_SCRIPT;
-    else
-      LUA_script = GNUPLOT_LUA_DIR "/" LUA_SCRIPT;
+  if (stat(LUA_script, &stat_buf) || !S_ISREG(stat_buf.st_mode)) {
+    script_fqn = gp_alloc(strlen(gp_lua_dir) + strlen(LUA_script) + 2, "LUA_script path");
+    sprintf(script_fqn, "%s%c%s", gp_lua_dir, DIRSEP1, LUA_script);
+  } else {
+    script_fqn = gp_strdup(LUA_script);
   }
 
   /* Load the file containing the script we are going to run */
-  lua_term_status = luaL_loadfile(L, LUA_script);
+  lua_term_status = luaL_loadfile(L, script_fqn);
   if (lua_term_status) {
-    LUA_call_report(lua_term_status);
-    lua_close(L);
-    L = NULL;
+    fprintf(stderr, "error: %s. Lua context closed.\n", lua_tostring(L, -1));
+    LUA_close();
+    free(script_fqn);
+    return(0);
   }
+  free(script_fqn);
 
   /* remember script "function" */
   sf = lua_gettop(L);
@@ -565,6 +588,8 @@ LUA_init_lua(void)
   /* put script "function" on top and call */
   lua_pushvalue(L, sf);
   LUA_call_report(lua_pcall(L, 0, LUA_MULTRET, tb));
+
+  return(1);
 }
 
 /* see color.h */
@@ -646,33 +671,56 @@ LUA_options()
 {
 
   char *opt_str = NULL;
+  char *s;
 
-  int need_init = (c_token == 3) ? 1 : 0;
-  int tc_off = c_token; /* token counter offset */
+  int tc_off = c_token+1; /* token counter offset */
+  int need_init = 1;
+
+
+  /* 'set term tikz' is short for 'set term lua tikz' */
+  if (c_token == 3) {
+    if (almost_equals(2,"termop$tions"))
+      need_init = 0;
+    else if (equals(2,"tikz"))
+      c_token--;
+  }
 
   if (!END_OF_COMMAND) {
     opt_str = gp_input_line + token[c_token].start_index;
-    /* c_token = num_tokens; */
-    while (!END_OF_COMMAND) {
-      if (almost_equals(c_token, "s$cript")) {
-        char *s;
-        c_token++;
-        if (!(s = try_to_get_string()))
-          int_error(c_token, "expecting script name");
+    if (*opt_str == '"' || *opt_str == '\'') {
+      s = try_to_get_string();
         gp_expand_tilde(&s);
-        LUA_script = s;
-        need_init = 1;
-      }
+    } else {
+      s = gp_alloc(token_len(c_token)+strlen("gnuplot-.lua")+1, "LUA_script");
+      memcpy(s, "gnuplot-", 8);
+      memcpy(s+8, opt_str , token_len(c_token));
+      memcpy(s+8+token_len(c_token), ".lua\0", 5);
       c_token++;
     }
-
+    if (LUA_script) {
+      if (strcmp(LUA_script, s)) {
+        free(LUA_script);
+        LUA_script = s;
+        need_init = 1;
+      } else {
+        free(s);
+        need_init = 0;
+      }
+    } else {
+      LUA_script = s;
+    }
+    opt_str = gp_input_line + token[c_token].start_index;
+    c_token = num_tokens;
   } else {
-    opt_str = "";
+    LUA_close();
+    int_error(NO_CARET, "No Lua driver name or file name given!");
   }
 
   /* init lua when opening the terminal or on script change */
   if(need_init) {
-    LUA_init_lua();
+    if(!LUA_init_lua()) {
+      return;
+    }
   }
 
   if(LUA_init_luaterm_function("options")) {
@@ -1042,6 +1090,12 @@ LUA_layer (t_termlayer syncpoint)
       case TERM_LAYER_AFTER_PLOT:   /* Close off front or back macro before leaving */
         m = "after_plot";
         break;
+      case TERM_LAYER_BEGIN_GRID:
+        m = "begin_grid";
+        break;
+      case TERM_LAYER_END_GRID:
+        m = "end_grid";
+        break;
 #endif
       default:
         m = "";
@@ -1152,6 +1206,32 @@ TERM_TABLE_END(lua_driver)
 #undef LAST_TERM
 #define LAST_TERM lua_driver
 
+TERM_TABLE_START(tikz_driver)
+    "tikz", "TeX TikZ graphics macros via the lua script driver",
+    LUA_XMAX, LUA_YMAX, LUA_VCHAR, LUA_HCHAR,
+    LUA_VTIC, LUA_HTIC, LUA_options, LUA_init, LUA_reset,
+    LUA_text, null_scale, LUA_graphics, LUA_move, LUA_vector,
+    LUA_linetype, LUA_put_text, LUA_text_angle,
+    LUA_justify_text, LUA_point, LUA_arrow, LUA_set_font, LUA_pointsize,
+    TERM_BINARY /*flags*/, 0 /*suspend*/, 0 /*resume*/,
+    LUA_boxfill, LUA_linewidth
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0
+#endif
+    , LUA_make_palette, LUA_previous_palette,  LUA_set_color
+    , LUA_filled_polygon
+    , LUA_image
+   , 0, 0, 0
+   , LUA_layer
+   , LUA_path
+#ifdef GNUPLOT_LUA_4_3
+   , LUA_TSCALE
+#endif
+TERM_TABLE_END(tikz_driver)
+
+#undef LAST_TERM
+#define LAST_TERM tikz_driver
+
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 
@@ -1168,19 +1248,37 @@ START_HELP(lua)
 " external Lua script to create a target-specific plot file.",
 " Currently the only supported target is TikZ -> pdflatex.",
 "",
-" Information about `Lua` is available at http://www.lua.org .",
+" Information about Lua is available at http://www.lua.org .",
 "",
 " Syntax:",
-"       set terminal lua {script \"<lua_script>\"}",
+"    set terminal lua <target name> | \"<file name>\"",
 "                        {<script_args> ...}",
 "                        {help}",
 "",
-" If no script is given the terminal will look for \"gnuplot.lua\" in the",
-" local directory and on failure in the 'libexec' directory of the gnuplot",
-" installation or via the environmental variable GNUPLOT_DRIVER_DIR.",
+" A 'target name' or 'file name' (in quotes) for a script is mandatory.",
+" If a 'target name' for the script is given, the terminal will look for",
+" \"gnuplot-<target name>.lua\" in the local directory and on failure in",
+" the 'libexec' directory of the gnuplot installation or via the",
+" environmental variable GNUPLOT_DRIVER_DIR.",
 "",
 " All arguments will be provided to the selected script for further",
-" evaluation. `set term lua help` will cause the script itself to print",
-" additional help on options and choices."
+" evaluation. E.g. 'set term lua tikz help' will cause the script itself",
+" to print additional help on options and choices for the script.",
+#include "lua/gnuplot-tikz.help"
+""
 END_HELP(lua)
+START_HELP(tikz)
+"1 tikz",
+"?commands set terminal tikz",
+"?set terminal tikz",
+"?set term tikz",
+"?terminal tikz",
+"?term tikz",
+"?tikz",
+" This driver creates output for use with the TikZ package of graphics macros",
+" in TeX.  It is currently implemented via an external lua script, and ",
+" `set term tikz` is a short form of the command `set term lua tikz`.",
+" See `term lua` for more information.  Use the command `set term tikz help`",
+" to print terminal options."
+END_HELP(tikz)
 #endif /* TERM_HELP */
