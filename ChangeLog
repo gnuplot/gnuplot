@@ -14,6 +14,12 @@
 	* term/emf.trm (EMF_options): Option 'size' broke out of parsing
 	loop prematurely.
 
+2008-05-23  Philipp K. Janert <janert@ieee.org>
+
+	* demo/all.dem demo/smooth.dem demo/dgrid3d.dem demo/random-points
+	demo/gnu-valley: added demos for the new dgrid3d kernels and for 
+	the "smooth cumulative"	smoothing algo.	
+
 2008-05-22  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* src/bitmap.c (b_vector): If either end of a vector would fall outside
