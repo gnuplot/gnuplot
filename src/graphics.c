@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.25 2008/03/12 03:21:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.26 2008/04/27 20:58:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5145,6 +5145,7 @@ do_key_sample(
 
     if ((this_plot->plot_type == DATA)
 	&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
+	&& (this_plot->plot_style != CANDLESTICKS)
 	&& (bar_size > 0.0)) {
 	draw_clip_line( xl + key_sample_left, yl + ERRORBARTIC,
 			xl + key_sample_left, yl - ERRORBARTIC);
