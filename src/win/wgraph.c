@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.58 2008/04/26 18:12:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.59 2008/05/17 15:37:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -347,7 +347,7 @@ GraphInit(LPGW lpgw)
 {
 	HMENU sysmenu;
 	WNDCLASS wndclass;
-	char buf[80];
+	char buf[MAX_PATH];
 	HDC hdc;
 	TEXTMETRIC metric;
 
