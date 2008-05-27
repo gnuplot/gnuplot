@@ -1,3 +1,9 @@
+2008-05-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wtext.c (TextInit), src/win/wgraph.c (GraphInit):
+	Increase buffer sizes which contain the path to wgnuplot.ini.  Fixes
+	crashes on systems with very long paths of the %APPDATA% directory.
+
 2008-05-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_key_sample): Do not draw errorbars on candlestick

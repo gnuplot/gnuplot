@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.15 2006/07/08 23:58:17 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.15.2.1 2006/11/10 22:33:34 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -173,7 +173,6 @@ TextInit(LPTW lptw)
     RECT rect;
     HMENU sysmenu;
     HGLOBAL hglobal;
-    char buf[80];
 
     ReadTextIni(lptw);
 
@@ -250,7 +249,8 @@ TextInit(LPTW lptw)
     AppendMenu(lptw->hPopMenu, MF_STRING | (lptw->bSysColors ? MF_CHECKED : MF_UNCHECKED),
 	       M_SYSCOLORS, "&System Colors");
     if (lptw->IniFile != (LPSTR)NULL) {
-	wsprintf(buf,"&Update %s",lptw->IniFile);
+	char buf[MAX_PATH+80];
+	wsprintf(buf,"&Update %s", lptw->IniFile);
 	AppendMenu(lptw->hPopMenu, MF_STRING, M_WRITEINI, (LPSTR)buf);
     }
 
