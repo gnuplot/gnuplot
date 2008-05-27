@@ -1,3 +1,11 @@
+2008-05-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (need_fill_border): LT_UNDEFINED really means
+	"use default color"
+
+	* src/graphics.c (do_key_sample): Do not draw errorbars on candlestick
+	key sample
+
 2008-05-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (check_for_variable_color):  Consolidate all the checks
