@@ -2,6 +2,16 @@
 
 	* src/axis.c (make_tics):  Don't generate tics for an empty axis range.
 
+	* term/pbm.trm (PBM_options):  Make the tic size independent of the
+	font size.
+	Bug #1969415
+
+2008-05-29  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/hidden3d.c (sort_polys_by_z in_front coord_to_treecell):
+	Add range-checks to the calculation of quadtree array indices.
+	Bugs #1969415 #1728063
+
 2008-05-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wtext.c (TextInit), src/win/wgraph.c (GraphInit):

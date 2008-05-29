@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.65 2008/02/24 19:49:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.66 2008/03/13 19:53:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -255,9 +255,20 @@ typedef qtreelist GPHUGE *p_qtreelist;
 # endif
 /* indices of the heads of all the cells' chains: */
 static long quadtree[QUADTREE_GRANULARITY][QUADTREE_GRANULARITY];
-/* and a macro to calculate the cells' position in that array: */
-#define COORD_TO_TREECELL(x)								\
-    ((unsigned int)(((((x) / surface_scale) + 1.0) / 2.0) * QUADTREE_GRANULARITY))
+
+/* and a routine to calculate the cells' position in that array: */
+static int
+coord_to_treecell(coordval x)
+{
+    int index;
+    index = ((((x) / surface_scale) + 1.0) / 2.0) * QUADTREE_GRANULARITY;
+    if (index >= QUADTREE_GRANULARITY)
+	index = QUADTREE_GRANULARITY - 1;
+    else if (index < 0)
+	index = 0;
+
+    return index;
+}
 
 /* the dynarray to actually store all that stuff in: */
 static dynarray qtree;
@@ -1513,8 +1524,8 @@ sort_polys_by_z()
     /* HBB 20000716: Loop backwards, to ease construction of
      * linked lists from the head: */
     {
-	unsigned int grid_x, grid_y;
-	unsigned int grid_x_low, grid_x_high, grid_y_low, grid_y_high;
+	int grid_x, grid_y;
+	int grid_x_low, grid_x_high, grid_y_low, grid_y_high;
 
 	for (grid_x = 0; grid_x < QUADTREE_GRANULARITY; grid_x++)
 	    for (grid_y = 0; grid_y < QUADTREE_GRANULARITY; grid_y++)
@@ -1523,10 +1534,10 @@ sort_polys_by_z()
 	for (i=polygons.end - 1; i >= 0; i--) {
 	    this = plist + sortarray[i];
 
-	    grid_x_low = COORD_TO_TREECELL(this->xmin);
-	    grid_x_high = COORD_TO_TREECELL(this->xmax);
-	    grid_y_low = COORD_TO_TREECELL(this->ymin);
-	    grid_y_high = COORD_TO_TREECELL(this->ymax);
+	    grid_x_low = coord_to_treecell(this->xmin);
+	    grid_x_high = coord_to_treecell(this->xmax);
+	    grid_y_low = coord_to_treecell(this->ymin);
+	    grid_y_high = coord_to_treecell(this->ymax);
 
 	    for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x++) {
 		for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y++) {
@@ -1741,9 +1752,9 @@ in_front(
 # define SET_YEXTENT /* nothing */
 #endif
 #if HIDDEN3D_QUADTREE
-    unsigned int grid_x, grid_y;
-    unsigned int grid_x_low, grid_x_high;
-    unsigned int grid_y_low, grid_y_high;
+    int grid_x, grid_y;
+    int grid_x_low, grid_x_high;
+    int grid_y_low, grid_y_high;
     long listhead;
 #endif
 
@@ -1798,10 +1809,10 @@ in_front(
     enter_vertices = vertices.end;
 
 #if HIDDEN3D_QUADTREE
-    grid_x_low = COORD_TO_TREECELL(xmin);
-    grid_x_high = COORD_TO_TREECELL(xmax);
-    grid_y_low = COORD_TO_TREECELL(ymin);
-    grid_y_high = COORD_TO_TREECELL(ymax);
+    grid_x_low = coord_to_treecell(xmin);
+    grid_x_high = coord_to_treecell(xmax);
+    grid_y_low = coord_to_treecell(ymin);
+    grid_y_high = coord_to_treecell(ymax);
 
     for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x ++)
 	for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y ++)
