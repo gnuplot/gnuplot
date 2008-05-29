@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.60.2.4 2008/01/14 07:27:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.60.2.5 2008/05/08 20:51:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -600,6 +600,8 @@ make_tics(AXIS_INDEX axis, int guide)
     double xr, tic;
 
     xr = fabs(axis_array[axis].min - axis_array[axis].max);
+    if (xr == 0)
+	return 1;       /* Anything will do, since we'll never use it */
     tic = quantize_normal_tics(xr, guide);
     /* FIXME HBB 20010831: disabling this might allow short log axis
      * to receive better ticking... */
