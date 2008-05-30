@@ -1,5 +1,5 @@
 #
-# $Id: candlesticks.dem,v 1.3 2003/10/17 15:02:21 mikulik Exp $
+# $Id: candlesticks.dem,v 1.4 2005/03/30 06:02:45 sfeam Exp $
 #
 
 reset
@@ -22,6 +22,14 @@ set title "candlesticks with style fill solid"
 set style fill solid
 set boxwidth 0.2
 replot
+#
+pause -1 "Hit return to continue"
+#
+set title "candlesticks showing both states of open/close"
+set style fill empty
+set boxwidth 0.2
+plot 'candlesticks.dat' using 1:(int($0)%3?$3:$5):2:6:(int($0)%3?$5:$3) with candlesticks title "open < close", \
+NaN with boxes lt 1 fs solid 1 title "close < open"
 #
 pause -1 "Hit return to continue"
 #

@@ -2,6 +2,11 @@
 
 	* src/plot2d.c (eval_plots):  'with rgbimage' does not use a palette.
 
+	* src/graphics.c (plot_c_bars do_key_sample) docs/gnuplot.doc
+	demo/candlesticks.dem:  Candlesticks used to approximate a solid fill by
+	drawing three vertical bars.  Now we use a true solid fill to indicate
+	(open > close). This is the standard convention for financial data.
+
 2008-05-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (make_tics):  Don't generate tics for an empty axis range.

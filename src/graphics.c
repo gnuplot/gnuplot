@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.266 2008/05/25 17:14:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.267 2008/05/27 21:57:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3974,7 +3974,8 @@ plot_f_bars(struct curve_points *plot)
 
 /* plot_c_bars:
  * Plot the curves in CANDLESTICSK style
- *  we just plot the bars; the points are not plotted
+ * EAM Apr 2008 - switch to using empty/fill rather than empty/striped 
+ *		  to distinguish whether (open > close)
  */
 static void
 plot_c_bars(struct curve_points *plot)
@@ -4040,11 +4041,10 @@ plot_c_bars(struct curve_points *plot)
 	    continue;
 
 	if (boxwidth < 0.0) {
-	    /* EAM Feb 2003 - Old code did essentially this */
 	    xlowM = xM - bar_size * tic;
 	    xhighM = xM + bar_size * tic;
-	} else {
 
+	} else {
 	    dxl = -boxwidth / 2.0;
 	    if (prev != UNDEFINED)
 		if (! boxwidth_is_absolute)
@@ -4088,25 +4088,41 @@ plot_c_bars(struct curve_points *plot)
 	    ymax = map_y(yopen); ymin = map_y(yclose);
 	}
 
-	if ((plot->fill_properties.fillstyle != FS_EMPTY) && term->fillbox) {
+	/* Reset to original color, if we changed it for the border */
+	if ((plot->fill_properties.border_linetype != LT_NODRAW)
+	&&  (plot->fill_properties.border_linetype != LT_UNDEFINED)) {
+		(*t->linetype)(plot->lp_properties.l_type);
+		if (plot->lp_properties.use_palette)
+		    apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
+	}
+	
+	/* Boxes are always filled if an explicit non-empty fillstyle is set. */
+	/* If the fillstyle is FS_EMPTY, fill to indicate (open > close).     */
+	if (term->fillbox) {
 	    int style = style_from_fill(&plot->fill_properties);
-	    unsigned int x = xlowM;
-	    unsigned int y = ymin;
-	    unsigned int w = (xhighM-xlowM);
-	    unsigned int h = (ymax-ymin);
+	    if ((style != FS_EMPTY) || (yopen > yclose)) {
+		unsigned int x = xlowM;
+		unsigned int y = ymin;
+		unsigned int w = (xhighM-xlowM);
+		unsigned int h = (ymax-ymin);
 
-	    if (plot->lp_properties.use_palette)
-		(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
-	    else
-		(*t->fillbox)(style, x, y, w, h);
+		if (style == FS_EMPTY)
+		    style = FS_OPAQUE;
 
-	    need_fill_border(&plot->fill_properties);
+		if (plot->lp_properties.use_palette)
+		    (*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
+		else
+		    (*t->fillbox)(style, x, y, w, h);
+
+		if (style_from_fill(&plot->fill_properties) != FS_EMPTY)
+		    need_fill_border(&plot->fill_properties);
+	    }
 	}
 
 	/* Draw whiskers and an open box */
 	    (*t->move)   (xM, ylowM);
-	    (*t->vector) (xM, map_y(yopen));
-	    (*t->move)   (xM, map_y(yclose));
+	    (*t->vector) (xM, ymin);
+	    (*t->move)   (xM, ymax);
 	    (*t->vector) (xM, yhighM);
 
 	    newpath();
@@ -4128,22 +4144,16 @@ plot_c_bars(struct curve_points *plot)
 	    (*t->vector) (xhighM-d, ylowM);
 	}
 
-	/* draw two extra vertical bars to indicate open > close */
-	if (yopen > yclose) {
+	/* Through 4.2 gnuplot would indicate (open > close) by drawing     */
+	/* three vertical bars.  Now we use solid fill.  But if the current */
+	/* terminal does not support filled boxes, fall back to the old way */
+	if ((yopen > yclose) && !(term->fillbox)) {
+	    (*t->move)   (xM, ymin);
+	    (*t->vector) (xM, ymax);
 	    (*t->move)   ( (xM + xlowM) / 2, ymin);
 	    (*t->vector) ( (xM + xlowM) / 2, ymax);
 	    (*t->move)   ( (xM + xhighM) / 2, ymin);
 	    (*t->vector) ( (xM + xhighM) / 2, ymax);
-	}
-
-	/* Reset to original color, if we changed it for the border */
-	if ((plot->fill_properties.fillstyle != FS_EMPTY) && term->fillbox) {
-	    if ((plot->fill_properties.border_linetype != LT_NODRAW)
-	    &&  (plot->fill_properties.border_linetype != LT_UNDEFINED)) {
-		(*t->linetype)(plot->lp_properties.l_type);
-		if (plot->lp_properties.use_palette)
-		    apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
-	    }
 	}
 
 	prev = plot->points[i].type;
@@ -5294,7 +5304,10 @@ do_key_sample(
 	    else
 		(*t->fillbox)(style,x,y,w,h);
 
-	    if (need_fill_border(fs)) {
+	    /* need_fill_border will set the border linetype, but candlesticks don't want it */
+	    if ((this_plot->plot_style == CANDLESTICKS && fs->fillstyle == FS_EMPTY)
+	    ||  (this_plot->plot_style == CANDLESTICKS && fs->border_linetype == LT_NODRAW)
+	    ||   need_fill_border(fs)) {
 		newpath();
 		draw_clip_line( xl + key_sample_left,  yl - key_entry_height/4,
 			    xl + key_sample_right, yl - key_entry_height/4);
