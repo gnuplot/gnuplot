@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pbm.trm,v 1.27 2006/11/23 05:33:30 sfeam Exp $
+ * $Id: pbm.trm,v 1.28 2008/04/07 03:54:02 sfeam Exp $
  *
  */
 
@@ -188,6 +188,11 @@ PBM_options()
 	}
     }
 
+    term->v_tic = (term->xmax < term->ymax) ? term->xmax/100 : term->ymax/100;
+    if (term->v_tic < 1)
+        term->v_tic = 1;
+    term->h_tic = term->v_tic;
+
     /* setup options string */
 
     switch (pbm_font) {
@@ -244,22 +249,16 @@ PBM_setfont()
 	b_charsize(FNT5X9);
 	term->v_char = FNT5X9_VCHAR;
 	term->h_char = FNT5X9_HCHAR;
-	term->v_tic = FNT5X9_HBITS;
-	term->h_tic = FNT5X9_HBITS;
 	break;
     case 2:
 	b_charsize(FNT9X17);
 	term->v_char = FNT9X17_VCHAR;
 	term->h_char = FNT9X17_HCHAR;
-	term->v_tic = FNT9X17_HBITS;
-	term->h_tic = FNT9X17_HBITS;
 	break;
     case 3:
 	b_charsize(FNT13X25);
 	term->v_char = FNT13X25_VCHAR;
 	term->h_char = FNT13X25_HCHAR;
-	term->v_tic = FNT13X25_HBITS;
-	term->h_tic = FNT13X25_HBITS;
 	break;
     }
 }
