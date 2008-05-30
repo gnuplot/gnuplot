@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.170 2008/05/21 04:32:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.171 2008/05/25 17:14:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1869,11 +1869,10 @@ eval_plots()
 
 #ifdef WITH_IMAGE
 	    /* Styles that use palette */
-	    if (this_plot->plot_style == IMAGE)
+	    if (this_plot->plot_style == IMAGE) {
 		this_plot->lp_properties.use_palette = 1;
-	    /* Styles that use colorbus */
-	    if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)
 		is_cb_plot = TRUE;
+	    }
 #endif /* WITH_IMAGE */
 
 	    /* we can now do some checks that we deferred earlier */

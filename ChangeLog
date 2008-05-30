@@ -1,3 +1,7 @@
+2008-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots):  'with rgbimage' does not use a palette.
+
 2008-05-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (make_tics):  Don't generate tics for an empty axis range.
