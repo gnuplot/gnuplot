@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.37 2007/10/16 21:19:45 sfeam Exp $
+ * $Id: term.h,v 1.38 2008/03/30 03:27:55 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -282,7 +282,8 @@
 #endif
 
 /* Adobe Illustrator Format */
-#include "ai.trm"
+/* obsolete: use 'set term postscript level1 */
+/* #include "ai.trm" */
 
 /* Computer Graphics Metafile (eg ms office) */
 #include "cgm.trm"
@@ -388,6 +389,9 @@
 #define NEC
 #define OKIDATA
 #define STARC
+
+/* Seiko DPU-414 thermal printer */
+#define DPU414
 
 /* Tandy DMP-130 series 60-dot per inch graphics */
 #define TANDY60

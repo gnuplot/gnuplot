@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tek.trm,v 1.17 2006/07/07 03:51:23 sfeam Exp $
+ * $Id: tek.trm,v 1.18 2006/07/21 02:35:48 sfeam Exp $
  *
  */
 
@@ -55,9 +55,13 @@
 #define TEK
 #define CTEK
 #define VTTEK
+
+/* Version 4.3: still available, but no longer built by default */
+#if 0
 #define KERMIT
 #define SELANAR
 #define BITGRAPH
+#endif
 
 #include "driver.h"
 
@@ -82,22 +86,30 @@ register_term(bitgraph)
 TERM_PUBLIC void TEK40init __PROTO((void));
 TERM_PUBLIC void TEK40graphics __PROTO((void));
 TERM_PUBLIC void TEK40text __PROTO((void));
-TERM_PUBLIC void TEK40linetype __PROTO((int linetype));
 TERM_PUBLIC void TEK40move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void TEK40vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void TEK40put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC void TEK40reset __PROTO((void));
+#ifdef BITGRAPH
 TERM_PUBLIC void BG_text __PROTO((void));
 TERM_PUBLIC void BG_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
+#endif
+#if defined(SELANAR) || defined(BITGRAPH)
+TERM_PUBLIC void TEK40linetype __PROTO((int linetype));
+#endif
+#ifdef KERMIT
 TERM_PUBLIC void KTEK40graphics __PROTO((void));
 TERM_PUBLIC void KTEK40Ctext __PROTO((void));
 TERM_PUBLIC void KTEK40Clinetype __PROTO((int linetype));
 TERM_PUBLIC void KTEK40Mlinetype __PROTO((int linetype));
 TERM_PUBLIC void KTEK40reset __PROTO((void));
+#endif
+#ifdef SELANAR
 TERM_PUBLIC void SEL_init __PROTO((void));
 TERM_PUBLIC void SEL_graphics __PROTO((void));
 TERM_PUBLIC void SEL_text __PROTO((void));
 TERM_PUBLIC void SEL_reset __PROTO((void));
+#endif
 TERM_PUBLIC void VTTEK40init __PROTO((void));
 TERM_PUBLIC void VTTEK40reset __PROTO((void));
 TERM_PUBLIC void VTTEK40linetype __PROTO((int linetype));
@@ -172,11 +184,13 @@ TEK40text()
 }
 
 
+#if defined(SELANAR) || defined(BITGRAPH)
 TERM_PUBLIC void
 TEK40linetype(int linetype)
 {
     (void) linetype;
 }
+#endif
 
 TERM_PUBLIC void
 TEK40move(unsigned int x, unsigned int y)
@@ -230,15 +244,11 @@ TEK40reset()
 
 
 #define BG_init TEK40init
-
 #define BG_graphics TEK40graphics
-
-
 #define BG_linetype TEK40linetype
-
 #define BG_move TEK40move
-
 #define BG_vector TEK40vector
+#define BG_reset TEK40reset
 
 
 TERM_PUBLIC void
@@ -262,8 +272,6 @@ BG_put_text(unsigned int x, unsigned int y, const char str[])
     fprintf(gpoutfile, "\037%s\n", str);
 }
 
-
-#define BG_reset TEK40reset
 
 #endif /* BITGRAPH */
 
@@ -626,23 +634,16 @@ CTEK_vector(unsigned int x, unsigned int y)
 
 #ifdef TERM_TABLE
 
+#ifdef CTEK
 TERM_TABLE_START(tek40_driver)
-#ifndef CTEK
-    "tek40xx", "Tektronix 4010 and others; most TEK emulators",
-    TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR,
-    TEK40VTIC, TEK40HTIC, options_null, TEK40init, TEK40reset,
-    TEK40text, null_scale, TEK40graphics, TEK40move, TEK40vector,
-    TEK40linetype, TEK40put_text, null_text_angle,
-    null_justify_text, line_and_point, do_arrow, set_font_null
-#else
     "tek40xx", "Tektronix 4010 and others; most TEK emulators",
     TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR,
     TEK40VTIC, TEK40HTIC, options_null, TEK40init, TEK40reset,
     TEK40text, null_scale, TEK40graphics, CTEK_move, CTEK_vector,
     CTEK_linetype, TEK40put_text, null_text_angle,
     null_justify_text, line_and_point, do_arrow, set_font_null
-#endif /* CTEK */
 TERM_TABLE_END(tek40_driver)
+#endif /* CTEK */
 
 #undef LAST_TERM
 #define LAST_TERM tek40_driver
@@ -738,6 +739,7 @@ START_HELP(tek40)
 "?terminal vttek",
 "?term vttek",
 "?vttek",
+#ifdef KERMIT
 "?commands set terminal kc-tek40xx",
 "?set terminal kc-tek40xx",
 "?set term kc-tek40xx",
@@ -750,23 +752,30 @@ START_HELP(tek40)
 "?terminal km-tek40xx",
 "?term km-tek40xx",
 "?km-tek40xx",
+#endif
+#ifdef SELANAR
 "?commands set terminal selanar",
 "?set terminal selanar",
 "?set term selanar",
 "?terminal selanar",
 "?term selanar",
 "?selanar",
+#endif
+#ifdef BITGRAPH
 "?commands set terminal bitgraph",
 "?set terminal bitgraph",
 "?set term bitgraph",
 "?terminal bitgraph",
 "?term bitgraph",
 "?bitgraph",
+#endif
 " This family of terminal drivers supports a variety of VT-like terminals.",
-" `tek40xx` supports Tektronix 4010 and others as well as most TEK emulators;",
-" `vttek` supports VT-like tek40xx terminal emulators; `kc-tek40xx` supports",
-" MS-DOS Kermit Tek4010 terminal emulators in color: `km-tek40xx` supports them",
-" in monochrome; `selanar` supports Selanar graphics; and `bitgraph` supports",
-" BBN Bitgraph terminals.  None have any options."
+" `tek40xx` supports Tektronix 4010 and others as well as most TEK emulators.",
+" `vttek` supports VT-like tek40xx terminal emulators.",
+" The following are present only if selected when gnuplot is built:",
+" `kc-tek40xx` supports MS-DOS Kermit Tek4010 terminal emulators in color;",
+" `km-tek40xx` supports them in monochrome. `selanar` supports Selanar graphics.",
+" `bitgraph` supports BBN Bitgraph terminals.",
+" None have any options."
 END_HELP(tek40)
 #endif /* TERM_HELP */
