@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.504 2008/05/31 23:09:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.505 2008/06/01 04:30:56 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1955,7 +1955,7 @@ C ... and restart the table:
                                         # in the current cbrange of the palette
       plot sin(x) lt palette frac 0.3   # fractional value along the palette
 
- See `show palette colornames`, `set palette`, `cbrange`.
+ See `show colornames`, `set palette`, `cbrange`.
 
  For terminals that support dot/dash patterns, each default linetype has both
  a dot-dash pattern and a default color. However, you can override the default
@@ -2004,7 +2004,7 @@ C ... and restart the table:
        palette z
 
  "colorname" refers to one of the color names built in to gnuplot. For a list
- of the available names, see `show palette colornames`.
+ of the available names, see `show colornames`.
 
  "#RRGGBB" is a hexadecimal constant preceded by the "#" symbol. The RRGGBB
  represents the red, green, and blue components of the color, each on a scale
@@ -9041,7 +9041,7 @@ Ffigure_mapcontours
        show palette gradient
        show palette fit2rgbformulae
        show palette rgbformulae
-       show palette colornames
+       show colornames
 
  `set palette` (i.e. without options) sets up the default values.
  Otherwise, the options can be given in any order.
@@ -9049,8 +9049,7 @@ Ffigure_mapcontours
 
  `show palette gradient` displays the gradient defining the palette (if
  appropriate).  `show palette rgbformulae` prints the available fixed gray -->
- color transformation formulae.  `show palette colornames` prints the
- implemented color names.
+ color transformation formulae.  `show colornames` prints the known color names.
 
  `show palette palette <n>` prints to the screen or to the file given by
  `set print` a table of RGB triplets calculated for the current palette settings
@@ -9189,8 +9188,7 @@ Ffigure_mapcontours
  whitespace, or the name of the color in quotes or X style color specifiers
  also in quotes.  You may freely mix the three types in a gradient definition,
  but the named color "red" will be something strange if RGB is not selected
- as color space.  Use `show palette colornames` for a list of known color
- names.
+ as color space.  Use `show colornames` for a list of known color names.
 
  Please note, that even if written as <r>, this might actually be the
  <H> component in HSV color space or <X> in CIE-XYZ space, or ...
@@ -9359,8 +9357,7 @@ Ffigure_mapcontours
  Gnuplot knows a limited number of color names. You can use these to define
  the color range spanned by a pm3d palette, or to assign a terminal-independent
  colot to a particular linetype or linestyle. To see the list of know color
- names, use the command `show palette colornames`.
- See `set palette`, `linestyle`.
+ names, use the command `show colornames`.  See `set palette`, `linestyle`.
 3 pointsize
 ?commands set pointsize
 ?commands show pointsize

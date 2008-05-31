@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.213 2008/05/31 23:09:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.214 2008/06/01 04:30:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -327,6 +327,10 @@ show_command()
 	break;
     case S_COLORBOX:
 	show_colorbox();
+	break;
+    case S_COLORNAMES:
+	c_token--;
+	show_palette_colornames();
 	break;
     case S_POINTSIZE:
 	show_pointsize();

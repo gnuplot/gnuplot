@@ -16,6 +16,9 @@
 	doesn't follow usual gnuplot syntax conventions. Provide new synonyms
 	"show bind" and "reset bind" that are less unexpected.
 
+	* src/tables.c src/tables.h src/show.c:  The command "show colornames"
+	was documented, but was not implemented.  Now it is.
+
 2008-05-31  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* term/epson.trm:  Add support for the Seiko DPU-414 thermal printer
