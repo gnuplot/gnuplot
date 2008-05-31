@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: epson.trm,v 1.21 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: epson.trm,v 1.22 2006/07/21 02:35:46 sfeam Exp $
  *
  */
 
@@ -42,6 +42,7 @@
  *  epson_lx800, nec_cp6, starc,
  *  epson_60dpi, tandy_60dpi
  *  epson_180dpi
+ *  dpu414
  *
  * AUTHORS
  *  Russell Lang
@@ -76,16 +77,20 @@ register_term(okidata)
 #ifdef STARC
 register_term(starc)
 #endif /* STARC */
-#ifdef TAMDY60
+#ifdef TANDY60
 register_term(tandy_60dpi)
 #endif /* TANDY60 */
+#ifdef DPU414
+register_term(dpu414)
+#endif /* DPU414 */
 #endif /* TERM_REGISTER */
 
 #ifdef TERM_PROTO
 
+TERM_PUBLIC void EPSON_reset __PROTO((void));
+
 #if defined(EPS180) || defined(EPS60) || defined(EPSONP) || defined(TANDY60) || defined(OKIDATA)
 TERM_PUBLIC void EPSON_init __PROTO((void));
-TERM_PUBLIC void EPSON_reset __PROTO((void));
 
 #if defined(EPS60) || defined(EPSONP) || defined(TANDY60) || defined(OKIDATA)
 #define EPSONVCHAR		FNT5X9_VCHAR
@@ -136,7 +141,6 @@ TERM_PUBLIC void NEC_init __PROTO((void));
 TERM_PUBLIC void NEC_graphics __PROTO((void));
 TERM_PUBLIC void NEC_text __PROTO((void));
 TERM_PUBLIC void NEC_linetype __PROTO((int linetype));
-TERM_PUBLIC void NEC_reset __PROTO((void));
 #define NECXMAX	400
 #define NECYMAX	320
 #define NECVCHAR		FNT5X9_VCHAR
@@ -150,7 +154,6 @@ TERM_PUBLIC void STARC_init __PROTO((void));
 TERM_PUBLIC void STARC_graphics __PROTO((void));
 TERM_PUBLIC void STARC_text __PROTO((void));
 TERM_PUBLIC void STARC_linetype __PROTO((int linetype));
-TERM_PUBLIC void STARC_reset __PROTO((void));
 #define STARCXMAX	512
 #define STARCYMAX	384
 #define STARCVCHAR		FNT5X9_VCHAR
@@ -159,10 +162,33 @@ TERM_PUBLIC void STARC_reset __PROTO((void));
 #define STARCHTIC		6
 #endif /* STARC */
 
+#ifdef DPU414
+TERM_PUBLIC void DPU414_options __PROTO((void));
+TERM_PUBLIC void DPU414_init __PROTO((void));
+TERM_PUBLIC void DPU414_graphics __PROTO((void));
+TERM_PUBLIC void DPU414_text __PROTO((void));
+TERM_PUBLIC void DPU414_setfont __PROTO((void));
+#define DPU414XMAX	(640)
+#define DPU414YMAX	(480)
+#define DPU414VCHAR	FNT5X9_VCHAR
+#define DPU414HCHAR	FNT5X9_HCHAR
+#define DPU414VTIC	FNT5X9_HBITS
+#define DPU414HTIC	FNT5X9_HBITS
+#endif /* DPU414 */
+
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
+
+
+TERM_PUBLIC void
+EPSON_reset()
+{
+#ifdef VMS
+    fflush_binary();
+#endif
+}
 
 
 #ifdef EPSONP
@@ -197,15 +223,6 @@ EPSON_text()
 {
     epson_dump();
     b_freebitmap();
-}
-
-
-TERM_PUBLIC void
-EPSON_reset()
-{
-#ifdef VMS
-    fflush_binary();
-#endif
 }
 
 
@@ -342,15 +359,6 @@ NEC_linetype(int linetype)
     }
 }
 
-
-
-TERM_PUBLIC void
-NEC_reset()
-{
-#ifdef VMS
-    fflush_binary();
-#endif
-}
 
 
 /* output file must be binary mode for nec_dump */
@@ -511,15 +519,6 @@ STARC_linetype(int linetype)
     b_setvalue(STARCcolor[linetype + 2]);
 }
 
-
-
-TERM_PUBLIC void
-STARC_reset()
-{
-#ifdef VMS
-    fflush_binary();
-#endif
-}
 
 
 /* output file must be binary mode for STARC_dump */
@@ -770,6 +769,198 @@ okidata_dump()
 
 #endif /* OKIDATA */
 
+#ifdef DPU414
+
+static void DPU414_dump __PROTO((void));
+
+static int DPU414_font = 2; /* medium font */
+static int DPU414_quality = 1; /* normal */
+
+enum DPU414_id {
+	DPU414_SMALL, DPU414_MEDIUM, DPU414_LARGE,
+	DPU414_NORMAL, DPU414_DRAFT,
+	DPU414_OTHER
+};
+
+static struct gen_table DPU414_opts[] =
+{
+	{ "s$mall", DPU414_SMALL },
+	{ "m$edium", DPU414_MEDIUM },
+	{ "l$arge", DPU414_LARGE },
+	{ "n$ormal", DPU414_NORMAL },
+	{ "d$raft", DPU414_DRAFT },
+	{ NULL, DPU414_OTHER }
+};
+
+TERM_PUBLIC void
+DPU414_options()
+{
+	DPU414_font = 2;
+	DPU414_quality = 1;
+	term_options[0] = NUL;
+
+	while (!END_OF_COMMAND) {
+		switch(lookup_table(&DPU414_opts[0],c_token)) {
+			case DPU414_SMALL:
+				DPU414_font = 1;
+				c_token++;
+				break;
+			case DPU414_MEDIUM:
+				DPU414_font = 2;
+				c_token++;
+				break;
+			case DPU414_LARGE:
+				DPU414_font = 3;
+				c_token++;
+				break;
+			case DPU414_NORMAL:
+				DPU414_quality = 1;
+				c_token++;
+				break;
+			case DPU414_DRAFT:
+				DPU414_quality = 2;
+				c_token++;
+				break;
+			case DPU414_OTHER:
+			default:
+				/* reset to default, since term is already set */
+				DPU414_font = 2;
+				DPU414_quality = 1;
+				int_error(c_token, "expecting: {small, medium, large} {normal, draft}");
+				break;
+		}
+	}
+
+	term->v_tic = (term->xmax < term->ymax) ? term->xmax/100 : term->ymax/100;
+	if (term->v_tic < 1)
+		term->v_tic = 1;
+	term->h_tic = term->v_tic;
+
+	/* setup options string */
+	switch (DPU414_font) {
+		case 1:
+			strcat(term_options, "small");
+			break;
+		case 2:
+			strcat(term_options, "medium");
+			break;
+		case 3:
+			strcat(term_options, "large");
+			break;
+	}
+	switch (DPU414_quality) {
+		case 1:
+			strcat(term_options, " normal");
+			term->xmax = DPU414XMAX;
+			term->ymax = DPU414YMAX;
+			break;
+		case 2:
+			strcat(term_options, " draft");
+			term->xmax = DPU414XMAX / 2;
+			term->ymax = DPU414YMAX / 2;
+			break;
+	}
+}
+
+TERM_PUBLIC void
+DPU414_init()
+{
+	DPU414_setfont();
+}
+
+TERM_PUBLIC void
+DPU414_setfont()
+{
+	switch (DPU414_font) {
+	case 1:
+		b_charsize(FNT5X9);
+		term->v_char = FNT5X9_VCHAR;
+		term->h_char = FNT5X9_HCHAR;
+		break;
+	case 2:
+		b_charsize(FNT9X17);
+		term->v_char = FNT9X17_VCHAR;
+		term->h_char = FNT9X17_HCHAR;
+		break;
+	case 3:
+		b_charsize(FNT13X25);
+		term->v_char = FNT13X25_VCHAR;
+		term->h_char = FNT13X25_HCHAR;
+		break;
+	}
+}
+
+TERM_PUBLIC void
+DPU414_graphics()
+{
+	switch (DPU414_quality) {
+	case 1:
+		b_makebitmap((unsigned int) (DPU414XMAX * xsize),
+		             (unsigned int) (DPU414YMAX * ysize), 1);
+		break;
+	case 2:
+		term->xmax = DPU414XMAX / 2;
+		term->ymax = DPU414YMAX / 2;
+		b_makebitmap((unsigned int) (DPU414XMAX / 2 * xsize),
+		             (unsigned int) (DPU414YMAX / 2 * ysize), 1);
+		break;
+	}
+}
+
+TERM_PUBLIC void
+DPU414_text()
+{
+	DPU414_dump();
+	b_freebitmap();
+}
+
+static void
+DPU414_dump()
+{
+	register unsigned int x;
+	int j;
+
+	fputs("\r", gpoutfile);	/* carriage return */
+	fprintf(gpoutfile, "\033%c", 'U');	/* unidirectional printing */
+	(void) fputc((char) 0, gpoutfile);
+
+	switch (DPU414_quality) {
+	case 1:
+		for (j = (b_ysize / 8) - 1; j >= 0; j-=2) {
+			/* select 120-dpi, emulated 16-pin printer graphics mode */
+			/* in reality it's 640/(89.6mm/25.4mm) = 181 dpi = appr. 180 dpi */
+			fputs("\033^\001", gpoutfile);
+			(void) fputc((char) (b_xsize % 256), gpoutfile);
+			(void) fputc((char) (b_xsize / 256), gpoutfile);
+			for (x = 0; x < b_xsize; x++) {
+				(void) fputc((char) (*((*b_p)[j] + x)), gpoutfile);
+				(void) fputc((char) (*((*b_p)[j-1] + x)), gpoutfile);
+			}
+			fprintf(gpoutfile, "\033%c\x10\r", 'J');	/* advance 16 halfdots, carriage return */
+		}
+		break;
+	case 2:
+		for (j = (b_ysize / 8) - 1; j >= 0; j--) {
+			/* select 60-dpi, 8-pin printer graphics mode */
+			/* in reality it's 320/(89.6mm/25.4mm) = 91 dpi = appr. 90 dpi */
+			fputs("\033K", gpoutfile);
+			(void) fputc((char) (b_xsize % 256), gpoutfile);
+			(void) fputc((char) (b_xsize / 256), gpoutfile);
+			for (x = 0; x < b_xsize; x++) {
+				(void) fputc((char) (*((*b_p)[j] + x)), gpoutfile);
+			}
+			fprintf(gpoutfile, "\033%c\x10\r", 'J');	/* advance 16 halfdots, carriage return */
+		}
+		break;
+	}
+	fputs("\r\n\033@\r\n", gpoutfile);	/* reset printer */
+#ifdef PC
+	fputs("Print using: COPY /B\n", stderr);
+#endif
+}
+
+#endif /* DPU414 */
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -823,7 +1014,7 @@ TERM_TABLE_END(epsonlx_driver)
     TERM_TABLE_START(nec_driver)
     "nec_cp6", "NEC printer CP6, Epson LQ-800 [monocrome color draft]",
     NECXMAX, NECYMAX, NECVCHAR, NECHCHAR,
-    NECVTIC, NECHTIC, NEC_options, NEC_init, NEC_reset,
+    NECVTIC, NECHTIC, NEC_options, NEC_init, EPSON_reset,
     NEC_text, null_scale, NEC_graphics, b_move, b_vector,
     NEC_linetype, b_put_text, b_text_angle,
     null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
@@ -853,7 +1044,7 @@ TERM_TABLE_END(okidata_driver)
 TERM_TABLE_START(starc_driver)
     "starc", "Star Color Printer",
     STARCXMAX, STARCYMAX, STARCVCHAR, STARCHCHAR,
-    STARCVTIC, STARCHTIC, options_null, STARC_init, STARC_reset,
+    STARCVTIC, STARCHTIC, options_null, STARC_init, EPSON_reset,
     STARC_text, null_scale, STARC_graphics, b_move, b_vector,
     STARC_linetype, b_put_text, b_text_angle,
     null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
@@ -879,36 +1070,51 @@ TERM_TABLE_END(tandy60_driver)
 #define LAST_TERM tandy60_driver
 #endif /* TANDY60 */
 
+#ifdef DPU414
+TERM_TABLE_START(dpu414_driver)
+    "dpu414", "Seiko DPU-414 thermal printer [small medium large]",
+    DPU414XMAX, DPU414YMAX, DPU414VCHAR, DPU414HCHAR,
+    DPU414VTIC, DPU414HTIC, DPU414_options, DPU414_init, EPSON_reset,
+    DPU414_text, null_scale, DPU414_graphics, b_move, b_vector,
+    b_setlinetype, b_put_text, b_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
+TERM_TABLE_END(dpu414_driver)
+
+#undef LAST_TERM
+#define LAST_TERM dpu414_driver
+#endif /* DPU414 */
+
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
 START_HELP(epson_180dpi)
-"1 epson-180dpi",
-"?commands set terminal epson-180dpi",
-"?set terminal epson-180dpi",
-"?set term epson-180dpi",
-"?terminal epson-180dpi",
-"?term epson-180dpi",
-"?epson-180dpi",
-"?commands set terminal epson-60dpi",
-"?set terminal epson-60dpi",
-"?set term epson-60dpi",
-"?terminal epson-60dpi",
-"?term epson-60dpi",
-"?epson-60dpi",
-"?commands set terminal epson-lx800",
-"?set terminal epson-lx800",
-"?set term epson-lx800",
-"?terminal epson-lx800",
-"?term epson-lx800",
-"?epson-lx800",
-"?commands set terminal nec-cp6",
-"?set terminal nec-cp6",
-"?set term nec-cp6",
-"?terminal nec-cp6",
-"?term nec-cp6",
-"?nec-cp6",
+"1 epson_180dpi",
+"?commands set terminal epson_180dpi",
+"?set terminal epson_180dpi",
+"?set term epson_180dpi",
+"?terminal epson_180dpi",
+"?term epson_180dpi",
+"?epson_180dpi",
+"?commands set terminal epson_60dpi",
+"?set terminal epson_60dpi",
+"?set term epson_60dpi",
+"?terminal epson_60dpi",
+"?term epson_60dpi",
+"?epson_60dpi",
+"?commands set terminal epson_lx800",
+"?set terminal epson_lx800",
+"?set term epson_lx800",
+"?terminal epson_lx800",
+"?term epson_lx800",
+"?epson_lx800",
+"?commands set terminal nec_cp6",
+"?set terminal nec_cp6",
+"?set term nec_cp6",
+"?terminal nec_cp6",
+"?term nec_cp6",
+"?nec_cp6",
 "?commands set terminal okidata",
 "?set terminal okidata",
 "?set term okidata",
@@ -921,36 +1127,52 @@ START_HELP(epson_180dpi)
 "?terminal starc",
 "?term starc",
 "?starc",
-"?commands set terminal tandy-60dpi",
-"?set terminal tandy-60dpi",
-"?set term tandy-60dpi",
-"?terminal tandy-60dpi",
-"?term tandy-60dpi",
-"?tandy-60dpi",
+"?commands set terminal tandy_60dpi",
+"?set terminal tandy_60dpi",
+"?set term tandy_60dpi",
+"?terminal tandy_60dpi",
+"?term tandy_60dpi",
+"?tandy_60dpi",
+"?commands set terminal dpu414",
+"?set terminal dpu414",
+"?set term dpu414",
+"?terminal dpu414",
+"?term dpu414",
+"?dpu414",
 " This driver supports a family of Epson printers and derivatives.",
 "",
-" `epson-180dpi` and `epson-60dpi` are drivers for Epson LQ-style 24-pin",
+" `epson_180dpi` and `epson_60dpi` are drivers for Epson LQ-style 24-pin",
 " printers with resolutions of 180 and 60 dots per inch, respectively.",
 "",
-" `epson-lx800` is a generic 9-pin driver appropriate for printers like the",
+" `epson_lx800` is a generic 9-pin driver appropriate for printers like the",
 " Epson LX-800, the Star NL-10 and NX-1000, the PROPRINTER, and so forth.",
 "",
-" `nec-cp6` is generic 24-pin driver that can be used for printers like the",
+" `nec_cp6` is generic 24-pin driver that can be used for printers like the",
 " NEC CP6 and the Epson LQ-800.",
 "",
 " The `okidata` driver supports the 9-pin OKIDATA 320/321 Standard printers.",
 "",
 " The `starc` driver is for the Star Color Printer.",
 "",
-" The `tandy-60dpi` driver is for the Tandy DMP-130 series of 9-pin, 60-dpi",
+" The `tandy_60dpi` driver is for the Tandy DMP-130 series of 9-pin, 60-dpi",
 " printers.",
 "",
-" Only `nec-cp6` has any options.",
+" The `dpu414` driver is for the Seiko DPU-414 thermal printer.",
+"",
+" `nec_cp6` has the options:",
 "",
 " Syntax:",
-"       set terminal nec-cp6 {monochrome | colour | draft}",
+"       set terminal nec_cp6 {monochrome | colour | draft}",
 "",
 " which defaults to monochrome.",
+"",
+" `dpu414` has the options:",
+"",
+" Syntax:",
+"       set terminal dpu414 {small | medium | large} {normal | draft}",
+"",
+" which defaults to medium (=font size) and normal.",
+" Preferred combinations are `medium normal` and `small draft`.",
 "",
 " With each of these drivers, a binary copy is required on a PC to print.  Do",
 " not use `print`---use instead `copy file /b lpt1:`."
