@@ -8,6 +8,10 @@
 	GPMIN, GPMAX.
 	Bug #1969415
 
+	* src/set.c (set_mouse) src/show.c (show_mouse) src/mouse.c src/mouse.h:
+	Rework mouse option parsing to use dynamically allocated strings and
+	try_to_get_string().
+
 2008-05-31  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* term/epson.trm:  Add support for the Seiko DPU-414 thermal printer

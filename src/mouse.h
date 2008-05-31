@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.18 2006/07/06 23:11:09 mikulik Exp $
+ * $Id: mouse.h,v 1.19 2007/05/18 06:15:31 sfeam Exp $
  */
 
 /* GNUPLOT - mouse.h */
@@ -66,8 +66,8 @@ typedef struct mouse_setting_t {
     int polardistance;     /* display dist. to ruler in polar coordinates */
     int verbose;           /* display ipc commands                        */
     int warp_pointer;      /* warp pointer after starting a zoom box      */
-    char fmt[0xff];        /* fprintf format for printing numbers         */
-    char labelopts[0xff];  /* label options                               */
+    char *fmt;             /* fprintf format for printing numbers         */
+    char *labelopts;       /* label options                               */
 } mouse_setting_t;
 
 extern mouse_setting_t mouse_setting;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.211 2008/05/18 03:31:18 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.212 2008/05/19 17:34:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2817,10 +2817,10 @@ show_mouse()
 		mouse_alt_string);
 	}
 	if (mouse_setting.label) {
-	    fprintf(stderr, "\tButton 2 draws labes with options \"%s\"\n",
+	    fprintf(stderr, "\tButton 2 draws persistent labels with options \"%s\"\n",
 		mouse_setting.labelopts);
 	} else {
-	    fprintf(stderr, "\tdrawing temporary annotation on Button 2\n");
+	    fprintf(stderr, "\tButton 2 draws temporary labels\n");
 	}
 	fprintf(stderr, "\tzoomjump is %s\n",
 	    mouse_setting.warp_pointer ? "on" : "off");

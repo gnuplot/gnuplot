@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.502 2008/05/25 17:14:05 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.503 2008/05/31 05:19:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8193,7 +8193,7 @@ Ffigure_mapcontours
                  {format <string>} \
                  {clipboardformat <int>/<string>} \
                  {mouseformat <int>/<string>} \
-                 {{no}labels} {labeloptions <string>} \
+                 {{no}labels {"labeloptions"}} \
                  {{no}zoomjump} {{no}verbose}
        unset mouse
 
@@ -8238,14 +8238,14 @@ Ffigure_mapcontours
   5   x == date / time                   [31. 12. 1999 23:59, 2.45]
   6   alt. format, specified as string   ""
 
- Choose the option `labels` to get real gnuplot labels on Button 2. (The
- default is `nolabels` which makes Button 2 drawing only temporary annotations
- at the mouse positions). The labels are drawn with the current setting of
- `mouseformat`. `labeloptions` controls which options are passed to the
- `set label` command. The default is "pointstyle 1" which will plot a small
- plus at the label position.  Note that the pointsize is taken from the
- `set pointsize` command.
- Labels can be removed by holding the Ctrl-Key down while clicking with
+=labels
+ Choose the option `labels` to define persistent gnuplot labels using Button 2.
+ The default is `nolabels`, which makes Button 2 draw only a temporary label at
+ the mouse position. Labels are drawn with the current setting of `mouseformat`.
+ The `labeloptions` string is passed to the `set label` command.  The default is
+ "point pointstyle 1" which will plot a small plus at the label position.
+ Temporary labels will disappear at the nex `replot` or mouse zoom operation.
+ Persistent labels can be removed by holding the Ctrl-Key down while clicking
  Button 2 on the label's point. The threshold for how close you must be to the
  label is also determined by the `pointsize`.
 

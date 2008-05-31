@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.274 2008/05/18 03:31:17 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.275 2008/05/22 01:56:55 janert Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2346,18 +2346,13 @@ set_mouse()
 	    mouse_setting.polardistance = 0;
 	    UpdateStatusline();
 	    ++c_token;
-	} else if (equals(c_token, "labels")) {
+	} else if (almost_equals(c_token, "label$s")) {
 	    mouse_setting.label = 1;
 	    ++c_token;
 	    /* check if the optional argument "<label options>" is present */
-	    if (isstring(c_token)) {
-		if (token_len(c_token) >= sizeof(mouse_setting.labelopts)) {
-		    int_error(c_token, "option string too long");
-		} else {
-		    quote_str(mouse_setting.labelopts,
-			c_token, token_len(c_token));
-		}
-		++c_token;
+	    if (isstringvalue(c_token)) {
+		free(mouse_setting.labelopts);
+		mouse_setting.labelopts = try_to_get_string();
 	    }
 	} else if (almost_equals(c_token, "nola$bels")) {
 	    mouse_setting.label = 0;
@@ -2376,34 +2371,23 @@ set_mouse()
 	    ++c_token;
 	} else if (almost_equals(c_token, "fo$rmat")) {
 	    ++c_token;
-	    if (isstring(c_token)) {
-		if (token_len(c_token) >= sizeof(mouse_setting.fmt)) {
-		    int_error(c_token, "format string too long");
-		} else {
-		    quote_str(mouse_setting.fmt, c_token, token_len(c_token));
-		}
-	    } else {
-		int_error(c_token, "expecting string format");
+	    if (isstringvalue(c_token)) {
+		free(mouse_setting.fmt);
+		mouse_setting.fmt = try_to_get_string();
 	    }
-	    ++c_token;
 	} else if (almost_equals(c_token, "cl$ipboardformat")) {
 	    ++c_token;
-	    if (isstring(c_token)) {
-		if (clipboard_alt_string)
+	    if (isstringvalue(c_token)) {
+		free(clipboard_alt_string);
+		clipboard_alt_string = try_to_get_string();
+		if (!strlen(clipboard_alt_string)) {
 		    free(clipboard_alt_string);
-		clipboard_alt_string = gp_alloc
-		    (token_len(c_token), "set->mouse->clipboardformat");
-		quote_str(clipboard_alt_string, c_token, token_len(c_token));
-		if (clipboard_alt_string && !strlen(clipboard_alt_string)) {
-		    free(clipboard_alt_string);
-		    clipboard_alt_string = (char*) 0;
-		    if (MOUSE_COORDINATES_ALT == mouse_mode) {
+		    clipboard_alt_string = NULL;
+		    if (MOUSE_COORDINATES_ALT == mouse_mode)
 			mouse_mode = MOUSE_COORDINATES_REAL;
-		    }
 		} else {
 		    clipboard_mode = MOUSE_COORDINATES_ALT;
 		}
-		c_token++;
 	    } else {
 		int itmp = int_expression();
 		if (itmp >= MOUSE_COORDINATES_REAL
@@ -2422,18 +2406,14 @@ set_mouse()
 	    }
 	} else if (almost_equals(c_token, "mo$useformat")) {
 	    ++c_token;
-	    if (isstring(c_token)) {
-		if (mouse_alt_string)
+	    if (isstringvalue(c_token)) {
+		free(mouse_alt_string);
+		mouse_alt_string = try_to_get_string();
+		if (!strlen(mouse_alt_string)) {
 		    free(mouse_alt_string);
-		mouse_alt_string = gp_alloc
-		    (token_len(c_token), "set->mouse->mouseformat");
-		quote_str(mouse_alt_string, c_token, token_len(c_token));
-		if (mouse_alt_string && !strlen(mouse_alt_string)) {
-		    free(mouse_alt_string);
-		    mouse_alt_string = (char*) 0;
-		    if (MOUSE_COORDINATES_ALT == mouse_mode) {
+		    mouse_alt_string = NULL;
+		    if (MOUSE_COORDINATES_ALT == mouse_mode)
 			mouse_mode = MOUSE_COORDINATES_REAL;
-		    }
 		} else {
 		    mouse_mode = MOUSE_COORDINATES_ALT;
 		}

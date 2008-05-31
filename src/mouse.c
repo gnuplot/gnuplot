@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.98 2008/03/13 20:02:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.99 2008/04/10 18:09:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -84,7 +84,7 @@ mouse_setting_t mouse_setting = {
     300 /* ms */,
     1, 0, 0, 0, 0,
     "% #g",
-    "point pt 1"
+    NULL
 };
 
 /* "usual well-known" keycodes, i.e. those not listed in special_keys in mouse.h
@@ -2418,7 +2418,8 @@ static void
 put_label(char *label, double x, double y)
 {
     char cmd[0xff];
-    sprintf(cmd, "set label \"%s\" at %g,%g %s", label, x, y, mouse_setting.labelopts);
+    sprintf(cmd, "set label \"%s\" at %g,%g %s", label, x, y, 
+	mouse_setting.labelopts ? mouse_setting.labelopts : "point pt 1");
     do_string_replot(cmd);
 }
 
