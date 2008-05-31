@@ -1,3 +1,8 @@
+2008-05-31  Allin Cottrell <cottrell@wfu.edu>
+
+	* term/metapost.trm (MP_filled_polygon):  Limit the number of vertices
+	per line of output.
+
 2008-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots):  'with rgbimage' does not use a palette.
