@@ -2,7 +2,7 @@
 
 	* term/tek.trm src/term.h:  Revise the list of default terminals.
 	New addition to default build: dpu414
-	Omit from default build: ai msdos/kermit selanar
+	Omit from default build: aed ai msdos/kermit selanar
 
 	* src/standard.c:  Replace incorrectly defined macros FMIN, FMAX with
 	GPMIN, GPMAX.

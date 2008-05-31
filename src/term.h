@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.38 2008/03/30 03:27:55 sfeam Exp $
+ * $Id: term.h,v 1.39 2008/05/31 19:49:44 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -246,7 +246,7 @@
 #if !(defined(MSDOS) || defined(_Windows) || defined(AMIGA))
 
 /* AED 512 and AED 767 graphics terminals */
-# include "aed.trm"
+/* # include "aed.trm" */
 
 # if defined(UNIXPLOT) || defined(GNUGRAPH)
 #  ifdef GNUGRAPH
