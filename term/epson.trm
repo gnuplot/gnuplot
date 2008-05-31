@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: epson.trm,v 1.23 2008/05/31 17:08:16 sfeam Exp $
+ * $Id: epson.trm,v 1.24 2008/05/31 19:49:45 sfeam Exp $
  *
  */
 
@@ -1175,9 +1175,9 @@ START_HELP(epson_180dpi)
 " Preferred combinations are `medium normal` and `small draft`.",
 #ifdef MSDOS
 "",
-" With each of these drivers, a binary copy is required on a PC to print.  Do",
-" not use `print`---use instead `copy file /b lpt1:`.",
+" With each of these drivers, a binary copy is required on a PC to print.",
+" Do not use `print`---use instead `copy file /b lpt1:`.",
 #endif
-"".
+""
 END_HELP(epson_180dpi)
 #endif /* TERM_HELP */
