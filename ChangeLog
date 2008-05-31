@@ -4,6 +4,10 @@
 	New addition to default build: dpu414
 	Omit from default build: ai msdos/kermit selanar
 
+	* src/standard.c:  Replace incorrectly defined macros FMIN, FMAX with
+	GPMIN, GPMAX.
+	Bug #1969415
+
 2008-05-31  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* term/epson.trm:  Add support for the Seiko DPU-414 thermal printer

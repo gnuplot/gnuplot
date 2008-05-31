@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.27 2008/03/30 03:03:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.28 2008/03/30 03:27:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -1147,8 +1147,6 @@ TIMEFUNC( f_tmyday, tm_yday)
 
 /*****************************************************************************/
 
-#define		FMIN(a,b)	((a)<(b)?(a):(b))
-#define		FMAX(a,b)	((a)<(b)?(a):(b))
 #define		SQR(a)		((a)*(a))
 
 #define C1 0.3
@@ -1290,8 +1288,8 @@ carlson_elliptic_rj(double x,double y,double z,double p)
 	pt=p;
 	a=b=rcx=0.0;
     } else {
-	xt=FMIN(FMIN(x,y),z);
-	zt=FMAX(FMAX(x,y),z);
+	xt=GPMIN(GPMIN(x,y),z);
+	zt=GPMAX(GPMAX(x,y),z);
 	yt=x+y+z-xt-zt;
 	a=1.0/(yt-p);
 	b=a*(zt-yt)*(yt-xt);
@@ -1346,7 +1344,5 @@ carlson_elliptic_rj(double x,double y,double z,double p)
 #undef	C7
 
 #undef			SQR
-#undef			FMAX
-#undef			FMIN
 
 /*****************************************************************************/
