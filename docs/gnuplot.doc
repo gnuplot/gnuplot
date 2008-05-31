@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.503 2008/05/31 05:19:03 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.504 2008/05/31 23:09:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2060,7 +2060,7 @@ C ... and restart the table:
  Syntax:
        bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
        bind <key-sequence> ""
-       bind!
+       reset bind
 
  The `bind` allows defining or redefining a hotkey, i.e. a sequence of gnuplot
  commands which will be executed when a certain key or key sequence is pressed
@@ -2072,8 +2072,10 @@ C ... and restart the table:
 
  Mouse buttons cannot be rebound.
 
- You get the list of all hotkeys by typing `bind` or by hitting 'h' in the
- graph window.
+ You get the list of all hotkeys by typing `show bind` or `bind` or by typing
+ the hotkey 'h' in the graph window.
+
+ Key bindings are restored to their default state by `reset bind`.
 
  Note that multikey-bindings with modifiers must be given in quotes.
 
@@ -2096,11 +2098,13 @@ C ... and restart the table:
  - show bindings:
      bind "ctrl-a"          # shows the binding for ctrl-a
      bind                   # shows all bindings
+     show bind              # show all bindings
 
  - remove bindings:
      bind "ctrl-alt-a" ""   # removes binding for ctrl-alt-a
                               (note that builtins cannot be removed)
-     bind!                  # installs default (builtin) bindings
+     reset bind             # installs default (builtin) bindings
+     bind!                  # deprecated form of "reset bind"
 
  - bind a key to toggle something:
    v=0
@@ -5773,6 +5777,7 @@ Ffigure_mapcontours
 ?commands reset
 ?reset
 ?reset errors
+?reset bind
  The `reset` command causes all graph-related options that can be set with the
  `set` command to take on their default values.  This command is useful, e.g.,
  to restore the default graph settings at the end of a command file, or to
@@ -5787,6 +5792,9 @@ Ffigure_mapcontours
 =error state
  `reset errors` clears only the error state variables GPVAL_ERRNO and
  GPVAL_ERRMSG.
+
+=bind
+ `reset bind` restores all hotkey bindings to their default state.
 2 save
 ?commands save
 ?save
@@ -6184,6 +6192,11 @@ Ffigure_mapcontours
 
  The `front` and `back` keywords are relevant only to errorbars attached
  to filled rectangles (boxes, candlesticks, histograms).
+3 bind
+?commands show bind
+?show bind
+=bind
+ Show the current state of all hotkey bindings. See `bind`.
 3 bmargin
 ?commands set bmargin
 ?set bmargin

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.117 2008/04/30 04:16:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.118 2008/05/18 03:31:18 janert Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1538,6 +1538,15 @@ reset_command()
 	c_token++;
 	return;
     }
+
+#ifdef USE_MOUSE
+    /* Reset key bindings only */
+    if (equals(c_token, "bind")) {
+	bind_remove_all();
+	c_token++;
+	return;
+    }
+#endif
 
     /* Kludge alert, HBB 20000506: set to noninteractive mode, to
      * suppress some of the commentary output by the individual

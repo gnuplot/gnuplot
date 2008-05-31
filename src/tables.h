@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.63 2008/03/13 19:53:37 sfeam Exp $
+ * $Id: tables.h,v 1.64 2008/05/03 22:19:21 sfeam Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -74,7 +74,7 @@ enum save_id { SAVE_INVALID, SAVE_FUNCS, SAVE_TERMINAL, SAVE_SET, SAVE_VARS };
  * this is rather big, we might be better off with a hash table */
 enum set_id {
     S_INVALID,
-    S_ACTIONTABLE, S_ALL, S_ANGLES, S_ARROW, S_AUTOSCALE, S_BARS, S_BORDER,
+    S_ACTIONTABLE, S_ALL, S_ANGLES, S_ARROW, S_AUTOSCALE, S_BARS, S_BIND, S_BORDER,
     S_BOXWIDTH, S_CLABEL, S_CLIP, S_CNTRPARAM, S_CONTOUR, S_DATA, S_DATAFILE,
     S_FUNCTIONS, S_DGRID3D, S_DUMMY, S_ENCODING, S_DECIMALSIGN, S_FIT,
     S_FONTPATH, S_FORMAT,

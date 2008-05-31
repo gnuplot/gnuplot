@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.43 2008/03/03 03:34:20 sfeam Exp $
+ * $Id: command.h,v 1.44 2008/04/01 19:37:01 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -145,6 +145,8 @@ extern void wxt_lower_terminal_group __PROTO((void));
 #ifdef USE_MOUSE
 void bind_command __PROTO((void));
 void restore_prompt __PROTO((void));
+#else
+#define bind_command()
 #endif
 #ifdef VOLATILE_REFRESH
 void refresh_request __PROTO((void));
