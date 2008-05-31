@@ -1,3 +1,7 @@
+2008-05-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tables.c src/tables.h src/show.c:  'show colornames'.
+
 2008-05-31  Allin Cottrell <cottrell@wfu.edu>
 
 	* term/metapost.trm (MP_filled_polygon):  Limit the number of vertices
