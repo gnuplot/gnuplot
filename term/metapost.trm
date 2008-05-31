@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.38 2006/08/04 20:35:32 sfeam Exp $
+ * $Id: metapost.trm,v 1.38.2.1 2007/02/27 04:10:22 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -941,8 +941,9 @@ MP_filled_polygon(int points, gpiPoint *corners)
 
     fprintf(gpoutfile, "fill ");
     for (i = 0; i < points; i++)
-	fprintf(gpoutfile, "(%.1fa,%.1fb)--",
-		corners[i].x / 10.0, corners[i].y / 10.0);
+	fprintf(gpoutfile, "(%.1fa,%.1fb)%s",
+		corners[i].x / 10.0, corners[i].y / 10.0,
+		(i < points - 1 && (i + 1) % MP_LINEMAX == 0) ? "\n--" : "--");
     fprintf(gpoutfile, "cycle withcolor fillcolor;\n");
 }
 
