@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.71 2008/02/22 06:13:49 sfeam Exp $
+ * $Id: term_api.h,v 1.72 2008/02/24 19:49:37 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -143,7 +143,7 @@ typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT,
 
 #ifdef WITH_IMAGE
 /* Color construction for an image, palette lookup or rgb components. */
-typedef enum t_imagecolor { IC_PALETTE, IC_RGB }
+typedef enum t_imagecolor { IC_PALETTE, IC_RGB, IC_RGBA }
 	     t_imagecolor;
 /* Holder for various image properties */
 typedef struct t_image {
@@ -167,6 +167,7 @@ typedef struct t_image {
 #define TERM_NO_OUTPUTFILE   64  /* terminal doesnt write to a file */
 #define TERM_CAN_CLIP       128  /* terminal does its own clipping  */
 #define TERM_CAN_DASH       256  /* terminal supports dashed lines  */
+#define TERM_ALPHA_CHANNEL  512  /* alpha channel transparency      */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.156 2008/05/10 03:00:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.157 2008/05/19 17:34:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -316,9 +316,6 @@ static struct curve_points *df_current_plot;	/* used to process histogram labels
 TBOOLEAN df_read_binary;
 TBOOLEAN df_matrix_binary;
 int df_plot_mode;
-
-/* Define the following true of binary is to have it's own format string. */
-#define BINARY_HAS_OWN_FORMAT_STRING 1
 
 static int df_readascii __PROTO((double [], int));
 static int df_readbinary __PROTO((double [], int));
@@ -1452,13 +1449,7 @@ plot_option_using(int max_using)
     if (!END_OF_COMMAND && isstring(c_token)) {
 
 	if (df_binary_file)
-# if BINARY_HAS_OWN_FORMAT_STRING
 	    int_error(NO_CARET, "Expecting \"binary format='...'\" or \"binary filetype=...\"");
-# else
-	    if (df_matrix_file)
-		int_error(c_token, matrix_general_binary_conflict_msg);
-	    plot_option_binary_format();
-# endif /* BINARY_HAS_OWN_FORMAT_STRING */
 
 	quote_str(df_format, c_token, MAX_LINE_LEN);
 	if (!valid_format(df_format))
@@ -2553,18 +2544,19 @@ avs_filetype_function(void)
     df_bin_record[0].cart_scan[0] = DF_SCAN_POINT;
     df_bin_record[0].cart_scan[1] = DF_SCAN_LINE;
 
-    /* The four components are 1 byte each.  Treat as three components
-       with the first one ignored. */
-    df_extend_binary_columns(3);
-    df_set_read_type(1, DF_UCHAR);  /* Each pixel component is 1 byte */
+    /* The four components are 1 byte each. Permute ARGB to RGBA */ 
+    df_extend_binary_columns(4);
+    df_set_read_type(1, DF_UCHAR);
     df_set_read_type(2, DF_UCHAR);
     df_set_read_type(3, DF_UCHAR);
-    df_set_skip_before(1,1);        /* Ignore the alpha component of 4-tuple */
+    df_set_read_type(4, DF_UCHAR);
+    df_set_skip_before(1,0);
 
-    df_no_use_specs = 3;
-    use_spec[0].column = 1;
-    use_spec[1].column = 2;
-    use_spec[2].column = 3;
+    df_no_use_specs = 4;
+    use_spec[0].column = 2;
+    use_spec[1].column = 3;
+    use_spec[2].column = 4;
+    use_spec[3].column = 1;
 
 }
 
@@ -2662,7 +2654,8 @@ df_bin_default_columns default_style_cols[LAST_PLOT_STYLE + 1] = {
     {HISTOGRAMS, 1, 0},
 #ifdef WITH_IMAGE
     {IMAGE, 1, 2},
-    {RGBIMAGE, 3, 2}
+    {RGBIMAGE, 3, 2},
+    {RGBA_IMAGE, 4, 2}
 #endif
 #ifdef EAM_OBJECTS
     , {CIRCLES, 2, 1}
@@ -2874,9 +2867,7 @@ plot_option_binary(TBOOLEAN set_matrix)
     TBOOLEAN set_flip = FALSE, set_noflip = FALSE;
     TBOOLEAN set_flipx = FALSE, set_flipy = FALSE, set_flipz = FALSE;
     TBOOLEAN set_scan = FALSE;
-#if BINARY_HAS_OWN_FORMAT_STRING
     TBOOLEAN set_format = FALSE;
-#endif
 
 	/* Binary file type must be the first word in the command following `binary`" */
 	if (almost_equals(c_token, "file$type") || (df_bin_filetype >= 0)) {
@@ -3186,7 +3177,6 @@ plot_option_binary(TBOOLEAN set_matrix)
 	    continue;
 	}
 
-#if BINARY_HAS_OWN_FORMAT_STRING
 	/* deal with various types of binary files */
 	if (almost_equals(c_token, "form$at")) {
 	    if (set_format) { duplication=TRUE; break; }
@@ -3208,7 +3198,6 @@ plot_option_binary(TBOOLEAN set_matrix)
 	    set_format = TRUE;
 	    continue;
 	}
-#endif
 
 	break; /* unknown option */
 

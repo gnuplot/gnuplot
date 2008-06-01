@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.59 2008/05/17 15:37:27 sfeam Exp $
+ * $Id: win.trm,v 1.60 2008/06/01 21:01:04 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -526,6 +526,26 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 	    }
 	    rgb_image -= 3 * M;
 	}
+#if (0) /* Alpha channel transparency not implemented  yet */
+    } else if (color_mode == IC_RGBA) {
+    	unsigned int x, y;
+
+	rgb_image += N * (3 * M + pad_bytes);
+	for (y=0; y<N; y++) {
+	    rgb_image -= 3 * M + pad_bytes;
+	    for(x=0; x<M; x++) {
+		rgb255_color rgb255;
+		rgb255.r = (BYTE) (*image++ * 255 + 0.5);
+		rgb255.g = (BYTE) (*image++ * 255 + 0.5);
+		rgb255.b = (BYTE) (*image++ * 255 + 0.5);
+		image++; /* Throw away alpha channel */
+		*(rgb_image++) = rgb255.b;
+		*(rgb_image++) = rgb255.g;
+		*(rgb_image++) = rgb255.r;
+	    }
+	    rgb_image -= 3 * M;
+	}
+#endif
     }
 
     /* squeze all the information into the buffer */

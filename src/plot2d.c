@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.171 2008/05/25 17:14:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.172 2008/05/31 04:54:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -461,7 +461,12 @@ get_data(struct curve_points *current_plot)
 
     case RGBIMAGE:
 	min_cols = 5;
-	max_cols = 5;
+        max_cols = 6;
+        break;
+
+    case RGBA_IMAGE:
+        min_cols = 6;
+        max_cols = 6;
 	break;
 #endif
 
@@ -558,7 +563,9 @@ get_data(struct curve_points *current_plot)
 	     * ignored for certain plot types requiring 3D coordinates in
 	     * MODE_PLOT.
 	     */
-	    if ((current_plot->plot_style == IMAGE) || (current_plot->plot_style == RGBIMAGE))
+            if (current_plot->plot_style == IMAGE
+	    ||  current_plot->plot_style == RGBIMAGE
+	    ||  current_plot->plot_style == RGBA_IMAGE)
 		continue;
 #endif
 	    /* break in data, make next point undefined */
@@ -858,21 +865,7 @@ get_data(struct curve_points *current_plot)
 
 #ifdef WITH_IMAGE
 		case RGBIMAGE:  /* x_center y_center r_value g_value b_value (rgb) */
-		    store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1], v[1], v[2]);
-
-		    /* There is only one color axis, but we are storing components in
-		     * different variables.  Place all components on the same axis.
-		     * (That will maintain a consistent mapping amongst the components.)
-		     */
-		    cp = &(current_plot->points[i]);
-		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_R, v[2], cp->type, COLOR_AXIS, 
-		    			current_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
-		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_G, v[3], cp->type, COLOR_AXIS,
-		    			current_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
-		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_B, v[4], cp->type, COLOR_AXIS,
-		    			current_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
-		    i++;
-		    break;
+		    goto images;
 #endif
 		}
 		break;
@@ -894,6 +887,22 @@ get_data(struct curve_points *current_plot)
 		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3], v[4],
 			      v[5], 0.0);
 		break;
+#ifdef WITH_IMAGE
+images:
+            case RGBA_IMAGE:  /* x_cent y_cent red green blue alpha */
+            case RGBIMAGE:    /* x_cent y_cent red green blue */
+                store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1], v[1], v[2]);
+                /* We will autoscale the RGB components to  a total range [0:255]
+                 * so we don't need to do any fancy scaling here.
+                 */
+                cp = &(current_plot->points[i]);
+                cp->CRD_R = v[2];
+                cp->CRD_G = v[3];
+                cp->CRD_B = v[4];
+                cp->CRD_A = v[5];	/* Alpha channel */
+                i++;
+                break;
+#endif
 	    }
 
 	}                       /*switch */
@@ -1615,7 +1624,9 @@ eval_plots()
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
 		    }
 #ifdef WITH_IMAGE
-		    if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)
+		    if (this_plot->plot_style == IMAGE
+		    ||  this_plot->plot_style == RGBIMAGE
+		    ||  this_plot->plot_style == RGBA_IMAGE)
 			get_image_options(&this_plot->image_properties);
 #endif
 		    if ((this_plot->plot_type == FUNC) &&
@@ -1920,6 +1931,7 @@ eval_plots()
 #ifdef WITH_IMAGE
 		&& this_plot->plot_style != IMAGE
 		&& this_plot->plot_style != RGBIMAGE
+                && this_plot->plot_style != RGBA_IMAGE
 		/* don't increment the default line/point properties if
 		 * this_plot is an image */
 #endif /* WITH_IMAGE */
@@ -1937,11 +1949,17 @@ eval_plots()
 		    goto SKIPPED_EMPTY_FILE;
 		}
 
-		/* Fiddle the auto-scaling data for histograms */
+		/* Fiddle the auto-scaling data for specific plot styles */
 		if (this_plot->plot_style == HISTOGRAMS)
 		    histogram_range_fiddling(this_plot);
 		if (this_plot->plot_style == BOXES)
 		    box_range_fiddling(this_plot);
+		if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
+		    if (CB_AXIS.autoscale & AUTOSCALE_MIN)
+			CB_AXIS.min = 0;
+		    if (CB_AXIS.autoscale & AUTOSCALE_MAX)
+			CB_AXIS.max = 255;
+		}
 
 		/* sort */
 		switch (this_plot->plot_smooth) {
@@ -1985,7 +2003,9 @@ eval_plots()
 		 * Compensate for extent of the image so `set autoscale fix`
 		 * uses outer edges of outer pixels in axes adjustment.
 		 */
-		if ((this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)) {
+                if ((this_plot->plot_style == IMAGE
+		    || this_plot->plot_style == RGBIMAGE
+		    || this_plot->plot_style == RGBA_IMAGE)) {
 		    this_plot->image_properties.type = IC_PALETTE;
 		    plot_image_or_update_axes(this_plot, TRUE);
 		}

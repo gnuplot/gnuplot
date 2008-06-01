@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.63 2008/03/18 00:16:34 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.64 2008/04/10 18:09:05 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2123,6 +2123,8 @@ void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corn
 
 	if (color_mode == IC_RGB)
 		imax = 3*M*N;
+	else if (color_mode == IC_RGBA)
+		imax = 4*M*N;
 	else
 		imax = M*N;
 

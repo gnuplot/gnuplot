@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.267 2008/05/27 21:57:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.268 2008/05/31 05:19:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -706,7 +706,7 @@ boundary(struct curve_points *plots, int count)
 		    key_cols = 1;
 		    key_panic = TRUE;
 		}
-  		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
+		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
 	    }
 	}
 
@@ -741,7 +741,7 @@ boundary(struct curve_points *plots, int count)
 		else
 		    plot_bounds.xright -= more;
 	    }
-  	}
+	}
 
 	/* warn if we had to punt on key size calculations */
 	if (key_panic)
@@ -770,7 +770,7 @@ boundary(struct curve_points *plots, int count)
     if (axis_array[FIRST_Y_AXIS].ticmode & TICS_ON_AXIS) {
 	/* FIXME: This test for how close the axis is to the border does not match */
 	/*        the tests in axis_output_tics(), and assumes FIRST_X_AXIS.       */
-        if (!inrange(0.0, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max))
+	if (!inrange(0.0, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max))
 	    shift_labels_to_border = TRUE;
 	if (0.1 > fabs( axis_array[FIRST_X_AXIS].min
 	       /  (axis_array[FIRST_X_AXIS].max - axis_array[FIRST_X_AXIS].min)))
@@ -2079,6 +2079,11 @@ do_plot(struct curve_points *plots, int pcount)
 		this_plot->image_properties.type = IC_RGB;
 		plot_image_or_update_axes(this_plot, FALSE);
 		break;
+
+	    case RGBA_IMAGE:
+		this_plot->image_properties.type = IC_RGBA;
+		plot_image_or_update_axes(this_plot, FALSE);
+		break;
 #endif
 #ifdef EAM_OBJECTS
 	    case CIRCLES:
@@ -2520,7 +2525,7 @@ plot_filledcurves(struct curve_points *plot)
 			    /* Fill in dummy points at plot corners if the bounding curve */
 			    /* went around the corner while out of range */
 			    fill_missing_corners(corners, &points, 
-			    	exit_edge, reentry_edge, out_updown, out_leftright);
+				exit_edge, reentry_edge, out_updown, out_leftright);
 
 			/* vector(map_x(ex),map_y(ey)); */
 			corners[points].x = map_x(ex);
@@ -2654,7 +2659,7 @@ plot_filledcurves(struct curve_points *plot)
     if (clip_fill) {   /* Did we finish cleanly, or is there an unresolved corner-crossing? */
 	if (first_entry && first_entry != exit_edge) {
 	    fill_missing_corners(corners, &points, exit_edge, first_entry,
-	    	out_updown, out_leftright);
+		out_updown, out_leftright);
 	}
     }
     
@@ -5316,7 +5321,7 @@ do_key_sample(
 		draw_clip_line( xl + key_sample_right, yl + key_entry_height/4,
 			    xl + key_sample_left,  yl + key_entry_height/4);
 		draw_clip_line( xl + key_sample_left,  yl + key_entry_height/4,
-	    		    xl + key_sample_left,  yl - key_entry_height/4);
+			    xl + key_sample_left,  yl - key_entry_height/4);
 		closepath();
 	    }
 	    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED) {
@@ -5463,7 +5468,6 @@ check_for_variable_color(struct curve_points *plot, struct coordinate *point)
 
 /* These might work better as fuctions, but defines will do for now. */
 #define ERROR_NOTICE(str)         "\nGNUPLOT (plot_image):  " str
-#define ERROR_NOTICE_NEWLINE(str) "\n                       " str
 
 /* hyperplane_between_points:
  * Compute the hyperplane representation of a line passing
@@ -5658,10 +5662,13 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	fprintf(stderr, ERROR_NOTICE("This terminal does not support palette-based images.\n\n"));
 	return;
     }
-    if (pixel_planes == IC_RGB && !term->set_color) {
+    if ((pixel_planes == IC_RGB || pixel_planes == IC_RGBA) && !term->set_color) {
 	fprintf(stderr, ERROR_NOTICE("This terminal does not support rgb images.\n\n"));
 	return;
     }
+    /* Use generic code to handle alpha channel if the terminal can't */
+    if (pixel_planes == IC_RGBA && !(term->flags & TERM_ALPHA_CHANNEL))
+	rectangular_image = FALSE;
 
     view_port_x[0] = (X_AXIS.set_autoscale & AUTOSCALE_MIN) ? X_AXIS.min : X_AXIS.set_min;
     view_port_x[1] = (X_AXIS.set_autoscale & AUTOSCALE_MAX) ? X_AXIS.max : X_AXIS.set_max;
@@ -5714,9 +5721,10 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	array_size = K*L;
 
 	/* If doing color, multiply size by three for RGB triples. */
-	if (pixel_planes == IC_RGB) {
+	if (pixel_planes == IC_RGB)
 	    array_size *= 3;
-	}
+	else if (pixel_planes == IC_RGBA)
+	    array_size *= 4;
 
 	image = (coordval *) gp_alloc(array_size*sizeof(image[0]),"image");
 
@@ -5807,6 +5815,8 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 			image[i_sub_image++] = cb2gray( points[i_image].CRD_R );
 			image[i_sub_image++] = cb2gray( points[i_image].CRD_G );
 			image[i_sub_image++] = cb2gray( points[i_image].CRD_B );
+			if (pixel_planes == IC_RGBA)
+			    image[i_sub_image++] = points[i_image].CRD_A;
 		    }
 
 		}
@@ -5863,7 +5873,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 		    corners[3].y = map_y(view_port_y[0]);
 		}
 
-		if ( (pixel_planes == IC_PALETTE) || (pixel_planes == IC_RGB) )
+		if ( (pixel_planes == IC_PALETTE) || (pixel_planes == IC_RGB) || (pixel_planes == IC_RGBA))
 		    (*term->image) (M, N, image, corners, pixel_planes);
 		else
 		    fprintf(stderr, ERROR_NOTICE("Invalid pixel color planes specified.\n\n"));
@@ -5878,134 +5888,135 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 
     } else {	/* !rectangular_image  or "with image failsafe" */
 
-	    /* Use sum of vectors to compute the pixel corners with respect to its center. */
-	    struct {double x; double y; double z;} delta_grid[2], delta_pixel[2];
-	    int j, i_image;
+	/* Use sum of vectors to compute the pixel corners with respect to its center. */
+	struct {double x; double y; double z;} delta_grid[2], delta_pixel[2];
+	int j, i_image;
 
-	    if (!term->filled_polygon)
-		int_error(NO_CARET, "This terminal does not support filled polygons");
+	if (!term->filled_polygon)
+	    int_error(NO_CARET, "This terminal does not support filled polygons");
 
-	    /* Grid spacing in 3D space. */
-	    delta_grid[0].x = (points[grid_corner[1]].x - points[grid_corner[0]].x)/(K-1);
-	    delta_grid[0].y = (points[grid_corner[1]].y - points[grid_corner[0]].y)/(K-1);
-	    delta_grid[0].z = (points[grid_corner[1]].z - points[grid_corner[0]].z)/(K-1);
-	    delta_grid[1].x = (points[grid_corner[2]].x - points[grid_corner[0]].x)/(L-1);
-	    delta_grid[1].y = (points[grid_corner[2]].y - points[grid_corner[0]].y)/(L-1);
-	    delta_grid[1].z = (points[grid_corner[2]].z - points[grid_corner[0]].z)/(L-1);
+	/* Grid spacing in 3D space. */
+	delta_grid[0].x = (points[grid_corner[1]].x - points[grid_corner[0]].x)/(K-1);
+	delta_grid[0].y = (points[grid_corner[1]].y - points[grid_corner[0]].y)/(K-1);
+	delta_grid[0].z = (points[grid_corner[1]].z - points[grid_corner[0]].z)/(K-1);
+	delta_grid[1].x = (points[grid_corner[2]].x - points[grid_corner[0]].x)/(L-1);
+	delta_grid[1].y = (points[grid_corner[2]].y - points[grid_corner[0]].y)/(L-1);
+	delta_grid[1].z = (points[grid_corner[2]].z - points[grid_corner[0]].z)/(L-1);
 
-	    /* Pixel dimensions in the 3D space. */
-	    delta_pixel[0].x = (delta_grid[0].x + delta_grid[1].x) / 2;
-	    delta_pixel[0].y = (delta_grid[0].y + delta_grid[1].y) / 2;
-	    delta_pixel[0].z = (delta_grid[0].z + delta_grid[1].z) / 2;
-	    delta_pixel[1].x = (delta_grid[0].x - delta_grid[1].x) / 2;
-	    delta_pixel[1].y = (delta_grid[0].y - delta_grid[1].y) / 2;
-	    delta_pixel[1].z = (delta_grid[0].z - delta_grid[1].z) / 2;
+	/* Pixel dimensions in the 3D space. */
+	delta_pixel[0].x = (delta_grid[0].x + delta_grid[1].x) / 2;
+	delta_pixel[0].y = (delta_grid[0].y + delta_grid[1].y) / 2;
+	delta_pixel[0].z = (delta_grid[0].z + delta_grid[1].z) / 2;
+	delta_pixel[1].x = (delta_grid[0].x - delta_grid[1].x) / 2;
+	delta_pixel[1].y = (delta_grid[0].y - delta_grid[1].y) / 2;
+	delta_pixel[1].z = (delta_grid[0].z - delta_grid[1].z) / 2;
 
-	    i_image = 0;
+	i_image = 0;
 
-	    for (j=0; j < L; j++) {
+	for (j=0; j < L; j++) {
 
-		double x_line_start, y_line_start, z_line_start;
+	    double x_line_start, y_line_start, z_line_start;
 
-		x_line_start = points[grid_corner[0]].x + j * delta_grid[1].x;
-		y_line_start = points[grid_corner[0]].y + j * delta_grid[1].y;
-		z_line_start = points[grid_corner[0]].z + j * delta_grid[1].z;
+	    x_line_start = points[grid_corner[0]].x + j * delta_grid[1].x;
+	    y_line_start = points[grid_corner[0]].y + j * delta_grid[1].y;
+	    z_line_start = points[grid_corner[0]].z + j * delta_grid[1].z;
 
-		for (i=0; i < K; i++) {
+	    for (i=0; i < K; i++) {
 
-		    double x, y, z;
-		    TBOOLEAN corner_in_range[4];
-		    TBOOLEAN pixel_in_view = FALSE, view_in_pixel = FALSE;
-		    struct {double x; double y; double z;} p_corners[4]; /* Parallelogram corners. */
-		    int k;
+		double x, y, z;
+		TBOOLEAN corner_in_range[4];
+		TBOOLEAN pixel_in_view = FALSE, view_in_pixel = FALSE;
+		struct {double x; double y; double z;} p_corners[4]; /* Parallelogram corners. */
+		int k;
 
-		    x = x_line_start + i * delta_grid[0].x;
-		    y = y_line_start + i * delta_grid[0].y;
-		    z = z_line_start + i * delta_grid[0].z;
+		/* Treat alpha channel as all or none */
+		if (pixel_planes == IC_RGBA && (points[i_image].CRD_A) < 127) {
+		    i_image++;
+		    continue;
+		}
 
-		    p_corners[0].x = x + delta_pixel[0].x;
-		    p_corners[0].y = y + delta_pixel[0].y;
-		    p_corners[0].z = z + delta_pixel[0].z;
-		    p_corners[1].x = x + delta_pixel[1].x;
-		    p_corners[1].y = y + delta_pixel[1].y;
-		    p_corners[1].z = z + delta_pixel[1].z;
-		    p_corners[2].x = x - delta_pixel[0].x;
-		    p_corners[2].y = y - delta_pixel[0].y;
-		    p_corners[2].z = z - delta_pixel[0].z;
-		    p_corners[3].x = x - delta_pixel[1].x;
-		    p_corners[3].y = y - delta_pixel[1].y;
-		    p_corners[3].z = z - delta_pixel[1].z;
+		x = x_line_start + i * delta_grid[0].x;
+		y = y_line_start + i * delta_grid[0].y;
+		z = z_line_start + i * delta_grid[0].z;
 
-		    /* Check if any of the corners are viewable */
-		    for (k=0; k < 4; k++) {
-			corner_in_range[k] =
-			    inrange(p_corners[k].x, view_port_x[0], view_port_x[1])
-			    && inrange(p_corners[k].y, view_port_y[0], view_port_y[1])
-			    && (!project_points || splot_map ||
-			        inrange(p_corners[k].z, view_port_z[0], view_port_z[1]));
-			pixel_in_view = pixel_in_view || corner_in_range[k];
-		    }
+		p_corners[0].x = x + delta_pixel[0].x;
+		p_corners[0].y = y + delta_pixel[0].y;
+		p_corners[0].z = z + delta_pixel[0].z;
+		p_corners[1].x = x + delta_pixel[1].x;
+		p_corners[1].y = y + delta_pixel[1].y;
+		p_corners[1].z = z + delta_pixel[1].z;
+		p_corners[2].x = x - delta_pixel[0].x;
+		p_corners[2].y = y - delta_pixel[0].y;
+		p_corners[2].z = z - delta_pixel[0].z;
+		p_corners[3].x = x - delta_pixel[1].x;
+		p_corners[3].y = y - delta_pixel[1].y;
+		p_corners[3].z = z - delta_pixel[1].z;
 
-		    if (pixel_in_view || view_in_pixel) {
+		/* Check if any of the corners are viewable */
+		for (k=0; k < 4; k++) {
+		    corner_in_range[k] =
+			inrange(p_corners[k].x, view_port_x[0], view_port_x[1])
+			&& inrange(p_corners[k].y, view_port_y[0], view_port_y[1])
+			&& (!project_points || splot_map ||
+			    inrange(p_corners[k].z, view_port_z[0], view_port_z[1]));
+		    pixel_in_view = pixel_in_view || corner_in_range[k];
+		}
 
-			int N_corners = 0;    /* Number of corners. */
-			gpiPoint corners[5];  /* At most 5 corners. */
+		if (pixel_in_view || view_in_pixel) {
 
-			corners[0].style = FS_DEFAULT;
+		    int N_corners = 0;    /* Number of corners. */
+		    gpiPoint corners[5];  /* At most 5 corners. */
 
-			if (pixel_in_view) {
-			    if (corner_in_range[0] && corner_in_range[1] && corner_in_range[2] && corner_in_range[3]) {
-				int i_corners;
+		    corners[0].style = FS_DEFAULT;
 
-				N_corners = 4;
+		    if (pixel_in_view) {
+			if (corner_in_range[0] && corner_in_range[1] && corner_in_range[2] && corner_in_range[3]) {
+			    int i_corners;
 
-				for (i_corners=0; i_corners < N_corners; i_corners++) {
-				    if (project_points) {
-					map3d_xy_double(p_corners[i_corners].x, p_corners[i_corners].y, p_corners[i_corners].z,
-						 &x, &y);
-					corners[i_corners].x = x;
-					corners[i_corners].y = y;
-				    } else {
-					corners[i_corners].x = map_x(p_corners[i_corners].x);
-					corners[i_corners].y = map_y(p_corners[i_corners].y);
-				    }
-				}
-			    } else {
-				/* Clip out one or more of the corners to create triangle, quadrangle or pentagon. */
-				static short clipping_yet_to_be_added_indicated = 0;
-				if (!clipping_yet_to_be_added_indicated) {
-				    /* Some tricky geometry.  Save until certain this will be in Gnuplot. */
-				    fprintf(stderr,"\nNOTICE:  A triangle/quadrangle/pentagon clipping algorithm\n"
-					    "         needs to be added for pixels at the boundary.  Image\n"
-					    "         may lie outside borders in some instances.\n\n");
-				    clipping_yet_to_be_added_indicated = 1;
+			    N_corners = 4;
+
+			    for (i_corners=0; i_corners < N_corners; i_corners++) {
+				if (project_points) {
+				    map3d_xy_double(p_corners[i_corners].x, p_corners[i_corners].y,
+						    p_corners[i_corners].z, &x, &y);
+				    corners[i_corners].x = x;
+				    corners[i_corners].y = y;
+				} else {
+				    corners[i_corners].x = map_x(p_corners[i_corners].x);
+				    corners[i_corners].y = map_y(p_corners[i_corners].y);
 				}
 			    }
 			} else {
-			    /* Could still be visible if any of the four corners of the view port are
-			     * within the parallelogram formed by the pixel.  This is also some tricky
-			     * geometry.  Wait until it is certain that this will be a part of Gnuplot..
+			    /* DJS FIXME:
+			     * A triangle/quadrangle/pentagon clipping algorithm needs to be
+			     * added for pixels at the boundary.
 			     */
 			}
-
-			if (N_corners >= 3) {
-			    if (pixel_planes == IC_PALETTE)
-				set_color( cb2gray(points[i_image].CRD_COLOR) );
-			    else {
-				int r = cb2gray(points[i_image].CRD_R) * 255. + 0.5;
-				int g = cb2gray(points[i_image].CRD_G) * 255. + 0.5;
-				int b = cb2gray(points[i_image].CRD_B) * 255. + 0.5;
-				int rgblt = (r << 16) + (g << 8) + b;
-				set_rgbcolor(rgblt);
-			    }
-			    (*term->filled_polygon) (N_corners, corners);
-			}
+		    } else {
+			/* DJS FIXME:
+			 * Could still be visible if any of the four corners of the view port are
+			 * within the parallelogram formed by the pixel.  This is tricky geometry.
+			 */
 		    }
 
-		    i_image++;
+		    if (N_corners >= 3) {
+			if (pixel_planes == IC_PALETTE)
+			    set_color( cb2gray(points[i_image].CRD_COLOR) );
+			else {
+			    int r = cb2gray(points[i_image].CRD_R) * 255. + 0.5;
+			    int g = cb2gray(points[i_image].CRD_G) * 255. + 0.5;
+			    int b = cb2gray(points[i_image].CRD_B) * 255. + 0.5;
+			    int rgblt = (r << 16) + (g << 8) + b;
+			    set_rgbcolor(rgblt);
+			}
+			(*term->filled_polygon) (N_corners, corners);
+		    }
 		}
+
+		i_image++;
 	    }
 	}
+    }
     }
 
 }

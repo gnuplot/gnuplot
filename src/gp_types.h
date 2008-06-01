@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.38 2008/05/18 03:49:12 janert Exp $
+ * $Id: gp_types.h,v 1.39 2008/05/25 17:25:34 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -103,6 +103,7 @@ typedef enum PLOT_STYLE {
 #ifdef WITH_IMAGE
     , IMAGE        = 25*PLOT_STYLE_BITS + 0
     , RGBIMAGE     = 26*PLOT_STYLE_BITS + 0
+    , RGBA_IMAGE   = 27*PLOT_STYLE_BITS + 0
 #endif
     , CIRCLES      = 27*PLOT_STYLE_BITS + PLOT_STYLE_HAS_FILL
 } PLOT_STYLE;
@@ -151,6 +152,7 @@ typedef enum coord_type {
 #define CRD_R yhigh
 #define CRD_G xlow
 #define CRD_B xhigh
+#define CRD_A ylow
 /* The field of 'struct coordinate' used for storing the point size in plot
  * style POINTSTYLE with variable point size
  */

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.21 2007/06/26 10:20:34 tlecomte Exp $
+ * $Id: wxt.trm,v 1.22 2008/02/04 22:52:28 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -355,7 +355,8 @@ TERM_TABLE_START (wxt_driver)
     wxt_move, wxt_vector, wxt_linetype, wxt_put_text,
     wxt_text_angle, wxt_justify_text,
     wxt_point, do_arrow, wxt_set_font,
-    wxt_pointsize, TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE,
+    wxt_pointsize,
+    TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL,
     wxt_text /* suspend */, 0 /* resume */, wxt_fillbox, wxt_linewidth
 #ifdef USE_MOUSE
     , wxt_waitforinput, wxt_put_tmptext, wxt_set_ruler, wxt_set_cursor, wxt_set_clipboard

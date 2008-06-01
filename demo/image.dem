@@ -226,16 +226,11 @@ reset
 
 print ""
 print "The range of valid pixel values can be set via \`cbrange\`.  If the"
-print "\`cbrange\` is in autoscale mode, Gnuplot will attempt to adjust the"
-print "luminance based upon the maximum pixel value in the image.  Previous"
-print "graphs all had the \`cbrange\' in autoscale mode.  However, there are"
-print "instances where one may want to force the image luminance or palette"
-print "to be of a certain range.  For example, each channel of the penguin"
-print "image has an 8-bit depth, and hence the valid range is from 0 to 255."
-print "The logical choice of \`cbrange\' is [0:255].  This is done in the"
-print "upper left image.  However, the image can be saturated by choosing a"
-print "smaller range, as done in the upper right image.  Expanding the color"
-print "box range will darken the image, as shown in the bottom examples."
+print "\`cbrange\` is in autoscale mode, gnuplot will set the color scale"
+print "range of RGB images to [0:255] (8 bits of color info per channel)."
+print "This is the case in the upper left image.  However, the image can be"
+print "saturated by choosing a smaller range, as done in the upper right image."
+print "Expanding the colorbox range will darken the image as in the bottom examples."
 print ""
 set size 1.0, 1.0
 set origin 0.0, 0.0

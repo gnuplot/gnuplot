@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.505 2008/06/01 04:30:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.506 2008/06/01 06:11:22 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -203,9 +203,9 @@ C
  See `labels`.
 
 4 Image data
- The `image` and `rgbimage` styles allow to plot 2D images (from ascii or
- `binary` files) and map them in a 2D or 3D plot.
- See `image` and `rgbimage`.
+ The `image`, `rgbimage`, and `rgbalpha` styles allow to plot 2D images from
+ an ascii or `binary` input file and map it onto a plane within a 2D or 3D plot.
+ See `image`, `rgbimage`, and `rgbalpha`.
 
 4 Filled curves
  The plot style `fillstyle` has been augmented to allow to fill the area
@@ -3041,23 +3041,48 @@ Ffigure_histcols
 ?plotting styles image
 ?style image
 ?image
- The `image` style is intended for projecting 2D images onto either 2D or 3D
- plots.  It may be used for both `plot` and `splot` in the form of 3D data
- (x,y,value) or projected 4D data (x,y,z,value), respectively.  It is assumed
- that in the viewing plane the image data forms an equidistant sampling grid in
- the viewing plane along two, not necessarily  orthogonal, directions.  In other
- words, groups of four adjacent points are assumed to form the same size
- parallelogram.  The variable `value` in the tuples represent a palette color
- (gray value) for indexing in the current palette.
-
+?rgbimage
+?rgbalpha
+ The `image`, `rgbimage`, and `rgbalpha` plotting styles all project an input 2D
+ image onto either a 2D or 3D plot.  It is assumed that the image data forms an
+ equidistant sampling grid in the viewing plane along two, not necessarily
+ orthogonal, directions.  In other words, each group of four adjacent points is
+ assumed to form a uniformly sized parallelogram.  The paralleogram is painted
+ using the color of the corresponding pixel in the input image.
+ 
  Each pixel (data point) of the input 2D image will become a rectangle or
- parallelipiped in theplot.  The coordinate of each data point will determine
+ parallelipiped in the plot. The coordinates of each data point will determine
  the center of the parallelipiped.  That is, an M x N set of data will form an
- image with M x N pixels.  This is slightly different than pm3d elements where
+ image with M x N pixels.  This is different from the pm3d plotting style, where
  an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
- directions for the image data grid can be any of eight possible combinations.
+ directions for a binary image data grid can be further controlled by additional
+ keywords. See `binary general keywords flipx`, `center`, and `rotate`.
 
- See also `rgbimage`.
+ The `image` style handles input pixels containing a grayscale or color palette
+ value. Thus 2D plots (`plot` command) require 3 columns of data (x,y,value),
+ while 3D plots (`splot` command) require 4 columns of data (x,y,z,value).
+ 
+ The `rgbimage` style handles input pixels that are described by three separate
+ values for the red, green, and blue components.  Thus 5D data (x,y,r,g,b) is
+ needed for `plot` and 6D data (x,y,z,r,g,b) for `splot`.  The individual red,
+ green, and blue components are assumed to lie in the range [0:255].
+
+ The `rgbalpha` style handles input pixels that contain alpha channel 
+ (transparency) information in addition to the red, green, and blue components.
+ Thus 6D data (x,y,r,g,b,a) is needed for `plot` and 7D data (x,y,z,r,g,b,a)
+ for `splot`.  The r, g, b, and alpha components are assumed to lie in the range
+ [0:255].
+3 transparency
+?image transparency
+?transparency
+?alpha channel
+ The `rgbalpha` plotting style assumes that each pixel of input data contains
+ an alpha value in the range [0:255].  A pixel with alpha = 0 is purely
+ transparent and does not alter the underlying contents of the plot. A pixel
+ with alpha = 255 is purely opaque.  All terminal types can handle these two
+ extreme cases.  A pixel with 0 < alpha < 255 is partially transparent.
+ Only a few terminal types can handle this correctly; other terminals will
+ approximate this by treating alpha as being either 0 or 255.
 3 image failsafe
 ?commands set style image failsafe
 ?set style image failsafe
@@ -3071,17 +3096,6 @@ Ffigure_histcols
  This optimized code may be disabled by using the keyword `failsafe`. E.g.
 
        plot 'data' with image failsafe
-
- Here are some specific comments about particular terminal drivers:
-
- x11 and wxt - Pixels are either repeated or decimated to fit the display
- resolution; no other processing (filtering) is done.  Thus, aliasing may
- occur when decimating images having high spatial frequency content.
-
- postscript (pslatex, epslatex, pstex) - Image is copied in its original
- resolution, and sample interpolation is turned off.
-
- See also `rgbimage`.
 2 impulses
 ?commands set style impulses
 ?set style impulses
@@ -3196,18 +3210,18 @@ Ffigure_steps
  steps demo.
 ^ </a>
 
+2 rgbalpha
+?commands set style rgbalpha
+?set style rgbalpha
+?plotting styles rgbalpha
+?style rgbalpha
+ See `image`.
 2 rgbimage
 ?commands set style rgbimage
 ?set style rgbimage
 ?plotting styles rgbimage
 ?style rgbimage
-?rgbimage
- The `rgbimage` style is intended for plotting 2D images and is similar
- in concept to `image`.  See `image` for details.  The difference is
- that 5D data (x,y,r,g,b) for `plot` and 6D data (x,y,z,r,g,b) for `splot`
- describe the coordinates and color components of an image.
-
- See also `image`.
+ See `image`.
 2 vectors
 ?commands set style vectors
 ?set style vectors
@@ -4576,11 +4590,13 @@ Ffigure_mapcontours
  is for plotting in three dimensions.
 6 center
 ?binary general keywords center
+?center
  Similar to `origin`, this keyword will position the array such that its center
  lies at the point given by the tuple.  For example, `center=(0,0)`.  Center
  does not apply when the size of the array is `Inf`.
 6 rotate
 ?binary general keywords rotate
+?rotate
  The transpose and flip commands provide some flexibility in generating and
  orienting coordinates.  However, for full degrees of freedom, it is possible to
  apply a rotational vector described by a rotational angle in two dimensions.

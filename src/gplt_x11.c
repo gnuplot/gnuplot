@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.186 2008/02/24 19:49:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.187 2008/04/10 18:09:04 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2705,7 +2705,10 @@ exec_cmd(plot_struct *plot, char *command)
 
 		/* Number of symbols depends upon whether it is color or palette lookup. */
 		i_remaining = M*N*sizeof(image[0]);
-		if (color_mode == IC_RGB) i_remaining *= 3;
+		if (color_mode == IC_RGB)
+		    i_remaining *= 3;
+		else if (color_mode == IC_RGBA)
+		    i_remaining *= 4;
 
 		if (!i_remaining) {
 		    fprintf(stderr, ERROR_NOTICE("Image of size zero.\n\n"));
@@ -2769,7 +2772,10 @@ exec_cmd(plot_struct *plot, char *command)
 		/* If the byte order needs to be swapped, do so. */
 		if (swap_endian) {
 		    int i = M*N;
-		    if (color_mode == IC_RGB) {i *= 3;}
+		    if (color_mode == IC_RGB)
+			i *= 3;
+		    else if (color_mode == IC_RGBA)
+			i *= 4;
 		    for (i--; i >= 0; i--) {
 			/* The assumption is that image data through the pipe is 16 bits. */
 			byteswap2(&image[i]);
@@ -3008,6 +3014,7 @@ exec_cmd(plot_struct *plot, char *command)
 
 			if (sample_data) {
 
+			    XImage *image_src;
 			    XImage *image_dest;
 
 			    /* Create an initialized image object. */
@@ -3017,6 +3024,11 @@ exec_cmd(plot_struct *plot, char *command)
 				fputs("gnuplot_x11: can't get memory for image object.\n", stderr);
 				EXIT(1);
 			    }
+
+			    /* Get the drawable image if using alpha blending. */
+			    if (color_mode == IC_RGBA)
+				image_src = XGetImage(dpy, plot->pixmap, final_1_1_x_plot, final_1_1_y_plot,
+						      M_view, N_view, AllPlanes, ZPixmap);
 
 			    /* Fill in the output image data by decimating or repeating the input image data. */
 			    for (j_view=0; j_view < N_view; j_view++) {
@@ -3058,11 +3070,31 @@ exec_cmd(plot_struct *plot, char *command)
 #endif
 #endif
 					XPutPixel(image_dest, i_view, j_view, pixel);
-				    } else {
+				    } else if (color_mode == IC_RGB) {
 					int index3 = 3*(row_start + i);
 					unsigned long pixel = ((unsigned int)((image[index3++]>>R_rshift)&R_msb_mask)) << R_lshift;
 					pixel |= ((unsigned int)((image[index3++]>>G_rshift)&G_msb_mask)) << G_lshift;
 					pixel |= ((unsigned int)((image[index3]>>B_rshift)&B_msb_mask)) << B_lshift;
+					XPutPixel(image_dest, i_view, j_view, pixel);
+				    } else {
+					/* EAM - I'm confused as to where the scaling happens, but by the time
+					 * we arrive here, RGB components run 0-0xffff but A runs 0-0xff
+					 */
+					int index4 = 4*(row_start + i);
+					double alpha = (double)(image[index4 + 3] & 0xff) / 255.;
+
+					/* Decompose existing pixel, i.e., reverse process. */
+					unsigned long pixel = XGetPixel(image_src, i_view, j_view);
+					unsigned int red = ((pixel>>R_lshift)&R_msb_mask) << R_rshift;
+					unsigned int green = ((pixel>>G_lshift)&G_msb_mask) << G_rshift;
+					unsigned int blue = ((pixel>>B_lshift)&B_msb_mask) << B_rshift;
+					/* Apply alpha blending. */
+					red   = (alpha * image[index4++] + (1.-alpha) * red);
+					green = (alpha * image[index4++] + (1.-alpha) * green);
+					blue  = (alpha * image[index4]   + (1.-alpha) * blue);
+					pixel = ((unsigned int)((red>>R_rshift)&R_msb_mask)) << R_lshift;
+					pixel |= ((unsigned int)((green>>G_rshift)&G_msb_mask)) << G_lshift;
+					pixel |= ((unsigned int)((blue>>B_rshift)&B_msb_mask)) << B_lshift;
 					XPutPixel(image_dest, i_view, j_view, pixel);
 				    }
 				}
@@ -3090,6 +3122,8 @@ exec_cmd(plot_struct *plot, char *command)
 
 			    /* Free resources. */
 			    XDestroyImage(image_dest);
+			    if (color_mode == IC_RGBA)
+				XDestroyImage(image_src);
 
 			    /* XDestroyImage frees the sample_data memory, so no "free" here. */
 

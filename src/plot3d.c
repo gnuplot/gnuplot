@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.160 2008/03/20 09:05:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.161 2008/05/18 03:31:17 janert Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -311,7 +311,9 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 	/* IMAGE clipping is done elsewhere, so we don't need INRANGE/OUTRANGE
 	 * checks.  
 	 */
-	if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE) {
+	if (this_plot->plot_style == IMAGE 
+	||  this_plot->plot_style == RGBIMAGE
+	||  this_plot->plot_style == RGBA_IMAGE) {
 	    if (x_axis->set_autoscale)
 		plot_image_or_update_axes(this_plot,TRUE);
 	    continue;
@@ -765,7 +767,8 @@ get_3ddata(struct surface_points *this_plot)
 		 * images.
 		 */
 		if ((this_plot->plot_style == IMAGE)
-		    || (this_plot->plot_style == RGBIMAGE))
+		||  (this_plot->plot_style == RGBIMAGE)
+		||  (this_plot->plot_style == RGBA_IMAGE))
 		    continue;
 #endif
 		if (this_plot->plot_style == VECTOR)
@@ -1011,14 +1014,14 @@ get_3ddata(struct surface_points *this_plot)
 		store_label(this_plot->labels, cp, xdatum, df_tokens[3], color);
 
 #ifdef WITH_IMAGE
-	    if (this_plot->plot_style == RGBIMAGE) {
-		/* There is only one color axis, but we are storing components in
-		 * different variables.  Place all components on the same axis.
-		 * That will maintain a consistent mapping amongst the components.
+	    if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
+		/* We will autoscale the RGB components to  a total range [0:255]
+		 * so we don't need to do any fancy scaling here.
 		 */
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_R, v[3], cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_G, v[4], cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_B, v[5], cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		cp->CRD_R = v[3];
+		cp->CRD_G = v[4];
+		cp->CRD_B = v[5];
+		cp->CRD_A = v[6];	/* Alpha channel */
 	    }
 #endif
 
@@ -1445,7 +1448,9 @@ eval_3dplots()
 		    }
 
 #ifdef WITH_IMAGE
-		    if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)
+		    if (this_plot->plot_style == IMAGE
+		    ||  this_plot->plot_style == RGBA_IMAGE
+		    ||  this_plot->plot_style == RGBIMAGE)
 			get_image_options(&this_plot->image_properties);
 #endif
 		    set_with = TRUE;
@@ -1625,6 +1630,7 @@ eval_3dplots()
 #ifdef WITH_IMAGE
 		&& this_plot->plot_style != IMAGE
 		&& this_plot->plot_style != RGBIMAGE
+		&& this_plot->plot_style != RGBA_IMAGE
 		/* same as above, for an (rgb)image plot */
 #endif
 		) {
@@ -1634,9 +1640,14 @@ eval_3dplots()
 	    }
 
 #ifdef WITH_IMAGE
-	    /* Styles that utilize palettes. */
 	    if (this_plot->plot_style == IMAGE)
 		this_plot->lp_properties.use_palette = 1;
+	    if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
+		if (CB_AXIS.autoscale & AUTOSCALE_MIN)
+		    CB_AXIS.min = 0;
+		if (CB_AXIS.autoscale & AUTOSCALE_MAX)
+		    CB_AXIS.max = 255;
+	    }
 #endif
 
 	    /* now get the data... having to think hard here...
@@ -1990,7 +2001,8 @@ eval_3dplots()
 	    if (this_plot->plot_style == LABELPOINTS
 	    ||  this_plot->plot_style == VECTOR
 	    ||  this_plot->plot_style == IMAGE
-	    ||  this_plot->plot_style == RGBIMAGE)
+	    ||  this_plot->plot_style == RGBIMAGE
+	    ||  this_plot->plot_style == RGBA_IMAGE)
 		continue;
 
 	    /* Allow individual surfaces to opt out of contouring */

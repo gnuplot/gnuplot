@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.37 2008/03/08 06:37:17 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.38 2008/05/08 00:10:02 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1027,6 +1027,22 @@ void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, in
 			rgb1.b = *image++;
 			rgb255_from_rgb1( rgb1, &rgb255 );
 			*image255copy++ = (0xFF<<24) + (rgb255.r<<16) + (rgb255.g<<8) + rgb255.b;
+		}
+		}
+	} else if (color_mode == IC_RGBA) {
+		unsigned char alpha255;
+		double alpha1;
+		for (n=0; n<N; n++) {
+		for (m=0; m<M; m++) {
+			alpha255 = *(image+3);
+			alpha1 = (float)alpha255 / 255.;
+			rgb1.r = alpha1 * (*image++);
+			rgb1.g = alpha1 * (*image++);
+			rgb1.b = alpha1 * (*image++);
+			image++;
+			rgb255_from_rgb1( rgb1, &rgb255 );
+			*image255copy++ = (alpha255<<24)
+					+ (rgb255.r<<16) + (rgb255.g<<8) + rgb255.b;
 		}
 		}
 	/* Palette plot->color lookup from gray value */

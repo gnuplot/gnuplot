@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.124 2008/02/24 19:49:38 sfeam Exp $
+ * $Id: gd.trm,v 1.125 2008/04/06 20:41:33 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2054,7 +2054,7 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
 	    int_error(NO_CARET,"libgd: failed to create image structure");
     } else
 #endif
-	{
+    {
 	im = gdImageCreate(M, N);
 	if (!im)
 	    int_error(NO_CARET,"libgd: failed to create image structure");
@@ -2071,12 +2071,38 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
     gdImageSetClip(png_state.image, xclip1, yclip1, xclip2, yclip2);
 #endif
 
-    /* Copy and resize onto requested region of plot */
+    /* Initialize image area with current contents of plot. */
     mout = abs( (int)corner[1].x - (int)corner[0].x );
     nout = abs( (int)corner[1].y - (int)corner[0].y );
 
-    /* TrueColor 24-bit color mode */
-    if (color_mode == IC_RGB) {
+    if (color_mode == IC_RGBA) {
+	/* RGB + Alpha channel
+	 * Resize explicitly in a loop rather than calling a library
+	 * routine in order not to apply the alpha correction more than
+	 * once when building up any given output pixel.
+	 */
+	for (n=0; n<nout; n++) {
+	for (m=0; m<mout; m++) {
+	    rgb_color rgb1;
+	    rgb255_color rgb255;
+	    int alpha;
+	    int msrc = (m*(long)(M-1))/(mout-1);
+	    int nsrc = (n*(long)(N-1))/(nout-1);
+	    coordval *cval = image + 4*(M*nsrc + msrc);
+	    rgb1.r = *cval++;
+	    rgb1.g = *cval++;
+	    rgb1.b = *cval++;
+	    alpha  = *cval++;
+	    alpha  = 127 - (alpha>>1);	/* input is [0:255] but gd wants [127:0] */
+	    rgb255_from_rgb1( rgb1, &rgb255 );
+	    pixel = gdImageColorResolveAlpha( png_state.image,
+		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b, alpha);
+	    gdImageSetPixel( png_state.image, m + corner[0].x, n + Y(corner[0].y), pixel );
+	}
+	}
+
+    } else if (color_mode == IC_RGB) {
+	/* TrueColor 24-bit color mode */
 	for (n=0; n<N; n++) {
 	for (m=0; m<M; m++) {
 	    rgb_color rgb1;
@@ -2090,8 +2116,9 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
 	    gdImageSetPixel( im, m, n, pixel );
 	}
 	}
-    /* Palette color lookup from gray value */
-    } else {
+
+    } else if (color_mode == IC_PALETTE) {
+	/* Palette color lookup from gray value */
 	for (n=0; n<N; n++) {
 	for (m=0; m<M; m++) {
 	    rgb255_color rgb;
@@ -2103,13 +2130,14 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
 	}
     }
 
-    /* FIXME - WOULD gdImageCopyResampled() do a nicer job ??? */
-    gdImageCopyResized(png_state.image, im,
-	(corner[0].x), Y(corner[0].y),	/* Destination X, Y */
-	0, 0, 				/* Source X, Y */
-	mout, nout,			/* Destination Width, Height */
-	M, N				/* Source Width, Height */
-	);
+    /* Copy and resize onto requested region of plot */
+    if (color_mode != IC_RGBA)
+	gdImageCopyResized(png_state.image, im,
+		(corner[0].x), Y(corner[0].y),	/* Destination X, Y */
+		0, 0, 				/* Source X, Y */
+		mout, nout,			/* Destination Width, Height */
+		M, N				/* Source Width, Height */
+		);
     gdImageDestroy(im);
 
 #if (GD2_VERS >= 2)
@@ -2134,7 +2162,7 @@ TERM_TABLE_START(png_driver)
     PNG_linetype, PNG_put_text, PNG_text_angle,
     PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
     PNG_pointsize,
-    TERM_BINARY,
+    TERM_BINARY | TERM_ALPHA_CHANNEL,
     0 /*suspend*/, 0 /*resume*/,
     PNG_boxfill /*EAM - fillbox*/,
     PNG_linewidth /*EAM - linewidth*/
@@ -2316,7 +2344,7 @@ TERM_TABLE_START(jpeg_driver)
     PNG_linetype, PNG_put_text, PNG_text_angle,
     PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
     PNG_pointsize,
-    TERM_CAN_MULTIPLOT | TERM_BINARY,
+    TERM_CAN_MULTIPLOT | TERM_BINARY | TERM_ALPHA_CHANNEL,
     0 /*suspend*/, 0 /*resume*/,
     PNG_boxfill /*EAM - fillbox*/,
     PNG_linewidth /*EAM - linewidth*/

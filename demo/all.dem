@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.38 2008/03/13 21:57:54 sfeam Exp $
+# $Id: all.dem,v 1.39 2008/05/23 17:56:43 janert Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -208,9 +208,10 @@ load "histograms.dem"
 load "histograms2.dem"
 reset
 
-print "********************** file image.dem *********************"
+print "**********************    Image formats    *********************"
 load "image.dem"
 load "image2.dem"
+load "rgbalpha.dem"
 reset
 
 print "********************** file stringvar.dem *********************"
