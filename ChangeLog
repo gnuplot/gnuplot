@@ -1,3 +1,8 @@
+2008-06-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/win.trm: Use a dynamically allocated string for the window title.
+	Bug #1769857
+
 2008-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/tek.trm src/term.h:  Revise the list of default terminals.

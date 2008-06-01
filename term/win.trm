@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.58 2008/04/28 16:04:17 sfeam Exp $
+ * $Id: win.trm,v 1.59 2008/05/17 15:37:27 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -141,7 +141,7 @@ static struct gen_table WIN_opts[] =
     { NULL, WIN_OTHER }
 };
 
-static char WIN_gtitle[MAXTITLELEN] = WINGRAPHTITLE;
+static char *WIN_gtitle = NULL;
 
 static int WIN_last_linetype = LT_NODRAW; /* HBB 20000813: linetype caching */
 
@@ -172,8 +172,6 @@ WIN_options()
     char *s;
     TBOOLEAN set_font = FALSE, set_fontsize = FALSE;
     TBOOLEAN set_title=FALSE;
-
-    graphwin.Title = WIN_gtitle;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&WIN_opts[0],c_token)) {
@@ -207,15 +205,9 @@ WIN_options()
 	    break;
 	case WIN_GTITLE:
 	    c_token++;
-	    if (END_OF_COMMAND)
-		int_error(c_token, "expecting title text");
-	    if (isstring(c_token))
-		quote_str( WIN_gtitle, c_token, MAXTITLELEN );
-	    else
- 		copy_str( WIN_gtitle, c_token, MAXTITLELEN );
-	    c_token++;
 	    set_title = TRUE;
-	    graphwin.Title = WIN_gtitle;
+	    free(WIN_gtitle);
+	    WIN_gtitle = try_to_get_string();
 	    break;
 	case WIN_FONT:
 	    c_token++;
@@ -267,7 +259,8 @@ WIN_options()
 
     if (IsWindow(graphwin.hWndGraph) && IsIconic(graphwin.hWndGraph))
 	ShowWindow(graphwin.hWndGraph, SW_SHOWNORMAL);
-    /* shige */
+
+    graphwin.Title = (WIN_gtitle ? WIN_gtitle : WINGRAPHTITLE);
     if (set_title) GraphChangeTitle(&graphwin);
 
     GraphRedraw(&graphwin);
