@@ -824,10 +824,12 @@ PNG_options()
 	    break;
 	case PNG_TRUECOLOR:
 	    png_state.TrueColor = TRUE;
+	    term->flags |= TERM_ALPHA_CHANNEL;
 	    c_token++;
 	    break;
 	case PNG_NOTRUECOLOR:
 	    png_state.TrueColor = FALSE;
+	    term->flags &= ~TERM_ALPHA_CHANNEL;
 	    c_token++;
 	    break;
 	case PNG_LINEWIDTH:
@@ -996,9 +998,10 @@ PNG_options()
 	strcat(term_options, "interlace ");
     }
     /* JPEG files are always 24-bit color */
-    if (strcmp(term->name, "jpeg") == 0)
+    if (strcmp(term->name, "jpeg") == 0) {
 	png_state.TrueColor = TRUE;
-    else if (png_state.TrueColor) {
+	term->flags |= TERM_ALPHA_CHANNEL;
+    } else if (png_state.TrueColor) {
 	strcat(term_options, "truecolor ");
     }
     if (!(png_state.flags & PNG_USE_CROP)) {
@@ -2162,7 +2165,7 @@ TERM_TABLE_START(png_driver)
     PNG_linetype, PNG_put_text, PNG_text_angle,
     PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
     PNG_pointsize,
-    TERM_BINARY | TERM_ALPHA_CHANNEL,
+    TERM_CAN_MULTIPLOT | TERM_BINARY, /* TERM_ALPHA_CHANNEL only if truecolor */
     0 /*suspend*/, 0 /*resume*/,
     PNG_boxfill /*EAM - fillbox*/,
     PNG_linewidth /*EAM - linewidth*/

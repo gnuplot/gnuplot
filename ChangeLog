@@ -40,7 +40,7 @@
 
 	* src/wxterminal/wxt_gui.cpp (wxt_image): Data limit 4*M*N for IC_RGB.
 
-	* term/x11.trm term/wxt.trm term/cairo.trm term/gd.trm:
+	* term/x11.trm term/wxt.trm term/cairo.trm term/gd.trm term/svg.trm:
 	Add flag TERM_ALPHA_CHANNEL.
 
 	* term/win.trm (WIN_image): Placemarker for code handling alpha channel.

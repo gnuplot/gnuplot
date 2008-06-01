@@ -5929,10 +5929,13 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 		struct {double x; double y; double z;} p_corners[4]; /* Parallelogram corners. */
 		int k;
 
-		/* Treat alpha channel as all or none */
-		if (pixel_planes == IC_RGBA && (points[i_image].CRD_A) < 127) {
-		    i_image++;
-		    continue;
+		/* If terminal can't handle alpha, treat it as all-or-none. */
+		if (pixel_planes == IC_RGBA) {
+		    if ((points[i_image].CRD_A == 0)
+		    ||  (points[i_image].CRD_A < 128 &&  !(term->flags & TERM_ALPHA_CHANNEL))) {
+			i_image++;
+			continue;
+		    }
 		}
 
 		x = x_line_start + i * delta_grid[0].x;
@@ -6008,6 +6011,10 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 			    int b = cb2gray(points[i_image].CRD_B) * 255. + 0.5;
 			    int rgblt = (r << 16) + (g << 8) + b;
 			    set_rgbcolor(rgblt);
+			}
+			if (pixel_planes == IC_RGBA && term->flags & TERM_ALPHA_CHANNEL) {
+			    int alpha = points[i_image].CRD_A;
+			    corners[0].style = FS_SOLID + (alpha<<4);
 			}
 			(*term->filled_polygon) (N_corners, corners);
 		    }

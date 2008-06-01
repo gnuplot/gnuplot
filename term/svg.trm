@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.93 2008/02/16 04:35:29 sfeam Exp $
+ * $Id: svg.trm,v 1.94 2008/05/14 04:05:29 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1455,7 +1455,7 @@ TERM_TABLE_START (svg_driver)
     SVG_options, SVG_init, SVG_reset, SVG_text, null_scale, SVG_graphics,
     SVG_move, SVG_vector, SVG_linetype, SVG_put_text, SVG_text_angle,
     SVG_justify_text, SVG_point, do_arrow, SVG_set_font, do_pointsize,
-    TERM_CAN_MULTIPLOT | TERM_BINARY | TERM_CAN_DASH,
+    TERM_CAN_MULTIPLOT | TERM_BINARY | TERM_CAN_DASH | TERM_ALPHA_CHANNEL,
     0 /* suspend */, 0 /* resume */ , SVG_fillbox, SVG_linewidth
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for svg */
