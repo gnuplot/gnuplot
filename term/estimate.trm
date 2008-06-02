@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: estimate.trm,v 1.5 2007/02/27 05:06:41 sfeam Exp $
+ * $Id: estimate.trm,v 1.6 2007/11/22 05:57:43 sfeam Exp $
  *
  */
 
@@ -35,6 +35,7 @@ static double ENHest_xsave, ENHest_ysave;
 static double ENHest_fragment_width;
 static double ENHest_fontsize;
 static double ENHest_min_height, ENHest_max_height;
+static double ENHest_total_width;
 
 static TBOOLEAN ENHest_opened_string;
 static TBOOLEAN ENHest_show = TRUE;
@@ -105,6 +106,7 @@ ENHest_FLUSH()
 	    /* Normal case is to update position to end of fragment */
 	    ENHest_x += len;
 
+	ENHest_total_width = GPMAX(ENHest_total_width, ENHest_x);
 	ENHest_opened_string = FALSE;
     }
 }
@@ -117,9 +119,10 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
     ENHest_opened_string = FALSE;
     ENHest_max_height = 1.0;
     ENHest_min_height = 0.0;
+    ENHest_total_width = 0.0;
 
     /* If no enhanced text processing is needed, strlen() is sufficient */
-    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~\n")) {
 	term->xmax = strlen(str);
 	term->ymax = 10;
 	return;
@@ -140,13 +143,21 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
 
     if (ENHest_x > 0.0 && ENHest_x < 1.0)
 	ENHest_x = 1;
-    term->xmax = ENHest_x;
+    term->xmax = ENHest_total_width;
     term->ymax = 10. * (ENHest_max_height - ENHest_min_height) + 0.5;
 }
 
 TERM_PUBLIC void
 ENHest_writec(int c)
 {
+    if (c == '\n') {
+	ENHest_FLUSH();
+	ENHest_opened_string = TRUE;
+	ENHest_min_height -= 1.0 * ENHest_fontsize;
+	ENHest_base -= 1.0 * ENHest_fontsize;
+	ENHest_x = 0;
+    }
+
     ENHest_fragment_width += ENHest_fontsize;
 }
 

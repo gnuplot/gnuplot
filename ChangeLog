@@ -9,6 +9,9 @@
 	handle that. 
 	Bug #172806
 
+	* src/term.c (estimate_strlen) term/estimate.trm:
+	Allow for embedded newlines when estimating string length and height.
+
 2008-06-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/term-ja.diff docs/gnuplot-ja.doc:

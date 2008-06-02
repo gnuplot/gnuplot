@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.173 2008/03/30 03:27:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.174 2008/06/02 19:18:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2744,13 +2744,14 @@ estimate_strlen(char *text)
 int len;
 
 #ifdef GP_ENH_EST
-    if (term->flags & TERM_ENHANCED_TEXT) {
+    if (strchr(text,'\n') || (term->flags & TERM_ENHANCED_TEXT)) {
 	struct termentry *tsave = term;
 	term = &ENHest;
 	term->put_text(0,0,text);
 	len = term->xmax;
+	FPRINTF((stderr,"Estimating length %d height %g for enhanced text string \"%s\"\n",
+		len, (double)(term->ymax)/10., text));
 	term = tsave;
-	FPRINTF((stderr,"Estimating length %d for enhanced text string \"%s\"\n",len,text));
     } else
 #endif
 	len = strlen(text);
