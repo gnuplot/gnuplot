@@ -344,7 +344,6 @@ a reply to you.  There is a form for such postings on the WWW site.
 
 @cindex new-features
 
-@c ?version 4.2 features
 Gnuplot version 4.2 offers many new features introduced since the preceding
 official version 4.0. This section lists major additions and gives a partial
 list of changes and minor new features. For a more exhaustive list, see the
@@ -394,9 +393,9 @@ See @ref{labels}.
 @node Image_data, Filled_curves, Label_plots, New_plot_styles
 @subsubsection Image data
 
-The `image` and @ref{rgbimage} styles allow to plot 2D images (from ascii or
-`binary` files) and map them in a 2D or 3D plot.
-See `image` and @ref{rgbimage}.
+The `image`, @ref{rgbimage}, and @ref{rgbalpha} styles allow to plot 2D images from
+an ascii or `binary` input file and map it onto a plane within a 2D or 3D plot.
+See `image`, @ref{rgbimage}, and @ref{rgbalpha}.
 
 
 @node Filled_curves, Vectors, Image_data, New_plot_styles
@@ -420,9 +419,9 @@ See @ref{vectors}.
 
 Gnuplot can now read a generic `binary` input, including matrix binary and
 `general binary` (until now gnuplot supported only its own `binary matrix`
-format). Several matrix file formats are autodetected (`gpbin`, `edf`, `avs`).
-Binary data files are mainly useful for `image` and @ref{rgbimage} drawings.
-See `binary` and `binary general filetype`.
+format). Several matrix file formats are autodetected by filename extension
+(`gpbin`, `edf`, `avs`).  Binary data files are mainly useful for `image` and
+@ref{rgbimage} drawings.  See `binary` and `binary general filetype`.
 
 
 @node New_plot_elements, String_handling, Input_from_binary_data_files, New_features_introduced_in_version_4.2
@@ -660,7 +659,6 @@ individual terminals.
 @node Features_introduced_in_version_4.0, Batch/Interactive_Operation, Backwards_compatibility, gnuplot
 @section Features introduced in version 4.0
 
-@c ?version 4 features
 Gnuplot version 4.0 contained many features introduced since the preceding
 official version 3.7.  These are summarized here.
 
@@ -2765,7 +2763,8 @@ palette.
 
 "palette z" maps the z value of each plot segment or plot element into the
 cbrange mapping of the palette. This allows smoothly-varying color along a
-3d line or surface. This option applies only to 3D plots (splot).
+3d line or surface. It also allows coloring 2D plots by palette values read
+from an extra column of data (not all 2D plot styles allow an extra column).
 
 @menu
 * rgbcolor_variable::           
@@ -2820,12 +2819,14 @@ See also the command `set mouse`.
 
 @c ?commands bind
 @cindex bind
+@opindex bind
+
 
 Syntax:
 @example
       bind @{allwindows@} [<key-sequence>] ["<gnuplot commands>"]
       bind <key-sequence> ""
-      bind!
+      reset bind
 
 @end example
 
@@ -2839,8 +2840,10 @@ exception, see `bind space`.
 
 Mouse buttons cannot be rebound.
 
-You get the list of all hotkeys by typing `bind` or by hitting 'h' in the
-graph window.
+You get the list of all hotkeys by typing `show bind` or `bind` or by typing
+the hotkey 'h' in the graph window.
+
+Key bindings are restored to their default state by `reset bind`.
 
 Note that multikey-bindings with modifiers must be given in quotes.
 
@@ -2867,6 +2870,7 @@ Examples:
 @example
     bind "ctrl-a"          # shows the binding for ctrl-a
     bind                   # shows all bindings
+    show bind              # show all bindings
 
 @end example
 
@@ -2874,7 +2878,8 @@ Examples:
 @example
     bind "ctrl-alt-a" ""   # removes binding for ctrl-alt-a
                              (note that builtins cannot be removed)
-    bind!                  # installs default (builtin) bindings
+    reset bind             # installs default (builtin) bindings
+    bind!                  # deprecated form of "reset bind"
 
 @end example
 
@@ -3500,6 +3505,7 @@ file are interpreted as plot data, see @ref{using}.
 * linespoints::                 
 * points::                      
 * steps::                       
+* rgbalpha::                    
 * rgbimage::                    
 * vectors::                     
 * xerrorbars::                  
@@ -3690,13 +3696,18 @@ plots, then add the keyword `whiskerbars` to the plot command.  By default
 these whiskerbars extend the full horizontal width of the candlestick, but
 you can modify this by specifying a fraction of the full width.
 
-By default the rectangle is empty if (open < close), and filled with three
-vertical bars if (close < open). If filled-boxes support is present, then
-the rectangle is colored according to `set style fill <fillstyle>`.
-See @ref{bars} and @ref{financebars}.  See also
-@uref{http://gnuplot.sourceforge.net/demo/candlesticks.html,finance demos
+The usual convention for financial data is that the rectangle is empty
+if (open < close) and solid fill if (close < open). This is the behavior you
+will get if the current fillstyle is set to "empty". See `fillstyle`.
+If you set the fillstyle to solid or pattern, then this will be used for
+all boxes independent of open and close values.
+See also @ref{bars} and @ref{financebars}.  See also the
+@uref{http://gnuplot.sourceforge.net/demo/candlesticks.html,candlestick
 }
-.
+and
+@uref{http://gnuplot.sourceforge.net/demo/finance.html,finance 
+}
+demos.
 
 Note: To place additional symbols, such as the median value, on a
 box-and-whisker plot requires additional plot commands as in this example:
@@ -4139,29 +4150,61 @@ For example, to create stacked histograms of the data in columns 3 through 8
 @c ?style image
 @cindex image
 
-The `image` style is intended for projecting 2D images onto either 2D or 3D
-plots.  It may be used for both `plot` and `splot` in the form of 3D data
-(x,y,value) or projected 4D data (x,y,z,value), respectively.  It is assumed
-that in the viewing plane the image data forms an equidistant sampling grid in
-the viewing plane along two, not necessarily  orthogonal, directions.  In other
-words, groups of four adjacent points are assumed to form the same size
-parallelogram.  The variable `value` in the tuples represent a palette color
-(gray value) for indexing in the current palette.
+@cindex rgbimage
+
+@cindex rgbalpha
+
+The `image`, @ref{rgbimage}, and @ref{rgbalpha} plotting styles all project an input 2D
+image onto either a 2D or 3D plot.  It is assumed that the image data forms an
+equidistant sampling grid in the viewing plane along two, not necessarily
+orthogonal, directions.  In other words, each group of four adjacent points is
+assumed to form a uniformly sized parallelogram.  The paralleogram is painted
+using the color of the corresponding pixel in the input image.
 
 Each pixel (data point) of the input 2D image will become a rectangle or
-parallelipiped in theplot.  The coordinate of each data point will determine
+parallelipiped in the plot. The coordinates of each data point will determine
 the center of the parallelipiped.  That is, an M x N set of data will form an
-image with M x N pixels.  This is slightly different than pm3d elements where
+image with M x N pixels.  This is different from the pm3d plotting style, where
 an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
-directions for the image data grid can be any of eight possible combinations.
+directions for a binary image data grid can be further controlled by additional
+keywords. See `binary general keywords flipx`, `center`, and `rotate`.
 
-See also @ref{rgbimage}.
+The `image` style handles input pixels containing a grayscale or color palette
+value. Thus 2D plots (`plot` command) require 3 columns of data (x,y,value),
+while 3D plots (`splot` command) require 4 columns of data (x,y,z,value).
+
+The @ref{rgbimage} style handles input pixels that are described by three separate
+values for the red, green, and blue components.  Thus 5D data (x,y,r,g,b) is
+needed for `plot` and 6D data (x,y,z,r,g,b) for `splot`.  The individual red,
+green, and blue components are assumed to lie in the range [0:255].
+
+The @ref{rgbalpha} style handles input pixels that contain alpha channel 
+(transparency) information in addition to the red, green, and blue components.
+Thus 6D data (x,y,r,g,b,a) is needed for `plot` and 7D data (x,y,z,r,g,b,a)
+for `splot`.  The r, g, b, and alpha components are assumed to lie in the range
+[0:255].
 
 @menu
+* transparency::                
 * image_failsafe::              
 @end menu
 
-@node image_failsafe,  , image, image
+@node transparency, image_failsafe, image, image
+@subsection transparency
+
+@c ?image transparency
+@cindex transparency
+
+@c ?alpha channel
+The @ref{rgbalpha} plotting style assumes that each pixel of input data contains
+an alpha value in the range [0:255].  A pixel with alpha = 0 is purely
+transparent and does not alter the underlying contents of the plot. A pixel
+with alpha = 255 is purely opaque.  All terminal types can handle these two
+extreme cases.  A pixel with 0 < alpha < 255 is partially transparent.
+Only a few terminal types can handle this correctly; other terminals will
+approximate this by treating alpha as being either 0 or 255.
+
+@node image_failsafe,  , transparency, image
 @subsection image failsafe
 
 @c ?commands set style image failsafe
@@ -4180,17 +4223,6 @@ This optimized code may be disabled by using the keyword `failsafe`. E.g.
       plot 'data' with image failsafe
 
 @end example
-
-Here are some specific comments about particular terminal drivers:
-
-x11 and wxt - Pixels are either repeated or decimated to fit the display
-resolution; no other processing (filtering) is done.  Thus, aliasing may
-occur when decimating images having high spatial frequency content.
-
-postscript (pslatex, epslatex, pstex) - Image is copied in its original
-resolution, and sample interpolation is turned off.
-
-See also @ref{rgbimage}.
 
 @node impulses, labels, image, plotting_styles
 @section impulses
@@ -4321,7 +4353,7 @@ The `points` style displays a small symbol at each point.  The command @ref{poin
 required if 3D plots.  See `style lines`.  Additional input columns may be used
 to provide information such as variable point size or line color.
 
-@node steps, rgbimage, points, plotting_styles
+@node steps, rgbalpha, points, plotting_styles
 @section steps
 
 @c ?commands set style steps
@@ -4341,21 +4373,23 @@ See also
 }
 
 
-@node rgbimage, vectors, steps, plotting_styles
+@node rgbalpha, rgbimage, steps, plotting_styles
+@section rgbalpha
+
+@c ?commands set style rgbalpha
+@c ?set style rgbalpha
+@c ?plotting styles rgbalpha
+@c ?style rgbalpha
+See `image`.
+
+@node rgbimage, vectors, rgbalpha, plotting_styles
 @section rgbimage
 
 @c ?commands set style rgbimage
 @c ?set style rgbimage
 @c ?plotting styles rgbimage
 @c ?style rgbimage
-@cindex rgbimage
-
-The @ref{rgbimage} style is intended for plotting 2D images and is similar
-in concept to `image`.  See `image` for details.  The difference is
-that 5D data (x,y,r,g,b) for `plot` and 6D data (x,y,z,r,g,b) for `splot`
-describe the coordinates and color components of an image.
-
-See also `image`.
+See `image`.
 
 @node vectors, xerrorbars, rgbimage, plotting_styles
 @section vectors
@@ -6173,6 +6207,8 @@ is for plotting in three dimensions.
 @noindent --- CENTER ---
 
 @c ?binary general keywords center
+@cindex center
+
 Similar to @ref{origin}, this keyword will position the array such that its center
 lies at the point given by the tuple.  For example, `center=(0,0)`.  Center
 does not apply when the size of the array is `Inf`.
@@ -6181,6 +6217,8 @@ does not apply when the size of the array is `Inf`.
 @noindent --- ROTATE ---
 
 @c ?binary general keywords rotate
+@cindex rotate
+
 The transpose and flip commands provide some flexibility in generating and
 orienting coordinates.  However, for full degrees of freedom, it is possible to
 apply a rotational vector described by a rotational angle in two dimensions.
@@ -6568,6 +6606,9 @@ resulting points are then connected by straight line segments.
 The `frequency` option makes the data monotonic in x; points with the same
 x-value are replaced by a single point having the summed y-values.  The
 resulting points are then connected by straight line segments.
+See also
+@uref{http://www.gnuplot.info/demo/smooth.html,smooth.dem
+}
 
 
 @noindent --- CUMULATIVE ---
@@ -6586,6 +6627,9 @@ x-value are replaced by a single point containing the cumulative sum of
 y-values of all data points with lower x-values (i.e. to the left of the
 current data point). This can be used to obtain a cumulative distribution 
 function from data.
+See also
+@uref{http://www.gnuplot.info/demo/smooth.html,smooth.dem
+}
 
 @node special-filenames, thru, smooth, data
 @subsubsection special-filenames
@@ -7442,8 +7486,9 @@ command @ref{palette}. The color value corresponds to the z-value of the
 point coordinates or to the color coordinate if specified by the 4th parameter
 in @ref{using}. Both 2d and 3d plots (`plot` and `splot` commands) can use palette
 colors as specified by either their fractional value or the corresponding value
-mapped to the colorbox range. 2d plots can not use palette colors mapped by
-Z value. See `colors`, @ref{palette}, `linetype`.
+mapped to the colorbox range.  A palette color value can also be read from an
+explicitly specified input column in the @ref{using} specifier.
+See `colors`, @ref{palette}, `linetype`.
 
 The keyword `nohidden3d` applies only to plots made with the `splot` command.
 Normally the global option @ref{hidden3d} applies to all plots in the graph.
@@ -7773,6 +7818,7 @@ See animate.dem in demo directory for an animated example.
 
 
 @c ?reset errors
+@c ?reset bind
 The @ref{reset} command causes all graph-related options that can be set with the
 `set` command to take on their default values.  This command is useful, e.g.,
 to restore the default graph settings at the end of a command file, or to
@@ -7791,6 +7837,12 @@ The following are _not_ affected by @ref{reset}.
 
 `reset errors` clears only the error state variables GPVAL_ERRNO and
 GPVAL_ERRMSG.
+
+@cindex bind
+@opindex bind
+
+
+`reset bind` restores all hotkey bindings to their default state.
 
 @node save, set-show, reset, Commands
 @section save
@@ -7880,6 +7932,7 @@ when the variable was initially defined.
 * arrow::                       
 * autoscale::                   
 * bars::                        
+* bind_::                       
 * bmargin::                     
 * border::                      
 * boxwidth::                    
@@ -8402,7 +8455,7 @@ See also
 @uref{http://www.gnuplot.info/demo/poldat.html,polar demos.
 }
 
-@node bars, bmargin, autoscale, set-show
+@node bars, bind_, autoscale, set-show
 @subsection bars
 
 @c ?commands set bars
@@ -8436,7 +8489,18 @@ itself.
 The `front` and `back` keywords are relevant only to errorbars attached
 to filled rectangles (boxes, candlesticks, histograms).
 
-@node bmargin, border, bars, set-show
+@node bind_, bmargin, bars, set-show
+@subsection bind
+
+@c ?commands show bind
+@c ?show bind
+@cindex bind
+@opindex bind
+
+
+Show the current state of all hotkey bindings. See `bind`.
+
+@node bmargin, border, bind_, set-show
 @subsection bmargin
 
 @c ?commands set bmargin
@@ -9036,6 +9100,7 @@ options are currently implemented.
 @subsubsection set datafile fortran
 
 @c ?set datafile fortran
+@c ?show datafile fortran
 @cindex fortran
 
 The `set datafile fortran` command enables a special check for values in the
@@ -9048,6 +9113,7 @@ containing Fortran D or Q constants. The option can be disabled again using
 @subsubsection set datafile missing
 
 @c ?set datafile missing
+@c ?show datafile missing
 @c ?set missing
 @cindex missing
 
@@ -9119,6 +9185,7 @@ will be treated as missing data.
 @subsubsection set datafile separator
 
 @c ?set datafile separator
+@c ?show datafile separator
 @cindex separator
 
 The command `set datafile separator "<char>"` tells `gnuplot` that data fields
@@ -9211,6 +9278,12 @@ Examples:
 @example
       set datafile binary filetype=auto
       set datafile binary array=512x512 format="%uchar"
+
+@end example
+
+@c ?show datafile binary
+@example
+      show datafile binary   # list current settings
 
 @end example
 
@@ -9316,7 +9389,10 @@ structure.
 
 Syntax:
 @example
-      set dgrid3d @{<row_size>@} @{,@{<col_size>@} @{,<norm>@}@}
+      set dgrid3d @{<rows>@} @{,@{<cols>@}@}
+                  @{ splines |
+                    qnorm @{<norm>@} |
+                    gauss | cauchy | exp | box | hann @{<dx>@} @{,@{dy@}@} @}
       unset dgrid3d
       show dgrid3d
 
@@ -9327,48 +9403,76 @@ are always treated as a scattered data set.  A grid with dimensions derived
 from a bounding box of the scattered data and size as specified by the
 row/col_size parameters is created for plotting and contouring.  The grid
 is equally spaced in x (rows) and in y (columns); the z values are computed
-as weighted averages of the scattered points' z values.
+as weighted averages or spline interpolations of the scattered points' z 
+values. In other words, a regularly spaced grid is created and the a smooth
+approximation to the raw data is evaluated for all grid points. Only this
+approximation is plotted, but not the raw data.
 
-The third parameter, norm, controls the weighting:  Each data point is
+The number of columns defaults to the number of rows, which defaults to 10.
+
+Several algorithms are available to calculate the approximation from the
+raw data. Some of these algorithms can take additional parameters.
+These interpolations are such the closer the data point is to a grid point, 
+the more effect it has on that grid point.
+
+The `splines` algorithm calculates an interpolation based on "thin plate
+splines". It does not take additional paramaters.
+
+The `qnorm` algorithm calculates a weighted average of the input data at
+each grid point. Each data point is
 weighted inversely by its distance from the grid point raised to the norm
 power.  (Actually, the weights are given by the inverse of dx^norm + dy^norm,
 where dx and dy are the components of the separation of the grid point from
 each data point.  For some norms that are powers of two, specifically 4, 8,
 and 16, the computation is optimized by using the Euclidean distance in the
 weight calculation, (dx^2+dy^2)^norm/2.  However, any non-negative integer
-can be used.)
+can be used.) The power of the norm can be specified as a single optional
+parameter. This algorithm is the default.
 
-The closer the data point is to a grid point, the more effect it has on
-that grid point and the larger the value of norm the less effect more
-distant data points have on that grid point.
+Finally, several smoothing kernels are available to calculate weighted
+averages: z = Sum_i w(d_i) * z_i / Sum_i w(d_i), where z_i is the value
+of the i-th data point and d_i is the distance between the current grid
+point and the location of the i-th data point. All kernels assign higher
+weights to data points that are close to the current grid point and lower
+weights to data points further away.
 
-The @ref{dgrid3d} option is a simple low pass filter that converts scattered
-data to a grid data set.  More sophisticated approaches to this problem
-exist and should be used to preprocess the data outside `gnuplot` if this
-simple solution is found inadequate.
-
-(The z values are found by weighting all data points, not by interpolating
-between nearby data points;  also edge effects may produce unexpected and/or
-undesired results.  In some cases, small norm values produce a grid point
-reflecting the average of distant data points rather than a local average,
-while large values of norm may produce "steps" with several grid points
-having the same value as the closest data point, rather than making a smooth
-transition between adjacent data points.  Some areas of a grid may be filled
-by extrapolation, to an arbitrary boundary condition.  The variables are
-not normalized; consequently the units used for x and y will affect the
-relative weights of points in the x and y directions.)
-
-Examples:
+The following kernels are available:
 @example
-      set dgrid3d 10,10,1     # defaults
-      set dgrid3d ,,4
+      gauss :     w(d) = exp(-d*d)
+      cauchy :    w(d) = 1/(1 + d*d)
+      exp :       w(d) = exp(-d)
+      box :       w(d) = 1                     if d<1
+                       = 0                     otherwise
+      hann :      w(d) = 0.5*(1-cos(2*pi*d))   if d<1
+                  w(d) = 0                     otherwise
 
 @end example
 
-The first specifies that a grid of size 10 by 10 is to be constructed using
-a norm value of 1 in the weight computation.  The second only modifies the
-norm, changing it to 4.
+When using one of these five smoothing kernels, up to two additional
+parameter can be specified: dx and dy. These are used to rescale the
+coordinate differences when calculating the distance: 
+d_i = sqrt( ((x-x_i)/dx)**2 + ((y-y_i)/dy)**2 ), where x,y are the
+coordinates of the current grid point and x_i,y_i are the coordinates
+of the i-th data point. The value of dy defaults to the value of dx,
+which defaults to 1. The parameters dx and dy make it possible to 
+control the radius over which data points contribute to a grid point
+IN THE UNITS OF THE DATA ITSELF.
+
+A slightly different syntax is also supported for reasons of backwards
+compatibility. If no interpolation algorithm has been explicitly selected,
+the `qnorm` algorithm is assumed. Up to three comma-separated, optional
+paramaters can be specified, which are interpreted as the the number of
+rows, the number of columns, and the norm value, respectively.
+
+The @ref{dgrid3d} option is a simple scheme which replaces scattered data
+with weighted averages on a regular grid.More sophisticated approaches
+to this problem exist and should be used to preprocess the data outside
+`gnuplot` if this simple solution is found inadequate.
+
 See also
+@uref{http://www.gnuplot.info/demo/dgrid3d.html,dgrid3d.dem: dgrid3d demo.
+}
+and
 @uref{http://www.gnuplot.info/demo/scatter.html,scatter.dem: dgrid3d demo.
 }
 
@@ -10365,14 +10469,13 @@ label command, i.e., `left` means left align with key to the right of
 @c ?commands set key samples
 @c ?set key samples
 @c ?key samples
-By default, each plot on the graph generates a corresponding entry in the
-key. This entry contains a plot title and a sample line/point/box of the
-same color and fill properties as used in the plot itself.  The font and
-textcolor properties control the appearance of the individual plot titles
-that appear in the key. Setting the textcolor to "rgb variable" causes
-the text for each key entry to be the same color as the line or fill
-color for that plot.  This was the default in some earlier versions of
-gnuplot.
+By default, each plot on the graph generates a corresponding entry in the key.
+This entry contains a plot title and a sample line/point/box of the same color
+and fill properties as used in the plot itself.  The font and textcolor
+properties control the appearance of the individual plot titles that appear in
+the key. Setting the textcolor to "rgb variable" causes the text for each key
+entry to be the same color as the line or fill color for that plot.
+This was the default in some earlier versions of gnuplot.
 
 The length of the sample line can be controlled by `samplen`.  The sample
 length is computed as the sum of the tic length and <sample_length> times the
@@ -10860,7 +10963,7 @@ Syntax:
                 @{format <string>@} \
                 @{clipboardformat <int>/<string>@} \
                 @{mouseformat <int>/<string>@} \
-                @{@{no@}labels@} @{labeloptions <string>@} \
+                @{@{no@}labels @{"labeloptions"@}@} \
                 @{@{no@}zoomjump@} @{@{no@}verbose@}
       unset mouse
 
@@ -10910,14 +11013,15 @@ format string was specified already):
 
 @end example
 
-Choose the option @ref{labels} to get real gnuplot labels on Button 2. (The
-default is `nolabels` which makes Button 2 drawing only temporary annotations
-at the mouse positions). The labels are drawn with the current setting of
-`mouseformat`. `labeloptions` controls which options are passed to the
-`set label` command. The default is "pointstyle 1" which will plot a small
-plus at the label position.  Note that the pointsize is taken from the
-@ref{pointsize} command.
-Labels can be removed by holding the Ctrl-Key down while clicking with
+@cindex labels
+
+Choose the option @ref{labels} to define persistent gnuplot labels using Button 2.
+The default is `nolabels`, which makes Button 2 draw only a temporary label at
+the mouse position. Labels are drawn with the current setting of `mouseformat`.
+The `labeloptions` string is passed to the `set label` command.  The default is
+"point pointstyle 1" which will plot a small plus at the label position.
+Temporary labels will disappear at the nex @ref{replot} or mouse zoom operation.
+Persistent labels can be removed by holding the Ctrl-Key down while clicking
 Button 2 on the label's point. The threshold for how close you must be to the
 label is also determined by the @ref{pointsize}.
 
@@ -11909,7 +12013,7 @@ Syntax:
       show palette gradient
       show palette fit2rgbformulae
       show palette rgbformulae
-      show palette colornames
+      show colornames
 
 @end example
 
@@ -11919,8 +12023,7 @@ Otherwise, the options can be given in any order.
 
 `show palette gradient` displays the gradient defining the palette (if
 appropriate).  @ref{rgbformulae} prints the available fixed gray -->
-color transformation formulae.  @ref{colornames} prints the
-implemented color names.
+color transformation formulae.  @ref{colornames} prints the known color names.
 
 `show palette palette <n>` prints to the screen or to the file given by
 `set print` a table of RGB triplets calculated for the current palette settings
@@ -12091,8 +12194,7 @@ Either by three numbers (each in [0,1]) for red, green and blue, separated by
 whitespace, or the name of the color in quotes or X style color specifiers
 also in quotes.  You may freely mix the three types in a gradient definition,
 but the named color "red" will be something strange if RGB is not selected
-as color space.  Use @ref{colornames} for a list of known color
-names.
+as color space.  Use @ref{colornames} for a list of known color names.
 
 Please note, that even if written as <r>, this might actually be the
 <H> component in HSV color space or <X> in CIE-XYZ space, or ...
@@ -12329,8 +12431,7 @@ versa and change the definition of <maxcolors>.
 Gnuplot knows a limited number of color names. You can use these to define
 the color range spanned by a pm3d palette, or to assign a terminal-independent
 colot to a particular linetype or linestyle. To see the list of know color
-names, use the command @ref{colornames}.
-See @ref{palette}, `linestyle`.
+names, use the command @ref{colornames}.  See @ref{palette}, `linestyle`.
 
 @node pointsize, polar, palette, set-show
 @subsection pointsize
@@ -15477,7 +15578,7 @@ with no modifiers.
 * eepic::                       
 * emf::                         
 * emxvga::                      
-* epson-180dpi::                
+* epson_180dpi::                
 * excl::                        
 * hercules::                    
 * fig::                         
@@ -16573,7 +16674,7 @@ Examples:
 
 @end example
 
-@node emxvga, epson-180dpi, emf, terminal_
+@node emxvga, epson_180dpi, emf, terminal_
 @subsubsection emxvga
 
 @c ?commands set terminal emxvga
@@ -16619,44 +16720,36 @@ Syntax:
 
 The only option is the vesa mode for `emxvesa`, which defaults to G640x480x256."
 
-@node epson-180dpi, excl, emxvga, terminal_
-@subsubsection epson-180dpi
+@node epson_180dpi, excl, emxvga, terminal_
+@subsubsection epson_180dpi
 
-@c ?commands set terminal epson-180dpi
-@c ?set terminal epson-180dpi
-@c ?set term epson-180dpi
-@c ?terminal epson-180dpi
-@c ?term epson-180dpi
-@cindex epson-180dpi
-@tmindex epson-180dpi
+@c ?commands set terminal epson_180dpi
+@c ?set terminal epson_180dpi
+@c ?set term epson_180dpi
+@c ?terminal epson_180dpi
+@c ?term epson_180dpi
+@cindex epson_180dpi
 
+@c ?commands set terminal epson_60dpi
+@c ?set terminal epson_60dpi
+@c ?set term epson_60dpi
+@c ?terminal epson_60dpi
+@c ?term epson_60dpi
+@cindex epson_60dpi
 
-@c ?commands set terminal epson-60dpi
-@c ?set terminal epson-60dpi
-@c ?set term epson-60dpi
-@c ?terminal epson-60dpi
-@c ?term epson-60dpi
-@cindex epson-60dpi
-@tmindex epson-60dpi
+@c ?commands set terminal epson_lx800
+@c ?set terminal epson_lx800
+@c ?set term epson_lx800
+@c ?terminal epson_lx800
+@c ?term epson_lx800
+@cindex epson_lx800
 
-
-@c ?commands set terminal epson-lx800
-@c ?set terminal epson-lx800
-@c ?set term epson-lx800
-@c ?terminal epson-lx800
-@c ?term epson-lx800
-@cindex epson-lx800
-@tmindex epson-lx800
-
-
-@c ?commands set terminal nec-cp6
-@c ?set terminal nec-cp6
-@c ?set term nec-cp6
-@c ?terminal nec-cp6
-@c ?term nec-cp6
-@cindex nec-cp6
-@tmindex nec-cp6
-
+@c ?commands set terminal nec_cp6
+@c ?set terminal nec_cp6
+@c ?set term nec_cp6
+@c ?terminal nec_cp6
+@c ?term nec_cp6
+@cindex nec_cp6
 
 @c ?commands set terminal okidata
 @c ?set terminal okidata
@@ -16676,47 +16769,68 @@ The only option is the vesa mode for `emxvesa`, which defaults to G640x480x256."
 @tmindex starc
 
 
-@c ?commands set terminal tandy-60dpi
-@c ?set terminal tandy-60dpi
-@c ?set term tandy-60dpi
-@c ?terminal tandy-60dpi
-@c ?term tandy-60dpi
-@cindex tandy-60dpi
-@tmindex tandy-60dpi
+@c ?commands set terminal tandy_60dpi
+@c ?set terminal tandy_60dpi
+@c ?set term tandy_60dpi
+@c ?terminal tandy_60dpi
+@c ?term tandy_60dpi
+@cindex tandy_60dpi
+
+@c ?commands set terminal dpu414
+@c ?set terminal dpu414
+@c ?set term dpu414
+@c ?terminal dpu414
+@c ?term dpu414
+@cindex dpu414
+@tmindex dpu414
 
 
 This driver supports a family of Epson printers and derivatives.
 
-`epson-180dpi` and `epson-60dpi` are drivers for Epson LQ-style 24-pin
+`epson_180dpi` and `epson_60dpi` are drivers for Epson LQ-style 24-pin
 printers with resolutions of 180 and 60 dots per inch, respectively.
 
-`epson-lx800` is a generic 9-pin driver appropriate for printers like the
+`epson_lx800` is a generic 9-pin driver appropriate for printers like the
 Epson LX-800, the Star NL-10 and NX-1000, the PROPRINTER, and so forth.
 
-`nec-cp6` is generic 24-pin driver that can be used for printers like the
+`nec_cp6` is generic 24-pin driver that can be used for printers like the
 NEC CP6 and the Epson LQ-800.
 
 The `okidata` driver supports the 9-pin OKIDATA 320/321 Standard printers.
 
 The `starc` driver is for the Star Color Printer.
 
-The `tandy-60dpi` driver is for the Tandy DMP-130 series of 9-pin, 60-dpi
+The `tandy_60dpi` driver is for the Tandy DMP-130 series of 9-pin, 60-dpi
 printers.
 
-Only `nec-cp6` has any options.
+The `dpu414` driver is for the Seiko DPU-414 thermal printer.
+
+`nec_cp6` has the options:
 
 Syntax:
 @example
-      set terminal nec-cp6 @{monochrome | colour | draft@}
+      set terminal nec_cp6 @{monochrome | colour | draft@}
 
 @end example
 
 which defaults to monochrome.
 
-With each of these drivers, a binary copy is required on a PC to print.  Do
-not use `print`---use instead `copy file /b lpt1:`."
+`dpu414` has the options:
 
-@node excl, hercules, epson-180dpi, terminal_
+Syntax:
+@example
+      set terminal dpu414 @{small | medium | large@} @{normal | draft@}
+
+@end example
+
+which defaults to medium (=font size) and normal.
+Preferred combinations are `medium normal` and `small draft`.
+
+With each of these drivers, a binary copy is required on a PC to print.
+Do not use `print`---use instead `copy file /b lpt1:`.
+
+
+@node excl, hercules, epson_180dpi, terminal_
 @subsubsection excl
 
 @c ?commands set terminal excl
@@ -18647,8 +18761,6 @@ terminals.  It has no options."
 @c ?terminal km-tek40xx
 @c ?term km-tek40xx
 @cindex km-tek40xx
-@tmindex km-tek40xx
-
 
 @c ?commands set terminal selanar
 @c ?set terminal selanar
@@ -18656,8 +18768,6 @@ terminals.  It has no options."
 @c ?terminal selanar
 @c ?term selanar
 @cindex selanar
-@tmindex selanar
-
 
 @c ?commands set terminal bitgraph
 @c ?set terminal bitgraph
@@ -18665,15 +18775,15 @@ terminals.  It has no options."
 @c ?terminal bitgraph
 @c ?term bitgraph
 @cindex bitgraph
-@tmindex bitgraph
-
 
 This family of terminal drivers supports a variety of VT-like terminals.
-`tek40xx` supports Tektronix 4010 and others as well as most TEK emulators;
-`vttek` supports VT-like tek40xx terminal emulators; `kc-tek40xx` supports
-MS-DOS Kermit Tek4010 terminal emulators in color: `km-tek40xx` supports them
-in monochrome; `selanar` supports Selanar graphics; and `bitgraph` supports
-BBN Bitgraph terminals.  None have any options."
+`tek40xx` supports Tektronix 4010 and others as well as most TEK emulators.
+`vttek` supports VT-like tek40xx terminal emulators.
+The following are present only if selected when gnuplot is built:
+`kc-tek40xx` supports MS-DOS Kermit Tek4010 terminal emulators in color;
+`km-tek40xx` supports them in monochrome. `selanar` supports Selanar graphics.
+`bitgraph` supports BBN Bitgraph terminals.
+None have any options."
 
 @node texdraw, tgif, tek40, terminal_
 @subsubsection texdraw

@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.220 2008-05-01 13:54:14+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.495
+C RCS $Id: gnuplot-ja.doc,v 1.225 2008-06-02 11:50:41+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.506
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -241,7 +241,6 @@ C Shigeharu Takeno et al (3.7, 4.X)
 
 2 New features introduced in version 4.2
 ?new-features
-?version 4.2 features
  gnuplot version 4.2 は、直前の公式バージョン 4.0 以降に追加されたたく
  さんの機能を提供します。この節では、主な追加機能の一覧と、変更や細かい
  新機能の一部を紹介します。より網羅的な一覧は、ファイル NEWS を参照して
@@ -278,9 +277,9 @@ C Shigeharu Takeno et al (3.7, 4.X)
  現在の gnuplot は、行列 (matrix) 形式のバイナリや `general binary` (こ
  れまで gnuplot は `binary matrix` 形式のみをサポートしていました) を含
  む一般的な `binary` データの入力が可能になっています。色々な matrix フ
- ァイルフォーマット (`gpbin`, `edf`, `avs`) が自動的に認識されるように
- なっています。バイナリデータファイルは、`image` や `rgbimage` の描画で
- 特に有用です。
+ ァイルフォーマットはファイル名の拡張子 (`gpbin`, `edf`, `avs`) で自動
+ 的に認識されるようになっています。バイナリデータファイルは、`image` や
+ `rgbimage` の描画で特に有用です。
  `binary`, `binary general filetype` 参照。
 
 3 新しい描画要素
@@ -430,7 +429,6 @@ C Shigeharu Takeno et al (3.7, 4.X)
  ださい。
 
 2 Features introduced in version 4.0
-?version 4 features
  gnuplot version 4.0 は、直前の公式バージョン 3.7 以降に追加されたたく
  さんの特徴を含んでいます。以下に要約します。
 
@@ -2027,7 +2025,7 @@ C ... and restart the table:
                                         # -45 に対応する色
       plot sin(x) lt palette frac 0.3   # パレットに対応する小数値
 
- `show palette colornames`, `set palette`, `cbrange` 参照。
+ `show colornames`, `set palette`, `cbrange` 参照。
 
  点線/破線のパターンをサポートする出力形式では、デフォルトの線種は点線/
  破線のパターンと色の両方が定義されています。しかし、デフォルトの色は、
@@ -2077,7 +2075,7 @@ C ... and restart the table:
        palette z
 
  "colorname" は gnuplot が内部に持っている色の名前のうちの一つを指定し
- ます。有効な名前の一覧に関しては `show palette colornames` を参照して
+ ます。有効な名前の一覧に関しては `show colornames` を参照して
  ください。
 
  "#RRGGBB" は "#" 記号の後に 16 進定数を並べます。RRGGBB は、赤、緑、青
@@ -2095,8 +2093,9 @@ C ... and restart the table:
 
  "palette z" は、各描画線分や描画要素の z の値を、パレットへ対応づけら
  れている cbrange の範囲に対応づけます。これにより、3 次元の曲線や曲面
- に沿って色を滑らかに変化させることができます。このオプションは 3D 描画
- (splot) のみに適用できます。
+ に沿って色を滑らかに変化させることができます。これは、2 次元描画で、パ
+ レット値を追加の列データから読み込ませて色付けするのにも使えます (すべ
+ ての 2 次元描画スタイルがこの追加列を認識するわけではありません)。
 4 rgbcolor variable
 ?rgbcolor variable
  大抵の場合描画コマンドは、各描画要素に一つの色 (線種) を割り当て、一つ
@@ -2134,7 +2133,7 @@ C ... and restart the table:
  書式:
        bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
        bind <key-sequence> ""
-       bind!
+       reset bind
 
  `bind` は、ホットキーの定義、再定義に使用します。ホットキーとは、入力
  カーソルがドライバのウィンドウ内にあるときに、あるキー、または複数のキ
@@ -2147,8 +2146,10 @@ C ... and restart the table:
 
  マウスボタンは再定義はできません。
 
- ホットキーの一覧を得るには `bind` とタイプするか、グラフウィンドウ上で
- 'h' と入力してください。
+ ホットキーの一覧を得るには `show bind`, または `bind` とタイプするか、
+ グラフウィンドウ上でホットキー 'h' を入力してください。
+
+ キー定義は、`reset bind` でデフォルトの状態に復帰できます。
 
  修飾キーを含む複数のキーの定義は引用符で囲む必要があることに注意してく
  ださい。
@@ -2173,11 +2174,13 @@ C ... and restart the table:
  - キー割当を表示:
      bind "ctrl-a"          # ctrl-a に対するキー割当を表示
      bind                   # 全てのキー定義を表示
+     show bind              # 全てのキー定義を表示
 
  - キー割当を削除:
      bind "ctrl-alt-a" ""   # ctrl-alt-a のキー割当を削除
                               (組み込みキー定義は削除されません)
-     bind!                  # デフォルト (組み込み) のキー定義を導入
+     reset bind             # デフォルト (組み込み) のキー定義を導入
+     bind!                  # "reset bind" の別の形式 (非推奨)
 
  - トグルスイッチ形式にキー割当:
    v=0
@@ -2769,14 +2772,20 @@ Ffigure_candlesticks
  てください。デフォルトでは、水平線は箱 (candlestick) の水平幅一杯に引
  かれますが、それは全体の幅に対する割合を指定することで変更できます。
 
- デフォルトでは長方形は (開始値)<(終値) の場合は空で、(終値)<(開始値)
- の場合は 3 本の垂直線が入ります。箱の塗りつぶしが有効である場合、その
- 長方形は `set style fill <fillstyle>` にしたがって塗りつぶされます。
- `set bars`, `financebars` を参照してください。また、以下も参照してくだ
- さい。
+ 金融データの通常の慣習では、(開始値) < (終値) の場合は長方形は空で、
+ (終値) < (開始値) の場合は塗り潰されます。現在の fillstyle に "empty"
+ をセットしている場合は、実際にこうなります。`fillstyle` 参照。
+ fillstyle に塗り潰し、またはパターンをセットしている場合は、開始値、終
+ 値に関係なく、すべての箱にそれが使われます。`set bars`, `financebars`
+ を参照してください。また、以下も参照してください。
 ^ <a href="http://gnuplot.sourceforge.net/demo/candlesticks.html">
- 金融データのデモ
+ candlestick
 ^ </a>
+ と
+^ <a href="http://gnuplot.sourceforge.net/demo/finance.html">
+ finance
+^ </a>
+ のデモ。
 
  注意: 中央値を表すための記号などを追加したい場合、以下の例のように、ひ
  げ付きの棒グラフに他の描画コマンドを追加する必要があります:
@@ -4875,14 +4884,15 @@ Ffigure_mapcontours
  または適切なモデルで fit を使うのがいいでしょう。
 
  書式:
-       smooth {unique | frequency | csplines | acsplines | bezier | sbezier}
+       smooth {unique | frequency | cumulative | csplines | acsplines
+               | bezier | sbezier}
 
- `unique` と `frequency` は、データを単調に揃えた後でそれらを plot しま
- す。他のルーチンはいずれも、データの両端の点の間を結ぶ、ある連続曲線の
- 係数を決定するためにデータを使います。この曲線は、関数として同じ方法で
- 描画されます。すなわち、それらの値は x 座標に沿う同じ幅の区間ごとに選
- ばれ (`set samples` 参照)、それらの点を線分でつなぐことにより (もし
- line style が選ばれているのならば) 描画されます。
+ `unique`, `frequency`, `cumulative` は、データを単調に揃えた後でそれら
+ を plot します。他のルーチンはいずれも、データの両端の点の間を結ぶ、あ
+ る連続曲線の係数を決定するためにデータを使います。この曲線は、関数とし
+ て同じ方法で描画されます。すなわち、それらの値は x 座標に沿う同じ幅の
+ 区間ごとに選ばれ (`set samples` 参照)、それらの点を線分でつなぐことに
+ より (もし line style が選ばれているのならば) 描画されます。
 
  もし `autoscale` の状態であれば、描画範囲はグラフの境界線の中に曲線が
  収まるように計算されます。
@@ -4992,6 +5002,27 @@ Ffigure_mapcontours
  オプション `frequency` は、データを x に関して単調にします。x 座標が同
  じ点は、それらの y の値の合計を y の値として持つ一つの点に置き換えられ
  ます。結果としてそれらの点は真っすぐな線分で結ばれることになります。
+ 以下も参照。
+^ <a href="http://www.gnuplot.info/demo/smooth.html">
+ smooth.dem
+^ </a>
+5 cumulative
+?commands plot datafile smooth cumulative
+?plot datafile smooth cumulative
+?plot smooth cumulative
+?data-file smooth cumulative
+?datafile smooth cumulative
+?plot cumulative
+?smooth cumulative
+?cumulative
+ オプション `cumulative` は、データを x に関して単調にします。x 座標が
+ 同じ点は、それ以下の x の値を持つすべての点 (すなわち現在のデータ点の
+ 左側の点) に対する y の値の累積的な合計を y の値として持つ一つの点に置
+ き換えられます。これは、データから累積分布関数を得るのに利用できます。
+ 以下も参照。
+^ <a href="http://www.gnuplot.info/demo/smooth.html">
+ smooth.dem
+^ </a>
 4 special-filenames
 ?commands plot datafile special-filenames
 ?plot datafile special-filenames
@@ -5672,9 +5703,9 @@ Ffigure_mapcontours
  の値は、点の z 座標の値か、または `using` で 4 番目のパラメータとして
  指定される色座標に対応します。2 次元、3 次元の描画 (`plot` と `splot`
  コマンド) の両方で、パレット色を小数値かまたはカラーボックスの範囲へ対
- 応づけられた値のいずれかで指定することができます。2 次元描画では Z の
- 値に対応づけられたパレット色を使うことはできません。`colors`,
- `set palette`, `linetype` 参照。
+ 応づけられた値のいずれかで指定することができます。パレット色の値は、
+ `using` 指定で明示的に指定された入力列から読み込むことも可能です。
+ `colors`, `set palette`, `linetype` 参照。
 
  キーワード `nohidden3d` は、`splot` コマンドで生成される描画にのみ適用
  されます。通常、グローバルなオプション `set hidden3d` はグラフ上の全て
@@ -5893,6 +5924,7 @@ Ffigure_mapcontours
 ?commands reset
 ?reset
 ?reset errors
+?reset bind
  コマンド `reset` は `set` コマンドで定義できる、グラフに関する全てのオ
  プションをデフォルトの値に設定します。このコマンドは、例えばコマンドフ
  ァイルの最後にグラフのデフォルトの設定に復帰する、あるいはコマンドファ
@@ -5907,6 +5939,10 @@ Ffigure_mapcontours
 =error state
  `reset errors` は、エラー状態変数 GPVAL_ERRNO と GPVAL_ERRMSG のみをク
  リアします。
+
+=bind
+ `reset bind` restores all hotkey bindings to their default state.
+ `reset bind` は、キー定義をデフォルトの状態に復帰します。
 2 save
 ?commands save
 ?save
@@ -6310,6 +6346,11 @@ Ffigure_mapcontours
 
  キーワード `front`, `back` は、塗り潰し長方形のついた errorbar のみに
  関連します (boxes, candlesticks, histograms)。
+3 bind
+?commands show bind
+?show bind
+=bind
+ 現在のホットキーの割り当て (binding) を表示します。`bind` 参照。
 3 bmargin
 ?commands set bmargin
 ?set bmargin
@@ -6798,6 +6839,7 @@ Ffigure_mapcontours
  ます。現在は、4 つのそのようなオプションが実装されています。
 4 set datafile fortran
 ?set datafile fortran
+?show datafile fortran
 ?fortran
  コマンド `set datafile fortran` は、入力ファイルの Fortran D 型、Q 型
  の定数値の特別なチェックを可能にします。この特別なチェックは入力処理を
@@ -6806,6 +6848,7 @@ Ffigure_mapcontours
  `unset datafile fortran` を行えば無効にできます。
 4 set datafile missing
 ?set datafile missing
+?show datafile missing
 ?set missing
 ?missing
  コマンド `set datafile missing` は `gnuplot` に、どのような文字列がデ
@@ -6863,6 +6906,7 @@ Ffigure_mapcontours
 
 4 set datafile separator
 ?set datafile separator
+?show datafile separator
 ?separator
  コマンド `set datafile separator "<char>"` は、`gnuplot` に、この後の
  入力ファイルのデータ列の分離文字が、空白 (whitespace) でなくて <char>
@@ -6920,6 +6964,9 @@ Ffigure_mapcontours
  例:
        set datafile binary filetype=auto
        set datafile binary array=512x512 format="%uchar"
+
+?show datafile binary
+       show datafile binary   # 現在の設定の一覧表示
 3 decimalsign
 ?commands set decimalsign
 ?commands show decimalsign
@@ -6992,50 +7039,80 @@ Ffigure_mapcontours
  の詳細は、`splot grid_data` を参照してください。
 
  書式:
-       set dgrid3d {<row_size>} {,{<col_size>} {,<norm>}}
+       set dgrid3d {<rows>} {,{<cols>}}
+                   { splines |
+                     qnorm {<norm>} |
+                     gauss | cauchy | exp | box | hann {<dx>} {,{dy}} }
        unset dgrid3d
        show dgrid3d
 
  デフォルトでは `dgrid3d` は無効になっています。有効になると、ファイル
  から読み込まれる 3 次元のデータは「散在した」データ (非格子状データ)
  であると見なされます。格子は、グラフと等高線の描画のために、散在した
- データを囲む矩形から得られる寸法と、row_size/col_size で指定される数の
- 行と列を持つように生成されます。格子は x 方向 (行) と y 方向 (列) に
- 等間隔です。z の値は散在するデータの z の値の重み付きの平均として計算
- されます。
+ データを囲む矩形から得られる寸法と、row_size/col_size で指定される数
+ の行と列を持つように生成されます。格子は x 方向 (行) と y 方向 (列) に
+ 等間隔です。z の値は散在するデータの z の値の重み付きの平均、またはス
+ プライン補間として計算されます。言い変えれば、規則的な間隔の格子が生成
+ され、全ての格子点で元のデータの滑かな近似値が評価されます。元のデータ
+ ではなく、この近似値のみが描画されます。
 
- 3 番目のパラメータであるノルム (norm) は、重み付けを制御するもので、
+ デフォルトの列の数は行の数に等しく、そのデフォルトの値は 10 です。
+
+ 元のデータから近似値を計算するためのいくつかのアルゴリズムが用意されて
+ いて、追加のパラメータを指定できるものもあります。これらの補間は、格子
+ 点に近いデータ点ほど、その格子点に対してより強い影響を与えます。
+
+ `splines` アルゴリズムは、"薄いつぎ板" を元にした補間計算を行います。
+ これは追加パラメータを取りません。
+
+ `qnorm` アルゴリズムは各格子点で入力データの重み付き平均を計算します。
  各点は格子点からの距離の norm 乗の逆数で重み付けされます。(実際には、
  dx, dy を各データ点と格子点との差の成分であるとすると、重みは dx^norm
  + dy^norm で与えられます。2 のべきのノルム、特に 4, 8, 16 に関しては、
  その重みの計算はユークリッド距離を使うことで (dx^2+dy^2)^norm/2 のよう
- に最適化されてますが、任意の負でない整数を使うことも可能です。)
+ に最適化されてますが、任意の負でない整数を使うことも可能です。) ノルム
+ のべきの値をただ一つの追加パラメータとして指定できます。このアルゴリズ
+ ムがデフォルトになっています。
 
- 格子点に近いデータ点程それはその格子点により大きい影響を与え、ノルムの
- 値が大きい程格子点から離れた点の影響は小さくなります。
+ 最後に、重み付き平均の計算用に、いくつかの平滑化重み付け関数 (kernel)
+ が用意されています: z = Sum_i w(d_i) * z_i / Sum_i w(d_i), ここで z_i
+ は i 番目のデータの値で、d_i は現在の格子点と i 番目のデータ点の位置と
+ の距離です。すべての重み付け関数が、現在の格子点に近い方のデータ点には
+ 大きな重み、遠い方のデータ点には小さい重みを付けます。
 
- `dgrid3d` オプションは散在するデータから格子状データに変換する簡単な
- ローパスフィルタです。この問題に対するより洗練された手法が存在します
- ので、この単純な方法が不十分であれば、`gnuplot` の外でそのような方法
- でデータを前処理するべきでしょう。
+ 以下の重み付け関数が使用できます:
+       gauss :     w(d) = exp(-d*d)
+       cauchy :    w(d) = 1/(1 + d*d)
+       exp :       w(d) = exp(-d)
+       box :       w(d) = 1                     d<1 の場合
+                        = 0                     その他
+       hann :      w(d) = 0.5*(1-cos(2*pi*d))   d<1 の場合
+                   w(d) = 0                     その他
 
- (z の値は全てのデータ点の重み付けとして求められ、隣接するデータ点を補
- 間しているのではありません。よって、端の影響が予期しない、望ましくない
- 結果を引き起こす可能性があります。ある場合では、小さいノルムの値により
- 局所的な平均ではなくデータ点の距離の平均を反映したような格子点が生成さ
- れ、一方、大きなノルムの値により、隣接するデータ点を滑らかに変化させる
- のでなく最も近くのデータ点と同じ値を持つ格子点による階段 ("steps") を
- 作ってしまいます。格子の領域内部は任意の境界条件に関する補外法により埋
- めることができますが、変数は正規化されず、よって x と y の単位が x, y
- 各方向に関して、点の相対的な重みに影響をおよぼすことになります。)
+ これら 5 つの平滑化重み付け関数のうち一つを使用する場合、2 つまでの追
+ 加パラメータ dx と dy を指定できます。これらは、距離の計算時に座標の違
+ いをスケール変換するのに使えます:
+ d_i = sqrt( ((x-x_i)/dx)**2 + ((y-y_i)/dy)**2 ), ここで、x,y は現在の
+ 格子点の座標で、x_i,y_i は i 番目のデータ点の座標です。dy のデフォルト
+ の値は dx で、そのデフォルトの値は 1 になっています。パラメータ dx と
+ dy は、データ点が格子点へ「データそれ自身の単位で」の寄与を行う範囲の
+ 制御を可能にします。
 
- 例:
-       set dgrid3d 10,10,1     # デフォルト
-       set dgrid3d ,,4
+ 後方互換性のために、わずかに異なる書式もサポートされています。どのアル
+ ゴリズムも明示的に選択しなかった場合、`qnorm` アルゴリズムが仮定され、
+ 3 つ以下の、コンマ (,) 区切りのオプションパラメータを指定した場合は、
+ それらをそれぞれ行数、列数、そして norm 値であると解釈します。
 
- 最初のものは、構成する格子を 10x10 にし、重みの計算のノルムは 1 にします。
- 2 番目の例はノルムのみ 4 に変更します。
+ オプション `dgrid3d` は、散在するデータを重み付き平均で規則的な格子に
+ 置き変える単純な仕組みに過ぎません。この問題に対するより洗練された手法
+ が存在しますので、この単純な方法が不十分であれば、`gnuplot` の外でその
+ ような方法でデータを前処理するべきでしょう。
+
  以下も参照
+^ <a href="http://www.gnuplot.info/demo/dgrid3d.html">
+ dgrid3d.dem: dgrid3d のデモ
+^ </a>
+ および
 ^ <a href="http://www.gnuplot.info/demo/scatter.html">
  scatter.dem: dgrid3d のデモ
 ^ </a>
@@ -8283,7 +8360,7 @@ Ffigure_mapcontours
                  {format <string>} \
                  {clipboardformat <int>/<string>} \
                  {mouseformat <int>/<string>} \
-                 {{no}labels} {labeloptions <string>} \
+                 {{no}labels {"labeloptions"}} \
                  {{no}zoomjump} {{no}verbose}
        unset mouse
 
@@ -8328,16 +8405,17 @@ Ffigure_mapcontours
   5   x == 日付 / 時刻                   [31. 12. 1999 23:59, 2.45]
   6   文字列で与えられた代替書式         ""
 
- ボタン 2 の gnuplot のラベルを実際に得るには、オプション `labels` を使
- 用します (デフォルトでは `nolabels` で、ボタン 2 は 単に一時的な注釈を
- マウス位置に描画します)。ラベルは現在の `mouseformat` の設定に従って書
- かれます。`labeloptions` は、コマンド `set label` にどんなオプションを
- 渡すかを制御します。デフォルトは "pointstyle 1" で、これはラベル位置に
- 小さいプラス (`+`) を描画します。その点の大きさは、`set pointsize` コ
- マンドで与えられることに注意してください。
- ラベルは、ラベルの点の上で Ctrl キーを押してボタン 2 をクリックするこ
- とで消すことができます。実際のラベルの位置にどれ位近くでクリックしなけ
- ればいけないかの閾値も `pointsize` で決定されます。
+=labels
+ ボタン 2 の gnuplot の永続的なラベルを定義するには、オプション
+ `labels` を使用します。デフォルトは `nolabels` で、ボタン 2 は単に一時
+ 的なラベルをマウス位置に描画します。ラベルは現在の `mouseformat` の設
+ 定に従って書かれます。`labeloptions` 文字列は、コマンド `set label` コ
+ マンドに渡されます。そのデフォルトは "point pointstyle 1" で、これはラ
+ ベル位置に小さいプラス (`+`) を描画します。一時的なラベルは、その次の
+ `replot`、またはマウスズーム操作では現れません。永続的なラベルは、ラベ
+ ルの点の上で Ctrl キーを押してボタン 2 をクリックすることで消すことが
+ できます。実際のラベルの位置にどれ位近くでクリックしなければいけないか
+ の閾値も `pointsize` で決定されます。
 
  オプション `zoomjump` が ON の場合、ボタン 3 によるズーム領域の選択を
  開始すると、マウスポインタは自動的に少しだけずれた位置に移動します。
@@ -9133,7 +9211,7 @@ Ffigure_mapcontours
        show palette gradient
        show palette fit2rgbformulae
        show palette rgbformulae
-       show palette colornames
+       show colornames
 
  `set palette` は (すなわちオプションなしでは) デフォルトの値を設定しま
  す。それ以外の場合、オプションは任意の順に与えることができます。
@@ -9142,7 +9220,7 @@ Ffigure_mapcontours
  `show palette gradient` は、パレットの勾配 (gradient) の定義が (それが
  適切であれば) 表示されます。`show palette rgbformulae` は、定義済で利
  用できる、灰色値からカラーへの変換公式が表示されます。
- `show palette colornames` は実装されている色名を表示します。
+ `show colornames` は、認識できる色名を表示します。
 
  `show palette palette <n>` は、<n> 個の離散的な色を持つパレットの、現
  在のパレットの設定によって計算される RGB の値の組とパレットの表を、画
@@ -9286,8 +9364,8 @@ Ffigure_mapcontours
  用符でくくられた色名、または引用符でくくられた X 形式の指定方式、のい
  ずれかです。勾配の定義では、これらの 3 種の型を自由に組み合わせること
  ができますが、色空間として RGB でないものが選択された場合色名 "red" は
- 少し違ったものになるでしょう。使用できる色名は `show palette colornames`
- でその一覧を見ることができます。
+ 少し違ったものになるでしょう。使用できる色名は `show colornames` でそ
+ の一覧を見ることができます。
 
  <r> と書いても、HSV 色空間ではそれは <H> 成分を、CIE-XYZ 空間では <X>
  を、といったように選択されたカラーモデルに依存して意味が違うことに注意
@@ -9459,8 +9537,8 @@ Ffigure_mapcontours
  gnuplot は限定された個数の色の名前を持っています。これらは、pm3d パレ
  ットでつながれる色の範囲を定義するのに、あるいは個々の線種やラインスタ
  イルの色を出力形式に依存しない形で定義したりするのに使えます。gnuplot
- の持つ色名の一覧を見るには、コマンド `show palette colornames` を使用
- してください。`set palette`, `linestyle` も参照。
+ の持つ色名の一覧を見るには、コマンド `show colornames` を使用してくだ
+ さい。`set palette`, `linestyle` も参照。
 3 pointsize
 ?commands set pointsize
 ?commands show pointsize

@@ -1,3 +1,8 @@
+2008-06-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	 * docs/term-ja.diff docs/gnuplot-ja.doc:
+	 Sync Japanese documentation to gnuplot.doc revision 1.506
+
 2008-06-02  Tim Hoffmann  <t_hoffmann@users.sourceforge.net>
 
 	* src/win/wtext.c (WndParentProc): Account for scrollbars when shrinking
