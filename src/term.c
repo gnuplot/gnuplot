@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.172 2008/02/24 19:49:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.173 2008/03/30 03:27:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -776,7 +776,7 @@ term_start_multiplot()
 #ifdef USE_MOUSE
     /* save the state of mouse_setting.on and
      * disable mouse; call UpdateStatusline()
-     * to turn of eventually statusline */
+     * to eventually turn off statusline */
     save_mouse_state = mouse_setting.on;
     mouse_setting.on = 0;
     UpdateStatusline();
@@ -2733,7 +2733,7 @@ mp_layout_size_and_offset(void)
  * contain more characters than will actually appear in the output.
  * This makes it hard to estimate how much horizontal space on the plot
  * (e.g. in the key box) must be reserved to hold them.  To approximate
- * the eventually length we switch briefly to the dummy terminal driver
+ * the eventual length we switch briefly to the dummy terminal driver
  * "estimate.trm" and then switch back to the current terminal.
  * If better, perhaps terminal-specific methods of estimation are
  * developed later they can be slotted into this one call site.

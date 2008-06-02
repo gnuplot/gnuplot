@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.99 2008/04/10 18:09:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.100 2008/05/31 23:09:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -64,6 +64,7 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.99 2008/04/10 18:09:04 sfe
 #include "readline.h"
 #include "term_api.h"
 #include "util3d.h"
+#include "hidden3d.h"
 
 #ifdef _Windows
 # include "win/winmain.h"
@@ -1708,7 +1709,12 @@ event_motion(struct gp_event_t *ge)
 		    if (surface_scale < 0)
 			surface_scale = 0;
 		} else {
-		    surface_zscale += (mouse_y - start_y) * 2.0 / term->ymax;
+		    if (disable_mouse_z && (mouse_y-start_y > 0))
+			;
+		    else {
+			surface_zscale += (mouse_y - start_y) * 2.0 / term->ymax;
+			disable_mouse_z = FALSE;
+		    }
 		    if (surface_zscale < 0)
 			surface_zscale = 0;
 		}

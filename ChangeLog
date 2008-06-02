@@ -1,7 +1,18 @@
+2008-06-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c (store_polygon) src/mouse.c (event_motion):
+	Replace a pair of assert() statements with a flag that prevents mouse
+	interaction from further increasing the value of surface_zscale. This
+	means you cannot trigger the error condition the asserts tried to guard 
+	against just by moving the mouse.  You can still trigger it by setting
+	the view parameters to something odd, but the patch of 2008-05-29 may
+	handle that. 
+	Bug #172806
+
 2008-06-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
-	 * docs/term-ja.diff docs/gnuplot-ja.doc:
-	 Sync Japanese documentation to gnuplot.doc revision 1.506
+	* docs/term-ja.diff docs/gnuplot-ja.doc:
+	Sync Japanese documentation to gnuplot.doc revision 1.506
 
 2008-06-02  Tim Hoffmann  <t_hoffmann@users.sourceforge.net>
 

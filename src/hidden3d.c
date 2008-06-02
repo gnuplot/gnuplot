@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.66 2008/03/13 19:53:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.67 2008/05/30 04:52:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -153,6 +153,11 @@ static int hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
  * each other than an absolute difference of EPSILON are considered
  * equal, by some of the routines in this module. */
 #define EPSILON 1e-5
+
+/* The code used to die messily if the scale parameters got over-large.
+ * Prevent this from happening due to mousing by locking out the mouse
+ * response. */
+TBOOLEAN disable_mouse_z = FALSE;
 
 /* Some inexact operations: == , > , >=, sign() */
 #define EQ(X,Y)  (fabs( (X) - (Y) ) < EPSILON)	/* X == Y */
@@ -854,7 +859,7 @@ store_polygon(long vnum1, polygon_direction direction, long crvlen)
     p->next = -1;
 #endif
 
-    /* Some helper macros for repeted code blocks: */
+    /* Some helper macros for repeated code blocks: */
 
     /* Gets Minimum 'var' value of polygon 'poly' into variable
      * 'min. C is one of x, y, or z: */
@@ -867,7 +872,7 @@ store_polygon(long vnum1, polygon_direction direction, long crvlen)
 	for (i = 1; i< POLY_NVERT; i++, v++)	\
 	    if (vlist[*v].var < min)		\
 		min = vlist[*v].var;		\
-        assert(min >= -surface_scale);		\
+        if (min < -surface_scale) disable_mouse_z = TRUE;	\
     } while (0)
 
     /* Gets Maximum 'var' value of polygon 'poly', as with GET_MIN */
@@ -880,7 +885,7 @@ store_polygon(long vnum1, polygon_direction direction, long crvlen)
 	for (i = 1; i< POLY_NVERT; i++, v++)	\
 	    if (vlist[*v].var > max)		\
 		max = vlist[*v].var;		\
-	assert(max <= surface_scale);		\
+        if (max > surface_scale) disable_mouse_z = TRUE;	\
     } while (0)
 
     GET_MIN(p, x, p->xmin);
