@@ -1,3 +1,19 @@
+2008-06-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c (store_polygon) src/mouse.c (event_motion):
+	Replace a pair of assert() statements with a flag that prevents mouse
+	interaction from further increasing the value of surface_zscale. This
+	means you cannot trigger the error condition the asserts tried to guard
+	against by moving the mouse.  You can still trigger it by setting the
+	view to something unreasonable, but the previous patch may handle that.
+	Bug #1728063
+
+2008-06-02  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/hidden3d.c (sort_polys_by_z in_front coord_to_treecell):
+	Add range-checks to the calculation of quadtree array indices.
+	Bugs #1969415 #1728063
+
 2008-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tables.c src/tables.h src/show.c:  'show colornames'.
@@ -55,7 +71,7 @@
 
 2008-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/pdf.trm (ENHPDF_FLUSH ENHPDF_put_text):  We correctly issue 
+	* term/pdf.trm (ENHPDF_FLUSH ENHPDF_put_text):  We correctly issue
 	save/restore requests to PDFlib, but we need to mirror these in the
 	terminal code so that we track what font is currently selected.
 
@@ -251,7 +267,7 @@
 2008-03-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cgm.trm (CGM_fillbox CGM_filled_polygon):  Move the
-	management of fill styles and pm3d fill from CGM_fillbox() to 
+	management of fill styles and pm3d fill from CGM_fillbox() to
 	CGM_filled_polygon().  This is necessary because while boxes
 	and histograms call filled_polygon() via term->fillbox(),
 	the pm3d code calls term->filled_polygon() directly.  Bugfix.
@@ -341,7 +357,7 @@
 	value) rather than 0 (major tick).  This allows to distinguish between
 	tick labels read from a data file and those from the command line.
 
-	* src/axis.c (gen_tics): Treat tick type -1 the same as major ticks. 
+	* src/axis.c (gen_tics): Treat tick type -1 the same as major ticks.
 
 	* src/set.c (prune_dataticks) src/setshow.h: New routine to purge any
 	axis tick labels left over from 'using xtics(n)' option of previous
@@ -399,7 +415,7 @@
 
 2007-12-08  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/gplt_x11.c: Command line options -bw and -borderwidth were 
+	* src/gplt_x11.c: Command line options -bw and -borderwidth were
 	being mapped to X Resource "borderwidth".  It should be "borderWidth".
 	Also remove limitation that maximum linewidth is 4 pixels.
 
@@ -480,7 +496,7 @@
 2007-10-30  Christian Faulhammer (v-li@users.sourceforge.net)
 
 	* docs/doc2texi.el: Gentoo patch to allow for changed handling of
-	newlines in up-coming version of XEmacs. Needed in order to 
+	newlines in up-coming version of XEmacs. Needed in order to
 	regenerate gnuplot.texi on such a system.
 	Bug #1822610
 
@@ -496,7 +512,7 @@
 
 2007-10-05  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/plot2d.c (eval_plots): Load first/second axis information into 
+	* src/plot2d.c (eval_plots): Load first/second axis information into
 	the head of the label list for plot mode LABELPOINTS.
 	Bug #1807015
 
@@ -563,7 +579,7 @@
 
 2007-08-28  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (plot_c_bars): Apply border color from 
+	* src/graphics.c (plot_c_bars): Apply border color from
 	'set style fill' to filled candlesticks.
 
 2007-08-26  Ethan Merritt  <merritt@u.washington.edu>
@@ -582,7 +598,7 @@
 
 2007-08-25  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
-	* docs/gnuplot-ja.doc docs/faq-ja.tex docs/README.ja docs/term-ja.diff: 
+	* docs/gnuplot-ja.doc docs/faq-ja.tex docs/README.ja docs/term-ja.diff:
 	Sync Japanese documentation to current version.
 
 2007-08-25  Ethan Merritt  <merritt@u.washington.edu>
@@ -630,8 +646,8 @@
 	* PATCHLEVEL src/version.c configure.in:
 	Increment version to Version 4.2.1
 
-	* docs/gnuplot.doc docs/gnuplot.texi:  Revert leakage from 
-	cvs branch (4.3) documentation into 4.2 documentation. In 
+	* docs/gnuplot.doc docs/gnuplot.texi:  Revert leakage from
+	cvs branch (4.3) documentation into 4.2 documentation. In
 	particular, 4.2 does not support transparency or iteration.
 
 	* Makefile.am: Remove reference to obsolete README.exp
@@ -646,7 +662,7 @@
 2007-08-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (read_line): Treat line extension consistently
-	for both interactive and non-interactive input paths. This is 
+	for both interactive and non-interactive input paths. This is
 	Timothee Lecomte's version of the fix.
 	Bug #1753069.
 
@@ -761,7 +777,7 @@
 	* term/svg.trm: Give font sizes explicitly in pt units.
 
 	* term/svg.trm: Subscript/superscripts position must be done using
-	relative offsets, not absolute offset. Otherwise it prematurely 
+	relative offsets, not absolute offset. Otherwise it prematurely
 	terminates the scope of the surrounding "chunk" of text.
 
 	* Make a concession to non-compliant svg viewers and clean up the scope
@@ -862,7 +878,7 @@
 	term/pdf.trm (PDF_filled_polygon) src/color.c (filled_quadrangle
 	filled_polygon_3dcoords filled_polygon_3dcoords_zfixed):
 	Change gpiPoints to contain signed x,y values. This is what the
-	explanatory comment always implied ("same as in gd.h"), but it 
+	explanatory comment always implied ("same as in gd.h"), but it
 	wasn't true.  The change fixes several image and polygon clipping
 	problems, including segfaults in the pdf driver.  It also fixes
 	broken filledcurves on 64-bit machines.
@@ -879,21 +895,21 @@
 	These are mostly trivial patches that went into CVS soon after the
 	code freeze for 4.2
 
-	* src/graphics.c (plot_impulses plot_points plot_dots) 
+	* src/graphics.c (plot_impulses plot_points plot_dots)
 	src/plot2d.c (get_data store_2dpoint store_label):
 	Allows a third column of data containing color info to be used in
 	2D plots (points/dots/impulses/labels),
 
 	* term/gd.trm (PNG_image) term/pdf.trm (PDF_image)
-	term/post.trm (PS_image) 
+	term/post.trm (PS_image)
 	src/wxterminal/gp_cairo.c (gp_cairo_draw_fillbox gp_cairo_draw_image):
 	Teach gd pdf post and wxt terminals to clip images using the
 	bounding box info passed in corners[2] and corners[3] via term->image().
 
-	* term/pdf.trm (PDF_SetFont): Trap errors from PDF font selection, 
+	* term/pdf.trm (PDF_SetFont): Trap errors from PDF font selection,
 	making it non-fatal.
 
-	* src/axis.c (get_position_default):  
+	* src/axis.c (get_position_default):
 	Reduce the problem of trailing comma after 2D offset.
 
 	* src/graph3d.c (plot3d_impulses): splot with impulses lt rgb variable.
@@ -903,7 +919,7 @@
 	draw it at all.  Without this patch, a spurious vertical line appears
 	in the key if the fillstyle includes a border.
 
-	* term/svg.trm (SVG_PathLimit SVG_MoveForced): 
+	* term/svg.trm (SVG_PathLimit SVG_MoveForced):
 	Avoid ridiculously long paths by limiting total path length to 512.
 
 	* src/util3d.c (draw3d_line_unconditional):  Clip line segment.
@@ -911,7 +927,7 @@
 	Bug #1649887
 
 	* src/graph3d.c (do_3dplot draw_3d_graphbox):
-	Add special-case tests to insure that the plot border is drawn either 
+	Add special-case tests to insure that the plot border is drawn either
 	back or front (in front of the grid) when splot_map is set.
 	Bug #1655001
 
@@ -920,8 +936,8 @@
 	alternating current_color/transparent/current_color/transparent.
 	Bug #1655001
 
-	* src/set.c (parse_label_options): 
-	Make sure that there is a default point type, so that 
+	* src/set.c (parse_label_options):
+	Make sure that there is a default point type, so that
 	'set label <n> point' does in fact draw an acceptable point.
 
 	* src/datafile.h src/datafile.c (df_reset_after_error)
@@ -942,7 +958,7 @@
 	* term/gd.trm (PNG_init):
 	The color palette indexing of the brush is not necessarily the same as
 	that of the main image.  Set initial color index to something invalid so
-	that we force an update on first use.  
+	that we force an update on first use.
 	Bug #1673316
 
 	* src/term.c (init_term):
@@ -1044,7 +1060,7 @@
 	* src/plot.c (main): Flag 'interactive' not reset to FALSE after running
 	command "gnuplot - nonExistingScript.gp". On some platforms, gnuplot
 	cannot 'exit' and goes to an infinite loop after Ctrl-D.
-	Bug #1612995 
+	Bug #1612995
 
 2007-02-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -1053,7 +1069,7 @@
 
 2007-02-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/plot3d.c (eval_3dplots): Improved message for non-grid data. 
+	* src/plot3d.c (eval_3dplots): Improved message for non-grid data.
 
 2007-01-31  Ethan Merritt  <merritt@u.washington.edu>
 
@@ -1063,7 +1079,7 @@
 
 2007-01-29  Per Persson <persquare@mac.com>
 
-	* configure.in: Testing libreadline for remove_history presence 
+	* configure.in: Testing libreadline for remove_history presence
 	instead of readline to avoid incompatible libedit wrapper.
 	
 2007-01-26  Petr Mikulik  <mikulik@physics.muni.cz>
@@ -1116,7 +1132,7 @@
 
 2007-01-10  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gplt_x11.c (PaletteSetColor): Update current color in 
+	* src/gplt_x11.c (PaletteSetColor): Update current color in
 	plot->current_rgb when setting color from a Palette. Bugfix.
 
 2007-01-09  Ethan Merritt  <merritt@u.washington.edu>

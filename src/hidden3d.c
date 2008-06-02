@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.56.2.1 2007/01/24 23:57:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.56.2.2 2008/01/10 05:35:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -154,6 +154,11 @@ static int hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
  * equal, by some of the routines in this module. */
 #define EPSILON 1e-5
 
+/* The code used to die messily if the scale parameters got over-large.
+ * Prevent this from happening due to mousing by locking out the mouse
+ * response. */
+TBOOLEAN disable_mouse_z = FALSE;
+
 /* Some inexact operations: == , > , >=, sign() */
 #define EQ(X,Y)  (fabs( (X) - (Y) ) < EPSILON)	/* X == Y */
 #define GR(X,Y)  ((X) >  (Y) + EPSILON)		/* X >  Y */
@@ -255,9 +260,20 @@ typedef qtreelist GPHUGE *p_qtreelist;
 # endif
 /* indices of the heads of all the cells' chains: */
 static long quadtree[QUADTREE_GRANULARITY][QUADTREE_GRANULARITY];
-/* and a macro to calculate the cells' position in that array: */
-#define COORD_TO_TREECELL(x)								\
-    ((unsigned int)(((((x) / surface_scale) + 1.0) / 2.0) * QUADTREE_GRANULARITY))
+
+/* and a routine to calculate the cells' position in that array: */
+static int
+coord_to_treecell(coordval x)
+{
+    int index;
+    index = ((((x) / surface_scale) + 1.0) / 2.0) * QUADTREE_GRANULARITY;
+    if (index >= QUADTREE_GRANULARITY)
+	index = QUADTREE_GRANULARITY - 1;
+    else if (index < 0)
+	index = 0;
+
+    return index;
+}
 
 /* the dynarray to actually store all that stuff in: */
 static dynarray qtree;
@@ -744,7 +760,7 @@ store_polygon(long vnum1, polygon_direction direction, long crvlen)
     p->next = -1;
 #endif
 
-    /* Some helper macros for repeted code blocks: */
+    /* Some helper macros for repeated code blocks: */
 
     /* Gets Minimum 'var' value of polygon 'poly' into variable
      * 'min. C is one of x, y, or z: */
@@ -757,7 +773,7 @@ store_polygon(long vnum1, polygon_direction direction, long crvlen)
 	for (i = 1; i< POLY_NVERT; i++, v++)	\
 	    if (vlist[*v].var < min)		\
 		min = vlist[*v].var;		\
-        assert(min >= -surface_scale);		\
+        if (min < -surface_scale) disable_mouse_z = TRUE;	\
     } while (0)
 
     /* Gets Maximum 'var' value of polygon 'poly', as with GET_MIN */
@@ -770,7 +786,7 @@ store_polygon(long vnum1, polygon_direction direction, long crvlen)
 	for (i = 1; i< POLY_NVERT; i++, v++)	\
 	    if (vlist[*v].var > max)		\
 		max = vlist[*v].var;		\
-	assert(max <= surface_scale);		\
+        if (max > surface_scale) disable_mouse_z = TRUE;	\
     } while (0)
 
     GET_MIN(p, x, p->xmin);
@@ -1423,8 +1439,8 @@ sort_polys_by_z()
     /* HBB 20000716: Loop backwards, to ease construction of
      * linked lists from the head: */
     {
-	unsigned int grid_x, grid_y;
-	unsigned int grid_x_low, grid_x_high, grid_y_low, grid_y_high;
+	int grid_x, grid_y;
+	int grid_x_low, grid_x_high, grid_y_low, grid_y_high;
 
 	for (grid_x = 0; grid_x < QUADTREE_GRANULARITY; grid_x++)
 	    for (grid_y = 0; grid_y < QUADTREE_GRANULARITY; grid_y++)
@@ -1433,10 +1449,10 @@ sort_polys_by_z()
 	for (i=polygons.end - 1; i >= 0; i--) {
 	    this = plist + sortarray[i];
 
-	    grid_x_low = COORD_TO_TREECELL(this->xmin);
-	    grid_x_high = COORD_TO_TREECELL(this->xmax);
-	    grid_y_low = COORD_TO_TREECELL(this->ymin);
-	    grid_y_high = COORD_TO_TREECELL(this->ymax);
+	    grid_x_low = coord_to_treecell(this->xmin);
+	    grid_x_high = coord_to_treecell(this->xmax);
+	    grid_y_low = coord_to_treecell(this->ymin);
+	    grid_y_high = coord_to_treecell(this->ymax);
 
 	    for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x++) {
 		for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y++) {
@@ -1662,9 +1678,9 @@ in_front(
 # define SET_YEXTENT /* nothing */
 #endif
 #if HIDDEN3D_QUADTREE
-    unsigned int grid_x, grid_y;
-    unsigned int grid_x_low, grid_x_high;
-    unsigned int grid_y_low, grid_y_high;
+    int grid_x, grid_y;
+    int grid_x_low, grid_x_high;
+    int grid_y_low, grid_y_high;
     long listhead;
 #endif
 
@@ -1713,10 +1729,10 @@ in_front(
     first_zmin = zmin;
 
 #if HIDDEN3D_QUADTREE
-    grid_x_low = COORD_TO_TREECELL(xmin);
-    grid_x_high = COORD_TO_TREECELL(xmax);
-    grid_y_low = COORD_TO_TREECELL(ymin);
-    grid_y_high = COORD_TO_TREECELL(ymax);
+    grid_x_low = coord_to_treecell(xmin);
+    grid_x_high = coord_to_treecell(xmax);
+    grid_y_low = coord_to_treecell(ymin);
+    grid_y_high = coord_to_treecell(ymax);
 
     for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x ++)
 	for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y ++)

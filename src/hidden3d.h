@@ -1,5 +1,5 @@
 /*
- * $Id: hidden3d.h,v 1.8 2004/07/01 17:10:06 broeker Exp $
+ * $Id: hidden3d.h,v 1.9 2004/09/30 03:21:03 sfeam Exp $
  */
 
 /* GNUPLOT - hidden3d.h */
@@ -47,6 +47,8 @@
 /* Type definitions */
 
 /* Variables of hidden3d.c needed by other modules: */
+
+extern TBOOLEAN disable_mouse_z;
 
 /* Prototypes of functions exported by hidden3d.c */
 
