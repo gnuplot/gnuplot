@@ -227,7 +227,13 @@ typedef enum histogram_type {
 /* Variables defined by gadgets.c needed by other modules. */
 /***********************************************************/
 
-
+/* bounding box position, in terminal coordinates */
+typedef struct {
+    int xleft;
+    int xright;
+    int ybot;
+    int ytop;
+} BoundingBox;
 
 /* EAM Feb 2003 - Move all global variables related to key into a */
 /* single structure. Eventually this will allow multiple keys.    */
@@ -257,6 +263,7 @@ typedef struct {
     char title[MAX_LINE_LEN+1];	/* title line for the key as a whole */
     char *font;			/* Will be used for both key title and plot titles */
     struct t_colorspec textcolor;	/* Will be used for both key title and plot titles */
+    BoundingBox bounds;
 } legend_key;
 
 extern legend_key keyT;
@@ -277,14 +284,6 @@ extern legend_key keyT;
 		DEFAULT_KEYBOX_LP, \
 		"", \
 		NULL, {TC_LT, LT_BLACK, 0.0} }
-
-/* bounding box position, in terminal coordinates */
-typedef struct {
-    int xleft;
-    int xright;
-    int ybot;
-    int ytop;
-} BoundingBox;
 
 
 /*
@@ -309,6 +308,7 @@ typedef struct {
   int layer; /* front or back */
   struct position origin;
   struct position size;
+  BoundingBox bounds;
 } color_box_struct;
 
 extern color_box_struct color_box;

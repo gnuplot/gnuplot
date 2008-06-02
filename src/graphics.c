@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.268 2008/05/31 05:19:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.270 2008/06/02 03:42:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -88,7 +88,6 @@ static int max_ptitl_len = 0;	/* max length of plot-titles (keys) */
 static double ktitl_lines = 0;	/* no lines in key->title (key header) */
 static int ptitl_cnt;		/* count keys with len > 0  */
 static int key_rows, key_col_wth, yl_ref;
-static struct clipbox keybox;	/* boundaries for key field */
 
 /* set by tic_callback - how large to draw polar radii */
 static double largest_polar_circle;
@@ -102,7 +101,6 @@ static int p_width, p_height;	/* pointsize * { t->h_tic | t->v_tic } */
 /* there are several things on right of plot - key, y2tics and y2label
  * when working out boundary, save posn of y2label for later...
  * Same goes for x2label.
- * key posn is also stored in keybox.xl, and tics go at plot_bounds.xright
  */
 static int ylabel_x, y2label_x, xlabel_y, x2label_y, title_y, time_y, time_x;
 static int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
@@ -1111,76 +1109,76 @@ boundary(struct curve_points *plots, int count)
     if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
 	|| (key->region == GPKEY_AUTO_EXTERIOR_LRTBC && key->vpos == JUST_CENTRE && key->hpos == CENTRE)) {
 	if (key->vpos == JUST_TOP) {
-	    keybox.yt = plot_bounds.ytop - t->v_tic;
-	    keybox.yb = keybox.yt - key_h;
+	    key->bounds.ytop = plot_bounds.ytop - t->v_tic;
+	    key->bounds.ybot = key->bounds.ytop - key_h;
 	} else if (key->vpos == JUST_BOT) {
-	    keybox.yb = plot_bounds.ybot + t->v_tic;
-	    keybox.yt = keybox.yb + key_h;
+	    key->bounds.ybot = plot_bounds.ybot + t->v_tic;
+	    key->bounds.ytop = key->bounds.ybot + key_h;
 	} else /* (key->vpos == JUST_CENTRE) */ {
 	    int key_box_half = key_h / 2;
-	    keybox.yb = (plot_bounds.ybot + plot_bounds.ytop) / 2 - key_box_half;
-	    keybox.yt = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
+	    key->bounds.ybot = (plot_bounds.ybot + plot_bounds.ytop) / 2 - key_box_half;
+	    key->bounds.ytop = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
 	}
 	if (key->hpos == LEFT) {
-	    keybox.xl = plot_bounds.xleft + t->h_char;
-	    keybox.xr = keybox.xl + key_w;
+	    key->bounds.xleft = plot_bounds.xleft + t->h_char;
+	    key->bounds.xright = key->bounds.xleft + key_w;
 	} else if (key->hpos == RIGHT) {
-	    keybox.xr = plot_bounds.xright - t->h_char;
-	    keybox.xl = keybox.xr - key_w;
+	    key->bounds.xright = plot_bounds.xright - t->h_char;
+	    key->bounds.xleft = key->bounds.xright - key_w;
 	} else /* (key->hpos == CENTER) */ {
 	    int key_box_half = key_w / 2;
-	    keybox.xl = (plot_bounds.xright + plot_bounds.xleft) / 2 - key_box_half;
-	    keybox.xr = (plot_bounds.xright + plot_bounds.xleft) / 2 + key_box_half;
+	    key->bounds.xleft = (plot_bounds.xright + plot_bounds.xleft) / 2 - key_box_half;
+	    key->bounds.xright = (plot_bounds.xright + plot_bounds.xleft) / 2 + key_box_half;
 	}
     } else if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
 
 	/* Vertical alignment */
 	if (key->margin == GPKEY_TMARGIN) {
 	    /* align top first since tmargin may be manual */
-	    keybox.yt = (ysize + yoffset) * t->ymax - t->v_tic;
-	    keybox.yb = keybox.yt - key_h;
+	    key->bounds.ytop = (ysize + yoffset) * t->ymax - t->v_tic;
+	    key->bounds.ybot = key->bounds.ytop - key_h;
 	} else if (key->margin == GPKEY_BMARGIN) {
 	    /* align bottom first since bmargin may be manual */
-	    keybox.yb = yoffset * t->ymax + t->v_tic;
-	    keybox.yt = keybox.yb + key_h;
+	    key->bounds.ybot = yoffset * t->ymax + t->v_tic;
+	    key->bounds.ytop = key->bounds.ybot + key_h;
 	} else {
 	    if (key->vpos == JUST_TOP) {
 		/* align top first since tmargin may be manual */
-		keybox.yt = plot_bounds.ytop;
-		keybox.yb = keybox.yt - key_h;
+		key->bounds.ytop = plot_bounds.ytop;
+		key->bounds.ybot = key->bounds.ytop - key_h;
 	    } else if (key->vpos == CENTRE) {
 		int key_box_half = key_h / 2;
-		keybox.yb = (plot_bounds.ybot + plot_bounds.ytop) / 2 - key_box_half;
-		keybox.yt = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
+		key->bounds.ybot = (plot_bounds.ybot + plot_bounds.ytop) / 2 - key_box_half;
+		key->bounds.ytop = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
 	    } else {
 		/* align bottom first since bmargin may be manual */
-		keybox.yb = plot_bounds.ybot;
-		keybox.yt = keybox.yb + key_h;
+		key->bounds.ybot = plot_bounds.ybot;
+		key->bounds.ytop = key->bounds.ybot + key_h;
 	    }
 	}
 
 	/* Horizontal alignment */
 	if (key->margin == GPKEY_LMARGIN) {
 	    /* align left first since lmargin may be manual */
-	    keybox.xl = xoffset * t->xmax + t->h_char;
-	    keybox.xr = keybox.xl + key_w;
+	    key->bounds.xleft = xoffset * t->xmax + t->h_char;
+	    key->bounds.xright = key->bounds.xleft + key_w;
 	} else if (key->margin == GPKEY_RMARGIN) {
 	    /* align right first since rmargin may be manual */
-	    keybox.xr = (xsize + xoffset) * (t->xmax-1) - t->h_char;
-	    keybox.xl = keybox.xr - key_w;
+	    key->bounds.xright = (xsize + xoffset) * (t->xmax-1) - t->h_char;
+	    key->bounds.xleft = key->bounds.xright - key_w;
 	} else {
 	    if (key->hpos == LEFT) {
 		/* align left first since lmargin may be manual */
-		keybox.xl = plot_bounds.xleft;
-		keybox.xr = keybox.xl + key_w;
+		key->bounds.xleft = plot_bounds.xleft;
+		key->bounds.xright = key->bounds.xleft + key_w;
 	    } else if (key->hpos == CENTRE) {
 		int key_box_half = key_w / 2;
-		keybox.xl = (plot_bounds.xright + plot_bounds.xleft) / 2 - key_box_half;
-		keybox.xr = (plot_bounds.xright + plot_bounds.xleft) / 2 + key_box_half;
+		key->bounds.xleft = (plot_bounds.xright + plot_bounds.xleft) / 2 - key_box_half;
+		key->bounds.xright = (plot_bounds.xright + plot_bounds.xleft) / 2 + key_box_half;
 	    } else {
 		/* align right first since rmargin may be manual */
-		keybox.xr = plot_bounds.xright;
-		keybox.xl = keybox.xr - key_w;
+		key->bounds.xright = plot_bounds.xright;
+		key->bounds.xleft = key->bounds.xright - key_w;
 	    }
 	}
 
@@ -1200,18 +1198,18 @@ boundary(struct curve_points *plots, int count)
 	fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
 #endif
 	/* Here top, bottom, left, right refer to the alignment with respect to point. */
-	keybox.xl = x;
+	key->bounds.xleft = x;
 	if (key->hpos == CENTRE)
-	    keybox.xl -= key_w/2;
+	    key->bounds.xleft -= key_w/2;
 	else if (key->hpos == RIGHT)
-	    keybox.xl -= key_w;
-	keybox.xr = keybox.xl + key_w;
-	keybox.yt = y;
+	    key->bounds.xleft -= key_w;
+	key->bounds.xright = key->bounds.xleft + key_w;
+	key->bounds.ytop = y;
 	if (key->vpos == JUST_CENTRE)
-	    keybox.yt += key_h/2;
+	    key->bounds.ytop += key_h/2;
 	else if (key->vpos == JUST_BOT)
-	    keybox.yt += key_h;
-	keybox.yb = keybox.yt - key_h;
+	    key->bounds.ytop += key_h;
+	key->bounds.ybot = key->bounds.ytop - key_h;
     }
     /*}}} */
 
@@ -1846,12 +1844,12 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
     if (lkey) {			/* may have been cancelled if something went wrong */
-	/* just use keybox.xl etc worked out in boundary() */
-	xl = keybox.xl + key_size_left;
-	yl = keybox.yt;
+	/* just use key->bounds.xleft etc worked out in boundary() */
+	xl = key->bounds.xleft + key_size_left;
+	yl = key->bounds.ytop;
 
 	if (*key->title) {
-	    int center = (keybox.xl + keybox.xr) / 2;
+	    int center = (key->bounds.xleft + key->bounds.xright) / 2;
 	    double extra_height = 0.0;
 
 	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
@@ -1865,7 +1863,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
 		extra_height += 0.3;
 	    ktitl_lines += extra_height;
-	    keybox.yb -= extra_height * t->v_char;
+	    key->bounds.ybot -= extra_height * t->v_char;
 	    yl -= t->v_char * ktitl_lines;
 	    (*t->linetype)(LT_BLACK);
 	}
@@ -1882,14 +1880,14 @@ do_plot(struct curve_points *plots, int pcount)
 		clip_area = &canvas;
 	    term_apply_lp_properties(&key->box);
 	    newpath();
-	    draw_clip_line(keybox.xl, keybox.yb, keybox.xl, keybox.yt);
-	    draw_clip_line(keybox.xl, keybox.yt, keybox.xr, keybox.yt);
-	    draw_clip_line(keybox.xr, keybox.yt, keybox.xr, keybox.yb);
-	    draw_clip_line(keybox.xr, keybox.yb, keybox.xl, keybox.yb);
+	    draw_clip_line(key->bounds.xleft, key->bounds.ybot, key->bounds.xleft, key->bounds.ytop);
+	    draw_clip_line(key->bounds.xleft, key->bounds.ytop, key->bounds.xright, key->bounds.ytop);
+	    draw_clip_line(key->bounds.xright, key->bounds.ytop, key->bounds.xright, key->bounds.ybot);
+	    draw_clip_line(key->bounds.xright, key->bounds.ybot, key->bounds.xleft, key->bounds.ybot);
 	    closepath();
 	    /* draw a horizontal line between key title and first entry */
-	    draw_clip_line(keybox.xl, keybox.yt - (ktitl_lines) * t->v_char,
-			   keybox.xr, keybox.yt - (ktitl_lines) * t->v_char);
+	    draw_clip_line(key->bounds.xleft, key->bounds.ytop - (ktitl_lines) * t->v_char,
+			   key->bounds.xright, key->bounds.ytop - (ktitl_lines) * t->v_char);
 	    clip_area = clip_save;
 	}
     } /* lkey */
@@ -1952,7 +1950,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 		key_count++;
 		if (key->invert)
-		    yl = keybox.yb + yl_ref + key_entry_height/2 - yl;
+		    yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
 		do_key_sample(this_plot, key, this_plot->title, t, xl, yl);
 	    }
 	    ignore_enhanced(FALSE);
@@ -2103,7 +2101,7 @@ do_plot(struct curve_points *plots, int pcount)
 		    (*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
 	    }
 	    if (key->invert)
-		yl = keybox.yb + yl_ref + key_entry_height/2 - yl;
+		yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
 	    if (key_count >= key_rows) {
 		yl = yl_ref;
 		xl += key_col_wth;
@@ -4838,14 +4836,15 @@ xtick2d_callback(
 		ogy = gy;
 	    }
 	} else {
-	    if (lkey && x < keybox.xr && x > keybox.xl
-	    &&  keybox.yt > plot_bounds.ybot && keybox.yb < plot_bounds.ytop) {
-		if (keybox.yb > plot_bounds.ybot) {
+	    legend_key *key = &keyT;
+	    if (lkey && x < key->bounds.xright && x > key->bounds.xleft
+	    &&  key->bounds.ytop > plot_bounds.ybot && key->bounds.ybot < plot_bounds.ytop) {
+		if (key->bounds.ybot > plot_bounds.ybot) {
 		    (*t->move) (x, plot_bounds.ybot);
-		    (*t->vector) (x, keybox.yb);
+		    (*t->vector) (x, key->bounds.ybot);
 		}
-		if (keybox.yt < plot_bounds.ytop) {
-		    (*t->move) (x, keybox.yt);
+		if (key->bounds.ytop < plot_bounds.ytop) {
+		    (*t->move) (x, key->bounds.ytop);
 		    (*t->vector) (x, plot_bounds.ytop);
 		}
 	    } else {
@@ -4917,14 +4916,15 @@ ytick2d_callback(
 	    }
 	} else {
 	    /* Make the grid avoid the key box */
-	    if (lkey && y < keybox.yt && y > keybox.yb
-	    &&  keybox.xl < plot_bounds.xright && keybox.xr > plot_bounds.xleft) {
-		if (keybox.xl > plot_bounds.xleft) {
+	    legend_key *key = &keyT;
+	    if (lkey && y < key->bounds.ytop && y > key->bounds.ybot
+	    &&  key->bounds.xleft < plot_bounds.xright && key->bounds.xright > plot_bounds.xleft) {
+		if (key->bounds.xleft > plot_bounds.xleft) {
 		    (*t->move) (plot_bounds.xleft, y);
-		    (*t->vector) (keybox.xl, y);
+		    (*t->vector) (key->bounds.xleft, y);
 		}
-		if (keybox.xr < plot_bounds.xright) {
-		    (*t->move) (keybox.xr, y);
+		if (key->bounds.xright < plot_bounds.xright) {
+		    (*t->move) (key->bounds.xright, y);
 		    (*t->vector) (plot_bounds.xright, y);
 		}
 	    } else {

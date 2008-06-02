@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.100 2008/05/31 23:09:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.101 2008/06/02 19:18:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -982,48 +982,32 @@ static char *
 builtin_toggle_log(struct gp_event_t *ge)
 {
     if (!ge)
-	return "`builtin-toggle-log` y logscale for plots, z and cb logscale for splots";
+	return "`builtin-toggle-log` y logscale for plots, z logscale for splots";
 
-    if (volatile_data) {
+    if (volatile_data)
 	int_warn(NO_CARET, "Cannot toggle log scale for volatile data");
-    } else if (is_3d_plot) {
-	if (Z_AXIS.log || CB_AXIS.log)
-	    do_string_replot("unset log zcb");
-	else
-	    do_string_replot("set log zcb");
-    } else {
-#ifdef WITH_IMAGE
-	/* set log cb or log y whether using "with (rgb)image" plot or not */
-	if (is_cb_plot) {
-	    if (CB_AXIS.log)
-		do_string_replot("unset log cb");
-	    else
-		do_string_replot("set log cb");
-	} else {
-#endif
-	if (axis_array[FIRST_Y_AXIS].log)
-	    do_string_replot("unset log y");
-	else
-	    do_string_replot("set log y");
-#ifdef WITH_IMAGE
-	}
-#endif
-    }
+    else if ((color_box.bounds.xleft < mouse_x && mouse_x < color_box.bounds.xright)
+	 &&  (color_box.bounds.ybot  < mouse_y && mouse_y < color_box.bounds.ytop))
+	do_string_replot( CB_AXIS.log ? "unset log cb" : "set log cb");
+    else if (is_3d_plot && !splot_map)
+	do_string_replot( Z_AXIS.log ? "unset log z" : "set log z");
+    else
+	do_string_replot( axis_array[FIRST_Y_AXIS].log ? "unset log y" : "set log y");
+
     return (char *) 0;
 }
 
 static char *
 builtin_nearest_log(struct gp_event_t *ge)
 {
-    if (!ge) {
+    if (!ge)
 	return "`builtin-nearest-log` toggle logscale of axis nearest cursor";
-    }
-    if (is_3d_plot) {
-	/* 3D-plot: toggle lin/log z axis */
-	if (Z_AXIS.log || CB_AXIS.log)
-	    do_string_replot("unset log zcb");
-	else
-	    do_string_replot("set log zcb");
+
+    if ((color_box.bounds.xleft < mouse_x && mouse_x < color_box.bounds.xright)
+    &&  (color_box.bounds.ybot  < mouse_y && mouse_y < color_box.bounds.ytop)) {
+	do_string_replot( CB_AXIS.log ? "unset log cb" : "set log cb");
+    } else if (is_3d_plot && !splot_map) {
+	do_string_replot( Z_AXIS.log ? "unset log z" : "set log z");
     } else {
 	/* 2D-plot: figure out which axis/axes is/are
 	 * close to the mouse cursor, and toggle those lin/log */
@@ -1031,25 +1015,30 @@ builtin_nearest_log(struct gp_event_t *ge)
 	 * the bottom, x2 at top, y left and y2 right; it
 	 * would be better to derive that from the ..tics settings */
 	TBOOLEAN change = FALSE;
-	if (mouse_y < plot_bounds.ybot + (plot_bounds.ytop - plot_bounds.ybot) / 4 && mouse_x > plot_bounds.xleft && mouse_x < plot_bounds.xright) {
+	if (mouse_y < plot_bounds.ybot + (plot_bounds.ytop - plot_bounds.ybot) / 4
+	&&  mouse_x > plot_bounds.xleft&& mouse_x < plot_bounds.xright) {
 	    do_string(axis_array[FIRST_X_AXIS].log ? "unset log x" : "set log x");
 	    change = TRUE;
 	}
-	if (mouse_y > plot_bounds.ytop - (plot_bounds.ytop - plot_bounds.ybot) / 4 && mouse_x > plot_bounds.xleft && mouse_x < plot_bounds.xright) {
+	if (mouse_y > plot_bounds.ytop - (plot_bounds.ytop - plot_bounds.ybot) / 4
+	&&  mouse_x > plot_bounds.xleft && mouse_x < plot_bounds.xright) {
 	    do_string(axis_array[SECOND_X_AXIS].log ? "unset log x2" : "set log x2");
 	    change = TRUE;
 	}
-	if (mouse_x < plot_bounds.xleft + (plot_bounds.xright - plot_bounds.xleft) / 4 && mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop) {
+	if (mouse_x < plot_bounds.xleft + (plot_bounds.xright - plot_bounds.xleft) / 4
+	&&  mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop) {
 	    do_string(axis_array[FIRST_Y_AXIS].log ? "unset log y" : "set log y");
 	    change = TRUE;
 	}
-	if (mouse_x > plot_bounds.xright - (plot_bounds.xright - plot_bounds.xleft) / 4 && mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop) {
+	if (mouse_x > plot_bounds.xright - (plot_bounds.xright - plot_bounds.xleft) / 4
+	&&  mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop) {
 	    do_string(axis_array[SECOND_Y_AXIS].log ? "unset log y2" : "set log y2");
 	    change = TRUE;
 	}
 	if (change)
 	    do_string_replot("");
     }
+
     return (char *) 0;
 }
 

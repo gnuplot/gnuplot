@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.81 2008/03/13 20:02:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.82 2008/04/05 04:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -52,9 +52,6 @@ static t_sm_palette prev_palette = {
 #ifdef EXTENDED_COLOR_SPECS
 int supply_extended_color_specs = 0;
 #endif
-
-/* Corners of the colour box. */
-static int cb_x_from, cb_x_to, cb_y_from, cb_y_to;
 
 /* Internal prototype declarations: */
 
@@ -324,19 +321,18 @@ filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, do
 
 
 /* plot the colour smooth box for from terminal's integer coordinates
-   [cb_x_from,cb_y_from] to [cb_x_to,cb_y_to].
    This routine is for postscript files --- actually, it writes a small
    PS routine.
  */
 static void
 draw_inside_color_smooth_box_postscript(FILE * out)
 {
-    int scale_x = (cb_x_to - cb_x_from), scale_y = (cb_y_to - cb_y_from);
+    int scale_x = (color_box.bounds.xright - color_box.bounds.xleft), scale_y = (color_box.bounds.ytop - color_box.bounds.ybot);
     fputs("stroke gsave\t%% draw gray scale smooth box\n"
 	  "maxcolors 0 gt {/imax maxcolors def} {/imax 1024 def} ifelse\n", out);
 
     /* nb. of discrete steps (counted in the loop) */
-    fprintf(out, "%i %i translate %i %i scale 0 setlinewidth\n", cb_x_from, cb_y_from, scale_x, scale_y);
+    fprintf(out, "%i %i translate %i %i scale 0 setlinewidth\n", color_box.bounds.xleft, color_box.bounds.ybot, scale_x, scale_y);
     /* define left bottom corner and scale of the box so that all coordinates
        of the box are from [0,0] up to [1,1]. Further, this normalization
        makes it possible to pass y from [0,1] as parameter to setgray */
@@ -372,17 +368,17 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
 
     (void) out;			/* to avoid "unused parameter" warning */
     if (color_box.rotation == 'v') {
-	corners[0].x = corners[3].x = cb_x_from;
-	corners[1].x = corners[2].x = cb_x_to;
-	xy_from = cb_y_from;
-	xy_to = cb_y_to;
+	corners[0].x = corners[3].x = color_box.bounds.xleft;
+	corners[1].x = corners[2].x = color_box.bounds.xright;
+	xy_from = color_box.bounds.ybot;
+	xy_to = color_box.bounds.ytop;
     } else {
-	corners[0].y = corners[1].y = cb_y_from;
-	corners[2].y = corners[3].y = cb_y_to;
-	xy_from = cb_x_from;
-	xy_to = cb_x_to;
+	corners[0].y = corners[1].y = color_box.bounds.ybot;
+	corners[2].y = corners[3].y = color_box.bounds.ytop;
+	xy_from = color_box.bounds.xleft;
+	xy_to = color_box.bounds.xright;
     }
-    xy_step = (color_box.rotation == 'h' ? cb_x_to - cb_x_from : cb_y_to - cb_y_from) / (double) steps;
+    xy_step = (color_box.rotation == 'h' ? color_box.bounds.xright - color_box.bounds.xleft : color_box.bounds.ytop - color_box.bounds.ybot) / (double) steps;
 
     for (i = 0; i < steps; i++) {
 	gray = (double) i / steps;	/* colours equidistantly from [0,1] */
@@ -430,24 +426,24 @@ cbtick_callback(
 
     /* calculate tic position */
     if (color_box.rotation == 'h') {
-	x1 = x2 = cb_x_from + cb_place * (cb_x_to - cb_x_from);
-	y1 = cb_y_from;
-	y2 = cb_y_from - len;
+	x1 = x2 = color_box.bounds.xleft + cb_place * (color_box.bounds.xright - color_box.bounds.xleft);
+	y1 = color_box.bounds.ybot;
+	y2 = color_box.bounds.ybot - len;
     } else {
-	x1 = cb_x_to;
-	x2 = cb_x_to + len;
-	y1 = y2 = cb_y_from + cb_place * (cb_y_to - cb_y_from);
+	x1 = color_box.bounds.xright;
+	x2 = color_box.bounds.xright + len;
+	y1 = y2 = color_box.bounds.ybot + cb_place * (color_box.bounds.ytop - color_box.bounds.ybot);
     }
 
     /* draw grid line */
     if (grid.l_type > LT_NODRAW) {
 	term_apply_lp_properties(&grid);	/* grid linetype */
 	if (color_box.rotation == 'h') {
-	    (*term->move) (x1, cb_y_from);
-	    (*term->vector) (x1, cb_y_to);
+	    (*term->move) (x1, color_box.bounds.ybot);
+	    (*term->vector) (x1, color_box.bounds.ytop);
 	} else {
-	    (*term->move) (cb_x_from, y1);
-	    (*term->vector) (cb_x_to, y1);
+	    (*term->move) (color_box.bounds.xleft, y1);
+	    (*term->vector) (color_box.bounds.xright, y1);
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
     }
@@ -466,7 +462,7 @@ cbtick_callback(
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
 	if (color_box.rotation == 'h') {
-	    int y3 = cb_y_from - (term->v_char);
+	    int y3 = color_box.bounds.ybot - (term->v_char);
 	    int hrotate = 0;
 
 	    if (axis_array[axis].tic_rotate
@@ -480,7 +476,7 @@ cbtick_callback(
 	    if (hrotate)
 		(*term->text_angle)(0);
 	} else {
-	    unsigned int x3 = cb_x_to + (term->h_char);
+	    unsigned int x3 = color_box.bounds.xright + (term->h_char);
 	    if (len > 0) x3 += len; /* add outer tics len */
 	    write_multiline(x3+offsetx, y2+offsety, text,
 			    LEFT, CENTRE, 0.0,
@@ -492,11 +488,11 @@ cbtick_callback(
     /* draw tic on the mirror side */
     if (CB_AXIS.ticmode & TICS_MIRROR) {
 	if (color_box.rotation == 'h') {
-	    y1 = cb_y_to;
-	    y2 = cb_y_to + len;
+	    y1 = color_box.bounds.ytop;
+	    y2 = color_box.bounds.ytop + len;
 	} else {
-	    x1 = cb_x_from;
-	    x2 = cb_x_from - len;
+	    x1 = color_box.bounds.xleft;
+	    x2 = color_box.bounds.xleft - len;
 	}
 	(*term->move) (x1, y1);
 	(*term->vector) (x2, y2);
@@ -529,50 +525,50 @@ draw_color_smooth_box(int plot_mode)
     if (color_box.where == SMCOLOR_BOX_USER) {
 	if (!is_3d_plot) {
 	    double xtemp, ytemp;
-	    map_position(&color_box.origin, &cb_x_from, &cb_y_from, "cbox");
+	    map_position(&color_box.origin, &color_box.bounds.xleft, &color_box.bounds.ybot, "cbox");
 	    map_position_r(&color_box.size, &xtemp, &ytemp, "cbox");
-	    cb_x_to = xtemp;
-	    cb_y_to = ytemp;
+	    color_box.bounds.xright = xtemp;
+	    color_box.bounds.ytop = ytemp;
 	} else if (splot_map && is_3d_plot) {
 	    /* In map view mode we allow any coordinate system for placement */
 	    double xtemp, ytemp;
 	    map3d_position_double(&color_box.origin, &xtemp, &ytemp, "cbox");
-	    cb_x_from = xtemp;
-	    cb_y_from = ytemp;
-	    map3d_position_r(&color_box.size, &cb_x_to, &cb_y_to, "cbox");
+	    color_box.bounds.xleft = xtemp;
+	    color_box.bounds.ybot = ytemp;
+	    map3d_position_r(&color_box.size, &color_box.bounds.xright, &color_box.bounds.ytop, "cbox");
 	} else {
 	    /* But in full 3D mode we only allow screen coordinates */
-	    cb_x_from = color_box.origin.x * (term->xmax) + 0.5;
-	    cb_y_from = color_box.origin.y * (term->ymax) + 0.5;
-	    cb_x_to = color_box.size.x * (term->xmax-1) + 0.5;
-	    cb_y_to = color_box.size.y * (term->ymax-1) + 0.5;
+	    color_box.bounds.xleft = color_box.origin.x * (term->xmax) + 0.5;
+	    color_box.bounds.ybot = color_box.origin.y * (term->ymax) + 0.5;
+	    color_box.bounds.xright = color_box.size.x * (term->xmax-1) + 0.5;
+	    color_box.bounds.ytop = color_box.size.y * (term->ymax-1) + 0.5;
 	}
-	cb_x_to += cb_x_from;
-	cb_y_to += cb_y_from;
+	color_box.bounds.xright += color_box.bounds.xleft;
+	color_box.bounds.ytop += color_box.bounds.ybot;
 
     } else { /* color_box.where == SMCOLOR_BOX_DEFAULT */
 	if (plot_mode == MODE_SPLOT && !splot_map) {
 	    /* HBB 20031215: new code.  Constants fixed to what the result
 	     * of the old code in default view (set view 60,30,1,1)
 	     * happened to be. Somebody fix them if they're not right! */
-	    cb_x_from = xmiddle + 0.709 * xscaler;
-	    cb_x_to   = xmiddle + 0.778 * xscaler;
-	    cb_y_from = ymiddle - 0.147 * yscaler;
-	    cb_y_to   = ymiddle + 0.497 * yscaler;
+	    color_box.bounds.xleft = xmiddle + 0.709 * xscaler;
+	    color_box.bounds.xright   = xmiddle + 0.778 * xscaler;
+	    color_box.bounds.ybot = ymiddle - 0.147 * yscaler;
+	    color_box.bounds.ytop   = ymiddle + 0.497 * yscaler;
 
 	} else if (is_3d_plot) {
 	    /* MWS 09-Dec-05, make color box full size for splot maps. */
 	    double dx = (X_AXIS.max - X_AXIS.min);
-	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, &cb_x_from, &cb_y_from);
-	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &cb_x_to, &cb_y_to);
+	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, &color_box.bounds.xleft, &color_box.bounds.ybot);
+	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &color_box.bounds.xright, &color_box.bounds.ytop);
 	} else { /* 2D plot */
 	    struct position default_origin = {graph,graph,graph, 1.025, 0, 0};
 	    struct position default_size = {graph,graph,graph, 0.05, 1.0, 0};
 	    double xtemp, ytemp;
-	    map_position(&default_origin, &cb_x_from, &cb_y_from, "cbox");
+	    map_position(&default_origin, &color_box.bounds.xleft, &color_box.bounds.ybot, "cbox");
 	    map_position_r(&default_size, &xtemp, &ytemp, "cbox");
-	    cb_x_to = xtemp + cb_x_from;
-	    cb_y_to = ytemp + cb_y_from;
+	    color_box.bounds.xright = xtemp + color_box.bounds.xleft;
+	    color_box.bounds.ytop = ytemp + color_box.bounds.ybot;
 	}
 
 	/* now corrections for outer tics */
@@ -582,21 +578,21 @@ draw_color_smooth_box(int plot_mode)
 	    int ylen = (Y_AXIS.tic_in ? -1 : 1) * Y_AXIS.ticscale * 
 		(term->h_tic); /* positive for outer tics */
 	    if ((cblen > 0) && (CB_AXIS.ticmode & TICS_MIRROR)) {
-		cb_x_from += cblen;
-		cb_x_to += cblen;
+		color_box.bounds.xleft += cblen;
+		color_box.bounds.xright += cblen;
 	    }
 	    if ((ylen > 0) && 
 		(axis_array[FIRST_Y_AXIS].ticmode & TICS_MIRROR)) {
-		cb_x_from += ylen;
-		cb_x_to += ylen;
+		color_box.bounds.xleft += ylen;
+		color_box.bounds.xright += ylen;
 	    }
 	}
     }
 
-    if (cb_y_from > cb_y_to) { /* switch them */
-	tmp = cb_y_to;
-	cb_y_to = cb_y_from;
-	cb_y_from = tmp;
+    if (color_box.bounds.ybot > color_box.bounds.ytop) { /* switch them */
+	tmp = color_box.bounds.ytop;
+	color_box.bounds.ytop = color_box.bounds.ybot;
+	color_box.bounds.ybot = tmp;
     }
 
     /* Optimized version of the smooth colour box in postscript. Advantage:
@@ -619,11 +615,11 @@ draw_color_smooth_box(int plot_mode)
 	    term_apply_lp_properties(&border_lp);
 	}
 	newpath();
-	(term->move) (cb_x_from, cb_y_from);
-	(term->vector) (cb_x_to, cb_y_from);
-	(term->vector) (cb_x_to, cb_y_to);
-	(term->vector) (cb_x_from, cb_y_to);
-	(term->vector) (cb_x_from, cb_y_from);
+	(term->move) (color_box.bounds.xleft, color_box.bounds.ybot);
+	(term->vector) (color_box.bounds.xright, color_box.bounds.ybot);
+	(term->vector) (color_box.bounds.xright, color_box.bounds.ytop);
+	(term->vector) (color_box.bounds.xleft, color_box.bounds.ytop);
+	(term->vector) (color_box.bounds.xleft, color_box.bounds.ybot);
 	closepath();
 
 	/* Set line properties to some value, this also draws lines in postscript terminals. */
@@ -645,10 +641,10 @@ draw_color_smooth_box(int plot_mode)
 		(term->v_tic);
 
 	    map3d_position_r(&(CB_AXIS.label.offset), &x, &y, "smooth_box");
-	    x += (cb_x_from + cb_x_to) / 2;
+	    x += (color_box.bounds.xleft + color_box.bounds.xright) / 2;
 
 #define DEFAULT_Y_DISTANCE 1.0
-	    y += cb_y_from + (- DEFAULT_Y_DISTANCE - 1.7) * term->v_char;
+	    y += color_box.bounds.ybot + (- DEFAULT_Y_DISTANCE - 1.7) * term->v_char;
 #undef DEFAULT_Y_DISTANCE
 	    if (len < 0) y += len;
 	    if (x<0) x = 0;
@@ -666,10 +662,10 @@ draw_color_smooth_box(int plot_mode)
 	    }
 	    map3d_position_r(&(CB_AXIS.label.offset), &x, &y, "smooth_box");
 #define DEFAULT_X_DISTANCE 1.0
-	    x += cb_x_to + (widest_tic_strlen + DEFAULT_X_DISTANCE + 1.5) * term->h_char;
+	    x += color_box.bounds.xright + (widest_tic_strlen + DEFAULT_X_DISTANCE + 1.5) * term->h_char;
 #undef DEFAULT_X_DISTANCE
 	    if (len > 0) x += len;
-	    y += (cb_y_from + cb_y_to) / 2;
+	    y += (color_box.bounds.ybot + color_box.bounds.ytop) / 2;
 	    if (x<0) x = 0;
 	    if (y<0) y = 0;
 	    if ((*term->text_angle)(CB_AXIS.label.rotate)) {

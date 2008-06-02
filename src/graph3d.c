@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.196 2008/03/13 19:53:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.197 2008/06/02 00:48:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -848,12 +848,16 @@ do_3dplot(
     if (key->region == GPKEY_USER_PLACEMENT) {
 	map3d_position(&key->user_pos, &xl, &yl, "key");
     }
-    
-    /* KEY TITLE */
+   
+    /* Key bounds */
+	key->bounds.xright = xl + key_col_wth * (key_cols - 1) + key_size_right;
+	key->bounds.xleft = xl - key_size_left;
+	key->bounds.ytop = yl + t->v_char * ktitle_lines;
+	key->bounds.ybot = yl - key_entry_height * key_rows;
+
+    /* Key title */
     if (key->visible && (*key->title)) {
-	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
-	int key_xl = xl - key_size_left;
-	int center = (key_xr + key_xl) / 2;
+	int center = (key->bounds.xright + key->bounds.xleft) / 2;
 	double extra_height = 0.0;
 
 	if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
@@ -871,27 +875,24 @@ do_3dplot(
 	yl -= t->v_char * ktitle_lines;
     }
 
+    /* Key box */
     if (key->visible && key->box.l_type > LT_NODRAW) {
-	int yt = yl + t->v_char * ktitle_lines;
-	int yb = yl - key_entry_height * key_rows;
-	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
-	int key_xl = xl - key_size_left;
 	int tmp = (int)(0.5 * key->height_fix * t->v_char);
-	yb -= 2*tmp;
+	key->bounds.ybot -= 2*tmp;
 	yl -= tmp;
 
 	term_apply_lp_properties(&key->box);
 	newpath();
-	(*t->move) (key_xl, yb);
-	(*t->vector) (key_xl, yt);
-	(*t->vector) (key_xr, yt);
-	(*t->vector) (key_xr, yb);
-	(*t->vector) (key_xl, yb);
+	(*t->move) (key->bounds.xleft, key->bounds.ybot);
+	(*t->vector) (key->bounds.xleft, key->bounds.ytop);
+	(*t->vector) (key->bounds.xright, key->bounds.ytop);
+	(*t->vector) (key->bounds.xright, key->bounds.ybot);
+	(*t->vector) (key->bounds.xleft, key->bounds.ybot);
 	closepath();
 
 	/* draw a horizontal line between key title and first entry  JFi */
-	(*t->move) (key_xl, yt - (ktitle_lines) * t->v_char);
-	(*t->vector) (key_xr, yt - (ktitle_lines) * t->v_char);
+	(*t->move) (key->bounds.xleft, key->bounds.ytop - (ktitle_lines) * t->v_char);
+	(*t->vector) (key->bounds.xright, key->bounds.ytop - (ktitle_lines) * t->v_char);
     }
 
 

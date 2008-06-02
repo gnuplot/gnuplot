@@ -12,6 +12,12 @@
 	* src/term.c (estimate_strlen) term/estimate.trm:
 	Allow for embedded newlines when estimating string length and height.
 
+	* src/graphics.h src/graphics.c src/gadgets.h src/graph3d.c src/color.c
+	src/mouse.c:  Move the bounding box information for the key and for the
+	colorbox into their respective structures so that they can be shared by
+	2D and 3D code.  Change the 'l' and 'L' hotkeys so that the color axis
+	log scaling is toggled if and only if the mouse is in the colorbox.
+
 2008-06-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/term-ja.diff docs/gnuplot-ja.doc:

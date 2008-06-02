@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.43 2008/03/13 19:53:34 sfeam Exp $
+ * $Id: graphics.h,v 1.44 2008/04/30 04:16:13 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -76,18 +76,6 @@ typedef struct curve_points {
     int z_axis;			/* same as either x_axis or y_axis, for 5-column plot types */
     struct coordinate GPHUGE *points;
 } curve_points;
-
-/* From ESR's "Actual code patch" :) */
-/* An exclusion box.
- * Right now, the only exclusion region is the key box, but that will
- * change when we support boxed labels.
- */
-struct clipbox {
-    int xl;
-    int xr;
-    int yt;
-    int yb;
-};
 
 /* externally visible variables of graphics.h */
 
