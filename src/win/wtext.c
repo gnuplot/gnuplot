@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.16 2006/11/10 22:30:16 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.17 2008/05/29 19:55:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -1022,6 +1022,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
     {
 	RECT crect, wrect;
+	int cxmax, cymax;
 	TEXTMETRIC tm;
 
 	lptw = ((CREATESTRUCT FAR *)lParam)->lpCreateParams;
@@ -1037,20 +1038,22 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	lptw->CharAscent = tm.tmAscent;
 	ReleaseDC(hwnd,hdc);
 	GetClientRect(hwnd, &crect);
-	if ( lptw->CharSize.x*lptw->ScreenSize.x < crect.right ) {
+	cxmax = lptw->CharSize.x*lptw->ScreenSize.x + GetSystemMetrics(SM_CXVSCROLL);
+	cymax = lptw->CharSize.y*lptw->ScreenSize.y + lptw->ButtonHeight + GetSystemMetrics(SM_CXHSCROLL);
+	if ( cxmax < crect.right ) {
 	    /* shrink x size */
 	    GetWindowRect(lptw->hWndParent,&wrect);
 	    MoveWindow(lptw->hWndParent, wrect.left, wrect.top,
-		       wrect.right-wrect.left + (lptw->CharSize.x*lptw->ScreenSize.x - crect.right),
+		       wrect.right-wrect.left + (cxmax - crect.right),
 		       wrect.bottom-wrect.top,
 		       TRUE);
 	}
-	if ( lptw->CharSize.y*lptw->ScreenSize.y < crect.bottom ) {
+	if ( cymax < crect.bottom ) {
 	    /* shrink y size */
 	    GetWindowRect(lptw->hWndParent,&wrect);
 	    MoveWindow(lptw->hWndParent, wrect.left, wrect.top,
 		       wrect.right-wrect.left,
-		       wrect.bottom-wrect.top + (lptw->CharSize.y*lptw->ScreenSize.y+lptw->ButtonHeight - crect.bottom),
+		       wrect.bottom-wrect.top + (cymax - crect.bottom),
 		       TRUE);
 	}
     }

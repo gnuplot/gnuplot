@@ -1,3 +1,8 @@
+2008-06-02  Tim Hoffmann  <t_hoffmann@users.sourceforge.net>
+
+	* src/win/wtext.c (WndParentProc): Account for scrollbars when shrinking
+	the textwin to the maximally needed width. SF Patch #1971437.
+
 2008-06-01  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_image):  Unpack RGBA data.
@@ -73,12 +78,12 @@
 	* src/tables.c src/tables.h src/show.c:  The command "show colornames"
 	was documented, but was not implemented.  Now it is.
 
-2008-05-31  Thomas Sefzick <thse@users.sourceforge.net>
+2008-05-31  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* term/epson.trm:  Add support for the Seiko DPU-414 thermal printer
 	'set term dpu414'.
 
-2008-05-31  Allin Cottrell <cottrell@wfu.edu>
+2008-05-31  Allin Cottrell  <cottrell@wfu.edu>
 
 	* term/metapost.trm (MP_filled_polygon):  Limit the number of vertices
 	per line of output.
@@ -131,12 +136,12 @@
 	isn't already using the full set of column assignments (candlesticks,
 	boxxyerror).
 
-2008-05-25  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
+2008-05-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/emf.trm (EMF_options): Option 'size' broke out of parsing
 	loop prematurely.
 
-2008-05-23  Philipp K. Janert <janert@ieee.org>
+2008-05-23  Philipp K. Janert  <janert@ieee.org>
 
 	* demo/all.dem demo/smooth.dem demo/dgrid3d.dem demo/random-points
 	demo/gnu-valley: added demos for the new dgrid3d kernels and for 
@@ -507,7 +512,7 @@
 	linetype of a fillstyle.  New helper routine need_fill_border() to
 	determine when this is needed and simplify the call sites.
 
-2008-03-30  Allin Cottrell <cottrell@wfu.edu>
+2008-03-30  Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/command.c (help_command): Fix incorrect nesting of #if clauses
 	from removal of atari support.
@@ -534,7 +539,7 @@
 	    "Due to declining membership, The Ol' Hackers Atari Users Group
 	     closed its doors after its final meeting in December 2000" 
 
-2008-03-29  Andras Pal <apal@szofi.elte.hu>
+2008-03-29  Andras Pal  <apal@szofi.elte.hu>
 
 	* src/standard.c (f_ellip_first f_ellip_second f_ellip_third)
 	src/standard.h src/eval.c:  New functions `EllipticK`, `EllipticE` and
@@ -2307,7 +2312,7 @@
 
 	* demo/html/index.save demo/html/Makefile: Update html demo set.
 
-2007-06-08  Timothee Lecomte <timothee.lecomte@ens.fr>
+2007-06-08  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_close_terminal_window): Send a
 	"Close event" to the event loop instead of using the default method
@@ -3067,7 +3072,7 @@
 
 	* docs/gnuplot.doc: Update section on "set key".
 
-2007-02-05  Per Persson <persquare@mac.com>
+2007-02-05  Per Persson  <persquare@mac.com>
 
 	* configure.in: Testing libreadline for remove_history presence 
 	instead of readline to avoid incompatible libedit wrapper.
@@ -8153,7 +8158,7 @@
 	variable (normally x or y) is not parsed correctly. This error is
 	eventually discovered and reported in imag().
 
-2005-07-16  John Bollinger <bbands@yahoo.com>
+2005-07-16  John Bollinger  <bbands@yahoo.com>
 
 	* demo/finance.dem demo/finance.dat: New demo illustrating
 	various gnuplot features applied to display of financial data.
@@ -9117,7 +9122,7 @@
 	environmental variable GNUTERM to any of the PostScript terminal modes
 	will cause a segfault on entry.
 
-2005-03-23  Aapo Lankinen <aapo.lankinen@gmail.com>
+2005-03-23  Aapo Lankinen  <aapo.lankinen@gmail.com>
 
 	* src/contour.c (contour): Bugfix: logscale on CB was being applied
 	twice when calculating contour colors.
