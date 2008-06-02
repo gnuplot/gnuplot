@@ -10,6 +10,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW 'volatile' data, including inline data, can be replotted without rereading
 * NEW 'refresh' command replots without rereading data if possible
 * NEW rgbimage style now works in 2D and 3D for all terminals that support RGB
+* NEW plot style rgbalpha 
 * NEW transparent fill styles
 * NEW iteration within a plot command; e.g.     plot for [i=1:10] foo(i)
 * NEW operators '=' and ',' in expression syntax
