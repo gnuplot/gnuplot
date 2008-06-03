@@ -79,6 +79,7 @@ Interactive demo scripts are not included on this page.
     <li><a href="binary.html">binary data</a></li>
     <li><a href="image.html">image data</a></li>
     <li><a href="image2.html">binary and image tricks</a></li>
+    <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
     </ul>
 
     <h4>Colors</h4>

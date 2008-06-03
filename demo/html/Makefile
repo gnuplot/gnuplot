@@ -29,6 +29,9 @@ image.html: $(GNUPLOT_LIB)/image.dem ./webify.pl
 image2.html: $(GNUPLOT_LIB)/image2.dem ./webify.pl
 	export DEMOTERM="png truecolor font 'arial,8' size 420,320"; ./webify.pl image2
 
+rgbalpha.html: $(GNUPLOT_LIB)/rgbalpha.dem ./webify.pl
+	export DEMOTERM="png truecolor font 'arial,8' size 450,300"; ./webify.pl rgbalpha
+
 finance.html: $(GNUPLOT_LIB)/finance.dem ./webify.pl
 	export DEMOTERM="png enhanced transparent font 'arial,8' size 660,320"; ./webify.pl finance
 

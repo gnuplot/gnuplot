@@ -1,7 +1,7 @@
 set border linecolor rgb "gold"
 set key title "Plot style rgbalpha" textcolor rgb "gold" 
 set key bottom left at screen .75, screen .75
-set key Left width -14 # Needed because the titles contain \n #
+set key Left width -7 sample 1
 
 set object  1 rect from screen 0, 0 to screen 1, 1 behind \
               fc rgb "gray10"  fillstyle  solid 1.00 noborder
