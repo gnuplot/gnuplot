@@ -100,6 +100,7 @@ Interactive demo scripts are not included on this page.
     <li><a href="finance.html">financial data</a></li>
     <li><a href="scatter.html">non-gridded data</a></li>
     <li><a href="running_avg.html">running averages</a></li>
+    <li><a href="smooth.html">cummulative smoothing</a></li>
     <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
     </ul>
 
