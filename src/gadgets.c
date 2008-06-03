@@ -154,11 +154,6 @@ TBOOLEAN parametric = FALSE;
 /* If last plot was a 3d one. */
 TBOOLEAN is_3d_plot = FALSE;
 
-#ifdef WITH_IMAGE
-/* If last plot was one using color bus, e.g., image, map, pm3d. */
-TBOOLEAN is_cb_plot = FALSE;
-#endif
-
 #ifdef VOLATILE_REFRESH
 /* Flag to signal that the existing data is valid for a quick refresh */
 int refresh_ok = 0;		/* 0 = no;  2 = 2D ok;  3 = 3D ok */

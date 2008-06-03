@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.171 2008/04/13 19:25:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.172 2008/04/15 05:01:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1573,9 +1573,6 @@ title 'R,G,B profiles of the current color palette';";
     char *order = "rgb";
     char *save_replot_line;
     TBOOLEAN save_is_3d_plot;
-#ifdef WITH_IMAGE
-    TBOOLEAN save_is_cb_plot;
-#endif
     FILE *f = tmpfile();
 
     c_token++;
@@ -1608,9 +1605,6 @@ title 'R,G,B profiles of the current color palette';";
     enable_reset_palette = 0;
     save_replot_line = gp_strdup(replot_line);
     save_is_3d_plot = is_3d_plot;
-#ifdef WITH_IMAGE
-    save_is_cb_plot = is_cb_plot;
-#endif
     fputs(pre1, f);
     if (can_pm3d)
 	fputs(pre2, f);
@@ -1662,9 +1656,6 @@ title 'R,G,B profiles of the current color palette';";
     free(replot_line);
     replot_line = save_replot_line;
     is_3d_plot = save_is_3d_plot;
-#ifdef WITH_IMAGE
-    is_cb_plot = save_is_cb_plot;
-#endif
 
     /* further, gp_input_line[] and token[] now destroyed! */
     c_token = num_tokens = 0;

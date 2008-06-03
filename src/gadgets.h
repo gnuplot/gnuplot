@@ -393,10 +393,6 @@ extern TBOOLEAN parametric;
 
 extern TBOOLEAN is_3d_plot;
 
-#ifdef WITH_IMAGE
-extern TBOOLEAN is_cb_plot;
-#endif
-
 #ifdef VOLATILE_REFRESH
 extern int refresh_ok;		/* 0 = no;  2 = 2D ok;  3 = 3D ok */
 extern int refresh_nplots;

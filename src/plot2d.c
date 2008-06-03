@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.172 2008/05/31 04:54:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.173 2008/06/02 00:48:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -197,9 +197,6 @@ plotrequest()
 	int_error(c_token, "use 'set term' to set terminal type first");
 
     is_3d_plot = FALSE;
-#ifdef WITH_IMAGE
-    is_cb_plot = FALSE;
-#endif
 
     /* Deactivate if 'set view map' is still running after the previous 'splot': */
     splot_map_deactivate();
@@ -1880,10 +1877,8 @@ eval_plots()
 
 #ifdef WITH_IMAGE
 	    /* Styles that use palette */
-	    if (this_plot->plot_style == IMAGE) {
+	    if (this_plot->plot_style == IMAGE)
 		this_plot->lp_properties.use_palette = 1;
-		is_cb_plot = TRUE;
-	    }
 #endif /* WITH_IMAGE */
 
 	    /* we can now do some checks that we deferred earlier */
