@@ -37,8 +37,8 @@
 
 
 
-  $Date: 2009-03-29 23:03:03 +0200 (So, 29. Mär 2009) $
-  $Author: peter $
+  $Date: 2009/05/26 05:59:30 $
+  $Author: sfeam $
   $Rev: 96 $
 
 ]]--
@@ -69,12 +69,13 @@ pgf.DEFAULT_CANVAS_SIZE_Y = 8.75
 pgf.DEFAULT_TIC_SIZE = 0.18
 -- the terminal resolution in "dots" per cm.
 pgf.DEFAULT_RESOLUTION = 1000
-
+-- default font size in TeX pt
+pgf.DEFAULT_FONT_SIZE = 10
 
 pgf.LATEX_STYLE_FILE = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = string.sub("$Rev: 96 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2009-03-29 23:03:03 +0200 (So, 29. Mär 2009) $",
+pgf.REVISION = string.sub("$Rev: 96a $",7,-3)
+pgf.REVISION_DATE = string.gsub("$Date: 2009/05/26 05:59:30 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -183,6 +184,27 @@ pgf.styles.plotmarks = {
  [16] = {"gp mark 15", "mark=oplus"}
 }  
 
+--[[===============================================================================================
+
+    helper functions
+
+]]--===============================================================================================
+
+-- from the Lua wiki
+explode = function(div,str)
+  if (div=='') then return false end
+  local pos,arr = 0,{}
+  local trim = function(s) return (string.gsub(s,"^%s*(.-)%s*$", "%1")) end
+  -- for each divider found
+  for st,sp in function() return string.find(str,div,pos,true) end do
+    table.insert(arr, trim(string.sub(str,pos,st-1))) -- Attach chars left of current divider
+    pos = sp + 1 -- Jump past current divider
+  end
+  table.insert(arr, trim(string.sub(str,pos))) -- Attach chars right of last divider
+  return arr
+end
+
+
 
 --[[===============================================================================================
 
@@ -204,7 +226,7 @@ pgf.format_coord = function(xc, yc)
 end
 
 pgf.write_doc_begin = function(preamble)
-  gp.write("\\documentclass[10pt]{article}\n"
+  gp.write("\\documentclass["..pgf.DEFAULT_FONT_SIZE.."pt]{article}\n"
         .."\\usepackage[T1]{fontenc}\n"
         .."\\usepackage{textcomp}\n\n"
         .."\\usepackage[utf8x]{inputenc}\n\n"
@@ -628,6 +650,8 @@ f:write([[
   \path[solid] plot[only marks,gp point,#1,mark options={gp shift only}] coordinates {#2};%
 }
 
+\def\gpfontsize#1#2{\fontsize{#1}{#2}\selectfont}
+
 %
 % char size calculation, that might be used with gnuplottex
 %
@@ -916,10 +940,17 @@ pgf.print_help = function(fwrite)
  script. Use gnuplot's 'show variables all' command to see the list
  of valid variables.
 
- <fontdesc> may contain any valid LaTeX font commands like e.g.
- '\small'. This can be 'misused' to add further code to a node,
- e.g. '\small,yshift=1ex' or ',yshift=1ex' are also valid while
- the latter does not change the current font settings.
+ The <fontdesc> string may contain any valid LaTeX font commands like
+ e.g. '\small'. It is passed directly as a node parameter in form of
+ "font=<fontdesc>". This can be 'misused' to add further code to a node,
+ e.g. '\small,yshift=1ex' or ',yshift=1ex' are also valid while the
+ latter does not change the current font settings. One exception is
+ the second argument of the list. If it is a number of the form
+ <number>{unit} it will be interpreted as a fontsize like in other
+ terminals and will be appended to the first argument. If the unit is
+ omitted the value is interpreted as 'pt'. As an example the string
+ '\sffamily,12,fill=red' sets the font to LaTeX's sans serif font at
+ a size of 12pt and red background color.
 
  Strings have to be put in single or double quotes. Double quoted
  strings may contain special characters like newlines '\n' etc.
@@ -1032,6 +1063,63 @@ gfx.TEXT_ANCHOR = {
 }
 
 gfx.HEAD_STR = {"", "->", "<-", "<->"}
+
+
+-- conversion factors in `cm'
+gfx.units = {
+  ['']    = 1,        -- default
+  ['cm']  = 1,
+  ['mm']  = 0.1,
+  ['in']  = 2.54,
+  ['inch']= 2.54,
+  ['pt']  = 0.035146, -- Pica Point   (72.27pt = 1in)
+  ['pc']  = 0.42176,  -- Pica         (1 Pica = 1/6 inch)
+  ['bp']  = 0.035278, -- Big Point    (72bp = 1in)
+  ['dd']  = 0.0376,   -- Didot Point  (1cm = 26.6dd)
+  ['cc']  = 0.45113   -- Cicero       (1cc = 12 dd)
+}
+
+
+gfx.parse_number_unit = function (str, from, to)
+  to = to or 'cm'
+  from = from or 'cm'
+  local num, unit = string.match(str, '([%d%.]+)([a-z]*)')
+  if unit and (string.len(unit) > 0) then
+    from = unit
+  else
+    unit = false
+  end
+  local factor_from = gfx.units[from]
+  local factor_to   = gfx.units[to]
+  num = tonumber(num)
+  if num and factor_from then
+    -- to cm and then to our target unit
+    return num*(factor_from/factor_to), unit
+  else
+    return false, false
+  end
+end
+
+
+gfx.parse_font_string = function (str)
+  local size,rets,toks = nil, str, explode(',', str)
+  -- if at least two tokens
+  if #toks > 1 then
+    -- add first element to font string
+    rets = table.remove(toks,1)
+    -- no unit means 'pt'
+    size, _ = gfx.parse_number_unit(toks[1],'pt','pt')
+    if (size) then
+      table.remove(toks,1)
+      rets = rets .. string.format('\\gpfontsize{%.2fpt}{%.2fpt}',size,size*1.2)
+    end
+    -- add remaining parts
+    for k,v in ipairs(toks) do
+      rets = rets .. ',' .. v
+    end
+  end
+  return rets, size
+end
 
 
 gfx.write_boundingbox = function()
@@ -1165,11 +1253,11 @@ gfx.start_path = function(x, y)
   gfx.posy = y
 end
 
--- type  string  LT|RGB|GRAY
+-- ctype  string  LT|RGB|GRAY
 -- val   table   {name}|{r,g,b}
-gfx.format_color = function(type, val)
+gfx.format_color = function(ctype, val)
   local c
-  if type == 'LT' then
+  if ctype == 'LT' then
     if val[1] < 0 then
       if val[1] < -2 then --  LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED
         c = 'gpbgfillcolor'
@@ -1180,17 +1268,17 @@ gfx.format_color = function(type, val)
       c = pgf.styles.lt_colors[(val[1] % #pgf.styles.lt_colors)+1][1]
     end
     -- c = pgf.styles.lt_colors[((val[1]+3) % #pgf.styles.lt_colors) + 1][1]
-  elseif type == 'RGB' then
+  elseif ctype == 'RGB' then
     c = string.format("\\gprgb{%i}{%i}{%i}",
                   1000*val[1]+0.5, 1000*val[2]+0.5, 1000*val[3]+0.5)
-  elseif type == 'GRAY' then
+  elseif ctype == 'GRAY' then
     c = string.format("black!%i", 100*val[1]+0.5)
   end
   return c
 end
 
-gfx.set_color = function(type, val)
-  gfx.color = gfx.format_color(type, val)
+gfx.set_color = function(ctype, val)
+  gfx.color = gfx.format_color(ctype, val)
 end
 
 
@@ -1217,8 +1305,8 @@ else
   term.h_tic =  pgf.DEFAULT_RESOLUTION * pgf.DEFAULT_TIC_SIZE
   term.v_tic =  pgf.DEFAULT_RESOLUTION * pgf.DEFAULT_TIC_SIZE
   -- default size for CM@10pt
-  term.h_char = 184 * math.floor(pgf.DEFAULT_RESOLUTION/1000+.5)
-  term.v_char = 308 * math.floor(pgf.DEFAULT_RESOLUTION/1000+.5)
+  term.h_char = 184 * math.floor((pgf.DEFAULT_FONT_SIZE/10) * (pgf.DEFAULT_RESOLUTION/1000) + .5)
+  term.v_char = 308 * math.floor((pgf.DEFAULT_FONT_SIZE/10) * (pgf.DEFAULT_RESOLUTION/1000) + .5)
   term.description = "Lua PGF/TikZ terminal for LaTeX2e"
   term.flags = term.TERM_BINARY + term.TERM_CAN_CLIP
                 + term.TERM_IS_POSTSCRIPT + term.TERM_CAN_MULTIPLOT
@@ -1237,8 +1325,8 @@ end
 --
 term.options = function(opt_str, initial, t_count)
 
-  local next = ""
-  local type = nil
+  local o_next = ""
+  local o_type = nil
   local s_start, s_end = 1, 1
 
   -- trim spaces
@@ -1246,6 +1334,11 @@ term.options = function(opt_str, initial, t_count)
   local opt_len = string.len(opt_str)
 
   t_count = t_count - 1
+
+  local set_t_count = function(num) 
+    -- gnuplot handles commas as regular tokens
+    t_count = t_count + 2*num - 2
+  end
 
   local almost_equals = function(param, opt)
     local op1, op2
@@ -1271,8 +1364,8 @@ term.options = function(opt_str, initial, t_count)
 
     -- beyond the limit?
     if s_start > opt_len then
-      next = ""
-      type = nil
+      o_next = ""
+      o_type = nil
       return
     end
 
@@ -1281,8 +1374,8 @@ term.options = function(opt_str, initial, t_count)
     -- search the start of the next token
     s_start, _ = string.find (opt_str, '[^%s]', s_start)
     if not s_start then
-      next = ""
-      type = nil
+      o_next = ""
+      o_type = nil
       return
     end
 
@@ -1293,12 +1386,12 @@ term.options = function(opt_str, initial, t_count)
       -- the next not escaped quote
       _ , s_end = string.find (opt_str, '[^\\]'..next_char, s_start+1)
       if s_end then
-        next = string.sub(opt_str, s_start+1, s_end-1)
+        o_next = string.sub(opt_str, s_start+1, s_end-1)
         if next_char == '"' then
           -- Wow! this is to resolve all string escapes, kind of "unescape string"
-          next = assert(loadstring("return(\""..next.."\")"))()
+          o_next = assert(loadstring("return(\""..o_next.."\")"))()
         end
-        type = "string"
+        o_type = "string"
       else
         -- FIXME: error: string does not end...
         -- seems that gnuplot adds missing quotes
@@ -1314,65 +1407,29 @@ term.options = function(opt_str, initial, t_count)
       else
         s_end = s_end + 1
       end
-      next = string.sub(opt_str, s_start, s_end-1)
-      type = "op"
+      o_next = string.sub(opt_str, s_start, s_end-1)
+      o_type = "op"
     end
     s_start = s_end + 1
     return
   end    
 
-  -- from the Lua wiki
-  local explode = function(div,str)
-    if (div=='') then return false end
-    local pos,arr = 0,{}
-    local trim = function(s) return (string.gsub(s,"^%s*(.-)%s*$", "%1")) end
-    -- for each divider found
-    for st,sp in function() return string.find(str,div,pos,true) end do
-      table.insert(arr, trim(string.sub(str,pos,st-1))) -- Attach chars left of current divider
-      pos = sp + 1 -- Jump past current divider
-    end
-    table.insert(arr, trim(string.sub(str,pos))) -- Attach chars right of last divider
-    -- gnuplot handles commas a regular tokens
-    t_count = t_count + 2*#arr - 2
-    return arr
-  end
-
-  -- conversion factors in `cm'
-  local units = {
-    ['']    = 1,        -- default
-    ['cm']  = 1,
-    ['mm']  = 0.1,
-    ['in']  = 2.54,
-    ['inch']= 2.54,
-    ['pt']  = 0.035146, -- Pica Point   (72.27pt = 1in)
-    ['pc']  = 0.42176,  -- Pica         (1 Pica = 1/6 inch)
-    ['bp']  = 0.035278, -- Big Point    (72bp = 1in)
-    ['dd']  = 0.0376,   -- Didot Point  (1cm = 26.6dd)
-    ['cc']  = 0.45113   -- Cicero       (1cc = 12 dd)
-  }
-
-  local calc_unit = function (str)
-    local num, unit = string.match(str, '([%d%.]+)([a-z]*)')
-    local factor = units[unit]
-    num = tonumber(num)
-    if string.len(unit) > 0 then
-      t_count = t_count + 1
-    end
-    if num and factor then
-      return num*factor
-    else
-      return false
-    end
-  end
-
   local get_two_sizes = function(str)
     local args = explode(',', str)
-    local num1, num2
+    set_t_count(#args)
+
+    local num1, num2, unit
     if #args ~= 2 then
       return false, nil
     else
-      num1 = calc_unit(args[1])
-      num2 = calc_unit(args[2])
+      num1, unit = gfx.parse_number_unit(args[1])
+      if unit then
+        t_count = t_count + 1
+      end
+      num2, unit = gfx.parse_number_unit(args[2])
+      if unit then
+        t_count = t_count + 1
+      end
       if not (num1 and num2) then
         return false, nil
       end
@@ -1384,116 +1441,123 @@ term.options = function(opt_str, initial, t_count)
 
   while true do
     get_next_token()
-    if not type then break end
-    if almost_equals(next, "he$lp") then
+    if not o_type then break end
+    if almost_equals(o_next, "he$lp") then
       print_help = true
-    elseif almost_equals(next, "mono$chrome") then
+    elseif almost_equals(o_next, "mono$chrome") then
       -- no colored lines
       gfx.opt.lines_colored = false
-    elseif almost_equals(next, "c$olor") or almost_equals(next, "c$olour") then
+    elseif almost_equals(o_next, "c$olor") or almost_equals(o_next, "c$olour") then
       -- colored lines
       gfx.opt.lines_colored = true
-    elseif almost_equals(next, "so$lid") then
+    elseif almost_equals(o_next, "so$lid") then
       -- no dashed and dotted etc. lines
       gfx.opt.lines_dashed = false
-    elseif almost_equals(next, "da$shed") then
+    elseif almost_equals(o_next, "da$shed") then
       -- dashed and dotted etc. lines
       gfx.opt.lines_dashed = true
-    elseif almost_equals(next, "gparr$ows") then
+    elseif almost_equals(o_next, "gparr$ows") then
       -- use gnuplot arrows instead of TikZ
       gfx.opt.gp_arrows = true
-    elseif almost_equals(next, "gppoint$s") then
+    elseif almost_equals(o_next, "gppoint$s") then
       -- use gnuplot points instead of TikZ
       gfx.opt.gp_points = true
-    elseif almost_equals(next, "nopic$environment") then
+    elseif almost_equals(o_next, "nopic$environment") then
       -- omit the 'tikzpicture' environment
       gfx.opt.nopicenv = true
-    elseif almost_equals(next, "origin$reset") then
+    elseif almost_equals(o_next, "origin$reset") then
       -- moves the origin of the TikZ picture to the lower left corner of the plot
       gfx.opt.set_origin = true
-    elseif almost_equals(next, "plot$size") then
+    elseif almost_equals(o_next, "plot$size") then
       get_next_token()
-      gfx.opt.plotsize_x, gfx.opt.plotsize_y = get_two_sizes(next)
+      gfx.opt.plotsize_x, gfx.opt.plotsize_y = get_two_sizes(o_next)
       if not gfx.opt.plotsize_x then
-        gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", next))
+        gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", o_next))
       end
       gfx.opt.set_plotsize = true
       -- we set the canvas size to the plotsize to keep the aspect ratio as good as possible
       -- and rescale later once we know the actual plotsize...
       term.xmax = gfx.opt.plotsize_x*pgf.DEFAULT_RESOLUTION
       term.ymax = gfx.opt.plotsize_y*pgf.DEFAULT_RESOLUTION
-    elseif almost_equals(next, "si$ze") then
+    elseif almost_equals(o_next, "si$ze") then
       get_next_token()
-      local plotsize_x, plotsize_y = get_two_sizes(next)
+      local plotsize_x, plotsize_y = get_two_sizes(o_next)
       if not plotsize_x then
-        gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", next))
+        gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", o_next))
       end
       term.xmax = plotsize_x*pgf.DEFAULT_RESOLUTION
       term.ymax = plotsize_y*pgf.DEFAULT_RESOLUTION
-    elseif almost_equals(next, "char$size") then
+    elseif almost_equals(o_next, "char$size") then
       get_next_token()
-      local charsize_h, charsize_v = get_two_sizes(next)
+      local charsize_h, charsize_v = get_two_sizes(o_next)
       if not charsize_h then
-        gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", next))
+        gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", o_next))
       end
-      term.h_char = math.floor(charsize_h*pgf.DEFAULT_RESOLUTION+.5)
-      term.v_char = math.floor(charsize_v*pgf.DEFAULT_RESOLUTION+.5)
-    elseif almost_equals(next, "sc$ale") then
+      term.h_char = math.floor(charsize_h*pgf.DEFAULT_RESOLUTION + .5)
+      term.v_char = math.floor(charsize_v*pgf.DEFAULT_RESOLUTION + .5)
+    elseif almost_equals(o_next, "sc$ale") then
       get_next_token()
-      local xscale, yscale = get_two_sizes(next)
+      local xscale, yscale = get_two_sizes(o_next)
       if not xscale then
-        gp.int_error(t_count, string.format("error: two comma seperated numbers expected, got `%s'.", next))
+        gp.int_error(t_count, string.format("error: two comma seperated numbers expected, got `%s'.", o_next))
       end
       term.xmax = term.xmax * xscale
       term.ymax = term.ymax * yscale
-    elseif almost_equals(next, "tikzpl$ot") then
+    elseif almost_equals(o_next, "tikzpl$ot") then
       get_next_token()
-      local args = explode(',', next)
+      local args = explode(',', o_next)
+      set_t_count(#args)
       for i = 1,#args do
         args[i] = tonumber(args[i])
         if args[i] == nil then
-          gp.int_error(t_count, string.format("error: list of comma seperated numbers expected, got `%s'.", next))
+          gp.int_error(t_count, string.format("error: list of comma seperated numbers expected, got `%s'.", o_next))
         end
         args[i] = args[i] - 1
       end
       gfx.opt.plot_list = args
-    elseif almost_equals(next, "provide$vars") then
+    elseif almost_equals(o_next, "provide$vars") then
       get_next_token()
-      local args = explode(',', next)
+      local args = explode(',', o_next)
+      set_t_count(#args)
       gfx.opt.gnuplot_vars = args
-    elseif almost_equals(next, "tikzar$rows") then
+    elseif almost_equals(o_next, "tikzar$rows") then
       -- map the arrow angles to TikZ arrow styles
       gfx.opt.tikzarrows = true
-    elseif almost_equals(next, "nobit$map") then
+    elseif almost_equals(o_next, "nobit$map") then
       -- render images as filled rectangles instead of the nativ
       -- PS or PDF image format
       gfx.opt.direct_image = false
-    elseif almost_equals(next, "cmyk$image") then
+    elseif almost_equals(o_next, "cmyk$image") then
       -- use cmyk color model for images
       gfx.opt.cmykimage = true
-    elseif almost_equals(next, "full$doc") or almost_equals(next, "stand$alone") then
+    elseif almost_equals(o_next, "full$doc") or almost_equals(o_next, "stand$alone") then
       -- produce full tex document
       gfx.opt.full_doc = true
-    elseif almost_equals(next, "create$style") then
+    elseif almost_equals(o_next, "create$style") then
       -- creates the coresponding LaTeX style from the script
       local f = io.open(pgf.LATEX_STYLE_FILE..".sty" , "w+")
       pgf.create_style(f)
-    elseif almost_equals(next, "fo$nt") then
+    elseif almost_equals(o_next, "fo$nt") then
+      local fsize
       get_next_token()
-      if type == 'string' then
-        gfx.opt.default_font = next
+      if o_type == 'string' then
+        gfx.opt.default_font, fsize = gfx.parse_font_string(o_next)
       else
-        gp.int_error(t_count, string.format("error: string expected, got `%s'.", next))
+        gp.int_error(t_count, string.format("error: string expected, got `%s'.", o_next))
       end
-    elseif almost_equals(next, "pre$amble") or almost_equals(next, "header") then
+      if fsize then
+        term.h_char = math.floor(term.h_char * (fsize/pgf.DEFAULT_FONT_SIZE) + .5)
+        term.v_char = math.floor(term.v_char * (fsize/pgf.DEFAULT_FONT_SIZE) + .5)
+      end
+    elseif almost_equals(o_next, "pre$amble") or almost_equals(o_next, "header") then
       get_next_token()
-      if type == 'string' then
-        gfx.opt.latex_preamble = gfx.opt.latex_preamble .. next .. "\n"
+      if o_type == 'string' then
+        gfx.opt.latex_preamble = gfx.opt.latex_preamble .. o_next .. "\n"
       else
-        gp.int_error(t_count, string.format("error: string expected, got `%s'.", next))
+        gp.int_error(t_count, string.format("error: string expected, got `%s'.", o_next))
       end
     else
-      gp.int_warn(t_count, string.format("unknown option `%s'.", next))
+      gp.int_warn(t_count, string.format("unknown option `%s'.", o_next))
     end
   end
 
@@ -1570,11 +1634,11 @@ term.move = function(x, y)
   return 1
 end
 
-term.linetype = function(type)
+term.linetype = function(ltype)
   gfx.check_in_path()
 
-  gfx.set_color('LT', {type})
-  gfx.linetype_idx = type
+  gfx.set_color('LT', {ltype})
+  gfx.linetype_idx = ltype
 
   return 1
 end
@@ -1640,7 +1704,7 @@ term.put_text = function(x, y, txt)
   gfx.check_in_path()
   gfx.check_color()
   
-  if (txt ~= '') or (gfx.font ~= '')  then -- omit empty nodes
+  if (txt ~= '') or (gfx.text_font ~= '')  then -- omit empty nodes
     pgf.write_text_node({x, y}, txt, gfx.text_angle, gfx.TEXT_ANCHOR[gfx.text_justify], gfx.text_font)
   end
   return 1
@@ -1673,7 +1737,7 @@ term.pointsize = function(size)
 end
 
 term.set_font = function(font)
-  gfx.text_font = font
+  gfx.text_font = gfx.parse_font_string(font)
   return 1
 end
 
@@ -1792,22 +1856,22 @@ term.previous_palette = function()
   return 1
 end
 
-term.set_color = function(type, lt, value, r, g, b)
+term.set_color = function(ctype, lt, value, r, g, b)
   gfx.check_in_path()
   -- FIXME gryscale on monochrome?? ... or use xcolor?
 
-  if type == 'LT' then
+  if ctype == 'LT' then
     gfx.set_color('LT', {lt})
-  elseif type == 'FRAC' then
+  elseif ctype == 'FRAC' then
     if gfx.opt.lines_colored then
       gfx.set_color('RGB', {r, g , b})
     else
       gfx.set_color('GRAY', {value})
     end
-  elseif type == 'RGB' then
+  elseif ctype == 'RGB' then
     gfx.set_color('RGB', {r, g , b})
   else
-    gp.int_error(string.format("set color: unknown type (%s), lt (%i), value (%.3f)\n", type, lt, value))
+    gp.int_error(string.format("set color: unknown type (%s), lt (%i), value (%.3f)\n", ctype, lt, value))
   end
   
   return 1

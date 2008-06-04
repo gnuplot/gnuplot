@@ -1,3 +1,9 @@
+2008-06-04  Peter Hedwig  <peter@affenbande.org>
+
+	* term/lua/gnuplot-tikz.lua term/lua/gnuplot-tikz.help
+	share/LaTeX/gnuplot-lua-tikz.sty: Update the lua terminal scripts to
+	accept a font size in the second slot of a font descriptor string.
+
 2009-06-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c:  The following test script triggered multiple problems.

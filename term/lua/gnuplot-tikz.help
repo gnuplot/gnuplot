@@ -1,119 +1,124 @@
-"2 tikz",
-"?set terminal lua tikz",
-"?set term lua tikz",
-"?term lua tikz",
-"?tikz",
-" The TikZ driver is an output driver for the generic Lua terminal.",
-" Please read the Lua terminal section for additional information.",
-"",
-" Syntax:",
-"     set terminal lua tikz",
-"",
-"      {help}",
-"      {monochrome}",
-"      {solid}",
-"      {originreset}",
-"      {gparrows}",
-"      {gppoints}",
-"      {nopicenvironment}",
-"      {size <x>{unit},<y>{unit}}",
-"      {scale <x>,<y>}",
-"      {plotsize <x>{unit},<y>{unit}}",
-"      {charsize <x>{unit},<y>{unit}}",
-"      {font \"<fontdesc>\"}",
-"      {createstyle}",
-"      {fulldoc|standalone}",
-"      {{preamble|header} \"<preamble_string>\"}",
-"      {tikzplot <ltn>,...}",
-"      {tikzarrows}",
-"      {cmykimages}",
-"      {nobitmap}",
-"      {providevars <var name>,...}",
-"",
-" For all options that expect lengths as their arguments they",
-" will default to 'cm' if no unit is specified. For all lengths",
-" the following units may be used: 'cm', 'mm', 'in' or 'inch',",
-" 'pt', 'pc', 'bp', 'dd', 'cc'. Blanks between numbers and units",
-" are not allowed.",
-"",
-" 'monochrome' disables line coloring and switches to grayscaled",
-" fills.",
-"",
-" 'solid' use only solid lines.",
-"",
-" 'originreset' moves the origin of the TikZ picture to the lower",
-" left corner of the plot. It may be used to align several plots",
-" within one tikzpicture environment. This is not tested with",
-" multiplots and pm3d plots!",
-"",
-" 'gparrows' use gnuplot's internal arrow drawing function",
-" instead of the ones provided by TikZ.",
-"",
-" 'gppoints' use gnuplot's internal plotmark drawing function",
-" instead of the ones provided by TikZ.",
-"",
-" 'nopicenvironment' omits the declaration of the 'tikzpicture'",
-" environment in order to set it manually. This permits putting",
-" some PGF/TikZ code directly before or after the plot.",
-"",
-" The 'size' option expects two lenghts <x> and <y> as the canvas size.",
-" The default size of the canvas is 12.5cm x 8.75cm.",
-"",
-" The 'scale' option works similar to the 'size' option but expects",
-" scaling factors <x> and <y> instead of lengths.",
-"",
-" The 'plotsize' option permits setting the size of the plot area",
-" instead of the canvas size, which is the usual gnuplot behaviour.",
-" Using this option may lead to slightly asymmetric tic lengths.",
-" Like 'originreset' this option may not lead to convenient results",
-" if used with multiplots or pm3d plots.",
-"",
-" The 'charsize' option expects the average horizontal and vertical",
-" size of the used font. Look at the generated style file for an",
-" example of how to use it from within your TeX document.",
-"",
-" 'createstyle' derives the LaTeX style file from the script and",
-" writes it to the file 'gnuplot-lua-tikz.sty'.",
-"",
-" 'fulldoc' or 'standalone' produces a full LaTeX document for direct",
-" compilation.",
-"",
-" 'preamble' or 'header' may be used to put any additional LaTeX code",
-" into the document preamble in standalone mode.",
-"",
-" With the 'tikzplot' option the '\\path plot' command will be used",
-" instead of only '\\path'. The following list of numbers of linetypes",
-" (<ltn>,...) defines the affected plotlines. There exists a plotstyle",
-" for every linetype. The default plotstyle is 'smooth' for every",
-" linetype >= 1.",
-"",
-" By using the 'tikzarrows' option the gnuplot arrow styles defined by",
-" the user will be mapped to TikZ arrow styles. This is done by 'misusing'",
-" the angle value of the arrow definition. E.g. an arrow style with the",
-" angle '7' will be mapped to the TikZ style 'gp arrow 7' ignoring all the",
-" other given values. By default the TikZ terminal uses the stealth' arrow",
-" tips for all arrows. To obtain the default gnuplot behaviour please use",
-" the 'gparrows' option.",
-"",
-" With 'cmykimages' the CMYK color model will be used for image data",
-" instead of the RGB model. All other colors (like line colors etc.) are",
-" not affected by this option, since they are handled by the xcolors",
-" package. So take care to change the color model also there if needed.",
-"",
-" The 'nobitmap' option let images be rendered as filled rectangles",
-" instead of the nativ PS or PDF image format. This option has to be",
-" enabled if you intend to use other output formats.",
-"",
-" The 'providevars' options makes gnuplot's internal and user variables",
-" available by using the '\\gpgetvar{<var name>}' commmand within the TeX",
-" script. Use gnuplot's 'show variables all' command to see the list",
-" of valid variables.",
-"",
-" <fontdesc> may contain any valid LaTeX font commands like e.g.",
-" '\\small'. This can be 'misused' to add further code to a node,",
-" e.g. '\\small,yshift=1ex' or ',yshift=1ex' are also valid while",
-" the latter does not change the current font settings.",
-"",
-" Strings have to be put in single or double quotes. Double quoted",
-" strings may contain special characters like newlines '\\n' etc.",
-""
+ This script is intended to be called from GNUPLOT.
+
+ For generating the associated LaTeX style file
+  ('gnuplot-lua-tikz.sty') just call this script
+ with the additional option 'style':
+
+   # lua gnuplot.lua style
+
+ The TikZ driver provides the following additional terminal options:
+
+      {help}
+      {monochrome}
+      {solid}
+      {originreset}
+      {gparrows}
+      {gppoints}
+      {nopicenvironment}
+      {size <x>{unit},<y>{unit}}
+      {scale <x>,<y>}
+      {plotsize <x>{unit},<y>{unit}}
+      {charsize <x>{unit},<y>{unit}}
+      {font "<fontdesc>"}
+      {createstyle}
+      {fulldoc|standalone}
+      {{preamble|header} "<preamble_string>"}
+      {tikzplot <ltn>,...}
+      {tikzarrows}
+      {cmykimages}
+      {nobitmap}
+      {providevars <var name>,...}
+
+ For all options that expect lengths as their arguments they
+ will default to 'cm' if no unit is specified. For all lengths
+ the following units may be used: 'cm', 'mm', 'in' or 'inch',
+ 'pt', 'pc', 'bp', 'dd', 'cc'. Blanks between numbers and units
+ are not allowed.
+
+ 'monochrome' disables line coloring and switches to grayscaled
+ fills.
+
+ 'solid' use only solid lines.
+
+ 'originreset' moves the origin of the TikZ picture to the lower
+ left corner of the plot. It may be used to align several plots
+ within one tikzpicture environment. This is not tested with
+ multiplots and pm3d plots!
+
+ 'gparrows' use gnuplot's internal arrow drawing function
+ instead of the ones provided by TikZ.
+
+ 'gppoints' use gnuplot's internal plotmark drawing function
+ instead of the ones provided by TikZ.
+
+ 'nopicenvironment' omits the declaration of the 'tikzpicture'
+ environment in order to set it manually. This permits putting
+ some PGF/TikZ code directly before or after the plot.
+
+ The 'size' option expects two lenghts <x> and <y> as the canvas size.
+ The default size of the canvas is 12.5cm x 8.75cm.
+
+ The 'scale' option works similar to the 'size' option but expects
+ scaling factors <x> and <y> instead of lengths.
+
+ The 'plotsize' option permits setting the size of the plot area
+ instead of the canvas size, which is the usual gnuplot behaviour.
+ Using this option may lead to slightly asymmetric tic lengths.
+ Like 'originreset' this option may not lead to convenient results
+ if used with multiplots or pm3d plots.
+
+ The 'charsize' option expects the average horizontal and vertical
+ size of the used font. Look at the generated style file for an
+ example of how to use it from within your TeX document.
+
+ 'createstyle' derives the LaTeX style file from the script and
+ writes it to the file 'gnuplot-lua-tikz.sty'.
+
+ 'fulldoc' or 'standalone' produces a full LaTeX document for direct
+ compilation.
+
+ 'preamble' or 'header' may be used to put any additional LaTeX code
+ into the document preamble in standalone mode.
+
+ With the 'tikzplot' option the '\path plot' command will be used
+ instead of only '\path'. The following list of numbers of linetypes
+ (<ltn>,...) defines the affected plotlines. There exists a plotstyle
+ for every linetype. The default plotstyle is 'smooth' for every
+ linetype >= 1.
+
+ By using the 'tikzarrows' option the gnuplot arrow styles defined by
+ the user will be mapped to TikZ arrow styles. This is done by 'misusing'
+ the angle value of the arrow definition. E.g. an arrow style with the
+ angle '7' will be mapped to the TikZ style 'gp arrow 7' ignoring all the
+ other given values. By default the TikZ terminal uses the stealth' arrow
+ tips for all arrows. To obtain the default gnuplot behaviour please use
+ the 'gparrows' option.
+
+ With 'cmykimages' the CMYK color model will be used for image data
+ instead of the RGB model. All other colors (like line colors etc.) are
+ not affected by this option, since they are handled by the xcolors
+ package. So take care to change the color model also there if needed.
+
+ The 'nobitmap' option let images be rendered as filled rectangles
+ instead of the nativ PS or PDF image format. This option has to be
+ enabled if you intend to use other output formats.
+
+ The 'providevars' options makes gnuplot's internal and user variables
+ available by using the '\gpgetvar{<var name>}' commmand within the TeX
+ script. Use gnuplot's 'show variables all' command to see the list
+ of valid variables.
+
+ The <fontdesc> string may contain any valid LaTeX font commands like
+ e.g. '\small'. It is passed directly as a node parameter in form of
+ "font=<fontdesc>". This can be 'misused' to add further code to a node,
+ e.g. '\small,yshift=1ex' or ',yshift=1ex' are also valid while the
+ latter does not change the current font settings. One exception is
+ the second argument of the list. If it is a number of the form
+ <number>{unit} it will be interpreted as a fontsize like in other
+ terminals and will be appended to the first argument. If the unit is
+ omitted the value is interpreted as 'pt'. As an example the string
+ '\sffamily,12,fill=red' sets the font to LaTeX's sans serif font at
+ a size of 12pt and red background color.
+
+ Strings have to be put in single or double quotes. Double quoted
+ strings may contain special characters like newlines '\n' etc.
