@@ -11,6 +11,8 @@
 	can be individually toggled using the 'L' hotkey.  'l' toggles only y,
 	which is what the documentation says, but maybe this should be changed.
 
+	* src/graph3d.c: Allow to draw contours associated with a pm3d surface.
+
 2008-06-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c (store_polygon) src/mouse.c (event_motion):

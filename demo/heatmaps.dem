@@ -104,7 +104,7 @@ set title "4D data (3D Heat Map)"\
 set view map
 
 set contour base
-splot '++' using 1:2:(Z($1,$2)):(color($1,$2)) with lines title "4 data columns x/y/z/color"
+splot '++' using 1:2:(Z($1,$2)):(color($1,$2)) with pm3d title "4 data columns x/y/z/color"
 
 pause -1 "Hit return to continue"
 
