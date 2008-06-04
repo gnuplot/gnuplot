@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.101 2008/06/02 19:18:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.102 2008/06/03 00:36:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1014,28 +1014,35 @@ builtin_nearest_log(struct gp_event_t *ge)
 	/* note: here it is assumed that the x axis is at
 	 * the bottom, x2 at top, y left and y2 right; it
 	 * would be better to derive that from the ..tics settings */
-	TBOOLEAN change = FALSE;
+	TBOOLEAN change_x1 = FALSE;
+	TBOOLEAN change_y1 = FALSE;
+	TBOOLEAN change_x2 = FALSE;
+	TBOOLEAN change_y2 = FALSE;
 	if (mouse_y < plot_bounds.ybot + (plot_bounds.ytop - plot_bounds.ybot) / 4
-	&&  mouse_x > plot_bounds.xleft&& mouse_x < plot_bounds.xright) {
-	    do_string(axis_array[FIRST_X_AXIS].log ? "unset log x" : "set log x");
-	    change = TRUE;
-	}
-	if (mouse_y > plot_bounds.ytop - (plot_bounds.ytop - plot_bounds.ybot) / 4
-	&&  mouse_x > plot_bounds.xleft && mouse_x < plot_bounds.xright) {
-	    do_string(axis_array[SECOND_X_AXIS].log ? "unset log x2" : "set log x2");
-	    change = TRUE;
-	}
+	&&  mouse_x > plot_bounds.xleft && mouse_x < plot_bounds.xright)
+	    change_x1 = TRUE;
 	if (mouse_x < plot_bounds.xleft + (plot_bounds.xright - plot_bounds.xleft) / 4
-	&&  mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop) {
-	    do_string(axis_array[FIRST_Y_AXIS].log ? "unset log y" : "set log y");
-	    change = TRUE;
-	}
+	&&  mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop)
+	    change_y1 = TRUE;
+	if (mouse_y > plot_bounds.ytop - (plot_bounds.ytop - plot_bounds.ybot) / 4
+	&&  mouse_x > plot_bounds.xleft && mouse_x < plot_bounds.xright)
+	    change_x2 = TRUE;
 	if (mouse_x > plot_bounds.xright - (plot_bounds.xright - plot_bounds.xleft) / 4
-	&&  mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop) {
+	&&  mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop)
+	    change_y2 = TRUE;
+	
+	if (change_x1)
+	    do_string(axis_array[FIRST_X_AXIS].log ? "unset log x" : "set log x");
+	if (change_y1)
+	    do_string(axis_array[FIRST_Y_AXIS].log ? "unset log y" : "set log y");
+	if (change_x2 && !splot_map)
+	    do_string(axis_array[SECOND_X_AXIS].log ? "unset log x2" : "set log x2");
+	if (change_y2 && !splot_map)
 	    do_string(axis_array[SECOND_Y_AXIS].log ? "unset log y2" : "set log y2");
-	    change = TRUE;
-	}
-	if (change)
+	if (!change_x1 && !change_y1 && splot_map)
+	    do_string_replot( Z_AXIS.log ? "unset log z" : "set log z");
+	
+	if (change_x1 || change_y1 || change_x2 || change_y2)
 	    do_string_replot("");
     }
 

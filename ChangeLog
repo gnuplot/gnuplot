@@ -1,3 +1,16 @@
+2008-06-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (builtin_nearest_log):
+	Further adjustment to 'L' hotkey behavior.  In "set view map" mode,
+	toggle the cb axis if the cursor is in the color box, toggle the x1 axis
+	if it is nearest, the y1 axis if it is nearest, and the z axis if none
+	of the above conditions is true.
+
+	* demo/heatmaps.dem:  Modify the last demo so that it can be used to
+	explore the behavior of the 'l' and 'L' hotkeys. All 4 axes (x y z cb)
+	can be individually toggled using the 'L' hotkey.  'l' toggles only y,
+	which is what the documentation says, but maybe this should be changed.
+
 2008-06-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c (store_polygon) src/mouse.c (event_motion):
