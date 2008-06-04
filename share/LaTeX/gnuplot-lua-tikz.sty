@@ -6,7 +6,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{gnuplot-lua-tikz}%
-          [2009/03/29 (rev. 96) GNUPLOT Lua terminal style]
+          [2009/05/26 (rev. 96a) GNUPLOT Lua terminal style]
 
 \RequirePackage{tikz,xxcolor,ifpdf,ifxetex}
 
@@ -133,6 +133,8 @@
 \def\gppoint#1#2{%
   \path[solid] plot[only marks,gp point,#1,mark options={gp shift only}] coordinates {#2};%
 }
+
+\def\gpfontsize#1#2{\fontsize{#1}{#2}\selectfont}
 
 %
 % char size calculation, that might be used with gnuplottex
