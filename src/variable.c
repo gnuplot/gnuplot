@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.32 2008/03/18 00:16:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.33 2008/03/30 03:27:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -387,7 +387,7 @@ fontpath_handler(int action, char *path)
 					      +cmdbeg-envend+1,
 					      "expand fontpath");
 			    strncpy(tmpdir,currdir,cmdbeg-currdir);
-			    if (envval)
+			    if (*envval)
 				strcpy(tmpdir+(cmdbeg-currdir),envval);
 			    strcpy(tmpdir+(cmdbeg-currdir+envlen), envend+1);
 
