@@ -1,3 +1,9 @@
+2008-06-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics):  Interpret tic labels read from a data file as
+	string constants rather than as formats.  Otherwise there are problems
+	with labels containing the "%" character.
+
 2008-06-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c (builtin_toggle_log): Help line for the 'l' hotkey missed
