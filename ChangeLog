@@ -1,3 +1,8 @@
+2008-06-05  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c (builtin_toggle_log): Help line for the 'l' hotkey missed
+	to mention both z and cb for splots.
+
 2008-06-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (builtin_nearest_log):

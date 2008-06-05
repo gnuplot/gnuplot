@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.102 2008/06/03 00:36:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.103 2008/06/04 18:43:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -982,7 +982,7 @@ static char *
 builtin_toggle_log(struct gp_event_t *ge)
 {
     if (!ge)
-	return "`builtin-toggle-log` y logscale for plots, z logscale for splots";
+	return "`builtin-toggle-log` y logscale for plots, z and cb for splots";
 
     if (volatile_data)
 	int_warn(NO_CARET, "Cannot toggle log scale for volatile data");
