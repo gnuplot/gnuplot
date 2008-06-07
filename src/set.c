@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.9 2008/03/12 03:09:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.10 2008/03/21 17:30:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2100,10 +2100,14 @@ set_margin(t_position *margin)
 
     if (END_OF_COMMAND)
 	return;
+
+    if (equals(c_token,"at") && !almost_equals(++c_token,"sc$reen"))
+	int_error(c_token,"expecting 'screen <fraction>'");
     if (almost_equals(c_token,"sc$reen")) {
 	margin->scalex = screen;
 	c_token++;
     }
+
     margin->x = real(const_express(&a));
     if (margin->x < 0)
 	margin->x = -1;
