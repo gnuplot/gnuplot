@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.157 2008/05/18 03:31:17 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.158 2008/05/22 01:56:53 janert Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -778,13 +778,13 @@ set origin %g,%g\n",
     fprintf(fp, "set zero %g\n", zero);
 
     fprintf(fp, "set lmargin %s %g\n",
-	    lmargin.scalex == screen ? "screen" : "", lmargin.x);
+	    lmargin.scalex == screen ? "at screen" : "", lmargin.x);
     fprintf(fp, "set bmargin %s %g\n",
-	    bmargin.scalex == screen ? "screen" : "", bmargin.x);
+	    bmargin.scalex == screen ? "at screen" : "", bmargin.x);
     fprintf(fp, "set rmargin %s %g\n",
-	    rmargin.scalex == screen ? "screen" : "", rmargin.x);
+	    rmargin.scalex == screen ? "at screen" : "", rmargin.x);
     fprintf(fp, "set tmargin %s %g\n",
-	    tmargin.scalex == screen ? "screen" : "", tmargin.x);
+	    tmargin.scalex == screen ? "at screen" : "", tmargin.x);
 
     fprintf(fp, "set locale \"%s\"\n", get_time_locale());
 

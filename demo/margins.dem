@@ -1,5 +1,5 @@
 #
-# Demonstrate use of 'set {btlr}margin screen <value>'
+# Demonstrate use of 'set {btlr}margin at screen <value>'
 # to pin plot borders to a specific place on the canvas.
 # This allows positioning multiple plots on the page so that their
 # corners line up perfectly.
@@ -12,10 +12,10 @@ set multiplot title "Demo of placing multiple plots (2D and 3D)\nwith explicit a
 #
 # First plot  (large)
 #
-set lmargin screen 0.20
-set rmargin screen 0.85
-set bmargin screen 0.25
-set tmargin screen 0.90
+set lmargin at screen 0.20
+set rmargin at screen 0.85
+set bmargin at screen 0.25
+set tmargin at screen 0.90
 
 set pm3d
 set palette rgbformulae 7, 5, 15
@@ -40,8 +40,8 @@ unset key
 #
 # second plot  (tall and narrow; at left of main plot)
 #
-set lmargin screen 0.10
-set rmargin screen 0.20
+set lmargin at screen 0.10
+set rmargin at screen 0.20
 
 set ytics
 
@@ -63,10 +63,10 @@ unset parametric
 #
 # third plot  (short and wide; at bottom of main plot)
 #
-set lmargin screen 0.20
-set rmargin screen 0.85
-set bmargin screen 0.10
-set tmargin screen 0.25
+set lmargin at screen 0.20
+set rmargin at screen 0.85
+set bmargin at screen 0.10
+set tmargin at screen 0.25
 
 set xrange [ -15.00 : 15.00 ]
 set yrange [ * : * ]

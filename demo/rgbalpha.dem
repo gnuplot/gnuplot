@@ -7,9 +7,9 @@ set object  1 rect from screen 0, 0 to screen 1, 1 behind \
               fc rgb "gray10"  fillstyle  solid 1.00 noborder
 set samples 128, 128
 set size ratio 0.95
-set bmargin screen .1
-set tmargin screen .9
-set lmargin screen .1
+set bmargin at screen .1
+set tmargin at screen .9
+set lmargin at screen .1
 
 
 set xrange [ 0. : 130. ] 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.507 2008/06/02 00:48:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.508 2008/06/04 02:38:23 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8170,10 +8170,10 @@ Ffigure_mapcontours
  margin` shows the current settings.
 
  Syntax:
-       set bmargin {{screen} <margin>}
-       set lmargin {{screen} <margin>}
-       set rmargin {{screen} <margin>}
-       set tmargin {{screen} <margin>}
+       set bmargin {{at screen} <margin>}
+       set lmargin {{at screen} <margin>}
+       set rmargin {{at screen} <margin>}
+       set tmargin {{at screen} <margin>}
        show margin
 
  The default units of <margin> are character heights or widths, as appropriate.
@@ -8181,8 +8181,8 @@ Ffigure_mapcontours
  (or none) causes `gnuplot` to revert to the computed value.  For 3D plots,
  only the left margin can be set using character units.
 
- The keyword `screen` indicates that the margin is specified as a fraction of
- the full drawing area. This can be used to precisely line up the corners of
+ The keywords `at screen` indicates that the margin is specified as a fraction
+ of the full drawing area. This can be used to precisely line up the corners of
  individual 2D and 3D graphs in a multiplot.
 
  Normally the margins of a plot are automatically calculated based on tics,
