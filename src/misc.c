@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.98 2008/05/21 04:32:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.99 2008/05/27 21:57:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -761,7 +761,7 @@ TBOOLEAN
 need_fill_border(struct fill_style_type *fillstyle)
 {
     /* Wants a border in the current color */
-    if (fillstyle->border_linetype == LT_UNDEFINED)
+    if (fillstyle->border_linetype == LT_DEFAULT)
 	return TRUE;
 
     /* Wants a border in a new color */
@@ -976,7 +976,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	if (END_OF_COMMAND)
 	    continue;
 	else if (almost_equals(c_token, "bo$rder")) {
-	    fs->border_linetype = LT_UNDEFINED;
+	    fs->border_linetype = LT_DEFAULT;
 	    c_token++;
 	    if (!END_OF_COMMAND)
 		fs->border_linetype = int_expression() - 1;

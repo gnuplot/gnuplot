@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.270 2008/06/02 03:42:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.271 2008/06/03 00:36:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3714,7 +3714,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		(*t->vector) (xl, yb);
 		closepath();
 
-		if( t->fillbox && plot->fill_properties.border_linetype != LT_UNDEFINED) {
+		if( t->fillbox && plot->fill_properties.border_linetype != LT_DEFAULT) {
 		    (*t->linetype)(plot->lp_properties.l_type);
 		    if (plot->lp_properties.use_palette)
 			apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
@@ -3784,8 +3784,7 @@ plot_circles(struct curve_points *plot)
     int style = style_from_fill(fillstyle);
     TBOOLEAN withborder = FALSE;
 
-    if (fillstyle->border_linetype != LT_NODRAW
-    &&  fillstyle->border_linetype != LT_UNDEFINED)
+    if (fillstyle->border_linetype != LT_NODRAW)
 	withborder = TRUE;
 
     for (i = 0; i < plot->p_count; i++) {
@@ -4093,7 +4092,7 @@ plot_c_bars(struct curve_points *plot)
 
 	/* Reset to original color, if we changed it for the border */
 	if ((plot->fill_properties.border_linetype != LT_NODRAW)
-	&&  (plot->fill_properties.border_linetype != LT_UNDEFINED)) {
+	&&  (plot->fill_properties.border_linetype != LT_DEFAULT)) {
 		(*t->linetype)(plot->lp_properties.l_type);
 		if (plot->lp_properties.use_palette)
 		    apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
@@ -5324,7 +5323,8 @@ do_key_sample(
 			    xl + key_sample_left,  yl - key_entry_height/4);
 		closepath();
 	    }
-	    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED) {
+	    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_NODRAW
+	    &&  fs->fillstyle != FS_DEFAULT) {
 		(*t->linetype)(this_plot->lp_properties.l_type);
 		if (this_plot->lp_properties.use_palette)
 		    apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);

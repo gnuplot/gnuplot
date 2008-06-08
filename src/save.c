@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.158 2008/05/22 01:56:53 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.159 2008/06/08 05:47:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1094,7 +1094,7 @@ save_fillstyle(FILE *fp, const struct fill_style_type *fs)
     }
     if (fs->border_linetype == LT_NODRAW)
 	fprintf(fp, "noborder\n");
-    else if (fs->border_linetype == LT_UNDEFINED)
+    else if (fs->border_linetype == LT_DEFAULT)
 	fprintf(fp, "border\n");
     else
 	fprintf(fp, "border %d\n",fs->border_linetype+1);

@@ -1,3 +1,11 @@
+2008-06-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c src/misc.c src/save.c src/show.c src/unset.c:
+	The flag LT_UNDEFINED was mis-used to indicate "same color as fill" for
+	the border of filled areas.  This caused hard-to-reproduce bugs in the
+	key samples for plots with filled areas.  Change the fillstyle code to
+	use LT_DEFAULT instead for this purpose.
+
 2008-06-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_margin) src/save.c (save_set_all) docs/gnuplot.doc

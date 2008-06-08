@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.118 2008/05/18 03:31:18 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.119 2008/06/01 04:30:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -641,7 +641,7 @@ unset_fillstyle()
     default_fillstyle.fillstyle = FS_EMPTY;
     default_fillstyle.filldensity = 100;
     default_fillstyle.fillpattern = 0;
-    default_fillstyle.border_linetype = LT_UNDEFINED;
+    default_fillstyle.border_linetype = LT_DEFAULT;
 }
 
 
