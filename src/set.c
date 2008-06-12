@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.276 2008/05/31 23:09:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.277 2008/06/08 05:47:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -364,6 +364,12 @@ set_command()
 		c_token++;
 	    } else if (almost_equals(c_token,"nofort$ran")) {
 		df_fortran_constants = FALSE;
+		c_token++;
+	    } else if (almost_equals(c_token,"fpe_trap")) {
+		df_nofpe_trap = FALSE;
+		c_token++;
+	    } else if (almost_equals(c_token,"nofpe_trap")) {
+		df_nofpe_trap = TRUE;
 		c_token++;
 	    } else
 		int_error(c_token,"expecting datafile modifier");

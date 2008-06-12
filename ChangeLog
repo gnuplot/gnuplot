@@ -1,3 +1,16 @@
+2008-06-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c src/datafile.h src/set.c src/save.c src/show.c
+	eval.c (evaluate_at) docs/gnuplot.doc:
+	New datafile property 'set datafile {no}fpe_trap'.
+
+	Until now, evaluate_at() has wrapped every expression evaluation with
+	set/reset of a floating point exception handler. This is very expensive
+	and dramatically slows down data input from large files.  Now we provide
+	a way to disable this via "set datafile {no}fpe_trap" or turn it back on
+	again if necessary.  The exception handler remains in place for contexts
+	other than data input.
+
 2008-06-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/misc.c src/save.c src/show.c src/unset.c:
@@ -10,8 +23,8 @@
 
 	* src/set.c (set_margin) src/save.c (save_set_all) docs/gnuplot.doc
 	demo/margins.dem demo/transparent_solids.dem demo/rgbalpha.dem:
-	Add keyword "at" to absolute margin placement commands.
-	'set rmargin screen .8' misleadingly seem to assign 80% of the page
+	Add a new keyword "at" to absolute margin placement commands.
+	'set rmargin screen .8' misleadingly seems to assign 80% of the page
 	to the right margin.  Really we mean "set rmargin at screen 0.8",
 	so say that.
 

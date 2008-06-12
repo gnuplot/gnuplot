@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.216 2008/06/04 02:38:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.217 2008/06/08 22:17:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2765,7 +2765,9 @@ show_datafile()
 	fprintf(stderr, "\tComments chars are \"%s\"\n", df_commentschars);
     }
     if (df_fortran_constants)
-	fputs("\tdatafile parsing will accept Fortran D or Q constants\n",stderr);
+	fputs("\tDatafile parsing will accept Fortran D or Q constants\n",stderr);
+    if (df_nofpe_trap)
+	fputs("\tNo floating point exception handler during data input\n",stderr);
 
     if (almost_equals(c_token,"bin$ary")) {
 	if (!END_OF_COMMAND)

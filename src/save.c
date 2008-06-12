@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.159 2008/06/08 05:47:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.160 2008/06/08 22:17:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -630,6 +630,8 @@ set isosamples %d, %d\n\
 	fprintf(fp, "set datafile commentschars '%s'\n", df_commentschars);
     if (df_fortran_constants)
 	fprintf(fp, "set datafile fortran\n");
+    if (df_nofpe_trap)
+	fprintf(fp, "set datafile nofpe_trap\n");
 
     save_hidden3doptions(fp);
     fprintf(fp, "set cntrparam order %d\n", contour_order);

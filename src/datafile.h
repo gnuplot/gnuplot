@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.26 2008/03/14 02:56:24 sfeam Exp $
+ * $Id: datafile.h,v 1.27 2008/04/15 17:39:34 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -100,6 +100,12 @@ extern TBOOLEAN plotted_data_from_stdin;
 /* Setting this allows the parser to recognize Fortran D or Q   */
 /* format constants in the input file. But it slows things down */
 extern TBOOLEAN df_fortran_constants;
+
+/* Setting this disables initialization of the floating point exception */
+/* handler before every expression evaluation in a using specifier.   	 */
+/* This can speed data input significantly, but assumes valid input.    */
+TBOOLEAN df_nofpe_trap;
+TBOOLEAN evaluate_inside_using;
 
 /* Prototypes of functions exported by datafile.c */
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.157 2008/05/19 17:34:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.158 2008/06/02 00:48:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -223,6 +223,10 @@ TBOOLEAN plotted_data_from_stdin = FALSE;
 /* format constants in the input file. But it slows things down */
 TBOOLEAN df_fortran_constants = FALSE;
 
+/* Setting this disables re-initialization of the floating point exception */
+/* handler before every expression evaluation in a using spec.             */
+TBOOLEAN df_nofpe_trap = FALSE;
+
 /* private variables */
 
 /* in order to allow arbitrary data line length, we need to use the heap
@@ -279,7 +283,7 @@ static int df_pseudospan = 0;
 /* parsing stuff */
 struct use_spec_s use_spec[MAXDATACOLS];
 static char df_format[MAX_LINE_LEN + 1];
-static TBOOLEAN evaluate_inside_using = FALSE;
+TBOOLEAN evaluate_inside_using = FALSE;
 
 /* rather than three arrays which all grow dynamically, make one
  * dynamic array of this structure
