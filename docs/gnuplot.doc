@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.509 2008/06/08 05:47:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.510 2008/06/12 18:07:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5536,7 +5536,7 @@ Ffigure_mapcontours
  or
        boxes            candlesticks   image      circles
        boxerrorbars     filledcurves   rgbimage
-       boxxyerrorbars   histograms     pm3d
+       boxxyerrorbars   histograms     rgbalpha   pm3d
 
  The first group of styles have associated line, point, and text properties.
  The second group of styles also have fill properties.  See `fillstyle`.  Some
