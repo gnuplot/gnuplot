@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.510 2008/06/12 18:07:06 sfeam Exp $
+C ROS $Id: gnuplot.doc,v 1.511 2008/06/13 22:01:54 seem Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -184,112 +184,29 @@ C
  you are subscribed to the list, so that users who use news will know to email
  a reply to you.  There is a form for such postings on the WWW site.
 
-2 New features introduced in version 4.2
+2 New features introduced in version 4.3
 ?new-features
- Gnuplot version 4.2 offers many new features introduced since the preceding
- official version 4.0. This section lists major additions and gives a partial
+ Gnuplot version 4.3 offers many new features introduced since the preceding
+ official version 4.2. This section lists major additions and gives a partial
  list of changes and minor new features. For a more exhaustive list, see the
  NEWS file.
 
-3 New plot styles
+3 Internationalization
+ Gnuplot 4.3 contains significantly improved support for locale settings and for
+ UTF-8 character encodings. See `set locale`, `set encoding`, `set decimalsign`.
 
-4 Histogram
- Histograms, or bar charts, can be produced.
- See `histograms`.
+3 Transparency
+ Gnuplot now supports transparent objects in several ways. Any object or plot
+ element that uses a fill style can be assigned a value from fully opaque to
+ fully transparent. Image or matrix data can be plotted with an alpha channel
+ using the new plot style `with rgbalpha`. See `fillstyle`, `rgbalpha`.
 
-4 Label plots
- In coordination with the new `datastrings` feature described below, gnuplot
- can draw a label at each vertex of a curve.
- See `labels`.
-
-4 Image data
- The `image`, `rgbimage`, and `rgbalpha` styles allow to plot 2D images from
- an ascii or `binary` input file and map it onto a plane within a 2D or 3D plot.
- See `image`, `rgbimage`, and `rgbalpha`.
-
-4 Filled curves
- The plot style `fillstyle` has been augmented to allow to fill the area
- between two input curves with a color or a pattern.
- See `filledcurves`.
-
-4 Vectors
- Gnuplot can draw plots with vectors with a small arrowhead, requiring four or
- six columns of data for 2D or 3D, respectively.
- See `vectors`.
-
-3 Input from binary data files
- Gnuplot can now read a generic `binary` input, including matrix binary and
- `general binary` (until now gnuplot supported only its own `binary matrix`
- format). Several matrix file formats are autodetected by filename extension
- (`gpbin`, `edf`, `avs`).  Binary data files are mainly useful for `image` and
- `rgbimage` drawings.  See `binary` and `binary general filetype`.
-
-3 New plot elements
-
-4 RGB colors
- Explicit RGB colors can be specified for all plot elements instead of
- specifying a predefined linetype.
- See `colorspec`.
-
-4 Arbitrary rectangles and other shapes
- You can place rectangles, cicles, and ellipses  with desired fill style and
- border anywhere in a 2D plot.
- See `set object`.
-
-3 String handling
-4 String and text data read from datafiles
- Gnuplot can now read and process text fields in datafiles.
- See `datastrings`.
-4 User-defined string variables, operators, and functions
- String variables and string functions are introduced. Most gnuplot commands
- that previously required a string constant will now also accept a string
- variable, a string expression, or a function that returns a string.
- See `string variables`.
-
-3 Macros
- Gnuplot supports command line macro expansion  by '@stringvariablename'.
- See `macros`.
-
-3 Auto-layout of multiple plots on a page
- The `multiplot` mode is now able to layout automatically simple
- multiplots without having to set the size or the position for each plot.
- See `multiplot`.
-
-3 Internal variables
- Gnuplot now exports several "read-only" variables such as GPVAL_TERM,
- GPVAL_X_MIN, etc.
- See `gnuplot-defined variables`.
-
-3 New or revised terminal drivers
-4 `wxt`
- The `wxt` terminal is an interactive and cross-platform terminal for on-screen
- rendering. It uses the wxWidgets library for its user interface, and Cairo
- associated with Pango for the actual rendering, providing nice plots with
- antialiasing on lines and text. The terminal supports the full range of
- gnuplot capabilities, including mousing, pm3d plots, image plots and
- enhanced text.
-4 `emf`
- The `emf` terminal generates an Enhanced Metafile Format file. This file
- format is the metafile standard on MS Win32 Systems. The emf terminal
- supports pm3d, rgb color, and image plot modes.
-4 `gif`, `jpeg`, `png`
- The code for the terminals using the `gd` library has been consolidated.
- The `gif` terminal also knows how to produce an animated gif from a sequence
- of plots.
-4 `postscript`
- The `postscript` terminal can load prologue files, which can contain
- additional user-defined sections with, for example, character encodings.
- See `postscript prologue`.
-4 `ai`
- The Adobe Illustrator `ai` driver is outdated. Since Adobe Illustrator
- understands PostScript files, `set terminal post level1 ...` should be used
- instead.
-4 `epslatex`, `pslatex`, `pstex`
- The terminals supporting an output to latex augmented by PostScript commands
- have been consolidated. Many options are the same as in the `postscript`
- terminal.
-4 `windows`
- The `windows` terminal now supports `enhanced text` mode.
+3 Volatile Data
+ The new command `refresh` is similar to `replot` except that it uses the
+ previously-stored input data values rather than rereading the input data file.
+ Mouse operations (zoom, rotate) will automatically use `refresh` rather than
+ `replot` if the input data stream is marked `volatile`.  Piped or in-line data
+ is automatically treated as volatile.  See `refresh`, `plot datafile volatile`.
 
 3 Canvas size
 ?canvas size
@@ -329,6 +246,19 @@ C
  however it is a change in the way the png driver worked for single plots in
  version 4.0.
 
+3 New plot elements
+=circles
+=ellipse
+ The `set object` command can now be used to define fixed circles and ellipses
+ as well as rectangles. There is a corresponding new plot style
+ `plot with circles`.  See `circles` `ellipse`.
+
+3 New or revised terminal drivers
+ Two new drivers based on the cairo and pango libraries are included,
+ `pngcairo` and `pdfcairo`.  These are alternatives to the older libgd-based
+ png driver and the older PDFLib-based pdf driver.  The figures in the pdf
+ version of this manual were prepared using the pdfcairo terminal driver.
+
 2 Backwards compatibility
 ?backwards compatibility
 ?compatibility
@@ -364,141 +294,6 @@ C
 
  Please see `set size`, `set term size` and also the documentation for
  individual terminals.
-
-2 Features introduced in version 4.0
- Gnuplot version 4.0 contained many features introduced since the preceding
- official version 3.7.  These are summarized here.
-
-3 Mouse and hotkey support in interactive terminals
-
- Interaction with the current plot via mouse and hotkeys is supported for the
- X11, OS/2 Presentation Manager, ggi, Windows, and wxWidgets terminals. See
- `mouse input` for more information on mousing. See help for `bind` for
- information on hotkeys. Also see the documentation for individual mousing
- terminals `ggi`, `pm`, `windows`, `wxt` and `x11`.
-
- Sample script: mousevariables.dem
-
-3 New terminals
-
- `aqua`: New terminal for Mac OS X. Requires AquaTerm 1.0 or later.
-
- `epslatex`: New terminal. Prepares eps figures for inclusion in LaTeX
- documents.
-
- `gif`: Consolidated with png/jpeg terminals. Requires libgd.
-
- `ggi`: New full-screen interactive terminal for Linux. Interface to the
- General Graphics Interface Library.
-
- `pdf`: New terminal exporting Adobe Portable Document Format. Requires libpdf.
-
- `png` and `jpeg`: Support for GIF, PNG and JPEG image output is provided by a
- new driver via libgd. The new driver supports many more features than the
- old png driver, including TrueType fonts. Requires libgd.
-
- `svg`: New terminal exporting Scalable Vector Graphics.
-
-3 New plot style `pm3d`
-
- The `splot` command is now capable of plotting 2D maps and 3D surfaces
- colored by greyscale or color palettes. See help for `set pm3d`, `set palette`,
- `set cbrange`, `set view map`, `set colorbox` and `test palette`.
-
- Sample scripts: pm3d.dem pm3dcolors.dem pm3dgamma.dem
-
-3 Filled boxes
-
- A solid color or patterned fill style can be set for any plot style that
- contains boxes. See `boxes`, `boxerrorbars`, `boxxyerrorbars`,
- `candlesticks`, `set style fill`.
-
- Sample scripts: fillstyle.dem candlesticks.dem
-
-3 New plot option smooth frequency
-
- Input data can be filtered through several built-in routines for interpolation
- or approximation of data.  See `smooth`, `frequency`, `unique`.
-
- Sample scripts: step.dem mgr.dem
-
-3 Improved text options
-
- Most gnuplot plot commands that produce text labels now accept modifiers to
- specify text color, font, size, and rotation angle. See `set label`.
- Not all terminal types support these options, however.  The enhanced text
- mode previously available for the postscript and pm terminals has been
- extended to other terminal types as well.  Terminal types currently supported
- include aqua, dumb, jpeg, pdf, pm, png, postscript, x11, windows, and wxt.
- See `enhanced text`.
-
- Sample scripts: textcolor.dem textrotate.dem
-
-3 More text encodings
-
- Several terminals, including `postscript`, `x11` and `pm`, support additional
- text `encodings`: ISO 8859-1 (Latin 1), ISO 8859-2 (Latin 2), ISO 8859-15
- (variant of 8859-1 with Euro sign), KOI8-R and KOI8-U (cyrillic), and
- miscellaneous codepages. See `encoding` for more details.
-
-3 Arrows
-
- Single- or double-ended arrows can be placed on a plot individually from the
- command line or from a data file via the `plot with vectors` style.
- See `set style arrow`, `plotting styles vectors`.
-
- Sample scripts: arrowstyle.dem vector.dem
-
-3 Data file format
-
- The new `set datafile` command can be used to specify information about the
- format of input data files, including the characters used to separate fields,
- to indicate comment lines, and to specify missing data.  Gnuplot now attempts
- to recognize text fields with embedded blanks as single entities based on the
- datafile format settings.  This allows input from csv (comma-separated value)
- files such as those exported by spreadsheet programs. See `set datafile`.
- See also the `binary` option (introduced in 4.2).
-
-3 New commands
-
- `set view map` selects a top-view 2D projection of 3D surface plot.
-
- `set term push` and `set term pop` save and restore the current terminal type.
-
- `load` and `save` commands accept piped input and output, respectively.
-
-3 Other changes and additions
-
- Since gnuplot 4.0, `unset <something>` is preferred to `set no<something>`.
- The older form has been deprecated.
- Version 4.2 continues to allow the older syntax, but such backwards
- compatibility may be lost in future versions.
-
- Commands of the form `set <something> <style>` also are deprecated in favor
- of the more general form `set style <something> <options>`.  Many more plot
- elements now have style options of their own, including arrows, filled
- areas, lines, and points. There are also style settings for input data and
- formatting. Please see `set style`, `set decimalsign`, and `set datafile`.
-
- The MS Windows package includes an additional executable `pgnuplot.exe` to
- support piping command through standard input, which is otherwise not
- available for graphical applications on this system.
-
-3 Accompanying documentation
-
- In directory docs/psdocs/ you may find new information in the gnuplot output
- postscript file guide, list of postscript symbols in different encodings.
-
- Improved FAQ. Please read it before asking your question in a public forum.
-
- There are plenty of new demos *.dem in the demo/ directory. Please run them,
- for example by
-       load "all.dem"
- before asking for help.  Plots produced by the demo scripts can also be viewed
- at
-^ <a href="http://www.gnuplot.info/demo/">
- http://www.gnuplot.info/demo/
-^ </a>
 
 2 Batch/Interactive Operation
 ?batch/interactive
@@ -684,10 +479,9 @@ C
  expression, which will be interpreted as seconds from 1 January 2000.
 2 Datastrings
 ?datastrings
- The configuration option --enable-datastrings allows gnuplot to read and
- process text fields in datafiles. A text field consists of either an arbitrary
- string of printable characters containing no whitespace or an arbitrary string
- of characters, possibly including whitespace, delimited by double quotes.
+ Data files may contain string data consisting of either an arbitrary string
+ of printable characters containing no whitespace or an arbitrary string of
+ characters, possibly including whitespace, delimited by double quotes.
  The following sample line from a datafile is interpreted to contain four
  columns, with a text field in column 3:
 
@@ -1245,9 +1039,6 @@ C
  `rand(-1)` resets both seeds to a standard value.
  `rand(x)`  for x>0 sets both seeds to a value based on the value of x.
  `rand({x,y})` for x>0 sets seed1 to x and seed2 to y.
- Note: This behavior has changed starting with gnuplot version 3.8l. Older
- scripts that expected rand(x>0) to produce sequential pseudo-random numbers
- from the same seeded sequence must be changed to call rand(0) instead.
 4 real
 ?expressions functions real
 ?functions real
@@ -1571,10 +1362,8 @@ C
 ?expressions random
 ?functions random
 ?random
- The behavior of the built-in function `rand(x)` has changed as of version 3.8l.
- Older scripts that expected rand(x>0) to produce sequential pseudo-random
- numbers from the same seeded sequence must be changed to call rand(0) instead.
- The current behavior is as follows:
+ Some older versions of gnuplot used rand(x>0) to produce sequential
+ pseudo-random numbers.  The current behavior is as follows:
   `rand(0)`  returns a pseudo random number in the interval [0:1] generated
              from the current value of two internal 32-bit seeds.
   `rand(-1)` resets both seeds to a standard value.
@@ -1793,15 +1582,13 @@ C ... and restart the table:
 
 3 Gnuplot-defined variables
 ?gnuplot-defined variables
- The variable `pi` is defined to be pi, see
-       print pi
-
- Additionally, gnuplot maintains a number of read-only variables that reflect
- the current internal state of the program and the most recent plot. These
- variables begin with the prefix "GPVAL_".  Examples include GPVAL_TERM,
- GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN. Type `show variables all` to display the
- complete list and current values. Values related to axes parameters (ranges,
- log base) are values used during the last plot, not those currently `set`.
+ Gnuplot maintains a number of read-only variables that reflect the current
+ internal state of the program and the most recent plot. These variables begin
+ with the prefix "GPVAL_".
+ Examples include GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN.
+ Type `show variables all` to display the complete list and current values.
+ Values related to axes parameters (ranges, log base) are values used during the
+ last plot, not those currently `set`.
 
 =errors
 =error state
@@ -4240,6 +4027,7 @@ Ffigure_mapcontours
 ?data
 ?file
 ?volatile
+?plot datafile volatile
  Discrete data contained in a file can be displayed by specifying the name of
  the data file (enclosed in single or double quotes) on the `plot` command line.
 
@@ -4525,7 +4313,7 @@ Ffigure_mapcontours
  (the latter means ESRF Header Format).  More information on specifications
  can be found at
 
-   http://www.esrf.fr/computing/expg/subgroups/general/format/Format.html
+   http://www.edfplus.info/specs
 
  See also `binary`.
 5 keywords
@@ -5004,8 +4792,8 @@ Ffigure_mapcontours
 
  is a lot easier to type.
 
- If you use `'-'` with `replot`, you may need to enter the data more than once
- (see `replot`).
+ If you use `'-'` with `replot`, you may need to enter the data more than once.
+ See `replot`, `refresh`.
 
  A blank filename ('') specifies that the previous filename should be reused.
  This can be useful with things like
@@ -5015,9 +4803,8 @@ Ffigure_mapcontours
  (If you use both `'-'` and `''` on the same `plot` command, you'll need to
  have two sets of inline data, as in the example above.)
 
- On some computer systems with a popen function (Unix), the datafile can be
- piped through a shell command by starting the file name with a '<'.  For
- example,
+ On systems with a popen function, the datafile can be piped through a shell
+ command by starting the file name with a '<'.  For example,
 
        pop(x) = 103*exp(-x/10)
        plot "< awk '{print $1-1965, $2}' population.dat", pop(x)
@@ -5171,15 +4958,10 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/using.html">
  Feeble using demos.
 ^ </a>
-
- If gnuplot is built with configuration option --enable-datastrings, then
- additional modifiers to `using` can specify handling of text fields in the
- datafile. See `datastrings`, `using xticlabels`, `using title`.
 5 using title
 ?using title
 ?plot using title
- If gnuplot is built with configuration option --enable-datastrings, then
- the first entry of a column of the input data file can be used as a string
+ The first entry of a column of the input data file can be used as a string
  to provide the plot title in the key box.  The column containing specified
  is independent of the column[s] used for the plot itself.
 
@@ -5192,8 +4974,7 @@ Ffigure_mapcontours
 5 xticlabels
 ?using xticlabels
 ?plot using xticlabels
- If gnuplot is built with configuration option --enable-datastrings, then
- a column of the input data file can be used to label axis tic marks.
+ A column of the input data file can be used to label axis tic marks.
  The format of such a plot command is
 
    plot 'datafile' using <xcol>:<ycol>:xticlabels(<labelcol>) with <plotstyle>
@@ -6626,7 +6407,17 @@ Ffigure_mapcontours
  the colorbox off.
 
  See also help for `set pm3d`, `set palette`, `x11 pm3d`, and `set style line`.
+3 colornames
+?colornames
+?show colornames
+?commands show colornames
+?show palette colornames
+ Gnuplot knows a limited number of color names. You can use these to define
+ the color range spanned by a pm3d palette, or to assign a terminal-independent
+ color to a particular linetype or linestyle. To see the list of know color
+ names, use the command `show colornames`.   Example:
 
+       set style line 1 linecolor rgb "sea-green"
 3 contour
 ?commands set contour
 ?commands unset contour
@@ -9147,12 +8938,8 @@ Ffigure_mapcontours
  XYZ are the three primary colors of the color model defined by the 'Commission
  Internationale de l'Eclairage' (CIE).
  For more information on color models see:
-^ <a href="http://www.cs.rit.edu/~ncs/color/glossary.htm">
-           http://www.cs.rit.edu/~ncs/color/glossary.htm
-^ </a>
- and
-^ <a href="http://cs.fit.edu/wds/classes/cse5255/cse5255/davis/index.html">
-           http://cs.fit.edu/wds/classes/cse5255/cse5255/davis/index.html
+^ <a href="http://en.wikipedia.org/wiki/Color_space">
+           http://en.wikipedia.org/wiki/Color_space
 ^ </a>
 
 4 rgbformulae
@@ -9376,14 +9163,6 @@ Ffigure_mapcontours
 
  You may manually change the postscript output from gray to color and vice
  versa and change the definition of <maxcolors>.
-4 colornames
-?colornames
-?show palette colornames
-?show colornames
- Gnuplot knows a limited number of color names. You can use these to define
- the color range spanned by a pm3d palette, or to assign a terminal-independent
- colot to a particular linetype or linestyle. To see the list of know color
- names, use the command `show colornames`.  See `set palette`, `linestyle`.
 3 pointsize
 ?commands set pointsize
 ?commands show pointsize
@@ -9420,17 +9199,6 @@ Ffigure_mapcontours
        set polar
        unset polar
        show polar
-
- There have been changes made to polar mode in version 3.7, so that scripts
- for `gnuplot` versions 3.5 and earlier will require modification.  The main
- change is that the dummy variable t is used for the angle so that the x and
- y ranges can be controlled independently.  Other changes are:
- 1) tics are no longer put along the zero axes automatically
- ---use `set xtics axis nomirror`; `set ytics axis nomirror`;
- 2) the grid, if selected, is not automatically polar
- ---use `set grid polar`;
- 3) the grid is not labelled with angles
- ---use `set label` as necessary.
 
  In polar coordinates, the dummy variable (t) is an angle.  The default range
  of t is [0:2*pi], or, if degree units have been selected, to [0:360] (see
@@ -11707,27 +11475,18 @@ Ffigure_mapcontours
 ?graphical user interfaces
 ?gui's
  Several graphical user interfaces have been written for `gnuplot` and one for
- win32 is included in this distribution.  In addition, there is a Python
- interface at
-^ <a href="http://py-gnuplot.darwinports.com/">
-          http://py-gnuplot.darwinports.com/
-^ </a>
+ win32 is included in this distribution.
 
- Also several X11 interfaces exist.
- One of them is called xgfe. It uses the Qt library and can be found on
-^ <a href="http://www.flash.net/~dmishee/xgfe/xgfe.html">
-          http://www.flash.net/~dmishee/xgfe/xgfe.html
-^ </a>
-
- In addition three Tcl/Tk located at the usual Tcl/Tk repositories exist.
-
- Bruce Ravel (ravel@phys.washington.edu) has written a new version of
- gnuplot-mode for GNU emacs and XEmacs. This version is based on
- the gnuplot.el file by Gershon Elber.
+ Bruce Ravel (ravel@phys.washington.edu) has written a gnuplot-mode for
+ GNU emacs and XEmacs based on  the earlier gnuplot.el file by Gershon Elber.
  While the gnuplot CVS repository has its own copy the most recent
  version of this package is available from
 ^ <a href="http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/">
            http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/
+^ </a>
+ For Python, Tk/Tcl, and other front-ends, check the links on
+^ <a href="http://gnuplot.sourceforge.net/links.html">
+          http://gnuplot.sourceforge.net/links.html
 ^ </a>
 
 1 Bugs

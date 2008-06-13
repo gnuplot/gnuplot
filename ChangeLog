@@ -1,3 +1,10 @@
+2008-06-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/titlepag.tex:
+	Replace "what's new in 4.0, 4.2" with "what's new in 4.3".
+	Remove discussion of pre-version 4 features.
+	Update or remove dead URLS.
+
 2008-06-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/datafile.h src/set.c src/save.c src/show.c
