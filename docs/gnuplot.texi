@@ -126,9 +126,8 @@ Johannes Zellner
 * Copyright::                   
 * Introduction::                
 * Seeking-assistance::          
-* New_features_introduced_in_version_4.2::  
+* New_features_introduced_in_version_4.3::  
 * Backwards_compatibility::     
-* Features_introduced_in_version_4.0::  
 * Batch/Interactive_Operation::  
 * Command-line-editing::        
 * Comments::                    
@@ -282,7 +281,7 @@ See the simple.dem demo, also available together with other demos on the web pag
 @uref{http://www.gnuplot.info/demo/,http://www.gnuplot.info/demo/
 }
 
-@node Seeking-assistance, New_features_introduced_in_version_4.2, Introduction, gnuplot
+@node Seeking-assistance, New_features_introduced_in_version_4.3, Introduction, gnuplot
 @section Seeking-assistance
 
 @cindex help-desk
@@ -339,230 +338,53 @@ you are subscribed to the list, so that users who use news will know to email
 a reply to you.  There is a form for such postings on the WWW site.
 
 
-@node New_features_introduced_in_version_4.2, Backwards_compatibility, Seeking-assistance, gnuplot
-@section New features introduced in version 4.2
+@node New_features_introduced_in_version_4.3, Backwards_compatibility, Seeking-assistance, gnuplot
+@section New features introduced in version 4.3
 
 @cindex new-features
 
-Gnuplot version 4.2 offers many new features introduced since the preceding
-official version 4.0. This section lists major additions and gives a partial
+Gnuplot version 4.3 offers many new features introduced since the preceding
+official version 4.2. This section lists major additions and gives a partial
 list of changes and minor new features. For a more exhaustive list, see the
 NEWS file.
 
 
 @menu
-* New_plot_styles::             
-* Input_from_binary_data_files::  
-* New_plot_elements::           
-* String_handling::             
-* Macros::                      
-* Auto-layout_of_multiple_plots_on_a_page::  
-* Internal_variables::          
-* New_or_revised_terminal_drivers::  
+* Internationalization::        
+* Transparency::                
+* Volatile_Data::               
 * Canvas_size::                 
+* New_plot_elements::           
+* New_or_revised_terminal_drivers::  
 @end menu
 
-@node New_plot_styles, Input_from_binary_data_files, New_features_introduced_in_version_4.2, New_features_introduced_in_version_4.2
-@subsection New plot styles
+@node Internationalization, Transparency, New_features_introduced_in_version_4.3, New_features_introduced_in_version_4.3
+@subsection Internationalization
 
+Gnuplot 4.3 contains significantly improved support for locale settings and for
+UTF-8 character encodings. See @ref{locale}, @ref{encoding}, @ref{decimalsign}.
 
 
-@menu
-* Histogram::                   
-* Label_plots::                 
-* Image_data::                  
-* Filled_curves::               
-* Vectors::                     
-@end menu
+@node Transparency, Volatile_Data, Internationalization, New_features_introduced_in_version_4.3
+@subsection Transparency
 
-@node Histogram, Label_plots, New_plot_styles, New_plot_styles
-@subsubsection Histogram
+Gnuplot now supports transparent objects in several ways. Any object or plot
+element that uses a fill style can be assigned a value from fully opaque to
+fully transparent. Image or matrix data can be plotted with an alpha channel
+using the new plot style @ref{rgbalpha}. See `fillstyle`, @ref{rgbalpha}.
 
-Histograms, or bar charts, can be produced.
-See @ref{histograms}.
 
+@node Volatile_Data, Canvas_size, Transparency, New_features_introduced_in_version_4.3
+@subsection Volatile Data
 
-@node Label_plots, Image_data, Histogram, New_plot_styles
-@subsubsection Label plots
+The new command @ref{refresh} is similar to @ref{replot} except that it uses the
+previously-stored input data values rather than rereading the input data file.
+Mouse operations (zoom, rotate) will automatically use @ref{refresh} rather than
+@ref{replot} if the input data stream is marked `volatile`.  Piped or in-line data
+is automatically treated as volatile.  See @ref{refresh}, `plot datafile volatile`.
 
-In coordination with the new `datastrings` feature described below, gnuplot
-can draw a label at each vertex of a curve.
-See @ref{labels}.
 
-
-@node Image_data, Filled_curves, Label_plots, New_plot_styles
-@subsubsection Image data
-
-The `image`, @ref{rgbimage}, and @ref{rgbalpha} styles allow to plot 2D images from
-an ascii or `binary` input file and map it onto a plane within a 2D or 3D plot.
-See `image`, @ref{rgbimage}, and @ref{rgbalpha}.
-
-
-@node Filled_curves, Vectors, Image_data, New_plot_styles
-@subsubsection Filled curves
-
-The plot style `fillstyle` has been augmented to allow to fill the area
-between two input curves with a color or a pattern.
-See @ref{filledcurves}.
-
-
-@node Vectors,  , Filled_curves, New_plot_styles
-@subsubsection Vectors
-
-Gnuplot can draw plots with vectors with a small arrowhead, requiring four or
-six columns of data for 2D or 3D, respectively.
-See @ref{vectors}.
-
-
-@node Input_from_binary_data_files, New_plot_elements, New_plot_styles, New_features_introduced_in_version_4.2
-@subsection Input from binary data files
-
-Gnuplot can now read a generic `binary` input, including matrix binary and
-`general binary` (until now gnuplot supported only its own `binary matrix`
-format). Several matrix file formats are autodetected by filename extension
-(`gpbin`, `edf`, `avs`).  Binary data files are mainly useful for `image` and
-@ref{rgbimage} drawings.  See `binary` and `binary general filetype`.
-
-
-@node New_plot_elements, String_handling, Input_from_binary_data_files, New_features_introduced_in_version_4.2
-@subsection New plot elements
-
-
-
-@menu
-* RGB_colors::                  
-* Arbitrary_rectangles_and_other_shapes::  
-@end menu
-
-@node RGB_colors, Arbitrary_rectangles_and_other_shapes, New_plot_elements, New_plot_elements
-@subsubsection RGB colors
-
-Explicit RGB colors can be specified for all plot elements instead of
-specifying a predefined linetype.
-See @ref{colorspec}.
-
-
-@node Arbitrary_rectangles_and_other_shapes,  , RGB_colors, New_plot_elements
-@subsubsection Arbitrary rectangles and other shapes
-
-You can place rectangles, cicles, and ellipses  with desired fill style and
-border anywhere in a 2D plot.
-See @ref{object}.
-
-
-@node String_handling, Macros, New_plot_elements, New_features_introduced_in_version_4.2
-@subsection String handling
-
-
-@menu
-* String_and_text_data_read_from_datafiles::  
-* User-defined_string_variables::  
-@end menu
-
-@node String_and_text_data_read_from_datafiles, User-defined_string_variables, String_handling, String_handling
-@subsubsection String and text data read from datafiles
-
-Gnuplot can now read and process text fields in datafiles.
-See `datastrings`.
-
-@node User-defined_string_variables,  , String_and_text_data_read_from_datafiles, String_handling
-@subsubsection User-defined string variables, operators, and functions
-
-String variables and string functions are introduced. Most gnuplot commands
-that previously required a string constant will now also accept a string
-variable, a string expression, or a function that returns a string.
-See @ref{variables}.
-
-
-@node Macros, Auto-layout_of_multiple_plots_on_a_page, String_handling, New_features_introduced_in_version_4.2
-@subsection Macros
-
-Gnuplot supports command line macro expansion  by '@@stringvariablename'.
-See @ref{macros}.
-
-
-@node Auto-layout_of_multiple_plots_on_a_page, Internal_variables, Macros, New_features_introduced_in_version_4.2
-@subsection Auto-layout of multiple plots on a page
-
-The @ref{multiplot} mode is now able to layout automatically simple
-multiplots without having to set the size or the position for each plot.
-See @ref{multiplot}.
-
-
-@node Internal_variables, New_or_revised_terminal_drivers, Auto-layout_of_multiple_plots_on_a_page, New_features_introduced_in_version_4.2
-@subsection Internal variables
-
-Gnuplot now exports several "read-only" variables such as GPVAL_TERM,
-GPVAL_X_MIN, etc.
-See @ref{variables}.
-
-
-@node New_or_revised_terminal_drivers, Canvas_size, Internal_variables, New_features_introduced_in_version_4.2
-@subsection New or revised terminal drivers
-
-
-@menu
-* `wxt`::                       
-* `emf`::                       
-* `gif`::                       
-* @ref{postscript}::            
-* `ai`::                        
-* `epslatex`::                  
-* `windows`::                   
-@end menu
-
-@node `wxt`, `emf`, New_or_revised_terminal_drivers, New_or_revised_terminal_drivers
-@subsubsection `wxt`
-
-The `wxt` terminal is an interactive and cross-platform terminal for on-screen
-rendering. It uses the wxWidgets library for its user interface, and Cairo
-associated with Pango for the actual rendering, providing nice plots with
-antialiasing on lines and text. The terminal supports the full range of
-gnuplot capabilities, including mousing, pm3d plots, image plots and
-enhanced text.
-
-@node `emf`, `gif`, `wxt`, New_or_revised_terminal_drivers
-@subsubsection `emf`
-
-The `emf` terminal generates an Enhanced Metafile Format file. This file
-format is the metafile standard on MS Win32 Systems. The emf terminal
-supports pm3d, rgb color, and image plot modes.
-
-@node `gif`, @ref{postscript}, `emf`, New_or_revised_terminal_drivers
-@subsubsection `gif`, `jpeg`, `png`
-
-The code for the terminals using the `gd` library has been consolidated.
-The `gif` terminal also knows how to produce an animated gif from a sequence
-of plots.
-
-@node @ref{postscript}, `ai`, `gif`, New_or_revised_terminal_drivers
-@subsubsection @ref{postscript}
-
-The @ref{postscript} terminal can load prologue files, which can contain
-additional user-defined sections with, for example, character encodings.
-See `postscript prologue`.
-
-@node `ai`, `epslatex`, @ref{postscript}, New_or_revised_terminal_drivers
-@subsubsection `ai`
-
-The Adobe Illustrator `ai` driver is outdated. Since Adobe Illustrator
-understands PostScript files, `set terminal post level1 ...` should be used
-instead.
-
-@node `epslatex`, `windows`, `ai`, New_or_revised_terminal_drivers
-@subsubsection `epslatex`, `pslatex`, `pstex`
-
-The terminals supporting an output to latex augmented by PostScript commands
-have been consolidated. Many options are the same as in the @ref{postscript}
-terminal.
-
-@node `windows`,  , `epslatex`, New_or_revised_terminal_drivers
-@subsubsection `windows`
-
-The `windows` terminal now supports `enhanced text` mode.
-
-
-@node Canvas_size,  , New_or_revised_terminal_drivers, New_features_introduced_in_version_4.2
+@node Canvas_size, New_plot_elements, Volatile_Data, New_features_introduced_in_version_4.3
 @subsection Canvas size
 
 @c ?canvas size
@@ -607,7 +429,28 @@ however it is a change in the way the png driver worked for single plots in
 version 4.0.
 
 
-@node Backwards_compatibility, Features_introduced_in_version_4.0, New_features_introduced_in_version_4.2, gnuplot
+@node New_plot_elements, New_or_revised_terminal_drivers, Canvas_size, New_features_introduced_in_version_4.3
+@subsection New plot elements
+
+@cindex circles
+
+@cindex ellipse
+
+The @ref{object} command can now be used to define fixed circles and ellipses
+as well as rectangles. There is a corresponding new plot style
+@ref{circles}.  See @ref{circles} @ref{ellipse}.
+
+
+@node New_or_revised_terminal_drivers,  , New_plot_elements, New_features_introduced_in_version_4.3
+@subsection New or revised terminal drivers
+
+Two new drivers based on the cairo and pango libraries are included,
+`pngcairo` and `pdfcairo`.  These are alternatives to the older libgd-based
+png driver and the older PDFLib-based pdf driver.  The figures in the pdf
+version of this manual were prepared using the pdfcairo terminal driver.
+
+
+@node Backwards_compatibility, Batch/Interactive_Operation, New_features_introduced_in_version_4.3, gnuplot
 @section Backwards compatibility
 
 @c ?backwards compatibility
@@ -656,198 +499,7 @@ Please see @ref{size}, @ref{size} and also the documentation for
 individual terminals.
 
 
-@node Features_introduced_in_version_4.0, Batch/Interactive_Operation, Backwards_compatibility, gnuplot
-@section Features introduced in version 4.0
-
-Gnuplot version 4.0 contained many features introduced since the preceding
-official version 3.7.  These are summarized here.
-
-
-@menu
-* Mouse_and_hotkey_support_in_interactive_terminals::  
-* New_terminals::               
-* New_plot_style_@ref{pm3d}::   
-* Filled_boxes::                
-* New_plot_option_smooth_frequency::  
-* Improved_text_options::       
-* More_text_encodings::         
-* Arrows::                      
-* Data_file_format::            
-* New_commands::                
-* Other_changes_and_additions::  
-* Accompanying_documentation::  
-@end menu
-
-@node Mouse_and_hotkey_support_in_interactive_terminals, New_terminals, Features_introduced_in_version_4.0, Features_introduced_in_version_4.0
-@subsection Mouse and hotkey support in interactive terminals
-
-
-Interaction with the current plot via mouse and hotkeys is supported for the
-X11, OS/2 Presentation Manager, ggi, Windows, and wxWidgets terminals. See
-`mouse input` for more information on mousing. See help for `bind` for
-information on hotkeys. Also see the documentation for individual mousing
-terminals `ggi`, `pm`, `windows`, `wxt` and `x11`.
-
-Sample script: mousevariables.dem
-
-
-@node New_terminals, New_plot_style_@ref{pm3d}, Mouse_and_hotkey_support_in_interactive_terminals, Features_introduced_in_version_4.0
-@subsection New terminals
-
-
-`aqua`: New terminal for Mac OS X. Requires AquaTerm 1.0 or later.
-
-`epslatex`: New terminal. Prepares eps figures for inclusion in LaTeX
-documents.
-
-`gif`: Consolidated with png/jpeg terminals. Requires libgd.
-
-`ggi`: New full-screen interactive terminal for Linux. Interface to the
-General Graphics Interface Library.
-
-`pdf`: New terminal exporting Adobe Portable Document Format. Requires libpdf.
-
-`png` and `jpeg`: Support for GIF, PNG and JPEG image output is provided by a
-new driver via libgd. The new driver supports many more features than the
-old png driver, including TrueType fonts. Requires libgd.
-
-`svg`: New terminal exporting Scalable Vector Graphics.
-
-
-@node New_plot_style_@ref{pm3d}, Filled_boxes, New_terminals, Features_introduced_in_version_4.0
-@subsection New plot style @ref{pm3d}
-
-
-The `splot` command is now capable of plotting 2D maps and 3D surfaces
-colored by greyscale or color palettes. See help for @ref{pm3d}, @ref{palette},
-@ref{cbrange}, `set view map`, `set colorbox` and @ref{palette}.
-
-Sample scripts: pm3d.dem pm3dcolors.dem pm3dgamma.dem
-
-
-@node Filled_boxes, New_plot_option_smooth_frequency, New_plot_style_@ref{pm3d}, Features_introduced_in_version_4.0
-@subsection Filled boxes
-
-
-A solid color or patterned fill style can be set for any plot style that
-contains boxes. See @ref{boxes}, @ref{boxerrorbars}, @ref{boxxyerrorbars},
-@ref{candlesticks}, `set style fill`.
-
-Sample scripts: fillstyle.dem candlesticks.dem
-
-
-@node New_plot_option_smooth_frequency, Improved_text_options, Filled_boxes, Features_introduced_in_version_4.0
-@subsection New plot option smooth frequency
-
-
-Input data can be filtered through several built-in routines for interpolation
-or approximation of data.  See @ref{smooth}, `frequency`, `unique`.
-
-Sample scripts: step.dem mgr.dem
-
-
-@node Improved_text_options, More_text_encodings, New_plot_option_smooth_frequency, Features_introduced_in_version_4.0
-@subsection Improved text options
-
-
-Most gnuplot plot commands that produce text labels now accept modifiers to
-specify text color, font, size, and rotation angle. See `set label`.
-Not all terminal types support these options, however.  The enhanced text
-mode previously available for the postscript and pm terminals has been
-extended to other terminal types as well.  Terminal types currently supported
-include aqua, dumb, jpeg, pdf, pm, png, postscript, x11, windows, and wxt.
-See `enhanced text`.
-
-Sample scripts: textcolor.dem textrotate.dem
-
-
-@node More_text_encodings, Arrows, Improved_text_options, Features_introduced_in_version_4.0
-@subsection More text encodings
-
-
-Several terminals, including @ref{postscript}, `x11` and `pm`, support additional
-text `encodings`: ISO 8859-1 (Latin 1), ISO 8859-2 (Latin 2), ISO 8859-15
-(variant of 8859-1 with Euro sign), KOI8-R and KOI8-U (cyrillic), and
-miscellaneous codepages. See @ref{encoding} for more details.
-
-
-@node Arrows, Data_file_format, More_text_encodings, Features_introduced_in_version_4.0
-@subsection Arrows
-
-
-Single- or double-ended arrows can be placed on a plot individually from the
-command line or from a data file via the @ref{vectors} style.
-See @ref{arrow}, @ref{vectors}.
-
-Sample scripts: arrowstyle.dem vector.dem
-
-
-@node Data_file_format, New_commands, Arrows, Features_introduced_in_version_4.0
-@subsection Data file format
-
-
-The new @ref{datafile} command can be used to specify information about the
-format of input data files, including the characters used to separate fields,
-to indicate comment lines, and to specify missing data.  Gnuplot now attempts
-to recognize text fields with embedded blanks as single entities based on the
-datafile format settings.  This allows input from csv (comma-separated value)
-files such as those exported by spreadsheet programs. See @ref{datafile}.
-See also the `binary` option (introduced in 4.2).
-
-
-@node New_commands, Other_changes_and_additions, Data_file_format, Features_introduced_in_version_4.0
-@subsection New commands
-
-
-`set view map` selects a top-view 2D projection of 3D surface plot.
-
-`set term push` and `set term pop` save and restore the current terminal type.
-
-`load` and @ref{save} commands accept piped input and output, respectively.
-
-
-@node Other_changes_and_additions, Accompanying_documentation, New_commands, Features_introduced_in_version_4.0
-@subsection Other changes and additions
-
-
-Since gnuplot 4.0, `unset <something>` is preferred to `set no<something>`.
-The older form has been deprecated.
-Version 4.2 continues to allow the older syntax, but such backwards
-compatibility may be lost in future versions.
-
-Commands of the form `set <something> <style>` also are deprecated in favor
-of the more general form `set style <something> <options>`.  Many more plot
-elements now have style options of their own, including arrows, filled
-areas, lines, and points. There are also style settings for input data and
-formatting. Please see @ref{style}, @ref{decimalsign}, and @ref{datafile}.
-
-The MS Windows package includes an additional executable `pgnuplot.exe` to
-support piping command through standard input, which is otherwise not
-available for graphical applications on this system.
-
-
-@node Accompanying_documentation,  , Other_changes_and_additions, Features_introduced_in_version_4.0
-@subsection Accompanying documentation
-
-
-In directory docs/psdocs/ you may find new information in the gnuplot output
-postscript file guide, list of postscript symbols in different encodings.
-
-Improved FAQ. Please read it before asking your question in a public forum.
-
-There are plenty of new demos *.dem in the demo/ directory. Please run them,
-for example by
-@example
-      load "all.dem"
-@end example
-
-before asking for help.  Plots produced by the demo scripts can also be viewed
-at
-@uref{http://www.gnuplot.info/demo/,http://www.gnuplot.info/demo/
-}
-
-
-@node Batch/Interactive_Operation, Command-line-editing, Features_introduced_in_version_4.0, gnuplot
+@node Batch/Interactive_Operation, Command-line-editing, Backwards_compatibility, gnuplot
 @section Batch/Interactive Operation
 
 @cindex batch/interactive
@@ -1030,10 +682,9 @@ expression, which will be interpreted as seconds from 1 January 2000.
 
 @cindex datastrings
 
-The configuration option --enable-datastrings allows gnuplot to read and
-process text fields in datafiles. A text field consists of either an arbitrary
-string of printable characters containing no whitespace or an arbitrary string
-of characters, possibly including whitespace, delimited by double quotes.
+Data files may contain string data consisting of either an arbitrary string
+of printable characters containing no whitespace or an arbitrary string of
+characters, possibly including whitespace, delimited by double quotes.
 The following sample line from a datafile is interpreted to contain four
 columns, with a text field in column 3:
 
@@ -1075,7 +726,7 @@ generate a title in the key box, while processing the remainder of columns
 
 @end example
 
-See @ref{labels}, `using xticlabels`, `plot title`, @ref{using}.
+See @ref{labels}, `using xticlabels`, @ref{title}, @ref{using}.
 
 @node Enhanced_text_mode, Environment, Datastrings, gnuplot
 @section Enhanced text mode
@@ -1211,7 +862,7 @@ S<max. horizontal resolution>. E.g. if your monitor's maximum resolution is
 If PCTRM is not set, standard VGA is used.
 
 FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
-fit is interrupted---see `fit`.  FIT_LOG specifies the default filename of the
+fit is interrupted---see @ref{fit}.  FIT_LOG specifies the default filename of the
 logfile maintained by fit.
 
 GNUPLOT_LIB may be used to define additional search directories for data
@@ -1821,9 +1472,6 @@ function of the real part of its argument.   See @ref{invnorm}, `erf` and @ref{e
 `rand(-1)` resets both seeds to a standard value.
 `rand(x)`  for x>0 sets both seeds to a value based on the value of x.
 `rand(@{x,y@})` for x>0 sets seed1 to x and seed2 to y.
-Note: This behavior has changed starting with gnuplot version 3.8l. Older
-scripts that expected rand(x>0) to produce sequential pseudo-random numbers
-from the same seeded sequence must be changed to call rand(0) instead.
 
 @node real, sgn, rand, Functions
 @subsubsection real
@@ -2282,10 +1930,8 @@ definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
 @c ?functions random
 @cindex random
 
-The behavior of the built-in function `rand(x)` has changed as of version 3.8l.
-Older scripts that expected rand(x>0) to produce sequential pseudo-random
-numbers from the same seeded sequence must be changed to call rand(0) instead.
-The current behavior is as follows:
+Some older versions of gnuplot used rand(x>0) to produce sequential
+pseudo-random numbers.  The current behavior is as follows:
 @example
  `rand(0)`  returns a pseudo random number in the interval [0:1] generated
             from the current value of two internal 32-bit seeds.
@@ -2464,18 +2110,13 @@ Please see @ref{using} for an explanation of the @ref{using} syntax.
 @subsection Gnuplot-defined variables
 
 @c ?gnuplot-defined variables
-The variable `pi` is defined to be pi, see
-@example
-      print pi
-
-@end example
-
-Additionally, gnuplot maintains a number of read-only variables that reflect
-the current internal state of the program and the most recent plot. These
-variables begin with the prefix "GPVAL_".  Examples include GPVAL_TERM,
-GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN. Type `show variables all` to display the
-complete list and current values. Values related to axes parameters (ranges,
-log base) are values used during the last plot, not those currently `set`.
+Gnuplot maintains a number of read-only variables that reflect the current
+internal state of the program and the most recent plot. These variables begin
+with the prefix "GPVAL_".
+Examples include GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN.
+Type `show variables all` to display the complete list and current values.
+Values related to axes parameters (ranges, log base) are values used during the
+last plot, not those currently `set`.
 
 @cindex errors
 
@@ -2489,13 +2130,13 @@ can be cleared using the command `reset errors`.
 Interactive terminals with `mouse` functionality maintain read-only variables
 with the prefix "MOUSE_".  See @ref{variables} for details.
 
-The `fit` mechanism uses several variables with names that begin "FIT_".  It
+The @ref{fit} mechanism uses several variables with names that begin "FIT_".  It
 is safest to avoid using such names.  "FIT_LIMIT", however, is one that you
 may wish to redefine. Under `set fit errorvariables`, the error for each
 fitted parameter will be stored in a variable named like the parameter, but
-with "_err" appended. See the documentation on `fit` for details.
+with "_err" appended. See the documentation on @ref{fit} for details.
 
-See @ref{variables}, `reset errors`, @ref{variables}, and `fit`.
+See @ref{variables}, `reset errors`, @ref{variables}, and @ref{fit}.
 
 
 @node User-defined_variables_and_functions,  , Gnuplot-defined_variables, Expressions
@@ -2580,7 +2221,7 @@ expression. For example
 Valid names are the same as in most programming languages: they must begin
 with a letter, but subsequent characters may be letters, digits, "$", or "_".
 
-See `show functions`, `functions`, @ref{variables}, @ref{macros}.
+See @ref{functions}, @ref{functions}, @ref{variables}, @ref{macros}.
 
 @node Glossary, linetype, Expressions, gnuplot
 @section Glossary
@@ -3113,7 +2754,7 @@ inequality operator "ne".  The following example will print TRUE.
 
 @end example
 
-See also the two string formatting functions `gprintf` and @ref{sprintf}.
+See also the two string formatting functions @ref{gprintf} and @ref{sprintf}.
 
 @cindex substring
 
@@ -3301,7 +2942,7 @@ a few special purposes.
 
 Commas are used to separate coordinates on the `set` commands @ref{arrow},
 `key`, and `label`; the list of variables being fitted (the list after the
-`via` keyword on the `fit` command); lists of discrete contours or the loop
+`via` keyword on the @ref{fit} command); lists of discrete contours or the loop
 parameters which specify them on the @ref{cntrparam} command; the arguments
 of the `set` commands @ref{dgrid3d}, @ref{dummy}, @ref{isosamples}, @ref{offsets}, @ref{origin},
 @ref{samples}, @ref{size}, `time`, and @ref{view}; lists of tics or the loop parameters
@@ -3312,7 +2953,7 @@ individual plots (data sets or functions) on the `plot`, @ref{replot} and `splot
 commands.
 
 Parentheses are used to delimit sets of explicit tics (as opposed to loop
-parameters) and to indicate computations in the @ref{using} filter of the `fit`,
+parameters) and to indicate computations in the @ref{using} filter of the @ref{fit},
 `plot`, @ref{replot} and `splot` commands.
 
 (Parentheses and commas are also used as usual in function notation.)
@@ -3322,7 +2963,7 @@ or `splot` commands.
 
 Colons are used to separate extrema in `range` specifications (whether they
 are given on `set`, `plot` or `splot` commands) and to separate entries in
-the @ref{using} filter of the `plot`, @ref{replot}, `splot` and `fit` commands.
+the @ref{using} filter of the `plot`, @ref{replot}, `splot` and @ref{fit} commands.
 
 Semicolons are used to separate commands given on a single command line.
 
@@ -4780,7 +4421,7 @@ a @ref{call}ed datafile plot.
 
 The @ref{clear} command erases the current screen or output device as specified
 by @ref{output}.  This usually generates a formfeed on hardcopy devices.  Use
-`set terminal` to set the device type.
+@ref{terminal} to set the device type.
 
 For some terminals @ref{clear} erases only the portion of the plotting surface
 defined by @ref{size}, so for these it can be used in conjunction with @ref{multiplot} to create an inset.
@@ -4839,7 +4480,7 @@ See help for `batch/interactive` for more details.
 
 @cindex Marquardt
 
-The `fit` command can fit a user-defined function to a set of data points
+The @ref{fit} command can fit a user-defined function to a set of data points
 (x,y) or (x,y,z), using an implementation of the nonlinear least-squares
 (NLLS) Marquardt-Levenberg algorithm.  Any user-defined variable occurring in
 the function body may serve as a fit parameter, but the return type of the
@@ -4866,7 +4507,7 @@ previously user-defined function of the form f(x) or f(x,y).
 
 <datafile> is treated as in the `plot` command.  All the @ref{datafile}
 modifiers (@ref{using}, @ref{every},...) except @ref{smooth} and the deprecated @ref{thru}
-are applicable to `fit`. See @ref{datafile}.
+are applicable to @ref{fit}. See @ref{datafile}.
 
 The default data formats for fitting functions with a single independent
 variable, y=f(x), are @{x:@}y or x:y:s; those formats can be changed with
@@ -4924,7 +4565,7 @@ environment variable FIT_SCRIPT.  The default for FIT_SCRIPT is @ref{replot},
 so if you had previously plotted both the data and the fitting function in
 one graph, you can display the current state of the fit.
 
-Once `fit` has finished, the @ref{update} command may be used to store final
+Once @ref{fit} has finished, the @ref{update} command may be used to store final
 values in a file for subsequent use as a parameter file.   See @ref{update}
 for details.
 
@@ -4972,9 +4613,9 @@ special form
 @end example
 
 means that the variable is treated as a 'fixed parameter', initialized by the
-parameter file, but not adjusted by `fit`.  For clarity, it may be useful to
+parameter file, but not adjusted by @ref{fit}.  For clarity, it may be useful to
 designate variables as fixed parameters so that their values are reported by
-`fit`.  The keyword `# FIXED` has to appear in exactly this form.
+@ref{fit}.  The keyword `# FIXED` has to appear in exactly this form.
 
 
 @node short_introduction, error_estimates, adjustable_parameters, fit
@@ -4985,7 +4626,7 @@ designate variables as fixed parameters so that their values are reported by
 @c ?fit guide
 @cindex fitting
 
-`fit` is used to find a set of parameters that 'best' fits your data to your
+@ref{fit} is used to find a set of parameters that 'best' fits your data to your
 user-defined function.  The fit is judged on the basis of the sum of the
 squared differences or 'residuals' (SSR) between the input data points and
 the function values, evaluated at the same places.  This quantity is often
@@ -4999,9 +4640,9 @@ to see what is meant by 'non-linear', but first we had better go over some
 terms.  Here it is convenient to use z as the dependent variable for
 user-defined functions of either one independent variable, z=f(x), or two
 independent variables, z=f(x,y).  A parameter is a user-defined variable
-that `fit` will adjust, i.e., an unknown quantity in the function
+that @ref{fit} will adjust, i.e., an unknown quantity in the function
 declaration.  Linearity/non-linearity refers to the relationship of the
-dependent variable, z, to the parameters which `fit` is adjusting, not of
+dependent variable, z, to the parameters which @ref{fit} is adjusting, not of
 z to the independent variables, x and/or y.  (To be technical, the
 second @{and higher@} derivatives of the fitting function with respect to
 the parameters are zero for a linear least-squares problem).
@@ -5023,20 +4664,20 @@ c is an unknown parameter, the problem is nonlinear.
 In the linear case, parameter values can be determined by comparatively
 simple linear algebra, in one direct step.  However LLS is a special case
 which is also solved along with more general NLLS problems by the iterative
-procedure that `gnuplot` uses.  `fit` attempts to find the minimum by doing
+procedure that `gnuplot` uses.  @ref{fit} attempts to find the minimum by doing
 a search.  Each step (iteration) calculates WSSR with a new set of parameter
 values.  The Marquardt-Levenberg algorithm selects the parameter values for
 the next iteration.  The process continues until a preset criterion is met,
 either (1) the fit has "converged" (the relative change in WSSR is less than
 FIT_LIMIT), or (2) it reaches a preset iteration count limit, FIT_MAXITER
 (see @ref{variables}).  The fit may also be interrupted
-and subsequently halted from the keyboard (see `fit`).  The user variable
+and subsequently halted from the keyboard (see @ref{fit}).  The user variable
 FIT_CONVERGED contains 1 if the previous fit command terminated due to
 convergence; it contains 0 if the previous fit terminated for any other
 reason.
 
 Often the function to be fitted will be based on a model (or theory) that
-attempts to describe or predict the behaviour of the data.  Then `fit` can
+attempts to describe or predict the behaviour of the data.  Then @ref{fit} can
 be used to find values for the free parameters of the model, to determine
 how well the data fits the model, and to estimate an error range for each
 parameter.  See `fit error_estimates`.
@@ -5044,12 +4685,12 @@ parameter.  See `fit error_estimates`.
 Alternatively, in curve-fitting, functions are selected independent of
 a model (on the basis of experience as to which are likely to describe
 the trend of the data with the desired resolution and a minimum number
-of parameters*functions.)  The `fit` solution then provides an analytic
+of parameters*functions.)  The @ref{fit} solution then provides an analytic
 representation of the curve.
 
 However, if all you really want is a smooth curve through your data points,
 the @ref{smooth} option to `plot` may be what you've been looking for rather
-than `fit`.
+than @ref{fit}.
 
 @node error_estimates, control, short_introduction, fit
 @subsection error estimates
@@ -5057,18 +4698,18 @@ than `fit`.
 @c ?commands fit error_estimates
 @c ?fit error_estimates
 @c ?fit errors
-In `fit`, the term "error" is used in two different contexts, data error
+In @ref{fit}, the term "error" is used in two different contexts, data error
 estimates and parameter error estimates.
 
 Data error estimates are used to calculate the relative weight of each data
 point when determining the weighted sum of squared residuals, WSSR or
 chisquare.  They can affect the parameter estimates, since they determine
 how much influence the deviation of each data point from the fitted function
-has on the final values.  Some of the `fit` output information, including
+has on the final values.  Some of the @ref{fit} output information, including
 the parameter error estimates, is more meaningful if accurate data error
 estimates have been provided.
 
-The 'statistical overview' describes some of the `fit` output and gives some
+The 'statistical overview' describes some of the @ref{fit} output and gives some
 background for the 'practical guidelines'.
 
 @menu
@@ -5103,7 +4744,7 @@ statistics where variance = counts, then each point should be individually
 weighted when comparing the observed sum of deviations and the expected sum
 of deviations.
 
-At the conclusion `fit` reports 'stdfit', the standard deviation of the fit,
+At the conclusion @ref{fit} reports 'stdfit', the standard deviation of the fit,
 which is the rms of the residuals, and the variance of the residuals, also
 called 'reduced chisquare' when the data points are weighted.  The number of
 degrees of freedom (the number of data points minus the number of fitted
@@ -5123,7 +4764,7 @@ value of chisquare corresponding to the desired confidence level, but
 considerably more calculation is required to determine the combinations of
 parameters which produce such values.
 
-Rather than determine confidence intervals, `fit` reports parameter error
+Rather than determine confidence intervals, @ref{fit} reports parameter error
 estimates which are readily obtained from the variance-covariance matrix
 after the final iteration.  By convention, these estimates are called
 "standard errors" or "asymptotic standard errors", since they are calculated
@@ -5159,7 +4800,7 @@ you make use of additional knowledge about your measurements, e.g., take into
 account that some points may be more reliable than others.  That may affect
 the final values of the parameters.
 
-Weighting the data provides a basis for interpreting the additional `fit`
+Weighting the data provides a basis for interpreting the additional @ref{fit}
 output after the last iteration.  Even if you weight each point equally,
 estimating an average standard deviation rather than using a weight of 1
 makes WSSR a dimensionless variable, as chisquare is by definition.
@@ -5167,7 +4808,7 @@ makes WSSR a dimensionless variable, as chisquare is by definition.
 Each fit iteration will display information which can be used to evaluate
 the progress of the fit.  (An '*' indicates that it did not find a smaller
 WSSR and is trying again.)  The 'sum of squares of residuals', also called
-'chisquare', is the WSSR between the data and your fitted function; `fit`
+'chisquare', is the WSSR between the data and your fitted function; @ref{fit}
 has minimized that.  At this stage, with weighted data, chisquare is expected
 to approach the number of degrees of freedom (data points minus parameters).
 The WSSR can be used to calculate the reduced chisquare (WSSR/ndf) or stdfit,
@@ -5197,12 +4838,12 @@ assumptions may not be justified, or the model function may be too general,
 fitting fluctuations in a particular sample in addition to the underlying
 trends.  In the latter case, a simpler function may be more appropriate.
 
-You'll have to get used to both `fit` and the kind of problems you apply it
+You'll have to get used to both @ref{fit} and the kind of problems you apply it
 to before you can relate the standard errors to some more practical estimates
 of parameter uncertainties or evaluate the significance of the correlation
 matrix.
 
-Note that `fit`, in common with most NLLS implementations, minimizes the
+Note that @ref{fit}, in common with most NLLS implementations, minimizes the
 weighted sum of squared distances (y-f(x))**2.  It does not provide any means
 to account for "errors" in the values of x, only in y.  Also, any "outliers"
 (data points outside the normal distribution of the model) will have an
@@ -5214,7 +4855,7 @@ exaggerated effect on the solution.
 @c ?commands fit control
 @c ?fit control
 There are a number of `gnuplot` variables that can be defined to affect
-`fit`.  Those which can be defined once `gnuplot` is running are listed
+@ref{fit}.  Those which can be defined once `gnuplot` is running are listed
 under 'control_variables' while those defined before starting `gnuplot`
 are listed under 'environment_variables'.
 
@@ -5264,7 +4905,7 @@ the chi-squared target function increased or decreased significantly.
 Setting FIT_LAMBDA_FACTOR to zero re-enables the default factor of
 10.0.
 
-Other variables with the FIT_ prefix may be added to `fit`, so it is safer
+Other variables with the FIT_ prefix may be added to @ref{fit}, so it is safer
 not to use that prefix for user-defined variables.
 
 The variables FIT_SKIP and FIT_INDEX were used by earlier releases of
@@ -5345,7 +4986,7 @@ solution with the smallest sum of squared residuals, SSR), and can get stuck
 at a local minimum.  The routine has no way to determine that;  it is up to
 you to judge whether this has happened.
 
-`fit` may, and often will get "lost" if started far from a solution, where
+@ref{fit} may, and often will get "lost" if started far from a solution, where
 SSR is large and changing slowly as the parameters are varied, or it may
 reach a numerically unstable region (e.g., too large a number causing a
 floating point overflow) which results in an "undefined value" message
@@ -5363,7 +5004,7 @@ a minimum with a poor fit.
 Of course, a reasonably good fit is not proof there is not a "better" fit (in
 either a statistical sense, characterized by an improved goodness-of-fit
 criterion, or a physical sense, with a solution more consistent with the
-model.)  Depending on the problem, it may be desirable to `fit` with various
+model.)  Depending on the problem, it may be desirable to @ref{fit} with various
 sets of starting values, covering a reasonable range for each parameter.
 
 @node tips,  , starting_values, fit
@@ -5373,11 +5014,11 @@ sets of starting values, covering a reasonable range for each parameter.
 @c ?fit tips
 @cindex tips
 
-Here are some tips to keep in mind to get the most out of `fit`.  They're not
+Here are some tips to keep in mind to get the most out of @ref{fit}.  They're not
 very organized, so you'll have to read them several times until their essence
 has sunk in.
 
-The two forms of the `via` argument to `fit` serve two largely distinct
+The two forms of the `via` argument to @ref{fit} serve two largely distinct
 purposes.  The `via "file"` form is best used for (possibly unattended) batch
 operation, where you just supply the startup values in a file and can later
 use @ref{update} to copy the results back into another (or the same) parameter
@@ -5412,7 +5053,7 @@ Some prescriptions for analysing data, given in practical experimentation
 courses, may have you first fit some functions to your data, perhaps in a
 multi-step process of accounting for several aspects of the underlying
 theory one by one, and then extract the information you really wanted from
-the fitting parameters of those functions.  With `fit`, this may often be
+the fitting parameters of those functions.  With @ref{fit}, this may often be
 done in one step by writing the model function directly in terms of the
 desired parameters.  Transforming data can also quite often be avoided,
 though sometimes at the cost of a more difficult fit problem.  If you think
@@ -5631,7 +5272,7 @@ Syntax:
 carriage return is hit, zero (0) won't pause at all, and a positive number
 will wait the specified number of seconds.  The time is rounded to an integer
 number of seconds if subsecond time resolution is not supported by the given
-platform.  `pause 0` is synonymous with `print`.
+platform.  `pause 0` is synonymous with @ref{print}.
 
 If the current terminal supports mousing, then `pause mouse` will terminate
 on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
@@ -5775,6 +5416,7 @@ axes (bottom left).
 
 @cindex volatile
 
+@c ?plot datafile volatile
 Discrete data contained in a file can be displayed by specifying the name of
 the data file (enclosed in single or double quotes) on the `plot` command line.
 
@@ -6119,7 +5761,7 @@ EDF stands for ESRF Data Format, and it supports both edf and ehf formats
 can be found at
 
 @example
-  http://www.esrf.fr/computing/expg/subgroups/general/format/Format.html
+  http://www.edfplus.info/specs
 
 @end example
 
@@ -6455,7 +6097,7 @@ or '[Population]'.
 `gnuplot` includes a few general-purpose routines for interpolation and
 approximation of data; these are grouped under the @ref{smooth} option.  More
 sophisticated data processing may be performed by preprocessing the data
-externally or by using `fit` with an appropriate model.
+externally or by using @ref{fit} with an appropriate model.
 
 Syntax:
 @example
@@ -6737,8 +6379,8 @@ does indeed work,
 
 is a lot easier to type.
 
-If you use `'-'` with @ref{replot}, you may need to enter the data more than once
-(see @ref{replot}).
+If you use `'-'` with @ref{replot}, you may need to enter the data more than once.
+See @ref{replot}, @ref{refresh}.
 
 A blank filename ('') specifies that the previous filename should be reused.
 This can be useful with things like
@@ -6751,9 +6393,8 @@ This can be useful with things like
 (If you use both `'-'` and `''` on the same `plot` command, you'll need to
 have two sets of inline data, as in the example above.)
 
-On some computer systems with a popen function (Unix), the datafile can be
-piped through a shell command by starting the file name with a '<'.  For
-example,
+On systems with a popen function, the datafile can be piped through a shell
+command by starting the file name with a '<'.  For example,
 
 @example
       pop(x) = 103*exp(-x/10)
@@ -6810,7 +6451,7 @@ natural
 
 also works (i.e. you can use y as the dummy variable).
 
-@ref{thru} is parsed for `splot` and `fit` but has no effect.
+@ref{thru} is parsed for `splot` and @ref{fit} but has no effect.
 
 @node using,  , thru, data
 @subsubsection using
@@ -6858,7 +6499,7 @@ and the data point number is used for x; for example, "`plot 'file' using 1`"
 is identical to "`plot 'file' using 0:1`".  If the @ref{using} list has two
 entries, these will be used for x and y.  Additional entries are usually
 errors in x and/or y.  See @ref{style} for details about plotting styles that
-make use of error information, and `fit` for use of error information in
+make use of error information, and @ref{fit} for use of error information in
 curve fitting.
 
 'scanf' accepts several numerical specifications but `gnuplot`
@@ -6949,17 +6590,12 @@ comment character (#) in the first column of the text lines.
 @uref{http://www.gnuplot.info/demo/using.html,Feeble using demos.
 }
 
-If gnuplot is built with configuration option --enable-datastrings, then
-additional modifiers to @ref{using} can specify handling of text fields in the
-datafile. See `datastrings`, `using xticlabels`, `using title`.
-
 
 @noindent --- USING TITLE ---
 
 @c ?using title
 @c ?plot using title
-If gnuplot is built with configuration option --enable-datastrings, then
-the first entry of a column of the input data file can be used as a string
+The first entry of a column of the input data file can be used as a string
 to provide the plot title in the key box.  The column containing specified
 is independent of the column[s] used for the plot itself.
 
@@ -6978,8 +6614,7 @@ The entry in the first row of columns 2 and 3 will be ignored.
 
 @c ?using xticlabels
 @c ?plot using xticlabels
-If gnuplot is built with configuration option --enable-datastrings, then
-a column of the input data file can be used to label axis tic marks.
+A column of the input data file can be used to label axis tic marks.
 The format of such a plot command is
 
 @example
@@ -7174,7 +6809,7 @@ function (`t**2` above) must not be interrupted with any modifiers or data
 functions; doing so will generate a syntax error stating that the parametric
 function is not fully specified.
 
-Other modifiers, such as @ref{with} and `title`, may be specified only after the
+Other modifiers, such as @ref{with} and @ref{title}, may be specified only after the
 parametric function has been completed:
 
 @example
@@ -7341,7 +6976,7 @@ and then replot.
 @c ?splot title
 A line title for each function and data set appears in the key, accompanied
 by a sample of the line and/or symbol used to represent it.  It can be
-changed by using the `title` option.
+changed by using the @ref{title} option.
 
 Syntax:
 @example
@@ -7361,7 +6996,7 @@ The line title and sample can be omitted from the key by using the keyword
 the sample is wanted, use one or more blanks (`title ' '`).  If `notitle`
 is followed by a string this string is ignored.
 
-If `key autotitles` is set (which is the default) and neither `title` nor
+If `key autotitles` is set (which is the default) and neither @ref{title} nor
 `notitle` are specified the line title is the function name or the file name as
 it appears on the `plot` command.  If it is a file name, any datafile modifiers
 specified will be included in the default title.
@@ -7439,7 +7074,7 @@ or
 @example
       boxes            candlesticks   image      circles
       boxerrorbars     filledcurves   rgbimage
-      boxxyerrorbars   histograms     pm3d
+      boxxyerrorbars   histograms     rgbalpha   pm3d
 
 @end example
 
@@ -7609,7 +7244,7 @@ This plots two color surfaces at different altitudes:
 @cmindex print
 
 
-The `print` command prints the value of <expression> to the screen.  It is
+The @ref{print} command prints the value of <expression> to the screen.  It is
 synonymous with `pause 0`.  <expression> may be anything that `gnuplot` can
 evaluate that produces a number, or it can be a string.
 
@@ -7619,7 +7254,7 @@ Syntax:
 
 @end example
 
-See `expressions`.  The output file can be set with `set print`.
+See `expressions`.  The output file can be set with @ref{print}.
 
 @node pwd, quit, print, Commands
 @section pwd
@@ -7863,22 +7498,22 @@ Syntax:
 
 @end example
 
-where <option> is `functions`, @ref{variables}, `terminal` or `set`. If
+where <option> is @ref{functions}, @ref{variables}, @ref{terminal} or `set`. If
 no option is used, `gnuplot` saves functions, variables, `set`
 options and the last `plot` (`splot`) command.
 
 @ref{save}d files are written in text format and may be read by the
 `load` command. For @ref{save} with the `set` option or without any
-option, the `terminal` choice and the @ref{output} filename are written
+option, the @ref{terminal} choice and the @ref{output} filename are written
 out as a comment, to get an output file that works in other
 installations of gnuplot, without changes and without risk of
 unwillingly overwriting files.
 
-`save terminal` will write out just the `terminal` status, without
+@ref{terminal} will write out just the @ref{terminal} status, without
 the comment marker in front of it. This is mainly useful for
-switching the `terminal` setting for a short while, and getting back
+switching the @ref{terminal} setting for a short while, and getting back
 to the previously set terminal, afterwards, by loading the saved
-`terminal` status. Note that for a single gnuplot session you may
+@ref{terminal} status. Note that for a single gnuplot session you may
 rather use the other method of saving and restoring current terminal
 by the commands `set term push` and `set term pop`, see `set term`.
 
@@ -7940,6 +7575,7 @@ when the variable was initially defined.
 * clip::                        
 * cntrparam::                   
 * color_box::                   
+* colornames::                  
 * contour::                     
 * data_style::                  
 * datafile::                    
@@ -8933,7 +8569,7 @@ and
 @uref{http://www.gnuplot.info/demo/discrete.html,contours with user defined levels demo (discrete.dem).
 }
 
-@node color_box, contour, cntrparam, set-show
+@node color_box, colornames, cntrparam, set-show
 @subsection color box
 
 @c ?commands set colorbox
@@ -9004,8 +8640,27 @@ the colorbox off.
 
 See also help for @ref{pm3d}, @ref{palette}, @ref{pm3d}, and `set style line`.
 
+@node colornames, contour, color_box, set-show
+@subsection colornames
 
-@node contour, data_style, color_box, set-show
+@cindex colornames
+@opindex colornames
+
+
+@c ?show colornames
+@c ?commands show colornames
+@c ?show palette colornames
+Gnuplot knows a limited number of color names. You can use these to define
+the color range spanned by a pm3d palette, or to assign a terminal-independent
+color to a particular linetype or linestyle. To see the list of know color
+names, use the command @ref{colornames}.   Example:
+
+@example
+      set style line 1 linecolor rgb "sea-green"
+
+@end example
+
+@node contour, data_style, colornames, set-show
 @subsection contour
 
 @c ?commands set contour
@@ -9085,18 +8740,19 @@ This form of the command is deprecated. Please see `set style data`.
 @c ?set datafile
 @c ?show datafile
 The @ref{datafile} command options control interpretation of fields read from
-input data files by the `plot`, `splot`, and `fit` commands.  Four such
+input data files by the `plot`, `splot`, and @ref{fit} commands.  Six such
 options are currently implemented.
 
 @menu
 * set_datafile_fortran::        
+* set_datafile_nofpe_trap::     
 * set_datafile_missing::        
 * set_datafile_separator::      
 * set_datafile_commentschars::  
 * set_datafile_binary::         
 @end menu
 
-@node set_datafile_fortran, set_datafile_missing, datafile, datafile
+@node set_datafile_fortran, set_datafile_nofpe_trap, datafile, datafile
 @subsubsection set datafile fortran
 
 @c ?set datafile fortran
@@ -9109,7 +8765,23 @@ the input process, and should only be selected if you do in fact have datafiles
 containing Fortran D or Q constants. The option can be disabled again using
 `unset datafile fortran`.
 
-@node set_datafile_missing, set_datafile_separator, set_datafile_fortran, datafile
+@node set_datafile_nofpe_trap, set_datafile_missing, set_datafile_fortran, datafile
+@subsubsection set datafile nofpe_trap
+
+@c ?set datafile nofpe_trap
+@cindex fpe_trap
+
+@cindex nofpe_trap
+
+@cindex floating point exceptions
+
+The `set datafile nofpe_trap` command tells gnuplot not to re-initialize a
+floating point exception handler before every expression evaluation used while
+reading data from an input file.  This can significantly speed data input from
+large files at the risk of program termination if a floating-point exception is
+generated.
+
+@node set_datafile_missing, set_datafile_separator, set_datafile_nofpe_trap, datafile
 @subsubsection set datafile missing
 
 @c ?set datafile missing
@@ -9589,7 +9261,7 @@ the device must be able to produce the desired non-standard characters.
 @c ?commands show fit
 @c ?set fit
 @c ?show fit
-The `fit` setting defines where the `fit` command writes its output.
+The @ref{fit} setting defines where the @ref{fit} command writes its output.
 If this option was built into your version of gnuplot, it also controls
 whether parameter errors from the fit will be written into variables.
 
@@ -9603,7 +9275,7 @@ Syntax:
 
 The <filename> argument must be enclosed in single or double quotes.
 
-If no filename is given or `unset fit` is used the log file is
+If no filename is given or @ref{fit} is used the log file is
 reset to its default value "fit.log" or the value of the environmental
 variable `FIT_LOG`.
 
@@ -9618,7 +9290,7 @@ a directory name, and the actual filename will be "fit.log" in that
 directory.
 
 If the `errorvariables` option is turned on, the error of each fitted
-parameter computed by `fit` will be copied to a user-defined variable
+parameter computed by @ref{fit} will be copied to a user-defined variable
 whose name is formed by appending "_err" to the name of the parameter
 itself.  This is useful mainly to put the parameter and its error onto
 a plot of the data and the fitted function, for reference, as in:
@@ -9911,7 +9583,7 @@ This form of the command is deprecated. Please see `set style function`.
 
 @c ?commands show functions
 @c ?show functions
-The `show functions` command lists all user-defined functions and their
+The @ref{functions} command lists all user-defined functions and their
 definitions.
 
 Syntax:
@@ -10227,8 +9899,8 @@ The `set key` command enables a key (or legend) describing plots on a plot.
 
 The contents of the key, i.e., the names given to each plotted data set and
 function and samples of the lines and/or symbols used to represent them, are
-determined by the `title` and @ref{with} options of the @{`s`@}`plot` command.
-Please see `plot title` and @ref{with} for more information.
+determined by the @ref{title} and @ref{with} options of the @{`s`@}`plot` command.
+Please see @ref{title} and @ref{with} for more information.
 
 Syntax:
 @example
@@ -10538,7 +10210,7 @@ attribute of an existing label, use the `set label` command with the
 appropriate tag, and specify the parts of the label to be changed.
 
 The <label text> can be a string constant, a string variable, or a string-
-valued expression. See `strings`, @ref{sprintf}, and `gprintf`.
+valued expression. See `strings`, @ref{sprintf}, and @ref{gprintf}.
 
 By default, the text is placed flush left against the point x,y,z.  To adjust
 the way the label is positioned with respect to the point x,y,z, add the
@@ -10655,7 +10327,7 @@ To set a label on a graph with a timeseries on the x axis, use, for example:
 @end example
 
 To display a freshly fitted parameter on the plot with the data and the
-fitted function, do this after the `fit`, but before the `plot`:
+fitted function, do this after the @ref{fit}, but before the `plot`:
 @example
       set label sprintf("a = %3.5g",par_a) at 30,15
       bfit = gprintf("b = %s*10^%S",par_b)
@@ -10901,10 +10573,10 @@ The computed margins can be overridden by the @ref{margin} commands.  @ref{margi
 
 Syntax:
 @example
-      set bmargin @{@{screen@} <margin>@}
-      set lmargin @{@{screen@} <margin>@}
-      set rmargin @{@{screen@} <margin>@}
-      set tmargin @{@{screen@} <margin>@}
+      set bmargin @{@{at screen@} <margin>@}
+      set lmargin @{@{at screen@} <margin>@}
+      set rmargin @{@{at screen@} <margin>@}
+      set tmargin @{@{at screen@} <margin>@}
       show margin
 
 @end example
@@ -10914,8 +10586,8 @@ A positive value defines the absolute size of the margin.  A negative value
 (or none) causes `gnuplot` to revert to the computed value.  For 3D plots,
 only the left margin can be set using character units.
 
-The keyword `screen` indicates that the margin is specified as a fraction of
-the full drawing area. This can be used to precisely line up the corners of
+The keywords `at screen` indicates that the margin is specified as a fraction
+of the full drawing area. This can be used to precisely line up the corners of
 individual 2D and 3D graphs in a multiplot.
 
 Normally the margins of a plot are automatically calculated based on tics,
@@ -11594,8 +11266,8 @@ MSDOS users should note that the \ character has special significance in
 double-quoted strings, so single-quotes should be used for filenames in
 different directories.
 
-When both `set terminal` and @ref{output} are used together, it is safest to
-give `set terminal` first, because some terminals set a flag which is needed
+When both @ref{terminal} and @ref{output} are used together, it is safest to
+give @ref{terminal} first, because some terminals set a flag which is needed
 in some operating systems.  This would be the case, for example, if the
 operating system needs to know whether or not a file is to be formatted in
 order to open it properly.
@@ -12026,7 +11698,7 @@ appropriate).  @ref{rgbformulae} prints the available fixed gray -->
 color transformation formulae.  @ref{colornames} prints the known color names.
 
 `show palette palette <n>` prints to the screen or to the file given by
-`set print` a table of RGB triplets calculated for the current palette settings
+@ref{print} a table of RGB triplets calculated for the current palette settings
 and a palette having <n> discrete colors.  The default wide table can be
 limited to 3 columns of r,g,b float values [0..1] or integer values [0..255]
 by options float or int, respectively.  This way, the current gnuplot color
@@ -12045,8 +11717,8 @@ as the gray for gray maps. The color map requires a transformation gray -->
 
 Basically two different types of mappings can be used:  Analytic formulae to
 convert gray to color, or discrete mapping tables which are interpolated.
-@ref{rgbformulae} and `palette functions` use analytic formulae whereas
-`palette defined` and @ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript output to a minimum.
+@ref{rgbformulae} and @ref{functions} use analytic formulae whereas
+@ref{defined} and @ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript output to a minimum.
 
 The command `show palette fit2rgbformulae` finds the best matching @ref{rgbformulae} for the current @ref{palette}. Naturally, it makes sense
 to use it for non-rgbformulae palettes. This command can be found useful
@@ -12060,7 +11732,7 @@ as gnuplot, like zimg (
 @end example
 
 `set palette gray` switches to a gray only palette. @ref{rgbformulae},
-`set palette defined`, @ref{file} and `set palette functions` switch
+@ref{defined}, @ref{file} and @ref{functions} switch
 to a color mapping. `set palette color` is an easy way to switch back from the
 gray palette to the last color mapping.
 
@@ -12080,7 +11752,7 @@ mapping to RGB.
 
 RGB color space might not be the most useful color space to work in.  For that
 reason you may change the color space with `model` to one of `RGB`, `HSV`,
-`CMY`, `YIQ` and `XYZ`.  Using color names for `set palette defined` tables
+`CMY`, `YIQ` and `XYZ`.  Using color names for @ref{defined} tables
 and a color space other than RGB will result in funny colors.  All explanation
 have been written for RGB color space, so please note, that `R` can be `H`,
 `C`, `Y`, or `X`, depending on the actual color space (`G` and `B`
@@ -12095,10 +11767,7 @@ recoding with downward compatibility for black and white television;
 XYZ are the three primary colors of the color model defined by the 'Commission
 Internationale de l'Eclairage' (CIE).
 For more information on color models see:
-@uref{http://www.cs.rit.edu/~ncs/color/glossary.htm,http://www.cs.rit.edu/~ncs/color/glossary.htm
-}
-and
-@uref{http://cs.fit.edu/wds/classes/cse5255/cse5255/davis/index.html,http://cs.fit.edu/wds/classes/cse5255/cse5255/davis/index.html
+@uref{http://en.wikipedia.org/wiki/Color_space,http://en.wikipedia.org/wiki/Color_space
 }
 
 
@@ -12109,7 +11778,6 @@ and
 * file::                        
 * gamma_correction::            
 * postscript::                  
-* colornames::                  
 @end menu
 
 @node rgbformulae, defined_, palette, palette
@@ -12169,7 +11837,7 @@ other color scheme by the command
 @c ?palette defined
 @cindex colors
 
-Gray-to-rgb mapping can be manually set by use of `palette defined`:  A color gradient
+Gray-to-rgb mapping can be manually set by use of @ref{defined}:  A color gradient
 is defined and used to give the rgb values.  Such a  gradient is a piecewise
 linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].
 You have to specify the gray values and the corresponding RGB values in
@@ -12203,7 +11871,7 @@ depending on the selected color model.
 The <gray> values have to form an ascending sequence of real numbers; the
 sequence will be automatically rescaled to [0,1].
 
-`set palette defined` (without a gradient definition in braces) switches to
+@ref{defined} (without a gradient definition in braces) switches to
 RGB color space and uses a preset full-spectrum color gradient.
 Use `show palette gradient` to display the gradient.
 
@@ -12381,7 +12049,7 @@ or even more intermediate points until the linear interpolation fits the
 "gamma corrected" interpolation well enough.
 
 
-@node postscript, colornames, gamma_correction, palette
+@node postscript,  , gamma_correction, palette
 @subsubsection postscript
 
 @c ?commands set palette postscript
@@ -12420,18 +12088,6 @@ by the enclosed awk script `pm3dConvertToImage.awk`.  Usage:
 
 You may manually change the postscript output from gray to color and vice
 versa and change the definition of <maxcolors>.
-
-@node colornames,  , postscript, palette
-@subsubsection colornames
-
-@cindex colornames
-
-@c ?show palette colornames
-@c ?show colornames
-Gnuplot knows a limited number of color names. You can use these to define
-the color range spanned by a pm3d palette, or to assign a terminal-independent
-colot to a particular linetype or linestyle. To see the list of know color
-names, use the command @ref{colornames}.  See @ref{palette}, `linestyle`.
 
 @node pointsize, polar, palette, set-show
 @subsection pointsize
@@ -12488,17 +12144,6 @@ Syntax:
 
 @end example
 
-There have been changes made to polar mode in version 3.7, so that scripts
-for `gnuplot` versions 3.5 and earlier will require modification.  The main
-change is that the dummy variable t is used for the angle so that the x and
-y ranges can be controlled independently.  Other changes are:
-1) tics are no longer put along the zero axes automatically
----use `set xtics axis nomirror`; `set ytics axis nomirror`;
-2) the grid, if selected, is not automatically polar
----use `set grid polar`;
-3) the grid is not labelled with angles
----use `set label` as necessary.
-
 In polar coordinates, the dummy variable (t) is an angle.  The default range
 of t is [0:2*pi], or, if degree units have been selected, to [0:360] (see
 @ref{angles}).
@@ -12545,7 +12190,7 @@ and
 @c ?commands show print
 @c ?set print
 @c ?show print
-The `set print` command redirects the output of the `print` command to a file.
+The @ref{print} command redirects the output of the @ref{print} command to a file.
 
 Syntax:
 @example
@@ -13255,7 +12900,7 @@ in order to go back to normal plotting on the current terminal.
 @c ?term pop
 @cindex pop
 
-`gnuplot` supports many different graphics devices.  Use `set terminal` to
+`gnuplot` supports many different graphics devices.  Use @ref{terminal} to
 tell `gnuplot` what kind of output to generate. Use @ref{output} to redirect
 that output to a file or device.
 
@@ -13269,8 +12914,8 @@ Syntax:
 If <terminal-type> is omitted, `gnuplot` will list the available terminal
 types.  <terminal-type> may be abbreviated.
 
-If both `set terminal` and @ref{output} are used together, it is safest to
-give `set terminal` first, because some terminals set a flag which is needed
+If both @ref{terminal} and @ref{output} are used together, it is safest to
+give @ref{terminal} first, because some terminals set a flag which is needed
 in some operating systems.
 
 Several terminals have many additional options.  For example, see `png`,
@@ -13289,7 +12934,7 @@ for instance. After gnuplot's startup, the default terminal or that from
 that `set term pop` restores the default terminal on a given platform unless
 another terminal has been pushed explicitly.
 
-For a complete list of available terminal types, see `terminal`.
+For a complete list of available terminal types, see @ref{terminal}.
 
 @node termoption, tics, terminal, set-show
 @subsection termoption
@@ -13301,7 +12946,7 @@ For a complete list of available terminal types, see `terminal`.
 
 
 The @ref{termoption} command allows you to change the behaviour of the
-current terminal without requiring a new `set terminal` command. Only one
+current terminal without requiring a new @ref{terminal} command. Only one
 option can be changed per command, and only a small number of options can
 be changed this way. Currently the only options accepted are
 
@@ -13553,8 +13198,8 @@ See also
 @opindex title
 
 
-The `set title` command produces a plot title that is centered at the top of
-the plot.  `set title` is a special case of `set label`.
+The @ref{title} command produces a plot title that is centered at the top of
+the plot.  @ref{title} is a special case of `set label`.
 
 Syntax:
 @example
@@ -13582,7 +13227,7 @@ linetype, an rgb color, or a palette mapping. See help for @ref{colorspec} and
 `noenhanced` requests that the title not be processed by the enhanced text
 mode parser, even if enhanced text mode is currently active.
 
-`set title` with no parameters clears the title.
+@ref{title} with no parameters clears the title.
 
 See `syntax` for details about the processing of backslash sequences and
 the distinction between single- and double-quotes.
@@ -14971,7 +14616,7 @@ The @ref{shell} command spawns an interactive shell.  To return to `gnuplot`,
 type `logout` if using VMS, @ref{exit} or the END-OF-FILE character if using
 Unix, `endcli` if using AmigaOS, or @ref{exit} if using MS-DOS or OS/2.
 
-There are two ways of spawning a shell command: using `system` command
+There are two ways of spawning a shell command: using @ref{system} command
 or via `!` ($ if using VMS). The former command takes a string as a
 parameter and thus it can be used anywhere among other gnuplot commands,
 while the latter syntax requires to be the only command on the line. Control
@@ -15037,7 +14682,7 @@ The syntax for setting ranges on the `splot` command is the same as for
 @ref{xrange}, @ref{yrange}, and @ref{zrange}.  In parametric mode, the order is @ref{urange},
 @ref{vrange}, @ref{xrange}, @ref{yrange}, and @ref{zrange}.
 
-The `title` option is the same as in `plot`.  The operation of @ref{with} is also
+The @ref{title} option is the same as in `plot`.  The operation of @ref{with} is also
 the same as in `plot`, except that the plotting styles available to `splot`
 are limited to `lines`, `points`, @ref{linespoints}, @ref{dots}, and @ref{impulses};  the
 error-bar capabilities of `plot` are not available for `splot`.
@@ -15093,7 +14738,7 @@ will be used for z, the datablock number will be used for y, and the index
 of the data point in the datablock will be used for x.  If two or four values
 are provided, `gnuplot` uses the last value for calculating the color in
 pm3d plots.  Three values are interpreted as an (x,y,z) triple.  Additional
-values are generally used as errors, which can be used by `fit`.
+values are generally used as errors, which can be used by @ref{fit}.
 
 Single blank records separate datablocks in a `splot` datafile; `splot`
 treats datablocks as the equivalent of function y-isolines.  No line will
@@ -15448,8 +15093,8 @@ Syntax:
 
 @end example
 
-@ref{test} or `test terminal` creates a display of line and point styles and other
-useful things appropriate for and supported by the `terminal` you are just
+@ref{test} or @ref{terminal} creates a display of line and point styles and other
+useful things appropriate for and supported by the @ref{terminal} you are just
 using.
 
 @ref{palette} draws graphically profiles R(z),G(z),B(z), where 0<=z<=1, as
@@ -15508,7 +15153,7 @@ Example:
 
 
 This command writes the current values of the fit parameters into the given
-file, formatted as an initial-value file (as described in the `fit`section).
+file, formatted as an initial-value file (as described in the @ref{fit}section).
 This is useful for saving the current values for later use or for restarting
 a converged or stopped fit.
 
@@ -15529,7 +15174,7 @@ naming convention, "ext" will be "`old`" and "filename" will be related
 (hopefully recognizably) to the initial name.  Renaming is not done at all
 on VMS systems, since they use file-versioning.]
 
-Please see `fit` for more information.
+Please see @ref{fit} for more information.
 
 @node Terminal_types, Graphical_User_Interfaces, Commands, Top
 @chapter Terminal types
@@ -15551,7 +15196,7 @@ Please see `fit` for more information.
 
 Gnuplot supports a large number of output formats. These are selected by
 choosing an appropriate terminal type, possibly with additional modifying
-options. See `set terminal`.
+options. See @ref{terminal}.
 
 This document may describe terminal types that are not available to you
 because they were not configured or installed on your system. To see a list of
@@ -16827,7 +16472,7 @@ which defaults to medium (=font size) and normal.
 Preferred combinations are `medium normal` and `small draft`.
 
 With each of these drivers, a binary copy is required on a PC to print.
-Do not use `print`---use instead `copy file /b lpt1:`.
+Do not use @ref{print}---use instead `copy file /b lpt1:`.
 
 
 @node excl, hercules, epson_180dpi, terminal_
@@ -18122,7 +17767,7 @@ LaTeX packages: amsfonts, amsmath(intlimits). By default these packages are not
 included.
 
 A name in quotes selects the font that will be used when no explicit font is
-given in a `set label` or `set title`.  A name recognized by TeX (a TFM file
+given in a `set label` or @ref{title}.  A name recognized by TeX (a TFM file
 exists) must be used.  The default is "cmr10" unless `notex` is selected,
 then it is "pcrr8r" (Courier).  Even under `notex`, a TFM file is needed by
 Metapost. The file `pcrr8r.tfm` is the name given to Courier in LaTeX's psnfss
@@ -19325,7 +18970,7 @@ size, background color and linestyles to the initialization file
 
 In order of preference, graphs may be be printed in the following ways.
 
-`1.` Use the `gnuplot` command `set terminal` to select a printer and @ref{output} to redirect output to a file.
+`1.` Use the `gnuplot` command @ref{terminal} to select a printer and @ref{output} to redirect output to a file.
 
 `2.` Select the `Print...` command from the `gnuplot graph` window.  An extra
 command `screendump` does this from the text window.
@@ -20647,24 +20292,16 @@ gnuplot_x11 commands, but sends them to the output file specified by
 @cindex gui's
 
 Several graphical user interfaces have been written for `gnuplot` and one for
-win32 is included in this distribution.  In addition, there is a Python
-interface at
-@uref{http://py-gnuplot.darwinports.com/,http://py-gnuplot.darwinports.com/
-}
+win32 is included in this distribution.
 
-Also several X11 interfaces exist.
-One of them is called xgfe. It uses the Qt library and can be found on
-@uref{http://www.flash.net/~dmishee/xgfe/xgfe.html,http://www.flash.net/~dmishee/xgfe/xgfe.html
-}
-
-In addition three Tcl/Tk located at the usual Tcl/Tk repositories exist.
-
-Bruce Ravel (ravel@@phys.washington.edu) has written a new version of
-gnuplot-mode for GNU emacs and XEmacs. This version is based on
-the gnuplot.el file by Gershon Elber.
+Bruce Ravel (ravel@@phys.washington.edu) has written a gnuplot-mode for
+GNU emacs and XEmacs based on  the earlier gnuplot.el file by Gershon Elber.
 While the gnuplot CVS repository has its own copy the most recent
 version of this package is available from
 @uref{http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/,http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/
+}
+For Python, Tk/Tcl, and other front-ends, check the links on
+@uref{http://gnuplot.sourceforge.net/links.html,http://gnuplot.sourceforge.net/links.html
 }
 
 
@@ -20711,11 +20348,9 @@ libraries and may have been fixed independent of any changes in gnuplot.
 @opindex timefmt
 
 
-@cindex load
-@cmindex load
-
-
 @cindex nohidden3d
+
+@cindex floating point exceptions
 
 Floating point exceptions (floating point number too large/small, divide by
 zero, etc.) may occasionally be generated by user defined functions.  Some of
@@ -20725,9 +20360,6 @@ the corresponding point as undefined) or aborts `gnuplot` depends on the
 compiler/runtime environment.
 
 The gamma and bessel functions do not work for complex arguments.
-
-If a command line contains a "load" command, then anything on the line after
-the "load <filename>" is ignored.
 
 Only one color palette at a time is active for any given x11 plot window.
 This means that multiplots whose constituent plots use different palettes
