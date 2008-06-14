@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.27 2008/04/15 17:39:34 sfeam Exp $
+ * $Id: datafile.h,v 1.28 2008/06/12 18:07:24 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -104,8 +104,8 @@ extern TBOOLEAN df_fortran_constants;
 /* Setting this disables initialization of the floating point exception */
 /* handler before every expression evaluation in a using specifier.   	 */
 /* This can speed data input significantly, but assumes valid input.    */
-TBOOLEAN df_nofpe_trap;
-TBOOLEAN evaluate_inside_using;
+extern TBOOLEAN df_nofpe_trap;
+extern TBOOLEAN evaluate_inside_using;
 
 /* Prototypes of functions exported by datafile.c */
 

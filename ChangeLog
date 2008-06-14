@@ -1,3 +1,8 @@
+2008-06-14  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* src/datafile.h (df_no_fpe_trap, evaluate_inside_using): Add
+	missing 'extern' to declaration of new variables.
+
 2008-06-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/titlepag.tex:
