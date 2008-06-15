@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.64 2008/04/10 18:09:05 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.65 2008/06/02 00:48:11 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -689,8 +689,6 @@ void wxtPanel::Draw()
 /* copy the plot to the panel, draw zoombow and ruler needed */
 void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 {
-	dc.BeginDrawing();
-
 	wxPen tmp_pen;
 
 	/* TODO extend the region mechanism to surfaces other than GTK_SURFACE */
@@ -791,8 +789,6 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		dc.SetLogicalFunction( wxCOPY );
 	}
 #endif /*USE_MOUSE*/
-
-	dc.EndDrawing();
 }
 
 /* avoid flickering under win32 */

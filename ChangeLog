@@ -1,3 +1,8 @@
+2008-06-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp:
+	Remove deprecated dc.BeginDrawing() dc.EndDrawing()
+
 2008-06-14  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* src/datafile.h (df_no_fpe_trap, evaluate_inside_using): Add
@@ -5,7 +10,7 @@
 
 2008-06-13  Ethan Merritt  <merritt@u.washington.edu>
 
-	* docs/gnuplot.doc docs/titlepag.tex:
+	* docs/gnuplot.doc docs/titlepag.tex docs/gnuplot.texi:
 	Replace "what's new in 4.0, 4.2" with "what's new in 4.3".
 	Remove discussion of pre-version 4 features.
 	Update or remove dead URLS.
