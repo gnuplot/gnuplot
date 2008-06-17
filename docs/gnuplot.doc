@@ -1,4 +1,4 @@
-C ROS $Id: gnuplot.doc,v 1.511 2008/06/13 22:01:54 seem Exp $
+C ROS $Id: gnuplot.doc,v 1.512 2008/06/14 04:47:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2908,17 +2908,25 @@ Ffigure_labels
  The `labels` style reads coordinates and text from a data file and places
  the text string at the corresponding 2D or 3D position.  3 or 4 input columns
  of basic data are required.  Additional input columns may be used to provide
- information such as variable text color (see `rgbcolor variable`).
+ information such as variable font size or text color (see `rgbcolor variable`).
 
       3 columns:  x  y  string    # 2D version
       4 columns:  x  y  z  string # 3D version
 
- The font, color, rotation angle and other properties of the printed text may be
- specified as additional command options (see `set label`). The example below
- will generate a 2D plot with text labels taken from column 4 of the input
- file (`tc lt 2` is shorthand for `textcolor linetype 2`, which is green).
+ The font, color, rotation angle and other properties of the printed text
+ may be specified as additional command options (see `set label`). The example
+ below generates a 2D plot with text labels constructed from the city whose
+ name is taken from column 1 of the input file, and whose geographic coordinates
+ are in columns 4 and 5. The font size is calculated from the value in column 3,
+ in this case the population.
 
-   plot 'datafile' using 1:(0.5 * $2):4 with labels font "arial,11" tc lt 2
+   CityName(String,Size) = sprintf("{/=%d %s}", Scale(Size), String)
+   plot 'cities.dat' using 5:4:(CityName(stringcolumn(1),$3)) with labels
+
+ If we did not want to adjust the font size to a different size for each city
+ name, the command would be much simpler:
+
+   plot 'cities.dat' using 5:4:1 with labels font "Times,8"
 
  The `labels` style can also be used in 3D plots. In this case four input
  column specifiers are required, corresponding to X Y Z and text.

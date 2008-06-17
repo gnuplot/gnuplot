@@ -37,11 +37,7 @@ plot '../demo/silver.dat' u 1:($2-10.) title 'with steps' with steps
 #
 set output 'figure_histeps.pdf'
 plot '../demo/silver.dat' u 1:($2-10.) title 'with histeps' with histeps
-#
-set output 'figure_labels.pdf'
-unset xzeroaxis
-plot '../demo/silver.dat' u 1:($2-10.):("ABCDEFGHIJKLMNOPQRSTUVWXYZ"[int($0-20):int($0-20)+int(4*rand(0))]) \
-     title 'with labels' with labels font ",8"
+
 #
 # Simple bar charts  (same data plotted)
 # ======================================
@@ -49,7 +45,7 @@ plot '../demo/silver.dat' u 1:($2-10.):("ABCDEFGHIJKLMNOPQRSTUVWXYZ"[int($0-20):
 set output 'figure_boxes.pdf'
 set xzeroaxis
 set boxwidth 0.8 relative
-plot '../demo/silver.dat' u 1:($2-10.) with boxes title 'with boxes' fs pattern 2
+plot '../demo/silver.dat' u 1:($2-10.) with boxes title 'with boxes' fs solid 0.5
 #
 set output 'figure_boxerrorbars.pdf'
 set boxwidth 0.8 relative
@@ -105,12 +101,12 @@ plot '../demo/candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
 # =============
 #
 set output 'figure_filledcurves.pdf'
-set style fill pattern 1 border -1
+set style fill solid 1.0 border -1
 set xrange [250:500]
 set auto y
 set key box title "with filledcurves"
-plot '../demo/silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above', \
-               '' u 1:2:($3+$1/50.) w filledcurves below title 'below', \
+plot '../demo/silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above' lc rgb "grey10", \
+               '' u 1:2:($3+$1/50.) w filledcurves below title 'below' lc rgb "grey75", \
                '' u 1:2 w lines lt -1 lw 1 title 'curve 1', \
                '' u 1:($3+$1/50.) w lines lt -1 lw 3 title 'curve 2'
 #
@@ -159,7 +155,16 @@ set style histogram columns
 set title "Columnstacked" offset 0,-1
 set boxwidth 0.8 rel
 set xtics
-plot 'histopt.dat' using 1 ti col fs pattern 0, '' using 2 ti col fs pattern 0
+
+set style line 1 lt rgb "gray0"
+set style line 2 lt rgb "white"
+set style line 3 lt rgb "gray40"
+set style line 4 lt rgb "gray70"
+set style increment user
+set style fill solid 1.0 border -1
+
+plot 'histopt.dat' using 1 ti col lt 1, '' using 2 ti col fs solid lt 1
+set style increment system
 #
 # Circles
 #
@@ -220,3 +225,22 @@ set title "projected contours using 'set view map'" offset 0,-1
 
 set output 'figure_mapcontours.pdf'
 splot sin(x) * cos(y)
+
+#
+#
+# Demonstrates how to pull font size from a data file column
+#
+reset
+Scale(size) = 0.25*sqrt(sqrt(column(size)))
+CityName(String,Size) = sprintf("{/=%d %s}", Scale(Size), stringcolumn(String))
+
+set termoption enhanced
+set output 'figure_labels.pdf'
+unset xtics
+unset ytics
+unset key
+set border 0
+set size square
+set datafile separator "\t"
+plot '../demo/cities.dat' using 5:4:($3 < 5000 ? "-" : CityName(1,3)) with labels
+reset
