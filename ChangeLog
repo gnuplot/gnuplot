@@ -1,3 +1,9 @@
+2008-06-17  Bastian Maerkisch  <bmaerkisch@web.de>
+	* src/win/wgraph.c term/win.trm (WIN_set_color):  Preserve setting of
+	dash type and linewidth when a new color is selected.
+	Allow dash types with linewidth > 1.
+	Bug #1863361
+
 2008-06-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_margin) src/save.c (save_set_all) docs/gnuplot.doc:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.52 2006/07/18 05:20:51 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.52.2.1 2008/05/29 20:01:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -889,21 +889,35 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    break;
 	case W_line_type:
 	    {
+		LOGBRUSH lb;
+		LOGPEN cur_penstruct;
+
 		short cur_pen = ((curptr->x < (WORD)(-2))
 				 ? (curptr->x % WGNUMPENS) + 2
 				 : curptr->x + 2);
-		LOGPEN cur_penstruct = (lpgw->color && isColor) ?
-		    lpgw->colorpen[cur_pen] : lpgw->monopen[cur_pen];
+		/* set color only when second parameter to W_line_type equals 1 */
+		if (curptr->y != 1)
+		    pen = cur_pen;
+		cur_penstruct = (lpgw->color && isColor) ?
+		    lpgw->colorpen[pen] : lpgw->monopen[pen];
+		cur_penstruct.lopnColor = ((lpgw->color && isColor) ?
+		    lpgw->colorpen[cur_pen] : lpgw->monopen[cur_pen]).lopnColor;
 
 		if (line_width != 1)
 		    cur_penstruct.lopnWidth.x *= line_width;
-		lpgw->hapen = CreatePenIndirect((LOGPEN FAR *) &cur_penstruct);
+	
+		/* use ExtCreatePen instead of CreatePen/CreatePenIndirect to support
+		 * dashed lines if line_width > 1 */
+		lb.lbStyle = BS_SOLID;
+		lb.lbColor = cur_penstruct.lopnColor;
+		lpgw->hapen = ExtCreatePen(
+		        (line_width==1 ? PS_COSMETIC : PS_GEOMETRIC) | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
+			cur_penstruct.lopnWidth.x, &lb, 0, 0);
 		DeleteObject(SelectObject(hdc, lpgw->hapen));
 
-		pen = cur_pen;
-		SelectObject(hdc, lpgw->colorbrush[pen]);
+		SelectObject(hdc, lpgw->colorbrush[cur_pen]);
 		/* PM 7.7.2002: support color text */
-		SetTextColor(hdc, lpgw->colorpen[pen].lopnColor);
+		SetTextColor(hdc, cur_penstruct.lopnColor);
 	    }
 	break;
 
@@ -1039,6 +1053,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		static HBRUSH last_pm3d_brush = NULL;
 		HBRUSH this_brush;
 		COLORREF c;
+		LOGPEN cur_penstruct;
+		LOGBRUSH lb;
 
 		/* distinguish gray values and RGB colors */
 		if (curptr->y == 0) {
@@ -1050,13 +1066,23 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    c = RGB(curptr->y & 0xff, (curptr->x >> 8) & 0xff, curptr->x & 0xff);
 		}
 
+		/* FIXME: always a _solid_ brush?? */
 		this_brush = CreateSolidBrush(c);
 		SelectObject(hdc, this_brush);
 		if (last_pm3d_brush != NULL)
 		    DeleteObject(last_pm3d_brush);
 		last_pm3d_brush = this_brush;
 		/* create new pen, too: */
-		DeleteObject(SelectObject(hdc, CreatePen(PS_SOLID, line_width, c)));
+		cur_penstruct = (lpgw->color && isColor) ?
+		    lpgw->colorpen[pen] : lpgw->monopen[pen];	
+		if (line_width != 1)
+		    cur_penstruct.lopnWidth.x *= line_width;
+		lb.lbStyle = BS_SOLID;
+		lb.lbColor = c;
+		lpgw->hapen = ExtCreatePen(
+		    (line_width==1 ? PS_COSMETIC : PS_GEOMETRIC) | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
+		    cur_penstruct.lopnWidth.x, &lb, 0, 0);
+		DeleteObject(SelectObject(hdc, lpgw->hapen));
 		/* finally set text color */
 		SetTextColor(hdc, c);
 	    }
