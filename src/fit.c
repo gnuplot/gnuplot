@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.61 2008/03/16 20:03:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.62 2008/03/30 03:27:54 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -138,7 +138,7 @@ static int max_params;
 static double epsilon = 1e-5;	/* convergence limit */
 static int maxiter = 0;
 
-static char fit_script[256];
+static char *fit_script = NULL;
 
 /* HBB/H.Harders 20020927: log file name now changeable from inside
  * gnuplot */
@@ -545,7 +545,7 @@ fit_interrupt()
 		struct value v;
 		const char *tmp;
 
-		tmp = (fit_script != 0 && *fit_script) ? fit_script : DEFAULT_CMD;
+		tmp = fit_script ? fit_script : DEFAULT_CMD;
 		fprintf(STANDARD, "executing: %s", tmp);
 		/* set parameters visible to gnuplot */
 		for (i = 0; i < num_params; i++) {
@@ -1357,9 +1357,11 @@ fit_command()
 	lambda_up_factor = lambda_down_factor = tmpd;
 	printf("Lambda scaling factors reset:  %g\n", lambda_up_factor);
     }
-    *fit_script = NUL;
-    if ((tmp = getenv(FITSCRIPT)) != NULL)
-	safe_strncpy(fit_script, tmp, sizeof(fit_script));
+    free(fit_script);
+    fit_script = NULL;
+    if ((tmp = getenv(FITSCRIPT)) != NULL) {
+	fit_script = gp_strdup(tmp);
+    }
 
     {
 	char *logfile = getfitlogfile();

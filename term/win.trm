@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.60 2008/06/01 21:01:04 sfeam Exp $
+ * $Id: win.trm,v 1.61 2008/06/02 00:48:12 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -582,7 +582,7 @@ WIN_set_color(t_colorspec *colorspec)
 {
     switch (colorspec->type ) {
 	case TC_FRAC:
-    WIN_last_linetype = LT_NODRAW;      /* invalidate cached linetype */
+	    WIN_last_linetype = LT_NODRAW;      /* invalidate cached linetype */
 	    GraphOp(&graphwin, W_pm3d_setcolor, (int)(WIN_PAL_COLORS*colorspec->value), 0, NULL);
 	    break;
 	case TC_RGB:
