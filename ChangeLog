@@ -1,3 +1,9 @@
+2008-06-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/aquaterm.trm (AQUA_init AQUA_boxfill AQUA_filled_polygon):
+	Query aquaterm for alpha channel support; use it if present.
+	Add fill styles to the filled polygon routine.
+
 2008-06-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c: Dynamic allocation for fit script string.
