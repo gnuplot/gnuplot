@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.37 2007/12/20 03:15:54 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.38 2008/01/22 01:08:16 sfeam Exp $
  *
  */
 
@@ -117,6 +117,9 @@ static inline void NOOP_(id x, ...) {;}
 static NSAutoreleasePool *arpool;
 static NSAutoreleasePool *loopPool;
 static AQTAdapter *adapter;
+
+/* Supported features */
+static TBOOLEAN AQUA_hasAlphaSupport = FALSE;
 
 /* Internal state */
 static int AQUA_plotRef = 0; /* A ref to the current plot */
@@ -352,6 +355,9 @@ AQUA_init()
   /* Must open plot before all other commands */
   [adapter openPlotWithIndex:AQUA_plotRef];
 
+  /* Check for support of version-dependent features */
+   AQUA_hasAlphaSupport = [AQTAdapter respondsToSelector:@selector(setColorRed:green:blue:alpha:)];
+
   /* set xmax, ymax*/
   term->xmax = AQUA_xSize;
   term->ymax = AQUA_ySize;
@@ -564,7 +570,6 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
    * - pattern : 0 - 100
    */
   int fillpar = style >> 4;
-
   style &= 0xf;
 
   switch (style) {
@@ -575,10 +580,15 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
       [adapter setColorRed:rb green:gb blue:bb];
     }
     break;
-  case FS_SOLID: /* solid fill */
   case FS_TRANSPARENT_SOLID:
+    if (AQUA_hasAlphaSupport) {
+      float alpha = fillpar * 0.01;
+      [adapter setColorRed:r green:g blue:b alpha:alpha];
+      break;
+    } else
+      /* fall through */
+  case FS_SOLID: /* solid fill */
     {
-      /* Alpha channel? RGB -> HSV -> R'G'B'? */
       float density = (100 - fillpar)*0.01;
       [adapter setColorRed:r*(1-density) + density
 	             green:g*(1-density) + density
@@ -653,6 +663,44 @@ TERM_PUBLIC void
 AQUA_filled_polygon(int pc, gpiPoint *corners)
 {
   int i;
+  int fillpar = corners->style >> 4;
+  float r,g,b;
+
+  [adapter getColorRed:&r green:&g blue:&b];
+ 
+  /* This switch is a clone of the one in AQUA_boxfill() */
+  switch (corners->style & 0xf) {
+  case 0: /* fill with background color */
+    {
+      float rb, gb, bb;
+      [adapter getBackgroundColorRed:&rb green:&gb blue:&bb];
+      [adapter setColorRed:rb green:gb blue:bb];
+    }
+    break;
+  case FS_TRANSPARENT_SOLID:
+    if (AQUA_hasAlphaSupport) {
+      float alpha = fillpar * 0.01;
+      [adapter setColorRed:r green:g blue:b alpha:alpha];
+      break;
+    } else
+      /* fall through */
+  case FS_SOLID: /* solid fill */
+    {
+      float density = (100 - fillpar)*0.01;
+      [adapter setColorRed:r*(1-density) + density
+	             green:g*(1-density) + density
+	              blue:b*(1-density) + density];
+    }
+    break;
+  case FS_PATTERN: /* pattern fill */
+  case FS_TRANSPARENT_PATTERN:
+    /* Can't do pattern easily, using colors. */
+    [adapter takeColorFromColormapEntry:(fillpar%CYCLIC_COLORS)+SPECIAL_COLORS];
+    break;
+  default:
+    break;
+  }
+
   [adapter moveToVertexPoint:NSMakePoint(corners[0].x/AQUA_RESOLUTION,
 					 corners[0].y/AQUA_RESOLUTION)];
   for (i=1; i<pc; i++) {
