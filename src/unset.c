@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.119 2008/06/01 04:30:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.120 2008/06/08 22:17:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1284,7 +1284,7 @@ unset_style()
 	data_style = POINTSTYLE;
 	func_style = LINES;
 	while (first_linestyle != NULL)
-	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
+	    delete_linestyle(&first_linestyle, NULL, first_linestyle);
 	unset_fillstyle();
 #ifdef EAM_OBJECTS
 	unset_style_rectangle();
@@ -1307,14 +1307,14 @@ unset_style()
 	c_token++;
 	if (END_OF_COMMAND) {
 	    while (first_linestyle != NULL)
-		delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
+		delete_linestyle(&first_linestyle, NULL, first_linestyle);
 	} else {
 	    int tag = int_expression();
 	    struct linestyle_def *this, *prev;
 	    for (this = first_linestyle, prev = NULL; this != NULL; 
 		 prev = this, this = this->next) {
 		if (this->tag == tag) {
-		    delete_linestyle(prev, this);
+		    delete_linestyle(&first_linestyle, prev, this);
 		    break;
 		}
 	    }
@@ -1565,7 +1565,7 @@ reset_command()
 	delete_label((struct text_label *) NULL, first_label);
     /* delete linestyles */
     while (first_linestyle != NULL)
-	delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
+	delete_linestyle(&first_linestyle, NULL, first_linestyle);
 #ifdef EAM_OBJECTS
     /* delete objects */
     while (first_object != NULL)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.277 2008/06/08 05:47:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.278 2008/06/12 18:07:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -153,7 +153,6 @@ static void load_tic_user __PROTO((AXIS_INDEX axis));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
 
 static void set_linestyle __PROTO((void));
-static int assign_linestyle_tag __PROTO((void));
 static void set_arrowstyle __PROTO((void));
 static int assign_arrowstyle_tag __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
@@ -4710,13 +4709,8 @@ set_linestyle()
     c_token++;
 
     /* get tag */
-    if (!END_OF_COMMAND) {
-	/* must be a tag expression! */
-	tag = int_expression();
-	if (tag <= 0)
-	    int_error(c_token, "tag must be > zero");
-    } else
-	tag = assign_linestyle_tag();	/* default next tag */
+    if (END_OF_COMMAND || ((tag = int_expression()) <= 0))
+	int_error(c_token, "tag must be > zero");
 
     /* Default style is based on linetype with the same tag id */
     loc_lp.l_type = tag - 1;
@@ -4744,11 +4738,8 @@ set_linestyle()
 	this_linestyle = new_linestyle;
     }
 
-    /* Reset to default values */
-    if (END_OF_COMMAND)
-	this_linestyle->lp_properties = loc_lp;
-    else if (almost_equals(c_token, "def$ault")) {
-	this_linestyle->lp_properties = loc_lp;
+    if (almost_equals(c_token, "def$ault")) {
+	delete_linestyle(&first_linestyle, prev_linestyle, this_linestyle);
 	c_token++;
     } else
 	/* pick up a line spec; dont allow ls, do allow point type */
@@ -4759,39 +4750,20 @@ set_linestyle()
 
 }
 
-/* assign a new linestyle tag
- * linestyles are kept sorted by tag number, so this is easy
- * returns the lowest unassigned tag number
- */
-static int
-assign_linestyle_tag()
-{
-    struct linestyle_def *this;
-    int last = 0;		/* previous tag value */
-
-    for (this = first_linestyle; this != NULL; this = this->next)
-	if (this->tag == last + 1)
-	    last++;
-	else
-	    break;
-
-    return (last + 1);
-}
-
-/* delete linestyle from linked list started by first_linestyle.
- * called with pointers to the previous linestyle (prev) and the
- * linestyle to delete (this).
- * If there is no previous linestyle (the linestyle to delete is
- * first_linestyle) then call with prev = NULL.
+/*
+ * Delete linestyle from linked list.
+ * Called with pointers to the head of the list,
+ * to the previous linestyle (not strictly necessary),
+ * and to the linestyle to delete.
  */
 void
-delete_linestyle(struct linestyle_def *prev, struct linestyle_def *this)
+delete_linestyle(struct linestyle_def **head, struct linestyle_def *prev, struct linestyle_def *this)
 {
     if (this != NULL) {		/* there really is something to delete */
-	if (prev != NULL)	/* there is a previous linestyle */
+	if (this == *head)
+	    *head = this->next;
+	else
 	    prev->next = this->next;
-	else			/* this = first_linestyle so change first_linestyle */
-	    first_linestyle = this->next;
 	free(this);
     }
 }
@@ -5077,7 +5049,7 @@ static void set_nolinestyle()
     if (END_OF_COMMAND) {
 	/* delete all linestyles */
 	while (first_linestyle != NULL)
-	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
+	    delete_linestyle(&first_linestyle, NULL, first_linestyle);
     } else {
 	/* get tag */
 	tag = int_expression();
@@ -5087,7 +5059,7 @@ static void set_nolinestyle()
 	     this != NULL;
 	     prev = this, this = this->next) {
 	    if (this->tag == tag) {
-		delete_linestyle(prev, this);
+		delete_linestyle(&first_linestyle, prev, this);
 		return;         /* exit, our job is done */
 	    }
 	}

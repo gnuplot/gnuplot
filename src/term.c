@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.174 2008/06/02 19:18:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.175 2008/06/02 19:49:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2885,5 +2885,40 @@ style_from_fill(struct fill_style_type *fs)
     }
 
     return style;
+}
+
+
+void
+lp_use_properties(struct lp_style_type *lp, int tag)
+{
+    /*  This function looks for a linestyle defined by 'tag' and copies
+     *  its data into the structure 'lp'.
+     */
+
+    struct linestyle_def *this;
+    int save_pointflag = lp->pointflag;
+
+    this = first_linestyle;
+    while (this != NULL) {
+	if (this->tag == tag) {
+	    *lp = this->lp_properties;
+	    lp->pointflag = save_pointflag;
+	    /* FIXME - It would be nicer if this were always true already */
+	    if (!lp->use_palette) {
+		lp->pm3d_color.type = TC_LT;
+		lp->pm3d_color.lt = lp->l_type;
+	    }
+	    return;
+	} else {
+	    this = this->next;
+	}
+    }
+
+    /* No user-defined style with this tag; fall back to default line type. */
+    /* NB: We assume that the remaining fields of lp have been initialized. */
+    lp->l_type = tag - 1;
+    lp->pm3d_color.type = TC_LT;
+    lp->pm3d_color.lt = lp->l_type;
+    lp->p_type = tag - 1;
 }
 

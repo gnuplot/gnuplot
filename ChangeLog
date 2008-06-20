@@ -1,3 +1,15 @@
+2008-06-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (delete_linestyle) src/unset.c src/setshow.h:
+	Pass the head of the linestyle list as a parameter rather than
+	hardcoding it to always be the list headed by first_linestyle.
+	Remove unused routine assign_linestyle_tag().
+
+	* src/misc.c src/misc.h src/term.c (lp_use_property):
+	Move this routine from misc.c to term.c.  This cleans up a botched
+	header dependency (the prototype was already in term_api.h rather than
+	being in misc.h).
+
 2008-06-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/aquaterm.trm (AQUA_init AQUA_boxfill AQUA_filled_polygon):

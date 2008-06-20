@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.99 2008/05/27 21:57:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.100 2008/06/08 22:17:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -717,44 +717,6 @@ filledcurves_options_tofile(filledcurves_opts *fco, FILE *fp)
 	fprintf(fp, "xy=%g,%g", fco->at, fco->aty);
 	return;
     }
-}
-
-/* line/point parsing...
- *
- */
-
-void
-lp_use_properties(struct lp_style_type *lp, int tag)
-{
-    /*  This function looks for a linestyle defined by 'tag' and copies
-     *  its data into the structure 'lp'.
-     */
-
-    struct linestyle_def *this;
-    int save_pointflag = lp->pointflag;
-
-    this = first_linestyle;
-    while (this != NULL) {
-	if (this->tag == tag) {
-	    *lp = this->lp_properties;
-	    lp->pointflag = save_pointflag;
-	    /* FIXME - It would be nicer if this were always true already */
-	    if (!lp->use_palette) {
-		lp->pm3d_color.type = TC_LT;
-		lp->pm3d_color.lt = lp->l_type;
-	    }
-	    return;
-	} else {
-	    this = this->next;
-	}
-    }
-
-    /* No user-defined style with this tag; fall back to default line type. */
-    /* NB: We assume that the remaining fields of lp have been initialized. */
-    lp->l_type = tag - 1;
-    lp->pm3d_color.type = TC_LT;
-    lp->pm3d_color.lt = lp->l_type;
-    lp->p_type = tag - 1;
 }
 
 TBOOLEAN
