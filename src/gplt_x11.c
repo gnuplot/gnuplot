@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.6 2007/12/08 23:56:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.7 2007/12/09 23:55:27 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -303,6 +303,8 @@ static plot_struct *Find_Plot_In_Linked_List_By_CMap __PROTO((cmap_t *));
 
 static struct plot_struct *current_plot = NULL;
 static struct plot_struct *plot_list_start = NULL;
+
+static void x11_setfill __PROTO((GC *gc, int style));
 
 /* information about window/plot to be removed */
 typedef struct plot_remove_struct {
@@ -2214,51 +2216,7 @@ exec_cmd(plot_struct *plot, char *command)
 	int style, xtmp, ytmp, w, h;
 
 	if (sscanf(buffer + 1, "%4d%4d%4d%4d%4d", &style, &xtmp, &ytmp, &w, &h) == 5) {
-	    int fillpar, idx;
-	    XColor xcolor, bgnd;
-	    float dim;
-
-	    /* upper 3 nibbles contain fillparameter (ULIG) */
-	    fillpar = style >> 4;
-
-	    /* lower nibble contains fillstyle */
-	    switch (style & 0xf) {
-	    case FS_SOLID:
-		/* filldensity is from 0..100 percent */
-		if (fillpar >= 100)
-		    break;
-		dim = (double)(fillpar)/100.;
-		/* retrieve current rgb color and shift it towards the background color */
-		xcolor.red = (double)(0xffff) * (double)((plot->current_rgb >> 16) & 0xff) /255.;
-		xcolor.green = (double)(0xffff) * (double)((plot->current_rgb >> 8) & 0xff) /255.;
-		xcolor.blue = (double)(0xffff) * (double)(plot->current_rgb & 0xff) /255.;
-		bgnd.red = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 16) & 0xff) /255.;
-		bgnd.green = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 8) & 0xff) /255.;
-		bgnd.blue = (double)(0xffff) * (double)(plot->cmap->rgbcolors[0] & 0xff) /255.;
-		xcolor.red   = dim*xcolor.red   + (1.-dim)*bgnd.red;
-		xcolor.green = dim*xcolor.green + (1.-dim)*bgnd.green;
-		xcolor.blue  = dim*xcolor.blue  + (1.-dim)*bgnd.blue;
-		FPRINTF((stderr,"Dimming box color %.6x by %.2f to %2d %2d %2d\n",
-				(unsigned long)(plot->current_rgb), dim, xcolor.red, xcolor.green, xcolor.blue));
-		if (XAllocColor(dpy, plot->cmap->colormap, &xcolor))
-		    XSetForeground(dpy, gc, xcolor.pixel);
-		break;
-	    case FS_PATTERN:
-		/* use fill pattern according to fillpattern */
-		idx = (int) fillpar;	/* fillpattern is enumerated */
-		if (idx < 0)
-		    idx = 0;
-		idx = idx % stipple_pattern_num;
-		XSetStipple(dpy, gc, stipple_pattern[idx]);
-		XSetFillStyle(dpy, gc, FillOpaqueStippled);
-		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
-		break;
-	    case FS_EMPTY:
-	    default:
-	    /* fill with background color */
-		XSetFillStyle(dpy, gc, FillSolid);
-		XSetForeground(dpy, gc, plot->cmap->colors[0]);
-	    }
+	    x11_setfill(&gc, style);
 
 	    /* gnuplot has origin at bottom left, but X uses top left
 	     * There may be an off-by-one (or more) error here.
@@ -2656,10 +2614,6 @@ exec_cmd(plot_struct *plot, char *command)
 	    if (!i_remaining) {
 
 		int i;
-		int fillpar, idx;
-		XColor xcolor, bgnd;
-		float dim;
-
 		transferring = 0;
 
 		/* If the byte order needs to be swapped, do so. */
@@ -2684,52 +2638,10 @@ exec_cmd(plot_struct *plot, char *command)
 		if (!fill_gc)
 		    fill_gc = XCreateGC(dpy, plot->window, 0, 0);
 		XCopyGC(dpy, *current_gc, ~0, fill_gc);
-		current_gc = &fill_gc;
 
-		fillpar = style >> 4;
-		switch (style & 0xf) {
-		case FS_SOLID:
-		    /* filldensity is from 0..100 percent */
-		    if (fillpar >= 100)
-			break;
-		    dim = (double)(fillpar)/100.;
-		    /* use halftone fill pattern according to filldensity */
-		    xcolor.red = (double)(0xffff) * (double)((plot->current_rgb >> 16) & 0xff) /255.;
-		    xcolor.green = (double)(0xffff) * (double)((plot->current_rgb >> 8) & 0xff) /255.;
-		    xcolor.blue = (double)(0xffff) * (double)(plot->current_rgb & 0xff) /255.;
-		    bgnd.red = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 16) & 0xff) /255.;
-		    bgnd.green = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 8) & 0xff) /255.;
-		    bgnd.blue = (double)(0xffff) * (double)(plot->cmap->rgbcolors[0] & 0xff) /255.;
-		    xcolor.red   = dim*xcolor.red   + (1.-dim)*bgnd.red;
-		    xcolor.green = dim*xcolor.green + (1.-dim)*bgnd.green;
-		    xcolor.blue  = dim*xcolor.blue  + (1.-dim)*bgnd.blue;
-		    FPRINTF((stderr,"Dimming poly color %.6x by %.2f to %2d %2d %2d\n",
-				(unsigned long)(plot->current_rgb), dim, xcolor.red, xcolor.green, xcolor.blue));
-		    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor))
-			XSetForeground(dpy, *current_gc, xcolor.pixel);
-		    break;
-		case FS_PATTERN:
-		    /* use fill pattern according to fillpattern */
-		    idx = (int) fillpar;	/* fillpattern is enumerated */
-		    if (idx < 0)
-			idx = 0;
-		    idx = idx % stipple_pattern_num;
-		    XSetStipple(dpy, *current_gc, stipple_pattern[idx]);
-		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
-		    XSetBackground(dpy, *current_gc, plot->cmap->colors[0]);
-		    break;
-		case FS_EMPTY:
-		    /* fill with background color */
-		    XSetFillStyle(dpy, *current_gc, FillSolid);
-		    XSetForeground(dpy, *current_gc, plot->cmap->colors[0]);
-		    break;
-		default:
-		    /* fill with current color */
-		    XSetFillStyle(dpy, *current_gc, FillSolid);
-		    break;
-		}
+		x11_setfill(&fill_gc, style);
 
-		XFillPolygon(dpy, plot->pixmap, *current_gc, points, npoints,
+		XFillPolygon(dpy, plot->pixmap, fill_gc, points, npoints,
 			     Nonconvex, CoordModeOrigin);
 
 #ifndef BINARY_X11_POLYGON
@@ -6560,4 +6472,55 @@ cmaps_differ(cmap_t *cmap1, cmap_t *cmap2)
 
     return 0;  /* They are the same. */
 
+}
+
+/*
+ * Shared code for setting fill style
+ */
+static void
+x11_setfill(GC *gc, int style)
+{
+    int fillpar, idx;
+    XColor xcolor, bgnd;
+    float dim;
+
+    /* upper 3 nibbles contain fillparameter (ULIG) */
+    fillpar = style >> 4;
+
+    /* lower nibble contains fillstyle */
+    switch (style & 0xf) {
+    case FS_SOLID:
+	/* filldensity is from 0..100 percent */
+	if (fillpar >= 100)
+	    break;
+	dim = (double)(fillpar)/100.;
+	/* retrieve current rgb color and shift it towards the background color */
+	xcolor.red = (double)(0xffff) * (double)((plot->current_rgb >> 16) & 0xff) /255.;
+	xcolor.green = (double)(0xffff) * (double)((plot->current_rgb >> 8) & 0xff) /255.;
+	xcolor.blue = (double)(0xffff) * (double)(plot->current_rgb & 0xff) /255.;
+	bgnd.red = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 16) & 0xff) /255.;
+	bgnd.green = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 8) & 0xff) /255.;
+	bgnd.blue = (double)(0xffff) * (double)(plot->cmap->rgbcolors[0] & 0xff) /255.;
+	xcolor.red   = dim*xcolor.red   + (1.-dim)*bgnd.red;
+	xcolor.green = dim*xcolor.green + (1.-dim)*bgnd.green;
+	xcolor.blue  = dim*xcolor.blue  + (1.-dim)*bgnd.blue;
+	if (XAllocColor(dpy, plot->cmap->colormap, &xcolor))
+	    XSetForeground(dpy, *gc, xcolor.pixel);
+	break;
+    case FS_PATTERN:
+	/* use fill pattern according to fillpattern */
+	idx = (int) fillpar;	/* fillpattern is enumerated */
+	if (idx < 0)
+	    idx = 0;
+	idx = idx % stipple_pattern_num;
+	XSetStipple(dpy, *gc, stipple_pattern[idx]);
+	XSetFillStyle(dpy, *gc, FillOpaqueStippled);
+	XSetForeground(dpy, *gc, plot->cmap->colors[plot->lt + 3]);
+	break;
+    case FS_EMPTY:
+    default:
+    /* fill with background color */
+	XSetFillStyle(dpy, *gc, FillSolid);
+	XSetForeground(dpy, *gc, plot->cmap->colors[0]);
+    }
 }
