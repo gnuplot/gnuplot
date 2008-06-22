@@ -1,3 +1,12 @@
+2008-06-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c: Plot with vectors did not honor linestyles requested via
+	'set style increment user'.
+
+	* src/gplt_x11.c: Consolidate the fillstyle code into a single routine
+	that is called both by fillbox and filledpolygon processing. This fixes
+	a bug in which the fillstyle border was not applied to filled curves.
+
 2008-06-17  Bastian Maerkisch  <bmaerkisch@web.de>
 	* src/win/wgraph.c term/win.trm (WIN_set_color):  Preserve setting of
 	dash type and linewidth when a new color is selected.
