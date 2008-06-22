@@ -1,3 +1,8 @@
+2008-06-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c: Plot with vectors did not honor linestyles requested via
+	'set style increment user'.
+
 2008-06-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (delete_linestyle) src/unset.c src/setshow.h:
