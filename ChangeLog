@@ -1,3 +1,10 @@
+2008-06-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.c (draw_inside_color_smooth_box_postscript): Fix colour of
+	the 2nd box in the colour box for negative palette in postscript
+	output.
+	SF Bug #2000751
+
 2008-06-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c: Plot with vectors did not honor linestyles requested via

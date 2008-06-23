@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.82 2008/04/05 04:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.83 2008/06/03 00:36:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -339,7 +339,7 @@ draw_inside_color_smooth_box_postscript(FILE * out)
     fprintf(out, "/ystep 1 imax div def /y0 0 def /ii 0 def\n");
     /* local variables; y-step, current y position and counter ii;  */
     if (sm_palette.positive == SMPAL_NEGATIVE)	/* inverted gray for negative figure */
-	fputs("{ 1 y0 sub g ", out);
+	fputs("{ 0.99999 y0 sub g ", out); /* 1 > x > 1-1.0/1024 */
     else
 	fputs("{ y0 g ", out);
     if (color_box.rotation == 'v')
