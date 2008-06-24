@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.175 2008/06/02 19:49:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.176 2008/06/22 04:26:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -567,9 +567,9 @@ term_start_plot()
 
     /* Set canvas size to full range of current terminal coordinates */
 	canvas.xleft  = 0;
-	canvas.xright = term->xmax;
+	canvas.xright = term->xmax - 1;
 	canvas.ybot   = 0;
-	canvas.ytop   = term->ymax;
+	canvas.ytop   = term->ymax - 1;
 
 }
 

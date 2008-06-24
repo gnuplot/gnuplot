@@ -1,3 +1,12 @@
+2008-06-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (term_start_plot): The term/README file clearly states that
+	terminal coordinates run from 0 to xmax-1 and 0 to ymax-1.  Therefore
+	[xmax,ymax] is out of range, and we should revise the clipping limits
+	accordingly.  NB: This may change the behavior of existing scripts that
+	draw to the extreme edge of the canvas (e.g. border=0).
+	Bugfix:  Prevents tripping the assert() statements in emf.trm
+
 2008-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph): Don't forget to draw a polyline even
