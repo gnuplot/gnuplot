@@ -170,13 +170,15 @@ set style increment system
 #
 reset
 set output 'figure_circles.pdf'
-set xrange [-1:1]
+#set title "Circles of Uncertainty"
 unset key
-unset xtics
-unset ytics
-set samples 10
-plot '+' using 1:(rand(0)):(rand(0)/2.) with circles fs empty
-
+set size ratio -1
+set xrange [-2.5:1.5]
+set yrange [-1:2.5]
+set xtics font "Times,5" format "%.1f" scale 0.5
+set ytics font "Times,5" format "%.1f" scale 0.5
+plot '../demo/optimize.dat' with circles lc rgb "gray" fs transparent solid 0.2 nobo,\
+     '../demo/optimize.dat' u 1:2 with linespoints lw 2 pt 7 ps 0.3 lc rgb "black"
 #
 # 3D Plot styles
 # ==============

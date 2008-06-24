@@ -1,4 +1,4 @@
-C ROS $Id: gnuplot.doc,v 1.512 2008/06/14 04:47:41 sfeam Exp $
+C ROS $Id: gnuplot.doc,v 1.514 2008/06/18 22:30:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2513,7 +2513,9 @@ Ffigure_circles
 
  Example (draws circles whose area is proportional to the value in column 3):
 
-     plot 'data' using 1:2:(sqrt($3)) with circles fillstyle empty
+     set style fill transparent solid 0.2 noborder
+     plot 'data' using 1:2:(sqrt($3)) with circles, \
+          'data' using 1:2 with linespoints
 
  The result is similar to using a `points` plot with variable size points and
  pointstyle 6, except that the circles will scale with the x axis range.
