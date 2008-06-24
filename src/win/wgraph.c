@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.59 2008/05/17 15:37:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.60 2008/05/29 19:55:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -893,6 +893,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	if ((lastop==W_vect) && (curptr->op!=W_vect)) {
 	    if (polyi >= 2)
 		Polyline(hdc, ppt, polyi);
+	    else if (polyi == 1)
+		LineTo(hdc, ppt, polyi);
 	    polyi = 0;
 	}
 	switch (curptr->op) {

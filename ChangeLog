@@ -1,3 +1,9 @@
+2008-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph): Don't forget to draw a polyline even
+	if it has only a single segment.
+	Bugfix
+
 2008-06-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.c (draw_inside_color_smooth_box_postscript): Fix colour of
