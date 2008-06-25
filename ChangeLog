@@ -1,3 +1,7 @@
+2008-06-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c: Allow to draw contours associated with a pm3d surface.
+
 2008-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph): Don't forget to draw a polyline even
