@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.30 2008/05/04 04:28:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.31 2008/06/08 05:58:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8998,10 +8998,11 @@ C ... and restart the table:
  then error bars can be added to the plot.  The following commands will add
  error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
  ends drawn the same width as the box itself. The error bars and bar ends are
- drawn in black with linewidth 2.
+ drawn with linewidth 2 using the border linetype from the current fill style.
 
        set bars fullwidth
-       set style histogram errorbars gap 2 lt -1 lw 2
+       set style fill solid border -1
+       set style histogram errorbars gap 2 lw 2
        plot 'file.dat' using 2:3, '' using 4:5, '' using 6:7:xticlabels(1)
 
  To plot the same data as a rowstacked histogram:
