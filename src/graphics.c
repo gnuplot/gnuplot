@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.271 2008/06/03 00:36:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.272 2008/06/08 22:17:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3694,7 +3694,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    && histogram_opts.type == HT_STACKED_IN_TOWERS)
 			style += (i<<4);
 
-		    if (plot->lp_properties.use_palette) {
+		    if (plot->lp_properties.use_palette && t->filled_polygon) {
 			(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
 		    } else
 			(*t->fillbox) (style, x, y, w, h);
@@ -4111,7 +4111,7 @@ plot_c_bars(struct curve_points *plot)
 		if (style == FS_EMPTY)
 		    style = FS_OPAQUE;
 
-		if (plot->lp_properties.use_palette)
+		if (plot->lp_properties.use_palette && t->filled_polygon)
 		    (*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
 		else
 		    (*t->fillbox)(style, x, y, w, h);

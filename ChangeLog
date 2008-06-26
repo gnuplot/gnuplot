@@ -1,3 +1,13 @@
+2008-06-26  Peter Rosin  <pekberg@users.sourceforge.net>
+
+	* term/ggi.trm: uint32 -> unit32_t
+	Allows to build with current libggi.
+
+2008-06-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c: Check for term->filled_polygon() before trying to
+	call it.  (fixes segfault triggered by ggi terminal driver).
+
 2008-06-26  Philipp K Janert  <janert@ieee.org>
 	
 	* src/gp_types.h src/interpol.c src/plot2d.c src/tables.c 

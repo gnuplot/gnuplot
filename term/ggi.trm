@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ggi.trm,v 1.25 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: ggi.trm,v 1.26 2006/07/21 02:35:46 sfeam Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -116,9 +116,9 @@ typedef struct {
 } GGI_vertex_t;
 
 TERM_PUBLIC long int GGI_SetTime(const struct timeval* current);
-TERM_PUBLIC int GGI_from_keysym __PROTO((uint32 keysym));
-TERM_PUBLIC int GGI_from_button __PROTO((uint32 button));
-TERM_PUBLIC int GGI_y __PROTO((sint32 y));
+TERM_PUBLIC int GGI_from_keysym __PROTO((uint32_t keysym));
+TERM_PUBLIC int GGI_from_button __PROTO((uint32_t button));
+TERM_PUBLIC int GGI_y __PROTO((int32_t y));
 TERM_PUBLIC int GGI_dispatch_event __PROTO((const ggi_event* event));
 TERM_PUBLIC int GGI_eventually_update_modifiers __PROTO((const ggi_event* event, const int add));
 TERM_PUBLIC int GGI_waitforinput __PROTO((void));
@@ -645,7 +645,7 @@ GGI_vector(unsigned int x, unsigned int y)
 
 /* translate ggi keysym to gnuplot keysym */
 TERM_PUBLIC int
-GGI_from_keysym(uint32 keysym)
+GGI_from_keysym(uint32_t keysym)
 {
     switch (keysym) {
 	case GIIUC_BackSpace:
@@ -811,7 +811,7 @@ GGI_SetTime(const struct timeval* current)
 }
 
 TERM_PUBLIC int
-GGI_from_button(uint32 button)
+GGI_from_button(uint32_t button)
 {
     switch (button) {
     case GII_PBUTTON_LEFT:
@@ -827,7 +827,7 @@ GGI_from_button(uint32 button)
 }
 
 TERM_PUBLIC int
-GGI_y(sint32 y)
+GGI_y(int32_t y)
 {
     return GGIymax - y;
 }
