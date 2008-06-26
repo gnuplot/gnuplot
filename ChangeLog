@@ -1,3 +1,7 @@
+2008-06-26  Philipp K Janert  <janert@ieee.org>
+
+	* src/interpolc.c (eval_kdensity do_kdensity): Follow code conventions.
+	
 2008-06-26  Peter Rosin  <pekberg@users.sourceforge.net>
 
 	* term/ggi.trm: uint32 -> unit32_t

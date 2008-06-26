@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.33 2008/05/18 03:49:12 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.34 2008/06/26 17:00:50 janert Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -183,6 +183,11 @@ typedef double five_diag[5];
 
 static int next_curve __PROTO((struct curve_points * plot, int *curve_start));
 static int num_curves __PROTO((struct curve_points * plot));
+static void eval_kdensity __PROTO((struct curve_points *cp, 
+				   int first_point, int num_points, double sr,
+				   coordval *px, coordval *py));
+static void do_kdensity __PROTO((struct curve_points *cp, int first_point,
+				 int num_points, struct coordinate *dest));
 static double *cp_binomial __PROTO((int points));
 static void eval_bezier __PROTO((struct curve_points * cp, int first_point,
 				 int num_points, double sr, coordval * px,
@@ -256,7 +261,8 @@ num_curves(struct curve_points *plot)
 */
 
 /* eval_kdensity is a modification of eval_bezier */
-void eval_kdensity ( 
+static void 
+eval_kdensity ( 
     struct curve_points *cp,
     int first_point,	/* where to start in plot->points (to find x-range) */
     int num_points,	/* to determine end in plot->points */
@@ -287,9 +293,9 @@ void eval_kdensity (
     avg /= (double)n;
     sigma = sqrt( (sigma - avg*avg)/(double)n ); /* Standard Deviation */
     
-    /* This is the optimal bandwidth if the point distributin is Gaussian.
+    /* This is the optimal bandwidth if the point distribution is Gaussian.
        (Applied Smoothing Techniques for Data Analysis
-       by Adrian W, Bowman & Adelchi Azzalini (1997) */
+       by Adrian W, Bowman & Adelchi Azzalini (1997)) */
     default_bandwidth = pow( 4.0/(3.0*num_points), 1.0/5.0 )*sigma;
 
     /* If the supplied bandwidth is zero of less, the default bandwidth
