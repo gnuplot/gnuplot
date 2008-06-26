@@ -1,3 +1,9 @@
+2008-06-26  Philipp K Janert  <janert@ieee.org>
+	
+	* src/gp_types.h src/interpol.c src/plot2d.c src/tables.c 
+	docs/gnuplot.doc: Changes for new smoothing algorithm for 
+	smooth histograms using Gaussian kernel density estimates.
+	
 2008-06-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (term_start_plot): The term/README file clearly states that

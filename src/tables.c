@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.85 2008/06/02 00:48:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.86 2008/06/25 22:48:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -138,6 +138,7 @@ const struct gen_table plot_smooth_tbl[] =
     { "u$nique", SMOOTH_UNIQUE },
     { "f$requency", SMOOTH_FREQUENCY },
     { "cum$ulative", SMOOTH_CUMULATIVE },
+    { "k$density", SMOOTH_KDENSITY },
     { NULL, SMOOTH_NONE }
 };
 
