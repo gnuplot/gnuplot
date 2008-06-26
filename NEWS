@@ -3,6 +3,7 @@ New features, changes and fixes since previous release
 * NEW set absolute plot margins in screen coordinates
 * NEW "nocontours" keyword for splot
 * NEW "undefine foo" clears previously defined user variable foo
+* NEW allow contouring of pm3d surfaces
 * CHANGE try harder to autotitle columns in using specs with expressions
 * CHANGE gd.trm: use dynamically-allocated TTF font names
 * CHANGE x11: more finely sampled color palette for PM3D
