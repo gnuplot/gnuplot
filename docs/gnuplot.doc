@@ -1,4 +1,4 @@
-C ROS $Id: gnuplot.doc,v 1.515 2008/06/24 19:32:42 sfeam Exp $
+C ROS $Id: gnuplot.doc,v 1.516 2008/06/26 17:00:47 janert Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2757,10 +2757,11 @@ Ffigure_histclust
  then error bars can be added to the plot.  The following commands will add
  error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
  ends drawn the same width as the box itself. The error bars and bar ends are
- drawn in black with linewidth 2.
+ drawn with linewidth 2, using the border linetype from the current fill style.
 
        set bars fullwidth
-       set style histogram errorbars gap 2 lt -1 lw 2
+       set style fill solid 1 border -1
+       set style histogram errorbars gap 2 lw 2
        plot for [COL=2:4:2] 'file.dat' using COL:COL+1
 
  To plot the same data as a rowstacked histogram.  Just to be different, this
