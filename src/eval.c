@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.64 2008/04/02 18:11:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.65 2008/06/12 18:07:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -726,6 +726,9 @@ fill_gpval_axis(AXIS_INDEX axis)
 #undef A
 }
 
+/* Fill variable "var" visible by "show var" or "show var all" ("GPVAL_*")
+ * by the given value (string, integer, float, complex).
+ */
 void
 fill_gpval_string(char *var, const char *stringvalue)
 {
@@ -741,6 +744,36 @@ fill_gpval_string(char *var, const char *stringvalue)
     Gstring(&v->udv_value, gp_strdup(stringvalue));
 }
 
+void
+fill_gpval_integer(char *var, int value)
+{
+    struct udvt_entry *v = add_udv_by_name(var);
+    if (!v)
+	return;
+    v->udv_undef = FALSE; 
+    Ginteger(&v->udv_value, value);
+}
+
+void
+fill_gpval_float(char *var, double value)
+{
+    struct udvt_entry *v = add_udv_by_name(var);
+    if (!v)
+	return;
+    v->udv_undef = FALSE; 
+    Gcomplex(&v->udv_value, value, 0);
+}
+
+void
+fill_gpval_complex(char *var, double areal, double aimag)
+{
+    struct udvt_entry *v = add_udv_by_name(var);
+    if (!v)
+	return;
+    v->udv_undef = FALSE; 
+    Gcomplex(&v->udv_value, areal, aimag);
+}
+
 /*
  * Export axis bounds in terminal coordinates from previous plot.
  * This allows offline mapping of pixel coordinates onto plot coordinates.
@@ -750,21 +783,10 @@ update_plot_bounds(void)
 {
     struct udvt_entry *v;
     
-    v = add_udv_by_name("GPVAL_TERM_XMIN");
-    Ginteger(&v->udv_value, axis_array[FIRST_X_AXIS].term_lower / term->tscale);
-    v->udv_undef = FALSE; 
-
-    v = add_udv_by_name("GPVAL_TERM_XMAX");
-    Ginteger(&v->udv_value, axis_array[FIRST_X_AXIS].term_upper / term->tscale);
-    v->udv_undef = FALSE; 
-
-    v = add_udv_by_name("GPVAL_TERM_YMIN");
-    Ginteger(&v->udv_value, axis_array[FIRST_Y_AXIS].term_lower / term->tscale);
-    v->udv_undef = FALSE; 
-
-    v = add_udv_by_name("GPVAL_TERM_YMAX");
-    Ginteger(&v->udv_value, axis_array[FIRST_Y_AXIS].term_upper / term->tscale);
-    v->udv_undef = FALSE; 
+    fill_gpval_integer("GPVAL_TERM_XMIN", axis_array[FIRST_X_AXIS].term_lower / term->tscale);
+    fill_gpval_integer("GPVAL_TERM_XMAX", axis_array[FIRST_X_AXIS].term_upper / term->tscale);
+    fill_gpval_integer("GPVAL_TERM_YMIN", axis_array[FIRST_Y_AXIS].term_lower / term->tscale);
+    fill_gpval_integer("GPVAL_TERM_YMAX", axis_array[FIRST_Y_AXIS].term_upper / term->tscale);
 }
 
 /*
@@ -779,7 +801,6 @@ update_plot_bounds(void)
 void
 update_gpval_variables(int context)
 {
-
     /* These values may change during a plot command due to auto range */
     if (context == 1) {
 	fill_gpval_axis(FIRST_X_AXIS);
@@ -810,10 +831,8 @@ update_gpval_variables(int context)
     }
 
     /* If we are called from int_error() then set the error state */
-    if (context == 2) {
-	struct udvt_entry *v = add_udv_by_name("GPVAL_ERRNO");
-	Ginteger(&v->udv_value, 1);
-    }
+    if (context == 2)
+	fill_gpval_integer("GPVAL_ERRNO", 1);
 
     /* These initializations need only be done once, on program entry */
     if (context == 3) {
@@ -830,21 +849,14 @@ update_gpval_variables(int context)
 	    fill_gpval_string("GPVAL_COMPILE_OPTIONS", compile_options);
 
 	/* Permanent copy of user-clobberable variables pi and NaN */
-	v = add_udv_by_name("GPVAL_pi");
-	v->udv_undef = FALSE; 
-	Gcomplex(&v->udv_value, M_PI, 0);
+	fill_gpval_float("GPVAL_pi", M_PI);
 #ifdef HAVE_ISNAN
-	v = add_udv_by_name("GPVAL_NaN");
-	v->udv_undef = FALSE; 
-	Gcomplex(&v->udv_value, atof("NaN"), 0);
+	fill_gpval_float("GPVAL_NaN", atof("NaN"));
 #endif
     }
 
     if (context == 3 || context == 4) {
-	struct udvt_entry *v = add_udv_by_name("GPVAL_VERSION");
-	v = add_udv_by_name("GPVAL_ERRNO");
-	v->udv_undef = FALSE; 
-	Ginteger(&v->udv_value, 0);
+	fill_gpval_integer("GPVAL_ERRNO", 0);
 	fill_gpval_string("GPVAL_ERRMSG","");
     }
 
