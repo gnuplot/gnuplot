@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.65 2008/06/12 18:07:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.66 2008/07/04 07:00:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -781,8 +781,6 @@ fill_gpval_complex(char *var, double areal, double aimag)
 static void
 update_plot_bounds(void)
 {
-    struct udvt_entry *v;
-    
     fill_gpval_integer("GPVAL_TERM_XMIN", axis_array[FIRST_X_AXIS].term_lower / term->tscale);
     fill_gpval_integer("GPVAL_TERM_XMAX", axis_array[FIRST_X_AXIS].term_upper / term->tscale);
     fill_gpval_integer("GPVAL_TERM_YMIN", axis_array[FIRST_Y_AXIS].term_lower / term->tscale);

@@ -1,3 +1,7 @@
+2008-07-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c: Remove unused variable.
+
 2008-07-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/eval.h src/eval.c: New routines fill_gpval_integer,
