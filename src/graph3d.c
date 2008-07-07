@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.198 2008/06/03 00:36:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.199 2008/06/04 20:01:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -444,7 +444,7 @@ boundary3d(struct surface_points *plots, int count)
 	xscaler = (plot_bounds.xright - plot_bounds.xleft) / surface_scale;
 
     /* HBB 20011011: 'set size {square|ratio}' for splots */
-    if (aspect_ratio != 0.0) {
+    if (splot_map && aspect_ratio != 0.0) {
 	double current_aspect_ratio;
 
 	if (aspect_ratio < 0

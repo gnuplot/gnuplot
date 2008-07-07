@@ -2,6 +2,9 @@
 
 	* src/eval.c: Remove unused variable.
 
+	* src/graph3d.c: Ignore 'set size ratio' in 3D plots unless the view
+	mode is 'set view map'.  This brings the behavior in line with the docs.
+
 2008-07-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/eval.h src/eval.c: New routines fill_gpval_integer,

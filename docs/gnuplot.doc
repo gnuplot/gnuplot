@@ -1,4 +1,4 @@
-C ROS $Id: gnuplot.doc,v 1.516 2008/06/26 17:00:47 janert Exp $
+C ROS $Id: gnuplot.doc,v 1.517 2008/06/26 17:19:23 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9367,7 +9367,8 @@ Ffigure_mapcontours
  of the terminal, but do not return <xscale> or <yscale> to their default
  values (1.0).
 
- `ratio` and `square` have no effect on 3D plots.
+ `ratio` and `square` have no effect on 3D plots, but do affect 3D projections
+ created using "set view map".
 
  Examples:
 
