@@ -5,6 +5,10 @@
 	* src/graph3d.c: Ignore 'set size ratio' in 3D plots unless the view
 	mode is 'set view map'.  This brings the behavior in line with the docs.
 
+	* src/util3d.c (map3d_xy) src/util3d.h src/graph3d.c:
+	Change coordinates in map3d_xy() to (int) rather than (unsigned int).
+	This makes it parallel to the 2D routine and also saves code.
+
 2008-07-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/eval.h src/eval.c: New routines fill_gpval_integer,

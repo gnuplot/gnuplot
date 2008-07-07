@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.199 2008/06/04 20:01:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.200 2008/07/07 16:37:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -680,7 +680,7 @@ do_3dplot(
 
     /* Clipping in 'set view map' mode should be like 2D clipping */
     if (splot_map) {
-	unsigned int map_x1, map_y1, map_x2, map_y2;
+	int map_x1, map_y1, map_x2, map_y2;
 	map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &map_x1, &map_y1);
 	map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
 	plot_bounds.xleft = map_x1;
@@ -694,7 +694,7 @@ do_3dplot(
 	unsigned int x, y;
 	int tmpx, tmpy;
 	if (splot_map) { /* case 'set view map' */
-	    unsigned int map_x1, map_y1, map_x2, map_y2;
+	    int map_x1, map_y1, map_x2, map_y2;
 	    int tics_len = 0;
 	    if (X_AXIS.ticmode & TICS_MIRROR) {
 		tics_len = (int)(X_AXIS.ticscale * (X_AXIS.tic_in ? -1 : 1) * (term->v_tic));
@@ -1348,16 +1348,14 @@ do_3dplot(
 #ifdef USE_MOUSE
     /* finally, store the 2d projection of the x and y axis, to enable zooming by mouse */
     {
-	unsigned int o_x, o_y, x, y;
-	map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &o_x, &o_y);
-	axis3d_o_x = (int)o_x;
-	axis3d_o_y = (int)o_y;
+	int x,y;
+	map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &axis3d_o_x, &axis3d_o_y);
 	map3d_xy(X_AXIS.max, Y_AXIS.min, base_z, &x, &y);
-	axis3d_x_dx = (int)x - axis3d_o_x;
-	axis3d_x_dy = (int)y - axis3d_o_y;
+	axis3d_x_dx = x - axis3d_o_x;
+	axis3d_x_dy = y - axis3d_o_y;
 	map3d_xy(X_AXIS.min, Y_AXIS.max, base_z, &x, &y);
-	axis3d_y_dx = (int)x - axis3d_o_x;
-	axis3d_y_dy = (int)y - axis3d_o_y;
+	axis3d_y_dx = x - axis3d_o_x;
+	axis3d_y_dy = y - axis3d_o_y;
     }
 #endif
 
@@ -1382,7 +1380,7 @@ static void
 plot3d_impulses(struct surface_points *plot)
 {
     int i;				/* point index */
-    unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
+    int x, y, xx0, yy0;			/* point in terminal coordinates */
     struct iso_curve *icrvs = plot->iso_crvs;
     int colortype = plot->lp_properties.pm3d_color.type;
     TBOOLEAN rgb_from_column;
@@ -1493,7 +1491,7 @@ static void
 plot3d_lines(struct surface_points *plot)
 {
     int i;
-    unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
+    int x, y, xx0, yy0;	/* point in terminal coordinates */
     double clip_x, clip_y, clip_z;
     struct iso_curve *icrvs = plot->iso_crvs;
     struct coordinate GPHUGE *points;
@@ -1611,7 +1609,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
     int n[2];
 
     int i, set, scan;
-    unsigned int x, y, xx0, yy0;	/* point in terminal coordinates */
+    int x, y, xx0, yy0;	/* point in terminal coordinates */
     double clip_x, clip_y, clip_z;
     struct coordinate GPHUGE *points;
     enum coord_type prev = UNDEFINED;
@@ -1774,7 +1772,7 @@ static void
 plot3d_points(struct surface_points *plot, int p_type)
 {
     int i;
-    unsigned int x, y;
+    int x, y;
     struct termentry *t = term;
     struct iso_curve *icrvs = plot->iso_crvs;
 
@@ -2019,7 +2017,7 @@ setup_3d_box_corners()
 static void
 draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid, int current_layer)
 {
-    unsigned int x, y;		/* point in terminal coordinates */
+    int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
     BoundingBox *clip_save;
 
@@ -2895,7 +2893,7 @@ map3d_position_r(
 
     /* startpoint in graph coordinates */
     if (map3d_getposition(pos, what, &xpos, &ypos, &zpos) == 0) {
-	unsigned int xoriginlocal, yoriginlocal;
+	int xoriginlocal, yoriginlocal;
 	double xx, yy;
 	map3d_xy_double(xpos, ypos, zpos, &xx, &yy);
 	*x = xx;
