@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.161 2008/05/18 03:31:17 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.162 2008/06/02 00:48:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -2033,6 +2033,7 @@ eval_3dplots()
 	/* note that m_capture also frees the old replot_line */
 	m_capture(&replot_line, plot_token, c_token - 1);
 	plot_token = -1;
+	fill_gpval_string("GPVAL_LAST_PLOT", replot_line);
     }
 
     /* record that all went well */

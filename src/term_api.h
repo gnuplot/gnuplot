@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.72 2008/02/24 19:49:37 sfeam Exp $
+ * $Id: term_api.h,v 1.73 2008/06/02 00:48:10 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -391,6 +391,7 @@ int estimate_strlen __PROTO((char *));
 int term_count __PROTO((void));
 #endif /* UNUSED */
 void list_terms __PROTO((void));
+char* get_terminals_names __PROTO((void));
 struct termentry *set_term __PROTO((int));
 void init_terminal __PROTO((void));
 void test_term __PROTO((void));

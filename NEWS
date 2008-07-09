@@ -17,6 +17,8 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW builtin functions 'strftime' and 'strptime'
 * NEW pdf and png terminals based on cairo and pango
 * NEW error status variables GPVAL_ERRNO and GPVAL_ERRMSG
+* NEW variables GPVAL_LAST_PLOT, GPVAL_{S}PLOT, GPVAL_MULTIPLOT
+* NEW variables GPVAL_VIEW_{MAP|ROT_X|ROT_Z|SCALE|ZSCALE}, GPVAL_TERMINALS
 * NEW support for dashed linetypes in additional terminals
 * NEW the 'bind' command accepts non-keyboard triggers, e.g. 'close'
 * NEW individual plots can be omitted from autoscaling of axis ranges

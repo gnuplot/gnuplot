@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.176 2008/06/22 04:26:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.177 2008/06/24 19:25:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -741,6 +741,7 @@ term_start_multiplot()
 
     /* If we reach here, then the command has been successfully parsed */
     multiplot = TRUE;
+    fill_gpval_integer("GPVAL_MULTIPLOT", 1);
 
     /* Place overall title before doing anything else */
     if (mp_layout.title.text) {
@@ -796,6 +797,7 @@ term_end_multiplot()
 	term_suspended = FALSE;
     }
     multiplot = FALSE;
+    fill_gpval_integer("GPVAL_MULTIPLOT", 0);
     /* reset plot size and origin to values before 'set multiplot layout' */
     if (mp_layout.auto_layout) {
 	xsize = mp_layout.prev_xsize;
@@ -1506,6 +1508,32 @@ list_terms()
 
     EndOutput();
     free(line_buffer);
+}
+
+/* Return string with all terminal names.
+   Note: caller must free the returned names after use.
+*/
+char*
+get_terminals_names()
+{
+    int i;
+    char *buf = gp_alloc(TERMCOUNT*15, "all_term_names"); /* max 15 chars per name */
+    char *names;
+    int sort_idxs[TERMCOUNT];
+
+    /* sort terminal types alphabetically */
+    for( i = 0; i < TERMCOUNT; i++ )
+	sort_idxs[i] = i;
+    qsort( sort_idxs, TERMCOUNT, sizeof(int), termcomp );
+    /* now sort_idxs[] contains the sorted indices */
+
+    strcpy(buf, " "); /* let the string have leading and trailing " " in order to search via strstrt(GPVAL_TERMINALS, " png "); */
+    for (i = 0; i < TERMCOUNT; i++)
+	sprintf(buf+strlen(buf), "%s ", term_tbl[sort_idxs[i]].name);
+    names = gp_alloc(strlen(buf)+1, "all_term_names2");
+    strcpy(names, buf);
+    free(buf);
+    return names;
 }
 
 static int

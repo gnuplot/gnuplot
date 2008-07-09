@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.66 2008/07/04 07:00:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.67 2008/07/07 16:26:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -811,6 +811,13 @@ update_gpval_variables(int context)
 	fill_gpval_axis(U_AXIS);
 	fill_gpval_axis(V_AXIS);
 	update_plot_bounds();
+	fill_gpval_integer("GPVAL_PLOT", is_3d_plot ? 0:1);
+	fill_gpval_integer("GPVAL_SPLOT", is_3d_plot ? 1:0);
+	fill_gpval_integer("GPVAL_VIEW_MAP", splot_map ? 1:0);
+	fill_gpval_float("GPVAL_VIEW_ROT_X", surface_rot_x);
+	fill_gpval_float("GPVAL_VIEW_ROT_Z", surface_rot_z);
+	fill_gpval_float("GPVAL_VIEW_SCALE", surface_scale);
+	fill_gpval_float("GPVAL_VIEW_ZSCALE", surface_zscale);
 	return;
     }
     
@@ -835,6 +842,7 @@ update_gpval_variables(int context)
     /* These initializations need only be done once, on program entry */
     if (context == 3) {
 	struct udvt_entry *v = add_udv_by_name("GPVAL_VERSION");
+	char *tmp;
 	if (v && v->udv_undef == TRUE) {
 	    v->udv_undef = FALSE; 
 	    Gcomplex(&v->udv_value, atof(gnuplot_version), 0);
@@ -845,6 +853,15 @@ update_gpval_variables(int context)
 	v = add_udv_by_name("GPVAL_COMPILE_OPTIONS");
 	if (v && v->udv_undef == TRUE)
 	    fill_gpval_string("GPVAL_COMPILE_OPTIONS", compile_options);
+
+	/* Start-up values */
+	fill_gpval_integer("GPVAL_MULTIPLOT", 0);
+	fill_gpval_integer("GPVAL_PLOT", 0);
+	fill_gpval_integer("GPVAL_SPLOT", 0);
+
+	tmp = get_terminals_names();
+	fill_gpval_string("GPVAL_TERMINALS", tmp);
+	free(tmp);
 
 	/* Permanent copy of user-clobberable variables pi and NaN */
 	fill_gpval_float("GPVAL_pi", M_PI);

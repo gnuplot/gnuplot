@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.175 2008/06/22 22:32:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.176 2008/06/26 17:00:50 janert Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2372,6 +2372,7 @@ eval_plots()
 	/* note that m_capture also frees the old replot_line */
 	m_capture(&replot_line, plot_token, c_token - 1);
 	plot_token = -1;
+	fill_gpval_string("GPVAL_LAST_PLOT", replot_line);
     }
 
     if (table_mode)

@@ -1,3 +1,11 @@
+2008-07-09  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/eval.c src/mouse.c src/plot2d.c src/plot3d.c src/term.c: Added
+	variables GPVAL_{S}PLOT, GPVAL_VIEW_{MAP|ROT_X|ROT_Z|SCALE|ZSCALE},
+	GPVAL_MULTIPLOT, GPVAL_LAST_PLOT, GPVAL_TERMINALS.
+
+	* src/term_api.h src/term.c: New function get_terminals_names().
+
 2008-07-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c: Remove unused variable.

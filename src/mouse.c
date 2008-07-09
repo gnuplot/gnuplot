@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.103 2008/06/04 18:43:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.104 2008/06/05 07:10:42 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1405,6 +1405,11 @@ ChangeView(int x, int z)
 	    surface_rot_z -= 360;
     }
 
+    if (x || z) {
+	fill_gpval_float("GPVAL_VIEW_ROT_X", surface_rot_x);
+	fill_gpval_float("GPVAL_VIEW_ROT_Z", surface_rot_z);
+    }
+
     if (display_ipc_commands()) {
 	fprintf(stderr, "changing view to %f, %f.\n", surface_rot_x, surface_rot_z);
     }
@@ -1732,6 +1737,10 @@ event_motion(struct gp_event_t *ge)
 		 * disabling further replots until it completes */
 		allowmotion = FALSE;
 		do_save_3dplot(first_3dplot, plot3d_num, !!(modifier_mask & Mod_Ctrl));
+		fill_gpval_float("GPVAL_VIEW_ROT_X", surface_rot_x);
+		fill_gpval_float("GPVAL_VIEW_ROT_Z", surface_rot_z);
+		fill_gpval_float("GPVAL_VIEW_SCALE", surface_scale);
+		fill_gpval_float("GPVAL_VIEW_ZSCALE", surface_zscale);
 	    } else {
 		/* postpone the replotting */
 		needreplot = TRUE;
