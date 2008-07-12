@@ -1,3 +1,7 @@
+2008-07-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (prune_dataticks): Fix double-free error.
+
 2008-07-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/eval.c src/mouse.c src/plot2d.c src/plot3d.c src/term.c: Added
