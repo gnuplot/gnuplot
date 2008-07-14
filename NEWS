@@ -39,6 +39,7 @@ New features, changes and fixes since gnuplot version 4.2
 * CHANGE Remove obsolete atari terminal types (atariaes atarivdi multitos)
 * CHANGE Use empty/solid fill for candlesticks rather than empty/striped
 * CHANGE 'l' and 'L' hotkeys toggle colorbar logscale iff mouse is in colorbar
+* CHANGE stacked histograms: center on true x-coord and modify xrange to match
 
 
 Features, changes and fixes in gnuplot version 4.2

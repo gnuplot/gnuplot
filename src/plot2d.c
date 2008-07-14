@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.177 2008/07/09 16:39:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.178 2008/07/15 00:15:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -623,7 +623,7 @@ get_data(struct curve_points *current_plot)
 
 		if (histogram_opts.type == HT_STACKED_IN_TOWERS) {
 		    histogram_rightmost = current_plot->histogram_sequence
-			+ current_plot->histogram->start;
+					+ current_plot->histogram->start;
 		    current_plot->histogram->end = histogram_rightmost;
 		} else if (v[0] + current_plot->histogram->start > histogram_rightmost) {
 		    histogram_rightmost = v[0] + current_plot->histogram->start;
@@ -1142,9 +1142,11 @@ histogram_range_fiddling(struct curve_points *plot)
 		}
 		break;
 	case HT_STACKED_IN_TOWERS:
+		/* FIXME: Rather than trying to reproduce the layout along X */
+		/* we should just track the actual xmin/xmax as we go.       */
 		if (!axis_array[FIRST_X_AXIS].set_autoscale)
 		    break;
-		xlow = 0.0;
+		xlow = -1.0;
 		xhigh = plot->histogram_sequence;
 		xhigh += plot->histogram->start + 1.0;
 		if (axis_array[FIRST_X_AXIS].min > xlow)
@@ -1420,6 +1422,11 @@ eval_plots()
 
 	    do {
 		previous_token = c_token;
+
+		if (equals(c_token,"at")) {
+		    c_token++;
+		    newhist_start = real_expression();
+		}
 
 		/* Store title in temporary variable and then copy into the */
 		/* new histogram structure when it is allocated.            */
@@ -1879,10 +1886,6 @@ eval_plots()
 		    this_plot->histogram = histogram_opts.next;
 		    this_plot->histogram->clustersize++;
 		}
-		/* Modify X and Y coordinate placement info so that xtic and */
-		/* title coords are handled correctly during get_data().     */
-		if (histogram_opts.type == HT_STACKED_IN_TOWERS)
-		    this_plot->histogram->start = 0.5;
 
 		/* Normally each histogram gets a new set of colors, but in */
 		/* 'newhistogram' you can force a starting color instead.   */

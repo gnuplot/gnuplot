@@ -1,3 +1,9 @@
+2008-07-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (histogram_range_fiddling eval_plots):  Center stacked
+	histograms at true x coordinate.  Allow user to set this via
+	'newhistogram {at <x-coord>}'.  Adjust xmin value accordingly.
+
 2008-07-14  Hilgers Christian  <hilgers@muc.zae-bayern.de>
 
 	* src/graphics.c src/plot2d.c docs/gnuplot.doc:
