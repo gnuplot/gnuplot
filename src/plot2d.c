@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.176 2008/06/26 17:00:50 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.177 2008/07/09 16:39:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1090,20 +1090,32 @@ histogram_range_fiddling(struct curve_points *plot)
 			free(stackheight);
 		    stackheight = gp_alloc( plot->p_count * sizeof(struct coordinate GPHUGE),
 					    "stackheight array");
-		    for (stack_count=0; stack_count < plot->p_count; stack_count++)
-			stackheight[stack_count].y = 0;
+		    for (stack_count=0; stack_count < plot->p_count; stack_count++) {
+			stackheight[stack_count].yhigh = 0;
+			stackheight[stack_count].ylow = 0;
+		    }
 		} else if (plot->p_count > stack_count) {
 		    stackheight = gp_realloc( stackheight,
 					    plot->p_count * sizeof(struct coordinate GPHUGE),
 					    "stackheight array");
-		    for ( ; stack_count < plot->p_count; stack_count++)
-			stackheight[stack_count].y = 0;
+		    for ( ; stack_count < plot->p_count; stack_count++) {
+			stackheight[stack_count].yhigh = 0;
+			stackheight[stack_count].ylow = 0;
+		    }
 		}
 		for (i=0; i<stack_count; i++) {
-		    if (plot->points[i].type != UNDEFINED)
-			stackheight[i].y += plot->points[i].y;
-		    if (axis_array[plot->y_axis].max < stackheight[i].y)
-			axis_array[plot->y_axis].max = stackheight[i].y;
+		    if (plot->points[i].type == UNDEFINED)
+			continue;
+		    if (plot->points[i].y >= 0)
+			stackheight[i].yhigh += plot->points[i].y;
+		    else
+			stackheight[i].ylow += plot->points[i].y;
+
+		    if (axis_array[plot->y_axis].max < stackheight[i].yhigh)
+			axis_array[plot->y_axis].max = stackheight[i].yhigh;
+		    if (axis_array[plot->y_axis].min > stackheight[i].ylow)
+			axis_array[plot->y_axis].min = stackheight[i].ylow;
+
 		}
 	    }
 		/* fall through to checks on x range */

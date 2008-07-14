@@ -1,3 +1,10 @@
+2008-07-14  Hilgers Christian  <hilgers@muc.zae-bayern.de>
+
+	* src/graphics.c src/plot2d.c docs/gnuplot.doc:
+	When constructing stacked histograms, track positive values separately
+	from negative values. Place only positive values in the upward stack.
+	Negative values are placed in a corresponding downward stack.
+
 2008-07-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (prune_dataticks): Fix double-free error.
