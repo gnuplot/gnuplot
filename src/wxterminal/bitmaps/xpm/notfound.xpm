@@ -1,5 +1,5 @@
 /* XPM */
-static char * notfound_xpm[] = {
+static const char * notfound_xpm[] = {
 "16 16 51 1",
 " 	c None",
 ".	c #FF0000",

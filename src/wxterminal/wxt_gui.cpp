@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.30.2.6 2007/05/05 19:01:41 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.30.2.7 2007/05/22 16:35:39 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -266,7 +266,7 @@ void wxtApp::LoadPngIcon(const unsigned char *embedded_png, int length, int icon
 }
 
 /* load a cursor */
-void wxtApp::LoadCursor(wxCursor &cursor, char* xpm_bits[])
+void wxtApp::LoadCursor(wxCursor &cursor, const char* xpm_bits[])
 {
 	int hotspot_x, hotspot_y;
 	wxBitmap cursor_bitmap = wxBitmap(xpm_bits);
@@ -621,8 +621,6 @@ void wxtPanel::Draw()
 /* copy the plot to the panel, draw zoombow and ruler needed */
 void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 {
-	dc.BeginDrawing();
-
 	wxPen tmp_pen;
 
 	/* TODO extend the region mechanism to surfaces other than GTK_SURFACE */
@@ -724,7 +722,6 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 	}
 #endif /*USE_MOUSE*/
 
-	dc.EndDrawing();
 }
 
 /* avoid flickering under win32 */
