@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.179 2008/07/15 00:52:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.177 2008/07/09 16:39:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1162,10 +1162,12 @@ histogram_range_fiddling(struct curve_points *plot)
 			    else
 				ylow += plot->points[i].y;
 			}
-		    if (axis_array[plot->y_axis].max < yhigh)
-			axis_array[plot->y_axis].max = yhigh;
-		    if (axis_array[plot->y_axis].min > ylow)
-			axis_array[plot->y_axis].min = ylow;
+		    if (axis_array[FIRST_Y_AXIS].set_autoscale & AUTOSCALE_MAX)
+			if (axis_array[plot->y_axis].max < yhigh)
+			    axis_array[plot->y_axis].max = yhigh;
+		    if (axis_array[FIRST_Y_AXIS].set_autoscale & AUTOSCALE_MIN)
+			if (axis_array[plot->y_axis].min > ylow)
+			    axis_array[plot->y_axis].min = ylow;
 		}
 		break;
     }
