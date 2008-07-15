@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.178 2008/07/15 00:15:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.179 2008/07/15 00:52:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1076,7 +1076,7 @@ box_range_fiddling(struct curve_points *plot)
 static void
 histogram_range_fiddling(struct curve_points *plot)
 {
-    double xlow, xhigh, yhigh;
+    double xlow, xhigh;
     int i;
     /*
      * EAM FIXME - HT_STACKED_IN_TOWERS forcibly resets xmin, which is only
@@ -1144,20 +1144,29 @@ histogram_range_fiddling(struct curve_points *plot)
 	case HT_STACKED_IN_TOWERS:
 		/* FIXME: Rather than trying to reproduce the layout along X */
 		/* we should just track the actual xmin/xmax as we go.       */
-		if (!axis_array[FIRST_X_AXIS].set_autoscale)
-		    break;
-		xlow = -1.0;
-		xhigh = plot->histogram_sequence;
-		xhigh += plot->histogram->start + 1.0;
-		if (axis_array[FIRST_X_AXIS].min > xlow)
-		    axis_array[FIRST_X_AXIS].min = xlow;
-		if (axis_array[FIRST_X_AXIS].max != xhigh)
-		    axis_array[FIRST_X_AXIS].max  = xhigh;
-		for (i=0, yhigh=0.0; i<plot->p_count; i++)
-		    if (plot->points[i].type != UNDEFINED)
-			yhigh += plot->points[i].y;
-		if (axis_array[plot->y_axis].max < yhigh)
-		    axis_array[plot->y_axis].max = yhigh;
+		if (axis_array[FIRST_X_AXIS].set_autoscale) {
+		    xlow = -1.0;
+		    xhigh = plot->histogram_sequence;
+		    xhigh += plot->histogram->start + 1.0;
+		    if (axis_array[FIRST_X_AXIS].min > xlow)
+			axis_array[FIRST_X_AXIS].min = xlow;
+		    if (axis_array[FIRST_X_AXIS].max != xhigh)
+			axis_array[FIRST_X_AXIS].max  = xhigh;
+		}
+		if (axis_array[FIRST_Y_AXIS].set_autoscale) {
+		    double ylow, yhigh;
+		    for (i=0, yhigh=ylow=0.0; i<plot->p_count; i++)
+			if (plot->points[i].type != UNDEFINED) {
+			    if (plot->points[i].y >= 0)
+				yhigh += plot->points[i].y;
+			    else
+				ylow += plot->points[i].y;
+			}
+		    if (axis_array[plot->y_axis].max < yhigh)
+			axis_array[plot->y_axis].max = yhigh;
+		    if (axis_array[plot->y_axis].min > ylow)
+			axis_array[plot->y_axis].min = ylow;
+		}
 		break;
     }
 }
