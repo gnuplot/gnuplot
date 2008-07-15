@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.7 2008/03/12 03:21:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.8 2008/06/22 23:06:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -975,7 +975,7 @@ store2d_point(
 static void
 histogram_range_fiddling(struct curve_points *plot)
 {
-    double xlow, xhigh, yhigh;
+    double xlow, xhigh;
     int i;
     /*
      * EAM FIXME - HT_STACKED_IN_TOWERS forcibly resets xmin, which is only
@@ -989,20 +989,32 @@ histogram_range_fiddling(struct curve_points *plot)
                         free(stackheight);
                     stackheight = gp_alloc( plot->p_count * sizeof(struct coordinate GPHUGE),
                                             "stackheight array");
-                    for (stack_count=0; stack_count < plot->p_count; stack_count++)
-                        stackheight[stack_count].y = 0;
+		    for (stack_count=0; stack_count < plot->p_count; stack_count++) {
+			stackheight[stack_count].yhigh = 0;
+			stackheight[stack_count].ylow = 0;
+		    }
                 } else if (plot->p_count > stack_count) {
                     stackheight = gp_realloc( stackheight,
                                             plot->p_count * sizeof(struct coordinate GPHUGE),
                                             "stackheight array");
-                    for ( ; stack_count < plot->p_count; stack_count++)
-                        stackheight[stack_count].y = 0;
+		    for ( ; stack_count < plot->p_count; stack_count++) {
+			stackheight[stack_count].yhigh = 0;
+			stackheight[stack_count].ylow = 0;
+		    }
                 }
                 for (i=0; i<stack_count; i++) {
-                    if (plot->points[i].type != UNDEFINED)
-                        stackheight[i].y += plot->points[i].y;
-                    if (axis_array[plot->y_axis].max < stackheight[i].y)
-                        axis_array[plot->y_axis].max = stackheight[i].y;
+		    if (plot->points[i].type == UNDEFINED)
+			continue;
+		    if (plot->points[i].y >= 0)
+			stackheight[i].yhigh += plot->points[i].y;
+		    else
+			stackheight[i].ylow += plot->points[i].y;
+
+		    if (axis_array[plot->y_axis].max < stackheight[i].yhigh)
+			axis_array[plot->y_axis].max = stackheight[i].yhigh;
+		    if (axis_array[plot->y_axis].min > stackheight[i].ylow)
+			axis_array[plot->y_axis].min = stackheight[i].ylow;
+
                 }
             }
                 /* fall through to checks on x range */
@@ -1029,20 +1041,31 @@ histogram_range_fiddling(struct curve_points *plot)
                 }
                 break;
         case HT_STACKED_IN_TOWERS:
-                if (!axis_array[FIRST_X_AXIS].set_autoscale)
-                    break;
-                xlow = 0.0;
-                xhigh = plot->histogram_sequence;
-                xhigh += plot->histogram->start + 1.0;
-                if (axis_array[FIRST_X_AXIS].min > xlow)
-                    axis_array[FIRST_X_AXIS].min = xlow;
-                if (axis_array[FIRST_X_AXIS].max != xhigh)
-                    axis_array[FIRST_X_AXIS].max  = xhigh;
-                for (i=0, yhigh=0.0; i<plot->p_count; i++)
-                    if (plot->points[i].type != UNDEFINED)
-                        yhigh += plot->points[i].y;
-                if (axis_array[plot->y_axis].max < yhigh)
-                    axis_array[plot->y_axis].max = yhigh;
+		if (axis_array[FIRST_X_AXIS].set_autoscale) {
+		    xlow = -1.0;
+		    xhigh = plot->histogram_sequence;
+		    xhigh += plot->histogram->start + 1.0;
+		    if (axis_array[FIRST_X_AXIS].min > xlow)
+			axis_array[FIRST_X_AXIS].min = xlow;
+		    if (axis_array[FIRST_X_AXIS].max != xhigh)
+			axis_array[FIRST_X_AXIS].max  = xhigh;
+		}
+		if (axis_array[FIRST_Y_AXIS].set_autoscale) {
+		    double ylow, yhigh;
+		    for (i=0, yhigh=ylow=0.0; i<plot->p_count; i++)
+			if (plot->points[i].type != UNDEFINED) {
+			    if (plot->points[i].y >= 0)
+				yhigh += plot->points[i].y;
+			    else
+				ylow += plot->points[i].y;
+			}
+		    if (axis_array[FIRST_Y_AXIS].set_autoscale & AUTOSCALE_MAX)
+			if (axis_array[plot->y_axis].max < yhigh)
+			    axis_array[plot->y_axis].max = yhigh;
+		    if (axis_array[FIRST_Y_AXIS].set_autoscale & AUTOSCALE_MIN)
+			if (axis_array[plot->y_axis].min > ylow)
+			    axis_array[plot->y_axis].min = ylow;
+		}
                 break;
     }
 }
@@ -1393,6 +1416,12 @@ eval_plots()
 
             do {
                 previous_token = c_token;
+
+		if (equals(c_token,"at")) {
+		    struct value a;
+		    c_token++;
+		    newhist_start = real(const_express(&a));
+		}
 
                 /* Store title in temporary variable and then copy into the */
                 /* new histogram structure when it is allocated.            */
@@ -1863,10 +1892,6 @@ eval_plots()
                     this_plot->histogram = histogram_opts.next;
                     this_plot->histogram->clustersize++;
                 }
-                /* Modify X and Y coordinate placement info so that xtic and */
-                /* title coords are handled correctly during get_data().     */
-                if (histogram_opts.type == HT_STACKED_IN_TOWERS)
-                    this_plot->histogram->start = 0.5;
 
                 /* Normally each histogram gets a new set of colors, but in */
                 /* 'newhistogram' you can force a starting color instead.   */

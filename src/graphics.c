@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.27 2008/05/27 22:13:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.28 2008/06/26 23:16:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3376,15 +3376,19 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 	    stackheight = gp_alloc(
 				newsize * sizeof(struct coordinate GPHUGE),
 				"stackheight array");
-	    for (i = 0; i < newsize; i++)
-		stackheight[i].y = 0;
+	    for (i = 0; i < newsize; i++) {
+		stackheight[i].yhigh = 0;
+		stackheight[i].ylow = 0;
+	    }
 	    stack_count = newsize;
 	} else if (stack_count < newsize) {
 	    stackheight = gp_realloc( stackheight,
 				newsize * sizeof(struct coordinate GPHUGE),
 				"stackheight array");
-	    for (i = stack_count; i < newsize; i++)
-		stackheight[i].y = 0;
+	    for (i = stack_count; i < newsize; i++) {
+		stackheight[i].yhigh = 0;
+		stackheight[i].ylow = 0;
+	    }
 	    stack_count = newsize;
 	}
     }
@@ -3481,9 +3485,17 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			} else
 			    (*t->linetype)(i);
 		    case HT_STACKED_IN_LAYERS:
-			dyb = stackheight[ix].y;
-			dyt += stackheight[ix].y;
-			stackheight[ix].y += plot->points[i].y;
+
+			if( plot->points[i].y >= 0 ){
+			    dyb = stackheight[ix].yhigh;
+			    dyt += stackheight[ix].yhigh;
+			    stackheight[ix].yhigh += plot->points[i].y;
+			} else {
+			    dyb = stackheight[ix].ylow;
+			    dyt += stackheight[ix].ylow;
+			    stackheight[ix].ylow += plot->points[i].y;
+			}
+
 			if ((Y_AXIS.min < Y_AXIS.max && dyb < Y_AXIS.min)
 			||  (Y_AXIS.max < Y_AXIS.min && dyb > Y_AXIS.min))
 			    dyb = Y_AXIS.min;
@@ -3493,7 +3505,6 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			break;
 		    case HT_CLUSTERED:
 		    case HT_ERRORBARS:
-			stackheight[i].y = plot->points[i].y;
 			break;
 		    }
 		}

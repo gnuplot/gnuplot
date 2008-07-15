@@ -1,3 +1,10 @@
+2008-07-15  Christian Hilgers  <hilgers@muc.zae-bayern.de>
+
+	* src/plot2d.c src/graphics.c docs/gnuplot.doc: Make stacked histograms
+	grow upward from positive data and downward from negative data.
+	Also adjust and fix autoscaling of stacked histograms.
+	This is a minor change in auto-layout of stacked histograms.
+
 2008-07-15  Timothee Lecomte  <timothee.lecomte@ens.fr>
 	
 	* src/wxterminal/wxt_gui.h:

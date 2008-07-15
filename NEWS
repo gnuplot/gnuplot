@@ -9,6 +9,7 @@ New features, changes and fixes since previous release
 * CHANGE x11: more finely sampled color palette for PM3D
 * CHANGE cgm: switch to using web_color_rgbs; approximate RGB colors
 * CHANGE fig: more point types, 4.2-style font and size syntax for "set term"
+* CHANGE stack histograms grow upward for positive values, downward for negative
 * FIX Do not re-quantize time tics interval explicitly set by user
 * FIX (gd post) don't segfault on very long font names
 * FIX allow variable color from input file for "with boxes"

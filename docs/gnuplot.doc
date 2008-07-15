@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.31 2008/06/08 05:58:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.32 2008/06/26 17:20:46 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8953,7 +8953,9 @@ C ... and restart the table:
  Two styles of stacked histogram are supported, chosen by the command
  `set style histogram {rowstacked|columnstacked}`.  In these styles the data
  values from the selected columns are collected into stacks of boxes.
- The default stacking mode is `rowstacked`.
+ Positive values stack upwards from y=0; negative values stack downwards.
+ Mixed positive and negative values will produce both an upward stack and a
+ downward stack.  The default stacking mode is `rowstacked`.
 
  The `rowstacked` style places a box resting on the x-axis for each
  data value in the first selected column; the first data value results in
