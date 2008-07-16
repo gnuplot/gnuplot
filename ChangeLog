@@ -1,3 +1,10 @@
+2008-07-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (do_plot) src/graph3d.c (do_3dplot): Move palette
+	initialize earlier in the sequence, so that no objects or axes are
+	drawn before the palette is defined.
+	Bug #2019453
+
 2008-07-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (histogram_range_fiddling):
