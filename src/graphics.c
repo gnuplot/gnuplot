@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.28 2008/06/26 23:16:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.29 2008/07/16 05:11:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1590,12 +1590,12 @@ do_plot(struct curve_points *plots, int pcount)
      */
     boundary(plots, pcount);
 
-    /* Give a chance for rectangles to be behind everything else */
-    place_rectangles( first_object, -1, 2, NULL );
-
     /* Make palette */
     if (is_plot_with_palette())
 	make_palette();
+
+    /* Give a chance for rectangles to be behind everything else */
+    place_rectangles(first_object, -1, 2, NULL);
 
     screen_ok = FALSE;
 

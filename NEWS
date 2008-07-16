@@ -9,7 +9,7 @@ New features, changes and fixes since previous release
 * CHANGE x11: more finely sampled color palette for PM3D
 * CHANGE cgm: switch to using web_color_rgbs; approximate RGB colors
 * CHANGE fig: more point types, 4.2-style font and size syntax for "set term"
-* CHANGE stack histograms grow upward for positive values, downward for negative
+* CHANGE stacked histograms grow upward for values > 0, downward for values < 0
 * FIX Do not re-quantize time tics interval explicitly set by user
 * FIX (gd post) don't segfault on very long font names
 * FIX allow variable color from input file for "with boxes"
@@ -17,6 +17,7 @@ New features, changes and fixes since previous release
 * FIX Fix discontinuity in piecewise approximation of inverse error function
 * FIX discard out of range vectors in the bitmap terminals (pbm, epson, etc)
 * FIX 2nd colour in the colour box for negative palette in postscript
+* FIX insure palette is initialized before any objects are drawn
 
 New features, changes and fixes in gnuplot version 4.2.3
 ===========================================================

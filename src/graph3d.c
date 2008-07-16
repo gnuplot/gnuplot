@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.17 2008/03/12 03:09:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.18 2008/06/25 22:05:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -649,6 +649,11 @@ do_3dplot(
     yscale3d = 2.0 / (Y_AXIS.max - Y_AXIS.min);
     xscale3d = 2.0 / (X_AXIS.max - X_AXIS.min);
 
+    /* Initialize palette */
+    if (!quick) {
+	can_pm3d = is_plot_with_palette() && !make_palette() && term->set_color;
+    }
+
     /* Give a chance for rectangles to be behind everything else */
     place_rectangles( first_object, -1, 3, NULL );
 
@@ -664,11 +669,6 @@ do_3dplot(
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_BACK);
     else if (splot_map && border_layer == 0)
 	draw_3d_graphbox(plots, pcount, BORDERONLY, LAYER_BACK);
-
-    /* Draw PM3D color key box */
-    if (!quick) {
-	can_pm3d = is_plot_with_palette() && !make_palette() && term->set_color;
-    }
 
 #ifdef USE_GRID_LAYERS
     if (!hidden3d && (grid_layer == -1))
