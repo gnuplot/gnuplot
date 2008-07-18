@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.29 2008/07/16 05:11:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.30 2008/07/16 20:05:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -164,6 +164,8 @@ static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *k
 
 static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
 				   char *title,  struct termentry *t, int xl, int yl));
+
+static TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, struct coordinate *point));
 
 static int style_from_fill __PROTO((struct fill_style_type *));
 
@@ -2104,9 +2106,8 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 	    }
 	}
 
-	if ((plot->lp_properties.pm3d_color.value < 0.0)
-	    && (plot->lp_properties.pm3d_color.type == TC_RGB))
-	    set_rgbcolor( plot->points[i].yhigh);
+	/* variable color read from data column */
+	check_for_variable_color(plot, &plot->points[i]);
 
 	if (polar)
 	    (*t->move) (yaxis_x, xaxis_y);
@@ -2133,10 +2134,7 @@ plot_lines(struct curve_points *plot)
     for (i = 0; i < plot->p_count; i++) {
 
 	/* rgb variable  -  color read from data column */
-	if (plot->points[i].type != UNDEFINED)
-	if ((plot->lp_properties.pm3d_color.value < 0.0)
-	    && (plot->lp_properties.pm3d_color.type == TC_RGB))
-	    set_rgbcolor( plot->points[i].yhigh);
+	check_for_variable_color(plot, &plot->points[i]);
 
 	switch (plot->points[i].type) {
 	case INRANGE:{
@@ -3529,9 +3527,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 
 		/* Variable color */
 		if (plot->plot_style == BOXES) {
-		    if ((plot->lp_properties.pm3d_color.type == TC_RGB)
-		    &&  (plot->lp_properties.pm3d_color.value < 0))
-			set_rgbcolor(plot->points[i].yhigh);
+		    check_for_variable_color(plot, &plot->points[i]);
 		}
 
 		if ((plot->fill_properties.fillstyle != FS_EMPTY) && t->fillbox) {
@@ -3627,9 +3623,7 @@ plot_points(struct curve_points *plot)
 		    && x <= plot_bounds.xright - p_width
 		    && y <= plot_bounds.ytop - p_height)) {
 
-		if ((plot->lp_properties.pm3d_color.value < 0.0)
-		    && (plot->lp_properties.pm3d_color.type == TC_RGB))
-		    set_rgbcolor( plot->points[i].yhigh);
+		check_for_variable_color(plot, &plot->points[i]);
 
 		if (plot->plot_style == POINTSTYLE
 		&&  plot->lp_properties.p_size == PTSZ_VARIABLE)
@@ -3654,9 +3648,7 @@ plot_dots(struct curve_points *plot)
 	if (plot->points[i].type == INRANGE) {
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
-	    if ((plot->lp_properties.pm3d_color.value < 0.0)
-		&& (plot->lp_properties.pm3d_color.type == TC_RGB))
-		set_rgbcolor( plot->points[i].yhigh);
+	    check_for_variable_color(plot, &plot->points[i]);
 	    /* point type -1 is a dot */
 	    (*t->point) (x, y, -1);
 	}
@@ -5228,6 +5220,20 @@ fill_corners(int style, unsigned int x, unsigned int y, unsigned int w, unsigned
 }
 
 
+static TBOOLEAN
+check_for_variable_color(struct curve_points *plot, struct coordinate *point)
+{
+    if ((plot->lp_properties.pm3d_color.value < 0.0)
+    &&  (plot->lp_properties.pm3d_color.type == TC_RGB)) {
+	set_rgbcolor(point->yhigh);
+	return TRUE;
+    } else if (plot->lp_properties.pm3d_color.type == TC_Z) {
+	set_color( cb2gray(point->yhigh) );
+	return TRUE;
+    } else
+	return FALSE;
+}
+	    
 #ifdef WITH_IMAGE
 
 /* Similar to HBB's comment above, this routine is shared with

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.32 2008/06/26 17:20:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.33 2008/07/16 05:11:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1906,7 +1906,8 @@ C ... and restart the table:
 
  "palette z" maps the z value of each plot segment or plot element into the
  cbrange mapping of the palette. This allows smoothly-varying color along a
- 3d line or surface. This option applies only to 3D plots (splot).
+ 3D line or surface.  It also allows coloring 2D plots by palette values read
+ from an extra column of data.
 
 2 mouse input
 ?mouse input
@@ -4439,7 +4440,8 @@ C ... and restart the table:
  point coordinates or to the color coordinate if specified by the 4th parameter
  in `using`. Both 2d and 3d plots (`plot` and `splot` commands) can use palette
  colors as specified by either their fractional value or the corresponding value
- mapped to the colorbox range. 2d plots can not use palette colors mapped by
+ mapped to the colorbox range. A palette color value can also be read from an
+ explicitly specified column in the `using` specifier.
  Z value. See `colors`, `set palette`, `linetype`.
 
  The keyword `nohidden3d` applies only to plots made with the `splot` command.

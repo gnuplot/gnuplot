@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.8 2008/06/22 23:06:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.9 2008/07/16 05:11:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -280,13 +280,13 @@ get_data(struct curve_points *current_plot)
     struct coordinate GPHUGE *cp;
 #endif
 
-    TBOOLEAN variable_color;
+    TBOOLEAN variable_color = FALSE;
     double   variable_color_value;
     if ((current_plot->lp_properties.pm3d_color.type == TC_RGB)
     &&  (current_plot->lp_properties.pm3d_color.value < 0))
 	variable_color = TRUE;
-    else
-	variable_color = FALSE;
+    if (current_plot->lp_properties.pm3d_color.type == TC_Z)
+	variable_color = TRUE;
 
     /* eval_plots has already opened file */
 
@@ -1832,9 +1832,6 @@ eval_plots()
                 &&  (this_plot->lp_properties.p_size == PTSZ_VARIABLE))
                     this_plot->lp_properties.p_size = 1;
             }
-            if (this_plot->lp_properties.use_palette
-            &&  this_plot->lp_properties.pm3d_color.type >= TC_Z)
-                int_error(NO_CARET,"2D plots cannot color by Z value; please use splot instead");
 
             /* Similar argument for check that all fill styles were set */
             if (this_plot->plot_style & PLOT_STYLE_HAS_FILL) {
