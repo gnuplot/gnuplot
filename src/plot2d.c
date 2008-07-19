@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.181 2008/07/15 19:31:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.182 2008/07/19 16:47:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -517,13 +517,18 @@ get_data(struct curve_points *current_plot)
 	    cp_extend(current_plot, i + i + 1000);
 	}
 
-	/* Allow for optional columns.  Currently only used for BOXES and */
-	/* CIRCLES, but should be extended to a more general mechanism.   */
+	/* Allow for optional columns.  Currently only used for a few styles, */
+	/* but could be extended to a more general mechanism.                 */
 	variable_color_value = 0;
-	if (j > 1 && variable_color) {
-	    int style = current_plot->plot_style;
-	    if (style == BOXES || style == CIRCLES || style == VECTOR)
-		variable_color_value = v[--j];
+	if (variable_color) {
+	    static char *errmsg = "Not enough columns for variable color";
+	    switch (current_plot->plot_style) {
+	    case VECTOR:	if (j < 5) int_error(NO_CARET,errmsg);
+	    case CIRCLES: 	if (j < 4) int_error(NO_CARET,errmsg);
+	    case BOXES:		if (j < 3) int_error(NO_CARET,errmsg);
+				variable_color_value = v[--j];
+	    default:		break;
+	    }
 	}
 
 	switch (j) {

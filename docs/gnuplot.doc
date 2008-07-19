@@ -1,4 +1,4 @@
-C ROS $Id: gnuplot.doc,v 1.518 2008/07/07 16:37:16 sfeam Exp $
+C ROS $Id: gnuplot.doc,v 1.519 2008/07/15 00:15:13 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1155,7 +1155,7 @@ C
  given in seconds since the year 2000.
  See `time_specifiers` and `strptime`.
 4 strptime
-? expressions functions strptime
+?expressions functions strptime
 ?functions strptime
 ?strptime
 #strptime("timeformat",s) & string & seconds since year 2000 as given in string s \\
