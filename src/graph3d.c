@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.201 2008/07/08 04:56:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.202 2008/07/16 19:44:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -152,7 +152,9 @@ static void key_sample_point __PROTO((int xl, int yl, int pointtype));
 static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, int yl));
 static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
 static TBOOLEAN can_pm3d = FALSE;
+static TBOOLEAN rgb_from_column = FALSE;
 static void key_text __PROTO((int xl, int yl, char *text));
+static void check_for_variable_color __PROTO((struct surface_points *plot, struct coordinate *point));
 
 static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, int*, int*, int*, int*));
 static void place_arrows3d __PROTO((int));
@@ -1383,7 +1385,6 @@ plot3d_impulses(struct surface_points *plot)
     int x, y, xx0, yy0;			/* point in terminal coordinates */
     struct iso_curve *icrvs = plot->iso_crvs;
     int colortype = plot->lp_properties.pm3d_color.type;
-    TBOOLEAN rgb_from_column;
 
     rgb_from_column = can_pm3d && plot->pm3d_color_from_column
 			&& plot->lp_properties.pm3d_color.value < 0.0;
@@ -1396,24 +1397,7 @@ plot3d_impulses(struct surface_points *plot)
 
 	for (i = 0; i < icrvs->p_count; i++) {
 
-	    switch (colortype) {
-	    case TC_RGB:
-		if (rgb_from_column)
-		    set_rgbcolor((int)points[i].CRD_COLOR);
-		break;
-	    case TC_Z:
-	    case TC_DEFAULT:
-		if (can_pm3d && plot->lp_properties.use_palette) {
-		    if (plot->pm3d_color_from_column)
-			set_color( cb2gray(points[i].CRD_COLOR) );
-		    else
-			set_color( cb2gray( z2cb(points[i].z) ) );
-		}
-		break;
-	    default:
-		/* The other cases were taken care of already */
-		break;
-	    }
+	    check_for_variable_color(plot, &points[i]);
 
 	    switch (points[i].type) {
 	    case INRANGE:
@@ -1496,7 +1480,6 @@ plot3d_lines(struct surface_points *plot)
     struct iso_curve *icrvs = plot->iso_crvs;
     struct coordinate GPHUGE *points;
     double lx[2], ly[2], lz[2];	/* two edge points */
-    TBOOLEAN rgb_from_column;
 
 #ifndef LITE
 /* These are handled elsewhere.  */
@@ -1779,8 +1762,8 @@ plot3d_points(struct surface_points *plot, int p_type)
     while (icrvs) {
 	struct coordinate GPHUGE *point;
 	int colortype = plot->lp_properties.pm3d_color.type;
-	TBOOLEAN rgb_from_column = plot->pm3d_color_from_column
-				&& plot->lp_properties.pm3d_color.value < 0.0;
+	rgb_from_column = plot->pm3d_color_from_column
+			&& plot->lp_properties.pm3d_color.value < 0.0;
 
 	/* Apply constant color outside of the loop */
 	if (colortype == TC_RGB && !rgb_from_column)
@@ -1792,24 +1775,7 @@ plot3d_points(struct surface_points *plot, int p_type)
 		map3d_xy(point->x, point->y, point->z, &x, &y);
 
 		if (!clip_point(x, y)) {
-		    switch( colortype ) {
-		    case TC_RGB:
-			if (rgb_from_column)
-			    set_rgbcolor( (int)point->CRD_COLOR );
-			break;
-		    case TC_Z:
-		    case TC_DEFAULT:   /* pm3d mode assumes this is default */
-			if (can_pm3d && plot->lp_properties.use_palette) {
-			    if (plot->pm3d_color_from_column)
-				set_color( cb2gray(point->CRD_COLOR) );
-			    else
-				set_color( cb2gray( z2cb(point->z) ) );
-			}
-			break;
-		    default:
-			/* The other cases were taken care of already */
-			break;
-		    }
+		    check_for_variable_color(plot, point);
 
 		    if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		    &&  plot->lp_properties.p_size == PTSZ_VARIABLE)
@@ -3151,6 +3117,8 @@ plot3d_vectors(struct surface_points *plot)
 	
 	if (heads[i].type == UNDEFINED || tails[i].type == UNDEFINED)
 	    continue;
+		
+	check_for_variable_color(plot, &heads[i]);
 
 	if (heads[i].type == INRANGE && tails[i].type == INRANGE) {
 	    map3d_xy_double(heads[i].x, heads[i].y, heads[i].z, &x1, &y1);
@@ -3160,3 +3128,27 @@ plot3d_vectors(struct surface_points *plot)
     }
 }
 
+static void
+check_for_variable_color(struct surface_points *plot, struct coordinate *point)
+{
+    int colortype = plot->lp_properties.pm3d_color.type;
+
+    switch( colortype ) {
+    case TC_RGB:
+	if (rgb_from_column)
+	    set_rgbcolor( (int)point->CRD_COLOR );
+	break;
+    case TC_Z:
+    case TC_DEFAULT:   /* pm3d mode assumes this is default */
+	if (can_pm3d && plot->lp_properties.use_palette) {
+	    if (plot->pm3d_color_from_column)
+		set_color( cb2gray(point->CRD_COLOR) );
+	    else
+		set_color( cb2gray( z2cb(point->z) ) );
+	}
+	break;
+    default:
+	/* The other cases were taken care of already */
+	break;
+    }
+}

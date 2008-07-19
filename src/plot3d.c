@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.162 2008/06/02 00:48:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.163 2008/07/09 16:39:50 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -967,7 +967,11 @@ get_3ddata(struct surface_points *this_plot)
 		    xtail = x + v[3];
 		    ytail = y + v[4];
 		    ztail = z + v[5];
-		    color_from_column(FALSE);
+		    if (j >= 7) {
+			color = v[6];
+			color_from_column(TRUE);
+		    } else
+			color = z;
 		}
 	    }
 #undef color_from_column

@@ -3,6 +3,9 @@
 	* src/graphics.c (plot_vectors) src/plot2d.c (get_data):
 	Allow 2D vector plots to take color from an extra data column.
 
+	* src/graph3d.c plot3d.c: Consolidate variable color checks into a
+	single routine. Allow 3D vector plots with variable color.
+
 2008-07-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_plot) src/graph3d.c (do_3dplot): Move palette
