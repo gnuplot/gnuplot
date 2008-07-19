@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.177 2008/07/09 16:39:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.181 2008/07/15 19:31:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -334,13 +334,13 @@ get_data(struct curve_points *current_plot)
     struct coordinate GPHUGE *cp;
 #endif
 
-    TBOOLEAN variable_color;
+    TBOOLEAN variable_color = FALSE;
     double   variable_color_value;
     if ((current_plot->lp_properties.pm3d_color.type == TC_RGB)
     &&  (current_plot->lp_properties.pm3d_color.value < 0))
 	variable_color = TRUE;
-    else
-	variable_color = FALSE;
+    if (current_plot->lp_properties.pm3d_color.type == TC_Z)
+	variable_color = TRUE;
 
     /* eval_plots has already opened file */
 
@@ -399,8 +399,9 @@ get_data(struct curve_points *current_plot)
 	    df_axis[2] = df_axis[3] = df_axis[1];
 	break;
 
-    case VECTOR:
-	min_cols = max_cols = 4;
+    case VECTOR:	/* x, y, dx, dy, variable_color */
+	min_cols = 4;
+	max_cols = 5;
 	break;
 
     case XERRORLINES:
@@ -518,11 +519,12 @@ get_data(struct curve_points *current_plot)
 
 	/* Allow for optional columns.  Currently only used for BOXES and */
 	/* CIRCLES, but should be extended to a more general mechanism.   */
-	if (j > 1 && variable_color
-	&& (current_plot->plot_style == BOXES || current_plot->plot_style == CIRCLES)) {
+	variable_color_value = 0;
+	if (j > 1 && variable_color) {
+	    int style = current_plot->plot_style;
+	    if (style == BOXES || style == CIRCLES || style == VECTOR)
 		variable_color_value = v[--j];
-	} else
-		variable_color_value = 0;
+	}
 
 	switch (j) {
 	default:
@@ -812,7 +814,7 @@ get_data(struct curve_points *current_plot)
 	    case VECTOR:
 		/* x,y,dx,dy */
 		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0] + v[2],
-			      v[1], v[1] + v[3], -1.0);
+			      v[1], v[1] + v[3], variable_color_value);
 		break;
 
 	    case POINTSTYLE: /* x, y, variable point size and variable color */
