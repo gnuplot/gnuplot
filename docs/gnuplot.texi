@@ -547,18 +547,12 @@ followed by another command file "trailer":
 
 @cindex command-line-editing
 
-Command-line editing is supported by the Unix, VMS, MS-DOS and OS/2
-versions of `gnuplot`.  Also, a history mechanism allows previous commands to
-be edited and re-executed.  After the command line has been edited, a newline
-or carriage return will enter the entire line without regard to where the
-cursor is positioned.
+Command-line editing and command history are supported using either the
+external gnu readline library or a built-in equivalent.  This choice is a
+configuration option at the time gnuplot is built.
 
-(The readline function in `gnuplot` is not the same as the readline used in
-GNU Bash and GNU Emacs.  If the GNU version is desired, it may be selected
-instead of the `gnuplot` version at compile time.)
-
-
-The editing commands are as follows:
+The editing commands of the built-in version are given below. The gnu
+readline library has its own documentation.
 
 
 @example
@@ -1641,7 +1635,7 @@ See `time_specifiers` and @ref{strptime}.
 @node strptime, system, strftime, Functions
 @subsubsection strptime
 
-@c ? expressions functions strptime
+@c ?expressions functions strptime
 @c ?functions strptime
 @cindex strptime
 @findex strptime
@@ -3391,7 +3385,9 @@ ratio of the plot are both ignored.
 Example (draws circles whose area is proportional to the value in column 3):
 
 @example
-    plot 'data' using 1:2:(sqrt($3)) with circles fillstyle empty
+    set style fill transparent solid 0.2 noborder
+    plot 'data' using 1:2:(sqrt($3)) with circles, \
+         'data' using 1:2 with linespoints
 
 @end example
 
@@ -3416,7 +3412,7 @@ For some terminals (post, pdf) the size of the dot can be controlled by
 changing the linewidth.
 
 @example
-     1 column    y         # x is taken from row number
+     1 column    y         # x is row number
      2 columns:  x  y
      3 columns:  x  y  z   # 3D only (splot)
 
@@ -3443,10 +3439,11 @@ Syntax:
 
 @end example
 
-where the option can be
+where the option can be one of the following
 
 @example
-    [closed | @{above | below@} @{x1 | x2 | y1 | y2@}[=<a>] | xy=<x>,<y>]
+    [closed | @{above | below@}
+    @{x1 | x2 | y1 | y2@}[=<a>] | xy=<x>,<y>]
 
 @end example
 
@@ -3633,7 +3630,9 @@ The appearance of the error bars is controlled by the current value of
 Two styles of stacked histogram are supported, chosen by the command
 `set style histogram @{rowstacked|columnstacked@}`.  In these styles the data
 values from the selected columns are collected into stacks of boxes.
-The default stacking mode is `rowstacked`.
+Positive values stack upwards from y=0; negative values stack downwards.
+Mixed positive and negative values will produce both an upward stack and a
+downward stack.  The default stacking mode is `rowstacked`.
 
 The `rowstacked` style places a box resting on the x-axis for each
 data value in the first selected column; the first data value results in
@@ -3659,15 +3658,18 @@ If a plot contains both histograms and other plot styles, the non-histogram
 plot elements may use either the x1 or the x2 axis.
 
 Examples:
-To plot a data file containing multiple columns of data as a histogram
-of clustered boxes (the default style):
+Suppose that the input file contains data values in columns 2, 4, 6, ...
+and error estimates in columns 3, 5, 7, ...  This example plots the values
+in columns 2 and 4 as a histogram of clustered boxes (the default style).
+Because we use iteration in the plot command, any number of data columns can
+be handled in a single command. See @ref{iteration}.
 
 @example
       set boxwidth 0.9 relative
       set style data histograms
       set style histogram cluster
       set style fill solid 1.0 border -1
-      plot 'file.dat' using 2, '' using 4
+      plot for [COL=2:4:2] 'file.dat' using COL
 
 @end example
 
@@ -3676,7 +3678,7 @@ at each integral value on the x axis.  If the first column of the input file
 contains labels, they may be placed along the x-axis using the variant command
 
 @example
-      plot 'file.dat' using 2, '' using 4:xticlabels(1)
+      plot for [COL=2:4:2] 'file.dat' using COL:xticlabels(1)
 
 @end example
 
@@ -3684,16 +3686,18 @@ If the file contains both magnitude and range information for each value,
 then error bars can be added to the plot.  The following commands will add
 error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
 ends drawn the same width as the box itself. The error bars and bar ends are
-drawn in black with linewidth 2.
+drawn with linewidth 2, using the border linetype from the current fill style.
 
 @example
       set bars fullwidth
-      set style histogram errorbars gap 2 lt -1 lw 2
-      plot 'file.dat' using 2:3, '' using 4:5:xticlabels(1)
+      set style fill solid 1 border -1
+      set style histogram errorbars gap 2 lw 2
+      plot for [COL=2:4:2] 'file.dat' using COL:COL+1
 
 @end example
 
-To plot the same data as a rowstacked histogram:
+To plot the same data as a rowstacked histogram.  Just to be different, this
+example lists the separate columns explicitly rather than using iteration.
 
 @example
       set style histogram rowstacked
@@ -3718,7 +3722,7 @@ x=1 will contain a box for each entry in column 2 of the datafile.  The stack
 at x=2 will contain a box for each parallel entry in column 4 of the datafile.
 Because this interchanges gnuplot's usual interpretation of input rows and
 columns, the specification of key titles and x-axis tic labels must also be
-modified.
+modified accordingly. See the comments given below.
 
 @example
       set style histogram columnstacked
@@ -3726,6 +3730,9 @@ modified.
       plot '' u 5 title columnhead  # uses first row to generate xtic labels
 
 @end example
+
+Note that the two examples just given present exactly the same data values,
+but in different formats.
 
 @menu
 * newhistogram::                
@@ -3874,10 +3881,14 @@ This optimized code may be disabled by using the keyword `failsafe`. E.g.
 @c ?style impulses
 @cindex impulses
 
-The @ref{impulses} style displays a vertical line from the x axis (2D) or from the
-xy plane (3D) to each input point.  To use this style effectively in 3D plots,
-it is useful to use thick lines (linewidth > 1).
-
+The @ref{impulses} style displays a vertical line from the x axis to the y value
+of each point (2D) or from the xy plane to the z value of each point (3D).
+Note that the y or z values may be negative.  As with most plot styles, data
+from additional columns can be used to control the color of each impulse.
+To use this style effectively in 3D plots, it is useful to use thick lines
+(linewidth > 1).  This approximates a 3D bar chart.
+     
+     
 @example
      1 column:   y        # implicit x coordinate from row number (2D)
      2 columns:  x  y     # line from [x,0] to [x,y]  (2D)
@@ -3898,7 +3909,7 @@ it is useful to use thick lines (linewidth > 1).
 The @ref{labels} style reads coordinates and text from a data file and places
 the text string at the corresponding 2D or 3D position.  3 or 4 input columns
 of basic data are required.  Additional input columns may be used to provide
-information such as variable text color (see `rgbcolor variable`).
+information such as variable font size or text color (see `rgbcolor variable`).
 
 @example
      3 columns:  x  y  string    # 2D version
@@ -3906,13 +3917,24 @@ information such as variable text color (see `rgbcolor variable`).
 
 @end example
 
-The font, color, rotation angle and other properties of the printed text may be
-specified as additional command options (see `set label`). The example below
-will generate a 2D plot with text labels taken from column 4 of the input
-file (`tc lt 2` is shorthand for `textcolor linetype 2`, which is green).
+The font, color, rotation angle and other properties of the printed text
+may be specified as additional command options (see `set label`). The example
+below generates a 2D plot with text labels constructed from the city whose
+name is taken from column 1 of the input file, and whose geographic coordinates
+are in columns 4 and 5. The font size is calculated from the value in column 3,
+in this case the population.
 
 @example
-  plot 'datafile' using 1:(0.5 * $2):4 with labels font "arial,11" tc lt 2
+  CityName(String,Size) = sprintf("@{/=%d %s@}", Scale(Size), String)
+  plot 'cities.dat' using 5:4:(CityName(stringcolumn(1),$3)) with labels
+
+@end example
+
+If we did not want to adjust the font size to a different size for each city
+name, the command would be much simpler:
+
+@example
+  plot 'cities.dat' using 5:4:1 with labels font "Times,8"
 
 @end example
 
@@ -4340,9 +4362,9 @@ Examples:
 
 @end example
 
-It is recommended for DOS and Windows users to use
-single-quotes---backslash [\] has special significance inside
-double-quotes and has to be escaped.  For example,
+It is recommended that Windows users use single-quotes, because backslash [\]
+has special significance inside double-quotes and has to be escaped.
+For example,
 @example
       cd "c:\newdata"
 @end example
@@ -4353,7 +4375,7 @@ fails, but
       cd "c:\\newdata"
 @end example
 
-works as expected.
+work as expected.
 
 @node call, clear, cd, Commands
 @section call
@@ -4557,8 +4579,8 @@ errorvariables`, the error for each fitted parameter will be stored in
 a variable named like the parameter, but with "_err" appended.  Thus the
 errors can be used as input for further computations.
 
-The fit may be interrupted by pressing Ctrl-C (any key but Ctrl-C under
-MSDOS).  After the current iteration completes, you have the option to
+The fit may be interrupted by pressing Ctrl-C.
+After the current iteration completes, you have the option to
 (1) stop the fit and accept the current parameter values,
 (2) continue the fit, (3) execute a `gnuplot` command as specified by the
 environment variable FIT_SCRIPT.  The default for FIT_SCRIPT is @ref{replot},
@@ -5368,6 +5390,7 @@ Examples:
       plot [t=1:10] [-pi:pi*2] tan(t), \
            "data.1" using (tan($2)):($3/$4) smooth csplines \
                     axes x1y2 notitle with lines 5
+      plot for [datafile in "spinach.dat broccoli.dat"] datafile
 
 @end example
 
@@ -6101,7 +6124,7 @@ externally or by using @ref{fit} with an appropriate model.
 
 Syntax:
 @example
-      smooth @{unique | frequency | cumulative | csplines | acsplines | bezier | sbezier@}
+      smooth @{unique | frequency | cumulative | kdensity | csplines | acsplines | bezier | sbezier@}
 
 @end example
 
@@ -6228,10 +6251,6 @@ applies the `bezier` algorithm.
 The `unique` option makes the data monotonic in x; points with the same
 x-value are replaced by a single point having the average y-value.  The
 resulting points are then connected by straight line segments.
-@c ^ See this
-@uref{http://www.gnuplot.info/demo/mgr.html,demos
-}
-@c ^ web page.
 
 
 @noindent --- FREQUENCY ---
@@ -6272,6 +6291,30 @@ function from data.
 See also
 @uref{http://www.gnuplot.info/demo/smooth.html,smooth.dem
 }
+
+
+@noindent --- KDENSITY ---
+
+@c ?commands plot datafile smooth kdensity
+@c ?plot datafile smooth kdensity
+@c ?plot smooth kdensity
+@c ?data-file smooth kdensity
+@c ?datafile smooth kdensity
+@c ?plot kdensity
+@c ?smooth kdensity
+@cindex kdensity
+
+The `kdensity` option is a way to plot a kernel density estimate (which is a
+smooth histogram) for a random collection of points, using Gaussian kernels.
+A Gaussian is placed at the location of each point in the first column and
+the sum of all these Gaussians is plotted as a function. The value in the
+second column is taken as weight of the Gaussian. (To obtain a normalized
+histogram, this should be 1/number-of-points). The value of the third column,
+if supplied, is taken as the bandwidth for the kernels. If only two columns
+have been specified, or if the value of the third column is zero or less,
+gnuplot calculates the bandwidth which would be optimal if the input data was
+normally distributed. (This will usually be a very conservative, i.e. broad 
+bandwidth.)
 
 @node special-filenames, thru, smooth, data
 @subsubsection special-filenames
@@ -6935,15 +6978,16 @@ convenient to do so by iterating over a shared plot command.
 
 Syntax:
 @example
-      plot for [<variable>=<start>:<end>@{:<increment>@}]
-      splot for [<variable>=<start>:<end>@{:<increment>@}]
+      plot for [<variable> = <start> : <end> @{:<increment>@}]
+      plot for [<variable> in "string of words"]
 
 @end example
 
-Example:
+Examples:
 @example
       file(n) = sprintf("dataset_%d.dat",n)
-      plot for [i=1:10] file(i) title sprintf("dataset %d",i)
+      splot for [i=1:10] file(i) title sprintf("dataset %d",i)
+      plot for [dataset in "apples bananas"] dataset."dat" title dataset
 
 @end example
 
@@ -6954,7 +6998,7 @@ example it is used both to generate a file name and a corresponding title.
 
 Example:
 @example
-      list = "a b c foo baz"
+      list = "apple banana cabbage daikon eggplant"
       item(n) = word(list,n)
       plot for [i=1:words(list)] item[i].".dat" title item(i)
       list = "new stuff"
@@ -6965,6 +7009,19 @@ Example:
 This example steps through a list and plots once per item.
 Because the items are retrieved dynamically, you can change the list
 and then replot.
+
+Example:
+@example
+      list = "apple banana cabbage daikon eggplant"
+      plot for [i in list] i.".dat" title i
+      list = "new stuff"
+      replot
+
+@end example
+
+This is example does exactly the same thing as the previous example, but uses
+the string iterator form of the command rather than an integer iterator.
+
 
 
 @node title, with, iteration, plot
@@ -9279,12 +9336,6 @@ If no filename is given or @ref{fit} is used the log file is
 reset to its default value "fit.log" or the value of the environmental
 variable `FIT_LOG`.
 
-Users of DOS-like platforms should note that the \ character has
-special significance in double-quoted strings, so single-quotes
-should be used for filenames in different directories, or you have
-to write \\ for each \.  Or you can just use forward slashes,
-even though this is DOS.
-
 If the given logfile name ends with a / or \, it is interpreted to be
 a directory name, and the actual filename will be "fit.log" in that
 directory.
@@ -11262,10 +11313,6 @@ and new output will be sent to STDOUT.  (If you give the command `set output
 "STDOUT"`, your output may be sent to a file named "STDOUT"!  ["May be", not
 "will be", because some terminals, like `x11` or `wxt`, ignore @ref{output}.])
 
-MSDOS users should note that the \ character has special significance in
-double-quoted strings, so single-quotes should be used for filenames in
-different directories.
-
 When both @ref{terminal} and @ref{output} are used together, it is safest to
 give @ref{terminal} first, because some terminals set a flag which is needed
 in some operating systems.  This would be the case, for example, if the
@@ -12329,7 +12376,8 @@ Both `noratio` and `nosquare` return the graph to the default aspect ratio
 of the terminal, but do not return <xscale> or <yscale> to their default
 values (1.0).
 
-`ratio` and `square` have no effect on 3D plots.
+`ratio` and `square` have no effect on 3D plots, but do affect 3D projections
+created using "set view map".
 
 Examples:
 
