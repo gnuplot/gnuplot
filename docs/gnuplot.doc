@@ -1,4 +1,4 @@
-C ROS $Id: gnuplot.doc,v 1.520 2008/07/20 04:56:28 sfeam Exp $
+C ROS $Id: gnuplot.doc,v 1.521 2008/07/21 20:19:23 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -286,15 +286,6 @@ C
        set style data linespoints
        plot 1 linetype 2 pointtype 4
 
- Another compatibility issue is the effect of the command `set size` outside
- when not in multiplot mode.  In earlier versions, the command
- `set size <xx>, <yy>` caused some terminals to change both the size of the plot
- and the size of the canvas is was drawn on; other terminals changed only the
- plot size.  The use of `set size` to change the canvas size is now deprecated.
-
- Please see `set size`, `set term size` and also the documentation for
- individual terminals.
-
 2 Batch/Interactive Operation
 ?batch/interactive
  `gnuplot` may be executed in either batch or interactive modes, and the two
@@ -386,40 +377,6 @@ C
 %^P@move back through history.
 %^N@move forward through history.
 @end table
-
- On the IBM PC, the use of a TSR program such as DOSEDIT or CED may be desired
- for line editing.  The default makefile assumes that this is the case;  by
- default `gnuplot` will be compiled with no line-editing capability.  If you
- want to use `gnuplot`'s line editing, set READLINE in the makefile and add
- readline.obj to the link file.  The following arrow keys may be used on the
- IBM PC versions if readline is used:
-
-@start table - first is interactive cleartext form
-       Left  Arrow      - same as ^B.
-       Right Arrow      - same as ^F.
-       Ctrl Left  Arrow - same as ^A.
-       Ctrl Right Arrow - same as ^E.
-       Up    Arrow      - same as ^P.
-       Down  Arrow      - same as ^N.
-#\begin{tabular}{|cl|} \hline
-#Arrow key  & Function \\ \hline
-#Left       & same as \verb~^B~. \\
-#Right      & same as \verb~^F~. \\
-#Ctrl Left  & same as \verb~^A~. \\
-#Ctrl Right & same as \verb~^E~. \\
-#Up         & same as \verb~^P~. \\
-#Down       & same as \verb~^N~. \\
-%c l .
-%Arrow key@Function
-%_
-%Left Arrow@same as ^B.
-%Right Arrow@same as ^F.
-%Ctrl Left Arrow@same as ^A.
-%Ctrl Right Arrow@same as ^E.
-%Up Arrow@same as ^P.
-%Down Arrow@same as ^N.
-%_
-@end table
 2 Comments
 ?comments
  Comments are supported as follows: a `#` may appear in most places in a line
@@ -428,7 +385,8 @@ C
  substitutions, etc.  In short, it works anywhere it makes sense to work.
 
  See also `set datafile commentschars` for specifying comment characters in
- data files.
+ data files.  Note that if a comment line ends in '\' then the subsequent
+ line is also treated as a comment.
 2 Coordinates
 ?coordinates
 =axes
@@ -613,8 +571,7 @@ C
  is itself overridden by the .gnuplot (or equivalent) start-up file
  (see `start-up`) and, of course, by later explicit changes.
 
- On Unix, AmigaOS, MS-DOS and OS/2, GNUHELP may be defined to be the
- pathname of the HELP file (gnuplot.gih).
+ GNUHELP may be defined to be the pathname of the HELP file (gnuplot.gih).
 
  On VMS, the logical name GNUPLOT$HELP should be defined as the name of the
  help library for `gnuplot`.  The `gnuplot` help can be put inside any system
@@ -631,13 +588,6 @@ C
 
  On Unix and AmigaOS, SHELL is used for the `shell` command.  On
  MS-DOS and OS/2, COMSPEC is used for the `shell` command.
-
- On MS-DOS, if the BGI or Watcom interface is used, PCTRM is used to tell
- the maximum resolution supported by your monitor by setting it to
- S<max. horizontal resolution>. E.g. if your monitor's maximum resolution is
- 800x600, then use:
-       set PCTRM=S800
- If PCTRM is not set, standard VGA is used.
 
  FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
  fit is interrupted---see `fit`.  FIT_LOG specifies the default filename of the
@@ -1667,8 +1617,9 @@ C ... and restart the table:
  preclude such perfection.  This section contains explanations of the way
  some of these terms are used.
 
- A "page" or "screen" is the entire area addressable by `gnuplot`.  On a
- monitor, it is the full screen; on a plotter, it is a single sheet of paper.
+ A "page" or "screen" or "canvas" is the entire area addressable by `gnuplot`.
+ On a desktop it is a full window; on a plotter, it is a single sheet of paper;
+ in svga mode it is the full monitor screen.
 
  A screen may contain one or more "plots".  A plot is defined by an abscissa
  and an ordinate, although these need not actually appear on it, as well as
