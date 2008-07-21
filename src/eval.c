@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.67 2008/07/07 16:26:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.68 2008/07/09 16:39:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -875,5 +875,33 @@ update_gpval_variables(int context)
 	fill_gpval_string("GPVAL_ERRMSG","");
     }
 
+}
+
+/* Callable wrapper for the words() internal function */
+int
+gp_words(char *string)
+{
+    struct value a;
+
+	push(Gstring(&a,string));
+	push(Ginteger(&a,-1));
+	f_words((union argument *)NULL);
+	pop(&a);
+	
+    return a.v.int_val;
+}
+
+/* Callable wrapper for the word() internal function */
+char *
+gp_word(char *string, int i)
+{
+    struct value a;
+
+	push(Gstring(&a,string));
+	push(Ginteger(&a,i));
+	f_words((union argument *)NULL);
+	pop(&a);
+	
+    return a.v.string_val;
 }
 

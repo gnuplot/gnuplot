@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.30 2007/10/16 21:03:19 sfeam Exp $
+ * $Id: eval.h,v 1.31 2008/07/04 07:00:18 mikulik Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -172,5 +172,9 @@ void fill_gpval_string __PROTO((char *var, const char *value));
 void fill_gpval_integer __PROTO((char *var, int value));
 void fill_gpval_float __PROTO((char *var, double value));
 void fill_gpval_complex __PROTO((char *var, double areal, double aimag));
+
+/* C-callable versions of internal gnuplot functions word() and words() */
+char * gp_word __PROTO((char *string, int i));
+int gp_words __PROTO((char *string));
 
 #endif /* GNUPLOT_EVAL_H */

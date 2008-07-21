@@ -1,3 +1,15 @@
+2008-07-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c src/eval.h (gp_word gp_words) C-callable versions of the
+	built-in functions word() and words().
+
+	* src/parse.c (check_for_iteration next_iteration) docs/gnuplot.doc:
+	Sanity check the name of the variable used for iteration.  New syntax 
+	allows iteration over the entries in a string:
+	    plot for [foo in "a b c d"] ...
+
+	* src/util.c (int_error): Allow somewhat longer error messages.
+
 2008-07-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_vectors) src/plot2d.c (get_data):

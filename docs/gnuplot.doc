@@ -1,4 +1,4 @@
-C ROS $Id: gnuplot.doc,v 1.519 2008/07/15 00:15:13 sfeam Exp $
+C ROS $Id: gnuplot.doc,v 1.520 2008/07/20 04:56:28 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4026,6 +4026,7 @@ Ffigure_mapcontours
        plot [t=1:10] [-pi:pi*2] tan(t), \
             "data.1" using (tan($2)):($3/$4) smooth csplines \
                      axes x1y2 notitle with lines 5
+       plot for [datafile in "spinach.dat broccoli.dat"] datafile
 
  See also `show plot`.
 3 axes
@@ -5249,12 +5250,13 @@ Ffigure_mapcontours
  convenient to do so by iterating over a shared plot command.
 
  Syntax:
-       plot for [<variable>=<start>:<end>{:<increment>}]
-       splot for [<variable>=<start>:<end>{:<increment>}]
+       plot for [<variable> = <start> : <end> {:<increment>}]
+       plot for [<variable> in "string of words"]
 
- Example:
+ Examples:
        file(n) = sprintf("dataset_%d.dat",n)
-       plot for [i=1:10] file(i) title sprintf("dataset %d",i)
+       splot for [i=1:10] file(i) title sprintf("dataset %d",i)
+       plot for [dataset in "apples bananas"] dataset."dat" title dataset
 
  This example defines a string-valued function that generates file names,
  and plots ten such files together. The iteration variable ('i' in this
@@ -5262,7 +5264,7 @@ Ffigure_mapcontours
  example it is used both to generate a file name and a corresponding title.
 
  Example:
-       list = "a b c foo baz"
+       list = "apple banana cabbage daikon eggplant"
        item(n) = word(list,n)
        plot for [i=1:words(list)] item[i].".dat" title item(i)
        list = "new stuff"
@@ -5271,6 +5273,16 @@ Ffigure_mapcontours
  This example steps through a list and plots once per item.
  Because the items are retrieved dynamically, you can change the list
  and then replot.
+
+ Example:
+       list = "apple banana cabbage daikon eggplant"
+       plot for [i in list] i.".dat" title i
+       list = "new stuff"
+       replot
+
+ This is example does exactly the same thing as the previous example, but uses
+ the string iterator form of the command rather than an integer iterator.
+
 
 3 title
 ?commands plot title

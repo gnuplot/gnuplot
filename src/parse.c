@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.53 2008/03/30 18:08:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.54 2008/04/06 17:23:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -58,6 +58,7 @@ static struct udvt_entry *iteration_udv = NULL;
 static int iteration_start = 0, iteration_end = 0;
 static int iteration_increment = 1;
 static int iteration_current = 0;
+static char *iteration_string = NULL;
 
 /* Internal prototypes: */
 
@@ -889,19 +890,26 @@ is_builtin_function(int t_num)
 void
 check_for_iteration()
 {
+    char *errormsg = "Expecting iterator \tfor [<var> = <start> : <end>]\n\t\t\tor\tfor [<var> in \"string of words\"]";
+
     iteration_udv = NULL;
+    free(iteration_string);
+    iteration_string = NULL;
     iteration_increment = 1;
-    if (equals(c_token, "for")) {
-	char *errormsg = "Expecting iterator of the form: for [<var> = <start> : <end>]";
+
+    if (!equals(c_token, "for"))
+	return;
+
+    c_token++;
+    if (!equals(c_token++, "[") || !isletter(c_token))
+	int_error(c_token-1, errormsg);
+    iteration_udv = add_udv(c_token++);
+
+    if (equals(c_token, "=")) {
 	c_token++;
-	if (!equals(c_token++, "["))
-	    int_error(c_token, errormsg);
-	iteration_udv = add_udv(c_token++);
-	if (!equals(c_token++, "="))
-	    int_error(c_token, errormsg);
 	iteration_start = int_expression();
 	if (!equals(c_token++, ":"))
-	    int_error(c_token, errormsg);
+	    int_error(c_token-1, errormsg);
 	iteration_end = int_expression();
 	if (equals(c_token,":")) {
 	    c_token++;
@@ -910,13 +918,32 @@ check_for_iteration()
 		iteration_increment = 1;
 	}
 	if (!equals(c_token++, "]"))
-	    int_error(c_token, errormsg);
+	    int_error(c_token-1, errormsg);
 	if (iteration_udv->udv_undef == FALSE)
 	    gpfree_string(&iteration_udv->udv_value);
 	Ginteger(&(iteration_udv->udv_value), iteration_start);
-	iteration_current = iteration_start;
 	iteration_udv->udv_undef = FALSE;
     }
+
+    else if (equals(c_token++, "in")) {
+	iteration_string = try_to_get_string();
+	if (!iteration_string)
+	    int_error(c_token-1, errormsg);
+	if (!equals(c_token++, "]"))
+	    int_error(c_token-1, errormsg);
+	iteration_start = 1;
+	iteration_end = gp_words(iteration_string);
+	if (iteration_udv->udv_undef == FALSE)
+	    gpfree_string(&iteration_udv->udv_value);
+	Gstring(&(iteration_udv->udv_value), gp_word(iteration_string, 1));
+	iteration_udv->udv_undef = FALSE;
+    }
+
+    else /* Neither [i=B:E] or [s in "foo"] */
+ 	int_error(c_token-1, errormsg);
+
+    iteration_current = iteration_start;
+
 }
 
 /* Set up next iteration.
@@ -928,7 +955,11 @@ next_iteration()
     if (!iteration_udv)
 	return FALSE;
     iteration_current += iteration_increment;
-    iteration_udv->udv_value.v.int_val = iteration_current;
+    if (iteration_string) {
+	free(iteration_udv->udv_value.v.string_val);
+	iteration_udv->udv_value.v.string_val = gp_word(iteration_string,iteration_current);
+    } else
+	iteration_udv->udv_value.v.int_val = iteration_current;
     return (iteration_current <= iteration_end);
 }
 
