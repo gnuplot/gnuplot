@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.233 2008/04/25 22:38:42 sfeam Exp $
+ * $Id: post.trm,v 1.234 2008/05/01 18:35:00 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1929,19 +1929,28 @@ PS_vector(unsigned int x, unsigned int y)
     if (!PS_relative_ok)
 	PS_move(PS_pen_x, PS_pen_y);
 
-    /* Ghostscript has a "pile-up of rounding errors" bug: a sequence of many
-     * rmove's or rlineto's does not yield the same line made by move's or
-     * lineto's.
-     * Therefore, we periodically force an update of the absolute position.
-     * There was a case when 400 rlineto's were too much, so let's go a little
-     * bit higher than the default function sampling rate in gnuplot. */
-    if (strlen(rel) < strlen(abso) && ps_path_count < 105) {
+    if (strlen(rel) < strlen(abso)) {
 	fputs(rel, gppsfile);
-	PS_taken++;
+	PS_taken++;		/* only used for debug info */
 	ps_path_count += 1;
     } else {
 	fputs(abso, gppsfile);
 	ps_path_count = 1;  /* If we set it to zero, it may never get flushed */
+    }
+    /* Ghostscript has a "pile-up of rounding errors" bug: a sequence of many
+     * rmove's or rlineto's does not yield the same line as move's or lineto's.
+     * Therefore, we periodically force an update of the absolute position.
+     * There was a case when 400 rlineto's were too much, so let's go a little
+     * bit higher than the default function sampling rate in gnuplot.
+     * This runs into a second ghostscript bug, that mixing relative and absolute
+     * lineto with no intervening 'stroke' is ridiculously slow to render.
+     * So we stroke the partial line, update the position in absolute terms,
+     * then continue.  This whole section can go away if ghostscript/gv is fixed.
+     */
+#define MAX_REL_PATHLEN 105
+    if (ps_path_count >= MAX_REL_PATHLEN) {
+	fprintf(gppsfile, "stroke %d %d M\n", x, y);
+	ps_path_count = 1;
     }
 
     PS_relative_ok = TRUE;
@@ -2838,7 +2847,7 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	fprintf(gppsfile, "%i %i N", corners[0].x, corners[0].y);
 	for (i = 1; i < points; i++) {
 	    /* The rationale for mixing V and L is given in PS_vector */
-	    if (i % 105)
+	    if (i % MAX_REL_PATHLEN)
 		fprintf(gppsfile, " %i %i V", corners[i].x-corners[i-1].x,
 		    corners[i].y-corners[i-1].y);
 	    else
@@ -2879,6 +2888,8 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 
     PS_relative_ok = FALSE;
 }
+
+#undef MAX_REL_PATHLEN
 
 TERM_PUBLIC void PS_previous_palette()
 {

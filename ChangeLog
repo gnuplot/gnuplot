@@ -10,6 +10,12 @@
 
 	* src/util.c (int_error): Allow somewhat longer error messages.
 
+	* term/post.trm (PS_vector): Work around a bug in ghostscript/gv.
+	If there is a long string of mixed relative/absolute lines without a
+	stroke command, ghostscript renders it veeeery slowly.  We already 
+	limit the number of relative moves in a row; this patch adds a "stroke".
+	Bug #2021942
+
 2008-07-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_vectors) src/plot2d.c (get_data):
