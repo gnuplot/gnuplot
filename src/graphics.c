@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.30 2008/07/16 20:05:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.31 2008/07/18 17:18:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3679,6 +3679,11 @@ plot_vectors(struct curve_points *plot)
 
 	if (points[0].type == UNDEFINED)
 	    continue;
+
+	/* variable color read from extra data column. Most styles */
+	/* have this stored in yhigh, but VECTOR stuffed it into z */
+	points[0].yhigh = points[0].z;
+	check_for_variable_color(plot, &points[0]);
 
 	if (inrange(points[1].x, X_AXIS.min, X_AXIS.max)
 	    && inrange(points[1].y, Y_AXIS.min, Y_AXIS.max)) {

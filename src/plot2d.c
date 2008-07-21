@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.9 2008/07/16 05:11:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.10 2008/07/18 17:18:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -345,8 +345,9 @@ get_data(struct curve_points *current_plot)
 	    df_axis[2] = df_axis[3] = df_axis[1];
         break;
 
-    case VECTOR:
-        min_cols = max_cols = 4;
+    case VECTOR:	/* x, y, dx, dy, variable_color */
+	min_cols = 4;
+	max_cols = 5;
         break;
 
     case XERRORLINES:
@@ -460,10 +461,13 @@ get_data(struct curve_points *current_plot)
 
 	/* Allow for optional columns.  Currently only used for BOXES, but */
 	/* should be extended to a more general mechanism.                 */
-	if (j > 1 && variable_color && current_plot->plot_style == BOXES) {
+	variable_color_value = 0;
+	if (variable_color) {
+	    int style = current_plot->plot_style;
+	    if ((style == BOXES  && j >= 3)
+	    ||  (style == VECTOR && j >= 5))
 		variable_color_value = v[--j];
-	} else
-		variable_color_value = 0;
+	}
 
         switch (j) {
         default:
@@ -734,7 +738,7 @@ get_data(struct curve_points *current_plot)
             case VECTOR:
                 /* x,y,dx,dy */
                 store2d_point(current_plot, i++, v[0], v[1], v[0], v[0] + v[2],
-                              v[1], v[1] + v[3], -1.0);
+			      v[1], v[1] + v[3], variable_color_value);
                 break;
 
             case POINTSTYLE: /* x, y, variable point size and variable color */

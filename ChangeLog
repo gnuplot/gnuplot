@@ -6,6 +6,9 @@
 	limit the number of relative moves in a row; this patch adds a "stroke".
 	Bug #2021942
 
+	* src/graphics.c (plot_vectors) src/plot2d.c (get_data):
+	Allow 2D vector plots to draw color from an extra data column.
+
 2008-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (check_for_variable_color):  Consolidate all the checks
