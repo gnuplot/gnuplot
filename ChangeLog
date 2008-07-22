@@ -1,3 +1,9 @@
+2008-07-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (boundary3d): Add missing initialization of the clipping
+	boundaries. Clip 3D plots to the canvas unless the terminal flags that
+	it will do its own clipping.
+
 2008-07-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/eval.h (gp_word gp_words) C-callable versions of the

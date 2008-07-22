@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.202 2008/07/16 19:44:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.203 2008/07/19 18:12:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -471,6 +471,14 @@ boundary3d(struct surface_points *plots, int count)
 		xscaler = yscaler / required;
 	}
     }
+
+    /* Set default clipping */
+    if (splot_map)
+	clip_area = &plot_bounds;
+    else if (term->flags & TERM_CAN_CLIP)
+	clip_area = NULL;
+    else
+	clip_area = &canvas;
 }
 
 static TBOOLEAN
