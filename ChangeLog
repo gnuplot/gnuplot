@@ -8,6 +8,10 @@
 	Add an example image plot to the pdf docs, modify the interlocking tori
 	idemo in hidden2d to show with/without depth sorting side-by-side.
 
+	* src/mouse.c (event_buttonpress): Zooming uses mouse button 3.
+	Do not disable it just because we are using buttons 1 or 2 for something
+	else.
+
 2008-07-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/eval.h (gp_word gp_words) C-callable versions of the
