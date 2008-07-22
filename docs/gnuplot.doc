@@ -2795,6 +2795,7 @@ Ffigure_histcols
  assumed to form a uniformly sized parallelogram.  The paralleogram is painted
  using the color of the corresponding pixel in the input image.
  
+Ffigure_rgb3D.pdf
  Each pixel (data point) of the input 2D image will become a rectangle or
  parallelipiped in the plot. The coordinates of each data point will determine
  the center of the parallelipiped.  That is, an M x N set of data will form an

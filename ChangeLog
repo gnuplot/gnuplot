@@ -4,6 +4,10 @@
 	boundaries. Clip 3D plots to the canvas unless the terminal flags that
 	it will do its own clipping.
 
+	* docs/plotstyles.gnu docs/gnuplot.doc demo/hidden2.dem:
+	Add an example image plot to the pdf docs, modify the interlocking tori
+	idemo in hidden2d to show with/without depth sorting side-by-side.
+
 2008-07-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/eval.h (gp_word gp_words) C-callable versions of the

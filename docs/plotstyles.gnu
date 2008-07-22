@@ -228,6 +228,22 @@ set title "projected contours using 'set view map'" offset 0,-1
 set output 'figure_mapcontours.pdf'
 splot sin(x) * cos(y)
 
+reset
+set output "figure_rgb3D.pdf"
+set title "RGB image mapped onto a plane in 3D" offset 0,1
+set xrange [ -10 : 137 ]
+set yrange [ -10 : 137 ]
+set zrange [  -1 :   1 ]
+set xyplane at -1
+set bmargin at screen 0.25
+set xtics offset 0,0 font "Times,5"
+set ytics offset 0,0 font "Times,5"
+set view 45, 25, 1.0, 1.35
+set grid
+unset key
+set format z "%.1f"
+splot '../demo/blutux.rgb' binary array=128x128 flip=y format='%uchar%uchar%uchar' with rgbimage
+
 #
 #
 # Demonstrates how to pull font size from a data file column
