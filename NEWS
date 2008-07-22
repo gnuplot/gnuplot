@@ -4,6 +4,7 @@ New features, changes and fixes since previous release
 * NEW "nocontours" keyword for splot
 * NEW "undefine foo" clears previously defined user variable foo
 * NEW allow contouring of pm3d surfaces
+* NEW allow color by z value ("palette z") in 2D plots
 * CHANGE try harder to autotitle columns in using specs with expressions
 * CHANGE gd.trm: use dynamically-allocated TTF font names
 * CHANGE x11: more finely sampled color palette for PM3D
@@ -12,7 +13,7 @@ New features, changes and fixes since previous release
 * CHANGE stacked histograms grow upward for values > 0, downward for values < 0
 * FIX Do not re-quantize time tics interval explicitly set by user
 * FIX (gd post) don't segfault on very long font names
-* FIX allow variable color from input file for "with boxes"
+* FIX allow variable color from input file for "with boxes", "with vectors"
 * FIX don't run off the end of "set format" commands
 * FIX Fix discontinuity in piecewise approximation of inverse error function
 * FIX discard out of range vectors in the bitmap terminals (pbm, epson, etc)
