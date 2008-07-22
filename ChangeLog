@@ -1,3 +1,9 @@
+2008-07-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (event_buttonpress): Zooming uses mouse button 3.
+	Do not disable it just because we are using buttons 1 or 2 for something
+	else.
+
 2008-07-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_vector): Work around a bug in ghostscript/gv.
