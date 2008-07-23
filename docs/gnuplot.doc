@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.33 2008/07/16 05:11:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.34 2008/07/18 17:18:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3123,14 +3123,15 @@ C ... and restart the table:
 
  If one or more end conditions are given after `pause mouse`, then any one of
  the conditions will terminate the pause. The possible end conditions are
- `keypress`, `button1`, `button2`, `button3`, and `any`.
+ `keypress`, `button1`, `button2`, `button3`, `close`, and `any`.
  If the pause terminates on a keypress, then the ascii value of the key pressed
  is returned in MOUSE_KEY.  The character itself is returned as a one character
- string in MOUSE_CHAR.
+ string in MOUSE_CHAR. Hotkeys (bind command) are disabled if keypress is one of
+ the end conditions.  Zooming is disabled if button3 is one of the end 
+ conditions. 
 
  In all cases the coordinates of the mouse are returned in variables MOUSE_X,
- MOUSE_Y, MOUSE_X2, MOUSE_Y2.
- See `mouse variables`.
+ MOUSE_Y, MOUSE_X2, MOUSE_Y2.  See `mouse variables`.
 
  Note: Since `pause` communicates with the operating system rather than the
  graphics, it may behave differently with different device drivers (depending

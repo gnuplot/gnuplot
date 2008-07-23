@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.85.2.3 2008/06/02 19:40:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.85.2.4 2008/07/22 20:18:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1837,9 +1837,10 @@ event_reset(struct gp_event_t *ge)
 	/* remove pause message box after 'pause mouse' */
 	kill_pending_Pause_dialog();
 #endif
-	/* This hack is necessary for X11 in order to prevent one character */
-	/* of input from being swallowed when the plot window is closed.    */
-	if (term && !strncmp("x11",term->name,3))
+	/* This hack is necessary on some systems in order to prevent one  */
+	/* character of input from being swallowed when the plot window is */
+	/* closed. But which systems, exactly?                             */
+	if (term && (!strncmp("x11",term->name,3) || !strncmp("wxt",term->name,3)))
 	    ungetc('\n',stdin);
     }
 }
