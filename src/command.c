@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.172 2008/04/15 05:01:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.173 2008/06/03 01:26:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1069,6 +1069,9 @@ pause_command()
 		    c_token++;
 		} else if (equals(c_token,"button3")) {
 		    end_condition |= PAUSE_BUTTON3;
+		    c_token++;
+		} else if (equals(c_token,"close")) {
+		    end_condition |= PAUSE_WINCLOSE;
 		    c_token++;
 		} else
 		    break;

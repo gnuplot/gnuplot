@@ -1,3 +1,12 @@
+2008-07-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c src/command.c (pause_command) src/command.h:
+	New variant 'pause mouse close' will pause until the plot window is
+	closed. Unlike existing variants, this does not disable mouse-clicks,
+	hotkeys, or zooming.  Add wxt to the list of terminals that need a
+	work-around to avoid losing an input character when the plot window
+	is closed.
+
 2008-07-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (boundary3d): Add missing initialization of the clipping

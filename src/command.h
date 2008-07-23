@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.44 2008/04/01 19:37:01 sfeam Exp $
+ * $Id: command.h,v 1.45 2008/06/01 04:30:57 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -70,6 +70,7 @@ extern int paused_for_mouse;	/* Flag the end condition we are paused until */
 #define PAUSE_BUTTON3   004		/* Mouse button 3 */
 #define PAUSE_CLICK	007		/* Any button click */
 #define PAUSE_KEYSTROKE 010		/* Any keystroke */
+#define PAUSE_WINCLOSE	020		/* Window close event */
 #define PAUSE_ANY       077		/* Terminate on any of the above */
 #endif
 
