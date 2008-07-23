@@ -1,3 +1,7 @@
+2008-07-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc: Fix various typos and cross-reference formats.
+
 2008-07-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c src/command.c (pause_command) src/command.h:

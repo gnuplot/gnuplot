@@ -489,15 +489,6 @@ New:
 
 @end example
 
-Another compatibility issue is the effect of the command @ref{size} outside
-when not in multiplot mode.  In earlier versions, the command
-`set size <xx>, <yy>` caused some terminals to change both the size of the plot
-and the size of the canvas is was drawn on; other terminals changed only the
-plot size.  The use of @ref{size} to change the canvas size is now deprecated.
-
-Please see @ref{size}, @ref{size} and also the documentation for
-individual terminals.
-
 
 @node Batch/Interactive_Operation, Command-line-editing, Backwards_compatibility, gnuplot
 @section Batch/Interactive Operation
@@ -586,25 +577,6 @@ readline library has its own documentation.
 @end example
 
 
-On the IBM PC, the use of a TSR program such as DOSEDIT or CED may be desired
-for line editing.  The default makefile assumes that this is the case;  by
-default `gnuplot` will be compiled with no line-editing capability.  If you
-want to use `gnuplot`'s line editing, set READLINE in the makefile and add
-readline.obj to the link file.  The following arrow keys may be used on the
-IBM PC versions if readline is used:
-
-
-@example
-      Left  Arrow      - same as ^B.
-      Right Arrow      - same as ^F.
-      Ctrl Left  Arrow - same as ^A.
-      Ctrl Right Arrow - same as ^E.
-      Up    Arrow      - same as ^P.
-      Down  Arrow      - same as ^N.
-
-@end example
-
-
 @node Comments, Coordinates, Command-line-editing, gnuplot
 @section Comments
 
@@ -616,7 +588,8 @@ inside quotes, inside numbers (including complex numbers), inside command
 substitutions, etc.  In short, it works anywhere it makes sense to work.
 
 See also `set datafile commentschars` for specifying comment characters in
-data files.
+data files.  Note that if a comment line ends in '\' then the subsequent
+line is also treated as a comment.
 
 @node Coordinates, Datastrings, Comments, gnuplot
 @section Coordinates
@@ -826,8 +799,7 @@ used.  This overrides any terminal type sensed by `gnuplot` on start-up, but
 is itself overridden by the .gnuplot (or equivalent) start-up file
 (see `start-up`) and, of course, by later explicit changes.
 
-On Unix, AmigaOS, MS-DOS and OS/2, GNUHELP may be defined to be the
-pathname of the HELP file (gnuplot.gih).
+GNUHELP may be defined to be the pathname of the HELP file (gnuplot.gih).
 
 On VMS, the logical name GNUPLOT$HELP should be defined as the name of the
 help library for `gnuplot`.  The `gnuplot` help can be put inside any system
@@ -844,16 +816,6 @@ On Unix, PAGER is used as an output filter for help messages.
 
 On Unix and AmigaOS, SHELL is used for the @ref{shell} command.  On
 MS-DOS and OS/2, COMSPEC is used for the @ref{shell} command.
-
-On MS-DOS, if the BGI or Watcom interface is used, PCTRM is used to tell
-the maximum resolution supported by your monitor by setting it to
-S<max. horizontal resolution>. E.g. if your monitor's maximum resolution is
-800x600, then use:
-@example
-      set PCTRM=S800
-@end example
-
-If PCTRM is not set, standard VGA is used.
 
 FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
 fit is interrupted---see @ref{fit}.  FIT_LOG specifies the default filename of the
@@ -2097,7 +2059,7 @@ the datum in column 1, but only if the datum in column 4 is non-negative:
 
 @end example
 
-Please see @ref{using} for an explanation of the @ref{using} syntax.
+For an explanation of the @ref{using} syntax, please see @ref{using}.
 
 
 @node Gnuplot-defined_variables, User-defined_variables_and_functions, Operators, Expressions
@@ -2228,8 +2190,9 @@ evolved over time, certain command and keyword names have been adopted that
 preclude such perfection.  This section contains explanations of the way
 some of these terms are used.
 
-A "page" or "screen" is the entire area addressable by `gnuplot`.  On a
-monitor, it is the full screen; on a plotter, it is a single sheet of paper.
+A "page" or "screen" or "canvas" is the entire area addressable by `gnuplot`.
+On a desktop it is a full window; on a plotter, it is a single sheet of paper;
+in svga mode it is the full monitor screen.
 
 A screen may contain one or more "plots".  A plot is defined by an abscissa
 and an ordinate, although these need not actually appear on it, as well as
@@ -3362,10 +3325,7 @@ box-and-whisker plot requires additional plot commands as in this example:
 
 @end example
 
-@example
- See @ref{boxwidth}, @ref{bars} and `set style fill`.
-
-@end example
+See @ref{boxwidth}, @ref{bars} and `set style fill`.
 
 @node circles, dots, candlesticks, plotting_styles
 @section circles
@@ -5302,14 +5262,15 @@ is not active, `pause mouse` is equivalent to `pause -1`.
 
 If one or more end conditions are given after `pause mouse`, then any one of
 the conditions will terminate the pause. The possible end conditions are
-`keypress`, `button1`, `button2`, `button3`, and `any`.
+`keypress`, `button1`, `button2`, `button3`, `close`, and `any`.
 If the pause terminates on a keypress, then the ascii value of the key pressed
 is returned in MOUSE_KEY.  The character itself is returned as a one character
-string in MOUSE_CHAR.
+string in MOUSE_CHAR. Hotkeys (bind command) are disabled if keypress is one of
+the end conditions.  Zooming is disabled if button3 is one of the end 
+conditions. 
 
 In all cases the coordinates of the mouse are returned in variables MOUSE_X,
-MOUSE_Y, MOUSE_X2, MOUSE_Y2.
-See @ref{variables}.
+MOUSE_Y, MOUSE_X2, MOUSE_Y2.  See @ref{variables}.
 
 Note: Since @ref{pause} communicates with the operating system rather than the
 graphics, it may behave differently with different device drivers (depending
@@ -7362,14 +7323,9 @@ parameter, only the associated plot window will be raised if it exists.
 The optional parameter is ignored for single plot-windows terminal, i.e. `pm`
 and `win`.
 
-@example
- If the window is not raised under X11, then (1) they don't run in the same
- X11 session (telnet or ssh session, for example), or (2) raising is blocked
- by your window manager. On KDE, you may like to go to the KDE Control Center
- => Desktop => Window Behaviour => Advanced and set the "Focus stealing
- prevention level" to None (default is Low).
-
-@end example
+If the window is not raised under X11, then perhaps the plot window is
+running in a different X11 session (telnet or ssh session, for example), or
+perhaps raising is blocked by your window manager policy setting.
 
 @node refresh, replot, raise, Commands
 @section refresh
@@ -10743,7 +10699,7 @@ The default is `nolabels`, which makes Button 2 draw only a temporary label at
 the mouse position. Labels are drawn with the current setting of `mouseformat`.
 The `labeloptions` string is passed to the `set label` command.  The default is
 "point pointstyle 1" which will plot a small plus at the label position.
-Temporary labels will disappear at the nex @ref{replot} or mouse zoom operation.
+Temporary labels will disappear at the next @ref{replot} or mouse zoom operation.
 Persistent labels can be removed by holding the Ctrl-Key down while clicking
 Button 2 on the label's point. The threshold for how close you must be to the
 label is also determined by the @ref{pointsize}.
@@ -11773,10 +11729,7 @@ mainly for external programs using the same rgbformulae definition of palettes
 as gnuplot, like zimg (
 @uref{http://zimg.sourceforge.net,http://zimg.sourceforge.net
 }
-@example
- ).
-
-@end example
+).
 
 `set palette gray` switches to a gray only palette. @ref{rgbformulae},
 @ref{defined}, @ref{file} and @ref{functions} switch
@@ -12205,8 +12158,8 @@ While in polar coordinates the meaning of an expression in t is really
 r = f(t), where t is an angle of rotation.  The trange controls the domain
 (the angle) of the function, and the x and y ranges control the range of the
 graph in the x and y directions.  Each of these ranges, as well as the
-rrange, may be autoscaled or set explicitly.  See @ref{xrange} for details
-of all the @ref{ranges} commands.
+rrange, may be autoscaled or set explicitly.  Ffor details of all the @ref{ranges}
+commands, see @ref{xrange}.
 
 Example:
 @example
@@ -12377,7 +12330,7 @@ of the terminal, but do not return <xscale> or <yscale> to their default
 values (1.0).
 
 `ratio` and `square` have no effect on 3D plots, but do affect 3D projections
-created using "set view map".
+created using `set view map`.
 
 Examples:
 
@@ -12536,10 +12489,7 @@ To draw an arrow without an arrow head and double width, use:
 
 @end example
 
-@example
- See also @ref{arrow} for further examples.
-
-@end example
+See also @ref{arrow} for further examples.
 
 
 @node set_style_data, set_style_fill, set_style_arrow, style

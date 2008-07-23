@@ -1,4 +1,4 @@
-C ROS $Id: gnuplot.doc,v 1.523 2008/07/22 19:35:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.524 2008/07/23 19:27:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1522,7 +1522,7 @@ C ... and restart the table:
 
        plot 'file' using 1:( $4<0 ? 1/0 : ($2+$3)/2 )
 
- Please see `plot datafile using` for an explanation of the `using` syntax.
+ For an explanation of the `using` syntax, please see `plot datafile using`.
 
 3 Gnuplot-defined variables
 ?gnuplot-defined variables
@@ -2448,7 +2448,7 @@ Ffigure_candlesticks
    # Plot with crossbars on the whiskers, crossbars are 50% of full width
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
 
-  See `set boxwidth`, `set bars` and `set style fill`.
+ See `set boxwidth`, `set bars` and `set style fill`.
 2 circles
 ?commands set style circles
 ?set style circles
@@ -5470,11 +5470,9 @@ Ffigure_mapcontours
  The optional parameter is ignored for single plot-windows terminal, i.e. `pm`
  and `win`.
 
-  If the window is not raised under X11, then (1) they don't run in the same
-  X11 session (telnet or ssh session, for example), or (2) raising is blocked
-  by your window manager. On KDE, you may like to go to the KDE Control Center
-  => Desktop => Window Behaviour => Advanced and set the "Focus stealing
-  prevention level" to None (default is Low).
+ If the window is not raised under X11, then perhaps the plot window is
+ running in a different X11 session (telnet or ssh session, for example), or
+ perhaps raising is blocked by your window manager policy setting.
 2 refresh
 ?commands refresh
 ?refresh
@@ -8067,7 +8065,7 @@ Ffigure_mapcontours
  the mouse position. Labels are drawn with the current setting of `mouseformat`.
  The `labeloptions` string is passed to the `set label` command.  The default is
  "point pointstyle 1" which will plot a small plus at the label position.
- Temporary labels will disappear at the nex `replot` or mouse zoom operation.
+ Temporary labels will disappear at the next `replot` or mouse zoom operation.
  Persistent labels can be removed by holding the Ctrl-Key down while clicking
  Button 2 on the label's point. The threshold for how close you must be to the
  label is also determined by the `pointsize`.
@@ -8889,7 +8887,7 @@ Ffigure_mapcontours
 ^ <a href="http://zimg.sourceforge.net">
            http://zimg.sourceforge.net
 ^ </a>
-  ).
+ ).
 
  `set palette gray` switches to a gray only palette. `set palette rgbformulae`,
  `set palette defined`, `set palette file` and `set palette functions` switch
@@ -9203,8 +9201,8 @@ Ffigure_mapcontours
  r = f(t), where t is an angle of rotation.  The trange controls the domain
  (the angle) of the function, and the x and y ranges control the range of the
  graph in the x and y directions.  Each of these ranges, as well as the
- rrange, may be autoscaled or set explicitly.  See `set xrange` for details
- of all the `ranges` commands.
+ rrange, may be autoscaled or set explicitly.  Ffor details of all the `ranges`
+ commands, see `set xrange`.
 
  Example:
        set polar
@@ -9335,7 +9333,7 @@ Ffigure_mapcontours
  values (1.0).
 
  `ratio` and `square` have no effect on 3D plots, but do affect 3D projections
- created using "set view map".
+ created using `set view map`.
 
  Examples:
 
@@ -9350,7 +9348,7 @@ Ffigure_mapcontours
 
  See also
 ^ <a href="http://www.gnuplot.info/demo/airfoil.html">
-  airfoil demo.
+ airfoil demo.
 ^ </a>
 3 style
 ?set style
@@ -9457,7 +9455,7 @@ Ffigure_mapcontours
        set style arrow 1 nohead lw 2
        set arrow arrowstyle 1
 
-  See also `set arrow` for further examples.
+ See also `set arrow` for further examples.
 
 4 set style data
 ?commands set style data
