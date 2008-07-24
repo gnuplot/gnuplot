@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.28 2008/06/12 18:07:24 sfeam Exp $
+ * $Id: datafile.h,v 1.29 2008/06/14 22:43:49 broeker Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -159,6 +159,7 @@ typedef enum df_endianess_type {
 typedef enum df_data_type {
     DF_CHAR, DF_UCHAR, DF_SHORT, DF_USHORT, DF_INT,
     DF_UINT, DF_LONG,  DF_ULONG, DF_FLOAT,  DF_DOUBLE,
+    DF_LONGLONG, DF_ULONGLONG,
     DF_BAD_TYPE
 } df_data_type;
 #define DF_DEFAULT_TYPE DF_FLOAT
@@ -168,13 +169,15 @@ typedef enum df_data_type {
  * appropriately sized variable from a data file.
  */ 
 #define SIGNED_TEST(val) ((val)==sizeof(long) ? DF_LONG : \
+			 ((val)==sizeof(long long) ? DF_LONGLONG : \
 			 ((val)==sizeof(int) ? DF_INT : \
 			 ((val)==sizeof(short) ? DF_SHORT : \
-			 ((val)==sizeof(char) ? DF_CHAR : DF_BAD_TYPE))))
+			 ((val)==sizeof(char) ? DF_CHAR : DF_BAD_TYPE)))))
 #define UNSIGNED_TEST(val) ((val)==sizeof(unsigned long) ? DF_ULONG : \
+			   ((val)==sizeof(unsigned long long) ? DF_ULONGLONG : \
 			   ((val)==sizeof(unsigned int) ? DF_UINT : \
 			   ((val)==sizeof(unsigned short) ? DF_USHORT : \
-			   ((val)==sizeof(unsigned char) ? DF_UCHAR : DF_BAD_TYPE))))
+			   ((val)==sizeof(unsigned char) ? DF_UCHAR : DF_BAD_TYPE)))))
 #define FLOAT_TEST(val) ((val)==sizeof(float) ? DF_FLOAT : \
 			((val)==sizeof(double) ? DF_DOUBLE : DF_BAD_TYPE))
 

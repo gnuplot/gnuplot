@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.158 2008/06/02 00:48:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.159 2008/06/12 18:07:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4250,6 +4250,8 @@ df_readbinary(double v[], int max)
 	    unsigned int ui;
 	    long lo;
 	    unsigned long ul;
+	    long long llo;
+	    unsigned long long ull;
 	    float fl;
 	    double db;
 	} io_val;
@@ -4341,6 +4343,12 @@ df_readbinary(double v[], int max)
 		    break;
 		case DF_ULONG:
 		    df_column[i].datum = io_val.ul;
+		    break;
+		case DF_LONGLONG:
+		    df_column[i].datum = io_val.llo;
+		    break;
+		case DF_ULONGLONG:
+		    df_column[i].datum = io_val.ull;
 		    break;
 		case DF_FLOAT:
 		    df_column[i].datum = io_val.fl;
