@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.15 2008/04/08 19:00:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.16 2008/04/27 18:04:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1590,8 +1590,8 @@ void plot_ticlabel_using(int axis)
 	use_spec[df_no_use_specs+df_no_tic_specs].at = NULL;
     } else {
 	use_spec[df_no_use_specs+df_no_tic_specs].at = perm_at();
-	/* FIXME: Does it make any difference what we put here? */
-	col = 1;
+	fast_columns = 0;	/* Force all columns to be evaluated */
+	col = 1;		/* Redundant because of the above */
     }
 #else
     col = (int) real(const_express(&a));
