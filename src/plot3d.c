@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.163 2008/07/09 16:39:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.164 2008/07/19 18:12:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -643,9 +643,17 @@ grid_nongrid_data(struct surface_points *this_plot)
 	    points->x = x;
 	    points->y = y;
 
-	    if( dgrid3d_mode != DGRID3D_SPLINES ) { 
+	    /* Honor requested x and y limits */
+	    /* FIXME: This code section was not in 4.2.  It imperfectly    */
+	    /* restores the clipping behaviour of version 3.7 and earlier. */
+	    if ((x < axis_array[x_axis].min && !(axis_array[x_axis].autoscale & AUTOSCALE_MIN))
+	    ||  (x > axis_array[x_axis].max && !(axis_array[x_axis].autoscale & AUTOSCALE_MAX))
+	    ||  (y < axis_array[y_axis].min && !(axis_array[y_axis].autoscale & AUTOSCALE_MIN))
+	    ||  (y > axis_array[y_axis].max && !(axis_array[y_axis].autoscale & AUTOSCALE_MAX)))
+		points->type = OUTRANGE;
+
+	    if (dgrid3d_mode != DGRID3D_SPLINES)
                 z = z / w;
-	    } 
             
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, 
 					    points->type, z_axis,
