@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.524 2008/07/23 19:27:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.525 2008/07/23 20:19:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4960,6 +4960,7 @@ Ffigure_mapcontours
  The entry in the first row of columns 2 and 3 will be ignored.
 
 5 xticlabels
+?xticlabels
 ?using xticlabels
 ?plot using xticlabels
  A column of the input data file can be used to label axis tic marks.
@@ -10516,7 +10517,7 @@ Ffigure_mapcontours
                   | <incr>
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
-                 { formt "formatstring" } { font "name{,<size>}" }
+                 { format "formatstring" } { font "name{,<size>}" }
                  { textcolor <colorspec> }
        unset xtics
        show xtics

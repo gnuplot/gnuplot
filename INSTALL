@@ -151,7 +151,7 @@ to change.  A complete list of options is available through
 
 $ ./configure --help
 
-   The options relevant to gnuplot are listed below:
+   Some options relevant to gnuplot are listed below:
 
   --prefix=PREFIX         Install architecture-independent files in PREFIX
                           [/usr/local]
@@ -167,51 +167,25 @@ $ ./configure --help
   --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --mandir=DIR            Man documentation in DIR [PREFIX/man]
+
   --disable-history-file  do not use history file
   --disable-mouse         disable mouse for interactive terminals
+  --disable-with-image    disable image support
   --disable-x11-mbfonts   disable multi-byte font support for x11
-  --disable-binary-data-file          disable binary_data_file
-  --disable-with-image          disable image support
-  --disable-binary-x11-polygon        disable binary_x11_polygon
+  --disable-binary-x11-polygon  disable binary_x11_polygon
+  --disable-x11-external  disable drawing to windows belonging to external apps
   --enable-thin-splines   enable thin plate splines
-  --disable-datastrings   disable reading strings from datafiles
-  --disable-histograms    disable histograms plot style
+  --disable-volatile-data disable zooming of volatile data
+  --disable-raise-console spacebar in plot window does not raise console
   --disable-objects       disable rectangles and other objects
-  --disable-stringvariables   disable string variables
   --disable-macros        disable command line macros
   --enable-mgr            enable MGR terminal
-  --disable-fiterrvars    enable fitting error variables
+  --disable-fiterrvars    disable fitting error variables
   --enable-rgip           enable Redwood Graphics Interface Protocol
-  --disable-h3d-quadtree   disable quadtree optimization in hidden3d code
+  --disable-h3d-quadtree  disable quadtree optimization in hidden3d code
   --enable-h3d-gridbox    enable gridbox optimization in hidden3d code
-  --disable-wxwidgets      wxWidgets terminal (default enabled)
-  --with-kpsexpand        search for kpsexpand at run-time
-  --with-x (*)            use the X Window System
-  --with-lasergnu         install lasergnu printer script
-  --with-gihdir=DIR       location of .gih file
-                          (default PREFIX/share/PACKAGE/VERSION)
-  --with-linux-vga        use the Linux SVGA console driver
-                          (requires /usr/lib/libvga)
-  --with-ggi=DIR          enable the ggi driver (EXPERIMENTAL)
-  --with-xmi=DIR          ggi's xmi support for pm3d (EXPERIMENTAL)
-  --with-readline (*)     use the builtin minimal readline function (default)
-  --without-readline      do not use the builtin readline function
-  --with-readline=gnu     use the GNU readline library (4.2 or newer required)
-  --with-readline=DIR     Specify the location of GNU readline
-  --with-plot=DIR       use the Unix plot library
-  --with-gd=DIR (*)     where to find Tom Boutell's gd library
-  --with-pdf=DIR (*)      enable pdf terminal
-                          (requires PDFLib)
-  --with-cwdrc            check current directory for .gnuplot file,
-                          normally disabled for security reasons
-  --without-lisp-files    do not build emacs lisp files
-  --with-row-help         format help and subtopic tables by row (default)
-  --without-row-help (*)  format help and subtopic tables by column
-  --without-tutorial      do not build LaTeX tutorial
-  --with-wx-config=PATH   Use the given path to wx-config, the wxWidgets configuration program
-    (default search in $PATH)
-  --without-cairopdf (*)  cairopdf terminal
-
+  --disable-wxwidgets     wxWidgets terminal (default enabled)
+  --enable-backwards-compatibility       enable deprecated syntax
 
 Options marked with (*) are enabled by default, ie. these features or
 packages are used if configure detects them even if the corresponding
@@ -285,18 +259,6 @@ Using SAS/C 6.1 or later versions
       libraries and the sources are all compiled using the same
       settings for CPU and MATH.
 Using gcc: see Unix
-
-Atari/TOS
----------
-
-Using gcc 2.x as unix cross- or native compiler
-	make -f makefile.st
-(Edit top of makefile.st for name of crosscompiler or choose native setting)
-Using PureC
-	use gnuplot.prj
-Using TurboC
-	use gnuplot.prj
-(Edit gnuplot.prj according to notes at the beginning)
 
 MS-Windows
 ----------
