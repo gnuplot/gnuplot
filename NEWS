@@ -21,6 +21,7 @@ New features, changes and fixes since previous release
 * FIX discard out of range vectors in the bitmap terminals (pbm, epson, etc)
 * FIX 2nd colour in the colour box for negative palette in postscript
 * FIX insure palette is initialized before any objects are drawn
+* FIX wxt terminal was not obeying "set palette maxcolors"
 
 New features, changes and fixes in gnuplot version 4.2.3
 ===========================================================
