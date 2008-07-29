@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.65 2008/06/02 00:48:11 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.66 2008/06/15 17:47:04 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2027,7 +2027,7 @@ void wxt_set_color(t_colorspec *colorspec)
 		wxt_linetype(colorspec->lt);
 		return;
 	} else if (colorspec->type == TC_FRAC)
-		rgb1_from_gray( colorspec->value, &rgb1 );
+		rgb1maxcolors_from_gray( colorspec->value, &rgb1 );
 	else if (colorspec->type == TC_RGB) {
 		rgb1.r = (double) ((colorspec->lt >> 16) & 0xff)/255;
 		rgb1.g = (double) ((colorspec->lt >> 8) & 0xff)/255;

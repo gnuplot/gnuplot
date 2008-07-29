@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.20 2008/06/02 00:48:11 sfeam Exp $
+ * $Id: cairo.trm,v 1.21 2008/06/02 03:46:59 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -687,10 +687,10 @@ void cairotrm_set_color(t_colorspec *colorspec)
 	} else if (colorspec->type == TC_FRAC && cairotrm_mono) {
 		int save_colorMode = sm_palette.colorMode;
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRAY;
-		rgb1_from_gray( colorspec->value, &rgb1 );
+		rgb1maxcolors_from_gray( colorspec->value, &rgb1 );
 		sm_palette.colorMode = save_colorMode;
 	} else if (colorspec->type == TC_FRAC) {
-		rgb1_from_gray( colorspec->value, &rgb1 );
+		rgb1maxcolors_from_gray( colorspec->value, &rgb1 );
 	} else if (colorspec->type == TC_RGB) {
 		rgb1.r = (double) ((colorspec->lt >> 16) & 0xff)/255;
 		rgb1.g = (double) ((colorspec->lt >> 8) & 0xff)/255;
