@@ -6,13 +6,6 @@ New features, changes and fixes since previous release
 * NEW allow contouring of pm3d surfaces
 * NEW allow color by z value ("palette z") in 2D plots
 * NEW "pause mouse close" waits until the plot window is closed
-* CHANGE try harder to autotitle columns in using specs with expressions
-* CHANGE gd.trm: use dynamically-allocated TTF font names
-* CHANGE x11: more finely sampled color palette for PM3D
-* CHANGE cgm: switch to using web_color_rgbs; approximate RGB colors
-* CHANGE fig: more point types, 4.2-style font and size syntax for "set term"
-* CHANGE stacked histograms grow upward for values > 0, downward for values < 0
-* CHANGE 'pause mouse button1' (or button2) does not disable zooming
 * FIX Do not re-quantize time tics interval explicitly set by user
 * FIX (gd post) don't segfault on very long font names
 * FIX allow variable color from input file for "with boxes", "with vectors"
@@ -22,6 +15,16 @@ New features, changes and fixes since previous release
 * FIX 2nd colour in the colour box for negative palette in postscript
 * FIX insure palette is initialized before any objects are drawn
 * FIX wxt terminal was not obeying "set palette maxcolors"
+* FIX Histograms did not correctly honor 'set style user increment'
+* FIX Avoid segfault if tic labels are requested from a non-existent data column
+* CHANGE try harder to autotitle columns in using specs with expressions
+* CHANGE gd.trm: use dynamically-allocated TTF font names
+* CHANGE x11: more finely sampled color palette for PM3D
+* CHANGE cgm: switch to using web_color_rgbs; approximate RGB colors
+* CHANGE fig: more point types, 4.2-style font and size syntax for "set term"
+* CHANGE stacked histograms grow upward for values > 0, downward for values < 0
+* CHANGE 'pause mouse button1' (or button2) does not disable zooming
+
 
 New features, changes and fixes in gnuplot version 4.2.3
 ===========================================================
