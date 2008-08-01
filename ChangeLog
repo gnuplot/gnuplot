@@ -8,6 +8,8 @@
 	Histograms did not correctly honor 'set style user increment'.
 	Bugfix.
 
+	* src/plot2d.c (eval_plots): Remove order dependency of newhist options.
+
 2008-07-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp(wxt_set_color):
