@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.31 2008/07/18 17:18:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.32 2008/07/22 05:59:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1847,6 +1847,13 @@ do_plot(struct curve_points *plots, int pcount)
 	term_apply_lp_properties(&(this_plot->lp_properties));
 
 #ifdef EAM_HISTOGRAMS
+	/* Why only for histograms? */
+	if (this_plot->plot_style == HISTOGRAMS ) {
+	    if (prefer_line_styles)
+		lp_use_properties(&this_plot->lp_properties,
+			this_plot->lp_properties.l_type+1, FALSE);
+	}
+
 	/* Skip a line in the key between histogram clusters */
 	if (this_plot->plot_style == HISTOGRAMS
 	&&  this_plot->histogram_sequence == 0 && yl != yl_ref) {
@@ -3447,6 +3454,10 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 #ifdef EAM_HISTOGRAMS
 		if (plot->plot_style == HISTOGRAMS) {
 		    int ix = i;
+		    int histogram_linetype = i;
+		    if (plot->histogram->startcolor > 0)
+			histogram_linetype += plot->histogram->startcolor;
+
 		    /* Shrink each cluster to fit within one unit along X axis,   */
 		    /* centered about the integer representing the cluster number */
 		    /* 'start' is reset to 0 at the top of eval_plots(), and then */
@@ -3478,10 +3489,10 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			/* Line type (color) must match row number */
 			if (prefer_line_styles) {
 			    struct lp_style_type ls;
-			    lp_use_properties(&ls, i+1, FALSE);
+			    lp_use_properties(&ls, histogram_linetype+1, FALSE);
 			    apply_pm3dcolor(&ls.pm3d_color, term);
 			} else
-			    (*t->linetype)(i);
+			    (*t->linetype)(histogram_linetype);
 		    case HT_STACKED_IN_LAYERS:
 
 			if( plot->points[i].y >= 0 ){

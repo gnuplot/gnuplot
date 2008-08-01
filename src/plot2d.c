@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.10 2008/07/18 17:18:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.11 2008/07/22 05:59:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1433,7 +1433,7 @@ eval_plots()
                     histogram_title = try_to_get_string();
 
                 /* Allow explicit starting color or pattern for this histogram */
-                lp_parse(&lp, TRUE, FALSE);
+                lp_parse(&lp, FALSE, FALSE);
                 parse_fillstyle(&fs, FS_SOLID, 100, fs.fillpattern, -1); 
 
                 } while (c_token != previous_token);
