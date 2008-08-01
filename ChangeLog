@@ -1,3 +1,8 @@
+2008-08-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (add_tic_user): Ignore NULL labels. This prevents possible
+	segfault if tic labels are requested from a non-existent data column.
+
 2008-07-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots) src/graphics.c (do_plot):
