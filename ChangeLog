@@ -1,4 +1,4 @@
-2008-08-02  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+2008-08-02  James R. Van Zandt  <jrvz@comcast.net>
 
 	* docs/gnuplot.doc: Fix syntax of "plot index": If only two
 	numbers are supplied, it's the third number (the stride) that has
