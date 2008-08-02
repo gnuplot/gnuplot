@@ -1,3 +1,10 @@
+2008-08-02  James R. Van Zandt  <jrv@vanzandt.comcast.net>
+
+	* docs/gnuplot.doc: Fix syntax of "plot index": If only two
+	numbers are supplied, it's the third number (the stride) that has
+	been omitted.  Therefore, the third number should be in the
+	innermost braces.
+
 2008-08-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (add_tic_user): Ignore NULL labels. This prevents possible

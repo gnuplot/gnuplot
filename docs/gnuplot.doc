@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.525 2008/07/23 20:19:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.526 2008/07/28 00:04:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4504,7 +4504,7 @@ Ffigure_mapcontours
  file to be plotted.
 
  Syntax:
-       plot 'file' index { <m>{{:<n>}:<p>} | "<name>" }
+       plot 'file' index { <m>{:<n>{:<p>}} | "<name>" }
 
  Data sets are separated by pairs of blank records.  `index <m>` selects only
  set <m>; `index <m>:<n>` selects sets in the range <m> to <n>; and `index
