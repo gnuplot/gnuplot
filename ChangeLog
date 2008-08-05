@@ -1,3 +1,11 @@
+2008-08-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/eval.c: Track min/max range of data on each axis
+	indepently of the current axis range itself.  Export to the
+	corresponding variables GPVAL_DATA_{AXIS}_MIN and so on.
+	This is useful all by itself, but also lays the groundwork for
+	implementing "range-frame" borders as per request #2025481.
+
 2008-08-02  James R. Van Zandt  <jrvz@comcast.net>
 
 	* docs/gnuplot.doc: Fix syntax of "plot index": If only two
