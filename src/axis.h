@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.45 2005/09/12 23:51:36 sfeam Exp $
+ * $Id: axis.h,v 1.46 2005/09/18 06:20:58 sfeam Exp $
  *
  */
 
@@ -191,6 +191,8 @@ typedef struct axis {
     double set_max;
     double writeback_min;	/* ULIG's writeback implementation */
     double writeback_max;
+    double data_min;		/* Not necessarily the same as axis min */
+    double data_max;
 
 /* output-related quantities */
     int term_lower;		/* low and high end of the axis on output, */
@@ -233,9 +235,10 @@ typedef struct axis {
 #define DEFAULT_AXIS_STRUCT {						    \
 	AUTOSCALE_BOTH, AUTOSCALE_BOTH, /* auto, set_auto */		    \
 	0, FALSE,		/* range_flags, rev_range */		    \
-	-10.0, 10.0,		/* 3 pairs of min/max */		    \
+	-10.0, 10.0,		/* 3 pairs of min/max for axis itself */    \
 	-10.0, 10.0,							    \
 	-10.0, 10.0,							    \
+	  0.0,  0.0,		/* and another min/max for the data */	    \
 	0, 0, 0, 0,		/* terminal dependents */		    \
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
 	0, 1,			/* is_timedata, format_numeric */	    \
@@ -386,6 +389,8 @@ do {									\
     } else {								\
 	this->log_base = this->log ? log(this->base) : 0;		\
     }									\
+    this->data_min = VERYLARGE;						\
+    this->data_max = -VERYLARGE;					\
 } while(0)
 
 #define AXIS_INIT2D(axis, infinite)					\
@@ -398,6 +403,8 @@ do {									\
     this->max = (infinite && (this->set_autoscale & AUTOSCALE_MAX))	\
 	? -VERYLARGE : this->set_max;					\
     this->log_base = this->log ? log(this->base) : 0;			\
+    this->data_min = VERYLARGE;						\
+    this->data_max = -VERYLARGE;					\
 } while(0)
 
 /* handle reversed ranges */
@@ -546,6 +553,8 @@ do {									  \
 	break;  /* don't set y range if x is outrange, for example */	  \
     if ((int)AXIS < 0)							  \
 	break;	/* HBB 20000507: don't check range if not a coordinate */ \
+    if ( VALUE<axis_array[AXIS].data_min )				  \
+	axis_array[AXIS].data_min = VALUE;				  \
     if ( VALUE<axis_array[AXIS].min ) {					  \
 	if (axis_array[AXIS].autoscale & AUTOSCALE_MIN)			  \
 	    axis_array[AXIS].min = VALUE;				  \
@@ -555,6 +564,8 @@ do {									  \
 	    break;							  \
 	}								  \
     }									  \
+    if ( VALUE>axis_array[AXIS].data_max )				  \
+	axis_array[AXIS].data_max = VALUE;				  \
     if ( VALUE>axis_array[AXIS].max ) {					  \
 	if (axis_array[AXIS].autoscale & AUTOSCALE_MAX)			  \
 	    axis_array[AXIS].max = VALUE;				  \
