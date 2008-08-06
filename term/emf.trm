@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.51 2008/05/25 10:15:41 broeker Exp $
+ * $Id: emf.trm,v 1.52 2008/08/06 16:35:59 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -285,6 +285,7 @@ static unsigned int emf_dashed = TRUE;
 static unsigned int emf_monochrome = FALSE;
 static double emf_linewidth;	/* line width in plot units */
 static double emf_linewidth_factor = 1.0;
+static double emf_dashlength = 1.0;
 static int emf_coords = 0;	/* # polyline coordinates saved */
 static char emf_fontname[255] = EMF_FONTNAME;
 static int emf_fontsize = EMF_FONTSIZE;
@@ -547,6 +548,13 @@ EMF_options()
 	    c_token++;
 	    continue;
 	}
+	if (equals(c_token, "dl") || almost_equals(c_token, "dashl$ength")) {
+	    c_token++;
+	    emf_dashlength = real_expression();
+	    if (emf_dashlength < 0.5)
+		emf_dashlength = 1.0;
+	    continue;
+	}
 	if (almost_equals(c_token, "s$olid")) {
 	    emf_dashed = FALSE;
 	    c_token++;
@@ -613,8 +621,11 @@ EMF_options()
 	sprintf(&(term_options[strlen(term_options)]), " size %d,%d ",
 	    (int)(0.5+term->xmax/EMF_PX2HM), (int)(0.5+term->ymax/EMF_PX2HM));
     if (emf_linewidth_factor != 1.0)
-	sprintf(&(term_options[strlen(term_options)]), " lw %4.1f",
+	sprintf(&(term_options[strlen(term_options)]), " lw %.1f",
 		emf_linewidth_factor);
+    if (emf_dashlength != 1.0)
+	sprintf(&(term_options[strlen(term_options)]), " dashlength %.1f",
+		emf_dashlength);
 }
 
 TERM_PUBLIC void 
@@ -930,7 +941,7 @@ EMF_dashtype(int dashtype)
 	/* set up dash dimensions */
 	j = (dashtype - 1) * 8;
 	for (i = 0; i < 8; i++, j++) {
-	    emf_step_sizes[i] = dot_length[j] * emf_linewidth * EMF_PX2HM;
+	    emf_step_sizes[i] = dot_length[j] * emf_dashlength * EMF_PX2HM;
 	}
 	/* first thing drawn will be a line */
 	emf_step = emf_step_sizes[1];
@@ -1294,26 +1305,29 @@ START_HELP(emf)
 "?terminal emf",
 "?term emf",
 "?emf",
-" The `emf` terminal generates an Enhanced Metafile Format file.  This file",
-" format is the metafile standard on MS Win32 Systems.",
+" The `emf` terminal generates an Enhanced Metafile Format file.",
+" This file format is recognized by many Windows applications.",
 "",
 " Syntax:",
-"       set terminal emf {<color>} {solid | dashed} {linewidth <X>}",
-"                        {size XX,YY}",
+"       set terminal emf {color | monochrome} {solid | dashed}",
+"                        {linewidth <LW>} {dashlength <DL>} {size XX,YY}",
 "                        {\"<fontname>\"} {<fontsize>}    #old syntax",
 "                        {font \"<fontname>,<fontsize>\"} #new syntax",
 "",
-" <color> is either `color` or `monochrome`; ",
+" In `monochrome` mode successive line types cycle through dash patterns.",
+" In `color` mode successive line types use successive colors, and only after",
+" all 8 default colors are exhausted is the dash pattern incremented.",
 " `solid` draws all curves with solid lines, overriding any dashed patterns;",
 " `linewidth <factor>` multiplies all line widths by this factor.",
+" `dashlength <factor>` is useful for thick lines.",
 " <font> is the name of a font; and ",
 " `<fontsize>` is the size of the font in points.",
 "",
-" The nominal size of the output image default to 1024x768 in arbitrary",
+" The nominal size of the output image defaults to 1024x768 in arbitrary",
 " units. You may specify a different nominal size using the `size` option.",
 "",
-" The first two options can be in any order.  Selecting `default` sets all",
-" options to their default values.",
+" The default settings are `color dashed font \"Arial,12\" size 1024,768`",
+" Selecting `default` sets all options to their default values.",
 "",
 " Examples:",
 "       set terminal emf 'Times Roman Italic' 12",

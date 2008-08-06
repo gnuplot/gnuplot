@@ -7,6 +7,11 @@
 	length to go to zero.
 	Bug #2040244
 
+2008-08-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm: Provide a separate "dashlength" option similar
+	to the post, pdf, gd, and cairo terminals.
+
 2008-08-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/eval.c: Track min/max range of data on each axis
