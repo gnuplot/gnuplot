@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.234 2008/05/01 18:35:00 sfeam Exp $
+ * $Id: post.trm,v 1.235 2008/07/22 05:06:28 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -996,7 +996,6 @@ PS_options()
 		if (ps_params->palfunc_deviation >= 1)
 		    int_error(c_token-1,"allowed deviation must be < 1");
 	    }
-	    ++c_token;
 	    break;
 	
 	case PS_SIZE:
