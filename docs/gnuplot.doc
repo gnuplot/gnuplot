@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.526 2008/07/28 00:04:11 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.527 2008/08/02 20:54:29 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2753,7 +2753,7 @@ Ffigure_histcols
 ?plotting style histograms newhistogram
  More than one set of histograms can appear in a single plot. In this case you
  can force a gap between them, and a separate label for each set, by using the
- plot command `newhistogram {"<title>"} {<linestyle>}`.
+ plot command `newhistogram {"<title>"} {<first-linetype} {at <x-coord>}`.
  For example
 
        set style histogram  cluster
@@ -2769,6 +2769,8 @@ Ffigure_histcols
  using the same coloring for multiple histograms
        plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
             newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
+
+ The `at <x-coord>` option only applies to column-stacked histograms.
 3 automated iteration over multiple columns
 ?automated
 ?histograms automated
