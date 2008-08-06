@@ -17,6 +17,8 @@ New features, changes and fixes since previous release
 * FIX wxt terminal was not obeying "set palette maxcolors"
 * FIX Histograms did not correctly honor 'set style user increment'
 * FIX Avoid segfault if tic labels are requested from a non-existent data column
+* FIX emf terminal - allow fractional linewidth (fixes 0-length dash problem)
+* FIX post terminal - fix parsing error for palfuncparam
 * CHANGE try harder to autotitle columns in using specs with expressions
 * CHANGE gd.trm: use dynamically-allocated TTF font names
 * CHANGE x11: more finely sampled color palette for PM3D
