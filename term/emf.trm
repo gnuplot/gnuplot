@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.42.2.5 2008/05/20 17:42:54 sfeam Exp $
+ * $Id: emf.trm,v 1.42.2.6 2008/05/25 10:26:19 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -276,7 +276,6 @@ static unsigned int emf_posx;
 static unsigned int emf_posy;
 static unsigned int emf_record_count = 0;
 static unsigned int emf_linetype = 1;
-static unsigned int emf_linewidth;      /* line width in plot units */
 static unsigned int emf_dashtype = 0;
 static unsigned long emf_color = 0L;
 static unsigned int emf_colors = EMF_COLORS;
@@ -284,6 +283,7 @@ static unsigned int emf_polyline[EMF_MAX_SEGMENTS];     /* stored polyline coord
 static unsigned int emf_graphics = FALSE;
 static unsigned int emf_dashed = TRUE;
 static unsigned int emf_monochrome = FALSE;
+static double emf_linewidth;	/* line width in plot units */
 static double emf_linewidth_factor = 1.0;
 static int emf_coords = 0;      /* # polyline coordinates saved */
 static char emf_fontname[255] = EMF_FONTNAME;
@@ -940,8 +940,7 @@ EMF_dashtype(int dashtype)
         /* set up dash dimensions */
         j = (dashtype - 1) * 8;
         for (i = 0; i < 8; i++, j++) {
-            emf_step_sizes[i] = (dot_length[j] * emf_linewidth
-                                 * EMF_PX2HM) * 3 / 3;
+	    emf_step_sizes[i] = dot_length[j] * emf_linewidth * EMF_PX2HM;
         }
         /* first thing drawn will be a line */
         emf_step = emf_step_sizes[1];
