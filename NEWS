@@ -24,6 +24,7 @@ New features, changes and fixes since previous release
 * CHANGE x11: more finely sampled color palette for PM3D
 * CHANGE cgm: switch to using web_color_rgbs; approximate RGB colors
 * CHANGE fig: more point types, 4.2-style font and size syntax for "set term"
+* CHANGE emf: separate dashlength option (don't use linewidth for dashlength)
 * CHANGE stacked histograms grow upward for values > 0, downward for values < 0
 * CHANGE 'pause mouse button1' (or button2) does not disable zooming
 
