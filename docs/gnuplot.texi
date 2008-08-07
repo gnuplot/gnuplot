@@ -1085,7 +1085,7 @@ generate a title in the key box, while processing the remainder of columns
 
 @end example
 
-See `set style labels`, `using xticlabels`, `plot title`, @ref{using}.
+See `set style labels`, `using xticlabels`, @ref{title}, @ref{using}.
 
 @node Environment, Expressions, Datastrings, gnuplot
 @section Environment
@@ -1130,7 +1130,7 @@ S<max. horizontal resolution>. E.g. if your monitor's maximum resolution is
 If PCTRM is not set, standard VGA is used.
 
 FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
-fit is interrupted---see `fit`.  FIT_LOG specifies the default filename of the
+fit is interrupted---see @ref{fit}.  FIT_LOG specifies the default filename of the
 logfile maintained by fit.
 
 GNUPLOT_LIB may be used to define additional search directories for data
@@ -2325,13 +2325,13 @@ GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN,... Type `show variables all`
 to display their list and values. Values related to axes parameters (ranges, log
 base) are values used during the last plot, not those currently `set`.
 
-The `fit` mechanism uses several variables with names that begin "FIT_".  It
+The @ref{fit} mechanism uses several variables with names that begin "FIT_".  It
 is safest to avoid using such names.  "FIT_LIMIT", however, is one that you
 may wish to redefine. Under `set fit errorvariables`, the error for each
 fitted parameter will be stored in a variable named like the parameter, but
-with "_err" appended. See the documentation on `fit` for details.
+with "_err" appended. See the documentation on @ref{fit} for details.
 
-See @ref{variables}, @ref{variables}, and `fit`.
+See @ref{variables}, @ref{variables}, and @ref{fit}.
 
 
 @node User-defined_variables_and_functions,  , Gnuplot-defined_variables, Expressions
@@ -2416,7 +2416,7 @@ expression. For example
 Valid names are the same as in most programming languages: they must begin
 with a letter, but subsequent characters may be letters, digits, "$", or "_".
 
-See `show functions`, `functions`, @ref{variables}, @ref{macros}.
+See @ref{functions}, @ref{functions}, @ref{variables}, @ref{macros}.
 
 @node Glossary, linetype, Expressions, gnuplot
 @section Glossary
@@ -2613,7 +2613,8 @@ palette.
 
 "palette z" maps the z value of each plot segment or plot element into the
 cbrange mapping of the palette. This allows smoothly-varying color along a
-3d line or surface. This option applies only to 3D plots (splot).
+3D line or surface.  It also allows coloring 2D plots by palette values read
+from an extra column of data.
 
 
 @node mouse_input, Plotting, linetype, gnuplot
@@ -2909,7 +2910,7 @@ inequality operator "ne".  The following example will print TRUE.
 
 @end example
 
-See also the two string formatting functions `gprintf` and @ref{sprintf}.
+See also the two string formatting functions @ref{gprintf} and @ref{sprintf}.
 
 @cindex substring
 
@@ -3097,7 +3098,7 @@ a few special purposes.
 
 Commas are used to separate coordinates on the `set` commands @ref{arrow},
 @ref{key}, and @ref{label}; the list of variables being fitted (the list after the
-`via` keyword on the `fit` command); lists of discrete contours or the loop
+`via` keyword on the @ref{fit} command); lists of discrete contours or the loop
 parameters which specify them on the @ref{cntrparam} command; the arguments
 of the `set` commands @ref{dgrid3d}, @ref{dummy}, @ref{isosamples}, @ref{offsets}, @ref{origin},
 @ref{samples}, @ref{size}, `time`, and @ref{view}; lists of tics or the loop parameters
@@ -3108,7 +3109,7 @@ individual plots (data sets or functions) on the `plot`, @ref{replot} and `splot
 commands.
 
 Parentheses are used to delimit sets of explicit tics (as opposed to loop
-parameters) and to indicate computations in the @ref{using} filter of the `fit`,
+parameters) and to indicate computations in the @ref{using} filter of the @ref{fit},
 `plot`, @ref{replot} and `splot` commands.
 
 (Parentheses and commas are also used as usual in function notation.)
@@ -3118,7 +3119,7 @@ or `splot` commands.
 
 Colons are used to separate extrema in `range` specifications (whether they
 are given on `set`, `plot` or `splot` commands) and to separate entries in
-the @ref{using} filter of the `plot`, @ref{replot}, `splot` and `fit` commands.
+the @ref{using} filter of the `plot`, @ref{replot}, `splot` and @ref{fit} commands.
 
 Semicolons are used to separate commands given on a single command line.
 
@@ -3410,7 +3411,7 @@ a @ref{call}ed datafile plot.
 
 The @ref{clear} command erases the current screen or output device as specified
 by @ref{output}.  This usually generates a formfeed on hardcopy devices.  Use
-`set terminal` to set the device type.
+@ref{terminal} to set the device type.
 
 For some terminals @ref{clear} erases only the portion of the plotting surface
 defined by @ref{size}, so for these it can be used in conjunction with @ref{multiplot} to create an inset.
@@ -3469,7 +3470,7 @@ See help for `batch/interactive` for more details.
 
 @cindex Marquardt
 
-The `fit` command can fit a user-defined function to a set of data points
+The @ref{fit} command can fit a user-defined function to a set of data points
 (x,y) or (x,y,z), using an implementation of the nonlinear least-squares
 (NLLS) Marquardt-Levenberg algorithm.  Any user-defined variable occurring in
 the function body may serve as a fit parameter, but the return type of the
@@ -3496,7 +3497,7 @@ previously user-defined function of the form f(x) or f(x,y).
 
 <datafile> is treated as in the `plot` command.  All the @ref{datafile}
 modifiers (@ref{using}, @ref{every},...) except @ref{smooth} and the deprecated @ref{thru}
-are applicable to `fit`. See @ref{datafile}.
+are applicable to @ref{fit}. See @ref{datafile}.
 
 The default data formats for fitting functions with a single independent
 variable, y=f(x), are @{x:@}y or x:y:s; those formats can be changed with
@@ -3555,7 +3556,7 @@ FIT_SCRIPT is @ref{replot}, so if you had previously plotted both the data
 and the fitting function in one graph, you can display the current state
 of the fit.
 
-Once `fit` has finished, the @ref{update} command may be used to store final
+Once @ref{fit} has finished, the @ref{update} command may be used to store final
 values in a file for subsequent use as a parameter file.   See @ref{update}
 for details.
 
@@ -3603,9 +3604,9 @@ special form
 @end example
 
 means that the variable is treated as a 'fixed parameter', initialized by the
-parameter file, but not adjusted by `fit`.  For clarity, it may be useful to
+parameter file, but not adjusted by @ref{fit}.  For clarity, it may be useful to
 designate variables as fixed parameters so that their values are reported by
-`fit`.  The keyword `# FIXED` has to appear in exactly this form.
+@ref{fit}.  The keyword `# FIXED` has to appear in exactly this form.
 
 
 @node short_introduction, error_estimates, adjustable_parameters, fit
@@ -3616,7 +3617,7 @@ designate variables as fixed parameters so that their values are reported by
 @c ?fit guide
 @cindex fitting
 
-`fit` is used to find a set of parameters that 'best' fits your data to your
+@ref{fit} is used to find a set of parameters that 'best' fits your data to your
 user-defined function.  The fit is judged on the basis of the sum of the
 squared differences or 'residuals' (SSR) between the input data points and
 the function values, evaluated at the same places.  This quantity is often
@@ -3630,9 +3631,9 @@ to see what is meant by 'non-linear', but first we had better go over some
 terms.  Here it is convenient to use z as the dependent variable for
 user-defined functions of either one independent variable, z=f(x), or two
 independent variables, z=f(x,y).  A parameter is a user-defined variable
-that `fit` will adjust, i.e., an unknown quantity in the function
+that @ref{fit} will adjust, i.e., an unknown quantity in the function
 declaration.  Linearity/non-linearity refers to the relationship of the
-dependent variable, z, to the parameters which `fit` is adjusting, not of
+dependent variable, z, to the parameters which @ref{fit} is adjusting, not of
 z to the independent variables, x and/or y.  (To be technical, the
 second @{and higher@} derivatives of the fitting function with respect to
 the parameters are zero for a linear least-squares problem).
@@ -3654,20 +3655,20 @@ c is an unknown parameter, the problem is nonlinear.
 In the linear case, parameter values can be determined by comparatively
 simple linear algebra, in one direct step.  However LLS is a special case
 which is also solved along with more general NLLS problems by the iterative
-procedure that `gnuplot` uses.  `fit` attempts to find the minimum by doing
+procedure that `gnuplot` uses.  @ref{fit} attempts to find the minimum by doing
 a search.  Each step (iteration) calculates WSSR with a new set of parameter
 values.  The Marquardt-Levenberg algorithm selects the parameter values for
 the next iteration.  The process continues until a preset criterion is met,
 either (1) the fit has "converged" (the relative change in WSSR is less than
 FIT_LIMIT), or (2) it reaches a preset iteration count limit, FIT_MAXITER
 (see @ref{variables}).  The fit may also be interrupted
-and subsequently halted from the keyboard (see `fit`).  The user variable
+and subsequently halted from the keyboard (see @ref{fit}).  The user variable
 FIT_CONVERGED contains 1 if the previous fit command terminated due to
 convergence; it contains 0 if the previous fit terminated for any other
 reason.
 
 Often the function to be fitted will be based on a model (or theory) that
-attempts to describe or predict the behaviour of the data.  Then `fit` can
+attempts to describe or predict the behaviour of the data.  Then @ref{fit} can
 be used to find values for the free parameters of the model, to determine
 how well the data fits the model, and to estimate an error range for each
 parameter.  See `fit error_estimates`.
@@ -3675,12 +3676,12 @@ parameter.  See `fit error_estimates`.
 Alternatively, in curve-fitting, functions are selected independent of
 a model (on the basis of experience as to which are likely to describe
 the trend of the data with the desired resolution and a minimum number
-of parameters*functions.)  The `fit` solution then provides an analytic
+of parameters*functions.)  The @ref{fit} solution then provides an analytic
 representation of the curve.
 
 However, if all you really want is a smooth curve through your data points,
 the @ref{smooth} option to `plot` may be what you've been looking for rather
-than `fit`.
+than @ref{fit}.
 
 @node error_estimates, control, short_introduction, fit
 @subsection error estimates
@@ -3688,18 +3689,18 @@ than `fit`.
 @c ?commands fit error_estimates
 @c ?fit error_estimates
 @c ?fit errors
-In `fit`, the term "error" is used in two different contexts, data error
+In @ref{fit}, the term "error" is used in two different contexts, data error
 estimates and parameter error estimates.
 
 Data error estimates are used to calculate the relative weight of each data
 point when determining the weighted sum of squared residuals, WSSR or
 chisquare.  They can affect the parameter estimates, since they determine
 how much influence the deviation of each data point from the fitted function
-has on the final values.  Some of the `fit` output information, including
+has on the final values.  Some of the @ref{fit} output information, including
 the parameter error estimates, is more meaningful if accurate data error
 estimates have been provided.
 
-The 'statistical overview' describes some of the `fit` output and gives some
+The 'statistical overview' describes some of the @ref{fit} output and gives some
 background for the 'practical guidelines'.
 
 @menu
@@ -3734,7 +3735,7 @@ statistics where variance = counts, then each point should be individually
 weighted when comparing the observed sum of deviations and the expected sum
 of deviations.
 
-At the conclusion `fit` reports 'stdfit', the standard deviation of the fit,
+At the conclusion @ref{fit} reports 'stdfit', the standard deviation of the fit,
 which is the rms of the residuals, and the variance of the residuals, also
 called 'reduced chisquare' when the data points are weighted.  The number of
 degrees of freedom (the number of data points minus the number of fitted
@@ -3754,7 +3755,7 @@ value of chisquare corresponding to the desired confidence level, but
 considerably more calculation is required to determine the combinations of
 parameters which produce such values.
 
-Rather than determine confidence intervals, `fit` reports parameter error
+Rather than determine confidence intervals, @ref{fit} reports parameter error
 estimates which are readily obtained from the variance-covariance matrix
 after the final iteration.  By convention, these estimates are called
 "standard errors" or "asymptotic standard errors", since they are calculated
@@ -3790,7 +3791,7 @@ you make use of additional knowledge about your measurements, e.g., take into
 account that some points may be more reliable than others.  That may affect
 the final values of the parameters.
 
-Weighting the data provides a basis for interpreting the additional `fit`
+Weighting the data provides a basis for interpreting the additional @ref{fit}
 output after the last iteration.  Even if you weight each point equally,
 estimating an average standard deviation rather than using a weight of 1
 makes WSSR a dimensionless variable, as chisquare is by definition.
@@ -3798,7 +3799,7 @@ makes WSSR a dimensionless variable, as chisquare is by definition.
 Each fit iteration will display information which can be used to evaluate
 the progress of the fit.  (An '*' indicates that it did not find a smaller
 WSSR and is trying again.)  The 'sum of squares of residuals', also called
-'chisquare', is the WSSR between the data and your fitted function; `fit`
+'chisquare', is the WSSR between the data and your fitted function; @ref{fit}
 has minimized that.  At this stage, with weighted data, chisquare is expected
 to approach the number of degrees of freedom (data points minus parameters).
 The WSSR can be used to calculate the reduced chisquare (WSSR/ndf) or stdfit,
@@ -3828,12 +3829,12 @@ assumptions may not be justified, or the model function may be too general,
 fitting fluctuations in a particular sample in addition to the underlying
 trends.  In the latter case, a simpler function may be more appropriate.
 
-You'll have to get used to both `fit` and the kind of problems you apply it
+You'll have to get used to both @ref{fit} and the kind of problems you apply it
 to before you can relate the standard errors to some more practical estimates
 of parameter uncertainties or evaluate the significance of the correlation
 matrix.
 
-Note that `fit`, in common with most NLLS implementations, minimizes the
+Note that @ref{fit}, in common with most NLLS implementations, minimizes the
 weighted sum of squared distances (y-f(x))**2.  It does not provide any means
 to account for "errors" in the values of x, only in y.  Also, any "outliers"
 (data points outside the normal distribution of the model) will have an
@@ -3845,7 +3846,7 @@ exaggerated effect on the solution.
 @c ?commands fit control
 @c ?fit control
 There are a number of `gnuplot` variables that can be defined to affect
-`fit`.  Those which can be defined once `gnuplot` is running are listed
+@ref{fit}.  Those which can be defined once `gnuplot` is running are listed
 under 'control_variables' while those defined before starting `gnuplot`
 are listed under 'environment_variables'.
 
@@ -3895,7 +3896,7 @@ the chi-squared target function increased or decreased significantly.
 Setting FIT_LAMBDA_FACTOR to zero re-enables the default factor of
 10.0.
 
-Other variables with the FIT_ prefix may be added to `fit`, so it is safer
+Other variables with the FIT_ prefix may be added to @ref{fit}, so it is safer
 not to use that prefix for user-defined variables.
 
 The variables FIT_SKIP and FIT_INDEX were used by earlier releases of
@@ -3976,7 +3977,7 @@ solution with the smallest sum of squared residuals, SSR), and can get stuck
 at a local minimum.  The routine has no way to determine that;  it is up to
 you to judge whether this has happened.
 
-`fit` may, and often will get "lost" if started far from a solution, where
+@ref{fit} may, and often will get "lost" if started far from a solution, where
 SSR is large and changing slowly as the parameters are varied, or it may
 reach a numerically unstable region (e.g., too large a number causing a
 floating point overflow) which results in an "undefined value" message
@@ -3994,7 +3995,7 @@ a minimum with a poor fit.
 Of course, a reasonably good fit is not proof there is not a "better" fit (in
 either a statistical sense, characterized by an improved goodness-of-fit
 criterion, or a physical sense, with a solution more consistent with the
-model.)  Depending on the problem, it may be desirable to `fit` with various
+model.)  Depending on the problem, it may be desirable to @ref{fit} with various
 sets of starting values, covering a reasonable range for each parameter.
 
 @node tips,  , starting_values, fit
@@ -4004,11 +4005,11 @@ sets of starting values, covering a reasonable range for each parameter.
 @c ?fit tips
 @cindex tips
 
-Here are some tips to keep in mind to get the most out of `fit`.  They're not
+Here are some tips to keep in mind to get the most out of @ref{fit}.  They're not
 very organized, so you'll have to read them several times until their essence
 has sunk in.
 
-The two forms of the `via` argument to `fit` serve two largely distinct
+The two forms of the `via` argument to @ref{fit} serve two largely distinct
 purposes.  The `via "file"` form is best used for (possibly unattended) batch
 operation, where you just supply the startup values in a file and can later
 use @ref{update} to copy the results back into another (or the same) parameter
@@ -4043,7 +4044,7 @@ Some prescriptions for analysing data, given in practical experimentation
 courses, may have you first fit some functions to your data, perhaps in a
 multi-step process of accounting for several aspects of the underlying
 theory one by one, and then extract the information you really wanted from
-the fitting parameters of those functions.  With `fit`, this may often be
+the fitting parameters of those functions.  With @ref{fit}, this may often be
 done in one step by writing the model function directly in terms of the
 desired parameters.  Transforming data can also quite often be avoided,
 though sometimes at the cost of a more difficult fit problem.  If you think
@@ -4264,7 +4265,7 @@ Syntax:
 carriage return is hit, zero (0) won't pause at all, and a positive number
 will wait the specified number of seconds.  The time is rounded to an integer
 number of seconds if subsecond time resolution is not supported by the given
-platform.  `pause 0` is synonymous with `print`.
+platform.  `pause 0` is synonymous with @ref{print}.
 
 If the current terminal supports mousing, then `pause mouse` will terminate
 on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
@@ -4272,14 +4273,15 @@ is not active, `pause mouse` is equivalent to `pause -1`.
 
 If one or more end conditions are given after `pause mouse`, then any one of
 the conditions will terminate the pause. The possible end conditions are
-`keypress`, `button1`, `button2`, `button3`, and `any`.
+`keypress`, `button1`, `button2`, `button3`, `close`, and `any`.
 If the pause terminates on a keypress, then the ascii value of the key pressed
 is returned in MOUSE_KEY.  The character itself is returned as a one character
-string in MOUSE_CHAR.
+string in MOUSE_CHAR. Hotkeys (bind command) are disabled if keypress is one of
+the end conditions.  Zooming is disabled if button3 is one of the end 
+conditions. 
 
 In all cases the coordinates of the mouse are returned in variables MOUSE_X,
-MOUSE_Y, MOUSE_X2, MOUSE_Y2.
-See @ref{variables}.
+MOUSE_Y, MOUSE_X2, MOUSE_Y2.  See @ref{variables}.
 
 Note: Since @ref{pause} communicates with the operating system rather than the
 graphics, it may behave differently with different device drivers (depending
@@ -5047,7 +5049,7 @@ Example:
 `gnuplot` includes a few general-purpose routines for interpolation and
 approximation of data; these are grouped under the @ref{smooth} option.  More
 sophisticated data processing may be performed by preprocessing the data
-externally or by using `fit` with an appropriate model.
+externally or by using @ref{fit} with an appropriate model.
 
 Syntax:
 @example
@@ -5341,7 +5343,7 @@ natural
 
 also works (i.e. you can use y as the dummy variable).
 
-@ref{thru} is parsed for `splot` and `fit` but has no effect.
+@ref{thru} is parsed for `splot` and @ref{fit} but has no effect.
 
 @node using,  , thru, data
 @subsubsection using
@@ -5389,7 +5391,7 @@ and the data point number is used for x; for example, "`plot 'file' using 1`"
 is identical to "`plot 'file' using 0:1`".  If the @ref{using} list has two
 entries, these will be used for x and y.  Additional entries are usually
 errors in x and/or y.  See @ref{style} for details about plotting styles that
-make use of error information, and `fit` for use of error information in
+make use of error information, and @ref{fit} for use of error information in
 curve fitting.
 
 'scanf' accepts several numerical specifications but `gnuplot`
@@ -5482,7 +5484,7 @@ comment character (#) in the first column of the text lines.
 
 If gnuplot is built with configuration option --enable-datastrings, then
 additional modifiers to @ref{using} can specify handling of text fields in the
-datafile. See `datastrings`, `using xticlabels`, `using title`.
+datafile. See `datastrings`, `using xticlabels`, @ref{title}.
 
 
 @noindent --- USING TITLE ---
@@ -5705,7 +5707,7 @@ function (`t**2` above) must not be interrupted with any modifiers or data
 functions; doing so will generate a syntax error stating that the parametric
 function is not fully specified.
 
-Other modifiers, such as @ref{with} and `title`, may be specified only after the
+Other modifiers, such as @ref{with} and @ref{title}, may be specified only after the
 parametric function has been completed:
 
 @example
@@ -5826,7 +5828,7 @@ This sets the x range for a timeseries:
 @c ?splot title
 A line title for each function and data set appears in the key, accompanied
 by a sample of the line and/or symbol used to represent it.  It can be
-changed by using the `title` option.
+changed by using the @ref{title} option.
 
 Syntax:
 @example
@@ -5846,7 +5848,7 @@ The line title and sample can be omitted from the key by using the keyword
 the sample is wanted, use one or more blanks (`title ' '`).  If `notitle`
 is followed by a string this string is ignored.
 
-If `key autotitles` is set (which is the default) and neither `title` nor
+If `key autotitles` is set (which is the default) and neither @ref{title} nor
 `notitle` are specified the line title is the function name or the file name as
 it appears on the `plot` command.  If it is a file name, any datafile modifiers
 specified will be included in the default title.
@@ -5964,7 +5966,8 @@ command @ref{palette}. The color value corresponds to the z-value of the
 point coordinates or to the color coordinate if specified by the 4th parameter
 in @ref{using}. Both 2d and 3d plots (`plot` and `splot` commands) can use palette
 colors as specified by either their fractional value or the corresponding value
-mapped to the colorbox range. 2d plots can not use palette colors mapped by
+mapped to the colorbox range. A palette color value can also be read from an
+explicitly specified column in the @ref{using} specifier.
 Z value. See `colors`, @ref{palette}, `linetype`.
 
 The keyword `nohidden3d` applies only to plots made with the `splot` command.
@@ -6086,7 +6089,7 @@ This plots two color surfaces at different altitudes:
 @cmindex print
 
 
-The `print` command prints the value of <expression> to the screen.  It is
+The @ref{print} command prints the value of <expression> to the screen.  It is
 synonymous with `pause 0`.  <expression> may be anything that `gnuplot` can
 evaluate that produces a number, or it can be a string.
 
@@ -6096,7 +6099,7 @@ Syntax:
 
 @end example
 
-See `expressions`.  The output file can be set with `set print`.
+See `expressions`.  The output file can be set with @ref{print}.
 
 @node pwd, quit, print, Commands
 @section pwd
@@ -6294,22 +6297,22 @@ Syntax:
 
 @end example
 
-where <option> is `functions`, @ref{variables}, `terminal` or `set`. If
+where <option> is @ref{functions}, @ref{variables}, @ref{terminal} or `set`. If
 no option is used, `gnuplot` saves functions, variables, `set`
 options and the last `plot` (`splot`) command.
 
 @ref{save}d files are written in text format and may be read by the
 `load` command. For @ref{save} with the `set` option or without any
-option, the `terminal` choice and the @ref{output} filename are written
+option, the @ref{terminal} choice and the @ref{output} filename are written
 out as a comment, to get an output file that works in other
 installations of gnuplot, without changes and without risk of
 unwillingly overwriting files.
 
-`save terminal` will write out just the `terminal` status, without
+@ref{terminal} will write out just the @ref{terminal} status, without
 the comment marker in front of it. This is mainly useful for
-switching the `terminal` setting for a short while, and getting back
+switching the @ref{terminal} setting for a short while, and getting back
 to the previously set terminal, afterwards, by loading the saved
-`terminal` status. Note that for a single gnuplot session you may
+@ref{terminal} status. Note that for a single gnuplot session you may
 rather use the other method of saving and restoring current terminal
 by the commands `set term push` and `set term pop`, see `set term`.
 
@@ -6403,7 +6406,7 @@ when the variable was initially defined.
 * mytics::                      
 * mztics::                      
 * offsets::                     
-* origin::                     
+* origin_::                     
 * output::                      
 * parametric_::                 
 * plot_::                       
@@ -7499,7 +7502,7 @@ This form of the command is deprecated. Please see `set style data`.
 @c ?set datafile
 @c ?show datafile
 The @ref{datafile} command options control interpretation of fields read from
-input data files by the `plot`, `splot`, and `fit` commands.  Four such
+input data files by the `plot`, `splot`, and @ref{fit} commands.  Four such
 options are currently implemented.
 
 @menu
@@ -7949,7 +7952,7 @@ Manager switches automatically to codepage 912 for `iso_8859_2`.
 @c ?commands show fit
 @c ?set fit
 @c ?show fit
-The `fit` setting defines where the `fit` command writes its output.
+The @ref{fit} setting defines where the @ref{fit} command writes its output.
 If this option was built into your version of gnuplot, it also controls
 whether parameter errors from the fit will be written into variables.
 
@@ -7963,7 +7966,7 @@ Syntax:
 
 The <filename> argument must be enclosed in single or double quotes.
 
-If no filename is given or `unset fit` is used the log file is
+If no filename is given or @ref{fit} is used the log file is
 reset to its default value "fit.log" or the value of the environmental
 variable `FIT_LOG`.
 
@@ -7978,7 +7981,7 @@ a directory name, and the actual filename will be "fit.log" in that
 directory.
 
 If the `errorvariables` option is turned on, the error of each fitted
-parameter computed by `fit` will be copied to a user-defined variable
+parameter computed by @ref{fit} will be copied to a user-defined variable
 whose name is formed by appending "_err" to the name of the parameter
 itself.  This is useful mainly to put the parameter and its error onto
 a plot of the data and the fitted function, for reference, as in:
@@ -8268,7 +8271,7 @@ This form of the command is deprecated. Please see `set style function`.
 
 @c ?commands show functions
 @c ?show functions
-The `show functions` command lists all user-defined functions and their
+The @ref{functions} command lists all user-defined functions and their
 definitions.
 
 Syntax:
@@ -8577,8 +8580,8 @@ The @ref{key} command enables a key (or legend) describing plots on a plot.
 
 The contents of the key, i.e., the names given to each plotted data set and
 function and samples of the lines and/or symbols used to represent them, are
-determined by the `title` and @ref{with} options of the @{`s`@}`plot` command.
-Please see `plot title` and @ref{with} for more information.
+determined by the @ref{title} and @ref{with} options of the @{`s`@}`plot` command.
+Please see @ref{title} and @ref{with} for more information.
 
 Syntax:
 @example
@@ -8866,7 +8869,7 @@ attribute of an existing label, use the @ref{label} command with the
 appropriate tag, and specify the parts of the label to be changed.
 
 The <label text> can be a string constant, a string variable, or a string-
-valued expression. See `strings`, @ref{sprintf}, and `gprintf`.
+valued expression. See `strings`, @ref{sprintf}, and @ref{gprintf}.
 
 By default, the text is placed flush left against the point x,y,z.  To adjust
 the way the label is positioned with respect to the point x,y,z, add the
@@ -8983,7 +8986,7 @@ To set a label on a graph with a timeseries on the x axis, use, for example:
 @end example
 
 To display a freshly fitted parameter on the plot with the data and the
-fitted function, do this after the `fit`, but before the `plot`:
+fitted function, do this after the @ref{fit}, but before the `plot`:
 @example
       set label sprintf("a = %3.5g",par_a) at 30,15
       bfit = gprintf("b = %s*10^%S",par_b)
@@ -9227,10 +9230,10 @@ The computed margins can be overridden by the @ref{margin} commands.  @ref{margi
 
 Syntax:
 @example
-      set bmargin @{@{screen@} <margin>@}
-      set lmargin @{@{screen@} <margin>@}
-      set rmargin @{@{screen@} <margin>@}
-      set tmargin @{@{screen@} <margin>@}
+      set bmargin @{@{at screen@} <margin>@}
+      set lmargin @{@{at screen@} <margin>@}
+      set rmargin @{@{at screen@} <margin>@}
+      set tmargin @{@{at screen@} <margin>@}
       show margin
 
 @end example
@@ -9240,8 +9243,8 @@ A positive value defines the absolute size of the margin.  A negative value
 (or none) causes `gnuplot` to revert to the computed value.  For 3D plots,
 only the left margin can be set using character units.
 
-The keyword `screen` indicates that the margin is specified as a fraction of
-the full drawing area. This can be used to precisely line up the corners of
+The keywords `at screen` indicates that the margin is specified as a fraction
+of the full drawing area. This can be used to precisely line up the corners of
 individual 2D and 3D graphs in a multiplot.
 
 Normally the margins of a plot are automatically calculated based on tics,
@@ -9643,7 +9646,7 @@ see @ref{mxtics}.
 Minor tic marks along the z axis are controlled by @ref{mztics}.  Please
 see @ref{mxtics}.
 
-@node offsets, origin, mztics, set-show
+@node offsets, origin_, mztics, set-show
 @subsection offsets
 
 @c ?commands set offsets
@@ -9688,7 +9691,7 @@ Example:
 This graph of sin(x) will have a y range [-3:3] because the function
 will be autoscaled to [-1:1] and the vertical offsets are each two.
 
-@node origin, output, offsets, set-show
+@node origin_, output, offsets, set-show
 @subsection origin
 
 @c ?commands set origin
@@ -9696,6 +9699,7 @@ will be autoscaled to [-1:1] and the vertical offsets are each two.
 @c ?set origin
 @c ?show origin
 @cindex origin
+@opindex origin
 
 
 The @ref{origin} command is used to specify the origin of a plotting surface
@@ -9709,7 +9713,7 @@ Syntax:
 
 @end example
 
-@node output, parametric_, origin, set-show
+@node output, parametric_, origin_, set-show
 @subsection output
 
 @c ?commands set output
@@ -9741,8 +9745,8 @@ MSDOS users should note that the \ character has special significance in
 double-quoted strings, so single-quotes should be used for filenames in
 different directories.
 
-When both `set terminal` and @ref{output} are used together, it is safest to
-give `set terminal` first, because some terminals set a flag which is needed
+When both @ref{terminal} and @ref{output} are used together, it is safest to
+give @ref{terminal} first, because some terminals set a flag which is needed
 in some operating systems.  This would be the case, for example, if the
 operating system needs to know whether or not a file is to be formatted in
 order to open it properly.
@@ -10193,8 +10197,8 @@ as the gray for gray maps. The color map requires a transformation gray -->
 
 Basically two different types of mappings can be used:  Analytic formulae to
 convert gray to color, or discrete mapping tables which are interpolated.
-@ref{rgbformulae} and `palette functions` use analytic formulae whereas
-`palette defined` and @ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript output to a minimum.
+@ref{rgbformulae} and @ref{functions} use analytic formulae whereas
+@ref{defined} and @ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript output to a minimum.
 
 The command `show palette fit2rgbformulae` finds the best matching @ref{rgbformulae} for the current @ref{palette}. Naturally, it makes sense
 to use it for non-rgbformulae palettes. This command can be found useful
@@ -10208,7 +10212,7 @@ as gnuplot, like zimg (
 @end example
 
 `set palette gray` switches to a gray only palette. @ref{rgbformulae},
-`set palette defined`, @ref{file} and `set palette functions` switch
+@ref{defined}, @ref{file} and @ref{functions} switch
 to a color mapping. `set palette color` is an easy way to switch back from the
 gray palette to the last color mapping.
 
@@ -10228,7 +10232,7 @@ mapping to RGB.
 
 RGB color space might not be the most useful color space to work in.  For that
 reason you may change the color space with `model` to one of `RGB`, `HSV`,
-`CMY`, `YIQ` and `XYZ`.  Using color names for `set palette defined` tables
+`CMY`, `YIQ` and `XYZ`.  Using color names for @ref{defined} tables
 and a color space other than RGB will result in funny colors.  All explanation
 have been written for RGB color space, so please note, that `R` can be `H`,
 `C`, `Y`, or `X`, depending on the actual color space (`G` and `B`
@@ -10317,7 +10321,7 @@ other color scheme by the command
 @c ?palette defined
 @cindex colors
 
-Gray-to-rgb mapping can be manually set by use of `palette defined`:  A color gradient
+Gray-to-rgb mapping can be manually set by use of @ref{defined}:  A color gradient
 is defined and used to give the rgb values.  Such a  gradient is a piecewise
 linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].
 You have to specify the gray values and the corresponding RGB values in
@@ -10352,7 +10356,7 @@ depending on the selected color model.
 The <gray> values have to form an ascending sequence of real numbers; the
 sequence will be automatically rescaled to [0,1].
 
-`set palette defined` (without a gradient definition in braces) switches to
+@ref{defined} (without a gradient definition in braces) switches to
 RGB color space and uses a preset full-spectrum color gradient.
 Use `show palette gradient` to display the gradient.
 
@@ -10695,7 +10699,7 @@ and
 @c ?commands show print
 @c ?set print
 @c ?show print
-The `set print` command redirects the output of the `print` command to a file.
+The @ref{print} command redirects the output of the @ref{print} command to a file.
 
 Syntax:
 @example
@@ -11797,7 +11801,9 @@ specification.
 Two styles of stacked histogram are supported, chosen by the command
 `set style histogram @{rowstacked|columnstacked@}`.  In these styles the data
 values from the selected columns are collected into stacks of boxes.
-The default stacking mode is `rowstacked`.
+Positive values stack upwards from y=0; negative values stack downwards.
+Mixed positive and negative values will produce both an upward stack and a
+downward stack.  The default stacking mode is `rowstacked`.
 
 The `rowstacked` style places a box resting on the x-axis for each
 data value in the first selected column; the first data value results in
@@ -11848,11 +11854,12 @@ If the file contains both a magnitude and an error estimate for each value,
 then error bars can be added to the plot.  The following commands will add
 error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
 ends drawn the same width as the box itself. The error bars and bar ends are
-drawn in black with linewidth 2.
+drawn with linewidth 2 using the border linetype from the current fill style.
 
 @example
       set bars fullwidth
-      set style histogram errorbars gap 2 lt -1 lw 2
+      set style fill solid border -1
+      set style histogram errorbars gap 2 lw 2
       plot 'file.dat' using 2:3, '' using 4:5, '' using 6:7:xticlabels(1)
 
 @end example
@@ -11899,7 +11906,7 @@ x-axis tic labels must also be modified.
 @c ?histograms newhistogram
 More than one set of histograms can appear in a single plot. In this case you
 can force a gap between them, and a separate label for each set, by using the
-plot command `newhistogram @{"<title>"@} @{<linestyle>@}`.
+plot command `newhistogram @{"<title>"@} @{<linetype>@} @{at <x-coord>@}`.
 For example
 
 @example
@@ -11922,6 +11929,7 @@ using the same coloring for multiple histograms
 
 @end example
 
+The `at <x-coord>` option only applies to column-stacked histograms.
 
 
 @noindent --- IMAGE ---
@@ -12340,7 +12348,7 @@ in order to go back to normal plotting on the current terminal.
 @c ?term pop
 @cindex pop
 
-`gnuplot` supports many different graphics devices.  Use `set terminal` to
+`gnuplot` supports many different graphics devices.  Use @ref{terminal} to
 tell `gnuplot` what kind of output to generate. Use @ref{output} to redirect
 that output to a file or device.
 
@@ -12354,8 +12362,8 @@ Syntax:
 If <terminal-type> is omitted, `gnuplot` will list the available terminal
 types.  <terminal-type> may be abbreviated.
 
-If both `set terminal` and @ref{output} are used together, it is safest to
-give `set terminal` first, because some terminals set a flag which is needed
+If both @ref{terminal} and @ref{output} are used together, it is safest to
+give @ref{terminal} first, because some terminals set a flag which is needed
 in some operating systems.
 
 Several terminals have many additional options.  For example, see `png`,
@@ -12374,7 +12382,7 @@ for instance. After gnuplot's startup, the default terminal or that from
 that `set term pop` restores the default terminal on a given platform unless
 another terminal has been pushed explicitly.
 
-For a complete list of available terminal types, see `terminal`.
+For a complete list of available terminal types, see @ref{terminal}.
 
 @node termoption, tics, terminal, set-show
 @subsection termoption
@@ -12386,7 +12394,7 @@ For a complete list of available terminal types, see `terminal`.
 
 
 The @ref{termoption} command allows you to change the behaviour of the
-current terminal without requiring a new `set terminal` command. Only one
+current terminal without requiring a new @ref{terminal} command. Only one
 option can be changed per command, and only a small number of options can
 be changed this way. Currently the only options accepted are
 
@@ -12623,8 +12631,8 @@ See also
 @opindex title
 
 
-The `set title` command produces a plot title that is centered at the top of
-the plot.  `set title` is a special case of @ref{label}.
+The @ref{title} command produces a plot title that is centered at the top of
+the plot.  @ref{title} is a special case of @ref{label}.
 
 Syntax:
 @example
@@ -12652,7 +12660,7 @@ linetype, an rgb color, or a palette mapping. See help for @ref{colorspec} and
 `noenhanced` requests that the title not be processed by the enhanced text
 mode parser, even if enhanced text mode is currently active.
 
-`set title` with no parameters clears the title.
+@ref{title} with no parameters clears the title.
 
 See `syntax` for details about the processing of backslash sequences and
 the distinction between single- and double-quotes.
@@ -14048,7 +14056,7 @@ The @ref{shell} command spawns an interactive shell.  To return to `gnuplot`,
 type `logout` if using VMS, @ref{exit} or the END-OF-FILE character if using
 Unix, `endcli` if using AmigaOS, or @ref{exit} if using MS-DOS or OS/2.
 
-There are two ways of spawning a shell command: using `system` command
+There are two ways of spawning a shell command: using @ref{system} command
 or via `!` ($ if using VMS). The former command takes a string as a
 parameter and thus it can be used anywhere among other gnuplot commands,
 while the latter syntax requires to be the only command on the line. Control
@@ -14118,7 +14126,7 @@ The syntax for setting ranges on the `splot` command is the same as for
 @ref{xrange}, @ref{yrange}, and @ref{zrange}.  In parametric mode, the order is @ref{urange},
 @ref{vrange}, @ref{xrange}, @ref{yrange}, and @ref{zrange}.
 
-The `title` option is the same as in `plot`.  The operation of @ref{with} is also
+The @ref{title} option is the same as in `plot`.  The operation of @ref{with} is also
 the same as in `plot`, except that the plotting styles available to `splot`
 are limited to `lines`, `points`, `linespoints`, `dots`, and `impulses`;  the
 error-bar capabilities of `plot` are not available for `splot`.
@@ -14174,7 +14182,7 @@ will be used for z, the datablock number will be used for y, and the index
 of the data point in the datablock will be used for x.  If two or four values
 are provided, `gnuplot` uses the last value for calculating the color in
 pm3d plots.  Three values are interpreted as an (x,y,z) triple.  Additional
-values are generally used as errors, which can be used by `fit`.
+values are generally used as errors, which can be used by @ref{fit}.
 
 Single blank records separate datablocks in a `splot` datafile; `splot`
 treats datablocks as the equivalent of function y-isolines.  No line will
@@ -14529,8 +14537,8 @@ Syntax:
 
 @end example
 
-@ref{test} or `test terminal` creates a display of line and point styles and other
-useful things appropriate for and supported by the `terminal` you are just
+@ref{test} or @ref{terminal} creates a display of line and point styles and other
+useful things appropriate for and supported by the @ref{terminal} you are just
 using.
 
 @ref{palette} draws graphically profiles R(z),G(z),B(z), where 0<=z<=1, as
@@ -14589,7 +14597,7 @@ Example:
 
 
 This command writes the current values of the fit parameters into the given
-file, formatted as an initial-value file (as described in the `fit`section).
+file, formatted as an initial-value file (as described in the @ref{fit}section).
 This is useful for saving the current values for later use or for restarting
 a converged or stopped fit.
 
@@ -14610,7 +14618,7 @@ naming convention, "ext" will be "`old`" and "filename" will be related
 (hopefully recognizably) to the initial name.  Renaming is not done at all
 on VMS systems, since they use file-versioning.]
 
-Please see `fit` for more information.
+Please see @ref{fit} for more information.
 
 @node Terminal_types, Graphical_User_Interfaces, Commands, Top
 @chapter Terminal types
@@ -14632,7 +14640,7 @@ Please see `fit` for more information.
 
 Gnuplot supports a large number of output formats. These are selected by
 choosing an appropriate terminal type, possibly with additional modifying
-options. See `set terminal`.
+options. See @ref{terminal}.
 
 This document may describe terminal types that are not available to you
 because they were not configured or installed on your system. To see a list of
@@ -15229,27 +15237,22 @@ The `cgm` terminal generates a Computer Graphics Metafile, Version 1.
 This file format is a subset of the ANSI X3.122-1986 standard entitled
 "Computer Graphics - Metafile for the Storage and Transfer of Picture
 Description Information".
-Several options may be set in `cgm`.
 
 Syntax:
 @example
-      set terminal cgm @{<mode>@} @{<color>@} @{<rotation>@} @{solid | dashed@}
-                       @{width <plot_width>@} @{linewidth <line_width>@}
-                       @{"<font>"@} @{<fontsize>@}
+      set terminal cgm @{color | monochrome@} @{solid | dashed@} @{@{no@}rotate@}
+                       @{<mode>@} @{width <plot_width>@} @{linewidth <line_width>@}
+                       @{font "<fontname>,<fontsize>"@}
                        @{<color0> <color1> <color2> ...@}
 
 @end example
 
-where <mode> is `landscape`, `portrait`, or `default`;
-<color> is either `color` or `monochrome`; 
-<rotation> is either `rotate` or `norotate`;
 `solid` draws all curves with solid lines, overriding any dashed patterns;
+<mode> is `landscape`, `portrait`, or `default`;
 <plot_width> is the assumed width of the plot in points; 
 <line_width> is the line width in points (default 1); 
-<font> is the name of a font; and 
+<fontname> is the name of a font (see list of fonts below)
 <fontsize> is the size of the font in points (default 12).
-
-By default, `cgm` uses rotated text for the Y axis label.
 
 The first six options can be in any order.  Selecting `default` sets all
 options to their default values.
@@ -15415,7 +15418,7 @@ The `solid` option may be used to disable dashed line styles in the
 plots.  This is useful when color is enabled and the dashing of the
 lines detracts from the appearance of the plot. The `dashed` option
 confirms the default behavior, which gives a different dash pattern to
-each curve.
+each line type.
 
 
 
@@ -15461,7 +15464,6 @@ Example:
 @c ?set terminal cgm nofontlist
 @c ?set term cgm nofontlist
 @c ?cgm nofontlist
-@c ?commands set terminal cgm winword6
 @c ?set terminal cgm winword6
 @c ?set term cgm winword6
 @c ?cgm winword6
@@ -15469,17 +15471,13 @@ The default font table includes the fonts recommended for WebCGM, which
 are compatible with the Computer Graphics Metafile input filter for
 Microsoft Office and Corel Draw.  Another application might use
 different fonts and/or different font names, which may not be
-documented.  As a workaround, the `nofontlist` option deletes the font
+documented.  The `nofontlist` (synonym `winword6`) option deletes the font
 table from the CGM file.  In this case, the reading application should
 use a default table.  Gnuplot will still use its own default font table
 to select font indices.  Thus, 'Helvetica' will give you an index of 1,
 which should get you the first entry in your application's default font
 table. 'Helvetica Bold' will give you its second entry, etc.
 
-The former `winword6` option is now a deprecated synonym for
-`nofontlist`.  The problems involving the color and font tables that
-the `winword6` option was intended to work around turned out to be
-gnuplot bugs which have now been fixed."
 
 
 @node corel, debug, cgm, terminal_
@@ -15730,29 +15728,32 @@ The other label -- account for long ticlabels:
 @tmindex emf
 
 
-The `emf` terminal generates an Enhanced Metafile Format file.  This file
-format is the metafile standard on MS Win32 Systems.
+The `emf` terminal generates an Enhanced Metafile Format file.
+This file format is recognized by many Windows applications.
 
 Syntax:
 @example
-      set terminal emf @{<color>@} @{solid | dashed@} @{linewidth <X>@}
-                       @{size XX,YY@}
+      set terminal emf @{color | monochrome@} @{solid | dashed@}
+                       @{linewidth <LW>@} @{dashlength <DL>@} @{size XX,YY@}
                        @{"<fontname>"@} @{<fontsize>@}    #old syntax
                        @{font "<fontname>,<fontsize>"@} #new syntax
 
 @end example
 
-<color> is either `color` or `monochrome`; 
+In `monochrome` mode successive line types cycle through dash patterns.
+In `color` mode successive line types use successive colors, and only after
+all 8 default colors are exhausted is the dash pattern incremented.
 `solid` draws all curves with solid lines, overriding any dashed patterns;
 `linewidth <factor>` multiplies all line widths by this factor.
+`dashlength <factor>` is useful for thick lines.
 <font> is the name of a font; and 
 `<fontsize>` is the size of the font in points.
 
-The nominal size of the output image default to 1024x768 in arbitrary
+The nominal size of the output image defaults to 1024x768 in arbitrary
 units. You may specify a different nominal size using the @ref{size} option.
 
-The first two options can be in any order.  Selecting `default` sets all
-options to their default values.
+The default settings are `color dashed font "Arial,12" size 1024,768`
+Selecting `default` sets all options to their default values.
 
 Examples:
 @example
@@ -15902,7 +15903,7 @@ Syntax:
 which defaults to monochrome.
 
 With each of these drivers, a binary copy is required on a PC to print.  Do
-not use `print`---use instead `copy file /b lpt1:`."
+not use @ref{print}---use instead `copy file /b lpt1:`."
 
 @node excl, hercules, epson-180dpi, terminal_
 @subsubsection excl
@@ -16010,7 +16011,7 @@ Syntax:
                        @{metric | inches@}
                        @{pointsmax <max_points>@}
                        @{solid | dashed@}
-                       @{fontsize <fsize>@}
+                       @{font <fontname>@} @{fontsize <fsize>@}
                        @{textnormal | @{textspecial texthidden textrigid@}@}
                        @{@{thickness|linewidth@} <units>@}
                        @{depth <layer>@}
@@ -17238,7 +17239,7 @@ LaTeX packages: amsfonts, amsmath(intlimits). By default these packages are not
 included.
 
 A name in quotes selects the font that will be used when no explicit font is
-given in a @ref{label} or `set title`.  A name recognized by TeX (a TFM file
+given in a @ref{label} or @ref{title}.  A name recognized by TeX (a TFM file
 exists) must be used.  The default is "cmr10" unless `notex` is selected,
 then it is "pcrr8r" (Courier).  Even under `notex`, a TFM file is needed by
 Metapost. The file `pcrr8r.tfm` is the name given to Courier in LaTeX's psnfss
@@ -18461,7 +18462,7 @@ size, background color and linestyles to the initialization file
 
 In order of preference, graphs may be be printed in the following ways.
 
-`1.` Use the `gnuplot` command `set terminal` to select a printer and @ref{output} to redirect output to a file.
+`1.` Use the `gnuplot` command @ref{terminal} to select a printer and @ref{output} to redirect output to a file.
 
 `2.` Select the `Print...` command from the `gnuplot graph` window.  An extra
 command `screendump` does this from the text window.

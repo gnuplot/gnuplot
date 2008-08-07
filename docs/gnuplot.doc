@@ -9039,7 +9039,7 @@ C ... and restart the table:
 ?histograms newhistogram
  More than one set of histograms can appear in a single plot. In this case you
  can force a gap between them, and a separate label for each set, by using the
- plot command `newhistogram {"<title>"} {<linestyle>}`.
+ plot command `newhistogram {"<title>"} {<linetype>} {at <x-coord>}`.
  For example
 
        set style histogram  cluster
@@ -9056,6 +9056,7 @@ C ... and restart the table:
        plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
             newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
 
+ The `at <x-coord>` option only applies to column-stacked histograms.
 5 image
 ?commands set style image
 ?set style image
