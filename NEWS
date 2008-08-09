@@ -27,6 +27,7 @@ New features, changes and fixes since previous release
 * CHANGE emf: separate dashlength option (don't use linewidth for dashlength)
 * CHANGE stacked histograms grow upward for values > 0, downward for values < 0
 * CHANGE 'pause mouse button1' (or button2) does not disable zooming
+* CHANGE built-in readline tries to recognize <home> and <end> keys
 
 
 New features, changes and fixes in gnuplot version 4.2.3
