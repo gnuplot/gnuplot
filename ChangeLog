@@ -1,3 +1,13 @@
+2008-08-12  Juergen Wieferink <wieferink@freenet.de>
+
+	* src/misc.h src/misc.c: Make lf_push() and lf_pop() global.
+
+	* src/command.c (do_string): Make use of lf_push() and lf_pop() to avoid
+	memory leaks on int_error().
+
+	* src/command.h src/command.c src/tables.c src/plot.c docs/gnuplot.doc:
+	New command `evaluate` executes the commands given by a string argument.
+
 2008-08-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/readline.c (ansi_getc): Teach built-in readline to map

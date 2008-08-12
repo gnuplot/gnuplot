@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.100 2008/06/08 22:17:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.101 2008/06/22 04:26:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -53,8 +53,6 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.100 2008/06/08 22:17:21 sfe
 # include <windows.h>
 #endif
 
-static TBOOLEAN lf_pop __PROTO((void));
-static void lf_push __PROTO((FILE *));
 static void arrow_use_properties __PROTO((struct arrow_style_type *arrow, int tag));
 static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
 
@@ -289,7 +287,7 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 /* pop from load_file state stack
    FALSE if stack was empty
    called by load_file and load_file_error */
-static TBOOLEAN
+TBOOLEAN
 lf_pop()
 {
     LFS *lf;
@@ -338,7 +336,7 @@ lf_pop()
 /* push onto load_file state stack
    essentially, we save information needed to undo the load_file changes
    called by load_file */
-static void
+void
 lf_push(FILE *fp)
 {
     LFS *lf;

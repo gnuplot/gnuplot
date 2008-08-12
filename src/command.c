@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.173 2008/06/03 01:26:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.174 2008/07/23 19:27:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -192,6 +192,8 @@ int num_tokens, c_token;
 
 static int if_depth = 0;
 static TBOOLEAN if_condition = FALSE;
+
+static int eval_depth = 0;
 
 static int command_exit_status = 0;
 
@@ -401,21 +403,28 @@ do_line()
 void
 do_string(char *s)
 {
-    char *orig_input_line = gp_strdup(gp_input_line);
-
-    while (gp_input_line_len < strlen(s) + 1)
-	extend_input_line();
-    strcpy(gp_input_line, s);
+    TBOOLEAN screen_was_ok = screen_ok;
 
 #ifdef USE_MOUSE
     if (display_ipc_commands())
 	fprintf(stderr, "%s\n", s);
 #endif
 
+    lf_push(NULL); /* save state for errors and recursion */
+    lf_head->c_token = c_token;
+    lf_head->num_tokens = num_tokens;
+    lf_head->tokens = gp_alloc(num_tokens * sizeof(struct lexical_unit),
+			       "lf tokens");
+    memcpy(lf_head->tokens, token, num_tokens * sizeof(struct lexical_unit));
+    lf_head->input_line = gp_strdup(gp_input_line);
+    while (gp_input_line_len < strlen(s) + 1)
+	extend_input_line();
+    strcpy(gp_input_line, s);
+    screen_ok = FALSE;
     do_line();
+    screen_ok = screen_was_ok;
 
-    strcpy(gp_input_line, orig_input_line);
-    free(orig_input_line);
+    lf_pop();
 }
 
 
@@ -812,6 +821,31 @@ clear_command()
 
 }
 
+/* process the 'evaluate' command */
+void
+eval_command()
+{
+    int save_token = ++c_token;
+    char *command = try_to_get_string();
+
+    if (!command)
+	int_error(c_token, "Expected command string");
+    if (++eval_depth > 4)
+	int_error(save_token, "Deep recursion in evaluate");
+    if (strchr(command, '\n'))
+	int_error(save_token, "Cannot evaluate multi-line string");
+
+    do_string(command);
+    --eval_depth;
+    free(command);
+}
+
+/* reset eval_depth counter */
+void
+reset_eval_depth()
+{
+    eval_depth = 0;
+}
 
 /* process the 'exit' and 'quit' commands */
 void

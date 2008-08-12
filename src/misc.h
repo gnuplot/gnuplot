@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.28 2008/04/15 05:01:08 sfeam Exp $
+ * $Id: misc.h,v 1.29 2008/06/22 04:26:02 sfeam Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -55,6 +55,8 @@ void iso_extend __PROTO((struct iso_curve *ip, int num));
 void iso_free __PROTO((struct iso_curve *ip));
 void load_file __PROTO((FILE *fp, char *name, TBOOLEAN subst_args));
 FILE *lf_top __PROTO((void));
+TBOOLEAN lf_pop __PROTO((void));
+void lf_push __PROTO((FILE *));
 void load_file_error __PROTO((void));
 FILE *loadpath_fopen __PROTO((const char *, const char *));
 char *fontpath_fullname __PROTO((const char *));

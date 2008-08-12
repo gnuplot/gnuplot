@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.45 2008/06/01 04:30:57 sfeam Exp $
+ * $Id: command.h,v 1.46 2008/07/23 19:27:06 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -155,6 +155,8 @@ void refresh_request __PROTO((void));
 void call_command __PROTO((void));
 void changedir_command __PROTO((void));
 void clear_command __PROTO((void));
+void eval_command __PROTO((void));
+void reset_eval_depth __PROTO((void));
 void exit_command __PROTO((void));
 void help_command __PROTO((void));
 void history_command __PROTO((void));

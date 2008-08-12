@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.527 2008/08/02 20:54:29 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.528 2008/08/06 23:43:50 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2076,6 +2076,8 @@ C ... and restart the table:
 
  Macro expansion does not occur inside either single or double quotes.
  However macro expansion does occur inside backquotes.
+
+ For execution of complete commands the `evaluate` command may also be handy.
 3 String variables, macros, and command line substitution
 ?mixing_macros_backquotes
 ?substitution mixing_macros_backquotes
@@ -3261,6 +3263,26 @@ Ffigure_mapcontours
 
  Please see `set multiplot`, `set size`, and `set origin` for details of these
  commands.
+2 evaluate
+?commands evaluate
+?evaluate
+ The `evaluate` command executes the commands given as an argument string.
+ Newline characters are not allowed within the string.
+
+ Syntax:
+       eval <string expression>
+
+ This is especially useful for a repetition of similar commands.
+
+ Example:
+       set_label(x, y, text) \
+         = sprintf("set label '%s' at %f, %f point pt 5", text, x, y)
+       eval set_label(1., 1., 'one/one')
+       eval set_label(2., 1., 'two/one')
+       eval set_label(1., 2., 'one/two')
+
+ Please see `substitution macros` for another way to execute commands
+ from a string.
 2 exit
 ?commands exit
 ?exit
