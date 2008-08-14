@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.46 2008/07/23 19:27:06 sfeam Exp $
+ * $Id: command.h,v 1.47 2008/08/13 02:43:09 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -186,7 +186,7 @@ void extend_input_line __PROTO((void));
 void extend_token_table __PROTO((void));
 int com_line __PROTO((void));
 int do_line __PROTO((void));
-void do_string __PROTO((char* s));
+void do_string __PROTO((char* s, TBOOLEAN throwaway_s));
 #ifdef USE_MOUSE
 void toggle_display_of_ipc_commands __PROTO((void));
 int display_ipc_commands __PROTO((void));

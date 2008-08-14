@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.107 2008/07/22 20:16:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.108 2008/07/23 19:27:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1032,13 +1032,13 @@ builtin_nearest_log(struct gp_event_t *ge)
 	    change_y2 = TRUE;
 	
 	if (change_x1)
-	    do_string(axis_array[FIRST_X_AXIS].log ? "unset log x" : "set log x");
+	    do_string(axis_array[FIRST_X_AXIS].log ? "unset log x" : "set log x", FALSE);
 	if (change_y1)
-	    do_string(axis_array[FIRST_Y_AXIS].log ? "unset log y" : "set log y");
+	    do_string(axis_array[FIRST_Y_AXIS].log ? "unset log y" : "set log y", FALSE);
 	if (change_x2 && !splot_map)
-	    do_string(axis_array[SECOND_X_AXIS].log ? "unset log x2" : "set log x2");
+	    do_string(axis_array[SECOND_X_AXIS].log ? "unset log x2" : "set log x2", FALSE);
 	if (change_y2 && !splot_map)
-	    do_string(axis_array[SECOND_Y_AXIS].log ? "unset log y2" : "set log y2");
+	    do_string(axis_array[SECOND_Y_AXIS].log ? "unset log y2" : "set log y2", FALSE);
 	if (!change_x1 && !change_y1 && splot_map)
 	    do_string_replot( Z_AXIS.log ? "unset log z" : "set log z");
 	
@@ -1360,7 +1360,7 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
 		    /* FIXME - Better to clear MOUSE_[XY] than to set it wrongly. */
 		    /*         This may be worth a separate subroutine.           */
 		    load_mouse_variables(0, 0, FALSE, c);
-		do_string(ptr->command);
+		do_string(ptr->command, FALSE);
 		/* Treat as a current event after we return to x11.trm */
 		ge->type = GE_keypress;
 		break;
@@ -1369,7 +1369,7 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
 		break;
 	    /* Let user defined bindings overwrite the builtin bindings */
 	    } else if ((par2 & 1) == 0 && ptr->command) {
-		do_string(ptr->command);
+		do_string(ptr->command, FALSE);
 		break;
 	    } else if (ptr->builtin) {
 		ptr->builtin(ge);
@@ -1877,7 +1877,7 @@ do_event(struct gp_event_t *ge)
 	break;
     case GE_replot:
 	/* used only by ggi.trm */
-	do_string("replot");
+	do_string("replot", FALSE);
 	break;
     case GE_reset:
 	event_reset(ge);

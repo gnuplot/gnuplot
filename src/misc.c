@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.101 2008/06/22 04:26:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.102 2008/08/13 02:43:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -604,8 +604,7 @@ pop_terminal()
 	i = interactive;
 	interactive = 0;
 	sprintf(s,"set term %s %s", push_term_name, (push_term_opts ? push_term_opts : ""));
-	do_string(s);
-	free(s);
+	do_string(s, TRUE);
 	interactive = i;
 	if (interactive)
 	    fprintf(stderr,"   restored terminal is %s %s\n", term->name, ((*term_options) ? term_options : ""));

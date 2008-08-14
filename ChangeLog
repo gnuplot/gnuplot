@@ -1,3 +1,10 @@
+2008-08-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c src/command.h src/command.c (do_string) src/mouse.c:
+	Add a flag parameter to do_string() indicating whether the string is to
+	be freed immediately after copying. This should fix memory leaks both in
+	the new eval_command() and the existing call in pop_terminal().
+
 2008-08-12  Juergen Wieferink <wieferink@freenet.de>
 
 	* src/misc.h src/misc.c: Make lf_push() and lf_pop() global.

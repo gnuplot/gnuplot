@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.174 2008/07/23 19:27:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.175 2008/08/13 02:43:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -401,7 +401,7 @@ do_line()
 
 
 void
-do_string(char *s)
+do_string(char *s, TBOOLEAN throwaway_s)
 {
     TBOOLEAN screen_was_ok = screen_ok;
 
@@ -420,6 +420,8 @@ do_string(char *s)
     while (gp_input_line_len < strlen(s) + 1)
 	extend_input_line();
     strcpy(gp_input_line, s);
+    if (throwaway_s)
+	free(s);
     screen_ok = FALSE;
     do_line();
     screen_ok = screen_was_ok;
@@ -826,18 +828,15 @@ void
 eval_command()
 {
     int save_token = ++c_token;
-    char *command = try_to_get_string();
+    char *command;
 
-    if (!command)
-	int_error(c_token, "Expected command string");
     if (++eval_depth > 4)
 	int_error(save_token, "Deep recursion in evaluate");
-    if (strchr(command, '\n'))
-	int_error(save_token, "Cannot evaluate multi-line string");
+    if (!(command = try_to_get_string()))
+	int_error(c_token, "Expected command string");
 
-    do_string(command);
+    do_string(command, TRUE);
     --eval_depth;
-    free(command);
 }
 
 /* reset eval_depth counter */
