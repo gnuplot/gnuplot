@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.279 2008/06/22 04:26:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.280 2008/07/13 05:52:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4570,7 +4570,8 @@ set_tic_prop(AXIS_INDEX axis)
 			looks_like_numeric(axis_array[axis].formatstring);
 	    } else if (equals(c_token,"tc") ||
 		       almost_equals(c_token,"text$color")) {
-		parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_FRAC);
+		parse_colorspec(&axis_array[axis].ticdef.textcolor,
+				axis == FIRST_Z_AXIS ? TC_Z : TC_FRAC);
 	    } else if (almost_equals(c_token, "au$tofreq")) {
 		/* auto tic interval */
 		++c_token;

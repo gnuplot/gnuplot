@@ -26,6 +26,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW commands 'show bind' and 'reset bind'
 * NEW terminal dpu414 - Seiko DPU-414 thermal printer
 * NEW command 'evaluate' executes commands from a string variable
+* NEW z-axis tic labels can be colored by Z value
 * FIX remove the limit of 64 characters read as string data from a data file
 * FIX remainder of command line is not lost after a "load" command
 * FIX more complete support for locale internationalization, UTF-8 encoding

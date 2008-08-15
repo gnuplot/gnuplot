@@ -1,3 +1,12 @@
+2008-08-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/dumb.trm: Accept terminal size in the form used by most other
+	terminal drivers.   'set term dumb size 80,23"
+
+	* src/set.c (set_tic_prop) src/graph3d.c (ztick_callback):
+	Allow tic labels on z axis to have 'tc palette z'
+	Feature request #1689545
+
 2008-08-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c src/command.h src/command.c (do_string) src/mouse.c:

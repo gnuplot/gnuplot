@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.203 2008/07/19 18:12:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.204 2008/07/22 18:09:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2726,6 +2726,8 @@ ztick_callback(
 	if (!axis_array[axis].tic_in)
 	    x1 -= (term->h_tic) * axis_array[axis].ticscale;
 	/* User-specified different color for the tics text */
+	if (axis_array[axis].ticdef.textcolor.type == TC_Z)
+	    axis_array[axis].ticdef.textcolor.value = place;
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
 	write_multiline(x1+offsetx, y1+offsety, text, RIGHT, JUST_CENTRE,

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.27 2006/12/27 21:40:28 sfeam Exp $
+ * $Id: dumb.trm,v 1.28 2008/02/24 19:49:38 sfeam Exp $
  *
  */
 
@@ -118,7 +118,7 @@ static int dumb_feed = 1;
 
 static void dumb_set_pixel __PROTO((int x, int y, int v, int p));
 
-enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH, DUMB_OTHER };
+enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH, DUMB_SIZE, DUMB_OTHER };
 
 static struct gen_table DUMB_opts[] =
 {
@@ -126,6 +126,7 @@ static struct gen_table DUMB_opts[] =
     { "nof$eed", DUMB_NOFEED },
     { "enh$anced", DUMB_ENH },
     { "noe$nhanced", DUMB_NOENH },
+    { "size", DUMB_SIZE },
     { NULL, DUMB_OTHER }
 };
 
@@ -156,10 +157,16 @@ DUMB_options()
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    break;
 #endif
+	case DUMB_SIZE:
+	    c_token++;
+	    /* Fall through */
+
 	case DUMB_OTHER:
 	default:
 	    x = int_expression();
 	    if (!END_OF_COMMAND) {
+		if (equals(c_token,","))
+		    c_token++;
 		y = int_expression();
 		dumb_xmax = term->xmax = x;
 		dumb_ymax = term->ymax = y;
@@ -168,7 +175,7 @@ DUMB_options()
 	}
     }
 
-    sprintf(term_options, "%sfeed %s %d %d",
+    sprintf(term_options, "%sfeed %s size %d, %d",
 	    dumb_feed ? "" : "no",
 	    term->put_text == ENHdumb_put_text ? "enhanced" : "",
 	    dumb_xmax, dumb_ymax);
