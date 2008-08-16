@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.25 2006/07/21 02:35:45 sfeam Exp $
+ * $Id: dumb.trm,v 1.26 2006/07/29 05:40:41 sfeam Exp $
  *
  */
 
@@ -118,7 +118,7 @@ static int dumb_feed = 1;
 
 static void dumb_set_pixel __PROTO((int x, int y, int v, int p));
 
-enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH, DUMB_OTHER };
+enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH, DUMB_SIZE, DUMB_OTHER };
 
 static struct gen_table DUMB_opts[] =
 {
@@ -126,6 +126,7 @@ static struct gen_table DUMB_opts[] =
     { "nof$eed", DUMB_NOFEED },
     { "enh$anced", DUMB_ENH },
     { "noe$nhanced", DUMB_NOENH },
+    { "size", DUMB_SIZE },
     { NULL, DUMB_OTHER }
 };
 
@@ -157,10 +158,16 @@ DUMB_options()
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    break;
 #endif
+	case DUMB_SIZE:
+	    c_token++;
+	    /* Fall through */
+
 	case DUMB_OTHER:
 	default:
 	    x = (int) real(const_express(&a));
 	    if (!END_OF_COMMAND) {
+		if (equals(c_token,","))
+		    c_token++;
 		y = (int) real(const_express(&a));
 		dumb_xmax = term->xmax = x;
 		dumb_ymax = term->ymax = y;
