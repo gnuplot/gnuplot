@@ -1,3 +1,8 @@
+2008-08-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/dumb.trm: Accept terminal size in the form used by most other
+	terminal drivers.   'set term dumb size 80,23"
+
 2008-08-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Typo in show colornames.
