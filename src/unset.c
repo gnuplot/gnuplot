@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.120 2008/06/08 22:17:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.121 2008/06/22 04:26:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1110,6 +1110,7 @@ unset_tics(AXIS_INDEX axis)
 	axis_array[i].ticdef.textcolor.lt = 0;
 	axis_array[i].ticdef.textcolor.value = 0;
 	axis_array[i].ticdef.offset = tics_nooffset;
+	axis_array[i].ticdef.rangelimited = FALSE;
 	axis_array[i].tic_rotate = 0;
 	axis_array[i].ticscale = 1.0;
 	axis_array[i].miniticscale = 0.5;

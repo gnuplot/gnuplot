@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.217 2008/06/08 22:17:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.218 2008/06/12 18:07:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3004,6 +3004,8 @@ show_ticdef(AXIS_INDEX axis)
 	break;
     }
 
+    if (axis_array[axis].ticdef.rangelimited)
+	fprintf(stderr, "\n\t  tics are limited to data range");
     fprintf(stderr, "\n\t  labels are format \"%s\"", ticfmt);
     if (axis_array[axis].tic_rotate) {
 	fprintf(stderr," rotated");

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.528 2008/08/06 23:43:50 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.529 2008/08/13 02:43:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10542,6 +10542,7 @@ Ffigure_mapcontours
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
                  { format "formatstring" } { font "name{,<size>}" }
+                 { rangelimited }
                  { textcolor <colorspec> }
        unset xtics
        show xtics
@@ -10672,9 +10673,12 @@ Ffigure_mapcontours
 
  Minor (unlabelled) tics can be added automatically by the `set mxtics`
  command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
-
- In case of timeseries data, position values must be given as quoted dates
- or times according to the format `timefmt`.  If the <start>, <incr>, <end>
+4 xtics time_data
+?set xtics time_axis tics
+?xtics time_axis tics
+?time_axis tics
+ In case of timeseries data, axis tic position values must be given as quoted
+ dates or times according to the format `timefmt`. If the <start>, <incr>, <end>
  form is used, <start> and <end> must be given according to `timefmt`, but
  <incr> must be in seconds.  Times will be written out according to the format
  given on `set format`, however.
@@ -10693,7 +10697,25 @@ Ffigure_mapcontours
        set xtics ("01/12", "" "03/12", "05/12")
  Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the
  second example the tic at "Dec 3" will be unlabelled.
-
+4 xtics rangelimited
+?set xtics rangelimited
+?xtics rangelimited
+?rangelimited
+?range-frame
+ This option limits both the auto-generated axis tic labels and the
+ corresponding plot border to the range of values actually present in the data
+ that has been plotted.  Note that this is independent of the current range 
+ limits for the plot. For example, suppose that the data in "file.dat" all lies
+ in the range 2 < y < 4.  Then the following commands will create a plot for
+ which the left-hand plot border (y axis) is drawn for only this portion of the
+ total y range, and only the axis tics in this region are generated.
+ I.e., the plot will be scaled to the full range on y, but there will be a gap
+ between 0 and 2 on the left border and another gap between 4 and 10. This
+ style is sometimes refered to as a `range-frame` graph.
+       set border 3
+       set yrange [0:10]
+       set ytics nomirror rangelimited
+       plot "file.dat"
 3 xyplane
 ?commands set xyplane
 ?commands show xyplane

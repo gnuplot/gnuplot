@@ -30,3 +30,16 @@ A = pi/9.
 plot 'random.tmp' using (1.5 + $1*cos(A)-2.*$2*sin(A)):(1.0 + $1*sin(A)+2.*$2*cos(A)) with dots
 
 pause -1 "Hit return to continue"
+
+set title 'Example of range-limited axes and tics'
+
+set tics out scale 0.5
+set xtics 1.0 border rangelimited nomirror
+set ytics 1.0 border rangelimited nomirror
+set format xy "%.0f"
+set border 3
+
+replot
+
+pause -1 "Hit return to continue"
+

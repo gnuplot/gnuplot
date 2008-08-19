@@ -1,3 +1,10 @@
+2008-08-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/axis.c(gen_tics) src/set.c(set_tics) src/show.c
+	src/graphics.c (plot_border): Add an axis tic attribute "rangelimited".
+	If set, the border and tics for this axis will be drawn only for the
+	range of the data, rather than the full range of the axis.
+
 2008-08-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/dumb.trm: Accept terminal size in the form used by most other

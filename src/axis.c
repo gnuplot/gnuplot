@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.70 2008/06/06 04:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.71 2008/08/01 16:15:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1122,6 +1122,12 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			} else {
 			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, user);
 			}
+
+			/* Range-limited tic placement */
+			if (def->rangelimited
+			&&  !inrange(internal,axis_array[axis].data_min,axis_array[axis].data_max))
+			    continue;
+
 			(*callback) (axis, internal, label, lgrd);
 		    }
 		}
