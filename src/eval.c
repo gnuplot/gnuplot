@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.69 2008/07/21 20:19:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.70 2008/08/05 23:27:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -463,16 +463,12 @@ pop_or_convert_from_string(struct value *v)
 {
     (void) pop(v);
     if (v->type == STRING) {
-#if (0)	/* Version 2.2 */
-	double d = atof(v->v.string_val);
-#else
 	char *eov;
 	double d = strtod(v->v.string_val,&eov);
 	if (v->v.string_val == eov) {
 	    gpfree_string(v);
 	    int_error(NO_CARET,"Non-numeric string found where a numeric expression was expected");
 	}
-#endif
 	gpfree_string(v);
 	Gcomplex(v, d, 0.);
 	FPRINTF((stderr,"converted string to CMPLX value %g\n",real(v)));

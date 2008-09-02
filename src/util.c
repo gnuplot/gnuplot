@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.80 2008/04/21 03:50:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.81 2008/07/21 20:19:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -364,13 +364,6 @@ try_to_get_string()
 	newstring = a.v.string_val;
     else
 	c_token = save_token;
-
-#if (0) /* Old pre-string handling alternative code */
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	m_quote_capture(&newstring, c_token, c_token);
-	c_token++;
-    }
-#endif
 
     return newstring;
 }
