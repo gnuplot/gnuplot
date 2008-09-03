@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.529 2008/08/13 02:43:09 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.530 2008/08/19 18:48:20 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4242,11 +4242,23 @@ Ffigure_mapcontours
  Currently, syntax allows for up to three-dimensional arrays.  However, no
  conventions have yet been made for handling three-dimensional coordinates.
 5 record
+?binary record
 ?binary general record
  This keyword serves the same function as `array`, having the same syntax.
  However, `record` causes gnuplot to not generate coordinate information.
  This is for the case where such information may be included in one of the
  columns of the binary data file.
+5 skip
+?binary skip
+?binary general skip
+ This keyword allows you to skip sections of a binary file. For instance, if the
+ file contains a 1024 byte header before the start of the data region you would
+ probably want to use
+       plot '<file_name>' binary skip=1024 ...
+ If there are multiple records in the file, you may specify a leading offset for
+ each. For example, to skip 512 bytes before the 1st record and 256 bytes before
+ the second and third records
+       plot '<file_name> binary record=356:356:356 skip=512:256:256 ...
 5 format
 ?binary general format
  The default binary format is a float.  For more flexibility, the format can
@@ -4416,6 +4428,7 @@ Ffigure_mapcontours
 ?binary_examples
 ?binary examples
 ?binary general examples
+=skip
  Examples:
 
        # Selects two float values (second one implicit) with a float value
@@ -4439,6 +4452,10 @@ Ffigure_mapcontours
        # data file.  The file was created with a endianess different from
        # the system on which gnuplot is running.
        splot '<file_name>' binary record=30:30:29:26 endian=swap u 1:2:3
+
+       # Same input file, but this time we skip the 1st and 3rd records
+       splot '<file_name>' binary record=30:26 skip=360:348 endian=swap u 1:2:3
+
 
  See also `binary matrix`.
 4 every
