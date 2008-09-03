@@ -1,3 +1,8 @@
+2008-09-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (add_tic_user): NULL labels are OK if requested via
+	'set xtics (x1, x2, ...)' as opposed to read from a data file.
+
 2008-08-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/axis.c(gen_tics) src/set.c(set_tics) src/show.c
