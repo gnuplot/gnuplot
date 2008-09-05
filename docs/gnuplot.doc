@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.530 2008/08/19 18:48:20 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.531 2008/09/03 20:32:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9375,7 +9375,8 @@ Ffigure_mapcontours
  values (1.0).
 
  `ratio` and `square` have no effect on 3D plots, but do affect 3D projections
- created using `set view map`.
+ created using `set view map`.  See also `set view equal_axes`, which similarly
+ forces the x and y axes of a 3D onto the same scale.
 
  Examples:
 
@@ -10188,7 +10189,9 @@ Ffigure_mapcontours
  orthogonal 2D projection into a 2D plot-like map.
 
  Syntax:
-       set view { <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}} | map }
+       set view <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}}
+       set view map
+       set view {no}equal_axes
        show view
 
  where <rot_x> and <rot_z> control the rotation angles (in degrees) in a
@@ -10214,6 +10217,10 @@ Ffigure_mapcontours
 
  The first sets all the four default values.  The second changes only scale,
  to 0.5.
+
+ The command `set view equal_axes` forces the unit length of the x and y axes
+ to be on the same same.  Otherwise by default both axes are scaled to fill the
+ available area.  This is similar to the `set size square` command for 2D plots.
 
  See also `set ticslevel`.
 3 vrange

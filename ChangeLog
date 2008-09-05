@@ -1,3 +1,11 @@
+2008-09-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc src/gadgets.c src/gadgets.h src/graph3d.c src/save.c   
+	src/set.c src/show.c src/unset.c NEWS:
+	New option 'set view equal_axes' that forces x and y axes in a 3D plot
+	to use the same scale.  This is similar to 'set size square' in 2D.
+	Bug #2004205. Feature request #2006851.
+
 2008-09-05  Peter Danenberg  <danenberg@users.sourceforge.net>
 
 	* term/cairo.trm (cairopng_do_crop): Crop option for pngcairo.

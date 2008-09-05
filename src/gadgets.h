@@ -324,6 +324,7 @@ extern float zsize;		/* z scale factor for size */
 extern float xoffset;		/* x origin setting */
 extern float yoffset;		/* y origin setting */
 extern float aspect_ratio;	/* 1.0 for square */
+extern float aspect_ratio_3D;	/* 1.0 for equal scaling of x and y */
 
 /* plot border autosizing overrides, in characters (-1: autosize) */
 extern t_position lmargin, bmargin, rmargin, tmargin;
