@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.21 2008/06/02 03:46:59 sfeam Exp $
+ * $Id: cairo.trm,v 1.22 2008/07/29 22:15:50 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -37,6 +37,7 @@
 /*
  * Modifications:
  *	Peter Danenberg, Ethan Merritt	- handle png output as well as pdf
+ *	Peter Danenberg - crop for PNGs
  */
 
 #ifdef TERM_REGISTER
@@ -77,6 +78,7 @@ TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
 
 #include "cairo-pdf.h"
 #include "wxterminal/gp_cairo.h"
+#include "sys/types.h"		/* For uint32_t */
 
 #define CAIROTRM_DEFAULT_FONTNAME "Sans"
 
@@ -86,6 +88,7 @@ TBOOLEAN cairotrm_dashed = FALSE;
 TBOOLEAN cairotrm_mono = FALSE;
 TBOOLEAN cairotrm_rounded = FALSE;
 TBOOLEAN cairotrm_transparent = FALSE;
+TBOOLEAN cairotrm_crop = FALSE;
 /* default text font family: */
 char cairotrm_set_fontname[MAX_ID_LEN + 1] = "";
 /* default text size*/
@@ -128,6 +131,9 @@ enum CAIROTRM_id {
     CAIROTRM_COLOR,
     CAIROTRM_DASHLENGTH,
     CAIROTRM_TRANSPARENT,
+    CAIROTRM_NOTRANSPARENT,
+    CAIROTRM_CROP,
+    CAIROTRM_NOCROP,
     CAIROTRM_OTHER
 };
 
@@ -148,6 +154,9 @@ static struct gen_table cairotrm_opts[] = {
     {"dl", CAIROTRM_DASHLENGTH},
     {"dashl$ength", CAIROTRM_DASHLENGTH},
     {"transp$arent", CAIROTRM_TRANSPARENT},
+    {"notransp$arent", CAIROTRM_NOTRANSPARENT},
+    {"crop", CAIROTRM_CROP},
+    {"nocrop", CAIROTRM_NOCROP},
     {NULL, CAIROTRM_OTHER}
 };
 
@@ -165,9 +174,13 @@ TERM_PUBLIC void cairotrm_options()
 	TBOOLEAN set_capjoin = FALSE;
 	size_units cairotrm_explicit_units;
 	char tmp_term_options[MAX_LINE_LEN+1] = "";
+#if 0
+	/* terminals should not reset options during "set term" call */
 	cairotrm_dashed = FALSE;	/* Dashed lines? (default is solid) */
 	cairotrm_mono = FALSE;  	/* Mono? (default is color) */
 	cairotrm_transparent = FALSE;
+	cairotrm_crop = FALSE;
+#endif
 
 	/* Initialize terminal-dependent values */
 	if (!strcmp(term->name,"pngcairo")) {
@@ -271,12 +284,26 @@ TERM_PUBLIC void cairotrm_options()
 			if (!strcmp(term->name,"pngcairo"))
 			    cairotrm_transparent = TRUE;
 			break;
+		case CAIROTRM_NOTRANSPARENT:
+			c_token++;
+			if (!strcmp(term->name,"pngcairo"))
+			    cairotrm_transparent = FALSE;
+			break;
+		case CAIROTRM_CROP:
+			c_token++;
+			if (!strcmp(term->name,"pngcairo"))
+			    cairotrm_crop = TRUE;
+			break;
+		case CAIROTRM_NOCROP:
+			c_token++;
+			if (!strcmp(term->name,"pngcairo"))
+			    cairotrm_crop = FALSE;
+			break;
 		case CAIROTRM_OTHER:
 			/* Ignore irrelevant keywords used by other png/pdf drivers */
 			if (almost_equals(c_token,"true$color")
-			||  almost_equals(c_token,"crop")
-			||  !strncmp(&gp_input_line[token[c_token].start_index],"no",2)
-			||  almost_equals(c_token,"inter$lace")) {
+			||  almost_equals(c_token,"inter$lace")
+			||  almost_equals(c_token,"nointer$lace")) {
 			    c_token++;
 			    break;
 			}
@@ -302,6 +329,11 @@ TERM_PUBLIC void cairotrm_options()
 
 
 	/* Save options back into options string in normalized format */
+	if (cairotrm_crop)
+		snprintf(term_options, sizeof(term_options)-strlen(term_options), " crop");
+	else
+		snprintf(term_options, sizeof(term_options)-strlen(term_options), " nocrop");
+
 	if (cairotrm_transparent)
 		snprintf(term_options, sizeof(term_options)-strlen(term_options),
 			" transparent");
@@ -418,7 +450,7 @@ void cairotrm_graphics()
 		gp_cairo_clear_background(&plot);
 	else
 		gp_cairo_solid_background(&plot);
-		
+
 
 	/* update the window scale factor first, cairo needs it */
 	plot.xscale = 1.0;
@@ -463,6 +495,83 @@ cairopng_write(void *closure, unsigned char *data, unsigned int length)
 	return CAIRO_STATUS_SUCCESS;
 }
 
+cairo_surface_t *
+cairopng_do_crop()
+{
+  cairo_surface_t *surface = cairo_get_target(plot.cr);
+  unsigned char *data = cairo_image_surface_get_data(surface);
+  int width = cairo_image_surface_get_width(surface);
+  int height = cairo_image_surface_get_height(surface);
+  int stride = cairo_image_surface_get_stride(surface);
+  int  i, j, x1 = 0, y1 = 0, x2 = width, y2 = height;
+
+  typedef u_int32_t uint32;
+  uint32 BG = ~0x0;
+  uint32 *row;
+
+  /* return unadulterated surface if we're not cropping */
+  if (!cairotrm_crop)
+	return(surface);
+
+  /* Row-wise, top-down iteration */
+  for (i = 0; i < height; i++) {
+    row = (uint32 *) (data + i * stride);
+    for (j = 0; j < width; j++) {
+      if (row[j] != BG) {
+	y1 = i;
+	goto found_y1;
+      }
+    }
+  }
+ found_y1:
+  /* Row-wise, bottom-up iteration */
+  for (i = height - 1; i >= y1; i--) {
+    row = (uint32 *)(data + i * stride);
+    for (j = 0; j < width; j++) {
+      if (row[j] != BG) {
+	y2 = i;
+	goto found_y2;
+      }
+    }
+  }
+ found_y2:
+  /* Column-wise, left-to-right iteration */
+  for (j = 0; j < width; j++) {
+    for (i = y1; i <= y2; i++) {
+      row = (uint32 *) (data + i * stride);
+      if (row[j] != BG) {
+	x1 = j;
+	goto found_x1;
+      }
+    }
+  }
+ found_x1:
+  /* Column-wise, right-to-left iteration */
+  for (j = width - 1; j >= x1; j--) {
+    for (i = y1; i <= y2; i++) {
+      row = (uint32 *) (data + i * stride);
+      if (row[j] != BG) {
+	x2 = j;
+	goto found_x2;
+      }
+    }
+  }
+ found_x2:
+  {
+  const int padding = 10;
+  int clip_width = GPMIN(x2 - x1 + padding, width);
+  int clip_height = GPMIN(y2 - y1 + padding, height);
+  cairo_surface_t *clip = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
+  			clip_width, clip_height);
+  cairo_t *clip_cr = cairo_create(clip);
+  cairo_set_source_surface(clip_cr, cairo_get_target(plot.cr),
+			-GPMAX(x1 - padding / 2, 0),
+			-GPMAX(y1 - padding / 2, 0));
+  cairo_rectangle(clip_cr, 0, 0, clip_width, clip_height);
+  cairo_fill(clip_cr);
+  return clip;
+  }
+}
 
 void cairotrm_text()
 {
@@ -480,7 +589,7 @@ void cairotrm_text()
 	cairo_show_page(plot.cr);
 	if (!strcmp(term->name,"pngcairo")) {
 		int error_data[1];
-		cairo_surface_write_to_png_stream(cairo_get_target(plot.cr),
+		cairo_surface_write_to_png_stream(cairopng_do_crop(),
 			(cairo_write_func_t)cairopng_write, error_data);
 	}
 
@@ -575,7 +684,7 @@ void cairotrm_linetype(int lt)
 	else
 	    gp_cairo_set_linestyle(&plot,  GP_CAIRO_SOLID);
 
-        if (cairotrm_mono && lt >= -1)
+	if (cairotrm_mono && lt >= -1)
 	    gp_cairo_set_color(&plot, gp_cairo_linetype2color( -1 ));
 	else
 	    gp_cairo_set_color(&plot, gp_cairo_linetype2color( lt ));
@@ -624,7 +733,7 @@ int cairotrm_set_font (const char *font)
 	 * They may be taken into account in next plot commands */
 	gp_cairo_set_font(&plot, fontname, fontsize);
 	gp_cairo_set_termvar(&plot, &(term->v_char),
-	                            &(term->h_char));
+				    &(term->h_char));
 
 	/* the returned int is not used anywhere */
 	return 1;
@@ -919,7 +1028,7 @@ START_HELP(pngcairo)
 " Syntax:",
 "         set term pngcairo",
 "                      {{no}enhanced} {mono|color} {solid|dashed}",
-"                      {transparent} {font <font>}",
+"                      {{no}transparent} {{no}crop} {font <font>}",
 "                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
 "                      {size <XX>{unit},<YY>{unit}}",
 "",

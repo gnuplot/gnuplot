@@ -1,3 +1,8 @@
+2008-09-05  Peter Danenberg  <danenberg@users.sourceforge.net>
+
+	* term/cairo.trm (cairopng_do_crop): Crop option for pngcairo.
+	SF Patch #1873297 
+
 2008-09-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (add_tic_user): NULL labels are OK if requested via
