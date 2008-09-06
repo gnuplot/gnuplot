@@ -1,3 +1,9 @@
+2008-09-06  Juergen Wieferink <wieferink@freenet.de>
+
+	* src/term.c (enhanced_recursion):  Add curly braces {} to the list of
+	characters that must be escaped in postscript enhanced mode.
+	Bug #1968636
+
 2008-09-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (load_tic_functions): Allow axis tick labels to be defined

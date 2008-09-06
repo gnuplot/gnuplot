@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.177 2008/06/24 19:25:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.178 2008/07/09 16:39:50 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2659,9 +2659,9 @@ enhanced_recursion(
 		/* need a separate flag for shift-JIS and certain other 8-bit */
 		/* character sets.                                            */
 		/* EAM Nov 2004 - Nevertheless we must allow \ to act as an   */
-		/* escape for the 5 enhanced mode formatting characters even  */
+		/* escape for a few enhanced mode formatting characters even  */
 		/* though it corrupts certain Shift-JIS character sequences.  */
-		if (strchr("^_@&~",p[1]) == NULL) {
+		if (strchr("^_@&~{}",p[1]) == NULL) {
 		    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
 		    (term->enhanced_writec)('\\');
 		    (term->enhanced_writec)('\\');
