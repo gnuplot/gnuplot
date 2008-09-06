@@ -1,3 +1,10 @@
+2008-09-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (load_tic_functions): Allow axis tick labels to be defined
+	by iteration over expressions giving the label and position.
+		set xtics for [i=1:N] ( label(i) position(i) {level} )
+	Based on a patch by Shige Takeno.
+
 2008-09-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src/gadgets.c src/gadgets.h src/graph3d.c src/save.c   

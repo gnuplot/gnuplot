@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.282 2008/08/19 18:48:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.283 2008/09/06 03:42:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -53,7 +53,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.282 2008/08/19 18:48:21 sfea
 #include "gp_time.h"
 #include "hidden3d.h"
 #include "misc.h"
-/* #include "parse.h" */
+#include "parse.h"
 #include "plot.h"
 #include "plot2d.h"
 #include "plot3d.h"
@@ -151,6 +151,7 @@ static void set_xyzlabel __PROTO((text_label * label));
 static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
+static void load_tic_function __PROTO((AXIS_INDEX axis));
 
 static void set_linestyle __PROTO((void));
 static void set_arrowstyle __PROTO((void));
@@ -4873,6 +4874,8 @@ load_tics(AXIS_INDEX axis)
     if (equals(c_token, "(")) {	/* set : TIC_USER */
 	c_token++;
 	load_tic_user(axis);
+    } else if (equals(c_token,"for")) { /* TIC_FUNCTION */
+	load_tic_function(axis);
     } else {			/* series : TIC_SERIES */
 	load_tic_series(axis);
     }
@@ -5028,6 +5031,63 @@ load_tic_series(AXIS_INDEX axis)
     tdef->def.series.end = end;
 }
 
+
+/*
+ * Load tic labels from user-defined functions:
+ *   for [var = start:end{:incr}]
+ *       (<label string expr> <axis position expr> {ticlevel})
+ */
+static void
+load_tic_function(AXIS_INDEX axis)
+{
+    static struct at_type *position_at = NULL;
+    static struct at_type *label_at = NULL;
+
+    char *ticlabel;
+    double ticposition;
+    int ticlevel = 0;
+    struct value a;
+
+    /* Free any old tic labels */
+    if (!axis_array[axis].ticdef.def.mix) {
+	free_marklist(axis_array[axis].ticdef.def.user);
+	axis_array[axis].ticdef.def.user = NULL;
+    }
+    free_at(position_at);
+    free_at(label_at);
+    position_at = NULL;
+    label_at = NULL;
+
+    /* Initialize iteration bookkeeping */
+    check_for_iteration();
+    if (equals(c_token,"("))
+	c_token++;
+
+    label_at = perm_at();
+    position_at = perm_at();
+
+    if (equals(c_token,")"))
+	c_token++;
+    else {
+	ticlevel = int_expression();
+	c_token++;
+    }
+
+    do {
+	evaluate_at(label_at,&a);
+	if (a.type != STRING)
+	    int_error(NO_CARET,"tic label must be a string");
+	ticlabel = a.v.string_val;
+
+	evaluate_at(position_at,&a);
+	ticposition = real(&a);
+
+	/* add to list */
+	add_tic_user(axis, ticlabel, ticposition, ticlevel);
+	free(ticlabel);
+
+    } while (next_iteration());
+}
 
 /* return 1 if format looks like a numeric format
  * ie more than one %{efg}, or %something-else
