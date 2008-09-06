@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.151.2.3 2007/11/17 04:22:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.151.2.4 2008/02/05 06:14:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2599,19 +2599,19 @@ enhanced_recursion(
                 }
                 break;
             } else if (term->flags & TERM_IS_POSTSCRIPT) {
-                /* Shigeharu TAKENO  Aug 2004 - Needed in order for shift-JIS */
-                /* encoding to work. If this change causes problems then we   */
-                /* need a separate flag for shift-JIS and certain other 8-bit */
-                /* character sets.                                            */
-                /* EAM Nov 2004 - Nevertheless we must allow \ to act as an   */
-                /* escape for the 5 enhanced mode formatting characters even  */
-                /* though it corrupts certain Shift-JIS character sequences.  */
-                if (strchr("^_@&~",p[1]) == NULL) {
-                    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
-                    (term->enhanced_writec)('\\');
-                    (term->enhanced_writec)('\\');
-                    break;
-                }
+		/* Shigeharu TAKENO  Aug 2004 - Needed in order for shift-JIS */
+		/* encoding to work. If this change causes problems then we   */
+		/* need a separate flag for shift-JIS and certain other 8-bit */
+		/* character sets.                                            */
+		/* EAM Nov 2004 - Nevertheless we must allow \ to act as an   */
+		/* escape for a few enhanced mode formatting characters even  */
+		/* though it corrupts certain Shift-JIS character sequences.  */
+		if (strchr("^_@&~{}",p[1]) == NULL) {
+		    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+		    (term->enhanced_writec)('\\');
+		    (term->enhanced_writec)('\\');
+		    break;
+		}
             }
             ++p;
 
