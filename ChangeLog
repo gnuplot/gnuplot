@@ -3,6 +3,11 @@
 	* src/set.c (load_tic_functions): Revert the load_tic_functions change.
 	There is a much better way to accomplish this.
 
+	* src/set.c (set_command) src/unset.c (unset_command) docs/gnuplot.doc:
+	Add iteration support to the 'set' and 'unset' commands. This turns out
+	to be both simpler and more powerful than adding iteration as a special
+	case for axis ticks. E.g.:   unset for [i=100:200] label i
+
 2008-09-06  Juergen Wieferink <wieferink@freenet.de>
 
 	* src/term.c (enhanced_recursion):  Add curly braces {} to the list of

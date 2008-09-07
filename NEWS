@@ -12,8 +12,8 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW rgbimage style now works in 2D and 3D for all terminals that support RGB
 * NEW plot style rgbalpha 
 * NEW transparent fill styles
-* NEW iteration within a plot command; e.g.  plot for [i=1:10] foo(i)
-* NEW iteration over axis tick labels; e.g.  set xtic for [i=1:N] (lab(i) pos(i))
+* NEW iteration within a plot command; e.g. plot for [i=1:10] foo(i)
+* NEW iteration with set/unset commands
 * NEW operators '=' and ',' in expression syntax
 * NEW pdf and png terminals based on cairo and pango
 * NEW error status variables GPVAL_ERRNO and GPVAL_ERRMSG

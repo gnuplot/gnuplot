@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.284 2008/09/06 19:56:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.285 2008/09/07 15:52:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -242,6 +242,11 @@ set_command()
     } else {
 
 #endif /* BACKWARDS_COMPATIBLE */
+
+	int save_token;
+	check_for_iteration();
+	save_token = c_token;
+	ITERATE:
 
 	switch(lookup_table(&set_tbl[0],c_token)) {
 	case S_ANGLES:
@@ -624,8 +629,15 @@ set_command()
 	    break;
 	}
 
+    	if (next_iteration()) {
+	    c_token = save_token;
+	    goto ITERATE;
+	}
+
     }
-    update_gpval_variables(0); /* update GPVAL_ inner variables */
+
+    /* FIXME - Should this be inside the iteration loop? */
+    update_gpval_variables(0);
 
 }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.122 2008/08/19 18:48:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.123 2008/09/06 03:42:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -143,14 +143,20 @@ void
 unset_command()
 {
     int found_token;
+    int save_token;
 
     c_token++;
+
+    check_for_iteration();
 
     found_token = lookup_table(&set_tbl[0],c_token);
 
     /* HBB 20000506: rationalize occurences of c_token++ ... */
     if (found_token != S_INVALID)
 	c_token++;
+
+    save_token = c_token;
+    ITERATE:
 
     switch(found_token) {
     case S_ANGLES:
@@ -508,7 +514,14 @@ unset_command()
 	int_error(c_token, "Unrecognized option.  See 'help unset'.");
 	break;
     }
-    update_gpval_variables(0); /* update GPVAL_ inner variables */
+
+    if (next_iteration()) {
+	c_token = save_token;
+	goto ITERATE;
+    }
+
+    /* FIXME - Should this be inside the iteration loop? */
+    update_gpval_variables(0);
 }
 
 

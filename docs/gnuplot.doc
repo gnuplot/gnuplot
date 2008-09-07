@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.533 2008/09/06 19:55:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.534 2008/09/07 15:52:39 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3861,6 +3861,26 @@ Ffigure_mapcontours
 
  See `reread` for an example of how `if` and `reread` can be used together to
  perform a loop.
+2 iteration
+?iteration
+ The `plot`, `splot`, `set` and `unset` commands may optionally contain an
+ iteration clause.  This has the effect of executing the basic command 
+ multiple times, each time re-evaluating any expressions that make use of the
+ iteration control variable.  Two forms of iteration clause are currently
+ supported:
+
+       for [intvar = start:end{:increment}]
+       for [stringvar in "A B C D"]
+
+ Examples:
+
+       plot for [filename in "A.dat B.dat C.dat"] filename using 1:2 with lines
+       plot for [basename in "A B C"] basename.".dat" using 1:2 with lines
+       set for [i = 1:10] style line i lc rgb "blue"
+       unset for [tag = 100:200] label tag
+
+ See additional documentation for `plot iteration`.
+
 2 load
 ?commands load
 ?load
@@ -5240,7 +5260,7 @@ Ffigure_mapcontours
 ?commands splot iteration
 ?plot iteration
 ?splot iteration
-?iteration
+=iteration
  If many similar files or functions are to be plotted together, it may be
  convenient to do so by iterating over a shared plot command.
 
@@ -5277,7 +5297,6 @@ Ffigure_mapcontours
 
  This is example does exactly the same thing as the previous example, but uses
  the string iterator form of the command rather than an integer iterator.
-
 
 3 title
 ?commands plot title
@@ -5687,8 +5706,7 @@ Ffigure_mapcontours
  The `set` command can be used to set _lots_ of options.  No screen is
  drawn, however, until a `plot`, `splot`, or `replot` command is given.
 
- The `show` command shows their settings;  `show all` shows all the
- settings.
+ The `show` command shows their settings;  `show all` shows all the settings.
 
  Options changed using `set` can be returned to the default state by giving the
  corresponding `unset` command.  See also the `reset` command, which returns
@@ -5697,6 +5715,10 @@ Ffigure_mapcontours
  If a variable contains time/date data, `show` will display it according to
  the format currently defined by `set timefmt`, even if that was not in effect
  when the variable was initially defined.
+=iteration
+ The `set` and `unset` commands may optionally contain an iteration clause.
+ See `iteration`.
+
 3 angles
 ?commands set angles
 ?commands show angles
@@ -9375,8 +9397,8 @@ Ffigure_mapcontours
  values (1.0).
 
  `ratio` and `square` have no effect on 3D plots, but do affect 3D projections
- created using `set view map`.  See also `set view equal_axes`, which similarly
- forces the x and y axes of a 3D onto the same scale.
+ created using `set view map`.  See also `set view equal_axes`, which forces
+ the x and y axes of a 3D onto the same scale.
 
  Examples:
 
@@ -10217,10 +10239,12 @@ Ffigure_mapcontours
 
  The first sets all the four default values.  The second changes only scale,
  to 0.5.
-
+4 equal_axes
+?set view equal_axes
+?view equal_axes
  The command `set view equal_axes` forces the unit length of the x and y axes
  to be on the same same.  Otherwise by default both axes are scaled to fill the
- available area.  This is similar to the `set size square` command for 2D plots.
+ available area.
 
  See also `set ticslevel`.
 3 vrange
@@ -11485,13 +11509,18 @@ Ffigure_mapcontours
 2 unset
 ?commands unset
 ?unset
+=iteration
  Options set using the `set` command may be returned to their default state by
- issuing the corresponding `unset` command.
+ the corresponding `unset` command.  The `unset` command may contain an optional
+ iteration clause. See `iteration`.
 
- Example:
+ Examples:
        set xtics mirror rotate by -45 0,10,100
        ...
        unset xtics
+
+       # Unset labels numbered between 100 and 200
+       unset for [i=100:200] label i
 
 2 update
 ?commands update
