@@ -1,3 +1,8 @@
+2008-09-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (load_tic_functions): Revert the load_tic_functions change.
+	There is a much better way to accomplish this.
+
 2008-09-06  Juergen Wieferink <wieferink@freenet.de>
 
 	* src/term.c (enhanced_recursion):  Add curly braces {} to the list of
