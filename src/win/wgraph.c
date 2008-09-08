@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.61 2008/06/24 18:42:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.62 2008/06/24 21:16:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -893,8 +893,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	if ((lastop==W_vect) && (curptr->op!=W_vect)) {
 	    if (polyi >= 2)
 		Polyline(hdc, ppt, polyi);
+	    /* EAM FIXME - Is this needed?  Is it even correct? */
 	    else if (polyi == 1)
-		LineTo(hdc, ppt[0].x, ppt[0].y);
+		MoveTo(hdc, ppt[0].x, ppt[0].y);
 	    polyi = 0;
 	}
 	switch (curptr->op) {

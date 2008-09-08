@@ -2,6 +2,15 @@
 
 	* src/graph3d.c (do_3dplot): Fixed MIN => GPMIN.
 
+2008-09-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/win.trm (WIN_set_color) src/win/wgraph.c (drawgraph):
+	The win terminal has been drawing spurious lines connecting distinct
+	polylines in the input data file, but only in the case of variable
+	rgb color or palette z.  I suspect the patch of 2008-06-24 but I am not
+	certain.  Try a variant on that patch and also impose more consistent 
+	bookkeeping of the current line type.
+
 2008-09-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (load_tic_functions): Revert the load_tic_functions change.
