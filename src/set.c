@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.285 2008/09/07 15:52:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.286 2008/09/07 17:27:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4902,7 +4902,7 @@ load_tic_user(AXIS_INDEX axis)
     double ticposition;
 
     /* Free any old tic labels */
-    if (!axis_array[axis].ticdef.def.mix) {
+    if (!axis_array[axis].ticdef.def.mix && !iteration) {
 	free_marklist(axis_array[axis].ticdef.def.user);
 	axis_array[axis].ticdef.def.user = NULL;
     }

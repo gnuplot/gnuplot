@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.54 2008/04/06 17:23:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.55 2008/07/21 20:19:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -59,6 +59,7 @@ static int iteration_start = 0, iteration_end = 0;
 static int iteration_increment = 1;
 static int iteration_current = 0;
 static char *iteration_string = NULL;
+int iteration = 0;
 
 /* Internal prototypes: */
 
@@ -896,6 +897,7 @@ check_for_iteration()
     free(iteration_string);
     iteration_string = NULL;
     iteration_increment = 1;
+    iteration = 0;
 
     if (!equals(c_token, "for"))
 	return;
@@ -952,8 +954,11 @@ check_for_iteration()
 TBOOLEAN
 next_iteration()
 {
-    if (!iteration_udv)
+    if (!iteration_udv) {
+	iteration = 0;
 	return FALSE;
+    }
+    iteration++;
     iteration_current += iteration_increment;
     if (iteration_string) {
 	free(iteration_udv->udv_value.v.string_val);

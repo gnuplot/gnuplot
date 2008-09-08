@@ -11,6 +11,11 @@
 	certain.  Try a variant on that patch and also impose more consistent 
 	bookkeeping of the current line type.
 
+	* src/parse.h src/parse.c src/set.c (load_tic_user):
+	Some set commands, e.g. set xtics, need to distinguish between the 
+	first time through an iteration and subsequent times through it.
+	Export a counter from parse.h that can be tested for this purpose.
+
 2008-09-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (load_tic_functions): Revert the load_tic_functions change.

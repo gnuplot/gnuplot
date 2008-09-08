@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.17 2007/08/27 04:33:47 sfeam Exp $
+ * $Id: parse.h,v 1.18 2008/04/06 17:23:06 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -74,5 +74,10 @@ void cleanup_udvlist __PROTO((void));
 void check_for_iteration __PROTO((void));
 TBOOLEAN next_iteration  __PROTO((void));
 TBOOLEAN empty_iteration  __PROTO((void));
+
+/* Some commands, e.g. set xtics, need to know if this is the first time
+ * or a subsequent time through the iteration.  Export a counter.
+ */
+extern int iteration;
 
 #endif /* PARSE_H */
