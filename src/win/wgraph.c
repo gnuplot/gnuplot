@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.62 2008/06/24 21:16:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.63 2008/09/08 17:56:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -891,11 +891,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
 	ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
 	if ((lastop==W_vect) && (curptr->op!=W_vect)) {
-	    if (polyi >= 2)
+	    if (polyi >= 2) {
 		Polyline(hdc, ppt, polyi);
-	    /* EAM FIXME - Is this needed?  Is it even correct? */
-	    else if (polyi == 1)
+		/* Bastian's proposed new fix */
 		MoveTo(hdc, ppt[0].x, ppt[0].y);
+	    }
+	    else if (polyi == 1)
+		/* Bastian's earlier fix */
+		LineTo(hdc, ppt[0].x, ppt[0].y);
 	    polyi = 0;
 	}
 	switch (curptr->op) {
