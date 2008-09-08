@@ -1,3 +1,7 @@
+2008-09-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graph3d.c (do_3dplot): Fixed MIN => GPMIN.
+
 2008-09-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (load_tic_functions): Revert the load_tic_functions change.
