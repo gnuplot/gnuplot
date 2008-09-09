@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.22 2008/07/29 22:15:50 sfeam Exp $
+ * $Id: cairo.trm,v 1.23 2008/09/05 09:44:31 mikulik Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -329,18 +329,14 @@ TERM_PUBLIC void cairotrm_options()
 
 
 	/* Save options back into options string in normalized format */
-	if (cairotrm_crop)
-		snprintf(term_options, sizeof(term_options)-strlen(term_options), " crop");
-	else
-		snprintf(term_options, sizeof(term_options)-strlen(term_options), " nocrop");
-
 	if (cairotrm_transparent)
-		snprintf(term_options, sizeof(term_options)-strlen(term_options),
-			" transparent");
+		strncat(term_options, " transparent", sizeof(term_options)-strlen(term_options));
+
+	if (cairotrm_crop)
+		strncat(term_options, " crop", sizeof(term_options)-strlen(term_options));
 
 	if (set_enhanced)
-		snprintf(term_options, sizeof(term_options)-strlen(term_options),
-			cairotrm_enhanced_enabled ? " enhanced" : " noenhanced");
+		strncat(term_options, " enhanced", sizeof(term_options)-strlen(term_options));
 
 	if (set_font) {
 		snprintf(tmp_term_options, sizeof(tmp_term_options), " font \"%s\"", font_setting);
@@ -505,12 +501,16 @@ cairopng_do_crop()
   int stride = cairo_image_surface_get_stride(surface);
   int  i, j, x1 = 0, y1 = 0, x2 = width, y2 = height;
 
-  typedef u_int32_t uint32;
-  uint32 BG = ~0x0;
+  typedef GP_UINT32_T uint32;
   uint32 *row;
+  uint32 BG = (cairotrm_transparent) ? 0x0 : ~0x0;
 
   /* return unadulterated surface if we're not cropping */
   if (!cairotrm_crop)
+	return(surface);
+
+  /* sanity check that GP_UINT32_T got defined as something usable */
+  if (sizeof(GP_UINT32_T) != 4)
 	return(surface);
 
   /* Row-wise, top-down iteration */

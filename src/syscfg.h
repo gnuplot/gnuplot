@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.33 2006/03/06 17:42:29 broeker Exp $
+ * $Id: syscfg.h,v 1.34 2008/03/30 03:27:55 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -441,5 +441,11 @@ typedef unsigned char _Bool;
 #define FALSE false
 
 #define TBOOLEAN bool
+
+/* For those platforms that don't use ./configure */
+/* If "unsigned int" is 64 bits, they're out of luck */
+#ifndef GP_UINT32_T
+# define GP_UINT32_T unsigned int
+#endif
 
 #endif /* !SYSCFG_H */
