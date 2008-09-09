@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.52.2.3 2008/06/24 18:46:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.52.2.4 2008/06/24 21:17:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -864,9 +864,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
 	ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
 	if ((lastop==W_vect) && (curptr->op!=W_vect)) {
-	    if (polyi >= 2)
+	    if (polyi >= 2) {
 		Polyline(hdc, ppt, polyi);
-	    else if (polyi == 1)
+		MoveTo(hdc, ppt[0].x, ppt[0].y);
+	    } else if (polyi == 1)
 		LineTo(hdc, ppt[0].x, ppt[0].y);
 	    polyi = 0;
 	}
