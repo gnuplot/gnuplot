@@ -3,6 +3,10 @@
 	* src/graph3d.c (place_labels3d):  Clip "splot with labels" against
 	plot boundaries in "set view map" mode, for consistency with 2D plots.
 
+	* configure.in term/cairo.trm src/syscfg.h:  glib.h provides a 
+	guaranteed 32-bit data type, and cairo.trm already depends on GLib.
+	Therefore we can use guint32 rather than defining our own type.
+
 2008-09-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/syscfg.h:  Try to discover and define a safe 32-bit

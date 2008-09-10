@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.234 2008/09/09 18:25:30 sfeam Exp $
+dnl $Id: configure.in,v 1.235 2008/09/10 04:09:28 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -138,19 +138,6 @@ AC_EGREP_HEADER(time_t,time.h,
              [ Define if time_t is declared in time.h. ])])
 AC_TYPE_SIGNAL
  
-dnl Try find a safe 32-bit type to use for image pixels
-AC_CHECK_SIZEOF(u_int32_t, 4)
-AC_CHECK_SIZEOF(int, 4)
-AC_CHECK_SIZEOF(short, 4)
-if test "$ac_cv_sizeof_u_int32_t" = "4"; then
-    AC_DEFINE(GP_UINT32_T, u_int32_t, [ some 32-bit type ])
-elif test "$ac_cv_sizeof_int" = "4"; then
-    AC_DEFINE(GP_UINT32_T, unsigned int, [ some 32-bit type ])
-elif test "$ac_cv_sizeof_short" = "4"; then
-    AC_DEFINE(GP_UINT32_T, "unsigned short", [ some 32-bit type ])
-else
-    AC_ERROR([could not find a 32-bit integer type])
-fi
 
 dnl Functions. Standard first, then others
 

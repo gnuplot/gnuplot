@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.23 2008/09/05 09:44:31 mikulik Exp $
+ * $Id: cairo.trm,v 1.24 2008/09/09 18:25:34 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -78,7 +78,7 @@ TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
 
 #include "cairo-pdf.h"
 #include "wxterminal/gp_cairo.h"
-#include "sys/types.h"		/* For uint32_t */
+#include "glib.h"		/* For guint32 */
 
 #define CAIROTRM_DEFAULT_FONTNAME "Sans"
 
@@ -501,21 +501,16 @@ cairopng_do_crop()
   int stride = cairo_image_surface_get_stride(surface);
   int  i, j, x1 = 0, y1 = 0, x2 = width, y2 = height;
 
-  typedef GP_UINT32_T uint32;
-  uint32 *row;
-  uint32 BG = (cairotrm_transparent) ? 0x0 : ~0x0;
+  guint32 *row;
+  guint32 BG = (cairotrm_transparent) ? 0x0 : ~0x0;
 
   /* return unadulterated surface if we're not cropping */
   if (!cairotrm_crop)
 	return(surface);
 
-  /* sanity check that GP_UINT32_T got defined as something usable */
-  if (sizeof(GP_UINT32_T) != 4)
-	return(surface);
-
   /* Row-wise, top-down iteration */
   for (i = 0; i < height; i++) {
-    row = (uint32 *) (data + i * stride);
+    row = (guint32 *) (data + i * stride);
     for (j = 0; j < width; j++) {
       if (row[j] != BG) {
 	y1 = i;
@@ -526,7 +521,7 @@ cairopng_do_crop()
  found_y1:
   /* Row-wise, bottom-up iteration */
   for (i = height - 1; i >= y1; i--) {
-    row = (uint32 *)(data + i * stride);
+    row = (guint32 *)(data + i * stride);
     for (j = 0; j < width; j++) {
       if (row[j] != BG) {
 	y2 = i;
@@ -538,7 +533,7 @@ cairopng_do_crop()
   /* Column-wise, left-to-right iteration */
   for (j = 0; j < width; j++) {
     for (i = y1; i <= y2; i++) {
-      row = (uint32 *) (data + i * stride);
+      row = (guint32 *) (data + i * stride);
       if (row[j] != BG) {
 	x1 = j;
 	goto found_x1;
@@ -549,7 +544,7 @@ cairopng_do_crop()
   /* Column-wise, right-to-left iteration */
   for (j = width - 1; j >= x1; j--) {
     for (i = y1; i <= y2; i++) {
-      row = (uint32 *) (data + i * stride);
+      row = (guint32 *) (data + i * stride);
       if (row[j] != BG) {
 	x2 = j;
 	goto found_x2;
