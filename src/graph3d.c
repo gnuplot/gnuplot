@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.18 2008/06/25 22:05:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.19 2008/07/16 20:05:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -510,6 +510,9 @@ place_labels3d(struct text_label *listhead, int layer)
 		     this_label->place.z, &xx, &yy);
 	    x = xx;
 	    y = yy;
+	    /* Only clip in 2D.   EAM - why? */
+	    if (splot_map && clip_point(x, y))
+		continue;
 	} else
 	    map3d_position(&this_label->place, &x, &y, "label");
 
