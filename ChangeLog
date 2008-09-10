@@ -1,3 +1,7 @@
+2008-09-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc term/emf.trm:  Fix typos
+
 2008-09-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (place_labels3d):  Clip "splot with labels" against

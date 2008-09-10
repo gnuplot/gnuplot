@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.534 2008/09/07 15:52:39 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.535 2008/09/07 17:27:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10243,7 +10243,7 @@ Ffigure_mapcontours
 ?set view equal_axes
 ?view equal_axes
  The command `set view equal_axes` forces the unit length of the x and y axes
- to be on the same same.  Otherwise by default both axes are scaled to fill the
+ to be on the same scale.  Otherwise by default both axes are scaled to fill the
  available area.
 
  See also `set ticslevel`.

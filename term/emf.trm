@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.52 2008/08/06 16:35:59 sfeam Exp $
+ * $Id: emf.trm,v 1.53 2008/08/06 22:05:29 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1320,7 +1320,7 @@ START_HELP(emf)
 " `solid` draws all curves with solid lines, overriding any dashed patterns;",
 " `linewidth <factor>` multiplies all line widths by this factor.",
 " `dashlength <factor>` is useful for thick lines.",
-" <font> is the name of a font; and ",
+" <fontname> is the name of a font; and ",
 " `<fontsize>` is the size of the font in points.",
 "",
 " The nominal size of the output image defaults to 1024x768 in arbitrary",
