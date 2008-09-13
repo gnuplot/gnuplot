@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.53 2008/08/06 22:05:29 sfeam Exp $
+ * $Id: emf.trm,v 1.54 2008/09/10 18:16:04 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -43,6 +43,15 @@
  * TODO
  *
  * HISTORY
+ *
+ * 4.3.1 12-Sep-2008 Ethan A Merritt
+ * - enhanced text mode
+ * - Two variants are here. One uses the TA_UPDATECP mode to track character position.
+ *   This works great horizontally, but I could not find a way to introduce a vertical
+ *   offset to handle subscripts and superscripts.
+ * - The second variant tracks both x and y by estimating the character width/height.
+ *   This causes visible imperfections in the character spacing.
+ * - Rotated enhanced text not yet supported
  *
  * 1.0.11 06-Dec-2004 Ethan A Merritt
  * - implement term->set_color(), term->filled_polygon(), and term->fillbox()
@@ -130,6 +139,13 @@ TERM_PUBLIC void EMF_set_color __PROTO((t_colorspec *colorspec));
 TERM_PUBLIC void EMF_filled_polygon __PROTO((int, gpiPoint *));
 TERM_PUBLIC void EMF_fillbox __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
 
+/* Enhanced text support */
+TERM_PUBLIC void ENHemf_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void ENHemf_OPEN __PROTO((char * fontname, double fontsize,
+                        double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+			int overprint));
+TERM_PUBLIC void ENHemf_FLUSH __PROTO((void));
+
 #undef RGB
 #define RGB(r,g,b) ((long)					\
 		    (((unsigned char)(r)			\
@@ -201,7 +217,7 @@ TERM_PUBLIC void EMF_fillbox __PROTO((int, unsigned int, unsigned int, unsigned 
     EMF_write_long(20);				\
 }
 #define EMF_SetMapMode(mode) {			\
-    EMF_write_emr(17, 0xc);			\
+    EMF_write_emr(17, 0x0C);			\
     EMF_write_long(mode);			\
 }
 #define EMF_SetWindowExtEx(width, height) {	\
@@ -221,7 +237,7 @@ TERM_PUBLIC void EMF_fillbox __PROTO((int, unsigned int, unsigned int, unsigned 
     EMF_write_sizel(width, height);		\
 }
 #define EMF_SetTextColor(color) {		\
-    EMF_write_emr(24, 0xc);			\
+    EMF_write_emr(24, 0x0C);			\
     EMF_write_long(color);			\
 }
 #define EMF_MoveToEx(x,y) {			\
@@ -263,6 +279,14 @@ TERM_PUBLIC void EMF_fillbox __PROTO((int, unsigned int, unsigned int, unsigned 
     EMF_write_emr(18, 0x0C);			\
     EMF_write_long(mode);			\
 }
+#define EMF_SaveDC() {				\
+    EMF_write_emr(33, 0x0C);			\
+    EMF_write_long(0);				\
+}
+#define EMF_RestoreDC() {			\
+    EMF_write_emr(34, 0x0C);			\
+    EMF_write_long(1);				\
+}
 
 #endif /* TERM_PROTO */
 
@@ -278,6 +302,7 @@ static unsigned int emf_record_count = 0;
 static unsigned int emf_linetype = 1;
 static unsigned int emf_dashtype = 0;
 static unsigned long emf_color = 0L;
+static unsigned long emf_textcolor = LT_UNDEFINED;
 static unsigned int emf_colors = EMF_COLORS;
 static unsigned int emf_polyline[EMF_MAX_SEGMENTS];	/* stored polyline coordinates */
 static unsigned int emf_graphics = FALSE;
@@ -288,14 +313,17 @@ static double emf_linewidth_factor = 1.0;
 static double emf_dashlength = 1.0;
 static int emf_coords = 0;	/* # polyline coordinates saved */
 static char emf_fontname[255] = EMF_FONTNAME;
-static int emf_fontsize = EMF_FONTSIZE;
+static float emf_fontsize = EMF_FONTSIZE;
+static enum JUSTIFY emf_justify = LEFT;
 static char emf_defaultfontname[255] = EMF_FONTNAME;
-static int emf_defaultfontsize = EMF_FONTSIZE;
+static float emf_defaultfontsize = EMF_FONTSIZE;
 static int emf_vert_text = 0;	/* text orientation -- nonzero for vertical */
 static int emf_step_sizes[8];	/* array of currently used dash lengths in plot units */
 static int emf_step_index = 0;	/* index into emf_step_sizes[] */
 static int emf_step = 0;	/* amount of current dash not yet drawn, in plot units */
 static int emf_tic, emf_tic707, emf_tic866, emf_tic500, emf_tic1241, emf_tic1077, emf_tic621;	/* marker dimensions */
+
+static TBOOLEAN emf_tweak = TRUE;	/* Empirical hack to adjust character widths */
 
 static void EMF_flush_polyline __PROTO((void));
 static void EMF_flush_polygon __PROTO((void));
@@ -313,6 +341,20 @@ static void EMF_setfont __PROTO((void));
 #define RUSSIAN_CHARSET    204
 #define EASTEUROPE_CHARSET 238
 #define KOI8_CHARSET       242
+
+/* Text alignment */
+#define TA_NOUPDATECP       0x00
+#define TA_UPDATECP         0x01
+#define TA_LEFT             0x00
+#define TA_RIGHT            0x02
+#define TA_CENTER           0x06
+#define TA_TOP              0x00
+#define TA_BOTTOM           0x08
+#define TA_BASELINE         0x18
+
+/* ExtTextOut options */
+#define ETO_NO_RECT	   0x100
+#define ETO_PDY		  0x2000
 
 static void 
 EMF_setfont()
@@ -522,6 +564,7 @@ EMF_options()
 	term->ymax = EMF_YMAX;
 	emf_dashed = TRUE;
 	emf_monochrome = FALSE;
+	emf_tweak = TRUE;
     }
 
     while (!END_OF_COMMAND) {
@@ -567,6 +610,23 @@ EMF_options()
 		emf_linewidth_factor = 1.0;
 	    continue;
 	}
+
+	if (almost_equals(c_token,"enh$anced")) {
+	    c_token++;
+	    term->put_text = ENHemf_put_text;
+	    term->flags |= TERM_ENHANCED_TEXT;
+	    continue;
+	} else if (almost_equals(c_token,"noenh$anced")) {
+	    c_token++;
+	    term->put_text = EMF_put_text;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
+	}
+
+	if (almost_equals(c_token,"nopro$portional")) {
+	    c_token++;
+	    emf_tweak = FALSE;
+	}
+
 	if (almost_equals(c_token, "si$ze")) {
 	    int tempxmax = 1024;
 	    int tempymax = 768;
@@ -591,7 +651,7 @@ EMF_options()
 	/* Fall through to old-style bare font name */
 	if ((s = try_to_get_string())) {
 	    char *comma = strrchr(s,',');
-	    if (comma && (1 == sscanf(comma+1,"%d",&emf_defaultfontsize))) {
+	    if (comma && (1 == sscanf(comma+1,"%g",&emf_defaultfontsize))) {
 		*comma = '\0';
 	    }
 	    if (*s)
@@ -613,7 +673,7 @@ EMF_options()
     
     emf_colors = emf_monochrome ? 1 : EMF_COLORS;
 
-    sprintf(term_options, "%s %s \"%s\" %d",
+    sprintf(term_options, "%s %s \"%s\" %g",
 	    emf_monochrome ? "monochrome" : "color",
 	    emf_dashed ? "dashed" : "solid",
 	    emf_defaultfontname, emf_defaultfontsize);
@@ -689,15 +749,26 @@ EMF_graphics()
 TERM_PUBLIC int 
 EMF_set_font(const char *font)
 {
+    static float last_fontsize = -1;
+    static char last_fontname[256] = {'\0'};
+
     if (font && *font) {
+	float tempsize;
 	int sep = strcspn(font,",");
 	if (sep > 0)
 	    safe_strncpy(emf_fontname, font, GPMIN(sep + 1, 32));
-	sscanf(font+sep+1, "%d", &emf_fontsize);
+	if (sep < strlen(font) && sscanf(font+sep+1, "%f", &tempsize))
+	    emf_fontsize = tempsize;
     } else {
 	strcpy(emf_fontname, emf_defaultfontname);
 	emf_fontsize = emf_defaultfontsize;
     }
+
+    /* Optimization only */
+    if (!strcmp(last_fontname,emf_fontname) && last_fontsize == emf_fontsize) {
+	return TRUE;
+    }
+
     term->h_char = (emf_fontsize * EMF_PT2HM)*0.6;
     term->v_char = (emf_fontsize * EMF_PT2HM)*1.3;
     EMF_setfont();
@@ -1032,7 +1103,10 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
     int i, len = strlen(str);
 
     EMF_flush_polyline();
-    EMF_SetTextColor(emf_color);	/* since text doesn't use pens, we must initialize with this */
+    if (emf_textcolor != emf_color) {
+	EMF_SetTextColor(emf_color);	/* since text doesn't use pens, we must initialize with this */
+	emf_textcolor = emf_color;
+    }
 
     /* SB 20040506: offset array now included since it won't work with MS Security patch (kb835732) */
     /* SB 20040506: also changed function from unicode to ansi version */
@@ -1092,20 +1166,23 @@ EMF_text_angle(int ang)
 TERM_PUBLIC int 
 EMF_justify_text(enum JUSTIFY mode)
 {
-    int align = 8;		/* y referenced to bottom */
+    int align = TA_BOTTOM;
+
+    emf_justify = mode;
 
     switch (mode) {
     case LEFT:
-	align |= 0;
+	align |= TA_LEFT;
 	break;
     case RIGHT:
-	align |= 2;
+	align |= TA_RIGHT;
 	break;
     case CENTRE:
-	align |= 6;
+	align |= TA_CENTER;
 	break;
     }
     EMF_SetTextAlign(align);
+
     return (TRUE);
 }
 
@@ -1262,6 +1339,266 @@ EMF_set_pointsize(double size)
     emf_tic621 = emf_tic * 18 / 29;
 }
 
+/*
+ * Ethan A Merritt September 2008
+ *	- Support for enhanced text mode
+ * PROBLEMS:
+ *	- Rotated enhanced text is not handled
+ *	- The proportional spacing hack is really ugly
+ *	  ETO_PDY is supposed to handle this, but pre-Vista Windows
+ *	  doesn't support the flag so it's of no real use.
+ */
+
+static TBOOLEAN ENHemf_opened_string;
+
+/* used in determining height of processed text */
+static float ENHemf_base;
+
+/* use these so that we don't over-write the current font settings */
+static float ENHemf_fontsize;
+static char   *ENHemf_font;
+
+static TBOOLEAN ENHemf_show = TRUE;
+static int ENHemf_overprint = 0;
+
+TERM_PUBLIC void
+ENHemf_OPEN(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag,
+    TBOOLEAN showflag,
+    int overprint)
+{
+
+    /* If the overprint code requests a save or restore, that's all we do */
+#define EMF_AVG_WID 0.8
+#undef TA_UPDATECP_MODE
+#ifdef TA_UPDATECP_MODE
+    if (overprint == 3) {
+	EMF_SaveDC();
+	return;
+    } else if (overprint == 4) {
+	EMF_RestoreDC();
+	return;
+    }
+#else
+    static int save_x, save_y;
+    if (overprint == 3) {
+	save_x = emf_posx;
+	save_y = emf_posy;
+	return;
+    } else if (overprint == 4) {
+	emf_posx = save_x;
+	emf_posy = save_y;
+	return;
+    }
+#endif
+
+    if (!ENHemf_opened_string) {
+	ENHemf_opened_string = TRUE;
+	enhanced_cur_text = &enhanced_text[0];
+	ENHemf_font = fontname;
+	ENHemf_fontsize = fontsize;
+	ENHemf_base = base;
+	ENHemf_show = showflag;
+	ENHemf_overprint = overprint;
+    }
+}
+
+/* Write a string fragment and update the current position */
+TERM_PUBLIC void
+ENHemf_FLUSH()
+{
+    unsigned int x, y;
+    char *str;
+    int i;
+    int incr_x;
+
+	if (ENHemf_opened_string) {
+	    *enhanced_cur_text = '\0';
+	    ENHemf_opened_string = FALSE;
+	    x = emf_posx;
+	    y = emf_posy;
+
+	    FPRINTF((stderr,"ENHemf_FLUSH: Write string \"%s\" len %d at %g with font %s,%g\n",
+		    enhanced_text,strlen(enhanced_text),
+		    (double)x/EMF_PX2HM,ENHemf_font,ENHemf_fontsize));
+
+	    if (1) {
+		char save_font[256];
+		float save_fontsize = emf_fontsize;
+		strcpy(save_font,emf_fontname);
+		emf_fontsize = ENHemf_fontsize;
+
+		EMF_set_font(ENHemf_font);
+		
+		emf_fontsize = save_fontsize;
+		strcpy(emf_fontname,save_font);
+	    }
+
+	    /* Don't know how to do a pure move; instead write in white */
+	    if (!ENHemf_show) {
+		EMF_SetTextColor(0xffffff);
+		emf_textcolor = 0xffffff;
+	    } else if (ENHemf_show && emf_textcolor != emf_color) {
+		EMF_SetTextColor(emf_color);
+		emf_textcolor = emf_color;
+	    }
+
+	    str = enhanced_text;
+
+#ifndef TA_UPDATEPC_MODE
+	    /* We are especially bad at guessing the width of whitespace. */
+	    /* Best is to pile up all our errors on top of leading space. */
+	    i = strspn(enhanced_text," ");
+	    if (i > 0) {
+		x += i * term->h_char 
+		   * EMF_AVG_WID * ENHemf_fontsize/emf_defaultfontsize;
+		emf_posx = x;
+		str += i;
+	    }
+#endif
+
+	    /* Copied from put_text(). Is all this really necessary? */
+	    {
+	    int record_length;
+	    int len = strlen(str);
+	    if (len % 4)
+		len += 4 - (len % 4);		/* Structure must be long aligned! */
+	    record_length = 76 + len + strlen(str)*4;
+
+	    EMF_write_emr(83, record_length);/* ExtTextOutA, ANSI char version! */
+	    EMF_write_rectl(0, 0, 0, 0);	/* bounding, never used */
+	    EMF_write_long(1);			/* GM_Compatible mode for advanced scaling */
+	    EMF_write_float(EMF_PX2HM);		/* x scale */
+	    EMF_write_float(EMF_PX2HM);		/* y scale */
+	    EMF_write_pointl(			/* x,y position (ignored if TA_UPDATECP) */
+		x, term->ymax - (y + 1.3 * EMF_PX2HM * ENHemf_base));
+	    EMF_write_long(strlen(str)); 	/* true number of characters */
+	    EMF_write_long(76);			/* offset to text */
+	    EMF_write_long(ETO_NO_RECT);	/* ExtTextOut options */
+	    EMF_write_rectl(0, 0, 0, 0);	/* bounding, never used */
+	    EMF_write_long(0);			/* offset to intercharacter spacing array */
+	    for (i = 0; i < len; i++) 
+		EMF_write_byte(i<strlen(str)?str[i]:0);	/* character string */
+	    for (i = 0; i < strlen(str); i++)
+		EMF_write_long(300); 		/* intercharacter spacing array (not used) */
+	    }
+
+	    if (emf_tweak) {
+		/* Tweak estimated length of rendered string by counting "thin" characters */
+		/* In principle EMF will accept an array of char widths. But in practice   */
+		/* none of the EMF viewers implement this option (ETO_PDY).                */
+		{
+		int thin = 0, wide = 0;
+		for (i=0; i<strlen(str); i++) {
+		    if (strchr(" ijl.,;:|!()[]1I",str[i]))
+			thin++;
+		    if (('A' <= str[i] && str[i] <= 'Z') || strchr("mw<>",str[i]))
+			wide++;
+		    if('i' == str[i])
+			thin++;
+		}
+		incr_x = ((double)strlen(str) * EMF_AVG_WID + (double)(wide-thin) * 0.2)
+			* term->h_char;
+		}
+	    } else {
+		incr_x = (double)strlen(str) * EMF_AVG_WID * term->h_char;
+	    }
+	    emf_posx += incr_x;
+
+	    if (ENHemf_overprint == 1)
+		emf_posx -= strlen(str) * term->h_char 
+	    		  * (0.5) * EMF_AVG_WID * ENHemf_fontsize/emf_defaultfontsize;
+
+	}
+}
+
+TERM_PUBLIC void
+ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
+{
+    int tmp_justify = emf_justify;
+    int len;
+
+    if (ignore_enhanced_text) {
+	EMF_put_text(x,y,str);
+	return;
+    }
+
+    if (!strlen(str))
+	return;
+    len = estimate_strlen((char *)str);
+
+    /* if there are no magic characters, we should just be able
+     * punt the string to EMF_put_text()
+     */
+    if (!strpbrk(str, "{}^_@&~")) {
+	/* FIXME: do something to ensure default font is selected */
+	EMF_put_text(x,y,str);
+	return;
+    }
+
+    if (emf_textcolor != emf_color) {
+	EMF_SetTextColor(emf_color);
+	emf_textcolor = emf_color;
+    }
+
+    /* set up the global variables needed by enhanced_recursion() */
+    enhanced_fontscale = 1.0;
+    strncpy(enhanced_escape_format,"&#x%2.2x;",sizeof(enhanced_escape_format));
+
+    ENHemf_opened_string = FALSE;
+    ENHemf_show = TRUE;
+    ENHemf_overprint = 0;
+
+    /* EAM - post.trm wasn't doing this, but how else do they get initialized? */
+	ENHemf_font = emf_fontname;
+	ENHemf_fontsize = emf_fontsize;
+
+    if (emf_justify == RIGHT) {
+	EMF_MoveToEx(x - term->h_char * len, term->ymax-y);
+	EMF_move(x - EMF_AVG_WID * term->h_char * len, y);
+    } else if (emf_justify == CENTRE) {
+	EMF_MoveToEx(x - term->h_char * len/2, term->ymax-y);
+	EMF_move(x - EMF_AVG_WID * term->h_char * len/2, y);
+    } else {
+	EMF_MoveToEx(x, term->ymax-y);
+	EMF_move(x, y);
+    }
+
+    emf_justify = LEFT;
+#ifdef UPDATECP_MODE
+    EMF_SetTextAlign(TA_BASELINE|TA_LEFT|TA_UPDATECP);
+#else
+    EMF_SetTextAlign(TA_BASELINE|TA_LEFT|TA_NOUPDATECP);
+#endif
+
+    /* Set the recursion going. We say to keep going until a
+     * closing brace, but we don't really expect to find one.
+     * If the return value is not the nul-terminator of the
+     * string, that can only mean that we did find an unmatched
+     * closing brace in the string. We increment past it (else
+     * we get stuck in an infinite loop) and try again.
+     */
+    while (*(str = enhanced_recursion((char *)str, TRUE,
+			ENHemf_font, ENHemf_fontsize,
+			0.0, TRUE, TRUE, 0))) {
+	(term->enhanced_flush)();
+
+	/* I think we can only get here if *str == '}' */
+	    enh_err_check(str);
+
+	if (!*++str)
+	    break; /* end of string */
+
+	/* else carry on and process the rest of the string */
+    }
+
+    /* Restore everything we messed with */
+    emf_justify = tmp_justify;
+    EMF_setfont(); /* Necessary? */
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -1288,7 +1625,7 @@ TERM_TABLE_START(emf_driver)
 #ifdef WITH_IMAGE
     , NULL
 #endif
-
+    , ENHemf_OPEN, ENHemf_FLUSH, do_enh_writec
 TERM_TABLE_END(emf_driver)
 #undef LAST_TERM
 #define LAST_TERM emf_driver
@@ -1310,6 +1647,7 @@ START_HELP(emf)
 "",
 " Syntax:",
 "       set terminal emf {color | monochrome} {solid | dashed}",
+"                        {enhanced {noproportional}}",
 "                        {linewidth <LW>} {dashlength <DL>} {size XX,YY}",
 "                        {\"<fontname>\"} {<fontsize>}    #old syntax",
 "                        {font \"<fontname>,<fontsize>\"} #new syntax",
@@ -1325,6 +1663,10 @@ START_HELP(emf)
 "",
 " The nominal size of the output image defaults to 1024x768 in arbitrary",
 " units. You may specify a different nominal size using the `size` option.",
+"",
+" Enhanced text mode tries to approximate proportional character spacing.",
+" If you are using a monospaced font, or don't like the approximation, you",
+" can turn off this correction using the `noproportional` option.",
 "",
 " The default settings are `color dashed font \"Arial,12\" size 1024,768`",
 " Selecting `default` sets all options to their default values.",

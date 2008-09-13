@@ -1,3 +1,7 @@
+2008-09-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm:  Add support for enhanced text mode.
+
 2008-09-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc term/emf.trm:  Fix typos
