@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.54 2008/09/10 18:16:04 sfeam Exp $
+ * $Id: emf.trm,v 1.55 2008/09/13 20:40:15 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -287,6 +287,11 @@ TERM_PUBLIC void ENHemf_FLUSH __PROTO((void));
     EMF_write_emr(34, 0x0C);			\
     EMF_write_long(1);				\
 }
+#define EMF_CreatePolygon(nvert) {		\
+    EMF_write_emr(3, (7+2*nvert)*4);		\
+    EMF_write_rectl(0,0,0,0);  /* Bounds */	\
+    EMF_write_long(nvert);			\
+} 
 
 #endif /* TERM_PROTO */
 
@@ -896,8 +901,6 @@ EMF_filled_polygon(int points, gpiPoint *corners)
     int fillpar = corners->style >> 4;
     int style = corners->style & 0xf;
 
-#define EMF_POLYGON 3
-
     switch (style) {
 	case FS_EMPTY: /* fill with background color */
 		color = RGB(255,255,255);
@@ -923,9 +926,7 @@ EMF_filled_polygon(int points, gpiPoint *corners)
 	EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, color, 0);
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
 
-	EMF_write_emr(EMF_POLYGON, (7 + 2*points) * 4);
-	EMF_write_rectl(0,0,0,0);  /* What are these? */
-	EMF_write_long(points);
+	EMF_CreatePolygon(points);
 	for (i=0; i<points; i++)
 	    EMF_write_pointl(corners[i].x, term->ymax - corners[i].y);
 
