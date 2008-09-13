@@ -1,5 +1,10 @@
 New features, changes and fixes since previous release
 ===========================================================
+
+
+New features, changes and fixes in gnuplot version 4.2.4
+===========================================================
+* NEW add support for enhanced text mode in the emf terminal driver
 * NEW builtin functions 'strftime' and 'strptime'
 * NEW set absolute plot margins in screen coordinates
 * NEW "nocontours" keyword for splot
@@ -31,7 +36,6 @@ New features, changes and fixes since previous release
 * CHANGE stacked histograms grow upward for values > 0, downward for values < 0
 * CHANGE 'pause mouse button1' (or button2) does not disable zooming
 * CHANGE built-in readline tries to recognize <home> and <end> keys
-
 
 New features, changes and fixes in gnuplot version 4.2.3
 ===========================================================
