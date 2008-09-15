@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.73 2008/06/02 00:48:10 sfeam Exp $
+ * $Id: term_api.h,v 1.74 2008/07/09 16:39:50 mikulik Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -59,9 +59,10 @@
 #define LT_DEFAULT    (-7)
 
 /* Constant value passed to (term->text_angle)(ang) to generate vertical
- * text. Current implementation has ang equal to rotation in degrees.
+ * text corresponding to old keyword "rotate", which produced the equivalent
+ * of "rotate by 90 right-justified".
  */
-#define TEXT_VERTICAL (90)
+#define TEXT_VERTICAL (-270)
 
 
 /* Type definitions */

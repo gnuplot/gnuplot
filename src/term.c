@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.178 2008/07/09 16:39:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.179 2008/09/07 04:13:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -995,9 +995,9 @@ write_multiline(
 		    (*t->put_text) (x - fix, y, text);
 	    }
 	}
-	if (angle == TEXT_VERTICAL)
+	if (angle == 90 || angle == TEXT_VERTICAL)
 	    x += t->v_char;
-	else if (-angle == TEXT_VERTICAL)
+	else if (angle == -90 || angle == -TEXT_VERTICAL)
 	    x -= t->v_char;
 	else
 	    y -= t->v_char;

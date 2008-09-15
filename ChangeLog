@@ -4,6 +4,11 @@
 	option, triggered by the save format.  Omit this option from "save"
 	until the parsing bug is fixed.
 
+	* src/term_api.h src/term.c (write_multiline):
+	Remove discontinuity in text rotation at "rotate by 90".
+	Text option "rotate" continues to work as it always has, but
+	"rotate by 90" is no longer a synonym meriting a special case.
+
 2008-09-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm:  Add support for enhanced text mode.
