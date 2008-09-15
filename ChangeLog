@@ -1,3 +1,9 @@
+2008-09-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/save.c: There is a parsing bug for the new "set view equal_axes"
+	option, triggered by the save format.  Omit this option from "save"
+	until the parsing bug is fixed.
+
 2008-09-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm:  Add support for enhanced text mode.
