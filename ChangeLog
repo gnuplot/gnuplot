@@ -1,3 +1,10 @@
+2008-09-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c (clip_line): Make sure that the clipped line segment
+	returned by clip_line() has the same direction as the original segment.
+	A simple draw command doesn't care, but if the segments are used to
+	bound a filled polygon then a reversed segments causes fill artifacts.
+
 2008-09-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c: There is a parsing bug for the new "set view equal_axes"

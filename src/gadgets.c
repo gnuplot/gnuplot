@@ -269,6 +269,9 @@ clip_put_text(unsigned int x, unsigned int y, char *str)
 /* Clip the given line to drawing coords defined by BoundingBox.
  *   This routine uses the cohen & sutherland bit mapping for fast clipping -
  * see "Principles of Interactive Computer Graphics" Newman & Sproull page 65.
+ * Return 0: entire line segment is outside bounding box
+ *        1: entire line segment is inside bounding box
+ *       -1: line segment has been clipped to bounding box
  */
 int
 clip_line(int *x1, int *y1, int *x2, int *y2)
@@ -337,10 +340,19 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
     }
 
     if (pos1 && pos2) {		/* Both were out - update both */
-	*x1 = x_intr[0];
-	*y1 = y_intr[0];
-	*x2 = x_intr[1];
-	*y2 = y_intr[1];
+	/* EAM Sep 2008 - preserve direction of line segment */
+	if ((dx*(x_intr[1]-x_intr[0]) < 0)
+	||  (dy*(y_intr[1]-y_intr[0]) < 0)) {
+	    *x1 = x_intr[1];
+	    *y1 = y_intr[1];
+	    *x2 = x_intr[0];
+	    *y2 = y_intr[0];
+	} else {
+	    *x1 = x_intr[0];
+	    *y1 = y_intr[0];
+	    *x2 = x_intr[1];
+	    *y2 = y_intr[1];
+	}
     } else if (pos1) {		/* Only x1/y1 was out - update only it */
 	/* This is about the only real difference between this and
 	 * draw_clip_line(): it compares for '>0', here */
@@ -365,7 +377,7 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
     if (*x1 < x_min || *x1 > x_max || *x2 < x_min || *x2 > x_max || *y1 < y_min || *y1 > y_max || *y2 < y_min || *y2 > y_max)
 	return 0;
 
-    return 1;
+    return -1;
 }
 
 
