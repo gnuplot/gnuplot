@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.535 2008/09/07 17:27:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.536 2008/09/10 18:16:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6475,7 +6475,7 @@ Ffigure_mapcontours
 ?show palette colornames
  Gnuplot knows a limited number of color names. You can use these to define
  the color range spanned by a pm3d palette, or to assign a terminal-independent
- color to a particular linetype or linestyle. To see the list of know color
+ color to a particular linetype or linestyle. To see the list of known color
  names, use the command `show colornames`.   Example:
 
        set style line 1 linecolor rgb "sea-green"
@@ -8107,7 +8107,7 @@ Ffigure_mapcontours
  `clipboardformat` and `mouseformat` are used for formatting the text on
  Button1 and Button2 actions -- copying the coordinates to the clipboard and
  temporarily annotating the mouse position. This corresponds to the key
- bindings '1', '2', '3', '4' (see the drivers's help window). If the argument
+ bindings '1', '2', '3', '4' (see the driver's documentation). If the argument
  is a string this string is used as c format specifier and should contain two
  float specifiers, e.g. `set mouse mouseformat "mouse = %5.2g, %10.2f"`. Use
  `set mouse mouseformat ""` to turn this string off again.
