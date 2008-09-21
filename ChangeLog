@@ -1,3 +1,7 @@
+2008-09-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/gnuplot.texi: Update for 4.2.4 release.
+
 2008-09-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm:  Add support for enhanced text mode.

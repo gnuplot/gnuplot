@@ -1278,6 +1278,8 @@ defaults to radians.
 * strlen::                      
 * strstrt::                     
 * substr::                      
+* strftime::                    
+* strptime::                    
 * system::                      
 * word::                        
 * words::                       
@@ -1857,7 +1859,7 @@ and returns the index to the first character of "key". If "key" is not found,
 returns 0. Similar to C library function strstr except that it returns an
 index rather than a string pointer. strstrt("hayneedlestack","needle") = 4.
 
-@node substr, system, strstrt, Functions
+@node substr, strftime, strstrt, Functions
 @subsubsection substr
 
 @c ?expressions functions substr
@@ -1873,7 +1875,33 @@ beg through end of the original string. This is exactly equivalent to the
 expression "string"[beg:end] except that you do not have the option of
 ommitting beg or end.
 
-@node system, word, substr, Functions
+@node strftime, strptime, substr, Functions
+@subsubsection strftime
+
+@c ?expressions functions strftime
+@c ?functions strftime
+@cindex strftime
+@findex strftime
+
+
+`strftime("timeformat",t)` applies the timeformat specifiers to the time t
+given in seconds since the year 2000. 
+See `time_specifiers` and @ref{strptime}.
+
+@node strptime, system, strftime, Functions
+@subsubsection strptime
+
+@c ? expressions functions strptime
+@c ?functions strptime
+@cindex strptime
+@findex strptime
+
+
+`strptime("timeformat",s)` reads the time from the string s using the
+timeformat specifiers and converts it into seconds since the year 2000.
+See `time_specifiers` and @ref{strftime}.
+
+@node system, word, strptime, Functions
 @subsubsection system
 
 @c ?expressions functions system
@@ -8216,20 +8244,21 @@ In time/date mode, the acceptable formats are:
       %A           full name of day of the week
       %b or %h     abbreviated name of the month
       %B           full name of the month
-      %d           day of the month, 1--31
-      %D           shorthand for "%m/%d/%y"
+      %d           day of the month, 01--31
+      %D           shorthand for "%m/%d/%y" (only output)
+      %F           shorthand for "%Y-%m-%d" (only output)
       %k           hour, 0--23 (one or two digits)
       %H           hour, 00--23 (always two digits)
-      *l           hour, 1--12 (one or two digits)
+      %l           hour, 1--12 (one or two digits)
       %I           hour, 01--12 (always two digits)
       %j           day of the year, 1--366
-      %m           month, 1--12
+      %m           month, 01--12
       %M           minute, 0--60
       %p           "am" or "pm"
-      %r           shorthand for "%I:%M:%S %p"
-      %R           shorthand for "%H:%M"
+      %r           shorthand for "%I:%M:%S %p" (only output)
+      %R           shorthand for "%H:%M" (only output)
       %S           second, 0--60
-      %T           shorthand for "%H:%M:%S"
+      %T           shorthand for "%H:%M:%S" (only output)
       %U           week of the year (week starts on Sunday)
       %w           day of the week, 0--6 (Sunday = 0)
       %W           week of the year (week starts on Monday)
@@ -10583,7 +10612,7 @@ versa and change the definition of <maxcolors>.
 @c ?show colornames
 Gnuplot knows a limited number of color names. You can use these to define
 the color range spanned by a pm3d palette, or to assign a terminal-independent
-colot to a particular linetype or linestyle. To see the list of know color
+color to a particular linetype or linestyle. To see the list of known color
 names, use the command @ref{colornames}.
 See @ref{palette}, `linestyle`.
 
@@ -13265,7 +13294,7 @@ Syntax:
                  | <incr>
                  | <start>, <incr> @{,<end>@}
                  | (@{"<label>"@} <pos> @{<level>@} @{,@{"<label>"@}...) @}
-                @{ formt "formatstring" @} @{ font "name@{,<size>@}" @}
+                @{ format "formatstring" @} @{ font "name@{,<size>@}" @}
                 @{ textcolor <colorspec> @}
       unset xtics
       show xtics
@@ -15734,6 +15763,7 @@ This file format is recognized by many Windows applications.
 Syntax:
 @example
       set terminal emf @{color | monochrome@} @{solid | dashed@}
+                       @{enhanced @{noproportional@}@}
                        @{linewidth <LW>@} @{dashlength <DL>@} @{size XX,YY@}
                        @{"<fontname>"@} @{<fontsize>@}    #old syntax
                        @{font "<fontname>,<fontsize>"@} #new syntax
@@ -15751,6 +15781,10 @@ all 8 default colors are exhausted is the dash pattern incremented.
 
 The nominal size of the output image defaults to 1024x768 in arbitrary
 units. You may specify a different nominal size using the @ref{size} option.
+
+Enhanced text mode tries to approximate proportional character spacing.
+If you are using a monospaced font, or don't like the approximation, you
+can turn off this correction using the `noproportional` option.
 
 The default settings are `color dashed font "Arial,12" size 1024,768`
 Selecting `default` sets all options to their default values.

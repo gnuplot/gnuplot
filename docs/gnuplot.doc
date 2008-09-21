@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.38 2008/08/14 13:57:23 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.39 2008/09/02 21:12:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8018,7 +8018,7 @@ C ... and restart the table:
 ?show colornames
  Gnuplot knows a limited number of color names. You can use these to define
  the color range spanned by a pm3d palette, or to assign a terminal-independent
- color to a particular linetype or linestyle. To see the list of know color
+ color to a particular linetype or linestyle. To see the list of known color
  names, use the command `show palette colornames`.
  See `set palette`, `linestyle`.
 3 pointsize
