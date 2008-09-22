@@ -1,3 +1,10 @@
+2008-09-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics): Add a sanity check for the number of auto-
+	generated axis ticks.  Do not accept a request for more ticks than the
+	resolution of the output device coordinate system (term->xmax).
+	Bug #2117370
+
 2008-09-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/gnuplot.texi: Update for 4.2.4 release.
