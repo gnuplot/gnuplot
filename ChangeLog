@@ -1,3 +1,11 @@
+2008-09-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics) src/graphics.c (label_width):  Add a sanity
+	check for the number of auto-generated axis ticks.  Do not accept a
+	request for more ticks than the resolution of the output device
+	coordinate system (term->xmax). Skip label processing for empty labels.
+	Bug #2117370
+
 2008-09-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (clip_line): Make sure that the clipped line segment

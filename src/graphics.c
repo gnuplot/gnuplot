@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.278 2008/08/01 00:22:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.279 2008/08/19 18:48:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4992,6 +4992,12 @@ label_width(const char *str, int *lines)
 {
     char *lab = NULL, *s, *e;
     int mlen, len, l;
+
+    if (!str || *str == '\0') {
+	if (lines)
+	    *lines = 0;
+	return (0);
+    }
 
     l = mlen = len = 0;
     lab = gp_alloc(strlen(str) + 2, "in label_width");

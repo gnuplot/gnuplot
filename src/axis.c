@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.72 2008/08/19 18:48:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.73 2008/09/03 16:28:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1052,6 +1052,12 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	if (step == 0)
 	    return;		/* just quietly ignore them ! */
 	/* }}} */
+
+	if ( (internal_max-internal_min)/step > term->xmax) {
+	    int_warn(NO_CARET,"Too many axis ticks (>%.0g)",
+		(internal_max-internal_min)/step);
+	    return;
+	}
 
 	/* FIXME HBB 20010121: keeping adding 'step' to 'tic' is
 	 * begging for rounding errors to strike us. */
