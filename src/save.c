@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.132.2.7 2008/03/27 22:17:25 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.132.2.8 2008/06/08 05:58:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -954,6 +954,8 @@ save_tics(FILE *fp, AXIS_INDEX axis)
     case TIC_USER:
 	break;
     }
+
+    fprintf(fp, (axis_array[axis].ticdef.rangelimited)?" rangelimit":" norangelimit");
 
     if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font)
         fprintf(fp, " font \"%s\"", axis_array[axis].ticdef.font);

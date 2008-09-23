@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.32 2008/07/22 05:59:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.33 2008/08/01 16:39:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4985,30 +4985,61 @@ map_position_r(
 static void
 plot_border()
 {
+    int min, max;
+
 	term_apply_lp_properties(&border_lp);	/* border linetype */
 	if (border_complete)
 	    newpath();
 	(*term->move) (plot_bounds.xleft, plot_bounds.ytop);
-	if (border_west) {
+
+	if (border_west && axis_array[FIRST_Y_AXIS].ticdef.rangelimited) {
+		max = AXIS_MAP(FIRST_Y_AXIS,axis_array[FIRST_Y_AXIS].data_max);
+		min = AXIS_MAP(FIRST_Y_AXIS,axis_array[FIRST_Y_AXIS].data_min);
+		(*term->move) (plot_bounds.xleft, max);
+		(*term->vector) (plot_bounds.xleft, min);
+		(*term->move) (plot_bounds.xleft, plot_bounds.ybot);
+	} else if (border_west) {
 	    (*term->vector) (plot_bounds.xleft, plot_bounds.ybot);
 	} else {
 	    (*term->move) (plot_bounds.xleft, plot_bounds.ybot);
 	}
-	if (border_south) {
+
+	if (border_south && axis_array[FIRST_X_AXIS].ticdef.rangelimited) {
+		max = AXIS_MAP(FIRST_X_AXIS,axis_array[FIRST_X_AXIS].data_max);
+		min = AXIS_MAP(FIRST_X_AXIS,axis_array[FIRST_X_AXIS].data_min);
+		(*term->move) (min, plot_bounds.ybot);
+		(*term->vector) (max, plot_bounds.ybot);
+		(*term->move) (plot_bounds.xright, plot_bounds.ybot);
+	} else if (border_south) {
 	    (*term->vector) (plot_bounds.xright, plot_bounds.ybot);
 	} else {
 	    (*term->move) (plot_bounds.xright, plot_bounds.ybot);
 	}
-	if (border_east) {
+
+	if (border_east && axis_array[SECOND_Y_AXIS].ticdef.rangelimited) {
+		max = AXIS_MAP(SECOND_Y_AXIS,axis_array[SECOND_Y_AXIS].data_max);
+		min = AXIS_MAP(SECOND_Y_AXIS,axis_array[SECOND_Y_AXIS].data_min);
+		(*term->move) (plot_bounds.xright, max);
+		(*term->vector) (plot_bounds.xright, min);
+		(*term->move) (plot_bounds.xright, plot_bounds.ybot);
+	} else if (border_east) {
 	    (*term->vector) (plot_bounds.xright, plot_bounds.ytop);
 	} else {
 	    (*term->move) (plot_bounds.xright, plot_bounds.ytop);
 	}
-	if (border_north) {
+
+	if (border_north && axis_array[SECOND_X_AXIS].ticdef.rangelimited) {
+		max = AXIS_MAP(SECOND_X_AXIS,axis_array[SECOND_X_AXIS].data_max);
+		min = AXIS_MAP(SECOND_X_AXIS,axis_array[SECOND_X_AXIS].data_min);
+		(*term->move) (min, plot_bounds.ytop);
+		(*term->vector) (max, plot_bounds.ytop);
+		(*term->move) (plot_bounds.xright, plot_bounds.ytop);
+	} else if (border_north) {
 	    (*term->vector) (plot_bounds.xleft, plot_bounds.ytop);
 	} else {
 	    (*term->move) (plot_bounds.xleft, plot_bounds.ytop);
 	}
+
 	if (border_complete)
 	    closepath();
 }

@@ -1,4 +1,14 @@
+2008-09-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/axis.c(gen_tics) src/set.c(set_tics) src/show.c
+	src/graphics.c (plot_border) demo/random.dem:
+	Add an axis tic attribute "rangelimited".  If set, the border and
+	tics for this axis will be drawn only for the range of the data,
+	rather than for the full range of the axis.
+
 2008-09-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	Version 4.2.4 release
 
 	* configure.in PATCHLEVEL docs/titlepag.tex src/version.c:
 	Update for 4.2.4 release

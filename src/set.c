@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.10 2008/03/21 17:30:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.11 2008/06/08 05:58:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4309,6 +4309,12 @@ set_tic_prop(AXIS_INDEX axis)
 		    { character, character, character, 0., 0., 0.};
 		++c_token;
 		axis_array[axis].ticdef.offset = tics_nooffset;
+	    } else if (almost_equals(c_token,"range$limited")) {
+		axis_array[axis].ticdef.rangelimited = TRUE;
+		++c_token;
+	    } else if (almost_equals(c_token,"norange$limited")) {
+		axis_array[axis].ticdef.rangelimited = FALSE;
+		++c_token;
 	    } else if (almost_equals(c_token, "f$ont")) {
 		++c_token;
 		/* Make sure they've specified a font */

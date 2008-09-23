@@ -1,5 +1,6 @@
 New features, changes and fixes since previous release
 ===========================================================
+* NEW 'set xtics rangelimit' allows creation of range/frame plots
 
 
 New features, changes and fixes in gnuplot version 4.2.4

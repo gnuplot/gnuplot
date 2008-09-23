@@ -1,5 +1,5 @@
 #
-# $Id: random.dem,v 1.12 2006/07/12 17:21:14 tlecomte Exp $
+# $Id: random.dem,v 1.12.2.1 2006/10/23 05:43:30 sfeam Exp $
 #
 # random.dem
 #
@@ -186,5 +186,24 @@ if (oneplot) unset multiplot
 #
 pause -1 "Hit return to continue"
 
-reset
+unset key
+unset grid
+set xrange [-8:8]
+set yrange [-8:8]
+set size ratio 1.0
+set zeroaxis
+set border 3
+set tics out scale 0.5
+set xtics 1.0 border rangelimited nomirror
+set ytics 1.0 border rangelimited nomirror
+set tics scale 0.5
+set format xy "%.0f"
+
+set title 'Example of range-limited axes and tics'
+
+A = pi/9.
+plot 'random.tmp' using (1.5 + $1*cos(A)-2.*$2*sin(A)):(1.0 + $1*sin(A)+2.*$2*cos(A)) with dots
+
+pause -1 "Hit return to continue"
+
 
