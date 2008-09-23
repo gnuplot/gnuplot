@@ -1,3 +1,8 @@
+2008-09-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/html/Makefile demo/html/index.save:
+	Add ellipse.dem to the set of auto-generated sample plots.
+
 2008-09-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics) src/graphics.c (label_width):  Add a sanity
