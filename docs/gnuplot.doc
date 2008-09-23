@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.536 2008/09/10 18:16:03 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.537 2008/09/22 16:37:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -249,8 +249,8 @@ C
 3 New plot elements
 =circles
 =ellipse
- The `set object` command can now be used to define fixed circles and ellipses
- as well as rectangles. There is a corresponding new plot style
+ The `set object` command can now be used to define fixed circles, ellipses, and
+ polygons as well as rectangles. There is a corresponding new plot style
  `plot with circles`.  See `circles` `ellipse`.
 
 3 New or revised terminal drivers
@@ -8370,11 +8370,11 @@ Ffigure_mapcontours
 ?show object
  The `set object` command defines a single object which will appear in all
  subsequent 2D plots. You may define as many objects as you like. Currently the
- supported object types are `rectangle`, `circle`, and `ellipse`.
+ supported object types are `rectangle`, `circle`, `ellipse`, and `polygon`.
  Rectangles inherit a default set of style properties (fill, color, border) from
  those set by the command `set style rectangle`, but each object can also be
- given individual style properties. Circles and ellipses inherit the fill style
- from `set style fill`.
+ given individual style properties. Circles, ellipses, and polygons  inherit the
+ fill style from `set style fill`.
 
  Syntax:
      set object <index>
@@ -8382,8 +8382,8 @@ Ffigure_mapcontours
          {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
          {default} {lw|linewidth <width>}
 
- <object-type> is either `rectangle`, `ellipse`, or `circle`. Each object type
- has its own set of characteristic properties.
+ <object-type> is either `rectangle`, `ellipse`, `circle`, or `polygon`.
+ Each object type has its own set of characteristic properties.
 
  Setting `front` will draw the object in front of all plot elements, but
  behind any labels that are also marked `front`. Setting `back` will place the
@@ -8480,6 +8480,28 @@ Ffigure_mapcontours
  By default a full circle is drawn. The optional qualifier `arc` specifies
  a starting angle and ending angle, in degrees, for one arc of the circle.
  The arc is always drawn counterclockwise.
+
+4 polygon
+?polygon
+?commands set object polygon
+?commands show object polygon
+?set object polygon
+?show object polygon
+ Syntax:
+     set object <index> polygon
+         from <position> to <position> ... {to <position>}
+ or
+         from <position> rto <position> ... {rto <position>}
+
+ The position of the rectangle may be specified by giving the position of a
+ sequence of vertices. These may be given in axis, graph, or screen coordinates.
+ If relative coordinates are used (rto) then the coordinate type must match
+ that of the previous vertex.
+ See `coordinates`.
+
+ Example:
+     set object 1 polygon from 0,0 to 1,1 to 2,0
+     set object 1 fc rgb "cyan" fillstyle solid 1.0 border -1
 
 3 offsets
 ?commands set offsets

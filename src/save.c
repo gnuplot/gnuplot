@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.164 2008/09/15 18:36:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.165 2008/09/23 20:08:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1307,19 +1307,6 @@ save_object(FILE *fp, int tag)
 		fprintf(fp, " to ");
 		save_position(fp, &this_rect->tr, FALSE);
 	    }
-
-	    fprintf(fp, " %s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
-	    if (this_object->lp_properties.l_width)
-		fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
-	    fprintf(fp, "fc ");
-	    if (this_object->lp_properties.l_type == LT_DEFAULT)
-		fprintf(fp,"default");
-	    else if (this_object->lp_properties.use_palette)
-		save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
-	    else
-		fprintf(fp, "lt %d",this_object->lp_properties.l_type+1);
-	    fprintf(fp, " fillstyle ");
-	    save_fillstyle(fp, &this_object->fillstyle);
 	}
 
 	else if ((this_object->object_type == OBJ_CIRCLE)
@@ -1334,19 +1321,6 @@ save_object(FILE *fp, int tag)
 	    fprintf(fp, " size ");
 	    fprintf(fp, "%s%g", e->scalex == first_axes ? "" : coord_msg[e->scalex], e->x);
 	    fprintf(fp, " arc [%g:%g] ", this_circle->arc_begin, this_circle->arc_end);
-
-	    fprintf(fp, " %s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
-	    if (this_object->lp_properties.l_width)
-		fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
-	    fprintf(fp, "fc ");
-	    if (this_object->lp_properties.l_type == LT_DEFAULT)
-		fprintf(fp,"default");
-	    else if (this_object->lp_properties.use_palette)
-		save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
-	    else
-		fprintf(fp, "lt %d",this_object->lp_properties.l_type+1);
-	    fprintf(fp, " fillstyle ");
-	    save_fillstyle(fp, &this_object->fillstyle);
 	}
 
 	else if ((this_object->object_type == OBJ_ELLIPSE)
@@ -1361,20 +1335,38 @@ save_object(FILE *fp, int tag)
 	    fprintf(fp, "%s%g", e->scalex == first_axes ? "" : coord_msg[e->scalex], e->x);
 	    fprintf(fp, ", %s%g", e->scaley == e->scalex ? "" : coord_msg[e->scaley], e->y);
 	    fprintf(fp, "  angle %g", this_ellipse->orientation);
-
-	    fprintf(fp, " %s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
-	    if (this_object->lp_properties.l_width)
-		fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
-	    fprintf(fp, "fc ");
-	    if (this_object->lp_properties.l_type == LT_DEFAULT)
-		fprintf(fp,"default");
-	    else if (this_object->lp_properties.use_palette)
-		save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
-	    else
-		fprintf(fp, "lt %d",this_object->lp_properties.l_type+1);
-	    fprintf(fp, " fillstyle ");
-	    save_fillstyle(fp, &this_object->fillstyle);
 	}
+
+	else if ((this_object->object_type == OBJ_POLYGON)
+	    && (tag == 0 || tag == this_object->tag)) {
+	    t_polygon *this_polygon = &this_object->o.polygon;
+	    int nv;
+	    showed = TRUE;
+	    fprintf(fp, "%sobject %2d polygon ", (fp==stderr) ? "\t" : "set ",this_object->tag);
+	    if (this_polygon->vertex) {
+		fprintf(fp, "from ");
+		save_position(fp, &this_polygon->vertex[0], FALSE);
+	    }
+	    for (nv=1; nv < this_polygon->type; nv++) {
+		fprintf(fp, (fp==stderr) ? "\n\t\t\t    to " : " to ");
+		save_position(fp, &this_polygon->vertex[nv], FALSE);
+	    }
+	}
+
+	/* Properties common to all objects */
+	fprintf(fp, "\n%sobject %2d ", (fp==stderr) ? "\t" : "set ",this_object->tag);
+	fprintf(fp, "%s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
+	if (this_object->lp_properties.l_width)
+		fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
+	fprintf(fp, "fc ");
+	if (this_object->lp_properties.l_type == LT_DEFAULT)
+		fprintf(fp,"default");
+	else if (this_object->lp_properties.use_palette)
+		save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
+	else
+		fprintf(fp, "lt %d",this_object->lp_properties.l_type+1);
+	fprintf(fp, " fillstyle ");
+	save_fillstyle(fp, &this_object->fillstyle);
 
     }
     if (tag > 0 && !showed)

@@ -2,7 +2,7 @@ New features, changes and fixes since gnuplot version 4.2
 =========================================================
 
 * NEW plot style "with circles"
-* NEW object types circle and ellipse
+* NEW object types circle, ellipse, and polygon
 * NEW preliminary export of information needed for external mousing scripts
 * NEW options front and back to "set colorbox"
 * NEW x11 can plot into a window opened and managed by an external application

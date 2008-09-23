@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.67 2008/05/30 04:52:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.68 2008/06/02 19:18:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -180,10 +180,9 @@ typedef struct edge {
 typedef edge GPHUGE *p_edge;
 
 
-/* One polygon (actually: always a triangle) of the surface
- * mesh(es). */
+/* One triangle of the surface mesh(es). */
 #define POLY_NVERT 3
-typedef struct polygon {
+typedef struct mesh_triangle {
     long vertex[POLY_NVERT];    /* The vertices (indices on vlist) */
     /* min/max in all three directions */
     coordval xmin, xmax, ymin, ymax, zmin, zmax;
@@ -196,8 +195,8 @@ typedef struct polygon {
     unsigned long xbits;	/* x coverage mask of bounding box */
     unsigned long ybits;	/* y coverage mask of bounding box */
 #endif
-} polygon;
-typedef polygon GPHUGE *p_polygon;
+} mesh_triangle;
+typedef mesh_triangle GPHUGE *p_polygon;
 
 #if HIDDEN3D_GRIDBOX
 # define UINT_BITS (CHAR_BIT * sizeof(unsigned int))
@@ -462,7 +461,7 @@ init_hidden_line_removal()
 
     init_dynarray(&vertices, sizeof(vertex), 100, 100);
     init_dynarray(&edges, sizeof(edge), 100, 100);
-    init_dynarray(&polygons, sizeof(polygon), 100, 100);
+    init_dynarray(&polygons, sizeof(mesh_triangle), 100, 100);
 #if HIDDEN3D_QUADTREE
     init_dynarray(&qtree, sizeof(qtreelist), 100, 100);
 #endif

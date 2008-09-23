@@ -131,6 +131,11 @@ typedef struct ellipse {
     double orientation;		/* angle of first axis to horizontal */
 } t_ellipse;
 
+typedef struct polygon {
+    int	type;			/* Number of vertices */
+    t_position *vertex;		/* Array of vertices */
+} t_polygon;
+
 /* Datastructure for 'set object' */
 typedef struct object {
     struct object *next;
@@ -139,11 +144,12 @@ typedef struct object {
     int object_type;		/* OBJ_RECTANGLE */
     fill_style_type fillstyle;
     lp_style_type lp_properties;
-    union o {t_rectangle rectangle; t_circle circle; t_ellipse ellipse;} o;
+    union o {t_rectangle rectangle; t_circle circle; t_ellipse ellipse; t_polygon polygon;} o;
 } t_object;
 #define OBJ_RECTANGLE (1)
 #define OBJ_CIRCLE (2)
 #define OBJ_ELLIPSE (3)
+#define OBJ_POLYGON (4)
 #endif
 
 /* Datastructure implementing 'set style line' */
@@ -446,6 +452,11 @@ extern struct object default_circle;
 	{FS_SOLID, 100, 0, LT_BLACK},   			\
 	{1, LT_BACKGROUND, 0, 1.0, 0.0},			\
 	{.ellipse = {1, {0,0.,0.,0.}, {0,0.,0.,0.}, 0. }} }
+
+#define DEFAULT_POLYGON_STYLE { NULL, -1, 0, OBJ_POLYGON,       \
+	{FS_SOLID, 100, 0, LT_BLACK},   			\
+	{1, LT_BLACK, 0, 1.0, 0.0},			\
+	{.polygon = {0, NULL} } }
 
 #endif
 

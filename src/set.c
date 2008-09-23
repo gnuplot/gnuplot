@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.286 2008/09/07 17:27:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.287 2008/09/09 06:05:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -122,7 +122,7 @@ static void set_polar __PROTO((void));
 static void set_print __PROTO((void));
 #ifdef EAM_OBJECTS
 static void set_object __PROTO((void));
-static void set_rectangle __PROTO((int, int));
+static void set_obj __PROTO((int, int));
 #endif
 static void set_samples __PROTO((void));
 static void set_size __PROTO((void));
@@ -3379,7 +3379,7 @@ set_polar()
 
 #ifdef EAM_OBJECTS
 /* 
- * Process command     'set object <tag> {rectangle|ellipse|circle}'
+ * Process command     'set object <tag> {rectangle|ellipse|circle|polygon}'
  * set object {tag} rectangle {from <bottom_left> {to|rto} <top_right>}
  *                     {{at|center} <xcen>,<ycen> size <w>,<h>}
  *                     {fc|fillcolor <colorspec>} {lw|linewidth <lw>}
@@ -3395,8 +3395,8 @@ set_object()
 
     /* The next token must either be a tag or the object type */
     c_token++;
-    if (almost_equals(c_token, "rect$angle")
-	|| equals(c_token, "ellipse") || equals(c_token, "circle"))
+    if (almost_equals(c_token, "rect$angle") || equals(c_token, "ellipse") 
+    ||  equals(c_token, "circle") || almost_equals(c_token, "poly$gon"))
 	tag = -1; /* We'll figure out what it really is later */
     else {
 	tag = int_expression();
@@ -3405,13 +3405,16 @@ set_object()
     }
 
     if (almost_equals(c_token, "rect$angle")) {
-	set_rectangle(tag, OBJ_RECTANGLE);
+	set_obj(tag, OBJ_RECTANGLE);
 
     } else if (equals(c_token, "ellipse")) {
-	set_rectangle(tag, OBJ_ELLIPSE);
+	set_obj(tag, OBJ_ELLIPSE);
 
     } else if (equals(c_token, "circle")) {
-	set_rectangle(tag, OBJ_CIRCLE);
+	set_obj(tag, OBJ_CIRCLE);
+
+    } else if (almost_equals(c_token, "poly$gon")) {
+	set_obj(tag, OBJ_POLYGON);
 
     } else if (tag > 0) {
 	/* Look for existing object with this tag */
@@ -3421,7 +3424,7 @@ set_object()
 		break;
 	if (this_object && tag == this_object->tag) {
 	    c_token--;
-	    set_rectangle(tag, this_object->object_type);
+	    set_obj(tag, this_object->object_type);
 	} else
 	    int_error(c_token, "unknown object");
 
@@ -3436,32 +3439,39 @@ new_object(int tag, int object_type, t_object *new)
     t_object def_rect = DEFAULT_RECTANGLE_STYLE;
     t_object def_ellipse = DEFAULT_ELLIPSE_STYLE;
     t_object def_circle = DEFAULT_CIRCLE_STYLE;
+    t_object def_polygon = DEFAULT_POLYGON_STYLE;
 
     if (!new)
 	new = gp_alloc(sizeof(struct object), "object");
-    if (object_type == OBJ_RECTANGLE)
+    else if (new->object_type == OBJ_POLYGON)
+	free(new->o.polygon.vertex);
+
+    if (object_type == OBJ_RECTANGLE) {
 	*new = def_rect;
-    else if (object_type == OBJ_ELLIPSE)
+	new->lp_properties.l_type = LT_DEFAULT; /* Use default rectangle color */
+	new->fillstyle.fillstyle = FS_DEFAULT;  /* and default fill style */
+    } else if (object_type == OBJ_ELLIPSE)
 	*new = def_ellipse;
     else if (object_type == OBJ_CIRCLE)
 	*new = def_circle;
+    else if (object_type == OBJ_POLYGON)
+	*new = def_polygon;
     else
 	int_error(NO_CARET,"object initialization failure");
 
     new->tag = tag;
     new->object_type = object_type;
-    new->lp_properties.l_type = LT_DEFAULT; /* Use default rectangle color */
-    new->fillstyle.fillstyle = FS_DEFAULT;  /* and default fill style */
 
     return new;
 }
 
 static void
-set_rectangle(int tag, int obj_type)
+set_obj(int tag, int obj_type)
 {
     t_rectangle *this_rect = NULL;
     t_ellipse *this_ellipse = NULL;
     t_circle *this_circle = NULL;
+    t_polygon *this_polygon = NULL;
     t_object *this_object = NULL;
     t_object *new_obj = NULL;
     t_object *prev_object = NULL;
@@ -3470,6 +3480,7 @@ set_rectangle(int tag, int obj_type)
     TBOOLEAN got_lw = FALSE;
     TBOOLEAN got_corners = FALSE;
     TBOOLEAN got_center = FALSE;
+    TBOOLEAN got_origin = FALSE;
     double lw = 1.0;
 
     c_token++;
@@ -3514,6 +3525,7 @@ set_rectangle(int tag, int obj_type)
 	this_rect = &this_object->o.rectangle;
 	this_ellipse = &this_object->o.ellipse;
 	this_circle = &this_object->o.circle;
+	this_polygon = &this_object->o.polygon;
 
     }
 
@@ -3608,6 +3620,54 @@ set_rectangle(int tag, int obj_type)
 		    continue;
 		}
 		break;
+
+	case OBJ_POLYGON:
+		if (equals(c_token,"from")) {
+		    c_token++;
+		    this_polygon->vertex = gp_realloc(this_polygon->vertex,
+					sizeof(struct position),
+					"polygon vertex");
+		    get_position(&this_polygon->vertex[0]);
+		    this_polygon->type = 1;
+		    got_origin = TRUE;
+		}
+		while (equals(c_token,"to") || equals(c_token,"rto")) {
+		    if (!got_origin)
+			goto polygon_error;
+		    this_polygon->vertex = gp_realloc(this_polygon->vertex,
+					(this_polygon->type+1) * sizeof(struct position),
+					"polygon vertex");
+		    if (equals(c_token++,"to")) {
+			get_position(&this_polygon->vertex[this_polygon->type]);
+		    } else /* "rto" */ {
+			int v = this_polygon->type;
+			get_position_default(&this_polygon->vertex[v],
+					      this_polygon->vertex->scalex);
+			if (this_polygon->vertex[v].scalex != this_polygon->vertex[v-1].scalex
+			||  this_polygon->vertex[v].scaley != this_polygon->vertex[v-1].scaley)
+			    int_error(c_token,"relative coordinates must match in type");
+			this_polygon->vertex[v].x += this_polygon->vertex[v-1].x;
+			this_polygon->vertex[v].y += this_polygon->vertex[v-1].y;
+		    }
+		    this_polygon->type++;
+		    got_corners = TRUE;
+		}
+		if (got_corners && memcmp(&this_polygon->vertex[this_polygon->type-1],
+					  &this_polygon->vertex[0],sizeof(struct position))) {
+		    fprintf(stderr,"Polygon is not closed - adding extra vertex\n");
+		    this_polygon->vertex = gp_realloc(this_polygon->vertex,
+					(this_polygon->type+1) * sizeof(struct position),
+					"polygon vertex");
+		    memcpy(&this_polygon->vertex[this_polygon->type],
+					&this_polygon->vertex[0],sizeof(struct position));
+		    this_polygon->type++;
+		}
+		break;
+		polygon_error:
+			free(this_polygon->vertex);
+			this_polygon->vertex = NULL;
+			this_polygon->type = 0;
+			int_error(c_token, "Unrecognized polygon syntax");
 
 	default:
 		int_error(c_token, "Unrecoginized object type");
@@ -3815,7 +3875,7 @@ set_style()
 #ifdef EAM_OBJECTS
     case SHOW_STYLE_RECTANGLE:
 	c_token++;
-	set_rectangle(-2, OBJ_RECTANGLE);
+	set_obj(-2, OBJ_RECTANGLE);
 	break;
 #endif
     case SHOW_STYLE_HISTOGRAM:

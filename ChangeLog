@@ -3,6 +3,10 @@
 	* demo/html/Makefile demo/html/index.save:
 	Add ellipse.dem to the set of auto-generated sample plots.
 
+	* docs/gnuplot.doc src/gadgets.h src/graphics.c src/graphics.h
+	src/hidden3d.c src/save.c src/set.c src/unset.c NEWS:
+	New object type: polygon
+
 2008-09-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics) src/graphics.c (label_width):  Add a sanity

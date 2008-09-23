@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.279 2008/08/19 18:48:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.280 2008/09/22 23:13:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1470,6 +1470,16 @@ place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *c
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fillstyle))
 		    do_ellipse(dimensions, &this_object->o.ellipse, 0);
+	}
+
+	if (this_object->object_type == OBJ_POLYGON) {
+	    term_apply_lp_properties(&lpstyle);
+
+	    do_polygon(dimensions, &this_object->o.polygon, style);
+
+	    /* Retrace the border if the style requests it */
+	    if (need_fill_border(fillstyle))
+		    do_polygon(dimensions, &this_object->o.polygon, 0);
 	}
 
 	/* Must be a rectangle */    
@@ -5502,6 +5512,59 @@ do_ellipse( int dimensions, t_ellipse *e, int style )
 	    draw_clip_line( vertex[i].x, vertex[i].y,
 		vertex[i+1].x, vertex[i+1].y );
     }
+}
+
+void
+do_polygon( int dimensions, t_polygon *p, int style )
+{
+    static gpiPoint *corners = NULL;
+    static gpiPoint *clpcorn = NULL;
+    int nv;
+
+    if (!p->vertex)
+	return;
+
+    corners = gp_realloc(corners, p->type * sizeof(gpiPoint), "polygon");
+    clpcorn = gp_realloc(clpcorn, 2 * p->type * sizeof(gpiPoint), "polygon");
+    for (nv = 0; nv < p->type; nv++) {
+	if (dimensions == 3)
+	    map3d_position(&p->vertex[nv], &corners[nv].x, &corners[nv].y, "pvert");
+	else
+	    map_position(&p->vertex[nv], &corners[nv].x, &corners[nv].y, "pvert");
+    }
+
+    if (term->filled_polygon && style) {
+	int i,o,clipped;
+	gpiPoint temp;
+	for (i=0,o=0; i<nv-1; i++) {
+	    clpcorn[o] = corners[i];
+	    temp = corners[i+1];
+	    clipped = clip_line(&corners[i].x, &corners[i].y, &corners[i+1].x, &corners[i+1].y);
+	    if (clipped == 0) continue;	/* both ends out of range */
+	    if (clipped  > 0) o++;	/* both ends in range */
+	    if (clipped  < 0) {		/* clipped to range */
+		clpcorn[o++] = corners[i];
+		clpcorn[o++] = corners[i+1];
+		corners[i+1] = temp;
+	    }
+	}
+	if (clipped == 1)
+	    clpcorn[o++] = corners[i];
+	clpcorn[0].style = style;
+	term->filled_polygon(o, clpcorn);
+
+    } else { /* Just draw the outline? */
+	int i;
+ 	newpath();
+	for (i=0; i<nv-1; i++)
+	    draw_clip_line( corners[i].x, corners[i].y,
+		corners[i+1].x, corners[i+1].y );
+	if (corners[i].x != corners[0].x || corners[i].y != corners[0].y)
+	    draw_clip_line( corners[i].x, corners[i].y,
+		corners[0].x, corners[0].y );
+	closepath();
+    }
+
 }
 #endif
 

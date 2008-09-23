@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.123 2008/09/06 03:42:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.124 2008/09/07 17:27:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -978,7 +978,9 @@ delete_object(struct object *prev, struct object *this)
 	    prev->next = this->next;
 	else			/* this = first_object so change first_object */
 	    first_object = this->next;
-	/* FIXME:  Must free contents as well */
+	/* NOTE:  Must free contents as well */
+	if (this->object_type == OBJ_POLYGON)
+	    free(this->o.polygon.vertex);
 	free (this);
     }
 }
