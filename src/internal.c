@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.49 2008/03/30 03:27:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.50 2008/04/02 03:15:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1370,14 +1370,13 @@ f_strftime(union argument *arg)
     /* Remove trailing space */
     assert(buffer[length-1] == ' ');
     buffer[length-1] = NUL;
-    buffer = gp_realloc(buffer, strlen(buffer)+1, "f_strftime");
-    FPRINTF((stderr," strftime result = \"%s\"\n",buffer));
 
     gpfree_string(&val);
     gpfree_string(&fmt);
     free(fmtstr);
 
     push(Gstring(&val, buffer));
+    free(buffer);
 }
 
 /* Convert string into seconds from year 2000 */

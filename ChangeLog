@@ -1,3 +1,9 @@
+2008-09-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_label load_tic_users prune_dataticks)
+	src/internal.c (f_strftime):  Fix memory leaks found by valgrind.
+	Memcheck now gives all.dem a clean bill of health.
+
 2008-09-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/html/Makefile demo/html/index.save:
