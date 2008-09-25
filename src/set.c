@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.11 2008/06/08 05:58:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.12 2008/09/23 23:11:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1876,8 +1876,10 @@ set_label()
 	char* text;
 	parse_label_options( this_label );
 	text = try_to_get_string();
-	if (text)
+	if (text) {
+	    free(this_label->text);
 	    this_label->text = text;
+	}
 #else
     /* get text from string */
     if (!END_OF_COMMAND && isstring(c_token)) {
@@ -4691,6 +4693,7 @@ load_tic_user(AXIS_INDEX axis)
 	if (ticlabel && axis_array[axis].is_timedata
 	    && (equals(c_token,",") || equals(c_token,")"))) {
 	    c_token = save_token;
+	    free(ticlabel);
 	    ticlabel = NULL;
 	}
 
@@ -4706,6 +4709,7 @@ load_tic_user(AXIS_INDEX axis)
 
 	/* add to list */
 	add_tic_user(axis, ticlabel, ticposition, ticlevel);
+	free(ticlabel);
 
 	/* expect "," or ")" here */
 	if (!END_OF_COMMAND && equals(c_token, ","))
@@ -4742,15 +4746,19 @@ prune_dataticks(struct ticmark *list)
 {
     struct ticmark a = {0.0,NULL,0,NULL};
     struct ticmark *b = &a;
+    struct ticmark *tmp;
 
     while (list) {
-	if (list->level < 0)
+	if (list->level < 0) {
 	    free(list->label);
-	else {
+	    tmp = list->label;
+	    free(list);
+	    list = tmp;
+	} else {
 	    b->next = list;
 	    b = list;
+	    list = list->next;
 	}
-	list = list->next;
     }
     b->next = NULL;
     return a.next;
