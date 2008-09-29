@@ -1,3 +1,11 @@
+2008-09-29  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.h: Add field c into structure gpdPoint.
+
+	* src/pm3d.c (pm3d_plot): Support "pm3d interpolate" for surfaces
+	given by both z and colour coordinates.
+	SF Bug #2127845
+
 2008-09-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_label load_tic_users prune_dataticks)
