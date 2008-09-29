@@ -36,6 +36,7 @@ New features, changes and fixes since gnuplot version 4.2
 * FIX handle addition plot styles in mode 'set table'
 * FIX purge tick labels read from a datafile at the end of each plot
 * FIX 2nd colour in the colour box for negative palette in postscript
+* FIX interpolatation for pm3d surfaces given by both z and colour coordinates
 * CHANGE 'reset' does not affect locale, encoding, decimalsign settings
 * CHANGE 'set key textcolor rgb variable' will use plot colors for key entries
 * CHANGE Remove obsolete IRIS4D terminal type
