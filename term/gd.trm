@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.125 2008/04/06 20:41:33 sfeam Exp $
+ * $Id: gd.trm,v 1.127 2008/06/02 03:42:18 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2125,9 +2125,15 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
 	for (n=0; n<N; n++) {
 	for (m=0; m<M; m++) {
 	    rgb255_color rgb;
-	    rgb255maxcolors_from_gray( *image++, &rgb );
-	    pixel = gdImageColorResolve( im,
-		(int)rgb.r, (int)rgb.g, (int)rgb.b );
+	    if (isnan(*image)) {
+		/* Transparent would be even better */
+		pixel = png_state.color_table[0];
+		image++;
+	    } else {
+		rgb255maxcolors_from_gray( *image++, &rgb );
+		pixel = gdImageColorResolve( im,
+		    (int)rgb.r, (int)rgb.g, (int)rgb.b );
+	    }
 	    gdImageSetPixel( im, m, n, pixel );
 	}
 	}

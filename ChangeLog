@@ -1,3 +1,17 @@
+2008-09-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_image_or_update_axes) src/plot2d.c (get_data)
+	term/pdf.trm (PDF_image) src/wxterminal/gp_cairo.c (gp_cairo_draw_image)
+	src/plot3d.c (get_3ddata) term/gd.trm (PNG_image) demo/imageNaN.dem:
+
+	When converting image data to image pixels, missing/NaN/Inf data points
+	were being mapped to 0.  Since 0 can often be a legitimate cbrange
+	value, this was unfortunate.  Modify the the input code to retain the
+	actual missing/NaN/Inf value, and teach the generic image code to skip
+	NaN data points. +Inf, -Inf values are now correctly pinned to the
+	extremes of the colorbar palette.  The terminal-specific image routines
+	handled by libgd, PDFlib, and cairo are similarly modified.
+
 2008-09-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.h: Add field c into structure gpdPoint.

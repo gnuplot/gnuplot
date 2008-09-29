@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.280 2008/09/22 23:13:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.281 2008/09/24 03:19:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6129,23 +6129,28 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 		    }
 
 		    if (N_corners >= 3) {
-			if (pixel_planes == IC_PALETTE)
+			if (pixel_planes == IC_PALETTE) {
+			    if (isnan(points[i_image].CRD_COLOR))
+				goto skip_pixel;
 			    set_color( cb2gray(points[i_image].CRD_COLOR) );
-			else {
+			} else {
 			    int r = cb2gray(points[i_image].CRD_R) * 255. + 0.5;
 			    int g = cb2gray(points[i_image].CRD_G) * 255. + 0.5;
 			    int b = cb2gray(points[i_image].CRD_B) * 255. + 0.5;
 			    int rgblt = (r << 16) + (g << 8) + b;
 			    set_rgbcolor(rgblt);
 			}
-			if (pixel_planes == IC_RGBA && term->flags & TERM_ALPHA_CHANNEL) {
+			if (pixel_planes == IC_RGBA) {
 			    int alpha = points[i_image].CRD_A;
-			    corners[0].style = FS_SOLID + (alpha<<4);
+			    if (alpha == 0)
+				goto skip_pixel;
+			    if (term->flags & TERM_ALPHA_CHANNEL)
+				corners[0].style = FS_SOLID + (alpha<<4);
 			}
 			(*term->filled_polygon) (N_corners, corners);
 		    }
 		}
-
+skip_pixel:
 		i_image++;
 	    }
 	}

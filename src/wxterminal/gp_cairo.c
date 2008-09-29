@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.38 2008/05/08 00:10:02 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.39 2008/06/02 00:48:11 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1049,8 +1049,13 @@ void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, in
 	} else {
 		for (n=0; n<N; n++) {
 		for (m=0; m<M; m++) {
-			rgb255maxcolors_from_gray( *image++, &rgb255 );
-			*image255copy++ = (0xFF<<24) + (rgb255.r<<16) + (rgb255.g<<8) + rgb255.b;
+			if (isnan(*image)) {
+				image++;
+				*image255copy++ = 0x00000000;
+			} else {
+				rgb255maxcolors_from_gray( *image++, &rgb255 );
+				*image255copy++ = (0xFF<<24) + (rgb255.r<<16) + (rgb255.g<<8) + rgb255.b;
+			}
 		}
 		}
 	}

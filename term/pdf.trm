@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.79 2008/02/24 19:49:41 sfeam Exp $
+ * $Id: pdf.trm,v 1.80 2008/05/08 19:55:42 sfeam Exp $
  */
 
 /*------------------------------
@@ -1425,11 +1425,18 @@ PDF_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
 	}
     } else {
         for (i=0, pixel=rawrgb; i< N*M; i++) {
-	    rgb255_color rgb;
-	    rgb255maxcolors_from_gray(image[i], &rgb);
-	    *pixel++ = rgb.r;
-	    *pixel++ = rgb.g;
-	    *pixel++ = rgb.b;
+	    if (isnan(image[i])) {
+		/* Transparent would be better! */
+		*pixel++ = 255;
+		*pixel++ = 255;
+		*pixel++ = 255;
+	    } else {
+		rgb255_color rgb;
+		rgb255maxcolors_from_gray(image[i], &rgb);
+		*pixel++ = rgb.r;
+		*pixel++ = rgb.g;
+		*pixel++ = rgb.b;
+	    }
 	}
     }
       

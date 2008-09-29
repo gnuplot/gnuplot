@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.184 2008/08/01 00:22:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.185 2008/08/01 20:52:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -737,7 +737,7 @@ get_data(struct curve_points *current_plot)
 				  v[1], v[2]);
 		    cp = &(current_plot->points[i]);
 		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, v[2], cp->type,
-			COLOR_AXIS, current_plot->noautoscale, NOOP, cp->CRD_COLOR=-VERYLARGE);
+			COLOR_AXIS, current_plot->noautoscale, NOOP, cp->CRD_COLOR=v[2]);
 		    i++;
 		    break;
 #endif

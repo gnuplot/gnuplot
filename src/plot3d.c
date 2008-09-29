@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.164 2008/07/19 18:12:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.165 2008/07/26 16:28:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1007,6 +1007,12 @@ get_3ddata(struct surface_points *this_plot)
 		if (this_plot->plot_style == VECTOR)
 		    cptail->z = ztail;
 	    } else {
+		/* EAM Sep 2008 - Otherwise z=Nan or z=Inf or DF_MISSING fails */
+		/* to set CRD_COLOR at all, since the z test bails to a goto.  */
+		if (this_plot->plot_style == IMAGE) {
+			cp->CRD_COLOR = z;
+	        }
+
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 		if (this_plot->plot_style == VECTOR)
 		    STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->z, ztail, cp->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);

@@ -1,0 +1,87 @@
+#
+# Two ways of generating a 2D heat map from ascii data
+#
+
+set title "Treatment of missing/undefined/NaN/Inf data"
+unset key
+set tic scale 0
+set arrow 1 from graph 0.25, -0.2 to graph 0.25, -0.02 lw 3
+
+# Color runs from white to green
+# set palette rgbformula -7,2,-7
+
+set cbrange [-2:7]
+set cblabel "Score"
+set cbtics 0,1,5
+
+set xrange [-0.5:4.5]
+set yrange [-0.5:4.5]
+
+set view map
+set xlabel "All values legal"
+splot '-' matrix with image 
+5 4 3 1 0
+2 2 0 0 1
+0 0 0 1 0
+0 0 0 2 3
+0 1 2 4 3
+e
+e
+
+pause -1 "Hit return to continue"
+set xlabel "Unrecognized character"
+splot '-' matrix with image 
+5 ? 3 1 0
+2 2 0 0 1
+0 0 0 1 0
+0 0 0 2 3
+0 1 2 4 3
+e
+e
+
+pause -1 "Hit return to continue"
+set xlabel "Explicit 'missing' character"
+set datafile missing "?"
+splot '-' matrix with image 
+5 ? 3 1 0
+2 2 0 0 1
+0 0 0 1 0
+0 0 0 2 3
+0 1 2 4 3
+e
+e
+
+pause -1 "Hit return to continue"
+set xlabel "NaN"
+splot '-' matrix with image 
+5 NaN 3 1 0
+2 2 0 0 1
+0 0 0 1 0
+0 0 0 2 3
+0 1 2 4 3
+e
+e
+
+pause -1 "Hit return to continue"
+set xlabel "Inf"
+splot '-' matrix with image 
+5 Inf 3 1 0
+2 2 0 0 1
+0 0 0 1 0
+0 0 0 2 3
+0 1 2 4 3
+e
+e
+
+pause -1 "Hit return to continue"
+set xlabel "-Inf"
+splot '-' matrix with image 
+5 -Inf 3 1 0
+2 2 0 0 1
+0 0 0 1 0
+0 0 0 2 3
+0 1 2 4 3
+e
+e
+
+pause -1 "Hit return to continue"
