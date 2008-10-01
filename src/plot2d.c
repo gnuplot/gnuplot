@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.12 2008/08/01 16:39:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.13 2008/08/01 20:55:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1107,7 +1107,7 @@ store_label(
     /* Check for optional (textcolor palette ...) */
     if (tl->textcolor.type == TC_Z)
         tl->textcolor.value = colorval;
-    else if (tl->textcolor.type == TC_RGB)
+    else if (tl->textcolor.type == TC_RGB && tl->textcolor.value < 0)
         tl->textcolor.lt = colorval;
 
     /* Check for null string (no label) */

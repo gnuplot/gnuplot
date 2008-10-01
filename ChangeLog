@@ -1,3 +1,9 @@
+2008-10-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (store_label): Only store color value for each label
+	in a "with labels" plot if "rgb variable" has been requested.
+	Bugfix
+
 2008-09-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.h: Add field c into structure gpdPoint.
