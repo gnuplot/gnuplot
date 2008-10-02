@@ -1,3 +1,9 @@
+2008-10-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c src/mouse.h src/set.c (set_mouse):
+	Do not free() the permanent copy of default mouse format.
+	Bug #2142011
+
 2008-09-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_image_or_update_axes) src/plot2d.c (get_data)

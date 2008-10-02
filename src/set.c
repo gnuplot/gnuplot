@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.288 2008/09/24 03:19:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.289 2008/09/25 18:33:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2395,9 +2395,11 @@ set_mouse()
 	} else if (almost_equals(c_token, "fo$rmat")) {
 	    ++c_token;
 	    if (isstringvalue(c_token)) {
-		free(mouse_setting.fmt);
+		if (mouse_setting.fmt != mouse_fmt_default)
+		    free(mouse_setting.fmt);
 		mouse_setting.fmt = try_to_get_string();
-	    }
+	    } else
+		mouse_setting.fmt = mouse_fmt_default;
 	} else if (almost_equals(c_token, "cl$ipboardformat")) {
 	    ++c_token;
 	    if (isstringvalue(c_token)) {

@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.19 2007/05/18 06:15:31 sfeam Exp $
+ * $Id: mouse.h,v 1.20 2008/05/31 23:09:51 sfeam Exp $
  */
 
 /* GNUPLOT - mouse.h */
@@ -71,6 +71,7 @@ typedef struct mouse_setting_t {
 } mouse_setting_t;
 
 extern mouse_setting_t mouse_setting;
+extern char mouse_fmt_default[];
 
 
 /* enum of GP_ -keycodes has moved to mousecmn.h so that it can be
