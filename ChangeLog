@@ -1,3 +1,8 @@
+2008-10-06  Juergen Wieferink <wieferink@freenet.de>
+
+	* src/set.c (set_palette_defined): Allow string variables and
+	expressions in "set palette defined". SF #2149065
+
 2008-10-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c src/mouse.h src/set.c (set_mouse):

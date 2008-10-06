@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.289 2008/09/25 18:33:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.290 2008/10/02 21:30:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2706,15 +2706,15 @@ set_palette_defined()
     num = -1;
 
     while (!END_OF_COMMAND) {
+	char *col_str;
 	p = real_expression();
-	if (isstring(c_token)) {
-	    /* either color name or X-styel rgb value "#rrggbb" */
-	    char col_buf[21];
-	    quote_str(col_buf, c_token++, 20);
-	    if (col_buf[0] == '#') {
+	col_str = try_to_get_string();
+	if (col_str) {
+	    /* either color name or X-style rgb value "#rrggbb" */
+	    if (col_str[0] == '#') {
 		/* X-style specifier */
 		int rr,gg,bb;
-		if (sscanf( col_buf, "#%2x%2x%2x", &rr, &gg, &bb ) != 3 )
+		if (sscanf( col_str, "#%2x%2x%2x", &rr, &gg, &bb ) != 3 )
 		    int_error( c_token-1,
 			       "Unknown color specifier. Use '#rrggbb'." );
 		r = (double)(rr)/255.;
@@ -2730,7 +2730,7 @@ set_palette_defined()
 		   so we'll do it manually */
 		const struct gen_table *tbl = pm3d_color_names_tbl;
 		while (tbl->key) {
-		    if (!strcmp(col_buf, tbl->key)) {
+		    if (!strcmp(col_str, tbl->key)) {
 			r = (double)((tbl->value >> 16 ) & 255) / 255.;
 			g = (double)((tbl->value >> 8 ) & 255) / 255.;
 			b = (double)(tbl->value & 255) / 255.;
@@ -2742,6 +2742,7 @@ set_palette_defined()
 		    int_error( c_token-1, "Unknown color name." );
 		named_colors = 1;
 	    }
+	    free(col_str);
 	} else {
 	    /* numerical rgb, hsv, xyz, ... values  [0,1] */
 	    r = real_expression();
