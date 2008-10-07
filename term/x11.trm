@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.174 2008/04/16 22:22:14 sfeam Exp $
+ * $Id: x11.trm,v 1.175 2008/06/02 00:48:12 sfeam Exp $
  *
  */
 
@@ -169,8 +169,7 @@ static struct x11opt {
     { "-selectionTimeout", hasArg}, { "-title", hasArg},
     { "-xnllanguage", hasArg}, { "-xrm", hasArg},
     { "-raise", hasNoArg}, { "-noraise", hasNoArg},
-    { "-solid", hasNoArg}, { "-dashed", hasNoArg},
-    { "-persist", hasNoArg}
+    { "-solid", hasNoArg}, { "-dashed", hasNoArg}
 #ifdef USE_MOUSE
     , { "-nofeedback", hasNoArg}
     , { "-noevents", hasNoArg}
@@ -313,7 +312,15 @@ X11_args(int argc, char *argv[])
     memcpy(xargv, argv, argc * sizeof(char *));
     i = parse_driver(X11_command);
 
+    if (persist_cl) {
+	optvec[i++] = "-persist";
+    }
+
     while (++argv, ++xargv, --argc > 0) {
+	if (!strcmp(*argv,"--persist") || !strncmp(*argv,"-p",2)) {
+	    nx11++;
+	    continue;
+	}
 	for (n = 0; n < X11_nopts; n++) {
 	    if (strcmp(*argv, X11_cmdopts[n].option) == 0) {
 		optvec[i++] = *xargv;
@@ -409,7 +416,8 @@ X11_options()
     TBOOLEAN set_window = FALSE;
 #endif
 
-    persist = do_raise = dashedlines = ctrlq = UNSET;
+    do_raise = dashedlines = ctrlq = UNSET;
+    persist = persist_cl;	/* previously set from command line */
 
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&X11_opts[0], c_token)) {

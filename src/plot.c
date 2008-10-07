@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.100 2008/08/13 02:43:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.101 2008/10/07 20:54:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -348,10 +348,12 @@ main(int argc, char **argv)
     for (i = 1; i < argc; i++) {
 	if (!argv[i])
 	    continue;
+
 	if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--version")) {
 	    printf("gnuplot %s patchlevel %s\n",
 		    gnuplot_version, gnuplot_patchlevel);
 	    return 0;
+
 	} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 	    printf( "Usage: gnuplot [OPTION]... [FILE]\n"
 #ifdef X11
@@ -359,38 +361,20 @@ main(int argc, char **argv)
 #endif
 		    "  -V, --version\n"
 		    "  -h, --help\n"
+		    "  -p  --persist\n"
 		    "  -e  \"command1; command2; ...\"\n"
 		    "gnuplot %s patchlevel %s\n"
 		    "Report bugs to %s\n",
 		    gnuplot_version, gnuplot_patchlevel, bug_email);
 	    return 0;
-	}
-    }
 
-    /* the X11 terminal removes tokens that it recognizes from argv.
-     * We have to parse -persist for the wxWidgets terminal before it happens, and
-     * keep that value for later use */
-    i=0;
-    while (i<argc) {
-	if (!argv[i]) {
-	    ++i;
-	    continue;
-	}
-	if (!strcmp(argv[i], "-persist")) {
-	    FPRINTF((stderr,"'persist' command line option recognized"));
+	} else if (!strncmp(argv[i], "-persist", 2) || !strcmp(argv[i], "--persist")) {
 	    persist_cl = TRUE;
-# ifdef X11
-	    ++i;
-# else
-	    --argc;
-	    ++argv;
-# endif
-	    break;
-	} else
-	    ++i;
+	}
     }
 
 #ifdef X11
+    /* the X11 terminal removes tokens that it recognizes from argv. */
     {
 	int n = X11_args(argc, argv);
 	argv += n;
@@ -629,7 +613,10 @@ main(int argc, char **argv)
 		noend = TRUE;
 	    else
 #endif
-	    if (strcmp(*argv, "-") == 0) {
+	    if (!strncmp(*argv, "-persist", 2) || !strcmp(*argv, "--persist")) {
+		FPRINTF((stderr,"'persist' command line option recognized\n"));
+
+	    } else if (strcmp(*argv, "-") == 0) {
 		/* DBT 10-7-98  go interactive if "-" on command line */
 
 		interactive = TRUE;
