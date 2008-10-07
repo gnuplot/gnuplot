@@ -1,17 +1,17 @@
 .\" dummy line
-.TH GNUPLOT 1 "29 April 2007"
+.TH GNUPLOT 1 " 7 October 2008"
 .UC 4
 .SH NAME
 gnuplot \- an interactive plotting program
 .SH SYNOPSIS
 .B gnuplot
-[ X11 options ] [file ...]
+[X11 options] [options] [file ...]
 .br
 .SH DESCRIPTION
 .B Gnuplot
 is a command-driven interactive function plotting program.
 .PP
-If files are given,
+If file names are given on the command line,
 gnuplot
 loads each file with the
 .B load
@@ -51,6 +51,15 @@ Load and save capability.
 Support for many output devices and file formats.
 .PP
 Output redirection.
+.SH OPTIONS
+.PP
+\fB\-p, --persist\fP lets plot windows survive after main gnuplot program exits.
+.PP
+\fB\-e "command list"\fP executes the requested commands before loading the next input file.
+.PP
+\fB\-h, --help\fP print summary of usage
+.PP
+\fB\-V\fP show current version
 .SH X11 OPTIONS
 .B Gnuplot
 provides the \fIx11\fP terminal type for use
@@ -71,8 +80,6 @@ new plot is displayed.
 (Grayscale displays receive monochrome rendering by default.)
 .PP
 \fB\-mono\fP forces monochrome rendering on color displays.
-.PP
-\fB\-persist\fP lets plot windows survive after main gnuplot program exits.
 .PP
 \fB-raise\fP raises the plot window after each plot.
 .PP

@@ -1,6 +1,6 @@
 2008-10-07  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/plot.c (main) term/x11.trm (X11_args X11_options):
+	* src/plot.c (main) man/gnuplot.1 term/x11.trm (X11_args X11_options):
 	Allow --persist and -p as synonyms for -persist on the command line.
 	Have wxt and x11 use the same mechanism for parsing --persist, 
 	rather than doing it in two separate places.
