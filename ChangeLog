@@ -1,3 +1,9 @@
+2008-10-07  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/plot.c (main) docs/gnuplot.doc:
+	Add a command line option -e to execute specified commands:
+	gnuplot   file1.in   -e "reset"   file2.in
+
 2008-10-06  Juergen Wieferink <wieferink@freenet.de>
 
 	* src/set.c (set_palette_defined): Allow string variables and

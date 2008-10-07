@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.99 2008/04/13 19:25:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.100 2008/08/13 02:43:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -359,6 +359,7 @@ main(int argc, char **argv)
 #endif
 		    "  -V, --version\n"
 		    "  -h, --help\n"
+		    "  -e  \"command1; command2; ...\"\n"
 		    "gnuplot %s patchlevel %s\n"
 		    "Report bugs to %s\n",
 		    gnuplot_version, gnuplot_patchlevel, bug_email);
@@ -637,6 +638,14 @@ main(int argc, char **argv)
 		while (!com_line());
 
 		interactive = FALSE;
+
+	    } else if (strcmp(*argv, "-e") == 0) {
+		--argc; ++argv;
+		if (argc <= 0) {
+		    fprintf(stderr, "syntax:  gnuplot -e \"commands\"\n");
+		    return 0;
+		}
+		do_string(*argv, FALSE);
 
 	    } else
 		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), FALSE);

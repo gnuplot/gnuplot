@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.537 2008/09/22 16:37:05 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.538 2008/09/24 03:19:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -88,26 +88,33 @@ C
 ?introduction
 ?
  `gnuplot` is a command-driven interactive function and data plotting program.
+ syntax:
+       gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
 
- Any command-line arguments are assumed to be names of files containing
- `gnuplot` commands, with the exception of standard X11 arguments, which are
- processed first.  Each file is loaded with the `load` command, in the order
- specified.  `gnuplot` exits after the last file is processed.  The special
- filename "-" is used to denote standard input.  When no load files are named,
- `gnuplot` enters into an interactive mode.  See help for `batch/interactive`
- for more details.
+ Generic X11 options, if any,  must come first.  See your X11 documentation.
+ If you are not using X11, ignore this.  Options interpreted by gnuplot
+ may come anywhere on the line.  Files are executed in the order specified, as
+ are commands supplied by the -e option.
+
+ Example:
+       gnuplot   file1.in   -e "reset"   file2.in
+
+ The special filename "-" is used to force reading from stdin.  `gnuplot` exits
+ after the last file is processed.  If no load files are named, `gnuplot` takes
+ interactive input from stdin.  See help `batch/interactive` for more details.
+ The options specific to gnuplot can be listed by typing
+
+       gnuplot --help
 
  `gnuplot` is case sensitive (commands and function names written in lowercase
  are not the same as those written in CAPS).  All command names may be
  abbreviated as long as the abbreviation is not ambiguous.  Any number of
- commands may appear on a line (with the exception that `load` or `call` must
- be the final command), separated by semicolons (;).  Strings are indicated
- with quotes.  They may be either single or double quotation marks, e.g.,
+ commands may appear on a line, separated by semicolons (;).  Strings may be
+ set off by either single or double quotes, although there are some subtle
+ differences.  See `syntax` and `quotes` for more details.  Examples:
 
        load "filename"
        cd 'dir'
-
- although there are some subtle differences (see `syntax` for more details).
 
  Many `gnuplot` commands have multiple options. Version 4 is less sensitive
  to the order of these options than earlier versions, but some order-dependence
@@ -291,12 +298,14 @@ C
  `gnuplot` may be executed in either batch or interactive modes, and the two
  may even be mixed together on many systems.
 
- Any command-line arguments are assumed to be names of files containing
- `gnuplot` commands (with the exception of standard X11 arguments, which are
- processed first).  Each file is loaded with the `load` command, in the order
- specified.  `gnuplot` exits after the last file is processed.  When no load
- files are named, `gnuplot` enters into an interactive mode.  The special
- filename "-" is used to denote standard input.
+ Any command-line arguments are assumed to be either program options (first
+ character is -) or names of files containing `gnuplot` commands. The option
+ -e "command" may be used to force execution of a gnuplot command. Each file
+ or command string will be executed in the order specified.  The special
+ filename "-" is indicates that commands are to be read from stdin.
+ `gnuplot` exits after the last file is processed.  If no load files and no 
+ command strings are specified, `gnuplot` accepts interactive input from
+ stdin.
 
  Both the `exit` and `quit` commands terminate the current command file and
  `load` the next one, until all have been processed.
@@ -312,6 +321,15 @@ C
  To launch an interactive session after an initialization file "header" and
  followed by another command file "trailer":
        gnuplot header - trailer
+
+ To give `gnuplot` commands directly in the command line, using the "-persist"
+ option so that the plot remains on the screen afterwards:
+       gnuplot -persist -e "set title 'Sine curve'; plot sin(x)"
+
+ To set user-defined variables a and s prior to executing commands from a file:
+       gnuplot -e "a=2; s='file.png'" input.gpl
+
+
 2 Command-line-editing
 ?line-editing
 ?editing

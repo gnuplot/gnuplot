@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.2
 =========================================================
 
+* NEW command line option -e "command list"
 * NEW plot style "with circles"
 * NEW object types circle, ellipse, and polygon
 * NEW preliminary export of information needed for external mousing scripts
