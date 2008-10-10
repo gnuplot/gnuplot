@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.52.2.4 2008/06/24 21:17:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.52.2.5 2008/09/09 16:42:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -909,13 +909,23 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		if (line_width != 1)
 		    cur_penstruct.lopnWidth.x *= line_width;
 	
-		/* use ExtCreatePen instead of CreatePen/CreatePenIndirect to support
-		 * dashed lines if line_width > 1 */
+		/* use ExtCreatePen instead of CreatePen/CreatePenIndirect
+		 * to support dashed lines if line_width > 1 */
 		lb.lbStyle = BS_SOLID;
 		lb.lbColor = cur_penstruct.lopnColor;
+
+#if 0 /* shige work-around for Windows clipboard bug */
 		lpgw->hapen = ExtCreatePen(
 		        (line_width==1 ? PS_COSMETIC : PS_GEOMETRIC) | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
 			cur_penstruct.lopnWidth.x, &lb, 0, 0);
+#else
+		if (line_width==1)
+		  lpgw->hapen = CreatePenIndirect((LOGPEN FAR *) &cur_penstruct);
+		else
+		  lpgw->hapen = ExtCreatePen(
+		        PS_GEOMETRIC | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
+			cur_penstruct.lopnWidth.x, &lb, 0, 0);
+#endif
 		DeleteObject(SelectObject(hdc, lpgw->hapen));
 
 		SelectObject(hdc, lpgw->colorbrush[cur_pen]);
