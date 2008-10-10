@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.15 2006/04/08 14:22:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.15.2.1 2007/08/26 06:15:51 sfeam Exp $"); }
 #endif
 
 /*
@@ -243,11 +243,12 @@ main (int argc, char *argv[])
 	    bPersist = TRUE;
 	} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 	    printf("Usage: gnuplot [OPTION] [FILE] [-]\n"
-		    "  -V, --version   show gnuplot version\n"
-		    "  -h, --help      show this help\n"
-		    "  -persist        don't close the plot after executing FILE\n"
-		    "  -noend, /noend  like -persist (non-portable Windows-only options)\n"
-		    "  -               allow work in interactive mode after executing FILE\n"
+		    "  -V, --version       show gnuplot version\n"
+		    "  -h, --help          show this help\n"
+		    "  -e \"cmd; cmd; ...\"  prepand additional commands\n"
+		    "  -persist            don't close the plot after executing FILE\n"
+		    "  -noend, /noend      like -persist (non-portable Windows-only options)\n"
+		    "  -                   allow work in interactive mode after executing FILE\n"
 		    "Only on Windows, -persist and - have the same effect.\n"
 		    "This is gnuplot %s patchlevel %s\n"
 		    "Report bugs to <http://sourceforge.net/projects/gnuplot>\n",
