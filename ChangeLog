@@ -1,3 +1,7 @@
+2008-10-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/win/pgnuplot.c: Document option "-e".
+
 2008-10-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/win/wgraph.c (drawgraph):  Work around a Windows clipboard bug by
