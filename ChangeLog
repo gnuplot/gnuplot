@@ -1,3 +1,10 @@
+2008-10-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/win/wgraph.c (drawgraph):  Work around a Windows clipboard bug by
+	using ExtCreatePen() only for linewidth != 1.  The clipboard loses the
+	line color if created with ExtCreatePen(), but not CreatePenIndirect().
+	Is the clipboard problem still present for thicker lines?
+
 2008-10-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c (main) man/gnuplot.1 term/x11.trm (X11_args X11_options):
