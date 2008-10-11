@@ -1,3 +1,11 @@
+2008-10-11  Michael Goffioul  <michael.goffioul@gmail.com>
+
+	* src/win/winmain.h src/win/winmain.c (WinMain): Compute new variable
+	szPackageDir from szModuleName, stripping possible "\bin\" at the end.
+
+	* term/post.trm (PS_open_prologue_file): Use szPackageDir instead of
+	szModuleName.
+
 2008-10-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/pgnuplot.c: Document option "-e".

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.235 2008/07/22 05:06:28 sfeam Exp $
+ * $Id: post.trm,v 1.236 2008/08/06 16:36:23 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3363,9 +3363,9 @@ PS_open_prologue_file(char *name)
 # if defined(_Windows)
 	/* retrieve prologues path relatively to gnuplot executable,
 	 * whose path is in szModuleName (winmain.c) */
-	ps_prologue_dir = gp_alloc(strlen((char*) szModuleName)
+	ps_prologue_dir = gp_alloc(strlen((char*) szPackageDir)
 			+ strlen(GNUPLOT_PS_DIR) + 2, "Prolog path");
-	strcpy(ps_prologue_dir, (char*) szModuleName);
+	strcpy(ps_prologue_dir, (char*) szPackageDir);
 	strcat(ps_prologue_dir, "\\");
 	/* GNUPLOT_PS_DIR is _relative_ path */
 	strcat(ps_prologue_dir, GNUPLOT_PS_DIR);

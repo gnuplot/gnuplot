@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.23 2007/03/18 03:18:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.24 2008/05/17 15:37:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -101,6 +101,7 @@ GW graphwin;
 PW pausewin;
 MW menuwin;
 LPSTR szModuleName;
+LPSTR szPackageDir;
 LPSTR winhelpname;
 LPSTR szMenuName;
 #define MENUNAME "wgnuplot.mnu"
@@ -295,6 +296,17 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	}
 	szModuleName = (LPSTR)farrealloc(szModuleName, _fstrlen(szModuleName)+1);
 	CheckMemory(szModuleName);
+
+	if (_fstrlen(szModuleName) >= 5 && _fstrnicmp(&szModuleName[_fstrlen(szModuleName)-5], "\\bin\\", 5) == 0)
+	{
+		int len = _fstrlen(szModuleName)-4;
+		szPackageDir = (LPSTR)farmalloc(len+1);
+		CheckMemory(szPackageDir);
+		_fstrncpy(szPackageDir, szModuleName, len);
+		szPackageDir[len] = '\0';
+	}
+	else
+		szPackageDir = szModuleName;
 
 	winhelpname = (LPSTR)farmalloc(_fstrlen(szModuleName)+_fstrlen(HELPFILE)+1);
 	CheckMemory(winhelpname);
