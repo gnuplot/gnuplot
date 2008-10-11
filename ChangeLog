@@ -1,3 +1,11 @@
+2008-10-11  James R. Van Zandt  <jrvz@comcast.net>
+
+	* docs/gnuplot.doc: "help datastrings": The "first item" would
+	usually be called a "column heading". Add some
+	cross-references. "help label": see also "labels". "help data":
+	see also "labels". "help plot title": mention getting title from
+	column heading, and link to "datastrings".
+
 2008-10-11  Michael Goffioul  <michael.goffioul@gmail.com>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_text): Define rint for MSVC.

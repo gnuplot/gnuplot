@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.538 2008/09/24 03:19:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.539 2008/10/07 20:54:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -474,10 +474,10 @@ C
    plot 'datafile' using 3:4:xticlabels(1) with linespoints
 
  There is also an option that will interpret the first entry in a column of
- input data as a text field, and use it as the key title for data plotted from
- that column. The example given below will use the first entry in column 2 to
- generate a title in the key box, while processing the remainder of columns
- 2 and 4 to draw the required line:
+ input data (i.e. the column heading) as a text field, and use it as the key
+ title for data plotted from that column. The example given below will use the
+ first entry in column 2 to generate a title in the key box, while processing
+ the remainder of columns 2 and 4 to draw the required line:
 
    plot 'datafile' using 1:(f($2)/$4) title 2 with lines
 
@@ -4146,6 +4146,8 @@ Ffigure_mapcontours
  To avoid this, you can use the `fixmin`/`fixmax` feature of the
  `set autoscale` command, which turns off the automatic extension of the
  axis range upto the next tic mark.
+ 
+ Label coordinates and text can also be read from a data file (see `labels`).
 
 
  BINARY DATA FILES:
@@ -5334,6 +5336,10 @@ Ffigure_mapcontours
  understood.  Note that backslash processing occurs only for strings enclosed
  in double quotes---use single quotes to prevent such processing.  The newline
  character "\n" is not processed in key entries in either type of string.
+
+ There is also an option that will interpret the first entry in a column of
+ input data (i.e. the column heading) as a text field, and use it as the key
+ title. See `datastrings`.
 
  The line title and sample can be omitted from the key by using the keyword
  `notitle`.  A null title (`title ''`) is equivalent to `notitle`.  If only
@@ -7848,6 +7854,8 @@ Ffigure_mapcontours
 
  The EEPIC, Imagen, LaTeX, and TPIC drivers allow \\ in a string to specify
  a newline.
+ 
+ Label coordinates and text can also be read from a data file (see `labels`).
 
  Examples:
 
