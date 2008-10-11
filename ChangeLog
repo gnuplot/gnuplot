@@ -1,5 +1,14 @@
 2008-10-11  Michael Goffioul  <michael.goffioul@gmail.com>
 
+	* src/wxterminal/gp_cairo.c (gp_cairo_draw_text): Define rint for MSVC.
+	Make code C compliant.
+
+	* src/wxterminal/wxt_gui.cpp (wxtFrame::wxtFrame): Do not force toolbar
+	item size. Force resize event at the end of frame creation.
+	(wxt_init): Declare wxSetInstance.
+
+2008-10-11  Michael Goffioul  <michael.goffioul@gmail.com>
+
 	* src/win/winmain.h src/win/winmain.c (WinMain): Compute new variable
 	szPackageDir from szModuleName, stripping possible "\bin\" at the end.
 

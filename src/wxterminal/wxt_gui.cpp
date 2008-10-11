@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.66 2008/06/15 17:47:04 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.67 2008/07/29 22:15:49 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -365,7 +365,7 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id, int xpos, int ypos, in
 	/* set up the toolbar */
 	wxToolBar * toolbar = CreateToolBar();
 	/* With wxMSW, default toolbar size is only 16x15. */
-	toolbar->SetToolBitmapSize(wxSize(16,16));
+//	toolbar->SetToolBitmapSize(wxSize(16,16));
 
 	toolbar->AddTool(Toolbar_CopyToClipboard, wxT("Copy"),
 				*(toolBarBitmaps[0]), wxT("Copy the plot to clipboard"));
@@ -398,6 +398,7 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id, int xpos, int ypos, in
 
 	/* setting minimum height and width for the window */
 	SetSizeHints(100, 100);
+	OnSize( wxSizeEvent( this->GetSize() ) );
 
 	FPRINTF((stderr,"wxtFrame constructor 3\n"));
 }
@@ -1405,6 +1406,7 @@ void wxt_init()
 
 #ifdef __WXMSW__
 		/* the following is done in wxEntry() with wxMSW only */
+		WXDLLIMPEXP_BASE void wxSetInstance(HINSTANCE hInst);
 		wxSetInstance(GetModuleHandle(NULL));
 		wxApp::m_nCmdShow = SW_SHOW;
 #endif

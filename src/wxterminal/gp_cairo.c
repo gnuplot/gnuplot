@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.39 2008/06/02 00:48:11 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.40 2008/09/30 04:55:05 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -76,6 +76,10 @@
 
 #include <pango/pangocairo.h>
 #include <glib.h>
+
+#ifdef _MSC_VER
+#define rint(x) floor((x)+0.5L)
+#endif
 
 /* undef this to see what happens without the Symbol-to-unicode processing */
 #define MAP_SYMBOL
@@ -787,6 +791,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	cairo_translate(plot->cr, x, y);
 	cairo_rotate(plot->cr, -arg);
 
+	{
 	PangoRectangle ink, logical;
 	double lw = cairo_get_line_width (plot->cr);
 	pango_layout_get_extents (layout, &ink, &logical);
@@ -806,6 +811,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 			(double)ink.width / PANGO_SCALE + lw,
 			(double)ink.height / PANGO_SCALE + lw);
 	cairo_stroke (plot->cr);
+	}
 #endif /* helper boxes to understand how text is positionned */
 
 	/* free the layout object */
