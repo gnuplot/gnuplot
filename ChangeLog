@@ -1,5 +1,10 @@
 2008-10-11  James R. Van Zandt  <jrvz@comcast.net>
 
+	* docs/gnuplot.doc: Document restriction on option order: "title
+	<column>" must come immediately after "using".
+
+2008-10-11  James R. Van Zandt  <jrvz@comcast.net>
+
 	* docs/gnuplot.doc: "help datastrings": The "first item" would
 	usually be called a "column heading". Add some
 	cross-references. "help label": see also "labels". "help data":

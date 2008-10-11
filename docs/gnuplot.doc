@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.539 2008/10/07 20:54:03 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.540 2008/10/11 15:18:51 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -480,6 +480,13 @@ C
  the remainder of columns 2 and 4 to draw the required line:
 
    plot 'datafile' using 1:(f($2)/$4) title 2 with lines
+
+ This option must come immediately after the 'using' clause, if any.  E.g.:
+
+   plot 'datafile'           title 2    linetype 5   # OK
+   plot 'datafile' using 1:2 title 2    linetype 5   # OK
+   plot 'datafile' using 1:2 linetype 5 title "FOO"  # OK
+   plot 'datafile' using 1:2 linetype 5 title 2      # fails
 
  See `set style labels`, `using xticlabels`, `plot title`, `using`.
 2 Enhanced text mode
