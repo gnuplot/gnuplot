@@ -1,3 +1,9 @@
+2008-10-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots): Explicitly set default color of first
+	histogram to linestyle/linetype 0.
+	Bug #2155287
+
 2008-10-11  James R. Van Zandt  <jrvz@comcast.net>
 
 	* docs/gnuplot.doc: Document restriction on option order: "title
