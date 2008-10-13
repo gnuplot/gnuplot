@@ -1,3 +1,9 @@
+2008-10-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp (wxtFrame::wxtFrame):
+	Revert call to OnSize() that caused compile failure on linux.
+	Bug #2159025
+
 2008-10-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots): Explicitly set default color of first

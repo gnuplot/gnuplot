@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.67 2008/07/29 22:15:49 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.68 2008/10/10 22:26:21 mikulik Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -398,7 +398,6 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id, int xpos, int ypos, in
 
 	/* setting minimum height and width for the window */
 	SetSizeHints(100, 100);
-	OnSize( wxSizeEvent( this->GetSize() ) );
 
 	FPRINTF((stderr,"wxtFrame constructor 3\n"));
 }
