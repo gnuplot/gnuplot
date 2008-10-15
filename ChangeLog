@@ -1,3 +1,8 @@
+2008-10-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (place_objects do_rectangle): Break out the rectangle
+	drawing code into a separate routine.
+
 2008-10-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxtFrame::wxtFrame):
