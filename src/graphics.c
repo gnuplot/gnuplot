@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.282 2008/09/30 04:55:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.283 2008/10/16 04:25:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5547,6 +5547,8 @@ do_polygon( int dimensions, t_polygon *p, int style )
 {
     static gpiPoint *corners = NULL;
     static gpiPoint *clpcorn = NULL;
+    BoundingBox *clip_save = clip_area;
+    TBOOLEAN noclip = TRUE;
     int nv;
 
     if (!p->vertex)
@@ -5559,7 +5561,14 @@ do_polygon( int dimensions, t_polygon *p, int style )
 	    map3d_position(&p->vertex[nv], &corners[nv].x, &corners[nv].y, "pvert");
 	else
 	    map_position(&p->vertex[nv], &corners[nv].x, &corners[nv].y, "pvert");
+	
+	/* Any vertex not given in screen coords will force clipping */
+	if (!noclip || p->vertex[nv].scalex != screen || p->vertex[nv].scaley != screen)
+	    noclip = FALSE;
     }
+
+    if (noclip)
+	clip_area = &canvas;
 
     if (term->filled_polygon && style) {
 	int i,o,clipped;
@@ -5592,6 +5601,8 @@ do_polygon( int dimensions, t_polygon *p, int style )
 		corners[0].x, corners[0].y );
 	closepath();
     }
+
+    clip_area = clip_save;
 
 }
 #endif

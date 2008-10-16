@@ -1,3 +1,9 @@
+2008-10-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (do_polygon): Do not clip polygon edges to the graph
+	borders if the vertices are all given in screen coordinates.  Without
+	this change, you cannot draw polygons outside of the graph.
+
 2008-10-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_objects do_rectangle): Break out the rectangle

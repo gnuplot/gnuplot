@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.540 2008/10/11 15:18:51 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.541 2008/10/11 20:01:03 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8428,7 +8428,7 @@ Ffigure_mapcontours
  The fill color of the object is taken from the <colorspec>. `fillcolor`
  may be abbreviated `fc`.  The fill style is taken from <fillstyle>.
  See `colorspec` and `fillstyle`.  If the keyword `default` is given,
- these properties are inherited from the default settings of at the time a plot
+ these properties are inherited from the default settings at the time a plot
  is drawn. See `set style rectangle`.
 4 rectangle
 ?rectangle
