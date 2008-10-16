@@ -1,3 +1,8 @@
+2008-10-16  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc docs/term-ja.diff:
+	Sync Japanese documentation to gnuplot.doc rev 1.539
+
 2008-10-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_polygon): Do not clip polygon edges to the graph

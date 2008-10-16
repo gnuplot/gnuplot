@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.241 2008-06-27 17:58:16+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.517
+C RCS $Id: gnuplot-ja.doc,v 1.263 2008-10-08 20:58:04+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.539
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -135,25 +135,34 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?introduction
 ?
  `gnuplot` は、コマンド入力方式の対話的な関数描画プログラムです。
+ 書式:
+       gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
 
- コマンドラインでの引数は `gnuplot` 用のコマンドの書かれたファイルの名
- 前であるものとします。但し標準の X11 の引数は例外で、まず最初に処理さ
- れます。各ファイルはコマンドライン上で指定された順に `load` コマンドで
- ロードされます。`gnuplot` は、最後に指定されたファイルを処理し終ると終
- 了します。特別なファイル名 "-" は標準入力を表します。ファイルが 1 つも
- 指定されていない場合は、`gnuplot` は対話モードになります。詳細について
- は、以下参照: `batch/interactive`。
+ 一般的な X11 オプションは、もしあるならそれを最初に置きます (あなたの
+ X11 の説明書を参照; X11 を使わないならここは無視してください)。gnuplot
+ に与えるオプションは、そのコマンド行のどこに置くこともできます。ファイ
+ ルは指定した順に実行され、同様に -e オプションで任意のコマンドも与える
+ ことができます。
+
+ 例:
+       gnuplot   file1.in   -e "reset"   file2.in
+
+ 特別なファイル名 "-" は、標準入力から読ませるのに使います。`gnuplot`
+ は最後のファイルを処理し終わると終了します。読み込ませるファイルを一つ
+ つも指定しない場合は、`gnuplot` は標準入力からの対話入力を取ります。詳
+ 細は以下参照: `batch/interactive`。gnuplot 用のオプションについては、
+ 以下のようにして一覧を見ることができます:
+
+       gnuplot --help
 
  `gnuplot` は、コマンドや関数名は大文字小文字を区別します。いずれのコマ
  ンドも、あいまいさの無い限りにおいて省略することができます。1 行中には
- セミコロン (;) で区切って複数のコマンドを書くことができます (ただし、
- `load` と `call` は最後のコマンドでなければなりません)。文字列は引用符
- を使って表します。引用符は、一重でも、二重でも構いません。例えば
+ セミコロン (;) で区切って複数のコマンドを書くことができます。文字列は単
+ 一引用符、あるいは二重引用符のどちらかで書き始めますが、両者には微妙な
+ 違いがあります (詳細は以下参照: `syntax`)。例:
 
        load "filename"
        cd 'dir'
-
- しかし、両者には微妙な違いがあります (詳細は以下参照: `syntax`)。
 
  `gnuplot` のコマンドの多くは複数のオプションを持っています。Version 4
  は以前の版に比べて、それらのオプションの順序に関しては許容的になってい
@@ -309,9 +318,9 @@ C Shigeharu Takeno et al (3.7, 4.X)
 3 新しい描画要素
 =circles
 =ellipse
- コマンド `set object` は、現在は固定された長方形だけでなく、円、楕円も
- 定義でき、そして、それに対応する新しい描画スタイル `plot with circles`
- もあります。以下参照: `circles`, `ellipse`。
+ コマンド `set object` は、現在は固定された長方形だけでなく、円、楕円、
+ 多角形も定義でき、そして、それに対応する新しい描画スタイル
+ `plot with circles` もあります。以下参照: `circles`, `ellipse`。
 
 3 新しい/修正された出力形式
  cairo, pango ライブラリによる 2 つの新しいドライバ `pngcairo`,
@@ -348,27 +357,19 @@ C Shigeharu Takeno et al (3.7, 4.X)
        set style data linespoints
        plot 1 linetype 2 pointtype 4
 
- その他の互換性の部分は、multiplot モード以外でのコマンド `set size` の
- 外側への影響です。以前の版では、コマンド `set size <xx>, <yy>` は、出
- 力形式によっては、グラフのサイズとそれが書かれるキャンバスのサイズの両
- 方を変更し、一方でグラフサイズのみを変更する出力形式もありました。キャ
- ンバスサイズを変更するための `set size` の使用は、現在では非推奨となっ
- ています。
-
- 以下参照: `set size`, `set term size`。個々の出力形式のヘルプも参照し
- てください。
-
 2 バッチ/対話型操作 (Batch/Interactive)
 ?batch/interactive
  `gnuplot` は多くのシステム上で、バッチ処理形式、あるいは対話型のどちら
  の形式でも実行でき、それらを組み合わせることも可能です。
 
- コマンドライン引数は `gnuplot` コマンドを含むファイルのファイル名であ
- ると解釈されます (先に指定される標準的な X11 用コマンドの引数を除いて)。
- 各ファイルは、指定された順に `load` コマンドで読み込まれます。最後のフ
- ァイルを実行した後は `gnuplot` は終了します。ロードファイルを指定しな
- い場合は、`gnuplot` は対話モードに入ります。特別なファイル名 "-" は標
- 準入力を指定するのに使われます。
+ コマンドライン引数は、プログラムへのオプション (文字 - で始まる) か、
+ `gnuplot` コマンドを含むファイルの名前であると解釈されます。
+ -e "command" の形式のオプションは、gnuplot コマンドを強制的に実行させ、
+ 各ファイルとこのコマンド文字列は、指定された順に実行されます。特別なフ
+ ァイル名 "-" は、コマンドを標準入力から読み込むことを意味します。最後
+ のファイルを実行した後に `gnuplot` は終了します。読み込ませるファイル、
+ およびコマンド文字列を指定しなかった場合は、`gnuplot` は標準入力からの
+ 対話型の入力を受け付けます。
 
  `exit` と `quit` はどちらも現在のコマンドファイルを終了し、まだ全ての
  ファイルが終っていなければ、次のファイルを `load` するのに使われます。
@@ -384,6 +385,15 @@ C Shigeharu Takeno et al (3.7, 4.X)
  初期化ファイル "header" の後、対話型モードを起動し、その後別のコマンド
  ファイル "tailer" を実行する:
        gnuplot header - trailer
+
+ コマンドラインから `gnuplot` コマンドを直接与え、終了後にスクリーン上
+ にグラフが残るようにオプション "-persist" を使う:
+        gnuplot -persist -e "set title 'Sine curve'; plot sin(x)"
+
+ ファイルのコマンドを実行する前に、ユーザ定義変数 a と s をセットする:
+       gnuplot -e "a=2; s='file.png'" input.gpl
+
+
 2 コマンドライン編集 (Command-line-editing)
 ?line-editing
 ?editing
@@ -451,40 +461,6 @@ C Shigeharu Takeno et al (3.7, 4.X)
 %^P@前の履歴へ移動
 %^N@次の履歴へ移動
 @end table
-
- IBM PC では、行編集用に DOSEDIT とか CED などの TSR (常駐) プログラム
- を使いたいと思うかも知れません。デフォルトの makefile はこれを仮定して
- いて、`gnuplot` はデフォルトでは行編集機能無しでコンパイルされます。も
- し `gnuplot` の行編集機能を使用したければ、makefile の READLINE をセッ
- トしてリンクファイルとして readline.obj を追加してください。IBM PC 版
- で readline を使う場合は以下のキーも使えます。
-
-@start table - まずは対話型テキスト形式
-       左矢印 (←)      - ^B と同じ
-       右矢印 (→)      - ^F と同じ
-       Ctrl + 左矢印    - ^A と同じ
-       Ctrl + 右矢印    - ^E と同じ
-       上矢印 (↑)      - ^P と同じ
-       下矢印 (↓)      - ^N と同じ
-#\begin{tabular}{|cl|} \hline
-#矢印キー   & 機能 \\ \hline
-#左 (←)    & \verb~^B~ と同じ\\
-#右 (→)    & \verb~^F~ と同じ\\
-#Ctrl + 左  & \verb~^A~ と同じ\\
-#Ctrl + 右  & \verb~^E~ と同じ\\
-#上 (↑)    & \verb~^P~ と同じ\\
-#下 (↓)    & \verb~^N~ と同じ\\
-%c l .
-%矢印キー@機能
-%_
-%左 (←)@^B と同じ
-%右 (→)@^F と同じ
-%Ctrl + 左@^A と同じ
-%Ctrl + 右@^E と同じ
-%上 (↑)@^P と同じ
-%下 (↓)@^N と同じ
-%_
-@end table
 2 コメント (Comments)
 ?comments
  コメントは次のように実装されています: 文字 '#' は、行中のたいていの場
@@ -494,7 +470,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
  のあるような使い方をしさえすれば、正しく動作すると言うことです。
 
  データファイル中のコメント文字の指定については、以下参照:
- `set datafile commentschars`。
+ `set datafile commentschars`。コメント行が '\' で終わっている場合、次
+ の行もコメントとして扱われることに注意してください。
 2 座標系 (Coordinates)
 ?coordinates
 =axes
@@ -680,8 +657,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
  イル (以下参照: `start-up`) による指定や、当り前のことですが、その後に
  明示的に指定した物の方が優先されます。
 
- Unix, AmigaOS, MS-DOS, OS/2 では、GNUHELP にヘルプファイル
- (gnuplot.gih) のパス名を定義しておくことができます。
+ GNUHELP にヘルプファイル (gnuplot.gih) のパス名を定義しておくことがで
+ きます。
 
  VMS では、論理名 GNUPLOT$HELP を `gnuplot` のヘルプライブラリの名前と
  して定義します。`gnuplot` のヘルプは任意のシステムのヘルプライブラリに
@@ -699,13 +676,6 @@ C Shigeharu Takeno et al (3.7, 4.X)
 
  Unix, AmigaOS では、SHELL が `shell` コマンドの際に使われます。MS-DOS,
  OS/2 では COMSPEC が `shell` コマンドの際に使われます。
-
- MS-DOS で BGI または Watcom インターフェースが使われている場合、PCTRM
- が、使用するモニタがサポートする最大解像度を指示するのに使われます。
- PCTM は S<最大水平解像度> のように指定します。例えば、モニタの最大解像
- 度が 800x600 ならば、以下のように指定します:
-       set PCTRM=S800
- PCTRM が設定されていなければ、標準的な VGA (640x480) が使われます。
 
  FIT_SCRIPT は、当てはめ (fit) が中断されたときに実行する `gnuplot` コ
  マンドの指定に使われます。以下参照: `fit`。FIT_LOG は当てはめによるロ
@@ -1208,7 +1178,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  書式指定 timeformat を適用します。
  以下参照: `time_specifiers`, `strptime`。
 4 strptime
-? expressions functions strptime
+?expressions functions strptime
 ?functions strptime
 ?strptime
 #strptime("timeformat",s) & 文字列 & 文字列を変換した 2000 年からの秒数 \\
@@ -1406,11 +1376,11 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?random
  古い版の gnuplot では、疑似乱数列を生成するのに rand(x>0) を使っていた
  こともありますが、現在の挙動は以下の通りです:
- `rand(0)`  内部に持つ 2 つの 32bit の種 (seed) の現在の値から生成され
-            る [0:1] 区間内の疑似乱数値を返す
- `rand(-1)` 2 つの種の値を標準値に戻す
- `rand(x)`  x>0 ならば両方の種に x の値に基づく値を設定する
- `rand({x,y})` x>0 ならば seed1 を x に、seed2 を y に設定する
+  `rand(0)`  内部に持つ 2 つの 32bit の種 (seed) の現在の値から生成され
+             る [0:1] 区間内の疑似乱数値を返す
+  `rand(-1)` 2 つの種の値を標準値に戻す
+  `rand(x)`  x>0 ならば両方の種に x の値に基づく値を設定する
+  `rand({x,y})` x>0 ならば seed1 を x に、seed2 を y に設定する
 
 3 演算子 (Operators)
 ?expressions operators
@@ -1718,9 +1688,10 @@ C ... and restart the table:
  性を排除するかのように採用されて来ているからです。この節では、これらの
  キーワードのいくつかがどのように使われているかを説明します。
 
- "ページ (page)" または "表示画面 (screen)" は `gnuplot` がアクセス可能
- な領域全体を指します。ディスプレイモニタでは、これは画面全体を指し、プ
- ロッタでは、一枚の紙全体になります。
+ "ページ (page)"、"表示画面 (screen)"、"キャンバス (canvas)" は、
+ `gnuplot` がアクセス可能な領域全体を指します。デスクトップではそれはウ
+ ィンドウ全体を指し、プロッタでは、一枚の紙全体、svga モードでは、モニ
+ タスクリーン全体を指します。
 
  表示画面は、一つ、またはそれ以上の "グラフ描画 (plot)" を含みます。グ
  ラフ描画は一つの横座標と一つの縦座標で定義されますが、余白 (margin) や
@@ -2191,6 +2162,8 @@ C ... and restart the table:
 
  マクロの展開は、単一引用符内、または二重引用符内では行なわれませんが、
  バッククォート内ではマクロ展開されます。
+
+ コマンドを完成させて実行するには、コマンド `evaluate` も有用でしょう。
 3 文字列変数、マクロ、コマンドライン置換 (mixing_macros_backquotes)
 ?mixing_macros_backquotes
 ?substitution mixing_macros_backquotes
@@ -2784,7 +2757,10 @@ Ffigure_histeps
  積み上げ型のヒストグラムも 2 つの形式がサポートされています。それらは
  コマンド `set style histogram {rowstacked|columnstacked}` で選択できま
  す。これらのスタイルにおいて、選択された列のデータの値は積み上げられた
- 箱として集められます。デフォルトの積み上げモードは `rowstacked` です。
+ 箱として集められます。正の値は、y=0 から上の方へ積み上げられ、負の値は
+ 下へ向かって積み上げられます。正の値と負の値が混じってい場合は、上向き
+ と下向きの両方の積み上げが生成されます。デフォルトの積み上げモードは
+ `rowstacked` です。
 
  スタイル `rowstacked` は、まず最初に選択された列の各行の値を x 軸のそ
  れぞれの位置に配置します: 1 行目の値は x=1 の箱、2 行目のは x=2、以下
@@ -2873,10 +2849,10 @@ Ffigure_histcols
 ?newhistogram
 ?histograms newhistogram
 ?plotting style histograms newhistogram
- 一回の描画に 1 つより多くのヒストグラムの組を作ることもできます。この
- 場合、描画コマンド `newhistogram {"<title>"} {<linestyle>}` を使うこと
- で、それらを強制的に分離し、またそれぞれのラベルを分離することができま
- す。
+ 一回の描画に 2 つ以上のヒストグラムの組を作ることもできます。この場合
+ `newhistogram {"<title>"} {<first-linetype} {at <x-coord>}` の描画コマ
+ ンドを使うことで、それらを強制的に分離し、またそれぞれのラベルを分離す
+ ることができます。
  例:
 
        set style histogram  cluster
@@ -2892,6 +2868,9 @@ Ffigure_histcols
  トグラムに同じ色付けを施します。
        plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
             newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
+
+ オプション `at <x-coord>` は列データの積み上げ型 (`columnstacked`) の
+ ヒストグラムのみに適用されます。
 3 複数の列に渡る自動的な繰り返し (automated)
 ?automated
 ?histograms automated
@@ -2919,6 +2898,7 @@ Ffigure_histcols
  れ一様な大きさの平行四辺形を作ることを意味します。その平行四辺形が、入
  力画像の対応するピクセルの色を用いて塗られます。
 
+Ffigure_rgb3D.pdf
  入力 2 次元画像の各ピクセル (データ点) は、描画グラフ中では長方形、ま
  たは平行六面体となります。画像の各データ点の座標は、平行六面体の中心を
  決定します。すなわち、M x N 個のデータ集合は M x N ピクセルの画像を生
@@ -3394,6 +3374,26 @@ Ffigure_mapcontours
 
  これらのコマンドの詳細については、以下参照: `set multiplot`,
  `set size`, `set origin`。
+2 evaluate
+?commands evaluate
+?evaluate
+ コマンド `evaluate` は、引数文字列として与えられたコマンドを実行します。
+ その文字列中に改行文字を入れてはいけません。
+
+ 書式:
+       eval <string expression>
+
+ これは、特に同様のコマンドの繰り返しに有用です。
+
+ 例:
+       set_label(x, y, text) \
+         = sprintf("set label '%s' at %f, %f point pt 5", text, x, y)
+       eval set_label(1., 1., 'one/one')
+       eval set_label(2., 1., 'two/one')
+       eval set_label(1., 2., 'one/two')
+
+ 文字列からコマンドを実行する別の方法に関しては、以下参照:
+ `substitution macros`。
 2 exit
 ?commands exit
 ?exit
@@ -3604,8 +3604,8 @@ Ffigure_mapcontours
  ります。正確なデータ誤差評価が与えられている場合には、パラメータの誤差
  評価等の `fit` が出力する情報はより役に立つでしょう。
 
- 'statistical overview' では `fit` の出力のいくつかを説明し、'practical
-  guidelines' に対する背景を述べています。
+ 'statistical overview' では `fit` の出力のいくつかを説明し、
+ 'practical guidelines' に対する背景を述べています。
 4 統計的な概要 (statistical overview)
 ?commands fit error statistical_overview
 ?fit error statistical_overview
@@ -3724,7 +3724,7 @@ Ffigure_mapcontours
  ます。それらは `gnuplot` の動作中に一度定義できますが、それは
  `control_variable` で紹介し、`gnuplot` が立 ち上がる前に設定する変数は
  `environment_variables` で紹介します。
-4 変数の制御 (control variables)
+4 制御変数 (control variables)
 ?commands fit control variables
 ?fit control variables
  デフォルトのもっとも小さい数字の限界 (1e-5) は、変数
@@ -3963,6 +3963,25 @@ Ffigure_mapcontours
 
  `if` と `reread` を使ってループを構成する例については、以下参照:
  `reread`。
+2 繰り返し (iteration)
+?iteration
+ `plot`, `splot`, `set`, `unset` コマンドでは、繰り返し節を使うこともで
+ きます。これは、基本的なコマンドを複数回実行する効果を持ち、そのおのお
+ のの実行では繰り返し制御変数によって数式は再評価されます。繰り返し節は
+ 現在は以下の 2 つの形式をサポートしています:
+
+       for [intvar = start:end{:increment}]
+       for [stringvar in "A B C D"]
+
+ 例:
+
+       plot for [filename in "A.dat B.dat C.dat"] filename using 1:2 with lines
+       plot for [basename in "A B C"] basename.".dat" using 1:2 with lines
+       set for [i = 1:10] style line i lc rgb "blue"
+       unset for [tag = 100:200] label tag
+
+ さらなる説明については以下参照: `plot iteration`。
+
 2 load
 ?commands load
 ?load
@@ -4036,12 +4055,14 @@ Ffigure_mapcontours
  うでない出力形式、またはマウス機能が有効になってない場合 `pause mouse`
  は `pause -1` と同じです。
 
- 一つ、あるいは複数の終了条件が `pause mouse` の後に与えられた場合、そ
- のうちのどの一つでも pause は終了します。指定できる終了条件は、
- `keypress`, `button1`, `button2`, `button3`, `any` のいずれかです。
- pause がキー入力によって終了した場合、押されたキーの ascii コードは
- MOUSE_KEY に保存され、文字それ自身は、1 文字の文字列値として
- MOUSE_CHAR に返されます。
+ 一つ、あるいは複数の終了条件 (endcondition) が `pause mouse` の後に与
+ えられた場合、そのうちのどの一つでも pause は終了します。指定できる終
+ 了条件は、`keypress`, `button1`, `button2`, `button3`, `close`, `any`
+ のいずれかです。pause がキー入力によって終了した場合、押されたキーの
+ ascii コードは MOUSE_KEY に保存され、文字それ自身は、1 文字の文字列値
+ として MOUSE_CHAR に返されます。`keypress` が終了条件の一つであれば、
+ ホットキー (キー割り当てコマンド) は無効になります。`buttons3` が終了
+ 条件の一つであれば、拡大機能は無効になります。
 
  どの場合でもマウスの座標は変数 MOUSE_X, MOUSE_Y, MOUSE_X2, MOUSE_Y2 に
  保存されます。以下参照: `mouse variables`。
@@ -4107,6 +4128,7 @@ Ffigure_mapcontours
        plot [t=1:10] [-pi:pi*2] tan(t), \
             "data.1" using (tan($2)):($3/$4) smooth csplines \
                      axes x1y2 notitle with lines 5
+       plot for [datafile in "spinach.dat broccoli.dat"] datafile
 
  以下参照: `show plot`。
 3 軸 (axes)
@@ -4355,11 +4377,24 @@ Ffigure_mapcontours
  今のところ、3 次元までの配列が書式として許されていますが、3 次元配列を
  扱うための規則はまだ何も用意されていません。
 5 record
+?binary record
 ?binary general record
  このキーワードは `array` と同じ書式で、同じ機能を提供します。しかし
  `record` は gnuplot に座標情報を自動生成させません。これは、そのような
  座標情報が、バイナリデータファイルのある列に含まれている場合のためのも
  のです。
+5 skip
+?binary skip
+?binary general skip
+ このキーワードは、バイナリファイルのある区画のスキップを可能にします。
+ 例えば、そのファイルがデータ領域の開始位置の前に 1024 バイトのヘッダを
+ 持つような場合には、以下のようにしたいと思うでしょう:
+       plot '<file_name>' binary skip=1024 ...
+ ファイルに複数のレコードがある場合、そのそれぞれに対する先頭のずらし位
+ 置を指定することができます。例えば、最初のレコードの前の 512 バイトを
+ スキップし、2 番目、3 番目のレコードの前の 256 バイトをスキップするに
+ は以下のようにします:
+       plot '<file_name> binary record=356:356:356 skip=512:256:256 ...
 5 format
 ?binary general format
  デフォルトのバイナリ形式は、単精度浮動小数 (float) が一つ、です。それ
@@ -4534,6 +4569,7 @@ Ffigure_mapcontours
 ?binary_examples
 ?binary examples
 ?binary general examples
+=skip
  例:
 
        # 2 つの float の値を選択し (2 つ目の値は無意味)、一方を読み捨て、
@@ -4557,6 +4593,10 @@ Ffigure_mapcontours
        # る。ファイルは gnuplot が実行されているシステムとは異なるエン
        # ディアンで生成されている。
        splot '<file_name>' binary record=30:30:29:26 endian=swap u 1:2:3
+
+       # 同じ入力ファイルで、今回は 1 番目と 3 番目のレコードをスキップ
+       splot '<file_name>' binary record=30:26 skip=360:348 endian=swap u 1:2:3
+
 
  以下参照: `binary matrix`。
 4 every
@@ -4650,7 +4690,7 @@ Ffigure_mapcontours
  タセットのみを選び出すのに使われます。
 
  書式:
-       plot 'file' index { <m>{{:<n>}:<p>} | "<name>" }
+       plot 'file' index { <m>{:<n>{:<p>}} | "<name>" }
 
  データセットは 2 行の空白で分離されています。`index <m>` は <m> 番目の
  セットだけを選択します; `index <m>:<n>` は <m> から <n> までのデータセ
@@ -4694,7 +4734,7 @@ Ffigure_mapcontours
  または適切なモデルで fit を使うのがいいでしょう。
 
  書式:
-       smooth {unique | frequency | cumulative | kdensity | csplines 
+       smooth {unique | frequency | cumulative | kdensity | csplines
                | acsplines | bezier | sbezier}
 
  `unique`, `frequency`, `cumulative` は、データを単調に揃えた後でそれら
@@ -5120,6 +5160,7 @@ Ffigure_mapcontours
  す。
 
 5 xticlabels
+?xticlabels
 ?using xticlabels
 ?plot using xticlabels
  入力データのある列を軸の刻みのラベルとして使えます。そのような描画コマ
@@ -5362,17 +5403,18 @@ Ffigure_mapcontours
 ?commands splot iteration
 ?plot iteration
 ?splot iteration
-?iteration
+=iteration
  多くの同等のファイルや関数を同時に描画する場合は、それぞれの plot コマ
  ンドの繰り返し (iteration) でそれを行うのが便利です。
 
  書式:
-       plot for [<variable>=<start>:<end>{:<increment>}]
-       splot for [<variable>=<start>:<end>{:<increment>}]
+       plot for [<variable> = <start> : <end> {:<increment>}]
+       plot for [<variable> in "string of words"]
 
  例:
        file(n) = sprintf("dataset_%d.dat",n)
-       plot for [i=1:10] file(i) title sprintf("dataset %d",i)
+       splot for [i=1:10] file(i) title sprintf("dataset %d",i)
+       plot for [dataset in "apples bananas"] dataset."dat" title dataset
 
  この例は、ファイル名で生成される文字列値関数を定義し、そのような 10 個
  のファイルを同時に描画します。繰り返しの変数 (この例では 'i') は一つの
@@ -5380,7 +5422,7 @@ Ffigure_mapcontours
  イル名とタイトルの生成の両方で使われています。
 
  例:
-       list = "a b c foo baz"
+       list = "apple banana cabbage daikon eggplant"
        item(n) = word(list,n)
        plot for [i=1:words(list)] item(i).".dat" title item(i)
        list = "new stuff"
@@ -5389,6 +5431,15 @@ Ffigure_mapcontours
  この例では、リストに従って各ステップが進行し、その各項目に対して一つの
  描画が行われます。この各項目は動的に取得されますので、そのリストを変更
  し、そのまま replot することができます。
+
+ 例:
+       list = "apple banana cabbage daikon eggplant"
+       plot for [i in list] i.".dat" title i
+       list = "new stuff"
+       replot
+
+ この例は、整数の繰り返し変数ではなく、文字列の繰り返し変数形式を用いて
+ いること以外は前の例と全く同じです。
 
 3 title
 ?commands plot title
@@ -5628,12 +5679,10 @@ Ffigure_mapcontours
  オプション引数は、単一の描画ウィンドウの出力形式、すなわち `pm` と
  `win` では無視されます。
 
- ウィンドウが X11 で前面に出ない場合、(1) それらが同じ X11 セッションで
- 動作してない (例えば telnet や ssh セッションなどによって)、または (2)
- 前面に出すことがウィンドウマネージャによって防害されているかのどちらか
- でしょう。KDE では、KDE Control Center => Desktop => Window Behaviour
- => Advanced と進んで、"Focus stealing prevention level" を None (デフ
- ォルトは Low) に設定するといいでしょう。
+ ウィンドウが X11 で前面に出ない場合、もしかすると描画ウィンドウは、異
+ なる X11 セッションで動作している (例えば telnet や ssh セッションなど
+ によって) か、または前面に出すことがウィンドウマネージャの設定によって
+ 防害されている可能性があります。
 2 refresh
 ?commands refresh
 ?refresh
@@ -5825,6 +5874,10 @@ Ffigure_mapcontours
  もし変数が日時のデータを含むならば、`show` は、`set timefmt` によって
  現在設定されている書式に従って表示します。それは変数が最初に設定されて
  いてその書式が効果を持たなかったとしてもです。
+=iteration
+ `set` と `unset` コマンドには繰り返し節も利用できます。以下参照:
+ `iteration`。
+
 3 angles
 ?commands set angles
 ?commands show angles
@@ -7291,7 +7344,7 @@ Ffigure_mapcontours
 #\verb@%A@ & 曜日名 (Sunday,Monday,...) \\
 #\verb@%b@, \verb@%h@ & 月名の省略形 (Jan,Feb,...) \\
 #\verb@%B@ & 月名 (January,February,...) \\
-#\verb@%d@ & 日 (1--31) \\
+#\verb@%d@ & 日 (01--31) \\
 #\verb@%D@ & \verb@"%m/%d/%y"@ の簡略形 (出力のみ)\\
 #\verb@%F@ & \verb@"%Y-%m-%d"@ の簡略形 (出力のみ)\\
 #\verb@%k@ & 時 (0--23; 1 桁または 2 桁) \\
@@ -7299,7 +7352,7 @@ Ffigure_mapcontours
 #\verb@%l@ & 時 (1--12; 1 桁または 2 桁) \\
 #\verb@%I@ & 時 (01--12; 常に 2 桁) \\
 #\verb@%j@ & その年の通算日 (1--366) \\
-#\verb@%m@ & 月 (1--12) \\
+#\verb@%m@ & 月 (01--12) \\
 #\verb@%M@ & 分 (0--60) \\
 #\verb@%p@ & "am" または "pm" \\
 #\verb@%r@ & \verb@"%I:%M:%S %p"@ の簡略形 (出力のみ)\\
@@ -7318,7 +7371,7 @@ Ffigure_mapcontours
 %%A@曜日名 (Sunday,Monday,...)
 %%b, %h@月名の省略形 (Jan,Feb,...)
 %%B@月名 (January,February,...)
-%%d@日 (1--31)
+%%d@日 (01--31)
 %%D@"%m/%d/%y" の簡略形 (出力のみ)
 %%F@"%Y-%m-%d" の簡略形 (出力のみ)
 %%k@時 (0--23; 1 桁または 2 桁)
@@ -7326,7 +7379,7 @@ Ffigure_mapcontours
 %%l@時 (1--12; 1 桁または 2 桁)
 %%I@時 (01--12; 常に 2 桁)
 %%j@その年の通算日 (1--366)
-%%m@月 (1--12)
+%%m@月 (01--12)
 %%M@分 (0--60)
 %%p@"am" または "pm"
 %%r@"%I:%M:%S %p" の簡略形 (出力のみ)
@@ -8139,9 +8192,9 @@ Ffigure_mapcontours
  `gnuplot` によって自動計算される値を使うことになります。3 次元描画では
  左の余白 (lmargin) のみが文字の大きさを単位として設定できます。
 
- キーワード `at screen` は、その余白の指定が全体の描画領域に対する割合であ
- ることを意味します。これは、多重描画 (multiplot) モードでの 2D, 3D グ
- ラフの角を正確に揃えるのに使えます。
+ キーワード `at screen` は、その余白の指定が全体の描画領域に対する割合
+ であることを意味します。これは、多重描画 (multiplot) モードでの 2D, 3D
+ グラフの角を正確に揃えるのに使えます。
 
  描画の余白は通常目盛り、目盛りの見出し、軸の見出し、描画のタイトル、
  日付、そして境界の外にある場合の key (グラフ見出し) のサイズ等を元に計
@@ -8208,12 +8261,12 @@ Ffigure_mapcontours
  は "% #g" です。
 
  `clipboardformat` と `mouseformat` は、ボタン 1 とボタン 2 の作用時
-  -- 座標をクリップボードへコピー、マウス位置に一時的に注釈をつける --
+ -- 座標をクリップボードへコピー、マウス位置に一時的に注釈をつける --
  の文字列の書式用に使われます。これは、キー割り当て '1', '2', '3', '4'
- に対応します (ドライバのヘルプウィンドウ参照)。引数が文字列の場合、そ
- の文字列は C 言語の書式で、2 つの実数の指定子を含んでいる必要がありま
- す。例: `set mouse mouseformat "mouse = %5.2g, %10.2f"`。この文字列を
- 再び OFF にするには `set mouse mouseformat ""` としてください。
+ に対応します (ドライバのマニュアル参照)。引数が文字列の場合、その文字
+ 列は C 言語の書式で、2 つの実数の指定子を含んでいる必要があります。例:
+ `set mouse mouseformat "mouse = %5.2g, %10.2f"`。この文字列を再び OFF
+ にするには `set mouse mouseformat ""` としてください。
 
  以下の書式が組み込まれています (書式 6 は書式文字列が既に指定されてい
  る場合のみ使用可):
@@ -8408,7 +8461,7 @@ Ffigure_mapcontours
  軸が対数軸である場合、分割区間の数はデフォルトでは有意な数にセットされ
  ます (10 個の長さを元にして)。<freq> が与えられていればそちらが優先さ
  れます。しかし、対数軸では通常の小目盛り (例えば 1 から 10 までの 2, 3,
-  ..., 8, 9 の刻み) は、9 つの部分区間しかありませんが、<freq> の設定は
+ ..., 8, 9 の刻み) は、9 つの部分区間しかありませんが、<freq> の設定は
  10 とすることでそうなります。
 
  小目盛りを任意の位置に設定するには、("<label>" <pos> <level>, ...) の
@@ -8492,8 +8545,9 @@ Ffigure_mapcontours
          {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
          {default} {lw|linewidth <width>}
 
- <object-type> は、`rectangle`, `ellipse`, `circle` のいずれかです。個
- 々のオブジェクトの型は、その型に特有の性質もいくつか持っています。
+ <object-type> は、`rectangle`, `ellipse`, `circle`, `polygon` のいずれ
+ かです。個々のオブジェクトの型は、その型に特有の性質もいくつか持ってい
+ ます。
 
  `front` を指定すると、オブジェクトはすべての描画要素の前 (上) に描画さ
  れますが、`front` と指定されたラベルよりは後ろ (下) になります。`back`
@@ -8588,6 +8642,28 @@ Ffigure_mapcontours
  デフォルトでは、完全な円が描画されます。オプションの `arc` に開始角と
  終了角を度を単位として指定すると円弧を描画します。円弧は、常に反時計回
  りに描かれます。
+
+4 polygon
+?polygon
+?commands set object polygon
+?commands show object polygon
+?set object polygon
+?show object polygon
+ 書式:
+     set object <index> polygon
+         from <position> to <position> ... {to <position>}
+ または
+         from <position> rto <position> ... {rto <position>}
+
+ 多角形の位置は、頂点の位置の列を与えることで指定できます。それらは、軸
+ の座標 (`first`, `second`)、グラフ領域内の相対座標 (`graph`)、スクリー
+ ン座標 (`screen`) のいずれかを使用できます。相対的な座標 (rto) を指定
+ する場合は、その座標系は前の頂点と同じ座標系でなければいけません。以下
+ 参照: `coordinates`。
+
+ 例:
+     set object 1 polygon from 0,0 to 1,1 to 2,0
+     set object 1 fc rgb "cyan" fillstyle solid 1.0 border -1
 
 3 offsets
 ?commands set offsets
@@ -9526,7 +9602,10 @@ Ffigure_mapcontours
  デフォルトのアスペクト比に戻しますが、<xscale> と <yscale> はそのデフ
  ォルトの値 (1.0) には戻しません。
 
- `ratio` と `square` は 3 次元描画では意味を持ちません。
+ `ratio` と `square` は 3 次元描画では意味を持ちませんが、`set view map`
+ を使用した 3 次元描画の 2 次元射影には影響を与えます。 以下も参照:
+ `set view equal_axes`。これは、3 次元の x 軸と y 軸を強制的に同じスケ
+ ールにします。
 
  例:
 
@@ -9541,7 +9620,7 @@ Ffigure_mapcontours
 
  以下も参照
 ^ <a href="http://www.gnuplot.info/demo/airfoil.html">
-  翼のデモ。
+ 翼のデモ。
 ^ </a>
 3 style
 ?set style
@@ -10349,7 +10428,9 @@ Ffigure_mapcontours
  への 2 次元直交射影がサポートされています。
 
  書式:
-       set view { <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}} | map }
+       set view <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}}
+       set view map
+       set view {no}equal_axes
        show view
 
  ここで <rot_x> と <rot_z> は、画面に投影される仮想的な 3 次元座標系の
@@ -10375,6 +10456,12 @@ Ffigure_mapcontours
 
  最初の例は 4 つの全てをデフォルトの値にしています。2 つめの例は縮小率
  のみを 0.5 に変更しています。
+4 equal_axes
+?set view equal_axes
+?view equal_axes
+ コマンド `set view equal_axes` は x 軸と y 軸の単位の長さを強制的に等
+ しくします。それを使わない場合は、それぞれの軸はデフォルトでは有効な領
+ 域を埋めるように縮尺されます。
 
  以下も参照: `set ticslevel`。
 3 vrange
@@ -10722,7 +10809,8 @@ Ffigure_mapcontours
                   | <incr>
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
-                 { formt "formatstring" } { font "name{,<size>}" }
+                 { format "formatstring" } { font "name{,<size>}" }
+                 { rangelimited }
                  { textcolor <colorspec> }
        unset xtics
        show xtics
@@ -10861,12 +10949,15 @@ Ffigure_mapcontours
  (見出し付けされない) 小目盛りは、`set mxtics` コマンドで自動的に追加す
  るか、または位置を手動で `set xtics ("" <pos> 1, ...)` の形式で与える
  こともできます。
-
- 時系列データの場合、位置の値は `timefmt` の書式にしたがった日付、また
- は時刻を引用符で囲んで与えなければいけません。<start>, <incr>, <end>
- 形式を使う場合、<start> と <end> は `timefmt` に従って与えますが、
- <incr> は秒単位で与える必要があります。その時刻は実際には `set format`
- で与えた書式に従って表示されます。
+4 xtics time_data
+?set xtics time_axis tics
+?xtics time_axis tics
+?time_axis tics
+ 時系列データの場合、軸の目盛り位置の値は `timefmt` の書式にしたがった
+ 日付、または時刻を引用符で囲んで与えなければいけません。<start>,
+ <incr>, <end> 形式を使う場合、<start> と <end> は `timefmt` に従って与
+ えますが、<incr> は秒単位で与える必要があります。その時刻は実際には
+ `set format` で与えた書式に従って表示されます。
 
  例:
        set xdata time
@@ -10882,7 +10973,24 @@ Ffigure_mapcontours
        set xtics ("01/12", "" "03/12", "05/12")
  これらは両方とも "Dec 1", "Dec 3", "Dec 5", の目盛りを生成しますが、2
  番目の例 "Dec 3" の目盛りは見出し付けされません。
-
+4 xtics rangelimited
+?set xtics rangelimited
+?xtics rangelimited
+?rangelimited
+?range-frame
+ このオプションは、自動的に生成される軸の目盛りの見出しと、描画されたデ
+ ータで実際に与えられる範囲に対応する描画境界の両方を制限します。これは
+ 描画に対する現在の範囲制限とは無関係であることに注意してください。例え
+ ばデータ "file.dat" のデータがすべて 2 < y < 4 の範囲にあるとすると、
+ 以下のコマンドは、左側の描画境界 (y 軸) は y の範囲全体 ([0:10]) のこ
+ の部分 ([2:4]) のみが描画され、この範囲 ([2:4]) の軸の目盛りのみが作ら
+ れる描画を生成します。つまり、描画は y の範囲全体 ([0:10]) に拡大され
+ ますが、左の境界は 0 から 2 の間、4 から 10 の間は空白領域となります。
+ このスタイルは、`範囲枠` グラフ (range-frame) とも呼ばれます。
+       set border 3
+       set yrange [0:10]
+       set ytics nomirror rangelimited
+       plot "file.dat"
 3 xyplane
 ?commands set xyplane
 ?commands show xyplane
@@ -11641,13 +11749,18 @@ Ffigure_mapcontours
 2 unset
 ?commands unset
 ?unset
+=iteration
  コマンド `set` で設定したオプションは、それに対応した `unset` コマンド
- を使うことで、そのデフォルトの値に戻すことが可能です。
+ によってそのデフォルトの値に戻すことが可能です。`unset` コマンドには繰
+ り返し節も利用できます。以下参照: `iteration`。
 
  例:
        set xtics mirror rotate by -45 0,10,100
        ...
        unset xtics
+
+       # 番号 100 から 200 までのラベルを unset
+       unset for [i=100:200] label i
 
 2 update
 ?commands update
@@ -11751,7 +11864,7 @@ Ffigure_mapcontours
  して免除するためのオプションですが、これは媒介変数の曲線 (parametric)
  に対しては機能しません。
 
-2 特別な出力形式 (terminals)
+2 特定の出力形式 (terminals)
 ?bugs terminals
  HP プロッタの古いモデルの中にはページの排出コマンド 'PG' を持たないも
  のがあります。現在の HPGL ドライバはこのコマンドを HPGL_reset で使用し
