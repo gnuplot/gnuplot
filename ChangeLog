@@ -3,6 +3,11 @@
 	* src/set.c (set_cntrparam): Allow iterative addition to the list of
 	contour levels:     set for [i=1:N:inc] cntr level discrete i
 
+	* src/graph3d.c (check_for_variable_color) src/misc.c (lp_parse) 
+	src/graphics.c (check_for_variable_color) plot3d.c (get_3ddata):
+	New colorspec:   'lc variable'
+	Read linestyle index from data column, look up corresponding color.
+
 2008-10-16  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:

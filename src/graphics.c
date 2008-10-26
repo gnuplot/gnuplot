@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.283 2008/10/16 04:25:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.284 2008/10/16 21:07:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5616,6 +5616,11 @@ check_for_variable_color(struct curve_points *plot, struct coordinate *point)
 	return TRUE;
     } else if (plot->lp_properties.pm3d_color.type == TC_Z) {
 	set_color( cb2gray(point->yhigh) );
+	return TRUE;
+    } else if (plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
+	lp_style_type lptmp;
+	lp_use_properties(&lptmp, (int)(point->yhigh));
+	apply_pm3dcolor(&(lptmp.pm3d_color), term);
 	return TRUE;
     } else
 	return FALSE;

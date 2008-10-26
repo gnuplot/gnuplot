@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.207 2008/09/08 16:42:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.208 2008/09/10 15:58:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -3165,6 +3165,10 @@ check_for_variable_color(struct surface_points *plot, struct coordinate *point)
 	    else
 		set_color( cb2gray( z2cb(point->z) ) );
 	}
+	break;
+    case TC_LINESTYLE:	/* linestyle from color data */
+	plot->lp_properties.pm3d_color.lt = (int)(point->CRD_COLOR);
+	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
 	break;
     default:
 	/* The other cases were taken care of already */
