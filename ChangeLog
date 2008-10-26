@@ -1,3 +1,8 @@
+2008-10-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_cntrparam): Allow iterative addition to the list of
+	contour levels:     set for [i=1:N:inc] cntr level discrete i
+
 2008-10-16  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:

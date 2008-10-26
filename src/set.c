@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.290 2008/10/02 21:30:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.291 2008/10/06 14:59:06 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1025,8 +1025,10 @@ set_cntrparam()
     } else if (almost_equals(c_token, "le$vels")) {
 	c_token++;
 
-	free_dynarray(&dyn_contour_levels_list);
-	init_dynarray(&dyn_contour_levels_list, sizeof(double), 5, 10);
+	if (!iteration) {
+	    free_dynarray(&dyn_contour_levels_list);
+	    init_dynarray(&dyn_contour_levels_list, sizeof(double), 5, 10);
+	}
 
 	/*  RKC: I have modified the next two:
 	 *   to use commas to separate list elements as in xtics
