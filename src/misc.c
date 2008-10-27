@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.81.2.2 2007/05/09 22:16:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.81.2.3 2008/03/08 17:51:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -822,6 +822,10 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    lp->pm3d_color.lt = LT_BACKGROUND;
 		    c_token++;
 #endif
+		} else if (almost_equals(c_token, "var$iable")) {
+		    c_token++;
+		    lp->l_type = LT_COLORFROMCOLUMN;
+		    lp->pm3d_color.type = TC_LINESTYLE;
 		} else {
 		    lp->pm3d_color.type = TC_LT;
 		    lp->pm3d_color.lt = (int) real(const_express(&t)) - 1;

@@ -1,3 +1,10 @@
+2008-10-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lp_parse) src/graphics.c (check_for_variable_color):
+	New colorspec:   'lc variable'
+	Read linestyle index from data column, look up corresponding color.
+	(2D plots only; Version 4.2 handling of variable color in 3D is messy).
+
 2008-10-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots): Explicitly set default color of first
