@@ -1,3 +1,11 @@
+2008-10-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c (apply_pm3dcolor): Only take the color, not the
+	dot-dash pattern.
+
+	* src/graph3d.c (plot3d_lines plot3d_lines_pm3d): Apply "lc variable"
+	to splot with lines.
+
 2008-10-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_cntrparam): Allow iterative addition to the list of

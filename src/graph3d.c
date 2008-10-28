@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.208 2008/09/10 15:58:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.209 2008/10/27 03:37:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1515,6 +1515,10 @@ plot3d_lines(struct surface_points *plot)
 
 	    if (rgb_from_column)
 		set_rgbcolor((int)points[i].CRD_COLOR);
+	    else if (can_pm3d && plot->lp_properties.pm3d_color.type == TC_LINESTYLE) {
+		plot->lp_properties.pm3d_color.lt = (int)(points[i].CRD_COLOR);
+		apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
+	    }
 	
 	    switch (points[i].type) {
 	    case INRANGE:{
@@ -1619,9 +1623,12 @@ plot3d_lines_pm3d(struct surface_points *plot)
     /* just a shortcut */
     TBOOLEAN color_from_column = plot->pm3d_color_from_column;
 
-    /* If plot uses a constant color, set it here and then let plot3d_lines take over */
-    if (plot->lp_properties.use_palette && plot->lp_properties.pm3d_color.type == TC_RGB) {
+    /* If plot really uses RGB rather than pm3d colors, let plot3d_lines take over */
+    if (plot->lp_properties.pm3d_color.type == TC_RGB) {
 	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
+	plot3d_lines(plot);
+	return;
+    } else if (plot->lp_properties.pm3d_color.type == TC_LINESTYLE) {
 	plot3d_lines(plot);
 	return;
     }
@@ -3166,7 +3173,7 @@ check_for_variable_color(struct surface_points *plot, struct coordinate *point)
 		set_color( cb2gray( z2cb(point->z) ) );
 	}
 	break;
-    case TC_LINESTYLE:	/* linestyle from color data */
+    case TC_LINESTYLE:	/* color from linestyle in data column */
 	plot->lp_properties.pm3d_color.lt = (int)(point->CRD_COLOR);
 	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
 	break;
