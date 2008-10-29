@@ -1,3 +1,9 @@
+2008-10-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc:
+	Add documentation for variable linecolor and using pseudocolumns.
+	Remove ancient comments about HP printers.
+
 2008-10-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (apply_pm3dcolor): Only take the color, not the

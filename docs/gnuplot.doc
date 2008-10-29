@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.541 2008/10/11 20:01:03 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.542 2008/10/16 21:07:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -245,7 +245,7 @@ C
        set size 0.5, 0.5
        set term png size 600, 400
        set output "figure.png"
-       plot "data" using lines
+       plot "data" with lines
 
  These commands will produce an output file "figure.png" that is 600 pixels
  wide and 400 pixels tall. The plot will fill the lower left quarter of this
@@ -1744,12 +1744,18 @@ C ... and restart the table:
 ?colorspec
 ?rgbcolor
 =colors
- Many commands allow you to specify a linetype with an explicit color. This
- option is only possible for terminals that support RGB color or pm3d palettes.
+?lc
+?linecolor
+?tc
+?textcolor
+ Many commands allow you to specify a linetype with an explicit color.
+ Terminal-independent color choice is only possible for terminals that support
+ RGB color or pm3d palettes.
 
  Syntax:
 
-       ... {linetype | lt} <colorspec>
+       ... {linecolor | lc} <colorspec>
+       ... {textcolor | tc} <colorspec>
 
  where <colorspec> has one of the following forms:
 
@@ -1759,6 +1765,7 @@ C ... and restart the table:
        palette frac <val>      # <val> runs from 0 to 1
        palette cb <value>      # <val> lies within cbrange
        palette z
+       variable                # color index is read from input file
 
  "colorname" refers to one of the color names built in to gnuplot. For a list
  of the available names, see `show colornames`.
@@ -1783,16 +1790,20 @@ C ... and restart the table:
  from an extra column of data (not all 2D plot styles allow an extra column).
 4 rgbcolor variable
 ?rgbcolor variable
+?lc rgbcolor variable
+?tc rgbcolor variable
  Most plot commands assign a single color (linetype) to each element of the
  plot.  If there are multiple plots on a single graph, the default color
- (linetype) is incremented sequentially.  Some plot stiles allow you to
- bypass this mechanism altogether, and assign a separate color for each
- data point, line segment, or label.  This is indicated by the colorspec
- `rgbcolor variable`, and tells the program to take the color for each point
- from a separate column in the data file. This requires an additional column
- in the `using` specifier.  The extra column is interpreted as a 24-bit packed
- RGB triple. These are most easily specified in a data file as hexidecimal
- values (see `rgbcolor`).
+ (linetype) is incremented sequentially.  You can instead assign a separate
+ color for each data point, line segment, or label based on additional 
+ information in the input data file.  This is indicated by the colorspec
+ keyword `variable`.  
+ 
+ `lc rgbcolor variable` tells the program to use a 24-bit RGB color from a
+ separate column in the data file. This requires a corresponding additional
+ column in the `using` specifier.  The extra column is interpreted as a 24-bit
+ packed RGB triple. These are most easily specified as hexidecimal values
+ (see `rgbcolor`). Text colors are similarly set using `tc rgbcolor variable`.
 
  Example:
 
@@ -1800,6 +1811,38 @@ C ... and restart the table:
        # their red, green, and blue components
        rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
        splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
+
+4 linecolor variable
+?linecolor variable
+?lc variable
+?textcolor variable
+?tc variable
+ Most plot commands assign a single color (linetype) to each element of the
+ plot.  If there are multiple plots on a single graph, the default color
+ (linetype) is incremented sequentially.  You can instead assign a separate
+ color for each data point, line segment, or label based on additional 
+ information in the input data file.  This is indicated by the colorspec
+ keyword `variable`. 
+ 
+ `lc variable` tells the program to use the value read from one column of the
+ input data as a linestyle index, and use the color belonging to that linestyle.
+ This requires a corresponding additional column in the `using` specifier.
+ Text colors can be set similarly using `tc variable`.
+
+ A single data file may contain multiple sets of data, separated by two blank
+ lines. Each of these separate sets is assigned an index value (see `index`)
+ that can be retrieved via the using specifier column(-2). See `pseudocolumns`.
+ All data in the file is drawn with the same color/linestyle/pointtype
+ properties by default.  The command `lc variable` can be used to assign
+ different colors to each data set in the file by using the index value from
+ pseudocolumn -2.
+
+ Examples:
+       # Use the third column of data to assign colors to individual points
+       plot 'data' using 1:2:3 with points lc variable
+
+       # Use the data set index to choose a linestyle color
+       plot 'data' using 1:2:(column(-2)) with lines lc variable
 
 2 mouse input
 ?mouse input
@@ -4125,12 +4168,13 @@ Ffigure_mapcontours
  provides integer values starting at 0.
 
  In datafiles, blank records (records with no characters other than blanks and
- a newline and/or carriage return) are significant---pairs of blank records
- separate `index`es (see `plot datafile index`).  Data separated by double
- blank records are treated as if they were in separate data files.
-
+ a newline and/or carriage return) are significant.
+ 
  Single blank records designate discontinuities in a `plot`; no line will join
  points separated by a blank records (if they are plotted with a line style).
+
+ Two blank records in a row indicate a break between separate data sets.
+ See `index`.
 
  If autoscaling has been enabled (`set autoscale`), the axes are automatically
  extended to include all datapoints, with a whole number of tic marks if tics
@@ -4167,7 +4211,7 @@ Ffigure_mapcontours
 
  The matrix binary format contains a two dimensional array of 32 bit IEEE
  float values with an additional column and row of coordinate values.  As
- with ASCII matrix, in the using list, repetition of the coordinate row
+ with ASCII matrix, in the `using` list, repetition of the coordinate row
  constitutes column 1, repetition of the coordinate column constitutes
  column 2, and the array of values constitutes column 3.
 
@@ -4179,7 +4223,7 @@ Ffigure_mapcontours
  translating data since often coordinates are not part of the file when
  uniform sampling is inherent in the data.  Different from matrix binary or
  ASCII, general binary does not treat the generated columns as 1, 2 or 3 in
- the using list.  Rather, column 1 begins with column 1 of the file, or as
+ the `using` list.  Rather, column 1 begins with column 1 of the file, or as
  specified in the `format` list.
 
  There are global default settings for the various binary options which may
@@ -4588,8 +4632,8 @@ Ffigure_mapcontours
 ?data-file index
 ?datafile index
 ?index
- The `index` keyword allows only some of the data sets in a multi-data-set
- file to be plotted.
+ The `index` keyword allows you to select specific data sets in a multi-data-set
+ file for plotting.
 
  Syntax:
        plot 'file' index { <m>{:<n>{:<p>}} | "<name>" }
@@ -4604,6 +4648,17 @@ Ffigure_mapcontours
  Example:
        plot 'file' index 4:5
 
+ For each point in the file, the index value of the data set it appears in is
+ available via the pseudo-column `column(-2)`.  This leads to an alternative way
+ of distinguishing individual data sets within a file as shown below.  This is
+ more awkward that the `index` command if all you are doing is selecting one
+ data set for plotting, but is very useful if you want to assign different
+ properties to each data set.  See `pseudocolumns`, `lc variable`.
+
+ Example:
+       plot 'file' using 1:(column(-2)==4 ? $2 : NaN)        # very awkward
+       plot 'file' using 1:2:(column(-2)) linecolor variable # very useful!
+
  `index '<name>'` selects the data set with name '<name>'.  Names are assigned
  to data sets in comment lines.  The comment character and leading white space
  are removed from the comment line.  If the resulting line starts with <name>,
@@ -4613,8 +4668,8 @@ Ffigure_mapcontours
        plot 'file' index 'Population'
 
  Please note that every comment that starts with <name> will name the following
- data set.  To avoid problems use a naming scheme like e.g. '== Popolation =='
- or '[Population]'.
+ data set.  To avoid problems it may be useful to choose a naming scheme like
+ '== Population ==' or '[Population]'.
 
 ^ See also web page
 ^ <a href="http://www.gnuplot.info/demo/multimsh.html">
@@ -4933,34 +4988,32 @@ Ffigure_mapcontours
 
  If a format is specified, each datafile record is read using the C library's
  'scanf' function, with the specified format string.  Otherwise the record is
- read and broken into columns at spaces or tabs.  A format cannot be specified
- this way for time-format data (instead use `set xdata time`).
+ read and broken into columns. By default the separation between columns is
+ whitespace (spaces and/or tabs), but see `datafile separator`.
 
- The resulting array of data is then sorted into columns according to the
- entries.  Each <entry> may be a simple column number, which selects the
- datum, an expression enclosed in parentheses, or empty.  The expression can
- use $1 to access the first item read, $2 for the second item, and so on.  It
- can also use `column(x)` and `valid(x)` where x is an arbitrary expression
- resulting in an integer.  `column(x)` returns the x'th datum; `valid(x)`
- tests that the datum in the x'th column is a valid number.  A column number
- of 0 generates a number increasing (from zero) with each point, and is reset
- upon encountering two blank records.  A column number of -1 gives the
- dataline number, which starts at 0, increments at single blank records, and
- is reset at double blank records.  A column number of -2 gives the index
- number, which is incremented only when two blank records are found.  An empty
- <entry> will default to its order in the list of entries.  For example,
- `using ::4` is interpreted as `using 1:2:4`.
+ Each <entry> may be a simple column number that selects the value from one
+ field of the input fit, an expression enclosed in parentheses, or empty.
 
- N.B.---the `call` command also uses $'s as a special character.  See `call`
- for details about how to include a column number in a `call` argument list.
+ If the entry is an expression in parentheses, then the function column(N) may
+ be used to indicate the value in column N. That is, column(1) refers to the
+ first item read, column(2) to the second, and so on.  The special symbols
+ $1, $2, ... are shorthand for column(1), column(2) ...  The function `valid(N)`
+ tests whether the value in the Nth column is a valid number.
+
+ In addition to the actual columns 1...N in the input data file, gnuplot
+ presents data from several "pseudo-columns" that hold bookkeeping information.
+ E.g. $0 or column(0) returns the sequence number of this data record within a
+ dataset.  Please see `pseudocolumns`.
+ 
+ An empty <entry> will default to its order in the list of entries.
+ For example, `using ::4` is interpreted as `using 1:2:4`.
 
  If the `using` list has but a single entry, that <entry> will be used for y
- and the data point number is used for x; for example, "`plot 'file' using 1`"
- is identical to "`plot 'file' using 0:1`".  If the `using` list has two
- entries, these will be used for x and y.  Additional entries are usually
- errors in x and/or y.  See `set style` for details about plotting styles that
- make use of error information, and `fit` for use of error information in
- curve fitting.
+ and the data point number (pseudo-column $0) is used for x; for example,
+ "`plot 'file' using 1`" is identical to "`plot 'file' using 0:1`".
+ If the `using` list has two entries, these will be used for x and y.
+ See `set style` and `fit` for details about plotting styles that make use of
+ data from additional columns of input.
 
  'scanf' accepts several numerical specifications but `gnuplot`
  requires all inputs to be double-precision floating-point variables,
@@ -4973,9 +5026,12 @@ Ffigure_mapcontours
 
  Note that the use of "\t", "\n", or "\f" requires use of double-quotes
  rather than single-quotes.
-
- Examples:
-
+5 using_examples
+?examples
+?commands plot datafile using examples
+?plot datafile using examples
+?datafile using examples
+?using examples
  This creates a plot of the sum of the 2nd and 3rd data against the first:
  The format string specifies comma- rather than space-separated columns.
  The same result could be achieved by specifying `set datafile separator ","`.
@@ -5034,6 +5090,23 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/using.html">
  Feeble using demos.
 ^ </a>
+5 pseuodocolumns
+?pseudocolumns
+?commands plot datafile using pseudocolumns
+?plot datafile using pseudocolumns
+?datafile using pseudocolumns
+?using pseudocolumns
+ Expressions in the `using` clause of a plot statement can refer to additional
+ bookkeeping values in addition to the actual data values contained in the input
+ file. These are contained in "pseudocolumns".
+       column(0)   The sequential order of each point within a data set.
+                   The counter starts at 0 and is reset by two sequential blank
+                   records.  The shorthand form $0 is available.
+       column(-1)  This counter starts at 0 and is reset by a single blank line.
+                   This corresponds to the data line in array or grid data.
+       column(-2)  The index number of the current data set within a file that
+                   contains multiple data sets.  See `index`.
+
 5 using title
 ?using title
 ?plot using title
@@ -6657,6 +6730,7 @@ Ffigure_mapcontours
 4 set datafile separator
 ?set datafile separator
 ?show datafile separator
+?datafile separator
 ?separator
  The command `set datafile separator "<char>"` tells `gnuplot` that data fields
  in subsequent input files are separated by <char> rather than by whitespace.
@@ -11675,13 +11749,6 @@ Ffigure_mapcontours
 
  The 'nohidden3d' option that is supposed to exempt individual plots from the
  global property 'set hidden3d' does not work for parametric curves.
-
-2 Specific terminals
-?bugs terminals
- Some older models of HP plotters do not have a page eject command 'PG'.  The
- current HPGL driver uses this command in HPGL_reset.  This may need to be
- removed for these plotters.  The current PCL5 driver uses HPGL/2 for text as
- well as graphics.  This should be modified to use scalable PCL fonts.
 
 2 External libraries
 ?bugs external_libraries
