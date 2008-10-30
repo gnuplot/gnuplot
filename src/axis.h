@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.46.2.1 2008/08/05 23:41:06 sfeam Exp $
+ * $Id: axis.h,v 1.46.2.2 2008/09/23 23:11:32 sfeam Exp $
  *
  */
 
@@ -622,8 +622,6 @@ do {						\
 /* (DFK) Watch for cancellation error near zero on axes labels */
 /* FIXME HBB 20000521: these seem not to be used much, anywhere... */
 #define CheckZero(x,tic) (fabs(x) < ((tic) * SIGNIF) ? 0.0 : (x))
-#define NearlyEqual(x,y,tic) (fabs((x)-(y)) < ((tic) * SIGNIF))
-
 
 
 /* ------------ functions exported by axis.c */
