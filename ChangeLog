@@ -1,3 +1,10 @@
+2008-10-30  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics) src/axis.h: Use a more complete test for
+	round-off error when the increment between axis tics is close to the
+	precision of the floating point representation.
+	Bug #2209654
+
 2008-10-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:
