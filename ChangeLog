@@ -1,3 +1,9 @@
+2008-10-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (do_3dplot): Draw key entry line samples for pm3d
+	surfaces with contours.
+	Bug #2163532
+
 2008-10-30  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics) src/axis.h: Use a more complete test for

@@ -1235,6 +1235,7 @@ do_3dplot(
 			    case STEPS:
 			    case FSTEPS:
 			    case HISTEPS:
+			    case PM3DSURFACE:
 				key_sample_line(xl, yl);
 				break;
 			    case YERRORLINES:	/* ignored; treat like points */
