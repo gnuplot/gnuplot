@@ -1,7 +1,9 @@
 2008-10-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot): Draw key entry line samples for pm3d
-	surfaces with contours.
+	surfaces with contours.  Fix vertical positioning of key text relative
+	to the key box. Do not clip key text to plot boundaries, since the
+	key may be outside the plot.
 	Bug #2163532
 
 	* src/save.c (save_set_all): Missing "at" keyword for user placement

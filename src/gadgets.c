@@ -252,20 +252,6 @@ draw_clip_arrow( int sx, int sy, int ex, int ey, int head)
 		(unsigned int)ex, (unsigned int)ey, head);
 }
 
-
-/* And text clipping routine. */
-void
-clip_put_text(unsigned int x, unsigned int y, char *str)
-{
-    struct termentry *t = term;
-
-    if (clip_point(x, y))
-	return;
-
-    (*t->put_text) (x, y, str);
-}
-
-
 /* Clip the given line to drawing coords defined by BoundingBox.
  *   This routine uses the cohen & sutherland bit mapping for fast clipping -
  * see "Principles of Interactive Computer Graphics" Newman & Sproull page 65.

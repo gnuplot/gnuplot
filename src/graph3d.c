@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.209 2008/10/27 03:37:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.211 2008/10/31 15:20:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -885,13 +885,14 @@ do_3dplot(
 	    apply_pm3dcolor(&(key->textcolor), t);
 	if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
 	    extra_height += 0.51;
-	write_multiline(center, yl - (0.5 + extra_height/2.0) * t->v_char,
+	write_multiline(center, key->bounds.ytop - (0.5 + extra_height/2.0) * t->v_char,
 			key->title, CENTRE, JUST_TOP, 0, key->font);
 	if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
 	    extra_height += 0.3;
 	ktitle_lines += extra_height;
+	yl -= t->v_char * extra_height;
+	key->bounds.ybot -= t->v_char * extra_height;
 	(*t->linetype)(LT_BLACK);
-	yl -= t->v_char * ktitle_lines;
     }
 
     /* Key box */
@@ -2928,18 +2929,10 @@ key_text(int xl, int yl, char *text)
 	(*term->put_text) (xl + key_text_left, yl, text);
     } else {
 	if ((*term->justify_text) (RIGHT)) {
-	    if (key->region == GPKEY_USER_PLACEMENT)
-		clip_put_text(xl + key_text_right, yl, text);
-	    else
-		(*term->put_text) (xl + key_text_right, yl, text);
+	    (*term->put_text) (xl + key_text_right, yl, text);
 	} else {
 	    int x = xl + key_text_right - (term->h_char) * estimate_strlen(text);
-	    if (key->region == GPKEY_USER_PLACEMENT) {
-		if (i_inrange(x, plot_bounds.xleft, plot_bounds.xright))
-		    clip_put_text(x, yl, text);
-	    } else {
-		(*term->put_text) (x, yl, text);
-	    }
+	    (*term->put_text) (x, yl, text);
 	}
     }
 }
