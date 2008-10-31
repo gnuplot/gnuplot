@@ -4,6 +4,9 @@
 	surfaces with contours.
 	Bug #2163532
 
+	* src/save.c (save_set_all): Missing "at" keyword for user placement
+	of key box.
+
 2008-10-30  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics) src/axis.h: Use a more complete test for

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.165 2008/09/23 20:08:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.166 2008/09/24 03:19:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -364,6 +364,7 @@ set y2data%s\n",
 	    }
 	    break;
 	case GPKEY_USER_PLACEMENT:
+	    fputs("at ", fp);
 	    save_position(fp, &key->user_pos, FALSE);
 	    break;
     }
