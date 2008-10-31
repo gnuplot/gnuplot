@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.291 2008/10/06 14:59:06 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.292 2008/10/26 19:02:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1900,7 +1900,9 @@ set_key()
 		c_token--;
 	    }
 	    break;
-
+	case S_KEY_NOTITLE:
+	    key->title[0] = '\0';
+	    break;
 	case S_KEY_FONT:
 	    c_token++;
 	    /* Make sure they've specified a font */
