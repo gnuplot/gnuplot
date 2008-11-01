@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.211 2008/10/31 15:20:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.212 2008/10/31 23:16:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -299,7 +299,8 @@ find_maxl_cntr(struct gnuplot_contours *contours, int *count)
     mlen = cnt = 0;
     while (cntrs) {
 	if (label_contours && cntrs->isNewLevel) {
-	    len = estimate_strlen(cntrs->label);
+	    len = estimate_strlen(cntrs->label)
+		- strspn(cntrs->label," ");
 	    if (len)
 		cnt++;
 	    if (len > mlen)
@@ -424,6 +425,15 @@ boundary3d(struct surface_points *plots, int count)
 	if (rmargin.scalex != screen)
 	    plot_bounds.xright -= key_width;
     }
+
+    if (key->visible)
+    if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
+	&& key->margin == GPKEY_LMARGIN) {
+	int key_width = key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
+	if (lmargin.scalex != screen)
+	    plot_bounds.xleft += key_width;
+    }
+
     plot_bounds.xleft += t->xmax * xoffset;
     plot_bounds.xright += t->xmax * xoffset;
     plot_bounds.ytop += t->ymax * yoffset;
@@ -849,9 +859,12 @@ do_3dplot(
 	    } else {
 		yl = plot_bounds.ybot + t->v_tic + key_entry_height * key_rows + ktitle_lines * t->v_char;
 	    }
-	    if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->region == GPKEY_RMARGIN) {
+	    if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_RMARGIN) {
 		/* keys outside plot border (right) */
 		xl = plot_bounds.xright + t->h_tic + key_size_left;
+	    } else if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_LMARGIN) {
+		/* keys outside plot border (left) */
+		xl = key_size_left + 2 * t->h_char;
 	    } else if (key->hpos == LEFT) {
 		xl = plot_bounds.xleft + t->h_tic + key_size_left;
 	    } else if (rmargin.scalex == screen 
