@@ -3,6 +3,11 @@
 	* src/graph3d.c: More bugfixes affecting key placement.
 	Bug #2163532
 
+	* src/set.c (set_xyplane) docs/gnuplot.doc:  Add keyword
+	'set xyplane relative <frac>' but continue to accept the older
+	form 'set ticslevel <frac>'.
+	Bug #2101990
+
 2008-10-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot): Draw key entry line samples for pm3d

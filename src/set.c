@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.292 2008/10/26 19:02:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.293 2008/11/01 03:48:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4249,8 +4249,12 @@ set_xyplane()
 	c_token++;
 	xyplane.z = real_expression();
 	xyplane.absolute = TRUE;
-    } else
-	int_error(c_token, "use 'ticslevel' for relative placement");
+	return;
+    } else if (!almost_equals(c_token,"rel$ative")) {
+	c_token--;
+	/* int_warn(NO_CARET, "deprecated syntax"); */
+    }
+    set_ticslevel();
 }
 
 

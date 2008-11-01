@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.542 2008/10/16 21:07:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.543 2008/10/30 02:42:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10904,15 +10904,16 @@ Ffigure_mapcontours
  compatibility.
 
  Syntax:
-       set ticslevel <frac>
-       set xyplane <frac>
        set xyplane at <zvalue>
+       set xyplane relative <frac>
+       set ticslevel <frac>	# equivalent to set xyplane relative
        show xyplane
 
- The form `set ticslevel <frac>` places the xy plane below the range in Z, where
- the distance from the xy plane to Zmin is given as a fraction of the total
- range in z.  The default value is 0.5.  Negative values are permitted, but tic
- labels on the three axes may overlap.
+ The form `set xyplane relative <frac>` places the xy plane below the range in
+ Z, where the distance from the xy plane to Zmin is given as a fraction of the
+ total range in z.  The default value is 0.5.  Negative values are permitted,
+ but tic labels on the three axes may overlap.  The older, deprecated, form
+ `set ticslevel` is retained for backwards compatibility.
 
  To place the xy-plane at a position 'pos' on the z-axis, `ticslevel` may
  be set equal to  (pos - zmin) / (zmin - zmax).  However, this position will
