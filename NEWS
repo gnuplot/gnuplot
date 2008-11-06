@@ -4,6 +4,7 @@ New features, changes and fixes since previous release
 * NEW 'set xtics rangelimit' allows creation of range/frame plots
 * FIX interpolatation for pm3d surfaces given by both z and colour coordinates
 * FIX infinite loop if axis tick increment is on the order of machine precision
+* FIX initialize x11 enhanced text mode to use most recently requested font 
 
 
 New features, changes and fixes in gnuplot version 4.2.4
