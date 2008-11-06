@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.132.2.8 2008/06/08 05:58:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.132.2.9 2008/09/23 23:11:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -281,6 +281,10 @@ set y2data%s\n",
     fprintf(fp, "set angles %s\n",
 	    (ang2rad == 1.0) ? "radians" : "degrees");
 
+    /* Grid back/front controls tics also. Make sure it is saved */
+    if (grid_layer >= 0)
+	fprintf(fp,"set tics %s\n", grid_layer == 0 ? "back" : "front");
+    
     if (! some_grid_selected())
 	fputs("unset grid\n", fp);
     else {

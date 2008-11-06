@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.41 2008/09/23 23:11:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.42 2008/10/06 05:14:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9461,10 +9461,16 @@ C ... and restart the table:
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
                 { format "formatstring" } { font "name{,<size>}" }
                 { textcolor <colorspec> }
+       set tics {front | back}
        unset tics
        show tics
 
- All specified options apply to all axes, i.e., x, y, z, x2, y2, and cb.
+ The options in the first set above can be applied individually to 
+ any or all axes, i.e., x, y, z, x2, y2, and cb.
+
+ Set tics `front` or `back` applies to all axes at once, but only for 2D plots
+ (not splot).  It controls whether the tics are placed behind or in front of
+ the plot elements, in the case that there is overlap.
 
  `axis` or `border` tells `gnuplot` to put the tics (both the tics themselves
  and the accompanying labels) along the axis or the border, respectively.  If

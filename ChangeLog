@@ -4,6 +4,10 @@
 	processing to use the most recently requested font rather than the
 	default font.
 
+	* src/set.c (set_tics) src/show.c (show_tics) src/save.c (save_set_all)
+	docs/gnuplot.doc:  Allow tics to be set front/back without turning on
+	the whole grid.    Syntax:   set tics {front|back}
+
 2008-10-30  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics) src/axis.h: Use a more complete test for
