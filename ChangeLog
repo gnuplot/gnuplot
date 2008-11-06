@@ -1,3 +1,9 @@
+2008-11-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm (X11_set_font ENHX11_put_text): Initialize enhanced text
+	processing to use most recently requested font rather than the default
+	font.
+
 2008-11-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: More bugfixes affecting key placement.

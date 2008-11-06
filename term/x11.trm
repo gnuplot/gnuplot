@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.175 2008/06/02 00:48:12 sfeam Exp $
+ * $Id: x11.trm,v 1.176 2008/10/07 21:01:20 sfeam Exp $
  *
  */
 
@@ -1410,7 +1410,7 @@ X11_point(unsigned int x, unsigned int y, int number)
 TERM_PUBLIC int
 X11_set_font(const char *fontname)
 {
-/*  PRINT1("QF%s\n", fontname?fontname:""); */
+    PRINT1("QF%s\n", fontname?fontname:"");
     strncpy(X11_next_font_used,fontname?fontname:"",sizeof(X11_next_font_used)-1);
     return(TRUE);
 }
@@ -1804,6 +1804,7 @@ TERM_PUBLIC void
 ENHX11_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
+    static char *initial_font = NULL;
     int pass = 1;
 
     if (ignore_enhanced_text) {
@@ -1839,12 +1840,18 @@ ENHX11_put_text(unsigned int x, unsigned int y, const char *str)
     }
 PASS2:
 
-    /* Make sure that we start out using the default font.
-     * FIXME: Really we should get feedback from gnuplot_x11 as to what
-     *        the default font size is.
-     */
+    /* Make sure that we start out using the intended font.  */
 	ENHx11_font = "DEFAULT";
 	ENHx11_fontsize = X11_default_fontsize;
+	if (*X11_next_font_used) {
+	    int sep = strcspn(X11_next_font_used,",");
+	    free(initial_font);
+	    initial_font = gp_strdup(X11_next_font_used);
+	    initial_font[sep] = '\0';
+	    sscanf(&(X11_next_font_used[sep+1]),"%lf",&ENHx11_fontsize);
+	    ENHx11_font = initial_font;
+	    fprintf(stderr,"setting font to %s,%g\n",ENHx11_font,ENHx11_fontsize);
+	}
 
     /* Set the recursion going. We say to keep going until a
      * closing brace, but we don't really expect to find one.
