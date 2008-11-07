@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.43 2008/03/30 03:27:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.44 2008/08/10 00:52:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -228,7 +228,12 @@ static int ansi_getc __PROTO((void));
 #  include "win/winmain.h"
 #  define TEXTUSER 0xf1
 #  define TEXTGNUPLOT 0xf0
+#  ifdef WGP_CONSOLE
+#   define special_getc() win_getch()
+static char win_getch __PROTO((void));
+#  else
 #  define special_getc() msdos_getch()
+#  endif /* WGP_CONSOLE */
 static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
 # endif				/* _Windows */
 
@@ -326,11 +331,15 @@ user_putc(int ch)
 {
     int rv;
 #ifdef _Windows
+#ifndef WGP_CONSOLE
     TextAttr(&textwin, TEXTUSER);
+#endif
 #endif
     rv = fputc(ch, stderr);
 #ifdef _Windows
+#ifndef WGP_CONSOLE
     TextAttr(&textwin, TEXTGNUPLOT);
+#endif
 #endif
     return rv;
 }
@@ -340,11 +349,15 @@ user_puts(char *str)
 {
     int rv;
 #ifdef _Windows
+#ifndef WGP_CONSOLE
     TextAttr(&textwin, TEXTUSER);
+#endif
 #endif
     rv = fputs(str, stderr);
 #ifdef _Windows
+#ifndef WGP_CONSOLE
     TextAttr(&textwin, TEXTGNUPLOT);
+#endif
 #endif
     return rv;
 }
@@ -766,6 +779,17 @@ ansi_getc()
 #endif
 
 #if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(OS2)
+
+#ifdef WGP_CONSOLE
+static char
+win_getch()
+{
+    if (term && term->waitforinput)
+        return term->waitforinput();
+    else
+        return ConsoleGetch();
+}
+#endif
 
 /* Convert Arrow keystrokes to Control characters: */
 static char

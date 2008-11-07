@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.68 2008/10/10 22:26:21 mikulik Exp $
+ * $Id: wxt_gui.cpp,v 1.69 2008/10/13 19:45:17 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3127,7 +3127,25 @@ int wxt_waitforinput()
  * the terminal events are directly processed when they are received */
 int wxt_waitforinput()
 {
-	return getch();
+#ifdef WGP_CONSOLE
+	if (paused_for_mouse) {
+		MSG msg;
+		BOOL ret;
+
+		while ((ret = GetMessage(&msg, NULL, 0, 0)) != 0) {
+			if (ret == -1)
+				break;
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+
+			if (!paused_for_mouse)
+				break;
+		}
+		return '\0';
+	}
+	else
+#endif /* WGP_CONSOLE */
+		return getch();
 }
 #endif /* WXT_MONOTHREADED || WXT_MULTITHREADED */
 

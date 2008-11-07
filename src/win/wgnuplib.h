@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.26 2008/04/24 16:30:51 sfeam Exp $
+ * $Id: wgnuplib.h,v 1.27 2008/05/17 15:37:25 sfeam Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -45,7 +45,9 @@
 #include <windows.h>
 
 #ifdef _WINDOWS
-#define _Windows
+# ifndef _Windows
+#  define _Windows
+# endif
 #endif
 
 /* HBB 19990506: The following used to be #ifdef __DLL__.
@@ -220,6 +222,7 @@ typedef struct tagTW
 typedef TW FAR*  LPTW;
 
 
+#ifndef WGP_CONSOLE
 /* ================================== */
 /* wtext.c - Text Window */
 void WDPROC TextMessage(void);
@@ -242,6 +245,8 @@ void WDPROC TextInsertLine(LPTW lptw);
 void WDPROC TextDeleteLine(LPTW lptw);
 void WDPROC TextScrollReverse(LPTW lptw);
 void WDPROC TextAttr(LPTW lptw, BYTE attr);
+#endif /* WGP_CONSOLE */
+
 void WDPROC AboutBox(HWND hwnd, LPSTR str);
 
 /* ================================== */

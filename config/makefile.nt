@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.20 2006/08/11 16:35:29 tlecomte Exp $
+# $Id: makefile.nt,v 1.21 2008/02/23 10:04:33 mikulik Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -59,6 +59,7 @@ OPTIONS = $(OPTIONS) /DHAVE_LIBPDF
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
 CBASEFLAGS = /G5 /GX /GR /MD /O2 /nologo
 CFLAGS = $(CBASEFLAGS) /I$(TOP) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
+CONSOLE_CFLAGS = /DWGP_CONSOLE
 
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = $(PROCESSOR_ARCHITECTURE)
@@ -79,7 +80,7 @@ T=..\\term\\
 D=..\\docs\\
 M=..\\demo\\
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe wgnuplot_pipes.exe
 
 !INCLUDE makefile.all
 
@@ -95,9 +96,14 @@ WINDOWS = makefile.win makefile.nt README.win win\wcommon.h \
 	win\wresourc.h win\wtext.c win\wtext.h win\geticon.c \
 	$(D)doc2rtf.c $(T)win.trm win\grpicon.ico win\texticon.ico
 
+ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
+
 # default rules
 .c.obj:
 	$(CC) $(CFLAGS) $*.c
+
+.c.cobj:
+	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) $*.c /Fo$@
 
 $(OBJS): config.h
 
@@ -138,36 +144,72 @@ wgnuplot.res :  win\wgnuplot.rc win\wgnuplib.rc win\wresourc.h texticon.ico grpi
 	rc /l 0x409 /fowgnuplot.res /i "win" /d "NDEBUG" /d WIN32 /d MSRC win\wgnuplot.rc
 
 term.obj: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) $(CFLAGS) $(TERMFLAGS) term.c
+	$(CC) $(CFLAGS) $(TERMFLAGS) term.c /Fo$@
+
+term.cobj: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
+	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) $(TERMFLAGS) term.c /Fo$@
 
 winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
-	$(CC) $(CFLAGS) win\winmain.c
+	$(CC) $(CFLAGS) win\winmain.c /Fo$@
+
+winmain.cobj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
+	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\winmain.c /Fo$@
 
 WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h
 
 wgnuplib.obj: win\wgnuplib.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wgnuplib.c
+	$(CC) $(CFLAGS) win\wgnuplib.c /Fo$@
+
+wgnuplib.cobj: win\wgnuplib.c $(WINDEPS)
+	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wgnuplib.c /Fo$@
 
 wmenu.obj: win\wmenu.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wmenu.c
+	$(CC) $(CFLAGS) win\wmenu.c /Fo$@
+
+wmenu.cobj: win\wmenu.c $(WINDEPS)
+	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wmenu.c /Fo$@
 
 wtext.obj: win\wtext.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wtext.c
+	$(CC) $(CFLAGS) win\wtext.c /Fo$@
+
+wtext.cobj: win\wtext.c $(WINDEPS)
+	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wtext.c /Fo$@
 
 wpause.obj: win\wpause.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wpause.c
+	$(CC) $(CFLAGS) win\wpause.c /Fo$@
+
+wpause.cobj: win\wpause.c $(WINDEPS)
+	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wpause.c /Fo$@
 
 wprinter.obj: win\wprinter.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wprinter.c
+	$(CC) $(CFLAGS) win\wprinter.c /Fo$@
+
+wprinter.cobj: win\wprinter.c $(WINDEPS)
+	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wprinter.c /Fo$@
 
 wgraph.obj: win\wgraph.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wgraph.c
+	$(CC) $(CFLAGS) win\wgraph.c /Fo$@
+
+wgraph.cobj: win\wgraph.c $(WINDEPS)
+	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wgraph.c /Fo$@
 
 wgnuplot.mnu: win\wgnuplot.mnu
 	copy win\wgnuplot.mnu wgnuplot.mnu
 
-pgnuplot.exe: win\pgnuplot.c
-	cl $(CBASEFLAGS) /I$(TOP) win\pgnuplot.c /link version.obj user32.lib
+wgnuplot_pipes.exe: win\pgnuplot.c
+	cl $(CBASEFLAGS) /I$(TOP) win\pgnuplot.c /Fe$@ /link version.obj user32.lib
+
+pgnuplot.exe: $(ALL_CONSOLE_OBJS) win\wgnuplot.def wgnuplot.res texticon.ico grpicon.ico
+	$(LD) $(LDFLAGS) /out:$@ @<<
+$(ALL_CONSOLE_OBJS)
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib
+advapi32.lib shell32.lib ole32.lib oleaut32.lib comctl32.lib
+gd.lib wxmsw28.lib wxtiff.lib
+jpeg.lib png.lib
+glib-2.0.lib gobject-2.0.lib gmodule-2.0.lib
+cairo.lib pango-1.0.lib pangocairo-1.0.lib
+wgnuplot.res
+<<
 
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
@@ -201,6 +243,7 @@ dbinary.obj: binary.c
 # clean up temporary files
 clean:
 	if exist *.obj del *.obj
+	if exist *.cobj del *.cobj
 	if exist *.ico del *.ico
 	if exist wgnuplot.res del wgnuplot.res
 	if exist win\gnuplot.rtf del win\gnuplot.rtf
@@ -216,6 +259,7 @@ veryclean: clean
 	if exist wgnuplot.hlp del wgnuplot.hlp
 	if exist wgnuplot.mnu del wgnuplot.mnu
 	if exist pgnuplot.exe del pgnuplot.exe
+	if exist wgnuplot_pipes.exe del wgnuplot_pipes.exe
 	if exist ..\demo\binary1 del ..\demo\binary1
 	if exist ..\demo\binary2 del ..\demo\binary2
 	if exist ..\demo\binary3 del ..\demo\binary3
@@ -223,3 +267,18 @@ veryclean: clean
 	if exist ..\demo\soundfit.par del ..\demo\soundfit.par
 	if exist config.h del config.h
 	if exist makefile.nt del makefile.nt
+	if exist *.manifest del *.manifest
+
+install: default
+	if not exist $(DESTDIR) mkdir $(DESTDIR)\bin
+	copy /Y wgnuplot.exe $(DESTDIR)\bin\wgnuplot.exe
+	copy /Y win\wgnuplot.mnu $(DESTDIR)\bin\wgnuplot.mnu
+#	copy /Y wgnuplot.hlp $(DESTDIR)\bin\wgnuplot.hlp
+	copy /Y pgnuplot.exe $(DESTDIR)\bin\pgnuplot.exe
+	copy /Y wgnuplot_pipes.exe $(DESTDIR)\bin\wgnuplot_pipes.exe
+	if not exist $(DESTDIR)\$(GNUPLOT_PS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_PS_DIR)
+	xcopy /Y ..\term\PostScript\*.ps $(DESTDIR)\$(GNUPLOT_PS_DIR)
+	if not exist $(DESTDIR) mkdir $(DESTDIR)
+	for %f in (BUGS README FAQ Copyright NEWS) do copy ..\%f $(DESTDIR)\%f
+	if not exist $(DESTDIR)\share\gnuplot\demo mkdir $(DESTDIR)\share\gnuplot\demo
+	xcopy /Y ..\demo $(DESTDIR)\share\gnuplot\demo

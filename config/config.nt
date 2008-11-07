@@ -28,7 +28,7 @@
 /* #undef DOS32 */
 
 /* Define to allow placement of rectangles and other objects */
-#define EAM_OBJECTS 1
+/* undef EAM_OBJECTS */
 
 /* Define if color information should be passed for each vertex. */
 /* #undef EXTENDED_COLOR_SPECS */
@@ -555,7 +555,8 @@
 #define GP_EXCEPTION_NAME _exception
 #define GP_MATHERR _matherr
 #define snprintf _snprintf
-#define vsnprintf _vsnprintf
+/*#define vsnprintf _vsnprintf*/
+#define isnan _isnan
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1

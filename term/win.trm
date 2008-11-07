@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.62 2008/06/18 23:14:10 sfeam Exp $
+ * $Id: win.trm,v 1.63 2008/09/08 17:56:55 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -85,6 +85,7 @@ TERM_PUBLIC void WIN_set_ruler __PROTO((int, int));
 TERM_PUBLIC void WIN_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void WIN_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void WIN_set_clipboard __PROTO((const char[]));
+TERM_PUBLIC int WIN_waitforinput __PROTO((void));
 #endif
 TERM_PUBLIC int WIN_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void WIN_set_color __PROTO((t_colorspec *));
@@ -466,6 +467,16 @@ WIN_set_clipboard ( const char s[] )
 {
     Graph_set_clipboard(&graphwin, s);
 }
+
+#ifdef WGP_CONSOLE
+
+TERM_PUBLIC int
+WIN_waitforinput  ()
+{
+    return ConsoleGetch();
+}
+
+#endif /* WGP_CONSOLE */
 
 #endif /* USE_MOUSE */
 
@@ -896,7 +907,11 @@ TERM_TABLE_START(win_driver)
     WIN_text /* suspend */ , WIN_resume,
     WIN_boxfill, WIN_linewidth
 #ifdef USE_MOUSE
+# ifdef WGP_CONSOLE
+    , WIN_waitforinput , 
+# else
     , 0 /* WIN_waitforinput */,
+# endif /* WGP_CONSOLE */
     WIN_put_tmptext, WIN_set_ruler, WIN_set_cursor, WIN_set_clipboard
 #endif
     , WIN_make_palette, 0 /* previous_palette */,

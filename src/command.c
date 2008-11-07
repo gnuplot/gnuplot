@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.175 2008/08/13 02:43:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.176 2008/08/15 00:45:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1148,7 +1148,7 @@ pause_command()
     }
 
     if (sleep_time < 0) {
-#ifdef _Windows
+#if defined(_Windows) && !defined(WGP_CONSOLE)
     if (paused_for_mouse && !graphwin.hWndGraph) {
 	if (interactive) { /* cannot wait for Enter in a non-interactive session without the graph window */
 	    char tmp[512];
@@ -2701,6 +2701,9 @@ read_line(const char *prompt)
 	    if (last >= 0) {
 		if (gp_input_line[last] == '\n') {	/* remove any newline */
 		    gp_input_line[last] = NUL;
+		    if (last > 0 && gp_input_line[last-1] == '\r') {
+		        gp_input_line[--last] = NUL;
+		    }
 		    /* Watch out that we don't backup beyond 0 (1-1-1) */
 		    if (last > 0)
 			--last;

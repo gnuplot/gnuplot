@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.101 2008/10/07 20:54:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.102 2008/10/07 21:01:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -443,7 +443,7 @@ main(int argc, char **argv)
     else
 	interactive = FALSE;
 #else
-# if (defined(__MSC__) && defined(_Windows)) || defined(__WIN32__)
+# if ((defined(__MSC__) && defined(_Windows)) || defined(__WIN32__)) && ! defined(WGP_CONSOLE)
     interactive = TRUE;
 # else
     interactive = isatty(fileno(stdin));

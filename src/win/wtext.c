@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.17 2008/05/29 19:55:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.18 2008/06/02 16:07:00 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -71,9 +71,13 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.17 2008/05/29 19:55:44 sfe
 #define TEXTFONTSIZE 9
 #define TEXTFONTNAME "Terminal"
 
+
+#ifndef WGP_CONSOLE
+
 #ifndef EOF /* HBB 980809: for MinGW32 */
 #define EOF -1		/* instead of using <stdio.h> */
 #endif
+
 /* limits */
 #define MAXSTR 256
 POINT ScreenMinSize = {16,4};
@@ -110,11 +114,11 @@ COLORREF TextColorTable[16] = {
 #define TextBack(attr) TextColorTable[(attr>>4) & 15]
 
 
+
 void WDPROC
 TextMessage()
 {
     MSG msg;
-
     while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 #if 1 /* HBB 19990505: Petzold says we should check this: */
         if (msg.message == WM_QUIT)
@@ -124,8 +128,6 @@ TextMessage()
         DispatchMessage(&msg);
     }
 }
-
-
 
 void
 CreateTextClass(LPTW lptw)
@@ -299,94 +301,6 @@ TextClose(LPTW lptw)
     if (lptw->lpmw)
 	CloseMacros(lptw);
     lptw->hWndParent = (HWND)NULL;
-}
-
-void
-WriteTextIni(LPTW lptw)
-{
-    RECT rect;
-    LPSTR file = lptw->IniFile;
-    LPSTR section = lptw->IniSection;
-    char profile[80];
-    int iconic;
-
-
-    if ((file == (LPSTR)NULL) || (section == (LPSTR)NULL))
-	return;
-
-    iconic = IsIconic(lptw->hWndParent);
-    if (iconic)
-	ShowWindow(lptw->hWndParent, SW_SHOWNORMAL);
-    GetWindowRect(lptw->hWndParent,&rect);
-    wsprintf(profile, "%d %d", rect.left, rect.top);
-    WritePrivateProfileString(section, "TextOrigin", profile, file);
-    wsprintf(profile, "%d %d", rect.right-rect.left, rect.bottom-rect.top);
-    WritePrivateProfileString(section, "TextSize", profile, file);
-    wsprintf(profile, "%d", iconic);
-    WritePrivateProfileString(section, "TextMinimized", profile, file);
-    wsprintf(profile, "%s,%d", lptw->fontname, lptw->fontsize);
-    WritePrivateProfileString(section, "TextFont", profile, file);
-    wsprintf(profile, "%d", lptw->bSysColors);
-    WritePrivateProfileString(section, "SysColors", profile, file);
-    if (iconic)
-	ShowWindow(lptw->hWndParent, SW_SHOWMINIMIZED);
-    return;
-}
-
-void
-ReadTextIni(LPTW lptw)
-{
-    LPSTR file = lptw->IniFile;
-    LPSTR section = lptw->IniSection;
-    char profile[81];
-    LPSTR p;
-    BOOL bOKINI;
-
-    bOKINI = (file != (LPSTR)NULL) && (section != (LPSTR)NULL);
-    profile[0] = '\0';
-
-    if (bOKINI)
-	GetPrivateProfileString(section, "TextOrigin", "", profile, 80, file);
-    if ( (p = GetInt(profile, (LPINT)&lptw->Origin.x)) == NULL)
-	lptw->Origin.x = CW_USEDEFAULT;
-    if ( (p = GetInt(p, (LPINT)&lptw->Origin.y)) == NULL)
-	lptw->Origin.y = CW_USEDEFAULT;
-    if ( (file != (LPSTR)NULL) && (section != (LPSTR)NULL) )
-	GetPrivateProfileString(section, "TextSize", "", profile, 80, file);
-    if ( (p = GetInt(profile, (LPINT)&lptw->Size.x)) == NULL)
-	lptw->Size.x = CW_USEDEFAULT;
-    if ( (p = GetInt(p, (LPINT)&lptw->Size.y)) == NULL)
-	lptw->Size.y = CW_USEDEFAULT;
-
-    if (bOKINI)
-	GetPrivateProfileString(section, "TextFont", "", profile, 80, file);
-    {
-	char FAR *size;
-	size = _fstrchr(profile,',');
-	if (size) {
-	    *size++ = '\0';
-	    if ( (p = GetInt(size, &lptw->fontsize)) == NULL)
-		lptw->fontsize = TEXTFONTSIZE;
-	}
-	_fstrcpy(lptw->fontname, profile);
-	if (lptw->fontsize == 0)
-	    lptw->fontsize = TEXTFONTSIZE;
-	if (!(*lptw->fontname))
-	    _fstrcpy(lptw->fontname,TEXTFONTNAME);
-    }
-
-    if (bOKINI) {
-	int iconic;
-	GetPrivateProfileString(section, "TextMinimized", "", profile, 80, file);
-	if ((p = GetInt(profile, &iconic)) == NULL)
-	    iconic = 0;
-	if (iconic)
-	    lptw->nCmdShow = SW_SHOWMINIMIZED;
-    }
-    lptw->bSysColors = FALSE;
-    GetPrivateProfileString(section, "SysColors", "", profile, 80, file);
-    if ((p = GetInt(profile, &lptw->bSysColors)) == NULL)
-	lptw->bSysColors = 0;
 }
 
 
@@ -743,34 +657,6 @@ UpdateMark(LPTW lptw, POINT pt)
     lptw->MarkEnd.x = pt.x;
     lptw->MarkEnd.y = pt.y;
 }
-
-
-#if WINVER >= 0x030a
-/* Windows 3.1 drag-drop feature */
-
-void
-DragFunc(LPTW lptw, HDROP hdrop)
-{
-    int i, cFiles;
-    LPSTR p;
-
-    if ((lptw->DragPre==(LPSTR)NULL) || (lptw->DragPost==(LPSTR)NULL))
-	return;
-    cFiles = DragQueryFile(hdrop, (UINT) -1, (LPSTR)NULL, 0);
-    for (i=0; i<cFiles; i++) {
-	char szFile[MAX_PATH];
-
-	DragQueryFile(hdrop, i, szFile, MAX_PATH);
-	for (p=lptw->DragPre; *p; p++)
-	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
-	for (p=szFile; *p; p++)
-	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
-	for (p=lptw->DragPost; *p; p++)
-	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
-    }
-    DragFinish(hdrop);
-}
-#endif
 
 
 void
@@ -1909,6 +1795,126 @@ TextAttr(LPTW lptw, BYTE attr)
 {
     lptw->Attr = attr;
 }
+
+#endif /* WGP_CONSOLE */
+
+
+#if WINVER >= 0x030a
+/* Windows 3.1 drag-drop feature */
+void
+DragFunc(LPTW lptw, HDROP hdrop)
+{
+    int i, cFiles;
+    LPSTR p;
+
+    if ((lptw->DragPre==(LPSTR)NULL) || (lptw->DragPost==(LPSTR)NULL))
+	return;
+    cFiles = DragQueryFile(hdrop, (UINT) -1, (LPSTR)NULL, 0);
+    for (i=0; i<cFiles; i++) {
+	char szFile[MAX_PATH];
+
+	DragQueryFile(hdrop, i, szFile, MAX_PATH);
+	for (p=lptw->DragPre; *p; p++)
+	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
+	for (p=szFile; *p; p++)
+	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
+	for (p=lptw->DragPost; *p; p++)
+	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
+    }
+    DragFinish(hdrop);
+}
+#endif /* WINVER >= 0x030a */
+
+
+void
+WriteTextIni(LPTW lptw)
+{
+    RECT rect;
+    LPSTR file = lptw->IniFile;
+    LPSTR section = lptw->IniSection;
+    char profile[80];
+    int iconic;
+
+
+    if ((file == (LPSTR)NULL) || (section == (LPSTR)NULL))
+	return;
+
+    iconic = IsIconic(lptw->hWndParent);
+    if (iconic)
+	ShowWindow(lptw->hWndParent, SW_SHOWNORMAL);
+    GetWindowRect(lptw->hWndParent,&rect);
+    wsprintf(profile, "%d %d", rect.left, rect.top);
+    WritePrivateProfileString(section, "TextOrigin", profile, file);
+    wsprintf(profile, "%d %d", rect.right-rect.left, rect.bottom-rect.top);
+    WritePrivateProfileString(section, "TextSize", profile, file);
+    wsprintf(profile, "%d", iconic);
+    WritePrivateProfileString(section, "TextMinimized", profile, file);
+    wsprintf(profile, "%s,%d", lptw->fontname, lptw->fontsize);
+    WritePrivateProfileString(section, "TextFont", profile, file);
+    wsprintf(profile, "%d", lptw->bSysColors);
+    WritePrivateProfileString(section, "SysColors", profile, file);
+    if (iconic)
+	ShowWindow(lptw->hWndParent, SW_SHOWMINIMIZED);
+    return;
+}
+
+
+void
+ReadTextIni(LPTW lptw)
+{
+    LPSTR file = lptw->IniFile;
+    LPSTR section = lptw->IniSection;
+    char profile[81];
+    LPSTR p;
+    BOOL bOKINI;
+
+    bOKINI = (file != (LPSTR)NULL) && (section != (LPSTR)NULL);
+    profile[0] = '\0';
+
+    if (bOKINI)
+	GetPrivateProfileString(section, "TextOrigin", "", profile, 80, file);
+    if ( (p = GetInt(profile, (LPINT)&lptw->Origin.x)) == NULL)
+	lptw->Origin.x = CW_USEDEFAULT;
+    if ( (p = GetInt(p, (LPINT)&lptw->Origin.y)) == NULL)
+	lptw->Origin.y = CW_USEDEFAULT;
+    if ( (file != (LPSTR)NULL) && (section != (LPSTR)NULL) )
+	GetPrivateProfileString(section, "TextSize", "", profile, 80, file);
+    if ( (p = GetInt(profile, (LPINT)&lptw->Size.x)) == NULL)
+	lptw->Size.x = CW_USEDEFAULT;
+    if ( (p = GetInt(p, (LPINT)&lptw->Size.y)) == NULL)
+	lptw->Size.y = CW_USEDEFAULT;
+
+    if (bOKINI)
+	GetPrivateProfileString(section, "TextFont", "", profile, 80, file);
+    {
+	char FAR *size;
+	size = _fstrchr(profile,',');
+	if (size) {
+	    *size++ = '\0';
+	    if ( (p = GetInt(size, &lptw->fontsize)) == NULL)
+		lptw->fontsize = TEXTFONTSIZE;
+	}
+	_fstrcpy(lptw->fontname, profile);
+	if (lptw->fontsize == 0)
+	    lptw->fontsize = TEXTFONTSIZE;
+	if (!(*lptw->fontname))
+	    _fstrcpy(lptw->fontname,TEXTFONTNAME);
+    }
+
+    if (bOKINI) {
+	int iconic;
+	GetPrivateProfileString(section, "TextMinimized", "", profile, 80, file);
+	if ((p = GetInt(profile, &iconic)) == NULL)
+	    iconic = 0;
+	if (iconic)
+	    lptw->nCmdShow = SW_SHOWMINIMIZED;
+    }
+    lptw->bSysColors = FALSE;
+    GetPrivateProfileString(section, "SysColors", "", profile, 80, file);
+    if ((p = GetInt(profile, &lptw->bSysColors)) == NULL)
+	lptw->bSysColors = 0;
+}
+
 
 /* About Box */
 BOOL CALLBACK WINEXPORT

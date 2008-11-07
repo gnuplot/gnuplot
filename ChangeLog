@@ -1,3 +1,47 @@
+2008-11-07  Michael Goffioul  <michael.goffioul@gmail.com>
+
+	SF Patch #1627936: Gnuplot Win32 in console mode
+	Implementation of console mode for Gnuplot under Win32, i.e. non-GUI
+	for the command line. As a result, pgnuplot.exe is a full-featured
+	gnuplot Windows executable with a proper piping capability (i.e. with
+	a standard input) which improves its functionality with external
+	programs like Octave. Up to now, pgnuplot.exe was sending messages to
+	wgnuplot.exe.
+
+	If gnuplot is compiled with defined WGP_CONSOLE, then the result is
+	console mode application. Otherwise, it is the traditional GUI
+	application.
+
+	* NEWS: Updated.
+
+	* config/config.nt config/makefile.nt: Updated to compile the console
+	executable target.
+
+	* src/command.c (pause_command read_line) src/mouse.c
+	(event_buttonrelease) src/plot.c (gnu_main): Minor modifications for
+	WGP_CONSOLE.
+
+	* src/readline.c (win_getch): New routine.
+
+	* src/term.c: Include io.h for _Windows and __MSC__.
+
+	* src/win/wgnuplib.h: Do not declare TextXXXX() routine for WGP_CONSOLE.
+
+	* src/win/wgraph.c: Do not call TextXXXX() if defined WGP_CONSOLE.
+
+	* src/win/winmain.c: Various changes for WGP_CONSOLE. New routines
+	stdin_pipe_reader() and ConsoleGetch().
+
+	* src/win/wtext.h: If not WGP_CONSOLE, then do not declare "the older"
+	routines, else declare ConsoleGetch().
+
+	* src/win/wtext.c: Define TextXXXX() routine only if not WGP_CONSOLE.
+
+	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput): Take care of
+	WGP_CONSOLE.
+
+	* term/win.trm: New routine WIN_waitforinput().
+
 2008-11-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (X11_set_font ENHX11_put_text): Initialize enhanced text

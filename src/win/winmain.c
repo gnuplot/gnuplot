@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.24 2008/05/17 15:37:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.25 2008/10/10 22:23:20 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -62,6 +62,7 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.24 2008/05/17 15:37:27 s
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <fcntl.h>
 #ifdef __MSC__
 # include <malloc.h>
 #endif
@@ -159,10 +160,13 @@ WinExit()
 #endif
 	if (graphwin.hWndGraph && IsWindow(graphwin.hWndGraph))
 		GraphClose(&graphwin);
+#ifndef WGP_CONSOLE
 	TextMessage();	/* process messages */
+#endif
  	WinHelp(textwin.hWndText,(LPSTR)winhelpname,HELP_QUIT,(DWORD)NULL);
-	TextClose(&textwin);
+#ifndef WGP_CONSOLE
 	TextMessage();	/* process messages */
+#endif
 	return;
 }
 
@@ -252,12 +256,22 @@ appdata_directory(void)
 
 #endif /* WIN32 */
 
+#ifndef WGP_CONSOLE
 int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		LPSTR lpszCmdLine, int nCmdShow)
+#else
+int main(int argc, char **argv)
+#endif
 {
 	/*WNDCLASS wndclass;*/
 	LPSTR tail;
 
+#ifdef WGP_CONSOLE
+# define _argv argv
+# define _argc argc
+	HINSTANCE hInstance = NULL, hPrevInstance = NULL;
+	int nCmdShow = 0;
+#else	 
 #ifdef __MSC__  /* MSC doesn't give us _argc and _argv[] so ...   */
 # ifdef WIN32    /* WIN32 has __argc and __argv */
 #  define _argv __argv
@@ -272,6 +286,7 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		_argv[++_argc] = _fstrtok( NULL, " ");
 # endif /* WIN32 */
 #endif /* __MSC__ */
+#endif /* WGP_CONSOLE */
 
 #ifdef	__WATCOMC__
 # define _argv __argv
@@ -364,6 +379,7 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	graphwin.color=TRUE;
 	graphwin.fontsize = WINFONTSIZE;
 
+#ifndef WGP_CONSOLE
 	if (TextInit(&textwin))
 		exit(1);
 	textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
@@ -389,15 +405,21 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		InvalidateRect(textwin.hWndParent, (LPRECT) &rect, 1);
 		UpdateWindow(textwin.hWndParent);
 	}
+#endif
 
 
 	atexit(WinExit);
+
+	if (!isatty(fileno(stdin)))
+		setmode(fileno(stdin), O_BINARY);
 
 	gnu_main(_argc, _argv, environ);
 
 	return 0;
 }
 
+
+#ifndef WGP_CONSOLE
 
 /* replacement stdio routines that use Text Window for stdin/stdout */
 /* WARNING: Do not write to stdout/stderr with functions not listed
@@ -497,7 +519,9 @@ MyFPutC(int ch, FILE *file)
 {
     if (isterm(file)) {
 	MyPutCh((BYTE)ch);
+#ifndef WGP_CONSOLE
 	TextMessage();
+#endif
 	return ch;
     }
     return fputc(ch,file);
@@ -508,7 +532,9 @@ MyFPutS(const char *str, FILE *file)
 {
     if (isterm(file)) {
 	TextPutS(&textwin, (char*) str);
+#ifndef WGP_CONSOLE
 	TextMessage();
+#endif
 	return (*str);	/* different from Borland library */
     }
     return fputs(str,file);
@@ -595,6 +621,91 @@ MyFRead(void *ptr, size_t size, size_t n, FILE *file)
     }
     return fread(ptr, size, n, file);
 }
+
+#else /* WGP_CONSOLE */
+
+DWORD WINAPI stdin_pipe_reader(LPVOID param)
+{
+#if 0
+    HANDLE h = (HANDLE)_get_osfhandle(fileno(stdin));
+    char c;
+    DWORD cRead;
+
+    if (ReadFile(h, &c, 1, &cRead, NULL))
+        return c;
+#else
+    unsigned char c;
+    if (fread(&c, 1, 1, stdin) == 1)
+        return (DWORD)c;
+    return EOF;
+#endif
+}
+
+int ConsoleGetch()
+{
+    int fd = fileno(stdin);
+    HANDLE h;
+    DWORD waitResult;
+
+    if (!isatty(fd))
+        h = CreateThread(NULL, 0, stdin_pipe_reader, NULL, 0, NULL);
+    else
+        h = (HANDLE)_get_osfhandle(fd);
+
+    do
+    {
+        waitResult = MsgWaitForMultipleObjects(1, &h, FALSE, INFINITE, QS_ALLINPUT);
+        if (waitResult == WAIT_OBJECT_0)
+        {
+            if (isatty(fd))
+            {
+                INPUT_RECORD rec;
+                DWORD recRead;
+
+                ReadConsoleInput(h, &rec, 1, &recRead);
+                if (recRead == 1 && rec.EventType == KEY_EVENT && rec.Event.KeyEvent.bKeyDown &&
+                        (rec.Event.KeyEvent.wVirtualKeyCode < VK_SHIFT || 
+                         rec.Event.KeyEvent.wVirtualKeyCode > VK_MENU))
+                {
+                    if (rec.Event.KeyEvent.uChar.AsciiChar)
+                        return rec.Event.KeyEvent.uChar.AsciiChar;
+                    else
+                        switch (rec.Event.KeyEvent.wVirtualKeyCode)
+                        {
+                            case VK_UP: return 020;
+                            case VK_DOWN: return 016;
+                            case VK_LEFT: return 002;
+                            case VK_RIGHT: return 006;
+                            case VK_HOME: return 001;
+                            case VK_END: return 005;
+                            case VK_DELETE: return 004;
+                        }
+                }
+            }
+            else
+            {
+                DWORD c;
+                GetExitCodeThread(h, &c);
+		CloseHandle(h);
+                return c;
+            }
+        }
+        else if (waitResult == WAIT_OBJECT_0+1)
+        {
+            MSG msg;
+
+            while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        else
+            break;
+    } while (1);
+}
+
+#endif /* WGP_CONSOLE */
 
 /* public interface to printer routines : Windows PRN emulation
  * (formerly in win.trm)
