@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.543 2008/10/30 02:42:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.544 2008/11/02 03:38:37 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -265,6 +265,15 @@ C
  `pngcairo` and `pdfcairo`.  These are alternatives to the older libgd-based
  png driver and the older PDFLib-based pdf driver.  The figures in the pdf
  version of this manual were prepared using the pdfcairo terminal driver.
+
+3 New smoothing algorithms
+=kdensity
+=cumulative
+ New smoothing algorithms have been added for both 2- and 3-dimensional plots.
+ `smooth kdensity` and `smooth cumul` can be used with `plot` to draw 
+ smooth histograms and cumulative distribution functions, resp. For use
+ with `splot` several new smoothing kernels have been added to `dgrid3d`.
+ See `smooth` `dgrid3d`.
 
 2 Backwards compatibility
 ?backwards compatibility

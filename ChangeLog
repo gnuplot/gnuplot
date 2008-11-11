@@ -1,3 +1,10 @@
+2008-11-11  Philipp K Janert  <janert@ieee.org>
+	
+	* src/interpol.c (eval_kdensity): Fixing minor defect.
+
+	* docs/gnuplot.doc docs/gnuplot.texi: Include smoothing 
+	algos in New Features section.
+	
 2008-11-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw: Support of WGP_CONSOLE. Choice for targets

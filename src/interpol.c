@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.34 2008/06/26 17:00:50 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.35 2008/06/27 03:59:45 janert Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -291,7 +291,9 @@ eval_kdensity (
       max = this_points[i].x > max ? this_points[i].x : max;
     }
     avg /= (double)n;
-    sigma = sqrt( (sigma - avg*avg)/(double)n ); /* Standard Deviation */
+
+    /*  sigma = sqrt( (sigma - avg*avg)/(double)n ); /* Standard Deviation */
+    sigma = sqrt( sigma/(double)n - avg*avg ); /* Standard Deviation */
     
     /* This is the optimal bandwidth if the point distribution is Gaussian.
        (Applied Smoothing Techniques for Data Analysis

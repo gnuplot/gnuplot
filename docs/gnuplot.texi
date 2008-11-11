@@ -355,6 +355,7 @@ NEWS file.
 * Volatile_Data::               
 * Canvas_size::                 
 * New_plot_elements::           
+* New_smoothing_algorithms::    
 * New_or_revised_terminal_drivers::  
 @end menu
 
@@ -429,7 +430,7 @@ however it is a change in the way the png driver worked for single plots in
 version 4.0.
 
 
-@node New_plot_elements, New_or_revised_terminal_drivers, Canvas_size, New_features_introduced_in_version_4.3
+@node New_plot_elements, New_smoothing_algorithms, Canvas_size, New_features_introduced_in_version_4.3
 @subsection New plot elements
 
 @cindex circles
@@ -441,7 +442,17 @@ as well as rectangles. There is a corresponding new plot style
 @ref{circles}.  See @ref{circles} @ref{ellipse}.
 
 
-@node New_or_revised_terminal_drivers,  , New_plot_elements, New_features_introduced_in_version_4.3
+@node New_smoothing_algorithms, New_or_revised_terminal_drivers, New_plot_elements, New_features_introduced_in_version_4.3
+@subsection New smoothing algorithms
+
+New smoothing algorithms have been added for both 2- and 3-dimensional plots.
+`smooth kdensity` and `smooth cumul` can be used with `plot` to draw 
+smooth histograms and cumulative distribution functions, resp. For use
+with `splot` several new smoothing kernels have been added to @ref{dgrid3d}.
+See @ref{smooth} @ref{dgrid3d}.
+
+
+@node New_or_revised_terminal_drivers,  , New_smoothing_algorithms, New_features_introduced_in_version_4.3
 @subsection New or revised terminal drivers
 
 Two new drivers based on the cairo and pango libraries are included,
