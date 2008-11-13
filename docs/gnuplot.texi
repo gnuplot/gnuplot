@@ -593,7 +593,7 @@ Example:
       set size 0.5, 0.5
       set term png size 600, 400
       set output "figure.png"
-      plot "data" using lines
+      plot "data" with lines
 
 @end example
 
@@ -2585,15 +2585,25 @@ See `linestyle`, `set style line`.
 
 @cindex rgbcolor
 
+@cindex lc
+
+@cindex linecolor
+
+@cindex tc
+
+@cindex textcolor
+
 @cindex colors
 
-Many commands allow you to specify a linetype with an explicit color. This
-option is only possible for terminals that support RGB color or pm3d palettes.
+Many commands allow you to specify a linetype with an explicit color.
+Note that not all terminals support RGB colors or pm3d palette colors.
 
 Syntax:
 
 @example
       ... @{linetype | lt@} <colorspec>
+      ... @{linecolor | lc@} <colorspec>
+      ... @{textcolor | tc@} <colorspec>
 
 @end example
 
@@ -2606,6 +2616,7 @@ where <colorspec> has one of the following forms:
       palette frac <val>      # <val> runs from 0 to 1
       palette cb <value>      # <val> lies within cbrange
       palette z
+      variable                # color index is read from input file
 
 @end example
 
@@ -2621,7 +2632,7 @@ be represented by #FF00FF, which is the hexadecimal representation of
 "rgb variable" requires an additional column in the @ref{using} specifier, and
 is only available in 3D plotting mode (splot). The extra column is interpreted
 as a 24-bit packed RGB triple. These are most easily specified in a data file
-as hexidecimal values (see above).
+as hexadecimal values (see above).
 
 Example:
 
@@ -2643,6 +2654,50 @@ palette.
 cbrange mapping of the palette. This allows smoothly-varying color along a
 3D line or surface.  It also allows coloring 2D plots by palette values read
 from an extra column of data.
+
+@menu
+* linecolor_variable::          
+@end menu
+
+@node linecolor_variable,  , colorspec, colorspec
+@subsubsection linecolor variable
+
+@c ?linecolor variable
+@c ?lc variable
+@c ?textcolor variable
+@c ?tc variable
+Most plot commands assign a single color (linetype) to each element of the
+plot.  If there are multiple plots on a single graph, the default color
+(linetype) is incremented sequentially.  You can instead assign a separate
+color for each data point, line segment, or label based on additional 
+information in the input data file.  This is indicated by the colorspec
+keyword `variable`. 
+
+`lc variable` tells the program to use the value read from one column of the
+input data as a linestyle index, and use the color belonging to that linestyle.
+This requires a corresponding additional column in the @ref{using} specifier.
+Text colors can be set similarly using `tc variable`.
+
+A single data file may contain multiple sets of data, separated by two blank
+lines. Each of these separate sets is assigned an index value (see @ref{index})
+that can be retrieved via the using specifier column(-2). See `pseudocolumns`.
+All data in the file is drawn with the same color/linestyle/pointtype
+properties by default.  The command `lc variable` can be used to assign
+different colors to each data set in the file by using the index value from
+pseudocolumn -2.
+
+Examples:
+@example
+      # Use the third column of data to assign colors to individual points
+      plot 'data' using 1:2:3 with points lc variable
+
+@end example
+
+@example
+      # Use the data set index to choose a linestyle color
+      plot 'data' using 1:2:(column(-2)) with lines lc variable
+
+@end example
 
 
 @node mouse_input, Plotting, linetype, gnuplot
@@ -4477,12 +4532,13 @@ Only one column (the y value) need be provided.  If x is omitted, `gnuplot`
 provides integer values starting at 0.
 
 In datafiles, blank records (records with no characters other than blanks and
-a newline and/or carriage return) are significant---pairs of blank records
-separate @ref{index}es (see @ref{index}).  Data separated by double
-blank records are treated as if they were in separate data files.
+a newline and/or carriage return) are significant.
 
 Single blank records designate discontinuities in a `plot`; no line will join
 points separated by a blank records (if they are plotted with a line style).
+
+Two blank records in a row indicate a break between separate data sets.
+See @ref{index}.
 
 If autoscaling has been enabled (@ref{autoscale}), the axes are automatically
 extended to include all datapoints, with a whole number of tic marks if tics
@@ -4520,7 +4576,7 @@ general binary format.
 
 The matrix binary format contains a two dimensional array of 32 bit IEEE
 float values with an additional column and row of coordinate values.  As
-with ASCII matrix, in the using list, repetition of the coordinate row
+with ASCII matrix, in the @ref{using} list, repetition of the coordinate row
 constitutes column 1, repetition of the coordinate column constitutes
 column 2, and the array of values constitutes column 3.
 
@@ -4532,7 +4588,7 @@ and changing endianess.  There are a set of commands for positioning and
 translating data since often coordinates are not part of the file when
 uniform sampling is inherent in the data.  Different from matrix binary or
 ASCII, general binary does not treat the generated columns as 1, 2 or 3 in
-the using list.  Rather, column 1 begins with column 1 of the file, or as
+the @ref{using} list.  Rather, column 1 begins with column 1 of the file, or as
 specified in the `format` list.
 
 There are global default settings for the various binary options which may
@@ -4829,7 +4885,7 @@ that assumed by gnuplot.  These keywords can flip the scanning direction along
 dimensions x, y, z.
 
 
-@noindent --- ORIGIN ---
+@noindent --- ORIGIN  ---
 
 @c ?binary general keywords origin
 When gnuplot generates coordinates based upon transposition and flip, it
@@ -5038,8 +5094,8 @@ The file "population.dat" might contain:
 @c ?datafile index
 @cindex index
 
-The @ref{index} keyword allows only some of the data sets in a multi-data-set
-file to be plotted.
+The @ref{index} keyword allows you to select specific data sets in a multi-data-set
+file for plotting.
 
 Syntax:
 @example
@@ -5057,6 +5113,20 @@ the file.  Specifying too large an index results in an error message.  If
 Example:
 @example
       plot 'file' index 4:5
+
+@end example
+
+For each point in the file, the index value of the data set it appears in is
+available via the pseudo-column `column(-2)`.  This leads to an alternative way
+of distinguishing individual data sets within a file as shown below.  This is
+more awkward that the @ref{index} command if all you are doing is selecting one
+data set for plotting, but is very useful if you want to assign different
+properties to each data set.  See `pseudocolumns`, `lc variable`.
+
+Example:
+@example
+      plot 'file' using 1:(column(-2)==4 ? $2 : NaN)        # very awkward
+      plot 'file' using 1:2:(column(-2)) linecolor variable # very useful!
 
 @end example
 
@@ -5393,34 +5463,32 @@ Syntax:
 
 If a format is specified, each datafile record is read using the C library's
 'scanf' function, with the specified format string.  Otherwise the record is
-read and broken into columns at spaces or tabs.  A format cannot be specified
-this way for time-format data (instead use `set xdata time`).
+read and broken into columns. By default the separation between columns is
+whitespace (spaces and/or tabs), but see `datafile separator`.
 
-The resulting array of data is then sorted into columns according to the
-entries.  Each <entry> may be a simple column number, which selects the
-datum, an expression enclosed in parentheses, or empty.  The expression can
-use $1 to access the first item read, $2 for the second item, and so on.  It
-can also use `column(x)` and `valid(x)` where x is an arbitrary expression
-resulting in an integer.  `column(x)` returns the x'th datum; `valid(x)`
-tests that the datum in the x'th column is a valid number.  A column number
-of 0 generates a number increasing (from zero) with each point, and is reset
-upon encountering two blank records.  A column number of -1 gives the
-dataline number, which starts at 0, increments at single blank records, and
-is reset at double blank records.  A column number of -2 gives the index
-number, which is incremented only when two blank records are found.  An empty
-<entry> will default to its order in the list of entries.  For example,
-`using ::4` is interpreted as `using 1:2:4`.
+Each <entry> may be a simple column number that selects the value from one
+field of the input fit, an expression enclosed in parentheses, or empty.
 
-N.B.---the @ref{call} command also uses $'s as a special character.  See @ref{call}
-for details about how to include a column number in a @ref{call} argument list.
+If the entry is an expression in parentheses, then the function column(N) may
+be used to indicate the value in column N. That is, column(1) refers to the
+first item read, column(2) to the second, and so on.  The special symbols
+$1, $2, ... are shorthand for column(1), column(2) ...  The function `valid(N)`
+tests whether the value in the Nth column is a valid number.
+
+In addition to the actual columns 1...N in the input data file, gnuplot
+presents data from several "pseudo-columns" that hold bookkeeping information.
+E.g. $0 or column(0) returns the sequence number of this data record within a
+dataset.  Please see `pseudocolumns`.
+
+An empty <entry> will default to its order in the list of entries.
+For example, `using ::4` is interpreted as `using 1:2:4`.
 
 If the @ref{using} list has but a single entry, that <entry> will be used for y
-and the data point number is used for x; for example, "`plot 'file' using 1`"
-is identical to "`plot 'file' using 0:1`".  If the @ref{using} list has two
-entries, these will be used for x and y.  Additional entries are usually
-errors in x and/or y.  See @ref{style} for details about plotting styles that
-make use of error information, and @ref{fit} for use of error information in
-curve fitting.
+and the data point number (pseudo-column $0) is used for x; for example,
+"`plot 'file' using 1`" is identical to "`plot 'file' using 0:1`".
+If the @ref{using} list has two entries, these will be used for x and y.
+See @ref{style} and @ref{fit} for details about plotting styles that make use of
+data from additional columns of input.
 
 'scanf' accepts several numerical specifications but `gnuplot`
 requires all inputs to be double-precision floating-point variables,
@@ -5434,8 +5502,15 @@ in the input stream must be explicitly skipped.
 Note that the use of "\t", "\n", or "\f" requires use of double-quotes
 rather than single-quotes.
 
-Examples:
 
+@noindent --- USING_EXAMPLES ---
+
+@cindex examples
+
+@c ?commands plot datafile using examples
+@c ?plot datafile using examples
+@c ?datafile using examples
+@c ?using examples
 This creates a plot of the sum of the 2nd and 3rd data against the first:
 The format string specifies comma- rather than space-separated columns.
 The same result could be achieved by specifying `set datafile separator ","`.
@@ -6434,7 +6509,7 @@ when the variable was initially defined.
 * mytics::                      
 * mztics::                      
 * offsets::                     
-* origin_::                     
+* origin::                      
 * output::                      
 * parametric_::                 
 * plot_::                       
@@ -7033,7 +7108,7 @@ way the border lines are drawn can be influenced (limited by what the current
 terminal driver supports).
 
 For `plot`, tics may be drawn on edges other than bottom and left by enabling
-the second axes -- see @ref{xtics} for details.
+the second axes -- see `set xtics` for details.
 
 If a `splot` draws only on the base, as is the case with "`unset surface; set
 contour base`", then the verticals and the top are not drawn even if they are
@@ -7628,6 +7703,8 @@ will be treated as missing data.
 @subsubsection set datafile separator
 
 @c ?set datafile separator
+@c ?show datafile separator
+@c ?datafile separator
 @cindex separator
 
 The command `set datafile separator "<char>"` tells `gnuplot` that data fields
@@ -8104,7 +8181,7 @@ to 100 characters.  If the format string is omitted, the format will
 be returned to the default "% g".  For LaTeX users, the format "$%g$"
 is often desirable.  If the empty string "" is used, no label will be
 plotted with each tic, though the tic mark will still be plotted.  To
-eliminate all tic marks, use @ref{xtics} or @ref{ytics}.
+eliminate all tic marks, use `unset xtics` or @ref{ytics}.
 
 Newline (\n) is accepted in the format string.  Use double-quotes rather than
 single-quotes to enable such interpretation.  See also `syntax`.
@@ -8119,7 +8196,7 @@ Characters not preceded by "%" are printed verbatim.  Thus you can include
 spaces and labels in your format string, such as "%g m", which will put " m"
 after each number.  If you want "%" itself, double it: "%g %%".
 
-See also @ref{xtics} for more information about tic labels, and
+See also `set xtics` for more information about tic labels, and
 @ref{decimalsign} for how to use non-default decimal separators in numbers
 printed this way.
 See also
@@ -8381,7 +8458,7 @@ functions. Since @ref{hidden3d} mode does its own sorting, it ignores
 all grid drawing order options and passes the grid lines through the
 hidden line removal machinery instead. These options actually affect
 not only the grid, but also the lines output by @ref{border} and the
-various ticmarks (see @ref{xtics}).
+various ticmarks (see `set xtics`).
 
 Z grid lines are drawn on the bottom of the plot.  This looks better if a
 partial box is drawn around the plot---see @ref{border}.
@@ -9620,7 +9697,7 @@ Major tics with special formatting, minor tics at log positions
 
 By default, minor tics are off for linear axes and on for logarithmic axes.
 They inherit the settings for `axis|border` and `@{no@}mirror` specified for
-the major tics.  Please see @ref{xtics} for information about these.
+the major tics.  Please see `set xtics` for information about these.
 
 @node my2tics, mytics, mxtics, set-show
 @subsection my2tics
@@ -9675,7 +9752,7 @@ see @ref{mxtics}.
 Minor tic marks along the z axis are controlled by @ref{mztics}.  Please
 see @ref{mxtics}.
 
-@node offsets, origin_, mztics, set-show
+@node offsets, origin, mztics, set-show
 @subsection offsets
 
 @c ?commands set offsets
@@ -9720,7 +9797,7 @@ Example:
 This graph of sin(x) will have a y range [-3:3] because the function
 will be autoscaled to [-1:1] and the vertical offsets are each two.
 
-@node origin_, output, offsets, set-show
+@node origin, output, offsets, set-show
 @subsection origin
 
 @c ?commands set origin
@@ -9742,7 +9819,7 @@ Syntax:
 
 @end example
 
-@node output, parametric_, origin_, set-show
+@node output, parametric_, origin, set-show
 @subsection output
 
 @c ?commands set output
@@ -12463,12 +12540,18 @@ Syntax:
                @{@{no@}rotate @{by <ang>@}@} @{offset <offset> | nooffset@}
                @{ format "formatstring" @} @{ font "name@{,<size>@}" @}
                @{ textcolor <colorspec> @}
+      set tics @{front | back@}
       unset tics
       show tics
 
 @end example
 
-All specified options apply to all axes, i.e., x, y, z, x2, y2, and cb.
+The options in the first set above can be applied individually to 
+any or all axes, i.e., x, y, z, x2, y2, and cb.
+
+Set tics `front` or `back` applies to all axes at once, but only for 2D plots
+(not splot).  It controls whether the tics are placed behind or in front of
+the plot elements, in the case that there is overlap.
 
 `axis` or @ref{border} tells `gnuplot` to put the tics (both the tics themselves
 and the accompanying labels) along the axis or the border, respectively.  If
@@ -12504,7 +12587,7 @@ See `coordinates` for details. `nooffset` switches off the offset.
 `set tics` with no options restores to place tics inwards. Every other
 options are retained.
 
-See also @ref{xtics} for more control of major (labelled) tic marks and
+See also `set xtics` for more control of major (labelled) tic marks and
 @ref{mxtics} for control of minor tic marks.  These commands provide control
 at a axis by axis basis.
 
@@ -12936,7 +13019,7 @@ the x2 (top) axis.  Please see @ref{xrange} for details.
 @cindex nox2tics
 
 The @ref{x2tics} command controls major (labelled) tics on the x2 (top) axis.
-Please see @ref{xtics} for details.
+Please see `set xtics` for details.
 
 @node x2zeroaxis, xdata, x2tics, set-show
 @subsection x2zeroaxis
@@ -13280,8 +13363,8 @@ To autoscale xmin while leaving xmax unchanged:
 @cindex noxtics
 
 Fine control of the major (labelled) tics on the x axis is possible with the
-@ref{xtics} command.  The tics may be turned off with the @ref{xtics}
-command, and may be turned on (the default state) with @ref{xtics}.  Similar
+`set xtics` command.  The tics may be turned off with the `unset xtics`
+command, and may be turned on (the default state) with `set xtics`.  Similar
 commands control the major tics on the y, z, x2 and y2 axes.
 
 Syntax:
@@ -13295,6 +13378,7 @@ Syntax:
                  | <start>, <incr> @{,<end>@}
                  | (@{"<label>"@} <pos> @{<level>@} @{,@{"<label>"@}...) @}
                 @{ format "formatstring" @} @{ font "name@{,<size>@}" @}
+                @{ rangelimited @}
                 @{ textcolor <colorspec> @}
       unset xtics
       show xtics
@@ -13343,7 +13427,7 @@ Move xtics more closely to the plot.
 
 @end example
 
-@ref{xtics} with no options restores the default border or axis if xtics are
+`set xtics` with no options restores the default border or axis if xtics are
 being displayed;  otherwise it has no effect.  Any previously specified tic
 frequency or position @{and labels@} are retained.
 
@@ -13455,8 +13539,19 @@ the explicit text of a label is included in the `set xtics ("<label>")` form.
 Minor (unlabelled) tics can be added automatically by the @ref{mxtics}
 command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
 
-In case of timeseries data, position values must be given as quoted dates
-or times according to the format @ref{timefmt}.  If the <start>, <incr>, <end>
+@menu
+* xtics_time_data::             
+* xtics_rangelimited::          
+@end menu
+
+@node xtics_time_data, xtics_rangelimited, xtics, xtics
+@subsubsection xtics time_data
+
+@c ?set xtics time_axis tics
+@c ?xtics time_axis tics
+@c ?time_axis tics
+In case of timeseries data, axis tic position values must be given as quoted
+dates or times according to the format @ref{timefmt}. If the <start>, <incr>, <end>
 form is used, <start> and <end> must be given according to @ref{timefmt}, but
 <incr> must be in seconds.  Times will be written out according to the format
 given on `set format`, however.
@@ -13482,6 +13577,32 @@ Examples:
 Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the
 second example the tic at "Dec 3" will be unlabelled.
 
+@node xtics_rangelimited,  , xtics_time_data, xtics
+@subsubsection xtics rangelimited
+
+@c ?set xtics rangelimited
+@c ?xtics rangelimited
+@cindex rangelimited
+
+@cindex range-frame
+
+This option limits both the auto-generated axis tic labels and the
+corresponding plot border to the range of values actually present in the data
+that has been plotted.  Note that this is independent of the current range 
+limits for the plot. For example, suppose that the data in "file.dat" all lies
+in the range 2 < y < 4.  Then the following commands will create a plot for
+which the left-hand plot border (y axis) is drawn for only this portion of the
+total y range, and only the axis tics in this region are generated.
+I.e., the plot will be scaled to the full range on y, but there will be a gap
+between 0 and 2 on the left border and another gap between 4 and 10. This
+style is sometimes refered to as a `range-frame` graph.
+@example
+      set border 3
+      set yrange [0:10]
+      set ytics nomirror rangelimited
+      plot "file.dat"
+
+@end example
 
 @node xyplane, xzeroaxis, xtics, set-show
 @subsection xyplane
@@ -13642,7 +13763,7 @@ the y2 (right-hand) axis.  Please see @ref{xrange} for details.
 @cindex noy2tics
 
 The @ref{y2tics} command controls major (labelled) tics on the y2 (right-hand)
-axis.  Please see @ref{xtics} for details.
+axis.  Please see `set xtics` for details.
 
 @node y2zeroaxis, ydata, y2tics, set-show
 @subsection y2zeroaxis
@@ -13755,7 +13876,7 @@ the y axis.  Please see @ref{xrange} for details.
 @cindex noytics
 
 The @ref{ytics} command controls major (labelled) tics on the y axis.
-Please see @ref{xtics} for details.
+Please see `set xtics` for details.
 
 @node yzeroaxis, zdata, ytics, set-show
 @subsection yzeroaxis
@@ -14000,7 +14121,7 @@ The zrange is used only by `splot` and is ignored by `plot`.  Please see
 @cindex noztics
 
 The @ref{ztics} command controls major (labelled) tics on the z axis.
-Please see @ref{xtics} for details.
+Please see `set xtics` for details.
 
 @node cblabel, cbmtics, ztics, set-show
 @subsection cblabel
@@ -14071,7 +14192,7 @@ Please see @ref{xrange} for details on @ref{cbrange} syntax. See also
 @cindex nocbtics
 
 The @ref{cbtics} command controls major (labelled) tics on the color box axis.
-Please see @ref{xtics} for details.
+Please see `set xtics` for details.
 
 @node shell, splot, set-show, Commands
 @section shell
@@ -19716,11 +19837,10 @@ libraries and may have been fixed indepently of any changes in gnuplot.
 
 @menu
 * Gnuplot_limitations::         
-* Specific_terminals::          
 * External_libraries::          
 @end menu
 
-@node Gnuplot_limitations, Specific_terminals, Bugs, Bugs
+@node Gnuplot_limitations, External_libraries, Bugs, Bugs
 @section Gnuplot limitations
 
 @c ?bugs gnuplot
@@ -19766,17 +19886,7 @@ The 'nohidden3d' option that is supposed to exempt individual plots from the
 global property 'set hidden3d' does not work for parametric curves.
 
 
-@node Specific_terminals, External_libraries, Gnuplot_limitations, Bugs
-@section Specific terminals
-
-@c ?bugs terminals
-Some older models of HP plotters do not have a page eject command 'PG'.  The
-current HPGL driver uses this command in HPGL_reset.  This may need to be
-removed for these plotters.  The current PCL5 driver uses HPGL/2 for text as
-well as graphics.  This should be modified to use scalable PCL fonts.
-
-
-@node External_libraries,  , Specific_terminals, Bugs
+@node External_libraries,  , Gnuplot_limitations, Bugs
 @section External libraries
 
 @c ?bugs external_libraries
