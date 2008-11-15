@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.88 2008/03/02 22:32:13 sfeam Exp $
+ * $Id: cgm.trm,v 1.89 2008/03/03 21:38:18 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -117,7 +117,7 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 				/* convert from plot units to pt */
 #define CGM_PT ((term->xmax + CGM_MARGIN)/cgm_plotwidth)
 #define CGM_LINE_TYPES 9	/* number of line types we support */
-#define CGM_COLORS WEB_N_COLORS	/* sizeof(web_color_rgbs)  currently in bitmap.c */
+#define CGM_COLORS 96		/* must not exceed size of pm3d_color_names_tbl[] */
 #define CGM_POINTS 13		/* number of markers we support */
 #define CGM_MAX_SEGMENTS 16382	/* maximum # polyline coordinates */
 #define CGM_VCHAR (CGM_SMALL/360*12)
@@ -524,9 +524,9 @@ CGM_options()
 
 	for (i = cgm_user_color_count, j = cgm_user_color_count * 3;
 		     i < CGM_COLORS; i++, j+=3) {
-		cgm_user_color_table[j+1] = web_color_rgbs[i].r;
-		cgm_user_color_table[j+2] = web_color_rgbs[i].g;
-		cgm_user_color_table[j+3] = web_color_rgbs[i].b;
+		cgm_user_color_table[j+1] = (pm3d_color_names_tbl[i].value >> 16) & 0xff;
+		cgm_user_color_table[j+2] = (pm3d_color_names_tbl[i].value >>  8) & 0xff;
+		cgm_user_color_table[j+3] = (pm3d_color_names_tbl[i].value      ) & 0xff;
 	}
 
 	cgm_user_color_count = CGM_COLORS;

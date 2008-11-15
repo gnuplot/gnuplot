@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.127 2008/06/02 03:42:18 sfeam Exp $
+ * $Id: gd.trm,v 1.128 2008/09/30 04:55:06 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -103,6 +103,8 @@
 
 /* Approximate "fillstyle solid FRAC " for indexed palettes */
 #define PASTEL_PALETTE
+
+#define GD_DEFINED_COLORS	96	/* Must not exceed size of pm3d_color_names_tbl[] */
 
 #include "driver.h"
 
@@ -1416,13 +1418,10 @@ PNG_graphics()
     png_state.charh = term->v_char;	/* png_state.font->h; */
     png_state.font = png_state.default_font;
     png_state.color = 0;
-    for (i = png_state.n_colors; i < WEB_N_COLORS; i++)
-	png_state.rgb_table[i] =
-	    (web_color_rgbs[i].r << 16) |
-	    (web_color_rgbs[i].g << 8) |
-	    web_color_rgbs[i].b;
-    if (png_state.n_colors < WEB_N_COLORS)
-	png_state.n_colors = WEB_N_COLORS;
+    for (i = png_state.n_colors; i < GD_DEFINED_COLORS; i++)
+	png_state.rgb_table[i] = pm3d_color_names_tbl[i].value;
+    if (png_state.n_colors < GD_DEFINED_COLORS)
+	png_state.n_colors = GD_DEFINED_COLORS;
     for (i = 0; i < png_state.n_colors; i++) {
 	rgb = png_state.rgb_table[i];
 	png_state.color_table[i] =

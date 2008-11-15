@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.66 2008/06/01 06:11:24 sfeam Exp $
+ * $Id: tables.h,v 1.67 2008/11/01 03:48:52 sfeam Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -196,11 +196,6 @@ enum filledcurves_opts_id {
 };
 
 extern const struct gen_table command_tbl[];
-/* pm 011129: unused for 2 yers, therefore #if 0 .. #endif; in future should
- * be split into datafile_tbl and plot_tbl: */
-#if 0
-extern const struct gen_table plot_tbl[];
-#endif
 extern const struct gen_table plot_axes_tbl[];
 extern const struct gen_table plot_smooth_tbl[];
 extern const struct gen_table save_tbl[];
@@ -211,10 +206,15 @@ extern const struct gen_table set_colorbox_tbl[];
 extern const struct gen_table set_palette_tbl[];
 extern const struct gen_table set_pm3d_tbl[];
 extern const struct gen_table color_model_tbl[];
-extern const struct gen_table pm3d_color_names_tbl[];
 extern const struct gen_table set_hidden3d_tbl[];
 extern const struct gen_table show_style_tbl[];
 extern const struct gen_table plotstyle_tbl[];
+
+/* EAM Nov 2008 - this is now dynamic, so we can add colors on the fly */
+extern       struct gen_table *user_color_names_tbl;
+extern       struct gen_table *pm3d_color_names_tbl;
+extern const int num_predefined_colors;
+extern int num_userdefined_colors;
 
 extern const struct gen_ftable command_ftbl[];
 

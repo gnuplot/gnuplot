@@ -1,5 +1,5 @@
 /*
- * $Id: bitmap.h,v 1.12 2001/08/27 15:02:14 broeker Exp $
+ * $Id: bitmap.h,v 1.13 2004/04/13 17:23:52 broeker Exp $
  */
 
 /* GNUPLOT - bitmap.h */
@@ -78,19 +78,6 @@ extern unsigned int b_rastermode; /* raster mode rotates -90deg */
 extern unsigned int b_linemask;	/* 16 bit mask for dotted lines */
 extern unsigned int b_angle;	/* rotation of text */
 extern int b_maskcount;
-
-/* RGB colour table moved out of gif.trm */
-/*
- * Common RGB color table for use by all devices.
- * It's a subset of the 216-color Web palette.
- */
-#define WEB_N_COLORS 99
-struct rgb
-{
-    unsigned char r, g, b;
-};
-
-extern struct rgb web_color_rgbs[];
 
 
 /* Prototypes from file "bitmap.c" */

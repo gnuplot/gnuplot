@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.80 2008/05/08 19:55:42 sfeam Exp $
+ * $Id: pdf.trm,v 1.81 2008/09/30 04:55:08 sfeam Exp $
  */
 
 /*------------------------------
@@ -619,10 +619,10 @@ PDF_linetype (int linetype)
 	PDF_current_gray = 0.0;
 	PDF_setgray(myPDF, PDF_current_gray);
     } else {
-	struct rgb *this_color = web_color_rgbs + 1 + linetype;
-	PDF_current_rgb.r = this_color->r / 255.0;
-	PDF_current_rgb.g = this_color->g / 255.0;
-	PDF_current_rgb.b = this_color->b / 255.0;
+	unsigned int irgb = pm3d_color_names_tbl[1+linetype].value;
+	PDF_current_rgb.r = (double)((irgb >> 16) & 0xff) / 255.;
+	PDF_current_rgb.g = (double)((irgb >>  8) & 0xff) / 255.;
+	PDF_current_rgb.b = (double)((irgb      ) & 0xff) / 255.;
 	PDF_setrgbcolor(myPDF, PDF_current_rgb.r, PDF_current_rgb.g, PDF_current_rgb.b);
     }
 
@@ -1365,10 +1365,10 @@ TERM_PUBLIC void
 PDF_set_color(t_colorspec *colorspec)
 {
     if (colorspec->type == TC_LT) {
-        struct rgb *this_color = web_color_rgbs + 1 + PDF_Pen_RealID(colorspec->lt);
-	PDF_current_rgb.r = this_color->r / 255.0;
-	PDF_current_rgb.g = this_color->g / 255.0;
-	PDF_current_rgb.b = this_color->b / 255.0;
+	unsigned int irgb = pm3d_color_names_tbl[ 1 + PDF_Pen_RealID(colorspec->lt) ].value;
+	PDF_current_rgb.r = (double)((irgb >> 16) & 0xff) / 255.;
+	PDF_current_rgb.g = (double)((irgb >>  8) & 0xff) / 255.;
+	PDF_current_rgb.b = (double)((irgb      ) & 0xff) / 255.;
 	PDF_current_gray = 0.0; /* monochrome mode only */
     } else if (colorspec->type == TC_FRAC) {
 	rgb1maxcolors_from_gray( colorspec->value, &PDF_current_rgb);
@@ -1592,7 +1592,7 @@ ENHPDF_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
 
-    if (ignore_enhanced_text || !PDF_fontNameCur) {
+    if (ignore_enhanced_text) {
 	PDF_put_text(x,y,str);
 	return;
     }

@@ -1,3 +1,11 @@
+2008-11-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/bitmap.c src/bitmap.h src/tables.c src/tables.h src/show.c
+	term/cgm.trm term/gd.trm term/pdf.trm:
+	Consolidate the list of RGB color names and the list of RGB colors used
+	for palette construction into a single table. Generalize the colorname
+	dump routine so that it will be able to handle additional color lists.
+
 2008-11-11  Philipp K Janert  <janert@ieee.org>
 	
 	* src/interpol.c (eval_kdensity): Fixing minor defect.

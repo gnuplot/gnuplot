@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.219 2008/08/19 18:48:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.220 2008/09/06 03:42:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2096,13 +2096,11 @@ show_palette_gradient()
 	}
 }
 
-
+/* Helper function for show_palette_colornames() */
 static void
-show_palette_colornames()
+show_colornames(const struct gen_table *tbl)
 {
-    const struct gen_table *tbl = pm3d_color_names_tbl;
     int i=0;
-    fputs( "\tList of known color names:", stderr );
     while (tbl->key) {
 	/* Print color names and their rgb values, table with 1 column */
 	int r = ((tbl->value >> 16 ) & 255);
@@ -2116,6 +2114,13 @@ show_palette_colornames()
     }
     fputs( "\n", stderr );
     ++c_token;
+}
+
+static void
+show_palette_colornames()
+{
+    fprintf(stderr, "\tThere are %d predefined color names:", num_predefined_colors);
+    show_colornames(pm3d_color_names_tbl);
 }
 
 
@@ -2194,7 +2199,7 @@ show_palette()
         show_palette_rgbformulae();
 	return;
     }
-    else if (almost_equals(c_token, "color$names" )) {
+    else if (equals(c_token, "colors") || almost_equals(c_token, "color$names" )) {
         /* 'show palette colornames' */
         show_palette_colornames();
 	return;
