@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.95.2.12 2007/12/14 05:25:38 sfeam Exp $
+ * $Id: gd.trm,v 1.95.2.13 2008/04/06 21:37:29 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -760,7 +760,7 @@ PNG_options()
 			0.0, 0, 0, "test");
 		if (err) {
 			fprintf(stderr,
-				"%s when opening font %s, using default\n",
+				"%s when opening font %s, trying default\n",
 				err, png_state.ttffont);
 			free(png_state.ttffont);
 			free(png_state.default_ttffont);
@@ -770,7 +770,7 @@ PNG_options()
 	    }
 #else
 	    c_token++;
-	    fprintf(stderr,"No TTF font support, using default\n");
+	    fprintf(stderr,"No TTF font support, using internal non-scalable font\n");
 #endif
 	    break;
 	case PNG_SIZE:
@@ -919,27 +919,29 @@ PNG_options()
 
 #ifdef HAVE_GD_TTF
     /* If no font has been chosen but there is a default, use it */
-    /* EAM FIXME - this is a duplication of code from above */
     if (!png_state.ttffont) {
 	char *external_default = getenv("GNUPLOT_DEFAULT_GDFONT");
-	if (external_default) {
-		int brect[8];
-		char *err;
-		png_state.ttffont = gp_strdup(external_default);
+	int brect[8];
+	char *err;
+
+	if (external_default)
+	    png_state.ttffont = gp_strdup(external_default);
+	else	/* Might as well try some plausible font; it's no worse than failing immediately */
+	    png_state.ttffont = gp_strdup("arial");
+
+	free(png_state.default_ttffont);
+	png_state.default_ttffont = gp_strdup(png_state.ttffont);
+	png_state.default_ttfsize = 2 * term->h_char - 2;
+	err = gdImageStringFT(NULL, &brect[0], 0,
+		png_state.ttffont, (double)png_state.default_ttfsize,
+		0.0, 0, 0, "test");
+	if (err) {
+		fprintf(stderr,"%s when opening font \"%s\", using internal non-scalable font\n",
+			err, png_state.ttffont);
+		free(png_state.ttffont);
 		free(png_state.default_ttffont);
-		png_state.default_ttffont = gp_strdup(png_state.ttffont);
-		png_state.default_ttfsize = 2 * term->h_char - 2;
-		err = gdImageStringFT(NULL, &brect[0], 0,
-			png_state.ttffont, (double)png_state.default_ttfsize,
-			0.0, 0, 0, "test");
-		if (err) {
-			fprintf(stderr,"%s when opening font %s, using default\n",
-				err, png_state.ttffont);
-			free(png_state.ttffont);
-			free(png_state.default_ttffont);
-			png_state.ttffont = NULL;
-			png_state.default_ttffont = NULL;
-		}
+		png_state.ttffont = NULL;
+		png_state.default_ttffont = NULL;
 	}
     }
 
