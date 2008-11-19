@@ -1,3 +1,10 @@
+2008-11-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_options): If no information is available about what
+	default scalable font might be available we currently give up and fall
+	back to a built in non-scalable font.  Now we try font "arial" before
+	falling back.  Who knows, it might even be available.
+
 2008-11-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/bitmap.c src/bitmap.h src/tables.c src/tables.h src/show.c
