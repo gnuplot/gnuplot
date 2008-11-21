@@ -1,7 +1,7 @@
 New features, changes and fixes since gnuplot version 4.2
 =========================================================
 
-* NEW pgnuplot.exe is a full-featured console mode gnuplot executable for Windows
+* NEW gnuplot.exe is a full-featured console mode gnuplot executable for Windows
 * NEW command line option -e "command list"
 * NEW plot style "with circles"
 * NEW object types circle, ellipse, and polygon

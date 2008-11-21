@@ -1,3 +1,8 @@
+2008-11-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw: Targets are wgnuplot.exe, wgnuplot_pipes.exe,
+	gnuplot.exe; pgnuplot.exe is kept as it was until now.
+
 2008-11-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_options): If no information is available about what

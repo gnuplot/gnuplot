@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.43 2008/02/23 10:03:35 mikulik Exp $
+# $Id: makefile.mgw,v 1.44 2008/11/07 12:01:10 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -21,15 +21,19 @@
 # Choose target to compile:
 # 1. wgnuplot.exe: The usual Windows GUI for input commands.
 # 2. wgnuplot_pipes.exe: The usual Windows GUI with support of pipes, so
-#    that e.g.  plot '<awk -f preprocess.awk my.dat')  can work.
-#    Drawback: wgnuplot_pipes.exe keeps attached to a console (DOS) window
-#    it was launched from, or it opens a new one.
-# 3. pgnuplot.exe: Console mode instead of GUI for the text input.
-#    This is an efficient replacement for pgnuplot in cases 1 and 2.
-#    The previous pgnuplot.exe is renamed to pgnuplot_small.exe.
+#    that e.g.  plot '<awk -f preprocess.awk my.dat')  or  x=system('ls -1')
+#    can work. Drawback: wgnuplot_pipes.exe keeps attached to a console (DOS)
+#    window it was launched from, or it opens a new one.
+# 3. gnuplot.exe: Console mode instead of GUI for the text input.
+#
+# Comment for programs using gnuplot as their plotting engine:
+# Both wgnuplot*.exe compile also pgnuplot.exe. This small helper program was
+# used when gnuplot.exe was not available on Windows. Nowadays, pgnuplot.exe
+# is deprecated -- plese use gnuplot.exe instead.
+
 TARGET=wgnuplot.exe
 #TARGET=wgnuplot_pipes.exe
-#TARGET=pgnuplot.exe
+#TARGET=gnuplot.exe
 
 # Comment out the definition lines to disable the according features:
 
@@ -126,22 +130,24 @@ GNUSORT = /bin/sort
 #
 
 # PIPES: define if you would prefer support of pipes undef Windows (e.g.
-# plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot.exe keeps attached
-# to a console=DOS window it was launched from, or it opens a new one.
+# plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot_pipes.exe keeps
+# attached to a console=DOS window it was launched from, or it opens a new one.
 # Note: Maybe it does not work properly with pgnuplot (not tested recently).
 
 # CONSOLE: define if you would prefer the console (non-GUI) version of the
 # text command window.
 
-# Set PIPES and CONSOLE according to the target
-PGNUPLOT=pgnuplot.exe
+# Set PGNUPLOT, PIPES and CONSOLE according to the target
+ifeq ($(TARGET),wgnuplot.exe)
+	PGNUPLOT=pgnuplot.exe
+endif
 ifeq ($(TARGET),wgnuplot_pipes.exe)
+	PGNUPLOT=pgnuplot.exe
 	PIPES=1
 endif
-ifeq ($(TARGET),pgnuplot.exe)
+ifeq ($(TARGET),gnuplot.exe)
 	PIPES=1
 	CONSOLE=1
-	PGNUPLOT=pgnuplot_small.exe
 endif
 
 
@@ -272,8 +278,7 @@ L=docs/latex/			# HBB FIXME 20060430: what's this for?
 M=../demo/
 
 
-default: $(TARGET) $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe \
-	$(PGNUPLOT)
+default: $(TARGET) $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe $(PGNUPLOT)
 
 all:	default gnuplot.ps gnuplot.pdf
 
@@ -283,7 +288,8 @@ include makefile.all
 
 OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS)
 
-WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) wpause.$(O) wmenu.$(O)
+WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
+	  wpause.$(O) wmenu.$(O)
 
 WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 	win/wgnuplib.c win/wgnuplib.def win/wgnuplib.h win/wgnuplib.rc \
@@ -459,9 +465,12 @@ veryclean: clean
 # now move the whole stuff to its destination
 install: default
 	mkdir -p $(DESTDIR)
+	cp gnuplot.exe $(DESTDIR)/gnuplot.exe
 	cp wgnuplot.exe $(DESTDIR)/wgnuplot.exe
+	cp wgnuplot_pipes.exe $(DESTDIR)/wgnuplot_pipes.exe
+	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
 	cp win/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
-	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
 	mkdir -p $(DESTDIR)/share/PostScript
 	cp ../term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
+
