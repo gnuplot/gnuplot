@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.94 2008/05/14 04:05:29 sfeam Exp $
+ * $Id: svg.trm,v 1.95 2008/06/02 03:42:19 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -159,6 +159,7 @@ static void SVG_load_fontfile __PROTO((char *fontfile));
 /* Stuff for enhanced text mode */
 static int ENHsvg_string_state = 0;
 static double ENHsvg_x_offset = 0;
+static TBOOLEAN ENHsvg_preserve_spaces = FALSE;
 #define CODDLE_NONCOMPLIANT_VIEWERS 1	/* Use pt rather than em spacing */
 
 /* Support for dashed lines */
@@ -990,7 +991,11 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 
 /* output text (unless the enhanced_text processing is in action) */
 
-    fputs ("\t\t<text>", gpoutfile);
+    if (strstr(str,"  "))
+	fputs ("\t\t<text xml:space=\"preserve\">", gpoutfile);
+    else
+	fputs ("\t\t<text>", gpoutfile);
+
     if (!ENHsvg_string_state) {
 
 	while (*str) {
@@ -1272,6 +1277,9 @@ ENHsvg_OPEN(
 	if (!showflag) {
 	    fprintf(gpoutfile, " fill=\"none\"");
 	}
+	if (ENHsvg_preserve_spaces) {
+	    fprintf(gpoutfile, " xml:space=\"preserve\"");
+	}
 	fputs(">", gpoutfile);
     }
 
@@ -1308,6 +1316,13 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
 	SVG_put_text(x, y, str);
     }
 
+    /* EAM FIXME - This is a total hack, to make up for the fact that all  */
+    /* svg viewers I have tried fail to pick up the xml:space setting from */
+    /* the environment. So it has to be set all over again for each text   */
+    /* fragment. Without this, all whitespace is collapsed to a single ' '.*/
+    if (strstr(str,"  "))
+	ENHsvg_preserve_spaces = TRUE;
+
     /* Set up global variables needed by enhanced_recursion() */
     ENHsvg_charcount = 0;
     enhanced_fontscale = 1.0;
@@ -1323,7 +1338,13 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
 
     /* Make sure we leave with the same font properties as on entry */
     strncpy(SVG_fontNameCur,fontname,sizeof(fontname));
-    SVG_fontSizeCur = fontsize;
+    if (SVG_fontSizeCur != fontsize || ENHsvg_base != 0) {
+	fprintf(gpoutfile, "<tspan font-size=\"%.1fpt\" dy=\"%.2fpt\"></tspan>",
+		fontsize, ENHsvg_base);
+	SVG_fontSizeCur = fontsize;
+	ENHsvg_base = 0;
+    }
+    ENHsvg_preserve_spaces = FALSE;
 
     /* Close the text section */
     fputs("</text>\n\t</g>\n", gpoutfile);

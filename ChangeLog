@@ -1,3 +1,11 @@
+2008-11-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Work around two bugs in current svg implementations.
+	The setting of xml:space="preserve" is not correctly inherited from the
+	enviroment, so we must set it explicitly for each text fragment.
+	Resetting dy="foo" after a sub- or superscript is best done inside the
+	same text block.
+
 2008-11-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw: Targets are wgnuplot.exe, wgnuplot_pipes.exe,
