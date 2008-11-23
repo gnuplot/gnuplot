@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.44 2008/11/07 12:01:10 mikulik Exp $
+# $Id: makefile.mgw,v 1.45 2008/11/21 22:13:30 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -459,7 +459,8 @@ clean:
 
 realclean: veryclean
 veryclean: clean
-	$(RM) wgnuplot.exe wgnuplot.hlp wgnuplot.mnu wgnuplot.gid
+	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
+	$(RM) wgnuplot.hlp wgnuplot.gid
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
 
 # now move the whole stuff to its destination

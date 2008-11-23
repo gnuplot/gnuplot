@@ -1,3 +1,10 @@
+2008-11-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/README: Updated.
+
+	* config/makefile.cyg config/makefile.mgw: Choose *.exe targets in
+	makefile.cyg as in makefile.mgw.
+
 2008-11-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Work around two bugs in current svg implementations.

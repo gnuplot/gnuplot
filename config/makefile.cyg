@@ -1,6 +1,6 @@
 # Hey, Emacs, this is a -*- Makefile -*-
 #
-# $Id: makefile.cyg,v 1.28 2007/06/02 22:27:50 mikulik Exp $
+# $Id: makefile.cyg,v 1.29 2008/02/23 10:01:34 mikulik Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -20,8 +20,24 @@
 
 #
 # ************** Begin of Configuration section ************************
-
 #
+
+# Choose target to compile:
+# 1. wgnuplot.exe: The usual Windows GUI for input commands.
+# 2. wgnuplot_pipes.exe: The usual Windows GUI with support of pipes, so
+#    that e.g.  plot '<awk -f preprocess.awk my.dat')  or  x=system('ls -1')
+#    can work. Drawback: wgnuplot_pipes.exe keeps attached to a console (DOS)
+#    window it was launched from, or it opens a new one.
+# 3. gnuplot.exe: Console mode instead of GUI for the text input.
+#
+# Comment for programs using gnuplot as their plotting engine:
+# Both wgnuplot*.exe compile also pgnuplot.exe. This small helper program was
+# used when gnuplot.exe was not available on Windows. Nowadays, pgnuplot.exe
+# is deprecated -- plese use gnuplot.exe instead.
+
+TARGET=wgnuplot.exe
+#TARGET=wgnuplot_pipes.exe
+#TARGET=gnuplot.exe
 
 # Comment out the definition lines to disable the according features:
 
@@ -41,7 +57,7 @@ JPEG=1
 FREETYPE=1
 
 # PDF device driver
-# may require PNG and Z libraries based on particular PDF library used
+# requires PNG and Z libraries based on particular PDF library used
 #PDF=1
 
 # DEBUGging support
@@ -51,12 +67,6 @@ FREETYPE=1
 
 # MOUSE support for the windows terminal
 MOUSE=1
-
-# PIPES: define if you would prefer support of pipes undef Windows (e.g.
-# plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot.exe keeps attached
-# to a console=DOS window it was launched from, or it opens a new one.
-# Also does not work properly with pgnuplot.
-#PIPES=1
 
 # Below you can adapt paths according to your software setup:
 
@@ -105,8 +115,28 @@ GNUSORT = /usr/bin/sort
 #
 #         There shouldn't be anything to be changed below this line
 # **********************************************************************
-
 #
+
+# PIPES: define if you would prefer support of pipes undef Windows (e.g.
+# plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot_pipes.exe keeps
+# attached to a console=DOS window it was launched from, or it opens a new one.
+# Note: Maybe it does not work properly with pgnuplot (not tested recently).
+
+# CONSOLE: define if you would prefer the console (non-GUI) version of the
+# text command window.
+
+# Set PGNUPLOT, PIPES and CONSOLE according to the target
+ifeq ($(TARGET),wgnuplot.exe)
+	PGNUPLOT=pgnuplot.exe
+endif
+ifeq ($(TARGET),wgnuplot_pipes.exe)
+	PGNUPLOT=pgnuplot.exe
+	PIPES=1
+endif
+ifeq ($(TARGET),gnuplot.exe)
+	PIPES=1
+	CONSOLE=1
+endif
 
 
 CC = $(GCCPATH)gcc
@@ -125,6 +155,11 @@ endif
 
 ifdef PIPES
   OPTS += -DPIPES
+  LDFLAGS2 = -mconsole
+endif
+
+ifdef CONSOLE
+  OPTS += -DWGP_CONSOLE
   LDFLAGS2 = -mconsole
 endif
 
@@ -208,7 +243,7 @@ L=docs/latex/
 M=../demo/
 
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe
+default: $(TARGET) $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe $(PGNUPLOT)
 
 all: default gnuplot.ps gnuplot.pdf
 
@@ -236,11 +271,11 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 
 LDLIBS = -L/usr/local/lib -lkernel32 -lgdi32
 
-wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.$(O) texticon.ico grpicon.ico
+$(TARGET): $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.$(O) texticon.ico grpicon.ico
 	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -mno-cygwin -o $@ \
 		$(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS) $(TERMLIBS)
 
-pgnuplot.exe: win/pgnuplot.c version.$(O)
+$(PGNUPLOT): win/pgnuplot.c version.$(O)
 	gcc -O2 -s -mno-cygwin -DHAVE_STDBOOL_H -o $@ \
 		win/pgnuplot.c version.$(O) -I. -luser32
 
@@ -382,14 +417,19 @@ clean:
 
 realclean: veryclean
 veryclean: clean
-	$(RM) wgnuplot.exe wgnuplot.hlp wgnuplot.mnu wgnuplot.gid
+	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
+	$(RM) wgnuplot.hlp wgnuplot.gid
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
-	$(RM) pgnuplot.exe
 
 # now move the whole stuff to its destination
 install: default
 	mkdir -p $(DESTDIR)
+	cp gnuplot.exe $(DESTDIR)/gnuplot.exe
 	cp wgnuplot.exe $(DESTDIR)/wgnuplot.exe
+	cp wgnuplot_pipes.exe $(DESTDIR)/wgnuplot_pipes.exe
+	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
 	cp win/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
-	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
+	mkdir -p $(DESTDIR)/share/PostScript
+	cp ../term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
+
