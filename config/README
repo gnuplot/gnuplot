@@ -1,23 +1,26 @@
-README  (EAM Oct 2007; give up on Atari platforms)
-buildvms.com
-make_vms.com
-makefile.unx
-descrip.mms: Makefile for VMS, Vers. 2.1, 1998/08/25
-makefile.286: Makefile for Borland C++ 3.x and PharLap 286 extender
+Notes:
+- EAM Oct 2007: give up on Atari platforms
+
+List of files:
+buildvms.com: Shell script on VMS
+make_vms.com: Shell script on VMS
+makefile.unx: Generic makefile for unixes
+descrip.mms:  Makefile for VMS, Vers. 2.1, 1998/08/25 (no longer available)
+makefile.286: Makefile for Borland C++ 3.x and PharLap 286 extender on DOS
 makefile.amg: Makefile for SAS/C 6.1 or better on the Amiga
 makefile.ami: Makefile for Manx Aztec C 5.2 beta of better on the Amiga
 makefile.cyg: Makefile for Cygwin on WinNT and Win95 and above
 makefile.dj2: Makefile for DJGPP version 2 on DOS
-makefile.emx: Makefile for use with emx-0.8f/gcc and ndmake 4.5 on MS-DOS
-makefile.g: Makefile for GRASS, a geographic information system. 
-makefile.mgw: Makefile for MinGW32 on 32bit MS Windows 
-makefile.msc: Makefile for use with Microsoft C  Version 5.10
-makefile.msw: Makefile for Microsoft C  Version 7.0 Windows Version
-makefile.nt: Makefile to compile gnuplot for WinNT and Win95/98
-makefile.os2: Makefile for gcc/emx on OS/2 3.x and above (might also work on OS/2 2.x)
-makefile.os9: Makefile for OS-9 and Ultra C, with X11 support
-makefile.tc: Makefile for Borland C++ 3.x DOS version
-makefile.vms: Makefile for VMS
-makefile.wc: Makefile for Watcom C 9.5a
+makefile.emx: Makefile for use with emx-0.8f/gcc and ndmake 4.5 on DOS
+makefile.g:   Makefile on GRASS (a geographic information system)
+makefile.mgw: Makefile for MinGW32 on WinNT and Win95 and above
+makefile.msc: Makefile for Microsoft C Version 5.10 on DOS
+makefile.msw: Makefile for Microsoft C Version 7.0 on Windows
+makefile.nt:  Makefile for VisualC 6.x on WinNT and Win95 and above
+makefile.os2: Makefile for gcc/emx on OS/2
+makefile.os9: Makefile for Ultra C on OS-9 (with X11 support)
+makefile.tc:  Makefile for Borland C++ 3.x DOS version
+makefile.vms: Makefile on VMS
+makefile.wc:  Makefile for Watcom C 9.5a on DOS
 makefile.win: Makefile for Borland C++ 16bit or 32bit Windows versions
-makefile.ztc: Makefile for Zortech C++ 3.x
+makefile.ztc: Makefile for Zortech C++ 3.x (on DOS?)
