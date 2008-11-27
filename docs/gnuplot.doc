@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.43 2008/11/07 06:34:21 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.44 2008/11/13 20:36:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8326,7 +8326,9 @@ C ... and restart the table:
  of the terminal, but do not return <xscale> or <yscale> to their default
  values (1.0).
 
- `ratio` and `square` have no effect on 3-d plots.
+ `ratio` and `square` have no effect on 3-d plots, but do affect 3D projections
+ created using `est view map`.  See also `set view equal_axes`, which similarly
+ forces the x and y axes of a 3D onto the same scale.
 
  Examples:
 
@@ -9796,7 +9798,9 @@ C ... and restart the table:
  orthogonal 2D projection into a 2D plot-like map.
 
  Syntax:
-       set view { <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}} | map }
+       set view <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}}
+       set view map
+       set view {no}equal_axes
        show view
 
  where <rot_x> and <rot_z> control the rotation angles (in degrees) in a
@@ -9822,6 +9826,10 @@ C ... and restart the table:
 
  The first sets all the four default values.  The second changes only scale,
  to 0.5.
+
+ The command `set view equal_axes` forces the unit length of the x and y axes
+ to be on the same same.  Otherwise by default both axes are scaled to fill the
+ available area.  This is similar to the `set size square` command for 2D plots.
 
  See also `set ticslevel`.
 3 vrange

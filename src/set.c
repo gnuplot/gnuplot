@@ -4068,6 +4068,14 @@ set_view()
 	splot_map = FALSE; /* default is no map */
     }
 
+    if (almost_equals(c_token,"equal$_axes")) {
+	aspect_ratio_3D = 1.0;
+	c_token++;
+    } else if (almost_equals(c_token,"noequal$_axes")) {
+	aspect_ratio_3D = 0.0;
+	c_token++;
+    }
+
     local_vals[0] = surface_rot_x;
     local_vals[1] = surface_rot_z;
     local_vals[2] = surface_scale;

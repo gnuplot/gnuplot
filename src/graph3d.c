@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.19 2008/07/16 20:05:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.157.2.20 2008/09/10 16:01:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -439,7 +439,7 @@ boundary3d(struct surface_points *plots, int count)
 	xscaler = (plot_bounds.xright - plot_bounds.xleft) / surface_scale;
 
     /* HBB 20011011: 'set size {square|ratio}' for splots */
-    if (aspect_ratio != 0.0) {
+    if (splot_map && aspect_ratio != 0.0) {
 	double current_aspect_ratio;
 
 	if (aspect_ratio < 0
@@ -651,6 +651,12 @@ do_3dplot(
     zscale3d = 2.0 / (ceiling_z - floor_z) * surface_zscale;
     yscale3d = 2.0 / (Y_AXIS.max - Y_AXIS.min);
     xscale3d = 2.0 / (X_AXIS.max - X_AXIS.min);
+
+    /* Allow 'set view equal_axes' to shrink rendered length of either X or Y axis */
+    if (aspect_ratio_3D == 1.0) {
+	xscale3d = MIN(xscale3d,yscale3d);
+	yscale3d = xscale3d;
+    }
 
     /* Initialize palette */
     if (!quick) {

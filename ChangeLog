@@ -1,3 +1,14 @@
+2008-11-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc src/gadgets.c src/gadgets.h src/graph3d.c src/save.c   
+	src/set.c src/show.c src/unset.c NEWS:
+	The docs say that 'set size ratio' is ignored in 3D;   make it so.
+	New option 'set view equal_axes' that forces x and y axes in a 3D plot
+	to use the same scale.  This is similar to 'set size square' in 2D.
+	Bug #2004205. Feature request #2006851.
+
+	* src/set.c (prune_dataticks): Fix typo causing ticlabel list corruption
+
 2008-11-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_options): If no information is available about what

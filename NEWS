@@ -2,6 +2,7 @@ New features, changes and fixes since previous release
 ===========================================================
 * NEW command line option -e "command list"
 * NEW 'set xtics rangelimit' allows creation of range/frame plots
+* NEW "set view equal_axes" does for 3D what "set size square" does for 2D.
 * FIX interpolatation for pm3d surfaces given by both z and colour coordinates
 * FIX infinite loop if axis tick increment is on the order of machine precision
 * FIX initialize x11 enhanced text mode to use most recently requested font 
@@ -17,6 +18,7 @@ New features, changes and fixes in gnuplot version 4.2.4
 * NEW allow contouring of pm3d surfaces
 * NEW allow color by z value ("palette z") in 2D plots
 * NEW "pause mouse close" waits until the plot window is closed
+* FIX The documentation says that "set size ratio" is ignored in 3D. Make it so.
 * FIX Do not re-quantize time tics interval explicitly set by user
 * FIX (gd post) don't segfault on very long font names
 * FIX allow variable color from input file for "with boxes", "with vectors"
