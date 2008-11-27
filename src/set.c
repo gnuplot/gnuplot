@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.14 2008/10/06 16:50:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.236.2.15 2008/11/07 06:34:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4758,7 +4758,7 @@ prune_dataticks(struct ticmark *list)
     while (list) {
 	if (list->level < 0) {
 	    free(list->label);
-	    tmp = list->label;
+	    tmp = list->next;
 	    free(list);
 	    list = tmp;
 	} else {
