@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.162 2008/11/27 17:54:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.163 2008/11/27 21:01:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2876,7 +2876,7 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 	/* Binary file type must be the first word in the command following `binary`" */
 	if (almost_equals(c_token, "file$type") || (df_bin_filetype >= 0)) {
 	    int i;
-	    char file_ext[4] = {'\0','\0','\0','\0','\0','\0','\0','\0'};
+	    char file_ext[8] = {'\0','\0','\0','\0','\0','\0','\0','\0'};
 
 	    /* Above keyword not part of pre-existing binary definition.
 	     * So use general binary. */
