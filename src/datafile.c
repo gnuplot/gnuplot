@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.160 2008/07/25 05:47:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.161 2008/07/25 23:21:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -330,8 +330,8 @@ static void initialize_binary_vars __PROTO((void));
 static void df_insert_scanned_use_spec __PROTO((int));
 static void adjust_binary_use_spec __PROTO((void));
 static void clear_binary_records __PROTO((df_records_type));
-static void plot_option_binary_format __PROTO((void));
-static void plot_option_binary __PROTO((TBOOLEAN));
+static void plot_option_binary_format __PROTO((char *));
+static void plot_option_binary __PROTO((TBOOLEAN, TBOOLEAN));
 static void plot_option_array __PROTO((void));
 static TBOOLEAN rotation_matrix_2D __PROTO((double R[][2], double));
 static TBOOLEAN rotation_matrix_3D __PROTO((double P[][3], double *));
@@ -441,7 +441,7 @@ struct gen_ftable df_bin_filetype_table[] = {
     {"edf", edf_filetype_function},
     {"ehf", edf_filetype_function},
     {"auto", auto_filetype_function},
-    {NULL,   auto_filetype_function}
+    {NULL,   NULL}
 };
 #define RAW_FILETYPE 1
 
@@ -1019,7 +1019,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	     */
 	    df_matrix_file = TRUE;
 	    initialize_binary_vars();
-	    plot_option_binary(set_matrix);
+	    plot_option_binary(set_matrix, FALSE);
 	    continue;
 	}
 
@@ -2478,7 +2478,7 @@ df_set_datafile_binary()
     }
     /* Process the binary tokens. */
     df_set_plot_mode(MODE_QUERY);
-    plot_option_binary(FALSE);
+    plot_option_binary(FALSE, TRUE);
     /* Copy the modified settings as the new default settings. */
     df_bin_filetype_default = df_bin_filetype;
     df_bin_file_endianess_default = df_bin_file_endianess;
@@ -2861,7 +2861,7 @@ char *equal_symbol_msg = "Equal ('=') symbol required";
 
 
 static void
-plot_option_binary(TBOOLEAN set_matrix)
+plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 {
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_record = FALSE;
@@ -2876,6 +2876,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 	/* Binary file type must be the first word in the command following `binary`" */
 	if (almost_equals(c_token, "file$type") || (df_bin_filetype >= 0)) {
 	    int i;
+	    char file_ext[4] = {'\0','\0','\0','\0'};
 
 	    /* Above keyword not part of pre-existing binary definition.
 	     * So use general binary. */
@@ -2887,7 +2888,18 @@ plot_option_binary(TBOOLEAN set_matrix)
 		if (!equals(++c_token, "="))
 		    int_error(c_token, equal_symbol_msg);
 
-		binary_input_function = lookup_ftable(df_bin_filetype_table, ++c_token);
+		copy_str(file_ext, ++c_token, 4);
+		for (i=0; df_bin_filetype_table[i].key; i++)
+		    if (!strcasecmp(file_ext, df_bin_filetype_table[i].key)) {
+			binary_input_function = df_bin_filetype_table[i].value;
+			df_bin_filetype = i;
+			break;
+		    }
+
+		if (df_bin_filetype != i)
+		    /* Maybe set to "auto" and continue? */
+		    int_error(c_token, "Unrecognized filetype; try \"show datafile binary filetypes\"");
+
 		c_token++;
 	    }
 
@@ -2900,7 +2912,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 			    binary_input_function = df_bin_filetype_table[i].value;
 		}
 		if (binary_input_function == auto_filetype_function)
-		    int_warn(NO_CARET, "Unrecognized binary file type");
+		    int_warn(NO_CARET, "Unrecognized filetype; try \"show datafile binary filetypes\"");
 	    }
 
 	    /* Unless only querying settings, call the routine to prep binary data parameters. */
@@ -3183,6 +3195,7 @@ plot_option_binary(TBOOLEAN set_matrix)
 
 	/* deal with various types of binary files */
 	if (almost_equals(c_token, "form$at")) {
+	    char *format_string;
 	    if (set_format) { duplication=TRUE; break; }
 	    c_token++;
 	    /* Format string not part of pre-existing binary definition.  So use general binary. */
@@ -3195,10 +3208,13 @@ plot_option_binary(TBOOLEAN set_matrix)
 		int_error(c_token, equal_symbol_msg);
 	    c_token++;
 
-	    if (isstring(c_token))
-		plot_option_binary_format();
-	    else
-		int_error(c_token, "Expecting format string");
+	    if (set_default)
+		int_error(c_token, "Sorry - default binary format not implemented");
+	    else {
+		format_string = try_to_get_string();
+		plot_option_binary_format(format_string);
+		free(format_string);
+	    }
 	    set_format = TRUE;
 	    continue;
 	}
@@ -3285,6 +3301,8 @@ clear_binary_records(df_records_type records_type)
 #define LEFT_TUPLE_CHAR "("   /* Parser problems with (#,#) considered complex. */
 #define RIGHT_TUPLE_CHAR ")"
 
+/* EAM FIXME - THIS WHOLE SET OF ROUTINES IS TOO UGLY TO KEEP. */
+/*             WHY DO THEY ALL TRAMPLE ON df_format?           */
 static void
 plot_option_array(void)
 {
@@ -3389,25 +3407,19 @@ token2tuple(double *tuple, int dimension)
 	c_token++;
 	while (!END_OF_COMMAND) {
 	    if (expecting_number) {
-		double x;
-
-		x = real_expression();
-		N++;
-		if (N <= dimension)
-		    *tuple++ = x;
+		if (++N <= dimension)
+		    *tuple++ = real_expression();
 		else
 		    int_error(c_token-1, "More than %d elements", N);
 		expecting_number = FALSE;
-	    } else {
-		if (equals(c_token, ",")) {
+	    } else if (equals(c_token, ",")) {
 		    c_token++;
 		    expecting_number = TRUE;
-		} else if (equals(c_token, RIGHT_TUPLE_CHAR)) {
+	    } else if (equals(c_token, RIGHT_TUPLE_CHAR)) {
 		    c_token++;
 		    return N;
-		} else
+	    } else
 		    int_error(c_token, "Expecting ',' or '" RIGHT_TUPLE_CHAR "'");
-	    }
 	}
     }
 
@@ -3723,18 +3735,17 @@ df_extend_binary_columns(int no_cols)
 /* Determine binary data widths from the `using` (or `binary`) format
  * specification. */
 void
-plot_option_binary_format(void)
+plot_option_binary_format(char *format_string)
 {
 
     int prev_read_type = DF_DEFAULT_TYPE; /* Defaults when none specified. */
     int no_fields = 0;
     char *substr;
 
-    /* Copy the token for our own analysis.  Parser makes just one token
-     * for whole string. */
-    copy_str(df_format, c_token, MAX_LINE_LEN);
+    /* Ugly, ugly! Why clobber df_format? */
+    strcpy(df_format, format_string);
 
-    for (substr = df_format + 1;
+    for (substr = df_format;
 	 *substr != '\0'
 	     && *substr != '\"'
 	     && *substr != '\''
@@ -3787,10 +3798,12 @@ plot_option_binary_format(void)
 					     df_binary_tables[j].group[k].type.read_type);
 				    prev_read_type = df_binary_tables[j].group[k].type.read_type;
 				}
-			    } else
+			    } else {
+				if (!df_column_bininfo)
+				    int_error(NO_CARET,"Failure in binary table initialization");
 				df_column_bininfo[no_fields].skip_bytes
-				    += field_repeat
-				    * df_binary_tables[j].group[k].type.read_size;
+				    += field_repeat * df_binary_tables[j].group[k].type.read_size;
+			    }
 			    breakout = 1;
 			    break;
 			}
@@ -3822,8 +3835,6 @@ plot_option_binary_format(void)
 	df_set_read_type(no_fields, prev_read_type);
     }
     df_no_bin_cols = no_fields;
-
-    c_token++;  /* Advance to next token character. */
 
 }
 

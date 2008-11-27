@@ -1,3 +1,11 @@
+2008-11-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_set_datafile_binary plot_option_binary_format
+	plot_option_binary): Restore tracking of default binary filetype.
+	Issue error rather than segfaulting on unsupported command
+	"set datafile binary format=...".
+	Bug #2345499
+
 2008-11-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/README: Updated.
