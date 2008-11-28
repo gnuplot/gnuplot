@@ -4,6 +4,11 @@
 	well, but return an exact match if one exists.  This fixes color lookup
 	for e.g.  grey/grey10/grey100.
 
+	* src/graphics.c (boundary):  `set {lrbt}margin at screen FRAC` should
+	behave consistently for all four plot borders.  Ignore the current value
+	of `set origin`.
+	Bug #2345000
+
 2008-11-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_set_datafile_binary plot_option_binary_format

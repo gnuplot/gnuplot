@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.545 2008/11/11 18:27:42 janert Exp $
+C RCS $Id: gnuplot.doc,v 1.546 2008/11/27 17:54:18 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8156,7 +8156,9 @@ Ffigure_mapcontours
 
  The keywords `at screen` indicates that the margin is specified as a fraction
  of the full drawing area. This can be used to precisely line up the corners of
- individual 2D and 3D graphs in a multiplot.
+ individual 2D and 3D graphs in a multiplot. This placement ignores the current
+ values of `set origin` and `set size`, and is intended as an alternative 
+ method for positioning graphs within a multiplot.
 
  Normally the margins of a plot are automatically calculated based on tics,
  tic labels, axis labels, the plot title, the timestamp and the size of the
