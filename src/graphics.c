@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.34 2008/09/23 23:11:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.35 2008/10/29 17:20:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -456,7 +456,7 @@ boundary(struct curve_points *plots, int count)
 
     if (tmargin.scalex == screen) {
 	/* Specified as absolute position on the canvas */
-	plot_bounds.ytop -= (1.0 - tmargin.x) * (float)t->ymax + 0.5;
+	plot_bounds.ytop = tmargin.x * (float)t->ymax;
     } else if (tmargin.x >=0) {
 	/* Specified in terms of character height */
 	plot_bounds.ytop -= tmargin.x * (float)t->v_char + 0.5;
@@ -488,7 +488,7 @@ boundary(struct curve_points *plots, int count)
 
     /*{{{  preliminary plot_bounds.xleft, needed for "under" */
     if (lmargin.scalex == screen)
-	plot_bounds.xleft = (xoffset + lmargin.x) * (float)t->xmax + 0.5;
+	plot_bounds.xleft = lmargin.x * (float)t->xmax;
     else
 	plot_bounds.xleft = xoffset * t->xmax
 			  + t->h_char * (lmargin.x >= 0 ? lmargin.x : 2);
@@ -497,7 +497,7 @@ boundary(struct curve_points *plots, int count)
 
     /*{{{  tentative plot_bounds.xright, needed for "under" */
     if (rmargin.scalex == screen)
-	plot_bounds.xright = (xoffset + rmargin.x) * (float)t->xmax + 0.5;
+	plot_bounds.xright = rmargin.x * (float)t->xmax;
     else
 	plot_bounds.xright = (xsize + xoffset) * t->xmax
 			   - t->h_char * (rmargin.x >= 0 ? rmargin.x : 2);
@@ -582,7 +582,7 @@ boundary(struct curve_points *plots, int count)
 
     if (bmargin.scalex == screen) {
 	/* Absolute position for bottom of plot */
-	plot_bounds.ybot += bmargin.x * (float)t->ymax + 0.5;
+	plot_bounds.ybot = bmargin.x * (float)t->ymax;
     } else if (bmargin.x >= 0) {
 	/* Position based on specified character height */
 	plot_bounds.ybot += bmargin.x * (float)t->v_char + 0.5;
@@ -826,6 +826,7 @@ boundary(struct curve_points *plots, int count)
 	if (!vertical_timelabel
 	    && plot_bounds.xleft - ytic_width - ytic_textwidth < -(int) (tmpx))
 	    plot_bounds.xleft = ytic_width + ytic_textwidth - (int) (tmpx);
+	/* EAM FIXME: Skip if "lmargin at screen ..."? */
 	if (plot_bounds.xleft == (int) (0.5 + t->xmax * xoffset)) {
 	    /* make room for end of xtic or x2tic label */
 	    plot_bounds.xleft += (int) (t->h_char * 2);

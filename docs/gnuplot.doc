@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.44 2008/11/13 20:36:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.45 2008/11/27 23:17:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1952,7 +1952,7 @@ C ... and restart the table:
 
  A single data file may contain multiple sets of data, separated by two blank
  lines. Each of these separate sets is assigned an index value (see `index`)
- that can be retrieved via the using specifier column(-2). See `pseudocolumns`.
+ that can be retrieved via the using specifier column(-2).
  All data in the file is drawn with the same color/linestyle/pointtype
  properties by default.  The command `lc variable` can be used to assign
  different colors to each data set in the file by using the index value from
@@ -3773,7 +3773,7 @@ C ... and restart the table:
  of distinguishing individual data sets within a file as shown below.  This is
  more awkward that the `index` command if all you are doing is selecting one
  data set for plotting, but is very useful if you want to assign different
- properties to each data set.  See `pseudocolumns`, `lc variable`.
+ properties to each data set.  See `lc variable`.
 
  Example:
        plot 'file' using 1:(column(-2)==4 ? $2 : NaN)        # very awkward
@@ -4047,7 +4047,7 @@ C ... and restart the table:
  In addition to the actual columns 1...N in the input data file, gnuplot
  presents data from several "pseudo-columns" that hold bookkeeping information.
  E.g. $0 or column(0) returns the sequence number of this data record within a
- dataset.  Please see `pseudocolumns`.
+ dataset.
  
  An empty <entry> will default to its order in the list of entries.
  For example, `using ::4` is interpreted as `using 1:2:4`.
@@ -7005,7 +7005,9 @@ C ... and restart the table:
 
  The keywords `at screen` indicates that the margin is specified as a fraction
  of the full drawing area. This can be used to precisely line up the corners of
- individual 2D and 3D graphs in a multiplot.
+ individual 2D and 3D graphs in a multiplot. This placement ignores the current
+ values of `set origin` and `set size`, and is intended as an alternative 
+ method for positioning graphs within a multiplot.
 
  Normally the margins of a plot are automatically calculated based on tics,
  tic labels, axis labels, the plot title, the timestamp and the size of the
@@ -8327,8 +8329,8 @@ C ... and restart the table:
  values (1.0).
 
  `ratio` and `square` have no effect on 3-d plots, but do affect 3D projections
- created using `est view map`.  See also `set view equal_axes`, which similarly
- forces the x and y axes of a 3D onto the same scale.
+ created using `set view map`.  Similarly `set view equal_axes` forces the
+ x and y axes of a 3D onto the same scale.
 
  Examples:
 
@@ -9789,6 +9791,7 @@ C ... and restart the table:
 ?commands show view
 ?set view
 ?set view map
+?set view equal_axes
 ?show view
 ?view
  The `set view` command sets the viewing angle for `splot`s.  It controls how

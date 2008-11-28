@@ -1,3 +1,11 @@
+2008-11-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary) src/graph3d.c (boundary3d)
+	docs/gnuplot.doc docs/gnuplot.texi:
+	`set {lrbt}margin at screen FRAC` should behave consistently for all
+	four plot borders.  Ignore the current value of `set origin`.
+	Bug #2345000
+
 2008-11-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src/gadgets.c src/gadgets.h src/graph3d.c src/save.c   

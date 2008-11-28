@@ -2680,7 +2680,7 @@ Text colors can be set similarly using `tc variable`.
 
 A single data file may contain multiple sets of data, separated by two blank
 lines. Each of these separate sets is assigned an index value (see @ref{index})
-that can be retrieved via the using specifier column(-2). See `pseudocolumns`.
+that can be retrieved via the using specifier column(-2).
 All data in the file is drawn with the same color/linestyle/pointtype
 properties by default.  The command `lc variable` can be used to assign
 different colors to each data set in the file by using the index value from
@@ -5121,7 +5121,7 @@ available via the pseudo-column `column(-2)`.  This leads to an alternative way
 of distinguishing individual data sets within a file as shown below.  This is
 more awkward that the @ref{index} command if all you are doing is selecting one
 data set for plotting, but is very useful if you want to assign different
-properties to each data set.  See `pseudocolumns`, `lc variable`.
+properties to each data set.  See `lc variable`.
 
 Example:
 @example
@@ -5478,7 +5478,7 @@ tests whether the value in the Nth column is a valid number.
 In addition to the actual columns 1...N in the input data file, gnuplot
 presents data from several "pseudo-columns" that hold bookkeeping information.
 E.g. $0 or column(0) returns the sequence number of this data record within a
-dataset.  Please see `pseudocolumns`.
+dataset.
 
 An empty <entry> will default to its order in the list of entries.
 For example, `using ::4` is interpreted as `using 1:2:4`.
@@ -9351,7 +9351,9 @@ only the left margin can be set using character units.
 
 The keywords `at screen` indicates that the margin is specified as a fraction
 of the full drawing area. This can be used to precisely line up the corners of
-individual 2D and 3D graphs in a multiplot.
+individual 2D and 3D graphs in a multiplot. This placement ignores the current
+values of @ref{origin} and @ref{size}, and is intended as an alternative 
+method for positioning graphs within a multiplot.
 
 Normally the margins of a plot are automatically calculated based on tics,
 tic labels, axis labels, the plot title, the timestamp and the size of the
@@ -11025,7 +11027,9 @@ Both `noratio` and `nosquare` return the graph to the default aspect ratio
 of the terminal, but do not return <xscale> or <yscale> to their default
 values (1.0).
 
-`ratio` and `square` have no effect on 3-d plots.
+`ratio` and `square` have no effect on 3-d plots, but do affect 3D projections
+created using `set view map`.  Similarly `set view equal_axes` forces the
+x and y axes of a 3D onto the same scale.
 
 Examples:
 
@@ -12863,6 +12867,7 @@ help file, and (again) the useful email addresses.
 @c ?commands show view
 @c ?set view
 @c ?set view map
+@c ?set view equal_axes
 @c ?show view
 @cindex view
 @opindex view
@@ -12876,7 +12881,9 @@ orthogonal 2D projection into a 2D plot-like map.
 
 Syntax:
 @example
-      set view @{ <rot_x>@{,@{<rot_z>@}@{,@{<scale>@}@{,<scale_z>@}@}@} | map @}
+      set view <rot_x>@{,@{<rot_z>@}@{,@{<scale>@}@{,<scale_z>@}@}@}
+      set view map
+      set view @{no@}equal_axes
       show view
 
 @end example
@@ -12907,6 +12914,10 @@ Examples:
 
 The first sets all the four default values.  The second changes only scale,
 to 0.5.
+
+The command `set view equal_axes` forces the unit length of the x and y axes
+to be on the same same.  Otherwise by default both axes are scaled to fill the
+available area.  This is similar to the `set size square` command for 2D plots.
 
 See also @ref{ticslevel}.
 
