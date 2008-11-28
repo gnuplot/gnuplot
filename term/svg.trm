@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.95 2008/06/02 03:42:19 sfeam Exp $
+ * $Id: svg.trm,v 1.96 2008/11/22 21:18:54 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -725,7 +725,7 @@ SVG_init ()
 	     /*  3 box */
 	     "\t<rect id='gpPt3' stroke-width='%.3f' stroke='currentColor' x='-1' y='-1' width='2' height='2'/>\n"
 	     /*  4 box                   filled */
-	     "\t<rect id='gpPt4' stroke-width='%.3f' fill='currentColor' x='-1' y='-1' width='2' height='2'/>\n"
+	     "\t<rect id='gpPt4' stroke-width='%.3f' stroke='currentColor' fill='currentColor' x='-1' y='-1' width='2' height='2'/>\n"
 	     /*  5 circle */
 	     "\t<circle id='gpPt5' stroke-width='%.3f' stroke='currentColor' cx='0' cy='0' r='1'/>\n"
 	     /*  6 circle (disk)         filled */

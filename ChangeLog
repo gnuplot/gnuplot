@@ -9,6 +9,8 @@
 	four plot borders.  Ignore the current value of `set origin`.
 	Bug #2345000
 
+	* term/svg.trm: Force stroke to match fill color in pointtype 5.
+
 2008-11-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_set_datafile_binary plot_option_binary_format
