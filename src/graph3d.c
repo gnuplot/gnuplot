@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.212 2008/10/31 23:16:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.213 2008/11/02 00:25:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -434,10 +434,14 @@ boundary3d(struct surface_points *plots, int count)
 	    plot_bounds.xleft += key_width;
     }
 
-    plot_bounds.xleft += t->xmax * xoffset;
-    plot_bounds.xright += t->xmax * xoffset;
-    plot_bounds.ytop += t->ymax * yoffset;
-    plot_bounds.ybot += t->ymax * yoffset;
+    if (lmargin.scalex != screen)
+	plot_bounds.xleft += t->xmax * xoffset;
+    if (rmargin.scalex != screen)
+	plot_bounds.xright += t->xmax * xoffset;
+    if (tmargin.scalex != screen)
+	plot_bounds.ytop += t->ymax * yoffset;
+    if (bmargin.scalex != screen)
+	plot_bounds.ybot += t->ymax * yoffset;
     xmiddle = (plot_bounds.xright + plot_bounds.xleft) / 2;
     ymiddle = (plot_bounds.ytop + plot_bounds.ybot) / 2;
 
@@ -835,6 +839,7 @@ do_3dplot(
 	    if (ptitl_cnt > 0) {
 		/* maximise no cols, limited by label-length */
 		key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) / key_col_wth;
+		if (key_cols < 1) key_cols = 1;
 		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
 		/* now calculate actual no cols depending on no rows */
 		key_cols = (int) (ptitl_cnt + key_rows - 1) / key_rows;
