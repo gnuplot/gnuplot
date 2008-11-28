@@ -1,3 +1,9 @@
+2008-11-28  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/tables.c (lookup_table_nth): Leading substring match is all very
+	well, but return an exact match if one exists.  This fixes color lookup
+	for e.g.  grey/grey10/grey100.
+
 2008-11-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_set_datafile_binary plot_option_binary_format

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.89 2008/11/01 03:48:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.90 2008/11/15 19:38:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -723,18 +723,23 @@ lookup_table_entry(const struct gen_table *tbl, const char *search_str)
     return -1;
 }
 
-/* Returns index of the table tbl whose key matches the beginning of the
- * search string search_str.
- * It returns index into the table or -1 if there is no match.
+/* Returns the index of the table entry whose key matches the search string.
+ * If there is no exact match return the first table entry that is a leading
+ * substring of the search string.  Returns -1 if there is no match.
  */
 int
 lookup_table_nth(const struct gen_table *tbl, const char *search_str)
 {
     int k = -1;
-    while (tbl[++k].key)
-	if (tbl[k].key && !strncmp(search_str, tbl[k].key, strlen(tbl[k].key)))
+    int best_so_far = -1;
+    while (tbl[++k].key) {
+	/* Exact match always wins */
+	if (!strcmp(search_str, tbl[k].key))
 	    return k;
-    return -1; /* not found */
+	if (!strncmp(search_str, tbl[k].key, strlen(tbl[k].key)))
+	    if (best_so_far < 0) best_so_far = k;
+    }
+    return best_so_far;
 }
 
 /* Returns index of the table tbl whose key matches the beginning of the
