@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.163 2008/11/27 21:01:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.164 2008/11/27 21:03:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -283,6 +283,7 @@ static int df_pseudospan = 0;
 /* parsing stuff */
 struct use_spec_s use_spec[MAXDATACOLS];
 static char df_format[MAX_LINE_LEN + 1];
+static char *df_binary_format = NULL;
 TBOOLEAN evaluate_inside_using = FALSE;
 
 /* rather than three arrays which all grow dynamically, make one
@@ -3208,9 +3209,10 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 		int_error(c_token, equal_symbol_msg);
 	    c_token++;
 
-	    if (set_default)
-		int_error(c_token, "Sorry - default binary format not implemented");
-	    else {
+	    if (set_default) {
+		free(df_binary_format);
+		df_binary_format = try_to_get_string();
+	    } else {
 		format_string = try_to_get_string();
 		plot_option_binary_format(format_string);
 		free(format_string);
@@ -3225,6 +3227,18 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 
     if (duplication)
 	int_error(c_token, "Duplicated or contradicting arguments in datafile options");
+
+    if (!set_default && !set_matrix && df_num_bin_records_default) {
+	int_warn(NO_CARET, "using default binary record/array structure");
+	df_matrix_file = FALSE;
+    }
+
+    if (!set_format && !df_matrix_file) {
+	if (df_binary_format) {
+	    plot_option_binary_format(df_binary_format);
+	    int_warn(NO_CARET, "using default binary format");
+	}
+    }
 
 }
 
@@ -3317,7 +3331,6 @@ plot_option_array(void)
 	/* Require equal symbol. */
 	if (!equals(c_token, "="))
 	    int_error(c_token, equal_symbol_msg);
-	c_token++;
 
 	/* Set true in case user starts string with a comma. */
 	expecting_number = TRUE;
@@ -3326,7 +3339,6 @@ plot_option_array(void)
 	 * parser creates a single token x#.  So, copy string and work
 	 * with that rather than the tokens directly.  Null terminate
 	 * and point to empty string.  */
-	c_token--;
 	df_format[0] = '\0';
 	token_string = df_format;
 
@@ -3863,6 +3875,9 @@ df_show_binary(FILE *fp)
 
     fprintf(fp, "\n\t  File Endianess: %s",
 	    df_endian[df_bin_file_endianess_default]);
+
+    fprintf(fp, "\n\t  Default binary format: %s",
+	    df_binary_format ? df_binary_format : "none");
 
     for (i = 0; i < num_record; i++) {
 	int dimension = 1;
