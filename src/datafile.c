@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.164 2008/11/27 21:03:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.165 2008/12/02 17:37:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3196,7 +3196,6 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 
 	/* deal with various types of binary files */
 	if (almost_equals(c_token, "form$at")) {
-	    char *format_string;
 	    if (set_format) { duplication=TRUE; break; }
 	    c_token++;
 	    /* Format string not part of pre-existing binary definition.  So use general binary. */
@@ -3213,7 +3212,9 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 		free(df_binary_format);
 		df_binary_format = try_to_get_string();
 	    } else {
-		format_string = try_to_get_string();
+		char *format_string = try_to_get_string();
+		if (!format_string)
+		    int_error(c_token, "missing format string");
 		plot_option_binary_format(format_string);
 		free(format_string);
 	    }
@@ -3752,17 +3753,10 @@ plot_option_binary_format(char *format_string)
 
     int prev_read_type = DF_DEFAULT_TYPE; /* Defaults when none specified. */
     int no_fields = 0;
-    char *substr;
+    char *substr = format_string;
 
-    /* Ugly, ugly! Why clobber df_format? */
-    strcpy(df_format, format_string);
+    while (*substr != '\0' && *substr != '\"' && *substr != '\'') {
 
-    for (substr = df_format;
-	 *substr != '\0'
-	     && *substr != '\"'
-	     && *substr != '\''
-	     && substr <= (df_format + MAX_LINE_LEN);
-	 ) {
 	if (*substr == ' ') {
 	    substr++;
 	    continue;

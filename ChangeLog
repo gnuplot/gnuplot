@@ -1,3 +1,7 @@
+2008-12-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (plot_option_binary_format): Code cleanup.
+
 2008-12-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (plot_option_binary plot_option_array):
@@ -5,7 +9,7 @@
 	never implemented.  Now it is.
 	    set datafile binary record=5x5 format="%double"
 	However, I believe that the syntax should be changed everywhere to 
-	    set datafile binary record="5x5" format="%double"
+	    set datafile binary record={something_parsable} format="%double"
 	Bug #2378535
 
 2008-11-28  Ethan Merritt  <merritt@u.washington.edu>
