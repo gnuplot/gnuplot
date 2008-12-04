@@ -1,3 +1,9 @@
+2008-12-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c:  Give an error message if the user requests any
+	unimplemented features documented for 'set datafile binary'.
+	Bug #2378535
+
 2008-11-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary) src/graph3d.c (boundary3d)
