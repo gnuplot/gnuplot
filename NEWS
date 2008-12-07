@@ -3,6 +3,7 @@ New features, changes and fixes since previous release
 * NEW command line option -e "command list"
 * NEW 'set xtics rangelimit' allows creation of range/frame plots
 * NEW "set view equal_axes" does for 3D what "set size square" does for 2D.
+* CHANGE key samples for fillstyle empty really are empty (not fill-with-bgnd)
 * FIX interpolatation for pm3d surfaces given by both z and colour coordinates
 * FIX infinite loop if axis tick increment is on the order of machine precision
 * FIX initialize x11 enhanced text mode to use most recently requested font 
