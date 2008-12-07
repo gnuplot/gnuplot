@@ -1,3 +1,11 @@
+2008-12-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (do_key_sample do_rectangle): Fill style EMPTY
+	should be no fill at all, rather than fill with background.
+	Also, the first empty box in a boxplot was being drawn in the wrong
+	color.
+	Bug #2345832
+
 2008-12-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (plot_option_binary_format): Code cleanup.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.285 2008/10/27 03:37:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.286 2008/11/28 19:13:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5273,8 +5273,7 @@ do_key_sample(
 	apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
 
     /* draw sample depending on bits set in plot_style */
-    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL
-	&& t->fillbox) {
+    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL && t->fillbox) {
 	struct fill_style_type *fs = &this_plot->fill_properties;
 	int style = style_from_fill(fs);
 	unsigned int x = xl + key_sample_left;
@@ -5288,14 +5287,16 @@ do_key_sample(
 	} else
 #endif
 	if (w > 0) {    /* All other plot types with fill */
-	    if (this_plot->lp_properties.use_palette && t->filled_polygon)
-		(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
-	    else
-		(*t->fillbox)(style,x,y,w,h);
+	    if (style != FS_EMPTY) {
+		if (this_plot->lp_properties.use_palette && t->filled_polygon)
+		    (*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
+		else
+		    (*t->fillbox)(style,x,y,w,h);
+	    }
 
 	    /* need_fill_border will set the border linetype, but candlesticks don't want it */
-	    if ((this_plot->plot_style == CANDLESTICKS && fs->fillstyle == FS_EMPTY)
-	    ||  (this_plot->plot_style == CANDLESTICKS && fs->border_linetype == LT_NODRAW)
+	    if ((this_plot->plot_style == CANDLESTICKS && fs->border_linetype == LT_NODRAW)
+	    ||   style == FS_EMPTY
 	    ||   need_fill_border(fs)) {
 		newpath();
 		draw_clip_line( xl + key_sample_left,  yl - key_entry_height/4,
@@ -5473,10 +5474,12 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 	term_apply_lp_properties(&lpstyle);
 	style = style_from_fill(fillstyle);
 
-	if (lpstyle.use_palette && term->filled_polygon) {
-	    (*term->filled_polygon)(4, fill_corners(style,x,y,w,h));
-	} else if (term->fillbox)
-	    (*term->fillbox) (style, x, y, w, h);
+	if (style != FS_EMPTY) {
+	    if (lpstyle.use_palette && term->filled_polygon) {
+		(*term->filled_polygon)(4, fill_corners(style,x,y,w,h));
+	    } else if (term->fillbox)
+		(*term->fillbox) (style, x, y, w, h);
+	}
 
 	if (need_fill_border(fillstyle)) {
 	    (*term->move)   (x, y);
