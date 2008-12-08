@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.546 2008/11/27 17:54:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.547 2008/11/28 19:13:23 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2409,7 +2409,7 @@ Ffigure_boxes
  See `set style fill` for details.  Alternatively a new fillstyle
  may be specified in the plot command.
 
- For fillstyle `empty` the box is filled with the background color.
+ For fillstyle `empty` the box is not filled.
 
  For fillstyle `solid` the box is filled with a solid rectangle of the
  current drawing color. There is an optional parameter <density> that
@@ -9712,7 +9712,6 @@ Ffigure_mapcontours
  from pattern <n>, much as the line type cycles for multiple line plots.
 
  The `empty` option causes filled boxes not to be filled. This is the default.
- It is equivalent to the `solid` option with a <density> parameter of zero.
 
  By default, `border`, the box is bounded by a solid line of the current
  linetype. `border <lt>` specifies that a border is to be drawn using
