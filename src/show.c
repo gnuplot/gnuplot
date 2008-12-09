@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.220 2008/09/06 03:42:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.221 2008/11/15 19:38:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1196,16 +1196,12 @@ show_fillstyle()
     default:
         fprintf(stderr, "\tFill style is empty");
     }
-    switch(default_fillstyle.border_linetype) {
-    case LT_NODRAW:
+    if (default_fillstyle.border_color.type == TC_LT && default_fillstyle.border_color.lt == LT_NODRAW)
 	fprintf(stderr," with no border\n");
-	break;
-    case LT_DEFAULT:
-	fprintf(stderr," with border\n");
-	break;
-    default:
-	fprintf(stderr," with border linetype %d\n",default_fillstyle.border_linetype+1);
-	break;
+    else {
+	fprintf(stderr," with border ");
+	save_pm3dcolor(stderr, &default_fillstyle.border_color);
+	fprintf(stderr,"\n");
     }
 }
 

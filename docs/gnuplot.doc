@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.547 2008/11/28 19:13:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.548 2008/12/08 07:17:20 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2776,7 +2776,7 @@ Ffigure_histclust
        set boxwidth 0.9 relative
        set style data histograms
        set style histogram cluster
-       set style fill solid 1.0 border -1
+       set style fill solid 1.0 border lt -1
        plot for [COL=2:4:2] 'file.dat' using COL
 
  This will produce a plot with clusters of two boxes (vertical bars) centered
@@ -2792,7 +2792,7 @@ Ffigure_histclust
  drawn with linewidth 2, using the border linetype from the current fill style.
 
        set bars fullwidth
-       set style fill solid 1 border -1
+       set style fill solid 1 border lt -1
        set style histogram errorbars gap 2 lw 2
        plot for [COL=2:4:2] 'file.dat' using COL:COL+1
 
@@ -8543,7 +8543,7 @@ Ffigure_mapcontours
      set object 2 rect from 0,0 to 2,3 fc lt 1
 
      # Position an empty rectangle (no fill) with a blue border
-     set object 3 rect from 0,0 to 2,3 fs empty border 3
+     set object 3 rect from 0,0 to 2,3 fs empty border rgb "blue"
 
      # Return fill and color to the default style but leave vertices unchanged
      set object 2 rect default
@@ -8620,7 +8620,7 @@ Ffigure_mapcontours
 
  Example:
      set object 1 polygon from 0,0 to 1,1 to 2,0
-     set object 1 fc rgb "cyan" fillstyle solid 1.0 border -1
+     set object 1 fc rgb "cyan" fillstyle solid 1.0 border lt -1
 
 3 offsets
 ?commands set offsets
@@ -9693,7 +9693,7 @@ Ffigure_mapcontours
        set style fill {empty
                        | {transparent} solid {<density>}
                        | {transparent} pattern {<n>}}
-                      {border {<linetype>} | noborder}
+                      {border {<colorspec>} | noborder}
 
  The default fillstyle is `empty`.
 
@@ -9714,8 +9714,8 @@ Ffigure_mapcontours
  The `empty` option causes filled boxes not to be filled. This is the default.
 
  By default, `border`, the box is bounded by a solid line of the current
- linetype. `border <lt>` specifies that a border is to be drawn using
- linetype <lt>. `noborder` specifies that no bounding lines are drawn.
+ linetype. `border <colorspec>` allows you to change the color of the border.
+ `noborder` specifies that no bounding lines are drawn.
 5 set style fill transparent
 ?commands set style fill transparent
 ?set style fill transparent
@@ -9926,7 +9926,7 @@ Ffigure_mapcontours
  See `colorspec` and `fillstyle`.  `fillcolor` may be abbreviated as `fc`.
 
  Examples:
-     set style rectangle back fc rgb "white" fs solid 1.0 border -1
+     set style rectangle back fc rgb "white" fs solid 1.0 border lt -1
      set style rectangle fc linsestyle 3 fs pattern 2 noborder
 
  The default values correspond to solid fill with the background color and a

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.293 2008/11/01 03:48:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.294 2008/11/02 03:38:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3720,11 +3720,11 @@ set_obj(int tag, int obj_type)
 	    if (new_obj)
 		parse_fillstyle(&this_object->fillstyle, default_style->fillstyle,
 			default_style->filldensity, default_style->fillpattern,
-			default_style->border_linetype);
+			default_style->border_color);
 	    else
 		parse_fillstyle(&this_object->fillstyle, this_object->fillstyle.fillstyle,
 			this_object->fillstyle.filldensity, this_object->fillstyle.fillpattern,
-			this_object->fillstyle.border_linetype);
+			this_object->fillstyle.border_color);
 	    if (c_token != save_token) {
 		got_fill = TRUE;
 		continue;
@@ -3876,7 +3876,7 @@ set_style()
 			default_fillstyle.fillstyle,
 			default_fillstyle.filldensity,
 			default_fillstyle.fillpattern,
-			default_fillstyle.border_linetype);
+			default_fillstyle.border_color);
 	break;
     case SHOW_STYLE_ARROW:
 	set_arrowstyle();

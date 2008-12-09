@@ -1,3 +1,13 @@
+2008-12-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/color.h src/gadgets.c src/gadgets.h src/graphics.c src/misc.c
+	src/misc.h src/plot2d.c src/save.c src/set.c src/show.c src/term_api.h
+	src/unset.c docs/gnuplot.doc:
+
+	Upgrade the fillstyle border field to take a color specifier rather than
+	a simple line type.
+	Bug #2345832
+
 2008-12-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_key_sample do_rectangle): Fill style EMPTY

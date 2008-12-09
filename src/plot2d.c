@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.186 2008/09/30 04:55:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.187 2008/10/12 17:58:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1453,7 +1453,7 @@ eval_plots()
 
 		/* Allow explicit starting color or pattern for this histogram */
 		lp_parse(&lp, FALSE, FALSE);
-		parse_fillstyle(&fs, FS_SOLID, 100, fs.fillpattern, -1);
+		parse_fillstyle(&fs, FS_SOLID, 100, fs.fillpattern, default_fillstyle.border_color);
 
 		} while (c_token != previous_token);
 
@@ -1766,7 +1766,7 @@ eval_plots()
 				default_fillstyle.fillstyle,
 				default_fillstyle.filldensity,
 				pattern_num,
-				default_fillstyle.border_linetype);
+				default_fillstyle.border_color);
 			if (this_plot->plot_style == FILLEDCURVES
 			&& this_plot->fill_properties.fillstyle == FS_EMPTY)
 			    this_plot->fill_properties.fillstyle = FS_SOLID;
@@ -1857,7 +1857,7 @@ eval_plots()
 				default_fillstyle.fillstyle,
 				default_fillstyle.filldensity,
 				pattern_num,
-				default_fillstyle.border_linetype);
+				default_fillstyle.border_color);
 		if ((this_plot->fill_properties.fillstyle == FS_PATTERN)
 		  ||(this_plot->fill_properties.fillstyle == FS_TRANSPARENT_PATTERN))
 		    pattern_num = this_plot->fill_properties.fillpattern + 1;

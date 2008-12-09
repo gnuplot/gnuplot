@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.29 2008/06/22 04:26:02 sfeam Exp $
+ * $Id: misc.h,v 1.30 2008/08/13 02:43:09 sfeam Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -72,7 +72,7 @@ void lp_parse __PROTO((struct lp_style_type *, TBOOLEAN, TBOOLEAN));
 void arrow_parse __PROTO((struct arrow_style_type *, TBOOLEAN));
 
 void parse_fillstyle __PROTO((struct fill_style_type *fs, int def_style,
-                              int def_density, int def_pattern, int def_border ));
+                              int def_density, int def_pattern, t_colorspec def_border ));
 void parse_colorspec __PROTO((struct t_colorspec *tc, int option));
 TBOOLEAN need_fill_border __PROTO((struct fill_style_type *fillstyle));
 

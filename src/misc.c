@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.103 2008/08/15 00:45:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.104 2008/10/27 03:37:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -719,21 +719,15 @@ filledcurves_options_tofile(filledcurves_opts *fco, FILE *fp)
 TBOOLEAN
 need_fill_border(struct fill_style_type *fillstyle)
 {
-    /* Wants a border in the current color */
-    if (fillstyle->border_linetype == LT_DEFAULT)
-	return TRUE;
+    /* Doesn't want a border at all */
+    if (fillstyle->border_color.type == TC_LT && fillstyle->border_color.lt == LT_NODRAW)
+	return FALSE;
 
     /* Wants a border in a new color */
-    if (fillstyle->border_linetype != LT_NODRAW) {
-	struct lp_style_type ls = DEFAULT_LP_STYLE_TYPE;
-	if (prefer_line_styles) {
-	    lp_use_properties(&ls, fillstyle->border_linetype+1);
-	    term_apply_lp_properties(&ls);
-	} else
-	    (*term->linetype)(fillstyle->border_linetype);
-	return TRUE;
-    }
-    return FALSE;
+    if (fillstyle->border_color.type != TC_DEFAULT)
+	apply_pm3dcolor(&fillstyle->border_color,term);
+    
+    return TRUE;
 }
 
 /*
@@ -899,7 +893,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 
 /* <fillstyle> = {empty | solid {<density>} | pattern {<n>}} {noborder | border {<lt>}} */
 void
-parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int def_pattern, int def_bordertype)
+parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int def_pattern, 
+		t_colorspec def_bordertype)
 {
     TBOOLEAN set_fill = FALSE;
     TBOOLEAN set_param = FALSE;
@@ -909,7 +904,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
     fs->fillstyle = def_style;
     fs->filldensity = def_density;
     fs->fillpattern = def_pattern;
-    fs->border_linetype = def_bordertype;
+    fs->border_color = def_bordertype;
 
     if (END_OF_COMMAND)
 	return;
@@ -939,13 +934,19 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	if (END_OF_COMMAND)
 	    continue;
 	else if (almost_equals(c_token, "bo$rder")) {
-	    fs->border_linetype = LT_DEFAULT;
+	    fs->border_color.type = TC_DEFAULT;
 	    c_token++;
-	    if (!END_OF_COMMAND)
-		fs->border_linetype = int_expression() - 1;
+	    if (equals(c_token,"-") || isanumber(c_token)) {
+		fs->border_color.type = TC_LT;
+		fs->border_color.lt = int_expression() - 1;
+	    } else if (!END_OF_COMMAND) {
+		c_token--;
+		parse_colorspec(&fs->border_color, TC_Z);
+	    }
 	    continue;
 	} else if (almost_equals(c_token, "nobo$rder")) {
-	    fs->border_linetype = LT_NODRAW;
+	    fs->border_color.type = TC_LT;
+	    fs->border_color.lt = LT_NODRAW;
 	    c_token++;
 	    continue;
 	}

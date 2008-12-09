@@ -164,7 +164,7 @@ int refresh_nplots = 0;
 /* Flag to show that volatile input data is present */
 TBOOLEAN volatile_data = FALSE;
 
-fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, LT_UNDEFINED } ;
+fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, DEFAULT_COLORSPEC } ;
 
 #ifdef EAM_OBJECTS
 /* Default rectangle style - background fill, black border */

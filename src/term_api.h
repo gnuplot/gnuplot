@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.74 2008/07/09 16:39:50 mikulik Exp $
+ * $Id: term_api.h,v 1.75 2008/09/16 05:35:25 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -134,7 +134,7 @@ typedef struct fill_style_type {
     int fillstyle;
     int filldensity;
     int fillpattern;
-    int border_linetype;
+    t_colorspec border_color;
 } fill_style_type;
 
 typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT, 
