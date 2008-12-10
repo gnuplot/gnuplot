@@ -66,7 +66,7 @@ unset key
 unset border
 set yrange [] reverse
 
-plot 'lena.rgb' binary array=128x128 dx=4 dy=4 format='%uchar' with rgbimage, \
+plot 'lena.rgb' binary array=(128,128) dx=4 dy=4 format='%uchar' with rgbimage, \
      'lena-keypoints.bin' binary format='%double' with circles lc rgb "yellow"
 
 pause -1 "Hit return to continue"

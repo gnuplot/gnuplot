@@ -18,7 +18,7 @@ set yrange [ 0. : 128. ]
 # Alpha =  linear gradient on x
 
 plot 100.*(.4+sin(x/5.)/(x/5.)) lw 5 title 'solid line', \
-     'lena.rgb' binary array=128x128 format="%uchar" flipy using 1:2:3:(2.*column(0)) \
+     'lena.rgb' binary array=(128,128) format="%uchar" flipy using 1:2:3:(2.*column(0)) \
                 with rgbalpha title "Lena with linear\nalpha gradient"
 
 pause -1 "Hit return to continue"
@@ -28,7 +28,7 @@ pause -1 "Hit return to continue"
 focus(x,y) = ((column(0)-x)**2 + (column(-1)-(127-y))**2) > 400 ? 0 : 255
 
 plot 100.*(.4+sin(x/5.)/(x/5.)) lw 5 title 'solid line', \
-     'lena.rgb' binary array=128x128 format="%uchar" flipy using 1:2:3:(focus(70,50)) \
+     'lena.rgb' binary array=(128,128) format="%uchar" flipy using 1:2:3:(focus(70,50)) \
                 with rgbalpha title "Lena with circular mask"
 
 pause -1 "Hit return to continue"

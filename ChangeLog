@@ -1,3 +1,17 @@
+2008-12-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c: Revise syntax of binary datafile record= and array=
+	options. This allows the use of variables and expressions, adds several
+	features that were documented but never implemented, and generally 
+	cleans up the code.
+	    old syntax:    set datafile binary array=128x128
+	    new syntax:    set datafile binary array=(128,128)
+	The old syntax is still accepted, but is now deprecated
+	Bug #2378535
+
+	* docs/gnuplot.doc demo/image.dem demo/rgbalpha.dem demo/image2.dem
+	demo/circles.dem: Update docs and demos to use the new syntax.
+
 2008-12-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.h src/gadgets.c src/gadgets.h src/graphics.c src/misc.c

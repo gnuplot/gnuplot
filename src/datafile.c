@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.165 2008/12/02 17:37:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.166 2008/12/05 04:54:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -282,7 +282,7 @@ static int df_pseudospan = 0;
 
 /* parsing stuff */
 struct use_spec_s use_spec[MAXDATACOLS];
-static char df_format[MAX_LINE_LEN + 1];
+static char *df_format = NULL;
 static char *df_binary_format = NULL;
 TBOOLEAN evaluate_inside_using = FALSE;
 
@@ -948,7 +948,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     }
 
     /*{{{  initialise static variables */
-    df_format[0] = NUL;         /* no format string */
+    free(df_format);
+    df_format = NULL;         /* no format string */
 
     df_no_tic_specs = 0;
     free(df_key_title);
@@ -1456,12 +1457,11 @@ plot_option_using(int max_using)
 	if (df_binary_file)
 	    int_error(NO_CARET, "Expecting \"binary format='...'\" or \"binary filetype=...\"");
 
-	quote_str(df_format, c_token, MAX_LINE_LEN);
+	df_format = try_to_get_string();
 	if (!valid_format(df_format))
 	    int_error(c_token,
 		      "Please use between 1 and 7 conversions, of type double (%%lf)");
 
-	c_token++;              /* skip format */
     } /* if (!EOC) */
 }
 
@@ -1661,7 +1661,7 @@ df_readascii(double v[], int max)
 
 	++df_datum;
 
-	if (*df_format) {
+	if (df_format) {
 	    /*{{{  do a sscanf */
 	    int i;
 
@@ -3312,104 +3312,66 @@ clear_binary_records(df_records_type records_type)
 }
 
 
-#define TUPLE_SEPARATOR_CHAR ":"
-#define LEFT_TUPLE_CHAR "("   /* Parser problems with (#,#) considered complex. */
-#define RIGHT_TUPLE_CHAR ")"
-
-/* EAM FIXME - THIS WHOLE SET OF ROUTINES IS TOO UGLY TO KEEP. */
-/*             WHY DO THEY ALL TRAMPLE ON df_format?           */
+/* EAM DEBUG - replacement for earlier ugly code
+ *             Syntax is now:   array=(xdim,ydim):(xdim,ydim):CONST:(xdim) etc
+ *
+ * For previously documented but broken "Inf", use -1
+ * Bug in original: need to reset # of dimensions each time
+ */
 static void
 plot_option_array(void)
 {
-    /* Process command line definition of array. */
-    if (!END_OF_COMMAND) {
-	int number_of_records = 0;
-	char *token_string;
-	TBOOLEAN expecting_number;
-	int ival;
-	int i_dimension = 0;
+    int number_of_records = 0;
 
-	/* Require equal symbol. */
-	if (!equals(c_token, "="))
-	    int_error(c_token, equal_symbol_msg);
+    if (!equals(c_token, "="))
+	int_error(c_token, equal_symbol_msg);
 
-	/* Set true in case user starts string with a comma. */
-	expecting_number = TRUE;
+    clear_binary_records(DF_CURRENT_RECORDS);
 
-	/* If the user has no space between 'x' or 'X' and number, the
-	 * parser creates a single token x#.  So, copy string and work
-	 * with that rather than the tokens directly.  Null terminate
-	 * and point to empty string.  */
-	df_format[0] = '\0';
-	token_string = df_format;
+    do {
+	c_token++;
 
-	while (1) {
-	    if (*token_string == '\0') {
+	/* A sop to partial compatibility with 4.2 */
+	if (isanumber(c_token)) {
+	    if (++number_of_records > df_num_bin_records)
+		df_add_binary_records(1, DF_CURRENT_RECORDS);
+	    df_bin_record[df_num_bin_records - 1].cart_dim[0] = int_expression();
+#if (1)
+	    if (!END_OF_COMMAND) {
+		char xguy[8]; int itmp=0;
+		copy_str(xguy, c_token, 6);
+		if (xguy[0] == 'x') {
+		    sscanf(&xguy[1],"%d",&itmp);
+		    df_bin_record[df_num_bin_records - 1].cart_dim[1] = itmp;
+		    c_token++;
+		}
+	    }
+#endif
+	} else
+
+	if (equals(c_token, "(")) {
+	    c_token++;
+	    if (++number_of_records > df_num_bin_records)
+		df_add_binary_records(1, DF_CURRENT_RECORDS);
+	    df_bin_record[df_num_bin_records - 1].cart_dim[0] = int_expression();
+	    if (equals(c_token, ",")) {
 		c_token++;
-		if (END_OF_COMMAND) break;
-		copy_str(df_format, c_token, MAX_LINE_LEN);
-		token_string = df_format;
+		df_bin_record[df_num_bin_records - 1].cart_dim[1] = int_expression();
 	    }
-
-	    if (expecting_number
-		&& !(isdigit(*token_string)
-		     || !strncasecmp(token_string, "Inf", 3)))
-		break;
-
-	    if (!strcmp(token_string, TUPLE_SEPARATOR_CHAR)) {
-		i_dimension = 0;
-		token_string++;
-		expecting_number = TRUE;
-		continue;
-	    }
-
-	    if ((*token_string=='x') || (*token_string=='X') ) {
-		i_dimension++;
-		if (i_dimension >= 2)
-		    int_error(c_token,
-			      "No support for sampled array dimensions greater than 2");
-		expecting_number = TRUE;
-		token_string++;
-		continue;
-	    }
-
-	    if (!expecting_number
-		&& (isdigit(*token_string)
-		    || !strncasecmp(token_string, "Inf", 3))) {
-		/* Dimension symbol or comma required. */
-		int_error(c_token, "Use '" TUPLE_SEPARATOR_CHAR "' between records or 'x' between dimensions");
-	    }
-
-	    if (!isdigit(*token_string) && strncasecmp(token_string, "Inf", 3)) break;
-
-	    /* Read number, add records if necessary, record number, advance past number. */
-	    if (isdigit(*token_string)) {
-		sscanf(token_string,"%d",&ival);
-		while(isdigit(*token_string)) token_string++;
-	    } else {
-		ival = 0;
-		token_string += 3;
-	    }
-	    if (!i_dimension) {
-		number_of_records++;
-		if (number_of_records > df_num_bin_records)
-		    df_add_binary_records(1, DF_CURRENT_RECORDS);
-	    }
-	    df_bin_record[df_num_bin_records - 1].cart_dim[i_dimension] = ival;
-	    expecting_number = FALSE;
-
+	    if (!equals(c_token, ")"))
+		int_error(c_token, "tuple syntax error");
+	    c_token++;
 	}
 
-	/* Don't allow ending while expecting a number. */
-	if (expecting_number)
-	    int_error(c_token, "Missing a number");
-
-    }
-
+    } while (equals(c_token, ":"));
 }
 
 
 /* Evaluate a tuple of up to specified dimension. */
+#define TUPLE_SEPARATOR_CHAR ":"
+#define LEFT_TUPLE_CHAR "("
+#define RIGHT_TUPLE_CHAR ")"
+
 int
 token2tuple(double *tuple, int dimension)
 {
@@ -3464,9 +3426,8 @@ plot_option_multivalued(df_multivalue_type type, int arg)
 		break;
 	    case DF_SCAN:
 	    case DF_FLIP:
-		/* Check if there are any characters in string that shouldn't be. */
-		copy_str(df_format, c_token, MAX_LINE_LEN);
-		test_val = ( (strlen(df_format) == strspn(df_format, "xXyYzZ")) || (strlen(df_format) == strspn(df_format, "tTrRzZ")) );
+		/* Will check later */
+		test_val = 1;
 		break;
 	    default: {
 		/* Check if a valid number. */
@@ -3476,8 +3437,8 @@ plot_option_multivalued(df_multivalue_type type, int arg)
 	}
 
 	if (test_val) {
-	    char const * cannot_flip_msg
-		= "Cannot flip a non-existent dimension";
+	    char const * cannot_flip_msg = "Cannot flip a non-existent dimension";
+	    char flip_list[4];
 
 	    if (bin_record_count >= df_num_bin_records)
 		int_error(c_token, "More parameters specified than data records specified");
@@ -3494,7 +3455,7 @@ plot_option_multivalued(df_multivalue_type type, int arg)
 		case DF_FLIP_AXIS:
 		    /* Set the direction of grid points increment in
 		     * the specified dimension. */
-		    if (df_bin_record[bin_record_count].cart_dim[0] > 0) {
+		    if (df_bin_record[bin_record_count].cart_dim[0] != 0) {
 			if (tuple[0] == 0.0)
 			    df_bin_record[bin_record_count].cart_dir[arg] = 0;
 			else if (tuple[0] == 1.0)
@@ -3509,24 +3470,24 @@ plot_option_multivalued(df_multivalue_type type, int arg)
 		    /* Set the direction of grid points increment in
 		     * based upon letters for axes. Check if there are
 		     * any characters in string that shouldn't be. */
-		    copy_str(df_format, c_token, MAX_LINE_LEN);
-		    if (strlen(df_format) != strspn(df_format, "xXyYzZ"))
-			int_error(c_token, "Only x, X, y, Y, z, or Z acceptable in dimension string");
+		    copy_str(flip_list, c_token, 4);
+		    if (strlen(flip_list) != strspn(flip_list, "xXyYzZ"))
+			int_error(c_token, "Can only flip x, y, and/or z");
 		    /* Check for valid dimensions. */
-		    if (strpbrk(df_format, "xX")) {
-			if (df_bin_record[bin_record_count].cart_dim[0] > 0)
+		    if (strpbrk(flip_list, "xX")) {
+			if (df_bin_record[bin_record_count].cart_dim[0] != 0)
 			    df_bin_record[bin_record_count].cart_dir[0] = arg;
 			else
 			    int_error(c_token, cannot_flip_msg);
 		    }
-		    if (strpbrk(df_format, "yY")) {
-			if (df_bin_record[bin_record_count].cart_dim[1] > 0)
+		    if (strpbrk(flip_list, "yY")) {
+			if (df_bin_record[bin_record_count].cart_dim[1] != 0)
 			    df_bin_record[bin_record_count].cart_dir[1] = arg;
 			else
 			    int_error(c_token, cannot_flip_msg);
 		    }
-		    if (strpbrk(df_format, "zZ")) {
-			if (df_bin_record[bin_record_count].cart_dim[2] > 0)
+		    if (strpbrk(flip_list, "zZ")) {
+			if (df_bin_record[bin_record_count].cart_dim[2] != 0)
 			    df_bin_record[bin_record_count].cart_dir[2] = arg;
 			else
 			    int_error(c_token, cannot_flip_msg);
@@ -4200,6 +4161,8 @@ df_readbinary(double v[], int max)
 		map = DF_SCAN_POINT - this_record->cart_scan[i];
 		if (this_record->cart_dim[i] > 0)
 		    scan_size[map] = this_record->cart_dim[i];
+		else if (this_record->cart_dim[i] < 0)
+		    scan_size[map] = MAXINT;
 		else
 		    scan_size[map] = this_record->scan_dim[map];
 		/* Sample periods */

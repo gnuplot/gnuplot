@@ -159,7 +159,7 @@ set title "Simple extension of a two dimensional image into three dimensions"
 set xrange [-10:137]
 set yrange [-10:157]
 set cbrange [0:255]
-splot 'blutux.rgb' binary array=128x128 flip=y format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
+splot 'blutux.rgb' binary array=(128,128) flip=y format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
 reset
 
@@ -170,7 +170,7 @@ print "specified as a three element tuple."
 print ""
 unset colorbox
 set title "Orientation operations from \'plot\' also apply to to \'splot\'"
-splot 'blutux.rgb' binary array=128x128 flipy rotate=90d center = (63.5,63.5,50) format='%uchar%uchar%uchar' using ($1+$2+$3) with image
+splot 'blutux.rgb' binary array=(128,128) flipy rotate=90d center = (63.5,63.5,50) format='%uchar%uchar%uchar' using ($1+$2+$3) with image
 pause -1 "Hit return to continue"
 reset
 
@@ -193,7 +193,7 @@ set arrow from -10,0,0 to 10,0,0 as 1
 set arrow from 0,-10,0 to 0,10,0 as 1
 set arrow from 0,0,-10 to 0,0,10 as 1
 set arrow from 0,0,0 to 30,30,30 as 2
-splot 'blutux.rgb' binary array=128x128 flipy rot=1.0pi center = (63.5,63.5,50) perp=(1,1,1) format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
+splot 'blutux.rgb' binary array=(128,128) flipy rot=1.0pi center = (63.5,63.5,50) perp=(1,1,1) format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
 reset
 
@@ -346,13 +346,13 @@ set title "Decimation works on general binary data files as well.\nLet Tux have 
 set xrange [28:98]
 set yrange [55:125]
 set label 1 "\"Can I do that?\"" at 64,116 center
-plot 'blutux.rgb' binary array=128x128 flipy format='%uchar' every 1:1:43:15:83:65 with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flipy format='%uchar' every 1:1:43:15:83:65 with rgbimage
 pause -1 "Hit return to continue"
 set title "... Sure, go ahead."
 set xrange [-10:130]
 set yrange [-8:157]
 set label 1 "\"Picasso's \'Penguin on Beach\'\"" at 64,139 center
-plot 'blutux.rgb' binary array=128x128 flipy format='%uchar' every 8:8 with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flipy format='%uchar' every 8:8 with rgbimage
 pause -1 "Hit return to continue"
 reset
 
@@ -424,13 +424,13 @@ plot 'demo.edf' binary filetype=auto transpose with image
 set size 0.5,0.5
 set origin 0.0,0.0
 set title 'Details specified at command line'
-set label 1 "array=32x64 dx=10 dy=5 scan=xy" at 315,500 center
-plot 'demo.edf' binary array=32x64 dx=10 dy=5 scan=xy skip=1024 format="%*float%float" using 1 with image
+set label 1 "array=(32,64) dx=10 dy=5 scan=xy" at 315,500 center
+plot 'demo.edf' binary array=(32,64) dx=10 dy=5 scan=xy skip=1024 format="%*float%float" using 1 with image
 set size 0.5,0.5
 set origin 0.5,0.0
 set title 'Transpose of command line axes parameters'
-set label 1 "array=64x32 dx=5 dy=10 scan=yx" at 315,500 center
-plot 'demo.edf' binary array=64x32 dx=5 dy=10 scan=yx skip=1024 format="%*float%float" using 1 with image
+set label 1 "array=(64,32) dx=5 dy=10 scan=yx" at 315,500 center
+plot 'demo.edf' binary array=(64,32) dx=5 dy=10 scan=yx skip=1024 format="%*float%float" using 1 with image
 unset label 1
 unset multiplot
 pause -1 "Hit return to continue"
@@ -462,7 +462,7 @@ set title "Binary data specified at the command line, intended for use through p
 set xrange [-1.5:3.5]
 set yrange [-1.5:3.5]
 set cbrange [0:1]
-plot '-' binary endian=little array=2x2 dx=2 format="%float" using 1:2:3 with rgbimage,\
+plot '-' binary endian=little array=(2,2) dx=2 format="%float" using 1:2:3 with rgbimage,\
      '-' binary endian=little record=4 format="%char" using 1:2 with points pt 7 ps 2 lt -1
            ?       ?           ?               ?    
 pause -1 "Hit return to continue"
@@ -523,7 +523,7 @@ set y2range [-0.5:127.5]
 set y2tics out mirror
 set title '"Eccentric coordinate systems"' offset 0,-0.5
 set label 1 "Images reverse according to axis orientation" at -30,162 center
-plot 'blutux.rgb' binary array=128x128 flip=y format='%uchar' using 1:2:3 with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flip=y format='%uchar' using 1:2:3 with rgbimage
 unset label 1
 set origin 0.5,0.47
 set xrange [-0.5:127.5]
@@ -574,8 +574,8 @@ set rmargin 0
 set lmargin 0
 set view 60, 45, 1, 1
 set label 1 "Tux in a reflective mood" at 140,0,40 center
-splot 'blutux.rgb' binary array=128x128 flip=y rot=90d origin=(0,0,0) perp = (1,0,0) format='%uchar' with rgbimage, \
-      'blutux.rgb' binary array=128x128 flipy rot=90d origin=(+137,+137,0) perp=(0,1,0) format='%uchar' with rgbimage
+splot 'blutux.rgb' binary array=(128,128) flip=y rot=90d origin=(0,0,0) perp = (1,0,0) format='%uchar' with rgbimage, \
+      'blutux.rgb' binary array=(128,128) flipy rot=90d origin=(+137,+137,0) perp=(0,1,0) format='%uchar' with rgbimage
 pause -1 "Hit return to continue"
 reset
 

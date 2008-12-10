@@ -33,7 +33,7 @@ set title "Larry Ewing's GIMP penguin on vacation basking in\nthe balmy waters o
 set xrange [-10:137]
 set yrange [-10:157]
 set label "\"I flew here... by plane.  Why?  For the halibut.\"" at 64,135 center
-plot 'blutux.rgb' binary array=128x128 flipy format='%uchar' with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flipy format='%uchar' with rgbimage
 pause -1 "Hit return to continue"
 reset
 
@@ -59,10 +59,10 @@ set xrange [-10:275]
 set yrange [-10:300]
 unset key
 set label "\"Time for a dip...\"" at 132,285 center
-plot 'blutux.rgb' binary array=128x128 flipy center=( 64,201 ) format='%uchar' with rgbimage, \
-     'blutux.rgb' binary array=128x128 flipy rotation=-90d center=(201,201) format='%uchar' with rgbimage, \
-     'blutux.rgb' binary array=128x128 flip=y rotate=3.1415 center=(201,64) format='%uchar' with rgbimage, \
-     'blutux.rgb' binary array=128x128 flip=y rot=0.5pi center=(64,64) format='%uchar' using 1:2:3 with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flipy center=( 64,201 ) format='%uchar' with rgbimage, \
+     'blutux.rgb' binary array=(128,128) flipy rotation=-90d center=(201,201) format='%uchar' with rgbimage, \
+     'blutux.rgb' binary array=(128,128) flip=y rotate=3.1415 center=(201,64) format='%uchar' with rgbimage, \
+     'blutux.rgb' binary array=(128,128) flip=y rot=0.5pi center=(64,64) format='%uchar' using 1:2:3 with rgbimage
 pause -1 "Hit return to continue"
 reset
 
@@ -83,7 +83,7 @@ set yrange [-10:157]
 set label 1 "\"I am the penguin, GOO GOO GOO JOOB.\"" at 63,140 center
 set title "Palette mode 'image' used to produce psychedelic bird"
 unset colorbox
-plot 'blutux.rgb' binary array=128x128 flipy format='%uchar%uchar%uchar' using ($1+$2+$3) with image
+plot 'blutux.rgb' binary array=(128,128) flipy format='%uchar%uchar%uchar' using ($1+$2+$3) with image
 pause -1 "Hit return to continue"
 reset
 
@@ -107,7 +107,7 @@ set label 1 "\"This picture was taken by my friend Ansel Adams.\"" at 63,140 cen
 set title "The palette can be changed from color to gray scale"
 set palette gray
 unset colorbox
-plot 'blutux.rgb' binary array=128x128 flipy format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
+plot 'blutux.rgb' binary array=(128,128) flipy format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
 unset label 1
 
@@ -134,7 +134,7 @@ set tics out
 set colorbox
 set cbrange [0:255]
 set title "As with 3d color surfaces, a color box may be added to the plot"
-splot 'blutux.rgb' binary array=128x128 flipy format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
+splot 'blutux.rgb' binary array=(128,128) flipy format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
 
 print ""
@@ -163,7 +163,7 @@ set yrange [-10:138]
 set tics out
 set title "Polygons used to draw pixels for rotated images\nNotice the slower refresh rate than for the next plot"
 unset colorbox
-plot 'blutux.rgb' binary array=128x128 dx=0.70711 dy=0.70711 flipy rotation=45d center=(63.5,63.5) format='%uchar' using ($1+$2+$3)/3 with image
+plot 'blutux.rgb' binary array=(128,128) dx=0.70711 dy=0.70711 flipy rotation=45d center=(63.5,63.5) format='%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
 reset
 
@@ -183,7 +183,7 @@ set yrange [-10:138]
 set tics out
 set title "Terminal image routine used to draw plot rotated about origin\nNotice the faster refresh rate than for the previous plot"
 unset colorbox
-plot 'blutux.rgb' binary array=128x128 dx=1 flip=y rotation=0.5pi origin=(0,0) format='%uchar' using ($1+$2+$3)/3 with image
+plot 'blutux.rgb' binary array=(128,128) dx=1 flip=y rotation=0.5pi origin=(0,0) format='%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
 reset
 
@@ -206,20 +206,20 @@ set yrange [-0.5:127.5]
 set tics out
 set label 1 "Selection of the input channels via \`using\`" at 140,160 center
 set title '"I do impersonations..."' offset 0,-0.5
-plot 'blutux.rgb' binary array=128x128 flip=y format='%uchar' using 1:2:3 with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flip=y format='%uchar' using 1:2:3 with rgbimage
 unset label 1
 set size 0.5,0.48
 set origin 0.5,0.47
 set title '"A cardinal."'
-plot 'blutux.rgb' binary array=128x128 flip=y format='%uchar%*uchar%*uchar' using 1:(0):(0) with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flip=y format='%uchar%*uchar%*uchar' using 1:(0):(0) with rgbimage
 set size 0.5,0.48
 set origin 0.0,0.0
 set title '"A parrot."'
-plot 'blutux.rgb' binary array=128x128 flipy format='%*uchar%uchar%*uchar' using (0):1:(0) with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flipy format='%*uchar%uchar%*uchar' using (0):1:(0) with rgbimage
 set size 0.5,0.48
 set origin 0.5,0.0
 set title '"A bluebird."'
-plot 'blutux.rgb' binary array=128x128 flipy format='%*uchar%*uchar%uchar' using (0):(0):1 with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flipy format='%*uchar%*uchar%uchar' using (0):(0):1 with rgbimage
 unset multiplot
 pause -1 "Hit return to continue"
 reset
@@ -244,23 +244,23 @@ set tics out
 set label 1 "Luminance adjustment via \`cbrange\`" at 140,160 center
 set title 'Lake Mendota, "or Wonk-sheck-ho-mik-la!"' offset 0,-0.5
 set cbrange [*:*]
-plot 'blutux.rgb' binary array=128x128 flipy format='%uchar' using 1:2:3 with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flipy format='%uchar' using 1:2:3 with rgbimage
 unset label 1
 set size 0.5,0.48
 set origin 0.5,0.47
 set title '"Lucky I brought sunscreen."'
 set cbrange [0:200]
-plot 'blutux.rgb' binary array=128x128 flip=y format='%uchar' using 1:2:3 with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flip=y format='%uchar' using 1:2:3 with rgbimage
 set size 0.5,0.48
 set origin 0.0,0.0
 set title 'Sunset on the Terrace'
 set cbrange [0:400]
-plot 'blutux.rgb' binary array=128x128 flip=y format='%uchar' using (1.5*$1):2:3 with rgbimage
+plot 'blutux.rgb' binary array=(128,128) flip=y format='%uchar' using (1.5*$1):2:3 with rgbimage
 set size 0.5,0.48
 set origin 0.5,0.0
 set title 'Sultry evening'
 set cbrange [0:400]
-plot 'blutux.rgb' binary array=128x128 flipy format='%uchar' using 1:2:3 with rgbimage, '-' w points pt 7 ps 6 lt -2, '-' w points pt 7 ps 0.65 lt -2
+plot 'blutux.rgb' binary array=(128,128) flipy format='%uchar' using 1:2:3 with rgbimage, '-' w points pt 7 ps 6 lt -2, '-' w points pt 7 ps 0.65 lt -2
 110 100
 e
 10 95
