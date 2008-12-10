@@ -51,7 +51,7 @@ unset key
 set size ratio -1
 set xrange [-2.5:1.5]
 set yrange [-1:2.5]
-plot 'optimize.dat' with circles lc rgb "blue" fs transparent solid 0.15,\
+plot 'optimize.dat' with circles lc rgb "blue" fs transparent solid 0.15 noborder,\
      'optimize.dat' u 1:2 with linespoints lw 2 lc rgb "black"
 
 pause -1 "Hit return to continue"
