@@ -12,6 +12,12 @@
 	* docs/gnuplot.doc demo/image.dem demo/rgbalpha.dem demo/image2.dem
 	demo/circles.dem: Update docs and demos to use the new syntax.
 
+	* src/gadgets.c src/gadgets.h src/graph3d.c src/save.c src/set.c
+	src/show.c src/unset.c docs/gnuplot.doc:
+	Modify command 'set view equal_axes' to accept suboptions xy and xyz.
+	`set view equal xy` uses the same scale for the x and y axes (as before)
+	`set view equal xyz` additionally uses that same scale for the z axis 
+
 2008-12-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.h src/gadgets.c src/gadgets.h src/graphics.c src/misc.c

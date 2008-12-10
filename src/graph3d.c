@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.213 2008/11/02 00:25:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.214 2008/11/28 19:59:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -677,10 +677,12 @@ do_3dplot(
     xscale3d = 2.0 / (X_AXIS.max - X_AXIS.min);
 
     /* Allow 'set view equal_axes' to shrink rendered length of either X or Y axis */
-    if (aspect_ratio_3D == 1.0) {
+    if (aspect_ratio_3D >= 2) {
 	xscale3d = GPMIN(xscale3d,yscale3d);
 	yscale3d = xscale3d;
     }
+    if (aspect_ratio_3D >= 3)
+	zscale3d = xscale3d * (double)term->xmax / (double)term->ymax;
 
     /* Initialize palette */
     if (!quick) {
