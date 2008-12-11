@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.68.2.7 2008/01/07 20:58:37 sfeam Exp $
+ * $Id: pdf.trm,v 1.68.2.8 2008/05/08 20:06:35 sfeam Exp $
  */
 
 /*------------------------------
@@ -1546,7 +1546,7 @@ ENHPDF_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
 
-    if (ignore_enhanced_text || !PDF_fontNameCur) {
+    if (ignore_enhanced_text) {
 	PDF_put_text(x,y,str);
 	return;
     }

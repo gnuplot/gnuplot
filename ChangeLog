@@ -13,6 +13,11 @@
 	The routine term_init() is renamed to term_initialise() to avoid
 	conflict with an identically named routine in libedit.
 
+2008-12-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c src/show.c src/variable.c term/pdf.trm:
+	Quiet some compiler warnings.
+
 2008-12-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_key_sample do_rectangle): Fill style EMPTY

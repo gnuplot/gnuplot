@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.185.2.8 2008/11/27 23:17:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.185.2.9 2008/12/12 06:57:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -630,7 +630,7 @@ show_command()
 
     case S_TERMOPTIONS:
 	fprintf(stderr,"Terminal options are '%s'\n",
-		(term_options && *term_options) ? term_options : "[none]");
+		(*term_options) ? term_options : "[none]");
 	break;
 
     /* HBB 20010525: 'set commands' that don't have an
