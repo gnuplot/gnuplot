@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.287 2008/12/08 06:59:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.288 2008/12/10 06:53:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1551,12 +1551,12 @@ do_plot(struct curve_points *plots, int pcount)
     adjust_offsets();
 
     /* EAM June 2003 - Although the comment below implies that font dimensions
-     * are known after term_init(), this is not true at least for the X11
+     * are known after term_initialise(), this is not true at least for the X11
      * driver.  X11 fonts are not set until an actual display window is
      * opened, and that happens in term->graphics(), which is called from
      * term_start_plot().
      */
-    term_init();		/* may set xmax/ymax */
+    term_initialise();		/* may set xmax/ymax */
     term_start_plot();
 
     /* compute boundary for plot (plot_bounds.xleft, plot_bounds.xright, plot_bounds.ytop, plot_bounds.ybot)

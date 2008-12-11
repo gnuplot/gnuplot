@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.44 2008/08/10 00:52:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.45 2008/11/07 11:55:46 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -57,9 +57,17 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.44 2008/08/10 00:52:20 
 #include "util.h"
 #include "term_api.h"
 
-#if defined(HAVE_LIBREADLINE)
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+#if defined(HAVE_LIBEDITLINE)
+int
+#else
 static int
+#endif
+#if defined(HAVE_LIBEDITLINE)
+getc_wrapper(FILE* fp /* is NULL, supplied by libedit */)
+#else
 getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
+#endif
 {
     int c;
 
@@ -70,15 +78,19 @@ getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
 	}
 	else
 #endif
+#if defined(HAVE_LIBEDITLINE)
+	    c = getchar();
+#else
 	    c = getc(fp);
+#endif
 	if (c == EOF && errno == EINTR)
 	    continue;
 	return c;
     }
 }
-#endif /* HAVE_LIBREADLINE */
+#endif /* HAVE_LIBREADLINE || HAVE_LIBEDITLINE */
 
-#if defined(HAVE_LIBREADLINE) || defined(READLINE)
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE) || defined(READLINE)
 char*
 readline_ipc(const char* prompt)
 {
@@ -90,7 +102,7 @@ readline_ipc(const char* prompt)
 #endif  /* defined(HAVE_LIBREADLINE) || define(READLINE) */
 
 
-#if defined(READLINE) && !defined(HAVE_LIBREADLINE)
+#if defined(READLINE) && !(defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE))
 
 /* a small portable version of GNU's readline
  * this is not the BASH or GNU EMACS version of READLINE due to Copyleft

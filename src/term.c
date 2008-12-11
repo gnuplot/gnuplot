@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.180 2008/09/16 05:35:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.181 2008/11/07 11:55:46 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -50,7 +50,7 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.180 2008/09/16 05:35:25 sfe
   *
   * term_set_output() : called when  set output  invoked
   *
-  * term_init()  : optional. Prepare the terminal for first
+  * term_initialise()  : optional. Prepare the terminal for first
   *                use. It protects itself against subsequent calls.
   *
   * term_start_plot() : called at start of graph output. Calls term_init
@@ -473,9 +473,9 @@ term_set_output(char *dest)
 }
 
 void
-term_init()
+term_initialise()
 {
-    FPRINTF((stderr, "term_init()\n"));
+    FPRINTF((stderr, "term_initialise()\n"));
 
     if (!term)
 	int_error(NO_CARET, "No terminal defined");
@@ -502,7 +502,7 @@ term_init()
 	 */
 	char *temp = gp_alloc(strlen(outstr) + 1, "temp file string");
 	if (temp) {
-	    FPRINTF((stderr, "term_init: reopening \"%s\" as %s\n",
+            FPRINTF((stderr, "term_initialise: reopening \"%s\" as %s\n",
 		     outstr, term->flags & TERM_BINARY ? "binary" : "text"));
 	    strcpy(temp, outstr);
 	    term_set_output(temp);      /* will free outstr */
@@ -543,7 +543,7 @@ term_start_plot()
     FPRINTF((stderr, "term_start_plot()\n"));
 
     if (!term_initialised)
-	term_init();
+        term_initialise();
 
     if (!term_graphics) {
 	FPRINTF((stderr, "- calling term->graphics()\n"));

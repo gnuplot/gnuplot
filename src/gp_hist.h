@@ -1,5 +1,5 @@
 /*
- * $Id: gp_hist.h,v 1.8 2005/08/08 09:24:30 mikulik Exp $
+ * $Id: gp_hist.h,v 1.9 2005/08/12 08:31:56 mikulik Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
@@ -66,16 +66,23 @@ extern long int gnuplot_history_size;
 # include <readline/history.h>
 #endif
 
-#if defined(READLINE) && !defined(HAVE_LIBREADLINE)
+/* NetBSD editline
+ * (almost) compatible readline relacement
+ */
+#if defined(HAVE_LIBEDITLINE)
+# include <editline/readline.h>
+#endif
+
+#if defined(READLINE) && !defined(HAVE_LIBREADLINE) && !defined(HAVE_LIBEDITLINE)
 void add_history __PROTO((char *line));
 void write_history_n __PROTO((const int, const char *, const char *));
 void write_history __PROTO((char *));
 void read_history __PROTO((char *));
-char *history_find __PROTO((char *));
+const char *history_find __PROTO((char *));
 int history_find_all __PROTO((char *));
-#elif defined(HAVE_LIBREADLINE)
+#elif defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 void write_history_n __PROTO((const int, const char *, const char *));
-char *history_find __PROTO((char *));
+const char *history_find __PROTO((char *));
 int history_find_all __PROTO((char *));
 #endif /* READLINE && !HAVE_LIBREADLINE */
 

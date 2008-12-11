@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.222 2008/12/10 06:53:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.223 2008/12/11 06:53:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -529,7 +529,7 @@ show_command()
 #endif
     case S_PLOT:
 	show_plot();
-#if defined(READLINE) || defined(HAVE_LIBREADLINE)
+#if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 	if (!END_OF_COMMAND) {
 	    if (almost_equals(c_token, "a$dd2history")) {
 		c_token++;
@@ -860,12 +860,16 @@ show_version(FILE *fp)
 		"READLINE  ";
 
 	    const char *gnu_rdline =
-#ifdef HAVE_LIBREADLINE
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 		"+"
 #else
 		"-"
 #endif
+#ifdef HAVE_LIBEDITLINE
+		"LIBEDITLINE  "
+#else
 		"LIBREADLINE  "
+#endif
 #ifdef GNUPLOT_HISTORY
 		"+"
 #else

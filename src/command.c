@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.176 2008/08/15 00:45:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.177 2008/11/07 11:55:46 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -483,6 +483,11 @@ restore_prompt()
 #if defined(HAVE_LIBREADLINE)
 	rl_forced_update_display();
 #else
+#if defined(HAVE_LIBEDITLINE)
+	/* FIXME: editline does not support forced update,
+	          so this is probably not enough */
+	rl_redisplay();
+#endif
 	fputs(PROMPT, stderr);
 	fflush(stderr);
 #endif
@@ -869,7 +874,7 @@ exit_command()
 void
 history_command()
 {
-#if defined(READLINE) || defined(HAVE_LIBREADLINE)
+#if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
     c_token++;
 
     if (!END_OF_COMMAND && equals(c_token,"?")) {
@@ -885,7 +890,7 @@ history_command()
 
     } else if (!END_OF_COMMAND && equals(c_token,"!")) {
 	char *search_str = NULL;  /* string from command line to search for */
-	char *line_to_do = NULL;  /* command to execute at end if necessary */
+	const char *line_to_do = NULL;  /* command to execute at end if necessary */
 	int c_token_copy;
 	static char *gpil_copy = NULL;
 
@@ -948,7 +953,7 @@ history_command()
 #else
     c_token++;
     int_warn(NO_CARET, "You have to compile gnuplot with builtin readline or GNU readline to enable history support.");
-#endif /* defined(READLINE) || defined(HAVE_LIBREADLINE) */
+#endif /* defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE) */
 }
 
 #define REPLACE_ELSE(tok)             \
@@ -2388,7 +2393,7 @@ getparms(char *command, char **parms)
 # endif				/* AMIGA_AC_5 */
 
 
-# if defined(READLINE) || defined(HAVE_LIBREADLINE)
+# if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 /* keep some compilers happy */
 static char *rlgets __PROTO((char *s, size_t n, const char *prompt));
 
@@ -2410,7 +2415,7 @@ rlgets(char *s, size_t n, const char *prompt)
 	leftover = 0;
 	/* If it's not an EOF */
 	if (line && *line) {
-#  ifdef HAVE_LIBREADLINE
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 	    int found;
 	    /* Initialize readline history functions */
 	    using_history();
@@ -2421,14 +2426,18 @@ rlgets(char *s, size_t n, const char *prompt)
 	    found = history_search(line, -1);
 	    if (found != -1 && !strcmp(current_history()->line,line)) {
 	    /* this line is already in the history, remove the earlier entry */
+#if defined(HAVE_LIBREADLINE)
 		HIST_ENTRY *removed = remove_history(where_history());
 		/* according to history docs we are supposed to free the stuff */
 		if (removed->line) free(removed->line);
 		if (removed->data) free(removed->data);
 		free(removed);
+#else
+		remove_history(where_history());
+#endif /* !HAVE_LIBREADLINE */
 	    }
 	    add_history(line);
-#  else /* !HAVE_LIBREADLINE */
+#  else /* !HAVE_LIBREADLINE && !HAVE_LIBEDITLINE */
 	    add_history(line);
 #  endif
 	}
@@ -2521,7 +2530,7 @@ do_shell()
 
 /* read from stdin, everything except VMS */
 
-# if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
+# if !defined(READLINE) && !defined(HAVE_LIBREADLINE) && !defined(HAVE_LIBEDITLINE)
 #  if (defined(MSDOS) || defined(DOS386)) && !defined(_Windows) && !defined(__EMX__) && !defined(DJGPP)
 
 /* if interactive use console IO so CED will work */
@@ -2655,7 +2664,7 @@ fgets_ipc(
 static char*
 gp_get_string(char * buffer, size_t len, const char * prompt)
 {
-# if defined(READLINE) || defined(HAVE_LIBREADLINE)
+# if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
     if (interactive)
 	return rlgets(buffer, len, prompt);
     else

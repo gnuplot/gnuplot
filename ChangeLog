@@ -1,3 +1,18 @@
+2008-12-11  Bastian Maerkisch  <bmaerkisch@web.de>
+            Axel Thimm <thimm@users.sourceforge.net>
+
+	* configure.in NEWS src/command.c src/gp_hist.h src/graphics.c
+	src/history.c src/plot.c src/readline.c src/readline.h src/show.c
+	src/term_api.h src/term.c (term_initialise):
+
+	./configure --with-readline=bsd
+	Allow gnuplot to use the NetBSD editline library as an alternative to
+	gnu readline. This adaptation was originally coded by Bastian Maerkisch
+	and subsequently improved by Axel Thimm and by Tormod Volden.
+	The routine term_init() is renamed to term_initialise()
+	to avoid conflict with an identically named routine in libedit.
+	SF Patch #1504831
+
 2008-12-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: Revise syntax of binary datafile record= and array=
