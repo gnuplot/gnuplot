@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.58 2006/04/29 00:37:42 tlecomte Exp $
+ * $Id: term_api.h,v 1.59 2006/06/14 00:25:04 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -361,7 +361,7 @@ extern TBOOLEAN ignore_enhanced_text;
 /* Prototypes of functions exported by term.c */
 
 void term_set_output __PROTO((char *));
-void term_init __PROTO((void));
+void term_initialise __PROTO((void));
 void term_start_plot __PROTO((void));
 void term_end_plot __PROTO((void));
 void term_start_multiplot __PROTO((void));

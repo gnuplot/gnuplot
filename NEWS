@@ -1,5 +1,6 @@
 New features, changes and fixes since previous release
 ===========================================================
+* NEW ./configure --with-readline=bsd to use libedit rather than libreadline
 * NEW command line option -e "command list"
 * NEW 'set xtics rangelimit' allows creation of range/frame plots
 * NEW "set view equal_axes" does for 3D what "set size square" does for 2D.

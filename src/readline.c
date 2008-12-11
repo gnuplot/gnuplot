@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.41 2006/04/28 16:54:03 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.41.2.1 2008/08/10 00:50:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -57,7 +57,7 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.41 2006/04/28 16:54:03 
 #include "util.h"
 #include "term_api.h"
 
-#if defined(HAVE_LIBREADLINE)
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 /* #include <readline/readline.h> --- HBB 20000508: now included by readline.h*/
 /* #include <readline/history.h> --- HBB 20000508: now included by gp_hist */
 
@@ -66,7 +66,7 @@ static char* line_buffer;
 static int line_complete;
 
 /**
- * called by libreadline if the input
+ * called by libreadline or editline if the input
  * was typed (not from the ipc).
  */
 static void
@@ -77,8 +77,16 @@ LineCompleteHandler(char* ptr)
     line_complete = 1;
 }
 
+#if defined(HAVE_LIBEDITLINE)
+int
+#else
 static int
+#endif
+#if defined(HAVE_LIBEDITLINE)
+getc_wrapper(FILE* fp /* is NULL, supplied by libedit */)
+#else
 getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
+#endif
 {
     int c;
 
@@ -89,16 +97,20 @@ getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
 	}
 	else
 #endif
+#if defined(HAVE_LIBEDITLINE)
+	    c = getchar();
+#else
 	    c = getc(fp);
+#endif
 	if (c == EOF && errno == EINTR)
 	    continue;
 	return c;
     }
 }
 
-#endif /* HAVE_LIBREADLINE */
+#endif /* HAVE_LIBREADLINE || HAVE_LIBEDITLINE */
 
-#if defined(HAVE_LIBREADLINE) || defined(READLINE)
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE) || defined(READLINE)
 char*
 readline_ipc(const char* prompt)
 {
@@ -121,7 +133,7 @@ readline_ipc(const char* prompt)
 #endif  /* defined(HAVE_LIBREADLINE) || define(READLINE) */
 
 
-#if defined(READLINE) && !defined(HAVE_LIBREADLINE)
+#if defined(READLINE) && !(defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE))
 
 /* a small portable version of GNU's readline
  * this is not the BASH or GNU EMACS version of READLINE due to Copyleft

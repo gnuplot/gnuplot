@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.90.2.3 2007/06/04 21:01:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.90.2.4 2008/10/08 18:04:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -116,6 +116,12 @@ extern smg$create_key_table();
 # endif
 extern int rl_complete_with_tilde_expansion;
 #endif 
+
+/* BSD editline
+*/
+#ifdef HAVE_LIBEDITLINE
+# include <editline/readline.h>
+#endif
 
 /* enable gnuplot history with readline */
 #ifdef GNUPLOT_HISTORY
@@ -348,13 +354,18 @@ main(int argc, char **argv)
     unsigned int status[2] = { 1, 0 };
 #endif
 
-#ifdef HAVE_LIBREADLINE
+#if defined(HAVE_LIBEDITLINE)
+    rl_getc_function = getc_wrapper;
+#endif
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
     using_history();
     /* T.Walter 1999-06-24: 'rl_readline_name' must be this fix name.
      * It is used to parse a 'gnuplot' specific section in '~/.inputrc' */
     rl_readline_name = "Gnuplot";
-    rl_complete_with_tilde_expansion = 1;
     rl_terminal_name = getenv("TERM");
+#endif
+#if defined(HAVE_LIBREADLINE)
+    rl_complete_with_tilde_expansion = 1;
 #endif
 
     for (i = 1; i < argc; i++) {
@@ -571,7 +582,7 @@ main(int argc, char **argv)
 	if (interactive && term != 0) {		/* not unknown */
 #ifdef GNUPLOT_HISTORY
 	    FPRINTF((stderr, "Before read_history\n"));
-#ifdef HAVE_LIBREADLINE
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 	    expanded_history_filename = tilde_expand(GNUPLOT_HISTORY_FILE);
 #else
 	    expanded_history_filename = gp_strdup(GNUPLOT_HISTORY_FILE);
@@ -683,12 +694,12 @@ main(int argc, char **argv)
 	while (!com_line());
     }
 
-#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#if (defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)) && defined(GNUPLOT_HISTORY)
 #if !defined(HAVE_ATEXIT) && !defined(HAVE_ON_EXIT)
     /* You should be here if you neither have 'atexit()' nor 'on_exit()' */
     wrapper_for_write_history();
 #endif /* !HAVE_ATEXIT && !HAVE_ON_EXIT */
-#endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
+#endif /* (HAVE_LIBREADLINE || HAVE_LIBEDITLINE) && GNUPLOT_HISTORY */
 
 #ifdef OS2
     RexxDeregisterSubcom("GNUPLOT", NULL);
@@ -973,7 +984,7 @@ RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 #endif
 
 #ifdef GNUPLOT_HISTORY
-# ifdef HAVE_LIBREADLINE
+# if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 
 static void
 wrapper_for_write_history()
@@ -1001,7 +1012,7 @@ wrapper_for_write_history()
 #endif
 }
 
-# else /* HAVE_LIBREADLINE */
+# else /* HAVE_LIBREADLINE || HAVE_LIBEDITLINE */
 
 /* version for gnuplot's own write_history */
 static void
@@ -1016,6 +1027,6 @@ wrapper_for_write_history()
 	write_history_n(gnuplot_history_size, expanded_history_filename, "w");
 }
 
-# endif /* HAVE_LIBREADLINE */
+# endif /* HAVE_LIBREADLINE || HAVE_LIBEDITLINE */
 #endif /* GNUPLOT_HISTORY */
 

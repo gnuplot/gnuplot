@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.21 2006/08/05 20:54:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.21.2.1 2007/06/03 11:56:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -52,7 +52,7 @@ long int gnuplot_history_size = HISTORY_SIZE;
 #endif
 
 
-#if defined(READLINE) && !defined(HAVE_LIBREADLINE)
+#if defined(READLINE) && !defined(HAVE_LIBREADLINE) && !defined(HAVE_LIBEDITLINE)
 
 struct hist *history = NULL;     /* no history yet */
 struct hist *cur_entry = NULL;
@@ -259,7 +259,7 @@ read_history(char *filename)
  * (ignores leading spaces in <cmd>)
  * Returns NULL if nothing found
  */
-char *
+const char *
 history_find(char *cmd)
 {
     struct hist *entry = history;
@@ -336,7 +336,7 @@ history_find_all(char *cmd)
     return res;
 }
 
-#elif defined(HAVE_LIBREADLINE)
+#elif defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 
 /* Save history to file, or write to stdout or pipe.
  * For pipes, only "|" works, pipes starting with ">" get a strange 
@@ -351,7 +351,10 @@ const int num;
 const char *const filename;
 const char *mode;
 {
+#ifdef HAVE_LIBREADLINE
     HIST_ENTRY **the_list = history_list();
+#endif
+    const HIST_ENTRY *list_entry;
     FILE *out = stdout;
     int is_pipe = 0;
     int is_file = 0;
@@ -386,17 +389,18 @@ const char *mode;
         if (istart < 0 || istart > history_length)
             istart = 0;
     } else istart = 0;
+#ifdef HAVE_LIBREADLINE
     if (the_list)
-        for (i = istart; the_list[i]; i++) {
+#endif
+        for (i = istart; list_entry = history_get(i); i++) {
             /* don't add line numbers when writing to file to make file loadable */
             if (is_file)
-                fprintf(out, "%s\n", the_list[i]->line);
+                fprintf(out, "%s\n", list_entry->line);
             else {
                 if (!is_quiet) fprintf(out, "%5i", i + history_base);
-                fprintf(out, "  %s\n", the_list[i]->line);
+                fprintf(out, "  %s\n", list_entry->line);
             }
         }
-
     /* close if something was opened */
 #ifdef PIPES
     if (is_pipe) pclose(out);
@@ -419,7 +423,7 @@ const char *mode;
  *
  * Peter Weilbacher, 28Jun2004
  */
-char *
+const char *
 history_find(cmd)
 char *cmd;
 {
@@ -480,4 +484,4 @@ char *cmd;
     return number;
 }
 
-#endif /* READLINE && !HAVE_LIBREADLINE */
+#endif /* READLINE && !HAVE_LIBREADLINE && !HAVE_LIBEDITLINE */
