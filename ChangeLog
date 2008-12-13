@@ -1,3 +1,9 @@
+2008-12-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm: Replace assert() statements with int_warn().
+	Fix handling of enhanced text for which the rotation angle is non-zero.
+	Bug #2424595
+
 2008-12-11  Bastian Maerkisch  <bmaerkisch@web.de>
             Axel Thimm <thimm@users.sourceforge.net>
 

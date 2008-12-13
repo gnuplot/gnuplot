@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.42.2.8 2008/08/06 22:09:41 sfeam Exp $
+ * $Id: emf.trm,v 1.42.2.9 2008/09/13 20:43:38 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -294,7 +294,6 @@ TERM_PUBLIC void ENHemf_FLUSH __PROTO((void));
 #ifdef TERM_BODY
 
 #include <ctype.h>              /* for isspace() */
-#include <assert.h>
 
 static unsigned int emf_posx;
 static unsigned int emf_posy;
@@ -688,6 +687,9 @@ EMF_options()
             emf_monochrome ? "monochrome" : "color",
             emf_dashed ? "dashed" : "solid",
             emf_defaultfontname, emf_defaultfontsize);
+
+    if (term->flags & TERM_ENHANCED_TEXT)
+	strcat(term_options, " enhanced ");
     if (term->xmax != (int)EMF_XMAX || term->ymax != (int)EMF_YMAX)
         sprintf(&(term_options[strlen(term_options)]), " size %d,%d ",
             (int)(0.5+term->xmax/EMF_PX2HM), (int)(0.5+term->ymax/EMF_PX2HM));
@@ -967,7 +969,6 @@ EMF_linewidth(double width)
         int current_dashtype = emf_dashtype;
     
     width *= emf_linewidth_factor;
-    assert(width >= 0);
     if (width == emf_linewidth)
         return;
     emf_linewidth = width;
@@ -1034,7 +1035,10 @@ EMF_dashtype(int dashtype)
 TERM_PUBLIC void 
 EMF_move(unsigned int x, unsigned int y)
 {
-    assert(x < term->xmax && y < term->ymax);
+    if (x >= term->xmax || y >= term->ymax) {
+	int_warn(NO_CARET, "emf_move: (%d,%d) out of range",x,y);
+	x = GPMIN(x, term->xmax); y = GPMIN(y, term->ymax);
+    }
     if (x == emf_posx && y == emf_posy)
         return;
     EMF_flush_polyline();
@@ -1050,7 +1054,8 @@ EMF_dashed_vector(unsigned int ux, unsigned int uy)
     int dist;                   /* approximate distance in plot units from starting point to specified end point. */
     long remain;                /* approximate distance in plot units remaining to specified end point. */
 
-    assert(ux < term->xmax && uy < term->ymax);
+    if (ux >= term->xmax || uy >= term->ymax)
+	int_warn(NO_CARET, "emf_dashed_vector: (%d,%d) out of range",ux,uy);
 
     dx = (ux - emf_posx);
     dy = (uy - emf_posy);
@@ -1093,7 +1098,8 @@ EMF_dashed_vector(unsigned int ux, unsigned int uy)
 TERM_PUBLIC void 
 EMF_solid_vector(unsigned int ux, unsigned int uy)
 {
-    assert(ux < term->xmax && uy < term->ymax);
+    if (ux >= term->xmax || uy >= term->ymax)
+	int_warn(NO_CARET, "emf_solid_vector: (%d,%d) out of range",ux,uy);
     if (ux == emf_posx && uy == emf_posy)
         return;
     if (emf_coords * 2 > EMF_MAX_SEGMENTS - 2)
@@ -1424,6 +1430,7 @@ ENHemf_FLUSH()
     char *str;
     int i;
     int incr_x;
+    double strl;
 
 	if (ENHemf_opened_string) {
 	    *enhanced_cur_text = '\0';
@@ -1483,8 +1490,17 @@ ENHemf_FLUSH()
 	    EMF_write_long(1);			/* GM_Compatible mode for advanced scaling */
 	    EMF_write_float(EMF_PX2HM);		/* x scale */
 	    EMF_write_float(EMF_PX2HM);		/* y scale */
-	    EMF_write_pointl(			/* x,y position (ignored if TA_UPDATECP) */
-		x, term->ymax - (y + 1.3 * EMF_PX2HM * ENHemf_base));
+	    if (emf_vert_text == 0) {		/* x,y position (ignored if TA_UPDATECP) */
+		float yo = 1.3 * EMF_PX2HM * ENHemf_base;
+		EMF_write_pointl(
+			x, term->ymax - (y + yo));
+	    } else {
+		float a = emf_vert_text * EMF_10THDEG2RAD;
+		float yo = 1.3 * EMF_PX2HM * ENHemf_base;
+		EMF_write_pointl(
+			x - (long) (yo * sin(a)),
+			term->ymax - (long) (y + (yo * cos(a))) );
+	    }
 	    EMF_write_long(strlen(str)); 	/* true number of characters */
 	    EMF_write_long(76);			/* offset to text */
 	    EMF_write_long(ETO_NO_RECT);	/* ExtTextOut options */
@@ -1495,6 +1511,11 @@ ENHemf_FLUSH()
 	    for (i = 0; i < strlen(str); i++)
 		EMF_write_long(300); 		/* intercharacter spacing array (not used) */
 	    }
+
+	    /* Empirical hack */
+	    strl = strlen(str);
+	    if (emf_vert_text != 0)
+		strl += 1.0;
 
 	    if (emf_tweak) {
 		/* Tweak estimated length of rendered string by counting "thin" characters */
@@ -1510,13 +1531,16 @@ ENHemf_FLUSH()
 		    if('i' == str[i])
 			thin++;
 		}
-		incr_x = ((double)strlen(str) * EMF_AVG_WID + (double)(wide-thin) * 0.2)
+		incr_x = (strl * EMF_AVG_WID + (double)(wide-thin) * 0.2)
 			* term->h_char;
 		}
 	    } else {
-		incr_x = (double)strlen(str) * EMF_AVG_WID * term->h_char;
+		incr_x = strl * EMF_AVG_WID * term->h_char;
 	    }
-	    emf_posx += incr_x;
+
+	    /* Attempt to handle slanted text. Not entirely successful */
+	    emf_posx += incr_x * cos(emf_vert_text * EMF_10THDEG2RAD);
+	    emf_posy += incr_x * sin(emf_vert_text * EMF_10THDEG2RAD);
 
 	    if (ENHemf_overprint == 1)
 		emf_posx -= strlen(str) * term->h_char 
