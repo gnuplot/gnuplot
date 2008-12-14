@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.214 2008/11/28 19:59:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.215 2008/12/11 06:53:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -109,6 +109,9 @@ int iso_samples_1 = ISO_SAMPLES;
 int iso_samples_2 = ISO_SAMPLES;
 
 double xscale3d, yscale3d, zscale3d;
+double xcenter3d = 0.0;
+double ycenter3d = 0.0;
+double zcenter3d = 0.0;
 
 typedef enum { ALLGRID, FRONTGRID, BACKGRID, BORDERONLY } WHICHGRID;
 
@@ -434,6 +437,18 @@ boundary3d(struct surface_points *plots, int count)
 	    plot_bounds.xleft += key_width;
     }
 
+    if (!splot_map && aspect_ratio_3D > 0) {
+	int height = (plot_bounds.ytop - plot_bounds.ybot);
+	int width  = (plot_bounds.xright - plot_bounds.xleft);
+	if (height > width) {
+	    plot_bounds.ybot += (height-width)/2;
+	    plot_bounds.ytop -= (height-width)/2;
+	} else {
+	    plot_bounds.xleft += (width-height)/2;
+	    plot_bounds.xright -= (width-height)/2;
+	}
+    }
+
     if (lmargin.scalex != screen)
 	plot_bounds.xleft += t->xmax * xoffset;
     if (rmargin.scalex != screen)
@@ -446,9 +461,6 @@ boundary3d(struct surface_points *plots, int count)
     ymiddle = (plot_bounds.ytop + plot_bounds.ybot) / 2;
 
     
-    /* HBB 980308: sigh... another 16bit glitch: on term's with more than
-     * 8000 pixels in either direction, these calculations produce garbage
-     * results if done in (16bit) ints */
     /* HBB: Magic number alert! */
     xscaler = ((plot_bounds.xright - plot_bounds.xleft) * 4L) / 7L;
     yscaler = ((plot_bounds.ytop - plot_bounds.ybot) * 4L) / 7L;
@@ -463,9 +475,7 @@ boundary3d(struct surface_points *plots, int count)
     if (splot_map && aspect_ratio != 0.0) {
 	double current_aspect_ratio;
 
-	if (aspect_ratio < 0
-	    && (X_AXIS.max - X_AXIS.min) != 0.0
-	    ) {
+	if (aspect_ratio < 0 && (X_AXIS.max - X_AXIS.min) != 0.0) {
 	    current_aspect_ratio = - aspect_ratio
 		* fabs((Y_AXIS.max - Y_AXIS.min) /
 		       (X_AXIS.max - X_AXIS.min));
@@ -676,13 +686,22 @@ do_3dplot(
     yscale3d = 2.0 / (Y_AXIS.max - Y_AXIS.min);
     xscale3d = 2.0 / (X_AXIS.max - X_AXIS.min);
 
-    /* Allow 'set view equal_axes' to shrink rendered length of either X or Y axis */
+    /* Allow 'set view equal xy' to adjust rendered length of the X and/or Y axes. */
+    /* FIXME EAM - This only works correctly if the coordinate system of the       */
+    /* terminal itself is isotropic.  E.g. x11 does not work because the x and y   */
+    /* coordinates always run from 0-4095 regardless of the shape of the window.   */
+    xcenter3d = ycenter3d = zcenter3d = 0.0;
     if (aspect_ratio_3D >= 2) {
-	xscale3d = GPMIN(xscale3d,yscale3d);
-	yscale3d = xscale3d;
+	if (yscale3d > xscale3d) {
+	    ycenter3d = 0.5*yscale3d/xscale3d - 1.0;
+	    yscale3d = xscale3d;
+	} else if (xscale3d > yscale3d) {
+	    xcenter3d = 0.5*xscale3d/yscale3d - 1.0;
+	    xscale3d = yscale3d;
+	}
+	if (aspect_ratio_3D >= 3)
+	    zscale3d = xscale3d;
     }
-    if (aspect_ratio_3D >= 3)
-	zscale3d = xscale3d * (double)term->xmax / (double)term->ymax;
 
     /* Initialize palette */
     if (!quick) {

@@ -1,3 +1,9 @@
+2008-12-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/graph3d.h:  More work on "set view equal {xy|xyz}'.
+	It now works well for terminals with isotropic coordinate systems, but 
+	unfortunately not for x11 or windows.
+
 2008-12-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm: Replace assert() statements with int_warn().

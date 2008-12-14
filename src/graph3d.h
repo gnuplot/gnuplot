@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.33 2008/03/20 09:05:33 sfeam Exp $
+ * $Id: graph3d.h,v 1.34 2008/05/18 03:31:17 janert Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -46,9 +46,9 @@
 #include "term_api.h"
 
 /* Function macros to map from user 3D space into normalized -1..1 */
-#define map_x3d(x) ((x-X_AXIS.min)*xscale3d-1.0)
-#define map_y3d(y) ((y-Y_AXIS.min)*yscale3d-1.0)
-#define map_z3d(z) ((z-floor_z)*zscale3d-1.0)
+#define map_x3d(x) ((x-X_AXIS.min)*xscale3d + xcenter3d -1.0)
+#define map_y3d(y) ((y-Y_AXIS.min)*yscale3d + ycenter3d -1.0)
+#define map_z3d(z) ((z-floor_z)*zscale3d + zcenter3d -1.0)
 
 /* Type definitions */
 
@@ -131,6 +131,7 @@ extern double floor_z;
 extern double ceiling_z, base_z; /* made exportable for PM3D */
 extern transform_matrix trans_mat;
 extern double xscale3d, yscale3d, zscale3d;
+extern double xcenter3d, ycenter3d, zcenter3d;
 
 extern t_contour_placement draw_contour;
 extern TBOOLEAN	label_contours;
