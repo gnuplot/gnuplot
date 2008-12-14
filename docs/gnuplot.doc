@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.47 2008/12/08 07:18:30 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.48 2008/12/08 17:22:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8329,7 +8329,7 @@ C ... and restart the table:
  values (1.0).
 
  `ratio` and `square` have no effect on 3-d plots, but do affect 3D projections
- created using `set view map`.  Similarly `set view equal_axes` forces the
+ created using `set view map`.  Similarly `set view equal` forces the
  x and y axes of a 3D onto the same scale.
 
  Examples:
@@ -9791,7 +9791,7 @@ C ... and restart the table:
 ?commands show view
 ?set view
 ?set view map
-?set view equal_axes
+?set view {no}equal {xy|xyz}
 ?show view
 ?view
  The `set view` command sets the viewing angle for `splot`s.  It controls how
@@ -9830,9 +9830,12 @@ C ... and restart the table:
  The first sets all the four default values.  The second changes only scale,
  to 0.5.
 
- The command `set view equal_axes` forces the unit length of the x and y axes
- to be on the same same.  Otherwise by default both axes are scaled to fill the
- available area.  This is similar to the `set size square` command for 2D plots.
+ The command `set view equal xy` forces the unit length of the x and y axes
+ to be on the same scale, and chooses that scale so that the plot will fit on
+ the page.  The command `set view equal xyz` additionally sets the z axis
+ scale to match the x and y axes; however there is no guarantee that the
+ current z axis range will fit within the plot boundary.
+ By default all three axes are scaled independently to fill the available area.
 
  See also `set ticslevel`.
 3 vrange

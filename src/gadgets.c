@@ -75,7 +75,7 @@ float zsize = 1.0;		/* scale factor for size */
 float xoffset = 0.0;		/* x origin */
 float yoffset = 0.0;		/* y origin */
 float aspect_ratio = 0.0;	/* don't attempt to force it */
-float aspect_ratio_3D = 0.0;	/* 1.0 will put x and y on same scale */
+int aspect_ratio_3D = 0;	/* 2 will put x and y on same scale, 3 for z also */
 
 /* EAM Augest 2006 - 
    redefine margin as t_position so that absolute placement is possible */
