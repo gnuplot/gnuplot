@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.166 2008/12/05 04:54:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.167 2008/12/11 04:09:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3331,12 +3331,12 @@ plot_option_array(void)
     do {
 	c_token++;
 
-	/* A sop to partial compatibility with 4.2 */
+	/* Partial backward compatibility with syntax up to 4.2.4 */
 	if (isanumber(c_token)) {
 	    if (++number_of_records > df_num_bin_records)
 		df_add_binary_records(1, DF_CURRENT_RECORDS);
 	    df_bin_record[df_num_bin_records - 1].cart_dim[0] = int_expression();
-#if (1)
+	    /* Handle the old syntax:  array=123x456 */
 	    if (!END_OF_COMMAND) {
 		char xguy[8]; int itmp=0;
 		copy_str(xguy, c_token, 6);
@@ -3346,7 +3346,6 @@ plot_option_array(void)
 		    c_token++;
 		}
 	    }
-#endif
 	} else
 
 	if (equals(c_token, "(")) {
