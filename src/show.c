@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.223 2008/12/11 06:53:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.224 2008/12/12 21:06:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1067,18 +1067,17 @@ show_version(FILE *fp)
 
 	    if (driverdir == NULL)
 		driverdir = X11_DRIVER_DIR;
-	    fprintf(stderr, "\
-DRIVER_DIR     = \"%s\"\n", driverdir);
+	    fprintf(stderr, "GNUPLOT_DRIVER_DIR = \"%s\"\n", driverdir);
 	}
 #endif
 
 #ifdef GNUPLOT_PS_DIR
 	{
-	   fprintf(stderr, "GNUPLOT_PS_DIR = \"%s\"\n", GNUPLOT_PS_DIR);
+	    fprintf(stderr, "GNUPLOT_PS_DIR     = \"%s\"\n", GNUPLOT_PS_DIR);
 	}
 #endif
 
-	fprintf(stderr, "HELPFILE       = \"%s\"\n", helpfile);
+	fprintf(stderr, "HELPFILE           = \"%s\"\n", helpfile);
 
     }
 }

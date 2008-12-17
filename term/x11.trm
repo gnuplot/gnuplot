@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.176 2008/10/07 21:01:20 sfeam Exp $
+ * $Id: x11.trm,v 1.177 2008/11/06 19:17:30 sfeam Exp $
  *
  */
 
@@ -275,7 +275,7 @@ parse_driver(const char *cmd)
 	if (dir[0] != '/' && dir[0] != '.') {
 	    /* Can't call int_error because longjump has not been set up yet */
 	    int_warn(NO_CARET, "Illegal X11 driver directory name! Using default");
-	    *dir = '\0';
+	    dir = "";
 	}
 #endif
 	X11_full_command_path = gp_realloc(X11_full_command_path,
@@ -1239,7 +1239,7 @@ X11_graphics()
 #endif
     /* send also XID of gnuplot window (<space> then raises it up) */
     if (!windowid) {
-	char *window_env = (char *) getenv("WINDOWID");
+	char *window_env = getenv("WINDOWID");
 	if (window_env)
 	    sscanf(window_env, "%lu", &windowid);
     }

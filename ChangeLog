@@ -1,7 +1,7 @@
 2008-12-17  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/show.c (show_version) term/x11/trm:  Do not overwrite the 
-	environmental variable GNUPLOT_DRIVER_DIR.
+	* src/show.c (show_version) term/x11.trm (parse_driver):
+	Do not overwrite the environmental variable GNUPLOT_DRIVER_DIR.
 
 2008-12-14  Ethan Merritt  <merritt@u.washington.edu>
 
