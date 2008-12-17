@@ -1,3 +1,8 @@
+2008-12-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm (parse_driver):  Do not overwrite environmental variable
+	GNUPLOT_DRIVER_DIR.
+
 2008-12-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/gadgets.h src/graph3d.c src/graph3d.h src/save.c
