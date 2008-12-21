@@ -1,3 +1,17 @@
+2008-12-21  Peter Hedwig  <peter@affenbande.org>
+
+	* configure.in src/Makefile.am src/term.h term/Makefile.am.in
+	term/lua/ChangeLog term/lua/gnuplot.lua term/lua/gnuplot-lua-tikz.sty
+	term/lua/INSTALL term/lua/NEWS term/lua/README term/lua/TODO:
+
+	Generic Lua terminal with PGF/TikZ support.
+	The current implementation supports output via TikZ/pdflatex:
+		set term lua standalone
+		set output 'plot.tex'
+		plot foo
+		unset output
+		!pdflatex plot
+
 2008-12-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version) term/x11.trm (parse_driver):

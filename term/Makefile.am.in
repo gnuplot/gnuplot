@@ -2,9 +2,11 @@
 AUTOMAKE_OPTIONS = foreign 1.2h
 
 EXTRA_DIST = README Makefile.am.in driver.h impcodes.h \
-object.h post.h $(CORETERM) PostScript
+object.h post.h $(CORETERM) PostScript lua
 
 postscriptdir = $(pkgdatadir)/$(VERSION_MAJOR)/PostScript
+
+luadir = $(pkgdatadir)/$(VERSION_MAJOR)
 
 # List of terminal drivers, and list of postscript installation files
 # must be created prior to running automake
@@ -19,6 +21,9 @@ Makefile.am: Makefile.am.in
 	  >> $@t
 	echo '#' >> $@t
 	echo postscript_DATA = PostScript/*.ps PostScript/*.txt | fmt \
+	  | (tr '\012' @; echo) |sed 's/@$$/%/;s/@/ \\@/g' \
+	  | tr @% '\012 ' >> $@t
+	echo lua_DATA = lua/*.sty | fmt \
 	  | (tr '\012' @; echo) |sed 's/@$$/%/;s/@/ \\@/g' \
 	  | tr @% '\012 ' >> $@t
 	sed -n '/^##trm-files-end/,$$p' Makefile.am.in >> $@t

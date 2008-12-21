@@ -1,0 +1,20 @@
+TODO
+====
+
+Autoconf
+
+ * liblua is not always named liblua;  can we autodetect its name?
+ * where to install gnuplot-lua-tikz.sty?  Versioning?
+
+Lua generic terminal
+
+ * support color palettes (low priority, not really needed for TikZ?)
+ * support enhanced text mode (low priority, not really needed for TikZ)
+ * alpha channel support for image data (need to have a look)?
+
+TikZ backend
+
+ * alpha channel support for image data (need to have a look)?
+ * automatic detection of font sizes (via LaTeX test call?! very low priority)
+ * ConTeXt and plain TeX support
+ * switch to pgf 2.0 style system

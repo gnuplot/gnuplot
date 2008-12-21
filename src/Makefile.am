@@ -13,6 +13,9 @@ HELPFILE=@GIHDIR@/gnuplot.gih
 # Default X11 driver location
 X11_DRIVER_DIR=$(pkglibexecdir)
 
+# Default lua driver location
+LUA_DRIVER_DIR=$(pkglibexecdir)
+
 # Default Postscript prologues location
 GNUPLOT_PS_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/PostScript
 
@@ -43,11 +46,19 @@ util3d.c util3d.h variable.c variable.h version.c version.h
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS) $(WX_LIBS)
 
+pkglibexec_PROGRAMS = 
+
 if BUILD_GNUPLOT_X11
-pkglibexec_PROGRAMS = gnuplot_x11
+pkglibexec_PROGRAMS += gnuplot_x11
 gnuplot_x11_SOURCES = gplt_x11.c gplt_x11.h gpexecute.c gpexecute.h mousecmn.h
 XLIBS = @LIBRARIES_FOR_X@
 gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
+endif
+
+if BUILD_LUA
+pkglibexec_PROGRAMS += gnuplot.lua
+gnuplot.lua: ../term/lua/gnuplot.lua
+	cp ../term/lua/gnuplot.lua .
 endif
 
 getcolor_x11.o: getcolor.c

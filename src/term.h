@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.39 2008/05/31 19:49:44 sfeam Exp $
+ * $Id: term.h,v 1.40 2008/05/31 21:38:13 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -445,6 +445,10 @@
 
 #ifdef HAVE_CAIROPDF
 # include "cairo.trm"
+#endif
+
+#ifdef HAVE_LUA
+#include "lua.trm"
 #endif
 
 #endif /* !SHORT_TERMLIST */

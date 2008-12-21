@@ -1,0 +1,283 @@
+2008-12-20  peter
+
+	* [r90] /Copyright, /gnuplot.lua, /lua.trm: style and color name
+	  changes and small fixes
+	  plot box coordinates are now accessible via a special node
+	  new interface function gp.term_options()
+
+2008-12-09  peter
+
+	* [r89] /COPYING, /Copyright, /INSTALL, /README, /TODO,
+	  /gnuplot.lua, /lua.trm: Changed the license from GPL to gnuplot
+	  license
+
+2008-11-23  peter
+
+	* [r88] /gnuplot.lua: fixed a typo in charsize example code
+	* [r87] /gnuplot.lua: added some example code for charsize
+	  small bugfix on charsize/canvas calculation
+
+2008-11-22  peter
+
+	* [r86] /gnuplot.lua: Straightened the canvas calculation to make
+	  it more easy to change the default sizes.
+	  Changed the default canvas size to 12.5cm x 8.75cm (suggested by
+	  Juergen Wieferink).
+	  In "fulldoc" mode the preview package is now used to clip the
+	  plot (suggested by Juergen Wieferink).
+	  Added north, south, west and east coordinates of the plot area.
+
+2008-02-24  peter
+
+	* [r85] /gnuplot.lua: new option `charsize'
+
+2008-02-02  peter
+
+	* [r84] /test.2.gnu, /test.tex: only minor changes in the demo
+	  files
+
+2008-01-29  peter
+
+	* [r83] /gnuplot.lua: minor "pretty printing" changes
+
+2008-01-27  peter
+
+	* [r82] /gnuplot.lua: some internal renaming
+	* [r81] /INSTALL, /gnuplot.lua, /lua.trm: keeping pace with gnuplot
+	  4.3 development
+
+2008-01-24  peter
+
+	* [r80] /INSTALL, /README, /gnuplot.lua: documentation update
+	* [r79] /gnuplot.lua, /lua.trm: added pager functionality for help
+	  output
+
+2008-01-17  peter
+
+	* [r78] /gnuplot.lua: added options for CMYK support and for
+	  disabling bitmap rendering
+	* [r77] /gnuplot.lua: fixed "zero length path" bug
+
+2008-01-12  peter
+
+	* [r76] /INSTALL, /lua.trm: added the environment variable
+	  GNUPLOT_LUA_SCRIPT
+
+2008-01-03  peter
+
+	* [r75] /lua.trm: fixing the latest changes
+	* [r74] /lua.trm: Initialize term->tscale for gnuplot 4.3
+
+2007-12-22  peter
+
+	* [r73] /INSTALL, /gnuplot.lua, /lua.trm: small adaptions to the
+	  most recent CVS version
+
+2007-11-03  peter
+
+	* [r72] /gnuplot.lua: gnuplottex support
+	  some minor changes
+
+2007-10-11  peter
+
+	* [r71] /gnuplot.lua: fixed the option parser fix and improved
+	  error reporting
+
+2007-10-10  peter
+
+	* [r70] /README, /TODO, /gnuplot.lua: gnuplot arrow styles to TikZ
+	  mapping
+	  cmyk support for image data
+	  some minor bugfixes (parser, "path redundencies", color value
+	  rounding)
+
+2007-09-29  peter
+
+	* [r69] /TODO, /gnuplot.lua, /lua.trm, /test.tex: new option
+	  'providevars'
+	  new color scheme and dash styles
+	  small option parser fixes
+	  bounding box coordinates name change
+
+2007-09-22  peter
+
+	* [r68] /TODO, /test.2.gnu, /test.gnu, /test.tex: examples update
+	* [r67] /gnuplot.lua: the 'smooth' option is now named 'tikzplot'
+
+2007-09-10  peter
+
+	* [r66] /gnuplot.lua: image code now works with tex (dvi/ps),
+	  pdftex and xetex
+
+2007-09-06  peter
+
+	* [r65] /gnuplot.lua: even more work on images
+
+2007-09-04  peter
+
+	* [r64] /gnuplot.lua, /lua.trm: more work on images
+	* [r63] /TODO, /gnuplot.lua, /lua.trm: First support for plotting
+	  images.
+	  API change: Color and fill styles are now passed as strings
+	  instead of integers to the script.
+
+2007-08-31  peter
+
+	* [r62] /TODO:
+
+2007-08-28  peter
+
+	* [r61] /gnuplot.lua: added \gpscalepointstrue \gpscalepointsfalse
+	  cleanups
+	* [r60] /test.2.gnu, /test.tex: only small changes
+	* [r59] /gnuplot.lua: lengths now accept units
+	  more individual gnuplot TikZ-styles
+	  experimental option 'smooth'
+
+2007-08-26  peter
+
+	* [r58] /lua.trm: little clean up
+	  added gp.is_multiplot()
+
+2007-08-25  peter
+
+	* [r57] /TODO, /gnuplot.lua: fixed a compatibility issue with pgf
+	  1.10
+	* [r56] /gnuplot.lua: option parser is more robust
+	* [r55] /gnuplot.lua: debug code removed
+	* [r54] /gnuplot.lua: Fixed rectangle scaling with option
+	  'plotsize'
+
+2007-08-24  peter
+
+	* [r53] /gnuplot.lua: New option 'size'.
+	  Removed 'xscale' and 'yscale'.
+	  Fixed scaling and resizing behavior.
+	  Made styles a little more flexible.
+	* [r52] /INSTALL, /test.2.gnu, /test.tex: more updates
+	* [r51] /README, /TODO: docs update
+	* [r50] /lua.trm: new ouput function for console messages
+
+2007-08-20  peter
+
+	* [r49] /gnuplot.lua, /lua.trm, /test.tex: new option 'createstyle'
+	  fixed a node placement bug in the lua script and tikz style
+
+2007-08-13  peter
+
+	* [r48] /gnuplot.lua, /test.tex: fixed scaling and aspect ratio of
+	  tic marks
+
+2007-08-12  peter
+
+	* [r47] /test.tex:
+	* [r46] /test.tex:
+	* [r45] /demo.gnu, /demo.tex, /test.gnu, /test.tex: new test file
+	* [r44] /demo.gnu, /demo.tex, /gnuplot.lua, /test.2.gnu, /test.gnu:
+	  new options 'originreset' and 'plotsize x,y'
+
+2007-08-08  peter
+
+	* [r43] /INSTALL, /README, /TODO, /gnuplot.lua: new terminal option
+	  'nopicenvironment'
+	  fixed gfx.format_color() call in term.filled_polygon()
+
+2007-07-09  peter
+
+	* [r42] /gnuplot.lua, /lua.trm: lots of internal api changes
+	  new options gparrows and gppoints
+	  debugging code removed
+
+2007-07-03  peter
+
+	* [r41] /README.terminal, /TODO, /gnuplot.lua, /lua.trm: linetype
+	  now set via \gpsetlinetype;
+	  changed bounding box determination;
+	  mapping for function 'layer'
+
+2007-07-01  peter
+
+	* [r40] /INSTALL, /gnuplot.lua: direkte Erzeugung des Style-Files,
+	  Hilfe auf der Kommandozeile
+	* [r39] /gnuplot.lua: Bugfix aus vorangegangener Revision
+	* [r38] /gnuplot.lua: mehr Infos im Style-File
+	* [r37] /README, /gnuplot.lua: neue Hilfsmakros \gpsetlinewidth,
+	  \gpsetpointsize und \gppoint
+
+2007-06-28  peter
+
+	* [r36] /INSTALL, /README, /TODO, /gnuplot.lua: Tippfehler und
+	  Doku, plotmarks haben nun eine eigene Basisgröße
+
+2007-06-27  peter
+
+	* [r35] /INSTALL, /gnuplot.lua: filldraw zurückgenommen
+
+2007-06-26  peter
+
+	* [r34] /TODO, /gnuplot.lua, /lua.trm, /test.gnu: bugfixes,
+	  kompaktere Ausgabe
+
+2007-06-25  peter
+
+	* [r33] /README, /TODO, /gnuplot.lua, /test.gnu: erzeugter Code ist
+	  etwas kompakter
+
+2007-06-24  peter
+
+	* [r32] /gnuplot.lua, /lua.trm: + ein paar Tippfehler gefixed
+	  + Initialisierung der Terminalvariablen überarbeitet
+	* [r31] /gnuplot.lua, /lua.trm, /test.gnu: neue Optionen 'xscale'
+	  und 'yscale'
+	  single und double quote strings in Optionen
+	  Koordinaten der Bounding-Box des Plots zugänglich gemacht
+	  Hilfe erweitert
+
+2007-06-23  peter
+
+	* [r30] /gnuplot.lua, /lua.trm: Koordinaten der bounding box des
+	  Plots sind nun verfügbar
+	* [r29] /gnuplot.lua, /lua.trm: Aufräumarbeiten
+
+2007-06-21  peter
+
+	* [r28] /gnuplot.lua, /lua.trm: filled_polygon API geändert
+
+2007-06-20  peter
+
+	* [r27] /gnuplot.lua, /lua.trm: Umbenennungen
+	  ein kleiner bugfix
+	  "Auflösung" reduziert
+	* [r26] /INSTALL, /TODO, /gnuplot.lua, /lua.trm, /test.gnu: einige
+	  Konstanten nach lua.trm verschoben
+	  Initialisierung des lua-Skriptes geändert
+
+2007-06-18  peter
+
+	* [r25] /gnuplot.lua, /test.gnu: typo gefixed
+	  option preamble mehrfach möglich
+	* [r24] /gnuplot.lua, /lua.trm, /test.gnu: hilfe erweitert
+	* [r23] /README, /gnuplot.lua, /test.gnu: neue optionen font (für
+	  default font), scale
+	  set_font unterstützung
+	* [r22] /gnuplot.lua, /lua.trm: lua terminal revision zugänglich
+	  gemacht
+	* [r21] /gnuplot.lua, /lua.trm, /test.gnu: gnuplot version nun
+	  direkt via variablen zugänglich
+	* [r20] /gnuplot.lua, /lua.trm: besseres skript handling
+	  neue funktion gp.version()
+	  bugfixes
+
+2007-06-17  peter
+
+	* [r19] /gnuplot.lua, /lua.trm, /test.gnu: lua optionen parser
+	  kennt nun auch abkürzungen wie in gnuplot
+	* [r18] /gnuplot.lua, /lua.trm, /test.gnu: verbesserte
+	  Fehlerbehandlung
+	  bugfixes
+	* [r17] /TODO, /gnuplot.lua, /lua.trm, /test.gnu: Optionen Parser
+	  im Skript
+	  bugfixes
+	* [r16] /lua.trm: verbesserte fehlerbehandlung
+	  terminal wertet die option "script" aus :-)
+

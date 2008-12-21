@@ -1,0 +1,187 @@
+
+
+This document consists of brief installation instructions of the GNUPLOT Lua
+terminal for
+
+  * Unix like systems
+  * MS Windows
+  * Mac OS X Leopard 
+
+
+
+
+Requirements
+============
+
+Since this software comes as a patch to the gnuplot sources and
+also uses Lua you need to get the following software before
+installation:
+
+  1. gnuplot 4.2 or 4.3cvs sources from http://gnuplot.sourceforge.net
+  
+  2. a working Lua 5.1 installation e.g. from http://www.lua.org
+     or http://lua-users.org/wiki/LuaBinaries
+
+  3. since the only supported backend is PGF/TikZ you may also
+     want to install the PGF/TikZ packages from
+     http://www.ctan.org/tex-archive/help/Catalogue/entries/pgf.html
+     or http://sourceforge.net/projects/pgf/
+
+
+
+Installation on Unix-like systems
+=================================
+
+  1. compile gnuplot 
+
+  2. copy lua.trm to "<gnuplot_src_path>/term/"
+
+  3. add the line 
+      
+       #include "lua.trm"
+    
+     at the bottom of <gnuplot_src_path>/src/term.h
+
+  4. modify <gnuplot_src_path>/src/Makefile, so that gnuplot
+     links against lua by adding e.g. `-llua' to LIBS:
+    
+       LIBS = -lm -llua
+
+     You may also have to adapt the include path in regard
+     to your Lua installation.
+
+  5. run "make" and "make install" again
+
+  6. call gnuplot.lua with the parameter 'style' to
+     generate the LaTeX style file:
+    
+       # lua gnuplot.lua style
+
+     Or from the gnuplot console:
+     
+       > set term lua createstyle
+     
+     The basename of the LaTeX style file is defined in the
+     'pgf.LATEX_STYLE_FILE' variable (currently set to
+     'gnuplot-lua-tikz').
+
+  7. try e.g. the example file:
+     
+       # gnuplot test.gnu
+       # pdflatex test.tex
+
+
+
+Installation on Windows systems
+===============================
+
+  1. see above
+
+  2. see above
+
+  3. see above
+
+  4. edit the makefile, used for the initial build process, similar to
+     the above, so that the Lua library and headers will be found
+
+  4b. in 'lua.trm' the line
+     
+       #define GNUPLOT_LUA_DIR X11_DRIVER_DIR
+   
+     has to be changed, so that GNUPLOT_LUA_DIR points to a directory
+     for the 'gnuplot.lua' script, e.g.:
+     
+       #define GNUPLOT_LUA_DIR "share\luaterm"
+
+
+  5. see above
+
+  6. see above
+
+  7. see above
+
+
+
+Installation on Mac OS X Leopard (Intel)
+(thanks to Federico Maggi)
+========================================
+
+  0. Update the port base (if needed) and get Gnuplot TikZ terminal:
+
+       $ sudo port sync
+       $ cd
+       $ wget http://peter.affenbande.org/gnuplot/gnuplot_lua_terminal.tgz
+       $ tar zxf gnuplot_lua_terminal.tgz
+ 
+
+  1. Install lua 5.1
+
+       $ sudo port install lua
+ 
+  2. Fetch GNUPLOT source (if GNUPLOT is alread installed, uninstall
+     it using $ sudo port uninstall gnuplot)
+
+       $ sudo port -d fetch gnuplot
+
+
+  3. Extract GNUPLOT and configure it
+
+       $ sudo port -d extract gnuplot
+       $ sudo port -d configure gnuplot
+
+
+  4. Patch the source code
+
+       $ cd {ports_prefix}/var/macports/build/${portbuildpath}/gnuplot-4.2.3/ 
+         (e.g. /opt/local/var/macports/build/_opt_local_var_macports_sources_rsync.macports.org_release_ports_math_gnuplot/work/gnuplot-4.2.3/ )
+       $ cp ~/gnuplot_lua_terminal/lua.trm term/
+       $ $EDITOR src/term.h
+
+     and add #include "lua.trm" to the bottom of the file.
+     Open the Makefile
+
+       $ $EDITOR src/Makefile 
+     
+     and locate the LIBS variable, append -llua to the other values of LIBS
+     (aquaterm should be there).
+
+
+  5. Build the port
+
+       $ sudo port build gnuplot
+
+
+  6. Install it
+
+       $ sudo port install gnuplot
+
+
+  7. Copy gnuplot.lua
+
+       $ sudo cp ~/gnuplot_lua_terminal/gnuplot.lua ${ports_prefix}/libexec/gnuplot/4.2/
+
+     or define the env variable GNUPLOT_LUA_SCRIPT to place it wherever you want.
+
+
+
+Additional notes
+================
+
+  Please take care, that the gnuplot.lua script is in the search path
+  of gnuplot. This is usually the working directory or the directory
+  defined in X11_DRIVER_DIR/GNUPLOT_LUA_DIR. It is also possible to refer
+  to a script by using the 'script' terminal option or the environment
+  variable GNUPLOT_LUA_SCRIPT.
+
+  For more informations about the Lua terminal options just type
+    > help term lua
+  and
+    > set term lua help
+  from the gnuplot console.
+
+
+  Now use the source :-)
+
+
+-Peter Hedwig <peter(at)affenbande.org>
+
