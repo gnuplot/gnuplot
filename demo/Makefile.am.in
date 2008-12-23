@@ -66,7 +66,7 @@ Makefile.am: Makefile.am.in
 	sed -n '1,/^##m4-files-begin/p' Makefile.am.in > $@t
 	echo EXTRA_DIST = Makefile.am.in *.bin *.cfg *.cor *.dat *.dem *.edf \
 	  *.fnc *.inc nearmap.csv *.pdb *.r3d *.rgb sound.par sound2.par \
-	  start.par *.rot gpdemos.tcl html | fmt | \
+	  start.par *.rot gnu-valley random-points gpdemos.tcl html | fmt | \
 	  (tr '\012' @; echo) | sed 's/@$$/%/;s/@/ \\@/g' | tr @% '\012 ' \
 	  >> $@t
 	sed -n '/^##m4-files-end/,$$p' $< >> $@t

@@ -1,3 +1,8 @@
+2008-12-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/Makefile.am.in demo/all.dem src/Makefile.am:
+	Clean up autoconf dependencies for lua terminal and for demos.
+
 2008-12-21  Peter Hedwig  <peter@affenbande.org>
 
 	* configure.in src/Makefile.am src/term.h term/Makefile.am.in

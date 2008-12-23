@@ -57,8 +57,9 @@ endif
 
 if BUILD_LUA
 pkglibexec_PROGRAMS += gnuplot.lua
-gnuplot.lua: ../term/lua/gnuplot.lua
-	cp ../term/lua/gnuplot.lua .
+gnuplot_lua_SOURCES =
+gnuplot.lua: $(top_srcdir)/term/lua/gnuplot.lua
+	cp $(top_srcdir)/term/lua/gnuplot.lua .
 endif
 
 getcolor_x11.o: getcolor.c
