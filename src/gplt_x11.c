@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.187 2008/04/10 18:09:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.188 2008/06/02 00:48:08 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -465,7 +465,7 @@ static void pr_color __PROTO((cmap_t *));
 static void pr_dashes __PROTO((void));
 static void pr_encoding __PROTO((void));
 static void pr_font __PROTO((char *));
-static void pr_geometry __PROTO((void));
+static void pr_geometry __PROTO((char *));
 static void pr_pointsize __PROTO((void));
 static void pr_width __PROTO((void));
 static void pr_window __PROTO((plot_struct *));
@@ -1575,6 +1575,14 @@ record()
 		    dashedlines = tmp_dashed;
 		if (UNSET != tmp_ctrlq)
 		    ctrlq = tmp_ctrlq;
+	    }
+	    return 1;
+
+        case 's': /* set window geometry */
+	    {
+		char strtmp[256];
+		sscanf(&buf[2], "%s", strtmp);
+		pr_geometry(strtmp);
 	    }
 	    return 1;
 
@@ -5140,7 +5148,7 @@ gnuplot: X11 aborted.\n", ldisplay);
 	}
     }
 
-    pr_geometry();
+    pr_geometry(NULL);
     pr_encoding();		/* check for global default encoding */
     pr_font(NULL);		/* set current font to default font */
     pr_color(&default_cmap);	/* set colors for default colormap */
@@ -5791,9 +5799,9 @@ char *fontname;
  *---------------------------------------------------------------------------*/
 
 static void
-pr_geometry()
+pr_geometry(char *instr)
 {
-    char *geometry = pr_GetR(db, ".geometry");
+    char *geometry = (instr != NULL)? instr : pr_GetR(db, ".geometry");
     int x, y, flags;
     unsigned int w, h;
 

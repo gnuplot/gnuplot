@@ -1,4 +1,8 @@
 2008-12-23  Ethan Merritt  <merritt@u.washington.edu>
+2008-12-24  Mike Sutton  <mws115@usa.com>
+
+	* term/x11.trm src/gplt_x11.c: Added size and position options for X11.
+
 
 	* demo/Makefile.am.in demo/all.dem src/Makefile.am:
 	Clean up autoconf dependencies for lua terminal and for demos.
