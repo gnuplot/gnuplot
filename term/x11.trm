@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.160.2.9 2008/11/06 19:21:41 sfeam Exp $
+ * $Id: x11.trm,v 1.160.2.10 2008/12/17 20:48:47 sfeam Exp $
  *
  */
 
@@ -114,6 +114,11 @@ TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
 # define X11_XMAX 4096
 # define X11_YMAX 4096
 
+static int X11_SIZE_X = 640;
+static int X11_SIZE_Y = 450;
+static int X11_POSITION_X = 0;
+static int X11_POSITION_Y = 0;
+
 /* approximations for typical font/screen sizes */
 # define X11_VCHAR (X11_YMAX/25)
 # define X11_HCHAR (X11_XMAX/100)
@@ -215,6 +220,8 @@ static int persist = UNSET;
 static int do_raise = UNSET;
 static int dashedlines = UNSET;
 static int ctrlq = UNSET;
+static int set_size = UNSET;
+static int set_position = UNSET;
 
 /* driver properties managed by x11.trm rather than gnuplot_x11 */
 static double X11_linewidth_multiplier = 1.0;
@@ -363,6 +370,8 @@ enum X11_id {
     X11_LINEWIDTH,
     X11_CTRLQ,
     X11_NOCTRLQ,
+    X11_SIZE,
+    X11_POSITION,
     X11_OTHER
 };
 
@@ -384,6 +393,8 @@ static struct gen_table X11_opts[] = {
     {"lw", X11_LINEWIDTH},
     {"ctrl$q", X11_CTRLQ},
     {"noctrl$q", X11_NOCTRLQ},
+    {"si$ze", X11_SIZE},
+    {"pos$ition", X11_POSITION},
     {NULL, X11_OTHER}
 };
 
@@ -403,6 +414,7 @@ X11_options()
     TBOOLEAN set_title = FALSE, set_number = FALSE, set_close = FALSE, set_solid = FALSE;
 
     persist = do_raise = dashedlines = ctrlq = UNSET;
+    set_size = set_position = UNSET;
 
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&X11_opts[0], c_token)) {
@@ -507,6 +519,42 @@ X11_options()
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    c_token++;
 	    break;
+	case X11_SIZE:
+	    c_token++;
+	    if (END_OF_COMMAND) {
+		int_error(c_token, "expecting X[,Y]");
+	    } else {
+		int x_in, y_in;
+		x_in = (int) real(const_express(&a));
+		if (x_in > 0)
+		    X11_SIZE_X = x_in;
+		else
+		    int_error(c_token, "X size must be > 0");
+		if (equals(c_token, ",")) {
+		    c_token++;
+		    y_in = (int) real(const_express(&a));
+		    if (y_in > 0)
+			X11_SIZE_Y = y_in;
+		    else
+			int_error(c_token, "Y size must be > 0");
+		}
+		set_size = yes;
+	    }
+	    break;
+	case X11_POSITION:
+	    c_token++;
+	    if (END_OF_COMMAND) {
+		int_error(c_token, "expecting X[,Y]");
+	    } else {
+		X11_POSITION_X = (int) real(const_express(&a));
+		if (equals(c_token, ",")) {
+		    c_token++;
+		    X11_POSITION_Y = (int) real(const_express(&a));
+		}
+		set_position = yes;
+	    }
+	    break;
+
 	case X11_OTHER:
 	default:
 	    /* let gnuplot_x11 check range */
@@ -593,6 +641,14 @@ X11_options()
 	strncat(term_options, "\"", MAX_LINE_LEN-strlen(term_options));
 	c_token = save_token;
     }
+    if (set_size != UNSET)
+	sprintf(term_options + strlen(term_options),
+	      " size %d,%d ", X11_SIZE_X,X11_SIZE_Y);
+
+    if (set_position != UNSET)
+	sprintf(term_options + strlen(term_options),
+	      " position %d,%d ", X11_POSITION_X,X11_POSITION_Y);
+
     X11_update_opts();
 }
 
@@ -641,9 +697,24 @@ x11_lower_terminal_group(void)
 TERM_PUBLIC void
 X11_update_opts()
 {
-    if (X11_ipc && (UNSET != do_raise || UNSET != persist || UNSET != dashedlines || UNSET != ctrlq)) {
+    if (!X11_ipc)
+	return;
+
+    if (UNSET != do_raise || UNSET != persist || UNSET != dashedlines || UNSET != ctrlq) {
 	fprintf(X11_ipc, "X %d %d %d %d\n", 
 		do_raise, persist, dashedlines, ctrlq);
+	fflush(X11_ipc);
+    }
+
+    /* pass size as a valid X11 geometry string WIDTHxHEIGHT[+XPOS+YPOS] */
+    if (set_size != UNSET || set_position != UNSET) {
+	if (set_size != UNSET && set_position == UNSET)
+	    fprintf(X11_ipc, "s %dx%d\n", X11_SIZE_X, X11_SIZE_Y);
+	else if (set_size == UNSET && set_position != UNSET)
+	    fprintf(X11_ipc, "s %+d%+d\n", X11_POSITION_X, X11_POSITION_Y);
+	else if (set_size != UNSET && set_position != UNSET)
+	    fprintf(X11_ipc, "s %dx%d%+d%+d\n", X11_SIZE_X, X11_SIZE_Y,
+		X11_POSITION_X, X11_POSITION_Y);
 	fflush(X11_ipc);
     }
 }
@@ -2044,6 +2115,7 @@ START_HELP(x11)
 "                     {linewidth LW} {solid|dashed}",
 "                     {{no}persist} {{no}raise} {{no}ctrlq}",
 "                     {close}",
+"                     {size XX,YY} {position XX,YY}",
 "    set terminal x11 {reset}",
 "",
 " Multiple plot windows are supported: `set terminal x11 <n>` directs the",
@@ -2092,6 +2164,12 @@ START_HELP(x11)
 " The option `title \"<title name>\"` will supply the title name of the window",
 " for the current plot window or plot window <n> if a number is given.",
 " Where (or if) this title is shown depends on your X window manager.",
+"",
+" The size option can be used to set the size of the plot window.  The",
+" size option will only apply to newly created windows.",
+"",
+" The position option can be used to set the position of the plot window.  The",
+" position option will only apply to newly created windows.",
 "",
 " The size or aspect ratio of a plot may be changed by resizing the `gnuplot`",
 " window.",
