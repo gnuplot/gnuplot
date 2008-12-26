@@ -1,3 +1,7 @@
+2008-12-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c: More work on "set view equal {xy|xyz}'.
+
 2008-12-24  Mike Sutton  <mws115@usa.com>
 
 	* term/x11.trm src/gplt_x11.c: Added size and position options for X11.
