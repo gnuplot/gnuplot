@@ -37,8 +37,8 @@
 
 /*
  *
- *  $Date: 2008-12-20 15:15:44 +0100 (Sa, 20. Dez 2008) $
- *  $Author: peter $
+ *  $Date: 2008/12/22 21:44:39 $
+ *  $Author: sfeam $
  *  $Rev: 90 $
  *
  */
@@ -1169,20 +1169,23 @@ START_HELP(lua)
 "?terminal lua",
 "?term lua",
 "?lua",
-" The `lua` generic terminal driver is intended for the use with an",
-" external Lua script.",
+" The `lua` generic terminal driver works in conjunction with an",
+" external Lua script to create a target-specific plot file.",
+" Currently the only supported target is TikZ -> pdflatex.",
 "",
 " Information about `Lua` is available at http://www.lua.org .",
 "",
 " Syntax:",
 "       set terminal lua {script \"<lua_script>\"}",
 "                        {<script_args> ...}",
+"                        {help}",
 "",
-" If no script is given the terminal will look for \"" LUA_SCRIPT "\"",
-" in the local directory and on failure in the 'libexec' directory",
-" of the gnuplot installation.",
+" If no script is given the terminal will look for \"gnuplot.lua\" in the",
+" local directory and on failure in the 'libexec' directory of the gnuplot",
+" installation or via the environmental variable GNUPLOT_DRIVER_DIR.",
 "",
 " All arguments will be provided to the selected script for further",
-" evaluation."
+" evaluation. `set term lua help` will cause the script itself to print",
+" additional help on options and choices."
 END_HELP(lua)
 #endif /* TERM_HELP */

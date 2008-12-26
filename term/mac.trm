@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: mac.trm,v 1.8 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: mac.trm,v 1.9 2006/07/21 02:35:47 sfeam Exp $
  *
  */
 
@@ -143,8 +143,6 @@ START_HELP(mac)
 "?terminal macintosh",
 "?term macintosh",
 "?macintosh",
-" Several options may be set in the 'macintosh' driver.",
-"",
 " Syntax:",
 "      set terminal macintosh {singlewin | multiwin} {vertical | novertical}",
 "                             {size <width>, <height> | default}",
@@ -152,22 +150,22 @@ START_HELP(mac)
 " 'singlewin' limits the output to a single window and is useful for animations.",
 " 'multiwin' allows multiple windows.",
 " 'vertical' is only valid under the gx option. With this option, rotated text",
-"     be drawn vertically. novertical turns this option off.",
-"  size <width>, <height> overrides the graph size set in the preferences",
-"     dialog until it is cleared with either 'set term mac size default'",
-"     or 'set term mac default'.",
+" will be drawn vertically. novertical turns this option off.",
+" size <width>, <height> overrides the graph size set in the preferences",
+" dialog until it is cleared with either 'set term mac size default'",
+" or 'set term mac default'.",
 "",
-"  'set term mac size default' sets the window size settings to those set in",
-"     the preferences dialog.",
+" 'set term mac size default' sets the window size settings to those set in",
+" the preferences dialog.",
 "",
-"  'set term mac default' sets all options to their default values.",
-"     Default values: nogx, multiwin, novertical.",
+" 'set term mac default' sets all options to their default values.",
+" Default values: nogx, multiwin, novertical.",
 "",
-"  If you generate graphs under the multiwin option and then switch to singlewin,",
-"  the next plot command will cause one more window to be created. This new",
-"  window will be reused as long as singlewin is in effect. If you switch back",
-"  to multiwin, generate some graphs, and then switch to singlewin again, the",
-"  orginal 'singlewin' window will be resused if it is still open. Otherwise",
-"  a new 'singlewin' window will be created. The 'singlewin' window is not numbered."
+" If you generate graphs under the multiwin option and then switch to singlewin,",
+" the next plot command will cause one more window to be created. This new",
+" window will be reused as long as singlewin is in effect. If you switch back",
+" to multiwin, generate some graphs, and then switch to singlewin again, the",
+" orginal 'singlewin' window will be resused if it is still open. Otherwise",
+" a new 'singlewin' window will be created. The 'singlewin' window is not numbered."
 END_HELP(mac)
 #endif /* TERM_HELP */

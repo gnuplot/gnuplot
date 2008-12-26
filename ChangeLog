@@ -1,8 +1,16 @@
-2008-12-23  Ethan Merritt  <merritt@u.washington.edu>
+2008-12-26  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc docs/Makefile.in term/lua.trm: Various fixes.
+
+2008-12-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/mac.trm: extra spaces are messing up the documentation..
+
 2008-12-24  Mike Sutton  <mws115@usa.com>
 
 	* term/x11.trm src/gplt_x11.c: Added size and position options for X11.
 
+2008-12-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/Makefile.am.in demo/all.dem src/Makefile.am:
 	Clean up autoconf dependencies for lua terminal and for demos.

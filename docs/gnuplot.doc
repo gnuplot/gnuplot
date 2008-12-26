@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.550 2008/12/11 04:09:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.551 2008/12/11 06:53:14 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -256,9 +256,10 @@ C
 3 New plot elements
 =circles
 =ellipse
+=polygon
  The `set object` command can now be used to define fixed circles, ellipses, and
  polygons as well as rectangles. There is a corresponding new plot style
- `plot with circles`.  See `circles` `ellipse`.
+ `plot with circles`.  See `circle` `ellipse` `polygon`.
 
 3 New or revised terminal drivers
  Two new drivers based on the cairo and pango libraries are included,
@@ -4661,7 +4662,7 @@ Ffigure_mapcontours
  For each point in the file, the index value of the data set it appears in is
  available via the pseudo-column `column(-2)`.  This leads to an alternative way
  of distinguishing individual data sets within a file as shown below.  This is
- more awkward that the `index` command if all you are doing is selecting one
+ more awkward than the `index` command if all you are doing is selecting one
  data set for plotting, but is very useful if you want to assign different
  properties to each data set.  See `pseudocolumns`, `lc variable`.
 
@@ -5100,7 +5101,7 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/using.html">
  Feeble using demos.
 ^ </a>
-5 pseuodocolumns
+5 pseudocolumns
 ?pseudocolumns
 ?commands plot datafile using pseudocolumns
 ?plot datafile using pseudocolumns
@@ -7300,7 +7301,7 @@ Ffigure_mapcontours
 #\verb@%A@ & full name of day of the week \\
 #\verb@%b@ or \verb@%h@ & abbreviated name of the month \\
 #\verb@%B@ & full name of the month \\
-#\verb@%d@ & day of the month, 1--31 \\
+#\verb@%d@ & day of the month, 01--31 \\
 #\verb@%D@ & shorthand for \verb@"%m/%d/%y"@ (only output) \\
 #\verb@%F@ & shorthand for \verb@"%Y-%m-%d"@ (only output) \\
 #\verb@%k@ & hour, 0--23 (one or two digits)\\
@@ -7308,7 +7309,7 @@ Ffigure_mapcontours
 #\verb@%l@ & hour, 1--12  (one or two digits)\\
 #\verb@%I@ & hour, 01--12 (always two digits)\\
 #\verb@%j@ & day of the year, 1--366 \\
-#\verb@%m@ & month, 1--12 \\
+#\verb@%m@ & month, 01--12 \\
 #\verb@%M@ & minute, 0--60 \\
 #\verb@%p@ & "am" or "pm" \\
 #\verb@%r@ & shorthand for \verb@"%I:%M:%S %p"@ (only output)\\
@@ -7327,7 +7328,7 @@ Ffigure_mapcontours
 %%A@full name of day of the week
 %%b or %h@abbreviated name of the month
 %%B@full name of the month
-%%d@day of the month, 1--31
+%%d@day of the month, 01--31
 %%D@shorthand for "%m/%d/%y" (only output)
 %%F@shorthand for "%Y-%m-%d" (only output)
 %%k@hour, 0--23 (one or two digits)
@@ -7335,7 +7336,7 @@ Ffigure_mapcontours
 %%l@hour, 1--12 (one or two digits)
 %%I@hour, 01--12 (always two digits)
 %%j@day of the year, 1--366
-%%m@month, 1--12
+%%m@month, 01--12
 %%M@minute, 0--60
 %%p@"am" or "pm"
 %%r@shorthand for "%I:%M:%S %p" (only output)
@@ -8612,7 +8613,7 @@ Ffigure_mapcontours
  or
          from <position> rto <position> ... {rto <position>}
 
- The position of the rectangle may be specified by giving the position of a
+ The position of the polygon may be specified by giving the position of a
  sequence of vertices. These may be given in axis, graph, or screen coordinates.
  If relative coordinates are used (rto) then the coordinate type must match
  that of the previous vertex.
