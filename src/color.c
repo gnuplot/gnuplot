@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.83 2008/06/03 00:36:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.84 2008/06/23 17:54:26 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -661,7 +661,7 @@ draw_color_smooth_box(int plot_mode)
 		gen_tics(COLOR_AXIS, /* 0, */ widest_tic_callback);
 	    }
 	    map3d_position_r(&(CB_AXIS.label.offset), &x, &y, "smooth_box");
-#define DEFAULT_X_DISTANCE 1.0
+#define DEFAULT_X_DISTANCE 0.0
 	    x += color_box.bounds.xright + (widest_tic_strlen + DEFAULT_X_DISTANCE + 1.5) * term->h_char;
 #undef DEFAULT_X_DISTANCE
 	    if (len > 0) x += len;

@@ -6,6 +6,9 @@
 
 	* term/mac.trm: extra spaces are messing up the documentation..
 
+	* src/graphics.c (boundary) color.c (draw_color_smooth_box):
+	Clean up border placement code, fix colorbox bug.
+
 2008-12-24  Mike Sutton  <mws115@usa.com>
 
 	* term/x11.trm src/gplt_x11.c: Added size and position options for X11.

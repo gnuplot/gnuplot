@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.288 2008/12/10 06:53:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.289 2008/12/12 21:06:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -491,7 +491,7 @@ boundary(struct curve_points *plots, int count)
 	plot_bounds.xleft = lmargin.x * (float)t->xmax;
     else
 	plot_bounds.xleft = xoffset * t->xmax
-			  + t->h_char * (lmargin.x >= 0 ? lmargin.x : 2);
+			  + t->h_char * (lmargin.x >= 0 ? lmargin.x : 1);
     /*}}} */
 
 
@@ -509,7 +509,8 @@ boundary(struct curve_points *plots, int count)
     /* Make room for the color box if anything in the graph uses a palette. */
     set_plot_with_palette(0, MODE_PLOT); /* EAM FIXME - 1st parameter is a dummy */
     if (rmargin.scalex != screen) {
-	if (is_plot_with_palette() && (color_box.where != SMCOLOR_BOX_NO)
+	if (is_plot_with_colorbox()
+	&& (color_box.where != SMCOLOR_BOX_NO)
 	&& (color_box.where != SMCOLOR_BOX_USER)) {
 	    plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
 	    plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
@@ -601,14 +602,6 @@ boundary(struct curve_points *plots, int count)
     }
 
     /*  end of preliminary plot_bounds.ybot calculation }}} */
-
-    /* EAM FIXME - 
-     * I don't understand why this is necessary, but it is.
-     * Didn't we already do this at line 488ff, and then add colorbox? */
-    if (lmargin.scalex != screen)
-	plot_bounds.xleft = xoffset * t->xmax;
-    if (rmargin.scalex != screen)
-	plot_bounds.xright = (xsize + xoffset) * (t->xmax-1) + 0.5;
 
     if (lkey) {
 	TBOOLEAN key_panic = FALSE;
