@@ -453,9 +453,11 @@ version 4.0.
 
 @cindex ellipse
 
+@cindex polygon
+
 The @ref{object} command can now be used to define fixed circles, ellipses, and
 polygons as well as rectangles. There is a corresponding new plot style
-@ref{circles}.  See @ref{circles} @ref{ellipse}.
+@ref{circles}.  See `circle` @ref{ellipse} @ref{polygon}.
 
 
 @node New_or_revised_terminal_drivers, New_smoothing_algorithms, New_plot_elements, New_features_introduced_in_version_4.3
@@ -6274,7 +6276,7 @@ Example:
 For each point in the file, the index value of the data set it appears in is
 available via the pseudo-column `column(-2)`.  This leads to an alternative way
 of distinguishing individual data sets within a file as shown below.  This is
-more awkward that the @ref{index} command if all you are doing is selecting one
+more awkward than the @ref{index} command if all you are doing is selecting one
 data set for plotting, but is very useful if you want to assign different
 properties to each data set.  See `pseudocolumns`, `lc variable`.
 
@@ -6836,7 +6838,7 @@ comment character (#) in the first column of the text lines.
 }
 
 
-@noindent --- PSEUODOCOLUMNS ---
+@noindent --- PSEUDOCOLUMNS ---
 
 @cindex pseudocolumns
 
@@ -11474,7 +11476,7 @@ or
 
 @end example
 
-The position of the rectangle may be specified by giving the position of a
+The position of the polygon may be specified by giving the position of a
 sequence of vertices. These may be given in axis, graph, or screen coordinates.
 If relative coordinates are used (rto) then the coordinate type must match
 that of the previous vertex.
@@ -17893,8 +17895,6 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 @tmindex macintosh
 
 
-Several options may be set in the 'macintosh' driver.
-
 Syntax:
 @example
      set terminal macintosh @{singlewin | multiwin@} @{vertical | novertical@}
@@ -17905,35 +17905,23 @@ Syntax:
 'singlewin' limits the output to a single window and is useful for animations.
 'multiwin' allows multiple windows.
 'vertical' is only valid under the gx option. With this option, rotated text
-@example
-    be drawn vertically. novertical turns this option off.
- size <width>, <height> overrides the graph size set in the preferences
-    dialog until it is cleared with either 'set term mac size default'
-    or 'set term mac default'.
+will be drawn vertically. novertical turns this option off.
+size <width>, <height> overrides the graph size set in the preferences
+dialog until it is cleared with either 'set term mac size default'
+or 'set term mac default'.
 
-@end example
+'set term mac size default' sets the window size settings to those set in
+the preferences dialog.
 
-@example
- 'set term mac size default' sets the window size settings to those set in
-    the preferences dialog.
+'set term mac default' sets all options to their default values.
+Default values: nogx, multiwin, novertical.
 
-@end example
-
-@example
- 'set term mac default' sets all options to their default values.
-    Default values: nogx, multiwin, novertical.
-
-@end example
-
-@example
- If you generate graphs under the multiwin option and then switch to singlewin,
- the next plot command will cause one more window to be created. This new
- window will be reused as long as singlewin is in effect. If you switch back
- to multiwin, generate some graphs, and then switch to singlewin again, the
- orginal 'singlewin' window will be resused if it is still open. Otherwise
- a new 'singlewin' window will be created. The 'singlewin' window is not numbered."
-
-@end example
+If you generate graphs under the multiwin option and then switch to singlewin,
+the next plot command will cause one more window to be created. This new
+window will be reused as long as singlewin is in effect. If you switch back
+to multiwin, generate some graphs, and then switch to singlewin again, the
+orginal 'singlewin' window will be resused if it is still open. Otherwise
+a new 'singlewin' window will be created. The 'singlewin' window is not numbered."
 
 @node mf, mp, macintosh, terminal_
 @subsubsection mf
@@ -19643,6 +19631,7 @@ Syntax:
                     @{linewidth LW@} @{solid|dashed@}
                     @{@{no@}persist@} @{@{no@}raise@} @{@{no@}ctrlq@}
                     @{close@}
+                    @{size XX,YY@} @{position XX,YY@}
    set terminal x11 @{reset@}
 
 @end example
@@ -19711,6 +19700,12 @@ does not get raised, see discussion in @ref{raise}.
 The option `title "<title name>"` will supply the title name of the window
 for the current plot window or plot window <n> if a number is given.
 Where (or if) this title is shown depends on your X window manager.
+
+The size option can be used to set the size of the plot window.  The
+size option will only apply to newly created windows.
+
+The position option can be used to set the position of the plot window.  The
+position option will only apply to newly created windows.
 
 The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
@@ -20155,6 +20150,7 @@ Syntax:
                     @{linewidth LW@} @{solid|dashed@}
                     @{@{no@}persist@} @{@{no@}raise@} @{@{no@}ctrlq@}
                     @{close@}
+                    @{size XX,YY@} @{position XX,YY@}
    set terminal x11 @{reset@}
 
 @end example
@@ -20223,6 +20219,12 @@ does not get raised, see discussion in @ref{raise}.
 The option `title "<title name>"` will supply the title name of the window
 for the current plot window or plot window <n> if a number is given.
 Where (or if) this title is shown depends on your X window manager.
+
+The size option can be used to set the size of the plot window.  The
+size option will only apply to newly created windows.
+
+The position option can be used to set the position of the plot window.  The
+position option will only apply to newly created windows.
 
 The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
