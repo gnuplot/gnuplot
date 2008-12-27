@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.81 2008/07/21 20:19:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.82 2008/09/02 21:17:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -548,6 +548,7 @@ gprintf(
                                        output, already */
     int stored_power = 0;	/* power that matches the mantissa
                                    output earlier */
+    TBOOLEAN got_hash = FALSE;				   
 
     set_numeric_locale();
 
@@ -571,6 +572,11 @@ gprintf(
 	/*{{{  copy format part to temp, excluding conversion character */
 	t = temp;
 	*t++ = '%';
+	if (format[1] == '#') {
+	    *t++ = '#';
+	    format++;
+	    got_hash = TRUE;
+	}
 	/* dont put isdigit first since sideeffect in macro is bad */
 	while (*++format == '.' || isdigit((unsigned char) *format)
 	       || *format == '-' || *format == '+' || *format == ' '
@@ -735,6 +741,11 @@ gprintf(
 	   int_error(NO_CARET, "Bad format character");
 	} /* switch */
 	/*}}} */
+	
+	if (got_hash && (format != strpbrk(format,"oeEfFgG"))) {
+	   reset_numeric_locale();
+	   int_error(NO_CARET, "Bad format character");
+	}
 
     /* change decimal `.' to the actual entry in decimalsign */
 	if (decimalsign != NULL) {

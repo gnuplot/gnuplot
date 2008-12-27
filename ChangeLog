@@ -1,3 +1,7 @@
+2008-12-27  Allin Cottrell  <cottrell@wfu.edu>
+
+	* util.c (gprintf): Allow '#' format character.
+
 2008-12-26  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc docs/Makefile.in term/lua.trm: Various fixes.
