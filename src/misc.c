@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.104 2008/10/27 03:37:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.105 2008/12/10 06:53:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -740,11 +740,12 @@ need_fill_border(struct fill_style_type *fillstyle)
 void
 lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 {
-    if (allow_ls &&
-	(almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
-	c_token++;
-	lp_use_properties(lp, int_expression());
-    } else {
+	if (allow_ls &&
+	    (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
+	    c_token++;
+	    lp_use_properties(lp, int_expression());
+	} 
+    
 	/* avoid duplicating options */
 	int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0;
 
@@ -881,14 +882,6 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 
 	if (set_lt > 1 || set_pal > 1 || set_lw > 1 || set_pt > 1 || set_ps > 1)
 	    int_error(c_token, "duplicated arguments in style specification");
-
-#if defined(__FILE__) && defined(__LINE__) && defined(DEBUG_LP)
-	fprintf(stderr,
-		"lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n",
-		__FILE__, __LINE__, lp->l_type, lp->l_width, lp->p_type,
-		lp->p_size);
-#endif
-    }
 }
 
 /* <fillstyle> = {empty | solid {<density>} | pattern {<n>}} {noborder | border {<lt>}} */
@@ -1216,22 +1209,6 @@ arrow_parse(
 	if (set_layer>1 || set_line>1 || set_head>1 || set_headsize>1 || set_headfilled>1)
 	    int_error(c_token, "duplicated arguments in style specification");
 
-#if defined(__FILE__) && defined(__LINE__) && defined(DEBUG_LP)
-	arrow->layer = 0;
-	arrow->lp_properties = tmp_lp_style;
-	arrow->head = 1;
-	arrow->head_length = 0.0;
-	arrow->head_lengthunit = first_axes;
-	arrow->head_angle = 15.0;
-	arrow->head_backangle = 90.0;
-	arrow->head_filled = 0;
-	fprintf(stderr,
-		"arrow_properties at %s:%d : layer: %d, lt: %d, lw: %.3f, head: %d, headlength/unit: %.3f/%d, headangles: %.3f/%.3f, headfilled %d\n",
-		__FILE__, __LINE__, arrow->layer, arrow->lp_properties.l_type,
-		arrow->lp_properties.l_width, arrow->head, arrow->head_length,
-		arrow->head_lengthunit, arrow->head_angle,
-		arrow->head_backangle, arrow->head_filled);
-#endif
     }
 }
 

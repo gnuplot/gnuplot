@@ -1,3 +1,8 @@
+2008-12-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lp_parse): Allow further options to modify a line style.
+	E.g.  plot ... with points ls 1 ps variable
+
 2008-12-27  Allin Cottrell  <cottrell@wfu.edu>
 
 	* util.c (gprintf): Allow '#' format character.
