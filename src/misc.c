@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.105 2008/12/10 06:53:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.106 2008/12/31 22:21:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -740,15 +740,15 @@ need_fill_border(struct fill_style_type *fillstyle)
 void
 lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 {
+	/* avoid duplicating options */
+	int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0;
+
 	if (allow_ls &&
 	    (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
 	    c_token++;
 	    lp_use_properties(lp, int_expression());
 	} 
     
-	/* avoid duplicating options */
-	int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0;
-
 	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
 		if (set_lt++)
