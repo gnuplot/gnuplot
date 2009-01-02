@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.63.2.10 2007/11/26 01:07:34 sfeam Exp $
+ * $Id: svg.trm,v 1.63.2.11 2007/12/14 05:25:38 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1410,10 +1410,8 @@ START_HELP(svg)
 " by a factor of <w>.",
 "",
 " <font> is the name of the default font to use (default Arial) and",
-" <fontsize> is the font size (in points, default 12). Gnuplot does not",
-" currently provide a mechanism for embedding fonts in the output file,",
-" so svg viewing programs may substitute other fonts when the file is",
-" displayed.",
+" <fontsize> is the font size (in points, default 12).  SVG viewing",
+" programs may substitute other fonts when the file is displayed.",
 "",
 " The svg terminal supports an enhanced text mode, which allows font",
 " and other formatting commands to be embedded in labels and other text",
@@ -1426,6 +1424,7 @@ START_HELP(svg)
 " resulting SVG output file.  This file may either itself contain a font,",
 " or may contain the records necessary to create a hypertext reference to",
 " the desired font. Gnuplot will look for the requested file using the",
-" directory list in the GNUPLOT_FONTPATH environmental variable."
+" directory list in the GNUPLOT_FONTPATH environmental variable.",
+" NB: You must embed an svg font, not a TrueType or PostScript font."
 END_HELP(svg)
 #endif
