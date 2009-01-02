@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.71 2008/03/30 18:08:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.72 2008/09/29 05:27:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -62,7 +62,6 @@ static quadrangle* quadrangles = (quadrangle*)0;
 
 /* Internal prototypes for this module */
 static TBOOLEAN plot_has_palette;
-static TBOOLEAN plot_wants_colorbox;
 static double geomean4 __PROTO((double, double, double, double));
 static double median4 __PROTO((double, double, double, double));
 static void pm3d_plot __PROTO((struct surface_points *, int));
@@ -999,10 +998,8 @@ set_plot_with_palette(int plot_num, int plot_mode)
     struct curve_points *this_2dplot = first_plot;
     int surface = 0;
     struct text_label *this_label = first_label;
-    TBOOLEAN want_palette_but_not_colorbox = FALSE;
 
     plot_has_palette = TRUE;
-    plot_wants_colorbox = TRUE;
     /* Is pm3d switched on globally? */
     if (pm3d.implicit == PM3D_IMPLICIT)
 	return;
@@ -1014,15 +1011,11 @@ set_plot_with_palette(int plot_num, int plot_mode)
 	    if (this_2dplot->plot_style == IMAGE)
 		return;
 #endif
-	    if (this_2dplot->lp_properties.use_palette) {
-		if (this_2dplot->lp_properties.pm3d_color.type <= TC_RGB)
-		    want_palette_but_not_colorbox = TRUE;
-		    /* don't return yet -- decide later whether showing color box is desirable */
-		else
-		    return;
-	    }
-	    if (this_2dplot->labels &&
-		this_2dplot->labels->textcolor.type >= TC_CB)
+	    if (this_2dplot->lp_properties.use_palette
+	    &&  this_2dplot->lp_properties.pm3d_color.type > TC_RGB)
+		return;
+	    if (this_2dplot->labels
+	    &&  this_2dplot->labels->textcolor.type >= TC_CB)
 		return;
 	    this_2dplot = this_2dplot->next;
 	}
@@ -1041,8 +1034,8 @@ set_plot_with_palette(int plot_num, int plot_mode)
 	    if (this_3dplot->lp_properties.use_palette) {
 	        int type = this_3dplot->lp_properties.pm3d_color.type;
 		if (type == TC_LT || type == TC_LINESTYLE || type == TC_RGB)
-		    want_palette_but_not_colorbox = TRUE;
-		    /* don't return yet -- decide later whether showing color box is desirable */
+		    /* don't return yet */
+		    ;
 		else
 		    /* TC_DEFAULT: splot x with line|lp|dot palette */
 		    return;
@@ -1072,9 +1065,7 @@ set_plot_with_palette(int plot_num, int plot_mode)
 #undef TC_USES_PALETTE
 
     /* Palette with continuous colors is not used. */
-    if (want_palette_but_not_colorbox == FALSE)
-	plot_has_palette = FALSE; /* otherwise it stays TRUE */
-    plot_wants_colorbox = FALSE;
+    plot_has_palette = FALSE; /* otherwise it stays TRUE */
 }
 
 TBOOLEAN
@@ -1086,6 +1077,6 @@ is_plot_with_palette()
 TBOOLEAN
 is_plot_with_colorbox()
 {
-    return plot_wants_colorbox;
+    return plot_has_palette && (color_box.where != SMCOLOR_BOX_NO);
 }
 

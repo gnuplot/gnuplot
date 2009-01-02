@@ -1,3 +1,9 @@
+2009-01-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c (set_plot_with_palette is_plot_with_colorbox):
+	Fix an accounting error that caused unnecessary loading of a color
+	palette into plots that do not need one.
+
 2008-12-31  Ralf Juengling  <juenglin@cs.pdx.edu>
 
 	* src/gp_types.h: Fix duplicate plot style indices for 
