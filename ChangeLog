@@ -1,3 +1,10 @@
+2009-01-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* configure.in, docs/gnuplot.doc:
+	Remove the EXPERIMENTAL warning for plotstyle 'image', for 'set object',
+	for x11 terminal features 'binary polygons' and 'external window',
+	and for the cairo-based terminals pngcairo and pdfcairo.
+
 2009-01-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c (set_plot_with_palette is_plot_with_colorbox):

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.551 2008/12/11 06:53:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.552 2008/12/26 22:16:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2919,8 +2919,7 @@ Ffigure_rgb3D.pdf
 ?image failsafe
 ?failsafe
  Some terminal drivers provide code to optimize rendering of image data
- within a rectangular 2D area.  However this code is known to be imperfect
- (hence the label EXPERIMENTAL for image support in gnuplot version 4.2).
+ within a rectangular 2D area.  However this code is known to be imperfect.
  This optimized code may be disabled by using the keyword `failsafe`. E.g.
 
        plot 'data' with image failsafe

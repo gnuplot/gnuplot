@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.237 2008/12/12 21:06:13 sfeam Exp $
+dnl $Id: configure.in,v 1.238 2008/12/22 21:44:39 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -1101,15 +1101,15 @@ if test "$no_x" != yes; then
   fi
 
   if test "$enable_x11_external" = yes; then
-    AC_MSG_RESULT([    (enable plotting to windows opened by external apps (EXPERIMENTAL)])
+    AC_MSG_RESULT([    (enable plotting to windows opened by external apps) ])
   else
-    AC_MSG_RESULT([    (disable plotting to windows opened by external apps (EXPERIMENTAL)])
+    AC_MSG_RESULT([    (disable plotting to windows opened by external apps) ])
   fi
 
   if test "$enable_binary_x11_polygon" = yes; then
-    AC_MSG_RESULT([    (with binary polygon protocol (EXPERIMENTAL))])
+    AC_MSG_RESULT([    (with binary polygon protocol )])
   else
-    AC_MSG_RESULT([    (without binary polygon protocol (EXPERIMENTAL))])
+    AC_MSG_RESULT([    (without binary polygon protocol )])
   fi
 else
     AC_MSG_RESULT([  X Window System terminal: no (requires X libraries)])
@@ -1237,7 +1237,7 @@ else
 fi
 
 if test "$with_cairo" = yes; then
-  AC_MSG_RESULT([  cairo-based pdf and png terminals: yes (EXPERIMENTAL)])
+  AC_MSG_RESULT([  cairo-based pdf and png terminals: yes ])
 else
   AC_MSG_RESULT([  cairo-based terminals: no (requires cairo>1.2, pango>1.10)])
 fi
@@ -1295,13 +1295,13 @@ else
 fi
 
 if test "$enable_objects" = yes; then
-  AC_MSG_RESULT([  Placement of rectangles and other objects: yes (EXPERIMENTAL)])
+  AC_MSG_RESULT([  Placement of rectangles and other objects: yes ])
 else
   AC_MSG_RESULT([  Placement of rectangles and other objects: no])
 fi
 
 if test "$enable_with_image" = yes; then
-  AC_MSG_RESULT([  Plot style image: yes (EXPERIMENTAL)])
+  AC_MSG_RESULT([  Plot style image: yes ])
 else
   AC_MSG_RESULT([  Plot style image: no])
 fi
