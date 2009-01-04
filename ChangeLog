@@ -1,3 +1,9 @@
+2009-01-04  Ralf Juengling  <juenglin@cs.pdx.edu>
+
+	* src/gp_types.h src/plot2d.c (get_data):  Fix column accounting for
+	variable color attribute in the case that no explicit 'using' spec
+	is given.
+
 2009-01-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in, docs/gnuplot.doc:

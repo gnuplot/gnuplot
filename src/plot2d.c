@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.187 2008/10/12 17:58:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.188 2008/12/10 06:53:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -517,20 +517,21 @@ get_data(struct curve_points *current_plot)
 	    cp_extend(current_plot, i + i + 1000);
 	}
 
-	/* Allow for optional columns.  Currently only used for a few styles, */
-	/* but could be extended to a more general mechanism.                 */
-	variable_color_value = 0;
-	if (variable_color) {
-	    static char *errmsg = "Not enough columns for variable color";
-	    switch (current_plot->plot_style) {
-	    case VECTOR:	if (j < 5) int_error(NO_CARET,errmsg);
-	    case CIRCLES: 	if (j < 4) int_error(NO_CARET,errmsg);
-	    case BOXES:		if (j < 3) int_error(NO_CARET,errmsg);
-				variable_color_value = v[--j];
-	    default:		break;
-	    }
-	}
-
+        if (j > 0) {
+            /* Allow for optional columns.  Currently only used for a few styles, */
+            /* but could be extended to a more general mechanism.                 */
+            variable_color_value = 0;
+            if (variable_color) {
+                static char *errmsg = "Not enough columns for variable color";
+                switch (current_plot->plot_style) {
+                case VECTOR:	if (j < 5) int_error(NO_CARET,errmsg);
+                case CIRCLES: 	if (j < 4) int_error(NO_CARET,errmsg);
+                case BOXES:	if (j < 3) int_error(NO_CARET,errmsg);
+                    variable_color_value = v[--j];
+                default:	break;
+                }
+            }
+        }
 	switch (j) {
 	default:
 	    {
