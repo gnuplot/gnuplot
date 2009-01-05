@@ -4,6 +4,9 @@
 	'with rgbimage' was failing to take advantage of a terminal's
 	alpha channel support.
 
+	* configure.in: Give up pretending to support libgd versions prior
+	to 2.0 (build fails because of missing truecolor and alpha channel).
+
 2009-01-04  Ralf Juengling  <juenglin@cs.pdx.edu>
 
 	* src/gp_types.h src/plot2d.c (get_data):  Fix column accounting for
