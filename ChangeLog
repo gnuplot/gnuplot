@@ -1,3 +1,9 @@
+2009-01-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_image_or_update_axes): The failsafe mode for
+	'with rgbimage' was failing to take advantage of a terminal's
+	alpha channel support.
+
 2009-01-04  Ralf Juengling  <juenglin@cs.pdx.edu>
 
 	* src/gp_types.h src/plot2d.c (get_data):  Fix column accounting for

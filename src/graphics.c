@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.289 2008/12/12 21:06:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.290 2008/12/27 04:03:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6180,11 +6180,11 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 			    set_rgbcolor(rgblt);
 			}
 			if (pixel_planes == IC_RGBA) {
-			    int alpha = points[i_image].CRD_A;
+			    int alpha = points[i_image].CRD_A * 100./255.;
 			    if (alpha == 0)
 				goto skip_pixel;
 			    if (term->flags & TERM_ALPHA_CHANNEL)
-				corners[0].style = FS_SOLID + (alpha<<4);
+				corners[0].style = FS_TRANSPARENT_SOLID + (alpha<<4);
 			}
 			(*term->filled_polygon) (N_corners, corners);
 		    }
