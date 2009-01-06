@@ -12,7 +12,7 @@ set tmargin at screen .9
 set lmargin at screen .1
 
 
-set xrange [ 0. : 130. ] 
+set xrange [ 0. : 128. ] 
 set yrange [ 0. : 128. ]
 
 # Alpha =  linear gradient on x
