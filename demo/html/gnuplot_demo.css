@@ -58,6 +58,7 @@
  div.box	{ border: none; border-width: thin; 
  		  margin-top: 5; margin-bottom: 5; 
 		  background: #AADDFF;
+		  text-align: center;
 		}
  div.color1	{ border: none;  background: #AADDFF; padding: 0.5em; }
  div.footer	{ border: solid; border-width: thin; 

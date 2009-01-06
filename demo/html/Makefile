@@ -20,6 +20,8 @@ index.html: index.save
 circles.html: $(GNUPLOT_LIB)/hidden2.dem ./webify.pl
 	export DEMOTERM="pngcairo truecolor font 'arial,8' size 500,300"; ./webify.pl circles
 
+ellipse.html: random.html
+
 hidden2.html: $(GNUPLOT_LIB)/hidden2.dem ./webify.pl
 	export DEMOTERM="png truecolor font 'arial,8' size 420,320"; ./webify.pl hidden2
 
