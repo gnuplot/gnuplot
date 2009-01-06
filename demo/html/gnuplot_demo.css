@@ -1,6 +1,3 @@
-<STYLE TYPE="type/css">
-<!--
-
  H1, H2, H3, H4, H5, H6, P, UL, OL, DIR, MENU, DIV, 
  DT, DD, ADDRESS, BLOCKQUOTE, PRE, HR, FORM, DL, 
  LISTING 
@@ -12,34 +9,29 @@
  BODY { 
  	background-color:white; 
  	margin-left: 3%; margin-right: 3%; 
- 	border-left: 3%; border-right: 3%; 
         background-image: url(grid.jpeg);
       }
 
  P    { 
-        margin-top:  0%; margin-bot:   0%;
+        margin-top:  0%; margin-bottom:   0%;
         margin-left:  0%; 
-        border-left:  0%; 
       }
 
  H1   { text-align: center; text-decoration: underline; }
  H3   { color:#009900; margin-left: 0%; }
  H4   { color:#009900; margin-left: 0%; 
  	margin-top: 1em; margin-bottom: 0;
- 	border-top: 0; border-bottom: 0;
       }
- H5   { color:#006600; margin-left: 3%; font-size=+1; }
+ H5   { color:#006600; margin-left: 3%; font-size:larger; }
 
  DT   { 
 	color:#006600;
 	font-weight: bold; 
 	margin-left: 4%; margin-right: 4%; 
-	border-left: 4%; border-right: 4%; 
 	margin-top: 3;
       }
  DD   {
 	margin-left: 8%; margin-right: 8%; 
-	border-left: 8%; border-right: 8%; 
 	margin-top: 3;
       }
 
@@ -47,7 +39,7 @@
 	{
 	margin-left: 2%   ;
  	line-height: 1.00 ;
-	font-size: 0.75em ;
+	font-size: smaller ;
 	}
 
  UL	{
@@ -58,14 +50,13 @@
  	}
 
  LI	{
- 	font-size: 0.9em ;
+ 	font-size: smaller ;
 	text-indent: 1em ;
  	list-style-type: none;
 	}
 
  div.box	{ border: none; border-width: thin; 
  		  margin-top: 5; margin-bottom: 5; 
-		  border-right: 3em;  border-left: -3em;
 		  background: #AADDFF;
 		}
  div.color1	{ border: none;  background: #AADDFF; padding: 0.5em; }
@@ -74,5 +65,3 @@
 		  margin-left: 0%; margin-right: 0%;
 		  padding: 10;
 		}
- -->
-</STYLE>
