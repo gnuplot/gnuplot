@@ -1,3 +1,9 @@
+2009-01-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util3d.c (edge3d_intersect):  Fix long-standing bug in which
+	the z coordinate was clipping against xmax rather than zmax.
+	Bug #2472621
+
 2009-01-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_image_or_update_axes): The failsafe mode for

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.34 2008/03/13 19:53:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.35 2008/07/08 04:56:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -402,7 +402,7 @@ edge3d_intersect(
 		   x, y, AXIS_ACTUAL_MIN(FIRST_Z_AXIS));
     INTERSECT_DIAG(AXIS_ACTUAL_MAX(FIRST_Z_AXIS), z,
 		   x, FIRST_X_AXIS, y, FIRST_Y_AXIS,
-		   x, y, AXIS_ACTUAL_MAX(FIRST_X_AXIS));
+		   x, y, AXIS_ACTUAL_MAX(FIRST_Z_AXIS));
 
 #undef INTERSECT_DIAG
 
