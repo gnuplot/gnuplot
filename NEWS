@@ -10,6 +10,7 @@ New features, changes and fixes since previous release
 * FIX infinite loop if axis tick increment is on the order of machine precision
 * FIX initialize x11 enhanced text mode to use most recently requested font 
 * FIX emf handling of enhanced text at non-zero angle
+* FIX 3D plots with fixed zrange were clipping against xmax rather than zmax
 
 
 New features, changes and fixes in gnuplot version 4.2.4
