@@ -380,10 +380,10 @@ See other sections of the manuals for more information about installing/using
 gnuplot on OS/2.
 
 
-Ultrix
-------
+Ultrix, SunOS, other systems with a SysV-like sprintf() function
+----------------------------------------------------------------
 
-The mousing code requires a patch in order to compile properly under Ultrix.
+The mousing code requires a patch in order to compile properly on these.
 You can download this patch from the contributed scripts section of the
 gnuplot project pages on SourceForge: http://gnuplot.sourceforge.net/scripts/
 Or you can avoid the problem via        ./configure --disable-mouse
@@ -422,7 +422,7 @@ non-default location that is not searched by the preprocessor or linker.
    Use the GNU readline library instead of gnuplot's builtin readline.
    Version 4.2 or better is required.
 
-   Please note that there is a bug in GNU readline up to and including 4.3
+   Please note that there was a bug in GNU readline up to and including 4.3
    that makes gnuplot exit if the terminal window is resized. A fix is
    described at
    http://sourceforge.net/tracker/index.php?func=detail&aid=608874&group_id=2055&atid=102055 .
@@ -455,13 +455,6 @@ non-default location that is not searched by the preprocessor or linker.
     UNIX plot library, if available. If used with the DIR argument,
     configure looks for the plot library from GNU plotutils version 2.2
     or better. The option is off by default.
-
-   --with-gif=png
-
-    If specified, the gif driver produces png images instead of gif.
-    Other arguments to this option are ignored! This feature exists
-    mainly for backwards compatibility with old plot scripts, and is
-    off by default.
 
 
 Platform compiler problems
@@ -531,11 +524,6 @@ whenever you re-run configure.
   See entry below for instructions.
 
   As of 1998-11-18, gnuplot compiles again with the native compiler cc.
-
- - System V.2/Ultrix 4.x/M88 SysV.3
-   An ANSI/ISO C compiler should be used to compile gnuplot. It is
-  recommended to install gcc. If this is not an option, the system
-  compiler cc can be made to work with Wietse Venema's unproto tool.
 
   Note that as of gnuplot-4.0, the alternative tool ansi2knr is
   included with the gnuplot source distribution and should
@@ -682,7 +670,7 @@ $ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot simple.dem </dev/null
 
 $ gnuplot all.dem </dev/null
 $ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot all.dem </dev/null
-   For convencience, the special make target 'check' will run the above
+   For convenience, the special make target 'check' will run the above
    if you run it from the demo directory of the source tree:
 $ make check
 
@@ -758,20 +746,4 @@ Cairo backend.
 On Unix, use the usual `./configure; make; make install' build process to
 compile this terminal. On Windows, please use the MinGW/MSYS makefile, namely
 config/makefile.mgw. MinGW and MSYS can be found on http://www.mingw.org.
-
-
-Front-ends for gnuplot
-======================
-
- o See gnuplot web page
-	http://gnuplot.sourceforge.net/links.html
-   for an up-to-date version of gnuplot front-ends
-
- o Bruce Ravel <ravel@phys.washington.edu> has written a new version of
-   gnuplot-mode for GNU emacs and XEmacs. This version is based on
-   the gnuplot.el file by Gershon Elber which used to be included with 
-   earlier versions of gnuplot's source distribution. The package is
-   available from http://feff.phys.washington.edu/~ravel/gnuplot/.
-   As of gnuplot 4.0 Bruce's version of gnuplot-mode is included 
-   with the gnuplot distribution, so you should already have it.
 
