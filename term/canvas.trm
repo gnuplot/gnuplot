@@ -1,0 +1,711 @@
+/* Hello, Emacs, this is -*-C-*-
+ * $Id: canvas.trm,v 0.9  2009/01/01 23:40:41 sfeam Exp $
+ *
+ */
+
+/* GNUPLOT - canvas.trm */
+
+/*
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   W3C HTML <canvas> tag
+ *
+ * AUTHOR
+ *   Bruce Lueckenhoff, Aug 2008
+ *   Bruce_Lueckenhoff@yahoo.com
+ *
+ * Additions
+ *   Ethan A Merritt, Jan 2009
+ *	CANVAS_set_color(), CANVAS_make_palette(), CANVAS_fillbox(), fillstyles, 
+ *	CANVAS_point(), CANVAS_pointsize()
+ *	"name <foo>" option to create only a callable javascript file foo.js
+ *	"fsize <F>" option to select font size (default remains 10.0)
+ *
+ * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
+ *
+ */
+#include "driver.h"
+
+#ifdef TERM_REGISTER
+register_term(canvas_driver)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void CANVAS_options __PROTO((void));
+TERM_PUBLIC void CANVAS_init __PROTO((void));
+TERM_PUBLIC void CANVAS_graphics __PROTO((void));
+TERM_PUBLIC int CANVAS_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC void CANVAS_text __PROTO((void));
+TERM_PUBLIC void CANVAS_reset __PROTO((void));
+TERM_PUBLIC void CANVAS_linetype __PROTO((int linetype));
+TERM_PUBLIC void CANVAS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
+					unsigned int width, unsigned int height));
+TERM_PUBLIC void CANVAS_linewidth __PROTO((double linewidth));
+TERM_PUBLIC void CANVAS_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void CANVAS_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void CANVAS_point __PROTO((unsigned int x, unsigned int y, int number));
+TERM_PUBLIC void CANVAS_pointsize __PROTO((double size));
+TERM_PUBLIC void CANVAS_put_text __PROTO((unsigned int x, unsigned int y,
+					const char *str));
+TERM_PUBLIC int CANVAS_text_angle __PROTO((int ang));
+TERM_PUBLIC void CANVAS_filled_polygon __PROTO((int, gpiPoint *));
+TERM_PUBLIC void CANVAS_set_color __PROTO((t_colorspec *colorspec));
+TERM_PUBLIC int CANVAS_make_palette __PROTO((t_sm_palette *palette));
+
+#define CANVAS_XMAX 600 
+#define CANVAS_YMAX 400
+#define CANVASVCHAR		10
+#define CANVASHCHAR		8
+#define CANVASVTIC		10	/* I'm not sure why, but these must be identical */
+#define CANVASHTIC		10	/* in order not to mess up the aspect ratio.     */
+
+#endif /* TERM_PROTO */
+
+#ifdef TERM_BODY
+
+#define CANVAS_AXIS_CONST '\1'
+#define CANVAS_BORDER_CONST '\2'
+
+static int canvas_x = -1;	/* current X position */
+static int canvas_y = -1;	/* current Y position */
+static int canvas_xmax = CANVAS_XMAX;
+static int canvas_ymax = CANVAS_YMAX;
+static int canvas_line_type = LT_UNDEFINED;
+static double CANVAS_ps = 1;	/* pointsize multiplier */
+static double canvas_font_size = CANVASVCHAR;
+static char *canvas_justify = "";
+static int canvas_text_angle = 0;
+static int canvas_in_a_path = FALSE;
+static char canvas_color[] = "rgb(000,000,000)"; /* Exact format is important */
+static TBOOLEAN CANVAS_standalone = TRUE;
+static char *CANVAS_name = NULL;
+
+enum CANVAS_case {
+    CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, CANVAS_OTHER
+};
+
+static struct gen_table CANVAS_opts[] =
+{
+    { "fsize", CANVAS_FSIZE },
+    { "name", CANVAS_NAME },
+    { "size", CANVAS_SIZE },
+    { "standalone", CANVAS_STANDALONE },
+    { NULL, CANVAS_OTHER }
+};
+
+static void
+CANVAS_start (void)
+{
+    if (canvas_in_a_path) {
+	return;
+    }
+    canvas_in_a_path = TRUE;
+    fprintf(gpoutfile,
+	    "ctx.beginPath();\n"
+	   );
+}
+
+static void
+CANVAS_finish (void)
+{
+    if (!canvas_in_a_path) {
+	return;
+    }
+    fprintf(gpoutfile,
+	    "ctx.stroke();\n"
+	    "ctx.closePath();\n"
+	   );
+    canvas_in_a_path = FALSE;
+}
+
+TERM_PUBLIC void
+CANVAS_options()
+{
+    /* Re-initialize a few things */
+    canvas_line_type = LT_UNDEFINED;
+    canvas_font_size = CANVASVCHAR;
+    CANVAS_standalone = TRUE;
+    free(CANVAS_name);
+    CANVAS_name = NULL;
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&CANVAS_opts[0],c_token++)) {
+	case CANVAS_SIZE:
+	    if (END_OF_COMMAND) {
+		canvas_xmax = CANVAS_XMAX;
+		canvas_ymax = CANVAS_YMAX;
+	    } else {
+		canvas_xmax = int_expression();
+		if (equals(c_token,",")) {
+		    c_token++;
+		    canvas_ymax = int_expression();
+		}
+	    }
+	    if (canvas_xmax <= 0)
+		canvas_xmax = CANVAS_XMAX;
+	    if (canvas_ymax <= 0)
+		canvas_ymax = CANVAS_YMAX;
+	    term->xmax = canvas_xmax;
+	    term->ymax = canvas_ymax;
+ 	    break;
+	
+	case CANVAS_NAME:
+	    CANVAS_name = try_to_get_string();
+	    if (!CANVAS_name)
+		    int_error(c_token,"expecting a javascript function name");
+	    if (CANVAS_name[strspn(CANVAS_name,
+	        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_1234567890")])
+		    int_error(c_token-1,"illegal javascript function name");
+	    CANVAS_standalone = FALSE;
+	    break;
+
+	case CANVAS_STANDALONE:
+	    CANVAS_standalone = TRUE;
+	    break;
+
+	case CANVAS_FSIZE:
+	    canvas_font_size = real_expression();
+	    if (canvas_font_size <= 0)
+		canvas_font_size = CANVASVCHAR;
+	    break;
+
+	default:
+	    int_warn(c_token-1,"unrecognized terminal option");
+ 	    break;
+	}
+    }
+
+    term->v_char = canvas_font_size;
+    term->h_char = canvas_font_size * 0.8;
+
+    sprintf(term_options, "size %d,%d", canvas_xmax, canvas_ymax);
+    sprintf(term_options + strlen(term_options), " fsize %g", canvas_font_size);
+    if (CANVAS_name)
+	sprintf(term_options + strlen(term_options), " name \"%s\"", CANVAS_name);
+    else
+	sprintf(term_options + strlen(term_options), " standalone");
+}
+
+
+TERM_PUBLIC void
+CANVAS_init()
+{
+    ;
+}
+
+TERM_PUBLIC void
+CANVAS_graphics()
+{
+    char *fulldir, *js_dir;
+
+    /* Force initialization at the beginning of each plot */
+    canvas_line_type = LT_UNDEFINED;
+    canvas_text_angle = 0;
+    canvas_in_a_path = FALSE;
+
+    /* Figure out where the javascript should come from when the page is viewed */
+    /* FIXME:  Does it make sense to take this from an environmental variable?  */
+    /*         It might be better to create a command "set jspath".     */
+    if ((js_dir = getenv("GNUPLOT_JS_DIR")) == NULL) {
+#ifdef GNUPLOT_JS_DIR
+# if defined(_Windows)
+	/* retrieve path relative to the gnuplot executable,
+	 * whose path is in szModuleName (winmain.c) */
+	js_dir = gp_alloc(strlen((char*) szPackageDir)
+			+ strlen(GNUPLOT_JS_DIR) + 2, "Prolog path");
+	strcpy(js_dir, (char*) szPackageDir);
+	strcat(js_dir, "\\");
+	/* GNUPLOT_JS_DIR is _relative_ path */
+	strcat(js_dir, GNUPLOT_JS_DIR);
+# else /* !_Windows */
+	/* use hardcoded _absolute_ path */
+	js_dir = GNUPLOT_JS_DIR;
+# endif
+#else
+	js_dir = "";
+#endif /* GNUPLOT_JS_DIR */
+    }
+
+    fulldir = gp_alloc(strlen(js_dir) + 4,"js_dir");
+    strcpy(fulldir,js_dir);
+#if defined(_Windows)
+    if (fulldir[strlen(fulldir)-1] != '\\')
+	strcat(fulldir,"\\");
+#elif !defined(VMS)
+    if (fulldir[strlen(fulldir)-1] != '/')
+	strcat(fulldir,"/");
+#endif
+
+    if (CANVAS_standalone) {
+	fprintf(gpoutfile,
+		"<html>\n"
+		"<head>\n"
+		"<title>Gnuplot Canvas Graph</title>\n"
+		"<!--[if IE]><script type=\"text/javascript\" src=\"excanvas.js\"></script><![endif]-->\n"
+		"<script src=\"%scanvastext.js\"></script>\n"
+		"<script type=\"text/javascript\">\n"
+		"var canvas, ctx;\n"
+		"function gnuplot_canvas() {\n"
+		"canvas = document.getElementById(\"gnuplot_canvas\");\n",
+		fulldir
+	);
+
+    } else {
+	fprintf(gpoutfile,
+		"var canvas, ctx;\n"
+		"function %s() {\n"
+		"canvas = document.getElementById(\"%s\");\n",
+		CANVAS_name, CANVAS_name
+	);
+    }
+
+    fprintf(gpoutfile,
+	    "ctx = canvas.getContext(\"2d\");\n"
+	    "CanvasTextFunctions.enable(ctx);\n"
+	    "ctx.lineWidth = \"1\";\n"
+	    "ctx.strokeStyle = \"rgb(215,215,215)\";\n"
+    );
+
+    free(fulldir);
+}
+
+
+TERM_PUBLIC void
+CANVAS_text()
+{
+    CANVAS_finish();
+    fprintf(gpoutfile, "}\n");
+
+    if (CANVAS_standalone) {
+	fprintf(gpoutfile,
+		"</script>\n"
+		"<style>\n"
+		"body {\n"
+		"background-color:white;\n"
+		"margin:50px;\n"
+		"text-align:center;\n"
+		"}\n"
+		"canvas {\n"
+		"border:0;\n"
+		"background-color: white;\n"
+		"}\n"
+		"</style>\n"
+		"</head>\n"
+		"<body onload=\"gnuplot_canvas();\">\n"
+		"<canvas id=\"gnuplot_canvas\" width=\"%d\" height=\"%d\"></canvas>\n"
+		"</body>\n"
+		"</html>\n"
+            , canvas_xmax, canvas_ymax);
+    }
+
+    fflush(gpoutfile);
+}
+
+
+TERM_PUBLIC void
+CANVAS_reset()
+{
+    ;
+}
+
+
+TERM_PUBLIC void
+CANVAS_linetype(int linetype)
+{
+    /* NB: These values are manipulated as numbers; */
+    /* it does not work to give only the color name */
+    static const char * pen_type[17] = {
+	"rgb(255,255,255)", /* should be background */
+	"rgb(000,000,000)", /* black */
+	"rgb(192,192,192)", /* grey */
+	"rgb(255,000,000)", /* red */
+	"rgb(000,171,000)", /* green */
+	"rgb(000,000,225)", /* blue */
+        "rgb(190,000,190)", /* purple */ 
+	"rgb(000,255,255)", /* cyan */
+	"rgb(021,117,069)", /* pine green*/
+	"rgb(000,000,148)", /* navy */
+	"rgb(255,153,000)", /* orange */
+	"rgb(000,153,161)", /* green blue*/
+	"rgb(214,214,069)", /* olive*/
+	"rgb(163,145,255)", /* cornflower*/
+	"rgb(255,204,000)", /* gold*/
+	"rgb(214,000,120)", /* mulberry*/
+	"rgb(171,214,000)", /* green yellow*/
+    };
+    if (linetype == canvas_line_type)
+	return;
+    canvas_line_type = linetype;
+    CANVAS_finish();
+
+    if (linetype >= 14)
+	linetype %= 14;
+    if (linetype <= LT_BACKGROUND) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
+	linetype = -3;
+    strcpy(canvas_color,pen_type[linetype + 3]);
+    fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_color);
+}
+
+
+TERM_PUBLIC void
+CANVAS_move(unsigned int arg_x, unsigned int arg_y)
+{
+    if (canvas_in_a_path && (canvas_x == arg_x) && (canvas_y == arg_y)) {
+        return;
+    }
+    CANVAS_start();
+    fprintf(gpoutfile,
+	    "ctx.moveTo(%u,%u);\n",
+            arg_x, canvas_ymax - arg_y);
+    canvas_x = arg_x;
+    canvas_y = arg_y;
+}
+
+TERM_PUBLIC void
+CANVAS_vector(unsigned int arg_x, unsigned int arg_y)
+{
+    if ((canvas_x == arg_x) && (canvas_y == arg_y))
+        return;
+
+    if (!canvas_in_a_path) {
+ 	/* Force a new path */
+	CANVAS_move(canvas_x, canvas_y);
+    }
+
+    fprintf(gpoutfile,
+	    "ctx.lineTo(%u,%u);\n",
+            arg_x, canvas_ymax - arg_y
+           );
+    canvas_x = arg_x;
+    canvas_y = arg_y;
+}
+
+
+TERM_PUBLIC int
+CANVAS_justify_text(enum JUSTIFY mode)
+{
+    switch (mode) {
+    case (CENTRE):
+	canvas_justify = "Center";
+	break;
+    case (RIGHT):
+	canvas_justify = "Right";
+	break;
+    default:
+    case (LEFT):
+        canvas_justify = "";
+	break;
+    }
+    return (TRUE);
+}
+
+TERM_PUBLIC void
+CANVAS_point(unsigned int x, unsigned int y, int number)
+{
+    int width  = CANVAS_ps * CANVASHCHAR;
+    int pt = number % 9;
+
+    CANVAS_finish();
+
+    switch (pt) {
+    default: /* How small a dot can we make? */
+	fprintf(gpoutfile, "ctx.strokeRect(%d,%d,0.5,0.5);\n", x, canvas_ymax-y);
+	break;
+    case 0:
+    case 1:
+    case 2:
+	fprintf(gpoutfile, "ctx.beginPath();\n");
+	do_point(x, y, pt);
+	fprintf(gpoutfile, "ctx.closePath();\n");
+	fprintf(gpoutfile, "ctx.stroke();\n");
+	break;
+    case 3:
+	fprintf(gpoutfile, "ctx.strokeRect(%d,%d,%d,%d);\n",
+		x-width/2, canvas_ymax - (y+width/2), width, width);
+	break;
+    case 4:
+	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_color);
+	fprintf(gpoutfile, "ctx.fillRect(%d,%d,%d,%d);\n",
+		x-width/2, canvas_ymax - (y+width/2), width, width);
+	break;
+    case 5:
+	fprintf(gpoutfile, "ctx.beginPath();\n");
+	fprintf(gpoutfile, "ctx.arc(%d,%d,%d,0,Math.PI*2,true);\n",
+		x, canvas_ymax-y, width/2);
+	fprintf(gpoutfile, "ctx.stroke();\n");
+	break;
+    case 6:
+	fprintf(gpoutfile, "ctx.beginPath();\n");
+	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_color);
+	fprintf(gpoutfile, "ctx.arc(%d,%d,%d,0,Math.PI*2,true);\n",
+		x, canvas_ymax-y, width/2);
+	fprintf(gpoutfile, "ctx.fill();\n");
+	break;
+    case 7:
+	fprintf(gpoutfile, "ctx.beginPath();\n");
+	do_point(x, y, 5);
+	fprintf(gpoutfile, "ctx.closePath();\n");
+	fprintf(gpoutfile, "ctx.stroke();\n");
+	break;
+    case 8:
+	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_color);
+	fprintf(gpoutfile, "ctx.beginPath();\n");
+	do_point(x, y, 5);
+	fprintf(gpoutfile, "ctx.closePath();\n");
+	fprintf(gpoutfile, "ctx.fill();\n");
+	break;
+    }
+}
+
+TERM_PUBLIC void
+CANVAS_pointsize(double ptsize)
+{
+    if (ptsize < 0)
+	CANVAS_ps = 1;
+    else
+	CANVAS_ps = ptsize;
+}
+
+
+TERM_PUBLIC int
+CANVAS_text_angle(int ang)
+{
+    canvas_text_angle = -1 * ang;
+    return TRUE;
+}
+
+
+TERM_PUBLIC void
+CANVAS_put_text(unsigned int x, unsigned int y, const char *str)
+{
+    if (!str || !(*str))
+	return;
+
+    CANVAS_finish();
+    if (0 != canvas_text_angle) {
+	fprintf(gpoutfile,
+		"ctx.save();\n"
+		"ctx.translate(%u, %u);\n"
+		"ctx.rotate(%d * Math.PI / 180);\n",
+                x, canvas_ymax - y, canvas_text_angle
+               );
+        x = 0;
+        y = canvas_ymax;
+    }
+    fprintf(gpoutfile, "ctx.drawText%s(\"sans\",%g,%u,%u,\"",
+            canvas_justify,
+            canvas_font_size,
+            x,
+            (unsigned int) canvas_ymax + 5 - y);
+
+    /* Sanitize string by escaping quote characters */
+    do {
+	if (*str == '"' || *str == '\\')
+	    fputc('\\', gpoutfile);
+	fputc(*str++, gpoutfile);
+    } while (*str);
+
+    fprintf(gpoutfile, "\");\n");
+    if (0 != canvas_text_angle)
+	fprintf(gpoutfile, "ctx.restore();\n");
+}
+
+
+TERM_PUBLIC void
+CANVAS_linewidth(double linewidth)
+{
+    CANVAS_finish();
+    fprintf(gpoutfile, "ctx.lineWidth = \"%g\";\n", linewidth);
+}
+
+TERM_PUBLIC void
+CANVAS_set_color(t_colorspec *colorspec)
+{
+    rgb255_color rgb255;
+
+    if (colorspec->type == TC_LT) {
+	CANVAS_linetype(colorspec->lt);
+	return;
+    } else if (colorspec->type == TC_RGB) {
+	rgb255.r = colorspec->lt >> 16;
+	rgb255.g = (colorspec->lt >> 8) & 0xff;
+	rgb255.b = colorspec->lt & 0xff;
+    } else if (colorspec->type == TC_FRAC) {
+	rgb255maxcolors_from_gray(colorspec->value, &rgb255);
+    } else
+	/* Other color types not yet supported */
+	return;
+
+    sprintf(canvas_color,"rgb(%03d,%03d,%03d)", rgb255.r, rgb255.g, rgb255.b);
+    fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_color);
+    canvas_line_type = LT_UNDEFINED;
+}
+
+TERM_PUBLIC int
+CANVAS_make_palette(t_sm_palette *palette)
+{
+    /* We can do full RGB color */
+    return 0;
+}
+
+
+TERM_PUBLIC void
+CANVAS_filled_polygon(int points, gpiPoint *corners)
+{
+    int		i;
+    float density = (float)(corners->style >> 4) / 100.;
+    char fillcolor[24];
+
+    switch (corners->style & 0xf) {
+	case FS_TRANSPARENT_SOLID:
+		sprintf(fillcolor,"rgba(%11.11s,%4.2f)%c",
+			&canvas_color[4], density, '\0');
+		break;
+	case FS_EMPTY:
+		strcpy(fillcolor,"rgba(255,255,255,0.00)");
+		break;
+	case FS_PATTERN:
+	case FS_TRANSPARENT_PATTERN:
+		/* Patterns are possible, but not yet implemented */
+		switch ((corners->style >> 4) % 5) {
+			case 0: density = 0.00; break;
+			case 1: density = 1.00; break;
+			case 2: density = 0.25; break;
+			case 3: density = 0.75; break;
+			case 4: density = 0.50; break;
+		}	/* fall through */
+	case FS_SOLID:
+		if (density == 1) {
+		    strcpy(fillcolor,canvas_color);
+		} else {
+		    int r = atoi(&canvas_color[4]);
+		    int g = atoi(&canvas_color[8]);
+		    int b = atoi(&canvas_color[12]);
+		    r = (float)r*density + 255.*(1.-density);
+		    g = (float)g*density + 255.*(1.-density);
+		    b = (float)b*density + 255.*(1.-density);
+		    sprintf(fillcolor,"rgb(%3d,%3d,%3d)%c", r, g, b, '\0');
+		}
+		break;
+	default:
+		/* Use current color, wherever it came from */
+		sprintf(fillcolor,"%s%c",canvas_color,'\0');
+    }
+
+    CANVAS_finish();
+    fprintf(gpoutfile,
+	    "ctx.fillStyle = \"%s\";\n"
+	    "ctx.beginPath();\n"
+	    "ctx.moveTo(%d, %d);\n"
+            , fillcolor, corners[0].x, canvas_ymax - corners[0].y);
+
+    for (i = 1; i < points; i++) {
+	fprintf(gpoutfile,
+		"ctx.lineTo(%d, %d);\n"
+                , corners[i].x, canvas_ymax - corners[i].y);
+    }
+	fprintf(gpoutfile,
+		"ctx.closePath();\n"
+		"ctx.fill();\n"
+               );
+
+}
+
+TERM_PUBLIC void
+CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
+{
+    gpiPoint corner[4];
+
+	corner[0].x = x1;        corner[0].y = y1;
+	corner[1].x = x1+width;  corner[1].y = y1;
+	corner[2].x = x1+width;  corner[2].y = y1+height;
+	corner[3].x = x1;        corner[3].y = y1+height;
+	corner->style = style;
+
+	CANVAS_filled_polygon(4, corner);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+TERM_TABLE_START(canvas_driver)
+    "canvas", "HTML Canvas object",
+    CANVAS_XMAX, CANVAS_YMAX, CANVASVCHAR, CANVASHCHAR,
+    CANVASVTIC, CANVASHTIC, CANVAS_options, CANVAS_init, CANVAS_reset,
+    CANVAS_text, null_scale, CANVAS_graphics, CANVAS_move, CANVAS_vector,
+    CANVAS_linetype, CANVAS_put_text, CANVAS_text_angle,
+    CANVAS_justify_text, CANVAS_point, do_arrow, set_font_null,
+    CANVAS_pointsize,
+    TERM_CAN_MULTIPLOT|TERM_ALPHA_CHANNEL,
+    NULL, NULL, CANVAS_fillbox, CANVAS_linewidth
+#ifdef USE_MOUSE
+    , NULL, NULL, NULL, NULL, NULL
+#endif
+    , CANVAS_make_palette, NULL, CANVAS_set_color
+    , CANVAS_filled_polygon
+#ifdef WITH_IMAGE
+    , NULL
+#endif
+    , NULL, NULL, NULL	/* enhanced text */
+    , NULL		/* layer control */
+    , NULL		/* path */
+TERM_TABLE_END(canvas_driver)
+
+#undef LAST_TERM
+#define LAST_TERM canvas_driver
+
+#endif /* TERM_TABLE */
+
+#ifdef TERM_HELP
+START_HELP(canvas)
+"1 canvas",
+"?commands set terminal canvas",
+"?set terminal canvas",
+"?set term canvas",
+"?terminal canvas",
+"?term canvas",
+"?canvas",
+" NB: The canvas terminal is EXPERIMENTAL, and may change before release.",
+"",
+" Syntax:",
+"       set terminal canvas {size <xsize>, <ysize>} {fsize <fontsize>}",
+"                           {standalone | name '<funcname>'}",
+"",
+" where <xsize> and <ysize> set the size of the plot area in pixels.",
+" The default size in standalone mode is 600 by 400 pixels.",
+" The default font size is 10.  NB: Only one font is available,",
+" the one loaded from canvastext.js ",
+"",
+" The default `standalone` mode creates an html page containing javascript",
+" code that renders the plot using the HTML 5 canvas element.  The html page",
+" links to a javascript library 'canvastext.js'.  By default this is a link to",
+" a local file, usually in directory /usr/local/share/gnuplot/<version>/js.",
+" You can change this by setting environmental variable GNUPLOT_JS_DIR to",
+" either a local file or a general URL.  The latter is usually appropriate if",
+" the plot is exported for viewing on remote client machines.",
+"",
+" The `name` option creates a file containing only javascript. Both the",
+" javascript function it contains and the id of the canvas element that it",
+" draws onto are taken from the following string parameter.  The commands",
+"       set term canvas name 'fishplot'",
+"       set output 'fishplot.js'",
+" will create a file containing a javascript function fishplot() that will",
+" draw onto a canvas with id=fishplot.  An html page that invokes this",
+" javascript function must also load the canvastext.js function as described",
+" above.  A minimal html file to wrap the fishplot created above might be:",
+"",
+"       <html>",
+"       <head>",
+"           <script src=\"canvastext.js\"></script>",
+"       </head>",
+"       <body onload=\"fishplot();\">",
+"           <script src=\"fishplot.js\"></script>",
+"           <canvas id=\"fishplot\" width=600 height=400>",
+"               <div id=\"err_msg\">No support for HTML 5 canvas element</div>",
+"           </canvas>",
+"       </body>",
+"       </html>",
+""
+END_HELP(canvas)
+#endif /* TERM_HELP */

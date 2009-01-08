@@ -16,6 +16,9 @@ X11_DRIVER_DIR=$(pkglibexecdir)
 # Default lua driver location
 LUA_DRIVER_DIR=$(pkglibexecdir)
 
+# Default javascript location
+GNUPLOT_JS_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/js
+
 # Default Postscript prologues location
 GNUPLOT_PS_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/PostScript
 
@@ -27,7 +30,7 @@ noinst_PROGRAMS = bf_test
 transform = @program_transform_name@
 GNUPLOT_X11 = `echo gnuplot_x11 | sed '$(transform)'`$(EXEEXT)
 
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\"
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"  -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
 breaders.c breaders.h bitmap.c bitmap.h color.c color.h command.c \

@@ -1,3 +1,23 @@
+2009-01-08  "Bruce Lueckenhoff" <lueckenhoff@users.sourceforge.net>
+
+	* /configure.in /docs/Makefile.in /src/makefile.all /src/Makefile.am
+	/src/makefile.awc /term/Makefile.am.in /src/term.h /term/canvas.trm
+	/term/js/canvastext.js:
+
+	New terminal driver "set term canvas" for the HTML 5 canvas element.
+	The HTML canvas tag supports compact, cross-platform graphics that can
+	easily be embedded in web pages and accessed by various browsers.
+
+	This terminal uses a single vector font implemented in canvastext.js
+	(released into the public domain by Jim Studt). The 'standalone' option
+	creates an html output file containing javascript code to actually draw
+	the plot.  The 'name <foo>' option instead creates pure javascript
+	output that contains a procedure foo() that draws the plot onto an
+	externally-created canvas named "foo".  You can thus include more than
+	one plot, each on a separate canvas, in a single html document.
+	In both standalone or embedded mode, the canvastext.js script is
+	referenced as an external resource.
+
 2009-01-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c (edge3d_intersect):  Fix long-standing bug in which

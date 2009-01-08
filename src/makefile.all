@@ -12,7 +12,7 @@ time.$(O) unset.$(O) util.$(O) util3d.$(O) variable.$(O)
 
 # List of terminal driver sources
 CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
-$(T)aquaterm.trm $(T)be.trm $(T)cgi.trm \
+$(T)aquaterm.trm $(T)be.trm $(T)canvas.trm $(T)cgi.trm \
 $(T)cgm.trm $(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm \
 $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm \
 $(T)epson.trm $(T)estimate.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm \

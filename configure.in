@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.239 2009/01/04 05:47:14 sfeam Exp $
+dnl $Id: configure.in,v 1.240 2009/01/07 00:44:25 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -1086,11 +1086,11 @@ AC_MSG_RESULT([gnuplot will be compiled with the following terminals:])
 AC_MSG_RESULT([])
 
 AC_MSG_RESULT([  Standalone terminals: yes (always builtin)])
-AC_MSG_RESULT([    (aed512, aed767, aifm, bitgraph, cgm, corel, dumb, dxf, eepic, emf, emtex,])
+AC_MSG_RESULT([    (canvas, cgm, corel, dumb, dxf, eepic, emf, emtex,])
 AC_MSG_RESULT([    epslatex, epson_180dpi, epson_60dpi, epson_lx800, fig, gpic, hp2623A,])
-AC_MSG_RESULT([    hp2648, hp500c, hpdj, hpgl, hpljii, hppj, imagen, kc_tek40xx, km_tek40xx,])
+AC_MSG_RESULT([    hp2648, hp500c, hpdj, hpgl, hpljii, hppj, imagen,])
 AC_MSG_RESULT([    latex, metafont, metapost, mif, pbm, postscript, pslatex, nec_cp6, okidata,])
-AC_MSG_RESULT([    pcl5, pstex, pstricks, qms, regis, selanar, svg, starc, tandy_60dpi,])
+AC_MSG_RESULT([    pcl5, pstex, pstricks, qms, regis, svg, tandy_60dpi,])
 AC_MSG_RESULT([    tek40xx, tek410x, texdraw, tgif, tkcanvas, tpic, vttek)])
 
 if test "$no_x" != yes; then
