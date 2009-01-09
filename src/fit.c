@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.62 2008/03/30 03:27:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.63 2008/06/18 23:14:08 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1637,7 +1637,11 @@ fit_command()
 	if (a[i] == 0)
 	    a[i] = NEARLY_ZERO;
 
-    (void) regress(a);
+
+    if (num_params == 0)
+	int_warn(NO_CARET, "No fittable parameters!\n");
+    else
+	(void) regress(a);
 
     (void) fclose(log_f);
     log_f = NULL;

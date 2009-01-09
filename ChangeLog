@@ -1,3 +1,9 @@
+2009-01-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c (fit_command):  Issue a warning if no fittable parameters
+	are found.
+	Bug #1964774
+
 2009-01-08  "Bruce Lueckenhoff" <lueckenhoff@users.sourceforge.net>
 
 	* /configure.in /docs/Makefile.in /src/makefile.all /src/Makefile.am
