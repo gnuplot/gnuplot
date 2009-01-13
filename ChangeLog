@@ -1,4 +1,12 @@
-2009-13-01  Petr Mikulik  <mikulik@physics.muni.cz>
+2009-01-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm term/js/gnuplot_mouse.js:
+	Mousing code for standalone plots created by the canvas driver.
+	Embedded plots are mouseable also, but the user must provide the
+	appropriate document to wrap the embedded plots and link them to
+	the mousing code.
+
+2009-01-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw: Option to run gdlib-config to determine libraries
 	for linking of gd. Fix link where to download hcw.
@@ -6,16 +14,15 @@
 2009-01-13  Timothee Lecomte  <timothee.lecomte@lpa.ens.fr>
 
 	* src/Makefile.am src/wxterminal/gp_cairo.c 
-(gp_cairo_draw_image) src/wxterminal/gp_cairo_helpers.c 
-src/wxterminal/gp_cairo_helpers.h src/wxterminal/Makefile.am:
+	(gp_cairo_draw_image) src/wxterminal/gp_cairo_helpers.c 
+	src/wxterminal/gp_cairo_helpers.h src/wxterminal/Makefile.am:
 
 	Introduce a new source file, named gp_cairo_helpers.c, to
 	contain gp_cairo_* code that uses functions from gnuplot core.
 	Currently this is a small portion of code to convert a
 	coordval* to a char* buffer. This will be helpful for
 	wxt-as-a-separate-process where I need to separate clearly the
-	code used in the core, and the code used in the terminal
-	process.
+	code used in the core, and the code used in the terminal process.
 
 2009-01-09  Ethan Merritt  <merritt@u.washington.edu>
 

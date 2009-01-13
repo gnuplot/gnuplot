@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 0.9  2009/01/01 23:40:41 sfeam Exp $
+ * $Id: canvas.trm,v 1.1 2009/01/09 00:30:35 sfeam Exp $
  *
  */
 
@@ -78,11 +78,13 @@ static char *canvas_justify = "";
 static int canvas_text_angle = 0;
 static int canvas_in_a_path = FALSE;
 static char canvas_color[] = "rgb(000,000,000)"; /* Exact format is important */
+static TBOOLEAN CANVAS_mouseable = FALSE;
 static TBOOLEAN CANVAS_standalone = TRUE;
 static char *CANVAS_name = NULL;
 
 enum CANVAS_case {
-    CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, CANVAS_OTHER
+    CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, 
+    CANVAS_MOUSING, CANVAS_OTHER
 };
 
 static struct gen_table CANVAS_opts[] =
@@ -91,6 +93,8 @@ static struct gen_table CANVAS_opts[] =
     { "name", CANVAS_NAME },
     { "size", CANVAS_SIZE },
     { "standalone", CANVAS_STANDALONE },
+    { "mous$ing", CANVAS_MOUSING },
+    { "mouse", CANVAS_MOUSING },
     { NULL, CANVAS_OTHER }
 };
 
@@ -126,6 +130,7 @@ CANVAS_options()
     canvas_line_type = LT_UNDEFINED;
     canvas_font_size = CANVASVCHAR;
     CANVAS_standalone = TRUE;
+    CANVAS_mouseable = FALSE;
     free(CANVAS_name);
     CANVAS_name = NULL;
 
@@ -170,6 +175,10 @@ CANVAS_options()
 		canvas_font_size = CANVASVCHAR;
 	    break;
 
+	case CANVAS_MOUSING:
+	    CANVAS_mouseable = TRUE;
+	    break;
+
 	default:
 	    int_warn(c_token-1,"unrecognized terminal option");
  	    break;
@@ -183,8 +192,11 @@ CANVAS_options()
     sprintf(term_options + strlen(term_options), " fsize %g", canvas_font_size);
     if (CANVAS_name)
 	sprintf(term_options + strlen(term_options), " name \"%s\"", CANVAS_name);
-    else
+    else {
 	sprintf(term_options + strlen(term_options), " standalone");
+	if (CANVAS_mouseable)
+	    sprintf(term_options + strlen(term_options), " mousing");
+    }
 }
 
 
@@ -244,11 +256,18 @@ CANVAS_graphics()
 		"<title>Gnuplot Canvas Graph</title>\n"
 		"<!--[if IE]><script type=\"text/javascript\" src=\"excanvas.js\"></script><![endif]-->\n"
 		"<script src=\"%scanvastext.js\"></script>\n"
+		, fulldir
+	);
+	if (CANVAS_mouseable)
+	    fprintf(gpoutfile,
+		"<script src=\"%sgnuplot_mouse.js\"></script>\n"
+		, fulldir
+	    );
+	fprintf(gpoutfile,
 		"<script type=\"text/javascript\">\n"
 		"var canvas, ctx;\n"
 		"function gnuplot_canvas() {\n"
-		"canvas = document.getElementById(\"gnuplot_canvas\");\n",
-		fulldir
+		"canvas = document.getElementById(\"gnuplot_canvas\");\n"
 	);
 
     } else {
@@ -275,28 +294,79 @@ TERM_PUBLIC void
 CANVAS_text()
 {
     CANVAS_finish();
+
+    /* FIXME: I am not sure whether these variable names should always be the */
+    /* same, so that they are re-used by all plots in a document, or whether  */
+    /* they should be tied to the function name and hence private.            */
+    if (TRUE) {
+	struct udvt_entry *udv;
+	fprintf(gpoutfile, "\n// plot boundaries and axis scaling information for mousing \n");
+	fprintf(gpoutfile, "plot_term_xmax = %d;\n", term->xmax);
+	fprintf(gpoutfile, "plot_term_ymax = %d;\n", term->ymax);
+	fprintf(gpoutfile, "plot_xmin = %d;\n", plot_bounds.xleft);
+	fprintf(gpoutfile, "plot_xmax = %d;\n", plot_bounds.xright);
+	fprintf(gpoutfile, "plot_ymin = %d;\n", plot_bounds.ybot);
+	fprintf(gpoutfile, "plot_ymax = %d;\n", plot_bounds.ytop);
+
+	/* Get true axis ranges as used in the plot */
+	update_gpval_variables(1);
+
+#define	MOUSE_PARAM( GP_NAME, js_NAME ) \
+	if ((udv = add_udv_by_name(GP_NAME))) { \
+	    if (udv->udv_value.type == INTGR)   \
+		fprintf(gpoutfile, "%s = %d;\n", js_NAME, udv->udv_value.v.int_val); \
+	    else if (udv->udv_value.type == CMPLX) \
+		fprintf(gpoutfile, "%s = %g;\n", js_NAME, udv->udv_value.v.cmplx_val.real); \
+	}
+	MOUSE_PARAM("GPVAL_X_MIN", "plot_axis_xmin");
+	MOUSE_PARAM("GPVAL_X_MAX", "plot_axis_xmax");
+	MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymin");
+	MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymax");
+	MOUSE_PARAM("GPVAL_Y2_MIN", "plot_axis_y2min");
+	MOUSE_PARAM("GPVAL_Y2_MAX", "plot_axis_y2max");
+#undef MOUSE_PARAM
+
+	fprintf(gpoutfile, "plot_logaxis_x = %d;\n",
+		axis_array[FIRST_X_AXIS].log ? 1: 0);
+	fprintf(gpoutfile, "plot_logaxis_y = %d;\n",
+		axis_array[FIRST_Y_AXIS].log ? 1: 0);
+
+    } /* End of section writing out variables for mousing */
+
     fprintf(gpoutfile, "}\n");
 
     if (CANVAS_standalone) {
 	fprintf(gpoutfile,
 		"</script>\n"
 		"<style>\n"
-		"body {\n"
-		"background-color:white;\n"
-		"margin:50px;\n"
-		"text-align:center;\n"
-		"}\n"
-		"canvas {\n"
-		"border:0;\n"
-		"background-color: white;\n"
-		"}\n"
+		"canvas { border:0; background-color: white; }\n"
+		"td.td0 { text-align: right; font-size: smaller; width: 50%%; }\n"
+		"td.td1 { text-align:  left; font-size: smaller; width: 50%%; }\n"
+		"table.plot { border:0; margin-left: auto; margin-right: auto; }\n"
 		"</style>\n"
 		"</head>\n"
-		"<body onload=\"gnuplot_canvas();\">\n"
-		"<canvas id=\"gnuplot_canvas\" width=\"%d\" height=\"%d\"></canvas>\n"
+		"<body onload=\"gnuplot_canvas(); gnuplot_init(); \">\n"
+		"<table class=\"plot\">\n"
+		"<tr><td>\n"
+		"    <canvas id=\"gnuplot_canvas\" width=\"%d\" height=\"%d\"></canvas>\n"
+		"</td></tr>\n"
+        	, canvas_xmax, canvas_ymax
+            );
+	if (CANVAS_mouseable) {
+	    fprintf(gpoutfile,
+		"<tr><td>\n"
+		"    <table width=100%% border=0 border-collapse=collapse id=\"gnuplot_mousebox\" align=center>\n"
+		"    <tr><td class=\"td0\">mouse coordinates &nbsp;</td><td class=\"td1\"><span id=\"span_scaled_x\">&nbsp;</span>, <span id=\"span_scaled_y\">&nbsp;</span></td></tr>\n"
+		"    <tr><td class=\"td0\">previous click &nbsp;</td><td class=\"td1\"><span id=\"span_last_x\">&nbsp;</span>, <span id=\"span_last_y\">&nbsp;</span></td></tr>\n"
+		"    </table>\n"
+		"</td></tr>\n"
+	    );
+	}
+	fprintf(gpoutfile,
+		"</table>\n"
 		"</body>\n"
 		"</html>\n"
-            , canvas_xmax, canvas_ymax);
+            );
     }
 
     fflush(gpoutfile);
@@ -670,7 +740,7 @@ START_HELP(canvas)
 "",
 " Syntax:",
 "       set terminal canvas {size <xsize>, <ysize>} {fsize <fontsize>}",
-"                           {standalone | name '<funcname>'}",
+"                           {standalone {mousing} | name '<funcname>'}",
 "",
 " where <xsize> and <ysize> set the size of the plot area in pixels.",
 " The default size in standalone mode is 600 by 400 pixels.",
@@ -684,6 +754,11 @@ START_HELP(canvas)
 " You can change this by setting environmental variable GNUPLOT_JS_DIR to",
 " either a local file or a general URL.  The latter is usually appropriate if",
 " the plot is exported for viewing on remote client machines.",
+"",
+" All plots produced by the canvas terminal are mouseable.  The additional",
+" keyword `mousing` causes the `standalone` mode to add a mouse-tracking box",
+" underneath the plot. It also adds a link to a javascript file",
+" 'gnuplot_mousing.js' in the same local or URL directory as 'canvastext.js'.",
 "",
 " The `name` option creates a file containing only javascript. Both the",
 " javascript function it contains and the id of the canvas element that it",

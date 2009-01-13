@@ -433,7 +433,9 @@ _image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor c
 
 _layer(t_termlayer syncpoint)
    Driver-specific synchronization or other layering commands.
-   As of this point (July 2005) used only by pslatex.trm
+   As of this point (Jan 2009) used only by fig lua post pslatex and svg.
+   See term_api.h for defined synchronization points. Any driver that 
+   implements term->layer() must silently ignore unrecognized syncpoints.
 
 _path(int p)
    PostScript-like devices make a distinction between the end of a 
