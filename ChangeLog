@@ -1,3 +1,8 @@
+2009-13-01  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw: Option to run gdlib-config to determine libraries
+	for linking of gd. Fix link where to download hcw.
+
 2009-01-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c (edge3d_intersect):  Fix long-standing bug in which
