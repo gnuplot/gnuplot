@@ -89,7 +89,7 @@ gnuplot_SOURCES += wxterminal/wxt_gui.cpp
 endif
 
 if BUILD_GPCAIRO
-gnuplot_SOURCES += wxterminal/gp_cairo.c
+gnuplot_SOURCES += wxterminal/gp_cairo.c wxterminal/gp_cairo_helpers.c
 endif
 
 ## we don't need COREOBJS, but CORETERM

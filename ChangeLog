@@ -1,3 +1,17 @@
+2009-01-13  Timothee Lecomte  <timothee.lecomte@lpa.ens.fr>
+
+	* src/Makefile.am src/wxterminal/gp_cairo.c 
+(gp_cairo_draw_image) src/wxterminal/gp_cairo_helpers.c 
+src/wxterminal/gp_cairo_helpers.h src/wxterminal/Makefile.am:
+
+	Introduce a new source file, named gp_cairo_helpers.c, to
+	contain gp_cairo_* code that uses functions from gnuplot core.
+	Currently this is a small portion of code to convert a
+	coordval* to a char* buffer. This will be helpful for
+	wxt-as-a-separate-process where I need to separate clearly the
+	code used in the core, and the code used in the terminal
+	process.
+
 2009-01-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (fit_command):  Issue a warning if no fittable parameters

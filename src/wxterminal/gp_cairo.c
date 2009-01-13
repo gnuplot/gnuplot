@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.40 2008/09/30 04:55:05 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.41 2008/10/10 22:26:21 mikulik Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -73,6 +73,8 @@
 #include "gp_cairo.h"
 
 #include "alloc.h"
+
+#include "gp_cairo_helpers.h"
 
 #include <pango/pangocairo.h>
 #include <glib.h>
@@ -1006,10 +1008,8 @@ void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int heigh
 void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int M, int N, t_imagecolor color_mode)
 {
 	int m,n;
-	unsigned int *image255, *image255copy;
+	unsigned int *image255;
 	double scale_x, scale_y;
-	rgb_color rgb1;
-	rgb255_color rgb255;
 	cairo_surface_t *image_surface;
 	cairo_pattern_t *pattern;
 	cairo_matrix_t matrix;
@@ -1019,52 +1019,7 @@ void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, in
 	/* also draw any open polygon set */
 	gp_cairo_end_polygon(plot);
 
-	/* cairo image buffer, upper bits are alpha, then r, g and b
-	 * Depends on endianess */
-	image255 = (unsigned int*) gp_alloc(M*N*sizeof(unsigned int), "gp_cairo : draw image");
-	image255copy = image255;
-
-	/* TrueColor 24-bit plot->color mode */
-	if (color_mode == IC_RGB) {
-		for (n=0; n<N; n++) {
-		for (m=0; m<M; m++) {
-			rgb1.r = *image++;
-			rgb1.g = *image++;
-			rgb1.b = *image++;
-			rgb255_from_rgb1( rgb1, &rgb255 );
-			*image255copy++ = (0xFF<<24) + (rgb255.r<<16) + (rgb255.g<<8) + rgb255.b;
-		}
-		}
-	} else if (color_mode == IC_RGBA) {
-		unsigned char alpha255;
-		double alpha1;
-		for (n=0; n<N; n++) {
-		for (m=0; m<M; m++) {
-			alpha255 = *(image+3);
-			alpha1 = (float)alpha255 / 255.;
-			rgb1.r = alpha1 * (*image++);
-			rgb1.g = alpha1 * (*image++);
-			rgb1.b = alpha1 * (*image++);
-			image++;
-			rgb255_from_rgb1( rgb1, &rgb255 );
-			*image255copy++ = (alpha255<<24)
-					+ (rgb255.r<<16) + (rgb255.g<<8) + rgb255.b;
-		}
-		}
-	/* Palette plot->color lookup from gray value */
-	} else {
-		for (n=0; n<N; n++) {
-		for (m=0; m<M; m++) {
-			if (isnan(*image)) {
-				image++;
-				*image255copy++ = 0x00000000;
-			} else {
-				rgb255maxcolors_from_gray( *image++, &rgb255 );
-				*image255copy++ = (0xFF<<24) + (rgb255.r<<16) + (rgb255.g<<8) + rgb255.b;
-			}
-		}
-		}
-	}
+	image255 = gp_cairo_helper_coordval_to_chars(image, M, N, color_mode);
 
 	image_surface = cairo_image_surface_create_for_data((unsigned char*) image255,
 				CAIRO_FORMAT_ARGB32, M, N, 4*M);
