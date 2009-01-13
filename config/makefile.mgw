@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.45 2008/11/21 22:13:30 mikulik Exp $
+# $Id: makefile.mgw,v 1.46 2008/11/23 07:48:58 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -47,10 +47,14 @@ TARGET=wgnuplot.exe
 # If libgd has been compiled with TrueType font support, then you can use
 # scaled TrueType fonts. If not, then uncomment FREETYPE.
 # Requires GD, PNG and Z libraries, optionally libfreetype.
+# In some cases, libfreetype can depend on additional libraries such as
+# fontconfig or iconv; then, uncomment GDAUTOCONFIGLIBS so that all of the
+# libraries needed for linking will be taken by running 'gdlib-config'.
 #
 NEWGD=1
 JPEG=1
 FREETYPE=1
+#GDAUTOCONFIGLIBS=1
 
 # PDF device driver
 # Requires PNG and Z libraries based on particular PDF library used, and
@@ -103,7 +107,9 @@ CFLAGS =
 
 
 # To compile the .hlp file you need hcw either out of Microsoft SDK or MS Help
-# Workshop. The latter can be obtained at www.helpmaster.com/help/devaids.htm.
+# Workshop. The latter can be obtained from either of
+# ftp://ftp.microsoft.com/softlib/mslfiles/hcwsetup.exe
+# http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=34D35502-4DE9-4676-952C-34CC7F64F098
 # Put the path to hcw here unless it is already in PATH:
 #HCWPATH = /c/Program\ Files/Help\ Workshop/
 HCW = $(HCWPATH)hcw
@@ -201,18 +207,27 @@ endif
 
 ifdef PNG
   CFLAGS += -DHAVE_LIBPNG
-  TERMLIBS += -lpng -lz
+  ifndef GDAUTOCONFIGLIBS
+    TERMLIBS += -lpng -lz
+  endif
 endif
 
 ifdef NEWGD
   CFLAGS += -DHAVE_GD_GIF -DGIF_ANIMATION -DHAVE_GD_PNG
 ifdef JPEG
   CFLAGS += -DHAVE_GD_JPEG
-  TERMLIBS += -ljpeg
+  ifndef GDAUTOCONFIGLIBS
+    TERMLIBS += -ljpeg
+  endif
 endif
 ifdef FREETYPE
   CFLAGS += -DHAVE_GD_TTF
-  TERMLIBS += -lfreetype
+  ifndef GDAUTOCONFIGLIBS
+    TERMLIBS += -lfreetype
+  endif
+endif
+ifdef GDAUTOCONFIGLIBS
+  TERMLIBS += $(shell gdlib-config --libs)
 endif
 endif
 
