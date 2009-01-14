@@ -398,7 +398,16 @@ extern enum PLOT_STYLE func_style;
 
 extern TBOOLEAN parametric;
 
+/* If last plot was a 3d one. */
 extern TBOOLEAN is_3d_plot;
+
+/* A macro to check whether 2D functionality is allowed in the last plot:
+   either the plot is a 2D plot, or it is a suitably oriented 3D plot (e.g. map).
+*/
+#define ALMOST2D      \
+    ( !is_3d_plot ||  \
+      ( fabs(fmod(surface_rot_z,90.0))<0.1  \
+        && (surface_rot_x>179.9 || surface_rot_x<0.1) ) )
 
 #ifdef VOLATILE_REFRESH
 extern int refresh_ok;		/* 0 = no;  2 = 2D ok;  3 = 3D ok */
