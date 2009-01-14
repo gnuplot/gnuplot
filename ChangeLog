@@ -1,4 +1,4 @@
-2009-13-01  Petr Mikulik  <mikulik@physics.muni.cz>
+2009-01-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw: Option to run gdlib-config to determine libraries
 	for linking of gd. Fix link where to download hcw.
