@@ -46,11 +46,9 @@
 
 #define X11_COMMAND_BUFFER_LENGTH 1024
 
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
 /* The endian value sent across the pipe can't have '\n' or '\0' within. */
 #define ENDIAN_VALUE 0x50515253
 #define X11_GR_CHECK_ENDIANESS  'B'
-#endif
 
 #define X11_GR_MAKE_PALETTE     'p'
 #define X11_GR_RELEASE_PALETTE  'e'
@@ -69,7 +67,6 @@
 #define X11_GR_SET_WINDOW_ID    'w'
 #endif
 
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
 /* One character for function code, and perhaps one or two for the core
  * routine to do something strange with end of buffer.  So shorten by a
  * few by trial and error.
@@ -94,7 +91,6 @@
 #define SET_COLOR_TRANSLATION_CHAR         3
 #define FILLED_POLYGON_TRANSLATION_CHAR  -13
 #define IMAGE_TRANSLATION_CHAR            45
-#endif
 
 #ifdef WITH_IMAGE
 /* Maximum image plane value of data transfer.

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.179 2008/12/25 03:02:05 sfeam Exp $
+ * $Id: x11.trm,v 1.180 2009/01/14 10:28:51 mikulik Exp $
  *
  */
 
@@ -83,9 +83,7 @@ TERM_PUBLIC int X11_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void X11_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void X11_fillbox __PROTO((int style, unsigned int x, unsigned int y, unsigned int width, unsigned int height));
 
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
 TERM_PUBLIC void X11_send_endianess __PROTO((void));
-#endif
 
 # ifdef USE_MOUSE
 TERM_PUBLIC int X11_waitforinput __PROTO((void));
@@ -1035,9 +1033,7 @@ X11_init()
 	GP_ATEXIT(X11_atexit);
 	been_here++;
     }
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
     X11_send_endianess();
-#endif
 #ifdef USE_MOUSE
     default_font_size_known = FALSE;
 #endif
@@ -1647,12 +1643,6 @@ X11_set_color(t_colorspec *colorspec)
     if (colorspec->type != TC_FRAC)
 	return;
 
-#ifndef BINARY_X11_POLYGON
-    fputc(X11_GR_SET_COLOR, X11_ipc);
-    PRINT1("%f\n", colorspec->value);
-    FFLUSH();
-    return;
-#else
     {
     char *c_ptr;
     unsigned short byte_remaining;
@@ -1679,39 +1669,12 @@ X11_set_color(t_colorspec *colorspec)
     fputc('\n', X11_ipc);
     FFLUSH();
     }
-#endif /* BINARY_X11_POLYGON */
 
 }
 
 TERM_PUBLIC void
 X11_filled_polygon(int points, gpiPoint *corners)
 {
-
-#ifndef BINARY_X11_POLYGON
-
-    int i;
-
-    fputc(X11_GR_FILLED_POLYGON, X11_ipc);
-    /* FIXME HBB 20010919: this %04d format somewhat arbitrarily
-     * limits us to 10000 vertices in the polygon */
-    PRINT2("%04d%04d", points, corners->style);
-    for (i = 0; i < points; i++) {
-	PRINT2("%04d%04d", corners[i].x, corners[i].y);
-	/* HBB 20010919: fix for buffer overflow problem: start
-	 * another line every 100 points, to avoid overflowing
-	 * fixed-size buffer in gplt_x11.  Number of points == -1
-	 * signals continuation line */
-	if ((i % 100) == 99) {
-	    PRINT1("xxxx\n%c-001", X11_GR_FILLED_POLYGON);
-	    FFLUSH();
-	}
-    }
-    fputc('\n', X11_ipc);
-    FFLUSH();
-    return;
-
-#else
-
     int int_cache[2];
     int i_corner;
     unsigned short i_buffer;
@@ -1788,8 +1751,6 @@ X11_filled_polygon(int points, gpiPoint *corners)
     }
 
     return;
-#endif
-
 }
 
 
@@ -1971,7 +1932,6 @@ PASS2:
 }
 
 
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
 TERM_PUBLIC void
 X11_send_endianess(void)
 {
@@ -1986,7 +1946,6 @@ X11_send_endianess(void)
     fputc('\n', X11_ipc);
     fflush(X11_ipc);
 }
-#endif
 
 #ifdef WITH_IMAGE
 

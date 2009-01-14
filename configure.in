@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.240 2009/01/07 00:44:25 sfeam Exp $
+dnl $Id: configure.in,v 1.241 2009/01/09 00:30:35 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -707,15 +707,6 @@ AC_ARG_ENABLE(x11-mbfonts,dnl
     LDFLAGS="$_ldflags"
   
   fi
-
-dnl binary_x11_polygon
-AC_ARG_ENABLE(binary_x11_polygon,dnl
-[  --disable-binary-x11-polygon  disable binary_x11_polygon],,
-  test -z "$enable_binary_x11_polygon" && enable_binary_x11_polygon=yes)
-
-if test "$enable_binary_x11_polygon" = yes; then
-  AC_DEFINE(BINARY_X11_POLYGON,1,[ Define if you want the x11 driver to transfer polygon information in binary format. ])
-fi
 
 dnl x11_external
 AC_ARG_ENABLE(x11_external,dnl

@@ -1,3 +1,11 @@
+2009-01-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* configure.in config/config.cyg config/config.dj2 config/config.mgw
+	config/config.nt config/config.os2 config/config.oww
+	src/gplt_x11.c src/gplt_x11.h src/show.c term/x11.trm:
+	Do away with the conditional code flag BINARY_X11_POLYGON.
+	No one has ever reported problems with it, so use it always.
+
 2009-01-14  Timothee Lecomte  <timothee.lecomte@lpa.ens.fr>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_image):

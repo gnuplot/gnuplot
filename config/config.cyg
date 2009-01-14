@@ -11,10 +11,6 @@
 /* Define if you want to support files in binary format. */
 #define BINARY_DATA_FILE 1
 
-/* Define if you want the x11 driver to transfer polygon information in binary
-   format. */
-/* #undef BINARY_X11_POLYGON */
-
 /* Define if you want to use the CGI terminal under SCO. */
 /* #undef CGI */
 

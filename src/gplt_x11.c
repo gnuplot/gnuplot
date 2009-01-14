@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.189 2008/12/25 03:02:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.190 2009/01/14 10:29:24 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -382,7 +382,7 @@ static void scan_palette_from_buf __PROTO((void));
 #if defined(WITH_IMAGE)
 static unsigned short BitMaskDetails __PROTO((unsigned long mask, unsigned short *left_shift, unsigned short *right_shift));
 #endif
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
+
 TBOOLEAN swap_endian = 0;  /* For binary data. */
 /* Petr's byte swapping routine. */
 static inline void
@@ -410,7 +410,6 @@ char byteswap_char;
     byteswap_char = ((char *)x)[1]; \
     ((char *)x)[1] = ((char *)x)[2]; \
     ((char *)x)[2] = byteswap_char
-#endif
 
 static void store_command __PROTO((char *, plot_struct *));
 static void prepare_plot __PROTO((plot_struct *));
@@ -1550,7 +1549,6 @@ record()
 	    }
 	    return 1;
 
-#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
 	case X11_GR_CHECK_ENDIANESS:
 	    {
 	        /* Initialize variable in case short happens to be longer than two bytes. */
@@ -1561,7 +1559,6 @@ record()
 		else swap_endian = 1;
 	    }
 	    return 1;
-#endif
 
 	case 'X':		/* tell the driver about do_raise /  persist */
 	    {
@@ -2464,7 +2461,6 @@ exec_cmd(plot_struct *plot, char *command)
 	}
     }
 
-#ifdef BINARY_X11_POLYGON
     else if (*buffer == X11_GR_BINARY_COLOR) {	/* set color */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
 	    /* This command will fit within a single buffer so it doesn't
@@ -2506,7 +2502,6 @@ exec_cmd(plot_struct *plot, char *command)
 	    current_gc = &gc;
 	}
     }
-#endif
 
     else if (*buffer == X11_GR_FILLED_POLYGON) {	/* filled polygon */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
@@ -2580,7 +2575,6 @@ exec_cmd(plot_struct *plot, char *command)
 
     }
 
-#ifdef BINARY_X11_POLYGON
     else if (*buffer == X11_GR_BINARY_POLYGON) {	/* filled polygon */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
 	    static TBOOLEAN transferring = 0;
@@ -2681,7 +2675,6 @@ exec_cmd(plot_struct *plot, char *command)
 	}
 
     }
-#endif /* BINARY_X11_POLYGON */
 
 #ifdef WITH_IMAGE
     else if (*buffer == X11_GR_IMAGE) {	/* image */
