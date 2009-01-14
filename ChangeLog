@@ -1,3 +1,16 @@
+2009-01-14  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/gplt_x11.c (process_event): Change the status bar of a non-active
+	or persistent window only for almost2d plot.
+
+	* src/gplt_x11.c (exec_cmd): Add field almost2d to plot_struct and set
+	it according to sent ALMOST2D.
+
+	* term/x11.trm (X11_text): Send information about ALMOST2D.
+
+	* src/gadgets.h src/mouse.c: Move definition of macro ALMOST2D to
+	gadgets.h.
+
 2009-01-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/js/gnuplot_mouse.js:
