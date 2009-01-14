@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.85.2.4 2008/07/22 20:18:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.85.2.5 2008/07/23 19:25:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -290,15 +290,6 @@ stpcpy(char *s, const char *p)
     return s + strlen(p);
 }
 # endif
-
-
-/* a macro to check whether 2D functionality is allowed:
-   either the plot is a 2D plot, or it is a suitably oriented 3D plot
-*/
-# define ALMOST2D      \
-    ( !is_3d_plot ||  \
-      ( fabs(fmod(surface_rot_z,90.0))<0.1  \
-        && (surface_rot_x>179.9 || surface_rot_x<0.1) ) )
 
 
 /* main job of transformation, which is not device dependent
