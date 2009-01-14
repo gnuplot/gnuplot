@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.41 2008/10/10 22:26:21 mikulik Exp $
+ * $Id: gp_cairo.c,v 1.42 2009/01/13 14:08:48 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -73,8 +73,6 @@
 #include "gp_cairo.h"
 
 #include "alloc.h"
-
-#include "gp_cairo_helpers.h"
 
 #include <pango/pangocairo.h>
 #include <glib.h>
@@ -1005,7 +1003,7 @@ void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int heigh
  *	corner[2] and corner[3] = (x3,y3) and (x4,y4) define a clipping box in
  *	the primary plot into which all or part of the image will be rendered.
  */
-void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int M, int N, t_imagecolor color_mode)
+void gp_cairo_draw_image(plot_struct *plot, unsigned int * image, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int M, int N)
 {
 	int m,n;
 	unsigned int *image255;
@@ -1019,9 +1017,7 @@ void gp_cairo_draw_image(plot_struct *plot, coordval * image, int x1, int y1, in
 	/* also draw any open polygon set */
 	gp_cairo_end_polygon(plot);
 
-	image255 = gp_cairo_helper_coordval_to_chars(image, M, N, color_mode);
-
-	image_surface = cairo_image_surface_create_for_data((unsigned char*) image255,
+	image_surface = cairo_image_surface_create_for_data((unsigned char*) image,
 				CAIRO_FORMAT_ARGB32, M, N, 4*M);
 
 	scale_x = (double)M/fabs( x2 - x1 );

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.29 2008/02/04 22:34:15 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.30 2008/02/04 22:52:28 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -191,6 +191,7 @@ extern "C" {
 #include "wxt_term.h"
 /* drawing facility */
 #include "gp_cairo.h"
+#include "gp_cairo_helpers.h"
 
 /* ======================================================================
  * declarations
@@ -295,8 +296,7 @@ typedef struct gp_command {
 	enum JUSTIFY mode;
 	rgb_color color;
 #ifdef WITH_IMAGE
-	t_imagecolor color_mode;
-	coordval * image;
+	unsigned int * image;
 #endif /* WITH_IMAGE */
 } gp_command;
 

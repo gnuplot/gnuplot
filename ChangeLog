@@ -1,3 +1,15 @@
+2009-01-14  Timothee Lecomte  <timothee.lecomte@lpa.ens.fr>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_draw_image):
+	* src/wxterminal/gp_cairo.h:
+	* src/wxterminal/wxt_gui.h:
+	* src/wxterminal/wxt_gui.cpp (wxt_image):
+	* term/cairo.trm (cairotrm_image):
+	Change gp_cairo_draw_image prototype so that the conversion from
+	gnuplot	internal image format to a unsigned int* is completely done
+	outside	gp_cairo.c. Modify callers in cairo-based terminals
+	accordingly. This is still preliminary work towards wxt-for-MacOSX.
+
 2009-01-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/gplt_x11.c (process_event): Change the status bar of a non-active

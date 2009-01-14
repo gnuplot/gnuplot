@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.24 2008/09/09 18:25:34 sfeam Exp $
+ * $Id: cairo.trm,v 1.25 2008/09/10 18:12:34 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -78,6 +78,7 @@ TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
 
 #include "cairo-pdf.h"
 #include "wxterminal/gp_cairo.h"
+#include "wxterminal/gp_cairo_helpers.h"
 #include "glib.h"		/* For guint32 */
 
 #define CAIROTRM_DEFAULT_FONTNAME "Sans"
@@ -854,14 +855,14 @@ void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint *
 	/* we will draw an image, scale and resize it */
 	/* FIXME add palette support ??? */
 
-	gp_cairo_draw_image(&plot, image,
+	unsigned int *image255 = gp_cairo_helper_coordval_to_chars(image, M, N, color_mode);
+	gp_cairo_draw_image(&plot, image255,
 			corner[0].x, term->ymax - corner[0].y,
 			corner[1].x, term->ymax - corner[1].y,
 			corner[2].x, term->ymax - corner[2].y,
 			corner[3].x, term->ymax - corner[3].y,
-			M, N,
-			color_mode);
-
+			M, N);
+	free(image255);
 }
 #endif /*WITH_IMAGE*/
 

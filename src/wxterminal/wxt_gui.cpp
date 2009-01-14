@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.69 2008/10/13 19:45:17 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.70 2008/11/07 11:55:46 mikulik Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -659,7 +659,7 @@ void wxtPanel::ClearCommandlist()
 			delete[] iter->corners;
 #ifdef WITH_IMAGE
 		if (iter->command == command_image)
-			delete[] iter->image;
+			free(iter->image);
 #endif /* WITH_IMAGE */
 	}
 
@@ -2102,7 +2102,6 @@ void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corn
 	if (wxt_status != STATUS_OK)
 		return;
 
-	int imax;
 	gp_command temp_command;
 
 	temp_command.command = command_image;
@@ -2116,17 +2115,8 @@ void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corn
 	temp_command.y4 = term->ymax - corner[3].y;
 	temp_command.integer_value = M;
 	temp_command.integer_value2 = N;
-	temp_command.color_mode = color_mode;	
 
-	if (color_mode == IC_RGB)
-		imax = 3*M*N;
-	else if (color_mode == IC_RGBA)
-		imax = 4*M*N;
-	else
-		imax = M*N;
-
-	temp_command.image = new coordval[imax];
-	memcpy(temp_command.image, image, imax*sizeof(coordval));
+	temp_command.image = gp_cairo_helper_coordval_to_chars(image, M, N, color_mode);
 
 	wxt_command_push(temp_command);
 }
@@ -2478,8 +2468,7 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 				command.x2, command.y2,
 				command.x3, command.y3,
 				command.x4, command.y4,
-				command.integer_value, command.integer_value2,
-				command.color_mode);
+				command.integer_value, command.integer_value2);
 		return;
 #endif /*WITH_IMAGE*/
 	}
