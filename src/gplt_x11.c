@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.8 2008/06/22 23:08:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.9 2008/12/25 05:50:59 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -280,6 +280,7 @@ typedef struct plot_struct {
      * plot coordinates of a mouse click.  It is a snapshot of the contents of
      * gnuplot's axis_array structure at the time the plot was drawn.
      */
+    int almost2d;
     int axis_mask;		/* Bits set to show which axes are active */
     axis_scale_t axis_scale[2*SECOND_AXES];
 #endif
@@ -3112,7 +3113,9 @@ exec_cmd(plot_struct *plot, char *command)
 	int axis, axis_mask;
 
 	sscanf(&buffer[1], "%d %d", &axis, &axis_mask);
-	if (axis < 0) {
+	if (axis == -2) {
+	    plot->almost2d = axis_mask;
+	} else if (axis < 0) {
 	    plot->axis_mask = axis_mask;
 	} else if (axis < 2*SECOND_AXES) {
 	    sscanf(&buffer[1], "%d %lg %d %lg %lg", &axis,
@@ -4592,7 +4595,7 @@ process_event(XEvent *event)
 		Call_display(plot);
 		gp_exec_event(GE_motion, (int) RevX(pos_x), (int) RevY(pos_y), 0, 0, 0);
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
-	    } else if (plot->axis_mask && plot->mouse_on) {
+	    } else if (plot->axis_mask && plot->mouse_on && plot->almost2d) {
 		/* This is not the active plot window, but we can still update the mouse coords */
 		char mouse_format[60];
 		char *m = mouse_format;
