@@ -1,3 +1,9 @@
+2009-01-14  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util.c: Replace the file util.c with the correct file for this
+	CVS branch.  Somehow the copy from the 4.3 branch got incorrectly
+	duplicated here.
+
 2009-01-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/gplt_x11.c (process_event): Change the status bar of a non-active
