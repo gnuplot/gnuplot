@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.160.2.10 2008/12/17 20:48:47 sfeam Exp $
+ * $Id: x11.trm,v 1.160.2.11 2008/12/25 05:50:59 sfeam Exp $
  *
  */
 
@@ -1329,6 +1329,7 @@ X11_text()
 	    if (axis_array[i].ticmode != NO_TICS)
 		axis_mask |= (1 << i);
 	}
+	PRINT2("S %d %d\n", -2, ALMOST2D);
 	PRINT2("S %2d %d\n", -1, axis_mask);
 	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", FIRST_X_AXIS,
 		axis_array[FIRST_X_AXIS].min,
