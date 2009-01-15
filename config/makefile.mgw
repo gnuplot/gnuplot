@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.47 2009/01/13 22:57:15 mikulik Exp $
+# $Id: makefile.mgw,v 1.48 2009/01/15 09:21:36 tlecomte Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -381,6 +381,9 @@ wxt_gui.$(O): wxterminal/wxt_gui.cpp wxterminal/wxt_gui.h $(WX_LOCATION)
 
 gp_cairo.$(O): wxterminal/gp_cairo.c wxterminal/gp_cairo.h
 	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) $(PANGO_CFLAGS) wxterminal/gp_cairo.c
+
+gp_cairo_helpers.$(O): wxterminal/gp_cairo_helpers.c wxterminal/gp_cairo_helpers.h
+	$(CC) -c $(CFLAGS) wxterminal/gp_cairo_helpers.c
 
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
