@@ -1,3 +1,9 @@
+2009-01-15  Timothee Lecomte  <timothee.lecomte@lpa.ens.fr>
+
+	* config/makefile.mgw:
+	Add gp_cairo_helpers.o in the list of object files to build for
+	wxt.
+
 2009-01-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in config/config.cyg config/config.dj2 config/config.mgw

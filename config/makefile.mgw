@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.46 2008/11/23 07:48:58 mikulik Exp $
+# $Id: makefile.mgw,v 1.47 2009/01/13 22:57:15 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -260,7 +260,7 @@ ifdef WXT
 	PANGO_CFLAGS = $(shell pkg-config --cflags pangocairo)
 	PANGO_LIBS = $(shell pkg-config --libs pangocairo)
 	WX_LIBS = $(shell wx-config --libs)
-	WX_OBJS = wxt_gui.o gp_cairo.o
+	WX_OBJS = wxt_gui.o gp_cairo.o gp_cairo_helpers.o
 endif
 
 ifdef GNU_RC
