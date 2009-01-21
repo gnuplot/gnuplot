@@ -1,3 +1,9 @@
+2009-01-21  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/post.trm:  Add a user-editable toggle ClipToBoundingBox.
+	Default behaviour remains unchanged, but setting this toggle to "true"
+	tells PostScript to clip everything that outside the canvas area.
+
 2009-01-15  Timothee Lecomte  <timothee.lecomte@lpa.ens.fr>
 
 	* config/makefile.mgw:
