@@ -1,3 +1,10 @@
+2009-01-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Back-port changes to svg terminal driver from 4.3 CVS.
+	This adds support for dashed lines, additional color modes,
+	more standard xml syntax for attributes, and a work-around for viewers
+	that fail to correctly inherit <text xml:space="preserve">
+
 2009-01-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (fit_command):  Issue a warning if no fittable parameters
