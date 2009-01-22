@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.97 2008/11/29 03:38:52 sfeam Exp $
+ * $Id: svg.trm,v 1.98 2009/01/01 00:05:59 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -694,7 +694,10 @@ SVG_init ()
 	     (unsigned int) (term->xmax / SVG_SCALE),
 	     (unsigned int) (term->ymax / SVG_SCALE));
     fprintf (gpoutfile, " xmlns=\"http://www.w3.org/2000/svg\"\n");
-    fprintf (gpoutfile, " xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n");
+    fprintf (gpoutfile, " xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n");
+    fprintf (gpoutfile, " xml:space=\"preserve\"\n");
+    fprintf (gpoutfile, ">\n\n");
+
     fprintf (gpoutfile,
 	     "<desc>Produced by GNUPLOT %s patchlevel %s </desc>\n\n",
 	     gnuplot_version, gnuplot_patchlevel);
