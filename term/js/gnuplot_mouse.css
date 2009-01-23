@@ -1,0 +1,7 @@
+canvas	{ border:0; background-color: white; }
+td.icon	{ width: 16; }
+td.mbh	{ height: 12pt; }
+td.mb0	{ text-align: right; font-size: smaller; width: 40%; }
+td.mb1	{ text-align:  left; font-size: smaller; width: 50%; color:#007700; }
+table.plot { border:0; margin-left: auto; margin-right: auto; }
+table.mousebox { border:0; border-collapse:collapse; margin-left: auto; margin-right: auto; }

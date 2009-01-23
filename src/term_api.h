@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.76 2008/12/10 06:53:14 sfeam Exp $
+ * $Id: term_api.h,v 1.77 2008/12/12 21:06:13 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -125,6 +125,8 @@ typedef enum termlayer {
 	TERM_LAYER_RESET,
 	TERM_LAYER_BACKTEXT,
 	TERM_LAYER_FRONTTEXT,
+	TERM_LAYER_BEGIN_GRID,
+	TERM_LAYER_END_GRID,
 	TERM_LAYER_END_TEXT,
 	TERM_LAYER_BEFORE_PLOT,
 	TERM_LAYER_AFTER_PLOT

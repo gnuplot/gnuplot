@@ -17,7 +17,9 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW iteration within a plot command; e.g. plot for [i=1:10] foo(i)
 * NEW iteration with set/unset commands
 * NEW operators '=' and ',' in expression syntax
-* NEW pdf and png terminals based on cairo and pango
+* NEW terminal canvas for HTML 5 canvas element
+* NEW terminals for pdf and png based on cairo and pango
+* NEW terminal dpu414 - Seiko DPU-414 thermal printer
 * NEW error status variables GPVAL_ERRNO and GPVAL_ERRMSG
 * NEW variables GPVAL_LAST_PLOT, GPVAL_{S}PLOT, GPVAL_MULTIPLOT
 * NEW variables GPVAL_VIEW_{MAP|ROT_X|ROT_Z|SCALE|ZSCALE}, GPVAL_TERMINALS
@@ -26,7 +28,6 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW individual plots can be omitted from autoscaling of axis ranges
 * NEW more smoothing options: new kernels (for dgrid3d) and 'smooth cumulative'
 * NEW commands 'show bind' and 'reset bind'
-* NEW terminal dpu414 - Seiko DPU-414 thermal printer
 * NEW command 'evaluate' executes commands from a string variable
 * NEW z-axis tic labels can be colored by Z value
 * NEW command 'set view equal {xy|xyz}' forces axes in a 3D plot to the same scale

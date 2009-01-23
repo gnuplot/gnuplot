@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.290 2008/12/27 04:03:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.291 2009/01/06 19:36:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4744,6 +4744,8 @@ xtick2d_callback(
     (void) axis;		/* avoid "unused parameter" warning */
 
     if (grid.l_type > LT_NODRAW) {
+	if (t->layer)
+	    (t->layer)(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid);
 	if (polar_grid_angle) {
 	    double x = place, y = 0, s = sin(0.1), c = cos(0.1);
@@ -4791,7 +4793,11 @@ xtick2d_callback(
 	    }
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
-    }
+	if (t->layer)
+	    (t->layer)(TERM_LAYER_END_GRID);
+    }	/* End of grid code */
+
+
     /* we precomputed tic posn and text posn in global vars */
 
     (*t->move) (x, tic_start);
@@ -4833,6 +4839,8 @@ ytick2d_callback(
     (void) axis;		/* avoid "unused parameter" warning */
 
     if (grid.l_type > LT_NODRAW) {
+	if (t->layer)
+	    (t->layer)(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid);
 	if (polar_grid_angle) {
 	    double x = 0, y = place, s = sin(0.1), c = cos(0.1);
@@ -4871,6 +4879,8 @@ ytick2d_callback(
 	    }
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
+	if (t->layer)
+	    (t->layer)(TERM_LAYER_END_GRID);
     }
     /* we precomputed tic posn and text posn */
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.1 2009/01/09 00:30:35 sfeam Exp $
+ * $Id: canvas.trm,v 1.2 2009/01/14 04:09:14 sfeam Exp $
  *
  */
 
@@ -52,6 +52,7 @@ TERM_PUBLIC int CANVAS_text_angle __PROTO((int ang));
 TERM_PUBLIC void CANVAS_filled_polygon __PROTO((int, gpiPoint *));
 TERM_PUBLIC void CANVAS_set_color __PROTO((t_colorspec *colorspec));
 TERM_PUBLIC int CANVAS_make_palette __PROTO((t_sm_palette *palette));
+TERM_PUBLIC void CANVAS_layer __PROTO((t_termlayer));
 
 #define CANVAS_XMAX 600 
 #define CANVAS_YMAX 400
@@ -81,6 +82,7 @@ static char canvas_color[] = "rgb(000,000,000)"; /* Exact format is important */
 static TBOOLEAN CANVAS_mouseable = FALSE;
 static TBOOLEAN CANVAS_standalone = TRUE;
 static char *CANVAS_name = NULL;
+static char *CANVAS_scriptdir = NULL;
 
 enum CANVAS_case {
     CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, 
@@ -209,7 +211,7 @@ CANVAS_init()
 TERM_PUBLIC void
 CANVAS_graphics()
 {
-    char *fulldir, *js_dir;
+    char *js_dir;
 
     /* Force initialization at the beginning of each plot */
     canvas_line_type = LT_UNDEFINED;
@@ -239,15 +241,18 @@ CANVAS_graphics()
 #endif /* GNUPLOT_JS_DIR */
     }
 
-    fulldir = gp_alloc(strlen(js_dir) + 4,"js_dir");
-    strcpy(fulldir,js_dir);
+    free(CANVAS_scriptdir);
+    CANVAS_scriptdir = gp_alloc(strlen(js_dir) + 4,"js_dir");
+    strcpy(CANVAS_scriptdir,js_dir);
+    if (*CANVAS_scriptdir) {
 #if defined(_Windows)
-    if (fulldir[strlen(fulldir)-1] != '\\')
-	strcat(fulldir,"\\");
+	if (CANVAS_scriptdir[strlen(CANVAS_scriptdir)-1] != '\\')
+	    strcat(CANVAS_scriptdir,"\\");
 #elif !defined(VMS)
-    if (fulldir[strlen(fulldir)-1] != '/')
-	strcat(fulldir,"/");
+	if (CANVAS_scriptdir[strlen(CANVAS_scriptdir)-1] != '/')
+	    strcat(CANVAS_scriptdir,"/");
 #endif
+    }
 
     if (CANVAS_standalone) {
 	fprintf(gpoutfile,
@@ -256,16 +261,17 @@ CANVAS_graphics()
 		"<title>Gnuplot Canvas Graph</title>\n"
 		"<!--[if IE]><script type=\"text/javascript\" src=\"excanvas.js\"></script><![endif]-->\n"
 		"<script src=\"%scanvastext.js\"></script>\n"
-		, fulldir
+		, CANVAS_scriptdir
 	);
 	if (CANVAS_mouseable)
 	    fprintf(gpoutfile,
 		"<script src=\"%sgnuplot_mouse.js\"></script>\n"
-		, fulldir
+		, CANVAS_scriptdir
 	    );
 	fprintf(gpoutfile,
 		"<script type=\"text/javascript\">\n"
 		"var canvas, ctx;\n"
+		"var grid_lines = 1;\n"
 		"function gnuplot_canvas() {\n"
 		"canvas = document.getElementById(\"gnuplot_canvas\");\n"
 	);
@@ -285,8 +291,6 @@ CANVAS_graphics()
 	    "ctx.lineWidth = \"1\";\n"
 	    "ctx.strokeStyle = \"rgb(215,215,215)\";\n"
     );
-
-    free(fulldir);
 }
 
 
@@ -338,28 +342,30 @@ CANVAS_text()
     if (CANVAS_standalone) {
 	fprintf(gpoutfile,
 		"</script>\n"
-		"<style>\n"
-		"canvas { border:0; background-color: white; }\n"
-		"td.td0 { text-align: right; font-size: smaller; width: 50%%; }\n"
-		"td.td1 { text-align:  left; font-size: smaller; width: 50%%; }\n"
-		"table.plot { border:0; margin-left: auto; margin-right: auto; }\n"
-		"</style>\n"
+		"<link text=\"text/css\" href=\"%sgnuplot_mouse.css\" rel=\"stylesheet\">\n"
 		"</head>\n"
 		"<body onload=\"gnuplot_canvas(); gnuplot_init(); \">\n"
 		"<table class=\"plot\">\n"
 		"<tr><td>\n"
 		"    <canvas id=\"gnuplot_canvas\" width=\"%d\" height=\"%d\"></canvas>\n"
-		"</td></tr>\n"
-        	, canvas_xmax, canvas_ymax
+		"</td></tr>\n",
+			CANVAS_scriptdir ? CANVAS_scriptdir : "",
+        		canvas_xmax, canvas_ymax
             );
 	if (CANVAS_mouseable) {
 	    fprintf(gpoutfile,
 		"<tr><td>\n"
-		"    <table width=100%% border=0 border-collapse=collapse id=\"gnuplot_mousebox\" align=center>\n"
-		"    <tr><td class=\"td0\">mouse coordinates &nbsp;</td><td class=\"td1\"><span id=\"span_scaled_x\">&nbsp;</span>, <span id=\"span_scaled_y\">&nbsp;</span></td></tr>\n"
-		"    <tr><td class=\"td0\">previous click &nbsp;</td><td class=\"td1\"><span id=\"span_last_x\">&nbsp;</span>, <span id=\"span_last_y\">&nbsp;</span></td></tr>\n"
+		"    <table class=\"mousebox\" id=\"gnuplot_mousebox\">\n"
+		"    <tr><td class=\"mbh\" colspan=3></td></tr>\n"
+		"    <tr><td class=\"icon\" onclick=toggle_grid><img src=\"%sgrid.png\" id=\"gnuplot_grid_icon\" align=right alt=\"#\"></td>\n"
+		"        <td class=\"mb0\">mouse coordinates &nbsp;</td>\n"
+		"        <td class=\"mb1\"><span id=\"span_scaled_x\">&nbsp;</span>, <span id=\"span_scaled_y\">&nbsp;</span></td></tr>\n"
+		"    <tr><td class=\"icon\"></td>\n"
+		"        <td class=\"mb0\">previous click &nbsp;</td>\n"
+		"        <td class=\"mb1\"><span id=\"span_last_x\">&nbsp;</span>, <span id=\"span_last_y\">&nbsp;</span></td></tr>\n"
 		"    </table>\n"
-		"</td></tr>\n"
+		"</td></tr>\n",
+			CANVAS_scriptdir ? CANVAS_scriptdir : ""
 	    );
 	}
 	fprintf(gpoutfile,
@@ -696,6 +702,15 @@ CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, 
 	CANVAS_filled_polygon(4, corner);
 }
 
+TERM_PUBLIC void 
+CANVAS_layer(t_termlayer layer)
+{
+	if (layer == TERM_LAYER_BEGIN_GRID)
+	    fprintf(gpoutfile, "if (grid_lines) {\n");
+	else if (layer == TERM_LAYER_END_GRID)
+	    fprintf(gpoutfile, "} // grid_lines\n");
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -718,7 +733,7 @@ TERM_TABLE_START(canvas_driver)
     , NULL
 #endif
     , NULL, NULL, NULL	/* enhanced text */
-    , NULL		/* layer control */
+    , CANVAS_layer
     , NULL		/* path */
 TERM_TABLE_END(canvas_driver)
 
@@ -758,7 +773,8 @@ START_HELP(canvas)
 " All plots produced by the canvas terminal are mouseable.  The additional",
 " keyword `mousing` causes the `standalone` mode to add a mouse-tracking box",
 " underneath the plot. It also adds a link to a javascript file",
-" 'gnuplot_mousing.js' in the same local or URL directory as 'canvastext.js'.",
+" 'gnuplot_mouse.js' and to a stylesheet for the mouse box 'gnuplot_mouse.css'",
+" in the same local or URL directory as 'canvastext.js'.",
 "",
 " The `name` option creates a file containing only javascript. Both the",
 " javascript function it contains and the id of the canvas element that it",

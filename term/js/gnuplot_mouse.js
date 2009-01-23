@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_mousing.js,v 1.0 2009/01/11 00:30:35 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.1 2009/01/14 22:23:22 sfeam Exp $
  */
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -26,11 +26,13 @@ var plot_axis_ymin = 0;
 var plot_axis_ymax = 0;
 var plot_logaxis_x = 0;
 var plot_logaxis_y = 0;
+var grid_lines = 1;
 
 function gnuplot_init()
 {
   document.getElementById("gnuplot_canvas").onmousemove = mouse_update;
   document.getElementById("gnuplot_canvas").onmouseup = saveclick;
+  document.getElementById("gnuplot_grid_icon").onmouseup = toggle_grid;
   mouse_update();
 }
 
@@ -102,6 +104,20 @@ function mouse_update(e)
 function saveclick(e)
 {
   mouse_update(e);
+  
+  // Limit tracking to the interior of the plot
+  if (plotx < 0 || ploty < 0) return;
+  if (mousex > plot_xmax || mousey < plot_term_ymax-plot_ymax) return;
+
   document.getElementById('span_last_x').innerHTML = document.getElementById('span_scaled_x').innerHTML;
   document.getElementById('span_last_y').innerHTML = document.getElementById('span_scaled_y').innerHTML;
+}
+
+function toggle_grid(e)
+{
+  if (grid_lines == 0) grid_lines = 1;
+  else grid_lines = 0;
+
+  ctx.clearRect(0,0,plot_term_xmax,plot_term_ymax);
+  gnuplot_canvas();
 }
