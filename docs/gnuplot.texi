@@ -3944,8 +3944,7 @@ approximate this by treating alpha as being either 0 or 255.
 @cindex failsafe
 
 Some terminal drivers provide code to optimize rendering of image data
-within a rectangular 2D area.  However this code is known to be imperfect
-(hence the label EXPERIMENTAL for image support in gnuplot version 4.2).
+within a rectangular 2D area.  However this code is known to be imperfect.
 This optimized code may be disabled by using the keyword `failsafe`. E.g.
 
 @example
@@ -18703,10 +18702,8 @@ setting, `fixed`, will request an absolute size.
 by a factor of <w>.
 
 <font> is the name of the default font to use (default Arial) and
-<fontsize> is the font size (in points, default 12). Gnuplot does not
-currently provide a mechanism for embedding fonts in the output file,
-so svg viewing programs may substitute other fonts when the file is
-displayed.
+<fontsize> is the font size (in points, default 12). SVG viewing
+programs may substitute other fonts when the file is displayed.
 
 The svg terminal supports an enhanced text mode, which allows font
 and other formatting commands to be embedded in labels and other text
@@ -18719,7 +18716,8 @@ specifies a local file which is copied into the <defs> section of the
 resulting SVG output file.  This file may either itself contain a font,
 or may contain the records necessary to create a hypertext reference to
 the desired font. Gnuplot will look for the requested file using the
-directory list in the GNUPLOT_FONTPATH environmental variable."
+directory list in the GNUPLOT_FONTPATH environmental variable.
+NB: You must embed an svg font, not a TrueType or PostScript font."
 
 @node tek410x, tek410x_, svg, terminal_
 @subsubsection tek410x
