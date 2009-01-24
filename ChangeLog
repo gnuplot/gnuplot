@@ -1,6 +1,10 @@
+2009-01-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm (CANVAS_finish): closePath() before stroke().
+
 2009-01-23  Ethan Merritt  <merritt@u.washington.edu>
 
-	src/graphics.c src/term_api.h term/canvas.trm term/Makefile.am.in
+	* src/graphics.c src/term_api.h term/canvas.trm term/Makefile.am.in
 	term/js/gnuplot_mouse.css term/js/gnuplot_mouse.js term/js/grid.png:
 	Clean up mousing code for the canvas terminal.  Add a "mousebox"
 	table to the html output in standalone mode, including an icon that
