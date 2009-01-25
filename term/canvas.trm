@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.4 2009/01/24 21:15:25 sfeam Exp $
+ * $Id: canvas.trm,v 1.2 2009/01/14 04:09:14 sfeam Exp $
  *
  */
 
@@ -53,6 +53,7 @@ TERM_PUBLIC void CANVAS_filled_polygon __PROTO((int, gpiPoint *));
 TERM_PUBLIC void CANVAS_set_color __PROTO((t_colorspec *colorspec));
 TERM_PUBLIC int CANVAS_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void CANVAS_layer __PROTO((t_termlayer));
+TERM_PUBLIC void CANVAS_path __PROTO((int));
 
 #define CANVAS_XMAX 600 
 #define CANVAS_YMAX 400
@@ -78,6 +79,7 @@ static double canvas_font_size = CANVASVCHAR;
 static char *canvas_justify = "";
 static int canvas_text_angle = 0;
 static int canvas_in_a_path = FALSE;
+static int already_closed = FALSE;
 static char canvas_color[] = "rgb(000,000,000)"; /* Exact format is important */
 static TBOOLEAN CANVAS_mouseable = FALSE;
 static TBOOLEAN CANVAS_standalone = TRUE;
@@ -103,29 +105,24 @@ static struct gen_table CANVAS_opts[] =
 static void
 CANVAS_start (void)
 {
-    if (canvas_in_a_path) {
+    if (canvas_in_a_path)
 	return;
-    }
+    fprintf(gpoutfile, "ctx.beginPath();\n");
     canvas_in_a_path = TRUE;
-    fprintf(gpoutfile,
-	    "ctx.beginPath();\n"
-	   );
+    already_closed = FALSE;
 }
 
 static void
 CANVAS_finish (void)
 {
-    if (!canvas_in_a_path) {
+    if (!canvas_in_a_path)
 	return;
-    }
-    /* FIXME: This is wrong!
-     * All of the beginPath/closePath code needs to be re-worked
-     */
-    fprintf(gpoutfile,
-	    "ctx.stroke();\n"
-	    "ctx.closePath();\n"
-	   );
+    fprintf(gpoutfile, "ctx.stroke();\n");
+
+    if (!already_closed)
+	fprintf(gpoutfile, "ctx.closePath();\n");
     canvas_in_a_path = FALSE;
+    already_closed = TRUE;
 }
 
 TERM_PUBLIC void
@@ -494,10 +491,9 @@ CANVAS_point(unsigned int x, unsigned int y, int number)
     case 0:
     case 1:
     case 2:
-	fprintf(gpoutfile, "ctx.beginPath();\n");
+	CANVAS_start();
 	do_point(x, y, pt);
-	fprintf(gpoutfile, "ctx.closePath();\n");
-	fprintf(gpoutfile, "ctx.stroke();\n");
+	CANVAS_finish();
 	break;
     case 3:
 	fprintf(gpoutfile, "ctx.strokeRect(%d,%d,%d,%d);\n",
@@ -616,6 +612,8 @@ CANVAS_set_color(t_colorspec *colorspec)
 	/* Other color types not yet supported */
 	return;
 
+    CANVAS_finish();
+
     sprintf(canvas_color,"rgb(%03d,%03d,%03d)", rgb255.r, rgb255.g, rgb255.b);
     fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_color);
     canvas_line_type = LT_UNDEFINED;
@@ -688,7 +686,6 @@ CANVAS_filled_polygon(int points, gpiPoint *corners)
 		"ctx.closePath();\n"
 		"ctx.fill();\n"
                );
-
 }
 
 TERM_PUBLIC void
@@ -714,6 +711,19 @@ CANVAS_layer(t_termlayer layer)
 	    fprintf(gpoutfile, "} // grid_lines\n");
 }
 
+TERM_PUBLIC void
+CANVAS_path(int p)
+{
+    switch (p) {
+	case 1: /* Close path */
+		fprintf(gpoutfile, "ctx.closePath();\n");
+		already_closed = TRUE;
+		break;
+	case 0:
+		break;
+    }
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -737,7 +747,7 @@ TERM_TABLE_START(canvas_driver)
 #endif
     , NULL, NULL, NULL	/* enhanced text */
     , CANVAS_layer
-    , NULL		/* path */
+    , CANVAS_path		/* path */
 TERM_TABLE_END(canvas_driver)
 
 #undef LAST_TERM

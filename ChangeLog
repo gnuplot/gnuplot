@@ -1,3 +1,10 @@
+2009-01-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm: Clean up the bookkeeping for beginPath()/closePath().
+	This is a work-around for early versions of the opera web brower, which
+	seem to require a closePath() element even if the path has already been
+	stroked or filled.
+
 2009-01-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/term_api.h term/canvas.trm term/Makefile.am.in
