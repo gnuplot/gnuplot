@@ -1,7 +1,3 @@
-2009-01-24  Ethan Merritt  <merritt@u.washington.edu>
-
-	* term/canvas.trm (CANVAS_finish): closePath() before stroke().
-
 2009-01-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/term_api.h term/canvas.trm term/Makefile.am.in
