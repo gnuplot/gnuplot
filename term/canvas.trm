@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.6 2009/01/25 19:52:59 sfeam Exp $
+ * $Id: canvas.trm,v 1.7 2009/01/25 20:01:53 sfeam Exp $
  *
  */
 
@@ -358,7 +358,7 @@ CANVAS_text()
 		"    <table class=\"mousebox\" id=\"gnuplot_mousebox\">\n"
 		"    <tr><td class=\"mbh\" colspan=3></td></tr>\n"
 		"    <tr><td class=\"icon\" onclick=toggle_grid><img src=\"%sgrid.png\" id=\"gnuplot_grid_icon\" align=right alt=\"#\"></td>\n"
-		"        <td class=\"mb0\">mouse coordinates &nbsp;</td>\n"
+		"        <td class=\"mb0\">mouse&nbsp;coordinates&nbsp;</td>\n"
 		"        <td class=\"mb1\"><span id=\"span_scaled_x\">&nbsp;</span>, <span id=\"span_scaled_y\">&nbsp;</span></td></tr>\n"
 		"    <tr><td class=\"icon\"></td>\n"
 		"        <td class=\"mb0\">previous click &nbsp;</td>\n"
