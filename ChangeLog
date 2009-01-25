@@ -5,6 +5,11 @@
 	seem to require a closePath() element even if the path has already been
 	stroked or filled.
 
+	* term/canvas.trm: CANVAS_fillbox() can use the primitive operation
+	ctx.fillRect() rather than the generic, but more expensive, routine
+	CANVAS_filled_polygon().  This is more likely to be handled correctly by
+	older versions of opera.
+
 2009-01-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/term_api.h term/canvas.trm term/Makefile.am.in

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.2 2009/01/14 04:09:14 sfeam Exp $
+ * $Id: canvas.trm,v 1.6 2009/01/25 19:52:59 sfeam Exp $
  *
  */
 
@@ -626,15 +626,13 @@ CANVAS_make_palette(t_sm_palette *palette)
     return 0;
 }
 
-
-TERM_PUBLIC void
-CANVAS_filled_polygon(int points, gpiPoint *corners)
+static char *
+CANVAS_fillstyle(int style)
 {
-    int		i;
-    float density = (float)(corners->style >> 4) / 100.;
-    char fillcolor[24];
+    float density = (float)(style >> 4) / 100.;
+    static char fillcolor[24];
 
-    switch (corners->style & 0xf) {
+    switch (style & 0xf) {
 	case FS_TRANSPARENT_SOLID:
 		sprintf(fillcolor,"rgba(%11.11s,%4.2f)%c",
 			&canvas_color[4], density, '\0');
@@ -645,7 +643,7 @@ CANVAS_filled_polygon(int points, gpiPoint *corners)
 	case FS_PATTERN:
 	case FS_TRANSPARENT_PATTERN:
 		/* Patterns are possible, but not yet implemented */
-		switch ((corners->style >> 4) % 5) {
+		switch ((style >> 4) % 5) {
 			case 0: density = 0.00; break;
 			case 1: density = 1.00; break;
 			case 2: density = 0.25; break;
@@ -670,6 +668,15 @@ CANVAS_filled_polygon(int points, gpiPoint *corners)
 		sprintf(fillcolor,"%s%c",canvas_color,'\0');
     }
 
+    return fillcolor;
+}
+
+TERM_PUBLIC void
+CANVAS_filled_polygon(int points, gpiPoint *corners)
+{
+    int		i;
+    char *fillcolor = CANVAS_fillstyle(corners->style);
+
     CANVAS_finish();
     fprintf(gpoutfile,
 	    "ctx.fillStyle = \"%s\";\n"
@@ -691,15 +698,13 @@ CANVAS_filled_polygon(int points, gpiPoint *corners)
 TERM_PUBLIC void
 CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
 {
-    gpiPoint corner[4];
+    char *fillcolor = CANVAS_fillstyle(style);
 
-	corner[0].x = x1;        corner[0].y = y1;
-	corner[1].x = x1+width;  corner[1].y = y1;
-	corner[2].x = x1+width;  corner[2].y = y1+height;
-	corner[3].x = x1;        corner[3].y = y1+height;
-	corner->style = style;
-
-	CANVAS_filled_polygon(4, corner);
+    /* Since filled-rectangle is a primitive operation for the canvas element */
+    /* it's worth making this a special case rather than using filled_polygon */
+	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", fillcolor);
+	fprintf(gpoutfile, "ctx.fillRect(%d,%d,%d,%d);\n",
+		x1, canvas_ymax - (y1+height), width, height);
 }
 
 TERM_PUBLIC void 
