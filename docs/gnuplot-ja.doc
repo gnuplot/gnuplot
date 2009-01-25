@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.263 2008-10-08 20:58:04+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.539
+C RCS $Id: gnuplot-ja.doc,v 1.275 2009-01-05 14:58:52+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.553
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -307,7 +307,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
        set size 0.5, 0.5
        set term png size 600, 400
        set output "figure.png"
-       plot "data" using lines
+       plot "data" with lines
 
  このコマンドは、幅 600 ピクセル、高さ 400 ピクセルの出力ファイル
  "figure.png" を生成します。グラフはキャンバスの中の左下に置かれます。
@@ -316,11 +316,12 @@ C Shigeharu Takeno et al (3.7, 4.X)
  ます。
 
 3 新しい描画要素
-=circles
+=circle
 =ellipse
+=polygon
  コマンド `set object` は、現在は固定された長方形だけでなく、円、楕円、
  多角形も定義でき、そして、それに対応する新しい描画スタイル
- `plot with circles` もあります。以下参照: `circles`, `ellipse`。
+ `plot with circles` もあります。以下参照: `circle` `ellipse` `polygon`。
 
 3 新しい/修正された出力形式
  cairo, pango ライブラリによる 2 つの新しいドライバ `pngcairo`,
@@ -329,6 +330,15 @@ C Shigeharu Takeno et al (3.7, 4.X)
  pdf 版の図は、pdfcairo 出力ドライバで作成されたものです (訳注: PDF 版
  マニュアルにこの図を入れるのには pdflatex が必要なため、日本語 PDF 版
  マニュアルには今のところこの図は含まれていないでしょう)。
+
+3 新しい平滑化アルゴリズム
+=kdensity
+=cumulative
+ 2 次元、3 次元描画の両方に、新しい平滑化アルゴリズムが追加されていて、
+ 滑らかなヒストグラムや累積分布関数の `plot` による描画に、それぞれ
+ `smooth kdensity` や `smooth cumul` が使えます。`splot` での使用に対し
+ ては、`dgrid3d` にいくつかの新しい平滑化重み付け関数 (kernel) が追加さ
+ れています。以下参照: `smooth`, `dgrid3d`。
 
 2 後方互換性 (Backwards compatibility)
 ?backwards compatibility
@@ -537,13 +547,21 @@ C Shigeharu Takeno et al (3.7, 4.X)
    set xtics
    plot 'datafile' using 3:4:xticlabels(1) with linespoints
 
- 入力データの列の最初のエントリをテキスト部分と解釈するもう一つのオプシ
- ョンがあり、それはテキスト部分を、その描画した列のデータの説明 (key)
- のタイトル部分として使用します。次の例は、先頭の行の 2 列目の部分を説
- 明ボックス内のタイトルを生成するのに使用し、その後の列の 2,4 列目は要
- 求された曲線を描画するのに処理されます:
+ 入力データの列の最初のエントリ (すなわち列の見出し) をテキスト部分と解
+ 釈するもう一つのオプションがあり、それはテキスト部分を、その描画した列
+ のデータの説明 (key) のタイトル部分として使用します。次の例は、先頭の
+ 行の 2 列目の部分を説明ボックス内のタイトルを生成するのに使用し、その
+ 後の列の 2,4 列目は要求された曲線を描画するのに処理されます:
 
    plot 'datafile' using 1:(f($2)/$4) title 2 with lines
+
+ このオプションは、`using` 指定があればその直後につける必要があります。
+ 例:
+
+   plot 'datafile'           title 2    linetype 5   # OK
+   plot 'datafile' using 1:2 title 2    linetype 5   # OK
+   plot 'datafile' using 1:2 linetype 5 title "FOO"  # OK
+   plot 'datafile' using 1:2 linetype 5 title 2      # 間違い
 
  以下参照: `set style labels`, `using xticlabels`, `plot title`,
  `using`。
@@ -1703,9 +1721,9 @@ C ... and restart the table:
  せん。
 
  グラフは一つまたはそれ以上の "曲線 (line)" を含みます。曲線は一つの関
- 数、またはデータセットです。用語 "line" は描画スタイルとしても使われま
- す。さらにこの用語は "文字列の一行 (a line of text)" のように使われる
- こともあります。多分文脈からそれらは区別できるでしょう。
+ 数、またはデータ集合です。用語 "line" は描画スタイルとしても使われます。
+ さらにこの用語は "文字列の一行 (a line of text)" のように使われること
+ もあります。多分文脈からそれらは区別できるでしょう。
 
  一つのグラフ上の複数の曲線はそれぞれ名前を持ちます。その名前は、その曲
  線の表現に使われる描画スタイルのサンプルとともに "(説明) key" 内に一覧
@@ -1799,13 +1817,18 @@ C ... and restart the table:
 ?colorspec
 ?rgbcolor
 =colors
+?lc
+?linecolor
+?tc
+?textcolor
  多くのコマンドで、明示的な色の指定をともなった線種を指定することができ
- ます。このオプションは、使用している出力形式が RGB カラーか pm3d パレ
- ットをサボートしている場合にのみ利用可能です。
+ ます。出力形式に依存する色の選択は、使用している出力形式が RGB カラー
+ か pm3d パレットをサボートしている場合にのみ利用可能です。
 
  書式:
 
-       ... {linetype | lt} <colorspec>
+       ... {linecolor | lc} <colorspec>
+       ... {textcolor | tc} <colorspec>
 
  <colorspec> は以下の形式のいずれかです:
 
@@ -1815,6 +1838,7 @@ C ... and restart the table:
        palette frac <val>      # <val> は 0 から 1 の値
        palette cb <value>      # <val> は cbrange の範囲の値
        palette z
+       variable                # 入力ファイルから色番号を読み込む
 
  "colorname" は gnuplot が内部に持っている色の名前のうちの一つを指定し
  ます。有効な名前の一覧に関しては、以下参照: `show colornames`。
@@ -1839,16 +1863,20 @@ C ... and restart the table:
  ての 2 次元描画スタイルがこの追加列を認識するわけではありません)。
 4 rgbcolor variable
 ?rgbcolor variable
+?lc rgbcolor variable
+?tc rgbcolor variable
  大抵の場合描画コマンドは、各描画要素に一つの色 (線種) を割り当て、一つ
  のグラフに複数の描画を行う場合、デフォルトの色 (線種) が順番に使われて
- いきます。いくつかの描画スタイルでは、必ずしもこの仕組みを使用せずに、
- 各データ点、各線分、または各ラベルにそれぞれ異なる色を割り当てることも
- 可能です。これは、色の指定として `rgbcolor variable` を使うことで可能
- であり、そしてこれはプログラムに、各点に対する色をデータファイルの別の
- 列から取得するよう指示します。よってこれは、`using` 指定子への列の指定
- の追加を必要とし、その列は 24-bit 形式の RGB の 3 つ組であるとみなされ
- ます。これはデータファイル中で 16 進値として (以下参照: `rgbcolor`) 簡
- 単に指定できます。
+ いきます。これとは別に、入力データファイルの追加情報に基づいて、各デー
+ タ点、各線分、または各ラベルにそれぞれ異なる色を割り当てることも可能で、
+ これは、色指定のキーワード `variable` を使うことで行えます。
+
+ `lc rgbcolor variable` は、データファイルの別の列から 24-bit RGB 色を
+ 取得して使用するようプログラムに指示します。よってこれは、`using` 指定
+ 子へ対応する列の指定の追加を必要とし、その列は 24-bit 形式の RGB の 3
+ つ組であるとみなされます。これは、最も簡単な形式の 16 進値として指定し
+ ます (以下参照: `rgbcolor`)。文字の色も同様に、`tc rgbcolor variable`
+ で指定できます。
 
  例:
 
@@ -1856,6 +1884,37 @@ C ... and restart the table:
        # のついた点を配置
        rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
        splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
+
+4 linecolor variable
+?linecolor variable
+?lc variable
+?textcolor variable
+?tc variable
+ 大抵の場合描画コマンドは、各描画要素に一つの色 (線種) を割り当て、一つ
+ のグラフに複数の描画を行う場合、デフォルトの色 (線種) が順番に使われて
+ いきます。これとは別に、入力データファイルの追加情報に基づいて、各デー
+ タ点、各線分、または各ラベルにそれぞれ異なる色を割り当てることも可能で、
+ これは、色指定のキーワード `variable` を使うことで行えます。
+
+ `lc variable` は、入力データの一つの列から読んだ値をラインスタイルの番
+ 号として使い、そのラインスタイルに属する色を使うようプログラムに指示し
+ ます。よってこれは、`using` 指定子へ対応する列の指定の追加を必要としま
+ す。文字の色も同様に、`tc variable` で指定できます。
+
+ 一つのデータファイルには、複数のデータ集合を入れることが可能で、それら
+ は 2 行の空行で分離されています。これらの個々のデータ集合には、index
+ 値が割り当てられていて (以下参照: `index`)、using 指定の column(-2) で
+ 取得できます。以下参照: `pseudocolumns`。デフォルトでは、ファイル内の
+ すべてのデータが同じ色、線種、点種の属性で描画されますが、コマンド
+ `lc variable` を使えば、疑似列 -2 による index 値を用いて、そのファイ
+ ル内の個々のデータ集合に異なる色を割り当てることが可能です。
+
+ 例:
+       # データの 3 列目を、個々の点に色を割り当てるのに使用
+       plot 'data' using 1:2:3 with points lc variable
+
+       # ラインスタイルの色を選択するのにデータ集合の index を使用
+       plot 'data' using 1:2:(column(-2)) with lines lc variable
 
 2 マウス入力 (mouse input)
 ?mouse input
@@ -2426,7 +2485,7 @@ Ffigure_boxes
  す。詳細は以下参照: `set style fill`。新しい塗りつぶしスタイルを plot
  コマンド上で指定することもできます。
 
- 塗りつぶしスタイルが `empty` の場合は、箱は背景色で塗りつぶされます。
+ 塗りつぶしスタイルが `empty` の場合は、箱は塗りつぶされません。
 
  塗りつぶしスタイルが `solid` の場合は、箱は現在の描画色でベタ塗りされ
  ます。これには追加オプション <density> があり、それは塗りつぶし密度を
@@ -2795,7 +2854,7 @@ Ffigure_histclust
        set boxwidth 0.9 relative
        set style data histograms
        set style histogram cluster
-       set style fill solid 1.0 border -1
+       set style fill solid 1.0 border lt -1
        plot for [COL=2:4:2] 'file.dat' using COL
 
  これは、x 軸上の各整数値を中心とするそれぞれ 2 つの箱 (鉛直な棒) 毎の
@@ -2810,7 +2869,7 @@ Ffigure_histclust
  と誤差線の端の線は、黒で線幅 2 で描画されます。
 
        set bars fullwidth
-       set style fill solid 1 border -1
+       set style fill solid 1 border lt -1
        set style histogram errorbars gap 2 lw 2
        plot for [COL=2:4:2] 'file.dat' using COL:COL+1
 
@@ -2942,10 +3001,8 @@ Ffigure_rgb3D.pdf
 ?failsafe
  出力形式のドライバによっては、2 次元の長方形領域内での画像データのレン
  ダリングを最適化するルーチンを提供している場合があります。しかし、その
- ルーチンは不完全であることが知られています (それで、gnuplot version
- 4.2 の画像サポートは「実験的な (EXPERIMENTAL)」というラベルがついてい
- ます)。この最適化ルーチンは、キーワード `failsafe` を使うことで無効化
- できます。例:
+ ルーチンは不完全であることが知られています。この最適化ルーチンは、キー
+ ワード `failsafe` を使うことで無効化できます。例:
 
        plot 'data' with image failsafe
 2 impulses
@@ -3781,8 +3838,8 @@ Ffigure_mapcontours
 ?branch
  複数当てはめ法 (multi-branch fitting) では、複数のデータ集合を、共通の
  パラメータを持つ複数の 1 変数の関数に、WSSR の総和を最小化することによ
- って同時に当てはめることが出来ます。各データセットに対する関数とパラメ
- ータ (枝) は '疑似変数' を使うことで選択できます。例えば、データ行番号
+ って同時に当てはめることが出来ます。各データ集合に対する関数とパラメー
+ タ (枝) は '疑似変数' を使うことで選択できます。例えば、データ行番号
  (-1; 'データ列' の番号) またはデータファイル番号 (-2) を 2 つ目の独立
  変数とします。
 
@@ -4166,8 +4223,8 @@ Ffigure_mapcontours
  修正子の `binary`, `index`, `every`, `thru`, `using`, `smooth` は、そ
  れぞれに分けて説明します。簡単に言うと、`binary` はデータ列をバイナリ
  ファイルから取得できるようにし (デフォルトは ASCII ファイル)、`index`
- はマルチデータセットファイルからどのデータセットを表示するのかを選び、
- `every` が、一つのデータセットからどの点を表示するのかを選び、`using`
+ はマルチデータ集合ファイルからどのデータ集合を表示するのかを選び、
+ `every` が、一つのデータ集合からどの点を表示するのかを選び、`using`
  は一行からどの列を解釈するのかを決定し (`thru` は、`using` の特別な場
  合である)、そして `smooth` が、単純な補間と近似を行います。(`splot`
  は、よく似た書式を持っていますが、`smooth` オプションと `thru` オプシ
@@ -4210,13 +4267,14 @@ Ffigure_mapcontours
  ら、`gnuplot` はそれを 0 で始まる整数値として用意します。
 
  データファイルにおいて、ブランク行 (空白と改行、復帰以外に文字を含まな
- い行) は重要です ---- ブランク行の対は、`index` (以下参照:
- `plot datafile index`) を区切ります。2 つのブランク行で分離されたデー
- タは、別々のデータファイルのデータであるかのように扱われます。
+ い行) は重要です。
 
- 一つのブランク行は、`plot` に不連続を指示します; ブランク行によって区
+ 1 行のブランク行は、`plot` に不連続を指示します; ブランク行によって区
  切られた点は線で結ばれることはありません (line style で書かれている場
  合には)。
+
+ 2 行のブランク行は、別々のデータ集合間の区切りを示します。以下参照:
+ `index`。
 
  もし autoscale の状態であれば (以下参照: `set autoscale`)、軸は全ての
  データポイントを含むように自動的に引き伸ばされて、目盛りが書かれる状態
@@ -4240,6 +4298,9 @@ Ffigure_mapcontours
  ョンを使うことができます。これは、軸の範囲を自動的に拡張して、次の目盛
  りの刻みに合うようにする機能を無効にします。
 
+ ラベルの座標と文字列もデータファイルから読み込むことができます (以下参
+ 照: `labels`)。
+
 
  バイナリデータファイル:
 
@@ -4251,7 +4312,7 @@ Ffigure_mapcontours
 
  matrix バイナリ形式は、32 ビット IEEE 規格の浮動小数値 (float) が 2 次
  元配列の形で並び、それらの座標値を表す行と列が追加されています。ASCII
- matrix 同様、using リストにおいては、座標用の列の並び (1 列目) が
+ matrix 同様、`using` リストにおいては、座標用の列の並び (1 列目) が
  using の 1 番目の要素 (x 座標) に対応し、座標用の行の並び (1 行目) が
  using の 2 番目の要素 (y 座標) に対応し、配列の各値が using の 3 番目
  の要素 (z 座標) に対応します。
@@ -4263,9 +4324,9 @@ Ffigure_mapcontours
  マンドがありますし、配置、データの変換を行なうコマンドの組があります。
  それは、一様に標本化されたデータの場合、その座標がファイルには含まれな
  いことが良くあるからです。matrix バイナリや ASCII データと違っていると
- ころですが、general バイナリは 1,2,3 といった using リストで生成される
- 列番号を使わず、むしろ 1 列目はファイルの 1 列目、あるいは `format` リ
- ストで指定されたもの、になります。
+ ころですが、general バイナリは 1,2,3 といった `using` リストで生成され
+ る列番号を使わず、むしろ 1 列目はファイルの 1 列目、あるいは `format`
+ リストで指定されたもの、になります。
 
  さまざまな binary オプションに対する大域的なデフォルトの設定も可能で、
  それは `(s)plot <filename> binary ...` コマンドに与えるオプションと全
@@ -4362,20 +4423,20 @@ Ffigure_mapcontours
  な文字は、一般にはバイナリデータでは使うべきではないことに注意してくだ
  さい。これを制御する <binary list> のキーワードがあります。
 5 array
+?binary array
 ?binary general array
  バイナリファイルの標本の配列の大きさを設定します。座標は gnuplot が生
- 成してくれます。各方向の次元を表す数、すなわち配列のサイズを少なくとも
- 一つは指定しなければいけません。例えば `array=10x20` は、2 次元で最初
- の次元方向 (x) には 10 点、2 番目の次元方向 (y) には 20 点の標本化デー
- タがあることを意味します。特別な "数字" として `Inf` を、ファイルの終
- 了までデータが続くことを示すのに使えます。複数のデータのサイズ指定を分
- 離するのに、コロンを使うことができます。例えば `array=25:35` は 2 つの
- 1 次元データがファイルの中にあることを意味します。そのコロンの意味は他
- の <binary list> 内のキーワードにも影響を与え、それぞれが個々のデータ
- に対応するように意味を持つようになります。
-
- 今のところ、3 次元までの配列が書式として許されていますが、3 次元配列を
- 扱うための規則はまだ何も用意されていません。
+ 成してくれます。各方向の次元を表す数を指定しなければいけません。例えば
+ `array=(10,20)` は、2 次元で最初の次元方向 (x) には 10 点、2 番目の次
+ 元方向 (y) には 20 点の標本化データがあることを意味します。ファイルの
+ 終了までデータが続くことを示すのに負の値を使えます。データ次元が 1 の
+ 場合は、カッコは省略できます。複数のデータのサイズ指定を分離するのに、
+ コロンを使うことができます。例えば `array=25:35` は 2 つの 1 次元デー
+ タがファイルの中にあることを意味します。
+       注意:  gnuplot version 4.2 では array=(128,128) という書式ではな
+              く、array=128x128 という書式を使用していました。古い書式
+              は推奨されていませんが、あなたの gnuplot が後方互換性をサ
+              ポートするようコンパイルされていれば一応今でも使えます。
 5 record
 ?binary record
 ?binary general record
@@ -4399,7 +4460,7 @@ Ffigure_mapcontours
 ?binary general format
  デフォルトのバイナリ形式は、単精度浮動小数 (float) が一つ、です。それ
  をより柔軟に設定するために、この format で変数のサイズに関する詳細な情
- 報を指定できます。例えば `format="uchar%int%float"` は、最初の using
+ 報を指定できます。例えば `format="%uchar%int%float"` は、最初の using
  列として符号なし文字型変数 (unsigned char) を、2 番目の列は符号つき整
  数 (int) を、3 番目の列は単精度浮動小数 (float) を指定しています。もし
  サイズ指定子の数が最大列数より小さい場合は、残りの列の変数サイズは暗黙
@@ -4586,7 +4647,7 @@ Ffigure_mapcontours
        # する (左上が原点になるように)。ピクセルの間隔も指定し、ファイ
        # ルには 2 つの画像が含まれていて、そのうち一つは origin で平行
        # 移動する。
-       plot '<file_name>' binary array=512x1024:1024x512 format='%uchar' \
+       plot '<file_name>' binary array=(512,1024):(1024,512) format='%uchar' \
             dx=2:1 dy=1:2 origin=(0,0):(1024,1024) flipy u 1:2:3 w rgbimage
 
        # 4 つの別のデータからなり、座標情報もデータファイルに含まれてい
@@ -4606,8 +4667,8 @@ Ffigure_mapcontours
 ?data-file every
 ?datafile every
 ?every
- キーワード `every` は、描画するデータをデータセットから周期的にサンプ
- リングすることを可能にします。
+ キーワード `every` は、描画するデータをデータ集合から周期的にサンプリ
+ ングすることを可能にします。
 
  ここでは 「ポイント」はファイル中の 1 つの行によって定義されるデータと
  し、ここでの「ブロック」は「データ・ブロック」(以下参照: `glossary`)
@@ -4686,36 +4747,46 @@ Ffigure_mapcontours
 ?data-file index
 ?datafile index
 ?index
- キーワード `index` はマルチデータセットファイルの中の、いくつかのデー
- タセットのみを選び出すのに使われます。
+ キーワード `index` は、描画用に複数のデータ集合を持つファイルから、特
+ 定のデータ集合を選択することを可能にします。
 
  書式:
        plot 'file' index { <m>{:<n>{:<p>}} | "<name>" }
 
- データセットは 2 行の空白で分離されています。`index <m>` は <m> 番目の
- セットだけを選択します; `index <m>:<n>` は <m> から <n> までのデータセ
- ットの選択; `index <m>:<n>:<p>` は、<m>, <m>+<p>, <m>+2<p>, など、<p>
- おきのセットを選択し、セット <n> で終了します。C 言語の添字 (index) の
- 付け方に従い、index 0 はそのファイルの最初のデータセットを意味します。
- 大きすぎる index の指定にはエラーメッセージが返されます。`index` が指
- 定されない場合は、全てのデータセットが単一のデータセットとして描かれま
- す。
+ データ集合は 2 行の空白で分離されています。`index <m>` は <m> 番目の集
+ 合だけを選択します; `index <m>:<n>` は <m> から <n> までのデータ集合の
+ 選択; `index <m>:<n>:<p>` は、<m>, <m>+<p>, <m>+2<p>, など、<p> おきの
+ 集合を選択し、集合 <n> で終了します。C 言語の添字 (index) の付け方に従
+ い、index 0 はそのファイルの最初のデータ集合を意味します。大きすぎる
+ index の指定にはエラーメッセージが返されます。`index` が指定されない場
+ 合は、全てのデータ集合が単一のデータ集合として描かれます。
 
  例:
        plot 'file' index 4:5
 
- `index '<name>'` は、データセットを名前 '<name>' で選択します。名前は
- コメント行に書いてデータセットに割り当てます。コメント文字とそれに続く
- 空白をそのコメント行から取り除いて、その結果が <name> から始まっていれ
- ば、それに続くデータセットに <name> という名前がつけられて、それを指定
- できます。
+ ファイルの各点に対して、それが含まれるデータ集合の index 値は、疑似列
+ `column(-2)` で利用できます。これは、以下に見るように、そのファイル内
+ の個々のデータ集合を区別する別の方法を提供します。これは、描画用に 1
+ つのデータ集合の選択しかしない場合は `index` コマンドよりも不恰好です
+ が、個々のデータ集合に異なる属性を割り当てたい場合にはとても便利です。
+ 以下参照: `pseudocolumns`, `lc variable`。
+
+ 例:
+       plot 'file' using 1:(column(-2)==4 ? $2 : NaN)        # とても不恰好
+       plot 'file' using 1:2:(column(-2)) linecolor variable # とても便利 !
+
+ `index '<name>'` は、データ集合を名前 '<name>' で選択します。名前はコ
+ メント行に書いてデータ集合に割り当てます。コメント文字とそれに続く空白
+ をそのコメント行から取り除いて、その結果が <name> から始まっていれば、
+ それに続くデータ集合に <name> という名前がつけられて、それを指定できま
+ す。
 
  例:
        plot 'file' index 'Population'
 
- <name> で始まるすべてのコメントがそれに続くデータセットの名前になるこ
- とに注意してください。問題を避けるために、例えば '== Popolation ==' や
- '[Population]' などの命名法を採用するといいでしょう。
+ <name> で始まるすべてのコメントがそれに続くデータ集合の名前になること
+ に注意してください。問題を避けるために、例えば '== Popolation ==' や
+ '[Population]' などの命名法を選択すると便利でしょう。
 
 ^ 以下の Web ページも参照:
 ^ <a href="http://www.gnuplot.info/demo/multimsh.html">
@@ -4983,8 +5054,8 @@ Ffigure_mapcontours
        plot 'ある/とても/長い/ファイル名' using 1:2, '' using 1:3, '' using 1:4
 
  のようなときに便利です。(もし同じ plot コマンド上で、`'-'` と `''` の
- 両方を使用すると、上の例にあるように、インラインデータの 2 つのセット
- を与える必要があります。)
+ 両方を使用すると、上の例にあるように、インラインデータの 2 つの集合を
+ 与える必要があります。)
 
  popen 関数を持っているシステム上では、データファイルは、'<' で始まるフ
  ァイル名によって、シェルコマンドからパイプ入力することができます。例え
@@ -5040,36 +5111,34 @@ Ffigure_mapcontours
 
  もし、フォーマット (format) が指定されれば、C のライブラリ関数 'scanf'
  を使ってデータファイルの各行をそのフォーマット文字列に従って読み込みま
- す。そうでなければ、行はスペースまたはタブの所で列に分割されて読み込ま
- れます。時系列フォーマットデータ (time-format data) の書式はこの方法で
- は指定できません (代わりに `set xdata time` を使ってください)。
+ す。そうでなければ、行は列に分割されて読み込まれますが、デフォルトでは
+ ホワイトスペース (スペースやタブ) で列の分離が行われていると見なします。
+ 以下参照: `datafile separator`。
 
- データは entry の指定に従った列に並び直されます。各 <entry> には、デー
- タを選び出すための単なる列の番号、カッコで囲まれた数式を指定するか、あ
- るいは何も指定しません。数式中では、最初の列の値を読み込むために $1、2
- 番目の列の項目を使うために $2、といった書き方を使用できます。また、
- `column(x)` や `valid(x)` といったものも使うことができます。ここで、x
- は結果として整数になる任意の数式です。`column(x)` は x 番目のデータを
- 返します。`valid(x)` は x 番目のデータが有効な値かをテストします。列番
- 号の 0 は、各点毎に 0 から始まる番号を表し、それは 2 行の空行が来たと
- ころでリセットされます。列番号の -1 は 0 から始まるデータ行の番号を意
- 味します。これは 1 行の空行毎に 1 ずつ増加し、2 行の空行が来たところで
- リセットされます。列番号の -2 は index を意味します。これは 2 行の空行
- が来たところで 1 ずつ増加します。<entry> に何も書かなければその entry
- のリストの順にデフォルトの値が使われます。例えば `using ::4` は
- `using 1:2:4` と解釈されます。
+  各 <entry> は、適切な入力の一つのフィールドから値を選択するための単な
+ る列の番号か、またはカッコで囲まれた数式の指定、または何も指定しないか
+ のいずれかです。
 
- 注: `call` コマンドも $ を特別な文字として使います。`call` の引数リスト
- の中に列番号を含ませる方法の詳細については、以下参照: `call`。
+ そのエントリがカッコで囲まれた数式の場合、N 列目の値を指定するのに関数
+ column(N) を使用できます。つまり、column(1) は読み込まれた最初の項目を
+ 参照し、column(2) は次の項目、といった具合です。column(1), column(2),
+ ... の略記として、特別な記号 $1, $2, ... を使用できます。関数
+ `valid(N)` で、N 番目の列が有効な数字であるかどうかテストできます。
 
- `using` にただ一つの entry を指定した場合はその <entry> は y の値とし
- て使われ、データ点の番号が x として使われます。例えば
+ 入力データファイルの 1...N という実際の列に加えて、gnuplot は管理情報
+ を持ついくつかの "疑似列" を提供します。例えば、$0 または column(0) は、
+ データ集合内のそのデータ行の行番号を返します。以下参照:
+ `pseudocolumns`。
+
+ <entry> に何も書かなければ、その entry のリストの順にデフォルトの値が
+ 使われます。例えば `using ::4` は、`using 1:2:4` と解釈されます。
+
+ `using` にただ一つの entry を指定した場合は、その <entry> は y の値と
+ して使われ、データ点の番号 (疑似列 $0) が x として使われます。例えば
  "`plot 'file' using 1`" は "`plot 'file' using 0:1`" と同じ意味です。
  `using` に 2 つの entry を与えた場合、それらは x, y として使われます。
- さらに entry を追加すると、それらは x および/または y の誤差に使われま
- す。誤差情報を使った plot スタイルの詳細については、以下参照:
- `set style`。そして、回帰曲線法での誤差情報の使用については、以下参照:
- `fit`。
+ さらにエントリを追加して、入力からのデータを利用するような描画スタイル
+ の詳細については、以下参照: `set style`, `fit`。
 
  'scanf' 関数では色々なデータ形式の数値入力が使えますが、`gnuplot` は全
  ての入力データを倍精度浮動小数とみなしますから、`gnuplot` では `%lf`
@@ -5082,9 +5151,12 @@ Ffigure_mapcontours
 
  "\t", "\n", "\f" を使うときはシングルクォートよりむしろダブルクォートを
  使うべきであることに注意してください。
-
- 例:
-
+5 using の例 (using_examples)
+?examples
+?commands plot datafile using examples
+?plot datafile using examples
+?datafile using examples
+?using examples
  次の例は、1 番目のデータに対する 2 番目と 3 番目の和の値を plot します。
  書式文字列は、各列データがスペース区切りでなく、カンマ区切りであること
  を指示していますが、同じことが `set datafile separator ","` を指定する
@@ -5146,6 +5218,23 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/using.html">
  弱々しい using のデモ
 ^ </a>
+5 疑似列 (pseudocolumns)
+?pseudocolumns
+?commands plot datafile using pseudocolumns
+?plot datafile using pseudocolumns
+?datafile using pseudocolumns
+?using pseudocolumns
+ plot 文の `using` 項目内の式では、入力ファイルに含まれる実際のデータ値
+ に加えて管理情報も参照でき、これらは "疑似列" (pseudocolumns) に含まれ
+ ています。
+       column(0)   データ集合内での各点の順番。順番は 0 から始まり、2
+                   行のブランク行でリセットされます。略記 $0 も使用可。
+       column(-1)  この番号は 0 から始まり、1 行のブランク行でリセット
+                   されます。これは、行列、または格子状データ内のデータ
+                   行に対応します。
+       column(-2)  複数のデータ集合を持つファイル内の、現在のデータ集合
+                   の index 番号。以下参照: `index`。
+
 5 using title
 ?using title
 ?plot using title
@@ -5460,6 +5549,10 @@ Ffigure_mapcontours
  クォートで囲まれた文字列でしか効きません。逆にその作用を働かさないよう
  にするにはシングルクォートを使ってください。改行文字 "\n" はどちらの型の
  クォートでもキーでは働きません。
+
+ 入力データの列の最初の項目 (すなわち列の見出し) を文字列フィールドと解
+ 釈し、それをキータイトルとして利用するオプションもあります。以下参照:
+ `datastrings`。
 
  曲線タイトルとサンプルは予約語 `notitle` を使うことでキーから削除でき
  ます。何もないタイトル (`title ''`) は `notitle` と同じ意味を持ちます。
@@ -6790,6 +6883,7 @@ Ffigure_mapcontours
 4 set datafile separator
 ?set datafile separator
 ?show datafile separator
+?datafile separator
 ?separator
  コマンド `set datafile separator "<char>"` は、`gnuplot` に、この後の
  入力ファイルのデータ列の分離文字が、空白 (whitespace) でなくて <char>
@@ -6846,7 +6940,7 @@ Ffigure_mapcontours
 
  例:
        set datafile binary filetype=auto
-       set datafile binary array=512x512 format="%uchar"
+       set datafile binary array=(512,512) format="%uchar"
 
 ?show datafile binary
        show datafile binary   # 現在の設定の一覧表示
@@ -7988,6 +8082,9 @@ Ffigure_mapcontours
  EEPIC, Imagen, LaTeX, TPIC で出力する場合は、\\ を使うことで見出しを
  改行させることができます。
 
+ ラベルの座標と文字列もデータファイルから読み込むことができます (以下参
+ 照: `labels`)。
+
  例:
 
  (1,2) の位置に "y=x" と書く場合:
@@ -8194,7 +8291,9 @@ Ffigure_mapcontours
 
  キーワード `at screen` は、その余白の指定が全体の描画領域に対する割合
  であることを意味します。これは、多重描画 (multiplot) モードでの 2D, 3D
- グラフの角を正確に揃えるのに使えます。
+ グラフの角を正確に揃えるのに使えます。この配置は現在の `set origin` や
+ や `set size` の値を無視するようになっていて、それは多重描画内のグラフ
+ の配置の別の方法として使われることを意図しています。
 
  描画の余白は通常目盛り、目盛りの見出し、軸の見出し、描画のタイトル、
  日付、そして境界の外にある場合の key (グラフ見出し) のサイズ等を元に計
@@ -8589,7 +8688,7 @@ Ffigure_mapcontours
      set object 2 rect from 0,0 to 2,3 fc lt 1
 
      # 青い境界の空 (塗り潰さない) 長方形を置く
-     set object 3 rect from 0,0 to 2,3 fs empty border 3
+     set object 3 rect from 0,0 to 2,3 fs empty border rgb "blue"
 
      # 頂点は移動しないまま、塗り潰しと色をデフォルトに変更
      set object 2 rect default
@@ -8663,7 +8762,7 @@ Ffigure_mapcontours
 
  例:
      set object 1 polygon from 0,0 to 1,1 to 2,0
-     set object 1 fc rgb "cyan" fillstyle solid 1.0 border -1
+     set object 1 fc rgb "cyan" fillstyle solid 1.0 border lt -1
 
 3 offsets
 ?commands set offsets
@@ -9604,8 +9703,8 @@ Ffigure_mapcontours
 
  `ratio` と `square` は 3 次元描画では意味を持ちませんが、`set view map`
  を使用した 3 次元描画の 2 次元射影には影響を与えます。 以下も参照:
- `set view equal_axes`。これは、3 次元の x 軸と y 軸を強制的に同じスケ
- ールにします。
+ `set view equal`。これは、3 次元の x 軸と y 軸を強制的に同じスケールに
+ します。
 
  例:
 
@@ -9760,7 +9859,7 @@ Ffigure_mapcontours
        set style fill {empty
                        | {transparent} solid {<density>}
                        | {transparent} pattern {<n>}}
-                      {border {<linetype>} | noborder}
+                      {border {<colorspec>} | noborder}
 
  デフォルトの塗りつぶしスタイル (fillstyle) は `empty` です。
 
@@ -9779,12 +9878,10 @@ Ffigure_mapcontours
  パターンを、パターン <n> から始めて周期的に利用します。
 
  オプション `empty` は、箱を塗りつぶしませんが、これがデフォルトです。
- これは、オプション `solid` でパラメータ <density> を 0 に設定した場合
- と同じです。
 
  デフォルトの `border` は、現在の線の種類の実線で箱の境界を描きます。
- `border <lt>` はその境界が線の種類 (linetype) <lt> で描かれるようにし
- ます。`noborder` は境界の線が描かれないようにします。
+ `border <colorspec>` で境界の色を変更することができます。`noborder` は
+ 境界の線が描かれないようにします。
 5 set style fill transparent
 ?commands set style fill transparent
 ?set style fill transparent
@@ -10000,7 +10097,7 @@ Ffigure_mapcontours
  以下参照: `colorspec`, `fillstyle`。`fillcolor` は `fc` と省略できます。
 
  例:
-     set style rectangle back fc rgb "white" fs solid 1.0 border -1
+     set style rectangle back fc rgb "white" fs solid 1.0 border lt -1
      set style rectangle fc linsestyle 3 fs pattern 2 noborder
 
  デフォルトの設定は、背景色での塗り潰しで、境界は黒になっています。
@@ -10430,7 +10527,7 @@ Ffigure_mapcontours
  書式:
        set view <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}}
        set view map
-       set view {no}equal_axes
+       set view {no}equal {xy|xyz}
        show view
 
  ここで <rot_x> と <rot_z> は、画面に投影される仮想的な 3 次元座標系の
@@ -10456,12 +10553,15 @@ Ffigure_mapcontours
 
  最初の例は 4 つの全てをデフォルトの値にしています。2 つめの例は縮小率
  のみを 0.5 に変更しています。
-4 equal_axes
-?set view equal_axes
-?view equal_axes
- コマンド `set view equal_axes` は x 軸と y 軸の単位の長さを強制的に等
- しくします。それを使わない場合は、それぞれの軸はデフォルトでは有効な領
- 域を埋めるように縮尺されます。
+4 equal
+?set view equal
+?view equal
+ コマンド `set view equal xy` は x 軸と y 軸の単位の長さが強制的に等し
+ くなるように縮尺を合わせ、グラフがページに丁度合うようにその縮尺を選択
+ します。コマンド `set view equal xyz` は、さらに z 軸も x と y 軸に合
+ うようにしますが、現在の z 軸の範囲が、描画境界の範囲に合う保証はあり
+ ません。デフォルトでは、3 つの軸は独立に有効な領域を埋めるように縮尺さ
+ れます。
 
  以下も参照: `set ticslevel`。
 3 vrange
@@ -11002,15 +11102,17 @@ Ffigure_mapcontours
  して使うことができます。
 
  書式:
-       set ticslevel <frac>
-       set xyplane <frac>
        set xyplane at <zvalue>
+       set xyplane relative <frac>
+       set ticslevel <frac>    # set xyplane relative と同等
        show xyplane
 
- `set ticslevel <frac>` は、xy 平面を Z 軸の範囲のどこに置くかを決定し
- ます。<frac> には、xy 平面と z の一番下の位置との差の、z 軸の範囲全体
- に対する割合を与えます。デフォルトの値は 0.5 です。負の値も許されてい
- ますが、そうすると 3 つの軸の目盛りの見出しが重なる可能性があります。
+ `set xyplane relative <frac>` は、xy 平面を Z 軸の範囲のどこに置くかを
+ 決定します。<frac> には、xy 平面と z の一番下の位置との差の、z 軸の範
+ 囲全体に対する割合を与えます。デフォルトの値は 0.5 です。負の値も許さ
+ れていますが、そうすると 3 つの軸の目盛りの見出しが重なる可能性があり
+ ます。非推奨ですが、古い形式 `set ticslevel` も後方互換性のために残さ
+ れています。
 
  xy 平面を z 軸の 'pos' の位置に置くには、`ticslevel` の値を
  (pos - zmin) / (zmin - zmax) としてください。しかし、この位置は z の範
@@ -11863,15 +11965,6 @@ Ffigure_mapcontours
  `nohidden3d` は、全体的な設定である `set hidden3d` を、個々の描画に対
  して免除するためのオプションですが、これは媒介変数の曲線 (parametric)
  に対しては機能しません。
-
-2 特定の出力形式 (terminals)
-?bugs terminals
- HP プロッタの古いモデルの中にはページの排出コマンド 'PG' を持たないも
- のがあります。現在の HPGL ドライバはこのコマンドを HPGL_reset で使用し
- ていますが、そのようなプロッタには、このコマンドを取り除く必要があるで
- しょう。現在の PCL5 ドライバは、グラフィックと同様にテキストにも
- HPGL/2 を使用しています。これはスケーラブル PCL フォントを使うように修
- 正されるべきでしょう。
 
 2 外部ライブラリ (External libraries)
 ?bugs external_libraries
