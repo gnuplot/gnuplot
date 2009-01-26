@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.237 2008/10/10 22:23:20 mikulik Exp $
+ * $Id: post.trm,v 1.238 2009/01/21 19:59:34 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2731,6 +2731,7 @@ PS_make_header(t_sm_palette *palette)
 
     switch(sm_palette.colorMode) {
     case SMPAL_COLOR_MODE_GRAY:
+	fputs("/InterpolatedColor false def\n", gppsfile);
 	break;  /* nothing to do for gray */
     case SMPAL_COLOR_MODE_RGB:
 	make_palette_formulae();
@@ -2769,8 +2770,23 @@ PS_make_header(t_sm_palette *palette)
 #define G sm_palette.formulaG
 #define B sm_palette.formulaB
 
+/* 18.1.2009 Since the beginning of pm3d, the Color definition switched
+   between gray and colour map. This led to ambiguities for custom colour
+   palettes if they contain grays only. Thus let postscript choose always
+   always colour palette for interpolated colours ('set palette defined',
+   'set palette file') and colour/gray according to Color otherwise
+   ('set palette gray', 'set palette rgb').
+*/
+#if 0
     fprintf(gppsfile, "Color %s and { %% COLOUR vs. GRAY map\n",
 	    (sm_palette.colorMode!=SMPAL_COLOR_MODE_GRAY) ? "true":"false");
+#else
+    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)
+	fputs("false { % COLOUR vs. GRAY map\n", gppsfile);
+    else
+	fputs("Color InterpolatedColor or { % COLOUR vs. GRAY map\n", gppsfile);
+#endif
+
     fputs("  InterpolatedColor { %% Interpolation vs. RGB-Formula\n",
 	  gppsfile);
     fputs("    /g {stroke pm3dround /grayv exch def interpolate\n", gppsfile);
@@ -3249,7 +3265,14 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
     /* Color and gray scale images do not need a palette and can use
      * the 5 operand form of the image routine.
      */
+#if 0
+    /* 18.1.2009 It was decided to use the custom palette (i.e. colours) also
+       for the monochrome postscript output.
+    */
     if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) || !ps_params->color)
+#else
+    if ((sm_palette.colorMode == SMPAL_COLOR_MODE_RGB && !ps_params->color) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY))
+#endif
 	five_operand_image = TRUE;
     else
 	five_operand_image = FALSE;
@@ -3294,7 +3317,7 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
 	    fprintf(gppsfile, "  %d %d L\n", corner[0].x, corner[0].y);
 	    fputs("  40 -110 R\n"
 		  "  (PS level 2 image) Lshow\n"
-		  "  %% Read data but ignore it\n", gppsfile);
+		  "  % Read data but ignore it\n", gppsfile);
 	    fprintf(gppsfile, "  /imagebuf %d string def\n", num_encoded_bytes);
 	    fputs("  currentfile imagebuf readstring\n"
 		  "} {\n", gppsfile);

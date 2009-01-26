@@ -1,3 +1,15 @@
+2009-01-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm (PS_make_header PS_image): Since the beginning of pm3d,
+	the "/Color def" switched between gray and colour map. Choosing "false"
+	for "Color", the gray map was always selected regardless the use of a
+	custom palette. This led to ambiguities for custom colour palettes if
+	they contain grays only. Thus let postscript choose always colour
+	palette for interpolated colours ('set palette defined', 'set palette
+	file') and colour/gray according to "Color" otherwise ('set palette
+	gray', 'set palette rgb').
+	SF Patch #2516634: custom colormap using postscript term
+
 2009-01-25  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:
@@ -227,7 +239,7 @@
 	Bug #2424595
 
 2008-12-11  Bastian Maerkisch  <bmaerkisch@web.de>
-            Axel Thimm <thimm@users.sourceforge.net>
+	    Axel Thimm <thimm@users.sourceforge.net>
 
 	* configure.in NEWS src/command.c src/gp_hist.h src/graphics.c
 	src/history.c src/plot.c src/readline.c src/readline.h src/show.c
