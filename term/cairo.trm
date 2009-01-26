@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.25 2008/09/10 18:12:34 sfeam Exp $
+ * $Id: cairo.trm,v 1.26 2009/01/14 23:16:49 tlecomte Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -819,6 +819,7 @@ void cairotrm_filled_polygon(int n, gpiPoint *corners)
 	}
 
 	gp_cairo_draw_polygon(&plot, n, mirrored_corners);
+	free(mirrored_corners);
 }
 
 #ifdef WITH_IMAGE

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.42 2009/01/13 14:08:48 tlecomte Exp $
+ * $Id: gp_cairo.c,v 1.43 2009/01/14 23:16:49 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1006,7 +1006,6 @@ void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int heigh
 void gp_cairo_draw_image(plot_struct *plot, unsigned int * image, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int M, int N)
 {
 	int m,n;
-	unsigned int *image255;
 	double scale_x, scale_y;
 	cairo_surface_t *image_surface;
 	cairo_pattern_t *pattern;
@@ -1054,7 +1053,6 @@ void gp_cairo_draw_image(plot_struct *plot, unsigned int * image, int x1, int y1
 
 	cairo_pattern_destroy( pattern );
 	cairo_surface_destroy( image_surface );
-	free( image255 );
 }
 #endif /*WITH_IMAGE*/
 

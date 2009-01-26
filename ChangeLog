@@ -1,3 +1,11 @@
+2009-01-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_draw_fillbox):
+	Fix segfault due to freeing an uninitialized buffer pointer.
+
+	* term/cairo.trm (cairotrm_filled_polygon):
+	Plug memory leak: image buffers were never freed.
+
 2009-01-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/post.trm (PS_make_header PS_image): Since the beginning of pm3d,
