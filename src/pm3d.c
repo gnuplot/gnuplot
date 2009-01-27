@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.66.2.2 2008/01/11 04:48:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.66.2.3 2008/09/29 05:29:26 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -475,7 +475,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		allocated_quadrangles += GPMAX(scanA->p_count, scanB->p_count) - 1;
 	    }
 	}
-
+	allocated_quadrangles *= (pm3d.interp_i > 1) ? pm3d.interp_i : 1;
+	allocated_quadrangles *= (pm3d.interp_j > 1) ? pm3d.interp_j : 1;
 	quadrangles = (quadrangle*)gp_realloc(quadrangles, allocated_quadrangles * sizeof (quadrangle), "pm3d_plot->quadrangles");
 	/* DEBUG: fprintf(stderr, "allocated_quadrangles = %d\n", allocated_quadrangles); */
     }
@@ -714,13 +715,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	    } else
     		filled_quadrangle(corners, icorners);
 #else
-	    if (pm3d.direction == PM3D_DEPTH) {
-		/* copy quadrangle */
-		quadrangle* qp = quadrangles + current_quadrangle;
-		memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
-		qp->gray = gray;
-		current_quadrangle++;
-	    } else
 	    if (pm3d.interp_i > 1 || pm3d.interp_j > 1) {
 		/* Interpolation is enabled.
 		 * interp_i is the # of points along scan lines
@@ -822,12 +816,28 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			}
 			/* transform z value to gray, i.e. to interval [0,1] */
 			gray = cb2gray(avgC);
-			set_color(gray);
-			filled_quadrangle(corners);
+			if (pm3d.direction != PM3D_DEPTH) {
+			    set_color(gray);
+			    filled_quadrangle(corners);
+			} else {
+			    /* copy quadrangle */
+			    quadrangle* qp = quadrangles + current_quadrangle;
+			    memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
+			    qp->gray = gray;
+			    current_quadrangle++;
+			}
 		    }
 		}
-	    } else {
-		filled_quadrangle(corners);
+	    } else { /* thus (pm3d.interp_i == 1 && pm3d.interp_j == 1) */
+		if (pm3d.direction != PM3D_DEPTH) {
+		    filled_quadrangle(corners);
+		} else {
+		    /* copy quadrangle */
+		    quadrangle* qp = quadrangles + current_quadrangle;
+		    memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
+		    qp->gray = gray;
+		    current_quadrangle++;
+		}
 	    } /* interpolate between points */
 #endif
 	} /* loop quadrangles over points of two subsequent scans */
