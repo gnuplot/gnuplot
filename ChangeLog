@@ -1,3 +1,8 @@
+2009-01-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c (pm3d_plot): Fix for "set pm3d depthorder" ignoring
+	"set pm3d interpolate".
+
 2009-01-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_fillbox):
