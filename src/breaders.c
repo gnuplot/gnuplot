@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: breaders.c,v 1.2 2004/09/03 15:56:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: breaders.c,v 1.3 2006/06/30 07:33:05 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - breaders.c */
@@ -155,15 +155,17 @@ edf_filetype_function(void)
     /* read header: it is a multiple of 512 B ending by "}\n" */
     while (header_size == 0 || strncmp(&header[header_size-2],"}\n",2)) {
 	int header_size_prev = header_size;
-	if (header_size > 12*512) /* protection against indefinite loop */
-	    os_error(NO_CARET, "Damaged EDF header of %s: not multiple of 512 B.\n", df_filename);
 	header_size += 512;
 	if (!header)
 	    header = gp_alloc(header_size+1, "EDF header");
 	else
 	    header = gp_realloc(header, header_size+1, "EDF header");
 	header[header_size_prev] = 0; /* protection against empty file */
-	fread(header+header_size_prev, 512, 1, fp);
+	k = fread(header+header_size_prev, 512, 1, fp);
+	if (k == 0) { /* protection against indefinite loop */
+	    free(header);
+	    os_error(NO_CARET, "Damaged EDF header of %s: not multiple of 512 B.\n", df_filename);
+	}
 	header[header_size] = 0; /* end of string: protection against strstr later on */
     }
     fclose(fp);
