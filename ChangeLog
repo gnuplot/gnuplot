@@ -1,3 +1,10 @@
+2009-01-28  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* term/emf.trm (GP_TA_NOUPDATECP, GP_TA_UPDATECP, GP_TA_LEFT)
+	(GP_TA_RIGHT, GP_TA_CENTER, GP_TA_TOP, GP_TA_BOTTOM)
+	(GP_TA_BASELINE): Added a GP_ prefix to avoid collision between
+	these and the actual Windows API macros of the same names.
+
 2009-01-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/breaders.c (edf_filetype_function): Fix for long headers.
