@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.552 2008/12/26 22:16:03 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.553 2009/01/04 05:47:14 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1642,6 +1642,12 @@ C ... and restart the table:
 
  Valid names are the same as in most programming languages: they must begin
  with a letter, but subsequent characters may be letters, digits, "$", or "_".
+
+ Each function definition is made available as a special string-valued
+ variable with the prefix 'GPFUN_'.
+ 
+ Example:
+       set label GPFUN_sinc at graph .05,.95
 
  See `show functions`, `functions`, `gnuplot-defined variables`, `macros`.
 2 Glossary
@@ -7982,6 +7988,13 @@ Ffigure_mapcontours
        set label sprintf("a = %3.5g",par_a) at 30,15
        bfit = gprintf("b = %s*10^%S",par_b)
        set label bfit at 30,20
+
+ Display a function definition along with its fitted parameters like this:
+       f(x)=a+b*x
+       fit f(x) 'datafile' via a,b
+       set label GPFUN_f at graph .05,.95
+       set label sprintf("a = %g", a) at graph .05,.90 
+       set label sprintf("b = %g", b) at graph .05,.85
 
  To set a label displaced a little bit from a small point:
        set label 'origin' at 0,0 point lt 1 pt 2 ps 3 offset 1,-1

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.177 2008/11/07 11:55:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.178 2008/12/12 21:06:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -530,6 +530,15 @@ define()
 	memcpy(c_dummy_var, save_dummy, sizeof(save_dummy));
 	m_capture(&(udf->definition), start_token, c_token - 1);
 	dummy_func = NULL;	/* dont let anyone else use our workspace */
+
+	/* Save function definition in a user-accessible variable */
+	if (1) {
+	    char *tmpnam = gp_alloc(6+strlen(udf->udf_name), "varname");
+	    strcpy(tmpnam, "GPFUN_");
+	    strcat(tmpnam, udf->udf_name);
+	    fill_gpval_string(tmpnam, udf->definition);
+	    free(tmpnam);
+	}
     } else {
 	/* variable ! */
 	char *varname = gp_input_line + token[c_token].start_index;

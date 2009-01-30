@@ -1,3 +1,8 @@
+2009-01-30  James R. Van Zandt  <jrvz@comcast.net>
+
+	* src/command.c (define): save a function definition in a
+	user-accessible variable
+
 2009-01-28  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* term/emf.trm (GP_TA_NOUPDATECP, GP_TA_UPDATECP, GP_TA_LEFT)
