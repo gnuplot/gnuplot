@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.553 2009/01/04 05:47:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.555 2009/01/31 14:34:29 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1592,13 +1592,13 @@ C ... and restart the table:
 ?user-defined variables
 ?user-defined
 ?variables
- New user-defined variables and functions of one through five variables may
+ New user-defined variables and functions of one through twelve variables may
  be declared and used anywhere, including on the `plot` command itself.
 
  User-defined function syntax:
-       <func-name>( <dummy1> {,<dummy2>} ... {,<dummy5>} ) = <expression>
+       <func-name>( <dummy1> {,<dummy2>} ... {,<dummy12>} ) = <expression>
 
- where <expression> is defined in terms of <dummy1> through <dummy5>.
+ where <expression> is defined in terms of <dummy1> through <dummy12>.
 
  User-defined variable syntax:
        <variable-name> = <constant-expression>

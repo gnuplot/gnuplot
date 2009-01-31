@@ -1,5 +1,8 @@
 2009-01-31  James R. Van Zandt  <jrvz@comcast.net>
 
+	* docs/gnuplot.doc: Update documentation: user functions can have
+	up to 12 variables.
+
 	* src/fit.c (fit_command): Allow second independent variable to be
 	renamed in a fit command.
 
