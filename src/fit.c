@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.64 2009/01/09 23:30:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.65 2009/01/31 15:19:27 vanzandt Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -716,7 +716,7 @@ regress(double a[])
 	v->udv_undef = FALSE;
 	Gcomplex(&v->udv_value, chisq, 0);
 
-	/* get covariance-, Korrelations- and Kurvature-Matrix */
+	/* get covariance-, Correlations- and Kurvature-Matrix */
 	/* and errors in the parameters                     */
 
 	/* compute covar[][] directly from C */
@@ -942,7 +942,7 @@ getivar(const char *varname)
 
 /*****************************************************************
     Read DOUBLE Variable value, return 0 if undefined or wrong type
-   I dont think it's a problem that it's an integer - div
+   I don't think it's a problem that it's an integer - div
 *****************************************************************/
 static double
 getdvar(const char *varname)
@@ -1268,7 +1268,7 @@ fit_command()
     else
 	strcpy(c_dummy_var[1], set_dummy_var[1]);
 
-    func.at = perm_at();
+    func.at = perm_at();	/* parse expression and save action table */
     dummy_func = NULL;
 
     token2 = c_token;
@@ -1318,7 +1318,7 @@ fit_command()
 	int_error(dummy_y, "Can't re-name 'y' in a one-variable fit");
 
     /* HBB 981210: two range specs mean different things, depending
-     * on wether this is a 2D or 3D fit */
+     * on whether this is a 2D or 3D fit */
     if (!is_a_3d_fit) {
 	if (zrange_token != -1)
 	    int_error(zrange_token, "Three range-specs not allowed in on-variable fit");
@@ -1441,9 +1441,9 @@ fit_command()
 	    v[2] = v[1];
 	    break;
 
-	    /* only if the explicitly asked for 4 columns do we
+	    /* only if they explicitly asked for 4 columns do we
 	     * do a 3d fit. (We can get here if they didn't
-	     * specify a using spec, and the file has 4 columns
+	     * specify a using spec, and the file has 4 columns.)
 	     */
 	case 4:		/* x, y, z, error */
 	    if (is_a_3d_fit)
@@ -1659,7 +1659,7 @@ fit_command()
 }
 
 /*
- * Print msg to stderr and log file
+ * Print message to stderr and log file
  */
 #if defined(VA_START) && defined(STDC_HEADERS)
 static void
