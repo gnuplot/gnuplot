@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.53 2008/08/19 18:48:21 sfeam Exp $
+ * $Id: axis.h,v 1.54 2008/10/30 22:21:07 sfeam Exp $
  *
  */
 
@@ -174,6 +174,13 @@ typedef enum e_autoscale {
     AUTOSCALE_FIXMAX = 1<<3
 } t_autoscale;
 
+/* type for specifying what scaling to use for an axis */
+typedef enum e_scale {
+  SCALE_LINEAR=0,
+  SCALE_LOG,
+  SCALE_PROBABILITY
+  /*  SCALE_USER            eventually allow a user-specified function */
+} t_scale;
 
 /* FIXME 20000725: collect some of those various TBOOLEAN fields into
  * a larger int (or -- shudder -- a bitfield?) */
@@ -189,6 +196,10 @@ typedef struct axis {
     TBOOLEAN range_is_reverted;	/* range [high:low] silently reverted? */
     double min;			/* 'transient' axis extremal values */
     double max;
+    double umin;		/* 'transient' axis extremal values,
+				   untransformed (i.e. no log or
+				   probability transform) */
+    double umax;
     double set_min;		/* set/show 'permanent' values */
     double set_max;
     double writeback_min;	/* ULIG's writeback implementation */
@@ -202,10 +213,14 @@ typedef struct axis {
     double term_scale;		/* scale factor: plot --> term coords */
     unsigned int term_zero;	/* position of zero axis */
 
+/* axis scaling */
+    t_scale log;   		/* indicator for type of scaling */
+
 /* log axis control */
-    TBOOLEAN log;		/* log axis stuff: flag "islog?" */
     double base;		/* logarithm base value */
     double log_base;		/* ln(base), for easier computations */
+    double (*do_scaling)(int,double); /* do data scaling (e.g. take log) */
+    double (*undo_scaling)(int,double); /* do data scaling (e.g. take power) */
 
 /* time/date axis control */
     TBOOLEAN is_timedata;	/* is this a time/date axis? */
@@ -237,12 +252,13 @@ typedef struct axis {
 #define DEFAULT_AXIS_STRUCT {						    \
 	AUTOSCALE_BOTH, AUTOSCALE_BOTH, /* auto, set_auto */		    \
 	0, FALSE,		/* range_flags, rev_range */		    \
-	-10.0, 10.0,		/* 3 pairs of min/max for axis itself */    \
+	-10.0, 10.0,		/* 4 pairs of min/max */		    \
+	-10.0, 10.0,							    \
 	-10.0, 10.0,							    \
 	-10.0, 10.0,							    \
 	  0.0,  0.0,		/* and another min/max for the data */	    \
 	0, 0, 0, 0,		/* terminal dependents */		    \
-	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
+	SCALE_LINEAR, 0.0, 0.0,	/* log, base, log(base) */		    \
 	0, 1,			/* is_timedata, format_numeric */	    \
 	DEF_FORMAT, TIMEFMT,	/* output format, timefmt */		    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
@@ -352,20 +368,25 @@ do {						\
     }						\
 } while(0)
 
-/* HBB 20000430: New macros, logarithmize a value into a stored
- * coordinate*/
+/* (un)scale a value for a given axis */
 #define AXIS_DO_LOG(axis,value) (log(value) / axis_array[axis].log_base)
 #define AXIS_UNDO_LOG(axis,value) exp((value) * axis_array[axis].log_base)
+#define AXIS_DO_PROBABILITY(axis,value) (inverse_normal_func(value))
+#define AXIS_UNDO_PROBABILITY(axis,value) (erfc((-value)/sqrt(2))/2)
+#define DO_SCALING(axis,value) ((axis_array[axis].do_scaling)(array_axis[axis].scaling_parameter,value))
+#define UNDO_SCALING(axis,value) ((axis_array[axis].undo_scaling)(array_axis[axis].scaling_parameter,value))
 
-/* HBB 20000430: same, but these test if the axis is log, first: */
-#define AXIS_LOG_VALUE(axis,value)				\
-    (axis_array[axis].log ? AXIS_DO_LOG(axis,value) : (value))
-#define AXIS_DE_LOG_VALUE(axis,coordinate)				  \
-    (axis_array[axis].log ? AXIS_UNDO_LOG(axis,coordinate): (coordinate))
+/* return minimum and maximum allowable users value for each kind of axis scaling */
+#define AXIS_LOG_UMIN(axis) 						\
+  ((axis_array[axis].log==SCALE_LOG)?(E_MINEXP/M_LN10):			\
+   (axis_array[axis].log==SCALE_PROBABILITY)?(-38.):(-VERYLARGE))
+#define AXIS_LOG_UMAX(axis) 						\
+  ((axis_array[axis].log==SCALE_LOG)?(VERYLARGE):			\
+   (axis_array[axis].log==SCALE_PROBABILITY)?(8.):(VERYLARGE))
 
 
 /* copy scalar data to arrays. The difference between 3D and 2D
- * versions is: dont know we have to support ranges [10:-10] - lets
+ * versions is: don't know we have to support ranges [10:-10] - let's
  * reverse it for now, then fix it at the end.  */
 /* FIXME HBB 20000426: unknown if this distinction makes any sense... */
 #define AXIS_INIT3D(axis, islog_override, infinite)			\
@@ -462,7 +483,7 @@ do {									\
      ? axis_array[axis].min : axis_array[axis].max)
 
 /* HBB 20000725: new macro, built upon ULIG's SAVE_WRITEBACK(axis),
- * but easier to use. Code like this occured twice, in plot2d and
+ * but easier to use. Code like this occurred twice, in plot2d and
  * plot3d: */
 #define SAVE_WRITEBACK_ALL_AXES					\
 do {								\
@@ -533,7 +554,7 @@ do {									\
 } while(0)
 
 /* This is one is very similar to GET_NUMBER_OR_TIME, but has slightly
- * different usage: it writes out '0' in case of inparsable time data,
+ * different usage: it writes out '0' in case of unparsable time data,
  * and it's used when the target axis is fixed without a 'first' or
  * 'second' keyword in front of it. */
 #define GET_NUM_OR_TIME(store,axis)			\
@@ -544,7 +565,7 @@ do {							\
 
 /* store VALUE or log(VALUE) in STORE, set TYPE as appropriate
  * Do OUT_ACTION or UNDEF_ACTION as appropriate
- * adjust range provided type is INRANGE (ie dont adjust y if x is outrange
+ * adjust range provided type is INRANGE (ie don't adjust y if x is outrange
  * VALUE must not be same as STORE
  * NOAUTOSCALE is per-plot property, whereas AUTOSCALE_XXX is per-axis.
  * Note: see the particular implementation for COLOR AXIS below.
@@ -561,7 +582,7 @@ do {									  \
 	UNDEF_ACTION;							  \
 	break;								  \
     }									  \
-    if (axis_array[AXIS].log) {						  \
+    if (axis_array[AXIS].log==SCALE_LOG) {				  \
 	if (VALUE<0.0) {						  \
 	    TYPE = UNDEFINED;						  \
 	    UNDEF_ACTION;						  \
@@ -573,6 +594,19 @@ do {									  \
 	    break;							  \
 	} else {							  \
 	    STORE = AXIS_DO_LOG(AXIS,VALUE);				  \
+	}								  \
+    } else if (axis_array[AXIS].log==SCALE_PROBABILITY) {		  \
+	if ((VALUE<0.0)||(VALUE>1.0)) {					  \
+	    TYPE = UNDEFINED;						  \
+	    UNDEF_ACTION;						  \
+	    break;							  \
+	} else if ((VALUE == 0.0)||(VALUE == 1.0)) {			  \
+	    STORE = -VERYLARGE;						  \
+	    TYPE = OUTRANGE;						  \
+	    OUT_ACTION;							  \
+	    break;							  \
+	} else {							  \
+	    STORE = AXIS_DO_PROBABILITY(AXIS,VALUE);			  \
 	}								  \
     } else								  \
 	STORE = VALUE;							  \
@@ -631,7 +665,7 @@ do {						\
 	axis_array[tmp].field=(value);		\
 } while(0)
 
-/* HBB 20000506: new macro to automatically build intializer lists
+/* HBB 20000506: new macro to automatically build initializer lists
  * for arrays of AXIS_ARRAY_SIZE equal elements */
 #define AXIS_ARRAY_INITIALIZER(value) {			\
     value, value, value, value, value,			\
@@ -685,5 +719,8 @@ void get_position_default __PROTO((struct position *pos, enum position_type defa
     || PM3D_IMPLICIT == pm3d.implicit \
     || 1 == (plot)->lp_properties.use_palette)
 int set_cbminmax __PROTO((void));
+
+double AXIS_LOG_VALUE __PROTO((AXIS_INDEX axis, double value));
+double AXIS_DE_LOG_VALUE __PROTO((AXIS_INDEX axis, double value));
 
 #endif /* GNUPLOT_AXIS_H */
