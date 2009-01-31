@@ -1,3 +1,8 @@
+2009-01-31  James R. Van Zandt  <jrvz@comcast.net>
+
+	* src/fit.c (fit_command): Allow second independent variable to be
+	renamed in a fit command.
+
 2009-01-30  James R. Van Zandt  <jrvz@comcast.net>
 
 	* src/command.c (define): save a function definition in a

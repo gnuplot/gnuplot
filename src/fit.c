@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.63 2008/06/18 23:14:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.64 2009/01/09 23:30:17 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1264,7 +1264,7 @@ fit_command()
 	strcpy(c_dummy_var[0], set_dummy_var[0]);
 
     if (dummy_y >= 0)
-	copy_str(c_dummy_var[0], dummy_y, MAX_ID_LEN);
+	copy_str(c_dummy_var[1], dummy_y, MAX_ID_LEN);
     else
 	strcpy(c_dummy_var[1], set_dummy_var[1]);
 
