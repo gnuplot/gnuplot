@@ -7989,7 +7989,7 @@ Ffigure_mapcontours
        bfit = gprintf("b = %s*10^%S",par_b)
        set label bfit at 30,20
 
- Display a function definition along with its fitted parameters like this:
+ To display a function definition along with its fitted parameters, use:
        f(x)=a+b*x
        fit f(x) 'datafile' via a,b
        set label GPFUN_f at graph .05,.95
