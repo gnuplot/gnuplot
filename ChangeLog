@@ -1,3 +1,8 @@
+2009-02-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (define): Fix under-allocation of space for 
+	user-accessible variable name.
+
 2009-01-31  James R. Van Zandt  <jrvz@comcast.net>
 
 	* docs/gnuplot.doc: Update documentation: user functions can have
