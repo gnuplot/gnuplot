@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.291 2009/01/06 19:36:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.292 2009/01/24 04:07:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -504,19 +504,6 @@ boundary(struct curve_points *plots, int count)
     /*}}} */
 
 
-#define COLORBOX_SCALE 0.125
-#define WIDEST_COLORBOX_TICTEXT 3
-    /* Make room for the color box if anything in the graph uses a palette. */
-    set_plot_with_palette(0, MODE_PLOT); /* EAM FIXME - 1st parameter is a dummy */
-    if (rmargin.scalex != screen) {
-	if (is_plot_with_colorbox()
-	&& (color_box.where != SMCOLOR_BOX_NO)
-	&& (color_box.where != SMCOLOR_BOX_USER)) {
-	    plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
-	    plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
-	}
-    }
-
     /*{{{  preliminary plot_bounds.ybot calculation
      *     first compute heights of labels and tics */
 
@@ -888,10 +875,13 @@ boundary(struct curve_points *plots, int count)
 
     /* Make room for the color box if needed. */
     if (rmargin.scalex != screen) {
-	if (is_plot_with_palette() && is_plot_with_colorbox()
-	&& (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
-	    plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
-	    plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
+	if (is_plot_with_colorbox()) {
+#define COLORBOX_SCALE 0.125
+#define WIDEST_COLORBOX_TICTEXT 3
+	    if ((color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
+		plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
+		plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
+	    }
 	}
 
 	if (rmargin.x < 0) {
@@ -1552,6 +1542,9 @@ do_plot(struct curve_points *plots, int pcount)
     term_initialise();		/* may set xmax/ymax */
     term_start_plot();
 
+    /* Figure out if we need a colorbox for this plot */
+    set_plot_with_palette(0, MODE_PLOT); /* EAM FIXME - 1st parameter is a dummy */
+
     /* compute boundary for plot (plot_bounds.xleft, plot_bounds.xright, plot_bounds.ytop, plot_bounds.ybot)
      * also calculates tics, since xtics depend on plot_bounds.xleft
      * but plot_bounds.xleft depends on ytics. Boundary calculations depend
@@ -1740,7 +1733,7 @@ do_plot(struct curve_points *plots, int pcount)
     }
 
     /* Add back colorbox if appropriate */
-    if (is_plot_with_palette() && is_plot_with_colorbox() && term->set_color
+    if (is_plot_with_colorbox() && term->set_color
 	&& color_box.layer == LAYER_BACK)
 	    draw_color_smooth_box(MODE_PLOT);
 
@@ -2046,7 +2039,7 @@ do_plot(struct curve_points *plots, int pcount)
 	plot_border();
 
     /* Add front colorbox if appropriate */
-    if (is_plot_with_palette() && is_plot_with_colorbox() && term->set_color
+    if (is_plot_with_colorbox() && term->set_color
 	&& color_box.layer == LAYER_FRONT)
 	    draw_color_smooth_box(MODE_PLOT);
 

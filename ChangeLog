@@ -1,7 +1,13 @@
+2009-02-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary do_plot): Move test for colorbox outside of
+	boundary(), and only calculate placement of colorbox once.
+	Bugfix.
+
 2009-02-01  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/command.c (define): Fix under-allocation of space for 
-	user-accessible variable name.
+	* src/command.c (define): Fix under-allocation of space for user
+	variables named GPFUN_*.
 
 2009-01-31  James R. Van Zandt  <jrvz@comcast.net>
 
