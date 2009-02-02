@@ -1,3 +1,8 @@
+2009-02-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c (lookup_key): Use exact match, otherwise F10, F11, or F12
+	hotkeys bind to F1.
+
 2009-02-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary do_plot): Move test for colorbox outside of

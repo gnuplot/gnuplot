@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.111 2008/11/07 11:55:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.112 2009/01/14 10:28:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1986,7 +1986,8 @@ lookup_key(char *ptr, int *len)
     }
     /* second, search in the table of other keys */
     for (keyptr = special_keys; *keyptr; ++keyptr) {
-	if (!strncasecmp(ptr, *keyptr, (*len = strlen(*keyptr)))) {
+	if (!strcmp(ptr, *keyptr)) {
+	    *len = strlen(ptr);
 	    return keyptr - special_keys + GP_FIRST_KEY;
 	}
     }
