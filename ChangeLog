@@ -9,6 +9,11 @@
 	boundary(), and only calculate placement of colorbox once.
 	Bugfix.
 
+	* term/canvas.trm: Taking the URL for associated javascripts from an
+	environmental variable turns out to be less than useful if the scripts
+	are tailored to the individual plots. Add a terminal option instead:
+	    set term canvas mouse jsdir 'URL/for/javascripts/'
+
 2009-02-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (define): Fix under-allocation of space for user

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.7 2009/01/25 20:01:53 sfeam Exp $
+ * $Id: canvas.trm,v 1.8 2009/01/25 22:33:33 sfeam Exp $
  *
  */
 
@@ -88,7 +88,7 @@ static char *CANVAS_scriptdir = NULL;
 
 enum CANVAS_case {
     CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, 
-    CANVAS_MOUSING, CANVAS_OTHER
+    CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_OTHER
 };
 
 static struct gen_table CANVAS_opts[] =
@@ -99,6 +99,7 @@ static struct gen_table CANVAS_opts[] =
     { "standalone", CANVAS_STANDALONE },
     { "mous$ing", CANVAS_MOUSING },
     { "mouse", CANVAS_MOUSING },
+    { "js$dir", CANVAS_JSDIR },
     { NULL, CANVAS_OTHER }
 };
 
@@ -135,6 +136,8 @@ CANVAS_options()
     CANVAS_mouseable = FALSE;
     free(CANVAS_name);
     CANVAS_name = NULL;
+    free(CANVAS_scriptdir);
+    CANVAS_scriptdir = NULL;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&CANVAS_opts[0],c_token++)) {
@@ -181,6 +184,10 @@ CANVAS_options()
 	    CANVAS_mouseable = TRUE;
 	    break;
 
+	case CANVAS_JSDIR:
+	    CANVAS_scriptdir = try_to_get_string();
+	    break;
+
 	default:
 	    int_warn(c_token-1,"unrecognized terminal option");
  	    break;
@@ -199,6 +206,8 @@ CANVAS_options()
 	if (CANVAS_mouseable)
 	    sprintf(term_options + strlen(term_options), " mousing");
     }
+    if (CANVAS_scriptdir)
+	sprintf(term_options + strlen(term_options), " jsdir %s", CANVAS_scriptdir);
 }
 
 
@@ -211,48 +220,44 @@ CANVAS_init()
 TERM_PUBLIC void
 CANVAS_graphics()
 {
-    char *js_dir;
-
     /* Force initialization at the beginning of each plot */
     canvas_line_type = LT_UNDEFINED;
     canvas_text_angle = 0;
     canvas_in_a_path = FALSE;
 
     /* Figure out where the javascript should come from when the page is viewed */
-    /* FIXME:  Does it make sense to take this from an environmental variable?  */
-    /*         It might be better to create a command "set jspath".     */
-    if ((js_dir = getenv("GNUPLOT_JS_DIR")) == NULL) {
+    if (CANVAS_scriptdir == NULL) {
+	char *canvas_default_jsdir = "";
 #ifdef GNUPLOT_JS_DIR
 # if defined(_Windows)
 	/* retrieve path relative to the gnuplot executable,
 	 * whose path is in szModuleName (winmain.c) */
-	js_dir = gp_alloc(strlen((char*) szPackageDir)
-			+ strlen(GNUPLOT_JS_DIR) + 2, "Prolog path");
-	strcpy(js_dir, (char*) szPackageDir);
-	strcat(js_dir, "\\");
+	/* EAM FIXME: memory leak */
+	canvas_default_jsdir = gp_alloc(strlen((char*) szPackageDir)
+			+ strlen(GNUPLOT_JS_DIR) + 2, "jsdir");
+	strcpy(canvas_default_jsdir, (char*) szPackageDir);
+	strcat(canvas_default_jsdir, "\\");
 	/* GNUPLOT_JS_DIR is _relative_ path */
-	strcat(js_dir, GNUPLOT_JS_DIR);
+	strcat(canvas_default_jsdir, GNUPLOT_JS_DIR);
 # else /* !_Windows */
 	/* use hardcoded _absolute_ path */
-	js_dir = GNUPLOT_JS_DIR;
+	canvas_default_jsdir = GNUPLOT_JS_DIR;
 # endif
-#else
-	js_dir = "";
 #endif /* GNUPLOT_JS_DIR */
+	CANVAS_scriptdir = gp_strdup(canvas_default_jsdir);
     }
 
-    free(CANVAS_scriptdir);
-    CANVAS_scriptdir = gp_alloc(strlen(js_dir) + 4,"js_dir");
-    strcpy(CANVAS_scriptdir,js_dir);
-    if (*CANVAS_scriptdir) {
 #if defined(_Windows)
-	if (CANVAS_scriptdir[strlen(CANVAS_scriptdir)-1] != '\\')
-	    strcat(CANVAS_scriptdir,"\\");
-#elif !defined(VMS)
-	if (CANVAS_scriptdir[strlen(CANVAS_scriptdir)-1] != '/')
-	    strcat(CANVAS_scriptdir,"/");
-#endif
+    if (CANVAS_scriptdir[strlen(CANVAS_scriptdir)-1] != '\\') {
+	CANVAS_scriptdir = gp_realloc(CANVAS_scriptdir, strlen(CANVAS_scriptdir)+2, "jsdir");
+	strcat(CANVAS_scriptdir,"\\");
     }
+#elif !defined(VMS)
+    if (CANVAS_scriptdir[strlen(CANVAS_scriptdir)-1] != '/') {
+	CANVAS_scriptdir = gp_realloc(CANVAS_scriptdir, strlen(CANVAS_scriptdir)+2, "jsdir");
+	strcat(CANVAS_scriptdir,"/");
+    }
+#endif
 
     if (CANVAS_standalone) {
 	fprintf(gpoutfile,
@@ -774,6 +779,7 @@ START_HELP(canvas)
 " Syntax:",
 "       set terminal canvas {size <xsize>, <ysize>} {fsize <fontsize>}",
 "                           {standalone {mousing} | name '<funcname>'}",
+"                           {jsdir 'URL/for/javascripts'}",
 "",
 " where <xsize> and <ysize> set the size of the plot area in pixels.",
 " The default size in standalone mode is 600 by 400 pixels.",
@@ -784,7 +790,7 @@ START_HELP(canvas)
 " code that renders the plot using the HTML 5 canvas element.  The html page",
 " links to a javascript library 'canvastext.js'.  By default this is a link to",
 " a local file, usually in directory /usr/local/share/gnuplot/<version>/js.",
-" You can change this by setting environmental variable GNUPLOT_JS_DIR to",
+" You can change this by using the `jsdir` option to set the directory to",
 " either a local file or a general URL.  The latter is usually appropriate if",
 " the plot is exported for viewing on remote client machines.",
 "",
