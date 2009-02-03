@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.70 2008/08/05 23:27:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.71 2008/09/02 21:17:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -798,6 +798,7 @@ update_plot_bounds(void)
  * 2: following an unsuccessful command (int_error)
  * 3: program entry
  * 4: explicit reset of error status
+ * 5: directory changed
  */
 void
 update_gpval_variables(int context)
@@ -878,6 +879,15 @@ update_gpval_variables(int context)
 	fill_gpval_string("GPVAL_ERRMSG","");
     }
 
+    if (context == 3 || context == 5) {
+	char *save_file = NULL;
+	save_file = (char *) gp_alloc(PATH_MAX, "filling GPVAL_PWD");
+	if (save_file) {
+	    GP_GETCWD(save_file, PATH_MAX);
+	    fill_gpval_string("GPVAL_PWD", save_file);
+	    free(save_file);
+	}
+    }
 }
 
 /* Callable wrapper for the words() internal function */

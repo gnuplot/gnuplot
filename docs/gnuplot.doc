@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.555 2009/01/31 14:34:29 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.556 2009/01/31 15:55:26 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5626,6 +5626,10 @@ Ffigure_mapcontours
 ?commands pwd
 ?pwd
  The `pwd` command prints the name of the working directory to the screen.
+
+ Note that if you wish to store the current directory into a string variable
+ or use it in string expressions, then you can use variable GPVAL_PWD, see
+ `show variables all`. This overcomes shell call by means of "`pwd`". 
 2 quit
 ?commands quit
 ?quit

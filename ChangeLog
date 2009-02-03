@@ -1,3 +1,9 @@
+2009-02-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/eval.c (update_gpval_variables) src/command.c (changedir_command)
+	docs/gnuplot.doc: New automatic variable GPVAL_PWD for current working
+	directory.
+
 2009-02-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c (lookup_key): Use exact match, otherwise F10, F11, or F12

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.179 2009/01/31 03:14:44 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.180 2009/02/02 06:10:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -812,6 +812,8 @@ changedir_command()
     gp_expand_tilde(&save_file);
     if (changedir(save_file))
 	int_error(c_token, "Can't change to this directory");
+    else
+	update_gpval_variables(5);
     free(save_file);
 }
 
@@ -1866,7 +1868,6 @@ changedir(char *path)
     return chdir(path);
 #endif /* MSDOS etc. */
 }
-
 
 /* used by replot_command() */
 void
