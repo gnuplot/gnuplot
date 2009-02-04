@@ -1,3 +1,11 @@
+2009-02-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS docs/gnuplot.doc src/pm3d.c (pm3d_plot) src/set.c (set_pm3d):
+	Let "pm3d interpolate m,n" for negative m,n interpolates the surface
+	for at least |m|, |n| points. The case m=n=0 means an optimal number
+	of interpolation points.
+	SF Patch #2558565: pm3d interpolate 0,0
+
 2009-02-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/eval.c (update_gpval_variables) src/command.c (changedir_command)
