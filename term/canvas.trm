@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.8 2009/01/25 22:33:33 sfeam Exp $
+ * $Id: canvas.trm,v 1.9 2009/02/02 22:40:58 sfeam Exp $
  *
  */
 
@@ -207,7 +207,7 @@ CANVAS_options()
 	    sprintf(term_options + strlen(term_options), " mousing");
     }
     if (CANVAS_scriptdir)
-	sprintf(term_options + strlen(term_options), " jsdir %s", CANVAS_scriptdir);
+	sprintf(term_options + strlen(term_options), " jsdir \"%s\"", CANVAS_scriptdir);
 }
 
 
