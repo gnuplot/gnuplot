@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.295 2008/12/10 06:53:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.296 2008/12/11 06:53:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3224,14 +3224,10 @@ set_pm3d()
 		    int_error(c_token, "expecting step values i,j");
 		} else {
 		    pm3d.interp_i = int_expression();
-		    if(pm3d.interp_i < 1)
-			pm3d.interp_i = 1;
 		    if (!equals(c_token,","))
 			int_error(c_token, "',' expected");
 		    c_token++;
 		    pm3d.interp_j = int_expression();
-		    if (pm3d.interp_j < 1)
-			pm3d.interp_j = 1;
 		    c_token--;
                 }
 		continue;

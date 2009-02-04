@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.73 2009/01/03 04:39:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.74 2009/01/27 22:07:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -422,6 +422,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     double avgC, gray;
     double cb1, cb2, cb3, cb4;
     gpdPoint corners[4];
+    int interp_i, interp_j;
 #ifdef EXTENDED_COLOR_SPECS
     gpiPoint icorners[4];
 #endif
@@ -455,6 +456,50 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
     pm3d_rearrange_scan_array(this_plot, &scan_array, &scan_array_n, &invert, (struct iso_curve ***) 0, (int *) 0, (int *) 0);
 
+    interp_i = pm3d.interp_i;
+    interp_j = pm3d.interp_j;
+
+    if (interp_i <= 0 || interp_j <= 0) {
+	/* Number of interpolations will be determined from desired number of points.
+	   Search for number of scans and maximal number of points in a scan for points
+	   which will be plotted (INRANGE). Then set interp_i,j so that number of points
+	   will be a bit larger than |interp_i,j|.
+	   If (interp_i,j==0) => set this number of points according to DEFAULT_OPTIMAL_NB_POINTS.
+	   Ideally this should be comparable to the resulution of the output device, which
+	   can hardly by done at this high level instead of the driver level.
+   	*/
+	#define DEFAULT_OPTIMAL_NB_POINTS 200
+	int max_scan_pts = 0;
+	int max_scans = 0;
+	int pts;
+	for (scan = 0; scan < this_plot->num_iso_read - 1; scan++) {
+	    scanA = scan_array[scan];
+	    pointsA = scanA->points;
+	    pts = 0;
+	    for (j=0; j<scanA->p_count; j++)
+		if (pointsA[j].type == INRANGE) pts++;
+	    if (pts > 0) {
+		max_scan_pts = GPMAX(max_scan_pts, pts);
+		max_scans++;
+	    }
+	}
+
+	if (interp_i <= 0) {
+	    ii = (interp_i == 0) ? DEFAULT_OPTIMAL_NB_POINTS : -interp_i;
+	    interp_i = floor(ii / max_scan_pts) + 1;
+	}
+	if (interp_j <= 0) {
+	    ii = (interp_j == 0) ? DEFAULT_OPTIMAL_NB_POINTS : -interp_j;
+	    interp_j = floor(ii / max_scans) + 1;
+	}
+#if 0
+	fprintf(stderr, "pm3d.interp_i=%i\t pm3d.interp_j=%i\n", pm3d.interp_i, pm3d.interp_j);
+	fprintf(stderr, "INRANGE: max_scans=%i  max_scan_pts=%i\n", max_scans, max_scan_pts);
+	fprintf(stderr, "seting interp_i=%i\t interp_j=%i => there will be %i and %i points\n",
+		interp_i, interp_j, interp_i*max_scan_pts, interp_j*max_scans);
+#endif
+    }
+
     if (pm3d.direction == PM3D_DEPTH) {
 
 	for (scan = 0; scan < this_plot->num_iso_read - 1; scan++) {
@@ -469,8 +514,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		allocated_quadrangles += GPMAX(scanA->p_count, scanB->p_count) - 1;
 	    }
 	}
-	allocated_quadrangles *= (pm3d.interp_i > 1) ? pm3d.interp_i : 1;
-	allocated_quadrangles *= (pm3d.interp_j > 1) ? pm3d.interp_j : 1;
+	allocated_quadrangles *= (interp_i > 1) ? interp_i : 1;
+	allocated_quadrangles *= (interp_j > 1) ? interp_j : 1;
 	quadrangles = (quadrangle*)gp_realloc(quadrangles, allocated_quadrangles * sizeof (quadrangle), "pm3d_plot->quadrangles");
 	/* DEBUG: fprintf(stderr, "allocated_quadrangles = %d\n", allocated_quadrangles); */
     }
@@ -502,10 +547,10 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
      * if bilinear interpolation is enabled, allocate memory for the
      * interpolated points here
      */
-    if (pm3d.interp_i > 1 || pm3d.interp_j > 1) {
-	bl_point = (gpdPoint **)gp_alloc(sizeof(gpdPoint*) * (pm3d.interp_i+1), "bl-interp along scan");
-	for (i1 = 0; i1 <= pm3d.interp_i; i1++)
-	    bl_point[i1] = (gpdPoint *)gp_alloc(sizeof(gpdPoint) * (pm3d.interp_j+1), "bl-interp between scan");
+    if (interp_i > 1 || interp_j > 1) {
+	bl_point = (gpdPoint **)gp_alloc(sizeof(gpdPoint*) * (interp_i+1), "bl-interp along scan");
+	for (i1 = 0; i1 <= interp_i; i1++)
+	    bl_point[i1] = (gpdPoint *)gp_alloc(sizeof(gpdPoint) * (interp_j+1), "bl-interp between scan");
     }
 
     /*
@@ -604,7 +649,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    continue;
 	    }
 
-	    if ((pm3d.interp_i <= 1 && pm3d.interp_j <= 1) || pm3d.direction == PM3D_DEPTH) {
+	    if ((interp_i <= 1 && interp_j <= 1) || pm3d.direction == PM3D_DEPTH) {
 #ifdef EXTENDED_COLOR_SPECS
 	      if (!supply_extended_color_specs) {
 #endif
@@ -661,7 +706,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	    corners[3].x = pointsA[i1].x;
 	    corners[3].y = pointsA[i1].y;
 
-	    if ( pm3d.interp_i > 1 || pm3d.interp_j > 1 || at_which_z == PM3D_AT_SURFACE) {
+	    if (interp_i > 1 || interp_j > 1 || at_which_z == PM3D_AT_SURFACE) {
 		/* always supply the z value if
 		 * EXTENDED_COLOR_SPECS is defined
 		 */
@@ -709,56 +754,56 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	    } else
     		filled_quadrangle(corners, icorners);
 #else
-	    if (pm3d.interp_i > 1 || pm3d.interp_j > 1) {
+	    if (interp_i > 1 || interp_j > 1) {
 		/* Interpolation is enabled.
 		 * interp_i is the # of points along scan lines
 		 * interp_j is the # of points between scan lines
 		 * Algorithm is to first sample i points along the scan lines
 		 * defined by corners[3],corners[0] and corners[2],corners[1]. */
 		int j1;
-		for (i1 = 0; i1 <= pm3d.interp_i; i1++) {
+		for (i1 = 0; i1 <= interp_i; i1++) {
 		    bl_point[i1][0].x = 
-			((corners[3].x - corners[0].x) / pm3d.interp_i) * i1 + corners[0].x;
-		    bl_point[i1][pm3d.interp_j].x = 
-			((corners[2].x - corners[1].x) / pm3d.interp_i) * i1 + corners[1].x;
+			((corners[3].x - corners[0].x) / interp_i) * i1 + corners[0].x;
+		    bl_point[i1][interp_j].x = 
+			((corners[2].x - corners[1].x) / interp_i) * i1 + corners[1].x;
 		    bl_point[i1][0].y =
-			((corners[3].y - corners[0].y) / pm3d.interp_i) * i1 + corners[0].y;
-		    bl_point[i1][pm3d.interp_j].y =
-			((corners[2].y - corners[1].y) / pm3d.interp_i) * i1 + corners[1].y;
+			((corners[3].y - corners[0].y) / interp_i) * i1 + corners[0].y;
+		    bl_point[i1][interp_j].y =
+			((corners[2].y - corners[1].y) / interp_i) * i1 + corners[1].y;
 		    bl_point[i1][0].z =
-			((corners[3].z - corners[0].z) / pm3d.interp_i) * i1 + corners[0].z;
-		    bl_point[i1][pm3d.interp_j].z =
-			((corners[2].z - corners[1].z) / pm3d.interp_i) * i1 + corners[1].z;
+			((corners[3].z - corners[0].z) / interp_i) * i1 + corners[0].z;
+		    bl_point[i1][interp_j].z =
+			((corners[2].z - corners[1].z) / interp_i) * i1 + corners[1].z;
 		    if (color_from_column) {
 			bl_point[i1][0].c =
-			    ((corners[3].c - corners[0].c) / pm3d.interp_i) * i1 + corners[0].c;
-			bl_point[i1][pm3d.interp_j].c =
-			    ((corners[2].c - corners[1].c) / pm3d.interp_i) * i1 + corners[1].c;
+			    ((corners[3].c - corners[0].c) / interp_i) * i1 + corners[0].c;
+			bl_point[i1][interp_j].c =
+			    ((corners[2].c - corners[1].c) / interp_i) * i1 + corners[1].c;
 		    }
 		    /* Next we sample j points between each of the new points
 		     * created in the previous step (this samples between
 		     * scan lines) in the same manner. */
-		    for (j1 = 1; j1 < pm3d.interp_j; j1++) {
+		    for (j1 = 1; j1 < interp_j; j1++) {
 			bl_point[i1][j1].x =
-			    ((bl_point[i1][pm3d.interp_j].x - bl_point[i1][0].x) / pm3d.interp_j) *
+			    ((bl_point[i1][interp_j].x - bl_point[i1][0].x) / interp_j) *
 				j1 + bl_point[i1][0].x;
 			bl_point[i1][j1].y =
-			    ((bl_point[i1][pm3d.interp_j].y - bl_point[i1][0].y) / pm3d.interp_j) *
+			    ((bl_point[i1][interp_j].y - bl_point[i1][0].y) / interp_j) *
 				j1 + bl_point[i1][0].y;
 			bl_point[i1][j1].z =
-			    ((bl_point[i1][pm3d.interp_j].z - bl_point[i1][0].z) / pm3d.interp_j) *
+			    ((bl_point[i1][interp_j].z - bl_point[i1][0].z) / interp_j) *
 				j1 + bl_point[i1][0].z;
 			if (color_from_column)
 			    bl_point[i1][j1].c =
-				((bl_point[i1][pm3d.interp_j].c - bl_point[i1][0].c) / pm3d.interp_j) *
+				((bl_point[i1][interp_j].c - bl_point[i1][0].c) / interp_j) *
 				    j1 + bl_point[i1][0].c;
 		    }
 		}
 		/* Once all points are created, move them into an appropriate
 		 * structure and call set_color on each to retrieve the
 		 * correct color mapping for this new sub-sampled quadrangle. */
-		for (i1 = 0; i1 < pm3d.interp_i; i1++) {
-		    for (j1 = 0; j1 < pm3d.interp_j; j1++) {
+		for (i1 = 0; i1 < interp_i; i1++) {
+		    for (j1 = 0; j1 < interp_j; j1++) {
 			corners[0].x = bl_point[i1][j1].x;
 			corners[0].y = bl_point[i1][j1].y;
 			corners[0].z = bl_point[i1][j1].z;
@@ -820,7 +865,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			}
 		    }
 		}
-	    } else { /* thus (pm3d.interp_i == 1 && pm3d.interp_j == 1) */
+	    } else { /* thus (interp_i == 1 && interp_j == 1) */
 		if (pm3d.direction != PM3D_DEPTH) {
 		    filled_quadrangle(corners);
 		} else {
@@ -836,7 +881,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     } /* loop over scans */
 
     if (bl_point) {
-	for (i1 = 0; i1 <= pm3d.interp_i; i1++)
+	for (i1 = 0; i1 <= interp_i; i1++)
 	    free(bl_point[i1]);
 	free(bl_point);
     }

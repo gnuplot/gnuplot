@@ -23,6 +23,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW error status variables GPVAL_ERRNO and GPVAL_ERRMSG
 * NEW variables GPVAL_LAST_PLOT, GPVAL_{S}PLOT, GPVAL_MULTIPLOT
 * NEW variables GPVAL_VIEW_{MAP|ROT_X|ROT_Z|SCALE|ZSCALE}, GPVAL_TERMINALS
+* NEW variables GPVAL_PWD
 * NEW support for dashed linetypes in additional terminals
 * NEW the 'bind' command accepts non-keyboard triggers, e.g. 'close'
 * NEW individual plots can be omitted from autoscaling of axis ranges
@@ -31,6 +32,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW command 'evaluate' executes commands from a string variable
 * NEW z-axis tic labels can be colored by Z value
 * NEW command 'set view equal {xy|xyz}' forces axes in a 3D plot to the same scale
+* NEW 'set pm3d interpolate m,n' supports also non-positive m,n as nbs of points
 * FIX remove the limit of 64 characters read as string data from a data file
 * FIX remainder of command line is not lost after a "load" command
 * FIX more complete support for locale internationalization, UTF-8 encoding

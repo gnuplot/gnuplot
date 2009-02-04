@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.556 2009/01/31 15:55:26 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.557 2009/02/03 22:26:19 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8864,7 +8864,7 @@ Ffigure_mapcontours
  Syntax (the options can be given in any order):
        set pm3d {
                   { at <bst combination> }
-                  { interpolate <steps in scan>,<steps between scans> }
+                  { interpolate <steps/points in scan, between scans> }
                   { scansautomatic | scansforward | scansbackward | depthorder }
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
@@ -8966,12 +8966,17 @@ Ffigure_mapcontours
  filtering and color range scaling, respectively; and also `set (no)surface`
  seems to have a (side?) effect.
 
- The option `interpolate` will interpolate grid points into a finer mesh, and
- color each quadrangle appropriately. For data files, this will smoothen the
- color surface, and enhance spikes in a color surface. For functions,
+ The option `interpolate m,n` will interpolate grid points into a finer mesh,
+ and color each quadrangle appropriately.  For data files, this will smoothen
+ the color surface, and enhance spikes in a color surface. For functions,
  interpolation makes little sense, except to trade off precision for memory.
- It would usually make more sense to use `samples` and `isosamples` when working
- with functions.
+ It would usually make more sense to use `samples` and `isosamples` when
+ working with functions. For positive m and n, each quadrangle or triangle
+ is interpolated m-times and n-times in the respective direction.  For negative
+ m and n, the interpolation frequency is chosen so that there will be at least
+ |m| and |n| points drawn; you can consider this as a special gridding function.
+ Zeros, i.e. `interpolation 0,0`, will automatically choose an optimal number of
+ interpolated surface points.
 
  The coloring setup as well as the color box drawing are determined by
  `set palette`.  There can be only one palette for the current plot.  Drawing
