@@ -1,3 +1,10 @@
+2009-02-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (type_udv) src/eval.c (add_udv_by_name) src/fit.c
+	src/plot2d.c: Prevent strange behaviour due to uninitialized field
+	udv_type in a udv entry that has been created but not yet defined.
+	Bug #2556225
+
 2009-02-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c (lookup_key): Use exact match, otherwise F10, F11, or F12

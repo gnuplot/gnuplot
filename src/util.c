@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.65.2.6 2008/04/20 22:27:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.65.2.8 2009/01/14 18:58:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -157,15 +157,24 @@ isstring(int t_num)
 	     gp_input_line[token[t_num].start_index] == '"'));
 }
 
+/* Test for the existence of a variable without triggering errors.
+ * Return values:
+ *  0	variable does not exist or is not defined
+ * >0	type of variable: INTGR, CMPLX, STRING
+ */
 int
 type_udv(int t_num)
 {
     struct udvt_entry **udv_ptr = &first_udv;
 
     while (*udv_ptr) {
-       if (equals(t_num, (*udv_ptr)->udv_name))
-	   return (*udv_ptr)->udv_value.type;
-       udv_ptr = &((*udv_ptr)->next_udv);
+	if (equals(t_num, (*udv_ptr)->udv_name)) {
+	    if ((*udv_ptr)->udv_undef)
+		return 0;
+	    else
+		return (*udv_ptr)->udv_value.type;
+	    }
+	udv_ptr = &((*udv_ptr)->next_udv);
     }
     return 0;
 }

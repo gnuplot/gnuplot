@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.14 2008/10/02 01:46:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.15 2008/10/12 17:59:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1693,7 +1693,7 @@ eval_plots()
 			struct value a;
                         this_plot->arrow_properties.head = BOTH_HEADS;
                         c_token++;
-			if (isanumber(c_token) || type_udv(c_token))
+			if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX)
 			    this_plot->arrow_properties.head_length = real(const_express(&a));
                     }
                 }
