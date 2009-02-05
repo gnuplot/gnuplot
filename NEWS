@@ -7,11 +7,14 @@ New features, changes and fixes since previous release
 * CHANGE updated svg terminal driver (back-ported from 4.3 CVS branch)
 * CHANGE fillstyle empty really is consistently empty (not fill-with-background)
 * CHANGE warn that some options to 'set datafile binary' are not implemented
+* CHANGE handling of custom palette in postscript plots set to "monochrome"
 * FIX interpolatation for pm3d surfaces given by both z and colour coordinates
 * FIX infinite loop if axis tick increment is on the order of machine precision
 * FIX initialize x11 enhanced text mode to use most recently requested font 
 * FIX emf handling of enhanced text at non-zero angle
 * FIX 3D plots with fixed zrange were clipping against xmax rather than zmax
+* FIX handling of uninitialized variables in fit "via" command
+* FIX pm3d depthorder was ignoring interpolation setting
 
 
 New features, changes and fixes in gnuplot version 4.2.4
