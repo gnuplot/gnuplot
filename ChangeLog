@@ -5,6 +5,9 @@
 	udv_type in a udv entry that has been created but not yet defined.
 	Bug #2556225
 
+	* src/graph3d.c (draw_3d_graphbox): Allow Z axis label in 3D plots
+	to be rotated.
+
 2009-02-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc src/pm3d.c (pm3d_plot) src/set.c (set_pm3d):
