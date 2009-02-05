@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.188 2008/12/10 06:53:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.189 2009/01/04 22:45:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1708,7 +1708,7 @@ eval_plots()
 		    if (almost_equals(c_token,"whisker$bars")) {
 			this_plot->arrow_properties.head = BOTH_HEADS;
 			c_token++;
-			if (isanumber(c_token) || type_udv(c_token))
+			if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX)
 			    this_plot->arrow_properties.head_length = real_expression();
 		    }
 		}

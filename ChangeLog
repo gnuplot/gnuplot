@@ -1,3 +1,10 @@
+2009-02-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (type_udv) src/eval.c (add_udv_by_name) src/fit.c
+	src/plot2d.c: Prevent strange behaviour due to uninitialized field
+	udv_type in a udv entry that has been created but not yet defined.
+	Bug #2556225
+
 2009-02-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc src/pm3d.c (pm3d_plot) src/set.c (set_pm3d):

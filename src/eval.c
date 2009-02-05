@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.71 2008/09/02 21:17:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.72 2009/02/03 22:26:19 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -685,6 +685,7 @@ add_udv_by_name(char *key)
     (*udv_ptr)->next_udv = NULL;
     (*udv_ptr)->udv_name = gp_strdup(key);
     (*udv_ptr)->udv_undef = TRUE;
+    (*udv_ptr)->udv_value.type = 0;
     return (*udv_ptr);
 }
 
