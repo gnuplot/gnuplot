@@ -1,3 +1,8 @@
+2009-02-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm (X11_options): Call term->init() rather than X11_init(),
+	since the options routine is shared by x11 and xlib drivers.
+
 2009-02-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (type_udv) src/eval.c (add_udv_by_name) src/fit.c

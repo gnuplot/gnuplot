@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.160.2.11 2008/12/25 05:50:59 sfeam Exp $
+ * $Id: x11.trm,v 1.160.2.12 2009/01/14 10:58:17 mikulik Exp $
  *
  */
 
@@ -570,7 +570,9 @@ X11_options()
 
     }
 
-    X11_init();
+
+    /* Call own init routine; this might be xlib rather than x11 */
+    term->init();
 
     if (set_reset)
 	X11_atexit();	/* tell gnuplot_x11 to shut down */
