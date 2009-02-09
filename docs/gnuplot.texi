@@ -11028,7 +11028,7 @@ of the terminal, but do not return <xscale> or <yscale> to their default
 values (1.0).
 
 `ratio` and `square` have no effect on 3-d plots, but do affect 3D projections
-created using `set view map`.  Similarly `set view equal_axes` forces the
+created using `set view map`.  Similarly `set view equal` forces the
 x and y axes of a 3D onto the same scale.
 
 Examples:
@@ -11252,7 +11252,6 @@ plotted, the pattern cycles through all available pattern types, starting
 from pattern <n>, much as the line type cycles for multiple line plots.
 
 The `empty` option causes filled boxes not to be filled. This is the default.
-It is equivalent to the `solid` option with a <density> parameter of zero.
 
 By default, @ref{border}, the box is bounded by a solid line of the current
 linetype. `border <lt>` specifies that a border is to be drawn using
@@ -11330,6 +11329,8 @@ using the default linetype 3.
 @c ?unset style line
 @c ?show style line
 @cindex linestyle
+
+@cindex linewidth
 
 @c ^ <a name="linewidth"></a>
 Each terminal has a default set of line and point types, which can be seen
@@ -12867,7 +12868,7 @@ help file, and (again) the useful email addresses.
 @c ?commands show view
 @c ?set view
 @c ?set view map
-@c ?set view equal_axes
+@c ?set view @{no@}equal @{xy|xyz@}
 @c ?show view
 @cindex view
 @opindex view
@@ -12915,9 +12916,12 @@ Examples:
 The first sets all the four default values.  The second changes only scale,
 to 0.5.
 
-The command `set view equal_axes` forces the unit length of the x and y axes
-to be on the same same.  Otherwise by default both axes are scaled to fill the
-available area.  This is similar to the `set size square` command for 2D plots.
+The command `set view equal xy` forces the unit length of the x and y axes
+to be on the same scale, and chooses that scale so that the plot will fit on
+the page.  The command `set view equal xyz` additionally sets the z axis
+scale to match the x and y axes; however there is no guarantee that the
+current z axis range will fit within the plot boundary.
+By default all three axes are scaled independently to fill the available area.
 
 See also @ref{ticslevel}.
 
@@ -17965,7 +17969,7 @@ Syntax:
                        @{fname "<font>"@} @{fsize <fontsize>@}
                        @{font "<fontname>@{,<fontsize>@}"@}
                        @{fontfile <filename>@}
-                       @{rounded|butt@} @{linewidth <lw>@}
+                       @{rounded|butt@} @{solid|dashed@} @{linewidth <lw>@}
 
 @end example
 
@@ -17977,10 +17981,8 @@ setting, `fixed`, will request an absolute size.
 by a factor of <w>.
 
 <font> is the name of the default font to use (default Arial) and
-<fontsize> is the font size (in points, default 12). Gnuplot does not
-currently provide a mechanism for embedding fonts in the output file,
-so svg viewing programs may substitute other fonts when the file is
-displayed.
+<fontsize> is the font size (in points, default 12). SVG viewing
+programs may substitute other fonts when the file is displayed.
 
 The svg terminal supports an enhanced text mode, which allows font
 and other formatting commands to be embedded in labels and other text
@@ -17993,7 +17995,8 @@ specifies a local file which is copied into the <defs> section of the
 resulting SVG output file.  This file may either itself contain a font,
 or may contain the records necessary to create a hypertext reference to
 the desired font. Gnuplot will look for the requested file using the
-directory list in the GNUPLOT_FONTPATH environmental variable."
+directory list in the GNUPLOT_FONTPATH environmental variable.
+NB: You must embed an svg font, not a TrueType or PostScript font."
 
 @node tek410x, tek410x_, svg, terminal_
 @subsubsection tek410x
@@ -18784,6 +18787,7 @@ Syntax:
                     @{linewidth LW@} @{solid|dashed@}
                     @{@{no@}persist@} @{@{no@}raise@} @{@{no@}ctrlq@}
                     @{close@}
+                    @{size XX,YY@} @{position XX,YY@}
    set terminal x11 @{reset@}
 
 @end example
@@ -18840,6 +18844,12 @@ does not get raised, see discussion in @ref{raise}.
 The option `title "<title name>"` will supply the title name of the window
 for the current plot window or plot window <n> if a number is given.
 Where (or if) this title is shown depends on your X window manager.
+
+The size option can be used to set the size of the plot window.  The
+size option will only apply to newly created windows.
+
+The position option can be used to set the position of the plot window.  The
+position option will only apply to newly created windows.
 
 The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
@@ -19284,6 +19294,7 @@ Syntax:
                     @{linewidth LW@} @{solid|dashed@}
                     @{@{no@}persist@} @{@{no@}raise@} @{@{no@}ctrlq@}
                     @{close@}
+                    @{size XX,YY@} @{position XX,YY@}
    set terminal x11 @{reset@}
 
 @end example
@@ -19340,6 +19351,12 @@ does not get raised, see discussion in @ref{raise}.
 The option `title "<title name>"` will supply the title name of the window
 for the current plot window or plot window <n> if a number is given.
 Where (or if) this title is shown depends on your X window manager.
+
+The size option can be used to set the size of the plot window.  The
+size option will only apply to newly created windows.
+
+The position option can be used to set the position of the plot window.  The
+position option will only apply to newly created windows.
 
 The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
@@ -19774,7 +19791,7 @@ you can set the resource 'gnuplot.fastrotate' to 'off'
 The `xlib` terminal driver supports the X11 Windows System.  It generates
 gnuplot_x11 commands, but sends them to the output file specified by
 `set output '<filename>'`. `set term x11` is equivalent to
-`set terminal xlib; set output "|gnuplot_x11 -noevents"`.
+`set output "|gnuplot_x11 -noevents"; set term xlib.`
 `xlib` takes the same set of options as `x11`."
 
 @node xlib_,  , xlib, terminal_
@@ -19792,7 +19809,7 @@ gnuplot_x11 commands, but sends them to the output file specified by
 The `xlib` terminal driver supports the X11 Windows System.  It generates
 gnuplot_x11 commands, but sends them to the output file specified by
 `set output '<filename>'`. `set term x11` is equivalent to
-`set terminal xlib; set output "|gnuplot_x11 -noevents"`.
+`set output "|gnuplot_x11 -noevents"; set term xlib.`
 `xlib` takes the same set of options as `x11`."
 
 @node Graphical_User_Interfaces, Bugs, Terminal_types, Top
