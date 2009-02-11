@@ -1,3 +1,7 @@
+2009-02-11  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw: Use $(CC) instead of gcc to compile pgnuplot.
+
 2009-02-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (X11_options): Call term->init() rather than X11_init(),

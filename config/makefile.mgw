@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.41.2.3 2008/02/23 11:21:56 mikulik Exp $
+# $Id: makefile.mgw,v 1.41.2.4 2009/01/13 22:57:41 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #  This assumes that MinGW32 is used via the MSYS toolkit
@@ -297,7 +297,7 @@ wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpic
 	$(TERMLIBS) $(WX_LIBS) $(CAIRO_LIBS) $(PANGO_LIBS)
 
 pgnuplot.exe: win/pgnuplot.c version.o
-	gcc -O2 -DHAVE_STDBOOL_H -s -o pgnuplot.exe win/pgnuplot.c version.o -I. -luser32
+	$(CC) -O2 -DHAVE_STDBOOL_H -s -o pgnuplot.exe win/pgnuplot.c version.o -I. -luser32
 
 # rules
 
