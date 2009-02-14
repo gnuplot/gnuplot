@@ -1,3 +1,7 @@
+2009-02-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/all.dem demo/heatmaps.dem:  Add heat maps to demo set.
+
 2009-02-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw: Use $(CC) instead of gcc to compile pgnuplot.

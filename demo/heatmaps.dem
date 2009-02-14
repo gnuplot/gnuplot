@@ -1,6 +1,11 @@
 #
 # Two ways of generating a 2D heat map from ascii data
 #
+if ((GPVAL_VERSION == 4.1 || GPVAL_VERSION == 4.2) \
+&&  (!strstrt(GPVAL_COMPILE_OPTIONS,"+IMAGE"))) \
+    print ">>> Skipping demo <<<\n" ; \
+    print "This copy of gnuplot was built without support for plotting images" ; \
+    exit ;
 
 set title "Heat Map generated from a file containing Z values only"
 unset key

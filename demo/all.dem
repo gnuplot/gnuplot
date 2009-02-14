@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.25.2.1 2006/10/09 20:51:39 mikulik Exp $
+# $Id: all.dem,v 1.25.2.2 2009/01/27 20:47:00 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -154,6 +154,10 @@ reset
 
 print "********************** file pm3dgamma.dem *********************"
 load "pm3dgamma.dem"
+reset
+
+print "********************** file heatmaps.dem ***********************"
+load "heatmaps.dem"
 reset
 
 print "********************** file hidden2.dem ***********************"
