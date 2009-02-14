@@ -180,6 +180,32 @@ set ytics font "Times,5" format "%.1f" scale 0.5
 plot '../demo/optimize.dat' with circles lc rgb "gray" fs transparent solid 0.2 nobo,\
      '../demo/optimize.dat' u 1:2 with linespoints lw 2 pt 7 ps 0.3 lc rgb "black"
 #
+# 2D heat map from an array of in-line data
+#
+reset
+set output 'figure_heatmap.pdf'
+set title "2D Heat map from in-line array of values" offset 0,-1
+unset key
+set bmargin 1
+set tmargin 3
+set tics scale 0
+unset cbtics
+unset xtics
+set xrange  [-0.5:4.5]
+set x2range [-0.5:4.5]
+set yrange  [-0.5:3.5] reverse
+set x2tics 0,1
+set ytics  0,1
+set palette rgbformula -3,-3,-3
+plot '-' matrix with image
+5 4 3 1 0
+2 2 0 0 1
+0 0 0 1 0
+0 1 2 4 3
+e
+e
+
+#
 # 3D Plot styles
 # ==============
 #

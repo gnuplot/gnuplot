@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.557 2009/02/03 22:26:19 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.558 2009/02/04 17:18:59 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2876,13 +2876,24 @@ Ffigure_histcols
 ?image
 ?rgbimage
 ?rgbalpha
- The `image`, `rgbimage`, and `rgbalpha` plotting styles all project an input 2D
- image onto either a 2D or 3D plot.  It is assumed that the image data forms an
- equidistant sampling grid in the viewing plane along two, not necessarily
- orthogonal, directions.  In other words, each group of four adjacent points is
- assumed to form a uniformly sized parallelogram.  The paralleogram is painted
- using the color of the corresponding pixel in the input image.
- 
+ The `image`, `rgbimage`, and `rgbalpha` plotting styles all project a
+ uniformly sampled grid of data values onto a plane  in either a 2D or 3D.
+ The input data may be an actual bitmapped image, perhaps converted from a
+ standard format such as PNG, or a simple array of numerical values.
+
+=heatmap
+Ffigure_heatmap.pdf
+ This figure illustrates generation of a heat map from an array of scalar values.
+ The current palette is used to map each value onto the color assigned to the
+ corresponding pixel.
+       plot '-' matrix with image
+       5 4 3 1 0
+       2 2 0 0 1
+       0 0 0 1 0
+       0 1 2 4 3
+       e
+       e
+
 Ffigure_rgb3D.pdf
  Each pixel (data point) of the input 2D image will become a rectangle or
  parallelipiped in the plot. The coordinates of each data point will determine

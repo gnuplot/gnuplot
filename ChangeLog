@@ -1,3 +1,8 @@
+2009-02-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/plotstyles.gnu:  Add a figure showing the use
+	of image mode to create a heat map. Add a "heatmap" entry to the index.
+
 2009-02-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw: Use $(CC) instead of gcc to compile pgnuplot.
