@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.181 2008/11/07 11:55:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.182 2008/12/12 21:06:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1550,20 +1550,27 @@ termcomp(const generic *arga, const generic *argb)
  * will change 'term' variable if successful
  */
 struct termentry *
-set_term(int c_token_arg)
+set_term()
 {
     struct termentry *t = NULL;
-    char *input_name;
+    char *input_name = NULL;
 
-    if (!token[c_token_arg].is_token)
-	int_error(c_token_arg, "terminal name expected");
-    input_name = gp_input_line + token[c_token_arg].start_index;
-    t = change_term(input_name, token[c_token_arg].length);
+    if (!END_OF_COMMAND) {
+	if (isstringvalue(c_token)) {
+	    input_name = try_to_get_string();  /* Cannot fail if isstringvalue succeeded */
+	    t = change_term(input_name, strlen(input_name));
+	    free(input_name);
+	} else {
+	    input_name = gp_input_line + token[c_token].start_index;
+    	    t = change_term(input_name, token[c_token].length);
+    	    c_token++;
+	}
+    }
+
     if (!t)
-	int_error(c_token_arg, "unknown or ambiguous terminal type; type just 'set terminal' for a list");
+	int_error(c_token-1, "unknown or ambiguous terminal type; type just 'set terminal' for a list");
 
     /* otherwise the type was changed */
-
     return (t);
 }
 

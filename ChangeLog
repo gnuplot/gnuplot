@@ -1,3 +1,9 @@
+2009-02-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/term.c (set_term) set.c (set_terminal):
+	Allow a string variable containing the requested terminal type.
+	E.g.  screen = 'x11';  set term screen
+
 2009-02-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	SF Patch #2570385: GPVAL_TERM_WINDOWID
