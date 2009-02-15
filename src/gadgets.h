@@ -417,6 +417,9 @@ extern int refresh_nplots;
 #endif
 extern TBOOLEAN volatile_data;
 
+/* WINDOWID to be filled by terminals running on X11 (x11, wxt, qt, ...) */
+extern int current_x11_windowid;
+
 /* Plot layer definitions are collected here. */
 /* Someday they might actually be used.       */
 #define LAYER_BEHIND     -1

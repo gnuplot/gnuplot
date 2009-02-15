@@ -1,3 +1,22 @@
+2009-02-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	SF Patch #2570385: GPVAL_TERM_WINDOWID
+	This patch adds automatic variable GPVAL_NAME_WINDOWID, which
+	contains ID of the current window running under X11 (e.g. x11 and wxt
+	terminals).
+
+	* src/eval.c (update_gpval_variables): Update GPVAL_TERM_WINDOWID.
+
+	* src/gadgets.h src/gadgets.c: New global variable current_x11_windowid
+	to be filled by terminals running on X11 (x11, wxt, qt, ...).
+
+	* src/mouse.c (do_event): Set global current_x11_windowid from ge->winid
+	and call update_gpval_variables() to update GPVAL_TERM_WINDOWID.
+
+	* src/gplt_x11.c (gp_execute_GE_plotdone): New routine to replace direct
+	call of gp_exec_event(GE_plotdone, ..., {0|X11 Window ID}) to notify
+	gnuplot of changed X11 Window ID.
+
 2009-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/plotstyles.gnu:  Add a figure showing the use

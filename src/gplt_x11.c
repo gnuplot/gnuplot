@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.190 2009/01/14 10:29:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.191 2009/01/15 04:55:50 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -424,6 +424,8 @@ static void mainloop __PROTO((void));
 static void display __PROTO((plot_struct *));
 static void UpdateWindow __PROTO((plot_struct *));
 #ifdef USE_MOUSE
+static void gp_execute_GE_plotdone __PROTO((int windowid));
+
 static int ErrorHandler __PROTO((Display *, XErrorEvent *));
 static void DrawRuler __PROTO((plot_struct *));
 static void EventuallyDrawMouseAddOns __PROTO((plot_struct *));
@@ -1522,7 +1524,7 @@ record()
 		display(plot);
 #ifdef USE_MOUSE
 	    if (current_plot)
-		gp_exec_event(GE_plotdone, 0, 0, 0, 0, 0);	/* notify main program */
+		gp_execute_GE_plotdone(plot->window); /* notify main program */
 #endif
 	    return 1;
 	case 'R':		/* leave x11 mode */
@@ -3713,6 +3715,19 @@ PaletteSetColor(plot_struct * plot, double gray)
 
 #ifdef USE_MOUSE
 
+/* Notify main program, send windowid for GPVAL_TERM_WINDOWID if it has been changed. */
+static void
+gp_execute_GE_plotdone (int windowid)
+{
+    static last_window_id = -1;
+    if (windowid == last_window_id)
+	gp_exec_event(GE_plotdone, 0, 0, 0, 0, 0);
+    else {
+	gp_exec_event(GE_plotdone, 0, 0, 0, 0, windowid);
+	last_window_id = windowid;
+    }
+}
+
 static int
 ErrorHandler(Display * display, XErrorEvent * error_event)
 {
@@ -5896,9 +5911,11 @@ pr_window(plot_struct *plot)
 	plot->width = gattr.width;
 	plot->height = gattr.height;
 	plot->gheight = gattr.height;
-	if (!plot->window)
+	if (!plot->window) {
 	    plot->window = XCreateWindow(dpy, plot->external_container, plot->x, plot->y, plot->width,
 					 plot->height, 0, dep, InputOutput, vis, 0, NULL);
+		gp_execute_GE_plotdone(plot->window); /* notify main program, send WINDOWID */
+	}
     }
 #endif /* EXTERNAL_X11_WINDOW */
 
@@ -5908,17 +5925,22 @@ pr_window(plot_struct *plot)
 	attr.background_pixel = plot->cmap->colors[0];
 	attr.border_pixel = plot->cmap->colors[1];
 	attr.colormap = plot->cmap->colormap;
-	if (!plot->window)
+	if (!plot->window) {
 	    plot->window = XCreateWindow(dpy, root, plot->x, plot->y, plot->width,
 					 plot->height, BorderWidth, dep, InputOutput, vis, mask, &attr);
+		gp_execute_GE_plotdone(plot->window); /* notify main program, send WINDOWID */
+	}
 	else
 	    XChangeWindowAttributes(dpy, plot->window, mask, &attr);
     } else
 #ifdef EXTERNAL_X11_WINDOW
     if (!plot->window)
 #endif
+	{
 	plot->window = XCreateSimpleWindow(dpy, root, plot->x, plot->y, plot->width, plot->height,
 					   BorderWidth, plot->cmap->colors[1], plot->cmap->colors[0]);
+		gp_execute_GE_plotdone(plot->window); /* notify main program, send WINDOWID */
+	}
 
     /* Return if something wrong. */
     if (plot->window == None)

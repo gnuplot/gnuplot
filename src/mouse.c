@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.112 2009/01/14 10:28:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.113 2009/02/02 21:29:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1844,6 +1844,10 @@ do_event(struct gp_event_t *ge)
     switch (ge->type) {
     case GE_plotdone:
 	event_plotdone();
+	if (ge->winid) {
+	    current_x11_windowid = ge->winid;
+	    update_gpval_variables(6); /* fill GPVAL_TERM_WINDOWID */
+	}
 	break;
     case GE_keypress:
 	event_keypress(ge, TRUE);

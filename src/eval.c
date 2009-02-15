@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.72 2009/02/03 22:26:19 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.73 2009/02/05 17:12:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -800,6 +800,7 @@ update_plot_bounds(void)
  * 3: program entry
  * 4: explicit reset of error status
  * 5: directory changed
+ * 6: X11 Window ID changed
  */
 void
 update_gpval_variables(int context)
@@ -888,6 +889,10 @@ update_gpval_variables(int context)
 	    fill_gpval_string("GPVAL_PWD", save_file);
 	    free(save_file);
 	}
+    }
+
+    if (context == 6) {
+	fill_gpval_integer("GPVAL_TERM_WINDOWID", current_x11_windowid);
     }
 }
 
