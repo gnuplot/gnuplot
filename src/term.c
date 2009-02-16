@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.182 2008/12/12 21:06:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.183 2009/02/16 07:37:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1556,13 +1556,13 @@ set_term()
     char *input_name = NULL;
 
     if (!END_OF_COMMAND) {
-	if (isstringvalue(c_token)) {
+	input_name = gp_input_line + token[c_token].start_index;
+    	t = change_term(input_name, token[c_token].length);
+	if (!t && isstringvalue(c_token)) {
 	    input_name = try_to_get_string();  /* Cannot fail if isstringvalue succeeded */
 	    t = change_term(input_name, strlen(input_name));
 	    free(input_name);
 	} else {
-	    input_name = gp_input_line + token[c_token].start_index;
-    	    t = change_term(input_name, token[c_token].length);
     	    c_token++;
 	}
     }
