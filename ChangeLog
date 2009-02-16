@@ -1,3 +1,8 @@
+2009-02-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/titlepag.tex docs/gnuplot.doc term/cgm.trm:
+	Remove duplicate keyword entries. Label pdf docs as version 4.2.5.
+
 2009-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/all.dem demo/heatmaps.dem:  Add heat maps to demo set.

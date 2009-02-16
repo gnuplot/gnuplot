@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.48 2008/12/08 17:22:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.49 2008/12/15 03:44:22 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8556,7 +8556,6 @@ C ... and restart the table:
 ?show style line
 ?linestyle
 ?linewidth
-^ <a name="linewidth"></a>
  Each terminal has a default set of line and point types, which can be seen
  by using the command `test`.  `set style line` defines a set of line types
  and widths and point types and sizes so that you can refer to them later by
