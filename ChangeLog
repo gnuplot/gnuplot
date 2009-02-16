@@ -1,7 +1,7 @@
 2009-02-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/titlepag.tex docs/gnuplot.doc term/cgm.trm:
-	Remove duplicate keyword entries. Label pdf docs as version 4.2.5.
+	Remove duplicate keyword entries. Put version number on title page.
 
 2009-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
