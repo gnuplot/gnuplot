@@ -1,3 +1,10 @@
+2009-02-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c:  Make variable definition comply with C standard.
+
+	* docs/gnuplot.doc docs/titlepag.tex term/cgm.trm term/canvas.trm:
+	Resolve duplicate index entries.  Add current version to title.
+
 2009-02-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/term.c (set_term) set.c (set_terminal):

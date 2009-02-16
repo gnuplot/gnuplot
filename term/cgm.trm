@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.89 2008/03/03 21:38:18 sfeam Exp $
+ * $Id: cgm.trm,v 1.90 2008/11/15 19:38:55 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1775,7 +1775,7 @@ START_HELP(cgm)
 "       set terminal cgm portrait \"Times Italic\" 12",
 "       set terminal cgm color solid      # no pesky dashes!",
 
-"2 font",
+"2 cgm font",
 "?commands set terminal cgm font",
 "?set terminal cgm font",
 "?set term cgm font",
@@ -1927,7 +1927,7 @@ START_HELP(cgm)
 "",
 " You cannot introduce a new font in a `set label` command.",
 
-"2 fontsize",
+"2 cgm fontsize",
 "?commands set terminal cgm fontsize",
 "?set terminal cgm fontsize",
 "?set term cgm fontsize",
@@ -1938,7 +1938,7 @@ START_HELP(cgm)
 " scaled up or down accordingly.  To change the assumed width, use the",
 " `width` option.",
 
-"2 linewidth",
+"2 cgm linewidth",
 "?commands set terminal cgm linewidth",
 "?set terminal cgm linewidth",
 "?set term cgm linewidth",
@@ -1947,7 +1947,7 @@ START_HELP(cgm)
 " is 1 pt.  Scaling is affected by the actual width of the page, as",
 " discussed under the `fontsize` and `width` options.",
 
-"2 rotate",
+"2 cgm rotate",
 "?commands set terminal cgm rotate",
 "?set terminal cgm rotate",
 "?set term cgm rotate",
@@ -1961,7 +1961,7 @@ START_HELP(cgm)
 " but the page can be edited without damage.  The `rotate` option confirms",
 " the default behavior.",
 
-"2 solid",
+"2 cgm solid",
 "?set terminal cgm solid",
 "?set term cgm solid",
 "?cgm solid",
@@ -1971,7 +1971,7 @@ START_HELP(cgm)
 " confirms the default behavior, which gives a different dash pattern to",
 " each line type.",
 
-"2 size",
+"2 cgm size",
 "?commands set terminal cgm size",
 "?set terminal cgm size",
 "?set term cgm size",
@@ -1979,7 +1979,7 @@ START_HELP(cgm)
 " Default size of a CGM plot is 32599 units wide and 23457 units high for",
 " landscape, or 23457 units wide by 32599 units high for portrait.",
 
-"2 width",
+"2 cgm width",
 "?commands set terminal cgm width",
 "?set terminal cgm width",
 "?set term cgm width",
@@ -1998,7 +1998,7 @@ START_HELP(cgm)
 "       set terminal cgm width 6*72           # same as above",
 "       set terminal cgm width 10/2.54*72     # 10 cm wide",
 
-"2 nofontlist",
+"2 cgm nofontlist",
 "?commands set terminal cgm nofontlist",
 "?set terminal cgm nofontlist",
 "?set term cgm nofontlist",
