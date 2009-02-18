@@ -1,3 +1,9 @@
+2009-02-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c:  The iteration code was getting confused by 3D plots
+	that contain multiple data sets.  Do not assume that the Nth file
+	mentioned on the command line is the Nth data set.  Bugfix.
+
 2009-02-18  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* docs/gnuplot.doc:  Do not use an explicit extension in the names of

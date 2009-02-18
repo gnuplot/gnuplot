@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.34 2008/05/18 03:31:17 janert Exp $
+ * $Id: graph3d.h,v 1.35 2008/12/15 00:48:17 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -113,7 +113,7 @@ typedef struct surface_points {
     TBOOLEAN opt_out_of_contours; /* set by "nocontours" option to splot command */
     TBOOLEAN pm3d_color_from_column;
     int has_grid_topology;
-    int plot_num;		/* needed for tracking iteration */
+    int iteration;		/* needed for tracking iteration */
 
     /* Data files only - num of isolines read from file. For functions,  */
     /* num_iso_read is the number of 'primary' isolines (in x direction) */

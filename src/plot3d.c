@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.166 2008/09/30 04:55:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.167 2008/10/27 03:37:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1327,7 +1327,7 @@ eval_3dplots()
 
 		/* for capture to key */
 		this_plot->token = end_token = c_token - 1;
-		this_plot->plot_num = plot_num;
+		this_plot->iteration = iteration; /* FIXME: Is this really needed? */
 
 		/* this_plot->token is temporary, for errors in get_3ddata() */
 
@@ -1710,7 +1710,7 @@ eval_3dplots()
 		    df_return = get_3ddata(this_plot);
 		    /* for second pass */
 		    this_plot->token = c_token;
-		    this_plot->plot_num = plot_num;
+		    this_plot->iteration = iteration;
 
 		    if (this_plot->num_iso_read == 0)
 			this_plot->plot_type = NODATA;
@@ -1743,6 +1743,7 @@ eval_3dplots()
 
 		    this_plot->plot_type = DATA3D;
 		    this_plot->plot_style = this_style;
+		    this_plot->iteration = iteration;
 		    /* Struct copy */
 		    this_plot->lp_properties = *these_props;
 		} while (df_return != DF_EOF);
@@ -1753,7 +1754,7 @@ eval_3dplots()
 	    } else {		/* not a data file */
 		tp_3d_ptr = &(this_plot->next_sp);
 		this_plot->token = c_token;	/* store for second pass */
-		this_plot->plot_num = plot_num;
+		this_plot->iteration = iteration;
 	    }
 
 	    if (empty_iteration())
@@ -1929,13 +1930,14 @@ eval_3dplots()
 		/* we saved it from first pass */
 		c_token = this_plot->token;
 
-		/* one data file can make several plots */
-		i = this_plot->plot_num;
-		do
+		/* we may have seen this one data file in multiple iterations */
+		i = this_plot->iteration;
+		do {
 		    this_plot = this_plot->next_sp;
-		while (this_plot
+		} while (this_plot
 			&& this_plot->token == c_token
-			&& this_plot->plot_num == i);
+			&& this_plot->iteration == i
+			);
 
 	    }			/* !is_definition */
 
