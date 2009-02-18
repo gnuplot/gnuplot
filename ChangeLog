@@ -9,6 +9,8 @@
 	* docs/gnuplot.doc:  Do not use an explicit extension in the names of
 	figures to be processed by {pdf}latex.
 
+	* term/post.trm:  Add missing intializer to various #define statements.
+
 2009-02-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:  Make variable definition comply with C standard.
