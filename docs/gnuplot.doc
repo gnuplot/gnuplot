@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.559 2009/02/15 04:31:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.560 2009/02/16 22:08:47 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2882,7 +2882,7 @@ Ffigure_histcols
  standard format such as PNG, or a simple array of numerical values.
 
 =heatmap
-Ffigure_heatmap.pdf
+Ffigure_heatmap
  This figure illustrates generation of a heat map from an array of scalar values.
  The current palette is used to map each value onto the color assigned to the
  corresponding pixel.
@@ -2894,7 +2894,7 @@ Ffigure_heatmap.pdf
        e
        e
 
-Ffigure_rgb3D.pdf
+Ffigure_rgb3D
  Each pixel (data point) of the input 2D image will become a rectangle or
  parallelipiped in the plot. The coordinates of each data point will determine
  the center of the parallelipiped.  That is, an M x N set of data will form an
