@@ -1,3 +1,7 @@
+2009-02-19  Manfred Schwarb  <manfred99@gmx.ch>
+
+	* src/gpexecute.c:  Remove a broken DEBUG section.
+
 2009-02-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c:  The iteration code was getting confused by 3D plots

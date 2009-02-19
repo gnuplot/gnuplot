@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.14 2005/03/26 22:06:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.15 2007/06/21 21:19:12 tlecomte Exp $"); }
 #endif
 
 /* GNUPLOT - gpexecute.c */
@@ -222,12 +222,6 @@ gp_exec_event(char type, int mx, int my, int par1, int par2, int winid)
 #if defined(PIPE_IPC) /* || defined(WIN_IPC) */
     static struct gpe_fifo_t *base = (gpe_fifo_t *) 0;
 #endif
-
-#ifdef DEBUG
-    char s[127];
-    sprintf(s, "%%%c %d %d %d %d %d", type, mx, my, par1, par2, winid);
-    gp_execute(s);
-#endif /* DEBUG */
 
     ge.type = type;
     ge.mx = mx;
