@@ -1,3 +1,9 @@
+2009-02-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/js/canvastext.js:  Correct some incorrect glyphs, modify
+	slightly to allow non-ascii characters, and a few examples of non-ascii
+	glyphs.
+
 2008-02-19  Peter Hedwig  <peter@affenbande.org>
 
 	* term/lua/gnuplot-lua:  More forgiving regexp to catch the

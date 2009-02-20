@@ -1,6 +1,7 @@
 //
 // This code is released to the public domain by Jim Studt, 2007.
 // He may keep some sort of up to date copy at http://www.federated.com/~jim/canvastext/
+// Modified by Ethan A Merritt (EAM) 2009 to work in non-ascii environments
 //
 var CanvasTextFunctions = { };
 
@@ -32,7 +33,7 @@ CanvasTextFunctions.letters = {
     '8': { width: 20, points: [[8,21],[5,20],[4,18],[4,16],[5,14],[7,13],[11,12],[14,11],[16,9],[17,7],[17,4],[16,2],[15,1],[12,0],[8,0],[5,1],[4,2],[3,4],[3,7],[4,9],[6,11],[9,12],[13,13],[15,14],[16,16],[16,18],[15,20],[12,21],[8,21]] },
     '9': { width: 20, points: [[16,14],[15,11],[13,9],[10,8],[9,8],[6,9],[4,11],[3,14],[3,15],[4,18],[6,20],[9,21],[10,21],[13,20],[15,18],[16,14],[16,9],[15,4],[13,1],[10,0],[8,0],[5,1],[4,3]] },
     ':': { width: 10, points: [[5,14],[4,13],[5,12],[6,13],[5,14],[-1,-1],[5,2],[4,1],[5,0],[6,1],[5,2]] },
-    ',': { width: 10, points: [[5,14],[4,13],[5,12],[6,13],[5,14],[-1,-1],[6,1],[5,0],[4,1],[5,2],[6,1],[6,-1],[5,-3],[4,-4]] },
+    ';': { width: 10, points: [[5,14],[4,13],[5,12],[6,13],[5,14],[-1,-1],[6,1],[5,0],[4,1],[5,2],[6,1],[6,-1],[5,-3],[4,-4]] },
     '<': { width: 24, points: [[20,18],[4,9],[20,0]] },
     '=': { width: 26, points: [[4,12],[22,12],[-1,-1],[4,6],[22,6]] },
     '>': { width: 24, points: [[4,18],[20,9],[4,0]] },
@@ -67,7 +68,7 @@ CanvasTextFunctions.letters = {
     '[': { width: 14, points: [[4,25],[4,-7],[-1,-1],[5,25],[5,-7],[-1,-1],[4,25],[11,25],[-1,-1],[4,-7],[11,-7]] },
     '\\': { width: 14, points: [[0,21],[14,-3]] },
     ']': { width: 14, points: [[9,25],[9,-7],[-1,-1],[10,25],[10,-7],[-1,-1],[3,25],[10,25],[-1,-1],[3,-7],[10,-7]] },
-    '^': { width: 16, points: [[6,15],[8,18],[10,15],[-1,-1],[3,12],[8,17],[13,12],[-1,-1],[8,17],[8,0]] },
+    '^': { width: 16, points: [[5,15],[8,19],[11,15],[-1,-1],[2,12],[8,18],[14,12]] },
     '_': { width: 16, points: [[0,-2],[16,-2]] },
     '`': { width: 10, points: [[6,21],[5,20],[4,18],[4,16],[5,15],[6,16],[5,17]] },
     'a': { width: 19, points: [[15,14],[15,0],[-1,-1],[15,11],[13,13],[11,14],[8,14],[6,13],[4,11],[3,8],[3,6],[4,3],[6,1],[8,0],[11,0],[13,1],[15,3]] },
@@ -99,12 +100,24 @@ CanvasTextFunctions.letters = {
     '{': { width: 14, points: [[9,25],[7,24],[6,23],[5,21],[5,19],[6,17],[7,16],[8,14],[8,12],[6,10],[-1,-1],[7,24],[6,22],[6,20],[7,18],[8,17],[9,15],[9,13],[8,11],[4,9],[8,7],[9,5],[9,3],[8,1],[7,0],[6,-2],[6,-4],[7,-6],[-1,-1],[6,8],[8,6],[8,4],[7,2],[6,1],[5,-1],[5,-3],[6,-5],[7,-6],[9,-7]] },
     '|': { width: 8, points: [[4,25],[4,-7]] },
     '}': { width: 14, points: [[5,25],[7,24],[8,23],[9,21],[9,19],[8,17],[7,16],[6,14],[6,12],[8,10],[-1,-1],[7,24],[8,22],[8,20],[7,18],[6,17],[5,15],[5,13],[6,11],[10,9],[6,7],[5,5],[5,3],[6,1],[7,0],[8,-2],[8,-4],[7,-6],[-1,-1],[8,8],[6,6],[6,4],[7,2],[8,1],[9,-1],[9,-3],[8,-5],[7,-6],[5,-7]] },
-    '~': { width: 24, points: [[3,6],[3,8],[4,11],[6,12],[8,12],[10,11],[14,8],[16,7],[18,7],[20,8],[21,10],[-1,-1],[3,8],[4,10],[6,11],[8,11],[10,10],[14,7],[16,6],[18,6],[20,7],[21,10],[21,12]] }
+    '~': { width: 24, points: [[3,6],[3,8],[4,11],[6,12],[8,12],[10,11],[14,8],[16,7],[18,7],[20,8],[21,10],[-1,-1],[3,8],[4,10],[6,11],[8,11],[10,10],[14,7],[16,6],[18,6],[20,7],[21,10],[21,12]] },
+
+// Miscellaneous glyphs (EAM)
+129: { width: 18, points: [[2,-2],[2,21],[16,21],[16,-2],[2,-2]] },
+176: { width: 8, points: [[3,22],[1,20],[1,18],[3,16],[5,16],[7,18],[7,20],[5,22],[3,22]]},
+197: { width: 18, points: [[9,18],[1,0],[-1,-1],[9,18],[17,0],[-1,-1],[4,7],[14,7],[-1,-1], [8,22],[6,20],[6,18],[8,16],[10,16],[12,18],[12,20],[10,22],[8,22]]},
+215: { width: 26, points: [[6,17],[20,3],[-1,-1],[6,3],[20,17]] }
 };
 
 CanvasTextFunctions.letter = function (ch)
 {
-    return CanvasTextFunctions.letters[ch];
+    glyph = CanvasTextFunctions.letters[ch];
+
+    // EAM - Draw an empty box for undefined glyphs
+    if (glyph == undefined)
+	glyph = CanvasTextFunctions.letters[129];
+
+    return glyph;
 }
 
 CanvasTextFunctions.ascent = function( font, size)
@@ -123,8 +136,13 @@ CanvasTextFunctions.measure = function( font, size, str)
     var len = str.length;
 
     for ( i = 0; i < len; i++) {
-	var c = CanvasTextFunctions.letter( str.charAt(i));
-	if ( c) total += c.width * size / 25.0;
+        var index = str.charAt(i);
+	// EAM deal with non-ascii characaters
+	if (index > '~')
+	    index = str.charCodeAt(i);
+
+	var c = CanvasTextFunctions.letter(index);
+	if (c) total += c.width * size / 25.0;
     }
     return total;
 }
@@ -140,7 +158,12 @@ CanvasTextFunctions.draw = function(ctx,font,size,x,y,str)
     ctx.lineWidth = 2.0 * mag;
 
     for ( i = 0; i < len; i++) {
-	var c = CanvasTextFunctions.letter( str.charAt(i));
+        var index = str.charAt(i);
+	// EAM deal with non-ascii characaters
+	if (index > '~')
+	    index = str.charCodeAt(i);
+
+	var c = CanvasTextFunctions.letter(index);
 	if ( !c) continue;
 
 	ctx.beginPath();
