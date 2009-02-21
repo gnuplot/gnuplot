@@ -30,7 +30,7 @@ set label 5 "Space-holders:" tc lt 3
 set label 6 at -0.45, 0.6 
 set label 6 "<&{{/=20 B}ig}> <&{x@_0^{-3/2}y}> holds space for"
 set label 7 at -0.45, 0.5 
-set label 7 "<{/=20 B}ig> <x@_0^{-3/2}y>"
+set label 7 "<{{/=20 B}ig}> <{x@_0^{-3/2}y}>"
 
 set label 8 at -0.9, -0.2
 set label 8 "Overprint\n(v should be centred over d)" tc lt 3

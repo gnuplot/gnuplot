@@ -12,6 +12,10 @@
 	symbols.  The additional glyphs are all indexed by their Unicode code
 	points.  If embedded in a UTF-8 document, everything works as it should.
 
+	* demo/approximate.dem demo/enhanced_utf8.dem:
+	Add {} to help terminals having trouble with character placement of
+	superscripts.
+
 2009-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/canvastext.js:  Correct some glyphs, modify slightly to allow
