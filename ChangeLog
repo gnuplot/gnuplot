@@ -1,12 +1,11 @@
 2009-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/js/canvastext.js:  Correct some incorrect glyphs, modify
-	slightly to allow non-ascii characters, and a few examples of non-ascii
-	glyphs.
+	* term/js/canvastext.js:  Correct some glyphs, modify slightly to allow
+	non-ascii characters, and add a few examples of non-ascii glyphs.
 
 2008-02-19  Peter Hedwig  <peter@affenbande.org>
 
-	* term/lua/gnuplot-lua:  More forgiving regexp to catch the
+	* term/lua/gnuplot.lua:  More forgiving regexp to catch the
 	version/date string.
 
 2009-02-19  Manfred Schwarb  <manfred99@gmx.ch>
@@ -31,7 +30,7 @@
 	* src/gplt_x11.c:  Make variable definition comply with C standard.
 
 	* docs/gnuplot.doc docs/titlepag.tex term/cgm.trm term/canvas.trm:
-	Resolve duplicate index entries.  Add current version to title.
+	Reconcile duplicate index entries.  Add current version to title.
 
 2009-02-15  Ethan A Merritt  <merritt@u.washington.edu>
 
