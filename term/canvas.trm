@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.10 2009/02/04 06:55:13 sfeam Exp $
+ * $Id: canvas.trm,v 1.11 2009/02/16 22:08:47 sfeam Exp $
  *
  */
 
@@ -264,15 +264,19 @@ CANVAS_graphics()
 		"<html>\n"
 		"<head>\n"
 		"<title>Gnuplot Canvas Graph</title>\n"
+		);
+	if (encoding == S_ENC_UTF8)
+	    fprintf(gpoutfile,
+		"<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n"
+	    );
+	fprintf(gpoutfile,
 		"<!--[if IE]><script type=\"text/javascript\" src=\"excanvas.js\"></script><![endif]-->\n"
 		"<script src=\"%scanvastext.js\"></script>\n"
-		, CANVAS_scriptdir
-	);
+		, CANVAS_scriptdir);
 	if (CANVAS_mouseable)
 	    fprintf(gpoutfile,
 		"<script src=\"%sgnuplot_mouse.js\"></script>\n"
-		, CANVAS_scriptdir
-	    );
+		, CANVAS_scriptdir);
 	fprintf(gpoutfile,
 		"<script type=\"text/javascript\">\n"
 		"var canvas, ctx;\n"

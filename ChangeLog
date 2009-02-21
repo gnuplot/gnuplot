@@ -1,3 +1,7 @@
+2009-02-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm:  Specify UTF-8 encoding in HTML header.
+
 2009-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/canvastext.js:  Correct some glyphs, modify slightly to allow
