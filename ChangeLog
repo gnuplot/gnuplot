@@ -1,3 +1,11 @@
+2009-02-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm: Add support for enhanced text mode.
+
+	* term/js/canvasmath.js:
+	Resize glyphs for - + / ×  so that they are all width 20 (same as 0-9).
+	Resize glyph = to width 24 (same as < > ~).
+
 2009-02-22  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* src/mouse.c:  Fix broken FPRINTF debugging statements.

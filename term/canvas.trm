@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.11 2009/02/16 22:08:47 sfeam Exp $
+ * $Id: canvas.trm,v 1.12 2009/02/21 18:57:30 sfeam Exp $
  *
  */
 
@@ -21,6 +21,10 @@
  *	CANVAS_point(), CANVAS_pointsize()
  *	"name <foo>" option to create only a callable javascript file foo.js
  *	"fsize <F>" option to select font size (default remains 10.0)
+ *   Ethan A Merritt, Feb 2009
+ *	Enhanced text support. Note: character placement could be done more
+ *	precisely by moving the enhanced text code into the javascript routines,
+ *	where exact character widths are known, and save/restore can be used.
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -55,6 +59,10 @@ TERM_PUBLIC int CANVAS_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void CANVAS_layer __PROTO((t_termlayer));
 TERM_PUBLIC void CANVAS_path __PROTO((int));
 
+TERM_PUBLIC void ENHCANVAS_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
+TERM_PUBLIC void ENHCANVAS_FLUSH __PROTO((void));
+TERM_PUBLIC void ENHCANVAS_put_text __PROTO((unsigned int, unsigned int, const char *));
+
 #define CANVAS_XMAX 600 
 #define CANVAS_YMAX 400
 #define CANVASVCHAR		10
@@ -88,7 +96,7 @@ static char *CANVAS_scriptdir = NULL;
 
 enum CANVAS_case {
     CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, 
-    CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_OTHER
+    CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_ENH, CANVAS_NOENH, CANVAS_OTHER
 };
 
 static struct gen_table CANVAS_opts[] =
@@ -100,6 +108,8 @@ static struct gen_table CANVAS_opts[] =
     { "mous$ing", CANVAS_MOUSING },
     { "mouse", CANVAS_MOUSING },
     { "js$dir", CANVAS_JSDIR },
+    { "enh$anced", CANVAS_ENH },
+    { "noenh$anced", CANVAS_NOENH },
     { NULL, CANVAS_OTHER }
 };
 
@@ -129,15 +139,19 @@ CANVAS_finish (void)
 TERM_PUBLIC void
 CANVAS_options()
 {
-    /* Re-initialize a few things */
-    canvas_line_type = LT_UNDEFINED;
-    canvas_font_size = CANVASVCHAR;
-    CANVAS_standalone = TRUE;
-    CANVAS_mouseable = FALSE;
-    free(CANVAS_name);
-    CANVAS_name = NULL;
-    free(CANVAS_scriptdir);
-    CANVAS_scriptdir = NULL;
+    /* (c_token == 2) only in the case of 'set termoption'	*/
+    /* which is after we have already initialized everything.	*/
+    if (c_token != 2) {
+	/* Re-initialize a few things */
+	canvas_line_type = LT_UNDEFINED;
+	canvas_font_size = CANVASVCHAR;
+	CANVAS_standalone = TRUE;
+	CANVAS_mouseable = FALSE;
+	free(CANVAS_name);
+	CANVAS_name = NULL;
+	free(CANVAS_scriptdir);
+	CANVAS_scriptdir = NULL;
+    }
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&CANVAS_opts[0],c_token++)) {
@@ -188,6 +202,16 @@ CANVAS_options()
 	    CANVAS_scriptdir = try_to_get_string();
 	    break;
 
+	case CANVAS_ENH:
+	    term->put_text = ENHCANVAS_put_text;
+	    term->flags |= TERM_ENHANCED_TEXT;
+	    break;
+
+	case CANVAS_NOENH:
+	    term->put_text = CANVAS_put_text;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
+	    break;
+
 	default:
 	    int_warn(c_token-1,"unrecognized terminal option");
  	    break;
@@ -198,7 +222,9 @@ CANVAS_options()
     term->h_char = canvas_font_size * 0.8;
 
     sprintf(term_options, "size %d,%d", canvas_xmax, canvas_ymax);
-    sprintf(term_options + strlen(term_options), " fsize %g", canvas_font_size);
+    sprintf(term_options + strlen(term_options), "%s fsize %g", 
+	term->put_text == ENHCANVAS_put_text ? " enhanced" : "",
+	canvas_font_size);
     if (CANVAS_name)
 	sprintf(term_options + strlen(term_options), " name \"%s\"", CANVAS_name);
     else {
@@ -738,6 +764,179 @@ CANVAS_path(int p)
     }
 }
 
+/* Enhanced text mode support starts here */
+
+static double ENHCANVAS_base = 0.0;
+static double ENHCANVAS_fontsize = 0;
+static TBOOLEAN ENHCANVAS_opened_string = FALSE;
+static TBOOLEAN ENHCANVAS_show = TRUE;
+static TBOOLEAN ENHCANVAS_sizeonly = FALSE;
+static TBOOLEAN ENHCANVAS_widthflag = TRUE;
+static TBOOLEAN ENHCANVAS_overprint = FALSE;
+
+TERM_PUBLIC void
+ENHCANVAS_OPEN(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag,
+    int overprint)
+{
+    static int save_x, save_y;
+    /* overprint = 1 means print the base text (leave position in center)
+     * overprint = 2 means print the overlying text
+     * overprint = 3 means save current position
+     * overprint = 4 means restore saved position
+     */
+    if (overprint == 3) {
+	save_x = canvas_x;
+	save_y = canvas_y;
+	return;
+    }
+    if (overprint == 4) {
+	canvas_x = save_x;
+	canvas_y = save_y;
+	return;
+    }
+
+    if (!ENHCANVAS_opened_string) {
+	ENHCANVAS_opened_string = TRUE;
+	enhanced_cur_text = &enhanced_text[0];
+	ENHCANVAS_fontsize = fontsize;
+	ENHCANVAS_base = base;
+	ENHCANVAS_show = showflag;
+	ENHCANVAS_widthflag = widthflag;
+	ENHCANVAS_overprint = overprint;
+    }
+}
+
+/*
+ * Since we only have the one font, and the character widths are known,
+ * we can go to the trouble of actually counting character widths.
+ * As it happens, the averages width of ascii characters is 20.
+ */
+static int utf8strlen(char *s)
+{
+    int width = 0;
+    char *end = s + strlen(s);
+
+    while (*s) {
+	if ((*s & 0x80) == 0) {
+		if      (strchr("iIl|", *s)) width += 8;
+		else if (strchr("j`',;:!.", *s)) width += 10;
+		else if (strchr("ftr", *s)) width += 12;
+		else if (strchr("()[]{}\\", *s)) width += 14;
+		else if (strchr(" JTv^_\"*ykLsxz", *s)) width += 16;
+		else if (strchr("AceFV?abdEghnopqu", *s)) width += 18;
+		else if (strchr("M~<>%W=&@", *s)) width += 24;
+		else if (strchr("m", *s)) width += 30;
+		else width += 20;
+		s++;
+		continue;
+	}
+	else if (encoding != S_ENC_UTF8) s++;
+	else if ((*s & 0xE0) == 0xC0) s += 2;
+	else if ((*s & 0xF0) == 0xE0) s += 3;
+	else s += 4; 
+	width += 18;	/* Assumed average width for UTF8 characters */
+	if (s > end) break;
+    }
+    return (width);
+}
+
+TERM_PUBLIC void
+ENHCANVAS_FLUSH()
+{
+    if (ENHCANVAS_opened_string) {
+	ENHCANVAS_opened_string = FALSE;
+	*enhanced_cur_text = '\0';
+
+	/* DEBUG - not working yet */
+	if (1) {
+		double save_fontsize = canvas_font_size;
+		int x = canvas_x;
+		int y = canvas_y;
+		double w = utf8strlen(enhanced_text) * ENHCANVAS_fontsize/25.;
+
+		canvas_font_size = ENHCANVAS_fontsize;
+		x -= sin((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
+		y += cos((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
+		if (ENHCANVAS_show && !ENHCANVAS_sizeonly)
+			CANVAS_put_text(x, y, enhanced_text);
+
+		if (ENHCANVAS_overprint == 1) {
+		    canvas_x += w * cos((double)canvas_text_angle * M_PI_2/90.)/2;
+		    canvas_y -= w * sin((double)canvas_text_angle * M_PI_2/90.)/2;
+		} else if (ENHCANVAS_widthflag) {
+		    canvas_x += w * cos((double)canvas_text_angle * M_PI_2/90.);
+		    canvas_y -= w * sin((double)canvas_text_angle * M_PI_2/90.);
+		}
+		canvas_font_size = save_fontsize;
+	}
+    }
+}
+
+TERM_PUBLIC void
+ENHCANVAS_put_text(unsigned int x, unsigned int y, const char *str)
+{
+    char *original_string = (char *)str;
+
+    /* Save starting font properties */
+    double fontsize = canvas_font_size;
+    char *fontname = "";
+
+    if (!strlen(str))
+	return;
+
+    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+	CANVAS_put_text(x, y, str);
+	return;
+    }
+
+    CANVAS_move(x,y);
+
+    /* Set up global variables needed by enhanced_recursion() */
+    enhanced_fontscale = 1.0;
+    strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
+    ENHCANVAS_opened_string = FALSE;
+    ENHCANVAS_fontsize = canvas_font_size;
+    if (!strcmp(canvas_justify,"Right") || !strcmp(canvas_justify,"Center"))
+	ENHCANVAS_sizeonly = TRUE;
+
+    while (*(str = enhanced_recursion((char *)str, TRUE,
+			fontname, fontsize, 0.0, TRUE, TRUE, 0))) {
+	(term->enhanced_flush)();
+	enh_err_check(str);
+	if (!*++str)
+	    break; /* end of string */
+    }
+
+    /* We can do text justification by running the entire top level string */
+    /* through 2 times, with the ENHgd_sizeonly flag set the first time.   */
+    /* After seeing where the final position is, we then offset the start  */
+    /* point accordingly and run it again without the flag set.            */
+    if (!strcmp(canvas_justify,"Right") || !strcmp(canvas_justify,"Center")) {
+	char *justification = canvas_justify;
+	int x_offset = canvas_x - x;
+	int y_offset = (canvas_text_angle == 0) ? 0 : canvas_y - y;
+
+	canvas_justify = "";
+	ENHCANVAS_sizeonly = FALSE;
+
+	if (!strcmp(justification,"Right")) {
+	    ENHCANVAS_put_text(x - x_offset, y - y_offset, original_string);
+	} else if (!strcmp(justification,"Center")) {
+	    ENHCANVAS_put_text(x - x_offset/2, y - y_offset/2, original_string);
+	}
+	canvas_justify = justification;
+    }
+
+    /* Make sure we leave with the same font properties as on entry */
+	canvas_font_size = fontsize;
+	ENHCANVAS_base = 0;
+
+    return;
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -747,7 +946,8 @@ TERM_TABLE_START(canvas_driver)
     CANVASVTIC, CANVASHTIC, CANVAS_options, CANVAS_init, CANVAS_reset,
     CANVAS_text, null_scale, CANVAS_graphics, CANVAS_move, CANVAS_vector,
     CANVAS_linetype, CANVAS_put_text, CANVAS_text_angle,
-    CANVAS_justify_text, CANVAS_point, do_arrow, set_font_null,
+    CANVAS_justify_text, CANVAS_point, do_arrow, 
+    set_font_null,
     CANVAS_pointsize,
     TERM_CAN_MULTIPLOT|TERM_ALPHA_CHANNEL,
     NULL, NULL, CANVAS_fillbox, CANVAS_linewidth
@@ -759,7 +959,7 @@ TERM_TABLE_START(canvas_driver)
 #ifdef WITH_IMAGE
     , NULL
 #endif
-    , NULL, NULL, NULL	/* enhanced text */
+    , ENHCANVAS_OPEN, ENHCANVAS_FLUSH, do_enh_writec
     , CANVAS_layer
     , CANVAS_path		/* path */
 TERM_TABLE_END(canvas_driver)
@@ -786,8 +986,10 @@ START_HELP(canvas)
 "",
 " where <xsize> and <ysize> set the size of the plot area in pixels.",
 " The default size in standalone mode is 600 by 400 pixels.",
-" The default font size is 10.  NB: Only one font is available,",
-" the one loaded from canvastext.js ",
+" The default font size is 10.  NB: Only one font is available, the ascii",
+" portion of Hershey simplex Roman provided in the file canvastext.js.",
+" You can replace this with the file canvasmath.js, which contains also",
+" UTF-8 encoded Hershey simplex Greek and math symbols.",
 "",
 " The default `standalone` mode creates an html page containing javascript",
 " code that renders the plot using the HTML 5 canvas element.  The html page",
