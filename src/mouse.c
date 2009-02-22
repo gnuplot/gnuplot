@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.113 2009/02/02 21:29:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.114 2009/02/15 21:59:03 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -299,7 +299,7 @@ static void
 MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double *y2)
 {
     if (!is_3d_plot) {
-	FPRINTF(("POS: plot_bounds.xleft=%i, plot_bounds.xright=%i, plot_bounds.ybot=%i, plot_bounds.ytop=%i\n",
+	FPRINTF((stderr, "POS: plot_bounds.xleft=%i, plot_bounds.xright=%i, plot_bounds.ybot=%i, plot_bounds.ytop=%i\n",
 		 plot_bounds.xleft, plot_bounds.xright, plot_bounds.ybot, plot_bounds.ytop));
 
 	if (plot_bounds.xright == plot_bounds.xleft)
@@ -314,7 +314,7 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	    *y = AXIS_MAPBACK(FIRST_Y_AXIS, yy);
 	    *y2 = AXIS_MAPBACK(SECOND_Y_AXIS, yy);
 	}
-	FPRINTF(("POS: xx=%i, yy=%i  =>  x=%g  y=%g\n", xx, yy, *x, *y));
+	FPRINTF(("stderr, POS: xx=%i, yy=%i  =>  x=%g  y=%g\n", xx, yy, *x, *y));
 
     } else {
 	/* for 3D plots, we treat the mouse position as if it is
