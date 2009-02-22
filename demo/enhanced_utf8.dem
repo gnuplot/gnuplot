@@ -17,10 +17,6 @@ set arrow from  0.5, -0.5 to  0.5, 0.0 nohead
 #
 set label 1 at -0.65, 0.95
 set label 1 "Superscripts and subscripts:" tc lt 3
-set label 10 at  -.40, 0.35
-set label 10 "Requires Symbol font:" tc lt 3
-set label 11 at -.30, 0.2
-set label 11 "{/Symbol=18 \362@_{/=9.6 0}^{/=12 ^\245}} {e^{-{/Symbol m}^2/2} d}{/Symbol m=(p/2)^{1/2}}"
 
 set label 3 at -0.55, 0.85
 set label 3 'A_{j,k} 10^{-2}  x@^2_k    x@_0^{-3/2}y'
@@ -41,7 +37,7 @@ set label 9 " ~{abcdefg}{0.8v}"
 set label 10 at  -.40, 0.35
 set label 10 "UTF-8 encoding does not require Symbol font:" tc lt 3
 set label 11 at -.30, 0.2
-set label 11 "{/=18 ∫@_{/=9.6 0}^{/=12 ∞}} {e^{-{μ}^2/2} d}{μ=(π/2)^{1/2}}"
+set label 11 "{/*1.5 ∫@_{/=9.6 0}^{/=12 ∞}} {e^{-{μ}^2/2} d}{μ=(π/2)^{1/2}}"
 
 set label 21 at 0.5, -.1
 set label 21 "Left  ^{centered} ƒ(αβγδεζ)" left
@@ -53,3 +49,6 @@ set label 23 "Center^{centered} ƒ(αβγδεζ)" center
 set key title " "
 plot sin(x)**2 lt 2 lw 2 title "sin^2(x)"
 #
+pause -1 "Hit return to continue"
+reset
+
