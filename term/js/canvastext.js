@@ -1,7 +1,9 @@
-//
-// This code is released to the public domain by Jim Studt, 2007.
+/*
+ * $Id: canvastext.js,v 1.1 2009/01/24 04:07:54 sfeam Exp $
+ */
+// The canvastext.js code was released to the public domain by Jim Studt, 2007.
 // He may keep some sort of up to date copy at http://www.federated.com/~jim/canvastext/
-// Modified by Ethan A Merritt (EAM) 2009 to work in non-ascii environments
+// Feb 2009 Ethan A Merritt (EAM) Modify code to work in non-ascii environments.
 //
 var CanvasTextFunctions = { };
 
