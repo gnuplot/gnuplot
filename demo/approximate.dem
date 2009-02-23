@@ -15,13 +15,13 @@ label2 = "x - {x^3}/3! + {x^5}/5!"
 label3 = "x - {x^3}/3! + {x^5}/5! - {x^7}/7!"
 
 #
-#
-#
 set termoption enhanced
+set encoding utf8
+#
 set title "Polynomial approximation of sin(x)"
 set key Left center top reverse
 set xrange [ -3.2 : 3.2 ]
-set xtics ("-p" -pi, "-p/2" -pi/2, 0, "p/2" pi/2, "p" pi) font "Symbol"
+set xtics ("-π" -pi, "-π/2" -pi/2, 0, "π/2" pi/2, "π" pi)
 set format y "%.1f"
 set samples 500
 set style fill solid 0.4 noborder
