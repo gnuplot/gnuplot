@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.12 2009/02/21 18:57:30 sfeam Exp $
+ * $Id: canvas.trm,v 1.13 2009/02/22 21:05:19 sfeam Exp $
  *
  */
 
@@ -323,6 +323,10 @@ CANVAS_graphics()
     fprintf(gpoutfile,
 	    "ctx = canvas.getContext(\"2d\");\n"
 	    "CanvasTextFunctions.enable(ctx);\n"
+	    "function bp(x,y) // begin polygon\n"
+	    "    { ctx.beginPath(); ctx.moveTo(x,y); }\n"
+	    "function cfp() // close and fill polygon\n"
+	    "    { ctx.closePath(); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); }\n"
 	    "ctx.lineWidth = \"1\";\n"
 	    "ctx.strokeStyle = \"rgb(215,215,215)\";\n"
     );
@@ -710,24 +714,25 @@ TERM_PUBLIC void
 CANVAS_filled_polygon(int points, gpiPoint *corners)
 {
     int		i;
-    char *fillcolor = CANVAS_fillstyle(corners->style);
+
+    if (corners->style != FS_OPAQUE && corners->style != FS_DEFAULT) {
+	char *fillcolor = CANVAS_fillstyle(corners->style);
+	fprintf(gpoutfile, "ctx.strokeStyle = \"%s\"\n", fillcolor);
+    }
 
     CANVAS_finish();
+
     fprintf(gpoutfile,
-	    "ctx.fillStyle = \"%s\";\n"
-	    "ctx.beginPath();\n"
-	    "ctx.moveTo(%d, %d);\n"
-            , fillcolor, corners[0].x, canvas_ymax - corners[0].y);
+	    "bp(%d, %d);\n"
+            , corners[0].x, canvas_ymax - corners[0].y);
 
     for (i = 1; i < points; i++) {
 	fprintf(gpoutfile,
 		"ctx.lineTo(%d, %d);\n"
                 , corners[i].x, canvas_ymax - corners[i].y);
     }
-	fprintf(gpoutfile,
-		"ctx.closePath();\n"
-		"ctx.fill();\n"
-               );
+
+    fprintf(gpoutfile, "cfp();\n");
 }
 
 TERM_PUBLIC void

@@ -1,3 +1,9 @@
+2009-02-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm: Introduce helper routines bp() and cfp() into the
+	javascript output file.  This reduces the file size of plots containing
+	lots of filled polygons, e.g. images or 3D surfaces, by about 1/3.
+
 2009-02-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm: Add support for enhanced text mode.
