@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.95.2.13 2008/04/06 21:37:29 sfeam Exp $
+ * $Id: gd.trm,v 1.95.2.14 2008/11/20 06:14:07 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1605,6 +1605,8 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 TERM_PUBLIC int
 PNG_text_angle(int ang)
 {
+    while (ang < -180) ang += 360;	/* Should not be needed, but reported to */
+    while (ang > 180) ang -= 360;	/* avoid a bug in some libgd versions    */
     png_state.angle = ang;
     return TRUE;
 }
