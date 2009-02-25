@@ -1,3 +1,8 @@
+2009-02-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_text_angle): Force angle to fall in the range
+	[-pi/2 : pi/2].  Reported to avoid problems in some versions of libgd.
+
 2009-02-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm: Introduce helper routines bp() and cfp() into the
