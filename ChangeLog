@@ -1,3 +1,18 @@
+2009-02-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.term:  Introduce a structure canvas_state to hold internal
+	state variables.  This allows us to avoid redundant writes of the
+	current color, linewidth, fill settings.  The size of image and filled
+	curve plots is substantially reduced.
+
+	* src/graphics.c (plot_image_or_update_axes):  
+	The flag "rectangular_image" doesn't really indicate what it says.
+	Fix that so we can use it to call term->fillbox() rather than
+	term->filled_polygon() as appropriate in image plots.
+	This makes a significant difference for the canvas terminal, because
+	drawing a filled rectangle is a primitive instruction, whereas filling
+	a polygon is a relatively verbose operation.
+
 2009-02-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_text_angle): Force angle to fall in the range

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.13 2009/02/22 21:05:19 sfeam Exp $
+ * $Id: canvas.trm,v 1.14 2009/02/24 06:11:10 sfeam Exp $
  *
  */
 
@@ -88,11 +88,17 @@ static char *canvas_justify = "";
 static int canvas_text_angle = 0;
 static int canvas_in_a_path = FALSE;
 static int already_closed = FALSE;
-static char canvas_color[] = "rgb(000,000,000)"; /* Exact format is important */
 static TBOOLEAN CANVAS_mouseable = FALSE;
 static TBOOLEAN CANVAS_standalone = TRUE;
 static char *CANVAS_name = NULL;
 static char *CANVAS_scriptdir = NULL;
+
+static struct {
+    int  previous_linewidth;
+    char color[18];		/* rgb(rrr,ggg,bbb) */
+    char previous_color[18];	/* rgb(rrr,ggg,bbb) */
+    char previous_fill[24];	/* rgba(rrr,ggg,bbb,aaaa) */
+} canvas_state;
 
 enum CANVAS_case {
     CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, 
@@ -143,7 +149,6 @@ CANVAS_options()
     /* which is after we have already initialized everything.	*/
     if (c_token != 2) {
 	/* Re-initialize a few things */
-	canvas_line_type = LT_UNDEFINED;
 	canvas_font_size = CANVASVCHAR;
 	CANVAS_standalone = TRUE;
 	CANVAS_mouseable = FALSE;
@@ -240,7 +245,6 @@ CANVAS_options()
 TERM_PUBLIC void
 CANVAS_init()
 {
-    ;
 }
 
 TERM_PUBLIC void
@@ -250,6 +254,10 @@ CANVAS_graphics()
     canvas_line_type = LT_UNDEFINED;
     canvas_text_angle = 0;
     canvas_in_a_path = FALSE;
+    canvas_state.previous_linewidth = -1;
+    canvas_state.previous_color[0] = '\0';
+    canvas_state.previous_fill[0] = '\0';
+    strcpy(canvas_state.color,"rgb(000,000,000)");
 
     /* Figure out where the javascript should come from when the page is viewed */
     if (CANVAS_scriptdir == NULL) {
@@ -326,8 +334,10 @@ CANVAS_graphics()
 	    "function bp(x,y) // begin polygon\n"
 	    "    { ctx.beginPath(); ctx.moveTo(x,y); }\n"
 	    "function cfp() // close and fill polygon\n"
+	    "    { ctx.closePath(); ctx.fill(); }\n"
+	    "function cfsp() // close and fill polygon with stroke color\n"
 	    "    { ctx.closePath(); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); }\n"
-	    "ctx.lineWidth = \"1\";\n"
+	    "ctx.lineWidth = 1;\n"
 	    "ctx.strokeStyle = \"rgb(215,215,215)\";\n"
     );
 }
@@ -433,7 +443,7 @@ CANVAS_linetype(int linetype)
     static const char * pen_type[17] = {
 	"rgb(255,255,255)", /* should be background */
 	"rgb(000,000,000)", /* black */
-	"rgb(192,192,192)", /* grey */
+	"rgb(160,160,160)", /* grey */
 	"rgb(255,000,000)", /* red */
 	"rgb(000,171,000)", /* green */
 	"rgb(000,000,225)", /* blue */
@@ -458,8 +468,11 @@ CANVAS_linetype(int linetype)
 	linetype %= 14;
     if (linetype <= LT_BACKGROUND) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	linetype = -3;
-    strcpy(canvas_color,pen_type[linetype + 3]);
-    fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_color);
+    strcpy(canvas_state.color,pen_type[linetype + 3]);
+    if (strcmp(canvas_state.color, canvas_state.previous_color)) {
+	fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_state.color);
+	strcpy(canvas_state.previous_color, canvas_state.color);
+    }
 }
 
 
@@ -539,7 +552,7 @@ CANVAS_point(unsigned int x, unsigned int y, int number)
 		x-width/2, canvas_ymax - (y+width/2), width, width);
 	break;
     case 4:
-	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_color);
+	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_state.color);
 	fprintf(gpoutfile, "ctx.fillRect(%d,%d,%d,%d);\n",
 		x-width/2, canvas_ymax - (y+width/2), width, width);
 	break;
@@ -551,7 +564,7 @@ CANVAS_point(unsigned int x, unsigned int y, int number)
 	break;
     case 6:
 	fprintf(gpoutfile, "ctx.beginPath();\n");
-	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_color);
+	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_state.color);
 	fprintf(gpoutfile, "ctx.arc(%d,%d,%d,0,Math.PI*2,true);\n",
 		x, canvas_ymax-y, width/2);
 	fprintf(gpoutfile, "ctx.fill();\n");
@@ -563,7 +576,7 @@ CANVAS_point(unsigned int x, unsigned int y, int number)
 	fprintf(gpoutfile, "ctx.stroke();\n");
 	break;
     case 8:
-	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_color);
+	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_state.color);
 	fprintf(gpoutfile, "ctx.beginPath();\n");
 	do_point(x, y, 5);
 	fprintf(gpoutfile, "ctx.closePath();\n");
@@ -630,7 +643,10 @@ TERM_PUBLIC void
 CANVAS_linewidth(double linewidth)
 {
     CANVAS_finish();
-    fprintf(gpoutfile, "ctx.lineWidth = \"%g\";\n", linewidth);
+    if (canvas_state.previous_linewidth != linewidth) {
+	fprintf(gpoutfile, "ctx.lineWidth = %g;\n", linewidth);
+	canvas_state.previous_linewidth = linewidth;
+    }
 }
 
 TERM_PUBLIC void
@@ -653,8 +669,11 @@ CANVAS_set_color(t_colorspec *colorspec)
 
     CANVAS_finish();
 
-    sprintf(canvas_color,"rgb(%03d,%03d,%03d)", rgb255.r, rgb255.g, rgb255.b);
-    fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_color);
+    sprintf(canvas_state.color,"rgb(%03d,%03d,%03d)", rgb255.r, rgb255.g, rgb255.b);
+    if (strcmp(canvas_state.color, canvas_state.previous_color)) {
+	fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_state.color);
+	strcpy(canvas_state.previous_color, canvas_state.color);
+    }
     canvas_line_type = LT_UNDEFINED;
 }
 
@@ -674,7 +693,7 @@ CANVAS_fillstyle(int style)
     switch (style & 0xf) {
 	case FS_TRANSPARENT_SOLID:
 		sprintf(fillcolor,"rgba(%11.11s,%4.2f)%c",
-			&canvas_color[4], density, '\0');
+			&canvas_state.color[4], density, '\0');
 		break;
 	case FS_EMPTY:
 		strcpy(fillcolor,"rgba(255,255,255,0.00)");
@@ -691,11 +710,11 @@ CANVAS_fillstyle(int style)
 		}	/* fall through */
 	case FS_SOLID:
 		if (density == 1) {
-		    strcpy(fillcolor,canvas_color);
+		    strcpy(fillcolor,canvas_state.color);
 		} else {
-		    int r = atoi(&canvas_color[4]);
-		    int g = atoi(&canvas_color[8]);
-		    int b = atoi(&canvas_color[12]);
+		    int r = atoi(&canvas_state.color[4]);
+		    int g = atoi(&canvas_state.color[8]);
+		    int b = atoi(&canvas_state.color[12]);
 		    r = (float)r*density + 255.*(1.-density);
 		    g = (float)g*density + 255.*(1.-density);
 		    b = (float)b*density + 255.*(1.-density);
@@ -704,7 +723,7 @@ CANVAS_fillstyle(int style)
 		break;
 	default:
 		/* Use current color, wherever it came from */
-		sprintf(fillcolor,"%s%c",canvas_color,'\0');
+		sprintf(fillcolor,"%s%c",canvas_state.color,'\0');
     }
 
     return fillcolor;
@@ -715,12 +734,15 @@ CANVAS_filled_polygon(int points, gpiPoint *corners)
 {
     int		i;
 
+    CANVAS_finish();
+
     if (corners->style != FS_OPAQUE && corners->style != FS_DEFAULT) {
 	char *fillcolor = CANVAS_fillstyle(corners->style);
-	fprintf(gpoutfile, "ctx.strokeStyle = \"%s\"\n", fillcolor);
+	if (strcmp(canvas_state.previous_fill, fillcolor)) {
+	    fprintf(gpoutfile, "ctx.fillStyle = \"%s\";\n", fillcolor);
+	    strcpy(canvas_state.previous_fill, fillcolor);
+	}
     }
-
-    CANVAS_finish();
 
     fprintf(gpoutfile,
 	    "bp(%d, %d);\n"
@@ -732,7 +754,12 @@ CANVAS_filled_polygon(int points, gpiPoint *corners)
                 , corners[i].x, canvas_ymax - corners[i].y);
     }
 
-    fprintf(gpoutfile, "cfp();\n");
+    if (corners->style != FS_OPAQUE && corners->style != FS_DEFAULT)
+	/* Fill with separate fillStyle color */
+	fprintf(gpoutfile, "cfp();\n");
+    else
+	/* Fill with stroke color */
+	fprintf(gpoutfile, "cfsp();\n");
 }
 
 TERM_PUBLIC void
@@ -742,7 +769,11 @@ CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, 
 
     /* Since filled-rectangle is a primitive operation for the canvas element */
     /* it's worth making this a special case rather than using filled_polygon */
-	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", fillcolor);
+	if (strcmp(canvas_state.previous_fill, fillcolor)) {
+	    fprintf(gpoutfile, "ctx.fillStyle = \"%s\";\n", fillcolor);
+	    strcpy(canvas_state.previous_fill, fillcolor);
+	}
+
 	fprintf(gpoutfile, "ctx.fillRect(%d,%d,%d,%d);\n",
 		x1, canvas_ymax - (y1+height), width, height);
 }
@@ -750,10 +781,15 @@ CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, 
 TERM_PUBLIC void 
 CANVAS_layer(t_termlayer layer)
 {
-	if (layer == TERM_LAYER_BEGIN_GRID)
-	    fprintf(gpoutfile, "if (grid_lines) {\n");
-	else if (layer == TERM_LAYER_END_GRID)
-	    fprintf(gpoutfile, "} // grid_lines\n");
+	if (layer == TERM_LAYER_BEGIN_GRID) {
+	    fprintf(gpoutfile, "if (grid_lines) {\n"
+			"var saveWidth = ctx.lineWidth;\n"
+			"ctx.lineWidth = ctx.lineWidth * 0.5;\n");
+	} else if (layer == TERM_LAYER_END_GRID) {
+	    fprintf(gpoutfile,
+			"ctx.lineWidth = saveWidth;\n"
+			"} // grid_lines\n");
+	}
 }
 
 TERM_PUBLIC void
