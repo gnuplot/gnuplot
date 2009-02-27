@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.114 2009/02/15 21:59:03 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.115 2009/02/22 17:14:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -314,7 +314,7 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	    *y = AXIS_MAPBACK(FIRST_Y_AXIS, yy);
 	    *y2 = AXIS_MAPBACK(SECOND_Y_AXIS, yy);
 	}
-	FPRINTF(("stderr, POS: xx=%i, yy=%i  =>  x=%g  y=%g\n", xx, yy, *x, *y));
+	FPRINTF((stderr, "POS: xx=%i, yy=%i  =>  x=%g  y=%g\n", xx, yy, *x, *y));
 
     } else {
 	/* for 3D plots, we treat the mouse position as if it is
