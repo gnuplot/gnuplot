@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.560 2009/02/16 22:08:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.561 2009/02/18 20:46:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3400,15 +3400,15 @@ Ffigure_mapcontours
 ?fit
 ?least-squares
 ?Marquardt
- The `fit` command can fit a user-defined function to a set of data points
- (x,y) or (x,y,z), using an implementation of the nonlinear least-squares
+ The `fit` command can fit a user-supplied expression to a set of data points
+ (x,z) or (x,y,z), using an implementation of the nonlinear least-squares
  (NLLS) Marquardt-Levenberg algorithm.  Any user-defined variable occurring in
- the function body may serve as a fit parameter, but the return type of the
- function must be real.
+ the expression may serve as a fit parameter, but the return type of the
+ expression must be real.
 
  Syntax:
-       fit {[xrange] {[yrange]}} <function> '<datafile>'
-           {datafile-modifiers}
+       fit {<ranges>} <expression>
+           '<datafile>' {datafile-modifiers}
            via '<parameter file>' | <var1>{,<var2>,...}
 
  Ranges may be specified to temporarily limit the data which is to be fitted;
@@ -3416,21 +3416,29 @@ Ffigure_mapcontours
        [{dummy_variable=}{<min>}{:<max>}],
  analogous to `plot`; see `plot ranges`.
 
- <function> is any valid `gnuplot` expression, although it is usual to use a
+ <expression> is any valid `gnuplot` expression, although it is usual to use a
  previously user-defined function of the form f(x) or f(x,y).
 
  <datafile> is treated as in the `plot` command.  All the `plot datafile`
  modifiers (`using`, `every`,...) except `smooth` and the deprecated `thru`
  are applicable to `fit`. See `plot datafile`.
 
- The default data formats for fitting functions with a single independent
- variable, y=f(x), are {x:}y or x:y:s; those formats can be changed with
- the datafile `using` qualifier.  The third item (a column number or an
- expression), if present, is interpreted as the standard deviation of the
- corresponding y value and is used to compute a weight for the datum, 1/s**2.
- Otherwise, all data points are weighted equally, with a weight of one.
- Note that if you don't specify a `using` option at all, no y deviations are
- read from the datafile even if it does have a third column, so you'll
+ The default data formats for fitting functions with a single
+ independent variable, z=f(x), are z or x:z.  That is, if there is
+ only a single column then it is the dependent variable and the line
+ numbers is the independent variable.  If there are two columns, the
+ first is the independent variable and the second is the dependent
+ variable.
+
+ Those formats can be changed with the datafile `using` qualifier, for
+ example to take the z value from a different column or to calculate
+ it from several columns.  A third `using` qualifier (a column number
+ or an expression), if present, is interpreted as the standard
+ deviation of the corresponding z value and is used to compute a
+ weight for the datum, 1/s**2.  Otherwise, all data points are
+ weighted equally, with a weight of one. Note that if you don't
+ specify a `using` option at all, no z standard deviations are read
+ from the datafile even if it does have a third column, so you'll
  always get unit weights.
 
  To fit a function with two independent variables, z=f(x,y), the required
@@ -3439,6 +3447,24 @@ Ffigure_mapcontours
  each data point are evaluated from 's' as above.  If error estimates are
  not available, a constant value can be specified as a constant expression
  (see `plot datafile using`), e.g., `using 1:2:3:(1)`.
+
+ The fit function may have up to five independent variables.  There
+ must be two more `using` qualifiers than there are independent
+ variables, unless there is only one variable.  The allowed formats,
+ and the default dummy variable names, are as follows:
+
+       z
+       x:z
+       x:z:s
+       x:y:z:s
+       x:y:t:z:s
+       x:y:t:u:z:s
+       x:y:t:u:v:z:s
+
+ The dummy variable names may be changed with ranges as noted above.
+ The first range corresponds to the first `using` spec, etc.  A range
+ may also be given for z (the dependent variable), but that name
+ cannot be changed.
 
  Multiple datasets may be simultaneously fit with functions of one
  independent variable by making y a 'pseudo-variable', e.g., the dataline
@@ -3455,6 +3481,12 @@ Ffigure_mapcontours
        fit f(x) 'measured.dat' using 3:($7-5) via 'start.par'
        fit f(x) './data/trash.dat' using 1:2:3 via a, b, c
        fit g(x,y) 'surface.dat' using 1:2:3:(1) via a, b, c
+       fit a0 + a1*x/(1 + a2*x/(1 + a3*x)) 'measured.dat' via a0,a1,a2,a3
+       fit a*x + b*y 'surface.dat' using 1:2:3:(1) via a,b
+       fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3:(1) via a,b
+       fit a*x + b*y + c*t 'foo.dat' using 1:2:3:4:(1) via a,b,c
+       h(x,y,t,u,v) = a*x + b*y + c*t + d*u + e*v
+       fit h(x,y,t,u,v) 'foo.dat' using 1:2:3:4:5:6:(1) via a,b,c,d,e
 
  After each iteration step, detailed information about the current state
  of the fit is written to the display.  The same information about the
