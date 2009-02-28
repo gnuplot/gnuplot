@@ -1,3 +1,7 @@
+2009-02-28  James R. Van Zandt  <jrvz@comcast.net>
+
+	* demo/fit.dem: revise printed comments to show the fit commands.
+
 2009-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.term:  Introduce a structure canvas_state to hold internal
