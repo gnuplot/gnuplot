@@ -1,3 +1,7 @@
+2009-02-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.term:  "set term canvas {linwidth <lw>}"
+
 2009-02-28  James R. Van Zandt  <jrvz@comcast.net>
 
 	* src/fit.c (fit_command): Allow fitting functions with up to five
@@ -21,8 +25,8 @@
 	Fix that so we can use it to call term->fillbox() rather than
 	term->filled_polygon() as appropriate in image plots.
 	This makes a significant difference for the canvas terminal, because
-	drawing a filled rectangle is a primitive instruction, whereas filling
-	a polygon is a relatively verbose operation.
+	drawing a filled rectangle is a primitive operation, whereas filling
+	a polygon is a relatively verbose sequence of instructions.
 
 2009-02-25  Ethan A Merritt  <merritt@u.washington.edu>
 

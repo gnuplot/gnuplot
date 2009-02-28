@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.14 2009/02/24 06:11:10 sfeam Exp $
+ * $Id: canvas.trm,v 1.15 2009/02/28 04:50:50 sfeam Exp $
  *
  */
 
@@ -82,6 +82,7 @@ static int canvas_y = -1;	/* current Y position */
 static int canvas_xmax = CANVAS_XMAX;
 static int canvas_ymax = CANVAS_YMAX;
 static int canvas_line_type = LT_UNDEFINED;
+static double canvas_linewidth = 1.0;
 static double CANVAS_ps = 1;	/* pointsize multiplier */
 static double canvas_font_size = CANVASVCHAR;
 static char *canvas_justify = "";
@@ -102,7 +103,8 @@ static struct {
 
 enum CANVAS_case {
     CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, 
-    CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_ENH, CANVAS_NOENH, CANVAS_OTHER
+    CANVAS_LINEWIDTH, CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_ENH, CANVAS_NOENH,
+    CANVAS_OTHER
 };
 
 static struct gen_table CANVAS_opts[] =
@@ -116,6 +118,8 @@ static struct gen_table CANVAS_opts[] =
     { "js$dir", CANVAS_JSDIR },
     { "enh$anced", CANVAS_ENH },
     { "noenh$anced", CANVAS_NOENH },
+    { "lw", CANVAS_LINEWIDTH },
+    { "linew$idth", CANVAS_LINEWIDTH },
     { NULL, CANVAS_OTHER }
 };
 
@@ -156,6 +160,7 @@ CANVAS_options()
 	CANVAS_name = NULL;
 	free(CANVAS_scriptdir);
 	CANVAS_scriptdir = NULL;
+	canvas_linewidth = 1.0;
     }
 
     while (!END_OF_COMMAND) {
@@ -217,6 +222,12 @@ CANVAS_options()
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    break;
 
+	case CANVAS_LINEWIDTH:
+	    canvas_linewidth = real_expression();
+	    if (canvas_linewidth <= 0)
+		canvas_linewidth = 1.0;
+	    break;
+
 	default:
 	    int_warn(c_token-1,"unrecognized terminal option");
  	    break;
@@ -227,9 +238,9 @@ CANVAS_options()
     term->h_char = canvas_font_size * 0.8;
 
     sprintf(term_options, "size %d,%d", canvas_xmax, canvas_ymax);
-    sprintf(term_options + strlen(term_options), "%s fsize %g", 
+    sprintf(term_options + strlen(term_options), "%s fsize %g lw %g", 
 	term->put_text == ENHCANVAS_put_text ? " enhanced" : "",
-	canvas_font_size);
+	canvas_font_size, canvas_linewidth);
     if (CANVAS_name)
 	sprintf(term_options + strlen(term_options), " name \"%s\"", CANVAS_name);
     else {
@@ -337,8 +348,9 @@ CANVAS_graphics()
 	    "    { ctx.closePath(); ctx.fill(); }\n"
 	    "function cfsp() // close and fill polygon with stroke color\n"
 	    "    { ctx.closePath(); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); }\n"
-	    "ctx.lineWidth = 1;\n"
 	    "ctx.strokeStyle = \"rgb(215,215,215)\";\n"
+	    "ctx.lineWidth = %.1g;\n",
+	canvas_linewidth
     );
 }
 
@@ -644,7 +656,7 @@ CANVAS_linewidth(double linewidth)
 {
     CANVAS_finish();
     if (canvas_state.previous_linewidth != linewidth) {
-	fprintf(gpoutfile, "ctx.lineWidth = %g;\n", linewidth);
+	fprintf(gpoutfile, "ctx.lineWidth = %g;\n", linewidth * canvas_linewidth);
 	canvas_state.previous_linewidth = linewidth;
     }
 }
@@ -1022,6 +1034,7 @@ START_HELP(canvas)
 "",
 " Syntax:",
 "       set terminal canvas {size <xsize>, <ysize>} {fsize <fontsize>}",
+"                           {{no}enhanced} {linewidth <lw>}",
 "                           {standalone {mousing} | name '<funcname>'}",
 "                           {jsdir 'URL/for/javascripts'}",
 "",
