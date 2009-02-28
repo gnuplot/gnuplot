@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.292 2009/01/24 04:07:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.293 2009/02/02 19:12:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5680,7 +5680,6 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     t_imagecolor pixel_planes;
     TBOOLEAN project_points = FALSE;		/* True if 3D plot */
 
-
     if (((struct surface_points *)plot)->plot_type == DATA3D)
 	project_points = TRUE;
 
@@ -5807,6 +5806,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
      */
     {
     TBOOLEAN rectangular_image = FALSE;
+    TBOOLEAN fallback = FALSE;
 
 #define SHIFT_TOLERANCE 0.01
     if ( ( (fabs(delta_x_grid[0]) < SHIFT_TOLERANCE*fabs(delta_x_grid[1]))
@@ -5814,16 +5814,15 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	&& ( (fabs(delta_y_grid[0]) < SHIFT_TOLERANCE*fabs(delta_y_grid[1]))
 	|| (fabs(delta_y_grid[1]) < SHIFT_TOLERANCE*fabs(delta_y_grid[0])) ) ) {
 
+	rectangular_image = TRUE;
+
 	/* If the terminal does not have image support then fall back to
 	 * using polygons to construct pixels.
 	 */
-	TBOOLEAN fallback;
 	if (project_points)
 	    fallback = !splot_map || ((struct surface_points *)plot)->image_properties.fallback;
 	else
 	    fallback = ((struct curve_points *)plot)->image_properties.fallback;
-	if (term->image && !fallback)
-	    rectangular_image = TRUE;
     }
 
     if (pixel_planes == IC_PALETTE && make_palette()) {
@@ -5836,7 +5835,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     }
     /* Use generic code to handle alpha channel if the terminal can't */
     if (pixel_planes == IC_RGBA && !(term->flags & TERM_ALPHA_CHANNEL))
-	rectangular_image = FALSE;
+	fallback = TRUE;
 
     view_port_x[0] = (X_AXIS.set_autoscale & AUTOSCALE_MIN) ? X_AXIS.min : X_AXIS.set_min;
     view_port_x[1] = (X_AXIS.set_autoscale & AUTOSCALE_MAX) ? X_AXIS.max : X_AXIS.set_max;
@@ -5847,7 +5846,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	view_port_z[1] = (Z_AXIS.set_autoscale & AUTOSCALE_MAX) ? Z_AXIS.max : Z_AXIS.set_max;
     }
 
-    if (rectangular_image) {
+    if (rectangular_image && term->image && !fallback) {
 
 	/* There are eight ways that a valid pixel grid can be entered.  Use table
 	 * lookup instead of if() statements.  (Draw the various array combinations
@@ -6054,7 +6053,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	    return;
 	}
 
-    } else {	/* !rectangular_image  or "with image failsafe" */
+    } else {	/* no term->image  or "with image failsafe" */
 
 	/* Use sum of vectors to compute the pixel corners with respect to its center. */
 	struct {double x; double y; double z;} delta_grid[2], delta_pixel[2];
@@ -6189,7 +6188,18 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 			    if (term->flags & TERM_ALPHA_CHANNEL)
 				corners[0].style = FS_TRANSPARENT_SOLID + (alpha<<4);
 			}
-			(*term->filled_polygon) (N_corners, corners);
+
+			if (N_corners == 4 && rectangular_image) {
+			    /* Some terminals (canvas) can do filled rectangles */
+			    /* more efficiently than filled polygons. */
+			    (*term->fillbox)( corners[0].style,
+				GPMIN(corners[0].x, corners[2].x),
+				GPMIN(corners[0].y, corners[2].y),
+				abs(corners[2].x - corners[0].x),
+				abs(corners[2].y - corners[0].y));
+			} else {
+			    (*term->filled_polygon) (N_corners, corners);
+			}
 		    }
 		}
 skip_pixel:
