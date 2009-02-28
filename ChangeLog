@@ -1,6 +1,13 @@
 2009-02-28  James R. Van Zandt  <jrvz@comcast.net>
 
+	* src/fit.c (fit_command): Allow fitting functions with up to five
+	independent variables.  If there is no data to fit, report how
+	many data lines were rejected by each range spec.  In fit.log,
+	report user-specified dummy variable names and all range
+	restrictions (including Z).
+
 	* demo/fit.dem: revise printed comments to show the fit commands.
+	Demonstrate fitting a function with three independent variables.
 
 2009-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 

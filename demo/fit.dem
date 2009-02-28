@@ -1,5 +1,5 @@
 #
-# $Id: fit.dem,v 1.5 2004/09/25 03:39:20 sfeam Exp $
+# $Id: fit.dem,v 1.6 2009/02/28 20:27:36 vanzandt Exp $
 #
 
 print "Some examples how data fitting using nonlinear least squares fit"
@@ -7,6 +7,7 @@ print "can be done."
 print ""
 pause -1 "first plotting the pure data set  (-> return)"
 
+reset
 set title 'data for first fit demo'
 set xlabel "Temperature T  [deg Cels.]"
 set ylabel "Density [g/cm3]"
@@ -247,6 +248,90 @@ print "This would normally be a reason to check for measurement problems"
 print "not yet accounted for, and maybe even re-think the theoretic"
 print "prediction in use."
 print ""
+pause -1 "Hit return to continue"
+
+reset
+set xlabel 'x'
+set ylabel 'y'
+set zlabel 'z'
+set ticslevel .2
+set zrange [-3:3]
+splot 'fit3.dat' index 0 using 1:2:4
+print '
+print 'Next we show a fit with three independent variables.  The file
+print 'fit3.dat has four columns, with values of the three independent
+print 'variable x, y, and t, and the resulting value z.  The data
+print 'lines are in four sections, with t being constant within each
+print 'section.  The sections are separated by two blank lines, so we
+print 'can select sections with "index" modifiers.  Here are the data in
+print 'the first section, where t = -3.
+print '
+print 'We will fit the function a0/(1 + a1*x**2 + a2*y**2) to these
+print 'data. Since at this point we have two independent variables,
+print 'our "using" spec has four entries, representing x:y:z:s (where
+print 's is the estimated error in the z value).
+
+print "Command will be: 
+print "  fit a0/(1+a1*x**2+a2*y**2) 'fit3.dat' index 0 using 1:2:4:(1) via a0,a1,a2
+pause -1 "(-> return)"
+a0=1; a1=.1; a2=.1
+fit a0/(1+a1*x**2+a2*y**2) 'fit3.dat' index 0 using 1:2:4:(1) via a0,a1,a2
+pause -1 "(-> return)"
+splot a0/(1+a1*x**2+a2*y**2), 'fit3.dat' in 0 u 1:2:4
+pause -1 "(-> return)"
+
+splot a0/(1+a1*x**2+a2*y**2), 'fit3.dat' in 3 u 1:2:4
+
+print "
+print "Here is the last set of data where t = 3.
+print "We fit the same function to this set.
+print "Command will be: 
+print "  fit a0/(1+a1*x**2+a2*y**2) 'fit3.dat' in 3 u 1:2:4:(1) via a0,a1,a2
+pause -1 "(-> return)"
+fit a0/(1+a1*x**2+a2*y**2) 'fit3.dat' in 3 u 1:2:4:(1) via a0,a1,a2
+pause -1 "(-> return)"
+splot a0/(1+a1*x**2+a2*y**2), 'fit3.dat' in 3 u 1:2:4
+pause -1 "(-> return)"
+splot a0/(1+a1*x**2+a2*y**2), 'fit3.dat' u 1:2:4
+
+print "
+print "We also have data for several intermediate values of t.  We
+print "will fit the function f(x,y,t)=a0*t/(1+a1*x**2+a2*y**2) to all
+print "the data.  Since there are now three independent variables, we
+print "need a using spec with five entries, representing x:y:t:z:s.
+print "Command will be: 
+print "  fit f(x,y,t) 'fit3.dat' u 1:2:3:4:(1) via a0,a1,a2
+pause -1 "(-> return)"
+f(x,y,t)=a0*t/(1+a1*x**2+a2*y**2)
+fit f(x,y,t) 'fit3.dat' u 1:2:3:4:(1) via a0,a1,a2
+
+print "We plot the data in each section with the corresponding
+print "function values.
+
+pause -1 "(-> return)"
+splot f(x,y,-3), 'fit3.dat' in 0 u 1:2:4
+pause -1 "(-> return)"
+splot f(x,y,-1), 'fit3.dat' in 1 u 1:2:4
+pause -1 "(-> return)"
+splot f(x,y,1), 'fit3.dat' in 2 u 1:2:4
+pause -1 "(-> return)"
+splot f(x,y,3), 'fit3.dat' in 3 u 1:2:4
+pause -1 "(-> return)"
+splot f(x,y,3),  'fit3.dat' in 3 u 1:2:4, \
+      f(x,y,1),  'fit3.dat' in 2 u 1:2:4, \
+      f(x,y,-1), 'fit3.dat' in 1 u 1:2:4, \
+      f(x,y,-3), 'fit3.dat' in 0 u 1:2:4
+
+print 'Here are all the data together.
+print '
+print 'You can use ranges to rename variables and/or limit the data
+print 'included in the fit.  The first range corresponds to the first
+print '"using" entry, etc.  For example, we could have gotten the same
+print 'fit like this:
+print '   fit [lon=*:*][lat=*:*][time=*:*]        \'
+print '   a0*time/(1 + a1*lon**2 + a2*lat**2)     \'
+print '   "fit3.dat" u 1:2:3:4:(1) via a0,a1,a2'
+print '
 
 print  "You can have a look at all previous fit results by looking into"
 print  "the file 'fit.log' or whatever you defined the env-variable 'FIT_LOGFILE'."
