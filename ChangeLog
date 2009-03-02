@@ -1,6 +1,6 @@
 2009-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/hpgl.trm term/tgif.trm src/graphics.c:
+	* term/hpgl.trm term/tgif.trm term/gd.trm src/graphics.c:
 	Fix dereference of uninitialized memory, overlapping memcpy, and
 	other problems found by valgrind.
 
