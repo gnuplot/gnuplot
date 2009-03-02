@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hpgl.trm,v 1.21 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: hpgl.trm,v 1.22 2006/07/21 02:35:47 sfeam Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -1342,6 +1342,7 @@ HPGL2_set_font(const char *font)
     if (i >= HPGL2_FONTS)
 	i = HPGL2_font_num;
 /* determine font size, use default from options if invalid */
+    int_size = 0;
     sscanf(&(font[sep + 1]), "%d", &int_size);
     if (int_size > 0) {
 	size = int_size;

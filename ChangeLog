@@ -1,3 +1,9 @@
+2009-03-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/hpgl.trm term/tgif.trm src/graphics.c:
+	Fix dereference of uninitialized memory, overlapping memcpy, and
+	other problems found by valgrind.
+
 2009-03-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/post.trm (PS_encode_image print_five_operand_image): Fix
@@ -22,7 +28,7 @@
 
 2009-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/canvas.term:  Introduce a structure canvas_state to hold internal
+	* term/canvas.trm:  Introduce a structure canvas_state to hold internal
 	state variables.  This allows us to avoid redundant writes of the
 	current color, linewidth, fill settings.  The size of image and filled
 	curve plots is substantially reduced.
