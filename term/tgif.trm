@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.41 2006/08/27 22:13:13 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.41.2.1 2006/11/18 17:27:02 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -447,22 +447,17 @@ TGIF_options()
 	}
     }
 
-    sprintf(term_options, "%s%s%s [%u,%u]",
-	    term_options, term_options[0]!='\0' ? " ":"",
+    sprintf(&(term_options[strlen(term_options)]), "%s [%u,%u]",
 	    TgifPortrait ? "portrait" : "landscape",
 	    uTgif_win_horiz, uTgif_win_verti);
+
 #ifdef USE_MONO_MODE
-    sprintf(term_options, "%s%s%s",
-	    term_options, term_options[0]!='\0' ? " ":"",
-	    TgifUseColor ? "color" : "monochrome");
+    strcat(term_options, TgifUseColor ? " color" : " monochrome");
 #endif
 #ifdef USE_LINEWIDTH
-    sprintf(term_options, "%s%s%s %f",
-	    term_options, term_options[0]!='\0' ? " ":"",
-	    "linewidth",uActThick_default);
+    sprintf(&(term_options[strlen(term_options)]), " linewidth %f", uActThick_default);
 #endif
-    sprintf(term_options, "%s%s%s \"%s\" %u",
-	    term_options, term_options[0]!='\0' ? " ":"",
+    sprintf(&(term_options[strlen(term_options)]), " %s \"%s\" %u",
 	    TgifSolid ? "solid" : "dashed",
 	    sActFont, uActFontSize);
 }
