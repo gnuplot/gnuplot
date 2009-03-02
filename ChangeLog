@@ -1,3 +1,10 @@
+2009-03-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm (PS_encode_image print_five_operand_image): Fix
+	related to the patch of post.trm from 2009-01-26: images drawn
+	"with rgbimage" must always be drawn as rgb colour images.
+	SF Patch #2613919: postscript outputs colour RGB as palette image
+
 2009-02-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.term:  "set term canvas {linwidth <lw>}"
