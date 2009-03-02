@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.203.2.15 2008/08/06 16:42:29 sfeam Exp $
+ * $Id: post.trm,v 1.203.2.16 2009/01/26 18:06:13 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2789,7 +2789,10 @@ PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode
 
 #define ASCII_PER_LINE 78
 
-    total_bits = bits_per_component*M*N*((color_mode == IC_RGB && ps_params->color) ? 3 : 1);
+    /* 18.1.2009 RGB images ("plot ... with rgbimage") are drawn always in color,
+     * i.e. for both "set term post color" and "set term post mono".
+     */
+    total_bits = bits_per_component*M*N*((color_mode == IC_RGB /* && ps_params->color */) ? 3 : 1);
 
     /* At the end of each image line, data is aligned to the nearest 8 bits,
      * which means potentially adding 7 bits per line.
@@ -2818,7 +2821,7 @@ PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode
     i_line = ASCII_PER_LINE;
     i_element = 0;
     coord_remaining = M*N;
-    if (color_mode == IC_RGB && ps_params->color) {
+    if (color_mode == IC_RGB /* && ps_params->color */) {
 	end_of_line *= 3;
 	coord_remaining *= 3;
     }
@@ -2828,7 +2831,7 @@ PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode
 
     while (coord_remaining) {
 	unsigned short us_tmp;
-	if (color_mode == IC_RGB && !ps_params->color) {
+	if (0 /* color_mode == IC_RGB && !ps_params->color */) {
 	    coordval c_tmp;
 	    c_tmp = *coord_ptr++;
 	    c_tmp += *coord_ptr++;
@@ -2963,11 +2966,12 @@ print_five_operand_image(unsigned M, unsigned N, gpiPoint *corner, t_imagecolor 
     fprintf(gppsfile, "%s%d %d %d\n", space, M, N, bits_per_component);
     fprintf(gppsfile, "%s[ %d 0 0 %d 0 0 ]\n", space, M, N);
     if (ps_params->level1) {
-	fprintf(gppsfile, "/imagebuf %d string def\n", (M*N*bits_per_component*((color_mode == IC_RGB && ps_params->color) ? 3 : 1) + 7)/8);
+ 	fprintf(gppsfile, "/imagebuf %d string def\n", 
+ 		(M*N*bits_per_component*((color_mode == IC_RGB /* && ps_params->color */) ? 3 : 1) + 7)/8);
         fputs("{currentfile imagebuf readhexstring pop}\n", gppsfile);
     } else
 	fprintf(gppsfile, "  currentfile /ASCII85Decode filter\n");
-    if (color_mode == IC_RGB && ps_params->color) {
+    if (color_mode == IC_RGB /* && ps_params->color */) {
 	fprintf(gppsfile, "%sfalse 3\n"
 			  "%scolorimage\n", space, space);
     } else
@@ -3020,7 +3024,7 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
     */
     if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) || !ps_params->color)
 #else
-    if ((sm_palette.colorMode == SMPAL_COLOR_MODE_RGB && !ps_params->color) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY))
+    if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB && !ps_params->color) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY))
 #endif
         five_operand_image = TRUE;
     else
