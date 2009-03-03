@@ -5,8 +5,6 @@
 	something other than liblua.so.
 	Bug #2637549
 
-	* configure.in: Ditto for readline+history support.
-
 2009-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/hpgl.trm term/tgif.trm term/gd.trm src/graphics.c:

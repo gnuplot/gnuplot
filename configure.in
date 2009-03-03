@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.243 2009/03/03 18:50:44 sfeam Exp $
+dnl $Id: configure.in,v 1.244 2009/03/03 19:26:21 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -325,7 +325,7 @@ if test "$with_readline" != no; then
     done
 
     if test "$with_readline" = gnu; then
-      AC_SEARCH_LIBS(remove_history, readline history,
+      AC_CHECK_LIB(readline, remove_history,
         [TERMLIBS="-lreadline $gp_tcap $TERMLIBS"],, [${gp_tcap}])
     else
       if test -d $with_readline/include; then
@@ -335,9 +335,18 @@ if test "$with_readline" != no; then
         LDFLAGS="$LDFLAGS -L$with_readline/lib"
       fi
 
-      AC_SEARCH_LIBS(remove_history, readline history,
+      AC_CHECK_LIB(readline, remove_history,
         [TERMLIBS="-lreadline $gp_tcap $TERMLIBS"],,[${gp_tcap}])
 
+    fi
+
+    if test "$ac_cv_lib_readline_remove_history" = no; then
+      dnl OSX keeps history functions in a separate library
+      AC_CHECK_LIB(history, remove_history,
+        TERMLIBS="-lreadline -lhistory $gp_tcap $TERMLIBS",
+	[ AC_MSG_WARN([GNU readline not found - falling back to builtin readline])
+          with_readline=builtin ]
+	,[${gp_tcap}])
     fi
 
     if [test "$ac_cv_lib_readline_remove_history" != no || test "$ac_cv_lib_history_remove_history" != no]; then
