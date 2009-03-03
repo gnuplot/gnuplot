@@ -1,3 +1,10 @@
+2009-03-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in:  Use AC_SEARCH_LIBS rather than AC_CHECK_LIB when
+	checking for lua support. This allows for the library to be named
+	something other than liblua.so.
+	Bug #2637549
+
 2009-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/hpgl.trm term/tgif.trm term/gd.trm src/graphics.c:
