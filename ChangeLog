@@ -1,7 +1,7 @@
 2009-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/hpgl.trm term/tgif.trm: Fix illegal memory access violations
-	found by valgrind.
+	* term/hpgl.trm term/tgif.trm term/gd.trm:
+	Fix illegal memory access violations found by valgrind.
 
 2009-03-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
