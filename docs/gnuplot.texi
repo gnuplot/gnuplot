@@ -11332,7 +11332,6 @@ using the default linetype 3.
 
 @cindex linewidth
 
-@c ^ <a name="linewidth"></a>
 Each terminal has a default set of line and point types, which can be seen
 by using the command @ref{test}.  `set style line` defines a set of line types
 and widths and point types and sizes so that you can refer to them later by
@@ -15439,7 +15438,7 @@ Examples:
 
 
 
-@noindent --- FONT ---
+@noindent --- CGM FONTS ---
 
 @c ?commands set terminal cgm font
 @c ?set terminal cgm font
@@ -15531,7 +15530,7 @@ You cannot introduce a new font in a @ref{label} command.
 
 
 
-@noindent --- FONTSIZE ---
+@noindent --- CGM FONTSIZE ---
 
 @c ?commands set terminal cgm fontsize
 @c ?set terminal cgm fontsize
@@ -15545,7 +15544,7 @@ scaled up or down accordingly.  To change the assumed width, use the
 
 
 
-@noindent --- LINEWIDTH ---
+@noindent --- CGM LINEWIDTH ---
 
 @c ?commands set terminal cgm linewidth
 @c ?set terminal cgm linewidth
@@ -15557,7 +15556,7 @@ discussed under the `fontsize` and `width` options.
 
 
 
-@noindent --- ROTATE ---
+@noindent --- CGM ROTATE ---
 
 @c ?commands set terminal cgm rotate
 @c ?set terminal cgm rotate
@@ -15574,7 +15573,7 @@ the default behavior.
 
 
 
-@noindent --- SOLID ---
+@noindent --- CGM SOLID ---
 
 @c ?set terminal cgm solid
 @c ?set term cgm solid
@@ -15587,7 +15586,7 @@ each line type.
 
 
 
-@noindent --- SIZE ---
+@noindent --- CGM SIZE ---
 
 @c ?commands set terminal cgm size
 @c ?set terminal cgm size
@@ -15598,7 +15597,7 @@ landscape, or 23457 units wide by 32599 units high for portrait.
 
 
 
-@noindent --- WIDTH ---
+@noindent --- CGM WIDTH ---
 
 @c ?commands set terminal cgm width
 @c ?set terminal cgm width
@@ -15623,7 +15622,7 @@ Example:
 
 
 
-@noindent --- NOFONTLIST ---
+@noindent --- CGM NOFONTLIST ---
 
 @c ?commands set terminal cgm nofontlist
 @c ?set terminal cgm nofontlist
