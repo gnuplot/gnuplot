@@ -1,3 +1,9 @@
+2009-03-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (find_maxl_keys do_plot): The first entry in a list of
+	labels is a placeholder for style information.  Do not reserve space for
+	this entry in the key of a columnstacked histogram plot.
+
 2009-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  Use AC_SEARCH_LIBS rather than AC_CHECK_LIB when

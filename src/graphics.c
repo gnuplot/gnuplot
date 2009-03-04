@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.294 2009/02/28 04:50:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.295 2009/03/02 23:55:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -261,7 +261,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	    cnt++;
 	/* Check for column-stacked histogram with key entries */
 	if (this_plot->plot_style == HISTOGRAMS &&  this_plot->labels) {
-	    text_label *key_entry = this_plot->labels;
+	    text_label *key_entry = this_plot->labels->next;
 	    for (; key_entry; key_entry=key_entry->next) {
 		cnt++;
 		len = key_entry->text ? estimate_strlen(key_entry->text) : 0;
@@ -270,7 +270,6 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	    }
 	}
     }
-
 
     if (kcnt != NULL)
 	*kcnt = cnt;
@@ -1839,7 +1838,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    localkey = 0;
 	    if (this_plot->labels) {
 		struct lp_style_type save_lp = this_plot->lp_properties;
-		for (key_entry = this_plot->labels; key_entry; key_entry = key_entry->next) {
+		for (key_entry = this_plot->labels->next; key_entry; key_entry = key_entry->next) {
 		    key_count++;
 		    this_plot->lp_properties.l_type = key_entry->tag;
 		    if (key_entry->text) {

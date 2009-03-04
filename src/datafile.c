@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.167 2008/12/11 04:09:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.168 2008/12/16 18:36:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2362,6 +2362,7 @@ add_key_entry(char *temp_string, int df_datum)
 
     /* Associate this key list with the histogram it belongs to. */
     if (!df_current_plot->labels) {
+	/* The first text_label structure in the list is a place-holder */
 	df_current_plot->labels = gp_alloc(sizeof(text_label), "key entry");
 	memset(df_current_plot->labels, 0, sizeof(text_label));
 	df_current_plot->labels->tag  = -1;
