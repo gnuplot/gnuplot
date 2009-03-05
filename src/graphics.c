@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.38 2008/12/12 06:57:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.39 2009/03/05 03:20:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1877,6 +1877,7 @@ do_plot(struct curve_points *plots, int pcount)
 		for (key_entry = this_plot->labels->next; key_entry; key_entry = key_entry->next) {
 		    key_count++;
 		    this_plot->lp_properties.l_type = key_entry->tag;
+		    this_plot->fill_properties.fillpattern = key_entry->tag;
 		    if (key_entry->text) {
 			if (prefer_line_styles)
 			    lp_use_properties(&this_plot->lp_properties, key_entry->tag + 1, FALSE);
@@ -3495,6 +3496,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			    apply_pm3dcolor(&ls.pm3d_color, term);
 			} else
 			    (*t->linetype)(histogram_linetype);
+			plot->fill_properties.fillpattern = histogram_linetype;
+			/* Fall through */
 		    case HT_STACKED_IN_LAYERS:
 
 			if( plot->points[i].y >= 0 ){
@@ -3562,13 +3565,6 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    }
 
 		    style = style_from_fill(&plot->fill_properties);
-#ifdef EAM_HISTOGRAMS
-		    /* FIXME EAM - broken, and doesn't match key entries */
-		    if (plot->plot_style == HISTOGRAMS
-		    && plot->fill_properties.fillstyle == FS_PATTERN
-		    && histogram_opts.type == HT_STACKED_IN_TOWERS)
-			style += (i<<4);
-#endif
 
 		    if (plot->lp_properties.use_palette && t->filled_polygon) {
 			(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
