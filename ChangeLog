@@ -6,6 +6,12 @@
 	* term/js/gnuplot_mouse.css term/js/prevzoom.png term/js/nexzoom.png
 	term/js/help.png:  Additional icons for the canvas driver.
 
+	* src/graph3d.c (do_3dplot): Define the clipping area in 3D plots to lie
+	between the left-most and right-most graph box edges. This is a change!
+	The intent is to allow the canvas terminal to use the plot's BoundingBox
+	as a zoom region.  If it causes problems for other terminals, we will
+	need to create and use a separate BoundingBox for this purpose.
+
 2009-03-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Fix assignment of fill patterns to plot boxes and key

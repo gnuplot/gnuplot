@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.217 2009/02/06 04:51:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.218 2009/03/11 19:12:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -741,6 +741,24 @@ do_3dplot(
 	plot_bounds.xright = map_x2;
 	plot_bounds.ybot = map_y2;
 	plot_bounds.ytop = map_y1;
+    }
+
+    /* Mar 2009 - This is a change!
+     * Define the clipping area in 3D to lie between the left-most and
+     * right-most graph box edges.  This is introduced for the benefit of
+     * zooming in the canvas terminal.  It may or may not make any practical
+     * difference for other terminals.  If it causes problems, then we will need
+     * a separate BoundingBox structure to track the actual 3D graph box.
+     */
+    else {
+	int xl, xb, xr, xf, yl, yb, yr, yf;
+
+	map3d_xy(zaxis_x, zaxis_y, base_z, &xl, &yl);
+	map3d_xy(back_x , back_y , base_z, &xb, &yb);
+	map3d_xy(right_x, right_y, base_z, &xr, &yr);
+	map3d_xy(front_x, front_y, base_z, &xf, &yf);
+	plot_bounds.xleft = GPMIN(xl, xb);	/* Always xl? */
+	plot_bounds.xright = GPMAX(xb, xr);	/* Always xr? */
     }
 
     /* PLACE TITLE */
