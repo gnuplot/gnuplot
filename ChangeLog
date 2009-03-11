@@ -3,6 +3,9 @@
 	* src/graph3d.c: Bracket the code that draws 3D grid lines with calls to
 	term->layer(TERM_LAYER_BEGIN_GRID) and term->layer(TERM_LAYER_END_GRID).
 
+	* term/js/gnuplot_mouse.css term/js/prevzoom.png term/js/nexzoom.png
+	term/js/help.png:  Additional icons for the canvas driver.
+
 2009-03-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Fix assignment of fill patterns to plot boxes and key

@@ -1,5 +1,5 @@
 canvas	{ border:0; background-color: white; }
-td.icon	{ width: 16; }
+td.icon	{ width:  16; height: 16; }
 td.mbh	{ height: 12pt; }
 td.mb0	{ text-align: right; font-size: smaller; width: 40%; }
 td.mb1	{ text-align:  left; font-size: smaller; width: 50%; color:#007700; }
