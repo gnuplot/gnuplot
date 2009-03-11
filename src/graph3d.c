@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.216 2008/12/15 00:48:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.217 2009/02/06 04:51:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2607,9 +2607,13 @@ xtick_callback(
 
     map3d_xyz(place, xaxis_y, base_z, &v1);
     if (grid.l_type > LT_NODRAW) {
+	if (t->layer)
+	    (t->layer)(TERM_LAYER_BEGIN_GRID);
 	/* to save mapping twice, map non-axis y */
 	map3d_xyz(place, other_end, base_z, &v2);
 	draw3d_line(&v1, &v2, &grid);
+	if (t->layer)
+	    (t->layer)(TERM_LAYER_END_GRID);
     }
     if ((X_AXIS.ticmode & TICS_ON_AXIS)
 	&& !Y_AXIS.log
@@ -2685,8 +2689,12 @@ ytick_callback(
 
     map3d_xyz(yaxis_x, place, base_z, &v1);
     if (grid.l_type > LT_NODRAW) {
+	if (t->layer)
+	    (t->layer)(TERM_LAYER_BEGIN_GRID);
 	map3d_xyz(other_end, place, base_z, &v2);
 	draw3d_line(&v1, &v2, &grid);
+	if (t->layer)
+	    (t->layer)(TERM_LAYER_END_GRID);
     }
     if (Y_AXIS.ticmode & TICS_ON_AXIS
 	&& !X_AXIS.log
@@ -2757,6 +2765,7 @@ ztick_callback(
     int len = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale)
 	* (axis_array[axis].tic_in ? 1 : -1) * (term->h_tic);
     vertex v1, v2, v3;
+    struct termentry *t = term;
 
     (void) axis;		/* avoid -Wunused warning */
 
@@ -2765,10 +2774,14 @@ ztick_callback(
     else
 	map3d_xyz(zaxis_x, zaxis_y, place, &v1);
     if (grid.l_type > LT_NODRAW) {
+	if (t->layer)
+	    (t->layer)(TERM_LAYER_BEGIN_GRID);
 	map3d_xyz(back_x, back_y, place, &v2);
 	map3d_xyz(right_x, right_y, place, &v3);
 	draw3d_line(&v1, &v2, &grid);
 	draw3d_line(&v2, &v3, &grid);
+	if (t->layer)
+	    (t->layer)(TERM_LAYER_END_GRID);
     }
     v2.x = v1.x + len / (double)xscaler;
     v2.y = v1.y;
