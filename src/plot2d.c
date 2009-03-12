@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.189 2009/01/04 22:45:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.190 2009/02/05 17:12:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1625,6 +1625,19 @@ eval_plots()
 			    xtitle[0] = '\0';       /* Remove default title . */
 		    }
 		    c_token++;
+
+		    if (almost_equals(c_token,"col$umnheader")) {
+			df_set_key_title_columnhead(this_plot->plot_type);
+		    } else 
+
+#ifdef BACKWARDS_COMPATIBLE
+		    /* Annoying backwards-compatibility hack - deprecate! */
+		    if (isanumber(c_token)) {
+			c_token--;
+			df_set_key_title_columnhead(this_plot->plot_type);
+		    } else
+#endif
+
 		    if (!(this_plot->title = try_to_get_string()))
 			int_error(c_token, "expecting \"title\" for plot");
 		    set_title = TRUE;

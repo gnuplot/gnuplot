@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.168 2008/12/16 18:36:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.169 2009/03/05 03:19:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -307,7 +307,6 @@ char *df_tokens[MAXDATACOLS];           /* filled in by df_tokenise */
 static char *df_stringexpression[MAXDATACOLS] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 #define NO_COLUMN_HEADER (-99)  /* some value that can never be a real column */
 static int column_for_key_title = NO_COLUMN_HEADER;
-static TBOOLEAN key_title_auto_col = FALSE;
 static char *df_key_title = NULL;     /* filled in from <col> in 1st row by df_tokenise */
 static struct curve_points *df_current_plot;	/* used to process histogram labels + key entries */
 
@@ -636,12 +635,15 @@ df_tokenise(char *s)
     for (i = 0; i<MAXDATACOLS; i++)
 	df_tokens[i] = NULL;
 
+#if (0)	/* Mar 2009 */
+    /* This code was broken by moving the check for 'title columnheader' elsewhere.*/
     /* Auto-titling of histograms is a bit tricky because the x coord did not come */
     /* from an explicit input column. This means our previous guess of what column */
     /* to take the title from was probably wrong.                                  */
     if (key_title_auto_col && df_current_plot
     &&  (df_current_plot->plot_style == HISTOGRAMS))
 	column_for_key_title = use_spec[0].column;
+#endif
 
 #define NOTSEP (*s != df_separator)
 
@@ -982,7 +984,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     /* Perhaps it should be a parameter to df_readline? */
     df_current_plot = plot;
     column_for_key_title = NO_COLUMN_HEADER;
-    key_title_auto_col = FALSE;
     /*}}} */
 
     assert(max_using <= MAXDATACOLS);
@@ -1091,29 +1092,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    continue;
 	}
 
-	/* Take key title from column head? */
-	if (almost_equals(c_token, "t$itle")) {
-	    c_token++;
-	    if (equals(c_token, "column") && equals(c_token+1,"(")) {
-		c_token += 2;
-		column_for_key_title = int_expression();
-		c_token++;
-	    } else if (almost_equals(c_token, "col$umn")) {
-		key_title_auto_col = TRUE;
-		if (df_no_use_specs == 1)
-		    column_for_key_title = use_spec[0].column;
-		else if (plot && plot->plot_type == DATA3D)
-		    column_for_key_title = use_spec[2].column;
-		else
-		    column_for_key_title = use_spec[1].column;
-		c_token++;
-	    } else if (!END_OF_COMMAND && isanumber(c_token)) {
-		column_for_key_title = int_expression();
-	    } else /* Let the general case parser handle it */
-		c_token--;
-	    break;
-	}
-
 	break; /* unknown option */
 
     } /* while (!END_OF_COMMAND) */
@@ -1123,18 +1101,14 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		  "duplicated or contradicting arguments in datafile options");
 
     /* Check for auto-generation of key title from column header  */
-    if (column_for_key_title == NO_COLUMN_HEADER) {
-	legend_key *key = &keyT;
-	
-	if (key->auto_titles == COLUMNHEAD_KEYTITLES) {
-	    key_title_auto_col = TRUE;
-	    if (df_no_use_specs == 1)
-		column_for_key_title = use_spec[0].column;
-	    else if (plot && plot->plot_type == DATA3D)
-		column_for_key_title = use_spec[2].column;
-	    else
-		column_for_key_title = use_spec[1].column;
-	}
+    /* Mar 2009:  This may no longer be the best place for this!  */
+    if ((&keyT)->auto_titles == COLUMNHEAD_KEYTITLES) {
+	if (df_no_use_specs == 1)
+	    column_for_key_title = use_spec[0].column;
+	else if (plot && plot->plot_type == DATA3D)
+	    column_for_key_title = use_spec[2].column;
+	else
+	    column_for_key_title = use_spec[1].column;
     }
 
     /*{{{  more variable inits */
@@ -1712,7 +1686,6 @@ df_readascii(double v[], int max)
 		     "df_readline: Found key title in col %d %s\n",
 		     column_for_key_title, df_key_title));
 	    column_for_key_title = NO_COLUMN_HEADER;
-	    key_title_auto_col = FALSE;
 	    return(DF_FOUND_KEY_TITLE);
 	}
 
@@ -2329,6 +2302,32 @@ df_set_key_title(struct curve_points *plot)
     plot->title_no_enhanced = !keyT.enhanced;
     plot->title = df_key_title;
     df_key_title = NULL;
+}
+
+/*
+ * Load plot title for key box from columnheader.
+ * Called from eval_plots(), eval_3dplots() while parsing the plot title option
+ */
+void
+df_set_key_title_columnhead(enum PLOT_TYPE plot_type)
+{
+    FPRINTF((stderr,"df_set_key_title_columnhead: column_for_key_title was %d, ",column_for_key_title));
+    c_token++;
+    if (equals(c_token,"(")) {
+	c_token++;
+	column_for_key_title = int_expression();
+	c_token++;
+    } else if (!END_OF_COMMAND && isanumber(c_token)) {
+	column_for_key_title = int_expression();
+    } else {
+	if (df_no_use_specs == 1)
+	    column_for_key_title = use_spec[0].column;
+	else if (plot_type == DATA3D)
+	    column_for_key_title = use_spec[2].column;
+	else
+	    column_for_key_title = use_spec[1].column;
+    }
+    FPRINTF((stderr," setting to %d\n",column_for_key_title));
 }
 
 static char *

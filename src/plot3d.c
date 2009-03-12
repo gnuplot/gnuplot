@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.167 2008/10/27 03:37:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.168 2009/02/19 04:53:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1422,6 +1422,19 @@ eval_3dplots()
 			}
 		    }
 		    c_token++;
+
+		    if (almost_equals(c_token,"col$umnheader")) {
+			df_set_key_title_columnhead(this_plot->plot_type);
+		    } else 
+
+#ifdef BACKWARDS_COMPATIBLE
+		    /* Annoying backwards-compatibility hack - deprecate! */
+		    if (isanumber(c_token)) {
+			c_token--;
+			df_set_key_title_columnhead(this_plot->plot_type);
+		    } else
+#endif
+
 		    if (!(this_plot->title = try_to_get_string()))
 			int_error(c_token, "expecting \"title\" for plot");
 		    set_title = TRUE;

@@ -9,12 +9,8 @@ set key noenhanced
 #
 # First plot using linespoints
 set style data linespoints
-plot 'immigration.dat' using 2:xtic(1) t 2, \
-'' u 3 t 3, '' u 4 t 4, '' u 5 t 5, '' u 6 t 6, \
-'' u 7 t 7, '' u 8 t 8, '' u 9 t 9, '' u 10 t 10, \
-'' u 11 t 11, '' u 12 t 12, '' u 13 t 13, '' u 14 t 14, \
-'' u 15 t 15, '' u 16 t 16, '' u 17 t 17, '' u 18 t 18, \
-'' u 19 t 19, '' u 20 t 20, '' u 21 t 21, '' u 22 t 22
+plot 'immigration.dat' using 2:xtic(1) title columnheader(2), \
+for [i=3:22] '' using i title columnheader(i)
 #
 pause -1 "<cr> to plot the same data as a histogram"
 #
@@ -70,7 +66,7 @@ set style histogram rowstacked
 set style fill solid border -1
 set boxwidth 0.75
 #
-plot 'immigration.dat' using (100.*$2/$24):xtic(1) t 2, \
+plot 'immigration.dat' using (100.*$2/$24):xtic(1) t column(2), \
      for [i=3:23] '' using (100.*column(i)/column(24)) title column(i) 
 #
 pause -1 "Now try histograms stacked by columns"
@@ -109,11 +105,11 @@ set grid y
 set auto y
 plot \
 newhistogram "Northern Europe", \
-'immigration.dat' using 6:xtic(1) t 6, '' u 13 t 13, '' u 14 t 14, \
+'immigration.dat' using 6:xtic(1) t col, '' u 13 t col, '' u 14 t col, \
 newhistogram "Southern Europe", \
-'' u 9:xtic(1) t 9, '' u 17 t 17, '' u 22 t 22, \
+'' u 9:xtic(1) t col, '' u 17 t col, '' u 22 t col, \
 newhistogram "British Isles", \
-'' u 10:xtic(1) t 10, '' u 21 t 21
+'' u 10:xtic(1) t col, '' u 21 t col
 #
 pause -1 "Same plot using rowstacked histogram"
 #

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.561 2009/02/18 20:46:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.562 2009/02/28 20:54:20 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -483,20 +483,14 @@ C
    set xtics
    plot 'datafile' using 3:4:xticlabels(1) with linespoints
 
+=columnheader
  There is also an option that will interpret the first entry in a column of
  input data (i.e. the column heading) as a text field, and use it as the key
  title for data plotted from that column. The example given below will use the
  first entry in column 2 to generate a title in the key box, while processing
  the remainder of columns 2 and 4 to draw the required line:
 
-   plot 'datafile' using 1:(f($2)/$4) title 2 with lines
-
- This option must come immediately after the 'using' clause, if any.  E.g.:
-
-   plot 'datafile'           title 2    linetype 5   # OK
-   plot 'datafile' using 1:2 title 2    linetype 5   # OK
-   plot 'datafile' using 1:2 linetype 5 title "FOO"  # OK
-   plot 'datafile' using 1:2 linetype 5 title 2      # fails
+   plot 'datafile' using 1:(f($2)/$4) with lines title columnhead(2)
 
  See `set style labels`, `using xticlabels`, `plot title`, `using`.
 2 Enhanced text mode
@@ -5165,20 +5159,6 @@ Ffigure_mapcontours
                    This corresponds to the data line in array or grid data.
        column(-2)  The index number of the current data set within a file that
                    contains multiple data sets.  See `index`.
-
-5 using title
-?using title
-?plot using title
- The first entry of a column of the input data file can be used as a string
- to provide the plot title in the key box.  The column containing specified
- is independent of the column[s] used for the plot itself.
-
-    plot 'data' using 1:($2/$3) title column(N)
-
- In this case the entry in the first row of column N will be used for the
- key entry of the plot constructed from dividing column 2 by column 3.
- The entry in the first row of columns 2 and 3 will be ignored.
-
 5 xticlabels
 ?xticlabels
 ?using xticlabels
@@ -5462,14 +5442,16 @@ Ffigure_mapcontours
 ?commands splot title
 ?plot title
 ?splot title
+?columnheader
  A line title for each function and data set appears in the key, accompanied
  by a sample of the line and/or symbol used to represent it.  It can be
  changed by using the `title` option.
 
  Syntax:
-       title "<title>" | notitle ["<ignored title>"]
+       title <text> | notitle [<ignored text>]
+       title columnheader | title columnheader(N)
 
- where <title> is the new title of the line and must be enclosed in quotes.
+ where <text> must either be a quoted string or a string variable.
  The quotes will not be shown in the key.  A special character may be given as
  a backslash followed by its octal value ("\345").  The tab character "\t" is
  understood.  Note that backslash processing occurs only for strings enclosed
@@ -5477,8 +5459,9 @@ Ffigure_mapcontours
  character "\n" is not processed in key entries in either type of string.
 
  There is also an option that will interpret the first entry in a column of
- input data (i.e. the column heading) as a text field, and use it as the key
- title. See `datastrings`.
+ input data (i.e. the column header) as a text field, and use it as the key
+ title.  See `datastrings`.  This can be made the default by speicifying
+ `set key autotitle columnhead`.
 
  The line title and sample can be omitted from the key by using the keyword
  `notitle`.  A null title (`title ''`) is equivalent to `notitle`.  If only
@@ -5504,6 +5487,10 @@ Ffigure_mapcontours
 
  This puts an untitled circular border around a polar graph:
        set polar; plot my_function(t), 1 notitle
+
+ Plot multiple columns of data, each of which contains its own title in the file
+       plot for [i=1:4] 'data' using i title columnhead
+
 3 with
 ?commands plot with
 ?commands splot with
@@ -7753,12 +7740,15 @@ Ffigure_mapcontours
  suppressed by `noautotitles`; then only those titles explicitly defined
  by `(s)plot ... title ...` will be drawn.
 
- The `set key autotitle columnheader` command causes the first entry in each
+=columnheader
+ The command `set key autotitle columnheader` causes the first entry in each
  column of input data to be interpreted as a text string and used as a title for
  the corresponding plot. If the quantity being plotted is a function of data
  from several columns, gnuplot may be confused as to which column to draw the
  title from. In this case it is necessary to specify the column explicitly in
- the plot command, e.g. `plot "datafile" using (($2+$3)/$4) title 3 with lines`.
+ the plot command, e.g.
+
+       plot "datafile" using (($2+$3)/$4) title columnhead(3) with lines
 
  An overall title can be put on the key (`title "<text>"`)---see also `syntax`
  for the distinction between text in single- or double-quotes.  The key title

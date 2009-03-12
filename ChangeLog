@@ -3,6 +3,18 @@
 	* src/fit.c (fit_command): Replace bogus initialization of dummy_token[]
 	with explicit declaration.  Bug #2657599 
 
+	* src/datafile.c (df_set_key_columnhead) src/datafile.h src/plot2d.c
+	src/plot3d.c docs/gnuplot.doc demo/datastrings.dem demo/histograms.dem
+	demo/histograms2.dem:
+
+	Document the plot option "... title columnhead{(N)}"
+	Move the point where this option is parsed from df_open() to 
+	eval_{3d}plots() with the rest of the title options, using a callback
+	to a new routine df_set_key_columnhead().  Deprecate the original form
+	of the command, "using N title N", which was undocumented but used in
+	several demos.  The deprecated syntax is still accepted if configured
+	--with-backwards-compatibility.
+
 2009-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Bracket the code that draws 3D grid lines with calls to

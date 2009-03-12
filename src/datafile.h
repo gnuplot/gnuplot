@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.29 2008/06/14 22:43:49 broeker Exp $
+ * $Id: datafile.h,v 1.30 2008/07/25 05:47:39 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -116,6 +116,7 @@ void df_showdata __PROTO((void));
 int df_2dbinary __PROTO((struct curve_points *));
 int df_3dmatrix __PROTO((struct surface_points *, int));
 void df_set_key_title __PROTO((struct curve_points *));
+void df_set_key_title_columnhead __PROTO((enum PLOT_TYPE));
 int expect_string __PROTO((const char column ));
 
 void df_reset_after_error __PROTO((void));
