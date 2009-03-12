@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.67 2009/02/05 17:12:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.68 2009/02/28 20:45:46 vanzandt Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1235,7 +1235,7 @@ fit_command()
     static int var_order[]={FIRST_X_AXIS, FIRST_Y_AXIS, T_AXIS, U_AXIS, V_AXIS, FIRST_Z_AXIS};
     static char dummy_default[MAX_NUM_VAR][MAX_ID_LEN+1]={"x","y","t","u","v","z"};
 
-    int dummy_token[7];	    /* tokens with dummy variable names */
+    int dummy_token[7] = {-1,-1,-1,-1,-1,-1,-1};
     int num_points=0;	    /* number of data points read from file */
     int skipped[12];	    /* num points out of range */
     int zrange_token = -1;
@@ -1271,8 +1271,6 @@ fit_command()
      * independent variable to start with (x), and adjust later
      * if needed. */
 
-    for (i=0; i<12; i++)
-      dummy_token[i]=-1;
     while (equals(c_token, "[")) {
       int i;
       if (num_ranges > 5)

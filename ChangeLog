@@ -1,3 +1,8 @@
+2009-03-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c (fit_command): Replace bogus initialization of dummy_token[]
+	with explicit declaration.  Bug #2657599 
+
 2009-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Bracket the code that draws 3D grid lines with calls to
