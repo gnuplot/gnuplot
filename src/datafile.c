@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.18 2008/12/05 01:11:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.19 2009/03/05 03:20:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1186,11 +1186,11 @@ df_open(const char *cmd_filename, int max_using)
 	if (almost_equals(c_token, "t$itle")) {
 	    struct value a;
 	    c_token++;
-	    if (equals(c_token, "column") && equals(c_token+1,"(")) {
+	    if (almost_equals(c_token, "col$umnheader") && equals(c_token+1,"(")) {
 		c_token += 2;
 		column_for_key_title = (int)real(const_express(&a));
 		c_token++;
-	    } else if (almost_equals(c_token, "col$umn")) {
+	    } else if (almost_equals(c_token, "col$umnheader")) {
 		key_title_auto_col = TRUE;
 		if (df_no_use_specs == 1)
 		    column_for_key_title = use_spec[0].column;
