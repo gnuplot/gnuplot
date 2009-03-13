@@ -1,3 +1,9 @@
+2009-03-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/datastrings.dem demo/histograms.dem demo/histograms:
+	Switch demos to use the documented syntax "... title columnhead(2)"
+	rather than the deprecated "... title 2"
+
 2009-03-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Fix assignment of fill patterns to plot boxes and key

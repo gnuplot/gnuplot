@@ -8,12 +8,13 @@ set xtics nomirror rotate by -45
 #
 # First plot using linespoints
 set style data linespoints
-plot 'immigration.dat' using 2:xtic(1) t 2, \
-'' u 3 t 3, '' u 4 t 4, '' u 5 t 5, '' u 6 t 6, \
-'' u 7 t 7, '' u 8 t 8, '' u 9 t 9, '' u 10 t 10, \
-'' u 11 t 11, '' u 12 t 12, '' u 13 t 13, '' u 14 t 14, \
-'' u 15 t 15, '' u 16 t 16, '' u 17 t 17, '' u 18 t 18, \
-'' u 19 t 19, '' u 20 t 20, '' u 21 t 21, '' u 22 t 22
+set key autotitle columnhead
+plot 'immigration.dat' using 2:xtic(1), \
+'' u 3, '' u 4, '' u 5, '' u 6, \
+'' u 7, '' u 8, '' u 9, '' u 10, \
+'' u 11, '' u 12, '' u 13, '' u 14, \
+'' u 15, '' u 16, '' u 17, '' u 18, \
+'' u 19, '' u 20, '' u 21, '' u 22
 #
 pause -1 "<cr> to plot the same data as a histogram"
 #
@@ -89,28 +90,28 @@ set style histogram rowstacked
 set style fill solid border -1
 set boxwidth 0.75
 #
-plot 'immigration.dat' using (100.*$2/$24):xtic(1) t 2, \
-'' using (100.*$3/$24) t 3, \
-'' using (100.*$4/$24) t 4, \
-'' using (100.*$5/$24) t 5, \
-'' using (100.*$6/$24) t 6, \
-'' using (100.*$7/$24) t 7, \
-'' using (100.*$8/$24) t 8, \
-'' using (100.*$9/$24) t 9, \
-'' using (100.*$10/$24) t 10, \
-'' using (100.*$11/$24) t 11, \
-'' using (100.*$12/$24) t 12, \
-'' using (100.*$13/$24) t 13, \
-'' using (100.*$14/$24) t 14, \
-'' using (100.*$15/$24) t 15, \
-'' using (100.*$16/$24) t 16, \
-'' using (100.*$17/$24) t 17, \
-'' using (100.*$18/$24) t 18, \
-'' using (100.*$19/$24) t 19, \
-'' using (100.*$20/$24) t 20, \
-'' using (100.*$21/$24) t 21, \
-'' using (100.*$22/$24) t 22, \
-'' using (100.*$23/$24) t 23
+plot 'immigration.dat' using (100.*$2/$24):xtic(1) title column(2), \
+'' using (100.*$3/$24) title column(3), \
+'' using (100.*$4/$24) title column(4), \
+'' using (100.*$5/$24) title column(5), \
+'' using (100.*$6/$24) title column(6), \
+'' using (100.*$7/$24) title column(7), \
+'' using (100.*$8/$24) title column(8), \
+'' using (100.*$9/$24) title column(9), \
+'' using (100.*$10/$24) title column(10), \
+'' using (100.*$11/$24) title column(11), \
+'' using (100.*$12/$24) title column(12), \
+'' using (100.*$13/$24) title column(13), \
+'' using (100.*$14/$24) title column(14), \
+'' using (100.*$15/$24) title column(15), \
+'' using (100.*$16/$24) title column(16), \
+'' using (100.*$17/$24) title column(17), \
+'' using (100.*$18/$24) title column(18), \
+'' using (100.*$19/$24) title column(19), \
+'' using (100.*$20/$24) title column(20), \
+'' using (100.*$21/$24) title column(21), \
+'' using (100.*$22/$24) title column(22), \
+'' using (100.*$23/$24) title column(23)
 #
 pause -1 "Now try histograms stacked by columns"
 #
@@ -137,6 +138,7 @@ pause -1 "Next we do several sets of parallel histograms"
 #
 set title "Immigration from different regions\n(give each histogram a separate title)"
 set key under nobox
+set key autotitle columnhead
 set style histogram clustered gap 1 title offset 2,0.25
 set style fill solid noborder
 set boxwidth 0.95
@@ -148,11 +150,11 @@ set grid y
 set auto y
 plot \
 newhistogram "Northern Europe", \
-'immigration.dat' using 6:xtic(1) t 6, '' u 13 t 13, '' u 14 t 14, \
+'immigration.dat' using 6:xtic(1), '' u 13, '' u 14, \
 newhistogram "Southern Europe", \
-'' u 9:xtic(1) t 9, '' u 17 t 17, '' u 22 t 22, \
+'' u 9:xtic(1), '' u 17, '' u 22, \
 newhistogram "British Isles", \
-'' u 10:xtic(1) t 10, '' u 21 t 21
+'' u 10:xtic(1), '' u 21
 #
 pause -1 "Same plot using rowstacked histogram"
 #
