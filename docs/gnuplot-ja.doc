@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.275 2009-01-05 14:58:52+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.553
+C RCS $Id: gnuplot-ja.doc,v 1.281 2009-03-01 16:02:42+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.562
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1642,14 +1642,14 @@ C ... and restart the table:
 ?user-defined variables
 ?user-defined
 ?variables
- 新たなユーザ定義変数と 1 個から 5 個までの引数を持つユーザ定義関数を、
+ 新たなユーザ定義変数と 1 個から 12 個までの引数を持つユーザ定義関数を、
  任意の場所で定義したり使ったりすることができます。それは `plot` コマン
  ド上でも可能です。
 
  ユーザ定義関数書式:
-       <func-name>( <dummy1> {,<dummy2>} ... {,<dummy5>} ) = <expression>
+       <func-name>( <dummy1> {,<dummy2>} ... {,<dummy12>} ) = <expression>
 
- ここで <expression> は仮変数 <dummy1> から <dummy5> で表される数式です。
+ ここで <expression> は仮変数 <dummy1> から <dummy12> で表される数式です。
 
  ユーザ定義変数書式:
        <variable-name> = <constant-expression>
@@ -1695,6 +1695,12 @@ C ... and restart the table:
  変数名や関数名の命名規則は、大抵のプログラミング言語と同じで、先頭はア
  ルファベットで、その後の文字はアルファベット、数字、"$", "_" が使えま
  す。
+
+ 各関数の定義式は、'GPFUN_' という接頭辞を持つ特別な文字列値変数として
+ 利用できます。
+
+ 例:
+       set label GPFUN_sinc at graph .05,.95
 
  以下参照: `show functions`, `functions`, `gnuplot-defined variables`,
  `macros`。
@@ -2950,14 +2956,24 @@ Ffigure_histcols
 ?image
 ?rgbimage
 ?rgbalpha
- 描画スタイル `image`, `rgbimage`, `rgbalpha` は、いずれも 2 次元画像を
- 2 次元、または 3 次元グラフ中に射影します。画像データは、表示平面の 2
- 方向 (必ずしも垂直でなくても良い) に沿って等間隔のサンプリング格子を形
- 成していると仮定されます。それは言い換えれば、4 つの隣接点の組がそれぞ
- れ一様な大きさの平行四辺形を作ることを意味します。その平行四辺形が、入
- 力画像の対応するピクセルの色を用いて塗られます。
+ 描画スタイル `image`, `rgbimage`, `rgbalpha` は、いずれも一様に標本点
+ を取った格子状データ値を、2 次元、または 3 次元中のある平面上に射影し
+ ます。入力データは、既にあるビッマップ画像ファイル (PNG のような標準的
+ なフォーマットから変換したものでよい) か、単純な数値配列です。
 
-Ffigure_rgb3D.pdf
+=heatmap
+Ffigure_heatmap
+ この図は、スカラー値の配列から温度分布を生成した例です。現在のパレット
+ を、各スカラー値から対応するピクセルの色への割り当てに使用します。
+       plot '-' matrix with image
+       5 4 3 1 0
+       2 2 0 0 1
+       0 0 0 1 0
+       0 1 2 4 3
+       e
+       e
+
+Ffigure_rgb3D
  入力 2 次元画像の各ピクセル (データ点) は、描画グラフ中では長方形、ま
  たは平行六面体となります。画像の各データ点の座標は、平行六面体の中心を
  決定します。すなわち、M x N 個のデータ集合は M x N ピクセルの画像を生
@@ -3475,15 +3491,15 @@ Ffigure_mapcontours
 ?fit
 ?least-squares
 ?Marquardt
- `fit` コマンドはユーザ定義関数を (x,y) または (x,y,z) の形式のデータ点の
- 集合への当てはめを可能にします。それには Marquardt-Levenberg 法による
- 非線形最小自乗法 (NLLS) の実装が用いられます。関数内部に現われるユーザ
- 定義変数はいずれも当てはめのパラメータとして使うことができます。ただ、
- その関数の返り値は実数である必要があります。
+ `fit` コマンドはユーザの与えた式を (x,y) または (x,y,z) の形式のデータ
+ 点の集合への当てはめを可能にします。それには Marquardt-Levenberg 法に
+ よる非線形最小自乗法 (NLLS) の実装が用いられます。式の内部に現われるユ
+ ーザ定義変数はいずれも当てはめのパラメータとして使うことができます。た
+ だ、その式の返り値は実数である必要があります。
 
  書式:
-       fit {[xrange] {[yrange]}} <function> '<datafile>'
-           {datafile-modifiers}
+       fit {<ranges>} <expression>
+           '<datafile>' {datafile-modifiers}
            via '<parameter file>' | <var1>{,<var2>,...}
 
  範囲 (xrange,yrange) は、当てはめられるデータ点を一時的に制限するのに
@@ -3492,28 +3508,49 @@ Ffigure_mapcontours
        [{dummy_variable=}{<min>}{:<max>}],
  です。以下参照: `plot ranges`。
 
- <function> は通常はあらかじめユーザ定義された f(x) または f(x,y) の形
- の関数ですが、`gnuplot` で有効な任意の数式を指定できます。
+ <expression> は通常はあらかじめユーザ定義された f(x) または f(x,y) の
+ 形の関数ですが、`gnuplot` で有効な任意の数式を指定できます。
 
  <datafile> は `plot` コマンドと同様に扱われます。`plot datafile` の修
  飾子 (`using`, `every`,...) は、`smooth` とあまり勧められない `thru`
  を除いて、全て `fit` に使うことができます。以下参照:`plot datafile`。
 
- 当てはめる 1 変数関数 y=f(x) へのデフォルトのデータの書式は {x:}y か
- x:y:s で、これらはデータファイルへの `using` 指定子で変更できます。こ
- の 3 番目の項目 (列番号、または数式) が与えられた場合は、それは対応す
- る y の値の標準偏差として解釈され、それはそのデータへの重み (=1/s**2)
- を計算するのに使われます。そうでなければ、全てのデータは同じ重み (1)
- で計算されます。`using` オプションを全く指定しなかった場合、3 列目のデ
- ータがあった場合でもデータから y の偏差は読まれませんので、その場合は
- 重み 1 になります。
+ 当てはめる 1 変数関数 z=f(x) へのデフォルトのデータの書式は z か x:z
+ です。つまり、データが 1 列しかなければそれは従属変数値 (関数値) と見
+ なされ、行番号が独立変数値 (変数値) となり、2 列のデータがあれば、1 列
+ 目が独立変数値、2 列目が従属変数値となります。
+
+ これらの形式はデータファイルへの `using` 指定子で変更でき、例えば z の
+ 値を他の列から取ったり、あるいは複数の列から計算した値とすることができ
+ ます。3 番目の `using` 指定 (列番号、または数式) が与えられた場合は、
+ それは対応する z の値の標準偏差として解釈され、それはそのデータへの重
+ み (=1/s**2) を計算するのに使われます。そうでなければ、全てのデータは
+ 同じ重み (1) で計算されます。`using` オプションを全く指定しなかった場
+ 合、3 列目のデータがあった場合でもデータから z の偏差は読まれませんの
+ で、その場合は重み 1 になります。
 
  2 変数関数 z=f(x,y) を当てはめる場合、データの書式は `using` による 4
  つの項目 x:y:z:s が要求されます。これは完全に全てが与えられなければな
- りません--不足する項目に対してはどの列もデフォルトは仮定されていません。
- 各データ点の重みは上と同様に 's' から計算されます。もし誤差評価を持っ
- ていなければ、定数値を定数式として指定すればいいでしょう
- (以下参照: `plot datafile using`)。例えば `using 1:2:3:(1)` のように。
+ らず、不足する項目に対してはどの列もデフォルトは仮定されていません。各
+ データ点の重みは上と同様に 's' から計算されます。もし誤差評価を持って
+ いなければ、定数値を定数式として指定すればいいでしょう (以下参照:
+ `plot datafile using`)。例えば `using 1:2:3:(1)` のように。
+
+ 当てはめ関数には、独立変数を 5 つまで持たせられますが、1 変数以外の場
+ 合は、その独立変数の個数よりも 2 つ多い `using` 指定をしなければいけま
+ せん。許される書式、そしてデフォルトのダミー変数名は以下の通りです:
+
+       z
+       x:z
+       x:z:s
+       x:y:z:s
+       x:y:t:z:s
+       x:y:t:u:z:s
+       x:y:t:u:v:z:s
+
+ ダミー変数名は、下にあげるように範囲指定によって変更できます。最初の範
+ 囲は `using` 指定の最初のものに対応し、以下同様です。z (従属変数) の範
+ 囲も指定できますが、その名前は変更できません。
 
  複数のデータ集合も複数の 1 変数関数に同時に当てはめることも、y を '仮
  変数' とすれば可能です。例えばデータ行番号を使い、2 変数関数への当ては
@@ -3530,6 +3567,12 @@ Ffigure_mapcontours
        fit f(x) 'measured.dat' using 3:($7-5) via 'start.par'
        fit f(x) './data/trash.dat' using 1:2:3 via a, b, c
        fit g(x,y) 'surface.dat' using 1:2:3:(1) via a, b, c
+       fit a0 + a1*x/(1 + a2*x/(1 + a3*x)) 'measured.dat' via a0,a1,a2,a3
+       fit a*x + b*y 'surface.dat' using 1:2:3:(1) via a,b
+       fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3:(1) via a,b
+       fit a*x + b*y + c*t 'foo.dat' using 1:2:3:4:(1) via a,b,c
+       h(x,y,t,u,v) = a*x + b*y + c*t + d*u + e*v
+       fit h(x,y,t,u,v) 'foo.dat' using 1:2:3:4:5:6:(1) via a,b,c,d,e
 
  反復の個々のステップの後で、当てはめの現在の状態についての詳細な情報が
  画面に表示されます。そし最初と最後の状態に関する同じ情報が "fit.log"
@@ -5746,6 +5789,11 @@ Ffigure_mapcontours
 ?commands pwd
 ?pwd
  `pwd` コマンドはカレントディレクトリの名前を画面に表示します。
+
+ カレントディレクトリを文字列変数に保存したり、文字式の中で使いたい場合
+ は、変数 GPVAL_PWD を使うことができることに注意してください。以下参照:
+ `show variables all`。これは、"`pwd`" によるシェル呼び出しよりも優れて
+ います。
 2 quit
 ?commands quit
 ?quit
@@ -8119,6 +8167,13 @@ Ffigure_mapcontours
        bfit = gprintf("b = %s*10^%S",par_b)
        set label bfit at 30,20
 
+ 当てはめられるパラメータのついた関数の定義式を表示したい場合:
+       f(x)=a+b*x
+       fit f(x) 'datafile' via a,b
+       set label GPFUN_f at graph .05,.95
+       set label sprintf("a = %g", a) at graph .05,.90
+       set label sprintf("b = %g", b) at graph .05,.85
+
  見出し文字列を小さい点から少しだけ移動する場合:
        set label 'origin' at 0,0 point lt 1 pt 2 ps 3 offset 1,-1
 
@@ -8992,7 +9047,7 @@ Ffigure_mapcontours
        set pm3d
        set pm3d {
                   { at <bst combination> }
-                  { interpolate <steps in scan>,<steps between scans> }
+                  { interpolate <steps/points in scan, between scans> }
                   { scansautomatic | scansforward | scansbackward | depthorder }
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
@@ -9098,12 +9153,16 @@ Ffigure_mapcontours
  適切に使用してください。`set (no)surface` も 効果 (副作用 ?) があるよ
  うです。
 
- オプション `interpolate` は格子点をより細かな網目に補間し、色四角形も
- 近似的に補間します。データ描画に対しては、これは曲面の色の変化を滑らか
- にし、曲面の色の尖りを補正します。関数描画に対しては、この補間は細かさ
- の代わりにメモリを消費してしまう、といったことくらいの意味しかありませ
- んから、関数描画の場合は普通 `samples` や `isosamples` を使うべきでし
- ょう。
+ オプション `interpolate m,n` は、格子点をより細かな網目に補間し、色四
+ 角形も近似的に補間します。データ描画に対しては、これは曲面の色の変化を
+ 滑らかにし、曲面の色の尖りを補正します。関数描画に対しては、この補間は
+ 細かさの代わりにメモリを消費してしまう、といったことくらいの意味しかあ
+ りませんから、関数描画の場合は普通 `samples` や `isosamples` を使うべ
+ きでしょう。正の m, n に対しては、各四辺形、または三角形は、それぞれの
+ 方向に m 回、n 回補間されます。負の m, n では補間の頻度は、少なくとも
+ |m|, |n| 点が描画されるように選択されます。これは特別な格子関数と見な
+ すことができます。0 の場合、すなわち `interpolation 0,0` は、自動的に
+ 最適な補間曲面点数を選択します。
 
  色づけの設定はカラーボックスの描画と同様に `set palette` で決定されま
  す。一つの描画では一つのパレットのみが存在し得ます。いくつもの曲面を
@@ -10488,6 +10547,7 @@ Ffigure_mapcontours
  `set xrange`。
 3 variables
 ?commands show variables
+?show variables all
 ?show variables
  `show variables` コマンドはユーザ定義変数と内部変数の現在の値の一覧を
  表示します。gnuplot は、GPVAL_, MOUSE_, FIT_, TERM_ で始まる名前を持つ

@@ -1,4 +1,4 @@
-# $Id: README.ja,v 1.11 2008-06-27 19:07:59+09 shige Exp $
+# $Id: README.ja,v 1.12 2009-03-13 18:46:18+09 shige Exp $
 # The Japanese translations of gnuplot manuals
 # Shigeharu TAKENO <shige@iee.niit.ac.jp>
 #
@@ -14,7 +14,9 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 
 [a] gnuplot-ja.doc: docs/gnuplot.doc の日本語訳
 [b] term-ja.diff:   term/*.trm のドキュメント等の日本語訳への差分
-[c] README.ja:      このファイル (主に Unix ユーザへの説明書)
+[c] faq-ja.tex:     faq.tex (FAQ の元; LaTeX ファイル) の日本語訳
+[d] gnuplot-ja.1:   man/gnuplot.1 の日本語訳
+[e] README.ja:      このファイル (主に Unix ユーザへの説明書)
 
 なお、これらのファイルは日本語テキストファイルですが、その漢字コ
 ードはいずれも EUC_JP (日本語 EUC) になっています。必要ならば適当
@@ -37,11 +39,13 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 
 2. 利用法
 ---------
-2.1. 日本語オンラインヘルプの作成
----------------------------------
+2.1. 日本語オンラインヘルプ (.gih) の作成
+-----------------------------------------
 
 まず、gnuplot-ja.doc を元に日本語オンラインヘルプファイルを作成す
-る手順を説明します。
+る手順を説明します。なお、ここでいう「オンラインヘルプ」とは、対
+話型 gnuplot コンソール上で help として参照できるもののこと 
+(.gih 形式のファイル) を指します。
 
 [1] 普通に gnuplot を make & install
 
@@ -304,6 +308,79 @@ MS-Windows 上のヘルプコンパイラは、MS-Windows 上の C 開発環境につ
  HC505.exe : Microsoft Help Compiler (version 3.10.505)
 
 
+2.3. faq-ja.tex
+---------------
+
+これは、gnuplot に付属する FAQ の元になっている LaTeX ファイルで
+オリジナルは以下にあります。
+
+ gnuplot/faq/faq.tex CVS Repository
+ http://gnuplot.cvs.sourceforge.net/gnuplot/faq/faq.tex 
+
+元は、comp.graphics.apps.gnuplot に流れたもので、配布物に含まれて
+いるものは、この faq.tex を latex2html にかけて、それを lynx でテ
+キスト化してそれを多少加工したものです。
+
+日本語版の FAQ テキストファイルも同様にして作成でき、以下でいくつ
+かの形式のものを作成して公開しています。
+
+ gnuplot-FAQ (日本語訳)
+ http://takeno.iee.niit.ac.jp/~shige/unix/gnuplot/gnuplot.html
+
+HTML ファイルは、以下のようなオプションで latex2html にかけていま
+す。
+
+% latex2html -image_type gif -split 0 -show_section_numbers \
+   -html_version 4.0 -nonavigation faq-ja.tex
+
+テキストファイルは、それを w3m にかけて作っています。
+
+% w3m -dump faq-ja/index.thml > faq-ja.txt
+
+LaTeX のコンパイルは platex で普通にコンパイルでき、それを dvips 
+にかけることも問題はないのですが、PDF ファイルにかけるときは、以
+下の 2 つを行っています。
+
+1) 先頭の \usepackage[...]{hyperref} のオプション ([...] の部分)
+  の hypertex, を dvipdfm, に変える
+2) \documentclass の次の行に、以下を入れる:
+   \AtBeginDvi{\special{pdf:tounicode EUC-UCS2}}
+
+この 2) は文字化けしないしおりを作るためのものです。
+
+
+2.4. gnuplot-ja.1
+-----------------
+
+gnuplot-ja.1 は、Unix 用のオンラインマニュアル (nroff ファイル) 
+で、元々 man/gnuplot.1 として入っているものを訳したものです。
+なお、これは「2.1. 日本語オンラインヘルプ (.gih) の作成」のオン
+ラインヘルプとは違い、gnuplot コマンドの中からではなく、Unix の
+man コマンドで参照します。
+
+Unix 用のオンラインマニュアルなので、基本的に X11 terminal に関す
+るマニュアルになっています。
+
+日本語訳は対訳形式で書いていますが、man コマンドで参照するには、
+日本語に対応している nroff (groff) が必要です。
+
+自動的にはこの日本語オンラインマニュアルがうまく変換されない場合
+は、手動で日本語対応の nroff (groff) で整形化テキストファイルを作
+成して、man/cat1 にインストールしてください。
+
+日本語対応の nroff の場合は、
+
+% nroff -man gnuplot-ja.1 > gnuplot.1
+
+日本語対応の groff の場合は、
+
+% groff -Tnippon -man gnuplot-ja.1 > gnuplot.1
+
+で整形化されたテキストファイルが作られると思います。うまくいかな
+い場合は、インストールされている nroff, groff のマニュアル等を参
+照してください。
+
+
 3. 注意
 -------
 
@@ -337,7 +414,7 @@ WWW page: http://takeno.iee.niit.ac.jp/~foo/gp-jman/
 
 訳者は以下の通りです。
 
-[a] gnuplot.doc-ja, [b] term-ja.diff:
+[a] gnuplot.doc-ja, [b] term-ja.diff, [d] gnuplot-ja.1:
  
  gnuplot 3.2 用: 田丸博晴
  gnuplot 3.5 用: 升谷保博
@@ -346,6 +423,13 @@ WWW page: http://takeno.iee.niit.ac.jp/~foo/gp-jman/
    柴信一郎、松本賢一、宮入洋介、山岡薫、山岸寛、竹野茂治
  gnuplot 3.8 用: 田村大輔、竹野茂治
  gnuplot 4.0 以降: 竹野茂治
+
+[c] faq-ja.tex:
+
+ 竹野茂治 
+
+なお、[d] の内容は、ほぼ [a],[b] に含まれていて、その訳を再利用し
+ています。
 
 gnuplot 3.2 の gnuplot.doc の日本語訳の作者の田丸博晴さん、
 gnuplot 3.5 用の日本語訳の作者の升谷保博さんからは、それらを元に
@@ -438,8 +522,10 @@ gnuplot 開発チームの Hans-Bernhard Broeker さん、Ethan Merritt さ
 -------
 1. はじめに
 2. 利用法
- 2.1. 日本語オンラインヘルプの作成
+ 2.1. 日本語オンラインヘルプ (.gih) の作成
  2.2. 他の形式のドキュメントの作成
+ 2.3. faq-ja.tex
+ 2.4. gnuplot-ja.1
 3. 注意
 4. 訳者とライセンス
 5. 謝辞

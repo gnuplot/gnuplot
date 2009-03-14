@@ -1,0 +1,477 @@
+.\" dummy line
+.\" $Id: gnuplot-ja.1,v 1.3 2009-03-09 20:21:36+09 shige Exp $
+.\" 日本語訳: Shigeharu TAKENO <shige@iee.niit.ac.jp>
+.\"
+.\" .TH GNUPLOT 1 " 7 October 2008"
+.TH GNUPLOT 1 " 2008 年 10 月 7 日"
+.UC 4
+.\" .SH NAME
+.SH 名前
+.\" gnuplot \- an interactive plotting program
+gnuplot \- 対話型グラフ描画プログラム
+.\" .SH SYNOPSIS
+.SH 形式
+.B gnuplot
+[X11 options] [options] [file ...]
+.br
+.\" .SH DESCRIPTION
+.SH 機能説明
+.\" .B Gnuplot
+.\" is a command-driven interactive function plotting program.
+.B Gnuplot
+は、コマンド入力方式の対話的な関数描画プログラムです。
+.PP
+.\" If file names are given on the command line,
+.\" gnuplot
+.\" loads each file with the
+.\" .B load
+.\" command, in the order specified, and exits after the last file is
+.\" processed.  If no files are given, \fBgnuplot\fP prompts for
+.\" interactive commands.
+コマンドラインから複数のファイル名を与えると、
+gnuplot は各ファイルを指定した順番に
+.B load
+コマンドで読み込み、最後のファイルを実行した後に終了します。
+ファイルを指定しなかった場合は、
+\fBgnuplot\fP は対話型コマンドの入力を促します。
+.PP
+.\" Here are some of its features:
+gnuplot は以下のような特徴を持ちます:
+.PP
+.\" Plots any number of functions, built up of C operators, C library
+.\" functions, and some things C doesn't have like **, sgn(), etc.  
+C の演算子や C のライブラリ関数、
+そして ** や sgn() などのように C にはないようなものを用いて表現された
+任意個数の関数の描画。
+.PP
+.\" User-defined constants and functions.
+ユーザ定義定数、ユーザ定義関数。
+.PP
+.\" All computations performed in the complex domain.  Just the real part is
+.\" plotted by default, but functions like imag() and abs() and arg() are
+.\" available to override this.
+複素数の範囲でのすべての計算。デフォルトでは実数部分のみが描画されますが、
+これを変更するために imag() や abs(), arg() のような関数が用意されています。
+.PP
+.\" Also support for plotting data files, to compare actual data to
+.\" theoretical curves.
+データファイルの描画のサポート。
+理論的な曲線と実際のデータを比較するために使えます。
+.PP
+.\" Nonlinear least-squares fitting.
+非線形の最小二乗法。
+.PP
+.\" 2D plots with mouse-controlled zooming.
+2 次元描画とマウスによる拡大制御。
+.PP
+.\" 3D plots with mouse-controlled point of view.
+3 次元描画とマウスによる視点制御。
+.PP
+.\" User-defined X and Y ranges (optional auto-ranging), smart axes scaling,
+.\" smart tic marks.
+X と Y の範囲のユーザ制御 (自動設定に対するオプション)、
+自動的な軸の縮尺、自動的な軸の刻み。
+.PP
+.\" Labelling of X and Y axes.
+X と Y の軸の見出し付け。
+.PP
+.\" Shell escapes and command line substitution.
+シェルコマンドの実行とコマンドライン置換。
+.PP
+.\" Load and save capability.
+load と save。
+.PP
+.\" Support for many output devices and file formats.
+多くの出力デバイス、出力ファイル形式のサポート。
+.PP
+.\" Output redirection.
+出力リダイレクト。
+.\" .SH OPTIONS
+.SH オプション
+.PP
+.\" \fB\-p, --persist\fP lets plot windows survive after main gnuplot program exits.
+\fB\-p, --persist\fP は、
+gnuplot プログラムが終了した後も描画ウィンドウを残します。
+.PP
+.\" \fB\-e "command list"\fP executes the requested commands before loading the next input file.
+\fB\-e "command list"\fP は、
+次の入力ファイルを読み込む前に指定したコマンドを実行します。
+.PP
+.\" \fB\-h, --help\fP print summary of usage
+\fB\-h, --help\fP は、使用法の要約を表示します。
+.PP
+.\" \fB\-V\fP show current version
+\fB\-V\fP は、現在のバージョンを表示します。
+.\" .SH X11 OPTIONS
+.SH X11 オプション
+.\" .B Gnuplot
+.\" provides the \fIx11\fP terminal type for use
+.\" with X servers. This terminal type is set automatically at startup if
+.\" the \fBDISPLAY\fR environment variable is set, if the \fBTERM\fR environment
+.\" variable is set to \fBxterm\fR, or if the \fB\-display\fR command line
+.\" option is used.
+.B gnuplot
+は、X サーバでの使用のために \fIx11\fP 出力形式を提供しています。
+\fBDISPLAY\fR 環境変数が設定されているか、
+\fBTERM\fR 環境変数が \fBxterm\fR と設定されているか、
+コマンドラインオプション \fB\-display\fR を使用した場合は、
+起動時に自動的にこの出力形式が設定されます。
+.\" For terminal type \fIx11\fR, \fIgnuplot\fP
+.\" accepts the standard X Toolkit options and resources such as geometry, font,
+.\" and background. See the X(1) man page for a description of
+.\" the options.
+\fIx11\fR 出力形式に関しては、\fIgnuplot\fP は geometry やフォント、
+背景色 (background) などの通常の X Toolkit オプションやリソースの指定を
+受けつけます。
+それらのオプションについては X(1) マニュアルページを参照してください。
+.\" In addition to the X Toolkit options:
+X Toolkit オプションに加え、以下のものが使用できます:
+.PP
+.\" \fB\-clear\fP requests that the window be cleared momentarily before a
+.\" new plot is displayed.
+\fB\-clear\fP 新しい描画を表示する前に (瞬間的に) 画面を消去
+.PP
+.\" \fB\-gray\fP requests grayscale rendering on grayscale or color displays.
+.\" (Grayscale displays receive monochrome rendering by default.)
+\fB\-gray\fP グレイスケールまたはカラーディスプレイ上でのグレイスケール描画
+(デフォルトではグレイスケールディスプレイは白黒描画を受け付ける)
+.PP
+.\" \fB\-mono\fP forces monochrome rendering on color displays.
+\fB\-mono\fP カラーディスプレイ上で強制的に白黒描画
+.PP
+.\" \fB-raise\fP raises the plot window after each plot.
+\fB-raise\fP 各描画後に描画ウィンドウを最前面へ出す
+.PP
+.\" \fB-noraise\fP does not raise the plot window after each plot.
+\fB-noraise\fP 各描画後に描画ウィンドウを最前面へ出すことはしない
+.PP
+.\" \fB\-tvtwm\fP requests that geometry specifications
+.\" for position of the window be made relative to the currently displayed
+.\" portion of the virtual root.
+\fB\-tvtwm\fP geometry オプションによる位置の指定を、
+仮想ルートウィンドウ中の現在の表示部分に対する相対的な位置にする
+.PP
+.\" These options may also be controlled with resources in your \fB.Xdefaults\fR
+.\" file.
+.\" For example: \fBgnuplot*gray: on\fP .
+これらのオプションは、ユーザの \fB.Xdefaults\fR ファイル内の
+リソースでも指定できます。
+.PP
+.\" \fIGnuplot\fP provides a command line option (\fB\-pointsize \fIv\fR) and
+.\" a resource (\fBgnuplot*pointsize: \fIv\fR) to control the size of points
+.\" plotted with the "points" plotting style. The value \fIv\fR is a real
+.\" number (greater than 0 and less than or equal to ten) used as a
+.\" scaling factor for point sizes. For example, \fB\-pointsize 2\fR uses
+.\" points twice the default size, and \fB\-pointsize 0.5\fR uses points
+.\" half the normal size.
+\fIgnuplot\fP は描画スタイル "points" で描画する点のサイズの制御にも、
+コマンドラインオプション (\fB\-pointsize \fIv\fR) と
+リソース (\fBgnuplot*pointsize: \fIv\fR) を提供しています。
+値 \fIv\fR は点のサイズの拡大率として使われる (正で 10 以下の) 実数値 で、
+例えば \fB\-pointsize 2\fR はデフォルトのサイズの 2 倍、
+\fB\-pointsize 0.5\fR は普通のサイズの半分の点が使われます。
+.PP
+.\" For monochrome displays, \fIgnuplot\fR does not honor foreground or
+.\" background colors. The default is black-on-white. \fB\-rv\fP or
+.\" \fBgnuplot*reverseVideo: on\fP requests white-on-black.
+白黒ディスプレイに対しては、\fIgnuplot\fR は描画色 (foreground) も
+背景色 (background) も与えません。デフォルトでは背景は白、描画は黒です。
+\fB\-rv\fR や \fBgnuplot*reverseVideo: on\fP の場合には
+背景が黒で描画は白になります。
+.PP
+.\" For color displays \fIgnuplot\fP honors
+.\" the following resources (shown here with default values). The values
+.\" may be color names in the X11 \fIrgb.txt\fP file on your system, hexadecimal
+.\" RGB color specifications (see X11 documentation), or a color name
+.\" followed by a comma and an \fIintensity\fR value from 0 to 1. For example,
+.\" \fBblue,.5\fR means a half intensity blue.
+カラーディスプレイに対しては、\fIgnuplot\fP は以下のリソース 
+(ここではそのデフォルトの値を示します) を参照します。
+リソースの値は、システム上の X11 \fIrgb.txt\fP ファイルに書かれている色名、
+または 16 進の色指定 (X11 のマニュアルを参照) か、
+色名と \fI強度\fR (0 から 1 の間の値) をコンマで区切った値を使用できます。
+例えば \fBblue,.5\fR は、半分の強度の青を意味します。
+.sp
+.B  "gnuplot*background: white"
+.br
+.B  "gnuplot*textColor: black"
+.br
+.B  "gnuplot*borderColor: black"
+.br
+.B  "gnuplot*axisColor: black"
+.br
+.B  "gnuplot*line1Color: red"
+.br
+.B  "gnuplot*line2Color: green"
+.br
+.B  "gnuplot*line3Color: blue"
+.br
+.B  "gnuplot*line4Color: magenta"
+.br
+.B  "gnuplot*line5Color: cyan"
+.br
+.B  "gnuplot*line6Color: sienna"
+.br
+.B  "gnuplot*line7Color: orange"
+.br
+.B  "gnuplot*line8Color: coral"
+.br
+
+.\" When \fB\-gray\fP is selected, \fIgnuplot\fP honors
+.\" the following resources for grayscale or color displays (shown here with
+.\" default values). Note that the default background is black.
+\fB\-gray\fP を選択すると、\fIgnuplot\fP は、
+グレイスケールまたはカラーディスプレイに対して、以下のリソースを参照します
+(ここではそのデフォルトの値を示します)。
+デフォルトの背景色は黒であることに注意してください。
+.sp
+.B  "gnuplot*background: black"
+.br
+.B  "gnuplot*textGray: white"
+.br
+.B  "gnuplot*borderGray: gray50"
+.br
+.B  "gnuplot*axisGray: gray50"
+.br
+.B  "gnuplot*line1Gray: gray100"
+.br
+.B  "gnuplot*line2Gray: gray60"
+.br
+.B  "gnuplot*line3Gray: gray80"
+.br
+.B  "gnuplot*line4Gray: gray40"
+.br
+.B  "gnuplot*line5Gray: gray90"
+.br
+.B  "gnuplot*line6Gray: gray50"
+.br
+.B  "gnuplot*line7Gray: gray70"
+.br
+.B  "gnuplot*line8Gray: gray30"
+.br
+
+.\" \fIGnuplot\fP honors the following resources for setting the width in
+.\" pixels of plot lines (shown here with default values.) 0 or 1 means
+.\" a minimal width line of 1 pixel width. A value of 2 or 3 may
+.\" improve the  appearance of some plots.
+\Ignuplot\fP は描画の線の幅 (ピクセル単位) の設定のために
+以下のリソースを参照します (ここではそのデフォルトの値を示します)。
+0 または 1 は最小の線幅の 1 ピクセル幅を意味します。
+2 または 3 の値によってグラフの外観を改善できる場合もあるでしょう。
+.sp
+.br
+.B  "gnuplot*borderWidth: 2"
+.br
+.B  "gnuplot*axisWidth: 0"
+.br
+.B  "gnuplot*line1Width: 0"
+.br
+.B  "gnuplot*line2Width: 0"
+.br
+.B  "gnuplot*line3Width: 0"
+.br
+.B  "gnuplot*line4Width: 0"
+.br
+.B  "gnuplot*line5Width: 0"
+.br
+.B  "gnuplot*line6Width: 0"
+.br
+.B  "gnuplot*line7Width: 0"
+.br
+.B  "gnuplot*line8Width: 0"
+.br
+
+.\" \fIGnuplot\fP honors the following resources for setting the dash style
+.\" used for plotting lines.  0 means a solid line. A 2 digit number \fIjk\fR
+.\" (\fIj\fP and \fIk\fP are >= 1  and <= 9) means a dashed line with a
+.\" repeated pattern of \fIj\fR pixels on followed by \fIk\fR pixels off.
+.\" For example, '16' is a "dotted" line with 1 pixel on followed by 6 pixels
+.\" off.  More elaborate on/off patterns can be specified with a 4 digit value.
+.\" For example, '4441' is 4 on, 4 off, 4 on, 1 off. The default values shown
+.\" below are for monochrome displays or monochrome rendering on color or
+.\" grayscale displays. For color displays, the defaults for all are 0
+.\" (solid line) except for \fBaxisDashes\fR which defaults to a '16' dotted
+.\" line.
+\fIgnuplot\fP は線描画で使用する点線の形式の設定用に
+以下のリソースを参照します。0 は実線を意味します。
+2 桁の 10 進数 \fIjk\fR (\fIj\fP と \fIk\fP は 1 から 9 までの値) は、
+\fIj\fR 個のピクセルの描画に \fIk\fR 個の空白のピクセルが続く
+パターンの繰り返しからなる点線を意味します。例えば '16' は、
+1 個のピクセルの後に 6 つの空白が続くパターンの点線になります。さらに、
+4 桁の 10 進数でより詳細なピクセルと空白の列のパターンを指定できます。
+例えば、'4441' は 4 つのピクセル、4 つの空白、4 つのピクセル、1 つの空白の
+パターンを意味します。以下のデフォルトのリソース値は、白黒ディスプレイ、
+あるいはカラーや白黒階調 (grayscale) ディスプレイ上の白黒描画における
+値です。カラーディスプレイでは、\fBaxisDashes\fR のデフォルト値のみが '16'
+の点線で、それ以外のデフォルト値はすべて 0 (実線) です。
+.sp
+.br
+.B  "gnuplot*borderDashes: 0"
+.br
+.B  "gnuplot*axisDashes: 16"
+.br
+.B  "gnuplot*line1Dashes: 0"
+.br
+.B  "gnuplot*line2Dashes: 42"
+.br
+.B  "gnuplot*line3Dashes: 13"
+.br
+.B  "gnuplot*line4Dashes: 44"
+.br
+.B  "gnuplot*line5Dashes: 15"
+.br
+.B  "gnuplot*line6Dashes: 4441"
+.br
+.B  "gnuplot*line7Dashes: 42"
+.br
+.B  "gnuplot*line8Dashes: 13"
+.br
+.PP
+.\" The size or aspect ratio of a plot may be changed by resizing the
+.\" .I gnuplot
+.\" window.
+描画サイズとアスペクト比は、
+.I gnuplot
+のウィンドウをリサイズすることで変更できます。
+.\" .SH ENVIRONMENT
+.SH 環境変数
+.\" A number of shell environment variables are understood by
+.\" gnuplot.  None of these are required.
+gnuplot は多くのシェル環境変数を認識します。必須のものはありません。
+.TP
+.B GNUTERM
+.\" The name of the terminal type to be used.  This overrides any terminal
+.\" type sensed by gnuplot on start-up, but is itself overridden by the
+.\" .gnuplot (or equivalent) start-up file (see \fBFILES\fP and "help
+.\" start-up") and, of course, by later explicit changes.
+使用される出力形式 (terminal) の名前。
+これは gnuplot が起動時に見つけた出力形式に優先して使用されますが、.gnuplot 
+(またはそれに相当する) スタートアップファイル (「ファイル」のセクション、
+または "help start-up" 参照) による指定や、当り前のことですが、
+その後に明示的に指定した物の方が優先されます。
+.TP
+.B GNUHELP 
+.\" The pathname of the HELP file (gnuplot.gih).
+ヘルプファイル (gnuplot.gih) のパス名。
+.TP
+.B HOME
+.\" The name of a directory to search for a .gnuplot file if none is found
+.\" in the current directory.
+カレントディレクトリに .gnuplot というファイルがない場合に
+そのファイルを検索するディレクトリ。
+.TP
+.B PAGER
+.\" An output filter for help messages.
+ヘルプメッセージの出力用のフィルタ。
+.TP
+.B SHELL
+.\" The program used for the "shell" command.
+"shell" コマンドの際に使われるプログラム。
+.TP
+.B FIT_SCRIPT
+.\" Specifies a gnuplot command to be executed when a
+.\" fit is interrupted---see "help fit".  
+当てはめ (fit) が中断されたときに実行する gnuplot コマンドの指定
+("help fit" 参照)。
+.TP
+.B FIT_LOG
+.\" The name of the logfile maintained by fit.
+当てはめ (fit) の使用するログファイルの名前。
+.TP
+.B GNUPLOT_LIB
+.\" Additional search directories for data and command files. The variable
+.\" may contain a single directory name, or a list of directories
+.\" separated by ':'. The contents of GNUPLOT_LIB are appended to the
+.\" "loadpath" variable, but not saved with the "save" and "save set"
+.\" commands.
+データやコマンドファイルの検索ディレクトリの追加定義。その変数は、
+一つのディレクトリ名か、または ':' 区切りで複数のディレクトリ名を
+つなげて書いたものです。GNUPLOT_LIB の値は変数 "loadpath" に追加されますが、
+それは "save" や "save set" コマンドでは保存されません。
+.TP
+.B GDFONTPATH
+.\" Several gnuplot terminal drivers access TrueType fonts via the gd library.
+.\" This variable gives the font search path for these drivers.
+出力形式の中には gd ライブラリ経由で TrueType フォントを扱えるものが
+いくつかあります。この変数はそれらの出力形式に対するフォントの
+検索パスを与えます。
+.TP
+.B GNUPLOT_DEFAULT_GDFONT
+.\" The default font for the terminal drivers that access TrueType fonts
+.\" via the gd library.
+gd ライブラリ経由で TrueType フォントを扱う出力形式のデフォルトフォント。
+.TP
+.B GNUPLOT_FONTPATH
+.\" The font search path used by the postscript terminal. The format is
+.\" the same as for GNUPLOT_LIB. The contents of GNUPLOT_FONTPATH are
+.\" appended to the "fontpath" variable, but not saved with the "save" and
+.\" "save set" commands.
+postscript 出力形式が使用するフォント検索パス。
+書式は GNUPLOT_LIB と同じです。
+GNUPLOT_FONTPATH の値は変数 "fontpath" に追加されますが、
+それは "save" や "save set" コマンドでは保存されません。
+.TP
+.B GNUPLOT_PS_DIR
+.\" Used by the postscript driver to locate external prologue
+.\" files. Depending on the build process, gnuplot contains either a
+.\" builtin copy of those files or simply a default hardcoded path. Use
+.\" this variable to test the postscript terminal with custom prologue
+.\" files. See "help postscript prologue".
+postscript 出力形式が探す外部 (prologue) 定義ファイルの置き場所。
+インストール時の作業により、gnuplot にはそれらのファイルのコピーが
+組み込まれているか、または単にそれらのファイルのあるデフォルトのパスが
+埋め込まれるかが変わります。カスタマイズした定義ファイルで postscript 出力を
+テストする場合は、この環境変数を使ってください。"help postscript prologue" 
+参照。
+.\" .SH FILES
+.SH ファイル
+.TP
+.I .gnuplot
+.\" Gnuplot looks for this initialization file, first in the current
+.\" directory, then in the HOME directory.  It may contain any legal
+.\" gnuplot commands, but typically they are limited to setting the
+.\" terminal and defining frequently-used functions or variables.
+gnuplot はこの初期化ファイルを、最初はカレントディレクトリを、
+その後でホームディレクトリを探します。ここには、
+任意の正しい gnuplot コマンドを書くことが可能ですが、一般的には、
+出力装置の指定や、よく使う関数や変数の定義を設定する程度に抑えておきます。
+.TP 
+.I fit.log
+.\" The default name of the logfile maintained by fit.
+当てはめ (fit) の使用するログファイルのデフォルトの名前。
+.\" .SH AUTHORS
+.SH 作者
+.\" Thomas Williams, Pixar Corporation,
+Thomas Williams (Pixar Corporation)
+.br
+(gnuplot-info@lists.sourceforge.net)
+.br
+.\" and Colin Kelley.
+および Colin Kelley。
+.PP
+.\" Additions for labelling by Russell Lang, Monash University, Australia.
+ラベル付けの追加: Russell Lang (Monash University, Australia)
+.br
+(rjl@monu1.cc.monash.edu.au)
+.br
+.\" Further additions by David Kotz, Dartmouth College, New Hampshire, USA
+.\" (formerly of Duke University, North Carolina, USA).
+さらなる追加: David Kotz (Dartmouth College, New Hampshire, USA; 
+(前の所属は Duke University, North Carolina, USA)
+.br
+(David.Kotz@Dartmouth.edu)
+.\" .SH BUGS
+.SH バグ
+.\" See the
+.\" .I help bugs
+.\" command in gnuplot.
+gnuplot のコマンド
+.I help bugs
+を参照。
+.\" .SH SEE ALSO
+.SH 参照
+.\" See the printed manual or the on-line help for details on specific commands.
+個々のコマンドの詳細については、印刷されたマニュアルやオンラインヘルプを参照。
+.br
+.\" X(1).
+X(1) 参照。
