@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.74 2008/09/22 23:13:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.75 2008/10/30 22:21:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -602,6 +602,9 @@ make_tics(AXIS_INDEX axis, int guide)
     xr = fabs(axis_array[axis].min - axis_array[axis].max);
     if (xr == 0)
 	return 1;	/* Anything will do, since we'll never use it */
+    if (xr >= VERYLARGE)
+	int_error(NO_CARET,"%s axis range undefined or overflow",
+		axis_defaults[axis].name);
     tic = quantize_normal_tics(xr, guide);
     /* FIXME HBB 20010831: disabling this might allow short log axis
      * to receive better ticking... */

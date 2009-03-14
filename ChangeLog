@@ -8,6 +8,9 @@
 	* configure.in: Explicitly include $LUA_CFLAGS as reported by pkgconfig.
 	Bug #2637549
 
+	* src/axis.c (make_tics): Trap case where there were insufficient data
+	to determine axis range. E.g. "set view map; set pm3d; splot {0,1};".
+
 2009-03-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (fit_command): Replace bogus initialization of dummy_token[]
