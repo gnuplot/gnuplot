@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.562 2009/02/28 20:54:20 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.563 2009/03/13 05:10:56 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -35,8 +35,8 @@ C
 ^   Mailing list for comments: gnuplot-info@lists.sourceforge.net <p>
 ^   Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net <p>
 ^</h2><p>
-^<h3> This manual was prepared by Dick Crawford</h3><p>
-^<h3> Last revised: February 2007</h3><p>
+^<h3> This manual was originally prepared by Dick Crawford</h3><p>
+^<h3> Last revised: March 2009</h3><p>
 ^<hr>
 1 gnuplot
 2 Copyright
@@ -344,12 +344,13 @@ C
 ?line-editing
 ?editing
 ?command-line-editing
- Command-line editing and command history are supported using either the
- external gnu readline library or a built-in equivalent.  This choice is a
- configuration option at the time gnuplot is built.
+ Command-line editing and command history are supported using either an
+ external gnu readline library, an external BSD libedit library,  or a
+ built-in equivalent.  This choice is a configuration option at the time
+ gnuplot is built.
 
  The editing commands of the built-in version are given below. The gnu
- readline library has its own documentation.
+ readline and BSD libedit libraries have their own documentation.
 
 @start table - first is interactive cleartext form
        `Line-editing`:
@@ -11807,7 +11808,7 @@ Ffigure_mapcontours
  the corresponding point as undefined) or aborts `gnuplot` depends on the
  compiler/runtime environment.
 
- The gamma and bessel functions do not work for complex arguments.
+ The gamma, bessel, and erf functions do not work for complex arguments.
 
  Only one color palette at a time is active for any given x11 plot window.
  This means that multiplots whose constituent plots use different palettes
