@@ -1,4 +1,4 @@
-New features, changes and fixes since previous release
+New features, changes and fixes in gnuplot version 4.2.5
 ===========================================================
 * NEW ./configure --with-readline=bsd to use libedit rather than libreadline
 * NEW command line option -e "command list"
@@ -7,7 +7,7 @@ New features, changes and fixes since previous release
 * CHANGE updated svg terminal driver (back-ported from 4.3 CVS branch)
 * CHANGE fillstyle empty really is consistently empty (not fill-with-background)
 * CHANGE warn that some options to 'set datafile binary' are not implemented
-* CHANGE handling of custom palette in postscript plots set to "monochrome"
+* CHANGE handling of custom palette when postscript mode is set to "monochrome"
 * CHANGE allow Z axis label in 3D plots to be rotated
 * FIX interpolatation for pm3d surfaces given by both z and colour coordinates
 * FIX infinite loop if axis tick increment is on the order of machine precision
@@ -16,6 +16,7 @@ New features, changes and fixes since previous release
 * FIX 3D plots with fixed zrange were clipping against xmax rather than zmax
 * FIX handling of uninitialized variables in fit "via" command
 * FIX pm3d depthorder was ignoring interpolation setting
+* FIX assignment of fill patterns to boxes in columnstacked histograms
 
 
 New features, changes and fixes in gnuplot version 4.2.4

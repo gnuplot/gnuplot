@@ -1,3 +1,8 @@
+2009-03-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Increment patchlevel, version strings, documentation dates, and NEWS in
+	preparation for release of version 4.2.5
+
 2009-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/datastrings.dem demo/histograms.dem demo/histograms:
