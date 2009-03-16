@@ -1,6 +1,11 @@
+/*
+ *  $Id: lua.trm,v 1.2 $
+ *  $Date: 2008/12/26 22:16:03 sfeam Exp $
+ *  $Rev: 90 $
+ */
+
 /* 
  *  GNUPLOT - lua.trm
- *
  */
 
 /*[
@@ -34,14 +39,6 @@
  * This software is provided "as is" without express or implied warranty
  * to the extent permitted by applicable law.
 ]*/
-
-/*
- *
- *  $Date: 2008/12/22 21:44:39 $
- *  $Author: sfeam $
- *  $Rev: 90 $
- *
- */
 
 
 #include "driver.h"
