@@ -21,7 +21,7 @@ set style data histogram
 set style histogram cluster gap 1
 set style fill solid border -1
 set boxwidth 0.9
-set xtic rotate by -45
+set xtic rotate by -45 scale 0
 #set bmargin 10 
 plot 'immigration.dat' using 6:xtic(1) ti col, '' u 12 ti col, '' u 13 ti col, '' u 14 ti col
 #
@@ -42,7 +42,7 @@ set key autotitle columnheader
 set yrange [0:7e6]
 set auto x
 unset xtics
-set xtics nomirror rotate by -45
+set xtics nomirror rotate by -45 scale 0
 set style data histogram
 set style histogram rowstacked
 set style fill solid border -1
@@ -98,7 +98,7 @@ set style histogram clustered gap 1 title offset 2,0.25
 set style fill solid noborder
 set boxwidth 0.95
 unset xtics
-set xtics nomirror rotate by -45
+set xtics nomirror rotate by -45 scale 0
 set xlabel "(note: histogram titles have specified offset relative to X-axis label)" offset 0,-2
 set ytics
 set grid y
