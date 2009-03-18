@@ -1,3 +1,11 @@
+2009-03-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_draw_text): Determine the vertical
+	placement of text based on the average value found when the font was
+	selected, rather than on the specific height of this text fragment.
+	Otherwise successive fragments with different height produce an uneven
+	baseline.  Bug #2661664
+
 2009-03-14  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff docs/README.ja man/gnuplot-ja.1:
