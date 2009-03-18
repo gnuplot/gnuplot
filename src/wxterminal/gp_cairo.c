@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.16.2.1 2007/03/22 04:20:04 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.16.2.2 2007/08/20 08:05:16 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -659,7 +659,8 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 
 	pango_layout_get_extents(layout, &ink_rect, &logical_rect);
 
-	vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE;
+	/* vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE; */
+	vert_just = term->v_char / 2;
 
 	x = (double) x1;
 	y = (double) y1;
@@ -1375,7 +1376,8 @@ void gp_cairo_draw_enhanced_text(plot_struct *plot, int x, int y, const char* st
 	pango_layout_set_attributes (layout, gp_cairo_enhanced_AttrList);
 
 	pango_layout_get_extents(layout, &ink_rect, &logical_rect);
-	vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE;
+	/* vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE; */
+	vert_just = term->v_char / 2;
 	
 	arg = plot->text_angle * M_PI/180;
 	enh_x = x - vert_just * sin(arg);
