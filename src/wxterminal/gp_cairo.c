@@ -1429,7 +1429,8 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 	pango_layout_set_attributes (layout, gp_cairo_enhanced_AttrList);
 
 	pango_layout_get_extents(layout, &ink_rect, &logical_rect);
-	vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE;
+	/* vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE; */
+	vert_just = avg_vchar/2;
 	
 	arg = plot->text_angle * M_PI/180;
 	enh_x = x - vert_just * sin(arg);
