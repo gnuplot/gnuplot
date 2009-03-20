@@ -1,3 +1,8 @@
+2009-03-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/canvas.trm:  set term canvas title "foo" sets the title of the
+	resulting HTML output document.
+
 2009-03-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_text): Determine the vertical

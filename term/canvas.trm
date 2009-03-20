@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.15 2009/02/28 04:50:50 sfeam Exp $
+ * $Id: canvas.trm,v 1.17 2009/03/01 05:37:07 sfeam Exp $
  *
  */
 
@@ -93,6 +93,7 @@ static TBOOLEAN CANVAS_mouseable = FALSE;
 static TBOOLEAN CANVAS_standalone = TRUE;
 static char *CANVAS_name = NULL;
 static char *CANVAS_scriptdir = NULL;
+static char *CANVAS_title = NULL;
 
 static struct {
     int  previous_linewidth;
@@ -102,7 +103,7 @@ static struct {
 } canvas_state;
 
 enum CANVAS_case {
-    CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, 
+    CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, CANVAS_TITLE,
     CANVAS_LINEWIDTH, CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_ENH, CANVAS_NOENH,
     CANVAS_OTHER
 };
@@ -120,6 +121,7 @@ static struct gen_table CANVAS_opts[] =
     { "noenh$anced", CANVAS_NOENH },
     { "lw", CANVAS_LINEWIDTH },
     { "linew$idth", CANVAS_LINEWIDTH },
+    { "title", CANVAS_TITLE },
     { NULL, CANVAS_OTHER }
 };
 
@@ -158,6 +160,8 @@ CANVAS_options()
 	CANVAS_mouseable = FALSE;
 	free(CANVAS_name);
 	CANVAS_name = NULL;
+	free(CANVAS_title);
+	CANVAS_title = NULL;
 	free(CANVAS_scriptdir);
 	CANVAS_scriptdir = NULL;
 	canvas_linewidth = 1.0;
@@ -183,7 +187,13 @@ CANVAS_options()
 	    term->xmax = canvas_xmax;
 	    term->ymax = canvas_ymax;
  	    break;
-	
+
+	case CANVAS_TITLE:
+	    CANVAS_title = try_to_get_string();
+	    if (!CANVAS_title)
+		int_error(c_token,"expecting an HTML title string");
+	    break;
+
 	case CANVAS_NAME:
 	    CANVAS_name = try_to_get_string();
 	    if (!CANVAS_name)
@@ -247,6 +257,8 @@ CANVAS_options()
 	sprintf(term_options + strlen(term_options), " standalone");
 	if (CANVAS_mouseable)
 	    sprintf(term_options + strlen(term_options), " mousing");
+	if (CANVAS_title)
+	    sprintf(term_options + strlen(term_options), " title \"%s\"", CANVAS_title);
     }
     if (CANVAS_scriptdir)
 	sprintf(term_options + strlen(term_options), " jsdir \"%s\"", CANVAS_scriptdir);
@@ -308,7 +320,8 @@ CANVAS_graphics()
 	fprintf(gpoutfile,
 		"<html>\n"
 		"<head>\n"
-		"<title>Gnuplot Canvas Graph</title>\n"
+		"<title>%s</title>\n",
+		CANVAS_title ? CANVAS_title : "Gnuplot Canvas Graph"
 		);
 	if (encoding == S_ENC_UTF8)
 	    fprintf(gpoutfile,
@@ -1037,6 +1050,7 @@ START_HELP(canvas)
 "                           {{no}enhanced} {linewidth <lw>}",
 "                           {standalone {mousing} | name '<funcname>'}",
 "                           {jsdir 'URL/for/javascripts'}",
+"                           {title '<some string>'}",
 "",
 " where <xsize> and <ysize> set the size of the plot area in pixels.",
 " The default size in standalone mode is 600 by 400 pixels.",
