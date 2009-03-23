@@ -1,3 +1,9 @@
+2009-03-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/win/wgraph.c (Wnd_exec_event): Zero 2nd parameter sent to
+	gp_exec_event after a keypress. This should fix the problem leading to
+	"protocol error" messages.
+
 2009-03-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_text): Determine the vertical
@@ -5,6 +11,9 @@
 	selected, rather than on the specific height of this text fragment.
 	Otherwise successive fragments with different height produce an uneven
 	baseline.  Bug #2661664
+
+	* src/axis.c (make_tics): Trap case where there were insufficient data
+	to determine axis range. E.g. "set view map; set pm3d; splot {0,1};".
 
 2009-03-15  Ethan A Merritt  <merritt@u.washington.edu>
 
