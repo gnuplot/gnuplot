@@ -1,3 +1,9 @@
+2009-03-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c (pm3d_plot): The quadrangles are only prepared but not
+	drawn by this routine in pm3d depthorder mode, thus set_color() should
+	not be called.
+
 2009-03-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/win/wgraph.c (Wnd_exec_event): Zero 2nd parameter sent to

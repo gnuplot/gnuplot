@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.66.2.3 2008/09/29 05:29:26 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.66.2.4 2009/01/27 22:10:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -652,7 +652,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		       pointsB[ii1].x, pointsB[ii1].y, pointsA[i1].x, pointsA[i1].y);
 #endif
 		/* set the color */
-		set_color(gray);
+		if (pm3d.direction != PM3D_DEPTH)
+		    set_color(gray);
 #ifdef EXTENDED_COLOR_SPECS
 	      }
 #endif
@@ -940,7 +941,7 @@ pm3d_draw_one(struct surface_points *plot)
     }
 
     /* for pm3dCompress.awk */
-    if (gppsfile)
+    if (gppsfile && (pm3d.direction != PM3D_DEPTH))
 	fputs("%pm3d_map_begin\n", gppsfile);
 
     for (; where[i]; i++) {
@@ -962,7 +963,7 @@ pm3d_draw_one(struct surface_points *plot)
     }
 
     /* for pm3dCompress.awk */
-    if (gppsfile)
+    if (gppsfile && (pm3d.direction != PM3D_DEPTH))
 	fputs("%pm3d_map_end\n", gppsfile);
 }
 
