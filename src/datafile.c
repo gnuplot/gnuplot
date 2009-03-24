@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.19 2009/03/05 03:20:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.110.2.20 2009/03/13 06:23:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1472,9 +1472,9 @@ static void
 plot_option_using(int max_using)
 {
 
-#ifdef BINARY_DATA_FILE
     int no_cols = 0;  /* For general binary only. */
 
+#ifdef BINARY_DATA_FILE
     /* The filetype function may have set the using specs, so reset
      * them before processing tokens. */
     if (df_binary_file)
@@ -1491,10 +1491,8 @@ plot_option_using(int max_using)
 	    if (equals(c_token, ":")) {
 		/* empty specification - use default */
 		use_spec[df_no_use_specs].column = df_no_use_specs;
-#ifdef BINARY_DATA_FILE
 		if (df_no_use_specs > no_cols)
 		    no_cols = df_no_use_specs;
-#endif
 		++df_no_use_specs;
 		/* do not increment c+token ; let while() find the : */
 	    } else if (equals(c_token, "(")) {
@@ -1532,10 +1530,8 @@ plot_option_using(int max_using)
 		if (col < -2)
 		    int_error(c_token, "Column must be >= -2");
 		use_spec[df_no_use_specs++].column = col;
-#ifdef BINARY_DATA_FILE
 		if (col > no_cols)
 		    no_cols = col;
-#endif
 	    }
 	} while (equals(c_token, ":") && ++c_token);
     }
