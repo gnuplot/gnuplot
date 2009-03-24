@@ -1,3 +1,9 @@
+2009-03-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c (pm3d_plot): The quadrangles are only prepared but not
+	drawn by this routine in pm3d depthorder mode, thus set_color() should
+	not be called.
+
 2009-03-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/canvas.trm:  set term canvas title "foo" sets the title of the
