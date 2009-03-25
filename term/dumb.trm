@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.28 2008/02/24 19:49:38 sfeam Exp $
+ * $Id: dumb.trm,v 1.29 2008/08/16 05:38:38 sfeam Exp $
  *
  */
 
@@ -551,9 +551,7 @@ TERM_TABLE_START(dumb_driver)
     , NULL, NULL, NULL, NULL, NULL
 #endif
     , NULL, NULL, NULL, NULL
-#ifdef WITH_IMAGE
-    , NULL
-#endif
+    , NULL /* image */
 #ifndef NO_DUMB_ENHANCED_SUPPORT
     , ENHdumb_OPEN, ENHdumb_FLUSH, do_enh_writec
 #endif /* NO_DUMB_ENHANCED_SUPPORT */

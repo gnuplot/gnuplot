@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.13 2008/05/08 00:10:06 sfeam Exp $
+ * $Id: gp_cairo.h,v 1.14 2009/01/14 23:16:49 tlecomte Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -206,9 +206,7 @@ void gp_cairo_draw_point(plot_struct *plot, int x1, int y1, int style);
 void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int height, int style);
 void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners);
 void gp_cairo_end_polygon(plot_struct *plot);
-#ifdef WITH_IMAGE
 void gp_cairo_draw_image(plot_struct *plot, unsigned int * image, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int M, int N);
-#endif /*WITH_IMAGE*/
 void gp_cairo_set_color(plot_struct *plot, rgb_color color);
 void gp_cairo_set_linestyle(plot_struct *plot, int linestyle);
 void gp_cairo_set_linetype(plot_struct *plot, int linetype);

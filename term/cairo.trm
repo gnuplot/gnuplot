@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.26 2009/01/14 23:16:49 tlecomte Exp $
+ * $Id: cairo.trm,v 1.27 2009/01/27 01:18:08 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -64,9 +64,7 @@ TERM_PUBLIC int cairotrm_text_angle __PROTO ((int ang));
 TERM_PUBLIC void cairotrm_fillbox __PROTO ((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC int cairotrm_set_font __PROTO ((const char *font));
 TERM_PUBLIC void cairotrm_pointsize __PROTO ((double ptsize));
-#ifdef WITH_IMAGE
 TERM_PUBLIC void cairotrm_image __PROTO ((unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode));
-#endif /*WITH_IMAGE*/
 TERM_PUBLIC int cairotrm_make_palette __PROTO ((t_sm_palette *palette));
 TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
 TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
@@ -822,7 +820,6 @@ void cairotrm_filled_polygon(int n, gpiPoint *corners)
 	free(mirrored_corners);
 }
 
-#ifdef WITH_IMAGE
 void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
 {
 	/* This routine is to plot a pixel-based image on the display device.
@@ -865,7 +862,6 @@ void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint *
 			M, N);
 	free(image255);
 }
-#endif /*WITH_IMAGE*/
 
 #endif /* TERM_BODY */
 
@@ -886,9 +882,7 @@ TERM_TABLE_START (pdfcairo_driver)
     , 0, 0, 0, 0, 0
 #endif
     , cairotrm_make_palette, 0 /* cairotrm_previous_palette */, cairotrm_set_color, cairotrm_filled_polygon
-#ifdef WITH_IMAGE
     , cairotrm_image
-#endif
     , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0
 TERM_TABLE_END (pdfcairo_driver)
@@ -913,9 +907,7 @@ TERM_TABLE_START (pngcairo_driver)
     , 0, 0, 0, 0, 0
 #endif
     , cairotrm_make_palette, 0 /* cairotrm_previous_palette */, cairotrm_set_color, cairotrm_filled_polygon
-#ifdef WITH_IMAGE
     , cairotrm_image
-#endif
     , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0
 TERM_TABLE_END (pngcairo_driver)

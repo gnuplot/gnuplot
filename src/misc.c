@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.106 2008/12/31 22:21:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.107 2009/01/01 21:48:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -634,9 +634,7 @@ expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
 \t'histeps', 'filledcurves', 'boxes', 'boxerrorbars', 'boxxyerrorbars',\n\
 \t'vectors', 'financebars', 'candlesticks', 'errorlines', 'xerrorlines',\n\
 \t'yerrorlines', 'xyerrorlines', 'pm3d', 'labels', 'histograms'"
-#ifdef WITH_IMAGE
 ",\n\t 'image', 'rgbimage'"
-#endif
 );
 	ps = LINES;
     }
@@ -1212,7 +1210,6 @@ arrow_parse(
     }
 }
 
-#ifdef WITH_IMAGE
 void
 get_image_options(t_image *image)
 {
@@ -1222,4 +1219,3 @@ get_image_options(t_image *image)
     }
 
 }
-#endif

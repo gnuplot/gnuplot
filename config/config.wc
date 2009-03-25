@@ -9,8 +9,6 @@
 #define HIDDEN3D_QUADTREE	1
 #define USE_ULIG_FILLEDBOXES	   1
 #define USE_ULIG_RELATIVE_BOXWIDTH 1
-#define WITH_IMAGE		1
-
 
 
 

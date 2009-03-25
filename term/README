@@ -75,9 +75,7 @@ struct TERMENTRY {
    void (*previous_palette) __PROTO(());
    void (*set_color) __PROTO((t_colorspec *colorspec));
    void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
-#ifdef WITH_IMAGE
-    void (*image) __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
-#endif
+   void (*image) __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 /* Enhanced text mode driver call-backs */
     void (*enhanced_open) __PROTO((char * fontname, double fontsize,
                double base, TBOOLEAN widthflag, TBOOLEAN showflag,
@@ -397,9 +395,6 @@ _enhanced_writec() - write (or buffer) a single character of the text fragment
                      being constructed
 _enhanced_flush()  - finish processing of previous fragment and write it to
                      the output stream
-
-The following function should be conditioned on WITH_IMAGE.  See also:
-src/README for notes about image support.
 
 _image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
    Plot a pixel-based image on the display device.

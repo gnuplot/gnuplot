@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.45 2009/03/01 05:04:53 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.47 2009/03/18 17:21:28 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1001,7 +1001,6 @@ void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int heigh
 }
 
 
-#ifdef WITH_IMAGE
 /*	corner[0] = (x1,y1) is the upper left corner (in terms of plot location) of
  *	the outer edge of the image.  Similarly, corner[1] = (x2,y2) is the lower
  *	right corner of the outer edge of the image.  (Outer edge means the
@@ -1059,7 +1058,6 @@ void gp_cairo_draw_image(plot_struct *plot, unsigned int * image, int x1, int y1
 	cairo_pattern_destroy( pattern );
 	cairo_surface_destroy( image_surface );
 }
-#endif /*WITH_IMAGE*/
 
 /* =======================================================================
  * Enhanced text mode support

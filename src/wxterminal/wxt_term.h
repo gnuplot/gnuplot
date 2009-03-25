@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.9 2008/02/04 22:52:28 tlecomte Exp $
+ * $Id: wxt_term.h,v 1.10 2008/02/24 19:49:37 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -73,9 +73,8 @@ int wxt_text_angle(int ang);
 void wxt_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
 int wxt_set_font __PROTO ((const char *font));
 void wxt_pointsize(double ptsize);
-#ifdef WITH_IMAGE
 void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode);
-#endif /*WITH_IMAGE*/
+
 # ifdef USE_MOUSE
 int wxt_waitforinput(void);
 void wxt_put_tmptext(int, const char str[]);

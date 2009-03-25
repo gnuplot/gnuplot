@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.63 2008/09/08 17:56:55 sfeam Exp $
+ * $Id: win.trm,v 1.64 2008/11/07 11:55:46 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -98,9 +98,7 @@ TERM_PUBLIC void WIN_enhanced_open __PROTO((char * fontname, double fontsize,
 	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
 			int overprint));
 TERM_PUBLIC void WIN_enhanced_flush __PROTO((void));
-#ifdef WITH_IMAGE
 TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
-#endif
 
 
 /* Initialization values - Guess Now Scale later */
@@ -481,8 +479,6 @@ WIN_waitforinput  ()
 #endif /* USE_MOUSE */
 
 
-#ifdef WITH_IMAGE
-
 /* Note: this is a verbatim copy of PM_image (pm.trm) with only minor changes */
 
 TERM_PUBLIC void
@@ -572,8 +568,6 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 
     free(rgb_image);
 }
-
-#endif /* WITH_IMAGE */
 
 
 TERM_PUBLIC int
@@ -916,9 +910,7 @@ TERM_TABLE_START(win_driver)
 #endif
     , WIN_make_palette, 0 /* previous_palette */,
     WIN_set_color, WIN_filled_polygon
-#ifdef WITH_IMAGE
     , WIN_image
-#endif
     , WIN_enhanced_open, WIN_enhanced_flush, do_enh_writec
 TERM_TABLE_END(win_driver)
 

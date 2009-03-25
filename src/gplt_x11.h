@@ -58,10 +58,7 @@
 #define X11_GR_SET_LINECOLOR    'l'
 #define X11_GR_FILLED_POLYGON   'I'
 #define X11_GR_BINARY_POLYGON   'f'
-
-#ifdef WITH_IMAGE
-#define X11_GR_IMAGE 'i'
-#endif
+#define X11_GR_IMAGE		'i'
 
 #ifdef EXTERNAL_X11_WINDOW
 #define X11_GR_SET_WINDOW_ID    'w'
@@ -92,10 +89,7 @@
 #define FILLED_POLYGON_TRANSLATION_CHAR  -13
 #define IMAGE_TRANSLATION_CHAR            45
 
-#ifdef WITH_IMAGE
-/* Maximum image plane value of data transfer.
- */
+/* Maximum image plane value of data transfer.  */
 #define IMAGE_PALETTE_VALUE_MAX USHRT_MAX
-#endif
 
 #endif /* GNUPLOT_GPLT_X11_H */

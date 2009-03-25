@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.38 2008/01/22 01:08:16 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.39 2008/06/19 17:49:09 sfeam Exp $
  *
  */
 
@@ -66,9 +66,7 @@ TERM_PUBLIC int AQUA_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void AQUA_previous_palette __PROTO((void));
 TERM_PUBLIC void AQUA_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void AQUA_filled_polygon __PROTO((int points, gpiPoint *corners));
-# ifdef WITH_IMAGE
 TERM_PUBLIC void AQUA_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
-# endif
 TERM_PUBLIC void ENHAQUA_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC void ENHAQUA_open __PROTO((char * fontname, double fontsize,
 				       double base, TBOOLEAN widthflag, TBOOLEAN showflag,
@@ -714,8 +712,6 @@ AQUA_previous_palette()
 {
 }
 
-#ifdef WITH_IMAGE
-
 TERM_PUBLIC void
 AQUA_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
 {
@@ -759,8 +755,6 @@ AQUA_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t
   }
   return;
 }
-
-#endif /* WITH_IMAGE */
 
 /*
  * Per Persson 20041019
@@ -894,11 +888,9 @@ TERM_TABLE_START(aqua_driver)
   , AQUA_make_palette,
   AQUA_previous_palette,
   AQUA_set_color,
-  AQUA_filled_polygon
-#ifdef WITH_IMAGE
-  , AQUA_image
-#endif
-    , ENHAQUA_open, ENHAQUA_flush, ENHAQUA_writec
+  AQUA_filled_polygon,
+  AQUA_image,
+  ENHAQUA_open, ENHAQUA_flush, ENHAQUA_writec
 TERM_TABLE_END(aqua_driver)
 
 #undef LAST_TERM

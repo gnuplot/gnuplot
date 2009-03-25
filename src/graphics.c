@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.296 2009/03/05 03:19:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.297 2009/03/05 20:32:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1981,7 +1981,6 @@ do_plot(struct curve_points *plots, int pcount)
 		place_labels( this_plot->labels->next, LAYER_PLOTLABELS, TRUE);
 		break;
 
-#ifdef WITH_IMAGE
 	    case IMAGE:
 		this_plot->image_properties.type = IC_PALETTE;
 		plot_image_or_update_axes(this_plot, FALSE);
@@ -1996,7 +1995,7 @@ do_plot(struct curve_points *plots, int pcount)
 		this_plot->image_properties.type = IC_RGBA;
 		plot_image_or_update_axes(this_plot, FALSE);
 		break;
-#endif
+
 #ifdef EAM_OBJECTS
 	    case CIRCLES:
 		plot_circles(this_plot);
@@ -5620,7 +5619,6 @@ check_for_variable_color(struct curve_points *plot, struct coordinate *point)
 	return FALSE;
 }
 	    
-#ifdef WITH_IMAGE
 
 /* Similar to HBB's comment above, this routine is shared with
  * graph3d.c, so it shouldn't be in this module (graphics.c).
@@ -6206,6 +6204,3 @@ skip_pixel:
     }
 
 }
-
-#endif
-

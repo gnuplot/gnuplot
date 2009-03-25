@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.75 2009/02/04 17:18:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.76 2009/03/24 11:18:15 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -1063,10 +1063,8 @@ set_plot_with_palette(int plot_num, int plot_mode)
     /* Check 2D plots */
     if (plot_mode == MODE_PLOT) {
 	while (this_2dplot) {
-#ifdef WITH_IMAGE
 	    if (this_2dplot->plot_style == IMAGE)
 		return;
-#endif
 	    if (this_2dplot->lp_properties.use_palette
 	    &&  this_2dplot->lp_properties.pm3d_color.type > TC_RGB)
 		return;
@@ -1083,10 +1081,8 @@ set_plot_with_palette(int plot_num, int plot_mode)
 	while (surface++ < plot_num) {
 	    if (this_3dplot->plot_style == PM3DSURFACE)
 		return;
-#ifdef WITH_IMAGE
 	    if (this_3dplot->plot_style == IMAGE)
 		return;
-#endif
 	    if (this_3dplot->lp_properties.use_palette) {
 	        int type = this_3dplot->lp_properties.pm3d_color.type;
 		if (type == TC_LT || type == TC_LINESTYLE || type == TC_RGB)

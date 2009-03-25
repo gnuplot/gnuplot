@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.181 2009/01/15 04:55:50 sfeam Exp $
+ * $Id: x11.trm,v 1.182 2009/02/07 19:47:46 sfeam Exp $
  *
  */
 
@@ -98,9 +98,7 @@ TERM_PUBLIC int X11_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void X11_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
 
-# ifdef WITH_IMAGE
 TERM_PUBLIC void X11_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
-# endif
 
 /* To support "set term x11 enhanced" */
 TERM_PUBLIC void ENHX11_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
@@ -1949,7 +1947,6 @@ X11_send_endianess(void)
     fflush(X11_ipc);
 }
 
-#ifdef WITH_IMAGE
 
 TERM_PUBLIC void
 X11_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
@@ -2072,8 +2069,6 @@ X11_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
     return;
 }
 
-#endif /* WITH_IMAGE */
-
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -2094,9 +2089,7 @@ TERM_TABLE_START(x11_driver)
 #endif
     , X11_make_palette, 0 /* X11_previous_palette */ ,
     X11_set_color, X11_filled_polygon
-#ifdef WITH_IMAGE
     , X11_image
-#endif
     , ENHX11_OPEN, ENHX11_FLUSH, do_enh_writec
 TERM_TABLE_END(x11_driver)
 

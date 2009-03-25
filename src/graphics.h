@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.45 2008/06/03 00:36:21 sfeam Exp $
+ * $Id: graphics.h,v 1.46 2008/09/24 03:19:06 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -59,9 +59,7 @@ typedef struct curve_points {
     struct arrow_style_type arrow_properties;
     struct fill_style_type fill_properties;
     struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */
-#ifdef WITH_IMAGE
     struct t_image image_properties;	/* only used if plot_style is IMAGE or RGB_IMAGE */
-#endif
 
     /* 2D and 3D plot structure fields overlay only to this point */
 
@@ -101,9 +99,7 @@ void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));
 void init_histogram __PROTO((struct histogram_style *hist, char *title));
 void free_histlist __PROTO((struct histogram_style *hist));
 
-#ifdef WITH_IMAGE
 void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN update_axes));
-#endif
 
 #ifdef EAM_OBJECTS
 void place_objects __PROTO((struct object *listhead, int layer, int dimensions, BoundingBox *clip_area));

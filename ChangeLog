@@ -1,3 +1,23 @@
+2009-03-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* config/config.cyg config/config.dj2 config/config.mgw config/config.nt 
+	config/config.os2 config/config.oww config/config.wc configure.in	
+	src/datafile.c src/gplt_x11.c src/gplt_x11.h src/gp_types.h 
+	src/graph3d.c src/graph3d.h src/graphics.c src/graphics.h src/misc.c 
+	src/misc.h src/plot2d.c src/plot3d.c src/pm3d.c src/save.c src/show.c 
+	src/tables.c src/term_api.h src/wxterminal/gp_cairo.c
+	src/wxterminal/gp_cairo.h src/wxterminal/wxt_gui.cpp
+	src/wxterminal/wxt_gui.h src/wxterminal/wxt_term.h term/aquaterm.trm
+	term/cairo.trm term/canvas.trm term/dumb.trm term/emf.trm
+	term/estimate.trm term/fig.trm term/gd.trm term/lua.trm term/pdf.trm
+	term/pm.trm term/post.trm term/pslatex.trm term/README term/svg.trm
+	term/win.trm term/wxt.trm term/x11.trm term/xlib.trm
+
+	Remove the conditional compilation status of WITH_IMAGE.
+	As Lucas Hart points out, for some while now it has not been possible to
+	successfully build with ./configure  --disable-with-image 
+	'show version long' will continue to report +IMAGE
+
 2009-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/canvasmath.js: Fill in most of the iso 8859-1 (Latin-1)

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.57 2008/12/14 05:17:19 sfeam Exp $
+ * $Id: emf.trm,v 1.58 2009/01/28 22:05:13 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1647,9 +1647,7 @@ TERM_TABLE_START(emf_driver)
    EMF_previous_palette,
    EMF_set_color,
    EMF_filled_polygon
-#ifdef WITH_IMAGE
-    , NULL
-#endif
+    , NULL /* image */
     , ENHemf_OPEN, ENHemf_FLUSH, do_enh_writec
 TERM_TABLE_END(emf_driver)
 #undef LAST_TERM

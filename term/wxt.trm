@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.22 2008/02/04 22:52:28 tlecomte Exp $
+ * $Id: wxt.trm,v 1.23 2008/06/02 00:48:12 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -362,9 +362,7 @@ TERM_TABLE_START (wxt_driver)
     , wxt_waitforinput, wxt_put_tmptext, wxt_set_ruler, wxt_set_cursor, wxt_set_clipboard
 #endif
     , wxt_make_palette, 0 /* wxt_previous_palette */, wxt_set_color, wxt_filled_polygon
-#ifdef WITH_IMAGE
     , wxt_image
-#endif
     , wxt_enhanced_open, wxt_enhanced_flush, wxt_enhanced_writec
 TERM_TABLE_END (wxt_driver)
 

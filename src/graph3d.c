@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.218 2009/03/11 19:12:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.219 2009/03/11 23:44:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -65,9 +65,7 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.218 2009/03/11 19:12:56 
 #include "plot3d.h"
 #include "color.h"
 
-#ifdef WITH_IMAGE
 #include "plot.h"
-#endif
 
 /* HBB NEW 20040311: PM3D did already split up grid drawing into two
  * parts, one before, the other after drawing the main surfaces, as a
@@ -1174,7 +1172,6 @@ do_3dplot(
 	    case HISTOGRAMS: /* Cannot happen */
 		break;
 
-#ifdef WITH_IMAGE
 	    case IMAGE:
 		/* Plot image using projection of 3D plot coordinates to 2D viewing coordinates. */
 		this_plot->image_properties.type = IC_PALETTE;
@@ -1191,7 +1188,7 @@ do_3dplot(
 		this_plot->image_properties.type = IC_RGBA;
 		plot_image_or_update_axes(this_plot, FALSE);
 		break;
-#endif
+
 	    }			/* switch(plot-style) */
 
 	    /* move key on a line */

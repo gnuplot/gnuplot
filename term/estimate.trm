@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: estimate.trm,v 1.6 2007/11/22 05:57:43 sfeam Exp $
+ * $Id: estimate.trm,v 1.7 2008/06/02 19:49:50 sfeam Exp $
  *
  */
 
@@ -175,9 +175,7 @@ static struct termentry ENHest = {
     , NULL, NULL, NULL, NULL, NULL
 #endif
     , NULL, NULL, NULL, NULL
-#ifdef WITH_IMAGE
     , NULL
-#endif
     , ENHest_OPEN, ENHest_FLUSH, ENHest_writec
 };
 

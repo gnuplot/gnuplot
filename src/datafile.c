@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.169 2009/03/05 03:19:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.170 2009/03/13 05:10:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2657,11 +2657,9 @@ df_bin_default_columns default_style_cols[LAST_PLOT_STYLE + 1] = {
     {PM3DSURFACE, 1, 2},
     {LABELPOINTS, 2, 1},
     {HISTOGRAMS, 1, 0},
-#ifdef WITH_IMAGE
     {IMAGE, 1, 2},
     {RGBIMAGE, 3, 2},
     {RGBA_IMAGE, 4, 2}
-#endif
 #ifdef EAM_OBJECTS
     , {CIRCLES, 2, 1}
 #endif

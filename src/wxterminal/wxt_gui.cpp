@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.70 2008/11/07 11:55:46 mikulik Exp $
+ * $Id: wxt_gui.cpp,v 1.71 2009/01/14 23:16:49 tlecomte Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -657,10 +657,8 @@ void wxtPanel::ClearCommandlist()
 			delete[] iter->string;
 		if (iter->command == command_filled_polygon)
 			delete[] iter->corners;
-#ifdef WITH_IMAGE
 		if (iter->command == command_image)
 			free(iter->image);
-#endif /* WITH_IMAGE */
 	}
 
 	command_list.clear();
@@ -2064,7 +2062,6 @@ void wxt_filled_polygon(int n, gpiPoint *corners)
 	wxt_command_push(temp_command);
 }
 
-#ifdef WITH_IMAGE
 void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
 {
 	/* This routine is to plot a pixel-based image on the display device.
@@ -2120,7 +2117,6 @@ void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corn
 
 	wxt_command_push(temp_command);
 }
-#endif /*WITH_IMAGE*/
 
 #ifdef USE_MOUSE
 /* Display temporary text, after
@@ -2461,7 +2457,6 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 					command.x2, command.y2,
 					command.integer_value);
 		return;
-#ifdef WITH_IMAGE
 	case command_image :
 		gp_cairo_draw_image(&plot, command.image,
 				command.x1, command.y1,
@@ -2470,7 +2465,6 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 				command.x4, command.y4,
 				command.integer_value, command.integer_value2);
 		return;
-#endif /*WITH_IMAGE*/
 	}
 }
 

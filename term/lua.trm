@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.2 $
- *  $Date: 2008/12/26 22:16:03 sfeam Exp $
+ *  $Id: lua.trm,v 1.3 2009/03/16 22:18:14 sfeam Exp $
+ *  $Date: 2009/03/16 22:18:14 $
  *  $Rev: 90 $
  */
 
@@ -1140,9 +1140,7 @@ TERM_TABLE_START(lua_driver)
 #endif
     , LUA_make_palette, LUA_previous_palette,  LUA_set_color
     , LUA_filled_polygon
-#ifdef WITH_IMAGE
     , LUA_image
-#endif
    , 0, 0, 0
    , LUA_layer
    , LUA_path

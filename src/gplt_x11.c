@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.192 2009/02/15 21:59:03 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.193 2009/02/16 22:08:47 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -379,9 +379,7 @@ static void PaletteSetColor __PROTO((plot_struct *, double));
 static int GetVisual __PROTO((int, Visual **, int *));
 static void scan_palette_from_buf __PROTO((void));
 
-#if defined(WITH_IMAGE)
 static unsigned short BitMaskDetails __PROTO((unsigned long mask, unsigned short *left_shift, unsigned short *right_shift));
-#endif
 
 TBOOLEAN swap_endian = 0;  /* For binary data. */
 /* Petr's byte swapping routine. */
@@ -2678,7 +2676,6 @@ exec_cmd(plot_struct *plot, char *command)
 
     }
 
-#ifdef WITH_IMAGE
     else if (*buffer == X11_GR_IMAGE) {	/* image */
 
 	static unsigned char *iptr;
@@ -3145,7 +3142,6 @@ exec_cmd(plot_struct *plot, char *command)
 	}
 
     }
-#endif /* WITH_IMAGE */
 
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
     /*   Axis scaling information to save for later mouse clicks */
@@ -6545,7 +6541,6 @@ Process_Remove_FIFO_Queue()
 }
 
 
-#ifdef WITH_IMAGE
 /* Extract details about the extent of a bit mask by doing a
  * single bit shift up and then down (left shift) and down
  * and then up (right shift).  When the pre- and post-shift
@@ -6583,7 +6578,6 @@ BitMaskDetails(unsigned long mask, unsigned short *left_shift, unsigned short *r
 
     return (unsigned short) m;
 }
-#endif
 
 
 /*-----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.17 2009/03/01 05:37:07 sfeam Exp $
+ * $Id: canvas.trm,v 1.18 2009/03/20 21:33:21 sfeam Exp $
  *
  */
 
@@ -1022,9 +1022,7 @@ TERM_TABLE_START(canvas_driver)
 #endif
     , CANVAS_make_palette, NULL, CANVAS_set_color
     , CANVAS_filled_polygon
-#ifdef WITH_IMAGE
-    , NULL
-#endif
+    , NULL /* image */
     , ENHCANVAS_OPEN, ENHCANVAS_FLUSH, do_enh_writec
     , CANVAS_layer
     , CANVAS_path		/* path */

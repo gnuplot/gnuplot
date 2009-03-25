@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.131 2009/02/25 18:39:25 sfeam Exp $
+ * $Id: gd.trm,v 1.132 2009/03/03 02:43:13 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -133,9 +133,7 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void PNG_previous_palette (void); */
 TERM_PUBLIC void PNG_set_color (t_colorspec *);
 TERM_PUBLIC void PNG_filled_polygon (int, gpiPoint *);
-#ifdef WITH_IMAGE
 TERM_PUBLIC void PNG_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
-#endif
 
 /* To support "set term png enhanced" */
 TERM_PUBLIC void ENHGD_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
@@ -2044,8 +2042,6 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
 
 #undef gdfont
 
-#ifdef WITH_IMAGE
-
 TERM_PUBLIC void
 PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
 {
@@ -2161,7 +2157,6 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
 
 }
 
-#endif
 #undef MAXLINEWIDTH
 #undef Y
 
@@ -2187,9 +2182,7 @@ TERM_TABLE_START(png_driver)
     0, /* previous_palette() ... no, single array of 256 colours for PNG */
     PNG_set_color,
     PNG_filled_polygon
-#ifdef WITH_IMAGE
     , PNG_image
-#endif
     , ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec
 TERM_TABLE_END(png_driver)
 
@@ -2369,9 +2362,7 @@ TERM_TABLE_START(jpeg_driver)
     0, /* previous_palette() ... no, single array of 256 colours for PNG */
     PNG_set_color,
     PNG_filled_polygon
-#ifdef WITH_IMAGE
     , PNG_image
-#endif
     , ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec
 TERM_TABLE_END(jpeg_driver)
 
@@ -2545,9 +2536,7 @@ TERM_TABLE_START(gif_driver)
     0, /* previous_palette() ... no, single array of 256 colours for PNG */
     PNG_set_color,
     PNG_filled_polygon
-#ifdef WITH_IMAGE
     , PNG_image
-#endif
     , ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec
 TERM_TABLE_END(gif_driver)
 

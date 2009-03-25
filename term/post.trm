@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.240 2009/02/19 05:00:05 sfeam Exp $
+ * $Id: post.trm,v 1.241 2009/03/02 17:28:31 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -109,9 +109,7 @@ TERM_PUBLIC int PS_make_palette (t_sm_palette *);
 TERM_PUBLIC void PS_previous_palette (void);
 TERM_PUBLIC void PS_set_color (t_colorspec *);
 TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
-#ifdef WITH_IMAGE
 TERM_PUBLIC void PS_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
-#endif
 
 /* To support "set term post enhanced" */
 TERM_PUBLIC void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
@@ -2991,8 +2989,6 @@ delete_ps_fontfile(struct ps_fontfile_def *prev, struct ps_fontfile_def *this)
 }
 
 
-#ifdef WITH_IMAGE
-
 static void
 PS_encode85(unsigned long tuple4, unsigned char *tuple5)
 {
@@ -3408,7 +3404,6 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
     return;
 }
 
-#endif /* WITH_IMAGE */
 
 /* First look for the GNUPLOT_PS_DIR environment variable
  * If unsuccessful, look for hardcoded absolute path on UNIX,
@@ -3650,9 +3645,7 @@ TERM_TABLE_START(post_driver)
     PS_previous_palette, /* write grestore */
     PS_set_color,
     PS_filled_polygon
-#ifdef WITH_IMAGE
     , PS_image
-#endif
     , ENHPS_OPEN, ENHPS_FLUSH, ENHPS_WRITEC
     , PS_layer		/* used only to insert comments */
     , PS_path

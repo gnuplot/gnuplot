@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.245 2009/03/03 20:06:16 sfeam Exp $
+dnl $Id: configure.in,v 1.246 2009/03/14 21:57:10 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -682,15 +682,6 @@ if test "$enable_mouse" = yes; then
 fi
 
 
-dnl with_image
-AC_ARG_ENABLE(with_image,dnl
-[  --disable-with-image          disable image support],,
-  test -z "$enable_with_image" && enable_with_image=yes)
-
-if test "$enable_with_image" = yes; then
-  AC_DEFINE(WITH_IMAGE,1,[ Define if you want to have image plotting support. ])
-fi
-
 dnl enable multi-byte font support in x11 terminal
 AC_ARG_ENABLE(x11-mbfonts,dnl
 [  --disable-x11-mbfonts   disable multi-byte font support for x11 ],,
@@ -1291,12 +1282,6 @@ if test "$enable_objects" = yes; then
   AC_MSG_RESULT([  Placement of rectangles and other objects: yes ])
 else
   AC_MSG_RESULT([  Placement of rectangles and other objects: no])
-fi
-
-if test "$enable_with_image" = yes; then
-  AC_MSG_RESULT([  Plot style image: yes ])
-else
-  AC_MSG_RESULT([  Plot style image: no])
 fi
 
 AC_MSG_RESULT([])

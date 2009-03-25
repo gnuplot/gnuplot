@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.168 2009/02/19 04:53:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.169 2009/03/13 05:10:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -765,7 +765,6 @@ get_3ddata(struct surface_points *this_plot)
 		break;		/* two blank lines */
 	    if (j == DF_FIRST_BLANK) {
 
-#if defined(WITH_IMAGE)
 		/* Images are in a sense similar to isocurves.
 		 * However, the routine for images is written to
 		 * compute the two dimensions of coordinates by
@@ -778,7 +777,7 @@ get_3ddata(struct surface_points *this_plot)
 		||  (this_plot->plot_style == RGBIMAGE)
 		||  (this_plot->plot_style == RGBA_IMAGE))
 		    continue;
-#endif
+
 		if (this_plot->plot_style == VECTOR)
 		    continue;
 
@@ -1034,7 +1033,6 @@ get_3ddata(struct surface_points *this_plot)
 	    if (this_plot->plot_style == LABELPOINTS)
 		store_label(this_plot->labels, cp, xdatum, df_tokens[3], color);
 
-#ifdef WITH_IMAGE
 	    if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
 		/* We will autoscale the RGB components to  a total range [0:255]
 		 * so we don't need to do any fancy scaling here.
@@ -1044,7 +1042,6 @@ get_3ddata(struct surface_points *this_plot)
 		cp->CRD_B = v[5];
 		cp->CRD_A = v[6];	/* Alpha channel */
 	    }
-#endif
 
 	come_here_if_undefined:
 	    /* some may complain, but I regard this as the correct use of goto */
@@ -1481,12 +1478,11 @@ eval_3dplots()
 			}
 		    }
 
-#ifdef WITH_IMAGE
 		    if (this_plot->plot_style == IMAGE
 		    ||  this_plot->plot_style == RGBA_IMAGE
 		    ||  this_plot->plot_style == RGBIMAGE)
 			get_image_options(&this_plot->image_properties);
-#endif
+
 		    set_with = TRUE;
 		    continue;
 		}
@@ -1661,19 +1657,16 @@ eval_3dplots()
 		&& this_plot->plot_style != PM3DSURFACE
 		/* don't increment the default line/point properties if
 		 * this_plot is an EXPLICIT pm3d surface plot */
-#ifdef WITH_IMAGE
 		&& this_plot->plot_style != IMAGE
 		&& this_plot->plot_style != RGBIMAGE
 		&& this_plot->plot_style != RGBA_IMAGE
 		/* same as above, for an (rgb)image plot */
-#endif
 		) {
 		if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
 		    point_num += 1 + (draw_contour != 0) + (hidden3d != 0);
 		line_num += 1 + (draw_contour != 0) + (hidden3d != 0);
 	    }
 
-#ifdef WITH_IMAGE
 	    if (this_plot->plot_style == IMAGE)
 		this_plot->lp_properties.use_palette = 1;
 	    if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
@@ -1682,7 +1675,6 @@ eval_3dplots()
 		if (CB_AXIS.autoscale & AUTOSCALE_MAX)
 		    CB_AXIS.max = 255;
 	    }
-#endif
 
 	    /* now get the data... having to think hard here...
 	     * first time through, we fill in this_plot. For second

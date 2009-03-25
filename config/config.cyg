@@ -492,9 +492,6 @@
 /* Define to allow zooming or refresh of volatile data. EXPERIMENTAL */
 #define VOLATILE_REFRESH 1
 
-/* Define if you want to have image plotting support. */
-#define WITH_IMAGE 1
-
 /* Define if you want the wxwidgets terminal. */
 /* #undef WXWIDGETS */
 
