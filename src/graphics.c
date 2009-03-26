@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.39 2009/03/05 03:20:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.40 2009/03/05 20:36:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -831,9 +831,9 @@ boundary(struct curve_points *plots, int count)
 	    plot_bounds.xleft += (int) (t->h_char * 2);
 	}
 	/* DBT 12-3-98  extra margin just in case */
-	plot_bounds.xleft += 0.5 * t->v_char;
-    } else if (lmargin.scalex != screen)
-	plot_bounds.xleft += (int) (lmargin.x * t->h_char);
+	plot_bounds.xleft += 0.5 * t->h_char;
+    }
+    /* Note: we took care of explicit 'set lmargin foo' at line 492 */
 
     /*  end of plot_bounds.xleft calculation }}} */
 
@@ -897,9 +897,9 @@ boundary(struct curve_points *plots, int count)
 		plot_bounds.xright -= (int) (t->h_char * 2);
 	    }
 	    /* DBT 12-3-98  extra margin just in case */
-	    plot_bounds.xright -= 0.5 * t->v_char;
+	    plot_bounds.xright -= 0.5 * t->h_char;
 	}
-	    plot_bounds.xright -= (int) (rmargin.x * t->h_char);
+	/* Note: we took care of explicit 'set rmargin foo' at line 502 */
     }
 
     /*  end of plot_bounds.xright calculation }}} */
