@@ -1,3 +1,8 @@
+2009-03-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/history.c (write_history_list): Indexing istart from 1 otherwise
+	"history" command (without arguments) does not work.
+
 2009-03-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/config.cyg config/config.dj2 config/config.mgw config/config.nt 
