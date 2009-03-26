@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.21.2.1 2007/06/03 11:56:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.21.2.2 2008/12/12 06:57:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -359,7 +359,7 @@ const char *mode;
     int is_pipe = 0;
     int is_file = 0;
     int is_quiet = 0;
-    int i,istart;
+    int i, istart;
 
     if (filename && filename[0] ) {
         /* good filename given and not quiet */
@@ -385,10 +385,10 @@ const char *mode;
      * and write_history() do not work they way I thought they did...
      */
     if (num > 0) {
-        istart = history_length - num;
-        if (istart < 0 || istart > history_length)
-            istart = 0;
-    } else istart = 0;
+        istart = history_length - num + 1;
+        if (istart <= 0 || istart > history_length)
+            istart = 1;
+    } else istart = 1;
 #ifdef HAVE_LIBREADLINE
     if (the_list)
 #endif
@@ -397,7 +397,7 @@ const char *mode;
             if (is_file)
                 fprintf(out, "%s\n", list_entry->line);
             else {
-                if (!is_quiet) fprintf(out, "%5i", i + history_base);
+                if (!is_quiet) fprintf(out, "%5i", i + history_base - 1);
                 fprintf(out, "  %s\n", list_entry->line);
             }
         }
