@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.23 2008/12/12 21:06:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.24 2009/03/26 18:46:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -385,7 +385,7 @@ const char *mode;
      * and write_history() do not work they way I thought they did...
      */
     if (num > 0) {
-        istart = history_length - num + 1;
+        istart = history_length - num;
         if (istart <= 0 || istart > history_length)
             istart = 1;
     } else istart = 1;
