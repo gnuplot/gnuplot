@@ -1,3 +1,9 @@
+2009-03-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary): Fix bug that caused the left/right
+	margin offsets to be applied twice, leading to too-wide margins.
+	Bug #2714997
+
 2009-03-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/history.c (write_history_list): Indexing istart from 1 otherwise
