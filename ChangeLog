@@ -3,6 +3,10 @@
 	* src/graphics.c (boundary):  Reserve room for user tic labels even if
 	the format for autoticks is "".
 
+	* src/set.c (load_tics) src/save.c (save_tics):  Do not save or restore
+	axis tic labels that were read from a data file.
+	Bug #2711994
+
 2009-03-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Fix bug that caused the left/right

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.169 2008/12/11 06:53:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.170 2009/03/26 00:49:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -997,6 +997,8 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 		(axis_array[axis].ticdef.type == TIC_USER) ? "" : "add");
 	fputs(" (", fp);
 	for (t = axis_array[axis].ticdef.def.user; t != NULL; t = t->next) {
+	    if (t->level < 0)	/* Don't save ticlabels read from data file */
+		continue;
 	    if (t->label)
 		fprintf(fp, "\"%s\" ", conv_text(t->label));
 	    SAVE_NUM_OR_TIME(fp, (double) t->position, axis);

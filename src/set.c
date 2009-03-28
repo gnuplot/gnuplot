@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.297 2009/02/04 17:18:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.298 2009/02/16 07:37:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4959,8 +4959,10 @@ static void
 load_tics(AXIS_INDEX axis)
 {
     if (equals(c_token, "(")) {	/* set : TIC_USER */
-	c_token++;
-	load_tic_user(axis);
+	if (equals(++c_token, ")"))
+	    c_token++;
+	else
+	    load_tic_user(axis);
     } else {			/* series : TIC_SERIES */
 	load_tic_series(axis);
     }
