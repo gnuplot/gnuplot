@@ -17,6 +17,9 @@ New features, changes and fixes in gnuplot version 4.2.5
 * FIX handling of uninitialized variables in fit "via" command
 * FIX pm3d depthorder was ignoring interpolation setting
 * FIX assignment of fill patterns to boxes in columnstacked histograms
+* FIX Reserve room for user tic labels even if the format for autoticks is ""
+* FIX bug in 4.2.4 that gave twice the requested left/right margin width
+
 
 
 New features, changes and fixes in gnuplot version 4.2.4
