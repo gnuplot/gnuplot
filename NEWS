@@ -9,6 +9,7 @@ New features, changes and fixes in gnuplot version 4.2.5
 * CHANGE warn that some options to 'set datafile binary' are not implemented
 * CHANGE handling of custom palette when postscript mode is set to "monochrome"
 * CHANGE allow Z axis label in 3D plots to be rotated
+* CHANGE do not save or restore axis tick labels that were read from a data file
 * FIX interpolatation for pm3d surfaces given by both z and colour coordinates
 * FIX infinite loop if axis tick increment is on the order of machine precision
 * FIX initialize x11 enhanced text mode to use most recently requested font 
