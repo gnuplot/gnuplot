@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.298 2009/03/26 00:49:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.299 2009/03/27 04:59:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -366,8 +366,14 @@ boundary(struct curve_points *plots, int count)
 	label_width(axis_array[FIRST_Y_AXIS].label.text, &ylablin);
     if (axis_array[SECOND_Y_AXIS].label.text)
 	label_width(axis_array[SECOND_Y_AXIS].label.text, &y2lablin);
-    if (axis_array[FIRST_X_AXIS].ticmode)
+
+    if (axis_array[FIRST_X_AXIS].ticmode) {
 	label_width(axis_array[FIRST_X_AXIS].formatstring, &xticlin);
+	/* Reserve room for user tic labels even if format of autoticks is "" */
+	if (xticlin == 0 && axis_array[FIRST_X_AXIS].ticdef.def.user)
+	    xticlin = 1;
+    }
+
     if (axis_array[SECOND_X_AXIS].ticmode)
 	label_width(axis_array[SECOND_X_AXIS].formatstring, &x2ticlin);
     if (axis_array[FIRST_Y_AXIS].ticmode)
