@@ -1,7 +1,13 @@
-canvas	{ border:0; background-color: white; }
-td.icon	{ width:  16; height: 16; }
-td.mbh	{ height: 12pt; }
-td.mb0	{ text-align: right; font-size: smaller; width: 40%; }
-td.mb1	{ text-align:  left; font-size: smaller; width: 50%; color:#007700; }
-table.plot { border:0; margin-left: auto; margin-right: auto; }
-table.mousebox { border:0; border-collapse:collapse; margin-left: auto; margin-right: auto; }
+canvas		{ border:0; background-color: white; }
+td.mousebox	{ vertical-align: top; }
+td.mbh		{ height: 16pt; }
+td.mb0		{ text-align: left; font-size: smaller; width: 20; padding-left: 15;
+		  color:#000; background-color: #EEE}
+td.mb1		{ text-align: left; font-size: smaller; width: 80; padding-left: 15;
+		  color:#070; background-color: #EEE}
+td.icon		{ width:  16; height: 16;
+		  background-color: #EEE}
+table.mbleft	{ border-collapse: collapse; border: 0; margin-left: auto; margin-right: auto; }
+table.mbunder	{ border-collapse: collapse; border: 0; margin-left: auto; margin-right: auto; }
+table.plot	{ border-collapse: collapse; border: 0; margin-left: auto; margin-right: auto; }
+table.mousebox	{ border-collapse: collapse; margin-left: 0; margin-right: 10; }

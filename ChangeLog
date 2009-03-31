@@ -1,3 +1,16 @@
+2009-03-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm term/js/gnuplot_mouse.css term/js/gnuplot_mouse.js
+	term/js/gnuplot_common.js term/js/textzoom.png:
+
+	Revise canvas terminal to provide additional client-side interactions.
+	- Left mouse-click annotates the graph
+	- Client side click-and-drag zooming of plots
+	- Hotkey support (doesn't work in Firefox for some reason)
+	- Coordinate space is oversampled to retain precision when zoomed
+	The size of output *.js files is reduced by roughly 25% by using a set
+	of shared routines kept in a separate file gnuplot_common.js
+
 2009-03-31  James R. Van Zandt  <jrvz@comcast.net>
 
 	* src/parse.c (empty_iteration): Iteration accepts negative

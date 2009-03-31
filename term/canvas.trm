@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.18 2009/03/20 21:33:21 sfeam Exp $
+ * $Id: canvas.trm,v 1.19 2009/03/26 00:49:19 sfeam Exp $
  *
  */
 
@@ -21,10 +21,14 @@
  *	CANVAS_point(), CANVAS_pointsize()
  *	"name <foo>" option to create only a callable javascript file foo.js
  *	"fsize <F>" option to select font size (default remains 10.0)
+ *   Ethan A Merritt, Jan 2009
+ *	Prototype mousing code in separate file gnuplot_mouse.js
  *   Ethan A Merritt, Feb 2009
  *	Enhanced text support. Note: character placement could be done more
  *	precisely by moving the enhanced text code into the javascript routines,
  *	where exact character widths are known, and save/restore can be used.
+ *   Ethan A Merritt, Mar 2009
+ *	Oversampling and client-side zoom/unzoom, hotkeys
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -63,12 +67,13 @@ TERM_PUBLIC void ENHCANVAS_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOL
 TERM_PUBLIC void ENHCANVAS_FLUSH __PROTO((void));
 TERM_PUBLIC void ENHCANVAS_put_text __PROTO((unsigned int, unsigned int, const char *));
 
-#define CANVAS_XMAX 600 
-#define CANVAS_YMAX 400
-#define CANVASVCHAR		10
-#define CANVASHCHAR		8
-#define CANVASVTIC		10	/* I'm not sure why, but these must be identical */
-#define CANVASHTIC		10	/* in order not to mess up the aspect ratio.     */
+#define CANVAS_OVERSAMPLE	10.
+#define CANVAS_XMAX		(600 * CANVAS_OVERSAMPLE) 
+#define CANVAS_YMAX 		(400 * CANVAS_OVERSAMPLE)
+#define CANVASVTIC		(10  * CANVAS_OVERSAMPLE)
+#define CANVASHTIC		(10  * CANVAS_OVERSAMPLE)
+#define CANVASVCHAR		(10  * CANVAS_OVERSAMPLE)
+#define CANVASHCHAR		(8   * CANVAS_OVERSAMPLE)
 
 #endif /* TERM_PROTO */
 
@@ -84,7 +89,7 @@ static int canvas_ymax = CANVAS_YMAX;
 static int canvas_line_type = LT_UNDEFINED;
 static double canvas_linewidth = 1.0;
 static double CANVAS_ps = 1;	/* pointsize multiplier */
-static double canvas_font_size = CANVASVCHAR;
+static double canvas_font_size = 10;
 static char *canvas_justify = "";
 static int canvas_text_angle = 0;
 static int canvas_in_a_path = FALSE;
@@ -155,7 +160,7 @@ CANVAS_options()
     /* which is after we have already initialized everything.	*/
     if (c_token != 2) {
 	/* Re-initialize a few things */
-	canvas_font_size = CANVASVCHAR;
+	canvas_font_size = 10;
 	CANVAS_standalone = TRUE;
 	CANVAS_mouseable = FALSE;
 	free(CANVAS_name);
@@ -174,10 +179,10 @@ CANVAS_options()
 		canvas_xmax = CANVAS_XMAX;
 		canvas_ymax = CANVAS_YMAX;
 	    } else {
-		canvas_xmax = int_expression();
+		canvas_xmax = int_expression() * CANVAS_OVERSAMPLE;
 		if (equals(c_token,",")) {
 		    c_token++;
-		    canvas_ymax = int_expression();
+		    canvas_ymax = int_expression() * CANVAS_OVERSAMPLE;
 		}
 	    }
 	    if (canvas_xmax <= 0)
@@ -211,7 +216,7 @@ CANVAS_options()
 	case CANVAS_FSIZE:
 	    canvas_font_size = real_expression();
 	    if (canvas_font_size <= 0)
-		canvas_font_size = CANVASVCHAR;
+		canvas_font_size = 10;
 	    break;
 
 	case CANVAS_MOUSING:
@@ -244,10 +249,10 @@ CANVAS_options()
 	}
     }
 
-    term->v_char = canvas_font_size;
-    term->h_char = canvas_font_size * 0.8;
+    term->v_char = canvas_font_size * CANVAS_OVERSAMPLE;
+    term->h_char = canvas_font_size * 0.8 * CANVAS_OVERSAMPLE;
 
-    sprintf(term_options, "size %d,%d", canvas_xmax, canvas_ymax);
+    sprintf(term_options, "size %d,%d", (int)(term->xmax/CANVAS_OVERSAMPLE), (int)(term->ymax/CANVAS_OVERSAMPLE));
     sprintf(term_options + strlen(term_options), "%s fsize %g lw %g", 
 	term->put_text == ENHCANVAS_put_text ? " enhanced" : "",
 	canvas_font_size, canvas_linewidth);
@@ -330,6 +335,8 @@ CANVAS_graphics()
 	fprintf(gpoutfile,
 		"<!--[if IE]><script type=\"text/javascript\" src=\"excanvas.js\"></script><![endif]-->\n"
 		"<script src=\"%scanvastext.js\"></script>\n"
+		"<script src=\"%sgnuplot_common.js\"></script>\n"
+		, CANVAS_scriptdir
 		, CANVAS_scriptdir);
 	if (CANVAS_mouseable)
 	    fprintf(gpoutfile,
@@ -338,7 +345,8 @@ CANVAS_graphics()
 	fprintf(gpoutfile,
 		"<script type=\"text/javascript\">\n"
 		"var canvas, ctx;\n"
-		"var grid_lines = 1;\n"
+		"var grid_lines = true;\n"
+		"var zoomed = false;\n"
 		"function gnuplot_canvas() {\n"
 		"canvas = document.getElementById(\"gnuplot_canvas\");\n"
 	);
@@ -355,12 +363,9 @@ CANVAS_graphics()
     fprintf(gpoutfile,
 	    "ctx = canvas.getContext(\"2d\");\n"
 	    "CanvasTextFunctions.enable(ctx);\n"
-	    "function bp(x,y) // begin polygon\n"
-	    "    { ctx.beginPath(); ctx.moveTo(x,y); }\n"
-	    "function cfp() // close and fill polygon\n"
-	    "    { ctx.closePath(); ctx.fill(); }\n"
-	    "function cfsp() // close and fill polygon with stroke color\n"
-	    "    { ctx.closePath(); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); }\n"
+    );
+
+    fprintf(gpoutfile,
 	    "ctx.strokeStyle = \"rgb(215,215,215)\";\n"
 	    "ctx.lineWidth = %.1g;\n",
 	canvas_linewidth
@@ -379,12 +384,14 @@ CANVAS_text()
     if (TRUE) {
 	struct udvt_entry *udv;
 	fprintf(gpoutfile, "\n// plot boundaries and axis scaling information for mousing \n");
-	fprintf(gpoutfile, "plot_term_xmax = %d;\n", term->xmax);
-	fprintf(gpoutfile, "plot_term_ymax = %d;\n", term->ymax);
-	fprintf(gpoutfile, "plot_xmin = %d;\n", plot_bounds.xleft);
-	fprintf(gpoutfile, "plot_xmax = %d;\n", plot_bounds.xright);
-	fprintf(gpoutfile, "plot_ymin = %d;\n", plot_bounds.ybot);
-	fprintf(gpoutfile, "plot_ymax = %d;\n", plot_bounds.ytop);
+	fprintf(gpoutfile, "plot_term_xmax = %d;\n", (int)(term->xmax / CANVAS_OVERSAMPLE));
+	fprintf(gpoutfile, "plot_term_ymax = %d;\n", (int)(term->ymax / CANVAS_OVERSAMPLE));
+	fprintf(gpoutfile, "plot_xmin = %.1f;\n", (double)plot_bounds.xleft / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "plot_xmax = %.1f;\n", (double)plot_bounds.xright / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "plot_ybot = %.1f;\n", (double)(term->ymax-plot_bounds.ybot) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "plot_ytop = %.1f;\n", (double)(term->ymax-plot_bounds.ytop) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "plot_width = %.1f;\n", (double)(plot_bounds.xright - plot_bounds.xleft) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "plot_height = %.1f;\n", (double)(plot_bounds.ytop - plot_bounds.ybot) / CANVAS_OVERSAMPLE);
 
 	/* Get true axis ranges as used in the plot */
 	update_gpval_variables(1);
@@ -400,14 +407,26 @@ CANVAS_text()
 	MOUSE_PARAM("GPVAL_X_MAX", "plot_axis_xmax");
 	MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymin");
 	MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymax");
-	MOUSE_PARAM("GPVAL_Y2_MIN", "plot_axis_y2min");
-	MOUSE_PARAM("GPVAL_Y2_MAX", "plot_axis_y2max");
+
+	if ((axis_array[SECOND_X_AXIS].ticmode & TICS_MASK) != NO_TICS) {
+	    MOUSE_PARAM("GPVAL_X2_MIN", "plot_axis_x2min");
+	    MOUSE_PARAM("GPVAL_X2_MAX", "plot_axis_x2max");
+	} else
+	    fprintf(gpoutfile, "plot_axis_x2min = \"none\"\n");
+	if ((axis_array[SECOND_Y_AXIS].ticmode & TICS_MASK) != NO_TICS) {
+	    MOUSE_PARAM("GPVAL_Y2_MIN", "plot_axis_y2min");
+	    MOUSE_PARAM("GPVAL_Y2_MAX", "plot_axis_y2max");
+	} else
+	    fprintf(gpoutfile, "plot_axis_y2min = \"none\"\n");
 #undef MOUSE_PARAM
 
 	fprintf(gpoutfile, "plot_logaxis_x = %d;\n",
 		axis_array[FIRST_X_AXIS].log ? 1: 0);
 	fprintf(gpoutfile, "plot_logaxis_y = %d;\n",
 		axis_array[FIRST_Y_AXIS].log ? 1: 0);
+
+	fprintf(gpoutfile, "plot_axis_width = plot_axis_xmax - plot_axis_xmin;\n");
+	fprintf(gpoutfile, "plot_axis_height = plot_axis_ymax - plot_axis_ymin;\n");
 
     } /* End of section writing out variables for mousing */
 
@@ -418,35 +437,89 @@ CANVAS_text()
 		"</script>\n"
 		"<link text=\"text/css\" href=\"%sgnuplot_mouse.css\" rel=\"stylesheet\">\n"
 		"</head>\n"
-		"<body onload=\"gnuplot_canvas(); gnuplot_init(); \">\n"
-		"<table class=\"plot\">\n"
-		"<tr><td>\n"
-		"    <canvas id=\"gnuplot_canvas\" width=\"%d\" height=\"%d\"></canvas>\n"
-		"</td></tr>\n",
-			CANVAS_scriptdir ? CANVAS_scriptdir : "",
-        		canvas_xmax, canvas_ymax
-            );
+		"<body onload=\"gnuplot_canvas(); gnuplot_init();\" oncontextmenu=\"return false;\">\n\n"
+		"<div class=\"gnuplot\">\n",
+			CANVAS_scriptdir ? CANVAS_scriptdir : ""
+	);
+
+	/* The format of the plot box and in particular the mouse tracking box
+	 * are determined by the CSS specs in customizable file gnuplot_mouse.css
+	 * We could make this even more customizable by providing an external HTML
+	 * template, but in that case the user might as well just create a *.js
+	 * file and provide his own wrapping HTML document.
+	 */
 	if (CANVAS_mouseable) {
 	    fprintf(gpoutfile,
+		"<table class=\"mbleft\"><tr><td class=\"mousebox\">\n"
+
+		"<table class=\"mousebox\" border=0>\n"
+		"  <tr><td class=\"mousebox\">\n"
+		"    <table class=\"mousebox\" id=\"gnuplot_mousebox\" border=0>\n"
+		"    <tr><td class=\"mbh\"></td></tr>\n"
+		"    <tr><td class=\"mbh\">\n"
+		"      <table class=\"mousebox\">\n"
+		"	<tr>\n"
+		"	  <td class=\"icon\"></td>\n"
+		"	  <td class=\"icon\" onclick=toggle_grid><img src=\"%sgrid.png\" id=\"gnuplot_grid_icon\" align=right alt=\"#\" title=\"toggle grid\"></td>\n"
+		"	  <td class=\"icon\" onclick=unzoom><img src=\"%spreviouszoom.png\" id=\"gnuplot_unzoom_icon\" align=right alt=\"unzoom\" title=\"unzoom\"></td>\n"
+		"	  <td class=\"icon\" onclick=rezoom><img src=\"%snextzoom.png\" id=\"gnuplot_rezoom_icon\" align=right alt=\"rezoom\" title=\"rezoom\"></td>\n"
+		"	  <td class=\"icon\" onclick=toggle_zoom_text><img src=\"%stextzoom.png\" id=\"gnuplot_textzoom_icon\" align=right alt=\"zoom text\" title=\"zoom text with plot\"></td>\n"
+		"	  <td class=\"icon\"><img src=\"%shelp.png\" id=\"gnuplot_help_icon\" align=right alt=\"?\" title=\"help\"></td>\n"
+		"	</tr>\n"
+		"      </table>\n"
+		"  </td></tr>\n"
+		"</table></td></tr><tr><td class=\"mousebox\">\n",
+		CANVAS_scriptdir ? CANVAS_scriptdir : "", CANVAS_scriptdir ? CANVAS_scriptdir : "",
+		CANVAS_scriptdir ? CANVAS_scriptdir : "", CANVAS_scriptdir ? CANVAS_scriptdir : "",
+		CANVAS_scriptdir ? CANVAS_scriptdir : ""
+	    );
+
+	    fprintf(gpoutfile,
+		"<table class=\"mousebox\" id=\"gnuplot_mousebox\" border=1>\n"
+		"<tr> <td class=\"mb0\">x&nbsp;</td> <td class=\"mb1\"><span id=\"span_scaled_x\">&nbsp;</span></td> </tr>\n"
+		"<tr> <td class=\"mb0\">y&nbsp;</td> <td class=\"mb1\"><span id=\"span_scaled_y\">&nbsp;</span></td> </tr>\n"
+	    );
+
+	    if ((axis_array[SECOND_X_AXIS].ticmode & TICS_MASK) != NO_TICS)
+	      fprintf(gpoutfile,
+		"<tr> <td class=\"mb0\">x2&nbsp;</td> <td class=\"mb1\"><span id=\"span_scaled_x2\">&nbsp;</span></td> </tr>\n");
+	    if ((axis_array[SECOND_Y_AXIS].ticmode & TICS_MASK) != NO_TICS)
+	      fprintf(gpoutfile,
+		"<tr> <td class=\"mb0\">y2&nbsp;</td> <td class=\"mb1\"><span id=\"span_scaled_y2\">&nbsp;</span></td> </tr>\n");
+
+	    fprintf(gpoutfile,
+		"</table></td></tr>\n"
+		"</table>\n"
+	    );
+
+	    fprintf(gpoutfile,
+	        "</td><td>\n"
+	    );
+	} /* End if (CANVAS_mouseable) */
+
+
+	fprintf(gpoutfile,
+		"<table class=\"plot\">\n"
 		"<tr><td>\n"
-		"    <table class=\"mousebox\" id=\"gnuplot_mousebox\">\n"
-		"    <tr><td class=\"mbh\" colspan=3></td></tr>\n"
-		"    <tr><td class=\"icon\" onclick=toggle_grid><img src=\"%sgrid.png\" id=\"gnuplot_grid_icon\" align=right alt=\"#\"></td>\n"
-		"        <td class=\"mb0\">mouse&nbsp;coordinates&nbsp;</td>\n"
-		"        <td class=\"mb1\"><span id=\"span_scaled_x\">&nbsp;</span>, <span id=\"span_scaled_y\">&nbsp;</span></td></tr>\n"
-		"    <tr><td class=\"icon\"></td>\n"
-		"        <td class=\"mb0\">previous click &nbsp;</td>\n"
-		"        <td class=\"mb1\"><span id=\"span_last_x\">&nbsp;</span>, <span id=\"span_last_y\">&nbsp;</span></td></tr>\n"
-		"    </table>\n"
-		"</td></tr>\n",
-			CANVAS_scriptdir ? CANVAS_scriptdir : ""
+		"    <canvas id=\"gnuplot_canvas\" width=\"%d\" height=\"%d\">\n"
+		"	Sorry, your browser seems not to support the HTML 5 canvas element\n"
+		"    </canvas>\n"
+		"</td></tr>\n"
+		"</table>\n",
+			(int)(term->xmax/CANVAS_OVERSAMPLE), (int)(term->ymax/CANVAS_OVERSAMPLE)
+        );
+
+	if (CANVAS_mouseable) {
+	    fprintf(gpoutfile,
+		"</td></tr></table>\n"
 	    );
 	}
+
 	fprintf(gpoutfile,
-		"</table>\n"
+		"</div>\n\n"
 		"</body>\n"
 		"</html>\n"
-            );
+        );
     }
 
     fflush(gpoutfile);
@@ -509,7 +582,7 @@ CANVAS_move(unsigned int arg_x, unsigned int arg_y)
     }
     CANVAS_start();
     fprintf(gpoutfile,
-	    "ctx.moveTo(%u,%u);\n",
+	    "M(%u,%u);\n",
             arg_x, canvas_ymax - arg_y);
     canvas_x = arg_x;
     canvas_y = arg_y;
@@ -527,7 +600,7 @@ CANVAS_vector(unsigned int arg_x, unsigned int arg_y)
     }
 
     fprintf(gpoutfile,
-	    "ctx.lineTo(%u,%u);\n",
+	    "L(%u,%u);\n",
             arg_x, canvas_ymax - arg_y
            );
     canvas_x = arg_x;
@@ -556,56 +629,32 @@ CANVAS_justify_text(enum JUSTIFY mode)
 TERM_PUBLIC void
 CANVAS_point(unsigned int x, unsigned int y, int number)
 {
-    int width  = CANVAS_ps * CANVASHCHAR;
+    double width  = CANVAS_ps * 0.6 * CANVASHTIC / CANVAS_OVERSAMPLE;
     int pt = number % 9;
 
     CANVAS_finish();
 
     switch (pt) {
     default: /* How small a dot can we make? */
-	fprintf(gpoutfile, "ctx.strokeRect(%d,%d,0.5,0.5);\n", x, canvas_ymax-y);
+	fprintf(gpoutfile, "ctx.strokeRect(%.1f,%.1f,0.5,0.5);\n",
+		x/CANVAS_OVERSAMPLE, (canvas_ymax-y)/CANVAS_OVERSAMPLE);
 	break;
+    case 4:
+    case 6:
+    case 8:
+	if (strcmp(canvas_state.previous_fill, canvas_state.color)) {
+	    fprintf(gpoutfile, "ctx.fillStyle = \"%s\";\n", canvas_state.color);
+	    strcpy(canvas_state.previous_fill, canvas_state.color);
+	}
+	/* Fall through */
     case 0:
     case 1:
     case 2:
-	CANVAS_start();
-	do_point(x, y, pt);
-	CANVAS_finish();
-	break;
     case 3:
-	fprintf(gpoutfile, "ctx.strokeRect(%d,%d,%d,%d);\n",
-		x-width/2, canvas_ymax - (y+width/2), width, width);
-	break;
-    case 4:
-	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_state.color);
-	fprintf(gpoutfile, "ctx.fillRect(%d,%d,%d,%d);\n",
-		x-width/2, canvas_ymax - (y+width/2), width, width);
-	break;
     case 5:
-	fprintf(gpoutfile, "ctx.beginPath();\n");
-	fprintf(gpoutfile, "ctx.arc(%d,%d,%d,0,Math.PI*2,true);\n",
-		x, canvas_ymax-y, width/2);
-	fprintf(gpoutfile, "ctx.stroke();\n");
-	break;
-    case 6:
-	fprintf(gpoutfile, "ctx.beginPath();\n");
-	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_state.color);
-	fprintf(gpoutfile, "ctx.arc(%d,%d,%d,0,Math.PI*2,true);\n",
-		x, canvas_ymax-y, width/2);
-	fprintf(gpoutfile, "ctx.fill();\n");
-	break;
     case 7:
-	fprintf(gpoutfile, "ctx.beginPath();\n");
-	do_point(x, y, 5);
-	fprintf(gpoutfile, "ctx.closePath();\n");
-	fprintf(gpoutfile, "ctx.stroke();\n");
-	break;
-    case 8:
-	fprintf(gpoutfile, "ctx.fillStyle = \"%s\"; ", canvas_state.color);
-	fprintf(gpoutfile, "ctx.beginPath();\n");
-	do_point(x, y, 5);
-	fprintf(gpoutfile, "ctx.closePath();\n");
-	fprintf(gpoutfile, "ctx.fill();\n");
+	fprintf(gpoutfile, "Pt(%d,%.1f,%.1f,%.1f);\n", pt,
+		x/CANVAS_OVERSAMPLE, (canvas_ymax-y)/CANVAS_OVERSAMPLE, width);
 	break;
     }
 }
@@ -637,19 +686,14 @@ CANVAS_put_text(unsigned int x, unsigned int y, const char *str)
     CANVAS_finish();
     if (0 != canvas_text_angle) {
 	fprintf(gpoutfile,
-		"ctx.save();\n"
-		"ctx.translate(%u, %u);\n"
-		"ctx.rotate(%d * Math.PI / 180);\n",
-                x, canvas_ymax - y, canvas_text_angle
-               );
-        x = 0;
-        y = canvas_ymax;
+		"TR(%d,%d,%d,%.1f,\"%s\",\"",
+		    x, (int)(canvas_ymax + 5*CANVAS_OVERSAMPLE - y),
+		    canvas_text_angle, canvas_font_size, canvas_justify);
+    } else {
+	fprintf(gpoutfile, "T(%d,%d,%.1f,\"%s\",\"",
+		x, (int)(canvas_ymax + 5*CANVAS_OVERSAMPLE - y), canvas_font_size,
+		canvas_justify);
     }
-    fprintf(gpoutfile, "ctx.drawText%s(\"sans\",%g,%u,%u,\"",
-            canvas_justify,
-            canvas_font_size,
-            x,
-            (unsigned int) canvas_ymax + 5 - y);
 
     /* Sanitize string by escaping quote characters */
     do {
@@ -659,8 +703,6 @@ CANVAS_put_text(unsigned int x, unsigned int y, const char *str)
     } while (*str);
 
     fprintf(gpoutfile, "\");\n");
-    if (0 != canvas_text_angle)
-	fprintf(gpoutfile, "ctx.restore();\n");
 }
 
 
@@ -775,7 +817,7 @@ CANVAS_filled_polygon(int points, gpiPoint *corners)
 
     for (i = 1; i < points; i++) {
 	fprintf(gpoutfile,
-		"ctx.lineTo(%d, %d);\n"
+		"L(%d, %d);\n"
                 , corners[i].x, canvas_ymax - corners[i].y);
     }
 
@@ -799,7 +841,7 @@ CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, 
 	    strcpy(canvas_state.previous_fill, fillcolor);
 	}
 
-	fprintf(gpoutfile, "ctx.fillRect(%d,%d,%d,%d);\n",
+	fprintf(gpoutfile, "R(%d,%d,%d,%d);\n",
 		x1, canvas_ymax - (y1+height), width, height);
 }
 
@@ -868,7 +910,7 @@ ENHCANVAS_OPEN(
 	ENHCANVAS_opened_string = TRUE;
 	enhanced_cur_text = &enhanced_text[0];
 	ENHCANVAS_fontsize = fontsize;
-	ENHCANVAS_base = base;
+	ENHCANVAS_base = base * CANVAS_OVERSAMPLE;
 	ENHCANVAS_show = showflag;
 	ENHCANVAS_widthflag = widthflag;
 	ENHCANVAS_overprint = overprint;
@@ -912,32 +954,33 @@ static int utf8strlen(char *s)
 TERM_PUBLIC void
 ENHCANVAS_FLUSH()
 {
+    double save_fontsize;
+    int x,y;
+    double w;
+
     if (ENHCANVAS_opened_string) {
 	ENHCANVAS_opened_string = FALSE;
 	*enhanced_cur_text = '\0';
 
-	/* DEBUG - not working yet */
-	if (1) {
-		double save_fontsize = canvas_font_size;
-		int x = canvas_x;
-		int y = canvas_y;
-		double w = utf8strlen(enhanced_text) * ENHCANVAS_fontsize/25.;
+	save_fontsize = canvas_font_size;
+	x = canvas_x;
+	y = canvas_y;
+	w = utf8strlen(enhanced_text) * CANVAS_OVERSAMPLE * ENHCANVAS_fontsize/25.;
 
-		canvas_font_size = ENHCANVAS_fontsize;
-		x -= sin((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
-		y += cos((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
-		if (ENHCANVAS_show && !ENHCANVAS_sizeonly)
-			CANVAS_put_text(x, y, enhanced_text);
+	canvas_font_size = ENHCANVAS_fontsize;
+	x -= sin((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
+	y += cos((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
+	if (ENHCANVAS_show && !ENHCANVAS_sizeonly)
+		CANVAS_put_text(x, y, enhanced_text);
 
-		if (ENHCANVAS_overprint == 1) {
-		    canvas_x += w * cos((double)canvas_text_angle * M_PI_2/90.)/2;
-		    canvas_y -= w * sin((double)canvas_text_angle * M_PI_2/90.)/2;
-		} else if (ENHCANVAS_widthflag) {
-		    canvas_x += w * cos((double)canvas_text_angle * M_PI_2/90.);
-		    canvas_y -= w * sin((double)canvas_text_angle * M_PI_2/90.);
-		}
-		canvas_font_size = save_fontsize;
+	if (ENHCANVAS_overprint == 1) {
+	    canvas_x += w * cos((double)canvas_text_angle * M_PI_2/90.)/2;
+	    canvas_y -= w * sin((double)canvas_text_angle * M_PI_2/90.)/2;
+	} else if (ENHCANVAS_widthflag) {
+	    canvas_x += w * cos((double)canvas_text_angle * M_PI_2/90.);
+	    canvas_y -= w * sin((double)canvas_text_angle * M_PI_2/90.);
 	}
+	canvas_font_size = save_fontsize;
     }
 }
 
@@ -1059,12 +1102,12 @@ START_HELP(canvas)
 "",
 " The default `standalone` mode creates an html page containing javascript",
 " code that renders the plot using the HTML 5 canvas element.  The html page",
-" links to a javascript library 'canvastext.js'.  By default this is a link to",
-" a local file, usually in directory /usr/local/share/gnuplot/<version>/js",
-" on unix-like systems.  See also platform-dependent installation notes.",
-" You can change this by using the `jsdir` option to set the directory to",
-" either a local file or a general URL.  The latter is usually appropriate if",
-" the plot is exported for viewing on remote client machines.",
+" links to two required javascript files 'canvastext.js' and 'gnuplot_common.js'.",
+" By default these point to local files, on unix-like systems usually in",
+" directory /usr/local/share/gnuplot/<version>/js.  See installation notes for",
+" other platforms. You can change this by using the `jsdir` option to specify",
+" either a different local directory or a general URL.  The latter is usually",
+" appropriate if the plot is exported for viewing on remote client machines.",
 "",
 " All plots produced by the canvas terminal are mouseable.  The additional",
 " keyword `mousing` causes the `standalone` mode to add a mouse-tracking box",
@@ -1085,6 +1128,7 @@ START_HELP(canvas)
 "       <html>",
 "       <head>",
 "           <script src=\"canvastext.js\"></script>",
+"           <script src=\"canvas_common.js\"></script>",
 "       </head>",
 "       <body onload=\"fishplot();\">",
 "           <script src=\"fishplot.js\"></script>",
