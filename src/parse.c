@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.55 2008/07/21 20:19:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.56 2008/09/09 06:05:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -916,8 +916,6 @@ check_for_iteration()
 	if (equals(c_token,":")) {
 	    c_token++;
 	    iteration_increment = int_expression();
-	    if (iteration_increment <= 0)
-		iteration_increment = 1;
 	}
 	if (!equals(c_token++, "]"))
 	    int_error(c_token-1, errormsg);
@@ -965,14 +963,15 @@ next_iteration()
 	iteration_udv->udv_value.v.string_val = gp_word(iteration_string,iteration_current);
     } else
 	iteration_udv->udv_value.v.int_val = iteration_current;
-    return (iteration_current <= iteration_end);
+    return iteration_increment && /* no infinite loops! */
+      ((iteration_end - iteration_current)*iteration_increment >= 0);
 }
 
 TBOOLEAN
 empty_iteration()
 {
     if (iteration_udv
-        && (iteration_start > iteration_end))
+        && ((iteration_end - iteration_start)*iteration_increment < 0))
         return TRUE;
     else
         return FALSE;

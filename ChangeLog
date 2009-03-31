@@ -1,3 +1,8 @@
+2009-03-31  James R. Van Zandt  <jrvz@comcast.net>
+
+	* src/parse.c (empty_iteration): Iteration accepts negative
+	increments.
+
 2009-03-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary):  Reserve room for user tic labels even if
