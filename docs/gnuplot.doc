@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.563 2009/03/13 05:10:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.564 2009/03/15 04:03:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5408,15 +5408,28 @@ Ffigure_mapcontours
        plot for [<variable> = <start> : <end> {:<increment>}]
        plot for [<variable> in "string of words"]
 
- Examples:
+ The scope of an iteration ends at the next comma or the end of the
+ command, whichever comes first.  Iteration may be nested.
+
+ Example:
+       plot for [dataset in "apples bananas"] dataset."dat" title dataset
+
+ In this example iteration is used both to generate a file name and a
+ corresponding title.
+
+ Example:
        file(n) = sprintf("dataset_%d.dat",n)
        splot for [i=1:10] file(i) title sprintf("dataset %d",i)
-       plot for [dataset in "apples bananas"] dataset."dat" title dataset
 
  This example defines a string-valued function that generates file names,
  and plots ten such files together. The iteration variable ('i' in this
- example) is treated as an integer, and may be used more than once. In this
- example it is used both to generate a file name and a corresponding title.
+ example) is treated as an integer, and may be used more than once.
+
+ Example:
+       set key left
+       plot [0:1] for [n=1:4] x**n sprintf("%d",n)
+
+ This example plots a family of functions.
 
  Example:
        list = "apple banana cabbage daikon eggplant"
