@@ -2,10 +2,8 @@ New features, changes and fixes since gnuplot version 4.2
 =========================================================
 
 * NEW gnuplot.exe is a full-featured console mode gnuplot executable for Windows
-* NEW command line option -e "command list"
 * NEW plot style "with circles"
 * NEW object types circle, ellipse, and polygon
-* NEW preliminary export of information needed for external mousing scripts
 * NEW options front and back to "set colorbox"
 * NEW x11 can plot into a window opened and managed by an external application
 * NEW optional 3 columns of data to generate histogram errorbars
@@ -24,11 +22,12 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW variables GPVAL_LAST_PLOT, GPVAL_{S}PLOT, GPVAL_MULTIPLOT
 * NEW variables GPVAL_VIEW_{MAP|ROT_X|ROT_Z|SCALE|ZSCALE}, GPVAL_TERMINALS
 * NEW variables GPVAL_PWD
+* NEW per-plot export of information needed for external mousing scripts
 * NEW support for dashed linetypes in additional terminals
 * NEW the 'bind' command accepts non-keyboard triggers, e.g. 'close'
+* NEW commands 'show bind' and 'reset bind'
 * NEW individual plots can be omitted from autoscaling of axis ranges
 * NEW more smoothing options: new kernels (for dgrid3d) and 'smooth cumulative'
-* NEW commands 'show bind' and 'reset bind'
 * NEW command 'evaluate' executes commands from a string variable
 * NEW z-axis tic labels can be colored by Z value
 * NEW command 'set view equal {xy|xyz}' forces axes in a 3D plot to the same scale
