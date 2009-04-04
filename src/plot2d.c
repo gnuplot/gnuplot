@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.191 2009/03/13 05:10:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.192 2009/03/26 00:49:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1422,7 +1422,7 @@ eval_plots()
 	    if (histogram_rightmost > 0)
 		newhist_start = histogram_rightmost + 2;
 
-	    lp.l_type = LT_UNDEFINED;
+	    lp.l_type = line_num;
 	    fs.fillpattern = LT_UNDEFINED;
 
 	    do {

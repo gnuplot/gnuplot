@@ -1,3 +1,9 @@
+2009-04-04  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
+	* src/plot2d.c (eval_plots): Initialize newhistogram line type to
+	current plot linetype. Otherwise "set style incr user" fails.
+	Bug #2725577
+
 2009-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm:  Track current and previous linewidth, so that we 
