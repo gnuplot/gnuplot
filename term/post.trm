@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.241 2009/03/02 17:28:31 mikulik Exp $
+ * $Id: post.trm,v 1.242 2009/03/26 00:49:22 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -460,7 +460,8 @@ PS_escape_string(char *origstr, char *escapelist)
 static int PS_pen_x, PS_pen_y;
 static int PS_taken;
 static int PS_linetype_last;
-static double PS_linewidth_last; /* HBB NEW 20031219 */
+static double PS_linewidth_last;
+static double PS_linewidth_current;
 static TBOOLEAN PS_relative_ok;
 
 /* HBB 990914: PS_SOLID is already used by the WIN32 API headers.
@@ -1789,7 +1790,8 @@ doclip\n\
     PS_relative_ok = FALSE;
     PS_pen_x = PS_pen_y = -4000;
     PS_taken = 0;
-    PS_linewidth_last = PS_linetype_last =  LT_UNDEFINED;
+    PS_linetype_last = LT_UNDEFINED;
+    PS_linewidth_last = PS_linewidth_current = LT_UNDEFINED;
 }
 
 
@@ -1841,6 +1843,7 @@ PS_linetype(int linetype)
     PS_FLUSH_PATH;
 
     PS_linetype_last = linetype;
+    PS_linewidth_last = PS_linewidth_current;
     fprintf(gppsfile, "LT%c\n", "wba012345678"[linetype]);
     ps_path_count = 0;
 }
@@ -1852,10 +1855,10 @@ PS_linewidth (double linewidth)
     /* HBB NEW 20031219: don't do anything if nothing changed */
     if (ps_path_count != 0 && PS_linewidth_last == linewidth)
 	return;
-    PS_linewidth_last = linewidth;
-    PS_linetype_last = -1;	/* disable cache for next linetype change */
-
     PS_FLUSH_PATH;
+
+    PS_linewidth_current = linewidth;
+    PS_linetype_last = LT_UNDEFINED;	/* disable cache for next linetype change */
     fprintf(gppsfile, "%.3f UL\n", linewidth);
 
     /*
@@ -2187,7 +2190,7 @@ PS_point(unsigned int x, unsigned int y, int number)
 
     PS_relative_ok = FALSE;
     ps_path_count = 0;
-    PS_linewidth_last = PS_linetype_last =  -1; /* force next linetype change */
+    PS_linetype_last = LT_UNDEFINED; /* force next linetype change */
 }
 
 TERM_PUBLIC void
@@ -2263,7 +2266,7 @@ PS_fillbox(
     }
 
     PS_relative_ok = FALSE;
-    PS_linewidth_last = PS_linetype_last =  -1;
+    PS_linetype_last = LT_UNDEFINED;
 }
 
 
@@ -2828,7 +2831,12 @@ TERM_PUBLIC void PS_set_color (t_colorspec *colorspec)
 {
     double gray;
 
-    PS_linetype_last = -1;  /* Force next call to linetype to be honored */
+    PS_linetype_last = LT_UNDEFINED;  /* Force next call to linetype to be honored */
+
+    if (PS_linewidth_last != PS_linewidth_current) {
+	PS_linewidth_last = PS_linewidth_current;
+	fprintf(gppsfile, "PL ");
+    }
 
     if (colorspec->type == TC_LT) {
 	int linetype = colorspec->lt;

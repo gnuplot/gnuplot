@@ -1,3 +1,10 @@
+2009-04-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm:  Track current and previous linewidth, so that we 
+	can issue an explicit "PL"  (stroke and set linewidth) if it has
+	changed.
+	Bug #2725599
+
 2009-03-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/js/gnuplot_mouse.css term/js/gnuplot_mouse.js
