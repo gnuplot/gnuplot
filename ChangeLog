@@ -1,3 +1,8 @@
+2009-04-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm term/js/gnuplot_mouse.c:
+	Add plot canvas to the focus list so that hotkeys work in Firefox.
+
 2009-04-04  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* src/plot2d.c (eval_plots): Initialize newhistogram line type to

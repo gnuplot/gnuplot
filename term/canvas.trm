@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.19 2009/03/26 00:49:19 sfeam Exp $
+ * $Id: canvas.trm,v 1.20 2009/04/01 03:45:53 sfeam Exp $
  *
  */
 
@@ -501,7 +501,7 @@ CANVAS_text()
 	fprintf(gpoutfile,
 		"<table class=\"plot\">\n"
 		"<tr><td>\n"
-		"    <canvas id=\"gnuplot_canvas\" width=\"%d\" height=\"%d\">\n"
+		"    <canvas id=\"gnuplot_canvas\" width=\"%d\" height=\"%d\" tabindex=\"0\">\n"
 		"	Sorry, your browser seems not to support the HTML 5 canvas element\n"
 		"    </canvas>\n"
 		"</td></tr>\n"

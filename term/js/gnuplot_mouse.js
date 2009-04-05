@@ -178,6 +178,7 @@ function saveclick(event)
     button= (event.which < 2) ? "LEFT" : ((event.which == 2) ? "MIDDLE" : "RIGHT");
 
   if (button == "LEFT") {
+    ctx.strokeStyle="black";
     ctx.strokeRect(mousex, mousey, 1, 1);
     click = " " + x.toPrecision(4) + ", " + y.toPrecision(4);
     ctx.drawText("sans", 9, mousex, mousey, click);
@@ -340,8 +341,6 @@ function zoomXY(x,y)
 function zoomW(w) { return (w*plot_axis_width/zoom_axis_width); }
 function zoomH(h) { return (h*plot_axis_height/zoom_axis_height); }
 
-// Works fine in Opera;  never gets called by Firefox
-//
 function do_hotkey(event) {
     keychar = String.fromCharCode(event.charCode ? event.charCode : event.keyCode);
     switch (keychar) {
@@ -352,15 +351,32 @@ function do_hotkey(event) {
 		break;
     case 'n':	rezoom();
 		break;
-    case 'r':	ctx.moveTo(plot_xmin, mousey); ctx.lineTo(plot_xmax, mousey);
+    case 'r':
+		ctx.lineWidth = 0.5;
+		ctx.strokeStyle="rgba(128,128,128,0.50)";
+		ctx.moveTo(plot_xmin, mousey); ctx.lineTo(plot_xmax, mousey);
 		ctx.moveTo(mousex, plot_ybot); ctx.lineTo(mousex, plot_ytop);
 		ctx.stroke();
 		break;
     case 'p':
     case 'u':	unzoom();
 		break;
-    default:	// DEBUG
-		ctx.drawText("sans", 10, mousex, mousey, keychar);
+    case '':	zoom_in_progress = false;
+		break;
+
+// Arrow keys
+    case '%':	// ctx.drawText("sans", 10, mousex, mousey, "<");
+		break;
+    case '\'':	// ctx.drawText("sans", 10, mousex, mousey, ">");
+		break;
+    case '&':	// ctx.drawText("sans", 10, mousex, mousey, "^");
+		break;
+    case '(':	// ctx.drawText("sans", 10, mousex, mousey, "v");
+		break;
+
+    default:	// ctx.drawText("sans", 10, mousex, mousey, keychar);
+		return true; // Let someone else handle it
 		break;
     }
+    return false; // Nobody else should respond to this keypress
 }
