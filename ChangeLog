@@ -1,3 +1,9 @@
+2009-04-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c:  Filled boxes and filled polygons have different
+	behaviour when the fillstyle is FS_DEFAULT, but the x11 driver was
+	not making this distinction. (caused by patch of 2008-06-22).
+
 2009-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Release 4.2.5

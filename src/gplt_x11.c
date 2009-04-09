@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.9 2008/12/25 05:50:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.167.2.10 2009/01/14 10:58:42 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -305,7 +305,7 @@ static plot_struct *Find_Plot_In_Linked_List_By_CMap __PROTO((cmap_t *));
 static struct plot_struct *current_plot = NULL;
 static struct plot_struct *plot_list_start = NULL;
 
-static void x11_setfill __PROTO((GC *gc, int style));
+static void x11_setfill __PROTO((GC *gc, int style, TBOOLEAN poly));
 
 /* information about window/plot to be removed */
 typedef struct plot_remove_struct {
@@ -2225,7 +2225,7 @@ exec_cmd(plot_struct *plot, char *command)
 	int style, xtmp, ytmp, w, h;
 
 	if (sscanf(buffer + 1, "%4d%4d%4d%4d%4d", &style, &xtmp, &ytmp, &w, &h) == 5) {
-	    x11_setfill(&gc, style);
+	    x11_setfill(&gc, style, FALSE);
 
 	    /* gnuplot has origin at bottom left, but X uses top left
 	     * There may be an off-by-one (or more) error here.
@@ -2648,7 +2648,7 @@ exec_cmd(plot_struct *plot, char *command)
 		    fill_gc = XCreateGC(dpy, plot->window, 0, 0);
 		XCopyGC(dpy, *current_gc, ~0, fill_gc);
 
-		x11_setfill(&fill_gc, style);
+		x11_setfill(&fill_gc, style, TRUE);
 
 		XFillPolygon(dpy, plot->pixmap, fill_gc, points, npoints,
 			     Nonconvex, CoordModeOrigin);
@@ -6489,7 +6489,7 @@ cmaps_differ(cmap_t *cmap1, cmap_t *cmap2)
  * Shared code for setting fill style
  */
 static void
-x11_setfill(GC *gc, int style)
+x11_setfill(GC *gc, int style, TBOOLEAN poly)
 {
     int fillpar, idx;
     XColor xcolor, bgnd;
@@ -6526,12 +6526,18 @@ x11_setfill(GC *gc, int style)
 	idx = idx % stipple_pattern_num;
 	XSetStipple(dpy, *gc, stipple_pattern[idx]);
 	XSetFillStyle(dpy, *gc, FillOpaqueStippled);
-	XSetForeground(dpy, *gc, plot->cmap->colors[plot->lt + 3]);
+	if (poly)
+	    XSetBackground(dpy, *gc, plot->cmap->colors[0]);
+	else
+	    XSetForeground(dpy, *gc, plot->cmap->colors[plot->lt + 3]);
 	break;
-    case FS_EMPTY:
-    default:
-    /* fill with background color */
+    case FS_EMPTY: /* fill with background color */
 	XSetFillStyle(dpy, *gc, FillSolid);
 	XSetForeground(dpy, *gc, plot->cmap->colors[0]);
+	break;
+    default:
+	XSetFillStyle(dpy, *gc, FillSolid);
+	if (!poly)
+	    XSetForeground(dpy, *gc, plot->cmap->colors[0]);
     }
 }
