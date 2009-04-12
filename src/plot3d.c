@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.169 2009/03/13 05:10:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.170 2009/03/26 00:49:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1500,6 +1500,13 @@ eval_3dplots()
 		if (almost_equals(c_token, "nocon$tours")) {
 		    c_token++;
 		    this_plot->opt_out_of_contours = TRUE;
+		    continue;
+		}
+
+		/* "set surface" is global.  Allow individual plots to opt out */
+		if (almost_equals(c_token, "nosur$face")) {
+		    c_token++;
+		    this_plot->opt_out_of_surface = TRUE;
 		    continue;
 		}
 

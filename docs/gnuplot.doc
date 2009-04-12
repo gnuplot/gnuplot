@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.564 2009/03/15 04:03:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.565 2009/04/01 00:19:32 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5527,7 +5527,7 @@ Ffigure_mapcontours
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}
                          {fill | fs <fillstyle>}
-                         {nohidden3d | nocontours}
+                         {nohidden3d} {nocontours} {nosurface}
                          {palette}}
                     }
 
@@ -5599,6 +5599,9 @@ Ffigure_mapcontours
 
  Similarly, the keyword `nocontours` will turn off contouring for an individual
  plot even if the global property "set contour" is active.
+
+ Similarly, the keyword `nocontours` will turn off the 3D surface for an
+ individual plot even if the global property "set surface" is active.
 
  The keywords may be abbreviated as indicated.
 
@@ -10020,11 +10023,13 @@ Ffigure_mapcontours
  The surface is drawn with the style specified by `with`, or else the
  appropriate style, data or function.
 
- Whenever `unset surface` is issued, `splot` will not draw points or lines
- corresponding to the function or data file points.  Contours may still be
- drawn on the surface, depending on the `set contour` option. `unset surface;
- set contour base` is useful for displaying contours on the grid base.  See
- also `set contour`.
+ `unset surface` will cause `splot` to not draw points or lines corresponding
+ to any of the function or data file points.  If you want to turn of the surface
+ for an individual function or data file while leaving the others active, use
+ the `nosurface` keyword in the `splot` command.  Contours may still be drawn on
+ the surface, depending on the `set contour` option.  The combination
+ `unset surface; set contour base` is useful for displaying contours on the grid
+ base.  See also `set contour`. 
 3 table
 ?commands set table
 ?set table

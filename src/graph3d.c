@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.219 2009/03/11 23:44:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.220 2009/03/26 00:49:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -271,8 +271,7 @@ find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
 	/* we draw a main entry if there is one, and we are
 	 * drawing either surface, or unlabelled contours
 	 */
-	if (this_plot->title && *this_plot->title && !this_plot->title_is_suppressed
-	    && (draw_surface || (draw_contour && !label_contours))) {
+	if (this_plot->title && *this_plot->title && !this_plot->title_is_suppressed) {
 	    ++cnt;
 	    len = estimate_strlen(this_plot->title);
 	    if (len > mlen)
@@ -1049,7 +1048,7 @@ do_3dplot(
 		    if (lkey) {
 			key_sample_line(xl, yl);
 		    }
-		    if (!(hidden3d && draw_surface))
+		    if (!(hidden3d && draw_surface && !this_plot->opt_out_of_surface))
 			plot3d_impulses(this_plot);
 		    break;
 		}
@@ -1057,7 +1056,7 @@ do_3dplot(
 	    case FSTEPS:
 	    case HISTEPS:
 	    case LINES:
-		if (draw_surface) {
+		if (draw_surface && !this_plot->opt_out_of_surface) {
 		    if (lkey) {
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_line_pm3d(this_plot, xl, yl);
@@ -1084,7 +1083,7 @@ do_3dplot(
 	    case FINANCEBARS:
 	    case CIRCLES:
 	    case POINTSTYLE:
-		if (draw_surface) {
+		if (draw_surface && !this_plot->opt_out_of_surface) {
 		    if (lkey) {
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
@@ -1097,7 +1096,7 @@ do_3dplot(
 		break;
 
 	    case LINESPOINTS:
-		if (draw_surface) {
+		if (draw_surface && !this_plot->opt_out_of_surface) {
 
 		    /* put lines */
 		    if (lkey) {
@@ -1129,7 +1128,7 @@ do_3dplot(
 		break;
 
 	    case DOTS:
-		if (draw_surface) {
+		if (draw_surface && !this_plot->opt_out_of_surface) {
 		    this_plot->lp_properties.p_type = -1;
 		    this_plot->lp_properties.pointflag = TRUE;
 		    if (lkey) {
@@ -1155,7 +1154,7 @@ do_3dplot(
 		break;
 
 	    case PM3DSURFACE:
-		if (draw_surface) {
+		if (draw_surface && !this_plot->opt_out_of_surface) {
 		    if (can_pm3d && PM3D_IMPLICIT != pm3d.implicit) {
 			pm3d_draw_one(this_plot);
 			if (!pm3d_order_depth)
