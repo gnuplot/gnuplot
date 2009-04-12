@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.170 2009/03/13 05:10:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.171 2009/03/26 00:49:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3229,7 +3229,6 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 
     if (!set_default && !set_matrix && df_num_bin_records_default) {
 	int_warn(NO_CARET, "using default binary record/array structure");
-	df_matrix_file = FALSE;
     }
 
     if (!set_format && !df_matrix_file) {

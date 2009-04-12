@@ -7,6 +7,10 @@
 	Add a per-plot attribute "nosurface", allowing an individual plot to 
 	opt out of the global 3D setting "set surface".
 
+	* src/datafile.c (plot_option_binary): Do not reset df_matrix_file to
+	FALSE just because there is a default setting for the binary format.
+	Bugfix
+
 2009-04-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/js/gnuplot_mouse.c:
