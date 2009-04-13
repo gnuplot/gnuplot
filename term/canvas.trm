@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.20 2009/04/01 03:45:53 sfeam Exp $
+ * $Id: canvas.trm,v 1.21 2009/04/06 03:43:45 sfeam Exp $
  *
  */
 
@@ -1128,7 +1128,7 @@ START_HELP(canvas)
 "       <html>",
 "       <head>",
 "           <script src=\"canvastext.js\"></script>",
-"           <script src=\"canvas_common.js\"></script>",
+"           <script src=\"gnuplot_common.js\"></script>",
 "       </head>",
 "       <body onload=\"fishplot();\">",
 "           <script src=\"fishplot.js\"></script>",

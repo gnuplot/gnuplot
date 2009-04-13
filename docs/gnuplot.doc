@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.565 2009/04/01 00:19:32 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.566 2009/04/12 22:27:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5598,10 +5598,10 @@ Ffigure_mapcontours
  be drawn, even if they would normally be obscured by other plot elements.
 
  Similarly, the keyword `nocontours` will turn off contouring for an individual
- plot even if the global property "set contour" is active.
+ plot even if the global property `set contour` is active.
 
- Similarly, the keyword `nocontours` will turn off the 3D surface for an
- individual plot even if the global property "set surface" is active.
+ Similarly, the keyword `nosurface` will turn off the 3D surface for an
+ individual plot even if the global property `set surface` is active.
 
  The keywords may be abbreviated as indicated.
 
@@ -10024,7 +10024,7 @@ Ffigure_mapcontours
  appropriate style, data or function.
 
  `unset surface` will cause `splot` to not draw points or lines corresponding
- to any of the function or data file points.  If you want to turn of the surface
+ to any of the function or data file points.  If you want to turn off the surface
  for an individual function or data file while leaving the others active, use
  the `nosurface` keyword in the `splot` command.  Contours may still be drawn on
  the surface, depending on the `set contour` option.  The combination
@@ -10458,6 +10458,7 @@ Ffigure_mapcontours
 ?set view equal_axes
 ?set view equal
 ?view equal_axes
+?view equal
  The command `set view equal xy` forces the unit length of the x and y axes
  to be on the same scale, and chooses that scale so that the plot will fit on
  the page.  The command `set view equal xyz` additionally sets the z axis 

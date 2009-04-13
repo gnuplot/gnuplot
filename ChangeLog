@@ -1,3 +1,7 @@
+2009-04-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc term/canvas.trm:  Fix typos in the documentation.
+
 2009-04-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (find_maxl_keys3d):  Fix incorrect layout of key box in
