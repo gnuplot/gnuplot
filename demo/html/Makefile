@@ -23,13 +23,13 @@ circles.html: $(GNUPLOT_LIB)/hidden2.dem ./webify.pl
 ellipse.html: random.html
 
 hidden2.html: $(GNUPLOT_LIB)/hidden2.dem ./webify.pl
-	export DEMOTERM="png truecolor font 'arial,8' size 420,320"; ./webify.pl hidden2
+	export DEMOTERM="png truecolor font 'arial,8' size 450,320"; ./webify.pl hidden2
 
 image.html: $(GNUPLOT_LIB)/image.dem ./webify.pl
-	export DEMOTERM="png truecolor font 'arial,8' size 420,320"; ./webify.pl image
+	export DEMOTERM="png truecolor font 'arial,8' size 450,320"; ./webify.pl image
 
 image2.html: $(GNUPLOT_LIB)/image2.dem ./webify.pl
-	export DEMOTERM="png truecolor font 'arial,8' size 420,320"; ./webify.pl image2
+	export DEMOTERM="png truecolor font 'arial,8' size 450,320"; ./webify.pl image2
 
 rgbalpha.html: $(GNUPLOT_LIB)/rgbalpha.dem ./webify.pl
 	export DEMOTERM="png truecolor font 'arial,8' size 450,300"; ./webify.pl rgbalpha

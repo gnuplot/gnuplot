@@ -25,8 +25,11 @@
 #    set term DEMOTERM
 # rather than the default terminal settings
 # E.g. (for image demo)
-#    setenv DEMOTERM "png truecolor enhanced font 'arial,8' transparent size 420,320"
+#    setenv DEMOTERM "png truecolor enhanced font 'arial,8' transparent size 450,320"
 #    ./webify.pl image
+#
+# EAM Apr 2009
+#    new layout for generated web pages
 #
 use Env qw(DEMOTERM GNUPLOT_LIB);
 
@@ -49,7 +52,7 @@ require "ctime.pl";
 	if ((defined $ENV{DEMOTERM}) && $DEMOTERM ne "") {
 	    print GNUPLOT "set term $DEMOTERM\n";
 	} else {
-	    print GNUPLOT "set term png enhanced font 'arial,8' transparent size 420,320\n";
+	    print GNUPLOT "set term png enhanced font 'arial,8' transparent size 450,320\n";
 	}
 	print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
 
@@ -74,7 +77,9 @@ require "ctime.pl";
 	print OUT "<hr>\n";
 
 # Start processing
-	print OUT "<img src=\"$ARGV[0].$plot.png\" alt=\"\" align=right>\n";
+	print OUT "<table border=0><tr><td class='LIMG'>";
+	print OUT "<img src=\"$ARGV[0].$plot.png\" alt=\"\">\n";
+	print OUT "</td><td>";
 	print OUT "<pre>\n";
 
 	while (<IN>) {
@@ -84,13 +89,17 @@ require "ctime.pl";
 				  "for minimal script to generate this plot</p>\n";
 			    print GNUPLOT "save \"| gpsavediff > $ARGV[0].$plot.gnu\"\n";
 			}
-			print OUT "</pre>\n<br clear=all>\n<hr>\n";
+			print OUT "</pre></td></tr></table>\n<br clear=all>\n<hr>\n";
 			$plot++;
-			print OUT "<img src=\"$ARGV[0].$plot.png\" alt=\"\" align=right>\n";
+			print OUT "<table border=0><tr><td class='LIMG'>";
+			print OUT "<img src=\"$ARGV[0].$plot.png\" alt=\"\">\n";
+			print OUT "</td><td valign=top>\n";
 			print OUT "<pre>\n";
 			print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
 		} elsif (/^pause/) {
 			print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
+		} elsif (/^ *reset/) {
+			print GNUPLOT;
 		} else {
 			print OUT HTML::Entities::encode($_);
 			print GNUPLOT;
@@ -101,6 +110,6 @@ require "ctime.pl";
 # Unlink leftover empty plot before leaving.
 	close GNUPLOT;
 	unlink("$ARGV[0].$plot.png");
-	print OUT "</pre>\n";
+	print OUT "</pre></td></tr></table>\n";
 	print OUT "</body>\n</html>\n";
 

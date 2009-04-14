@@ -2,6 +2,9 @@
 
 	* term/js/gnuplot_mouse.js:  Initialize x2 and y2 axes in mousing code.
 
+	* demo/html/Makefile demo/html/webify.pl demo/html/gnuplot_demo.css:
+	Modify the layout of auto-generated web pages for the demo collection.
+
 2009-04-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc term/canvas.trm:  Fix typos in the documentation.
