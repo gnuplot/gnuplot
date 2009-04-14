@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.2 2009/01/24 04:07:54 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.4 2009/04/06 03:43:45 sfeam Exp $
  */
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -26,6 +26,8 @@ var plot_axis_width  = 0;
 var plot_axis_height = 0;
 var plot_axis_ymin = 0;
 var plot_axis_ymax = 0;
+var plot_axis_x2min = "none";
+var plot_axis_y2min = "none";
 var plot_logaxis_x = 0;
 var plot_logaxis_y = 0;
 var grid_lines = true;

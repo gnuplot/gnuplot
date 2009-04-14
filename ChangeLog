@@ -1,3 +1,7 @@
+2009-04-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/js/gnuplot_mouse.js:  Initialize x2 and y2 axes in mousing code.
+
 2009-04-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc term/canvas.trm:  Fix typos in the documentation.
