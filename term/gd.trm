@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.132 2009/03/03 02:43:13 sfeam Exp $
+ * $Id: gd.trm,v 1.133 2009/03/26 00:49:20 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1062,11 +1062,12 @@ PNG_options()
     sprintf(term_options + strlen(term_options),
 	    "size %d,%d ", PNG_XMAX, PNG_YMAX);
 
-    for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN &&
-           i < png_state.n_colors; i++) {
-	sprintf(term_options + strlen(term_options),
+    if (new_colors)
+	for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN &&
+	     i < png_state.n_colors; i++) {
+	    sprintf(term_options + strlen(term_options),
 		"x%06x ", png_state.rgb_table[i]);
-    }
+	}
 }
 
 

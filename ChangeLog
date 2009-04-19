@@ -1,3 +1,8 @@
+2009-04-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm:  Only show a list of colors in "show term" if the user
+	actually set some new colors in the "set term" command.
+
 2009-04-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/gnuplot_mouse.js:  Initialize x2 and y2 axes in mousing code.
