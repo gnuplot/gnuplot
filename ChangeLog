@@ -1,3 +1,10 @@
+2009-04-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c:  Clean up string handling and remove dead code.
+	Use strcat() rather than overlapping sprintf(). This should do away
+	with the need for the "ultrix" mouse patch in our contrib collection,
+	and also fix Bug #2700365.
+
 2009-04-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm:  Only show a list of colors in "show term" if the user
