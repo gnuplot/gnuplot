@@ -1,3 +1,8 @@
+2009-04-22  Carl Troein (troein@users.sourceforge.net)
+
+	* src/axis.c (get_position_default):  Zero each position structure when
+	allocated.  Bug #2778438.
+
 2009-04-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c:  Clean up string handling and remove dead code.

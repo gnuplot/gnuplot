@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.75 2008/10/30 22:21:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.76 2009/03/15 03:17:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1590,6 +1590,8 @@ get_position_default(struct position *pos, enum position_type default_type)
 {
     int axes;
     enum position_type type = default_type;
+
+    memset(pos, 0, sizeof(struct position));
 
     get_position_type(&type, &axes);
     pos->scalex = type;
