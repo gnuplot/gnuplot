@@ -1,3 +1,9 @@
+2009-05-05  Thomas Sefzick (thse@users.sourceforge.net)
+
+	* term/pslatex.trm: 'set epslatex ... blacktext' was producing white
+	text for tics labels, axis labels, key labels, but black title text.
+	Bug #2750114
+
 2009-04-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:  Filled boxes and filled polygons have different
