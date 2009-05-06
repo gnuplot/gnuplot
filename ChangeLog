@@ -1,3 +1,8 @@
+2009-05-05  Peter Gasparovic  (buteo@users.sourceforge.net)
+
+	* term/PostScript/cp1250.ps:  Fix code points for Lcaron, lcaron.
+	Bug #2785002
+
 2009-05-05  Thomas Sefzick (thse@users.sourceforge.net)
 
 	* term/pslatex.trm: 'set epslatex ... blacktext' was producing white
