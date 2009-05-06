@@ -1,3 +1,9 @@
+2009-05-05  Thomas Sefzick (thse@users.sourceforge.net)
+
+	* term/pslatex.trm: 'set epslatex ... blacktext' was producing white
+	text for tics labels, axis labels, key labels, but black title text.
+	Bug #2750114
+
 2009-04-22  Carl Troein (troein@users.sourceforge.net)
 
 	* src/axis.c (get_position_default):  Zero each position structure when
