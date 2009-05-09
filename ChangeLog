@@ -1,3 +1,10 @@
+2009-05-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* Makefile.am, src/Makefile.am:  Add a top level make target "gnuplot"
+	that builds only the gnuplot executable.  I.e. no auxilliary programs
+	for testing or demo generation, no documentation or tutorials, etc.
+	This change was requested in order to simplify cross-compilation.
+
 2009-05-05  Peter Gasparovic  (buteo@users.sourceforge.net)
 
 	* term/PostScript/cp1250.ps:  Fix code points for Lcaron, lcaron.

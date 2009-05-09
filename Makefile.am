@@ -19,3 +19,7 @@ dist-hook:
 	@find $(distdir) -type d -name .deps -print | xargs rm -rf
 	@find $(distdir) -type f -name .cvsignore -print | xargs rm -f
 	@(cd $(distdir)/lisp && rm -f $(LISP_DISTCLEANFILES))
+
+gnuplot:
+	cd src; make binonly
+

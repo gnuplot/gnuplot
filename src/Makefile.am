@@ -26,6 +26,7 @@ GNUPLOT_PS_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/PostScript
 
 bin_PROGRAMS = gnuplot
 noinst_PROGRAMS = bf_test
+binonly: $(bin_PROGRAMS)
 
 transform = @program_transform_name@
 GNUPLOT_X11 = `echo gnuplot_x11 | sed '$(transform)'`$(EXEEXT)
