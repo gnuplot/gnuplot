@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.299 2009/03/27 04:59:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.300 2009/03/28 20:07:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -328,6 +328,7 @@ boundary(struct curve_points *plots, int count)
     int ytic_textwidth;		/* width of ytic labels */
     int y2tic_textwidth;	/* width of y2tic labels */
     int x2tic_height;		/* 0 for tic_in or no x2tics, ticscale*v_tic otherwise */
+    int xtic_textwidth;		/* amount by which the xtic label protrude to the right */
     int xtic_height;
     int ytic_width;
     int y2tic_width;
@@ -858,6 +859,39 @@ boundary(struct curve_points *plots, int count)
 	y2tic_textwidth = 0;
     }
 
+    /* EAM May 2009
+     * Check to see if any xtic labels are so long that they extend beyond
+     * the right boundary of the plot. If so, allow extra room in the margin.
+     * If the labels are too long to fit even with a big margin, too bad.
+     */
+    if (axis_array[FIRST_X_AXIS].ticdef.def.user) {
+	struct ticmark *tic = axis_array[FIRST_X_AXIS].ticdef.def.user;
+	int maxrightlabel = plot_bounds.xright;
+	while (tic) {
+	    if (tic->label) {
+		double xx;
+		int length = estimate_strlen(tic->label)
+			   * cos(DEG2RAD * (double)(axis_array[FIRST_X_AXIS].tic_rotate))
+			   * term->h_char;
+
+		/* We don't really know the plot layout yet, but try for an estimate */
+		AXIS_SETSCALE(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
+		axis_set_graphical_range(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
+		xx = axis_log_value_checked(FIRST_X_AXIS, tic->position, "xtic");
+	        xx = AXIS_MAP(FIRST_X_AXIS, xx);
+		xx += (axis_array[FIRST_X_AXIS].tic_rotate) ? length : length /2;
+		if (maxrightlabel < xx)
+		    maxrightlabel = xx;
+	    }
+	    tic = tic->next;
+	}
+	xtic_textwidth = maxrightlabel - plot_bounds.xright;
+	if (xtic_textwidth > term->xmax/2) {
+	    xtic_textwidth = term->xmax/2;
+	    int_warn(NO_CARET, "difficulty making room for xtic labels");
+	}
+    }
+
     /* tics */
     if (!axis_array[SECOND_Y_AXIS].tic_in
 	&& ((axis_array[SECOND_Y_AXIS].ticmode & TICS_ON_BORDER)
@@ -890,7 +924,6 @@ boundary(struct curve_points *plots, int count)
 	}
 
 	if (rmargin.x < 0) {
-	    /* plot_bounds.xright -= y2label_textwidth + y2tic_width + y2tic_textwidth; */
 	    plot_bounds.xright -= y2tic_width + y2tic_textwidth;
 	    if (y2label_textwidth > 0)
 		plot_bounds.xright -= y2label_textwidth;
@@ -899,6 +932,9 @@ boundary(struct curve_points *plots, int count)
 		/* make room for end of xtic or x2tic label */
 		plot_bounds.xright -= (int) (t->h_char * 2);
 	    }
+	    /* EAM 2009 - protruding xtic labels */
+	    if (term->xmax - plot_bounds.xright < xtic_textwidth)
+		plot_bounds.xright = term->xmax - xtic_textwidth;
 	    /* DBT 12-3-98  extra margin just in case */
 	    plot_bounds.xright -= 0.5 * t->h_char;
 	}

@@ -5,6 +5,10 @@
 	for testing or demo generation, no documentation or tutorials, etc.
 	This change was requested in order to simplify cross-compilation.
 
+	* src/graphics.c (boundary):  Allow extra space in the right margin if
+	user-defined xtic labels would otherwise protrude off the right edge of
+	the plot.
+
 2009-05-05  Peter Gasparovic  (buteo@users.sourceforge.net)
 
 	* term/PostScript/cp1250.ps:  Fix code points for Lcaron, lcaron.
