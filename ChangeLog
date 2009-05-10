@@ -1,3 +1,9 @@
+2009-05-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm:  Do not call term->text() in between multiplot
+	sections; it causes a spurious page break in the pdf output.
+	Bugfix
+
 2009-05-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Makefile.am, src/Makefile.am:  Add a top level make target "gnuplot"
