@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.300 2009/03/28 20:07:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.301 2009/05/10 05:21:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -328,7 +328,7 @@ boundary(struct curve_points *plots, int count)
     int ytic_textwidth;		/* width of ytic labels */
     int y2tic_textwidth;	/* width of y2tic labels */
     int x2tic_height;		/* 0 for tic_in or no x2tics, ticscale*v_tic otherwise */
-    int xtic_textwidth;		/* amount by which the xtic label protrude to the right */
+    int xtic_textwidth=0;	/* amount by which the xtic label protrude to the right */
     int xtic_height;
     int ytic_width;
     int y2tic_width;
