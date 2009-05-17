@@ -6,6 +6,9 @@
 	There is now a top level entry "Fonts" in the manual, with subsections
 	for font-handling in libgd, PostScript, and cairo (as yet unfinished).
 
+	* term/js/gnuplot_mouse.js (saveclick zoom_in): Do not let the current
+	mouse event fall through to also activate default desktop actions.
+
 2009-05-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Initialize xtic_textwidth on entry.

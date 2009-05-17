@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.4 2009/04/06 03:43:45 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.5 2009/04/14 21:16:23 sfeam Exp $
  */
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -197,6 +197,7 @@ function saveclick(event)
     zoom_temp_ploty = ploty;
     zoom_in_progress = true;
   }
+  return false; // Nobody else should respond to this event
 }
 
 function zoom_in(event)
@@ -245,6 +246,7 @@ function zoom_in(event)
     zoom_in_progress = false;
     rezoom(event);
   }
+  return false; // Nobody else should respond to this event
 }
 
 function toggle_grid(e)
