@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.566 2009/04/12 22:27:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.567 2009/04/13 23:59:52 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1645,6 +1645,88 @@ C ... and restart the table:
        set label GPFUN_sinc at graph .05,.95
 
  See `show functions`, `functions`, `gnuplot-defined variables`, `macros`.
+2 Fonts
+?fonts
+ Gnuplot does not provide any fonts of its own. It relies on external font
+ handling, the details of which unfortunately vary from one terminal type to
+ another. Brief documentation of font mechanisms that apply to more than one
+ terminal type is given here. For information on font use by other individual
+ terminals, see the documentation for that terminal.
+3 cairo (pdfcairo, pngcairo, wxt terminals)
+?fonts cairo
+=fonts
+=pdf
+=png
+=wxt
+ Sorry, this section is under construction.
+3 gd (png, gif, jpeg terminals)
+?gd
+?fonts gd
+=fonts
+=png
+=jpeg
+=gif
+ Font handling for the png, gif, and jpeg terminals is done by the external
+ library libgd.  Five basic fonts are provided directly by libgd. These are
+ `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), `large`
+ (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled or rotated.
+ Use one of these keywords instead of the `font` keyword. E.g.
+      set term png tiny
+
+ On most systems libgd also provides access to Adobe Type 1 fonts (*.pfa) and
+ TrueType fonts (*.ttf). You must give the name of the font file (not the name
+ of the font itself, in the form "<face> {,<pointsize>}".
+ <face> is either the full pathname to the font file, or the first part of a
+ filename in one of the directories listed in the GDFONTPATH environmental
+ variable. That is, 'set term png font "Face"' will look for a font file named
+ either <somedirectory>/Face.ttf or <somedirectory>/Face.pfa.
+ For example, if GDFONTPATH contains `/usr/local/fonts/ttf:/usr/local/fonts/pfa`
+ then the following pairs of commands are equivalent
+      set term png font "arial"
+      set term png font "/usr/local/fonts/ttf/arial.ttf"
+      set term png font "Helvetica"
+      set term png font "/usr/local/fonts/Helvetica.pfa"
+ To request a default font size at the same time:
+      set term png font "arial,11"
+
+ Both TrueType and Adobe Type 1 fonts are fully scalable and rotatable.
+ If no specific font is requested in the "set term" command, gnuplot checks
+ the environmental variable GNUPLOT_DEFAULT_GDFONT to see if there is a
+ preferred default font.
+3 postscript  (also encapsulated postscript *.eps)
+?fonts postscript
+=fonts
+=postscript
+=eps
+ PostScript font handling is done by the printer or viewing program.
+ Gnuplot can create valid PostScript or encapsulated PostScript (*.eps) even if
+ no fonts at all are installed on your computer.  Gnuplot simply refers to the
+ font by name in the output file, and assumes that the printer or viewing
+ program will know how to find or approximate a font by that name.
+ 
+ All PostScript printers or viewers should know about the standard set of Adobe
+ fonts `Times-Roman`, `Helvetica`, `Courier`, and `Symbol`.  It is likely that
+ many additional fonts are also available, but the specific set depends on your
+ system or printer configuration. Gnuplot does not know or care about this;
+ the output *.ps or *.eps files that it creates will simply refer to whatever
+ font names you request.
+
+ Thus
+      set term postscript eps font "Times-Roman,12"
+ will produce output that is suitable for all printers and viewers.
+
+ On the other hand
+      set term postscript eps font "Garamond-Premier-Pro-Italic"
+ will produce an output file that contains valid PostScript, but since it
+ refers to a specialized font, only some printers or viewers will be able to
+ display the specific font that was requested.  Most will substitute a
+ different font.
+
+ However, it is possible to embed a specific font in the output file so that
+ all printers will be able to use it. This requires that the a suitable font
+ description file is available on your system. Note that some font files require
+ specific licensing if they are to be embedded in this way.
+ See `postscript fontfile` for more detailed description and examples.
 2 Glossary
 ?glossary
  Throughout this document an attempt has been made to maintain consistency of

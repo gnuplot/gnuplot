@@ -1,3 +1,11 @@
+2009-05-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm docs/gnuplot.doc: Restore the option of using one of
+	libgd's built-in fonts, even if a scalable font is available.
+	Begin a reorganization of the documentation dealing with fonts.
+	There is now a top level entry "Fonts" in the manual, with subsections
+	for font-handling in libgd, PostScript, and cairo (as yet unfinished).
+
 2009-05-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): Initialize xtic_textwidth on entry.

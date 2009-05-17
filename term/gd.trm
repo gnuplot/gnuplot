@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.133 2009/03/26 00:49:20 sfeam Exp $
+ * $Id: gd.trm,v 1.134 2009/04/20 00:02:00 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -236,6 +236,7 @@ static struct {
     int linetype;
     int linewidth;
     TBOOLEAN capbutt;  /* use capbutt on lines with GD2, 20051205 MWS*/
+    TBOOLEAN use_builtin;
     int ttfsize;
     char *ttffont;
     gdFontPtr default_font;
@@ -626,6 +627,7 @@ PNG_options()
 	png_state.default_font = gdfont;
 	png_state.n_colors = 0;
 	png_state.flags = 0;
+	png_state.use_builtin = FALSE;
 	png_state.ttffont = NULL;
 	png_state.default_ttffont = NULL;
 	png_state.default_ttfsize = 0;
@@ -694,16 +696,19 @@ PNG_options()
 	    png_state.flags &= ~PNG_USE_CROP;
 	    ++c_token;
 	    break;
-	case PNG_TINY:
+
 #ifdef HAVE_GD_TTF
 # define UNSET_TTF_FONT \
 	    free(png_state.ttffont); \
 	    png_state.ttffont = NULL; \
-	    png_state.default_ttfsize = 2 * term->h_char - 2;
+	    png_state.default_ttfsize = 2 * term->h_char - 2; \
+	    png_state.use_builtin = TRUE;
 #else
 # define UNSET_TTF_FONT \
 	    ; /* nothing to do */
 #endif
+
+	case PNG_TINY:
 	    png_state.default_font=gdFontTiny;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
@@ -738,6 +743,7 @@ PNG_options()
 	    ++c_token;
 	    UNSET_TTF_FONT;
 	    break;
+
 	case PNG_FONT:
 	    c_token++;
 #ifdef HAVE_GD_TTF
@@ -790,6 +796,8 @@ PNG_options()
 	    fprintf(stderr,"No TTF font support, using internal non-scalable font\n");
 #endif
 	    break;
+# undef UNSET_TTF_FONT
+
 	case PNG_SIZE:
 	    c_token++;
 	    if (END_OF_COMMAND) {
@@ -942,7 +950,7 @@ PNG_options()
 
 #ifdef HAVE_GD_TTF
     /* If no font has been chosen but there is a default, use it */
-    if (!png_state.ttffont) {
+    if (!png_state.ttffont && !png_state.use_builtin) {
 	char *external_default = getenv("GNUPLOT_DEFAULT_GDFONT");
 	int brect[8];
 	char *err;
@@ -2209,68 +2217,49 @@ START_HELP(png)
 "              {{no}truecolor} {rounded|butt}",
 "              {linewidth <lw>} {dashlength <dl>}",
 "              {tiny | small | medium | large | giant}",
-"              {font <face> {<pointsize>}}",
+"              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
 "              {size <x>,<y>} {{no}crop}",
-"              {{no}enhanced}",
 "              {<color0> <color1> <color2> ...}",
 "",
-" PNG images are created using libgd, with optional support for TrueType",
-" and Adobe Type 1 fonts via libfreetype. Version 1.8 or greater of libgd",
-" is required.",
+" PNG, JPEG and GIF images are created using the external library libgd.",
+" PNG plots may be viewed interactively by piping the output to the",
+" 'display' program from the ImageMagick package as follows:",
+"                set term png",
+"                set output '| display png:-'",
+" You can view the output from successive plot commands interactively by typing",
+" <space> in the display window.  To save the current plot to a file,",
+" left click in the display window and choose `save`.",
 "",
-" `transparent` instructs the driver to generate transparent PNGs.  The first",
-" color will be the transparent one. Default is `notransparent`.",
+" `transparent` instructs the driver to make the background color transparent.",
+" Default is `notransparent`.",
 "",
 " `interlace` instructs the driver to generate interlaced PNGs.",
 " Default is `nointerlace`.",
 "",
-" By default a 256-color png image is produced. The `truecolor` option instead",
-" creates a TrueColor output image with 24 bits of color information per pixel.",
-" The use of transparent fill areas requires use of the `truecolor` option.",
+" The `linewidth` and `dashlength` options are scaling factors that affect all",
+" lines drawn, i.e. they are multiplied by values requested in various drawing",
+" commands.",
+"",
+" By default output png images use 256 indexed colors. The `truecolor` option",
+" instead creates TrueColor images with 24 bits of color information per pixel.",
+" Transparent fill styles require the `truecolor` option. See `fillstyle`.",
 " A transparent background is possible in either indexed or TrueColor images.",
 "",
 " `butt` instructs the driver to use a line drawing method that does",
 " not overshoot the desired end point of a line.  This setting is only",
 " applicable for line widths greater than 1.  This setting is most useful when",
 " drawing horizontal or vertical lines.  Default is `rounded`.",
-" Version 2.0 or greater of libgd is required.",
 "",
-" PNG plots may be conveniently viewed by piping the output to the",
-" 'display' program from the ImageMagick package as follows:",
-"                set term png",
-"                set output '| display png:-'",
+" The details of font selection are complicated.",
+" Two equivalent simple examples are given below:",
+"      set term png font arial 11",
+"      set term png font \"arial,11\"",
+" For more information please see the separate section under `fonts`.",
 "",
-" View the output from successive plot commands interactively by hitting",
-" <space> in the display window.  To save a particular one to disk, left",
-" click in the display window and choose `save`.",
-"",
-" Five basic fonts are supported directly by the gd library. These are",
-" `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), ",
-" `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
-" or rotated (pure horizontal or vertical text only).",
-"",
-"=fonts",
-" If gnuplot was built with support for TrueType (*.ttf) or Adobe Type 1 ",
-" (*.pfa) fonts, they may be selected using the 'font <face> {<pointsize>}' ",
-" option. <face> is either the full pathname to the font file, or a font ",
-" face name that is assumed to be the first part of a filename in one of the ",
-" directories listed in the GDFONTPATH environmental variable. That is, ",
-" 'set term png font \"Face\"' will look for a font file named either ",
-" <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
-" Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
-" If no font is specified, gnuplot checks the environmental variable ",
-" GNUPLOT_DEFAULT_GDFONT to see if there is a preferred default font. ",
-"",
-" `enhanced` enables the enhanced text processing features, (subscripts, ",
-" superscripts and mixed fonts). See `enhanced` for more information. ",
-" The full enhanced mode syntax is supported by the PNG/JPEG driver itself,",
-" but some of these features are dependent on which version of the ",
-" underlying libgd library is present, and which fonts are available.",
-"",
-" The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
-" pixels can be also modified by scaling with the `set size` command.",
-" `crop` trims blank space from the edges of the completed plot, resulting",
-" in a smaller final image size. Default is `nocrop`.",
+" The output plot size <x,y> is given in pixels---it defaults to 640x480.",
+" Please see additional information under `canvas` and `set size`.",
+" Blank space at the edges of the finished plot may be trimmed using the `crop`",
+" option, resulting in a smaller final image size. Default is `nocrop`.",
 "",
 " Each color must be of the form 'xrrggbb', where x is the literal character",
 " 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
@@ -2278,27 +2267,28 @@ START_HELP(png)
 " colors, then the X & Y axis colors, then the plotting colors.  The maximum",
 " number of colors that can be set is 256.",
 "",
-" Examples:",
+"2 examples",
+"?set term png examples",
 "       set terminal png medium size 640,480 \\",
 "                        xffffff x000000 x404040 \\",
 "                        xff0000 xffa500 x66cdaa xcdb5cd \\",
 "                        xadd8e6 x0000ff xdda0dd x9500d3    # defaults",
 "",
-" which uses white for the non-transparent background, black for borders, gray",
-" for the axes, and red, orange, medium aquamarine, thistle 3, light blue, blue,",
-" plum and dark violet for eight plotting colors.",
+" Use the medium size built-in non-scaleable, non-rotatable font.",
+" Use white (xffffff) for the non-transparent background, black for borders,",
+" gray for the axes, and red, orange, medium aquamarine, thistle 3, light blue,",
+" blue, plum and dark violet for the first eight plotting colors.",
 "",
 "       set terminal png font arial 14 size 800,600",
 "",
-" which searches for a TrueType font with face name 'arial' in the directory",
-" specified by the environment variable GDFONTPATH and 14pt font size.",
+" Searches for a scalable font with face name 'arial' and sets the font",
+" size to 14pt.  Please see `fonts` for details of how the font search",
+" is done.",
 "",
-"       set terminal png transparent xffffff \\",
-"                        x000000 x202020 x404040 x606060 \\",
-"                        x808080 xA0A0A0 xC0C0C0 xE0E0E0",
+"       set terminal png transparent truecolor enhanced",
 "",
-" which uses white for the transparent background, black for borders, dark",
-" gray for axes, and a gray-scale for the six plotting colors.",
+" Use 24 bits of color information per pixel, with a transparent background.",
+" Use the `enhanced text` mode to control the layout of strings to be printed.",
 ""
 END_HELP(png)
 #endif /* TERM_HELP */
@@ -2373,7 +2363,6 @@ TERM_TABLE_END(jpeg_driver)
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 
-
 #ifdef TERM_HELP
 START_HELP(jpeg)
 "1 jpeg",
@@ -2383,70 +2372,50 @@ START_HELP(jpeg)
 "?terminal jpeg",
 "?term jpeg",
 "?jpeg",
-"",
 " Syntax:",
 "       set terminal jpeg ",
-"                        {{no}interlace}",
-"                        {tiny | small | medium | large | giant}",
-"                        {font <face> {<pointsize>}}",
-"                        {size <x>,<y>} {{no}crop}",
-"                        {{no}enhanced}",
-"                        {<color0> <color1> <color2> ...}",
+"              {{no}interlace}",
+"              {linewidth <lw>} {dashlength <dl>} {rounded|butt}",
+"              {tiny | small | medium | large | giant}",
+"              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
+"              {size <x>,<y>} {{no}crop}",
+"              {<color0> <color1> <color2> ...}",
 "",
-" JPEG images are created using libgd, with optional support for TrueType",
-" fonts via libfreetype.",
+" PNG, JPEG and GIF images are created using the external library libgd.",
+" In most cases, PNG is to be preferred for single plots, and GIF for",
+" animations.  Both are loss-less image formats, and produce better image",
+" quality than the lossy JPEG format. This is in particular noticeable",
+" for solid color lines against a solid background, i.e. exactly the sort",
+" of image typically created by gnuplot.",
 "",
 " The `interlace` option creates a progressive JPEG image.",
 " Default is `nointerlace`.",
 "",
-" Five basic fonts are supported directly by the gd library. These are",
-" `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), ",
-" `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
-" or rotated (pure horizontal or vertical text only).",
+" The `linewidth` and `dashlength` options are scaling factors that affect all",
+" lines drawn, i.e. they are multiplied by values requested in various drawing",
+" commands.",
 "",
-"=fonts",
-" If gnuplot was built with support for TrueType (*.ttf) or Adobe Type 1 ",
-" (*.pfa) fonts, they may be selected using the 'font <face> {<pointsize>}' ",
-" option. <face> is either the full pathname to the font file, or a font ",
-" face name that is assumed to be the first part of a filename in one of the ",
-" directories listed in the GDFONTPATH environmental variable. That is, ",
-" 'set term jpeg font \"Face\"' will look for a font file named either ",
-" <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
-" Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
-" If no font is specified, gnuplot checks the environmental variable ",
-" GNUPLOT_DEFAULT_GDFONT to see if there is a preferred default font. ",
+" `butt` instructs the driver to use a line drawing method that does",
+" not overshoot the desired end point of a line.  This setting is only",
+" applicable for line widths greater than 1.  This setting is most useful when",
+" drawing horizontal or vertical lines.  Default is `rounded`.",
 "",
-" `enhanced` enables the enhanced text processing features, (subscripts, ",
-" superscripts and mixed fonts). See `enhanced` for more information. ",
-" The full enhanced mode syntax is supported by the PNG/JPEG driver itself,",
-" but some of these features are dependent on which version of the ",
-" underlying libgd library is present, and which fonts are available.",
+" The details of font selection are complicated.",
+" Two equivalent simple examples are given below:",
+"      set term jpeg font arial 11",
+"      set term jpeg font \"arial,11\"",
+" For more information please see the separate section under `fonts`.",
 "",
-" The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
-" pixels can be also modified by scaling with the `set size` command.",
-" `crop` trims blank space from the edges of the completed plot, resulting",
-" in a smaller final image size. Default is `nocrop`.",
+" The output plot size <x,y> is given in pixels---it defaults to 640x480.",
+" Please see additional information under `canvas` and `set size`.",
+" Blank space at the edges of the finished plot may be trimmed using the `crop`",
+" option, resulting in a smaller final image size. Default is `nocrop`.",
 "",
 " Each color must be of the form 'xrrggbb', where x is the literal character",
 " 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
 " 'x00ff00' is green.  The background color is set first, then the border",
 " colors, then the X & Y axis colors, then the plotting colors.  The maximum",
 " number of colors that can be set is 256.",
-"",
-" Examples:",
-"       set terminal jpeg medium size 640,480 \\",
-"                        xffffff x000000 x404040 \\",
-"                        xff0000 xffa500 x66cdaa xcdb5cd \\",
-"                        xadd8e6 x0000ff xdda0dd x9500d3    # defaults",
-"",
-" which uses white for the non-transparent background, black for borders, gray",
-" for the axes, and red, orange, medium aquamarine, thistle 3, light blue, blue,",
-" plum and dark violet for eight plotting colors.",
-"",
-"       set terminal jpeg large font arial size 800,600",
-"",
-" which searches for a TrueType font with face name 'arial' in the directory",
-" specified by the environment variable GDFONTPATH and large (14pt) font size.",
 ""
 END_HELP(jpeg)
 #endif /* TERM_HELP */
@@ -2557,54 +2526,41 @@ START_HELP(gif)
 "?terminal gif",
 "?term gif",
 "?gif",
-"",
 " Syntax:",
 "       set terminal gif ",
-"                        {tiny | small | medium | large | giant}",
-"                        {{no}transparent} {{no}enhanced}",
-"                        {linewidth <lw>} {dashlength <dl>}",
-"                        {font <face> {<pointsize>}}",
-"                        {animate {delay <time>} {{no}optimize}}",
-"                        {size <x>,<y>} {{no}crop}",
-"                        {<color0> <color1> <color2> ...}",
+"              {{no}transparent} {rounded|butt}",
+"              {linewidth <lw>} {dashlength <dl>}",
+"              {tiny | small | medium | large | giant}",
+"              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
+"              {size <x>,<y>} {{no}crop}",
+"              {<color0> <color1> <color2> ...}",
 "",
-" GIF images are created using libgd, with optional support for TrueType",
-" fonts via libfreetype.",
-"",
-" GIF plots may be conveniently viewed by piping the output to the",
+" PNG, JPEG and GIF images are created using the external library libgd.",
+" GIF plots may be viewed interactively by piping the output to the",
 " 'display' program from the ImageMagick package as follows:",
 "                set term gif",
 "                set output '| display gif:-'",
+" You can view the output from successive plot commands interactively by typing",
+" <space> in the display window.  To save the current plot to a file,",
+" left click in the display window and choose `save`.",
 "",
-" View the output from successive plot commands interactively by hitting",
-" <space> in the display window.  To save a particular one to disk, left",
-" click in the display window and choose `save`.",
+" `transparent` instructs the driver to make the background color transparent.",
+" Default is `notransparent`.",
 "",
-" Five basic fonts are supported directly by the gd library. These are",
-" `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), ",
-" `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
-" or rotated (pure horizontal or vertical text only).",
+" The `linewidth` and `dashlength` options are scaling factors that affect all",
+" lines drawn, i.e. they are multiplied by values requested in various drawing",
+" commands.",
 "",
-" `transparent` instructs the driver to generate transparent GIFs.  The first",
-" color will be the transparent one. Default is `notransparent`.",
+" `butt` instructs the driver to use a line drawing method that does",
+" not overshoot the desired end point of a line.  This setting is only",
+" applicable for line widths greater than 1.  This setting is most useful when",
+" drawing horizontal or vertical lines.  Default is `rounded`.",
 "",
-" `enhanced` enables the enhanced text processing features, (subscripts, ",
-" superscripts and mixed fonts). See `enhanced` for more information. ",
-" The full enhanced mode syntax is supported by the PNG/GIF driver itself,",
-" but some of these features are dependent on which version of the ",
-" underlying libgd library is present, and which fonts are available.",
-"",
-"=fonts",
-" If your local gd library was built with support for TrueType  and Adobe",
-" Type 1 fonts, they may be selected using the 'font <face> {<pointsize>}' ",
-" option. <face> is either the full pathname to the font file, or a font ",
-" face name that is assumed to be the first part of a filename in one of the ",
-" directories listed in the GDFONTPATH environmental variable. That is, ",
-" 'set term gif font \"Face\"' will look for a font file named either ",
-" <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
-" Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
-" If no font is specified, gnuplot checks the environmental variable ",
-" GNUPLOT_DEFAULT_GDFONT to see if there is a preferred default font. ",
+" The details of font selection are complicated.",
+" Two equivalent simple examples are given below:",
+"      set term gif font arial 11",
+"      set term gif font \"arial,11\"",
+" For more information please see the separate section under `fonts`.",
 "",
 " The `animate` option is available only if your local gd library supports",
 " the creation of animated gifs. The default delay between display of",
@@ -2641,21 +2597,41 @@ START_HELP(gif)
 " 'x00ff00' is green.  The background color is set first, then the border",
 " colors, then the X & Y axis colors, then the plotting colors.  The maximum",
 " number of colors that can be set is 256.",
+" The output plot size <x,y> is given in pixels---it defaults to 640x480.",
+" Please see additional information under `canvas` and `set size`.",
+" Blank space at the edges of the finished plot may be trimmed using the `crop`",
+" option, resulting in a smaller final image size. Default is `nocrop`.",
 "",
-" Examples:",
+" Each color must be of the form 'xrrggbb', where x is the literal character",
+" 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
+" 'x00ff00' is green.  The background color is set first, then the border",
+" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
+" number of colors that can be set is 256.",
+"",
+"2 examples",
+"?set term gif examples",
 "       set terminal gif medium size 640,480 \\",
 "                        xffffff x000000 x404040 \\",
 "                        xff0000 xffa500 x66cdaa xcdb5cd \\",
 "                        xadd8e6 x0000ff xdda0dd x9500d3    # defaults",
 "",
-" which uses white for the non-transparent background, black for borders, gray",
-" for the axes, and red, orange, medium aquamarine, thistle 3, light blue, blue,",
-" plum and dark violet for eight plotting colors.",
+" Use the medium size built-in non-scaleable, non-rotatable font.",
+" Use white (xffffff) for the non-transparent background, black for borders,",
+" gray for the axes, and red, orange, medium aquamarine, thistle 3, light blue,",
+" blue, plum and dark violet for the first eight plotting colors.",
 "",
-"       set terminal gif font 'arial' 14 size 800,600",
+"       set terminal gif font arial 14 enhanced",
 "",
-" which searches for a TrueType font with face name 'arial' in the directory",
-" specified by the environment variable GDFONTPATH and 14pt font size.",
+" Searches for a scalable font with face name 'arial' and sets the font",
+" size to 14pt.  Please see `fonts` for details of how the font search",
+" is done.  Because this is a scalable font, we can use enhanced text mode.",
+"",
+"       set term gif animate transparent opt delay 10 size 200,200 x000000",
+"       load \"animate2.dem\"",
+"",
+" Open the gif terminal for creation of an animated gif file.  The individual",
+" frames of the animation sequence are created by the script file animate2.dem",
+" from the standard collection of demos.",
 ""
 END_HELP(gif)
 #endif /* TERM_HELP */
