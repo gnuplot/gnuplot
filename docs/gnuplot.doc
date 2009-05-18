@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.387.2.49 2008/12/15 03:44:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.387.2.50 2009/02/16 21:41:56 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -422,7 +422,7 @@ C
  Input data can be filtered through several built-in routines for interpolation
  or approximation of data.  See `smooth`, `frequency`, `unique`.
 
- Sample scripts: step.dem mgr.dem
+ Sample scripts: steps.dem mgr.dem
 
 3 Improved text options
 
