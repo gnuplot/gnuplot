@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.134 2009/04/20 00:02:00 sfeam Exp $
+ * $Id: gd.trm,v 1.135 2009/05/17 22:31:55 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -81,19 +81,12 @@
  *
  ******************************************************************************
  * PLEASE READ                                                                *
- * This driver uses the gd library, available from http://www.boutell.com/gd/ *
- * Earlier versions of the gd library produced GIF images, but starting with  *
- * version 1.6 the gd library no longer supports creation of GIF images due   *
- * to licensing issues. Hence this modified driver, which uses the old gd/gif *
- * code to produce PNG images instead.                                        *
- *                                                                            *
- * requires:                                                                  *
- *      libgd version 1.8 or greater     http://www.boutell.com/gd/           *
- *      libfreetype version 2            http://www.freetype.org/             *
- *                                                                            *
- * This driver allows you to use TrueType fonts.  You can use this driver     *
- * without having any TrueType fonts installed, but the default fonts are     *
- * comparatively limited.                                                     *
+ * This driver uses the gd library, available from http://www.libgd.org       *
+ * This driver allows you to use TrueType, OpenType, or Adobe Type 1 fonts.   *
+ * If you have libgd version 2.0.36 or later, you may also be able to access  *
+ * any fonts that are managed by the fontconfig utility.                      *
+ * You can use this driver without having any TrueType fonts installed,       *
+ * but the default fonts are comparatively limited.                           *
  ******************************************************************************
  *
  * Petr Mikulik, Jan 1999: terminal entries for PM3D functionality
@@ -144,6 +137,17 @@ TERM_PUBLIC void ENHGD_FLUSH __PROTO((void));
 
 
 #include "gd.h"
+
+/* Before version 2.0.36, the libgd function gdFTUseFontConfig() didn't */
+/* do what we need.  Test for earlier versions and ignore it.           */
+#ifdef GD_MAJOR_VERSION
+#  if (GD_MINOR_VERSION > 0  ||  GD_RELEASE_VERSION > 35)
+#    define gdUseFontConfig(x) gdFTUseFontConfig(x)
+#  endif
+#endif
+#ifndef gdUseFontConfig
+#define gdUseFontConfig(x) 0
+#endif
 
 #if defined(WIN32) && !defined(NONDLL)
   /* static font pointers are recommended when using bgd.dll */
@@ -778,18 +782,30 @@ PNG_options()
 		}
 		free(png_state.default_ttffont);
 		png_state.default_ttffont = gp_strdup(png_state.ttffont);
+
+		/* First try the old GDFONTPATH mechanism for locating fonts */
+		gdUseFontConfig(0);
 		err = gdImageStringFT(NULL, &brect[0], 0,
-			png_state.ttffont, (double)png_state.ttfsize,
+			png_state.ttffont, (double)png_state.default_ttfsize,
 			0.0, 0, 0, "test");
-		if (err) {
-			fprintf(stderr,
-				"%s when opening font %s, trying default\n",
-				err, png_state.ttffont);
-			free(png_state.ttffont);
-			free(png_state.default_ttffont);
-			png_state.ttffont = NULL;
-			png_state.default_ttffont = NULL;
+	
+		/* If that didn't work, try again using the fontconfig mechanism */
+		if (err && gdUseFontConfig(1)) {
+		    err = gdImageStringFT(NULL, &brect[0], 0,
+			png_state.ttffont, (double)png_state.default_ttfsize,
+			0.0, 0, 0, "test");
 		}
+
+		/* If we still haven't found the font, punt to the internal non-TTF default set */
+		if (err) {
+		    fprintf(stderr, "%s when opening font %s, trying default\n",
+				err, png_state.ttffont);
+		    free(png_state.ttffont);
+		    free(png_state.default_ttffont);
+		    png_state.ttffont = NULL;
+		    png_state.default_ttffont = NULL;
+		}
+
 	    }
 #else
 	    c_token++;
@@ -964,9 +980,21 @@ PNG_options()
 	png_state.default_ttffont = gp_strdup(png_state.ttffont);
 	if (png_state.default_ttfsize == 0)
 		png_state.default_ttfsize = 2 * term->h_char - 2;
+
+	/* First try the old GDFONTPATH mechanism for locating fonts */
+	gdUseFontConfig(0);
 	err = gdImageStringFT(NULL, &brect[0], 0,
 		png_state.ttffont, (double)png_state.default_ttfsize,
 		0.0, 0, 0, "test");
+
+	/* If that didn't work, try again using fontconfig mechanism */
+	if (err && gdUseFontConfig(1)) {
+	    err = gdImageStringFT(NULL, &brect[0], 0,
+		png_state.ttffont, (double)png_state.default_ttfsize,
+		0.0, 0, 0, "test");
+	}
+
+	/* If we still haven't found the font, punt to the internal non-TTF default set */
 	if (err) {
 		fprintf(stderr,"%s when opening font \"%s\", using internal non-scalable font\n",
 			err, png_state.ttffont);
@@ -975,6 +1003,7 @@ PNG_options()
 		png_state.ttffont = NULL;
 		png_state.default_ttffont = NULL;
 	}
+
     }
 
     /* If no explicit TTF font size found, generate default */

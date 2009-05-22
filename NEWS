@@ -6,6 +6,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW object types circle, ellipse, and polygon
 * NEW options front and back to "set colorbox"
 * NEW x11 can plot into a window opened and managed by an external application
+* NEW gd terminal can use fonts through fontconfig (libgd version > 2.0.35)
 * NEW optional 3 columns of data to generate histogram errorbars
 * NEW 'volatile' data, including inline data, can be replotted without rereading
 * NEW 'refresh' command replots without rereading data if possible

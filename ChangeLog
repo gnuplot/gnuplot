@@ -1,3 +1,9 @@
+2009-05-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm:  Test for libgd version 2.0.36 or newer.  These allow
+	us to specify fonts either by filename or by using the syntax of the
+	fontconfig utility.  E.g. "set term png font 'times:italic' 12"
+
 2009-05-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm docs/gnuplot.doc: Restore the option of using one of
