@@ -4,6 +4,7 @@ TODO
 Autoconf
 
  * liblua is not always named liblua;  can we autodetect its name?
+   EAM: Yes, via the AC_SEARCH_LIBS macro in configure.in
  * where to install gnuplot-lua-tikz.sty?  Versioning?
 
 Lua generic terminal
@@ -11,10 +12,12 @@ Lua generic terminal
  * support color palettes (low priority, not really needed for TikZ?)
  * support enhanced text mode (low priority, not really needed for TikZ)
  * alpha channel support for image data (need to have a look)?
+   EAM: Seems to work already.  Did you have an example that fails?
 
 TikZ backend
 
  * alpha channel support for image data (need to have a look)?
+   EAM: The demos for transparency seem to work already
  * automatic detection of font sizes (via LaTeX test call?! very low priority)
  * ConTeXt and plain TeX support
  * switch to pgf 2.0 style system
