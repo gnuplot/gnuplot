@@ -60,8 +60,8 @@ gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
 endif
 
 if BUILD_LUA
+#gnuplot_lua_SOURCES =
 pkglibexec_PROGRAMS += gnuplot-tikz.lua
-gnuplot_lua_SOURCES =
 gnuplot-tikz.lua: $(top_srcdir)/term/lua/gnuplot-tikz.lua
 	cp $(top_srcdir)/term/lua/gnuplot-tikz.lua .
 endif
