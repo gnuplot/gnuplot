@@ -1,3 +1,15 @@
+2009-05-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm: Silence an escaped debug fprintf.  Bugfix.
+
+2008-05-25  Peter Hedwig  <peter@affenbande.org>
+
+	* src/Makefile.am term/lua/ChangeLog term/lua/gnuplot.lua
+	 term/lua/gnuplot-lua-tikz.sty term/lua/gnuplot-tikz.help
+	 term/lua/gnuplot-tikz.lua term/lua/NEWS term/lua.trm:
+
+	Rearrange internal documentation, improved error handling,
+	remove the "script" keyword (script name is now mandatory).
 2009-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm: Broken format specifier.
