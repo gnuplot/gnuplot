@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.182 2009/02/07 19:47:46 sfeam Exp $
+ * $Id: x11.trm,v 1.183 2009/03/26 00:49:27 sfeam Exp $
  *
  */
 
@@ -1883,7 +1883,7 @@ PASS2:
 	    initial_font[sep] = '\0';
 	    sscanf(&(X11_next_font_used[sep+1]),"%lf",&ENHx11_fontsize);
 	    ENHx11_font = initial_font;
-	    fprintf(stderr,"setting font to %s,%g\n",ENHx11_font,ENHx11_fontsize);
+	    FPRINTF((stderr,"setting font to %s,%g\n",ENHx11_font,ENHx11_fontsize));
 	}
 
     /* Set the recursion going. We say to keep going until a

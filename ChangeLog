@@ -8,6 +8,8 @@
 	Dots were not handled by the zoom code.  Create a new routined Dot(x,y)
 	to wrap the call to strokeRect().  Bugfix.
 
+	* term/x11.trm: Silence an escaped debug fprintf.  Bugfix.
+
 2008-05-25  Peter Hedwig  <peter@affenbande.org>
 
 	* src/Makefile.am term/lua/ChangeLog term/lua/gnuplot.lua
