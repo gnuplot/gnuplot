@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.21 2009/04/06 03:43:45 sfeam Exp $
+ * $Id: canvas.trm,v 1.22 2009/04/13 23:59:52 sfeam Exp $
  *
  */
 
@@ -349,23 +349,38 @@ CANVAS_graphics()
 		"var zoomed = false;\n"
 		"function gnuplot_canvas() {\n"
 		"canvas = document.getElementById(\"gnuplot_canvas\");\n"
+		"ctx = canvas.getContext(\"2d\");\n"
 	);
 
     } else {
 	fprintf(gpoutfile,
-		"var canvas, ctx;\n"
 		"function %s() {\n"
-		"canvas = document.getElementById(\"%s\");\n",
+		"canvas = document.getElementById(\"%s\");\n"
+		"ctx = canvas.getContext(\"2d\");\n",
 		CANVAS_name, CANVAS_name
+	);
+	fprintf(gpoutfile,
+	    "// Reinitialize mouse tracking and zoom for this particular plot\n"
+	    "if (active_plot != %s  &&  typeof(mouse_update) != \"undefined\") {\n"
+	    "  active_plot_name = \"%s\";\n"
+	    "  active_plot = %s;\n"
+	    "  canvas.onmousemove = mouse_update;\n"
+	    "  canvas.onmouseup = zoom_in;\n"
+	    "  canvas.onmousedown = saveclick;\n"
+	    "  canvas.onkeypress = do_hotkey;\n"
+	    "  if (canvas.attachEvent) {canvas.attachEvent('mouseover', %s);}\n"
+	    "  else if (canvas.addEventListener) {canvas.addEventListener('mouseover', %s, false);} \n"
+	    "  zoomed = false;\n"
+	    "  zoom_axis_width = 0;\n"
+	    "  ctx.clearRect(0,0,%d,%d);\n"
+	    "}\n",
+		CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name,
+		(int)(term->xmax / CANVAS_OVERSAMPLE), (int)(term->ymax / CANVAS_OVERSAMPLE)
 	);
     }
 
     fprintf(gpoutfile,
-	    "ctx = canvas.getContext(\"2d\");\n"
 	    "CanvasTextFunctions.enable(ctx);\n"
-    );
-
-    fprintf(gpoutfile,
 	    "ctx.strokeStyle = \"rgb(215,215,215)\";\n"
 	    "ctx.lineWidth = %.1g;\n",
 	canvas_linewidth

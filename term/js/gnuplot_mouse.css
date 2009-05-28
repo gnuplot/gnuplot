@@ -8,6 +8,8 @@ td.mb1		{ text-align: left; font-size: smaller; width: 80; padding-left: 15;
 td.icon		{ width:  16; height: 16;
 		  background-color: #EEE}
 table.mbleft	{ border-collapse: collapse; border: 0; margin-left: auto; margin-right: auto; }
+table.mbright	{ border-collapse: collapse; border: 0; margin-left: 0; margin-right: auto; }
 table.mbunder	{ border-collapse: collapse; border: 0; margin-left: auto; margin-right: auto; }
 table.plot	{ border-collapse: collapse; border: 0; margin-left: auto; margin-right: auto; }
 table.mousebox	{ border-collapse: collapse; margin-left: 0; margin-right: 10; }
+div.gnuplot	{ background-color: white; }
