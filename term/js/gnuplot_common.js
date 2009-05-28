@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_common.js,v 1.0 2009/03/20 04:07:54 sfeam Exp $
+ * $Id: gnuplot_common.js,v 1.1 2009/04/01 03:45:53 sfeam Exp $
  */
 // Shared helper routines for gnuplot's canvas terminal driver.
 // Link to this file by reference rather than including the function definitions
@@ -56,6 +56,11 @@ function cfp() // close and fill polygon
     { ctx.closePath(); ctx.fill(); }
 function cfsp() // close and fill polygon with stroke color
     { ctx.closePath(); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); }
+function Dot(x,y) {
+    xx = x; yy = y;
+    if (zoomed) {zoom = zoomXY(xx,yy); xx = zoom.x; yy = zoom.y; if (zoom.clip) return;}
+    ctx.strokeRect(xx,yy,0.5,0.5);
+}
 function Pt(N,x,y,w) {
     xx = x; yy = y;
     if (zoomed) {zoom = zoomXY(xx,yy); xx = zoom.x; yy = zoom.y; if (zoom.clip) return;}

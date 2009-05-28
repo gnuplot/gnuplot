@@ -4,6 +4,10 @@
 	initializes the mouse and zoom tracking for each plot.  This will be
 	needed in order to embed multiple mouseable plots in a single document.
 
+	* term/canvas.trm term/js/gnuplot_common.js:
+	Dots were not handled by the zoom code.  Create a new routined Dot(x,y)
+	to wrap the call to strokeRect().  Bugfix.
+
 2008-05-25  Peter Hedwig  <peter@affenbande.org>
 
 	* src/Makefile.am term/lua/ChangeLog term/lua/gnuplot.lua

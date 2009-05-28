@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.22 2009/04/13 23:59:52 sfeam Exp $
+ * $Id: canvas.trm,v 1.23 2009/05/29 02:42:43 sfeam Exp $
  *
  */
 
@@ -650,8 +650,8 @@ CANVAS_point(unsigned int x, unsigned int y, int number)
     CANVAS_finish();
 
     switch (pt) {
-    default: /* How small a dot can we make? */
-	fprintf(gpoutfile, "ctx.strokeRect(%.1f,%.1f,0.5,0.5);\n",
+    default:
+	fprintf(gpoutfile, "Dot(%.1f,%.1f);\n",
 		x/CANVAS_OVERSAMPLE, (canvas_ymax-y)/CANVAS_OVERSAMPLE);
 	break;
     case 4:
