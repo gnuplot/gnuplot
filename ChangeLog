@@ -7,9 +7,14 @@
 	'make install' will not fail.
 	Bugfix #2798303
 
-	* share/LaTeX/Makefile.am term/lua/README */gnuplot-lua-tikz.sty:
+	* share/LaTeX/Makefile.am term/lua/TODO */gnuplot-lua-tikz.sty:
 	Move gnuplot-lua-tikz.sty from term/lua/ to share/LaTeX/ so that it can
 	be installed along with other latex support files.
+
+	* configure.in:  Issue a warning that the BSD editline library does not
+	handle multibyte character encodings.  That makes it pretty useless in a
+	UTF-8 environment.  This is not something we can fix.
+	Bug #2790153
 
 2009-05-30  Thomas Sefzick <thse@users.sourceforge.net>
 

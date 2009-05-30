@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.246 2009/03/14 21:57:10 sfeam Exp $
+dnl $Id: configure.in,v 1.247 2009/03/26 00:49:11 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -274,7 +274,7 @@ dnl Use builtin readline or GNU readline or NetBSD editline
 AC_ARG_WITH(readline,dnl
 [  --with-readline=builtin  use the built-in minimal readline
   --with-readline=gnu      use the GNU readline library (default; 4.2 or newer required)
-  --with-readline=bsd      use the NetBSD editline library
+  --with-readline=bsd      use the NetBSD editline library (NB: does not handle UTF-8!)
   --with-readline=DIR      specify the location of GNU readline
   --without-readline       do not use any readline function], ,
   test -z "$with_readline" && with_readline=gnu)
@@ -1298,6 +1298,7 @@ fi
     else
       AC_MSG_RESULT([  Readline library: BSD editline library])
     fi
+    AC_MSG_RESULT(  [           WARNING:     editline cannot handle multi-byte characters!])
   else if test "$with_readline" != builtin; then
     if test -n "$gp_tcap"; then
       AC_MSG_RESULT([  Readline library: GNU readline library with $gp_tcap])
