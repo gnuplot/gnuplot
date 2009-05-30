@@ -1,3 +1,12 @@
+2009-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* share/LaTeX/Makefile.am:   Add ${prefix}/usr in front of the 
+	install directory for latex files.  This probably still doesn't work
+	correctly, because kpsexpand may not return a reasonable path.
+	But at least if you have write permission to ${prefix} then
+	'make install' will not fail.
+	Bugfix #2798303
+
 2009-05-30  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* src/graph3d.c (do_3dplot):  Adjust position of 3D plot with
