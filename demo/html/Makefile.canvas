@@ -1,0 +1,48 @@
+all: html
+
+distclean: clean
+clean:
+	rm -f *.gnu *.html *.dat *.tmp *.js *.par jsdir
+
+GNUPLOT_LIB = ..
+
+#
+# Auto-generation of html demo set.
+#
+html: airfoil.html approximate.html arrowstyle.html binary.html bivariat.html candlesticks.html canvas_utf8.html circles.html cities.html contours.html controls.html datastrings.html discrete.html electron.html enhanced_utf8.html fillbetween.html fillcrvs.html fillstyle.html finance.html hidden.html hidden2.html histograms.html histograms2.html index.html iterate.html key.html layout.html margins.html mgr.html multiaxis.html multimsh.html multiplt.html param.html pm3dcolors.html pm3d.html pointsize.html polar.html poldat.html prob2.html prob.html rainbow.html random.html ellipse.html rectangle.html rgbalpha.html rgb_variable.html running_avg.html scatter.html simple.html singulr.html smooth.html spline.html steps.html surface1.html surface2.html transparent.html transparent_solids.html textcolor.html textrotate.html timedat.html using.html vector.html world.html world2.html dashcolor.html heatmaps.html
+
+index.html: index.canvas
+	cp index.canvas index.html
+
+ellipse.html: random.html
+
+canvas_utf8.html: canvas_utf8.dem
+	gnuplot canvas_utf8.dem
+
+#
+# Examples of mousing code
+#
+simple.html: jsdir
+	./webify_canvas.pl --mouse simple
+
+mgr.html: jsdir
+	./webify_canvas.pl --mouse mgr
+
+cities.html: jsdir
+	./webify_canvas.pl --mouse cities
+	cat cities.html | sed -e 's/grid_lines/zoom_text/' > xxx
+	mv xxx cities.html
+
+multiaxis.html: jsdir
+	./webify_canvas.pl --mouse multiaxis
+
+jsdir:
+	cp ../../term/js/*.png .
+	cp ../../term/js/*.js .
+	cp ../../term/js/*.css .
+	cp canvasmath.js canvastext.js
+	touch jsdir
+
+%.html: $(GNUPLOT_LIB)/%.dem ./webify_canvas.pl jsdir
+	./webify_canvas.pl $*
+

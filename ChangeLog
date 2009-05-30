@@ -1,3 +1,17 @@
+2009-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm term/js/gnuplot_mouse.js:  Give each plot its own
+	namespace, so that multiple mouseable plots in the same document do
+	not overwrite each other's mouse readout.
+
+	* demo/cities.dem demo/html/Makefile.canvas demo/html/webify_canvas.pl
+	demo/html/index.canvas demo/html/mousebox.template
+	demo/html/canvas_utf8.dem:
+	Add scripts to generate a demo set for the canvas terminal.
+
+	* term/js/README:  Provide some documentation on using the canvas
+	terminal to create web pages, and on known browser quirks.
+
 2009-05-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm:  Javascript output using the "name" option now

@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.5 2009/04/14 21:16:23 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.6 2009/05/17 23:37:24 sfeam Exp $
  */
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -141,21 +141,21 @@ function mouse_update(e)
 	axis_x2min = (zoomed) ? zoom_axis_x2min : plot_axis_x2min;
 	axis_x2max = (zoomed) ? zoom_axis_x2max : plot_axis_x2max;
 	x2 =  axis_x2min + (plotx / (plot_xmax-plot_xmin)) * (axis_x2max - axis_x2min);
-	if (document.getElementById('span_scaled_x2'))
-	    document.getElementById('span_scaled_x2').innerHTML = x2.toPrecision(4);
+	if (document.getElementById(active_plot_name + "_x2"))
+	    document.getElementById(active_plot_name + "_x2").innerHTML = x2.toPrecision(4);
     }
     if (plot_axis_y2min != "none") {
 	axis_y2min = (zoomed) ? zoom_axis_y2min : plot_axis_y2min;
 	axis_y2max = (zoomed) ? zoom_axis_y2max : plot_axis_y2max;
 	y2 = axis_y2min - (ploty / (plot_ytop-plot_ybot)) * (axis_y2max - axis_y2min);
-	if (document.getElementById('span_scaled_y2'))
-	    document.getElementById('span_scaled_y2').innerHTML = y2.toPrecision(4);
+	if (document.getElementById(active_plot_name + "_y2"))
+	    document.getElementById(active_plot_name + "_y2").innerHTML = y2.toPrecision(4);
     }
 
-  if (document.getElementById('span_scaled_x'))
-      document.getElementById('span_scaled_x').innerHTML = x.toPrecision(4);
-  if (document.getElementById('span_scaled_y'))
-      document.getElementById('span_scaled_y').innerHTML = y.toPrecision(4);
+  if (document.getElementById(active_plot_name + "_x"))
+      document.getElementById(active_plot_name + "_x").innerHTML = x.toPrecision(4);
+  if (document.getElementById(active_plot_name + "_y"))
+      document.getElementById(active_plot_name + "_y").innerHTML = y.toPrecision(4);
 
   // Echo the zoom box interactively
   if (zoom_in_progress) {
@@ -202,6 +202,9 @@ function saveclick(event)
 
 function zoom_in(event)
 {
+  if (!zoom_in_progress)
+    return false;
+
   mouse_update(event);
   
   if (event.which == null) 	/* IE case */

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.23 2009/05/29 02:42:43 sfeam Exp $
+ * $Id: canvas.trm,v 1.24 2009/05/29 03:14:48 sfeam Exp $
  *
  */
 
@@ -29,6 +29,9 @@
  *	where exact character widths are known, and save/restore can be used.
  *   Ethan A Merritt, Mar 2009
  *	Oversampling and client-side zoom/unzoom, hotkeys
+ *   Ethan A Merritt, May 2009
+ *	Give each plot its own namespace for mousing (allows multiple mouseable
+ *	plots in a single HTML document).
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -347,6 +350,7 @@ CANVAS_graphics()
 		"var canvas, ctx;\n"
 		"var grid_lines = true;\n"
 		"var zoomed = false;\n"
+		"var active_plot_name = \"gnuplot_canvas\";\n\n"
 		"function gnuplot_canvas() {\n"
 		"canvas = document.getElementById(\"gnuplot_canvas\");\n"
 		"ctx = canvas.getContext(\"2d\");\n"
@@ -372,6 +376,7 @@ CANVAS_graphics()
 	    "  else if (canvas.addEventListener) {canvas.addEventListener('mouseover', %s, false);} \n"
 	    "  zoomed = false;\n"
 	    "  zoom_axis_width = 0;\n"
+	    "  zoom_in_progress = false;\n"
 	    "  ctx.clearRect(0,0,%d,%d);\n"
 	    "}\n",
 		CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name,
@@ -491,16 +496,16 @@ CANVAS_text()
 
 	    fprintf(gpoutfile,
 		"<table class=\"mousebox\" id=\"gnuplot_mousebox\" border=1>\n"
-		"<tr> <td class=\"mb0\">x&nbsp;</td> <td class=\"mb1\"><span id=\"span_scaled_x\">&nbsp;</span></td> </tr>\n"
-		"<tr> <td class=\"mb0\">y&nbsp;</td> <td class=\"mb1\"><span id=\"span_scaled_y\">&nbsp;</span></td> </tr>\n"
+		"<tr> <td class=\"mb0\">x&nbsp;</td> <td class=\"mb1\"><span id=\"gnuplot_canvas_x\">&nbsp;</span></td> </tr>\n"
+		"<tr> <td class=\"mb0\">y&nbsp;</td> <td class=\"mb1\"><span id=\"gnuplot_canvas_y\">&nbsp;</span></td> </tr>\n"
 	    );
 
 	    if ((axis_array[SECOND_X_AXIS].ticmode & TICS_MASK) != NO_TICS)
 	      fprintf(gpoutfile,
-		"<tr> <td class=\"mb0\">x2&nbsp;</td> <td class=\"mb1\"><span id=\"span_scaled_x2\">&nbsp;</span></td> </tr>\n");
+		"<tr> <td class=\"mb0\">x2&nbsp;</td> <td class=\"mb1\"><span id=\"gnuplot_canvas_x2\">&nbsp;</span></td> </tr>\n");
 	    if ((axis_array[SECOND_Y_AXIS].ticmode & TICS_MASK) != NO_TICS)
 	      fprintf(gpoutfile,
-		"<tr> <td class=\"mb0\">y2&nbsp;</td> <td class=\"mb1\"><span id=\"span_scaled_y2\">&nbsp;</span></td> </tr>\n");
+		"<tr> <td class=\"mb0\">y2&nbsp;</td> <td class=\"mb1\"><span id=\"gnuplot_canvas_y2\">&nbsp;</span></td> </tr>\n");
 
 	    fprintf(gpoutfile,
 		"</table></td></tr>\n"
