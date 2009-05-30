@@ -6,6 +6,8 @@ Autoconf
  * liblua is not always named liblua;  can we autodetect its name?
    EAM: Yes, via the AC_SEARCH_LIBS macro in configure.in
  * where to install gnuplot-lua-tikz.sty?  Versioning?
+   EAM: I moved this file to .../share/LaTeX, where there is already an 
+   installation script for latex support files
 
 Lua generic terminal
 

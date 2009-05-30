@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 AUTOMAKE_OPTIONS = foreign 1.2h
 
-EXTRA_DIST = README gnuplot.cfg
+EXTRA_DIST = README gnuplot.cfg gnuplot-lua-tikz.sty
 
 install-data-hook: install-cfg
 uninstall-hook: uninstall-cfg
@@ -12,6 +12,10 @@ install-cfg:
 	  $(top_srcdir)/mkinstalldirs $(DESTDIR)$$installdir ; \
 	  if [ ! -f $(DESTDIR)$$installdir/gnuplot.cfg ]; then \
 	    $(INSTALL_DATA) $(srcdir)/gnuplot.cfg $(DESTDIR)$$installdir/gnuplot.cfg && \
+	    texhash; \
+	  fi ; \
+	  if [ ! -f $(DESTDIR)$$installdir/gnuplot-lua-tikz.sty ]; then \
+	    $(INSTALL_DATA) $(srcdir)/gnuplot-lua-tikz.sty $(DESTDIR)$$installdir/gnuplot-lua-tikz.sty && \
 	    texhash; \
 	  fi ; \
 	  fi
