@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.220 2009/03/26 00:49:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.221 2009/04/12 22:27:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -690,10 +690,10 @@ do_3dplot(
     xcenter3d = ycenter3d = zcenter3d = 0.0;
     if (aspect_ratio_3D >= 2) {
 	if (yscale3d > xscale3d) {
-	    ycenter3d = 0.5*yscale3d/xscale3d - 1.0;
+	    ycenter3d = 1.0 - xscale3d/yscale3d;
 	    yscale3d = xscale3d;
 	} else if (xscale3d > yscale3d) {
-	    xcenter3d = 0.5*xscale3d/yscale3d - 1.0;
+	    xcenter3d = 1.0 - yscale3d/xscale3d;
 	    xscale3d = yscale3d;
 	}
 	if (aspect_ratio_3D >= 3)

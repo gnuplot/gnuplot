@@ -1,3 +1,10 @@
+2009-05-30  Thomas Sefzick <thse@users.sourceforge.net>
+
+	* src/graph3d.c (do_3dplot):  Adjust position of 3D plot with
+	'set view equal xyz' so that the center of rotation is at the center
+	of the screen.
+	Bugfix #2797226
+
 2009-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/js/gnuplot_mouse.js:  Give each plot its own
