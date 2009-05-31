@@ -1,5 +1,5 @@
 #
-# $Id: prob2.dem,v 1.8 2004/02/14 03:14:43 sfeam Exp $
+# $Id: prob2.dem,v 1.9 2006/06/14 03:24:09 sfeam Exp $
 #
 # Demo Statistical Approximations version 1.1
 #
@@ -32,7 +32,7 @@ print ""
 print "     NOTE: contains 10 plots and consequently takes some time to run"
 print "                      Press Ctrl-C to exit right now"
 print ""
-pause -1 "                      Press Return to start demo ..."
+pause   -1 "                      Press Return to start demo ..."
 
 load "stat.inc"
 rnd(x) = floor(x+0.5)

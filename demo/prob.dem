@@ -1,5 +1,5 @@
 #
-# $Id: prob.dem,v 1.8 2004/02/14 03:14:43 sfeam Exp $
+# $Id: prob.dem,v 1.9 2006/06/14 03:24:09 sfeam Exp $
 #
 # Demo Statistical Functions version 2.3
 #
@@ -15,7 +15,7 @@ print "\n          Copyright (c) 1991, 1992, Jos van de Woude, jvdwoude@hut.nl"
 print "\n\n\n\n\n\n\n"
 print "NOTE: contains 54 plots and consequently takes a lot of time to run"
 print "                      Press Ctrl-C to exit right now"
-pause -1 "                      Press Return to start demo ..."
+pause   -1 "                      Press Return to start demo ..."
 
 load "stat.inc"
 

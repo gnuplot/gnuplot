@@ -39,7 +39,7 @@
 
 # last update: 8 May 2005
 
-pause -1 "Click OK to start the Finance Demo"
+pause   -1 "Click OK to start the Finance Demo"
 
 reset
 # set label 1 "Demo of plotting financial data" at screen 0.5, screen 0.95 center
