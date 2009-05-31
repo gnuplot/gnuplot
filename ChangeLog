@@ -1,3 +1,9 @@
+2009-05-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (get_position_default):  Ugly hack to work around
+	ambiguous syntax if "offset x,y" is the last thing in a plot clause.
+	Bugfix #2726798
+
 2009-05-31  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/term-ja.diff docs/gnuplot-ja.doc:  Sync to rev.1.568
