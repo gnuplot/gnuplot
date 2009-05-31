@@ -2,12 +2,12 @@ all: html
 
 distclean: clean
 clean:
-	rm -f *.png *.gnu *.html *.dat epslatex* fit.log soundfit.par
+	rm -f *.png *.gnu *.html *.dat epslatex* fit.log soundfit.par *.tmp *.js *.?.svg *.??.svg
 
 GNUPLOT_LIB = ..
 
 #
-# Auto-generation of html demo set.
+# Auto-generation of the html demo set using the png terminal.
 #
 # Several of the demos need manual intervention:
 #	fontfile vector epslatex

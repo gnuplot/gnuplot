@@ -1,3 +1,8 @@
+2009-05-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Revert the global attribute xml:space="preserve"
+	because Firefox 3 messes up badly when it is present.
+
 2009-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* share/LaTeX/Makefile.am:   Add ${prefix}/usr in front of the 

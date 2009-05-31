@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.99 2009/01/22 21:47:27 sfeam Exp $
+ * $Id: svg.trm,v 1.100 2009/03/26 00:49:26 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -695,7 +695,10 @@ SVG_init ()
 	     (unsigned int) (term->ymax / SVG_SCALE));
     fprintf (gpoutfile, " xmlns=\"http://www.w3.org/2000/svg\"\n");
     fprintf (gpoutfile, " xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n");
+#if (0)
+    /* This should be required, but Firefox gets it totally wrong */
     fprintf (gpoutfile, " xml:space=\"preserve\"\n");
+#endif
     fprintf (gpoutfile, ">\n\n");
 
     fprintf (gpoutfile,
