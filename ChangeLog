@@ -2,6 +2,8 @@
 
 	* docs/term-ja.diff docs/gnuplot-ja.doc:  Sync to rev.1.568
 
+	* docs/gnuplot.doc term/gd.trm: typos in documentation
+
 2009-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Start branch for Release 4.4

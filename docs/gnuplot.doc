@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.567 2009/04/13 23:59:52 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568 2009/05/17 22:31:55 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1674,8 +1674,8 @@ C ... and restart the table:
       set term png tiny
 
  On most systems libgd also provides access to Adobe Type 1 fonts (*.pfa) and
- TrueType fonts (*.ttf). You must give the name of the font file (not the name
- of the font itself, in the form "<face> {,<pointsize>}".
+ TrueType fonts (*.ttf). You must give the name of the font file, not the name
+ of the font inside it, in the form "<face> {,<pointsize>}".
  <face> is either the full pathname to the font file, or the first part of a
  filename in one of the directories listed in the GDFONTPATH environmental
  variable. That is, 'set term png font "Face"' will look for a font file named
