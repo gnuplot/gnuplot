@@ -10,6 +10,11 @@
 	Entries before the 4.2.0-rc1 release are now in ChangeLog.1,
 	newer ones are in ChangeLog (this file).
 
+	* README, README.1ST, TODO:  Quick pass at updating these.
+
+	* src/Makefile.am term/Makefile.am.in: Handle the new term/js and
+	gnuplot-lua-tikz.sty files correctly during 'make distcheck'.
+
 2009-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* share/LaTeX/Makefile.am:   Add ${prefix}/usr in front of the 

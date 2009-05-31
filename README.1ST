@@ -41,20 +41,16 @@
  IMPORTANT NOTE ON GIF, PNG and JPEG SUPPORT
  ===========================================
 
- The gd library from http://www.boutell.com/gd/ is used to generate
- GIF, PNG and JPEG outputs. We recommend using version 2.0.29 or newer,
- as it supports GIF, animated GIF, PNG and JPEG.
+ The gd library from http://libgd.org/ is used to generate GIF, PNG and JPEG
+ output. We strongly recommend using version 2.0.29 or newer.
 
  Historical notes:
      Old versions of the Boutell gd library (versions 1.2 to 1.4) produced
  only GIF output. This means you cannot obtain a PNG or a JPEG output from
  gnuplot 4.2 with these versions. (Note that gnuplot's old minimalistic but
  standalone PNG driver driver has now been removed).
-     Versions of the the Boutell gd library between 1.6 and 2.0.27 do not
+     Versions of the the Boutell gd library between 1.6 and 2.0.27 did not
  support GIF output because of patent concerns. This means that with these
- versions, you cannot generate a GIF output directly from gnuplot. However
- versions 1.6 and newer support PNG outputs, and 1.7 and newer support JPEG
- outputs. Versions 1.6.2 and newer also support TrueType fonts. Version 2.0.28
- of the Boutell gd library restored GIF functionality, 2.0.29 added support
- for GIF animation.
+ versions, you cannot generate a GIF output directly from gnuplot.
+ Version 2.0.29 added support for GIF animation.
 

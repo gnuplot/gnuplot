@@ -160,15 +160,18 @@ HBB:
 
 [Optional:] See if 16-bit compilations can be made to work again.
 
-Ethan's List:
+Ethan's List (2009):
 
 - separate out the handling of junk, NaN, Inf, and missing data entries
 - you should be able to set a default style for arrows and labels
 - isosurfaces (3D contour of 4D data)
-- terminal-independent escape sequence to print a given Unicode character
 - fix emf text handling to match other terminals (vertical centering, enhanced)
 - javascript mousing support integrated with svg output
-- provide a unicode-compatible Type 1 font containing math symbols
+  (low priority now that the canvas terminal supports mousing).
 - pdflatex driver
 - user-configuration options, e.g. permanently redefine line and point
   properties and sequence
+- allow the user to assign arbitrary coordinate transforms to the axes
+- more demos and more comprehensible descriptions in the user manual
+- update the FAQ!
+
