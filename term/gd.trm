@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.135 2009/05/17 22:31:55 sfeam Exp $
+ * $Id: gd.trm,v 1.136 2009/05/24 06:12:44 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2616,10 +2616,9 @@ START_HELP(gif)
 " file than gnuplot's internal optimization mode.",
 " The default is `nooptimize`.",
 "",
-" The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
-" pixels can be also modified by scaling with the `set size` command.",
-" `crop` trims blank space from the edges of the completed plot, resulting",
-" in a smaller final image size. Default is `nocrop`.",
+" The output plot size <x,y> is given in pixels---it defaults to 640x480.",
+" Please see additional information under `canvas` and `set size`.",
+" Blank space at the edges of the finished plot may be trimmed using the `crop`",
 "",
 " Each color must be of the form 'xrrggbb', where x is the literal character",
 " 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
