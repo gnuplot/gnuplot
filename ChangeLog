@@ -1,3 +1,7 @@
+2009-05-31  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/term-ja.diff docs/gnuplot-ja.doc:  Sync to rev.1.568
+
 2009-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Start branch for Release 4.4
