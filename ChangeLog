@@ -3,6 +3,9 @@
 	* term/svg.trm:  Revert the global attribute xml:space="preserve"
 	because Firefox 3 messes up badly when it is present.
 
+	* demo/html/Makefile.svg demo/html/webify_svg.pl demo/html/index.svg:
+	Add scripts to generate a demo set for the svg terminal.
+
 2009-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* share/LaTeX/Makefile.am:   Add ${prefix}/usr in front of the 

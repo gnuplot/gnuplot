@@ -1,0 +1,185 @@
+<html><head><title>Demo scripts for SVG terminal in gnuplot CVS version</title>
+
+<link text="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
+
+
+
+<h2 align=center>
+    Demo scripts for gnuplot CVS version (SVG terminal)<br>
+    See also the demo output for the 
+       <a href="../demo_cvs/">PNG</a> and
+       <a href="../demo_canvas/">canvas</a> terminals.
+</h2>
+
+<p>
+Gnuplot is distributed with a large set of scripts that demonstrate
+various features.  Collected below are the results of running
+many of these through the CVS version of gnuplot using the svg terminal.
+Viewing these is a fairly stringent test of your browser's svg support.
+
+
+<table border="0" width="100%">
+<tbody><tr valign="top">
+
+<td rowspan=2>
+    <h4>Basic 2D plot styles</h4>
+    <ul>
+    <li><a href="simple.html">simple&nbsp;functions</a></li>
+    <li><a href="fillcrvs.html">filled&nbsp;curves</a></li>
+    <li><a href="fillbetween.html">fill&nbsp;between&nbsp;curves</a></li>
+    <li><a href="candlesticks.html">candlesticks</a></li>
+    <li><a href="mgr.html">error bars</a></li>
+    <li><a href="histograms.html">histograms</a></li>
+    <li><a href="steps.html">step functions</a></li>
+    <li><a href="multiaxis.html">multiple axis scales</a></li>
+    <li><a href="using.html">mixing styles</a></li>
+    <li><a href="pointsize.html">variable size points</a></li>
+    <li><a href="param.html">parametric&nbsp;functions</a></li>
+    <li><a href="vector.html">vector fields</a></li>
+    <li><a href="circles.html">circles</a></li>
+    </ul>
+
+    <h4>Math functions</h4>
+    <ul>
+    <li><a href="approximate.html">approximation</a></li>
+    <li><a href="spline.html">B-splines</a></li>
+    <li><a href="airfoil.html">Bezier splines</a></li>
+    <li><a href="prob2.html">probability</a></li>
+    <li><a href="prob.html">probability (more)</a></li>
+    <li><a href="random.html">random numbers</a></li>
+    <li><a href="bivariat.html">recursion, etc...</a></li>
+    </ul>
+
+    <h4>Animation</h4>
+    <ul>
+    <li><font color=gray>not supported</font></li>
+    </ul>
+
+</td>
+
+<td rowspan=2>
+    <h4>Surfaces and<br>3D plotting</h4>
+    <ul>
+    <li><a href="surface1.html">surfaces 1</a></li>
+    <li><a href="surface2.html">surfaces 2</a></li>
+    <li><a href="contours.html">contours</a></li>
+    <li><a href="singulr.html">singularities</a></li>
+    <li><a href="hidden.html">hidden surfaces</a></li>
+    <li><a href="pm3d.html">pm3d coloring</a></li>
+    <li><a href="hidden2.html">pm3d hidden surfaces</a></li>
+    <li><a href="world2.html">3D mapping</a></li>
+    </ul>
+
+    <h4>Coordinate and<br> axis transforms</h4>
+    <ul>
+    <li><a href="polar.html">polar coords</a></li>
+    <li><a href="poldat.html">polar data</a></li>
+    <li><a href="world.html">cylindrical/spherical</a></li>
+    <li><a href="timedat.html">time/date coords</a></li>
+    </ul>
+
+    <h4>Binary and Image data </h4>
+    <ul>
+    <li><a href="binary.html">binary data</a></li>
+    <li><font color=gray>image data</font></li>
+    <li><font color=gray>binary and image tricks</font></li>
+    </ul>
+
+    <h4>Colors</h4>
+    <ul>
+    <li><a href="rainbow.html">user-defined colors</a></li>
+    <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="pm3dcolors.html">pm3d colors</a></li>
+    </ul>
+</td>
+
+<td rowspan=2>
+    <h4>Sample Applications</h4>
+    <ul>
+    <li><a href="controls.html">control models</a></li>
+    <li><a href="discrete.html">discrete&nbsp;contours</a></li>
+    <li><a href="finance.html">financial data</a></li>
+    <li><a href="scatter.html">non-gridded data</a></li>
+    <li><a href="running_avg.html">running averages</a></li>
+    <li><a href="smooth.html">cummulative smoothing</a></li>
+    <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
+    </ul>
+
+    <h4>Text options</h4>
+    <ul>
+    <li><a href="textcolor.html">colored text</a></li>
+    <li><a href="enhanced_utf8.html">'enhanced' text</a></li>
+    <li><a href="datastrings.html">string data</a></li>
+    <li><a href="stringvar.html">string variables</a></li>
+    </ul>
+
+    <h4>Page Layout</h4>
+    <ul>
+    <li><a href="key.html">plot key</a></li>
+    <li><a href="layout.html">multiplot&nbsp;layout</a></li>
+    <li><a href="multiplt.html">multiple plots</a></li>
+    <li><a href="margins.html">aligned plots</a></li>
+    <li><a href="ellipse.html">axis location</a></li>
+    <li><a href="rectangle.html">rectangles</a></li>
+    </ul>
+
+    <h4>Styles</h4>
+    <ul>
+    <li><a href="dashcolor.html">line styles</a></li>
+    <li><a href="fillstyle.html">fill styles</a></li>
+    <li><a href="arrowstyle.html">arrow styles</a></li>
+    <li><a href="transparent.html">transparency</a></li>
+    <li><a href="transparent_solids.html">transparent solids</a></li>
+    </ul>
+</td>
+
+<td align=center valign=bot>
+	<h4></h4>
+	These plots were generated using
+	<font size="-1"><pre>set term svg enhanced font 'arial,11' size 600,400</pre></font>
+</td>
+</tr>
+
+<tr valign=top><td align=center>
+	<table border=0 width=500><tr><td colspan=3>
+	    	<embed src="href.svg" type="image/svg+xml" width=500 height=350 align=right>
+	    </td></tr>
+	    <tr> <td width=50></td><td>
+	    	Figure showing hyperlinks attached to individual plot elements and labels.
+	    </td><td>
+		<a href="http://validator.w3.org/check?uri=referer"><img
+		src="http://www.w3.org/Icons/valid-svg11"
+		alt="Valid SVG 1.1 align=right"   /></a>
+	    </td></tr>
+	</table>
+</td></tr>
+
+</tbody></table>
+</p>
+<hr>
+
+
+<table border="0" width="100%">
+<tbody><tr valign="top">
+
+    <td>
+    <i>This page created by Ethan Merritt<br>May 2009</i>
+    </td>
+
+    <td>
+    <ul>
+    <li><a href="http://sourceforge.net/projects/gnuplot/">
+	Gnuplot development pages on SourceForge</a></li>
+    <li>On-line documentation in
+	<a href="http://gnuplot.sourceforge.net/docs_cvs/gnuplot.pdf">PDF</a></li>
+    </ul>
+    </td>
+    
+    <td>
+    <ul>
+    </ul>
+    </td>
+    
+</tr>
+</tbody></table>
+</body></html>
