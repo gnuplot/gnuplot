@@ -1,5 +1,10 @@
 2009-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
+	Start branch for Release 4.4
+	Set VERSION to 4.4   PATCHLEVEL to alpha
+
+2009-05-31  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* term/svg.trm:  Revert the global attribute xml:space="preserve"
 	because Firefox 3 messes up badly when it is present.
 
@@ -396,7 +401,7 @@
 	* term/canvas.trm: Add support for enhanced text mode.
 
 	* term/js/canvasmath.js:
-	Resize glyphs for - + / ×  so that they are all width 20 (same as 0-9).
+	Resize glyphs for - + / Ã—  so that they are all width 20 (same as 0-9).
 	Resize glyph = to width 24 (same as < > ~).
 
 2009-02-22  Benjamin Lindner  <lindnerb@users.sourceforge.net>
