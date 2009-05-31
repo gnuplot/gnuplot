@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.76 2009/03/15 03:17:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.77 2009/04/22 23:20:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1610,7 +1610,8 @@ get_position_default(struct position *pos, enum position_type default_type)
     /* z is not really allowed for a screen co-ordinate, but keep it simple ! */
     if (equals(c_token, ",")
        /* Partial fix for ambiguous syntax when trailing comma ends a plot command */
-	&& !(isstringvalue(c_token+1))
+	&& !(isstringvalue(c_token+1)) && !(almost_equals(c_token+1,"newhist$ogram"))
+	&& !(almost_equals(c_token+1,"for"))
        ) {
 	++c_token;
 	get_position_type(&type, &axes);
