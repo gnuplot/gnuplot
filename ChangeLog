@@ -1,5 +1,17 @@
 2009-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
+	Start branch for Release 4.4
+
+	New stuff, i.e. code other than bugfixes or things identified as 
+	being desireable for version 4.4, should be commited in the
+	development branch only (this one).
+
+	Bugfixes should be applied to both the development branch 4.3
+	(this one) and the new one (branch-4-4-stable).  When we release
+	4.4, we will bump the version number of the development branch to 4.5.
+
+2009-05-31  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* term/svg.trm:  Revert the global attribute xml:space="preserve"
 	because Firefox 3 messes up badly when it is present.
 
