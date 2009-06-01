@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568 2009/05/17 22:31:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.569 2009/06/01 04:25:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1685,7 +1685,7 @@ C ... and restart the table:
       set term png font "arial"
       set term png font "/usr/local/fonts/ttf/arial.ttf"
       set term png font "Helvetica"
-      set term png font "/usr/local/fonts/Helvetica.pfa"
+      set term png font "/usr/local/fonts/pfa/Helvetica.pfa"
  To request a default font size at the same time:
       set term png font "arial,11"
 
