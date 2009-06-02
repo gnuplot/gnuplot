@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.1 2009/06/01 04:26:05 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.2 2009/06/01 05:12:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -191,15 +191,15 @@ C
  you are subscribed to the list, so that users who use news will know to email
  a reply to you.  There is a form for such postings on the WWW site.
 
-2 New features introduced in version 4.3
+2 New features introduced in version 4.4
 ?new-features
- Gnuplot version 4.3 offers many new features introduced since the preceding
+ Gnuplot version 4.4 offers many new features introduced since the preceding
  official version 4.2. This section lists major additions and gives a partial
  list of changes and minor new features. For a more exhaustive list, see the
  NEWS file.
 
 3 Internationalization
- Gnuplot 4.3 contains significantly improved support for locale settings and for
+ Gnuplot 4.4 contains significantly improved support for locale settings and for
  UTF-8 character encodings. See `set locale`, `set encoding`, `set decimalsign`.
 
 3 Transparency
@@ -223,7 +223,7 @@ C
  In earlier versions of gnuplot, some terminal types used the values from
  `set size` to control also the size of the output canvas; others did not.
  The use of 'set size' for this purpose was deprecated in version 4.2.
- In version 4.3 almost all terminals now behave as follows:
+ In version 4.4 almost all terminals now behave as follows:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
  file, or "canvas". Please see individual terminal documentation for allowed
@@ -3104,10 +3104,9 @@ Ffigure_lines
 ?linespoints
 ?lp
 Ffigure_linespoints
- The `linespoints` style does both `lines` and `points`, that is, it draws a
- small symbol at each point and then connects adjacent points with straight
- line segments.  The command `set pointsize` may be used to change the size of
- the points.  See `set pointsize` for its usage.
+ The `linespoints` style connects adjacent points with straight line segments
+ and then goes back to draw a small symbol at each point.  The command
+ `set pointsize` may be used to change the size of the points.
  1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
  required if 3D plots.  See `style lines`.  Additional input columns may be used
  to provide information such as variable point size or line color.

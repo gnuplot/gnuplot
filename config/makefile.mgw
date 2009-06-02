@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.49 2009/01/15 12:48:34 tlecomte Exp $
+# $Id: makefile.mgw,v 1.50 2009/02/11 09:59:26 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -94,7 +94,7 @@ HELPFILE = wgnuplot.hlp
 GNUPLOT_PS_DIR = share/PostScript
 
 # Destination directory, used in 'make install':
-DESTDIR = /c/Progra~1/Gnuplot4.3
+DESTDIR = /c/Progra~1/Gnuplot4.4
 
 # give here the path to MinGW compiler unless it is already in PATH
 #GCCPATH = g:/mingw32/bin/
