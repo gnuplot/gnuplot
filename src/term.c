@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.183 2009/02/16 07:37:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.184 2009/02/16 18:53:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2472,6 +2472,28 @@ enhanced_recursion(
 
     while (*p) {
 	float shift;
+
+	/*
+	 * EAM Jun 2009 - treating bytes one at a time does not work for multibyte
+	 * encodings, including utf-8. If we hit a byte with the high bit set, test
+	 * whether it starts a legal UTF-8 sequence and if so copy the whole thing.  
+	 * Other multibyte encodings are still a problem.
+	 * Gnuplot's other defined encodings are all single-byte; for those we
+	 * really do want to treat one byte at a time.
+	 */
+	if ((*p & 0x80) && (encoding == S_ENC_DEFAULT || encoding == S_ENC_UTF8)) {
+	    unsigned long utf8char;
+	    const char *nextchar = p;
+
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+	    if (utf8toulong(&utf8char, &nextchar)) {	/* Legal UTF8 sequence */
+		while (p < nextchar)
+		    (term->enhanced_writec)(*p++);
+		p--;
+	    } else {					/* Some other multibyte encoding? */
+		(term->enhanced_writec)(*p);
+	    }
+	} else
 
 	switch (*p) {
 	case '}'  :

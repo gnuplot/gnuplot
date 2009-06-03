@@ -1,3 +1,10 @@
+2009-06-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (enhanced_recursion):  Enhanced text markup applied to a
+	single multibyte character was producing garbage.  Fix this for UTF-8.
+	Other multibyte encoding may still trigger this problem.
+	Bugfix #2800539
+
 2009-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (get_position_default):  Ugly hack to work around

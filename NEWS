@@ -43,6 +43,7 @@ New features, changes and fixes since gnuplot version 4.2
 * FIX 2nd colour in the colour box for negative palette in postscript
 * FIX interpolatation for pm3d surfaces given by both z and colour coordinates
 * FIX 'set datafile binary format=...' was documented, but not implemented
+* FIX enhanced text mode treatment of UTF-8 characters
 * CHANGE syntax of 'set datafile binary' array= and record= options
 * CHANGE 'reset' does not affect locale, encoding, decimalsign settings
 * CHANGE 'set key textcolor rgb variable' will use plot colors for key entries
