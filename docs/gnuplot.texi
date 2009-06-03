@@ -100,8 +100,8 @@ Johannes Zellner
 @c ^   Mailing list for comments: gnuplot-info@@lists.sourceforge.net <p>
 @c ^   Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net <p>
 @c ^</h2><p>
-@c ^<h3> This manual was prepared by Dick Crawford</h3><p>
-@c ^<h3> Last revised: February 2007</h3><p>
+@c ^<h3> This manual was originally prepared by Dick Crawford</h3><p>
+@c ^<h3> Last revised: March 2009</h3><p>
 @c ^<hr>
 
 @menu
@@ -136,6 +136,7 @@ Johannes Zellner
 * Enhanced_text_mode::          
 * Environment::                 
 * Expressions::                 
+* Fonts::                       
 * Glossary::                    
 * linetype::                    
 * mouse_input::                 
@@ -588,12 +589,13 @@ To set user-defined variables a and s prior to executing commands from a file:
 
 @cindex command-line-editing
 
-Command-line editing and command history are supported using either the
-external gnu readline library or a built-in equivalent.  This choice is a
-configuration option at the time gnuplot is built.
+Command-line editing and command history are supported using either an
+external gnu readline library, an external BSD libedit library,  or a
+built-in equivalent.  This choice is a configuration option at the time
+gnuplot is built.
 
 The editing commands of the built-in version are given below. The gnu
-readline library has its own documentation.
+readline and BSD libedit libraries have their own documentation.
 
 
 @example
@@ -732,6 +734,8 @@ X coordinate of each point and label the tic mark with text taken from column
 
 @end example
 
+@cindex columnheader
+
 There is also an option that will interpret the first entry in a column of
 input data (i.e. the column heading) as a text field, and use it as the key
 title for data plotted from that column. The example given below will use the
@@ -739,17 +743,7 @@ first entry in column 2 to generate a title in the key box, while processing
 the remainder of columns 2 and 4 to draw the required line:
 
 @example
-  plot 'datafile' using 1:(f($2)/$4) title 2 with lines
-
-@end example
-
-This option must come immediately after the 'using' clause, if any.  E.g.:
-
-@example
-  plot 'datafile'           title 2    linetype 5   # OK
-  plot 'datafile' using 1:2 title 2    linetype 5   # OK
-  plot 'datafile' using 1:2 linetype 5 title "FOO"  # OK
-  plot 'datafile' using 1:2 linetype 5 title 2      # fails
+  plot 'datafile' using 1:(f($2)/$4) with lines title columnhead(2)
 
 @end example
 
@@ -904,7 +898,7 @@ copy of those files or simply a default hardcoded path. Use this variable
 to test the postscript terminal with custom prologue files. See
 `postscript prologue`.
 
-@node Expressions, Glossary, Environment, gnuplot
+@node Expressions, Fonts, Environment, gnuplot
 @section Expressions
 
 @cindex expressions
@@ -2166,16 +2160,16 @@ See @ref{variables}, `reset errors`, @ref{variables}, and @ref{fit}.
 @opindex variables
 
 
-New user-defined variables and functions of one through five variables may
+New user-defined variables and functions of one through twelve variables may
 be declared and used anywhere, including on the `plot` command itself.
 
 User-defined function syntax:
 @example
-      <func-name>( <dummy1> @{,<dummy2>@} ... @{,<dummy5>@} ) = <expression>
+      <func-name>( <dummy1> @{,<dummy2>@} ... @{,<dummy12>@} ) = <expression>
 
 @end example
 
-where <expression> is defined in terms of <dummy1> through <dummy5>.
+where <expression> is defined in terms of <dummy1> through <dummy12>.
 
 User-defined variable syntax:
 @example
@@ -2237,9 +2231,154 @@ expression. For example
 Valid names are the same as in most programming languages: they must begin
 with a letter, but subsequent characters may be letters, digits, "$", or "_".
 
+Each function definition is made available as a special string-valued
+variable with the prefix 'GPFUN_'.
+
+Example:
+@example
+      set label GPFUN_sinc at graph .05,.95
+
+@end example
+
 See @ref{functions}, @ref{functions}, @ref{variables}, @ref{macros}.
 
-@node Glossary, linetype, Expressions, gnuplot
+@node Fonts, Glossary, Expressions, gnuplot
+@section Fonts
+
+@cindex fonts
+
+Gnuplot does not provide any fonts of its own. It relies on external font
+handling, the details of which unfortunately vary from one terminal type to
+another. Brief documentation of font mechanisms that apply to more than one
+terminal type is given here. For information on font use by other individual
+terminals, see the documentation for that terminal.
+
+@menu
+* cairo_(pdfcairo::             
+* gd_(png::                     
+* postscript__(also_encapsulated_postscript_*.eps)::  
+@end menu
+
+@node cairo_(pdfcairo, gd_(png, Fonts, Fonts
+@subsection cairo (pdfcairo, pngcairo, wxt terminals)
+
+@c ?fonts cairo
+@cindex fonts
+
+@cindex pdf
+@tmindex pdf
+
+
+@cindex png
+@tmindex png
+
+
+@cindex wxt
+@tmindex wxt
+
+
+Sorry, this section is under construction.
+
+@node gd_(png, postscript__(also_encapsulated_postscript_*.eps), cairo_(pdfcairo, Fonts
+@subsection gd (png, gif, jpeg terminals)
+
+@cindex gd
+
+@c ?fonts gd
+@cindex fonts
+
+@cindex png
+@tmindex png
+
+
+@cindex jpeg
+
+@cindex gif
+
+Font handling for the png, gif, and jpeg terminals is done by the external
+library libgd.  Five basic fonts are provided directly by libgd. These are
+`tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), `large`
+(8x16) or `giant` (9x15 pixels). These fonts cannot be scaled or rotated.
+Use one of these keywords instead of the `font` keyword. E.g.
+@example
+     set term png tiny
+
+@end example
+
+On most systems libgd also provides access to Adobe Type 1 fonts (*.pfa) and
+TrueType fonts (*.ttf). You must give the name of the font file, not the name
+of the font inside it, in the form "<face> @{,<pointsize>@}".
+<face> is either the full pathname to the font file, or the first part of a
+filename in one of the directories listed in the GDFONTPATH environmental
+variable. That is, 'set term png font "Face"' will look for a font file named
+either <somedirectory>/Face.ttf or <somedirectory>/Face.pfa.
+For example, if GDFONTPATH contains `/usr/local/fonts/ttf:/usr/local/fonts/pfa`
+then the following pairs of commands are equivalent
+@example
+     set term png font "arial"
+     set term png font "/usr/local/fonts/ttf/arial.ttf"
+     set term png font "Helvetica"
+     set term png font "/usr/local/fonts/pfa/Helvetica.pfa"
+@end example
+
+To request a default font size at the same time:
+@example
+     set term png font "arial,11"
+
+@end example
+
+Both TrueType and Adobe Type 1 fonts are fully scalable and rotatable.
+If no specific font is requested in the "set term" command, gnuplot checks
+the environmental variable GNUPLOT_DEFAULT_GDFONT to see if there is a
+preferred default font.
+
+@node postscript__(also_encapsulated_postscript_*.eps),  , gd_(png, Fonts
+@subsection postscript  (also encapsulated postscript *.eps)
+
+@c ?fonts postscript
+@cindex fonts
+
+@cindex postscript
+
+@cindex eps
+
+PostScript font handling is done by the printer or viewing program.
+Gnuplot can create valid PostScript or encapsulated PostScript (*.eps) even if
+no fonts at all are installed on your computer.  Gnuplot simply refers to the
+font by name in the output file, and assumes that the printer or viewing
+program will know how to find or approximate a font by that name.
+
+All PostScript printers or viewers should know about the standard set of Adobe
+fonts `Times-Roman`, `Helvetica`, `Courier`, and `Symbol`.  It is likely that
+many additional fonts are also available, but the specific set depends on your
+system or printer configuration. Gnuplot does not know or care about this;
+the output *.ps or *.eps files that it creates will simply refer to whatever
+font names you request.
+
+Thus
+@example
+     set term postscript eps font "Times-Roman,12"
+@end example
+
+will produce output that is suitable for all printers and viewers.
+
+On the other hand
+@example
+     set term postscript eps font "Garamond-Premier-Pro-Italic"
+@end example
+
+will produce an output file that contains valid PostScript, but since it
+refers to a specialized font, only some printers or viewers will be able to
+display the specific font that was requested.  Most will substitute a
+different font.
+
+However, it is possible to embed a specific font in the output file so that
+all printers will be able to use it. This requires that the a suitable font
+description file is available on your system. Note that some font files require
+specific licensing if they are to be embedded in this way.
+See `postscript fontfile` for more detailed description and examples.
+
+@node Glossary, linetype, Fonts, gnuplot
 @section Glossary
 
 @cindex glossary
@@ -3044,7 +3183,7 @@ the @ref{using} filter of the `plot`, @ref{replot}, `splot` and @ref{fit} comman
 Semicolons are used to separate commands given on a single command line.
 
 Braces are used in text to be specially processed by some terminals, like
-@ref{postscript}.  They are also used to denote complex numbers: @{3,2@} = 3 + 2i.
+`postscript`.  They are also used to denote complex numbers: @{3,2@} = 3 + 2i.
 
 At present you should not embed \n inside @{@} when using the PostScript
 terminal in `enhanced text` mode.
@@ -3883,12 +4022,26 @@ For example, to create stacked histograms of the data in columns 3 through 8
 
 @cindex rgbalpha
 
-The `image`, @ref{rgbimage}, and @ref{rgbalpha} plotting styles all project an input 2D
-image onto either a 2D or 3D plot.  It is assumed that the image data forms an
-equidistant sampling grid in the viewing plane along two, not necessarily
-orthogonal, directions.  In other words, each group of four adjacent points is
-assumed to form a uniformly sized parallelogram.  The paralleogram is painted
-using the color of the corresponding pixel in the input image.
+The `image`, @ref{rgbimage}, and @ref{rgbalpha} plotting styles all project a
+uniformly sampled grid of data values onto a plane  in either a 2D or 3D.
+The input data may be an actual bitmapped image, perhaps converted from a
+standard format such as PNG, or a simple array of numerical values.
+
+@cindex heatmap
+
+This figure illustrates generation of a heat map from an array of scalar values.
+The current palette is used to map each value onto the color assigned to the
+corresponding pixel.
+@example
+      plot '-' matrix with image
+      5 4 3 1 0
+      2 2 0 0 1
+      0 0 0 1 0
+      0 1 2 4 3
+      e
+      e
+
+@end example
 
 Each pixel (data point) of the input 2D image will become a rectangle or
 parallelipiped in the plot. The coordinates of each data point will determine
@@ -4072,10 +4225,9 @@ See also `linetype`, `linewidth`, and `linestyle`.
 
 @cindex lp
 
-The @ref{linespoints} style does both `lines` and `points`, that is, it draws a
-small symbol at each point and then connects adjacent points with straight
-line segments.  The command @ref{pointsize} may be used to change the size of
-the points.  See @ref{pointsize} for its usage.
+The @ref{linespoints} style connects adjacent points with straight line segments
+and then goes back to draw a small symbol at each point.  The command
+@ref{pointsize} may be used to change the default size of the points.
 1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
 required if 3D plots.  See `style lines`.  Additional input columns may be used
 to provide information such as variable point size or line color.
@@ -4616,16 +4768,16 @@ See help for `batch/interactive` for more details.
 
 @cindex Marquardt
 
-The @ref{fit} command can fit a user-defined function to a set of data points
-(x,y) or (x,y,z), using an implementation of the nonlinear least-squares
+The @ref{fit} command can fit a user-supplied expression to a set of data points
+(x,z) or (x,y,z), using an implementation of the nonlinear least-squares
 (NLLS) Marquardt-Levenberg algorithm.  Any user-defined variable occurring in
-the function body may serve as a fit parameter, but the return type of the
-function must be real.
+the expression may serve as a fit parameter, but the return type of the
+expression must be real.
 
 Syntax:
 @example
-      fit @{[xrange] @{[yrange]@}@} <function> '<datafile>'
-          @{datafile-modifiers@}
+      fit @{<ranges>@} <expression>
+          '<datafile>' @{datafile-modifiers@}
           via '<parameter file>' | <var1>@{,<var2>,...@}
 
 @end example
@@ -4638,21 +4790,29 @@ any out-of-range data points are ignored. The syntax is
 
 analogous to `plot`; see @ref{ranges}.
 
-<function> is any valid `gnuplot` expression, although it is usual to use a
+<expression> is any valid `gnuplot` expression, although it is usual to use a
 previously user-defined function of the form f(x) or f(x,y).
 
 <datafile> is treated as in the `plot` command.  All the @ref{datafile}
 modifiers (@ref{using}, @ref{every},...) except @ref{smooth} and the deprecated @ref{thru}
 are applicable to @ref{fit}. See @ref{datafile}.
 
-The default data formats for fitting functions with a single independent
-variable, y=f(x), are @{x:@}y or x:y:s; those formats can be changed with
-the datafile @ref{using} qualifier.  The third item (a column number or an
-expression), if present, is interpreted as the standard deviation of the
-corresponding y value and is used to compute a weight for the datum, 1/s**2.
-Otherwise, all data points are weighted equally, with a weight of one.
-Note that if you don't specify a @ref{using} option at all, no y deviations are
-read from the datafile even if it does have a third column, so you'll
+The default data formats for fitting functions with a single
+independent variable, z=f(x), are z or x:z.  That is, if there is
+only a single column then it is the dependent variable and the line
+numbers is the independent variable.  If there are two columns, the
+first is the independent variable and the second is the dependent
+variable.
+
+Those formats can be changed with the datafile @ref{using} qualifier, for
+example to take the z value from a different column or to calculate
+it from several columns.  A third @ref{using} qualifier (a column number
+or an expression), if present, is interpreted as the standard
+deviation of the corresponding z value and is used to compute a
+weight for the datum, 1/s**2.  Otherwise, all data points are
+weighted equally, with a weight of one. Note that if you don't
+specify a @ref{using} option at all, no z standard deviations are read
+from the datafile even if it does have a third column, so you'll
 always get unit weights.
 
 To fit a function with two independent variables, z=f(x,y), the required
@@ -4661,6 +4821,27 @@ given---no default columns are assumed for a missing token.  Weights for
 each data point are evaluated from 's' as above.  If error estimates are
 not available, a constant value can be specified as a constant expression
 (see @ref{using}), e.g., `using 1:2:3:(1)`.
+
+The fit function may have up to five independent variables.  There
+must be two more @ref{using} qualifiers than there are independent
+variables, unless there is only one variable.  The allowed formats,
+and the default dummy variable names, are as follows:
+
+@example
+      z
+      x:z
+      x:z:s
+      x:y:z:s
+      x:y:t:z:s
+      x:y:t:u:z:s
+      x:y:t:u:v:z:s
+
+@end example
+
+The dummy variable names may be changed with ranges as noted above.
+The first range corresponds to the first @ref{using} spec, etc.  A range
+may also be given for z (the dependent variable), but that name
+cannot be changed.
 
 Multiple datasets may be simultaneously fit with functions of one
 independent variable by making y a 'pseudo-variable', e.g., the dataline
@@ -4678,6 +4859,12 @@ Examples:
       fit f(x) 'measured.dat' using 3:($7-5) via 'start.par'
       fit f(x) './data/trash.dat' using 1:2:3 via a, b, c
       fit g(x,y) 'surface.dat' using 1:2:3:(1) via a, b, c
+      fit a0 + a1*x/(1 + a2*x/(1 + a3*x)) 'measured.dat' via a0,a1,a2,a3
+      fit a*x + b*y 'surface.dat' using 1:2:3:(1) via a,b
+      fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3:(1) via a,b
+      fit a*x + b*y + c*t 'foo.dat' using 1:2:3:4:(1) via a,b,c
+      h(x,y,t,u,v) = a*x + b*y + c*t + d*u + e*v
+      fit h(x,y,t,u,v) 'foo.dat' using 1:2:3:4:5:6:(1) via a,b,c,d,e
 
 @end example
 
@@ -6860,26 +7047,6 @@ file. These are contained in "pseudocolumns".
 @end example
 
 
-
-@noindent --- USING TITLE ---
-
-@c ?using title
-@c ?plot using title
-The first entry of a column of the input data file can be used as a string
-to provide the plot title in the key box.  The column containing specified
-is independent of the column[s] used for the plot itself.
-
-@example
-   plot 'data' using 1:($2/$3) title column(N)
-
-@end example
-
-In this case the entry in the first row of column N will be used for the
-key entry of the plot constructed from dividing column 2 by column 3.
-The entry in the first row of columns 2 and 3 will be ignored.
-
-
-
 @noindent --- XTICLABELS ---
 
 @cindex xticlabels
@@ -7214,18 +7381,37 @@ Syntax:
 
 @end example
 
-Examples:
+The scope of an iteration ends at the next comma or the end of the
+command, whichever comes first.  Iteration may be nested.
+
+Example:
+@example
+      plot for [dataset in "apples bananas"] dataset."dat" title dataset
+
+@end example
+
+In this example iteration is used both to generate a file name and a
+corresponding title.
+
+Example:
 @example
       file(n) = sprintf("dataset_%d.dat",n)
       splot for [i=1:10] file(i) title sprintf("dataset %d",i)
-      plot for [dataset in "apples bananas"] dataset."dat" title dataset
 
 @end example
 
 This example defines a string-valued function that generates file names,
 and plots ten such files together. The iteration variable ('i' in this
-example) is treated as an integer, and may be used more than once. In this
-example it is used both to generate a file name and a corresponding title.
+example) is treated as an integer, and may be used more than once.
+
+Example:
+@example
+      set key left
+      plot [0:1] for [n=1:4] x**n sprintf("%d",n)
+
+@end example
+
+This example plots a family of functions.
 
 Example:
 @example
@@ -7261,17 +7447,20 @@ the string iterator form of the command rather than an integer iterator.
 @c ?commands splot title
 @c ?plot title
 @c ?splot title
+@cindex columnheader
+
 A line title for each function and data set appears in the key, accompanied
 by a sample of the line and/or symbol used to represent it.  It can be
 changed by using the @ref{title} option.
 
 Syntax:
 @example
-      title "<title>" | notitle ["<ignored title>"]
+      title <text> | notitle [<ignored text>]
+      title columnheader | title columnheader(N)
 
 @end example
 
-where <title> is the new title of the line and must be enclosed in quotes.
+where <text> must either be a quoted string or a string variable.
 The quotes will not be shown in the key.  A special character may be given as
 a backslash followed by its octal value ("\345").  The tab character "\t" is
 understood.  Note that backslash processing occurs only for strings enclosed
@@ -7279,8 +7468,9 @@ in double quotes---use single quotes to prevent such processing.  The newline
 character "\n" is not processed in key entries in either type of string.
 
 There is also an option that will interpret the first entry in a column of
-input data (i.e. the column heading) as a text field, and use it as the key
-title. See `datastrings`.
+input data (i.e. the column header) as a text field, and use it as the key
+title.  See `datastrings`.  This can be made the default by speicifying
+`set key autotitle columnhead`.
 
 The line title and sample can be omitted from the key by using the keyword
 `notitle`.  A null title (`title ''`) is equivalent to `notitle`.  If only
@@ -7316,6 +7506,13 @@ This puts an untitled circular border around a polar graph:
 
 @end example
 
+Plot multiple columns of data, each of which contains its own title in the file
+@example
+      plot for [i=1:4] 'data' using i title columnhead
+
+@end example
+
+
 @node with,  , title, plot
 @subsection with
 
@@ -7345,7 +7542,7 @@ Syntax:
                         @{pointtype | pt <point_type>@}
                         @{pointsize | ps <point_size>@}
                         @{fill | fs <fillstyle>@}
-                        @{nohidden3d | nocontours@}
+                        @{nohidden3d@} @{nocontours@} @{nosurface@}
                         @{palette@}@}
                    @}
 
@@ -7424,7 +7621,10 @@ surfaces (i.e. lines, dots, labels, ...) of a plot marked `nohidden3d` will all
 be drawn, even if they would normally be obscured by other plot elements.
 
 Similarly, the keyword `nocontours` will turn off contouring for an individual
-plot even if the global property "set contour" is active.
+plot even if the global property @ref{contour} is active.
+
+Similarly, the keyword `nosurface` will turn off the 3D surface for an
+individual plot even if the global property @ref{surface} is active.
 
 The keywords may be abbreviated as indicated.
 
@@ -7556,6 +7756,10 @@ See `expressions`.  The output file can be set with @ref{print}.
 
 
 The @ref{pwd} command prints the name of the working directory to the screen.
+
+Note that if you wish to store the current directory into a string variable
+or use it in string expressions, then you can use variable GPVAL_PWD, see
+`show variables all`. This overcomes shell call by means of "@ref{pwd}". 
 
 @node quit, raise, pwd, Commands
 @section quit
@@ -9606,7 +9810,7 @@ The @ref{fontpath} setting defines additional locations for font files
 searched when including font files. Currently only the postscript terminal
 supports @ref{fontpath}. If a file cannot be found in the current directory,
 the directories in @ref{fontpath} are tried. Further documentation concerning
-the supported file formats is included in the @ref{postscript} section
+the supported file formats is included in the `terminal postscript` section
 of the documentation.
 
 Syntax:
@@ -10251,12 +10455,19 @@ default option `autotitles`. The automatic generation of titles can be
 suppressed by `noautotitles`; then only those titles explicitly defined
 by `(s)plot ... title ...` will be drawn.
 
-The `set key autotitle columnheader` command causes the first entry in each
+@cindex columnheader
+
+The command `set key autotitle columnheader` causes the first entry in each
 column of input data to be interpreted as a text string and used as a title for
 the corresponding plot. If the quantity being plotted is a function of data
 from several columns, gnuplot may be confused as to which column to draw the
 title from. In this case it is necessary to specify the column explicitly in
-the plot command, e.g. `plot "datafile" using (($2+$3)/$4) title 3 with lines`.
+the plot command, e.g.
+
+@example
+      plot "datafile" using (($2+$3)/$4) title columnhead(3) with lines
+
+@end example
 
 An overall title can be put on the key (`title "<text>"`)---see also `syntax`
 for the distinction between text in single- or double-quotes.  The key title
@@ -10621,6 +10832,16 @@ fitted function, do this after the @ref{fit}, but before the `plot`:
       set label sprintf("a = %3.5g",par_a) at 30,15
       bfit = gprintf("b = %s*10^%S",par_b)
       set label bfit at 30,20
+
+@end example
+
+To display a function definition along with its fitted parameters, use:
+@example
+      f(x)=a+b*x
+      fit f(x) 'datafile' via a,b
+      set label GPFUN_f at graph .05,.95
+      set label sprintf("a = %g", a) at graph .05,.90 
+      set label sprintf("b = %g", b) at graph .05,.85
 
 @end example
 
@@ -11770,7 +11991,7 @@ Syntax (the options can be given in any order):
 @example
       set pm3d @{
                  @{ at <bst combination> @}
-                 @{ interpolate <steps in scan>,<steps between scans> @}
+                 @{ interpolate <steps/points in scan, between scans> @}
                  @{ scansautomatic | scansforward | scansbackward | depthorder @}
                  @{ flush @{ begin | center | end @} @}
                  @{ ftriangles | noftriangles @}
@@ -11877,12 +12098,17 @@ Take care that you properly use @ref{zrange} and @ref{cbrange} for input data po
 filtering and color range scaling, respectively; and also `set (no)surface`
 seems to have a (side?) effect.
 
-The option `interpolate` will interpolate grid points into a finer mesh, and
-color each quadrangle appropriately. For data files, this will smoothen the
-color surface, and enhance spikes in a color surface. For functions,
+The option `interpolate m,n` will interpolate grid points into a finer mesh,
+and color each quadrangle appropriately.  For data files, this will smoothen
+the color surface, and enhance spikes in a color surface. For functions,
 interpolation makes little sense, except to trade off precision for memory.
-It would usually make more sense to use @ref{samples} and @ref{isosamples} when working
-with functions.
+It would usually make more sense to use @ref{samples} and @ref{isosamples} when
+working with functions. For positive m and n, each quadrangle or triangle
+is interpolated m-times and n-times in the respective direction.  For negative
+m and n, the interpolation frequency is chosen so that there will be at least
+|m| and |n| points drawn; you can consider this as a special gridding function.
+Zeros, i.e. `interpolation 0,0`, will automatically choose an optimal number of
+interpolated surface points.
 
 The coloring setup as well as the color box drawing are determined by
 @ref{palette}.  There can be only one palette for the current plot.  Drawing
@@ -13159,11 +13385,13 @@ Syntax:
 The surface is drawn with the style specified by @ref{with}, or else the
 appropriate style, data or function.
 
-Whenever @ref{surface} is issued, `splot` will not draw points or lines
-corresponding to the function or data file points.  Contours may still be
-drawn on the surface, depending on the @ref{contour} option. `unset surface;
-set contour base` is useful for displaying contours on the grid base.  See
-also @ref{contour}.
+@ref{surface} will cause `splot` to not draw points or lines corresponding
+to any of the function or data file points.  If you want to turn off the surface
+for an individual function or data file while leaving the others active, use
+the `nosurface` keyword in the `splot` command.  Contours may still be drawn on
+the surface, depending on the @ref{contour} option.  The combination
+`unset surface; set contour base` is useful for displaying contours on the grid
+base.  See also @ref{contour}. 
 
 @node table, terminal, surface, set-show
 @subsection table
@@ -13237,7 +13465,7 @@ give @ref{terminal} first, because some terminals set a flag which is needed
 in some operating systems.
 
 Several terminals have many additional options.  For example, see `png`,
-or @ref{postscript}.
+or `postscript`.
 The options used by a previous invocation `set term <term> <options>` of a
 given `<term>` are remembered, thus subsequent `set term <term>` does
 not reset them.  This helps in printing, for instance, when switching
@@ -13252,7 +13480,7 @@ for instance. After gnuplot's startup, the default terminal or that from
 that `set term pop` restores the default terminal on a given platform unless
 another terminal has been pushed explicitly.
 
-For a complete list of available terminal types, see @ref{terminal}.
+For more information, see the `complete list of terminals`.
 
 @node termoption, tics, terminal, set-show
 @subsection termoption
@@ -13596,6 +13824,7 @@ Please see @ref{xrange} for details.
 @subsection variables
 
 @c ?commands show variables
+@c ?show variables all
 @c ?show variables
 The @ref{variables} command lists the current value of user-defined and
 internal variables. Gnuplot internally defines variables whose names begin
@@ -13691,7 +13920,9 @@ to 0.5.
 @subsubsection equal_axes
 
 @c ?set view equal_axes
+@c ?set view equal
 @c ?view equal_axes
+@c ?view equal
 The command `set view equal xy` forces the unit length of the x and y axes
 to be on the same scale, and chooses that scale so that the plot will fit on
 the page.  The command `set view equal xyz` additionally sets the z axis 
@@ -15568,12 +15799,13 @@ Please see @ref{fit} for more information.
 @c ^ <h2> Terminal Types </h2>
 
 @menu
-* terminal_::                   
+* complete_list_of_terminals::  
 @end menu
 
-@node terminal_,  , Terminal_types, Terminal_types
-@section terminal
+@node complete_list_of_terminals,  , Terminal_types, Terminal_types
+@section complete list of terminals
 
+@c ?complete list of terminals
 @cindex terminal
 @opindex terminal
 
@@ -15598,6 +15830,7 @@ with no modifiers.
 * aqua::                        
 * be::                          
 * pdfcairo::                    
+* canvas::                      
 * cgi::                         
 * cgm::                         
 * corel::                       
@@ -15631,6 +15864,7 @@ with no modifiers.
 * latex::                       
 * linux::                       
 * linux_::                      
+* lua::                         
 * macintosh::                   
 * mf::                          
 * mp::                          
@@ -15669,7 +15903,7 @@ with no modifiers.
 * xlib_::                       
 @end menu
 
-@node aed767, aifm, terminal_, terminal_
+@node aed767, aifm, complete_list_of_terminals, complete_list_of_terminals
 @subsubsection aed767
 
 @c ?commands set terminal aed767
@@ -15695,7 +15929,7 @@ The two drivers differ only in their horizontal ranges, which are 512 and
 768 pixels, respectively.  Their vertical range is 575 pixels.  There are
 no options for these drivers."
 
-@node aifm, amiga, aed767, terminal_
+@node aifm, amiga, aed767, complete_list_of_terminals
 @subsubsection aifm
 
 @c ?commands set terminal aifm
@@ -15736,7 +15970,7 @@ Examples:
 
 @end example
 
-@node amiga, apollo, aifm, terminal_
+@node amiga, apollo, aifm, complete_list_of_terminals
 @subsubsection amiga
 
 @c ?commands set terminal amiga
@@ -15764,7 +15998,7 @@ The default font is 8-point "topaz".
 The screen option uses a virtual screen, so it is possible that the graph
 will be larger than the screen."
 
-@node apollo, aqua, amiga, terminal_
+@node apollo, aqua, amiga, complete_list_of_terminals
 @subsubsection apollo
 
 @c ?commands set terminal apollo
@@ -15781,7 +16015,7 @@ with rescaling after window resizing.  It has no options.
 
 If a fixed-size window is desired, the `gpr` terminal may be used instead."
 
-@node aqua, be, apollo, terminal_
+@node aqua, be, apollo, complete_list_of_terminals
 @subsubsection aqua
 
 @c ?commands set terminal aqua
@@ -15820,7 +16054,7 @@ Lines can be drawn either solid or dashed, (default is solid) and the dash
 spacing can be modified by <dashlength> which is a multiplier > 0.
 
 
-@node be, pdfcairo, aqua, terminal_
+@node be, pdfcairo, aqua, complete_list_of_terminals
 @subsubsection be
 
 @c ?commands set terminal be
@@ -16048,7 +16282,7 @@ to a '16' dotted line.
 @end example
 
 
-@node pdfcairo, cgi, be, terminal_
+@node pdfcairo, canvas, be, complete_list_of_terminals
 @subsubsection pdfcairo
 
 @c ?set terminal pdfcairo
@@ -16139,7 +16373,79 @@ so that gnuplot can draw a line from non-integer coordinates. This avoids
 wobbling effects on diagonal lines ('plot x' for example).
 
 
-@node cgi, cgm, pdfcairo, terminal_
+@node canvas, cgi, pdfcairo, complete_list_of_terminals
+@subsubsection canvas
+
+@c ?commands set terminal canvas
+@c ?set terminal canvas
+@c ?set term canvas
+@c ?terminal canvas
+@c ?term canvas
+NB: The canvas terminal is EXPERIMENTAL, and may change before release.
+
+Syntax:
+@example
+      set terminal canvas @{size <xsize>, <ysize>@} @{fsize <fontsize>@}
+                          @{@{no@}enhanced@} @{linewidth <lw>@}
+                          @{standalone @{mousing@} | name '<funcname>'@}
+                          @{jsdir 'URL/for/javascripts'@}
+                          @{title '<some string>'@}
+
+@end example
+
+where <xsize> and <ysize> set the size of the plot area in pixels.
+The default size in standalone mode is 600 by 400 pixels.
+The default font size is 10.  NB: Only one font is available, the ascii
+portion of Hershey simplex Roman provided in the file canvastext.js.
+You can replace this with the file canvasmath.js, which contains also
+UTF-8 encoded Hershey simplex Greek and math symbols.
+
+The default `standalone` mode creates an html page containing javascript
+code that renders the plot using the HTML 5 canvas element.  The html page
+links to two required javascript files 'canvastext.js' and 'gnuplot_common.js'.
+By default these point to local files, on unix-like systems usually in
+directory /usr/local/share/gnuplot/<version>/js.  See installation notes for
+other platforms. You can change this by using the `jsdir` option to specify
+either a different local directory or a general URL.  The latter is usually
+appropriate if the plot is exported for viewing on remote client machines.
+
+All plots produced by the canvas terminal are mouseable.  The additional
+keyword `mousing` causes the `standalone` mode to add a mouse-tracking box
+underneath the plot. It also adds a link to a javascript file
+'gnuplot_mouse.js' and to a stylesheet for the mouse box 'gnuplot_mouse.css'
+in the same local or URL directory as 'canvastext.js'.
+
+The `name` option creates a file containing only javascript. Both the
+javascript function it contains and the id of the canvas element that it
+draws onto are taken from the following string parameter.  The commands
+@example
+      set term canvas name 'fishplot'
+      set output 'fishplot.js'
+@end example
+
+will create a file containing a javascript function fishplot() that will
+draw onto a canvas with id=fishplot.  An html page that invokes this
+javascript function must also load the canvastext.js function as described
+above.  A minimal html file to wrap the fishplot created above might be:
+
+@example
+      <html>
+      <head>
+          <script src="canvastext.js"></script>
+          <script src="gnuplot_common.js"></script>
+      </head>
+      <body onload="fishplot();">
+          <script src="fishplot.js"></script>
+          <canvas id="fishplot" width=600 height=400>
+              <div id="err_msg">No support for HTML 5 canvas element</div>
+          </canvas>
+      </body>
+      </html>
+
+@end example
+
+
+@node cgi, cgm, canvas, complete_list_of_terminals
 @subsubsection cgi
 
 @c ?commands set terminal cgi
@@ -16167,7 +16473,7 @@ then that display is used.  Otherwise CGIPRNT is used.
 
 These terminals have no options."
 
-@node cgm, corel, cgi, terminal_
+@node cgm, corel, cgi, complete_list_of_terminals
 @subsubsection cgm
 
 @c ?commands set terminal cgm
@@ -16220,7 +16526,7 @@ Examples:
 
 
 
-@noindent --- FONT ---
+@noindent --- CGM FONT ---
 
 @c ?commands set terminal cgm font
 @c ?set terminal cgm font
@@ -16312,7 +16618,7 @@ You cannot introduce a new font in a `set label` command.
 
 
 
-@noindent --- FONTSIZE ---
+@noindent --- CGM FONTSIZE ---
 
 @c ?commands set terminal cgm fontsize
 @c ?set terminal cgm fontsize
@@ -16326,7 +16632,7 @@ scaled up or down accordingly.  To change the assumed width, use the
 
 
 
-@noindent --- LINEWIDTH ---
+@noindent --- CGM LINEWIDTH ---
 
 @c ?commands set terminal cgm linewidth
 @c ?set terminal cgm linewidth
@@ -16338,7 +16644,7 @@ discussed under the `fontsize` and `width` options.
 
 
 
-@noindent --- ROTATE ---
+@noindent --- CGM ROTATE ---
 
 @c ?commands set terminal cgm rotate
 @c ?set terminal cgm rotate
@@ -16355,7 +16661,7 @@ the default behavior.
 
 
 
-@noindent --- SOLID ---
+@noindent --- CGM SOLID ---
 
 @c ?set terminal cgm solid
 @c ?set term cgm solid
@@ -16368,7 +16674,7 @@ each line type.
 
 
 
-@noindent --- SIZE ---
+@noindent --- CGM SIZE ---
 
 @c ?commands set terminal cgm size
 @c ?set terminal cgm size
@@ -16379,7 +16685,7 @@ landscape, or 23457 units wide by 32599 units high for portrait.
 
 
 
-@noindent --- WIDTH ---
+@noindent --- CGM WIDTH ---
 
 @c ?commands set terminal cgm width
 @c ?set terminal cgm width
@@ -16404,7 +16710,7 @@ Example:
 
 
 
-@noindent --- NOFONTLIST ---
+@noindent --- CGM NOFONTLIST ---
 
 @c ?commands set terminal cgm nofontlist
 @c ?set terminal cgm nofontlist
@@ -16426,7 +16732,7 @@ table. 'Helvetica Bold' will give you its second entry, etc.
 
 
 
-@node corel, debug, cgm, terminal_
+@node corel, debug, cgm, complete_list_of_terminals
 @subsubsection corel
 
 @c ?commands set terminal corel
@@ -16452,7 +16758,7 @@ Syntax:
 where the fontsize and linewidth are specified in points and the sizes in
 inches.  The defaults are monochrome, "SwitzerlandLight", 22, 8.2, 10 and 1.2."
 
-@node debug, svga, corel, terminal_
+@node debug, svga, corel, complete_list_of_terminals
 @subsubsection debug
 
 @c ?commands set terminal debug
@@ -16467,7 +16773,7 @@ inches.  The defaults are monochrome, "SwitzerlandLight", 22, 8.2, 10 and 1.2."
 This terminal is provided to allow for the debugging of `gnuplot`.  It is
 likely to be of use only for users who are modifying the source code."
 
-@node svga, dumb, debug, terminal_
+@node svga, dumb, debug, complete_list_of_terminals
 @subsubsection svga
 
 @c ?commands set terminal svga
@@ -16488,7 +16794,7 @@ Syntax:
 
 @end example
 
-@node dumb, dxf, svga, terminal_
+@node dumb, dxf, svga, complete_list_of_terminals
 @subsubsection dumb
 
 @c ?commands set terminal dumb
@@ -16520,7 +16826,7 @@ Examples:
 
 @end example
 
-@node dxf, dxy800a, dumb, terminal_
+@node dxf, dxy800a, dumb, complete_list_of_terminals
 @subsubsection dxf
 
 @c ?commands set terminal dxf
@@ -16541,7 +16847,7 @@ modifying the source file.  If a black-and-white plotting device is used, the
 colors are mapped to differing line thicknesses.  See the description of the
 AutoCad print/plot command."
 
-@node dxy800a, eepic, dxf, terminal_
+@node dxy800a, eepic, dxf, complete_list_of_terminals
 @subsubsection dxy800a
 
 @c ?commands set terminal dxy800a
@@ -16555,7 +16861,7 @@ AutoCad print/plot command."
 
 This terminal driver supports the Roland DXY800A plotter.  It has no options."
 
-@node eepic, emf, dxy800a, terminal_
+@node eepic, emf, dxy800a, complete_list_of_terminals
 @subsubsection eepic
 
 @c ?commands set terminal eepic
@@ -16662,7 +16968,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node emf, emxvga, eepic, terminal_
+@node emf, emxvga, eepic, complete_list_of_terminals
 @subsubsection emf
 
 @c ?commands set terminal emf
@@ -16713,7 +17019,7 @@ Examples:
 
 @end example
 
-@node emxvga, epson_180dpi, emf, terminal_
+@node emxvga, epson_180dpi, emf, complete_list_of_terminals
 @subsubsection emxvga
 
 @c ?commands set terminal emxvga
@@ -16759,7 +17065,7 @@ Syntax:
 
 The only option is the vesa mode for `emxvesa`, which defaults to G640x480x256."
 
-@node epson_180dpi, excl, emxvga, terminal_
+@node epson_180dpi, excl, emxvga, complete_list_of_terminals
 @subsubsection epson_180dpi
 
 @c ?commands set terminal epson_180dpi
@@ -16869,7 +17175,7 @@ With each of these drivers, a binary copy is required on a PC to print.
 Do not use @ref{print}---use instead `copy file /b lpt1:`.
 
 
-@node excl, hercules, epson_180dpi, terminal_
+@node excl, hercules, epson_180dpi, complete_list_of_terminals
 @subsubsection excl
 
 @c ?commands set terminal excl
@@ -16884,7 +17190,7 @@ Do not use @ref{print}---use instead `copy file /b lpt1:`.
 The `excl` terminal driver supports Talaris printers such as the EXCL Laser
 printer and the 1590.  It has no options."
 
-@node hercules, fig, excl, terminal_
+@node hercules, fig, excl, complete_list_of_terminals
 @subsubsection hercules
 
 @c ?commands set terminal hercules
@@ -16953,7 +17259,7 @@ printer and the 1590.  It has no options."
 These drivers supports PC monitors with autodetected graphics boards.  They
 can be used only when compiled with Zortech C/C++.  None have options."
 
-@node fig, png, hercules, terminal_
+@node fig, png, hercules, complete_list_of_terminals
 @subsubsection fig
 
 @c ?commands set terminal fig
@@ -17067,7 +17373,7 @@ To plot the error bars on top of the circles use
 
 @end example
 
-@node png, ggi, fig, terminal_
+@node png, ggi, fig, complete_list_of_terminals
 @subsubsection png
 
 @c ?commands set terminal png
@@ -17086,74 +17392,57 @@ Syntax:
              @{@{no@}truecolor@} @{rounded|butt@}
              @{linewidth <lw>@} @{dashlength <dl>@}
              @{tiny | small | medium | large | giant@}
-             @{font <face> @{<pointsize>@}@}
+             @{font "<face> @{,<pointsize>@}"@} @{@{no@}enhanced@}
              @{size <x>,<y>@} @{@{no@}crop@}
-             @{@{no@}enhanced@}
              @{<color0> <color1> <color2> ...@}
 
 @end example
 
-PNG images are created using libgd, with optional support for TrueType
-and Adobe Type 1 fonts via libfreetype. Version 1.8 or greater of libgd
-is required.
+PNG, JPEG and GIF images are created using the external library libgd.
+PNG plots may be viewed interactively by piping the output to the
+'display' program from the ImageMagick package as follows:
+@example
+               set term png
+               set output '| display png:-'
+@end example
 
-`transparent` instructs the driver to generate transparent PNGs.  The first
-color will be the transparent one. Default is `notransparent`.
+You can view the output from successive plot commands interactively by typing
+<space> in the display window.  To save the current plot to a file,
+left click in the display window and choose @ref{save}.
+
+`transparent` instructs the driver to make the background color transparent.
+Default is `notransparent`.
 
 `interlace` instructs the driver to generate interlaced PNGs.
 Default is `nointerlace`.
 
-By default a 256-color png image is produced. The `truecolor` option instead
-creates a TrueColor output image with 24 bits of color information per pixel.
-The use of transparent fill areas requires use of the `truecolor` option.
+The `linewidth` and `dashlength` options are scaling factors that affect all
+lines drawn, i.e. they are multiplied by values requested in various drawing
+commands.
+
+By default output png images use 256 indexed colors. The `truecolor` option
+instead creates TrueColor images with 24 bits of color information per pixel.
+Transparent fill styles require the `truecolor` option. See `fillstyle`.
 A transparent background is possible in either indexed or TrueColor images.
 
 `butt` instructs the driver to use a line drawing method that does
 not overshoot the desired end point of a line.  This setting is only
 applicable for line widths greater than 1.  This setting is most useful when
 drawing horizontal or vertical lines.  Default is `rounded`.
-Version 2.0 or greater of libgd is required.
 
-PNG plots may be conveniently viewed by piping the output to the
-'display' program from the ImageMagick package as follows:
+The details of font selection are complicated.
+Two equivalent simple examples are given below:
 @example
-               set term png
-               set output '| display png:-'
-
+     set term png font arial 11
+     set term png font "arial,11"
 @end example
 
-View the output from successive plot commands interactively by hitting
-<space> in the display window.  To save a particular one to disk, left
-click in the display window and choose @ref{save}.
+For more information please see the separate section under `fonts`.
 
-Five basic fonts are supported directly by the gd library. These are
-`tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), 
-`large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled
-or rotated (pure horizontal or vertical text only).
-
-@cindex fonts
-
-If gnuplot was built with support for TrueType (*.ttf) or Adobe Type 1 
-(*.pfa) fonts, they may be selected using the 'font <face> @{<pointsize>@}' 
-option. <face> is either the full pathname to the font file, or a font 
-face name that is assumed to be the first part of a filename in one of the 
-directories listed in the GDFONTPATH environmental variable. That is, 
-'set term png font "Face"' will look for a font file named either 
-<somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and 
-Adobe Type 1 fonts are fully scalable and may be rotated through any angle.
-If no font is specified, gnuplot checks the environmental variable 
-GNUPLOT_DEFAULT_GDFONT to see if there is a preferred default font. 
-
-`enhanced` enables the enhanced text processing features, (subscripts, 
-superscripts and mixed fonts). See `enhanced` for more information. 
-The full enhanced mode syntax is supported by the PNG/JPEG driver itself,
-but some of these features are dependent on which version of the 
-underlying libgd library is present, and which fonts are available.
-
-The size <x,y> is given in pixels---it defaults to 640x480.  The number of
-pixels can be also modified by scaling with the @ref{size} command.
-`crop` trims blank space from the edges of the completed plot, resulting
-in a smaller final image size. Default is `nocrop`.
+The output plot size <x,y> is given in pixels---it defaults to 640x480.
+Please see additional information under `canvas` and @ref{size}.
+Blank space at the edges of the finished plot may be trimmed using the `crop`
+option, resulting in a smaller final image size. Default is `nocrop`.
 
 Each color must be of the form 'xrrggbb', where x is the literal character
 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,
@@ -17161,7 +17450,11 @@ Each color must be of the form 'xrrggbb', where x is the literal character
 colors, then the X & Y axis colors, then the plotting colors.  The maximum
 number of colors that can be set is 256.
 
-Examples:
+
+
+@noindent --- EXAMPLES ---
+
+@c ?set term png examples
 @example
       set terminal png medium size 640,480 \\
                        xffffff x000000 x404040 \\
@@ -17170,30 +17463,30 @@ Examples:
 
 @end example
 
-which uses white for the non-transparent background, black for borders, gray
-for the axes, and red, orange, medium aquamarine, thistle 3, light blue, blue,
-plum and dark violet for eight plotting colors.
+Use the medium size built-in non-scaleable, non-rotatable font.
+Use white (xffffff) for the non-transparent background, black for borders,
+gray for the axes, and red, orange, medium aquamarine, thistle 3, light blue,
+blue, plum and dark violet for the first eight plotting colors.
 
 @example
       set terminal png font arial 14 size 800,600
 
 @end example
 
-which searches for a TrueType font with face name 'arial' in the directory
-specified by the environment variable GDFONTPATH and 14pt font size.
+Searches for a scalable font with face name 'arial' and sets the font
+size to 14pt.  Please see `fonts` for details of how the font search
+is done.
 
 @example
-      set terminal png transparent xffffff \\
-                       x000000 x202020 x404040 x606060 \\
-                       x808080 xA0A0A0 xC0C0C0 xE0E0E0
+      set terminal png transparent truecolor enhanced
 
 @end example
 
-which uses white for the transparent background, black for borders, dark
-gray for axes, and a gray-scale for the six plotting colors.
+Use 24 bits of color information per pixel, with a transparent background.
+Use the `enhanced text` mode to control the layout of strings to be printed.
 
 
-@node ggi, Gnugraph(GNU_plotutils), png, terminal_
+@node ggi, Gnugraph(GNU_plotutils), png, complete_list_of_terminals
 @subsubsection ggi
 
 @c ?commands set terminal ggi
@@ -17244,7 +17537,7 @@ Examples:
 
 @end example
 
-@node Gnugraph(GNU_plotutils), gpic, ggi, terminal_
+@node Gnugraph(GNU_plotutils), gpic, ggi, complete_list_of_terminals
 @subsubsection Gnugraph(GNU plotutils)
 
 @c ?commands set terminal gnugraph
@@ -17286,7 +17579,7 @@ Examples:
 There is a non-GNU version of the `gnugraph` driver which cannot be compiled
 unless this version is left out."
 
-@node gpic, gpic_, Gnugraph(GNU_plotutils), terminal_
+@node gpic, gpic_, Gnugraph(GNU_plotutils), complete_list_of_terminals
 @subsubsection gpic
 
 @c ?commands set terminal gpic
@@ -17374,7 +17667,7 @@ for example, using
 
 @end example
 
-@node gpic_, gpr, gpic, terminal_
+@node gpic_, gpr, gpic, complete_list_of_terminals
 @subsubsection gpic
 
 @c ?commands set terminal gpic
@@ -17462,7 +17755,7 @@ for example, using
 
 @end example
 
-@node gpr, grass, gpic_, terminal_
+@node gpr, grass, gpic_, complete_list_of_terminals
 @subsubsection gpr
 
 @c ?commands set terminal gpr
@@ -17479,7 +17772,7 @@ for a fixed-size window.  It has no options.
 
 If a variable window size is desired, use the `apollo` terminal instead."
 
-@node grass, hp2623a, gpr, terminal_
+@node grass, hp2623a, gpr, complete_list_of_terminals
 @subsubsection grass
 
 @c ?commands set terminal grass
@@ -17496,7 +17789,7 @@ GRASS geographic information system.  Contact grassp-list@@moon.cecer.army.mil
 for more information.  Pages are written to the current frame of the GRASS
 Graphics Window.  There are no options."
 
-@node hp2623a, hp2648, grass, terminal_
+@node hp2623a, hp2648, grass, complete_list_of_terminals
 @subsubsection hp2623a
 
 @c ?commands set terminal hp2623a
@@ -17511,7 +17804,7 @@ Graphics Window.  There are no options."
 The `hp2623a` terminal driver supports the Hewlett Packard HP2623A.  It has
 no options."
 
-@node hp2648, hp500c, hp2623a, terminal_
+@node hp2648, hp500c, hp2623a, complete_list_of_terminals
 @subsubsection hp2648
 
 @c ?commands set terminal hp2648
@@ -17526,7 +17819,7 @@ no options."
 The `hp2648` terminal driver supports the Hewlett Packard HP2647 and HP2648.
 It has no options."
 
-@node hp500c, hpgl, hp2648, terminal_
+@node hp500c, hpgl, hp2648, complete_list_of_terminals
 @subsubsection hp500c
 
 @c ?commands set terminal hp500c
@@ -17552,7 +17845,7 @@ or "tiff".  Any other inputs are replaced by the defaults, which are 75 dpi
 and no compression.  Rasterization at the higher resolutions may require a
 large amount of memory."
 
-@node hpgl, hpljii, hp500c, terminal_
+@node hpgl, hpljii, hp500c, complete_list_of_terminals
 @subsubsection hpgl
 
 @c ?commands set terminal hpgl
@@ -17653,7 +17946,7 @@ to bother with @ref{encoding}.
 
 HPGL graphics can be imported by many software packages."
 
-@node hpljii, hppj, hpgl, terminal_
+@node hpljii, hppj, hpgl, complete_list_of_terminals
 @subsubsection hpljii
 
 @c ?commands set terminal hpljii
@@ -17690,7 +17983,7 @@ Rasterization at the higher resolutions may require a large amount of memory.
 The `hp500c` terminal is similar to `hpdj`; `hp500c` additionally supports
 color and compression."
 
-@node hppj, imagen, hpljii, terminal_
+@node hppj, imagen, hpljii, complete_list_of_terminals
 @subsubsection hppj
 
 @c ?commands set terminal hppj
@@ -17713,7 +18006,7 @@ Syntax:
 
 with the middle-sized font (FNT9X17) being the default."
 
-@node imagen, kyo, hppj, terminal_
+@node imagen, kyo, hppj, complete_list_of_terminals
 @subsubsection imagen
 
 @c ?commands set terminal imagen
@@ -17747,7 +18040,7 @@ Example:
 
 puts six graphs on the page in three rows of two in portrait orientation."
 
-@node kyo, latex, imagen, terminal_
+@node kyo, latex, imagen, complete_list_of_terminals
 @subsubsection kyo
 
 @c ?commands set terminal kyo
@@ -17772,7 +18065,7 @@ The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.
 The only difference between the two is that `kyo` uses "Helvetica" whereas
 `prescribe` uses "Courier".  There are no options."
 
-@node latex, linux, kyo, terminal_
+@node latex, linux, kyo, complete_list_of_terminals
 @subsubsection latex
 
 @c ?commands set terminal emtex
@@ -17849,7 +18142,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, linux_, latex, terminal_
+@node linux, linux_, latex, complete_list_of_terminals
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -17866,7 +18159,7 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node linux_, macintosh, linux, terminal_
+@node linux_, lua, linux, complete_list_of_terminals
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -17883,7 +18176,44 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node macintosh, mf, linux_, terminal_
+@node lua, macintosh, linux_, complete_list_of_terminals
+@subsubsection lua
+
+@c ?commands set terminal lua
+@c ?set terminal lua
+@c ?set term lua
+@c ?terminal lua
+@c ?term lua
+@cindex lua
+@tmindex lua
+
+
+The `lua` generic terminal driver works in conjunction with an
+external Lua script to create a target-specific plot file.
+Currently the only supported target is TikZ -> pdflatex.
+
+Information about Lua is available at http://www.lua.org .
+
+Syntax:
+@example
+   set terminal lua <target name> | "<file name>"
+                       @{<script_args> ...@}
+                       @{help@}
+
+@end example
+
+A 'target name' or 'file name' (in quotes) for a script is mandatory.
+If a 'target name' for the script is given, the terminal will look for
+"gnuplot-<target name>.lua" in the local directory and on failure in
+the 'libexec' directory of the gnuplot installation or via the
+environmental variable GNUPLOT_DRIVER_DIR.
+
+All arguments will be provided to the selected script for further
+evaluation. E.g. 'set term lua tikz help' will cause the script itself
+to print additional help on options and choices for the script.
+
+
+@node macintosh, mf, lua, complete_list_of_terminals
 @subsubsection macintosh
 
 @c ?set terminal macintosh
@@ -17922,7 +18252,7 @@ to multiwin, generate some graphs, and then switch to singlewin again, the
 orginal 'singlewin' window will be resused if it is still open. Otherwise
 a new 'singlewin' window will be created. The 'singlewin' window is not numbered."
 
-@node mf, mp, macintosh, terminal_
+@node mf, mp, macintosh, complete_list_of_terminals
 @subsubsection mf
 
 @c ?commands set terminal mf
@@ -18053,7 +18383,7 @@ saves a lot of TeX memory.  One last advantage of using the METAFONT driver
 is that the DVI file really remains device independent, because no \\special
 commands are used as in the eepic and tpic drivers."
 
-@node mp, mgr, mf, terminal_
+@node mp, mgr, mf, complete_list_of_terminals
 @subsubsection mp
 
 @c ?commands set terminal mpost
@@ -18264,7 +18594,7 @@ built-in size changing commands can be used for maximum flexibility. Be sure
 to set the appropriate MP configuration variable to force Metapost to run
 LaTeX instead of plainTeX."
 
-@node mgr, mif, mp, terminal_
+@node mgr, mif, mp, complete_list_of_terminals
 @subsubsection mgr
 
 @c ?commands set terminal mgr
@@ -18278,7 +18608,7 @@ LaTeX instead of plainTeX."
 
 The `mgr` terminal driver supports the Mgr Window system.  It has no options."
 
-@node mif, next, mgr, terminal_
+@node mif, next, mgr, complete_list_of_terminals
 @subsubsection mif
 
 @c ?commands set terminal mif
@@ -18321,7 +18651,7 @@ Examples:
 
 @end example
 
-@node next, Openstep_(next), mif, terminal_
+@node next, Openstep_(next), mif, complete_list_of_terminals
 @subsubsection next
 
 @c ?commands set terminal next
@@ -18363,7 +18693,7 @@ Examples:
 
 Pointsizes may be changed with `set linestyle`."
 
-@node Openstep_(next), pbm, next, terminal_
+@node Openstep_(next), pbm, next, complete_list_of_terminals
 @subsubsection Openstep (next)
 
 @c ?commands set terminal openstep
@@ -18413,7 +18743,7 @@ Examples:
 
 Pointsizes may be changed with `set linestyle`."
 
-@node pbm, dospc, Openstep_(next), terminal_
+@node pbm, dospc, Openstep_(next), complete_list_of_terminals
 @subsubsection pbm
 
 @c ?commands set terminal pbm
@@ -18454,7 +18784,7 @@ Examples:
 
 @end example
 
-@node dospc, pdf, pbm, terminal_
+@node dospc, pdf, pbm, complete_list_of_terminals
 @subsubsection dospc
 
 @c ?commands set terminal dospc
@@ -18470,7 +18800,7 @@ The `dospc` terminal driver supports PCs with arbitrary graphics boards,
 which will be automatically detected.  It should be used only if you are
 not using the gcc or Zortec C/C++ compilers."
 
-@node pdf, pstricks, dospc, terminal_
+@node pdf, pstricks, dospc, complete_list_of_terminals
 @subsubsection pdf
 
 @c ?commands set terminal pdf
@@ -18523,7 +18853,7 @@ are taken to be in inches, but other units are possible (currently only cm).
 
 * does not work.
 
-@node pstricks, qms, pdf, terminal_
+@node pstricks, qms, pdf, complete_list_of_terminals
 @subsubsection pstricks
 
 @c ?commands set terminal pstricks
@@ -18553,7 +18883,7 @@ Syntax:
 The first option invokes an ugly hack that gives nicer numbers; the second
 has to do with plot scaling.  The defaults are `hacktext` and `nounit`."
 
-@node qms, regis, pstricks, terminal_
+@node qms, regis, pstricks, complete_list_of_terminals
 @subsubsection qms
 
 @c ?commands set terminal qms
@@ -18568,7 +18898,7 @@ has to do with plot scaling.  The defaults are `hacktext` and `nounit`."
 The `qms` terminal driver supports the QMS/QUIC Laser printer, the Talaris
 1200 and others.  It has no options."
 
-@node regis, regis_, qms, terminal_
+@node regis, regis_, qms, complete_list_of_terminals
 @subsubsection regis
 
 @c ?commands set terminal regis
@@ -18589,7 +18919,7 @@ Syntax:
 
 @end example
 
-@node regis_, rgip, regis, terminal_
+@node regis_, rgip, regis, complete_list_of_terminals
 @subsubsection regis
 
 @c ?commands set terminal regis
@@ -18610,7 +18940,7 @@ Syntax:
 
 @end example
 
-@node rgip, sun, regis_, terminal_
+@node rgip, sun, regis_, complete_list_of_terminals
 @subsubsection rgip
 
 @c ?commands set terminal rgip
@@ -18654,7 +18984,7 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node sun, svg, rgip, terminal_
+@node sun, svg, rgip, complete_list_of_terminals
 @subsubsection sun
 
 @c ?commands set terminal sun
@@ -18669,7 +18999,7 @@ puts six graphs on a page in three rows of two in portrait orientation."
 The `sun` terminal driver supports the SunView window system.  It has no
 options."
 
-@node svg, tek410x, sun, terminal_
+@node svg, tek410x, sun, complete_list_of_terminals
 @subsubsection svg
 
 @c ?commands set terminal svg
@@ -18719,7 +19049,7 @@ the desired font. Gnuplot will look for the requested file using the
 directory list in the GNUPLOT_FONTPATH environmental variable.
 NB: You must embed an svg font, not a TrueType or PostScript font."
 
-@node tek410x, tek410x_, svg, terminal_
+@node tek410x, tek410x_, svg, complete_list_of_terminals
 @subsubsection tek410x
 
 @c ?commands set terminal tek410x
@@ -18734,7 +19064,7 @@ NB: You must embed an svg font, not a TrueType or PostScript font."
 The `tek410x` terminal driver supports the 410x and 420x family of Tektronix
 terminals.  It has no options."
 
-@node tek410x_, tek40, tek410x, terminal_
+@node tek410x_, tek40, tek410x, complete_list_of_terminals
 @subsubsection tek410x
 
 @c ?commands set terminal tek410x
@@ -18749,7 +19079,7 @@ terminals.  It has no options."
 The `tek410x` terminal driver supports the 410x and 420x family of Tektronix
 terminals.  It has no options."
 
-@node tek40, texdraw, tek410x_, terminal_
+@node tek40, texdraw, tek410x_, complete_list_of_terminals
 @subsubsection tek40
 
 @c ?commands set terminal tek40xx
@@ -18809,7 +19139,7 @@ The following are present only if selected when gnuplot is built:
 `bitgraph` supports BBN Bitgraph terminals.
 None have any options."
 
-@node texdraw, tgif, tek40, terminal_
+@node texdraw, tgif, tek40, complete_list_of_terminals
 @subsubsection texdraw
 
 @c ?commands set terminal texdraw
@@ -18831,7 +19161,7 @@ of any LaTeX implementation.  Please do not forget to use this package.
 
 It has no options."
 
-@node tgif, tgif_, texdraw, terminal_
+@node tgif, tgif_, texdraw, complete_list_of_terminals
 @subsubsection tgif
 
 @c ?commands set terminal tgif
@@ -18919,7 +19249,7 @@ Examples using the built-in multiplot mechanism:
 
 @end example
 
-@node tgif_, tkcanvas, tgif, terminal_
+@node tgif_, tkcanvas, tgif, complete_list_of_terminals
 @subsubsection tgif
 
 @c ?commands set terminal tgif
@@ -19007,7 +19337,7 @@ Examples using the built-in multiplot mechanism:
 
 @end example
 
-@node tkcanvas, tpic, tgif_, terminal_
+@node tkcanvas, tpic, tgif_, complete_list_of_terminals
 @subsubsection tkcanvas
 
 @c ?commands set terminal tkcanvas
@@ -19072,7 +19402,7 @@ coordinates of the midpoint are only filled for logarithmic axes.
 
 The current version of `tkcanvas` supports neither @ref{multiplot} nor @ref{replot}."
 
-@node tpic, unixpc, tkcanvas, terminal_
+@node tpic, unixpc, tkcanvas, complete_list_of_terminals
 @subsubsection tpic
 
 @c ?commands set terminal tpic
@@ -19129,7 +19459,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node unixpc, unixplot, tpic, terminal_
+@node unixpc, unixplot, tpic, complete_list_of_terminals
 @subsubsection unixpc
 
 @c ?commands set terminal unixpc
@@ -19144,7 +19474,7 @@ The other label -- account for long ticlabels:
 The `unixpc` terminal driver supports AT&T 3b1 and AT&T 7300 Unix PC.  It has
 no options."
 
-@node unixplot, vx384, unixpc, terminal_
+@node unixplot, vx384, unixpc, complete_list_of_terminals
 @subsubsection unixplot
 
 @c ?commands set terminal unixplot
@@ -19162,7 +19492,7 @@ language.  It has no options.
 This terminal cannot be compiled if the GNU version of plot is to be used;
 in that case, use the `gnugraph` terminal instead."
 
-@node vx384, vgagl, unixplot, terminal_
+@node vx384, vgagl, unixplot, complete_list_of_terminals
 @subsubsection vx384
 
 @c ?commands set terminal vx384
@@ -19177,7 +19507,7 @@ in that case, use the `gnugraph` terminal instead."
 The `vx384` terminal driver supports the Vectrix 384 and Tandy color
 printers.  It has no options."
 
-@node vgagl, VWS, vx384, terminal_
+@node vgagl, VWS, vx384, complete_list_of_terminals
 @subsubsection vgagl
 
 @c ?commands set terminal vgagl
@@ -19241,7 +19571,7 @@ The vgagl driver uses the first *available* vga mode from the following list:
 @end example
 
 
-@node VWS, windows, vgagl, terminal_
+@node VWS, windows, vgagl, complete_list_of_terminals
 @subsubsection VWS
 
 @c ?commands set terminal VWS
@@ -19257,7 +19587,7 @@ The `VWS` terminal driver supports the VAX Windowing System.  It has
 no options.  It will sense the display type (monochrome, gray scale,
 or color.)  All line styles are plotted as solid lines."
 
-@node windows, wxt, VWS, terminal_
+@node windows, wxt, VWS, complete_list_of_terminals
 @subsubsection windows
 
 @c ?commands set terminal windows
@@ -19480,7 +19810,7 @@ line width is 1 pixel.  If `Linestyle` is negative, it specifies the width of
 a SOLID line in pixels.  Line1 and any linestyle used with the `points` style
 must be SOLID with unit width."
 
-@node wxt, x11, windows, terminal_
+@node wxt, x11, windows, complete_list_of_terminals
 @subsubsection wxt
 
 @c ?set terminal wxt
@@ -19604,7 +19934,7 @@ bindings by <ctrl>+<space> and <ctrl>+'q', respectively.
 These three keywords (raise, persist and ctrl) can also be set and remembered
 between sessions through the configuration dialog."
 
-@node x11, x11_, wxt, terminal_
+@node x11, x11_, wxt, complete_list_of_terminals
 @subsubsection x11
 
 @c ?commands set terminal x11
@@ -20123,7 +20453,7 @@ you can set the resource 'gnuplot.fastrotate' to 'off'
 
 
 
-@node x11_, xlib, x11, terminal_
+@node x11_, xlib, x11, complete_list_of_terminals
 @subsubsection x11
 
 @c ?commands set terminal x11
@@ -20642,7 +20972,7 @@ you can set the resource 'gnuplot.fastrotate' to 'off'
 
 
 
-@node xlib, xlib_, x11_, terminal_
+@node xlib, xlib_, x11_, complete_list_of_terminals
 @subsubsection xlib
 
 @c ?commands set terminal xlib
@@ -20657,10 +20987,10 @@ you can set the resource 'gnuplot.fastrotate' to 'off'
 The `xlib` terminal driver supports the X11 Windows System.  It generates
 gnuplot_x11 commands, but sends them to the output file specified by
 `set output '<filename>'`. `set term x11` is equivalent to
-`set terminal xlib; set output "|gnuplot_x11 -noevents"`.
+`set output "|gnuplot_x11 -noevents"; set term xlib`.
 `xlib` takes the same set of options as `x11`."
 
-@node xlib_,  , xlib, terminal_
+@node xlib_,  , xlib, complete_list_of_terminals
 @subsubsection xlib
 
 @c ?commands set terminal xlib
@@ -20675,7 +21005,7 @@ gnuplot_x11 commands, but sends them to the output file specified by
 The `xlib` terminal driver supports the X11 Windows System.  It generates
 gnuplot_x11 commands, but sends them to the output file specified by
 `set output '<filename>'`. `set term x11` is equivalent to
-`set terminal xlib; set output "|gnuplot_x11 -noevents"`.
+`set output "|gnuplot_x11 -noevents"; set term xlib`.
 `xlib` takes the same set of options as `x11`."
 
 @node Graphical_User_Interfaces, Bugs, Terminal_types, Top
@@ -20751,7 +21081,7 @@ Whether the system ignores such exceptions (in which case `gnuplot` labels
 the corresponding point as undefined) or aborts `gnuplot` depends on the
 compiler/runtime environment.
 
-The gamma and bessel functions do not work for complex arguments.
+The gamma, bessel, and erf functions do not work for complex arguments.
 
 Only one color palette at a time is active for any given x11 plot window.
 This means that multiplots whose constituent plots use different palettes
