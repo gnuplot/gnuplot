@@ -253,6 +253,7 @@ Major contributors (alphabetic order):
 	"aquaterm"
 	"be"
 	"cairo"
+	"canvas"
 	"cgi"
 	"cgm"
 	"corel"
@@ -287,6 +288,7 @@ Major contributors (alphabetic order):
 	"kyo"
 	"latex"
 	"linux"
+	"lua"
 	"mac"
 	"metafont"
 	"metapost"
@@ -311,6 +313,7 @@ Major contributors (alphabetic order):
 	"tek"
 	"texdraw"
 	"tgif"
+	"tikz"
 	"tkcanvas"
 	"tpic"
 	"unixpc"
@@ -412,6 +415,12 @@ particular conversion chore."
     (if (string-match "amiga" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("amiga"))))
+    (if (string-match "canvas" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("canvas"))))
+    (if (string-match "lua" system-configuration)
+	(setq d2t-terminal-list (append d2t-terminal-list
+					'("lua" "tikz"))))
     (if (string-match "mac" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("mac" "openstep"))))

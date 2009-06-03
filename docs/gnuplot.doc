@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.2 2009/06/01 05:12:09 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.3 2009/06/02 00:45:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3106,7 +3106,7 @@ Ffigure_lines
 Ffigure_linespoints
  The `linespoints` style connects adjacent points with straight line segments
  and then goes back to draw a small symbol at each point.  The command
- `set pointsize` may be used to change the size of the points.
+ `set pointsize` may be used to change the default size of the points.
  1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
  required if 3D plots.  See `style lines`.  Additional input columns may be used
  to provide information such as variable point size or line color.
@@ -10182,7 +10182,7 @@ Ffigure_mapcontours
  that `set term pop` restores the default terminal on a given platform unless
  another terminal has been pushed explicitly.
 
- For a complete list of available terminal types, see `terminal`.
+ For more information, see the `complete list of terminals`.
 3 termoption
 ?commands set termoption
 ?set termoption
@@ -11849,7 +11849,8 @@ Ffigure_mapcontours
  Please see `fit` for more information.
 1 Terminal types
 ^ <h2> Terminal Types </h2>
-2 terminal
+2 complete list of terminals
+?complete list of terminals
 ?terminal
 ?term
  Gnuplot supports a large number of output formats. These are selected by
