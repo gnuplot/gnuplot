@@ -1,3 +1,12 @@
+2009-06-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c:  The following test script triggered multiple problems.
+	                "set multi; set x2data time; set x2tics; unset multi;"
+	- initialize mouse_x, mouse_y to -1;  test before using
+	- initialize mouse values with VERYLARGE (replace magic number 1e38)
+	- xDateTimeFormat: do not attempt to convert VERYLARGE to a date
+	Bugfix.
+
 2009-06-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/gd.trm:  Remove redundant section in gif help text.
