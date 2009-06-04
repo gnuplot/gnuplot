@@ -1,3 +1,12 @@
+2009-06-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c:  The following test script triggered multiple problems.
+	                "set multi; set x2data time; set x2tics; unset multi;"
+	- initialize mouse_x, mouse_y to -1;  test before using
+	- initialize mouse values with VERYLARGE (replace magic number 1e38)
+	- xDateTimeFormat: do not attempt to convert VERYLARGE to a date
+	Bugfix.
+
 2009-06-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/gd.trm:  Remove redundant section in gif help text.
@@ -96,7 +105,7 @@
 	needed in order to embed multiple mouseable plots in a single document.
 
 	* term/canvas.trm term/js/gnuplot_common.js:
-	Dots were not handled by the zoom code.  Create a new routined Dot(x,y)
+	Dots were not handled by the zoom code.  Create a new routine Dot(x,y)
 	to wrap the call to strokeRect().  Bugfix.
 
 	* term/x11.trm: Silence an escaped debug fprintf.  Bugfix.

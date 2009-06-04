@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.116 2009/02/27 19:07:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.117 2009/04/21 15:53:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -119,7 +119,7 @@ static struct {
 
 /* the coordinates of the mouse cursor in gnuplot's internal coordinate system
  */
-static int mouse_x, mouse_y;
+static int mouse_x = -1, mouse_y = -1;
 
 
 /* the "real" coordinates of the mouse cursor, i.e., in the user's coordinate
@@ -299,13 +299,13 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 		 plot_bounds.xleft, plot_bounds.xright, plot_bounds.ybot, plot_bounds.ytop));
 
 	if (plot_bounds.xright == plot_bounds.xleft)
-	    *x = *x2 = 1e38;	/* protection */
+	    *x = *x2 = VERYLARGE;	/* protection */
 	else {
 	    *x = AXIS_MAPBACK(FIRST_X_AXIS, xx);
 	    *x2 = AXIS_MAPBACK(SECOND_X_AXIS, xx);
 	}
 	if (plot_bounds.ytop == plot_bounds.ybot)
-	    *y = *y2 = 1e38;	/* protection */
+	    *y = *y2 = VERYLARGE;	/* protection */
 	else {
 	    *y = AXIS_MAPBACK(FIRST_Y_AXIS, yy);
 	    *y2 = AXIS_MAPBACK(SECOND_Y_AXIS, yy);
@@ -331,7 +331,7 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 						 axis_array[FIRST_X_AXIS].min);
 	} else {
 	    /* both diffs are zero (x axis points into the screen */
-	    *x = 1e38;
+	    *x = VERYLARGE;
 	}
 
 	if (abs(axis3d_y_dx) > abs(axis3d_y_dy)) {
@@ -344,10 +344,10 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 						 axis_array[FIRST_Y_AXIS].min);
 	} else {
 	    /* both diffs are zero (y axis points into the screen */
-	    *y = 1e38;
+	    *y = VERYLARGE;
 	}
 
-	*x2 = *y2 = 1e38;	/* protection */
+	*x2 = *y2 = VERYLARGE;	/* protection */
     }
     /*
        Note: there is plot_bounds.xleft+0.5 in "#define map_x" in graphics.c, which
@@ -484,6 +484,7 @@ xDateTimeFormat(double x, char *b, int mode)
  * value. Code is now closer to what setup_tics does. */
 #define MKSTR(sp,x,axis)					\
 do {								\
+    if (x >= VERYLARGE)	break;					\
     if (axis_array[axis].is_timedata) { 			\
 	char *format = copy_or_invent_formatstring(axis);	\
 	while (strchr(format,'\n'))				\
@@ -553,7 +554,7 @@ GetRulerString(char *p, double x, double y)
 # endif
 	} else { /* mouse_setting.polardistance==2: (distance, tangent) */
 	    phi = x - rx;
-	    phi = (phi == 0) ? ((y-ry>0) ? 1e308:-1e308) : (y - ry)/phi;
+	    phi = (phi == 0) ? ((y-ry>0) ? VERYLARGE : -VERYLARGE) : (y - ry)/phi;
 	    sprintf(format+strlen(format), ", tangent=%s)", mouse_setting.fmt);
 	}
 	sprintf(ptmp, format, rho, phi);
