@@ -5,6 +5,12 @@
 	- initialize mouse_x, mouse_y to -1;  test before using
 	- initialize mouse values with VERYLARGE (replace magic number 1e38)
 	- xDateTimeFormat: do not attempt to convert VERYLARGE to a date
+	
+	* time.c (ggmtime): Counting back from 1.e38 by one year at a time takes
+	forever. Limit the range of acceptable time values to +/- 10^12 seconds,
+	which gives a range of 33688 years forward or back.
+	* axis.c (gen_tics): Skip calculation of 0-length minor ticks
+
 	Bugfix.
 
 2009-05-30  Thomas Sefzick <thse@users.sourceforge.net>

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.60.2.12 2008/10/30 22:26:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.60.2.13 2009/03/23 23:02:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -980,7 +980,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	step = fabs(step);
 	/* }}} */
 
-	if (minitics) {
+	if (minitics && axis_array[axis].miniticscale != 0) {
 	    /* {{{  figure out ministart, ministep, miniend */
 	    if (minitics == MINI_USER) {
 		/* they have said what they want */
@@ -1156,7 +1156,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		/* }}} */
 
 	    }
-	    if (minitics) {
+	    if (minitics && axis_array[axis].miniticscale != 0) {
 		/* {{{  process minitics */
 		double mplace, mtic;
 		for (mplace = ministart; mplace < miniend; mplace += ministep) {
