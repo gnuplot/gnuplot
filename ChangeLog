@@ -1,3 +1,7 @@
+2009-06-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/gd.trm:  Remove redundant section in gif help text.
+
 2009-06-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (enhanced_recursion):  Enhanced text markup applied to a

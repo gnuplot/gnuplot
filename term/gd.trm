@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.136 2009/05/24 06:12:44 sfeam Exp $
+ * $Id: gd.trm,v 1.137 2009/06/01 04:25:51 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2619,16 +2619,6 @@ START_HELP(gif)
 " The output plot size <x,y> is given in pixels---it defaults to 640x480.",
 " Please see additional information under `canvas` and `set size`.",
 " Blank space at the edges of the finished plot may be trimmed using the `crop`",
-"",
-" Each color must be of the form 'xrrggbb', where x is the literal character",
-" 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
-" 'x00ff00' is green.  The background color is set first, then the border",
-" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
-" number of colors that can be set is 256.",
-" The output plot size <x,y> is given in pixels---it defaults to 640x480.",
-" Please see additional information under `canvas` and `set size`.",
-" Blank space at the edges of the finished plot may be trimmed using the `crop`",
-" option, resulting in a smaller final image size. Default is `nocrop`.",
 "",
 " Each color must be of the form 'xrrggbb', where x is the literal character",
 " 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
