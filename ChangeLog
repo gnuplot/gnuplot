@@ -1,3 +1,10 @@
+2009-06-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* time.c (ggmtime): Counting back from 1.e38 by one year at a time takes
+	forever. Limit the range of acceptable time values to +/- 10^12 seconds,
+	which gives a range of 33688 years forward or back.
+	* axis.c (gen_tics): Skip calculation of 0-length minor ticks
+
 2008-06-04  Peter Hedwig  <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.lua term/lua/gnuplot-tikz.help

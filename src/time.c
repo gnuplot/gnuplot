@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.19 2005/02/01 11:37:49 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.20 2007/03/30 05:18:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -699,10 +699,13 @@ ggmtime(struct tm *tm, double l_clock)
     int i, days;
 
     /* dodgy way of doing wday - i hope it works ! */
-
     int wday = JAN_FIRST_WDAY;	/* eg 6 for 2000 */
 
     FPRINTF((stderr, "%g seconds = ", l_clock));
+    if (fabs(l_clock) > 1.e12) {  /* Some time in the year 33688 */
+	int_warn(NO_CARET, "time value out of range");
+	return(-1);
+    }
 
     tm->tm_year = ZERO_YEAR;
     tm->tm_mday = tm->tm_yday = tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
