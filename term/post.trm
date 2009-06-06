@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.242 2009/03/26 00:49:22 sfeam Exp $
+ * $Id: post.trm,v 1.243 2009/04/05 03:25:17 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -769,6 +769,7 @@ PS_options()
 			  "extraneous argument in set terminal %s",term->name);
 	    set_color = TRUE;
 	    ps_params->color = FALSE;
+	    term->flags |= TERM_MONOCHROME;
 	    c_token++;
 	    break;
 	case PS_COLOR:
@@ -777,6 +778,7 @@ PS_options()
 			  "extraneous argument in set terminal %s",term->name);
 	    set_color = TRUE;
 	    ps_params->color = TRUE;
+	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    break;
 	case PS_BLACKTEXT:
@@ -3644,7 +3646,7 @@ TERM_TABLE_START(post_driver)
     PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
     PS_linetype, PS_put_text, PS_text_angle, 
     PS_justify_text, PS_point, PS_arrow, PS_set_font, PS_pointsize,
-    TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_CAN_DASH /*flags*/, 
+    TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_MONOCHROME, 
     0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support for postscript */

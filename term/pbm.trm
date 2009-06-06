@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pbm.trm,v 1.28 2008/04/07 03:54:02 sfeam Exp $
+ * $Id: pbm.trm,v 1.29 2008/05/30 04:47:20 sfeam Exp $
  *
  */
 
@@ -149,6 +149,7 @@ PBM_options()
 	    break;
 	case PBM_MONOCHROME:
 	    pbm_mode = 0;
+	    term->flags |= TERM_MONOCHROME;
 	    c_token++;
 	    break;
 	case PBM_GRAY:
@@ -157,6 +158,7 @@ PBM_options()
 	    break;
 	case PBM_COLOR:
 	    pbm_mode = 2;
+	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    break;
 	case PBM_SIZE:

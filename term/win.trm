@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.64 2008/11/07 11:55:46 mikulik Exp $
+ * $Id: win.trm,v 1.65 2009/03/26 00:49:27 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -186,10 +186,12 @@ WIN_options()
 	    break;
 	case WIN_MONOCHROME:
 	    graphwin.color = FALSE;
+	    term->flags |= TERM_MONOCHROME;
 	    c_token++;
 	    break;
 	case WIN_COLOR:
 	    graphwin.color = TRUE;
+	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    break;
 	case WIN_ENHANCED:

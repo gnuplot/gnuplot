@@ -6,6 +6,11 @@
 	This is a modified version of patchset #2653943 contributed by
 	Hans (oe6jwf@users.sourceforge.net).
 
+	* src/term_api.h term/post.trm term/cairo.trm term/pdf.trm term/cgm.trm
+	term/pbm.trm term/emf.trm term/win.trm:  Add a flag TERM_MONOCHROME
+	that indicates a terminal wants black lines only, even if it is capable
+	of RGB or palette color.
+
 2009-06-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* time.c (ggmtime): Counting back from 1.e38 by one year at a time takes
