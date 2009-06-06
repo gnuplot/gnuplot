@@ -1,3 +1,11 @@
+2009-06-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c src/save.c src/graphics.c src/term_api.h docs/gnuplot.doc
+	docs/plotstyles.gnu:  Add new linestyle property 'pointinterval'.
+
+	This is a modified version of patchset #2653943 contributed by
+	Hans (oe6jwf@users.sourceforge.net).
+
 2009-06-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* time.c (ggmtime): Counting back from 1.e38 by one year at a time takes

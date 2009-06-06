@@ -26,8 +26,10 @@ plot '../demo/silver.dat' u 1:($2-10.):(1+rand(0)) title 'with points ps variabl
      with points ps variable pt 6
 #
 set output 'figure_linespoints.pdf'
+f(x) = 8 + 8*sin(x/20)
 plot '../demo/silver.dat' u 1:($2-10.) title 'with linespoints' \
-     with linespoints pt 6 ps 1
+     with linespoints pt 6 ps 1, \
+     '' u 1:($2) title 'pointinterval -2' with lp pt 4 ps 1 pi -2
 #
 set output 'figure_fsteps.pdf'
 plot '../demo/silver.dat' u 1:($2-10.) title 'with fsteps' with fsteps

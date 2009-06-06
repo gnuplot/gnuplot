@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.301 2009/05/10 05:21:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302 2009/05/13 03:49:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2049,6 +2049,12 @@ do_plot(struct curve_points *plots, int pcount)
 
 	if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 	    /* we deferred point sample until now */
+	    if (this_plot->plot_style == LINESPOINTS
+	    &&  this_plot->lp_properties.p_interval < 0) {
+		(*t->linetype)(LT_BACKGROUND);
+		(*t->point)(xl + key_point_offset, yl, 6);
+		term_apply_lp_properties(&this_plot->lp_properties);
+	    }
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
 		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize);
@@ -3707,9 +3713,13 @@ plot_points(struct curve_points *plot)
 {
     int i;
     int x, y;
+    int interval = plot->lp_properties.p_interval;
     struct termentry *t = term;
 
     for (i = 0; i < plot->p_count; i++) {
+	if ((plot->plot_style == LINESPOINTS) && (interval) && (i % interval)) {
+	    continue;
+	}
 	if (plot->points[i].type == INRANGE) {
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
@@ -3720,12 +3730,23 @@ plot_points(struct curve_points *plot)
 		    && x <= plot_bounds.xright - p_width
 		    && y <= plot_bounds.ytop - p_height)) {
 
-		/* rgb variable  -  color read from data column */
-		check_for_variable_color(plot, &plot->points[i]);
-
 		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		&&  plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize * plot->points[i].z);
+
+		/* A negative interval indicates we should try to blank out the */
+		/* area behind the point symbol. This could be done better by   */
+		/* implementing a special point type, but that would require    */
+		/* modification to all terminal drivers. It might be worth it.  */
+		if (plot->plot_style == LINESPOINTS && interval < 0) {
+		    (*t->linetype)(LT_BACKGROUND);
+		    (*t->point) (x, y, 6);
+		    term_apply_lp_properties(&(plot->lp_properties));
+		}
+
+		/* rgb variable  -  color read from data column */
+		check_for_variable_color(plot, &plot->points[i]);
+
 		(*t->point) (x, y, plot->lp_properties.p_type);
 	    }
 	}
@@ -5375,7 +5396,7 @@ do_key_sample(
     /* oops - doing the point sample now would break the postscript
      * terminal for example, which changes current line style
      * when drawing a point, but does not restore it. We must wait
-     then draw the point sample at the end of do_plot (line 1625)
+     then draw the point sample at the end of do_plot (line 2058)
      */
 
     /* Restore previous clipping area */

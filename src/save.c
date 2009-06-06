@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.170 2009/03/26 00:49:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.171 2009/03/28 21:15:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1264,6 +1264,7 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 	    fprintf(fp, " pointsize default");
 	else
 	    fprintf(fp, " pointsize %.3f", lp->p_size);
+	fprintf(fp, " pointinterval %d", lp->p_interval);
     }
 	
 }
