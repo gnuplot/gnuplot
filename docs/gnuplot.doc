@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.571 2009/06/03 04:52:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.572 2009/06/06 18:28:43 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -203,9 +203,9 @@ C
  UTF-8 character encodings. See `set locale`, `set encoding`, `set decimalsign`.
 
 3 Transparency
- Gnuplot now supports transparent objects in several ways. Any object or plot
- element that uses a fill style can be assigned a value from fully opaque to
- fully transparent. Image or matrix data can be plotted with an alpha channel
+ Gnuplot now supports several forms of transparency. Any object or plot
+ element that uses a fill style can be assigned a transparency from fully opaque
+ to fully transparent. Image or matrix data can be plotted with an alpha channel
  using the new plot style `with rgbalpha`. See `fillstyle`, `rgbalpha`.
 
 3 Volatile Data
@@ -266,6 +266,23 @@ C
  `pngcairo` and `pdfcairo`.  These are alternatives to the older libgd-based
  png driver and the older PDFLib-based pdf driver.  The figures in the pdf
  version of this manual were prepared using the pdfcairo terminal driver.
+
+ The `canvas` terminal driver produces javascript output that draws onto the
+ HTML canvas element of a web page.  It can produce either a complete web page
+ containing a single plot, or a script that can be embedded as part of an
+ externally generated HTML document that perhaps contains multiple plots.
+ The embedded plots support browser-side mousing, including zoom/unzoom.
+
+ The `lua` terminal driver creates an data intended to be further processed
+ by a script in the lua programming language.  At this point only one such
+ lua script, gnuplot-tikz.lua, is available.  It produces a TeX document
+ suitable for use with the latex TikZ package.  Other lua scripts could be
+ written to process the gnuplot output for use with other TeX packages,
+ or with other non-TeX tools.
+
+ `Set term tikz` is shorthand for `set term lua tikz`.  As decribed above, it
+ uses the generic lua terminal and an external lua script to produce a latex
+ document.
 
 3 New smoothing algorithms
 =kdensity

@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.2
 =========================================================
 
+* NEW linetype property 'pointinterval'
 * NEW gnuplot.exe is a full-featured console mode gnuplot executable for Windows
 * NEW plot style "with circles"
 * NEW object types circle, ellipse, and polygon
@@ -16,8 +17,11 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW iteration within a plot command; e.g. plot for [i=1:10] foo(i)
 * NEW iteration with set/unset commands
 * NEW operators '=' and ',' in expression syntax
+* NEW terminal lua generates commands for interpretation by external lua script
+* NEW terminal tikz uses a lua script to generate output for latex TikZ package
 * NEW terminal canvas for HTML 5 canvas element
-* NEW terminals for pdf and png based on cairo and pango
+* NEW terminal pdfcairo based on cairo and pango
+* NEW terminal pngcairo based on cairo and pango
 * NEW terminal dpu414 - Seiko DPU-414 thermal printer
 * NEW error status variables GPVAL_ERRNO and GPVAL_ERRMSG
 * NEW variables GPVAL_LAST_PLOT, GPVAL_{S}PLOT, GPVAL_MULTIPLOT
