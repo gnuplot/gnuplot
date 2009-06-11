@@ -1,4 +1,10 @@
 2009-06-06  Ethan A Merritt  <merritt@u.washington.edu>
+2009-06-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp (wxt_set_color):  plot .. lc N should take
+	only the color from linetype N, not any of the other properties.
+	Bugfix  (e.g.  plot sin(x) with lines lt 0 lc 3)
+
 
 	* src/misc.c src/save.c src/graphics.c src/term_api.h docs/gnuplot.doc
 	docs/plotstyles.gnu:  Add new linestyle property 'pointinterval'.

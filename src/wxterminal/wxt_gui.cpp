@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.71 2009/01/14 23:16:49 tlecomte Exp $
+ * $Id: wxt_gui.cpp,v 1.72 2009/03/26 00:49:18 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2023,8 +2023,7 @@ void wxt_set_color(t_colorspec *colorspec)
 	gp_command temp_command;
 
 	if (colorspec->type == TC_LT) {
-		wxt_linetype(colorspec->lt);
-		return;
+		rgb1 = gp_cairo_linetype2color(colorspec->lt);
 	} else if (colorspec->type == TC_FRAC)
 		rgb1maxcolors_from_gray( colorspec->value, &rgb1 );
 	else if (colorspec->type == TC_RGB) {
