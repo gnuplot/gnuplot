@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.72 2009/03/26 00:49:18 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.73 2009/06/11 23:20:22 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1839,17 +1839,23 @@ void wxt_linetype(int lt)
 	gp_command temp_command;
 	gp_command temp_command2;
 
-	temp_command.command = command_color;
-	temp_command.color = gp_cairo_linetype2color( lt );
-
 	temp_command2.command = command_linestyle;
 	if (lt == -1)
 		temp_command2.integer_value = GP_CAIRO_DOTS;
-	else
+	else if (wxt_dashed && lt >= 0) {
+		temp_command2.integer_value = GP_CAIRO_DASH;
+		wxt_current_plot->dashlength = wxt_dashlength;
+	} else
 		temp_command2.integer_value = GP_CAIRO_SOLID;
-
-	wxt_command_push(temp_command);
 	wxt_command_push(temp_command2);
+
+	temp_command.command = command_linetype;
+	temp_command.integer_value = lt;
+	wxt_command_push(temp_command);
+
+	temp_command.command = command_color;
+	temp_command.color = gp_cairo_linetype2color( lt );
+	wxt_command_push(temp_command);
 }
 
 
