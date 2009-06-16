@@ -3,6 +3,9 @@
 	* src/term.c (test_term): Initialize bounding box.  Exercise a few
 	more terminal properties if available:  transparency, enhanced text. 
 
+	* configure.in: Remove the EXPERIMENTAL warning from the configuration
+	options for command line macros and for the tikz/lua terminal.
+
 2009-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_term.h term/wxt.trm:
