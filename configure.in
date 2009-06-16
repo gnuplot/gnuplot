@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.248 2009/05/31 04:31:21 sfeam Exp $
+dnl $Id: configure.in,v 1.248.2.1 2009/06/02 00:45:38 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -803,7 +803,7 @@ AC_ARG_ENABLE(macros,dnl
   test -z "$enable_macros" && enable_macros=yes)
   if test "$enable_macros" = yes; then
       AC_DEFINE(GP_MACROS,1,
-               [ Define to allow command line macros. EXPERIMENTAL ])
+               [ Define to allow command line macros. ])
   fi
 
 dnl MGR Window system
@@ -1227,7 +1227,7 @@ else
 fi
 
 if test "$with_lua" = yes; then
-  AC_MSG_RESULT([  lua/TikZ terminal: yes (EXPERIMENTAL)])
+  AC_MSG_RESULT([  lua/TikZ terminal: yes ])
 else
   AC_MSG_RESULT([  lua/TikZ terminal: no ])
 fi
@@ -1273,9 +1273,9 @@ else
 fi
 
 if test "$enable_macros" = yes; then
-  AC_MSG_RESULT([  Command line macros: yes (EXPERIMENTAL)])
+  AC_MSG_RESULT([  Command line macros: yes ])
 else
-  AC_MSG_RESULT([  Command line macros: no (requires string variables)])
+  AC_MSG_RESULT([  Command line macros: no ])
 fi
 
 if test "$enable_objects" = yes; then
