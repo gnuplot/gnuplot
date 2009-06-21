@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.138 2009/06/04 03:43:58 sfeam Exp $
+ * $Id: gd.trm,v 1.139 2009/06/05 02:57:43 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -473,6 +473,7 @@ static int
 PNG_FillPattern(int style)
 {
     int rgb = png_state.rgb;
+    int brgb = png_state.rgb_table[0];
     int fillpar = (style >> 4) % 8;
     style = style & 0xf;
 
@@ -493,7 +494,8 @@ PNG_FillPattern(int style)
 	if (!((PNG_fill_tile.im = gdImageCreate(8, 8))))
 	    int_error(NO_CARET,"libgd: failed to create pattern-fill tile");
 
-	background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255);
+	background = gdImageColorAllocate(PNG_fill_tile.im,
+		(brgb >> 16) & 0xff, (brgb >> 8) & 0xff, brgb & 0xff);
 	if (style == FS_TRANSPARENT_PATTERN)
 	    gdImageColorTransparent(PNG_fill_tile.im, background);
 	gdImageFilledRectangle(PNG_fill_tile.im, 0, 0, 7, 7, background);
@@ -1428,7 +1430,8 @@ PNG_graphics()
 {
     int i;
     unsigned int rgb;
-
+    unsigned int brgb = png_state.rgb_table[0];
+ 
 #if (GD2_VERS >= 2)
     /* TrueColor images default to a black background; load white instead.	*/
     /* If PNG_USE_TRANSPARENT, store the background alpha in the output file	*/
@@ -1439,11 +1442,13 @@ PNG_graphics()
 	if (!png_state.image)
 	    int_error(NO_CARET,"libgd: failed to create output image structure");
 	if (png_state.flags & PNG_USE_TRANSPARENT) {
-	    rgb = gdImageColorAllocateAlpha(png_state.image, 255, 255, 255, 127);
+	    rgb = gdImageColorAllocateAlpha(png_state.image,
+		(brgb >> 16) & 0xff, (brgb >> 8) & 0xff, brgb & 0xff, 127);
 	    gdImageSaveAlpha(png_state.image, 1);
 	    gdImageAlphaBlending(png_state.image, 0);
 	} else {
-	    rgb = gdImageColorAllocate(png_state.image, 255, 255, 255);
+	    rgb = gdImageColorAllocate(png_state.image,
+		(brgb >> 16) & 0xff, (brgb >> 8) & 0xff, brgb & 0xff);
 	}
 	gdImageFill(png_state.image, 1, 1, rgb);
 	gdImageAlphaBlending(png_state.image, 1);

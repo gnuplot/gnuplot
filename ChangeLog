@@ -1,3 +1,9 @@
+2009-06-21  Thomas Sefzick <thse@users.sourceforge.net>
+
+	* term/gd.trm: The background color requested in "set term png..."
+	was not being used in truecolor png output.
+	Bugfix
+
 2009-06-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (test_term): Initialize bounding box.  Exercise a few
