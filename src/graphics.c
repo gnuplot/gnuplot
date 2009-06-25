@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302 2009/05/13 03:49:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.303 2009/06/06 18:28:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3982,6 +3982,8 @@ plot_c_bars(struct curve_points *plot)
     int tic = GPMAX(ERRORBARTIC/2,1);
 
     for (i = 0; i < plot->p_count; i++) {
+	TBOOLEAN skip_box = FALSE;
+
 	/* undefined points don't count */
 	if (plot->points[i].type == UNDEFINED)
 	    continue;
@@ -4071,6 +4073,8 @@ plot_c_bars(struct curve_points *plot)
 	}
 
 	/* EAM Feb 2006 Clip to plot vertical extent */
+	high_inrange = inrange(yopen, axis_array[y_axis].min, axis_array[y_axis].max);
+	low_inrange = inrange(yclose, axis_array[y_axis].min, axis_array[y_axis].max);
 	cliptorange(yopen, Y_AXIS.min, Y_AXIS.max);
 	cliptorange(yclose, Y_AXIS.min, Y_AXIS.max);
 	if (map_y(yopen) < map_y(yclose)) {
@@ -4078,6 +4082,8 @@ plot_c_bars(struct curve_points *plot)
 	} else {
 	    ymax = map_y(yopen); ymin = map_y(yclose);
 	}
+	if (!high_inrange && !low_inrange && ymin == ymax)
+	    skip_box = TRUE;
 
 	/* Reset to original color, if we changed it for the border */
 	if (plot->fill_properties.border_color.type != TC_DEFAULT
@@ -4090,7 +4096,7 @@ plot_c_bars(struct curve_points *plot)
 	
 	/* Boxes are always filled if an explicit non-empty fillstyle is set. */
 	/* If the fillstyle is FS_EMPTY, fill to indicate (open > close).     */
-	if (term->fillbox) {
+	if (term->fillbox && !skip_box) {
 	    int style = style_from_fill(&plot->fill_properties);
 	    if ((style != FS_EMPTY) || (yopen > yclose)) {
 		unsigned int x = xlowM;
@@ -4117,19 +4123,21 @@ plot_c_bars(struct curve_points *plot)
 	    (*t->move)   (xM, ymax);
 	    (*t->vector) (xM, yhighM);
 
-	    newpath();
-	    (*t->move)   (xlowM, map_y(yopen));
-	    (*t->vector) (xhighM, map_y(yopen));
-	    (*t->vector) (xhighM, map_y(yclose));
-	    (*t->vector) (xlowM, map_y(yclose));
-	    (*t->vector) (xlowM, map_y(yopen));
-	    closepath();
+	    if (!skip_box) {
+		newpath();
+		(*t->move)   (xlowM, map_y(yopen));
+		(*t->vector) (xhighM, map_y(yopen));
+		(*t->vector) (xhighM, map_y(yclose));
+		(*t->vector) (xlowM, map_y(yclose));
+		(*t->vector) (xlowM, map_y(yopen));
+		closepath();
+	    }
 
 	/* Some users prefer bars at the end of the whiskers */
 	if (plot->arrow_properties.head == BOTH_HEADS) {
 	    double frac = plot->arrow_properties.head_length;
 	    unsigned int d = (frac <= 0) ? 0 : (xhighM-xlowM)*(1.-frac)/2.;
-	
+
 	    (*t->move)   (xlowM+d, yhighM);
 	    (*t->vector) (xhighM-d, yhighM);
 	    (*t->move)   (xlowM+d, ylowM);
