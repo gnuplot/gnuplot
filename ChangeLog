@@ -1,3 +1,10 @@
+2009-06-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_c_bars): Candlestick boxes that were entirely out
+	of range on y were nevertheless appearing as a horizontal line along the
+	plot border.  Skip them entirely.
+	Bug #2807571
+
 2009-06-21  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* term/gd.trm: The background color requested in "set term png..."
