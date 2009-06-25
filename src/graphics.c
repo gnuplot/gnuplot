@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.303 2009/06/06 18:28:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.304 2009/06/26 00:27:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3979,6 +3979,7 @@ plot_c_bars(struct curve_points *plot)
     int ymin, ymax;					/* clipped to plot extent */
     enum coord_type prev = UNDEFINED;			/* type of previous point */
     TBOOLEAN low_inrange, high_inrange;
+    TBOOLEAN open_inrange, close_inrange;
     int tic = GPMAX(ERRORBARTIC/2,1);
 
     for (i = 0; i < plot->p_count; i++) {
@@ -4073,8 +4074,8 @@ plot_c_bars(struct curve_points *plot)
 	}
 
 	/* EAM Feb 2006 Clip to plot vertical extent */
-	high_inrange = inrange(yopen, axis_array[y_axis].min, axis_array[y_axis].max);
-	low_inrange = inrange(yclose, axis_array[y_axis].min, axis_array[y_axis].max);
+	open_inrange = inrange(yopen, axis_array[y_axis].min, axis_array[y_axis].max);
+	close_inrange = inrange(yclose, axis_array[y_axis].min, axis_array[y_axis].max);
 	cliptorange(yopen, Y_AXIS.min, Y_AXIS.max);
 	cliptorange(yclose, Y_AXIS.min, Y_AXIS.max);
 	if (map_y(yopen) < map_y(yclose)) {
@@ -4082,7 +4083,7 @@ plot_c_bars(struct curve_points *plot)
 	} else {
 	    ymax = map_y(yopen); ymin = map_y(yclose);
 	}
-	if (!high_inrange && !low_inrange && ymin == ymax)
+	if (!open_inrange && !close_inrange && ymin == ymax)
 	    skip_box = TRUE;
 
 	/* Reset to original color, if we changed it for the border */
@@ -4138,10 +4139,14 @@ plot_c_bars(struct curve_points *plot)
 	    double frac = plot->arrow_properties.head_length;
 	    unsigned int d = (frac <= 0) ? 0 : (xhighM-xlowM)*(1.-frac)/2.;
 
-	    (*t->move)   (xlowM+d, yhighM);
-	    (*t->vector) (xhighM-d, yhighM);
-	    (*t->move)   (xlowM+d, ylowM);
-	    (*t->vector) (xhighM-d, ylowM);
+	    if (high_inrange) {
+		(*t->move)   (xlowM+d, yhighM);
+		(*t->vector) (xhighM-d, yhighM);
+	    }
+	    if (low_inrange) {
+		(*t->move)   (xlowM+d, ylowM);
+		(*t->vector) (xhighM-d, ylowM);
+	    }
 	}
 
 	/* Through 4.2 gnuplot would indicate (open > close) by drawing     */

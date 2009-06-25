@@ -2,8 +2,8 @@
 
 	* src/graphics.c (plot_c_bars): Candlestick boxes that were entirely out
 	of range on y were nevertheless appearing as a horizontal line along the
-	plot border.  Skip them entirely.
-	Bug #2807571
+	plot border.  Skip them entirely.  Same problem for whiskerbars.
+	Bugs #2807571 #2812572
 
 2009-06-21  Thomas Sefzick <thse@users.sourceforge.net>
 
