@@ -1,3 +1,9 @@
+2009-07-03  Harald Harders  <h.harders@tu-bs.de>
+	* term/cairo.trm: Introduce the struct cairo_params_t that takes all pdfcairo
+	and pngcairo terminal options, e.g., color, rounded, fontsize, 	etc., as it 
+	is already done in term/post.trm. This is useful when different terminals 
+	share the same portion of code.
+
 2009-07-02  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.c: The "size xx,yy" option should have a comma between
