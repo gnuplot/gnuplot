@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.298 2009/02/16 07:37:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.299 2009/03/28 21:15:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -936,6 +936,11 @@ set_border()
 	    draw_border = int_expression();
 	}
     }
+
+    /* This is the only place the user can change the border	*/
+    /* so remember what he set.  If draw_border is later changed*/
+    /* internally, we can still recover the user's preference.	*/
+    user_border = draw_border;
 }
 
 
