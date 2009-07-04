@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.305 2009/06/26 06:41:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.306 2009/07/05 00:09:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -126,7 +126,6 @@ static void plot_betweencurves __PROTO((struct curve_points * plot));
 static void fill_missing_corners __PROTO((gpiPoint *corners, int *points, int exit, int reentry, int updown, int leftright));
 static void fill_between __PROTO((double, double, double, double, double, double, double, double, struct curve_points *));
 static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey, filledcurves_opts *filledcurves_options));
-static gpiPoint *fill_corners __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
@@ -3665,11 +3664,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    }
 
 		    style = style_from_fill(&plot->fill_properties);
-
-		    if (plot->lp_properties.use_palette && t->filled_polygon) {
-			(*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
-		    } else
-			(*t->fillbox) (style, x, y, w, h);
+		    (*t->fillbox) (style, x, y, w, h);
 
 		    if (!need_fill_border(&plot->fill_properties))
 			break;
@@ -4107,11 +4102,7 @@ plot_c_bars(struct curve_points *plot)
 
 		if (style == FS_EMPTY)
 		    style = FS_OPAQUE;
-
-		if (plot->lp_properties.use_palette && t->filled_polygon)
-		    (*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
-		else
-		    (*t->fillbox)(style, x, y, w, h);
+		(*t->fillbox)(style, x, y, w, h);
 
 		if (style_from_fill(&plot->fill_properties) != FS_EMPTY)
 		    need_fill_border(&plot->fill_properties);
@@ -5352,12 +5343,8 @@ do_key_sample(
 	} else
 #endif
 	if (w > 0) {    /* All other plot types with fill */
-	    if (style != FS_EMPTY) {
-		if (this_plot->lp_properties.use_palette && t->filled_polygon)
-		    (*t->filled_polygon)(4, fill_corners(style,x,y,w,h));
-		else
-		    (*t->fillbox)(style,x,y,w,h);
-	    }
+	    if (style != FS_EMPTY)
+		(*t->fillbox)(style,x,y,w,h);
 
 	    /* need_fill_border will set the border linetype, but candlesticks don't want it */
 	    if ((this_plot->plot_style == CANDLESTICKS && fs->border_color.type == TC_LT
@@ -5414,29 +5401,6 @@ do_key_sample(
 
     /* Restore previous clipping area */
     clip_area = clip_save;
-}
-
-
-/*
- * The equivalent of t->fillbox() except that it uses PM3D colors instead
- * of plain line types
- */
-static gpiPoint *
-fill_corners(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
-{
-    static gpiPoint corner[4];
-
-    corner[0].style = style;
-    corner[0].x = x;
-    corner[0].y = y;
-    corner[1].x = x;
-    corner[1].y = y+h;
-    corner[2].x = x+w;
-    corner[2].y = y+h;
-    corner[3].x = x+w;
-    corner[3].y = y;
-
-    return corner;
 }
 
 #ifdef EAM_OBJECTS
@@ -5540,12 +5504,8 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 	term_apply_lp_properties(&lpstyle);
 	style = style_from_fill(fillstyle);
 
-	if (style != FS_EMPTY) {
-	    if (lpstyle.use_palette && term->filled_polygon) {
-		(*term->filled_polygon)(4, fill_corners(style,x,y,w,h));
-	    } else if (term->fillbox)
+	if (style != FS_EMPTY && term->fillbox)
 		(*term->fillbox) (style, x, y, w, h);
-	}
 
 	if (need_fill_border(fillstyle)) {
 	    (*term->move)   (x, y);

@@ -12,6 +12,11 @@
 	user setting for both 2D and 3D plots. Change it to cycle the border
 	setting between user / off / full / partial (3D only).
 
+	* src/graphics.c (plot_boxes plot_c_bars do_rectangle do_key_sample):
+	Remove the fill_corners() routine and instead call term->fillbox()
+	directly rather than dummying up a call to term->filled_polygon().
+	Bug #2804784
+
 2009-07-04  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* term/aquaterm.trm (AQUA_options): Fix typo.
