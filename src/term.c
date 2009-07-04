@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.184 2009/02/16 18:53:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.184.2.1 2009/06/04 03:19:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -93,7 +93,6 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.184 2009/02/16 18:53:54 sfe
 
 #ifdef USE_MOUSE
 #include "mouse.h"
-static int save_mouse_state = 1;
 #endif
 
 #ifdef _Windows
@@ -776,11 +775,6 @@ term_start_multiplot()
     mp_layout_size_and_offset();
 
 #ifdef USE_MOUSE
-    /* save the state of mouse_setting.on and
-     * disable mouse; call UpdateStatusline()
-     * to eventually turn off statusline */
-    save_mouse_state = mouse_setting.on;
-    mouse_setting.on = 0;
     UpdateStatusline();
 #endif
 }
@@ -817,14 +811,9 @@ term_end_multiplot()
 
     term_end_plot();
 #ifdef USE_MOUSE
-    /* restore the state of mouse_setting.on;
-     * call UpdateStatusline() to turn on
-     * eventually statusline */
-    mouse_setting.on = save_mouse_state;
     UpdateStatusline();
 #endif
 }
-
 
 
 static void
