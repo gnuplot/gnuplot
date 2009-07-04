@@ -1,3 +1,9 @@
+2009-07-04  Thomas Sefzick <thse@users.sourceforge.net>
+
+	* graphics.c (plot_boxes):  Minimal fix for off-by-one pixel bug in
+	width of boxes with palette or rgb color.  Complete fix is in 4.4.
+	Bug #2804784
+
 2009-07-01  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.c: The "size xx,yy" option should have a comma between
