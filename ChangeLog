@@ -1,3 +1,7 @@
+2009-07-04  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* term/aquaterm.trm (AQUA_options): Fix typo.
+
 2009-07-03  Harald Harders  <h.harders@tu-bs.de>
 	* term/cairo.trm: Introduce the struct cairo_params_t that takes all pdfcairo
 	and pngcairo terminal options, e.g., color, rounded, fontsize, 	etc., as it 

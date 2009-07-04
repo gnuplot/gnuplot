@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.40 2009/03/26 00:49:19 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.41 2009/07/03 05:33:00 sfeam Exp $
  *
  */
 
@@ -198,7 +198,7 @@ AQUA_options()
 
 	if (END_OF_COMMAND)
 	    int_error(c_token,"expecting y size");
-	is (equals(c_token, ","))
+	if (equals(c_token, ","))
 	    c_token++;
 	value = real_expression();
 	if (value < 2 || value > 2048)
