@@ -127,7 +127,8 @@ double zero = ZERO;
 double pointsize = 1.0;
 
 /* set border */
-int draw_border = 31;
+int draw_border = 31;	/* The current settings */
+int user_border = 31;	/* What the user last set explicitly */
 int border_layer = 1;
 # define DEFAULT_BORDER_LP { 0, -2, 0, 1.0, 1.0, 0 }
 struct lp_style_type border_lp = DEFAULT_BORDER_LP;

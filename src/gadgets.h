@@ -378,6 +378,7 @@ extern double pointsize;
 #define border_north	(draw_border & NORTH)
 #define border_complete	((draw_border & 15) == 15)
 extern int draw_border;
+extern int user_border;
 extern int border_layer;
 
 extern struct lp_style_type border_lp;

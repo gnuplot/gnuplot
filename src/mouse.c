@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.117 2009/04/21 15:53:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.118 2009/06/05 00:20:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -889,20 +889,25 @@ builtin_autoscale(struct gp_event_t *ge)
 static char *
 builtin_toggle_border(struct gp_event_t *ge)
 {
-    if (!ge) {
+    if (!ge)
 	return "`builtin-toggle-border`";
-    }
-    if (is_3d_plot) {
-	if (draw_border == 4095)
-	    do_string_replot("set border");
-	else
-	    do_string_replot("set border 4095 lw 0.5");
-    } else {
-	if (draw_border == 15)
-	    do_string_replot("set border");
-	else
-	    do_string_replot("set border 15 lw 0.5");
-    }
+
+    /* EAM July 2009  Cycle through border settings
+     * - no border
+     * - last border requested by the user
+     * - default border
+     * - (3D only) full border
+     */
+    if (draw_border == 0 && draw_border != user_border)
+	draw_border = user_border;
+    else if (draw_border == user_border && draw_border != 31)
+	draw_border = 31;
+    else if (is_3d_plot && draw_border == 31)
+	draw_border = 4095;
+    else
+	draw_border = 0;
+
+    do_string_replot("");
     return (char *) 0;
 }
 

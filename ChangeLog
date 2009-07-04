@@ -7,15 +7,21 @@
 	Also hotkeys would not work.  
 	Bug #2812476
 
+	* src/gadgets.h src/gadgets.h src/mouse.c (builtin_toggle_border)
+	src/set.c:  The 'b' hotkey was a no-op in 2D plots, and lost the current
+	user setting for both 2D and 3D plots. Change it to cycle the border
+	setting between user / off / full / partial (3D only).
+
 2009-07-04  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* term/aquaterm.trm (AQUA_options): Fix typo.
 
 2009-07-03  Harald Harders  <h.harders@tu-bs.de>
-	* term/cairo.trm: Introduce the struct cairo_params_t that takes all pdfcairo
-	and pngcairo terminal options, e.g., color, rounded, fontsize, 	etc., as it 
-	is already done in term/post.trm. This is useful when different terminals 
-	share the same portion of code.
+
+	* term/cairo.trm: Introduce the struct cairo_params_t that takes all
+	pdfcairo and pngcairo terminal options, e.g., color, rounded, fontsize,
+	etc., as it is already done in term/post.trm. This is useful when
+	different terminals share the same portion of code.
 
 2009-07-02  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
