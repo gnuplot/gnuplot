@@ -1,3 +1,12 @@
+2009-07-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c: The code was disabling all mousing and mouse events
+	during multiplot.  This had the unfortunate side effect that window
+	resizing and placement events were never acknowledged.  If the first
+	plot drawn was inside the multiplot, very strange things happened.
+	Also hotkeys would not work.  
+	Bug #2812476
+
 2009-07-04  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* term/aquaterm.trm (AQUA_options): Fix typo.
