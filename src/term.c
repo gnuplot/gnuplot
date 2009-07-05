@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.184.2.1 2009/06/04 03:19:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.184.2.2 2009/07/04 23:55:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1295,8 +1295,8 @@ do_arrow(
 #ifdef EAM_OBJECTS
 /* Generic routine for drawing circles or circular arcs.          */
 /* If this feature proves useful, we can add a new terminal entry */
-/* point term->arc() to the API and let termials either provide a */
-/* private implemenation or use this generic one.                 */
+/* point term->arc() to the API and let terminals either provide  */
+/* a private implemenation or use this generic one.               */
 
 void
 do_arc( 
