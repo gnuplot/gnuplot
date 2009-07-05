@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.304 2009/06/26 00:27:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.305 2009/06/26 06:41:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4798,7 +4798,7 @@ xtick2d_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
-    struct lp_style_type grid)	/* linetype or -2 for no grid */
+    struct lp_style_type grid)	/* grid.l_type == LT_NODRAW means no grid */
 {
     struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
@@ -4893,7 +4893,7 @@ ytick2d_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
-    struct lp_style_type grid)	/* linetype or -2 */
+    struct lp_style_type grid)	/* grid.l_type == LT_NODRAW means no grid */
 {
     struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
