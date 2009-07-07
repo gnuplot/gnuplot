@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.290 2009-05-19 17:16:15+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.568
+C RCS $Id: gnuplot-ja.doc,v 1.292 2009-06-11 11:24:20+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.573
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -261,12 +261,11 @@ C Shigeharu Takeno et al (3.7, 4.X)
  `set encoding`, `set decimalsign`。
 
 3 透明化 (Transparency)
- 現在の gnuplot は、いくつかの方法で透明なオブジェクトをサポートしてい
- ます。塗り潰しスタイルを使用する任意のオブジェクト、描画要素には「完全
- な不透明」から「完全な透明」までの値を割り当てることができます。画像や
- matrix データは、新しい描画スタイル `with rgbalpha` を使用することで、
- アルファチャネル指定付きで描画できます。以下参照: `fillstyle`,
- `rgbalpha`。
+ 現在の gnuplot は、いくつかの形式の透明化をサポートしています。塗り潰
+ しスタイルを使用する任意のオブジェクト、描画要素には「完全な不透明」か
+ ら「完全な透明」までの透明化を割り当てることができます。画像や matrix
+ データは、新しい描画スタイル `with rgbalpha` を使用することで、アルフ
+ ァチャネル指定付きで描画できます。以下参照: `fillstyle`, `rgbalpha`。
 
 3 揮発性データ (Volatile Data)
  新しいコマンド `refresh` はほぼ `replot` と同じですが、入力データファ
@@ -330,6 +329,24 @@ C Shigeharu Takeno et al (3.7, 4.X)
  pdf 版の図は、pdfcairo 出力ドライバで作成されたものです (訳注: PDF 版
  マニュアルにこの図を入れるのには pdflatex が必要なため、日本語 PDF 版
  マニュアルには今のところこの図は含まれていないでしょう)。
+
+ 出力ドライバ `canvas` は、ウェブページの canvas 要素 HTML 中に描画する
+ javascript 出力を生成します。これは、一つの描画だけを含む完全なウェブ
+ ページ、あるいは外部に生成された HTML ドキュメントの一部 (複数の描画を
+ 入れることができる) として埋め込めるスクリプト、のいずれかを作成できま
+ す。埋め込ませる描画は、拡大/縮小などの、ブラウザ側のマウス動作をサポ
+ ートしています。
+
+ 出力ドライバ `lua` は、lua プログラミング言語のスクリプトによってさら
+ なる処理が可能なデータを生成します。現時点では、そのようなスクリプトと
+ しては gnuplot-tikz.lua のみが用意されていて、これは、latex TikZ パッ
+ ケージ用の出力を作成します。もちろん、他の TeX パッケージ用、あるいは
+ TeX 以外のツール用の gnuplot 出力を生成する lua スクリプトなどを作成す
+ ることも可能でしょう。
+
+ `set term tikz` は、`set term lua tikz` の省略形です。上に書いたように
+ これは lua 出力形式と外部の lua スクリプトを使用して latex 文書を生成
+ します。 
 
 3 新しい平滑化アルゴリズム
 =kdensity
@@ -3186,14 +3203,21 @@ Ffigure_lines
 ?style lp
 ?linespoints
 ?lp
+=pointinterval
 Ffigure_linespoints
- `linespoints` スタイルは `lines` と `points` の両方を行ないます。すな
- わち、各点に小さな記号をつけ、そして隣接する点を真直な線分で結びます。
- コマンド `set pointsize` を使って点 (point) の記号の大きさを変更できま
- す。その使い方については、以下参照 `set pointsize`。基本的に 2 次元描
- 画では 1 列、または 2 列の入力データが必要で、3 次元描画では 1 列、ま
- たは 3 列のデータが必要です。以下参照: `style lines`。余分な入力列は、
- 点のサイズや線の色の変更などの情報が提供されたものとして使用されます。
+ `linespoints` スタイルは、隣接する点を真っ直ぐな線分で結び、その後で最
+ 初に戻って各点に小さな記号を描きます。コマンド `set pointsize` を使っ
+ て、その記号のデフォルトの大きさを変更できます。
+ 基本的に 2 次元描画では 1 列、または 2 列の入力データが必要で、3 次元
+ 描画では 1 列、または 3 列のデータが必要です。以下参照: `style lines`。
+ 余分な入力列は、点のサイズや線の色の変更などの情報が提供されたものとし
+ て使用されます。
+
+ ラインスタイルの属性である `pointinterval` (省略形 `pi`) で、グラフの
+ すべての点を与えた記号にするかどうかを制御できます。例えば、
+ `with lp pi 3` は、すべてのデータ点間に線分を引きますが、点の記号は 3
+ つおきにしか書きません。`pointinterval` を負の値にした場合は、記号の下
+ の線分の部分を消します。
 
  `linespoints` は `lp` と略すことが出来ます。
 2 points
@@ -10138,6 +10162,9 @@ Ffigure_mapcontours
 ?linestyle
 ?linewidth
 =linewidth
+=interval
+=linespoints
+=pointinterval
  出力装置にはおのおのデフォルトの線種と点種の集合があり、それらはコマン
  ド `test` で見ることができます。`set style line` は線種と線幅、点種と
  点の大きさを、個々の呼び出しで、それらの情報を全部指定する代わりに、単
@@ -10150,6 +10177,7 @@ Ffigure_mapcontours
                               {{linewidth | lw} <line_width>}
                               {{pointtype | pt} <point_type>}
                               {{pointsize | ps} <point_size>}
+                              {{pointinterval | pi} <interval>}
                               {palette}
        unset style line
        show style line
@@ -10161,13 +10189,20 @@ Ffigure_mapcontours
  えられたパラメータのみが変更されます。<index> が存在しなければ、指定さ
  れなかった値はデフォルトの値になります。
 
- 線種と点種現在の出力装置が持つデフォルトの種類から選ばれます。線幅と点
- の大きさはデフォルトの幅、大きさに対する乗数です (しかし、ここでの
- <point_size> は、`set pointsize` で与えられる乗数には影響を受けないこ
- とに注意してください)。
+ 線種と点種は、その index 値をデフォルトとします。その index 値に対する
+ 実際の記号の形は、出力形式によって異なり得ます。
 
- 線種と線幅のデフォルトの値はそのラインスタイル番号 (index) です。幅と
- 大きさのデフォルトの大きさはどちらも 1 です。
+ 線幅と点の大きさは、現在の出力形式のデフォルトの幅、大きさに対する乗数
+ です (しかし、ここでの <point_size> は、コマンド `set pointsize` で与
+ えられる乗数には影響を受けないことに注意してください)。
+
+ `pointinterval` は、スタイル `linespoints` でグラフ中に描かれる点の間
+ 隔を制御します。デフォルトは 0 です (すべての点が描画される)。例えば、
+ `set style line N pi 3` は、点種が N、点の大きさと線幅は現在の出力形式
+ のデフォルトで、`with linespoints` での描画では点は 3 つおきに描画され
+ るようなラインスタイルを定義します。その間隔を負の値にすると、それは間
+ 隔は正の値の場合と同じですが、点の記号の下になる線を書かないようにしま
+ す (出力形式によっては)。
 
  このようにつくられるラインスタイルは、デフォルトの型 (線種, 点種) を
  別なものに置き換えることはしないので、ラインスタイル、デフォルトの型、
@@ -10351,7 +10386,7 @@ Ffigure_mapcontours
  `set term pop` によって復帰させる、という動作を期待したスクリプトを可
  搬性を失わずに書くことが出来ます。
 
- 有効な出力形式の一覧全体については、以下参照: `terminal`。
+ 詳細は、以下参照: `complete list of terminals`。
 3 termoption
 ?commands set termoption
 ?set termoption
@@ -12046,7 +12081,8 @@ Ffigure_mapcontours
  より詳しい情報に関しては、以下参照: `fit`。
 1 出力形式 (Terminal)
 ^ <h2> Terminal Types </h2>
-2 terminal
+2 出力形式の一覧
+?complete list of terminals
 ?terminal
 ?term
  gnuplot はとても多くの出力形式をサポートしています。これらは、適切な
