@@ -452,23 +452,23 @@ extern fill_style_type default_fillstyle;
 extern struct object default_rectangle;
 #define DEFAULT_RECTANGLE_STYLE { NULL, -1, 0, OBJ_RECTANGLE,	\
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{1, LT_BACKGROUND, 0, 1.0, 0.0},			\
+	{1, LT_BACKGROUND, 0, 0, 1.0, 0.0, FALSE, DEFAULT_COLORSPEC}, \
 	{.rectangle = {0, {0,0.,0.,0.}, {0,0.,0.,0.}, {0,0.,0.,0.}, {0,0.,0.,0.}}} }
 
 extern struct object default_circle;
 #define DEFAULT_CIRCLE_STYLE { NULL, -1, 0, OBJ_CIRCLE,       \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{1, LT_BACKGROUND, 0, 1.0, 0.0},			\
+	{1, LT_BACKGROUND, 0, 0, 1.0, 0.0, FALSE, DEFAULT_COLORSPEC},			\
 	{.circle = {1, {0,0.,0.,0.}, {0,0.,0.,0.}, 0., 360. }} }
 
 #define DEFAULT_ELLIPSE_STYLE { NULL, -1, 0, OBJ_CIRCLE,       \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{1, LT_BACKGROUND, 0, 1.0, 0.0},			\
+	{1, LT_BACKGROUND, 0, 0, 1.0, 0.0, FALSE, DEFAULT_COLORSPEC},			\
 	{.ellipse = {1, {0,0.,0.,0.}, {0,0.,0.,0.}, 0. }} }
 
 #define DEFAULT_POLYGON_STYLE { NULL, -1, 0, OBJ_POLYGON,       \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{1, LT_BLACK, 0, 1.0, 0.0},			\
+	{1, LT_BLACK, 0, 0, 1.0, 0.0, FALSE, DEFAULT_COLORSPEC},			\
 	{.polygon = {0, NULL} } }
 
 #endif
