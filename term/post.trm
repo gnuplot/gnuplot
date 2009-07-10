@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.242 2009/03/26 00:49:22 sfeam Exp $
+ * $Id: post.trm,v 1.243 2009/04/05 03:25:17 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2206,6 +2206,11 @@ PS_fillbox(
 
     switch(style & 0xf) {
 
+    case FS_DEFAULT:
+	/* Fill with current color, wherever it came from */
+	fprintf(gppsfile, "%d %d %d %d Rec fill\n", x1,y1, width,height);
+	break;
+
     case FS_SOLID:
     case FS_TRANSPARENT_SOLID:
 	/* style == 1 --> fill with intensity according to filldensity */
@@ -2261,7 +2266,8 @@ PS_fillbox(
 	}
 	break; /* end of pattern filling part */
 
-    default: /* style == 0 or unknown --> fill with background color */
+    case FS_EMPTY:
+    default: /* fill with background color */
 	fprintf(gppsfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
     }
 

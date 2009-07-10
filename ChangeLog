@@ -1,3 +1,9 @@
+2009-07-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_fillbox):  FS_DEFAULT should be treated as 
+	"fill with current color" rather than "fill with background color".
+	Bug #2819615
+
 2009-07-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h: Repair incomplete initialization specs for default
