@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.66 2008/11/07 11:55:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67 2009/03/23 23:12:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -925,18 +925,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	case W_line_type:
 	    {
 		LOGBRUSH lb;
-		LOGPEN cur_penstruct;
-
 		short cur_pen = ((curptr->x < (WORD)(-2))
-				 ? (curptr->x % WGNUMPENS) + 2
-				 : curptr->x + 2);
-		/* set color only when second parameter to W_line_type equals 1 */
-		if (curptr->y != 1)
-		    pen = cur_pen;
-		cur_penstruct = (lpgw->color && isColor) ?
-		    lpgw->colorpen[pen] : lpgw->monopen[pen];
-		cur_penstruct.lopnColor = ((lpgw->color && isColor) ?
-		    lpgw->colorpen[cur_pen] : lpgw->monopen[cur_pen]).lopnColor;
+					? (curptr->x % WGNUMPENS) + 2
+					: curptr->x + 2);
+		LOGPEN cur_penstruct =  (lpgw->color && isColor)
+					?  lpgw->colorpen[cur_pen]
+					: lpgw->monopen[cur_pen];
 
 		if (line_width != 1)
 		    cur_penstruct.lopnWidth.x *= line_width;
@@ -946,21 +940,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		lb.lbStyle = BS_SOLID;
 		lb.lbColor = cur_penstruct.lopnColor;
 
-#if 0 /* shige work-around for Windows clipboard bug */
-		lpgw->hapen = ExtCreatePen(
-		        (line_width==1 ? PS_COSMETIC : PS_GEOMETRIC) | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
-			cur_penstruct.lopnWidth.x, &lb, 0, 0);
-#else
+		/* shige: work-around for Windows clipboard bug */
 		if (line_width==1)
 		  lpgw->hapen = CreatePenIndirect((LOGPEN FAR *) &cur_penstruct);
 		else
 		  lpgw->hapen = ExtCreatePen(
 		        PS_GEOMETRIC | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
 			cur_penstruct.lopnWidth.x, &lb, 0, 0);
-#endif
 		DeleteObject(SelectObject(hdc, lpgw->hapen));
 
-		SelectObject(hdc, lpgw->colorbrush[cur_pen]);
+		pen = cur_pen;
+		SelectObject(hdc, lpgw->colorbrush[pen]);
 		/* PM 7.7.2002: support color text */
 		SetTextColor(hdc, cur_penstruct.lopnColor);
 	    }
@@ -1023,14 +1013,16 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			idx = 0;
 		    SelectObject(hdc, pattern_brush[idx]);
 		    break;
+		case FS_DEFAULT:
+		    /* Leave the current brush in place */
+		    break;
 		case FS_EMPTY:
 		default:
-		    /* style == 0 or unknown --> fill with background color */
+		    /* fill with background color */
 		    SelectObject(hdc, halftone_brush[0]);
+		    break;
 	    }
-	    /* needs to be fixed for monochrome devices */
-	    /* FIXME: probably should keep track of text color */
-	    SetTextColor(hdc, lpgw->colorpen[pen].lopnColor);
+
 	    xdash -= rl;
 	    ydash -= rb - 1;
 	    PatBlt(hdc, ppt[0].x, ppt[0].y, xdash, ydash, PATCOPY);
@@ -1104,33 +1096,44 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		LOGBRUSH lb;
 
 		/* distinguish gray values and RGB colors */
-		if (curptr->y == 0) {
+		if (curptr->y == 0) {			/* TC_FRAC */
 		    rgb255_color rgb255;
 		    rgb255maxcolors_from_gray(curptr->x / (double)WIN_PAL_COLORS, &rgb255);
 		    c = RGB(rgb255.r, rgb255.g, rgb255.b);
 		}
-		else {
+		else if (curptr->y == (TC_LT << 8)) {	/* TC_LT */
+		    short pen = (curptr->x < (WORD)(-2)) ? (curptr->x % WGNUMPENS) + 2 : curptr->x + 2;
+		    c = lpgw->colorpen[pen].lopnColor;
+		}
+		else {					/* TC_RGB */
 		    c = RGB(curptr->y & 0xff, (curptr->x >> 8) & 0xff, curptr->x & 0xff);
 		}
 
-		/* FIXME: always a _solid_ brush?? */
+		/* Solid fill brush */
 		this_brush = CreateSolidBrush(c);
 		SelectObject(hdc, this_brush);
 		if (last_pm3d_brush != NULL)
 		    DeleteObject(last_pm3d_brush);
 		last_pm3d_brush = this_brush;
-		/* create new pen, too: */
+
+		/* create new pen, too */
 		cur_penstruct = (lpgw->color && isColor) ?
 		    lpgw->colorpen[pen] : lpgw->monopen[pen];	
 		if (line_width != 1)
 		    cur_penstruct.lopnWidth.x *= line_width;
 		lb.lbStyle = BS_SOLID;
 		lb.lbColor = c;
-		lpgw->hapen = ExtCreatePen(
-		    (line_width==1 ? PS_COSMETIC : PS_GEOMETRIC) | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
-		    cur_penstruct.lopnWidth.x, &lb, 0, 0);
+		/* shige: work-around for Windows clipboard bug */
+		if (line_width == 1) {
+		    cur_penstruct.lopnColor = c;
+		    lpgw->hapen = CreatePenIndirect((LOGPEN FAR *) &cur_penstruct);
+		} else
+		    lpgw->hapen = ExtCreatePen(
+			PS_GEOMETRIC | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
+			cur_penstruct.lopnWidth.x, &lb, 0, 0);
 		DeleteObject(SelectObject(hdc, lpgw->hapen));
-		/* finally set text color */
+
+		/* set text color, which is also used for pattern fill */
 		SetTextColor(hdc, c);
 	    }
 	    break;
