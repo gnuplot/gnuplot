@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.64 2008/11/07 11:55:46 mikulik Exp $
+ * $Id: win.trm,v 1.65 2009/03/26 00:49:27 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -593,8 +593,7 @@ WIN_set_color(t_colorspec *colorspec)
 	    GraphOp(&graphwin, W_pm3d_setcolor, (colorspec->lt) & 0xffff, 0xff00 | ((colorspec->lt >> 16) & 0x00ff), NULL);
 	    break;
 	case TC_LT:
-	    /* set color only when second parameter to W_line_type equals 1 */
-	    GraphOp(&graphwin, W_line_type, colorspec->lt, 1, NULL);
+	    GraphOp(&graphwin, W_pm3d_setcolor, colorspec->lt, TC_LT << 8, NULL);
 	    break;
     }
     WIN_last_linetype = LT_NODRAW;
