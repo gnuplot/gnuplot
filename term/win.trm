@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.66 2009/06/08 04:37:29 sfeam Exp $
+ * $Id: win.trm,v 1.67 2009/07/14 05:46:29 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -605,7 +605,8 @@ TERM_PUBLIC void
 WIN_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
-    /* Notice HBB 20010208: --> WIN_move() */
+    /* FIXME:  fillstyle is ignored by polygon code in wgraph.c */
+    GraphOp(&graphwin, W_fillstyle, corners->style, 0, NULL);
     for (i=0; i<points; i++)
     	GraphOp(&graphwin, W_pm3d_filled_polygon_pt, corners[i].x, corners[i].y, NULL);
     /* finish series: */
@@ -618,8 +619,7 @@ WIN_boxfill(
     unsigned int xleft, unsigned int ybottom,
     unsigned int width, unsigned int height)
 {
-    /* split into two commands to squeeze through all the necessary info */
-    /* Notice HBB 20010208: --> WIN_move() */
+    /* split into multiple commands to squeeze through all the necessary info */
     GraphOp(&graphwin, W_fillstyle, style, 0, NULL);
     GraphOp(&graphwin, W_move, xleft, ybottom, NULL);
     GraphOp(&graphwin, W_boxfill, width, height, NULL);
