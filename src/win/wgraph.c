@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67 2009/03/23 23:12:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.68 2009/07/14 05:46:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -925,12 +925,19 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	case W_line_type:
 	    {
 		LOGBRUSH lb;
-		short cur_pen = ((curptr->x < (WORD)(-2))
-					? (curptr->x % WGNUMPENS) + 2
-					: curptr->x + 2);
-		LOGPEN cur_penstruct =  (lpgw->color && isColor)
-					?  lpgw->colorpen[cur_pen]
-					: lpgw->monopen[cur_pen];
+		LOGPEN cur_penstruct;
+		short cur_pen = curptr->x;
+
+		if (cur_pen > WGNUMPENS)
+		    cur_pen = cur_pen % WGNUMPENS;
+		if (cur_pen <= LT_BACKGROUND) {
+		    cur_pen = 1;
+		    cur_penstruct = lpgw->colorpen[1];
+		    cur_penstruct.lopnColor = lpgw->background;
+		} else {
+		    cur_pen += 2;
+		    cur_penstruct =  (lpgw->color && isColor) ?  lpgw->colorpen[cur_pen] : lpgw->monopen[cur_pen];
+		}
 
 		if (line_width != 1)
 		    cur_penstruct.lopnWidth.x *= line_width;
@@ -951,7 +958,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 		pen = cur_pen;
 		SelectObject(hdc, lpgw->colorbrush[pen]);
-		/* PM 7.7.2002: support color text */
+		/* Text color is also used for pattern fill */
 		SetTextColor(hdc, cur_penstruct.lopnColor);
 	    }
 	break;
@@ -1102,8 +1109,15 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    c = RGB(rgb255.r, rgb255.g, rgb255.b);
 		}
 		else if (curptr->y == (TC_LT << 8)) {	/* TC_LT */
-		    short pen = (curptr->x < (WORD)(-2)) ? (curptr->x % WGNUMPENS) + 2 : curptr->x + 2;
-		    c = lpgw->colorpen[pen].lopnColor;
+		    short pen = curptr->x;
+		    if (pen > WGNUMPENS) pen = pen % WGNUMPENS;
+		    if (pen <= LT_BACKGROUND) {
+			pen = 1;
+			c = lpgw->background;
+		    } else {
+			pen += 2;
+			c = lpgw->colorpen[pen].lopnColor;
+		    }
 		}
 		else {					/* TC_RGB */
 		    c = RGB(curptr->y & 0xff, (curptr->x >> 8) & 0xff, curptr->x & 0xff);
@@ -1117,8 +1131,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		last_pm3d_brush = this_brush;
 
 		/* create new pen, too */
-		cur_penstruct = (lpgw->color && isColor) ?
-		    lpgw->colorpen[pen] : lpgw->monopen[pen];	
+		cur_penstruct = (lpgw->color && isColor) ?  lpgw->colorpen[pen] : lpgw->monopen[pen];
 		if (line_width != 1)
 		    cur_penstruct.lopnWidth.x *= line_width;
 		lb.lbStyle = BS_SOLID;
