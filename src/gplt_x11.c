@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.193 2009/02/16 22:08:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.194 2009/03/26 00:49:13 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2226,7 +2226,11 @@ exec_cmd(plot_struct *plot, char *command)
 
 	if (sscanf(buffer + 1, "%4d%4d%4d%4d%4d", &style, &xtmp, &ytmp, &w, &h) == 5) {
 
-	    x11_setfill(&gc, style);
+	    /* Load selected pattern or fill into a separate gc */
+	    if (!fill_gc)
+		fill_gc = XCreateGC(dpy, plot->window, 0, 0);
+	    XCopyGC(dpy, *current_gc, ~0, fill_gc);
+	    x11_setfill(&fill_gc, style);
 
 	    /* gnuplot has origin at bottom left, but X uses top left
 	     * There may be an off-by-one (or more) error here.
@@ -2234,10 +2238,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    ytmp += h;		/* top left corner of rectangle to be filled */
 	    w *= xscale;
 	    h *= yscale;
-	    XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w + 1, h + 1);
-	    /* reset everything */
-	    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
-	    XSetFillStyle(dpy, gc, FillSolid);
+	    XFillRectangle(dpy, plot->pixmap, fill_gc, X(xtmp), Y(ytmp), w + 1, h + 1);
 	}
     }
     /*   X11_justify_text(mode) - set text justification mode  */
