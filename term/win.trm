@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.65.2.1 2009/07/14 05:47:24 sfeam Exp $
+ * $Id: win.trm,v 1.65.2.2 2009/07/14 22:17:12 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -603,8 +603,13 @@ TERM_PUBLIC void
 WIN_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
-    /* FIXME:  fillstyle is ignored by polygon code in wgraph.c */
-    GraphOp(&graphwin, W_fillstyle, corners->style, 0, NULL);
+    /* FIXME:  fillstyle is ignored by the polygon code in wgraph.c
+     * This is an experiment to see if we can piggyback on the fillbox() code
+     * to set a pattern brush that will stay in effect for the polygon fill.
+     */
+    if (corners->style != FS_OPAQUE)
+	WIN_boxfill(corners->style, corners->x, corners->y, 0, 1);
+
     for (i=0; i<points; i++)
     	GraphOp(&graphwin, W_pm3d_filled_polygon_pt, corners[i].x, corners[i].y, NULL);
     /* finish series: */
