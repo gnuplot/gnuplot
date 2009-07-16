@@ -3,6 +3,9 @@
 	* src/save.c: The "set view" command was incorrectly saved twice.
 	Bug #2822433
 
+	* term/win.trm: WIN_filled_polygon():  Attempt to handle pattern fill
+	by piggybacking on the WIN_fillbox() code that creates a pattern brush.
+
 2009-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/win.trm: Set the fillstyle belonging to a filled polygon.
