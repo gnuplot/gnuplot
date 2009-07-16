@@ -6,6 +6,10 @@
 	* term/win.trm: WIN_filled_polygon():  Attempt to handle pattern fill
 	by piggybacking on the WIN_fillbox() code that creates a pattern brush.
 
+	* src/graphics.c (plot_image_or_update_axes): In image failsafe mode,
+	clip the individual rectangles (pixels) to the edge of the plot.
+	Bug #2820529
+
 2009-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/win.trm: Set the fillstyle belonging to a filled polygon.
