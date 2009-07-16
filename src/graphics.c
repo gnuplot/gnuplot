@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.3 2009/07/05 00:10:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.4 2009/07/05 07:13:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6100,8 +6100,8 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	    for (i=0; i < K; i++) {
 
 		double x, y, z;
-		TBOOLEAN corner_in_range[4];
-		TBOOLEAN pixel_in_view = FALSE, view_in_pixel = FALSE;
+		TBOOLEAN view_in_pixel = FALSE;
+		int corners_in_view = 0;
 		struct {double x; double y; double z;} p_corners[4]; /* Parallelogram corners. */
 		int k;
 
@@ -6133,43 +6133,45 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 
 		/* Check if any of the corners are viewable */
 		for (k=0; k < 4; k++) {
-		    corner_in_range[k] =
-			inrange(p_corners[k].x, view_port_x[0], view_port_x[1])
-			&& inrange(p_corners[k].y, view_port_y[0], view_port_y[1])
-			&& (!project_points || splot_map ||
-			    inrange(p_corners[k].z, view_port_z[0], view_port_z[1]));
-		    pixel_in_view = pixel_in_view || corner_in_range[k];
+		    if ( inrange(p_corners[k].x, view_port_x[0], view_port_x[1])
+		    &&   inrange(p_corners[k].y, view_port_y[0], view_port_y[1])
+		    &&  (inrange(p_corners[k].z, view_port_z[0], view_port_z[1]) || !project_points || splot_map))
+		    	corners_in_view++;
 		}
 
-		if (pixel_in_view || view_in_pixel) {
+		if (corners_in_view > 0 || view_in_pixel) {
 
 		    int N_corners = 0;    /* Number of corners. */
 		    gpiPoint corners[5];  /* At most 5 corners. */
 
 		    corners[0].style = FS_DEFAULT;
 
-		    if (pixel_in_view) {
-			if (corner_in_range[0] && corner_in_range[1] && corner_in_range[2] && corner_in_range[3]) {
-			    int i_corners;
+		    if (corners_in_view > 0) {
+			int i_corners;
 
-			    N_corners = 4;
+			N_corners = 4;
 
-			    for (i_corners=0; i_corners < N_corners; i_corners++) {
-				if (project_points) {
+			for (i_corners=0; i_corners < N_corners; i_corners++) {
+			    if (project_points) {
 				    map3d_xy_double(p_corners[i_corners].x, p_corners[i_corners].y,
 						    p_corners[i_corners].z, &x, &y);
 				    corners[i_corners].x = x;
 				    corners[i_corners].y = y;
-				} else {
+			    } else {
 				    corners[i_corners].x = map_x(p_corners[i_corners].x);
 				    corners[i_corners].y = map_y(p_corners[i_corners].y);
-				}
 			    }
-			} else {
-			    /* DJS FIXME:
-			     * A triangle/quadrangle/pentagon clipping algorithm needs to be
-			     * added for pixels at the boundary.
-			     */
+			    /* Clip rectangle if necessary */
+			    if (rectangular_image && term->fillbox && corners_in_view < 4) {
+				if (corners[i_corners].x < clip_area->xleft)
+				    corners[i_corners].x = clip_area->xleft;
+				if (corners[i_corners].x > clip_area->xright)
+				    corners[i_corners].x = clip_area->xright;
+				if (corners[i_corners].y > clip_area->ytop)
+				    corners[i_corners].y = clip_area->ytop;
+				if (corners[i_corners].y < clip_area->ybot)
+				    corners[i_corners].y = clip_area->ybot;
+			    }
 			}
 		    } else {
 			/* DJS FIXME:
@@ -6178,7 +6180,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 			 */
 		    }
 
-		    if (N_corners >= 3) {
+		    if (N_corners > 0) {
 			if (pixel_planes == IC_PALETTE) {
 			    if (isnan(points[i_image].CRD_COLOR))
 				goto skip_pixel;
@@ -6198,7 +6200,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 				corners[0].style = FS_TRANSPARENT_SOLID + (alpha<<4);
 			}
 
-			if (N_corners == 4 && rectangular_image && term->fillbox) {
+			if (rectangular_image && term->fillbox) {
 			    /* Some terminals (canvas) can do filled rectangles */
 			    /* more efficiently than filled polygons. */
 			    (*term->fillbox)( corners[0].style,
