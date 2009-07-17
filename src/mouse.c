@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.118 2009/06/05 00:20:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.119 2009/07/05 00:06:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1456,6 +1456,133 @@ event_buttonpress(struct gp_event_t *ge)
 		if (display_ipc_commands()) {
 		    fprintf(stderr, "starting zoom region.\n");
 		}
+	    } else if (4 == b &&			/* wheel up */
+		       (!replot_disabled || refresh_ok)	/* Use refresh if available */
+		       && !(paused_for_mouse & PAUSE_BUTTON3)) {
+	      double xmin, ymin, x2min, y2min;
+	      double xmax, ymax, x2max, y2max;
+	      double mousex, mousey;
+	      if (modifier_mask & Mod_Ctrl) {
+		if (modifier_mask & Mod_Shift) {
+		  /* zoom in (X axis only) */
+		  double w1=23./25.;
+		  double w2= 2./25.;
+		  mousex = w1*axis_array[FIRST_X_AXIS].term_lower + w2*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = axis_array[FIRST_Y_AXIS].term_lower;
+		  MousePosToGraphPosReal(mousex, mousey, &xmin, &ymin, &x2min, &y2min);
+		  mousex = w2*axis_array[FIRST_X_AXIS].term_lower + w1*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmax, &ymax, &x2max, &y2max);
+		  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
+		  if (display_ipc_commands()) {
+		    fprintf(stderr, "zoom in X.\n");
+		  }
+		} else {
+		  /* zoom in (factor of approximatly 2^(.25), so four steps gives 2x larger) */
+		  double w1=23./25.;
+		  double w2= 2./25.;
+		  mousex = w1*axis_array[FIRST_X_AXIS].term_lower + w2*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = w1*axis_array[FIRST_Y_AXIS].term_lower + w2*axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmin, &ymin, &x2min, &y2min);
+		  mousex = w2*axis_array[FIRST_X_AXIS].term_lower + w1*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = w2*axis_array[FIRST_Y_AXIS].term_lower + w1*axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmax, &ymax, &x2max, &y2max);
+		  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
+		  if (display_ipc_commands()) {
+		    fprintf(stderr, "zoom in.\n");
+		  }
+		}
+	      } else {
+		if (modifier_mask & Mod_Shift) {
+		  /* scroll left */
+		  mousex =  1.1*axis_array[FIRST_X_AXIS].term_lower-.1*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = axis_array[FIRST_Y_AXIS].term_lower;
+		  MousePosToGraphPosReal(mousex, mousey, &xmin, &ymin, &x2min, &y2min);
+		  mousex =   .1*axis_array[FIRST_X_AXIS].term_lower+.9*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmax, &ymax, &x2max, &y2max);
+		  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
+		  if (display_ipc_commands()) {
+		    fprintf(stderr, "scroll left.\n");
+		  }
+		} else {
+		  /* scroll up */
+		  mousex = axis_array[FIRST_X_AXIS].term_lower;
+		  mousey = .9*axis_array[FIRST_Y_AXIS].term_lower+.1*axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmin, &ymin, &x2min, &y2min);
+		  mousex = axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = -.1*axis_array[FIRST_Y_AXIS].term_lower+1.1*axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmax, &ymax, &x2max, &y2max);
+		  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
+		  if (display_ipc_commands()) {
+		    fprintf(stderr, "scroll up.\n");
+		  }
+		}
+	      }
+
+	    } else if (5 == b &&			/* wheel down */
+		       (!replot_disabled || refresh_ok)	/* Use refresh if available */
+		       && !(paused_for_mouse & PAUSE_BUTTON3)) {
+	      double xmin, ymin, x2min, y2min;
+	      double xmax, ymax, x2max, y2max;
+	      double mousex, mousey;
+	      if (modifier_mask & Mod_Ctrl) {
+		if (modifier_mask & Mod_Shift) {
+		  /* zoom out (X axis only) */
+		  double w1= 23./21.;
+		  double w2=-2./21.;
+		  mousex = w1*axis_array[FIRST_X_AXIS].term_lower + w2*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = axis_array[FIRST_Y_AXIS].term_lower;
+		  MousePosToGraphPosReal(mousex, mousey, &xmin, &ymin, &x2min, &y2min);
+		  mousex = w2*axis_array[FIRST_X_AXIS].term_lower + w1*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmax, &ymax, &x2max, &y2max);
+		  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
+		  if (display_ipc_commands()) {
+		    fprintf(stderr, "zoom out X.\n");
+		  }
+		} else {
+		  /* zoom out (exactly undo a zoom in step) */
+		  double w1= 23./21.;
+		  double w2=-2./21.;
+		  mousex = w1*axis_array[FIRST_X_AXIS].term_lower + w2*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = w1*axis_array[FIRST_Y_AXIS].term_lower + w2*axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmin, &ymin, &x2min, &y2min);
+		  mousex = w2*axis_array[FIRST_X_AXIS].term_lower + w1*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = w2*axis_array[FIRST_Y_AXIS].term_lower + w1*axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmax, &ymax, &x2max, &y2max);
+		  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
+		  if (display_ipc_commands()) {
+		    fprintf(stderr, "zoom out.\n");
+		  }
+		}
+	      } else {
+		if (modifier_mask & Mod_Shift) {
+		  /* scroll right */
+		  mousex = .9*axis_array[FIRST_X_AXIS].term_lower+.1*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = axis_array[FIRST_Y_AXIS].term_lower;
+		  MousePosToGraphPosReal(mousex, mousey, &xmin, &ymin, &x2min, &y2min);
+		  mousex = -.1*axis_array[FIRST_X_AXIS].term_lower+1.1*axis_array[FIRST_X_AXIS].term_upper;
+		  mousey = axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmax, &ymax, &x2max, &y2max);
+		  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
+		  if (display_ipc_commands()) {
+		    fprintf(stderr, "scroll right.\n");
+		  }
+		} else {
+		  /* scroll down */
+		  mousex = axis_array[FIRST_X_AXIS].term_lower;
+		  mousey =  1.1*axis_array[FIRST_Y_AXIS].term_lower-.1*axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmin, &ymin, &x2min, &y2min);
+		  mousex = axis_array[FIRST_X_AXIS].term_upper;
+		  mousey =   .1*axis_array[FIRST_Y_AXIS].term_lower+.9*axis_array[FIRST_Y_AXIS].term_upper;
+		  MousePosToGraphPosReal(mousex, mousey, &xmax, &ymax, &x2max, &y2max);
+		  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
+		  if (display_ipc_commands()) {
+		    fprintf(stderr, "scroll down.\n");
+		  }
+		}
+	      }
 	    }
 	} else {
 

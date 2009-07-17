@@ -1,3 +1,10 @@
+2009-07-17  James R. Van Zandt  <jrvz@comcast.net>
+
+	* src/mouse.c (event_buttonpress): Implement pan and zoom with
+	mouse wheel: wheel to pan up or down, shift-wheel to pan left or
+	right, control-wheel to zoom in or out, shift-control-wheel to
+	zoom X axis only.
+
 2009-07-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c: The "set view" command was incorrectly saved twice.
