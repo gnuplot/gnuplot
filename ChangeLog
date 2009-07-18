@@ -1,3 +1,9 @@
+2009-07-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h:
+	Pass through mouse wheel events from the wxt terminal, so that the new
+	pan and zoom works for wxt as well as x11.
+
 2009-07-17  James R. Van Zandt  <jrvz@comcast.net>
 
 	* src/mouse.c (event_buttonpress): Implement pan and zoom with
