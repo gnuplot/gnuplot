@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.41 2008/12/22 21:44:39 sfeam Exp $
+ * $Id: term.h,v 1.42 2009/01/09 00:30:35 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -452,6 +452,10 @@
 
 #ifdef HAVE_LUA
 #include "lua.trm"
+#endif
+
+#ifdef QTTERM
+# include "qt.trm"
 #endif
 
 #endif /* !SHORT_TERMLIST */

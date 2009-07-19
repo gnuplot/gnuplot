@@ -1,3 +1,26 @@
+2009-07-19  Jérôme Lodewyck <lodewyck@users.sourceforge.net>	
+
+	Add a Qt terminal, which can either act as a standalone interactive
+	terminal window or be embedded in an external Qt application.
+
+	* configure.in docs/Makefile.in src/Makefile.am src/makefile.all
+	src/makefile.awc src/term.c src/term.h ./term/qt.trm
+
+	* qtterminal/*
+	Makefile.am QtGnuplotApplication.cpp QtGnuplotApplication.h
+	QtGnuplotEvent.cpp QtGnuplotEvent.h QtGnuplotInstance.cpp
+	QtGnuplotInstance.h QtGnuplotItems.cpp QtGnuplotItems.h
+	QtGnuplotResource.qrc QtGnuplotScene.cpp QtGnuplotScene.h
+	QtGnuplotSettings.ui QtGnuplotWidget.cpp QtGnuplotWidget.h
+	QtGnuplotWindow.cpp QtGnuplotWindow.h 
+	qt_conversion.cpp qt_term.cpp qt_term.h
+	embed_example.cpp embed_example.h README.Qt 
+
+	* qtterminal/images/*
+	application-pdf.png configure.png document-export.png document-print.png
+	edit-paste.png grid.png icon32x32.xpm image-bmp.png image-x-eps.png
+	view-refresh.png zoom-in.png zoom-original.png zoom-out.png
+
 2009-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h:

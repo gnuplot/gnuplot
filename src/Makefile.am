@@ -48,7 +48,7 @@ tabulate.c tabulate.h \
 template.h term_api.h term.c term.h time.c unset.c util.c util.h \
 util3d.c util3d.h variable.c variable.h version.c version.h
 
-gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS) $(WX_LIBS)
+gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS) $(WX_LIBS) $(QT_LIBS)
 
 pkglibexec_PROGRAMS = 
 
@@ -75,7 +75,7 @@ if BUILD_SRC_BEOS_SUBDIR
 d_beos = beos
 endif
 
-SUBDIRS = $(d_beos) wxterminal
+SUBDIRS = $(d_beos) wxterminal qtterminal
 
 EXTRA_gnuplot_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c
 
@@ -92,6 +92,54 @@ endif
 if BUILD_GPCAIRO
 gnuplot_SOURCES += wxterminal/gp_cairo.c wxterminal/gp_cairo_helpers.c
 endif
+
+if BUILD_QT
+
+# Call the moc preprocessor
+moc_%.cpp : qtterminal/%.h
+	moc -i -o $@ $<
+
+# Call the Qt resource compiler
+qrc_%.cpp: qtterminal/%.qrc
+	rcc -name QtGnuplotResource -o $@ $<
+
+# Call the Qt ui compiler
+ui_%.h: qtterminal/%.ui
+	uic -o $@ $<
+
+# Clean moc & qrc files
+clean-qt-extra:
+	rm -vf moc_*.cpp qrc_*.cpp qrc_*.o ui_*.h
+
+clean-am: clean-qt-extra
+
+# Qt terminal sources
+$(gnuplot_OBJECTS) : moc_QtGnuplotWindow.cpp moc_QtGnuplotApplication.cpp \
+                     moc_QtGnuplotWidget.cpp moc_QtGnuplotScene.cpp \
+                     moc_QtGnuplotEvent.cpp  moc_QtGnuplotInstance.cpp \
+                     ui_QtGnuplotSettings.h
+
+gnuplot_SOURCES += qtterminal/qt_term.cpp qtterminal/QtGnuplotWindow.cpp \
+qtterminal/QtGnuplotApplication.cpp qtterminal/QtGnuplotWidget.cpp \
+qtterminal/QtGnuplotScene.cpp qtterminal/QtGnuplotItems.cpp \
+qtterminal/QtGnuplotEvent.cpp \
+qrc_QtGnuplotResource.cpp
+
+# embed example (uncomment to build it)
+
+# bin_PROGRAMS += embed_example
+#
+# $(embed_example_OBJECTS) : moc_embed_example.cpp
+#
+# embed_example_SOURCES = qtterminal/embed_example.cpp \
+# qtterminal/QtGnuplotWidget.cpp qtterminal/QtGnuplotEvent.cpp \
+# qtterminal/QtGnuplotScene.cpp qtterminal/QtGnuplotItems.cpp \
+# qtterminal/QtGnuplotInstance.cpp \
+# qrc_QtGnuplotResource.cpp
+#
+# embed_example_LDADD = $(QT_LIBS)
+
+endif # build_qt
 
 ## we don't need COREOBJS, but CORETERM
 ## for the term.o dependencies

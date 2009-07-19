@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.187 2009/07/04 23:54:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.188 2009/07/05 00:09:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1694,6 +1694,11 @@ init_terminal()
 	    && env_term != (char *) NULL && strcmp(env_term, "sun") == 0)
 	    term_name = "sun";
 #endif /* SUN */
+
+#ifdef QTTERM
+	if (term_name == (char *) NULL)
+		term_name = "qt";
+#endif
 
 #ifdef WXWIDGETS
 	if (term_name == (char *) NULL)
