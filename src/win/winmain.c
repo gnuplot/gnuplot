@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.25 2008/10/10 22:23:20 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.26 2008/11/07 11:55:46 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -269,7 +269,7 @@ int main(int argc, char **argv)
 #ifdef WGP_CONSOLE
 # define _argv argv
 # define _argc argc
-	HINSTANCE hInstance = NULL, hPrevInstance = NULL;
+	HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
 	int nCmdShow = 0;
 #else	 
 #ifdef __MSC__  /* MSC doesn't give us _argc and _argv[] so ...   */
