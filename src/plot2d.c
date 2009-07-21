@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.15 2008/10/12 17:59:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.16 2009/02/05 17:17:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -970,6 +970,12 @@ store2d_point(
         STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, width, dummy_type, current_plot->z_axis, NOOP, cp->z = -VERYLARGE);
     else
         cp->z = width;
+
+    /* If we have variable color corresponding to a z-axis value, use it to autoscale */
+    if (current_plot->lp_properties.pm3d_color.type == TC_Z)
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, cp->z, dummy_type, COLOR_AXIS, 
+					NOOP, NOOP);
+
 }                               /* store2d_point */
 
 #ifdef EAM_HISTOGRAMS
