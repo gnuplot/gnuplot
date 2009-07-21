@@ -5,6 +5,8 @@
 	fails if graphwin.hInstance equals NULL.
 	Patch #1627936
 
+2009-07-20  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/plot2d.c (store2d_point):  If the plot uses palette colors taken
 	from the Z coordinate, then also use Z to auto-scale cbrange.
 	Bug #2133407
