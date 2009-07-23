@@ -1,3 +1,10 @@
+2009-07-23  James R. Van Zandt  <jrvz@comcast.net>
+
+	* src/mouse.c (event_buttonpress): Reimplement pan and zoom with
+	mouse wheel to use axis_array[].min and .max directly, without
+	using the mouse position.  Extend pan and zoom to 3D plots.  Add
+	documentation and help printout.
+
 2009-07-20  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* src/win/winmain.c: enable load of the correct .ico symbol for the
@@ -11,7 +18,7 @@
 	from the Z coordinate, then also use Z to auto-scale cbrange.
 	Bug #2133407
 
-2009-07-19  Jérôme Lodewyck <lodewyck@users.sourceforge.net>	
+2009-07-19  JÃ©rÃ´me Lodewyck <lodewyck@users.sourceforge.net>	
 
 	Add a Qt terminal, which can either act as a standalone interactive
 	terminal window or be embedded in an external Qt application.
@@ -635,7 +642,7 @@
 	* term/canvas.trm: Add support for enhanced text mode.
 
 	* term/js/canvasmath.js:
-	Resize glyphs for - + / ×  so that they are all width 20 (same as 0-9).
+	Resize glyphs for - + / Ã  so that they are all width 20 (same as 0-9).
 	Resize glyph = to width 24 (same as < > ~).
 
 2009-02-22  Benjamin Lindner  <lindnerb@users.sourceforge.net>

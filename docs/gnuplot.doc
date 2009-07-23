@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.572 2009/06/06 18:28:43 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.573 2009/06/07 18:59:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8351,11 +8351,22 @@ Ffigure_mapcontours
  2d-graph mode works for 2d graphs and for maps (i.e. splots with `set view`
  having z-rotation 0, 90, 180, 270 or 360 degrees, including `set view map`)
  and it allows tracing the position over graph, zooming, annotating graph etc.
+
  For 3d graphs `splot`, the view and scaling of the graph can be changed with
- mouse buttons 1 and 2. If additionally to these buttons the modifier <ctrl> is
- hold down, the coordinate system only is rotated which is useful for large
- data sets. A vertical motion of Button 2 with the shift key hold down changes
- the `ticslevel`.
+ mouse buttons 1 and 2, respectively. A vertical motion of Button 2 with the
+ shift key held down changes the `ticslevel`.  If additionally to these
+ buttons the modifier <ctrl> is held down, the coordinate axes are displayed
+ but the data are suppressed.  This is useful for large data sets.
+ 
+ X and Y axis scaling in both 2d and 3d graphs can be adjusted using the
+ mouse wheel.  <wheel-up> scrolls up (increases both YMIN and YMAX by ten
+ percent of the Y range, and increases both Y2MIN and Y2MAX likewise), and
+ <wheel down> scrolls down.  <shift-wheel-up> scrolls left (decreases both
+ XMIN and XMAX, and both X2MIN and X2MAX), and <shift-wheel-down> scrolls
+ right.  <control-wheel-up> zooms in toward the center of the plot, and
+ <control-wheel-down> zooms out.  <shift-control-wheel-up> zooms in along the
+ X and X2 axes only, and <shift-control-wheel-down> zooms out along the X and
+ X2 axes only.
 
  Mousing is not available in multiplot mode. When multiplot is finished using
  `unset multiplot`, then the mouse will be turned on again and acts on the
