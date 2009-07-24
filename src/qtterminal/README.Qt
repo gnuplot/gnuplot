@@ -16,9 +16,7 @@ QApplication in a separate process and communicates with it through a QLocalSock
 Known issues
 ============
 
-- the size term option is not working
-- problems with Symbol -> utf8 conversion
-- export to EPS not working
+- export to EPS
 - image clipping not implemented
 - Multiplots are reported to be slow
 - wxt/Qt incompatible

@@ -49,6 +49,8 @@
 #include <QtCore>
 #include <QtGui>
 
+class QtGnuplotWidget;
+
 class GnuplotWidget : public QWidget
 {
 Q_OBJECT
@@ -58,12 +60,14 @@ public:
 
 public slots:
 	void tick();
+	void plot();
 	void statusText(const QString& status);
 
 private:
 	QtGnuplotInstance gp;
 	QTimer timer;
 	double phi;
+	QtGnuplotWidget* widgets[4];
 };
 
 #endif

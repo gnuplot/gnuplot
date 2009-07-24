@@ -75,7 +75,8 @@ private:
 	void updateRuler(const QPoint& point);
 	void flushCurrentPolygon();
 	QPolygonF& clipPolygon(QPolygonF& polygon, bool checkDiag = true) const;
-	QPointF& clipPoint(QPointF& point) const;
+	QPointF&   clipPoint(QPointF& point) const;
+	QRectF&    clipRect(QRectF& point) const;
 	double sceneToGraph(int axis, double coord) const;
 
 private:

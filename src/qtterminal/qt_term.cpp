@@ -252,8 +252,10 @@ void qt_init()
 	GP_ATEXIT(qt_atexit);
 
 	// The creation of a QApplication mangled our locale settings
+#ifdef HAVE_LOCALE_H
 	setlocale(LC_NUMERIC, "C");
 	setlocale(LC_TIME, current_locale);
+#endif
 }
 
 // Called just before a plot is going to be displayed.
@@ -435,15 +437,11 @@ void qt_linetype(int lt)
 		lt = LT_NODRAW; // background color
 
 	if (lt == -1)
-	{
-		qt_out << GEPenColor << QColor(Qt::gray);
 		qt_out << GEPenStyle << Qt::DashLine;
-	}
 	else
-	{
-		qt_out << GEPenColor << qt_colorList[lt % 9 + 3];
 		qt_out << GEPenStyle << Qt::SolidLine;
-	}
+
+	qt_out << GEPenColor << qt_colorList[lt % 9 + 3];
 }
 
 int qt_set_font (const char* font)

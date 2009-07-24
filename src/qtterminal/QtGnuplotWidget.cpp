@@ -56,7 +56,7 @@ QtGnuplotWidget::QtGnuplotWidget(int id, QtGnuplotEventHandler* eventHandler, QW
 {
 	m_id = id;
 	m_active = false;
-	m_resizeToken = false;
+	m_lastSizeRequest = QSize(-1, -1);
 	m_eventHandler = eventHandler;
 	// Register as the main event receiver if not already created
 	if (m_eventHandler == 0)
@@ -88,6 +88,11 @@ bool QtGnuplotWidget::isActive() const
 	return m_active;
 }
 
+QSize QtGnuplotWidget::plotAreaSize() const
+{
+	return m_view->viewport()->size();
+}
+
 void QtGnuplotWidget::setViewMatrix()
 {
 	m_view->resetMatrix();
@@ -99,32 +104,19 @@ void QtGnuplotWidget::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		QSize s;
 		in >> s;
-//		qDebug() << "1 Size request" << s << "W" << size() << "V" << m_view->size() << "P" << m_view->maximumViewportSize();
+//		qDebug() << "Size request" << s << " / viewport" << m_view->maximumViewportSize();
 		m_lastSizeRequest = s;
-		m_resizeToken = false;
-		m_view->resize((s));// + m_view->size() - m_view->maximumViewportSize()));
-//		qDebug() << "2 Size request" << s << "W" << size() << "V" << m_view->size() << "P" << m_view->maximumViewportSize();
-//		resize(m_view->size());
-//		qDebug() << "3 Size request" << s << "W" << size() << "V" << m_view->size() << "P" << m_view->maximumViewportSize();
-		setViewMatrix();
-		adjustSize();
-//		setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+		m_view->resetMatrix();
+		QWidget* viewport = m_view->viewport();
 
-/*		if (oldSize.width() < sizeHint().width() || oldSize.height() < sizeHint().height())
+		if (s != viewport->size())
 		{
-			setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-			updateGeometry();
+//			qDebug() << " -> resizing";
+			QMainWindow* parent = dynamic_cast<QMainWindow*>(parentWidget());
+			if (parent)
+				parent->resize(s + parent->size() - viewport->size());
+			viewport->resize(s);
 		}
-		else
-		{
-			setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-			updateGeometry();
-		}*/
-		//setFixedSize(m_view->size());
-//		updateGeometry();
-//		qDebug() << "4 Size request" << s << "W" << size() << "V" << m_view->size() << "P" << m_view->maximumViewportSize();
-		layout()->update();
-//		qDebug() << "5 Size request" << s << "W" << size() << "V" << m_view->size() << "P" << m_view->maximumViewportSize();
 	}
 	else if (type == GEStatusText)
 	{
@@ -158,33 +150,23 @@ void QtGnuplotWidget::processEvent(QtGnuplotEventType type, QDataStream& in)
 		m_scene->processEvent(type, in);
 }
 
-QSize QtGnuplotWidget::sizeHint() const
-{
-//	qDebug() << "SizeHint" <<  m_view->size() << size();
-	return m_view->size();
-}
-
 void QtGnuplotWidget::resizeEvent(QResizeEvent* event)
 {
-//	qDebug() << "Resize" << sizePolicy().verticalPolicy() << event->size() << event->oldSize();
-//	qDebug() << "1 Resize" << "W" << size() << "V" << m_view->size() << "P" << m_view->maximumViewportSize();
-	if (m_resizeToken && (size() != m_lastSizeRequest))
+	QWidget* viewport = m_view->viewport();
+//	qDebug() << "QtGnuplotWidget::resizeEvent" << "W" << size() << "V" << m_view->size() << "P" << viewport->size();
+
+	// We only inform gnuplot of a new size, and not of the first resize event
+	if ((viewport->size() != m_lastSizeRequest) && (m_lastSizeRequest != QSize(-1, -1)))
 	{
-//		qDebug() << "2 Resize" << "W" << size() << "V" << m_view->size() << "P" << m_view->maximumViewportSize();
-//		qDebug() << "Send size request";
-		m_eventHandler->postTermEvent(GE_fontprops, m_view->size().width(),
-		                               m_view->size().height(), 9, 9, 0); /// @todo m_id
-		m_view->fitInView(m_scene->sceneRect(), Qt::KeepAspectRatio);
-	//	m_eventHandler->postTermEvent(GE_keypress, 0, 0, 'e', 0, 0); // ask for replot ?
-//		qDebug() << "3 Resize" << "W" << size() << "V" << m_view->size() << "P" << m_view->maximumViewportSize();
-//		QMainWindow* parent = dynamic_cast<QMainWindow*>(parentWidget());
-//		if (parent)
-//			parent->adjustSize();
+		m_eventHandler->postTermEvent(GE_fontprops,viewport->size().width(),
+		                               viewport->size().height(), 9, 9, 0); /// @todo m_id
+		if (m_replotOnResize)
+			m_eventHandler->postTermEvent(GE_keypress, 0, 0, 'e', 0, 0); // ask for replot
+		else
+			m_view->fitInView(m_scene->sceneRect(), Qt::KeepAspectRatio);
 	}
 
-	m_resizeToken = true;
 	QWidget::resizeEvent(event);
-//	qDebug() << "4 Resize" << "W" << size() << "V" << m_view->size() << "P" << m_view->maximumViewportSize();
 }
 
 /////////////////////////////////////////////////
@@ -236,6 +218,7 @@ void QtGnuplotWidget::exportToPdf()
 
 void QtGnuplotWidget::exportToEps()
 {
+	/// @todo
 }
 
 void QtGnuplotWidget::exportToImage()
@@ -275,7 +258,8 @@ void QtGnuplotWidget::loadSettings()
 {
 	QSettings settings("gnuplot", "qtterminal");
 	m_antialias = settings.value("view/antialias", true).toBool();
-	m_backgroundColor = settings.value("view/backgroundColor", Qt::red).value<QColor>();
+	m_backgroundColor = settings.value("view/backgroundColor", Qt::white).value<QColor>();
+	m_replotOnResize = settings.value("view/replotOnResize", true).toBool();
 	applySettings();
 }
 
@@ -290,6 +274,7 @@ void QtGnuplotWidget::saveSettings()
 	QSettings settings("gnuplot", "qtterminal");
 	settings.setValue("view/antialias", m_antialias);
 	settings.setValue("view/backgroundColor", m_backgroundColor);
+	settings.setValue("view/replotOnResize", m_replotOnResize);
 }
 
 #include "ui_QtGnuplotSettings.h"
@@ -300,6 +285,7 @@ void QtGnuplotWidget::showSettingsDialog()
 	m_ui = new Ui_settingsDialog();
 	m_ui->setupUi(settingsDialog);
 	m_ui->antialiasCheckBox->setCheckState(m_antialias ? Qt::Checked : Qt::Unchecked);
+	m_ui->replotOnResizeCheckBox->setCheckState(m_replotOnResize ? Qt::Checked : Qt::Unchecked);
 	QPixmap samplePixmap(m_ui->sampleColorLabel->size());
 	samplePixmap.fill(m_backgroundColor);
 	m_ui->sampleColorLabel->setPixmap(samplePixmap);
@@ -309,8 +295,9 @@ void QtGnuplotWidget::showSettingsDialog()
 
 	if (settingsDialog->result() == QDialog::Accepted)
 	{
-		m_antialias = (m_ui->antialiasCheckBox->checkState() == Qt::Checked);
 		m_backgroundColor = m_chosenBackgroundColor;
+		m_antialias = (m_ui->antialiasCheckBox->checkState() == Qt::Checked);
+		m_replotOnResize = (m_ui->replotOnResizeCheckBox->checkState() == Qt::Checked);
 		applySettings();
 		saveSettings();
 	}

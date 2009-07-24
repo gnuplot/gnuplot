@@ -58,6 +58,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QCheckBox" name="replotOnResizeCheckBox">
+       <property name="text">
+        <string>Replot on resize</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

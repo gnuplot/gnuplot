@@ -90,7 +90,7 @@ QtGnuplotWindow::QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler, QW
 	exportMenu->addAction(copyToClipboardAction);
 	exportMenu->addAction(printAction);
 	exportMenu->addAction(exportPdfAction);
-	exportMenu->addAction(exportEpsAction);
+//	exportMenu->addAction(exportEpsAction);
 	exportMenu->addAction(exportSvgAction);
 	exportMenu->addAction(exportPngAction);
 	exportAction->setMenu(exportMenu);

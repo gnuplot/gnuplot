@@ -50,7 +50,6 @@ GnuplotWidget::GnuplotWidget()
 	: QWidget()
 {
 	QGridLayout* layout = new QGridLayout(this);
-	QtGnuplotWidget* widgets[4];
 	for (int i = 0; i < 4; i++)
 	{
 		widgets[i] = new QtGnuplotWidget();
@@ -60,7 +59,10 @@ GnuplotWidget::GnuplotWidget()
 	}
 
 	setLayout(layout);
+}
 
+void GnuplotWidget::plot()
+{
 	gp.setWidget(widgets[0]);
 	gp << "plot x w l lt 3\n";
 
@@ -101,6 +103,7 @@ int main(int argc, char* argv[])
 	mainWindow->setCentralWidget(widget);
 	mainWindow->statusBar()->showMessage("Qt Gnuplot widgets embedding example");
 	mainWindow->show();
+	widget->plot();
 	app.exec();
 
 	return 0;

@@ -62,12 +62,12 @@ public:
 public:
 	bool isActive() const;
 	void setStatusText(const QString& status);
+	QSize plotAreaSize() const;
 
 signals:
 	void statusTextChanged(const QString& status);
 
 public:
-	QSize sizeHint() const;
 	void processEvent(QtGnuplotEventType type, QDataStream& in);
 
 public slots:
@@ -96,8 +96,6 @@ private:
 	bool m_active;
 	QtGnuplotScene* m_scene;
 	QGraphicsView* m_view;
-	bool m_resizeToken;
-//	QSize m_sizeHint;
 	QSize m_lastSizeRequest;
 
 	static int m_widgetUid;
@@ -107,6 +105,7 @@ private:
 	QColor m_backgroundColor;
 	QColor m_chosenBackgroundColor;
 	bool m_antialias;
+	bool m_replotOnResize;
 };
 
 #endif // QTGNUPLOTWIDGET_H

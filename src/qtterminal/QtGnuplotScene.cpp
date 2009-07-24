@@ -95,6 +95,16 @@ QPointF& QtGnuplotScene::clipPoint(QPointF& point) const
 	return point;
 }
 
+QRectF& QtGnuplotScene::clipRect(QRectF& rect) const
+{
+	rect.setTop   (round(rect.top   () + 0.5) - 0.5);
+	rect.setBottom(round(rect.bottom() + 0.5) - 0.5);
+	rect.setLeft  (round(rect.left  () + 0.5) - 0.5);
+	rect.setRight (round(rect.right () + 0.5) - 0.5);
+
+	return rect;
+}
+
 // A succession of move and vector is gathered in a single polygon
 // to make drawing faster
 void QtGnuplotScene::flushCurrentPolygon()
@@ -265,7 +275,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			m_zoomStopText->setVisible(true);
 			m_zoomStopText->setPlainText(text); /// @todo font
 			m_zoomStopText->setPos(m_lastMousePos);
-			m_zoomRect->setRect(QRectF(m_zoomBoxCorner, m_lastMousePos));
+			m_zoomRect->setRect(QRectF(m_zoomBoxCorner + QPointF(0.5, 0.5), m_lastMousePos + QPointF(0.5, 0.5)));
 		}
 	}
 	else if (type == GELineTo)

@@ -45,7 +45,7 @@ static QColor qt_colorList[12] =
 {
 	Qt::white,
 	Qt::black,
-	Qt::black,
+	Qt::gray,
 	Qt::red,
 	Qt::green,
 	Qt::blue,
