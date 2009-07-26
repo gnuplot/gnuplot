@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.84 2008/06/23 17:54:26 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.85 2008/12/27 04:03:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -566,6 +566,7 @@ draw_color_smooth_box(int plot_mode)
 	    struct position default_size = {graph,graph,graph, 0.05, 1.0, 0};
 	    double xtemp, ytemp;
 	    map_position(&default_origin, &color_box.bounds.xleft, &color_box.bounds.ybot, "cbox");
+	    color_box.bounds.xleft += color_box.xoffset;
 	    map_position_r(&default_size, &xtemp, &ytemp, "cbox");
 	    color_box.bounds.xright = xtemp + color_box.bounds.xleft;
 	    color_box.bounds.ytop = ytemp + color_box.bounds.ybot;

@@ -1,3 +1,16 @@
+2009-07-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c (draw_color_smooth_box) src/gadgets.h src/gadgets.c
+	src/graphics.c (boundary):  Add a field color_box.xoffset to allow the
+	colorbox to be shifted left or right from the default placement.
+	Use this internally to correct for the width taken by y2 tics and
+	labels.
+	Bugfix:  'set y2tics; plot foo using 1:2:3 axes x1y2 lc palette'
+	
+2009-07-24  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+
+	* qtterminal/qt_term.cpp: use locale config macros
+
 2009-07-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (store2d_point):  If the plot uses palette colors taken
