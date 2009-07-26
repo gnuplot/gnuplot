@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.307 2009/07/05 07:11:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.308 2009/07/17 04:25:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -914,15 +914,17 @@ boundary(struct curve_points *plots, int count)
     /* Make room for the color box if needed. */
     if (rmargin.scalex != screen) {
 	if (is_plot_with_colorbox()) {
-#define COLORBOX_SCALE 0.125
+#define COLORBOX_SCALE 0.100
 #define WIDEST_COLORBOX_TICTEXT 3
 	    if ((color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
 		plot_bounds.xright -= (int) (plot_bounds.xright-plot_bounds.xleft)*COLORBOX_SCALE;
 		plot_bounds.xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
 	    }
+	    color_box.xoffset = 0;
 	}
 
 	if (rmargin.x < 0) {
+	    color_box.xoffset = plot_bounds.xright;
 	    plot_bounds.xright -= y2tic_width + y2tic_textwidth;
 	    if (y2label_textwidth > 0)
 		plot_bounds.xright -= y2label_textwidth;
@@ -931,6 +933,7 @@ boundary(struct curve_points *plots, int count)
 		/* make room for end of xtic or x2tic label */
 		plot_bounds.xright -= (int) (t->h_char * 2);
 	    }
+	    color_box.xoffset -= plot_bounds.xright;
 	    /* EAM 2009 - protruding xtic labels */
 	    if (term->xmax - plot_bounds.xright < xtic_textwidth)
 		plot_bounds.xright = term->xmax - xtic_textwidth;
