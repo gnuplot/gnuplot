@@ -6,7 +6,12 @@
 	Use this internally to correct for the width taken by y2 tics and
 	labels.
 	Bugfix:  'set y2tics; plot foo using 1:2:3 axes x1y2 lc palette'
-	
+
+	* src/graphics.c (do_polygon):  Change the clipping rules for polygons
+	to match those of rectangles.  A polygon is clipped only if all of its
+	vertices are specified in plot coordinates (i.e. not screen or graph
+	coordinates.
+
 2009-07-24  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
 
 	* qtterminal/qt_term.cpp: use locale config macros
