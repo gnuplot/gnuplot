@@ -13,6 +13,14 @@ The Gnuplot Qt terminal comprises the following components:
 qt_term.cpp defines the interface between Gnuplot and the GUI. It starts the
 QApplication in a separate process and communicates with it through a QLocalSocket
 
+Translation howto
+=================
+
+1/ Edit QtGnuplot.pro and add a TRANSLATION entry corresponding to your language
+2/ run 'lupdate QtGnuplot.pro'. This will generate a .ts file in the po directory
+3/ run linguist to edit the .ts file
+4/ add an entry for a qm file in src/Makefile.am, section TRANSLATIONS
+
 Known issues
 ============
 

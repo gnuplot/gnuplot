@@ -238,6 +238,18 @@ void qt_init()
 	{
 		signal(SIGINT, SIG_IGN); // Do not listen to SIGINT signals anymore
 		QtGnuplotApplication application(argc, (char**)( NULL));
+
+		// Load translations for the qt library
+		QTranslator qtTranslator;
+		qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+		application.installTranslator(&qtTranslator);
+
+		// Load translations for the qt terminal
+		QTranslator translator;
+		translator.load("qtgnuplot_" + QLocale::system().name(), QTGNUPLOT_DATA_DIR);
+		application.installTranslator(&translator);
+
+		// Start
 		application.exec();
 		exit(0);
 	}

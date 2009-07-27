@@ -158,5 +158,3 @@ void QtGnuplotEventReceiver::swallowEvent(QtGnuplotEventType type, QDataStream& 
 	else if (type == GEDesactivate)      ;               // 1037
 	else qDebug() << "Event not swallowed !" << type;
 }
-
-#include "moc_QtGnuplotEvent.cpp"

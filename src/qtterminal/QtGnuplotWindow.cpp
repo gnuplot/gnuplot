@@ -137,5 +137,3 @@ void QtGnuplotWindow::processEvent(QtGnuplotEventType type, QDataStream& in)
 	else
 		m_widget->processEvent(type, in);
 }
-
-#include "moc_QtGnuplotWindow.cpp"

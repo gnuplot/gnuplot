@@ -95,9 +95,10 @@ endif
 
 if BUILD_QT
 
+
 # Call the moc preprocessor
 moc_%.cpp : qtterminal/%.h
-	moc -i -o $@ $<
+	moc -o $@ $<
 
 # Call the Qt resource compiler
 qrc_%.cpp: qtterminal/%.qrc
@@ -107,29 +108,41 @@ qrc_%.cpp: qtterminal/%.qrc
 ui_%.h: qtterminal/%.ui
 	uic -o $@ $<
 
+# Generate translation files
+%.qm: qtterminal/po/%.ts
+	lrelease $< -qm $@
+
+# List of compiles translation files
+TRANSLATIONS = qtgnuplot_fr.qm
+
+# Install translation files
+qtgnuplotdir = $(pkgdatadir)/$(VERSION_MAJOR)/qt
+qtgnuplot_DATA = $(TRANSLATIONS)
+AM_CPPFLAGS += -DQTGNUPLOT_DATA_DIR=\"$(qtgnuplotdir)\"
+
 # Clean moc & qrc files
 clean-qt-extra:
-	rm -vf moc_*.cpp qrc_*.cpp qrc_*.o ui_*.h
+	rm -vf moc_*.cpp qrc_*.cpp qrc_*.o ui_*.h qtgnuplot*.qm
 
 clean-am: clean-qt-extra
 
 # Qt terminal sources
-$(gnuplot_OBJECTS) : moc_QtGnuplotWindow.cpp moc_QtGnuplotApplication.cpp \
-                     moc_QtGnuplotWidget.cpp moc_QtGnuplotScene.cpp \
-                     moc_QtGnuplotEvent.cpp  moc_QtGnuplotInstance.cpp \
-                     ui_QtGnuplotSettings.h
+nodist_gnuplot_SOURCES = moc_QtGnuplotWindow.cpp moc_QtGnuplotApplication.cpp \
+                         moc_QtGnuplotWidget.cpp moc_QtGnuplotScene.cpp \
+                         moc_QtGnuplotEvent.cpp qrc_QtGnuplotResource.cpp
+
+$(gnuplot_OBJECTS) : ui_QtGnuplotSettings.h $(TRANSLATIONS)
 
 gnuplot_SOURCES += qtterminal/qt_term.cpp qtterminal/QtGnuplotWindow.cpp \
 qtterminal/QtGnuplotApplication.cpp qtterminal/QtGnuplotWidget.cpp \
 qtterminal/QtGnuplotScene.cpp qtterminal/QtGnuplotItems.cpp \
-qtterminal/QtGnuplotEvent.cpp \
-qrc_QtGnuplotResource.cpp
+qtterminal/QtGnuplotEvent.cpp
 
 # embed example (uncomment to build it)
 
 # bin_PROGRAMS += embed_example
 #
-# $(embed_example_OBJECTS) : moc_embed_example.cpp
+# nodist_embed_example_SOURCES = moc_embed_example.cpp moc_QtGnuplotInstance.cpp
 #
 # embed_example_SOURCES = qtterminal/embed_example.cpp \
 # qtterminal/QtGnuplotWidget.cpp qtterminal/QtGnuplotEvent.cpp \

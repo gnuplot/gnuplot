@@ -589,6 +589,3 @@ double QtGnuplotScene::sceneToGraph(int axis, double coord) const
 
 	return result;
 }
-
-
-#include "moc_QtGnuplotScene.cpp"

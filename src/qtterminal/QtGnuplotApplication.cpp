@@ -100,5 +100,3 @@ void QtGnuplotApplication::processEvent(QtGnuplotEventType type, QDataStream& in
 	else
 		swallowEvent(type, in);
 }
-
-#include "moc_QtGnuplotApplication.cpp"

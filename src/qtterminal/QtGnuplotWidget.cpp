@@ -310,5 +310,3 @@ void QtGnuplotWidget::settingsSelectBackgroundColor()
 	samplePixmap.fill(m_chosenBackgroundColor);
 	m_ui->sampleColorLabel->setPixmap(samplePixmap);
 }
-
-#include "moc_QtGnuplotWidget.cpp"

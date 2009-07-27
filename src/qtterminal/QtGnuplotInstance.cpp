@@ -119,5 +119,3 @@ QtGnuplotInstance& operator<<(QtGnuplotInstance& instance, const QVector<QPointF
 
 	return instance;
 }
-
-#include "moc_QtGnuplotInstance.cpp"
