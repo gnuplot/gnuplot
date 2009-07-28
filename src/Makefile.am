@@ -141,15 +141,16 @@ qtterminal/QtGnuplotEvent.cpp
 # embed example (uncomment to build it)
 
 # bin_PROGRAMS += embed_example
-#
-# nodist_embed_example_SOURCES = moc_embed_example.cpp moc_QtGnuplotInstance.cpp
-#
+# 
+# nodist_embed_example_SOURCES = moc_embed_example.cpp moc_QtGnuplotInstance.cpp \
+#                          moc_QtGnuplotWidget.cpp moc_QtGnuplotScene.cpp \
+#                          moc_QtGnuplotEvent.cpp qrc_QtGnuplotResource.cpp
+# 
 # embed_example_SOURCES = qtterminal/embed_example.cpp \
 # qtterminal/QtGnuplotWidget.cpp qtterminal/QtGnuplotEvent.cpp \
 # qtterminal/QtGnuplotScene.cpp qtterminal/QtGnuplotItems.cpp \
-# qtterminal/QtGnuplotInstance.cpp \
-# qrc_QtGnuplotResource.cpp
-#
+# qtterminal/QtGnuplotInstance.cpp
+# 
 # embed_example_LDADD = $(QT_LIBS)
 
 endif # build_qt

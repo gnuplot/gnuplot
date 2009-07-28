@@ -645,14 +645,32 @@ int qt_waitforinput(void)
 		if (FD_ISSET(socket_fd, &read_fds))
 		{
 			qt_socket.waitForReadyRead(-1);
+			// Temporary event for mouse move events. If several consecutive move events
+			// are received, only transmit the last one.
+			gp_event_t tempEvent;
+			tempEvent.type = -1;
 			while (qt_socket.bytesAvailable() >= sizeof(gp_event_t))
 			{
 				struct gp_event_t event;
 				qt_socket.read((char*) &event, sizeof(gp_event_t));
-				/// @todo don't process mouse move events if others are in the queue
-				if (qt_processTermEvent(&event))
-					return '\0'; // exit from paused_for_mouse
+				// Delay move events
+				if (event.type == GE_motion)
+					tempEvent = event;
+				// Other events. Replay the last move event if present
+				else
+				{
+					if (tempEvent.type == GE_motion)
+					{
+						qt_processTermEvent(&tempEvent);
+						tempEvent.type = -1;
+					}
+					if (qt_processTermEvent(&event))
+						return '\0'; // exit from paused_for_mouse
+				}
 			}
+			// Replay move event
+			if (tempEvent.type == GE_motion)
+				qt_processTermEvent(&tempEvent);
 		}
 	} while (paused_for_mouse || (!paused_for_mouse && !FD_ISSET(stdin_fd, &read_fds)));
 #endif

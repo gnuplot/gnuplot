@@ -1,4 +1,4 @@
-/* GNUPLOT - QtGnuplotEvent.h */
+/* GNUPLOT - QtGnuplotEvent.cpp */
 
 /*[
  * Copyright 2009   Jérôme Lodewyck

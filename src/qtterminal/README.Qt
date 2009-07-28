@@ -28,4 +28,3 @@ Known issues
 - image clipping not implemented
 - Multiplots are reported to be slow
 - wxt/Qt incompatible
-- Mousing cleverness : only make the last redraw
