@@ -1,11 +1,16 @@
+2009-07-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii): Handle xticlabels() in the case of
+	histograms with errorbars.  Bugfix
+
 2009-07-28  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
 
-	* qtterminal/po/qtgnuplot_ja.ts: Japanese translation. Closes patch 2828290
+	* qtterminal/po/qtgnuplot_ja.ts: Japanese translation. patch 2828290
 
 2009-07-28  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
 
-	* qtterminal/qt_term.cpp: When consecutive motion events are received, only
-	process the last one.
+	* qtterminal/qt_term.cpp: When consecutive motion events are received,
+	only process the last one.
 	* src/Makefile.am: Fix make rules for embed_example
 
 2009-07-27  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
@@ -25,7 +30,7 @@
 	* src/graphics.c (do_polygon):  Change the clipping rules for polygons
 	to match those of rectangles.  A polygon is clipped only if all of its
 	vertices are specified in plot coordinates (i.e. not screen or graph
-	coordinates.
+	coordinates).
 
 2009-07-24  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
 

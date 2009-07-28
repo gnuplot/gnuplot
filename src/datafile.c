@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.171 2009/03/26 00:49:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172 2009/04/13 03:07:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1747,7 +1747,7 @@ df_readascii(double v[], int max)
 
 		    if (df_current_plot
 			&& df_current_plot->plot_style == HISTOGRAMS) {
-			if (output == 2) /* Can only happen for HT_ERRORBARS */
+			if (output > 1) /* Can only happen for HT_ERRORBARS */
 			    xpos = (axcol == 0) ? df_datum : v[axcol-1];
 			xpos += df_current_plot->histogram->start;
 		    }
