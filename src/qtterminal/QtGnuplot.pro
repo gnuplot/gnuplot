@@ -4,4 +4,5 @@
 
 SOURCES      = QtGnuplotWidget.cpp QtGnuplotWindow.cpp
 FORMS        = QtGnuplotSettings.ui
-TRANSLATIONS = po/qtgnuplot_fr.ts
+TRANSLATIONS = po/qtgnuplot_fr.ts \
+               po/qtgnuplot_ja.ts

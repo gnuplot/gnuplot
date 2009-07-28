@@ -113,7 +113,7 @@ ui_%.h: qtterminal/%.ui
 	lrelease $< -qm $@
 
 # List of compiles translation files
-TRANSLATIONS = qtgnuplot_fr.qm
+TRANSLATIONS = qtgnuplot_fr.qm qtgnuplot_ja.qm
 
 # Install translation files
 qtgnuplotdir = $(pkgdatadir)/$(VERSION_MAJOR)/qt
