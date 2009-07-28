@@ -1,3 +1,8 @@
+2009-07-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii): Handle xticlabels() in the case of
+	histograms with errorbars.  Bugfix
+
 2009-07-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (draw_color_smooth_box) src/gadgets.h src/gadgets.c
