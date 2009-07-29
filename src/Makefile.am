@@ -95,10 +95,9 @@ endif
 
 if BUILD_QT
 
-
 # Call the moc preprocessor
 moc_%.cpp : qtterminal/%.h
-	moc -o $@ $<
+	$(MOC) -o $@ $<
 
 # Call the Qt resource compiler
 qrc_%.cpp: qtterminal/%.qrc
@@ -106,11 +105,13 @@ qrc_%.cpp: qtterminal/%.qrc
 
 # Call the Qt ui compiler
 ui_%.h: qtterminal/%.ui
-	uic -o $@ $<
+	$(UIC) -o $@ $<
+
+if HAVE_LRELEASE
 
 # Generate translation files
 %.qm: qtterminal/po/%.ts
-	lrelease $< -qm $@
+	$(LRELEASE) $< -qm $@
 
 # List of compiles translation files
 TRANSLATIONS = qtgnuplot_fr.qm qtgnuplot_ja.qm
@@ -119,6 +120,8 @@ TRANSLATIONS = qtgnuplot_fr.qm qtgnuplot_ja.qm
 qtgnuplotdir = $(pkgdatadir)/$(VERSION_MAJOR)/qt
 qtgnuplot_DATA = $(TRANSLATIONS)
 AM_CPPFLAGS += -DQTGNUPLOT_DATA_DIR=\"$(qtgnuplotdir)\"
+
+endif # HAVE_LRELEASE
 
 # Clean moc & qrc files
 clean-qt-extra:
@@ -131,7 +134,7 @@ nodist_gnuplot_SOURCES = moc_QtGnuplotWindow.cpp moc_QtGnuplotApplication.cpp \
                          moc_QtGnuplotWidget.cpp moc_QtGnuplotScene.cpp \
                          moc_QtGnuplotEvent.cpp qrc_QtGnuplotResource.cpp
 
-$(gnuplot_OBJECTS) : ui_QtGnuplotSettings.h $(TRANSLATIONS)
+$(gnuplot_OBJECTS) : ui_QtGnuplotSettings.h
 
 gnuplot_SOURCES += qtterminal/qt_term.cpp qtterminal/QtGnuplotWindow.cpp \
 qtterminal/QtGnuplotApplication.cpp qtterminal/QtGnuplotWidget.cpp \
