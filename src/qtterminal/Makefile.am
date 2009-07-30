@@ -2,6 +2,9 @@
 AUTOMAKE_OPTIONS = foreign 1.2h
 
 # here are listed all the qtterminal files that go to the distribution
-EXTRA_DIST = qt_term.h qt_conversion.cpp QtGnuplotWindow.h \
+EXTRA_DIST = qt_term.h qt_conversion.cpp QtGnuplot.pro QtGnuplotWindow.h \
 QtGnuplotApplication.h QtGnuplotWidget.h QtGnuplotScene.h QtGnuplotEvent.h \
-QtGnuplotItems.h QtGnuplotSettings.ui QtGnuplotResource.qrc images/* po/*
+QtGnuplotItems.h QtGnuplotSettings.ui QtGnuplotResource.qrc \
+QtGnuplotInstance.cpp QtGnuplotInstance.h \
+README.Qt embed_example.cpp embed_example.h \
+images/* po/*
