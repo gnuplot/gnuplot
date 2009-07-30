@@ -7,4 +7,4 @@ QtGnuplotApplication.h QtGnuplotWidget.h QtGnuplotScene.h QtGnuplotEvent.h \
 QtGnuplotItems.h QtGnuplotSettings.ui QtGnuplotResource.qrc \
 QtGnuplotInstance.cpp QtGnuplotInstance.h \
 README.Qt embed_example.cpp embed_example.h \
-images/* po/*
+images po

@@ -4,7 +4,7 @@
 	To build with qt support use    ./configure --enable-qt
 
 	* src/qtterminal/Makefile.am: Add additional files to the list of
-	things to placed in the distribution package.
+	things to be placed in the distribution package.
 
 2009-07-30  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
 
