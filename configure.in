@@ -1020,8 +1020,10 @@ AC_ARG_ENABLE(backwards-compatibility,dnl
 dnl Qt terminal
 
 AC_ARG_ENABLE(qt,dnl
-[  --disable-qt      Qt terminal (default enabled)],,
-  [test -z "${enable_qt}" && enable_qt=yes])
+[  --enable-qt      Qt terminal (default disabled)],
+  [if test "$enableval" = yes; then
+     enable_qt = yes;
+   fi])
 
 if test "${enable_qt}" = yes ; then
   dnl variable used to determine if all checks pass
@@ -1054,10 +1056,11 @@ if test "${enable_qt_ok}" = yes ; then
   AC_SUBST(QT_LIBS)
   AC_DEFINE(QTTERM,1, [ Define if you want the Qt terminal. ])
 fi
+AM_CONDITIONAL(BUILD_QT, test "${enable_qt_ok}" = yes)
 
+dnl translation tools
 AC_CHECK_PROGS(LRELEASE, lrelease-qt4 lrelease, no)
 AM_CONDITIONAL(HAVE_LRELEASE, test "${LRELEASE}" != no)
-AM_CONDITIONAL(BUILD_QT, test "${enable_qt_ok}" = yes)
 
 
 dnl build lisp files

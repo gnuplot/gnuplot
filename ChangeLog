@@ -1,4 +1,10 @@
+2009-07-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: Change default state of qt terminal to disabled.
+	To build with qt support use    ./configure --enable-qt
+
 2009-07-30  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+
 	* configue.in: Fix a compile error when the Qt terminal is disabled.
 
 2009-07-29  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
