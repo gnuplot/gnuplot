@@ -143,6 +143,7 @@ void QtGnuplotEventReceiver::swallowEvent(QtGnuplotEventType type, QDataStream& 
 {
 	QString string;
 	int i;
+	bool b;
 
 	     if (type == GESetCurrentWindow) in >> i;        // 1000
 	else if (type == GEInitWindow)       ;               // 1001
@@ -151,10 +152,11 @@ void QtGnuplotEventReceiver::swallowEvent(QtGnuplotEventType type, QDataStream& 
 	else if (type == GEPersist)          ;               // 1004
 	else if (type == GEStatusText)       in >> string;   // 1005
 	else if (type == GETitle)            in >> string;   // 1006
-	else if (type == GECursor)           in >> i;        // 1008
-	else if (type == GEZoomStart)        in >> string;   // 1021
-	else if (type == GEZoomStop)         in >> string;   // 1022
-	else if (type == GERaise)            ;               // 1033
-	else if (type == GEDesactivate)      ;               // 1037
+	else if (type == GESetCtrl)          in >> b;        // 1007
+	else if (type == GECursor)           in >> i;        // 1009
+	else if (type == GEZoomStart)        in >> string;   // 1022
+	else if (type == GEZoomStop)         in >> string;   // 1023
+	else if (type == GERaise)            ;               // 1034
+	else if (type == GEDesactivate)      ;               // 1038
 	else qDebug() << "Event not swallowed !" << type;
 }

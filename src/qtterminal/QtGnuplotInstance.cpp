@@ -47,10 +47,10 @@
 #include <QtCore>
 #include <iostream>
 
-QtGnuplotInstance::QtGnuplotInstance(QtGnuplotWidget* widget)
+QtGnuplotInstance::QtGnuplotInstance(QtGnuplotWidget* widget, QString gnuplotPath)
 {
 	m_gnuplot.setProcessChannelMode(QProcess::MergedChannels);
-	m_gnuplot.start("./gnuplot");
+	m_gnuplot.start(gnuplotPath);
 	m_gnuplot.waitForStarted();
 	connect(&m_gnuplot, SIGNAL(readyReadStandardOutput()), this, SLOT(gnuplotDataReady()));
 

@@ -73,9 +73,9 @@ void qt_atexit();
 
 int  qt_optionWindowId = 0;
 bool qt_optionEnhanced = false;
-int  qt_optionPersist  = false;
-int  qt_optionRaise    = true;
-int  qt_optionCtrl     = false;
+bool qt_optionPersist  = false;
+bool qt_optionRaise    = true;
+bool qt_optionCtrl     = false;
 int  qt_optionWidth    = 640;
 int  qt_optionHeight   = 480;
 int  qt_optionFontSize = 9;
@@ -303,6 +303,7 @@ void qt_graphics()
 	qt_out << GEInitWindow;
 	qt_out << GEActivate;
 	qt_out << GETitle << qt_optionTitle;
+	qt_out << GESetCtrl << qt_optionCtrl;
 	qt_out << GESetWidgetSize << QSize(term->xmax, term->ymax)/qt_oversampling;
 	// Initialize the scene
 	qt_out << GESetSceneSize << QSize(term->xmax, term->ymax)/qt_oversampling;

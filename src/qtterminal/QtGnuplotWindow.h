@@ -59,6 +59,7 @@ public:
 	QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler = 0, QWidget* parent = 0);
 
 public:
+	virtual void keyPressEvent(QKeyEvent* event);
 	void processEvent(QtGnuplotEventType type, QDataStream& in);
 
 public slots:
@@ -69,6 +70,7 @@ private:
 	void createAction(const QString& name, int key, const QString& icon);
 
 private:
+	bool m_ctrl;
 	int m_id;
 	QToolBar* m_toolBar;
 	QtGnuplotWidget* m_widget;

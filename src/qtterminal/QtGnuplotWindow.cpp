@@ -50,6 +50,7 @@
 QtGnuplotWindow::QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler, QWidget* parent)
 	: QMainWindow(parent)
 {
+	m_ctrl = false;
 	m_eventHandler = eventHandler;
 	m_id = id;
 	setAttribute(Qt::WA_DeleteOnClose);
@@ -134,6 +135,16 @@ void QtGnuplotWindow::processEvent(QtGnuplotEventType type, QDataStream& in)
 	}
 	else if (type == GERaise)
 		raise();
+	else if (type == GESetCtrl)
+		in >> m_ctrl;
 	else
 		m_widget->processEvent(type, in);
+}
+
+void QtGnuplotWindow::keyPressEvent(QKeyEvent* event)
+{
+	if ((event->key() == 'Q') && ( !m_ctrl || (QApplication::keyboardModifiers() & Qt::ControlModifier) ))
+		close();
+
+	QMainWindow::keyPressEvent(event);
 }

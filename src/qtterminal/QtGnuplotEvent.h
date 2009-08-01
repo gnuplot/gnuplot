@@ -59,7 +59,7 @@ enum QtGnuplotEventType {
 // Events for QtGnuplotApplication
 GESetCurrentWindow = 1000, GEInitWindow, GECloseWindow, GEExit, GEPersist,
 // Events for QtGnuplotWindow
-GEStatusText, GETitle,
+GEStatusText, GETitle, GESetCtrl,
 // Events for QtGnuplotWidget
 GESetWidgetSize, GECursor,
 // Events for QtGnuplotScene

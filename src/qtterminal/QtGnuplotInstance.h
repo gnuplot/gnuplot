@@ -53,7 +53,7 @@ class QtGnuplotInstance : public QObject
 Q_OBJECT
 
 public:
-	QtGnuplotInstance(QtGnuplotWidget* widget = 0);
+	QtGnuplotInstance(QtGnuplotWidget* widget = 0, QString gnuplotPath = "gnuplot");
 	~QtGnuplotInstance();
 
 public:
