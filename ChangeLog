@@ -5,6 +5,12 @@
 	This is a modified version of patchset #2653943 contributed by
 	Hans (oe6jwf@users.sourceforge.net).
 
+	* src/axis.c src/axis.h src/color.c src/graphics.c src/graph3d.c:
+	Add an additional parameter to all tick_callback() routines. In the case
+	of auto-generated ticks, we use this to pass in a list of user-specified
+	labels in case one is supposed to replace the auto-generated label.
+	The actual label replacement is only implemented for 2D plots.
+
 2009-07-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readascii): Handle xticlabels() in the case of
