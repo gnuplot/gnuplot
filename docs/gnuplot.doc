@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.574 2009/07/24 01:35:55 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.575 2009/08/01 00:44:57 vanzandt Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2404,7 +2404,7 @@ C ... and restart the table:
  deactivation command (like `set xdata`), the quantity will be shown in its
  numerical form.
 
- The commands `set format` or `set tics format`	define the format that will be
+ The commands `set format` or `set tics format` define the format that will be
  used for tic labels, whether or not the specified axis is time/date.
 
  If time/date information is to be plotted from a file, the `using` option
@@ -11124,7 +11124,7 @@ Ffigure_mapcontours
  Syntax:
        set xyplane at <zvalue>
        set xyplane relative <frac>
-       set ticslevel <frac>	# equivalent to set xyplane relative
+       set ticslevel <frac>        # equivalent to set xyplane relative
        show xyplane
 
  The form `set xyplane relative <frac>` places the xy plane below the range in
