@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.309 2009/07/26 21:57:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.310 2009/07/27 01:14:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -151,8 +151,8 @@ static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * po
 static void boundary __PROTO((struct curve_points * plots, int count));
 
 /* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
-void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
-void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
+void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid, struct ticmark *userlabels));
+void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid, struct ticmark *userlabels));
 int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* ex, int* ey));
@@ -4792,7 +4792,8 @@ xtick2d_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
-    struct lp_style_type grid)	/* grid.l_type == LT_NODRAW means no grid */
+    struct lp_style_type grid,	/* grid.l_type == LT_NODRAW means no grid */
+    struct ticmark *userlabels)	/* User-specified tic labels */
 {
     struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
@@ -4800,6 +4801,17 @@ xtick2d_callback(
     int x = map_x(place);
 
     (void) axis;		/* avoid "unused parameter" warning */
+
+    /* Skip label if we've already written a user-specified one */
+#   define MINIMUM_SEPARATION 2
+    while (userlabels) {
+	int here = map_x(AXIS_LOG_VALUE(axis,userlabels->position));
+	if (abs(here-x) <= MINIMUM_SEPARATION) {
+	    text = NULL;
+	    break;
+	}
+	userlabels = userlabels->next;
+    }
 
     if (grid.l_type > LT_NODRAW) {
 	if (t->layer)
@@ -4887,14 +4899,25 @@ ytick2d_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
-    struct lp_style_type grid)	/* grid.l_type == LT_NODRAW means no grid */
+    struct lp_style_type grid,	/* grid.l_type == LT_NODRAW means no grid */
+    struct ticmark *userlabels)	/* User-specified tic labels */
 {
     struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
     int ticsize = tic_direction * (int) t->h_tic * (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale);
     int y = map_y(place);
 
-    (void) axis;		/* avoid "unused parameter" warning */
+    (void) axis;	/* avoid "unused parameter" warning */
+
+    /* Skip label if we've already written a user-specified one */
+    while (userlabels) {
+	int here = map_y(AXIS_LOG_VALUE(axis,userlabels->position));
+	if (abs(here-y) <= 1) {	/* FIXME: min separation could be configurable */
+	    text = NULL;
+	    break;
+	}
+	userlabels = userlabels->next;
+    }
 
     if (grid.l_type > LT_NODRAW) {
 	if (t->layer)

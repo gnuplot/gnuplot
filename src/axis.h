@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.54 2008/10/30 22:21:07 sfeam Exp $
+ * $Id: axis.h,v 1.56 2009/01/31 17:21:32 vanzandt Exp $
  *
  */
 
@@ -126,7 +126,8 @@ enum en_minitics_status {
 
 /* Function pointer type for callback functions doing operations for a
  * single ticmark */
-typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, struct lp_style_type ));
+typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, struct lp_style_type,
+					struct ticmark *));
 
 /* Values to put in the axis_tics[] variables that decides where the
  * ticmarks should be drawn: not at all, on one or both plot borders,
@@ -674,7 +675,8 @@ void set_writeback_min __PROTO((AXIS_INDEX));
 void set_writeback_max __PROTO((AXIS_INDEX));
 
 /* set widest_tic_label: length of the longest tics label */
-void widest_tic_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
+void widest_tic_callback __PROTO((AXIS_INDEX, double place, char *text, 
+			struct lp_style_type grid, struct ticmark *));
 
 void get_position __PROTO((struct position *pos));
 void get_position_default __PROTO((struct position *pos, enum position_type default_type));

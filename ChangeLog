@@ -1,3 +1,11 @@
+2009-08-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/color.c src/graphics.c src/graph3d.c:
+	Add an additional parameter to all tick_callback() routines. In the case
+	of auto-generated ticks, we use this to pass in a list of user-specified
+	labels in case one is supposed to replace the auto-generated label.
+	The actual label replacement is only implemented for 2D plots.
+
 2009-08-01  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
 
 	* qtterminal/QtGnuplotWindow.cpp qtterminal/QtGnuplotEvent.cpp qt_term.cpp:
