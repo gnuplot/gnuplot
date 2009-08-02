@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.107 2009/01/01 21:48:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.108 2009/03/26 00:49:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -835,9 +835,6 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		continue;
 	    }
 
-	    /* HBB 20010622: restructured to allow for more descriptive
-	     * error message, here. Would otherwise only print out
-	     * 'undefined variable: pointtype' --- rather unhelpful. */
 	    if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt")) {
 		if (allow_point) {
 		    if (set_pt++)
@@ -873,6 +870,18 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		}
 		continue;
 	    }
+
+	    if (almost_equals(c_token, "pointi$nterval") || equals(c_token, "pi")) {
+		c_token++;
+		if (allow_point) {
+		    lp->p_interval = int_expression();
+		} else {
+		    int_warn(c_token, "No pointinterval specifier allowed, here");
+		    int_expression();
+		}
+		continue;
+	    }
+
 
 	    /* unknown option catched -> quit the while(1) loop */
 	    break;

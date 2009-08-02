@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.77.2.1 2009/06/01 06:24:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.77.2.2 2009/06/12 05:02:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -882,7 +882,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    else
 		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log10_base, mark->position);
 	    /* use NULL instead of label for minitic */
-	    (*callback) (axis, internal, (mark->level>0)?NULL:label, (mark->level>0)?mgrd:lgrd);
+	    (*callback) (axis, internal, (mark->level>0)?NULL:label, (mark->level>0)?mgrd:lgrd, NULL);
 	}
 	if (def->type == TIC_USER)
 	    return;
@@ -1107,14 +1107,16 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			int d = (long) floor(user + 0.5) % 7;
 			if (d < 0)
 			    d += 7;
-			(*callback) (axis, internal, abbrev_day_names[d], lgrd);
+			(*callback) (axis, internal, abbrev_day_names[d], lgrd,
+					def->def.user);
 			break;
 		    }
 		case TIC_MONTH:{
 			int m = (long) floor(user - 1) % 12;
 			if (m < 0)
 			    m += 12;
-			(*callback) (axis, internal, abbrev_month_names[m], lgrd);
+			(*callback) (axis, internal, abbrev_month_names[m], lgrd,
+					def->def.user);
 			break;
 		    }
 		default:{	/* comp or series */
@@ -1137,7 +1139,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			&&  !inrange(internal,axis_array[axis].data_min,axis_array[axis].data_max))
 			    continue;
 
-			(*callback) (axis, internal, label, lgrd);
+			(*callback) (axis, internal, label, lgrd, def->def.user);
 		    }
 		}
 		/* }}} */
@@ -1157,7 +1159,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			       : mplace);
 		    if (inrange(mtic, internal_min, internal_max)
 			&& inrange(mtic, start - step * SIGNIF, end + step * SIGNIF))
-			(*callback) (axis, mtic, NULL, mgrd);
+			(*callback) (axis, mtic, NULL, mgrd, NULL);
 		}
 		/* }}} */
 	    }
@@ -1450,7 +1452,9 @@ load_range(AXIS_INDEX axis, double *a, double *b, t_autoscale autoscale)
  */
 
 void
-widest_tic_callback(AXIS_INDEX axis, double place, char *text, struct lp_style_type grid)
+widest_tic_callback(AXIS_INDEX axis, double place, char *text,
+    struct lp_style_type grid,
+    struct ticmark *userlabels)
 {
     (void) axis;		/* avoid "unused parameter" warnings */
     (void) place;

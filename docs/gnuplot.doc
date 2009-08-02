@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.5 2009/06/07 19:02:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.6 2009/08/02 18:59:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3120,6 +3120,7 @@ Ffigure_lines
 ?style lp
 ?linespoints
 ?lp
+=pointinterval
 Ffigure_linespoints
  The `linespoints` style connects adjacent points with straight line segments
  and then goes back to draw a small symbol at each point.  The command
@@ -3127,6 +3128,12 @@ Ffigure_linespoints
  1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
  required if 3D plots.  See `style lines`.  Additional input columns may be used
  to provide information such as variable point size or line color.
+
+ The `pointinterval` (short form `pi`) property of the line style can be used to
+ control whether or not every point in the plot is given a symbol.  For example,
+ 'with lp pi 3' will draw line segments through every data point, but will only
+ place a symbol on every 3rd point.  A negative value for `pointinterval` will
+ erase the portion of line segment that passes underneath the symbol.
 
  `linespoints` may be abbreviated `lp`.
 2 points
@@ -9991,6 +9998,9 @@ Ffigure_mapcontours
 ?linestyle
 ?linewidth
 =linewidth
+=interval
+=linespoints
+=pointinterval
  Each terminal has a default set of line and point types, which can be seen
  by using the command `test`.  `set style line` defines a set of line types
  and widths and point types and sizes so that you can refer to them later by
@@ -10003,6 +10013,7 @@ Ffigure_mapcontours
                               {{linewidth | lw} <line_width>}
                               {{pointtype | pt} <point_type>}
                               {{pointsize | ps} <point_size>}
+                              {{pointinterval | pi} <interval>}
                               {palette}
        unset style line
        show style line
@@ -10014,13 +10025,20 @@ Ffigure_mapcontours
  changed while all others are preserved.  If not, all undefined values are
  set to the default values.
 
- The line and point types are taken from the default types for the terminal
- currently in use.  The line width and point size are multipliers for the
+ The line and point types default to the index value. The exact symbol that is
+ drawn for that index value may vary from one terminal type to another.
+ 
+ The line width and point size are multipliers for the current terminal's
  default width and size (but note that <point_size> here is unaffected by
- the multiplier given on `set pointsize`).
+ the multiplier given by the command`set pointsize`).
 
- The defaults for the line and point types is the index.  The defaults for
- the width and size are both unity.
+ The `pointinterval` controls the spacing between points in a plot drawn with
+ style `linespoints`.  The default is 0 (every point is drawn). For example,
+ `set style line N pi 3` defines a linestyle that uses pointtype N, pointsize
+ and linewidth equal to the current defaults for the terminal, and will draw
+ every 3rd point in plots using `with linespoints`.  A negative value for the
+ interval is treated the same as a positive value, except that some terminals
+ will try to interrupt the line where it passes through the point symbol.
 
  Linestyles created by this mechanism do not replace the default linetype
  styles; both may be used.  If you want plots to use the defined styles in

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.221 2009/04/12 22:27:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.222 2009/05/30 20:08:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -137,11 +137,11 @@ static void draw_3d_graphbox __PROTO((struct surface_points * plot,
 				      WHICHGRID whichgrid, int current_layer));
 /* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
 void xtick_callback __PROTO((AXIS_INDEX, double place, char *text,
-			     struct lp_style_type grid));
+			     struct lp_style_type grid, struct ticmark *userlabels));
 void ytick_callback __PROTO((AXIS_INDEX, double place, char *text,
-			     struct lp_style_type grid));
+			     struct lp_style_type grid, struct ticmark *userlabels));
 void ztick_callback __PROTO((AXIS_INDEX, double place, char *text,
-			     struct lp_style_type grid));
+			     struct lp_style_type grid, struct ticmark *userlabels));
 
 static int find_maxl_cntr __PROTO((struct gnuplot_contours * contours, int *count));
 static int find_maxl_keys3d __PROTO((struct surface_points *plots, int count, int *kcnt));
@@ -2609,7 +2609,8 @@ xtick_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
-    struct lp_style_type grid)	/* linetype or -2 for none */
+    struct lp_style_type grid,		/* linetype or -2 for none */
+    struct ticmark *userlabels)	/* currently ignored in 3D plots */
 {
     vertex v1, v2;
     double scale = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale) * (axis_array[axis].tic_in ? 1 : -1);
@@ -2691,7 +2692,8 @@ ytick_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
-    struct lp_style_type grid)
+    struct lp_style_type grid,
+    struct ticmark *userlabels)	/* currently ignored in 3D plots */
 {
     vertex v1, v2;
     double scale = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale) * (axis_array[axis].tic_in ? 1 : -1);
@@ -2773,7 +2775,8 @@ ztick_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
-    struct lp_style_type grid)
+    struct lp_style_type grid,
+    struct ticmark *userlabels)	/* currently ignored in 3D plots */
 {
     /* HBB: inserted some ()'s to shut up gcc -Wall, here and below */
     int len = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale)

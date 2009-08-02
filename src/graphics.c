@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.6 2009/07/26 21:58:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.7 2009/07/27 01:14:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -151,8 +151,8 @@ static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * po
 static void boundary __PROTO((struct curve_points * plots, int count));
 
 /* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
-void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
-void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
+void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid, struct ticmark *userlabels));
+void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid, struct ticmark *userlabels));
 int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* ex, int* ey));
@@ -2051,6 +2051,12 @@ do_plot(struct curve_points *plots, int pcount)
 
 	if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 	    /* we deferred point sample until now */
+	    if (this_plot->plot_style == LINESPOINTS
+	    &&  this_plot->lp_properties.p_interval < 0) {
+		(*t->linetype)(LT_BACKGROUND);
+		(*t->point)(xl + key_point_offset, yl, 6);
+		term_apply_lp_properties(&this_plot->lp_properties);
+	    }
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
 		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize);
@@ -3705,9 +3711,13 @@ plot_points(struct curve_points *plot)
 {
     int i;
     int x, y;
+    int interval = plot->lp_properties.p_interval;
     struct termentry *t = term;
 
     for (i = 0; i < plot->p_count; i++) {
+	if ((plot->plot_style == LINESPOINTS) && (interval) && (i % interval)) {
+	    continue;
+	}
 	if (plot->points[i].type == INRANGE) {
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
@@ -3718,12 +3728,23 @@ plot_points(struct curve_points *plot)
 		    && x <= plot_bounds.xright - p_width
 		    && y <= plot_bounds.ytop - p_height)) {
 
-		/* rgb variable  -  color read from data column */
-		check_for_variable_color(plot, &plot->points[i]);
-
 		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		&&  plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize * plot->points[i].z);
+
+		/* A negative interval indicates we should try to blank out the */
+		/* area behind the point symbol. This could be done better by   */
+		/* implementing a special point type, but that would require    */
+		/* modification to all terminal drivers. It might be worth it.  */
+		if (plot->plot_style == LINESPOINTS && interval < 0) {
+		    (*t->linetype)(LT_BACKGROUND);
+		    (*t->point) (x, y, 6);
+		    term_apply_lp_properties(&(plot->lp_properties));
+		}
+
+		/* rgb variable  -  color read from data column */
+		check_for_variable_color(plot, &plot->points[i]);
+
 		(*t->point) (x, y, plot->lp_properties.p_type);
 	    }
 	}
@@ -4771,7 +4792,8 @@ xtick2d_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
-    struct lp_style_type grid)	/* grid.l_type == LT_NODRAW means no grid */
+    struct lp_style_type grid,	/* grid.l_type == LT_NODRAW means no grid */
+    struct ticmark *userlabels)	/* User-specified tic labels */
 {
     struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
@@ -4779,6 +4801,17 @@ xtick2d_callback(
     int x = map_x(place);
 
     (void) axis;		/* avoid "unused parameter" warning */
+
+    /* Skip label if we've already written a user-specified one */
+#   define MINIMUM_SEPARATION 2
+    while (userlabels) {
+	int here = map_x(AXIS_LOG_VALUE(axis,userlabels->position));
+	if (abs(here-x) <= MINIMUM_SEPARATION) {
+	    text = NULL;
+	    break;
+	}
+	userlabels = userlabels->next;
+    }
 
     if (grid.l_type > LT_NODRAW) {
 	if (t->layer)
@@ -4866,14 +4899,25 @@ ytick2d_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
-    struct lp_style_type grid)	/* grid.l_type == LT_NODRAW means no grid */
+    struct lp_style_type grid,	/* grid.l_type == LT_NODRAW means no grid */
+    struct ticmark *userlabels)	/* User-specified tic labels */
 {
     struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
     int ticsize = tic_direction * (int) t->h_tic * (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale);
     int y = map_y(place);
 
-    (void) axis;		/* avoid "unused parameter" warning */
+    (void) axis;	/* avoid "unused parameter" warning */
+
+    /* Skip label if we've already written a user-specified one */
+    while (userlabels) {
+	int here = map_y(AXIS_LOG_VALUE(axis,userlabels->position));
+	if (abs(here-y) <= 1) {	/* FIXME: min separation could be configurable */
+	    text = NULL;
+	    break;
+	}
+	userlabels = userlabels->next;
+    }
 
     if (grid.l_type > LT_NODRAW) {
 	if (t->layer)
@@ -5378,7 +5422,7 @@ do_key_sample(
     /* oops - doing the point sample now would break the postscript
      * terminal for example, which changes current line style
      * when drawing a point, but does not restore it. We must wait
-     then draw the point sample at the end of do_plot (line 1625)
+     then draw the point sample at the end of do_plot (line 2058)
      */
 
     /* Restore previous clipping area */
