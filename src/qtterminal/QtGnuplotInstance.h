@@ -57,9 +57,16 @@ public:
 	~QtGnuplotInstance();
 
 public:
+	/// Redirect the instance plotting to widget @p widget
 	void setWidget(QtGnuplotWidget* widget);
+	/// Returns the widget to which the instance plots
 	QtGnuplotWidget* widget();
+	/// Send the given command to gnuplot
 	void exec(const QByteArray& command);
+
+signals:
+	/// Emitted when gnuplot sends data through it standards outputs
+	void gnuplotOutput(const QString& output);
 
 private slots:
 	void gnuplotDataReady();
@@ -69,7 +76,9 @@ private:
 	QProcess m_gnuplot;
 };
 
+/// Overloaded from QtGnuplotInstance::exec
 QtGnuplotInstance& operator<<(QtGnuplotInstance& instance, const QString& command);
+/// Overloaded from QtGnuplotInstance::exec
 QtGnuplotInstance& operator<<(QtGnuplotInstance& instance, const QVector<QPointF>& points);
 
 #endif // QTGNUPLOTINSTANCE_H

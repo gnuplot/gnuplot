@@ -111,7 +111,7 @@ QPointF qt_termCoordF(unsigned int x, unsigned int y)
 // The same, but with coordinates clipped to the nearest pixel
 QPoint qt_termCoord(unsigned int x, unsigned int y)
 {
-	return QPoint(round(double(x)/qt_oversamplingF), round(double(term->ymax - y)/qt_oversamplingF));
+	return QPoint(qRound(double(x)/qt_oversamplingF), qRound(double(term->ymax - y)/qt_oversamplingF));
 }
 
 /*-------------------------------------------------------
@@ -165,7 +165,8 @@ void qt_connectToServer()
 	if (qt_socket.state() == QLocalSocket::ConnectedState)
 	{
 		qt_socket.disconnectFromServer();
-		qt_socket.waitForDisconnected(1000);
+		while (qt_socket.state() == QLocalSocket::ConnectedState)
+			qt_socket.waitForDisconnected(1000);
 	}
 
 	// Connect to server, or local server if not available.

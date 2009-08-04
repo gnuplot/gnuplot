@@ -50,6 +50,7 @@
 #include <QtGui>
 
 class QtGnuplotWidget;
+class QPlainTextEdit;
 
 class GnuplotWidget : public QWidget
 {
@@ -62,12 +63,14 @@ public slots:
 	void tick();
 	void plot();
 	void statusText(const QString& status);
+	void gnuplotOutput(const QString& output);
 
 private:
 	QtGnuplotInstance gp;
 	QTimer timer;
 	double phi;
 	QtGnuplotWidget* widgets[4];
+	QPlainTextEdit* outputFrame;
 };
 
 #endif

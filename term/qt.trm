@@ -148,8 +148,6 @@ START_HELP(qt)
 " explicitely close all the plot windows.",
 " Finally, by default the key <space> raises the gnuplot console window, and",
 " 'q' closes the plot window. The keyword \"ctrl\" allows you to replace those",
-" bindings by <ctrl>+<space> and <ctrl>+'q', respectively.",
-" These three keywords (raise, persist and ctrl) can also be set and remembered",
-" between sessions through the configuration dialog."
+" bindings by <ctrl>+<space> and <ctrl>+'q', respectively."
 END_HELP(qt)
 #endif /* TERM_HELP */

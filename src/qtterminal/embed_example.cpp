@@ -49,22 +49,34 @@ QMainWindow* mainWindow;
 GnuplotWidget::GnuplotWidget()
 	: QWidget()
 {
-	QGridLayout* layout = new QGridLayout(this);
+	QGridLayout* gridLayout = new QGridLayout();
 	for (int i = 0; i < 4; i++)
 	{
 		widgets[i] = new QtGnuplotWidget();
 		connect(widgets[i], SIGNAL(statusTextChanged(const QString&)), this, SLOT(statusText(const QString&)));
 		widgets[i]->setFixedSize(400,250);
-		layout->addWidget(widgets[i], i/2, i%2);
+		gridLayout->addWidget(widgets[i], i/2, i%2);
 	}
 
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->addLayout(gridLayout);
+
+	outputFrame = new QPlainTextEdit(this);
+	outputFrame->setReadOnly(true);
+/*	QFont font = outputFrame->document().defaultFont();
+	font.setFamiliy("Mono");
+	outputFrame->document().setDefaultFont(font);*/
+	layout->addWidget(outputFrame);
+
 	setLayout(layout);
+	connect(&gp, SIGNAL(gnuplotOutput(const QString&)), this, SLOT(gnuplotOutput(const QString&)));
 }
 
 void GnuplotWidget::plot()
 {
 	gp.setWidget(widgets[0]);
 	gp << "plot x w l lt 3\n";
+	gp << "print pi\n";
 
 	gp.setWidget(widgets[1]);
 	gp << "set grid; plot x**2 w l lt 2 lw 4\n";
@@ -87,12 +99,18 @@ void GnuplotWidget::plot()
 void GnuplotWidget::tick()
 {
 	gp << "plot sin(x + " + QString::number(phi) + ")\n";
+	gp << "print pi, " + QString::number(phi) + "\n";
 	phi += 0.3;
 }
 
 void GnuplotWidget::statusText(const QString& status)
 {
 	mainWindow->statusBar()->showMessage(status);
+}
+
+void GnuplotWidget::gnuplotOutput(const QString& output)
+{
+	outputFrame->appendPlainText(output);
 }
 
 int main(int argc, char* argv[])

@@ -80,8 +80,8 @@ QPolygonF& QtGnuplotScene::clipPolygon(QPolygonF& polygon, bool checkDiag) const
 
 	for (int i = 0; i < polygon.size(); i++)
 	{
-		polygon[i].setX(round(polygon[i].x() + 0.5) - 0.5);
-		polygon[i].setY(round(polygon[i].y() + 0.5) - 0.5);
+		polygon[i].setX(qRound(polygon[i].x() + 0.5) - 0.5);
+		polygon[i].setY(qRound(polygon[i].y() + 0.5) - 0.5);
 	}
 
 	return polygon;
@@ -89,18 +89,18 @@ QPolygonF& QtGnuplotScene::clipPolygon(QPolygonF& polygon, bool checkDiag) const
 
 QPointF& QtGnuplotScene::clipPoint(QPointF& point) const
 {
-	point.setX(round(point.x() + 0.5) - 0.5);
-	point.setY(round(point.y() + 0.5) - 0.5);
+	point.setX(qRound(point.x() + 0.5) - 0.5);
+	point.setY(qRound(point.y() + 0.5) - 0.5);
 
 	return point;
 }
 
 QRectF& QtGnuplotScene::clipRect(QRectF& rect) const
 {
-	rect.setTop   (round(rect.top   () + 0.5) - 0.5);
-	rect.setBottom(round(rect.bottom() + 0.5) - 0.5);
-	rect.setLeft  (round(rect.left  () + 0.5) - 0.5);
-	rect.setRight (round(rect.right () + 0.5) - 0.5);
+	rect.setTop   (qRound(rect.top   () + 0.5) - 0.5);
+	rect.setBottom(qRound(rect.bottom() + 0.5) - 0.5);
+	rect.setLeft  (qRound(rect.left  () + 0.5) - 0.5);
+	rect.setRight (qRound(rect.right () + 0.5) - 0.5);
 
 	return rect;
 }

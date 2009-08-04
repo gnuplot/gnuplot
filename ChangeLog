@@ -1,3 +1,12 @@
+2009-08-04  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+
+	* configure.in: Remove unwanted spaces.
+
+	* qtterminal/QtGnuplotScene.* qt_term.cpp: Changed round() to qRound().
+
+	* qtterminal/QtGnuplotInstance.* qtterminal/embed_example.*: Forward
+	gnuplot standard outputs to a custom frame.
+
 2009-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/color.c src/graphics.c src/graph3d.c:
