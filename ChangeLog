@@ -1,3 +1,7 @@
+2009-08-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc:  Expand section on newhistogram command.
+
 2009-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c src/save.c src/graphics.c src/term_api.h docs/gnuplot.doc
