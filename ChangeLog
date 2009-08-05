@@ -1,3 +1,11 @@
+2009-08-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary): The calculation of vertical space required
+	to hold rotated x axis tick labels was only being done if the margins
+	were in auto mode.  Rearrange the code so that the calculation is also
+	made for plots with explicit 'set [tb]margin'.
+	Bug #2830712
+
 2009-08-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  Expand section on newhistogram command.
