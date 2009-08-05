@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.7 2009/07/27 01:14:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.8 2009/08/02 23:38:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1007,27 +1007,30 @@ boundary(struct curve_points *plots, int count)
 	}
     }
 
-    /*  adjust top and bottom margins for tic label rotation */
+    /*  Calculate space needed for tic label rotation.
+     *  If [tb]margin is auto, move the plot boundary.
+     *  Otherwise use textheight to adjust placement of various titles.
+     */
 
-    if (tmargin.x < 0
-	&& axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER
-	&& vertical_x2tics) {
+    if (axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER && vertical_x2tics) {
 	double projection = sin((double)axis_array[SECOND_X_AXIS].tic_rotate*DEG2RAD);
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(SECOND_X_AXIS, /* 0, */ widest_tic_callback);
-	plot_bounds.ytop += x2tic_textheight;
+	if (tmargin.x < 0) /* Undo original estimate */
+	    plot_bounds.ytop += x2tic_textheight;
 	/* Now compute a new one and use that instead: */
 	if (projection > 0.0)
 	    x2tic_textheight = (int) (t->h_char * (widest_tic_strlen)) * projection;
 	else
 	    x2tic_textheight = t->v_char;
-	plot_bounds.ytop -= x2tic_textheight;
+	if (tmargin.x < 0)
+	    plot_bounds.ytop -= x2tic_textheight;
     }
-    if (bmargin.x < 0
-	&& axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER
-	&& vertical_xtics) {
+    if (axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER && vertical_xtics) {
 	double projection;
 	if (axis_array[FIRST_X_AXIS].tic_rotate == 90)
+	    projection = 1.0;
+	else if (axis_array[FIRST_X_AXIS].tic_rotate == TEXT_VERTICAL)
 	    projection = 1.0;
 	else
 	    projection = -sin((double)axis_array[FIRST_X_AXIS].tic_rotate*DEG2RAD);
@@ -1037,7 +1040,8 @@ boundary(struct curve_points *plots, int count)
 	if (projection > 0.0)
 	    xtic_textheight = (int) (t->h_char * widest_tic_strlen) * projection
 			    + t->v_char;
-	plot_bounds.ybot += xtic_textheight;
+	if (bmargin.x < 0)
+	    plot_bounds.ybot += xtic_textheight;
     }
 
     /* EAM - FIXME
