@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.576 2009/08/02 18:58:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.577 2009/08/05 04:16:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5522,7 +5522,7 @@ Ffigure_mapcontours
        plot for [<variable> in "string of words"]
 
  The scope of an iteration ends at the next comma or the end of the
- command, whichever comes first.  Iteration may be nested.
+ command, whichever comes first.  Iteration can not be nested.
 
  Example:
        plot for [dataset in "apples bananas"] dataset."dat" title dataset
