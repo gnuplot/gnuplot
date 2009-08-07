@@ -1,3 +1,9 @@
+2009-08-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c: The combination of iteration and in-line definition was
+	fatal to splot.  Move the iteration check to encompass definitions also.
+	Bug #2833808
+
 2009-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): The calculation of vertical space required
