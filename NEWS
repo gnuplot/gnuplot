@@ -1,5 +1,6 @@
 New features, changes and fixes in gnuplot version 4.2.6
 ===========================================================
+* NEW xterm tektronix emulation 'set term xterm'
 * FIX off-by-one pixel bug in width of boxes with palette or rgb color
 * FIX center rotation of 'set view equal xyz' mode at screen center
 * FIX sanity check time ranges for axes with timeformat
