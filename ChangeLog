@@ -1,3 +1,7 @@
+2009-08-13  anonymous 
+
+	* term/tek.trm: Add support for xterm tektronix emulation
+
 2009-08-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c: The combination of iteration and in-line definition was

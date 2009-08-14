@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tek.trm,v 1.18 2006/07/21 02:35:48 sfeam Exp $
+ * $Id: tek.trm,v 1.19 2008/05/31 19:49:45 sfeam Exp $
  *
  */
 
@@ -40,7 +40,7 @@
  *
  * This terminal driver supports:
  *  tek40xx, bitgraph, kermit_color_tek40xx, kermit_mono_tek40xx, selanar
- *  ln03plus
+ *  ln03plus, xterm
  *
  * AUTHORS
  *   Colin Kelley, Thomas Williams, Russell Lang
@@ -55,6 +55,7 @@
 #define TEK
 #define CTEK
 #define VTTEK
+#define XTERM
 
 /* Version 4.3: still available, but no longer built by default */
 #if 0
@@ -69,6 +70,9 @@
 register_term(tek40)
 #ifdef VTTEK
 register_term(vttek)
+#endif
+#ifdef XTERM
+register_term(xterm)
 #endif
 #ifdef KERMIT
 register_term(kc_tek40)
@@ -114,6 +118,10 @@ TERM_PUBLIC void VTTEK40init __PROTO((void));
 TERM_PUBLIC void VTTEK40reset __PROTO((void));
 TERM_PUBLIC void VTTEK40linetype __PROTO((int linetype));
 TERM_PUBLIC void VTTEK40put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
+TERM_PUBLIC void XTERM_graphics __PROTO((void));
+TERM_PUBLIC void XTERM_resume __PROTO((void));
+TERM_PUBLIC void XTERM_text __PROTO((void));
+TERM_PUBLIC int  XTERM_set_font __PROTO((const char * fontname));
 TERM_PUBLIC void CTEK_linetype __PROTO((int linetype));
 TERM_PUBLIC void CTEK_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void CTEK_vector __PROTO((unsigned int x, unsigned int y));
@@ -472,6 +480,54 @@ VTTEK40put_text(unsigned int x, unsigned int y, const char str[])
 
 #endif /* VTTEK */
 
+#ifdef XTERM
+
+#define XT_TEK_ESC "\033"
+#define XT_TEK_GFX XT_TEK_ESC "[?38h"
+#define XT_TEK_ANSI XT_TEK_ESC "\003"
+#define XT_TEK_CLR XT_TEK_ESC "\014"
+#define XT_TEK_ALPHA "\037"
+
+static const char *xt_tek_fontsize = "89:;";
+
+TERM_PUBLIC void
+XTERM_graphics()
+{
+    XTERM_resume();
+    fputs(XT_TEK_CLR, gpoutfile);
+}
+
+
+TERM_PUBLIC void
+XTERM_resume()
+{
+    fputs(XT_TEK_GFX, gpoutfile);
+}
+
+
+TERM_PUBLIC void
+XTERM_text()
+{
+    fputs(XT_TEK_ALPHA XT_TEK_ANSI, gpoutfile);
+}
+
+
+TERM_PUBLIC int
+XTERM_set_font(const char *fontname)
+{
+    char size = 0;
+    if (fontname) {
+      size_t lp = strlen(fontname);
+      if (lp>0) size = fontname[lp-1]-'1';
+    }
+    fprintf(gpoutfile, XT_TEK_ESC "%c",
+            xt_tek_fontsize[size>0&&size<4?size:0]);
+
+    return(TRUE);
+}
+
+#endif /* XTERM */
+
 #ifdef LN03P
 
 TERM_PUBLIC void
@@ -663,6 +719,22 @@ TERM_TABLE_END(vttek_driver)
 
 #endif /* VTTEK */
 
+#ifdef XTERM
+TERM_TABLE_START(xterm_driver)
+    "xterm", "Xterm Tektronix 4014 Mode",
+    TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR,
+    TEK40VTIC, TEK40HTIC, options_null, TEK40init, TEK40reset,
+    XTERM_text, null_scale, XTERM_graphics, TEK40move, TEK40vector,
+    VTTEK40linetype, VTTEK40put_text, null_text_angle,
+    null_justify_text, line_and_point, do_arrow, XTERM_set_font, 0,
+    TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE, XTERM_text, XTERM_resume
+TERM_TABLE_END(xterm_driver)
+
+#undef LAST_TERM
+#define LAST_TERM xterm_driver
+
+#endif /* XTERM */
+
 #ifdef KERMIT
 TERM_TABLE_START(kc_tek40_driver)
    "kc_tek40xx", "MS-DOS Kermit Tek4010 terminal emulator - color",
@@ -739,6 +811,12 @@ START_HELP(tek40)
 "?terminal vttek",
 "?term vttek",
 "?vttek",
+"?commands set terminal xterm",
+"?set terminal xterm",
+"?set term xterm",
+"?terminal xterm",
+"?term xterm",
+"?xterm",
 #ifdef KERMIT
 "?commands set terminal kc-tek40xx",
 "?set terminal kc-tek40xx",
