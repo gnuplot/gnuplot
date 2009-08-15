@@ -1,3 +1,7 @@
+2009-08-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/tgif.trm (TGIF_set_color): Support for RGB colors and TC_LT.
+
 2009-08-13  anonymous 
 
 	* term/tek.trm: Add support for xterm tektronix emulation
