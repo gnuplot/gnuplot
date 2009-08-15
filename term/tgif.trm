@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.44 2007/12/20 03:15:55 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.45 2009/03/02 23:55:26 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -79,9 +79,6 @@
 register_term(tgif)
 #endif
 
-#define USE_LINEWIDTH
-#define USE_MONO_MODE
-
 #ifdef TERM_PROTO
 TERM_PUBLIC void TGIF_options __PROTO((void));
 TERM_PUBLIC void TGIF_init __PROTO((void));
@@ -98,9 +95,7 @@ TERM_PUBLIC void TGIF_point __PROTO((unsigned int ux, unsigned int uy, int numbe
 TERM_PUBLIC void TGIF_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 TERM_PUBLIC int TGIF_set_font __PROTO((const char *font));
 TERM_PUBLIC void TGIF_set_pointsize __PROTO((double size));
-#ifdef USE_LINEWIDTH
 TERM_PUBLIC void TGIF_set_linewidth __PROTO((double size));
-#endif
 TERM_PUBLIC int TGIF_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void TGIF_previous_palette (void); */
 TERM_PUBLIC void TGIF_set_color (t_colorspec *);
@@ -168,14 +163,9 @@ static unsigned int uTgifPlotRow=1, uTgifPlotCol=1;		/* actual plot row and col 
 static unsigned int uTgif_win_horiz=1, /* number of plots in x and  */
     uTgif_win_verti=1;	/*      y direction [x,y]         */
 
-
-#ifdef USE_LINEWIDTH
-static double uActThick_factor=1.0;
-static double uActThick_default=1.0;
-#endif
-#ifdef USE_MONO_MODE
+static double uActThick_factor=1.0;  /* linewidth factor */
+static double uActThick_default=1.0; /* default linewidth factor */
 static TBOOLEAN TgifUseColor = TRUE;
-#endif
 
 static char sActColor[TGIF_STRLEN_MAX];		/* current color         */
 static unsigned int uDefaultFontSize = 18;	/* default font size         */
@@ -305,9 +295,7 @@ TGIF_options()
 	    term->h_char = (unsigned int) (uActFontSize * 6 / 10);
 
 	    TgifPortrait = TRUE;
-#ifdef USE_MONO_MODE
 	    TgifUseColor = TRUE;
-#endif
 	    TgifSolid = FALSE;
 	    uTgifPlotsPerPage = 1;
 	    uTgifPlotRow = 1;
@@ -315,13 +303,10 @@ TGIF_options()
 	    uTgif_win_horiz = 1;
 	    uTgif_win_verti = 1;
 	    uActResolution = 100;
-#ifdef USE_LINEWIDTH
 	    uActThick_factor = 1.0;
 	    uActThick_default = 1.0;
-#endif
 	    c_token++;
 	    break;
-#ifdef USE_MONO_MODE
 	case TGIF_MONOCHROME:
 	    TgifUseColor = FALSE;
 	    c_token++;
@@ -330,8 +315,6 @@ TGIF_options()
 	    TgifUseColor = TRUE;
 	    c_token++;
 	    break;
-#endif
-#ifdef USE_LINEWIDTH
 	case TGIF_LINEWIDTH:
 	    c_token++;
 	    if (END_OF_COMMAND) {
@@ -343,7 +326,6 @@ TGIF_options()
 		}
 	    }
 	    break;
-#endif
 	case TGIF_PORTRAIT:
 	    TgifPortrait = TRUE;
 	    c_token++;
@@ -452,12 +434,9 @@ TGIF_options()
 	    TgifPortrait ? "portrait" : "landscape",
 	    uTgif_win_horiz, uTgif_win_verti);
 
-#ifdef USE_MONO_MODE
     strcat(term_options, TgifUseColor ? " color" : " monochrome");
-#endif
-#ifdef USE_LINEWIDTH
-    sprintf(&(term_options[strlen(term_options)]), " linewidth %f", uActThick_default);
-#endif
+    sprintf(&(term_options[strlen(term_options)]), " linewidth %f", 
+	    uActThick_default);
     sprintf(&(term_options[strlen(term_options)]), " %s \"%s\" %u",
 	    TgifSolid ? "solid" : "dashed",
 	    sActFont, uActFontSize);
@@ -548,12 +527,8 @@ TGIF_graphics()
     uActThick = 1;
     uActStyle = 0;
     uActJust = LEFT;
-#ifndef USE_MONO_MODE
-    strcpy(sActColor, psColors[0]);
-#else
     if(TgifUseColor == FALSE) strcpy(sActColor,"black");
     else strcpy(sActColor, psColors[0]);
-#endif
 
 }				/* TGIF_graphics */
 /*}}}  */
@@ -600,13 +575,9 @@ TGIF_linetype(int linetype)
     else
 	ult = linetype + 2;
 
-#ifndef USE_MONO_MODE
-    strcpy(sActColor, psColors[ult]);
-#else
     if(TgifUseColor == FALSE) strcpy(sActColor,"black");
     else strcpy(sActColor, psColors[ult]);
-#endif
-#ifndef USE_LINEWIDTH
+#if 0
     uActThick = uLineThick[ult];
 #else
     uActThick = uActThick_factor * uActThick_default * uLineThick[ult]+0.5;
@@ -1585,13 +1556,11 @@ TGIF_set_pointsize(double size)
     uActPointSize = size < 0. ? 1. : size;
 }
 
-#ifdef USE_LINEWIDTH
 TERM_PUBLIC void
 TGIF_set_linewidth(double size)
 {
     uActThick_factor = size < 0. ? 1. : size;
 }
-#endif
 
 /*}}}  */
 /***************************************************************************/
@@ -1624,7 +1593,6 @@ TGIF_make_palette(t_sm_palette *palette)
     TGIF_flush_poly(); /* Clean up current data */
 
     if (TGIF_palette_set == FALSE) {
-#ifdef USE_MONO_MODE
 	if (TgifUseColor == FALSE
 	    || sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
             /* Gray palette */
@@ -1638,17 +1606,14 @@ TGIF_make_palette(t_sm_palette *palette)
                 sprintf(TGIF_colours[i],"#%.2x%.2x%.2x",j,j,j);
             }
 	} else {
-#endif
 	/* Create new palette */
-	for (i = 0; i < sm_palette.colors; i++) {
-	    sprintf(TGIF_colours[i],"#%.2x%.2x%.2x",
-		(int)( palette->color[i].r * 255 + 0.5 ),
-		(int)( palette->color[i].g * 255 + 0.5 ),
-		(int)( palette->color[i].b * 255 + 0.5 ) );
+	    for (i = 0; i < sm_palette.colors; i++) {
+		sprintf(TGIF_colours[i],"#%.2x%.2x%.2x",
+			(int)( palette->color[i].r * 255 + 0.5 ),
+			(int)( palette->color[i].g * 255 + 0.5 ),
+			(int)( palette->color[i].b * 255 + 0.5 ) );
+	    }
 	}
-#ifdef USE_MONO_MODE
-	}
-#endif
 	TGIF_palette_set = TRUE;
     } else {
 	fprintf(stderr, "Attempt to set palette twice\n");
@@ -1662,16 +1627,26 @@ TGIF_set_color(t_colorspec *colorspec)
     double gray = colorspec->value;
     int color;
 
-    if (colorspec->type != TC_FRAC)
+    if (colorspec->type == TC_LT) {
+	TGIF_linetype(colorspec->lt);
 	return;
-
-    color = (gray <= 0) ? 0 : (int)(gray * TGIF_palette_size);
-    if (color >= TGIF_palette_size)
-	color = TGIF_palette_size - 1;
-    if (TGIF_palette_set == FALSE) {
-	fprintf(stderr, "tgif: Palette used before set\n"); /* Error condition */
+    } else if (colorspec->type == TC_FRAC) {
+	color = (gray <= 0) ? 0 : (int)(gray * TGIF_palette_size);
+	if (color >= TGIF_palette_size)
+	  color = TGIF_palette_size - 1;
+	if (TGIF_palette_set == FALSE) {
+	    fprintf(stderr, "tgif: Palette used before set\n"); 
+            /* Error condition */
+	}
+	sprintf(sActColor, "%s", TGIF_colours[color]);
+	return;
+    } else if (colorspec->type == TC_RGB) {
+	sprintf(sActColor, "#%.2x%.2x%.2x",
+		colorspec->lt >> 16 & 0xff,
+		colorspec->lt >> 8 & 0xff,
+		colorspec->lt & 0xff);
+	return;
     }
-    sprintf(sActColor, "%s", TGIF_colours[color]);
 }
 
 TERM_PUBLIC void
@@ -1713,11 +1688,7 @@ TERM_TABLE_START(tgif_driver)
     TGIF_linetype, TGIF_put_text, TGIF_text_angle,
     TGIF_justify_text, TGIF_point, TGIF_arrow, TGIF_set_font,
     TGIF_set_pointsize, TERM_CAN_MULTIPLOT|TERM_CAN_DASH, 0, 0, 0,
-#ifdef USE_LINEWIDTH
     TGIF_set_linewidth
-#else
-    0
-#endif
 #ifdef USE_MOUSE
     ,0, 0, 0, 0, 0 /* no mouse support for the tgif terminal */
 #endif
