@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.172 2009/07/24 01:35:55 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.173 2009/08/08 06:31:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1213,6 +1213,7 @@ eval_3dplots()
     int start_token=0, end_token;
     int begin_token;
     TBOOLEAN some_data_files = FALSE, some_functions = FALSE;
+    TBOOLEAN was_definition = FALSE;
     int df_return = 0;
     int plot_num, line_num, point_num;
     /* part number of parametric function triplet: 0 = z, 1 = y, 2 = x */
@@ -1259,11 +1260,16 @@ eval_3dplots()
 	if (END_OF_COMMAND)
 	    int_error(c_token, "function to plot expected");
 
-	if (crnt_param == 0)
+	if (crnt_param == 0 && !was_definition)
 	    start_token = c_token;
 
 	if (is_definition(c_token)) {
 	    define();
+	    if (!equals(c_token,",")) {
+		was_definition = TRUE;
+		continue;
+	    }
+
 	} else {
 	    int specs = -1;
 	    struct surface_points *this_plot;
@@ -1274,8 +1280,10 @@ eval_3dplots()
 	    TBOOLEAN set_lpstyle = FALSE;
 	    TBOOLEAN checked_once = FALSE;
 	    TBOOLEAN set_labelstyle = FALSE;
-	    if (!parametric || crnt_param == 0)
+
+	    if (!was_definition && (!parametric || crnt_param == 0))
 		start_token = c_token;
+	    was_definition = FALSE;
 
 	    dummy_func = &plot_func;
 	    /* WARNING: do NOT free name_str */
@@ -1889,14 +1897,20 @@ eval_3dplots()
 
 	/* Read through functions */
 	while (TRUE) {
-	    if (crnt_param == 0)
+	    if (crnt_param == 0 && !was_definition)
 		start_token = c_token;
 
 	    if (is_definition(c_token)) {
 		define();
+		if (!equals(c_token,",")) {
+		    was_definition = TRUE;
+		    continue;
+		}
+
 	    } else {
 		struct at_type *at_ptr;
 		char *name_str;
+		was_definition = FALSE;
 
 		dummy_func = &plot_func;
 		name_str = string_or_express(&at_ptr);

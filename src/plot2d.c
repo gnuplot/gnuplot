@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193 2009/04/05 04:01:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.194 2009/07/21 05:28:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1360,6 +1360,7 @@ eval_plots()
     int some_functions = 0;
     int plot_num, line_num, point_num;
     TBOOLEAN in_parametric = FALSE;
+    TBOOLEAN was_definition = FALSE;
     int pattern_num;
     char *xtitle = NULL;
     int begin_token = c_token;  /* so we can rewind for second pass */
@@ -1413,7 +1414,7 @@ eval_plots()
 	    int_error(c_token, "function to plot expected");
 
 	this_plot = NULL;
-	if (!in_parametric)
+	if (!in_parametric && !was_definition)
 	    start_token = c_token;
 
 	if (almost_equals(c_token,"newhist$ogram")) {
@@ -1456,6 +1457,10 @@ eval_plots()
 
 	if (is_definition(c_token)) {
 	    define();
+	    if (!equals(c_token,",")) {
+		was_definition = TRUE;
+		continue;
+	    }
 
 	} else {
 	    int specs = 0;
@@ -1471,6 +1476,7 @@ eval_plots()
 
 	    plot_num++;
 
+	    was_definition = FALSE;
 	    dummy_func = &plot_func;
 	    /* should this be saved in "this_plot"? */
 	    name_str = string_or_express(NULL);
@@ -2161,15 +2167,20 @@ eval_plots()
 
 	/* Read through functions */
 	while (TRUE) {
-	    if (!in_parametric)
+	    if (!in_parametric && !was_definition)
 		start_token = c_token;
 
 	    if (is_definition(c_token)) {
 		define();
+		if (!equals(c_token,",")) {
+		    was_definition = TRUE;
+		    continue;
+		}
 
 	    } else {
 		struct at_type *at_ptr;
 		char *name_str;
+		was_definition = FALSE;
 
 		/* HBB 20000820: now globals in 'axis.c' */
 		x_axis = this_plot->x_axis;
