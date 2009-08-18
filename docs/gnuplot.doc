@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.8 2009/08/05 04:17:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.9 2009/08/07 15:49:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4239,7 +4239,7 @@ Ffigure_mapcontours
             {<iteration>}
             {<function> | {"<datafile>" {datafile-modifiers}}}
             {axes <axes>} {<title-spec>} {with <style>}
-            {, {definitions,} <function> ...}
+            {, {definitions{,}} <function> ...}
 
  where either a <function> or the name of a data file enclosed in quotes is
  supplied.  A function is a mathematical expression or a pair of mathematical
@@ -5523,6 +5523,11 @@ Ffigure_mapcontours
 
  The scope of an iteration ends at the next comma or the end of the
  command, whichever comes first.  Iteration can not be nested.
+
+ This will plot one curve, sin(3x), because iteration ends at the comma
+       plot for [i=1:3] j=i, sin(j*x)
+ This will plot three curves because there is no comma after the definition of j
+       plot for [i=1:3] j=i sin(j*x)
 
  Example:
        plot for [dataset in "apples bananas"] dataset."dat" title dataset
@@ -11514,7 +11519,7 @@ Ffigure_mapcontours
              {<iteration>}
              <function> | "<datafile>" {datafile-modifiers}}
              {<title-spec>} {with <style>}
-             {, {definitions,} <function> ...}
+             {, {definitions{,}} <function> ...}
 
  where either a <function> or the name of a data file enclosed in quotes is
  supplied.  The function can be a mathematical expression, or a triple of

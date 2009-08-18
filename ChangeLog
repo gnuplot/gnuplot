@@ -1,3 +1,11 @@
+2009-08-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/plot3d.c docs/gnuplot.doc: More problems with
+	iterate plus in-line definitions.  The scope of iteration within a plot
+	command is documented as extending to the first comma or semicolon, but
+	unfortunately the parser didn't allow omiting the comma after a 
+	definition.  Now it does.  Add simple examples to the documentation.
+
 2009-08-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/tgif.trm (TGIF_set_color): Support for RGB colors and TC_LT.
