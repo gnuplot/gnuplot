@@ -1,3 +1,13 @@
+2009-08-19  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/tgif.trm:
+	1) supports continuous colors (make_palette, set_color)
+	2) supports fill patterns (filled_polygon)
+	3) supports the density of solid fill (filled_polygon)
+	4) adds TGIF_fillbox and TGIF_previous_palette (doing nothing)
+	5) modifies two variable names (u* -> d*)
+	6) swap point types 1 and 2 to match other terminals
+
 2009-08-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c docs/gnuplot.doc: More problems with
