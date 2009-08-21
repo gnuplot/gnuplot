@@ -1,3 +1,13 @@
+2009-08-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readbinary): The binary data syntax
+	splot ... binary array=(x,y) 
+	is very odd because it always fills in the z coordinate of each
+	voxel with 0 rather than with the actual array value.  This makes a
+	small amount of sense for IMAGE data, but makes the input mode useless
+	for plotting a data surface from a binary array.  This patch changes
+	the behaviour by loading the array value into z for non-image plots.
+
 2009-08-19  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/tgif.trm:

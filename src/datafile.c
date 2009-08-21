@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172 2009/04/13 03:07:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.173 2009/07/28 20:10:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4490,11 +4490,24 @@ df_readbinary(double v[], int max)
 			return DF_UNDEFINED; 
 
 		    v[output] = real(&a);
-		} else if (column == -5) {
-		    v[output] = o_value*delta[2];
-		} else if (column == -4) {
+		} else if (column == DF_SCAN_PLANE) {
+		    if ((df_current_plot->plot_style == IMAGE)
+		    ||  (df_current_plot->plot_style == RGBIMAGE))
+			v[output] = o_value*delta[2];
+		    /* EAM August 2009
+		     * This was supposed to be "z" in a 3D grid holding a binary
+		     * value at each voxel.  But in fact the binary code does not
+		     * support 3D grids, only 2D. So this always got set to 0,
+		     * making the whole thing pretty useless except for inherently.
+		     * planar objects like 2D images.
+		     * Now I set Z to be the pixel value, which allows you
+		     * to draw surfaces described by a 2D binary array.
+		     */ 
+		    else
+			v[output] = df_column[0].datum;
+		} else if (column == DF_SCAN_LINE) {
 		    v[output] = n_value*delta[1];
-		} else if (column == -3) {
+		} else if (column == DF_SCAN_POINT) {
 		    v[output] = m_value*delta[0];
 		} else if (column == -2) {
 		    v[output] = df_current_index;
