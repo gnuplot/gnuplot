@@ -741,7 +741,7 @@ Sample scripts: fillstyle.dem candlesticks.dem
 Input data can be filtered through several built-in routines for interpolation
 or approximation of data.  See @ref{smooth}, `frequency`, `unique`.
 
-Sample scripts: step.dem mgr.dem
+Sample scripts: steps.dem mgr.dem
 
 
 @node Improved_text_options, More_text_encodings, New_plot_option_smooth_frequency, Features_introduced_in_version_4.0
@@ -18082,6 +18082,15 @@ terminals.  It has no options."
 @c ?term bitgraph
 @cindex bitgraph
 @tmindex bitgraph
+
+
+@c ?commands set terminal xterm
+@c ?set terminal xterm
+@c ?set term xterm
+@c ?terminal xterm
+@c ?term xterm
+@cindex xterm
+@tmindex xterm
 
 
 This family of terminal drivers supports a variety of VT-like terminals.
