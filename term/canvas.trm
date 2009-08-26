@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.24 2009/05/29 03:14:48 sfeam Exp $
+ * $Id: canvas.trm,v 1.25 2009/05/30 17:55:42 sfeam Exp $
  *
  */
 
@@ -1104,7 +1104,6 @@ START_HELP(canvas)
 "?set term canvas",
 "?terminal canvas",
 "?term canvas",
-" NB: The canvas terminal is EXPERIMENTAL, and may change before release.",
 "",
 " Syntax:",
 "       set terminal canvas {size <xsize>, <ysize>} {fsize <fontsize>}",

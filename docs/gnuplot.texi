@@ -16381,7 +16381,6 @@ wobbling effects on diagonal lines ('plot x' for example).
 @c ?set term canvas
 @c ?terminal canvas
 @c ?term canvas
-NB: The canvas terminal is EXPERIMENTAL, and may change before release.
 
 Syntax:
 @example
