@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.244 2009/06/08 04:37:29 sfeam Exp $
+ * $Id: post.trm,v 1.245 2009/07/11 02:29:26 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3780,11 +3780,11 @@ PS_COMMON_OPTS2
 " but transfers the texts to LaTeX instead of including in the PostScript",
 " code. Thus, many options are the same as in the `postscript terminal`.",
 "",
-" From version 4.0 to 4.1, some changes have been invoked into the default ",
-" appearance of the epslatex terminal to reach better consistency with the",
-" postscript terminal:  The plot size has been changed from 5 x 3 inches to",
-" 5 x 3.5 inches;  the character width is now estimated to be 60% of the font",
-" size while the old epslatex terminal used 50%;  now, the larger number of",
+" The appearance of the epslatex terminal changed between versions 4.0 and 4.2",
+" to reach better consistency with the postscript terminal:",
+" The plot size has been changed from 5 x 3 inches to 5 x 3.5 inches;",
+" the character width is now estimated to be 60% of the font size",
+" while the old epslatex terminal used 50%;  now, the larger number of",
 " postscript linetypes and symbols are used.  To reach an appearance that is",
 " nearly identical to the old one specify the option `oldstyle`. (In fact",
 " some small differences remain: the symbol sizes are slightly different, the",
@@ -3973,7 +3973,7 @@ PS_COMMON_DOC1
 " \\special{psfile=...} command.  Remember to close the `output file` before",
 " next plot unless in `multiplot` mode.",
 "",
-" Gnuplot versions prior version 4.1 have generated plots of the size",
+" Gnuplot versions prior to version 4.2 generated plots of the size",
 " 5 x 3 inches using the ps(la)tex terminal while the current version generates",
 " 5 x 3.5 inches to be consistent with the postscript eps terminal.  In",
 " addition, the character width is now estimated to be 60% of the font size",
