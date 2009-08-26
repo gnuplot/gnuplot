@@ -1,3 +1,10 @@
+2009-08-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in term/canvas.trm: Remove EXPERIMENTAL flag from
+	canvas and wxt terminals.
+
+	* term/post.trm: Fix typos in version history
+
 2009-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readbinary): The binary data syntax
