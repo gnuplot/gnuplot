@@ -1,3 +1,14 @@
+2009-08-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h term/post.trm term/cairo.trm term/pdf.trm
+	term/cgm.trm term/pbm.trm term/emf.trm term/win.trm:
+
+	Add a terminal flag TERM_MONOCHROME that signals a terminal wants
+	black lines only, even if it is capable of RGB or palette color.
+
+	* src/wxterminal/gp_cairo_helpers.c: Remove a dependence on 
+	core routine gp_alloc().
+
 2009-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readbinary): The binary data syntax

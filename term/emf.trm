@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.58 2009/01/28 22:05:13 broeker Exp $
+ * $Id: emf.trm,v 1.59 2009/03/26 00:49:19 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -577,16 +577,19 @@ EMF_options()
 	    emf_defaultfontsize = EMF_FONTSIZE;
 	    emf_monochrome = FALSE;
 	    emf_dashed = TRUE;
+	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    continue;
 	}
 	if (almost_equals(c_token, "m$onochrome")) {
 	    emf_monochrome = TRUE;
+	    term->flags |= TERM_MONOCHROME;
 	    c_token++;
 	    continue;
 	}
 	if (almost_equals(c_token, "c$olor") || almost_equals(c_token, "c$olour")) {
 	    emf_monochrome = FALSE;
+	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    continue;
 	}

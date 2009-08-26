@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.80 2009/03/26 00:49:17 sfeam Exp $
+ * $Id: term_api.h,v 1.80.2.1 2009/08/02 23:38:51 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -170,6 +170,7 @@ typedef struct t_image {
 #define TERM_CAN_CLIP       128  /* terminal does its own clipping  */
 #define TERM_CAN_DASH       256  /* terminal supports dashed lines  */
 #define TERM_ALPHA_CHANNEL  512  /* alpha channel transparency      */
+#define TERM_MONOCHROME    1024  /* term is running in mono mode    */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *
