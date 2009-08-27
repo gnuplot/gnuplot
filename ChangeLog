@@ -1,3 +1,18 @@
+2009-08-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/breaders.c (png_filetype_function df_libgd_get_pixel)
+	src/breaders.h src/datafile.c (df_open df_readbinary):
+	If gnuplot has been linked with libgd (to support gif/png/jpeg) then
+	we might as well use its ability to read in png images as binary data.
+	New binary option for use with either rgbimage or rgbalpha
+		plot 'foo.png' binary filetype=png
+
+	* src/datafile.c (plot_option_binary):  Fix the logic that checks for a
+	default binary filetype if none is specified in the plot command.
+
+	* docs/gnuplot.doc docs/plotstyles.gnu docs/bldg.png:
+	Add a sample plot the uses rescaled png images as plot elements.
+
 2009-08-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h term/post.trm term/cairo.trm term/pdf.trm

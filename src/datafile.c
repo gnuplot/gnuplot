@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.1 2009/07/29 01:25:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.2 2009/08/22 01:05:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -202,6 +202,8 @@ int df_datum;                   /* suggested x value if none given */
 AXIS_INDEX df_axis[MAXDATACOLS];
 TBOOLEAN df_matrix = FALSE;     /* indicates if data originated from a 2D or 3D format */
 TBOOLEAN df_binary = FALSE;     /* this is a binary file */
+
+void *df_datablock;		/* pixel data from an external library (e.g. libgd) */
 
 /* jev -- the 'thru' function --- NULL means no dummy vars active */
 /* HBB 990829: moved this here, from command.c */
@@ -433,13 +435,17 @@ static void (*binary_input_function)(void);	/* Will point to one of the above */
 static void auto_filetype_function(void){};	/* Just a placeholder for auto    */
 
 struct gen_ftable df_bin_filetype_table[] = {
-    {"gpbin", gpbin_filetype_function},
-    {"raw", raw_filetype_function},
-    {"rgb", raw_filetype_function},
-    {"bin", raw_filetype_function},
     {"avs", avs_filetype_function},
+    {"bin", raw_filetype_function},
     {"edf", edf_filetype_function},
     {"ehf", edf_filetype_function},
+    {"gif", gif_filetype_function},
+    {"gpbin", gpbin_filetype_function},
+    {"jpeg", jpeg_filetype_function},
+    {"jpg", jpeg_filetype_function},
+    {"png", png_filetype_function},
+    {"raw", raw_filetype_function},
+    {"rgb", raw_filetype_function},
     {"auto", auto_filetype_function},
     {NULL,   NULL}
 };
@@ -977,6 +983,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     lastpoint = lastline = MAXINT;
 
     df_binary_file = df_matrix_file = FALSE;
+    df_datablock = NULL;
 
     df_eof = 0;
 
@@ -2873,6 +2880,8 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
     TBOOLEAN set_format = FALSE;
 
 	/* Binary file type must be the first word in the command following `binary`" */
+	if (df_bin_filetype_default >= 0)
+	    df_bin_filetype = df_bin_filetype_default;
 	if (almost_equals(c_token, "file$type") || (df_bin_filetype >= 0)) {
 	    int i;
 	    char file_ext[8] = {'\0','\0','\0','\0','\0','\0','\0','\0'};
@@ -2902,7 +2911,8 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 		c_token++;
 	    }
 
-	    if (df_plot_mode != MODE_QUERY && binary_input_function == auto_filetype_function) {
+	    if (df_plot_mode != MODE_QUERY  
+	    && !strcmp("auto", df_bin_filetype_table[df_bin_filetype].key)) {
 		int i;
 		char *file_ext = strrchr(df_filename, '.');
 		if (file_ext++) {
@@ -4280,6 +4290,10 @@ df_readbinary(double v[], int max)
 		break;
 
 	    /* Read in a "column", i.e., a binary value of various types. */
+	    if (df_datablock) {
+		io_val.uc = df_libgd_get_pixel(df_M_count, df_N_count, i);
+	    } else
+
 	    if (memory_data) {
 		for (fread_ret = 0;
 		     fread_ret < df_column_bininfo[i].column.read_size;

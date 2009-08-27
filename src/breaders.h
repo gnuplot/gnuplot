@@ -1,5 +1,5 @@
 /*
- * $Id: breaders.h,v 1.3 2005/07/15 15:55:13 broeker Exp $
+ * $Id: breaders.h,v 1.4 2008/03/14 02:56:22 sfeam Exp $
  */
 
 /* GNUPLOT - binedf.h */
@@ -50,5 +50,9 @@
 /* Prototypes of functions exported by breaders.c */
 
 void edf_filetype_function __PROTO((void));
+void png_filetype_function __PROTO((void));
+void gif_filetype_function __PROTO((void));
+void jpeg_filetype_function __PROTO((void));
+int  df_libgd_get_pixel __PROTO((int i, int j, int component));
 
 #endif /* GNUPLOT_BINEDF_H */

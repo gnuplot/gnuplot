@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: breaders.c,v 1.5 2008/03/14 02:56:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: breaders.c,v 1.6 2009/01/28 10:36:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - breaders.c */
@@ -57,6 +57,8 @@ static char *RCSid() { return RCSid("$Id: breaders.c,v 1.5 2008/03/14 02:56:22 s
 extern char *df_filename;	/* name of data file */
 extern int df_no_bin_cols;	/* cols to read */
 extern df_endianess_type df_bin_file_endianess;
+extern TBOOLEAN df_matrix_file, df_binary_file;
+extern void *df_datablock;
 
 /* Reader for the ESRF Header File format files (EDF / EHF).
  */
@@ -256,3 +258,125 @@ edf_filetype_function(void)
     free(header);
 
 }
+
+/*
+ *	Use libgd for input of binary images in PNG GIF JPEG formats
+ *	Ethan A Merritt - August 2009
+ */
+
+#define GD_PNG 1
+#define GD_GIF 2
+#define GD_JPEG 3
+void gd_filetype_function __PROTO((int filetype));
+
+void
+png_filetype_function(void)
+{
+    gd_filetype_function(GD_PNG);
+}
+
+void
+gif_filetype_function(void)
+{
+    gd_filetype_function(GD_GIF);
+}
+
+void
+jpeg_filetype_function(void)
+{
+    gd_filetype_function(GD_JPEG);
+}
+
+#ifndef HAVE_GD_PNG
+
+void
+gd_filetype_function(int type)
+{
+    int_error(NO_CARET, "This copy of gnuplot cannot read png/gif/jpeg images");
+}
+
+#else
+
+#include <gd.h>
+static gdImagePtr im = NULL;
+
+void
+gd_filetype_function(int filetype)
+{
+    FILE *fp;
+    unsigned int M, N;
+
+    /* free previous image, if any */
+    if (im) {
+	gdImageDestroy(im);
+	im = NULL;
+    }
+
+    /* read image into memory */
+    fp = loadpath_fopen(df_filename, "rb");
+    if (!fp)
+	int_error(NO_CARET, "Can't open data file \"%s\"", df_filename);
+    
+    switch(filetype) {
+	case GD_PNG:	im = gdImageCreateFromPng(fp); break;
+	case GD_GIF:	im = gdImageCreateFromGif(fp); break;
+	case GD_JPEG:	im = gdImageCreateFromJpeg(fp); break;
+    }
+    fclose(fp);
+    
+    if (!im)
+	int_error(NO_CARET, "libgd doesn't recognize the format of \"%s\"", df_filename);
+
+    /* check on image properties and complain if we can't handle them */
+    M = im->sx;
+    N = im->sy;
+    FPRINTF((stderr,"This is a %u X %u %s image\n",M,N,
+		im->trueColor ? "TrueColor" : "palette"));
+
+    df_datablock = im->trueColor ? (void *)im->tpixels : (void *)im->pixels;
+    df_matrix_file = FALSE;
+    df_binary_file = TRUE;
+
+    df_bin_record[0].scan_skip[0] = 0;                                                  
+    df_bin_record[0].scan_dim[0] = M;                                                   
+    df_bin_record[0].scan_dim[1] = N;                                                   
+
+    df_bin_record[0].scan_dir[0] = 1;                                                   
+    df_bin_record[0].scan_dir[1] = -1;                                                  
+    df_bin_record[0].scan_generate_coord = TRUE;                                        
+    df_bin_record[0].cart_scan[0] = DF_SCAN_POINT;                                      
+    df_bin_record[0].cart_scan[1] = DF_SCAN_LINE;
+
+    df_extend_binary_columns(4);
+    df_set_read_type(1, DF_UCHAR);
+    df_set_read_type(2, DF_UCHAR);
+    df_set_read_type(3, DF_UCHAR);
+    df_set_read_type(4, DF_UCHAR);
+    df_set_skip_before(1,0);
+
+    df_no_use_specs = 4;
+    use_spec[0].column = 1;
+    use_spec[1].column = 2;
+    use_spec[2].column = 3;
+    use_spec[3].column = 4;
+}
+
+int
+df_libgd_get_pixel(int i, int j, int component)
+{
+    static int pixel;
+    int alpha;
+
+    switch(component) {
+    case 0:	pixel = gdImageGetTrueColorPixel(im, i,j);
+    		return gdTrueColorGetRed(pixel);
+    case 1:	return gdTrueColorGetGreen(pixel);
+    case 2:	return gdTrueColorGetBlue(pixel);
+    case 3:	/* FIXME? Supposedly runs from 0-127 rather than 0-255 */
+		alpha = 2 * gdTrueColorGetAlpha(pixel);
+		return (255-alpha);
+    default:	return 0; /* shouldn't happen */
+    }
+}
+
+#endif
