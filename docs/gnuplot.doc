@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.578 2009/08/07 15:48:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.579 2009/08/19 15:52:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3005,6 +3005,15 @@ Ffigure_rgb3D
  directions for a binary image data grid can be further controlled by additional
  keywords. See `binary general keywords flipx`, `center`, and `rotate`.
 
+Ffigure_scaled_image
+ Image data can be scaled to fill a particular rectangle within a 2D plot 
+ coordinate system by specifying the x and y extent of each pixel.
+ See `binary general keywords dx` and `dy`. To generate the figure at the right,
+ the same input image was placed multiple times, each with a specified dx, dy,
+ and origin. The input PNG image of a building is 50x128 pixels.  The tall
+ building was drawn by mapping this using `dx=0.5 dy=1.5`.  The short building
+ used a mapping `dx=0.5 dy=0.35`.
+
  The `image` style handles input pixels containing a grayscale or color palette
  value. Thus 2D plots (`plot` command) require 3 columns of data (x,y,value),
  while 3D plots (`splot` command) require 4 columns of data (x,y,z,value).
@@ -4583,6 +4592,18 @@ Ffigure_mapcontours
    http://www.edfplus.info/specs
 
  See also `binary`.
+6 png
+?binary general filetype png
+?filetype png
+ If gnuplot was configured to use the libgd library for png/gif/jpeg output, 
+ then it can also be used to read these same image types as binary files.
+ You can use an explicit command
+       plot 'file.png' binary filetype=png
+ Or the file type will be recognized automatically from the extension if you
+ have previously requested
+       set datafile binary filetype=auto
+
+ See also `binary`.
 5 keywords
 ?binary general keywords
 ?filetype keywords
@@ -4614,6 +4635,9 @@ Ffigure_mapcontours
  Shorthand notation for `scan=yx` or `scan=yxz`.
 6 dx, dy, dz
 ?binary general keywords dx
+?binary general keywords dy
+?dx
+?dy
  When gnuplot generates coordinates, it uses the spacing described by these
  keywords.  For example `dx=10 dy=20` would mean space samples along the
  x dimension by 10 and space samples along the y dimension by 20.  `dy` cannot

@@ -272,6 +272,27 @@ unset key
 set format z "%.1f"
 splot '../demo/blutux.rgb' binary array=128x128 flip=y format='%uchar%uchar%uchar' with rgbimage
 
+reset
+set output "figure_scaled_image.pdf"
+set title "Rescaled image used as plot element"
+
+set xrange [ -10 : 150 ]
+set yrange [   0 : 200 ]
+set y2range[   0 : 200 ]
+
+set y2tics
+set grid y
+
+set key title "Building Heights\nby Neighborhood"
+set key box
+
+set xtics   ("NE" 72.0, "S" 42.0, "Downtown" 12.0, "Suburbs" 122.0)  scale 0.0
+
+plot 'bldg.png' binary filetype=png origin=(0,0)  dx=0.5 dy=1.5 with rgbimage notitle, \
+     'bldg.png' binary filetype=png origin=(60,0) dx=0.5 dy=1 with rgbimage notitle, \
+     'bldg.png' binary filetype=png origin=(30,0) dx=0.5 dy=0.7 with rgbimage notitle, \
+     'bldg.png' binary filetype=png origin=(110,0) dx=0.5 dy=0.35 with rgbimage notitle
+
 #
 #
 # Demonstrates how to pull font size from a data file column
