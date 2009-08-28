@@ -1,3 +1,7 @@
+2009-08-28  Alexander Täschner <taschna@users.sourceforge.net>
+
+	* src/win/winmain.c:  Avoid buffer overflow in MyPrintF and MyFPrintF.
+
 2009-08-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphcs.c (boundary):  Fix bug #2845874

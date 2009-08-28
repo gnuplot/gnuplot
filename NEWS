@@ -15,7 +15,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW plot style rgbalpha 
 * NEW transparent fill styles
 * NEW iteration within a plot command; e.g. plot for [i=1:10] foo(i)
-* NEW iteration with set/unset commands
+* NEW iteration within set/unset commands
 * NEW operators '=' and ',' in expression syntax
 * NEW terminal lua generates commands for interpretation by external lua script
 * NEW terminal tikz uses a lua script to generate output for latex TikZ package
