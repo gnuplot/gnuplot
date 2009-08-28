@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.1 2009/07/14 05:47:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.2 2009/07/14 22:19:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1478,21 +1478,41 @@ CopyPrint(LPGW lpgw)
 	DLGPROC lpfnAbortProc;
 	DLGPROC lpfnPrintDlgProc;
 #endif
-	PRINTDLG pd;
+	PAGESETUPDLG pg;
+	DEVNAMES* pDevNames;
+	DEVMODE* pDevMode;
+	LPCTSTR szDriver, szDevice, szOutput;
 	HWND hwnd;
 	RECT rect;
 	GP_PRINT pr;
 
 	hwnd = lpgw->hWndGraph;
 
-	_fmemset(&pd, 0, sizeof(PRINTDLG));
-	pd.lStructSize = sizeof(PRINTDLG);
-	pd.hwndOwner = hwnd;
-	pd.Flags = PD_PRINTSETUP | PD_RETURNDC;
 
-	if (!PrintDlg(&pd))
+	/* See http://support.microsoft.com/kb/240082 */
+
+	_fmemset (&pg, 0, sizeof pg);
+	pg.lStructSize = sizeof pg;
+	pg.hwndOwner = hwnd;
+
+	if (!PageSetupDlg (&pg))
 		return;
-	printer = pd.hDC;
+
+	pDevNames = (DEVNAMES*) GlobalLock (pg.hDevNames);
+	pDevMode = (DEVMODE*) GlobalLock (pg.hDevMode);
+
+	szDriver = (LPCTSTR)pDevNames + pDevNames->wDriverOffset;
+	szDevice = (LPCTSTR)pDevNames + pDevNames->wDeviceOffset;
+	szOutput = (LPCTSTR)pDevNames + pDevNames->wOutputOffset;
+
+	printer = CreateDC (szDriver, szDevice, szOutput, pDevMode);
+
+	GlobalUnlock (pg.hDevMode);
+	GlobalUnlock (pg.hDevNames);
+
+	GlobalFree (pg.hDevMode);
+	GlobalFree (pg.hDevNames);
+
 	if (NULL == printer)
 		return;	/* abort */
 
