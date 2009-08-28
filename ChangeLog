@@ -1,3 +1,8 @@
+2009-08-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphcs.c (boundary):  Fix bug #2845874
+	(Rotated xtics caused misplacement of explicit bmargin).
+
 2009-08-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/breaders.c (png_filetype_function df_libgd_get_pixel)
