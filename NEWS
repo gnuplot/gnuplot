@@ -6,7 +6,7 @@ New features, changes and fixes in gnuplot version 4.2.6
 * FIX sanity-check time ranges for axes with timeformat
 * FIX pslatex blacktext and broken format specifier
 * FIX PostScript code points for Lcaron, lcaron in encoding cp1250
-* FIX If a 2D plot uses a Z-based palette, then autoscale cbrange
+* CHANGE If a 2D plot uses a Z-based palette, then autoscale cbrange
 * CHANGE aquaterm accepts "size xx,yy" with a comma
 
 
