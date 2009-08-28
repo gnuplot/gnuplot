@@ -1,3 +1,8 @@
+2009-08-28  jpsa <john-aldridge@users.sourceforge.net>
+
+	* src/win/wgraph.c:   Use printer open method recommended by 
+	Microsoft knowledge base article 240082.
+
 2009-08-28  Alexander Täschner <taschna@users.sourceforge.net>
 
 	* src/win/winmain.c:  Avoid buffer overflow in MyPrintF and MyFPrintF.
