@@ -8,6 +8,7 @@ New features, changes and fixes in gnuplot version 4.2.6
 * FIX PostScript code points for Lcaron, lcaron in encoding cp1250
 * CHANGE If a 2D plot uses a Z-based palette, then autoscale cbrange
 * CHANGE aquaterm accepts "size xx,yy" with a comma
+* CHANGE Remove the EXPERIMENTAL flag from the wxt terminal
 
 
 

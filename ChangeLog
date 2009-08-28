@@ -1,3 +1,7 @@
+2009-08-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: Remove the EXPERIMENTAL flag from the wxt terminal
+
 2009-08-13  anonymous 
 
 	* term/tek.trm: Add support for xterm tektronix emulation
