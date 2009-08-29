@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.50 2009/02/11 09:59:26 mikulik Exp $
+# $Id: makefile.mgw,v 1.50.2.1 2009/06/02 00:45:38 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -77,12 +77,20 @@ FREETYPE=1
 # MOUSE support for the windows terminal
 MOUSE=1
 
+# Cairo/Pango terminals
+# Uncomment the following lines to select the pngcairo and pdfcairo
+# terminals
+#CAIROTERMS=1
+#CAIROLIBS=1
+#
+
 # WXWIDGETS interactive terminal
 # Requires wxWidgets, Cairo, Pango, and their respective dependencies.
 # Uncomment the following lines to compile it.
 # WXT_LOCATION should give the path where can be found wx/*.h headers
 #WXT=1
 #WX_LOCATION=/usr/local/include/wx-2.6
+#CAIROLIBS=1
 
 # Below you can adapt paths according to your software setup:
 
@@ -252,15 +260,24 @@ ifdef NEED_PNG_W
 endif
 endif
 
-ifdef WXT
-	CFLAGS += -DWXWIDGETS
-	CXXFLAGS += $(shell wx-config --cxxflags)
+ifdef CAIROLIBS
 	CAIRO_CFLAGS = $(shell pkg-config --cflags cairo)
 	CAIRO_LIBS = $(shell pkg-config --libs cairo)
 	PANGO_CFLAGS = $(shell pkg-config --cflags pangocairo)
 	PANGO_LIBS = $(shell pkg-config --libs pangocairo)
+	CAIRO_OBJS = gp_cairo.o
+	TERMFLAGS += $(CAIRO_CFLAGS) $(PANGO_CFLAGS)
+endif
+
+ifdef CAIROTERMS
+	CFLAGS += -DHAVE_CAIROPDF
+endif
+
+ifdef WXT
+	CFLAGS += -DWXWIDGETS
+	CXXFLAGS += $(shell wx-config --cxxflags)
 	WX_LIBS = $(shell wx-config --libs)
-	WX_OBJS = wxt_gui.o gp_cairo.o gp_cairo_helpers.o
+	WX_OBJS = wxt_gui.o gp_cairo_helpers.o
 endif
 
 ifdef GNU_RC
@@ -301,7 +318,7 @@ all:	default gnuplot.ps gnuplot.pdf
 # include the 'core makefile template'
 include makefile.all
 
-OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS)
+OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS)
 
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
 	  wpause.$(O) wmenu.$(O)
