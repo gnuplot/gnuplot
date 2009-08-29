@@ -9,6 +9,7 @@ New features, changes and fixes in gnuplot version 4.2.6
 * CHANGE If a 2D plot uses a Z-based palette, then autoscale cbrange
 * CHANGE aquaterm accepts "size xx,yy" with a comma
 * CHANGE Remove the EXPERIMENTAL flag from the wxt terminal
+* CHANGE Remove the EXPERIMENTAL flag from the x11 terminal binary polygon mode
 
 
 
