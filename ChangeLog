@@ -1,3 +1,9 @@
+2009-08-28  Benjamin Lindner  <lindnerb@users.sourceforge.net> 
+
+	* config/makefile.mgw:  Separate configuration flag CAIROTERMS for
+	inclusion of pngcairo and pdfcairo terminals. 
+	EAM - Share a CAIROLIBS flag for use by both WXT and CAIROTERMS.
+
 2009-08-28  jpsa <john-aldridge@users.sourceforge.net>
 
 	* src/win/wgraph.c:   Use printer open method recommended by 
