@@ -1,3 +1,7 @@
+2009-08-30  Tatsuro Matsuoka <tmacchant3@yahoo.co.jp>
+
+	* config/makeile.mgw:  The cairo terminals need gp_cairo_helpers also.
+
 2009-08-28  Benjamin Lindner  <lindnerb@users.sourceforge.net> 
 
 	* config/makefile.mgw:  Separate configuration flag CAIROTERMS for

@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.50.2.1 2009/06/02 00:45:38 sfeam Exp $
+# $Id: makefile.mgw,v 1.50.2.2 2009/08/29 22:15:08 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -265,7 +265,7 @@ ifdef CAIROLIBS
 	CAIRO_LIBS = $(shell pkg-config --libs cairo)
 	PANGO_CFLAGS = $(shell pkg-config --cflags pangocairo)
 	PANGO_LIBS = $(shell pkg-config --libs pangocairo)
-	CAIRO_OBJS = gp_cairo.o
+	CAIRO_OBJS = gp_cairo.o gp_cairo_helpers.o
 	TERMFLAGS += $(CAIRO_CFLAGS) $(PANGO_CFLAGS)
 endif
 
@@ -277,7 +277,7 @@ ifdef WXT
 	CFLAGS += -DWXWIDGETS
 	CXXFLAGS += $(shell wx-config --cxxflags)
 	WX_LIBS = $(shell wx-config --libs)
-	WX_OBJS = wxt_gui.o gp_cairo_helpers.o
+	WX_OBJS = wxt_gui.o
 endif
 
 ifdef GNU_RC
