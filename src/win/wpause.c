@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.14 2006/11/10 22:30:16 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.15 2007/02/10 00:14:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -91,12 +91,13 @@ win_sleep(DWORD dwMilliSeconds)
 
 	    /* calculate remaining time, detect overflow */
 	    t1 = GetTickCount();
-	    if (tstop > t0) 
+	    if (tstop > t0) {
 		if ((t1 >= tstop) || (t1 < t0))
 		    rc = WAIT_TIMEOUT;
-	    else
+	    } else {
 		if ((t1 >= tstop) && (t1 < t0))
 		    rc = WAIT_TIMEOUT;
+	    }
 	    t1 = tstop - t1; /* remaining time to wait */
 	}
     } while(rc != WAIT_TIMEOUT);
