@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.47 2009/03/18 17:21:28 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.48 2009/03/26 00:49:17 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1026,7 +1026,7 @@ void gp_cairo_draw_image(plot_struct *plot, unsigned int * image, int x1, int y1
 	scale_x = (double)M/fabs( x2 - x1 );
 	scale_y = (double)N/fabs( y2 - y1 );
 
-	FPRINTF((stderr,"M %d N %lf x1 %d y1 %d\n", M, N, x1, y1));
+	FPRINTF((stderr,"M %d N %d x1 %d y1 %d\n", M, N, x1, y1));
 	cairo_save( plot->cr );
 
 	/* Set clipping boundaries for image copy.
