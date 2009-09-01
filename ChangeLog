@@ -1,3 +1,9 @@
+2009-09-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_tic_prop):  When xtics (e.g.) were unset, then a new
+	command 'set xtics ...' could lose track of the tic properties being set.
+	Bug #2848433
+
 2009-08-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Remove the EXPERIMENTAL flag from the x11 terminal
