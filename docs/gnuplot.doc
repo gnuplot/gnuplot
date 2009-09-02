@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.579 2009/08/19 15:52:53 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.580 2009/08/28 05:16:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2886,6 +2886,7 @@ Ffigure_histclust
 
        plot for [COL=2:4:2] 'file.dat' using COL:xticlabels(1)
 
+Ffigure_histerrorbar
  If the file contains both magnitude and range information for each value,
  then error bars can be added to the plot.  The following commands will add
  error bars extending from (y-<error>) to (y+<error>), capped by horizontal bar
