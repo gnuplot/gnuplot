@@ -1,3 +1,8 @@
+2009-09-02  Benjamin Lindner  <lindnerb@users.sourceforge.net> 
+
+	* docs/gnuplot.doc docs/plotstyles.gnu demo/histerror.dat:
+	Add a figure to the pdf documentation showing histogram with errorbars.
+
 2009-09-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_tic_prop):  When xtics (e.g.) were unset, then a new

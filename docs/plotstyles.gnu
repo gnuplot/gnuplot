@@ -145,12 +145,18 @@ set tmargin 1
 #
 set output 'figure_histclust.pdf'
 set style histogram clustered
-plot 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
+plot '../demo/histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
+#
+set output 'figure_histerrorbar.pdf'
+set title "Histogram with error bars" offset 0,-1
+set style fill solid border -1
+set style histogram errorbars lw 2
+plot '../demo/histerror.dat' using 2:3 fs solid 0.5 ti 'A', '' using 4:5 fs empty ti 'B'
 #
 set output 'figure_histrows.pdf'
 set style histogram rows
 set title "Rowstacked" offset 0,-1
-plot 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
+plot '../demo/histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
 #
 set output 'figure_histcols.pdf'
 set style histogram columns
@@ -165,7 +171,7 @@ set style line 4 lt rgb "gray70"
 set style increment user
 set style fill solid 1.0 border -1
 
-plot 'histopt.dat' using 1 ti col lt 1, '' using 2 ti col fs solid lt 1
+plot '../demo/histopt.dat' using 1 ti col lt 1, '' using 2 ti col fs solid lt 1
 set style increment system
 #
 # Circles
