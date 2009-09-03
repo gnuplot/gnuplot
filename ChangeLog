@@ -1,3 +1,8 @@
+2009-09-03  Alexander Täschner  <taschna@users.sourceforge.net>
+
+	* src/datafile.c (df_generate_pseudodata):  Fix off-by-one error in
+	generating the number of points corresponding to samples.
+
 2009-09-02  Benjamin Lindner  <lindnerb@users.sourceforge.net> 
 
 	* docs/gnuplot.doc docs/plotstyles.gnu demo/histerror.dat:

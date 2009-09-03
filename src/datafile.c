@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.2 2009/08/22 01:05:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.3 2009/08/28 05:19:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4633,6 +4633,8 @@ df_generate_pseudodata()
     /* This code copied from that in second pass through eval_plots() */
     if (df_pseudodata == 1) {
 	static double t, t_min, t_max, t_step;
+	if (df_pseudorecord >= samples_1)
+	    return NULL;
 	if (df_pseudorecord == 0) {
 	    if (parametric || polar)
 		int_error(NO_CARET,"Pseudodata not yet implemented for polar or parametric graphs");
@@ -4648,8 +4650,7 @@ df_generate_pseudodata()
 	t = t_min + df_pseudorecord * t_step;
 	t = AXIS_DE_LOG_VALUE(x_axis, t);
 	sprintf(line,"%g",t);
-	if (++df_pseudorecord >= samples_1)
-	    return NULL;
+	++df_pseudorecord;
     }
 
     /* Pseudofile '++' returns a (samples X isosamples) grid of x,y coordinates */
@@ -4661,6 +4662,14 @@ df_generate_pseudodata()
 	double u, v;
 	AXIS_INDEX u_axis = FIRST_X_AXIS;
 	AXIS_INDEX v_axis = FIRST_Y_AXIS;
+
+	if ((df_pseudorecord >= nusteps) && (df_pseudorecord > 0)) {
+	    df_pseudorecord = 0;
+	    if (++df_pseudospan >= nvsteps)
+		return NULL;
+	    else
+		return ""; /* blank record for end of scan line */
+	}
 
 	if (df_pseudospan == 0) {
 	    if (samples_1 < 2 || samples_2 < 2 || iso_samples_1 < 2 || iso_samples_2 < 2)
@@ -4690,14 +4699,7 @@ df_generate_pseudodata()
 	u = u_min + df_pseudorecord * u_step;
 	v = v_max - df_pseudospan * v_isostep;
 	sprintf(line,"%g %g", AXIS_DE_LOG_VALUE(u_axis,u), AXIS_DE_LOG_VALUE(v_axis,v));
-
-	if (++df_pseudorecord > nusteps) {
-	    df_pseudorecord = 0;
-	    if (++df_pseudospan >= nvsteps)
-		return NULL;
-	    else
-		return ""; /* blank record for end of scan line */
-	}
+	++df_pseudorecord;
     }
 
     return line;
