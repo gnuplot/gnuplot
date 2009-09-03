@@ -1,3 +1,7 @@
+2009-09-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Release 4.2.6
+
 2009-09-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_tic_prop):  When xtics (e.g.) were unset, then a new
