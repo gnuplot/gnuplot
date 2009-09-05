@@ -386,9 +386,9 @@ UTF-8 character encodings. See @ref{locale}, @ref{encoding}, @ref{decimalsign}.
 @node Transparency, Volatile_Data, Internationalization, New_features_introduced_in_version_4.3
 @subsection Transparency
 
-Gnuplot now supports transparent objects in several ways. Any object or plot
-element that uses a fill style can be assigned a value from fully opaque to
-fully transparent. Image or matrix data can be plotted with an alpha channel
+Gnuplot now supports several forms of transparency. Any object or plot
+element that uses a fill style can be assigned a transparency from fully opaque
+to fully transparent. Image or matrix data can be plotted with an alpha channel
 using the new plot style @ref{rgbalpha}. See `fillstyle`, @ref{rgbalpha}.
 
 
@@ -468,6 +468,23 @@ Two new drivers based on the cairo and pango libraries are included,
 `pngcairo` and `pdfcairo`.  These are alternatives to the older libgd-based
 png driver and the older PDFLib-based pdf driver.  The figures in the pdf
 version of this manual were prepared using the pdfcairo terminal driver.
+
+The `canvas` terminal driver produces javascript output that draws onto the
+HTML canvas element of a web page.  It can produce either a complete web page
+containing a single plot, or a script that can be embedded as part of an
+externally generated HTML document that perhaps contains multiple plots.
+The embedded plots support browser-side mousing, including zoom/unzoom.
+
+The `lua` terminal driver creates an data intended to be further processed
+by a script in the lua programming language.  At this point only one such
+lua script, gnuplot-tikz.lua, is available.  It produces a TeX document
+suitable for use with the latex TikZ package.  Other lua scripts could be
+written to process the gnuplot output for use with other TeX packages,
+or with other non-TeX tools.
+
+`Set term tikz` is shorthand for `set term lua tikz`.  As decribed above, it
+uses the generic lua terminal and an external lua script to produce a latex
+document.
 
 
 @node New_smoothing_algorithms,  , New_or_revised_terminal_drivers, New_features_introduced_in_version_4.3
@@ -666,7 +683,7 @@ Each <system> can either be `first`, `second`, `graph`, `screen`, or
 and bottom axes; `second` places it in the system defined by the second axes
 (top and right); `graph` specifies the area within the axes---0,0 is bottom
 left and 1,1 is top right (for splot, 0,0,0 is bottom left of plotting area;
-use negative z to get to the base---see @ref{ticslevel}); `screen`
+use negative z to get to the base---see @ref{xyplane}); `screen`
 specifies the screen area (the entire area---not just the portion selected by
 @ref{size}), with 0,0 at bottom left and 1,1 at top right; and `character`
 gives the position in character widths and heights from the bottom left of
@@ -980,6 +997,7 @@ defaults to radians.
 * abs::                         
 * acos::                        
 * acosh::                       
+* airy::                        
 * arg::                         
 * asin::                        
 * asinh::                       
@@ -1076,7 +1094,7 @@ The `acos(x)` function returns the arc cosine (inverse cosine) of its
 argument.  `acos` returns its argument in radians or degrees, as selected by
 @ref{angles}.
 
-@node acosh, arg, acos, Functions
+@node acosh, airy, acos, Functions
 @subsubsection acosh
 
 @c ?expressions functions acosh
@@ -1088,7 +1106,21 @@ argument.  `acos` returns its argument in radians or degrees, as selected by
 The `acosh(x)` function returns the inverse hyperbolic cosine of its argument
 in radians.
 
-@node arg, asin, acosh, Functions
+@node airy, arg, acosh, Functions
+@subsubsection airy
+
+@c ?expressions functions airy
+@c ?functions airy
+@cindex airy
+@findex airy
+
+
+The `airy(x)` function returns the value of the Airy function Ai(x) of its 
+argument. The function Ai(x) is that solution of the equation y'' - x y = 0
+which is everywhere finite. If the argument is complex, its imaginary part
+is ignored.
+
+@node arg, asin, airy, Functions
 @subsubsection arg
 
 @c ?expressions functions arg
@@ -3280,7 +3312,7 @@ will be displayed in the new @ref{timefmt}.  For that matter, if you give the
 deactivation command (like @ref{xdata}), the quantity will be shown in its
 numerical form.
 
-The commands `set format` or `set tics format`	define the format that will be
+The commands `set format` or `set tics format` define the format that will be
 used for tic labels, whether or not the specified axis is time/date.
 
 If time/date information is to be plotted from a file, the @ref{using} option
@@ -3964,9 +3996,16 @@ but in different formats.
 
 @c ?histograms newhistogram
 @c ?plotting style histograms newhistogram
+Syntax:
+
+@example
+     newhistogram @{"<title>"@} @{<linetype>@} @{<fillstyle>@} @{at <x-coord>@}
+
+@end example
+
 More than one set of histograms can appear in a single plot. In this case you
 can force a gap between them, and a separate label for each set, by using the
-plot command `newhistogram @{"<title>"@} @{<first-linetype@} @{at <x-coord>@}`.
+@ref{newhistogram} command.
 For example
 
 @example
@@ -3988,6 +4027,10 @@ using the same coloring for multiple histograms
            newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
 
 @end example
+
+Similarly you can force the next histogram to begin with a specified fillstyle.
+If the fillstyle is set to `pattern`, then the pattern used for filling will
+be incremented automatically.
 
 The `at <x-coord>` option only applies to column-stacked histograms.
 
@@ -4050,6 +4093,14 @@ image with M x N pixels.  This is different from the pm3d plotting style, where
 an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
 directions for a binary image data grid can be further controlled by additional
 keywords. See `binary general keywords flipx`, `center`, and `rotate`.
+
+Image data can be scaled to fill a particular rectangle within a 2D plot 
+coordinate system by specifying the x and y extent of each pixel.
+See `binary general keywords dx` and `dy`. To generate the figure at the right,
+the same input image was placed multiple times, each with a specified dx, dy,
+and origin. The input PNG image of a building is 50x128 pixels.  The tall
+building was drawn by mapping this using `dx=0.5 dy=1.5`.  The short building
+used a mapping `dx=0.5 dy=0.35`.
 
 The `image` style handles input pixels containing a grayscale or color palette
 value. Thus 2D plots (`plot` command) require 3 columns of data (x,y,value),
@@ -4225,12 +4276,20 @@ See also `linetype`, `linewidth`, and `linestyle`.
 
 @cindex lp
 
+@cindex pointinterval
+
 The @ref{linespoints} style connects adjacent points with straight line segments
 and then goes back to draw a small symbol at each point.  The command
 @ref{pointsize} may be used to change the default size of the points.
 1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
 required if 3D plots.  See `style lines`.  Additional input columns may be used
 to provide information such as variable point size or line color.
+
+The `pointinterval` (short form `pi`) property of the line style can be used to
+control whether or not every point in the plot is given a symbol.  For example,
+'with lp pi 3' will draw line segments through every data point, but will only
+place a symbol on every 3rd point.  A negative value for `pointinterval` will
+erase the portion of line segment that passes underneath the symbol.
 
 @ref{linespoints} may be abbreviated `lp`.
 
@@ -5703,7 +5762,7 @@ Syntax:
            @{<iteration>@}
            @{<function> | @{"<datafile>" @{datafile-modifiers@}@}@}
            @{axes <axes>@} @{<title-spec>@} @{with <style>@}
-           @{, @{definitions,@} <function> ...@}
+           @{, @{definitions@{,@}@} <function> ...@}
 
 @end example
 
@@ -6153,6 +6212,27 @@ can be found at
 See also `binary`.
 
 
+@noindent --- PNG ---
+
+@c ?binary general filetype png
+@c ?filetype png
+If gnuplot was configured to use the libgd library for png/gif/jpeg output, 
+then it can also be used to read these same image types as binary files.
+You can use an explicit command
+@example
+      plot 'file.png' binary filetype=png
+@end example
+
+Or the file type will be recognized automatically from the extension if you
+have previously requested
+@example
+      set datafile binary filetype=auto
+
+@end example
+
+See also `binary`.
+
+
 @noindent --- KEYWORDS ---
 
 @c ?binary general keywords
@@ -6194,6 +6274,11 @@ Shorthand notation for `scan=yx` or `scan=yxz`.
 @noindent --- DX, DY, DZ ---
 
 @c ?binary general keywords dx
+@c ?binary general keywords dy
+@cindex dx
+
+@cindex dy
+
 When gnuplot generates coordinates, it uses the spacing described by these
 keywords.  For example `dx=10 dy=20` would mean space samples along the
 x dimension by 10 and space samples along the y dimension by 20.  `dy` cannot
@@ -7382,7 +7467,18 @@ Syntax:
 @end example
 
 The scope of an iteration ends at the next comma or the end of the
-command, whichever comes first.  Iteration may be nested.
+command, whichever comes first.  Iteration can not be nested.
+
+This will plot one curve, sin(3x), because iteration ends at the comma
+@example
+      plot for [i=1:3] j=i, sin(j*x)
+@end example
+
+This will plot three curves because there is no comma after the definition of j
+@example
+      plot for [i=1:3] j=i sin(j*x)
+
+@end example
 
 Example:
 @example
@@ -11128,11 +11224,22 @@ windows and wxt terminals are mouse enhanced. There are two mouse modes. The
 2d-graph mode works for 2d graphs and for maps (i.e. splots with @ref{view}
 having z-rotation 0, 90, 180, 270 or 360 degrees, including `set view map`)
 and it allows tracing the position over graph, zooming, annotating graph etc.
+
 For 3d graphs `splot`, the view and scaling of the graph can be changed with
-mouse buttons 1 and 2. If additionally to these buttons the modifier <ctrl> is
-hold down, the coordinate system only is rotated which is useful for large
-data sets. A vertical motion of Button 2 with the shift key hold down changes
-the @ref{ticslevel}.
+mouse buttons 1 and 2, respectively. A vertical motion of Button 2 with the
+shift key held down changes the @ref{xyplane}.  If additionally to these
+buttons the modifier <ctrl> is held down, the coordinate axes are displayed
+but the data are suppressed.  This is useful for large data sets.
+
+X and Y axis scaling in both 2d and 3d graphs can be adjusted using the
+mouse wheel.  <wheel-up> scrolls up (increases both YMIN and YMAX by ten
+percent of the Y range, and increases both Y2MIN and Y2MAX likewise), and
+<wheel down> scrolls down.  <shift-wheel-up> scrolls left (decreases both
+XMIN and XMAX, and both X2MIN and X2MAX), and <shift-wheel-down> scrolls
+right.  <control-wheel-up> zooms in toward the center of the plot, and
+<control-wheel-down> zooms out.  <shift-control-wheel-up> zooms in along the
+X and X2 axes only, and <shift-control-wheel-down> zooms out along the X and
+X2 axes only.
 
 Mousing is not available in multiplot mode. When multiplot is finished using
 @ref{multiplot}, then the mouse will be turned on again and acts on the
@@ -13218,6 +13325,12 @@ using the default linetype 3.
 
 @cindex linewidth
 
+@cindex interval
+
+@cindex linespoints
+
+@cindex pointinterval
+
 Each terminal has a default set of line and point types, which can be seen
 by using the command @ref{test}.  `set style line` defines a set of line types
 and widths and point types and sizes so that you can refer to them later by
@@ -13231,6 +13344,7 @@ Syntax:
                              @{@{linewidth | lw@} <line_width>@}
                              @{@{pointtype | pt@} <point_type>@}
                              @{@{pointsize | ps@} <point_size>@}
+                             @{@{pointinterval | pi@} <interval>@}
                              @{palette@}
       unset style line
       show style line
@@ -13244,13 +13358,20 @@ If the linestyle <index> already exists, only the given parameters are
 changed while all others are preserved.  If not, all undefined values are
 set to the default values.
 
-The line and point types are taken from the default types for the terminal
-currently in use.  The line width and point size are multipliers for the
-default width and size (but note that <point_size> here is unaffected by
-the multiplier given on @ref{pointsize}).
+The line and point types default to the index value. The exact symbol that is
+drawn for that index value may vary from one terminal type to another.
 
-The defaults for the line and point types is the index.  The defaults for
-the width and size are both unity.
+The line width and point size are multipliers for the current terminal's
+default width and size (but note that <point_size> here is unaffected by
+the multiplier given by the command@ref{pointsize}).
+
+The `pointinterval` controls the spacing between points in a plot drawn with
+style @ref{linespoints}.  The default is 0 (every point is drawn). For example,
+`set style line N pi 3` defines a linestyle that uses pointtype N, pointsize
+and linewidth equal to the current defaults for the terminal, and will draw
+every 3rd point in plots using @ref{linespoints}.  A negative value for the
+interval is treated the same as a positive value, except that some terminals
+will try to interrupt the line where it passes through the point symbol.
 
 Linestyles created by this mechanism do not replace the default linetype
 styles; both may be used.  If you want plots to use the defined styles in
@@ -13930,7 +14051,7 @@ scale to match the x and y axes; however there is no guarantee that the
 current z axis range will fit within the plot boundary.
 By default all three axes are scaled independently to fill the available area.
 
-See also @ref{ticslevel}.
+See also @ref{xyplane}.
 
 @node vrange, x2data, view, set-show
 @subsection vrange
@@ -14646,7 +14767,7 @@ Syntax:
 @example
       set xyplane at <zvalue>
       set xyplane relative <frac>
-      set ticslevel <frac>	# equivalent to set xyplane relative
+      set ticslevel <frac>        # equivalent to set xyplane relative
       show xyplane
 
 @end example
@@ -15271,7 +15392,7 @@ Syntax:
             @{<iteration>@}
             <function> | "<datafile>" @{datafile-modifiers@}@}
             @{<title-spec>@} @{with <style>@}
-            @{, @{definitions,@} <function> ...@}
+            @{, @{definitions@{,@}@} <function> ...@}
 
 @end example
 
@@ -15280,8 +15401,8 @@ supplied.  The function can be a mathematical expression, or a triple of
 mathematical expressions in parametric mode.
 
 By default `splot` draws the xy plane completely below the plotted data.
-The offset between the lowest ztic and the xy plane can be changed by @ref{ticslevel}.  The orientation of a `splot` projection is controlled by
-@ref{view}.  See @ref{view} and @ref{ticslevel} for more information.
+The offset between the lowest ztic and the xy plane can be changed by @ref{xyplane}.  The orientation of a `splot` projection is controlled by
+@ref{view}.  See @ref{view} and @ref{xyplane} for more information.
 
 The syntax for setting ranges on the `splot` command is the same as for
 `plot`.  In non-parametric mode, the order in which ranges must be given is
@@ -15846,7 +15967,7 @@ with no modifiers.
 * excl::                        
 * hercules::                    
 * fig::                         
-* png::                         
+* png_::                        
 * ggi::                         
 * Gnugraph(GNU_plotutils)::     
 * gpic::                        
@@ -16381,7 +16502,6 @@ wobbling effects on diagonal lines ('plot x' for example).
 @c ?set term canvas
 @c ?terminal canvas
 @c ?term canvas
-NB: The canvas terminal is EXPERIMENTAL, and may change before release.
 
 Syntax:
 @example
@@ -17259,7 +17379,7 @@ printer and the 1590.  It has no options."
 These drivers supports PC monitors with autodetected graphics boards.  They
 can be used only when compiled with Zortech C/C++.  None have options."
 
-@node fig, png, hercules, complete_list_of_terminals
+@node fig, png_, hercules, complete_list_of_terminals
 @subsubsection fig
 
 @c ?commands set terminal fig
@@ -17373,7 +17493,7 @@ To plot the error bars on top of the circles use
 
 @end example
 
-@node png, ggi, fig, complete_list_of_terminals
+@node png_, ggi, fig, complete_list_of_terminals
 @subsubsection png
 
 @c ?commands set terminal png
@@ -17486,7 +17606,7 @@ Use 24 bits of color information per pixel, with a transparent background.
 Use the `enhanced text` mode to control the layout of strings to be printed.
 
 
-@node ggi, Gnugraph(GNU_plotutils), png, complete_list_of_terminals
+@node ggi, Gnugraph(GNU_plotutils), png_, complete_list_of_terminals
 @subsubsection ggi
 
 @c ?commands set terminal ggi
@@ -19100,6 +19220,15 @@ terminals.  It has no options."
 @tmindex vttek
 
 
+@c ?commands set terminal xterm
+@c ?set terminal xterm
+@c ?set term xterm
+@c ?terminal xterm
+@c ?term xterm
+@cindex xterm
+@tmindex xterm
+
+
 @c ?commands set terminal kc-tek40xx
 @c ?set terminal kc-tek40xx
 @c ?set term kc-tek40xx
@@ -19833,6 +19962,7 @@ Syntax:
                      @{@{no@}enhanced@}
                      @{font <font>@}
                      @{title "title"@}
+                     @{dashed|solid@} @{dashlength <dl>@}
                      @{@{no@}persist@}
                      @{@{no@}raise@}
                      @{@{no@}ctrl@}

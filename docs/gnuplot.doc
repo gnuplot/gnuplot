@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.580 2009/08/28 05:16:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.581 2009/09/02 18:38:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -758,6 +758,16 @@ C
 %acosh(x)@any@$cosh sup -1 x$ (inverse hyperbolic cosine) in radians
  The `acosh(x)` function returns the inverse hyperbolic cosine of its argument
  in radians.
+4 airy
+?expressions functions airy
+?functions airy
+?airy
+#airy(x) & any  & Airy function Ai(x) \\
+%airy(x)@any@Airy function Ai(x)
+ The `airy(x)` function returns the value of the Airy function Ai(x) of its 
+ argument. The function Ai(x) is that solution of the equation y'' - x y = 0
+ which is everywhere finite. If the argument is complex, its imaginary part
+ is ignored.
 4 arg
 ?expressions functions arg
 ?functions arg
