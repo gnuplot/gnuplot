@@ -8,6 +8,9 @@
 	assign tick positions for it.
 	Bug #2822482
 
+	* term/gd.trm: Re-order initialization of background color, correct
+	compilation warnings if using libgd 2.0.36
+
 2009-09-03  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	* src/datafile.c (df_generate_pseudodata):  Fix off-by-one error in
