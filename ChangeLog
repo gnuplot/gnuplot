@@ -4,6 +4,10 @@
 	after drawing a polyline.
 	Bug #2213362
 
+	* src/graphics.c (boundary): If there is no colorbox, don't try to 
+	assign tick positions for it.
+	Bug #2822482
+
 2009-09-03  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	* src/datafile.c (df_generate_pseudodata):  Fix off-by-one error in
