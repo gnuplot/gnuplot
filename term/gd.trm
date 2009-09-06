@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.136.2.4 2009/06/21 17:04:30 sfeam Exp $
+ * $Id: gd.trm,v 1.136.2.5 2009/06/26 22:57:20 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -786,7 +786,7 @@ PNG_options()
 		png_state.default_ttffont = gp_strdup(png_state.ttffont);
 
 		/* First try the old GDFONTPATH mechanism for locating fonts */
-		err = gdUseFontConfig(0);
+		gdUseFontConfig(0);
 		err = gdImageStringFT(NULL, &brect[0], 0,
 			png_state.ttffont, (double)png_state.default_ttfsize,
 			0.0, 0, 0, "test");
@@ -984,7 +984,7 @@ PNG_options()
 		png_state.default_ttfsize = 2 * term->h_char - 2;
 
 	/* First try the old GDFONTPATH mechanism for locating fonts */
-	err = gdUseFontConfig(0);
+	gdUseFontConfig(0);
 	err = gdImageStringFT(NULL, &brect[0], 0,
 		png_state.ttffont, (double)png_state.default_ttfsize,
 		0.0, 0, 0, "test");
@@ -1430,14 +1430,19 @@ PNG_graphics()
 {
     int i;
     unsigned int rgb;
-    unsigned int brgb = png_state.rgb_table[0];
  
+    for (i = png_state.n_colors; i < GD_DEFINED_COLORS; i++)
+	png_state.rgb_table[i] = pm3d_color_names_tbl[i].value;
+    if (png_state.n_colors < GD_DEFINED_COLORS)
+	png_state.n_colors = GD_DEFINED_COLORS;
+
 #if (GD2_VERS >= 2)
     /* TrueColor images default to a black background; load white instead.	*/
     /* If PNG_USE_TRANSPARENT, store the background alpha in the output file	*/
     /* but apply alpha for the rest of the image internally. Otherwise you	*/
     /* see only background through the topmost transparent layer.		*/
     if (png_state.TrueColor) {
+        unsigned int brgb = png_state.rgb_table[0];
 	png_state.image = gdImageCreateTrueColor(PNG_XMAX, PNG_YMAX);
 	if (!png_state.image)
 	    int_error(NO_CARET,"libgd: failed to create output image structure");
@@ -1463,10 +1468,7 @@ PNG_graphics()
     png_state.charh = term->v_char;	/* png_state.font->h; */
     png_state.font = png_state.default_font;
     png_state.color = 0;
-    for (i = png_state.n_colors; i < GD_DEFINED_COLORS; i++)
-	png_state.rgb_table[i] = pm3d_color_names_tbl[i].value;
-    if (png_state.n_colors < GD_DEFINED_COLORS)
-	png_state.n_colors = GD_DEFINED_COLORS;
+
     for (i = 0; i < png_state.n_colors; i++) {
 	rgb = png_state.rgb_table[i];
 	png_state.color_table[i] =
@@ -1474,8 +1476,7 @@ PNG_graphics()
 				 (rgb >> 8) & 0xff, rgb & 0xff);
     }
     if (png_state.flags & PNG_USE_TRANSPARENT)
-	gdImageColorTransparent(png_state.image,
-				png_state.color_table[0]);
+	gdImageColorTransparent(png_state.image, png_state.color_table[0]);
     else
 	gdImageColorTransparent(png_state.image, -1);
 
