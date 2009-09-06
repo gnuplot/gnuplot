@@ -1,3 +1,9 @@
+2009-09-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/win/wgraph.c (drawgraph): Make sure to update current position
+	after drawing a polyline.
+	Bug #2213362
+
 2009-09-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Release 4.2.6
