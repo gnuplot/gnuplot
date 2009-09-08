@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.37 2008/05/21 18:01:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.38 2009/09/06 01:59:56 janert Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -113,7 +113,8 @@ static double ranf __PROTO((struct value * init));
 static double inverse_error_func __PROTO((double p));
 static double inverse_normal_func __PROTO((double p));
 static double lambertw __PROTO((double x));
-static double airy __PROTO((double x));
+static double airy_neg __PROTO(( double x ));
+static double airy_pos __PROTO((double x));
 #ifndef GAMMA
 static int ISNAN __PROTO((double x));
 static int ISFINITE __PROTO((double x));

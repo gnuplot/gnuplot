@@ -1,3 +1,8 @@
+2009-09-08  Philipp K. Janert  <janert@ieee.org>
+
+	* src/specfun.c: Fixing the static function declarations for the
+	Airy function.
+	
 2009-09-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/win/wgraph.c (drawgraph): Make sure to update current position
