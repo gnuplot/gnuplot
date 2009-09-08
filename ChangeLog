@@ -11,6 +11,11 @@
 	* term/gd.trm: Re-order initialization of background color, correct
 	compilation warnings if using libgd 2.0.36
 
+2009-09-05  Philipp K. Janert  <janert@ieee.org>
+
+        * src/specfun.c src/specfun.h src/eval.c docs/gnuplot.doc:  Adding
+        support for the Airy function Ai(x) as gnuplot function airy(x).
+	
 2009-09-03  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	* src/datafile.c (df_generate_pseudodata):  Fix off-by-one error in
