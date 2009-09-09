@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.29 2009/05/11 03:33:25 sfeam Exp $
+ * $Id: cairo.trm,v 1.29.2.1 2009/08/26 19:16:13 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -946,7 +946,7 @@ START_HELP(pdfcairo)
 "",
 " The width of all lines in the plot can be modified by the factor <lw>",
 " specified in `linewidth`. The default linewidth is 0.25 points.",
-" (1 \"PostScript\" point = 1/72 inch = 0.353 cm)",
+" (1 \"PostScript\" point = 1/72 inch = 0.353 mm)",
 "",
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",
 " default, butt caps and mitered joins.",
@@ -1030,7 +1030,7 @@ START_HELP(pngcairo)
 "",
 " The width of all lines in the plot can be modified by the factor <lw>",
 " specified in `linewidth`. The default linewidth is 0.25 points.",
-" (1 \"PostScript\" point = 1/72 inch = 0.353 cm)",
+" (1 \"PostScript\" point = 1/72 inch = 0.353 mm)",
 "",
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",
 " default, butt caps and mitered joins.",
