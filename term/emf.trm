@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.59 2009/03/26 00:49:19 sfeam Exp $
+ * $Id: emf.trm,v 1.59.2.1 2009/08/26 19:16:13 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1638,7 +1638,7 @@ TERM_TABLE_START(emf_driver)
     EMF_linetype, EMF_put_text, EMF_text_angle,
     EMF_justify_text, EMF_point, do_arrow, EMF_set_font,
     EMF_set_pointsize,
-    TERM_BINARY|TERM_CAN_DASH,		/* various flags */
+    TERM_BINARY|TERM_CAN_DASH|TERM_LINEWIDTH,		/* various flags */
     NULL,				/* suspend */
     NULL,				/* resume  */
     EMF_fillbox,

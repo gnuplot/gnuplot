@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.91 2009/02/16 22:08:47 sfeam Exp $
+ * $Id: cgm.trm,v 1.91.2.1 2009/08/26 19:16:13 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1714,7 +1714,7 @@ TERM_TABLE_START(cgm_driver)
     CGM_linetype, CGM_put_text, CGM_text_angle,
     CGM_justify_text, CGM_point, do_arrow, CGM_set_font,
     CGM_set_pointsize,
-    TERM_BINARY|TERM_CAN_DASH,	/* various flags */
+    TERM_BINARY|TERM_CAN_DASH|TERM_LINEWIDTH,	/* various flags */
     NULL,			/* after one plot of multiplot */
     NULL,			/* before subsequent plot of multiplot */
     CGM_fillbox,

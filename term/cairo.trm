@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.29.2.1 2009/08/26 19:16:13 sfeam Exp $
+ * $Id: cairo.trm,v 1.29.2.2 2009/09/09 22:01:47 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -878,7 +878,7 @@ TERM_TABLE_START (pdfcairo_driver)
     cairotrm_text_angle, cairotrm_justify_text,
     cairotrm_point, do_arrow, cairotrm_set_font,
     cairotrm_pointsize,
-    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_CAN_DASH,
+    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_CAN_DASH|TERM_LINEWIDTH,
     0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
@@ -903,7 +903,7 @@ TERM_TABLE_START (pngcairo_driver)
     cairotrm_text_angle, cairotrm_justify_text,
     cairotrm_point, do_arrow, cairotrm_set_font,
     cairotrm_pointsize,
-    TERM_BINARY|TERM_CAN_DASH|TERM_ALPHA_CHANNEL,
+    TERM_BINARY|TERM_CAN_DASH|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH,
     0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
