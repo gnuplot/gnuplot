@@ -4,6 +4,11 @@
 	'set termoption <foo>', using terminal flags to ensure that a command
 	is only sent to terminal types that can handle it.
 
+	* docs/gnuplot.doc term/cairo.trm term/canvas.trm term/cgm.trm
+	term/emf.trm term/gd.trm term/pdf.trm term/post.trm term/svg.trm
+	term/tgif.trm term/x11.trm docs/gnuplot.doc:
+	Add flag to allow "set termopt linewidth <lw>"
+
 2009-09-08  Philipp K. Janert  <janert@ieee.org>
 
 	* src/specfun.c: Fixing the static function declarations for the

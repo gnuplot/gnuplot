@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.25 2009/05/30 17:55:42 sfeam Exp $
+ * $Id: canvas.trm,v 1.26 2009/08/26 04:38:27 sfeam Exp $
  *
  */
 
@@ -1078,7 +1078,7 @@ TERM_TABLE_START(canvas_driver)
     CANVAS_justify_text, CANVAS_point, do_arrow, 
     set_font_null,
     CANVAS_pointsize,
-    TERM_CAN_MULTIPLOT|TERM_ALPHA_CHANNEL,
+    TERM_CAN_MULTIPLOT|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH,
     NULL, NULL, CANVAS_fillbox, CANVAS_linewidth
 #ifdef USE_MOUSE
     , NULL, NULL, NULL, NULL, NULL

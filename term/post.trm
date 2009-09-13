@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.245 2009/07/11 02:29:26 sfeam Exp $
+ * $Id: post.trm,v 1.246 2009/08/26 04:38:27 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3652,7 +3652,7 @@ TERM_TABLE_START(post_driver)
     PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
     PS_linetype, PS_put_text, PS_text_angle, 
     PS_justify_text, PS_point, PS_arrow, PS_set_font, PS_pointsize,
-    TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_MONOCHROME, 
+    TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_MONOCHROME|TERM_LINEWIDTH, 
     0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support for postscript */

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.183 2009/03/26 00:49:27 sfeam Exp $
+ * $Id: x11.trm,v 1.184 2009/05/29 03:22:09 sfeam Exp $
  *
  */
 
@@ -2081,7 +2081,7 @@ TERM_TABLE_START(x11_driver)
     X11_linetype, X11_put_text, X11_text_angle,
     X11_justify_text, X11_point, do_arrow, X11_set_font,
     X11_pointsize, 
-    TERM_CAN_MULTIPLOT|TERM_INIT_ON_REPLOT|TERM_NO_OUTPUTFILE|TERM_CAN_DASH|TERM_ALPHA_CHANNEL,
+    TERM_CAN_MULTIPLOT|TERM_INIT_ON_REPLOT|TERM_NO_OUTPUTFILE|TERM_CAN_DASH|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH,
     X11_text /* suspend can use same routine */ , 0 /* resume */ ,
     X11_fillbox, X11_linewidth
 #ifdef USE_MOUSE
