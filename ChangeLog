@@ -1,3 +1,9 @@
+2009-09-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/set.c (set_termoptions): Clean up the code for
+	'set termoption <foo>', using terminal flags to ensure that a command
+	is only sent to terminal types that can handle it.
+
 2009-09-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/win/wgraph.c (drawgraph): Make sure to update current position

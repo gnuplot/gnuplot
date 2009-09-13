@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.299.2.1 2009/07/05 00:07:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.299.2.2 2009/09/01 16:37:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4005,12 +4005,9 @@ set_terminal()
 
 
 /* 
- * Accept a single terminal option to apply to the current terminal if
- * possible.  The options are intended to be limited to those which apply
- * to a large number of terminals.  It would be nice also to limit it to
- * options for which we can test in advance to see if the terminal will
- * support it; that allows us to silently ignore the command rather than
- * issuing an error when the current terminal would not be affected anyhow.
+ * Accept a single terminal option to apply to the current terminal if possible.
+ * If the current terminal cannot support this option, we silently ignore it.
+ * Only reasonably common terminal options are supported.
  *
  * If necessary, the code in term->options() can detect that it was called
  * from here because in this case (c_token == 2), whereas when called from 
@@ -4020,39 +4017,46 @@ set_terminal()
 static void
 set_termoptions()
 {
+    TBOOLEAN ok_to_call_terminal = FALSE;
     int save_end_of_line = num_tokens;
     c_token++;
 
-    if (END_OF_COMMAND || !term) {
+    if (END_OF_COMMAND || !term)
 	return;
-    } else if (almost_equals(c_token,"enh$anced")
+    
+    if (almost_equals(c_token,"enh$anced")
            ||  almost_equals(c_token,"noenh$anced")) {
 	num_tokens = GPMIN(num_tokens,c_token+1);
-	if (term->enhanced_open) {
-	    *term_options = 0;
-	    (term->options)();
-	} else
+	if (term->enhanced_open)
+	    ok_to_call_terminal = TRUE;
+	else
 	    c_token++;
-    } else if (almost_equals(c_token,"font")
-           ||  almost_equals(c_token,"fname")) {
+    } else if (equals(c_token,"font") ||  equals(c_token,"fname")) {
 	num_tokens = GPMIN(num_tokens,c_token+2);
-	if (term->set_font) {
-	    *term_options = 0;
-	    (term->options)();
-	} else
+	if (term->set_font)
+	    ok_to_call_terminal = TRUE;
+	else
 	    c_token += 2;
-    } else if (almost_equals(c_token,"dash$ed") || equals(c_token,"solid")) {
-	if (!(term->flags & TERM_CAN_DASH)) {
+    } else if (equals(c_token,"lw") || almost_equals(c_token,"linew$idth")) {
+	if (term->flags & TERM_LINEWIDTH)
+	    ok_to_call_terminal = TRUE;
+	else {
 	    c_token++;
-	    return;   /* Silently ignore the request */
+	    real_expression();   /* Silently ignore the request */
 	}
-	*term_options = 0;
-	(term->options)();
+    } else if (almost_equals(c_token,"dash$ed") || equals(c_token,"solid")) {
+	if (term->flags & TERM_CAN_DASH)
+	    ok_to_call_terminal = TRUE;
+	else
+	    c_token++;
     } else if (!strcmp(term->name,"gif") && equals(c_token,"delay") && num_tokens==4) {
-	*term_options = 0;
-	(term->options)();
+	ok_to_call_terminal = TRUE;
     } else {
 	int_error(c_token,"This option cannot be changed using 'set termoption'");
+    }
+    if (ok_to_call_terminal) {
+	*term_options = 0;
+	(term->options)();
     }
     num_tokens = save_end_of_line;
 }
