@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.59.2.1 2009/08/26 19:16:13 sfeam Exp $
+ * $Id: emf.trm,v 1.59.2.2 2009/09/13 17:54:09 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1496,7 +1496,7 @@ ENHemf_FLUSH()
 	    }
 	    EMF_write_long(strlen(str)); 	/* true number of characters */
 	    EMF_write_long(76);			/* offset to text */
-	    EMF_write_long(ETO_NO_RECT);	/* ExtTextOut options */
+	    EMF_write_long(0);			/* ExtTextOut options */
 	    EMF_write_rectl(0, 0, 0, 0);	/* bounding, never used */
 	    EMF_write_long(0);			/* offset to intercharacter spacing array */
 	    for (i = 0; i < len; i++) 
