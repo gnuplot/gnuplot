@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.43 2009/07/05 06:16:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.194.2.44 2009/09/06 18:14:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -242,7 +242,8 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
     mlen = cnt = 0;
     this_plot = plots;
     for (curve = 0; curve < count; this_plot = this_plot->next, curve++) {
-	if (this_plot->title && !this_plot->title_is_suppressed) {
+	if (this_plot->title && !this_plot->title_is_suppressed
+	&&  this_plot->plot_type != NODATA) {
 	    ignore_enhanced(this_plot->title_no_enhanced);
 	    len = estimate_strlen(this_plot->title);
 	    if (len != 0) {

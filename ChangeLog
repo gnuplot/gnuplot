@@ -1,3 +1,9 @@
+2009-09-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (find_maxl_keys): Ignore key titles that may or may not
+	have been read from an empty data file.
+	Bug #2859699
+
 2009-09-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/win/wgraph.c (drawgraph): Make sure to update current position
