@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.26 2009/08/26 04:38:27 sfeam Exp $
+ * $Id: canvas.trm,v 1.27 2009/09/13 17:49:16 sfeam Exp $
  *
  */
 
@@ -365,7 +365,7 @@ CANVAS_graphics()
 	);
 	fprintf(gpoutfile,
 	    "// Reinitialize mouse tracking and zoom for this particular plot\n"
-	    "if (active_plot != %s  &&  typeof(mouse_update) != \"undefined\") {\n"
+	    "if ((typeof(active_plot) == \"undefined\" || ative_plot != %s)  &&  typeof(mouse_update) != \"undefined\") {\n"
 	    "  active_plot_name = \"%s\";\n"
 	    "  active_plot = %s;\n"
 	    "  canvas.onmousemove = mouse_update;\n"

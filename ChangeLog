@@ -1,3 +1,8 @@
+2009-09-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm (CANVAS_graphics): Be wary of uninitialized
+	global variables when setting up the mouse event handler.
+
 2009-09-17  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* src/win/winmain.c (MyFPrintF, MyVFPrintF, MyPrintF): Cannot call
@@ -7,7 +12,7 @@
 2009-09-16  Benjamin Lindner  <lindnerb@users.sourceforge.net> 
 
 	* term/emf.trm (ENHemf_FLUSH): Possible fix for the problem of
-	Windows utilities not properly displaying files created using
+	Windows utilities not properly displaying files created by
 	enhaced text mode.  Bug #2744404
 
 2009-09-13  Ethan A Merritt  <merritt@u.washington.edu>
