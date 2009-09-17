@@ -1,3 +1,9 @@
+2009-09-16  Benjamin Lindner  <lindnerb@users.sourceforge.net> 
+
+	* term/emf.trm (ENHemf_FLUSH):  Possible fix for the problem of Windows
+	utilities not properly displaying files created using enhaced text mode.
+	Bug #2744404
+
 2009-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/set.c (set_termoptions): Clean up the code for
