@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.26 2008/11/07 11:55:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.29 2009/09/17 20:02:39 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -83,11 +83,11 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.26 2008/11/07 11:55:46 m
 #ifdef WIN32
 # ifndef _WIN32_IE
 #  define _WIN32_IE 0x0400
-# endif 
+# endif
 # include <shlobj.h>
 # include <shlwapi.h>
   /* workaround for old header files */
-# ifndef CSIDL_APPDATA 
+# ifndef CSIDL_APPDATA
 #  define CSIDL_APPDATA (0x001a)
 # endif
 #endif
@@ -189,18 +189,18 @@ GetDllVersion(LPCTSTR lpszDllName)
     HINSTANCE hinstDll;
     DWORD dwVersion = 0;
 
-    /* For security purposes, LoadLibrary should be provided with a 
+    /* For security purposes, LoadLibrary should be provided with a
        fully-qualified path to the DLL. The lpszDllName variable should be
        tested to ensure that it is a fully qualified path before it is used. */
     hinstDll = LoadLibrary(lpszDllName);
-	
+
     if (hinstDll) {
         DLLGETVERSIONPROC pDllGetVersion;
-        pDllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(hinstDll, 
+        pDllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(hinstDll,
                           "DllGetVersion");
 
         /* Because some DLLs might not implement this function, you
-        must test for it explicitly. Depending on the particular 
+        must test for it explicitly. Depending on the particular
         DLL, the lack of a DllGetVersion function can be a useful
         indicator of the version. */
         if (pDllGetVersion) {
@@ -222,7 +222,7 @@ GetDllVersion(LPCTSTR lpszDllName)
 char *
 appdata_directory(void)
 {
-    HMODULE hShell32; 
+    HMODULE hShell32;
     FARPROC pSHGetSpecialFolderPath;
     static char dir[MAX_PATH] = "";
 
@@ -233,7 +233,7 @@ appdata_directory(void)
     hShell32 = LoadLibrary(TEXT("shell32.dll"));
     if (hShell32) {
 	pSHGetSpecialFolderPath =
-	    GetProcAddress(hShell32, 
+	    GetProcAddress(hShell32,
 			   TEXT("SHGetSpecialFolderPathA"));
 	if (pSHGetSpecialFolderPath)
 	    (*pSHGetSpecialFolderPath)(NULL, dir, CSIDL_APPDATA, FALSE);
@@ -268,9 +268,9 @@ int main(int argc, char **argv)
 #ifdef WGP_CONSOLE
 # define _argv argv
 # define _argc argc
-	HINSTANCE hInstance = NULL, hPrevInstance = NULL;
+	HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
 	int nCmdShow = 0;
-#else	 
+#else
 #ifdef __MSC__  /* MSC doesn't give us _argc and _argv[] so ...   */
 # ifdef WIN32    /* WIN32 has __argc and __argv */
 #  define _argv __argv
@@ -554,17 +554,19 @@ MyFPrintF(FILE *file, const char *fmt, ...)
     int count;
     va_list args;
 
-    va_start(args,fmt);
+    va_start(args, fmt);
     if (isterm(file)) {
 	char *buf;
 #ifdef __MSC__
-	count = _vscprintf(fmt,args) + 1;
+	count = _vscprintf(fmt, args) + 1;
 #else
-    count = vsnprintf(NULL,0,fmt,args) + 1;
+	count = vsnprintf(NULL,0,fmt,args) + 1;
 #endif
+	va_end(args);
+	va_start(args, fmt);
 	buf = (char *)malloc(count * sizeof(char));
-	count = vsnprintf(buf,count,fmt,args);
-	TextPutS(&textwin,&buf[0]);
+	count = vsnprintf(buf, count, fmt, args);
+	TextPutS(&textwin, buf);
 	free(buf);
     } else
 	count = vfprintf(file, fmt, args);
@@ -579,13 +581,17 @@ MyVFPrintF(FILE *file, const char *fmt, va_list args)
 
     if (isterm(file)) {
 	char *buf;
+	va_list args_copied;
+
+	va_copy(args_copied, args);
 #ifdef __MSC__
-	count = _vscprintf(fmt,args) + 1;
+	count = _vscprintf(fmt, args_copied) + 1;
 #else
-    count = vsnprintf(NULL,0,fmt,args) + 1;
+	count = vsnprintf(NULL, 0U, fmt, args_copied) + 1;
 #endif
+	va_end(args_copied);
 	buf = (char *)malloc(count * sizeof(char));
-	count = vsnprintf(buf,count,fmt,args);
+	count = vsnprintf(buf, count, fmt, args);
 	TextPutS(&textwin, buf);
 	free(buf);
     } else
@@ -600,16 +606,18 @@ MyPrintF(const char *fmt, ...)
     char *buf;
     va_list args;
 
-    va_start(args,fmt);
+    va_start(args, fmt);
 #ifdef __MSC__
-	count = _vscprintf(fmt,args) + 1;
+    count = _vscprintf(fmt, args) + 1;
 #else
-    count = vsnprintf(NULL,0,fmt,args) + 1;
+    count = vsnprintf(NULL, 0, fmt, args) + 1;
 #endif
-	buf = (char *)malloc(count * sizeof(char));
-    count = vsnprintf(buf,count,fmt,args);
-    TextPutS(&textwin,buf);
-	free(buf);
+    va_end(args);
+    va_start(args, fmt);
+    buf = (char *)malloc(count * sizeof(char));
+    count = vsnprintf(buf, count, fmt, args);
+    TextPutS(&textwin, buf);
+    free(buf);
     va_end(args);
     return count;
 }
@@ -683,7 +691,7 @@ int ConsoleGetch()
 
                 ReadConsoleInput(h, &rec, 1, &recRead);
                 if (recRead == 1 && rec.EventType == KEY_EVENT && rec.Event.KeyEvent.bKeyDown &&
-                        (rec.Event.KeyEvent.wVirtualKeyCode < VK_SHIFT || 
+                        (rec.Event.KeyEvent.wVirtualKeyCode < VK_SHIFT ||
                          rec.Event.KeyEvent.wVirtualKeyCode > VK_MENU))
                 {
                     if (rec.Event.KeyEvent.uChar.AsciiChar)

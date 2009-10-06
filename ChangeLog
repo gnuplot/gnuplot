@@ -1,3 +1,9 @@
+2009-10-06  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* src/win/winmain.c (MyFPrintF, MyVFPrintF, MyPrintF): Cannot call
+	va_list functions twice with the same va_list.  Have to call a
+	pair of va_end() and either va_start() or va_copy() in between.
+
 2009-10-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Silence a compiler warning if gdUseFontConfig() is
