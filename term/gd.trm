@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.136.2.6 2009/09/07 02:56:43 sfeam Exp $
+ * $Id: gd.trm,v 1.136.2.7 2009/09/13 17:54:09 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -786,7 +786,7 @@ PNG_options()
 		png_state.default_ttffont = gp_strdup(png_state.ttffont);
 
 		/* First try the old GDFONTPATH mechanism for locating fonts */
-		gdUseFontConfig(0);
+		(void)gdUseFontConfig(0);
 		err = gdImageStringFT(NULL, &brect[0], 0,
 			png_state.ttffont, (double)png_state.default_ttfsize,
 			0.0, 0, 0, "test");
@@ -984,7 +984,7 @@ PNG_options()
 		png_state.default_ttfsize = 2 * term->h_char - 2;
 
 	/* First try the old GDFONTPATH mechanism for locating fonts */
-	gdUseFontConfig(0);
+	(void)gdUseFontConfig(0);
 	err = gdImageStringFT(NULL, &brect[0], 0,
 		png_state.ttffont, (double)png_state.default_ttfsize,
 		0.0, 0, 0, "test");

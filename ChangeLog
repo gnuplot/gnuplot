@@ -1,3 +1,8 @@
+2009-10-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm: Silence a compiler warning if gdUseFontConfig() is
+	defined to be 0.
+
 2009-10-06  Tatsuro Matsuoka <tmacchant3@yahoo.co.jp>
 
 	* config/makeile.mgw:  Override the -mwindows compilation flag 
