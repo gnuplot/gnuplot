@@ -1,3 +1,8 @@
+2009-10-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/term.c (term_start_multiplot): Accept an explicit font for
+	the multiplot title.
+
 2009-10-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Silence a compiler warning if gdUseFontConfig() is

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.188 2009/07/05 00:09:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.189 2009/07/19 22:51:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -651,6 +651,15 @@ term_start_multiplot()
 	    if ((s = try_to_get_string())) {
 		free(mp_layout.title.text);
 		mp_layout.title.text = s;
+ 	    }
+ 	    continue;
+       }
+
+       if (equals(c_token, "font")) {
+	    c_token++;
+ 	    if ((s = try_to_get_string())) {
+ 		free(mp_layout.title.font);
+ 		mp_layout.title.font = s;
 	    }
 	    continue;
 	}
