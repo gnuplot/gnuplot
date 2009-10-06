@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.51 2009/08/29 22:18:24 sfeam Exp $
+# $Id: makefile.mgw,v 1.52 2009/08/31 03:01:03 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -276,7 +276,7 @@ endif
 ifdef WXT
 	CFLAGS += -DWXWIDGETS
 	CXXFLAGS += $(shell wx-config --cxxflags)
-	WX_LIBS = $(shell wx-config --libs)
+	WX_LIBS = $(shell wx-config --libs | sed -e "s+-Wl,--subsystem,windows++g" -e "s+-mwindows++g")
 	WX_OBJS = wxt_gui.o
 endif
 

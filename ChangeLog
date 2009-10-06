@@ -1,3 +1,8 @@
+2009-10-06  Tatsuro Matsuoka <tmacchant3@yahoo.co.jp>
+
+	* config/makeile.mgw:  Override the -mwindows compilation flag 
+	provided by wx-config.
+
 2009-09-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm (CANVAS_graphics): Be wary of uninitialized
