@@ -46,6 +46,9 @@ require "ctime.pl";
 # Use the in-tree copy of gnuplot if there is one
 	my $gnuplot = ( -x "../../src/gnuplot" ) ? "../../src/gnuplot" : "gnuplot" ;
 
+	if ((!defined $ENV{GNUPLOT_LIB}) || $GNUPLOT_LIB eq "") {
+	    $GNUPLOT_LIB = "..";
+	}
 	my $date = &ctime(time);
 	my $plot = 1;
 	my $mousing = 0;
