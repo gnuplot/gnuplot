@@ -1,3 +1,7 @@
+2009-10-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* FAQ.pdf (replaces outdated FAQ)
+
 2009-10-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/term.c (term_start_multiplot): Accept an explicit font for

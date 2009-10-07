@@ -1,10 +1,10 @@
-C RCS $Id: gnuplot.doc,v 1.582 2009/09/06 01:59:56 janert Exp $
+C RCS $Id: gnuplot.doc,v 1.583 2009/09/13 17:49:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
 ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-^ <h2>  Version 4.2 organized by Hans-Bernhard Broeker and others</h2><p>
+^ <h2>  Version 4.4 organized by Ethan A Merritt and others</h2><p>
 ^ <h2>Major contributors (alphabetic order):</h2>
 ^<ul><h3>
 ^<li>  Hans-Bernhard Broeker
@@ -191,29 +191,12 @@ C
  you are subscribed to the list, so that users who use news will know to email
  a reply to you.  There is a form for such postings on the WWW site.
 
-2 New features introduced in version 4.3
+2 New features introduced in version 4.5
 ?new-features
- Gnuplot version 4.3 offers many new features introduced since the preceding
- official version 4.2. This section lists major additions and gives a partial
+ Gnuplot version 4.5 offers many new features introduced since the preceding
+ official version 4.4. This section lists major additions and gives a partial
  list of changes and minor new features. For a more exhaustive list, see the
  NEWS file.
-
-3 Internationalization
- Gnuplot 4.3 contains significantly improved support for locale settings and for
- UTF-8 character encodings. See `set locale`, `set encoding`, `set decimalsign`.
-
-3 Transparency
- Gnuplot now supports several forms of transparency. Any object or plot
- element that uses a fill style can be assigned a transparency from fully opaque
- to fully transparent. Image or matrix data can be plotted with an alpha channel
- using the new plot style `with rgbalpha`. See `fillstyle`, `rgbalpha`.
-
-3 Volatile Data
- The new command `refresh` is similar to `replot` except that it uses the
- previously-stored input data values rather than rereading the input data file.
- Mouse operations (zoom, rotate) will automatically use `refresh` rather than
- `replot` if the input data stream is marked `volatile`.  Piped or in-line data
- is automatically treated as volatile.  See `refresh`, `plot datafile volatile`.
 
 3 Canvas size
 ?canvas size
@@ -223,7 +206,7 @@ C
  In earlier versions of gnuplot, some terminal types used the values from
  `set size` to control also the size of the output canvas; others did not.
  The use of 'set size' for this purpose was deprecated in version 4.2.
- In version 4.3 almost all terminals now behave as follows:
+ In version 4.4 almost all terminals now behave as follows:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
  file, or "canvas". Please see individual terminal documentation for allowed
@@ -9741,7 +9724,7 @@ Ffigure_mapcontours
  Important note:
        In earlier versions of gnuplot, some terminal types used the values from
        `set size` to control also the size of the output canvas; others did not.
-       In version 4.2 almost all terminals now follow the following convention:
+       In version 4.4 almost all terminals now follow the following convention:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
  file, or `canvas`. Please see individual terminal documentation for allowed
@@ -11986,7 +11969,7 @@ Ffigure_mapcontours
  and, if possible, a test script that demonstrates the bug.
  See `Seeking-assistance`.
 
- The sections below list problems known to be present in gnuplot version 4.2 at
+ The sections below list problems known to be present in gnuplot version 4.4 at
  the time of release.  Some of these are actually bugs in external support
  libraries and may have been fixed independent of any changes in gnuplot.
 
