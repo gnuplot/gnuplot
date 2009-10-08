@@ -6,6 +6,10 @@
 	* src/plot.c src/show.c src/syscfg.h src/version.c src/version.h:
 	More concise contact info on splash page.
 
+	* src/graph3d.c (do_3dplot): Explicit 'set xyplane at <z-value>' should
+	be honored even if the x and y tics are turned off.
+	Bugfix
+
 2009-10-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/term.c (term_start_multiplot): Accept an explicit font for
