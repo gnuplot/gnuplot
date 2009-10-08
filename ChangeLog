@@ -10,6 +10,9 @@
 	be honored even if the x and y tics are turned off.
 	Bugfix
 
+	* src/graph3d.c (plot3drequest): Fixes spurious error from old tics,
+	e.g.  "set ytics ("Bug" 0); unset ytics; set ytics; splot x*y"
+
 2009-10-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/term.c (term_start_multiplot): Accept an explicit font for
