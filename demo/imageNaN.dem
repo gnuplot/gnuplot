@@ -21,7 +21,7 @@ unset xtics
 set xlabel "First column contains various odd values" offset 0,1
 
 set view map
-splot '-' matrix with image 
+plot '-' matrix with image 
 0    5 4 3 1 0
 ?    2 2 0 0 1
 Junk 1 2 3 4 5
@@ -34,7 +34,21 @@ e
 pause -1 "Hit return to continue"
 #
 #
-set title "Same thing in failsafe mode"
+set title "Same thing in failsafe mode (2D)"
+
+plot '-' matrix with image failsafe
+0    5 4 3 1 0
+?    2 2 0 0 1
+Junk 1 2 3 4 5
+NaN  0 0 3 1 0
+Inf  3 2 0 2 3
+-Inf 0 1 2 4 3
+e
+e
+
+pause -1 "Hit return to continue"
+
+set title "Same thing in failsafe mode (3D)"
 
 splot '-' matrix with image failsafe
 0    5 4 3 1 0
@@ -47,3 +61,4 @@ e
 e
 
 pause -1 "Hit return to continue"
+

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.313 2009/08/28 15:30:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.314 2009/09/06 18:11:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6238,7 +6238,9 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 
 		    if (N_corners > 0) {
 			if (pixel_planes == IC_PALETTE) {
-			    if (isnan(points[i_image].CRD_COLOR))
+			    /* FIXME: Why do we have to check both??? */
+			    if ((points[i_image].type == UNDEFINED)
+			    ||  isnan(points[i_image].CRD_COLOR))
 				goto skip_pixel;
 			    set_color( cb2gray(points[i_image].CRD_COLOR) );
 			} else {
