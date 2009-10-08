@@ -1,10 +1,10 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.12 2009/09/02 18:39:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.13 2009/09/13 17:54:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
 ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-^ <h2>  Version 4.2 organized by Hans-Bernhard Broeker and others</h2><p>
+^ <h2>  Version 4.4 organized by Ethan A Merritt and others</h2><p>
 ^ <h2>Major contributors (alphabetic order):</h2>
 ^<ul><h3>
 ^<li>  Hans-Bernhard Broeker
@@ -9720,7 +9720,7 @@ Ffigure_mapcontours
  Important note:
        In earlier versions of gnuplot, some terminal types used the values from
        `set size` to control also the size of the output canvas; others did not.
-       In version 4.2 almost all terminals now follow the following convention:
+       In version 4.4 almost all terminals now follow the following convention:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
  file, or `canvas`. Please see individual terminal documentation for allowed
@@ -11965,7 +11965,7 @@ Ffigure_mapcontours
  and, if possible, a test script that demonstrates the bug.
  See `Seeking-assistance`.
 
- The sections below list problems known to be present in gnuplot version 4.2 at
+ The sections below list problems known to be present in gnuplot version 4.4 at
  the time of release.  Some of these are actually bugs in external support
  libraries and may have been fixed independent of any changes in gnuplot.
 
