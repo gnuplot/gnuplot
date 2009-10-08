@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.222 2009/05/30 20:08:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.223 2009/08/02 22:06:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -634,14 +634,14 @@ do_3dplot(
      *      graph_error("all points undefined!");
      */
 
+    /* absolute or relative placement of xyplane along z */
+    if (xyplane.absolute)
+	base_z = AXIS_LOG_VALUE(0, xyplane.z);
+    else
+	base_z = Z_AXIS.min - (Z_AXIS.max - Z_AXIS.min) * xyplane.z;
+
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
     if (X_AXIS.ticmode || Y_AXIS.ticmode || some_grid_selected()) {
-	/* absolute or relative placement */
-	if (xyplane.absolute)
-	    base_z = AXIS_LOG_VALUE(0, xyplane.z);
-	else
-	    base_z = Z_AXIS.min
-		- (Z_AXIS.max - Z_AXIS.min) * xyplane.z;
 	if (Z_AXIS.range_flags & RANGE_REVERSE) {
 	    floor_z = GPMAX(Z_AXIS.min, base_z);
 	    ceiling_z = GPMIN(Z_AXIS.max, base_z);
@@ -650,7 +650,7 @@ do_3dplot(
 	    ceiling_z = GPMAX(Z_AXIS.max, base_z);
 	}
     } else {
-	floor_z = base_z = Z_AXIS.min;
+	floor_z = Z_AXIS.min;
 	ceiling_z = Z_AXIS.max;
     }
 

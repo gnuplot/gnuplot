@@ -2,6 +2,10 @@
 
 	* FAQ.pdf Makefile.am: FAQ.pdf replaces outdated FAQ
 
+	* src/graph3d.c (do_3dplot): Explicit 'set xyplane at <z-value>' should
+	be honored even if the x and y tics are turned off.
+	Bugfix
+
 2009-10-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/term.c (term_start_multiplot): Accept an explicit font for
