@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.173 2009/08/08 06:31:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.174 2009/08/19 15:52:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -273,6 +273,15 @@ plot3drequest()
     CHECK_REVERSE(FIRST_X_AXIS);
     CHECK_REVERSE(FIRST_Y_AXIS);
     CHECK_REVERSE(FIRST_Z_AXIS);
+
+    /* Clear out any tick labels read from data files in previous plot */
+    for (u_axis=0; u_axis<AXIS_ARRAY_SIZE; u_axis++) {
+	struct ticdef *ticdef = &axis_array[u_axis].ticdef;
+	if (ticdef->def.user)
+	    ticdef->def.user = prune_dataticks(ticdef->def.user);
+	if (!ticdef->def.user && ticdef->type == TIC_USER)
+	    ticdef->type = TIC_COMPUTED;
+    }
 
     /* use the default dummy variable unless changed */
     if (dummy_token0 >= 0)
