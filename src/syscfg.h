@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.35 2008/09/09 18:25:31 sfeam Exp $
+ * $Id: syscfg.h,v 1.36 2008/09/10 18:12:34 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -215,17 +215,6 @@
 # define PATHSEP ':'
 #endif
 
-#ifndef FAQ_LOCATION
-#define FAQ_LOCATION "http://www.gnuplot.info/faq/"
-#endif
-
-#ifndef CONTACT
-# define CONTACT "gnuplot-bugs@lists.sourceforge.net"
-#endif
-
-#ifndef HELPMAIL
-# define HELPMAIL "gnuplot-info@lists.sourceforge.net"
-#endif
 /* End fall-through defaults */
 
 /* Need this before any headers are incldued */

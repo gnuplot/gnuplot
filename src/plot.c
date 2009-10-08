@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.103 2008/11/07 11:55:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.104 2008/12/12 21:06:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -376,7 +376,7 @@ main(int argc, char **argv)
 		    "  -e  \"command1; command2; ...\"\n"
 		    "gnuplot %s patchlevel %s\n"
 		    "Report bugs to %s\n",
-		    gnuplot_version, gnuplot_patchlevel, bug_email);
+		    gnuplot_version, gnuplot_patchlevel, bug_report);
 	    return 0;
 
 	} else if (!strncmp(argv[i], "-persist", 2) || !strcmp(argv[i], "--persist")) {

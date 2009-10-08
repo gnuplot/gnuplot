@@ -1,12 +1,10 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.248.2.2 2009/06/17 06:40:46 sfeam Exp $
+dnl $Id: configure.in,v 1.248.2.3 2009/08/26 04:37:51 sfeam Exp $
 dnl
-dnl this is actually major.minor ...
-dnl note that for a non-beta release, we need to
-dnl remove the letter from VERSION
-AC_INIT(gnuplot, 4.4)
+dnl AC_INIT must match the release number
+AC_INIT(gnuplot, 4.4.rc0)
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ(2.58)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -273,7 +271,7 @@ AC_ARG_WITH(xmi,dnl
 dnl Use builtin readline or GNU readline or NetBSD editline
 AC_ARG_WITH(readline,dnl
 [  --with-readline=builtin  use the built-in minimal readline
-  --with-readline=gnu      use the GNU readline library (default; 4.2 or newer required)
+  --with-readline=gnu      use the GNU readline library (default)
   --with-readline=bsd      use the NetBSD editline library (NB: does not handle UTF-8!)
   --with-readline=DIR      specify the location of GNU readline
   --without-readline       do not use any readline function], ,

@@ -1,7 +1,10 @@
 2009-10-08  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* FAQ.pdf Makefile.am docs/gnuplot.doc:  Replace outdated FAQ with
-	current FAQ.pdf.  Update version numbers in gnuplot.doc.
+	* FAQ.pdf Makefile.am docs/gnuplot.doc configure.in:
+	Replace outdated FAQ with current FAQ.pdf.  Update version numbers.
+
+	* src/plot.c src/show.c src/syscfg.h src/version.c src/version.h:
+	More concise contact info on splash page.
 
 2009-10-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
