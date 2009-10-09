@@ -1,3 +1,9 @@
+2009-10-09  Thomas Sefzick <thse@users.sourceforge.net>
+
+	* term/latex.trm:  Add an option for rotated text in the old latex
+	terminal.  'set term latex rotate' enables it and turns off the 
+	previous 'stacked' y-label mechanism.
+
 2009-10-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_image_or_update_axes) demo/imageNaN.dem: 

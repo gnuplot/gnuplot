@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: latex.trm,v 1.33 2007/05/26 04:02:09 sfeam Exp $
+ * $Id: latex.trm,v 1.34 2007/05/27 05:14:58 sfeam Exp $
  *
  */
 
@@ -78,6 +78,9 @@
  * PostScript and other terminals. Uses symbols from amssymb package.
  */
 
+/* T.Sefzick Oct 2009 - rotate text when option 'rotated' is given.
+ * needs graphics or graphicx package.
+ */
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -141,6 +144,7 @@ static int LATEX_fontsize = 10;
 static char LATEX_font[MAX_ID_LEN+1] = "doc";
 static enum JUSTIFY latex_justify = LEFT;
 static int latex_angle = 0;
+static TBOOLEAN latex_rotate = FALSE;
 
 static TBOOLEAN latex_explicit_size = FALSE;
 static size_units latex_explicit_units = INCHES;
@@ -230,7 +234,7 @@ static struct vslope {
 /* figure out the best arrow */
 static void best_latex_arrow __PROTO((int, int, int, int, int, int));
 
-enum LATEX_id { LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT, LATEX_SIZE, LATEX_OTHER };
+enum LATEX_id { LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT, LATEX_SIZE, LATEX_ROTATE, LATEX_NOROTATE, LATEX_OTHER };
 
 static struct gen_table LATEX_opts[] =
 {
@@ -238,6 +242,8 @@ static struct gen_table LATEX_opts[] =
     { "r$oman", LATEX_ROMAN },
     { "d$efault", LATEX_DEFAULT },
     { "si$ze", LATEX_SIZE },
+    { "rot$ate", LATEX_ROTATE },
+    { "no$rotate", LATEX_NOROTATE },
     { NULL, LATEX_OTHER }
 };
 
@@ -271,6 +277,14 @@ LATEX_options()
 	    term->ymax = ymax_t * DOTS_PER_INCH/72;
 	    break;
 	    }
+	case LATEX_ROTATE:
+	    latex_rotate = TRUE;
+	    c_token++;
+	    break;
+	case LATEX_NOROTATE:
+	    latex_rotate = FALSE;
+	    c_token++;
+	    break;
 	case LATEX_OTHER:
 	default:
 	    /* if isannumber? */
@@ -299,6 +313,12 @@ LATEX_options()
 	    sprintf(&(term_options[strlen(term_options)]), "size %.2fin, %.2fin ",
 		(float)term->xmax/(DOTS_PER_INCH),
 		(float)term->ymax/(DOTS_PER_INCH));
+    }
+
+    if (latex_rotate) {
+	sprintf(&(term_options[strlen(term_options)]), " rotate");
+    } else {
+	sprintf(&(term_options[strlen(term_options)]), " norotate");
     }
 
 }
@@ -773,10 +793,13 @@ LATEX_put_text(unsigned int x, unsigned int y, const char str[])
     if (str[0] == NUL)
 	return;
 
+    if (!latex_rotate)
     for (flag = FALSE, i = 0; str[i] && !flag;)
 	flag = (str[i++] == '\\') && (str[i++] == '\\');
 
     fprintf(gpoutfile, "\\put(%d,%d)", x, y);
+    if (latex_rotate && latex_angle)
+    	fprintf (gpoutfile, "{\\rotatebox{%d}", latex_angle);
     if ((str[0] == '{') || (str[0] == '[')) {
 	fprintf(gpoutfile, "{\\makebox(0,0)%s}\n", str);
     } else if (flag)
@@ -785,6 +808,8 @@ LATEX_put_text(unsigned int x, unsigned int y, const char str[])
     else
 	fprintf(gpoutfile, "{\\makebox(0,0)%s{%s}}\n",
 		justify[latex_justify], str);
+    if (latex_rotate && latex_angle)
+    	fprintf (gpoutfile, "}");
 }
 
 TERM_PUBLIC int
@@ -800,7 +825,9 @@ LATEX_text_angle(int ang)
     /* we can't really write text vertically, but this will
        put the ylabel centred at the left of the plot, and
        then we'll make a \shortstack */
-    latex_angle = (ang ? 1 : 0);
+    /* latex_angle is not used elsewhere, so we use it for
+       'real' text rotation using '\rotatebox' */
+    latex_angle = ang;
     return (TRUE);
 }
 
@@ -936,7 +963,7 @@ START_HELP(latex)
 "?latex",
 " Syntax:",
 "       set terminal {latex | emtex} {default | {courier|roman} {<fontsize>}}",
-"                    {size <XX>{unit}, <YY>{unit}}",
+"                    {size <XX>{unit}, <YY>{unit}} {rotate | norotate}",
 "",
 " By default the plot will inherit font settings from the embedding document.",
 " You have the option of forcing either Courier (cmtt) or Roman (cmr) fonts",
@@ -963,6 +990,10 @@ START_HELP(latex)
 " The default size for the plot is 5 inches by 3 inches. The `size` option",
 " changes this to whatever the user requests. By default the X and Y sizes",
 " are taken to be in inches, but other units are possible (currently only cm).",
+"",
+" If 'rotate' is specified, rotated text, especially a rotated y-axis label,",
+" is possible (the packages graphics or graphicx are needed). The 'stacked'",
+" y-axis label mechanism is then deactivated.",
 "",
 " Examples:",
 " About label positioning:",
