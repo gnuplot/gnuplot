@@ -1,3 +1,8 @@
+2009-10-10  Jost Brachert  <jotyc@users.sourceforge.net>
+
+	* src/datafile.c (plot_option_index) docs/gnuplot.doc:
+	Allow a blank trailing index spec to indicate "until end of file".
+
 2009-10-10  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	* src/tabulate.c:  Fix tabular output of log scale data.

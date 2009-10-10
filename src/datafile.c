@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.175 2009/08/28 05:16:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.176 2009/09/03 04:43:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1328,10 +1328,13 @@ plot_option_index()
     df_lower_index = int_expression();
     if (equals(c_token, ":")) {
 	++c_token;
-	df_upper_index = abs(int_expression());
-	if (df_upper_index < df_lower_index)
-	    int_error(c_token, "Upper index should be bigger than lower index");
-
+	if (equals(c_token, ":")) {
+	    df_upper_index = MAXINT;    /* If end index not specified */
+	} else {
+	    df_upper_index = int_expression();
+	    if (df_upper_index < df_lower_index)
+		int_error(c_token, "Upper index should be bigger than lower index");
+	}
 	if (equals(c_token, ":")) {
 	    ++c_token;
 	    df_index_step = abs(int_expression());
