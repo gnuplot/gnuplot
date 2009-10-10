@@ -1,3 +1,8 @@
+2009-10-10  Alexander Täschner  <taschna@users.sourceforge.net>
+
+	* src/tabulate.c:  Fix tabular output of log scale data.
+	Bug #2849166
+
 2009-10-09  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* term/latex.trm:  Add an option for rotated text in the old latex
