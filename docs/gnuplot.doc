@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.13 2009/09/13 17:54:09 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.14 2009/10/08 03:39:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4834,8 +4834,10 @@ Ffigure_mapcontours
  set <m>; `index <m>:<n>` selects sets in the range <m> to <n>; and `index
  <m>:<n>:<p>` selects indices <m>, <m>+<p>, <m>+2<p>, etc., but stopping at
  <n>.  Following C indexing, the index 0 is assigned to the first data set in
- the file.  Specifying too large an index results in an error message.  If
- `index` is not specified, all sets are plotted as a single data set.
+ the file.  Specifying too large an index results in an error message.
+ If <p> is specified but <n> is left blank then every <p>-th dataset is read
+ until the end of the file.  If `index` is not specified, the entire file is
+ plotted as a single data set.
 
  Example:
        plot 'file' index 4:5
