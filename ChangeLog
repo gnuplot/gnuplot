@@ -1,3 +1,8 @@
+2009-10-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (test_term):  Add a few items to the test page output if
+	the current terminal supports them:  enhanced text, transparency.
+
 2009-10-10  Jost Brachert  <jotyc@users.sourceforge.net>
 
 	* src/datafile.c (plot_option_index) docs/gnuplot.doc:
