@@ -236,7 +236,7 @@ diff -rc docs/tex2ja.awk.ORG docs/tex2ja.awk
 + 
 diff -rc term/aed.trm.ORG term/aed.trm
 *** term/aed.trm	2006-07-22.ORG 17:39:07.000000000 +0900
---- term/aed.trm	2009-06-26 16:06:40.000000000 +0900
+--- term/aed.trm	2009-10-13 09:31:58.000000000 +0900
 ***************
 *** 203,208 ****
 --- 203,209 ----
@@ -276,7 +276,7 @@ diff -rc term/aed.trm.ORG term/aed.trm
   #endif
 diff -rc term/ai.trm.ORG term/ai.trm
 *** term/ai.trm	2006-07-30.ORG 20:04:05.000000000 +0900
---- term/ai.trm	2009-06-26 16:06:40.000000000 +0900
+--- term/ai.trm	2009-10-13 09:31:58.000000000 +0900
 ***************
 *** 528,533 ****
 --- 528,534 ----
@@ -332,7 +332,7 @@ diff -rc term/ai.trm.ORG term/ai.trm
   #endif /* TERM_HELP */
 diff -rc term/amiga.trm.ORG term/amiga.trm
 *** term/amiga.trm	2006-07-22.ORG 17:39:07.000000000 +0900
---- term/amiga.trm	2009-06-26 16:06:40.000000000 +0900
+--- term/amiga.trm	2009-10-13 09:31:59.000000000 +0900
 ***************
 *** 809,814 ****
 --- 809,815 ----
@@ -374,7 +374,7 @@ diff -rc term/amiga.trm.ORG term/amiga.trm
   #endif /* TERM_HELP */
 diff -rc term/apollo.trm.ORG term/apollo.trm
 *** term/apollo.trm	2006-07-22.ORG 17:39:07.000000000 +0900
---- term/apollo.trm	2009-06-26 16:06:40.000000000 +0900
+--- term/apollo.trm	2009-10-13 09:31:59.000000000 +0900
 ***************
 *** 595,600 ****
 --- 595,601 ----
@@ -409,11 +409,11 @@ diff -rc term/apollo.trm.ORG term/apollo.trm
   END_HELP(apollo)
   #endif /* TERM_HELP */
 diff -rc term/aquaterm.trm.ORG term/aquaterm.trm
-*** term/aquaterm.trm	2009-03-27.ORG 14:11:35.000000000 +0900
---- term/aquaterm.trm	2009-06-26 16:06:40.000000000 +0900
+*** term/aquaterm.trm	2009-07-06.ORG 08:50:59.000000000 +0900
+--- term/aquaterm.trm	2009-10-13 09:31:59.000000000 +0900
 ***************
-*** 901,906 ****
---- 901,907 ----
+*** 903,908 ****
+--- 903,909 ----
   
   #ifdef TERM_HELP
   START_HELP(aqua)
@@ -422,8 +422,8 @@ diff -rc term/aquaterm.trm.ORG term/aquaterm.trm
   "?commands set terminal aqua",
   "?set terminal aqua",
 ***************
-*** 932,937 ****
---- 933,973 ----
+*** 934,939 ****
+--- 935,975 ----
   " Lines can be drawn either solid or dashed, (default is solid) and the dash",
   " spacing can be modified by <dashlength> which is a multiplier > 0.",
   ""
@@ -467,7 +467,7 @@ diff -rc term/aquaterm.trm.ORG term/aquaterm.trm
   
 diff -rc term/be.trm.ORG term/be.trm
 *** term/be.trm	2006-07-22.ORG 17:39:07.000000000 +0900
---- term/be.trm	2009-06-26 16:06:41.000000000 +0900
+--- term/be.trm	2009-10-13 09:31:59.000000000 +0900
 ***************
 *** 390,395 ****
 --- 390,396 ----
@@ -787,11 +787,11 @@ diff -rc term/be.trm.ORG term/be.trm
   END_HELP(be)
   #endif /* TERM_HELP */
 diff -rc term/cairo.trm.ORG term/cairo.trm
-*** term/cairo.trm	2009-06-09.ORG 08:46:24.000000000 +0900
---- term/cairo.trm	2009-06-26 16:06:41.000000000 +0900
+*** term/cairo.trm	2009-09-14.ORG 09:21:41.000000000 +0900
+--- term/cairo.trm	2009-10-13 09:31:59.000000000 +0900
 ***************
-*** 922,927 ****
---- 922,928 ----
+*** 916,921 ****
+--- 916,922 ----
   
   #ifdef TERM_HELP
   START_HELP(pdfcairo)
@@ -800,8 +800,8 @@ diff -rc term/cairo.trm.ORG term/cairo.trm
   "?set terminal pdfcairo",
   "?terminal pdfcairo",
 ***************
-*** 1001,1011 ****
---- 1002,1097 ----
+*** 995,1005 ****
+--- 996,1091 ----
   " so that gnuplot can draw a line from non-integer coordinates. This avoids",
   " wobbling effects on diagonal lines ('plot x' for example).",
   ""
@@ -830,7 +830,7 @@ diff -rc term/cairo.trm.ORG term/cairo.trm
 + "",
 + " 描画における全ての線の幅は、`linewidth` で指定する因子 <lw> で変更でき",
 + " ます。デフォルトの線幅は 0.25 ポイントです。(1 \"PostScript\" ポイント",
-+ " = 1/72 インチ = 0.353 cm)",
++ " = 1/72 インチ = 0.353 mm)",
 + "",
 + " `rounded` は、線の端や接合部を丸くし、デフォルトの `butt` は尖った端と",
 + " 角張った接合部を使用します。",
@@ -899,8 +899,8 @@ diff -rc term/cairo.trm.ORG term/cairo.trm
   "?set terminal pngcairo",
   "?terminal pngcairo",
 ***************
-*** 1085,1090 ****
---- 1171,1260 ----
+*** 1079,1084 ****
+--- 1165,1254 ----
   " so that gnuplot can draw a line from non-integer coordinates. This avoids",
   " wobbling effects on diagonal lines ('plot x' for example).",
   ""
@@ -929,7 +929,7 @@ diff -rc term/cairo.trm.ORG term/cairo.trm
 + "",
 + " 描画における全ての線の幅は、`linewidth` で指定する因子 <lw> で変更でき",
 + " ます。デフォルトの線幅は 0.25 ポイントです。(1 \"PostScript\" ポイント",
-+ " = 1/72 インチ = 0.353 cm)",
++ " = 1/72 インチ = 0.353 mm)",
 + "",
 + " `rounded` は、線の端や接合部を丸くし、デフォルトの `butt` は尖った端と",
 + " 角張った接合部を使用します。",
@@ -992,8 +992,8 @@ diff -rc term/cairo.trm.ORG term/cairo.trm
   #endif /* TERM_HELP */
   
 diff -rc term/canvas.trm.ORG term/canvas.trm
-*** term/canvas.trm	2009-05-31.ORG 11:29:14.000000000 +0900
---- term/canvas.trm	2009-06-26 16:06:41.000000000 +0900
+*** term/canvas.trm	2009-09-22.ORG 16:45:33.000000000 +0900
+--- term/canvas.trm	2009-10-13 09:31:59.000000000 +0900
 ***************
 *** 1098,1103 ****
 --- 1098,1104 ----
@@ -1005,8 +1005,8 @@ diff -rc term/canvas.trm.ORG term/canvas.trm
   "?commands set terminal canvas",
   "?set terminal canvas",
 ***************
-*** 1158,1162 ****
---- 1159,1231 ----
+*** 1157,1161 ****
+--- 1158,1228 ----
   "       </body>",
   "       </html>",
   ""
@@ -1017,8 +1017,6 @@ diff -rc term/canvas.trm.ORG term/canvas.trm
 + "?set term canvas",
 + "?terminal canvas",
 + "?term canvas",
-+ " 注: canvas 出力形式はまだ試験的なもので、リリースまでにはまだ変更され",
-+ " る可能性があります。",
 + "",
 + " 書式:",
 + "       set terminal canvas {size <xsize>, <ysize>} {fsize <fontsize>}",
@@ -1082,7 +1080,7 @@ diff -rc term/canvas.trm.ORG term/canvas.trm
   #endif /* TERM_HELP */
 diff -rc term/cgi.trm.ORG term/cgi.trm
 *** term/cgi.trm	2006-07-22.ORG 17:39:07.000000000 +0900
---- term/cgi.trm	2009-06-26 16:06:41.000000000 +0900
+--- term/cgi.trm	2009-10-13 09:31:59.000000000 +0900
 ***************
 *** 319,324 ****
 --- 319,325 ----
@@ -1123,8 +1121,8 @@ diff -rc term/cgi.trm.ORG term/cgi.trm
   END_HELP(cgi)
   #endif
 diff -rc term/cgm.trm.ORG term/cgm.trm
-*** term/cgm.trm	2009-06-09.ORG 08:46:25.000000000 +0900
---- term/cgm.trm	2009-06-26 16:06:41.000000000 +0900
+*** term/cgm.trm	2009-09-14.ORG 09:21:42.000000000 +0900
+--- term/cgm.trm	2009-10-13 09:31:59.000000000 +0900
 ***************
 *** 1737,1742 ****
 --- 1737,1743 ----
@@ -1344,7 +1342,7 @@ diff -rc term/cgm.trm.ORG term/cgm.trm
 + "?set terminal cgm fontsize",
 + "?set term cgm fontsize",
 + "?cgm fontsize",
-+ " フォントは、ページが 6 インチの幅であると仮定して縮尺されます。`size`",
++ " フォントは、ページが 6 インチの幅であると仮定して伸縮されます。`size`",
 + " コマンドでページの縦横比が変更されていたり、CGM ファイルが異なる幅に変",
 + " 換されている場合、結果としてフォントのサイズも拡大されたり縮小されたり",
 + " することになります。仮定されている幅を変更するには、`width` オプション",
@@ -1438,7 +1436,7 @@ diff -rc term/cgm.trm.ORG term/cgm.trm
   #endif /* TERM_HELP */
 diff -rc term/corel.trm.ORG term/corel.trm
 *** term/corel.trm	2006-07-22.ORG 17:39:07.000000000 +0900
---- term/corel.trm	2009-06-26 16:06:41.000000000 +0900
+--- term/corel.trm	2009-10-13 09:32:00.000000000 +0900
 ***************
 *** 431,436 ****
 --- 431,437 ----
@@ -1479,7 +1477,7 @@ diff -rc term/corel.trm.ORG term/corel.trm
   #endif /* TERM_HELP */
 diff -rc term/debug.trm.ORG term/debug.trm
 *** term/debug.trm	2006-07-22.ORG 17:39:07.000000000 +0900
---- term/debug.trm	2009-06-26 16:06:42.000000000 +0900
+--- term/debug.trm	2009-10-13 09:32:00.000000000 +0900
 ***************
 *** 309,314 ****
 --- 309,315 ----
@@ -1511,7 +1509,7 @@ diff -rc term/debug.trm.ORG term/debug.trm
   #endif
 diff -rc term/djsvga.trm.ORG term/djsvga.trm
 *** term/djsvga.trm	2007-06-06.ORG 11:26:08.000000000 +0900
---- term/djsvga.trm	2009-06-26 16:06:42.000000000 +0900
+--- term/djsvga.trm	2009-10-13 09:32:00.000000000 +0900
 ***************
 *** 471,476 ****
 --- 471,477 ----
@@ -1547,7 +1545,7 @@ diff -rc term/djsvga.trm.ORG term/djsvga.trm
   #endif /* TERM_HELP */
 diff -rc term/dumb.trm.ORG term/dumb.trm
 *** term/dumb.trm	2009-03-27.ORG 14:11:35.000000000 +0900
---- term/dumb.trm	2009-06-26 16:06:42.000000000 +0900
+--- term/dumb.trm	2009-10-13 09:32:00.000000000 +0900
 ***************
 *** 564,569 ****
 --- 564,570 ----
@@ -1593,7 +1591,7 @@ diff -rc term/dumb.trm.ORG term/dumb.trm
   #endif /* TERM_HELP */
 diff -rc term/dxf.trm.ORG term/dxf.trm
 *** term/dxf.trm	2006-07-22.ORG 17:39:07.000000000 +0900
---- term/dxf.trm	2009-06-26 16:06:42.000000000 +0900
+--- term/dxf.trm	2009-10-13 09:32:00.000000000 +0900
 ***************
 *** 404,409 ****
 --- 404,410 ----
@@ -1631,7 +1629,7 @@ diff -rc term/dxf.trm.ORG term/dxf.trm
   #endif /* TERM_HELP */
 diff -rc term/dxy.trm.ORG term/dxy.trm
 *** term/dxy.trm	2006-07-22.ORG 17:39:07.000000000 +0900
---- term/dxy.trm	2009-06-26 16:06:42.000000000 +0900
+--- term/dxy.trm	2009-10-13 09:32:00.000000000 +0900
 ***************
 *** 191,196 ****
 --- 191,197 ----
@@ -1663,7 +1661,7 @@ diff -rc term/dxy.trm.ORG term/dxy.trm
   #endif
 diff -rc term/eepic.trm.ORG term/eepic.trm
 *** term/eepic.trm	2008-02-25.ORG 12:04:17.000000000 +0900
---- term/eepic.trm	2009-06-26 16:06:42.000000000 +0900
+--- term/eepic.trm	2009-10-13 09:32:00.000000000 +0900
 ***************
 *** 556,561 ****
 --- 556,562 ----
@@ -1733,7 +1731,7 @@ diff -rc term/eepic.trm.ORG term/eepic.trm
 + " の一般的な問題なのか、eepic.sty や dvips/dvipdfm のバグが原因なのかは私",
 + " にはわかりません。)",
 + " デフォルトの eepic グラフの大きさは 5x3 インチで、これは 'set size a,b'",
-+ " で縮尺可能です。",
++ " で伸縮可能です。",
 + " 数ある中で、点 (point) は、LaTeX のコマンド \"\\Diamond\", \"\\Box\" などを",
 + " 使って描かれます。これらのコマンドは現在は LaTeX2e のコアには存在せず",
 + " latexsym パッケージに含まれていますが、このパッケージ基本配布の一部で",
@@ -1770,8 +1768,8 @@ diff -rc term/eepic.trm.ORG term/eepic.trm
   END_HELP(eepic)
   #endif /* TERM_HELP */
 diff -rc term/emf.trm.ORG term/emf.trm
-*** term/emf.trm	2009-06-09.ORG 08:46:25.000000000 +0900
---- term/emf.trm	2009-06-26 16:06:42.000000000 +0900
+*** term/emf.trm	2009-09-18.ORG 12:04:49.000000000 +0900
+--- term/emf.trm	2009-10-13 09:32:00.000000000 +0900
 ***************
 *** 1661,1666 ****
 --- 1661,1667 ----
@@ -1835,7 +1833,7 @@ diff -rc term/emf.trm.ORG term/emf.trm
   #endif /* TERM_HELP */
 diff -rc term/emxvga.trm.ORG term/emxvga.trm
 *** term/emxvga.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/emxvga.trm	2009-06-26 16:06:42.000000000 +0900
+--- term/emxvga.trm	2009-10-13 09:32:01.000000000 +0900
 ***************
 *** 475,480 ****
 --- 475,481 ----
@@ -1891,7 +1889,7 @@ diff -rc term/emxvga.trm.ORG term/emxvga.trm
   #endif /* TERM_HELP */
 diff -rc term/epson.trm.ORG term/epson.trm
 *** term/epson.trm	2008-06-02.ORG 08:48:43.000000000 +0900
---- term/epson.trm	2009-06-26 16:06:43.000000000 +0900
+--- term/epson.trm	2009-10-13 09:32:01.000000000 +0900
 ***************
 *** 1090,1095 ****
 --- 1090,1096 ----
@@ -2005,7 +2003,7 @@ diff -rc term/epson.trm.ORG term/epson.trm
   #endif /* TERM_HELP */
 diff -rc term/excl.trm.ORG term/excl.trm
 *** term/excl.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/excl.trm	2009-06-26 16:06:43.000000000 +0900
+--- term/excl.trm	2009-10-13 09:32:01.000000000 +0900
 ***************
 *** 273,278 ****
 --- 273,279 ----
@@ -2037,7 +2035,7 @@ diff -rc term/excl.trm.ORG term/excl.trm
   #endif
 diff -rc term/fg.trm.ORG term/fg.trm
 *** term/fg.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/fg.trm	2009-06-26 16:06:43.000000000 +0900
+--- term/fg.trm	2009-10-13 09:32:01.000000000 +0900
 ***************
 *** 414,419 ****
 --- 414,420 ----
@@ -2106,7 +2104,7 @@ diff -rc term/fg.trm.ORG term/fg.trm
   #endif /* TERM_HELP */
 diff -rc term/fig.trm.ORG term/fig.trm
 *** term/fig.trm	2009-03-27.ORG 14:11:37.000000000 +0900
---- term/fig.trm	2009-06-26 16:06:43.000000000 +0900
+--- term/fig.trm	2009-10-13 09:32:01.000000000 +0900
 ***************
 *** 1290,1295 ****
 --- 1290,1296 ----
@@ -2222,11 +2220,11 @@ diff -rc term/fig.trm.ORG term/fig.trm
   #endif /* TERM_HELP */
   
 diff -rc term/gd.trm.ORG term/gd.trm
-*** term/gd.trm	2009-06-22.ORG 08:42:55.000000000 +0900
---- term/gd.trm	2009-06-26 16:06:43.000000000 +0900
+*** term/gd.trm	2009-10-07.ORG 08:53:51.000000000 +0900
+--- term/gd.trm	2009-10-13 09:32:01.000000000 +0900
 ***************
-*** 2238,2243 ****
---- 2238,2244 ----
+*** 2239,2244 ****
+--- 2239,2245 ----
   #ifndef JPEG_HELP_ONLY
   #ifdef TERM_HELP
   START_HELP(png)
@@ -2235,8 +2233,8 @@ diff -rc term/gd.trm.ORG term/gd.trm
   "?commands set terminal png",
   "?set terminal png",
 ***************
-*** 2324,2329 ****
---- 2325,2421 ----
+*** 2325,2330 ****
+--- 2326,2422 ----
   " Use 24 bits of color information per pixel, with a transparent background.",
   " Use the `enhanced text` mode to control the layout of strings to be printed.",
   ""
@@ -2335,8 +2333,8 @@ diff -rc term/gd.trm.ORG term/gd.trm
   #endif /* TERM_HELP */
   #endif /* JPEG_HELP_ONLY */
 ***************
-*** 2399,2404 ****
---- 2491,2497 ----
+*** 2400,2405 ****
+--- 2492,2498 ----
   
   #ifdef TERM_HELP
   START_HELP(jpeg)
@@ -2345,8 +2343,8 @@ diff -rc term/gd.trm.ORG term/gd.trm
   "?commands set terminal jpeg",
   "?set terminal jpeg",
 ***************
-*** 2451,2456 ****
---- 2544,2602 ----
+*** 2452,2457 ****
+--- 2545,2603 ----
   " colors, then the X & Y axis colors, then the plotting colors.  The maximum",
   " number of colors that can be set is 256.",
   ""
@@ -2407,8 +2405,8 @@ diff -rc term/gd.trm.ORG term/gd.trm
   #endif /* TERM_HELP */
   #endif /* HAVE_GD_JPEG */
 ***************
-*** 2553,2558 ****
---- 2699,2705 ----
+*** 2554,2559 ****
+--- 2700,2706 ----
   
   #ifdef TERM_HELP
   START_HELP(gif)
@@ -2417,8 +2415,8 @@ diff -rc term/gd.trm.ORG term/gd.trm
   "?commands set terminal gif",
   "?set terminal gif",
 ***************
-*** 2656,2661 ****
---- 2803,2925 ----
+*** 2660,2665 ****
+--- 2807,2926 ----
   " frames of the animation sequence are created by the script file animate2.dem",
   " from the standard collection of demos.",
   ""
@@ -2437,6 +2435,7 @@ diff -rc term/gd.trm.ORG term/gd.trm
 + "              {tiny | small | medium | large | giant}",
 + "              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
 + "              {size <x>,<y>} {{no}crop}",
++ "              {animate {delay <d>} {loop <n>} {{no}optimize}}",
 + "              {<color0> <color1> <color2> ...}",
 + "",
 + " PNG, JPEG, GIF 画像は、外部ライブラリ libgd を使って生成されます。GIF",
@@ -2472,6 +2471,8 @@ diff -rc term/gd.trm.ORG term/gd.trm
 + " ン gif の作成をサポートする場合にのみ有効です。作成される画像の表示間",
 + " 隔は、1/100 秒単位で指定できます (デフォルトは 5)。ただし実際の表示間",
 + " 隔は、使用する表示ソフトによって変化します。",
++ " アニメーションの繰り返し回数も指定できますが、デフォルトは 0 でそれは",
++ " 無限の繰り返しを意味します。",
 + " アニメーション画像列は、次の `set output` か `set term` コマンドによっ",
 + " て終了します。オプション `optimize` は、アニメーションに関する 2 つの",
 + " 効果を持ちます。",
@@ -2495,12 +2496,6 @@ diff -rc term/gd.trm.ORG term/gd.trm
 + " るかもしれません。",
 + " デフォルトでは `nooptimize` です。",
 + "",
-+ #if 0
-+ " サイズ <x,y> はピクセル単位で与えます。デフォルトは 640x480 です。ピク",
-+ " セル数は `set size` コマンドで縮尺することでも変更できます。",
-+ " `crop` は完成した描画グラフの端の空白領域を取り除いて、結果として画像",
-+ " サイズを小さくします。デフォルトは `nocrop` です。",
-+ #endif
 + " 出力描画サイズ <x,y> はピクセル単位で与えます。デフォルトは 640x480 で",
 + " す。以下も参照: `canvas`, `set size`。",
 + " 描画終了後の端の余白は、オプション `crop` で取り除くことができ、その結",
@@ -2544,7 +2539,7 @@ diff -rc term/gd.trm.ORG term/gd.trm
   #endif /* HAVE_GD_GIF */
 diff -rc term/ggi.trm.ORG term/ggi.trm
 *** term/ggi.trm	2008-06-27.ORG 08:34:21.000000000 +0900
---- term/ggi.trm	2009-06-26 16:06:44.000000000 +0900
+--- term/ggi.trm	2009-10-13 09:32:02.000000000 +0900
 ***************
 *** 1504,1509 ****
 --- 1504,1510 ----
@@ -2601,7 +2596,7 @@ diff -rc term/ggi.trm.ORG term/ggi.trm
   #endif
 diff -rc term/gnugraph.trm.ORG term/gnugraph.trm
 *** term/gnugraph.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/gnugraph.trm	2009-06-26 16:06:44.000000000 +0900
+--- term/gnugraph.trm	2009-10-13 09:32:02.000000000 +0900
 ***************
 *** 422,427 ****
 --- 422,428 ----
@@ -2654,7 +2649,7 @@ diff -rc term/gnugraph.trm.ORG term/gnugraph.trm
   #endif
 diff -rc term/gpic.trm.ORG term/gpic.trm
 *** term/gpic.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/gpic.trm	2009-06-26 16:06:44.000000000 +0900
+--- term/gpic.trm	2009-10-13 09:32:02.000000000 +0900
 ***************
 *** 294,299 ****
 --- 294,300 ----
@@ -2704,7 +2699,7 @@ diff -rc term/gpic.trm.ORG term/gpic.trm
 + "       gpic filename.pic | geqn -d@@ -Tps | groff -m[macro-package] -Tps",
 + "           > filename.ps",
 + "",
-+ " このようにして作られた図は文書に綺麗に当てはまるように縮尺することがで",
++ " このようにして作られた図は文書に綺麗に当てはまるように伸縮することがで",
 + " きます。pic 言語は簡単に理解できるので、必要なら容易にグラフを直接編集",
 + " できます。`gnuplot` で作られる pic ファイルの全ての座標は x+gnuplotx,",
 + " y+gnuploty の形で与えられます。デフォルトでは x, y の値は 0 です。いく",
@@ -2740,7 +2735,7 @@ diff -rc term/gpic.trm.ORG term/gpic.trm
   #endif /* TERM_HELP */
 diff -rc term/gpr.trm.ORG term/gpr.trm
 *** term/gpr.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/gpr.trm	2009-06-26 16:06:44.000000000 +0900
+--- term/gpr.trm	2009-10-13 09:32:02.000000000 +0900
 ***************
 *** 462,467 ****
 --- 462,468 ----
@@ -2775,7 +2770,7 @@ diff -rc term/gpr.trm.ORG term/gpr.trm
   #endif /* TERM_HELP */
 diff -rc term/grass.trm.ORG term/grass.trm
 *** term/grass.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/grass.trm	2009-06-26 16:06:44.000000000 +0900
+--- term/grass.trm	2009-10-13 09:32:02.000000000 +0900
 ***************
 *** 624,629 ****
 --- 624,630 ----
@@ -2809,7 +2804,7 @@ diff -rc term/grass.trm.ORG term/grass.trm
   #endif
 diff -rc term/hp26.trm.ORG term/hp26.trm
 *** term/hp26.trm	2007-01-17.ORG 19:53:34.000000000 +0900
---- term/hp26.trm	2009-06-26 16:06:44.000000000 +0900
+--- term/hp26.trm	2009-10-13 09:32:02.000000000 +0900
 ***************
 *** 691,696 ****
 --- 691,697 ----
@@ -2841,7 +2836,7 @@ diff -rc term/hp26.trm.ORG term/hp26.trm
   #endif
 diff -rc term/hp2648.trm.ORG term/hp2648.trm
 *** term/hp2648.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/hp2648.trm	2009-06-26 16:06:44.000000000 +0900
+--- term/hp2648.trm	2009-10-13 09:32:02.000000000 +0900
 ***************
 *** 188,193 ****
 --- 188,194 ----
@@ -2873,7 +2868,7 @@ diff -rc term/hp2648.trm.ORG term/hp2648.trm
   #endif
 diff -rc term/hp500c.trm.ORG term/hp500c.trm
 *** term/hp500c.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/hp500c.trm	2009-06-26 16:06:44.000000000 +0900
+--- term/hp500c.trm	2009-10-13 09:32:03.000000000 +0900
 ***************
 *** 527,532 ****
 --- 527,533 ----
@@ -2914,7 +2909,7 @@ diff -rc term/hp500c.trm.ORG term/hp500c.trm
   #endif /* TERM_HELP */
 diff -rc term/hpgl.trm.ORG term/hpgl.trm
 *** term/hpgl.trm	2009-03-03.ORG 08:59:34.000000000 +0900
---- term/hpgl.trm	2009-06-26 16:06:44.000000000 +0900
+--- term/hpgl.trm	2009-10-13 09:32:03.000000000 +0900
 ***************
 *** 2611,2616 ****
 --- 2611,2617 ----
@@ -3016,7 +3011,7 @@ diff -rc term/hpgl.trm.ORG term/hpgl.trm
   #endif /* TERM_HELP */
 diff -rc term/hpljii.trm.ORG term/hpljii.trm
 *** term/hpljii.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/hpljii.trm	2009-06-26 16:06:46.000000000 +0900
+--- term/hpljii.trm	2009-10-13 09:32:03.000000000 +0900
 ***************
 *** 401,406 ****
 --- 401,407 ----
@@ -3065,7 +3060,7 @@ diff -rc term/hpljii.trm.ORG term/hpljii.trm
   #endif /* TERM_HELP */
 diff -rc term/hppj.trm.ORG term/hppj.trm
 *** term/hppj.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/hppj.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/hppj.trm	2009-10-13 09:32:04.000000000 +0900
 ***************
 *** 273,278 ****
 --- 273,279 ----
@@ -3102,7 +3097,7 @@ diff -rc term/hppj.trm.ORG term/hppj.trm
   #endif
 diff -rc term/imagen.trm.ORG term/imagen.trm
 *** term/imagen.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/imagen.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/imagen.trm	2009-10-13 09:32:08.000000000 +0900
 ***************
 *** 886,891 ****
 --- 886,892 ----
@@ -3148,7 +3143,7 @@ diff -rc term/imagen.trm.ORG term/imagen.trm
   #endif
 diff -rc term/kyo.trm.ORG term/kyo.trm
 *** term/kyo.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/kyo.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/kyo.trm	2009-10-13 09:32:08.000000000 +0900
 ***************
 *** 204,209 ****
 --- 204,210 ----
@@ -3187,11 +3182,11 @@ diff -rc term/kyo.trm.ORG term/kyo.trm
   END_HELP(kyo)
   #endif
 diff -rc term/latex.trm.ORG term/latex.trm
-*** term/latex.trm	2007-05-28.ORG 09:17:19.000000000 +0900
---- term/latex.trm	2009-06-26 16:06:50.000000000 +0900
+*** term/latex.trm	2009-10-13.ORG 08:26:09.000000000 +0900
+--- term/latex.trm	2009-10-13 09:32:08.000000000 +0900
 ***************
-*** 921,926 ****
---- 921,927 ----
+*** 948,953 ****
+--- 948,954 ----
   
   #ifdef TERM_HELP
   START_HELP(latex)
@@ -3200,8 +3195,8 @@ diff -rc term/latex.trm.ORG term/latex.trm
   "?commands set terminal emtex",
   "?set terminal emtex",
 ***************
-*** 974,978 ****
---- 975,1037 ----
+*** 1005,1009 ****
+--- 1006,1072 ----
   "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
   " The other label -- account for long ticlabels:",
   "        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'"
@@ -3221,7 +3216,7 @@ diff -rc term/latex.trm.ORG term/latex.trm
 + "?latex",
 + " 書式:",
 + "       set terminal {latex | emtex} {default | {courier|roman} {<fontsize>}}",
-+ "                    {size <XX>{unit}, <YY>{unit}}",
++ "                    {size <XX>{unit}, <YY>{unit}} {rotate | norotate}",
 + "",
 + " デフォルトでは、それを埋め込む文書のフォントの設定を引き継ぎますが、代",
 + " わりに Courier (cmtt) か Roman (cmr) フォントのいずれかにするオプショ",
@@ -3252,6 +3247,10 @@ diff -rc term/latex.trm.ORG term/latex.trm
 + " のサイズの単位は inch ですが、他の単位を使うことも可能です (現在は cm",
 + " のみ)。",
 + "",
++ " 'rotate' を指定すると、文字列の回転、特に y 軸のラベルの回転が可能にな",
++ " ります (graphics か graphicx パッケージが必要)。その場合、y 軸ラベルを",
++ " '積み上げ型' にする仕組みは停止されます。",
++ "",
 + " 例:",
 + " 見出しの位置合わせに関して:",
 + " gnuplot のデフォルト (大抵それなりになるが、そうでないこともある):",
@@ -3267,7 +3266,7 @@ diff -rc term/latex.trm.ORG term/latex.trm
   #endif /* TERM_TABLE */
 diff -rc term/linux.trm.ORG term/linux.trm
 *** term/linux.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/linux.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/linux.trm	2009-10-13 09:32:08.000000000 +0900
 ***************
 *** 336,341 ****
 --- 336,342 ----
@@ -3301,7 +3300,7 @@ diff -rc term/linux.trm.ORG term/linux.trm
   #endif
 diff -rc term/lua/gnuplot-tikz.help.ORG term/lua/gnuplot-tikz.help
 *** term/lua/gnuplot-tikz.help	2009-06-08.ORG 08:33:01.000000000 +0900
---- term/lua/gnuplot-tikz.help	2009-06-26 16:06:53.000000000 +0900
+--- term/lua/gnuplot-tikz.help	2009-10-13 09:32:12.000000000 +0900
 ***************
 *** 1,3 ****
 --- 1,4 ----
@@ -3440,7 +3439,7 @@ diff -rc term/lua/gnuplot-tikz.help.ORG term/lua/gnuplot-tikz.help
 + #endif /* JAPANESE_DOC */
 diff -rc term/lua.trm.ORG term/lua.trm
 *** term/lua.trm	2009-05-27.ORG 14:42:19.000000000 +0900
---- term/lua.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/lua.trm	2009-10-13 09:32:08.000000000 +0900
 ***************
 *** 1237,1242 ****
 --- 1237,1243 ----
@@ -3518,7 +3517,7 @@ diff -rc term/lua.trm.ORG term/lua.trm
   #endif /* TERM_HELP */
 diff -rc term/mac.trm.ORG term/mac.trm
 *** term/mac.trm	2008-12-27.ORG 16:15:27.000000000 +0900
---- term/mac.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/mac.trm	2009-10-13 09:32:08.000000000 +0900
 ***************
 *** 137,142 ****
 --- 137,143 ----
@@ -3573,7 +3572,7 @@ diff -rc term/mac.trm.ORG term/mac.trm
   #endif /* TERM_HELP */
 diff -rc term/metafont.trm.ORG term/metafont.trm
 *** term/metafont.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/metafont.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/metafont.trm	2009-10-13 09:32:08.000000000 +0900
 ***************
 *** 540,545 ****
 --- 540,546 ----
@@ -3693,7 +3692,7 @@ diff -rc term/metafont.trm.ORG term/metafont.trm
   #endif /* TERM_HELP */
 diff -rc term/metapost.trm.ORG term/metapost.trm
 *** term/metapost.trm	2008-06-02.ORG 08:48:43.000000000 +0900
---- term/metapost.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/metapost.trm	2009-10-13 09:32:09.000000000 +0900
 ***************
 *** 993,998 ****
 --- 993,999 ----
@@ -3910,7 +3909,7 @@ diff -rc term/metapost.trm.ORG term/metapost.trm
   #endif				/* TERM_HELP */
 diff -rc term/mgr.trm.ORG term/mgr.trm
 *** term/mgr.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/mgr.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/mgr.trm	2009-10-13 09:32:09.000000000 +0900
 ***************
 *** 232,237 ****
 --- 232,238 ----
@@ -3942,7 +3941,7 @@ diff -rc term/mgr.trm.ORG term/mgr.trm
   #endif
 diff -rc term/mif.trm.ORG term/mif.trm
 *** term/mif.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/mif.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/mif.trm	2009-10-13 09:32:09.000000000 +0900
 ***************
 *** 965,970 ****
 --- 965,971 ----
@@ -3997,7 +3996,7 @@ diff -rc term/mif.trm.ORG term/mif.trm
   #endif /* TERM_HELP */
 diff -rc term/next.trm.ORG term/next.trm
 *** term/next.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/next.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/next.trm	2009-10-13 09:32:09.000000000 +0900
 ***************
 *** 1501,1506 ****
 --- 1501,1507 ----
@@ -4052,7 +4051,7 @@ diff -rc term/next.trm.ORG term/next.trm
   
 diff -rc term/openstep.trm.ORG term/openstep.trm
 *** term/openstep.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/openstep.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/openstep.trm	2009-10-13 09:32:09.000000000 +0900
 ***************
 *** 1373,1378 ****
 --- 1373,1379 ----
@@ -4114,7 +4113,7 @@ diff -rc term/openstep.trm.ORG term/openstep.trm
   
 diff -rc term/pbm.trm.ORG term/pbm.trm
 *** term/pbm.trm	2009-06-09.ORG 08:46:25.000000000 +0900
---- term/pbm.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/pbm.trm	2009-10-13 09:32:09.000000000 +0900
 ***************
 *** 483,488 ****
 --- 483,489 ----
@@ -4168,7 +4167,7 @@ diff -rc term/pbm.trm.ORG term/pbm.trm
   #endif /* TERM_HELP */
 diff -rc term/pc.trm.ORG term/pc.trm
 *** term/pc.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/pc.trm	2009-06-26 16:06:50.000000000 +0900
+--- term/pc.trm	2009-10-13 09:32:09.000000000 +0900
 ***************
 *** 546,551 ****
 --- 546,552 ----
@@ -4200,8 +4199,8 @@ diff -rc term/pc.trm.ORG term/pc.trm
   END_HELP(dospc)
   #endif /* TERM_HELP */
 diff -rc term/pdf.trm.ORG term/pdf.trm
-*** term/pdf.trm	2009-06-09.ORG 08:46:26.000000000 +0900
---- term/pdf.trm	2009-06-26 16:06:51.000000000 +0900
+*** term/pdf.trm	2009-09-14.ORG 09:21:45.000000000 +0900
+--- term/pdf.trm	2009-10-13 09:32:09.000000000 +0900
 ***************
 *** 1702,1707 ****
 --- 1702,1708 ----
@@ -4268,7 +4267,7 @@ diff -rc term/pdf.trm.ORG term/pdf.trm
   #endif
 diff -rc term/pm.trm.ORG term/pm.trm
 *** term/pm.trm	2009-03-27.ORG 14:11:38.000000000 +0900
---- term/pm.trm	2009-06-26 16:06:51.000000000 +0900
+--- term/pm.trm	2009-10-13 09:32:09.000000000 +0900
 ***************
 *** 1277,1282 ****
 --- 1277,1283 ----
@@ -4324,11 +4323,11 @@ diff -rc term/pm.trm.ORG term/pm.trm
   END_HELP(pm)
   #endif /* TERM_HELP */
 diff -rc term/post.trm.ORG term/post.trm
-*** term/post.trm	2009-06-09.ORG 08:46:28.000000000 +0900
---- term/post.trm	2009-06-26 16:06:51.000000000 +0900
+*** term/post.trm	2009-09-14.ORG 09:21:47.000000000 +0900
+--- term/post.trm	2009-10-13 09:32:09.000000000 +0900
 ***************
-*** 3680,3685 ****
---- 3680,3686 ----
+*** 3686,3691 ****
+--- 3686,3692 ----
    * of "text" that is necessary to avoid errors.
    */
   START_HELP(00psglobal)
@@ -4337,8 +4336,8 @@ diff -rc term/post.trm.ORG term/post.trm
   "                               {level1 | leveldefault}",\
   "                               {color | colour | monochrome}",\
 ***************
-*** 3750,3758 ****
---- 3751,3834 ----
+*** 3756,3764 ****
+--- 3757,3840 ----
   " actual limits of the plot.",\
   "",
   ""
@@ -4424,8 +4423,8 @@ diff -rc term/post.trm.ORG term/post.trm
   "?commands set terminal epslatex",
   "?set terminal epslatex",
 ***************
-*** 3920,3928 ****
---- 3996,4180 ----
+*** 3926,3934 ****
+--- 4002,4185 ----
   " by the `header` command.  Thus, you can use `header` to overwrite some of",
   " settings performed using \"gnuplot.cfg\"",
   ""
@@ -4451,16 +4450,15 @@ diff -rc term/post.trm.ORG term/post.trm
 + " ファイルに移すことを除けば `terminal postscript eps` 同様に描画します。",
 + " よって、`postscript terminal` と多くのオプションが共通です。",
 + "",
-+ " version 4.0 から 4.1 にかけて、postscript 出力形式とのより良い互換性の",
-+ " ために epslatex 出力形式のデフォルトの状態にいくつかの変更が行なわれて",
-+ " 来ました。描画サイズは 5 x 3 インチから 5 x 3.5 インチへと変更され、文",
-+ " 字幅は従来はフォントサイズの 50% と評価していましたが、現在は 60% と見",
-+ " なしています。より多くの Postscript の線種や記号も使われます。以前の状",
-+ " 態にほぼ等しい状態にするにはオプション `oldstyle` を指定してください。",
-+ " (実際にはごくわずかな違いが残ります: 記号のサイズがわずかに違い、目盛り",
-+ " 刻 (tics) は従来の半分になっていますがそれは `set tics scale` で変更で",
-+ " きます。そして矢 (arrow) に関しては postscript 出力形式で使える全ての機",
-+ " 能が利用できます。)",
++ " version 4.0 から 4.2 の間に、postscript 出力形式とのより良い互換性の",
++ " ために epslatex 出力は変更されました。描画サイズは 5 x 3 インチから",
++ " 5 x 3.5 インチへと変更され、文字幅は従来はフォントサイズの 50% と見",
++ " なしていましたが、現在は 60% と評価しています。より多くの Postscript",
++ " の線種や記号も使われます。以前の状態にほぼ等しい状態にするにはオプショ",
++ " ン `oldstyle` を指定してください。(実際にはごくわずかな違いが残ります:",
++ " 記号のサイズがわずかに違い、目盛刻み (tics) は従来の半分になっています",
++ " がそれは `set tics scale` で変更できます。そして矢 (arrow) に関しては",
++ " postscript 出力形式で使える全ての機能が利用できます。)",
 + "",
 + PS_COMMON_PROLOG_INFO
 + PS_COMMON_DOC1
@@ -4612,8 +4610,8 @@ diff -rc term/post.trm.ORG term/post.trm
   "?commands set terminal pslatex",
   "?set terminal pslatex",
 ***************
-*** 4002,4010 ****
---- 4254,4342 ----
+*** 4008,4016 ****
+--- 4259,4347 ----
   "",
   " Linewidths and pointsizes may be changed with `set style line`."
   ""
@@ -4661,8 +4659,8 @@ diff -rc term/post.trm.ORG term/post.trm
 + " 取り込まれます。`multiplot` モード以外では、次の描画を行なう前にその出",
 + " 力ファイルをクローズするのを忘れないでください。",
 + "",
-+ " version 4.1 より前の gnuplot は ps(la)tex 出力形式では 5 x 3 インチの出",
-+ " 力でしたが、現在では 5 x 3.5 インチになっています。これは postscript",
++ " version 4.2 より前の gnuplot は ps(la)tex 出力形式では 5 x 3 インチの",
++ " 出力でしたが、現在では 5 x 3.5 インチになっています。これは postscript",
 + " eps 出力形式に合わせた変更です。加えて、文字幅は、以前の epslatex 出力",
 + " 形式はフォントサイズの 50% と見なしましたが、現在は 60% と評価していま",
 + " す。従来の形式に戻すには、オプション `oldstyle` を指定してください。",
@@ -4704,8 +4702,8 @@ diff -rc term/post.trm.ORG term/post.trm
   "?commands set terminal postscript",
   "?set terminal postscript",
 ***************
-*** 4267,4271 ****
---- 4599,4868 ----
+*** 4273,4277 ****
+--- 4604,4873 ----
   " other fonts you may have to try both settings.  See also `fontfile`.",
   "",
   ""
@@ -4978,7 +4976,7 @@ diff -rc term/post.trm.ORG term/post.trm
   #endif /* TERM_HELP */
 diff -rc term/pstricks.trm.ORG term/pstricks.trm
 *** term/pstricks.trm	2006-11-19.ORG 15:16:13.000000000 +0900
---- term/pstricks.trm	2009-06-26 16:06:51.000000000 +0900
+--- term/pstricks.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 673,678 ****
 --- 673,679 ----
@@ -5016,14 +5014,14 @@ diff -rc term/pstricks.trm.ORG term/pstricks.trm
 + "       set terminal pstricks {hacktext | nohacktext} {unit | nounit}",
 + "",
 + " 最初のオプションは、あまり綺麗ではない方法で数字のより良い出力を生成す",
-+ " るもので、2 つ目のオプションはグラフを縮尺する際には必要です。デフォル",
++ " るもので、2 つ目のオプションはグラフを伸縮する際には必要です。デフォル",
 + " トでは `hacktext` と `nounit` です。"
 + #endif /* JAPANESE_DOC */
   END_HELP(pstricks)
   #endif /* TERM_HELP */
 diff -rc term/qms.trm.ORG term/qms.trm
 *** term/qms.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/qms.trm	2009-06-26 16:06:51.000000000 +0900
+--- term/qms.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 225,230 ****
 --- 225,231 ----
@@ -5053,9 +5051,114 @@ diff -rc term/qms.trm.ORG term/qms.trm
 + #endif /* JAPANESE_DOC */
   END_HELP(qms)
   #endif
+diff -rc term/qt.trm.ORG term/qt.trm
+*** term/qt.trm	2009-08-05.ORG 08:47:42.000000000 +0900
+--- term/qt.trm	2009-10-13 09:32:10.000000000 +0900
+***************
+*** 69,74 ****
+--- 69,75 ----
+  
+  #ifdef TERM_HELP
+  START_HELP(qt)
++ #ifndef JAPANESE_DOC
+  "1 qt",
+  "?set terminal qt",
+  "?terminal qt",
+***************
+*** 149,153 ****
+--- 150,238 ----
+  " Finally, by default the key <space> raises the gnuplot console window, and",
+  " 'q' closes the plot window. The keyword \"ctrl\" allows you to replace those",
+  " bindings by <ctrl>+<space> and <ctrl>+'q', respectively."
++ #else /* JAPANESE_DOC */
++ "1 qt",
++ "?set terminal qt",
++ "?terminal qt",
++ "?set term qt",
++ "?term qt",
++ "?qt",
++ " `qt` 出力形式は、Qt ライブラリを用いて別ウィンドウへの出力を生成します。",
++ "",
++ " 書式:",
++ "         set term qt {<n>}",
++ "                     {size <width>,<height>}",
++ "                     {{no}enhanced}",
++ "                     {font <font>}",
++ "                     {title \"title\"}",
++ "                     {{no}persist}",
++ "                     {{no}raise}",
++ "                     {{no}ctrl}",
++ "                     {close}",
++ "                     {widget <id>}",
++ "",
++ " 複数の描画ウィンドウもサポートしていて、`set terminal qt <n>` とすれば",
++ " 番号 n の描画ウィンドウへ出力します。",
++ "",
++ " デフォルトのウィンドウタイトルは、このウィンドウ番号に基づいています。",
++ " そのタイトルはキーワード \"title\" でも指定できます。",
++ "",
++ " 描画ウィンドウは、`gnuplot` の出力形式を別なものに変更した後でも開いた",
++ " まま残ります。描画ウィンドウは、そのウィンドウが入力フォーカスを持って",
++ " いる状態で文字 'q' を打つか、ウィンドウマネージャメニューで `close` を",
++ " 選択するか、または `set term qt <n> close` とすることで閉じることができ",
++ " ます。",
++ "",
++ " 描画領域のサイズはピクセル単位で与えます、デフォルトは 640x480 です。",
++ " それに加えて、ウィンドウの実際のサイズには、ツールバーやステータスバー",
++ " 用のスペースも追加されます。",
++ " ウィンドウのサイズを変更すると、描画グラフもウィンドウの新しいサイズに",
++ " ぴったり合うようにすぐに伸縮されます。`qt` 出力形式はフォント、線幅も含",
++ " めて描画全体を伸縮しますが、全体のアスペクト比は一定に保ちます。",
++ " その後 `replot` とタイプするか、ターミナルツールバーの `replot` アイコ",
++ " ンをクリックするか、新たに `plot` コマンドを入力すると、その新しい描画",
++ " では完全にそのウィンドウに合わせられますが、フォントサイズや線幅はそれ"
++ " ぞれのデフォルトにリセットされます。",
++ "",
++ " 現在の描画ウィンドウ (`set term qt <n>` で選択されたもの) は対話型で、",
++ " その挙動は、他の出力形式と共通です。詳細は、以下参照: `mouse`。それには",
++ " 追加のアイコンもいくつかついていますが、それらはそれ自体が説明的なもの",
++ " になっているはずです。",
++ "",
++ " この出力形式は、拡張文字列処理モード (enhanced text mode) をサポートし",
++ " ていて、フォントや書式コマンド (上付、下付など) をラベルや他の文字列に",
++ " 埋め込むことができます。拡張文字列処理モードの書式は、gnuplot の他の出",
++ " 力形式と共通です。詳細は、以下参照: `enhanced`。",
++ "",
++ " <font> は \"FontFace,FontSize\" の形式で、FontFace と FontSize とをコ",
++ " ンマで分離して一つの文字列として書きます。FontFace は、\'Arial\' のよ",
++ " うな通常のフォント名です。FontFace を与えない場合は、qt 出力形式は",
++ " \'Sans\' を使用します。FontSize はポイント単位のフォントサイズです。",
++ " FontSize を与えない場合は、qt 出力形式は 9 ポイントを使用します。",
++ "    例 :",
++ "       set term qt font \"Arial,12\"",
++ "       set term qt font \"Arial\" # フォント名のみ変更",
++ "       set term qt font \",12\" # フォントサイズのみ変更",
++ "       set term qt font \"\" # フォント名、、フォントサイズをリセット",
++ "",
++ " 可能な限り最も良い出力を生成するために、このレンダリングはアンチアリア",
++ " ス、オーバーサンプリング、ヒンチングの 3 つの機構を持っています。",
++ " アンチエイリアスは、水平や垂直でない線の滑らかな表示を可能にします。",
++ " オーバーサンプリングは、アンチエイリアスと組でピクセルよりも小さいサイ",
++ " ズでの精度を提供し、gnuplot が非整数座標の直線を書けるようになります。",
++ " これは、対角方向の直線 (例えば 'plot x') が左右に揺れるのを避けます。",
++ " ヒンティングは、オーバーサンプリングによって引き起こされる水平、垂直方",
++ " 向の線分のぼかしを避けます。この出力形式は、これらの直線を整数座標に揃",
++ " え、それにより、1 ピクセル幅の直線は本当に 1 つ (1 つより多くも少なく",
++ " もない) のピクセルで描画します。",
++ "",
++ " デフォルトでは、描画が行われたときにウィンドウはデスクトップの一番上",
++ " (最前面) に表示されます。これは、キーワード \"raise\" で制御できます。",
++ " キーワード \"persist\" は、すべての描画ウインドウを明示的に閉じない間",
++ " は、gnuplot が終了しないようにします。",
++ " 最後に、デフォルトでは <space> キーは gnuplot コンソールウィンドウを上",
++ " に上げ、'q' は描画ウィンドウを閉じます。キーワード \"ctrl\" は、それら",
++ " のキー割り当てを、それぞれ <ctrl>+<space> と <ctrl>+'q' に変更します。"
++ #endif /* JAPANESE_DOC */
+  END_HELP(qt)
+  #endif /* TERM_HELP */
 diff -rc term/regis.trm.ORG term/regis.trm
 *** term/regis.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/regis.trm	2009-06-26 16:06:51.000000000 +0900
+--- term/regis.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 258,263 ****
 --- 258,264 ----
@@ -5091,7 +5194,7 @@ diff -rc term/regis.trm.ORG term/regis.trm
   #endif
 diff -rc term/rgip.trm.ORG term/rgip.trm
 *** term/rgip.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/rgip.trm	2009-06-26 16:06:52.000000000 +0900
+--- term/rgip.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 585,590 ****
 --- 585,591 ----
@@ -5144,7 +5247,7 @@ diff -rc term/rgip.trm.ORG term/rgip.trm
   #endif /* TERM_HELP */
 diff -rc term/sun.trm.ORG term/sun.trm
 *** term/sun.trm	2008-04-19.ORG 15:50:22.000000000 +0900
---- term/sun.trm	2009-06-26 16:06:52.000000000 +0900
+--- term/sun.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 360,365 ****
 --- 360,366 ----
@@ -5175,8 +5278,8 @@ diff -rc term/sun.trm.ORG term/sun.trm
   END_HELP(sun)
   #endif
 diff -rc term/svg.trm.ORG term/svg.trm
-*** term/svg.trm	2009-06-01.ORG 09:08:39.000000000 +0900
---- term/svg.trm	2009-06-26 16:06:52.000000000 +0900
+*** term/svg.trm	2009-09-14.ORG 09:21:47.000000000 +0900
+--- term/svg.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 1506,1511 ****
 --- 1506,1512 ----
@@ -5243,7 +5346,7 @@ diff -rc term/svg.trm.ORG term/svg.trm
   #endif
 diff -rc term/t410x.trm.ORG term/t410x.trm
 *** term/t410x.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/t410x.trm	2009-06-26 16:06:52.000000000 +0900
+--- term/t410x.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 315,320 ****
 --- 315,321 ----
@@ -5274,11 +5377,11 @@ diff -rc term/t410x.trm.ORG term/t410x.trm
   END_HELP(tek410x)
   #endif
 diff -rc term/tek.trm.ORG term/tek.trm
-*** term/tek.trm	2008-06-02.ORG 08:48:43.000000000 +0900
---- term/tek.trm	2009-06-26 16:06:52.000000000 +0900
+*** term/tek.trm	2009-08-14.ORG 15:21:35.000000000 +0900
+--- term/tek.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
-*** 726,731 ****
---- 726,732 ----
+*** 798,803 ****
+--- 798,804 ----
   
   #ifdef TERM_HELP
   START_HELP(tek40)
@@ -5287,8 +5390,8 @@ diff -rc term/tek.trm.ORG term/tek.trm
   "?commands set terminal tek40xx",
   "?set terminal tek40xx",
 ***************
-*** 777,781 ****
---- 778,836 ----
+*** 855,859 ****
+--- 856,920 ----
   " `km-tek40xx` supports them in monochrome. `selanar` supports Selanar graphics.",
   " `bitgraph` supports BBN Bitgraph terminals.",
   " None have any options."
@@ -5306,6 +5409,12 @@ diff -rc term/tek.trm.ORG term/tek.trm
 + "?terminal vttek",
 + "?term vttek",
 + "?vttek",
++ "?commands set terminal xterm",
++ "?set terminal xterm",
++ "?set term xterm",
++ "?terminal xterm",
++ "?term xterm",
++ "?xterm",
 + #ifdef KERMIT
 + "?commands set terminal kc-tek40xx",
 + "?set terminal kc-tek40xx",
@@ -5350,7 +5459,7 @@ diff -rc term/tek.trm.ORG term/tek.trm
   #endif /* TERM_HELP */
 diff -rc term/texdraw.trm.ORG term/texdraw.trm
 *** term/texdraw.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/texdraw.trm	2009-06-26 16:06:52.000000000 +0900
+--- term/texdraw.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 368,373 ****
 --- 368,374 ----
@@ -5390,11 +5499,11 @@ diff -rc term/texdraw.trm.ORG term/texdraw.trm
   END_HELP(texdraw)
   #endif /* TERM_HELP */
 diff -rc term/tgif.trm.ORG term/tgif.trm
-*** term/tgif.trm	2009-03-03.ORG 08:59:35.000000000 +0900
---- term/tgif.trm	2009-06-26 16:06:55.000000000 +0900
+*** term/tgif.trm	2009-09-14.ORG 09:21:47.000000000 +0900
+--- term/tgif.trm	2009-10-13 09:32:15.000000000 +0900
 ***************
-*** 1733,1738 ****
---- 1733,1739 ----
+*** 1713,1718 ****
+--- 1713,1719 ----
   
   #ifdef TERM_HELP
   START_HELP(tgif)
@@ -5403,8 +5512,8 @@ diff -rc term/tgif.trm.ORG term/tgif.trm
   "?commands set terminal tgif",
   "?set terminal tgif",
 ***************
-*** 1803,1808 ****
---- 1804,1882 ----
+*** 1783,1788 ****
+--- 1784,1862 ----
   "                                         # and 2 in the y-direction",
   "       set terminal tgif landscape [3,3] # landscape; 3 plots in both",
   "                                         # directions"
@@ -5486,7 +5595,7 @@ diff -rc term/tgif.trm.ORG term/tgif.trm
   /*{{{}}}*/
 diff -rc term/tkcanvas.trm.ORG term/tkcanvas.trm
 *** term/tkcanvas.trm	2006-08-28.ORG 09:12:27.000000000 +0900
---- term/tkcanvas.trm	2009-06-26 16:06:52.000000000 +0900
+--- term/tkcanvas.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 611,616 ****
 --- 611,617 ----
@@ -5561,7 +5670,7 @@ diff -rc term/tkcanvas.trm.ORG term/tkcanvas.trm
   #endif
 diff -rc term/tpic.trm.ORG term/tpic.trm
 *** term/tpic.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/tpic.trm	2009-06-26 16:06:52.000000000 +0900
+--- term/tpic.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 928,933 ****
 --- 928,934 ----
@@ -5621,7 +5730,7 @@ diff -rc term/tpic.trm.ORG term/tpic.trm
   #endif /* TERM_TABLE */
 diff -rc term/unixpc.trm.ORG term/unixpc.trm
 *** term/unixpc.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/unixpc.trm	2009-06-26 16:06:52.000000000 +0900
+--- term/unixpc.trm	2009-10-13 09:32:10.000000000 +0900
 ***************
 *** 615,620 ****
 --- 615,621 ----
@@ -5653,7 +5762,7 @@ diff -rc term/unixpc.trm.ORG term/unixpc.trm
   #endif /* TERM_HELP */
 diff -rc term/unixplot.trm.ORG term/unixplot.trm
 *** term/unixplot.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/unixplot.trm	2009-06-26 16:06:52.000000000 +0900
+--- term/unixplot.trm	2009-10-13 09:32:11.000000000 +0900
 ***************
 *** 176,181 ****
 --- 176,182 ----
@@ -5689,7 +5798,7 @@ diff -rc term/unixplot.trm.ORG term/unixplot.trm
   #endif
 diff -rc term/v384.trm.ORG term/v384.trm
 *** term/v384.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/v384.trm	2009-06-26 16:06:52.000000000 +0900
+--- term/v384.trm	2009-10-13 09:32:11.000000000 +0900
 ***************
 *** 194,199 ****
 --- 194,200 ----
@@ -5721,7 +5830,7 @@ diff -rc term/v384.trm.ORG term/v384.trm
   #endif
 diff -rc term/vgagl.trm.ORG term/vgagl.trm
 *** term/vgagl.trm	2006-07-22.ORG 17:39:09.000000000 +0900
---- term/vgagl.trm	2009-06-26 16:06:53.000000000 +0900
+--- term/vgagl.trm	2009-10-13 09:32:11.000000000 +0900
 ***************
 *** 1550,1555 ****
 --- 1550,1556 ----
@@ -5801,7 +5910,7 @@ diff -rc term/vgagl.trm.ORG term/vgagl.trm
   #endif /* defined(USE_MOUSE) */
 diff -rc term/vws.trm.ORG term/vws.trm
 *** term/vws.trm	2007-10-18.ORG 09:02:14.000000000 +0900
---- term/vws.trm	2009-06-26 16:06:53.000000000 +0900
+--- term/vws.trm	2009-10-13 09:32:11.000000000 +0900
 ***************
 *** 477,482 ****
 --- 477,483 ----
@@ -5833,11 +5942,11 @@ diff -rc term/vws.trm.ORG term/vws.trm
   END_HELP(VWS)
   #endif /* TERM_HELP */
 diff -rc term/win.trm.ORG term/win.trm
-*** term/win.trm	2009-06-09.ORG 08:46:28.000000000 +0900
---- term/win.trm	2009-06-26 16:06:53.000000000 +0900
+*** term/win.trm	2009-07-17.ORG 10:45:36.000000000 +0900
+--- term/win.trm	2009-10-13 09:32:11.000000000 +0900
 ***************
-*** 924,929 ****
---- 924,930 ----
+*** 928,933 ****
+--- 928,934 ----
   
   #ifdef TERM_HELP
   START_HELP(windows)
@@ -5846,8 +5955,8 @@ diff -rc term/win.trm.ORG term/win.trm
   "?commands set terminal windows",
   "?set terminal windows",
 ***************
-*** 1113,1117 ****
---- 1114,1312 ----
+*** 1117,1121 ****
+--- 1118,1316 ----
   " line width is 1 pixel.  If `Linestyle` is negative, it specifies the width of",
   " a SOLID line in pixels.  Line1 and any linestyle used with the `points` style",
   " must be SOLID with unit width."
@@ -6049,7 +6158,7 @@ diff -rc term/win.trm.ORG term/win.trm
   #endif /* TERM_HELP */
 diff -rc term/wxt.trm.ORG term/wxt.trm
 *** term/wxt.trm	2009-06-14.ORG 17:58:29.000000000 +0900
---- term/wxt.trm	2009-06-26 16:06:53.000000000 +0900
+--- term/wxt.trm	2009-10-13 09:32:11.000000000 +0900
 ***************
 *** 406,411 ****
 --- 406,412 ----
@@ -6090,11 +6199,11 @@ diff -rc term/wxt.trm.ORG term/wxt.trm
 + "                      {{no}ctrl}",
 + "                      {close}",
 + "",
-+ " 複数の描画ウィンドウがサポートされています: `set terminal wxt <n>` は",
-+ " 出力を番号 n の描画ウィンドウに向けます。",
++ " 複数の描画ウィンドウもサポートしていて、`set terminal wxt <n>` とすれば",
++ " 番号 n の描画ウィンドウへ出力します。",
 + "",
-+ " デフォルトのウィンドウタイトルは、この番号に基づいています。そのタイト",
-+ " ルは \"title\" キーワードでも指定できます。",
++ " デフォルトのウィンドウタイトルは、このウィンドウ番号に基づいています。",
++ " そのタイトルは \"title\" キーワードでも指定できます。",
 + "",
 + " 描画ウィンドウは、`gnuplot` の出力形式を別なものに変更しても残ったまま",
 + " になります。それを閉じるには、そのウィンドウに入力フォーカスがある状態",
@@ -6110,10 +6219,10 @@ diff -rc term/wxt.trm.ORG term/wxt.trm
 + " ト比は一定に保って、空いたスペースは灰色で塗り潰します。その後 `replot`",
 + " とタイプするかターミナルツールバーの `replot` アイコンをクリックするか",
 + " 新たに `plot` コマンドを入力すると、その新しい描画では完全にそのウィン",
-+ " ドウに合わせられますが、フォントサイズや線幅はそのデフォルトにリセット",
-+ " されます。",
++ " ドウに合わせられますが、フォントサイズや線幅はそれぞれのデフォルトにリ"
++ " セットされます。",
 + "",
-+ " 有効な描画ウィンドウ (`set term wxt <n>` で選択されたもの) は対話的で",
++ " 現在の描画ウィンドウ (`set term wxt <n>` で選択されたもの) は対話的で",
 + " その挙動は、他の出力形式と共通です。詳細は、以下参照: `mouse`。それに",
 + " は追加のアイコンもいくつかついていますが、それらはそれ自体が説明的なも",
 + " のになっているはずです。",
@@ -6164,10 +6273,10 @@ diff -rc term/wxt.trm.ORG term/wxt.trm
 + " \"windings\" のような他の非標準のフォントでも動作することが報告されて",
 + " います。",
 + "",
-+ " 描画のレンダリングは、ツールバーで対話的に変更できます。出力をより良く",
-+ " するためにこのレンダリングは、アンチエイリアス、オーバーサンプリング、",
-+ " ヒンティングの 3 つの機構を持っています。",
-+ " アンチエイリアスは、水平や垂直でない線を滑らかに表示します。",
++ " 描画のレンダリングは、ツールバーで対話的に変更できます。可能な限り最も",
++ " 良い出力を生成するためにこのレンダリングは、アンチエイリアス、オーバー",
++ " サンプリング、ヒンティングの 3 つの機構を持っています。",
++ " アンチエイリアスは、水平や垂直でない線の滑らかな表示を可能にします。",
 + " オーバーサンプリングは、アンチエイリアスと組でピクセルよりも小さいサイ",
 + " ズでの精度を提供し、gnuplot が非整数座標の直線を書けるようになります。",
 + " これは、対角方向の直線 (例えば 'plot x') が左右に揺れるのを避けます。",
@@ -6189,8 +6298,8 @@ diff -rc term/wxt.trm.ORG term/wxt.trm
   END_HELP(wxt)
   #endif /* TERM_HELP */
 diff -rc term/x11.trm.ORG term/x11.trm
-*** term/x11.trm	2009-05-31.ORG 11:29:14.000000000 +0900
---- term/x11.trm	2009-06-26 16:06:53.000000000 +0900
+*** term/x11.trm	2009-09-14.ORG 09:21:48.000000000 +0900
+--- term/x11.trm	2009-10-13 09:32:12.000000000 +0900
 ***************
 *** 2102,2107 ****
 --- 2102,2108 ----
@@ -6781,7 +6890,7 @@ diff -rc term/x11.trm.ORG term/x11.trm
   #endif				/* TERM_HELP */
 diff -rc term/xlib.trm.ORG term/xlib.trm
 *** term/xlib.trm	2009-03-27.ORG 14:11:42.000000000 +0900
---- term/xlib.trm	2009-06-26 16:06:53.000000000 +0900
+--- term/xlib.trm	2009-10-13 09:32:12.000000000 +0900
 ***************
 *** 89,94 ****
 --- 89,95 ----
