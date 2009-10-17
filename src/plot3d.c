@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.171.2.2 2009/08/19 15:52:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.171.2.3 2009/10/08 20:12:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1718,11 +1718,8 @@ eval_3dplots()
 
 	    if (this_plot->plot_type == DATA3D) {
 		/*{{{  read data */
-		/* remember settings for second surface in file */
-		struct lp_style_type *these_props = &(this_plot->lp_properties);
-		enum PLOT_STYLE this_style = this_plot->plot_style;
+		/* pointer to the plot of the first dataset (surface) in the file */
 		struct surface_points *first_dataset = this_plot;
-		    /* pointer to the plot of the first dataset (surface) in the file */
 		int this_token = this_plot->token;
 
 		do {
@@ -1771,10 +1768,14 @@ eval_3dplots()
 		    }
 
 		    this_plot->plot_type = DATA3D;
-		    this_plot->plot_style = this_style;
 		    this_plot->iteration = iteration;
-		    /* Struct copy */
-		    this_plot->lp_properties = *these_props;
+		    this_plot->plot_style = first_dataset->plot_style;
+		    this_plot->lp_properties = first_dataset->lp_properties;
+		    if (this_plot->plot_style == LABELPOINTS) {
+			this_plot->labels = new_text_label(-1);
+			*(this_plot->labels) = *(first_dataset->labels);
+			this_plot->labels->next = NULL;
+		    }
 		} while (df_return != DF_EOF);
 
 		df_close();

@@ -1,3 +1,9 @@
+2009-10-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c: Initialize each new surface in a 3d dataset directly
+	from the first surface.
+	Bug #2876167
+
 2009-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (test_term):  Add a few items to the test page output if
