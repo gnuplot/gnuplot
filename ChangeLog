@@ -1,3 +1,9 @@
+2009-10-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c: Initialize each new surface in a 3d dataset directly
+	from the first surface.
+	Bug #2876167
+
 2009-10-14  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:
