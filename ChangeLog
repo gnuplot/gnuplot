@@ -1,3 +1,10 @@
+2009-10-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* VERSION FAQ.pdf
+	config/makefile.mgw configure.in docs/doc2texi.el src/version.c
+
+	Bump version of CVS development tree to 4.5
+
 2009-10-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c: Initialize each new surface in a 3d dataset directly
