@@ -26,17 +26,17 @@
 
             An Interactive Plotting Program
              Thomas Williams & Colin Kelley
-                Version 4.3 organized by:
+                Version 4.5 organized by:
     Hans-Bernhard Broeker, Ethan A Merritt, and others
 
    Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
-           Copyright (C) 2004 - 2008  various authors
+           Copyright (C) 2004 - 2009  various authors
 
        Mailing list for comments: gnuplot-info@@lists.sourceforge.net
      Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net
 
          This manual was originally prepared by Dick Crawford
-                   Version 4.3 - 21 May 2008
+                   Version 4.5 - October 2009
 
 
 Major contributors (alphabetic order):
@@ -44,7 +44,7 @@ Major contributors (alphabetic order):
 
 @c ^ <h2> An Interactive Plotting Program </h2><p>
 @c ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-@c ^ <h2>  Version 4.2 organized by Hans-Bernhard Broeker and others</h2><p>
+@c ^ <h2>  Version 4.4 organized by Ethan A Merritt and others</h2><p>
 @c ^ <h2>Major contributors (alphabetic order):</h2>
 
 @itemize @bullet
@@ -126,7 +126,7 @@ Johannes Zellner
 * Copyright::                   
 * Introduction::                
 * Seeking-assistance::          
-* New_features_introduced_in_version_4.3::  
+* New_features_introduced_in_version_4.5::  
 * Backwards_compatibility::     
 * Batch/Interactive_Operation::  
 * Command-line-editing::        
@@ -298,7 +298,7 @@ See the simple.dem demo, also available together with other demos on the web pag
 @uref{http://www.gnuplot.info/demo/,http://www.gnuplot.info/demo/
 }
 
-@node Seeking-assistance, New_features_introduced_in_version_4.3, Introduction, gnuplot
+@node Seeking-assistance, New_features_introduced_in_version_4.5, Introduction, gnuplot
 @section Seeking-assistance
 
 @cindex help-desk
@@ -355,54 +355,25 @@ you are subscribed to the list, so that users who use news will know to email
 a reply to you.  There is a form for such postings on the WWW site.
 
 
-@node New_features_introduced_in_version_4.3, Backwards_compatibility, Seeking-assistance, gnuplot
-@section New features introduced in version 4.3
+@node New_features_introduced_in_version_4.5, Backwards_compatibility, Seeking-assistance, gnuplot
+@section New features introduced in version 4.5
 
 @cindex new-features
 
-Gnuplot version 4.3 offers many new features introduced since the preceding
-official version 4.2. This section lists major additions and gives a partial
+Gnuplot version 4.5 offers many new features introduced since the preceding
+official version 4.4. This section lists major additions and gives a partial
 list of changes and minor new features. For a more exhaustive list, see the
 NEWS file.
 
 
 @menu
-* Internationalization::        
-* Transparency::                
-* Volatile_Data::               
 * Canvas_size::                 
 * New_plot_elements::           
 * New_or_revised_terminal_drivers::  
 * New_smoothing_algorithms::    
 @end menu
 
-@node Internationalization, Transparency, New_features_introduced_in_version_4.3, New_features_introduced_in_version_4.3
-@subsection Internationalization
-
-Gnuplot 4.3 contains significantly improved support for locale settings and for
-UTF-8 character encodings. See @ref{locale}, @ref{encoding}, @ref{decimalsign}.
-
-
-@node Transparency, Volatile_Data, Internationalization, New_features_introduced_in_version_4.3
-@subsection Transparency
-
-Gnuplot now supports several forms of transparency. Any object or plot
-element that uses a fill style can be assigned a transparency from fully opaque
-to fully transparent. Image or matrix data can be plotted with an alpha channel
-using the new plot style @ref{rgbalpha}. See `fillstyle`, @ref{rgbalpha}.
-
-
-@node Volatile_Data, Canvas_size, Transparency, New_features_introduced_in_version_4.3
-@subsection Volatile Data
-
-The new command @ref{refresh} is similar to @ref{replot} except that it uses the
-previously-stored input data values rather than rereading the input data file.
-Mouse operations (zoom, rotate) will automatically use @ref{refresh} rather than
-@ref{replot} if the input data stream is marked `volatile`.  Piped or in-line data
-is automatically treated as volatile.  See @ref{refresh}, `plot datafile volatile`.
-
-
-@node Canvas_size, New_plot_elements, Volatile_Data, New_features_introduced_in_version_4.3
+@node Canvas_size, New_plot_elements, New_features_introduced_in_version_4.5, New_features_introduced_in_version_4.5
 @subsection Canvas size
 
 @c ?canvas size
@@ -413,7 +384,7 @@ is automatically treated as volatile.  See @ref{refresh}, `plot datafile volatil
 In earlier versions of gnuplot, some terminal types used the values from
 @ref{size} to control also the size of the output canvas; others did not.
 The use of 'set size' for this purpose was deprecated in version 4.2.
-In version 4.3 almost all terminals now behave as follows:
+In version 4.4 almost all terminals now behave as follows:
 
 `set term <terminal_type> size <XX>, <YY>` controls the size of the output
 file, or "canvas". Please see individual terminal documentation for allowed
@@ -447,7 +418,7 @@ however it is a change in the way the png driver worked for single plots in
 version 4.0.
 
 
-@node New_plot_elements, New_or_revised_terminal_drivers, Canvas_size, New_features_introduced_in_version_4.3
+@node New_plot_elements, New_or_revised_terminal_drivers, Canvas_size, New_features_introduced_in_version_4.5
 @subsection New plot elements
 
 @cindex circles
@@ -461,7 +432,7 @@ polygons as well as rectangles. There is a corresponding new plot style
 @ref{circles}.  See `circle` @ref{ellipse} @ref{polygon}.
 
 
-@node New_or_revised_terminal_drivers, New_smoothing_algorithms, New_plot_elements, New_features_introduced_in_version_4.3
+@node New_or_revised_terminal_drivers, New_smoothing_algorithms, New_plot_elements, New_features_introduced_in_version_4.5
 @subsection New or revised terminal drivers
 
 Two new drivers based on the cairo and pango libraries are included,
@@ -487,7 +458,7 @@ uses the generic lua terminal and an external lua script to produce a latex
 document.
 
 
-@node New_smoothing_algorithms,  , New_or_revised_terminal_drivers, New_features_introduced_in_version_4.3
+@node New_smoothing_algorithms,  , New_or_revised_terminal_drivers, New_features_introduced_in_version_4.5
 @subsection New smoothing algorithms
 
 @cindex kdensity
@@ -501,7 +472,7 @@ with `splot` several new smoothing kernels have been added to @ref{dgrid3d}.
 See @ref{smooth} @ref{dgrid3d}.
 
 
-@node Backwards_compatibility, Batch/Interactive_Operation, New_features_introduced_in_version_4.3, gnuplot
+@node Backwards_compatibility, Batch/Interactive_Operation, New_features_introduced_in_version_4.5, gnuplot
 @section Backwards compatibility
 
 @c ?backwards compatibility
@@ -6535,8 +6506,10 @@ Data sets are separated by pairs of blank records.  `index <m>` selects only
 set <m>; `index <m>:<n>` selects sets in the range <m> to <n>; and `index
 <m>:<n>:<p>` selects indices <m>, <m>+<p>, <m>+2<p>, etc., but stopping at
 <n>.  Following C indexing, the index 0 is assigned to the first data set in
-the file.  Specifying too large an index results in an error message.  If
-@ref{index} is not specified, all sets are plotted as a single data set.
+the file.  Specifying too large an index results in an error message.
+If <p> is specified but <n> is left blank then every <p>-th dataset is read
+until the end of the file.  If @ref{index} is not specified, the entire file is
+plotted as a single data set.
 
 Example:
 @example
@@ -12948,7 +12921,7 @@ Important note:
 @example
       In earlier versions of gnuplot, some terminal types used the values from
       @ref{size} to control also the size of the output canvas; others did not.
-      In version 4.2 almost all terminals now follow the following convention:
+      In version 4.4 almost all terminals now follow the following convention:
 
 @end example
 
@@ -13621,6 +13594,7 @@ be changed this way. Currently the only options accepted are
      set termoption @{no@}enhanced
      set termoption font "<fontname>@{,<fontsize>@}"
      set termoption @{solid|dashed@}
+     set termoption @{linewidth <lw>@}@{lw <lw>@}
 
 @end example
 
@@ -16435,7 +16409,7 @@ gnuplot terminal types. See `enhanced` for more details.
 
 The width of all lines in the plot can be modified by the factor <lw>
 specified in `linewidth`. The default linewidth is 0.25 points.
-(1 "PostScript" point = 1/72 inch = 0.353 cm)
+(1 "PostScript" point = 1/72 inch = 0.353 mm)
 
 `rounded` sets line caps and line joins to be rounded; `butt` is the
 default, butt caps and mitered joins.
@@ -18209,7 +18183,7 @@ The only difference between the two is that `kyo` uses "Helvetica" whereas
 Syntax:
 @example
       set terminal @{latex | emtex@} @{default | @{courier|roman@} @{<fontsize>@}@}
-                   @{size <XX>@{unit@}, <YY>@{unit@}@}
+                   @{size <XX>@{unit@}, <YY>@{unit@}@} @{rotate | norotate@}
 
 @end example
 
@@ -18238,6 +18212,10 @@ Other point types use symbols from the amssymb package.
 The default size for the plot is 5 inches by 3 inches. The @ref{size} option
 changes this to whatever the user requests. By default the X and Y sizes
 are taken to be in inches, but other units are possible (currently only cm).
+
+If 'rotate' is specified, rotated text, especially a rotated y-axis label,
+is possible (the packages graphics or graphicx are needed). The 'stacked'
+y-axis label mechanism is then deactivated.
 
 Examples:
 About label positioning:
@@ -21176,7 +21154,7 @@ Please give complete information on the version of gnuplot you are using
 and, if possible, a test script that demonstrates the bug.
 See @ref{Seeking-assistance}.
 
-The sections below list problems known to be present in gnuplot version 4.2 at
+The sections below list problems known to be present in gnuplot version 4.4 at
 the time of release.  Some of these are actually bugs in external support
 libraries and may have been fixed independent of any changes in gnuplot.
 
