@@ -1,3 +1,9 @@
+2009-10-22  David Marx  <itsdmarx@users.sourceforge.net>
+
+	* src/wxterminal/wxt_gui.cpp:  _T() macro has been deprecated in favor
+	of wxT().
+	Bug #2883574
+
 2009-10-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* VERSION FAQ.pdf src/version.c

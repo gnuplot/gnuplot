@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.74 2009/06/13 05:23:56 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.75 2009/07/18 22:40:12 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1300,7 +1300,7 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	: wxDialog(parent, -1, wxT("Terminal configuration"), wxDefaultPosition, wxDefaultSize,
                    wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 {
-/* 	wxStaticBox *sb = new wxStaticBox( this, wxID_ANY, _T("&Explanation"),
+/* 	wxStaticBox *sb = new wxStaticBox( this, wxID_ANY, wxT("&Explanation"),
 		wxDefaultPosition, wxDefaultSize );
 	wxStaticBoxSizer *wrapping_sizer = new wxStaticBoxSizer( sb, wxVERTICAL );
 	wxStaticText *text1 = new wxStaticText(this, wxID_ANY,
@@ -1317,13 +1317,13 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	pConfig->Read(wxT("hinting"),&hinting_setting);
 
 	wxCheckBox *check1 = new wxCheckBox (this, wxID_ANY,
-		_T("Put the window at the top of your desktop after each plot (raise)"),
+		wxT("Put the window at the top of your desktop after each plot (raise)"),
 		wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&raise_setting));
 	wxCheckBox *check2 = new wxCheckBox (this, wxID_ANY,
-		_T("Don't quit until all windows are closed (persist)"),
+		wxT("Don't quit until all windows are closed (persist)"),
 		wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&persist_setting));
 	wxCheckBox *check3 = new wxCheckBox (this, wxID_ANY,
-		_T("Replace 'q' by <ctrl>+'q' and <space> by <ctrl>+<space> (ctrl)"),
+		wxT("Replace 'q' by <ctrl>+'q' and <space> by <ctrl>+<space> (ctrl)"),
 		wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&ctrl_setting));
 
 	wxString choices[3];
@@ -1332,7 +1332,7 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	choices[2] = wxT("Antialiasing and oversampling");
 
 	wxStaticBox *sb2 = new wxStaticBox( this, wxID_ANY,
-		_T("Rendering options (applied to the next plot)"),
+		wxT("Rendering options (applied to the next plot)"),
 		wxDefaultPosition, wxDefaultSize );
 	wxStaticBoxSizer *box_sizer2 = new wxStaticBoxSizer( sb2, wxVERTICAL );
 
