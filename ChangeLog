@@ -1,3 +1,9 @@
+2009-10-22  David Marx  <itsdmarx@users.sourceforge.net>
+
+	* src/wxterminal/wxt_gui.cpp:  _T() macro has been deprecated in favor
+	of wxT().
+	Bug #2883574
+
 2009-10-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c: Initialize each new surface in a 3d dataset directly
