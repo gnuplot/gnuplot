@@ -1,3 +1,9 @@
+2009-10-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data): The mechanism for flagging "lc variable"
+	was not being triggered for plot types VECTOR, CIRCLES, BOXES.
+	Bug fix
+
 2009-10-22  David Marx  <itsdmarx@users.sourceforge.net>
 
 	* src/wxterminal/wxt_gui.cpp:  _T() macro has been deprecated in favor
