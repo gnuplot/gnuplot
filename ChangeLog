@@ -1,3 +1,9 @@
+2009-10-24  David Marx  <itsdmarx@users.sourceforge.net>
+
+	* src/wxterminal/wxt_gui.cpp:  The pieces of a catenated string
+	literal must be wrapped in wxT() to satisfy the Sun Studio CC compiler.
+	Bug #2883574
+
 2009-10-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (make_palette): Remove useless warning message.
