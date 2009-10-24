@@ -1,6 +1,6 @@
 2009-10-24  David Marx  <itsdmarx@users.sourceforge.net>
 
-	* src/wxterminal/wxt_gui.cpp:  The pieces of a catenated string
+	* src/wxterminal/wxt_gui.cpp:  The pieces of a concatenated string
 	literal must be wrapped in wxT() to satisfy the Sun Studio CC compiler.
 	Bug #2883574
 
@@ -9,7 +9,7 @@
 	* src/color.c (make_palette): Remove useless warning message.
 
 	* src/internal.c (f_power):  Check for integer overflow from i**j and
-	return a real value (well, actually a complex value) is it is needed.
+	return a real value (well, actually a complex value) if it is needed.
 	Bug #2881789
 
 2009-10-23  Ethan A Merritt  <merritt@u.washington.edu>
