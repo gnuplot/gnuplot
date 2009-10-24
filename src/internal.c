@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.50 2008/04/02 03:15:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.51 2008/09/25 18:33:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -806,7 +806,8 @@ void
 f_power(union argument *arg)
 {
     struct value a, b, result;
-    int i, t, count;
+    int i, count;
+    int t;
     double mag, ang;
 
     (void) arg;			/* avoid -Wunused warning */
@@ -817,19 +818,23 @@ f_power(union argument *arg)
     case INTGR:
 	switch (b.type) {
 	case INTGR:
-	    count = abs(b.v.int_val);
+	    if (a.v.int_val == 0) {
+		if (b.v.int_val < 0)
+		    undefined = TRUE;
+		(void) Ginteger(&result, b.v.int_val == 0 ? 1 : 0);
+		break;
+	    }
+	    /* EAM Oct 2009 - avoid integer overflow by switching to double */
+	    mag = pow((double)a.v.int_val,(double)b.v.int_val);
+	    if (mag > (double)INT_MAX  ||  b.v.int_val < 0) {
+		(void) Gcomplex(&result, mag, 0.0);
+		break;
+	    }
 	    t = 1;
 	    /* this ought to use bit-masks and squares, etc */
-	    for (i = 0; i < count; i++)
+	    for (i = 0; i < b.v.int_val; i++)
 		t *= a.v.int_val;
-	    if (b.v.int_val >= 0)
-		(void) Ginteger(&result, t);
-	    else if (t != 0)
-		(void) Gcomplex(&result, 1.0 / t, 0.0);
-	    else {
-		undefined = TRUE;
-		(void) Gcomplex(&result, 0.0, 0.0);
-	    }
+	    (void) Ginteger(&result, t);
 	    break;
 	case CMPLX:
 	    if (a.v.int_val == 0) {

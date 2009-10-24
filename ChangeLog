@@ -8,6 +8,10 @@
 
 	* src/color.c (make_palette): Remove useless warning message.
 
+	* src/internal.c (f_power):  Check for integer overflow from i**j and
+	return a real value (well, actually a complex value) is it is needed.
+	Bug #2881789
+
 2009-10-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data): The mechanism for flagging "lc variable"
