@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.86 2009/07/26 21:57:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.87 2009/08/02 22:06:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -102,7 +102,6 @@ make_palette()
     double gray;
 
     if (!term->make_palette) {
-	fprintf(stderr, "Error: terminal \"%s\" does not support continuous colors.\n",term->name);
 	return 1;
     }
 
