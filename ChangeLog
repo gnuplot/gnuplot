@@ -1,3 +1,8 @@
+2009-10-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c src/axis.c src/term.c:  Replace in-line warnings sent
+	to stderr by instead calling int_warn();
+
 2009-10-24  David Marx  <itsdmarx@users.sourceforge.net>
 
 	* src/wxterminal/wxt_gui.cpp:  The pieces of a concatenated string

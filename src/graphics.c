@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.314 2009/09/06 18:11:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.315 2009/10/09 23:02:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1575,7 +1575,7 @@ do_plot(struct curve_points *plots, int pcount)
     struct termentry *t = term;
     int curve;
     struct curve_points *this_plot = NULL;
-    int xl = 0, yl = 0;	/* avoid gcc -Wall warning */
+    int xl = 0, yl = 0;
     int key_count = 0;
     legend_key *key = &keyT;
 
@@ -2025,7 +2025,7 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 	    case PM3DSURFACE:
-		fprintf(stderr, "** warning: can't use pm3d for 2d plots -- please unset pm3d\n");
+		int_warn(NO_CARET, "Can't use pm3d for 2d plots");
 		break;
 
 	    case LABELPOINTS:
@@ -5699,9 +5699,6 @@ check_for_variable_color(struct curve_points *plot, struct coordinate *point)
  */
 #include "util3d.h"
 
-/* These might work better as fuctions, but defines will do for now. */
-#define ERROR_NOTICE(str)         "\nGNUPLOT (plot_image):  " str
-
 /* hyperplane_between_points:
  * Compute the hyperplane representation of a line passing
  *  between two points.
@@ -5759,12 +5756,12 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     }
 
     if (p_count < 1) {
-	fprintf(stderr, ERROR_NOTICE("No points (visible or invisible) to plot.\n\n"));
+	int_warn(NO_CARET, "No points (visible or invisible) to plot.\n\n");
 	return;
     }
 
     if (p_count < 4) {
-	fprintf(stderr, ERROR_NOTICE("Image grid must be at least 4 points (2 x 2).\n\n"));
+	int_warn(NO_CARET, "Image grid must be at least 4 points (2 x 2).\n\n");
 	return;
     }
 
@@ -5823,12 +5820,12 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     }
 
     if (K == p_count) {
-	fprintf(stderr, ERROR_NOTICE("Image grid must be at least 2 x 2.\n\n"));
+	int_warn(NO_CARET, "Image grid must be at least 2 x 2.\n\n");
 	return;
     }
     L = p_count/K;
     if (((double)L) != ((double)p_count/K)) {
-	fprintf(stderr, ERROR_NOTICE("Number of pixels cannot be factored into integers matching grid. N = %d  K = %d\n\n"), p_count, K);
+	int_warn(NO_CARET, "Number of pixels cannot be factored into integers matching grid. N = %d  K = %d", p_count, K);
 	return;
     }
     grid_corner[0] = 0;
@@ -5891,11 +5888,11 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     }
 
     if (pixel_planes == IC_PALETTE && make_palette()) {
-	fprintf(stderr, ERROR_NOTICE("This terminal does not support palette-based images.\n\n"));
+	/* int_warn(NO_CARET, "This terminal does not support palette-based images.\n\n"); */
 	return;
     }
     if ((pixel_planes == IC_RGB || pixel_planes == IC_RGBA) && !term->set_color) {
-	fprintf(stderr, ERROR_NOTICE("This terminal does not support rgb images.\n\n"));
+	/* int_warn(NO_CARET, "This terminal does not support rgb images.\n\n"); */
 	return;
     }
     /* Use generic code to handle alpha channel if the terminal can't */
@@ -6034,7 +6031,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 			    N += 1;
 			line_pixel_count++;
 			if ( (N != 1) && (line_pixel_count > M) ) {
-			    fprintf(stderr, ERROR_NOTICE("Visible pixel grid has a scan line longer than previous scan lines."));
+			    int_warn(NO_CARET, "Visible pixel grid has a scan line longer than previous scan lines.");
 			    return;
 			}
 		    }
@@ -6059,7 +6056,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 		    if (M == 0)
 			M = line_pixel_count;
 		    else if ((line_pixel_count > 0) && (line_pixel_count != M)) {
-			fprintf(stderr, ERROR_NOTICE("Visible pixel grid has a scan line shorter than previous scan lines."));
+			int_warn(NO_CARET, "Visible pixel grid has a scan line shorter than previous scan lines.");
 			return;
 		    }
 		    line_pixel_count = 0;
@@ -6105,16 +6102,13 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 		    corners[3].y = map_y(view_port_y[0]);
 		}
 
-		if ( (pixel_planes == IC_PALETTE) || (pixel_planes == IC_RGB) || (pixel_planes == IC_RGBA))
-		    (*term->image) (M, N, image, corners, pixel_planes);
-		else
-		    fprintf(stderr, ERROR_NOTICE("Invalid pixel color planes specified.\n\n"));
+		(*term->image) (M, N, image, corners, pixel_planes);
 	    }
 
 	    free ((void *)image);
 
 	} else {
-	    fprintf(stderr, ERROR_NOTICE("Could not allocate memory for image."));
+	    int_warn(NO_CARET, "Could not allocate memory for image.");
 	    return;
 	}
 

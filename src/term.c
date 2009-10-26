@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.189 2009/07/19 22:51:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.190 2009/10/07 03:23:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2775,10 +2775,9 @@ void
 enh_err_check(const char *str)
 {
     if (*str == '}')
-	fputs("enhanced text mode parser - ignoring spurious }\n", stderr);
+	int_warn(NO_CARET, "enhanced text mode parser - ignoring spurious }");
     else
-	fprintf(stderr, "enhanced text mode parsing error - *str=0x%x\n",
-		*str);
+	int_warn(NO_CARET, "enhanced text mode parsing error");
 }
 
 /* Helper function for multiplot auto layout to issue size and offest cmds */
