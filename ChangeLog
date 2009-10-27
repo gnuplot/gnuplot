@@ -1,3 +1,7 @@
+2009-10-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_fillstyle):  Repair missing brackets in if/else.
+
 2009-10-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/axis.c src/term.c:  Replace in-line warnings sent
