@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.171.2.1 2009/07/16 15:48:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.171.2.2 2009/08/02 23:38:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1102,12 +1102,13 @@ save_fillstyle(FILE *fp, const struct fill_style_type *fs)
 	fprintf(fp, " empty ");
 	break;
     }
-    if (fs->border_color.type == TC_LT && fs->border_color.lt == LT_NODRAW)
+    if (fs->border_color.type == TC_LT && fs->border_color.lt == LT_NODRAW) {
 	fprintf(fp, "noborder\n");
-    else
+    } else {
 	fprintf(fp, "border");
 	save_pm3dcolor(fp, &fs->border_color);
 	fprintf(fp, "\n");
+    }
 }
 
 void
