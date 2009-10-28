@@ -1,3 +1,8 @@
+2009-10-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/luz.trm term/lua/gnuplot-tikz.lua: Remove conditional tests
+	for gnuplot version 4.3.  We're past that now.
+
 2009-10-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_fillstyle):  Repair missing brackets in if/else.

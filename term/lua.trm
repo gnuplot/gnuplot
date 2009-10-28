@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.4 2009/03/26 00:49:21 sfeam Exp $
- *  $Date: 2009/03/26 00:49:21 $
+ *  $Id: lua.trm,v 1.5 2009/05/26 04:23:03 sfeam Exp $
+ *  $Date: 2009/05/26 04:23:03 $
  *  $Rev: 90 $
  */
 
@@ -46,11 +46,6 @@
 #define LUA_TERM_REVISON "$Rev: 96 $"
 /* FIXME: this is only valid on "X11" systems, we need our own definition here */
 #define GNUPLOT_LUA_DIR X11_DRIVER_DIR
-
-/*  TERM_CAN_DASH is new in 4.3cvs */
-#ifdef TERM_CAN_DASH
- #define GNUPLOT_LUA_4_3
-#endif
 
 #ifdef TERM_REGISTER
 register_term(lua)
@@ -443,11 +438,9 @@ LUA_get_term_vars(void) {
   term->flags = (lua_isnumber(L, -1)) ? (int)lua_tointeger(L, -1) : TERM_BINARY;
   lua_pop(L, 1);
 
-#ifdef GNUPLOT_LUA_4_3
   lua_getfield(L, luaterm, "tscale");
   term->tscale = (lua_isnumber(L, -1)) ? (double)lua_tonumber(L, -1) : LUA_TSCALE;
   lua_pop(L, 1);
-#endif
 }
 
 static void
@@ -466,11 +459,7 @@ LUA_set_term_vars() {
   /* set term.lua_ident */
   lua_pushstring(L, lua_ident);
   lua_setfield(L, luaterm, "lua_ident");
-#ifdef GNUPLOT_LUA_4_3
   lua_pushboolean(L, 1);
-#else
-  lua_pushboolean(L, 0);
-#endif
   lua_setfield(L, luaterm, "IS_GNUPLOT_43");
   
   /* some static definitions */
@@ -490,10 +479,8 @@ LUA_set_term_vars() {
   lua_setfield(L, luaterm, "TERM_NO_OUTPUTFILE");
   lua_pushinteger(L, TERM_CAN_CLIP);          /* terminal does its own clipping  */
   lua_setfield(L, luaterm, "TERM_CAN_CLIP");
-#ifdef GNUPLOT_LUA_4_3
   lua_pushinteger(L, TERM_CAN_DASH);          /* terminal knows dashed lines */
   lua_setfield(L, luaterm, "TERM_CAN_DASH");
-#endif
 }
 
 static int
@@ -643,14 +630,12 @@ LUA_get_fillstyle(int style) {
       case FS_PATTERN:
         style_str = "PATTERN";
         break;
-#ifdef GNUPLOT_LUA_4_3
       case FS_TRANSPARENT_SOLID:
         style_str = "TRANSPARENT_SOLID";
         break;
       case FS_TRANSPARENT_PATTERN:
         style_str = "TRANSPARENT_PATTERN";
         break;
-#endif
       case FS_DEFAULT:
         style_str = "DEFAULT";
         break;
@@ -1083,7 +1068,6 @@ LUA_layer (t_termlayer syncpoint)
       case TERM_LAYER_END_TEXT:   /* Close off front or back macro before leaving */
         m = "end_text";
         break;
-#ifdef GNUPLOT_LUA_4_3
       case TERM_LAYER_BEFORE_PLOT:  /* Close off front or back macro before leaving */
         m = "before_plot";
         break;
@@ -1096,7 +1080,6 @@ LUA_layer (t_termlayer syncpoint)
       case TERM_LAYER_END_GRID:
         m = "end_grid";
         break;
-#endif
       default:
         m = "";
         break;
@@ -1198,9 +1181,7 @@ TERM_TABLE_START(lua_driver)
    , 0, 0, 0
    , LUA_layer
    , LUA_path
-#ifdef GNUPLOT_LUA_4_3
    , LUA_TSCALE
-#endif
 TERM_TABLE_END(lua_driver)
 
 #undef LAST_TERM
@@ -1224,9 +1205,7 @@ TERM_TABLE_START(tikz_driver)
    , 0, 0, 0
    , LUA_layer
    , LUA_path
-#ifdef GNUPLOT_LUA_4_3
    , LUA_TSCALE
-#endif
 TERM_TABLE_END(tikz_driver)
 
 #undef LAST_TERM
