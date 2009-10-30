@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.584 2009/10/08 03:43:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.585 2009/10/10 18:43:30 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1857,8 +1857,8 @@ C ... and restart the table:
 
  Syntax:
 
-       ... {linecolor | lc} <colorspec>
-       ... {textcolor | tc} <colorspec>
+       ... {linecolor | lc} {<colorspec> | <n>}
+       ... {textcolor | tc} {<colorspec> | {linetype | lt} <n>}
 
  where <colorspec> has one of the following forms:
 
@@ -1869,6 +1869,8 @@ C ... and restart the table:
        palette cb <value>      # <val> lies within cbrange
        palette z
        variable                # color index is read from input file
+
+ The "<n>" is the linetype number the color of which is used, see `test`.
 
  "colorname" refers to one of the color names built in to gnuplot. For a list
  of the available names, see `show colornames`.
