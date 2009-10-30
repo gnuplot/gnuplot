@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.180 2009/02/02 06:10:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.181 2009/02/03 22:26:19 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -401,13 +401,18 @@ do_line()
 
 
 void
-do_string(char *s, TBOOLEAN throwaway_s)
+do_string(const char *s)
 {
-    TBOOLEAN screen_was_ok = screen_ok;
-
+    char *cmdline = gp_strdup(s);
+    do_string_and_free(cmdline);
+}
+ 
+void
+do_string_and_free(char *cmdline)
+{
 #ifdef USE_MOUSE
     if (display_ipc_commands())
-	fprintf(stderr, "%s\n", s);
+	fprintf(stderr, "%s\n", cmdline);
 #endif
 
     lf_push(NULL); /* save state for errors and recursion */
@@ -417,15 +422,14 @@ do_string(char *s, TBOOLEAN throwaway_s)
 			       "lf tokens");
     memcpy(lf_head->tokens, token, num_tokens * sizeof(struct lexical_unit));
     lf_head->input_line = gp_strdup(gp_input_line);
-    while (gp_input_line_len < strlen(s) + 1)
+    while (gp_input_line_len < strlen(cmdline) + 1)
 	extend_input_line();
-    strcpy(gp_input_line, s);
-    if (throwaway_s)
-	free(s);
+    strcpy(gp_input_line, cmdline);
+    free(cmdline);
     screen_ok = FALSE;
     do_line();
-    screen_ok = screen_was_ok;
 
+    /* We don't know if screen_ok is appropriate so leave it FALSE. */
     lf_pop();
 }
 
@@ -447,17 +451,9 @@ display_ipc_commands()
 }
 
 void
-do_string_replot(char *s)
+do_string_replot(const char *s)
 {
-    char *orig_input_line = gp_strdup(gp_input_line);
-
-    while (gp_input_line_len < strlen(s) + 1)
-	extend_input_line();
-    strcpy(gp_input_line, s);
-    if (display_ipc_commands())
-	fprintf(stderr, "%s\n", s);
-
-    do_line();
+    do_string(s);
 
 #ifdef VOLATILE_REFRESH
     if (volatile_data && refresh_ok) {
@@ -472,8 +468,6 @@ do_string_replot(char *s)
     else
 	int_warn(NO_CARET, "refresh not possible and replot is disabled");
 
-    strcpy(gp_input_line, orig_input_line);
-    free(orig_input_line);
 }
 
 void
@@ -851,7 +845,7 @@ eval_command()
     if (!(command = try_to_get_string()))
 	int_error(c_token, "Expected command string");
 
-    do_string(command, TRUE);
+    do_string_and_free(command);
     --eval_depth;
 }
 

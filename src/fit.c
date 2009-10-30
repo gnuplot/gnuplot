@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.68 2009/02/28 20:45:46 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.69 2009/03/13 01:28:57 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -572,8 +572,7 @@ fit_interrupt()
 		    (void) Gcomplex(&v, a[i], 0.0);
 		    setvar(par_name[i], v);
 		}
-		safe_strncpy(gp_input_line, tmp, gp_input_line_len);
-		(void) do_line();
+		do_string(tmp);
 	    }
 	}
     }

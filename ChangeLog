@@ -1,3 +1,15 @@
+2009-10-30  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/command.c, src/command.h (do_string, do_string_and_free):
+	Use to different functions depending on whether the command string has
+	to be freed.  Don't reset screen_ok.
+	
+	* src/command.c, src/command.h (do_string_replot), src/fit.c
+	(fit_interrupt): Use do_string() instead of do_line().
+
+	* src/command.c, src/misc.c, src/mouse.c, src/plot.c src/term.c:
+	Adjust calls to do_string().
+
 2009-10-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/winmain.c (MyFPrintF MyVFPrintF MyPrintF): Workaround for

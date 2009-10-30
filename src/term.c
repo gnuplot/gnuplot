@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.190 2009/10/07 03:23:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.191 2009/10/26 18:47:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1933,7 +1933,7 @@ test_term()
 
     already_in_enhanced_text_mode = t->flags & TERM_ENHANCED_TEXT;
     if (!already_in_enhanced_text_mode)
-	do_string("set termopt enh",FALSE);
+	do_string("set termopt enh");
 
     term_start_plot();
     screen_ok = FALSE;
@@ -2000,7 +2000,7 @@ test_term()
 	(*t->put_text) (xmax_t * 0.5, ymax_t * 0.40, tmptext);
 	free(tmptext);
 	if (!already_in_enhanced_text_mode)
-	    do_string("set termopt noenh",FALSE);
+	    do_string("set termopt noenh");
     }
 
     /* test justification */

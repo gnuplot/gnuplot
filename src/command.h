@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.47 2008/08/13 02:43:09 sfeam Exp $
+ * $Id: command.h,v 1.48 2008/08/15 00:45:34 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -186,11 +186,12 @@ void extend_input_line __PROTO((void));
 void extend_token_table __PROTO((void));
 int com_line __PROTO((void));
 int do_line __PROTO((void));
-void do_string __PROTO((char* s, TBOOLEAN throwaway_s));
+void do_string __PROTO((const char* s));
+void do_string_and_free __PROTO((char* s));
 #ifdef USE_MOUSE
 void toggle_display_of_ipc_commands __PROTO((void));
 int display_ipc_commands __PROTO((void));
-void do_string_replot __PROTO((char* s));
+void do_string_replot __PROTO((const char* s));
 #endif
 #ifdef VMS                     /* HBB 990829: used only on VMS */
 void done __PROTO((int status));
