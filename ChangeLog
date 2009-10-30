@@ -1,5 +1,8 @@
 2009-10-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/win/winmain.c (MyFPrintF MyVFPrintF MyPrintF): Workaround for
+	vsnprintf(NULL,0,...) returning zero (MingW 3.4).
+
 	* docs/gnuplot.doc: Document "linetype <n>" option of linecolor and
 	textcolor.
 
