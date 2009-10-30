@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.194 2009/03/26 00:49:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.195 2009/07/14 23:20:43 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3016,7 +3016,7 @@ exec_cmd(plot_struct *plot, char *command)
 
 			if (sample_data) {
 
-			    XImage *image_src;
+			    XImage *image_src = NULL;
 			    XImage *image_dest;
 
 			    /* Create an initialized image object. */

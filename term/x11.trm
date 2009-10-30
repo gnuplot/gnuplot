@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.184 2009/05/29 03:22:09 sfeam Exp $
+ * $Id: x11.trm,v 1.185 2009/09/13 17:49:16 sfeam Exp $
  *
  */
 
@@ -185,7 +185,6 @@ static FILE *X11_ipc = (FILE *) 0;
 #define X11_ipc_back_fd ipc_back_fd
 #endif
 
-static char **xargv = (char **) NULL;
 /* reserve a minimum 10 driver opts */
 static char *optvec[2 * X11_nopts + 1 + 10];
 
@@ -302,13 +301,9 @@ int
 X11_args(int argc, char *argv[])
 {
     int nx11 = 0, i, n;
+    char **xargv, **xargv_orig; 
 
-    xargv = (char **) gp_alloc(argc * sizeof(char *), "<xargv>");
-
-    if (!xargv) {
-	fputs("not enough memory to copy argv - quitting\n", stderr);
-	exit(EXIT_FAILURE);
-    }
+    xargv = xargv_orig = (char **) gp_alloc(argc * sizeof(char *), "<xargv>");
 
     /* We make a copy of the argument vector because
      * argv is modified later. */
@@ -334,13 +329,16 @@ X11_args(int argc, char *argv[])
 		if (strcmp(*argv, "-display") == 0)
 		    X11_Display++;
 		if (X11_cmdopts[n].arg == hasArg) {
-		    if (--argc <= 0)
+		    if (--argc <= 0) {
+			free(xargv_orig);
 			return nx11;
+		    }
 		    optvec[i++] = *++xargv, ++argv;
 		    nx11++;
 		}
 		if (i >= (sizeof(optvec) / sizeof(char))) {
 		    fprintf(stderr, "warning: X11 options will be truncated\n");
+		    free(xargv_orig);
 		    return nx11;	/* optvec is full */
 		}
 		nx11++;
@@ -350,7 +348,7 @@ X11_args(int argc, char *argv[])
 	if (n == X11_nopts)
 	    break;
     }
-
+    free(xargv_orig);
     return (nx11);
 }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.223 2009/08/02 22:06:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.224 2009/10/08 19:29:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2064,7 +2064,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 {
     int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
-    BoundingBox *clip_save;
+    BoundingBox *clip_save = clip_area;
 
     if (draw_border && splot_map) {
 	if (border_layer == current_layer) {
@@ -2277,10 +2277,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     if (whichgrid == BORDERONLY)
 	return;
 
-    if (splot_map) {
-	clip_save = clip_area;
+    if (splot_map)
 	clip_area = NULL;
-    }
 
     /* Draw ticlabels and axis labels. x axis, first:*/
     if (X_AXIS.ticmode || X_AXIS.label.text) {

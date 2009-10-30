@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.110 2009/10/31 03:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.111 2009/10/31 03:22:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1169,7 +1169,7 @@ arrow_parse(
 		arrow->head_lengthunit = hsize.scalex;
 		arrow->head_angle = hsize.y;
 		arrow->head_backangle = hsize.z;
-		/* invalid backangle --> default of 90.0° */
+		/* invalid backangle --> default of 90.0 degrees */
 		if (arrow->head_backangle <= arrow->head_angle)
 		    arrow->head_backangle = 90.0;
 		continue;

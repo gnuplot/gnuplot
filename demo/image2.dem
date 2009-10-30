@@ -405,7 +405,7 @@ print "the various dimensions to change.  However, when the qualifier"
 print "\'array\' is entered at the command line, the array dimensions"
 print "adjust so that \'array=XxYxZ\' is always the number of samples"
 print "along the Cartesian x, y and z directions, respectively."
-print "
+print ""
 set size 1.0, 1.0
 set origin 0.0, 0.0
 set multiplot

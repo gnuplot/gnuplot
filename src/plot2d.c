@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.195 2009/08/19 15:52:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.196 2009/10/23 15:33:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -333,7 +333,7 @@ get_data(struct curve_points *current_plot)
     struct coordinate GPHUGE *cp;
 
     TBOOLEAN variable_color = FALSE;
-    double   variable_color_value;
+    double   variable_color_value = 0.;
     if ((current_plot->lp_properties.pm3d_color.type == TC_RGB)
     &&  (current_plot->lp_properties.pm3d_color.value < 0))
 	variable_color = TRUE;

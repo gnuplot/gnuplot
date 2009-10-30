@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo_helpers.c,v 1.1 2009/01/13 14:08:48 tlecomte Exp $
+ * $Id: gp_cairo_helpers.c,v 1.2 2009/08/26 19:14:13 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo_helpers.c */
@@ -47,6 +47,7 @@
 
 #include "gp_cairo_helpers.h"
 
+#include "alloc.h"
 /* for rgb functions */
 # include "getcolor.h"
 

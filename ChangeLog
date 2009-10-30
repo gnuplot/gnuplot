@@ -10,6 +10,16 @@
 	* src/command.c, src/misc.c, src/mouse.c, src/plot.c src/term.c:
 	Adjust calls to do_string().
 
+	* src/plot2d.c src/graph3d.c src/gplt_x11.c term/lua.trm term/latex.trm
+	src/wxterminal/gp_cairo_helpers.c:
+	Silence gcc -Wall warnings.
+
+	* src/misc.c: Remove latin1 char.
+
+	* term/x11.trm: Silence valgrind warning.
+
+	* demo/vector.dem, demo/fit.dem: Add closing quotes.
+
 2009-10-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/winmain.c (MyFPrintF MyVFPrintF MyPrintF): Workaround for

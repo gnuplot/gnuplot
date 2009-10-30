@@ -1,5 +1,5 @@
 #
-# $Id: vector.dem,v 1.10 2006/06/26 03:44:44 sfeam Exp $
+# $Id: vector.dem,v 1.11 2006/07/12 17:21:14 tlecomte Exp $
 #
 # This file demonstrates
 # -1- saving contour lines as a gnuplottable file
@@ -8,7 +8,7 @@
 # the example is taken here from Physics is the display of equipotential
 # lines and electrostatic field for a dipole (+q,-q)
 
-print "\n This file demonstrates
+print "\n This file demonstrates"
 print " -1- saving contour lines as a gnuplottable file"
 print " -2- plotting a vector field on the same graph"
 print " -3- manipulating columns using the '$1,$2' syntax."
