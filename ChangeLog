@@ -1,3 +1,8 @@
+2009-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/show.c (show_version): Fit width of welcome messages into 80
+	characters. 
+
 2009-10-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.h src/util.h:  Tell gcc that routines bail_to_command_line(),
