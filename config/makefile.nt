@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.21 2008/02/23 10:04:33 mikulik Exp $
+# $Id: makefile.nt,v 1.22 2008/11/07 11:55:46 mikulik Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -33,6 +33,9 @@ HELPFILE = wgnuplot.hlp
 
 # directory for PostScript prolog and associated files
 GNUPLOT_PS_DIR = share\\PostScript
+
+# Similarly for javascript files for the canvas terminal:
+GNUPLOT_JS_DIR = share\\js
 
 TOP = .
 
@@ -72,10 +75,10 @@ LDFLAGS = /subsystem:windows /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT /libpath:.
 
 # ...and here.
 # see other terminal defines in term.h
-TERMFLAGS = /I..\\term /I..\\src\\pdflib\\pdflib /I..\\src\\gdwin32 /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\"
+TERMFLAGS = /I..\\term /I..\\src\\pdflib\\pdflib /I..\\src\\gdwin32 /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
 
 # macros for makefile.all
-O=obj
+
 T=..\\term\\
 D=..\\docs\\
 M=..\\demo\\
@@ -270,7 +273,8 @@ veryclean: clean
 	if exist *.manifest del *.manifest
 
 install: default
-	if not exist $(DESTDIR) mkdir $(DESTDIR)\bin
+	if not exist $(DESTDIR) mkdir $(DESTDIR)
+	if not exist $(DESTDIR)\bin mkdir $(DESTDIR)\bin
 	copy /Y wgnuplot.exe $(DESTDIR)\bin\wgnuplot.exe
 	copy /Y win\wgnuplot.mnu $(DESTDIR)\bin\wgnuplot.mnu
 #	copy /Y wgnuplot.hlp $(DESTDIR)\bin\wgnuplot.hlp
@@ -278,7 +282,8 @@ install: default
 	copy /Y wgnuplot_pipes.exe $(DESTDIR)\bin\wgnuplot_pipes.exe
 	if not exist $(DESTDIR)\$(GNUPLOT_PS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_PS_DIR)
 	xcopy /Y ..\term\PostScript\*.ps $(DESTDIR)\$(GNUPLOT_PS_DIR)
-	if not exist $(DESTDIR) mkdir $(DESTDIR)
+	if not exist $(DESTDIR)\$(GNUPLOT_JS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_JS_DIR)
+	xcopy /Y ..\term\js\*.* $(DESTDIR)\$(GNUPLOT_JS_DIR)
 	for %f in (BUGS README FAQ Copyright NEWS) do copy ..\%f $(DESTDIR)\%f
 	if not exist $(DESTDIR)\share\gnuplot\demo mkdir $(DESTDIR)\share\gnuplot\demo
 	xcopy /Y ..\demo $(DESTDIR)\share\gnuplot\demo

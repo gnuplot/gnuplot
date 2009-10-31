@@ -1,6 +1,6 @@
 # Hey, Emacs, this is a -*- Makefile -*-
 #
-# $Id: makefile.cyg,v 1.29 2008/02/23 10:01:34 mikulik Exp $
+# $Id: makefile.cyg,v 1.30 2008/11/23 07:48:58 mikulik Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -76,6 +76,9 @@ HELPFILE = wgnuplot.hlp
 # Where to install the PostScript prologue files, relatively to the executable
 # wgnuplot.exe
 GNUPLOT_PS_DIR = share/PostScript
+
+# Similarly for javascript files for the canvas terminal:
+GNUPLOT_JS_DIR = share/js
 
 # Destination directory, used in 'make install':
 DESTDIR = /cygdrive/c/Apps/gnuplot
@@ -164,7 +167,7 @@ ifdef CONSOLE
 endif
 
 TOP = ..
-TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -I$(TOP)/term
+TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -I$(TOP)/term
 TERMLIBS =
 
 CFLAGS += -I. -D_Windows -DCYGWIN -mno-cygwin -DHAVE_CONFIG_H\
@@ -432,4 +435,6 @@ install: default
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
 	mkdir -p $(DESTDIR)/share/PostScript
 	cp ../term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
+	mkdir -p $(DESTDIR)/share/js
+	cp ../term/js/* $(DESTDIR)/$(GNUPLOT_JS_DIR)
 

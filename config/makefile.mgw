@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.53 2009/10/06 22:58:44 sfeam Exp $
+# $Id: makefile.mgw,v 1.54 2009/10/18 21:10:05 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -101,6 +101,9 @@ HELPFILE = wgnuplot.hlp
 # wgnuplot.exe
 GNUPLOT_PS_DIR = share/PostScript
 
+# Similarly for javascript files for the canvas terminal:
+GNUPLOT_JS_DIR = share/js
+
 # Destination directory, used in 'make install':
 DESTDIR = /c/Progra~1/Gnuplot4.5
 
@@ -193,7 +196,7 @@ ifdef CONSOLE
 endif
 
 TOP = ..
-TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -I$(TOP)/term
+TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -I$(TOP)/term
 TERMLIBS = 
 
 CFLAGS += -I$(TOP) -I. -D_Windows -DHAVE_CONFIG_H\
@@ -509,4 +512,6 @@ install: default
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
 	mkdir -p $(DESTDIR)/share/PostScript
 	cp ../term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
+	mkdir -p $(DESTDIR)/share/js
+	cp ../term/js/* $(DESTDIR)/$(GNUPLOT_JS_DIR)
 
