@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.108 2009/03/26 00:49:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.109 2009/06/06 18:28:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -613,8 +613,7 @@ pop_terminal()
 }
 
 
-/* Parse a plot style. Used by 'set style {data|function}' and by
- * (s)plot.  */
+/* Parse a plot style. Used by 'set style {data|function}' and by (s)plot.  */
 enum PLOT_STYLE
 get_style()
 {
@@ -627,17 +626,8 @@ get_style()
 
     c_token++;
 
-    if (ps == -1) {
-	int_error(c_token, "\
-expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
-\t'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps',\n\
-\t'histeps', 'filledcurves', 'boxes', 'boxerrorbars', 'boxxyerrorbars',\n\
-\t'vectors', 'financebars', 'candlesticks', 'errorlines', 'xerrorlines',\n\
-\t'yerrorlines', 'xyerrorlines', 'pm3d', 'labels', 'histograms'"
-",\n\t 'image', 'rgbimage'"
-);
-	ps = LINES;
-    }
+    if (ps == -1)
+	int_error(c_token, "unrecognized plot type");
 
     return ps;
 }
