@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.30 2007/11/11 19:22:19 sfeam Exp $
+ * $Id: util.h,v 1.31 2008/03/18 00:16:33 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -94,10 +94,16 @@ void gprintf __PROTO((char *, size_t, char *, double, double));
 
 /* Error message handling */
 #if defined(VA_START) && defined(STDC_HEADERS)
-void os_error __PROTO((int, const char *, ...));
-void int_error __PROTO((int, const char *, ...));
+#  if defined(__GNUC__)
+    void os_error __PROTO((int, const char *, ...)) __attribute__((noreturn));
+    void int_error __PROTO((int, const char *, ...)) __attribute__((noreturn));
+    void graph_error __PROTO((const char *, ...)) __attribute__((noreturn));
+#  else
+    void os_error __PROTO((int, const char *, ...));
+    void int_error __PROTO((int, const char *, ...));
+    void graph_error __PROTO((const char *, ...));
+#  endif
 void int_warn __PROTO((int, const char *, ...));
-void graph_error __PROTO((const char *, ...));
 #else
 void os_error __PROTO(());
 void int_error __PROTO(());

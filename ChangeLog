@@ -1,3 +1,15 @@
+2009-10-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot.h src/util.h:  Tell gcc that routines bail_to_command_line(),
+	int_error(), graph_error(), and os_error() do not return. 
+	#ifdef __GNUC__ ...  __attribute__((noreturn));
+	This avoids spurious warnings about uninitialized variables from
+	call sites like:
+	    int foo;
+	    if (END_OF_COMMAND || !(foo = try_to_get_string()))
+		int_error(c_token,"missing string");
+	    baz = foo;
+
 2009-10-30  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/command.c, src/command.h (do_string, do_string_and_free):

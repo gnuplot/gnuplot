@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.44 2006/11/10 22:46:43 tlecomte Exp $
+ * $Id: plot.h,v 1.45 2008/03/30 03:27:54 sfeam Exp $
  */
 
 /* GNUPLOT - plot.h */
@@ -61,7 +61,12 @@ extern TBOOLEAN CallFromRexx;
 
 /* Prototypes of functions exported by plot.c */
 
+#if defined(__GNUC__)
+void bail_to_command_line __PROTO((void)) __attribute__((noreturn));
+#else
 void bail_to_command_line __PROTO((void));
+#endif
+
 void interrupt_setup __PROTO((void));
 void gp_expand_tilde __PROTO((char **));
 void get_user_env __PROTO((void));
