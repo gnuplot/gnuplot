@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.25.2.2 2009/09/13 17:54:09 sfeam Exp $
+ * $Id: canvas.trm,v 1.29 2009/10/31 23:33:50 mikulik Exp $
  *
  */
 
@@ -281,6 +281,9 @@ CANVAS_init()
 TERM_PUBLIC void
 CANVAS_graphics()
 {
+#if !defined(VMS)
+    int len;
+#endif
     /* Force initialization at the beginning of each plot */
     canvas_line_type = LT_UNDEFINED;
     canvas_text_angle = 0;
@@ -301,7 +304,9 @@ CANVAS_graphics()
 	canvas_default_jsdir = gp_alloc(strlen((char*) szPackageDir)
 			+ strlen(GNUPLOT_JS_DIR) + 2, "jsdir");
 	strcpy(canvas_default_jsdir, (char*) szPackageDir);
-	strcat(canvas_default_jsdir, "\\");
+	len = strlen(canvas_default_jsdir);
+	if (*canvas_default_jsdir && canvas_default_jsdir[len-1] != '\\' && canvas_default_jsdir[len-1] != '/')
+	    strcat(canvas_default_jsdir, "\\");
 	/* GNUPLOT_JS_DIR is _relative_ path */
 	strcat(canvas_default_jsdir, GNUPLOT_JS_DIR);
 # else /* !_Windows */
@@ -313,13 +318,17 @@ CANVAS_graphics()
     }
 
 #if defined(_Windows)
-    if (CANVAS_scriptdir[strlen(CANVAS_scriptdir)-1] != '\\') {
-	CANVAS_scriptdir = gp_realloc(CANVAS_scriptdir, strlen(CANVAS_scriptdir)+2, "jsdir");
-	strcat(CANVAS_scriptdir,"\\");
+    len = strlen(CANVAS_scriptdir);
+    if (*CANVAS_scriptdir && CANVAS_scriptdir[len-1] != '\\' && CANVAS_scriptdir[len-1] != '/') {
+	CANVAS_scriptdir = gp_realloc(CANVAS_scriptdir, len+2, "jsdir");
+	if (CANVAS_scriptdir[len-1] == '\\') /* use backslash if used in jsdir, otherwise slash */
+	    strcat(CANVAS_scriptdir,"\\");
+	else
+	    strcat(CANVAS_scriptdir,"/");
     }
 #elif !defined(VMS)
-    if (CANVAS_scriptdir[strlen(CANVAS_scriptdir)-1] != '/') {
-	CANVAS_scriptdir = gp_realloc(CANVAS_scriptdir, strlen(CANVAS_scriptdir)+2, "jsdir");
+    if (*CANVAS_scriptdir && CANVAS_scriptdir[len-1] != '/') {
+	CANVAS_scriptdir = gp_realloc(CANVAS_scriptdir, len+2, "jsdir");
 	strcat(CANVAS_scriptdir,"/");
     }
 #endif

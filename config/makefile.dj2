@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.dj2,v 1.13 2007/10/16 21:19:44 sfeam Exp $
+# $Id: makefile.dj2,v 1.14 2008/02/23 10:02:43 mikulik Exp $
 #
 # GNUPLOT Makefile for DJGPP version 2 on DOS
 #
@@ -10,7 +10,7 @@
 #
 # AUTHORS : several ... including Edzer Pebesma <pebesma@metoor.frw.uva.nl>
 #           last mod. by Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
-# DATE of last mod: $Date: 2007/10/16 21:19:44 $
+# DATE of last mod: $Date: 2008/02/23 10:02:43 $
 #
 # 
 # removed atari reference and added binary demo bf_test
@@ -45,6 +45,9 @@ HELPFILE =gnuplot.gih
 # Where to install the PostScript prologue files, relatively to the executable
 # gnuplot.exe
 GNUPLOT_PS_DIR = share/PostScript
+
+# Similarly for javascript files for the canvas terminal:
+GNUPLOT_JS_DIR = share/js
 
 # compiler
 CC = gcc

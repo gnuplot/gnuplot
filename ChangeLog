@@ -1,6 +1,14 @@
+2009-11-01  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.dj2 config/makefile.cyg config/makefile.mgw
+	config/makefile.nt config/makefile.os2: Added GNUPLOT_JS_DIR.
+
+	* term/canvas.trm (CANVAS_graphics): Fix // vs \ and / for jsdir and
+	Windows.
+
 2009-10-24  David Marx  <itsdmarx@users.sourceforge.net>
 
-	* src/wxterminal/wxt_gui.cpp:  The pieces of a catenated string
+	* src/wxterminal/wxt_gui.cpp:  The pieces of a concatenated string
 	literal must be wrapped in wxT() to satisfy the Sun Studio CC compiler.
 	Bug #2883574
 
