@@ -1,3 +1,11 @@
+2009-11-01  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.dj2 config/makefile.cyg config/makefile.mgw
+	config/makefile.nt config/makefile.os2: Added GNUPLOT_JS_DIR.
+
+	* term/canvas.trm (CANVAS_graphics): Fix // vs \ and / for jsdir and
+	Windows.
+
 2009-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/show.c (show_version): Fit width of welcome messages into 80
