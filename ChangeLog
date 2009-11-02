@@ -1,3 +1,8 @@
+2009-11-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/breader.c:  Give df_libgd_get_pixel() a valid return value even
+	if it's only a dummy function because there is no png support.
+
 2009-11-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.dj2 config/makefile.cyg config/makefile.mgw
