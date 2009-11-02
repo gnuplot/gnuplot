@@ -1,3 +1,8 @@
+2009-11-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Document "linetype <n>" option of linecolor and
+	textcolor.
+
 2009-11-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.dj2 config/makefile.cyg config/makefile.mgw
