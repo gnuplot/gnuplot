@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.184.2.4 2009/10/07 03:23:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.184.2.5 2009/10/13 17:15:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -400,7 +400,7 @@ term_set_output(char *dest)
     assert(dest == NULL || dest != outstr);
 
     if (multiplot) {
-	fputs("In multiplotmode you can't change the output\n", stderr);
+	fputs("In multiplot mode you can't change the output\n", stderr);
 	return;
     }
     if (term && term_initialised) {
@@ -2525,7 +2525,7 @@ enhanced_recursion(
 	    if (brace)
 		return (p);
 
-	    fputs("enhanced text parser - spurious }\n", stderr);
+	    int_warn(NO_CARET, "enhanced text parser - spurious }");
 	    break;
 	    /*}}}*/
 
@@ -2727,7 +2727,7 @@ enhanced_recursion(
 	    /* HBB 20030122: Avoid broken output if there's a \
 	     * exactly at the end of the line */
 	    if (*p == '\0') {
-		fputs("enhanced text parser -- spurious backslash\n", stderr);
+		int_warn(NO_CARET, "enhanced text parser -- spurious backslash");
 		break;
 	    }
 
@@ -2770,13 +2770,12 @@ void
 enh_err_check(const char *str)
 {
     if (*str == '}')
-	fputs("enhanced text mode parser - ignoring spurious }\n", stderr);
+	int_warn(NO_CARET, "enhanced text mode parser - ignoring spurious }");
     else
-	fprintf(stderr, "enhanced text mode parsing error - *str=0x%x\n",
-		*str);
+	int_warn(NO_CARET, "enhanced text mode parsing error");
 }
 
-/* Helper function for multiplot auto layout to issue size and offest cmds */
+/* Helper function for multiplot auto layout to issue size and offset cmds */
 static void
 mp_layout_size_and_offset(void)
 {
