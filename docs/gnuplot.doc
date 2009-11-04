@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.15 2009/10/10 18:45:30 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.16 2009/11/02 08:41:21 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -449,7 +449,7 @@ C
  and bottom axes; `second` places it in the system defined by the second axes
  (top and right); `graph` specifies the area within the axes---0,0 is bottom
  left and 1,1 is top right (for splot, 0,0,0 is bottom left of plotting area;
- use negative z to get to the base---see `set ticslevel`); `screen`
+ use negative z to get to the base---see `set xyplane`); `screen`
  specifies the screen area (the entire area---not just the portion selected by
  `set size`), with 0,0 at bottom left and 1,1 at top right; and `character`
  gives the position in character widths and heights from the bottom left of
@@ -8397,7 +8397,7 @@ Ffigure_mapcontours
  mouse buttons 1 and 2. If additionally to these buttons the modifier <ctrl> is
  hold down, the coordinate system only is rotated which is useful for large
  data sets. A vertical motion of Button 2 with the shift key hold down changes
- the `ticslevel`.
+ the `xyplane`.
 
  Mousing is not available in multiplot mode. When multiplot is finished using
  `unset multiplot`, then the mouse will be turned on again and acts on the
@@ -10625,7 +10625,7 @@ Ffigure_mapcontours
  current z axis range will fit within the plot boundary.
  By default all three axes are scaled independently to fill the available area.
 
- See also `set ticslevel`.
+ See also `set xyplane`.
 3 vrange
 ?commands set vrange
 ?commands show vrange
@@ -11557,8 +11557,8 @@ Ffigure_mapcontours
 
  By default `splot` draws the xy plane completely below the plotted data.
  The offset between the lowest ztic and the xy plane can be changed by `set
- ticslevel`.  The orientation of a `splot` projection is controlled by
- `set view`.  See `set view` and `set ticslevel` for more information.
+ xyplane`.  The orientation of a `splot` projection is controlled by
+ `set view`.  See `set view` and `set xyplane` for more information.
 
  The syntax for setting ranges on the `splot` command is the same as for
  `plot`.  In non-parametric mode, the order in which ranges must be given is
