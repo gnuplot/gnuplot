@@ -1,3 +1,8 @@
+2009-11-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/term.c (enhanced_recursion): Replace in-line warnings sent to
+	stderr by instead calling int_warn().
+
 2009-11-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/breader.c:  Give df_libgd_get_pixel() a valid return value even
