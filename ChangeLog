@@ -1,3 +1,10 @@
+2009-11-06  Allin Cottrell  <cottrell@wfu.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_convert):  Work around a font
+	problem in the win32 backend for pango/cairo character rendering.
+	Conditional on WIN32 and libcairo > 1.21, request rendering by freetype
+	rather than win32. Fix suggested by cairo developer Behdad Esfahbod.
+
 2009-11-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: ticslevel => xyplane.
