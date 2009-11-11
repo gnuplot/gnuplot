@@ -1,3 +1,7 @@
+2009-11-11 Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Updated introduction.
+
 2009-11-06  Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_convert):  Work around a font
@@ -26,7 +30,7 @@
 2009-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/show.c (show_version): Fit width of welcome messages into 80
-	characters. 
+	characters.
 
 2009-10-31  Ethan A Merritt  <merritt@u.washington.edu>
 
