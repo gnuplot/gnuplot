@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.16 2009/11/02 08:41:21 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.17 2009/11/04 16:21:09 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -87,31 +87,33 @@ C
 2 Introduction
 ?introduction
 ?
- `gnuplot` is a command-driven interactive function and data plotting program.
- syntax:
-       gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
+ `Gnuplot` is a portable command-line driven graphing utility for Linux, OS/2,
+ MS Windows, OSX, VMS, and many other platforms. The source code is copyrighted
+ but freely distributed (i.e., you don't have to pay for it). It was originally
+ created to allow scientists and students to visualize mathematical functions
+ and data interactively, but has grown to support many non-interactive uses
+ such as web scripting. It is also used as a plotting engine by third-party
+ applications like Octave. Gnuplot has been supported and under active
+ development since 1986. 
 
- Generic X11 options, if any,  must come first.  See your X11 documentation.
- If you are not using X11, ignore this.  Options interpreted by gnuplot
- may come anywhere on the line.  Files are executed in the order specified, as
- are commands supplied by the -e option.
+ Gnuplot supports many types of plots in either 2D and 3D. It can draw using
+ lines, points, boxes, contours, vector fields, surfaces, and various
+ associated text. It also supports various specialized plot types.
 
- Example:
-       gnuplot   file1.in   -e "reset"   file2.in
+ Gnuplot supports many different types of output: interactive screen terminals
+ (with mouse and hotkey input), direct output to pen plotters or modern
+ printers, and output to many file formats (eps, fig, jpeg, LaTeX, metafont,
+ pbm, pdf, png, postscript, svg, ...). Gnuplot is easily extensible to include
+ new output modes. Recent additions include interactive terminals based on
+ aquaterm (OSX) and wxWidgets (multiple platforms). 
 
- The special filename "-" is used to force reading from stdin.  `gnuplot` exits
- after the last file is processed.  If no load files are named, `gnuplot` takes
- interactive input from stdin.  See help `batch/interactive` for more details.
- The options specific to gnuplot can be listed by typing
-
-       gnuplot --help
-
- `gnuplot` is case sensitive (commands and function names written in lowercase
- are not the same as those written in CAPS).  All command names may be
- abbreviated as long as the abbreviation is not ambiguous.  Any number of
- commands may appear on a line, separated by semicolons (;).  Strings may be
- set off by either single or double quotes, although there are some subtle
- differences.  See `syntax` and `quotes` for more details.  Examples:
+ The command language of `gnuplot` is case sensitive, i.e. commands and
+ function names written in lowercase are not the same as those written in
+ capitals. All command names may be abbreviated as long as the abbreviation is
+ not ambiguous. Any number of commands may appear on a line, separated by
+ semicolons (;). Strings may be set off by either single or double quotes,
+ although there are some subtle differences.  See `syntax` and `quotes` for
+ more details. Examples:
 
        load "filename"
        cd 'dir'
@@ -131,7 +133,7 @@ C
  and in that case will not necessarily point to the correct line.
 
  In this document, curly braces ({}) denote optional arguments and a vertical
- bar (|) separates mutually exclusive choices.  `gnuplot` keywords or `help`
+ bar (|) separates mutually exclusive choices.  `Gnuplot` keywords or `help`
  topics are indicated by backquotes or `boldface` (where available).  Angle
  brackets (<>) are used to mark replaceable tokens.  In many cases, a default
  value of the token will be taken for optional arguments if the token is
@@ -148,17 +150,53 @@ C
 ^ <a href="http://www.gnuplot.info/demo/">
            http://www.gnuplot.info/demo/
 ^ </a>
+ `Gnuplot` can be started from a command line or from an icon according to the
+ desktop environment. Running it from command line can take the syntax
+       gnuplot {OPTIONS} file1 file2 ...
+ where file1, file2, etc. are input file as in the `load` command.
+ On X11-based systems, you can use
+       gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
+ see your X11 documentation or rather `x11` in this document.
+
+ Options interpreted by gnuplot may come anywhere on the line.  Files are
+ executed in the order specified, as are commands supplied by the -e option,
+ for example
+       gnuplot   file1.in   -e "reset"   file2.in
+
+ The special filename "-" is used to force reading from stdin.  `Gnuplot` exits
+ after the last file is processed.  If no load files are named, `Gnuplot` takes
+ interactive input from stdin.  See help `batch/interactive` for more details.
+ The options specific to gnuplot can be listed by typing
+       gnuplot --help
+ See `command line options` for more details.
+
+ Hit 'h' for help about `hotkeys` and `mousing` features in interactive screen
+ terminals (`pm`, `windows`, `wxt`, `x11`).
+
+ Section `seeking-assistance` will help you to find further information, help
+ and FAQ.
 2 Seeking-assistance
 ?help-desk
 ?seeking-assistance
 ^ <a name="Seeking-assistance"></a>
- There is a mailing list for `gnuplot` users.  Note, however, that the
- newsgroup
+ The canonical gnuplot web page can be found at
+
+^ <a href="http://www.gnuplot.info">
+           http://www.gnuplot.info
+^ </a>
+
+ Before seeking help, please check file FAQ.pdf or the above website for
+
+^ <a href="http://www.gnuplot.info/faq/">
+           FAQ (Frequently Asked Questions) list.
+^ </a>
+
+ If you need help as a gnuplot user, please use the newsgroup
        comp.graphics.apps.gnuplot
- is identical to the mailing list (they both carry the same set of messages).
  We prefer that you read the messages through the newsgroup rather than
- subscribing to the mailing list.  Instructions for subscribing to gnuplot
- mailing lists may be found via the gnuplot development website on SourceForge
+ subscribing to the mailing list which is also available and carries the same
+ set of messages. Instructions for subscribing to gnuplot mailing lists may be
+ found via the gnuplot development website on SourceForge
 ^ <a href="http://sourceforge.net/projects/gnuplot">
            http://sourceforge.net/projects/gnuplot
 ^ </a>
@@ -168,28 +206,18 @@ C
 
  Bug reports and code contributions should be uploaded to the trackers at
        http://sourceforge.net/projects/gnuplot
+ Please check previous bug reports if the bug you want to report has not been
+ already fixed in a newer version of gnuplot.
 
- The list of those interested in beta-test versions is:
+ The list of those interested in development version of gnuplot is:
        gnuplot-beta@lists.sourceforge.net
-
- There is also the canonical (if occasionally out-of-date) gnuplot web page at
-
-^ <a href="http://www.gnuplot.info">
-           http://www.gnuplot.info
-^ </a>
-
- Before seeking help, please check the
-
-^ <a href="http://www.gnuplot.info/faq/">
-           FAQ (Frequently Asked Questions) list.
-^ </a>
 
  When posting a question, please include full details of the version of
  `gnuplot`, the machine, and operating system you are using.  A _small_ script
  demonstrating the problem may be useful.  Function plots are preferable to
  datafile plots.  If email-ing to gnuplot-info, please state whether or not
  you are subscribed to the list, so that users who use news will know to email
- a reply to you.  There is a form for such postings on the WWW site.
+ a reply to you.  There is a form for such postings on the website.
 
 2 New features introduced in version 4.4
 ?new-features
@@ -259,7 +287,7 @@ C
 =polygon
  The `set object` command can now be used to define fixed circles, ellipses, and
  polygons as well as rectangles. There is a corresponding new plot style
- `plot with circles`.  See `circle` `ellipse` `polygon`.
+ `plot with circles`.  See `circle`, `ellipse` and `polygon`.
 
 3 New or revised terminal drivers
  Two new drivers based on the cairo and pango libraries are included,
@@ -322,7 +350,8 @@ C
 
 2 Batch/Interactive Operation
 ?batch/interactive
- `gnuplot` may be executed in either batch or interactive modes, and the two
+?command line options
+ `Gnuplot` may be executed in either batch or interactive modes, and the two
  may even be mixed together on many systems.
 
  Any command-line arguments are assumed to be either program options (first
@@ -330,7 +359,7 @@ C
  -e "command" may be used to force execution of a gnuplot command. Each file
  or command string will be executed in the order specified.  The special
  filename "-" is indicates that commands are to be read from stdin.
- `gnuplot` exits after the last file is processed.  If no load files and no 
+ `Gnuplot` exits after the last file is processed.  If no load files and no 
  command strings are specified, `gnuplot` accepts interactive input from
  stdin.
 
@@ -473,7 +502,7 @@ C
 
  If one (or more) axis is timeseries, the appropriate coordinate should
  be given as a quoted time string according to the `timefmt` format string.
- See `set xdata` and `set timefmt`.  `gnuplot` will also accept an integer
+ See `set xdata` and `set timefmt`.  `Gnuplot` will also accept an integer
  expression, which will be interpreted as seconds from 1 January 2000.
 2 Datastrings
 ?datastrings
@@ -1968,6 +1997,8 @@ C ... and restart the table:
  See also the command `set mouse`.
 3 bind
 ?commands bind
+?hotkey
+?hotkeys
 ?bind
  Syntax:
        bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
@@ -2057,7 +2088,7 @@ C ... and restart the table:
  setting the XResource 'gnuplot*ctrlq'.  See `x11 command-line-options`.
 3 Mouse variables
 ?mouse variables
- When mousing is active, clicking in the active window will set several user
+ When `mousing` is active, clicking in the active window will set several user
  variables that can be accessed from the gnuplot command line. The coordinates
  of the mouse at the time of the click are stored in MOUSE_X MOUSE_Y MOUSE_X2
  and MOUSE_Y2. The mouse button clicked, and any meta-keys active at that time,
@@ -4193,7 +4224,7 @@ Ffigure_mapcontours
  number of seconds if subsecond time resolution is not supported by the given
  platform.  `pause 0` is synonymous with `print`.
 
- If the current terminal supports mousing, then `pause mouse` will terminate
+ If the current terminal supports `mousing`, then `pause mouse` will terminate
  on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
  is not active, `pause mouse` is equivalent to `pause -1`.
 
@@ -8386,6 +8417,7 @@ Ffigure_mapcontours
 ?commands unset mouse
 ?set mouse
 ?unset mouse
+?mousing
 ?mouse
 ?nomouse
  The command `set mouse` enables mouse actions. Currently the pm, x11, ggi,
