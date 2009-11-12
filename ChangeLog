@@ -1,3 +1,7 @@
+2009-11-12  Thomas Sefzick <thse@users.sourceforge.net>
+
+	* term/canvas.trm:  Fix initialization failure on non-unix platforms.
+
 2009-11-11 Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Updated introduction.

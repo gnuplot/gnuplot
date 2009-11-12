@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.28 2009/09/18 05:50:40 sfeam Exp $
+ * $Id: canvas.trm,v 1.29 2009/10/31 23:33:50 mikulik Exp $
  *
  */
 
@@ -317,8 +317,9 @@ CANVAS_graphics()
 	CANVAS_scriptdir = gp_strdup(canvas_default_jsdir);
     }
 
-#if defined(_Windows)
+#if !defined(VMS)
     len = strlen(CANVAS_scriptdir);
+# if defined(_Windows)
     if (*CANVAS_scriptdir && CANVAS_scriptdir[len-1] != '\\' && CANVAS_scriptdir[len-1] != '/') {
 	CANVAS_scriptdir = gp_realloc(CANVAS_scriptdir, len+2, "jsdir");
 	if (CANVAS_scriptdir[len-1] == '\\') /* use backslash if used in jsdir, otherwise slash */
@@ -326,11 +327,12 @@ CANVAS_graphics()
 	else
 	    strcat(CANVAS_scriptdir,"/");
     }
-#elif !defined(VMS)
+# else
     if (*CANVAS_scriptdir && CANVAS_scriptdir[len-1] != '/') {
 	CANVAS_scriptdir = gp_realloc(CANVAS_scriptdir, len+2, "jsdir");
 	strcat(CANVAS_scriptdir,"/");
     }
+# endif
 #endif
 
     if (CANVAS_standalone) {
