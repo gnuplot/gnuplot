@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.586 2009/10/30 14:38:55 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.587 2009/11/11 07:50:13 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11915,12 +11915,22 @@ Ffigure_mapcontours
 ?commands undefine
 ?undefine
  Clear one or more previously defined user variables.  This is useful in order
- to reset the state of a script containing an initialization test.
+ to reset the state of a script containing an initialization test. 
+
+ A variable name can contain the wildcard character `*` as last character. If the
+ wildcard character is found, all variables with names that begin with the prefix 
+ preceding the wildcard will be removed. This is useful to remove several variables 
+ sharing a common prefix. Note that the wildcard character is only allowed at the 
+ end of the variable name! Specifying the wildcard character as sole argument to 
+ `undefine` has no effect.
 
  Example:
 
        undefine foo foo1 foo2
        if (!exists("foo")) load "initialize.gp"
+
+       bar = 1; bar1 = 2; bar2 = 3
+       undefine bar*                 # removes all three variables
 
 2 unset
 ?commands unset

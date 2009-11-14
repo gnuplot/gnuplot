@@ -1,3 +1,10 @@
+2009-11-14  Philipp K. Janert <janert@ieee.org>
+
+	* src/command.c (undefine_command): Added support for wildcards in 
+	variable names.
+	
+	* docs/gnuplot.doc: Associated documentation.	
+	
 2009-11-12  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* term/canvas.trm:  Fix initialization failure on non-unix platforms.
