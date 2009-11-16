@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.111 2009/10/31 03:22:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.112 2009/10/31 05:24:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -183,8 +183,10 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 	/* These were initialized to NULL in lf_push(); will be freed in lf_pop() */
 	lf_head->c_token = c_token;
 	lf_head->num_tokens = num_tokens;
-	lf_head->tokens = gp_alloc(num_tokens * sizeof(struct lexical_unit), "lf tokens");
-	memcpy(lf_head->tokens, token, num_tokens * sizeof(struct lexical_unit));
+	lf_head->tokens = gp_alloc((num_tokens+1)
+				   * sizeof(struct lexical_unit), "lf tokens");
+	memcpy(lf_head->tokens, token,
+	       (num_tokens+1) * sizeof(struct lexical_unit));
 	lf_head->input_line = gp_strdup(gp_input_line);
 	
 	while (!stop) {		/* read all commands in file */
@@ -317,7 +319,9 @@ lf_pop()
 	if (lf->tokens) {
 	    num_tokens = lf->num_tokens;
 	    c_token = lf->c_token;
-	    memcpy(token, lf->tokens, lf->num_tokens * sizeof(struct lexical_unit));
+	    assert(token_table_size >= lf->num_tokens+1);
+	    memcpy(token, lf->tokens,
+		   (lf->num_tokens+1) * sizeof(struct lexical_unit));
 	    free(lf->tokens);
 	}
 	if (lf->input_line) {

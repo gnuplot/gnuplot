@@ -1,3 +1,8 @@
+2009-11-16  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/command.c (do_string_and_free) src/misc.c (load_file): Fix memory
+	issues of patch 2009-10-30 (SF Patch #2898455 and Bug #2895620).
+
 2009-11-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Fix support web page URL.
@@ -6,11 +11,11 @@
 
 2009-11-14  Philipp K. Janert <janert@ieee.org>
 
-	* src/command.c (undefine_command): Added support for wildcards in 
+	* src/command.c (undefine_command): Added support for wildcards in
 	variable names.
-	
-	* docs/gnuplot.doc: Associated documentation.	
-	
+
+	* docs/gnuplot.doc: Associated documentation.
+
 2009-11-12  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* term/canvas.trm:  Fix initialization failure on non-unix platforms.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.182 2009/10/31 03:22:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.183 2009/11/15 02:23:38 janert Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -418,9 +418,10 @@ do_string_and_free(char *cmdline)
     lf_push(NULL); /* save state for errors and recursion */
     lf_head->c_token = c_token;
     lf_head->num_tokens = num_tokens;
-    lf_head->tokens = gp_alloc(num_tokens * sizeof(struct lexical_unit),
+    lf_head->tokens = gp_alloc((num_tokens+1) * sizeof(struct lexical_unit),
 			       "lf tokens");
-    memcpy(lf_head->tokens, token, num_tokens * sizeof(struct lexical_unit));
+    memcpy(lf_head->tokens, token,
+	   (num_tokens+1) * sizeof(struct lexical_unit));
     lf_head->input_line = gp_strdup(gp_input_line);
     while (gp_input_line_len < strlen(cmdline) + 1)
 	extend_input_line();
