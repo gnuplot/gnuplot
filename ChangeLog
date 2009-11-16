@@ -1,3 +1,7 @@
+2009-11-16  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/show.c (show_version): Less info help lines.
+
 2009-11-12  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* term/canvas.trm:  Fix initialization failure on non-unix platforms.
