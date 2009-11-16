@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.587 2009/11/11 07:50:13 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.588 2009/11/15 02:23:38 janert Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -180,19 +180,17 @@ C
 ?seeking-assistance
 ^ <a name="Seeking-assistance"></a>
  The canonical gnuplot web page can be found at
-
 ^ <a href="http://www.gnuplot.info">
            http://www.gnuplot.info
 ^ </a>
 
  Before seeking help, please check file FAQ.pdf or the above website for
-
 ^ <a href="http://www.gnuplot.info/faq/">
            FAQ (Frequently Asked Questions) list.
 ^ </a>
 
  If you need help as a gnuplot user, please use the newsgroup
-       comp.graphics.apps.gnuplot
+           comp.graphics.apps.gnuplot
  We prefer that you read the messages through the newsgroup rather than
  subscribing to the mailing list which is also available and carries the same
  set of messages. Instructions for subscribing to gnuplot mailing lists may be
@@ -202,15 +200,15 @@ C
 ^ </a>
 
  The address for mailing to list members is:
-       gnuplot-info@lists.sourceforge.net
+           gnuplot-info@lists.sourceforge.net
 
  Bug reports and code contributions should be uploaded to the trackers at
-       http://sourceforge.net/projects/gnuplot
+           http://sourceforge.net/projects/gnuplot/support
  Please check previous bug reports if the bug you want to report has not been
  already fixed in a newer version of gnuplot.
 
  The list of those interested in development version of gnuplot is:
-       gnuplot-beta@lists.sourceforge.net
+           gnuplot-beta@lists.sourceforge.net
 
  When posting a question, please include full details of the version of
  `gnuplot`, the machine, and operating system you are using.  A _small_ script

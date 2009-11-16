@@ -1,5 +1,7 @@
 2009-11-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* docs/gnuplot.doc: Fix support web page URL.
+
 	* src/show.c (show_version): Less info help lines.
 
 2009-11-14  Philipp K. Janert <janert@ieee.org>
