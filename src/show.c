@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.227 2009/03/26 00:49:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.228 2009/10/31 21:58:47 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -837,6 +837,7 @@ show_version(FILE *fp)
      */
     char prefix[6];		/* "#    " */
     char *p = prefix;
+    char fmt[2048];
 
     prefix[0] = '#';
     prefix[1] = prefix[2] = prefix[3] = prefix[4] = ' ';
@@ -1013,7 +1014,8 @@ show_version(FILE *fp)
 #endif /* BINDIR */
     }
 
-    fprintf(fp, "%s\n\
+    strcpy(fmt, "\
+%s\n\
 %s\t%s\n\
 %s\tVersion %s patchlevel %s\n\
 %s\tlast modified %s\n\
@@ -1022,13 +1024,18 @@ show_version(FILE *fp)
 %s\t%s\n\
 %s\tThomas Williams, Colin Kelley and many others\n\
 %s\n\
+%s\tgnuplot home:     http://www.gnuplot.info\n\
+");
+#ifndef RELEASE_VERSION
+    strcat(fmt, "%s\tmailing list:     %s\n");
+#endif
+    strcat(fmt, "\
+%s\tfaq, bugs, etc:   type \"help seeking-assistance\"\n\
 %s\timmediate help:   type \"help\"\n\
 %s\tplot window:      hit 'h'\n\
-%s\tgnuplot home:     http://www.gnuplot.info\n\
-%s\tgnuplot FAQ:      FAQ.pdf and %s\n\
-%s\treport bugs:      http://sf.net/projects/gnuplot/support\n\
-%s\tmailing list:     %s\n\
-%s\n",
+");
+
+    fprintf(fp, fmt,
 	    p,			/* empty line */
 	    p, PROGRAM,
 	    p, gnuplot_version, gnuplot_patchlevel,
@@ -1038,13 +1045,14 @@ show_version(FILE *fp)
 	    p, gnuplot_copyright,
 	    p,			/* authors */
 	    p,			/* empty line */
-	    p,			/* type "help" */
-	    p,			/* hit 'h' */
-	    p,			/* empty line */
-	    p, faq_location,	/* FAQ */
-	    p,			/* empty line */
+	    p,			/* website */
+#ifndef RELEASE_VERSION
 	    p, help_email,	/* mailing list */
-	    p);			/* empty line */
+#endif
+	    p,			/* type "help" */
+	    p,			/* type "help seeking-assistance" */
+	    p			/* hit 'h' */
+	    );
 
 
     /* show version long */

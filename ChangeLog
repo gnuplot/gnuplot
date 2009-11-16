@@ -1,3 +1,7 @@
+2009-11-16  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/show.c (show_version): Less info help lines.
+
 2009-11-14  Philipp K. Janert <janert@ieee.org>
 
 	* src/command.c (undefine_command): Added support for wildcards in 
