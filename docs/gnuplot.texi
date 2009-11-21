@@ -30,13 +30,13 @@
     Hans-Bernhard Broeker, Ethan A Merritt, and others
 
    Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
-           Copyright (C) 2004 - 2008  various authors
+           Copyright (C) 2004 - 2009  various authors
 
        Mailing list for comments: gnuplot-info@@lists.sourceforge.net
      Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net
 
          This manual was originally prepared by Dick Crawford
-                   Version 4.4 - 1 Jun 2009
+                   Version 4.4 - 31 May 2009
 
 
 Major contributors (alphabetic order):
@@ -44,7 +44,7 @@ Major contributors (alphabetic order):
 
 @c ^ <h2> An Interactive Plotting Program </h2><p>
 @c ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-@c ^ <h2>  Version 4.2 organized by Hans-Bernhard Broeker and others</h2><p>
+@c ^ <h2>  Version 4.4 organized by Ethan A Merritt and others</h2><p>
 @c ^ <h2>Major contributors (alphabetic order):</h2>
 
 @itemize @bullet
@@ -225,40 +225,33 @@ to the extent permitted by applicable law.
 @cindex introduction
 
 @c ?
-`gnuplot` is a command-driven interactive function and data plotting program.
-syntax:
-@example
-      gnuplot @{X11OPTIONS@} @{OPTIONS@} file1 file2 ...
+`Gnuplot` is a portable command-line driven graphing utility for Linux, OS/2,
+MS Windows, OSX, VMS, and many other platforms. The source code is copyrighted
+but freely distributed (i.e., you don't have to pay for it). It was originally
+created to allow scientists and students to visualize mathematical functions
+and data interactively, but has grown to support many non-interactive uses
+such as web scripting. It is also used as a plotting engine by third-party
+applications like Octave. Gnuplot has been supported and under active
+development since 1986. 
 
-@end example
+Gnuplot supports many types of plots in either 2D and 3D. It can draw using
+lines, points, boxes, contours, vector fields, surfaces, and various
+associated text. It also supports various specialized plot types.
 
-Generic X11 options, if any,  must come first.  See your X11 documentation.
-If you are not using X11, ignore this.  Options interpreted by gnuplot
-may come anywhere on the line.  Files are executed in the order specified, as
-are commands supplied by the -e option.
+Gnuplot supports many different types of output: interactive screen terminals
+(with mouse and hotkey input), direct output to pen plotters or modern
+printers, and output to many file formats (eps, fig, jpeg, LaTeX, metafont,
+pbm, pdf, png, postscript, svg, ...). Gnuplot is easily extensible to include
+new output modes. Recent additions include interactive terminals based on
+aquaterm (OSX) and wxWidgets (multiple platforms). 
 
-Example:
-@example
-      gnuplot   file1.in   -e "reset"   file2.in
-
-@end example
-
-The special filename "-" is used to force reading from stdin.  `gnuplot` exits
-after the last file is processed.  If no load files are named, `gnuplot` takes
-interactive input from stdin.  See help `batch/interactive` for more details.
-The options specific to gnuplot can be listed by typing
-
-@example
-      gnuplot --help
-
-@end example
-
-`gnuplot` is case sensitive (commands and function names written in lowercase
-are not the same as those written in CAPS).  All command names may be
-abbreviated as long as the abbreviation is not ambiguous.  Any number of
-commands may appear on a line, separated by semicolons (;).  Strings may be
-set off by either single or double quotes, although there are some subtle
-differences.  See `syntax` and `quotes` for more details.  Examples:
+The command language of `gnuplot` is case sensitive, i.e. commands and
+function names written in lowercase are not the same as those written in
+capitals. All command names may be abbreviated as long as the abbreviation is
+not ambiguous. Any number of commands may appear on a line, separated by
+semicolons (;). Strings may be set off by either single or double quotes,
+although there are some subtle differences.  See `syntax` and `quotes` for
+more details. Examples:
 
 @example
       load "filename"
@@ -281,7 +274,7 @@ command, the parser may not be able to locate precisely where the error is
 and in that case will not necessarily point to the correct line.
 
 In this document, curly braces (@{@}) denote optional arguments and a vertical
-bar (|) separates mutually exclusive choices.  `gnuplot` keywords or @ref{help}
+bar (|) separates mutually exclusive choices.  `Gnuplot` keywords or @ref{help}
 topics are indicated by backquotes or `boldface` (where available).  Angle
 brackets (<>) are used to mark replaceable tokens.  In many cases, a default
 value of the token will be taken for optional arguments if the token is
@@ -297,6 +290,43 @@ interactive session, type `help plotting`).
 See the simple.dem demo, also available together with other demos on the web page
 @uref{http://www.gnuplot.info/demo/,http://www.gnuplot.info/demo/
 }
+`Gnuplot` can be started from a command line or from an icon according to the
+desktop environment. Running it from command line can take the syntax
+@example
+      gnuplot @{OPTIONS@} file1 file2 ...
+@end example
+
+where file1, file2, etc. are input file as in the `load` command.
+On X11-based systems, you can use
+@example
+      gnuplot @{X11OPTIONS@} @{OPTIONS@} file1 file2 ...
+@end example
+
+see your X11 documentation or rather `x11` in this document.
+
+Options interpreted by gnuplot may come anywhere on the line.  Files are
+executed in the order specified, as are commands supplied by the -e option,
+for example
+@example
+      gnuplot   file1.in   -e "reset"   file2.in
+
+@end example
+
+The special filename "-" is used to force reading from stdin.  `Gnuplot` exits
+after the last file is processed.  If no load files are named, `Gnuplot` takes
+interactive input from stdin.  See help `batch/interactive` for more details.
+The options specific to gnuplot can be listed by typing
+@example
+      gnuplot --help
+@end example
+
+See `command line options` for more details.
+
+Hit 'h' for help about `hotkeys` and `mousing` features in interactive screen
+terminals (`pm`, `windows`, `wxt`, `x11`).
+
+Section `seeking-assistance` will help you to find further information, help
+and FAQ.
 
 @node Seeking-assistance, New_features_introduced_in_version_4.4, Introduction, gnuplot
 @section Seeking-assistance
@@ -306,53 +336,52 @@ See the simple.dem demo, also available together with other demos on the web pag
 @cindex seeking-assistance
 
 @c ^ <a name="Seeking-assistance"></a>
-There is a mailing list for `gnuplot` users.  Note, however, that the
-newsgroup
+The canonical gnuplot web page can be found at
+@uref{http://www.gnuplot.info,http://www.gnuplot.info
+}
+
+Before seeking help, please check file FAQ.pdf or the above website for
+@uref{http://www.gnuplot.info/faq/,FAQ (Frequently Asked Questions) list.
+}
+
+If you need help as a gnuplot user, please use the newsgroup
 @example
-      comp.graphics.apps.gnuplot
+          comp.graphics.apps.gnuplot
 @end example
 
-is identical to the mailing list (they both carry the same set of messages).
 We prefer that you read the messages through the newsgroup rather than
-subscribing to the mailing list.  Instructions for subscribing to gnuplot
-mailing lists may be found via the gnuplot development website on SourceForge
+subscribing to the mailing list which is also available and carries the same
+set of messages. Instructions for subscribing to gnuplot mailing lists may be
+found via the gnuplot development website on SourceForge
 @uref{http://sourceforge.net/projects/gnuplot,http://sourceforge.net/projects/gnuplot
 }
 
 The address for mailing to list members is:
 @example
-      gnuplot-info@@lists.sourceforge.net
+          gnuplot-info@@lists.sourceforge.net
 
 @end example
 
 Bug reports and code contributions should be uploaded to the trackers at
 @example
-      http://sourceforge.net/projects/gnuplot
-
+          http://sourceforge.net/projects/gnuplot/support
 @end example
 
-The list of those interested in beta-test versions is:
+Please check previous bug reports if the bug you want to report has not been
+already fixed in a newer version of gnuplot.
+
+The list of those interested in development version of gnuplot is:
 @example
-      gnuplot-beta@@lists.sourceforge.net
+          gnuplot-beta@@lists.sourceforge.net
 
 @end example
-
-There is also the canonical (if occasionally out-of-date) gnuplot web page at
-
-@uref{http://www.gnuplot.info,http://www.gnuplot.info
-}
-
-Before seeking help, please check the
-
-@uref{http://www.gnuplot.info/faq/,FAQ (Frequently Asked Questions) list.
-}
 
 When posting a question, please include full details of the version of
 `gnuplot`, the machine, and operating system you are using.  A _small_ script
 demonstrating the problem may be useful.  Function plots are preferable to
 datafile plots.  If email-ing to gnuplot-info, please state whether or not
 you are subscribed to the list, so that users who use news will know to email
-a reply to you.  There is a form for such postings on the WWW site.
+a reply to you.  There is a form for such postings on the website.
 
 
 @node New_features_introduced_in_version_4.4, Backwards_compatibility, Seeking-assistance, gnuplot
@@ -386,9 +415,9 @@ UTF-8 character encodings. See @ref{locale}, @ref{encoding}, @ref{decimalsign}.
 @node Transparency, Volatile_Data, Internationalization, New_features_introduced_in_version_4.4
 @subsection Transparency
 
-Gnuplot now supports transparent objects in several ways. Any object or plot
-element that uses a fill style can be assigned a value from fully opaque to
-fully transparent. Image or matrix data can be plotted with an alpha channel
+Gnuplot now supports several forms of transparency. Any object or plot
+element that uses a fill style can be assigned a transparency from fully opaque
+to fully transparent. Image or matrix data can be plotted with an alpha channel
 using the new plot style @ref{rgbalpha}. See `fillstyle`, @ref{rgbalpha}.
 
 
@@ -458,7 +487,7 @@ version 4.0.
 
 The @ref{object} command can now be used to define fixed circles, ellipses, and
 polygons as well as rectangles. There is a corresponding new plot style
-@ref{circles}.  See `circle` @ref{ellipse} @ref{polygon}.
+@ref{circles}.  See `circle`, @ref{ellipse} and @ref{polygon}.
 
 
 @node New_or_revised_terminal_drivers, New_smoothing_algorithms, New_plot_elements, New_features_introduced_in_version_4.4
@@ -468,6 +497,23 @@ Two new drivers based on the cairo and pango libraries are included,
 `pngcairo` and `pdfcairo`.  These are alternatives to the older libgd-based
 png driver and the older PDFLib-based pdf driver.  The figures in the pdf
 version of this manual were prepared using the pdfcairo terminal driver.
+
+The `canvas` terminal driver produces javascript output that draws onto the
+HTML canvas element of a web page.  It can produce either a complete web page
+containing a single plot, or a script that can be embedded as part of an
+externally generated HTML document that perhaps contains multiple plots.
+The embedded plots support browser-side mousing, including zoom/unzoom.
+
+The `lua` terminal driver creates an data intended to be further processed
+by a script in the lua programming language.  At this point only one such
+lua script, gnuplot-tikz.lua, is available.  It produces a TeX document
+suitable for use with the latex TikZ package.  Other lua scripts could be
+written to process the gnuplot output for use with other TeX packages,
+or with other non-TeX tools.
+
+`Set term tikz` is shorthand for `set term lua tikz`.  As decribed above, it
+uses the generic lua terminal and an external lua script to produce a latex
+document.
 
 
 @node New_smoothing_algorithms,  , New_or_revised_terminal_drivers, New_features_introduced_in_version_4.4
@@ -529,7 +575,8 @@ New:
 
 @cindex batch/interactive
 
-`gnuplot` may be executed in either batch or interactive modes, and the two
+@c ?command line options
+`Gnuplot` may be executed in either batch or interactive modes, and the two
 may even be mixed together on many systems.
 
 Any command-line arguments are assumed to be either program options (first
@@ -537,7 +584,7 @@ character is -) or names of files containing `gnuplot` commands. The option
 -e "command" may be used to force execution of a gnuplot command. Each file
 or command string will be executed in the order specified.  The special
 filename "-" is indicates that commands are to be read from stdin.
-`gnuplot` exits after the last file is processed.  If no load files and no 
+`Gnuplot` exits after the last file is processed.  If no load files and no 
 command strings are specified, `gnuplot` accepts interactive input from
 stdin.
 
@@ -666,7 +713,7 @@ Each <system> can either be `first`, `second`, `graph`, `screen`, or
 and bottom axes; `second` places it in the system defined by the second axes
 (top and right); `graph` specifies the area within the axes---0,0 is bottom
 left and 1,1 is top right (for splot, 0,0,0 is bottom left of plotting area;
-use negative z to get to the base---see @ref{ticslevel}); `screen`
+use negative z to get to the base---see @ref{xyplane}); `screen`
 specifies the screen area (the entire area---not just the portion selected by
 @ref{size}), with 0,0 at bottom left and 1,1 at top right; and `character`
 gives the position in character widths and heights from the bottom left of
@@ -693,7 +740,7 @@ logarithmic while the y axis is linear.
 
 If one (or more) axis is timeseries, the appropriate coordinate should
 be given as a quoted time string according to the @ref{timefmt} format string.
-See @ref{xdata} and @ref{timefmt}.  `gnuplot` will also accept an integer
+See @ref{xdata} and @ref{timefmt}.  `Gnuplot` will also accept an integer
 expression, which will be interpreted as seconds from 1 January 2000.
 
 @node Datastrings, Enhanced_text_mode, Coordinates, gnuplot
@@ -2534,8 +2581,8 @@ RGB color or pm3d palettes.
 Syntax:
 
 @example
-      ... @{linecolor | lc@} <colorspec>
-      ... @{textcolor | tc@} <colorspec>
+      ... @{linecolor | lc@} @{<colorspec> | <n>@}
+      ... @{textcolor | tc@} @{<colorspec> | @{linetype | lt@} <n>@}
 
 @end example
 
@@ -2551,6 +2598,8 @@ where <colorspec> has one of the following forms:
       variable                # color index is read from input file
 
 @end example
+
+The "<n>" is the linetype number the color of which is used, see @ref{test}.
 
 "colorname" refers to one of the color names built in to gnuplot. For a list
 of the available names, see @ref{colornames}.
@@ -2672,6 +2721,10 @@ See also the command `set mouse`.
 @subsection bind
 
 @c ?commands bind
+@cindex hotkey
+
+@cindex hotkeys
+
 @cindex bind
 @opindex bind
 
@@ -2807,7 +2860,7 @@ setting the XResource 'gnuplot*ctrlq'.  See `x11 command-line-options`.
 @subsection Mouse variables
 
 @c ?mouse variables
-When mousing is active, clicking in the active window will set several user
+When `mousing` is active, clicking in the active window will set several user
 variables that can be accessed from the gnuplot command line. The coordinates
 of the mouse at the time of the click are stored in MOUSE_X MOUSE_Y MOUSE_X2
 and MOUSE_Y2. The mouse button clicked, and any meta-keys active at that time,
@@ -3280,7 +3333,7 @@ will be displayed in the new @ref{timefmt}.  For that matter, if you give the
 deactivation command (like @ref{xdata}), the quantity will be shown in its
 numerical form.
 
-The commands `set format` or `set tics format`	define the format that will be
+The commands `set format` or `set tics format` define the format that will be
 used for tic labels, whether or not the specified axis is time/date.
 
 If time/date information is to be plotted from a file, the @ref{using} option
@@ -3964,9 +4017,16 @@ but in different formats.
 
 @c ?histograms newhistogram
 @c ?plotting style histograms newhistogram
+Syntax:
+
+@example
+     newhistogram @{"<title>"@} @{<linetype>@} @{<fillstyle>@} @{at <x-coord>@}
+
+@end example
+
 More than one set of histograms can appear in a single plot. In this case you
 can force a gap between them, and a separate label for each set, by using the
-plot command `newhistogram @{"<title>"@} @{<first-linetype@} @{at <x-coord>@}`.
+@ref{newhistogram} command.
 For example
 
 @example
@@ -3988,6 +4048,10 @@ using the same coloring for multiple histograms
            newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
 
 @end example
+
+Similarly you can force the next histogram to begin with a specified fillstyle.
+If the fillstyle is set to `pattern`, then the pattern used for filling will
+be incremented automatically.
 
 The `at <x-coord>` option only applies to column-stacked histograms.
 
@@ -4050,6 +4114,14 @@ image with M x N pixels.  This is different from the pm3d plotting style, where
 an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
 directions for a binary image data grid can be further controlled by additional
 keywords. See `binary general keywords flipx`, `center`, and `rotate`.
+
+Image data can be scaled to fill a particular rectangle within a 2D plot 
+coordinate system by specifying the x and y extent of each pixel.
+See `binary general keywords dx` and `dy`. To generate the figure at the right,
+the same input image was placed multiple times, each with a specified dx, dy,
+and origin. The input PNG image of a building is 50x128 pixels.  The tall
+building was drawn by mapping this using `dx=0.5 dy=1.5`.  The short building
+used a mapping `dx=0.5 dy=0.35`.
 
 The `image` style handles input pixels containing a grayscale or color palette
 value. Thus 2D plots (`plot` command) require 3 columns of data (x,y,value),
@@ -4225,12 +4297,20 @@ See also `linetype`, `linewidth`, and `linestyle`.
 
 @cindex lp
 
+@cindex pointinterval
+
 The @ref{linespoints} style connects adjacent points with straight line segments
 and then goes back to draw a small symbol at each point.  The command
 @ref{pointsize} may be used to change the default size of the points.
 1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
 required if 3D plots.  See `style lines`.  Additional input columns may be used
 to provide information such as variable point size or line color.
+
+The `pointinterval` (short form `pi`) property of the line style can be used to
+control whether or not every point in the plot is given a symbol.  For example,
+'with lp pi 3' will draw line segments through every data point, but will only
+place a symbol on every 3rd point.  A negative value for `pointinterval` will
+erase the portion of line segment that passes underneath the symbol.
 
 @ref{linespoints} may be abbreviated `lp`.
 
@@ -5629,7 +5709,7 @@ will wait the specified number of seconds.  The time is rounded to an integer
 number of seconds if subsecond time resolution is not supported by the given
 platform.  `pause 0` is synonymous with @ref{print}.
 
-If the current terminal supports mousing, then `pause mouse` will terminate
+If the current terminal supports `mousing`, then `pause mouse` will terminate
 on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
 is not active, `pause mouse` is equivalent to `pause -1`.
 
@@ -5703,7 +5783,7 @@ Syntax:
            @{<iteration>@}
            @{<function> | @{"<datafile>" @{datafile-modifiers@}@}@}
            @{axes <axes>@} @{<title-spec>@} @{with <style>@}
-           @{, @{definitions,@} <function> ...@}
+           @{, @{definitions@{,@}@} <function> ...@}
 
 @end example
 
@@ -6153,6 +6233,27 @@ can be found at
 See also `binary`.
 
 
+@noindent --- PNG ---
+
+@c ?binary general filetype png
+@c ?filetype png
+If gnuplot was configured to use the libgd library for png/gif/jpeg output, 
+then it can also be used to read these same image types as binary files.
+You can use an explicit command
+@example
+      plot 'file.png' binary filetype=png
+@end example
+
+Or the file type will be recognized automatically from the extension if you
+have previously requested
+@example
+      set datafile binary filetype=auto
+
+@end example
+
+See also `binary`.
+
+
 @noindent --- KEYWORDS ---
 
 @c ?binary general keywords
@@ -6194,6 +6295,11 @@ Shorthand notation for `scan=yx` or `scan=yxz`.
 @noindent --- DX, DY, DZ ---
 
 @c ?binary general keywords dx
+@c ?binary general keywords dy
+@cindex dx
+
+@cindex dy
+
 When gnuplot generates coordinates, it uses the spacing described by these
 keywords.  For example `dx=10 dy=20` would mean space samples along the
 x dimension by 10 and space samples along the y dimension by 20.  `dy` cannot
@@ -6450,8 +6556,10 @@ Data sets are separated by pairs of blank records.  `index <m>` selects only
 set <m>; `index <m>:<n>` selects sets in the range <m> to <n>; and `index
 <m>:<n>:<p>` selects indices <m>, <m>+<p>, <m>+2<p>, etc., but stopping at
 <n>.  Following C indexing, the index 0 is assigned to the first data set in
-the file.  Specifying too large an index results in an error message.  If
-@ref{index} is not specified, all sets are plotted as a single data set.
+the file.  Specifying too large an index results in an error message.
+If <p> is specified but <n> is left blank then every <p>-th dataset is read
+until the end of the file.  If @ref{index} is not specified, the entire file is
+plotted as a single data set.
 
 Example:
 @example
@@ -7382,7 +7490,18 @@ Syntax:
 @end example
 
 The scope of an iteration ends at the next comma or the end of the
-command, whichever comes first.  Iteration may be nested.
+command, whichever comes first.  Iteration can not be nested.
+
+This will plot one curve, sin(3x), because iteration ends at the comma
+@example
+      plot for [i=1:3] j=i, sin(j*x)
+@end example
+
+This will plot three curves because there is no comma after the definition of j
+@example
+      plot for [i=1:3] j=i sin(j*x)
+
+@end example
 
 Example:
 @example
@@ -11117,6 +11236,8 @@ to tic labels overwriting other text if the axis is very close to the border.
 @c ?commands unset mouse
 @c ?set mouse
 @c ?unset mouse
+@cindex mousing
+
 @cindex mouse
 @opindex mouse
 
@@ -11132,7 +11253,7 @@ For 3d graphs `splot`, the view and scaling of the graph can be changed with
 mouse buttons 1 and 2. If additionally to these buttons the modifier <ctrl> is
 hold down, the coordinate system only is rotated which is useful for large
 data sets. A vertical motion of Button 2 with the shift key hold down changes
-the @ref{ticslevel}.
+the @ref{xyplane}.
 
 Mousing is not available in multiplot mode. When multiplot is finished using
 @ref{multiplot}, then the mouse will be turned on again and acts on the
@@ -12841,7 +12962,7 @@ Important note:
 @example
       In earlier versions of gnuplot, some terminal types used the values from
       @ref{size} to control also the size of the output canvas; others did not.
-      In version 4.2 almost all terminals now follow the following convention:
+      In version 4.4 almost all terminals now follow the following convention:
 
 @end example
 
@@ -13218,6 +13339,12 @@ using the default linetype 3.
 
 @cindex linewidth
 
+@cindex interval
+
+@cindex linespoints
+
+@cindex pointinterval
+
 Each terminal has a default set of line and point types, which can be seen
 by using the command @ref{test}.  `set style line` defines a set of line types
 and widths and point types and sizes so that you can refer to them later by
@@ -13231,6 +13358,7 @@ Syntax:
                              @{@{linewidth | lw@} <line_width>@}
                              @{@{pointtype | pt@} <point_type>@}
                              @{@{pointsize | ps@} <point_size>@}
+                             @{@{pointinterval | pi@} <interval>@}
                              @{palette@}
       unset style line
       show style line
@@ -13244,13 +13372,20 @@ If the linestyle <index> already exists, only the given parameters are
 changed while all others are preserved.  If not, all undefined values are
 set to the default values.
 
-The line and point types are taken from the default types for the terminal
-currently in use.  The line width and point size are multipliers for the
-default width and size (but note that <point_size> here is unaffected by
-the multiplier given on @ref{pointsize}).
+The line and point types default to the index value. The exact symbol that is
+drawn for that index value may vary from one terminal type to another.
 
-The defaults for the line and point types is the index.  The defaults for
-the width and size are both unity.
+The line width and point size are multipliers for the current terminal's
+default width and size (but note that <point_size> here is unaffected by
+the multiplier given by the command@ref{pointsize}).
+
+The `pointinterval` controls the spacing between points in a plot drawn with
+style @ref{linespoints}.  The default is 0 (every point is drawn). For example,
+`set style line N pi 3` defines a linestyle that uses pointtype N, pointsize
+and linewidth equal to the current defaults for the terminal, and will draw
+every 3rd point in plots using @ref{linespoints}.  A negative value for the
+interval is treated the same as a positive value, except that some terminals
+will try to interrupt the line where it passes through the point symbol.
 
 Linestyles created by this mechanism do not replace the default linetype
 styles; both may be used.  If you want plots to use the defined styles in
@@ -13500,6 +13635,7 @@ be changed this way. Currently the only options accepted are
      set termoption @{no@}enhanced
      set termoption font "<fontname>@{,<fontsize>@}"
      set termoption @{solid|dashed@}
+     set termoption @{linewidth <lw>@}@{lw <lw>@}
 
 @end example
 
@@ -13930,7 +14066,7 @@ scale to match the x and y axes; however there is no guarantee that the
 current z axis range will fit within the plot boundary.
 By default all three axes are scaled independently to fill the available area.
 
-See also @ref{ticslevel}.
+See also @ref{xyplane}.
 
 @node vrange, x2data, view, set-show
 @subsection vrange
@@ -14646,7 +14782,7 @@ Syntax:
 @example
       set xyplane at <zvalue>
       set xyplane relative <frac>
-      set ticslevel <frac>	# equivalent to set xyplane relative
+      set ticslevel <frac>        # equivalent to set xyplane relative
       show xyplane
 
 @end example
@@ -15271,7 +15407,7 @@ Syntax:
             @{<iteration>@}
             <function> | "<datafile>" @{datafile-modifiers@}@}
             @{<title-spec>@} @{with <style>@}
-            @{, @{definitions,@} <function> ...@}
+            @{, @{definitions@{,@}@} <function> ...@}
 
 @end example
 
@@ -15280,8 +15416,8 @@ supplied.  The function can be a mathematical expression, or a triple of
 mathematical expressions in parametric mode.
 
 By default `splot` draws the xy plane completely below the plotted data.
-The offset between the lowest ztic and the xy plane can be changed by @ref{ticslevel}.  The orientation of a `splot` projection is controlled by
-@ref{view}.  See @ref{view} and @ref{ticslevel} for more information.
+The offset between the lowest ztic and the xy plane can be changed by @ref{xyplane}.  The orientation of a `splot` projection is controlled by
+@ref{view}.  See @ref{view} and @ref{xyplane} for more information.
 
 The syntax for setting ranges on the `splot` command is the same as for
 `plot`.  In non-parametric mode, the order in which ranges must be given is
@@ -15846,7 +15982,7 @@ with no modifiers.
 * excl::                        
 * hercules::                    
 * fig::                         
-* png::                         
+* png_::                        
 * ggi::                         
 * Gnugraph(GNU_plotutils)::     
 * gpic::                        
@@ -16314,7 +16450,7 @@ gnuplot terminal types. See `enhanced` for more details.
 
 The width of all lines in the plot can be modified by the factor <lw>
 specified in `linewidth`. The default linewidth is 0.25 points.
-(1 "PostScript" point = 1/72 inch = 0.353 cm)
+(1 "PostScript" point = 1/72 inch = 0.353 mm)
 
 `rounded` sets line caps and line joins to be rounded; `butt` is the
 default, butt caps and mitered joins.
@@ -17258,7 +17394,7 @@ printer and the 1590.  It has no options."
 These drivers supports PC monitors with autodetected graphics boards.  They
 can be used only when compiled with Zortech C/C++.  None have options."
 
-@node fig, png, hercules, complete_list_of_terminals
+@node fig, png_, hercules, complete_list_of_terminals
 @subsubsection fig
 
 @c ?commands set terminal fig
@@ -17372,7 +17508,7 @@ To plot the error bars on top of the circles use
 
 @end example
 
-@node png, ggi, fig, complete_list_of_terminals
+@node png_, ggi, fig, complete_list_of_terminals
 @subsubsection png
 
 @c ?commands set terminal png
@@ -17485,7 +17621,7 @@ Use 24 bits of color information per pixel, with a transparent background.
 Use the `enhanced text` mode to control the layout of strings to be printed.
 
 
-@node ggi, Gnugraph(GNU_plotutils), png, complete_list_of_terminals
+@node ggi, Gnugraph(GNU_plotutils), png_, complete_list_of_terminals
 @subsubsection ggi
 
 @c ?commands set terminal ggi
@@ -18088,7 +18224,7 @@ The only difference between the two is that `kyo` uses "Helvetica" whereas
 Syntax:
 @example
       set terminal @{latex | emtex@} @{default | @{courier|roman@} @{<fontsize>@}@}
-                   @{size <XX>@{unit@}, <YY>@{unit@}@}
+                   @{size <XX>@{unit@}, <YY>@{unit@}@} @{rotate | norotate@}
 
 @end example
 
@@ -18117,6 +18253,10 @@ Other point types use symbols from the amssymb package.
 The default size for the plot is 5 inches by 3 inches. The @ref{size} option
 changes this to whatever the user requests. By default the X and Y sizes
 are taken to be in inches, but other units are possible (currently only cm).
+
+If 'rotate' is specified, rotated text, especially a rotated y-axis label,
+is possible (the packages graphics or graphicx are needed). The 'stacked'
+y-axis label mechanism is then deactivated.
 
 Examples:
 About label positioning:
@@ -19097,6 +19237,15 @@ terminals.  It has no options."
 @c ?term vttek
 @cindex vttek
 @tmindex vttek
+
+
+@c ?commands set terminal xterm
+@c ?set terminal xterm
+@c ?set term xterm
+@c ?terminal xterm
+@c ?term xterm
+@cindex xterm
+@tmindex xterm
 
 
 @c ?commands set terminal kc-tek40xx
@@ -21045,7 +21194,7 @@ Please give complete information on the version of gnuplot you are using
 and, if possible, a test script that demonstrates the bug.
 See @ref{Seeking-assistance}.
 
-The sections below list problems known to be present in gnuplot version 4.2 at
+The sections below list problems known to be present in gnuplot version 4.4 at
 the time of release.  Some of these are actually bugs in external support
 libraries and may have been fixed independent of any changes in gnuplot.
 
