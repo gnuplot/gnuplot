@@ -2,6 +2,9 @@
 
 	* Update version info for upcoming release of 4.4.rc1
 
+	* demo/Makefile.am.in demo/bldg.png: Ensure that this demo image
+	is included in the distribution tarball.
+
 2009-11-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Fix support web page URL.
