@@ -1,3 +1,8 @@
+2009-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/win/winmain.c (MyFPrintF MyVFPrintF MyPrintF): Workaround for
+	vsnprintf(NULL,0,...) returning zero (MingW 3.4).
+
 2009-11-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Update version info for upcoming release of 4.4.rc1
