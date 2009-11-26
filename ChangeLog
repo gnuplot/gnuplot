@@ -1,3 +1,7 @@
+2009-11-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c:  Remove unused global df_binary.
+
 2009-11-16  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/command.c (do_string_and_free) src/misc.c (load_file): Fix memory

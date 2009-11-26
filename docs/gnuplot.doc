@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.588 2009/11/15 02:23:38 janert Exp $
+C RCS $Id: gnuplot.doc,v 1.589 2009/11/16 10:38:22 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3004,7 +3004,7 @@ Ffigure_histcols
 ?rgbimage
 ?rgbalpha
  The `image`, `rgbimage`, and `rgbalpha` plotting styles all project a
- uniformly sampled grid of data values onto a plane  in either a 2D or 3D.
+ uniformly sampled grid of data values onto a plane  in either 2D or 3D.
  The input data may be an actual bitmapped image, perhaps converted from a
  standard format such as PNG, or a simple array of numerical values.
 

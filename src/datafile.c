@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.176 2009/09/03 04:43:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.177 2009/10/10 18:43:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -74,8 +74,6 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.176 2009/09/03 04:43:48
  *    int df_no_tic_specs - count of additional ticlabel columns
  *    int df_line_number  - for error reporting
  *    int df_datum        - increases with each data point
- *    TBOOLEAN df_binary  - it's a binary file
- *        [ might change this to return value from df_open() ]
  *    int df_eof          - end of file
  *
  * functions
@@ -201,7 +199,6 @@ int df_line_number;
 int df_datum;                   /* suggested x value if none given */
 AXIS_INDEX df_axis[MAXDATACOLS];
 TBOOLEAN df_matrix = FALSE;     /* indicates if data originated from a 2D or 3D format */
-TBOOLEAN df_binary = FALSE;     /* this is a binary file */
 
 void *df_datablock;		/* pixel data from an external library (e.g. libgd) */
 
@@ -1011,7 +1008,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	free_at(ydata_func.at);
     ydata_func.at = NULL;
 
-    df_binary = df_matrix = FALSE;
+    df_matrix = FALSE;
 
     /* pm 25.11.2001 allow any order of options */
     while (!END_OF_COMMAND) {
@@ -1200,11 +1197,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		 || ((df_num_bin_records == 1) 
 		     && ((df_bin_record[0].cart_dim[1] > 0)
 			 || (df_bin_record[0].scan_dim[1] > 0))));
-
-    /* Same idea, but try removing this one.  I can't see why it is
-     * important for the rest of the program to know if if the data
-     * came from a binary file. (DJS 20 Aug 2004) */
-    df_binary = df_binary_file;
 
     return df_no_use_specs;
 }
