@@ -1,3 +1,7 @@
+2009-11-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	4.4.0-rc1
+
 2009-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/winmain.c (MyFPrintF MyVFPrintF MyPrintF): Workaround for
