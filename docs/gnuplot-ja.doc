@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.290 2009-05-19 17:16:15+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.568
+C RCS $Id: gnuplot-ja.doc,v 1.1 2009-11-30 13:48:32+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.568.2.19
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7,7 +7,7 @@ C Japanese translation: Hiroharu Tamaru (2.0, 3.2), MASUTANI Yasuhiro (3.5),
 C Shigeharu Takeno et al (3.7, 4.X)
 ^ <h2> An Interactive Plotting Program </h2><p>
 ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-^ <h2>  Version 4.2 organized by Hans-Bernhard Broeker and others</h2><p>
+^ <h2>  Version 4.4 organized by Ethan A Merritt and others</h2><p>
 ^ <h2>Major contributors (alphabetic order):</h2>
 ^<ul><h3>
 ^<li>  Hans-Bernhard Broeker
@@ -134,32 +134,35 @@ C Shigeharu Takeno et al (3.7, 4.X)
 2 はじめに (Introduction)
 ?introduction
 ?
- `gnuplot` は、コマンド入力方式の対話的な関数描画プログラムです。
- 書式:
-       gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
+ `gnuplot` は、ポータブルなコマンド入力方式のグラフユーティリティで、
+ Linux, OS/2, MS Windows, OSX, VMS, その他多くのプラットホーム上で動作
+ します。ソースコードには著作権がありますが、無料で配布されています (す
+ なわち、それに対価を支払う必要はありません)。元は、科学者や学生が数学
+ 関数やデータなどを対話的に表示できるよう作られたのですが、現在までに、
+ 例えば Web スクリプトなど、多くの非対話型の利用もサポートするように成
+ 長しています。これは、例えば Octave のようにサードパーティのアプリケー
+ ションの描画エンジンとしても使われています。gnuplot は、1986 よりサポ
+ ートと活発な開発が行われています。
 
- 一般的な X11 オプションは、もしあるならそれを最初に置きます (あなたの
- X11 の説明書を参照; X11 を使わないならここは無視してください)。gnuplot
- に与えるオプションは、そのコマンド行のどこに置くこともできます。ファイ
- ルは指定した順に実行され、同様に -e オプションで任意のコマンドも与える
- ことができます。
+ gnuplot は、2 次元、または 3 次元の、多くの種類のグラフをサポートして
+ います: 折線グラフ、点グラフ、棒グラフ、等高線、ベクトル場描画、曲面、
+ そしてそれらに関連するさまざまな文字列等。そしてさらにいくつかの特別な
+ 描画型もサポートしています。
 
- 例:
-       gnuplot   file1.in   -e "reset"   file2.in
+ gnuplot は多くの異なる出力をサポートしています: 対話型スクリーン出力形
+ 式 (マウスやホットキー入力も可能)、ペンプロッタや現在のプリンタへの直
+ 接出力、または多くのファイル形式への出力 (eps, fig, jpeg, LaTeX,
+ metafont, pbm, pdf, png, postscript, svg, ...)。gnuplot は、容易に新し
+ い出力形式を追加するよう拡張することができます。最近追加された対話型出
+ 力形式には、aquaterm (OSX) や wxWidgets (マルチプラットホーム) を元に
+ したものがあります。
 
- 特別なファイル名 "-" は、標準入力から読ませるのに使います。`gnuplot`
- は最後のファイルを処理し終わると終了します。読み込ませるファイルを一つ
- つも指定しない場合は、`gnuplot` は標準入力からの対話入力を取ります。詳
- 細は、以下参照: `batch/interactive`。gnuplot 用のオプションについては、
- 以下のようにして一覧を見ることができます:
-
-       gnuplot --help
-
- `gnuplot` は、コマンドや関数名は大文字小文字を区別します。いずれのコマ
- ンドも、あいまいさの無い限りにおいて省略することができます。1 行中には
- セミコロン (;) で区切って複数のコマンドを書くことができます。文字列は単
- 一引用符、あるいは二重引用符のどちらかで書き始めますが、両者には微妙な
- 違いがあります (詳細は、以下参照: `syntax`)。例:
+ `gnuplot` のコマンド言語は大文字小文字を区別します。すなわち、小文字で
+ 書かれたコマンドや関数名は、それらを大文字で書いたものとは同じではあり
+ ません。いずれのコマンドも、あいまいさの無い限りにおいて省略することが
+ できます。1 行中にはセミコロン (;) で区切って複数のコマンドを書くこと
+ ができます。文字列は単一引用符、あるいは二重引用符のどちらかで書き始め
+ ますが、両者には微妙な違いがあります (詳細は、以下参照: `syntax`)。例:
 
        load "filename"
        cd 'dir'
@@ -202,42 +205,72 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ^ <a href="http://www.gnuplot.info/demo/">
            http://www.gnuplot.info/demo/
 ^ </a>
+ `gnuplot` はコマンドラインから、あるいはデスクトップ環境のアイコンから
+ 起動することができます。コマンドラインから起動するときは、以下の書式が
+ 使えます。
+       gnuplot {OPTIONS} file1 file2 ...
+ ここで file1, file2 等は、`local` コマンドで取り込むのと同等の入力ファ
+ イル (スクリプトファイル) です。
+ X11 ベースのシステムでは、以下の書式が使えます。
+       gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
+ 詳細は、X11 のドキュメントか、あるいは以下参照: `x11`。
+
+ gnuplot に与えるオプションは、コマンド行のどこに置いても構いません。フ
+ ァイルは指定した順に実行され、同様に -e オプションで任意のコマンドを与
+ えることもできます。例:
+       gnuplot   file1.in   -e "reset"   file2.in
+
+ 特別なファイル名 "-" は、標準入力から読ませるのに使います。`gnuplot`
+ は最後のファイルを処理し終わると終了します。読み込ませるファイルを一つ
+ も指定しない場合は、`gnuplot` は標準入力からの対話入力を取ります。詳細
+ は、以下参照: `batch/interactive`。gnuplot 用のオプションについては、
+ 以下のようにして一覧を見ることができます:
+       gnuplot --help
+ 詳細は以下参照: `command line options`。
+
+ 対話型スクリーン出力形式 (`pm`, `windows`, `wxt`, `x11`) では、'h' を
+ 打つとホットキー (`hotkeys`) とマウス機能 (`mousing`) に関するヘルプが
+ 表示されます。
+
+ `seeking-assistance` のセクションは、さらなる情報やヘルプ、FAQ を探す
+ 手掛りを与えてくれるでしょう。
 2 探し出す手助け (Seeking-assistance)
 ?help-desk
 ?seeking-assistance
 ^ <a name="Seeking-assistance"></a>
- `gnuplot` ユーザのためのメーリングリストがあります。しかし、ニュースグ
- ループ
-       comp.graphics.apps.gnuplot
- は、そのメーリングリストと同等であることに注意してください (どちらにも
- 同じメッセージが流れます)。私達はメーリングリストに参加するより、むし
- ろニュースグループのメッセージを読むことを勧めます。メーリングリストに
- 参加する方法に関しては、SouceForge にある gnuplot の開発 Web サイト
+ 公式の gnuplot Web ページは以下にあります。
+^ <a href="http://www.gnuplot.info">
+           http://www.gnuplot.info
+^ </a>
+
+ 助けを求める前に、ファイル FAQ.pdf か、または上の Web サイトの
+^ <a href="http://www.gnuplot.info/faq/">
+           FAQ (度々聞かれる質問; Frequently Asked Questions) の一覧
+^ </a>
+ をチェックしてください。
+
+ gnuplot ユーザとしての手助けが必要なら、以下のニュースグループを利用し
+ てください。
+           comp.graphics.apps.gnuplot
+ 私達はメーリングリストに参加するより、むしろニュースグループのメッセー
+ ジを読むことを勧めます。メーリングリストも有効で、同じメッセージ列を配
+ 送しています。メーリングリストに参加する方法に関しては、SouceForge に
+ ある gnuplot の開発 Web サイト
 ^ <a href="http://sourceforge.net/projects/gnuplot">
            http://sourceforge.net/projects/gnuplot
 ^ </a>
  を参照してください。
 
  メーリングリストメンバーへのメールアドレス:
-       gnuplot-info@lists.sourceforge.net
+           gnuplot-info@lists.sourceforge.net
 
  バグリポート、ソースの改良等は以下の trackers に upload してください:
-       http://sourceforge.net/projects/gnuplot
+           http://sourceforge.net/projects/gnuplot/support
+ ただし、リポートを送る前に、あなたがリポートしようとしているバグが、よ
+ り新しい gnuplot で既に修正されていないかチェックしてください。
 
- βテスト版に関するメーリングリスト:
-       gnuplot-beta@lists.sourceforge.net
-
- 公式の (そしてたまに更新が遅れることもある) WWW ページもあります。
-
-^ <a href="http://www.gnuplot.info">
-           http://www.gnuplot.info
-^ </a>
-
- 助けを求める前に、次をチェックしてください:
-
-^ <a href="http://www.gnuplot.info/faq/">
-           FAQ (度々聞かれる質問; Frequently Asked Questions) の一覧
-^ </a>
+ 開発版に関するメーリングリスト:
+           gnuplot-beta@lists.sourceforge.net
 
  何か質問を投稿するときは、あなたが使用している `gnuplot` のバージョン、
  実行マシン、オペレーティングシステム、といった全ての情報を含むようにし
@@ -246,34 +279,34 @@ C Shigeharu Takeno et al (3.7, 4.X)
  いです。もし、gnuplot-info へメールをするなら、そのメーリングリストの
  購読をしているかどうかを述べてください。そうすれば、ニュースを見たユー
  ザはあなたへの返事をメールで出せば良いことが分かるでしょうから。そのよ
- うな記事のポストの form が WWW サイトにあります。
+ うな記事のポストの form が Web サイトにあります。
 
-2 バージョン 4.3 で導入された新しい機能 (New features)
+2 バージョン 4.5 で導入された新しい機能 (New features)
 ?new-features
- gnuplot version 4.3 は、直前の公式バージョン 4.2 以降に追加されたたく
+ gnuplot version 4.4 は、直前の公式バージョン 4.2 以降に追加されたたく
  さんの機能を提供します。この節では、主な追加機能の一覧と、変更や細かい
  新機能の一部を紹介します。より網羅的な一覧は、ファイル NEWS を参照して
  ください。
 
 3 国際化 (Internationalization)
- gnuplot 4.3 には、ロカールの設定と UTF-8 文字エンコードのサポートに関
+ gnuplot 4.4 には、ロカールの設定と UTF-8 文字エンコードのサポートに関
  する意味深い改良が含まれています。以下参照: `set locale`,
  `set encoding`, `set decimalsign`。
 
 3 透明化 (Transparency)
- 現在の gnuplot は、いくつかの方法で透明なオブジェクトをサポートしてい
- ます。塗り潰しスタイルを使用する任意のオブジェクト、描画要素には「完全
- な不透明」から「完全な透明」までの値を割り当てることができます。画像や
- matrix データは、新しい描画スタイル `with rgbalpha` を使用することで、
- アルファチャネル指定付きで描画できます。以下参照: `fillstyle`,
+ 現在の gnuplot は、いくつかの形式の透明化をサポートしています。塗り潰
+ しスタイルを使用する任意のオブジェクト、描画要素には「完全な不透明」か
+ ら「完全な透明」までの透明化を割り当てることができます。画像 (image)
+ や matrix データは、新しい描画スタイル `with rgbalpha` を使用すること
+ で、アルファチャネル指定付きで描画できます。以下参照: `fillstyle`,
  `rgbalpha`。
 
 3 揮発性データ (Volatile Data)
  新しいコマンド `refresh` はほぼ `replot` と同じですが、入力データファ
  イルの再読み込みをせず、前に保存した入力データを使うところが違います。
  入力データが `volatile` と指定されていれば、マウス操作 (ズーム、回転)
- `replot` ではなく自動的に `refresh` を使用します。パイプ入力、インラン
- データも自動的に `volatile` と扱われます。以下参照: `refresh`,
+ は `replot` ではなく自動的に `refresh` を使用します。パイプ入力、イン
+ ランデータも自動的に `volatile` と扱われます。以下参照: `refresh`,
  `plot datafile volatile`。
 
 3 キャンバスサイズ (Canvas size)
@@ -284,7 +317,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  gnuplot の以前の版では、`set size` の値を、出力する描画領域 (キャンバ
  ス) のサイズを制御するのにも使っていた出力形式もありましたが、すべての
  出力形式がそうだったわけではありませんでした。この目的のために
- `set size` を使用することは version 4.2 で非推奨となり、version 4.3 で
+ `set size` を使用することは version 4.2 で非推奨となり、version 4.4 で
  は、ほとんどの出力形式が以下のルールに従うようになりました:
 
  `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
@@ -321,7 +354,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
 =polygon
  コマンド `set object` は、現在は固定された長方形だけでなく、円、楕円、
  多角形も定義でき、そして、それに対応する新しい描画スタイル
- `plot with circles` もあります。以下参照: `circle` `ellipse` `polygon`。
+ `plot with circles` もあります。以下参照: `circle`, `ellipse`,
+ `polygon`。
 
 3 新しい/修正された出力形式
  cairo, pango ライブラリによる 2 つの新しいドライバ `pngcairo`,
@@ -330,6 +364,24 @@ C Shigeharu Takeno et al (3.7, 4.X)
  pdf 版の図は、pdfcairo 出力ドライバで作成されたものです (訳注: PDF 版
  マニュアルにこの図を入れるのには pdflatex が必要なため、日本語 PDF 版
  マニュアルには今のところこの図は含まれていないでしょう)。
+
+ 出力ドライバ `canvas` は、ウェブページの canvas 要素 HTML 中に描画する
+ javascript 出力を生成します。これは、一つの描画だけを含む完全なウェブ
+ ページ、あるいは外部に生成された HTML ドキュメントの一部 (複数の描画を
+ 入れることができる) として埋め込めるスクリプト、のいずれかを作成できま
+ す。埋め込ませる描画は、拡大/縮小などの、ブラウザ側のマウス動作をサポ
+ ートしています。
+
+ 出力ドライバ `lua` は、lua プログラミング言語のスクリプトによってさら
+ なる処理が可能なデータを生成します。現時点では、そのようなスクリプトと
+ しては gnuplot-tikz.lua のみが用意されていて、これは、latex TikZ パッ
+ ケージ用の出力を作成します。もちろん、他の TeX パッケージ用、あるいは
+ TeX 以外のツール用の gnuplot 出力を生成する lua スクリプトなどを作成す
+ ることも可能でしょう。
+
+ `set term tikz` は、`set term lua tikz` の省略形です。上に書いたように
+ これは lua 出力形式と外部の lua スクリプトを使用して latex 文書を生成
+ します。
 
 3 新しい平滑化アルゴリズム
 =kdensity
@@ -369,6 +421,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 
 2 バッチ/対話型操作 (Batch/Interactive)
 ?batch/interactive
+?command line options
  `gnuplot` は多くのシステム上で、バッチ処理形式、あるいは対話型のどちら
  の形式でも実行でき、それらを組み合わせることも可能です。
 
@@ -497,9 +550,9 @@ C Shigeharu Takeno et al (3.7, 4.X)
  します。`second` は第 2 軸 (上と右の軸) を使用します。`graph` はグラフ
  描画領域内の相対的位置を指定し、左下が 0,0 で 右上が 1,1 (splot の場合
  はグラフ描画領域内の左下が 0,0,0 で、土台の位置は負の z の値を使用しま
- す。以下参照: `set ticslevel`) となります。`screen` は表示範囲内 (範囲
- 全体であり、`set size` で選択される一部分ではありません) を指定し、左
- 下が 0,0 で 右上が 1,1 となります。`character` は、画面領域の左下
+ す。以下参照: `set xyplane`) となります。`screen` は表示範囲内 (範囲全
+ 体であり、`set size` で選択される一部分ではありません) を指定し、左下
+ が 0,0 で 右上が 1,1 となります。`character` は、画面領域の左下
  (screen 0,0) からの、文字の幅、文字の高さでの位置を与えます。よって、
  `character` 座標は、選択されたフォントのサイズに依存します。
 
@@ -1912,8 +1965,8 @@ C ... and restart the table:
 
  書式:
 
-       ... {linecolor | lc} <colorspec>
-       ... {textcolor | tc} <colorspec>
+       ... {linecolor | lc} {<colorspec> | <n>}
+       ... {textcolor | tc} {<colorspec> | {linetype | lt} <n>}
 
  <colorspec> は以下の形式のいずれかです:
 
@@ -1924,6 +1977,9 @@ C ... and restart the table:
        palette cb <value>      # <val> は cbrange の範囲の値
        palette z
        variable                # 入力ファイルから色番号を読み込む
+
+ <n> は、その線種 (linetype) 番号が使う色を意味します。以下参照:
+ `test`。
 
  "colorname" は gnuplot が内部に持っている色の名前のうちの一つを指定し
  ます。有効な名前の一覧に関しては、以下参照: `show colornames`。
@@ -2013,6 +2069,8 @@ C ... and restart the table:
  す。以下参照: `bind`, `mouse variables`。また以下も参照: `set mouse`。
 3 bind
 ?commands bind
+?hotkey
+?hotkeys
 ?bind
  書式:
        bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
@@ -2108,16 +2166,16 @@ C ... and restart the table:
  以下参照: `x11 command-line-options`。
 3 マウス用の変数 (Mouse variables)
 ?mouse variables
- マウス機能が有効な場合、現在のウィンドウ上でのマウスクリックによって
- gnuplot のコマンドライン上で使うことができる色々なユーザ変数が設定され
- ます。クリック時のマウスの座標は変数 MOUSE_X, MOUSE_Y, MOUSE_X2,
- MOUSE_Y2 に代入されます。クリックされたボタンや、そのときのメタキーの
- 状態は MOUSE_BUTTON, MOUSE_SHIFT, MOUSE_ALT, MOUSE_CTRL に代入されます。
- これらの変数は任意の描画の開始時には未定義で、有効な描画ウィンドウ中で
- のマウスクリックイベントによって初めて定義されます。有効な描画ウィンド
- ウ中でマウスが既にクリックされたかどうかをスクリプトから調べるには、こ
- れらの変数のうちのどれか一つが定義されているかどうかをチェックすれば十
- 分です。
+ `mousing` (マウス機能) が有効な場合、現在のウィンドウ上でのマウスクリ
+ ックによって gnuplot のコマンドライン上で使うことができる色々なユーザ
+ 変数が設定されます。クリック時のマウスの座標は変数 MOUSE_X, MOUSE_Y,
+ MOUSE_X2, MOUSE_Y2 に代入されます。クリックされたボタンや、そのときの
+ メタキーの状態は MOUSE_BUTTON, MOUSE_SHIFT, MOUSE_ALT, MOUSE_CTRL に代
+ 入されます。これらの変数は任意の描画の開始時には未定義で、有効な描画ウ
+ ィンドウ中でのマウスクリックイベントによって初めて定義されます。有効な
+ 描画ウィンドウ中でマウスが既にクリックされたかどうかをスクリプトから調
+ べるには、これらの変数のうちのどれか一つが定義されているかどうかをチェ
+ ックすれば十分です。
 
        plot 'something'
        pause mouse
@@ -2706,7 +2764,7 @@ Ffigure_circles
           'data' using 1:2 with linespoints
 
  これは、pointstyle 6 で点のサイズを variable とした `points` による描
- 画と似ていますが、circles は x 軸の範囲で縮尺される点が異なります。以
+ 画と似ていますが、circles は x 軸の範囲で伸縮される点が異なります。以
  下も参照: `set object circle`, `fillstyle`。
 2 dots
 ?commands set style dots
@@ -2948,6 +3006,7 @@ Ffigure_histclust
 
        plot for [COL=2:4:2] 'file.dat' using COL:xticlabels(1)
 
+Ffigure_histerrorbar
  ファイルが、各データの測定値と範囲の情報の両方を含んでいる場合、描画に
  誤差線を追加することができます。以下のコマンドは誤差線を (y-<error>)
  から (y+<error>) に引き、その頭に箱と同じ幅の水平線をつけます。誤差線
@@ -2993,10 +3052,13 @@ Ffigure_histcols
 ?newhistogram
 ?histograms newhistogram
 ?plotting style histograms newhistogram
+ 書式:
+
+      newhistogram {"<title>"} {<linetype>} {<fillstyle>} {at <x-coord>}
+
  一回の描画に 2 つ以上のヒストグラムの組を作ることもできます。この場合
- `newhistogram {"<title>"} {<first-linetype} {at <x-coord>}` の描画コマ
- ンドを使うことで、それらを強制的に分離し、またそれぞれのラベルを分離す
- ることができます。
+ コマンド `newhistogram` を使うことで、それらを強制的に分離し、またそれ
+ ぞれのラベルを分離することができます。
  例:
 
        set style histogram  cluster
@@ -3012,6 +3074,10 @@ Ffigure_histcols
  トグラムに同じ色付けを施します。
        plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
             newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
+
+ 同様に、次のヒストグラムを指定した fillstyle で始めさせることが可能で
+ す。その fillstyle を `pattern` にセットした場合、塗り潰しに使用される
+ パターン番号は自動的に増加されていきます。
 
  オプション `at <x-coord>` は列データの積み上げ型 (`columnstacked`) の
  ヒストグラムのみに適用されます。
@@ -3060,6 +3126,16 @@ Ffigure_rgb3D
  pm3d の構造とは異なります。バイナリ画像データの格子の走査方向は、追加
  キーワードでさらに制御可能です。以下参照:
  `binary general keywords flipx`, `center`, `rotate`。
+
+Ffigure_scaled_image
+ 各ピクセルの x と y の大きさを示すことで、画像データを 2 次元描画座標
+ 系内の特定の長方形に収まるように伸縮することができます。以下参照:
+ `binary general keywords dx`, `dy`。右の画像を生成するのには、同じ入力
+ 画像を、それぞれ dx, dy, origin を指定して複数回配置しました。入力 PNG
+ 画像であるビルの絵は 50x128 ピクセルです。高いビルは、`dx=0.5 dy=1.5`
+ で割り当てて描画し、低いビルは、`dx=0.5 dy=0.35` としています (訳注:
+ ここで述べている画像とは、pdflatex を使用したマニュアルだけに現れます
+ ので、日本語のマニュアルにはこの図は含まれていないでしょう。)
 
  スタイル `image` は、グレイスケール (灰色階調)、またはカラーパレット値
  を含んでいるピクセルの入力を処理します。よって 2 次元描画 (`plot` コマ
@@ -3186,14 +3262,21 @@ Ffigure_lines
 ?style lp
 ?linespoints
 ?lp
+=pointinterval
 Ffigure_linespoints
- `linespoints` スタイルは `lines` と `points` の両方を行ないます。すな
- わち、各点に小さな記号をつけ、そして隣接する点を真直な線分で結びます。
- コマンド `set pointsize` を使って点 (point) の記号の大きさを変更できま
- す。その使い方については、以下参照 `set pointsize`。基本的に 2 次元描
- 画では 1 列、または 2 列の入力データが必要で、3 次元描画では 1 列、ま
- たは 3 列のデータが必要です。以下参照: `style lines`。余分な入力列は、
- 点のサイズや線の色の変更などの情報が提供されたものとして使用されます。
+ `linespoints` スタイルは、隣接する点を真っ直ぐな線分で結び、その後で最
+ 初に戻って各点に小さな記号を描きます。コマンド `set pointsize` を使っ
+ て、その記号のデフォルトの大きさを変更できます。
+ 基本的に 2 次元描画では 1 列、または 2 列の入力データが必要で、3 次元
+ 描画では 1 列、または 3 列のデータが必要です。以下参照: `style lines`。
+ 余分な入力列は、点のサイズや線の色の変更などの情報が提供されたものとし
+ て使用されます。
+
+ ラインスタイルの属性である `pointinterval` (省略形 `pi`) で、グラフの
+ すべての点を与えた記号にするかどうかを制御できます。例えば、
+ `with lp pi 3` は、すべてのデータ点間に線分を引きますが、点の記号は 3
+ つおきにしか書きません。`pointinterval` を負の値にした場合は、記号の下
+ の線分の部分を消します。
 
  `linespoints` は `lp` と略すことが出来ます。
 2 points
@@ -4229,10 +4312,10 @@ Ffigure_mapcontours
  ちます。実行環境が秒以下の時間指定をサポートしていない場合、その時間は
  整数の秒数に丸められます。`pause 0` は `print` と同じです。
 
- 使用している出力形式がマウス機能をサポートしている場合、`pause mouse`
- は、マウスクリックがあるか ctrl-C が押されるまで待つようになります。そ
- うでない出力形式、またはマウス機能が有効になってない場合 `pause mouse`
- は `pause -1` と同じです。
+ 使用している出力形式が `mousing` (マウス機能) をサポートしている場合、
+ `pause mouse` は、マウスクリックがあるか ctrl-C が押されるまで待つよう
+ になります。そうでない出力形式、またはマウス機能が有効になってない場合
+ `pause mouse` は `pause -1` と同じです。
 
  一つ、あるいは複数の終了条件 (endcondition) が `pause mouse` の後に与
  えられた場合、そのうちのどの一つでも pause は終了します。指定できる終
@@ -4284,17 +4367,17 @@ Ffigure_mapcontours
  ります。
 
  書式:
-     plot {<範囲 (ranges)>}
-          {<繰返し (iteration)>}
-          { <関数 (function)>
-            |  {"<データファイル (datafile)>" {データファイル修飾子}}}
-          {axes <軸 (axes)>}{<表題 (title)>}{with <スタイル (style)>}
-          {, {定義,} <関数> ...}
+       plot {<ranges>}
+            {<iteration>}
+            {<function> | {"<datafile>" {datafile-modifiers}}}
+            {axes <axes>} {<title-spec>} {with <style>}
+            {, {definitions{,}} <function> ...}
 
- <関数> または引用符で囲まれたデータファイル名のどちらか一方を与えます。
- 関数は一本の数式、または parametric mode においては 2 つの数式の組です。
- 数式は完全に定義してもいいですし、前の方の `gnuplot` のコマンド列で部
- 分的に定義してもいいです (以下参照: `user-defined`)。
+ 関数 <function>、または引用符で囲まれたデータファイル名 (<datafile>)
+ のどちらか一方を与えます。関数は一本の数式、または parametric mode に
+ おいては 2 つの数式の組です。数式は完全に定義してもいいですし、前の方
+ の `gnuplot` のコマンド列で部分的に定義してもいいです (以下参照:
+ `user-defined`)。
 
  関数とパラメータは `plot` コマンド自身の上で定義をすることも可能です。
  これは単に他の項目とコンマで分離して記述することでなされます。
@@ -4314,11 +4397,11 @@ Ffigure_mapcontours
 ?commands plot axes
 ?plot axes
 ?axes
- 軸は、4 種類の組が利用できます; キーワード <軸> は、特定の直線をどの軸
- に尺度を合わせるか、ということを選択するのに使われます。`x1y1` は下の
- 軸と左の軸を指定; `x2y2` は上と右の軸の指定; `x1y2` は下と右の軸の指定;
- `x2y1` は上と左の軸の指定です。`plot` コマンドで指定された範囲は、この
- 最初の軸の組 (下と左) にのみ適用されます。
+ 軸 (axes) は、4 種類の組が利用できます; キーワード <axes> は、特定の直
+ 線をどの軸に尺度を合わせるか、ということを選択するのに使われます。
+ `x1y1` は下の軸と左の軸を指定; `x2y2` は上と右の軸の指定; `x1y2` は下
+ と右の軸の指定; `x2y1` は上と左の軸の指定です。`plot` コマンドで指定さ
+ れた範囲は、この最初の軸の組 (下と左) にのみ適用されます。
 3 データ (data)
 ?commands plot datafile
 ?plot datafile
@@ -4329,8 +4412,8 @@ Ffigure_mapcontours
 ?volatile
 ?plot datafile volatile
  ファイルに納められた離散的なデータは、`plot` コマンドライン上で、その
- データファイル名 (単一引用符または二重引用符で囲まれた) を指定すること
- によって表示できます。
+ データファイル名 (<datafile>) を単一引用符または二重引用符で囲んで指定
+ することによって表示できます。
 
  書式：
        plot '<file_name>' {binary <binary list>}
@@ -4649,6 +4732,18 @@ Ffigure_mapcontours
    http://www.edfplus.info/specs
 
  以下も参照: `binary`。
+6 png
+?binary general filetype png
+?filetype png
+ gnuplot が png/gif/jpeg 出力用に libgd ライブラリを使うようにインスト
+ ールされている場合、それらの画像形式をバイナリファイルとして読み込むこ
+ ともできます。以下のような明示的なコマンド
+       plot 'file.png' binary filetype=png
+ を使うこともできますし、あらかじめ以下のように設定して、拡張子から自動
+ 的に画像形式を自動的に認識させることもできます。
+       set datafile binary filetype=auto
+
+ 以下も参照: `binary`。
 5 keywords
 ?binary general keywords
 ?filetype keywords
@@ -4678,6 +4773,9 @@ Ffigure_mapcontours
  `scan=yx`、または `scan=yxz` と同じです。
 6 dx, dy, dz
 ?binary general keywords dx
+?binary general keywords dy
+?dx
+?dy
  gnuplot が座標を生成する場合、その間隔はこれらのキーワードで指定された
  ものが使用されます。例えば `dx=10 dy=20` は x 方向に 10、y 方向に 20
  の間隔で標本化されたことを意味します。`dy` は `dx` がなければ使えませ
@@ -4880,8 +4978,10 @@ Ffigure_mapcontours
  選択; `index <m>:<n>:<p>` は、<m>, <m>+<p>, <m>+2<p>, など、<p> おきの
  集合を選択し、集合 <n> で終了します。C 言語の添字 (index) の付け方に従
  い、index 0 はそのファイルの最初のデータ集合を意味します。大きすぎる
- index の指定にはエラーメッセージが返されます。`index` が指定されない場
- 合は、全てのデータ集合が単一のデータ集合として描かれます。
+ index の指定にはエラーメッセージが返されます。<p> を指定し、<n> を空欄
+ にした場合、<p> 毎のデータをファイルの最後まで読み込みます。`index` を
+ 指定しない場合は、ファイルのデータ全体を単一のデータ集合として描画しま
+ す。
 
  例:
        plot 'file' index 4:5
@@ -4940,8 +5040,8 @@ Ffigure_mapcontours
  もし `autoscale` の状態であれば、描画範囲はグラフの境界線の中に曲線が
  収まるように計算されます。
 
- もし `autoscale` の状態でなく、smooth のオプションが `acspline` か
- `cspline` であれば、生成する曲線の標本化は、入力データを含むような x
+ もし `autoscale` の状態でなく、smooth のオプションが `acsplines` か
+ `csplines` であれば、生成する曲線の標本化は、入力データを含むような x
  の範囲と、`set xrange` などで定義される固定された横座標の範囲の共通部
  分の上で行なわれます。
 
@@ -5529,17 +5629,17 @@ Ffigure_mapcontours
 ?plot ranges
 ?splot ranges
 ?ranges
- オプションの範囲は、表示されるグラフの領域範囲を指定します。
+ オプションの範囲 (range) は、表示されるグラフの領域範囲を指定します。
 
  書式:
-       [{<dummy-var>=}{{<最小値>}:{<最大値>}}]
-       [{{<最小値>}:{<最大値>}}]
+       [{<dummy-var>=}{{<min>}:{<max>}}]
+       [{{<min>}:{<max>}}]
 
  最初の範囲指定は独立変数の範囲 (`xrange` またはパラメトリックモードで
  は `trange`) で、2 番目のものは従属変数の範囲 `yrange` (パラメトリック
  モードでは `xrange`) となります。<dummy-var> には独立変数の新しい別名を
- 指定します (デフォルトの変数名は `set dummy` で変更できます)。<最小値>,
- <最大値> には定数式、あるいは * を書くことができます。
+ 指定します (デフォルトの変数名は `set dummy` で変更できます)。<min>,
+ <max> には定数式、あるいは * を書くことができます。
 
  パラメトリックモードでなければ、与えられるべき範囲指定は `xrange`,
  `yrange` の順になります。
@@ -5558,8 +5658,8 @@ Ffigure_mapcontours
  分を全く指定しないようにはできません。その代わり、そこに空の範囲指定
  `[]` を置きます。
 
- `*` は、最小値や最大値に自動範囲指定 (autoscale) の機能を使うことを
- 可能にします。以下も参照: `set autoscale`。
+ `*` は、min (最小値) や max (最大値) に自動範囲指定 (autoscale) の機能
+ を使うことを可能にします。以下も参照: `set autoscale`。
 
  `plot` や `splot` のコマンド行で指定された範囲はそのグラフにのみ影響を
  及ぼします。よって、その後のグラフのデフォルトの範囲を変更するには、
@@ -5608,8 +5708,13 @@ Ffigure_mapcontours
        plot for [<variable> in "string of words"]
 
  繰り返しの適用範囲 (scope) は、次のコンマ (,) かコマンドの終わり、のい
- ずれか先に現れたところまでです。繰り返しは入れ子 (nest) にすることもで
- きます。
+ ずれか先に現れたところまでです。繰り返しは入れ子 (nest) にすることはで
+ きません。
+
+ 繰り返し文がコンマまでなので、以下は一つの曲線 sin(3x) を描画します。
+       plot for [i=1:3] j=i, sin(j*x)
+ j の後にコンマがないので、以下は 3 つの曲線を描画します。
+       plot for [i=1:3] j=i sin(j*x)
 
  例:
        plot for [dataset in "apples bananas"] dataset."dat" title dataset
@@ -8452,6 +8557,7 @@ Ffigure_mapcontours
 ?commands unset mouse
 ?set mouse
 ?unset mouse
+?mousing
 ?mouse
 ?nomouse
  コマンド `set mouse` はマウス機能を有効にします。現在、pm, x11, ggi,
@@ -8460,11 +8566,11 @@ Ffigure_mapcontours
  (すなわち、z の回転角が 0, 90, 180, 270, 360 度の `set view` での
  splot、および `set view map`) で動作し、グラフ上の位置の追跡、拡大表示、
  グラフの注釈づけ等を可能にします。`splot` による 3 次元グラフに対して
- は、グラフの視方向 (view) と伸縮の変更が、マウスボタン 1 と 2 (による
- ドラッグ) で行えます。これらのボタンにさらに <ctrl> キーを押すと、座標
- 系のみが回転、拡大されますが、これは大きなデータに対して有用でしょう。
+ は、グラフの視方向 (view) と縮尺の変更が、それぞれマウスボタン 1 と 2
+ (によるドラッグ) で行えます。これらのボタンにさらに <ctrl> キーを押す
+ と、座標軸のみが回転されますが、これは大きなデータに対して有用でしょう。
  ボタン 2 の垂直方向のドラッグを shift キーと同時に行うと、z 軸の一番下
- の位置 (`ticslevel`) を上下します。
+ の位置 (`xyplane`) を上下します。
 
  マウスは多重描画 (multiplot) モードでは無効ですが、`unset multiplot`
  で多重描画が終了すれば、マウス機能は ON になり、直前の描画 (ほぼ
@@ -9725,7 +9831,7 @@ Ffigure_mapcontours
        plot [-2*pi:2*pi] [-3:3] [-3:3] t*sin(t)
 
  最初の `plot` はデフォルトの角度の範囲の 0 から 2*pi を使います。半径
- とグラフのサイズは自動的に縮尺されます。2 番目の `plot` は角度の定義域
+ とグラフのサイズは自動的に伸縮されます。2 番目の `plot` は角度の定義域
  を拡張し、グラフのサイズを x,y のいずれの方向にも [-3:3] に制限します。
 
  `set size square` とすると `gnuplot` はアスペクト比 (縦横の比) を 1 に
@@ -9816,7 +9922,7 @@ Ffigure_mapcontours
        gnuplot の以前の版では、`set size` の値を、出力する描画領域
        (キャンバス) のサイズを制御するのにも使っていた出力形式もありま
        したが、すべての出力形式がそうだったわけではありませんでした。
-       version 4.2 では、ほとんどの出力形式が以下のルールに従うようにな
+       version 4.4 では、ほとんどの出力形式が以下のルールに従うようにな
        りました:
 
  `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
@@ -10138,6 +10244,9 @@ Ffigure_mapcontours
 ?linestyle
 ?linewidth
 =linewidth
+=interval
+=linespoints
+=pointinterval
  出力装置にはおのおのデフォルトの線種と点種の集合があり、それらはコマン
  ド `test` で見ることができます。`set style line` は線種と線幅、点種と
  点の大きさを、個々の呼び出しで、それらの情報を全部指定する代わりに、単
@@ -10150,6 +10259,7 @@ Ffigure_mapcontours
                               {{linewidth | lw} <line_width>}
                               {{pointtype | pt} <point_type>}
                               {{pointsize | ps} <point_size>}
+                              {{pointinterval | pi} <interval>}
                               {palette}
        unset style line
        show style line
@@ -10161,13 +10271,20 @@ Ffigure_mapcontours
  えられたパラメータのみが変更されます。<index> が存在しなければ、指定さ
  れなかった値はデフォルトの値になります。
 
- 線種と点種現在の出力装置が持つデフォルトの種類から選ばれます。線幅と点
- の大きさはデフォルトの幅、大きさに対する乗数です (しかし、ここでの
- <point_size> は、`set pointsize` で与えられる乗数には影響を受けないこ
- とに注意してください)。
+ 線種と点種は、その index 値をデフォルトとします。その index 値に対する
+ 実際の記号の形は、出力形式によって異なり得ます。
 
- 線種と線幅のデフォルトの値はそのラインスタイル番号 (index) です。幅と
- 大きさのデフォルトの大きさはどちらも 1 です。
+ 線幅と点の大きさは、現在の出力形式のデフォルトの幅、大きさに対する乗数
+ です (しかし、ここでの <point_size> は、コマンド `set pointsize` で与
+ えられる乗数には影響を受けないことに注意してください)。
+
+ `pointinterval` は、スタイル `linespoints` でグラフ中に描かれる点の間
+ 隔を制御します。デフォルトは 0 です (すべての点が描画される)。例えば、
+ `set style line N pi 3` は、点種が N、点の大きさと線幅は現在の出力形式
+ のデフォルトで、`with linespoints` での描画では点は 3 つおきに描画され
+ るようなラインスタイルを定義します。その間隔を負の値にすると、それは間
+ 隔は正の値の場合と同じですが、点の記号の下になる線を書かないようにしま
+ す (出力形式によっては)。
 
  このようにつくられるラインスタイルは、デフォルトの型 (線種, 点種) を
  別なものに置き換えることはしないので、ラインスタイル、デフォルトの型、
@@ -10351,7 +10468,7 @@ Ffigure_mapcontours
  `set term pop` によって復帰させる、という動作を期待したスクリプトを可
  搬性を失わずに書くことが出来ます。
 
- 有効な出力形式の一覧全体については、以下参照: `terminal`。
+ 詳細は、以下参照: `complete list of terminals`。
 3 termoption
 ?commands set termoption
 ?set termoption
@@ -10365,6 +10482,7 @@ Ffigure_mapcontours
       set termoption {no}enhanced
       set termoption font "<fontname>{,<fontsize>}"
       set termoption {solid|dashed}
+      set termoption {linewidth <lw>}{lw <lw>}
 
 3 tics
 ?commands set tics
@@ -10674,7 +10792,7 @@ Ffigure_mapcontours
 ?view
  コマンド `set view` は `splot` の視線の角度を設定します。これは、グラ
  フ描画の 3 次元座標をどのように 2 次元の画面 (screen) に投影するかを制
- 御します。これは、描画されたデータの回転と伸縮の制御を与えてくれますが
+ 御します。これは、描画されたデータの回転と縮尺の制御を与えてくれますが
  正射影しかサポートしていません。3 次元射影、および 2 次元描画的地図上
  への 2 次元直交射影がサポートされています。
 
@@ -10716,10 +10834,10 @@ Ffigure_mapcontours
  くなるように縮尺を合わせ、グラフがページに丁度合うようにその縮尺を選択
  します。コマンド `set view equal xyz` は、さらに z 軸も x と y 軸に合
  うようにしますが、現在の z 軸の範囲が、描画境界の範囲に合う保証はあり
- ません。デフォルトでは、3 つの軸は独立に有効な領域を埋めるように縮尺さ
+ ません。デフォルトでは、3 つの軸は独立に有効な領域を埋めるように伸縮さ
  れます。
 
- 以下も参照: `set ticslevel`。
+ 以下も参照: `set xyplane`。
 3 vrange
 ?commands set vrange
 ?commands show vrange
@@ -11260,7 +11378,7 @@ Ffigure_mapcontours
  書式:
        set xyplane at <zvalue>
        set xyplane relative <frac>
-       set ticslevel <frac>    # set xyplane relative と同等
+       set ticslevel <frac>        # set xyplane relative と同等
        show xyplane
 
  `set xyplane relative <frac>` は、xy 平面を Z 軸の範囲のどこに置くかを
@@ -11659,16 +11777,16 @@ Ffigure_mapcontours
              {<iteration>}
              <function> | "<datafile>" {datafile-modifiers}}
              {<title-spec>} {with <style>}
-             {, {definitions,} <function> ...}
+             {, {definitions{,}} <function> ...}
 
  ここで、関数 <function>、またはクォートでくくられたデータファイル名の
  どちらかが必要です。関数は、一本の数式、あるいは媒介変数モードでは
  3 つの数式の組です。
 
  デフォルトでは、`splot` は描画されるデータの下に完全な xy 面を描きます。
- z の一番下の目盛りと xy 平面の位置関係は `set ticslevel` で変更できます。
+ z の一番下の目盛りと xy 平面の位置関係は `set xyplane` で変更できます。
  `splot` の射影の向きは `set view` で制御できます。詳細は、以下参照:
- `set view`, `set ticslevel`。
+ `set view`, `set xyplane`。
 
  `splot` コマンドの範囲の指定の書式は `plot` の場合と同じです。媒介変数
  モードでなければ範囲は `xrange`, `yrange`, `zrange` の順であり、媒介変
@@ -12046,7 +12164,8 @@ Ffigure_mapcontours
  より詳しい情報に関しては、以下参照: `fit`。
 1 出力形式 (Terminal)
 ^ <h2> Terminal Types </h2>
-2 terminal
+2 出力形式の一覧
+?complete list of terminals
 ?terminal
 ?term
  gnuplot はとても多くの出力形式をサポートしています。これらは、適切な
@@ -12088,7 +12207,7 @@ Ffigure_mapcontours
  して可能ならばそのバグを実証するテストスクリプトを送ってください。以下
  参照: `Seeking-assistance`。
 
- 以下のセクションは、gnuplot 4.2 のリリース時現在に知られている問題の一
+ 以下のセクションは、gnuplot 4.4 のリリース時現在に知られている問題の一
  覧を示しています。これらには外部のサポートライブラリのバグも含まれてい
  るので、gnuplot の修正とは関係なく改良されるかもしれません。
 
