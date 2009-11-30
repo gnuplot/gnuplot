@@ -3,6 +3,8 @@
 	* docs/gnuplot-ja.doc docs/term-ja.diff:
 	Sync Japanese documentation to gnuplot.doc 1.568.2.19
 
+	* term/gd.trm: Replace two missing lines
+
 2009-11-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	4.4.0-rc1

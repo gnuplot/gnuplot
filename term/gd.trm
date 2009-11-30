@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.136.2.7 2009/09/13 17:54:09 sfeam Exp $
+ * $Id: gd.trm,v 1.145 2009/10/06 23:02:59 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2568,6 +2568,7 @@ START_HELP(gif)
 "              {tiny | small | medium | large | giant}",
 "              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
 "              {size <x>,<y>} {{no}crop}",
+"              {animate {delay <d>} {loop <n>} {{no}optimize}}",
 "              {<color0> <color1> <color2> ...}",
 "",
 " PNG, JPEG and GIF images are created using the external library libgd.",
@@ -2601,6 +2602,7 @@ START_HELP(gif)
 " the creation of animated gifs. The default delay between display of",
 " successive images may be specified in units of 1/100 second (default 5).",
 " The actual delay may vary depending on the program used as a viewer.",
+" Number of animation loops can be specified, default 0 means infinity.",
 " An animation sequence is terminated by the next `set output` or `set term`",
 " command.  The `optimize` option has two effects on the animation.",
 "",
