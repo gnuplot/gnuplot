@@ -27,7 +27,7 @@ set key top left Left reverse samplen 1
 
 set title "Solid filled curves"
 plot d1(x) fs solid 1.0 lc rgb "forest-green" title "μ =  0.5 σ = 0.5", \
-     d2(x) lc rgb "gold" title "μ =  2.0 σ = 0.5", \
+     d2(x) lc rgb "gold" title "μ =  2.0 σ = 1.0", \
      d3(x) lc rgb "red" title "μ = -1.0 σ = 2.0"
 
 pause -1 "Hit return to continue"
