@@ -1,6 +1,6 @@
 # Hey, Emacs, this is a -*- Makefile -*-
 #
-# $Id: makefile.cyg,v 1.30 2008/11/23 07:48:58 mikulik Exp $
+# $Id: makefile.cyg,v 1.30.2.1 2009/11/01 22:12:20 sfeam Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -79,6 +79,9 @@ GNUPLOT_PS_DIR = share/PostScript
 
 # Similarly for javascript files for the canvas terminal:
 GNUPLOT_JS_DIR = share/js
+
+# Similarly for lua scripts used by the lua terminal
+GNUPLOT_LUA_DIR = share/lua
 
 # Destination directory, used in 'make install':
 DESTDIR = /cygdrive/c/Apps/gnuplot
@@ -167,7 +170,8 @@ ifdef CONSOLE
 endif
 
 TOP = ..
-TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -I$(TOP)/term
+TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" 
+TERMFLAGS += -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\" -I$(TOP)/term
 TERMLIBS =
 
 CFLAGS += -I. -D_Windows -DCYGWIN -mno-cygwin -DHAVE_CONFIG_H\
@@ -436,5 +440,7 @@ install: default
 	mkdir -p $(DESTDIR)/share/PostScript
 	cp ../term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
 	mkdir -p $(DESTDIR)/share/js
+	cp ../term/lua/* $(DESTDIR)/$(GNUPLOT_LUA_DIR)
+	mkdir -p $(DESTDIR)/share/lua
 	cp ../term/js/* $(DESTDIR)/$(GNUPLOT_JS_DIR)
 

@@ -1,3 +1,12 @@
+2009-12-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* config/makefile.cyg config/makefile.dj2 config/makefile.mgw
+	config/makefile.os2 src/Makefile.am term/lua.trm term/Makefile.am.in:
+	Install gnuplot-tikz.lua under $pkgdatadir rather than under
+	$pkglibexecdir.
+	Fixes build problems under cygwin and mingw.
+	Thanks to Tatsuro Matsuoka.
+
 2009-11-30  Shigeharu Takeno  <shige-takeno@users.sourceforge.net>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:
