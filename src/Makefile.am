@@ -14,7 +14,7 @@ HELPFILE=@GIHDIR@/gnuplot.gih
 X11_DRIVER_DIR=$(pkglibexecdir)
 
 # Default lua driver location
-LUA_DRIVER_DIR=$(pkglibexecdir)
+GNUPLOT_LUA_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/lua
 
 # Default javascript location
 GNUPLOT_JS_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/js
@@ -31,7 +31,7 @@ binonly: $(bin_PROGRAMS)
 transform = @program_transform_name@
 GNUPLOT_X11 = `echo gnuplot_x11 | sed '$(transform)'`$(EXEEXT)
 
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"  -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\"
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"  -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
 breaders.c breaders.h bitmap.c bitmap.h color.c color.h command.c \
@@ -57,13 +57,6 @@ pkglibexec_PROGRAMS += gnuplot_x11
 gnuplot_x11_SOURCES = gplt_x11.c gplt_x11.h gpexecute.c gpexecute.h mousecmn.h
 XLIBS = @LIBRARIES_FOR_X@
 gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
-endif
-
-if BUILD_LUA
-gnuplot_tikz_lua_SOURCES =
-pkglibexec_PROGRAMS += gnuplot-tikz.lua
-gnuplot-tikz.lua: $(top_srcdir)/term/lua/gnuplot-tikz.lua
-	cp $(top_srcdir)/term/lua/gnuplot-tikz.lua .
 endif
 
 getcolor_x11.o: getcolor.c

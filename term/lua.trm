@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.6 2009/10/29 03:42:14 sfeam Exp $
- *  $Date: 2009/10/29 03:42:14 $
+ *  $Id: lua.trm,v 1.7 2009/10/31 05:24:18 sfeam Exp $
+ *  $Date: 2009/10/31 05:24:18 $
  *  $Rev: 90 $
  */
 
@@ -43,9 +43,7 @@
 
 #include "driver.h"
 
-#define LUA_TERM_REVISON "$Rev: 96 $"
-/* FIXME: this is only valid on "X11" systems, we need our own definition here */
-#define GNUPLOT_LUA_DIR X11_DRIVER_DIR
+#define LUA_TERM_REVISON "$Rev: 97 $"
 
 #ifdef TERM_REGISTER
 register_term(lua)
@@ -531,9 +529,26 @@ LUA_init_lua(void)
   luaL_openlibs(L); /* Load Lua libraries */
   luaopen_debug(L);
 
-  gp_lua_dir = getenv("GNUPLOT_DRIVER_DIR");
+  gp_lua_dir = getenv("GNUPLOT_LUA_DIR");
+
+# if defined(_Windows)
+  if (!gp_lua_dir) {
+    int len;
+    /* retrieve path relative to the gnuplot executable whose path is in 
+     * szModuleName (winmain.c) */
+    gp_lua_dir = gp_alloc(strlen((char*) szPackageDir)
+                            + strlen(GNUPLOT_LUA_DIR) + 2, "luadir");
+    strcpy(gp_lua_dir, (char*) szPackageDir);
+    len = strlen(gp_lua_dir);
+    if (*gp_lua_dir && gp_lua_dir[len-1] != '\\' &&   gp_lua_dir[len-1] != '/')
+	strcat(gp_lua_dir, "\\");
+    /* GNUPLOT_LUA_DIR is _relative_ path */
+    strcat(gp_lua_dir, GNUPLOT_LUA_DIR);
+    }
+#else /* not _Windows */
   if (!gp_lua_dir)
     gp_lua_dir = GNUPLOT_LUA_DIR;
+#endif
 
   if (stat(LUA_script, &stat_buf) || !S_ISREG(stat_buf.st_mode)) {
     script_fqn = gp_alloc(strlen(gp_lua_dir) + strlen(LUA_script) + 2, "LUA_script path");
@@ -1238,8 +1253,7 @@ START_HELP(lua)
 " A 'target name' or 'file name' (in quotes) for a script is mandatory.",
 " If a 'target name' for the script is given, the terminal will look for",
 " \"gnuplot-<target name>.lua\" in the local directory and on failure in",
-" the 'libexec' directory of the gnuplot installation or via the",
-" environmental variable GNUPLOT_DRIVER_DIR.",
+" the environmental variable GNUPLOT_LUA_DIR.",
 "",
 " All arguments will be provided to the selected script for further",
 " evaluation. E.g. 'set term lua tikz help' will cause the script itself",
