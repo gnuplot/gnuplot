@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.589 2009/11/16 10:38:22 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.590 2009/11/26 17:23:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9477,6 +9477,10 @@ Ffigure_mapcontours
        set palette model HSV
        set palette defined ( 0 0 1 1, 1 1 1 1 )
        set palette defined ( 0 0 1 0, 1 0 1 1, 6 0.8333 1 1, 7 0.8333 0 1)
+
+ Approximate the default palette used by MATLAB:
+       set pal defined (1 '#00008f', 8 '#0000ff', 24 '#00ffff', \
+                        40 '#ffff00', 56 '#ff0000', 64 '#800000')
 
  To produce a palette with few colors only use:
        set palette model RGB maxcolors 4

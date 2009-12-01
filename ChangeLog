@@ -7,6 +7,10 @@
 	Fixes build problems under cygwin and mingw.
 	Thanks to Tatsuro Matsuoka.
 
+	* docs/gnuplot.doc:  Provide an example of using 'set palette defined'
+	to approximate default MATLAB coloring.
+	Thanks to Mike <mws115@usa.com>
+
 2009-11-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  Remove unused global df_binary.
