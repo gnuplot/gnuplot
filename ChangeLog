@@ -1,3 +1,8 @@
+2009-12-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_margin): Limit range of set ?margin at screen <foo>
+	to 0 < foo < 1.
+
 2009-12-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/makefile.cyg config/makefile.dj2 config/makefile.mgw
