@@ -5,6 +5,10 @@
 
 	* src/datafile.c (f_stringcolumn) src/plot2d.c (eval_plots):
 	Enforce restrictions on which plot types can accept matrix data.
+	(NB: reverted because of problems reported in 4.5)
+
+	* src/datafile.c (df_open): Re-initialize df_num_bin_records to 0 at the
+	start of every file.
 
 2009-12-01  Ethan A Merritt  <merritt@u.washington.edu>
 

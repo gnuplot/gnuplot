@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.3 2009/10/23 15:34:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.4 2009/12/04 04:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1863,13 +1863,14 @@ eval_plots()
 		    this_plot->lp_properties.p_size = 1;
 	    }
 
+#if (0)	    /* FIXME:  restore this after fixing initialization problems with df_matrix */
 	    if (df_matrix) {
 		if (!(this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE
 	              || this_plot->plot_style == RGBA_IMAGE || this_plot->plot_style == LINES
 		      || this_plot->plot_style == POINTSTYLE))
 		int_error(NO_CARET, "this 2D plot style cannot handle matrix data");
-
 	    }
+#endif
 
 	    /* Similar argument for check that all fill styles were set */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL) {
