@@ -1,3 +1,14 @@
+2009-12-04  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
+
+	* config/makefile.mgw:  Create installation directories
+	$(DESTDIR)/$(GNUPLOT_PS_DIR) $(DESTDIR)/$(GNUPLOT_LUA_DIR)
+	$(DESTDIR)/$(GNUPLOT_JS_DIR)
+
+2009-12-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* config/makefile.dj2:  Remove LUA from configuration options because
+	lua.trm does not compile under djgpp (no snprintf).
+
 2009-12-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_margin): Limit range of set ?margin at screen <foo>
