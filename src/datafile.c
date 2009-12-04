@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.178 2009/11/26 17:23:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.179 2009/12/04 04:43:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -981,6 +981,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 
     df_binary_file = df_matrix_file = FALSE;
     df_datablock = NULL;
+    df_num_bin_records = 0;
+    df_matrix = FALSE;
 
     df_eof = 0;
 
@@ -1007,8 +1009,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     if (ydata_func.at) /* something for thru (?) */
 	free_at(ydata_func.at);
     ydata_func.at = NULL;
-
-    df_matrix = FALSE;
 
     /* pm 25.11.2001 allow any order of options */
     while (!END_OF_COMMAND) {
