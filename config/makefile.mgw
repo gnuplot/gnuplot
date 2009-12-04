@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.55 2009/10/31 23:33:12 mikulik Exp $
+# $Id: makefile.mgw,v 1.56 2009/12/02 04:59:57 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -523,10 +523,10 @@ install: default
 	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
 	cp win/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
-	mkdir -p $(DESTDIR)/share/PostScript
+	mkdir -p $(DESTDIR)/$(GNUPLOT_PS_DIR)
 	cp ../term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
-	mkdir -p $(DESTDIR)/share/js
+	mkdir -p $(DESTDIR)/$(GNUPLOT_JS_DIR)
 	cp ../term/js/* $(DESTDIR)/$(GNUPLOT_JS_DIR)
-	mkdir -p $(DESTDIR)/share/lua
+	mkdir -p $(DESTDIR)/$(GNUPLOT_LUA_DIR)
 	cp ../term/lua/* $(DESTDIR)/$(GNUPLOT_LUA_DIR)
 

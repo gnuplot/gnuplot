@@ -1,3 +1,8 @@
+2009-12-04  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
+
+	* config/makefile.mgw:  Create installation directories
+	$(DESTDIR)/$(GNUPLOT_PS_DIR) $(DESTDIR)/$(GNUPLOT_LUA_DIR)
+
 2009-12-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_open): The variables that track matrix and binary
