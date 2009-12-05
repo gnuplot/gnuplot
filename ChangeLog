@@ -1,3 +1,9 @@
+2009-12-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (undefine_command):
+	'undefine  A* B' should not affect BFOO.
+	Bugfix.
+
 2009-12-04  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
 	* config/makefile.mgw config/makefile.cyg:  Create installation

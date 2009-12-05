@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.183 2009/11/15 02:23:38 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.184 2009/11/16 14:01:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -556,9 +556,8 @@ void
 undefine_command()
 {
     char key[MAX_ID_LEN+1];
-    char wildcard[MAX_ID_LEN+1];
     struct udvt_entry **udv_ptr = &first_udv;
-    int isWildcard = 0;
+    TBOOLEAN isWildcard;
 
     c_token++;               /* consume the command name */
 
@@ -568,18 +567,9 @@ undefine_command()
 
 	/* Peek ahead - must do this, because a '*' is returned as a 
 	   separate token, not as part of the 'key' */
-	c_token++;
-	if( !(END_OF_COMMAND) ) {
-	  copy_str(wildcard, c_token, MAX_ID_LEN);
-
-	  if( !strcmp( wildcard, "*" ) ) {
-	    isWildcard = 1;
-	  } else {
-	    c_token--;
-	  }
-	} else {
-	  c_token--;
-	}
+	isWildcard = equals(c_token+1,"*");
+	if (isWildcard)
+	    c_token++;
 
         /* ignore internal variables */
 	if (strncmp(key, "GPVAL_", 6) && strncmp(key, "MOUSE_", 6)) {
