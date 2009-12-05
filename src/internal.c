@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.52 2009/10/25 02:47:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.53 2009/10/26 17:34:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -652,6 +652,7 @@ void
 f_mult(union argument *arg)
 {
     struct value a, b, result;
+    double product;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -661,8 +662,11 @@ f_mult(union argument *arg)
     case INTGR:
 	switch (b.type) {
 	case INTGR:
-	    (void) Ginteger(&result, a.v.int_val *
-			    b.v.int_val);
+	    product = (double)a.v.int_val * (double)b.v.int_val;
+	    if (fabs(product) >= (double)INT_MAX)
+		(void) Gcomplex(&result, product, 0.0);
+	    else
+		(void) Ginteger(&result, a.v.int_val * b.v.int_val);
 	    break;
 	case CMPLX:
 	    (void) Gcomplex(&result, a.v.int_val *

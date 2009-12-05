@@ -4,6 +4,10 @@
 	'undefine  A* B' should not affect BFOO.
 	Bugfix.
 
+	* src/internal.c (f_mult):  Check for integer overflow when performing
+	internal integer multiplication.
+	Bug #2908270
+
 2009-12-04  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
 	* config/makefile.mgw config/makefile.cyg:  Create installation
