@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: breaders.c,v 1.8 2009/08/28 05:30:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: breaders.c,v 1.9 2009/11/02 20:22:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - breaders.c */
@@ -322,8 +322,16 @@ gd_filetype_function(int filetype)
     
     switch(filetype) {
 	case GD_PNG:	im = gdImageCreateFromPng(fp); break;
-	case GD_GIF:	im = gdImageCreateFromGif(fp); break;
-	case GD_JPEG:	im = gdImageCreateFromJpeg(fp); break;
+	case GD_GIF:
+#ifdef HAVE_GD_GIF
+			im = gdImageCreateFromGif(fp);
+#endif
+			break;
+	case GD_JPEG:
+#ifdef HAVE_GD_JPEG
+			im = gdImageCreateFromJpeg(fp);
+#endif
+	default:	break;
     }
     fclose(fp);
     

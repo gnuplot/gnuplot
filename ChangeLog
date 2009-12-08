@@ -4,6 +4,9 @@
 	enhanced text was not taking into account the text angle. Now it does.
 	Bugfix.
 
+	* src/breaders.c (gd_filetype_function): Make load of jpeg or gif image
+	conditional on support by the installed libgd.
+
 2009-12-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (undefine_command):
