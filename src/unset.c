@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.127 2008/12/11 06:53:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.128 2009/04/12 22:27:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1640,6 +1640,10 @@ reset_command()
 
     data_style = POINTSTYLE;
     func_style = LINES;
+
+    /* Reset individual plot style options to the default */
+    filledcurves_opts_data.closeto = FILLEDCURVES_CLOSED;
+    filledcurves_opts_func.closeto = FILLEDCURVES_CLOSED;
 
     bar_size = 1.0;
     bar_layer = LAYER_FRONT;

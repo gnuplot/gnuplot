@@ -7,6 +7,9 @@
 	* src/breaders.c (gd_filetype_function): Make load of jpeg or gif image
 	conditional on support by the installed libgd.
 
+	* src/unset.c (reset_command): Reset options to plot style filledcurve.
+	Bug #2911203
+
 2009-12-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (undefine_command):
