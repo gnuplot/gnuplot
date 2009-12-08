@@ -1,3 +1,9 @@
+2009-12-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm (ENHemf_put_text): Left/right/center justification of
+	enhanced text was not taking into account the text angle. Now it does.
+	Bugfix.
+
 2009-12-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (undefine_command):
