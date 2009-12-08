@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.59.2.2 2009/09/13 17:54:09 sfeam Exp $
+ * $Id: emf.trm,v 1.59.2.3 2009/09/17 04:03:25 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1578,21 +1578,24 @@ ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
     ENHemf_opened_string = FALSE;
     ENHemf_show = TRUE;
     ENHemf_overprint = 0;
+    ENHemf_font = emf_fontname;
+    ENHemf_fontsize = emf_fontsize;
 
-    /* EAM - post.trm wasn't doing this, but how else do they get initialized? */
-	ENHemf_font = emf_fontname;
-	ENHemf_fontsize = emf_fontsize;
-
+    /* EAM -FIXME
+     * To do proper justification requires some way to track the current position
+     * after writing a text fragment.  I don't know how to do that in emf.
+     * So I punt by just estimating the total length.
+     */
     if (emf_justify == RIGHT) {
-	EMF_MoveToEx(x - term->h_char * len, term->ymax-y);
-	EMF_move(x - EMF_AVG_WID * term->h_char * len, y);
+		x -= term->h_char * len * cos(emf_vert_text * EMF_10THDEG2RAD);
+		y -= term->h_char * len * sin(emf_vert_text * EMF_10THDEG2RAD);
     } else if (emf_justify == CENTRE) {
-	EMF_MoveToEx(x - term->h_char * len/2, term->ymax-y);
-	EMF_move(x - EMF_AVG_WID * term->h_char * len/2, y);
-    } else {
-	EMF_MoveToEx(x, term->ymax-y);
-	EMF_move(x, y);
+		x -= term->h_char * len/2. * cos(emf_vert_text * EMF_10THDEG2RAD);
+		y -= term->h_char * len/2. * sin(emf_vert_text * EMF_10THDEG2RAD);
     }
+    x += term->v_char/3. * sin(emf_vert_text * EMF_10THDEG2RAD);
+    y -= term->v_char/3. * cos(emf_vert_text * EMF_10THDEG2RAD);
+    EMF_move(x,y);
 
     emf_justify = LEFT;
 #ifdef UPDATECP_MODE
