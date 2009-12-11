@@ -1,3 +1,10 @@
+2009-12-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary):  Tweak auto-placement of plot borders so
+	that it is closer to that used prior to version 4.2.4.  This make the
+	right margin slightly wider than in 4.2.6, and the left margin slightly
+	narrower.
+
 2009-12-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm (ENHemf_put_text): Left/right/center justification of
