@@ -1,3 +1,10 @@
+2009-12-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/plotstyles.gnu demo/bldg.png demo/barchart_art.dem Makefile.am.in
+	New demo showing 
+	a) input of png image using binary filetype=png
+	b) rescaling rectangular images to act as plot elements
+
 2009-12-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary):  Tweak auto-placement of plot borders so
