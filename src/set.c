@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.299.2.3 2009/09/13 17:43:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.299.2.4 2009/12/04 04:26:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1125,181 +1125,85 @@ set_contour()
 
 
 /* process 'set dgrid3d' command */
-/* PKJ: this is the original version, which is called by the new
-   set_dgrid3d() to handle the old syntax of this command. */
-static void
-classic_set_dgrid3d()
-{
-    int local_vals[3];
-    int i;
-    TBOOLEAN was_comma = TRUE;
-
-    c_token++;
-    local_vals[0] = dgrid3d_row_fineness;
-    local_vals[1] = dgrid3d_col_fineness;
-    local_vals[2] = dgrid3d_norm_value;
-
-    for (i = 0; i < 3 && !(END_OF_COMMAND);) {
-	if (equals(c_token,",")) {
-	    if (was_comma) i++;
-	    was_comma = TRUE;
-	    c_token++;
-	} else {
-	    if (!was_comma)
-		int_error(c_token, "',' expected");
-	    local_vals[i] = real_expression();
-	    i++;
-	    was_comma = FALSE;
-	}
-    }
-
-    if (local_vals[0] < 2 || local_vals[0] > 1000)
-	int_error(c_token, 
-		  "Row size must be in [2:1000] range; size unchanged");
-    if (local_vals[1] < 2 || local_vals[1] > 1000)
-	int_error(c_token,
-		  "Col size must be in [2:1000] range; size unchanged");
-    if (local_vals[2] < 1 || local_vals[2] > 100)
-	int_error(c_token, "Norm must be in [1:100] range; norm unchanged");
-
-    dgrid3d_row_fineness = local_vals[0];
-    dgrid3d_col_fineness = local_vals[1];
-    dgrid3d_norm_value = local_vals[2];
-    dgrid3d = TRUE;
-}
-
-
-/* process 'set dgrid3d' command */
 static void
 set_dgrid3d()
 {
-    int tmp = c_token;
-    int t, ft, mt, token_cnt; /* tokens, first_token, mode_token */
+    int token_cnt = 0; /* Number of comma-separated values read in */
   
-    double gridx  = (double)dgrid3d_row_fineness;
-    double gridy  = (double)dgrid3d_col_fineness;
-    /* dgrid3d_norm_value is not used by 'new' syntax, only 'classic' */
+    int gridx     = dgrid3d_row_fineness;
+    int gridy     = dgrid3d_col_fineness;
+    int normval   = dgrid3d_norm_value;
     double scalex = dgrid3d_x_scale;
     double scaley = dgrid3d_y_scale;
 
     /* dgrid3d has two different syntax alternatives: classic and new.
-       If there is a "mode" token, the syntax is new, otherwise it's classic.*/
+       If there is a "mode" keyword, the syntax is new, otherwise it is classic.*/
+    dgrid3d_mode  = DGRID3D_DEFAULT;
 
-    /* look for mode as first string token - remember its token number */
     c_token++;
-    mt = -1;                           /* no string found among tokens */
-    while( !(END_OF_COMMAND) ) { 
-        if( mt == -1 && !isanumber(c_token) && !equals( c_token, "," ) ) {
-            mt = c_token;
-        }
-        c_token++;
+    while ( !(END_OF_COMMAND) ) { 
+        int tmp_mode = lookup_table(&dgrid3d_mode_tbl[0],c_token);
+	if (tmp_mode != DGRID3D_OTHER) {
+	    dgrid3d_mode = tmp_mode;
+	    c_token++;
+	}
+
+	switch (tmp_mode) {
+	case DGRID3D_QNORM:
+				if (!(END_OF_COMMAND)) normval = int_expression();
+				break;
+	case DGRID3D_SPLINES:
+				break;
+	case DGRID3D_GAUSS:
+	case DGRID3D_CAUCHY:
+	case DGRID3D_EXP:
+	case DGRID3D_BOX:
+	case DGRID3D_HANN:
+				if (!(END_OF_COMMAND)) {
+					scalex = real_expression();
+					scaley = scalex;
+					if (equals(c_token, ",")) {
+						c_token++;
+						scaley = real_expression();
+					}
+				}
+				break;
+
+	default:		/* {rows}{,cols{,norm}}} */
+
+			if  ( equals( c_token, "," )) {
+				c_token++;
+				token_cnt++;
+			} else if( token_cnt == 0) {
+		        	gridx = int_expression();
+		        	gridy = gridx; /* gridy defaults to gridx, unless overridden below */
+			} else if( token_cnt == 1) {
+		        	gridy = int_expression();
+			} else if( token_cnt == 2) {
+		        	normval = int_expression();
+			} else
+				int_error(c_token,"Unrecognize keyword or unexpected value");
+			break;
+	}
+		
     }
-    token_cnt = c_token - (tmp+1);
-    c_token = tmp;     /* reset token counter to its original position */
 
-    /* no mode token found: classic format - reset counter and call old fct */
-    if( mt == -1 ) { 
-        classic_set_dgrid3d();
-        dgrid3d_mode = DGRID3D_QNORM; /* only set if classic succeeds */
-        return; 
-    }
-
-    /* determine the mode - fail if not recognized */
-    if(      equals( mt, "splines" ) ) { dgrid3d_mode = DGRID3D_SPLINES; }
-    else if( equals( mt, "qnorm"   ) ) { dgrid3d_mode = DGRID3D_QNORM; }
-    else if( equals( mt, "gauss"   ) ) { dgrid3d_mode = DGRID3D_GAUSS; }
-    else if( equals( mt, "cauchy"  ) ) { dgrid3d_mode = DGRID3D_CAUCHY; }
-    else if( equals( mt, "exp"     ) ) { dgrid3d_mode = DGRID3D_EXP; }
-    else if( equals( mt, "box"     ) ) { dgrid3d_mode = DGRID3D_BOX; }
-    else if( equals( mt, "hann"    ) ) { dgrid3d_mode = DGRID3D_HANN; }
-    else {
-        int_error( mt,
-        "Expecting one of: splines, qnorm, gauss, cauchy, exp, box, hann" );
-    }
-  
-    /* handle tokens before the mode argument */
-    c_token++;
-    t = mt-c_token; /* number of tokens before the mode argument */
-    ft = c_token;   /* position of the first token after 'dgrid3d' */
-
-    if( t > 3 )
-        int_error( ft+3, "At most two numeric arguments before mode" );
-
-    if( t > 0 ) {
-        if( !isanumber(ft+0) ) 
-            int_error(ft+0, "Expecting number of grid points");
-
-        gridx = real_expression();
-        gridy = gridx; /* gridy defaults to gridx, unless overridden below */
-
-        if( t > 1 ) {
-            if( !equals(ft+1, ",") ) int_error( ft+1, "Expecting comma" );
-            c_token++; /* consume the comma */
-
-            if( t > 2 ) {
-                if( !isanumber(ft+2) )
-                    int_error( ft+2, "Expecting number of grid points" );
-
-                gridy = real_expression();
-            }
-        }
-    }
     /* we could warn here about floating point values being truncated... */  
     if( gridx < 2 || gridx > 1000 || gridy < 2 || gridy > 1000 )
-        int_error( ft, 
+        int_error( NO_CARET, 
                    "Number of grid points must be in [2:1000] - not changed!");
 
+    /* no mode token found: classic format */
+    if( dgrid3d_mode == DGRID3D_DEFAULT )
+        dgrid3d_mode = DGRID3D_QNORM;
 
-    /* skip the mode token */
-    c_token++; 
-
-
-    /* handle tokens after the mode argument */
-    t = token_cnt - (t+1); /* after is all minus before minus mode itself*/
-    ft = c_token;          /* pos of first token after the mode token */
-
-    if( dgrid3d_mode == DGRID3D_SPLINES && t > 0 )
-        int_error( mt, "No arguments expected for splines" );
-    if( dgrid3d_mode == DGRID3D_QNORM && t > 1 )
-        int_error( mt, "Only one argument expected for qnorm" );
-
-    if( t > 0 ) {
-        if( dgrid3d_mode == DGRID3D_QNORM ) {
-            if( !isanumber(ft+0) ) 
-                int_error( ft+0, "Expecting q-value for norm" );
-
-            tmp = (int)real_expression();
-            if( tmp < 1 || tmp > 100 ) 
-                int_error( ft, 
-                           "Norm parameter must be in [1:100] - not changed!");
-            dgrid3d_norm_value = tmp;
-
-        } else {
-            if( !isanumber(ft+0) ) 
-                int_error( ft+0, "Expecting numeric scale factor" );
-
-            scalex = real_expression();
-            scaley = scalex;  /* default,unless overridden below */
-        }
-
-        if( t > 1 ) {
-            if( !equals(ft+1, ",") ) int_error( ft+1, "Expecting comma" );
-            c_token++; /* consume comma */
-
-            if( t > 2 ) {
-                if( !isanumber(ft+2) ) 
-                    int_error( ft+2, "Expecting numeric scale factor" );
-
-                scaley = real_expression();
-            }
-        }
-    }
     if( scalex < 0.0 || scaley < 0.0 )
-        int_error( ft, 
+        int_error( NO_CARET, 
                    "Scale factors must be greater than zero - not changed!" );
 
-    dgrid3d_row_fineness = (int)gridx;
-    dgrid3d_col_fineness = (int)gridy;
+    dgrid3d_row_fineness = gridx;
+    dgrid3d_col_fineness = gridy;
+    dgrid3d_norm_value = normval;
     dgrid3d_x_scale = scalex;
     dgrid3d_y_scale = scaley;
     dgrid3d = TRUE;
