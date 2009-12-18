@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.91 2008/11/28 16:49:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.92 2009/03/26 00:49:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -42,6 +42,7 @@ static char *RCSid() { return RCSid("$Id: tables.c,v 1.91 2008/11/28 16:49:41 sf
 #include "term_api.h"
 #include "util.h"
 #include "alloc.h"	/* for init_colornames() */
+#include "graph3d.h"	/* for DGRID3D_* options */
 # include "getcolor.h"
 
 /* gnuplot commands */
@@ -142,6 +143,19 @@ const struct gen_table plot_smooth_tbl[] =
     { "cum$ulative", SMOOTH_CUMULATIVE },
     { "k$density", SMOOTH_KDENSITY },
     { NULL, SMOOTH_NONE }
+};
+
+/* dgrid3d modes */
+const struct gen_table dgrid3d_mode_tbl[] =
+{
+    { "qnorm", DGRID3D_QNORM },
+    { "spline$s", DGRID3D_SPLINES },
+    { "gauss", DGRID3D_GAUSS },
+    { "exp", DGRID3D_EXP },
+    { "cauchy", DGRID3D_CAUCHY },
+    { "box", DGRID3D_BOX },
+    { "hann", DGRID3D_HANN },
+    { NULL, DGRID3D_OTHER }
 };
 
 /* 'save' command */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.228 2009/10/31 21:58:47 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.229 2009/11/16 10:29:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1326,14 +1326,11 @@ show_dgrid3d()
 		dgrid3d_row_fineness,
 		dgrid3d_col_fineness );
       } else {
-	char *modes[] = { "qnorm", "splines", 
-			  "gauss", "exp", "cauchy", "box", "hann" };
-			  
 	fprintf(stderr, 
 		"\tdata grid3d is enabled for mesh of size %dx%d, kernel=%s, scale factors x=%f, y=%f\n", 
 		dgrid3d_row_fineness,
 		dgrid3d_col_fineness,
-		modes[dgrid3d_mode],
+		reverse_table_lookup(dgrid3d_mode_tbl, dgrid3d_mode),
 		dgrid3d_x_scale,
 		dgrid3d_y_scale );
       }

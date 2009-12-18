@@ -1,3 +1,13 @@
+2009-12-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tables.h src/tables.c src/show.c src/save.c src/graph3d.h:
+	Move all the DGRID3D_* options into a shared table.
+
+	* src/set.c: Replace the set_dgrid3d() routine with a version that uses
+	a shared option table and handles input values contained in variables.
+
+	* docs/gnuplot.doc: bring dgrid3d syntax into line with the code
+
 2009-12-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/plotstyles.gnu demo/bldg.png demo/barchart_art.dem Makefile.am.in
