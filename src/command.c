@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.184 2009/11/16 14:01:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.185 2009/12/05 21:57:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -190,10 +190,8 @@ __far int num_tokens, c_token;
 int num_tokens, c_token;
 #endif
 
-static int if_depth = 0;
-static TBOOLEAN if_condition = FALSE;
-
-static int eval_depth = 0;
+int if_depth = 0;
+TBOOLEAN if_condition = FALSE;
 
 static int command_exit_status = 0;
 
@@ -415,18 +413,10 @@ do_string_and_free(char *cmdline)
 	fprintf(stderr, "%s\n", cmdline);
 #endif
 
-    lf_push(NULL); /* save state for errors and recursion */
-    lf_head->c_token = c_token;
-    lf_head->num_tokens = num_tokens;
-    lf_head->tokens = gp_alloc((num_tokens+1) * sizeof(struct lexical_unit),
-			       "lf tokens");
-    memcpy(lf_head->tokens, token,
-	   (num_tokens+1) * sizeof(struct lexical_unit));
-    lf_head->input_line = gp_strdup(gp_input_line);
+    lf_push(NULL, NULL, cmdline); /* save state for errors and recursion */
     while (gp_input_line_len < strlen(cmdline) + 1)
 	extend_input_line();
     strcpy(gp_input_line, cmdline);
-    free(cmdline);
     screen_ok = FALSE;
     do_line();
 
@@ -862,24 +852,14 @@ clear_command()
 void
 eval_command()
 {
-    int save_token = ++c_token;
     char *command;
-
-    if (++eval_depth > 4)
-	int_error(save_token, "Deep recursion in evaluate");
-    if (!(command = try_to_get_string()))
+    c_token++;
+    command = try_to_get_string();
+    if (!command)
 	int_error(c_token, "Expected command string");
-
     do_string_and_free(command);
-    --eval_depth;
 }
 
-/* reset eval_depth counter */
-void
-reset_eval_depth()
-{
-    eval_depth = 0;
-}
 
 /* process the 'exit' and 'quit' commands */
 void
@@ -921,8 +901,6 @@ history_command()
     } else if (!END_OF_COMMAND && equals(c_token,"!")) {
 	char *search_str = NULL;  /* string from command line to search for */
 	const char *line_to_do = NULL;  /* command to execute at end if necessary */
-	int c_token_copy;
-	static char *gpil_copy = NULL;
 
 	c_token++;
 	m_capture(&search_str, c_token, c_token);
@@ -930,30 +908,9 @@ history_command()
 	free(search_str);
 	if (line_to_do == NULL)
 	    int_error(c_token, "not in history");
-
-	/* Must keep current input line in case there are some remaining lines
-	 * to process after a semicolon.  However, could int_error() some where
-	 * during do_line() so a static copy is kept.
-	 */
-	free(gpil_copy);
-	gpil_copy = gp_strdup(gp_input_line);
-	c_token_copy = c_token;
-
-	while (gp_input_line_len < strlen(line_to_do) + 1)
-	    extend_input_line();
-	strcpy(gp_input_line, line_to_do);
-	if (scanner(&gp_input_line, &gp_input_line_len)) {
-	    if (almost_equals(0, "hi$story") && equals(1, "!"))
-		int_error(c_token-1,"petitio principii");	/* Oops... infinite loop */
-	    else {
-		printf("  Executing:\n\t%s\n", line_to_do);
-		do_line();
-	    }
-	}
-	/* Restore previous state of line and parser, gpil_copy will be freed next time */
-	strcpy(gp_input_line, gpil_copy);
-	num_tokens = scanner(&gp_input_line, &gp_input_line_len);
-	c_token = c_token_copy + 1;
+	printf("  Executing:\n\t%s\n", line_to_do);
+	do_string(line_to_do);
+	c_token++;
 
     } else {
 	int n = 0;		   /* print only <last> entries */

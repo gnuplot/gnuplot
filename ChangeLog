@@ -1,3 +1,25 @@
+2009-12-19  Juergen Wieferink  <wieferink@freenet.de>
+
+	* src/command.c, src/command.h, src/misc.c, src/misc.h
+	(lf_push, lf_pop): Save if-state.
+
+	* src/command.c, src/command.h, src/misc.c, src/misc.h
+	(lf_push, lf_pop, load_file, do_string):
+	Refactor duplicate code from load_file() and do_string() into lf_push()
+
+	* misc.h, misc.c: Add field cmdline to LFS to allow correct
+	deallocation.  Check for infinite recursion.
+
+	* src/misc.c (prepare_call, expand_call_args, load_file):
+	Refactor code related to the call command out of load_file().
+
+	* src/command.c (history_command): Use do_string() now that it can
+	detect recursions.
+
+	* command.c, command.h, plot.c:
+	Remove eval_depth and reset_eval_depth().  The new recursion detection
+	in lf_push() should supercede this.
+
 2009-12-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tables.h src/tables.c src/show.c src/save.c src/graph3d.h:

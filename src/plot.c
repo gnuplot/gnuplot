@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.104 2008/12/12 21:06:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.105 2009/10/31 03:22:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -585,7 +585,6 @@ main(int argc, char **argv)
 	(void) rawcon(0);
 #endif
 	load_file_error();	/* if we were in load_file(), cleanup */
-	reset_eval_depth();     /* reset evaluate command recursion counter */
 	SET_CURSOR_ARROW;
 
 #ifdef VMS

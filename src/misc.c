@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.112 2009/10/31 05:24:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.113 2009/11/16 14:01:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -55,6 +55,8 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.112 2009/10/31 05:24:18 sfe
 
 static void arrow_use_properties __PROTO((struct arrow_style_type *arrow, int tag));
 static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
+static void prepare_call __PROTO((void));
+static void expand_call_args __PROTO((void));
 
 /* A copy of the declaration from set.c */
 /* There should only be one declaration in a header file. But I do not know
@@ -69,6 +71,7 @@ LFS *lf_head = NULL;		/* NULL if not in load_file */
 /* these two could be in load_file, except for error recovery */
 static TBOOLEAN do_load_arg_substitution = FALSE;
 static char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+static int call_argc;
 
 /*
  * iso_alloc() allocates a iso_curve structure that can hold 'num'
@@ -140,6 +143,76 @@ iso_free(struct iso_curve *ip)
     }
 }
 
+static void
+prepare_call(void)
+{
+    call_argc = 0;
+    /* Gnuplot "call" command can have up to 10 arguments "$0" to "$9" */
+    while (!END_OF_COMMAND && call_argc <= 9) {
+	if (isstring(c_token))
+	    m_quote_capture(&call_args[call_argc++], c_token, c_token);
+	else
+	    m_capture(&call_args[call_argc++], c_token, c_token);
+	c_token++;
+    }
+    if (!END_OF_COMMAND)
+	int_error(++c_token, "too many arguments for 'call <file>'");
+}
+
+
+const char *
+expand_call_arg(int c)
+{
+    static char numstr[3];
+    if (c == '$') {
+	return "$";
+    } else if (c == '#') {
+	assert(call_argc >= 0 && call_argc <= 9);
+	sprintf(numstr, "%i", call_argc);
+	return numstr;
+    } else if (c >= '0' && c <= '9') {
+	int ind = c - '0';
+	if (ind >= call_argc)
+	    return "";
+	else
+	    return call_args[ind];
+    } else
+	int_error(NO_CARET, "Invalid substitution $%c", c);
+    return NULL; /* Avoid compiler warning */
+}
+
+
+static void
+expand_call_args(void)
+{
+    int il = 0;
+    int len;
+    char *rl;
+    char *raw_line = gp_strdup(gp_input_line);
+
+    rl = raw_line;
+    *gp_input_line = '\0';
+    while (*rl) {
+	if (*rl == '$') {
+	    const char *sub = expand_call_arg(*(++rl));
+	    len = strlen(sub);
+	    while (gp_input_line_len - il < len + 1)
+		extend_input_line();
+	    strcpy(gp_input_line + il, sub);
+	    il += len;
+	} else {
+	    if (il + 1 > gp_input_line_len)
+		extend_input_line();
+	    gp_input_line[il++] = *rl;
+	}
+	rl++;
+    }
+    if (il + 1 > gp_input_line_len)
+	extend_input_line();
+    gp_input_line[il] = '\0';
+    free(raw_line);
+}
+
 void
 load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 {
@@ -149,7 +222,7 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
     int more;
     int stop = FALSE;
 
-    lf_push(fp);		/* save state for errors and recursion */
+    lf_push(fp, name, NULL); /* save state for errors and recursion */
     do_load_arg_substitution = can_do_args;
 
     if (fp == (FILE *) NULL) {
@@ -160,41 +233,23 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 	interactive = TRUE;
 	while (!com_line());
     } else {
+	call_argc = 0;
+	if (can_do_args) {
+	    prepare_call();
+	    lf_head->c_token = c_token; /* update after prepare_call() */
+	}
+	/* things to do after lf_push */
+	inline_num = 0;
 	/* go into non-interactive mode during load */
 	/* will be undone below, or in load_file_error */
-	int argc = 0; /* number arguments passed by "call" */
 	interactive = FALSE;
-	inline_num = 0;
-	lf_head->name = name;
 
-	if (can_do_args) {
-	    /* Gnuplot "call" command can have up to 10 arguments "$0" to "$9" */
-	    while (!END_OF_COMMAND && argc <= 9) {
-		if (isstring(c_token))
-		    m_quote_capture(&call_args[argc++], c_token, c_token);
-		else
-		    m_capture(&call_args[argc++], c_token, c_token);
-		c_token++;
-	    }
-	    if (!END_OF_COMMAND)
-		int_error(++c_token, "too many arguments for 'call <file>'");
-	}
-
-	/* These were initialized to NULL in lf_push(); will be freed in lf_pop() */
-	lf_head->c_token = c_token;
-	lf_head->num_tokens = num_tokens;
-	lf_head->tokens = gp_alloc((num_tokens+1)
-				   * sizeof(struct lexical_unit), "lf tokens");
-	memcpy(lf_head->tokens, token,
-	       (num_tokens+1) * sizeof(struct lexical_unit));
-	lf_head->input_line = gp_strdup(gp_input_line);
-	
-	while (!stop) {		/* read all commands in file */
-	    /* read one command */
+	while (!stop) {	/* read all lines in file */
 	    left = gp_input_line_len;
 	    start = 0;
 	    more = TRUE;
 
+	    /* read one logical line */
 	    while (more) {
 		if (fgets(&(gp_input_line[start]), left, fp) == (char *) NULL) {
 		    stop = TRUE;	/* EOF in file */
@@ -228,52 +283,11 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 		}
 	    }
 
+	    /* process line */
 	    if (strlen(gp_input_line) > 0) {
-		if (can_do_args) {
-		    int il = 0;
-		    char *rl;
-		    char *raw_line = gp_strdup(gp_input_line);
+		if (can_do_args)
+		  expand_call_args();
 
-		    rl = raw_line;
-		    *gp_input_line = '\0';
-		    while (*rl) {
-			int aix;
-			if (*rl == '$'
-			    && ((aix = *(++rl)) != 0)	/* HBB 980308: quiet BCC warning */
-			    && ((aix >= '0' && aix <= '9') || aix == '#')) {
-			    if (aix == '#') {
-				/* replace $# by number of passed arguments */
-				len = argc < 10 ? 1 : 2; /* argc can be 0 .. 10 */
-				while (gp_input_line_len - il < len + 1) {
-				    extend_input_line();
-				}
-				sprintf(gp_input_line + il, "%i", argc);
-				il += len;
-			    } else
-			    if (call_args[aix -= '0']) {
-				/* replace $n for n=0..9 by the passed argument */
-				len = strlen(call_args[aix]);
-				while (gp_input_line_len - il < len + 1) {
-				    extend_input_line();
-				}
-				strcpy(gp_input_line + il, call_args[aix]);
-				il += len;
-			    }
-			} else {
-			    /* substitute for $<n> here */
-			    if (il + 1 > gp_input_line_len) {
-				extend_input_line();
-			    }
-			    gp_input_line[il++] = *rl;
-			}
-			rl++;
-		    }
-		    if (il + 1 > gp_input_line_len) {
-			extend_input_line();
-		    }
-		    gp_input_line[il] = '\0';
-		    free(raw_line);
-		}
 		screen_ok = FALSE;	/* make sure command line is
 					   echoed on error */
 		if (do_line())
@@ -314,6 +328,8 @@ lf_pop()
 	do_load_arg_substitution = lf->do_load_arg_substitution;
 	interactive = lf->interactive;
 	inline_num = lf->inline_num;
+	if_depth = lf->if_depth;
+	if_condition = lf->if_condition;
 
 	/* Restore saved input state and free the copy */
 	if (lf->tokens) {
@@ -328,11 +344,11 @@ lf_pop()
 	    strcpy(gp_input_line, lf->input_line);
 	    free(lf->input_line);
 	}
-	if (lf->name)
-	    free(lf->name);
+	free(lf->name);
+	free(lf->cmdline);
 	
 	lf_head = lf->prev;
-	free((char *) lf);
+	free(lf);
 	return (TRUE);
     }
 }
@@ -341,7 +357,7 @@ lf_pop()
    essentially, we save information needed to undo the load_file changes
    called by load_file */
 void
-lf_push(FILE *fp)
+lf_push(FILE *fp, char *name, char *cmdline)
 {
     LFS *lf;
     int argindex;
@@ -353,6 +369,9 @@ lf_push(FILE *fp)
 	int_error(c_token, "not enough memory to load file");
     }
     lf->fp = fp;		/* save this file pointer */
+    lf->name = name;
+    lf->cmdline = cmdline;
+
     lf->interactive = interactive;	/* save current state */
     lf->inline_num = inline_num;	/* save current line number */
     lf->do_load_arg_substitution = do_load_arg_substitution;
@@ -361,13 +380,29 @@ lf_push(FILE *fp)
 	call_args[argindex] = NULL;	/* initially no args */
     }
     lf->depth = lf_head ? lf_head->depth+1 : 0;	/* recursion depth */
-    lf->c_token = c_token;	/* Will be updated by caller */
-    lf->num_tokens = num_tokens;/* Will be updated by caller */
-    lf->input_line = NULL;	/* Will be filled in by caller */
-    lf->tokens = NULL;		/* Will be filled in by caller */
-    lf->name = NULL;		/* Will be filled in by caller */
+    if (lf->depth > 1024)
+	int_error(NO_CARET, "Deep load/eval recursion detected");
+    lf->if_depth = if_depth;
+    lf->if_condition = if_condition;
+    lf->c_token = c_token;
+    lf->num_tokens = num_tokens;
+    lf->tokens = gp_alloc((num_tokens+1) * sizeof(struct lexical_unit),
+			  "lf tokens");
+    memcpy(lf->tokens, token, (num_tokens+1) * sizeof(struct lexical_unit));
+    lf->input_line = gp_strdup(gp_input_line);
+
     lf->prev = lf_head;		/* link to stack */
     lf_head = lf;
+
+    /* Check for recursion (Is this too strict?) */
+    if (cmdline) {
+	while ((lf = lf->prev) != NULL) {
+	    if (lf->cmdline && !strcmp(cmdline, lf->cmdline))
+		int_error(NO_CARET,
+			  "probably infinite load/eval recursion at \"%s\"",
+			  cmdline);
+	}
+    }
 }
 
 /* used for reread  vsnyder@math.jpl.nasa.gov */

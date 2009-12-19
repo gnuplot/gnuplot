@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.48 2008/08/15 00:45:34 sfeam Exp $
+ * $Id: command.h,v 1.49 2009/10/31 03:22:37 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -44,6 +44,9 @@ extern char *gp_input_line;
 extern size_t gp_input_line_len;
 
 extern int inline_num;
+
+extern int if_depth;
+extern TBOOLEAN if_condition;
 
 typedef struct lexical_unit {	/* produced by scanner */
     TBOOLEAN is_token;		/* true if token, false if a value */
@@ -156,7 +159,6 @@ void call_command __PROTO((void));
 void changedir_command __PROTO((void));
 void clear_command __PROTO((void));
 void eval_command __PROTO((void));
-void reset_eval_depth __PROTO((void));
 void exit_command __PROTO((void));
 void help_command __PROTO((void));
 void history_command __PROTO((void));

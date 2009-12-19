@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.31 2008/12/10 06:53:13 sfeam Exp $
+ * $Id: misc.h,v 1.32 2009/03/26 00:49:16 sfeam Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -53,10 +53,11 @@
 struct iso_curve * iso_alloc __PROTO((int num));
 void iso_extend __PROTO((struct iso_curve *ip, int num));
 void iso_free __PROTO((struct iso_curve *ip));
+const char *expand_call_arg __PROTO((int c));
 void load_file __PROTO((FILE *fp, char *name, TBOOLEAN subst_args));
 FILE *lf_top __PROTO((void));
 TBOOLEAN lf_pop __PROTO((void));
-void lf_push __PROTO((FILE *));
+void lf_push __PROTO((FILE *fp, char *name, char *cmdline));
 void load_file_error __PROTO((void));
 FILE *loadpath_fopen __PROTO((const char *, const char *));
 char *fontpath_fullname __PROTO((const char *));
@@ -82,12 +83,17 @@ void get_image_options __PROTO((t_image *image));
  * and properly handle recursive load_file calls
  */
 typedef struct lf_state_struct {
+    /* new recursion level: */
     FILE *fp;			/* file pointer for load file */
     char *name;			/* name of file */
+    char *cmdline;              /* content of command string for do_string() */
+    /* last recursion level: */
     TBOOLEAN interactive;	/* value of interactive flag on entry */
     TBOOLEAN do_load_arg_substitution;	/* likewise ... */
     int inline_num;		/* inline_num on entry */
     int depth;			/* recursion depth */
+    int if_depth;
+    TBOOLEAN if_condition;
     char *input_line;		/* Input line text to restore */
     struct lexical_unit *tokens;/* Input line tokens to restore */
     int num_tokens;		/* How big is the above ? */
