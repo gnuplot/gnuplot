@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.303 2009/12/04 04:25:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.304 2009/12/20 03:53:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -78,7 +78,6 @@ static void set_clabel __PROTO((void));
 static void set_clip __PROTO((void));
 static void set_cntrparam __PROTO((void));
 static void set_contour __PROTO((void));
-static void classic_set_dgrid3d __PROTO((void));
 static void set_dgrid3d __PROTO((void));
 static void set_decimalsign __PROTO((void));
 static void set_dummy __PROTO((void));
