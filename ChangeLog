@@ -1,3 +1,9 @@
+2009-12-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/win/wgraph.c (drawgraph: W_line_type):  Change initial line
+	template for LT_BACKGROUND to 0 (lt -1) rather than 1 (lt 0).
+	Possible fix for bug #1952287
+
 2009-12-19  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/command.c, src/command.h, src/misc.c, src/misc.h
