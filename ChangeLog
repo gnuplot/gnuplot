@@ -1,3 +1,9 @@
+2009-12-24  Robert Schwebel <r.schwebel@pengutronix.de>
+
+	* configure.in docs/Makefile.in:
+	When cross compiling gnuplot, build the documentation generation tools
+	in docs/ with CC_FOR_BUILD (host compiler), not with the cross compiler.
+
 2009-12-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/win/wgraph.c (drawgraph: W_line_type):  Change initial line

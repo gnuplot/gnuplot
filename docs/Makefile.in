@@ -70,7 +70,7 @@ POST_UNINSTALL = :
 
 INFO_DEPS = $(srcdir)/gnuplot.info
 
-CC     = @CC@
+CC     = @CC_FOR_BUILD@
 CPP    = @CPP@
 DEFS   = @DEFS@
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.. -I$(top_builddir)

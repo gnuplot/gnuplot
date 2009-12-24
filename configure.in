@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.255 2009/08/26 04:38:27 sfeam Exp $
+dnl $Id: configure.in,v 1.256 2009/10/18 21:10:05 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -11,6 +11,8 @@ AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ(2.58)
 AM_CONFIG_HEADER(config.h:config.hin)
 AM_INIT_AUTOMAKE(1.7.9)
+
+AM_MAINTAINER_MODE
 
 VERSION_MAJOR="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
@@ -26,6 +28,46 @@ AC_PROG_CPP
 AC_C_CONST
 AC_C_INLINE
 AC_C_STRINGIZE
+
+
+if test "${build}" != "${host}"
+then
+  CC=${CC-${host_alias}-gcc}
+  CFLAGS=${CFLAGS-"-g -O2"}
+  CXX=${CXX-${host_alias}-c++}
+  CXXFLAGS=${CXXFLAGS-"-g -O2"}
+  CC_FOR_BUILD=${CC_FOR_BUILD-gcc}
+else
+  CC_FOR_BUILD="\$(CC)"
+  AC_PROG_CC
+
+  # We must set the default linker to the linker used by gcc for the correct
+  # operation of libtool.  If LD is not defined and we are using gcc, try to
+  # set the LD default to the ld used by gcc.
+  if test -z "$LD"
+  then
+    if test "$GCC" = yes
+    then
+      case $build in
+      *-*-mingw*)
+        gcc_prog_ld=`$CC -print-prog-name=ld 2>&1 | tr -d '\015'` ;;
+      *)
+        gcc_prog_ld=`$CC -print-prog-name=ld 2>&1` ;;
+      esac
+      case $gcc_prog_ld in
+      # Accept absolute paths.
+      [[\\/]* | [A-Za-z]:[\\/]*)]
+        LD="$gcc_prog_ld" ;;
+      esac
+    fi
+  fi
+
+  CXX=${CXX-"c++"}
+  CFLAGS=${CFLAGS-"-g -O2"}
+  CXXFLAGS=${CXXFLAGS-"-g -O2"}
+fi
+AC_SUBST(CC_FOR_BUILD)
+
 
 dnl Various programs
 dnl X/Emacs for building lisp packages and creating .texi version of docs
