@@ -1,3 +1,12 @@
+2009-12-24  Thomas Sefzick <thse@users.sourceforge.net>
+
+	* src/tabulate.c src/time.c:
+	Support the "%s" format specifier to strftime as per the unix man page.
+	If the output format string is exactly "%s" then 'output_number()' in
+	'src/tabulate.c' returns the number of seconds since the beginning of
+	the epoch as a number.  All other cases ("%s" in combination with any
+	other character) are treated in 'time.c'.
+
 2009-12-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate: Fix buffer overflow.

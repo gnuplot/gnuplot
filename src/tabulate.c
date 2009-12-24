@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.8 2009/10/10 18:11:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.9 2009/12/25 00:22:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -62,6 +62,15 @@ static FILE *outfile;
 
 static void
 output_number(double coord, int axis, char *buffer) {
+    /* treat timedata and "%s" output format as a special case:
+     * return a number.
+     * "%s" in combination with any other character is treated
+     * like a normal time format specifier and handled in time.c
+     */
+    if (axis_array[axis].is_timedata &&
+        strcmp(axis_array[axis].formatstring, "%s") == 0) {
+	gprintf(buffer, BUFFERSIZE, "%.0f", 1.0, coord);
+    } else
     if (axis_array[axis].is_timedata) {
 	buffer[0] = '"';
 	gstrftime(buffer+1, BUFFERSIZE-1, axis_array[axis].formatstring, coord);
