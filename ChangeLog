@@ -1,3 +1,7 @@
+2009-12-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate: Fix buffer overflow.
+
 2009-12-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/win/wgraph.c (drawgraph: W_line_type):  Change initial line
