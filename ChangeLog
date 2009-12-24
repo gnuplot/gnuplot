@@ -1,3 +1,7 @@
+2009-12-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate: Fix buffer overflow.
+
 2009-12-24  Robert Schwebel <r.schwebel@pengutronix.de>
 
 	* configure.in docs/Makefile.in:

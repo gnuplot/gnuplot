@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.7 2008/03/23 18:55:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.8 2009/10/10 18:11:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -58,19 +58,20 @@ static FILE *outfile;
 
 /* This routine got longer than is reasonable for a macro */
 #define OUTPUT_NUMBER(x,y) output_number(x,y,buffer)
+#define BUFFERSIZE 150
 
 static void
 output_number(double coord, int axis, char *buffer) {
     if (axis_array[axis].is_timedata) {
 	buffer[0] = '"';
-	gstrftime(buffer+1, 150, axis_array[axis].formatstring, coord);
+	gstrftime(buffer+1, BUFFERSIZE-1, axis_array[axis].formatstring, coord);
 	while (strchr(buffer,'\n')) {*(strchr(buffer,'\n')) = ' ';}
 	strcat(buffer,"\"");
     } else if (axis_array[axis].log) {
 	double x = pow(axis_array[axis].base, coord);
-	gprintf(buffer, 150, axis_array[axis].formatstring, 1.0, x);
+	gprintf(buffer, BUFFERSIZE, axis_array[axis].formatstring, 1.0, x);
     } else
-	gprintf(buffer, 150, axis_array[axis].formatstring, 1.0, coord);
+	gprintf(buffer, BUFFERSIZE, axis_array[axis].formatstring, 1.0, coord);
     fputs(buffer, outfile);
     fputc(' ', outfile);
 }
@@ -80,7 +81,7 @@ void
 print_table(struct curve_points *current_plot, int plot_num)
 {
     int i, curve;
-    char *buffer = gp_alloc(150, "print_table: output buffer");
+    char *buffer = gp_alloc(BUFFERSIZE, "print_table: output buffer");
     outfile = (table_outfile) ? table_outfile : gpoutfile;
 
     for (curve = 0; curve < plot_num;
@@ -234,7 +235,7 @@ print_3dtable(int pcount)
     int i, surface;
     struct coordinate GPHUGE *point;
     struct coordinate GPHUGE *tail;
-    char *buffer = gp_alloc(150, "print_3dtable output buffer");
+    char *buffer = gp_alloc(BUFFERSIZE, "print_3dtable output buffer");
     outfile = (table_outfile) ? table_outfile : gpoutfile;
 
     for (surface = 0, this_plot = first_3dplot;
