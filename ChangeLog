@@ -11,6 +11,11 @@
 
 	* src/tabulate: Fix buffer overflow.
 
+	* configure.in:  The cross-compilation patch causes a recursive 
+	definition of CC in docs/Makefile.  I have attempted to fix this by
+	revising the definition of CC_FOR_BUILD, but I don't know if this
+	will break cross-compilation again.
+
 2009-12-24  Robert Schwebel <r.schwebel@pengutronix.de>
 
 	* configure.in docs/Makefile.in:
