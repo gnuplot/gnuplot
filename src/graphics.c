@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.316 2009/10/26 18:47:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.317 2009/12/12 06:46:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3972,6 +3972,7 @@ plot_f_bars(struct curve_points *plot)
  * Plot the curves in CANDLESTICSK style
  * EAM Apr 2008 - switch to using empty/fill rather than empty/striped 
  *		  to distinguish whether (open > close)
+ * EAM Dec 2009	- allow an optional 6th column to specify width
  */
 static void
 plot_c_bars(struct curve_points *plot)
@@ -4039,7 +4040,15 @@ plot_c_bars(struct curve_points *plot)
 	    /* both out of range on the same side */
 	    continue;
 
-	if (boxwidth < 0.0) {
+	if (plot->points[i].xlow != plot->points[i].x) {
+	    dxl = plot->points[i].xlow;
+	    dxr = 2 * x - dxl;
+	    cliptorange(dxr, X_AXIS.min, X_AXIS.max);
+	    cliptorange(dxl, X_AXIS.min, X_AXIS.max);
+	    xlowM = map_x(dxl);
+	    xhighM = map_x(dxr);
+
+	} else if (boxwidth < 0.0) {
 	    xlowM = xM - bar_size * tic;
 	    xhighM = xM + bar_size * tic;
 
@@ -4062,8 +4071,8 @@ plot_c_bars(struct curve_points *plot)
 	if (prev == UNDEFINED)
 	    dxl = -dxr;
 
-	dxl = plot->points[i].x + dxl;
-	dxr = plot->points[i].x + dxr;
+	dxl = x + dxl;
+	dxr = x + dxr;
 	cliptorange(dxr, X_AXIS.min, X_AXIS.max);
 	cliptorange(dxl, X_AXIS.min, X_AXIS.max);
 	xlowM = map_x(dxl);

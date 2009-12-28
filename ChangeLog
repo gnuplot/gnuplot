@@ -1,3 +1,11 @@
+2009-12-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c (get_data) src/graphics.c (plot_c_bars)
+	src/tabulate.c (print_table) docs/gnuplot.doc:
+
+	Allow an optional 6th column in CANDLESTICKS style that specifies the
+	width of each individual candle.
+
 2009-12-24  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* src/tabulate.c src/time.c:

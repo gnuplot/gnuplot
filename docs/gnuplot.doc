@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.591 2009/12/02 06:21:01 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.592 2009/12/20 03:53:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2618,6 +2618,10 @@ Ffigure_candlesticks
  For backwards compatibility with earlier gnuplot versions, when the
  boxwidth parameter has not been set then the width of the candlestick
  rectangle is controlled by `set bars <width>`.
+
+ Alternatively, an explicit width for each box-and-whiskers grouping may be
+ specified in an optional 6th column of data.  The width must be given in the
+ same units as the x coordinate.
 
  By default the vertical line segments have no crossbars at the top and
  bottom. If you want crossbars, which are typically used for box-and-whisker
