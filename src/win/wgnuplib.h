@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.27 2008/05/17 15:37:25 sfeam Exp $
+ * $Id: wgnuplib.h,v 1.28 2008/11/07 11:55:46 mikulik Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -385,6 +385,7 @@ void WDPROC GraphRedraw(LPGW lpgw);
 void WDPROC GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
 unsigned int WDPROC GraphGetTextLength(LPGW lpgw, LPCSTR text, LPCSTR fontname, int fontsize);
 int WDPROC GraphGetFontScaling(LPGW lpgw, LPCSTR font, int fontsize);
+void	ReadGraphIni(LPGW lpgw);
 
 #ifdef USE_MOUSE
 void WDPROC Graph_set_cursor (LPGW lpgw, int c, int x, int y );
