@@ -1,3 +1,8 @@
+2009-12-30  Thomas Sefzick <thse@users.sourceforge.net>
+
+	* src/graph3d.c: Fix incorrect color assignment of contour lines when
+	'set style increment user' is set.
+
 2009-12-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate: Fix buffer overflow.
