@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.74 2009/12/31 04:20:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.75 2009/12/31 04:44:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -139,9 +139,6 @@ int wginitstyle[WGDEFSTYLE] = {PS_SOLID, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOT
 #define GWOPMAX 4096
 
 
-/* shige */
-#define USEFRACFS
-#ifndef USEFRACFS
 /* bitmaps for filled boxes (ULIG) */
 /* zeros represent the foreground color and ones represent the background color */
 /* FIXME HBB 20010916: *never* extern in a C source! */
@@ -164,7 +161,6 @@ static unsigned char halftone_bitmaps[][16] ={
 static HBRUSH halftone_brush[halftone_num];
 static BITMAP halftone_bitdata[halftone_num];
 static HBITMAP halftone_bitmap[halftone_num];
-#endif /* !USEFFACFS */
 
 static unsigned char pattern_bitmaps[][16] = {
   {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -197,9 +193,6 @@ static HBITMAP pattern_bitmap[pattern_num];
 
 static TBOOLEAN brushes_initialized = FALSE;
 
-#ifdef USEFRACFS
-static COLORREF thisbrushcolor = RGB(0,0,0);
-#endif
 
 /* ================================== */
 
@@ -564,7 +557,6 @@ MakePens(LPGW lpgw, HDC hdc)
 	if( ! brushes_initialized ) {
 		int i;
 
-#ifndef USEFRACFS
 		for(i=0; i < halftone_num; i++) {
 			halftone_bitdata[i].bmType       = 0;
 			halftone_bitdata[i].bmWidth      = 16;
@@ -576,7 +568,6 @@ MakePens(LPGW lpgw, HDC hdc)
 			halftone_bitmap[i] = CreateBitmapIndirect(&halftone_bitdata[i]);
 			halftone_brush[i] = CreatePatternBrush(halftone_bitmap[i]);
 		}
-#endif
 
 		for(i=0; i < pattern_num; i++) {
 			pattern_bitdata[i].bmType       = 0;
@@ -609,12 +600,10 @@ DestroyPens(LPGW lpgw)
 	if( brushes_initialized ) {
 		int i;
 
-#ifndef USEFRACFS
 		for( i=0; i<halftone_num; i++ ) {
 			DeleteObject(halftone_bitmap[i]);
 			DeleteObject(halftone_brush[i]);
 		}
-#endif
 		for( i=0; i<pattern_num; i++ ) {
 			DeleteObject(pattern_bitmap[i]);
 			DeleteObject(pattern_brush[i]);
@@ -974,9 +963,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 		pen = cur_pen;
 		SelectObject(hdc, lpgw->colorbrush[pen]);
-#ifdef USEFRACFS
-		thisbrushcolor = lpgw->colorpen[pen].lopnColor;
-#endif
 		/* Text color is also used for pattern fill */
 		SetTextColor(hdc, cur_penstruct.lopnColor);
 	    }
@@ -1009,11 +995,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	case W_boxfill:   /* ULIG */
 
-#ifdef USEFRACFS
-	  {
-	    static HBRUSH last_pm3d_brush = NULL;
-	    HBRUSH this_brush;
-#endif
 	    assert (polyi == 1);
 
 	    /* NOTE: the x and y passed with this call are the width and
@@ -1023,7 +1004,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    switch(fillstyle & 0x0f) {
 		case FS_SOLID:
 		case FS_TRANSPARENT_SOLID:
-#ifndef USEFRACFS
 		    /* style == 1 --> use halftone fill pattern
 		     * according to filldensity. Density is from
 		     * 0..100 percent: */
@@ -1033,26 +1013,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    if (idx > halftone_num - 1)
 			idx = halftone_num - 1;
 		    SelectObject(hdc, halftone_brush[idx]);
-#else
-		    {
-		      double density = (fillstyle >> 4)*0.01;
-		      int r,g,b;
-		      COLORREF c; 
-		      if (density < 0.0) density = 0.0;
-		      else if (density > 1.0) density = 1.0;
-		      r = thisbrushcolor & 0xff;
-		      g = thisbrushcolor >> 8 & 0xff;
-		      b = thisbrushcolor >> 16 & 0xff;
-		      c = RGB((int)(255 - (255 - r)*density),
-			      (int)(255 - (255 - g)*density),
-			      (int)(255 - (255 - b)*density));
-		      this_brush = CreateSolidBrush(c);
-		      SelectObject(hdc, this_brush);
-		      if (last_pm3d_brush != NULL)
-			DeleteObject(last_pm3d_brush);
-		      last_pm3d_brush = this_brush;
-		    }
-#endif /* USEFRACFS */
 		    break;
 		case FS_PATTERN:
 		case FS_TRANSPARENT_PATTERN:
@@ -1071,15 +1031,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		case FS_EMPTY:
 		default:
 		    /* fill with background color */
-#ifndef USEFRACFS 
 		    SelectObject(hdc, halftone_brush[0]);
-#else
-		    this_brush = CreateSolidBrush(thisbrushcolor);
-		    SelectObject(hdc, this_brush);
-		    if (last_pm3d_brush != NULL)
-		      DeleteObject(last_pm3d_brush);
-		    last_pm3d_brush = this_brush;
-#endif
 		    break;
 	    }
 
@@ -1088,9 +1040,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    PatBlt(hdc, ppt[0].x, ppt[0].y, xdash, ydash, PATCOPY);
 	    polyi = 0;
 	    break;
-#ifdef USEFRACFS 
-	  }
-#endif
   	case W_text_angle:
  	    if (lpgw->angle != (short int)curptr->x) {
  		lpgw->angle = (short int)curptr->x;
@@ -1163,9 +1112,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    rgb255_color rgb255;
 		    rgb255maxcolors_from_gray(curptr->x / (double)WIN_PAL_COLORS, &rgb255);
 		    c = RGB(rgb255.r, rgb255.g, rgb255.b);
-#ifdef USEFRACFS
-		    thisbrushcolor = c;
-#endif
 		}
 		else if (curptr->y == (TC_LT << 8)) {	/* TC_LT */
 		    short pen = curptr->x;
@@ -1177,15 +1123,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			pen += 2;
 			c = lpgw->colorpen[pen].lopnColor;
 		    }
-#ifdef USEFRACFS
-		    thisbrushcolor = c;
-#endif
 		}
 		else {					/* TC_RGB */
 		    c = RGB(curptr->y & 0xff, (curptr->x >> 8) & 0xff, curptr->x & 0xff);
-#ifdef USEFRACFS
-		    thisbrushcolor = c;
-#endif
 		}
 
 		/* Solid fill brush */

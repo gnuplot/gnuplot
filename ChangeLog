@@ -8,9 +8,6 @@
 	correct. This should be done only once on first entry before setting
 	the terminal options.
 
-	* src/win/wgraph.c:
-	Support fractional density variant of fill style solid on win terminal.
-
 2009-12-30  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* src/graph3d.c: Fix incorrect color assignment of contour lines when
