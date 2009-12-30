@@ -1,3 +1,11 @@
+2009-12-30  Peter Kalinin  <pkalinin@users.sourceforge.net>
+
+	* term/metapost.trm (MP_options):
+	The metapost terminal sets the line thickness for plots via drawoptions,
+	then uses 'draw GPtext ...' to place the text. The draw inherits options
+	from drawoptions, which results in altered thicknesses of lines.
+	Replace 'draw GPtext' with 'addto currentpicture also GPtext'.
+
 2009-12-30  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm:

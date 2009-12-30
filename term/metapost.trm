@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.42 2007/12/20 03:15:55 sfeam Exp $
+ * $Id: metapost.trm,v 1.43 2008/05/31 15:05:29 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -553,7 +553,7 @@ def put_text(expr pic, x, y, r, j) =\n\
     else: (-(urcorner GPtext + lrcorner GPtext)/2)\n\
     fi\n\
     rotated r;\n\
-  draw GPtext shifted (x,y)\n\
+  addto currentpicture also GPtext shifted (x,y)\n\
 enddef;\n", gpoutfile);
 }
 
