@@ -1,3 +1,7 @@
+2009-12-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc:  More info on font use in wxt and cairo terms.
+
 2009-12-30  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* src/graph3d.c: Fix incorrect color assignment of contour lines when
