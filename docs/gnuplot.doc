@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.592 2009/12/20 03:53:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.593 2009/12/28 23:57:54 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1809,8 +1809,8 @@ C ... and restart the table:
  a single record.  A "datablock" is a set of points from consecutive records,
  delimited by blank records.  A line, when referred to in the context of a
  data file, is a subset of a datablock.
-2 linetype, colors, and styles
-?linetype
+2 linetypes, colors, and styles
+?linetypes
 ?colors
  Each gnuplot terminal type provides a set of distinct "linetypes". These may
  differ in color, in thickness, in dot/dash pattern, or in some combination of
@@ -1819,9 +1819,15 @@ C ... and restart the table:
  The pre-defined colors and dot/dash patterns are not guaranteed to be
  consistent for all terminal types, but all terminals use the special linetype
  -1 to mean a solid line in the primary foreground color (normally black).
+
+ You can redefine the default linetype properties either interactively or via an
+ initialization file.  This allows you to customize the colors and other
+ properties of the lines used by all gnuplot plotting commands.
+ See `set linetype`.  
+
  By default, successive functions or datafiles plotted by a single command will
- be assigned successive linetypes.  You can override this default by specifying
- a particular linetype for any function, datafile, or plot element.
+ be assigned successive linetypes.  You can override this default sequence by
+ specifying a particular linetype for any function, datafile, or plot element.
 
  Examples:
 
@@ -8229,6 +8235,67 @@ Ffigure_mapcontours
  To set a label whose color matches the z value (in this case 5.5) of some
  point on a 3D splot colored using pm3d:
        set label 'text' at 0,0,5.5 tc palette z
+3 linetype
+?commands set linetype
+?commands unset linetype
+?commands show linetype
+?set linetype
+?unset linetype
+?show linetype
+?linetype
+ The `set linetype` command allows you to redefine the basic linetypes used
+ for plots.  The command options are identical to those for "set style line".
+ Unlike line styles, redefinitions by `set linetype` are persistent;  they
+ are not affected by `reset`.
+ 
+ For example, linetypes one and two default to red and green. If you redefine
+ them like this:
+
+       set linetype 1 lw 2 lc rgb "blue" pointtype 6
+       set linetype 2 lw 2 lc rgb "forest-green" pointtype 8
+
+ everywhere that uses lt 1 will now get a thick blue line rather than a thin red
+ line (the previous default meaning of lt 1).  This includes uses such as the
+ definition of a temporary linestyle derived from the base linetype 1.
+
+ `Note`: This command is new to gnuplot version 4.5.  It supersedes a rather
+ cryptic command in version 4.2 "set style increment user".
+ The older command is now deprecated.
+
+ This mechanism can be used to define a set of personal preferences for the
+ sequence of lines used in gnuplot.  The recommended way to do this is to add
+ to the run-time initialization file ~/.gnuplot a sequence of commands like
+
+       if ((GPVAL_VERSION < 4.5) \
+       ||  (!strstrt(GPVAL_COMPILE_OPTIONS,"+USER_LINETYPES"))) \
+           exit
+       set linetype 1 lc rgb "dark-violet" lw 2 pt 0
+       set linetype 2 lc rgb "sea-green"   lw 2 pt 7
+       set linetype 3 lc rgb "cyan"        lw 2 pt 6 pi -1
+       set linetype 4 lc rgb "dark-red"    lw 2 pt 5 pi -1
+       set linetype 5 lc rgb "blue"        lw 2 pt 8
+       set linetype 6 lc rgb "dark-orange" lw 2 pt 3
+       set linetype 7 lc rgb "black"       lw 2 pt 11
+       set linetype 8 lc rgb "goldenrod"   lw 2
+       set linetype cycle 8
+
+ Every time you run gnuplot the line types will be initialized to these values.
+ You may initialize as many linetypes as you like. If you do not redefine, say,
+ linetype 3 then it will continue to have the default properties (in this case
+ blue, pt 3, lw 1, etc).  The first few lines of the example script insure that
+ the commands will be skipped by older versions of gnuplot.
+
+ Similar script files can be used to define theme-based color choices, or sets
+ of colors optimized for a particular plot type or output device.
+
+=cycle
+ The command `set linetype cycle 8` tells gnuplot to re-use these definitions
+ for the color and linewidth of higher-numbered linetypes.  That is, linetypes
+ 9-16, 17-24, and so on will use this same sequence of colors and widths.
+ The point properties (pointtype, pointsize, pointinterval) are not affected by
+ this command.  `unset linetype cycle` disables this feature.  If the line
+ properties of a higher numbered linetype are explicitly defined, this takes
+ precedence over the recycled low-number linetype properties.
 
 3 lmargin
 ?commands set lmargin
@@ -10049,6 +10116,11 @@ Ffigure_mapcontours
 ?commands show style increment
 ?set style increment
 ?show style increment
+ `Note`:  This command has been deprecated.  Instead please use the newer
+ command `set linetype`, which redefines the linetypes themselves rather
+ than searching for a suitable temporary line style to substitute.
+ See `set linetype`
+
  Syntax:
        set style increment {default|userstyles}
        show style increment
@@ -10109,6 +10181,11 @@ Ffigure_mapcontours
  changed while all others are preserved.  If not, all undefined values are
  set to the default values.
 
+ Line styles created by this mechanism do not replace the default linetype
+ styles; both may be used.  Line styles are temporary. They are lost whenever
+ you execute a `reset` command.  To redefine the linetype itself,
+ please see `set linetype`.
+
  The line and point types default to the index value. The exact symbol that is
  drawn for that index value may vary from one terminal type to another.
  
@@ -10123,10 +10200,6 @@ Ffigure_mapcontours
  every 3rd point in plots using `with linespoints`.  A negative value for the
  interval is treated the same as a positive value, except that some terminals
  will try to interrupt the line where it passes through the point symbol.
-
- Linestyles created by this mechanism do not replace the default linetype
- styles; both may be used.  If you want plots to use the defined styles in
- preference to the default linetypes, please see `set style increment`.
 
  Not all terminals support the `linewidth` and `pointsize` features; if
  not supported, the option will be ignored.

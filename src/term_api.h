@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.82 2009/06/08 04:37:29 sfeam Exp $
+ * $Id: term_api.h,v 1.83 2009/09/13 17:44:20 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -335,6 +335,9 @@ extern double curr_arrow_headbackangle;
 /* arrow head filled or not */
 extern int curr_arrow_headfilled;
 
+/* Recycle count for user-defined linetypes */
+extern int linetype_recycle_count;
+
 /* Current 'output' file: name and open filehandle */
 extern char *outstr;
 extern FILE *gpoutfile;
@@ -443,8 +446,8 @@ void PM_set_gpPMmenu __PROTO((struct t_gpPMmenu * gpPMmenu));
 # endif
 #endif
 
-/* in misc.c */
 void lp_use_properties __PROTO((struct lp_style_type *lp, int tag));
+void load_linetype __PROTO((struct lp_style_type *lp, int tag));
 
 /* Wrappers for term->path() */
 void newpath __PROTO((void));

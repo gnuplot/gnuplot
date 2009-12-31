@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.192 2009/10/31 03:22:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.193 2009/11/04 16:13:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -178,6 +178,10 @@ char enhanced_escape_format[16] = "";
 double enhanced_max_height = 0.0, enhanced_min_height = 0.0;
 /* flag variable to disable enhanced output of filenames, mainly. */
 TBOOLEAN ignore_enhanced_text = FALSE;
+
+/* Recycle count for user-defined linetypes */
+int linetype_recycle_count = 0;
+
 
 /* Internal variables */
 
@@ -2072,9 +2076,11 @@ test_term()
     y = ymax_t - key_entry_height;
     (*t->pointsize) (pointsize);
     for (i = -2; y > key_entry_height; i++) {
-	(*t->linetype) (i);
-	/*      (void) sprintf(label,"%d",i);  Jorgen Lippert
-	   lippert@risoe.dk */
+	struct lp_style_type ls;
+	ls.l_width = 1;
+	load_linetype(&ls,i+1);
+	term_apply_lp_properties(&ls);
+
 	(void) sprintf(label, "%d", i + 1);
 	if ((*t->justify_text) (RIGHT))
 	    (*t->put_text) (x, y, label);
@@ -3001,6 +3007,51 @@ lp_use_properties(struct lp_style_type *lp, int tag)
     }
 
     /* No user-defined style with this tag; fall back to default line type. */
+    load_linetype(lp, tag);
+}
+
+
+/*
+ * Load lp with the properties of a user-defined linetype
+ */
+void
+load_linetype(struct lp_style_type *lp, int tag)
+{
+    struct linestyle_def *this;
+    int save_pointflag = lp->pointflag;
+
+recycle:
+    this = first_perm_linestyle;
+    while (this != NULL) {
+	if (this->tag == tag) {
+	    *lp = this->lp_properties;
+	    lp->pointflag = save_pointflag;
+	    if (term->flags & TERM_MONOCHROME) {
+		lp->l_type = tag;
+		lp->use_palette = FALSE;
+		return;
+	    }
+	    if (!(term->set_color))
+		break;
+	    /* FIXME - It would be nicer if this were always true already */
+	    if (!lp->use_palette) {
+		lp->pm3d_color.type = TC_LT;
+		lp->pm3d_color.lt = lp->l_type;
+	    }
+	    return;
+	} else {
+	    this = this->next;
+	}
+    }
+
+    /* This linetype wasn't defined explicitly.		*/
+    /* Should we recycle one of the first N linetypes?	*/
+    if (tag > linetype_recycle_count && linetype_recycle_count > 0) {
+	tag = (tag-1) % linetype_recycle_count + 1;
+	goto recycle;
+    }
+
+    /* No user-defined linetype with this tag; fall back to default line type. */
     /* NB: We assume that the remaining fields of lp have been initialized. */
     lp->l_type = tag - 1;
     lp->pm3d_color.type = TC_LT;

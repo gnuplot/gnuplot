@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.113 2009/11/16 14:01:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.114 2009/12/20 21:32:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -804,6 +804,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    int lt = int_expression();
 		    lp->l_type = lt - 1;
 		    /* user may prefer explicit line styles */
+		    if (first_perm_linestyle)
+			load_linetype(lp, lt);
 		    if (prefer_line_styles && allow_ls)
 			lp_use_properties(lp, lt);
 		}

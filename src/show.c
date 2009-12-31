@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.229 2009/11/16 10:29:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.230 2009/12/20 03:53:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -151,6 +151,7 @@ static void show_plot __PROTO((void));
 static void show_variables __PROTO((void));
 
 static void show_linestyle __PROTO((int tag));
+static void show_linetype __PROTO((int tag));
 static void show_arrowstyle __PROTO((int tag));
 static void show_arrow __PROTO((int tag));
 
@@ -282,16 +283,14 @@ show_command()
 	CHECK_TAG_GT_ZERO;
 	show_arrow(tag);
 	break;
-#ifdef BACKWARDS_COMPATIBLE
     case S_LINESTYLE:
 	CHECK_TAG_GT_ZERO;
 	show_linestyle(tag);
 	break;
-#else
-    case S_LINESTYLE:
-	error_message = "keyword 'linestyle' deprecated, use 'show style line'";
+    case S_LINETYPE:
+	CHECK_TAG_GT_ZERO;
+	show_linetype(tag);
 	break;
-#endif
     case S_KEYTITLE:
 	show_keytitle();
 	break;
@@ -982,6 +981,7 @@ show_version(FILE *fp)
 		"+THIN_SPLINES  "
 # endif
 		"+IMAGE  "
+		"+USER_LINETYPES "
 	    "";
 
 	    sprintf(compile_options, "\
@@ -2927,6 +2927,30 @@ show_linestyle(int tag)
     }
     if (tag > 0 && !showed)
 	int_error(c_token, "linestyle not found");
+}
+
+/* Show linetype number <tag> (0 means show all) */
+static void
+show_linetype(int tag)
+{
+    struct linestyle_def *this_linestyle;
+    TBOOLEAN showed = FALSE;
+
+    if (tag == 0)
+	fprintf(stderr, "\tLinetypes repeat every %d unless explicitly defined\n",
+		linetype_recycle_count);
+
+    for (this_linestyle = first_perm_linestyle; this_linestyle != NULL;
+	 this_linestyle = this_linestyle->next) {
+	if (tag == 0 || tag == this_linestyle->tag) {
+	    showed = TRUE;
+	    fprintf(stderr, "\tlinetype %d, ", this_linestyle->tag);
+	    save_linetype(stderr, &(this_linestyle->lp_properties), TRUE);
+	    fputc('\n', stderr);
+	}
+    }
+    if (tag > 0 && !showed)
+	int_error(c_token, "linetype not found");
 }
 
 

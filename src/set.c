@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.304 2009/12/20 03:53:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.305 2009/12/21 19:38:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -151,7 +151,7 @@ static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
 
-static void set_linestyle __PROTO((void));
+static void set_linestyle __PROTO((struct linestyle_def **head));
 static void set_arrowstyle __PROTO((void));
 static int assign_arrowstyle_tag __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
@@ -206,11 +206,6 @@ set_command()
 	    else
 		func_style = temp_style;
 	}
-    } else if (almost_equals(c_token,"li$nestyle") || equals(c_token, "ls" )) {
-	if (interactive)
-	    int_warn(c_token, "deprecated syntax, use \"set style line\"");
-	c_token++;
-	set_linestyle();
     } else if (almost_equals(c_token,"noli$nestyle") || equals(c_token, "nols" )) {
 	c_token++;
 	set_nolinestyle();
@@ -320,6 +315,16 @@ set_command()
 	    break;
 	case S_KEYTITLE:
 	    set_keytitle();
+	    break;
+	case S_LINESTYLE:
+	    set_linestyle(&first_linestyle);
+	    break;
+	case S_LINETYPE:
+	    if (equals(c_token+1,"cycle")) {
+		c_token += 2;
+		linetype_recycle_count = int_expression();
+	    } else
+		set_linestyle(&first_perm_linestyle);
 	    break;
 	case S_LABEL:
 	    set_label();
@@ -3781,7 +3786,7 @@ set_style()
 	    break;
 	}
     case SHOW_STYLE_LINE:
-	set_linestyle();
+	set_linestyle(&first_linestyle);
 	break;
     case SHOW_STYLE_FILLING:
 	parse_fillstyle( &default_fillstyle,
@@ -4717,16 +4722,17 @@ set_xyzlabel(text_label *label)
 }
 
 
-
-/* 'set style line' command */
-/* set style line {tag} {linetype n} {linewidth x} {pointtype n} {pointsize x} */
+/*
+ * Change or insert a new linestyle in a list of line styles.
+ * Supports the old 'set linestyle' command (backwards-compatible)
+ * and the new "set style line" and "set linetype" commands.
+ */
 static void
-set_linestyle()
+set_linestyle(struct linestyle_def **head)
 {
     struct linestyle_def *this_linestyle = NULL;
     struct linestyle_def *new_linestyle = NULL;
     struct linestyle_def *prev_linestyle = NULL;
-    struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     int tag;
 
     c_token++;
@@ -4735,26 +4741,23 @@ set_linestyle()
     if (END_OF_COMMAND || ((tag = int_expression()) <= 0))
 	int_error(c_token, "tag must be > zero");
 
-    /* Default style is based on linetype with the same tag id */
-    loc_lp.l_type = tag - 1;
-    loc_lp.p_type = tag - 1;
-
     /* Check if linestyle is already defined */
-    if (first_linestyle != NULL) {	/* skip to last linestyle */
-	for (this_linestyle = first_linestyle; this_linestyle != NULL;
-	     prev_linestyle = this_linestyle,
-	     this_linestyle = this_linestyle->next)
-	    /* is this the linestyle we want? */
-	    if (tag <= this_linestyle->tag)
+    for (this_linestyle = *head; this_linestyle != NULL;
+	 prev_linestyle = this_linestyle, this_linestyle = this_linestyle->next)
+	if (tag <= this_linestyle->tag)
 		break;
-    }
 
     if (this_linestyle == NULL || tag != this_linestyle->tag) {
+	/* Default style is based on linetype with the same tag id */
+        struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
+	loc_lp.l_type = tag - 1;
+	loc_lp.p_type = tag - 1;
+
 	new_linestyle = gp_alloc(sizeof(struct linestyle_def), "linestyle");
 	if (prev_linestyle != NULL)
 	    prev_linestyle->next = new_linestyle;	/* add it to end of list */
 	else
-	    first_linestyle = new_linestyle;	/* make it start of list */
+	    *head = new_linestyle;	/* make it start of list */
 	new_linestyle->tag = tag;
 	new_linestyle->next = this_linestyle;
 	new_linestyle->lp_properties = loc_lp;
@@ -4762,15 +4765,15 @@ set_linestyle()
     }
 
     if (almost_equals(c_token, "def$ault")) {
-	delete_linestyle(&first_linestyle, prev_linestyle, this_linestyle);
+	delete_linestyle(head, prev_linestyle, this_linestyle);
 	c_token++;
     } else
 	/* pick up a line spec; dont allow ls, do allow point type */
 	lp_parse(&this_linestyle->lp_properties, FALSE, TRUE);
 
     if (!END_OF_COMMAND)
-	int_error(c_token,"Extraneous arguments to set style line");
-
+	int_error(c_token,"Extraneous arguments to set %s",
+		head == &first_perm_linestyle ? "linetype" : "style line");
 }
 
 /*

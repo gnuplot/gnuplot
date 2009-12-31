@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.175 2009/10/08 20:13:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.176 2009/10/17 22:56:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1413,6 +1413,8 @@ eval_3dplots()
 	    /* user may prefer explicit line styles */
 	    if (prefer_line_styles)
 		lp_use_properties(&this_plot->lp_properties, line_num+1);
+	    else
+		load_linetype(&this_plot->lp_properties, line_num+1);
 
 	    /* pm 25.11.2001 allow any order of options */
 	    while (!END_OF_COMMAND || !checked_once) {
@@ -1583,6 +1585,8 @@ eval_3dplots()
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
 			lp_use_properties(&lp, line_num+1);
+		    else if (first_perm_linestyle)
+			load_linetype(&lp, line_num+1);
 
  		    lp_parse(&lp, TRUE,
 			     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
@@ -1644,6 +1648,8 @@ eval_3dplots()
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
 			lp_use_properties(&this_plot->lp_properties, line_num+1);
+		    else
+			load_linetype(&this_plot->lp_properties, line_num+1);
 
 		    lp_parse(&this_plot->lp_properties, TRUE,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);

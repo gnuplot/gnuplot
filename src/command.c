@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.185 2009/12/05 21:57:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.186 2009/12/20 21:32:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1645,13 +1645,13 @@ title 'R,G,B profiles of the current color palette';";
 	fputs("'-'tit'", f);
 	switch (order[i]) {
 	case 'r':
-	    fputs("red'w l lt 1", f);
+	    fputs("red'w l lt 1 lc rgb 'red'", f);
 	    break;
 	case 'g':
-	    fputs("green'w l lt 2", f);
+	    fputs("green'w l lt 2 lc rgb 'green'", f);
 	    break;
 	case 'b':
-	    fputs("blue'w l lt 3", f);
+	    fputs("blue'w l lt 3 lc rgb 'blue'", f);
 	    break;
 	} /* switch(order[i]) */
     } /* for (i) */

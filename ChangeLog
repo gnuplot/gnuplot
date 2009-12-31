@@ -1,3 +1,21 @@
+2009-12-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/gadgets.c src/gadgets.h src/graph3d.c src/graphics.c
+	src/misc.c src/plot2d.c src/plot3d.c src/set.c src/show.c src/tables.c
+	src/tables.h src/term_api.h src/term.c src/unset.c src/util3d.c
+	demo/tango_colors.gp docs/gnuplot.doc:
+
+	Allow the user to redefine the properties of basic linetypes.
+	The redefinitions are persistent; i.e. they are not affected by "reset".
+	The command options are identical to those for "set style line".
+	New command:
+		set linetype N {various line properties}
+		set linetype cycle M
+	
+	The new line colors and widths can be set to cycle after going through
+	M linetypes.  E.g. for M=8, the color of linetypes 9, 17, 25 ... are the
+	same as that of linetype 1.
+
 2009-12-30  Peter Kalinin  <pkalinin@users.sourceforge.net>
 
 	* term/metapost.trm (MP_options):

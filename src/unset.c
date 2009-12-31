@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.128 2009/04/12 22:27:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.129 2009/12/09 05:55:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -84,6 +84,8 @@ static void unset_key __PROTO((void));
 static void unset_keytitle __PROTO((void));
 static void unset_label __PROTO((void));
 static void delete_label __PROTO((struct text_label * prev, struct text_label * this));
+static void unset_linestyle __PROTO((struct linestyle_def **head));
+static void unset_linetype __PROTO((void));
 #ifdef EAM_OBJECTS
 static void unset_object __PROTO((void));
 static void delete_object __PROTO((struct object * prev, struct object * this));
@@ -227,6 +229,9 @@ unset_command()
 	break;
     case S_LABEL:
 	unset_label();
+	break;
+    case S_LINETYPE:
+	unset_linetype();
 	break;
     case S_LOADPATH:
 	unset_loadpath();
@@ -933,6 +938,31 @@ delete_label(struct text_label *prev, struct text_label *this)
     }
 }
 
+static void
+unset_linestyle(struct linestyle_def **head)
+{
+    int tag = int_expression();
+    struct linestyle_def *this, *prev;
+    for (this = *head, prev = NULL; this != NULL; 
+	 prev = this, this = this->next) {
+	if (this->tag == tag) {
+	    delete_linestyle(head, prev, this);
+	    break;
+	}
+    }
+}
+
+static void
+unset_linetype()
+{
+    if (equals(c_token,"cycle")) {
+	linetype_recycle_count = 0;
+	c_token++;
+    }
+    else if (!END_OF_COMMAND)
+	unset_linestyle(&first_perm_linestyle);
+}
+
 #ifdef EAM_OBJECTS
 /* process 'unset rectangle' command */
 static void
@@ -1325,15 +1355,7 @@ unset_style()
 	    while (first_linestyle != NULL)
 		delete_linestyle(&first_linestyle, NULL, first_linestyle);
 	} else {
-	    int tag = int_expression();
-	    struct linestyle_def *this, *prev;
-	    for (this = first_linestyle, prev = NULL; this != NULL; 
-		 prev = this, this = this->next) {
-		if (this->tag == tag) {
-		    delete_linestyle(&first_linestyle, prev, this);
-		    break;
-		}
-	    }
+	    unset_linestyle(&first_linestyle);
 	}
 	break;
     case SHOW_STYLE_FILLING:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.317 2009/12/12 06:46:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.318 2009/12/28 23:57:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1896,6 +1896,8 @@ do_plot(struct curve_points *plots, int pcount)
 		    if (key_entry->text) {
 			if (prefer_line_styles)
 			    lp_use_properties(&this_plot->lp_properties, key_entry->tag + 1);
+			else
+			    load_linetype(&this_plot->lp_properties, key_entry->tag + 1);
 			do_key_sample(this_plot, key, key_entry->text, t, xl, yl);
 		    }
 		    yl = yl - key_entry_height;
@@ -3606,8 +3608,11 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			    struct lp_style_type ls;
 			    lp_use_properties(&ls, histogram_linetype+1);
 			    apply_pm3dcolor(&ls.pm3d_color, term);
-			} else
-			    (*t->linetype)(histogram_linetype);
+			} else {
+			    struct lp_style_type ls;
+			    load_linetype(&ls, i+1);
+			    apply_pm3dcolor(&ls.pm3d_color, term);
+			}
 			plot->fill_properties.fillpattern = histogram_linetype;
 			/* Fall through */
 		    case HT_STACKED_IN_LAYERS:

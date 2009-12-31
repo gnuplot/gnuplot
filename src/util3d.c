@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.35 2008/07/08 04:56:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.36 2009/01/07 22:55:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -989,6 +989,8 @@ draw3d_line_unconditional(
     /* User-specified line styles */
     if (prefer_line_styles && linetype >= 0)
 	lp_use_properties(&ls, linetype+1);
+    else if (first_perm_linestyle)
+	load_linetype(&ls, linetype+1);
 
     /* The usual case of auto-generated line types */
     else

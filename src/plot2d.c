@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.198 2009/12/04 04:43:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.199 2009/12/28 23:57:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1746,7 +1746,7 @@ eval_plots()
 			if (prefer_line_styles)
 			    lp_use_properties(&(this_plot->arrow_properties.lp_properties), line_num+1);
 			else
-			    this_plot->arrow_properties.lp_properties.l_type = line_num;
+			    load_linetype(&(this_plot->arrow_properties.lp_properties), line_num+1);
 		    }
 
 		    arrow_parse(&(this_plot->arrow_properties), TRUE);
@@ -1769,6 +1769,8 @@ eval_plots()
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
 			lp_use_properties(&lp, line_num+1);
+		    else
+			load_linetype(&lp, line_num+1);
 
 		    lp_parse(&lp, TRUE,
 			     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
@@ -1829,7 +1831,7 @@ eval_plots()
 		    if (prefer_line_styles)
 			lp_use_properties(&(this_plot->arrow_properties.lp_properties), line_num+1);
 		    else
-			this_plot->arrow_properties.lp_properties.l_type = line_num;
+			load_linetype(&(this_plot->arrow_properties.lp_properties), line_num+1);
 		    arrow_parse(&this_plot->arrow_properties, TRUE);
 		}
 		this_plot->lp_properties = this_plot->arrow_properties.lp_properties;
@@ -1848,6 +1850,8 @@ eval_plots()
 		/* user may prefer explicit line styles */
 		if (prefer_line_styles)
 		    lp_use_properties(&this_plot->lp_properties, line_num+1);
+		else if (first_perm_linestyle)
+		    load_linetype(&this_plot->lp_properties, line_num+1);
 
 		lp_parse(&this_plot->lp_properties, TRUE,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);
