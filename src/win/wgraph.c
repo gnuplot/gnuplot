@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.72 2009/12/22 21:01:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.73 2009/12/31 01:21:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -216,7 +216,9 @@ static void	drawgraph(LPGW lpgw, HDC hdc, LPRECT rect);
 static void	CopyClip(LPGW lpgw);
 static void	CopyPrint(LPGW lpgw);
 static void	WriteGraphIni(LPGW lpgw);
+#if (0)	/* shige */
 static void	ReadGraphIni(LPGW lpgw);
+#endif
 static COLORREF	GetColor(HWND hwnd, COLORREF ref);
 static void	UpdateColorSample(HWND hdlg);
 static BOOL	LineStyle(LPGW lpgw);
