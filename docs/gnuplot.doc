@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.593 2009/12/28 23:57:54 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.594 2009/12/31 22:28:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1696,6 +1696,18 @@ C ... and restart the table:
 =png
 =wxt
  Sorry, this section is under construction.
+ These terminals find and access fonts using the external fontconfig tool set.
+ Please see the
+^ <a href="http://fontconfig.org/fontconfig-user.html">
+ fontconfig user manual.
+^ </a>
+ It is usually sufficient in gnuplot to request a font by a generic name and
+ size, letting fontconfig substitute a similar font if necessary. The following
+ will probably all work:
+      set term pdfpng font "sans,12"
+      set term pdfpng font "Times,12"
+      set term pdfpng font "Times-New-Roman,12"
+
 3 gd (png, gif, jpeg terminals)
 ?gd
 ?fonts gd
