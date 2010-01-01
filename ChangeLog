@@ -1,3 +1,9 @@
+2010-01-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/PostScript/prologue.ps term/PostScript/prologues.h:
+	Update version in PostScript headers.
+	Define a user-configurable flag SuppressPDFMark.
+
 2009-12-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/gadgets.c src/gadgets.h src/graph3d.c src/graphics.c
