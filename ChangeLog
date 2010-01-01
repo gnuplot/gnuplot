@@ -4,6 +4,10 @@
 	Update version in PostScript headers.
 	Define a user-configurable flag SuppressPDFMark.
 
+	* term/post.trm: Re-arrange stuff in the prolog so that users can either
+	set SuppressPDFMark to true in an individual file or make a permanent
+	change by setting it in the shared prolog file.
+
 2009-12-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/gadgets.c src/gadgets.h src/graph3d.c src/graphics.c

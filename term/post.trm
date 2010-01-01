@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.246 2009/08/26 04:38:27 sfeam Exp $
+ * $Id: post.trm,v 1.247 2009/09/13 17:49:16 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1493,6 +1493,7 @@ PS_common_init(
 /Level1 %s def\n\
 /Rounded %s def\n\
 /ClipToBoundingBox %s def\n\
+/SuppressPDFMark false def\n\
 /TransparentPatterns false def\n\
 /gnulinewidth %.3f def\n\
 /userlinewidth gnulinewidth def\n\
@@ -1513,7 +1514,8 @@ PS_common_init(
 /vpt vpt_ def\n";
 
     static const char GPFAR psi3[] = "\
-Level1 {} {\n\
+Level1 SuppressPDFMark or \n\
+{} {\n\
 /SDict 10 dict def\n\
 systemdict /pdfmark known not {\n\
   userdict /pdfmark systemdict /cleartomark get put\n\
@@ -1597,24 +1599,6 @@ end\n\
 	    PS_HTIC/2.0,		/* half point width */
 	    PS_VTIC/2.0);		/* half point height */
 
-    /* HH: print pdf information interpreted by ghostscript/acrobat */
-    {
-	char *username=getusername();
-	char *username2=PS_escape_string(username,"()\\");
-	char *outstr2=PS_escape_string(outstr,"()\\");
-	fprintf(gppsfile, psi3,
-		outstr2?outstr2:"",
-		gnuplot_version, gnuplot_patchlevel,
-		username2?username2:"", 
-		timedate);
-	if (username)
-	    free(username);
-	if (username2)
-	    free(username2);
-	if (outstr2)
-	    free(outstr2);
-    }
-
     /* HH: Clip to BoundingBox if the corresponding flag is toggled */
     fprintf(gppsfile,"\
 /doclip {\n\
@@ -1670,6 +1654,31 @@ end\n\
     if (uses_fonts) {
 	PS_load_fontfiles(TRUE);
 	PS_RememberFont(ps_params->font);
+    }
+
+    /* This pdfmark has triggered many complaints and bug reports */
+    /* because it causes epslatex (but not pdflatex) to overwrite */
+    /* the actual TeX document title.  We can argue that that is  */
+    /* an epslatex bug rather than a gnuplot bug, but people still*/
+    /* complain.  I have created a flag SuppressPDFMark in the    */
+    /* postscript prolog file that users can toggle to disable it.*/
+
+    /* HH: print pdf information interpreted by ghostscript/acrobat */
+    {
+	char *username=getusername();
+	char *username2=PS_escape_string(username,"()\\");
+	char *outstr2=PS_escape_string(outstr,"()\\");
+	fprintf(gppsfile, psi3,
+		outstr2?outstr2:"",
+		gnuplot_version, gnuplot_patchlevel,
+		username2?username2:"", 
+		timedate);
+	if (username)
+	    free(username);
+	if (username2)
+	    free(username2);
+	if (outstr2)
+	    free(outstr2);
     }
 
     fputs("end\n%%EndProlog\n", gppsfile);
