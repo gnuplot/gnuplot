@@ -1,3 +1,9 @@
+2010-01-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/PostScript/prologue.ps term/PostScript/prologues.h:
+	Update version in PostScript prolog.
+	Define a user-configurable flag SuppressPDFMark.
+
 2009-12-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  More info on font use in wxt and cairo terms.
