@@ -1,5 +1,5 @@
 #
-# $Id: electron.dem,v 1.8 2007/08/12 18:36:02 sfeam Exp $
+# $Id: electron.dem,v 1.9 2008/04/30 04:16:05 sfeam Exp $
 #
 # Electronics demo
 #
@@ -51,14 +51,16 @@ set xlabel "Drain voltage Vd (V)"
 set xrange [0 : 4]
 set ylabel "Drain current Id (mA)"
 set yrange [0 : 5]
-set label "-0.5 Vp" at 4.1,0.625
-set label "-0.25 Vp" at 4.1,1.4
-set label "0" at 4.1,2.5
-set label "Vg = 0.5 Vp" at 4.1,3.9
+set rmargin 12
+set label 1 "-0.5 Vp" at 4.1,0.625
+set label 2 "-0.25 Vp" at 4.1,1.4
+set label 3 "0" at 4.1,2.5
+set label 4 "Vg = 0.5 Vp" at 4.1,3.9
 plot Vg=0.5*Vp,Id(Vd),Vg=0.25*Vp,Id(Vd),Vg=0,Id(Vd),Vg=-0.25*Vp,Id(Vd)
-unset label
 
 pause -1 "Hit return to continue"
+unset label
+unset rmargin
 
 # show off double axes
 
