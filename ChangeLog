@@ -1,3 +1,10 @@
+2010-01-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii): Time format "%s" should be able to
+	handle any numeric input. Convert input of the form   'using ($1)' or
+	'using (f($1))' to a string so that it can be passed to gstrptime().
+	Bug #2899511
+
 2010-01-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps term/PostScript/prologues.h:
