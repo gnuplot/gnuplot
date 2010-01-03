@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.180 2009/12/04 19:38:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.181 2010/01/03 21:59:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1793,6 +1793,19 @@ df_readascii(double v[], int max)
 			   && axis_array[df_axis[output]].is_timedata)
 			timefield = TRUE;
 
+		    if (timefield && (a.type != STRING)
+		    && !strcmp(axis_array[df_axis[output]].timefmt,"%s")) {
+			/* Handle the case of timefmt "%s" which expects a string */
+			/* containing a number. If evaluate_at() above returned a */
+			/* bare number then we must convert it to a sting before  */
+			/* falling through to the usual processing case.          */
+			/* NB: We only accept time values of +/- 10^12 seconds.   */
+			char *timestring = gp_alloc(20,"timestring");
+			sprintf(timestring,"%16.3f",real(&a));
+			a.type = STRING;
+			a.v.string_val = timestring;
+		    }
+
 		    if (a.type == STRING) {
 			/* This string value will get parsed as if it were a data column */
 			/* so put it in quotes to allow embedded whitespace.             */
@@ -1817,16 +1830,7 @@ df_readascii(double v[], int max)
 			gpfree_string(&a);
 		    }
 
-		    else if (timefield) {
-			struct tm tm;
-			char timestring[20];
-			/* This will only work if timefmt is %s. Should we warn? */
-			/* We only recognize time values of +/- 10^12 seconds.   */
-			sprintf(timestring,"%16.3f",real(&a));
-			gstrptime(timestring, axis_array[df_axis[output]].timefmt, &tm);
-			v[output] = (double) gtimegm(&tm);
-
-		    } else
+		    else
 			v[output] = real(&a);
 
 		} else if (column == -2) {

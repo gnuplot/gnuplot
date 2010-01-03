@@ -1,3 +1,10 @@
+2010-01-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii): Further revision to maintain the old
+	behaviour of the string variables demo.  The demo uses a very unusual
+	method to read time strings from the input file, but let's not break
+	it unless necessary.
+
 2010-01-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readascii): Time format "%s" should be able to
