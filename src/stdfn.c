@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.16 2004/07/01 17:10:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.17 2005/07/26 04:24:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -458,5 +458,18 @@ gp_strtod(const char *str, char **endptr)
     return d;
 #else
     return strtod(str,endptr);
+#endif
+}
+
+/* Implement portable generation of a NaN value. */
+
+double
+not_a_number(void)
+{
+#ifdef __MSC__
+	unsigned long lnan[2]={0xffffffff, 0x7fffffff};
+    return *( double* )lnan;
+#else
+	return atof("NaN");
 #endif
 }

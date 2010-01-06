@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.6 2009/12/04 04:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.7 2009/12/04 19:51:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -701,7 +701,7 @@ df_tokenise(char *s)
 		df_column[df_no_cols].good = DF_STRINGDATA;
 	} else if (check_missing(s)) {
 	    df_column[df_no_cols].good = DF_MISSING;
-	    df_column[df_no_cols].datum = atof("NaN");
+	    df_column[df_no_cols].datum = not_a_number();
 	} else {
 	    int used;
 	    int count;
