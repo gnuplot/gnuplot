@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.74 2009/02/15 21:59:03 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.75 2009/09/06 01:59:56 janert Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -874,7 +874,7 @@ update_gpval_variables(int context)
 	/* Permanent copy of user-clobberable variables pi and NaN */
 	fill_gpval_float("GPVAL_pi", M_PI);
 #ifdef HAVE_ISNAN
-	fill_gpval_float("GPVAL_NaN", atof("NaN"));
+	fill_gpval_float("GPVAL_NaN", not_a_number());
 #endif
     }
 

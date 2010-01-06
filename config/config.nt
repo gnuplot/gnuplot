@@ -139,7 +139,7 @@
 /* #undef HAVE_INTTYPES_H */
 
 /* Define to 1 if you have the `isnan' function. */
-/* #undef HAVE_ISNAN */
+#define HAVE_ISNAN 1
 
 /* Define if you use have kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
