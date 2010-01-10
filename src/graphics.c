@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.318 2009/12/28 23:57:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.319 2009/12/31 22:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -50,8 +50,6 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.318 2009/12/28 23:57:54
 #include "misc.h"
 #include "gp_time.h"
 #include "gadgets.h"
-/* FIXME HBB 20010822: this breaks the plan of disentangling graphics
- * and plot2d, because each #include's the other's header: */
 #include "plot2d.h"		/* for boxwidth */
 #include "term_api.h"
 #include "util.h"
@@ -129,6 +127,7 @@ static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int 
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
+static void plot_boxplot __PROTO((struct curve_points * plot));
 
 static void place_labels __PROTO((struct text_label * listhead, int layer, TBOOLEAN clip));
 static void place_arrows __PROTO((int layer));
@@ -2026,6 +2025,10 @@ do_plot(struct curve_points *plots, int pcount)
 		plot_c_bars(this_plot);
 		break;
 
+	    case BOXPLOT:
+		plot_boxplot(this_plot);
+		break;
+
 	    case PM3DSURFACE:
 		int_warn(NO_CARET, "Can't use pm3d for 2d plots");
 		break;
@@ -2066,6 +2069,10 @@ do_plot(struct curve_points *plots, int pcount)
 		(*t->point)(xl + key_point_offset, yl, 6);
 		term_apply_lp_properties(&this_plot->lp_properties);
 	    }
+	    if (this_plot->plot_style == BOXPLOT)
+		;	/* Don't draw a sample point in the key */
+	    else
+
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
 		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize);
@@ -3978,6 +3985,8 @@ plot_f_bars(struct curve_points *plot)
  * EAM Apr 2008 - switch to using empty/fill rather than empty/striped 
  *		  to distinguish whether (open > close)
  * EAM Dec 2009	- allow an optional 6th column to specify width
+ *		  This routine is also used for BOXPLOT, which
+ *		  loads a median value into xhigh
  */
 static void
 plot_c_bars(struct curve_points *plot)
@@ -4053,6 +4062,11 @@ plot_c_bars(struct curve_points *plot)
 	    xlowM = map_x(dxl);
 	    xhighM = map_x(dxr);
 
+	} else if (plot->plot_style == BOXPLOT) {
+	    dxr = (boxwidth_is_absolute && boxwidth > 0) ? boxwidth/2. : 0.25;
+	    xlowM = map_x(x-dxr);
+	    xhighM = map_x(x+dxr);
+
 	} else if (boxwidth < 0.0) {
 	    xlowM = xM - bar_size * tic;
 	    xhighM = xM + bar_size * tic;
@@ -4073,15 +4087,15 @@ plot_c_bars(struct curve_points *plot)
 		}
 	    }
 
-	if (prev == UNDEFINED)
-	    dxl = -dxr;
+	    if (prev == UNDEFINED)
+		dxl = -dxr;
 
-	dxl = x + dxl;
-	dxr = x + dxr;
-	cliptorange(dxr, X_AXIS.min, X_AXIS.max);
-	cliptorange(dxl, X_AXIS.min, X_AXIS.max);
-	xlowM = map_x(dxl);
-	xhighM = map_x(dxr);
+	    dxl = x + dxl;
+	    dxr = x + dxr;
+	    cliptorange(dxr, X_AXIS.min, X_AXIS.max);
+	    cliptorange(dxl, X_AXIS.min, X_AXIS.max);
+	    xlowM = map_x(dxl);
+	    xhighM = map_x(dxr);
 	}
 
 	/* EAM Feb 2007 Force width to be an odd number of pixels */
@@ -4124,7 +4138,7 @@ plot_c_bars(struct curve_points *plot)
 		unsigned int w = (xhighM-xlowM);
 		unsigned int h = (ymax-ymin);
 
-		if (style == FS_EMPTY)
+		if (style == FS_EMPTY && plot->plot_style != BOXPLOT)
 		    style = FS_OPAQUE;
 		(*t->fillbox)(style, x, y, w, h);
 
@@ -4150,8 +4164,8 @@ plot_c_bars(struct curve_points *plot)
 	    }
 
 	/* Some users prefer bars at the end of the whiskers */
-	if (plot->arrow_properties.head == BOTH_HEADS) {
-	    double frac = plot->arrow_properties.head_length;
+	if (plot->arrow_properties.head == BOTH_HEADS || plot->plot_style == BOXPLOT) {
+	    double frac = (plot->plot_style == BOXPLOT) ? 1.0 : plot->arrow_properties.head_length;
 	    unsigned int d = (frac <= 0) ? 0 : (xhighM-xlowM)*(1.-frac)/2.;
 
 	    if (high_inrange) {
@@ -4162,6 +4176,13 @@ plot_c_bars(struct curve_points *plot)
 		(*t->move)   (xlowM+d, ylowM);
 		(*t->vector) (xhighM-d, ylowM);
 	    }
+	}
+
+	/* BOXPLOT wants a median line also, which is stored in xhigh */
+	if (plot->plot_style == BOXPLOT) {
+	    int ymedianM = map_y(plot->points[i].xhigh);
+	    (*t->move)   (xlowM,  ymedianM);
+	    (*t->vector) (xhighM, ymedianM);
 	}
 
 	/* Through 4.2 gnuplot would indicate (open > close) by drawing     */
@@ -4178,6 +4199,144 @@ plot_c_bars(struct curve_points *plot)
 
 	prev = plot->points[i].type;
     }
+}
+
+/* 
+ * Plot the curves in BOXPLOT style
+ */
+int
+compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
+{
+    struct coordinate const *p1 = arg1;
+    struct coordinate const *p2 = arg2;
+
+    if (p1->y > p2->y)
+	return (1);
+    if (p1->y < p2->y)
+	return (-1);
+    return (0);
+}
+
+static void
+plot_boxplot(struct curve_points *plot)
+{
+    int N = plot->p_count;
+    struct coordinate *save_points = plot->points;
+    struct coordinate candle;
+    double median, quartile1, quartile3;
+    double whisker_top, whisker_bot;
+
+    /* Sort the points to find median and quartiles */
+    qsort(plot->points, N, sizeof(struct coordinate), compare_ypoints);
+
+    if ((N & 0x1) == 0)
+	median = 0.5 * (plot->points[N/2].y + plot->points[N/2 + 1].y);
+    else
+	median = plot->points[(N+1)/2].y;
+    if ((N & 0x3) == 0)
+	quartile1 = 0.5 * (plot->points[N/4].y + plot->points[N/4 + 1].y);
+    else
+	quartile1 = plot->points[(N+3)/4].y;
+    if ((N & 0x3) == 0)
+	quartile3 = 0.5 * (plot->points[N - N/4].y + plot->points[N - (N/4 + 1)].y);
+    else
+	quartile3 = plot->points[N - (N+3)/4].y;
+
+    FPRINTF((stderr,"Boxplot: quartile boundaries for %d points: %g %g %g\n",
+		N, quartile1, median, quartile3));
+
+    /* Set the whisker limits based on the user-defined style */
+    if (boxplot_opts.limit_type == 0) {
+	/* Fraction of interquartile range */
+	double whisker_len = boxplot_opts.limit_value * (quartile3 - quartile1);
+	int i;
+	whisker_bot = quartile1 - whisker_len;
+	for (i=0; i<N; i++)
+	    if (plot->points[i].y >= whisker_bot) {
+		whisker_bot = plot->points[i].y;
+		break;
+	    }
+	whisker_top = quartile3 + whisker_len;
+	for (i=N-1; i>= 0; i--)
+	    if (plot->points[i].y <= whisker_top) {
+		whisker_top = plot->points[i].y;
+		break;
+	    }
+
+    } else {
+	/* Set limits to include some fraction of the total number of points. */
+	/* The limits are symmetric about the median, but are truncated to    */
+	/* lie on a point in the data set.                                    */
+	int top = N-1;
+	int bot = 0;
+	while ((double)(top-bot+1)/(double)(N) >= boxplot_opts.limit_value) {
+	    whisker_top = plot->points[top].y;
+	    whisker_bot = plot->points[bot].y;
+	    if (whisker_top - median >= median - whisker_bot) {
+		top--;
+		while (plot->points[top].y == plot->points[top-1].y)
+		    top--;
+	    }
+	    if (whisker_top - median <= median - whisker_bot) {
+		bot++;
+		while (plot->points[bot].y == plot->points[bot+1].y)
+		    bot++;
+	    }
+	}
+    }
+
+    /* Dummy up a single-point candlesticks plot using these limiting values */
+    if (plot->plot_type == FUNC)
+	candle.x = (plot->points[0].x + plot->points[N-1].x) / 2.;
+    else
+	candle.x = plot->points->x;
+    candle.y = quartile1;
+    candle.z = quartile3;
+    candle.ylow  = whisker_bot;
+    candle.yhigh = whisker_top;
+    candle.xlow  = plot->points->xlow;
+    candle.xhigh = median;	/* Crazy order of candlestick parameters! */
+    plot->points = &candle;
+    plot->p_count = 1;
+
+    plot_c_bars( plot );
+
+    plot->points = save_points;
+    plot->p_count = N;
+
+    /* Now draw individual points for the outliers */
+    if (boxplot_opts.outliers) {
+	int i,j,x,y;
+	p_width = pointsize * term->h_tic;
+
+	for (i = 0; i < plot->p_count; i++) {
+
+	    if (plot->points[i].y >= candle.ylow
+	    &&  plot->points[i].y <= candle.yhigh)
+		continue;
+
+	    if (plot->points[i].type != INRANGE)
+		continue;
+
+	    x = map_x(candle.x);
+	    y = map_y(plot->points[i].y);
+	    /* do clipping if necessary */
+		if (clip_points &&
+		      (x < plot_bounds.xleft + p_width
+		    || y < plot_bounds.ybot + p_height
+		    || x > plot_bounds.xright - p_width
+		    || y > plot_bounds.ytop - p_height)) {
+			continue;
+		}
+
+	    /* Separate any duplicate outliers */
+	    for (j=1; (i >= j) && (plot->points[i].y == plot->points[i-j].y); j++)
+		x += p_width * ((j & 1) == 0 ? -j : j);;
+
+	    (term->point) (x, y, plot->lp_properties.p_type);
+	}
+    }
+
 }
 
 

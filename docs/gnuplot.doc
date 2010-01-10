@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.594 2009/12/31 22:28:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.595 2010/01/01 01:16:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2588,6 +2588,39 @@ Ffigure_boxes
            'file4' with boxes fill pattern 1, \
            'file5' with boxes fill empty
 
+2 boxplot
+?plotting styles boxplot
+?style boxplot
+?boxplot
+Ffigure_boxplot
+ Boxplots are a common way to represent a statistical distribution of values.
+ Quartile boundaries are determined such that 1/4 of the points have a value
+ equal or less than the first quartile boundary, 1/2 of the points have a value
+ equal or less than the second quartile (median) value, etc.  A box is drawn
+ around the region between the first and third quartiles, with a horizontal line
+ at the median value.  Whiskers extend from the box to user-specified limits.
+ Points that lie outside these limits are drawn individually.
+
+ Examples
+
+     # Place a boxplot at x coordinate 1.0 representing the y values in column 5
+     plot 'data' using (1.0):5
+
+     # Same plot but suppress outliers and force the width of the boxplot to 0.3
+     set style boxplot nooutliers
+     plot 'data' using (1.0):5:(0.3)
+
+ The default width of the box can be set via `set boxwidth <width>` or may be
+ specified as an optional 3rd column in the `using` clause of the plot command.
+ The first and third columns (x coordinate and width) are normally provided as
+ constants rather than as data columns.
+
+ By default the whiskers extend from the ends of the box to the most distant
+ point whose y value lies within 1.5 times the interquartile range. Outliers are
+ drawn as circles (point type 7).  These default properties may be changed using
+ the `set style boxplot` command.  See `set style boxplot`, `boxwidth`,
+ `fillstyle`, `candlesticks`.
+
 2 boxxyerrorbars
 ?commands set style boxxyerrorbars
 ?set style boxxyerrorbars
@@ -2674,7 +2707,7 @@ Ffigure_candlesticks
    # Plot with crossbars on the whiskers, crossbars are 50% of full width
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
 
- See `set boxwidth`, `set bars` and `set style fill`.
+ See `set boxwidth`, `set bars`, `set style fill`, and `boxplot`.
 2 circles
 ?commands set style circles
 ?set style circles
@@ -6552,7 +6585,7 @@ Ffigure_mapcontours
 ?show boxwidth
 ?boxwidth
  The `set boxwidth` command is used to set the default width of boxes in the
- `boxes`, `boxerrorbars`, `candlesticks` and `histograms` styles.
+ `boxes`, `boxerrorbars`, `boxplot`, `candlesticks` and `histograms` styles.
 
  Syntax:
        set boxwidth {<width>} {absolute|relative}
@@ -10002,6 +10035,44 @@ Ffigure_mapcontours
        set arrow arrowstyle 1
 
  See also `set arrow` for further examples.
+
+4 boxplot
+?commands set style boxplot
+?commands unset style boxplot
+?commands show style boxplot
+?set style boxplot
+?unset style boxplot
+?show style boxplot
+ The `set style boxplot` command allows you to change the layout of plots
+ created using the `boxplot` plot style.
+
+ Syntax:
+       set style boxplot {range <r> | fraction <f>}
+                         {{no}outliers} {pointtype <p>}
+ 
+ The box in the boxplot always spans the range of values from the first
+ quartile to the third quartile of the data points.  The limit of the whiskers
+ that extend from the box can be controlled in two different ways. By default
+ the whiskers extend from each end of the box for a range equal to 1.5 times
+ the interquartile range (i.e. the vertical height of the box proper).
+ Each whisker is truncated back toward the median so that it terminates at a
+ y value belonging to some point in the data set. Since there may be no point
+ whose value is exactly 1.5 times the interquartile distance, the whisker may
+ be shorter than its nominal range.  This default corresponds to 
+       set style boxplot range 1.5
+
+ Alternatively, you can specify the fraction of the total number of points
+ that the whiskers should span.  In this case the range is extended 
+ symmetrically from the median value until it encompasses the requested fraction
+ of the data set.  Here again each whisker is constrained to end at a point in
+ the data set.  To span 95% of the points in the set
+       set style boxplot fraction 0.95
+
+ Any points that lie outside the range of the whiskers are considered outliers.
+ By default these are drawn as individual circles (pointtype 7).  The option
+ `nooutliers` disables this.
+
+ See `boxplot`.
 
 4 set style data
 ?commands set style data

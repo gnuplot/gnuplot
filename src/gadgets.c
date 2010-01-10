@@ -182,6 +182,8 @@ TBOOLEAN prefer_line_styles = FALSE;
 
 histogram_style histogram_opts = DEFAULT_HISTOGRAM_STYLE;
 
+boxplot_style boxplot_opts = DEFAULT_BOXPLOT_STYLE;
+
 /* WINDOWID to be filled by terminals running on X11 (x11, wxt, qt, ...) */
 int current_x11_windowid = 0;
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.226 2009/12/30 21:43:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.227 2009/12/31 22:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1079,7 +1079,8 @@ do_3dplot(
 	    case XYERRORBARS:	/* ignored; treat like points */
 	    case BOXXYERROR:	/* HBB: ignore these as well */
 	    case BOXERROR:
-	    case CANDLESTICKS:	/* HBB: dito */
+	    case CANDLESTICKS:	/* HBB: ditto */
+	    case BOXPLOT:
 	    case FINANCEBARS:
 	    case CIRCLES:
 	    case POINTSTYLE:
@@ -1231,7 +1232,8 @@ do_3dplot(
 		    case XYERRORBARS:	/* ignored; treat like points */
 		    case BOXERROR:	/* HBB: ignore these as well */
 		    case BOXXYERROR:
-		    case CANDLESTICKS:	/* HBB: dito */
+		    case CANDLESTICKS:	/* HBB: ditto */
+		    case BOXPLOT:
 		    case FINANCEBARS:
 		    case CIRCLES:
 		    case POINTSTYLE:
@@ -1299,6 +1301,7 @@ do_3dplot(
 			    case BOXERROR:		/* HBB: treat these likewise */
 			    case BOXXYERROR:
 			    case CANDLESTICKS:	/* HBB: ditto */
+			    case BOXPLOT:
 			    case FINANCEBARS:
 			    case CIRCLES:
 			    case POINTSTYLE:

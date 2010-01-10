@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.305 2009/12/21 19:38:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.306 2009/12/31 22:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -73,6 +73,7 @@ static int assign_arrow_tag __PROTO((void));
 static void set_autoscale __PROTO((void));
 static void set_bars __PROTO((void));
 static void set_border __PROTO((void));
+static void set_boxplot __PROTO((void));
 static void set_boxwidth __PROTO((void));
 static void set_clabel __PROTO((void));
 static void set_clip __PROTO((void));
@@ -945,6 +946,47 @@ set_border()
     /* so remember what he set.  If draw_border is later changed*/
     /* internally, we can still recover the user's preference.	*/
     user_border = draw_border;
+}
+
+
+/* process 'set style boxplot' command */
+static void
+set_boxplot()
+{
+    c_token++;
+    if (END_OF_COMMAND) {
+	boxplot_style defstyle = DEFAULT_BOXPLOT_STYLE;
+	boxplot_opts = defstyle;
+    }
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "noout$liers")) {
+	    boxplot_opts.outliers = FALSE;
+	    c_token++;
+	}
+	else if (almost_equals(c_token, "out$liers")) {
+	    boxplot_opts.outliers = TRUE;
+	    c_token++;
+	}
+	else if (almost_equals(c_token, "point$type") || equals (c_token, "pt")) {
+	    c_token++;
+	    boxplot_opts.pointtype = int_expression()-1;
+	}
+	else if (equals(c_token,"range")) {
+	    c_token++;
+	    boxplot_opts.limit_type = 0;
+	    boxplot_opts.limit_value = real_expression();
+	}
+	else if (almost_equals(c_token,"frac$tion")) {
+	    c_token++;
+	    boxplot_opts.limit_value = real_expression();
+	    if (boxplot_opts.limit_value < 0 || boxplot_opts.limit_value > 1)
+		int_error(c_token-1,"fraction must be less than 1");
+	    boxplot_opts.limit_type = 1;
+	}
+	else
+	    int_error(c_token,"unrecognized option");
+    }
+    
 }
 
 
@@ -3814,6 +3856,9 @@ set_style()
 	else if (almost_equals(c_token,"u$serstyles"))
 	    prefer_line_styles = TRUE;
 	c_token++;
+	break;
+    case SHOW_STYLE_BOXPLOT:
+	set_boxplot();
 	break;
     default:
 	int_error(c_token,

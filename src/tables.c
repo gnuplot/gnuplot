@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.93 2009/12/20 03:53:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.94 2009/12/31 22:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -647,6 +647,7 @@ const struct gen_table show_style_tbl[] =
     { "incr$ement", SHOW_STYLE_INCREMENT },
     { "hist$ogram", SHOW_STYLE_HISTOGRAM },
     { "rect$angle", SHOW_STYLE_RECTANGLE },
+    { "boxplot", SHOW_STYLE_BOXPLOT },
     { NULL, SHOW_STYLE_INVALID }
 };
 
@@ -677,6 +678,7 @@ const struct gen_table plotstyle_tbl[] =
     { "vec$tors", VECTOR },
     { "fin$ancebars", FINANCEBARS },
     { "can$dlesticks", CANDLESTICKS },
+    { "boxplot", BOXPLOT },
     { "pm$3d", PM3DSURFACE },
     { "labels", LABELPOINTS },
     { "ima$ge", IMAGE },

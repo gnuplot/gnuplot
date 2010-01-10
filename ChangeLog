@@ -1,3 +1,12 @@
+2010-01-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/plotstyles.gnu demo/boxplot.dem
+	src/datafile.c src/gadgets.c src/gadgets.h src/gp_types.h
+	src/graph3d.c src/graphics.c src/plot2d.c src/save.c
+	src/set.c src/show.c src/tables.c src/tables.h src/unset.c:
+
+	New plot style "with boxplot" and corresponding "set style boxplot".
+
 2010-01-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.129 2009/12/09 05:55:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.130 2009/12/31 22:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -41,6 +41,7 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.129 2009/12/09 05:55:42 sf
 #include "contour.h"
 #include "datafile.h"
 #include "fit.h"
+#include "gadgets.h"
 #include "gp_hist.h"
 #include "hidden3d.h"
 #include "misc.h"
@@ -62,7 +63,7 @@ static void delete_arrow __PROTO((struct arrow_def *, struct arrow_def *));
 static void unset_autoscale __PROTO((void));
 static void unset_bars __PROTO((void));
 static void unset_border __PROTO((void));
-
+static void unset_boxplot __PROTO((void));
 static void unset_boxwidth __PROTO((void));
 static void unset_fillstyle __PROTO((void));
 static void unset_clabel __PROTO((void));
@@ -640,6 +641,15 @@ unset_border()
     /* this is not the effect as with reset, as the border is enabled,
      * by default */
     draw_border = 0;
+}
+
+
+/* process 'unset style boxplot' command */
+static void
+unset_boxplot()
+{
+    boxplot_style defstyle = DEFAULT_BOXPLOT_STYLE;
+    boxplot_opts = defstyle;
 }
 
 
@@ -1336,6 +1346,7 @@ unset_style()
 	unset_style_rectangle();
 #endif
 	unset_histogram();
+	unset_boxplot();
 	c_token++;
 	return;
     }
@@ -1376,6 +1387,10 @@ unset_style()
 	c_token++;
 	break;
 #endif
+    case SHOW_STYLE_BOXPLOT:
+	unset_boxplot();
+	c_token++;
+	break;
     default:
 	int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
     }
@@ -1649,6 +1664,7 @@ reset_command()
 	reset_logscale(axis);
     }
 
+    unset_boxplot();
     unset_boxwidth();
 
     clip_points = FALSE;

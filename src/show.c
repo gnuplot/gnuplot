@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.230 2009/12/20 03:53:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.231 2009/12/31 22:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -79,6 +79,7 @@ static void show_autoscale __PROTO((void));
 static void show_bars __PROTO((void));
 static void show_border __PROTO((void));
 static void show_boxwidth __PROTO((void));
+static void show_boxplot __PROTO((void));
 static void show_fillstyle __PROTO((void));
 static void show_clip __PROTO((void));
 static void show_contour __PROTO((void));
@@ -1178,6 +1179,24 @@ show_boxwidth()
     }
 }
 
+/* process 'show boxplot' command */
+static void
+show_boxplot()
+{
+    fprintf(stderr, "\tboxplot range extends from the ");
+    if (boxplot_opts.limit_type == 1)
+	fprintf(stderr, "\tmedian to include %5.2f of the points\n",
+		boxplot_opts.limit_value);
+    else
+	fprintf(stderr, "\tbox by %5.2f of the interquartile distance\n",
+		boxplot_opts.limit_value);
+    if (boxplot_opts.outliers)
+	fprintf(stderr, "\t  outliers will be drawn using point type %d\n",
+		boxplot_opts.pointtype+1);
+    else
+	fprintf(stderr,"\t  outliers will not be drawn\n");
+}
+
 
 /* process 'show fillstyle' command */
 static void
@@ -1448,6 +1467,10 @@ show_style()
 	CHECK_TAG_GT_ZERO;
 	show_arrowstyle(tag);
 	break;
+    case SHOW_STYLE_BOXPLOT:
+	show_boxplot();
+	c_token++;
+	break;
     default:
 	/* show all styles */
 	show_styles("Data",data_style);
@@ -1457,6 +1480,7 @@ show_style()
 	show_increment();
 	show_histogram();
 	show_arrowstyle(0);
+	show_boxplot();
 #ifdef EAM_OBJECTS
 	/* Fall through (FIXME: this is ugly) */
     case SHOW_STYLE_RECTANGLE:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.199 2009/12/28 23:57:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.200 2009/12/31 22:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -70,6 +70,7 @@ static void store2d_point __PROTO((struct curve_points *, int i, double x, doubl
 static void eval_plots __PROTO((void));
 static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
 static void box_range_fiddling __PROTO((struct curve_points *plot));
+static void boxplot_range_fiddling __PROTO((struct curve_points *plot));
 static void histogram_range_fiddling __PROTO((struct curve_points *plot));
 
 /* internal and external variables */
@@ -380,6 +381,11 @@ get_data(struct curve_points *current_plot)
 	/* HBB 20060427: signal 3rd and 4th column are absolute y data
 	 * --- needed so time/date parsing works */
 	df_axis[2] = df_axis[3] = df_axis[4] = df_axis[1];
+	break;
+
+    case BOXPLOT:
+	min_cols = 2;		/* fixed x, lots of y data points */
+	max_cols = 3;		/* and an optional width */
 	break;
 
     case CANDLESTICKS:
@@ -753,6 +759,11 @@ get_data(struct curve_points *current_plot)
 				  v[1], v[2], v[2]);
 		    break;
 
+		case BOXPLOT:	/* x, y, width */
+		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2]/2., v[0]+v[2]/2.,
+		    		  v[1], variable_color_value, v[2]);
+		    break;
+
 #ifdef EAM_OBJECTS
 		case CIRCLES:	/* x, y, radius */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
@@ -1026,6 +1037,7 @@ store2d_point(
 	break;
     case BOXES:			/* auto-scale to xlow xhigh */
     case CIRCLES:
+    case BOXPLOT:
 	cp->ylow = y;
 	cp->yhigh = yhigh;	/* really variable_color_data */
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
@@ -1082,6 +1094,28 @@ box_range_fiddling(struct curve_points *plot)
 	    if (axis_array[plot->x_axis].max < xhigh)
 		axis_array[plot->x_axis].max = xhigh;
 	}
+    }
+}
+
+/* Autoscaling of boxplots with no explicit width cuts off the outer edges of the box */ 
+static void
+boxplot_range_fiddling(struct curve_points *plot)
+{
+    double extra_width = plot->points[0].xhigh - plot->points[0].xlow;
+    if (extra_width == 0)
+    	extra_width = (boxwidth > 0 && boxwidth_is_absolute) ? boxwidth : 0.5;
+
+    if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MIN) {
+	if (axis_array[plot->x_axis].min >= plot->points[0].x)
+	    axis_array[plot->x_axis].min -= 1.5 * extra_width;
+	else if (axis_array[plot->x_axis].min >= plot->points[0].x - extra_width)
+	    axis_array[plot->x_axis].min -= 1 * extra_width;
+    }
+    if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MAX) {
+	if (axis_array[plot->x_axis].max <= plot->points[plot->p_count-1].x)
+	    axis_array[plot->x_axis].max += 1.5 * extra_width;
+	else if (axis_array[plot->x_axis].max <= plot->points[plot->p_count-1].x + extra_width)
+	    axis_array[plot->x_axis].max += 1 * extra_width;
     }
 }
 
@@ -1685,6 +1719,7 @@ eval_plots()
 			/* read a possible option for 'with filledcurves' */
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
 		    }
+
 		    if (this_plot->plot_style == IMAGE
 		    ||  this_plot->plot_style == RGBIMAGE
 		    ||  this_plot->plot_style == RGBA_IMAGE)
@@ -1772,6 +1807,9 @@ eval_plots()
 		    else
 			load_linetype(&lp, line_num+1);
 
+		    if (this_plot->plot_style == BOXPLOT)
+			lp.p_type = boxplot_opts.pointtype;
+
 		    lp_parse(&lp, TRUE,
 			     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 		    if (stored_token != c_token) {
@@ -1853,6 +1891,9 @@ eval_plots()
 		else if (first_perm_linestyle)
 		    load_linetype(&this_plot->lp_properties, line_num+1);
 
+		if (this_plot->plot_style == BOXPLOT)
+		    this_plot->lp_properties.p_type = boxplot_opts.pointtype;
+
 		lp_parse(&this_plot->lp_properties, TRUE,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 
@@ -1888,9 +1929,9 @@ eval_plots()
 
 	    }
 
-	    /* Similar argument for check that all fill styles were set */
+	    /* If we got this far without initializing the fill style, do it now */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL) {
-		if (! set_fillstyle)
+		if (!set_fillstyle)
 		    parse_fillstyle(&this_plot->fill_properties,
 				default_fillstyle.fillstyle,
 				default_fillstyle.filldensity,
@@ -2023,6 +2064,8 @@ eval_plots()
 		    histogram_range_fiddling(this_plot);
 		if (this_plot->plot_style == BOXES)
 		    box_range_fiddling(this_plot);
+		if (this_plot->plot_style == BOXPLOT)
+		    boxplot_range_fiddling(this_plot);
 		if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
 		    if (CB_AXIS.autoscale & AUTOSCALE_MIN)
 			CB_AXIS.min = 0;

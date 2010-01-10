@@ -112,6 +112,23 @@ plot '../demo/silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above' l
                '' u 1:2 w lines lt -1 lw 1 title 'curve 1', \
                '' u 1:($3+$1/50.) w lines lt -1 lw 3 title 'curve 2'
 #
+# Boxplot
+# =======
+#
+set output 'figure_boxplot.pdf'
+reset
+set style fill solid 0.25 border -1
+set yrange [-15:165]
+set xrange [0.5:2.0]
+set xtics ("A" 1, "B" 1.5) scale 0
+set ytics nomirror
+set border 2
+set lmargin at screen 0.3
+unset key
+set style data boxplot
+plot '../demo/silver.dat' using (1):2:(.25) ps 0.3, \
+     '' using (1.5):(5*$3):(.25) ps 0.3
+#
 # Dots
 # ====
 #
