@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.305 2009-10-13 09:38:02+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.585
+C RCS $Id: gnuplot-ja.doc,v 1.313 2010-01-04 20:27:15+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.595
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -134,32 +134,35 @@ C Shigeharu Takeno et al (3.7, 4.X)
 2 はじめに (Introduction)
 ?introduction
 ?
- `gnuplot` は、コマンド入力方式の対話的な関数描画プログラムです。
- 書式:
-       gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
+ `gnuplot` は、ポータブルなコマンド入力方式のグラフユーティリティで、
+ Linux, OS/2, MS Windows, OSX, VMS, その他多くのプラットホーム上で動作
+ します。ソースコードには著作権がありますが、無料で配布されています (す
+ なわち、それに対価を支払う必要はありません)。元は、科学者や学生が数学
+ 関数やデータなどを対話的に表示できるよう作られたのですが、現在までに、
+ 例えば Web スクリプトなど、多くの非対話型の利用もサポートするように成
+ 長しています。これは、例えば Octave のようにサードパーティのアプリケー
+ ションの描画エンジンとしても使われています。gnuplot は、1986 よりサポ
+ ートと活発な開発が行われています。
 
- 一般的な X11 オプションは、もしあるならそれを最初に置きます (あなたの
- X11 の説明書を参照; X11 を使わないならここは無視してください)。gnuplot
- に与えるオプションは、そのコマンド行のどこに置くこともできます。ファイ
- ルは指定した順に実行され、同様に -e オプションで任意のコマンドも与える
- ことができます。
+ gnuplot は、2 次元、または 3 次元の、多くの種類のグラフをサポートして
+ います: 折線グラフ、点グラフ、棒グラフ、等高線、ベクトル場描画、曲面、
+ そしてそれらに関連するさまざまな文字列等。そしてさらにいくつかの特別な
+ 描画型もサポートしています。
 
- 例:
-       gnuplot   file1.in   -e "reset"   file2.in
+ gnuplot は多くの異なる出力をサポートしています: 対話型スクリーン出力形
+ 式 (マウスやホットキー入力も可能)、ペンプロッタや現在のプリンタへの直
+ 接出力、または多くのファイル形式への出力 (eps, fig, jpeg, LaTeX,
+ metafont, pbm, pdf, png, postscript, svg, ...)。gnuplot は、容易に新し
+ い出力形式を追加するよう拡張することができます。最近追加された対話型出
+ 力形式には、aquaterm (OSX) や wxWidgets (マルチプラットホーム) を元に
+ したものがあります。
 
- 特別なファイル名 "-" は、標準入力から読ませるのに使います。`gnuplot`
- は最後のファイルを処理し終わると終了します。読み込ませるファイルを一つ
- つも指定しない場合は、`gnuplot` は標準入力からの対話入力を取ります。詳
- 細は、以下参照: `batch/interactive`。gnuplot 用のオプションについては、
- 以下のようにして一覧を見ることができます:
-
-       gnuplot --help
-
- `gnuplot` は、コマンドや関数名は大文字小文字を区別します。いずれのコマ
- ンドも、あいまいさの無い限りにおいて省略することができます。1 行中には
- セミコロン (;) で区切って複数のコマンドを書くことができます。文字列は単
- 一引用符、あるいは二重引用符のどちらかで書き始めますが、両者には微妙な
- 違いがあります (詳細は、以下参照: `syntax`)。例:
+ `gnuplot` のコマンド言語は大文字小文字を区別します。すなわち、小文字で
+ 書かれたコマンドや関数名は、それらを大文字で書いたものとは同じではあり
+ ません。いずれのコマンドも、あいまいさの無い限りにおいて省略することが
+ できます。1 行中にはセミコロン (;) で区切って複数のコマンドを書くこと
+ ができます。文字列は単一引用符、あるいは二重引用符のどちらかで書き始め
+ ますが、両者には微妙な違いがあります (詳細は、以下参照: `syntax`)。例:
 
        load "filename"
        cd 'dir'
@@ -202,42 +205,72 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ^ <a href="http://www.gnuplot.info/demo/">
            http://www.gnuplot.info/demo/
 ^ </a>
+ `gnuplot` はコマンドラインから、あるいはデスクトップ環境のアイコンから
+ 起動することができます。コマンドラインから起動するときは、以下の書式が
+ 使えます。
+       gnuplot {OPTIONS} file1 file2 ...
+ ここで file1, file2 等は、`local` コマンドで取り込むのと同等の入力ファ
+ イル (スクリプトファイル) です。
+ X11 ベースのシステムでは、以下の書式が使えます。
+       gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
+ 詳細は、X11 のドキュメントか、あるいは以下参照: `x11`。
+
+ gnuplot に与えるオプションは、コマンド行のどこに置いても構いません。フ
+ ァイルは指定した順に実行され、同様に -e オプションで任意のコマンドを与
+ えることもできます。例:
+       gnuplot   file1.in   -e "reset"   file2.in
+
+ 特別なファイル名 "-" は、標準入力から読ませるのに使います。`gnuplot`
+ は最後のファイルを処理し終わると終了します。読み込ませるファイルを一つ
+ も指定しない場合は、`gnuplot` は標準入力からの対話入力を取ります。詳細
+ は、以下参照: `batch/interactive`。gnuplot 用のオプションについては、
+ 以下のようにして一覧を見ることができます:
+       gnuplot --help
+ 詳細は以下参照: `command line options`。
+
+ 対話型スクリーン出力形式 (`pm`, `windows`, `wxt`, `x11`) では、'h' を
+ 打つとホットキー (`hotkeys`) とマウス機能 (`mousing`) に関するヘルプが
+ 表示されます。
+
+ `seeking-assistance` のセクションは、さらなる情報やヘルプ、FAQ を探す
+ 手掛りを与えてくれるでしょう。
 2 探し出す手助け (Seeking-assistance)
 ?help-desk
 ?seeking-assistance
 ^ <a name="Seeking-assistance"></a>
- `gnuplot` ユーザのためのメーリングリストがあります。しかし、ニュースグ
- ループ
-       comp.graphics.apps.gnuplot
- は、そのメーリングリストと同等であることに注意してください (どちらにも
- 同じメッセージが流れます)。私達はメーリングリストに参加するより、むし
- ろニュースグループのメッセージを読むことを勧めます。メーリングリストに
- 参加する方法に関しては、SouceForge にある gnuplot の開発 Web サイト
+ 公式の gnuplot Web ページは以下にあります。
+^ <a href="http://www.gnuplot.info">
+           http://www.gnuplot.info
+^ </a>
+
+ 助けを求める前に、ファイル FAQ.pdf か、または上の Web サイトの
+^ <a href="http://www.gnuplot.info/faq/">
+           FAQ (度々聞かれる質問; Frequently Asked Questions) の一覧
+^ </a>
+ をチェックしてください。
+
+ gnuplot ユーザとしての手助けが必要なら、以下のニュースグループを利用し
+ てください。
+           comp.graphics.apps.gnuplot
+ 私達はメーリングリストに参加するより、むしろニュースグループのメッセー
+ ジを読むことを勧めます。メーリングリストも有効で、同じメッセージ列を配
+ 送しています。メーリングリストに参加する方法に関しては、SouceForge に
+ ある gnuplot の開発 Web サイト
 ^ <a href="http://sourceforge.net/projects/gnuplot">
            http://sourceforge.net/projects/gnuplot
 ^ </a>
  を参照してください。
 
  メーリングリストメンバーへのメールアドレス:
-       gnuplot-info@lists.sourceforge.net
+           gnuplot-info@lists.sourceforge.net
 
  バグリポート、ソースの改良等は以下の trackers に upload してください:
-       http://sourceforge.net/projects/gnuplot
+           http://sourceforge.net/projects/gnuplot/support
+ ただし、リポートを送る前に、あなたがリポートしようとしているバグが、よ
+ り新しい gnuplot で既に修正されていないかチェックしてください。
 
- βテスト版に関するメーリングリスト:
-       gnuplot-beta@lists.sourceforge.net
-
- 公式の (そしてたまに更新が遅れることもある) WWW ページもあります。
-
-^ <a href="http://www.gnuplot.info">
-           http://www.gnuplot.info
-^ </a>
-
- 助けを求める前に、次をチェックしてください:
-
-^ <a href="http://www.gnuplot.info/faq/">
-           FAQ (度々聞かれる質問; Frequently Asked Questions) の一覧
-^ </a>
+ 開発版に関するメーリングリスト:
+           gnuplot-beta@lists.sourceforge.net
 
  何か質問を投稿するときは、あなたが使用している `gnuplot` のバージョン、
  実行マシン、オペレーティングシステム、といった全ての情報を含むようにし
@@ -246,7 +279,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  いです。もし、gnuplot-info へメールをするなら、そのメーリングリストの
  購読をしているかどうかを述べてください。そうすれば、ニュースを見たユー
  ザはあなたへの返事をメールで出せば良いことが分かるでしょうから。そのよ
- うな記事のポストの form が WWW サイトにあります。
+ うな記事のポストの form が Web サイトにあります。
 
 2 バージョン 4.5 で導入された新しい機能 (New features)
 ?new-features
@@ -300,7 +333,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
 =polygon
  コマンド `set object` は、現在は固定された長方形だけでなく、円、楕円、
  多角形も定義でき、そして、それに対応する新しい描画スタイル
- `plot with circles` もあります。以下参照: `circle` `ellipse` `polygon`。
+ `plot with circles` もあります。以下参照: `circle`, `ellipse`,
+ `polygon`。
 
 3 新しい/修正された出力形式
  cairo, pango ライブラリによる 2 つの新しいドライバ `pngcairo`,
@@ -366,6 +400,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
 
 2 バッチ/対話型操作 (Batch/Interactive)
 ?batch/interactive
+?command line options
  `gnuplot` は多くのシステム上で、バッチ処理形式、あるいは対話型のどちら
  の形式でも実行でき、それらを組み合わせることも可能です。
 
@@ -1717,6 +1752,19 @@ C ... and restart the table:
 =png
 =wxt
  すみません。このセクションはまだできていません。
+ これらの出力形式は、フォントの検索とアクセスに外部の fontconfig ツール
+ 群を使用します。
+^ <a href="http://fontconfig.org/fontconfig-user.html">
+ fontconfig ユーザマニュアル
+^ </a>
+ を参照してください。これは、gnuplot で一般的な名前やサイズでフォントを
+ 要求することを可能にし、必要ならば fontconfig に同等のフォントを代用さ
+ せることもできるので、通常はこれで十分でしょう。以下は、多分いずれも機
+ 能します:
+      set term pdfpng font "sans,12"
+      set term pdfpng font "Times,12"
+      set term pdfpng font "Times-New-Roman,12"
+
 3 gd (png, gif, jpeg terminals)
 ?gd
 ?fonts gd
@@ -1843,8 +1891,8 @@ C ... and restart the table:
  (訳注: この日本語訳の中ではここに書かれているような用語の統一は考慮さ
  れてはおらず、よって混乱を引き起こす可能性があります。厳密には原文を参
  照すべきでしょう。)
-2 線種、色、スタイル (linetype)
-?linetype
+2 線種、色、スタイル (linetypes)
+?linetypes
 ?colors
  gnuplot の各出力形式は "線種 (linetype)" をある程度用意しています。そ
  れらは色、太さ、点線/破線のパターン、または色と点線/破線の組合せで違い
@@ -1852,10 +1900,16 @@ C ... and restart the table:
  定した (`set terminal`) 後で `test` コマンドを発行することで確認できま
  す。定義されている色、点線/破線のパターンはすべての出力形式で同じもの
  であるという保証は何もありませんが、線種 -1 は特別に全ての出力形式で、
- 最も普通の表示色 (通常は黒) の実線を意味しています。デフォルトでは、一
- つの描画コマンド内での関数やデータファイルの並びには、順番に線種が割り
- 当てられます。そのデフォルトは、関数、データファイル、またはその他の描
- 画要素に個別に線種を指定することで上書きできます。
+ 最も普通の表示色 (通常は黒) の実線を意味しています。
+
+ デフォルトの線種 (linetype) の属性は、対話的か初期化ファイルのいずれか
+ によって再定義可能です。これは、すべての gnuplot 描画コマンドで使用さ
+ れる線の色や他の属性をカスタマイズすることを可能にします。以下参照:
+ `set linetype`。
+
+ デフォルトでは、一つの描画コマンド内での関数やデータファイルの並びには、
+ 順番に線種が割り当てられます。そのデフォルトの順列は、関数、データファ
+ イル、またはその他の描画要素に個別に線種を指定することで上書きできます。
 
  例:
 
@@ -1918,8 +1972,8 @@ C ... and restart the table:
 
  書式:
 
-       ... {linecolor | lc} <colorspec>
-       ... {textcolor | tc} <colorspec>
+       ... {linecolor | lc} {<colorspec> | <n>}
+       ... {textcolor | tc} {<colorspec> | {linetype | lt} <n>}
 
  <colorspec> は以下の形式のいずれかです:
 
@@ -1930,6 +1984,9 @@ C ... and restart the table:
        palette cb <value>      # <val> は cbrange の範囲の値
        palette z
        variable                # 入力ファイルから色番号を読み込む
+
+ <n> は、その線種 (linetype) 番号が使う色を意味します。以下参照:
+ `test`。
 
  "colorname" は gnuplot が内部に持っている色の名前のうちの一つを指定し
  ます。有効な名前の一覧に関しては、以下参照: `show colornames`。
@@ -2019,6 +2076,8 @@ C ... and restart the table:
  す。以下参照: `bind`, `mouse variables`。また以下も参照: `set mouse`。
 3 bind
 ?commands bind
+?hotkey
+?hotkeys
 ?bind
  書式:
        bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
@@ -2114,16 +2173,16 @@ C ... and restart the table:
  以下参照: `x11 command-line-options`。
 3 マウス用の変数 (Mouse variables)
 ?mouse variables
- マウス機能が有効な場合、現在のウィンドウ上でのマウスクリックによって
- gnuplot のコマンドライン上で使うことができる色々なユーザ変数が設定され
- ます。クリック時のマウスの座標は変数 MOUSE_X, MOUSE_Y, MOUSE_X2,
- MOUSE_Y2 に代入されます。クリックされたボタンや、そのときのメタキーの
- 状態は MOUSE_BUTTON, MOUSE_SHIFT, MOUSE_ALT, MOUSE_CTRL に代入されます。
- これらの変数は任意の描画の開始時には未定義で、有効な描画ウィンドウ中で
- のマウスクリックイベントによって初めて定義されます。有効な描画ウィンド
- ウ中でマウスが既にクリックされたかどうかをスクリプトから調べるには、こ
- れらの変数のうちのどれか一つが定義されているかどうかをチェックすれば十
- 分です。
+ `mousing` (マウス機能) が有効な場合、現在のウィンドウ上でのマウスクリ
+ ックによって gnuplot のコマンドライン上で使うことができる色々なユーザ
+ 変数が設定されます。クリック時のマウスの座標は変数 MOUSE_X, MOUSE_Y,
+ MOUSE_X2, MOUSE_Y2 に代入されます。クリックされたボタンや、そのときの
+ メタキーの状態は MOUSE_BUTTON, MOUSE_SHIFT, MOUSE_ALT, MOUSE_CTRL に代
+ 入されます。これらの変数は任意の描画の開始時には未定義で、有効な描画ウ
+ ィンドウ中でのマウスクリックイベントによって初めて定義されます。有効な
+ 描画ウィンドウ中でマウスが既にクリックされたかどうかをスクリプトから調
+ べるには、これらの変数のうちのどれか一つが定義されているかどうかをチェ
+ ックすれば十分です。
 
        plot 'something'
        pause mouse
@@ -2657,6 +2716,10 @@ Ffigure_candlesticks
  長方形の幅はコマンド `set boxwidth` で制御できますが、以前の gnuplot
  への後方互換性として、boxwidth パラメータが設定されていない場合は
  `set bars <width>` で制御されるようになっています。
+
+ これの代わりに、箱ひげ (box-and-whisker) のグループ化に関する明示的な
+ 幅の指定を、追加の 6 番目のデータで指定できます。その幅は、x 座標と同
+ じ単位で与えなければいけません。
 
  デフォルトでは、鉛直線分のてっぺんと底には垂直に交わる水平線は引かれま
  せん。それを引きたい場合、例えば典型的な例は箱ひげ図 (box-and-whisker
@@ -4260,10 +4323,10 @@ Ffigure_mapcontours
  ちます。実行環境が秒以下の時間指定をサポートしていない場合、その時間は
  整数の秒数に丸められます。`pause 0` は `print` と同じです。
 
- 使用している出力形式がマウス機能をサポートしている場合、`pause mouse`
- は、マウスクリックがあるか ctrl-C が押されるまで待つようになります。そ
- うでない出力形式、またはマウス機能が有効になってない場合 `pause mouse`
- は `pause -1` と同じです。
+ 使用している出力形式が `mousing` (マウス機能) をサポートしている場合、
+ `pause mouse` は、マウスクリックがあるか ctrl-C が押されるまで待つよう
+ になります。そうでない出力形式、またはマウス機能が有効になってない場合
+ `pause mouse` は `pause -1` と同じです。
 
  一つ、あるいは複数の終了条件 (endcondition) が `pause mouse` の後に与
  えられた場合、そのうちのどの一つでも pause は終了します。指定できる終
@@ -7208,7 +7271,7 @@ Ffigure_mapcontours
        set dgrid3d {<rows>} {,{<cols>}}
                    { splines |
                      qnorm {<norm>} |
-                     gauss | cauchy | exp | box | hann {<dx>} {,{dy}} }
+                     (gauss | cauchy | exp | box | hann) {<dx>} {,dy} }
        unset dgrid3d
        show dgrid3d
 
@@ -8176,7 +8239,7 @@ Ffigure_mapcontours
  か) を表す数値です。これは、説明に外枠を書き、文字列に制御文字を使う場
  合にだけ有用でしょう。`gnuplot` は外枠の幅を計算するときは、ラベル文字
  列の文字数を単純に数えるだけなので、それを修正するのに使えます。
-3 label
+3 ラベル (label)
 ?commands set label
 ?commands unset label
 ?commands show label
@@ -8323,6 +8386,69 @@ Ffigure_mapcontours
  pm3d を使った 3 次元のカラー曲面上のある点の位置に、その z の値 (この
  場合 5.5) に対応した色を見出し文字列につける場合:
        set label 'text' at 0,0,5.5 tc palette z
+3 線種 (linetype)
+?commands set linetype
+?commands unset linetype
+?commands show linetype
+?set linetype
+?unset linetype
+?show linetype
+?linetype
+ コマンド `set linetype` は各種描画に使用される基本的な線種 (linetype)
+ を再定義することを可能にします。このコマンドのオプションは、
+ "set style line" のものと全く同じです。ラインスタイルと違うところは、
+ `set linetype` による再定義は永続的なことで、これは `reset` の影響を受
+ けません。
+
+ 例えば、線種の 1 と 2 はデフォルトでは赤と緑です。それを以下のように再
+ 定義します:
+
+       set linetype 1 lw 2 lc rgb "blue" pointtype 6
+       set linetype 2 lw 2 lc rgb "forest-green" pointtype 8
+
+ すると lt 1 を使用しているすべてのものが、細い赤線 (lt 1 の以前のデフ
+ ォルト) か太い青線になります。この性質は、lt 1 に基づいて作られた一時
+ 的なラインスタイルの定義のようなものも含んでいます。
+
+ `注意`: このコマンドは gnuplot バージョン 4.5 で新たに導入されたもので、
+ バージョン 4.2 のあいまいなコマンド "set style increment user" に置き
+ 換わるものです。古いコマンドは現在は非推奨です。
+
+ この仕組みは、gnuplot で使用する線種列に対する個人的な好みを設定するの
+ にも使えます。それを行うには、実行時初期化ファイル ~/.gnuplot に、例え
+ ば以下のようなそれ用のコマンド列を追加することをお勧めします:
+
+       if ((GPVAL_VERSION < 4.5) \
+       ||  (!strstrt(GPVAL_COMPILE_OPTIONS,"+USER_LINETYPES"))) \
+           exit
+       set linetype 1 lc rgb "dark-violet" lw 2 pt 0
+       set linetype 2 lc rgb "sea-green"   lw 2 pt 7
+       set linetype 3 lc rgb "cyan"        lw 2 pt 6 pi -1
+       set linetype 4 lc rgb "dark-red"    lw 2 pt 5 pi -1
+       set linetype 5 lc rgb "blue"        lw 2 pt 8
+       set linetype 6 lc rgb "dark-orange" lw 2 pt 3
+       set linetype 7 lc rgb "black"       lw 2 pt 11
+       set linetype 8 lc rgb "goldenrod"   lw 2
+       set linetype cycle 8
+
+ こうすると、あなたが gnuplot を実行する度に線種はこれらの値に初期化さ
+ れます。線種はあなたが好む数だけ初期化できます。再定義しない場合は、そ
+ れはデフォルトの属性を持ち続けます。例えば線種 3 を再定義から外せば、
+ それは青で pt 3, lw 1 となります。なお、サンプルスクリプトの最初の 2,3
+ の行は、古いバージョンの gnuplot ではスキップさせるための保険です。
+
+ 同様のスクリプトファイルで、テーマベースの色選択の定義を行ったり、特定
+ の描画タイプ、あるいは特定の出力形式用に色をカスタマイズしたりすること
+ も可能です。
+
+=cycle
+ コマンド `set linetype cycle 8` は、大きな番号の線種に対しては色や線幅
+ に関するこれらの定義を再利用することを gnuplot に伝えます。すなわち、
+ 線種 (linetype) 9-16, 17-24 等に対しては、これと同じ色、幅の列を使用し
+ ます。ただし、点の属性 (pointtype, pointsize, pointinterval) は、この
+ コマンドの影響は受けません。`unset linetype cycle` はこの機能を無効に
+ します。大きな線種番号の線の属性を明示的に定義した場合は、それは小さい
+ 番号の線種の属性の再利用よりも優先されます。
 
 3 lmargin
 ?commands set lmargin
@@ -8505,6 +8631,7 @@ Ffigure_mapcontours
 ?commands unset mouse
 ?set mouse
 ?unset mouse
+?mousing
 ?mouse
 ?nomouse
  コマンド `set mouse` はマウス機能を有効にします。現在、pm, x11, ggi,
@@ -9599,6 +9726,10 @@ Ffigure_mapcontours
        set palette defined ( 0 0 1 1, 1 1 1 1 )
        set palette defined ( 0 0 1 0, 1 0 1 1, 6 0.8333 1 1, 7 0.8333 0 1)
 
+ MATLAB で使われるデフォルトパレットの近似:
+       set pal defined (1 '#00008f', 8 '#0000ff', 24 '#00ffff', \
+                        40 '#ffff00', 56 '#ff0000', 64 '#800000')
+
  あまり色を使わないパレットを生成するには:
        set palette model RGB maxcolors 4
        set palette defined ( 0 "blue", 1 "green", 2 "yellow", 3 "red" )
@@ -10171,6 +10302,10 @@ Ffigure_mapcontours
 ?commands show style increment
 ?set style increment
 ?show style increment
+ `注意`: このコマンドは非推奨です。代わりに新しいコマンド `set linetype`
+ を使用してください。これは、代用のための一時的な適当な線種を検索するの
+ ではなく、線種自体を再定義します。以下参照: `set linetype`。
+
  書式:
        set style increment {default|userstyles}
        show style increment
@@ -10231,6 +10366,12 @@ Ffigure_mapcontours
  えられたパラメータのみが変更されます。<index> が存在しなければ、指定さ
  れなかった値はデフォルトの値になります。
 
+ このようにつくられるラインスタイルは、デフォルトの型 (線種, 点種) を
+ 別なものに置き換えることはしないので、ラインスタイル、デフォルトの型、
+ どちらも使えます。ラインスタイルは一時的なもので、コマンド `reset` を
+ 実行すればいつでもそれらは消え去ります。線種自体を再定義したい場合は、
+ 以下参照: `set linetype`。
+
  線種と点種は、その index 値をデフォルトとします。その index 値に対する
  実際の記号の形は、出力形式によって異なり得ます。
 
@@ -10245,11 +10386,6 @@ Ffigure_mapcontours
  るようなラインスタイルを定義します。その間隔を負の値にすると、それは間
  隔は正の値の場合と同じですが、点の記号の下になる線を書かないようにしま
  す (出力形式によっては)。
-
- このようにつくられるラインスタイルは、デフォルトの型 (線種, 点種) を
- 別なものに置き換えることはしないので、ラインスタイル、デフォルトの型、
- どちらも使えます。もし、定義したスタイルをデフォルトの線種の代わりに使
- いたい場合は、以下参照: `set style increment`。
 
  全ての出力装置が `linewidth` や `pointsize` をサポートしているわけでは
  ありません。もしサポートされていない場合はそれらのオプションは無視され
@@ -12077,10 +12213,20 @@ Ffigure_mapcontours
  1 つ、または複数の定義済みのユーザ変数を削除します。これは、初期化テス
  トを含むようなスクリプトの状態をリセットするのに便利でしょう。
 
+ 変数名には、最後の文字としてワイルドカード文字 `*` を使うことができま
+ す。ワイルドカード文字が見つかると、それより前の部分で始まるすべての変
+ 数を削除します。これは、共通の接頭語を使っている複数の変数を削除するの
+ に便利でしょう。ただし、ワイルドカード文字は変数名の最後にしか使えない
+ ことに注意してください。`undefine` にワイルドカード文字のみを引数とし
+ て与えた場合は何もしません。
+
  例:
 
        undefine foo foo1 foo2
        if (!exists("foo")) load "initialize.gp"
+
+       bar = 1; bar1 = 2; bar2 = 3
+       undefine bar*                 # 3 つの変数を全部削除
 
 2 unset
 ?commands unset
