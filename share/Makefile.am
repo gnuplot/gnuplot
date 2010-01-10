@@ -9,7 +9,11 @@ appdefaultdir = $(libdir)/X11/app-defaults
 
 APPDEFAULTFILES = Gnuplot
 
+if BUILD_GNUPLOT_X11
 appdefault_DATA = $(APPDEFAULTFILES)
+else
+appdefault_DATA =
+endif
 
 Gnuplot: $(srcdir)/Gnuplot.app-defaults
 	cp -p $(srcdir)/Gnuplot.app-defaults $@
