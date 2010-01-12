@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.248.2.5 2009/11/22 01:34:15 sfeam Exp $
+dnl $Id: configure.in,v 1.248.2.6 2009/11/29 21:59:03 sfeam Exp $
 dnl
 dnl AC_INIT must match the release number
 AC_INIT(gnuplot, 4.4.0-rc1)
@@ -31,9 +31,20 @@ dnl X/Emacs for building lisp packages and creating .texi version of docs
 # If you have an Emacs named "t", then use the full path.
 test x"$EMACS" = xt && EMACS=
 AC_CHECK_PROGS(EMACS, emacs xemacs, no)
-AC_CHECK_PROGS(PLAINTEX, tex, no)
-AC_CHECK_PROGS(LATEX, latex latex2e, no)
-AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
+
+dnl Allow manual specification of tex
+AC_ARG_WITH(latex,[--without-latex         disable latex support, (default enable)],[],[with_latex="yes"])
+if test "$with_latex" = yes; then
+  AC_CHECK_PROGS(PLAINTEX, tex, no)
+  AC_CHECK_PROGS(LATEX, latex latex2e, no)
+  AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
+  test "$PLAINTEX" = "no" -o "$LATEX" = no -o "$PDFLATEX" = "no" && with_latex="no"
+else
+    PLAINTEX="no"
+    LATEX="no"
+    PDFLATEX="no"
+fi
+AM_CONDITIONAL(HAVE_LATEX, test "$with_latex" != no)
 AC_CHECK_PROGS(DVIPS, dvips, no)
 AC_CHECK_PROGS(TROFF, troff, no)
 
@@ -662,7 +673,7 @@ TUTORIAL=tutorial
 AC_ARG_WITH(tutorial,dnl
 [  --without-tutorial      do not build LaTeX tutorial])
 dnl only if latex/2e is found
-if test "$LATEX" = no -o "$with_tutorial" = no ; then
+if test "$with_latex" = no -o "$with_tutorial" = no ; then
   TUTORIAL=notutorial
   with_tutorial=no
 fi
@@ -1377,8 +1388,16 @@ else
   AC_MSG_RESULT([  LaTeX tutorial: no])
 fi
 
-if test "$with_lua" != no; then
-  AC_MSG_RESULT([  TeX *.sty for lua/tikz terminal: yes])
+if test "$with_latex" != no; then
+  AC_MSG_RESULT([  cfg file for epslatex terminal: yes])
+  if test "$with_lua" != no; then
+    AC_MSG_RESULT([  TeX *.sty for lua/tikz terminal: yes])
+  else
+    AC_MSG_RESULT([  TeX *.sty for lua/tikz terminal: no])
+  fi
+else
+  AC_MSG_RESULT([  cfg file for epslatex terminal: no])
+  AC_MSG_RESULT([  TeX *.sty for lua/tikz terminal: no])
 fi
 
 AC_MSG_RESULT([  Help file: yes (always), in $GIHDIR/gnuplot.gih])
