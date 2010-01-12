@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.29 2009/09/17 20:02:39 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.30 2009/10/30 22:15:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -584,16 +584,16 @@ MyVFPrintF(FILE *file, const char *fmt, va_list args)
 
     if (isterm(file)) {
 	char *buf;
-	va_list args_copied;
 
-	va_copy(args_copied, args);
 #ifdef __MSC__
-	count = _vscprintf(fmt, args_copied) + 1;
+	count = _vscprintf(fmt, args) + 1;
 #else
+	va_list args_copied;
+	va_copy(args_copied, args);
 	count = vsnprintf(NULL, 0U, fmt, args_copied) + 1;
 	if (count == 0) count = MAXPRINTF;
-#endif
 	va_end(args_copied);
+#endif
 	buf = (char *)malloc(count * sizeof(char));
 	count = vsnprintf(buf, count, fmt, args);
 	TextPutS(&textwin, buf);

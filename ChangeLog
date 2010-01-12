@@ -1,3 +1,8 @@
+2010-01-12  Alexander Täschner  <taschna@users.sourceforge.net>
+
+	* src/win/winmain.c (MyVFPrintF): Microsoft Visual C does not use
+	va_copy() and va_end().
+
 2010-01-12  <ottxor@users.sourceforge.net>
 
 	* configure.in share/Makefile.am:  Do not install LaTeX support files
