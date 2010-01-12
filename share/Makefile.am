@@ -3,7 +3,9 @@ AUTOMAKE_OPTIONS = foreign 1.2h
                                                                                 
 EXTRA_DIST = Gnuplot.app-defaults
 
+if HAVE_LATEX
 SUBDIRS = LaTeX
+endif
 
 appdefaultdir = $(libdir)/X11/app-defaults
 
