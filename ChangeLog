@@ -8,6 +8,10 @@
 	initialize all fields.
 	Bug #2930705
 
+	* src/plot2d.c (store2d_point): steps, fsteps, and histeps were 
+	incorrectly auto-scaling to yhigh (which is really variable color).
+	Bug #2929314
+
 2010-01-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/plotstyles.gnu demo/boxplot.dem
