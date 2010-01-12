@@ -3,6 +3,11 @@
 	* term/pdf.trm: Always start a new path with a moveto.
 	Bug #2930705
 
+	* src/plot2d.c (eval_plots): In generating points for a function plot,
+	only x and y were guaranteed to be initialized. Now to be safe we
+	initialize all fields.
+	Bug #2930705
+
 2010-01-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/plotstyles.gnu demo/boxplot.dem

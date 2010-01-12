@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.200 2009/12/31 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.201 2010/01/11 04:31:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2289,7 +2289,12 @@ eval_plots()
 			if (undefined || (fabs(imag(&a)) > zero)) {
 			    this_plot->points[i].type = UNDEFINED;
 			    continue;
+			} else {
+			    /* Jan 2010 - initialize all fields! */
+			    memset(&this_plot->points[i], 0, sizeof(struct coordinate));
 			}
+
+
 			temp = real(&a);
 
 			/* width of box not specified */
