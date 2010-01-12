@@ -1,3 +1,8 @@
+2010-01-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm: Always start a new path with a moveto.
+	Bug #2930705
+
 2009-09-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (find_maxl_keys): Ignore key titles that may or may not

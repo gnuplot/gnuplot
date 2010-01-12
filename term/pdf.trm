@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.68.2.8 2008/05/08 20:06:35 sfeam Exp $
+ * $Id: pdf.trm,v 1.68.2.9 2008/12/12 07:14:11 sfeam Exp $
  */
 
 /*------------------------------
@@ -695,7 +695,11 @@ PDF_vector (unsigned int x, unsigned int y)
     if (PDF_pathIsOpen && x == PDF_xLast && y == PDF_yLast)
 	return;
 
-    PDF_PathOpen ();
+    if (!PDF_pathIsOpen) {
+	PDF_PathOpen ();
+	PDF_moveto(myPDF, PDF_xLast, PDF_yLast);
+    }
+
     PDF_lineto(myPDF, x, y);
 
     PDF_xLast = x;
