@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.4 2009/12/04 04:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.5 2009/12/04 19:51:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1006,6 +1006,9 @@ store2d_point(
     case LABELPOINTS:
     case DOTS:
     case IMPULSES:
+    case STEPS:
+    case FSTEPS:
+    case HISTEPS:
 	cp->xlow = xlow;
 	cp->xhigh = xhigh;
 	cp->ylow = ylow;

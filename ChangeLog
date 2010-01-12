@@ -3,6 +3,10 @@
 	* term/pdf.trm: Always start a new path with a moveto.
 	Bug #2930705
 
+	* src/plot2d.c (store2d_point): steps, fsteps, and histeps were
+	incorrectly auto-scaling to yhigh (which is really variable color).
+	Bug #2929314
+
 2010-01-10  <ottxor@users.sourceforge.net>
 
 	* share/Makefile.am:  Do not install x11 appdefaults file if no
