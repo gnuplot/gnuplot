@@ -1,3 +1,7 @@
+2010-03-05  Christoph Junghans (ottxor)
+
+	* src/Makefile.am:  Fix broken target "make clean"
+
 2010-03-04  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* src/svg.trm:  Make sure to reset ENHsvg_string_state after each use.
@@ -249,7 +253,7 @@
 	the environmental variable GNUPLOT_PS_DIR.
 	Bug #2933345
 
-2010-01-15  <ottxor@users.sourceforge.net>
+2010-01-15  Christoph Junghans <ottxor@users.sourceforge.net>
 
 	* configure.in src/Makefile.am demo/Makefile.am.in:
 	"make check" needs help if we did ./configure --program-suffix=FOO

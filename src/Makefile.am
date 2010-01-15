@@ -127,7 +127,7 @@ clean-qt-extra:
 clean-demo:
 	rm -vf $(GNUPLOT_X11)
 
-clean-am: clean-qt-extra clean-demo
+clean-local: clean-qt-extra clean-demo
 
 # Qt terminal sources
 nodist_gnuplot_SOURCES = moc_QtGnuplotWindow.cpp moc_QtGnuplotApplication.cpp \
