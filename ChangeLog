@@ -1,3 +1,11 @@
+2010-01-15  <ottxor@users.sourceforge.net>
+
+	* configure.in src/Makefile.am demo/Makefile.am.in:
+	"make check" needs help if we did ./configure --program-suffix=FOO
+	In this case make a temporary symlink so that 'make check' can find
+	gnuplot_x11.
+	Bug #2926141
+
 2010-01-12  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	* src/win/winmain.c (MyVFPrintF): Microsoft Visual C does not use

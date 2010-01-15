@@ -120,7 +120,11 @@ endif # HAVE_LRELEASE
 clean-qt-extra:
 	rm -vf moc_*.cpp qrc_*.cpp qrc_*.o ui_*.h qtgnuplot*.qm
 
-clean-am: clean-qt-extra
+# Clean transform gnuplot_x11 for demo
+clean-demo:
+	rm -vf $(GNUPLOT_X11)
+
+clean-am: clean-qt-extra clean-demo
 
 # Qt terminal sources
 nodist_gnuplot_SOURCES = moc_QtGnuplotWindow.cpp moc_QtGnuplotApplication.cpp \

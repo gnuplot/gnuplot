@@ -18,9 +18,17 @@ $(BINARY_FILES): ../src/bf_test
 	@echo Creating binary data files
 	@../src/bf_test
 
+transform = @program_transform_name@
+GNUPLOT_X11 = `echo gnuplot_x11 | sed '$(transform)'`$(EXEEXT)
+
+check-prepare:
+	@if test ! -e "$(top_builddir)/src/$(GNUPLOT_X11)"; then\
+	   $(LN_S) gnuplot_x11 $(top_builddir)/src/$(GNUPLOT_X11); \
+	fi
+
 check-local: check-noninteractive
 
-check-interactive: $(BINARY_FILES)
+check-interactive: check-prepare $(BINARY_FILES)
 	@if test -z "$(GNUTERM)" ; then \
 	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
 	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
@@ -32,7 +40,7 @@ check-interactive: $(BINARY_FILES)
 	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
 	fi
 
-check-noninteractive: $(BINARY_FILES)
+check-noninteractive: check-prepare $(BINARY_FILES)
 	@if test -z "$(GNUTERM)" ; then \
 	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
 	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
