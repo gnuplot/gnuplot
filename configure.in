@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.248.2.6 2009/11/29 21:59:03 sfeam Exp $
+dnl $Id: configure.in,v 1.248.2.7 2010/01/13 03:37:35 sfeam Exp $
 dnl
 dnl AC_INIT must match the release number
 AC_INIT(gnuplot, 4.4.0-rc1)
@@ -24,6 +24,7 @@ AC_PROG_CPP
 AC_C_CONST
 AC_C_INLINE
 AC_C_STRINGIZE
+AC_PROG_LN_S
 
 dnl Various programs
 dnl X/Emacs for building lisp packages and creating .texi version of docs

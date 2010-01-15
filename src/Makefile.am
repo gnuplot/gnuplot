@@ -86,6 +86,11 @@ if BUILD_GPCAIRO
 gnuplot_SOURCES += wxterminal/gp_cairo.c wxterminal/gp_cairo_helpers.c
 endif
 
+clean-demo:
+	rm -vf $(GNUPLOT_X11)
+
+clean-am: clean-demo
+
 ## we don't need COREOBJS, but CORETERM
 ## for the term.o dependencies
 O=o
