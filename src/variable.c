@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.33 2008/03/30 03:27:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.34 2008/06/04 02:38:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -78,6 +78,7 @@ loadpath_handler(int action, char *path)
     /* index pointer, end of loadpath,
      * env section of loadpath, current limit, in that order */
     static char *p, *last, *envptr, *limit;
+    char *psdir;
 
     switch (action) {
     case ACTION_CLEAR:
@@ -148,6 +149,11 @@ loadpath_handler(int action, char *path)
 	    }
 	} else
 	    fputs("\tloadpath is empty\n", stderr);
+
+	if ((psdir = getenv("GNUPLOT_PS_DIR"))) {
+	    fprintf(stderr,"\tenvironmental path for PostScript files: \"%s\"\n",
+		psdir);
+	}
 	break;
     case ACTION_SAVE:
 	/* we don't save the load path taken from the
