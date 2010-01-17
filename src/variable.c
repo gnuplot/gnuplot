@@ -154,6 +154,12 @@ loadpath_handler(int action, char *path)
 	    fprintf(stderr,"\tenvironmental path for PostScript files: \"%s\"\n",
 		psdir);
 	}
+#ifdef GNUPLOT_PS_DIR
+	else {
+	    fprintf(stderr,"\tno GNUPLOT_PS_DIR found in the environment,\n");
+	    fprintf(stderr,"\t    falling back to \"%s\"\n", GNUPLOT_PS_DIR);
+	}
+#endif
 	break;
     case ACTION_SAVE:
 	/* we don't save the load path taken from the
