@@ -1,3 +1,7 @@
+2010-01-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* INSTALL: Add section explaining the libreadline problem on OSX.
+
 2010-01-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/wgraph.c (drawgraph pattern_bitmaps): Synchronize fill
