@@ -1,3 +1,8 @@
+2010-01-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/win/wgraph.c (drawgraph pattern_bitmaps): Synchronize fill
+	patterns of the Windows terminal with other terminals.
+
 2010-01-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/variable.c (loadpath_handler):  Have "show loadpath" should
