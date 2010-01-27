@@ -1,3 +1,7 @@
+2010-01-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/version.c: gnuplot_patchlevel[] should be 0-rc1 not rc1.
+
 2010-01-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* INSTALL: Add section explaining the libreadline problem on OSX.
