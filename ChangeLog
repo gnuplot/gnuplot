@@ -1,3 +1,8 @@
+2010-01-28  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (pause_command): Fix "pause mouse" for gnuplot.exe on
+	Windows.
+
 2010-01-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* INSTALL: Add section explaining the libreadline problem on OSX.
