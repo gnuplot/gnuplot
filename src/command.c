@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.180 2009/02/02 06:10:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.181 2009/02/03 22:26:19 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1164,25 +1164,37 @@ pause_command()
     }
 
     if (sleep_time < 0) {
-#if defined(_Windows) && !defined(WGP_CONSOLE)
-    if (paused_for_mouse && !graphwin.hWndGraph) {
-	if (interactive) { /* cannot wait for Enter in a non-interactive session without the graph window */
-	    char tmp[512];
-	    if (buf) fprintf(stderr,"%s\n", buf);
-	    fgets(tmp, 512, stdin); /* graphical window not yet initialized, wait for any key here */
-	}
-    } else { /* pausing via graphical windows */
-	int tmp = paused_for_mouse;
-	if (buf && paused_for_mouse) fprintf(stderr,"%s\n", buf);
-	if (!Pause(buf)) {
-	    if (!tmp) {
-		bail_to_command_line();
-	    } else {
-		if (!graphwin.hWndGraph) 
-		    bail_to_command_line();
+#if defined(_Windows)
+# ifdef WXWIDGETS
+	if (!strcmp(term->name, "wxt")) {
+	    /* copy of the code below:  !(_Windows || OS2 || _Macintosh) */
+#  ifdef USE_MOUSE
+	    if (term && term->waitforinput)
+		term->waitforinput();
+	    else
+#  endif
+		fgets(buf, sizeof(buf), stdin); /* Hold until CR hit. */
+	} else
+# endif /* _Windows && WXWIDGETS */
+	{
+	    if (paused_for_mouse && !graphwin.hWndGraph) {
+		if (interactive) { /* cannot wait for Enter in a non-interactive session without the graph window */
+		    if (buf) fprintf(stderr,"%s\n", buf);
+		    fgets(buf, sizeof(buf), stdin); /* graphical window not yet initialized, wait for any key here */
+		}
+	    } else { /* pausing via graphical windows */
+		int tmp = paused_for_mouse;
+		if (buf && paused_for_mouse) fprintf(stderr,"%s\n", buf);
+		if (!Pause(buf)) {
+		    if (!tmp) {
+			bail_to_command_line();
+		    } else {
+			if (!graphwin.hWndGraph) 
+			    bail_to_command_line();
+		    }
+		}
 	    }
 	}
-    }
 #elif defined(OS2)
 	if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
 	    int rc;

@@ -1,3 +1,8 @@
+2010-01-28  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (pause_command): Fix "pause mouse" for gnuplot.exe on
+	Windows.
+
 2010-01-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/version.c: gnuplot_patchlevel[] should be 0-rc1 not rc1.
