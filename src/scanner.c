@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.26 2008/05/17 04:09:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.27 2008/05/20 05:57:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -99,6 +99,11 @@ static int t_num;		/* number of token I'm working on */
  *      8.  `           (command substitution: all characters through the
  *                      matching backtic are replaced by the output of
  *                      the contained command, then scanning is restarted.)
+ * EAM Jan 2010:	Bugfix. No rule covered an initial period. This caused
+ *			string concatenation to fail for variables whose first
+ *			character is 'E' or 'e'.  Now we add a 9th rule:
+ *	9.  .		A period may be a token by itself (string concatenation)
+ *			or the start of a decimal number continuing with a digit
  *
  *                      white space between tokens is ignored
  */
@@ -131,13 +136,19 @@ scanner(char **expressionp, size_t *expressionlenp)
 	if (isalpha((unsigned char) expression[current])
 	    || expression[current] == '_') {
 	    SCAN_IDENTIFIER;
-	} else if (isdigit((unsigned char) expression[current])
-		   || expression[current] == '.') {
+	} else if (isdigit((unsigned char) expression[current])) {
 	    token[t_num].is_token = FALSE;
 	    token[t_num].length = get_num(&expression[current]);
 	    current += (token[t_num].length - 1);
-	    if (token[t_num].length == 1 && expression[current] == '.')
-		token[t_num].is_token = TRUE;
+
+	} else if (expression[current] == '.') {
+	    /* Rule 9 */
+	    if (isdigit(expression[current+1])) {
+		token[t_num].is_token = FALSE;
+		token[t_num].length = get_num(&expression[current]);
+		current += (token[t_num].length - 1);
+	    } /* do nothing if the . is a token by itself */
+
 	} else if (expression[current] == LBRACE) {
 	    token[t_num].is_token = FALSE;
 	    token[t_num].l_val.type = CMPLX;
