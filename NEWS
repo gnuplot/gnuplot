@@ -50,6 +50,7 @@ New features, changes and fixes since gnuplot version 4.2
 * FIX 'set datafile binary format=...' was documented, but not implemented
 * FIX enhanced text mode treatment of UTF-8 characters
 * FIX emf terminal enhanced text mode now accepted by Windows programs
+* CHANGE A number that begins with a . must continue with a digit
 * CHANGE syntax of 'set datafile binary' array= and record= options
 * CHANGE 'reset' does not affect locale, encoding, decimalsign settings
 * CHANGE 'set key textcolor rgb variable' will use plot colors for key entries

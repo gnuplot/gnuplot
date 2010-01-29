@@ -1,3 +1,12 @@
+2010-01-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/scanner.c (scanner): There was no scanner rule covering a token
+	starting with '.'. This caused ambiguity in the interpretation of '.E1'.
+	Is it a strange representation of 0, or concatenation of a string
+	variable E1?  Resolve this with a new rule that a number with an initial
+	'.' must continue with a digit.
+	Bugfix
+
 2010-01-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (pause_command): Fix "pause mouse" for gnuplot.exe on
