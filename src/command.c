@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.187 2009/12/31 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.188 2010/01/28 20:19:20 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1144,12 +1144,18 @@ pause_command()
 # ifdef WXWIDGETS
 	if (!strcmp(term->name, "wxt")) {
 	    /* copy of the code below:  !(_Windows || OS2 || _Macintosh) */
-#  ifdef USE_MOUSE
-	    if (term && term->waitforinput)
+	    if (term && term->waitforinput && paused_for_mouse){
+		fprintf(stderr,"%s\n", buf);
 		term->waitforinput();
-	    else
+	    } else {
+#  if defined(WGP_CONSOLE)
+		fprintf(stderr,"%s\n", buf);
+		term->waitforinput();
+#  else /* !WGP_CONSOLE */
+		if (!Pause(buf)) 
+		bail_to_command_line();
 #  endif
-		fgets(buf, sizeof(buf), stdin); /* Hold until CR hit. */
+	    }
 	} else
 # endif /* _Windows && WXWIDGETS */
 	{
@@ -1161,13 +1167,18 @@ pause_command()
 	    } else { /* pausing via graphical windows */
 		int tmp = paused_for_mouse;
 		if (buf && paused_for_mouse) fprintf(stderr,"%s\n", buf);
-		if (!Pause(buf)) {
-		    if (!tmp) {
-			bail_to_command_line();
-		    } else {
-			if (!graphwin.hWndGraph) 
-			    bail_to_command_line();
-		    }
+		if (!tmp) {
+#  if defined(WGP_CONSOLE)
+		    fprintf(stderr,"%s\n", buf);
+		    term->waitforinput(); 
+#  else
+		    if (!Pause(buf)) 
+		       bail_to_command_line();
+#  endif
+		} else {
+		    if (!Pause(buf)) 
+		      if (!graphwin.hWndGraph) 
+		        bail_to_command_line();
 		}
 	    }
 	}
