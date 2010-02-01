@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.181.2.1 2010/01/28 20:20:25 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.181.2.2 2010/01/31 20:29:03 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1145,8 +1145,8 @@ pause_command()
 	sleep_time = real_expression();
 
     if (END_OF_COMMAND) {
-	if (!buf)  /* Can only happen the first time through */
-	    buf = gp_strdup("paused");
+	free(buf); /* remove the previous message */
+	buf = gp_strdup("paused"); /* default message, used in Windows GUI pause dialog */
     } else {
 	free(buf);
 	buf = try_to_get_string();
