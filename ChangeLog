@@ -1,4 +1,9 @@
-2010-01-31  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+2010-02-01  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (pause_command): Use the default message for Windows
+	pause dialog.
+
+2010-01-31  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
 	* src/command.c (pause_command): Fixes for pause on Windows with wxt.
 
