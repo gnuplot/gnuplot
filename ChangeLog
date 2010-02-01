@@ -1,3 +1,8 @@
+2010-02-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm: Fix typo in javascript output.
+	Bug #2943778
+
 2010-02-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (pause_command): Use the default message for Windows
