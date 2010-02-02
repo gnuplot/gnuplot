@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.193 2009/11/04 16:13:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.194 2009/12/31 22:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2076,7 +2076,7 @@ test_term()
     y = ymax_t - key_entry_height;
     (*t->pointsize) (pointsize);
     for (i = -2; y > key_entry_height; i++) {
-	struct lp_style_type ls;
+	struct lp_style_type ls = DEFAULT_LP_STYLE_TYPE;
 	ls.l_width = 1;
 	load_linetype(&ls,i+1);
 	term_apply_lp_properties(&ls);

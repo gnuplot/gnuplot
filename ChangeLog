@@ -1,3 +1,9 @@
+2010-02-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (test_term): Iniitialize linetype structure before loading
+	dynamic linetypes.
+	Bug: points all showed as dots if user linetypes were not defined
+
 2010-02-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm: Fix typo in javascript output.
