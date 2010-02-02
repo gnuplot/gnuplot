@@ -198,6 +198,15 @@ options can have additional arguments:
  o `--with-PACKAGE=DIR' checks for PACKAGE in DIR
 
 
+Linux
+-----
+
+Ubuntu:
+	./configure fails to find lua support because Ubuntu packages it as
+	"lua5.1" rather than "lua".  You can fix this by adding a symlink
+	prior to running ./configure
+	    ln -s /usr/lib/pkgconfig/lua5.1.pc  /usr/lib/pkgconfig/lua.pc
+
 
 Mac OSX
 -------
