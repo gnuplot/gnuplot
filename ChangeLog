@@ -4,6 +4,10 @@
 	dynamic linetypes.
 	Bug: points all showed as dots if user linetypes were not defined
 
+	* src/syscfg.h: Attempt to fix build problem under Sun Studio (no
+	definition for _Bool).
+	Bug #2915835
+
 2010-02-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm: Fix typo in javascript output.
