@@ -1,3 +1,10 @@
+2010-02-02  Christoph Junghans (ottxor)
+
+	* configure.in share/LaTeX/Makefile.am:
+	kpsexpand was used in share/LaTeX/Makefile.am even if it was not
+	installed.  Add --texdir=DIR option to configure
+	Bug #2934829
+
 2010-02-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/syscfg.h: Attempt to fix build problem under Sun Studio (no

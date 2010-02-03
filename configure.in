@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.248.2.7 2010/01/13 03:37:35 sfeam Exp $
+dnl $Id: configure.in,v 1.248.2.8 2010/01/16 07:05:34 sfeam Exp $
 dnl
 dnl AC_INIT must match the release number
 AC_INIT(gnuplot, 4.4.0-rc1)
@@ -49,13 +49,34 @@ AM_CONDITIONAL(HAVE_LATEX, test "$with_latex" != no)
 AC_CHECK_PROGS(DVIPS, dvips, no)
 AC_CHECK_PROGS(TROFF, troff, no)
 
+AC_ARG_WITH(texdir,dnl
+  [  --with-texdir=DIR       where to install latex style files
+                          (default by kpsexpand in subdir PACKAGE)],
+  TEXDIR="$withval",
+  TEXDIR="no")
 dnl Allow manual specification of kpsexpand 
+AC_CHECK_PROGS(KPSEXPAND, kpsexpand, no)
+AC_CHECK_PROGS(TEXHASH, texhash, true)
 AC_ARG_WITH(kpsexpand,dnl
   [--with-kpsexpand        search for kpsexpand at run-time (default disabled)],
   [if test "$withval" = yes; then
+    test "$KPSEXPAND" != "no" || AC_MSG_ERROR(dnl
+      [You tell me to use kpsexpand, but there is no kpsexpand])
     AC_DEFINE(HAVE_KPSEXPAND,1,[ Define if you use have kpsexpand (TeX). ])
   fi])
 
+dnl we only care about texdir if latex is enabled
+if test "$with_latex" = yes; then
+  test "$KPSEXPAND" = "no" -a "$TEXDIR" = "no" && AC_MSG_ERROR(dnl
+    [texdir is not given and there is no kpsexpand, please tell where to install])
+  dnl texdir has priority
+  if test "$TEXDIR" = "no"; then
+    #in the case prefix = NONE us ac_default_prefix
+    TEXDIR="${prefix}"
+    test "x$TEXDIR" = xNONE && TEXDIR=$ac_default_prefix
+    TEXDIR=`$KPSEXPAND $TEXDIR/usr/'$TEXMFLOCAL'/tex/latex/gnuplot |sed "s%^.*share/%$TEXDIR/share/%"`
+  fi
+fi
 dnl X Window System files.
 AC_SUBST(LIBRARIES_FOR_X)
 AC_PATH_XTRA
@@ -1041,6 +1062,7 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION_MAJOR)
 AC_SUBST(VERSION)
 AC_SUBST(GIHDIR)
+AC_SUBST(TEXDIR)
 AC_SUBST(LASERGNU)
 AC_SUBST(LINUXSUID)
 AC_SUBST(TERMLIBS)
@@ -1396,6 +1418,8 @@ if test "$with_latex" != no; then
   else
     AC_MSG_RESULT([  TeX *.sty for lua/tikz terminal: no])
   fi
+  AC_MSG_RESULT([  TeX files will be installed in $TEXDIR])
+  AC_MSG_RESULT([                               (use --with-texdir=DIR to change)])
 else
   AC_MSG_RESULT([  cfg file for epslatex terminal: no])
   AC_MSG_RESULT([  TeX *.sty for lua/tikz terminal: no])
