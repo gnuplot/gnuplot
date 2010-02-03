@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.181.2.2 2010/01/31 20:29:03 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.181.2.3 2010/02/01 06:55:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1174,7 +1174,7 @@ pause_command()
 	    } else {
 #  if defined(WGP_CONSOLE)
 		fprintf(stderr,"%s\n", buf);
-		term->waitforinput();
+		while (term->waitforinput() != (int)'\r') {}; /* waiting for Enter*/
 #  else /* !WGP_CONSOLE */
 		if (!Pause(buf)) 
 		bail_to_command_line();
@@ -1194,7 +1194,7 @@ pause_command()
 		if (!tmp) {
 #  if defined(WGP_CONSOLE)
 		    fprintf(stderr,"%s\n", buf);
-		    term->waitforinput(); 
+		    while (term->waitforinput() != (int)'\r') {}; /* waiting for Enter*/
 #  else
 		    if (!Pause(buf)) 
 		       bail_to_command_line();
