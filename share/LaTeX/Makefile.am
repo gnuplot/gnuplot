@@ -7,8 +7,8 @@ tex_DATA = gnuplot.cfg gnuplot-lua-tikz.sty
 texdir = @TEXDIR@
 
 install-data-hook:
-	test -z "$(DESTDIR)" && $(TEXHASH)
+	test -n "$(DESTDIR)" || $(TEXHASH)
 
 uninstall-hook: 
-	test -z "$(DESTDIR)" && $(TEXHASH)
+	test -n "$(DESTDIR)" || $(TEXHASH)
 
