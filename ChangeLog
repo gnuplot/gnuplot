@@ -1,3 +1,8 @@
+2010-02-03  Christoph Junghans (ottxor)
+
+	* share/LaTeX/Makefile.am: Fix a logic error in testing the need
+	to call texhash.
+
 2010-02-03  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
 	* src/command.c (pause_command): Loop of waitforinput() for "pause -1"
