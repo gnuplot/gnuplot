@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.319 2009/12/31 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.320 2010/01/11 04:31:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4230,15 +4230,15 @@ plot_boxplot(struct curve_points *plot)
     qsort(plot->points, N, sizeof(struct coordinate), compare_ypoints);
 
     if ((N & 0x1) == 0)
-	median = 0.5 * (plot->points[N/2].y + plot->points[N/2 + 1].y);
+	median = 0.5 * (plot->points[N/2 - 1].y + plot->points[N/2].y);
     else
-	median = plot->points[(N+1)/2].y;
+	median = plot->points[(N-1)/2].y;
     if ((N & 0x3) == 0)
-	quartile1 = 0.5 * (plot->points[N/4].y + plot->points[N/4 + 1].y);
+	quartile1 = 0.5 * (plot->points[N/4 - 1].y + plot->points[N/4].y);
     else
-	quartile1 = plot->points[(N+3)/4].y;
+	quartile1 = plot->points[(N+3)/4 - 1].y;
     if ((N & 0x3) == 0)
-	quartile3 = 0.5 * (plot->points[N - N/4].y + plot->points[N - (N/4 + 1)].y);
+	quartile3 = 0.5 * (plot->points[N - N/4].y + plot->points[N - N/4 - 1].y);
     else
 	quartile3 = plot->points[N - (N+3)/4].y;
 
