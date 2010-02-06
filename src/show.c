@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.231 2009/12/31 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.232 2010/01/11 04:31:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -117,6 +117,7 @@ static void show_decimalsign __PROTO((void));
 static void show_fit __PROTO((void));
 static void show_polar __PROTO((void));
 static void show_print __PROTO((void));
+static void show_psdir __PROTO((void));
 static void show_angles __PROTO((void));
 static void show_samples __PROTO((void));
 static void show_isosamples __PROTO((void));
@@ -352,6 +353,9 @@ show_command()
 	break;
     case S_PRINT:
 	show_print();
+	break;
+    case S_PSDIR:
+	show_psdir();
 	break;
     case S_OBJECT:
 #ifdef EAM_OBJECTS
@@ -814,6 +818,7 @@ show_all()
     show_timefmt();
     show_loadpath();
     show_fontpath();
+    show_psdir();
     show_locale();
     show_zero();
     show_datafile();
@@ -1927,6 +1932,23 @@ show_print()
     SHOW_ALL_NL;
 
     fprintf(stderr, "\tprint output is sent to '%s'\n", print_show_output());
+}
+
+/* process 'show print' command */
+static void
+show_psdir()
+{
+    SHOW_ALL_NL;
+
+    fprintf(stderr, "\tdirectory from 'set psdir': ");
+    fprintf(stderr, "%s\n", PS_psdir ? PS_psdir : "none");
+    fprintf(stderr, "\tenvironment variable GNUPLOT_PS_DIR: ");
+    fprintf(stderr, "%s\n", getenv("GNUPLOT_PS_DIR") ? getenv("GNUPLOT_PS_DIR") : "none");
+#ifdef GNUPLOT_PS_DIR
+    fprintf(stderr, "\tdefault system directory \"%s\"\n", GNUPLOT_PS_DIR);
+#else
+    fprintf(stderr, "\tfall through to built-in defaults\n");
+#endif
 }
 
 

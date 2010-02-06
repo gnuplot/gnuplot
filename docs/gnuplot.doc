@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.595 2010/01/01 01:16:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.596 2010/01/11 04:31:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -667,11 +667,11 @@ C
  GNUPLOT_LIB. The contents of GNUPLOT_FONTPATH are appended to the `fontpath`
  variable, but not saved with the `save` and `save set` commands.
 
- GNUPLOT_PS_DIR is used by the postscript driver to use external prologue
- files. Depending on the build process, gnuplot contains either a builtin
- copy of those files or simply a default hardcoded path. Use this variable
- to test the postscript terminal with custom prologue files. See
- `postscript prologue`.
+ GNUPLOT_PS_DIR is used by the postscript driver to search for external
+ prologue files. Depending on the build process, gnuplot contains either a
+ built-in copy of those files or a default hardcoded path. You can use this
+ variable have the postscript terminal use custom prologue files rather than
+ the default files. See `postscript prologue`.
 2 Expressions
 ?expressions
  In general, any mathematical expression accepted by C, FORTRAN, Pascal, or
@@ -6037,7 +6037,7 @@ Ffigure_mapcontours
 
  The following are _not_ affected by `reset`.
       `set term` `set output` `set loadpath` `set fontpath`
-      `set encoding` `set decimalsign` `set locale`
+      `set encoding` `set decimalsign` `set locale` `set psdir`
 
 =error state
  `reset errors` clears only the error state variables GPVAL_ERRNO and
@@ -9820,6 +9820,21 @@ Ffigure_mapcontours
  "-" means <STDOUT>. The `append` flag causes the file to be opened in append
  mode.  A <filename> starting with "|" is opened as a pipe to the
  <shell_command> on platforms that support piping.
+3 psdir
+?commands set psdir
+?commands show psdir
+?set psdir
+?show psdir
+?psdir
+ The `set psdir <directory>` command controls the search path used by the
+ postscript terminal to find prologue.ps and character encoding files.
+ You can use this mechanism to switch between different sets of
+ locally-customized prolog files.
+ The search order is
+       1) The directory specified by `set psdir`, if any
+       2) The directory specified by environmental variable GNUPLOT_PS_DIR
+       3) A built-in header or one from the default system directory
+       4) Directories set by `set loadpath`
 3 rmargin
 ?commands set rmargin
 ?set rmargin
@@ -10441,8 +10456,7 @@ Ffigure_mapcontours
  give `set terminal` first, because some terminals set a flag which is needed
  in some operating systems.
 
- Several terminals have many additional options.  For example, see `png`,
- or `postscript`.
+ Some terminals have many additional options.
  The options used by a previous invocation `set term <term> <options>` of a
  given `<term>` are remembered, thus subsequent `set term <term>` does
  not reset them.  This helps in printing, for instance, when switching

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.306 2009/12/31 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.307 2010/01/11 04:31:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -124,6 +124,7 @@ static void set_print __PROTO((void));
 static void set_object __PROTO((void));
 static void set_obj __PROTO((int, int));
 #endif
+static void set_psdir __PROTO((void));
 static void set_samples __PROTO((void));
 static void set_size __PROTO((void));
 static void set_style __PROTO((void));
@@ -420,6 +421,9 @@ set_command()
 	    break;
 	case S_PRINT:
 	    set_print();
+	    break;
+	case S_PSDIR:
+	    set_psdir();
 	    break;
 #ifdef EAM_OBJECTS
 	case S_OBJECT:
@@ -2577,6 +2581,19 @@ set_print()
 	int_error(c_token, "expecting filename");
 }
 
+/* process 'set psdir' command */
+static void
+set_psdir()
+{
+    c_token++;
+    if (END_OF_COMMAND) {	/* no file specified */
+	free(PS_psdir);
+	PS_psdir = NULL;
+    } else if ((PS_psdir = try_to_get_string())) {
+	gp_expand_tilde(&PS_psdir);
+    } else
+	int_error(c_token, "expecting filename");
+}
 
 /* process 'set parametric' command */
 static void

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.83 2009/09/13 17:44:20 sfeam Exp $
+ * $Id: term_api.h,v 1.84 2009/12/31 22:28:45 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -355,6 +355,7 @@ extern FILE *gpoutfile;
    for PS, for instance).
 */
 extern FILE *gppsfile;
+extern char *PS_psdir;
 
 extern TBOOLEAN multiplot;
 

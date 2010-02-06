@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.34 2008/06/04 02:38:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.36 2010/01/17 01:25:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -149,17 +149,6 @@ loadpath_handler(int action, char *path)
 	    }
 	} else
 	    fputs("\tloadpath is empty\n", stderr);
-
-	if ((psdir = getenv("GNUPLOT_PS_DIR"))) {
-	    fprintf(stderr,"\tenvironmental path for PostScript files: \"%s\"\n",
-		psdir);
-	}
-#ifdef GNUPLOT_PS_DIR
-	else {
-	    fprintf(stderr,"\tno GNUPLOT_PS_DIR found in the environment,\n");
-	    fprintf(stderr,"\t    falling back to \"%s\"\n", GNUPLOT_PS_DIR);
-	}
-#endif
 	break;
     case ACTION_SAVE:
 	/* we don't save the load path taken from the

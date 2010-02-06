@@ -1,3 +1,14 @@
+2010-02-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* NEWS docs/gnuplot.doc src/save.c src/set.c src/show.c src/tables.c
+	src/tables.h src/term_api.h src/unset.c src/variable.c term/post.trm:
+
+	Revise the search order for PostScript prologue files
+	1) directory given by 'set psdir' [new command]
+	2) directory given by environmental variable GNUPLOT_PS_DIR
+	3) built-in header if present, otherwise default system directory
+	4) loadpath [pretty useless, but that's what it did before]
+
 2010-02-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxplot): Fix off-by-one error in calculating

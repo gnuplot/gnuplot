@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.130 2009/12/31 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.131 2010/01/11 04:31:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -120,6 +120,7 @@ static void unset_colorbox __PROTO((void));
 static void unset_pointsize __PROTO((void));
 static void unset_polar __PROTO((void));
 static void unset_print __PROTO((void));
+static void unset_psdir __PROTO((void));
 static void unset_samples __PROTO((void));
 static void unset_size __PROTO((void));
 static void unset_style __PROTO((void));
@@ -314,6 +315,9 @@ unset_command()
 	break;
     case S_PRINT:
 	unset_print();
+	break;
+    case S_PSDIR:
+	unset_psdir();
 	break;
 #ifdef EAM_OBJECTS
     case S_OBJECT:
@@ -1224,6 +1228,13 @@ unset_print()
     print_set_output(NULL, FALSE);
 }
 
+/* process 'unset psdir' command */
+static void
+unset_psdir()
+{
+    free(PS_psdir);
+    PS_psdir = NULL;
+}
 
 /* process 'unset parametric' command */
 static void

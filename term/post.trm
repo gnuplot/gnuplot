@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.247 2009/09/13 17:49:16 sfeam Exp $
+ * $Id: post.trm,v 1.248 2010/01/02 07:23:22 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -238,6 +238,7 @@ static void write_gradient_definition __PROTO((gradient_struct *gradient, int cn
 static void write_color_space __PROTO((t_sm_palette *palette));
 static void make_palette_formulae __PROTO((void));
 static void PS_make_header __PROTO((t_sm_palette *palette));
+static void PS_dump_header_to_file __PROTO((char *name));
 
 static float ps_fontsize;
 
@@ -350,6 +351,8 @@ NULL
 #else /* GNUPLOT_PS_DIR */
 # include "PostScript/prologues.h"
 #endif /* GNUPLOT_PS_DIR */
+
+char *PS_psdir = NULL;
 
 /* added to enhpost by Matt Heffron <heffron@falstaff.css.beckman.com> */
 /* moved to post.trm by drd */
@@ -3430,20 +3433,24 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
 }
 
 
-/* First look for the GNUPLOT_PS_DIR environment variable
- * If unsuccessful, look for hardcoded absolute path on UNIX,
- * or hardcoded relative path on Windows and OS2,
- * or files included at compile time. */
+/* Feb 2010 - Search order for prolog and other files 
+ * 1) current setting of "set psdir <dir>"
+ * 2) environmental variable GNUPLOT_PS_DIR
+ * 3) hard-coded path selected at build time
+ * 4) directories in "set loadpath <dirlist>"
+ */
 static FILE *
 PS_open_prologue_file(char *name)
 {
-    char *fullname;
+    char *fullname = NULL;
     char *ps_prologue_dir;
+    char *ps_prologue_env;
     FILE *prologue_fd;
 
-    if ((ps_prologue_dir = getenv("GNUPLOT_PS_DIR")) == NULL) {
+    /* Allocate and load default directory into ps_prologue_dir.　*/
+    /* FIXME:  Why should we have to recalculate this every time? */
 #ifdef GNUPLOT_PS_DIR
-# if defined(_Windows)
+#   if defined(_Windows)
 	/* retrieve prologues path relatively to gnuplot executable,
 	 * whose path is in szModuleName (winmain.c) */
 	ps_prologue_dir = gp_alloc(strlen((char*) szPackageDir)
@@ -3452,7 +3459,7 @@ PS_open_prologue_file(char *name)
 	strcat(ps_prologue_dir, "\\");
 	/* GNUPLOT_PS_DIR is _relative_ path */
 	strcat(ps_prologue_dir, GNUPLOT_PS_DIR);
-# elif defined(OS2)
+#   elif defined(OS2)
 	const ULONG bufsiz = 1024;
 	CHAR exepath[bufsiz];
 	PPIB ppib;
@@ -3476,11 +3483,70 @@ PS_open_prologue_file(char *name)
 	    /* unsucessful to retrieve executable path */
 	    strcpy(ps_prologue_dir,"");
 	}
-# else /* !_Windows && !OS2 */
+#   else /* !_Windows && !OS2 */
 	/* use hardcoded _absolute_ path */
-	ps_prologue_dir = GNUPLOT_PS_DIR;
-# endif
-#else /* using headers included at compile time */
+	ps_prologue_dir = gp_strdup(GNUPLOT_PS_DIR);
+#   endif
+# endif /* system-dependent ps_prologue_dir */
+
+    prologue_fd = NULL;
+    /* First try current setting of "set psdir" */
+    if (PS_psdir) {
+	fullname = gp_alloc(strlen(PS_psdir) + strlen(name) + 4,"Prolog name");
+	strcpy(fullname, PS_psdir);
+	PATH_CONCAT(fullname, name);
+	prologue_fd = fopen(fullname, "r");
+	free(fullname);
+    }
+
+    /* Second try environmental variable GNUPLOT_PS_DIR */
+    if (!prologue_fd && (ps_prologue_env = getenv("GNUPLOT_PS_DIR"))) {
+	fullname = gp_alloc(strlen(ps_prologue_env) + strlen(name) + 4,"Prolog name");
+	strcpy(fullname, ps_prologue_env);
+	PATH_CONCAT(fullname, name);
+	prologue_fd = fopen(fullname, "r");
+	free(fullname);
+    }
+
+#   ifndef GNUPLOT_PS_DIR
+    /* We should have a built-in copy of the headers */
+    if (!prologue_fd) {
+	PS_dump_header_to_file(name);
+	return NULL;
+    }
+#   endif
+
+    /* Third try system default directory */
+    if (!prologue_fd) {
+	fullname = gp_alloc(strlen(ps_prologue_dir) + strlen(name) + 4,"Prolog name");
+	strcpy(fullname, ps_prologue_dir);
+	PATH_CONCAT(fullname, name);
+	prologue_fd = fopen(fullname, "r");
+	free(fullname);
+    }
+
+    free(ps_prologue_dir);
+
+    /* Last-gasp effort: look in loadpath directories */
+    if (!prologue_fd)
+	prologue_fd = loadpath_fopen(name,"r");
+
+    if (!prologue_fd) {
+	fprintf(stderr,"Can't find PostScript prologue file %s\n", name);
+	loadpath_handler(ACTION_SHOW,NULL);
+	fprintf(stderr,"Please copy %s to one of the above directories\n",name);
+	fprintf(stderr,"or set the environmental variable GNUPLOT_PS_DIR\n");
+	fprintf(stderr,"or set the loadpath appropriately\n");
+	int_error(NO_CARET,"Plot failed!");
+    }
+
+    return prologue_fd;
+}
+
+#ifndef GNUPLOT_PS_DIR
+static void
+PS_dump_header_to_file(char *name)
+{
 	const char **dump = NULL;
 	int i;
 
@@ -3510,45 +3576,15 @@ PS_open_prologue_file(char *name)
 	else if (!strcmp(name,"prologue.ps"))
 		dump = prologue_prologue_ps;
 	else
-		int_warn(NO_CARET,"Requested Postscript prologue %s not found",name);
+		int_warn(NO_CARET,"Requested Postscript prologue %s not included in this build of gnuplot",name);
 
 	if (dump) {
 		for (i = 0; dump[i] != NULL; ++i)
 		fprintf(gppsfile, "%s", dump[i]);
 	}
-	return NULL;
-#endif /* GNUPLOT_PS_DIR */
-    }
-
-    fullname = gp_alloc(strlen(ps_prologue_dir) + strlen(name) + 4,"Prolog name");
-    strcpy(fullname,ps_prologue_dir);
-#if defined(_Windows) || defined(OS2)
-    if (fullname[strlen(fullname)-1] != '\\')
-	strcat(fullname,"\\");
-#elif !defined(VMS)
-    if (fullname[strlen(fullname)-1] != '/')
-	strcat(fullname,"/");
-#endif
-    strcat(fullname,name);
-    prologue_fd = fopen(fullname,"r");
-#if defined(_Windows) || defined(OS2)
-    if (getenv("GNUPLOT_PS_DIR") == NULL)
-	free(ps_prologue_dir);
-#endif
-    if (!prologue_fd)
-	prologue_fd = loadpath_fopen(name,"r");
-    if (!prologue_fd) {
-	fprintf(stderr,"Can't find PostScript prologue file %s\n", fullname);
-	loadpath_handler(ACTION_SHOW,NULL);
-	free(fullname);
-	fprintf(stderr,"Please copy %s to one of the above directories\n",name);
-	fprintf(stderr,"or set the loadpath appropriately\n");
-	fprintf(stderr,"or set the environmental variable GNUPLOT_PS_DIR\n");
-	int_error(NO_CARET,"Plot failed!");
-    }
-    free(fullname);
-    return prologue_fd;
 }
+#endif
+
     
 static void
 PS_dump_prologue_file(char *name)
@@ -4253,13 +4289,13 @@ PS_COMMON_DOC1
 "?postscript prologue",
 "?prologue",
 " Each PostScript output file includes a %%Prolog section and possibly some",
-" additional user-defined sections containing, for example, character",
-" encodings. These sections are copied from a set of PostScript prologue files",
-" which are either compiled in the gnuplot executable or stored elsewhere on your",
-" computer. This behaviour and the default directory where these files live are",
-" controlled at the time gnuplot is built. However, you can control this",
-" either by defining an environment variable GNUPLOT_PS_DIR or by using the",
-" gnuplot command `set loadpath`. See `set loadpath`.",
+" additional user-defined sections containing, for example, character encodings.",
+" These sections are copied from a set of PostScript prologue files that are",
+" either compiled into the gnuplot executable or stored elsewhere on your",
+" computer. A default directory where these files live is set at the time",
+" gnuplot is built. However, you can override this default either by using the",
+" gnuplot command `set psdir` or by defining an environment variable",
+" GNUPLOT_PS_DIR. See `set psdir`.",
 "2 postscript adobeglyphnames",
 "?commands set terminal postscript adobeglyphnames",
 "?set terminal postscript adobeglyphnames",
