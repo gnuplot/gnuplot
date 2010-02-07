@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.20 2009/12/20 03:54:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.21 2010/01/01 01:16:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5347,18 +5347,20 @@ Ffigure_mapcontours
 ?xticlabels
 ?using xticlabels
 ?plot using xticlabels
- A column of the input data file can be used to label axis tic marks.
- The format of such a plot command is
+ Axis tick labels can be generated via a string function, usually taking a data
+ column as an argument. The simplest form uses the data column itself as a 
+ string. That is,  xticlabels(N) is shorthand for xticlabels(stringcolumn(N)).
+ This example uses the contents of column 3 as x-axis tick labels.
 
-   plot 'datafile' using <xcol>:<ycol>:xticlabels(<labelcol>) with <plotstyle>
+       plot 'datafile' using <xcol>:<ycol>:xticlabels(3) with <plotstyle>
 
- Tic labels may be read for any of the plot axes: x x2 y y2 z.
+ Axis tick labels may be generated for any of the plot axes: x x2 y y2 z.
  The `ticlabels(<labelcol>)` specifiers must come after all of the data
  coordinate specifiers in the `using` portion of the command.
  For each data point which has a valid set of X,Y[,Z] coordinates,
- the text field found in column <labelcol> is added to the list of xtic labels
- at the same X coordinate as the point it belongs to. `xticlabels(<labelcol>)`
- may be shortened to `xtic(<labelcol>)`.
+ the string value given to xticlabels() is added to the list of xtic labels
+ at the same X coordinate as the point it belongs to. `xticlabels()`
+ may be shortened to `xtic()` and so on.
 
  Example:
 
@@ -5367,6 +5369,14 @@ Ffigure_mapcontours
  In this example the x and y axis tic labels are taken from different columns
  than the x and y coordinate values. The z axis tics, however, are generated
  from the z coordinate of the corresponding point.
+
+ Example:
+
+       plot "data" using 1:2:xtic( $3 > 10. ? "A" : "B" )
+
+ This example shows the use of a string-valued function to generate x-axis
+ tick labels. Each point in the data file generates a tick mark on x labeled
+ either "A" or "B" depending on the value in column 3.
 5 x2ticlabels
 ?using x2ticlabels
 ?plot using x2ticlabels
