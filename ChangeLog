@@ -2,7 +2,7 @@
 
 	* configure.in share/Makefile.am src/Makefile.am src/gplt_x11.c
 	src/variable.c: Configurable X11 application resource path.
-	Bug #2931287
+	Bug #2931287 #219323
 
 2010-02-03  Christoph Junghans (ottxor)
 
