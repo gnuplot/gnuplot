@@ -146,7 +146,8 @@ CLEANFILES = doc2tex gnuplot.tex gnuplot.dvi gnuplot.aux gnuplot.log \
 gnuplot.toc gnuplot.pdf gnuplot.ps gpcard.dvi gpcard.log gpcard.ps alldoc2gih \
 doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.idx gnuplot.ilg gnuplot.ind \
 gnuplot.info* gnuplot.out doc2ipf gnuplot.ipf doc2ms gnuplot.ms doc2rnh \
-gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff checkdoc gnuplot.txt \
+gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff checkdoc gnuplot.txt gnuplot.tmp \
+VERSION gnuplot.4tc gnuplot.4ct gnuplot.idv gnuplot.xref gnuplot.lg \
 figure*.pdf
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
@@ -236,16 +237,16 @@ html: htmldocs/gnuplot.html
 # htmldocs/gnuplot.html: $(srcdir)/gnuplot.texi 
 #	$(MAKEINFO) --html -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
-# TeX itself does a better job these days,
-# and doesn't depend on having emacs around to do lisp pre-processing.
-# However, it does require help finding a set of color names:
-#     setenv RGBDEF /usr/lib/latex2html/styles/rgb.txt
-# Also it messes up on adding html escape sequences to the characters < and >
-# particularly inside the verbatim text segments.  Manual cleanup is necessary.
-#
-htmldocs/gnuplot.html: $(srcdir)/gnuplot.tex
+# requires a working latex2html, which is hard to find these days
+# htmldocs/gnuplot.html: $(srcdir)/gnuplot.tex
+#	mkdir -p htmldocs
+#	latex2html -dir htmldocs -local_icons gnuplot
+
+htmldocs/gnuplot.html: $(srcdir)/gnuplot.dvi
+	rm -f VERSION; ln -s ../VERSION .
+	htlatex gnuplot
 	mkdir -p htmldocs
-	latex2html -dir htmldocs -local_icons gnuplot
+	mv gnuplot.html gnuplot.css gnuplot*.png gnuplot.log htmldocs/
 
 ### PDF documentation
 pdffigures: figures gnuplot.pdf figures

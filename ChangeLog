@@ -1,6 +1,7 @@
 2010-02-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Clarify the documentation for xticlabels().
+	* docs/Makefile.in: Use htlatex to generate html docs
 
 2010-02-07  Christoph Junghans (ottxor)
 
