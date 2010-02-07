@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.202 2010/01/12 21:09:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.203 2010/01/13 03:04:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -926,6 +926,11 @@ images:
 
     }                           /*while */
 
+#if (0) /* This removes extra point caused by blank lines after data. */
+    if (current_plot->points[i-1].type == UNDEFINED)
+	i--;
+#endif
+
     current_plot->p_count = i;
     cp_extend(current_plot, i); /* shrink to fit */
 
@@ -1107,6 +1112,12 @@ boxplot_range_fiddling(struct curve_points *plot)
     double extra_width = plot->points[0].xhigh - plot->points[0].xlow;
     if (extra_width == 0)
     	extra_width = (boxwidth > 0 && boxwidth_is_absolute) ? boxwidth : 0.5;
+
+    /* FIXME:  This is a boxplot-specific kludge to remove any extra, undefined
+     * points at the end of the point list.  A more general fix would be nice.
+     */
+    while (plot->points[plot->p_count-1].type == UNDEFINED)
+	plot->p_count--;
 
     if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MIN) {
 	if (axis_array[plot->x_axis].min >= plot->points[0].x)

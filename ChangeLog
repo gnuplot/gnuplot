@@ -1,3 +1,8 @@
+2010-02-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boxplot_range_fiddling) src/plot2d.c (plot_boxplot):
+	Make boxplot handling ignore any undefined points in the data set.
+
 2010-02-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* NEWS docs/gnuplot.doc src/save.c src/set.c src/show.c src/tables.c

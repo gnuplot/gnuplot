@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.320 2010/01/11 04:31:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.321 2010/02/06 00:04:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4220,14 +4220,24 @@ compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 static void
 plot_boxplot(struct curve_points *plot)
 {
+    int i;
     int N = plot->p_count;
     struct coordinate *save_points = plot->points;
     struct coordinate candle;
     double median, quartile1, quartile3;
     double whisker_top, whisker_bot;
 
+    /* Force any undefined points to the end of the list */
+    for (i=0; i<N; i++)
+	if (plot->points[i].type == UNDEFINED)
+	    plot->points[i].y = VERYLARGE;
+
     /* Sort the points to find median and quartiles */
     qsort(plot->points, N, sizeof(struct coordinate), compare_ypoints);
+
+    /* Remove any undefined points */
+    while (plot->points[N-1].type == UNDEFINED)
+	N--;
 
     if ((N & 0x1) == 0)
 	median = 0.5 * (plot->points[N/2 - 1].y + plot->points[N/2].y);
