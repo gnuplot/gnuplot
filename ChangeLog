@@ -1,3 +1,7 @@
+2010-02-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Clarify the documentation for xticlabels().
+
 2010-02-07  Christoph Junghans (ottxor)
 
 	* configure.in share/Makefile.am src/Makefile.am src/gplt_x11.c
