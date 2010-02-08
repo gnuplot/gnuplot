@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.65.2.3 2009/07/17 18:35:13 sfeam Exp $
+ * $Id: win.trm,v 1.65.2.4 2009/08/26 19:16:13 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -171,6 +171,13 @@ WIN_options()
     char *s;
     TBOOLEAN set_font = FALSE, set_fontsize = FALSE;
     TBOOLEAN set_title=FALSE;
+    /* shige */
+    static int readinit=0;
+
+    if (!readinit){
+	ReadGraphIni(&graphwin);
+	readinit=1;
+    }
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&WIN_opts[0],c_token)) {

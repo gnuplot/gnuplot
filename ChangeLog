@@ -1,3 +1,13 @@
+2010-02-08  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm:
+	Monochrome option of win terminal seems to have no effect.
+	    set term win mono
+	    plot x
+	draws a red line. I think the timing of calling ReadGraphini() is not
+	correct. This should be done only once on first entry before setting
+	the terminal options.
+
 2010-02-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Clarify the documentation for xticlabels().

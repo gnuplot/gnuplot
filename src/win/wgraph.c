@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.5 2009/12/23 04:08:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.6 2010/01/25 07:54:00 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -217,7 +217,9 @@ static void	drawgraph(LPGW lpgw, HDC hdc, LPRECT rect);
 static void	CopyClip(LPGW lpgw);
 static void	CopyPrint(LPGW lpgw);
 static void	WriteGraphIni(LPGW lpgw);
+#if 0 /* shige */
 static void	ReadGraphIni(LPGW lpgw);
+#endif
 static COLORREF	GetColor(HWND hwnd, COLORREF ref);
 static void	UpdateColorSample(HWND hdlg);
 static BOOL	LineStyle(LPGW lpgw);
@@ -366,7 +368,9 @@ GraphInit(LPGW lpgw)
 		RegisterClass(&wndclass);
 	}
 
+#if 0  /* shige */
 	ReadGraphIni(lpgw);
+#endif
 
 	lpgw->hWndGraph = CreateWindow(szGraphClass, lpgw->Title,
 		WS_OVERLAPPEDWINDOW,
@@ -1643,7 +1647,7 @@ WriteGraphIni(LPGW lpgw)
 	return;
 }
 
-static void
+void
 ReadGraphIni(LPGW lpgw)
 {
 	LPSTR file = lpgw->IniFile;
