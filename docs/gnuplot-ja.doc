@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.313 2010-01-04 20:27:15+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.595
+C RCS $Id: gnuplot-ja.doc,v 1.315 2010-02-09 11:17:52+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.598
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -741,12 +741,12 @@ C Shigeharu Takeno et al (3.7, 4.X)
  同じです。GNUPLOT_FONTPATH の値は変数 `fontpath` に追加されますが、そ
  れは `save` や `save set` コマンドでは保存されません。
 
- PostScript ドライバは、外部 (組み込まれていない) 定義ファイルを使うた
+ PostScript ドライバは、外部 (組み込まれていない) 定義ファイルを探すた
  めに環境変数 GNUPLOT_PS_DIR を利用します。インストール時の作業により、
- gnuplot にはそれらのファイルのコピーが組み込まれているか、または単にそ
- れらのファイルのあるデフォルトのパスが埋め込まれるかが変わります。カス
- タマイズした定義ファイルで PostScript 出力をテストする場合はこの環境変
- 数を使ってください。以下参照: `postscript prologue`。
+ gnuplot にはそれらのファイルのコピーが組み込まれているか、または単にデ
+ フォルトのパスが埋め込まれています。この変数は、postscript 出力形式で
+ デフォルトのファイルの代わりにカスタマイズした prologue ファイルを使用
+ するのに利用できます。以下参照: `postscript prologue`。
 2 式 (Expressions)
 ?expressions
  基本的には C, FORTRAN, Pascal, BASIC において利用可能な数学表現を使用
@@ -2669,6 +2669,37 @@ Ffigure_boxes
            'file4' with boxes fill pattern 1, \
            'file5' with boxes fill empty
 
+2 boxplot
+?plotting styles boxplot
+?style boxplot
+?boxplot
+Ffigure_boxplot
+ boxplot は、値の統計的な分布を表現する一般的な方法です。四分位境界は、
+ 1/4 の点が第一四分位境界以下の値を持つように、1/2 の点が第二四分位境界
+ (メジアン) 以下の値を持つように、等と決定されます。第一四分位と第三四
+ 分位の間の領域を囲むように箱を描画し、メジアン値のところには水平線を描
+ きます。箱ひげは、箱からユーザ指定限界まで延長されます。それらの限界の
+ 外にある点は、ひとつひとつ描画されます。
+
+ 例:
+
+     # x 座標は 1.0、y は 5 列目の値のところに boxplot を配置
+     plot 'data' using (1.0):5
+
+     # 上と同じだが、範囲外の点は隠し、boxplot の幅を 0.3 にする
+     set style boxplot nooutliers
+     plot 'data' using (1.0):5:(0.3)
+
+ その箱のデフォルトの幅は `set boxwidth <width>` で設定できますが、plot
+ コマンドの `using` による 3 番目のオプション列でも指定できます。1 番目
+ と 3 番目の列 (x 座標と幅) は通常データ列ではなく定数として与えます。
+
+ デフォルトでは、箱ひげは箱の端から、y の値が四分位範囲の 1.5 倍の中に
+ 収まっていて最も離れているような点まで延長されます。範囲外の点
+ (outliner) は円 (pointtype 7) で描かれます。これらのデフォルトの性質は
+ `set style boxplot` コマンドで変更できます。以下参照:
+ `set style boxplot`, `boxwidth`, `fillstyle`, `candlesticks`.
+
 2 boxxyerrorbars
 ?commands set style boxxyerrorbars
 ?set style boxxyerrorbars
@@ -2754,7 +2785,7 @@ Ffigure_candlesticks
    # ひげの上に水平線を伴う描画で、水平線の幅を全体幅の 50% にする
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
 
- 以下参照: `set boxwidth`, `set bars`, `set style fill`。
+ 以下参照: `set boxwidth`, `set bars`, `set style fill`, `boxplot`。
 2 circles
 ?commands set style circles
 ?set style circles
@@ -5470,18 +5501,20 @@ Ffigure_mapcontours
 ?xticlabels
 ?using xticlabels
 ?plot using xticlabels
- 入力データのある列を軸の刻みのラベルとして使えます。そのような描画コマ
- ンドの書式は以下の通りです。
+ 軸の刻みの見出し (ticlabel) は文字列関数によって作ることもでき、それは
+ 通常は引数としてデータ列から取得します。最も単純な形式は、データ列自身
+ の文字列としての利用で、xticlabels(N) は xticlabels(stringcolumn(N))
+ の省略形として使えます。以下の例は 3 列目の要素を x 軸の刻みの見出しと
+ して使用します。
 
-   plot 'datafile' using <xcol>:<ycol>:xticlabels(<labelcol>) with <plotstyle>
+       plot 'datafile' using <xcol>:<ycol>:xticlabels(3) with <plotstyle>
 
- 目盛りの見出し、任意の描画軸 x,x2,y,y2,z 用に読みだすことができます。
+ 軸の目盛りの見出しは、任意の描画軸 x,x2,y,y2,z 用に生成できます。
  `ticlabels(<labelcol>)` 指定は、`using` 指定の中で、そのデータの座標指
  定が全て済んだ後に行う必要があります。有効な X,Y[,Z] 座標の組を持つ各
- データ点に対して、<labelcol> 列に見つかるテキスト部分は、その点の X 座
- 標と同じ位置の x 軸の刻みのラベルに追加されます。
- `xticlabels(<labelcol>)` は `xtic(<labelcol>)` と省略することもできま
- す。
+ データ点に対して、xticlabels() に与える文字列値は、それに対応する点の
+ x 座標と同じ場所の x 軸の見出しのリストに追加されます。`xticlabels()`
+ は `xtic()` と省略することもでき、他の軸に関しても同様です。
 
  例:
 
@@ -5489,6 +5522,14 @@ Ffigure_mapcontours
 
  この例では、x 軸、y 軸の見出しは x,y 座標値とは別の列から取り出されま
  すが、z 軸の見出しは、対応する点の z 座標値から生成されます。
+
+ 例:
+
+       plot "data" using 1:2:xtic( $3 > 10. ? "A" : "B" )
+
+ この例は、x 軸の見出しの生成に文字列値関数を使用したもので、データファ
+ イルの各点の x 軸の刻みの見出しは、3 列目の値によって "A" か "B" かの
+ いずれかとなります。
 5 x2ticlabels
 ?using x2ticlabels
 ?plot using x2ticlabels
@@ -6141,7 +6182,7 @@ Ffigure_mapcontours
 
  以下のものは、`reset` の影響を受けません。
       `set term` `set output` `set loadpath` `set fontpath`
-      `set encoding` `set decimalsign` `set locale`
+      `set encoding` `set decimalsign` `set locale` `set psdir`
 
 =error state
  `reset errors` は、エラー状態変数 GPVAL_ERRNO と GPVAL_ERRMSG のみをク
@@ -6692,9 +6733,9 @@ Ffigure_mapcontours
 ?set boxwidth
 ?show boxwidth
 ?boxwidth
- コマンド `set boxwidth` は `boxes`, `boxerrorbars`, `candlesticks`,
- `histograms` スタイルにおける棒のデフォルトの幅を設定するために使いま
- す。
+ コマンド `set boxwidth` は `boxes`, `boxerrorbars`, `boxplot`,
+ `candlesticks`, `histograms` スタイルにおける棒のデフォルトの幅を設定
+ するために使います。
 
  書式:
        set boxwidth {<width>} {absolute|relative}
@@ -9955,6 +9996,20 @@ Ffigure_mapcontours
  (append) モードで開くことを意味します。パイプをサポートするプラットホ
  ーム上では、<filename> が "|" で始まっていたら、<shell_command> へのパ
  イプが開かれます。
+3 psdir
+?commands set psdir
+?commands show psdir
+?set psdir
+?show psdir
+?psdir
+ コマンド `set psdir <directory>` は、postscript 出力形式が prologue.ps
+ や文字エンコード用のファイルを探すのに使用する検索パスを制御します。こ
+ の仕組みは、別にローカルにカスタマイズした prolog ファイル群と切り替え
+ るのに使えます。検索の順番は以下のようになっています。
+       1) `set psdir` を指定した場合はそのディレクトリ
+       2) 環境変数 GNUPLOT_PS_DIR で指定したディレクトリ
+       3) 組み込まれたヘッダー、またはデフォルトのシステムディレクトリ
+       4) `set loadpath` で指定したディレクトリ
 3 rmargin
 ?commands set rmargin
 ?set rmargin
@@ -10174,6 +10229,43 @@ Ffigure_mapcontours
        set arrow arrowstyle 1
 
  その他の例については、以下参照: `set arrow`。
+
+4 boxplot
+?commands set style boxplot
+?commands unset style boxplot
+?commands show style boxplot
+?set style boxplot
+?unset style boxplot
+?show style boxplot
+ コマンド `set style boxplot` により、描画スタイル `boxplot` で生成する
+ 描画のレイアウトを変更できます。
+
+ 書式:
+       set style boxplot {range <r> | fraction <f>}
+                         {{no}outliers} {pointtype <p>}
+
+ boxplot の箱は、常にデータ点の第一四分位から第三四分位の値の範囲にかか
+ っています。箱から延長される箱ひげの限界は、2 つの異なる方法で制御でき
+ ます。デフォルトでは、箱ひげは、その箱のそれぞれの端から、四分位範囲の
+ 1.5 倍 (すなわち、その箱の厳密な垂直方向の高さ) に等しい範囲にまで延長
+ されます。箱ひげそれぞれは、データ集合のある点に属する y の値で終了す
+ るように、メジアンに向かって切り捨てられます。四分位範囲の丁度 1.5 倍
+ の値の点がない場合もありますから、箱ひげはその名目上の範囲よりも短くな
+ る場合もあります。このデフォルトは以下に対応します。
+       set style boxplot range 1.5
+
+ もう一つの方法として、箱ひげがかかる点の総数の割合 (fraction) を指定す
+ ることができます。この場合、その範囲はメジアン値から、データ集合の指定
+ した分を囲い込むまで、対称に延長されます。このときも、個々の箱ひげはデ
+ ータ集合内の点の端までに制限されます。データ集合の 95% の点をはるには
+ 以下のようにします。
+       set style boxplot fraction 0.95
+
+ 箱ひげの範囲の外にある任意の点は、outliers と見なされます。デフォルト
+ ではそれらはひとつひとつ円 (pointtype 7) で描かれますが、オプション
+ `nooutliers` はこれを無効にします。
+
+ 以下参照: `boxplot`.
 
 4 set style data
 ?commands set style data
@@ -10547,8 +10639,7 @@ Ffigure_mapcontours
  にする方が安全です。それは、OS によっては、それが必要とするフラグをセ
  ットする出力形式があるからです。
 
- いくつかの出力形式はたくさんの追加オプションを持ちます。例えば、以下参
- 照: `png`, `postscript`。
+ いくつかの出力形式はたくさんの追加オプションを持ちます。
  各 `<term>` に対し、直前の `set term <term> <options>` で使用されたオ
  プションは記憶され、その後の `set term <term>` がそれをリセットするこ
  とはありません。これは例えば印刷時に有用です。幾つかの異なる出力形式を
