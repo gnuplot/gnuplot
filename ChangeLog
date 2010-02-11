@@ -1,3 +1,8 @@
+2010-02-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_boxes): Amazingly old bug that fails to apply 
+	absolute boxwidth in the case where previous point was undefined.
+
 2010-02-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.321 2010/02/06 00:04:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.322 2010/02/07 18:28:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3531,26 +3531,31 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 	case INRANGE:{
 		if (plot->points[i].z < 0.0) {
 		    /* need to auto-calc width */
-		    if (prev != UNDEFINED)
+		    if (prev != UNDEFINED) {
 			if (boxwidth < 0)
 			    dxl = (plot->points[i-1].x - plot->points[i].x) / 2.0;
 			else if (! boxwidth_is_absolute)
 			    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
 			else /* Hits here on 3 column BOXERRORBARS */
 			    dxl = -boxwidth / 2.0;
-		    else
-			dxl = 0.0;
+		    } else {
+			if (boxwidth_is_absolute)
+			    dxl = -boxwidth / 2.0;
+			else
+			    dxl = 0.0;
+		    }
 
 		    if (i < plot->p_count - 1) {
-			if (plot->points[i + 1].type != UNDEFINED)
+			if (plot->points[i + 1].type != UNDEFINED) {
 			    if (boxwidth < 0)
 				dxr = (plot->points[i+1].x - plot->points[i].x) / 2.0;
 			    else if (! boxwidth_is_absolute)
 				dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
 			    else /* Hits here on 3 column BOXERRORBARS */
 				dxr = boxwidth / 2.0;
-			else
+			} else {
 			    dxr = -dxl;
+			}
 		    } else {
 			dxr = -dxl;
 		    }
