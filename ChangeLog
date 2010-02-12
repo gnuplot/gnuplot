@@ -1,3 +1,7 @@
+2010-02-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_obj): Sanity check start and end angles of arc.
+
 2010-02-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxes): Amazingly old bug that fails to apply 
