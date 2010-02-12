@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.299.2.5 2009/12/20 03:54:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.299.2.6 2009/12/21 19:37:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3510,10 +3510,19 @@ set_obj(int tag, int obj_type)
 		} else if (equals(c_token, "arc")) {
 		    /* Start and end angle for arc */
 		    if (equals(++c_token,"[")) {
+			double arc;
 			c_token++;
-			this_circle->arc_begin = real_expression();
+			arc = real_expression();
+			if (fabs(arc) > 1000.)
+			    int_error(c_token-1,"Angle out of range");
+			else
+			    this_circle->arc_begin = arc;
 			if (equals(c_token++, ":")) {
-			    this_circle->arc_end = real_expression();
+			    arc = real_expression();
+			    if (fabs(arc) > 1000.)
+				int_error(c_token-1,"Angle out of range");
+			    else
+				this_circle->arc_end = arc;
 			    if (equals(c_token++,"]"))
 				continue;
 			}
