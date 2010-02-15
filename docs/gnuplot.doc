@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.21 2010/01/01 01:16:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.22 2010/02/08 04:43:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6400,9 +6400,7 @@ Ffigure_mapcontours
 ?set bars
 ?show bars
 ?bars
- The `set bars` command controls the tics at the ends of error bars,
- and also the width of the boxes in plot styles candlesticks and
- financebars.
+ The `set bars` command controls the tics at the ends of error bars.
 
  Syntax:
        set bars {small | large | fullwidth | <size>} {front | back}
