@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.71 2010/02/16 07:08:42 mikulik Exp $
+ * $Id: win.trm,v 1.72 2010/02/16 07:12:52 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -125,7 +125,8 @@ TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiP
 /* Interface routines - create list of actions for Windows */
 
 enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR, WIN_GTITLE,
-	      WIN_ENHANCED, WIN_NOENHANCED, WIN_FONT, WIN_OTHER };
+	      WIN_ENHANCED, WIN_NOENHANCED, WIN_FONT, WIN_SIZE, 
+	      WIN_POSITION, WIN_OTHER };
 
 static struct gen_table WIN_opts[] =
 {
@@ -137,6 +138,8 @@ static struct gen_table WIN_opts[] =
     { "enh$anced", WIN_ENHANCED },
     { "font", WIN_FONT },
     { "ti$tle", WIN_GTITLE },
+    { "siz$e", WIN_SIZE },
+    { "pos$ition", WIN_POSITION },
     { NULL, WIN_OTHER }
 };
 
@@ -196,6 +199,42 @@ WIN_options()
 	    term->flags |= TERM_MONOCHROME;
 	    c_token++;
 	    break;
+	case WIN_SIZE:
+	{
+	    c_token++;
+	    int win_width = 0;
+	    int win_height = 0;
+	    if (END_OF_COMMAND)
+		int_error(c_token,"size requires 'width,heigth'");
+	    win_width = real_expression();
+	    if (!equals(c_token++,","))
+		int_error(c_token,"size requires 'width,heigth'");
+	    win_height = real_expression();
+	    if (win_width < 1 || win_height < 1)
+		int_error(c_token, "size is out of range");
+	    
+	    graphwin.Size.x = win_width;
+	    graphwin.Size.y = win_height + graphwin.statuslineheight;
+	    break;
+	}
+	case WIN_POSITION:
+	{
+	    c_token++;
+	    int win_x = 0;
+	    int win_y = 0;
+	    if (END_OF_COMMAND)
+		int_error(c_token,"position requires 'x,y'");
+	    win_x = real_expression();
+	    if (!equals(c_token++,","))
+		int_error(c_token,"position requires 'x,y'");
+	    win_y = real_expression();
+	    if (win_x < 1 || win_y < 1)
+		int_error(c_token, "position is out of range");
+	    
+	    graphwin.Origin.x = win_x;
+	    graphwin.Origin.y = win_y;
+	    break;
+	}
 	case WIN_COLOR:
 	    graphwin.color = TRUE;
 	    term->flags &= ~TERM_MONOCHROME;
@@ -949,12 +988,18 @@ START_HELP(windows)
 "                            {enhanced | noenhanced}",
 "                            {{font} \"fontname{,fontsize}\" {<fontsize>}}",
 "                            {title \"Plot Window Title\"}",
+"                            {size <width>,<height>}",
+"                            {position <x>,<y>}",
 "",
 " where `color` and `monochrome` select colored or mono output,", 
 " `enhanced` enables enhanced text mode features (subscripts,",
 " superscripts and mixed fonts). See `enhanced` for more information.",
 " `\"<fontname>\"` is the name of a valid Windows font, and `<fontsize>`",
 " is the size of the font in points.",
+" `size` defines the width and height of the window in pixel and `position`",
+" the origin of the window i.e. the position of the top left corner on the",
+" screen (again in pixel). Both these options override the default settings",
+" from the WGNUPLOT.INI file (see below).",
 "",
 " Other options may be set with the graph-menu or the initialization file.",
 "",
