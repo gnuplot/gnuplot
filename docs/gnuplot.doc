@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.597 2010/02/07 06:39:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.598 2010/02/08 04:43:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2616,10 +2616,12 @@ Ffigure_boxplot
  constants rather than as data columns.
 
  By default the whiskers extend from the ends of the box to the most distant
- point whose y value lies within 1.5 times the interquartile range. Outliers are
- drawn as circles (point type 7).  These default properties may be changed using
- the `set style boxplot` command.  See `set style boxplot`, `boxwidth`,
- `fillstyle`, `candlesticks`.
+ point whose y value lies within 1.5 times the interquartile range. By default
+ outliers are drawn as circles (point type 7).  The width of the bars at the
+ end of the whiskers may be controlled using `set bars`.
+ 
+ These default properties may be changed using the `set style boxplot` command.
+ See `set style boxplot`, `bars`, `boxwidth`, `fillstyle`, `candlesticks`.
 
 2 boxxyerrorbars
 ?commands set style boxxyerrorbars
@@ -6437,8 +6439,7 @@ Ffigure_mapcontours
 ?show bars
 ?bars
  The `set bars` command controls the tics at the ends of error bars,
- and also the width of the boxes in plot styles candlesticks and
- financebars.
+ and also at the end of the whiskers belonging to a boxplot.
 
  Syntax:
        set bars {small | large | fullwidth | <size>} {front | back}
@@ -6448,10 +6449,9 @@ Ffigure_mapcontours
  `small` is a synonym for 0.0, and `large` for 1.0.
  The default is 1.0 if no size is given.
 
- The keyword `fullwidth` is relevant only to histograms with errorbars.
- It sets the width of the errorbar ends to be the same as the width of the
- associated box in the histogram.  It does not change the width of the box
- itself.
+ The keyword `fullwidth` is relevant only to boxplots and to histograms with
+ errorbars.  It sets the width of the errorbar ends to be the same as the width
+ of the associated box.  It does not change the width of the box itself.
 
  The `front` and `back` keywords are relevant only to errorbars attached
  to filled rectangles (boxes, candlesticks, histograms).
@@ -10074,6 +10074,7 @@ Ffigure_mapcontours
  Syntax:
        set style boxplot {range <r> | fraction <f>}
                          {{no}outliers} {pointtype <p>}
+                         {candlesticks | financebars}
  
  The box in the boxplot always spans the range of values from the first
  quartile to the third quartile of the data points.  The limit of the whiskers
@@ -10097,7 +10098,10 @@ Ffigure_mapcontours
  By default these are drawn as individual circles (pointtype 7).  The option
  `nooutliers` disables this.
 
- See `boxplot`.
+ By default boxplots are drawn in a style similar to candlesticks, but you have
+ the option of using instead a style similar to finance bars.
+
+ See `boxplot`, `candlesticks`, `financebars`.
 
 4 set style data
 ?commands set style data

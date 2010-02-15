@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.322 2010/02/07 18:28:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.323 2010/02/11 21:20:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3920,7 +3920,11 @@ plot_vectors(struct curve_points *plot)
 }
 
 
-/* plot_f_bars() - finance bars */
+/* plot_f_bars:
+ * Plot the curves in FINANCEBARS style
+ * EAM Feg 2010	- This routine is also used for BOXPLOT, which
+ *		  loads a median value into xhigh
+ */
 static void
 plot_f_bars(struct curve_points *plot)
 {
@@ -3981,12 +3985,19 @@ plot_f_bars(struct curve_points *plot)
 	/* draw the close tic */
 	(*t->move) ((unsigned int) (xM + bar_size * tic), map_y(yclose));
 	(*t->vector) (xM, map_y(yclose));
+
+	/* Draw a bar at the median (stored in xhigh) */
+	if (plot->plot_style == BOXPLOT) {
+	    unsigned int ymedian = map_y(plot->points[i].xhigh);
+	    (*t->move) (xM - bar_size * tic, ymedian);
+	    (*t->vector) (xM + bar_size * tic, ymedian);
+	}
     }
 }
 
 
 /* plot_c_bars:
- * Plot the curves in CANDLESTICSK style
+ * Plot the curves in CANDLESTICKS style
  * EAM Apr 2008 - switch to using empty/fill rather than empty/striped 
  *		  to distinguish whether (open > close)
  * EAM Dec 2009	- allow an optional 6th column to specify width
@@ -4169,9 +4180,18 @@ plot_c_bars(struct curve_points *plot)
 	    }
 
 	/* Some users prefer bars at the end of the whiskers */
-	if (plot->arrow_properties.head == BOTH_HEADS || plot->plot_style == BOXPLOT) {
-	    double frac = (plot->plot_style == BOXPLOT) ? 1.0 : plot->arrow_properties.head_length;
-	    unsigned int d = (frac <= 0) ? 0 : (xhighM-xlowM)*(1.-frac)/2.;
+	if (plot->plot_style == BOXPLOT 
+	||  plot->arrow_properties.head == BOTH_HEADS) {
+	    unsigned int d;
+	    if (plot->plot_style == BOXPLOT) {
+		if (bar_size < 0)
+		    d = 0;
+		else
+		    d = (xhighM-xlowM)/2. - (bar_size * term->h_tic);
+	    } else {
+		double frac = plot->arrow_properties.head_length;
+		d = (frac <= 0) ? 0 : (xhighM-xlowM)*(1.-frac)/2.;
+	    }
 
 	    if (high_inrange) {
 		(*t->move)   (xlowM+d, yhighM);
@@ -4314,7 +4334,10 @@ plot_boxplot(struct curve_points *plot)
     plot->points = &candle;
     plot->p_count = 1;
 
-    plot_c_bars( plot );
+    if (boxplot_opts.plotstyle == FINANCEBARS)
+	plot_f_bars( plot );
+    else
+	plot_c_bars( plot );
 
     plot->points = save_points;
     plot->p_count = N;

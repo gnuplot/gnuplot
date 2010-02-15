@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.232 2010/01/11 04:31:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.233 2010/02/07 06:39:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1188,18 +1188,20 @@ show_boxwidth()
 static void
 show_boxplot()
 {
+    fprintf(stderr, "\tboxplot representation is %s\n",
+	    boxplot_opts.plotstyle == FINANCEBARS ? "finance bar" : "box and whisker");
     fprintf(stderr, "\tboxplot range extends from the ");
     if (boxplot_opts.limit_type == 1)
-	fprintf(stderr, "\tmedian to include %5.2f of the points\n",
+	fprintf(stderr, "  median to include %5.2f of the points\n",
 		boxplot_opts.limit_value);
     else
-	fprintf(stderr, "\tbox by %5.2f of the interquartile distance\n",
+	fprintf(stderr, "  box by %5.2f of the interquartile distance\n",
 		boxplot_opts.limit_value);
     if (boxplot_opts.outliers)
-	fprintf(stderr, "\t  outliers will be drawn using point type %d\n",
+	fprintf(stderr, "\toutliers will be drawn using point type %d\n",
 		boxplot_opts.pointtype+1);
     else
-	fprintf(stderr,"\t  outliers will not be drawn\n");
+	fprintf(stderr,"\toutliers will not be drawn\n");
 }
 
 

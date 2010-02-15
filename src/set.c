@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.308 2010/02/07 06:39:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.309 2010/02/13 06:35:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -986,6 +986,14 @@ set_boxplot()
 	    if (boxplot_opts.limit_value < 0 || boxplot_opts.limit_value > 1)
 		int_error(c_token-1,"fraction must be less than 1");
 	    boxplot_opts.limit_type = 1;
+	}
+	else if (almost_equals(c_token,"candle$sticks")) {
+	    c_token++;
+	    boxplot_opts.plotstyle = CANDLESTICKS;
+	}
+	else if (almost_equals(c_token,"finance$bars")) {
+	    c_token++;
+	    boxplot_opts.plotstyle = FINANCEBARS;
 	}
 	else
 	    int_error(c_token,"unrecognized option");

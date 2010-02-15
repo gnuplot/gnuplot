@@ -233,9 +233,10 @@ typedef struct boxplot_style {
     double limit_value;
     TBOOLEAN outliers;
     int pointtype;
+    int plotstyle;	/* CANDLESTICKS or FINANCEBARS */
 } boxplot_style;
 extern boxplot_style boxplot_opts;
-#define DEFAULT_BOXPLOT_STYLE { 0, 1.5, TRUE, 6 }
+#define DEFAULT_BOXPLOT_STYLE { 0, 1.5, TRUE, 6, CANDLESTICKS }
 
 /***********************************************************/
 /* Variables defined by gadgets.c needed by other modules. */
