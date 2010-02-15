@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.65.2.4 2009/08/26 19:16:13 sfeam Exp $
+ * $Id: win.trm,v 1.65.2.5 2010/02/09 00:42:58 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -982,7 +982,7 @@ START_HELP(windows)
 " `Color` when checked enables color linestyles.  When unchecked it forces",
 " monochrome linestyles.",
 "",
-" `Copy to Clipboard` copies a bitmap and a Metafile picture.",
+" `Copy to Clipboard` copies a bitmap and an enhanced Metafile picture.",
 "",
 " `Background...` sets the window background color.",
 "",

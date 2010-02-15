@@ -1,10 +1,17 @@
+2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
+	* src/win/wgraph.c: Update code to copy to clipboard as enhanced
+	metafile, add Ctrl+C shortcut for graph window.
+	
+	* term/win.trm: Update documentation accordingly.
+
 2010-02-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_obj): Sanity check start and end angles of arc.
 
 2010-02-11  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (plot_boxes): Amazingly old bug that fails to apply 
+	* src/graphics.c (plot_boxes): Amazingly old bug that fails to apply
 	absolute boxwidth in the case where previous point was undefined.
 
 2010-02-08  Shigeharu Takeno  <shige@iee.niit.ac.jp>

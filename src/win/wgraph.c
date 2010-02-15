@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.6 2010/01/25 07:54:00 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.7 2010/02/09 00:42:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -389,7 +389,7 @@ GraphInit(LPGW lpgw)
 		M_GRAPH_TO_TOP, "Bring to &Top");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->color ? MF_CHECKED : MF_UNCHECKED),
 		M_COLOR, "C&olor");
-	AppendMenu(lpgw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard");
+	AppendMenu(lpgw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard (Ctrl+C)");
 #if WINVER >= 0x030a
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
@@ -644,6 +644,38 @@ GetPlotRect(LPGW lpgw, LPRECT rect)
 	GetClientRect(lpgw->hWndGraph, rect);
 	rect->bottom -= lpgw->statuslineheight; /* leave some room for the status line */
 	if (rect->bottom < rect->top) rect->bottom = rect->top;
+}
+
+static void 
+GetPlotRectInMM(LPGW lpgw, LPRECT rect, HDC hdc)
+{
+	GetPlotRect (lpgw, rect);
+	
+	/* Taken from 
+	http://msdn.microsoft.com/en-us/library/dd183519(VS.85).aspx
+	 */
+	
+	// Determine the picture frame dimensions.  
+	// iWidthMM is the display width in millimeters.  
+	// iHeightMM is the display height in millimeters.  
+	// iWidthPels is the display width in pixels.  
+	// iHeightPels is the display height in pixels  
+	
+	int iWidthMM = GetDeviceCaps(hdc, HORZSIZE); 
+	int iHeightMM = GetDeviceCaps(hdc, VERTSIZE); 
+	int iWidthPels = GetDeviceCaps(hdc, HORZRES); 
+	int iHeightPels = GetDeviceCaps(hdc, VERTRES); 
+	
+	// Convert client coordinates to .01-mm units.  
+	// Use iWidthMM, iWidthPels, iHeightMM, and  
+	// iHeightPels to determine the number of  
+	// .01-millimeter units per pixel in the x-  
+	//  and y-directions.  
+	
+	rect->left = (rect->left * iWidthMM * 100)/iWidthPels; 
+	rect->top = (rect->top * iHeightMM * 100)/iHeightPels; 
+	rect->right = (rect->right * iWidthMM * 100)/iWidthPels; 
+	rect->bottom = (rect->bottom * iHeightMM * 100)/iHeightPels; 
 }
 
 
@@ -1362,12 +1394,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 static void
 CopyClip(LPGW lpgw)
 {
-	RECT rect;
-	HDC mem;
+	RECT rect, mfrect;
+	HDC mem, hmf;
 	HBITMAP bitmap;
-	HANDLE hmf;
-	GLOBALHANDLE hGMem;
-	LPMETAFILEPICT lpMFP;
+	HENHMETAFILE hemf;
 	HWND hwnd;
 	HDC hdc;
 
@@ -1400,49 +1430,23 @@ CopyClip(LPGW lpgw)
 	}
 	DeleteDC(mem);
 
-	/* OK, bitmap done, now create a Metafile context at full theoretical resolution
-	 * of the Windows terminal (24000 x 18000 pixels), and redraw the whole
-	 * plot into that. */
+	/* OK, bitmap done, now create an enhanced Metafile context 
+	 * and redraw the whole plot into that. 
+	 */
 	{
 		/* make copy of window's main status struct for modification */
 		GW gwclip = *lpgw;
-		int windowfontsize = MulDiv(lpgw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-		int i;
 
-		gwclip.fontsize = MulDiv(windowfontsize, lpgw->ymax, rect.bottom);
 		gwclip.hfonth = gwclip.hfontv = 0;
-
-		/* HBB 981203: scale up pens as well... */
-		for (i = 0; i < WGNUMPENS + 2; i++) {
-			if(gwclip.monopen[i].lopnWidth.x > 1)
-				gwclip.monopen[i].lopnWidth.x =
-					MulDiv(gwclip.monopen[i].lopnWidth.x,
-					       gwclip.xmax, rect.right-rect.left);
-			if(gwclip.colorpen[i].lopnWidth.x > 1)
-				gwclip.colorpen[i].lopnWidth.x =
-					MulDiv(gwclip.colorpen[i].lopnWidth.x,
-					       gwclip.xmax, rect.right-rect.left);
-		}
-
-		rect.right = lpgw->xmax;
-		rect.bottom = lpgw->ymax;
-
 		MakePens(&gwclip, hdc);
 		MakeFonts(&gwclip, &rect, hdc);
 
-		ReleaseDC(hwnd, hdc);
+		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
-		hdc = CreateMetaFile((LPSTR)NULL);
+		hmf = CreateEnhMetaFile(hdc, (LPCTSTR)NULL, &mfrect, (LPCTSTR)NULL);
+		drawgraph(&gwclip, hmf, (LPRECT) &rect);
+		hemf = CloseEnhMetaFile(hmf);
 
-/* HBB 981203: According to Petzold, Metafiles shouldn't contain SetMapMode() calls: */
-	/*SetMapMode(hdc, MM_ANISOTROPIC);*/
-#ifdef WIN32
-		SetWindowExtEx(hdc, rect.right, rect.bottom, (LPSIZE)NULL);
-#else
-		SetWindowExt(hdc, rect.right, rect.bottom);
-#endif
-		drawgraph(&gwclip, hdc, (LPRECT) &rect);
-		hmf = CloseMetaFile(hdc);
 		DestroyFonts(&gwclip);
 		DestroyPens(&gwclip);
 	}
@@ -1450,23 +1454,13 @@ CopyClip(LPGW lpgw)
 	/* Now we have the Metafile and Bitmap prepared, post their contents to
 	 * the Clipboard */
 
-	hGMem = GlobalAlloc(GMEM_MOVEABLE, (DWORD)sizeof(METAFILEPICT));
-	lpMFP = (LPMETAFILEPICT) GlobalLock(hGMem);
-	hdc = GetDC(hwnd);	/* get window size */
-	GetPlotRect(lpgw, &rect);
-	/* in MM_ANISOTROPIC, xExt & yExt give suggested size in 0.01mm units */
-	lpMFP->mm = MM_ANISOTROPIC;
-	lpMFP->xExt = MulDiv(rect.right-rect.left, 2540, GetDeviceCaps(hdc, LOGPIXELSX));
-	lpMFP->yExt = MulDiv(rect.bottom-rect.top, 2540, GetDeviceCaps(hdc, LOGPIXELSY));
-	lpMFP->hMF = hmf;
-	ReleaseDC(hwnd, hdc);
-	GlobalUnlock(hGMem);
-
 	OpenClipboard(hwnd);
 	EmptyClipboard();
-	SetClipboardData(CF_METAFILEPICT,hGMem);
+	SetClipboardData(CF_ENHMETAFILE,hemf);
 	SetClipboardData(CF_BITMAP, bitmap);
 	CloseClipboard();
+	ReleaseDC(hwnd, hdc);
+	DeleteEnhMetaFile(hemf);
 	return;
 }
 
@@ -2244,6 +2238,15 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case WM_KEYDOWN:
 			{
+			if (GetKeyState(VK_CONTROL) < 0) {
+				switch(wParam) {
+				case 'C':
+					/* Ctrl-C: Copy to Clipboard */
+					SendMessage(hwnd,WM_COMMAND,M_COPY_CLIP,0L);
+					break;
+				} /* switch(wparam) */
+			} /* if(Ctrl) */
+			else {
 				/* First, look for a change in modifier status */
 				unsigned int modifier_mask = 0;
 				modifier_mask = ((GetKeyState(VK_SHIFT) < 0) ? Mod_Shift : 0 )
@@ -2253,6 +2256,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					Wnd_exec_event ( lpgw, lParam, GE_modifier, modifier_mask);
 					last_modifier_mask = modifier_mask;
 				}
+			}
 			}
 			switch (wParam) {
 			case VK_BACK:
