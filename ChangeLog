@@ -1,5 +1,10 @@
 2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
+	* term/win.trm: Fix for windows terminal ignoring explicit fontname and
+	size for labels.
+
+2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
 	* src/win/wmenu.c (SendMacro): Bugfix in call to _getcwd.
 
 2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
