@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.5 2004/04/13 17:24:14 broeker Exp $
+ * $Id: wresourc.h,v 1.6 2004/07/01 17:10:11 broeker Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -76,6 +76,9 @@
 #define M_COMMANDLINE  NUMMENU+12
 /* wtext.c */
 #define M_SYSCOLORS    NUMMENU+13
+
+/* wgraph.c */
+#define M_SAVE_AS_EMF  NUMMENU+14
 
 /* wprinter.c */
 #define PSIZE_SBOX 100

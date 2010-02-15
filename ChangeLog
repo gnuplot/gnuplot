@@ -1,5 +1,13 @@
 2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
+	* src/win/wgraph.c src/win/wresourc.h: Add the possibility to
+	save the current graph window as EMF file. Add a Ctrl+S shortcut for
+	the graph window and add an entry to the window's system menu.
+	
+	* term/win.trm: Update documentation accordingly.
+
+2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
 	* src/win/wgraph.c: Update code to copy to clipboard as enhanced
 	metafile, add Ctrl+C shortcut for graph window.
 	

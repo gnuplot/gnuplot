@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.77 2010/01/25 07:57:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.78 2010/02/16 07:08:42 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -215,6 +215,7 @@ static void	SelFont(LPGW lpgw);
 static void	dot(HDC hdc, int xdash, int ydash);
 static void	drawgraph(LPGW lpgw, HDC hdc, LPRECT rect);
 static void	CopyClip(LPGW lpgw);
+static void	SaveAsEMF(LPGW lpgw);
 static void	CopyPrint(LPGW lpgw);
 static void	WriteGraphIni(LPGW lpgw);
 #if (0)	/* shige */
@@ -390,6 +391,7 @@ GraphInit(LPGW lpgw)
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->color ? MF_CHECKED : MF_UNCHECKED),
 		M_COLOR, "C&olor");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard (Ctrl+C)");
+	AppendMenu(lpgw->hPopMenu, MF_STRING, M_SAVE_AS_EMF, "&Save as EMF... (Ctrl+S)");
 #if WINVER >= 0x030a
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
@@ -1388,6 +1390,71 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 /* ================================== */
 
+/* save graph windows as enhanced metafile
+ * The code in here is very similar to what CopyClip does...
+ */
+static void
+SaveAsEMF(LPGW lpgw)
+{
+    static OPENFILENAME Ofn;
+    
+    static char lpstrCustomFilter[256] = { '\0' };
+    static char lpstrFileName[MAX_PATH] = { '\0' };
+    static char lpstrFileTitle[MAX_PATH] = { '\0' };
+    
+    HWND hwnd;
+    
+    hwnd = lpgw->hWndGraph;
+    
+    Ofn.lStructSize = sizeof(OPENFILENAME);
+    Ofn.hwndOwner = hwnd;
+    Ofn.lpstrInitialDir = (LPSTR)NULL;
+    Ofn.lpstrFilter = (LPCTSTR) "Enhanced Metafile (*.EMF)\0*.EMF\0All Files (*.*)\0*.*\0";
+    Ofn.lpstrCustomFilter = lpstrCustomFilter;
+    Ofn.nMaxCustFilter = 255;
+    Ofn.nFilterIndex = 1;   /* start with the *.emf filter */
+    Ofn.lpstrFile = lpstrFileName;
+    Ofn.nMaxFile = MAX_PATH;
+    Ofn.lpstrFileTitle = lpstrFileTitle;
+    Ofn.nMaxFileTitle = MAX_PATH;
+    Ofn.lpstrInitialDir = (LPSTR)NULL;
+    Ofn.lpstrTitle = (LPSTR)NULL;
+    Ofn.Flags = OFN_OVERWRITEPROMPT;
+    Ofn.lpstrDefExt = (LPSTR) "emf";
+    
+    /* save cwd as GetSaveFileName apparently changes it */
+    char *cwd;
+    cwd = _getcwd( NULL, 0 );
+    
+    if( GetSaveFileName(&Ofn) != 0 ) {
+	RECT rect, mfrect;
+	HDC hdc;
+	HENHMETAFILE hemf;
+	HDC hmf;
+	
+	/* get the context */
+	hdc = GetDC(hwnd);
+	GetPlotRect(lpgw, &rect);
+	GetPlotRectInMM(lpgw, &mfrect, hdc);
+
+	hmf = CreateEnhMetaFile(hdc, Ofn.lpstrFile, &mfrect, (LPCTSTR)NULL);
+	drawgraph(lpgw, hmf, (LPRECT) &rect);
+	hemf = CloseEnhMetaFile(hmf);
+
+	DeleteEnhMetaFile(hemf);
+	ReleaseDC(hwnd, hdc);
+	
+	/* restore cwd */
+	if (cwd != NULL) 
+	    _chdir( cwd );
+    }
+    
+    /* free the cwd buffer allcoated by _getcwd */
+    free(cwd);
+}
+
+/* ================================== */
+
 /* copy graph window to clipboard --- note that the Metafile is drawn at the full
  * virtual resolution of the Windows terminal driver (24000 x 18000 pixels), to
  * preserve as much accuracy as remotely possible */
@@ -2179,6 +2246,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_COLOR:
 				case M_CHOOSE_FONT:
 				case M_COPY_CLIP:
+				case M_SAVE_AS_EMF:
 				case M_LINESTYLE:
 				case M_BACKGROUND:
 				case M_PRINT:
@@ -2243,6 +2311,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case 'C':
 					/* Ctrl-C: Copy to Clipboard */
 					SendMessage(hwnd,WM_COMMAND,M_COPY_CLIP,0L);
+					break;
+				case 'S':
+					/* Ctrl-S: Save As EMF */
+					SendMessage(hwnd,WM_COMMAND,M_SAVE_AS_EMF,0L);
 					break;
 				} /* switch(wparam) */
 			} /* if(Ctrl) */
@@ -2375,6 +2447,9 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return 0;
 				case M_COPY_CLIP:
 					CopyClip(lpgw);
+					return 0;
+				case M_SAVE_AS_EMF:
+					SaveAsEMF(lpgw);
 					return 0;
 				case M_LINESTYLE:
 					if (LineStyle(lpgw))
