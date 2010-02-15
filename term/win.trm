@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.72 2010/02/16 07:12:52 mikulik Exp $
+ * $Id: win.trm,v 1.73 2010/02/16 07:13:46 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -890,11 +890,11 @@ WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 	ENHwin_sizeonly = TRUE; 
     }
 
+    /* make a backup copy of the fontname to use 
+       for enhanced recursion */
+    char* copy_WIN_font = strdup(WIN_font);
+    
     for( pass=1; pass <= num_passes; pass++ ) {
-
-	/* This will restore the default font 
-	   and update WIN_font and WIN_fontsize */
-	WIN_set_font(NULL); 
 
 	/* Set the recursion going. We say to keep going until a
 	* closing brace, but we don't really expect to find one.
@@ -904,7 +904,7 @@ WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 	* we get stuck in an infinite loop) and try again.
 	*/
 	while (*(str = enhanced_recursion((char *)str, TRUE,
-			NULL, WIN_fontsize,
+			copy_WIN_font, WIN_fontsize,
 			0.0, TRUE, TRUE, 0))) {
 	    (term->enhanced_flush)();
 
@@ -929,6 +929,7 @@ WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 	    GraphOp(&graphwin, W_justify, LEFT, 0, NULL);
 	}
     }
+    free(copy_WIN_font);
 
     /* restore default font */
     WIN_set_font(NULL); 
