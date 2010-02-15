@@ -1,5 +1,9 @@
 2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
+	* src/win/wmenu.c (SendMacro): Bugfix in call to _getcwd.
+
+2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
 	* term/win.trm: Add the options "size" and "position" to the windows
 	terminal driver. Update documentation accordingly.
 

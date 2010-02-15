@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.7 2005/08/04 16:44:58 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.8 2006/08/09 07:39:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -399,7 +399,7 @@ char *szFilter;
 				/* Windows XP has it's very special meaning of 'default directory'  */
 				/* (search for OPENFILENAME on MSDN). So we set it here explicitly: */
 				/* ofn.lpstrInitialDir = (LPSTR)NULL; */
-				_getcwd(&cwd, sizeof(cwd));
+				_getcwd(cwd, sizeof(cwd));
 				ofn.lpstrInitialDir = cwd;
 				ofn.Flags = OFN_SHOWHELP | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 				flag = (save ? GetSaveFileName(&ofn) : GetOpenFileName(&ofn));
