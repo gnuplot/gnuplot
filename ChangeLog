@@ -1,3 +1,10 @@
+2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
+	* src/win/wgraph.c: Update code to copy to clipboard as enhanced
+	metafile, add Ctrl+C shortcut for graph window.
+	
+	* term/win.trm: Update documentation accordingly.
+
 2010-02-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src/gadgets.h src/graphics.c src/save.c
