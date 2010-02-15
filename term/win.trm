@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.65.2.5 2010/02/09 00:42:58 sfeam Exp $
+ * $Id: win.trm,v 1.65.2.6 2010/02/16 07:01:52 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -983,6 +983,8 @@ START_HELP(windows)
 " monochrome linestyles.",
 "",
 " `Copy to Clipboard` copies a bitmap and an enhanced Metafile picture.",
+"",
+" `Save as EMF...` allows the user to save the current graph window as enhanced metafile",
 "",
 " `Background...` sets the window background color.",
 "",
