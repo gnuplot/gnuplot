@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.65.2.8 2010/02/16 07:03:50 mikulik Exp $
+ * $Id: win.trm,v 1.65.2.9 2010/02/16 07:04:47 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -126,7 +126,7 @@ TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiP
 
 enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR, WIN_GTITLE,
 	      WIN_ENHANCED, WIN_NOENHANCED, WIN_FONT, WIN_SIZE, 
-	      WIN_POSITION, WIN_OTHER };
+	      WIN_POSITION, WIN_CLOSE, WIN_OTHER };
 
 static struct gen_table WIN_opts[] =
 {
@@ -140,6 +140,7 @@ static struct gen_table WIN_opts[] =
     { "ti$tle", WIN_GTITLE },
     { "siz$e", WIN_SIZE },
     { "pos$ition", WIN_POSITION },
+    { "cl$ose", WIN_CLOSE },
     { NULL, WIN_OTHER }
 };
 
@@ -173,7 +174,7 @@ WIN_options()
 {
     char *s;
     TBOOLEAN set_font = FALSE, set_fontsize = FALSE;
-    TBOOLEAN set_title=FALSE;
+    TBOOLEAN set_title=FALSE, set_close = FALSE;
     /* shige */
     static int readinit=0;
 
@@ -256,6 +257,10 @@ WIN_options()
 	    free(WIN_gtitle);
 	    WIN_gtitle = try_to_get_string();
 	    break;
+	case WIN_CLOSE:
+	    c_token++;
+	    set_close = TRUE;
+	    break;
 	case WIN_FONT:
 	    c_token++;
 	    /* Fall through to attempt to read font name */
@@ -303,6 +308,11 @@ WIN_options()
 		graphwin.color ? "color" : "monochrome",
 		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced",
 		graphwin.fontname, graphwin.fontsize);
+
+    if (set_close) {
+	win_close_terminal_window(&graphwin);
+	return;
+    }
 
     if (IsWindow(graphwin.hWndGraph) && IsIconic(graphwin.hWndGraph))
 	ShowWindow(graphwin.hWndGraph, SW_SHOWNORMAL);
@@ -991,6 +1001,7 @@ START_HELP(windows)
 "                            {title \"Plot Window Title\"}",
 "                            {size <width>,<height>}",
 "                            {position <x>,<y>}",
+"                            {close}",
 "",
 " where `color` and `monochrome` select colored or mono output,", 
 " `enhanced` enables enhanced text mode features (subscripts,",
@@ -1012,6 +1023,9 @@ START_HELP(windows)
 " former Windows-only options `/noend` or `-noend` are still accepted as well),",
 " will not close gnuplot. Contrary to gnuplot on other operating systems,",
 " gnuplot's interactive command line is accessible after the -persist option.",
+"",
+" The plot window remains open even when the gnuplot driver is changed to a",
+" different device. The plot window can be close with `set term windows close`",
 "2 graph-menu",
 "?commands set terminal windows graph-menu",
 "?set terminal windows graph-menu",
