@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.78 2010/02/16 07:08:42 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.79 2010/02/16 07:12:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -2614,6 +2614,13 @@ GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect)
     }
 }
 
+/* close the terminal window */
+void WDPROC
+win_close_terminal_window(LPGW lpgw)
+{
+   if (lpgw->hWndGraph && IsWindow(lpgw->hWndGraph))
+	SendMessage( lpgw->hWndGraph, WM_CLOSE, 0L, 0L );
+}
 
 #if 0
 int WDPROC

@@ -1,5 +1,11 @@
 2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
+	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm: Add the option
+	"close" to the windows terminal driver. Update documentation
+	accordingly.
+
+2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
 	* term/win.trm: Fix for windows terminal ignoring explicit fontname and
 	size for labels.
 
