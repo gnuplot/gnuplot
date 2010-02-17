@@ -1,3 +1,8 @@
+2010-02-17  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
+	* src/plot.c (interrupt_setup): Ctrl+C crashes windows console build.
+	SF Patch #2848002
+
 2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm: Add the option
