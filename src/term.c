@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.194 2009/12/31 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.195 2010/02/03 00:47:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1318,16 +1318,22 @@ do_arc(
     double arc_start, double arc_end, /* Limits of arc in degress */
     int style)
 {
-    gpiPoint vertex[120];
+    gpiPoint vertex[250];  /* changed this - JP */
     int i, segments;
     double aspect;
+
+    /* Protect against out-of-range values */
+    if (arc_start < -360 || arc_start > 360)
+	arc_start = arc_start - trunc(arc_start / 360.)*360.;
+    if (arc_end < -360 || arc_end > 360)
+	arc_end = arc_end - trunc(arc_end / 360.)*360.;
 
     /* Always draw counterclockwise */
     while (arc_end < arc_start)
 	arc_end += 360.;
 
     /* Choose how many segments to draw for this arc */
-#   define INC 5.
+#   define INC 3.
     segments = (arc_end - arc_start) / INC;
 
     /* Calculate the vertices */
