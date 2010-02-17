@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.194.2.1 2009/07/14 23:21:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.197 2010/02/07 23:18:14 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3016,7 +3016,7 @@ exec_cmd(plot_struct *plot, char *command)
 
 			if (sample_data) {
 
-			    XImage *image_src;
+			    XImage *image_src = NULL;
 			    XImage *image_dest;
 
 			    /* Create an initialized image object. */
@@ -5014,20 +5014,21 @@ gnuplot: X11 aborted.\n", ldisplay);
 	sprintf(buffer, "%s/%s", appdefdir, "Gnuplot");
     }
 #else /* !OS/2 */
+    {
     char *appdefdir;
-    if ((appdefdir = getenv("XAPPLRESDIR")) == NULL) {
+	if ((appdefdir = getenv("XAPPLRESDIR")) == NULL) {
 #ifdef XAPPLRESDIR
-    	strcpy(buffer, XAPPLRESDIR);
-    	strcat(buffer, "/");
-    	strcat(buffer, "Gnuplot");
+    	    strcpy(buffer, XAPPLRESDIR);
+    	    strcat(buffer, "/");
+    	    strcat(buffer, "Gnuplot");
 #else
-	buffer = NULL;
+	    buffer = NULL;
 #endif
-    }
-    else {
-    	strcpy(buffer, appdefdir);
-    	strcat(buffer, "/");
-    	strcat(buffer, "Gnuplot");
+	} else {
+    	    strcpy(buffer, appdefdir);
+    	    strcat(buffer, "/");
+    	    strcat(buffer, "Gnuplot");
+	}
     }
 #endif /* !VMS */
 

@@ -1,3 +1,8 @@
+2010-02-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Add brackets to suppress compiler complaints.
+	* src/term.c (do_arc): Sanity checks for start and end angles of arc.
+
 2010-02-17  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* src/plot.c (interrupt_setup): Ctrl+C crashes windows console build.

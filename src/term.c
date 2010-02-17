@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.184.2.5 2009/10/13 17:15:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.184.2.6 2009/11/04 16:11:26 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1317,6 +1317,12 @@ do_arc(
     gpiPoint vertex[120];
     int i, segments;
     double aspect;
+
+    /* Protect against out-of-range values */
+    while (arc_start < 0.)
+	arc_start +=360.;
+    while (arc_end > 360.)
+	arc_end -= 360.;
 
     /* Always draw counterclockwise */
     while (arc_end < arc_start)
