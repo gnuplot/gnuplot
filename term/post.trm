@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.248 2010/01/02 07:23:22 sfeam Exp $
+ * $Id: post.trm,v 1.249 2010/02/07 06:39:47 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -238,7 +238,9 @@ static void write_gradient_definition __PROTO((gradient_struct *gradient, int cn
 static void write_color_space __PROTO((t_sm_palette *palette));
 static void make_palette_formulae __PROTO((void));
 static void PS_make_header __PROTO((t_sm_palette *palette));
+#ifndef GNUPLOT_PS_DIR
 static void PS_dump_header_to_file __PROTO((char *name));
+#endif
 
 static float ps_fontsize;
 
