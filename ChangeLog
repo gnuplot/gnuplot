@@ -1,3 +1,8 @@
+2010-02-17  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
+	* src/plot.c (interrupt_setup): Ctrl+C crashes windows console build.
+	SF Patch #2848002
+
 2010-02-16  Peter Juhasz
 
 	* src/graphics.c src/plot2d.c src/term.c docs/gnuplot.doc
