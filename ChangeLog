@@ -1,3 +1,8 @@
+2010-02-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (do_arc):  Avoid calling trunc() because some compilers
+	are still back in the dark ages (pre C99).
+
 2010-02-17  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* src/plot.c (interrupt_setup): Ctrl+C crashes windows console build.

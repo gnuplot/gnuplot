@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.196 2010/02/17 06:19:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.197 2010/02/17 06:21:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1323,10 +1323,10 @@ do_arc(
     double aspect;
 
     /* Protect against out-of-range values */
-    if (arc_start < -360 || arc_start > 360)
-	arc_start = arc_start - trunc(arc_start / 360.)*360.;
-    if (arc_end < -360 || arc_end > 360)
-	arc_end = arc_end - trunc(arc_end / 360.)*360.;
+    while (arc_start < 0)
+	arc_start += 360.;
+    while (arc_end > 360.)
+	arc_end -= 360.;
 
     /* Always draw counterclockwise */
     while (arc_end < arc_start)
