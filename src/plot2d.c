@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.203 2010/01/13 03:04:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.204 2010/02/07 18:28:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -479,10 +479,10 @@ get_data(struct curve_points *current_plot)
 	break;
 
 #ifdef EAM_OBJECTS
-    case CIRCLES:	/* 3 + possible variable color */
-	min_cols = 3;
-	max_cols = 4;
-	break;
+    case CIRCLES:	/* 3 + possible variable color, or 5 + possible variable color */
+        min_cols = 3;
+        max_cols = 6;
+        break;	
 #endif
 
     case POINTSTYLE:
@@ -535,7 +535,7 @@ get_data(struct curve_points *current_plot)
                 static char *errmsg = "Not enough columns for variable color";
                 switch (current_plot->plot_style) {
                 case VECTOR:	if (j < 5) int_error(NO_CARET,errmsg);
-                case CIRCLES: 	if (j < 4) int_error(NO_CARET,errmsg);
+                case CIRCLES: 	if ((j != 4) && (j != 6)) int_error(NO_CARET,errmsg);
                 case BOXES:	if (j < 3) int_error(NO_CARET,errmsg);
                     variable_color_value = v[--j];
                 default:	break;
@@ -767,7 +767,7 @@ get_data(struct curve_points *current_plot)
 #ifdef EAM_OBJECTS
 		case CIRCLES:	/* x, y, radius */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
-		    		  v[1], variable_color_value, v[2]);
+		    		  0., variable_color_value, 360.); /* by default a full circle is drawn */
 		    break;
 #endif
 		}               /*inner switch */
@@ -876,10 +876,19 @@ get_data(struct curve_points *current_plot)
 				  v[2], v[3], v[4]);
 		    break;
 
+#ifdef EAM_OBJECTS
+		case CIRCLES:	/* x, y, radius, arc begin, arc end */
+		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
+		    		  v[3], variable_color_value, v[4]);
+		    break;
+#endif	
+
 		case RGBIMAGE:  /* x_center y_center r_value g_value b_value (rgb) */
 		    goto images;
 
-		}
+		}               /* inner switch */
+
+
 		break;
 	    }
 
@@ -890,7 +899,7 @@ get_data(struct curve_points *current_plot)
 	    /* x, y, xlow, xhigh, ylow, yhigh */
 	    switch (current_plot->plot_style) {
 	    default:
-		int_warn(storetoken, "This plot style not work with 6 cols. Setting to xyerrorbars");
+		int_warn(storetoken, "This plot style does not work with 6 cols. Setting to xyerrorbars");
 		current_plot->plot_style = XYERRORBARS;
 		/*fall through */
 	    case XYERRORLINES:
@@ -1044,7 +1053,6 @@ store2d_point(
 	cp->yhigh = yhigh;
 	break;
     case BOXES:			/* auto-scale to xlow xhigh */
-    case CIRCLES:
     case BOXPLOT:
 	cp->ylow = y;
 	cp->yhigh = yhigh;	/* really variable_color_data */
@@ -1053,6 +1061,24 @@ store2d_point(
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
 					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);
 	break;
+#ifdef EAM_OBJECTS	
+	case CIRCLES:
+	cp->yhigh = yhigh;	/* really variable_color_data */
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
+					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
+					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);	
+	/* The xlow and xhigh were calculated and passed to this function 
+	 * because they were needed to update the xrange.
+	 * xlow is needed because the radius of the circle is calculated from it.
+	 * However, xhigh is not needed anymore, so we hijack it
+	 * and use it to store the end angle. The start angle is passed in ylow. */
+	cp->ylow = ylow;	/* arc begin */
+	cp->xhigh = width;	/* arc end */
+	if (fabs(ylow) > 1000. || fabs(width) > 1000.)
+	    cp->type = UNDEFINED;
+	break;
+#endif
     default:			/* auto-scale to xlow xhigh ylow yhigh */
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
@@ -1074,9 +1100,20 @@ store2d_point(
 	cp->z = width;
 
     /* If we have variable color corresponding to a z-axis value, use it to autoscale */
-    if (current_plot->lp_properties.pm3d_color.type == TC_Z)
-	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, cp->z, dummy_type, COLOR_AXIS, 
-					current_plot->noautoscale, NOOP, NOOP);
+    /* For CIRCLES, BOXES and BOXPLOT, yhigh is used to pass variable color data 
+     * so we use that to autoscale the color axis. */
+    if (current_plot->lp_properties.pm3d_color.type == TC_Z) {
+        if ((current_plot->plot_style == BOXES)
+#ifdef EAM_OBJECTS
+         || (current_plot->plot_style == CIRCLES)
+#endif
+         || (current_plot->plot_style == BOXPLOT))
+            STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, cp->yhigh, dummy_type, COLOR_AXIS, 
+                               current_plot->noautoscale, NOOP, NOOP);
+        else
+            STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, cp->z, dummy_type, COLOR_AXIS, 
+                               current_plot->noautoscale, NOOP, NOOP);
+    }
 
 }                               /* store2d_point */
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.323 2010/02/11 21:20:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.324 2010/02/15 19:01:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3784,7 +3784,7 @@ plot_circles(struct curve_points *plot)
 {
     int i;
     int x, y;
-    double radius;
+    double radius, arc_begin, arc_end;
     struct fill_style_type *fillstyle = &plot->fill_properties;
     int style = style_from_fill(fillstyle);
     TBOOLEAN withborder = FALSE;
@@ -3799,13 +3799,16 @@ plot_circles(struct curve_points *plot)
 	    y = map_y(plot->points[i].y);
 	    radius = x - map_x(plot->points[i].xlow);
 
+	    arc_begin = plot->points[i].ylow;
+	    arc_end = plot->points[i].xhigh;
+	    
 	    /* rgb variable  -  color read from data column */
 	    if (!check_for_variable_color(plot, &plot->points[i]) && withborder)
 		term_apply_lp_properties(&plot->lp_properties);
-	    do_arc(x,y, radius, 0., 360., style);
+	    do_arc(x,y, radius, arc_begin, arc_end, style);
 	    if (withborder) {
 		need_fill_border(&plot->fill_properties);
-		do_arc(x,y, radius, 0., 360., 0);
+		do_arc(x,y, radius, arc_begin, arc_end, 0);
 	    }
 	}
     }

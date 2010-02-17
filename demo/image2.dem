@@ -505,7 +505,7 @@ reset
 print ""
 print "Images maintain orientation with respect to axis direction."
 print "All plots show the same exact plot, but with various states"
-print "of reversed axes.  The upper left plot has reveresed x axis,"
+print "of reversed axes.  The upper left plot has reversed x axis,"
 print "the upper right plot has conventional axes, the lower left"
 print "plot has both reversed x and y axes, and the lower right"
 print "plot has reversed y axis."

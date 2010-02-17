@@ -3,6 +3,7 @@ New features, changes and fixes since gnuplot version 4.4
 
 * NEW user-definable linetypes
 * NEW plot style "with boxplot"
+* NEW plot style "with circles" allows start/end angles for each arc
 * NEW qt terminal driver 
 
 New features, changes and fixes since gnuplot version 4.2

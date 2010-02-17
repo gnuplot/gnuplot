@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.195 2010/02/03 00:47:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.196 2010/02/17 06:19:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1332,7 +1332,8 @@ do_arc(
     while (arc_end < arc_start)
 	arc_end += 360.;
 
-    /* Choose how many segments to draw for this arc */
+    /* Choose how finely to divide this arc into segments */
+    /* FIXME: INC=2 causes problems for gnuplot_x11 */
 #   define INC 3.
     segments = (arc_end - arc_start) / INC;
 
