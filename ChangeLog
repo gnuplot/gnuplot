@@ -1,3 +1,8 @@
+2010-02-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Use dynamic allocation for all font names. This prevents
+	buffer overflow problems for very long font names.
+
 2010-02-17  Christoph Junghans (ottxor)
 
 	* configure.in plot.c: New configuration option to add local packager to
