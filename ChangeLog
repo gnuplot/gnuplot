@@ -1,7 +1,15 @@
+2010-02-17  Christoph Junghans (ottxor)
+
+	* configure.in plot.c: New configuration option to add local packager to
+	list of contacts for bug reporting.
+	Bug #2951583
+
 2010-02-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Add brackets to suppress compiler complaints.
 	* src/term.c (do_arc): Sanity checks for start and end angles of arc.
+	* configure.in: Change default installation directory for x11 resources
+	to /etc/X11/app-defaults.  Bug #1953742
 
 2010-02-17  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
