@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.101 2009/05/31 07:08:44 sfeam Exp $
+ * $Id: svg.trm,v 1.102 2009/09/13 17:49:16 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -119,10 +119,10 @@ static int SVG_TextAngle = 0;	/* current text orientation*/
 static enum JUSTIFY SVG_TextJust = LEFT; /* current text justification*/
 
 /* default text font family: */
-static char SVG_fontNameDef[MAX_ID_LEN + 1] = "Arial";
+static char *SVG_fontNameDef = NULL;
 static double SVG_fontSizeDef = 12;	/* default text size*/
 /* current text font family: */
-static char SVG_fontNameCur[MAX_ID_LEN + 1] = "Arial";
+static char *SVG_fontNameCur = NULL;
 static double SVG_fontSizeCur = 12;	/* current text size*/
 static TBOOLEAN SVG_groupIsOpen = FALSE; /* open group flag*/
 static TBOOLEAN SVG_pathIsOpen = FALSE; /* open path flag*/
@@ -287,8 +287,10 @@ SVG_PathLimit ()
 static void
 SVG_SetFont (const char *name, double size)
 {
-    if (name && name != SVG_fontNameCur)
-	strncpy (SVG_fontNameCur, name, sizeof(SVG_fontNameCur)-1);
+    if (name != SVG_fontNameCur) {
+	free(SVG_fontNameCur);
+	SVG_fontNameCur = gp_strdup(name);
+    }
     SVG_fontSizeCur = size;
 
 /* since we cannot interrogate SVG about text properties and according
@@ -486,9 +488,11 @@ SVG_options ()
 	    comma = strrchr(s,',');
 	    if (comma && (1 == sscanf(comma + 1, "%lf", &SVG_fontSizeDef)))
 		*comma = '\0';
-	    if (*s)
-		strncpy(SVG_fontNameDef, s, sizeof(SVG_fontNameDef));
-	    free(s);
+	    if (*s) {
+		free(SVG_fontNameDef);
+		SVG_fontNameDef = s;
+	    } else
+		free(s);
 	    continue;
 	}
 
@@ -590,7 +594,8 @@ SVG_local_reset()
     SVG_xSize      = SVG_XMAX;
     SVG_ySize      = SVG_YMAX;
     SVG_fixed_size = TRUE;
-    strcpy(SVG_fontNameDef,"Arial");
+    free(SVG_fontNameDef);
+    SVG_fontNameDef = gp_strdup("Arial");
     SVG_fontSizeDef  = 12;
     if (SVG_embedded_font)
 	free(SVG_embedded_font);
@@ -1035,12 +1040,14 @@ SVG_set_font (const char *font)
 {
 
     if (!font || !(*font)) {
-	strcpy (SVG_fontNameCur, SVG_fontNameDef);
+	free(SVG_fontNameCur);
+	SVG_fontNameCur = gp_strdup(SVG_fontNameDef);
 	SVG_fontSizeCur = SVG_fontSizeDef;
     } else {
 	int sep = strcspn(font,",");
 	if (sep > 0) {
-	    strncpy(SVG_fontNameCur, font, sep);
+	    free(SVG_fontNameCur);
+	    SVG_fontNameCur = gp_strdup(font);
 	    SVG_fontNameCur[sep] = NUL;
 	}
 	if (font[sep] == ',')
@@ -1260,7 +1267,8 @@ ENHsvg_OPEN(
 	/* Start a new textspan fragment */
 	fputs("<tspan", gpoutfile);
 	if (strcmp(SVG_fontNameCur, fontname)) {
-	    strncpy(SVG_fontNameCur, fontname, sizeof(SVG_fontNameCur));
+	    free(SVG_fontNameCur);
+	    SVG_fontNameCur = gp_strdup(fontname);
 	    fprintf(gpoutfile, " style=\"font-family:%s\" ", SVG_fontNameCur);
 	}
 	if (SVG_fontSizeCur != fontsize) {
@@ -1306,9 +1314,11 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
 {
 
     /* We need local copies of the starting font properties */
-    char fontname[MAX_ID_LEN + 1];
     double fontsize = SVG_fontSizeCur;
-    strncpy(fontname,SVG_fontNameCur,sizeof(fontname));
+    static char *fontname = NULL;
+
+    free(fontname);
+    fontname = gp_strdup(SVG_fontNameCur);
 
     /* We need the full set of tags for text, just as normal. But in */
     /* the case of enhanced text ENHsvg_string_state == 1 tells the  */
@@ -1343,7 +1353,9 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
     }
 
     /* Make sure we leave with the same font properties as on entry */
-    strncpy(SVG_fontNameCur,fontname,sizeof(fontname));
+    free(SVG_fontNameCur);
+    SVG_fontNameCur = fontname;
+    fontname = NULL;
     if (SVG_fontSizeCur != fontsize || ENHsvg_base != 0) {
 	fprintf(gpoutfile, "<tspan font-size=\"%.1fpt\" dy=\"%.2fpt\"></tspan>",
 		fontsize, ENHsvg_base);

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.249 2010/02/07 06:39:47 sfeam Exp $
+ * $Id: post.trm,v 1.250 2010/02/17 23:56:28 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1065,7 +1065,8 @@ PS_options()
 			    while (strpbrk(s, "()[]{}| "))
 				*(strpbrk(s, "()[]{}| ")) = '-';
 			}
-			strncpy(ps_params->font, s, sizeof(ps_params->font));
+			ps_params->font[sizeof(ps_params->font)-1] = '\0';
+			strncpy(ps_params->font, s, sizeof(ps_params->font)-1);
 		    }
 		    free(s);
 		} else
@@ -2432,7 +2433,7 @@ ENHPS_set_font(const char *font)
 
     if (*font) {
 	size_t sep = strcspn(font,",");
-	if (sep > 0) {
+	if (sep > 0 && sep < sizeof(ps_enh_font)) {
 	    strncpy(ps_enh_font,font,sep);
 	    ps_enh_font[sep] = NUL;
 	    PS_RememberFont(ps_enh_font);
