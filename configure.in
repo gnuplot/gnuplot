@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.261 2010/02/03 05:16:34 sfeam Exp $
+dnl $Id: configure.in,v 1.262 2010/02/07 23:18:14 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -143,9 +143,9 @@ AM_CONDITIONAL(BUILD_GNUPLOT_X11, test "$no_x" != yes)
 dnl change location of X11 defaults
 AC_ARG_WITH(x-app-defaultdir,dnl
 [  --with-x-app-defaultdir=DIR       location of X11 application defaults
-                          (default SYSCONFDIR/X11/app-defaults/PACKAGE/VERSION)],
+                          (default /etc/X11/app-defaults/)],
   X11_APPDEFAULTS_DIR="$withval",
-  X11_APPDEFAULTS_DIR="$sysconfdir/X11/app-defaults/$PACKAGE/$VERSION_MAJOR")
+  X11_APPDEFAULTS_DIR="/etc/X11/app-defaults/")
 
 dnl Operating systems.
 dnl FIXME AC_DEFINE(ISC22)
@@ -1145,6 +1145,10 @@ dnl translation tools
 AC_CHECK_PROGS(LRELEASE, lrelease-qt4 lrelease, no)
 AM_CONDITIONAL(HAVE_LRELEASE, test "${LRELEASE}" != no)
 
+AC_ARG_VAR(DIST_CONTACT,[Contact address for modified and binary distributed gnuplot versions])
+if test -n "${DIST_CONTACT}"; then
+  AC_DEFINE_UNQUOTED([DIST_CONTACT],["$DIST_CONTACT"],[Contact address for modified and binary distributed gnuplot versions])
+fi
 
 dnl build lisp files
 if test "$with_lisp_files" != no; then
