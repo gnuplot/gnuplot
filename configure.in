@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.248.2.10 2010/02/07 23:17:34 sfeam Exp $
+dnl $Id: configure.in,v 1.248.2.11 2010/02/18 05:52:48 sfeam Exp $
 dnl
 dnl AC_INIT must match the release number
 AC_INIT(gnuplot, 4.4.0-rc1)
@@ -1055,6 +1055,11 @@ AC_ARG_ENABLE(backwards-compatibility,dnl
                [ Define to allow use of deprecated syntax and terminal behaviour. ])
   fi])
 
+AC_ARG_VAR(DIST_CONTACT,[Contact address for modified and binary distributed gnuplot versions])
+if test -n "${DIST_CONTACT}"; then
+  AC_DEFINE_UNQUOTED([DIST_CONTACT],["$DIST_CONTACT"],[Contact address for modified and binary distributed gnuplot versions])
+fi
+
 dnl build lisp files
 if test "$with_lisp_files" != no; then
   AC_CONFIG_SUBDIRS(lisp)
@@ -1406,11 +1411,6 @@ if test "$with_lasergnu" = yes; then
   AC_MSG_RESULT([  lasergnu printer script: yes])
 else
   AC_MSG_RESULT([  lasergnu printer script: no (use --with-lasergnu to enable)])
-fi
-
-AC_ARG_VAR(DIST_CONTACT,[Contact address for modified and binary distributed gnuplot versions])
-if test -n "${DIST_CONTACT}"; then
-  AC_DEFINE_UNQUOTED([DIST_CONTACT],["$DIST_CONTACT"],[Contact address for modified and binary distributed gnuplot versions])
 fi
 
 if test "$with_lisp_files" != no; then

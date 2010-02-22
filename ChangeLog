@@ -1,3 +1,8 @@
+2010-02-22  Christoph Junghans (ottxor)
+
+	* configure.in: Fix order of processing configuration options.
+	Bug #2951583 #2956754
+
 2010-02-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Use dynamic allocation for all font names. This prevents
