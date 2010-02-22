@@ -1,3 +1,8 @@
+2010-02-22  Don Taber  <dtaber@topaflyers.com>
+
+	* src/win/wgraph.c (SelFont):  After a font change, call 
+	do_string_replot("") so that it is immediately visible.
+
 2010-02-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Use dynamic allocation for all font names. This prevents

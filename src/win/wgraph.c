@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.79 2010/02/16 07:12:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.80 2010/02/16 07:15:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -815,6 +815,8 @@ SelFont(LPGW lpgw)
 		strcpy(lpgw->deffontname,lpgw->fontname);
 		lpgw->deffontsize = lpgw->fontsize;
 		SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);
+		/* DBT 2010-02-22 replot to force immediate font change, volatile data OK */
+		do_string_replot("");
 	}
 #endif
 }
