@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.38 2009/09/06 01:59:56 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.39 2009/09/09 05:07:18 janert Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -688,7 +688,8 @@ void f_rand(union argument *arg)
  *
  *   XREF      lngamma()
  *
- *   BUGS      none
+ *   BUGS      This approximation is only accurate on the domain
+ *             x < (a-1)/(a+b-2)
  *
  *   REFERENCE The continued fraction expansion as given by
  *             Abramowitz and Stegun (1964) is used.
@@ -714,7 +715,12 @@ ibeta(double a, double b, double x)
 	return x;
 
     /* Swap a, b if necessary for more efficient evaluation */
-    return a < x * (a + b) ? 1.0 - confrac(b, a, 1.0 - x) : confrac(a, b, x);
+    if (a < x * (a + b)) {
+	double temp = confrac(b, a, 1.0 - x);
+	return (temp < 0.0) ? temp : 1.0 - temp;
+    } else {
+	return confrac(a, b, x);
+    }
 }
 
 static double

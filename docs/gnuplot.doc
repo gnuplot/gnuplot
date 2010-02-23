@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.599 2010/02/15 19:01:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.600 2010/02/17 06:19:00 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -954,7 +954,9 @@ C
 %ibeta(p,q,x)@any@$ibeta ( roman real (p,q,x))$, ibeta function of real ($p$,$q$,$x$)
  The `ibeta(p,q,x)` function returns the incomplete beta function of the real
  parts of its arguments. p, q > 0 and x in [0:1].  If the arguments are
- complex, the imaginary components are ignored.
+ complex, the imaginary components are ignored.  The function is approximated by
+ the method of continued fractions (Abramowitz and Stegun, 1964).
+ The approximation is only accurate in the region x < (p-1)/(p+q-2). 
 4 inverf
 ?expressions functions inverf
 ?functions inverf
