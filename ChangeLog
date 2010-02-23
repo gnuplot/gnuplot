@@ -1,3 +1,13 @@
+2010-02-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/specfun.c (ibeta) docs/gnuplot.doc:
+	The approximation used for the function ibeta(a,b,x) was taken from 
+	Abramowitz & Stegun. However we failed to document that it is only
+	usable on the domain x < (a-1)/(a+b-2).  Add this warning to the docs
+	and make sure that the function itself returns a consistant error
+	value (-1) if the domain or range is invalid.
+	Bug #2957184
+
 2010-02-22  Christoph Junghans (ottxor)
 
 	* configure.in: Fix order of processing configuration options.
