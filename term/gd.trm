@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.145 2009/10/06 23:02:59 sfeam Exp $
+ * $Id: gd.trm,v 1.136.2.9 2009/12/01 06:23:06 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -64,6 +64,8 @@
  * color borders, then the X & Y axis, then the plotting colors.
  * (The wierd color spec is in order to get around limitations
  * in gnuplot's scanner.)
+ * EAM Feb 2010: This mechanism is totally obsolete except for setting the
+ * background color.  Revise the documentation accordingly.
  *
  * This driver is modeled after the PBM driver pbm.trm.
  *
@@ -2254,7 +2256,7 @@ START_HELP(png)
 "              {tiny | small | medium | large | giant}",
 "              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
 "              {size <x>,<y>} {{no}crop}",
-"              {<color0> <color1> <color2> ...}",
+"              {<background_color>}",
 "",
 " PNG, JPEG and GIF images are created using the external library libgd.",
 " PNG plots may be viewed interactively by piping the output to the",
@@ -2296,23 +2298,17 @@ START_HELP(png)
 " Blank space at the edges of the finished plot may be trimmed using the `crop`",
 " option, resulting in a smaller final image size. Default is `nocrop`.",
 "",
-" Each color must be of the form 'xrrggbb', where x is the literal character",
-" 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
-" 'x00ff00' is green.  The background color is set first, then the border",
-" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
-" number of colors that can be set is 256.",
+" The background color must be given in the form 'xrrggbb', where x is the",
+" literal character 'x' and 'rrggbb' are the red, green and blue components",
+" in hexadecimal.  For example, 'x00ff00' is green.  The specification of",
+" additional colors other than the background is deprecated.",
 "",
 "2 examples",
 "?set term png examples",
-"       set terminal png medium size 640,480 \\",
-"                        xffffff x000000 x404040 \\",
-"                        xff0000 xffa500 x66cdaa xcdb5cd \\",
-"                        xadd8e6 x0000ff xdda0dd x9500d3    # defaults",
+"       set terminal png medium size 640,480 xffffff",
 "",
 " Use the medium size built-in non-scaleable, non-rotatable font.",
-" Use white (xffffff) for the non-transparent background, black for borders,",
-" gray for the axes, and red, orange, medium aquamarine, thistle 3, light blue,",
-" blue, plum and dark violet for the first eight plotting colors.",
+" Use white (xffffff) for the non-transparent background.",
 "",
 "       set terminal png font arial 14 size 800,600",
 "",
@@ -2414,7 +2410,7 @@ START_HELP(jpeg)
 "              {tiny | small | medium | large | giant}",
 "              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
 "              {size <x>,<y>} {{no}crop}",
-"              {<color0> <color1> <color2> ...}",
+"              {<background_color>}",
 "",
 " PNG, JPEG and GIF images are created using the external library libgd.",
 " In most cases, PNG is to be preferred for single plots, and GIF for",
@@ -2446,11 +2442,10 @@ START_HELP(jpeg)
 " Blank space at the edges of the finished plot may be trimmed using the `crop`",
 " option, resulting in a smaller final image size. Default is `nocrop`.",
 "",
-" Each color must be of the form 'xrrggbb', where x is the literal character",
-" 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
-" 'x00ff00' is green.  The background color is set first, then the border",
-" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
-" number of colors that can be set is 256.",
+" The background color must be given in the form 'xrrggbb', where x is the",
+" literal character 'x' and 'rrggbb' are the red, green and blue components",
+" in hexadecimal.  For example, 'x00ff00' is green.  The specification of",
+" additional colors other than the background is deprecated.",
 ""
 END_HELP(jpeg)
 #endif /* TERM_HELP */
@@ -2569,7 +2564,7 @@ START_HELP(gif)
 "              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
 "              {size <x>,<y>} {{no}crop}",
 "              {animate {delay <d>} {loop <n>} {{no}optimize}}",
-"              {<color0> <color1> <color2> ...}",
+"              {<background_color>}",
 "",
 " PNG, JPEG and GIF images are created using the external library libgd.",
 " GIF plots may be viewed interactively by piping the output to the",
@@ -2629,23 +2624,17 @@ START_HELP(gif)
 " Blank space at the edges of the finished plot may be trimmed using the `crop`",
 " option, resulting in a smaller final image size. Default is `nocrop`.",
 "",
-" Each color must be of the form 'xrrggbb', where x is the literal character",
-" 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
-" 'x00ff00' is green.  The background color is set first, then the border",
-" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
-" number of colors that can be set is 256.",
+" The background color must be given in the form 'xrrggbb', where x is the",
+" literal character 'x' and 'rrggbb' are the red, green and blue components",
+" in hexadecimal.  For example, 'x00ff00' is green.  The specification of",
+" additional colors other than the background is deprecated.",
 "",
 "2 examples",
 "?set term gif examples",
-"       set terminal gif medium size 640,480 \\",
-"                        xffffff x000000 x404040 \\",
-"                        xff0000 xffa500 x66cdaa xcdb5cd \\",
-"                        xadd8e6 x0000ff xdda0dd x9500d3    # defaults",
+"       set terminal gif medium size 640,480 xffffff",
 "",
 " Use the medium size built-in non-scaleable, non-rotatable font.",
-" Use white (xffffff) for the non-transparent background, black for borders,",
-" gray for the axes, and red, orange, medium aquamarine, thistle 3, light blue,",
-" blue, plum and dark violet for the first eight plotting colors.",
+" Use white (xffffff) for the non-transparent background.",
 "",
 "       set terminal gif font arial 14 enhanced",
 "",

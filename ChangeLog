@@ -4,6 +4,11 @@
 	both the user-loaded colors and the default set of colors.  Otherwise 
 	RGB fails if the user has loaded no colors.
 
+	* term/gd.trm:  Documentation for the mechanism for setting line colors
+	in the 'set term' command is out of date, and anyhow the mechanism is
+	needed only for the terminal background.  Line colors can now be handled
+	in terminal-independent commands.  Revise the docs accordingly.
+
 2010-02-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c (ibeta) docs/gnuplot.doc:
