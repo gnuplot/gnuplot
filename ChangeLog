@@ -1,3 +1,9 @@
+2010-02-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cgm.trm (find_nearest_color):  When looking for RGB colors, check
+	both the user-loaded colors and the default set of colors.  Otherwise 
+	RGB fails if the user has loaded no colors.
+
 2010-02-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c (ibeta) docs/gnuplot.doc:

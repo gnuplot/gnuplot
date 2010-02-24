@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.92 2009/06/08 04:37:29 sfeam Exp $
+ * $Id: cgm.trm,v 1.93 2009/09/13 17:49:16 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1670,7 +1670,7 @@ CGM_find_nearest_color(t_colorspec *colorspec)
     int k;
     int dr, dg, db, distance;
 
-    for (k=0; k<cgm_user_color_max; k++) {
+    for (k=0; k<cgm_user_color_count; k++) {
 	dr = cgm_user_color_table[++i] - red;
 	dg = cgm_user_color_table[++i] - green;
 	db = cgm_user_color_table[++i] - blue;
