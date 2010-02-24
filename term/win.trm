@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.74 2010/02/16 07:14:38 mikulik Exp $
+ * $Id: win.trm,v 1.75 2010/02/16 07:15:12 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -202,9 +202,9 @@ WIN_options()
 	    break;
 	case WIN_SIZE:
 	{
-	    c_token++;
 	    int win_width = 0;
 	    int win_height = 0;
+	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token,"size requires 'width,heigth'");
 	    win_width = real_expression();
@@ -220,9 +220,9 @@ WIN_options()
 	}
 	case WIN_POSITION:
 	{
-	    c_token++;
 	    int win_x = 0;
 	    int win_y = 0;
+	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token,"position requires 'x,y'");
 	    win_x = real_expression();
@@ -871,6 +871,7 @@ WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
     unsigned int pass, num_passes;
+    char* copy_WIN_font;
 
     /* If no enhanced text processing is needed, we can use the plain  */
     /* vanilla put_text() routine instead of this fancy recursive one. */
@@ -902,7 +903,7 @@ WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 
     /* make a backup copy of the fontname to use 
        for enhanced recursion */
-    char* copy_WIN_font = strdup(WIN_font);
+    copy_WIN_font = strdup(WIN_font);
     
     for( pass=1; pass <= num_passes; pass++ ) {
 

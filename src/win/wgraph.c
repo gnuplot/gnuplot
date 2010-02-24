@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.80 2010/02/16 07:15:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.81 2010/02/22 22:18:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -651,6 +651,8 @@ GetPlotRect(LPGW lpgw, LPRECT rect)
 static void 
 GetPlotRectInMM(LPGW lpgw, LPRECT rect, HDC hdc)
 {
+	int iWidthMM, iHeightMM, iWidthPels, iHeightPels;
+
 	GetPlotRect (lpgw, rect);
 	
 	/* Taken from 
@@ -663,10 +665,10 @@ GetPlotRectInMM(LPGW lpgw, LPRECT rect, HDC hdc)
 	// iWidthPels is the display width in pixels.  
 	// iHeightPels is the display height in pixels  
 	
-	int iWidthMM = GetDeviceCaps(hdc, HORZSIZE); 
-	int iHeightMM = GetDeviceCaps(hdc, VERTSIZE); 
-	int iWidthPels = GetDeviceCaps(hdc, HORZRES); 
-	int iHeightPels = GetDeviceCaps(hdc, VERTRES); 
+	iWidthMM = GetDeviceCaps(hdc, HORZSIZE); 
+	iHeightMM = GetDeviceCaps(hdc, VERTSIZE); 
+	iWidthPels = GetDeviceCaps(hdc, HORZRES); 
+	iHeightPels = GetDeviceCaps(hdc, VERTRES); 
 	
 	// Convert client coordinates to .01-mm units.  
 	// Use iWidthMM, iWidthPels, iHeightMM, and  
@@ -1398,6 +1400,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 static void
 SaveAsEMF(LPGW lpgw)
 {
+    char *cwd;
     static OPENFILENAME Ofn;
     
     static char lpstrCustomFilter[256] = { '\0' };
@@ -1425,7 +1428,6 @@ SaveAsEMF(LPGW lpgw)
     Ofn.lpstrDefExt = (LPSTR) "emf";
     
     /* save cwd as GetSaveFileName apparently changes it */
-    char *cwd;
     cwd = _getcwd( NULL, 0 );
     
     if( GetSaveFileName(&Ofn) != 0 ) {
