@@ -37,6 +37,7 @@ New features, changes and fixes since gnuplot version 4.2
 * NEW z-axis tic labels can be colored by Z value
 * NEW command 'set view equal {xy|xyz}' forces axes in a 3D plot to the same scale
 * NEW 'set pm3d interpolate m,n' supports also non-positive m,n as nbs of points
+* FIX domain restrictions on ibeta()
 * FIX color assignment of contour lines when "set increment user" is in effect
 * FIX remove the limit of 64 characters read as string data from a data file
 * FIX remainder of command line is not lost after a "load" command
