@@ -1,3 +1,9 @@
+2010-02-24  Peter Juhasz
+
+	* src/save.c:  The 'save' command was not correctly handling plot styles
+	circles, image, or rgbimage.
+	Bug #2958235
+
 2010-02-24  Alexander Taschner  <tachna@users.sourceforge.net>
 
 	* src/command.c src/win/wgraph.c term/win.trm:  Move declarations to
