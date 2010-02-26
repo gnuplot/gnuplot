@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.24 2010/02/24 04:16:48 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.25 2010/02/24 20:55:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1713,9 +1713,9 @@ C ... and restart the table:
  It is usually sufficient in gnuplot to request a font by a generic name and
  size, letting fontconfig substitute a similar font if necessary. The following
  will probably all work:
-      set term pdfpng font "sans,12"
-      set term pdfpng font "Times,12"
-      set term pdfpng font "Times-New-Roman,12"
+      set term pdfcairo font "sans,12"
+      set term pdfcairo font "Times,12"
+      set term pdfcairo font "Times-New-Roman,12"
 
 3 gd (png, gif, jpeg terminals)
 ?gd
