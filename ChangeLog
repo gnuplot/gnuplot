@@ -6,6 +6,8 @@
 	rgb_from_column, but it was not being updated in some circumstances.
 	Get rid of the variable and test the plot header directly when needed.
 
+	* docs/gnuplot.texi: Sync to current docs
+
 2010-02-24  Peter Juhasz
 
 	* src/save.c:  The 'save' command was not correctly handling plot styles

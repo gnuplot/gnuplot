@@ -1386,7 +1386,9 @@ value, the imaginary component is ignored.
 
 The `ibeta(p,q,x)` function returns the incomplete beta function of the real
 parts of its arguments. p, q > 0 and x in [0:1].  If the arguments are
-complex, the imaginary components are ignored.
+complex, the imaginary components are ignored.  The function is approximated by
+the method of continued fractions (Abramowitz and Stegun, 1964).
+The approximation is only accurate in the region x < (p-1)/(p+q-2). 
 
 @node inverf, igamma, ibeta, Functions
 @subsubsection inverf
@@ -2276,7 +2278,7 @@ expression. For example
 @end example
 
 Valid names are the same as in most programming languages: they must begin
-with a letter, but subsequent characters may be letters, digits, "$", or "_".
+with a letter, but subsequent characters may be letters, digits, or "_".
 
 Each function definition is made available as a special string-valued
 variable with the prefix 'GPFUN_'.
@@ -2325,6 +2327,20 @@ terminals, see the documentation for that terminal.
 
 
 Sorry, this section is under construction.
+These terminals find and access fonts using the external fontconfig tool set.
+Please see the
+@uref{http://fontconfig.org/fontconfig-user.html,fontconfig user manual.
+}
+It is usually sufficient in gnuplot to request a font by a generic name and
+size, letting fontconfig substitute a similar font if necessary. The following
+will probably all work:
+@example
+     set term pdfcairo font "sans,12"
+     set term pdfcairo font "Times,12"
+     set term pdfcairo font "Times-New-Roman,12"
+
+@end example
+
 
 @node gd_(png, postscript__(also_encapsulated_postscript_*.eps), cairo_(pdfcairo, Fonts
 @subsection gd (png, gif, jpeg terminals)
@@ -7161,21 +7177,23 @@ file. These are contained in "pseudocolumns".
 
 @c ?using xticlabels
 @c ?plot using xticlabels
-A column of the input data file can be used to label axis tic marks.
-The format of such a plot command is
+Axis tick labels can be generated via a string function, usually taking a data
+column as an argument. The simplest form uses the data column itself as a 
+string. That is,  xticlabels(N) is shorthand for xticlabels(stringcolumn(N)).
+This example uses the contents of column 3 as x-axis tick labels.
 
 @example
-  plot 'datafile' using <xcol>:<ycol>:xticlabels(<labelcol>) with <plotstyle>
+      plot 'datafile' using <xcol>:<ycol>:xticlabels(3) with <plotstyle>
 
 @end example
 
-Tic labels may be read for any of the plot axes: x x2 y y2 z.
+Axis tick labels may be generated for any of the plot axes: x x2 y y2 z.
 The `ticlabels(<labelcol>)` specifiers must come after all of the data
 coordinate specifiers in the @ref{using} portion of the command.
 For each data point which has a valid set of X,Y[,Z] coordinates,
-the text field found in column <labelcol> is added to the list of xtic labels
-at the same X coordinate as the point it belongs to. `xticlabels(<labelcol>)`
-may be shortened to `xtic(<labelcol>)`.
+the string value given to xticlabels() is added to the list of xtic labels
+at the same X coordinate as the point it belongs to. `xticlabels()`
+may be shortened to `xtic()` and so on.
 
 Example:
 
@@ -7187,6 +7205,17 @@ Example:
 In this example the x and y axis tic labels are taken from different columns
 than the x and y coordinate values. The z axis tics, however, are generated
 from the z coordinate of the corresponding point.
+
+Example:
+
+@example
+      plot "data" using 1:2:xtic( $3 > 10. ? "A" : "B" )
+
+@end example
+
+This example shows the use of a string-valued function to generate x-axis
+tick labels. Each point in the data file generates a tick mark on x labeled
+either "A" or "B" depending on the value in column 3.
 
 
 @noindent --- X2TICLABELS ---
@@ -8717,9 +8746,7 @@ See also
 @opindex bars
 
 
-The @ref{bars} command controls the tics at the ends of error bars,
-and also the width of the boxes in plot styles candlesticks and
-financebars.
+The @ref{bars} command controls the tics at the ends of error bars.
 
 Syntax:
 @example
@@ -9426,8 +9453,15 @@ Example:
 
 Example:
 @example
+      set style data linespoints
+      plot '-'
+         1 10
+         2 20
+         3 ?
+         4 40
+         5 50
+         e
       set datafile missing "?"
-      set style data lines
       plot '-'
          1 10
          2 20
@@ -9457,10 +9491,10 @@ will use the single-datum-on-a-line convention that the line number is "x"
 and the datum is "y", so the point will be plotted (in this case erroneously)
 at (2,3).
 
-The second `plot` will correctly ignore the middle line.  The plotted line
-will connect the points at (2,20) and (4,40).
+The second and third `plot` commands will correctly ignore the middle line.
+The plotted line will connect the points at (2,20) and (4,40).
 
-The third `plot` will also correctly ignore the middle line, but the plotted
+The fourth `plot` will also correctly ignore the middle line, but the plotted
 line will not connect the points at (2,20) and (4,40).
 
 There is no default character for `missing`, but in many cases any
@@ -9680,7 +9714,7 @@ Syntax:
       set dgrid3d @{<rows>@} @{,@{<cols>@}@}
                   @{ splines |
                     qnorm @{<norm>@} |
-                    gauss | cauchy | exp | box | hann @{<dx>@} @{,@{dy@}@} @}
+                    (gauss | cauchy | exp | box | hann) @{<dx>@} @{,dy@} @}
       unset dgrid3d
       show dgrid3d
 
@@ -17529,7 +17563,7 @@ Syntax:
              @{tiny | small | medium | large | giant@}
              @{font "<face> @{,<pointsize>@}"@} @{@{no@}enhanced@}
              @{size <x>,<y>@} @{@{no@}crop@}
-             @{<color0> <color1> <color2> ...@}
+             @{<background_color>@}
 
 @end example
 
@@ -17579,11 +17613,10 @@ Please see additional information under `canvas` and @ref{size}.
 Blank space at the edges of the finished plot may be trimmed using the `crop`
 option, resulting in a smaller final image size. Default is `nocrop`.
 
-Each color must be of the form 'xrrggbb', where x is the literal character
-'x' and 'rrggbb' are the red, green and blue components in hex.  For example,
-'x00ff00' is green.  The background color is set first, then the border
-colors, then the X & Y axis colors, then the plotting colors.  The maximum
-number of colors that can be set is 256.
+The background color must be given in the form 'xrrggbb', where x is the
+literal character 'x' and 'rrggbb' are the red, green and blue components
+in hexadecimal.  For example, 'x00ff00' is green.  The specification of
+additional colors other than the background is deprecated.
 
 
 
@@ -17591,17 +17624,12 @@ number of colors that can be set is 256.
 
 @c ?set term png examples
 @example
-      set terminal png medium size 640,480 \\
-                       xffffff x000000 x404040 \\
-                       xff0000 xffa500 x66cdaa xcdb5cd \\
-                       xadd8e6 x0000ff xdda0dd x9500d3    # defaults
+      set terminal png medium size 640,480 xffffff
 
 @end example
 
 Use the medium size built-in non-scaleable, non-rotatable font.
-Use white (xffffff) for the non-transparent background, black for borders,
-gray for the axes, and red, orange, medium aquamarine, thistle 3, light blue,
-blue, plum and dark violet for the first eight plotting colors.
+Use white (xffffff) for the non-transparent background.
 
 @example
       set terminal png font arial 14 size 800,600
@@ -18344,8 +18372,7 @@ Syntax:
 A 'target name' or 'file name' (in quotes) for a script is mandatory.
 If a 'target name' for the script is given, the terminal will look for
 "gnuplot-<target name>.lua" in the local directory and on failure in
-the 'libexec' directory of the gnuplot installation or via the
-environmental variable GNUPLOT_DRIVER_DIR.
+the environmental variable GNUPLOT_LUA_DIR.
 
 All arguments will be provided to the selected script for further
 evaluation. E.g. 'set term lua tikz help' will cause the script itself
@@ -19755,6 +19782,9 @@ Syntax:
                            @{enhanced | noenhanced@}
                            @{@{font@} "fontname@{,fontsize@}" @{<fontsize>@}@}
                            @{title "Plot Window Title"@}
+                           @{size <width>,<height>@}
+                           @{position <x>,<y>@}
+                           @{close@}
 
 @end example
 
@@ -19763,6 +19793,10 @@ where `color` and `monochrome` select colored or mono output,
 superscripts and mixed fonts). See `enhanced` for more information.
 `"<fontname>"` is the name of a valid Windows font, and `<fontsize>`
 is the size of the font in points.
+@ref{size} defines the width and height of the window in pixel and `position`
+the origin of the window i.e. the position of the top left corner on the
+screen (again in pixel). Both these options override the default settings
+from the WGNUPLOT.INI file (see below).
 
 Other options may be set with the graph-menu or the initialization file.
 
@@ -19774,6 +19808,9 @@ By giving the optional argument `-persist` (same as for gnuplot under x11;
 former Windows-only options `/noend` or `-noend` are still accepted as well),
 will not close gnuplot. Contrary to gnuplot on other operating systems,
 gnuplot's interactive command line is accessible after the -persist option.
+
+The plot window remains open even when the gnuplot driver is changed to a
+different device. The plot window can be close with `set term windows close`
 
 
 @noindent --- GRAPH-MENU ---
@@ -19796,7 +19833,9 @@ plot.
 `Color` when checked enables color linestyles.  When unchecked it forces
 monochrome linestyles.
 
-`Copy to Clipboard` copies a bitmap and a Metafile picture.
+`Copy to Clipboard` copies a bitmap and an enhanced Metafile picture.
+
+`Save as EMF...` allows the user to save the current graph window as enhanced metafile
 
 `Background...` sets the window background color.
 
