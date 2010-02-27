@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.602 2010/02/24 20:54:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.603 2010/02/26 16:59:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7010,8 +7010,15 @@ Ffigure_mapcontours
        set datafile missing "NaN"
 
  Example:
+       set style data linespoints
+       plot '-'
+          1 10
+          2 20
+          3 ?
+          4 40
+          5 50
+          e
        set datafile missing "?"
-       set style data lines
        plot '-'
           1 10
           2 20
@@ -7039,10 +7046,10 @@ Ffigure_mapcontours
  and the datum is "y", so the point will be plotted (in this case erroneously)
  at (2,3).
 
- The second `plot` will correctly ignore the middle line.  The plotted line
- will connect the points at (2,20) and (4,40).
+ The second and third `plot` commands will correctly ignore the middle line.
+ The plotted line will connect the points at (2,20) and (4,40).
 
- The third `plot` will also correctly ignore the middle line, but the plotted
+ The fourth `plot` will also correctly ignore the middle line, but the plotted
  line will not connect the points at (2,20) and (4,40).
 
  There is no default character for `missing`, but in many cases any

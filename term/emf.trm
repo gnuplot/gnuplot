@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.62 2009/09/17 04:02:43 sfeam Exp $
+ * $Id: emf.trm,v 1.63 2009/12/09 00:57:49 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1517,14 +1517,16 @@ ENHemf_FLUSH()
 		{
 		int thin = 0, wide = 0;
 		for (i=0; i<strlen(str); i++) {
-		    if (strchr(" ijl.,;:|!()[]1I",str[i]))
+		    if (strchr(" ijl.,;:|!()[]I-'",str[i]))
 			thin++;
 		    if (('A' <= str[i] && str[i] <= 'Z') || strchr("mw<>",str[i]))
 			wide++;
-		    if('i' == str[i])
+		    if (strchr(" i.,;:|!'",str[i]))  /* really thin */
 			thin++;
 		}
-		incr_x = (strl * EMF_AVG_WID + (double)(wide-thin) * 0.2)
+		incr_x = (strl * EMF_AVG_WID 
+			+ (double)(wide) * 0.3
+			+ (double)(-thin) * 0.2)
 			* term->h_char;
 		}
 	    } else {
