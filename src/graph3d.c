@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.227 2009/12/31 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.228 2010/01/11 04:31:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -153,7 +153,6 @@ static void key_sample_point __PROTO((int xl, int yl, int pointtype));
 static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, int yl));
 static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
 static TBOOLEAN can_pm3d = FALSE;
-static TBOOLEAN rgb_from_column = FALSE;
 static void key_text __PROTO((int xl, int yl, char *text));
 static void check_for_variable_color __PROTO((struct surface_points *plot, struct coordinate *point));
 
@@ -1468,7 +1467,7 @@ plot3d_impulses(struct surface_points *plot)
     struct iso_curve *icrvs = plot->iso_crvs;
     int colortype = plot->lp_properties.pm3d_color.type;
 
-    rgb_from_column = can_pm3d && plot->pm3d_color_from_column
+    TBOOLEAN rgb_from_column = can_pm3d && plot->pm3d_color_from_column
 			&& plot->lp_properties.pm3d_color.value < 0.0;
 
     if (colortype == TC_RGB && !rgb_from_column)
@@ -1562,6 +1561,7 @@ plot3d_lines(struct surface_points *plot)
     struct iso_curve *icrvs = plot->iso_crvs;
     struct coordinate GPHUGE *points;
     double lx[2], ly[2], lz[2];	/* two edge points */
+    TBOOLEAN rgb_from_column;
 
 #ifndef LITE
 /* These are handled elsewhere.  */
@@ -1851,7 +1851,7 @@ plot3d_points(struct surface_points *plot, int p_type)
     while (icrvs) {
 	struct coordinate GPHUGE *point;
 	int colortype = plot->lp_properties.pm3d_color.type;
-	rgb_from_column = plot->pm3d_color_from_column
+	TBOOLEAN rgb_from_column = plot->pm3d_color_from_column
 			&& plot->lp_properties.pm3d_color.value < 0.0;
 
 	/* Apply constant color outside of the loop */
@@ -3230,7 +3230,7 @@ check_for_variable_color(struct surface_points *plot, struct coordinate *point)
 
     switch( colortype ) {
     case TC_RGB:
-	if (rgb_from_column)
+	if (plot->pm3d_color_from_column)
 	    set_rgbcolor( (int)point->CRD_COLOR );
 	break;
     case TC_Z:
