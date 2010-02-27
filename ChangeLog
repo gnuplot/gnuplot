@@ -8,6 +8,9 @@
 
 	* docs/gnuplot.texi: Sync to current docs
 
+	* term/emf.trm:  Tweak empirical corrections for character widths.
+	Additional thin character -, really thin chars i,.:;|!
+
 2010-02-24  Peter Juhasz
 
 	* src/save.c:  The 'save' command was not correctly handling plot styles
