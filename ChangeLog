@@ -1,3 +1,11 @@
+2010-02-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* graph3d.c (check_for_variable_color) plot3d.c (get_3ddata)
+	plot3d.c (plot3d_impulses plot3d_lines plot3d_points):
+	The presence of variable color was being tracked by a shared variable,
+	rgb_from_column, but it was not being updated in some circumstances.
+	Get rid of the variable and test the plot header directly when needed.
+
 2010-02-24  Peter Juhasz
 
 	* src/save.c:  The 'save' command was not correctly handling plot styles

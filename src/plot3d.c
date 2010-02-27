@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.171.2.3 2009/10/08 20:12:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.171.2.4 2009/10/17 22:57:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -770,6 +770,7 @@ get_3ddata(struct surface_points *this_plot)
 
 	while ((retval = df_readline(v,MAXDATACOLS)) != DF_EOF) {
 	    j = retval;
+
 	    if (j == DF_SECOND_BLANK)
 		break;		/* two blank lines */
 	    if (j == DF_FIRST_BLANK) {
@@ -986,8 +987,10 @@ get_3ddata(struct surface_points *this_plot)
 		    if (j >= 7) {
 			color = v[6];
 			color_from_column(TRUE);
-		    } else
+		    } else {
 			color = z;
+			color_from_column(FALSE);
+		    }
 		}
 	    }
 #undef color_from_column
