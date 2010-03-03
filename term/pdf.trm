@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.83.2.2 2009/09/13 17:54:09 sfeam Exp $
+ * $Id: pdf.trm,v 1.83.2.3 2010/01/12 20:45:22 sfeam Exp $
  */
 
 /*------------------------------
@@ -428,7 +428,7 @@ PDF_options ()
 	    pdf_explicit_units = parse_term_size(&xmax_t, &ymax_t, INCHES);
 	    term->xmax = xmax_t*PDF_RESOLUTION*72./gp_resolution;
 	    term->ymax = ymax_t*PDF_RESOLUTION*72./gp_resolution;
-	    break;
+	    continue;
 	}
 
 #ifdef HAVE_NODASH_LIBPDF

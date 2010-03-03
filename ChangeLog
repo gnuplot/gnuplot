@@ -1,3 +1,8 @@
+2010-03-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm:  Remove requirement that the 'size' option must be the
+	last option given.
+
 2010-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* graph3d.c (check_for_variable_color) plot3d.c (get_3ddata)
