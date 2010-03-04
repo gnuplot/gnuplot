@@ -1,3 +1,7 @@
+2010-03-04  Thomas Sefzick <thse@users.sourceforge.net>
+
+	* src/svg.trm:  Make sure to reset ENHsvg_string_state after each use.
+
 2010-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm:  Remove requirement that the 'size' option must be the

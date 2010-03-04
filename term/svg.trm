@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.102 2009/09/13 17:49:16 sfeam Exp $
+ * $Id: svg.trm,v 1.103 2010/02/18 17:48:35 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1330,6 +1330,7 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
     } else {
 	ENHsvg_string_state = 1;
 	SVG_put_text(x, y, str);
+	ENHsvg_string_state = 0;
     }
 
     /* EAM FIXME - This is a total hack, to make up for the fact that all  */
