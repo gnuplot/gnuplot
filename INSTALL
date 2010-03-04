@@ -56,6 +56,9 @@ gnuplot_x11                     PREFIX/libexec/gnuplot/$VERSION
 gnuplot.1                       PREFIX/man/man1
 gnuplot.gih                     PREFIX/share/gnuplot/$VERSION
 
+Gnuplot				PREFIX/share/gnuplot/$VERSION/app-defaults
+				(please copy to system app-defaults location)
+
    The only files where the runtime location is defined at compile time are
 gnuplot.gih and show.c. This is important if gnuplot is not installed 
 by running 'make install'.

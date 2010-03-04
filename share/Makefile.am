@@ -7,7 +7,7 @@ if HAVE_LATEX
 SUBDIRS = LaTeX
 endif
 
-appdefaultdir = @X11_APPDEFAULTS_DIR@
+appdefaultdir = $(pkgdatadir)/$(VERSION_MAJOR)/app-defaults
 
 APPDEFAULTFILES = Gnuplot
 
