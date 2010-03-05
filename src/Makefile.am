@@ -92,7 +92,7 @@ endif
 clean-demo:
 	rm -vf $(GNUPLOT_X11)
 
-clean-am: clean-demo
+clean-local: clean-demo
 
 ## we don't need COREOBJS, but CORETERM
 ## for the term.o dependencies
