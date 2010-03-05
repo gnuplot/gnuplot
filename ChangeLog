@@ -1,3 +1,11 @@
+2010-03-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c (eval_reset_after_error f_call) src/internal.h
+	src/util.c (int_error) eval.h (STACK_DEPTH):
+	Add a recursion depth limit for calls to a user-defined function.
+	Bump the maximum depth from 100 to 250.
+	Bug #2954383
+
 2010-03-05  Christoph Junghans (ottxor)
 
 	* src/Makefile.am:  Fix broken target "make clean"

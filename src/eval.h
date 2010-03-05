@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.31 2008/07/04 07:00:18 mikulik Exp $
+ * $Id: eval.h,v 1.32 2008/07/21 20:19:25 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -44,7 +44,7 @@
 
 #include <stdio.h>		/* for FILE* */
 
-#define STACK_DEPTH 100		/* maximum size of the execution stack */
+#define STACK_DEPTH 250		/* maximum size of the execution stack */
 #define MAX_AT_LEN 150		/* max number of entries in action table */
 
 /* Type definitions */

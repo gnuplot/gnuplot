@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.53 2009/10/26 17:34:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.54 2009/12/05 23:20:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -67,6 +67,13 @@ GP_MATHERR( STRUCT_EXCEPTION_P_X )
 
 #define BAD_DEFAULT default: int_error(NO_CARET, "internal error : type neither INT or CMPLX"); return;
 
+static int recursion_depth = 0;
+void
+eval_reset_after_error()
+{
+    recursion_depth = 0;
+}
+
 void
 f_push(union argument *x)
 {
@@ -124,18 +131,23 @@ f_call(union argument *x)
     struct value save_dummy;
 
     udf = x->udf_arg;
-    if (!udf->at) {		/* undefined */
+    if (!udf->at)
 	int_error(NO_CARET, "undefined function: %s", udf->udf_name);
-    }
+
     save_dummy = udf->dummy_values[0];
     (void) pop(&(udf->dummy_values[0]));
 
     if (udf->dummy_num != 1)
 	int_error(NO_CARET, "function %s requires %d variables", udf->udf_name, udf->dummy_num);
 
+    if (recursion_depth++ > STACK_DEPTH)
+	int_error(NO_CARET, "recursion depth limit exceeded");
+
     execute_at(udf->at);
     gpfree_string(&udf->dummy_values[0]);
     udf->dummy_values[0] = save_dummy;
+
+    recursion_depth--;
 }
 
 
