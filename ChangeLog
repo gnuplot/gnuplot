@@ -10,6 +10,14 @@
 	use the same y axis properties.
 	Bug #2941257
 
+	* src/util.c configure.in config/config.cyg config/config.dj2
+	config/config.mgw config/config.ntconfig/config.os2 config/config.oww:
+	Remove the test for pwd.h, the configuration flag HAVE_PWD_H, and the
+	conditional code that copies GECOS information from the password file
+	into the header of PostScript and PDF output files.  This addresses
+	reported issues of privacy and reported problems with building a static
+	executable.
+
 2010-03-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (eval_reset_after_error f_call) src/internal.h

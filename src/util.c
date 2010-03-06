@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.86 2010/03/06 06:12:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.87 2010/03/06 21:17:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -50,16 +50,6 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.86 2010/03/06 06:12:59 sfea
 # include <dirent.h>
 #elif defined(_Windows)
 # include <windows.h>
-#endif
-
-#if defined(HAVE_PWD_H)
-# include <sys/types.h>
-# include <pwd.h>
-#elif defined(_Windows)
-# include <windows.h>
-# if !defined(INFO_BUFFER_SIZE)
-#  define INFO_BUFFER_SIZE 32767
-# endif
 #endif
 
 /* Exported (set-table) variables */
@@ -1207,31 +1197,8 @@ getusername ()
     if (!username)
 	username=getenv("USERNAME");
 
-#ifdef HAVE_PWD_H
-    if (username) {
-	struct passwd *pwentry = NULL;
-	pwentry=getpwnam(username);
-	if (pwentry && strlen(pwentry->pw_gecos)) {
-	    fullname = gp_alloc(strlen(pwentry->pw_gecos)+1,"getusername");
-	    strcpy(fullname, pwentry->pw_gecos);
-	} else {
-	    fullname = gp_alloc(strlen(username)+1,"getusername");
-	    strcpy(fullname, username);
-	}
-    }
-#elif defined(_Windows)
-    if (username) {
-	DWORD bufCharCount = INFO_BUFFER_SIZE;
-	fullname = gp_alloc(INFO_BUFFER_SIZE + 1,"getusername");
-	if (!GetUserName(fullname,&bufCharCount)) {
-	    free(fullname);
-	    fullname = NULL;
-	}
-    }
-#else
     fullname = gp_alloc(strlen(username)+1,"getusername");
     strcpy(fullname, username);
-#endif /* HAVE_PWD_H */
 
     return fullname;
 }
