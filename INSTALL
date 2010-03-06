@@ -310,18 +310,9 @@ Using Visual C++ and compiling for Windows (32-bit, i.e. 9x and NT family)
       copy ..\config\makefile.nt makefile
       nmake
 
-Using the MinGW32 port of gcc: you need parts of the Micrsoft SDK for the
-moment.
-      copy ..\config\makefile.mgw makefile
-  Look through the Makefile to see if you need to make any changes.
-      make 
-      make install
+Using the MinGW32 port of gcc:  Instructions are given in config/makefile.mgw
 
-Using the Cygwin port of gcc, which includes MinGW32: you need parts of
-the Microsoft SDK for the moment.
-      copy ..\config\makefile.cyg makefile
-  Look through the Makefile to see if you need to make any changes.
-      make
+Using the Cygwin port of gcc:  Instructions are given in config/makefile.cyg
 
 Using Borland C++ 32 bit compilers, like the freely downloadable BCC55:
       copy ..\config\makefile.win makefile.win
@@ -329,19 +320,7 @@ Using Borland C++ 32 bit compilers, like the freely downloadable BCC55:
   You'll probably have to change TC and some others.
       make -fmakefile.win WIN32=1
       
-[NOTE: the 16-bit Windows version no longer work.  gnuplot has become
-too large.]
-
-Using Microsoft C 7.0 and compiling for MS-Windows (16-bit)
-      copy ..\config\makefile.msw makefile
-  Look through the Makefile to see if you need to make any changes.
-      nmake
-
-Using Borland C++ 3.1 and compiling for MS-Windows (16-bit)
-      copy ..\config\makefile.win makefile.win
-  Look through the Makefile to see if you need to make any changes.
-  You'll probably have to change TC and some others.
-      make -fmakefile.win
+[NOTE: gnuplot can no longer be built for 16-bit Windows versions.]
 
 
 MSDOS
@@ -358,23 +337,6 @@ Using DJGPP (32-bit DOS port of GNU CC)
 
 [NOTE: the 16-bit DOS versions of gnuplot no longer work.  gnuplot has
 outgrown this platform.]
-
-Using Microsoft C 7.0 targetting 16-bit DOS
-      copy makefile.msc makefile
-      nmake 
-
-Using Borland C++ 3.0 targetting 16-bit DOS
-      copy makefile.tc makefile
-  Edit makefile to change TC, BIN, BGI, BGIOBJ. You may also want to turn
-  off overlays (See manual for more on overlays).
-      make
-
-You'll want to copy the compiled executable and gnuplot.gih to a
-directory on your PATH to make them easily usable.
-
-The file gnuplot.gih is needed for help on the PC.
-If the file gnuplot.gih is not in the default directory, then use:
-    set GNUHELP={full path name of gnuplot.gih}
 
 OS/2
 ----

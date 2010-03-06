@@ -1,6 +1,6 @@
 # Hey, Emacs, this is a -*- Makefile -*-
 #
-# $Id: makefile.cyg,v 1.32 2009/12/02 04:59:57 sfeam Exp $
+# $Id: makefile.cyg,v 1.33 2009/12/05 07:01:39 sfeam Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -10,8 +10,9 @@
 # - check the beginning of this file settings you may want to change
 #   You'll have to tell it where to find the Help Compiler, among other
 #   things.
-# - compile the package: go to directory 'gnuplot' and therefrom run
+# - compile the package: go to directory 'gnuplot' and issue the commands
 #	 make -C src -f ../config/makefile.cyg
+#	 make install -C src -f ../config/makefile.cyg
 # - resource compiler used is windres.exe in Cygwin
 # - note pdf, png, and gif libraries if used have to be build for Cygwin
 #   with -mno-cygwin option
