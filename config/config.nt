@@ -222,9 +222,6 @@
 /* Define to 1 if you have the `popen' function. */
 /* #define HAVE_POPEN 1 */
 
-/* Define to 1 if you have the <pwd.h> header file. */
-/* #undef HAVE_PWD_H */
-
 /* Define to 1 if you have the <readline/history.h> header file. */
 /* #undef HAVE_READLINE_HISTORY_H */
 
