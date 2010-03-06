@@ -1,3 +1,9 @@
+2010-03-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data): Both curves in 'with filledcurves' must
+	use the same y axis properties.
+	Bug #2941257
+
 2010-02-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxes): Amazingly old bug that fails to apply 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.16 2009/02/05 17:17:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.133.2.17 2009/07/21 18:16:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -384,6 +384,11 @@ get_data(struct curve_points *current_plot)
         break;
 
     case FILLEDCURVES:
+	min_cols = 1;
+	max_cols = 3;
+	df_axis[2] = df_axis[1];	/* Both curves use same y axis */
+	break;
+
     case IMPULSES:	/* 2 + possible variable color */
     case LINES:
     case DOTS:
