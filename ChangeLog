@@ -1,3 +1,9 @@
+2010-03-06  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
+
+	* INSTALL config/makefile.mgw config/makefile.cyg:
+	Consolidate the instructions for building using mgw and cygwin into
+	their respective makefiles.
+
 2010-03-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data): Both curves in 'with filledcurves' must

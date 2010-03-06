@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.50.2.6 2009/12/02 05:05:09 sfeam Exp $
+# $Id: makefile.mgw,v 1.50.2.7 2009/12/05 06:32:47 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -7,8 +7,9 @@
 
 # To compile gnuplot for WinXX:
 #
-# - compile the package: go to directory 'gnuplot' and therefrom run
+# - compile the package: go to directory 'gnuplot' and issue the command
 #	 make -C src -f ../config/makefile.mgw
+#	 make install -C src -f ../config/makefile.mgw
 #
 # This makefile was tested with MSYS, MingW32 and Microsoft Help
 # Workshop 4.03.
