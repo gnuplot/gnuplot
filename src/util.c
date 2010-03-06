@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.85 2009/07/05 00:09:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.86 2010/03/06 06:12:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -39,6 +39,7 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.85 2009/07/05 00:09:32 sfea
 #include "alloc.h"
 #include "command.h"
 #include "datafile.h"		/* for df_showdata and df_reset_after_error */
+#include "internal.h"		/* for eval_reset_after_error */
 #include "misc.h"
 #include "plot.h"
 #include "term_api.h"		/* for term_end_plot() used by graph_error() */
