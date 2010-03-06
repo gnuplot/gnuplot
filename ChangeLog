@@ -1,3 +1,9 @@
+2010-03-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data): Both curves in 'with filledcurves' must
+	use the same y axis properties.
+	Bug #2941257
+
 2010-03-05  Christoph Junghans (ottxor)
 
 	* src/Makefile.am:  Fix broken target "make clean"
