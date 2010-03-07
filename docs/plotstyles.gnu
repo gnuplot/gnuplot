@@ -236,7 +236,7 @@ e
 #
 reset
 set view 75, 33, 1.0, 0.82
-set bmargin screen 0.18
+set bmargin screen 0.40
 unset key
 set samples 20, 20
 set isosamples 21, 21
