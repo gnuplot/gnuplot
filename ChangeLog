@@ -1,3 +1,9 @@
+2010-03-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/README docs/Makefile.in docs/pdffigures.tex docs/titlepag.tex:
+	Split out dependence on the packages graphicx and picins into a separate
+	file (pdffigures.tex) that is only needed by target "make pdffigures".
+
 2010-03-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* share/Makefile.am: Give up on figuring out a universally agreed on

@@ -14,9 +14,11 @@ information.  They derive their information from the file "gnuplot.doc",
 which is the master copy of gnuplot help information.  All other forms,
 except for the man page "gnuplot.1", are derived from it. 
 
+PostScript, PDF, or HTML versions of the manual can be created from the TeX 
+version if you have latex, pdflatex, and htlatex available, respectively.
+
 gnuplot.doc -> gnuplot.gih 
             -> gnuplot.hlp
-            -> gnuplot.html
             -> gnuplot.info
             -> gnuplot.ipf
             -> gnuplot.ms
@@ -36,9 +38,9 @@ help libraries, using lib/help ('help lib').  If VMS users prefer the
 gnuplot interactive help facility to the system facility, this can be 
 easily changed by not defining NO_GIH.
 
-On the World Wide Web, the gnuplot manual can include demonstration
-plots; the links for these are included in the file "gnuplot.html"
-('make html').
+The PDF and HTML versions of the gnuplot manual can include hyperlinks to
+demonstration plots.  There is a special makefile target "make pdffigures"
+to generate and include sample plots directly in the manual itself.
 
 Under EMACS, interactive help uses the file "gnuplot.info" ('make info').
 
@@ -52,12 +54,6 @@ For groff (on linux), use  'groff -t -e -mgs gnuplot.ms'
 
 On MS-Windows, the Microsoft help compiler converts the file "gnuplot.rtf"
 to an 'hlp' file which is used by the standard Windows help program.
-
-The printed document is also available in LaTeX format, using the file
-"gnuplot.tex" ('make tex').  If you use LaTeX on your computer, you can
-type 'make dvi' to create "gnuplot.dvi", and then run your dvi-to-
-PostScript converter to generate "gnuplot.ps".
-
 
 Manual entries for the terminals are not included in "gnuplot.doc";
 instead, each "driver.trm" file (in the directory /term) contains its
