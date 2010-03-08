@@ -140,14 +140,14 @@ HEADERS = doc2x.h xref.h
 
 EXTRA_DIST = doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex makefile.ami \
 makefile.dst titlepag.ipf titlepag.ms titlepag.tex toc_entr.sty old psdoc \
-faq-ja.tex gnuplot-ja.doc README.ja term-ja.diff plotstyles.gnu
+faq-ja.tex gnuplot-ja.doc README.ja term-ja.diff plotstyles.gnu pdffigures.tex
 
 CLEANFILES = doc2tex gnuplot.tex gnuplot.dvi gnuplot.aux gnuplot.log \
 gnuplot.toc gnuplot.pdf gnuplot.ps gpcard.dvi gpcard.log gpcard.ps alldoc2gih \
 doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.idx gnuplot.ilg gnuplot.ind \
 gnuplot.info* gnuplot.out doc2ipf gnuplot.ipf doc2ms gnuplot.ms doc2rnh \
 gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff checkdoc gnuplot.txt \
-figure*.pdf
+figure*.pdf pdffigures.*
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
@@ -248,11 +248,15 @@ htmldocs/gnuplot.html: $(srcdir)/gnuplot.tex
 	latex2html -dir htmldocs -local_icons gnuplot
 
 ### PDF documentation
-pdffigures: figures gnuplot.pdf figures
+pdffigures: figures gnuplot.pdf
+	rm -f gnuplot.tex
+	echo "" > pdffigures.tex
 
 figures: doc2tex
 	../src/gnuplot plotstyles.gnu
 	./doc2tex -figures $(srcdir)/gnuplot.doc gnuplot.tex
+	echo "\usepackage{graphicx}" > pdffigures.tex
+	echo "\usepackage{picins}" >> pdffigures.tex
 
 pdf: gnuplot.pdf
 

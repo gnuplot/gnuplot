@@ -1,3 +1,9 @@
+2010-03-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/README docs/Makefile.in docs/pdffigures.tex docs/titlepag.tex:
+	Split out dependence on the packages graphicx and picins into a separate
+	file (pdffigures.tex) that is only needed by target "make pdffigures".
+
 2010-03-07	TAG CVS Release_4_4_0
 
 2010-03-06  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
