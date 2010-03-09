@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.196 2009/10/31 05:24:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.197 2010/02/07 23:18:14 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -5022,7 +5022,7 @@ gnuplot: X11 aborted.\n", ldisplay);
     	    strcat(buffer, "/");
     	    strcat(buffer, "Gnuplot");
 #else
-	    buffer = NULL;
+	    *buffer = '\0';
 #endif
 	} else {
     	    strcpy(buffer, appdefdir);
