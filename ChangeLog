@@ -1,3 +1,8 @@
+2010-03-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (preset): Fix compilation error if XAPPLRESDIR is not
+	externally defined.
+
 2010-03-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/README docs/Makefile.in docs/pdffigures.tex docs/titlepag.tex:
