@@ -8,7 +8,7 @@
 
 	* share/Makefile.am: Give up on figuring out a universally agreed on
 	place where x11 app-defaults files should be installed.  Place ours in
-	${PREFIX}/share/gnuplot/4.4/app-defaults
+	${PREFIX}/share/gnuplot/4.5/app-defaults
 
 2010-03-06  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
