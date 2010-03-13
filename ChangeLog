@@ -1,3 +1,11 @@
+2010-03-13  Version 4.4.0 Release
+	    =====================
+
+2010-03-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (getusername): Fix segfault if neither USER or USERNAME
+	are present in the environment.
+
 2010-03-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (preset): Fix compilation error if XAPPLRESDIR is not

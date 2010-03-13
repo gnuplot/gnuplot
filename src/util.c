@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.84.2.1 2009/07/05 00:10:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.84.2.2 2010/03/07 00:50:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1189,16 +1189,12 @@ char *
 getusername ()
 {
     char *username = NULL;
-    char *fullname = NULL;
 
     username=getenv("USER");
     if (!username)
 	username=getenv("USERNAME");
 
-    fullname = gp_alloc(strlen(username)+1,"getusername");
-    strcpy(fullname, username);
-
-    return fullname;
+    return gp_strdup(username);
 }
 
 TBOOLEAN contains8bit(const char *s)

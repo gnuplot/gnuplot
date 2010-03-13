@@ -1,5 +1,10 @@
-New features, changes and fixes since gnuplot version 4.2
-=========================================================
+
+New features, changes and fixes since gnuplot version 4.4.0
+===========================================================
+
+
+Features, changes and fixes in gnuplot version 4.4
+==================================================
 
 * NEW linetype property 'pointinterval'
 * NEW gnuplot.exe is a full-featured console mode gnuplot executable for Windows
