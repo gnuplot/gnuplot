@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.36 2008/09/10 18:12:34 sfeam Exp $
+ * $Id: syscfg.h,v 1.37 2010/02/03 05:00:22 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -146,11 +146,6 @@
  * See stdfn.h
  */
 #  define S_IFIFO  _S_IFIFO
-# else
-#  define OS "MS-Windows"
-#  ifndef WIN16
-#   define WIN16
-#  endif
 # endif /* WIN32 */
 # define HOME    "GNUPLOT"
 # define PLOTRC  "gnuplot.ini"
@@ -161,9 +156,6 @@
 #endif /* _WINDOWS */
 
 #if defined(MSDOS) && !defined(_Windows)
-# if !defined(DOS32) && !defined(DOS16)
-#  define DOS16
-# endif
 /* should this be here ? */
 # define OS       "MS-DOS"
 # undef HELPFILE
@@ -308,27 +300,18 @@
  * so it belongs here, IMHO */
 
 /* To access curves larger than 64k, MSDOS needs to use huge pointers */
-#if (defined(__TURBOC__) && defined(MSDOS)) || defined(WIN16)
+#if (defined(__TURBOC__) && defined(MSDOS))
 # define GPHUGE huge
 # define GPFAR far
-#else /* not TurboC || WIN16 */
+#else /* not TurboC */
 # define GPHUGE /* nothing */
 # define GPFAR /* nothing */
-#endif /* not TurboC || WIN16 */
+#endif /* not TurboC */
 
-#if defined(DOS16) || defined(WIN16)
-typedef float coordval;		/* memory is tight on PCs! */
-# define COORDVAL_FLOAT 1
-#else
 typedef double coordval;
-#endif
 
 /* Set max. number of arguments in a user-defined function */
-#ifdef DOS16
-# define MAX_NUM_VAR	3
-#else
 # define MAX_NUM_VAR	12
-#endif
 
 /* HBB 20010223: Moved VERYLARGE definition to stdfn.h: it can only be
  * resolved correctly after #include <float.h>, which is done there,

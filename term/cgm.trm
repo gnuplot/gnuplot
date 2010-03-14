@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.93 2009/09/13 17:49:16 sfeam Exp $
+ * $Id: cgm.trm,v 1.94 2010/02/24 20:15:56 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1284,10 +1284,8 @@ CGM_write_int(int value)
 	char c[2];
     } u;
 
-#if !defined(DOS16) && !defined(WIN16)
     assert( -32768 <= value );
     assert( value <= 32767 );
-#endif
 
     u.c[0] = (value >> 8) & 255;	/* convert to network order */
     u.c[1] = value & 255;

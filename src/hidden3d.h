@@ -1,5 +1,5 @@
 /*
- * $Id: hidden3d.h,v 1.9 2004/09/30 03:21:03 sfeam Exp $
+ * $Id: hidden3d.h,v 1.10 2008/06/02 19:18:32 sfeam Exp $
  */
 
 /* GNUPLOT - hidden3d.h */
@@ -56,13 +56,10 @@ void set_hidden3doptions __PROTO((void));
 void show_hidden3doptions __PROTO((void));
 void reset_hidden3doptions __PROTO((void));
 void save_hidden3doptions __PROTO((FILE *fp));
-#ifndef LITE
 void init_hidden_line_removal __PROTO((void));
 void reset_hidden_line_removal __PROTO((void));
 void term_hidden_line_removal __PROTO((void));
 void plot3d_hidden __PROTO((struct surface_points *plots, int pcount));
 void draw_line_hidden __PROTO((p_vertex, p_vertex, lp_style_type *));
-#endif
-
 
 #endif /* GNUPLOT_HIDDEN3D_H */

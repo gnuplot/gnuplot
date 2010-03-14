@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.233 2010/02/07 06:39:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.234 2010/02/15 19:01:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2502,13 +2502,9 @@ show_hidden3d()
 {
     SHOW_ALL_NL;
 
-#ifdef LITE
-    printf(" Hidden Line Removal Not Supported in LITE version\n");
-#else
     fprintf(stderr, "\thidden surface is %s\n",
 	    hidden3d ? "removed" : "drawn");
     show_hidden3doptions();
-#endif /* LITE */
 }
 
 static void

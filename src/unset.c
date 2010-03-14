@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.131 2010/01/11 04:31:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.132 2010/02/07 06:39:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -836,11 +836,7 @@ unset_grid()
 static void
 unset_hidden3d()
 {
-#ifdef LITE
-    printf(" Hidden Line Removal Not Supported in LITE version\n");
-#else
     hidden3d = FALSE;
-#endif
 }
 
 static void

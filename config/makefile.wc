@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.6 2004/02/23 13:59:37 broeker Exp $
+# $Id: makefile.wc,v 1.7 2005/04/28 20:33:22 broeker Exp $
 #
 # GNUPLOT Makefile for Watcom C
 #
@@ -42,7 +42,6 @@ M=..\demo\
 # -DHAVE_CONFIG_H: do the configuration #defines the (now) usual way
 # -DREADLINE to use the history/line editing capability. If you want this
 #    capability add -DREADLINE to CFLAGS
-# -DLITE means no hiddenline removal to conserve memory
 CPPFLAGS=-DHAVE_CONFIG_H -UMSDOS -DDOS386 -DDOS386 -DDOS32 -DPC
 
 # -w0 means ignore warnings and do not report them

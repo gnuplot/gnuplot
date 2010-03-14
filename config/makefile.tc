@@ -1,5 +1,5 @@
 #
-# $Id: makefile.tc,v 1.9 2007/10/16 21:19:44 sfeam Exp $
+# $Id: makefile.tc,v 1.10 2007/11/19 21:17:13 sfeam Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.x
 #
@@ -62,14 +62,12 @@ MODEL = l
 # -w- means ignore warnings and do not report them
 # -DREADLINE to use the history/line editing capability. If you want this
 #    capability add -DREADLINE to CFLAGS
-# -DLITE means no hiddenline removal to conserve memory
 # -Z -2 -3 -G -O are optimization flags (-2 produces 286 only code)
 #CFLAGS1 = -Ff=256 -c -f -m$(MODEL) -w- -Z -2 -G -O -n.
 # HBB: specialise on '386 or higher, and take '-c' out, so
 #      the flags can be used for doc2xxx and bf_test as well:
 CFLAGS1 = -Ff=256 -f -m$(MODEL) -w- -Z -3 -f287 -d -G -n. -v -y
-#CFLAGS2 = -I$(TC)\include -DLITE -DMSDOS -DPC -DREADLINE -DHAVE_STRNICMP
-# HBB: try without -DLITE, to activate hidden-lining (for trying)
+#CFLAGS2 = -I$(TC)\include -DMSDOS -DPC -DREADLINE -DHAVE_STRNICMP
 CFLAGS2 = -I$(TC)\include -DMSDOS=1 -DPC -DPROTOTYPES -DREADLINE=1 -DHAVE_GETCWD -DHAVE_STRNICMP -DHAVE_STRINGIZE
 CFLAGS3 = -DHAVE_SLEEP -DEXTERN_ERRNO -DHAVE_STRING_H -DHAVE_VALUES_H
 

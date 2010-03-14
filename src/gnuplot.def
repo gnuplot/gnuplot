@@ -1,5 +1,0 @@
-;gnuplot.def for Phar Lap LITE286 DOS Extender
-PROTMODE
-STUB	'gorun286.exe'
-STACKSIZE	16384
-EXPORTS	BCC286_EXE

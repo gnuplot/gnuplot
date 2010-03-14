@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.114 2009/12/20 21:32:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.115 2009/12/31 22:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -102,15 +102,6 @@ iso_extend(struct iso_curve *ip, int num)
 {
     if (num == ip->p_max)
 	return;
-
-#if defined(DOS16) || defined(WIN16)
-    /* Make sure we do not allocate more than 64k points in msdos since
-       * indexing is done with 16-bit int
-       * Leave some bytes for malloc maintainance.
-     */
-    if (num > 32700)
-	int_error(NO_CARET, "Array index must be less than 32k in msdos");
-#endif /* 16bit (Win)Doze */
 
     if (num > 0) {
 	if (ip->points == NULL) {

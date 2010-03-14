@@ -1,5 +1,5 @@
 #
-# $Id: makefile.msc,v 1.6 2007/10/16 21:19:44 sfeam Exp $
+# $Id: makefile.msc,v 1.7 2007/11/19 21:17:12 sfeam Exp $
 #
 # GNUPLOT Makefile for use with Microsoft C  Version 5.10
 #  and Microsoft Program Maintenance Utility  Version 4.07
@@ -11,7 +11,6 @@ HELPFILE = gnuplot.gih
 # /c  means don't link
 # /AL means large memory model (large code, large data)
 # /DPC means define symbol PC
-# /DLITE means no hiddenline removal
 # /Gt means no 64k segment problem
 # /Gt16 means all data items larger than 16 byte allocated outside
 #	default DATA segment thus providing more Stack space
@@ -20,9 +19,9 @@ HELPFILE = gnuplot.gih
 # /FPi87    use inline 80x87 code (requires 486 or x87 Copro)
 # CFLAGS = /c /AL /DPC #/DMSDOS #/Zi #/Od
 # CFLAGS = /c /AL /G2 /Gt16 /Zi /Od /DPC /DREADLINE
-CFLAGS = /c /AL /EM /G2 /Gt16 /Gs /Og /FPi87 /DPC /DREADLINE /DLITE /D__MSC__ /DHAVE_STRNICMP /nologo
+CFLAGS = /c /AL /EM /G2 /Gt16 /Gs /Og /FPi87 /DPC /DREADLINE /D__MSC__ /DHAVE_STRNICMP /nologo
 # CFLAGS = /c /AL /Gt16 /Gs /Og /DPC /DREADLINE
-# CFLAGS = /c /AL /EM /DPC /DREADLINE /DLITE /Gt /D__MSC__ #/Zi #/Od
+# CFLAGS = /c /AL /EM /DPC /DREADLINE /Gt /D__MSC__ #/Zi #/Od
 
 # see other terminal defines in term.h
 TERMFLAGS = 

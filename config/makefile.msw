@@ -1,5 +1,5 @@
 #
-# $Id: makefile.msw,v 1.6 2007/10/16 21:19:44 sfeam Exp $
+# $Id: makefile.msw,v 1.7 2007/11/19 21:17:12 sfeam Exp $
 #
 # GNUPLOT Makefile for Microsoft C  Version 7.0 Windows Version
 #  and Microsoft Program Maintenance Utility  Version 1.20
@@ -11,7 +11,6 @@ TOP = .
 
 # /c  means don't link
 # /AL means large memory model (large code, large data)
-# /DLITE means remove hiddenline capability
 # /Gt128 means make data object > 128 FAR
 # /W1 means lower warning level
 # /I  means extra include directory

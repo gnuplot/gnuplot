@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.205 2010/02/17 06:19:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.206 2010/03/06 19:13:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -128,16 +128,6 @@ cp_alloc(int num)
 void
 cp_extend(struct curve_points *cp, int num)
 {
-
-#if defined(DOS16) || defined(WIN16)
-    /* Make sure we do not allocate more than 64k points in msdos since
-     * indexing is done with 16-bit int
-     * Leave some bytes for malloc maintainance.
-     */
-    if (num > 32700)
-	int_error(NO_CARET, "Array index must be less than 32k in msdos");
-#endif /* MSDOS */
-
     if (num == cp->p_max)
 	return;
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.228 2010/01/11 04:31:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.229 2010/02/27 21:50:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -840,12 +840,10 @@ do_3dplot(
     if (term->layer)
 	(term->layer)(TERM_LAYER_FRONTTEXT);
 
-#ifndef LITE
     if (hidden3d && draw_surface && !quick) {
 	init_hidden_line_removal();
 	reset_hidden_line_removal();
     }
-#endif /* not LITE */
 
     /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
 
@@ -971,10 +969,8 @@ do_3dplot(
 
     /* DRAW SURFACES AND CONTOURS */
 
-#ifndef LITE
     if (hidden3d && (hidden3d_layer == LAYER_BACK) && draw_surface && !quick)
 	plot3d_hidden(plots, pcount);
-#endif /* not LITE */
 
     /* Set up bookkeeping for the individual key titles */
 #define NEXT_KEY_LINE()					\
@@ -1391,10 +1387,8 @@ do_3dplot(
 	pm3d_depth_queue_flush(); /* draw pending plots */
     }
 
-#ifndef LITE
     if (hidden3d && (hidden3d_layer == LAYER_FRONT) && draw_surface && !quick)
 	plot3d_hidden(plots, pcount);
-#endif /* not LITE */
 
     /* DRAW GRID AND BORDER */
 #ifndef USE_GRID_LAYERS
@@ -1448,11 +1442,10 @@ do_3dplot(
 
     term_end_plot();
 
-#ifndef LITE
     if (hidden3d && draw_surface) {
 	term_hidden_line_removal();
     }
-#endif /* not LITE */
+
 }
 
 
@@ -1563,11 +1556,9 @@ plot3d_lines(struct surface_points *plot)
     double lx[2], ly[2], lz[2];	/* two edge points */
     TBOOLEAN rgb_from_column;
 
-#ifndef LITE
 /* These are handled elsewhere.  */
     if (plot->has_grid_topology && hidden3d)
 	return;
-#endif /* not LITE */
 
     rgb_from_column = can_pm3d && plot->pm3d_color_from_column
 			&& plot->lp_properties.pm3d_color.type == TC_RGB
@@ -1698,11 +1689,9 @@ plot3d_lines_pm3d(struct surface_points *plot)
 	return;
     }
 
-#ifndef LITE
-/* These are handled elsewhere.  */
+    /* These are handled elsewhere.  */
     if (plot->has_grid_topology && hidden3d)
 	return;
-#endif /* not LITE */
 
     /* split the bunch of scans in two sets in
      * which the scans are already depth ordered */

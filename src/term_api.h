@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.84 2009/12/31 22:28:45 sfeam Exp $
+ * $Id: term_api.h,v 1.85 2010/02/07 06:39:47 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -184,11 +184,7 @@ typedef struct t_image {
 
 typedef struct TERMENTRY {
     const char *name;
-#ifdef WIN16
-    const char GPFAR description[80];  /* to make text go in FAR segment */
-#else
     const char *description;
-#endif
     unsigned int xmax,ymax,v_char,h_char,v_tic,h_tic;
 
     void (*options) __PROTO((void));
@@ -272,11 +268,7 @@ typedef struct TERMENTRY {
 
 } TERMENTRY;
 
-#ifdef WIN16
-# define termentry TERMENTRY far
-#else
 # define termentry TERMENTRY
-#endif
 
 enum set_encoding_id {
    S_ENC_DEFAULT, S_ENC_ISO8859_1, S_ENC_ISO8859_2, S_ENC_ISO8859_9, S_ENC_ISO8859_15,

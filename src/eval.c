@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.75 2009/09/06 01:59:56 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.76 2010/01/06 17:29:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -606,21 +606,17 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
     errno = 0;
     reset_stack();
 
-#ifndef DOSX286
     if (!evaluate_inside_using || !df_nofpe_trap) {
 	if (SETJMP(fpe_env, 1))
 	    return;
 	(void) signal(SIGFPE, (sigfunc) fpe);
     }
-#endif
 
     execute_at(at_ptr);
 
-#ifndef DOSX286
     if (!evaluate_inside_using || !df_nofpe_trap) {
 	(void) signal(SIGFPE, SIG_DFL);
     }
-#endif
 
     if (errno == EDOM || errno == ERANGE) {
 	undefined = TRUE;

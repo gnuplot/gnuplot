@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.197 2010/02/17 06:21:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.198 2010/02/18 04:20:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -308,7 +308,7 @@ void fflush_binary();
 # define FOPEN_BINARY(file) fopen(file, "wb")
 #endif /* !VMS */
 
-#if defined(MSDOS) || defined(WIN32) || defined(WIN16)
+#if defined(MSDOS) || defined(WIN32)
 # if defined(__DJGPP__) || defined (__TURBOC__)
 #  include <io.h>
 # endif

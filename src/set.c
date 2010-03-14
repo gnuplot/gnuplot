@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.309 2010/02/13 06:35:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.310 2010/02/15 19:01:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1535,13 +1535,8 @@ static void
 set_hidden3d()
 {
     c_token++;
-#ifdef LITE
-    printf(" Hidden Line Removal Not Supported in LITE version\n");
-#else
-    /* HBB 970618: new parsing engine for hidden3d options */
     set_hidden3doptions();
     hidden3d = TRUE;
-#endif
 }
 
 

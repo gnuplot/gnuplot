@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.108 2010/02/17 22:40:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.109 2010/02/18 05:34:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -187,10 +187,7 @@ inter(int anint)
 {
     (void) anint;		/* aovid -Wunused warning */
     (void) signal(SIGINT, (sigfunc) inter);
-
-#ifndef DOSX286
     (void) signal(SIGFPE, SIG_DFL);	/* turn off FPE trapping */
-#endif
 
 #ifdef OS2
     if (!strcmp(term->name,"pm")) {
@@ -319,14 +316,12 @@ main(int argc, char **argv)
 #endif
 
 /* get helpfile from home directory */
-#ifndef DOSX286
 # ifndef _Windows
 #  if defined (__TURBOC__) && (defined (MSDOS) || defined(DOS386))
     strcpy(HelpFile, argv[0]);
     strcpy(strrchr(HelpFile, DIRSEP1), "\\gnuplot.gih");
 #  endif			/*   - DJL */
 # endif				/* !_Windows */
-#endif /* !DOSX286 */
 #ifdef __DJGPP__
     {
 	char *s;
