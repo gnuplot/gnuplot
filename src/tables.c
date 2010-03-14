@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.95 2010/01/11 04:31:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.96 2010/02/07 06:39:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -93,33 +93,6 @@ const struct gen_ftable command_ftbl[] =
     /* last key must be NULL */
     { NULL, invalid_command }
 };
-
-/* 'plot' and 'splot' */
-/* HBB 990829: unused, yet? */
-/* Lars 991108: yes, because the 'plot' parser is a real bitch :( */
-/* pm 011129: ...and therefore I'm putting it into #if 0 ... #endif.
- * Anyway, this table can't be used as below because some options
- * belong to the group of data file options and others to the group
- * of plot options
- */
-#if 0
-const struct gen_table plot_tbl[] =
-{
-    { "ax$es", P_AXES },
-    { "ax$is", P_AXES },
-    { "bin$ary", P_BINARY },
-    { "ev$ery", P_EVERY },
-    { "i$ndex", P_INDEX },
-    { "mat$rix", P_MATRIX },
-    { "s$mooth", P_SMOOTH },
-    { "thru$", P_THRU },
-    { "t$itle", P_TITLE },
-    { "not$itle", P_NOTITLE },
-    { "u$sing", P_USING },
-    { "w$ith", P_WITH },
-    { NULL, P_INVALID }
-};
-#endif
 
 /* 'plot ax[ei]s' parameter */
 const struct gen_table plot_axes_tbl[] =

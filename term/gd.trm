@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.145 2009/10/06 23:02:59 sfeam Exp $
+ * $Id: gd.trm,v 1.146 2010/02/24 20:32:23 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1252,9 +1252,6 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 	if (i == 0) {
 	    i = (sm_palette.colors <= 0) ? -1 : sm_palette.colors;
 	        /* (no more colorus) : (previous palette (obviously multiplot mode)) */
-#if 0
-	    if (i > 0) fprintf(stderr,"reusing it again\n");
-#endif
 	}
 	return i;
     }
@@ -1274,11 +1271,6 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 	    FPRINTF((stderr,"png_smooth_color[i]<0 cannot happen"));
 	    exit(1);
 	}
-#if 0
-	fprintf(stderr,"ALLOCATED: i=%i\t=> pal_index=%i\tr=%g g=%g b=%g\n",
-	    i, png_smooth_color[i],
-	    palette->color[i].r, palette->color[i].g, palette->color[i].b );
-#endif
     }
     return 0;
 }

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.54 2007/11/13 22:44:47 sfeam Exp $
+ * $Id: pm.trm,v 1.55 2009/03/26 00:49:22 sfeam Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -76,9 +76,6 @@ TERM_PUBLIC void PM_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void PM_set_clipboard __PROTO((const char[]));
 #endif
 TERM_PUBLIC int PM_make_palette (t_sm_palette *);
-#if 0
-TERM_PUBLIC void PM_previous_palette (void);
-#endif
 TERM_PUBLIC void PM_set_color (t_colorspec *);
 TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
 TERM_PUBLIC void PM_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
@@ -98,20 +95,10 @@ TERM_PUBLIC void PM_enhanced_flush __PROTO((void));
 #define PM_YMAX 12500
 
 /* approximations for typical font/screen sizes */
-#define PM_VCHAR (550)
-#define PM_HCHAR (220)
-/* Note: VCHAR AND HCHAR sizes in gnuplot 3.5 were 415 and 242,
-   in X11 are 500 and 195, respectively.
-*/
-#if 0 /* Sizes of gnuplot 3.6 and 3.7: */
-#  define PM_VTIC (200)
-#  define PM_HTIC (200)
-#else /* Sizes as X11: */
-#  define PM_VTIC (125)
-#  define PM_HTIC (130)
-/* Note: sizes for VTIC and HTIC in gnuplot 3.5 were 122 and 128, respectively.
-*/
-#endif
+# define PM_VCHAR (550)
+# define PM_HCHAR (220)
+# define PM_VTIC (125)
+# define PM_HTIC (130)
 
 #endif
 
@@ -355,13 +342,6 @@ PM_options()
 	} else if (isstring(c_token)) {
 	    copy_str(PM_term_title, c_token, 127);
 	}
-#if 0
-	else if (almost_equals(c_token, "po$rtrait")) {
-	    strcat(PM_opts, "-l ");
-	    strcat(term_options, "portrait ");
-	    PM_optargs = 1;
-	}
-#endif
 	c_token++;
     }
     if (PM_term_title[0]) {
@@ -806,16 +786,6 @@ PM_make_palette(t_sm_palette * palette)
     }
     return 0;
 }
-
-
-#if 0
-/* switch back to the palette used before calling make_palette */
-TERM_PUBLIC void
-PM_previous_palette()
-{
-    putc(GR_RELEASE_PALETTE, PM_pipe);
-}
-#endif
 
 
 TERM_PUBLIC void

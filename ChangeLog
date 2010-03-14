@@ -20,6 +20,9 @@
 	The final gnuplot version in the apollo archives was gnuplot 2.0 (1996).
 	15 files changed, 16 insertions(+), 1211 deletions(-)
 
+	* src/pm3d.c src/tables.c src/term.c term/gd.trm term/pm.trm
+	term/post.trm: Remove bits of dead code.
+
 2010-03-13  Ethan A Merritt  <merritt@u.washington.edu
 
  	* config/makefile.286 config/makefile.msc config/makefile.msw

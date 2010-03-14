@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.76 2009/03/24 11:18:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.77 2009/03/26 00:49:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -81,14 +81,6 @@ static void filled_color_contour_plot  __PROTO((struct surface_points *, int));
 static double
 geomean4 (double x1, double x2, double x3, double x4)
 {
-#if 0
-    /* return 0 if any of the number is negative */
-    if (x1 <= 0) x1 = 1;
-    if (x2 > 0) x1 *= x2;
-    if (x3 > 0) x1 *= x3;
-    if (x4 > 0) x1 *= x4;
-    return pow(x1, 0.25);
-#else
     /* honor signess, i.e. sign(geomean) = sign(prod(x_i)) */
     int neg = (x1 < 0) + (x2 < 0) + (x3 < 0) + (x4 < 0);
     x1 *= x2 * x3 * x4;
@@ -105,7 +97,6 @@ geomean4 (double x1, double x2, double x3, double x4)
     }
 #endif
     return (neg <= 2) ? x1 : -x1;
-#endif
 }
 
 

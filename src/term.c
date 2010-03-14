@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.200 2010/03/14 18:01:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.201 2010/03/14 18:52:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2189,53 +2189,6 @@ test_term()
     term_end_plot();
 }
 
-#if 0
-# if defined(MSDOS)||defined(g)||defined(OS2)||defined(_Windows)||defined(DOS386)
-
-/* output for some terminal types must be binary to stop non Unix computers
-   changing \n to \r\n.
-   If the output is not STDOUT, the following code reopens gpoutfile
-   with binary mode. */
-void
-reopen_binary()
-{
-    if (outstr) {
-	(void) fclose(gpoutfile);
-#  ifdef _Windows
-	if (!stricmp(outstr, "PRN")) {
-	    /* use temp file for windows */
-	    (void) strcpy(filename, win_prntmp);
-	}
-#  endif
-	if ((gpoutfile = fopen(filename, "wb")) == (FILE *) NULL) {
-	    if ((gpoutfile = fopen(filename, "w")) == (FILE *) NULL) {
-		os_error(NO_CARET, "cannot reopen file with binary type; output unknown");
-	    } else {
-		os_error(NO_CARET, "cannot reopen file with binary type; output reset to ascii");
-	    }
-	}
-#  if defined(__TURBOC__) && defined(MSDOS)
-#   ifndef _Windows
-	if (!stricmp(outstr, "PRN")) {
-	    /* Put the printer into binary mode. */
-	    union REGS regs;
-	    regs.h.ah = 0x44;   /* ioctl */
-	    regs.h.al = 0;      /* get device info */
-	    regs.x.bx = fileno(gpoutfile);
-	    intdos(&regs, &regs);
-	    regs.h.dl |= 0x20;  /* binary (no ^Z intervention) */
-	    regs.h.dh = 0;
-	    regs.h.ah = 0x44;   /* ioctl */
-	    regs.h.al = 1;      /* set device info */
-	    intdos(&regs, &regs);
-	}
-#   endif /* !_Windows */
-#  endif /* TURBOC && MSDOS */
-    }
-}
-
-# endif /* MSDOS || g || ... */
-#endif /* 0 */
 
 #ifdef VMS
 /* these are needed to modify terminal characteristics */

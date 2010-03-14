@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.250 2010/02/17 23:56:28 sfeam Exp $
+ * $Id: post.trm,v 1.251 2010/02/18 17:48:35 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2801,15 +2801,10 @@ PS_make_header(t_sm_palette *palette)
    'set palette file') and colour/gray according to Color otherwise
    ('set palette gray', 'set palette rgb').
 */
-#if 0
-    fprintf(gppsfile, "Color %s and { %% COLOUR vs. GRAY map\n",
-	    (sm_palette.colorMode!=SMPAL_COLOR_MODE_GRAY) ? "true":"false");
-#else
     if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)
 	fputs("false { % COLOUR vs. GRAY map\n", gppsfile);
     else
 	fputs("Color InterpolatedColor or { % COLOUR vs. GRAY map\n", gppsfile);
-#endif
 
     fputs("  InterpolatedColor { %% Interpolation vs. RGB-Formula\n",
 	  gppsfile);
