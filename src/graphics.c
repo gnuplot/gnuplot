@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.324 2010/02/15 19:01:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.325 2010/02/17 06:19:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -183,41 +183,9 @@ static void do_rectangle __PROTO((int dimensions, t_object *this_object, int sty
 
 #define clip_fill	((plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED) || clip_lines2)
 
-/*
- * The Amiga SAS/C 6.2 compiler moans about macro envocations causing
- * multiple calls to functions. I converted these macros to inline
- * functions coping with the problem without losing speed.
- * If your compiler supports __inline, you should add it to the
- * #ifdef directive
- * (MGR, 1993)
- */
-
-#ifdef AMIGA_SC_6_1
-GP_INLINE static TBOOLEAN
-i_inrange(int z, int min, int max)
-{
-    return ((min < max)
-	    ? ((z >= min) && (z <= max))
-	    : ((z >= max) && (z <= min)));
-}
-
-GP_INLINE static double
-f_max(double a, double b)
-{
-    return (GPMAX(a, b));
-}
-
-GP_INLINE static double
-f_min(double a, double b)
-{
-    return (GPMIN(a, b));
-}
-
-#else
 #define f_max(a,b) GPMAX((a),(b))
 #define f_min(a,b) GPMIN((a),(b))
 #define i_inrange(z,a,b) inrange((z),(a),(b))
-#endif
 
 /* True if a and b have the same sign or zero (positive or negative) */
 #define samesign(a,b) ((a) * (b) >= 0)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.191 2010/02/03 09:55:44 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.192 2010/02/24 20:38:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -149,9 +149,6 @@ static void do_system __PROTO((const char *));
 static void test_palette_subcommand __PROTO((void));
 static void test_time_subcommand __PROTO((void));
 
-#ifdef AMIGA_AC_5
-static void getparms __PROTO((char *, char **));
-#endif
 #ifdef GP_MACROS
 static int string_expand __PROTO((void));
 TBOOLEAN expand_macros = FALSE;
@@ -184,11 +181,7 @@ FILE *print_out = NULL;
 char *print_out_name = NULL;
 
 /* input data, parsing variables */
-#ifdef AMIGA_SC_6_1
-__far int num_tokens, c_token;
-#else
 int num_tokens, c_token;
-#endif
 
 int if_depth = 0;
 TBOOLEAN if_condition = FALSE;
@@ -2341,17 +2334,11 @@ help_command()
 static void
 do_system(const char *cmd)
 {
-# ifdef AMIGA_AC_5
-    static char *parms[80];
-    if (!cmd)
-	return;
-    getparms(input_line + 1, parms);
-    fexecv(parms[0], parms);
-# elif defined(_Windows) && defined(USE_OWN_WINSYSTEM_FUNCTION)
+# if defined(_Windows) && defined(USE_OWN_WINSYSTEM_FUNCTION)
     if (!cmd)
 	return;
     winsystem(cmd);
-# else /* !(AMIGA_AC_5 || _Windows) */
+# else /* _Windows) */
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
  * i.e. calling a shell by "!" will always end with an error message.
@@ -2361,47 +2348,8 @@ do_system(const char *cmd)
     if (!cmd)
 	return;
     system(cmd);
-# endif /* !(AMIGA_AC_5 || _Windows) */
+# endif /* !(_Windows) */
 }
-
-
-# ifdef AMIGA_AC_5
-/******************************************************************************
- * Parses the command string (for fexecv use) and  converts the first token
- * to lower case
- *****************************************************************************/
-static void
-getparms(char *command, char **parms)
-{
-    static char strg0[256];
-    int i = 0, j = 0, k = 0;		/* A bunch of indices */
-
-    while (command[j] != NUL) {	/* Loop on string characters */
-	parms[k++] = strg0 + i;
-	while (command[j] == ' ')
-	    ++j;
-	while (command[j] != ' ' && command[j] != NUL) {
-	    if (command[j] == '"') {	/* Get quoted string */
-		do {
-		    strg0[i++] = command[j++];
-		} while (command[j] != '"' && command[j] != NUL);
-	    }
-	    strg0[i++] = command[j++];
-	}
-	if (strg0[i] != NUL)
-	    strg0[i++] = NUL;	/* NUL terminate every token */
-    }
-    parms[k] = NUL;
-
-    /* Convert to lower case */
-    /* FIXME HBB 20010621: do we really want to stop on char *before*
-     * the actual end of the string strg0[]? */
-    for (k=0; strg0[k+1] != NUL; k++)
-	if (strg0[k] >= 'A' && (strg0[k] <= 'Z'))
-	    strg0[k] += ('a' - 'A');
-}
-
-# endif				/* AMIGA_AC_5 */
 
 
 # if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
@@ -2483,21 +2431,6 @@ do_shell()
 #  endif			/* !(_Windows || DJGPP) */
 		    os_error(NO_CARET, "unable to spawn shell");
     }
-}
-
-# elif defined(AMIGA_SC_6_1)
-
-void
-do_shell()
-{
-    screen_ok = FALSE;
-    c_token++;
-
-    if (user_shell) {
-	if (system(user_shell))
-	    os_error(NO_CARET, "system() failed");
-    }
-    (void) putc('\n', stderr);
 }
 
 #  elif defined(OS2)
@@ -2919,9 +2852,7 @@ do_system_func(const char *cmd, char **output)
     int result_allocated, result_pos;
     char* result;
     int ierr = 0;
-# ifdef AMIGA_AC_5
-    int fd;
-# elif defined(VMS)
+# if defined(VMS)
     int chan, one = 1;
     struct dsc$descriptor_s pgmdsc = {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, 0};
     static $DESCRIPTOR(lognamedsc, "PLOT$MAILBOX");
@@ -2941,8 +2872,6 @@ do_system_func(const char *cmd, char **output)
 
     if ((f = fopen("PLOT$MAILBOX", "r")) == NULL)
 	os_error(NO_CARET, "mailbox open failed");
-# elif defined(AMIGA_AC_5)
-	if ((fd = open(cmd, "O_RDONLY")) == -1)
 # else	/* everyone else */
 	    if ((f = popen(cmd, "r")) == NULL)
 		os_error(NO_CARET, "popen failed");
@@ -2954,15 +2883,8 @@ do_system_func(const char *cmd, char **output)
     result = gp_alloc(MAX_LINE_LEN, "do_system_func");
     result[0] = NUL;
     while (1) {
-# if defined(AMIGA_AC_5)
-	char ch;
-	if (read(fd, &ch, 1) != 1)
-	    break;
-	c = ch;
-# else
 	if ((c = getc(f)) == EOF)
 	    break;
-# endif				/* !AMIGA_AC_5 */
 	/* result <- c */
 	result[result_pos++] = c;
 	if ( result_pos == result_allocated ) {
@@ -2981,11 +2903,7 @@ do_system_func(const char *cmd, char **output)
     result[result_pos] = NUL;
 
     /* close stream */
-# ifdef AMIGA_AC_5
-    (void) close(fd);
-# else				/* Rest of the world */
     ierr = pclose(f);
-# endif
 
     result = gp_realloc(result, strlen(result)+1, "do_system_func");
     *output = result;

@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.46 2008/09/24 03:19:06 sfeam Exp $
+ * $Id: graphics.h,v 1.47 2009/03/26 00:49:16 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -91,7 +91,7 @@ int label_width __PROTO((const char *, int *));
 void map_position __PROTO((struct position * pos, int *x, int *y, const char *what));
 void map_position_r __PROTO((struct position* pos, double* x, double* y,
 			     const char* what));
-#if defined(sun386) || defined(AMIGA_SC_6_1)
+#if defined(sun386)
 double CheckLog __PROTO((TBOOLEAN, double, double));
 #endif
 void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));

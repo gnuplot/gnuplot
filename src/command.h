@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.49 2009/10/31 03:22:37 sfeam Exp $
+ * $Id: command.h,v 1.50 2009/12/20 21:32:53 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -116,11 +116,7 @@ void call_kill_pending_Pause_dialog(void);
 #endif
 
 /* input data, parsing variables */
-#ifdef AMIGA_SC_6_1
-extern __far int num_tokens, c_token;
-#else
 extern int num_tokens, c_token;
-#endif
 
 void raise_lower_command __PROTO((int));
 void raise_command __PROTO((void));

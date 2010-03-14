@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.263 2010/02/18 05:34:09 sfeam Exp $
+dnl $Id: configure.in,v 1.264 2010/03/07 00:53:28 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -1377,8 +1377,7 @@ fi
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([  Additional terminals are availaible in platform-specific makefiles:])
-AC_MSG_RESULT([   amiga (makefile.amg and makefile.ami), apollo/gpr (makefile.unx)])
-AC_MSG_RESULT([   cgi (makefile.unx), pm (makefile.os2),])
+AC_MSG_RESULT([   apollo/gpr (makefile.unx), cgi (makefile.unx), pm (makefile.os2),])
 AC_MSG_RESULT([   sun (makefile.unx), unixpc (makefile.unx), windows (various Windows])
 AC_MSG_RESULT([   makefiles)])
 

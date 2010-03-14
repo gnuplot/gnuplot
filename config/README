@@ -1,14 +1,12 @@
 Notes:
 - EAM Oct 2007: give up on Atari platforms
+- EAM Mar 2010: give up on Amiga and 16-bit DOS, WIN
 
 List of files:
 buildvms.com: Shell script on VMS
 make_vms.com: Shell script on VMS
 makefile.unx: Generic makefile for unixes
 descrip.mms:  Makefile for VMS, Vers. 2.1, 1998/08/25 (no longer available)
-makefile.286: Makefile for Borland C++ 3.x and PharLap 286 extender on DOS
-makefile.amg: Makefile for SAS/C 6.1 or better on the Amiga
-makefile.ami: Makefile for Manx Aztec C 5.2 beta of better on the Amiga
 makefile.cyg: Makefile for Cygwin on WinNT and Win95 and above
 makefile.dj2: Makefile for DJGPP version 2 on DOS
 makefile.emx: Makefile for use with emx-0.8f/gcc and ndmake 4.5 on DOS

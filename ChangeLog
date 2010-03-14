@@ -1,3 +1,16 @@
+2010-03-14  Ethan A Merritt  <merritt@u.washington.edu
+
+	* INSTALL config/README config/makefile.amg config/makefile.ami
+	config/makefile.dj2 config/makefile.unx config/term_pc.h configure.in
+	docs/Makefile.in docs/README docs/gnuplot.doc src/Makefile.am
+	src/Makefile.maint src/amiga.c src/command.c src/command.h src/graph3d.c
+	src/graphics.c src/graphics.h src/makefile.all src/makefile.awc
+	src/plot.c src/scanner.c src/stdfn.c src/stdfn.h src/syscfg.h src/term.c
+	src/term.h src/variable.c term/amiga.trm:
+
+	Remove code specific to amiga platforms. 
+	30 files changed, 43 insertions(+), 1941 deletions(-)
+
 2010-03-13  Ethan A Merritt  <merritt@u.washington.edu
 
  	* config/makefile.286 config/makefile.msc config/makefile.msw

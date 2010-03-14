@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.109 2010/02/18 05:34:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.110 2010/03/14 06:43:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -93,10 +93,6 @@ extern int vms_ktid;
 extern smg$create_key_table();
 #endif /* VMS */
 
-#ifdef AMIGA_SC_6_1
-# include <proto/dos.h>
-#endif
-
 #ifdef _Windows
 # include <windows.h>
 # ifndef SIGINT
@@ -131,7 +127,7 @@ extern int rl_complete_with_tilde_expansion;
 /*
  * The next variable is a pointer to the value returned from 'tilde_expand()'.
  * This function expands '~' to the user's home directory, or $HOME, with
- * UN*X, AmigaOS, MSDOS.
+ * UN*X, MSDOS.
  * Depending on your OS you have to make sure that the "$HOME" environment
  * variable exitsts.  You are responsible for valid values.
  */
@@ -448,18 +444,11 @@ main(int argc, char **argv)
      * can be registered to be executed before the terminal is reset. */
     GP_ATEXIT(term_reset);
 
-#ifdef AMIGA_SC_6_1
-    if (IsInteractive(Input()) == DOSTRUE)
-	interactive = TRUE;
-    else
-	interactive = FALSE;
-#else
 # if ((defined(__MSC__) && defined(_Windows)) || defined(__WIN32__)) && ! defined(WGP_CONSOLE)
     interactive = TRUE;
 # else
     interactive = isatty(fileno(stdin));
 # endif
-#endif /* !AMIGA_SC_6_1 */
 
     if (argc > 1)
 	interactive = noinputfiles = FALSE;
@@ -581,9 +570,6 @@ main(int argc, char **argv)
 	}
 #endif
 
-#ifdef AMIGA_SC_6_1
-	(void) rawcon(0);
-#endif
 	load_file_error();	/* if we were in load_file(), cleanup */
 	SET_CURSOR_ARROW;
 

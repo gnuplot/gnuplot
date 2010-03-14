@@ -26,7 +26,7 @@ gnuplot.doc -> gnuplot.gih
             -> gnuplot.rtf
             -> gnuplot.tex
     	   	  	 	    		
-On Unix, AmigaOS, and MSDOS the interactive help is built into the
+On Unix and MSDOS the interactive help is built into the
 program, and uses the file "gnuplot.gih" ('make gih').
 
 On VMS, the interactive help is supplied by the system help facility,

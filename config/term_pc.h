@@ -1,5 +1,5 @@
 /*
- * $Id: term_pc.h,v 1.6 2007/10/16 21:19:44 sfeam Exp $
+ * $Id: term_pc.h,v 1.7 2008/03/30 03:27:51 sfeam Exp $
  *
  */
 
@@ -69,12 +69,6 @@
 /****************************************************************************/
 /* Platform dependent part                                                  */
 /****************************************************************************/
-
-/* Amiga */
-#ifdef AMIGA
-# include "amiga.trm"
-#endif
-
 
 /* Apple Macintosh */
 #ifdef _Macintosh
@@ -196,8 +190,8 @@
 #endif
 
 /****************************************************************************/
-/* Terminals not relevant for MSDOS, OS2, MS-Windows, or Amiga        */
-#if !(defined(MSDOS) || defined(OS2) || defined(_Windows) || defined(AMIGA))
+/* Terminals not relevant for MSDOS, OS2, MS-Windows       */
+#if !(defined(MSDOS) || defined(OS2) || defined(_Windows))
 
 /* AED 512 and AED 767 graphics terminals */
 # include "aed.trm"
@@ -225,7 +219,7 @@
 /* inboard terminal driver for X11 (dumps gnuplot_x11 commands) */
 # include "xlib.trm"
 
-#endif /* !(MSDOS || OS2 || _Windows || AMIGA) */
+#endif /* !(MSDOS || OS2 || _Windows) */
 /****************************************************************************/
 
 

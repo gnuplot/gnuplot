@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.42 2009/01/09 00:30:35 sfeam Exp $
+ * $Id: term.h,v 1.43 2009/07/19 22:51:59 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -96,11 +96,6 @@
 /****************************************************************************/
 /* Platform dependent part                                                  */
 /****************************************************************************/
-
-/* Amiga */
-#ifdef AMIGA
-# include "amiga.trm"
-#endif
 
 
 /* Apple Macintosh */
@@ -242,8 +237,8 @@
 #endif
 
 /****************************************************************************/
-/* Terminals not relevant for MSDOS, MS-Windows, Amiga             */
-#if !(defined(MSDOS) || defined(_Windows) || defined(AMIGA))
+/* Terminals not relevant for MSDOS, MS-Windows */
+#if !(defined(MSDOS) || defined(_Windows))
 
 /* AED 512 and AED 767 graphics terminals */
 /* # include "aed.trm" */
@@ -269,7 +264,7 @@
 # include "tek.trm"
 
 
-#endif /* !MSDOS && !_Windows && !AMIGA */
+#endif /* !MSDOS && !_Windows */
 /****************************************************************************/
 
 

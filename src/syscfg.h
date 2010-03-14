@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.37 2010/02/03 05:00:22 sfeam Exp $
+ * $Id: syscfg.h,v 1.38 2010/03/14 06:43:17 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -60,26 +60,6 @@
  * PATHSEP:  [':'] Character which separates path names
  *
  */
-
-#if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
-# ifndef __amigaos__
-#  define OS "Amiga"
-#  define HELPFILE "S:gnuplot.gih"
-#  define HOME     "GNUPLOT"
-#  define SHELL    "NewShell"
-#  define DIRSEP2  ':'
-#  define PATHSEP  ';'
-# endif
-# ifndef AMIGA
-#  define AMIGA
-# endif
-/* Fake S_IFIFO for SAS/C
- * See stdfn.h for details
- */
-# ifdef AMIGA_SC_6_1
-#  define S_IFIFO S_IREAD
-# endif
-#endif /* Amiga */
 
 #ifdef DOS386
 # define OS       "DOS 386"

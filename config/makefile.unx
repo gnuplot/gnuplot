@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.10 2008/03/30 03:27:51 sfeam Exp $
+# $Id: makefile.unx,v 1.11 2010/03/14 06:50:53 sfeam Exp $
 #
 #
 ############################################################
@@ -441,7 +441,7 @@ CSOURCE1 = bf_test.c binary.c command.c set.c show.c
 CSOURCE2 = help.c graphics.c graph3d.c internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.o plot3d.o readline.c scanner.c standard.c stdfn.c
 CSOURCE4 = bitmap.c term.c time.c util.c version.c fit.c matrix.c variable.c tabulate.c
-CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm \
+CSOURCE5 = term/ai.trm term/aed.trm \
 	term/cgi.trm term/corel.trm \
 	term/djsvga.trm term/dumb.trm \
 	term/dxf.trm term/dxy.trm term/debug.trm \

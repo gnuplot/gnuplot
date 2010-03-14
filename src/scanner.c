@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.27 2008/05/20 05:57:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.28 2010/01/30 05:07:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -42,12 +42,6 @@ static char *RCSid() { return RCSid("$Id: scanner.c,v 1.27 2008/05/20 05:57:26 s
 
 static int get_num __PROTO((char str[]));
 static void substitute __PROTO((char **strp, size_t *str_lenp, int current));
-
-#ifdef AMIGA_AC_5
-#define O_RDONLY	0
-int open(const char *_name, int _mode,...);
-int close(int);
-#endif /* AMIGA_AC_5 */
 
 #ifdef VMS
 #include <descrip.h>

@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.32 2006/05/13 09:22:17 mikulik Exp $
+ * $Id: stdfn.h,v 1.33 2010/01/06 17:29:03 sfeam Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -261,7 +261,7 @@ extern char *sys_errlist[];
 # define time_t long
 #endif
 
-#if defined(PIPES) && (defined(VMS) || (defined(OSK) && defined(_ANSI_EXT))) || defined(PIPES) && defined(AMIGA_SC_6_1)
+#if defined(PIPES) && (defined(VMS) || (defined(OSK) && defined(_ANSI_EXT)))
 FILE *popen __PROTO((char *, char *));
 int pclose __PROTO((FILE *));
 #endif

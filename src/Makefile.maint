@@ -2,7 +2,7 @@
 # Makefile fragment to generate makefile.all and update version.c
 
 # Non-core sources and version.c
-noncoresrc = amiga.c ansi2knr.c bf_test.c corplot.c gpexecute.c gplt_x11.c \
+noncoresrc = ansi2knr.c bf_test.c corplot.c gpexecute.c gplt_x11.c \
 os9.c strftime.c version.c vms.c
 
 coresrc := $(filter-out $(noncoresrc),$(wildcard *.c))

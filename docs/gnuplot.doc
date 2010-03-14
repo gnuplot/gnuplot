@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.603 2010/02/26 16:59:41 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.604 2010/02/28 04:30:47 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -636,15 +636,14 @@ C
  if desired.
 
  On Unix, HOME is used as the name of a directory to search for a .gnuplot
- file if none is found in the current directory.  On AmigaOS,
- MS-DOS, Windows and OS/2, GNUPLOT is used.  On Windows, the NT-specific
- variable USERPROFILE is tried, too. VMS, SYS$LOGIN: is used. Type `help
- start-up`.
+ file if none is found in the current directory.  On MS-DOS, Windows and OS/2,
+ GNUPLOT is used.  On Windows, the NT-specific variable USERPROFILE is also
+ tried. VMS, SYS$LOGIN: is used. Type `help start-up`.
 
  On Unix, PAGER is used as an output filter for help messages.
 
- On Unix and AmigaOS, SHELL is used for the `shell` command.  On
- MS-DOS and OS/2, COMSPEC is used for the `shell` command.
+ On Unix, SHELL is used for the `shell` command.  On MS-DOS and OS/2, COMSPEC
+ is used for the `shell` command.
 
  FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
  fit is interrupted---see `fit`.  FIT_LOG specifies the default filename of the
@@ -653,7 +652,7 @@ C
  GNUPLOT_LIB may be used to define additional search directories for data
  and command files. The variable may contain a single directory name, or
  a list of directories separated by a platform-specific path separator,
- eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga platforms. The contents
+ eg. ':' on Unix, or ';' on DOS/Windows/OS/2 platforms. The contents
  of GNUPLOT_LIB are appended to the `loadpath` variable, but not saved
  with the `save` and `save set` commands.
 
@@ -2173,13 +2172,12 @@ C ... and restart the table:
 ?.gnuplot
 ^ <a name="start-up"></a>
  When `gnuplot` is run, it looks for an initialization file to load.
- This file is called `.gnuplot` on Unix and AmigaOS systems, and
- `GNUPLOT.INI` on other systems.  If this file is not found in the
- current directory, the program will look for it in the HOME directory
- (under AmigaOS, MS-DOS, Windows and OS/2, the
- environment variable `GNUPLOT` should contain the name of this
- directory; on Windows NT, it will use `USERPROFILE` if GNUPLOT isn't
- defined).  Note: if NOCWDRC is defined during the installation,
+ This file is called `.gnuplot` on Unix-like systems, and `GNUPLOT.INI`
+ on other systems.  If this file is not found in the current directory,
+ the program will look for it in the HOME directory.
+ (under DOS, Windows and OS/2, the environment variable `GNUPLOT` should contain
+ the name of this directory; on Windows NT, it will use `USERPROFILE` if GNUPLOT
+ isn't defined).  Note: if NOCWDRC is defined during the installation,
  `gnuplot` will not read from the current directory.
 
  If the initialization file is found, `gnuplot` executes the commands in it.
@@ -7404,7 +7402,7 @@ Ffigure_mapcontours
 
  Path names may be entered as single directory names, or as a list of
  path names separated by a platform-specific path separator, eg. colon
- (':') on Unix, semicolon (';') on DOS/Windows/OS/2/Amiga platforms.
+ (':') on Unix, semicolon (';') on DOS/Windows/OS/2 platforms.
  The `show fontpath`, `save` and `save set` commands replace the
  platform-specific separator with a space character (' ') for maximum
  portability. If a directory name ends with an exclamation mark ('!') also
@@ -8403,7 +8401,7 @@ Ffigure_mapcontours
 
  Path names may be entered as single directory names, or as a list of
  path names separated by a platform-specific path separator, eg. colon
- (':') on Unix, semicolon (';') on DOS/Windows/OS/2/Amiga platforms.
+ (':') on Unix, semicolon (';') on DOS/Windows/OS/2 platforms.
  The `show loadpath`, `save` and `save set` commands replace the
  platform-specific separator with a space character (' ') for maximum
  portability.
@@ -11768,14 +11766,14 @@ Ffigure_mapcontours
 ?shell
  The `shell` command spawns an interactive shell.  To return to `gnuplot`,
  type `logout` if using VMS, `exit` or the END-OF-FILE character if using
- Unix, `endcli` if using AmigaOS, or `exit` if using MS-DOS or OS/2.
+ Unix, or `exit` if using MS-DOS or OS/2.
 
  There are two ways of spawning a shell command: using `system` command
  or via `!` ($ if using VMS). The former command takes a string as a
  parameter and thus it can be used anywhere among other gnuplot commands,
  while the latter syntax requires to be the only command on the line. Control
  will return immediately to `gnuplot` after this command is executed.  For
- example, in AmigaOS, MS-DOS or OS/2,
+ example, in MS-DOS or OS/2,
 
        ! dir
  or

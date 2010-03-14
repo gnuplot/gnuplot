@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.229 2010/02/27 21:50:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.230 2010/03/14 06:43:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -161,38 +161,9 @@ static void place_arrows3d __PROTO((int));
 static void place_labels3d __PROTO((struct text_label * listhead, int layer));
 static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
 
-/*
- * The Amiga SAS/C 6.2 compiler moans about macro envocations causing
- * multiple calls to functions. I converted these macros to inline
- * functions coping with the problem without loosing speed.
- * (MGR, 1993)
- */
-#ifdef AMIGA_SC_6_1
-GP_INLINE static TBOOLEAN
-i_inrange(int z, int min, int max)
-{
-    return ((min < max)
-	    ? ((z >= min) && (z <= max))
-	    : ((z >= max) && (z <= min)));
-}
-
-GP_INLINE static double
-f_max(double a, double b)
-{
-    return (max(a, b));
-}
-
-GP_INLINE static double
-f_min(double a, double b)
-{
-    return (min(a, b));
-}
-
-#else
 # define f_max(a,b) GPMAX((a),(b))
 # define f_min(a,b) GPMIN((a),(b))
 # define i_inrange(z,a,b) inrange((z),(a),(b))
-#endif
 
 #define apx_eq(x,y) (fabs(x-y) < 0.001)
 #define ABS(x) ((x) >= 0 ? (x) : -(x))

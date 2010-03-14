@@ -73,7 +73,7 @@ endif
 
 SUBDIRS = $(d_beos) wxterminal qtterminal
 
-EXTRA_gnuplot_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c
+EXTRA_gnuplot_SOURCES = corplot.c os9.c strftime.c vms.c
 
 EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep README \
 corgraph.asm genopt.com gnuplot.opt gnuplot.prj header.mac \

@@ -602,8 +602,8 @@ to test the postscript terminal with custom prologue files.
 GNUPLOT_LIB may be used to define additional search directories for
 data and command files. The variable may contain a single directory
 name, or a list of directories separated by a platform-specific path
-separator, eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga
-platforms. The contents of GNUPLOT_LIB are appended to the `loadpath`
+separator, eg. ':' on Unix, or ';' on DOS/Windows/OS/2 platforms.
+The contents of GNUPLOT_LIB are appended to the `loadpath`
 variable, but not saved with the `save` and `save set` commands.
 
 GNUFITLOG holds the name of a file that saves fit results. The default
