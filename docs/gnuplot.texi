@@ -16247,7 +16247,6 @@ with no modifiers.
 @menu
 * aed767::                      
 * aifm::                        
-* apollo::                      
 * aqua::                        
 * be::                          
 * pdfcairo::                    
@@ -16272,7 +16271,6 @@ with no modifiers.
 * Gnugraph(GNU_plotutils)::     
 * gpic::                        
 * gpic_::                       
-* gpr::                         
 * grass::                       
 * hp2623a::                     
 * hp2648::                      
@@ -16350,7 +16348,7 @@ The two drivers differ only in their horizontal ranges, which are 512 and
 768 pixels, respectively.  Their vertical range is 575 pixels.  There are
 no options for these drivers."
 
-@node aifm, apollo, aed767, complete_list_of_terminals
+@node aifm, aqua, aed767, complete_list_of_terminals
 @subsubsection aifm
 
 @c ?commands set terminal aifm
@@ -16391,24 +16389,7 @@ Examples:
 
 @end example
 
-@node apollo, aqua, aifm, complete_list_of_terminals
-@subsubsection apollo
-
-@c ?commands set terminal apollo
-@c ?set terminal apollo
-@c ?set term apollo
-@c ?terminal apollo
-@c ?term apollo
-@cindex apollo
-@tmindex apollo
-
-
-The `apollo` terminal driver supports the Apollo Graphics Primitive Resource
-with rescaling after window resizing.  It has no options.
-
-If a fixed-size window is desired, the `gpr` terminal may be used instead."
-
-@node aqua, be, apollo, complete_list_of_terminals
+@node aqua, be, aifm, complete_list_of_terminals
 @subsubsection aqua
 
 @c ?commands set terminal aqua
@@ -18053,7 +18034,7 @@ for example, using
 
 @end example
 
-@node gpic_, gpr, gpic, complete_list_of_terminals
+@node gpic_, grass, gpic, complete_list_of_terminals
 @subsubsection gpic
 
 @c ?commands set terminal gpic
@@ -18141,24 +18122,7 @@ for example, using
 
 @end example
 
-@node gpr, grass, gpic_, complete_list_of_terminals
-@subsubsection gpr
-
-@c ?commands set terminal gpr
-@c ?set terminal gpr
-@c ?set term gpr
-@c ?terminal gpr
-@c ?term gpr
-@cindex gpr
-@tmindex gpr
-
-
-The `gpr` terminal driver supports the Apollo Graphics Primitive Resource
-for a fixed-size window.  It has no options.
-
-If a variable window size is desired, use the `apollo` terminal instead."
-
-@node grass, hp2623a, gpr, complete_list_of_terminals
+@node grass, hp2623a, gpic_, complete_list_of_terminals
 @subsubsection grass
 
 @c ?commands set terminal grass
