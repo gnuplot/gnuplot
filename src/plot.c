@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.110 2010/03/14 06:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.111 2010/03/14 18:01:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -387,10 +387,6 @@ main(int argc, char **argv)
 	argv += n;
 	argc -= n;
     }
-#endif
-
-#ifdef APOLLO
-    apollo_pfm_catch();
 #endif
 
     setbuf(stderr, (char *) NULL);

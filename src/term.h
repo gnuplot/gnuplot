@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.43 2009/07/19 22:51:59 sfeam Exp $
+ * $Id: term.h,v 1.44 2010/03/14 18:01:46 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -182,16 +182,6 @@
 /***************************************************************************/
 /* Terminals for various Unix platforms                                    */
 /***************************************************************************/
-
-/* Apollo Graphics Primitive Resource */
-#ifdef APOLLO
-/* with resizeable windows */
-# include "apollo.trm"
-#  ifdef GPR
-/* with fixed windows */
-#   include "gpr.trm"
-#  endif
-#endif /* Apollo */
 
 /* Linux VGA */
 #ifdef LINUXVGA

@@ -11,6 +11,15 @@
 	Remove code specific to amiga platforms. 
 	30 files changed, 43 insertions(+), 1941 deletions(-)
 
+	* config/makefile.dj2 config/makefile.unx config/term_pc.h
+	configure.in docs/doc2texi.el src/eval.c src/eval.h src/makefile.all
+	src/makefile.awc src/plot.c src/syscfg.h src/term.c src/term.h
+	term/apollo.trm term/gpr.trm:
+
+	Remove code specific to support of Apollo workstations.
+	The final gnuplot version in the apollo archives was gnuplot 2.0 (1996).
+	15 files changed, 16 insertions(+), 1211 deletions(-)
+
 2010-03-13  Ethan A Merritt  <merritt@u.washington.edu
 
  	* config/makefile.286 config/makefile.msc config/makefile.msw

@@ -248,7 +248,6 @@ Major contributors (alphabetic order):
 (setq d2t-terminal-list
       '("aed"
 	"ai"
-	"apollo"
 	"aquaterm"
 	"be"
 	"cairo"

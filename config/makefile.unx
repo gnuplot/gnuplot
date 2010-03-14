@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.11 2010/03/14 06:50:53 sfeam Exp $
+# $Id: makefile.unx,v 1.12 2010/03/14 18:01:46 sfeam Exp $
 #
 #
 ############################################################
@@ -58,10 +58,9 @@ INSTALL=install
 #   If READLINE is defined, then command-line editing is supported.
 #   Otherwise, your normal terminal editing is all you get.
 #   Some machines will not support this, and they will turn this
-#   option off (for example, apollos running SR10.2 or SR10.3 and
-#   loaded with BSD4.3 instead of SYS5). Note: problems with
-#   gnuplot prompts have been noted when this feature is selected
-#   on IBM RS/6000 AIX, and compile errors are encountered on
+#   option off.
+#   Note: problems with gnuplot prompts have been noted when this feature
+#   is selected on IBM RS/6000 AIX, and compile errors are encountered on
 #   Sequent Dynix 3 and Convex OS 9.0. If seems to work with ConvexOS 10.1.
 # HAVE_LIBREADLINE
 #   If you want to use the more complex gnu version of readline, you can
@@ -126,8 +125,8 @@ MY_FLAGS  = CC="$(CC)" COPTS="$(COPTS)" DEST="$(DEST)" \
 #  -DHAVE_COPY if you have bcopy() and no memcpy()
 #  -DHAVE_STRNICMP if you have strnicmp()
 #  -DHAVE_STRNCASECMP if you have strncasecmp() (GNU Libc, bsd)
-#  -DGAMMA=foo if your gamma function is called foo(). Apollos and
-#    Linux have lgamma(3m). The default is -DGAMMA=gamma.
+#  -DGAMMA=foo if your gamma function is called foo().
+#    Linux has lgamma(3m). The default is -DGAMMA=gamma.
 #  -DHAVE_GETCWD if your unix uses getcwd() instead of getwd()
 #    this is needed by HP-UX and Cray Unicos systems.
 #  -DHAVE_GETWD if you have getwd()
@@ -160,8 +159,6 @@ CFLAGS = $(COPTS) $(OPTIONS)
 # See other terminal defines in term.h.
 # Define ULTRIX_KLUDGE if you have the every-other plot problem in Ultrix X11.
 #
-# -DAPOLLO      Apollo Graphics Primitive Resource (window resize after replot)
-# -DGPR         Apollo Graphics Primitive Resource (fixed-size window)
 # -DCGI         SCO CGI
 # -DSUN         Sun Microsystems Workstation
 # -DLINUXVGA	Linux PC with SuperVGA library
@@ -224,15 +221,6 @@ DEC_FLAGS = \
            PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11=$(GNUPLOT_X11) \
            X11INSTALL="$(X11INSTALL)" \
            TERMFLAGS="$(TERMFLAGS) -DULTRIX_KLUDGE"
-
-APOLLO_FLAGS = \
-           CFLAGS="$(COPTS) $(OPTIONS) -DGAMMA=lgamma" \
-           LIBS="$(LIBS)" X11FLAGS="$(X11FLAGS)" \
-           X11INCLUDES="$(X11INCLUDES)" \
-           X11LIBS="-L/usr/lib/X11 -lX11" \
-           PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11=$(GNUPLOT_X11) \
-           X11INSTALL="$(X11INSTALL)" \
-           TERMFLAGS="$(TERMFLAGS) -DAPOLLO -DGPR"
 
 HP8_FLAGS = \
            CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD" \
@@ -448,7 +436,7 @@ CSOURCE5 = term/ai.trm term/aed.trm \
 	term/emxvga.trm term/eepic.trm term/epson.trm term/excl.trm \
 	term/fig.trm term/grass.trm term/hp26.trm term/hp2648.trm term/hpgl.trm \
 	term/hp500c.trm term/hpljii.trm term/metafont.trm term/mgr.trm\
-	term/apollo.trm term/gpr.trm term/hppj.trm
+	term/hppj.trm
 CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
 	term/kyo.trm term/latex.trm term/mif.trm \
 	term/pbm.trm term/pslatex.trm term/gpic.trm term/gnugraph.trm
@@ -521,7 +509,6 @@ DOCS3 = docs/latextut/makefile docs/latextut/eg1.plt \
 info:
 	@echo "Please do a 'make <MACHINE>' where <MACHINE> is one of the following:"
 	@echo
-	@echo "apollo       for Apollo running SR10.3 with Apollo's X11"
 	@echo "dec_osf      for Dec3100/5000 running DEC OSF/1 v1.0"
 	@echo "dec          for Dec3100/5000 running Ultrix 3.1d with MIT's X11"
 	@echo "hp8          for HP/9000 700 series running HP/UX 8.0 with MIT's X11R4"
@@ -550,9 +537,6 @@ info:
 	@echo "Examples:"
 	@echo
 	@echo "         make x11"
-	@echo "         make apollo"
-	@echo "         make apollo       OPTIONS='-DNOCWDRC' "
-	@echo "         make apollo       DEST='/usr/um/misc/bin' "
 	@echo "         make dec"
 	@echo "         make hp"
 	@echo "         make next"
@@ -603,9 +587,6 @@ dec_osf:
 
 dec:
 	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(DEC_FLAGS)      $(TARGET)
-
-apollo:
-	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(APOLLO_FLAGS)   $(TARGET)
 
 hp8:
 	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(HP8_FLAGS)       $(TARGET)
@@ -713,14 +694,13 @@ install:
 	@echo
 	@echo "Please do a 'make <MACHINE> TARGET=Install' where <MACHINE> is one of the following:"
 	@echo
-	@echo "apollo, dec, hp, sun, sun_x11, sgi, sgix11, cgi,"
+	@echo "dec, hp, sun, sun_x11, sgi, sgix11, cgi,"
 	@echo "next, next_x11, 3b1, 386ix, 386ix_x11, aix32, aix32o,"
 	@echo "x11, cray, cray_x11, ptx_x11, sequent_x11, convex_x11"
 	@echo
 	@echo "Examples:"
 	@echo
 	@echo "         make x11          TARGET=Install "
-	@echo "         make apollo       TARGET=Install "
 	@echo "         make dec          TARGET=Install "
 	@echo "         make hp           TARGET=Install "
 	@echo "         make sun          TARGET=Install HELPDEST='/usr/um/misc/lib BINDIR='/usr/um/misc/bin' "

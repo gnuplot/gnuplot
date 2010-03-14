@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.76 2010/01/06 17:29:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.77 2010/03/14 06:43:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -36,8 +36,7 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.76 2010/01/06 17:29:03 sfea
 
 /* HBB 20010724: I moved several variables and functions from parse.c
  * to here, because they're involved with *evaluating* functions, not
- * with parsing them: evaluate_at(), fpe(), the APOLLO signal handling
- * stuff, and fpe_env */
+ * with parsing them: evaluate_at(), fpe(), and fpe_env */
 
 #include "eval.h"
 
@@ -55,9 +54,6 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.76 2010/01/06 17:29:03 sfea
 
 /* Internal prototypes */
 static RETSIGTYPE fpe __PROTO((int an_int));
-#ifdef APOLLO
-static pfm_$fh_func_val_t apollo_sigfpe(pfm_$fault_rec_t & fault_rec)
-#endif
 
 /* Global variables exported by this module */
 struct udvt_entry udv_pi = { NULL, "pi", FALSE, {INTGR, {0} } };
@@ -232,41 +228,6 @@ fpe(int an_int)
     undefined = TRUE;
     LONGJMP(fpe_env, TRUE);
 }
-
-/* FIXME HBB 20010724: do we really want this in *here*? Maybe it
- * should be in syscfg.c or somewhere similar. */
-#ifdef APOLLO
-# include <apollo/base.h>
-# include <apollo/pfm.h>
-# include <apollo/fault.h>
-
-/*
- * On an Apollo, the OS can signal a couple errors that are not mapped into
- * SIGFPE, namely signalling NaN and branch on an unordered comparison.  I
- * suppose there are others, but none of these are documented, so I handle
- * them as they arise.
- *
- * Anyway, we need to catch these faults and signal SIGFPE.
- */
-
-static pfm_$fh_func_val_t
-apollo_sigfpe(pfm_$fault_rec_t & fault_rec)
-{
-    kill(getpid(), SIGFPE);
-    return pfm_$continue_fault_handling;
-}
-
-/* This is called from main(), if the platform is an APOLLO */
-void
-apollo_pfm_catch()
-{
-    status_$t status;
-    pfm_$establish_fault_handler(fault_$fp_bsun, pfm_$fh_backstop,
-				 apollo_sigfpe, &status);
-    pfm_$establish_fault_handler(fault_$fp_sig_nan, pfm_$fh_backstop,
-				 apollo_sigfpe, &status);
-}
-#endif /* APOLLO */
 
 /* Exported functions */
 

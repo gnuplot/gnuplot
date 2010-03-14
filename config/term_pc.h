@@ -1,5 +1,5 @@
 /*
- * $Id: term_pc.h,v 1.7 2008/03/30 03:27:51 sfeam Exp $
+ * $Id: term_pc.h,v 1.8 2010/03/14 18:01:46 sfeam Exp $
  *
  */
 
@@ -138,17 +138,6 @@
 /***************************************************************************/
 /* Terminals for various Unix platforms                                    */
 /***************************************************************************/
-
-/* Apollo Graphics Primitive Resource */
-#ifdef APOLLO
-/* with resizeable windows */
-# include "apollo.trm"
-#  ifdef GPR
-/* with fixed windows */
-#   include "gpr.h"
-#  endif
-#endif /* Apollo */
-
 
 /* Linux VGA */
 #ifdef LINUXVGA

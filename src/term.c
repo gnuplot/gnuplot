@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.199 2010/03/14 06:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.200 2010/03/14 18:01:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1730,18 +1730,6 @@ init_terminal()
 	if (term_name == (char *) NULL)
 		term_name = "win";
 #endif /* _Windows */
-
-#ifdef GPR
-	/* find out whether stdout is a DM pad. See term/gpr.trm */
-	if (gpr_isa_pad())
-	    term_name = "gpr";
-#else
-# ifdef APOLLO
-	/* find out whether stdout is a DM pad. See term/apollo.trm */
-	if (apollo_isa_pad())
-	    term_name = "apollo";
-# endif                         /* APOLLO */
-#endif /* GPR    */
 
 #if defined(__APPLE__) && defined(__MACH__) && defined(HAVE_LIBAQUATERM)
 	/* Mac OS X with AquaTerm installed */

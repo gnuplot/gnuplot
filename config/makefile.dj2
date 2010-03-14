@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.dj2,v 1.16 2009/12/02 04:59:57 sfeam Exp $
+# $Id: makefile.dj2,v 1.17 2010/03/14 18:01:46 sfeam Exp $
 #
 # GNUPLOT Makefile for DJGPP version 2 on DOS
 #
@@ -10,7 +10,7 @@
 #
 # AUTHORS : several ... including Edzer Pebesma <pebesma@metoor.frw.uva.nl>
 #           last mod. by Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
-# DATE of last mod: $Date: 2009/12/02 04:59:57 $
+# DATE of last mod: $Date: 2010/03/14 18:01:46 $
 #
 # 
 # removed atari reference and added binary demo bf_test
@@ -86,7 +86,7 @@ CSOURCE5 = $(T)ai.trm $(T)aed.trm \
 	$(T)debug.trm $(T)eepic.trm $(T)epson.trm $(T)fig.trm  \
 	$(T)hp26.trm $(T)hp2648.trm $(T)hpgl.trm  \
 	$(T)hpljii.trm $(T)metafont.trm\
-	$(T)apollo.trm $(T)gpr.trm $(T)hppj.trm
+	$(T)hppj.trm
 CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)next.trm $(T)object.h \
 	$(T)kyo.trm $(T)latex.trm $(T)mif.trm \
 	$(T)pbm.trm $(T)pc.trm 
