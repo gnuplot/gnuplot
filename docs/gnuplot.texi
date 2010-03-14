@@ -879,15 +879,14 @@ help library, allowing access to help from both within and outside `gnuplot`
 if desired.
 
 On Unix, HOME is used as the name of a directory to search for a .gnuplot
-file if none is found in the current directory.  On AmigaOS,
-MS-DOS, Windows and OS/2, GNUPLOT is used.  On Windows, the NT-specific
-variable USERPROFILE is tried, too. VMS, SYS$LOGIN: is used. Type `help
-start-up`.
+file if none is found in the current directory.  On MS-DOS, Windows and OS/2,
+GNUPLOT is used.  On Windows, the NT-specific variable USERPROFILE is also
+tried. VMS, SYS$LOGIN: is used. Type `help start-up`.
 
 On Unix, PAGER is used as an output filter for help messages.
 
-On Unix and AmigaOS, SHELL is used for the @ref{shell} command.  On
-MS-DOS and OS/2, COMSPEC is used for the @ref{shell} command.
+On Unix, SHELL is used for the @ref{shell} command.  On MS-DOS and OS/2, COMSPEC
+is used for the @ref{shell} command.
 
 FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
 fit is interrupted---see @ref{fit}.  FIT_LOG specifies the default filename of the
@@ -896,7 +895,7 @@ logfile maintained by fit.
 GNUPLOT_LIB may be used to define additional search directories for data
 and command files. The variable may contain a single directory name, or
 a list of directories separated by a platform-specific path separator,
-eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga platforms. The contents
+eg. ':' on Unix, or ';' on DOS/Windows/OS/2 platforms. The contents
 of GNUPLOT_LIB are appended to the @ref{loadpath} variable, but not saved
 with the @ref{save} and `save set` commands.
 
@@ -1372,7 +1371,9 @@ value, the imaginary component is ignored.
 
 The `ibeta(p,q,x)` function returns the incomplete beta function of the real
 parts of its arguments. p, q > 0 and x in [0:1].  If the arguments are
-complex, the imaginary components are ignored.
+complex, the imaginary components are ignored.  The function is approximated by
+the method of continued fractions (Abramowitz and Stegun, 1964).
+The approximation is only accurate in the region x < (p-1)/(p+q-2). 
 
 @node inverf, igamma, ibeta, Functions
 @subsubsection inverf
@@ -2262,7 +2263,7 @@ expression. For example
 @end example
 
 Valid names are the same as in most programming languages: they must begin
-with a letter, but subsequent characters may be letters, digits, "$", or "_".
+with a letter, but subsequent characters may be letters, digits, or "_".
 
 Each function definition is made available as a special string-valued
 variable with the prefix 'GPFUN_'.
@@ -2319,9 +2320,9 @@ It is usually sufficient in gnuplot to request a font by a generic name and
 size, letting fontconfig substitute a similar font if necessary. The following
 will probably all work:
 @example
-     set term pdfpng font "sans,12"
-     set term pdfpng font "Times,12"
-     set term pdfpng font "Times-New-Roman,12"
+     set term pdfcairo font "sans,12"
+     set term pdfcairo font "Times,12"
+     set term pdfcairo font "Times-New-Roman,12"
 
 @end example
 
@@ -2957,13 +2958,12 @@ have no effect whereas of course those controlling the z axis do take effect.
 
 @c ^ <a name="start-up"></a>
 When `gnuplot` is run, it looks for an initialization file to load.
-This file is called `.gnuplot` on Unix and AmigaOS systems, and
-`GNUPLOT.INI` on other systems.  If this file is not found in the
-current directory, the program will look for it in the HOME directory
-(under AmigaOS, MS-DOS, Windows and OS/2, the
-environment variable `GNUPLOT` should contain the name of this
-directory; on Windows NT, it will use `USERPROFILE` if GNUPLOT isn't
-defined).  Note: if NOCWDRC is defined during the installation,
+This file is called `.gnuplot` on Unix-like systems, and `GNUPLOT.INI`
+on other systems.  If this file is not found in the current directory,
+the program will look for it in the HOME directory.
+(under DOS, Windows and OS/2, the environment variable `GNUPLOT` should contain
+the name of this directory; on Windows NT, it will use `USERPROFILE` if GNUPLOT
+isn't defined).  Note: if NOCWDRC is defined during the installation,
 `gnuplot` will not read from the current directory.
 
 If the initialization file is found, `gnuplot` executes the commands in it.
@@ -3703,22 +3703,44 @@ See @ref{boxwidth}, @ref{bars}, `set style fill`, and @ref{boxplot}.
 @cindex circles
 
 The @ref{circles} style plots a circle with an explicit radius at each data point.
-Three columns of data are required: x, y, radius.  An optional 4th column may
-be used to specify color information.  The radius is always interpreted in the
-units of the plot's horizontal axis (x or x2).  The scale on y and the aspect
-ratio of the plot are both ignored.
+Three columns of data are required: x, y, radius.  By default a full circle
+will be drawn.  It is possible to plot circle segments instead of full
+circles by specifying the start and end angle in the 4th and 5th column.
+An optional 4th or 6th column may be used to specify color information.
+The radius is always interpreted in the units of the plot's horizontal axis
+(x or x2).  The scale on y and the aspect ratio of the plot are both ignored.
+The start and end angles of the circle segments must be specified in degrees.
 
-Example (draws circles whose area is proportional to the value in column 3):
+
+Examples:
 
 @example
+    # draws circles whose area is proportional to the value in column 3
     set style fill transparent solid 0.2 noborder
     plot 'data' using 1:2:(sqrt($3)) with circles, \
          'data' using 1:2 with linespoints
 
 @end example
 
+@example
+    # draws Pac-men instead of circles
+    plot 'data' using 1:2:(10):(40):(320) with circles
+    
+    # draw a pie chart with inline data
+    set xrange [-15:15]
+    set style fill transparent solid 0.9 noborder
+    plot '-' using 1:2:3:4:5:6 with circles lc var
+    0    0    5    0    30    1
+    0    0    5   30    70    2
+    0    0    5   70   120    3
+    0    0    5  120   230    4
+    0    0    5  230   360    5
+    e
+
+@end example
+
 The result is similar to using a `points` plot with variable size points and
-pointstyle 6, except that the circles will scale with the x axis range.
+pointstyle 7, except that the circles will scale with the x axis range.
 See also `set object circle` and `fillstyle`.
 
 @node dots, filledcurves, circles, plotting_styles
@@ -9494,8 +9516,15 @@ Example:
 
 Example:
 @example
+      set style data linespoints
+      plot '-'
+         1 10
+         2 20
+         3 ?
+         4 40
+         5 50
+         e
       set datafile missing "?"
-      set style data lines
       plot '-'
          1 10
          2 20
@@ -9525,10 +9554,10 @@ will use the single-datum-on-a-line convention that the line number is "x"
 and the datum is "y", so the point will be plotted (in this case erroneously)
 at (2,3).
 
-The second `plot` will correctly ignore the middle line.  The plotted line
-will connect the points at (2,20) and (4,40).
+The second and third `plot` commands will correctly ignore the middle line.
+The plotted line will connect the points at (2,20) and (4,40).
 
-The third `plot` will also correctly ignore the middle line, but the plotted
+The fourth `plot` will also correctly ignore the middle line, but the plotted
 line will not connect the points at (2,20) and (4,40).
 
 There is no default character for `missing`, but in many cases any
@@ -10009,7 +10038,7 @@ Syntax:
 
 Path names may be entered as single directory names, or as a list of
 path names separated by a platform-specific path separator, eg. colon
-(':') on Unix, semicolon (';') on DOS/Windows/OS/2/Amiga platforms.
+(':') on Unix, semicolon (';') on DOS/Windows/OS/2 platforms.
 The @ref{fontpath}, @ref{save} and `save set` commands replace the
 platform-specific separator with a space character (' ') for maximum
 portability. If a directory name ends with an exclamation mark ('!') also
@@ -11157,7 +11186,7 @@ Syntax:
 
 Path names may be entered as single directory names, or as a list of
 path names separated by a platform-specific path separator, eg. colon
-(':') on Unix, semicolon (';') on DOS/Windows/OS/2/Amiga platforms.
+(':') on Unix, semicolon (';') on DOS/Windows/OS/2 platforms.
 The @ref{loadpath}, @ref{save} and `save set` commands replace the
 platform-specific separator with a space character (' ') for maximum
 portability.
@@ -15600,14 +15629,14 @@ Please see `set xtics` for details.
 
 The @ref{shell} command spawns an interactive shell.  To return to `gnuplot`,
 type `logout` if using VMS, @ref{exit} or the END-OF-FILE character if using
-Unix, `endcli` if using AmigaOS, or @ref{exit} if using MS-DOS or OS/2.
+Unix, or @ref{exit} if using MS-DOS or OS/2.
 
 There are two ways of spawning a shell command: using @ref{system} command
 or via `!` ($ if using VMS). The former command takes a string as a
 parameter and thus it can be used anywhere among other gnuplot commands,
 while the latter syntax requires to be the only command on the line. Control
 will return immediately to `gnuplot` after this command is executed.  For
-example, in AmigaOS, MS-DOS or OS/2,
+example, in MS-DOS or OS/2,
 
 @example
       ! dir
@@ -16218,7 +16247,6 @@ with no modifiers.
 @menu
 * aed767::                      
 * aifm::                        
-* amiga::                       
 * apollo::                      
 * aqua::                        
 * be::                          
@@ -16322,7 +16350,7 @@ The two drivers differ only in their horizontal ranges, which are 512 and
 768 pixels, respectively.  Their vertical range is 575 pixels.  There are
 no options for these drivers."
 
-@node aifm, amiga, aed767, complete_list_of_terminals
+@node aifm, apollo, aed767, complete_list_of_terminals
 @subsubsection aifm
 
 @c ?commands set terminal aifm
@@ -16363,35 +16391,7 @@ Examples:
 
 @end example
 
-@node amiga, apollo, aifm, complete_list_of_terminals
-@subsubsection amiga
-
-@c ?commands set terminal amiga
-@c ?set terminal amiga
-@c ?set term amiga
-@c ?terminal amiga
-@c ?term amiga
-@cindex amiga
-@tmindex amiga
-
-
-The `amiga` terminal, for Commodore Amiga computers, allows the user to
-plot either to a screen (default), or, if Kickstart 3.0 or higher is
-installed, to a window on the current public screen. The font and its size
-can also be selected.
-
-Syntax:
-@example
-      set terminal amiga @{screen | window@} @{"<fontname>"@} @{<fontsize>@}
-
-@end example
-
-The default font is 8-point "topaz".
-
-The screen option uses a virtual screen, so it is possible that the graph
-will be larger than the screen."
-
-@node apollo, aqua, amiga, complete_list_of_terminals
+@node apollo, aqua, aifm, complete_list_of_terminals
 @subsubsection apollo
 
 @c ?commands set terminal apollo
@@ -17786,7 +17786,7 @@ Syntax:
              @{tiny | small | medium | large | giant@}
              @{font "<face> @{,<pointsize>@}"@} @{@{no@}enhanced@}
              @{size <x>,<y>@} @{@{no@}crop@}
-             @{<color0> <color1> <color2> ...@}
+             @{<background_color>@}
 
 @end example
 
@@ -17836,11 +17836,10 @@ Please see additional information under `canvas` and @ref{size}.
 Blank space at the edges of the finished plot may be trimmed using the `crop`
 option, resulting in a smaller final image size. Default is `nocrop`.
 
-Each color must be of the form 'xrrggbb', where x is the literal character
-'x' and 'rrggbb' are the red, green and blue components in hex.  For example,
-'x00ff00' is green.  The background color is set first, then the border
-colors, then the X & Y axis colors, then the plotting colors.  The maximum
-number of colors that can be set is 256.
+The background color must be given in the form 'xrrggbb', where x is the
+literal character 'x' and 'rrggbb' are the red, green and blue components
+in hexadecimal.  For example, 'x00ff00' is green.  The specification of
+additional colors other than the background is deprecated.
 
 
 
@@ -17848,17 +17847,12 @@ number of colors that can be set is 256.
 
 @c ?set term png examples
 @example
-      set terminal png medium size 640,480 \\
-                       xffffff x000000 x404040 \\
-                       xff0000 xffa500 x66cdaa xcdb5cd \\
-                       xadd8e6 x0000ff xdda0dd x9500d3    # defaults
+      set terminal png medium size 640,480 xffffff
 
 @end example
 
 Use the medium size built-in non-scaleable, non-rotatable font.
-Use white (xffffff) for the non-transparent background, black for borders,
-gray for the axes, and red, orange, medium aquamarine, thistle 3, light blue,
-blue, plum and dark violet for the first eight plotting colors.
+Use white (xffffff) for the non-transparent background.
 
 @example
       set terminal png font arial 14 size 800,600
@@ -20011,6 +20005,9 @@ Syntax:
                            @{enhanced | noenhanced@}
                            @{@{font@} "fontname@{,fontsize@}" @{<fontsize>@}@}
                            @{title "Plot Window Title"@}
+                           @{size <width>,<height>@}
+                           @{position <x>,<y>@}
+                           @{close@}
 
 @end example
 
@@ -20019,6 +20016,10 @@ where `color` and `monochrome` select colored or mono output,
 superscripts and mixed fonts). See `enhanced` for more information.
 `"<fontname>"` is the name of a valid Windows font, and `<fontsize>`
 is the size of the font in points.
+@ref{size} defines the width and height of the window in pixel and `position`
+the origin of the window i.e. the position of the top left corner on the
+screen (again in pixel). Both these options override the default settings
+from the WGNUPLOT.INI file (see below).
 
 Other options may be set with the graph-menu or the initialization file.
 
@@ -20030,6 +20031,9 @@ By giving the optional argument `-persist` (same as for gnuplot under x11;
 former Windows-only options `/noend` or `-noend` are still accepted as well),
 will not close gnuplot. Contrary to gnuplot on other operating systems,
 gnuplot's interactive command line is accessible after the -persist option.
+
+The plot window remains open even when the gnuplot driver is changed to a
+different device. The plot window can be close with `set term windows close`
 
 
 @noindent --- GRAPH-MENU ---
@@ -20052,7 +20056,9 @@ plot.
 `Color` when checked enables color linestyles.  When unchecked it forces
 monochrome linestyles.
 
-`Copy to Clipboard` copies a bitmap and a Metafile picture.
+`Copy to Clipboard` copies a bitmap and an enhanced Metafile picture.
+
+`Save as EMF...` allows the user to save the current graph window as enhanced metafile
 
 `Background...` sets the window background color.
 
