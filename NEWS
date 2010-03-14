@@ -5,6 +5,7 @@ New features, changes and fixes since gnuplot version 4.4
 * NEW plot style "with boxplot"
 * NEW plot style "with circles" allows start/end angles for each arc
 * NEW qt terminal driver 
+* CHANGE remove vestigial code supporting Amiga, Apollo, and 16-bit MSDOS/WIN
 
 New features, changes and fixes since gnuplot version 4.2
 =========================================================
