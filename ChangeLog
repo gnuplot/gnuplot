@@ -1,10 +1,11 @@
 2010-03-13  Ethan A Merritt  <merritt@u.washington.edu
 
  	* config/makefile.286 config/makefile.msc config/makefile.msw
-	config/makefile.tc config/makefile.wc src/alloc.c src/alloc.h
-	src/eval.c src/gnuplot.def src/graph3d.c src/help.c src/hidden3d.h
-	src/misc.c src/plot.c src/plot2d.c src/set.c src/show.c src/syscfg.h
-	src/term.c src/term_api.h src/unset.c src/util3d.c term/cgm.trm:
+	config/makefile.tc config/makefile.wc config/makefile.unx
+	src/Makefile.am src/alloc.c src/alloc.h src/eval.c src/gnuplot.def
+	src/graph3d.c src/help.c src/hidden3d.h src/misc.c src/plot.c
+	src/plot2d.c src/set.c src/show.c src/syscfg.h src/term.c
+	src/term_api.h src/unset.c src/util3d.c term/cgm.trm:
 
 	We have not supported 16-bit DOS or WIN since version 4.0.
 	Remove the old cruft that was wrapped in conditional flags

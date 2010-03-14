@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.9 2007/11/19 21:17:13 sfeam Exp $
+# $Id: makefile.unx,v 1.10 2008/03/30 03:27:51 sfeam Exp $
 #
 #
 ############################################################
@@ -490,7 +490,7 @@ BETA =
 # PC-specific files
 PC = corgraph.asm corplot.c header.mac hrcgraph.asm lineproc.mac \
 	linkopt.msc makefile.msc makefile.tc makefile.st makefile.djg \
-	pcgraph.asm gnuplot.def makefile.286 makefile.emx \
+	pcgraph.asm makefile.emx \
 	makefile.ztc linkopt.ztc term/fg.trm term/pc.trm 
 WINDOWS = makefile.win makefile.msw README.win win/wcommon.h \
 	win/wgnuplib.c win/wgnuplib.def win/wgnuplib.h win/wgnuplib.rc \
