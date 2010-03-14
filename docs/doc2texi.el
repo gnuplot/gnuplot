@@ -248,7 +248,6 @@ Major contributors (alphabetic order):
 (setq d2t-terminal-list
       '("aed"
 	"ai"
-	"amiga"
 	"apollo"
 	"aquaterm"
 	"be"
@@ -412,9 +411,6 @@ particular conversion chore."
     (if (string-match "linux" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("linux"))))
-    (if (string-match "amiga" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("amiga"))))
     (if (string-match "canvas" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("canvas"))))
@@ -448,7 +444,7 @@ particular conversion chore."
     (if (string-match "vms" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("vws"))))
-    (unless (member* system-configuration '("pc" "windows" "amiga")
+    (unless (member* system-configuration '("pc" "windows")
 		     :test 'string-match)
       (setq d2t-terminal-list
 	    (append d2t-terminal-list
