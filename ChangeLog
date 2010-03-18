@@ -1,3 +1,8 @@
+2010-03-18  Ethan A Merritt  <merritt@u.washington.edu
+
+	* docs/gnuplot.doc:  Add index entries and update description of mouse
+	scrolling and hotkeys.
+
 2010-03-17  Ethan A Merritt  <merritt@u.washington.edu
 
 	* plot.c (main): Initialize c_token to a legal value at the start of

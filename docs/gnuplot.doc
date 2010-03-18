@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.605 2010/03/14 18:01:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.606 2010/03/18 04:52:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8574,20 +8574,10 @@ Ffigure_mapcontours
  shift key held down changes the `xyplane`.  If additionally to these
  buttons the modifier <ctrl> is held down, the coordinate axes are displayed
  but the data are suppressed.  This is useful for large data sets.
- 
- X and Y axis scaling in both 2d and 3d graphs can be adjusted using the
- mouse wheel.  <wheel-up> scrolls up (increases both YMIN and YMAX by ten
- percent of the Y range, and increases both Y2MIN and Y2MAX likewise), and
- <wheel down> scrolls down.  <shift-wheel-up> scrolls left (decreases both
- XMIN and XMAX, and both X2MIN and X2MAX), and <shift-wheel-down> scrolls
- right.  <control-wheel-up> zooms in toward the center of the plot, and
- <control-wheel-down> zooms out.  <shift-control-wheel-up> zooms in along the
- X and X2 axes only, and <shift-control-wheel-down> zooms out along the X and
- X2 axes only.
 
- Mousing is not available in multiplot mode. When multiplot is finished using
- `unset multiplot`, then the mouse will be turned on again and acts on the
- last plot (like replot does).
+ Mousing is not available inside multiplot mode. When multiplot is completed
+ using `unset multiplot`, then the mouse will be turned on again but acts only
+ on the most recent plot within the multiplot (like replot does).
 
  Syntax:
        set mouse {doubleclick <ms>} {nodoubleclick} \
@@ -8601,19 +8591,17 @@ Ffigure_mapcontours
                  {{no}zoomjump} {{no}verbose}
        unset mouse
 
- The doubleclick resolution is given in milliseconds and used for Button 1
- which copies the current mouse position to the `clipboard`. If you want that
- to be done by single clicking a value of 0 ms can be used. The default value
- is 300 ms.
+ The doubleclick resolution is given in milliseconds and used for Button 1,
+ which copies the current mouse position to the `clipboard`.  The default value
+ is 300 ms.  Setting the value to 0 ms triggers the copy on a single click.
 
  The option `zoomcoordinates` determines if the coordinates of the zoom box are
  drawn at the edges while zooming. This is on by default.
 
- The options `noruler` and `ruler` switch the ruler off and on, the
- latter optionally setting the origin at the given coordinates. While
- the ruler is on, the distance in user units from the ruler origin to
- the mouse is displayed continuously. By default, toggling the ruler
- has the key binding 'r'.
+ The options `noruler` and `ruler` switch the ruler off and on, the latter
+ optionally setting the origin at the given coordinates. While the ruler is on,
+ the distance in user units from the ruler origin to the mouse is displayed
+ continuously. By default, toggling the ruler has the key binding 'r'.
 
  The option `polardistance` determines if the distance between the mouse cursor
  and the ruler is also shown in polar coordinates (distance and angle in
@@ -8666,11 +8654,22 @@ Ffigure_mapcontours
  bindings.  This will also display user defined bindings or `hotkeys` which
  can be defined using the `bind` command, see help for `bind`.  Note, that user
  defined `hotkeys` may override the default bindings.
-
- Press 'q' in the driver's window to close the window. This key cannot be
- overridden with the `bind` command.
-
  See also help for `bind` and `label`.
+4 scrolling
+?set mouse scrolling
+?mouse scrolling
+?mouse wheel
+?scrolling
+?mousewheel
+ X and Y axis scaling in both 2d and 3d graphs can be adjusted using the
+ mouse wheel.  <wheel-up> scrolls up (increases both YMIN and YMAX by ten
+ percent of the Y range, and increases both Y2MIN and Y2MAX likewise), and
+ <wheel down> scrolls down.  <shift-wheel-up> scrolls left (decreases both
+ XMIN and XMAX, and both X2MIN and X2MAX), and <shift-wheel-down> scrolls
+ right.  <control-wheel-up> zooms in toward the center of the plot, and
+ <control-wheel-down> zooms out.  <shift-control-wheel-up> zooms in along the
+ X and X2 axes only, and <shift-control-wheel-down> zooms out along the X and
+ X2 axes only.
 4 X11 mouse
 ?mouse x11_mouse
 ?x11_mouse
@@ -8679,12 +8678,6 @@ Ffigure_mapcontours
  terminal option, then only the current plot window supports the entire
  range of mouse commands and hotkeys.  The other windows will, however,
  continue to display mouse coordinates at the lower left.
-
- For consistency with other screen terminals, X11 mouse support is turned on by
- default, wherever the standard input comes from. However, on some UNIX
- flavors, special input devices as /dev/null might not be `select-able`; using
- such devices with the mouse turned on will hang gnuplot. Please turn off
- mousing with `unset mouse` if you are in this situation.
 3 multiplot
 ?commands set multiplot
 ?commands unset multiplot
