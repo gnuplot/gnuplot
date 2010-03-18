@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.86 2010/01/12 20:44:48 sfeam Exp $
+ * $Id: pdf.trm,v 1.87 2010/03/04 07:16:00 sfeam Exp $
  */
 
 /*------------------------------
@@ -107,6 +107,7 @@ static double PDF_fontSizeDef = 6;	/* default text size*/
 /* current text font family: */
 static char PDF_fontNameCur[MAX_ID_LEN + 1] = "Helvetica";
 static double PDF_fontSizeCur = 6; /* current text size*/
+static double PDF_fontscale = 1.0;
 
 static TBOOLEAN PDF_pageIsOpen = FALSE; /* already started a page ?? */
 static TBOOLEAN PDF_pathIsOpen = FALSE; /* open path flag*/
@@ -212,18 +213,18 @@ PDF_SetFont ()
 	fprintf(stderr,"Couldn't find font %s, falling back to Times-Roman\n", PDF_fontNameCur);
     }
 
-    PDF_setfont(myPDF, font_handle, PDF_fontSizeCur * PDF_RESOLUTION);
+    PDF_setfont(myPDF, font_handle, PDF_fontSizeCur * PDF_RESOLUTION * PDF_fontscale);
 
     /* Ask PDFlib for the actual numbers */
-    PDF_fontAscent = (int) (PDF_RESOLUTION * PDF_fontSizeCur * PDF_get_value(myPDF, "ascender", 0));
-    PDF_fontDescent = (int) (- PDF_RESOLUTION * PDF_fontSizeCur * PDF_get_value(myPDF, "descender", 0));
-    PDF_fontLeading = (int) (PDF_RESOLUTION * PDF_fontSizeCur * 0.25);
+    PDF_fontAscent = (int) (PDF_RESOLUTION * PDF_fontSizeCur * PDF_fontscale * PDF_get_value(myPDF, "ascender", 0));
+    PDF_fontDescent = (int) (- PDF_RESOLUTION * PDF_fontSizeCur * PDF_fontscale * PDF_get_value(myPDF, "descender", 0));
+    PDF_fontLeading = (int) (PDF_RESOLUTION * PDF_fontSizeCur * PDF_fontscale * 0.25);
 
     /* Assume this particular string is a somewhat reasonable typical
      * output, for getting at the average character width */
     PDF_fontAvWidth = (int)
 	(PDF_RESOLUTION * PDF_stringwidth(myPDF, "01234567890123456789",
-					  font_handle, PDF_fontSizeCur)
+					  font_handle, PDF_fontSizeCur * PDF_fontscale )
 	 / 20.0);
     PDF_currentFontHandle = font_handle;
 
@@ -431,6 +432,14 @@ PDF_options ()
 	    continue;
 	}
 
+	if (equals(c_token, "fontscale")) {
+	    c_token++;
+	    PDF_fontscale = END_OF_COMMAND ? -1 : real_expression();
+	    if (PDF_fontscale < 0)
+		PDF_fontscale = 1.0;
+	    continue;
+	}
+
 #ifdef HAVE_NODASH_LIBPDF
 	int_warn(NO_CARET,"gnuplot was linked against a version of pdflib with no dash or pattern support");
 #else
@@ -446,10 +455,10 @@ PDF_options ()
     }
 
     /* Save options back into options string in normalized format */
-    sprintf(term_options, "%s%s fname '%s'  fsize %g linewidth %3.1f %s ",
+    sprintf(term_options, "%s%s fname '%s'  fsize %g fontscale %3.1f linewidth %3.1f %s ",
 	    PDF_monochrome ? "monochrome " : " ",
 	    term->put_text == ENHPDF_put_text ? "enhanced" : "noenhanced",
-	    PDF_fontNameDef, PDF_fontSizeDef, PDF_linewidth_factor,
+	    PDF_fontNameDef, PDF_fontSizeDef, PDF_fontscale, PDF_linewidth_factor,
 	    PDF_LineCap == 1 ? "rounded" : "");
     if (PDF_dashedlines)
 	sprintf(&(term_options[strlen(term_options)]), "dashed dl %3.1f",
@@ -1553,7 +1562,7 @@ ENHPDF_FLUSH()
 		char save_fontname[MAX_ID_LEN + 1];
 		double save_fontsize = PDF_fontSizeCur;
 		    strcpy(save_fontname,PDF_fontNameCur);
-		    PDF_fontSizeCur = ENHpdf_fontsize;
+		    PDF_fontSizeCur = ENHpdf_fontsize / PDF_fontscale;
 		    PDF_set_font(ENHpdf_font);
 		    strcpy(PDF_fontNameCur,save_fontname);
 		    PDF_fontSizeCur = save_fontsize;
@@ -1620,7 +1629,7 @@ ENHPDF_put_text(unsigned int x, unsigned int y, const char *str)
      */
 
     /* set up the global variables needed by enhanced_recursion() */
-    enhanced_fontscale = 1.0;
+    enhanced_fontscale = PDF_fontscale;
     strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
 
     ENHpdf_opened_string = FALSE;
@@ -1637,7 +1646,7 @@ ENHPDF_put_text(unsigned int x, unsigned int y, const char *str)
      * we get stuck in an infinite loop) and try again.
      */
     while (*(str = enhanced_recursion((char *)str, TRUE,
-			PDF_fontNameCur, PDF_fontSizeCur,
+			PDF_fontNameCur, PDF_fontSizeCur * PDF_fontscale,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
@@ -1686,7 +1695,7 @@ TERM_TABLE_START (pdf_driver)
     PDF_options, PDF_init, PDF_reset, PDF_text, null_scale, PDF_graphics,
     PDF_move, PDF_vector, PDF_linetype, PDF_put_text, PDF_text_angle,
     PDF_justify_text, PDF_point, do_arrow, PDF_set_font, do_pointsize,
-    TERM_BINARY|TERM_CAN_DASH|TERM_LINEWIDTH,
+    TERM_BINARY|TERM_CAN_DASH|TERM_LINEWIDTH|TERM_FONTSCALE,
     0 /* suspend */, 0 /* resume */ , PDF_boxfill, PDF_linewidth
 #   ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for pdf */
@@ -1720,7 +1729,7 @@ START_HELP(pdf)
 "       set terminal pdf {monochrome|color|colour}",
 "                        {{no}enhanced}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
-"                        {font \"<fontname>{,<fontsize>}\"}",
+"                        {font \"<fontname>{,<fontsize>}\"} {fontscale <scale>}",
 "                        {linewidth <lw>} {rounded|butt}",
 "                        {solid|dashed} {dl <dashlength>}}",
 "                        {size <XX>{unit},<YY>{unit}}",

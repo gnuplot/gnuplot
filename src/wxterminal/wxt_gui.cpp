@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.77 2009/10/24 19:57:50 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.78 2010/01/31 20:27:19 mikulik Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1801,7 +1801,7 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 		wxt_command_push(temp_command);
 
 		/* set up the global variables needed by enhanced_recursion() */
-		enhanced_fontscale = 1.0;
+		enhanced_fontscale = wxt_set_fontscale;
 		strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
 
 		/* Set the recursion going. We say to keep going until a
@@ -1812,7 +1812,8 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 		* we get stuck in an infinite loop) and try again. */
 
 		while (*(string = enhanced_recursion((char*)string, TRUE, wxt_current_plot->fontname,
-				wxt_current_plot->fontsize, 0.0, TRUE, TRUE, 0))) {
+				wxt_current_plot->fontsize * wxt_set_fontscale, 
+				0.0, TRUE, TRUE, 0))) {
 			wxt_enhanced_flush();
 
 			/* we can only get here if *str == '}' */
@@ -1915,12 +1916,13 @@ int wxt_set_font (const char *font)
 			fontsize = wxt_set_fontsize;
 	}
 
-
 	/* Reset the term variables (hchar, vchar, h_tic, v_tic).
 	 * They may be taken into account in next plot commands */
-	gp_cairo_set_font(wxt_current_plot, fontname, fontsize);
+	gp_cairo_set_font(wxt_current_plot, fontname, fontsize * wxt_set_fontscale);
 	gp_cairo_set_termvar(wxt_current_plot, &(term->v_char),
 	                                       &(term->h_char));
+	gp_cairo_set_font(wxt_current_plot, fontname, fontsize);
+
 	wxt_MutexGuiLeave();
 	wxt_sigint_check();
 	wxt_sigint_restore();
@@ -1928,7 +1930,7 @@ int wxt_set_font (const char *font)
 	/* Note : we must take '\0' (EndOfLine) into account */
 	temp_command.string = new char[strlen(fontname)+1];
 	strcpy(temp_command.string, fontname);
-	temp_command.integer_value = fontsize;
+	temp_command.integer_value = fontsize * wxt_set_fontscale;
 
 	wxt_command_push(temp_command);
 	/* the returned int is not used anywhere */
@@ -2454,7 +2456,8 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		gp_cairo_enhanced_flush(&plot);
 		return;
 	case command_enhanced_open :
-		gp_cairo_enhanced_open(&plot, command.string, command.double_value, command.double_value2, command.integer_value2 & 1, (command.integer_value2 & 2) >> 1, command.integer_value);
+		gp_cairo_enhanced_open(&plot, command.string, command.double_value,
+				command.double_value2, command.integer_value2 & 1, (command.integer_value2 & 2) >> 1, command.integer_value);
 		return;
 	case command_enhanced_writec :
 		gp_cairo_enhanced_writec(&plot, command.integer_value);

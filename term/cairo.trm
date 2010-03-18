@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.32 2009/09/09 22:01:14 sfeam Exp $
+ * $Id: cairo.trm,v 1.33 2009/09/13 17:49:16 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -100,6 +100,7 @@ typedef struct cairo_params_t {
     TBOOLEAN crop;
     char fontname[MAX_ID_LEN + 1];    /* name of font */
     int fontsize;                     /* size of font in pts */
+    float fontscale;                  /* modified by this */
     float width;
     float height;
     float base_linewidth;
@@ -107,15 +108,15 @@ typedef struct cairo_params_t {
 } cairo_params_t;
 
 #define CAIROPDF_PARAMS_DEFAULT { \
-    CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, FALSE, FALSE, FALSE, FALSE, "", 6, \
-    5*72., 3*72., 0.25, 1.0 \
+    CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, FALSE, FALSE, FALSE, FALSE, "", \
+    12, 0.5, 5*72., 3*72., 0.25, 1.0 \
 }
 static cairo_params_t cairopdf_params = CAIROPDF_PARAMS_DEFAULT;
 static const cairo_params_t cairopdf_params_default = CAIROPDF_PARAMS_DEFAULT;
 
 #define CAIROPNG_PARAMS_DEFAULT { \
-    CAIROTERM_PNG, PIXELS, FALSE, FALSE, 1.0, FALSE, FALSE, FALSE, FALSE, "", 12, \
-    640., 480., 1.0, 1.0 \
+    CAIROTERM_PNG, PIXELS, FALSE, FALSE, 1.0, FALSE, FALSE, FALSE, FALSE, "", \
+    12, 1.0, 640., 480., 1.0, 1.0 \
 }
 static cairo_params_t cairopng_params = CAIROPNG_PARAMS_DEFAULT;
 static const cairo_params_t cairopng_params_default = CAIROPNG_PARAMS_DEFAULT;
@@ -127,6 +128,7 @@ plot_struct plot;
 
 enum CAIROTRM_id {
     CAIROTRM_FONT,
+    CAIROTRM_FONTSCALE,
     CAIROTRM_ENHANCED,
     CAIROTRM_NOENHANCED,
     CAIROTRM_SIZE,
@@ -146,6 +148,7 @@ enum CAIROTRM_id {
 };
 
 static struct gen_table cairotrm_opts[] = {
+    {"fontscale",   CAIROTRM_FONTSCALE},
     {"f$ont",   CAIROTRM_FONT},
     {"enh$anced", CAIROTRM_ENHANCED},
     {"noenh$anced", CAIROTRM_NOENHANCED},
@@ -179,7 +182,7 @@ TERM_PUBLIC void cairotrm_options()
 	int sep;
 	TBOOLEAN duplication = FALSE;
 	TBOOLEAN set_enhanced = FALSE, set_font = FALSE, set_size = FALSE;
-	TBOOLEAN set_capjoin = FALSE;
+	TBOOLEAN set_capjoin = FALSE, set_fontscale = FALSE;
 	char tmp_term_options[MAX_LINE_LEN+1] = "";
 
 	/* Initialize terminal-dependent values */
@@ -281,6 +284,13 @@ TERM_PUBLIC void cairotrm_options()
 			if (cairo_params->dash_length < 0.0)
 			    cairo_params->dash_length = cairo_params_default->dash_length;
 			break;
+		case CAIROTRM_FONTSCALE:
+			c_token++;
+			cairo_params->fontscale = END_OF_COMMAND ? -1 : real_expression();
+			if (cairo_params->fontscale <= 0.0)
+			    cairo_params->fontscale = cairo_params_default->fontscale;
+			set_fontscale = TRUE;
+			break;
 		case CAIROTRM_TRANSPARENT:
 			c_token++;
 			if (!strcmp(term->name,"pngcairo"))
@@ -336,6 +346,11 @@ TERM_PUBLIC void cairotrm_options()
 	if (set_font) {
 		snprintf(tmp_term_options, sizeof(tmp_term_options), " font \"%s\"", font_setting);
 		free(font_setting);
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+	}
+
+	if (set_fontscale) {
+		snprintf(tmp_term_options, sizeof(tmp_term_options), " fontscale %.1f", cairo_params->fontscale);
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
 	}
 
@@ -620,7 +635,7 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 		gp_cairo_enhanced_init(&plot, strlen(string));
 
 		/* set up the global variables needed by enhanced_recursion() */
-		enhanced_fontscale = 1.0;
+		enhanced_fontscale = cairo_params->fontscale;
 		strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
 
 		/* Set the recursion going. We say to keep going until a
@@ -630,8 +645,9 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 		* closing brace in the string. We inplot->crement past it (else
 		* we get stuck in an infinite loop) and try again. */
 
-		while (*(string = enhanced_recursion((char*)string, TRUE, plot.fontname,
-				plot.fontsize, 0.0, TRUE, TRUE, 0))) {
+		while (*(string = enhanced_recursion((char*)string, TRUE, 
+				plot.fontname, plot.fontsize * cairo_params->fontscale, 
+				0.0, TRUE, TRUE, 0))) {
 			cairotrm_enhanced_flush();
 
 			/* we can only get here if *str == '}' */
@@ -662,7 +678,8 @@ void cairotrm_enhanced_writec(int c)
 
 void cairotrm_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint)
 {
-	gp_cairo_enhanced_open(&plot, fontname, fontsize, base, widthflag, showflag, overprint);
+	gp_cairo_enhanced_open(&plot, fontname, fontsize, 
+				base, widthflag, showflag, overprint);
 }
 
 void cairotrm_linetype(int lt)
@@ -718,12 +735,12 @@ int cairotrm_set_font (const char *font)
 			fontsize = cairo_params->fontsize;
 	}
 
-
 	/* Reset the term variables (hchar, vchar, h_tic, v_tic).
 	 * They may be taken into account in next plot commands */
-	gp_cairo_set_font(&plot, fontname, fontsize);
+	gp_cairo_set_font(&plot, fontname, fontsize * cairo_params->fontscale);
 	gp_cairo_set_termvar(&plot, &(term->v_char),
 				    &(term->h_char));
+	gp_cairo_set_font(&plot, fontname, fontsize);
 
 	/* the returned int is not used anywhere */
 	return 1;
@@ -872,7 +889,7 @@ TERM_TABLE_START (pdfcairo_driver)
     cairotrm_text_angle, cairotrm_justify_text,
     cairotrm_point, do_arrow, cairotrm_set_font,
     cairotrm_pointsize,
-    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_CAN_DASH|TERM_LINEWIDTH,
+    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_CAN_DASH|TERM_LINEWIDTH|TERM_FONTSCALE,
     0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
@@ -897,7 +914,7 @@ TERM_TABLE_START (pngcairo_driver)
     cairotrm_text_angle, cairotrm_justify_text,
     cairotrm_point, do_arrow, cairotrm_set_font,
     cairotrm_pointsize,
-    TERM_BINARY|TERM_CAN_DASH|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH,
+    TERM_BINARY|TERM_CAN_DASH|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_FONTSCALE,
     0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
@@ -929,7 +946,7 @@ START_HELP(pdfcairo)
 " Syntax:",
 "         set term pdfcairo",
 "                      {{no}enhanced} {mono|color} {solid|dashed}",
-"                      {font <font>}",
+"                      {font <font>} {fontscale <scale>}",
 "                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
 "                      {size <XX>{unit},<YY>{unit}}",
 "",
@@ -955,7 +972,10 @@ START_HELP(pdfcairo)
 " comma-separated in a single string. FontFace is a usual font face name, such",
 " as \'Arial\'. If you do not provide FontFace, the pdfcairo terminal will use",
 " \'Sans\'. FontSize is the font size, in points. If you do not provide it,",
-" the pdfcairo terminal will use a size of 6 points.",
+" the pdfcairo terminal will use a nominal font size of 12 points.",
+" However, the default fontscale parameter for this terminal is 0.5,",
+" so the apparent font size is smaller than this if the pdf output is",
+" viewed at full size.",
 "    For example :",
 "       set term pdfcairo font \"Arial,12\"",
 "       set term pdfcairo font \"Arial\" # to change the font face only",
@@ -1013,7 +1033,8 @@ START_HELP(pngcairo)
 " Syntax:",
 "         set term pngcairo",
 "                      {{no}enhanced} {mono|color} {solid|dashed}",
-"                      {{no}transparent} {{no}crop} {font <font>}",
+"                      {{no}transparent} {{no}crop}",
+"                      {font <font>} {fontscale <scale>}",
 "                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
 "                      {size <XX>{unit},<YY>{unit}}",
 "",
@@ -1039,7 +1060,7 @@ START_HELP(pngcairo)
 " comma-separated in a single string. FontFace is a usual font face name, such",
 " as \'Arial\'. If you do not provide FontFace, the pngcairo terminal will use",
 " \'Sans\'. FontSize is the font size, in points. If you do not provide it,",
-" the pngcairo terminal will use a size of 6 points.",
+" the pngcairo terminal will use a size of 12 points.",
 "    For example :",
 "       set term pngcairo font \"Arial,12\"",
 "       set term pngcairo font \"Arial\" # to change the font face only",

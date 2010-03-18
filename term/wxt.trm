@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.24 2009/03/26 00:49:27 sfeam Exp $
+ * $Id: wxt.trm,v 1.25 2009/06/13 05:23:56 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -69,6 +69,7 @@ int wxt_rounded = no;
 char wxt_set_fontname[MAX_ID_LEN + 1] = "";
 /* default text size*/
 int wxt_set_fontsize = 0;
+double wxt_set_fontscale = 1.0;
 /* window title */
 char wxt_title[MAX_ID_LEN + 1] = "";
 /* size of the plot area, in pixels
@@ -82,6 +83,7 @@ wxt_axis_state_t wxt_axis_state[4];
 
 enum WXT_id {
     WXT_FONT,
+    WXT_FONTSCALE,
     WXT_ENHANCED,
     WXT_NOENHANCED,
     WXT_SIZE,
@@ -102,6 +104,7 @@ enum WXT_id {
 };
 
 static struct gen_table wxt_opts[] = {
+    {"fontscale",   WXT_FONTSCALE},
     {"font",   WXT_FONT},
     {"enh$anced", WXT_ENHANCED},
     {"noenh$anced", WXT_NOENHANCED},
@@ -164,6 +167,12 @@ TERM_PUBLIC void wxt_options()
 			free(s);
 			if (set_font) duplication=TRUE;
 			set_font = TRUE;
+			break;
+		case WXT_FONTSCALE:
+			c_token++;
+			wxt_set_fontscale = END_OF_COMMAND ? -1 : real_expression();
+			if (wxt_set_fontscale <= 0)
+			    wxt_set_fontscale = 1.;
 			break;
 		case WXT_ENHANCED:
 			c_token++;
@@ -322,6 +331,12 @@ TERM_PUBLIC void wxt_options()
 		free(font_setting);
 	}
 
+	if (wxt_set_fontscale != 1.0) {
+		char tmp_term_options[MAX_LINE_LEN+1] = "";
+		snprintf(tmp_term_options,sizeof(tmp_term_options), " fontscale %.1f", wxt_set_fontscale);
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+	}
+
 	if (set_capjoin)
 		strncat(term_options, wxt_rounded ? " rounded" : " butt",
 			sizeof(term_options)-strlen(term_options));
@@ -388,7 +403,7 @@ TERM_TABLE_START (wxt_driver)
     wxt_text_angle, wxt_justify_text,
     wxt_point, do_arrow, wxt_set_font,
     wxt_pointsize,
-    TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL|TERM_CAN_DASH,
+    TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL|TERM_CAN_DASH|TERM_FONTSCALE,
     wxt_text /* suspend */, 0 /* resume */, wxt_fillbox, wxt_linewidth
 #ifdef USE_MOUSE
     , wxt_waitforinput, wxt_put_tmptext, wxt_set_ruler, wxt_set_cursor, wxt_set_clipboard
@@ -421,7 +436,7 @@ START_HELP(wxt)
 "         set term wxt {<n>}",
 "                      {size <width>,<height>}",
 "                      {{no}enhanced}",
-"                      {font <font>}",
+"                      {font <font>} {fontscale <scale>}",
 "                      {title \"title\"}",
 "                      {dashed|solid} {dashlength <dl>}",
 "                      {{no}persist}",

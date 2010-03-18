@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.251 2010/02/18 17:48:35 sfeam Exp $
+ * $Id: post.trm,v 1.252 2010/03/14 22:44:38 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -182,6 +182,7 @@ typedef struct ps_params_t {
     struct ps_fontfile_def *first_fontfile;
     char font[MAX_ID_LEN+1];          /* name of font */
     float fontsize;                     /* size of font in pts */
+    float fontscale;			/* multiplier for nominal font size */
     TBOOLEAN useauxfile;              /* only necessary for ps(la)tex */
     TBOOLEAN rotate;                  /* only necessary for ps(la)tex */
     int palfunc_samples;              /* setable via "palf$uncparam" */
@@ -194,7 +195,7 @@ typedef struct ps_params_t {
 #define POST_PARAMS_DEFAULT { \
     PSTERM_POSTSCRIPT, 50, 50, \
     PSTERM_LANDSCAPE, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
-    FALSE, FALSE, FALSE, NULL, "Helvetica", 14, FALSE, FALSE, 2000, 0.003, \
+    FALSE, FALSE, FALSE, NULL, "Helvetica", 14., 1., FALSE, FALSE, 2000, 0.003, \
     FALSE, TRUE, FALSE \
 }
 
@@ -204,7 +205,7 @@ static const ps_params_t post_params_default = POST_PARAMS_DEFAULT;
 #define EPSLATEX_PARAMS_DEFAULT { \
     PSTERM_EPSLATEX, 50, 50, \
     PSTERM_EPS, FALSE, FALSE, TRUE, FALSE, 1.0, 1.0, FALSE, \
-    FALSE, FALSE, FALSE, NULL, "", 11, TRUE, FALSE, 2000, 0.003, \
+    FALSE, FALSE, FALSE, NULL, "", 11., 1., TRUE, FALSE, 2000, 0.003, \
     FALSE, FALSE, FALSE \
 }
 static ps_params_t epslatex_params = EPSLATEX_PARAMS_DEFAULT;
@@ -213,7 +214,7 @@ static const ps_params_t epslatex_params_default = EPSLATEX_PARAMS_DEFAULT;
 #define PSLATEX_PARAMS_DEFAULT { \
     PSTERM_PSLATEX, 0, 0, \
     PSTERM_EPS, FALSE, FALSE, TRUE, FALSE, 1.0, 1.0, FALSE, \
-    FALSE, FALSE, FALSE, NULL, "", 0, FALSE, TRUE, 2000, 0.003, \
+    FALSE, FALSE, FALSE, NULL, "", 0., 1., FALSE, TRUE, 2000, 0.003, \
     FALSE, FALSE, FALSE \
 }
 static ps_params_t pslatex_params = PSLATEX_PARAMS_DEFAULT;
@@ -222,7 +223,7 @@ static const ps_params_t pslatex_params_default = PSLATEX_PARAMS_DEFAULT;
 #define PSTEX_PARAMS_DEFAULT { \
     PSTERM_PSTEX, 0, 0, \
     PSTERM_EPS, FALSE, FALSE, TRUE, FALSE, 1.0, 1.0, FALSE, \
-    FALSE, FALSE, FALSE, NULL, "", 0, FALSE, TRUE, 2000, 0.003, \
+    FALSE, FALSE, FALSE, NULL, "", 0., 1., FALSE, TRUE, 2000, 0.003, \
     FALSE, FALSE, FALSE \
 }
 static ps_params_t pstex_params = PSTEX_PARAMS_DEFAULT;
@@ -480,7 +481,7 @@ enum PS_id {
     PS_SIMPLEX, PS_DUPLEX, PS_DEFAULTPLEX,
     PS_ROUNDED, PS_NOROUNDED, PS_CLIP, PS_NOCLIP, PS_FONTFILE, PS_NOFONTFILES,
     PS_PALFUNCPARAM,
-    PS_LEVEL1, PS_LEVELDEFAULT, PS_FONT,
+    PS_LEVEL1, PS_LEVELDEFAULT, PS_FONT, PS_FONTSCALE, 
     PSLATEX_ROTATE, PSLATEX_NOROTATE, PSLATEX_AUXFILE, PSLATEX_NOAUXFILE,
     PSLATEX_OLDSTYLE, PSLATEX_NEWSTYLE, EPSLATEX_HEADER, EPSLATEX_NOHEADER,
     PS_SIZE,
@@ -517,6 +518,7 @@ static struct gen_table PS_opts[] =
     { "clip", PS_CLIP },
     { "noclip", PS_NOCLIP },
     { "fontf$ile", PS_FONTFILE },
+    { "fontscale", PS_FONTSCALE },
     { "nofontf$iles", PS_NOFONTFILES },
     { "palf$uncparam", PS_PALFUNCPARAM },
     { "level1", PS_LEVEL1 },
@@ -552,6 +554,7 @@ PS_options()
     TBOOLEAN set_standalone = FALSE, set_epslheader = FALSE;
     TBOOLEAN set_pslrotate = FALSE, set_pslauxfile = FALSE;
     TBOOLEAN set_psloldstyle = FALSE, set_font = FALSE, set_fontsize = FALSE;
+    TBOOLEAN set_fontscale = FALSE;
 
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal.                  */
@@ -898,6 +901,16 @@ PS_options()
 	    ps_params->clipped = FALSE;
 	    c_token++;
 	    break;
+	case PS_FONTSCALE:
+	    if (set_fontscale)
+		int_error(c_token,
+			  "extraneous argument in set terminal %s",term->name);
+	    set_fontscale = TRUE;
+	    c_token++;
+	    ps_params->fontscale = END_OF_COMMAND ? -1 : real_expression();
+	    if (ps_params->fontscale < 0.0)
+		ps_params->fontscale = 1.0;
+	    break;
 	case PS_FONTFILE: {
 	    TBOOLEAN deleteentry = FALSE;
 	    char *fontfilename = NULL;
@@ -1101,11 +1114,11 @@ PS_options()
 	    ps_fontsize = 20; /* default: 10pt */
 	break;
     }
-    term->v_char = (unsigned int)(ps_fontsize*PS_SC);
+    term->v_char = (unsigned int)(ps_fontsize*PS_SCF);
     if (ps_params->oldstyle)
-	term->h_char = (unsigned int)(ps_fontsize*PS_SC*5/10);
+	term->h_char = (unsigned int)(ps_fontsize*PS_SCF*5/10);
     else
-	term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
+	term->h_char = (unsigned int)(ps_fontsize*PS_SCF*6/10);
     sprintf(PS_default_font,"%s,%g",ps_params->font,ps_fontsize);
 
     if (ps_params->terminal == PSTERM_POSTSCRIPT) {
@@ -1215,7 +1228,9 @@ PS_options()
 	tmp_term_options[0]='\0';
     if (ps_fontfile_char)
 	free(ps_fontfile_char);
+    strcat(term_options,tmp_term_options);
 
+    sprintf(tmp_term_options," fontscale %3.1f ",ps_params->fontscale);
     strcat(term_options,tmp_term_options);
 
 }
@@ -2149,12 +2164,12 @@ PS_set_font(const char *font)
     if (ps_params->terminal == PSTERM_POSTSCRIPT) {
 	PS_RememberFont(name);
 	fprintf(gppsfile, "/%s findfont %g scalefont setfont\n",
-		name, size*PS_SC);
+		name, size*PS_SCF);
     }
     free(name);
 
-    term->v_char = (unsigned int)(size*PS_SC);
-    term->h_char = (unsigned int)(size*PS_SC*6/10);
+    term->v_char = (unsigned int)(size*PS_SCF);
+    term->h_char = (unsigned int)(size*PS_SCF*6/10);
     return TRUE;
 }
 
@@ -2428,6 +2443,8 @@ ENHPS_WRITEC(int c)
 TERM_PUBLIC int
 ENHPS_set_font(const char *font)
 {
+    double size;
+
     if (ignore_enhanced_text)
 	return PS_set_font(font);
 
@@ -2445,8 +2462,9 @@ ENHPS_set_font(const char *font)
 	strcpy(ps_enh_font, ps_params->font);
 	ps_enh_fontsize = ps_fontsize;
     }
-    term->v_char = (unsigned int)(ps_enh_fontsize*PS_SC);
-    term->h_char = (unsigned int)(ps_enh_fontsize*PS_SC*6/10);
+    size = ps_enh_fontsize * ps_params->fontsize;
+    term->v_char = (unsigned int)(size*PS_SCF);
+    term->h_char = (unsigned int)(size*PS_SCF*6/10);
 
     return TRUE;
 }
@@ -2491,7 +2509,7 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
     /* set up the global variables needed by enhanced_recursion() */
     enhanced_max_height = -1000;
     enhanced_min_height = 1000;
-    enhanced_fontscale = PS_SC;
+    enhanced_fontscale = PS_SCF;
     strncpy(enhanced_escape_format,"\\%o",sizeof(enhanced_escape_format));
 
     ENHps_opened_string = FALSE;
@@ -2509,7 +2527,7 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
      * at startup and by ENHPS_set_font
      */
     while (*(str = enhanced_recursion((char *)str, TRUE, ps_enh_font,
-		 (double)(ps_enh_fontsize*PS_SC), 0.0, TRUE, TRUE, 0))) {
+		 (double)(ps_enh_fontsize*PS_SCF), 0.0, TRUE, TRUE, 0))) {
 	ENHPS_FLUSH();
 
 	/* I think we can only get here if *str == '}' */
@@ -3695,7 +3713,7 @@ TERM_TABLE_START(post_driver)
     PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
     PS_linetype, PS_put_text, PS_text_angle, 
     PS_justify_text, PS_point, PS_arrow, PS_set_font, PS_pointsize,
-    TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_MONOCHROME|TERM_LINEWIDTH, 
+    TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_MONOCHROME|TERM_LINEWIDTH|TERM_FONTSCALE, 
     0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support for postscript */
@@ -3741,7 +3759,8 @@ START_HELP(00psglobal)
 "                               {size <XX>{unit},<YY>{unit}}",
 #define PS_COMMON_OPTS2 \
 "                               {blacktext | colortext | colourtext}",\
-"                               {{font} \"fontname{,fontsize}\" {<fontsize>}}",
+"                               {{font} \"fontname{,fontsize}\" {<fontsize>}}",\
+"                               {fontscale <scale>}",
 #define PS_COMMON_PROLOG_INFO \
 " If you see the error message",\
 "       \"Can't find PostScript prologue file ... \"",\

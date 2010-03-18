@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.146 2010/02/24 20:32:23 sfeam Exp $
+ * $Id: gd.trm,v 1.147 2010/03/14 22:44:38 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -248,6 +248,7 @@ static struct {
     gdFontPtr default_font;
     char *    default_ttffont;
     int       default_ttfsize;
+    double    fontscale;
     TBOOLEAN  TrueColor;
     /* Variables for animated gif support: */
     TBOOLEAN  animate;		/* Only gif supports animation */
@@ -268,7 +269,7 @@ enum PNG_id {
     PNG_CROP, PNG_NOCROP,
     /* Font size */
     PNG_TINY, PNG_SMALL, PNG_MEDIUM, PNG_LARGE, PNG_GIANT,
-    PNG_FONT,
+    PNG_FONT, PNG_FONTSCALE,
     PNG_SIZE,
     PNG_ENHANCED, PNG_NOENHANCED,
     PNG_TRUECOLOR, PNG_NOTRUECOLOR,
@@ -300,6 +301,7 @@ static struct gen_table PNG_opts[] =
     { "m$edium", PNG_MEDIUM },
     { "l$arge", PNG_LARGE },
     { "g$iant", PNG_GIANT },
+    { "fontscale", PNG_FONTSCALE },
     { "fo$nt", PNG_FONT },
     { "si$ze", PNG_SIZE },
     { "enh$anced", PNG_ENHANCED },
@@ -639,6 +641,7 @@ PNG_options()
 	png_state.ttffont = NULL;
 	png_state.default_ttffont = NULL;
 	png_state.default_ttfsize = 0;
+	png_state.fontscale = 1;
 	png_state.justify = CENTRE;
 	png_state.TrueColor = FALSE;
 	PNG_linewidth_factor = 1.0;
@@ -790,13 +793,13 @@ PNG_options()
 		/* First try the old GDFONTPATH mechanism for locating fonts */
 		(void)gdUseFontConfig(0);
 		err = gdImageStringFT(NULL, &brect[0], 0,
-			png_state.ttffont, (double)png_state.default_ttfsize,
+			png_state.ttffont, (double)png_state.default_ttfsize*png_state.fontscale,
 			0.0, 0, 0, "test");
 	
 		/* If that didn't work, try again using the fontconfig mechanism */
 		if (err && gdUseFontConfig(1)) {
 		    err = gdImageStringFT(NULL, &brect[0], 0,
-			png_state.ttffont, (double)png_state.default_ttfsize,
+			png_state.ttffont, (double)png_state.default_ttfsize*png_state.fontscale,
 			0.0, 0, 0, "test");
 		}
 
@@ -817,6 +820,13 @@ PNG_options()
 #endif
 	    break;
 # undef UNSET_TTF_FONT
+
+	case PNG_FONTSCALE:
+	    c_token++;
+	    png_state.fontscale = END_OF_COMMAND ? 1 : real_expression();
+	    if (png_state.fontscale <= 0)
+		png_state.fontscale = 1.;
+	    break;
 
 	case PNG_SIZE:
 	    c_token++;
@@ -988,13 +998,13 @@ PNG_options()
 	/* First try the old GDFONTPATH mechanism for locating fonts */
 	(void)gdUseFontConfig(0);
 	err = gdImageStringFT(NULL, &brect[0], 0,
-		png_state.ttffont, (double)png_state.default_ttfsize,
+		png_state.ttffont, (double)png_state.default_ttfsize*png_state.fontscale,
 		0.0, 0, 0, "test");
 
 	/* If that didn't work, try again using fontconfig mechanism */
 	if (err && gdUseFontConfig(1)) {
 	    err = gdImageStringFT(NULL, &brect[0], 0,
-		png_state.ttffont, (double)png_state.default_ttfsize,
+		png_state.ttffont, (double)png_state.default_ttfsize*png_state.fontscale,
 		0.0, 0, 0, "test");
 	}
 
@@ -1021,7 +1031,7 @@ PNG_options()
 	int brect[8];
 	char *err;
 	err = gdImageStringFT(NULL, &brect[0], 0,
-		png_state.default_ttffont, (double)png_state.default_ttfsize,
+		png_state.default_ttffont, (double)png_state.default_ttfsize*png_state.fontscale,
 		0.0, 0, 0, "f00000000g");
 	if (!err) {
 	    term->h_char = .11 * (float)(brect[2] - brect[0]) + 0.5;
@@ -1061,6 +1071,8 @@ PNG_options()
     if (png_state.ttffont) {
 	sprintf(term_options + strlen(term_options),
 		"font %s %d ", png_state.ttffont, png_state.ttfsize);
+	sprintf(term_options + strlen(term_options),
+		"fontscale %.1f ", png_state.fontscale);
     } else switch (term->h_char) {
     case 5:
 	strcat(term_options,"tiny ");
@@ -1628,7 +1640,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	/* Draw once with a NULL image to get the bounding rectangle */
 	/* then draw it again, centered.                             */
 	err = gdImageStringFT(NULL, brect, png_state.color,
-			png_state.ttffont, (double)png_state.ttfsize,
+			png_state.ttffont, (double)png_state.ttfsize*png_state.fontscale,
 			(double)png_state.angle * M_PI_2 / 90. ,
 			x, Y(y), (char *)string);
 	if (err) {
@@ -1650,7 +1662,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 		default:	break;
 	    }
 	    err = gdImageStringFT(png_state.image, brect, png_state.color,
-			png_state.ttffont, (double)png_state.ttfsize,
+			png_state.ttffont, (double)png_state.ttfsize*png_state.fontscale,
 			(double)png_state.angle * M_PI_2 / 90.,
 			x, Y(y), (char *)string);
 	    if (err)
@@ -1855,7 +1867,7 @@ PNG_set_font(const char *fontname)
 	int brect[8];
 	char *err;
 	err = gdImageStringFT(NULL, &brect[0], 0,
-		png_state.ttffont, (double)png_state.ttfsize,
+		png_state.ttffont, (double)png_state.ttfsize*png_state.fontscale,
 		0.0, 0, 0, "f00000000g");
 	if (!err) {
 	    term->h_char = .11 * (float)(brect[2] - brect[0]) + 0.5;
@@ -2018,7 +2030,7 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
     PNG_move(x,y);
 
     /* set up the global variables needed by enhanced_recursion() */
-    enhanced_fontscale = 1.0;
+    enhanced_fontscale = png_state.fontscale;
     strncpy(enhanced_escape_format,"&#x%2.2x;",sizeof(enhanced_escape_format));
 
     ENHgd_opened_string = FALSE;
@@ -2041,7 +2053,7 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
      * we get stuck in an infinite loop) and try again.
      */
     while (*(str = enhanced_recursion((char *)str, TRUE,
-			ENHgd_font, ENHgd_fontsize,
+			ENHgd_font, ENHgd_fontsize * png_state.fontscale,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
@@ -2209,7 +2221,7 @@ TERM_TABLE_START(png_driver)
     PNG_linetype, PNG_put_text, PNG_text_angle,
     PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
     PNG_pointsize,
-    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_LINEWIDTH, /* TERM_ALPHA_CHANNEL only if truecolor */
+    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_LINEWIDTH|TERM_FONTSCALE, /* TERM_ALPHA_CHANNEL only if truecolor */
     0 /*suspend*/, 0 /*resume*/,
     PNG_boxfill /*EAM - fillbox*/,
     PNG_linewidth /*EAM - linewidth*/
@@ -2242,11 +2254,12 @@ START_HELP(png)
 "?png",
 " Syntax:",
 "       set terminal png ",
+"              {{no}enhanced}",
 "              {{no}transparent} {{no}interlace}",
 "              {{no}truecolor} {rounded|butt}",
 "              {linewidth <lw>} {dashlength <dl>}",
 "              {tiny | small | medium | large | giant}",
-"              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
+"              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
 "              {size <x>,<y>} {{no}crop}",
 "              {<background_color>}",
 "",
@@ -2365,7 +2378,7 @@ TERM_TABLE_START(jpeg_driver)
     PNG_linetype, PNG_put_text, PNG_text_angle,
     PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
     PNG_pointsize,
-    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH,
+    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_FONTSCALE,
     0 /*suspend*/, 0 /*resume*/,
     PNG_boxfill /*EAM - fillbox*/,
     PNG_linewidth /*EAM - linewidth*/
@@ -2397,10 +2410,11 @@ START_HELP(jpeg)
 "?jpeg",
 " Syntax:",
 "       set terminal jpeg ",
+"              {{no}enhanced}",
 "              {{no}interlace}",
 "              {linewidth <lw>} {dashlength <dl>} {rounded|butt}",
 "              {tiny | small | medium | large | giant}",
-"              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
+"              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
 "              {size <x>,<y>} {{no}crop}",
 "              {<background_color>}",
 "",
@@ -2517,7 +2531,7 @@ TERM_TABLE_START(gif_driver)
     PNG_linetype, PNG_put_text, PNG_text_angle,
     PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
     PNG_pointsize,
-    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_LINEWIDTH,
+    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_LINEWIDTH|TERM_FONTSCALE,
     0 /*suspend*/, 0 /*resume*/,
     PNG_boxfill /*EAM - fillbox*/,
     PNG_linewidth /*EAM - linewidth*/
@@ -2550,10 +2564,11 @@ START_HELP(gif)
 "?gif",
 " Syntax:",
 "       set terminal gif ",
+"              {{no}enhanced}",
 "              {{no}transparent} {rounded|butt}",
 "              {linewidth <lw>} {dashlength <dl>}",
 "              {tiny | small | medium | large | giant}",
-"              {font \"<face> {,<pointsize>}\"} {{no}enhanced}",
+"              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
 "              {size <x>,<y>} {{no}crop}",
 "              {animate {delay <d>} {loop <n>} {{no}optimize}}",
 "              {<background_color>}",

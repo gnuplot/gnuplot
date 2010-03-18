@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.604 2010/02/28 04:30:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.605 2010/03/14 18:01:46 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10523,6 +10523,7 @@ Ffigure_mapcontours
 
       set termoption {no}enhanced
       set termoption font "<fontname>{,<fontsize>}"
+      set termoption fontscale <scale>
       set termoption {solid|dashed}
       set termoption {linewidth <lw>}{lw <lw>}
 

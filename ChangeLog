@@ -3,6 +3,15 @@
 	* plot.c (main): Initialize c_token to a legal value at the start of
 	interactive input.
 
+	* docs/gnuplot.doc src/set.c src/term_api.h src/wxterminal/wxt_gui.cpp
+	src/wxterminal/wxt_term.h term/cairo.trm term/emf.trm term/gd.trm
+	term/pdf.trm term/post.h term/post.trm term/wxt.trm:
+
+	New terminal option "fontscale <scale>".  This scale factor is applied
+	to the nominal font size before use, so that you can scale the font 
+	size up or down in parallel with scaling the output page up or down.
+	This is mostly relevant for hardcopy output or embedded figures.
+
 2010-03-14  Ethan A Merritt  <merritt@u.washington.edu
 
 	* INSTALL config/README config/makefile.amg config/makefile.ami

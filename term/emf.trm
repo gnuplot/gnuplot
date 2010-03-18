@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.63 2009/12/09 00:57:49 sfeam Exp $
+ * $Id: emf.trm,v 1.64 2010/02/28 04:30:47 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -328,6 +328,7 @@ static int emf_step = 0;	/* amount of current dash not yet drawn, in plot units 
 static int emf_tic, emf_tic707, emf_tic866, emf_tic500, emf_tic1241, emf_tic1077, emf_tic621;	/* marker dimensions */
 
 static TBOOLEAN emf_tweak = TRUE;	/* Empirical hack to adjust character widths */
+static double emf_fontscale = 1.0;
 
 static void EMF_flush_polyline __PROTO((void));
 static void EMF_flush_polygon __PROTO((void));
@@ -404,7 +405,7 @@ EMF_setfont()
     /* SB 20040506: was not complete size was 104, now it is 332 */
     EMF_write_emr(82, 332); 
     EMF_write_long(EMF_HANDLE_FONT);
-    EMF_write_long((long) (-emf_fontsize * EMF_PT2HM));	/* height */
+    EMF_write_long((long) (-emf_fontsize * EMF_PT2HM * emf_fontscale));	/* height */
     EMF_write_long(0);		        /* width */
     EMF_write_long(emf_vert_text);	/* escapement */
     EMF_write_long(emf_vert_text);	/* orientation */
@@ -653,6 +654,13 @@ EMF_options()
 	    term->v_tic = term->h_tic;
 	    continue;
 	}
+	if (equals(c_token, "fontscale")) {
+	    c_token++;
+	    emf_fontscale = END_OF_COMMAND ? -1 : real_expression();
+	    if (emf_fontscale <= 0)
+		emf_fontscale = 1.0;
+	    continue;
+	}
 	if (equals(c_token, "font"))
 	    c_token++;
 	/* Fall through to old-style bare font name */
@@ -687,6 +695,9 @@ EMF_options()
 
     if (term->flags & TERM_ENHANCED_TEXT)
 	strcat(term_options, " enhanced ");
+    if (emf_fontscale != 1.0)
+	sprintf(&(term_options[strlen(term_options)]), " fontscale %.1f",
+		emf_fontscale);
     if (term->xmax != (int)EMF_XMAX || term->ymax != (int)EMF_YMAX)
 	sprintf(&(term_options[strlen(term_options)]), " size %d,%d ",
 	    (int)(0.5+term->xmax/EMF_PX2HM), (int)(0.5+term->ymax/EMF_PX2HM));
@@ -779,8 +790,8 @@ EMF_set_font(const char *font)
 	return TRUE;
     }
 
-    term->h_char = (emf_fontsize * EMF_PT2HM)*0.6;
-    term->v_char = (emf_fontsize * EMF_PT2HM)*1.3;
+    term->h_char = 0.6 * (emf_fontsize * EMF_PT2HM * emf_fontscale);
+    term->v_char = 1.3 * (emf_fontsize * EMF_PT2HM * emf_fontscale);
     EMF_setfont();
     return TRUE;
 }
@@ -1409,7 +1420,7 @@ ENHemf_OPEN(
 	enhanced_cur_text = &enhanced_text[0];
 	ENHemf_font = fontname;
 	ENHemf_fontsize = fontsize;
-	ENHemf_base = base;
+	ENHemf_base = base * emf_fontscale;
 	ENHemf_show = showflag;
 	ENHemf_overprint = overprint;
     }
@@ -1613,6 +1624,7 @@ ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
      * closing brace in the string. We increment past it (else
      * we get stuck in an infinite loop) and try again.
      */
+
     while (*(str = enhanced_recursion((char *)str, TRUE,
 			ENHemf_font, ENHemf_fontsize,
 			0.0, TRUE, TRUE, 0))) {
@@ -1643,7 +1655,7 @@ TERM_TABLE_START(emf_driver)
     EMF_linetype, EMF_put_text, EMF_text_angle,
     EMF_justify_text, EMF_point, do_arrow, EMF_set_font,
     EMF_set_pointsize,
-    TERM_BINARY|TERM_CAN_DASH|TERM_LINEWIDTH,		/* various flags */
+    TERM_BINARY|TERM_CAN_DASH|TERM_LINEWIDTH|TERM_FONTSCALE,
     NULL,				/* suspend */
     NULL,				/* resume  */
     EMF_fillbox,
@@ -1682,6 +1694,7 @@ START_HELP(emf)
 "                        {linewidth <LW>} {dashlength <DL>} {size XX,YY}",
 "                        {\"<fontname>\"} {<fontsize>}    #old syntax",
 "                        {font \"<fontname>,<fontsize>\"} #new syntax",
+"                        {fontscale <scale>}",
 "",
 " In `monochrome` mode successive line types cycle through dash patterns.",
 " In `color` mode successive line types use successive colors, and only after",
