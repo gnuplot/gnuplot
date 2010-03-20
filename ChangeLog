@@ -23,7 +23,11 @@
 	Allow an optional 6th column in 'with candlesticks' to specify box width
 
 	* src/tabulate.c src/time.c:
-	Support the "%s" format specifier in strftime().
+	Support the "%s" format specifier in strftime()
+
+	* src.datafile.c:
+	Time format "%s" should apply to both  using 1:2 and using ($1):2.
+	Bug #2899511 
 
 
 2010-03-13  Version 4.4.0 Release
