@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2009/06/05 05:35:12 $
+  $Date: 2009/06/05 05:37:04 $
   $Author: sfeam $
   $Rev: 96 $
 
@@ -75,7 +75,7 @@ pgf.DEFAULT_FONT_SIZE = 10
 pgf.LATEX_STYLE_FILE = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 96a $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2009/06/05 05:35:12 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2009/06/05 05:37:04 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -1310,9 +1310,7 @@ else
   term.description = "Lua PGF/TikZ terminal for LaTeX2e"
   term.flags = term.TERM_BINARY + term.TERM_CAN_CLIP
                 + term.TERM_IS_POSTSCRIPT + term.TERM_CAN_MULTIPLOT
-  if term.IS_GNUPLOT_43 then  -- gnuplot 4.3
-    term.flags = term.flags + term.TERM_CAN_DASH
-  end
+  term.flags = term.flags + term.TERM_CAN_DASH
 end
 
 

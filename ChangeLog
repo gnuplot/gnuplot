@@ -10,6 +10,9 @@
 	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_term.h term/wxt.trm:
 	set term wxt ... {dashed|solid} {dashlength <dl>}
 
+	* term/lua/gnuplot-tikz.lua term/lua.trm: Remove tests for gnuplot
+	version 4.3.
+
 	* src/internal.c: Handle integer arithmetic overflow.  If i**j or i*j
 	would cause integer overflow, return real number value instead.
 
