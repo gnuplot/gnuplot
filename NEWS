@@ -2,6 +2,8 @@
 New features, changes and fixes since gnuplot version 4.4.0
 ===========================================================
 
+* NEW Optional 6th data column in candlesticks style to specific box width
+* NEW if integer arithmetic i*j or i**j would overflow, return value as a real
 * FIX font glitch in win terminal 
 * FIX protect against runaway recursion by limiting depth of nested functions
 

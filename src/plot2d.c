@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.6 2010/01/13 03:07:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.7 2010/03/06 19:14:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -374,12 +374,18 @@ get_data(struct curve_points *current_plot)
 	break;
 
     case FINANCEBARS:
-    case CANDLESTICKS:
 	/* HBB 20000504: use 'z' coordinate for y-axis quantity */
 	current_plot->z_axis = current_plot->y_axis;
 	min_cols = max_cols = 5;
 	/* HBB 20060427: signal 3rd and 4th column are absolute y data
 	 * --- needed so time/date parsing works */
+	df_axis[2] = df_axis[3] = df_axis[4] = df_axis[1];
+	break;
+
+    case CANDLESTICKS:
+	current_plot->z_axis = current_plot->y_axis;
+	min_cols = 5;
+	max_cols = 6;
 	df_axis[2] = df_axis[3] = df_axis[4] = df_axis[1];
 	break;
 
@@ -887,6 +893,13 @@ get_data(struct curve_points *current_plot)
 		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3], v[4],
 			      v[5], 0.0);
 		break;
+
+	    case CANDLESTICKS:
+		store2d_point(current_plot, i++, v[0], v[1],
+				v[5] > 0 ? v[0]-v[5]/2. : v[0], v[0],
+				v[2], v[3], v[4]);
+		break;
+
 images:
             case RGBA_IMAGE:  /* x_cent y_cent red green blue alpha */
             case RGBIMAGE:    /* x_cent y_cent red green blue */

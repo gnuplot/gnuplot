@@ -19,6 +19,9 @@
 	* src/internal.c src/internal.h src/util.c:  Protect against runaway
 	recursion by limiting depth of function calls to STACK_DEPTH. 
 
+	* src/graphics.c src/plot2d.c tabulate.c docs/gnuplot.doc:
+	Allow an optional 6th column in 'with candlesticks' to specify box width
+
 2010-03-13  Version 4.4.0 Release
 	    =====================
 
