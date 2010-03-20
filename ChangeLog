@@ -29,6 +29,8 @@
 	Time format "%s" should apply to both  using 1:2 and using ($1):2.
 	Bug #2899511 
 
+	* term/metapost.trm:  Bugfix by Petr Kalinin.
+	Fix inheritance of line thickness by text strings.
 
 2010-03-13  Version 4.4.0 Release
 	    =====================
