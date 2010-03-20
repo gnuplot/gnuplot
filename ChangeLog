@@ -1,3 +1,21 @@
+2010-03-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* PATCHLEVEL: Bump to 4.4.1 and start adding patches added to CVS after
+	the code freeze for 4.4.0.
+
+	* src/win/winmain.c: Allow building with Visual C
+
+	* src/win/wgraph.c: Make font changes take immediate effect
+
+	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_term.h term/wxt.trm:
+	set term wxt ... {dashed|solid} {dashlength <dl>}
+
+	* src/internal.c: Handle integer arithmetic overflow.  If i**j or i*j
+	would cause integer overflow, return real number value instead.
+
+	* src/internal.c src/internal.h src/util.c:  Protect against runaway
+	recursion by limiting depth of function calls to STACK_DEPTH. 
+
 2010-03-13  Version 4.4.0 Release
 	    =====================
 
