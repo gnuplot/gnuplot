@@ -32,6 +32,9 @@
 	* term/metapost.trm:  Bugfix by Petr Kalinin.
 	Fix inheritance of line thickness by text strings.
 
+	* plot.c (main): Initialize c_token to a legal value at the start of
+	interactive input.
+
 2010-03-13  Version 4.4.0 Release
 	    =====================
 

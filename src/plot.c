@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.104.2.3 2010/02/17 22:39:13 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.104.2.4 2010/02/18 05:52:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -622,7 +622,7 @@ main(int argc, char **argv)
 	/* load filenames given as arguments */
 	while (--argc > 0) {
 	    ++argv;
-	    c_token = NO_CARET;	/* in case of file not found */
+	    c_token = 0;
 #ifdef _Windows
 	    if (stricmp(*argv, "-noend") == 0 || stricmp(*argv, "/noend") == 0
 	       	|| stricmp(*argv, "-persist") == 0)
@@ -633,13 +633,8 @@ main(int argc, char **argv)
 		FPRINTF((stderr,"'persist' command line option recognized\n"));
 
 	    } else if (strcmp(*argv, "-") == 0) {
-		/* DBT 10-7-98  go interactive if "-" on command line */
-
 		interactive = TRUE;
-		/* will this work on all platforms? */
-
 		while (!com_line());
-
 		interactive = FALSE;
 
 	    } else if (strcmp(*argv, "-e") == 0) {
@@ -650,8 +645,10 @@ main(int argc, char **argv)
 		}
 		do_string(*argv, FALSE);
 
-	    } else
+	    } else {
+		c_token = NO_CARET;	/* in case of file not found */
 		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), FALSE);
+	    }
 	}
 #ifdef _Windows
 	if (noend) {
