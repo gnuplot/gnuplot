@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.20 2007/03/30 05:18:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.20.2.1 2009/06/12 05:02:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -557,6 +557,11 @@ xstrftime(
 	    case 'R':
 		if (!xstrftime(s, bsz - l, "%H:%M", tm))
 		    return (0);
+		break;
+
+	    case 's':
+		CHECK_SPACE(12); /* large enough for year 9999 */
+		sprintf(s, "%.0f", gtimegm(tm));
 		break;
 
 	    case 'S':

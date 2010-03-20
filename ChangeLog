@@ -1,7 +1,7 @@
 2010-03-20  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* PATCHLEVEL: Bump to 4.4.1 and start adding patches added to CVS after
-	the code freeze for 4.4.0.
+	* PATCHLEVEL: Bump to 4.4.1 and start applying patches added to CVS
+	after the code freeze for 4.4.0.  They have now had months of testing.
 
 	* src/win/winmain.c: Allow building with Visual C
 
@@ -21,6 +21,10 @@
 
 	* src/graphics.c src/plot2d.c tabulate.c docs/gnuplot.doc:
 	Allow an optional 6th column in 'with candlesticks' to specify box width
+
+	* src/tabulate.c src/time.c:
+	Support the "%s" format specifier in strftime().
+
 
 2010-03-13  Version 4.4.0 Release
 	    =====================
