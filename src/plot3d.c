@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.178 2010/01/01 21:57:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.179 2010/02/27 21:50:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -938,6 +938,15 @@ get_3ddata(struct surface_points *this_plot)
 		int_error(this_plot->token,
 			"Wrong number of columns in input data - line %d",
 			df_line_number);
+
+	    /* FIXME: Work-around for hidden3d, which otherwise would use */
+	    /* the color of the vector midpoint rather than the endpoint. */
+	    if (this_plot->plot_style == IMPULSES) {
+		if (this_plot->lp_properties.pm3d_color.type == TC_Z) {
+		    color = z;
+		    color_from_column(TRUE);
+		}
+	    }
 
 	    /* After the first three columns it gets messy because */
 	    /* different plot styles assume different contents in the columns */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.230 2010/03/14 06:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.231 2010/03/14 18:01:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1851,7 +1851,7 @@ cntr3d_impulses(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 	for (i = 0; i < cntr->num_pts; i++) {
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, cntr->coords[i].z,
 		      &vertex_on_surface);
-	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
+	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, 0.0,
 		      &vertex_on_base);
 	    /* HBB 20010822: Provide correct color-coding for
 	     * "linetype palette" PM3D mode */

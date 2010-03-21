@@ -1,14 +1,16 @@
 New features, changes and fixes since gnuplot version 4.4
 =========================================================
 
+* NEW hidden3d supports "with impulses"
 * NEW user-definable linetypes
 * NEW plot style "with boxplot"
 * NEW plot style "with circles" allows start/end angles for each arc
 * NEW qt terminal driver 
 * CHANGE remove vestigial code supporting Amiga, Apollo, and 16-bit MSDOS/WIN
+* CHANGE 3D impulses are now always drawn from z=0
 
-New features, changes and fixes since gnuplot version 4.2
-=========================================================
+New features, changes and fixes in gnuplot version 4.4.0
+========================================================
 
 * NEW Allow redefinition or customization of the basic linetypes
 * NEW CANDLESTICKS accept an option 6th input column specifying width

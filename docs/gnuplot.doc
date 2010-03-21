@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.606 2010/03/18 04:52:53 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.607 2010/03/18 16:46:33 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3159,13 +3159,11 @@ Ffigure_scaled_image
 ?style impulses
 ?impulses
 Ffigure_impulses
- The `impulses` style displays a vertical line from the x axis to the y value
- of each point (2D) or from the xy plane to the z value of each point (3D).
- Note that the y or z values may be negative.  As with most plot styles, data
- from additional columns can be used to control the color of each impulse.
- To use this style effectively in 3D plots, it is useful to use thick lines
- (linewidth > 1).  This approximates a 3D bar chart.
-      
+ The `impulses` style displays a vertical line from y=0 to the y value of each
+ point (2D) or from z=0 to the z value of each point (3D).  Note that the y or z
+ values may be negative.  Data from additional columns can be used to control
+ the color of each impulse.  To use this style effectively in 3D plots, it is
+ useful to use thick lines (linewidth > 1).  This approximates a 3D bar chart.
       
       1 column:   y        # implicit x coordinate from row number (2D)
       2 columns:  x  y     # line from [x,0] to [x,y]  (2D)
@@ -7798,12 +7796,12 @@ Ffigure_mapcontours
  and to other surfaces, if more than one surface is plotted.  Contours drawn
  on the surface (`set contour surface`) don't work.
 
- Labels and arrows are always visible and are unaffected.  The key box is
- never hidden by the surface. As of gnuplot version 4.2, `set hidden3d` also
- affects 3D plotting styles `with points`, `with labels`, and `with vectors`,
- even if no surface is present in the graph.  Individual plots within the
- graph may be explicitly excluded from this processing by appending the extra
- option `nohidden3d` to the `with` specifier.
+ Labels and arrows are always visible and are unaffected.  The key box is never
+ hidden by the surface. As of gnuplot version 4.5, hidden3d also affects 3D
+ plotting styles `points`, `labels`, `vectors`, and `impulses` even if no
+ surface is present in the graph.  Individual plots within the graph may be
+ explicitly excluded from this processing by appending the extra option 
+ `nohidden3d` to the `with` specifier.
 
  Hidden3d does not affect solid surfaces drawn using the pm3d mode. To achieve
  a similar effect purely for pm3d surfaces, use instead `set pm3d depthorder`.

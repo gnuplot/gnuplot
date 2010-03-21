@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.68 2008/06/02 19:18:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.69 2008/09/24 03:19:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1226,12 +1226,25 @@ build_networks(struct surface_points *plots, int pcount)
 			break;
 		    case BOXES:
 		    case FILLEDCURVES:
-		    case IMPULSES:
 			/* set second vertex to the low end of zrange */
 			{
 			    coordval remember_z = points[i].z;
 
 			    points[i].z = axis_array[FIRST_Z_AXIS].min;
+			    basevertex = store_vertex(points + i, lp_style,
+						      color_from_column);
+			    points[i].z = remember_z;
+			}
+			if (basevertex > 0)
+			    store_edge(basevertex, edir_impulse, 0, lp, above);
+			break;
+
+		    case IMPULSES:
+			/* set second vertex to z=0 */
+			{
+			    coordval remember_z = points[i].z;
+
+			    points[i].z = 0.0;
 			    basevertex = store_vertex(points + i, lp_style,
 						      color_from_column);
 			    points[i].z = remember_z;
@@ -1414,7 +1427,8 @@ build_networks(struct surface_points *plots, int pcount)
 		    {
 			coordval remember_z = points[i].z;
 
-			points[i].z = axis_array[FIRST_Z_AXIS].min;
+			points[i].z = (this_plot->plot_style == IMPULSES)
+					? 0.0 : axis_array[FIRST_Z_AXIS].min;
 			basevertex = store_vertex(points + i, lp_style,
 						  color_from_column);
 			points[i].z = remember_z;
@@ -1584,7 +1598,7 @@ draw_vertex(p_vertex v)
 
     TERMCOORD(v, x, y);
     if (v->lp_style && v->lp_style->p_type >= -1 && !clip_point(x,y)) {
-	int colortype = v->lp_style->pm3d_color.type;
+	struct t_colorspec *tc = &(v->lp_style->pm3d_color);
 
 	if (v->label)  {
 	    write_label(x,y, v->label);
@@ -1593,14 +1607,19 @@ draw_vertex(p_vertex v)
 	}
 
 	/* EAM DEBUG - Check for extra point properties */
-	if (colortype == TC_LT)
-	    /* Should have been set already! */
-	    ;
-	else if (colortype == TC_RGB && v->lp_style->pm3d_color.lt == LT_COLORFROMCOLUMN)
-	    set_rgbcolor(v->real_z);
-	else if (colortype == TC_RGB)
-	    set_rgbcolor(v->lp_style->pm3d_color.lt);
-	else if (colortype == TC_Z)
+	if (tc->type == TC_LINESTYLE && tc->lt == LT_COLORFROMCOLUMN) {
+	    struct lp_style_type style = *(v->lp_style);
+	    load_linetype(&style, (int)v->real_z);
+	    tc = &style.pm3d_color;
+	    apply_pm3dcolor(tc, term);
+	}
+	else if (tc->type == TC_RGB && tc->lt == LT_COLORFROMCOLUMN)
+	    set_rgbcolor((int)v->real_z);
+	else if (tc->type == TC_RGB)
+	    set_rgbcolor(tc->lt);
+	else if (tc->type == TC_CB)
+	    set_color( cb2gray(v->real_z) );
+	else if (tc->type == TC_Z)
 	    set_color( cb2gray(z2cb(v->real_z)) );
 
 #ifdef HIDDEN3D_VAR_PTSIZE
