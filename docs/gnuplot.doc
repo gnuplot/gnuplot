@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.607 2010/03/18 16:46:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.608 2010/03/21 00:57:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1106,6 +1106,15 @@ C
 %tanh(x)@any@$tanh~x$, hyperbolic tangent of $x$ in radians
  The `tanh(x)` function returns the hyperbolic tangent of its argument.  `tanh`
  expects its argument to be in radians.
+4 voigt
+?expressions functions voigt
+?functions voigt
+?voigt
+#voigt(x,y) & real & Voigt/Faddeeva function $\frac{y}{\pi} \int{\frac{exp(t^2)}{(x-t)^2+y^2}}dt$ \\
+%voigt(x,y)@real@convolution of Gaussian and Lorentzian
+ The function `voigt(x,y)` returns an approximation to the Voigt/Faddeeva
+ function used in spectral analysis. The approximation is accurate to 
+ one part in 10^4.
 @end table
 
 @start table

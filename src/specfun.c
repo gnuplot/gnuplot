@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.39 2009/09/09 05:07:18 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.40 2010/02/24 04:17:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -108,6 +108,7 @@ static double polevl __PROTO((double x, const double coef[], int N));
 static double p1evl __PROTO((double x, const double coef[], int N));
 static double confrac __PROTO((double a, double b, double x));
 static double ibeta __PROTO((double a, double b, double x));
+static double humlik __PROTO((double x, double y));
 static double igamma __PROTO((double a, double x));
 static double ranf __PROTO((struct value * init));
 static double inverse_error_func __PROTO((double p));
@@ -663,6 +664,171 @@ void f_rand(union argument *arg)
 }
 
 #endif /* BADRAND */
+
+void
+f_voigt(union argument *arg)
+{
+    struct value a;
+    double x,y;
+    (void) arg;				/* avoid -Wunused warning */
+    y = real(pop(&a));
+    x = real(pop(&a));
+    push(Gcomplex(&a, humlik(x, y), 0.0));	
+}
+
+/*
+ * Calculate the Voigt/Faddeeva function with relative error less than 10^(-4).
+ *     (see http://www.atm.ox.ac.uk/user/wells/voigt.html)
+ *
+ * K(x,y) = \frac{y}{\pi} \int{\frac{e^{t^2}}{(x-t)^2+y^2}}dt
+ *
+ *  arguments:
+ *	x, y - real and imaginary components of complex argument
+ *  return value
+ *	real value K(x,y)
+ *
+ * Algorithm: Josef Humlíček JQSRT 27 (1982) pp 437
+ * Fortran program by J.R. Wells  JQSRT 62 (1999) pp 29-48. 
+ * Translated to C++ with f2c program and modified by Marcin Wojdyr
+ * Minor adaptations from C++ to C by E. Stambulchik
+ * Adapted for gnuplot by Tommaso Vinci
+ */
+static double humlik(double x, double y)
+{
+
+    const double c[6] = { 1.0117281,     -0.75197147,      0.012557727,
+                         0.010022008,   -2.4206814e-4,    5.0084806e-7 };
+    const double s[6] = { 1.393237,       0.23115241,     -0.15535147,
+                         0.0062183662,   9.1908299e-5,   -6.2752596e-7 };
+    const double t[6] = { 0.31424038,     0.94778839,      1.5976826,
+                                2.2795071,      3.020637,        3.8897249 };
+
+    const double rrtpi = 0.56418958; /* 1/SQRT(pi) */
+
+    double a0, d0, d2, e0, e2, e4, h0, h2, h4, h6,
+                 p0, p2, p4, p6, p8, z0, z2, z4, z6, z8;
+    double mf[6], pf[6], mq[6], pq[6], xm[6], ym[6], xp[6], yp[6];
+    double old_y = -1.;
+    bool rg1, rg2, rg3;
+    double xlim0, xlim1, xlim2, xlim3, xlim4;
+    double yq, yrrtpi;
+    double abx, xq;
+    double k;
+
+    if (y != old_y) {
+        old_y = y;
+        yq = y * y;
+        yrrtpi = y * rrtpi;
+        rg1 = true, rg2 = true, rg3 = true;
+        if (y < 70.55) {
+            xlim0 = sqrt(y * (40. - y * 3.6) + 15100.);
+            xlim1 = (y >= 8.425 ?  0. : sqrt(164. - y * (y * 1.8 + 4.3)));
+            xlim2 = 6.8 - y;
+            xlim3 = y * 2.4;
+            xlim4 = y * 18.1 + 1.65;
+            if (y <= 1e-6)
+                xlim2 = xlim1 = xlim0;
+        }
+    }
+
+    abx = fabs(x);
+    xq = abx * abx;
+
+    if (abx >= xlim0 || y >= 70.55)     /* Region 0 algorithm */
+        return yrrtpi / (xq + yq);
+
+    else if (abx >= xlim1) {            /* Humlicek W4 Region 1 */
+        if (rg1) {                      /* First point in Region 1 */
+            rg1 = false;
+            a0 = yq + 0.5;              /* Region 1 y-dependents */
+            d0 = a0 * a0;
+            d2 = yq + yq - 1.;
+        }
+        return rrtpi / (d0 + xq * (d2 + xq)) * y * (a0 + xq);
+    }
+
+    else if (abx > xlim2) {             /* Humlicek W4 Region 2 */
+        if (rg2) {                      /* First point in Region 2 */
+            rg2 = false;
+            /* Region 2 y-dependents */
+            h0 = yq * (yq * (yq * (yq + 6.) + 10.5) + 4.5) + 0.5625;
+            h2 = yq * (yq * (yq * 4. + 6.) + 9.) - 4.5;
+            h4 = 10.5 - yq * (6. - yq * 6.);
+            h6 = yq * 4. - 6.;
+            e0 = yq * (yq * (yq + 5.5) + 8.25) + 1.875;
+            e2 = yq * (yq * 3. + 1.) + 5.25;
+            e4 = h6 * 0.75;
+        }
+        return rrtpi / (h0 + xq * (h2 + xq * (h4 + xq * (h6 + xq))))
+                 * y * (e0 + xq * (e2 + xq * (e4 + xq)));
+    }
+
+    else if (abx < xlim3) {             /* Humlicek W4 Region 3 */
+        if (rg3) {                      /* First point in Region 3 */
+            rg3 = false;
+            /* Region 3 y-dependents */
+            z0 = y * (y * (y * (y * (y * (y * (y * (y * (y * (y
+                    + 13.3988) + 88.26741) + 369.1989) + 1074.409)
+                    + 2256.981) + 3447.629) + 3764.966) + 2802.87)
+                    + 1280.829) + 272.1014;
+            z2 = y * (y * (y * (y * (y * (y * (y * (y * 5.  + 53.59518)
+                    + 266.2987) + 793.4273) + 1549.675) + 2037.31)
+                    + 1758.336) + 902.3066) + 211.678;
+            z4 = y * (y * (y * (y * (y * (y * 10. + 80.39278) + 269.2916)
+                    + 479.2576) + 497.3014) + 308.1852) + 78.86585;
+            z6 = y * (y * (y * (y * 10. + 53.59518) + 92.75679)
+                    + 55.02933) + 22.03523;
+            z8 = y * (y * 5. + 13.3988) + 1.49646;
+            p0 = y * (y * (y * (y * (y * (y * (y * (y * (y * 0.3183291
+                    + 4.264678) + 27.93941) + 115.3772) + 328.2151) +
+                    662.8097) + 946.897) + 919.4955) + 549.3954)
+                    + 153.5168;
+            p2 = y * (y * (y * (y * (y * (y * (y * 1.2733163 + 12.79458)
+                    + 56.81652) + 139.4665) + 189.773) + 124.5975)
+                    - 1.322256) - 34.16955;
+            p4 = y * (y * (y * (y * (y * 1.9099744 + 12.79568)
+                    + 29.81482) + 24.01655) + 10.46332) + 2.584042;
+            p6 = y * (y * (y * 1.273316 + 4.266322) + 0.9377051)
+                    - 0.07272979;
+            p8 = y * .3183291 + 5.480304e-4;
+        }
+        return 1.7724538 / (z0 + xq * (z2 + xq * (z4 + xq * (z6 +
+                xq * (z8 + xq)))))
+                  * (p0 + xq * (p2 + xq * (p4 + xq * (p6 + xq * p8))));
+    }
+
+    else {                              /* Humlicek CPF12 algorithm */
+        double ypy0 = y + 1.5;
+        double ypy0q = ypy0 * ypy0;
+        int j;
+        for (j = 0; j <= 5; ++j) {
+            double d = x - t[j];
+            mq[j] = d * d;
+            mf[j] = 1. / (mq[j] + ypy0q);
+            xm[j] = mf[j] * d;
+            ym[j] = mf[j] * ypy0;
+            d = x + t[j];
+            pq[j] = d * d;
+            pf[j] = 1. / (pq[j] + ypy0q);
+            xp[j] = pf[j] * d;
+            yp[j] = pf[j] * ypy0;
+        }
+        k = 0.;
+        if (abx <= xlim4)               /* Humlicek CPF12 Region I */
+            for (j = 0; j <= 5; ++j)
+                k += c[j] * (ym[j]+yp[j]) - s[j] * (xm[j]-xp[j]);
+        else {                          /* Humlicek CPF12 Region II */
+            double yf = y + 3.;
+            for (j = 0; j <= 5; ++j)
+                k += (c[j] * (mq[j] * mf[j] - ym[j] * 1.5)
+                         + s[j] * yf * xm[j]) / (mq[j] + 2.25)
+                        + (c[j] * (pq[j] * pf[j] - yp[j] * 1.5)
+                           - s[j] * yf * xp[j]) / (pq[j] + 2.25);
+            k = y * k + exp(-xq);
+        }
+        return k;
+    }
+}
 
 /* ** ibeta.c
  *

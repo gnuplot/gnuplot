@@ -1,3 +1,8 @@
+2010-03-21  Tommaso Vinci  <ilbibi@users.sourceforge.net>
+
+	* Provide Humlicek's approximation to the Voigt/Faddeeva function
+	  voigt(x,y) = \frac{y}{\pi} \int{\frac{e^{t^2}}{(x-t)^2+y^2}}dt
+
 2010-03-20  Ethan A Merritt  <merritt@u.washington.edu
 
 	* NEWS src/hidden3d.c src/plot3d.c src/graph3d.c docs/gnuplot.doc:
