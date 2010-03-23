@@ -1,3 +1,9 @@
+2010-03-22  Ethan A Merritt  <merritt@u.washington.edu
+
+	* src/misc.c (lp_parse): Re-write the lp_parse() routine to prevent the
+	loading of a user-defined linetype from undoing other linestyle 
+	properties given earlier in the same command.
+
 2010-03-21  Tommaso Vinci  <ilbibi@users.sourceforge.net>
 
 	* Provide Humlicek's approximation to the Voigt/Faddeeva function

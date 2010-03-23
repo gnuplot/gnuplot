@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.115 2009/12/31 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.116 2010/03/14 06:43:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -752,15 +752,20 @@ need_fill_border(struct fill_style_type *fillstyle)
  * allow_ls controls whether we are allowed to accept linestyle in
  * the current context [ie not when doing a  set linestyle command]
  * allow_point is whether we accept a point command
- * allow any order of options - pm 24.11.2001
- * EAM Oct 2005 - Require that default values have been placed in lp by the caller
  */
 void
 lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 {
-	/* avoid duplicating options */
-	int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0;
+    /* keep track of which options were set during this call */
+    int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0, set_pi = 0;
 
+    /* EAM Mar 2010 - We don't want properties from a user-defined default
+     * linetype to override properties explicitly set here.  So fill in a
+     * local lp_style_type as we go and then copy over the specifically
+     * requested properties on top of the default ones.                                           
+     */
+    struct lp_style_type newlp = *lp;
+	
 	if (allow_ls &&
 	    (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
 	    c_token++;
@@ -776,22 +781,22 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    if (set_pal++)
 			break;
 		    c_token--;
-		    parse_colorspec(&lp->pm3d_color, TC_RGB);
-		    lp->use_palette = 1;
+		    parse_colorspec(&(newlp.pm3d_color), TC_RGB);
+		    newlp.use_palette = 1;
 		} else
 		/* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
 		if (almost_equals(c_token, "pal$ette")) {
 		    if (set_pal++)
 			break;
 		    c_token--;
-		    parse_colorspec(&lp->pm3d_color, TC_Z);
-		    lp->use_palette = 1;
-#ifdef KEYWORD_BGND
+		    parse_colorspec(&(newlp.pm3d_color), TC_Z);
+		    newlp.use_palette = 1;
 		} else if (equals(c_token,"bgnd")) {
 		    lp->l_type = LT_BACKGROUND;
+		    lp->use_palette = 0;
 		    c_token++;
-#endif
 		} else {
+		    /* These replace the base style */
 		    int lt = int_expression();
 		    lp->l_type = lt - 1;
 		    /* user may prefer explicit line styles */
@@ -807,35 +812,41 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		if (set_pal++)
 		    break;
 		c_token--;
-		parse_colorspec(&lp->pm3d_color, TC_Z);
-		lp->use_palette = 1;
+		parse_colorspec(&(newlp.pm3d_color), TC_Z);
+		newlp.use_palette = 1;
 		continue;
 	    }
 
 	    if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")) {
-		lp->use_palette = 1;
+		newlp.use_palette = 1;
 		if (set_pal++)
 		    break;
 		c_token++;
 		if (almost_equals(c_token, "rgb$color")) {
 		    c_token--;
-		    parse_colorspec(&lp->pm3d_color, TC_RGB);
+		    parse_colorspec(&(newlp.pm3d_color), TC_RGB);
 		} else if (almost_equals(c_token, "pal$ette")) {
 		    c_token--;
-		    parse_colorspec(&lp->pm3d_color, TC_Z);
-#ifdef KEYWORD_BGND
+		    parse_colorspec(&(newlp.pm3d_color), TC_Z);
 		} else if (equals(c_token,"bgnd")) {
-		    lp->pm3d_color.type = TC_LT;
-		    lp->pm3d_color.lt = LT_BACKGROUND;
+		    newlp.pm3d_color.type = TC_LT;
+		    newlp.pm3d_color.lt = LT_BACKGROUND;
 		    c_token++;
-#endif
 		} else if (almost_equals(c_token, "var$iable")) {
 		    c_token++;
-		    lp->l_type = LT_COLORFROMCOLUMN;
-		    lp->pm3d_color.type = TC_LINESTYLE;
+		    newlp.l_type = LT_COLORFROMCOLUMN;
+		    newlp.pm3d_color.type = TC_LINESTYLE;
 		} else {
-		    lp->pm3d_color.type = TC_LT;
-		    lp->pm3d_color.lt = int_expression() - 1;
+		    /* Pull the line colour from a default linetype, but */
+		    /* only if we are not in the middle of defining one! */
+		    if (allow_ls) {
+			struct lp_style_type temp;
+			load_linetype(&temp, int_expression());
+			newlp.pm3d_color = temp.pm3d_color;
+		    } else {
+			newlp.pm3d_color.type = TC_LT;
+			newlp.pm3d_color.lt = int_expression() - 1;
+		    }
 		}
 		continue;
 	    }
@@ -844,13 +855,15 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		if (set_lw++)
 		    break;
 		c_token++;
-		lp->l_width = real_expression();
-		if (lp->l_width < 0)
-		    lp->l_width = 0;
+		newlp.l_width = real_expression();
+		if (newlp.l_width < 0)
+		    newlp.l_width = 0;
 		continue;
 	    }
 
 	    if (equals(c_token,"bgnd")) {
+		if (set_lt++)
+		    break;;
 		lp->l_type = LT_BACKGROUND;
 		lp->use_palette = 0;
 		c_token++;
@@ -862,7 +875,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    if (set_pt++)
 			break;
 		    c_token++;
-		    lp->p_type = int_expression() - 1;
+		    newlp.p_type = int_expression() - 1;
 		} else {
 		    int_warn(c_token, "No pointtype specifier allowed, here");
 		    c_token += 2;
@@ -876,15 +889,15 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 			break;
 		    c_token++;
 		    if (almost_equals(c_token, "var$iable")) {
-			lp->p_size = PTSZ_VARIABLE;
+			newlp.p_size = PTSZ_VARIABLE;
 			c_token++;
 		    } else if (almost_equals(c_token, "def$ault")) {
-			lp->p_size = PTSZ_DEFAULT;
+			newlp.p_size = PTSZ_DEFAULT;
 			c_token++;
 		    } else {
-			lp->p_size = real_expression();
-			if (lp->p_size < 0)
-			    lp->p_size = 0;
+			newlp.p_size = real_expression();
+			if (newlp.p_size < 0)
+			    newlp.p_size = 0;
 		    }
 		} else {
 		    int_warn(c_token, "No pointsize specifier allowed, here");
@@ -896,7 +909,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    if (almost_equals(c_token, "pointi$nterval") || equals(c_token, "pi")) {
 		c_token++;
 		if (allow_point) {
-		    lp->p_interval = int_expression();
+		    newlp.p_interval = int_expression();
+		    set_pi = 1;
 		} else {
 		    int_warn(c_token, "No pointinterval specifier allowed, here");
 		    int_expression();
@@ -905,12 +919,25 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    }
 
 
-	    /* unknown option catched -> quit the while(1) loop */
+	    /* caught unknown option -> quit the while(1) loop */
 	    break;
 	}
 
 	if (set_lt > 1 || set_pal > 1 || set_lw > 1 || set_pt > 1 || set_ps > 1)
 	    int_error(c_token, "duplicated arguments in style specification");
+
+	if (set_pal) {
+	    lp->pm3d_color = newlp.pm3d_color;
+	    lp->use_palette = newlp.use_palette;
+	}
+	if (set_lw)
+	    lp->l_width = newlp.l_width;
+	if (set_pt)
+	    lp->p_type = newlp.p_type;
+	if (set_ps)
+	    lp->p_size = newlp.p_size;
+	if (set_pi)
+	    lp->p_interval = newlp.p_interval;
 }
 
 /* <fillstyle> = {empty | solid {<density>} | pattern {<n>}} {noborder | border {<lt>}} */
@@ -1014,12 +1041,10 @@ parse_colorspec(struct t_colorspec *tc, int options)
     if (almost_equals(c_token,"def$ault")) {
 	c_token++;
 	tc->type = TC_DEFAULT;
-#ifdef KEYWORD_BGND
     } else if (equals(c_token,"bgnd")) {
 	c_token++;
 	tc->type = TC_LT;
 	tc->lt = LT_BACKGROUND;
-#endif
     } else if (equals(c_token,"lt")) {
 	c_token++;
 	if (END_OF_COMMAND)
