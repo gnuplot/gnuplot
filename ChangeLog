@@ -1,3 +1,8 @@
+2010-03-23  Guy Mann  <guydmann@gmail.com>
+
+	* term/js/gnuplot_mouse.js (mouse_update):
+	Repaint current plot before each incremental update of the zoom box.
+
 2010-03-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL: Bump to 4.4.1 and start applying patches added to CVS
