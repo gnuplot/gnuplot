@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.6 2009/05/17 23:37:24 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.7 2009/05/30 17:55:42 sfeam Exp $
  */
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -49,6 +49,8 @@ var zoom_temp_ymin = 0;
 var zoom_temp_x2min = 0;
 var zoom_temp_y2min = 0;
 var zoom_in_progress = false;
+
+var full_canvas_image = null;
 
 function gnuplot_init()
 {
@@ -159,7 +161,14 @@ function mouse_update(e)
 
   // Echo the zoom box interactively
   if (zoom_in_progress) {
-    ctx.strokeStyle="rgba(128,128,128,0.20)";
+    // Clear previous box before drawing a new one
+    if (full_canvas_image == null) {
+      full_canvas_image = ctx.getImageData(0,0,canvas.width,canvas.height);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.putImageData(full_canvas_image,0,0);
+    }
+    ctx.strokeStyle="rgba(128,128,128,0.60)";
     ctx.strokeRect(
 	plot_xmin + zoom_temp_plotx,  plot_ybot - zoom_temp_ploty,
 	plotx - zoom_temp_plotx, -(ploty - zoom_temp_ploty));
@@ -196,6 +205,7 @@ function saveclick(event)
     zoom_temp_plotx = plotx;
     zoom_temp_ploty = ploty;
     zoom_in_progress = true;
+    full_canvas_image = null;
   }
   return false; // Nobody else should respond to this event
 }
