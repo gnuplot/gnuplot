@@ -1,5 +1,5 @@
 /*
- * $Id: util3d.h,v 1.14 2008/03/13 19:53:37 sfeam Exp $
+ * $Id: util3d.h,v 1.15 2008/07/08 04:56:45 sfeam Exp $
  */
 
 /* GNUPLOT - util3d.h */
@@ -84,7 +84,7 @@ void map3d_xyz __PROTO((double x, double y, double z, p_vertex out));
 void map3d_xy __PROTO((double x, double y, double z, int *xt, int *yt));
 void map3d_xy_double __PROTO((double x, double y, double z, double *xt, double *yt));
 void draw3d_line __PROTO((p_vertex, p_vertex, struct lp_style_type *));
-void draw3d_line_unconditional __PROTO((p_vertex, p_vertex, struct lp_style_type *, int));
+void draw3d_line_unconditional __PROTO((p_vertex, p_vertex, struct lp_style_type *, t_colorspec));
 void draw3d_point __PROTO((p_vertex v, struct lp_style_type *lp));
 
 /* HBB NEW 20031218: 3D polyline support */

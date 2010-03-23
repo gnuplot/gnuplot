@@ -4,6 +4,13 @@
 	loading of a user-defined linetype from undoing other linestyle 
 	properties given earlier in the same command.
 
+	* src/util3d.h src/util3d.c (draw3d_line_unconditional)
+	src/hidden3d (draw_edge draw_line_hidden):  The code was passing in
+	top and bottom colors for the hidden3d routines as integer linetypes.
+	But loading a whole linetype lost any line properties given explicitly
+	in the splot command. Change this so that the top and bottom colors are
+	passed as t_colorspec structures instead.
+
 2010-03-21  Tommaso Vinci  <ilbibi@users.sourceforge.net>
 
 	* Provide Humlicek's approximation to the Voigt/Faddeeva function

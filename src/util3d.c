@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.37 2009/12/31 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.38 2010/03/14 06:43:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -971,7 +971,7 @@ void
 draw3d_line_unconditional(
     p_vertex v1, p_vertex v2,
     struct lp_style_type *lp,
-    int linetype)
+    t_colorspec color)
 {
     unsigned int x1, y1, x2, y2;
     struct lp_style_type ls = *lp;
@@ -986,15 +986,8 @@ draw3d_line_unconditional(
     TERMCOORD(v1, x1, y1);
     TERMCOORD(v2, x2, y2);
 
-    /* User-specified line styles */
-    if (prefer_line_styles && linetype >= 0)
-	lp_use_properties(&ls, linetype+1);
-    else if (first_perm_linestyle)
-	load_linetype(&ls, linetype+1);
-
-    /* The usual case of auto-generated line types */
-    else
-	ls.l_type = linetype;
+    /* Replace original color with the one passed in */
+	ls.pm3d_color = color;
 
     /* Color by Z value */
     if (ls.pm3d_color.type == TC_Z)
@@ -1013,7 +1006,7 @@ draw3d_line (p_vertex v1, p_vertex v2, struct lp_style_type *lp)
 	return;
     }
 
-    draw3d_line_unconditional(v1, v2, lp, lp->l_type);
+    draw3d_line_unconditional(v1, v2, lp, lp->pm3d_color);
 
 }
 
@@ -1073,7 +1066,7 @@ polyline3d_next(p_vertex v2, struct lp_style_type *lp)
      * revert back to old method */
     if (lp->use_palette) {
 	draw3d_line_unconditional(&polyline3d_previous_vertex, v2,
-				  lp, lp->l_type);
+				  lp, lp->pm3d_color);
 	polyline3d_previous_vertex = *v2;
 	return;
 

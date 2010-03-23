@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.69 2008/09/24 03:19:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.70 2010/03/21 00:57:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1642,9 +1642,24 @@ draw_vertex(p_vertex v)
 static void
 draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 {
-    assert (e >= elist && e < elist + edges.end);
+    /* It used to be that p_edge contained style as a integer linetype.
+     * But loading a full defined linetype destroyed any style attributes set 
+     * in the splot command.  We really just want a colorspec, but we have
+     * to set l_type also for times when rgb colors are not in use.
+     */
+    struct t_colorspec color = e->lp->pm3d_color;
+    struct lp_style_type lptemp = *(e->lp);
 
-    draw3d_line_unconditional(v1, v2, e->lp, e->style);
+    if ((hiddenBacksideLinetypeOffset != 0)
+    &&  (e->lp->pm3d_color.type != TC_Z)) {
+	load_linetype(&lptemp, e->style + 1);
+	color = lptemp.pm3d_color;
+	lptemp = *(e->lp);
+	lptemp.l_type = e->style;
+	lptemp.pm3d_color = color;
+    }
+
+    draw3d_line_unconditional(v1, v2, &lptemp, color);
     if (e->lp->pointflag) {
 	draw_vertex(v1);
 	draw_vertex(v2);
@@ -2077,7 +2092,7 @@ draw_line_hidden(
      * can't use in_front() because the datastructures are partly
      * invalid. So just draw the line and be done with it */
     if (!polygons.end) {
-	draw3d_line_unconditional(v1, v2, lp, lp->l_type);
+	draw3d_line_unconditional(v1, v2, lp, lp->pm3d_color);
 	return;
     }
 
