@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.45.2.2 2009/08/20 02:04:29 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.45.2.3 2009/09/13 17:54:09 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -704,6 +704,7 @@ TERM_PUBLIC int
 TGIF_text_angle(int ang)
 {
     switch (ang) {
+	case -270:
 	case   90:	uActAngle = 3; break;
 	case  180:
 	case -180:	uActAngle = 2; break;
