@@ -1,7 +1,12 @@
+2010-03-24  Ethan A Merritt  <merritt@u.washington.edu
+
+	* term/tgif.trm (text_angle): Handle text rotation -270 same as +90.
+	Bugfix
+
 2010-03-23  Guy Mann  <guydmann@gmail.com>
 
 	* term/js/gnuplot_mouse.js (mouse_update):
-	Repaint current plot before each incremental update of the zoom box.
+	Repaint current canvas before each incremental update of the zoom box.
 
 2010-03-22  Ethan A Merritt  <merritt@u.washington.edu
 
