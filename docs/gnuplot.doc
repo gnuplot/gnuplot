@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.608 2010/03/21 00:57:11 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.609 2010/03/21 17:42:26 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7614,7 +7614,7 @@ Ffigure_mapcontours
        %U           week of the year (week starts on Sunday)
        %w           day of the week, 0--6 (Sunday = 0)
        %W           week of the year (week starts on Monday)
-       %y           year, 0-99
+       %y           year, 0-68 for 2000-2068, 69-99 for 1969-1999
        %Y           year, 4-digit
 #\begin{tabular}{|cl|} \hline
 #\multicolumn{2}{|c|}{Tic-mark label Date/Time Format Specifiers}\\
@@ -7642,7 +7642,7 @@ Ffigure_mapcontours
 #\verb@%U@ & week of the year (week starts on Sunday) \\
 #\verb@%w@ & day of the week, 0--6 (Sunday = 0) \\
 #\verb@%W@ & week of the year (week starts on Monday) \\
-#\verb@%y@ & year, 0-99 \\
+#\verb@%y@ & year, 0-99 in range 1969-2068\\
 #\verb@%Y@ & year, 4-digit \\
 %c l .
 %Format@Explanation
@@ -7669,7 +7669,7 @@ Ffigure_mapcontours
 %%U@week of the year (week starts on Sunday)
 %%w@day of the week, 0--6 (Sunday = 0)
 %%W@week of the year (week starts on Monday)
-%%y@year, 0-99
+%%y@year, 0-99 in range 1969-2068
 %%Y@year, 4-digit
 %_
 @end table
@@ -10720,12 +10720,16 @@ Ffigure_mapcontours
  columns.  To avoid confusion, `gnuplot` requires that you provide a complete
  `using` specification if your file contains timedata.
 
- Since `gnuplot` cannot read non-numerical text, if the date format includes
- the day or month in words, the format string must exclude this text.  But
- it can still be printed with the "%a", "%A", "%b", or "%B" specifier:
- see `set format` for more details about these and other options for printing
- timedata.  (`gnuplot` will determine the proper month and weekday from the
- numerical values.)
+ If the date format includes the day or month in words, the format string must
+ exclude this text.  But it can still be printed with the "%a", "%A", "%b", or
+ "%B" specifier.  `gnuplot` will determine the proper month and weekday from the
+ numerical values.  See `set format` for more details about these and other
+ options for printing time data.  
+
+ When reading two-digit years with %y, values 69-99 refer to the 20th century,
+ while values 00-68 refer to the 21st century.   NB: This is in accordance with
+ the UNIX98 spec, but conventions vary widely and two-digit year values are
+ inherently ambiguous.
 
  See also `set xdata` and `Time/date` for more information.
 
