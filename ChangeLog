@@ -1,3 +1,8 @@
+2010-03-28  Ethan A Merritt  <merritt@u.washington.edu
+
+	* docs/gnuplot.doc: State explicitly that the timefmt %y interprets
+	a 2 digit year number as being in the range 1969-2068.
+
 2010-03-24  Ethan A Merritt  <merritt@u.washington.edu
 
 	* term/tgif.trm (text_angle): Handle text rotation -270 same as +90.
