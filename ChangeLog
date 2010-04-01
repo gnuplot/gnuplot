@@ -1,3 +1,10 @@
+2010-04-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary):  Tweak auto-placement of plot borders so
+	that it is closer to what was used prior to version 4.2.4.  This makes
+	the left margin narrower than in 4.4.4 - 4.4.0, and the right margin
+	slightly wider.
+
 2010-03-28  Ethan A Merritt  <merritt@u.washington.edu
 
 	* docs/gnuplot.doc: State explicitly that the timefmt %y interprets

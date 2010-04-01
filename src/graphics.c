@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.13 2010/02/11 21:20:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.14 2010/03/21 04:00:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -816,6 +816,7 @@ boundary(struct curve_points *plots, int count)
 	/* Auto-calculation */
 	double tmpx, tmpy;
 
+	plot_bounds.xleft = xoffset * t->xmax;
 	plot_bounds.xleft += (timelabel_textwidth > ylabel_textwidth
 		  ? timelabel_textwidth : ylabel_textwidth)
 	    + ytic_width + ytic_textwidth;
@@ -930,16 +931,15 @@ boundary(struct curve_points *plots, int count)
 	    if (y2label_textwidth > 0)
 		plot_bounds.xright -= y2label_textwidth;
 
-	    if (plot_bounds.xright == (int) (0.5 + (t->xmax - 1) * (xsize + xoffset))) {
-		/* make room for end of xtic or x2tic label */
-		plot_bounds.xright -= (int) (t->h_char * 2);
-	    }
+	    if (plot_bounds.xright > (xsize+xoffset)*(t->xmax-1) - (t->h_char * 2))
+		plot_bounds.xright = (xsize+xoffset)*(t->xmax-1) - (t->h_char * 2);
+
 	    color_box.xoffset -= plot_bounds.xright;
 	    /* EAM 2009 - protruding xtic labels */
 	    if (term->xmax - plot_bounds.xright < xtic_textwidth)
 		plot_bounds.xright = term->xmax - xtic_textwidth;
 	    /* DBT 12-3-98  extra margin just in case */
-	    plot_bounds.xright -= 0.5 * t->h_char;
+	    plot_bounds.xright -= 1.0 * t->h_char;
 	}
 	/* Note: we took care of explicit 'set rmargin foo' at line 502 */
     }
