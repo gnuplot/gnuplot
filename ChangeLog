@@ -1,3 +1,9 @@
+2010-04-04  Ethan A Merritt  <merritt@u.washington.edu
+
+	* term/cairo.trm: The cairo terminals were forgetting fontscale
+	after the initial application.
+	Bugfix
+
 2010-03-28  Ethan A Merritt  <merritt@u.washington.edu
 
 	* docs/gnuplot.doc: State explicitly that the timefmt %y interprets

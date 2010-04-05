@@ -3,7 +3,7 @@
 #  EAM - July 2007
 #
 #
-set term pdfcairo mono font "Times,7" size 3.5,2.0 dashlength 0.2
+set term pdfcairo mono font "Times,12" size 3.5,2.0 dashlength 0.2
 #
 # Line and point type plots  (same data plotted)
 # ==============================================
@@ -200,8 +200,8 @@ unset key
 set size ratio -1
 set xrange [-2.5:1.5]
 set yrange [-1:2.5]
-set xtics font "Times,5" format "%.1f" scale 0.5
-set ytics font "Times,5" format "%.1f" scale 0.5
+set xtics font "Times,10" format "%.1f" scale 0.5
+set ytics font "Times,10" format "%.1f" scale 0.5
 plot '../demo/optimize.dat' with circles lc rgb "gray" fs transparent solid 0.2 nobo,\
      '../demo/optimize.dat' u 1:2 with linespoints lw 2 pt 7 ps 0.3 lc rgb "black"
 #
@@ -287,8 +287,8 @@ set yrange [ -10 : 137 ]
 set zrange [  -1 :   1 ]
 set xyplane at -1
 set bmargin at screen 0.25
-set xtics offset 0,0 font "Times,5"
-set ytics offset 0,0 font "Times,5"
+set xtics offset 0,0 font "Times,10"
+set ytics offset 0,0 font "Times,10"
 set view 45, 25, 1.0, 1.35
 set grid
 unset key

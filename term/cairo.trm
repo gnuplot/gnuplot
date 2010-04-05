@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.33 2009/09/13 17:49:16 sfeam Exp $
+ * $Id: cairo.trm,v 1.34 2010/03/18 04:52:53 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -349,10 +349,9 @@ TERM_PUBLIC void cairotrm_options()
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
 	}
 
-	if (set_fontscale) {
+	/* fontscale */
 		snprintf(tmp_term_options, sizeof(tmp_term_options), " fontscale %.1f", cairo_params->fontscale);
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
-	}
 
 	if (cairo_params->mono)
 		strncat(term_options, " monochrome", sizeof(term_options)-strlen(term_options));
@@ -740,7 +739,6 @@ int cairotrm_set_font (const char *font)
 	gp_cairo_set_font(&plot, fontname, fontsize * cairo_params->fontscale);
 	gp_cairo_set_termvar(&plot, &(term->v_char),
 				    &(term->h_char));
-	gp_cairo_set_font(&plot, fontname, fontsize);
 
 	/* the returned int is not used anywhere */
 	return 1;
