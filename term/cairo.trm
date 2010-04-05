@@ -349,9 +349,11 @@ TERM_PUBLIC void cairotrm_options()
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
 	}
 
-	/* fontscale */
+	/* if (set_fontscale) */
+	{
 		snprintf(tmp_term_options, sizeof(tmp_term_options), " fontscale %.1f", cairo_params->fontscale);
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+	}
 
 	if (cairo_params->mono)
 		strncat(term_options, " monochrome", sizeof(term_options)-strlen(term_options));
@@ -623,46 +625,57 @@ void cairotrm_vector(unsigned int x, unsigned int y)
 
 void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 {
+	if (!string || !strlen(string))
+		return;
+
 	/* if ignore_enhanced_text is set, draw with the normal routine.
 	 * This is meant to avoid enhanced syntax when the enhanced mode is on */
-	if (cairo_params->enhanced && !ignore_enhanced_text) {
-		/* Uses enhanced_recursion() to analyse the string to print.
-		 * enhanced_recursion() calls _enhanced_open() to initialize the text drawing,
-		 * then it calls _enhanced_writec() which buffers the characters to draw,
-		 * and finally _enhanced_flush() to draw the buffer with the correct justification. */
-
-		gp_cairo_enhanced_init(&plot, strlen(string));
-
-		/* set up the global variables needed by enhanced_recursion() */
-		enhanced_fontscale = cairo_params->fontscale;
-		strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
-
-		/* Set the recursion going. We say to keep going until a
-		* closing brace, but we don't really expect to find one.
-		* If the return value is not the nul-terminator of the
-		* string, that can only mean that we did find an unmatched
-		* closing brace in the string. We inplot->crement past it (else
-		* we get stuck in an infinite loop) and try again. */
-
-		while (*(string = enhanced_recursion((char*)string, TRUE, 
-				plot.fontname, plot.fontsize * cairo_params->fontscale, 
-				0.0, TRUE, TRUE, 0))) {
-			cairotrm_enhanced_flush();
-
-			/* we can only get here if *str == '}' */
-			enh_err_check(string);
-
-			if (!*++string)
-				break; /* end of string */
-			/* else carry on and process the rest of the string */
-		}
-
-		/* finish */
-		gp_cairo_enhanced_finish(&plot, x, term->ymax - y);
+	if (ignore_enhanced_text || !cairo_params->enhanced) {
+		gp_cairo_draw_text(&plot, x, term->ymax - y, string);
 		return;
 	}
 
-	gp_cairo_draw_text(&plot, x, term->ymax - y, string);
+	/* If there are no mark-up characters we can use the normal routine */
+	if (!strpbrk(string, "{}^_@&~")) {
+		gp_cairo_draw_text(&plot, x, term->ymax - y, string);
+		return;
+	}
+
+	/* Uses enhanced_recursion() to analyse the string to print.
+	 * enhanced_recursion() calls _enhanced_open() to initialize the text drawing,
+	 * then it calls _enhanced_writec() which buffers the characters to draw,
+	 * and finally _enhanced_flush() to draw the buffer with the correct justification. */
+
+	gp_cairo_enhanced_init(&plot, strlen(string));
+
+	/* set up the global variables needed by enhanced_recursion() */
+	enhanced_fontscale = cairo_params->fontscale;
+	strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
+
+	/* Set the recursion going. We say to keep going until a
+	* closing brace, but we don't really expect to find one.
+	* If the return value is not the nul-terminator of the
+	* string, that can only mean that we did find an unmatched
+	* closing brace in the string. We inplot->crement past it (else
+	* we get stuck in an infinite loop) and try again. */
+
+	while (*(string = enhanced_recursion((char*)string, TRUE, 
+			plot.fontname, plot.fontsize * cairo_params->fontscale, 
+			0.0, TRUE, TRUE, 0))) {
+		cairotrm_enhanced_flush();
+
+		/* we can only get here if *str == '}' */
+		enh_err_check(string);
+
+		if (!*++string)
+			break; /* end of string */
+		/* else carry on and process the rest of the string */
+	}
+
+	/* finish */
+	gp_cairo_enhanced_finish(&plot, x, term->ymax - y);
+	return;
+
 }
 
 void cairotrm_enhanced_flush()

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.49 2009/08/31 18:31:07 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.50 2009/11/07 03:39:57 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -284,7 +284,7 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
     char *c;
     char *fname;
 
-	FPRINTF((stderr,"set_font\n"));
+	FPRINTF(("set_font \"%s\" %d\n", name,fontsize));
 
 	/* Split out Bold and Italic attributes from font name */
 	fname = strdup(name);
@@ -693,7 +693,8 @@ gchar * gp_cairo_convert(plot_struct *plot, const char* string)
  * Suggested by cairo developer Behdad Esfahbod. 
  */
 #ifdef WIN32
-PangoLayout *gp_cairo_create_layout (cairo_t *cr)
+PangoLayout *
+gp_cairo_create_layout (cairo_t *cr)
 {
     static PangoFontMap *fontmap;
     PangoContext *context;
@@ -718,7 +719,8 @@ PangoLayout *gp_cairo_create_layout (cairo_t *cr)
     return layout;
 }
 #else
-PangoLayout *gp_cairo_create_layout (cairo_t *cr)
+PangoLayout *
+gp_cairo_create_layout (cairo_t *cr)
 {
     return pango_cairo_create_layout(cr);
 }
@@ -1240,10 +1242,13 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		 * the saved attributes list, get extents */
 		underprinted_layout = gp_cairo_create_layout (plot->cr);
 		pango_layout_set_text (underprinted_layout, gp_cairo_underprinted_utf8, -1);
-		pango_layout_set_attributes (underprinted_layout, gp_cairo_enhanced_underprinted_AttrList);
+		// EAM DEBUG
+		if (!gp_cairo_enhanced_underprinted_AttrList)
+			fprintf(stderr,"uninitialized gp_cairo_enhanced_underprinted_AttrList!\n");
+		else
+			pango_layout_set_attributes (underprinted_layout, gp_cairo_enhanced_underprinted_AttrList);
 		pango_layout_get_extents(underprinted_layout, NULL, &underprinted_logical_rect);
 		g_object_unref (underprinted_layout);
-		pango_attr_list_unref( gp_cairo_enhanced_underprinted_AttrList );
 
 		/* compute the size of the text to overprint*/
 
@@ -1371,6 +1376,8 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 			sizeof(gp_cairo_underprinted_utf8)-strlen(gp_cairo_underprinted_utf8));
 		underprinted_end = strlen(gp_cairo_underprinted_utf8);
 
+		if (gp_cairo_enhanced_underprinted_AttrList)
+			pango_attr_list_unref( gp_cairo_enhanced_underprinted_AttrList );
 		gp_cairo_enhanced_underprinted_AttrList = pango_attr_list_new();
 
 		/* add text attributes to the underprinted list */

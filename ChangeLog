@@ -4,6 +4,10 @@
 	after the initial application.
 	Bugfix
 
+	* src/wxterminal/gp_cairo.c term/cairo.trm: Use-after-free error caused
+	a segfault on certain enhanced text strings.
+	Bug #2947223
+
 2010-03-28  Ethan A Merritt  <merritt@u.washington.edu
 
 	* docs/gnuplot.doc: State explicitly that the timefmt %y interprets
