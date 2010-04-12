@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.252 2010/03/14 22:44:38 sfeam Exp $
+ * $Id: post.trm,v 1.253 2010/03/18 04:52:53 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2462,7 +2462,7 @@ ENHPS_set_font(const char *font)
 	strcpy(ps_enh_font, ps_params->font);
 	ps_enh_fontsize = ps_fontsize;
     }
-    size = ps_enh_fontsize * ps_params->fontsize;
+    size = ps_enh_fontsize * ps_params->fontscale;
     term->v_char = (unsigned int)(size*PS_SCF);
     term->h_char = (unsigned int)(size*PS_SCF*6/10);
 

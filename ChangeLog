@@ -1,3 +1,8 @@
+2010-04-12  Ethan A Merritt  <merritt@u.washington.edu
+
+	* term/post.trm: Correct a typo that leads to serious problems with
+	font size and placement (introduced by the fontscale code).
+
 2010-04-04  Ethan A Merritt  <merritt@u.washington.edu
 
 	* term/cairo.trm: The cairo terminals were forgetting fontscale
