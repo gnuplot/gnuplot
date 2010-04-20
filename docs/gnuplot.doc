@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.609 2010/03/21 17:42:26 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.610 2010/03/28 21:36:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4989,15 +4989,15 @@ Ffigure_mapcontours
  externally or by using `fit` with an appropriate model.
 
  Syntax:
-       smooth {unique | frequency | cumulative | kdensity | csplines | acsplines | bezier | sbezier}
+       smooth {unique | frequency | cumulative | cnormal | kdensity | csplines | acsplines | bezier | sbezier}
 
- `unique`, `frequency`, and `cumulative` plot the data after making them 
- monotonic.  Each of the other routines uses the data to determine the 
- coefficients of a continuous curve between the endpoints of the data.  
- This curve is then plotted in the same manner as a function, that is, 
- by finding its value at uniform intervals along the abscissa 
- (see `set samples`) and connecting these points with straight line 
- segments (if a line style is chosen).
+ `unique`, `frequency`, `cumulative` and `cnormal` plot the data after
+ making them monotonic.  Each of the other routines uses the data to
+ determine the coefficients of a continuous curve between the endpoints
+ of the data.  This curve is then plotted in the same manner as a
+ function, that is, by finding its value at uniform intervals along the
+ abscissa (see `set samples`) and connecting these points with straight
+ line segments (if a line style is chosen).
 
  If `autoscale` is in effect, the ranges will be computed such that the
  plotted curve lies within the borders of the graph.
@@ -5122,6 +5122,28 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/smooth.html">
  smooth.dem
 ^ </a>
+5 cnormal
+?commands plot datafile smooth cnormal
+?plot datafile smooth cnormal
+?plot smooth cnormal
+?data-file smooth cnormal
+?datafile smooth cnormal
+?plot cnormal
+?smooth cnormal
+?cnormal
+ The `cnormal` option makes the data monotonic in x and normalises the
+ y-values onto the range [0:1].  Points with the same x-value are
+ replaced by a single point containing the cumulative sum of y-values
+ of all data points with lower x-values (i.e. to the left of the
+ current data point) divided by the total sum of all y-values. This can
+ be used to obtain a normalised cumulative distribution function from
+ data (useful when comparing sets of samples with differing numbers of
+ members).
+ See also
+^ <a href="http://www.gnuplot.info/demo/smooth.html">
+ smooth.dem
+^ </a>
+
 5 kdensity
 ?commands plot datafile smooth kdensity
 ?plot datafile smooth kdensity

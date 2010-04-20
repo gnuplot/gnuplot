@@ -1,3 +1,10 @@
+2010-04-20  John Naylon  <jpbn@users.sourceforge.net>
+
+	* src/gp_types.h src/interpol.c src/plot2d.c src/tables.c
+	docs/gnuplot.doc: New option "smooth cnormal", equivalent to 
+	"smooth cummulative" with automatic normalization to the range
+	[0:1].
+
 2010-04-12  Ethan A Merritt  <merritt@u.washington.edu
 
 	* term/post.trm: Correct a typo that leads to serious problems with

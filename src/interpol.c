@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.37 2008/11/12 02:27:39 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.38 2008/11/12 02:29:43 janert Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -997,9 +997,27 @@ gen_interp_frequency(struct curve_points *plot)
 {
     int i, j, curves;
     int first_point, num_points;
-    double y;
+    double y, y_total;
 
     curves = num_curves(plot);
+
+    if (plot->plot_smooth == SMOOTH_CUMULATIVE_NORMALISED) {
+	y_total = 0.0;
+	first_point = 0;
+
+	for (i = 0; i < curves; i++) {
+	    num_points = next_curve(plot, &first_point);
+
+	    for (j = first_point; j < first_point + num_points; j++) {
+		if (plot->points[j].type == UNDEFINED) 
+		    continue;
+	    
+		y_total += plot->points[j].y;
+	    }
+	    first_point += num_points + 1;
+	}
+    }
+
 
     first_point = 0;
     for (i = 0; i < curves; i++) {
@@ -1018,6 +1036,26 @@ gen_interp_frequency(struct curve_points *plot)
                 plot->points[j].y = y;
             }
         }
+
+	/* Alternatively, cumulative normalised means replace the
+	   current y-value with the sum of all previous y-values
+	   divided by the total sum of all values.  This assumes the
+	   data is sorted as before.  Normalising in this way allows
+	   comparison of the CDF of data sets with differing total
+	   numbers of samples.  */
+
+	if (plot->plot_smooth == SMOOTH_CUMULATIVE_NORMALISED) {
+	    y = 0;
+
+	    for (j = first_point; j < first_point + num_points; j++) {
+		if (plot->points[j].type == UNDEFINED) 
+		    continue;
+
+		y += plot->points[j].y;
+		plot->points[j].y = y / y_total;
+	    }
+	}
+
 
         do_freq(plot, first_point, num_points);
         first_point += num_points + 1;
@@ -1180,7 +1218,8 @@ cp_implode(struct curve_points *cp)
 	    } else {
 		cp->points[j].x = x;
  		if ( cp->plot_smooth == SMOOTH_FREQUENCY ||
- 		     cp->plot_smooth == SMOOTH_CUMULATIVE )
+ 		     cp->plot_smooth == SMOOTH_CUMULATIVE ||
+		     cp->plot_smooth == SMOOTH_CUMULATIVE_NORMALISED )
 		    k = 1;
 		cp->points[j].y = y /= (double) k;
 		cp->points[j].xhigh = sux / (double) k;
@@ -1231,7 +1270,8 @@ cp_implode(struct curve_points *cp)
 	if (k) {
 	    cp->points[j].x = x;
 	    if ( cp->plot_smooth == SMOOTH_FREQUENCY ||
-		 cp->plot_smooth == SMOOTH_CUMULATIVE )
+		 cp->plot_smooth == SMOOTH_CUMULATIVE ||
+		 cp->plot_smooth == SMOOTH_CUMULATIVE)
 		k = 1;
 	    cp->points[j].y = y /= (double) k;
 	    cp->points[j].xhigh = sux / (double) k;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.206 2010/03/06 19:13:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.207 2010/03/14 06:43:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1649,11 +1649,12 @@ eval_plots()
 		    case SMOOTH_FREQUENCY:
 		    case SMOOTH_CUMULATIVE:
 		    case SMOOTH_KDENSITY:
+		    case SMOOTH_CUMULATIVE_NORMALISED:
 			this_plot->plot_smooth = found_token;
 			break;
 		    case SMOOTH_NONE:
 		    default:
-			int_error(c_token, "expecting 'unique', 'frequency', 'cumulative', 'kdensity', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
+			int_error(c_token, "expecting 'unique', 'frequency', 'cumulative', 'cnormal', 'kdensity', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
 			break;
 		    }
 		    this_plot->plot_style = LINES;
@@ -2125,6 +2126,7 @@ eval_plots()
 		case SMOOTH_UNIQUE:
 		case SMOOTH_FREQUENCY:
 		case SMOOTH_CUMULATIVE:
+		case SMOOTH_CUMULATIVE_NORMALISED:
 		case SMOOTH_CSPLINES:
 		case SMOOTH_ACSPLINES:
 		case SMOOTH_SBEZIER:
@@ -2141,6 +2143,7 @@ eval_plots()
 		 * interpolation routines */
 		case SMOOTH_FREQUENCY:
 		case SMOOTH_CUMULATIVE:
+		case SMOOTH_CUMULATIVE_NORMALISED:
 		    gen_interp_frequency(this_plot);
 		    break;
 		case SMOOTH_CSPLINES:
