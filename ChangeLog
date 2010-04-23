@@ -1,3 +1,8 @@
+2010-04-24  Ethan A Merritt  <merritt@u.washington.edu
+
+	* config.mgw config.cyg config.os2:  Enable HIDDEN_QUADTREE by default.
+	Tracker item #2990173
+
 2010-04-20  John Naylon  <jpbn@users.sourceforge.net>
 
 	* src/gp_types.h src/interpol.c src/plot2d.c src/tables.c

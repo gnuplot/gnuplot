@@ -407,7 +407,7 @@
 /* #undef HIDDEN3D_GRIDBOX */
 
 /* Define to enable quadtree optimization in hidden3d code. */
-/* #undef HIDDEN3D_QUADTREE */
+#define HIDDEN3D_QUADTREE 1
 
 /* Define to enable handling point size in hidden3d code. */
 #define HIDDEN3D_VAR_PTSIZE 1
