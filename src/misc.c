@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.116 2010/03/14 06:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.117 2010/03/23 05:18:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -938,6 +938,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    lp->p_size = newlp.p_size;
 	if (set_pi)
 	    lp->p_interval = newlp.p_interval;
+	if (newlp.l_type == LT_COLORFROMCOLUMN)
+	    lp->l_type = LT_COLORFROMCOLUMN;
 }
 
 /* <fillstyle> = {empty | solid {<density>} | pattern {<n>}} {noborder | border {<lt>}} */

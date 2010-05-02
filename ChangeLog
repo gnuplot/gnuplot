@@ -8,6 +8,9 @@
 	Remove conditional flag GP_FIT_ERRVARS, default to "set fit errorvar".
 	Tracker item #2985752
 
+	* src/misc.c (lp_parse): "lc variable" was being lost in some cases.
+	Bugfix
+
 2010-04-24  Ethan A Merritt  <merritt@u.washington.edu
 
 	* config.mgw config.cyg config.os2:  Enable HIDDEN_QUADTREE by default.
