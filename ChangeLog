@@ -1,3 +1,12 @@
+2010-05-02  Thomas Sefzick <thse@users.sourceforge.net>
+
+	* src/gadgets.h src/graphics.c src/save.c src/set.c set/show.c
+	src/tables.c src/tables.h docs/gnuplot.doc:
+
+	New options "set key maxcolumns N maxrows M" to manually adjust the
+	automatic layout of items in the figure legend. Implemented for 2D
+	plots only.
+
 2010-05-02  Ethan A Merritt  <merritt@u.washington.edu
 
 	* configure.in src/save.c src/set.c src/show.c src/unset.c src/fit.c

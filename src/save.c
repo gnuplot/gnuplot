@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.179 2010/02/24 22:46:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.180 2010/05/02 20:56:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -408,10 +408,11 @@ set y2data%s\n",
     } else
 	fputs("nobox", fp);
 
-    /* Put less common options on a separate line*/
+    /* Put less common options on separate lines */
     fprintf(fp, "\nset key %sinvert samplen %g spacing %g width %g height %g ",
 		key->invert ? "" : "no",
 		key->swidth, key->vert_factor, key->width_fix, key->height_fix);
+    fprintf(fp, "\nset key maxcolumns %d maxrows %d",key->maxcols,key->maxrows);
     fputc('\n', fp);
 
     if (!(key->visible))

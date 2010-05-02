@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.610 2010/03/28 21:36:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.611 2010/04/21 07:34:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8003,6 +8003,8 @@ Ffigure_mapcontours
                {{no}box { {linestyle | ls <line_style>}
                           | {linetype | lt <line_type>}
                             {linewidth | lw <line_width>}}}
+               {maxcols {<max no. of columns> | auto}}
+               {maxrows {<max no. of rows> | auto}}
        unset key
        show key
 
@@ -8014,8 +8016,9 @@ Ffigure_mapcontours
  Elements within the key are stacked according to `vertical` or `horizontal`.
  In the case of `vertical`, the key occupies as few columns as possible.  That
  is, elements are aligned in a column until running out of vertical space at
- which point a new column is started.  In the case of `horizontal`, the key
- occupies as few rows as possible.
+ which point a new column is started.  The vertical space may be limited using
+ 'maxrows'.  In the case of `horizontal`, the key occupies as few rows as
+ possible.  The horizontal space may be limited using 'maxcols'.
 
  By default the key is placed in the upper right inside corner of the graph.
  The keywords `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
