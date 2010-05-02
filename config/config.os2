@@ -46,9 +46,6 @@
 /* #undef GNUPLOT_HISTORY */
 /* Don't change it here -- this define is set in config/makefile.os2. */
 
-/* Define to allow 'fit' to create parameter error variables. */
-#define GP_FIT_ERRVARS 1
-
 /* Define to allow command line macros. EXPERIMENTAL */
 #define GP_MACROS 1
 

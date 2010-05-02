@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.68 2009/02/28 20:45:46 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.69 2009/03/13 01:28:57 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -128,10 +128,7 @@ char fitbuf[256];
 
 /* log-file for fit command */
 char *fitlogfile = NULL;
-
-#ifdef GP_FIT_ERRVARS
 TBOOLEAN fit_errorvariables = FALSE;
-#endif /* GP_FIT_ERRVARS */
 
 /* private variables: */
 
@@ -206,10 +203,7 @@ static char *get_next_word __PROTO((char **s, char *subst));
 static double createdvar __PROTO((char *varname, double value));
 static void splitpath __PROTO((char *s, char *p, char *f));
 static void backup_file __PROTO((char *, const char *));
-
-#ifdef GP_FIT_ERRVARS
 static void setvarerr __PROTO((char *varname, double value));
-#endif
 
 /*****************************************************************
     Small function to write the last fit command into a file
@@ -692,13 +686,11 @@ regress(double a[])
 
     /* compute errors in the parameters */
 
-#ifdef GP_FIT_ERRVARS
     if (fit_errorvariables)
 	/* Set error variable to zero before doing this */
 	/* Thus making sure they are created */
 	for (i = 0; i < num_params; i++)
 	    setvarerr(par_name[i], 0.0);
-#endif
 
     if (num_data == num_params) {
 	int k;
@@ -777,10 +769,8 @@ regress(double a[])
 
 	    Dblf6("%-15.15s = %-15g  %-3.3s %-12.4g (%.4g%%)\n",
 		  par_name[i], a[i], PLUSMINUS, dpar[i], temp);
-#ifdef GP_FIT_ERRVARS
 	    if (fit_errorvariables)
 		setvarerr(par_name[i], dpar[i]);
-#endif
 	}
 
 	Dblf("\n\ncorrelation matrix of the fit parameters:\n\n");
@@ -918,7 +908,6 @@ setvar(char *varname, struct value data)
     udv_ptr->udv_undef = FALSE;
 }
 
-#ifdef GP_FIT_ERRVARS
 /*****************************************************************
             Set a GNUPLOT user-defined variable for an error
             variable: so take the parameter name, turn it
@@ -939,7 +928,6 @@ setvarerr(char *varname, double value)
 	setvar(pErrValName, errval);
 	free(pErrValName);
 }
-#endif /* GP_FIT_ERRVARS */
 
 /*****************************************************************
     Read INTGR Variable value, return 0 if undefined or wrong type

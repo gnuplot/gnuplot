@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.128 2009/04/12 22:27:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.128.2.1 2009/12/09 05:56:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -758,9 +758,7 @@ unset_fit()
     if (fitlogfile != NULL)
 	free(fitlogfile);
     fitlogfile = NULL;
-#if GP_FIT_ERRVARS
     fit_errorvariables = FALSE;
-#endif /* GP_FIT_ERRVARS */
 }
 
 

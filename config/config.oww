@@ -42,9 +42,6 @@
 /* Define if you want to use a gnuplot history file. */
 #define GNUPLOT_HISTORY 1
 
-/* Define to allow 'fit' to create parameter error variables. */
-#define GP_FIT_ERRVARS 1
-
 /* Define to allow command line macros. EXPERIMENTAL */
 #define GP_MACROS 1
 
