@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.178 2010/02/15 19:01:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.179 2010/02/24 22:46:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -925,18 +925,12 @@ set origin %g,%g\n",
 	fprintf(fp, "set psdir\n");
 
     /* HBB NEW 20020927: fit logfile name option */
-#if GP_FIT_ERRVARS
     fprintf(fp, "set fit %serrorvariables",
 	    fit_errorvariables ? "" : "no");
     if (fitlogfile) {
 	fprintf(fp, " logfile \'%s\'", fitlogfile);
     }
     fputc('\n', fp);
-#else
-    if (fitlogfile) {
-	fprintf(fp, "set fit logfile \'%s\'\n", fitlogfile);
-    }
-#endif /* GP_FIT_ERRVARS */
 
 }
 

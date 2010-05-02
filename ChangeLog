@@ -1,3 +1,13 @@
+2010-05-02  Ethan A Merritt  <merritt@u.washington.edu
+
+	* configure.in src/save.c src/set.c src/show.c src/unset.c src/fit.c
+	src/fit.h docs/gnuplot.doc config/config.os2 config/config.wc
+	config/config.nt config/config.dj2 config/config.oww config/config.cyg
+	config/config.amg config/config.mgw:
+
+	Remove conditional flag GP_FIT_ERRVARS, default to "set fit errorvar".
+	Tracker item #2985752
+
 2010-04-24  Ethan A Merritt  <merritt@u.washington.edu
 
 	* config.mgw config.cyg config.os2:  Enable HIDDEN_QUADTREE by default.

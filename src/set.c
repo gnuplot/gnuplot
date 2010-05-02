@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.311 2010/03/14 06:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.312 2010/03/18 04:52:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1367,14 +1367,12 @@ set_fit()
 		fitlogfile=NULL;
 	    } else if (!(fitlogfile = try_to_get_string()))
 		int_error(c_token, "expecting string");
-#if GP_FIT_ERRVARS
 	} else if (almost_equals(c_token, "err$orvariables")) {
 	    fit_errorvariables = TRUE;
 	    c_token++;
 	} else if (almost_equals(c_token, "noerr$orvariables")) {
 	    fit_errorvariables = FALSE;
 	    c_token++;
-#endif /* GP_FIT_ERRVARS */
 	} else {
 	    int_error(c_token,
 		      "unknown --- expected 'logfile' or [no]errorvariables");
