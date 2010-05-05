@@ -1,6 +1,6 @@
 2010-05-05  Ethan A Merritt  <merritt@u.washington.edu
 
-	* term/post.trm src/term.c: Move a global definition out of post.trm so
+	* term/post.trm src/term.c: Move a global declaration out of post.trm so
 	that gnuplot can be built without including the postscript terminal.
 
 2010-05-02  Thomas Sefzick <thse@users.sourceforge.net>
