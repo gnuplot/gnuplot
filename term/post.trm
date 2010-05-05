@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.253 2010/03/18 04:52:53 sfeam Exp $
+ * $Id: post.trm,v 1.254 2010/04/12 18:41:46 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -354,8 +354,6 @@ NULL
 #else /* GNUPLOT_PS_DIR */
 # include "PostScript/prologues.h"
 #endif /* GNUPLOT_PS_DIR */
-
-char *PS_psdir = NULL;
 
 /* added to enhpost by Matt Heffron <heffron@falstaff.css.beckman.com> */
 /* moved to post.trm by drd */
