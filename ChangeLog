@@ -1,3 +1,9 @@
+2010-05-06  Ethan A Merritt  <merritt@u.washington.edu
+
+	* term/cairo.trm (cairotrm_graphics): Handle the special case of
+	streaming pdfcairo output to stdout.  (Requires cairo version >= 1.2)
+	Bug #578311
+
 2010-05-02  Ethan A Merritt  <merritt@u.washington.edu
 
 	* configure.in src/save.c src/set.c src/show.c src/unset.c src/fit.c

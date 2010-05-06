@@ -9,6 +9,7 @@ New features, changes and fixes since gnuplot version 4.4.0
 * FIX Protect against runaway recursion by limiting depth of nested functions
 * FIX metapost terminal: Fix inheritance of line thickness by text strings
 * FIX cairo terminals could segfault on certain enhanced text strings
+* FIX pdfcairo output to stdout now works
 * CHANGE Enable HIDDEN_QUADTREE by default
 
 Features, changes and fixes in gnuplot version 4.4
