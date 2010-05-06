@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.34 2010/03/18 04:52:53 sfeam Exp $
+ * $Id: cairo.trm,v 1.36 2010/04/05 05:20:04 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -80,6 +80,9 @@ TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
 #include "glib.h"		/* For guint32 */
 
 #define CAIROTRM_DEFAULT_FONTNAME "Sans"
+
+static cairo_status_t cairostream_write __PROTO ((void *closure, unsigned char *data, unsigned int length));
+static int cairostream_error[1];
 
 /* Terminal type of postscript dialect */
 enum CAIRO_TERMINALTYPE {
@@ -419,9 +422,17 @@ void cairotrm_init()
 		cairo_destroy(plot.cr);
 
 	if (!strcmp(term->name,"pdfcairo")) {
-		surface = cairo_pdf_surface_create(outstr,
+		/* Output can either be a file or stdout */
+		if (!outstr) {
+		    surface = cairo_pdf_surface_create_for_stream(
+			(cairo_write_func_t)cairostream_write, cairostream_error,
 				plot.device_xmax /*double width_in_points*/,
 				plot.device_ymax /*double height_in_points*/);
+		} else {
+		    surface = cairo_pdf_surface_create(outstr,
+				plot.device_xmax /*double width_in_points*/,
+				plot.device_ymax /*double height_in_points*/);
+		}
 		/* it is up to the pdf viewer to do the hinting */
 		plot.hinting = 0;
 		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
@@ -495,7 +506,7 @@ void cairotrm_graphics()
 
 /* cairo mechanism to allow writing to an output stream */
 cairo_status_t
-cairopng_write(void *closure, unsigned char *data, unsigned int length)
+cairostream_write(void *closure, unsigned char *data, unsigned int length)
 {
 	if (length != fwrite(data, 1, length, gpoutfile))
 		return CAIRO_STATUS_WRITE_ERROR;
@@ -594,9 +605,8 @@ void cairotrm_text()
 	 * to be written */
 	cairo_show_page(plot.cr);
 	if (!strcmp(term->name,"pngcairo")) {
-		int error_data[1];
 		cairo_surface_write_to_png_stream(cairopng_do_crop(),
-			(cairo_write_func_t)cairopng_write, error_data);
+			(cairo_write_func_t)cairostream_write, cairostream_error);
 	}
 
 	FPRINTF((stderr,"status = %s\n",cairo_status_to_string(cairo_status(plot.cr))));
