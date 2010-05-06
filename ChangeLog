@@ -1,3 +1,7 @@
+2010-05-06  David Marx  <itsdmarx@users.sourceforge.net>
+
+	* src/syscfg.c: Tweaked version of _bool support for Sun/Solaris
+
 2010-05-06  Ethan A Merritt  <merritt@u.washington.edu
 
 	* term/cairo.trm (cairotrm_graphics): Handle the special case of
