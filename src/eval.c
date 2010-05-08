@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.78 2010/03/14 18:52:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.79 2010/03/21 17:42:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -286,10 +286,26 @@ magnitude(struct value *val)
     case INTGR:
 	return ((double) abs(val->v.int_val));
     case CMPLX:
-	return (sqrt(val->v.cmplx_val.real *
-		     val->v.cmplx_val.real +
-		     val->v.cmplx_val.imag *
-		     val->v.cmplx_val.imag));
+	{
+	    /* The straightforward implementation sqrt(r*r+i*i)
+	     * over-/underflows if either r or i is very large or very
+	     * small. This implementation avoids over-/underflows from
+	     * squaring large/small numbers whenever possible.  It
+	     * only over-/underflows if the correct result would, too.
+	     * CAVEAT: sqrt(1+x*x) can still have accuracy
+	     * problems. */
+	    double abs_r = fabs(val->v.cmplx_val.real);
+	    double abs_i = fabs(val->v.cmplx_val.imag);
+	    double quotient;
+
+	    if(abs_r > abs_i) {
+		quotient = abs_i / abs_r;
+		return abs_r * sqrt(1 + quotient*quotient);
+	    } else {
+		quotient = abs_r / abs_i;
+		return abs_i * sqrt(1 + quotient*quotient);
+	    }
+	}
     default:
 	int_error(NO_CARET, "unknown type in magnitude()");
     }
