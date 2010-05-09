@@ -1,3 +1,8 @@
+2010-05-09  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
+
+	* src/eval.c (magnitude): Yesterday's change breaks if the complex
+	argument is {0,0}.
+
 2010-05-08  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* src/eval.c (magnitude): Make implementation robust to overflows
