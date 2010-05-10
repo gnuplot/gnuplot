@@ -1,7 +1,10 @@
-2010-05-10  Ethan A Merritt  <merritt@u.washington.edu
+2010-05-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_set_font): set ... font ",size" was not working
 	for non-enhanced text.  Now it is.
+
+	* src/plot2d.c (parametric_fixup) src/plot3d.c (parametric_3dfixup):
+	Delete vestigial code for auto-generation of a parametric plot title.
 
 2010-05-09  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 

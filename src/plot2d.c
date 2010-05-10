@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.207 2010/03/14 06:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.208 2010/04/21 07:34:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2670,16 +2670,6 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 		}
 	    }
 
-	    /* Ok, fix up the title to include both the xp and yp plots. */
-	    if (xp->title && xp->title[0] != '\0' && yp->title) {
-		tlen = strlen(yp->title) + strlen(xp->title) + 3;
-		new_title = gp_alloc(tlen, "string");
-		strcpy(new_title, xp->title);
-		strcat(new_title, ", ");
-		strcat(new_title, yp->title);
-		free(yp->title);
-		yp->title = new_title;
-	    }
 	    /* move xp to head of free list */
 	    xp->next = free_list;
 	    free_list = xp;

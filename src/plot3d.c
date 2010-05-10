@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.179 2010/02/27 21:50:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.180 2010/03/21 00:57:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -2213,26 +2213,6 @@ parametric_3dfixup(struct surface_points *start_plot, int *plot_num)
 		zicrvs = zicrvs->next;
 	    }
 
-	    /* Ok, fix up the title to include xp and yp plots. */
-	    if (((xp->title && xp->title[0] != '\0') ||
-		 (yp->title && yp->title[0] != '\0')) && zp->title) {
-		tlen = (xp->title ? strlen(xp->title) : 0) +
-		    (yp->title ? strlen(yp->title) : 0) +
-		    (zp->title ? strlen(zp->title) : 0) + 5;
-		new_title = gp_alloc(tlen, "string");
-		new_title[0] = 0;
-		if (xp->title && xp->title[0] != '\0') {
-		    strcat(new_title, xp->title);
-		    strcat(new_title, ", ");	/* + 2 */
-		}
-		if (yp->title && yp->title[0] != '\0') {
-		    strcat(new_title, yp->title);
-		    strcat(new_title, ", ");	/* + 2 */
-		}
-		strcat(new_title, zp->title);
-		free(zp->title);
-		zp->title = new_title;
-	    }
 	    /* add xp and yp to head of free list */
 	    assert(xp->next_sp == yp);
 	    yp->next_sp = free_list;
