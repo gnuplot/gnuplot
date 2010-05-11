@@ -1,3 +1,8 @@
+2010-05-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (magnitude):  Optimize for the predominant case
+	(no imaginary component).
+
 2010-05-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_set_font): set ... font ",size" was not working
@@ -18,7 +23,7 @@
 
 2010-05-06  David Marx  <itsdmarx@users.sourceforge.net>
 
-	* src/syscfg.c: Tweaked version of _bool support for Sun/Solaris
+	* src/syscfg.h: Tweaked version of _bool support for Sun/Solaris
 
 2010-05-06  Ethan A Merritt  <merritt@u.washington.edu
 
