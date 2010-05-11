@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.254 2010/04/12 18:41:46 sfeam Exp $
+ * $Id: post.trm,v 1.255 2010/05/05 18:03:50 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2149,13 +2149,18 @@ PS_set_font(const char *font)
     if (!font || !(*font))
 	font = PS_default_font;
     sep = strcspn(font,",");
-    name = gp_strdup(font);
-    name[sep] = NUL;
-    for (i=0; i<sep; i++)
-	if (name[i] == ' ') name[i] = '-';
     size = ps_fontsize;
     if (font[sep] == ',')
 	sscanf (&(font[sep+1]),"%f",&size);
+
+    if (sep == 0) {
+	name = gp_strdup(PS_default_font);
+	sep = strcspn(name,",");
+    } else
+	name = gp_strdup(font);
+    name[sep] = NUL;
+    for (i=0; i<sep; i++)
+	if (name[i] == ' ') name[i] = '-';
 
     /* If TeX is doing the font handling, we don't need to */
     /* write anything into the postscript stream */

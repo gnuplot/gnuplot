@@ -1,3 +1,8 @@
+2010-05-10  Ethan A Merritt  <merritt@u.washington.edu
+
+	* term/post.trm (PS_set_font): set ... font ",size" was not working
+	for non-enhanced text.  Now it is.
+
 2010-05-09  Hans-Bernhard Broeker  <broeker@physik.rwth-achen.de>
 
 	* src/eval.c (magnitude): Yesterday's change breaks if the complex
