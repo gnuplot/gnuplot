@@ -1,7 +1,10 @@
 2010-05-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairotrm_options): The "noenhanced" option was
-	broken.  Fix it.
+	broken by the patch of 2009-07-03.  Fix it.
+
+	* term/cairo.trm (cairotrm_put_text): Enhanced text was applying
+	the fontscale twice.  Fix it.
 
 2010-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 

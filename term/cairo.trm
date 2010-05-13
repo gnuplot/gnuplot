@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.37 2010/05/06 20:54:56 sfeam Exp $
+ * $Id: cairo.trm,v 1.38 2010/05/14 05:24:15 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -670,7 +670,7 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 	* we get stuck in an infinite loop) and try again. */
 
 	while (*(string = enhanced_recursion((char*)string, TRUE, 
-			plot.fontname, plot.fontsize * cairo_params->fontscale, 
+			plot.fontname, plot.fontsize,
 			0.0, TRUE, TRUE, 0))) {
 		cairotrm_enhanced_flush();
 
