@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.36 2010/04/05 05:20:04 sfeam Exp $
+ * $Id: cairo.trm,v 1.37 2010/05/06 20:54:56 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -231,7 +231,7 @@ TERM_PUBLIC void cairotrm_options()
 			break;
 		case CAIROTRM_NOENHANCED:
 			c_token++;
-			cairo_params->enhanced = TRUE;
+			cairo_params->enhanced = FALSE;
 			term->flags &= ~TERM_ENHANCED_TEXT;
 			if (set_enhanced) duplication=TRUE;
 			set_enhanced = TRUE;

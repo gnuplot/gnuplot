@@ -1,3 +1,8 @@
+2010-05-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm (cairotrm_options): The "noenhanced" option was
+	broken.  Fix it.
+
 2010-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (magnitude):  Optimize for the predominant case
