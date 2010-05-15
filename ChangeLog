@@ -1,3 +1,12 @@
+2010-05-15  Ethan A Merritt  <merritt@u.washington.edu
+
+	* NEWS src/hidden3d.c src/plot3d.c src/graph3d.c docs/gnuplot.doc:
+
+	Add support for 'with impulses' in hidden3d code.  Previously the manual
+	said 3D impulses were drawn "from the xy plane" but the code did not
+	follow this, drawing instead from zmin.  Now the 3D code always draws
+	impulses from z=0 just as the 2D code always draws from y=0.
+
 2010-05-12  Ethan A Merritt  <merritt@u.washington.edu
 
 	* src/eval.c (magnitude):  Back-port Hans-Bernhard's fix for the
