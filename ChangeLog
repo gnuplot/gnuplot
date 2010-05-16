@@ -1,3 +1,8 @@
+2010-05-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c (draw_edge): Add support for coloring lines in
+	hidden3d mode using 'lc variable' or 'lc rgb variable'.
+
 2010-05-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairotrm_options): The "noenhanced" option was

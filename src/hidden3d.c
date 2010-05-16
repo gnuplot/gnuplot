@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.70 2010/03/21 00:57:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.71 2010/03/23 05:40:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1635,24 +1635,38 @@ draw_vertex(p_vertex v)
 }
 
 
-/* The function that actually does the drawing of the visible portions
- * of lines */
-/* HBB 20001108: changed to take the pointers to the end vertices as
- * additional arguments. */
+/* The function that actually draws the visible portions of lines */
 static void
 draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 {
     /* It used to be that p_edge contained style as a integer linetype.
-     * But loading a full defined linetype destroyed any style attributes set 
-     * in the splot command.  We really just want a colorspec, but we have
-     * to set l_type also for times when rgb colors are not in use.
+     * This destroyed any style attributes set in the splot command.
+     * We really just want to extract a colorspec.
      */
     struct t_colorspec color = e->lp->pm3d_color;
     struct lp_style_type lptemp = *(e->lp);
+    TBOOLEAN recolor = FALSE;
 
+    /* This handles 'lc rgb variable' */
+    if (color.type == TC_RGB && color.lt == LT_COLORFROMCOLUMN) {
+	recolor = TRUE;
+	lptemp.pm3d_color.lt = (int)v1->real_z;
+    } else
+
+    /* This handles 'lc variable' */
+    if (lptemp.l_type == LT_COLORFROMCOLUMN) {
+	recolor = TRUE;
+	load_linetype(&lptemp, (int)v1->real_z);
+    } else
+
+    /* This is the default style: color top and bottom in successive colors */
     if ((hiddenBacksideLinetypeOffset != 0)
     &&  (e->lp->pm3d_color.type != TC_Z)) {
+	recolor = TRUE;
 	load_linetype(&lptemp, e->style + 1);
+    }
+
+    if (recolor) {
 	color = lptemp.pm3d_color;
 	lptemp = *(e->lp);
 	lptemp.l_type = e->style;
