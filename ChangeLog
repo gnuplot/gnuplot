@@ -1,3 +1,15 @@
+2010-05-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/estimate.trm (ENHest_writec strlen_utf8)
+	src/term.c (estimate_strlen):
+
+	Teach estimate_strlen() to handle UTF-8 encoded strings.  The estimate
+	is imperfect, but then again the estimate is already imperfect for any
+	proportional font.  To truly do this more accurately would require
+	customized implementations for each terminal type.  Any unicode code
+	point below 0x3000 is treated as requiring one character width; code
+	points above 0x3000 are treated as requiring two character widths.
+
 2010-05-15  Ethan A Merritt  <merritt@u.washington.edu
 
 	* NEWS src/hidden3d.c src/plot3d.c src/graph3d.c docs/gnuplot.doc:

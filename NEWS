@@ -11,6 +11,7 @@ New features, changes and fixes since gnuplot version 4.4.0
 * FIX cairo terminals could segfault on certain enhanced text strings
 * FIX pdfcairo output to stdout now works
 * FIX font ",size" in non-enhanced mode postscript terminals
+* FIX Do a better job of estimating the width of UTF-8 encoded strings
 * CHANGE 3D impulses are now always drawn from z=0
 * CHANGE Enable HIDDEN_QUADTREE by default
 * CHANGE Enable "set fit errorvariables" by default

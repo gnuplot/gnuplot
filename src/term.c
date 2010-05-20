@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.184.2.6 2009/11/04 16:11:26 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.184.2.7 2010/02/18 04:34:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2839,7 +2839,9 @@ int len;
 	FPRINTF((stderr,"Estimating length %d height %g for enhanced text string \"%s\"\n",
 		len, (double)(term->ymax)/10., text));
 	term = tsave;
-    } else
+    } else if (encoding == S_ENC_UTF8)
+	len = strlen_utf8(text);
+    else
 #endif
 	len = strlen(text);
 
