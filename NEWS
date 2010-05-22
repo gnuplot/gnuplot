@@ -12,6 +12,7 @@ New features, changes and fixes since gnuplot version 4.4.0
 * FIX pdfcairo output to stdout now works
 * FIX font ",size" in non-enhanced mode postscript terminals
 * FIX Do a better job of estimating the width of UTF-8 encoded strings
+* FIX baseline bug in canvas terminal rotation of enhanced text
 * CHANGE 3D impulses are now always drawn from z=0
 * CHANGE Enable HIDDEN_QUADTREE by default
 * CHANGE Enable "set fit errorvariables" by default
