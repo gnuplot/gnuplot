@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.30 2009/11/13 04:44:26 sfeam Exp $
+ * $Id: canvas.trm,v 1.31 2010/02/01 16:30:08 sfeam Exp $
  *
  */
 
@@ -356,6 +356,10 @@ CANVAS_graphics()
 	    fprintf(gpoutfile,
 		"<script src=\"%sgnuplot_mouse.js\"></script>\n"
 		, CANVAS_scriptdir);
+	else
+	    fprintf(gpoutfile,
+		"<script type=\"text/javascript\">"
+		"function gnuplot_init() {};</script>\n");
 	fprintf(gpoutfile,
 		"<script type=\"text/javascript\">\n"
 		"var canvas, ctx;\n"
@@ -999,7 +1003,7 @@ ENHCANVAS_FLUSH()
 	w = utf8strlen(enhanced_text) * CANVAS_OVERSAMPLE * ENHCANVAS_fontsize/25.;
 
 	canvas_font_size = ENHCANVAS_fontsize;
-	x -= sin((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
+	x += sin((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
 	y += cos((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
 	if (ENHCANVAS_show && !ENHCANVAS_sizeonly)
 		CANVAS_put_text(x, y, enhanced_text);

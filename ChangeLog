@@ -1,3 +1,10 @@
+2010-05-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm (CANVAS_graphics ENHCANVAS_FLUSH):
+	Fix a bug in applying the baseline of rotated enhanced text.
+	Provide a dummy gnuplot_init() routine if a standalone html
+	file with no mouse support is created.
+
 2010-05-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/estimate.trm (ENHest_writec strlen_utf8)
