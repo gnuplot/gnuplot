@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.25.2.5 2009/11/13 04:45:30 sfeam Exp $
+ * $Id: canvas.trm,v 1.25.2.6 2010/02/01 16:29:28 sfeam Exp $
  *
  */
 
@@ -999,7 +999,7 @@ ENHCANVAS_FLUSH()
 	w = utf8strlen(enhanced_text) * CANVAS_OVERSAMPLE * ENHCANVAS_fontsize/25.;
 
 	canvas_font_size = ENHCANVAS_fontsize;
-	x -= sin((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
+	x += sin((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
 	y += cos((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
 	if (ENHCANVAS_show && !ENHCANVAS_sizeonly)
 		CANVAS_put_text(x, y, enhanced_text);
