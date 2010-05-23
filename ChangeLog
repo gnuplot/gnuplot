@@ -1,3 +1,7 @@
+2010-05-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm: Revise the enhanced text mode, especially text rotation.
+
 2010-05-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm (CANVAS_graphics ENHCANVAS_FLUSH):

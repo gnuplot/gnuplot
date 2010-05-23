@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.64 2010/02/28 04:30:47 sfeam Exp $
+ * $Id: emf.trm,v 1.65 2010/03/18 04:52:53 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1125,7 +1125,7 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 
     EMF_flush_polyline();
     if (emf_textcolor != emf_color) {
-	EMF_SetTextColor(emf_color);	/* since text doesn't use pens, we must initialize with this */
+	EMF_SetTextColor(emf_color);
 	emf_textcolor = emf_color;
     }
 
@@ -1144,11 +1144,13 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 	x + (long) ((EMF_VCHAR / 2) * sin(emf_vert_text * EMF_10THDEG2RAD)),
 	term->ymax - y + (long) (EMF_VCHAR / 2
 				 * cos(emf_vert_text * EMF_10THDEG2RAD)));
-    EMF_write_long(strlen(str)); /* real char size */
+    EMF_write_long(strlen(str)); /* true number of characters */
     EMF_write_long(76);		/* offset to text */
     EMF_write_long(0);		/* options, none */
     EMF_write_rectl(0, 0, 0, 0); /* rectangle clipping not used */
-    EMF_write_long(0);		/* offset to intercharacter spacing array, can't be used since really we don't know anything about the face properties used */
+    EMF_write_long(0);		/* offset to intercharacter spacing array */
+				/* can't be used since we don't know anything */
+				/* about the font properties being used */
     for (i = 0; i < len; i++) 
 	EMF_write_byte(i<strlen(str)?str[i]:0);	/* writing text */
     for (i = 0; i < strlen(str); i++)
@@ -1156,6 +1158,7 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 	EMF_write_long(300); 
     /* SB 20040506: end of modification */
 
+    /* Invalidate current position */
     emf_posx = emf_posy = -2000;
 }
 
@@ -1380,6 +1383,7 @@ static float ENHemf_fontsize;
 static char   *ENHemf_font;
 
 static TBOOLEAN ENHemf_show = TRUE;
+static TBOOLEAN ENHemf_sizeonly = FALSE;
 static int ENHemf_overprint = 0;
 
 TERM_PUBLIC void
@@ -1390,7 +1394,6 @@ ENHemf_OPEN(
     TBOOLEAN showflag,
     int overprint)
 {
-
     /* If the overprint code requests a save or restore, that's all we do */
 #define EMF_AVG_WID 0.8
 #undef TA_UPDATECP_MODE
@@ -1431,6 +1434,7 @@ TERM_PUBLIC void
 ENHemf_FLUSH()
 {
     unsigned int x, y;
+    int x_offset, y_offset;
     char *str;
     int i;
     int incr_x;
@@ -1441,10 +1445,6 @@ ENHemf_FLUSH()
 	    ENHemf_opened_string = FALSE;
 	    x = emf_posx;
 	    y = emf_posy;
-
-	    FPRINTF((stderr,"ENHemf_FLUSH: Write string \"%s\" len %d at %g with font %s,%g\n",
-		    enhanced_text,strlen(enhanced_text),
-		    (double)x/EMF_PX2HM,ENHemf_font,ENHemf_fontsize));
 
 	    if (1) {
 		char save_font[256];
@@ -1458,15 +1458,6 @@ ENHemf_FLUSH()
 		strcpy(emf_fontname,save_font);
 	    }
 
-	    /* Don't know how to do a pure move; instead write in white */
-	    if (!ENHemf_show) {
-		EMF_SetTextColor(0xffffff);
-		emf_textcolor = 0xffffff;
-	    } else if (ENHemf_show && emf_textcolor != emf_color) {
-		EMF_SetTextColor(emf_color);
-		emf_textcolor = emf_color;
-	    }
-
 	    str = enhanced_text;
 
 #ifndef GP_TA_UPDATEPC_MODE
@@ -1474,57 +1465,28 @@ ENHemf_FLUSH()
 	    /* Best is to pile up all our errors on top of leading space. */
 	    i = strspn(enhanced_text," ");
 	    if (i > 0) {
-		x += i * term->h_char 
-		   * EMF_AVG_WID * ENHemf_fontsize/emf_defaultfontsize;
+		double blank = i * term->h_char * EMF_AVG_WID;
+		x += cos(emf_vert_text * EMF_10THDEG2RAD) * blank;
+		y += sin(emf_vert_text * EMF_10THDEG2RAD) * blank;
 		emf_posx = x;
+		emf_posy = y;
 		str += i;
 	    }
 #endif
 
-	    /* Copied from put_text(). Is all this really necessary? */
-	    {
-	    int record_length;
-	    int len = strlen(str);
-	    if (len % 4)
-		len += 4 - (len % 4);		/* Structure must be long aligned! */
-	    record_length = 76 + len + strlen(str)*4;
+	    x_offset = sin(emf_vert_text * EMF_10THDEG2RAD) * ENHemf_base * EMF_PX2HM;
+	    y_offset = cos(emf_vert_text * EMF_10THDEG2RAD) * ENHemf_base * EMF_PX2HM;
 
-	    EMF_write_emr(83, record_length);/* ExtTextOutA, ANSI char version! */
-	    EMF_write_rectl(0, 0, 0, 0);	/* bounding, never used */
-	    EMF_write_long(1);			/* GM_Compatible mode for advanced scaling */
-	    EMF_write_float(EMF_PX2HM);		/* x scale */
-	    EMF_write_float(EMF_PX2HM);		/* y scale */
-	    if (emf_vert_text == 0) {		/* x,y position (ignored if GP_TA_UPDATECP) */
-		float yo = 1.3 * EMF_PX2HM * ENHemf_base;
-		EMF_write_pointl(
-			x, term->ymax - (y + yo));
-	    } else {
-		float a = emf_vert_text * EMF_10THDEG2RAD;
-		float yo = 1.3 * EMF_PX2HM * ENHemf_base;
-		EMF_write_pointl(
-			x - (long) (yo * sin(a)),
-			term->ymax - (long) (y + (yo * cos(a))) );
-	    }
-	    EMF_write_long(strlen(str)); 	/* true number of characters */
-	    EMF_write_long(76);			/* offset to text */
-	    EMF_write_long(0);			/* ExtTextOut options */
-	    EMF_write_rectl(0, 0, 0, 0);	/* bounding, never used */
-	    EMF_write_long(0);			/* offset to intercharacter spacing array */
-	    for (i = 0; i < len; i++) 
-		EMF_write_byte(i<strlen(str)?str[i]:0);	/* character string */
-	    for (i = 0; i < strlen(str); i++)
-		EMF_write_long(300); 		/* intercharacter spacing array (not used) */
-	    }
+	    if (ENHemf_show && !ENHemf_sizeonly)
+		EMF_put_text(x-x_offset, y+y_offset, str);
 
-	    /* Empirical hack */
+
 	    strl = strlen(str);
-	    if (emf_vert_text != 0)
-		strl += 1.0;
 
 	    if (emf_tweak) {
-		/* Tweak estimated length of rendered string by counting "thin" characters */
-		/* In principle EMF will accept an array of char widths. But in practice   */
-		/* none of the EMF viewers implement this option (ETO_PDY).                */
+		/* Tweak estimated length of rendered string by counting "thin" */
+		/* characters. In principle EMF will accept an array of char    */
+		/* widths. But EMF viewers don't implement this option (ETO_PDY */
 		{
 		int thin = 0, wide = 0;
 		for (i=0; i<strlen(str); i++) {
@@ -1545,12 +1507,18 @@ ENHemf_FLUSH()
 	    }
 
 	    /* Attempt to handle slanted text. Not entirely successful */
-	    emf_posx += incr_x * cos(emf_vert_text * EMF_10THDEG2RAD);
-	    emf_posy += incr_x * sin(emf_vert_text * EMF_10THDEG2RAD);
+	    emf_posx = x + incr_x * cos(emf_vert_text * EMF_10THDEG2RAD);
+	    emf_posy = y + incr_x * sin(emf_vert_text * EMF_10THDEG2RAD);
 
-	    if (ENHemf_overprint == 1)
-		emf_posx -= strlen(str) * term->h_char 
-	    		  * (0.5) * EMF_AVG_WID * ENHemf_fontsize/emf_defaultfontsize;
+	    FPRINTF((stderr,"fontwidth = %d text box: %d x %d\n",
+		(int)(EMF_AVG_WID * term->h_char),
+	    	(int)(incr_x * cos(emf_vert_text * EMF_10THDEG2RAD)),
+		(int)(incr_x * sin(emf_vert_text * EMF_10THDEG2RAD))));
+
+	    if (ENHemf_overprint == 1) {
+		emf_posx -= 0.5 * incr_x * cos(emf_vert_text * EMF_10THDEG2RAD);
+		emf_posy -= 0.5 * incr_x * sin(emf_vert_text * EMF_10THDEG2RAD);
+	    }
 
 	}
 }
@@ -1558,26 +1526,21 @@ ENHemf_FLUSH()
 TERM_PUBLIC void
 ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
 {
-    int tmp_justify = emf_justify;
-    int len;
+    char *original_string = (char *) str;
 
-    if (ignore_enhanced_text) {
-	EMF_put_text(x,y,str);
+    if (str == NULL || *str == '\0')
 	return;
-    }
-
-    if (!strlen(str))
-	return;
-    len = estimate_strlen((char *)str);
 
     /* if there are no magic characters, we should just be able
      * punt the string to EMF_put_text()
      */
-    if (!strpbrk(str, "{}^_@&~")) {
+    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
 	/* FIXME: do something to ensure default font is selected */
 	EMF_put_text(x,y,str);
 	return;
     }
+
+    EMF_move(x,y);
 
     if (emf_textcolor != emf_color) {
 	EMF_SetTextColor(emf_color);
@@ -1589,28 +1552,13 @@ ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
     strncpy(enhanced_escape_format,"&#x%2.2x;",sizeof(enhanced_escape_format));
 
     ENHemf_opened_string = FALSE;
-    ENHemf_show = TRUE;
     ENHemf_overprint = 0;
     ENHemf_font = emf_fontname;
     ENHemf_fontsize = emf_fontsize;
 
-    /* EAM -FIXME
-     * To do proper justification requires some way to track the current position
-     * after writing a text fragment.  I don't know how to do that in emf.
-     * So I punt by just estimating the total length.
-     */
-    if (emf_justify == RIGHT) {
-		x -= term->h_char * len * cos(emf_vert_text * EMF_10THDEG2RAD);
-		y -= term->h_char * len * sin(emf_vert_text * EMF_10THDEG2RAD);
-    } else if (emf_justify == CENTRE) {
-		x -= term->h_char * len/2. * cos(emf_vert_text * EMF_10THDEG2RAD);
-		y -= term->h_char * len/2. * sin(emf_vert_text * EMF_10THDEG2RAD);
-    }
-    x += term->v_char/3. * sin(emf_vert_text * EMF_10THDEG2RAD);
-    y -= term->v_char/3. * cos(emf_vert_text * EMF_10THDEG2RAD);
-    EMF_move(x,y);
+    if (emf_justify == RIGHT || emf_justify == CENTRE)
+	ENHemf_sizeonly = TRUE;
 
-    emf_justify = LEFT;
 #ifdef UPDATECP_MODE
     EMF_SetTextAlign(GP_TA_BASELINE|GP_TA_LEFT|GP_TA_UPDATECP);
 #else
@@ -1639,9 +1587,28 @@ ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
 	/* else carry on and process the rest of the string */
     }
 
+    /* EAM May 2010 - 2-pass text justification */
+    /* We can do text justification by running the entire top level string */
+    /* through 2 times, with the ENHgd_sizeonly flag set the first time.   */
+    /* After seeing where the final position is, we then offset the start  */
+    /* point accordingly and run it again without the sizeonly flag set.   */
+    if (emf_justify == RIGHT || emf_justify == CENTRE) {
+	enum JUSTIFY justification = emf_justify;
+	int x_offset = emf_posx - x;
+	int y_offset = (emf_vert_text == 0) ? 0 : emf_posy - y;
+
+	emf_justify = LEFT;
+	ENHemf_sizeonly = FALSE;
+	if (justification == RIGHT)
+	    ENHemf_put_text(x - x_offset, y - y_offset, original_string);
+	else if (justification == CENTRE)
+	    ENHemf_put_text(x - x_offset/2, y - y_offset/2, original_string);
+	emf_justify = justification;
+    }
+
     /* Restore everything we messed with */
-    emf_justify = tmp_justify;
     EMF_setfont(); /* Necessary? */
+    ENHemf_base = 0;
 }
 
 #endif /* TERM_BODY */
