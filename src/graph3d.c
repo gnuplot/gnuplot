@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.222.2.4 2010/02/27 21:52:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.222.2.5 2010/05/15 21:45:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1024,8 +1024,12 @@ do_3dplot(
 	    if (term->layer)
 		(term->layer)(TERM_LAYER_BEFORE_PLOT);
 
+#if (0)
+	    /* Versions through 4.4.0 used this to limit depth-sorting of pm3d */
+	    /* surfaces to those which are adjacent in the splot command. Why? */
 	    if (pm3d_order_depth && this_plot->plot_style != PM3DSURFACE)
 		pm3d_depth_queue_flush(); /* draw pending plots */
+#endif
 
 	    lkey = (key->visible && this_plot->title && this_plot->title[0]
 				 && !this_plot->title_is_suppressed);

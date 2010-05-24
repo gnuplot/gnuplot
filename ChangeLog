@@ -1,3 +1,11 @@
+2010-05-24  Ethan A Merritt  <merritt@u.washington.edu>
+	
+	* src/graph3d.c (do_3dplot):  Remove a restriction that limited depth-
+	sorting of pm3d surfaces to those which were adjacent in the splot
+	command.  If there was a reason for the original restriction, that 
+	reason is now not remembered.
+	Bug #3004793
+
 2010-05-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm (CANVAS_graphics ENHCANVAS_FLUSH):
