@@ -1,3 +1,8 @@
+2010-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+	
+	* docs/gnuplot.doc:  Document recently added %s time format
+	(seconds since start of 2000).
+
 2010-05-24  Ethan A Merritt  <merritt@u.washington.edu>
 	
 	* src/graph3d.c (do_3dplot):  Remove a restriction that limited depth-
