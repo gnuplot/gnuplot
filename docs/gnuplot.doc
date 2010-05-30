@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.29 2010/03/28 21:38:29 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.30 2010/05/15 21:45:37 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2475,7 +2475,7 @@ C ... and restart the table:
 
  which will produce xtic labels that look like "03/21".
 
- See the descriptions of each command for more details.
+ See `time_specifiers`.
 1 plotting styles
 ?plotting styles
 
@@ -7549,6 +7549,7 @@ Ffigure_mapcontours
        %p           "am" or "pm"
        %r           shorthand for "%I:%M:%S %p" (only output)
        %R           shorthand for "%H:%M" (only output)
+       %s           number of seconds since the start of year 2000
        %S           second, 0--60
        %T           shorthand for "%H:%M:%S" (only output)
        %U           week of the year (week starts on Sunday)
@@ -7578,6 +7579,7 @@ Ffigure_mapcontours
 #\verb@%r@ & shorthand for \verb@"%I:%M:%S %p"@ (only output)\\
 #\verb@%R@ & shorthand for \verb@%H:%M"@ (only output)\\
 #\verb@%S@ & second, 0--60 \\
+#\verb@%s@ & number of seconds since start of year 2000 \\
 #\verb@%T@ & shorthand for \verb@"%H:%M:%S"@ (only output)\\
 #\verb@%U@ & week of the year (week starts on Sunday) \\
 #\verb@%w@ & day of the week, 0--6 (Sunday = 0) \\
@@ -7605,6 +7607,7 @@ Ffigure_mapcontours
 %%r@shorthand for "%I:%M:%S %p" (only output)
 %%R@shorthand for %H:%M" (only output)
 %%S@second, 0--60
+%%s@number of seconds since start of year 2000
 %%T@shorthand for "%H:%M:%S" (only output)
 %%U@week of the year (week starts on Sunday)
 %%w@day of the week, 0--6 (Sunday = 0)
