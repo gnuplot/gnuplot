@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.117 2010/03/23 05:18:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.118 2010/05/02 21:56:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -737,13 +737,19 @@ filledcurves_options_tofile(filledcurves_opts *fco, FILE *fp)
 TBOOLEAN
 need_fill_border(struct fill_style_type *fillstyle)
 {
-    /* Doesn't want a border at all */
-    if (fillstyle->border_color.type == TC_LT && fillstyle->border_color.lt == LT_NODRAW)
-	return FALSE;
+    struct lp_style_type p;
+    p.pm3d_color = fillstyle->border_color;
+
+    if (p.pm3d_color.type == TC_LT) {
+	/* Doesn't want a border at all */
+	if (p.pm3d_color.lt == LT_NODRAW)
+	    return FALSE;
+	load_linetype(&p, p.pm3d_color.lt+1);
+    }
 
     /* Wants a border in a new color */
-    if (fillstyle->border_color.type != TC_DEFAULT)
-	apply_pm3dcolor(&fillstyle->border_color,term);
+    if (p.pm3d_color.type != TC_DEFAULT)
+	apply_pm3dcolor(&p.pm3d_color,term);
     
     return TRUE;
 }
