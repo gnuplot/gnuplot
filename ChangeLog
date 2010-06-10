@@ -1,3 +1,8 @@
+2010-06-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary):  Fix a type that can distort the
+	vertical size of subplots in a multiplot.
+
 2010-06-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (need_fill_border): The fillstyle border color was not
