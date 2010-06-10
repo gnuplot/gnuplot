@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.14 2010/03/21 04:00:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.15 2010/04/02 04:49:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -482,7 +482,7 @@ boundary(struct curve_points *plots, int count)
 	    top_margin += (int) t->v_char;
 
 	plot_bounds.ytop -= top_margin;
-	if (plot_bounds.ytop >= (ysize + yoffset) * (t->ymax-1)) {
+	if (plot_bounds.ytop == (ysize + yoffset) * (t->ymax-1)) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    plot_bounds.ytop -= (int) (t->h_char * 2);
 	}

@@ -1,3 +1,8 @@
+2010-06-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (boundary):  Fix a type that can distort the
+	vertical size of subplots in a multiplot.
+
 2010-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 	
 	* docs/gnuplot.doc:  Document recently added %s time format
