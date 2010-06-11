@@ -482,7 +482,7 @@ boundary(struct curve_points *plots, int count)
 	    top_margin += (int) t->v_char;
 
 	plot_bounds.ytop -= top_margin;
-	if (plot_bounds.ytop == (ysize + yoffset) * (t->ymax-1)) {
+ 	if (plot_bounds.ytop == (int) (0.5 + (ysize + yoffset) * (t->ymax-1))) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    plot_bounds.ytop -= (int) (t->h_char * 2);
 	}
