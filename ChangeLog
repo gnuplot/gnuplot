@@ -1,3 +1,12 @@
+2010-06-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h: Add in missing fields of object initializers.
+
+2010-06-11  Peter Juhasz
+
+	* src/graphics.c (boundary):  More correct fix for distorted
+	vertical size of subplots in a multiplot.
+
 2010-06-11  Peter Juhasz
 
 	* src/graphics.c (boundary):  More correct fix for distorted
