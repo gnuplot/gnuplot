@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.183 2010/01/06 17:29:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.184 2010/01/11 04:31:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1710,7 +1710,12 @@ df_readascii(double v[], int max)
 		if (use_spec[output].expected_type >= CT_XTICLABEL) {
 		    int axis, axcol;
 		    float xpos;
-		    
+		   
+		    /* EAM FIXME - skip columnstacked histograms also */
+		    if (df_current_plot) {
+			if (df_current_plot->plot_style == BOXPLOT)
+				continue;
+		    }
 		    switch (use_spec[output].expected_type) {
 			default:
 			case CT_XTICLABEL:
