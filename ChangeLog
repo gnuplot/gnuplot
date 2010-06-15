@@ -3,6 +3,8 @@
 	* src/datafile.c: Do not allow xticlabels(foo) in association with
 	style BOXPLOT, since there are no x coordinates.
 
+	* src/gadgets.h: Add in missing fields of object initializers.
+
 2010-06-11  Peter Juhasz
 
 	* src/graphics.c (boundary):  More correct fix for distorted
