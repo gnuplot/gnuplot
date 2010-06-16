@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.8 2010/03/21 04:00:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.9 2010/05/11 04:25:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2305,7 +2305,10 @@ eval_plots()
 			    /* If non-para, it must be INRANGE */
 			    /* logscale ? log(x) : x */
 			    this_plot->points[i].x = t;
-			    if (boxwidth >= 0 && boxwidth_is_absolute) {
+
+			    /* For boxes [only] check use of boxwidth */
+			    if ((this_plot->plot_style == BOXES)
+			    &&  (boxwidth >= 0 && boxwidth_is_absolute)) {
 				double xlow, xhigh;
 				int dmy_type = INRANGE;
 				this_plot->points[i].z = 0;
@@ -2323,6 +2326,13 @@ eval_plots()
 				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, xhigh, dmy_type, x_axis,
 								    this_plot->noautoscale, NOOP, NOOP );
 			    }
+			    /* Fill in additional fields needed to draw a circle */
+			    if (this_plot->plot_style == CIRCLES) {
+				this_plot->points[i].xlow = t;
+				this_plot->points[i].ylow = 0;
+				this_plot->points[i].xhigh = 360;
+			    }
+
 			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, in_parametric ? x_axis : y_axis,
 			    				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 

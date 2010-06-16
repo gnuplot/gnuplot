@@ -1,3 +1,9 @@
+2010-06-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots): Function plots should not be affected by
+	the current setting of "boxwidth" unless they really do contain boxes.
+	Bugfix
+	
 2010-06-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h: Add in missing fields of object initializers.
