@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.236 2010/05/02 20:56:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.237 2010/05/02 23:47:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1503,6 +1503,10 @@ show_style()
 	fprintf(stderr, ", lw %.1f ", default_rectangle.lp_properties.l_width);
 	fprintf(stderr, ", fillstyle");
 	save_fillstyle(stderr, &default_rectangle.fillstyle);
+    case SHOW_STYLE_CIRCLE:
+	fprintf(stderr, "\tCircle style has default radius ");
+	show_position(&default_circle.o.circle.extent);
+
 	c_token++;
 #endif
 	break;

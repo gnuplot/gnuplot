@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.612 2010/05/02 23:47:03 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.613 2010/05/30 18:00:43 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2727,12 +2727,14 @@ Ffigure_candlesticks
 ?circles
 Ffigure_circles
  The `circles` style plots a circle with an explicit radius at each data point.
- Three columns of data are required: x, y, radius.  By default a full circle
- will be drawn.  It is possible to plot circle segments instead of full
- circles by specifying the start and end angle in the 4th and 5th column.
- An optional 4th or 6th column may be used to specify color information.
+ If three columns of data are present, they are interpreted as x, y, radius.
  The radius is always interpreted in the units of the plot's horizontal axis
  (x or x2).  The scale on y and the aspect ratio of the plot are both ignored.
+ If only two columns are present, the radius is taken from `set style circle`.
+ In this case the radius may be given in graph or screen coordinates.
+ By default a full circle will be drawn.  It is possible to plot arc segments
+ instead of full circles by specifying a start and end angle in the 4th and 5th
+ columns.  An optional 4th or 6th column can specify per-circle color.
  The start and end angles of the circle segments must be specified in degrees.
 
 
@@ -10417,6 +10419,21 @@ Ffigure_mapcontours
 
  will assign linestyle 10 to be a solid cyan line on any terminal that
  supports rgb colors.
+
+4 set style circle
+?commands set style circle
+?commands unset style circle
+?commands show style circle
+?set style circle
+?unset style circle
+?show style circle
+
+ Syntax:
+       set style circle {radius {graph|screen} <R>}
+ 
+ This command sets the default radius used in plot style "with circles".  It
+ applies to data plots with only 2 columns of data (x,y) and to function plots.
+ The default is "set style circle radius graph 0.02".
 
 4 set style rectangle
 ?commands set style rectangle

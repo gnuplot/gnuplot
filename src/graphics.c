@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.328 2010/06/11 03:13:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.329 2010/06/11 17:07:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3770,6 +3770,10 @@ plot_circles(struct curve_points *plot)
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
 	    radius = x - map_x(plot->points[i].xlow);
+	    if (radius < 0) {
+		double junk;
+		map_position_r( &default_circle.o.circle.extent, &radius, &junk, "radius");
+	    }
 
 	    arc_begin = plot->points[i].ylow;
 	    arc_end = plot->points[i].xhigh;
