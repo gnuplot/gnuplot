@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.171.2.5 2010/02/24 22:48:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.171.2.6 2010/05/02 21:00:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -257,6 +257,11 @@ set y2data%s\n",
 	fprintf(fp, "lt %d",default_rectangle.lp_properties.l_type+1);
     fprintf(fp, " fillstyle ");
     save_fillstyle(fp, &default_rectangle.fillstyle);
+
+    /* Default circle properties */
+    fprintf(fp, "set style circle radius ");
+    save_position(fp, &default_circle.o.circle.extent, FALSE);
+    fputs(" \n", fp);
 #endif
 
     if (dgrid3d) {

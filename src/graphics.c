@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.15 2010/04/02 04:49:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.17 2010/06/11 17:12:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3786,6 +3786,10 @@ plot_circles(struct curve_points *plot)
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
 	    radius = x - map_x(plot->points[i].xlow);
+	    if (radius < 0) {
+		double junk;
+		map_position_r( &default_circle.o.circle.extent, &radius, &junk, "radius");
+	    }
 
 	    /* rgb variable  -  color read from data column */
 	    if (!check_for_variable_color(plot, &plot->points[i]) && withborder)

@@ -170,6 +170,7 @@ fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, DEFAULT_COLORSPEC } ;
 #ifdef EAM_OBJECTS
 /* Default rectangle style - background fill, black border */
 struct object default_rectangle = DEFAULT_RECTANGLE_STYLE;
+struct object default_circle = DEFAULT_CIRCLE_STYLE;
 #endif
 
 /* filledcurves style options */

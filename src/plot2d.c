@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.9 2010/05/11 04:25:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.10 2010/06/16 21:49:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -479,7 +479,7 @@ get_data(struct curve_points *current_plot)
 
 #ifdef EAM_OBJECTS
     case CIRCLES:	/* 3 + possible variable color */
-	min_cols = 3;
+        min_cols = 2;
 	max_cols = 4;
 	break;
 #endif
@@ -671,6 +671,12 @@ get_data(struct curve_points *current_plot)
 				      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
 				      v[1], variable_color_value, 0.0);
 
+#ifdef EAM_OBJECTS
+	    } else if (current_plot->plot_style == CIRCLES) {
+		    /* x, y, default radius, full circle */
+		    store2d_point(current_plot, i++, v[0], v[1], v[0]+1., v[0],
+		    		  0., variable_color_value, 360.);
+#endif
 	    } else {
 		    if (current_plot->plot_style == CANDLESTICKS
 			|| current_plot->plot_style == FINANCEBARS) {
@@ -760,8 +766,9 @@ get_data(struct curve_points *current_plot)
 
 #ifdef EAM_OBJECTS
 		case CIRCLES:	/* x, y, radius */
+		    if (v[2] < 0) v[2] = 0;
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
-		    		  v[1], variable_color_value, v[2]);
+		    		  0., variable_color_value, 360.); /* by default a full circle is drawn */
 		    break;
 #endif
 		}               /*inner switch */
@@ -2328,7 +2335,7 @@ eval_plots()
 			    }
 			    /* Fill in additional fields needed to draw a circle */
 			    if (this_plot->plot_style == CIRCLES) {
-				this_plot->points[i].xlow = t;
+				this_plot->points[i].xlow = t+1.;
 				this_plot->points[i].ylow = 0;
 				this_plot->points[i].xhigh = 360;
 			    }

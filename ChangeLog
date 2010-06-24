@@ -1,3 +1,12 @@
+2010-06-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/gadgets.h src/graphics.c src/plot2d.c src/save.c
+	src/set.c src/show.c src/tables.c src/tables.h src/unset.c
+	docs/gnuplot.doc:
+
+	New style element "set style circle radius <R>" specifies a default
+	radius for function plots or 2-column data plots drawn "with circles".
+
 2010-06-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots): Function plots should not be affected by

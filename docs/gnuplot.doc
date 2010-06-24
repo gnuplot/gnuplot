@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.30 2010/05/15 21:45:37 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.31 2010/05/30 18:00:12 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2690,6 +2690,8 @@ Ffigure_circles
  be used to specify color information.  The radius is always interpreted in the
  units of the plot's horizontal axis (x or x2).  The scale on y and the aspect
  ratio of the plot are both ignored.
+ If only two columns are present, the radius is taken from `set style circle`.
+ In this case the radius may be given in graph or screen coordinates.
 
  Example (draws circles whose area is proportional to the value in column 3):
 
@@ -10200,6 +10202,21 @@ Ffigure_mapcontours
 
  will assign linestyle 10 to be a solid cyan line on any terminal that
  supports rgb colors.
+
+4 set style circle
+?commands set style circle
+?commands unset style circle
+?commands show style circle
+?set style circle
+?unset style circle
+?show style circle
+
+ Syntax:
+       set style circle {radius {graph|screen} <R>}
+ 
+ This command sets the default radius used in plot style "with circles".  It
+ applies to data plots with only 2 columns of data (x,y) and to function plots.
+ The default is "set style circle radius graph 0.02".
 
 4 set style rectangle
 ?commands set style rectangle

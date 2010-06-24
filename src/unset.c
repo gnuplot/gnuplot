@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.128.2.1 2009/12/09 05:56:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.128.2.2 2010/05/02 21:00:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -88,6 +88,7 @@ static void delete_label __PROTO((struct text_label * prev, struct text_label * 
 static void unset_object __PROTO((void));
 static void delete_object __PROTO((struct object * prev, struct object * this));
 static void unset_style_rectangle __PROTO(());
+static void unset_style_circle __PROTO(());
 #endif
 static void unset_loadpath __PROTO((void));
 static void unset_locale __PROTO((void));
@@ -1302,6 +1303,7 @@ unset_style()
 	unset_fillstyle();
 #ifdef EAM_OBJECTS
 	unset_style_rectangle();
+	unset_style_circle();
 #endif
 	unset_histogram();
 	c_token++;
@@ -1349,6 +1351,7 @@ unset_style()
 #ifdef EAM_OBJECTS
     case SHOW_STYLE_RECTANGLE:
 	unset_style_rectangle();
+	unset_style_circle();
 	c_token++;
 	break;
 #endif
@@ -1586,6 +1589,7 @@ reset_command()
     while (first_object != NULL)
 	delete_object((struct object *) NULL, first_object);
     unset_style_rectangle();
+    unset_style_circle();
 #endif
 
     /* 'polar', 'parametric' and 'dummy' are interdependent, so be
@@ -1707,6 +1711,13 @@ unset_style_rectangle()
 {
     struct object foo = DEFAULT_RECTANGLE_STYLE;
     default_rectangle = foo;
+    return;
+}
+static void
+unset_style_circle()
+{
+    struct object foo = DEFAULT_CIRCLE_STYLE;
+    default_circle = foo;
     return;
 }
 #endif
