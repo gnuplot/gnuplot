@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.10 2010/06/16 21:49:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.11 2010/06/26 06:43:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -766,9 +766,9 @@ get_data(struct curve_points *current_plot)
 
 #ifdef EAM_OBJECTS
 		case CIRCLES:	/* x, y, radius */
-		    if (v[2] < 0) v[2] = 0;
+		    /* by default a full circle is drawn */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
-		    		  0., variable_color_value, 360.); /* by default a full circle is drawn */
+		    		  0., variable_color_value, 360.);
 		    break;
 #endif
 		}               /*inner switch */
