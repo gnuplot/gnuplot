@@ -1,3 +1,8 @@
+2010-06-26  Peter Juhasz
+
+	* src/plot2d.c: In plots style "with circles", let a negative value for
+	the radius indicate that the default radius should be used.
+
 2010-06-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/gadgets.h src/graphics.c src/plot2d.c src/save.c
