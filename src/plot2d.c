@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.211 2010/06/26 05:43:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.212 2010/06/26 15:15:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -138,13 +138,17 @@ cp_extend(struct curve_points *cp, int num)
 	} else {
 	    cp->points = gp_realloc(cp->points, num * sizeof(cp->points[0]),
 				    "expanding curve points");
+	    if (cp->varcolor)
+		cp->varcolor = gp_realloc(cp->varcolor, num * sizeof(double),
+					"expanding curve variable colors");
 	}
 	cp->p_max = num;
     } else {
-	if (cp->points != NULL)
-	    free(cp->points);
+	free(cp->points);
 	cp->points = NULL;
 	cp->p_max = 0;
+	free(cp->varcolor);
+	cp->varcolor = NULL;
     }
 }
 
@@ -164,10 +168,10 @@ cp_free(struct curve_points *cp)
 	    free(cp->title);
 	if (cp->points)
 	    free(cp->points);
-	if (cp->labels) {
+	if (cp->labels)
 	    free_labels(cp->labels);
-	    cp->labels = (struct text_label *)NULL;
-	}
+	if (cp->varcolor)
+	    free(cp->varcolor);
 	free(cp);
 	cp = next;
     }
@@ -323,15 +327,21 @@ get_data(struct curve_points *current_plot)
     int storetoken = current_plot->token;
     struct coordinate GPHUGE *cp;
 
-    TBOOLEAN variable_color = FALSE;
     double   variable_color_value = 0.;
-    if ((current_plot->lp_properties.pm3d_color.type == TC_RGB)
-    &&  (current_plot->lp_properties.pm3d_color.value < 0))
-	variable_color = TRUE;
-    if (current_plot->lp_properties.pm3d_color.type == TC_Z)
-	variable_color = TRUE;
-    if (current_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
-	variable_color = TRUE;
+
+    if (current_plot->varcolor == NULL) {
+	TBOOLEAN variable_color = FALSE;
+	if ((current_plot->lp_properties.pm3d_color.type == TC_RGB)
+	&&  (current_plot->lp_properties.pm3d_color.value < 0))
+	    variable_color = TRUE;
+	if (current_plot->lp_properties.pm3d_color.type == TC_Z)
+	    variable_color = TRUE;
+	if (current_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
+	    variable_color = TRUE;
+	if (variable_color)
+	    current_plot->varcolor = gp_alloc(current_plot->p_max * sizeof(double),
+		"varcolor array");
+    }
 
     /* eval_plots has already opened file */
 
@@ -352,7 +362,7 @@ get_data(struct curve_points *current_plot)
     case XYERRORBARS:
     case BOXXYERROR:
 	min_cols = 4;
-	max_cols = 7;		/* HBB FIXME 20060427: what's 7th? */
+	max_cols = 7;
 
 	if (df_no_use_specs >= 6) {
 	    /* HBB 20060427: signal 3rd and 4th column are absolute x
@@ -367,7 +377,8 @@ get_data(struct curve_points *current_plot)
     case FINANCEBARS:
 	/* HBB 20000504: use 'z' coordinate for y-axis quantity */
 	current_plot->z_axis = current_plot->y_axis;
-	min_cols = max_cols = 5;
+	min_cols = 5;
+	max_cols = 6;
 	/* HBB 20060427: signal 3rd and 4th column are absolute y data
 	 * --- needed so time/date parsing works */
 	df_axis[2] = df_axis[3] = df_axis[4] = df_axis[1];
@@ -381,19 +392,20 @@ get_data(struct curve_points *current_plot)
     case CANDLESTICKS:
 	current_plot->z_axis = current_plot->y_axis;
 	min_cols = 5;
-	max_cols = 6;
+	max_cols = 7;
 	df_axis[2] = df_axis[3] = df_axis[4] = df_axis[1];
 	break;
 
     case BOXERROR:
-	min_cols = 3;           /* HBB 20040520: fixed, was 4 */
-	max_cols = 5;
+	min_cols = 3;
+	max_cols = 6;
 
-	/* There are four(!) possible cases: */
+	/* There are four possible cases: */
 	/* 3 cols --> (x,y,dy), auto dx */
 	/* 4 cols, boxwidth==-2 --> (x,y,ylow,yhigh), auto dx */
 	/* 4 cols, boxwidth!=-2 --> (x,y,dy,dx) */
 	/* 5 cols --> (x,y,ylow,yhigh,dx) */
+	/* In each case an additional column may hold variable color */
 	if ((df_no_use_specs == 4 && boxwidth == -2)
 	    || df_no_use_specs == 5)
 	    /* HBB 20060427: signal 3rd and 4th column are absolute y
@@ -522,21 +534,50 @@ get_data(struct curve_points *current_plot)
 	    cp_extend(current_plot, i + i + 1000);
 	}
 
-        if (j > 0) {
-            /* Allow for optional columns.  Currently only used for a few styles, */
-            /* but could be extended to a more general mechanism.                 */
-            variable_color_value = 0;
-            if (variable_color) {
-                static char *errmsg = "Not enough columns for variable color";
-                switch (current_plot->plot_style) {
-                case VECTOR:	if (j < 5) int_error(NO_CARET,errmsg);
-                case CIRCLES: 	if ((j != 4) && (j != 6)) int_error(NO_CARET,errmsg);
-                case BOXES:	if (j < 3) int_error(NO_CARET,errmsg);
-                    variable_color_value = v[--j];
-                default:	break;
-                }
-            }
-        }
+	if (j > 0) {
+	    /* June 2010 - New mechanism for variable color                  */
+	    /* If variable color is requested, take the color value from the */
+	    /* final column of input and decrement the column count by one.  */
+	    /* FIXME - the original mechanism is still in place; remove it later! */
+	    variable_color_value = 0;
+	    if (current_plot->varcolor) {
+		static char *errmsg = "Not enough columns for variable color";
+		switch (current_plot->plot_style) {
+
+		case XYERRORLINES:
+		case XYERRORBARS:
+		case BOXXYERROR:
+				if (j < 7) int_error(NO_CARET,errmsg);
+		case CANDLESTICKS:
+		case FINANCEBARS:
+				if (j < 6) int_error(NO_CARET,errmsg);
+		case VECTOR:	
+				if (j < 5) int_error(NO_CARET,errmsg);
+		case LABELPOINTS:
+		case BOXERROR:
+				if (j < 4) int_error(NO_CARET,errmsg);
+		case CIRCLES: 	
+				if ((j != 4) && (j != 6)) int_error(NO_CARET,errmsg);
+		case BOXES:	
+				if (j < 3) int_error(NO_CARET,errmsg);
+
+				variable_color_value = v[--j];
+				current_plot->varcolor[i] = variable_color_value;
+				break;
+		case POINTSTYLE:
+		case LINESPOINTS:
+		case IMPULSES:
+		case LINES:
+		case DOTS:	
+				if (j < 3) int_error(NO_CARET,errmsg);
+				current_plot->varcolor[i] = v[--j];
+				j++; /* FIXME - remove this in a later patch */
+				break;
+		default:
+		    break;
+		}
+	    }
+	}
 	switch (j) {
 	default:
 	    {

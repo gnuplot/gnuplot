@@ -1,3 +1,17 @@
+2010-06-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.h src/graphics.c plot2d.c:  Maintain a dynamically-
+	allocated array of per-datapoint color values in the header of each 2D
+	plot.  The array is allocated only if the plot uses variable color.
+
+	* src/plot2d.c: Store variable color data in the plot->varcolor[] array
+	for plot styles VECTOR CIRCLES BOXES LINES DOTS IMPULSES POINTSTYLE
+	LINESPOINTS XYERRORLINES XYERRORBARS BOXXYERROR LABELPOINTS BOXERROR
+
+	* src/graphics.c (check_for_variable_color):  Convert this routine to
+	check and load variable color using the new mechanism.
+	Add variable color support for BOXXYERROR, BOXERROR
+
 2010-06-26  Peter Juhasz
 
 	* src/plot2d.c: In plots style "with circles", let a negative value for

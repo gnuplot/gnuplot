@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.329 2010/06/11 17:07:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.330 2010/06/26 05:43:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -162,7 +162,7 @@ static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *k
 static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
 				   char *title,  struct termentry *t, int xl, int yl));
 
-static TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, struct coordinate *point));
+static TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, double *colorvalue));
 
 #ifdef EAM_OBJECTS
 static void plot_circles __PROTO((struct curve_points *plot));
@@ -2156,7 +2156,7 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 	}
 
 	/* variable color read from data column */
-	check_for_variable_color(plot, &plot->points[i]);
+	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	if (polar)
 	    (*t->move) (yaxis_x, xaxis_y);
@@ -2183,7 +2183,7 @@ plot_lines(struct curve_points *plot)
     for (i = 0; i < plot->p_count; i++) {
 
 	/* rgb variable  -  color read from data column */
-	check_for_variable_color(plot, &plot->points[i]);
+	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	switch (plot->points[i].type) {
 	case INRANGE:{
@@ -3640,8 +3640,9 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			yb = map_y(dyb);
 
 		/* Variable color */
-		if (plot->plot_style == BOXES) {
-		    check_for_variable_color(plot, &plot->points[i]);
+		if (plot->plot_style == BOXES || plot->plot_style == BOXXYERROR
+		    || plot->plot_style == BOXERROR) {
+		    check_for_variable_color(plot, &plot->varcolor[i]);
 		}
 
 		if ((plot->fill_properties.fillstyle != FS_EMPTY) && t->fillbox) {
@@ -3739,7 +3740,7 @@ plot_points(struct curve_points *plot)
 		}
 
 		/* rgb variable  -  color read from data column */
-		check_for_variable_color(plot, &plot->points[i]);
+		check_for_variable_color(plot, &plot->varcolor[i]);
 
 		(*t->point) (x, y, plot->lp_properties.p_type);
 	    }
@@ -3779,7 +3780,7 @@ plot_circles(struct curve_points *plot)
 	    arc_end = plot->points[i].xhigh;
 	    
 	    /* rgb variable  -  color read from data column */
-	    if (!check_for_variable_color(plot, &plot->points[i]) && withborder)
+	    if (!check_for_variable_color(plot, &plot->varcolor[i]) && withborder)
 		term_apply_lp_properties(&plot->lp_properties);
 	    do_arc(x,y, radius, arc_begin, arc_end, style);
 	    if (withborder) {
@@ -3806,7 +3807,7 @@ plot_dots(struct curve_points *plot)
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
 	    /* rgb variable  -  color read from data column */
-	    check_for_variable_color(plot, &plot->points[i]);
+	    check_for_variable_color(plot, &plot->varcolor[i]);
 	    /* point type -1 is a dot */
 	    (*t->point) (x, y, -1);
 	}
@@ -3839,10 +3840,8 @@ plot_vectors(struct curve_points *plot)
 	points[1].x = plot->points[i].xhigh;
 	points[1].y = plot->points[i].yhigh;
 
-	/* variable color read from extra data column. Most styles */
-	/* have this stored in yhigh, but VECTOR stuffed it into z */
-	points[0].yhigh = points[0].z;
-	check_for_variable_color(plot, &points[0]);
+	/* variable color read from extra data column. */
+	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	if (inrange(points[1].x, X_AXIS.min, X_AXIS.max)
 	    && inrange(points[1].y, Y_AXIS.min, Y_AXIS.max)) {
@@ -5862,18 +5861,21 @@ do_polygon( int dimensions, t_polygon *p, int style )
 #endif
 
 static TBOOLEAN
-check_for_variable_color(struct curve_points *plot, struct coordinate *point)
+check_for_variable_color(struct curve_points *plot, double *colorvalue)
 {
+    if (!plot->varcolor)
+	return FALSE;
+
     if ((plot->lp_properties.pm3d_color.value < 0.0)
     &&  (plot->lp_properties.pm3d_color.type == TC_RGB)) {
-	set_rgbcolor(point->yhigh);
+	set_rgbcolor(*colorvalue);
 	return TRUE;
     } else if (plot->lp_properties.pm3d_color.type == TC_Z) {
-	set_color( cb2gray(point->yhigh) );
+	set_color( cb2gray(*colorvalue) );
 	return TRUE;
     } else if (plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
 	lp_style_type lptmp;
-	lp_use_properties(&lptmp, (int)(point->yhigh));
+	lp_use_properties(&lptmp, (int)(*colorvalue));
 	apply_pm3dcolor(&(lptmp.pm3d_color), term);
 	return TRUE;
     } else
