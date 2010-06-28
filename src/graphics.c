@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.331 2010/06/28 04:28:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.332 2010/06/28 04:46:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3321,8 +3321,15 @@ plot_bars(struct curve_points *plot)
 		    continue;
 	    }
 
+	    /* Check for variable color - June 2010 */
+	    if ((plot->plot_style != HISTOGRAMS)
+		&& (plot->plot_style != FILLEDCURVES)
+		) {
+		check_for_variable_color(plot, &plot->varcolor[i]);
+	    }
+
 	    /* by here everything has been mapped */
-	    if (!polar) {
+	    if (!polar) {		
 		/* HBB 981130: use Igor's routine *only* for polar errorbars */
 		(*t->move) (xM, ylowM);
 		/* draw the main bar */
@@ -3440,7 +3447,10 @@ plot_bars(struct curve_points *plot)
 	    if (!high_inrange && !low_inrange && xlowM == xhighM)
 		/* both out of range on the same side */
 		continue;
-
+		
+	    /* Check for variable color - June 2010 */
+	    check_for_variable_color(plot, &plot->varcolor[i]);
+	    
 	    /* by here everything has been mapped */
 	    (*t->move) (xlowM, yM);
 	    (*t->vector) (xhighM, yM);	/* draw the main bar */
@@ -3953,6 +3963,9 @@ plot_f_bars(struct curve_points *plot)
 	if (!high_inrange && !low_inrange && ylowM == yhighM)
 	    /* both out of range on the same side */
 	    continue;
+	    
+	/* variable color read from extra data column. June 2010 */
+	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	/* by here everything has been mapped */
 	(*t->move) (xM, ylowM);
@@ -4112,6 +4125,9 @@ plot_c_bars(struct curve_points *plot)
 	}
 	if (!open_inrange && !close_inrange && ymin == ymax)
 	    skip_box = TRUE;
+
+	/* variable color read from extra data column. June 2010 */
+	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	/* Reset to original color, if we changed it for the border */
 	if (plot->fill_properties.border_color.type != TC_DEFAULT

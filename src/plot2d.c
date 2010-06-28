@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.213 2010/06/28 04:28:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.214 2010/06/28 04:46:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -405,7 +405,7 @@ get_data(struct curve_points *current_plot)
 	/* 5 cols --> (x,y,ylow,yhigh,dx) */
 	/* In each case an additional column may hold variable color */
 	if ((df_no_use_specs == 4 && boxwidth == -2)
-	    || df_no_use_specs == 5)
+	    || df_no_use_specs >= 5)
 	    /* HBB 20060427: signal 3rd and 4th column are absolute y
 	     * data --- needed so time/date parsing works */
 	    df_axis[2] = df_axis[3] = df_axis[1];
@@ -419,8 +419,8 @@ get_data(struct curve_points *current_plot)
     case XERRORLINES:
     case XERRORBARS:
 	min_cols = 3;
-	max_cols = 4;
-	if (df_no_use_specs == 4)
+	max_cols = 5;
+	if (df_no_use_specs >= 4)
 	    /* HBB 20060427: signal 3rd and 4th column are absolute x
 	     * data --- needed so time/date parsing works */
 	    df_axis[2] = df_axis[3] = df_axis[0];
@@ -429,8 +429,8 @@ get_data(struct curve_points *current_plot)
     case YERRORLINES:
     case YERRORBARS:
 	min_cols = 3;
-	max_cols = 4;
-	if (df_no_use_specs == 4)
+	max_cols = 5;
+	if (df_no_use_specs >= 4)
 	    /* HBB 20060427: signal 3rd and 4th column are absolute y
 	     * data --- needed so time/date parsing works */
 	    df_axis[2] = df_axis[3] = df_axis[1];
@@ -554,6 +554,10 @@ get_data(struct curve_points *current_plot)
 				break;
 		case LABELPOINTS:
 		case BOXERROR:
+		case XERRORLINES:
+		case XERRORBARS:
+		case YERRORLINES:
+		case YERRORBARS:
 				if (j < 4) int_error(NO_CARET,errmsg);
 				break;
 		case CIRCLES: 	

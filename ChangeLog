@@ -8,8 +8,10 @@
 	* demo/varcolor.dem:  General demo and debugging tool for the expanded
 	support of variable color across almost all plot styles.
 
-	NB: Not all of the plot styles are working yet. There is another patch
-	yet to go in this series.
+	* src/graphics.c src/plot2d.c: Implement variable color for
+	*ERRORBARS, *ERRORLINES, FINANCEBARS, CANDLESTICKS
+
+	NB: Not all of the plot styles are working with variable color yet.
 
 2010-06-27  Ethan A Merritt  <merritt@u.washington.edu>
 
