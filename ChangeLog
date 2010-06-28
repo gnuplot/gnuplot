@@ -1,3 +1,16 @@
+2010-06-27  Peter Juhasz
+
+	* src/graphics.c src/plot2d.c: Remove dead code supporting the old way
+	of handling variable color.  Make "lc palette z" work.
+	Since the new variable color mechanism frees up space in struct
+	coordinate, use this to clean up the data storage for "with circles".
+
+	* demo/varcolor.dem:  General demo and debugging tool for the expanded
+	support of variable color across almost all plot styles.
+
+	NB: Not all of the plot styles are working yet. There is another patch
+	yet to go in this series.
+
 2010-06-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.h src/graphics.c plot2d.c:  Maintain a dynamically-

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.212 2010/06/26 15:15:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.213 2010/06/28 04:28:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -327,8 +327,6 @@ get_data(struct curve_points *current_plot)
     int storetoken = current_plot->token;
     struct coordinate GPHUGE *cp;
 
-    double   variable_color_value = 0.;
-
     if (current_plot->varcolor == NULL) {
 	TBOOLEAN variable_color = FALSE;
 	if ((current_plot->lp_properties.pm3d_color.type == TC_RGB)
@@ -538,44 +536,42 @@ get_data(struct curve_points *current_plot)
 	    /* June 2010 - New mechanism for variable color                  */
 	    /* If variable color is requested, take the color value from the */
 	    /* final column of input and decrement the column count by one.  */
-	    /* FIXME - the original mechanism is still in place; remove it later! */
-	    variable_color_value = 0;
 	    if (current_plot->varcolor) {
 		static char *errmsg = "Not enough columns for variable color";
 		switch (current_plot->plot_style) {
 
-		case XYERRORLINES:
-		case XYERRORBARS:
-		case BOXXYERROR:
-				if (j < 7) int_error(NO_CARET,errmsg);
 		case CANDLESTICKS:
 		case FINANCEBARS:
 				if (j < 6) int_error(NO_CARET,errmsg);
+				break;
+		case XYERRORLINES:
+		case XYERRORBARS:
+		case BOXXYERROR:
+				if (j != 7 && j != 5) int_error(NO_CARET,errmsg);
+				break;
 		case VECTOR:	
 				if (j < 5) int_error(NO_CARET,errmsg);
+				break;
 		case LABELPOINTS:
 		case BOXERROR:
 				if (j < 4) int_error(NO_CARET,errmsg);
-		case CIRCLES: 	
-				if ((j != 4) && (j != 6)) int_error(NO_CARET,errmsg);
-		case BOXES:	
-				if (j < 3) int_error(NO_CARET,errmsg);
-
-				variable_color_value = v[--j];
-				current_plot->varcolor[i] = variable_color_value;
 				break;
+		case CIRCLES: 	
+				if (j != 6 && j != 4) int_error(NO_CARET,errmsg);
+				break;
+		case BOXES:	
 		case POINTSTYLE:
 		case LINESPOINTS:
 		case IMPULSES:
 		case LINES:
 		case DOTS:	
 				if (j < 3) int_error(NO_CARET,errmsg);
-				current_plot->varcolor[i] = v[--j];
-				j++; /* FIXME - remove this in a later patch */
 				break;
 		default:
 		    break;
 		}
+
+		current_plot->varcolor[i] = v[--j];
 	    }
 	}
 	switch (j) {
@@ -702,17 +698,17 @@ get_data(struct curve_points *current_plot)
 			double base = axis_array[current_plot->x_axis].base;
 			store2d_point(current_plot, i++, v[0], v[1],
 				      v[0] * pow(base, -boxwidth/2.), v[0] * pow(base, boxwidth/2.),
-				      v[1], variable_color_value, 0.0);
+				      v[1], v[1], 0.0);
 		    } else
 			store2d_point(current_plot, i++, v[0], v[1],
 				      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
-				      v[1], variable_color_value, 0.0);
+				      v[1], v[1], 0.0);
 
 #ifdef EAM_OBJECTS
 	    } else if (current_plot->plot_style == CIRCLES) {
 		    /* x, y, default radius, full circle */
-		    store2d_point(current_plot, i++, v[0], v[1], v[0]+1., v[0],
-		    		  0., variable_color_value, 360.);
+		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
+		    		  0., 360., -1.0);
 #endif
 	    } else {
 		    if (current_plot->plot_style == CANDLESTICKS
@@ -723,7 +719,7 @@ get_data(struct curve_points *current_plot)
 		    /* xlow and xhigh are same as x */
 		    /* auto width if boxes, else ignored */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1],
-				  variable_color_value, -1.0);
+				  v[1], -1.0);
 	    }
 	    break;
 
@@ -770,7 +766,7 @@ get_data(struct curve_points *current_plot)
 		    /* calculate xmin and xmax here, so that logs are taken if if necessary */
 		    store2d_point(current_plot, i++, v[0], v[1],
 				  v[0] - v[2] / 2, v[0] + v[2] / 2,
-				  v[1], variable_color_value, 0.0);
+				  v[1], v[1], 0.0);
 		    break;
 
 		case LABELPOINTS:
@@ -792,25 +788,26 @@ get_data(struct curve_points *current_plot)
 		    i++;
 		    break;
 
-		case POINTSTYLE: /* x, y, variable point size or variable color */
+		case POINTSTYLE: /* x, y, variable point size */
 		case LINESPOINTS:
 		case IMPULSES:
 		case LINES:
 		case DOTS:
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
-				  v[1], v[2], v[2]);
+				  v[1], v[1], v[2]);
 		    break;
 
 		case BOXPLOT:	/* x, y, width */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2]/2., v[0]+v[2]/2.,
-		    		  v[1], variable_color_value, v[2]);
+		    		  v[1], v[1], v[2]);
 		    break;
 
 #ifdef EAM_OBJECTS
 		case CIRCLES:	/* x, y, radius */
 		    /* by default a full circle is drawn */
+		    /* negative radius means default radius -> set flag in width */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
-		    		  0., variable_color_value, 360.);
+		    		  0.0, 360.0, (v[2] >= 0) ? 0.0 : -1.0);
 		    break;
 #endif
 		}               /*inner switch */
@@ -850,7 +847,7 @@ get_data(struct curve_points *current_plot)
 	    case BOXES:
 		/* x, y, xmin, xmax */
 		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3],
-			      v[1], variable_color_value, 0.0);
+			      v[1], v[1], 0.0);
 		break;
 
 	    case XERRORLINES:
@@ -875,13 +872,7 @@ get_data(struct curve_points *current_plot)
 	    case VECTOR:
 		/* x,y,dx,dy */
 		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0] + v[2],
-			      v[1], v[1] + v[3], variable_color_value);
-		break;
-
-	    case POINTSTYLE: /* x, y, variable point size and variable color */
-	    case LINESPOINTS:
-		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
-				  v[1], v[3], v[2]);
+			      v[1], v[1] + v[3], 0.);
 		break;
 
 	    case LABELPOINTS:
@@ -921,8 +912,9 @@ get_data(struct curve_points *current_plot)
 
 #ifdef EAM_OBJECTS
 		case CIRCLES:	/* x, y, radius, arc begin, arc end */
+		    /* negative radius means default radius -> set flag in width */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
-		    		  v[3], variable_color_value, v[4]);
+		    		  v[3], v[4], (v[2] >= 0) ? 0.0 : -1.0);
 		    break;
 #endif	
 
@@ -1098,7 +1090,7 @@ store2d_point(
     case BOXES:			/* auto-scale to xlow xhigh */
     case BOXPLOT:
 	cp->ylow = y;
-	cp->yhigh = yhigh;	/* really variable_color_data */
+	cp->yhigh = yhigh;	
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
@@ -1106,19 +1098,14 @@ store2d_point(
 	break;
 #ifdef EAM_OBJECTS	
 	case CIRCLES:
-	cp->yhigh = yhigh;	/* really variable_color_data */
+	cp->yhigh = yhigh;	
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
 					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);	
-	/* The xlow and xhigh were calculated and passed to this function 
-	 * because they were needed to update the xrange.
-	 * xlow is needed because the radius of the circle is calculated from it.
-	 * However, xhigh is not needed anymore, so we hijack it
-	 * and use it to store the end angle. The start angle is passed in ylow. */
 	cp->ylow = ylow;	/* arc begin */
-	cp->xhigh = width;	/* arc end */
-	if (fabs(ylow) > 1000. || fabs(width) > 1000.)
+	cp->xhigh = yhigh;	/* arc end */
+	if (fabs(ylow) > 1000. || fabs(yhigh) > 1000.) /* safety check for insane arc angles */
 	    cp->type = UNDEFINED;
 	break;
 #endif
@@ -1143,20 +1130,12 @@ store2d_point(
 	cp->z = width;
 
     /* If we have variable color corresponding to a z-axis value, use it to autoscale */
-    /* For CIRCLES, BOXES and BOXPLOT, yhigh is used to pass variable color data 
-     * so we use that to autoscale the color axis. */
+    /* June 2010 - New mechanism for variable color */
     if (current_plot->lp_properties.pm3d_color.type == TC_Z) {
-        if ((current_plot->plot_style == BOXES)
-#ifdef EAM_OBJECTS
-         || (current_plot->plot_style == CIRCLES)
-#endif
-         || (current_plot->plot_style == BOXPLOT))
-            STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, cp->yhigh, dummy_type, COLOR_AXIS, 
-                               current_plot->noautoscale, NOOP, NOOP);
-        else
-            STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, cp->z, dummy_type, COLOR_AXIS, 
-                               current_plot->noautoscale, NOOP, NOOP);
-    }
+	STORE_WITH_LOG_AND_UPDATE_RANGE(current_plot->varcolor[i], current_plot->varcolor[i],
+				dummy_type, COLOR_AXIS, current_plot->noautoscale, NOOP, NOOP);
+    }    
+
 
 }                               /* store2d_point */
 
