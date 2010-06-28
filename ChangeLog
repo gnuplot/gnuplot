@@ -1,6 +1,9 @@
 2010-06-28  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/set.c (set_key):  Accept "set key tc variable"
+	* src/color.h: New flag TC_VARIABLE (only used for textcolor)
+
+	* src/misc.c (parse_colorspec) src/set.c (set_key) 
+	src/graphics.c (do_key_sample):  Accept "set key tc variable"
 
 2010-06-27  Peter Juhasz
 

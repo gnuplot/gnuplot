@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.332 2010/06/28 04:46:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.333 2010/06/28 05:29:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5537,7 +5537,7 @@ do_key_sample(
     else
 	clip_area = &canvas;
 
-    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
+    if (key->textcolor.type == TC_VARIABLE)
 	/* Draw key text in same color as plot */
 	;
     else if (key->textcolor.type != TC_DEFAULT)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.118 2010/05/02 21:56:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.119 2010/06/02 02:42:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1035,7 +1035,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
  * Parse the sub-options of text color specification
  *   { def$ault | lt <linetype> | pal$ette { cb <val> | frac$tion <val> | z }
  * The ordering of alternatives shown in the line above is kept in the symbol definitions
- * TC_DEFAULT TC_LT TC_RGB TC_CB TC_FRAC TC_Z  (0 1 2 3 4 5)
+ * TC_DEFAULT TC_LT TC_LINESTYLE TC_RGB TC_CB TC_FRAC TC_Z TC_VARIABLE (0 1 2 3 4 5 6 7)
  * and the "options" parameter to parse_colorspec limits legal input to the
  * corresponding point in the series. So TC_LT allows only default or linetype
  * coloring, while TC_Z allows all coloring options up to and including pal z
@@ -1122,6 +1122,9 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	    if (options >= TC_Z)
 		tc->type = TC_Z;
 	}
+    } else if (options >= TC_VARIABLE && almost_equals(c_token,"var$iable")) {
+	tc->type = TC_VARIABLE;
+	c_token++;
     } else {
 	int_error(c_token, "colorspec option not recognized");
     }
