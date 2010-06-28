@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.333 2010/06/28 05:29:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.334 2010/06/28 19:07:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3327,6 +3327,11 @@ plot_bars(struct curve_points *plot)
 		) {
 		check_for_variable_color(plot, &plot->varcolor[i]);
 	    }
+	    
+	    /* Error bars should be drawn in the border color for filled boxes
+	     * but only if there *is* a border color. */
+	    if ((plot->plot_style == BOXERROR) && t->fillbox)
+		(void) need_fill_border(&plot->fill_properties);
 
 	    /* by here everything has been mapped */
 	    if (!polar) {		
@@ -4126,9 +4131,6 @@ plot_c_bars(struct curve_points *plot)
 	if (!open_inrange && !close_inrange && ymin == ymax)
 	    skip_box = TRUE;
 
-	/* variable color read from extra data column. June 2010 */
-	check_for_variable_color(plot, &plot->varcolor[i]);
-
 	/* Reset to original color, if we changed it for the border */
 	if (plot->fill_properties.border_color.type != TC_DEFAULT
 	&& !( plot->fill_properties.border_color.type == TC_LT &&
@@ -4137,6 +4139,9 @@ plot_c_bars(struct curve_points *plot)
 		if (plot->lp_properties.use_palette)
 		    apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
 	}
+
+	/* variable color read from extra data column. June 2010 */
+	check_for_variable_color(plot, &plot->varcolor[i]);
 	
 	/* Boxes are always filled if an explicit non-empty fillstyle is set. */
 	/* If the fillstyle is FS_EMPTY, fill to indicate (open > close).     */

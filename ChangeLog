@@ -1,3 +1,8 @@
+2010-06-28  Peter Juhasz
+
+	* src/graphics.c demo/varcolor.dem: Finish variable color for plot
+	style CANDLESTICKS.  Expand the demo.
+
 2010-06-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.h: New flag TC_VARIABLE (only used for textcolor)
