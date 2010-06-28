@@ -1,3 +1,7 @@
+2010-06-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_key):  Accept "set key tc variable"
+
 2010-06-27  Peter Juhasz
 
 	* src/graphics.c src/plot2d.c: Remove dead code supporting the old way
