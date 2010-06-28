@@ -1,3 +1,7 @@
+2010-06-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_key):  Accept "set key tc variable"
+
 2010-06-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/gadgets.h src/graphics.c src/plot2d.c src/save.c
