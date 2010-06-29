@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.214 2010/06/28 04:46:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.215 2010/06/28 05:29:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -778,8 +778,9 @@ get_data(struct curve_points *current_plot)
 		    store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
 				  v[1], -1.0);
 		    /* Allocate and fill in a text_label structure to match it */
-		    store_label(current_plot->labels,
-				&(current_plot->points[i]), i, df_tokens[2], 0.0);
+		    store_label(current_plot->labels, &(current_plot->points[i]), 
+				i, df_tokens[2], 
+				current_plot->varcolor ? current_plot->varcolor[i] : 0.0);
 		    i++;
 		    break;
 
@@ -1331,8 +1332,13 @@ store_label(
     if (tl->textcolor.type == TC_Z)
 	tl->textcolor.value = colorval;
     /* Check for optional (textcolor rgb variable) */
-    else if (tl->textcolor.type == TC_RGB && tl->textcolor.value < 0)
+    else if (listhead->textcolor.type == TC_RGB && listhead->textcolor.value < 0)
 	tl->textcolor.lt = colorval;
+    else if (listhead->textcolor.type == TC_VARIABLE) {
+	struct lp_style_type lptmp;
+	load_linetype(&lptmp, (int)colorval);
+	tl->textcolor = lptmp.pm3d_color;
+    }
 
     /* Check for null string (no label) */
     if (!string)
@@ -1815,29 +1821,6 @@ eval_plots()
 		    continue;
 		}
 
-		/* Labels can have font and text property info as plot options */
-		/* In any case we must allocate one instance of the text style */
-		/* that all labels in the plot will share.                     */
-		if (this_plot->plot_style == LABELPOINTS) {
-		    int stored_token = c_token;
-
-		    if (this_plot->labels == NULL) {
-			this_plot->labels = new_text_label(-1);
-			this_plot->labels->pos = JUST_CENTRE;
-			this_plot->labels->layer = LAYER_PLOTLABELS;
-		    }
-		    parse_label_options(this_plot->labels);
-		    if (stored_token != c_token) {
-			if (set_labelstyle) {
-			    duplication = TRUE;
-			    break;
-			} else {
-			    set_labelstyle = TRUE;
-			    continue;
-			}
-		    }
-		}
-
 		/* pick up line/point specs and other style-specific keywords
 		 * - point spec allowed if style uses points, ie style&2 != 0
 		 * - keywords for lt and pt are optional
@@ -1872,6 +1855,31 @@ eval_plots()
 			    continue;
 			}
 		    }
+		}
+		
+		/* Labels can have font and text property info as plot options */
+		/* In any case we must allocate one instance of the text style */
+		/* that all labels in the plot will share.                     */
+		if (this_plot->plot_style == LABELPOINTS) {
+		    int stored_token = c_token;
+
+		    if (this_plot->labels == NULL) {
+			this_plot->labels = new_text_label(-1);
+			this_plot->labels->pos = JUST_CENTRE;
+			this_plot->labels->layer = LAYER_PLOTLABELS;
+		    }
+		    parse_label_options(this_plot->labels);
+		    if (stored_token != c_token) {
+			if (set_labelstyle) {
+			    duplication = TRUE;
+			    break;
+			} else {
+			    set_labelstyle = TRUE;
+			    continue;
+			}
+		    }
+		    this_plot->lp_properties = this_plot->labels->lp_properties;
+
 		} else {
 		    int stored_token = c_token;
 		    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;

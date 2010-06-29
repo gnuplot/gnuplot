@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.316 2010/06/28 06:09:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.317 2010/06/28 19:08:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5426,7 +5426,7 @@ parse_label_options( struct text_label *this_label )
 
 	if ((equals(c_token,"tc") || almost_equals(c_token,"text$color"))
 	    && ! set_textcolor ) {
-	    parse_colorspec( &textcolor, TC_Z );
+	    parse_colorspec( &textcolor, TC_VARIABLE );
 	    set_textcolor = TRUE;
 	    continue;
 	}

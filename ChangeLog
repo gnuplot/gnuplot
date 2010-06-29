@@ -1,7 +1,12 @@
+2010-06-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (parse_label_options) src/plot2d.c (store_label):
+	Finish variable color support for text color in LABELPOINTS.
+
 2010-06-28  Peter Juhasz
 
-	* src/graphics.c demo/varcolor.dem: Finish variable color for plot
-	style CANDLESTICKS.  Expand the demo.
+	* src/graphics.c demo/varcolor.dem: Finish variable color support
+	for plot style CANDLESTICKS.  Expand the demo.
 
 2010-06-28  Ethan A Merritt  <merritt@u.washington.edu>
 
