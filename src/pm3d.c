@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.77 2009/03/26 00:49:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.78 2010/03/14 22:44:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -1060,7 +1060,9 @@ set_plot_with_palette(int plot_num, int plot_mode)
 	    &&  this_2dplot->lp_properties.pm3d_color.type > TC_RGB)
 		return;
 	    if (this_2dplot->labels
-	    &&  this_2dplot->labels->textcolor.type >= TC_CB)
+	    && (this_2dplot->labels->textcolor.type == TC_CB
+	    ||  this_2dplot->labels->textcolor.type == TC_FRAC
+	    ||  this_2dplot->labels->textcolor.type == TC_Z))
 		return;
 	    this_2dplot = this_2dplot->next;
 	}
