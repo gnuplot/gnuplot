@@ -1,3 +1,8 @@
+2010-06-29  Peter Juhasz
+
+	* docs/gnuplot.doc: Document variable color for plot styles that were
+	not previously supported.
+
 2010-06-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (parse_label_options) src/plot2d.c (store_label):
@@ -27,8 +32,6 @@
 
 	* src/graphics.c src/plot2d.c: Implement variable color for
 	*ERRORBARS, *ERRORLINES, FINANCEBARS, CANDLESTICKS
-
-	NB: Not all of the plot styles are working with variable color yet.
 
 2010-06-27  Ethan A Merritt  <merritt@u.washington.edu>
 

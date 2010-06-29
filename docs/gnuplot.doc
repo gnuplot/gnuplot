@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.613 2010/05/30 18:00:43 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.614 2010/06/26 05:43:28 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2001,7 +2001,7 @@ C ... and restart the table:
        # Use the third column of data to assign colors to individual points
        plot 'data' using 1:2:3 with points lc variable
 
-       # Use the data set index to choose a linestyle color
+       # Use the data set index to choose a line color
        plot 'data' using 1:2:(column(-2)) with lines lc variable
 
 2 mouse input
@@ -2527,6 +2527,10 @@ Ffigure_boxerrorbars
  form "ylow yhigh".  In this case the boxwidth will be calculated so that each
  box touches the adjacent boxes.  The width will also be calculated in cases
  where three-column data are used.
+ 
+ An additional (4th, 5th or 6th) input column may be used to provide variable 
+ (per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
+ The error bar will be drawn in the same color as the border of the box.
 
  The box height is determined from the y error in the same way as it is for
  the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
@@ -2652,6 +2656,9 @@ Ffigure_boxxyerrorbars
  way as they are for the `xyerrorbars` style---either from xlow to xhigh and
  from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
  y+ydelta, depending on how many data columns are provided.
+ 
+ An additional (5th or 7th) input column may be used to provide variable 
+ (per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
 
  The interior of the boxes is drawn according to the current fillstyle.
  See `set style fill` and `boxes` for details.  Alternatively a new fillstyle
@@ -2684,7 +2691,11 @@ Ffigure_candlesticks
  Alternatively, an explicit width for each box-and-whiskers grouping may be
  specified in an optional 6th column of data.  The width must be given in the
  same units as the x coordinate.
-
+ 
+ An additional (6th, or 7th if the 6th column is used for width data)
+ input column may be used to provide variable (per-datapoint) color
+ information (see `linecolor` and `rgbcolor variable`).
+ 
  By default the vertical line segments have no crossbars at the top and
  bottom. If you want crossbars, which are typically used for box-and-whisker
  plots, then add the keyword `whiskerbars` to the plot command.  By default
@@ -2852,6 +2863,9 @@ Ffigure_filledcurves
  data.  It requires 1 x coordinate (usually a date) and 4 y values (prices).
 
       5 columns:   date  open  low  high  close
+
+ An additional (6th) input column may be used to provide variable 
+ (per-record) color information (see `linecolor` and `rgbcolor variable`).
 
 Ffigure_financebars
  The symbol is a vertical line segment, located horizontally at the x
@@ -3274,7 +3288,7 @@ Ffigure_points
  pointsize` may be used to change the default size of the points.
  1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
  required if 3D plots.  See `style lines`.  Additional input columns may be used
- to provide information such as variable point size or line color.
+ to provide information such as variable point size or point color.
 2 steps
 ?commands set style steps
 ?set style steps
@@ -3318,6 +3332,10 @@ Ffigure_steps
       4 columns:  x  y  xdelta  ydelta
       6 columns:  x  y  z  xdelta  ydelta  zdelta
 
+ In both cases, an additional input column (5th in 2D, 7th in 3D) may be used
+ to provide variable (per-datapoint) color information. 
+ (see `linecolor` and `rgbcolor variable`).
+ 
  splot with vectors is supported only for `set mapping cartesian`.
  The keywords "with vectors" may be followed by arrow style specifications.
  See `arrowstyle` for more details.
@@ -3336,7 +3354,7 @@ Ffigure_steps
 ?xerrorbars
 Ffigure_xerrorbars
  The `xerrorbars` style is only relevant to 2D data plots.  `xerrorbars` is
- like `dots`, except that a horizontal error bar is also drawn.  At each point
+ like `points`, except that a horizontal error bar is also drawn.  At each point
  (x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
  (x+xdelta,y), depending on how many data columns are provided.  A tic mark
  is placed at the ends of the error bar (unless `set bars` is used---see
@@ -3344,6 +3362,9 @@ Ffigure_xerrorbars
 
       3 columns:  x  y  xdelta
       4 columns:  x  y  xlow  xhigh
+
+ An additional input column (4th or 5th) may be used to provide information 
+ such as variable point color.
 
 2 xyerrorbars
 ?commands set style xyerrorbars
@@ -3353,7 +3374,7 @@ Ffigure_xerrorbars
 ?xyerrorbars
 Ffigure_xyerrorbars
  The `xyerrorbars` style is only relevant to 2D data plots.  `xyerrorbars` is
- like `dots`, except that horizontal and vertical error bars are also drawn.
+ like `points`, except that horizontal and vertical error bars are also drawn.
  At each point (x,y), lines are drawn from (x,y-ydelta) to (x,y+ydelta) and
  from (x-xdelta,y) to (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from
  (xlow,y) to (xhigh,y), depending upon the number of data columns provided.  A
@@ -3368,6 +3389,10 @@ Ffigure_xyerrorbars
  if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
+       
+ An additional input column (5th or 7th) may be used to provide variable 
+ (per-datapoint) color information. 
+ 
 2 yerrorbars
 ?commands set style yerrorbars
 ?commands set style errorbars
@@ -3388,6 +3413,9 @@ Ffigure_yerrorbars
 
       3 columns:  x  y  ydelta
       4 columns:  x  y  ylow  yhigh
+
+ An additional input column (4th or 5th) may be used to provide information 
+ such as variable point color.
 
  See also
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
@@ -3410,6 +3438,9 @@ Ffigure_xerrorlines
 
       3 columns:  x  y  xdelta
       4 columns:  x  y  xlow  xhigh
+
+ An additional input column (4th or 5th) may be used to provide information 
+ such as variable point color.
 
 2 xyerrorlines
 ?commands set style xyerrorlines
@@ -3435,6 +3466,10 @@ Ffigure_xyerrorlines
  if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
+
+ An additional input column (5th or 7th) may be used to provide variable 
+ (per-datapoint) color information. 
+ 
 2 yerrorlines
 ?commands set style yerrorlines
 ?commands set style errorlines
@@ -3456,6 +3491,9 @@ Ffigure_yerrorlines
 
       3 columns:  x  y  ydelta
       4 columns:  x  y  ylow  yhigh
+
+ An additional input column (4th or 5th) may be used to provide information 
+ such as variable point color.
 
  See also
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
@@ -8188,7 +8226,7 @@ Ffigure_mapcontours
  This entry contains a plot title and a sample line/point/box of the same color
  and fill properties as used in the plot itself.  The font and textcolor
  properties control the appearance of the individual plot titles that appear in
- the key. Setting the textcolor to "rgb variable" causes the text for each key
+ the key. Setting the textcolor to "variable" causes the text for each key
  entry to be the same color as the line or fill color for that plot.
  This was the default in some earlier versions of gnuplot.
 
