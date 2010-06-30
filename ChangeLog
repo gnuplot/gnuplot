@@ -3,6 +3,8 @@
 	* docs/gnuplot.doc: Document variable color for plot styles that were
 	not previously supported.
 
+	* src/plot2d.c: The final piece of "with labels tc variable"
+
 2010-06-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (parse_label_options) src/plot2d.c (store_label)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.215 2010/06/28 05:29:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.216 2010/06/29 16:58:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -878,16 +878,6 @@ get_data(struct curve_points *current_plot)
 		/* x,y,dx,dy */
 		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0] + v[2],
 			      v[1], v[1] + v[3], 0.);
-		break;
-
-	    case LABELPOINTS:
-		/* Load the coords just as we would have for a point plot */
-		store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
-			      v[1], -1.0);
-		/* Allocate and fill in a text_label structure to match it */
-		store_label(current_plot->labels,
-			    &(current_plot->points[i]), i, df_tokens[2], v[3]);
-		i++;
 		break;
 
 	    }                   /*inner switch */
@@ -1878,7 +1868,6 @@ eval_plots()
 			    continue;
 			}
 		    }
-		    this_plot->lp_properties = this_plot->labels->lp_properties;
 
 		} else {
 		    int stored_token = c_token;
@@ -2045,6 +2034,10 @@ eval_plots()
 		    (x_axis == SECOND_X_AXIS) ? second_axes : first_axes;
 		this_plot->labels->place.scaley =
 		    (y_axis == SECOND_Y_AXIS) ? second_axes : first_axes;
+		/* Needed for variable color - June 2010 */
+		this_plot->lp_properties.pm3d_color = this_plot->labels->textcolor;
+	        if (this_plot->labels->textcolor.type == TC_VARIABLE) 
+		    this_plot->lp_properties.l_type = LT_COLORFROMCOLUMN;
 	    }
 
 	    /* Initialize histogram data structure */
