@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.216 2010/06/29 16:58:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.217 2010/06/30 04:25:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -878,6 +878,15 @@ get_data(struct curve_points *current_plot)
 		/* x,y,dx,dy */
 		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0] + v[2],
 			      v[1], v[1] + v[3], 0.);
+		break;
+
+	    case POINTSTYLE:
+	    case LINESPOINTS:
+	    case LABELPOINTS:
+		/* These are here only to catch the case where no using spec */
+		/* is given and there are more than 3 columns in the data file */
+		store2d_point(current_plot, i++, v[0], v[1], 
+				v[0], v[0], v[1], v[1], v[2]);
 		break;
 
 	    }                   /*inner switch */

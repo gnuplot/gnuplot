@@ -1,3 +1,10 @@
+2010-06-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data): Add back the rather useless code that handles
+	four columns of data for styles LINESPOINTS and POINTSTYLE, even though
+	the variable color handling no longer needs it.  It is still called
+	(foolishly) if the plot command is issued with no using spec at all.
+
 2010-06-29  Peter Juhasz
 
 	* docs/gnuplot.doc: Document variable color for plot styles that were
