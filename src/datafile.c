@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.185 2010/06/15 14:29:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.186 2010/07/01 16:50:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4552,28 +4552,12 @@ df_readbinary(double v[], int max)
 		    v[output] = line_count;
 		} else if (column == 0) {
 		    v[output] = df_datum;
-		} else if (column <= 0)
+		} else if (column <= 0) {
 		    int_error(NO_CARET, "internal error: unkown column type");
-		else if ((df_axis[output] != NO_AXIS)
-			 && (axis_array[df_axis[output]].is_timedata)) {
-		    struct tm tm;
-		    double usec = 0.0;
-			
-		    if (column > df_no_cols
-			|| df_column[column - 1].good == DF_MISSING
-			|| !df_column[column - 1].position
-			|| !gstrptime(df_column[column - 1].position,
-				      axis_array[df_axis[output]].timefmt,
-				      &tm, &usec)) {
-			/* line bad only if user explicitly asked
-			 * for this column */
-			if (df_no_use_specs)
-			    line_okay = 0;
-			
-			/* return or ignore line depending on line_okay */
-			break;
-		    }
-		    v[output] = (double) gtimegm(&tm) + usec;
+
+		/* July 2010 - We used to have special code to handle time data. */
+		/* But time data in a binary file is just one more binary value, */
+		/* so let the general case code handle it.                       */
 		} else if ((column <= df_no_cols)
 			   && df_column[column - 1].good == DF_GOOD)
 		    v[output] = df_column[column - 1].datum;
