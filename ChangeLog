@@ -6,6 +6,11 @@
 	like any other binary value.
 	Thanks to Thomas Sefzick for pointing this out.
 
+	* src/datafile.c (df_readbinary): In binary mode, string-valued 
+	functions were silently ignored.  Fix this, thus allowing binary files
+	to be plotted "with labels".  For example: 
+	plot 'foo' binary format='%double' using 0:1:("A") with labels
+
 2010-07-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src/axis.h src/command.c src/datafile.c src/gp_time.h
