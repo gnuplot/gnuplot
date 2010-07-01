@@ -1,6 +1,6 @@
 2010-07-01  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/datafile.c (df_read_binary): Regardless of the current timefmt
+	* src/datafile.c (df_readbinary): Regardless of the current timefmt
 	setting, if we are reading time data from a binary file it will come in
 	as a floating point value rather than as a string.  So we can treat it
 	like any other binary value.
