@@ -1,3 +1,26 @@
+2010-07-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc src/axis.h src/command.c src/datafile.c src/gp_time.h
+	src/internal.c src/time.c:
+
+	Track time coordinates to sub-second precision.
+	
+	Time data read using the %S format specifier in "set timefmt" is now
+	treated as a floating point number rather than an integer. This affects
+	data read from an input file ("set xdata time"), the axis range and tic
+	locations given for an axis using time coordinates ("set xrange",
+	"set xtics"), and time conversions performed via calls to strptime().
+
+	Time data output formats ("set format" strftime()) now accept a 
+	precision modifier to the %S format. For example, "%H:%M:%.3S" will
+	print hour, minute, seconds to a precision of milliseconds.
+	gnuplot> print strftime("%Y %D %H:%M:%.3S", 12345.6789)
+	         2000 01/01/00 03:25:45.679
+
+	The maximum precision allowed for output is 6 digits (microseconds).
+	6 digit accuracy is possible for absolute dates through the year 2550.
+
+
 2010-06-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data): Add back the rather useless code that handles

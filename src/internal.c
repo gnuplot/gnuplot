@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.54 2009/12/05 23:20:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.55 2010/03/06 06:12:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1405,6 +1405,7 @@ f_strptime(union argument *arg)
 {
     struct value fmt, val;
     struct tm time_tm;
+    double usec = 0.0;
     double result;
 
     (void) arg; /* Avoid compiler warnings */
@@ -1419,12 +1420,15 @@ f_strptime(union argument *arg)
 	int_error(NO_CARET, "Internal error: string not allocated");
 
 
-    /* string -> time_tm */
-    gstrptime(val.v.string_val, fmt.v.string_val, &time_tm);
+    /* string -> time_tm  plus extra fractional second */
+    gstrptime(val.v.string_val, fmt.v.string_val, &time_tm, &usec);
 
     /* time_tm -> result */
     result = gtimegm(&time_tm);
     FPRINTF((stderr," strptime result = %g seconds \n", result));
+
+    /* Add back any extra fractional second */
+    result += usec;
 
     gpfree_string(&val);
     gpfree_string(&fmt);

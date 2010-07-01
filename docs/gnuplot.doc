@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.614 2010/06/26 05:43:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.615 2010/06/29 17:07:18 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7672,7 +7672,7 @@ Ffigure_mapcontours
        %r           shorthand for "%I:%M:%S %p" (only output)
        %R           shorthand for "%H:%M" (only output)
        %s           number of seconds since the start of year 2000
-       %S           second, 0--60
+       %S           second, integer 0--60 on output, (double) on input
        %T           shorthand for "%H:%M:%S" (only output)
        %U           week of the year (week starts on Sunday)
        %w           day of the week, 0--6 (Sunday = 0)
@@ -7700,7 +7700,7 @@ Ffigure_mapcontours
 #\verb@%p@ & "am" or "pm" \\
 #\verb@%r@ & shorthand for \verb@"%I:%M:%S %p"@ (only output)\\
 #\verb@%R@ & shorthand for \verb@%H:%M"@ (only output)\\
-#\verb@%S@ & second, 0--60 \\
+#\verb@%S@ & second, integer 0--60 on output, (double) on input\\
 #\verb@%s@ & number of seconds since start of year 2000 \\
 #\verb@%T@ & shorthand for \verb@"%H:%M:%S"@ (only output)\\
 #\verb@%U@ & week of the year (week starts on Sunday) \\
@@ -7728,7 +7728,7 @@ Ffigure_mapcontours
 %%p@"am" or "pm"
 %%r@shorthand for "%I:%M:%S %p" (only output)
 %%R@shorthand for %H:%M" (only output)
-%%S@second, 0--60
+%%S@second, integer 0--60 on output, (double) on input
 %%s@number of seconds since start of year 2000
 %%T@shorthand for "%H:%M:%S" (only output)
 %%U@week of the year (week starts on Sunday)
@@ -7742,8 +7742,10 @@ Ffigure_mapcontours
  Except for the non-numerical formats, these may be preceded by a "0" ("zero",
  not "oh") to pad the field length with leading zeroes, and a positive digit,
  to define the minimum field width (which will be overridden if the specified
- width is not large enough to contain the number).  There is a 24-character
- limit to the length of the printed text; longer strings will be truncated.
+ width is not large enough to contain the number).  The %S format also accepts
+ a precision specifier so that fractional seconds can be written.
+ There is a 24-character limit to the length of the printed text;
+ longer strings will be truncated.
 
  Examples:
 
@@ -7752,8 +7754,8 @@ Ffigure_mapcontours
        set format x "%A, %d %b %Y"  # "Saturday, 25 Dec 1976"
        set format x "%r %D"         # "11:11:11 pm 12/25/76"
 
- Suppose the text is "98/07/06 05:04:03".  Then
-       set format x "%1y/%2m/%3d %01H:%02M:%03S"  # "98/ 7/  6 5:04:003"
+ Suppose the text is "98/07/06 05:04:03.123456".  Then
+       set format x "%1y/%2m/%3d %01H:%02M:%06.3S"  # "98/ 7/  6 5:04:03.123"
 3 function style
 ?set function style
  This form of the command is deprecated. Please see `set style function`.
@@ -10754,7 +10756,7 @@ Ffigure_mapcontours
        %H           hour, 0--24
        %M           minute, 0--60
        %s           seconds since the Unix epoch (1970-01-01, 00:00 UTC)
-       %S           second, 0--60
+       %S           second, integer 0--60 on output, (double) on input
        %b           three-character abbreviation of the name of the month
        %B           name of the month
 #\begin{tabular}{|cl|} \hline
@@ -10769,7 +10771,7 @@ Ffigure_mapcontours
 #\verb@%H@ & hour, 0--24 \\
 #\verb@%M@ & minute, 0--60 \\
 #\verb@%s@ & seconds since the Unix epoch (1970-01-01 00:00 UTC) \\
-#\verb@%S@ & second, 0--60 \\
+#\verb@%S@ & second, integer 0--60 on output, (double) on input \\
 #\verb@%b@ & three-character abbreviation of the name of the month \\
 #\verb@%B@ & name of the month \\
 %c l .
@@ -10783,7 +10785,7 @@ Ffigure_mapcontours
 %%H@hour, 0--24
 %%M@minute, 0--60
 %%s@seconds since the Unix epoch (1970-01-01 00:00 UTC)
-%%S@second, 0--60
+%%S@second, integer 0--60 on output, (double) on input
 %%b@three-character abbreviation of the name of the month
 %%B@name of the month
 %_
@@ -10791,7 +10793,9 @@ Ffigure_mapcontours
  Any character is allowed in the string, but must match exactly.  \t (tab) is
  recognized.  Backslash-octals (\nnn) are converted to char.  If there is no
  separating character between the time/date elements, then %d, %m, %y, %H, %M
- and %S read two digits each, %Y reads four digits and %j reads three digits.
+ and %S read two digits each.  If a decimal point immediately follows the field
+ read by %S, the decimal and any following digits are interpreted as a
+ fractional second.  %Y reads four digits. %j reads three digits.
  %b requires three characters, and %B requires as many as it needs.
 
  Spaces are treated slightly differently.  A space in the string stands for

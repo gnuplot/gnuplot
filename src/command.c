@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.192 2010/02/24 20:38:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.193 2010/03/14 18:01:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1719,6 +1719,7 @@ test_time_subcommand()
     char *string = NULL;
     struct tm tm;
     double secs;
+    double usec;
 
     /* given a format and a time string, exercise the time code */
 
@@ -1727,7 +1728,7 @@ test_time_subcommand()
 	if (isstring(++c_token)) {
 	    m_quote_capture(&string, c_token, c_token);
 	    memset(&tm, 0, sizeof(tm));
-	    gstrptime(string, format, &tm);
+	    gstrptime(string, format, &tm, &usec);
 	    secs = gtimegm(&tm);
 	    fprintf(stderr, "internal = %f - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
 		    secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,

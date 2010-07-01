@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.21 2009/06/06 06:18:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.22 2009/12/25 00:30:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -35,16 +35,15 @@ static char *RCSid() { return RCSid("$Id: time.c,v 1.21 2009/06/06 06:18:20 sfea
 ]*/
 
 
-/* some systems may not implement time very well ; in particular,
- * things might break as the year 2000 approaches.
- * This module either adds a routine gstrptime() to read a formatted time,
+/* This module either adds a routine gstrptime() to read a formatted time,
  * augmenting the standard suite of time routines provided by ansi,
  * or it completely replaces the whole lot with a new set of routines,
  * which count time relative to the year 2000. Default is to use the
- * new routines. define USE_SYSTEM_TIME to use the system routines, at your
+ * new routines. Define USE_SYSTEM_TIME to use the system routines, at your
  * own risk. One problem in particular is that not all systems allow
  * the time with integer value 0 to be represented symbolically, which
- * prevents use of relative times.
+ * prevents use of relative times.  Also, the system routines do not allow
+ * you to read in fractional seconds.
  */
 
 
@@ -138,7 +137,7 @@ static int gdysize __PROTO((int yr));
 
 static int mndday[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-static size_t xstrftime __PROTO((char *buf, size_t bufsz, const char *fmt, struct tm * tm));
+static size_t xstrftime __PROTO((char *buf, size_t bufsz, const char *fmt, struct tm * tm, double usec));
 
 /* days in year */
 static int
@@ -159,7 +158,7 @@ gdysize(int yr)
  * year 2000.... */
 
 char *
-gstrptime(char *s, char *fmt, struct tm *tm)
+gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 {
     int yday, date;
 
@@ -168,6 +167,11 @@ gstrptime(char *s, char *fmt, struct tm *tm)
     tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
     /* make relative times work (user-defined tic step) */
     tm->tm_year = ZERO_YEAR;
+
+    /* Fractional seconds will be returned separately, since
+     * there is no slot for the fraction in struct tm.
+     */
+    *usec = 0.0;
 
     /* we do not yet calculate wday or yday, so make them illegal
      * [but yday will be read by %j]
@@ -275,6 +279,8 @@ gstrptime(char *s, char *fmt, struct tm *tm)
 
 	case 'S':
 	    s = read_int(s, 2, &tm->tm_sec);
+	    if (*s == '.' || (decimalsign && *s == *decimalsign))
+		*usec = atof(s);
 	    break;
 
 	/* read EPOCH data
@@ -395,15 +401,13 @@ size_t
 gstrftime(char *s, size_t bsz, const char *fmt, double l_clock)
 {
     struct tm tm;
+    double usec;
 
     ggmtime(&tm, l_clock);
-#if 0
-    if ((tm.tm_zone = (char *) malloc(strlen(xtm->tm_zone) + 1)))
-	strcpy(tm.tm_zone, xtm->tm_zone);
-    /* printf("zone: %s - %s\n",tm.tm_zone,xtm->tm_zone); */
-#endif
 
-    return xstrftime(s, bsz, fmt, &tm);
+    usec = l_clock - (double)floor(l_clock);
+
+    return xstrftime(s, bsz, fmt, &tm, usec);
 }
 
 
@@ -412,7 +416,8 @@ xstrftime(
     char *str,			/* output buffer */
     size_t bsz,			/* space available */
     const char *fmt,
-    struct tm *tm)
+    struct tm *tm,
+    double usec)
 {
     size_t l = 0;			/* chars written so far */
 
@@ -430,6 +435,7 @@ xstrftime(
 	    /* set up format modifiers */
 	    int w = 0;
 	    int z = 0;
+	    int p = 0;
 
 	    if (*++fmt == '0') {
 		z = 1;
@@ -438,6 +444,14 @@ xstrftime(
 	    while (*fmt >= '0' && *fmt <= '9') {
 		w = w * 10 + (*fmt - '0');
 		++fmt;
+	    }
+	    if (*fmt == '.') {
+		++fmt;
+		while (*fmt >= '0' && *fmt <= '9') {
+		    p = p * 10 + (*fmt - '0');
+		    ++fmt;
+		}
+		if (p > 6) p = 6;
 	    }
 
 	    switch (*fmt++) {
@@ -496,7 +510,7 @@ xstrftime(
 #if 0
 		/* %x not currently supported, so neither is c */
 	    case 'c':
-		if (!xstrftime(s, bsz - l, "%x %X", tm))
+		if (!xstrftime(s, bsz - l, "%x %X", tm, 0.))
 		    return (0);
 		break;
 #endif
@@ -506,12 +520,12 @@ xstrftime(
 		break;
 
 	    case 'D':
-		if (!xstrftime(s, bsz - l, "%m/%d/%y", tm))
+		if (!xstrftime(s, bsz - l, "%m/%d/%y", tm, 0.))
 		    return (0);
 		break;
 
 	    case 'F':
-		if (!xstrftime(s, bsz - l, "%Y-%m-%d", tm))
+		if (!xstrftime(s, bsz - l, "%Y-%m-%d", tm, 0.))
 		    return (0);
 		break;
 
@@ -550,12 +564,12 @@ xstrftime(
 		break;
 
 	    case 'r':
-		if (!xstrftime(s, bsz - l, "%I:%M:%S %p", tm))
+		if (!xstrftime(s, bsz - l, "%I:%M:%S %p", tm, 0.))
 		    return (0);
 		break;
 
 	    case 'R':
-		if (!xstrftime(s, bsz - l, "%H:%M", tm))
+		if (!xstrftime(s, bsz - l, "%H:%M", tm, 0.))
 		    return (0);
 		break;
 
@@ -566,10 +580,19 @@ xstrftime(
 
 	    case 'S':
 		FORMAT_STRING(1, 2, tm->tm_sec);	/* %02d */
+
+		/* EAM FIXME - need to implement an actual format specifier */
+		if (p > 0) {
+		    double base = pow(10.,p);
+		    int msec = floor(0.5 + base * usec);
+		    char *f = &s[strlen(s)];
+		    CHECK_SPACE(p+1);
+		    sprintf(f, ".%0*d", p, msec<(int)base?msec:(int)base-1);
+		}
 		break;
 
 	    case 'T':
-		if (!xstrftime(s, bsz - l, "%H:%M:%S", tm))
+		if (!xstrftime(s, bsz - l, "%H:%M:%S", tm, 0.))
 		    return (0);
 		break;
 
@@ -881,7 +904,7 @@ main(int argc, char *argv[])
 	struct tm *tm;
 	ftime(&now);
 	tm = gmtime(&now.time);
-	xstrftime(output, 80, argv[1], tm);
+	xstrftime(output, 80, argv[1], tm, 0.);
 	puts(output);
     } else {
 	struct tm tm;
