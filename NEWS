@@ -18,6 +18,7 @@ New features, changes and fixes since gnuplot version 4.4.0
 * CHANGE 3D impulses are now always drawn from z=0
 * CHANGE Enable HIDDEN_QUADTREE by default
 * CHANGE Enable "set fit errorvariables" by default
+* CHANGE Regardless of current timefmt, read time from binary files as a binary
 
 Features, changes and fixes in gnuplot version 4.4
 ==================================================
