@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.9 2010/03/21 04:10:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.10 2010/07/01 22:29:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4526,7 +4526,20 @@ df_readbinary(double v[], int max)
 		    if (undefined)
 			return DF_UNDEFINED; 
 
-		    v[output] = real(&a);
+		    if (a.type == STRING) {
+			if (use_spec[output].expected_type == CT_STRING) {
+			    char *s = gp_alloc(strlen(a.v.string_val)+3,"quote");
+			    *s = '"';
+			    strcpy(s+1, a.v.string_val);
+			    strcat(s, "\"");
+			    free(df_stringexpression[output]);
+			    df_tokens[output] = df_stringexpression[output] = s;
+			}
+			gpfree_string(&a);
+		    }
+		    else
+			v[output] = real(&a);
+
 		} else if (column == DF_SCAN_PLANE) {
 		    if ((df_current_plot->plot_style == IMAGE)
 		    ||  (df_current_plot->plot_style == RGBIMAGE))
