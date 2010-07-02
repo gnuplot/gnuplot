@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.65.2.10 2010/02/16 07:05:40 mikulik Exp $
+ * $Id: win.trm,v 1.65.2.11 2010/02/24 20:41:29 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -316,6 +316,9 @@ WIN_options()
 
     if (IsWindow(graphwin.hWndGraph) && IsIconic(graphwin.hWndGraph))
 	ShowWindow(graphwin.hWndGraph, SW_SHOWNORMAL);
+
+    /* font initialization */
+    WIN_set_font(NULL);
 
     graphwin.Title = (WIN_gtitle ? WIN_gtitle : WINGRAPHTITLE);
     if (set_title) GraphChangeTitle(&graphwin);
