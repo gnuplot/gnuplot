@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.232 2010/03/21 00:57:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.233 2010/05/24 21:09:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -437,6 +437,10 @@ boundary3d(struct surface_points *plots, int count)
 	yscaler = (plot_bounds.ytop - plot_bounds.ybot) / surface_scale;
     if (rmargin.scalex == screen || lmargin.scalex == screen)
 	xscaler = (plot_bounds.xright - plot_bounds.xleft) / surface_scale;
+
+    /* EAM Jul 2010 - prevent infinite loop or divide-by-zero if scaling is bad */
+    if (yscaler == 0) yscaler = 1;
+    if (xscaler == 0) xscaler = 1;
 
     /* HBB 20011011: 'set size {square|ratio}' for splots */
     if (splot_map && aspect_ratio != 0.0) {
