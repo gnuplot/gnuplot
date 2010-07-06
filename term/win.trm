@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.76 2010/02/24 20:38:08 sfeam Exp $
+ * $Id: win.trm,v 1.77 2010/07/02 16:27:30 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -875,10 +875,12 @@ WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
     char *original_string = (char *)str;
     unsigned int pass, num_passes;
     char* copy_WIN_font;
+    int copy_WIN_fontsize; /* by Akira Kakuto */
 
     /* If no enhanced text processing is needed, we can use the plain  */
     /* vanilla put_text() routine instead of this fancy recursive one. */
     if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+	WIN_set_font(NULL);
 	WIN_put_text(x,y,str);
 	return;
     }
@@ -904,9 +906,10 @@ WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 	ENHwin_sizeonly = TRUE; 
     }
 
-    /* make a backup copy of the fontname to use 
+    /* make a backup copy of the fontname and size to use 
        for enhanced recursion */
     copy_WIN_font = strdup(WIN_font);
+    copy_WIN_fontsize = WIN_fontsize;
     
     for( pass=1; pass <= num_passes; pass++ ) {
 
@@ -918,7 +921,7 @@ WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 	* we get stuck in an infinite loop) and try again.
 	*/
 	while (*(str = enhanced_recursion((char *)str, TRUE,
-			copy_WIN_font, WIN_fontsize,
+			copy_WIN_font, copy_WIN_fontsize,
 			0.0, TRUE, TRUE, 0))) {
 	    (term->enhanced_flush)();
 
