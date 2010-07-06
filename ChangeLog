@@ -1,3 +1,9 @@
+2010-07-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (boundary3d): Prevent infinite loop or divide-by-zero
+	if the requested plot is so small that x or y dimension goes to zero.
+	Bug #3026145
+
 2010-07-05  Akira Kakuto
 
 	* term/win.trm:  More fixes to font initialization.
