@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.237 2010/05/02 23:47:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.238 2010/06/26 05:43:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -93,6 +93,11 @@ static void show_dummy __PROTO((void));
 static void show_format __PROTO((void));
 static void show_styles __PROTO((const char *name, enum PLOT_STYLE style));
 static void show_style __PROTO((void));
+#ifdef EAM_OBJECTS
+static void show_style_rectangle __PROTO((void));
+static void show_style_circle __PROTO((void));
+static void show_style_ellipse __PROTO((void));
+#endif
 static void show_grid __PROTO((void));
 static void show_zeroaxis __PROTO((AXIS_INDEX));
 static void show_label __PROTO((int tag));
@@ -1478,6 +1483,20 @@ show_style()
 	show_boxplot();
 	c_token++;
 	break;
+#ifdef EAM_OBJECTS
+    case SHOW_STYLE_RECTANGLE:
+	show_style_rectangle();
+	c_token++;
+	break;
+    case SHOW_STYLE_CIRCLE:
+	show_style_circle();
+	c_token++;
+	break;
+    case SHOW_STYLE_ELLIPSE:
+	show_style_ellipse(); 
+	c_token++;
+	break;
+#endif
     default:
 	/* show all styles */
 	show_styles("Data",data_style);
@@ -1489,30 +1508,65 @@ show_style()
 	show_arrowstyle(0);
 	show_boxplot();
 #ifdef EAM_OBJECTS
-	/* Fall through (FIXME: this is ugly) */
-    case SHOW_STYLE_RECTANGLE:
-	fprintf(stderr, "\tRectangle style is %s, fill color ",
-		default_rectangle.layer > 0 ? "front" : 
-		default_rectangle.layer < 0 ? "behind" : "back");
-	if (default_rectangle.lp_properties.use_palette)
-	    save_pm3dcolor(stderr, &default_rectangle.lp_properties.pm3d_color);
-	else if (default_rectangle.lp_properties.l_type == LT_BACKGROUND)
-	    fprintf(stderr, "background");
-	else
-	    fprintf(stderr, "lt %d",default_rectangle.lp_properties.l_type+1);
-	fprintf(stderr, ", lw %.1f ", default_rectangle.lp_properties.l_width);
-	fprintf(stderr, ", fillstyle");
-	save_fillstyle(stderr, &default_rectangle.fillstyle);
-    case SHOW_STYLE_CIRCLE:
-	fprintf(stderr, "\tCircle style has default radius ");
-	show_position(&default_circle.o.circle.extent);
-
-	c_token++;
+	show_style_rectangle();
+	show_style_circle();
+	show_style_ellipse();
 #endif
 	break;
     }
 #undef CHECK_TAG_GT_ZERO
 }
+
+#ifdef EAM_OBJECTS
+/* called by show_style() - defined for aesthetic reasons */
+static void
+show_style_rectangle() 
+{
+    SHOW_ALL_NL;
+    fprintf(stderr, "\tRectangle style is %s, fill color ",
+		default_rectangle.layer > 0 ? "front" : 
+		default_rectangle.layer < 0 ? "behind" : "back");
+    if (default_rectangle.lp_properties.use_palette)
+	save_pm3dcolor(stderr, &default_rectangle.lp_properties.pm3d_color);
+    else if (default_rectangle.lp_properties.l_type == LT_BACKGROUND)
+	fprintf(stderr, "background");
+    else
+	fprintf(stderr, "lt %d",default_rectangle.lp_properties.l_type+1);
+    fprintf(stderr, ", lw %.1f ", default_rectangle.lp_properties.l_width);
+    fprintf(stderr, ", fillstyle");
+    save_fillstyle(stderr, &default_rectangle.fillstyle);
+}
+
+static void
+show_style_circle()
+{
+    SHOW_ALL_NL;
+    fprintf(stderr, "\tCircle style has default radius ");
+    show_position(&default_circle.o.circle.extent);
+    fputs("\n", stderr);
+}
+
+static void
+show_style_ellipse() 
+{
+    SHOW_ALL_NL;
+    fprintf(stderr, "\tEllipse style has default size ");
+    show_position(&default_ellipse.o.ellipse.extent);
+    fprintf(stderr, ", default angle is %.1f degrees", default_ellipse.o.ellipse.orientation);
+    
+    switch (default_ellipse.o.ellipse.type) {
+        case ELLIPSEAXES_XY:
+            fputs(", diameters are in different units (major: x axis, minor: y axis)\n", stderr);
+	    break;
+	case ELLIPSEAXES_XX:
+	    fputs(", both diameters are in the same units as the x axis\n", stderr);
+	    break;
+	case ELLIPSEAXES_YY:
+	    fputs(", both diameters are in the same units as the y axis\n", stderr);
+	    break;
+    }
+}
+#endif
 
 /* called by show_data() and show_func() */
 static void

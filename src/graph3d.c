@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.233 2010/05/24 21:09:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.234 2010/07/07 05:12:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1056,7 +1056,10 @@ do_3dplot(
 	    case CANDLESTICKS:	/* HBB: ditto */
 	    case BOXPLOT:
 	    case FINANCEBARS:
+#ifdef EAM_OBJECTS
 	    case CIRCLES:
+	    case ELLIPSES:
+#endif
 	    case POINTSTYLE:
 		if (draw_surface && !this_plot->opt_out_of_surface) {
 		    if (lkey) {
@@ -1209,7 +1212,10 @@ do_3dplot(
 		    case CANDLESTICKS:	/* HBB: ditto */
 		    case BOXPLOT:
 		    case FINANCEBARS:
+#ifdef EAM_OBJECTS
 		    case CIRCLES:
+		    case ELLIPSES:
+#endif
 		    case POINTSTYLE:
 			if (this_plot->lp_properties.use_palette)
 			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
@@ -1277,7 +1283,10 @@ do_3dplot(
 			    case CANDLESTICKS:	/* HBB: ditto */
 			    case BOXPLOT:
 			    case FINANCEBARS:
+#ifdef EAM_OBJECTS
 			    case CIRCLES:
+			    case ELLIPSES:
+#endif
 			    case POINTSTYLE:
 				if (this_plot->lp_properties.use_palette)
 				    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
@@ -1332,7 +1341,10 @@ do_3dplot(
 		    case BOXXYERROR:
 		    case CANDLESTICKS:
 		    case FINANCEBARS:
+#ifdef EAM_OBJECTS
 		    case CIRCLES:
+		    case ELLIPSES:		    
+#endif
 			/* treat all the above like points */
 		    case DOTS:
 		    case POINTSTYLE:

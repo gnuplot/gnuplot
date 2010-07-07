@@ -1,3 +1,14 @@
+2010-07-07  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/datafile.c src/gadgets.c src/gadgets.h src/gp_types.h
+	src/graph3d.c src/graphics.c src/graphics.h src/plot2d.c src/save.c
+	src/set.c src/show.c src/tables.c src/tables.h src/unset.c:
+
+	* docs/gnuplot.doc docs/plotstyles.gnu demo/all.dem demo/ellipses.dat
+	demo/ellipses_style.dem demo/orbital_elements.dat demo/orbits.dem
+
+	New plot style "with ellipses".  Demos and documentation to match.
+
 2010-07-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps:  Add a default definition 

@@ -116,6 +116,8 @@ typedef struct rectangle {
     t_position tr;		/* top right */
 } t_rectangle;
 
+#define DEFAULT_RADIUS (-1.0)
+#define DEFAULT_ELLIPSE (-2.0)
 typedef struct circle {
     int type;			/* not used */
     t_position center;		/* center */
@@ -124,8 +126,11 @@ typedef struct circle {
     double arc_end;
 } t_circle;
 
+#define ELLIPSEAXES_XY (0)
+#define ELLIPSEAXES_XX (1)
+#define ELLIPSEAXES_YY (2)
 typedef struct ellipse {
-    int type;			/* not used */
+    int type;			/* mapping of axes: ELLIPSEAXES_XY, ELLIPSEAXES_XX or ELLIPSEAXES_YY */
     t_position center;		/* center */
     t_position extent;		/* major and minor axes */
     double orientation;		/* angle of first axis to horizontal */
@@ -474,10 +479,11 @@ extern struct object default_circle;
 	{1, LT_BACKGROUND, 0, 0, 1.0, 0.0, FALSE, DEFAULT_COLORSPEC},			\
 	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360. }} }
 
-#define DEFAULT_ELLIPSE_STYLE { NULL, -1, 0, OBJ_CIRCLE,       \
+extern struct object default_ellipse;
+#define DEFAULT_ELLIPSE_STYLE { NULL, -1, 0, OBJ_ELLIPSE,       \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
 	{1, LT_BACKGROUND, 0, 0, 1.0, 0.0, FALSE, DEFAULT_COLORSPEC}, \
-	{.ellipse = {1, {0,0,0,0.,0.,0.}, {0,0,0,0.,0.,0.}, 0. }} }
+	{.ellipse = {ELLIPSEAXES_XY, {0,0,0,0.,0.,0.}, {graph,graph,0,0.05,0.03,0.}, 0. }} }
 
 #define DEFAULT_POLYGON_STYLE { NULL, -1, 0, OBJ_POLYGON,       \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\

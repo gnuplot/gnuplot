@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.48 2010/03/14 18:01:46 sfeam Exp $
+ * $Id: graphics.h,v 1.49 2010/06/28 04:28:49 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -62,8 +62,8 @@ typedef struct curve_points {
     struct t_image image_properties;	/* only used if plot_style is IMAGE or RGB_IMAGE */
 
     /* 2D and 3D plot structure fields overlay only to this point */
-
     filledcurves_opts filledcurves_options;
+    int ellipseaxes_units;              /* Only used if plot_style == ELLIPSES */    
     struct histogram_style *histogram;	/* Only used if plot_style == HISTOGRAM */
     int histogram_sequence;	/* Ordering of this dataset within the histogram */
     enum PLOT_SMOOTH plot_smooth; /* which "smooth" method to be used? */
@@ -104,7 +104,7 @@ void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN update_axes));
 
 #ifdef EAM_OBJECTS
 void place_objects __PROTO((struct object *listhead, int layer, int dimensions, BoundingBox *clip_area));
-void do_ellipse __PROTO((int dimensions, t_ellipse *e, int style ));
+void do_ellipse __PROTO((int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping ));
 void do_polygon __PROTO((int dimensions, t_polygon *p, int style ));
 #else
 #define place_objects(listhead,layer,dimensions,clip_area) /* void() */

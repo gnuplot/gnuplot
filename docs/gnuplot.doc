@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.615 2010/06/29 17:07:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.616 2010/07/01 16:50:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -267,8 +267,9 @@ C
 =ellipse
 =polygon
  The `set object` command can now be used to define fixed circles, ellipses, and
- polygons as well as rectangles. There is a corresponding new plot style
- `plot with circles`.  See `circle`, `ellipse` and `polygon`.
+ polygons as well as rectangles. There are two corresponding new plot styles:
+ `plot with circles` and `plot with ellipses`.  
+ See `circle`, `ellipse` and `polygon`.
 
 3 New or revised terminal drivers
  Two new drivers based on the cairo and pango libraries are included,
@@ -2773,6 +2774,60 @@ Ffigure_circles
  The result is similar to using a `points` plot with variable size points and
  pointstyle 7, except that the circles will scale with the x axis range.
  See also `set object circle` and `fillstyle`.
+2 ellipses
+?plotting styles ellipses
+?style ellipses
+?ellipses
+Ffigure_ellipses
+ The `ellipses` style plots an ellipse at each data point.  This style is
+ only relevant for 2D plotting.  Each ellipse is described in terms of its
+ center, major and minor diameters, and the angle between its major diameter
+ and the x axis.
+
+      2 columns: x y
+      3 columns: x y major_diam
+      4 columns: x y major_diam minor_diam
+      5 columns: x y major_diam minor_diam angle
+
+ If only two input columns are present, they are taken as the coordinates of
+ the centers, and the ellipses will be drawn with the default extent
+ (see `set style ellipse`).  The orientation of the ellipse, which is
+ defined as the angle between the major diameter and the plot's x axis,
+ is taken from the default ellipse style (see `set style ellipse`).
+ If three input columns are provided, the third column is used for both
+ diameters.  The orientation angle defaults to zero.
+ If four columns are present, they are interpreted as x, y, major diameter,
+ minor diameter.  Note that these are diameters, not radii.
+ An optional 5th column may be used to specify the orientation angle 
+ in degrees. 
+ The ellipses will also be drawn with their default extent if either of the 
+ supplied diameters in the 3-4-5 column form is negative.
+
+ In all of the above cases, optional variable color data may be given in an
+ additional last (3th, 4th, 5th or 6th) column. See `colorspec` for further
+ information.
+
+ By default, the major diameter is interpreted in the units of the plot's
+ horizontal axis (x or x2) while the minor diameter in that of the vertical
+ (y or y2).  This implies that if the x and y axis scales are not equal,
+ then the major/minor diameter ratio will no longer be correct after rotation.
+ This behavior can be changed with the `units` keyword, however. 
+
+ There are three alternatives: 
+ if `units xy` is included in the plot specification, the axes will be scaled
+ as described above. `units xx` ensures that both diameters are interpreted
+ in units of the x axis, while `units yy` means that both diameters are
+ interpreted in units of the y axis. In the latter two cases the ellipses
+ will have the correct aspect ratio, even if the plot is resized.
+
+ If `units` is omitted, the default setting will be used, which is equivalent
+ to `units xy`. This can be redefined by `set style ellipse`.
+
+ Example (draws ellipses, cycling through the available line types):
+
+     plot 'data' using 1:2:3:4:(0):0 with ellipses
+
+ See also `set object ellipse`, `set style ellipse` and `fillstyle`.
 2 dots
 ?commands set style dots
 ?set style dots
@@ -5864,8 +5919,9 @@ Ffigure_mapcontours
                                         vectors
  or
        boxes            candlesticks   image      circles
-       boxerrorbars     filledcurves   rgbimage
+       boxerrorbars     filledcurves   rgbimage   ellipses
        boxxyerrorbars   histograms     rgbalpha   pm3d
+       boxplot
 
  The first group of styles have associated line, point, and text properties.
  The second group of styles also have fill properties.  See `fillstyle`.  Some
@@ -9017,6 +9073,7 @@ Ffigure_mapcontours
 
      # Return fill and color to the default style but leave vertices unchanged
      set object 2 rect default
+
 4 ellipse
 ?ellipse
 ?commands set object ellipse
@@ -9025,7 +9082,7 @@ Ffigure_mapcontours
 ?show object ellipse
  Syntax:
      set object <index> ellipse {at|center} <position> size <w>,<h>
-         {angle <orientation>}
+         {angle <orientation>} {units xy|xx|yy}
          {<other-object-properties>}
 
  The position of the ellipse is specified by giving the center followed by
@@ -9033,19 +9090,32 @@ Ffigure_mapcontours
  `at` and `center` are synonyms.  The center position may be given in axis,
  graph, or screen coordinates. See `coordinates`. The major and minor axis
  lengths must be given in axis coordinates.  The orientation of the ellipse
- is specified by the angle between the horizontal axis and the first axis
- of the ellipse.  NB: If the x and y axis scales are not equal, then the
- major/minor axis ratio will no longer be correct after rotation. This may
- be fixed in a later gnuplot version.
+ is specified by the angle between the horizontal axis and the major diameter
+ of the ellipse.  If no angle is given, the default ellipse orientation
+ will be used instead (see `set style ellipse`).  The `units` keyword
+ controls the scaling of the axes of the ellipse. `units xy` means that the
+ major axis is interpreted in terms of units along the x axis, while the 
+ minor axis in that of the y axis. `units xx` means that both axes of the 
+ ellipses are scaled in the units of the x axis, while `units yy` means 
+ that both axes are in units of the y axis. 
+ The default is `xy` or whatever `set style ellipse units` was set to.
+ 
+ NB: If the x and y axis scales are not equal, (e.g. `units xy` is in
+ effect) then the major/minor axis ratio will no longer be correct after
+ rotation.
 
  Note that `set object ellipse size <2r>,<2r>` does not in general produce
  the same result as `set object circle <r>`.  The circle radius is always
  interpreted in terms of units along the x axis, and will always produce a
  circle even if the x and y axis scales are different and even if the aspect
- ratio of your plot is not 1.  'Set object ellipse' interprets the first '2r'
- in terms of x axis units and the second '2r' in terms of y axis units.
- This will only produce a circle if the x and y axis scales are identical and
- the plot aspect ratio is 1.
+ ratio of your plot is not 1.  If `units` is set to `xy`, then
+ 'set object ellipse' interprets the first <2r> in terms of x axis units 
+ and the second '2r' in terms of y axis units. This will only produce a
+ circle if the x and y axis scales are identical and the plot aspect ratio
+ is 1.  On the other hand, if `units` is set to `xx` or `yy`, then the
+ diameters specified in the 'set object' command will be interpreted in the
+ same units, so the ellipse will have the correct aspect ration, and it will
+ maintain its aspect ration even if the plot is resized.
 
 4 circle
 ?circle
@@ -10074,6 +10144,14 @@ Ffigure_mapcontours
        set style histogram <histogram style options>
        set style line <n> <linestyle>
 
+ If `gnuplot` was built with the support of objects, then the following
+ options are also available:
+ 
+ Syntax:
+       set style rectangle <object options> <linestyle> <fillstyle>
+       set style circle radius <size>
+       set style ellipse size <size> units {xy|xx|yy}
+
 4 set style arrow
 ?commands set style arrow
 ?commands unset style arrow
@@ -10499,6 +10577,51 @@ Ffigure_mapcontours
 
  The default values correspond to solid fill with the background color and a
  black border.
+
+4 set style ellipse
+?commands set style ellipse
+?commands show style ellipse
+?commands set style ellipse
+?set style ellipse
+?unset style ellipse
+?show style ellipse
+
+ Syntax:
+       set style ellipse {units xx|xy|yy}
+                         {size {graph|screen} <a>, {{graph|screen} <b>}}
+                         {angle <angle>}
+
+ This command governs whether the diameters of ellipses are interpreted in
+ the same units or not.
+ Default is `xy`, which means that the major diameter (first axis) of
+ ellipses will be interpreted in the same units as the x (or x2) axis,
+ while the minor (second) diameter in those of the y (or y2) axis.  
+ In this mode the ratio of the ellipse axes depends on the scales of the
+ plot axes and aspect ratio of the plot.  When set to `xx` or `yy`,
+ both axes of all ellipses will be interpreted in the same units.
+ This means that the ratio of the axes of the plotted ellipses will be
+ correct even after rotation, but either their vertical or horizontal extent
+ will not be correct.
+ 
+ This is a global setting that affects all ellipses, both those defined as
+ objects and those generated with the `plot` command, however, the value of
+ `units` can also be redefined on a per-plot and per-object basis.
+
+ It is also possible to set a default size for ellipses with the `size` 
+ keyword.  This default size applies to data plots with only 
+ 2 columns of data (x,y) and to function plots.  The two values are 
+ interpreted as the major and minor diameters (as opposed to semi-major 
+ and semi-minor axes) of the ellipse.
+
+ The default is "set style ellipse size graph 0.05,0.03".
+
+ Last, but not least it is possible to set the default orientation with the
+ `angle` keyword. The orientation, which is defined as the angle between the
+ major axis of the ellipse and the plot's x axis, must be given in degrees.
+
+
+ For defining ellipse objects, see `set object ellipse`;
+ for the 2D plot style, see `ellipses`.
 
 3 surface
 ?commands set surface

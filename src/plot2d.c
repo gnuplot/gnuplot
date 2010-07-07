@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.217 2010/06/30 04:25:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.218 2010/07/01 04:20:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -487,7 +487,12 @@ get_data(struct curve_points *current_plot)
     case CIRCLES:	/* 3 + possible variable color, or 5 + possible variable color */
         min_cols = 2;
         max_cols = 6;
-        break;	
+        break;
+
+	case ELLIPSES:
+	    min_cols = 2; /* x, y, major axis, minor axis */
+	    max_cols = 6; /* + optional angle, possible variable color */
+	    break;
 #endif
 
     case POINTSTYLE:
@@ -560,9 +565,12 @@ get_data(struct curve_points *current_plot)
 		case YERRORBARS:
 				if (j < 4) int_error(NO_CARET,errmsg);
 				break;
+#ifdef EAM_OBJECTS
 		case CIRCLES: 	
-				if (j != 6 && j != 4) int_error(NO_CARET,errmsg);
+				if (j == 5 || j < 3) int_error(NO_CARET,errmsg);
 				break;
+		case ELLIPSES:	
+#endif
 		case BOXES:	
 		case POINTSTYLE:
 		case LINESPOINTS:
@@ -712,7 +720,12 @@ get_data(struct curve_points *current_plot)
 	    } else if (current_plot->plot_style == CIRCLES) {
 		    /* x, y, default radius, full circle */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
-		    		  0., 360., -1.0);
+		    		  0., 360., DEFAULT_RADIUS);
+		}  else if (current_plot->plot_style == ELLIPSES) {
+			/* x, y, major axis = minor axis = default, default orientation */
+		    store2d_point(current_plot, i++, v[0], v[1], 0.0, 0.0,
+		    		  0.0, 0.0, DEFAULT_ELLIPSE);
+
 #endif
 	    } else {
 		    if (current_plot->plot_style == CANDLESTICKS
@@ -812,7 +825,12 @@ get_data(struct curve_points *current_plot)
 		    /* by default a full circle is drawn */
 		    /* negative radius means default radius -> set flag in width */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
-		    		  0.0, 360.0, (v[2] >= 0) ? 0.0 : -1.0);
+		    		  0.0, 360.0, (v[2] >= 0) ? 0.0 : DEFAULT_RADIUS);
+		    break;
+
+		case ELLIPSES:	/* x, y, major axis = minor axis, 0 as orientation */
+		    store2d_point(current_plot, i++, v[0], v[1], fabs(v[2]), fabs(v[2]),
+		    		  0.0, v[2], (v[2] >= 0) ? 0.0 : DEFAULT_RADIUS);
 		    break;
 #endif
 		}               /*inner switch */
@@ -889,6 +907,14 @@ get_data(struct curve_points *current_plot)
 				v[0], v[0], v[1], v[1], v[2]);
 		break;
 
+
+#ifdef EAM_OBJECTS
+	    case ELLIPSES:	/* x, y, major axis, minor axis, 0 as orientation */
+		store2d_point(current_plot, i++, v[0], v[1], fabs(v[2]), fabs(v[3]),
+				0.0, v[2], ((v[2] >= 0) && (v[3] >= 0)) ? 0.0 : DEFAULT_RADIUS);
+		break;
+#endif	
+
 	    }                   /*inner switch */
 
 	    break;
@@ -918,7 +944,12 @@ get_data(struct curve_points *current_plot)
 		case CIRCLES:	/* x, y, radius, arc begin, arc end */
 		    /* negative radius means default radius -> set flag in width */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
-		    		  v[3], v[4], (v[2] >= 0) ? 0.0 : -1.0);
+		    		  v[3], v[4], (v[2] >= 0) ? 0.0 : DEFAULT_RADIUS);
+		    break;
+
+		case ELLIPSES:	/* x, y, major axis, minor axis, orientation */
+		    store2d_point(current_plot, i++, v[0], v[1], fabs(v[2]), fabs(v[3]),
+		    		  v[4], v[2], ((v[2] >= 0) && (v[3] >= 0)) ? 0.0 : DEFAULT_RADIUS);
 		    break;
 #endif	
 
@@ -1112,7 +1143,39 @@ store2d_point(
 	if (fabs(ylow) > 1000. || fabs(yhigh) > 1000.) /* safety check for insane arc angles */
 	    cp->type = UNDEFINED;
 	break;
+	case ELLIPSES:
+	/* We want to pass the parameters to the ellipse drawing routine as they are, 
+	 * so we have to calculate the extent of the ellipses for autoscaling here. 
+	 * Properly calculating the correct extent of a rotated ellipse, respecting 
+	 * axis scales and all would be very hard. 
+	 * So we just use the larger of the two axes, multiplied by some empirical factors 
+	 * to ensure^Whope that all parts of the ellipses will be in the auto-scaled area. */
+	/* xlow = major axis, xhigh = minor axis, ylow = orientation */
+#define YRANGE_FACTOR ((current_plot->ellipseaxes_units == ELLIPSEAXES_YY) ? 1.0 : 1.4)
+#define XRANGE_FACTOR ((current_plot->ellipseaxes_units == ELLIPSEAXES_XX) ? 1.1 : 1.0)
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, x-0.5*GPMAX(xlow, xhigh)*XRANGE_FACTOR, 
+					dummy_type, current_plot->x_axis, 
+					current_plot->noautoscale, NOOP, 
+					cp->xlow = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, x+0.5*GPMAX(xlow, xhigh)*XRANGE_FACTOR, 
+					dummy_type, current_plot->x_axis, 
+					current_plot->noautoscale, NOOP, 
+					cp->xhigh = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->ylow, y-0.5*GPMAX(xlow, xhigh)*YRANGE_FACTOR, 
+					dummy_type, current_plot->y_axis, 
+					current_plot->noautoscale, NOOP, 
+					cp->ylow = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, y+0.5*GPMAX(xlow, xhigh)*YRANGE_FACTOR, 
+					dummy_type, current_plot->y_axis, 
+					current_plot->noautoscale, NOOP, 
+					cp->yhigh = -VERYLARGE);
+	/* So after updating the axes we re-store the parameters */
+	cp->xlow = xlow;    /* major axis */
+	cp->xhigh = xhigh;  /* minor axis */
+	cp->ylow = ylow;    /* orientation */
+	break;	
 #endif
+
     default:			/* auto-scale to xlow xhigh ylow yhigh */
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
@@ -1604,6 +1667,9 @@ eval_plots()
 	    TBOOLEAN set_with = FALSE, set_lpstyle = FALSE;
 	    TBOOLEAN set_fillstyle = FALSE;
 	    TBOOLEAN set_labelstyle = FALSE;
+#ifdef EAM_OBJECTS
+	    TBOOLEAN set_ellipseaxes_units = FALSE;
+#endif
 
 	    plot_num++;
 
@@ -1856,6 +1922,38 @@ eval_plots()
 		    }
 		}
 		
+#ifdef EAM_OBJECTS
+		/* pick up the special 'units' keyword the 'ellipses' style allows */
+		if (this_plot->plot_style == ELLIPSES) {
+		    int stored_token = c_token;
+		    
+		    if (!set_ellipseaxes_units)
+		        this_plot->ellipseaxes_units = default_ellipse.o.ellipse.type;
+		    if (almost_equals(c_token,"unit$s")) {
+			c_token++;
+		        if (equals(c_token,"xy")) {
+	                    this_plot->ellipseaxes_units = ELLIPSEAXES_XY;
+	                } else if (equals(c_token,"xx")) {
+	                    this_plot->ellipseaxes_units = ELLIPSEAXES_XX;
+	                } else if (equals(c_token,"yy")) {
+	                    this_plot->ellipseaxes_units = ELLIPSEAXES_YY;
+	                } else {
+	                    int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
+	                }
+	                c_token++;
+		    }
+		    if (stored_token != c_token) {
+			if (set_ellipseaxes_units) {
+			    duplication=TRUE;
+			    break;
+			} else {
+			    set_ellipseaxes_units = TRUE;
+			    continue;
+			}
+		    }
+		}		
+#endif
+
 		/* Labels can have font and text property info as plot options */
 		/* In any case we must allocate one instance of the text style */
 		/* that all labels in the plot will share.                     */
@@ -2460,11 +2558,16 @@ eval_plots()
 								    this_plot->noautoscale, NOOP, NOOP );
 			    }
 			    /* Fill in additional fields needed to draw a circle */
+#ifdef EAM_OBJECTS
 			    if (this_plot->plot_style == CIRCLES) {
-				this_plot->points[i].xlow = t+1.;
+				this_plot->points[i].z = DEFAULT_RADIUS;
 				this_plot->points[i].ylow = 0;
 				this_plot->points[i].xhigh = 360;
+			    } else if (this_plot->plot_style == ELLIPSES) {
+				this_plot->points[i].z = DEFAULT_RADIUS;
+				this_plot->points[i].ylow = default_ellipse.o.ellipse.orientation;
 			    }
+#endif	
 
 			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, in_parametric ? x_axis : y_axis,
 			    				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);

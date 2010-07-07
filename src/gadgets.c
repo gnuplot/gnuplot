@@ -172,6 +172,7 @@ fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, DEFAULT_COLORSPEC } ;
 /* Default rectangle style - background fill, black border */
 struct object default_rectangle = DEFAULT_RECTANGLE_STYLE;
 struct object default_circle = DEFAULT_CIRCLE_STYLE;
+struct object default_ellipse = DEFAULT_ELLIPSE_STYLE;
 #endif
 
 /* filledcurves style options */

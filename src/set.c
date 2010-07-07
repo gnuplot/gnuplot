@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.317 2010/06/28 19:08:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.318 2010/06/29 16:58:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3404,8 +3404,8 @@ set_object()
 
     /* The next token must either be a tag or the object type */
     c_token++;
-    if (almost_equals(c_token, "rect$angle") || equals(c_token, "ellipse") 
-    ||  equals(c_token, "circle") || almost_equals(c_token, "poly$gon"))
+    if (almost_equals(c_token, "rect$angle") || almost_equals(c_token, "ell$ipse") 
+    ||  almost_equals(c_token, "circ$le") || almost_equals(c_token, "poly$gon"))
 	tag = -1; /* We'll figure out what it really is later */
     else {
 	tag = int_expression();
@@ -3416,10 +3416,10 @@ set_object()
     if (almost_equals(c_token, "rect$angle")) {
 	set_obj(tag, OBJ_RECTANGLE);
 
-    } else if (equals(c_token, "ellipse")) {
+    } else if (almost_equals(c_token, "ell$ipse")) {
 	set_obj(tag, OBJ_ELLIPSE);
 
-    } else if (equals(c_token, "circle")) {
+    } else if (almost_equals(c_token, "circ$le")) {
 	set_obj(tag, OBJ_CIRCLE);
 
     } else if (almost_equals(c_token, "poly$gon")) {
@@ -3632,10 +3632,25 @@ set_obj(int tag, int obj_type)
 		    get_position(&this_ellipse->extent);
 		    continue;
 	
-		} else if (equals(c_token,"angle")) {
+		} else if (almost_equals(c_token,"ang$le")) {
 		    c_token++;
 		    this_ellipse->orientation = real_expression();
 		    continue;
+
+		} else if (almost_equals(c_token,"unit$s")) {
+		    c_token++;
+		    if (equals(c_token,"xy") || END_OF_COMMAND) {
+	                this_ellipse->type = ELLIPSEAXES_XY;
+	            } else if (equals(c_token,"xx")) {
+	                this_ellipse->type = ELLIPSEAXES_XX;
+	            } else if (equals(c_token,"yy")) {
+	                this_ellipse->type = ELLIPSEAXES_YY;
+	            } else {
+	                int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
+	            }
+	            c_token++; 
+		    continue;
+		
 		}
 		break;
 
@@ -3901,6 +3916,36 @@ set_style()
 	    get_position(&default_circle.o.circle.extent);
 	}
 	break;
+    case SHOW_STYLE_ELLIPSE:
+        c_token++;
+	while (!END_OF_COMMAND) {
+	    if (equals(c_token,"size")) {
+	        c_token++;    
+	        get_position(&default_ellipse.o.ellipse.extent);
+	        c_token--;
+	    } else if (almost_equals(c_token,"ang$le")) {
+	        c_token++;
+	        if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX) {
+	            default_ellipse.o.ellipse.orientation = real_expression();
+	            c_token--;
+	        }
+	    } else if (almost_equals(c_token,"unit$s")) {
+	        c_token++;
+	        if (equals(c_token,"xy") || END_OF_COMMAND) {
+	            default_ellipse.o.ellipse.type = ELLIPSEAXES_XY;
+	        } else if (equals(c_token,"xx")) {
+	            default_ellipse.o.ellipse.type = ELLIPSEAXES_XX;
+	        } else if (equals(c_token,"yy")) {
+	            default_ellipse.o.ellipse.type = ELLIPSEAXES_YY;
+	        } else {
+	            int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
+	        }
+	    } else 
+	        int_error(c_token, "expecting 'units {xy|xx|yy}', 'angle <number>' or 'size <position>'" );
+	    
+	    c_token++;
+	}
+	break;
 #endif
     case SHOW_STYLE_HISTOGRAM:
 	parse_histogramstyle(&histogram_opts,HT_CLUSTERED,histogram_opts.gap);
@@ -3918,7 +3963,7 @@ set_style()
 	break;
     default:
 	int_error(c_token,
-		  "expecting 'data', 'function', 'line', 'fill', 'rectangle', or 'arrow'" );
+		  "expecting 'data', 'function', 'line', 'fill', 'rectangle', 'circle', 'ellipse' or 'arrow'" );
     }
 }
 

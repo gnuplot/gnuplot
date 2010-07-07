@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.181 2010/05/02 23:47:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.182 2010/06/26 05:43:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -262,6 +262,23 @@ set y2data%s\n",
     fprintf(fp, "set style circle radius ");
     save_position(fp, &default_circle.o.circle.extent, FALSE);
     fputs(" \n", fp);
+
+    /* Default ellipse properties */
+    fprintf(fp, "set style ellipse size ");
+    save_position(fp, &default_ellipse.o.ellipse.extent, FALSE);
+    fprintf(fp, " angle %g ", default_ellipse.o.ellipse.orientation);
+    fputs("units ", fp);
+    switch (default_ellipse.o.ellipse.type) {
+        case ELLIPSEAXES_XY:
+            fputs("xy\n", fp);
+	    break;
+	case ELLIPSEAXES_XX:
+	    fputs("xx\n", fp);
+	    break;
+	case ELLIPSEAXES_YY:
+	    fputs("yy\n", fp);
+	    break;
+    }
 #endif
 
     if (dgrid3d) {
@@ -1255,6 +1272,9 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
 	case CIRCLES:
 	fputs("circles\n", fp);
 	break;
+	case ELLIPSES:
+	fputs("ellipses\n", fp);
+	break;
 #endif
     default:
 	fputs("---error!---\n", fp);
@@ -1357,6 +1377,18 @@ save_object(FILE *fp, int tag)
 	    fprintf(fp, "%s%g", e->scalex == first_axes ? "" : coord_msg[e->scalex], e->x);
 	    fprintf(fp, ", %s%g", e->scaley == e->scalex ? "" : coord_msg[e->scaley], e->y);
 	    fprintf(fp, "  angle %g", this_ellipse->orientation);
+	    fputs(" units ", fp);
+	    switch (this_ellipse->type) {
+        	case ELLIPSEAXES_XY:
+        	    fputs("xy", fp);
+		    break;
+		case ELLIPSEAXES_XX:
+		    fputs("xx", fp);
+		    break;
+		case ELLIPSEAXES_YY:
+		    fputs("yy", fp);
+		    break;
+	    }
 	}
 
 	else if ((this_object->object_type == OBJ_POLYGON)

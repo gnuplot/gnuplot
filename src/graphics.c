@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.334 2010/06/28 19:07:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.335 2010/06/28 23:36:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -166,6 +166,7 @@ static TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, dou
 
 #ifdef EAM_OBJECTS
 static void plot_circles __PROTO((struct curve_points *plot));
+static void plot_ellipses __PROTO((struct curve_points *plot));
 static void do_rectangle __PROTO((int dimensions, t_object *this_object, int style));
 #endif
 
@@ -1467,15 +1468,15 @@ place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *c
 	    term_apply_lp_properties(&lpstyle);
 
 	    if (dimensions == 2)
-		do_ellipse(2, &this_object->o.ellipse, style);
+		do_ellipse(2, &this_object->o.ellipse, style, TRUE);
 	    else if (splot_map)
-		do_ellipse(3, &this_object->o.ellipse, style);
+		do_ellipse(3, &this_object->o.ellipse, style, TRUE);
 	    else
 		break;
 
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fillstyle))
-		do_ellipse(dimensions, &this_object->o.ellipse, 0);
+		do_ellipse(dimensions, &this_object->o.ellipse, 0, TRUE);
 
 	    break;
 	}
@@ -2028,6 +2029,11 @@ do_plot(struct curve_points *plots, int pcount)
 	    case CIRCLES:
 		plot_circles(this_plot);
 		break;
+		
+	    case ELLIPSES:
+		plot_ellipses(this_plot);
+		break;
+		
 #endif
 	    }
 	}
@@ -3786,7 +3792,7 @@ plot_circles(struct curve_points *plot)
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
 	    radius = x - map_x(plot->points[i].xlow);
-	    if (plot->points[i].z < 0) {
+	    if (plot->points[i].z == DEFAULT_RADIUS) {
 		double junk;
 		map_position_r( &default_circle.o.circle.extent, &radius, &junk, "radius");
 	    }
@@ -3804,6 +3810,88 @@ plot_circles(struct curve_points *plot)
 	    }
 	}
     }
+}
+
+/* plot_ellipses:
+ * Plot the curves in ELLIPSES style
+ */
+static void
+plot_ellipses(struct curve_points *plot)
+{
+    int i;
+    t_ellipse *e = (t_ellipse *) gp_alloc(sizeof(t_ellipse), "ellipse plot");
+    double tempx, tempy, tempfoo;
+    struct fill_style_type *fillstyle = &plot->fill_properties;
+    int style = style_from_fill(fillstyle);
+    TBOOLEAN withborder = FALSE;
+
+    if (fillstyle->border_color.type != TC_LT
+    ||  fillstyle->border_color.lt != LT_NODRAW)
+	withborder = TRUE;
+	
+    e->extent.scalex = (plot->x_axis == SECOND_X_AXIS) ? second_axes : first_axes;
+    e->extent.scaley = (plot->y_axis == SECOND_Y_AXIS) ? second_axes : first_axes;
+    e->type = plot->ellipseaxes_units; 
+	
+    for (i = 0; i < plot->p_count; i++) {
+	if (plot->points[i].type == INRANGE) {
+	    e->center.x = map_x(plot->points[i].x);
+	    e->center.y = map_y(plot->points[i].y);
+	   	    
+	    e->extent.x = plot->points[i].xlow; /* major axis */
+	    e->extent.y = plot->points[i].xhigh; /* minor axis */
+	    /* the mapping can be set by the 
+	     * "set ellipseaxes" setting
+	     * both x units, mixed, both y units */
+	    /* clumsy solution */
+	    switch (e->type) {
+	    case ELLIPSEAXES_XY:
+	        map_position_r(&e->extent, &tempx, &tempy, "ellipse");
+	        e->extent.x = tempx;
+	        e->extent.y = tempy;        
+	        break;
+	    case ELLIPSEAXES_XX:
+	        map_position_r(&e->extent, &tempx, &tempy, "ellipse");
+	        tempfoo = tempx;
+	        e->extent.x = e->extent.y;
+	        map_position_r(&e->extent, &tempy, &tempx, "ellipse");
+	        e->extent.x = tempfoo;
+	        e->extent.y = tempy;
+	        break;
+	    case ELLIPSEAXES_YY:
+	        map_position_r(&e->extent, &tempx, &tempy, "ellipse");
+	        tempfoo = tempy;
+	        e->extent.y = e->extent.x;
+	        map_position_r(&e->extent, &tempy, &tempx, "ellipse");
+	        e->extent.x = tempx;
+	        e->extent.y = tempfoo;
+	        break;
+	    }
+	    
+	    if (plot->points[i].z <= DEFAULT_RADIUS) {
+	        /*memcpy(&(e->extent), &default_ellipse.o.ellipse.extent, sizeof(t_position));*/
+	        /*e->extent.x = default_ellipse.o.ellipse.extent.x;
+	        e->extent.y = default_ellipse.o.ellipse.extent.y;*/
+	        map_position_r(&default_ellipse.o.ellipse.extent, &e->extent.x, &e->extent.y, "ellipse");
+	    }
+	    
+	    if (plot->points[i].z == DEFAULT_ELLIPSE) 
+	        e->orientation = default_ellipse.o.ellipse.orientation;
+	    else
+	        e->orientation = plot->points[i].ylow;
+
+	    /* rgb variable  -  color read from data column */
+	    if (!check_for_variable_color(plot, &plot->varcolor[i]) && withborder)
+		term_apply_lp_properties(&plot->lp_properties);
+	    do_ellipse(2, e, style, FALSE);
+	    if (withborder) {
+		need_fill_border(&plot->fill_properties);
+		do_ellipse(2, e, 0, FALSE);
+	    }
+	}
+    }
+    free(e);
+    /* free(willy); */
 }
 #endif
 
@@ -5583,6 +5671,17 @@ do_key_sample(
 #ifdef EAM_OBJECTS
 	if (this_plot->plot_style == CIRCLES && w > 0) {
 	    do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., style);
+	} else if (this_plot->plot_style == ELLIPSES && w > 0) {
+	    t_ellipse *key_ellipse = (t_ellipse *) gp_alloc(sizeof(t_ellipse), 
+	        "cute little ellipse for the key sample");
+	    key_ellipse->center.x = xl + key_point_offset;
+	    key_ellipse->center.y = yl;
+	    key_ellipse->extent.x = w * 2/3;
+	    key_ellipse->extent.y = h;
+	    key_ellipse->orientation = 0.0;
+	    /* already in term coords, no need to map */
+	    do_ellipse(2, key_ellipse, style, FALSE);
+	    free(key_ellipse);
 	} else
 #endif
 	if (w > 0) {    /* All other plot types with fill */
@@ -5762,44 +5861,96 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 }
 
 void
-do_ellipse( int dimensions, t_ellipse *e, int style )
+do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 {
     gpiPoint vertex[120];
     int i;
     double angle;
     double cx, cy;
     double xoff, yoff;
+    double junkfoo;
     int junkw, junkh;
     double cosO = cos(DEG2RAD * e->orientation);
     double sinO = sin(DEG2RAD * e->orientation);
     double A = e->extent.x / 2.0;	/* Major axis radius */
     double B = e->extent.y / 2.0;	/* Minor axis radius */
     struct position pos = e->extent;	/* working copy with axis info attached */
+    double aspect = (double)term->v_tic / (double)term->h_tic;
 
     /* Choose how many segments to draw for this ellipse */
     int segments = 72;
     double ang_inc  =  M_PI / 36.;
 
     /* Find the center of the ellipse */
-    if (dimensions == 2)
-	map_position_double(&e->center, &cx, &cy, "ellipse");
+    /* If this ellipse is part of a plot - as opposed to an object -
+     * then the caller plot_ellipses function already did the mapping for us.
+     * Else we do it here. The 'ellipses' plot style is 2D only, but objects 
+     * can apparently be placed on splot maps too, so we do 3D mapping if needed. */
+	if (!do_own_mapping) {
+	    cx = e->center.x;
+	    cy = e->center.y;
+	}
+	else if (dimensions == 2)
+	    map_position_double(&e->center, &cx, &cy, "ellipse");
     else
-	map3d_position_double(&e->center, &cx, &cy, "ellipse");
+	    map3d_position_double(&e->center, &cx, &cy, "ellipse");
 
     /* Calculate the vertices */
     vertex[0].style = style;
     for (i=0, angle = 0.0; i<=segments; i++, angle += ang_inc) {
-	pos.x = A * cosO * cos(angle) - B * sinO * sin(angle);
-	pos.y = A * sinO * cos(angle) + B * cosO * sin(angle);
-	if (dimensions == 2)
-	    map_position_r(&pos, &xoff, &yoff, "ellipse");
-	else {
-	    map3d_position_r(&pos, &junkw, &junkh, "ellipse");
-	    xoff = junkw;
-	    yoff = junkh;
-	}
-	vertex[i].x = cx + xoff;
-	vertex[i].y = cy + yoff;
+        /* Given that the (co)sines of same sequence of angles 
+         * are calculated every time - shouldn't they be precomputed
+         * and put into a table? */
+	    pos.x = A * cosO * cos(angle) - B * sinO * sin(angle);
+	    pos.y = A * sinO * cos(angle) + B * cosO * sin(angle);
+	    if (!do_own_mapping) {
+	        xoff = pos.x;
+	        yoff = pos.y;
+	    }
+	    else if (dimensions == 2)
+	    switch (e->type) {
+	    case ELLIPSEAXES_XY:
+	        map_position_r(&pos, &xoff, &yoff, "ellipse");
+		    break;
+	    case ELLIPSEAXES_XX:
+	        map_position_r(&pos, &xoff, &junkfoo, "ellipse");
+	        pos.x = pos.y;
+		    map_position_r(&pos, &yoff, &junkfoo, "ellipse");
+	        break;
+	    case ELLIPSEAXES_YY:
+	        map_position_r(&pos, &junkfoo, &yoff, "ellipse");
+	        pos.y = pos.x;
+		    map_position_r(&pos, &junkfoo, &xoff, "ellipse");
+		    break;
+		}	        
+	    else {
+	    switch (e->type) {
+	    case ELLIPSEAXES_XY:
+	        map3d_position_r(&pos, &junkw, &junkh, "ellipse");
+	        xoff = junkw;
+	        yoff = junkh;
+		    break;
+	    case ELLIPSEAXES_XX:
+	        map3d_position_r(&pos, &junkw, &junkh, "ellipse");
+	        xoff = junkw;
+	        pos.x = pos.y;
+		    map3d_position_r(&pos, &junkh, &junkw, "ellipse");
+		    yoff = junkh;
+	        break;
+	    case ELLIPSEAXES_YY:
+	        map3d_position_r(&pos, &junkw, &junkh, "ellipse");
+	        yoff = junkh;
+	        pos.y = pos.x;
+		    map3d_position_r(&pos, &junkh, &junkw, "ellipse");
+		    xoff = junkw;
+		    break;
+		}	      
+	    }
+	    vertex[i].x = cx + xoff;
+	    if (!do_own_mapping) 
+	        vertex[i].y = cy + yoff * aspect;
+	    else
+	        vertex[i].y = cy + yoff;
     }
 
     if (style) {

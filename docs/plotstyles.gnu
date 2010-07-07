@@ -205,6 +205,16 @@ set ytics font "Times,10" format "%.1f" scale 0.5
 plot '../demo/optimize.dat' with circles lc rgb "gray" fs transparent solid 0.2 nobo,\
      '../demo/optimize.dat' u 1:2 with linespoints lw 2 pt 7 ps 0.3 lc rgb "black"
 #
+# Ellipses
+#
+reset
+set output 'figure_ellipses.pdf'
+unset xtics; unset ytics
+
+plot '../demo/ellipses.dat' u 1:2:3:4:5 with ellipses units xy title "with ellipses",\
+     '' u 1:2:3:4:5 with ellipses units xx notitle,\
+     '' u 1:2:3:4:5 with ellipses units yy notitle
+#
 # 2D heat map from an array of in-line data
 #
 reset
