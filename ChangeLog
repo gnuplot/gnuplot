@@ -1,3 +1,11 @@
+2010-07-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/PostScript/prologue.ps:  Add a default definition 
+	    /g {setgray} def
+	so that a missing palette initialization will result in normal 
+	grayscale rather than an invalid PostScript file.
+	Bug #3026477
+
 2010-07-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (boundary3d): Prevent infinite loop or divide-by-zero
