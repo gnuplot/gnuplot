@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.318 2010/06/29 16:58:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.319 2010/07/08 04:54:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4495,8 +4495,8 @@ set_view()
 	}
     }
 
-    if (local_vals[0] < 0 || local_vals[0] > 180)
-	int_error(c_token, errmsg1, 'x', 180);
+    if (local_vals[0] < 0 || local_vals[0] > 360)
+	int_error(c_token, errmsg1, 'x', 360);
     if (local_vals[1] < 0 || local_vals[1] > 360)
 	int_error(c_token, errmsg1, 'z', 360);
     if (local_vals[2] < 1e-6)

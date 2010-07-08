@@ -1,3 +1,8 @@
+2010-07-08  Ingo Thies  <ingo.thies@gmx.de>
+
+	* src/gadgets.h src/mouse.c src/set.c:  Allow continuous rotation of 3D
+	plots when mousing; i.e., do not limit rotation angle to 0<rotx<180
+
 2010-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (lp_parse): The coloring option "lc N" should not set a

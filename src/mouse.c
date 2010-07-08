@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.121 2009/07/24 01:35:55 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.122 2009/10/31 03:22:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1361,9 +1361,9 @@ ChangeView(int x, int z)
     if (x) {
 	surface_rot_x += x;
 	if (surface_rot_x < 0)
-	    surface_rot_x = 0;
-	if (surface_rot_x > 180)
-	    surface_rot_x = 180;
+	    surface_rot_x += 360;
+	if (surface_rot_x > 360)
+	    surface_rot_x -= 360;
     }
     if (z) {
 	surface_rot_z += z;
@@ -1711,7 +1711,8 @@ event_buttonpress(struct gp_event_t *ge)
     start_x = mouse_x;
     start_y = mouse_y;
     zero_rot_z = surface_rot_z + 360.0 * mouse_x / term->xmax;
-    zero_rot_x = surface_rot_x - 180.0 * mouse_y / term->ymax;
+    /* zero_rot_x = surface_rot_x - 180.0 * mouse_y / term->ymax; */
+    zero_rot_x = surface_rot_x - 360.0 * mouse_y / term->ymax;
 }
 
 
@@ -1830,11 +1831,12 @@ event_motion(struct gp_event_t *ge)
 
 	if (button & (1 << 1)) {
 	    /* dragging with button 1 -> rotate */
-	    surface_rot_x = floor(0.5 + zero_rot_x + 180.0 * mouse_y / term->ymax);
+	  /*surface_rot_x = floor(0.5 + zero_rot_x + 180.0 * mouse_y / term->ymax);*/
+	    surface_rot_x = floor(0.5 + fmod(zero_rot_x + 360.0 * mouse_y / term->ymax, 360));
 	    if (surface_rot_x < 0)
-		surface_rot_x = 0;
-	    if (surface_rot_x > 180)
-		surface_rot_x = 180;
+		surface_rot_x += 360;
+	    if (surface_rot_x > 360)
+		surface_rot_x -= 360;
 	    surface_rot_z = floor(0.5 + fmod(zero_rot_z - 360.0 * mouse_x / term->xmax, 360));
 	    if (surface_rot_z < 0)
 		surface_rot_z += 360;

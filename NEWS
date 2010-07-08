@@ -11,6 +11,7 @@ New features, changes and fixes since gnuplot version 4.4
 * NEW variable (per-data point) color for additional plot styles
 * CHANGE remove vestigial code supporting Amiga, Apollo, and 16-bit MSDOS/WIN
 * CHANGE 3D impulses are now always drawn from z=0
+* CHANGE do not limit 3D rotation to 0<rotx<180
 
 New features, changes and fixes in gnuplot version 4.4.0
 ========================================================
