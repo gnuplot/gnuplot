@@ -1,3 +1,10 @@
+2010-07-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lp_parse): The coloring option "lc N" should not set a
+	use_palette flag.  Probably the option "lc variable" shouldn't either,
+	but I'm not 100% certain about that.
+	Bug #3026477
+
 2010-07-07  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/datafile.c src/gadgets.c src/gadgets.h src/gp_types.h

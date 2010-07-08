@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.119 2010/06/02 02:42:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.120 2010/06/28 19:08:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -854,6 +854,9 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 			newlp.pm3d_color.lt = int_expression() - 1;
 		    }
 		}
+		if (newlp.pm3d_color.type == TC_LT
+		||  newlp.l_type == LT_COLORFROMCOLUMN) /* FIXME: not sure about this */
+		    newlp.use_palette = 0;
 		continue;
 	    }
 
