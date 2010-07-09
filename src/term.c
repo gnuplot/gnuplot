@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.203 2010/05/05 18:03:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.204 2010/05/21 04:53:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -883,6 +883,7 @@ term_apply_lp_properties(struct lp_style_type *lp)
      *  this function by explicitly issuing additional '(*term)(...)'
      *  commands.
      */
+    int lt = lp->l_type;
 
     if (lp->pointflag) {
 	/* change points, too
@@ -896,13 +897,17 @@ term_apply_lp_properties(struct lp_style_type *lp)
 	    (*term->pointsize) (lp->p_size);
     }
     /*  _first_ set the line width, _then_ set the line type !
-
      *  The linetype might depend on the linewidth in some terminals.
      */
     (*term->linewidth) (lp->l_width);
 
+    /* FIXME: This shouldn't happen, because the higher level code */
+    /* should have made some decision about color before this. But */
+    /* better to draw in black than not to draw at all.            */
+    if (lt <= LT_COLORFROMCOLUMN) lt = LT_BLACK;
+
     /* Apply "linetype", which can include both color and dot/dash */
-    (*term->linetype) (lp->l_type);
+    (*term->linetype) (lt);
     /* Possibly override the linetype color with a fancier colorspec */
     if (lp->use_palette)
 	apply_pm3dcolor(&lp->pm3d_color, term);

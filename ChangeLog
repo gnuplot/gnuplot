@@ -1,3 +1,10 @@
+2010-07-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (term_apply_lp_properties): Yet another bandaid fix for
+	problems with "lc var".  If the higher level code has failed to resolve
+	LC_COLORFROMCOLUMN (or LT_DEFAULT) into an actual color, use LT_BLACK.
+	Bug #3026477
+
 2010-07-08  Ingo Thies  <ingo.thies@gmx.de>
 
 	* src/gadgets.h src/mouse.c src/set.c:  Allow continuous rotation of 3D
