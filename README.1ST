@@ -5,6 +5,8 @@
  directory after going through this file. In a very small nutshell:
 
  - Under Unix, use configure and make
+   If your source is from the CVS repository rather from a release package,
+   the order of commands is  ./prepare; ./configure; make
  
  - Under DOS, if you are using bash and DJGPP,
    you can just run config/djconfig.sh
