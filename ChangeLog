@@ -1,3 +1,10 @@
+2010-07-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (do_3dplot): Fix bug introduced by patch of 23-Mar-2010.
+	If the linetype of a 3D surface used "lc ..." then all contours of the
+	surface were stuck with that same coloring rather than incrementing
+	through line types.
+
 2010-07-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (term_apply_lp_properties): Yet another bandaid fix for

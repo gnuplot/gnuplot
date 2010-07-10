@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.234 2010/07/07 05:12:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.235 2010/07/08 04:54:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1254,7 +1254,8 @@ do_3dplot(
 				lp_use_properties(&ls, ++thiscontour_lp_properties.l_type+1);
 			    else
 				load_linetype(&ls, ++thiscontour_lp_properties.l_type+1);
-			    term_apply_lp_properties(&ls);
+			    thiscontour_lp_properties.pm3d_color = ls.pm3d_color;
+			    term_apply_lp_properties(&thiscontour_lp_properties);
 			}
 
 			if (key->visible) {
