@@ -1,9 +1,20 @@
+2010-07-11  Peter Juhasz  <juhaszp@users.sourceforge.net>
+            Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util3d.c (draw3d_point_unconditional):  Remove incomplete local
+	color handling; the shared code in term_apply_lp_properties now does a
+	more complete job.
+
+	* src/graph3d.c (do_3dplot): Simplify the key sample code for contour
+	plots with style "points".  Set a default color sequence for contours
+	belonging to a surface drawn with "lc variable".
+
 2010-07-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot): Fix bug introduced by patch of 23-Mar-2010.
 	If the linetype of a 3D surface used "lc ..." then all contours of the
 	surface were stuck with that same coloring rather than incrementing
-	through line types.
+	through successive line types.
 
 2010-07-09  Ethan A Merritt  <merritt@u.washington.edu>
 
@@ -20,8 +31,7 @@
 2010-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (lp_parse): The coloring option "lc N" should not set a
-	use_palette flag.  Probably the option "lc variable" shouldn't either,
-	but I'm not 100% certain about that.
+	use_palette flag.  I think the option "lc variable" shouldn't either.
 	Bug #3026477
 
 2010-07-07  Peter Juhasz  <juhaszp@users.sourceforge.net>

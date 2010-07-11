@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.38 2010/03/14 06:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.39 2010/03/23 05:40:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -955,11 +955,9 @@ draw3d_point_unconditional(p_vertex v, struct lp_style_type *lp)
     unsigned int x, y;
 
     TERMCOORD(v, x, y);
+    /* Jul 2010 EAM - is it safe to overwrite like this? Make a copy instead? */
+    lp->pm3d_color.value = v->real_z;
     term_apply_lp_properties(lp);
-    /* HBB 20010822: implemented "linetype palette" for points, too */
-    if (lp->use_palette) {
-	set_color(cb2gray( z2cb(v->real_z) ));
-    }
     if (!clip_point(x, y))
 	(term->point) (x, y, lp->p_type);
 }
