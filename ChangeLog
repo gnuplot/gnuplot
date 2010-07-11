@@ -1,3 +1,9 @@
+2010-07-11  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/graph3d.c (do_3dplot): Simplify the key sample code for contour
+	plots with style "points".  Set a default color sequence for contours
+	belonging to a surface drawn with "lc variable".
+
 2010-07-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (term_apply_lp_properties): Yet another bandaid fix for

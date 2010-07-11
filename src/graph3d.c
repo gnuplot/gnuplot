@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.222.2.6 2010/05/24 21:11:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.222.2.7 2010/07/07 05:12:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1242,21 +1242,12 @@ do_3dplot(
 		    case FINANCEBARS:
 		    case CIRCLES:
 		    case POINTSTYLE:
-			if (this_plot->lp_properties.use_palette)
-			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
-			else
 			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 			break;
 		    case LINESPOINTS:
-			if (this_plot->lp_properties.use_palette)
-			    key_sample_line_pm3d(this_plot, xl, yl);
-			else
 			key_sample_line(xl, yl);
 			break;
 		    case DOTS:
-			if (this_plot->lp_properties.use_palette)
-			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
-			else
 			key_sample_point(xl, yl, -1);
 			break;
 
@@ -1271,11 +1262,14 @@ do_3dplot(
 			    (*t->linetype)(LT_BLACK);
 			    key_text(xl, yl, cntrs->label);
 			}
+			if (thiscontour_lp_properties.l_type == LT_COLORFROMCOLUMN)
+			    thiscontour_lp_properties.l_type = 0;
 			if (use_palette && thiscontour_lp_properties.pm3d_color.type == TC_Z)
 			    set_color( cb2gray( z2cb(cntrs->z) ) );
 			else {
 			    if (prefer_line_styles && label_contours) {
 				struct lp_style_type ls = thiscontour_lp_properties;
+
 				lp_use_properties(&ls, ++thiscontour_lp_properties.l_type+1);
 				term_apply_lp_properties(&ls);
 			    } else {
@@ -1311,15 +1305,9 @@ do_3dplot(
 			    case FINANCEBARS:
 			    case CIRCLES:
 			    case POINTSTYLE:
-				if (this_plot->lp_properties.use_palette)
-				    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
-				else
 				    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 				break;
 			    case DOTS:
-				if (this_plot->lp_properties.use_palette)
-				    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
-				else
 				    key_sample_point(xl, yl, -1);
 				break;
 
@@ -1576,7 +1564,7 @@ plot3d_lines(struct surface_points *plot)
 	return;
 #endif /* not LITE */
 
-    rgb_from_column = can_pm3d && plot->pm3d_color_from_column
+    rgb_from_column = plot->pm3d_color_from_column
 			&& plot->lp_properties.pm3d_color.type == TC_RGB
 			&& plot->lp_properties.pm3d_color.value < 0.0;
 
@@ -1587,7 +1575,7 @@ plot3d_lines(struct surface_points *plot)
 
 	    if (rgb_from_column)
 		set_rgbcolor((int)points[i].CRD_COLOR);
-	    else if (can_pm3d && plot->lp_properties.pm3d_color.type == TC_LINESTYLE) {
+	    else if (plot->lp_properties.pm3d_color.type == TC_LINESTYLE) {
 		plot->lp_properties.pm3d_color.lt = (int)(points[i].CRD_COLOR);
 		apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
 	    }
@@ -1859,6 +1847,7 @@ plot3d_points(struct surface_points *plot, int p_type)
 	struct coordinate GPHUGE *point;
 	int colortype = plot->lp_properties.pm3d_color.type;
 	TBOOLEAN rgb_from_column = plot->pm3d_color_from_column
+			&& colortype == TC_RGB
 			&& plot->lp_properties.pm3d_color.value < 0.0;
 
 	/* Apply constant color outside of the loop */
