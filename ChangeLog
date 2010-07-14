@@ -3,6 +3,15 @@
 	* src/hidden3d.c: Remove magic number -3 and the test (foo>=-2) in
 	favor of LT_NODRAW and test (foo!=LT_NODRAW).
 
+	* src/hidden3d.c:  #define PT_ARROWHEAD and PT_BACKARROW
+	* src/hidden3d.c (make_edge draw_edge build_networks) src/util3d.c
+	(draw3d_line_unconditional):
+	Handle arrow heads and other arrow style parameters in hidden3d mode.
+	For surfaces, edge.style indicates whether this edge is seen from the
+	top or the bottom.  Coopt this flag for VECTOR plots to indicate
+	whether the vector points up (positive z) or down (negative z).
+	Separate flag is needed because the end points are sorted on z.
+
 2010-07-11  Peter Juhasz  <juhaszp@users.sourceforge.net>
             Ethan A Merritt  <merritt@u.washington.edu>
 

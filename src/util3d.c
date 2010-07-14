@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.39 2010/03/23 05:40:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.40 2010/07/12 04:16:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -992,7 +992,15 @@ draw3d_line_unconditional(
 	    ls.pm3d_color.value = (v1->real_z + v2->real_z) * 0.5;
 
     term_apply_lp_properties(&ls);
-    draw_clip_line(x1,y1,x2,y2);
+
+    /* Support for hidden3d VECTOR mode with arrowheads */
+    if (lp->p_type == PT_ARROWHEAD)
+	draw_clip_arrow(x1,y1,x2,y2,END_HEAD);
+    else if (lp->p_type == PT_BACKARROW)
+	draw_clip_arrow(x1,y1,x2,y2,BACKHEAD);
+    else
+
+	draw_clip_line(x1,y1,x2,y2);
 }
 
 void

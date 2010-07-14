@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.72 2010/05/16 21:29:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.73 2010/07/15 03:51:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -50,6 +50,7 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.72 2010/05/16 21:29:34 
 #include "command.h"
 #include "dynarray.h"
 #include "graph3d.h"
+#include "graphics.h"	/* For apply_head_properties, which should probably be in gadgets */
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
@@ -549,18 +550,20 @@ make_edge(
     p_vertex v1 = vlist + vnum1;
     p_vertex v2 = vlist + vnum2;
 
+    thisedge->style = style;
+    thisedge->lp = lp;
+    thisedge->next = next;
+
     /* ensure z ordering inside each edge */
     if (v1->z >= v2->z) {
 	thisedge->v1 = vnum1;
 	thisedge->v2 = vnum2;
+	if (lp->p_type == PT_ARROWHEAD) thisedge->style = PT_ARROWHEAD;
     } else {
 	thisedge->v1 = vnum2;
 	thisedge->v2 = vnum1;
+	if (lp->p_type == PT_ARROWHEAD) thisedge->style = PT_BACKARROW;
     }
-
-    thisedge->style = style;
-    thisedge->lp = lp;
-    thisedge->next = next;
 
     return thisedge - elist;
 }
@@ -1168,6 +1171,11 @@ build_networks(struct surface_points *plots, int pcount)
 	 * initialized sensibly --- thou hast been warned */
 	lp_style = &(this_plot->lp_properties);
 
+	if (this_plot->plot_style == VECTOR) {
+	    apply_head_properties(&(this_plot->arrow_properties));
+	    lp->p_type = PT_ARROWHEAD;
+	}
+
 	/* HBB 20000715: new initialization code block for non-grid
 	 * structured datasets. Sufficiently different from the rest
 	 * to warrant separate code, I think. */
@@ -1658,6 +1666,11 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
     if (lptemp.l_type == LT_COLORFROMCOLUMN) {
 	recolor = TRUE;
 	load_linetype(&lptemp, (int)v1->real_z);
+    } else
+
+    /* This handles style VECTORS */
+    if (lptemp.p_type == PT_ARROWHEAD || lptemp.p_type == PT_BACKARROW) {
+	lptemp.p_type = e->style;
     } else
 
     /* This is the default style: color top and bottom in successive colors */

@@ -1,5 +1,5 @@
 /*
- * $Id: hidden3d.h,v 1.10 2008/06/02 19:18:32 sfeam Exp $
+ * $Id: hidden3d.h,v 1.11 2010/03/14 06:43:17 sfeam Exp $
  */
 
 /* GNUPLOT - hidden3d.h */
@@ -45,6 +45,9 @@
 #include "util3d.h"
 
 /* Type definitions */
+
+#define PT_ARROWHEAD -10
+#define PT_BACKARROW -11
 
 /* Variables of hidden3d.c needed by other modules: */
 
