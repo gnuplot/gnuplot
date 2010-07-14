@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.71 2010/03/23 05:40:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.72 2010/05/16 21:29:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -619,7 +619,7 @@ store_edge(
     if (drawbits &&		/* no bits set: 'blind' edge --> no test! */
 	! (hiddenTriangleLinesdrawnPattern & drawbits)
 	)
-	style = -3;
+	style = LT_NODRAW;
 
     return make_edge(vnum1, vnum2, lp, style, -1);
 }
@@ -936,13 +936,13 @@ color_edges(
 	switch (casenumber) {
 	case 0:
 	    /* both backfacing */
-	    if (elist[new_edge].style >= -2)
+	    if (elist[new_edge].style != LT_NODRAW)
 		elist[new_edge].style	= below;
-	    if (elist[old_edge].style >= -2)
+	    if (elist[old_edge].style != LT_NODRAW)
 		elist[old_edge].style = below;
 	    break;
 	case 2:
-	    if (elist[new_edge].style >= -2)
+	    if (elist[new_edge].style != LT_NODRAW)
 		elist[new_edge].style = below;
 	    /* FALLTHROUGH */
 	case 1:
@@ -950,7 +950,7 @@ color_edges(
 	    /* new back-, old one frontfacing */
 	    if (((new_edge == old_edge)
 		 && hiddenHandleBentoverQuadrangles) /* a diagonal edge! */
-		|| (elist[old_edge].style >= -2)) {
+		|| (elist[old_edge].style != LT_NODRAW)) {
 		/* conflict has occured: two polygons meet here, with opposige
 		 * sides being shown. What's to do?
 		 * 1) find a vertex of one polygon outside this common
@@ -1035,7 +1035,8 @@ build_networks(struct surface_points *plots, int pcount)
     long int *north_edges;	/* stores edges of polyline above */
     long int *these_edges;	/* same, being built for use by next turn */
     struct iso_curve *icrvs;
-    int above = -3, below;	/* line type for edges of front/back side*/
+    int above = LT_NODRAW;	/* line type for edges of front side*/
+    int below = LT_NODRAW;	/* line type for edges of back side*/
     struct lp_style_type *lp;	/* pointer to line and point properties */
 
     /* Count out the initial sizes needed for the polygon and vertex
@@ -2175,7 +2176,7 @@ plot3d_hidden(struct surface_points *plots, int pcount)
 	temporary_pfirst = pfirst;
 
 	while (efirst >=0) {
-	    if (elist[efirst].style >= -2) /* skip invisible edges */
+	    if (elist[efirst].style != LT_NODRAW) /* skip invisible edges */
 		in_front(efirst, elist[efirst].v1, elist[efirst].v2,
 			 &temporary_pfirst);
 	    efirst = elist[efirst].next;

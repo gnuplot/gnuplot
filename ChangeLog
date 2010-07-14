@@ -1,3 +1,8 @@
+2010-07-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c: Remove magic number -3 and the test (foo>=-2) in
+	favor of LT_NODRAW and test (foo!=LT_NODRAW).
+
 2010-07-11  Peter Juhasz  <juhaszp@users.sourceforge.net>
             Ethan A Merritt  <merritt@u.washington.edu>
 
