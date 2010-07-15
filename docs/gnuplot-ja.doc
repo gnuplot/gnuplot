@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.315 2010-02-09 11:17:52+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.598
+C RCS $Id: gnuplot-ja.doc,v 1.334 2010-07-13 18:13:23+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.617
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -333,8 +333,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
 =polygon
  コマンド `set object` は、現在は固定された長方形だけでなく、円、楕円、
  多角形も定義でき、そして、それに対応する新しい描画スタイル
- `plot with circles` もあります。以下参照: `circle`, `ellipse`,
- `polygon`。
+ `plot with circles`, `plot with ellipses` もあります。以下参照:
+ `circle`, `ellipse`, `polygon`。
 
 3 新しい/修正された出力形式
  cairo, pango ライブラリによる 2 つの新しいドライバ `pngcairo`,
@@ -709,16 +709,16 @@ C Shigeharu Takeno et al (3.7, 4.X)
  ん。
 
  Unix においては、カレントディレクトリに .gnuplot というファイルがない
- 場合には、HOME に定義されたディレクトリを探します。AmigaOS, MS-DOS,
- Windows, OS/2 では GNUPLOT がその役割に使われます。Windows では、NT 専
- 用の変数 USERPROFILE も参照されます。VMS では SYS$LOGIN です。
- `help start-up` と打ってみてください。
+ 場合には、HOME に定義されたディレクトリを探します。MS-DOS, Windows,
+ OS/2 では GNUPLOT がその役割に使われます。Windows では、NT 専用の変数
+ USERPROFILE も参照されます。VMS では SYS$LOGIN です。`help start-up`
+ と打ってみてください。
 
  Unix においては、PAGER がヘルプメッセージの出力用のフィルタとして使わ
  れます。
 
- Unix, AmigaOS では、SHELL が `shell` コマンドの際に使われます。MS-DOS,
- OS/2 では COMSPEC が `shell` コマンドの際に使われます。
+ Unix では、SHELL が `shell` コマンドの際に使われます。MS-DOS, OS/2 で
+ は COMSPEC が `shell` コマンドの際に使われます。
 
  FIT_SCRIPT は、当てはめ (fit) が中断されたときに実行する `gnuplot` コ
  マンドの指定に使われます。以下参照: `fit`。FIT_LOG は当てはめによるロ
@@ -727,9 +727,9 @@ C Shigeharu Takeno et al (3.7, 4.X)
  GNUPLOT_LIB は、データやコマンドファイルの検索ディレクトリを追加定義す
  るのに使われます。その変数は、一つのディレクトリ名かまたは複数のディレ
  クトリ名を書くことができますが、ディレクトリの区切りはプラットホーム毎
- に違います。例えば Unix では ':' で、DOS,Windows,OS/2,Amiga では ';'
- です。GNUPLOT_LIB の値は変数 `loadpath` に追加されますが、それは
- `save` や `save set` コマンドでは保存されません。
+ に違います。例えば Unix では ':' で、MS-DOS, Windows, OS/2 では ';' で
+ す。GNUPLOT_LIB の値は変数 `loadpath` に追加されますが、それは `save`
+ や `save set` コマンドでは保存されません。
 
  出力ドライバの中には gd ライブラリ経由で TrueType フォントを扱えるもの
  もいくつかあります。これらのドライバのフォント検索パスは、環境変数
@@ -743,10 +743,10 @@ C Shigeharu Takeno et al (3.7, 4.X)
 
  PostScript ドライバは、外部 (組み込まれていない) 定義ファイルを探すた
  めに環境変数 GNUPLOT_PS_DIR を利用します。インストール時の作業により、
- gnuplot にはそれらのファイルのコピーが組み込まれているか、または単にデ
- フォルトのパスが埋め込まれています。この変数は、postscript 出力形式で
- デフォルトのファイルの代わりにカスタマイズした prologue ファイルを使用
- するのに利用できます。以下参照: `postscript prologue`。
+ gnuplot にはそれらのファイルのコピーが組み込まれているか、またはデフォ
+ ルトのパスが埋め込まれています。この変数は、postscript 出力形式でデフ
+ ォルトのファイルの代わりにカスタマイズした prologue ファイルを使用する
+ のに利用できます。以下参照: `postscript prologue`。
 2 式 (Expressions)
 ?expressions
  基本的には C, FORTRAN, Pascal, BASIC において利用可能な数学表現を使用
@@ -829,16 +829,16 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?acos
 #acos(x) & 任意 & $\cos^{-1} x$ (アークコサイン) \\
 %acos(x)@任意@$cos sup -1 x$ (アークコサイン)
- 関数 `acos(x)` は引数のアークコサイン (逆余弦) を返します。`acos` の
- 返す値がラジアン単位かまたは度であるかは `set angles` で選択されます。
+ 関数 `acos(x)` は引数のアークコサイン (逆余弦) を返します。`acos` の返
+ す値がラジアン単位かまたは度であるかは `set angles` で選択されます。
 4 acosh
 ?expressions functions acosh
 ?functions acosh
 ?acosh
 #acosh(x) & 任意 & ラジアンでの $\cosh^{-1} x$ (逆双曲余弦)\\
 %acosh(x)@任意@$ラジアンでの cosh sup -1 x$ (逆双曲余弦)
- 関数 `acosh(x)` は逆ハイパボリックコサイン (逆双曲余弦) の値をラジアンで
- 返します。
+ 関数 `acosh(x)` は逆ハイパボリックコサイン (逆双曲余弦) の値をラジアン
+ で返します。
 4 airy
 ?expressions functions airy
 ?functions airy
@@ -854,16 +854,16 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?arg
 #arg(x) & 複素数 & $x$ の偏角 \\
 %arg(x)@複素数@$x$ の偏角
- 関数 `arg(x)` は複素数の偏角を、`set angles` の設定にしたがってラジアン、
- または度で返します。
+ 関数 `arg(x)` は複素数の偏角を、`set angles` の設定にしたがってラジア
+ ン、または度で返します。
 4 asin
 ?expressions functions asin
 ?functions asin
 ?asin
 #asin(x) & 任意  & $\sin^{-1} x$ (アークサイン) \\
 %asin(x)@任意@$sin sup -1 x$ (アークサイン)
- 関数 `asin(x)` は引数のアークサイン (逆正弦) を返します。`asin` の
- 返す値は `set angles` の設定によってラジアン単位かまたは度になります。
+ 関数 `asin(x)` は引数のアークサイン (逆正弦) を返します。`asin` の返す
+ 値は `set angles` の設定によってラジアン単位かまたは度になります。
 4 asinh
 ?expressions functions asinh
 ?functions asinh
@@ -973,8 +973,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?erf
 #erf(x) & 任意 & $\mbox{erf}(\mbox{real}(x))$,  $x$ の 実部の誤差関数\\
 %erf(x)@任意@$erf ( roman real (x))$, $x$ の実部の誤差関数
- 関数 `erf(x)` は引数の実部の誤差関数の値を返します。引数が複素数の場合は
- 虚部は無視されます。以下参照: `erfc`, `inverf`, `norm`。
+ 関数 `erf(x)` は引数の実部の誤差関数の値を返します。引数が複素数の場合
+ は虚部は無視されます。以下参照: `erfc`, `inverf`, `norm`。
 4 erfc
 ?expressions functions erfc
 ?functions erfc
@@ -990,34 +990,36 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?exp
 #exp(x) & 任意 & $e^{x}$, $x$ の指数関数\\
 %exp(x)@任意@$e sup x$, $x$ の指数関数
- 関数 `exp(x)` 引数の指数関数の値 (`e` の引数乗) を返します。環境によっては
- (特に sun) 大きい x の値に対する exp(-x) は未定義値を返す場合があります。
- このような場合、safe(x) = x<-100 ? 0 : exp(x) のようなユーザ定義関数が役に
- 立つでしょう。
+ 関数 `exp(x)` 引数の指数関数の値 (`e` の引数乗) を返します。環境によっ
+ ては (特に sun) 大きい x の値に対する exp(-x) は未定義値を返す場合があ
+ ります。このような場合、safe(x) = x<-100 ? 0 : exp(x) のようなユーザ定
+ 義関数が役に立つでしょう。
 4 floor
 ?expressions functions floor
 ?functions floor
 ?floor
 #floor(x) & 任意 & $\lfloor x \rfloor$, $x$ (の実部) 以下の最大の整数\\
 %floor(x)@任意@$left floor x right floor$, $x$ (の実部) 以下の最大の整数
- 関数 `floor(x)` はその引数以下の最大の整数を返します。複素数引数に対しては
- `floor` はその引数の実部以下の最大の整数を返します。
+ 関数 `floor(x)` はその引数以下の最大の整数を返します。複素数引数に対し
+ ては `floor` はその引数の実部以下の最大の整数を返します。
 4 gamma
 ?expressions functions gamma
 ?functions gamma
 ?gamma
 #gamma(x) & 任意 & $\mbox{gamma}(\mbox{real}(x))$, $x$ の実部のガンマ関数\\
 %gamma(x)@任意@$GAMMA ( roman real (x))$, $x$ の実部のガンマ関数
- 関数 `gamma(x)` は引数の実部のガンマ関数の値を返します。整数 n に対しては
- gamma(n+1) = n! です。引数が複素数の場合、虚数部分は無視されます。
+ 関数 `gamma(x)` は引数の実部のガンマ関数の値を返します。整数 n に対し
+ ては gamma(n+1) = n! です。引数が複素数の場合、虚数部分は無視されます。
 4 ibeta
 ?expressions functions ibeta
 ?functions ibeta
 ?ibeta
 #ibeta(p,q,x) & 任意 & $\mbox{ibeta}(\mbox{real}(p,q,x))$, $p$,$q$,$x$ の実部の不完全ベータ関数 \\
 %ibeta(p,q,x)@任意@$ibeta ( roman real (p,q,x))$, $p$,$q$,$x$ の実部の不完全ベータ関数
- 関数 `ibeta(p,q,x)` は引数の実部の不完全ベータ関数の値を返します。p, q > 0
- で x は [0:1] 内の値です。引数が複素数の場合は虚部は無視されます。
+ 関数 `ibeta(p,q,x)` は引数の実部の不完全ベータ関数の値を返します。p, q
+ は正で x は [0:1] 内の値です。引数が複素数の場合は虚部は無視されます。
+ この関数は連分数法 (Abramowitz and Stegun, 1964) で近似していて、この
+ 近似は x < (p-1)/(p+q-2) の範囲でしか正確ではありません。
 4 inverf
 ?expressions functions inverf
 ?functions inverf
@@ -1161,8 +1163,16 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?tanh
 #tanh(x) & 任意 & $\tanh x$, $x$ のハイパボリックタンジェント\\
 %tanh(x)@任意@$tanh~x$, $x$ のハイパボリックタンジェント
- 関数 `tanh(x)` は引数のハイパボリックタンジェントの値を返します。`tanh` の
- 引数はラジアンで与えます。
+ 関数 `tanh(x)` は引数のハイパボリックタンジェントの値を返します。
+ `tanh` の引数はラジアンで与えます。
+4 voigt
+?expressions functions voigt
+?functions voigt
+?voigt
+#voigt(x,y) & 実数 & Voigt/Faddeeva 関数 $\frac{y}{\pi} \int{\frac{exp(t^2)}{(x-t)^2+y^2}}dt$ \\
+%voigt(x,y)@実数@ガウス関数とローレンツ関数の畳みこみ
+ 関数 `voigt(x,y)` は、スペクトル解析で使用される Voigt/Faddeeva 関数の
+ 近似を返します。その誤差は 1/10^4 以内です。
 @end table
 
 @start table
@@ -1727,8 +1737,7 @@ C ... and restart the table:
        if (!exists("b")) print "b is not defined"
 
  変数名や関数名の命名規則は、大抵のプログラミング言語と同じで、先頭はア
- ルファベットで、その後の文字はアルファベット、数字、"$", "_" が使えま
- す。
+ ルファベットで、その後の文字はアルファベット、数字、"_" が使えます。
 
  各関数の定義式は、'GPFUN_' という接頭辞を持つ特別な文字列値変数として
  利用できます。
@@ -1761,9 +1770,9 @@ C ... and restart the table:
  要求することを可能にし、必要ならば fontconfig に同等のフォントを代用さ
  せることもできるので、通常はこれで十分でしょう。以下は、多分いずれも機
  能します:
-      set term pdfpng font "sans,12"
-      set term pdfpng font "Times,12"
-      set term pdfpng font "Times-New-Roman,12"
+      set term pdfcairo font "sans,12"
+      set term pdfcairo font "Times,12"
+      set term pdfcairo font "Times-New-Roman,12"
 
 3 gd (png, gif, jpeg terminals)
 ?gd
@@ -2061,7 +2070,7 @@ C ... and restart the table:
        # データの 3 列目を、個々の点に色を割り当てるのに使用
        plot 'data' using 1:2:3 with points lc variable
 
-       # ラインスタイルの色を選択するのにデータ集合の index を使用
+       # 線色を選択するのにデータ集合の index を使用
        plot 'data' using 1:2:(column(-2)) with lines lc variable
 
 2 マウス入力 (mouse input)
@@ -2248,13 +2257,13 @@ C ... and restart the table:
 ?.gnuplot
 ^ <a name="start-up"></a>
  `gnuplot` が起動されるとき、初期設定ファイルを読み込もうとします。この
- ファイルは Unix と AmigaOS では、`.gnuplot` であり、その他の処理系で
+ ファイルは Unix 系のシステムでは、`.gnuplot` であり、その他の処理系で
  は `GNUPLOT.INI` となっています。このファイルがカレントディレクトリに
- 無い場合、`gnuplot` はホームディレクトリを検索します (AmigaOS, MS-DOS,
- Windows, OS/2 では、環境変数 `GNUPLOT` にホームディレクトリに対応する
- ディレクトリを指定します; Windows NT では、GNUPLOT が定義されていなけ
- れば `USERPROFILE` が使われます)。注意: インストールの時に NOCWDRC を
- 定義した場合には、`gnuplot` はカレントディレクトリからは読みません。
+ 無い場合、`gnuplot` はホームディレクトリを検索します (MS-DOS, Windows,
+ OS/2 では、環境変数 `GNUPLOT` にホームディレクトリに対応するディレクト
+ リを指定します; Windows NT では、GNUPLOT が定義されていなければ
+ `USERPROFILE` が使われます)。注意: インストールの時に NOCWDRC を定義し
+ た場合には、`gnuplot` はカレントディレクトリからは読みません。
 
  初期設定ファイルが見つかると、`gnuplot` はこのファイルに書かれているコ
  マンドを実行します。ここには任意の正しい `gnuplot` コマンドを書くこと
@@ -2553,7 +2562,7 @@ C ... and restart the table:
 
  ここで、x 軸の目盛りの見出しは "03/21" のように表示されます。
 
- 各コマンドの詳細はそれぞれの項の記述を参照してください。
+ 以下参照: `time_specifiers`。
 1 描画スタイル (plotting styles)
 ?plotting styles
 
@@ -2601,6 +2610,10 @@ Ffigure_boxerrorbars
  列のデータに対する `boxwidth = -2.0` という設定があります。この場合箱
  の横幅は、隣接する箱にくっつくように自動的に計算されます。3 列のデータ
  の場合も、横幅は自動的に計算されます。
+
+ 入力列を追加 (4,5,6 列目) すると、それらは各データ点毎の variable color
+ 情報 (以下参照: `linecolor`, `rgbcolor variable`) として使われます。誤
+ 差線は、箱の境界と同じ色で描画されます。
 
  箱の高さは、`yerrorbars` スタイル同様に y の誤差の値から決定されます。
  y-ydelta から y+ydelta まで、あるいは ylow から yhigh まで、これらは何
@@ -2695,10 +2708,13 @@ Ffigure_boxplot
  と 3 番目の列 (x 座標と幅) は通常データ列ではなく定数として与えます。
 
  デフォルトでは、箱ひげは箱の端から、y の値が四分位範囲の 1.5 倍の中に
- 収まっていて最も離れているような点まで延長されます。範囲外の点
- (outliner) は円 (pointtype 7) で描かれます。これらのデフォルトの性質は
- `set style boxplot` コマンドで変更できます。以下参照:
- `set style boxplot`, `boxwidth`, `fillstyle`, `candlesticks`.
+ 収まっていて最も離れているような点まで延長されます。デフォルトでは、範
+ 囲外の点 (outliner) は円 (pointtype 7) で描かれます。箱ひげの端の棒の
+ 幅は `set bars` を使って制御できます。
+
+ これらのデフォルトの性質は `set style boxplot` コマンドで変更できます。
+ 以下参照: `set style boxplot`, `bars`, `boxwidth`, `fillstyle`,
+ `candlesticks`。
 
 2 boxxyerrorbars
 ?commands set style boxxyerrorbars
@@ -2720,6 +2736,10 @@ Ffigure_boxxyerrorbars
  つまり、xlow から xhigh までと ylow から yhigh まで、または x-xdelta
  から x+xdelta までと y-ydelta から y+ydelta まで。これらは何列のデータ
  が与えられているかによって決まります。
+
+ 入力列を追加 (5,7 列目) すると、それらは各データ点毎の variable color
+ 情報 (以下参照: `linecolor`, `rgbcolor variable`) であるとして使われま
+ す。
 
  箱の内部は現在の塗りつぶしスタイル (fillstyle) に従って塗られます。詳
  細は、以下参照: `set style fill`, `boxes`。plot コマンド上で新しい塗り
@@ -2751,6 +2771,10 @@ Ffigure_candlesticks
  これの代わりに、箱ひげ (box-and-whisker) のグループ化に関する明示的な
  幅の指定を、追加の 6 番目のデータで指定できます。その幅は、x 座標と同
  じ単位で与えなければいけません。
+
+ 入力列を追加 (6 列目、または 6 列目がデータの幅として使れる場合は 7 列
+ 目) すると、それらは各データ点毎の variable color 情報 (以下参照:
+ `linecolor`, `rgbcolor variable`) として使われます。
 
  デフォルトでは、鉛直線分のてっぺんと底には垂直に交わる水平線は引かれま
  せん。それを引きたい場合、例えば典型的な例は箱ひげ図 (box-and-whisker
@@ -2793,21 +2817,91 @@ Ffigure_candlesticks
 ?style circles
 ?circles
 Ffigure_circles
- スタイル `circles` は、各データ点に明示された半径の円を描画します。こ
- れは、x, y, 半径、の 3 列のデータが必要です。4 列目のデータを追加して
- 色の情報の指定とすることもできます。半径は、常に描画の水平軸 (x または
- x2) の単位で解釈されます。y 方向の縮尺と描画のアスペクト比は、いずれも
- 無視されます。
+ スタイル `circles` は、各データ点に明示された半径の円を描画します。3
+ 列のデータを与えた場合は、それを x, y, 半径と解釈します。半径は、常に
+ 描画の水平軸 (x または x2) の単位で解釈されます。y 方向の縮尺と描画の
+ アスペクト比は、いずれも無視されます。2 列のデータしか与えないと、半径
+ は `set style circle` から取ります。この場合、半径は graph か screen
+ の座標系で与えることができます。デフォルトでは完全な円を描画しますが、
+ 4 列目、5 列目に開始角、終了角を指定することで扇形を描画することもでき
+ ます。4 列目、あるいは 6 列目のデータを追加して部分円の色を指定するこ
+ ともできます。扇形の開始角、終了角の単位は度で指定する必要があります。
 
- 例 (面積が 3 列目の値に比例するような円を描画):
 
+ 例:
+
+     # 面積が 3 列目の値に比例するような円を描画
      set style fill transparent solid 0.2 noborder
      plot 'data' using 1:2:(sqrt($3)) with circles, \
           'data' using 1:2 with linespoints
 
- これは、pointstyle 6 で点のサイズを variable とした `points` による描
+     # 円の代わりにパックマンを描画
+     plot 'data' using 1:2:(10):(40):(320) with circles
+
+     # インランデータで円グラフを描画
+     set xrange [-15:15]
+     set style fill transparent solid 0.9 noborder
+     plot '-' using 1:2:3:4:5:6 with circles lc var
+     0    0    5    0    30    1
+     0    0    5   30    70    2
+     0    0    5   70   120    3
+     0    0    5  120   230    4
+     0    0    5  230   360    5
+     e
+
+ これは、pointstyle 7 で点のサイズを variable とした `points` による描
  画と似ていますが、circles は x 軸の範囲で伸縮される点が異なります。以
  下も参照: `set object circle`, `fillstyle`。
+2 ellipses
+?plotting styles ellipses
+?style ellipses
+?ellipses
+Ffigure_ellipses
+ スタイル `ellipses` は、各データ点に楕円 (ellipse) を描画します。この
+ スタイルは、2 次元描画にのみ適用されます。各楕円は、中心、主軸直径、副
+ 軸直径、x 軸と主軸のなす角、で表現されます。
+
+      2 列: x y
+      3 列: x y major_diam
+      4 列: x y major_diam minor_diam
+      5 列: x y major_diam minor_diam angle
+
+ 2 列のデータのみが与えられた場合は、それらは中心の座標とみなされ、楕円
+ はデフォルトの大きさで描画されます (以下参照: `set style ellipse`)。楕
+ 円の向きは、主軸と x 軸のなす角で定義されますが、それもデフォルトの
+ ellipse のスタイルから取られます (以下参照: `set style ellipse`)。
+ 3 列のデータが与えられた場合は、3 列目は主、副両軸の直径 (幅) として使
+ われます。向きはデフォルトで 0 になります。
+ 4 列のデータが与えられた場合は、それらは中心の座標、主軸直径 (幅)、副
+ 軸直径として使わわれます。これらは直径であり、半径でないことに注意して
+ ください。
+ 5 列のデータが与えられた場合は、5 列目の値は度単位の向きの角度の指定と
+ して使われます。
+ 楕円は、3,4,5 列の値は負の値として指定することで、それらのデフォルトの
+ 値を利用して楕円を書かせることもできます。
+
+ 上のすべての場合で、variable color データを最後の列 (3,4,5,6 列目) と
+ して追加できます。詳細は以下参照: `colorspec`。
+
+ デフォルトでは、主軸直径は水平軸 (x または x2) の単位、副軸直径は垂直
+ 軸 (y または y2) の単位であるとみなされます。これは、x 軸と y 軸の縮尺
+ が異なる場合、主軸と副軸の比は回転後には正しくはならない、ということを
+ 意味しています。しかしこの挙動は、キーワード `units` で変更できます。
+
+ これに関しては、3 種類の代用品があります:
+ `units xy` が描画指定に含まれている場合、その軸は上に述べたように縮尺
+ されます。`units xx` とすると、直径は両軸とも x 軸の単位で計算され、
+ `units yy` は両軸とも y 軸の単位で計算されます。後の 2 つは、描画のサ
+ イズを変更しても、楕円は正しいアスペクト比を持ちます。
+
+ `units` を省略した場合は、デフォルトの設定が使用され、`units xy` とな
+ りますが、これは、`set style ellipse` で再定義可能です。
+
+ 例 (楕円を有効な線種を周期的に使用して描画):
+
+     plot 'data' using 1:2:3:4:(0):0 with ellipses
+
+ 以下も参照: `set object ellipse`, `set style ellipse`, `fillstyle`。
 2 dots
 ?commands set style dots
 ?set style dots
@@ -2900,6 +2994,9 @@ Ffigure_filledcurves
  します。
 
       5 列:   date  open  low  high  close
+
+ 入力列を追加 (6 列目) すると、それらは各行毎の variable color 情報 (以
+ 下参照: `linecolor`, `rgbcolor variable`) として使われます。
 
 Ffigure_financebars
  記号は、水平方向にはその x 座標に置かれ、垂直方向には最高値 (high) と
@@ -3225,13 +3322,12 @@ Ffigure_scaled_image
 ?style impulses
 ?impulses
 Ffigure_impulses
- `impulses` スタイルは、2 次元描画では x 軸から各点の y の値への、3 次
- 元描画では xy 平面から各点の z の値への、垂直な線分を表示します。y や
- z の値は負の値でもよいことに注意してください。他のほとんどの描画スタイ
- ルと同様、データの追加列を各垂直線分の色の制御に利用できます。このスタ
- イルを 3 次元描画で使用する場合、太い線 (linewidth > 1) を利用するとよ
- り効果的でしょう。それは 3 次元の棒グラフに似たものになります。
-
+ `impulses` スタイルは、2 次元描画では y=0 から各点の y の値への、3 次
+ 元描画では z=0 から各点の z の値への、垂直な線分を表示します。y や z
+ の値は負の値でもよいことに注意してください。データの追加列を各垂直線分
+ の色の制御に利用できます。このスタイルを 3 次元描画で使用する場合、太
+ い線 (linewidth > 1) を利用するとより効果的でしょう。それは 3 次元の棒
+ グラフに似たものになります。
 
       1 列:  y        # 行番号による暗黙の x 座標 (2D)
       2 列:  x  y     # [x,0] から [x,y] への線 (2D)
@@ -3332,7 +3428,7 @@ Ffigure_points
  の大きさを変更するにはコマンド `set pointsize` が使えます。
  基本的に 2 次元描画では 1 列、または 2 列の入力データが必要で、3 次元
  描画では 1 列、または 3 列のデータが必要です。以下参照: `style lines`。
- 余分な入力列は、点のサイズや線色の変更などの情報が提供されたものとして
+ 余分な入力列は、点のサイズや点色の変更などの情報が提供されたものとして
  使用されます。
 2 steps
 ?commands set style steps
@@ -3377,6 +3473,10 @@ Ffigure_steps
       4 列:  x  y  xdelta  ydelta
       6 列:  x  y  z  xdelta  ydelta  zdelta
 
+ 両方の場合で、入力列を追加 (2D では 5 列目、3D では 7 列目) すると、そ
+ れらは各データ点毎の variable color 情報 (以下参照: `linecolor`,
+ `rgbcolor variable`) として使われます。
+
  vectors スタイルを使っての splot は `set mapping cartesian` のみでサポ
  ートされています。キーワード "with vectors" は arrow スタイルの指定子
  を後ろに伴うことができます。詳細は、以下参照: `arrowstyle`。
@@ -3396,7 +3496,7 @@ Ffigure_steps
 Ffigure_xerrorbars
  `xerrorbars` スタイルは 2 次元のデータ描画のみで利用可能です。
  `xerrorbars` は、水平の誤差指示線 (error bar) が表示される以外は
- `dots` と同じです。各点 (x,y) において (xlow,y) から (xhigh,y) まで、
+ `points` と同じです。各点 (x,y) において (xlow,y) から (xhigh,y) まで、
  または (x-xdelta,y) から (x+xdelta,y) までの線分が引かれますが、これら
  はいくつのデータ列が与えられるかによって変わります。誤差指示線の端には
  刻みの印が付けられます (`set bars` が使われていなければ。詳細に関して
@@ -3405,6 +3505,9 @@ Ffigure_xerrorbars
 
       3 列:  x  y  xdelta
       4 列:  x  y  xlow  xhigh
+
+ 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
+ 使われます。
 
 2 xyerrorbars
 ?commands set style xyerrorbars
@@ -3415,12 +3518,13 @@ Ffigure_xerrorbars
 Ffigure_xyerrorbars
  `xyerrorbars` スタイルは 2 次元のデータ描画のみで利用可能です。
  `xyerrorbars` は、水平、垂直の誤差指示線 (error bar) も表示される以外
- は `dots` と同じです。各点 (x,y) において (x,y-ydelta) から (x,y+ydelta)
- までと (x-xdelta,y) から (x+xdelta,y) まで、または (x,ylow) から
- (x,yhigh) までと (xlow,y) から (xhigh,y) までの線分が引かれますが、こ
- れらはいくつのデータ列が与えられるかによって変わります。誤差指示線の端
- には刻みの印が付けられます (`set bars` が使われていなければ。詳細に関
- しては、以下参照: `set bars`)。これは 4 列か、6 列のデータが必要です。
+ は `pointss` と同じです。各点 (x,y) において (x,y-ydelta) から
+ (x,y+ydelta) までと (x-xdelta,y) から (x+xdelta,y) まで、または
+ (x,ylow) から (x,yhigh) までと (xlow,y) から (xhigh,y) までの線分が引
+ かれますが、これらはいくつのデータ列が与えられるかによって変わります。
+ 誤差指示線の端には刻みの印が付けられます (`set bars` が使われていなけ
+ れば。詳細に関しては、以下参照: `set bars`)。これは 4 列か、6 列のデー
+ タが必要です。
 
       4 列:  x  y  xdelta  ydelta
       6 列:  x  y  xlow  xhigh  ylow  yhigh
@@ -3431,6 +3535,10 @@ Ffigure_xyerrorbars
  します:
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
+
+ 入力列を追加 (5,7 列目) すると、それらは各データ点毎の variable color
+ 情報として使われます。
+
 2 yerrorbars
 ?commands set style yerrorbars
 ?commands set style errorbars
@@ -3454,6 +3562,9 @@ Ffigure_yerrorbars
       3 列:  x  y  ydelta
       4 列:  x  y  ylow  yhigh
 
+ 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
+ 使われます。
+
  以下も参照
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
  errorbar デモ。
@@ -3475,6 +3586,9 @@ Ffigure_xerrorlines
 
       3 列:  x  y  xdelta
       4 列:  x  y  xlow  xhigh
+
+ 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
+ 使われます。
 
 2 xyerrorlines
 ?commands set style xyerrorlines
@@ -3501,6 +3615,10 @@ Ffigure_xyerrorlines
  します:
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
+
+ 入力列を追加 (5,7 列目) すると、それらは各データ点毎の variable color
+ 情報として使われます。
+
 2 yerrorlines
 ?commands set style yerrorlines
 ?commands set style errorlines
@@ -3522,6 +3640,9 @@ Ffigure_yerrorlines
 
       3 列:  x  y  ydelta
       4 列:  x  y  ylow  yhigh
+
+ 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
+ 使われます。
 
  以下も参照。
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
@@ -5069,15 +5190,16 @@ Ffigure_mapcontours
  または適切なモデルで fit を使うのがいいでしょう。
 
  書式:
-       smooth {unique | frequency | cumulative | kdensity | csplines
-               | acsplines | bezier | sbezier}
+       smooth {unique | frequency | cumulative | cnormal | kdensity
+               | csplines | acsplines | bezier | sbezier}
 
- `unique`, `frequency`, `cumulative` は、データを単調に揃えた後でそれら
- を plot します。他のルーチンはいずれも、データの両端の点の間を結ぶ、あ
- る連続曲線の係数を決定するためにデータを使います。この曲線は、関数とし
- て同じ方法で描画されます。すなわち、それらの値は x 座標に沿う同じ幅の
- 区間ごとに選ばれ (以下参照: `set samples`)、それらの点を線分でつなぐこ
- とにより (もし line style が選ばれているのならば) 描画されます。
+ `unique`, `frequency`, `cumulative`, `cnormal` は、データを単調に揃え
+ た後でそれらを plot します。他のルーチンはいずれも、データの両端の点の
+ 間を結ぶ、ある連続曲線の係数を決定するためにデータを使います。この曲線
+ は、関数として同じ方法で描画されます。すなわち、それらの値は x 座標に
+ 沿う同じ幅の区間ごとに選ばれ (以下参照: `set samples`)、それらの点を線
+ 分でつなぐことにより (もし line style が選ばれているのならば) 描画され
+ ます。
 
  もし `autoscale` の状態であれば、描画範囲はグラフの境界線の中に曲線が
  収まるように計算されます。
@@ -5203,6 +5325,27 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/smooth.html">
  smooth.dem
 ^ </a>
+5 cnormal
+?commands plot datafile smooth cnormal
+?plot datafile smooth cnormal
+?plot smooth cnormal
+?data-file smooth cnormal
+?datafile smooth cnormal
+?plot cnormal
+?smooth cnormal
+?cnormal
+ オプション `cnormal` は、x に関して単調で、y の値は [0:1] に正規化され
+ たデータを生成します。同じ x の値を持つ点が複数ある場合は、それより小
+ さい x の値を持つすべてのデータ点 (すなわち現在のデータ点よりも左にあ
+ る点) の累積和を、すべての y の値の和で割った値を y の値として持つよう
+ な一点のデータに置き変えられます。これは、データから正規化された累積分
+ 布関数を得るのに使えます (特に標本点数の異なるデータ集合を比較するのに
+ 有用です)。
+ 以下も参照。
+^ <a href="http://www.gnuplot.info/demo/smooth.html">
+ smooth.dem
+^ </a>
+
 5 kdensity
 ?commands plot datafile smooth kdensity
 ?plot datafile smooth kdensity
@@ -5899,8 +6042,9 @@ Ffigure_mapcontours
                                         vectors
  または、
        boxes            candlesticks   image      circles
-       boxerrorbars     filledcurves   rgbimage
+       boxerrorbars     filledcurves   rgbimage   ellipses
        boxxyerrorbars   histograms     rgbalpha   pm3d
+       boxplot
 
  最初のグループのスタイルは、線、点、文字の属性を持ち、第 2 のグループ
  のスタイルは、さらに塗り潰し属性も持っています。以下参照: `fillstyle`。
@@ -6579,8 +6723,8 @@ Ffigure_mapcontours
 ?set bars
 ?show bars
 ?bars
- コマンド `set bars` は誤差グラフ (errorbar) の両端のマークの幅、および
- 描画スタイル candlesticks, financebars の箱の幅を制御します。
+ コマンド `set bars` は誤差グラフ (errorbar) の両端、および boxplot に
+ つく箱ひげの両端のマークを制御します。
 
  書式:
        set bars {small | large | fullwidth | <size>} {front | back}
@@ -6590,9 +6734,9 @@ Ffigure_mapcontours
  `small` は 0.0, `large` は 1.0 と同じです。サイズを指定しなければデフォ
  ルトの値は 1.0 です。
 
- キーワード `fullwidth` は errorbar を伴うヒストグラム (histgrams) にの
- み関連します。これは errorbar の両端の幅を、関連するヒストグラムの箱の
- 幅と同じに設定しますが、箱の幅自体を変更することはありません。
+ キーワード `fullwidth` は、errorbar を伴う boxplots と histograms にの
+ み関連します。これは errorbar の両端の幅を、対応する箱の幅と同じに設定
+ しますが、箱の幅自体を変更することはありません。
 
  キーワード `front`, `back` は、塗り潰し長方形のついた errorbar のみに
  関連します (boxes, candlesticks, histograms)。
@@ -7135,8 +7279,15 @@ Ffigure_mapcontours
        set datafile missing "NaN"
 
  例:
+       set style data linespoints
+       plot '-'
+          1 10
+          2 20
+          3 ?
+          4 40
+          5 50
+          e
        set datafile missing "?"
-       set style data lines
        plot '-'
           1 10
           2 20
@@ -7163,10 +7314,10 @@ Ffigure_mapcontours
  行に 1 つしかデータがなかった場合の規則が適用され、行番号が "x" でデー
  タが "y" と見なされ、その点は (2,3) に (この場合は誤って) 描画されます。
 
- 2 番目の `plot` は、真中の行を正しく無視します。描画される曲線は、
- (2,20) と (4,40) が結ばれます。
+ 2 番目と 3 番目の `plot` コマンドは、真中の行を正しく無視します。描画
+ される曲線は、(2,20) と (4,40) が結ばれます。
 
- 3 番目の `plot` も真中の行を正しく無視しますが、この場合は  (2,20) と
+ 4 番目の `plot` も真中の行を正しく無視しますが、この場合は  (2,20) と
  (4,40) は結ばれません。
 
  デフォルトの `missing` 用の文字は何も定義されていませんが、多くの場合
@@ -7515,8 +7666,8 @@ Ffigure_mapcontours
 
  パス名は単一のディレクトリ名、または複数のパス名のリストとして入力しま
  す。複数のパスからなるパスリストは OS 固有のパス区切り、例えば Unix で
- はコロン (':'), DOS//Windows/OS/2/Amiga ではセミコロン (';') 等で区切
- ります。`show fontpath`, `save`, `save set` コマンドは、可搬性のために
+ はコロン (':'), MS-DOS, Windows, OS/2 ではセミコロン (';') 等で区切り
+ ます。`show fontpath`, `save`, `save set` コマンドは、可搬性のために
  OS 固有のパス区切りをスペース (' ') で置き換えます。ディレクトリ名がエ
  クスクラメーションマーク ('!') で終っている場合、そのディレクトリのサ
  ブディレクトリも検索されます。
@@ -7716,12 +7867,13 @@ Ffigure_mapcontours
        %p           "am" または "pm"
        %r           "%I:%M:%S %p" の簡略形 (出力のみ)
        %R           "%H:%M" の簡略形 (出力のみ)
-       %S           秒 (0--60)
+       %S           秒 (出力では 0--60 の整数、入力では実数)
+       %s           2000 年最初からの秒数
        %T           "%H:%M:%S" の簡略形 (出力のみ)
        %U           その年の通算週 (週は日曜日からと数える)
        %w           曜日番号 (0--6, 日曜 = 0)
        %W           その年の通算週 (週は月曜日からと数える)
-       %y           西暦 (0-99)
+       %y           西暦 (2000-2068 年は 0-68、1969-1999 年は 69-99)
        %Y           西暦 (4 桁)
 #\begin{tabular}{|cl|} \hline
 #\multicolumn{2}{|c|}{目盛りラベルの日時書式指定子}\\
@@ -7744,12 +7896,13 @@ Ffigure_mapcontours
 #\verb@%p@ & "am" または "pm" \\
 #\verb@%r@ & \verb@"%I:%M:%S %p"@ の簡略形 (出力のみ)\\
 #\verb@%R@ & \verb@"%H:%M"@ の簡略形 (出力のみ)\\
-#\verb@%S@ & 秒 (0--60) \\
+#\verb@%S@ & 秒 (出力では 0--60 の整数、入力では実数)\\
+#\verb@%s@ & 2000 年最初からの秒数 \\
 #\verb@%T@ & \verb@"%H:%M:%S"@ の簡略形 (出力のみ)\\
 #\verb@%U@ & その年の通算週 (週は日曜日からと数える) \\
 #\verb@%w@ & 曜日番号 (0--6, 日曜 = 0) \\
 #\verb@%W@ & その年の通算週 (週は月曜日からと数える) \\
-#\verb@%y@ & 西暦 (0-99) \\
+#\verb@%y@ & 西暦 (0-99、1969-2068 年の下 2 桁) \\
 #\verb@%Y@ & 西暦 (4 桁) \\
 %c l .
 %書式@説明
@@ -7771,20 +7924,22 @@ Ffigure_mapcontours
 %%p@"am" または "pm"
 %%r@"%I:%M:%S %p" の簡略形 (出力のみ)
 %%R@"%H:%M" の簡略形 (出力のみ)
-%%S@秒 (0--60)
+%%S@秒 (出力では 0--60 の整数、入力では実数)
+%%s@2000 年最初からの秒数
 %%T@"%H:%M:%S" の簡略形 (出力のみ)
 %%U@その年の通算週 (週は日曜日からと数える)
 %%w@曜日番号 (0--6, 日曜 = 0)
 %%W@その年の通算週 (週は月曜日からと数える)
-%%y@西暦 (0-99)
+%%y@西暦 (0-99、1969-2068 年の下 2 桁)
 %%Y@西暦 (4 桁)
 %_
 @end table
 
- 数字を表す書式では、これらの指定子 (% の後ろ、指定子の前) に "0" ("オー"
- でなく "ゼロ") をつけることで、先頭に空白ができる場合に空白の代わりに 0
- で埋めることができ、また最小の出力幅を正の整数で指定することもできます
- (出力される数字を表示するのに指定した幅が足りない場合は無視されます)。
+ 数字を表す書式では、これらの指定子 (% の後ろ、指定子の前) に "0"
+ ("オー" でなく "ゼロ") をつけることで、先頭に空白ができる場合に空白の
+ 代わりに 0 で埋めることができ、また最小の出力幅を正の整数で指定するこ
+ ともできます (出力される数字を表示するのに指定した幅が足りない場合は無
+ 視されます)。書式 %S は実数指定も受けつけますので、小数秒も書けます。
  表示する文字の長さは 24 文字まで、という制限があり、長すぎた部分は切り
  捨てられます。
 
@@ -7795,8 +7950,8 @@ Ffigure_mapcontours
        set format x "%A, %d %b %Y"  # "Saturday, 25 Dec 1976"
        set format x "%r %D"         # "11:11:11 pm 12/25/76"
 
- 日時のデータが "98/07/06 05:04:03" の場合
-       set format x "%1y/%2m/%3d %01H:%02M:%03S"  # "98/ 7/  6 5:04:003"
+ 日時のデータが "98/07/06 05:04:03.123456" の場合
+       set format x "%1y/%2m/%3d %01H:%02M:%06.3S"  # "98/ 7/  6 5:04:03.123"
 3 function style
 ?set function style
  このコマンドの形式は現在は推奨されていません。以下参照:
@@ -7912,11 +8067,11 @@ Ffigure_mapcontours
  表示 (`set contour surface`) は機能しません。
 
  見出しと矢印は常に表示され、影響を受けません。グラフの説明 (key) も曲
- 面に隠されることはありません。gnuplot バージョン 4.2 ではグラフ上に曲
- 面が一つもない状態でも、`set hidden3d` は `with points`, `with labels`
- `with vectors` の 3 次元の描画スタイルに影響を与えます。グラフ内の各々
- の描画をこの処理から明示的に除外したいときは、`with` 指定に特別のオプ
- ション `nohidden3d` を追加してください。
+ 面に隠されることはありません。gnuplot バージョン 4.5 では、グラフ上に
+ 曲面が一つもない状態でも、hidden3d は `points`, `labels`, `vectors`,
+ `impulses` の 3 次元の描画スタイルに影響を与えます。グラフ内の各々の描
+ 画をこの処理から明示的に除外したいときは、`with` 指定に特別のオプショ
+ ン `nohidden3d` を追加してください。
 
  hidden3d は、pm3d モードで描画された、塗り潰された曲面には影響を与えま
  せん。pm3d の曲面に対して同様の効果を純粋に得たいならば、これの代わり
@@ -8085,6 +8240,8 @@ Ffigure_mapcontours
                {{no}box { {linestyle | ls <line_style>}
                           | {linetype | lt <line_type>}
                             {linewidth | lw <line_width>}}}
+               {maxcols {<max no. of columns> | auto}}
+               {maxrows {<max no. of rows> | auto}}
        unset key
        show key
 
@@ -8096,8 +8253,9 @@ Ffigure_mapcontours
  キー内の各要素は `vertical` (縦) または `horizontal` (横) に従って重ね
  られます。`vertical` の場合、key は可能ならば 2,3 個の縦の列を使います。
  すなわち、各要素は垂直スペースがなくなるまでは 1 つの列に整列されます
- が、そこから新しい列が開始されます。`horizontal` の場合は、key は可能
- ならば 2,3 個の横の行を使用します。
+ が、そこから新しい列が開始されます。垂直スペースは、'maxrows' を使って
+ 制限できます。`horizontal` の場合は、key は可能ならば 2,3 個の横の行を
+ 使用します。水平スペースは、'maxcols' を使って制限できます。
 
  デフォルトでは、key はグラフ領域の内側の右上の角に置かれます。キーワー
  ド `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
@@ -8261,9 +8419,9 @@ Ffigure_mapcontours
  生成します。このエントリには、描画タイトルと、その描画で使われるのと同
  じ色、同じ塗りつぶし属性による線/点/箱 のサンプルが入ります。font と
  textcolor 属性は、キー内に現われる個々の描画タイトルの見た目を制御しま
- す。textcolor を "rgb variable" にセットすると、キーの各エントリの文字
- 列は、描画グラフの線や塗りつぶし色と同じ色になります。これは、以前のあ
- る時期の gnuplot のデフォルトの挙動でした。
+ す。textcolor を "variable" にセットすると、キーの各エントリの文字列は、
+ 描画グラフの線や塗りつぶし色と同じ色になります。これは、以前のある時期
+ の gnuplot のデフォルトの挙動でした。
 
  グラフ曲線のサンプルの線分の長さは `samplen` で指定できます。その長さ
  は目盛りの長さと、<sample_length>*(文字幅) の和として計算されます。
@@ -8514,8 +8672,8 @@ Ffigure_mapcontours
 
  パス名は単一のディレクトリ名、または複数のパス名のリストとして入力しま
  す。複数のパスからなるパスリストは OS 固有のパス区切り、例えば Unix で
- はコロン (':'), DOS//Windows/OS/2/Amiga ではセミコロン (';') 等で区切
- ります。`show loadpath`, `save`, `save set` コマンドは、可搬性のために
+ はコロン (':'), MS-DOS, Windows, OS/2 ではセミコロン (';') 等で区切り
+ ます。`show loadpath`, `save`, `save set` コマンドは、可搬性のために
  OS 固有のパス区切りをスペース (' ') で置き換えます。
 
  環境変数 GNUPLOT_LIB が設定されている場合、その内容は `loadpath` に追
@@ -8689,20 +8847,10 @@ Ffigure_mapcontours
  と、座標軸は表示されますが、データの表示は消えます。これは大きなデータ
  に対して有用でしょう。
 
- 2 次元グラフと 3 次元グラフの両方で、X と Y 軸の伸縮はマウスホイールを
- 使うことで調整できます。<wheel-up> はスクロールアップし (YMIN と YMAX
- の両方を Y の範囲の 10 パーセントずつ増加させ、Y2MIN と Y2MAX にも同様
- のことを行います)、<wheel-down> はスクロールダウンします。
- <shift-wheel-up> は左スクロールし (XMIN と XMAX の両方、そして X2MIN
- と X2MAX の両方を減少)、<shift-wheel-down> は右スクロールします。
- <control-wheel-up> はグラフの中心方向にズームインし、
- <control-wheel-down> はズームアウトします。<shift-control-wheel-up> は
- X と X2 軸のみに沿ってズームインし、<shift-control-wheel-down> は X と
- X2 軸に沿ってのみズームアウトします。
-
- マウスは多重描画 (multiplot) モードでは無効ですが、`unset multiplot`
- で多重描画が終了すれば、マウス機能は ON になり、直前の描画 (ほぼ
- replot で描画されるもの) に対して作用します。
+ マウスは多重描画 (multiplot) モード内では無効ですが、`unset multiplot`
+ で多重描画が完結すれば、マウス機能は ON になります。ただし、その作用は
+ multiplot 内の最後の描画 (replot で描画されるようなもの) に対してのみ
+ です。
 
  書式:
        set mouse {doubleclick <ms>} {nodoubleclick} \
@@ -8717,9 +8865,9 @@ Ffigure_mapcontours
        unset mouse
 
  ダブルクリックの解像度はミリ秒 (ms) 単位で与えます。これは、ボタン 1
- 用のもので、現在のマウス位置を `clipboard` にコピーするのに使います。
- シングルクリックでそれを行うようにするには、0 ms を指定してください。
- デフォルトの値は 300 ms です。
+ 用のもので、現在のマウス位置をクリップボード (`clipboard`) にコピーす
+ るのに使います。デフォルトの値は 300 ms です。これを 0 ms に設定すると
+ シングルクリックでそのコピーを行うようになります。
 
  オプション `zoomcoordinates` は、拡大 (zoom) の時に、ズームの枠の端に
  その座標を書くかどうかを決定し、デフォルトでは ON になっています。
@@ -8782,11 +8930,23 @@ Ffigure_mapcontours
  されます。これは、ユーザ定義のキー割当、すなわち `bind` コマンドによる
  `hotkeys` (以下参照: `bind`) も表示されます。ユーザ定義の `hotkeys` は
  デフォルトのキー割当を無効にします。
-
- ドライバウィンドウ上で 'q' を打つと、ウィンドウを閉じます。このキーは
- `bind` コマンドでは無効にできません。
-
  以下も参照: `bind`, `label`。
+4 マウススクロール (scrolling)
+?set mouse scrolling
+?mouse scrolling
+?mouse wheel
+?scrolling
+?mousewheel
+ 2 次元グラフと 3 次元グラフの両方で、X と Y 軸の伸縮はマウスホイールを
+ 使うことで調整できます。<wheel-up> はスクロールアップし (YMIN と YMAX
+ の両方を Y の範囲の 10 パーセントずつ増加させ、Y2MIN と Y2MAX にも同様
+ のことを行います)、<wheel-down> はスクロールダウンします。
+ <shift-wheel-up> は左スクロールし (XMIN と XMAX の両方、そして X2MIN
+ と X2MAX の両方を減少)、<shift-wheel-down> は右スクロールします。
+ <control-wheel-up> はグラフの中心方向にズームインし、
+ <control-wheel-down> はズームアウトします。<shift-control-wheel-up> は
+ X と X2 軸のみに沿ってズームインし、<shift-control-wheel-down> は X と
+ X2 軸に沿ってのみズームアウトします。
 4 X11 でのマウス (X11 mouse)
 ?mouse x11_mouse
 ?x11_mouse
@@ -8795,13 +8955,6 @@ Ffigure_mapcontours
  ウィンドウが開いている場合、マウスコマンドとホットキーの機能をちゃんと
  使えるのは現在の描画ウィンドウのみです。しかし、他のウィンドウも左下に
  マウスの座標を表示位はしてくれるでしょう。
-
- 他のスクリーン出力形式との統一性も考え、X11 でのマウスサポートは、標準
- 入力がどこからであっても、デフォルトで ON になります。しかし、UNIX 風
- の OS の中には、/dev/null のような特殊な入力デバイスを選択してはいけな
- いものがあり、そのようなデバイスでマウスを ON にすると gnuplot がハン
- グアップしてしまうことがあります。このような状況では、`unset mouse` で
- マウス機能を OFF にしてください。
 3 multiplot
 ?commands set multiplot
 ?commands unset multiplot
@@ -8873,7 +9026,7 @@ Ffigure_mapcontours
  や `set origin` コマンドなしに、単純な複数グラフの描画を作成できます。
  それらの設定は自動的に行なわれ、いつでもその設定を変更できます。
  `layout` では表示は <rows> 行と <cols> 列の格子に分割され、各格子は、
- その後に続く対応する名前のオプションによって列 (rowsfirst)、あるいは行
+ その後に続く対応する名前のオプションによって行 (rowsfirst)、あるいは列
  (columnsfirst) が先に埋められて行きます。描画グラフの積み上げは下方向
  (`downwards`) に、または上方向 (`upwards`) に伸びるようにできます。デ
  フォルトは `rowsfirst` で `downwards` です。
@@ -9071,6 +9224,7 @@ Ffigure_mapcontours
 
      # 頂点は移動しないまま、塗り潰しと色をデフォルトに変更
      set object 2 rect default
+
 4 ellipse
 ?ellipse
 ?commands set object ellipse
@@ -9079,25 +9233,36 @@ Ffigure_mapcontours
 ?show object ellipse
  書式:
      set object <index> ellipse {at|center} <position> size <w>,<h>
-         {angle <orientation>}
+         {angle <orientation>} {units xy|xx|yy}
          {<other-object-properties>}
 
- 楕円の位置は、中心を指定し、その後ろに幅と高さ (長軸と短軸) を指定しま
+ 楕円の位置は、中心を指定し、その後ろに幅と高さ (主軸と副軸) を指定しま
  す。キーワード `at` と `center` は同じ意味です。中心の位置の指定には、
  軸の座標 (`first`, `second`)、グラフ領域内の相対座標 (`graph`)、スクリ
  ーン座標 (`screen`) のいずれかを使用できます (以下参照: `coordinates`)。
- 長軸と短軸の長さは、軸の座標で与えなければいけません。楕円の向き
- (orientation) は、水平軸と楕円の最初の軸との間の角度で指定します。
- 注意: x 軸と y 軸の縮尺が合っていない場合、回転後の長軸と短軸の比は正
- しくはなりません。これは、gnuplot の今後の版で修正されるでしょう。
+ 主軸と副軸の長さは、軸の座標で与えなければいけません。楕円の向き
+ (orientation) は、水平軸と楕円の主軸との間の角度で指定します。角度を与
+ えなければ、デフォルトの楕円の向きが代わりに使われます (以下参照:
+ `set style ellipse`)。キーワード `units` は、楕円の軸の縮尺の制御に使
+ 用します。`units xy` は、主軸は x 軸の単位で、副軸は y 軸の単位で計算
+ しますが、`units xx` は両軸とも x 軸の単位で縮尺し、`units yy` は両軸
+ とも y 軸の単位になります。
+ デフォルトは `xy` ですが、`set style ellipse units` の設定でいつでも変
+ 更できます。
+
+ 注意: x 軸と y 軸の縮尺が等しくない場合 (そして `units xy` の場合)、回
+ 転後の主軸と副軸の比は正しくはなりません。
 
  `set object ellipse size <2r>,<2r>` と `set object circle <r>` とは、
  一般には同じことにはならないことに注意してください。circle の半径は常
  に x 軸の単位で計られ、よって x 軸と y 軸の縮尺が違ったり、描画のアス
- ペクト比が 1 でなくても、常に円が生成されます。`set object ellipse` で
- は、最初の '2r' は x 軸の単位で、後ろの '2r' は y 軸の単位で計られます
- ので、こちらは x 軸と y 軸の縮尺が同じで、かつ描画のアスペクト比が 1
- である場合のみ円が生成されることになります。
+ ペクト比が 1 でなくても、常に円が生成されます。`units` が `xy` に設定
+ されていれば、'set object ellipse' では、最初の <2r> は x 軸の単位で、
+ 後ろの <2r> は y 軸の単位で計られますが、これは x 軸と y 軸の縮尺が同
+ じで、かつ描画のアスペクト比が 1 である場合のみ円を生成することを意味
+ します。しかし、`units` を `xx` や `yy` にセットすれば、コマンド
+ `set object` で指定した直径は同じ単位で計算されるので、楕円は正しいア
+ スペクト比を持ち、描画をリサイズしてもそのアスペクト比は保持されます。
 
 4 circle
 ?circle
@@ -9227,7 +9392,7 @@ Ffigure_mapcontours
        set output "|lpr -Plaser filename"
        set output "|lp -dlaser filename"
 
- MSDOS では、`set output "PRN"` とすると標準のプリンタに出力されます。
+ MS-DOS では、`set output "PRN"` とすると標準のプリンタに出力されます。
  VMS では出力は任意のスプール可能なデバイスに送ることが出来ます。出力を
  DECnet 透過なタスクに送ることも可能で、それはある種の柔軟性を与えてく
  れます。
@@ -10146,6 +10311,14 @@ Ffigure_mapcontours
        set style histogram <histogram style options>
        set style line <n> <linestyle>
 
+ `gnuplot` が object をサポートするようにコンパイルされていれば、以下の
+ オプションも有効です:
+
+ 書式:
+       set style rectangle <object options> <linestyle> <fillstyle>
+       set style circle radius <size>
+       set style ellipse size <size> units {xy|xx|yy}
+
 4 set style arrow
 ?commands set style arrow
 ?commands unset style arrow
@@ -10243,6 +10416,7 @@ Ffigure_mapcontours
  書式:
        set style boxplot {range <r> | fraction <f>}
                          {{no}outliers} {pointtype <p>}
+                         {candlesticks | financebars}
 
  boxplot の箱は、常にデータ点の第一四分位から第三四分位の値の範囲にかか
  っています。箱から延長される箱ひげの限界は、2 つの異なる方法で制御でき
@@ -10265,7 +10439,10 @@ Ffigure_mapcontours
  ではそれらはひとつひとつ円 (pointtype 7) で描かれますが、オプション
  `nooutliers` はこれを無効にします。
 
- 以下参照: `boxplot`.
+ デフォルトでは boxplot は candlesticks と似たスタイルで描画しますが、
+ financebars と似たスタイルで描画するためのオプションもあります。
+
+ 以下参照: `boxplot`, `candlesticks`, `financebars`。
 
 4 set style data
 ?commands set style data
@@ -10533,6 +10710,22 @@ Ffigure_mapcontours
  は、RGB カラーをサポートするすべての出力形式で、ラインスタイル 10 に実
  線の水色を割り当てます。
 
+4 set style circle
+?commands set style circle
+?commands unset style circle
+?commands show style circle
+?set style circle
+?unset style circle
+?show style circle
+
+ 書式:
+       set style circle {radius {graph|screen} <R>}
+
+ このコマンドは、描画スタイル "with circles" で使われるデフォルトの半径
+ を設定します。これは、データ描画で 2 列のデータ (x,y) しか与えなかった
+ 場合、あるいは関数描画のときに適用されます。デフォルトは、以下のように
+ なっています: "set style circle radius graph 0.02"。
+
 4 set style rectangle
 ?commands set style rectangle
 ?commands unset style rectangle
@@ -10556,6 +10749,47 @@ Ffigure_mapcontours
      set style rectangle fc linsestyle 3 fs pattern 2 noborder
 
  デフォルトの設定は、背景色での塗り潰しで、境界は黒になっています。
+
+4 set style ellipse
+?commands set style ellipse
+?commands show style ellipse
+?commands set style ellipse
+?set style ellipse
+?unset style ellipse
+?show style ellipse
+
+ 書式:
+       set style ellipse {units xx|xy|yy}
+                         {size {graph|screen} <a>, {{graph|screen} <b>}}
+                         {angle <angle>}
+
+ このコマンドは、楕円の直径を同じ単位で計算するかどうかを制御します。
+ デフォルトは `xy` で、これは楕円の主軸 (第 1 軸) の直径は x (または x2)
+ 軸と同じ単位で計算し、副軸 (第 2 軸) の直径は y (または y2) 軸の単位で
+ 計算します。このモードでは、楕円の両軸の比は、描画軸のアスペクト比に依
+ 存します。`xx` か `yy` に設定すれば、すべての楕円の両軸は同じ単位で計
+ 算されます。これは、描画される楕円の両軸の比は、回転しても正しいままで
+ すが、水平方向か垂直方向の一方の縮尺の変更により正しくなくなることを意
+ 味します。
+
+ これは、object として定義された楕円、コマンド `plot` によって描画され
+ る楕円の両方に影響を与える全体的な設定ですが、`units` の値は、描画毎、
+ オブジェクト毎に設定を再定義できます。
+
+ 楕円のデフォルトのサイズも、キーワード `size` で設定できます。デフォル
+ トのサイズは、2 列のみのデータ、または関数の plot 命令で適用されます。
+ 2 つの値は、楕円の (2 つの主軸、2 つの副軸に向かい合う) 主軸直径と副軸
+ 直径として使用されます。
+
+ デフォルトは、"set style ellipse size graph 0.05,0.03" です。
+
+ 最後になりますが、デフォルトの向きをキーワード `angle` で設定もできま
+ す。向きは、楕円の主軸とグラフの x 軸の方向となす角で、単位は度で与え
+ る必要があります。
+
+
+ 楕円の object の定義に関しては以下も参照: `set object ellipse`。2 次元
+ の描画スタイルに関しては以下参照: `ellipses`。
 
 3 surface
 ?commands set surface
@@ -10668,6 +10902,7 @@ Ffigure_mapcontours
 
       set termoption {no}enhanced
       set termoption font "<fontname>{,<fontsize>}"
+      set termoption fontscale <scale>
       set termoption {solid|dashed}
       set termoption {linewidth <lw>}{lw <lw>}
 
@@ -10817,7 +11052,7 @@ Ffigure_mapcontours
        %H           何時, 0--24
        %M           何分, 0--60
        %s           Unix epoch (1970-01-01, 00:00 UTC) からの秒数
-       %S           何秒, 0--60
+       %S           何秒 (出力では 0--60 の整数、入力では実数)
        %b           月名 (英語) の 3 文字省略形
        %B           月名 (英語)
 #\begin{tabular}{|cl|} \hline
@@ -10832,7 +11067,7 @@ Ffigure_mapcontours
 #\verb@%H@ & 何時, 0--24 \\
 #\verb@%M@ & 何分, 0--60 \\
 #\verb@%s@ & Unix epoch (1970-01-01, 00:00 UTC) からの秒数\\
-#\verb@%S@ & 何秒, 0--60 \\
+#\verb@%S@ & 何秒 (出力では 0--60 の整数、入力では実数)\\
 #\verb@%b@ & 月名 (英語) の 3 文字省略形 \\
 #\verb@%B@ & 月名 (英語) \\
 %c l .
@@ -10846,7 +11081,7 @@ Ffigure_mapcontours
 %%H@何時, 0--24
 %%M@何分, 0--60
 %%s@Unix epoch (1970-01-01, 00:00 UTC) からの秒数
-%%S@何秒, 0--60
+%%S@何秒 (出力では 0--60 の整数、入力では実数)
 %%b@月名 (英語) の 3 文字省略形
 %%B@月名 (英語)
 %_
@@ -10854,8 +11089,10 @@ Ffigure_mapcontours
  任意の文字を文字列中で使用できますが、規則に従っている必要があります。
  \t (タブ) は認識されます。バックスラッシュ + 8 進数列 (\nnn) はそれが
  示す文字に変換されます。日時要素の中に分離文字がない場合、%d, %m, %y,
- %H, %M, %S はそれぞれ 2 桁の数字を読み込み、%Y は 4 桁、%j は 3 桁の数
- 字を読み込みます。%b は 3 文字を、%B は必要な分だけの文字を要求します。
+ %H, %M, %S はそれぞれ 2 桁の数字を読み込みます。%S での読み込みで小数
+ 点がそのフィールドについている場合は、その小数点つきの数を小数の秒指定
+ だと解釈します。%Y は 4 桁、%j は 3 桁の数字を読み込みます。%b は 3 文
+ 字を、%B は必要な分だけの文字を要求します。
 
  空白 (スペース) の扱いはやや違います。書式文字列中の 1 つの空白は、フ
  ァイル中の 0 個、あるいは 1 つ以上の空白文字列を表します。すなわち、
@@ -10866,11 +11103,14 @@ Ffigure_mapcontours
  識されます。混乱を避けるために、日時データが含まれる場合 `gnuplot` は、
  あなたの `using` 指定が完璧なものであると仮定します。
 
- `gnuplot` は数字でない文字列を読めないので、日付データが曜日、月の名前
- を含んでいる場合、書式文字列でそれを排除しなければいけません。しかし、
- "%a", "%A", "%b", "%B" でそれらを表示することはできます: これら、及び
- 日時データの出力の他のオプションの詳細に関しては、以下参照:
- `set format`。(`gnuplot` は数値から月や曜日を正しく求めます。)
+ 日付データが曜日、月の名前を含んでいる場合、書式文字列でそれを排除しな
+ ければいけませんが、"%a", "%A", "%b", "%B" でそれらを表示することはで
+ きます。`gnuplot` は数値から月や曜日を正しく求めます。これら、及び日時
+ データの出力の他のオプションの詳細に関しては、以下参照: `set format`。
+
+ 2 桁の西暦を %y で読む場合、69-99 は 2000 年未満、00-68 は 2000 年以後
+ と見なします。注: これは、UNIX98 の仕様に合わせたものですが、この慣例
+ はあちこちで違いがあるので、2 桁の西暦値は本質的にあいまいです。
 
  他の情報については、以下も参照: `set xdata`, `Time/date`。
 
@@ -11012,7 +11252,7 @@ Ffigure_mapcontours
 
  最初の例は 4 つの全てをデフォルトの値にしています。2 つめの例は縮小率
  のみを 0.5 に変更しています。
-4 equal
+4 equal_axes
 ?set view equal_axes
 ?set view equal
 ?view equal_axes
@@ -11928,15 +12168,14 @@ Ffigure_mapcontours
 ?shell
  `shell` コマンドは対話的なシェルを起動します。`gnuplot` に戻るには、
  VMS では `logout` を、Unix ならば `exit` もしくは END-OF-FILE 文字を、
- AmigaOS では `endcli` を、MS-DOS か OS/2 ならば `exit` を入力して下
- さい。
+ MS-DOS か OS/2 ならば `exit` を入力して下さい。
 
  シェルコマンドを実行する方法は 2 つあります: コマンド `system` を使う
  か `!` (VMS では $) を使うか。前者は、コマンド文字列をパラメータとして
  取るので、他の gnuplot コマンドのどこでも使うことができますが、後者の
  書式は、その行にそのコマンドただ一つであることを要求します。これらの場
  合コマンドが終了するとすぐに制御は `gnuplot` に戻ってきます。例えば
- AmigaDOS, MS-DOS, OS/2 では、
+ MS-DOS, OS/2 では、
 
       ! dir
  または
@@ -12353,10 +12592,11 @@ Ffigure_mapcontours
  名に `.old` をつけてファイル名を変更し、指定したファイル名のファイルを
  新たに開き直します。つまり、"`update 'fred'`" とすると、それは
  "`!rename fred fred.old; update 'fred.old' 'fred'`" としたことと同じこ
- とになります。["filename.ext" の 12 文字しか使えない DOS や他のシステ
- ムでは、"ext" が "`old`" になって "filename" は最初のファイルに関係す
- るもの (多分どれかがすぐに分かるでしょう) が使われます。VMS では、ファ
- イルのバージョン管理システムが使われるため、名前の変更は行なわれません。]
+ とになります。["filename.ext" の 12 文字しか使えない MS-DOS や他のシス
+ テムでは、"ext" が "`old`" になって "filename" は最初のファイルに関係
+ するもの (多分どれかがすぐに分かるでしょう) が使われます。VMS では、フ
+ ァイルのバージョン管理システムが使われるため、名前の変更は行なわれませ
+ ん。]
 
  より詳しい情報に関しては、以下参照: `fit`。
 1 出力形式 (Terminal)

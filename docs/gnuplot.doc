@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.616 2010/07/01 16:50:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.617 2010/07/08 04:54:50 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9110,12 +9110,12 @@ Ffigure_mapcontours
  circle even if the x and y axis scales are different and even if the aspect
  ratio of your plot is not 1.  If `units` is set to `xy`, then
  'set object ellipse' interprets the first <2r> in terms of x axis units 
- and the second '2r' in terms of y axis units. This will only produce a
+ and the second <2r> in terms of y axis units. This will only produce a
  circle if the x and y axis scales are identical and the plot aspect ratio
  is 1.  On the other hand, if `units` is set to `xx` or `yy`, then the
  diameters specified in the 'set object' command will be interpreted in the
- same units, so the ellipse will have the correct aspect ration, and it will
- maintain its aspect ration even if the plot is resized.
+ same units, so the ellipse will have the correct aspect ratio, and it will
+ maintain its aspect ratio even if the plot is resized.
 
 4 circle
 ?circle
@@ -10618,7 +10618,6 @@ Ffigure_mapcontours
  Last, but not least it is possible to set the default orientation with the
  `angle` keyword. The orientation, which is defined as the angle between the
  major axis of the ellipse and the plot's x axis, must be given in degrees.
-
 
  For defining ellipse objects, see `set object ellipse`;
  for the 2D plot style, see `ellipses`.
