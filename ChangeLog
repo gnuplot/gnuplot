@@ -2,6 +2,10 @@
 
 	* term/canvas.trm:  "set term canvas fontscale <fs>"
 
+	* src/graphics.c (do_plot do_key_layout): Separate out the code that
+	allocates space for the graph legend, and collect the key sample code
+	into a single place.
+
 2010-07-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: typos

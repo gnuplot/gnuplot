@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.335 2010/06/28 23:36:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.336 2010/07/08 04:54:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -159,6 +159,7 @@ static void map_position_double __PROTO((struct position* pos, double* x, double
 
 static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
 
+static void do_key_layout __PROTO((legend_key *key, int *xl, int *yl));
 static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
 				   char *title,  struct termentry *t, int xl, int yl));
 
@@ -1772,55 +1773,9 @@ do_plot(struct curve_points *plots, int pcount)
     if (term->layer)
 	(term->layer)(TERM_LAYER_FRONTTEXT);
 
-    /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
-    if (lkey) {			/* may have been cancelled if something went wrong */
-	/* just use key->bounds.xleft etc worked out in boundary() */
-	xl = key->bounds.xleft + key_size_left;
-	yl = key->bounds.ytop;
-
-	if (*key->title) {
-	    int center = (key->bounds.xleft + key->bounds.xright) / 2;
-	    double extra_height = 0.0;
-
-	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
-		apply_pm3dcolor(&(key->box.pm3d_color), t);
-	    else
-		apply_pm3dcolor(&(key->textcolor), t);
-	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
-		extra_height += 0.51;
-	    write_multiline(center, yl - (0.5 + extra_height/2.0) * t->v_char,
-			    key->title, CENTRE, JUST_TOP, 0, key->font);
-	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
-		extra_height += 0.3;
-	    ktitl_lines += extra_height;
-	    key->bounds.ybot -= extra_height * t->v_char;
-	    yl -= t->v_char * ktitl_lines;
-	    (*t->linetype)(LT_BLACK);
-	}
-
-	yl -= (int)(0.5 * key->height_fix * t->v_char);
-	yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
-	key_count = 0;
-
-	if (key->box.l_type > LT_NODRAW) {
-	    BoundingBox *clip_save = clip_area;
-	    if (term->flags & TERM_CAN_CLIP)
-		clip_area = NULL;
-	    else
-		clip_area = &canvas;
-	    term_apply_lp_properties(&key->box);
-	    newpath();
-	    draw_clip_line(key->bounds.xleft, key->bounds.ybot, key->bounds.xleft, key->bounds.ytop);
-	    draw_clip_line(key->bounds.xleft, key->bounds.ytop, key->bounds.xright, key->bounds.ytop);
-	    draw_clip_line(key->bounds.xright, key->bounds.ytop, key->bounds.xright, key->bounds.ybot);
-	    draw_clip_line(key->bounds.xright, key->bounds.ybot, key->bounds.xleft, key->bounds.ybot);
-	    closepath();
-	    /* draw a horizontal line between key title and first entry */
-	    draw_clip_line(key->bounds.xleft, key->bounds.ytop - (ktitl_lines) * t->v_char,
-			   key->bounds.xright, key->bounds.ytop - (ktitl_lines) * t->v_char);
-	    clip_area = clip_save;
-	}
-    } /* lkey */
+    /* Draw the key */
+    if (lkey)
+	do_key_layout( key, &xl, &yl );
 
     /* DRAW CURVES */
     this_plot = plots;
@@ -1929,10 +1884,6 @@ do_plot(struct curve_points *plots, int pcount)
 		plot_points(this_plot);
 		break;
 	    case DOTS:
-		if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
-		    if (on_page(xl + key_point_offset, yl))
-			(*t->point) (xl + key_point_offset, yl, -1);
-		}
 		plot_dots(this_plot);
 		break;
 	    case YERRORLINES:
@@ -2046,12 +1997,16 @@ do_plot(struct curve_points *plots, int pcount)
 		(*t->linetype)(LT_BACKGROUND);
 		(*t->point)(xl + key_point_offset, yl, 6);
 		term_apply_lp_properties(&this_plot->lp_properties);
-	    }
-	    if (this_plot->plot_style == BOXPLOT)
-		;	/* Don't draw a sample point in the key */
-	    else
 
-	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
+	    } else if (this_plot->plot_style == BOXPLOT) {
+		;	/* Don't draw a sample point in the key */
+
+	    } else if (this_plot->plot_style == DOTS) {
+		if (on_page(xl + key_point_offset, yl))
+		    (*t->point) (xl + key_point_offset, yl, -1);
+	    }
+
+	    else if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
 		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize);
 		if (on_page(xl + key_point_offset, yl))
@@ -6636,4 +6591,63 @@ skip_pixel:
     }
     }
 
+}
+
+/* Graph legend is now optionally done in two passes. The first pass calculates	*/
+/* and reserves the necessary space.  Next the individual plots in the graph 	*/
+/* are drawn. Then the reserved space for the legend is blanked out, and 	*/
+/* finally the second pass through this code draws the legend.			*/
+static void
+do_key_layout(legend_key *key, int *xinkey, int *yinkey)
+{
+    struct termentry *t = term;
+    int xl = key->bounds.xleft + key_size_left;
+    int yl = key->bounds.ytop;
+
+    if (*key->title) {
+	int center = (key->bounds.xleft + key->bounds.xright) / 2;
+	double extra_height = 0.0;
+
+	if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
+	    extra_height += 0.51;
+
+	if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
+	    apply_pm3dcolor(&(key->box.pm3d_color), t);
+	else
+	    apply_pm3dcolor(&(key->textcolor), t);
+	write_multiline(center, yl - (0.5 + extra_height/2.0) * t->v_char,
+			key->title, CENTRE, JUST_TOP, 0, key->font);
+	(*t->linetype)(LT_BLACK);
+
+	if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
+	    extra_height += 0.3;
+	ktitl_lines += extra_height;
+	key->bounds.ybot -= extra_height * t->v_char;
+	yl -= t->v_char * ktitl_lines;
+    }
+
+    yl -= (int)(0.5 * key->height_fix * t->v_char);
+    yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
+
+    if (key->box.l_type > LT_NODRAW) {
+	BoundingBox *clip_save = clip_area;
+	if (term->flags & TERM_CAN_CLIP)
+	    clip_area = NULL;
+	else
+	    clip_area = &canvas;
+	term_apply_lp_properties(&key->box);
+	newpath();
+	draw_clip_line(key->bounds.xleft, key->bounds.ybot, key->bounds.xleft, key->bounds.ytop);
+	draw_clip_line(key->bounds.xleft, key->bounds.ytop, key->bounds.xright, key->bounds.ytop);
+	draw_clip_line(key->bounds.xright, key->bounds.ytop, key->bounds.xright, key->bounds.ybot);
+	draw_clip_line(key->bounds.xright, key->bounds.ybot, key->bounds.xleft, key->bounds.ybot);
+	closepath();
+	/* draw a horizontal line between key title and first entry */
+	draw_clip_line( key->bounds.xleft, key->bounds.ytop - (ktitl_lines) * t->v_char,
+			key->bounds.xright, key->bounds.ytop - (ktitl_lines) * t->v_char);
+	clip_area = clip_save;
+    }
+
+    *xinkey = xl;
+    *yinkey = yl;
 }
