@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.617 2010/07/08 04:54:50 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.618 2010/07/15 05:52:13 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10581,7 +10581,6 @@ Ffigure_mapcontours
 4 set style ellipse
 ?commands set style ellipse
 ?commands show style ellipse
-?commands set style ellipse
 ?set style ellipse
 ?unset style ellipse
 ?show style ellipse

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.31 2010/02/01 16:30:08 sfeam Exp $
+ * $Id: canvas.trm,v 1.32 2010/05/22 16:11:12 sfeam Exp $
  *
  */
 
@@ -93,6 +93,7 @@ static int canvas_line_type = LT_UNDEFINED;
 static double canvas_linewidth = 1.0;
 static double CANVAS_ps = 1;	/* pointsize multiplier */
 static double canvas_font_size = 10;
+static double canvas_fontscale = 1.0;
 static char *canvas_justify = "";
 static int canvas_text_angle = 0;
 static int canvas_in_a_path = FALSE;
@@ -113,7 +114,7 @@ static struct {
 enum CANVAS_case {
     CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, CANVAS_TITLE,
     CANVAS_LINEWIDTH, CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_ENH, CANVAS_NOENH,
-    CANVAS_OTHER
+    CANVAS_FONTSCALE, CANVAS_OTHER
 };
 
 static struct gen_table CANVAS_opts[] =
@@ -130,6 +131,7 @@ static struct gen_table CANVAS_opts[] =
     { "lw", CANVAS_LINEWIDTH },
     { "linew$idth", CANVAS_LINEWIDTH },
     { "title", CANVAS_TITLE },
+    { "fontscale", CANVAS_FONTSCALE },
     { NULL, CANVAS_OTHER }
 };
 
@@ -164,6 +166,7 @@ CANVAS_options()
     if (c_token != 2) {
 	/* Re-initialize a few things */
 	canvas_font_size = 10;
+	canvas_fontscale = 1.0;
 	CANVAS_standalone = TRUE;
 	CANVAS_mouseable = FALSE;
 	free(CANVAS_name);
@@ -246,14 +249,20 @@ CANVAS_options()
 		canvas_linewidth = 1.0;
 	    break;
 
+	case CANVAS_FONTSCALE:
+	    canvas_fontscale = real_expression();
+	    if (canvas_fontscale <= 0)
+		canvas_fontscale = 1.0;
+	    break;
+
 	default:
 	    int_warn(c_token-1,"unrecognized terminal option");
  	    break;
 	}
     }
 
-    term->v_char = canvas_font_size * CANVAS_OVERSAMPLE;
-    term->h_char = canvas_font_size * 0.8 * CANVAS_OVERSAMPLE;
+    term->v_char = canvas_font_size * canvas_fontscale * CANVAS_OVERSAMPLE;
+    term->h_char = canvas_font_size * canvas_fontscale * 0.8 * CANVAS_OVERSAMPLE;
 
     sprintf(term_options, "size %d,%d", (int)(term->xmax/CANVAS_OVERSAMPLE), (int)(term->ymax/CANVAS_OVERSAMPLE));
     sprintf(term_options + strlen(term_options), "%s fsize %g lw %g", 
@@ -723,11 +732,11 @@ CANVAS_put_text(unsigned int x, unsigned int y, const char *str)
 	fprintf(gpoutfile,
 		"TR(%d,%d,%d,%.1f,\"%s\",\"",
 		    x, (int)(canvas_ymax + 5*CANVAS_OVERSAMPLE - y),
-		    canvas_text_angle, canvas_font_size, canvas_justify);
+		    canvas_text_angle, canvas_font_size * canvas_fontscale, canvas_justify);
     } else {
 	fprintf(gpoutfile, "T(%d,%d,%.1f,\"%s\",\"",
-		x, (int)(canvas_ymax + 5*CANVAS_OVERSAMPLE - y), canvas_font_size,
-		canvas_justify);
+		x, (int)(canvas_ymax + 5*CANVAS_OVERSAMPLE - y),
+		canvas_font_size * canvas_fontscale, canvas_justify);
     }
 
     /* Sanitize string by escaping quote characters */

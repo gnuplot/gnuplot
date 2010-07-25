@@ -1,3 +1,7 @@
+2010-07-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm:  "set term canvas fontscale <fs>"
+
 2010-07-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: typos
