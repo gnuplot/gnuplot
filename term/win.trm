@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.77 2010/07/02 16:27:30 sfeam Exp $
+ * $Id: win.trm,v 1.78 2010/07/06 00:21:24 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -696,7 +696,13 @@ WIN_set_font(const char *font)
     char fontname[MAXFONTNAME];
     int  fontsize;
 
-    if (font != NULL) {
+	if (font == NULL) {
+	    GraphOp(&graphwin, W_font, 0, 0, "");
+	    strcpy(WIN_font, graphwin.deffontname);
+	    WIN_fontsize = graphwin.deffontsize;
+	    return TRUE;
+	}
+
 	if (font[0] == '\0') {
 	    strcpy(fontname, graphwin.deffontname);
 	    fontsize = graphwin.deffontsize;
@@ -719,18 +725,11 @@ WIN_set_font(const char *font)
 		sscanf(size+1,"%i", &fontsize);
 	    }
 	}
-    }
 
-    if (font != NULL) {
 	GraphOp(&graphwin, W_font, fontsize, 0, fontname);
-        strcpy(WIN_font, fontname);
-        WIN_fontsize = fontsize;
-    }
-    else {
-	GraphOp(&graphwin, W_font, 0, 0, "");
-        strcpy(WIN_font, graphwin.deffontname);
-        WIN_fontsize = graphwin.deffontsize;
-    }
+	strcpy(WIN_font, fontname);
+	WIN_fontsize = fontsize;
+
     return TRUE;
 }
 
@@ -877,10 +876,10 @@ WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
     char* copy_WIN_font;
     int copy_WIN_fontsize; /* by Akira Kakuto */
 
+    if(str==NULL || !strlen(str)) return;
     /* If no enhanced text processing is needed, we can use the plain  */
     /* vanilla put_text() routine instead of this fancy recursive one. */
     if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
-	WIN_set_font(NULL);
 	WIN_put_text(x,y,str);
 	return;
     }
@@ -949,7 +948,7 @@ WIN_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
     free(copy_WIN_font);
 
     /* restore default font */
-    WIN_set_font(NULL); 
+    WIN_set_font("");
 
     /* restore text alignment */
     if (num_passes > 1)
