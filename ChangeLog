@@ -1,3 +1,8 @@
+2010-07-26  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/win.trm src/win/wgraph.c:  Yet another windows terminal font fix.
+	Bug #2972307
+
 2010-07-11  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/graph3d.c (do_3dplot): Simplify the key sample code for contour
