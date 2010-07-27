@@ -1,3 +1,10 @@
+2010-07-27  Tim Mooney  <enchanter@users.sourceforge.net>
+
+	* configure.in:  If lua.pc is not present but liblua.so is found
+	anyhow,  then set HAVE_LUA and LUA_LIBS explicitly.
+
+	Bug #3035608
+
 2010-07-26  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/win.trm src/win/wgraph.c:  Yet another windows terminal font fix.

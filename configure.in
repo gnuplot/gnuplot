@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.266 2010/03/14 18:52:42 sfeam Exp $
+dnl $Id: configure.in,v 1.267 2010/05/02 20:56:08 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -676,6 +676,8 @@ if test "${with_lua}" = yes ; then
      AC_DEFINE(HAVE_LUA,1, [ Define if you want the lua/TikZ terminal. ])
      AC_CHECK_HEADERS(lua.h,,
        AC_MSG_WARN([please add path to lua.h to CPPFLAGS in Makefile]))
+     with_lua=yes
+     LUA_LIBS='-llua'
     ],
     with_lua=no)
  
