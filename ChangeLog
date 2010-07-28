@@ -1,8 +1,13 @@
+2010-07-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/estimate.trm:  Always estimate escaped characters as requiring
+	one character width.
+	Bug #3036010
+
 2010-07-27  Tim Mooney  <enchanter@users.sourceforge.net>
 
 	* configure.in:  If lua.pc is not present but liblua.so is found
 	anyhow,  then set HAVE_LUA and LUA_LIBS explicitly.
-
 	Bug #3035608
 
 2010-07-26  Shigeharu Takeno  <shige@iee.niit.ac.jp>

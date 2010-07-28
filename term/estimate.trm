@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: estimate.trm,v 1.8 2009/03/26 00:49:20 sfeam Exp $
+ * $Id: estimate.trm,v 1.9 2010/05/21 04:53:38 sfeam Exp $
  *
  */
 
@@ -123,6 +123,7 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
     ENHest_max_height = 1.0;
     ENHest_min_height = 0.0;
     ENHest_total_width = 0.0;
+    strncpy(enhanced_escape_format,".",sizeof(enhanced_escape_format));
 
     /* If no enhanced text processing is needed, strlen() is sufficient */
     if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~\n")) {
