@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.11 2010/06/26 06:43:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.12 2010/06/26 15:16:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2510,9 +2510,7 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 {
     struct curve_points *xp, *new_list = NULL, *free_list = NULL;
     struct curve_points **last_pointer = &new_list;
-    size_t tlen;
     int i, curve;
-    char *new_title;
 
     /*
      * Ok, go through all the plots and move FUNC types together.  Note: this
