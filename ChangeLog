@@ -1,3 +1,10 @@
+2010-07-29  Allin Cottrell  <cottrell@wfu.edu>
+
+	* src/term.c src/term_api.h term/emf.trm term/svg.trm docs/gnuplot.doc:
+	Add support for codepage 950, which is Microsoft's version of Chinese
+	Big5 encoding.  Only the emf terminal (and maybe svg) do anything useful
+	with it.   "set encoding cp950"
+
 2010-07-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/estimate.trm:  Always estimate escaped characters as requiring

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.65 2010/03/18 04:52:53 sfeam Exp $
+ * $Id: emf.trm,v 1.66 2010/05/23 21:58:44 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -338,14 +338,15 @@ static void EMF_write_long __PROTO((unsigned long));
 static void EMF_write_float __PROTO((double)); 
 static void EMF_setfont __PROTO((void));
 
-#define ANSI_CHARSET         0
-#define DEFAULT_CHARSET      1
-#define GREEK_CHARSET      161
-#define TURKISH_CHARSET    162
-#define BALTIC_CHARSET     186
-#define RUSSIAN_CHARSET    204
-#define EASTEUROPE_CHARSET 238
-#define KOI8_CHARSET       242
+#define ANSI_CHARSET          0
+#define DEFAULT_CHARSET       1
+#define CHINESEBIG5_CHARSET 136
+#define GREEK_CHARSET       161
+#define TURKISH_CHARSET     162
+#define BALTIC_CHARSET      186
+#define RUSSIAN_CHARSET     204
+#define EASTEUROPE_CHARSET  238
+#define KOI8_CHARSET        242
 
 /* Text alignment */
 #define GP_TA_NOUPDATECP       0x00
@@ -427,6 +428,9 @@ EMF_setfont()
     case S_ENC_CP1254:
     case S_ENC_ISO8859_9:
 	EMF_write_byte(TURKISH_CHARSET);
+	break;
+    case S_ENC_CP950:
+	EMF_write_byte(CHINESEBIG5_CHARSET);
 	break;
     default:
 	EMF_write_byte(DEFAULT_CHARSET);
@@ -1121,7 +1125,8 @@ EMF_solid_vector(unsigned int ux, unsigned int uy)
 TERM_PUBLIC void 
 EMF_put_text(unsigned int x, unsigned int y, const char str[])
 {
-    int i, len = strlen(str);
+    int i, slen = strlen(str);
+    int alen = slen;
 
     EMF_flush_polyline();
     if (emf_textcolor != emf_color) {
@@ -1131,9 +1136,9 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 
     /* SB 20040506: offset array now included since it won't work with MS Security patch (kb835732) */
     /* SB 20040506: also changed function from unicode to ansi version */
-    if (len % 4)
-	len += 4 - (len % 4); /* Structure must be long aligned! */
-    EMF_write_emr(83, 76 + len + strlen(str)*4);/* ExtTextOutA, ANSI char version! */
+    if (alen % 4)
+	alen += 4 - (slen % 4); /* Structure must be long aligned! */
+    EMF_write_emr(83, 76 + alen + slen*4);/* ExtTextOutA, ANSI char version! */
     EMF_write_rectl(0, 0, 0, 0); /* bounding, never used */
     EMF_write_long(1);		/* GM_Compatible mode for advanced scaling */
     EMF_write_float(EMF_PX2HM);	/* x scale */
@@ -1144,16 +1149,16 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 	x + (long) ((EMF_VCHAR / 2) * sin(emf_vert_text * EMF_10THDEG2RAD)),
 	term->ymax - y + (long) (EMF_VCHAR / 2
 				 * cos(emf_vert_text * EMF_10THDEG2RAD)));
-    EMF_write_long(strlen(str)); /* true number of characters */
+    EMF_write_long(slen);       /* true number of characters */
     EMF_write_long(76);		/* offset to text */
     EMF_write_long(0);		/* options, none */
     EMF_write_rectl(0, 0, 0, 0); /* rectangle clipping not used */
     EMF_write_long(0);		/* offset to intercharacter spacing array */
 				/* can't be used since we don't know anything */
 				/* about the font properties being used */
-    for (i = 0; i < len; i++) 
-	EMF_write_byte(i<strlen(str)?str[i]:0);	/* writing text */
-    for (i = 0; i < strlen(str); i++)
+    for (i = 0; i < alen; i++) 
+	EMF_write_byte(i<slen?str[i]:0);	/* writing text */
+    for (i = 0; i < slen; i++)
 	/* writing intercharacter spacing array (but we don't use it) */
 	EMF_write_long(300); 
     /* SB 20040506: end of modification */

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.103 2010/02/18 17:48:35 sfeam Exp $
+ * $Id: svg.trm,v 1.104 2010/03/04 17:17:13 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -675,6 +675,7 @@ SVG_init ()
 	case S_ENC_ISO8859_15:	svg_encoding = "encoding=\"iso-8859-15\" "; break;
 	case S_ENC_CP850:	svg_encoding = "encoding=\"ibm-850\" "; break;
 	case S_ENC_CP852:	svg_encoding = "encoding=\"ibm-852\" "; break;
+	case S_ENC_CP950:	svg_encoding = "encoding=\"cp950\" "; break;
 	case S_ENC_CP1250:	svg_encoding = "encoding=\"windows-1250\" "; break;
 	case S_ENC_KOI8_R:	svg_encoding = "encoding=\"koi8-r\" "; break;
 	case S_ENC_KOI8_U:	svg_encoding = "encoding=\"koi8-u\" "; break;

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.618 2010/07/15 05:52:13 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.619 2010/07/25 15:27:29 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7456,6 +7456,7 @@ Ffigure_mapcontours
     cp437       - codepage for MS-DOS
     cp850       - codepage for OS/2, Western Europe
     cp852       - codepage for OS/2, Central and Eastern Europe
+    cp950       - MS version of Big5 (emf terminal only)
     cp1250      - codepage for MS Windows, Central and Eastern Europe
     cp1254      - codepage for MS Windows, Turkish (superset of Latin5)
     utf8        - variable-length (multibyte) representation of Unicode
