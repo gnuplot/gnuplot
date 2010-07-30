@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.24 2008/03/30 03:27:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.25 2010/03/14 06:43:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -59,9 +59,6 @@ void OutLine(const char *M){fputs(M,stderr);}
  ** Much extension by David Kotz for use in gnutex, and then in gnuplot.
  ** Added output paging support, both unix and builtin. Rewrote completely
  ** to read helpfile into memory, avoiding reread of help file. 12/89.
- **
- ** Modified by Russell Lang to avoid reading completely into memory
- ** if DOS16 defined.  This uses much less memory.  6/91
  **
  ** The help file looks like this (the question marks are really in column 1):
  **
@@ -212,9 +209,7 @@ help(
     return (status);
 }
 
-/* we only read the file once, into memory
- * except for DOS16 when we don't read all the file -
- * just the keys and location of the text
+/* we only read the file into memory once
  */
 static int
 LoadHelp(char *path)
