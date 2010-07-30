@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.193 2010/03/14 18:01:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.194 2010/07/01 16:50:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -458,14 +458,13 @@ void
 restore_prompt()
 {
     if (interactive) {
-#if defined(HAVE_LIBREADLINE)
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+#  if defined(HAVE_RL_FORCED_UPDATE_DISPLAY)
 	rl_forced_update_display();
-#else
-#if defined(HAVE_LIBEDITLINE)
-	/* FIXME: editline does not support forced update,
-	          so this is probably not enough */
+#  else
 	rl_redisplay();
-#endif
+#  endif
+#else
 	fputs(PROMPT, stderr);
 	fflush(stderr);
 #endif
@@ -1822,7 +1821,7 @@ invalid_command()
 static int
 changedir(char *path)
 {
-#if defined(MSDOS) || defined(WIN16) || defined(DOS386)
+#if defined(MSDOS) || defined(DOS386)
 # if defined(__ZTC__)
     unsigned dummy;		/* it's a parameter needed for dos_setdrive */
 # endif

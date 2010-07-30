@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.46 2010/04/21 07:34:35 sfeam Exp $
+ * $Id: gp_types.h,v 1.47 2010/07/08 04:54:51 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -175,7 +175,7 @@ typedef struct coordinate {
     coordval color;		/* PM3D's color value to be used */
 				/* Note: accessed only if NEED_PALETTE(this_plot) */
 #endif
-#if defined(WIN16) || (defined(MSDOS) && defined(__TURBOC__))
+#if (defined(MSDOS) && defined(__TURBOC__))
     /* FIXME HBB 20020301: addition of 'color' probably broke this */
     char pad[2];		/* pad to 32 byte boundary */
 #endif
