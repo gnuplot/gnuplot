@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.32 2010/05/22 16:11:12 sfeam Exp $
+ * $Id: canvas.trm,v 1.33 2010/07/25 15:27:29 sfeam Exp $
  *
  */
 
@@ -268,6 +268,7 @@ CANVAS_options()
     sprintf(term_options + strlen(term_options), "%s fsize %g lw %g", 
 	term->put_text == ENHCANVAS_put_text ? " enhanced" : "",
 	canvas_font_size, canvas_linewidth);
+    sprintf(term_options + strlen(term_options), " fontscale %g", canvas_fontscale);
     if (CANVAS_name)
 	sprintf(term_options + strlen(term_options), " name \"%s\"", CANVAS_name);
     else {
