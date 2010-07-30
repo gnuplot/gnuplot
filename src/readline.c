@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.45 2008/11/07 11:55:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.46 2008/12/12 21:06:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -145,7 +145,7 @@ readline_ipc(const char* prompt)
 # endif
 #endif /* not HAVE_TERMIOS_H && HAVE_TCGETATTR */
 
-#if !defined(MSDOS) && !defined(_Windows) && !defined(DOS386) && !defined(OSK)
+#if !defined(MSDOS) && !defined(_Windows) && !defined(OSK)
 
 /*
  * Set up structures using the proper include file
@@ -232,7 +232,7 @@ static int term_set = 0;	/* =1 if rl_termio set */
 #define special_getc() ansi_getc()
 static int ansi_getc __PROTO((void));
 
-#else /* MSDOS or _Windows or DOS386 or OSK */
+#else /* MSDOS or _Windows or OSK */
 
 # ifdef _Windows
 #  include <windows.h>
@@ -249,7 +249,7 @@ static char win_getch __PROTO((void));
 static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
 # endif				/* _Windows */
 
-# if defined(MSDOS) || defined(DOS386)
+# if defined(MSDOS)
 /* MSDOS specific stuff */
 #  ifdef DJGPP
 #   include <pc.h>
@@ -259,7 +259,7 @@ static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
 #  endif			/* __EMX__ */
 #  define special_getc() msdos_getch()
 static char msdos_getch();
-# endif				/* MSDOS || DOS386 */
+# endif				/* MSDOS */
 
 # ifdef OSK
 #  include <sgstat.h>
@@ -292,7 +292,7 @@ putc(char c, FILE *fp)
 
 # endif				/* OSK */
 
-#endif /* MSDOS or _Windows or DOS386 or OSK */
+#endif /* MSDOS or _Windows or OSK */
 
 #ifdef OS2
 # if defined( special_getc )
@@ -746,7 +746,7 @@ copy_line(char *line)
     cur_pos = max_pos = strlen(cur_line);
 }
 
-#if !defined(MSDOS) && !defined(_Windows) && !defined(DOS386) && !defined(OSK)
+#if !defined(MSDOS) && !defined(_Windows) && !defined(OSK)
 /* Convert ANSI arrow keys to control characters */
 static int
 ansi_getc()
@@ -790,7 +790,7 @@ ansi_getc()
 }
 #endif
 
-#if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(OS2)
+#if defined(MSDOS) || defined(_Windows) || defined(OS2)
 
 #ifdef WGP_CONSOLE
 static char
@@ -868,7 +868,7 @@ msdos_getch()
     return c;
 }
 
-#endif /* MSDOS || _Windows || DOS386 || OS2 */
+#endif /* MSDOS || _Windows || OS2 */
 
 #ifdef OS2
 /* We need to call different procedures, dependent on the
@@ -897,7 +897,7 @@ os2_getch() {
 static void
 set_termio()
 {
-#if !defined(MSDOS) && !defined(_Windows) && !defined(DOS386)
+#if !defined(MSDOS) && !defined(_Windows)
 /* set termio so we can do our own input processing */
 /* and save the old terminal modes so we can reset them later */
     if (term_set == 0) {
@@ -1023,13 +1023,13 @@ set_termio()
 # endif				/* OSK */
 	term_set = 1;
     }
-#endif /* not MSDOS && not _Windows && not DOS386 */
+#endif /* not MSDOS && not _Windows */
 }
 
 static void
 reset_termio()
 {
-#if !defined(MSDOS) && !defined(_Windows) && !defined(DOS386)
+#if !defined(MSDOS) && !defined(_Windows)
 /* reset saved terminal modes */
     if (term_set == 1) {
 # ifndef OSK
@@ -1056,7 +1056,7 @@ reset_termio()
 # endif				/* OSK */
 	term_set = 0;
     }
-#endif /* not MSDOS && not _Windows && not DOS386 */
+#endif /* not MSDOS && not _Windows */
 }
 
 #endif /* READLINE && !HAVE_LIBREADLINE */

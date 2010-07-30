@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.18 2010/01/06 17:29:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.19 2010/03/14 18:01:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -302,7 +302,7 @@ purec_sscanf(const char *string, const char *format,...)
 unsigned int
 sleep(unsigned int delay)
 {
-#if defined(MSDOS) || defined(_Windows) || defined(DOS386)
+#if defined(MSDOS) || defined(_Windows)
 # if !(defined(__TURBOC__) || defined(__EMX__) || defined(DJGPP)) || defined(_Windows)	/* Turbo C already has sleep() */
     /* kludge to provide sleep() for msc 5.1 */
     unsigned long time_is_up;

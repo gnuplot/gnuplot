@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.112 2010/03/14 18:52:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.113 2010/03/17 16:24:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -77,7 +77,7 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.112 2010/03/14 18:52:45 sfe
 # include <sys/utsname.h>
 #endif
 
-#if defined(MSDOS) || defined(DOS386) || defined(__EMX__)
+#if defined(MSDOS) || defined(__EMX__)
 # include <io.h>
 #endif
 
@@ -152,7 +152,7 @@ extern int X11_args __PROTO((int, char **)); /* FIXME: defined in term/x11.trm *
 #endif
 
 /* patch to get home dir, see command.c */
-#if (defined (__TURBOC__) && (defined (MSDOS) || defined(DOS386))) || defined(DJGPP)
+#if defined (__TURBOC__) && (defined (MSDOS) || defined(DJGPP))
 # include <dir.h>               /* MAXPATH */
 char HelpFile[MAXPATH];
 #endif /*   - DJL */
@@ -313,7 +313,7 @@ main(int argc, char **argv)
 
 /* get helpfile from home directory */
 # ifndef _Windows
-#  if defined (__TURBOC__) && (defined (MSDOS) || defined(DOS386))
+#  if defined (__TURBOC__) && defined (MSDOS)
     strcpy(HelpFile, argv[0]);
     strcpy(strrchr(HelpFile, DIRSEP1), "\\gnuplot.gih");
 #  endif			/*   - DJL */
@@ -734,7 +734,7 @@ get_user_env()
 	const char *env_shell;
 
 	if ((env_shell = getenv("SHELL")) == NULL)
-#if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(OS2)
+#if defined(MSDOS) || defined(_Windows) || defined(OS2)
 	    if ((env_shell = getenv("COMSPEC")) == NULL)
 #endif
 		env_shell = SHELL;

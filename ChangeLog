@@ -1,3 +1,9 @@
+2010-07-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/command.h src/eval.c src/fit.c src/gp_types.h
+	src/plot.c src/readline.c src/stdfn.c src/syscfg.h src/term.h:
+	Remove vestigial tests for DOS16 or DOS386
+
 2010-07-29  Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/term.c src/term_api.h term/emf.trm term/svg.trm docs/gnuplot.doc:

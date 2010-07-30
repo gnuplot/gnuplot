@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.194 2010/07/01 16:50:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.195 2010/07/30 18:32:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -94,7 +94,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.194 2010/07/01 16:50:32 
 
 #define PROMPT "gnuplot> "
 
-#if (defined(MSDOS) || defined(DOS386)) && defined(__TURBOC__) && !defined(_Windows)
+#if defined(MSDOS) && defined(__TURBOC__) && !defined(_Windows)
 unsigned _stklen = 16394;        /* increase stack size */
 #endif /* MSDOS && TURBOC */
 
@@ -1821,7 +1821,7 @@ invalid_command()
 static int
 changedir(char *path)
 {
-#if defined(MSDOS) || defined(DOS386)
+#if defined(MSDOS)
 # if defined(__ZTC__)
     unsigned dummy;		/* it's a parameter needed for dos_setdrive */
 # endif
@@ -2195,7 +2195,7 @@ help_command()
 	/* if can't find environment variable then just use HELPFILE */
 
 /* patch by David J. Liu for getting GNUHELP from home directory */
-#  if (defined(__TURBOC__) && (defined(MSDOS) || defined(DOS386))) || defined(__DJGPP__)
+#  if (defined(__TURBOC__) && defined(MSDOS)) || defined(__DJGPP__)
 	help_ptr = HelpFile;
 #  else			/* __TURBOC__ */
 	help_ptr = HELPFILE;
@@ -2414,7 +2414,7 @@ rlgets(char *s, size_t n, const char *prompt)
 # endif				/* READLINE || HAVE_LIBREADLINE */
 
 
-# if defined(MSDOS) || defined(_Windows) || defined(DOS386)
+# if defined(MSDOS) || defined(_Windows)
 void
 do_shell()
 {
@@ -2475,7 +2475,7 @@ do_shell()
 /* read from stdin, everything except VMS */
 
 # if !defined(READLINE) && !defined(HAVE_LIBREADLINE) && !defined(HAVE_LIBEDITLINE)
-#  if (defined(MSDOS) || defined(DOS386)) && !defined(_Windows) && !defined(__EMX__) && !defined(DJGPP)
+#  if defined(MSDOS) && !defined(_Windows) && !defined(__EMX__) && !defined(DJGPP)
 
 /* if interactive use console IO so CED will work */
 

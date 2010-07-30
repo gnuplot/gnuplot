@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.40 2010/03/14 18:52:45 sfeam Exp $
+ * $Id: syscfg.h,v 1.41 2010/05/07 03:50:49 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -60,16 +60,6 @@
  * PATHSEP:  [':'] Character which separates path names
  *
  */
-
-#ifdef DOS386
-# define OS       "DOS 386"
-# define HELPFILE "gnuplot.gih"
-# define HOME     "GNUPLOT"
-# define PLOTRC   "gnuplot.ini"
-# define SHELL    "\\command.com"
-# define DIRSEP1  '\\'
-# define PATHSEP  ';'
-#endif /* DOS386 */
 
 #if defined(__NeXT__) || defined(NEXT)
 # ifndef NEXT
@@ -208,7 +198,7 @@
 #endif
 
 /* DOS/Windows stuff. Moved here from command.c */
-#if defined(MSDOS) || defined(DOS386)
+#if defined(MSDOS)
 
 # ifdef DJGPP
 #  include <dos.h>

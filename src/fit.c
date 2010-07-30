@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.70 2009/10/31 03:22:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.71 2010/05/02 20:56:09 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -76,17 +76,17 @@ static void Dblfn __PROTO(());
 #define Dblf5 Dblfn
 #define Dblf6 Dblfn
 
-#if defined(MSDOS) || defined(DOS386)	/* non-blocking IO stuff */
+#if defined(MSDOS) 	/* non-blocking IO stuff */
 # include <io.h>
 # ifndef _Windows		/* WIN16 does define MSDOS .... */
 #  include <conio.h>
 # endif
 # include <dos.h>
-#else /* !(MSDOS || DOS386) */
+#else /* !(MSDOS) */
 # ifndef VMS
 #  include <fcntl.h>
 # endif				/* !VMS */
-#endif /* !(MSDOS || DOS386) */
+#endif /* !(MSDOS) */
 
 enum marq_res {
     OK, ML_ERROR, BETTER, WORSE
@@ -113,7 +113,7 @@ typedef enum marq_res marq_res_t;
 #define LAMBDA_UP_FACTOR 10
 #define LAMBDA_DOWN_FACTOR 10
 
-#if defined(MSDOS) || defined(OS2) || defined(DOS386)
+#if defined(MSDOS) || defined(OS2)
 # define PLUSMINUS   "\xF1"	/* plusminus sign */
 #else
 # define PLUSMINUS   "+/-"
@@ -250,7 +250,7 @@ ctrlc_setup()
  *
  *  I hope that other OSes do it better, if not... add #ifdefs :-(
  */
-#if (defined(__EMX__) || !defined(MSDOS) && !defined(DOS386))
+#if (defined(__EMX__) || !defined(MSDOS))
     (void) signal(SIGINT, (sigfunc) ctrlc_handle);
 #endif
 }
@@ -259,7 +259,7 @@ ctrlc_setup()
 /*****************************************************************
     getch that handles also function keys etc.
 *****************************************************************/
-#if defined(MSDOS) || defined(DOS386)
+#if defined(MSDOS)
 
 /* HBB 980317: added a prototype... */
 int getchx __PROTO((void));
@@ -625,7 +625,7 @@ regress(double a[])
  *  HBB: I think this can be enabled for DJGPP V2. SIGINT is actually
  *  handled there, AFAIK.
  */
-#if ((defined(MSDOS) || defined(DOS386)) && !defined(__EMX__))
+#if (defined(MSDOS) && !defined(__EMX__))
 	if (kbhit()) {
 	    do {
 		getchx();
