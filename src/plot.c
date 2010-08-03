@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.113 2010/03/17 16:24:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.114 2010/07/30 19:11:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -152,7 +152,7 @@ extern int X11_args __PROTO((int, char **)); /* FIXME: defined in term/x11.trm *
 #endif
 
 /* patch to get home dir, see command.c */
-#if defined (__TURBOC__) && (defined (MSDOS) || defined(DJGPP))
+#if defined (__TURBOC__) && (defined (MSDOS)) || defined(DJGPP)
 # include <dir.h>               /* MAXPATH */
 char HelpFile[MAXPATH];
 #endif /*   - DJL */
