@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.114 2010/07/30 19:11:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.115 2010/08/03 00:23:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -110,7 +110,9 @@ extern smg$create_key_table();
 # ifdef GNUPLOT_HISTORY
 #  include <readline/tilde.h>
 # endif
-extern int rl_complete_with_tilde_expansion;
+# if !defined(MISSING_RL_TILDE_EXPANSION)
+   extern int rl_complete_with_tilde_expansion;
+# endif
 #endif
 
 /* BSD editline
@@ -343,7 +345,7 @@ main(int argc, char **argv)
     rl_readline_name = "Gnuplot";
     rl_terminal_name = getenv("TERM");
 #endif
-#if defined(HAVE_LIBREADLINE)
+#if !defined(MISSING_RL_TILDE_EXPANSION)
     rl_complete_with_tilde_expansion = 1;
 #endif
 
@@ -558,7 +560,7 @@ main(int argc, char **argv)
 	/* come back here from int_error() */
 	if (interactive == FALSE)
 	    exit_status = EXIT_FAILURE;
-#ifdef HAVE_LIBREADLINE
+#ifdef HAVE_READLINE_RESET
 	else
 	{
 	    /* reset properly readline after a SIGINT+longjmp */

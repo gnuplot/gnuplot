@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.122 2009/10/31 03:22:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.123 2010/07/08 23:13:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -261,7 +261,9 @@ alert()
     DosBeep(444, 111);
 # else
 #  ifdef HAVE_LIBREADLINE
-    rl_ding();
+#    if !defined(MISSING_RL_DING)
+        rl_ding();
+#    endif
     fflush(rl_outstream);
 #  else
     fprintf(stderr, "\a");

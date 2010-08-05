@@ -1,3 +1,15 @@
+2010-08-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in src/command.c src/history.c src/mouse.c src/plot.c
+	src/show.c:
+
+	Finally a work-around for the broken libreadline on OSX, which is really
+	a wrapper for some version of libeditline.  Test for each potentially
+	missing function in configure and deal with it if it's missing.  There
+	may still be an issue with autoconfiguring support for the history
+	functions.
+	Bug #1839048 and others 
+
 2010-07-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/command.h src/eval.c src/fit.c src/gp_types.h

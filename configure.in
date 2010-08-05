@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.267 2010/05/02 20:56:08 sfeam Exp $
+dnl $Id: configure.in,v 1.268 2010/07/28 04:36:42 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -430,6 +430,27 @@ if test "$with_readline" != no; then
 	[ AC_MSG_WARN([GNU readline not found - falling back to builtin readline])
           with_readline=builtin ]
 	,[${gp_tcap}])
+    fi
+
+    dnl Work around some functions missing from the OSX readline library.
+    dnl Would it be better to simply switch to with_readline=bsd in this case?
+    AC_CHECK_LIB(readline, rl_ding, , , [${gp_tcap}])
+    if [test "$ac_cv_lib_readline_rl_ding" == no]; then
+	AC_DEFINE(MISSING_RL_DING,1,[ Define if your libreadline has no rl_ding])
+    fi
+    AC_CHECK_LIB(readline, rl_forced_update_display, , , [${gp_tcap}])
+    if [test "$ac_cv_lib_readline_rl_forced_update_display" == no]; then
+	AC_DEFINE(MISSING_RL_FORCED_UPDATE_DISPLAY,1,[ Define if your libreadline has no rl_force_update_display])
+    fi
+    AC_CHECK_LIB(readline, rl_reset_after_signal, , , [${gp_tcap}])
+    if [test "$ac_cv_lib_readline_rl_reset_after_signal" == yes]; then
+	AC_DEFINE(HAVE_READLINE_RESET,1,[ Define if your libreadline has rl_reset_after_signal])
+    fi
+    # Warning: rl_complete_with_tilde_expansion is an int, not a function.
+    # I.e., it is not callable.  AC_CHECK_LIB seems to work anyhow, but...
+    AC_CHECK_LIB(readline, rl_complete_with_tilde_expansion, , , [${gp_tcap}])
+    if [test "$ac_cv_lib_readline_rl_complete_with_tilde_expansion" == no]; then
+	AC_DEFINE(MISSING_RL_TILDE_EXPANSION,1,[ Define if your libreadline has no rl_complete_with_tilde_expansion])
     fi
 
     if [test "$ac_cv_lib_readline_remove_history" != no || test "$ac_cv_lib_history_remove_history" != no]; then
@@ -1433,6 +1454,9 @@ fi
       AC_MSG_RESULT([  Readline library: GNU readline library with $gp_tcap])
     else
       AC_MSG_RESULT([  Readline library: GNU readline library])
+    fi
+    if test "$ac_cv_lib_readline_rl_forced_update_display" = no; then
+      AC_MSG_RESULT([                    missing some features (OSX version?)])
     fi
   else
     AC_MSG_RESULT([  Readline library: builtin minimal (use --with-readline=gnu for GNU readline)])
