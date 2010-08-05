@@ -6,6 +6,7 @@ New features, changes and fixes since gnuplot version 4.4.0
 * NEW Optional 6th data column in candlesticks style to specific box width
 * NEW If integer arithmetic i*j or i**j would overflow, return value as a real
 * NEW "set style circle radius <default-radius>"
+* FIX autoconfiguration of readline support in OSX
 * FIX font problems in win terminal 
 * FIX Protect against runaway recursion by limiting depth of nested functions
 * FIX metapost terminal: Fix inheritance of line thickness by text strings

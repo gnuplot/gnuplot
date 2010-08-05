@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.24 2009/03/26 18:46:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.25 2009/03/26 22:00:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -351,9 +351,6 @@ const int num;
 const char *const filename;
 const char *mode;
 {
-#ifdef HAVE_LIBREADLINE
-    HIST_ENTRY **the_list = history_list();
-#endif
     const HIST_ENTRY *list_entry;
     FILE *out = stdout;
     int is_pipe = 0;
@@ -389,9 +386,7 @@ const char *mode;
         if (istart <= 0 || istart > history_length)
             istart = 1;
     } else istart = 1;
-#ifdef HAVE_LIBREADLINE
-    if (the_list)
-#endif
+
         for (i = istart; (list_entry = history_get(i)); i++) {
             /* don't add line numbers when writing to file to make file loadable */
             if (is_file)

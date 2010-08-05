@@ -214,40 +214,19 @@ Ubuntu:
 Mac OSX
 -------
 
-Default ./configure; ./make  fails on OSX with error messages like these:
+As I understand the situation, Apple ships OSX with a "fake" libreadline shared
+library. The file /usr/lib/libreadline.dylib is really a symlink to a
+compatibility layer over the BSD libedit library.  But the compatibility isn't
+complete, and in particular it is missing many of the routines used for readline
+support by gnuplot. As of version 4.4.1, the ./configure script should be able
+to cope with this. But you will still be left without some of the functionality
+of the "real" libreadline.  For one thing, libedit doesn't handle UTF input.
+You have a couple of options:
 
-  /Undefined symbols:
-    /"_rl_forced_update_display", referenced from:
-    /_restore_prompt in command.o
-    /"_rl_ding", referenced from:
-    /_alert in mouse.o
-    /"_history_list", referenced from:
-    /_write_history_list in history.o
-    /"_rl_complete_with_tilde_expansion", referenced from:
-    /_rl_complete_with_tilde_expansion$non_lazy_ptr in plot.o
-    /ld: symbol(s) not found
-    /collect2: ld returned 1 exit status
-
-As I understand the situation, the story seems to be that Apple have provided
-a "fake" libreadline shared library. The file /usr/lib/libreadline.dylib is
-really a symlink to a compatibility layer over the BSD libedit library.
-But the compatibility isn't complete, and in particular it is missing many of
-the routines used for readline support by gnuplot.
-
-If the configure script can't find libreadline then it is supposed to fall
-back to using built-in routines. But the "fake" libreadline fools the
-configure script into thinking it really is present, and then the build
-fails later when it turns out that routines are missing.
-
-Alternative work-arounds:
-
-1) Explicitly tell gnuplot libreadline is not available:
-./configure --with-readline=builtin
-
-2) Delete the fake libreadline libraries from OSX and install
+1) Delete the fake libreadline libraries from OSX and install
 the real gnu libreadline as a system library.
 
-3) Install the real gnu libreadline into your personal account and
+2) Install the real gnu libreadline into your personal account and
 tell gnuplot to use it:
 ./configure --with-readline=/my/private/readline/installdir
 This may require some playing around with additional -L and -I

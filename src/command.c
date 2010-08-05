@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.181.2.4 2010/02/03 09:56:06 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.181.2.5 2010/02/24 20:41:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -480,14 +480,13 @@ void
 restore_prompt()
 {
     if (interactive) {
-#if defined(HAVE_LIBREADLINE)
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+#  if !defined(MISSING_RL_FORCED_UPDATE_DISPLAY)
 	rl_forced_update_display();
-#else
-#if defined(HAVE_LIBEDITLINE)
-	/* FIXME: editline does not support forced update,
-	          so this is probably not enough */
+#  else
 	rl_redisplay();
-#endif
+#  endif
+#else
 	fputs(PROMPT, stderr);
 	fflush(stderr);
 #endif
