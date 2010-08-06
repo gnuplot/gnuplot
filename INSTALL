@@ -56,6 +56,9 @@ gnuplot_x11                     PREFIX/libexec/gnuplot/$VERSION
 gnuplot.1                       PREFIX/man/man1
 gnuplot.gih                     PREFIX/share/gnuplot/$VERSION
 
+Gnuplot				PREFIX/share/gnuplot/$VERSION/app-defaults
+				(please copy to system app-defaults location)
+
    The only files where the runtime location is defined at compile time are
 gnuplot.gih and show.c. This is important if gnuplot is not installed 
 by running 'make install'.
@@ -198,44 +201,32 @@ options can have additional arguments:
  o `--with-PACKAGE=DIR' checks for PACKAGE in DIR
 
 
+Linux
+-----
+
+Ubuntu:
+	./configure fails to find lua support because Ubuntu packages it as
+	"lua5.1" rather than "lua".  You can fix this by adding a symlink
+	prior to running ./configure
+	    ln -s /usr/lib/pkgconfig/lua5.1.pc  /usr/lib/pkgconfig/lua.pc
+
 
 Mac OSX
 -------
 
-Default ./configure; ./make  fails on OSX with error messages like these:
+As I understand the situation, Apple ships OSX with a "fake" libreadline shared
+library. The file /usr/lib/libreadline.dylib is really a symlink to a
+compatibility layer over the BSD libedit library.  But the compatibility isn't
+complete, and in particular it is missing many of the routines used for readline
+support by gnuplot. As of version 4.4.1, the ./configure script should be able
+to cope with this. But you will still be left without some of the functionality
+of the "real" libreadline.  For one thing, libedit doesn't handle UTF input.
+You have a couple of options:
 
-  /Undefined symbols:
-    /"_rl_forced_update_display", referenced from:
-    /_restore_prompt in command.o
-    /"_rl_ding", referenced from:
-    /_alert in mouse.o
-    /"_history_list", referenced from:
-    /_write_history_list in history.o
-    /"_rl_complete_with_tilde_expansion", referenced from:
-    /_rl_complete_with_tilde_expansion$non_lazy_ptr in plot.o
-    /ld: symbol(s) not found
-    /collect2: ld returned 1 exit status
-
-As I understand the situation, the story seems to be that Apple have provided
-a "fake" libreadline shared library. The file /usr/lib/libreadline.dylib is
-really a symlink to a compatibility layer over the BSD libedit library.
-But the compatibility isn't complete, and in particular it is missing many of
-the routines used for readline support by gnuplot.
-
-If the configure script can't find libreadline then it is supposed to fall
-back to using built-in routines. But the "fake" libreadline fools the
-configure script into thinking it really is present, and then the build
-fails later when it turns out that routines are missing.
-
-Alternative work-arounds:
-
-1) Explicitly tell gnuplot libreadline is not available:
-./configure --with-readline=builtin
-
-2) Delete the fake libreadline libraries from OSX and install
+1) Delete the fake libreadline libraries from OSX and install
 the real gnu libreadline as a system library.
 
-3) Install the real gnu libreadline into your personal account and
+2) Install the real gnu libreadline into your personal account and
 tell gnuplot to use it:
 ./configure --with-readline=/my/private/readline/installdir
 This may require some playing around with additional -L and -I
@@ -602,8 +593,8 @@ to test the postscript terminal with custom prologue files.
 GNUPLOT_LIB may be used to define additional search directories for
 data and command files. The variable may contain a single directory
 name, or a list of directories separated by a platform-specific path
-separator, eg. ':' on Unix, or ';' on DOS/Windows/OS/2 platforms.
-The contents of GNUPLOT_LIB are appended to the `loadpath`
+separator, eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga
+platforms. The contents of GNUPLOT_LIB are appended to the `loadpath`
 variable, but not saved with the `save` and `save set` commands.
 
 GNUFITLOG holds the name of a file that saves fit results. The default
