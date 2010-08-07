@@ -4,6 +4,9 @@
 	of the input stream.
 	Bugfix.
 
+	* src/plot2d.c (eval_plots):  Update GPVAL_DATA values after plot in
+	tabulate mode just as for normal plotting mode.
+
 2010-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/command.c src/history.c src/mouse.c src/plot.c

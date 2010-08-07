@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.13 2010/07/29 17:51:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.14 2010/08/07 20:30:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2471,15 +2471,12 @@ eval_plots()
 	fill_gpval_string("GPVAL_LAST_PLOT", replot_line);
     }
 
-    if (table_mode)
+    if (table_mode) {
 	print_table(first_plot, plot_num);
-    else {
-	START_LEAK_CHECK();     /* check for memory leaks in this routine */
 
+    } else {
 	/* do_plot now uses axis_array[] */
 	do_plot(first_plot, plot_num);
-
-	END_LEAK_CHECK();
 
 	/* after do_plot(), axis_array[].min and .max
 	 * contain the plotting range actually used (rounded
@@ -2487,8 +2484,6 @@ eval_plots()
 	 *  --> save them now for writeback if requested
 	 */
 	SAVE_WRITEBACK_ALL_AXES;
-	/* update GPVAL_ variables available to user */
-	update_gpval_variables(1);
 
 #ifdef VOLATILE_REFRESH
 	/* Mark these plots as safe for quick refresh */
@@ -2496,6 +2491,9 @@ eval_plots()
 	refresh_ok = 2;
 #endif
     }
+
+    /* update GPVAL_ variables available to user */
+    update_gpval_variables(1);
 
 }                               /* eval_plots */
 
