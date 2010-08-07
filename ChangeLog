@@ -6,6 +6,7 @@
 
 	* src/plot2d.c (eval_plots):  Update GPVAL_DATA values after plot in
 	tabulate mode just as for normal plotting mode.
+	Bug #3041233
 
 2010-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
