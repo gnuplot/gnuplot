@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.319 2010/07/08 04:54:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.320 2010/07/08 23:13:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1904,6 +1904,13 @@ set_key()
 	    if (key->maxrows < 0)
 		key->maxrows = 0;
 	    c_token--; /* it is incremented after loop */
+	    break;
+
+	case S_KEY_FRONT:
+	    key->front = TRUE;
+	    break;
+	case S_KEY_NOFRONT:
+	    key->front = FALSE;
 	    break;
 
 	case S_KEY_MANUAL:

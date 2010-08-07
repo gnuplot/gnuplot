@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.336 2010/07/08 04:54:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.337 2010/07/25 19:15:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -159,7 +159,7 @@ static void map_position_double __PROTO((struct position* pos, double* x, double
 
 static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
 
-static void do_key_layout __PROTO((legend_key *key, int *xl, int *yl));
+static void do_key_layout __PROTO((legend_key *key, TBOOLEAN key_pass, int *xl, int *yl));
 static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
 				   char *title,  struct termentry *t, int xl, int yl));
 
@@ -1550,6 +1550,7 @@ do_plot(struct curve_points *plots, int pcount)
     struct curve_points *this_plot = NULL;
     int xl = 0, yl = 0;
     int key_count = 0;
+    TBOOLEAN key_pass = FALSE;
     legend_key *key = &keyT;
 
     x_axis = FIRST_X_AXIS;
@@ -1773,13 +1774,15 @@ do_plot(struct curve_points *plots, int pcount)
     if (term->layer)
 	(term->layer)(TERM_LAYER_FRONTTEXT);
 
-    /* Draw the key */
+    /* Draw the key, or at least reserve space for it (pass 1) */
     if (lkey)
-	do_key_layout( key, &xl, &yl );
+	do_key_layout( key, key_pass, &xl, &yl );
+    SECOND_KEY_PASS:
 
     /* DRAW CURVES */
     this_plot = plots;
     for (curve = 0; curve < pcount; this_plot = this_plot->next, curve++) {
+
 	TBOOLEAN localkey = lkey;	/* a local copy */
 
 	/* Sync point for start of new curve (used by svg, post, ...) */
@@ -1814,7 +1817,7 @@ do_plot(struct curve_points *plots, int pcount)
 	&&  histogram_opts.type == HT_STACKED_IN_TOWERS) {
 	    text_label *key_entry;
 	    localkey = 0;
-	    if (this_plot->labels) {
+	    if (this_plot->labels && (key_pass || !key->front)) {
 		struct lp_style_type save_lp = this_plot->lp_properties;
 		for (key_entry = this_plot->labels->next; key_entry; key_entry = key_entry->next) {
 		    key_count++;
@@ -1838,7 +1841,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    localkey = FALSE;
 	} else if (this_plot->plot_type == NODATA) {
 	    localkey = FALSE;
-	} else {
+	} else if (key_pass || !key->front) {
 	    ignore_enhanced(this_plot->title_no_enhanced);
 		/* don't write filename or function enhanced */
 	    if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
@@ -1852,13 +1855,13 @@ do_plot(struct curve_points *plots, int pcount)
 
 	/* If any plots have opted out of autoscaling, we need to recheck */
 	/* whether their points are INRANGE or not.                       */
-	if (this_plot->noautoscale)
+	if (this_plot->noautoscale  &&  !key_pass)
 	    recheck_ranges(this_plot);
 
 	/* and now the curves, plus any special key requirements */
 	/* be sure to draw all lines before drawing any points */
 	/* Skip missing/empty curves */
-	if (this_plot->plot_type != NODATA) {
+	if (this_plot->plot_type != NODATA  &&  !key_pass) {
 
 	    switch (this_plot->plot_style) {
 	    case IMPULSES:
@@ -1991,9 +1994,13 @@ do_plot(struct curve_points *plots, int pcount)
 
 
 	if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
+	    /* If there are two passes, defer point sample till the second */
+	    if (key->front && !key_pass) {
+		; /* Do nothing during first pass */
+
 	    /* we deferred point sample until now */
-	    if (this_plot->plot_style == LINESPOINTS
-	    &&  this_plot->lp_properties.p_interval < 0) {
+	    } else if (this_plot->plot_style == LINESPOINTS
+	         &&  this_plot->lp_properties.p_interval < 0) {
 		(*t->linetype)(LT_BACKGROUND);
 		(*t->point)(xl + key_point_offset, yl, 6);
 		term_apply_lp_properties(&this_plot->lp_properties);
@@ -2004,14 +2011,14 @@ do_plot(struct curve_points *plots, int pcount)
 	    } else if (this_plot->plot_style == DOTS) {
 		if (on_page(xl + key_point_offset, yl))
 		    (*t->point) (xl + key_point_offset, yl, -1);
-	    }
 
-	    else if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
+	    } else if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
 		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize);
 		if (on_page(xl + key_point_offset, yl))
 		    (*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
 	    }
+
 	    if (key->invert)
 		yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
 	    if (key_count >= key_rows) {
@@ -2026,6 +2033,13 @@ do_plot(struct curve_points *plots, int pcount)
 	if (term->layer)
 	    (term->layer)(TERM_LAYER_AFTER_PLOT);
 
+    }
+
+    /* Go back and draw the legend in a separate pass if necessary */
+    if (lkey && key->front && !key_pass) {
+	key_pass = TRUE;
+	do_key_layout( key, key_pass, &xl, &yl );
+	goto SECOND_KEY_PASS;
     }
 
     /* DRAW TICS AND GRID */
@@ -6598,11 +6612,20 @@ skip_pixel:
 /* are drawn. Then the reserved space for the legend is blanked out, and 	*/
 /* finally the second pass through this code draws the legend.			*/
 static void
-do_key_layout(legend_key *key, int *xinkey, int *yinkey)
+do_key_layout(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 {
     struct termentry *t = term;
     int xl = key->bounds.xleft + key_size_left;
     int yl = key->bounds.ytop;
+
+    /* In two-pass mode, we blank out the key area after the graph	*/
+    /* is drawn and then redo the key in the blank area.		*/
+    if (key_pass && t->fillbox) {
+	(*t->linetype)(LT_BACKGROUND);
+	(*t->fillbox)(FS_OPAQUE, key->bounds.xleft, key->bounds.ybot,
+				key->bounds.xright - key->bounds.xleft,
+				key->bounds.ytop - key->bounds.ybot);
+    }
 
     if (*key->title) {
 	int center = (key->bounds.xleft + key->bounds.xright) / 2;
@@ -6611,13 +6634,16 @@ do_key_layout(legend_key *key, int *xinkey, int *yinkey)
 	if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
 	    extra_height += 0.51;
 
-	if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
-	    apply_pm3dcolor(&(key->box.pm3d_color), t);
-	else
-	    apply_pm3dcolor(&(key->textcolor), t);
-	write_multiline(center, yl - (0.5 + extra_height/2.0) * t->v_char,
+	/* Only draw the title once */
+	if (key_pass || !key->front) {
+	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
+		apply_pm3dcolor(&(key->box.pm3d_color), t);
+	    else
+		apply_pm3dcolor(&(key->textcolor), t);
+	    write_multiline(center, yl - (0.5 + extra_height/2.0) * t->v_char,
 			key->title, CENTRE, JUST_TOP, 0, key->font);
-	(*t->linetype)(LT_BLACK);
+	    (*t->linetype)(LT_BLACK);
+	}
 
 	if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
 	    extra_height += 0.3;

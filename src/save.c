@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.182 2010/06/26 05:43:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.183 2010/07/08 04:54:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -436,6 +436,7 @@ set y2data%s\n",
 		key->swidth, key->vert_factor, key->width_fix, key->height_fix);
     fprintf(fp, "\nset key maxcolumns %d maxrows %d",key->maxcols,key->maxrows);
     fputc('\n', fp);
+    fprintf(fp, "set key %sopaque\n", key->front ? "" : "no");
 
     if (!(key->visible))
 	fputs("unset key\n", fp);

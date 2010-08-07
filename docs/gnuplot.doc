@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.619 2010/07/25 15:27:29 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.620 2010/07/29 20:45:10 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8095,6 +8095,7 @@ Ffigure_mapcontours
                  | {at <position>}}
                {left | right | center} {top | bottom | center}
                {vertical | horizontal} {Left | Right}
+               {{no}opaque}
                {{no}reverse} {{no}invert}
                {samplen <sample_length>} {spacing <vertical_spacing>}
                {width <width_increment>}
@@ -8135,6 +8136,14 @@ Ffigure_mapcontours
  `Right` (default).  The text and sample can be reversed (`reverse`) and a
  box can be drawn around the key (`box {...}`) in a specified `linetype`
  and `linewidth`, or a user-defined `linestyle`.
+
+ By default the key is built up one plot at a time. That is, the key symbol and
+ title are drawn at the same time as the corresponding plot.  That means newer
+ plots may sometimes place elements on top of the key.  `set key opaque` causes
+ the key to be generated after all the plots.  In this case the key area is 
+ filled with background color and then the key symbols and titles are written.
+ Therefore the key itself may obscure portions of some plot elements.
+ The default can be restored by `set key noopaque`.
 
  By default the first plot label is at the top of the key and successive labels
  are entered below it. The `invert` option causes the first label to be placed

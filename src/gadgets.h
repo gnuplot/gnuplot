@@ -276,6 +276,7 @@ typedef struct {
     double width_fix;		/* user specified additional (+/-) width of key titles */
     double height_fix;
     keytitle_type auto_titles;	/* auto title curves unless plotted 'with notitle' */
+    TBOOLEAN front;		/* draw key in a second pass after the rest of the graph */
     TBOOLEAN reverse;		/* key back to front */
     TBOOLEAN invert;		/* key top to bottom */
     TBOOLEAN enhanced;		/* enable/disable enhanced text of key titles */
@@ -302,7 +303,7 @@ extern legend_key keyT;
 		GPKEY_RIGHT, GPKEY_VERTICAL, \
 		4.0, 1.0, 0.0, 0.0, \
 		FILENAME_KEYTITLES, \
-		FALSE, FALSE, TRUE, \
+		FALSE, FALSE, FALSE, TRUE, \
 		DEFAULT_KEYBOX_LP, \
 		"", \
 		NULL, {TC_LT, LT_BLACK, 0.0} }

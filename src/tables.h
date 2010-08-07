@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.74 2010/06/26 05:43:28 sfeam Exp $
+ * $Id: tables.h,v 1.75 2010/07/08 04:54:52 sfeam Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -137,7 +137,8 @@ enum set_key_id {
     S_KEY_FONT, S_KEY_TEXTCOLOR,
     S_KEY_AUTOTITLES, S_KEY_NOAUTOTITLES,
     S_KEY_DEFAULT, S_KEY_ON, S_KEY_OFF,
-    S_KEY_MAXCOLS, S_KEY_MAXROWS
+    S_KEY_MAXCOLS, S_KEY_MAXROWS,
+    S_KEY_FRONT, S_KEY_NOFRONT
 };
 
 enum set_colorbox_id {

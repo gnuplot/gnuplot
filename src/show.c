@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.239 2010/07/08 04:54:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.240 2010/08/06 01:21:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1860,6 +1860,9 @@ show_key()
 	fputc('\n', stderr);
     } else
 	fprintf(stderr, "not boxed\n");
+   
+    if (key->front)
+	fprintf(stderr, "\tkey box is opaque and drawn in front of the graph\n");
 
     fprintf(stderr, "\
 \tsample length is %g characters\n\
