@@ -1,3 +1,9 @@
+2010-08-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c: Do not create a data record for a blank line at the end
+	of the input stream.
+	Bugfix.
+
 2010-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/command.c src/history.c src/mouse.c src/plot.c
