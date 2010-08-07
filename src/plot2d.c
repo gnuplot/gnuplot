@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.12 2010/06/26 15:16:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.13 2010/07/29 17:51:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -926,6 +926,10 @@ images:
 	}                       /*switch */
 
     }                           /*while */
+
+    /* This removes extra point caused by blank lines after data. */
+    if (current_plot->points[i-1].type == UNDEFINED)
+	i--;
 
     current_plot->p_count = i;
     cp_extend(current_plot, i); /* shrink to fit */
