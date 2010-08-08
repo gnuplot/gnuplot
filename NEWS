@@ -11,6 +11,7 @@ New features, changes and fixes since gnuplot version 4.4
 * NEW qt terminal driver 
 * NEW variable (per-data point) color for additional plot styles
 * NEW "set key opaque" produces a key with an opaque background
+* NEW ISO-IEC-80000 prefixes (ki Mi Gi etc) available as gprintf formats %b %B
 * FIX length estimation of UTF-8 strings
 * CHANGE remove vestigial code supporting Amiga, Apollo, and 16-bit MSDOS/WIN
 * CHANGE 3D impulses are now always drawn from z=0

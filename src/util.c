@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.88 2010/03/07 00:53:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.89 2010/03/13 21:17:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -546,6 +546,7 @@ gprintf(
     char *t;
     TBOOLEAN seen_mantissa = FALSE; /* memorize if mantissa has been
                                        output, already */
+    double stored_power_base = 0;   /* base for the last mantissa output*/
     int stored_power = 0;	/* power that matches the mantissa
                                    output earlier */
     TBOOLEAN got_hash = FALSE;				   
@@ -615,7 +616,9 @@ gprintf(
 
 		t[0] = 'f';
 		t[1] = 0;
-		mant_exp(log10_base, x, FALSE, &mantissa, &stored_power, temp);
+		stored_power_base = log10_base;
+		mant_exp(stored_power_base, x, FALSE, &mantissa,
+				&stored_power, temp);
 		seen_mantissa = TRUE;
 		sprintf(dest, temp, mantissa);
 		break;
@@ -628,7 +631,9 @@ gprintf(
 
 		t[0] = 'f';
 		t[1] = 0;
-		mant_exp(1.0, x, FALSE, &mantissa, &stored_power, temp);
+		stored_power_base = 1.0;
+		mant_exp(stored_power_base, x, FALSE, &mantissa,
+				&stored_power, temp);
 		seen_mantissa = TRUE;
 		sprintf(dest, temp, mantissa);
 		break;
@@ -641,7 +646,24 @@ gprintf(
 
 		t[0] = 'f';
 		t[1] = 0;
-		mant_exp(1.0, x, TRUE, &mantissa, &stored_power, temp);
+		stored_power_base = 1.0;
+		mant_exp(stored_power_base, x, TRUE, &mantissa,
+				&stored_power, temp);
+		seen_mantissa = TRUE;
+		sprintf(dest, temp, mantissa);
+		break;
+	    }
+	    /*}}} */
+	    /*{{{  b --- base-1024 mantissa */
+	case 'b':
+	    {
+		double mantissa;
+
+		t[0] = 'f';
+		t[1] = 0;
+		stored_power_base = log10(1024);
+		mant_exp(stored_power_base, x, FALSE, &mantissa,
+				&stored_power, temp);
 		seen_mantissa = TRUE;
 		sprintf(dest, temp, mantissa);
 		break;
@@ -655,8 +677,12 @@ gprintf(
 		t[0] = 'd';
 		t[1] = 0;
 		if (seen_mantissa)
-		    power = stored_power;
+		    if (stored_power_base == log10_base)
+			power = stored_power;
+		    else
+			int_error(NO_CARET, "Format character mismatch: %%L is only valid with %%l");
 		else
+		    stored_power_base = log10_base;
 		    mant_exp(log10_base, x, FALSE, NULL, &power, "%.0f");
 		sprintf(dest, temp, power);
 		break;
@@ -670,7 +696,10 @@ gprintf(
 		t[0] = 'd';
 		t[1] = 0;
 		if (seen_mantissa)
-		    power = stored_power;
+		    if (stored_power_base == 1.0)
+			power = stored_power;
+		    else
+			int_error(NO_CARET, "Format character mismatch: %%T is only valid with %%t");
 		else
 		    mant_exp(1.0, x, FALSE, NULL, &power, "%.0f");
 		sprintf(dest, temp, power);
@@ -685,7 +714,10 @@ gprintf(
 		t[0] = 'd';
 		t[1] = 0;
 		if (seen_mantissa)
-		    power = stored_power;
+		    if (stored_power_base == 1.0)
+			power = stored_power;
+		    else
+			int_error(NO_CARET, "Format character mismatch: %%S is only valid with %%s");
 		else
 		    mant_exp(1.0, x, TRUE, NULL, &power, "%.0f");
 		sprintf(dest, temp, power);
@@ -700,19 +732,24 @@ gprintf(
 		t[0] = 'c';
 		t[1] = 0;
 		if (seen_mantissa)
-		    power = stored_power;
+		    if (stored_power_base == 1.0)
+			power = stored_power;
+		    else
+			int_error(NO_CARET, "Format character mismatch: %%c is only valid with %%s");
 		else
 		    mant_exp(1.0, x, TRUE, NULL, &power, "%.0f");
 
-		if (power >= -18 && power <= 18) {
+		if (power >= -24 && power <= 24) {
 		    /* -18 -> 0, 0 -> 6, +18 -> 12, ... */
 		    /* HBB 20010121: avoid division of -ve ints! */
-		    power = (power + 18) / 3;
-		    sprintf(dest, temp, "afpnum kMGTPE"[power]);
+		    power = (power + 24) / 3;
+		    sprintf(dest, temp, "yzafpnum kMGTPEZY"[power]);
 		} else {
 		    /* please extend the range ! */
 		    /* name  power   name  power
 		       -------------------------
+		       yocto  -24    yotta  24
+		       zepto  -21    zetta  21
 		       atto   -18    Exa    18
 		       femto  -15    Peta   15
 		       pico   -12    Tera   12
@@ -720,8 +757,45 @@ gprintf(
 		       micro   -6    Mega    6
 		       milli   -3    kilo    3   */
 
-		    /* for the moment, print e+21 for example */
-		    sprintf(dest, "e%+02d", (power - 6) * 3);
+		    /* fall back to simple exponential */
+		    sprintf(dest, "e%+02d", power);
+		}
+		break;
+	    }
+	    /*}}} */
+	    /*{{{  B --- IEC 60027-2 A.2 / ISO/IEC 80000 binary unit prefix letters */
+	case 'B':
+	    {
+		int power;
+
+		t[0] = 'c';
+		t[1] = 'i';
+		t[2] = 0;
+		if (seen_mantissa)
+		    if (stored_power_base == log10(1024))
+			power = stored_power;
+		    else
+			int_error(NO_CARET, "Format character mismatch: %%B is only valid with %%b");
+		else
+			mant_exp(log10(1024), x, FALSE, NULL, &power, "%.0f");
+
+		if (power > 0 && power <= 8) {
+		    /* name  power
+		       -----------
+		       Yobi   8
+		       Zebi   7
+		       Exbi   9
+		       Pebi   5
+		       Tebi   4
+		       Gibi   3
+		       Mebi   2
+		       kibi   1   */
+		    sprintf(dest, temp, " kMGTPEZY"[power]);
+		} else if (power > 8) {
+		    /* for the larger values, print x2^{10}Gi for example */
+		    sprintf(dest, "x2^{%d}Yi", power-8);
+		} else if (power < 0) {
+		    sprintf(dest, "x2^{%d}", power*10);
 		}
 
 		break;

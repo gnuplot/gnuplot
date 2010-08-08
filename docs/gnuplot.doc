@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.620 2010/07/29 20:45:10 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.621 2010/08/08 03:46:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7621,6 +7621,8 @@ Ffigure_mapcontours
        %L           power to base of current logscale
        %S           scientific power
        %c           character replacement for scientific power
+       %b           mantissa of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) 
+       %B           prefix of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) 
        %P           multiple of pi
 #\begin{tabular}{|cl|} \hline
 #\multicolumn{2}{|c|}{Tic-mark label numerical format specifiers}\\
@@ -7638,6 +7640,8 @@ Ffigure_mapcontours
 #\verb@%L@ & power to base of current logscale \\
 #\verb@%S@ & scientific power \\
 #\verb@%c@ & character replacement for scientific power \\
+#\verb@%b@ & mantissa of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) \\
+#\verb@%B@ & prefix of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) \\
 #\verb@%P@ & multiple of pi \\
 %c l .
 %Format@Explanation
@@ -7654,6 +7658,8 @@ Ffigure_mapcontours
 %%L@power to base of current logscale
 %%S@scientific power
 %%c@character replacement for scientific power
+%%b@mantissa of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi)
+%%B@prefix of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi)
 %%P@multiple of pi
 %_
 @end table

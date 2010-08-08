@@ -1,3 +1,10 @@
+2010-08-08  Olivier Mehani  <shtrom@users.sourceforge.net>
+
+	* src/util.c docs/gnuplot.doc:  Add ISO-IEC-80000 prefixes
+	(ki Mi Gi etc) as gprintf format specifiers %b and %B, which are
+	respectively the mantissa and exponent.  Also fix an out-of-range
+	formatting bug.
+
 2010-08-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c: Do not create a data record for a blank line at the end
