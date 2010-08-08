@@ -11,7 +11,7 @@
 	* docs/gnuplot.doc src/gadgets.h src/graphics.c src/save.c src/set.c
 	src/show.c src/tables.c src/tables.h:
 	New option "set key opaque".   If requested, the code makes two passes
-	over each "plot" command.  The actual graph is drawn during the first
+	over each 2D plot command.  The actual graph is drawn during the first
 	pass, and the key box with plot samples is drawn during the second pass.
 
 2010-08-05  Ethan A Merritt  <merritt@u.washington.edu>
