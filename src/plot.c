@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.116 2010/08/06 01:21:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.117 2010/08/09 06:34:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -106,13 +106,9 @@ extern smg$create_key_table();
  * Only required by two files directly,
  * so I don't put this into a header file. -lh
  */
-#ifdef HAVE_LIBREADLINE
-# ifdef GNUPLOT_HISTORY
+#if defined(HAVE_LIBREADLINE) && !defined(MISSING_RL_TILDE_EXPANSION)
 #  include <readline/tilde.h>
-# endif
-# if !defined(MISSING_RL_TILDE_EXPANSION)
    extern int rl_complete_with_tilde_expansion;
-# endif
 #endif
 
 /* BSD editline
