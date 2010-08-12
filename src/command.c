@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.181.2.5 2010/02/24 20:41:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.181.2.6 2010/08/06 01:23:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2463,9 +2463,11 @@ rlgets(char *s, size_t n, const char *prompt)
 #if defined(HAVE_LIBREADLINE)
 		HIST_ENTRY *removed = remove_history(where_history());
 		/* according to history docs we are supposed to free the stuff */
-		if (removed->line) free(removed->line);
-		if (removed->data) free(removed->data);
-		free(removed);
+		if (removed) {
+		    free(removed->line);
+		    free(removed->data);
+		    free(removed);
+		}
 #else
 		remove_history(where_history());
 #endif /* !HAVE_LIBREADLINE */
