@@ -1,3 +1,8 @@
+2010-08-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c:  OSX history command could segfault if there was no
+	previous history file.
+
 2010-08-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/plot.c: More work to enable autoconfigue on OSX.
