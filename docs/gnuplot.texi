@@ -4285,11 +4285,11 @@ the center of the parallelipiped.  That is, an M x N set of data will form an
 image with M x N pixels.  This is different from the pm3d plotting style, where
 an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
 directions for a binary image data grid can be further controlled by additional
-keywords. See `binary general keywords flipx`, `center`, and `rotate`.
+keywords. See `binary keywords flipx`, `keywords center`, and `keywords rotate`.
 
 Image data can be scaled to fill a particular rectangle within a 2D plot 
 coordinate system by specifying the x and y extent of each pixel.
-See `binary general keywords dx` and `dy`. To generate the figure at the right,
+See `binary keywords dx` and `dy`. To generate the figure at the right,
 the same input image was placed multiple times, each with a specified dx, dy,
 and origin. The input PNG image of a building is 50x128 pixels.  The tall
 building was drawn by mapping this using `dx=0.5 dy=1.5`.  The short building
@@ -6149,7 +6149,7 @@ BINARY DATA FILES:
 
 Gnuplot can read binary data files.  However, adequate information about
 details of the file format must be given on the command line or extracted
-from the file itself for a supported binary `filetype`.  In particular,
+from the file itself for a supported binary @ref{filetype}.  In particular,
 there are two structures for binary files, a matrix binary format and a
 general binary format.
 
@@ -6160,8 +6160,8 @@ constitutes column 1, repetition of the coordinate column constitutes
 column 2, and the array of values constitutes column 3.
 
 The general binary format contains an arbitrary number of columns for which
-information must be specified at the command line.  For example, `array`,
-`record`, `format` and @ref{using} can indicate the size, format and dimension
+information must be specified at the command line.  For example, @ref{array},
+@ref{record}, `format` and @ref{using} can indicate the size, format and dimension
 of data.  There are a variety of useful commands for skipping file headers
 and changing endianess.  There are a set of commands for positioning and
 translating data since often coordinates are not part of the file when
@@ -6177,19 +6177,26 @@ The general rule is that common command-line specified parameters override
 file-extracted parameters which override default parameters.
 
 Matrix binary is the default binary format when no keywords specific to
-general binary are given, i.e., `array`, `record`, `format`, `filetype`.
+general binary are given, i.e., @ref{array}, @ref{record}, `format`, @ref{filetype}.
 
 General binary data can be entered at the command line via the special file
 name '-'.  However, this is intended for use through a pipe where programs
 can exchange binary data, not for keyboards.  There is no "end of record"
 character for binary data.  Gnuplot continues reading from a pipe until it
-has read the number of points declared in the `array` qualifier.
+has read the number of points declared in the @ref{array} qualifier.
 
 See `datafile binary` for more details.
 
 @menu
 * binary::                      
 * binary_general::              
+* array::                       
+* record::                      
+* skip::                        
+* format::                      
+* endian::                      
+* filetype::                    
+* keywords::                    
 * every::                       
 * example_datafile::            
 * index::                       
@@ -6219,7 +6226,7 @@ for which details about the file must be given at the command line.
 
 See `binary matrix` or `binary general` for more details.
 
-@node binary_general, every, binary, data
+@node binary_general, array, binary, data
 @subsubsection binary general
 
 @c ?commands plot datafile binary general
@@ -6241,8 +6248,8 @@ Syntax:
 @end example
 
 General binary format is activated by keywords in <binary list> pertaining
-to information about file structure, i.e., `array`, `record`, `format` or
-`filetype`.  Otherwise, matrix binary format is assumed.  (See `binary matrix`
+to information about file structure, i.e., @ref{array}, @ref{record}, `format` or
+@ref{filetype}.  Otherwise, matrix binary format is assumed.  (See `binary matrix`
 for more details.)
 
 There are some standard file types that may be read for which details about
@@ -6251,7 +6258,7 @@ binary` at the command line for a list.)  Otherwise, details must be
 specified at the command line or set in the defaults.  Keywords are described
 below.
 
-The keyword `filetype` in <binary list> controls the routine used to
+The keyword @ref{filetype} in <binary list> controls the routine used to
 read the file, i.e., the format of the data.  For a list of the supported
 file types, type `show datafile binary filetypes`.  If no file type is
 given, the rule is that traditional gnuplot binary is assumed for `splot`
@@ -6283,11 +6290,10 @@ that the special characters for @ref{using} representing point/line/index
 generally should not be used for binary data.  There are keywords in
 <binary list> that control this.
 
-
-@noindent --- ARRAY ---
+@node array, record, binary_general, data
+@subsubsection array
 
 @c ?binary array
-@c ?binary general array
 Describes the sampling array dimensions associated with the binary file.
 The coordinates will be generated by gnuplot.  A number must be specified
 for each dimension of the array.  For example, `array=(10,20)` means the
@@ -6306,21 +6312,19 @@ the file.
 
 @end example
 
-
-@noindent --- RECORD ---
+@node record, skip, array, data
+@subsubsection record
 
 @c ?binary record
-@c ?binary general record
-This keyword serves the same function as `array`, having the same syntax.
-However, `record` causes gnuplot to not generate coordinate information.
+This keyword serves the same function as @ref{array}, having the same syntax.
+However, @ref{record} causes gnuplot to not generate coordinate information.
 This is for the case where such information may be included in one of the
 columns of the binary data file.
 
-
-@noindent --- SKIP ---
+@node skip, format, record, data
+@subsubsection skip
 
 @c ?binary skip
-@c ?binary general skip
 This keyword allows you to skip sections of a binary file. For instance, if the
 file contains a 1024 byte header before the start of the data region you would
 probably want to use
@@ -6336,10 +6340,10 @@ the second and third records
 
 @end example
 
+@node format, endian, skip, data
+@subsubsection format
 
-@noindent --- FORMAT ---
-
-@c ?binary general format
+@c ?binary format
 The default binary format is a float.  For more flexibility, the format can
 include details about variable sizes.  For example, `format="%uchar%int%float"`
 associates an unsigned character with the first using column, an int with the
@@ -6355,10 +6359,10 @@ to discard two ints before reading three floats.  To list variable sizes, type
 dependent along with their sizes in bytes for the particular compilation.
 There is also a group of names which attempt to be machine independent.
 
+@node endian, filetype, format, data
+@subsubsection endian
 
-@noindent --- ENDIAN ---
-
-@c ?binary general endian
+@c ?binary endian
 Often the endianess of binary data in the file does not agree with the
 endianess used by the platform on which gnuplot is running.  Several words can
 direct gnuplot how to arrange bytes.  For example `endian=little` means treat
@@ -6376,10 +6380,10 @@ are
 
 Gnuplot can support "middle" ("pdp") endian if it is compiled with that option.
 
+@node filetype, keywords, endian, data
+@subsubsection filetype
 
-@noindent --- FILETYPE ---
-
-@c ?binary general filetype
+@c ?binary filetype
 For some standard binary file formats gnuplot can extract all the necessary
 information from the file in question.  As an example, "format=edf" will read
 ESRF Header File format files.  For a list of the currently supported file
@@ -6395,7 +6399,7 @@ for details.)
 
 @noindent --- AVS ---
 
-@c ?binary general filetype avs
+@c ?binary filetype avs
 @c ?filetype avs
 @cindex avs
 
@@ -6407,7 +6411,7 @@ of pixels, each with four bytes of information alpha/red/green/blue.
 
 @noindent --- EDF ---
 
-@c ?binary general filetype edf
+@c ?binary filetype edf
 @c ?filetype edf
 @cindex edf
 
@@ -6429,8 +6433,12 @@ See also `binary`.
 
 @noindent --- PNG ---
 
-@c ?binary general filetype png
+@c ?binary filetype png
+@c ?binary filetype gif
+@c ?binary filetype jpeg
 @c ?filetype png
+@c ?filetype gif
+@c ?filetype jpeg
 If gnuplot was configured to use the libgd library for png/gif/jpeg output, 
 then it can also be used to read these same image types as binary files.
 You can use an explicit command
@@ -6447,18 +6455,18 @@ have previously requested
 
 See also `binary`.
 
+@node keywords, every, filetype, data
+@subsubsection keywords
 
-@noindent --- KEYWORDS ---
-
-@c ?binary general keywords
-@c ?filetype keywords
-The following keywords apply only when generating coordinates.  That is, when
-the keyword `array` is used.
+@c ?binary keywords
+The following keywords apply only when generating coordinates from binary 
+data files.  That is, the control mapping the individual elements of a binary
+array, matrix, or image to specific x/y/z positions.
 
 
 @noindent --- SCAN ---
 
-@c ?binary general keywords scan
+@c ?binary keywords scan
 A great deal of confusion can arise concerning the relationship between how
 gnuplot scans a binary file and the dimensions seen on the plot.  To lessen
 the confusion, conceptually think of gnuplot _always_ scanning the binary file
@@ -6482,14 +6490,14 @@ analogous to the x, y and z of Cartesian coordinates.
 
 @noindent --- TRANSPOSE ---
 
-@c ?binary general keywords transpose
+@c ?binary keywords transpose
 Shorthand notation for `scan=yx` or `scan=yxz`.
 
 
 @noindent --- DX, DY, DZ ---
 
-@c ?binary general keywords dx
-@c ?binary general keywords dy
+@c ?binary keywords dx
+@c ?binary keywords dy
 @cindex dx
 
 @cindex dy
@@ -6509,7 +6517,7 @@ they may also be used with matrix binary files.
 
 @noindent --- FLIPX, FLIPY, FLIPZ ---
 
-@c ?binary general keywords flipx
+@c ?binary keywords flipx
 Sometimes the scanning directions in a binary datafile are not consistent with
 that assumed by gnuplot.  These keywords can flip the scanning direction along
 dimensions x, y, z.
@@ -6517,7 +6525,7 @@ dimensions x, y, z.
 
 @noindent --- ORIGIN  ---
 
-@c ?binary general keywords origin
+@c ?binary keywords origin
 When gnuplot generates coordinates based upon transposition and flip, it
 attempts to always position the lower left point in the array at the origin,
 i.e., the data lies in the first quadrant of a Cartesian system after transpose
@@ -6533,9 +6541,8 @@ is for plotting in three dimensions.
 
 @noindent --- CENTER ---
 
-@c ?binary general keywords center
-@cindex center
-
+@c ?binary keywords center
+@c ?keywords center
 Similar to @ref{origin}, this keyword will position the array such that its center
 lies at the point given by the tuple.  For example, `center=(0,0)`.  Center
 does not apply when the size of the array is `Inf`.
@@ -6543,9 +6550,8 @@ does not apply when the size of the array is `Inf`.
 
 @noindent --- ROTATE ---
 
-@c ?binary general keywords rotate
-@cindex rotate
-
+@c ?binary keywords rotate
+@c ?keywords rotate
 The transpose and flip commands provide some flexibility in generating and
 orienting coordinates.  However, for full degrees of freedom, it is possible to
 apply a rotational vector described by a rotational angle in two dimensions.
@@ -6564,7 +6570,7 @@ point before translation.  Otherwise, the rotation is done about the array
 
 @noindent --- PERPENDICULAR ---
 
-@c ?binary general keywords perpendicular
+@c ?binary keywords perpendicular
 For `splot`, the concept of a rotational vector is implemented by a triple
 representing the vector to be oriented normal to the two-dimensional x-y plane.
 Naturally, the default is (0,0,1).  Thus specifying both rotate and
@@ -6634,7 +6640,7 @@ Examples:
 
 See also `binary matrix`.
 
-@node every, example_datafile, binary_general, data
+@node every, example_datafile, keywords, data
 @subsubsection every
 
 @c ?commands plot datafile every
@@ -7328,7 +7334,7 @@ the first element on a line is a time with an embedded space, the y value
 should be specified as column three.
 
 It should be noted that `plot 'file'`, `plot 'file' using 1:2`, and `plot
-'file' using ($1):($2)` can be subtly different: 1) if @ref{file} has some lines
+'file' using ($1):($2)` can be subtly different: 1) if `file` has some lines
 with one column and some with two, the first will invent x values when they
 are missing, the second will quietly ignore the lines with one column, and
 the third will store an undefined value for lines with one point (so that in
@@ -12421,7 +12427,7 @@ terminals include
 @end example
 
 Let us first describe how a map/surface is drawn.  The input data come from an
-evaluated function or from an @ref{file}.  Each surface consists of a
+evaluated function or from an `splot data file`.  Each surface consists of a
 sequence of separate scans (isolines).  The pm3d algorithm fills the region
 between two neighbouring points in one scan with another two points in the
 next scan by a gray (or color) according to z-values (or according to an
@@ -12744,7 +12750,7 @@ as the gray for gray maps. The color map requires a transformation gray -->
 Basically two different types of mappings can be used:  Analytic formulae to
 convert gray to color, or discrete mapping tables which are interpolated.
 @ref{rgbformulae} and @ref{functions} use analytic formulae whereas
-@ref{defined} and @ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript output to a minimum.
+@ref{defined} and `palette file` use interpolated tables.  @ref{rgbformulae} reduces the size of postscript output to a minimum.
 
 The command `show palette fit2rgbformulae` finds the best matching @ref{rgbformulae} for the current @ref{palette}. Naturally, it makes sense
 to use it for non-rgbformulae palettes. This command can be found useful
@@ -12755,7 +12761,7 @@ as gnuplot, like zimg (
 ).
 
 `set palette gray` switches to a gray only palette. @ref{rgbformulae},
-@ref{defined}, @ref{file} and @ref{functions} switch
+@ref{defined}, `set palette file` and @ref{functions} switch
 to a color mapping. `set palette color` is an easy way to switch back from the
 gray palette to the last color mapping.
 
@@ -12994,7 +13000,7 @@ A gamma-corrected black and white palette
 @c ?commands set palette file
 @c ?set palette file
 @c ?palette file
-@ref{file} is basically a `set palette defined (<gradient>)` where
+`set palette file` is basically a `set palette defined (<gradient>)` where
 <gradient> is read from a datafile.  Either 4 columns (gray,R,G,B) or
 just three columns (R,G,B) have to be selected via the @ref{using} data file
 modifier.  In the three column case, the line number will be used as gray.
@@ -16053,8 +16059,8 @@ It is no longer necessary to specify `parametric` mode for three-column
 @cindex gpbin
 
 Gnuplot can read matrix binary files by use of the option `binary` appearing
-without keyword qualifications unique to general binary, i.e., `array`,
-`record`, `format`, or `filetype`.  Other general binary keywords for
+without keyword qualifications unique to general binary, i.e., @ref{array},
+@ref{record}, `format`, or @ref{filetype}.  Other general binary keywords for
 translation should also apply to matrix binary.  (See `binary general` for
 more details.)
 
@@ -20174,7 +20180,7 @@ color.
 The (mutually exclusive) options `interpolate` and `uniform` control
 if color interpolation is done while drawing triangles (on by default).
 
-A @ref{file} can be specified with the `dump "file"` option.
+A `screen dump file` can be specified with the `dump "file"` option.
 If this option is present, (i.e the dump file name is not empty) pressing
 the key KP_Delete will write the file.  This action cannot and cannot be
 rebound. The file is written in raw ppm (P6) format. Note that this option
