@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.185 2009/09/13 17:49:16 sfeam Exp $
+ * $Id: x11.trm,v 1.186 2009/10/31 05:24:18 sfeam Exp $
  *
  */
 
@@ -934,16 +934,6 @@ X11_init()
 
     if (!X11_ipc) {
 	/* first time through or after a reset */
-#if defined(OSK)
-	/* OS-9 popen() does not block on close for child to end, so
-	 * we can safely use it here
-	 */
-	/* FIXME HBB 20020214: This doesn't understand X11_DRIVER_DIR
-	 * or $GNUPLOT_DRIVER_DIR yet. This may break execution of
-	 * freshly built gnuplot until 'make install' */
-
-	   X11_ipc = popen(X11_command, "w");
-#else
 #if defined(OS2)
       /* FIXME amai 20020219: nice try...
        * But popen() does return a non-NULL handle to almost command,
@@ -954,7 +944,7 @@ X11_init()
       {
 	   X11_ipc = popen(X11_command, "w");
       }
-#else /* !(OSK || OS/2) */
+#else /* !(OS/2) */
 	int fdes[2];
 # ifdef PIPE_IPC
 	int fdes_back[2];
@@ -1023,7 +1013,6 @@ X11_init()
 	/* close the read side of the parent's forward fd */
 	close(fdes[0]);
 	X11_ipc = fdopen(fdes[1], "w");
-#endif /* !OSK  */
 #endif /* !OS/2 */
     }
 

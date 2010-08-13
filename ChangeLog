@@ -1,3 +1,9 @@
+2010-08-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/ansichek.h src/gplt_x11.c src/plot.c src/readline.c src/show.c
+	src/stdfn.h src/syscfg.h term/x11.trm:  Remove conditional code for 
+	another obsolete platform (OSK/OS9, used for example on TRS-80).
+
 2010-08-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c:  OSX history command could segfault if there was no

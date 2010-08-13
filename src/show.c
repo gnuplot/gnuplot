@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.241 2010/08/08 03:46:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.242 2010/08/09 21:36:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3312,12 +3312,10 @@ conv_text(const char *t)
 	    *s++ = '\\';
 	    *s++ = 'n';
 	    break;
-#ifndef OSK
 	case '\r':
 	    *s++ = '\\';
 	    *s++ = 'r';
 	    break;
-#endif
 	case '"':
 	case '\\':
 	    *s++ = '\\';

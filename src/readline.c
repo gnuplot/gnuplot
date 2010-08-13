@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.46 2008/12/12 21:06:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.47 2010/07/30 19:11:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -145,7 +145,7 @@ readline_ipc(const char* prompt)
 # endif
 #endif /* not HAVE_TERMIOS_H && HAVE_TCGETATTR */
 
-#if !defined(MSDOS) && !defined(_Windows) && !defined(OSK)
+#if !defined(MSDOS) && !defined(_Windows)
 
 /*
  * Set up structures using the proper include file
@@ -232,7 +232,7 @@ static int term_set = 0;	/* =1 if rl_termio set */
 #define special_getc() ansi_getc()
 static int ansi_getc __PROTO((void));
 
-#else /* MSDOS or _Windows or OSK */
+#else /* MSDOS or _Windows */
 
 # ifdef _Windows
 #  include <windows.h>
@@ -261,38 +261,7 @@ static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
 static char msdos_getch();
 # endif				/* MSDOS */
 
-# ifdef OSK
-#  include <sgstat.h>
-#  include <modes.h>
-
-#  define STDIN	0
-static int term_set = 0;	/* =1 if new_settings is set */
-
-static struct _sgs old_settings;	/* old terminal settings        */
-static struct _sgs new_settings;	/* new terminal settings        */
-
-#  define special_getc() ansi_getc()
-static int ansi_getc __PROTO((void));
-
-/* On OS9 a '\n' is a character 13 and '\r' == '\n'. This gives troubles
-   here, so we need a new putc wich handles this correctly and print a
-   character 10 on each place we want a '\n'.
- */
-#  undef putc			/* Undefine the macro for putc */
-
-static int
-putc(char c, FILE *fp)
-{
-    write(fileno(fp), &c, 1);
-    if (c == '\012') {		/* A normal ASCII '\n' */
-	c = '\r';
-	write(fileno(fp), &c, 1);
-    }
-}
-
-# endif				/* OSK */
-
-#endif /* MSDOS or _Windows or OSK */
+#endif /* MSDOS or _Windows */
 
 #ifdef OS2
 # if defined( special_getc )
@@ -309,11 +278,7 @@ static char os2_getch __PROTO((void));
 #define BACKSPACE 0x08   /* ^H */
 #define SPACE	' '
 
-#ifdef OSK
-# define NEWLINE	'\012'
-#else /* OSK */
 # define NEWLINE	'\n'
-#endif /* not OSK */
 
 static char *cur_line;		/* current contents of the line */
 static size_t line_len = 0;
@@ -630,9 +595,6 @@ readline(const char *prompt)
 		max_pos = cur_pos;
 		break;
 	    case '\n':		/* ^J */
-#ifndef OSK
-	    case '\r':		/* ^M */
-#endif
 		cur_line[max_pos + 1] = '\0';
 #ifdef OS2
 		while (cur_pos < max_pos) {
@@ -746,7 +708,7 @@ copy_line(char *line)
     cur_pos = max_pos = strlen(cur_line);
 }
 
-#if !defined(MSDOS) && !defined(_Windows) && !defined(OSK)
+#if !defined(MSDOS) && !defined(_Windows)
 /* Convert ANSI arrow keys to control characters */
 static int
 ansi_getc()
@@ -904,7 +866,6 @@ set_termio()
 	/*
 	 * Get terminal modes.
 	 */
-# ifndef OSK
 #  ifdef SGTTY
 	ioctl(0, TIOCGETP, &orig_termio);
 #  else				/* not SGTTY */
@@ -918,26 +879,16 @@ set_termio()
 	ioctl(0, TCGETA, &orig_termio);
 #   endif			/* TERMIOS */
 #  endif			/* not SGTTY */
-# else				/* OSK */
-	setbuf(stdin, (char *) 0);	/* Make stdin and stdout unbuffered */
-	setbuf(stderr, (char *) 0);
-	_gs_opt(STDIN, &new_settings);
-# endif				/* OSK */
 
 	/*
 	 * Save terminal modes
 	 */
-# ifndef OSK
 	rl_termio = orig_termio;
-# else				/* OSK */
-	_gs_opt(STDIN, &old_settings);
-# endif				/* OSK */
 
 	/*
 	 * Set the modes to the way we want them
 	 *  and save our input special characters
 	 */
-# ifndef OSK
 #  ifdef SGTTY
 	rl_termio.sg_flags |= CBREAK;
 	rl_termio.sg_flags &= ~(ECHO | XTABS);
@@ -993,18 +944,10 @@ set_termio()
 	rl_termio.c_cc[VSUSP] = 0;
 #   endif			/* TERMIOS */
 #  endif			/* not SGTTY */
-# else				/* OSK */
-	new_settings._sgs_echo = 0;	/* switch off terminal echo */
-	new_settings._sgs_pause = 0;	/* inhibit page pause */
-	new_settings._sgs_eofch = 0;	/* inhibit eof  */
-	new_settings._sgs_kbich = 0;	/* inhibit ^C   */
-	new_settings._sgs_kbach = 0;	/* inhibit ^E   */
-# endif				/* OSK */
 
 	/*
 	 * Set the new terminal modes.
 	 */
-# ifndef OSK
 #  ifdef SGTTY
 	ioctl(0, TIOCSLTC, &s_ltchars);
 #  else				/* not SGTTY */
@@ -1018,9 +961,6 @@ set_termio()
 	ioctl(0, TCSETAW, &rl_termio);
 #   endif			/* not TERMIOS */
 #  endif			/* not SGTTY */
-# else				/* OSK */
-	_ss_opt(STDIN, &new_settings);
-# endif				/* OSK */
 	term_set = 1;
     }
 #endif /* not MSDOS && not _Windows */
@@ -1032,7 +972,6 @@ reset_termio()
 #if !defined(MSDOS) && !defined(_Windows)
 /* reset saved terminal modes */
     if (term_set == 1) {
-# ifndef OSK
 #  ifdef SGTTY
 	ioctl(0, TIOCSETN, &orig_termio);
 #   ifdef TIOCGLTC
@@ -1051,9 +990,6 @@ reset_termio()
 	ioctl(0, TCSETAW, &orig_termio);
 #   endif			/* TERMIOS */
 #  endif			/* not SGTTY */
-# else				/* OSK */
-	_ss_opt(STDIN, &old_settings);
-# endif				/* OSK */
 	term_set = 0;
     }
 #endif /* not MSDOS && not _Windows */

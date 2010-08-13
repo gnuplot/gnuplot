@@ -1,5 +1,5 @@
 /*
- * $Id: ansichek.h,v 1.4 2000/10/31 19:59:30 joze Exp $
+ * $Id: ansichek.h,v 1.5 2004/04/13 17:23:51 broeker Exp $
  */
 
 /* GNUPLOT - ansichek.h */
@@ -59,7 +59,7 @@
  * just set ANSI_C ?
  */
 
-#  if defined(ANSI_C) || defined(__TURBOC__) || defined (__PUREC__) || defined (__ZTC__) || defined (_MSC_VER) || (defined(OSK) && defined(_ANSI_EXT))
+#  if defined(ANSI_C) || defined(__TURBOC__) || defined (__PUREC__) || defined (__ZTC__) || defined (_MSC_VER)
 #   ifndef PROTOTYPES
 #    define PROTOTYPES
 #   endif

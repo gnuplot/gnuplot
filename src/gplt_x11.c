@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.197 2010/02/07 23:18:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.198 2010/03/10 00:16:50 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -210,11 +210,6 @@ typedef struct axis_scale_t {
 #  define EXIT(status) exit(status)
 # endif	/* PIPE_IPC */
 #endif /* !VMS */
-
-#ifdef OSK
-# define EINTR	E_ILLFNC
-#endif
-
 
 #define Ncolors 13
 
@@ -668,10 +663,6 @@ main(int argc, char *argv[])
     int getfl;
 #endif
 
-#ifdef OSK
-    /* malloc large blocks, otherwise problems with fragmented mem */
-    _mallocmin(102400);
-#endif
 #ifdef __EMX__
     /* close open file handles */
     fcloseall();
