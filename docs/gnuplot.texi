@@ -457,8 +457,9 @@ version 4.0.
 @cindex polygon
 
 The @ref{object} command can now be used to define fixed circles, ellipses, and
-polygons as well as rectangles. There is a corresponding new plot style
-@ref{circles}.  See `circle`, @ref{ellipse} and @ref{polygon}.
+polygons as well as rectangles. There are two corresponding new plot styles:
+@ref{circles} and @ref{ellipses}.  
+See `circle`, `ellipse` and @ref{polygon}.
 
 
 @node New_or_revised_terminal_drivers, New_smoothing_algorithms, New_plot_elements, New_features_introduced_in_version_4.5
@@ -1038,6 +1039,7 @@ defaults to radians.
 * sqrt::                        
 * tan::                         
 * tanh::                        
+* voigt::                       
 * gprintf::                     
 * sprintf::                     
 * strlen::                      
@@ -1588,7 +1590,7 @@ The `sqrt(x)` function returns the square root of its argument.
 The `tan(x)` function returns the tangent of its argument.  `tan` expects
 its argument to be in radians or degrees, as selected by @ref{angles}.
 
-@node tanh, gprintf, tan, Functions
+@node tanh, voigt, tan, Functions
 @subsubsection tanh
 
 @c ?expressions functions tanh
@@ -1600,10 +1602,23 @@ its argument to be in radians or degrees, as selected by @ref{angles}.
 The `tanh(x)` function returns the hyperbolic tangent of its argument.  @ref{tanh}
 expects its argument to be in radians.
 
+@node voigt, gprintf, tanh, Functions
+@subsubsection voigt
+
+@c ?expressions functions voigt
+@c ?functions voigt
+@cindex voigt
+@findex voigt
+
+
+The function `voigt(x,y)` returns an approximation to the Voigt/Faddeeva
+function used in spectral analysis. The approximation is accurate to 
+one part in 10^4.
 
 
 
-@node gprintf, sprintf, tanh, Functions
+
+@node gprintf, sprintf, voigt, Functions
 @subsubsection gprintf
 
 @c ?expressions functions gprintf
@@ -2700,7 +2715,7 @@ Examples:
 @end example
 
 @example
-      # Use the data set index to choose a linestyle color
+      # Use the data set index to choose a line color
       plot 'data' using 1:2:(column(-2)) with lines lc variable
 
 @end example
@@ -3371,7 +3386,7 @@ This file can be plotted by
 
 which will produce xtic labels that look like "03/21".
 
-See the descriptions of each command for more details.
+See `time_specifiers`.
 
 @node plotting_styles, Commands, gnuplot, Top
 @chapter plotting styles
@@ -3408,6 +3423,7 @@ file are interpreted as plot data, see @ref{using}.
 * boxxyerrorbars::              
 * candlesticks::                
 * circles::                     
+* ellipses::                    
 * dots::                        
 * filledcurves::                
 * financebars::                 
@@ -3461,6 +3477,10 @@ special case  `boxwidth = -2.0` is for four-column data with y errors in the
 form "ylow yhigh".  In this case the boxwidth will be calculated so that each
 box touches the adjacent boxes.  The width will also be calculated in cases
 where three-column data are used.
+
+An additional (4th, 5th or 6th) input column may be used to provide variable 
+(per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
+The error bar will be drawn in the same color as the border of the box.
 
 The box height is determined from the y error in the same way as it is for
 the @ref{yerrorbars} style---either from y-ydelta to y+ydelta or from ylow to
@@ -3616,6 +3636,9 @@ way as they are for the @ref{xyerrorbars} style---either from xlow to xhigh and
 from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
 y+ydelta, depending on how many data columns are provided.
 
+An additional (5th or 7th) input column may be used to provide variable 
+(per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
+
 The interior of the boxes is drawn according to the current fillstyle.
 See `set style fill` and @ref{boxes} for details.  Alternatively a new fillstyle
 may be specified in the plot command.
@@ -3653,6 +3676,10 @@ rectangle is controlled by `set bars <width>`.
 Alternatively, an explicit width for each box-and-whiskers grouping may be
 specified in an optional 6th column of data.  The width must be given in the
 same units as the x coordinate.
+
+An additional (6th, or 7th if the 6th column is used for width data)
+input column may be used to provide variable (per-datapoint) color
+information (see `linecolor` and `rgbcolor variable`).
 
 By default the vertical line segments have no crossbars at the top and
 bottom. If you want crossbars, which are typically used for box-and-whisker
@@ -3693,7 +3720,7 @@ box-and-whisker plot requires additional plot commands as in this example:
 
 See @ref{boxwidth}, @ref{bars}, `set style fill`, and @ref{boxplot}.
 
-@node circles, dots, candlesticks, plotting_styles
+@node circles, ellipses, candlesticks, plotting_styles
 @section circles
 
 @c ?commands set style circles
@@ -3703,12 +3730,14 @@ See @ref{boxwidth}, @ref{bars}, `set style fill`, and @ref{boxplot}.
 @cindex circles
 
 The @ref{circles} style plots a circle with an explicit radius at each data point.
-Three columns of data are required: x, y, radius.  By default a full circle
-will be drawn.  It is possible to plot circle segments instead of full
-circles by specifying the start and end angle in the 4th and 5th column.
-An optional 4th or 6th column may be used to specify color information.
+If three columns of data are present, they are interpreted as x, y, radius.
 The radius is always interpreted in the units of the plot's horizontal axis
 (x or x2).  The scale on y and the aspect ratio of the plot are both ignored.
+If only two columns are present, the radius is taken from `set style circle`.
+In this case the radius may be given in graph or screen coordinates.
+By default a full circle will be drawn.  It is possible to plot arc segments
+instead of full circles by specifying a start and end angle in the 4th and 5th
+columns.  An optional 4th or 6th column can specify per-circle color.
 The start and end angles of the circle segments must be specified in degrees.
 
 
@@ -3743,7 +3772,70 @@ The result is similar to using a `points` plot with variable size points and
 pointstyle 7, except that the circles will scale with the x axis range.
 See also `set object circle` and `fillstyle`.
 
-@node dots, filledcurves, circles, plotting_styles
+@node ellipses, dots, circles, plotting_styles
+@section ellipses
+
+@c ?plotting styles ellipses
+@c ?style ellipses
+@cindex ellipses
+
+The @ref{ellipses} style plots an ellipse at each data point.  This style is
+only relevant for 2D plotting.  Each ellipse is described in terms of its
+center, major and minor diameters, and the angle between its major diameter
+and the x axis.
+
+@example
+     2 columns: x y
+     3 columns: x y major_diam
+     4 columns: x y major_diam minor_diam
+     5 columns: x y major_diam minor_diam angle
+
+@end example
+
+If only two input columns are present, they are taken as the coordinates of
+the centers, and the ellipses will be drawn with the default extent
+(see `set style ellipse`).  The orientation of the ellipse, which is
+defined as the angle between the major diameter and the plot's x axis,
+is taken from the default ellipse style (see `set style ellipse`).
+If three input columns are provided, the third column is used for both
+diameters.  The orientation angle defaults to zero.
+If four columns are present, they are interpreted as x, y, major diameter,
+minor diameter.  Note that these are diameters, not radii.
+An optional 5th column may be used to specify the orientation angle 
+in degrees. 
+The ellipses will also be drawn with their default extent if either of the 
+supplied diameters in the 3-4-5 column form is negative.
+
+In all of the above cases, optional variable color data may be given in an
+additional last (3th, 4th, 5th or 6th) column. See @ref{colorspec} for further
+information.
+
+By default, the major diameter is interpreted in the units of the plot's
+horizontal axis (x or x2) while the minor diameter in that of the vertical
+(y or y2).  This implies that if the x and y axis scales are not equal,
+then the major/minor diameter ratio will no longer be correct after rotation.
+This behavior can be changed with the `units` keyword, however. 
+
+There are three alternatives: 
+if `units xy` is included in the plot specification, the axes will be scaled
+as described above. `units xx` ensures that both diameters are interpreted
+in units of the x axis, while `units yy` means that both diameters are
+interpreted in units of the y axis. In the latter two cases the ellipses
+will have the correct aspect ratio, even if the plot is resized.
+
+If `units` is omitted, the default setting will be used, which is equivalent
+to `units xy`. This can be redefined by `set style ellipse`.
+
+Example (draws ellipses, cycling through the available line types):
+
+@example
+    plot 'data' using 1:2:3:4:(0):0 with ellipses
+
+@end example
+
+See also `set object ellipse`, `set style ellipse` and `fillstyle`.
+
+@node dots, filledcurves, ellipses, plotting_styles
 @section dots
 
 @c ?commands set style dots
@@ -3868,6 +3960,9 @@ data.  It requires 1 x coordinate (usually a date) and 4 y values (prices).
      5 columns:   date  open  low  high  close
 
 @end example
+
+An additional (6th) input column may be used to provide variable 
+(per-record) color information (see `linecolor` and `rgbcolor variable`).
 
 The symbol is a vertical line segment, located horizontally at the x
 coordinate and limited vertically by the high and low prices.  A horizontal
@@ -4263,13 +4358,11 @@ This optimized code may be disabled by using the keyword `failsafe`. E.g.
 @c ?style impulses
 @cindex impulses
 
-The @ref{impulses} style displays a vertical line from the x axis to the y value
-of each point (2D) or from the xy plane to the z value of each point (3D).
-Note that the y or z values may be negative.  As with most plot styles, data
-from additional columns can be used to control the color of each impulse.
-To use this style effectively in 3D plots, it is useful to use thick lines
-(linewidth > 1).  This approximates a 3D bar chart.
-     
+The @ref{impulses} style displays a vertical line from y=0 to the y value of each
+point (2D) or from z=0 to the z value of each point (3D).  Note that the y or z
+values may be negative.  Data from additional columns can be used to control
+the color of each impulse.  To use this style effectively in 3D plots, it is
+useful to use thick lines (linewidth > 1).  This approximates a 3D bar chart.
      
 @example
      1 column:   y        # implicit x coordinate from row number (2D)
@@ -4403,7 +4496,7 @@ erase the portion of line segment that passes underneath the symbol.
 The `points` style displays a small symbol at each point.  The command @ref{pointsize} may be used to change the default size of the points.
 1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
 required if 3D plots.  See `style lines`.  Additional input columns may be used
-to provide information such as variable point size or line color.
+to provide information such as variable point size or point color.
 
 @node steps, rgbalpha, points, plotting_styles
 @section steps
@@ -4462,6 +4555,10 @@ A small arrowhead is drawn at the end of each vector.
 
 @end example
 
+In both cases, an additional input column (5th in 2D, 7th in 3D) may be used
+to provide variable (per-datapoint) color information. 
+(see `linecolor` and `rgbcolor variable`).
+
 splot with vectors is supported only for `set mapping cartesian`.
 The keywords "with vectors" may be followed by arrow style specifications.
 See `arrowstyle` for more details.
@@ -4486,7 +4583,7 @@ Please see @ref{clip} and `arrowstyle`.
 @cindex xerrorbars
 
 The @ref{xerrorbars} style is only relevant to 2D data plots.  @ref{xerrorbars} is
-like @ref{dots}, except that a horizontal error bar is also drawn.  At each point
+like `points`, except that a horizontal error bar is also drawn.  At each point
 (x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
 (x+xdelta,y), depending on how many data columns are provided.  A tic mark
 is placed at the ends of the error bar (unless @ref{bars} is used---see
@@ -4497,6 +4594,9 @@ is placed at the ends of the error bar (unless @ref{bars} is used---see
      4 columns:  x  y  xlow  xhigh
 
 @end example
+
+An additional input column (4th or 5th) may be used to provide information 
+such as variable point color.
 
 
 @node xyerrorbars, yerrorbars, xerrorbars, plotting_styles
@@ -4509,7 +4609,7 @@ is placed at the ends of the error bar (unless @ref{bars} is used---see
 @cindex xyerrorbars
 
 The @ref{xyerrorbars} style is only relevant to 2D data plots.  @ref{xyerrorbars} is
-like @ref{dots}, except that horizontal and vertical error bars are also drawn.
+like `points`, except that horizontal and vertical error bars are also drawn.
 At each point (x,y), lines are drawn from (x,y-ydelta) to (x,y+ydelta) and
 from (x-xdelta,y) to (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from
 (xlow,y) to (xhigh,y), depending upon the number of data columns provided.  A
@@ -4528,8 +4628,12 @@ if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
 @example
       plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
-
+      
 @end example
+
+An additional input column (5th or 7th) may be used to provide variable 
+(per-datapoint) color information. 
+
 
 @node yerrorbars, xerrorlines, xyerrorbars, plotting_styles
 @section yerrorbars
@@ -4557,6 +4661,9 @@ used---see @ref{bars} for details).  Either 3 or 4 input columns are required.
 
 @end example
 
+An additional input column (4th or 5th) may be used to provide information 
+such as variable point color.
+
 See also
 @uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
 }
@@ -4583,6 +4690,9 @@ The basic style requires either 3 or 4 columns:
      4 columns:  x  y  xlow  xhigh
 
 @end example
+
+An additional input column (4th or 5th) may be used to provide information 
+such as variable point color.
 
 
 @node xyerrorlines, yerrorlines, xerrorlines, plotting_styles
@@ -4618,6 +4728,10 @@ if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
 @end example
 
+An additional input column (5th or 7th) may be used to provide variable 
+(per-datapoint) color information. 
+
+
 @node yerrorlines, 3D_(surface)_plots, xyerrorlines, plotting_styles
 @section yerrorlines
 
@@ -4644,6 +4758,9 @@ Either 3 or 4 input columns are required.
      4 columns:  x  y  ylow  yhigh
 
 @end example
+
+An additional input column (4th or 5th) may be used to provide information 
+such as variable point color.
 
 See also
 @uref{http://www.gnuplot.info/demo/mgr.html,errorbar demo.
@@ -6694,17 +6811,17 @@ externally or by using @ref{fit} with an appropriate model.
 
 Syntax:
 @example
-      smooth @{unique | frequency | cumulative | kdensity | csplines | acsplines | bezier | sbezier@}
+      smooth @{unique | frequency | cumulative | cnormal | kdensity | csplines | acsplines | bezier | sbezier@}
 
 @end example
 
-`unique`, `frequency`, and `cumulative` plot the data after making them 
-monotonic.  Each of the other routines uses the data to determine the 
-coefficients of a continuous curve between the endpoints of the data.  
-This curve is then plotted in the same manner as a function, that is, 
-by finding its value at uniform intervals along the abscissa 
-(see @ref{samples}) and connecting these points with straight line 
-segments (if a line style is chosen).
+`unique`, `frequency`, `cumulative` and `cnormal` plot the data after
+making them monotonic.  Each of the other routines uses the data to
+determine the coefficients of a continuous curve between the endpoints
+of the data.  This curve is then plotted in the same manner as a
+function, that is, by finding its value at uniform intervals along the
+abscissa (see @ref{samples}) and connecting these points with straight
+line segments (if a line style is chosen).
 
 If @ref{autoscale} is in effect, the ranges will be computed such that the
 plotted curve lies within the borders of the graph.
@@ -6861,6 +6978,31 @@ function from data.
 See also
 @uref{http://www.gnuplot.info/demo/smooth.html,smooth.dem
 }
+
+
+@noindent --- CNORMAL ---
+
+@c ?commands plot datafile smooth cnormal
+@c ?plot datafile smooth cnormal
+@c ?plot smooth cnormal
+@c ?data-file smooth cnormal
+@c ?datafile smooth cnormal
+@c ?plot cnormal
+@c ?smooth cnormal
+@cindex cnormal
+
+The `cnormal` option makes the data monotonic in x and normalises the
+y-values onto the range [0:1].  Points with the same x-value are
+replaced by a single point containing the cumulative sum of y-values
+of all data points with lower x-values (i.e. to the left of the
+current data point) divided by the total sum of all y-values. This can
+be used to obtain a normalised cumulative distribution function from
+data (useful when comparing sets of samples with differing numbers of
+members).
+See also
+@uref{http://www.gnuplot.info/demo/smooth.html,smooth.dem
+}
+
 
 
 @noindent --- KDENSITY ---
@@ -7770,8 +7912,9 @@ where <style> is one of
 or
 @example
       boxes            candlesticks   image      circles
-      boxerrorbars     filledcurves   rgbimage
+      boxerrorbars     filledcurves   rgbimage   ellipses
       boxxyerrorbars   histograms     rgbalpha   pm3d
+      boxplot
 
 @end example
 
@@ -9947,6 +10090,7 @@ Valid values are
    cp437       - codepage for MS-DOS
    cp850       - codepage for OS/2, Western Europe
    cp852       - codepage for OS/2, Central and Eastern Europe
+   cp950       - MS version of Big5 (emf terminal only)
    cp1250      - codepage for MS Windows, Central and Eastern Europe
    cp1254      - codepage for MS Windows, Turkish (superset of Latin5)
    utf8        - variable-length (multibyte) representation of Unicode
@@ -10159,6 +10303,8 @@ The acceptable formats (if not in time/date mode) are:
       %L           power to base of current logscale
       %S           scientific power
       %c           character replacement for scientific power
+      %b           mantissa of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) 
+      %B           prefix of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) 
       %P           multiple of pi
 
 @end example
@@ -10246,12 +10392,13 @@ In time/date mode, the acceptable formats are:
       %p           "am" or "pm"
       %r           shorthand for "%I:%M:%S %p" (only output)
       %R           shorthand for "%H:%M" (only output)
-      %S           second, 0--60
+      %s           number of seconds since the start of year 2000
+      %S           second, integer 0--60 on output, (double) on input
       %T           shorthand for "%H:%M:%S" (only output)
       %U           week of the year (week starts on Sunday)
       %w           day of the week, 0--6 (Sunday = 0)
       %W           week of the year (week starts on Monday)
-      %y           year, 0-99
+      %y           year, 0-68 for 2000-2068, 69-99 for 1969-1999
       %Y           year, 4-digit
 
 @end example
@@ -10260,8 +10407,10 @@ In time/date mode, the acceptable formats are:
 Except for the non-numerical formats, these may be preceded by a "0" ("zero",
 not "oh") to pad the field length with leading zeroes, and a positive digit,
 to define the minimum field width (which will be overridden if the specified
-width is not large enough to contain the number).  There is a 24-character
-limit to the length of the printed text; longer strings will be truncated.
+width is not large enough to contain the number).  The %S format also accepts
+a precision specifier so that fractional seconds can be written.
+There is a 24-character limit to the length of the printed text;
+longer strings will be truncated.
 
 Examples:
 
@@ -10273,9 +10422,9 @@ Suppose the text is "76/12/25 23:11:11".  Then
 
 @end example
 
-Suppose the text is "98/07/06 05:04:03".  Then
+Suppose the text is "98/07/06 05:04:03.123456".  Then
 @example
-      set format x "%1y/%2m/%3d %01H:%02M:%03S"  # "98/ 7/  6 5:04:003"
+      set format x "%1y/%2m/%3d %01H:%02M:%06.3S"  # "98/ 7/  6 5:04:03.123"
 
 @end example
 
@@ -10421,12 +10570,12 @@ be hidden.  Each surface has its hidden parts removed with respect to itself
 and to other surfaces, if more than one surface is plotted.  Contours drawn
 on the surface (@ref{surface}) don't work.
 
-Labels and arrows are always visible and are unaffected.  The key box is
-never hidden by the surface. As of gnuplot version 4.2, @ref{hidden3d} also
-affects 3D plotting styles `with points`, @ref{labels}, and @ref{vectors},
-even if no surface is present in the graph.  Individual plots within the
-graph may be explicitly excluded from this processing by appending the extra
-option `nohidden3d` to the @ref{with} specifier.
+Labels and arrows are always visible and are unaffected.  The key box is never
+hidden by the surface. As of gnuplot version 4.5, hidden3d also affects 3D
+plotting styles `points`, @ref{labels}, @ref{vectors}, and @ref{impulses} even if no
+surface is present in the graph.  Individual plots within the graph may be
+explicitly excluded from this processing by appending the extra option 
+`nohidden3d` to the @ref{with} specifier.
 
 Hidden3d does not affect solid surfaces drawn using the pm3d mode. To achieve
 a similar effect purely for pm3d surfaces, use instead @ref{depthorder}.
@@ -10616,6 +10765,7 @@ Syntax:
                 | @{at <position>@}@}
               @{left | right | center@} @{top | bottom | center@}
               @{vertical | horizontal@} @{Left | Right@}
+              @{@{no@}opaque@}
               @{@{no@}reverse@} @{@{no@}invert@}
               @{samplen <sample_length>@} @{spacing <vertical_spacing>@}
               @{width <width_increment>@}
@@ -10626,6 +10776,8 @@ Syntax:
               @{@{no@}box @{ @{linestyle | ls <line_style>@}
                          | @{linetype | lt <line_type>@}
                            @{linewidth | lw <line_width>@}@}@}
+              @{maxcols @{<max no. of columns> | auto@}@}
+              @{maxrows @{<max no. of rows> | auto@}@}
       unset key
       show key
 
@@ -10639,8 +10791,9 @@ in the graph. The key may be turned off by requesting `set key off` or
 Elements within the key are stacked according to `vertical` or `horizontal`.
 In the case of `vertical`, the key occupies as few columns as possible.  That
 is, elements are aligned in a column until running out of vertical space at
-which point a new column is started.  In the case of `horizontal`, the key
-occupies as few rows as possible.
+which point a new column is started.  The vertical space may be limited using
+'maxrows'.  In the case of `horizontal`, the key occupies as few rows as
+possible.  The horizontal space may be limited using 'maxcols'.
 
 By default the key is placed in the upper right inside corner of the graph.
 The keywords `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
@@ -10655,6 +10808,14 @@ Justification of the plot titles within the key is controlled by `Left` or
 `Right` (default).  The text and sample can be reversed (`reverse`) and a
 box can be drawn around the key (`box @{...@}`) in a specified `linetype`
 and `linewidth`, or a user-defined `linestyle`.
+
+By default the key is built up one plot at a time. That is, the key symbol and
+title are drawn at the same time as the corresponding plot.  That means newer
+plots may sometimes place elements on top of the key.  `set key opaque` causes
+the key to be generated after all the plots.  In this case the key area is 
+filled with background color and then the key symbols and titles are written.
+Therefore the key itself may obscure portions of some plot elements.
+The default can be restored by `set key noopaque`.
 
 By default the first plot label is at the top of the key and successive labels
 are entered below it. The `invert` option causes the first label to be placed
@@ -10859,7 +11020,7 @@ By default, each plot on the graph generates a corresponding entry in the key.
 This entry contains a plot title and a sample line/point/box of the same color
 and fill properties as used in the plot itself.  The font and textcolor
 properties control the appearance of the individual plot titles that appear in
-the key. Setting the textcolor to "rgb variable" causes the text for each key
+the key. Setting the textcolor to "variable" causes the text for each key
 entry to be the same color as the line or fill color for that plot.
 This was the default in some earlier versions of gnuplot.
 
@@ -11427,19 +11588,9 @@ shift key held down changes the @ref{xyplane}.  If additionally to these
 buttons the modifier <ctrl> is held down, the coordinate axes are displayed
 but the data are suppressed.  This is useful for large data sets.
 
-X and Y axis scaling in both 2d and 3d graphs can be adjusted using the
-mouse wheel.  <wheel-up> scrolls up (increases both YMIN and YMAX by ten
-percent of the Y range, and increases both Y2MIN and Y2MAX likewise), and
-<wheel down> scrolls down.  <shift-wheel-up> scrolls left (decreases both
-XMIN and XMAX, and both X2MIN and X2MAX), and <shift-wheel-down> scrolls
-right.  <control-wheel-up> zooms in toward the center of the plot, and
-<control-wheel-down> zooms out.  <shift-control-wheel-up> zooms in along the
-X and X2 axes only, and <shift-control-wheel-down> zooms out along the X and
-X2 axes only.
-
-Mousing is not available in multiplot mode. When multiplot is finished using
-@ref{multiplot}, then the mouse will be turned on again and acts on the
-last plot (like replot does).
+Mousing is not available inside multiplot mode. When multiplot is completed
+using @ref{multiplot}, then the mouse will be turned on again but acts only
+on the most recent plot within the multiplot (like replot does).
 
 Syntax:
 @example
@@ -11456,19 +11607,17 @@ Syntax:
 
 @end example
 
-The doubleclick resolution is given in milliseconds and used for Button 1
-which copies the current mouse position to the `clipboard`. If you want that
-to be done by single clicking a value of 0 ms can be used. The default value
-is 300 ms.
+The doubleclick resolution is given in milliseconds and used for Button 1,
+which copies the current mouse position to the `clipboard`.  The default value
+is 300 ms.  Setting the value to 0 ms triggers the copy on a single click.
 
 The option `zoomcoordinates` determines if the coordinates of the zoom box are
 drawn at the edges while zooming. This is on by default.
 
-The options `noruler` and `ruler` switch the ruler off and on, the
-latter optionally setting the origin at the given coordinates. While
-the ruler is on, the distance in user units from the ruler origin to
-the mouse is displayed continuously. By default, toggling the ruler
-has the key binding 'r'.
+The options `noruler` and `ruler` switch the ruler off and on, the latter
+optionally setting the origin at the given coordinates. While the ruler is on,
+the distance in user units from the ruler origin to the mouse is displayed
+continuously. By default, toggling the ruler has the key binding 'r'.
 
 The option `polardistance` determines if the distance between the mouse cursor
 and the ruler is also shown in polar coordinates (distance and angle in
@@ -11525,17 +11674,34 @@ Press 'h' in the driver's window for a short summary of the mouse and key
 bindings.  This will also display user defined bindings or `hotkeys` which
 can be defined using the `bind` command, see help for `bind`.  Note, that user
 defined `hotkeys` may override the default bindings.
-
-Press 'q' in the driver's window to close the window. This key cannot be
-overridden with the `bind` command.
-
 See also help for `bind` and `label`.
 
 @menu
+* scrolling::                   
 * X11_mouse::                   
 @end menu
 
-@node X11_mouse,  , mouse, mouse
+@node scrolling, X11_mouse, mouse, mouse
+@subsubsection scrolling
+
+@c ?set mouse scrolling
+@c ?mouse scrolling
+@c ?mouse wheel
+@cindex scrolling
+
+@cindex mousewheel
+
+X and Y axis scaling in both 2d and 3d graphs can be adjusted using the
+mouse wheel.  <wheel-up> scrolls up (increases both YMIN and YMAX by ten
+percent of the Y range, and increases both Y2MIN and Y2MAX likewise), and
+<wheel down> scrolls down.  <shift-wheel-up> scrolls left (decreases both
+XMIN and XMAX, and both X2MIN and X2MAX), and <shift-wheel-down> scrolls
+right.  <control-wheel-up> zooms in toward the center of the plot, and
+<control-wheel-down> zooms out.  <shift-control-wheel-up> zooms in along the
+X and X2 axes only, and <shift-control-wheel-down> zooms out along the X and
+X2 axes only.
+
+@node X11_mouse,  , scrolling, mouse
 @subsubsection X11 mouse
 
 @c ?mouse x11_mouse
@@ -11546,12 +11712,6 @@ If multiple X11 plot windows have been opened using the `set term x11 <n>`
 terminal option, then only the current plot window supports the entire
 range of mouse commands and hotkeys.  The other windows will, however,
 continue to display mouse coordinates at the lower left.
-
-For consistency with other screen terminals, X11 mouse support is turned on by
-default, wherever the standard input comes from. However, on some UNIX
-flavors, special input devices as /dev/null might not be `select-able`; using
-such devices with the mouse turned on will hang gnuplot. Please turn off
-mousing with `unset mouse` if you are in this situation.
 
 @node multiplot, mx2tics, mouse, set-show
 @subsection multiplot
@@ -11820,7 +11980,7 @@ see @ref{mxtics}.
 @c ?show object
 The @ref{object} command defines a single object which will appear in all
 subsequent 2D plots. You may define as many objects as you like. Currently the
-supported object types are @ref{rectangle}, `circle`, @ref{ellipse}, and @ref{polygon}.
+supported object types are @ref{rectangle}, `circle`, `ellipse`, and @ref{polygon}.
 Rectangles inherit a default set of style properties (fill, color, border) from
 those set by the command @ref{rectangle}, but each object can also be
 given individual style properties. Circles, ellipses, and polygons  inherit the
@@ -11835,7 +11995,7 @@ Syntax:
 
 @end example
 
-<object-type> is either @ref{rectangle}, @ref{ellipse}, `circle`, or @ref{polygon}.
+<object-type> is either @ref{rectangle}, `ellipse`, `circle`, or @ref{polygon}.
 Each object type has its own set of characteristic properties.
 
 Setting `front` will draw the object in front of all plot elements, but
@@ -11911,6 +12071,7 @@ Examples:
 
 @end example
 
+
 @node ellipse, circle, rectangle, object
 @subsubsection ellipse
 
@@ -11923,7 +12084,7 @@ Examples:
 Syntax:
 @example
     set object <index> ellipse @{at|center@} <position> size <w>,<h>
-        @{angle <orientation>@}
+        @{angle <orientation>@} @{units xy|xx|yy@}
         @{<other-object-properties>@}
 
 @end example
@@ -11933,19 +12094,32 @@ the width and the height (actually the major and minor axes). The keywords
 `at` and `center` are synonyms.  The center position may be given in axis,
 graph, or screen coordinates. See `coordinates`. The major and minor axis
 lengths must be given in axis coordinates.  The orientation of the ellipse
-is specified by the angle between the horizontal axis and the first axis
-of the ellipse.  NB: If the x and y axis scales are not equal, then the
-major/minor axis ratio will no longer be correct after rotation. This may
-be fixed in a later gnuplot version.
+is specified by the angle between the horizontal axis and the major diameter
+of the ellipse.  If no angle is given, the default ellipse orientation
+will be used instead (see `set style ellipse`).  The `units` keyword
+controls the scaling of the axes of the ellipse. `units xy` means that the
+major axis is interpreted in terms of units along the x axis, while the 
+minor axis in that of the y axis. `units xx` means that both axes of the 
+ellipses are scaled in the units of the x axis, while `units yy` means 
+that both axes are in units of the y axis. 
+The default is `xy` or whatever `set style ellipse units` was set to.
+
+NB: If the x and y axis scales are not equal, (e.g. `units xy` is in
+effect) then the major/minor axis ratio will no longer be correct after
+rotation.
 
 Note that `set object ellipse size <2r>,<2r>` does not in general produce
 the same result as `set object circle <r>`.  The circle radius is always
 interpreted in terms of units along the x axis, and will always produce a
 circle even if the x and y axis scales are different and even if the aspect
-ratio of your plot is not 1.  'Set object ellipse' interprets the first '2r'
-in terms of x axis units and the second '2r' in terms of y axis units.
-This will only produce a circle if the x and y axis scales are identical and
-the plot aspect ratio is 1.
+ratio of your plot is not 1.  If `units` is set to `xy`, then
+'set object ellipse' interprets the first <2r> in terms of x axis units 
+and the second <2r> in terms of y axis units. This will only produce a
+circle if the x and y axis scales are identical and the plot aspect ratio
+is 1.  On the other hand, if `units` is set to `xx` or `yy`, then the
+diameters specified in the 'set object' command will be interpreted in the
+same units, so the ellipse will have the correct aspect ratio, and it will
+maintain its aspect ratio even if the plot is resized.
 
 
 @node circle, polygon, ellipse, object
@@ -13269,6 +13443,17 @@ Syntax:
 
 @end example
 
+If `gnuplot` was built with the support of objects, then the following
+options are also available:
+
+Syntax:
+@example
+      set style rectangle <object options> <linestyle> <fillstyle>
+      set style circle radius <size>
+      set style ellipse size <size> units @{xy|xx|yy@}
+
+@end example
+
 
 @menu
 * set_style_arrow::             
@@ -13278,7 +13463,9 @@ Syntax:
 * set_style_function::          
 * set_style_increment::         
 * set_style_line::              
+* set_style_circle::            
 * set_style_rectangle::         
+* set_style_ellipse::           
 @end menu
 
 @node set_style_arrow, boxplot_, style, style
@@ -13597,7 +13784,7 @@ linetype is used instead.  E.g. in the example above, f3(x) will be plotted
 using the default linetype 3.
 
 
-@node set_style_line, set_style_rectangle, set_style_increment, style
+@node set_style_line, set_style_circle, set_style_increment, style
 @subsubsection set style line
 
 @c ?commands set style line
@@ -13732,7 +13919,28 @@ will assign linestyle 10 to be a solid cyan line on any terminal that
 supports rgb colors.
 
 
-@node set_style_rectangle,  , set_style_line, style
+@node set_style_circle, set_style_rectangle, set_style_line, style
+@subsubsection set style circle
+
+@c ?commands set style circle
+@c ?commands unset style circle
+@c ?commands show style circle
+@c ?set style circle
+@c ?unset style circle
+@c ?show style circle
+
+Syntax:
+@example
+      set style circle @{radius @{graph|screen@} <R>@}
+
+@end example
+
+This command sets the default radius used in plot style "with circles".  It
+applies to data plots with only 2 columns of data (x,y) and to function plots.
+The default is "set style circle radius graph 0.02".
+
+
+@node set_style_rectangle, set_style_ellipse, set_style_circle, style
 @subsubsection set style rectangle
 
 @c ?commands set style rectangle
@@ -13764,6 +13972,55 @@ Examples:
 
 The default values correspond to solid fill with the background color and a
 black border.
+
+
+@node set_style_ellipse,  , set_style_rectangle, style
+@subsubsection set style ellipse
+
+@c ?commands set style ellipse
+@c ?commands show style ellipse
+@c ?set style ellipse
+@c ?unset style ellipse
+@c ?show style ellipse
+
+Syntax:
+@example
+      set style ellipse @{units xx|xy|yy@}
+                        @{size @{graph|screen@} <a>, @{@{graph|screen@} <b>@}@}
+                        @{angle <angle>@}
+
+@end example
+
+This command governs whether the diameters of ellipses are interpreted in
+the same units or not.
+Default is `xy`, which means that the major diameter (first axis) of
+ellipses will be interpreted in the same units as the x (or x2) axis,
+while the minor (second) diameter in those of the y (or y2) axis.  
+In this mode the ratio of the ellipse axes depends on the scales of the
+plot axes and aspect ratio of the plot.  When set to `xx` or `yy`,
+both axes of all ellipses will be interpreted in the same units.
+This means that the ratio of the axes of the plotted ellipses will be
+correct even after rotation, but either their vertical or horizontal extent
+will not be correct.
+
+This is a global setting that affects all ellipses, both those defined as
+objects and those generated with the `plot` command, however, the value of
+`units` can also be redefined on a per-plot and per-object basis.
+
+It is also possible to set a default size for ellipses with the @ref{size} 
+keyword.  This default size applies to data plots with only 
+2 columns of data (x,y) and to function plots.  The two values are 
+interpreted as the major and minor diameters (as opposed to semi-major 
+and semi-minor axes) of the ellipse.
+
+The default is "set style ellipse size graph 0.05,0.03".
+
+Last, but not least it is possible to set the default orientation with the
+`angle` keyword. The orientation, which is defined as the angle between the
+major axis of the ellipse and the plot's x axis, must be given in degrees.
+
+For defining ellipse objects, see `set object ellipse`;
+for the 2D plot style, see @ref{ellipses}.
 
 
 @node surface, table, style, set-show
@@ -13907,6 +14164,7 @@ be changed this way. Currently the only options accepted are
 @example
      set termoption @{no@}enhanced
      set termoption font "<fontname>@{,<fontsize>@}"
+     set termoption fontscale <scale>
      set termoption @{solid|dashed@}
      set termoption @{linewidth <lw>@}@{lw <lw>@}
 
@@ -14100,7 +14358,7 @@ The valid formats are:
       %H           hour, 0--24
       %M           minute, 0--60
       %s           seconds since the Unix epoch (1970-01-01, 00:00 UTC)
-      %S           second, 0--60
+      %S           second, integer 0--60 on output, (double) on input
       %b           three-character abbreviation of the name of the month
       %B           name of the month
 
@@ -14109,7 +14367,9 @@ The valid formats are:
 Any character is allowed in the string, but must match exactly.  \t (tab) is
 recognized.  Backslash-octals (\nnn) are converted to char.  If there is no
 separating character between the time/date elements, then %d, %m, %y, %H, %M
-and %S read two digits each, %Y reads four digits and %j reads three digits.
+and %S read two digits each.  If a decimal point immediately follows the field
+read by %S, the decimal and any following digits are interpreted as a
+fractional second.  %Y reads four digits. %j reads three digits.
 %b requires three characters, and %B requires as many as it needs.
 
 Spaces are treated slightly differently.  A space in the string stands for
@@ -14121,12 +14381,16 @@ Each set of non-blank characters in the timedata counts as one column in the
 columns.  To avoid confusion, `gnuplot` requires that you provide a complete
 @ref{using} specification if your file contains timedata.
 
-Since `gnuplot` cannot read non-numerical text, if the date format includes
-the day or month in words, the format string must exclude this text.  But
-it can still be printed with the "%a", "%A", "%b", or "%B" specifier:
-see `set format` for more details about these and other options for printing
-timedata.  (`gnuplot` will determine the proper month and weekday from the
-numerical values.)
+If the date format includes the day or month in words, the format string must
+exclude this text.  But it can still be printed with the "%a", "%A", "%b", or
+"%B" specifier.  `gnuplot` will determine the proper month and weekday from the
+numerical values.  See `set format` for more details about these and other
+options for printing time data.  
+
+When reading two-digit years with %y, values 69-99 refer to the 20th century,
+while values 00-68 refer to the 21st century.   NB: This is in accordance with
+the UNIX98 spec, but conventions vary widely and two-digit year values are
+inherently ambiguous.
 
 See also @ref{xdata} and `Time/date` for more information.
 
@@ -16675,7 +16939,7 @@ Syntax:
 @example
         set term pdfcairo
                      @{@{no@}enhanced@} @{mono|color@} @{solid|dashed@}
-                     @{font <font>@}
+                     @{font <font>@} @{fontscale <scale>@}
                      @{linewidth <lw>@} @{rounded|butt@} @{dashlength <dl>@}
                      @{size <XX>@{unit@},<YY>@{unit@}@}
 
@@ -16703,7 +16967,10 @@ plot edges as specified by the @ref{size} option.
 comma-separated in a single string. FontFace is a usual font face name, such
 as \'Arial\'. If you do not provide FontFace, the pdfcairo terminal will use
 \'Sans\'. FontSize is the font size, in points. If you do not provide it,
-the pdfcairo terminal will use a size of 6 points.
+the pdfcairo terminal will use a nominal font size of 12 points.
+However, the default fontscale parameter for this terminal is 0.5,
+so the apparent font size is smaller than this if the pdf output is
+viewed at full size.
 @example
    For example :
       set term pdfcairo font "Arial,12"
@@ -17363,6 +17630,7 @@ Syntax:
                        @{linewidth <LW>@} @{dashlength <DL>@} @{size XX,YY@}
                        @{"<fontname>"@} @{<fontsize>@}    #old syntax
                        @{font "<fontname>,<fontsize>"@} #new syntax
+                       @{fontscale <scale>@}
 
 @end example
 
@@ -17761,11 +18029,12 @@ To plot the error bars on top of the circles use
 Syntax:
 @example
       set terminal png 
+             @{@{no@}enhanced@}
              @{@{no@}transparent@} @{@{no@}interlace@}
              @{@{no@}truecolor@} @{rounded|butt@}
              @{linewidth <lw>@} @{dashlength <dl>@}
              @{tiny | small | medium | large | giant@}
-             @{font "<face> @{,<pointsize>@}"@} @{@{no@}enhanced@}
+             @{font "<face> @{,<pointsize>@}"@} @{fontscale <scale>@}
              @{size <x>,<y>@} @{@{no@}crop@}
              @{<background_color>@}
 
@@ -19173,7 +19442,7 @@ Syntax:
       set terminal pdf @{monochrome|color|colour@}
                        @{@{no@}enhanced@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
-                       @{font "<fontname>@{,<fontsize>@}"@}
+                       @{font "<fontname>@{,<fontsize>@}"@} @{fontscale <scale>@}
                        @{linewidth <lw>@} @{rounded|butt@}
                        @{solid|dashed@} @{dl <dashlength>@}@}
                        @{size <XX>@{unit@},<YY>@{unit@}@}
@@ -20205,7 +20474,7 @@ Syntax:
         set term wxt @{<n>@}
                      @{size <width>,<height>@}
                      @{@{no@}enhanced@}
-                     @{font <font>@}
+                     @{font <font>@} @{fontscale <scale>@}
                      @{title "title"@}
                      @{dashed|solid@} @{dashlength <dl>@}
                      @{@{no@}persist@}
