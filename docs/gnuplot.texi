@@ -3381,7 +3381,7 @@ This file can be plotted by
 
 which will produce xtic labels that look like "03/21".
 
-See the descriptions of each command for more details.
+See `time_specifiers`.
 
 @node plotting_styles, Commands, gnuplot, Top
 @chapter plotting styles
@@ -3615,6 +3615,10 @@ For backwards compatibility with earlier gnuplot versions, when the
 boxwidth parameter has not been set then the width of the candlestick
 rectangle is controlled by `set bars <width>`.
 
+Alternatively, an explicit width for each box-and-whiskers grouping may be
+specified in an optional 6th column of data.  The width must be given in the
+same units as the x coordinate.
+
 By default the vertical line segments have no crossbars at the top and
 bottom. If you want crossbars, which are typically used for box-and-whisker
 plots, then add the keyword `whiskerbars` to the plot command.  By default
@@ -3668,6 +3672,8 @@ Three columns of data are required: x, y, radius.  An optional 4th column may
 be used to specify color information.  The radius is always interpreted in the
 units of the plot's horizontal axis (x or x2).  The scale on y and the aspect
 ratio of the plot are both ignored.
+If only two columns are present, the radius is taken from `set style circle`.
+In this case the radius may be given in graph or screen coordinates.
 
 Example (draws circles whose area is proportional to the value in column 3):
 
@@ -4202,13 +4208,11 @@ This optimized code may be disabled by using the keyword `failsafe`. E.g.
 @c ?style impulses
 @cindex impulses
 
-The @ref{impulses} style displays a vertical line from the x axis to the y value
-of each point (2D) or from the xy plane to the z value of each point (3D).
-Note that the y or z values may be negative.  As with most plot styles, data
-from additional columns can be used to control the color of each impulse.
-To use this style effectively in 3D plots, it is useful to use thick lines
-(linewidth > 1).  This approximates a 3D bar chart.
-     
+The @ref{impulses} style displays a vertical line from y=0 to the y value of each
+point (2D) or from z=0 to the z value of each point (3D).  Note that the y or z
+values may be negative.  Data from additional columns can be used to control
+the color of each impulse.  To use this style effectively in 3D plots, it is
+useful to use thick lines (linewidth > 1).  This approximates a 3D bar chart.
      
 @example
      1 column:   y        # implicit x coordinate from row number (2D)
@@ -10183,12 +10187,13 @@ In time/date mode, the acceptable formats are:
       %p           "am" or "pm"
       %r           shorthand for "%I:%M:%S %p" (only output)
       %R           shorthand for "%H:%M" (only output)
+      %s           number of seconds since the start of year 2000
       %S           second, 0--60
       %T           shorthand for "%H:%M:%S" (only output)
       %U           week of the year (week starts on Sunday)
       %w           day of the week, 0--6 (Sunday = 0)
       %W           week of the year (week starts on Monday)
-      %y           year, 0-99
+      %y           year, 0-68 for 2000-2068, 69-99 for 1969-1999
       %Y           year, 4-digit
 
 @end example
@@ -10358,12 +10363,12 @@ be hidden.  Each surface has its hidden parts removed with respect to itself
 and to other surfaces, if more than one surface is plotted.  Contours drawn
 on the surface (@ref{surface}) don't work.
 
-Labels and arrows are always visible and are unaffected.  The key box is
-never hidden by the surface. As of gnuplot version 4.2, @ref{hidden3d} also
-affects 3D plotting styles `with points`, @ref{labels}, and @ref{vectors},
-even if no surface is present in the graph.  Individual plots within the
-graph may be explicitly excluded from this processing by appending the extra
-option `nohidden3d` to the @ref{with} specifier.
+Labels and arrows are always visible and are unaffected.  The key box is never
+hidden by the surface. As of gnuplot version 4.5, hidden3d also affects 3D
+plotting styles `points`, @ref{labels}, @ref{vectors}, and @ref{impulses} even if no
+surface is present in the graph.  Individual plots within the graph may be
+explicitly excluded from this processing by appending the extra option 
+`nohidden3d` to the @ref{with} specifier.
 
 Hidden3d does not affect solid surfaces drawn using the pm3d mode. To achieve
 a similar effect purely for pm3d surfaces, use instead @ref{depthorder}.
@@ -13098,6 +13103,7 @@ Syntax:
 * set_style_function::          
 * set_style_increment::         
 * set_style_line::              
+* set_style_circle::            
 * set_style_rectangle::         
 @end menu
 
@@ -13358,7 +13364,7 @@ linetype is used instead.  E.g. in the example above, f3(x) will be plotted
 using the default linetype 3.
 
 
-@node set_style_line, set_style_rectangle, set_style_increment, style
+@node set_style_line, set_style_circle, set_style_increment, style
 @subsubsection set style line
 
 @c ?commands set style line
@@ -13492,7 +13498,28 @@ will assign linestyle 10 to be a solid cyan line on any terminal that
 supports rgb colors.
 
 
-@node set_style_rectangle,  , set_style_line, style
+@node set_style_circle, set_style_rectangle, set_style_line, style
+@subsubsection set style circle
+
+@c ?commands set style circle
+@c ?commands unset style circle
+@c ?commands show style circle
+@c ?set style circle
+@c ?unset style circle
+@c ?show style circle
+
+Syntax:
+@example
+      set style circle @{radius @{graph|screen@} <R>@}
+
+@end example
+
+This command sets the default radius used in plot style "with circles".  It
+applies to data plots with only 2 columns of data (x,y) and to function plots.
+The default is "set style circle radius graph 0.02".
+
+
+@node set_style_rectangle,  , set_style_circle, style
 @subsubsection set style rectangle
 
 @c ?commands set style rectangle
@@ -13882,12 +13909,16 @@ Each set of non-blank characters in the timedata counts as one column in the
 columns.  To avoid confusion, `gnuplot` requires that you provide a complete
 @ref{using} specification if your file contains timedata.
 
-Since `gnuplot` cannot read non-numerical text, if the date format includes
-the day or month in words, the format string must exclude this text.  But
-it can still be printed with the "%a", "%A", "%b", or "%B" specifier:
-see `set format` for more details about these and other options for printing
-timedata.  (`gnuplot` will determine the proper month and weekday from the
-numerical values.)
+If the date format includes the day or month in words, the format string must
+exclude this text.  But it can still be printed with the "%a", "%A", "%b", or
+"%B" specifier.  `gnuplot` will determine the proper month and weekday from the
+numerical values.  See `set format` for more details about these and other
+options for printing time data.  
+
+When reading two-digit years with %y, values 69-99 refer to the 20th century,
+while values 00-68 refer to the 21st century.   NB: This is in accordance with
+the UNIX98 spec, but conventions vary widely and two-digit year values are
+inherently ambiguous.
 
 See also @ref{xdata} and `Time/date` for more information.
 
@@ -20020,6 +20051,7 @@ Syntax:
                      @{@{no@}enhanced@}
                      @{font <font>@}
                      @{title "title"@}
+                     @{dashed|solid@} @{dashlength <dl>@}
                      @{@{no@}persist@}
                      @{@{no@}raise@}
                      @{@{no@}ctrl@}
