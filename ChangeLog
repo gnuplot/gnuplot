@@ -1,3 +1,12 @@
+2010-08-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c:  The gnuplot_x11 side of Shige's fix.
+
+2010-08-14  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/x11.trm:  The last font used inside an enhanced text string was
+	not being cleared on exit.
+
 2010-08-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c:  OSX history command could segfault if there was no

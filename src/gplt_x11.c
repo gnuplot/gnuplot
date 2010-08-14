@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.194.2.3 2010/02/18 04:34:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.194.2.4 2010/03/10 00:15:57 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -5556,8 +5556,10 @@ char *fontname;
     char *orgfontname = NULL;
 #endif
 
-    if (!fontname || !(*fontname))
+    if (!fontname || !(*fontname)) {
 	fontname = default_font;
+	*previous_font_name = '\0';
+    }
 
     if (!fontname || !(*fontname)) {
 	if ((fontname = pr_GetR(db, ".font")))
@@ -5607,6 +5609,7 @@ char *fontname;
 	if (!strncmp(fontname, "DEFAULT", 7)) {
 	    sscanf(&fontname[8], "%d", &fontsize);
 	    fontname = default_font;
+	    *previous_font_name = '\0';
 #ifdef USE_X11_MULTIBYTE
 	    backfont = 1;
 #endif
