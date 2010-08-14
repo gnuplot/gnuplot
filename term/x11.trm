@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.186 2009/10/31 05:24:18 sfeam Exp $
+ * $Id: x11.trm,v 1.187 2010/08/13 23:36:58 sfeam Exp $
  *
  */
 
@@ -1893,6 +1893,7 @@ PASS2:
 
 	/* else carry on and process the rest of the string */
     }
+    X11_set_font("");
 
     /* Restore text justification flag after 2nd pass */
     if (pass > 1) {
