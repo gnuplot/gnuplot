@@ -1,3 +1,8 @@
+2010-08-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots):  Allow "fc <colorspec>" as an in-line
+	option to the plot command for plot styles that use a fill.
+
 2010-08-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:  The gnuplot_x11 side of Shige's fix.
