@@ -1,6 +1,6 @@
 
-New features, changes and fixes since gnuplot version 4.4.0
-===========================================================
+New features, changes and fixes in gnuplot version 4.4.1
+========================================================
 
 * NEW Support the "%s" format specifier in strftime()
 * NEW Optional 6th data column in candlesticks style to specific box width

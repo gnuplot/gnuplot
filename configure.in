@@ -1,10 +1,10 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.248.2.17 2010/08/06 01:23:06 sfeam Exp $
+dnl $Id: configure.in,v 1.248.2.18 2010/08/10 05:40:45 sfeam Exp $
 dnl
 dnl AC_INIT must match the release number
-AC_INIT(gnuplot, 4.4.0)
+AC_INIT(gnuplot, 4.4.1)
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ(2.58)
 AM_CONFIG_HEADER(config.h:config.hin)
