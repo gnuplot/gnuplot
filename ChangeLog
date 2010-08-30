@@ -1,3 +1,13 @@
+2010-08-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/show.c (conv_text):
+	Until now, the "show" and "save" commands have replaced all non-ascii
+	characters with a byte-by-byte octal escape sequence.  This makes any
+	labels, variables, titles, etc not human-readable if they contain UTF8
+	encoded characters. Now we simply pass them through as-is if the current
+	encoding is UTF-8. I think this is the correct thing to do for other
+	8-bit encodings as well, but I can't test those easily.
+
 2010-08-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots):  Allow "fc <colorspec>" as an in-line
