@@ -1,3 +1,14 @@
+2010-08-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/os2/gnupmdrv.rc: Removed menu item Commands to clipboard.
+
+	* src/gpexecute.c (gp_execute): Removed bSend2gp and call to
+	TextToClipboard.
+
+	* src/mouse.c (alert): Use DosBeep under OS/2.
+
+	* os2/gclient.c: Removed unused #define GNUPMDRV.
+
 2010-08-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (conv_text):

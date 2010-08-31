@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.49 2008/02/23 10:11:11 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.50 2008/04/10 18:09:05 sfeam Exp $";
 #endif
 
 /****************************************************************************
@@ -103,7 +103,6 @@ static char RCSid[]="$Id: gclient.c,v 1.49 2008/02/23 10:11:11 mikulik Exp $";
 #include "term_api.h"
 #include "gnupmdrv.h"
 #include "pm_msgs.h"
-#define GNUPMDRV
 #include "mousecmn.h"
 
 
@@ -225,9 +224,8 @@ static double   multLineVert = 0.; /* for multiline prints.		    */
 static int	codepage = 0;
 
 static int 	ulMouseSprintfFormatItem = IDM_MOUSE_FORMAT_XcY;
-static BOOL     bSend2gp = FALSE;
-/* HBB FIXME 20040630: why isn't this 'static'? */
-const  char  *SetDataStyles[] = {
+static BOOL	bSend2gp = FALSE;
+static const  char  *SetDataStyles[] = {
     "boxes", "dots", "fsteps", "histeps", "impulses",
     "lines", "linespoints", "points", "steps"
 };
@@ -405,8 +403,6 @@ static int drop_count = 0;
    with PMR_DROP requests. */
 
 /* Finally, include the common mousing declarations and routines: */
-#define GNUPMDRV
-  /* let mousing.c know whether called from gclient.c or gplt_x11.c */
 #include "../gpexecute.h"
 
 /* End of new functions related to the mouse processing */
