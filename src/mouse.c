@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.123 2010/07/08 23:13:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.124 2010/08/06 01:21:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -71,6 +71,7 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.123 2010/07/08 23:13:46 sf
 #endif
 
 #ifdef OS2
+#include <os2.h>
 #include "os2/pm_msgs.h"
 #endif
 
@@ -257,7 +258,7 @@ static void put_label __PROTO((char *label, double x, double y));
 static void
 alert()
 {
-# ifdef GNUPMDRV
+# ifdef OS2
     DosBeep(444, 111);
 # else
 #  ifdef HAVE_LIBREADLINE
