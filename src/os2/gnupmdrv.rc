@@ -131,7 +131,7 @@ BEGIN
         MENUITEM   "reload\tF5", IDM_DO_RELOAD
         MENUITEM  SEPARATOR
         MENUITEM   "~command...", IDM_DO_SENDCOMMAND
-        MENUITEM  "cmds2clip", IDM_MOUSE_CMDS2CLIP,,
+        // MENUITEM  "cmds2clip", IDM_MOUSE_CMDS2CLIP,,
     END
 
     MENUITEM "~Gnuplot" , IDM_COMMAND
@@ -230,7 +230,7 @@ BEGIN
     BEGIN
         CTEXT           "GnuplotPM", -1, 8, 65, 128, 8
         CTEXT           "Gnuplot display for OS/2", -1, 8, 50, 128, 8
-        CTEXT           "$Revision: 1.9 $", -1, 8, 35, 128, 8
+        CTEXT           "$Revision: 1.10 $", -1, 8, 35, 128, 8
         DEFPUSHBUTTON   "OK", DID_OK, 56, 10, 32, 14, WS_GROUP
     END
 END
