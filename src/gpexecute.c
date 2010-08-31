@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.15 2007/06/21 21:19:12 tlecomte Exp $"); }
+static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.16 2009/02/19 21:15:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gpexecute.c */
@@ -135,11 +135,6 @@ gp_execute(char *s)
 	((char *) input_from_PM_Terminal)[0] = 0;
 	return;
     }
-#ifdef GNUPMDRV
-    /* write the command to clipboard */
-    if (bSend2gp == TRUE)
-	TextToClipboard(input_from_PM_Terminal);
-#endif
     gp_post_shared_mem();
 }
 
