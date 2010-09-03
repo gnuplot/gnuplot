@@ -1,3 +1,8 @@
+2010-09-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/readline.c (readline): Fix Windows breakage (failure to
+	recognize ^M as newline) caused by error in OSK code removal.
+
 2010-08-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gnupmdrv.rc: Removed menu item Commands to clipboard.

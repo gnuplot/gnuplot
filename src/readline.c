@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.47 2010/07/30 19:11:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.48 2010/08/13 23:36:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -595,6 +595,7 @@ readline(const char *prompt)
 		max_pos = cur_pos;
 		break;
 	    case '\n':		/* ^J */
+	    case '\r':		/* ^M */
 		cur_line[max_pos + 1] = '\0';
 #ifdef OS2
 		while (cur_pos < max_pos) {
