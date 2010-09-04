@@ -1,3 +1,8 @@
+2010-09-04  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/set.c (set_logscale): Removed arbitrary limitation for log base
+	(was >= 1.1, now > 1.0)
+
 2010-09-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/readline.c (readline): Fix Windows breakage (failure to
