@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.334 2010-07-13 18:13:23+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.617
+C RCS $Id: gnuplot-ja.doc,v 1.339 2010-08-19 10:40:36+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.623
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3263,18 +3263,18 @@ Ffigure_rgb3D
  決定します。すなわち、M x N 個のデータ集合は M x N ピクセルの画像を生
  成します。これは、M x N 個のデータ集合が (M-1) x (N-1) 要素を作成する
  pm3d の構造とは異なります。バイナリ画像データの格子の走査方向は、追加
- キーワードでさらに制御可能です。以下参照:
- `binary general keywords flipx`, `center`, `rotate`。
+ キーワードでさらに制御可能です。以下参照: `binary keywords flipx`,
+ `keywords center`, `keywords rotate`。
 
 Ffigure_scaled_image
  各ピクセルの x と y の大きさを示すことで、画像データを 2 次元描画座標
  系内の特定の長方形に収まるように伸縮することができます。以下参照:
- `binary general keywords dx`, `dy`。右の画像を生成するのには、同じ入力
- 画像を、それぞれ dx, dy, origin を指定して複数回配置しました。入力 PNG
- 画像であるビルの絵は 50x128 ピクセルです。高いビルは、`dx=0.5 dy=1.5`
- で割り当てて描画し、低いビルは、`dx=0.5 dy=0.35` としています (訳注:
- ここで述べている画像とは、pdflatex を使用したマニュアルだけに現れます
- ので、日本語のマニュアルにはこの図は含まれていないでしょう。)
+ `binary keywords dx`, `dy`。右の画像を生成するのには、同じ入力画像を、
+ それぞれ dx, dy, origin を指定して複数回配置しました。入力 PNG 画像で
+ あるビルの絵は 50x128 ピクセルです。高いビルは、`dx=0.5 dy=1.5` で割り
+ 当てて描画し、低いビルは、`dx=0.5 dy=0.35` としています (訳注: ここで
+ 述べている画像とは、pdflatex を使用したマニュアルだけに現れますので、
+ 日本語のマニュアルにはこの図は含まれていないでしょう。)
 
  スタイル `image` は、グレイスケール (灰色階調)、またはカラーパレット値
  を含んでいるピクセルの入力を処理します。よって 2 次元描画 (`plot` コマ
@@ -4790,9 +4790,8 @@ Ffigure_mapcontours
  ォルトで `using 1:2:3` が使われます。`using` で 点/線/index を表す特別
  な文字は、一般にはバイナリデータでは使うべきではないことに注意してくだ
  さい。これを制御する <binary list> のキーワードがあります。
-5 array
+4 array
 ?binary array
-?binary general array
  バイナリファイルの標本の配列の大きさを設定します。座標は gnuplot が生
  成してくれます。各方向の次元を表す数を指定しなければいけません。例えば
  `array=(10,20)` は、2 次元で最初の次元方向 (x) には 10 点、2 番目の次
@@ -4805,16 +4804,14 @@ Ffigure_mapcontours
               く、array=128x128 という書式を使用していました。古い書式
               は推奨されていませんが、あなたの gnuplot が後方互換性をサ
               ポートするようコンパイルされていれば一応今でも使えます。
-5 record
+4 record
 ?binary record
-?binary general record
  このキーワードは `array` と同じ書式で、同じ機能を提供します。しかし
  `record` は gnuplot に座標情報を自動生成させません。これは、そのような
  座標情報が、バイナリデータファイルのある列に含まれている場合のためのも
  のです。
-5 skip
+4 skip
 ?binary skip
-?binary general skip
  このキーワードは、バイナリファイルのある区画のスキップを可能にします。
  例えば、そのファイルがデータ領域の開始位置の前に 1024 バイトのヘッダを
  持つような場合には、以下のようにしたいと思うでしょう:
@@ -4824,8 +4821,8 @@ Ffigure_mapcontours
  スキップし、2 番目、3 番目のレコードの前の 256 バイトをスキップするに
  は以下のようにします:
        plot '<file_name> binary record=356:356:356 skip=512:256:256 ...
-5 format
-?binary general format
+4 format
+?binary format
  デフォルトのバイナリ形式は、単精度浮動小数 (float) が一つ、です。それ
  をより柔軟に設定するために、この format で変数のサイズに関する詳細な情
  報を指定できます。例えば `format="%uchar%int%float"` は、最初の using
@@ -4842,8 +4839,8 @@ Ffigure_mapcontours
  それらは、それぞれのコンパイルによってそのバイトサイズとともにマシンに
  依存する変数名のグループと、マシンに依存しない変数名のグループに分かれ
  ています。
-5 endian
-?binary general endian
+4 endian
+?binary endian
  ファイルのバイナリデータのエンディアンは、gnuplot が動作するプラットホ
  ームのエンディアンとは異なる場合も良くあります。いくつかの指定で
  gnuplot がバイトをどのように扱うかを制御できます。例えば
@@ -4858,8 +4855,8 @@ Ffigure_mapcontours
 
  gnuplot は、コンパイル時にオプションが指定されていれば、"middle" (や
  "pdp") エンディアンもサポートできます。
-5 filetype
-?binary general filetype
+4 filetype
+?binary filetype
  gnuplot は、いくつか標準的なバイナリファイル形式については必要な情報を
  そのファイルから抜き出すことができます。例えば "format=edf" は ESRF ヘ
  ッダーファイル形式のファイルとして読み込みます。現在サポートしているフ
@@ -4872,8 +4869,8 @@ Ffigure_mapcontours
  コマンドラインキーワードはファイルから読み取る設定を上書きするのに使わ
  れ、ファイルから読み取る設定はデフォルトの設定を上書きします (詳細は
  以下参照: `set datafile binary`)。
-6 avs
-?binary general filetype avs
+5 avs
+?binary filetype avs
 ?filetype avs
 ?avs
  `avs` は、自動的に認識される画像イメージに対するバイナリファイルの型の
@@ -4881,8 +4878,8 @@ Ffigure_mapcontours
  するのに最も適しています。これは、2 つの long (xwidth と ywidth) と、
  その後続くピクセルの列から成り、その各ピクセルは alpha/red/green/blue
  の 4 バイトから成ります。
-6 edf
-?binary general filetype edf
+5 edf
+?binary filetype edf
 ?filetype edf
 ?edf
 ?filetype ehf
@@ -4895,9 +4892,13 @@ Ffigure_mapcontours
    http://www.edfplus.info/specs
 
  以下も参照: `binary`。
-6 png
-?binary general filetype png
+5 png
+?binary filetype png
+?binary filetype gif
+?binary filetype jpeg
 ?filetype png
+?filetype gif
+?filetype jpeg
  gnuplot が png/gif/jpeg 出力用に libgd ライブラリを使うようにインスト
  ールされている場合、それらの画像形式をバイナリファイルとして読み込むこ
  ともできます。以下のような明示的なコマンド
@@ -4907,13 +4908,13 @@ Ffigure_mapcontours
        set datafile binary filetype=auto
 
  以下も参照: `binary`。
-5 keywords
-?binary general keywords
-?filetype keywords
- 以下のキーワード (keyword) は、座標の生成のときにのみ適用されます。よ
- って、これらは `array` キーワードが使われるときのためのものです。
-6 scan
-?binary general keywords scan
+4 keywords
+?binary keywords
+ 以下のキーワード (keyword) は、バイナリファイルから座標を生成するとき
+ にのみ適用されます。つまり、binary array, matrix, image の個々の要素を
+ 特定の x,y,z の位置への配置の制御のためのものです。
+5 scan
+?binary keywords scan
  gnuplot がバイナリファイルをどのように走査するか、ということと実際の描
  画で見られる軸の方向との間の関係については多くの混乱が起こり得ます。そ
  の混乱を減らすには、gnuplot はバイナリファイルを "常に" 点/線/面、また
@@ -4931,12 +4932,12 @@ Ffigure_mapcontours
  別にありません。この理由で、円柱座標への割り当てのための指定子も用意さ
  れていて、それらは直交座標の x, y, z に類似した形で t (角度), r, z と
  なっています。
-6 transpose
-?binary general keywords transpose
+5 transpose
+?binary keywords transpose
  `scan=yx`、または `scan=yxz` と同じです。
-6 dx, dy, dz
-?binary general keywords dx
-?binary general keywords dy
+5 dx, dy, dz
+?binary keywords dx
+?binary keywords dy
 ?dx
 ?dy
  gnuplot が座標を生成する場合、その間隔はこれらのキーワードで指定された
@@ -4950,13 +4951,13 @@ Ffigure_mapcontours
 
  以下のキーワードも座標の生成時にのみ適用されます。しかし、以下のものは
  matrix バイナリファイルにも使われます。
-6 flipx, flipy, flipz
-?binary general keywords flipx
+5 flipx, flipy, flipz
+?binary keywords flipx
  バイナリデータファイルの走査方向が gnuplot の走査方向と一致しないこと
  がたまにあります。これらのキーワードは、それぞれ x, y, z 方向のデータ
  の走査方向を逆向きにします。
-6 origin 
-?binary general keywords origin
+5 origin 
+?binary keywords origin
  gnuplot は転置 (transpose) や反転 (flip) において座標を生成する場合、
  常に配列の左下の点が原点になるようにします。すなわち、データが、転置や
  反転の行なわれた後の直交座標系の第 1 象限に来るようにします。
@@ -4967,15 +4968,15 @@ Ffigure_mapcontours
  ば `origin=(100,100):(100,200)` は、一つのファイルに含まれる 2 つのデ
  ータに対する指定で、2 次元の描画に対する指定です。2 つ目の例として
  `origin=(0,0,3.5)` をあげると、これは 3 次元描画用の指定です。
-6 center
-?binary general keywords center
-?center
+5 center
+?binary keywords center
+?keywords center
  `origin` と似ていますが、このキーワードは、配列の中心がこのキーワード
  で指定した点になるように配置します。例えば `center=(0,0)` のようにしま
  す。配列のサイズが `Inf` のときは center は適用されません。
-6 rotate
-?binary general keywords rotate
-?rotate
+5 rotate
+?binary keywords rotate
+?keywords rotate
  転置 (transpose) と反転 (flip) コマンドは座標の生成と座標軸の方向にあ
  る種の柔軟性を与えてくれます。しかし、角度に関する完全な制御は、2 次元
  の回転角を記述した回転角ベクトルを与えることにより行なうことが可能にな
@@ -4991,8 +4992,8 @@ Ffigure_mapcontours
  `origin` が指定された場合、回転は平行移動の前に左下の点を中心にして行
  なわれます。それ以外では回転は配列の中心 (`center`) に関して行なわれま
  す。
-6 perpendicular
-?binary general keywords perpendicular
+5 perpendicular
+?binary keywords perpendicular
  `splot` に関して回転ベクトルの設定が、ベクトルを表現する 3 つの数字の
  組を指定することで実装されていて、このベクトルは 2 次元の xy 平面に対
  して向き付けられた法線ベクトル (perpendicular) を表しています。もちろ
@@ -7597,6 +7598,7 @@ Ffigure_mapcontours
     cp437       - MS-DOS のコードページ
     cp850       - 西ヨーロッパの OS/2 のコードページ
     cp852       - 中央/東ヨーロッパの OS/2 のコードページ
+    cp950       - MS 版の Big5 (emf terminal のみ)
     cp1250      - 中央/東ヨーロッパの MS Windows のコードページ
     cp1254      - トルコの MS Windows のコードページ (Latin5 の拡張)
     utf8        - 各文字の Unicode エントリポイントの、可変長 (マルチバ
@@ -7762,6 +7764,8 @@ Ffigure_mapcontours
        %L         現在の対数尺の底を基数とする指数部
        %S         補助単位の指数部 (scientific power)
        %c         補助単位文字
+       %b         ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の仮数部
+       %B         ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の接頭辞
        %P         πの倍数
 #\begin{tabular}{|cl|} \hline
 #\multicolumn{2}{|c|}{目盛りラベルの数値書式指定子}\\
@@ -7779,6 +7783,8 @@ Ffigure_mapcontours
 #\verb@%L@ & 現在の対数尺の底を基数とする指数部 \\
 #\verb@%S@ & 補助単位の指数部 (scientific power) \\
 #\verb@%c@ & 補助単位文字 \\
+#\verb@%b@ & ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の仮数部\\
+#\verb@%B@ & ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の接頭辞\\
 #\verb@%P@ & πの倍数 \\
 %c l .
 %書式@説明
@@ -7795,6 +7801,8 @@ Ffigure_mapcontours
 %%L@現在の対数尺の底を基数とする指数部
 %%S@補助単位の指数部 (scientific power)
 %%c@補助単位文字
+%%b@ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の仮数部
+%%B@ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の接頭辞
 %%P@πの倍数
 %_
 @end table
@@ -8230,6 +8238,7 @@ Ffigure_mapcontours
                  | {at <position>}}
                {left | right | center} {top | bottom | center}
                {vertical | horizontal} {Left | Right}
+               {{no}opaque}
                {{no}reverse} {{no}invert}
                {samplen <sample_length>} {spacing <vertical_spacing>}
                {width <width_increment>}
@@ -8272,10 +8281,18 @@ Ffigure_mapcontours
  線は、線種 (`linetype`), 線幅 (`linewidth`)、あるいは定義済のラインス
  タイル (`linestyle`) を指定することもできます。
 
- デフォルトでは最初の描画のラベルが説明の一番上に現われ、それに続くラベ
- ルがその下に並んで行きます。オプション `invert` は、最初のラベルを説明
- の一番下に置き、それに続くラベルをその上に並べて行きます。このオプショ
- ンは、説明のラベルの縦の並びの順番を、積み上げ形式のヒストグラム
+ デフォルトでは、key は一つのグラフと同時に作られます。すなわち、key の
+ 記号とタイトルは、それに対応するグラフと同時に描かれます。それは、新し
+ いグラフが時には key の上に要素をかぶせて配置しうることを意味します。
+ `set key opaque` は、key をすべてのグラフの描画が終った後に生成させま
+ す。この場合、key の領域は背景色で塗りつぶされて key の記号とタイトル
+ が描かれます。よって、key 自身はいくつかの描画要素を覆い隠してしまい得
+ ることになります。`set key noopaque` でデフォルトに復帰できます。
+
+ デフォルトでは、最初の描画のラベルが説明の一番上に現われ、それに続くラ
+ ベルがその下に並んで行きます。オプション `invert` は、最初のラベルを説
+ 明の一番下に置き、それに続くラベルをその上に並べて行きます。このオプシ
+ ョンは、説明のラベルの縦の並びの順番を、積み上げ形式のヒストグラム
  (`histograms`) の箱の順番に合わせるときに便利でしょう。
 
  <height_increment> は、説明の箱の高さに加えたり減らしたりする高さ (何
@@ -10753,7 +10770,6 @@ Ffigure_mapcontours
 4 set style ellipse
 ?commands set style ellipse
 ?commands show style ellipse
-?commands set style ellipse
 ?set style ellipse
 ?unset style ellipse
 ?show style ellipse
@@ -10786,7 +10802,6 @@ Ffigure_mapcontours
  最後になりますが、デフォルトの向きをキーワード `angle` で設定もできま
  す。向きは、楕円の主軸とグラフの x 軸の方向となす角で、単位は度で与え
  る必要があります。
-
 
  楕円の object の定義に関しては以下も参照: `set object ellipse`。2 次元
  の描画スタイルに関しては以下参照: `ellipses`。
