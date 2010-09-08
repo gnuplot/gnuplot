@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.222 2010/08/07 20:51:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.223 2010/08/26 05:09:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1395,11 +1395,27 @@ store_label(
     /* Check for optional (textcolor rgb variable) */
     else if (listhead->textcolor.type == TC_RGB && listhead->textcolor.value < 0)
 	tl->textcolor.lt = colorval;
+    /* Check for optional (textcolor variable) */
     else if (listhead->textcolor.type == TC_VARIABLE) {
 	struct lp_style_type lptmp;
 	load_linetype(&lptmp, (int)colorval);
 	tl->textcolor = lptmp.pm3d_color;
     }
+
+    /* Check for optional (point linecolor palette ...) */
+    if (tl->lp_properties.pm3d_color.type == TC_Z)
+	tl->lp_properties.pm3d_color.value = colorval;
+    /* Check for optional (point linecolor rgb variable) */
+    else if (listhead->lp_properties.pm3d_color.type == TC_RGB 
+             && listhead->lp_properties.pm3d_color.value < 0)
+	tl->lp_properties.pm3d_color.lt = colorval;
+    /* Check for optional (point linecolor variable) */
+    else if (listhead->lp_properties.l_type == LT_COLORFROMCOLUMN) {
+	struct lp_style_type lptmp;
+	load_linetype(&lptmp, (int)colorval);
+	tl->lp_properties.pm3d_color = lptmp.pm3d_color;
+    }
+    
 
     /* Check for null string (no label) */
     if (!string)
@@ -2145,10 +2161,29 @@ eval_plots()
 		    (x_axis == SECOND_X_AXIS) ? second_axes : first_axes;
 		this_plot->labels->place.scaley =
 		    (y_axis == SECOND_Y_AXIS) ? second_axes : first_axes;
+		
 		/* Needed for variable color - June 2010 */
 		this_plot->lp_properties.pm3d_color = this_plot->labels->textcolor;
-	        if (this_plot->labels->textcolor.type == TC_VARIABLE) 
+		if (this_plot->labels->textcolor.type == TC_VARIABLE)
 		    this_plot->lp_properties.l_type = LT_COLORFROMCOLUMN;
+
+		/* We want to trigger the variable color mechanism even if 
+		 * there was no 'textcolor variable/palette/rgb var' , 
+		 * but there was a 'point linecolor variable/palette/rgb var'. */
+		if (this_plot->labels->textcolor.type != TC_Z
+		&& this_plot->labels->textcolor.type != TC_VARIABLE
+		&& (this_plot->labels->textcolor.type != TC_RGB 
+		 || this_plot->labels->textcolor.value >= 0)) {
+		    if ((this_plot->labels->lp_properties.pm3d_color.type == TC_RGB)
+		    &&  (this_plot->labels->lp_properties.pm3d_color.value < 0)) {
+		        this_plot->lp_properties.pm3d_color = this_plot->labels->lp_properties.pm3d_color;
+		    }
+		    if (this_plot->labels->lp_properties.pm3d_color.type == TC_Z)
+		        this_plot->lp_properties.pm3d_color.type = TC_Z;
+		    if (this_plot->labels->lp_properties.l_type == LT_COLORFROMCOLUMN)
+		        this_plot->lp_properties.l_type = LT_COLORFROMCOLUMN;
+		}
+		 
 	    }
 
 	    /* Initialize histogram data structure */

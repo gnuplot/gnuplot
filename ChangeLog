@@ -1,5 +1,9 @@
 2010-09-08  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
+	* src/plot2d.c (store_label eval_plots): Extend variable color support
+	for LABELPOINTS style by allowing "with labels tc X lc Y" where X, Y is
+	one of "lc variable", "lc palette z", or "lc rgb variable".
+
 	* src/misc.c (lp_parse): Revert the patch of 2010-07-08 because 
 	it accidentally disabled the coloring option "lc N".
 	* src/graph3d.c (key_sample_line_pm3d key_sample_point_pm3d): 
