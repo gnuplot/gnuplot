@@ -1,3 +1,9 @@
+2010-09-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_close):  Free binary matrix data that was stored
+	in memory during input.  Otherwise we leak memory after every plot of
+	binary matrix data.
+
 2010-09-08  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/plot2d.c (store_label eval_plots): Extend variable color support
