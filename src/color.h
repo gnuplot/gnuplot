@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.32 2008/12/10 06:53:13 sfeam Exp $
+ * $Id: color.h,v 1.33 2010/06/28 19:07:52 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -48,6 +48,7 @@ typedef struct t_colorspec {
 
 #define DEFAULT_COLORSPEC {TC_DEFAULT, 0, 0.0}
 #define BLACK_COLORSPEC {TC_LT, LT_BLACK, 0.0}
+#define BACKGROUND_COLORSPEC {TC_LT, LT_BACKGROUND, 0.0}
 
 #ifdef EXTENDED_COLOR_SPECS
 typedef struct {

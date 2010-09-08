@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.205 2010/07/09 17:25:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.206 2010/07/29 20:45:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2950,6 +2950,9 @@ lp_use_properties(struct lp_style_type *lp, int tag)
 	    lp->pointflag = save_pointflag;
 	    /* FIXME - It would be nicer if this were always true already */
 	    if (!lp->use_palette) {
+		if (lp->pm3d_color.type != TC_LT || lp->pm3d_color.lt != lp->l_type)
+			FPRINTF((stderr,"lp_use_properties: uninitialized linetype %d\n",
+				lp->l_type));
 		lp->pm3d_color.type = TC_LT;
 		lp->pm3d_color.lt = lp->l_type;
 	    }
@@ -2984,10 +2987,9 @@ recycle:
 		lp->use_palette = FALSE;
 		return;
 	    }
-	    if (!(term->set_color))
-		break;
 	    /* FIXME - It would be nicer if this were always true already */
 	    if (!lp->use_palette) {
+		FPRINTF((stderr,"load_linetype: uninitialized linetype\n"));
 		lp->pm3d_color.type = TC_LT;
 		lp->pm3d_color.lt = lp->l_type;
 	    }

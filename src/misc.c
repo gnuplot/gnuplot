@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.121 2010/07/08 21:25:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.122 2010/09/08 20:56:14 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -798,8 +798,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    parse_colorspec(&(newlp.pm3d_color), TC_Z);
 		    newlp.use_palette = 1;
 		} else if (equals(c_token,"bgnd")) {
-		    lp->l_type = LT_BACKGROUND;
-		    lp->use_palette = 0;
+		    *lp = background_lp;
 		    c_token++;
 		} else {
 		    /* These replace the base style */
@@ -870,9 +869,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    if (equals(c_token,"bgnd")) {
 		if (set_lt++)
 		    break;;
-		lp->l_type = LT_BACKGROUND;
-		lp->use_palette = 0;
 		c_token++;
+		*lp = background_lp;
 		continue;
 	    }
 
