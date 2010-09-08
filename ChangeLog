@@ -1,3 +1,12 @@
+2010-09-08  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/misc.c (lp_parse): Revert the patch of 2010-07-08 because 
+	it accidentally disabled the coloring option "lc N".
+	* src/graph3d.c (key_sample_line_pm3d key_sample_point_pm3d): 
+	More correct fix to bug #3026477: the functions above failed to call
+	the simpler key sample routines in case of plots with coloring option
+	"lc N" and "lc rgb 'color'".
+
 2010-09-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/term-ja.diff docs/gnuplot-ja.doc:

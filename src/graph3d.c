@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.236 2010/07/11 05:50:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.237 2010/07/12 04:16:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -3055,9 +3055,12 @@ key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
     int i = 1, x1 = xl + key_sample_left, x2;
     double cbmin, cbmax;
     double gray, gray_from, gray_to, gray_step;
+    int colortype = plot->lp_properties.pm3d_color.type;
 
     /* If plot uses a constant color, set it here and then let simpler routine take over */
-    if (plot->lp_properties.use_palette && plot->lp_properties.pm3d_color.type == TC_RGB) {
+    if ((colortype == TC_RGB && plot->lp_properties.pm3d_color.value >= 0.0)
+    || (colortype == TC_LT)
+    || (colortype == TC_LINESTYLE && plot->lp_properties.l_type != LT_COLORFROMCOLUMN)) {
 	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
 	key_sample_line(xl,yl);
 	return;
@@ -3107,15 +3110,19 @@ key_sample_point_pm3d(
     int i = 0, x1 = xl + key_sample_left, x2;
     double cbmin, cbmax;
     double gray, gray_from, gray_to, gray_step;
+    int colortype = plot->lp_properties.pm3d_color.type;
     /* rule for number of steps: 3*char_width*pointsize or char_width for dots,
      * but at least 3 points */
     double step = term->h_char * (pointtype == -1 ? 1 : 3*(1+(pointsize-1)/2));
     int steps = (int)(((double)(key_sample_right - key_sample_left)) / step + 0.5);
+
     if (steps < 2) steps = 2;
     step = ((double)(key_sample_right - key_sample_left)) / steps;
 
     /* If plot uses a constant color, set it here and then let simpler routine take over */
-    if (plot->lp_properties.use_palette && plot->lp_properties.pm3d_color.type == TC_RGB) {
+    if ((colortype == TC_RGB && plot->lp_properties.pm3d_color.value >= 0.0)
+    || (colortype == TC_LT)
+    || (colortype == TC_LINESTYLE && plot->lp_properties.l_type != LT_COLORFROMCOLUMN)) {
 	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
 	key_sample_point(xl,yl,pointtype);
 	return;
