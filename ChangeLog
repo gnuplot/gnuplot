@@ -1,8 +1,7 @@
 2010-09-08  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/datafile.c (df_close):  Free binary matrix data that was stored
-	in memory during input.  Otherwise we leak memory after every plot of
-	binary matrix data.
+	* src/datafile.c (df_close):  Free matrix data that was stored in memory
+	during input.  Otherwise we leak memory after every plot of matrix data.
 
 	* src/color.h src/gadgets.c src/gadgets.h src/misc.c src/term.c
 	src/term_api.h:  Repair some lp_style_type definitions and initializers
