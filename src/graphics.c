@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.17 2010/06/11 17:12:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.18 2010/06/26 06:43:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -868,6 +868,11 @@ boundary(struct curve_points *plots, int count)
     if (axis_array[FIRST_X_AXIS].ticdef.def.user) {
 	struct ticmark *tic = axis_array[FIRST_X_AXIS].ticdef.def.user;
 	int maxrightlabel = plot_bounds.xright;
+
+	/* We don't really know the plot layout yet, but try for an estimate */
+	AXIS_SETSCALE(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
+	axis_set_graphical_range(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
+
 	while (tic) {
 	    if (tic->label) {
 		double xx;
@@ -875,20 +880,21 @@ boundary(struct curve_points *plots, int count)
 			   * cos(DEG2RAD * (double)(axis_array[FIRST_X_AXIS].tic_rotate))
 			   * term->h_char;
 
-		/* We don't really know the plot layout yet, but try for an estimate */
-		AXIS_SETSCALE(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
-		axis_set_graphical_range(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
-		xx = axis_log_value_checked(FIRST_X_AXIS, tic->position, "xtic");
-	        xx = AXIS_MAP(FIRST_X_AXIS, xx);
-		xx += (axis_array[FIRST_X_AXIS].tic_rotate) ? length : length /2;
-		if (maxrightlabel < xx)
-		    maxrightlabel = xx;
+		if (inrange(tic->position, 
+		    axis_array[FIRST_X_AXIS].set_min, 
+		    axis_array[FIRST_X_AXIS].set_max)) {
+			xx = axis_log_value_checked(FIRST_X_AXIS, tic->position, "xtic");
+		        xx = AXIS_MAP(FIRST_X_AXIS, xx);
+			xx += (axis_array[FIRST_X_AXIS].tic_rotate) ? length : length /2;
+			if (maxrightlabel < xx)
+			    maxrightlabel = xx;
+		}
 	    }
 	    tic = tic->next;
 	}
 	xtic_textwidth = maxrightlabel - plot_bounds.xright;
-	if (xtic_textwidth > term->xmax/2) {
-	    xtic_textwidth = term->xmax/2;
+	if (xtic_textwidth > term->xmax/4) {
+	    xtic_textwidth = term->xmax/4;
 	    int_warn(NO_CARET, "difficulty making room for xtic labels");
 	}
     }

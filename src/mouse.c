@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.117.2.3 2010/07/27 06:34:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.117.2.4 2010/08/06 01:23:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -642,6 +642,7 @@ apply_zoom(struct t_zoom *z)
 	int i;
 	for (i=0; i<AXIS_ARRAY_SIZE; i++) {
 	    axis_array_copy[i].label = axis_array[i].label;
+	    axis_array_copy[i].ticdef.def.user = axis_array[i].ticdef.def.user;
 	}
 	memcpy(axis_array, axis_array_copy, sizeof(axis_array));
 	s[0] = '\0';	/* FIXME:  Is this better than calling replotrequest()? */
