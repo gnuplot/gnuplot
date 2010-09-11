@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.223 2010/08/26 05:09:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.224 2010/09/08 21:14:00 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1197,7 +1197,7 @@ store2d_point(
 
     /* If we have variable color corresponding to a z-axis value, use it to autoscale */
     /* June 2010 - New mechanism for variable color */
-    if (current_plot->lp_properties.pm3d_color.type == TC_Z) {
+    if (current_plot->lp_properties.pm3d_color.type == TC_Z && current_plot->varcolor) {
 	STORE_WITH_LOG_AND_UPDATE_RANGE(current_plot->varcolor[i], current_plot->varcolor[i],
 				dummy_type, COLOR_AXIS, current_plot->noautoscale, NOOP, NOOP);
     }    
