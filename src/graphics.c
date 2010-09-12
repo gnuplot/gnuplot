@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.338 2010/08/08 03:46:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.339 2010/09/10 17:09:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4407,7 +4407,7 @@ plot_boxplot(struct curve_points *plot)
     /* Now draw individual points for the outliers */
     if (boxplot_opts.outliers) {
 	int i,j,x,y;
-	p_width = pointsize * term->h_tic;
+	p_width = plot->lp_properties.p_size * term->h_tic;
 
 	for (i = 0; i < plot->p_count; i++) {
 
