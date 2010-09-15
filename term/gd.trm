@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.147 2010/03/14 22:44:38 sfeam Exp $
+ * $Id: gd.trm,v 1.148 2010/03/18 04:52:53 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1866,9 +1866,20 @@ PNG_set_font(const char *fontname)
     if (png_state.ttffont) {
 	int brect[8];
 	char *err;
+        /* First try the old GDFONTPATH mechanism for locating fonts */
+	(void)gdUseFontConfig(0);
 	err = gdImageStringFT(NULL, &brect[0], 0,
 		png_state.ttffont, (double)png_state.ttfsize*png_state.fontscale,
 		0.0, 0, 0, "f00000000g");
+	/* If that didn't work, try again using fontconfig mechanism */
+	if (err && gdUseFontConfig(1)) {
+	    FPRINTF((stderr,"DEBUG1: gd.trm:3: gdUseFontConfig(1) (%s)\n",
+		    png_state.ttffont));
+	    err = gdImageStringFT(NULL, &brect[0], 0,
+		png_state.ttffont, 
+		(double)png_state.default_ttfsize*png_state.fontscale,
+		0.0, 0, 0, "f00000000g");
+	}
 	if (!err) {
 	    term->h_char = .11 * (float)(brect[2] - brect[0]) + 0.5;
 	    term->v_char = 1.1 * (float)(brect[1] - brect[7]) + 0.5;
@@ -1965,6 +1976,8 @@ ENHGD_FLUSH()
 	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
 	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
 
+	    /* First try the old GDFONTPATH mechanism for locating fonts */
+	    (void)gdUseFontConfig(0);
 #ifdef gdFTEX_Adobe_Custom
 	    /* libgd defaults to UTF-8 encodings. We have limited options for	*/
 	    /* over-riding this, but we can try					*/
@@ -1981,6 +1994,14 @@ ENHGD_FLUSH()
 			ENHgd_font, ENHgd_fontsize,
 			(double)png_state.angle * M_PI_2/90.,
 			x, Y(y), enhanced_text, &PNG_FONT_INFO);
+	    if (err && gdUseFontConfig(1)) {
+		err = gdImageStringFTEx(
+			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
+			brect, png_state.color,
+			ENHgd_font, ENHgd_fontsize,
+			(double)png_state.angle * M_PI_2/90.,
+			x, Y(y), enhanced_text, &PNG_FONT_INFO);
+	    }
 #else
 	    err = gdImageStringFT(
 			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
@@ -1988,6 +2009,14 @@ ENHGD_FLUSH()
 			ENHgd_font, ENHgd_fontsize,
 			(double)png_state.angle * M_PI_2/90.,
 			x, Y(y), enhanced_text);
+	    if (err && gdUseFontConfig(1)) {
+		err = gdImageStringFT(
+			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
+			brect, png_state.color,
+			ENHgd_font, ENHgd_fontsize,
+			(double)png_state.angle * M_PI_2/90.,
+			x, Y(y), enhanced_text);
+	    }
 #endif
 	    if (err) 
 		fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
