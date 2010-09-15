@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.88 2010/07/29 20:45:10 sfeam Exp $
+ * $Id: term_api.h,v 1.89 2010/09/09 04:08:19 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -154,11 +154,7 @@ typedef struct t_image {
     TBOOLEAN fallback; /* true == don't use terminal-specific code */
 } t_image;
 
-/* values for the optional flags field - choose sensible defaults
- * these aren't really very sensible names - multiplot attributes
- * depend on whether stdout is redirected or not. Remember that
- * the default is 0. Thus most drivers can do multiplot only if
- * the output is redirected
+/* Values for the flags field of TERMENTRY
  */
 #define TERM_CAN_MULTIPLOT    1  /* tested if stdout not redirected */
 #define TERM_CANNOT_MULTIPLOT 2  /* tested if stdout is redirected  */
@@ -173,6 +169,7 @@ typedef struct t_image {
 #define TERM_MONOCHROME    1024  /* term is running in mono mode    */
 #define TERM_LINEWIDTH     2048  /* support for set term linewidth  */
 #define TERM_FONTSCALE     4096  /* terminal supports fontscale     */
+#define TERM_IS_LATEX      8192  /* text uses TeX markup            */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *

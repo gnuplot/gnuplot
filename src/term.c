@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.206 2010/07/29 20:45:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.207 2010/09/09 04:08:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -224,6 +224,8 @@ static void UNKNOWN_null __PROTO((void));
 static void MOVE_null __PROTO((unsigned int, unsigned int));
 static void LINETYPE_null __PROTO((int));
 static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
+
+static int strlen_tex __PROTO((const char *));
 
 /* Used by terminals and by shared routine parse_term_size() */
 typedef enum {
@@ -2786,6 +2788,10 @@ estimate_strlen(char *text)
 {
 int len;
 
+    if ((term->flags & TERM_IS_LATEX))
+	len = strlen_tex(text);
+    else
+
 #ifdef GP_ENH_EST
     if (strchr(text,'\n') || (term->flags & TERM_ENHANCED_TEXT)) {
 	struct termentry *tsave = term;
@@ -3014,3 +3020,50 @@ recycle:
     lp->p_type = tag - 1;
 }
 
+/*
+ * Totally bogus estimate of TeX string lengths.
+ * Basically 
+ * - don't count anything inside square braces
+ * - count regexp \[a-zA-z]* as a single character
+ * - ignore characters {}$^_ 
+ */
+int
+strlen_tex(const char *str)
+{
+    const char *s = str;
+    int len = 0;
+
+    if (!strpbrk(s, "{}$[]\\")) {
+	len = strlen(s);
+	FPRINTF((stderr,"strlen_tex(\"%s\") = %d\n",s,len));
+	return len;
+    }
+
+    while (*s) {
+	switch (*s) {
+	case '[':
+		while (*s && *s != ']') s++;
+		s++;
+		break;
+	case '\\':
+		s++;
+		while (*s && isalpha(*s)) s++;
+		len++;
+		break;
+	case '{':
+	case '}':
+	case '$':
+	case '_':
+	case '^':
+		s++;
+		break;
+	default:
+		s++;
+		len++;
+	}
+    }
+
+
+    FPRINTF((stderr,"strlen_tex(\"%s\") = %d\n",str,len));
+    return len;
+}

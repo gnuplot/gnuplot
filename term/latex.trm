@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: latex.trm,v 1.35 2009/10/10 06:06:02 sfeam Exp $
+ * $Id: latex.trm,v 1.36 2009/10/31 05:24:18 sfeam Exp $
  *
  */
 
@@ -917,7 +917,7 @@ TERM_TABLE_START(latex_driver)
     LATEX_linetype, LATEX_put_text, LATEX_text_angle,
     LATEX_justify_text, LATEX_point, LATEX_arrow, set_font_null,
     NULL,      /* pointsize */
-    0,         /* flags */
+    TERM_IS_LATEX,         /* flags */
     NULL, NULL, /* suspend, resume */
     LATEX_fillbox, NULL, /* linewidth */
 #ifdef USE_MOUSE
@@ -937,7 +937,8 @@ TERM_TABLE_START(emtex_driver)
     LATEX_VTIC, LATEX_HTIC, LATEX_options, EMTEX_init, EMTEX_reset,
     EMTEX_text, null_scale, LATEX_graphics, LATEX_move, LATEX_vector,
     LATEX_linetype, LATEX_put_text, LATEX_text_angle,
-    LATEX_justify_text, LATEX_point, LATEX_arrow, set_font_null
+    LATEX_justify_text, LATEX_point, LATEX_arrow, set_font_null,
+    NULL, TERM_IS_LATEX
 TERM_TABLE_END(emtex_driver)
 
 #undef LAST_TERM
