@@ -1,3 +1,9 @@
+2010-09-15  Ingo Thies  <ingo.thies@gmx.de>
+
+	* src/graph3d.c src/graph3d.h src/mouse.c src/set.c src/unset.c:
+	Switch the middle button left/right mouse zoom behaviour in 3D plots
+	so that the zoom factor is logarithmic.  
+
 2010-09-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/gd.trm:  As of libgd 2.0.36  can now specify the TrueType font

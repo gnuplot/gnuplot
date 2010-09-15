@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.237 2010/07/12 04:16:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.238 2010/09/08 20:56:14 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -95,6 +95,7 @@ float surface_rot_z = 30.0;
 float surface_rot_x = 60.0;
 float surface_scale = 1.0;
 float surface_zscale = 1.0;
+float surface_lscale = 0.0;
 
 /* Set by 'set view map': */
 int splot_map = FALSE;
