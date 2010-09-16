@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.187 2010/08/13 23:36:58 sfeam Exp $
+ * $Id: x11.trm,v 1.188 2010/08/15 00:00:59 sfeam Exp $
  *
  */
 
@@ -2098,10 +2098,6 @@ START_HELP(x11)
 "?term x11",
 "?x11",
 "?X11",
-" `gnuplot` provides the `x11` terminal type for use with X servers.  This",
-" terminal type is set automatically at startup if the `DISPLAY` environment",
-" variable is set, if the `TERM` environment variable is set to `xterm`, or",
-" if the `-display` command line option is used.",
 "",
 " Syntax:",
 "    set terminal x11 {<n> | window \"<string>\"}",
