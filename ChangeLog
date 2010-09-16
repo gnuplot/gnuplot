@@ -1,3 +1,8 @@
+2010-09-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* tutorial/eg2.plt tutorial/eg6.plt tutorial/tutorial.tex:
+	Update the LaTeX tutorial a bit.  More could be done.
+
 2010-09-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Release 4.4.1
