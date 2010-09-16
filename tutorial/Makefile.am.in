@@ -9,7 +9,7 @@ header.tex makefile.dst tutorial.tex eg3.dat
 
 CLEANFILES = tutorial.aux tutorial.dvi tutorial.log tutorial.pdf tutorial.ps \
 tutorial.toc eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex eg7.tex \
-eg7.eps eg7.pdf test.tex
+eg7.eps eg7.pdf test.tex test_tikz.tex
 
 DVIPS = dvips
 LATEX = @LATEX@
@@ -38,7 +38,7 @@ tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex eg7.tex eg7.eps te
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) tutorial
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) tutorial
 
-tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex eg7.tex eg7.pdf test.tex \
+tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex eg7.tex eg7.pdf test.tex test_tikz.tex \
 	tutorial.tex header.tex
 	@echo "Building LaTeX tutorial (PDF version)"
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) tutorial
