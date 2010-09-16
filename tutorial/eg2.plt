@@ -1,6 +1,5 @@
-set terminal latex
+set terminal latex size 7cm, 5cm
 set output "eg2.tex"
-set size 5/5., 4/3.
 set format xy "$%g$"
 set title 'This is a plot of $y=\sin(x)$'
 set xlabel 'This is the $x$ axis'
