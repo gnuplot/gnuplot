@@ -1,5 +1,5 @@
 %
-% $Id: tutorial.tex,v 1.7 2006/11/18 21:56:35 vanzandt Exp $
+% $Id: tutorial.tex,v 1.8 2010/09/17 03:05:25 sfeam Exp $
 %
 % Tutorial for gnuplot plotting program, for LaTeX users
 % David Kotz
@@ -33,7 +33,7 @@ Principal author of this tutorial for gnuplot 3.0, July 3, 1991 \\[1.0cm]
 {\bf current gnuplot team} \\[0.4cm]
 Updates of this tutorial for gnuplot 4.0, March 2004 \\
 Update of this tutorial for gnuplot 4.2, August 2006 \\
-Update of this tutorial for gnuplot 4.4, August 2010
+Update of this tutorial for gnuplot 4.4, September 2010
 
 \vskip2cm
 
@@ -68,8 +68,7 @@ publication-quality plots.
 In late 1989 and early 1990 Gnu\TeX\ and a number of other gnuplot
 variants were merged together into a new release of gnuplot, 2.0. This
 includes, among many other improvements, a \LaTeX\ driver derived from
-the one in Gnu\TeX. Former Gnu\TeX\ users are referred to
-Section~\ref{oldusers} for information about adapting to gnuplot.
+the one in Gnu\TeX.
 Anyone interested in using gnuplot with \LaTeX\ should read the next
 section, a tutorial, and the primary gnuplot manual.
 
@@ -88,9 +87,6 @@ There is a small package of auxiliary files (makefiles and scripts)
 that I find useful for making \LaTeX\ plots with gnuplot. This is
 available for \verb+ftp+ as \verb+pub/gnuplot-latex.shar+ from
 \verb+cs.duke.edu+.
-
-NB: There is also a much more recent tikz latex terminal that
-is not described in this tutorial.
 
 \section{Using gnuplot for \LaTeX: a Tutorial}
 
@@ -178,13 +174,13 @@ some labels.  This input file produces Figure~\ref{eg2}.
 \end{verbatim}
 \currentspace
 
-\boxfigure{htbp}{\fullboxwidth}{
+\begin{figure}[htbp]
   \begin{center}
     \input{eg2}
   \end{center}
-  \caption{A more fancy example.}
+  \caption{A fancier example.}
   \label{eg2}
-}
+\end{figure}
 
 We have specified the plot to be 7 cm wide and 5 cm tall with
 the {\tt set term latex size ...} command. This is the size of the 
@@ -263,7 +259,7 @@ data points, and another called {\tt dots} that plots a tiny dot for
 each data point.  The {\tt points} and {\tt linespoints} styles
 produce a different point symbol for each curve on the plot (for up to
 twelve symbols, after which they are re-used; see
-Figure~\ref{test} for a complete list). The {\tt lines} and {\tt
+Figure~\ref{testcomp} for a complete list). The {\tt lines} and {\tt
 linespoints} styles use a different line style for each curve on the
 plot (in this example the dots have different spacing). The
 style {\tt impulses} draws a perpendicular from each point to the
@@ -361,27 +357,19 @@ self-explanatory. This is shown in Figure~\ref{eg6}.
 \end{verbatim}
 \currentspace
 
-\boxfigure{htbp}{\fullboxwidth}{
+\begin{figure}
   \begin{center}
     \input{eg6}
   \end{center}
   \caption{An example of many features.}
   \label{eg6}
-}
+\end{figure}
 
 \paragraph{Line and point types:} For reference, we show all of the
-line and point types available in Figure~\ref{test}.
-
-\boxfigure{htbp}{\fullboxwidth}{
-  \begin{center}
-    \input{test}
-  \end{center}
-  \caption{All of the line and point types in the \LaTeX\ driver.}
-  \label{test}
-}
+line and point types available in Figure~\ref{testcomp}.
 
 \subsection{Summary --- Use with \LaTeX}
-In summary, to use the \LaTeX\ facilities of gnuplot, the first
+In summary, to use the most basic \LaTeX\ mode of gnuplot, the first
 command to gnuplot should be
 \begin{syntax}
     set terminal latex
@@ -445,7 +433,8 @@ the document style options {\tt [epic,eepic]}.
 \section{What is new for \TeX{} and \LaTeX{} terminals in gnuplot 4.0}
 
 In addition to the \texttt{latex} terminal, the following \LaTeX-friendly
-terminals are available:
+terminals are available. The gnuplot documentation contains more information
+about the options and usage for each of these.
 
 \begin{itemize}
 \item \texttt{emtex}: Like the \texttt{latex} terminal, but supports emtex
@@ -463,11 +452,6 @@ postscript parts for text and lines, respectively, included by
 
 \end{itemize}
 
-See helps of these terminals for more details about their usage.
-
-In addition, the \texttt{postscript eps enhanced} is the most useful for \TeX{}
-and \LaTeX{} if you don't insist on using \TeX{} fonts for the graph labels, and
-\texttt{pdf enhanced} and \texttt{png enhanced} for pdf\LaTeX{}.
 
 \section{What is new for \TeX{} and \LaTeX{} terminals in gnuplot 4.4}
 
@@ -476,7 +460,8 @@ and \LaTeX{} if you don't insist on using \TeX{} fonts for the graph labels, and
 \item \texttt{pslatex and epslatex}:  Rewritten version.  See the example below. 
 
 \item \texttt{tikz}:  Much improved graphics compaired to earlier \LaTeX terminals.  
-Requires a lua interpreter as an intermediate processing step.
+Requires a lua interpreter that is called by gnuplot. Compare the output
+of the \texttt{test} command to that from the minimal latex terminal.
 
 \end{itemize}
 
@@ -517,6 +502,18 @@ generated with the following commands:
   \label{epslatex_test}
 }
 
+\begin{figure}[htbp]
+  \begin{center}
+
+  \subfigure[Line and point types in the latex driver]
+            {\input{test}}
+  \subfigure[Line and point types in the tikz driver]
+            {\input{test_tikz}}
+  
+  \end{center}
+  \caption{The exact line and point types available depend on the terminal type.}
+  \label{testcomp}
+\end{figure}
 
 \section{Contact for help}
 
