@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.10 2010/07/01 22:29:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.11 2010/07/01 22:53:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1228,13 +1228,21 @@ df_close()
 	free_at(ydata_func.at);
 	ydata_func.at = NULL;
     }
-    /*{{{  free any use expression storage */
+
+    /* free any use expression storage */
     for (i = 0; i < MAXDATACOLS; ++i)
 	if (use_spec[i].at) {
 	    free_at(use_spec[i].at);
 	    use_spec[i].at = NULL;
 	}
-    /*}}} */
+
+    /* free binary matrix data */
+    if (df_matrix) {
+	for (i = 0; i < df_num_bin_records; i++) {
+	    free(df_bin_record[i].memory_data);
+	    df_bin_record[i].memory_data = NULL;
+	}
+    }
 
     if (!mixed_data_fp) {
 #if defined(PIPES)

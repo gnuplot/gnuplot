@@ -1,3 +1,8 @@
+2010-09-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_close):  Free matrix data that was stored in memory
+	during input.  Otherwise we leak memory after every plot of matrix data.
+
 2010-09-17  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* src/gadgets.h src/graphics.c src/save.c src/set.c set/show.c
