@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.14 2010/08/07 20:30:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.15 2010/08/07 20:54:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1805,8 +1805,8 @@ eval_plots()
 
 		/* Some plots have a fill style as well */
 		if (this_plot->plot_style & PLOT_STYLE_HAS_FILL){
+		    int stored_token = c_token;
 		    if (equals(c_token,"fs") || almost_equals(c_token,"fill$style")) {
-			int stored_token = c_token;
 			parse_fillstyle(&this_plot->fill_properties,
 				default_fillstyle.fillstyle,
 				default_fillstyle.filldensity,
@@ -1816,9 +1816,14 @@ eval_plots()
 			&& this_plot->fill_properties.fillstyle == FS_EMPTY)
 			    this_plot->fill_properties.fillstyle = FS_SOLID;
 			set_fillstyle = TRUE;
-			if (stored_token != c_token)
-			    continue;
 		    }
+		    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
+			parse_colorspec(&this_plot->lp_properties.pm3d_color,TC_Z);
+			this_plot->lp_properties.use_palette = TRUE;
+			set_lpstyle = TRUE;
+		    }
+		    if (stored_token != c_token)
+			continue;
 		}
 
 		break; /* unknown option */
