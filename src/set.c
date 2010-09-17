@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.299.2.10 2010/06/28 06:10:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.299.2.11 2010/07/27 06:34:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1833,6 +1833,26 @@ set_key()
 	    key->textcolor = lcolor;
 	    }
 	    c_token--;
+	    break;
+	case S_KEY_MAXCOLS:
+	    c_token++;
+	    if (END_OF_COMMAND || almost_equals(c_token, "a$utomatic"))
+		key->maxcols = 0;
+	    else
+		key->maxcols = int_expression();
+	    if (key->maxcols < 0)
+		key->maxcols = 0;
+	    c_token--; /* it is incremented after loop */
+	    break;
+	case S_KEY_MAXROWS:
+	    c_token++;
+	    if (END_OF_COMMAND || almost_equals(c_token, "a$utomatic"))
+		key->maxrows = 0;
+	    else
+		key->maxrows = int_expression();
+	    if (key->maxrows < 0)
+		key->maxrows = 0;
+	    c_token--; /* it is incremented after loop */
 	    break;
 
 	case S_KEY_MANUAL:

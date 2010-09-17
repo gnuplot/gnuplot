@@ -270,6 +270,8 @@ typedef struct {
     char *font;			/* Will be used for both key title and plot titles */
     struct t_colorspec textcolor;	/* Will be used for both key title and plot titles */
     BoundingBox bounds;
+    int maxcols;		/* maximum no of columns for horizontal keys */
+    int maxrows;		/* maximum no of rows for vertical keys */
 } legend_key;
 
 extern legend_key keyT;

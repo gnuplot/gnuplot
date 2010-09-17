@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.18 2010/06/26 06:43:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.19 2010/09/10 18:29:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -659,6 +659,8 @@ boundary(struct curve_points *plots, int count)
 	if (key->stack_dir == GPKEY_HORIZONTAL) {
 	    /* maximise no cols, limited by label-length */
 	    key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) / key_col_wth;
+	    if (key->maxcols > 0 && key_cols > key->maxcols)
+		key_cols = key->maxcols;
 	    /* EAM Dec 2004 - Rather than turn off the key, try to squeeze */
 	    if (key_cols == 0) {
 		key_cols = 1;
@@ -678,6 +680,8 @@ boundary(struct curve_points *plots, int count)
 	    int i = (int) (plot_bounds.ytop - plot_bounds.ybot - key->height_fix * t->v_char
 			   - (ktitl_lines + 1) * t->v_char)
 		/ key_entry_height;
+	    if (key->maxrows > 0 && i > key->maxrows)
+		i = key->maxrows;
 
 	    if (i == 0) {
 		i = 1;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.227.2.6 2010/08/06 01:23:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.227.2.7 2010/08/09 21:38:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1790,6 +1790,18 @@ show_key()
 	    key->auto_titles == FILENAME_KEYTITLES ? "with filename" :
 	    key->auto_titles == COLUMNHEAD_KEYTITLES
 	    ? "with column header" : "");
+
+    fputs("\tmaximum number of columns is ", stderr);
+    if (key->maxcols > 0)
+	fprintf(stderr, "%d for horizontal alignment\n", key->maxcols);
+    else
+	fputs("calculated automatically\n", stderr);
+    fputs("\tmaximum number of rows is ", stderr);
+    if (key->maxrows > 0)
+	fprintf(stderr, "%d for vertical alignment\n", key->maxrows);
+    else
+	fputs("calculated automatically\n", stderr);
+
     show_keytitle();
 }
 
