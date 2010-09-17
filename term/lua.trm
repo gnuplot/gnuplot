@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.5.2.1 2009/12/02 05:05:09 sfeam Exp $
- *  $Date: 2009/12/02 05:05:09 $
+ *  $Id: lua.trm,v 1.5.2.2 2010/03/21 03:50:23 sfeam Exp $
+ *  $Date: 2010/03/21 03:50:23 $
  *  $Rev: 90 $
  */
 
@@ -433,7 +433,7 @@ LUA_get_term_vars(void) {
   lua_pop(L, 1);
   
   lua_getfield(L, luaterm, "flags");
-  term->flags = (lua_isnumber(L, -1)) ? (int)lua_tointeger(L, -1) : TERM_BINARY;
+  term->flags |= (lua_isnumber(L, -1)) ? (int)lua_tointeger(L, -1) : TERM_BINARY;
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "tscale");
@@ -471,6 +471,8 @@ LUA_set_term_vars() {
   lua_setfield(L, luaterm, "TERM_INIT_ON_REPLOT");
   lua_pushinteger(L, TERM_IS_POSTSCRIPT);     /* post, next, pslatex, etc        */
   lua_setfield(L, luaterm, "TERM_IS_POSTSCRIPT");
+  lua_pushinteger(L, TERM_IS_LATEX);     /* post, next, pslatex, etc        */
+  lua_setfield(L, luaterm, "TERM_IS_LATEX");
   lua_pushinteger(L, TERM_ENHANCED_TEXT);     /* enhanced text mode is enabled   */
   lua_setfield(L, luaterm, "TERM_ENHANCED_TEXT");
   lua_pushinteger(L, TERM_NO_OUTPUTFILE);     /* terminal doesnt write to a file */
@@ -1210,7 +1212,7 @@ TERM_TABLE_START(tikz_driver)
     LUA_text, null_scale, LUA_graphics, LUA_move, LUA_vector,
     LUA_linetype, LUA_put_text, LUA_text_angle,
     LUA_justify_text, LUA_point, LUA_arrow, LUA_set_font, LUA_pointsize,
-    TERM_BINARY /*flags*/, 0 /*suspend*/, 0 /*resume*/,
+    TERM_BINARY|TERM_IS_LATEX /*flags*/, 0 /*suspend*/, 0 /*resume*/,
     LUA_boxfill, LUA_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0

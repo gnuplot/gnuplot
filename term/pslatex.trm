@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.74 2009/05/06 03:23:09 sfeam Exp $
+ * $Id: pslatex.trm,v 1.75 2009/05/11 17:55:20 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -940,7 +940,7 @@ TERM_TABLE_START(epslatex_driver)
     PS_text, null_scale, PS_graphics, PS_move,
     PS_vector, EPSLATEX_linetype, EPSLATEX_put_text, PS_text_angle,
     PS_justify_text, PS_point, do_arrow, PS_set_font,
-    PS_pointsize, TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP /*flags */,
+    PS_pointsize, TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_IS_LATEX /*flags */,
     0 /*suspend */, 0 /*resume */,
     PS_fillbox, PS_linewidth,
 #ifdef USE_MOUSE
@@ -963,7 +963,7 @@ TERM_TABLE_START(pslatex_driver)
     PSTEX_text, null_scale, PS_graphics, PS_move,
     PS_vector, PS_linetype, PSTEX_put_text, PS_text_angle,
     PS_justify_text, PS_point, PS_arrow, set_font_null,
-    PS_pointsize, TERM_CAN_CLIP /*flags */ , 0 /*suspend */
+    PS_pointsize, TERM_CAN_CLIP|TERM_IS_LATEX /*flags */ , 0 /*suspend */
     , 0 /*resume */ ,
     PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE
@@ -988,7 +988,7 @@ TERM_TABLE_START(pstex_driver)
     PSTEX_text, null_scale, PS_graphics, PS_move,
     PS_vector, PS_linetype, PSTEX_put_text, PS_text_angle,
     PS_justify_text, PS_point, PS_arrow, set_font_null,
-    PS_pointsize, TERM_CAN_CLIP /*flags */ , 0 /*suspend */
+    PS_pointsize, TERM_CAN_CLIP|TERM_IS_LATEX /*flags */ , 0 /*suspend */
     , 0 /*resume */ ,
     PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE

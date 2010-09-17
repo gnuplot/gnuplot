@@ -3,6 +3,16 @@
 	* src/datafile.c (df_close):  Free matrix data that was stored in memory
 	during input.  Otherwise we leak memory after every plot of matrix data.
 
+	* src/term_api.h src/term.c (strlen_tex):  Add a special-case routine to
+	estimate the true number of output characters in a LaTeX string
+	containing markup. This is not a real LaTeX parser, but even a poor
+	estimate is better than just calling strlen().
+	Bug #1603348 and others
+
+	* term/latex.trm term/lua.trm term/pslatex.trm: Set flag TERM_IS_LATEX
+	so that strings passed to these terminals are sent to strlen_tex() 
+	rather than the normal enhanced text string length estimation.
+
 2010-09-17  Thomas Sefzick <thse@users.sourceforge.net>
 
 	* src/gadgets.h src/graphics.c src/save.c src/set.c set/show.c
