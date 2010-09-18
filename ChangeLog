@@ -9,6 +9,11 @@
 	Among other things, this allows you to read variable names from
 	a data file and use the current value of those variables in a plot.
 
+	* src/util.c (gprintf):  Handle formats x/X/o/O for values that
+	overflow (int) by switching to llx/llX/llo/llO and (long long).
+	NB: This does _not_ extend the representation of negative numbers
+	to 64 bits unless the representation overflows 32 bits.
+
 2010-09-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* tutorial/eg2.plt tutorial/eg6.plt tutorial/test_tikz.plt 

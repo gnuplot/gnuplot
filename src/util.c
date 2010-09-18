@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.89 2010/03/13 21:17:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.90 2010/08/09 04:41:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -592,9 +592,17 @@ gprintf(
 	case 'X':
 	case 'o':
 	case 'O':
-	    t[0] = *format;
-	    t[1] = 0;
-	    sprintf(dest, temp, (int) x);
+	    if (fabs(x) >= (double)INT_MAX) {
+		t[0] = 'l';
+		t[1] = 'l';
+		t[2] = *format;
+		t[3] = '\0';
+		sprintf(dest, temp, (long long) x);
+	    } else {
+		t[0] = *format;
+		t[1] = '\0';
+		sprintf(dest, temp, (int) x);
+	    }
 	    break;
 	    /*}}} */
 	    /*{{{  e, f and g */

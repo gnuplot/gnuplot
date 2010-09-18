@@ -16,6 +16,7 @@ New features, changes and fixes since gnuplot version 4.4
 * CHANGE 3D zoom using middle mouse button is now a logarithmic response
 * CHANGE 3D impulses are now always drawn from z=0
 * CHANGE remove vestigial code supporting Amiga, Apollo, and 16-bit MSDOS/WIN
+* CHANGE extend formats x/X/o/O to 64 bits if necessary to represent the value
 
 New features, changes and fixes in gnuplot version 4.4.0
 ========================================================
