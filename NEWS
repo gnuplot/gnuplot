@@ -20,7 +20,6 @@ New features, changes and fixes since gnuplot version 4.4
 New features, changes and fixes in gnuplot version 4.4.0
 ========================================================
 
-* NEW Allow redefinition or customization of the basic linetypes
 * NEW CANDLESTICKS accept an option 6th input column specifying width
 * NEW point property 'pointinterval'
 * NEW gnuplot.exe is a full-featured console mode gnuplot executable for Windows
