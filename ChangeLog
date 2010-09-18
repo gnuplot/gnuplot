@@ -1,3 +1,14 @@
+2010-09-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c src/internal.c src/internal.h docs/gnuplot.doc:
+	New function value("X") returns the value of a variable named X.
+	A = "foo"
+	value("A") returns "foo"
+	value(A) returns NaN, because there is no variable named foo
+	value(2) returns 2 (numeric expressions have a natural value)
+	Among other things, this allows you to read variable names from
+	a data file and use the current value of those variables in a plot.
+
 2010-09-17  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* * src/set.c (set_logscale): Removed arbitrary limitation for log base

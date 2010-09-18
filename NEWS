@@ -1,3 +1,9 @@
+New features, changes and fixes in gnuplot version 4.4.2
+========================================================
+
+* NEW set key maxcolumns N maxrows M
+* NEW value("varname") returns the value of the named variable
+* FIX better estimation of latex string lengths
 
 New features, changes and fixes in gnuplot version 4.4.1
 ========================================================
