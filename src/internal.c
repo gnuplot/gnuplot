@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.55 2010/03/06 06:12:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.56 2010/07/01 16:50:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1545,3 +1545,43 @@ f_assign(union argument *arg)
     }
 }
 
+/*
+ * Retrieve the current value of a user-defined variable whose name is known.
+ * B = value("A") has the same result as B = A.
+ */
+
+void
+f_value(union argument *arg)
+{
+    struct udvt_entry *p = first_udv;
+    struct value a;
+    struct value result;
+
+    (void) arg;
+    (void) pop(&a);
+
+    if (a.type != STRING) {
+	/* int_warn(NO_CARET,"non-string value passed to value()"); */
+	push(&a);
+	return;
+    }
+
+    while (p) {
+	if (!strcmp(p->udv_name, a.v.string_val)) {
+	    result = p->udv_value;
+	    if (p->udv_undef)
+		p = NULL;
+	    else if (result.type == STRING)
+		result.v.string_val = gp_strdup(result.v.string_val);
+	    break;
+	}
+	p = p->next_udv;
+    }
+    gpfree_string(&a);
+    if (!p) {
+	/* int_warn(NO_CARET,"undefined variable name passed to value()"); */
+	result.type = CMPLX;
+	result.v.cmplx_val.real = not_a_number();
+    }
+    push(&result);
+}

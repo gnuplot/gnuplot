@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.622 2010/08/09 04:41:44 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.623 2010/08/13 18:13:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1251,8 +1251,8 @@ C
 ?expressions functions exists
 ?functions exists
 ?exists
-#exists("X") & "variable name" & returns 1 if a variable named X is defined, 0 otherwise. \\
-%exists("X")@"variable name"@ returns 1 if a variable named X is defined, 0 otherwise.
+#exists("X") & string & returns 1 if a variable named X is defined, 0 otherwise. \\
+%exists("X")@string@ returns 1 if a variable named X is defined, 0 otherwise.
  The argument to exists() is a string constant or a string variable;
  if the string contains the name of a defined variable, the function returns 1.
  Otherwise the function returns 0.
@@ -1360,6 +1360,9 @@ C
 %valid(x)@int@ test validity of column($x$) during datafile manip.
  `valid(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  See `plot datafile using`.
+
+#value("name") & string & returns the value of the named variable.\\
+%value("name")@string@ returns the current value of the named variable.
 @end table
 
 4 elliptic integrals
@@ -1391,6 +1394,18 @@ C
   `rand(-1)` resets both seeds to a standard value.
   `rand(x)`  for x>0 sets both seeds to a value based on the value of x.
   `rand({x,y})` for x>0 sets seed1 to x and seed2 to y.
+
+4 value
+?expressions functions value
+?functions value
+?value
+ B = value("A") is effectively the same as B = A, where A is the name of a 
+ user-defined variable.  This is useful when the name of the variable is itself
+ held in a string variable. See `user-defined variables`.  It also allows you to
+ read the name of a variable from a data file.  If the argument is a numerical
+ expression, value() returns the value of that expression.  If the argument is a
+ string that does not correspond to a currently defined variable,
+ value() returns NaN.
 
 3 Operators
 ?expressions operators
@@ -1692,7 +1707,8 @@ C ... and restart the table:
  Example:
        set label GPFUN_sinc at graph .05,.95
 
- See `show functions`, `functions`, `gnuplot-defined variables`, `macros`.
+ See `show functions`, `functions`, `gnuplot-defined variables`, `macros`,
+ `value`.
 2 Fonts
 ?fonts
  Gnuplot does not provide any fonts of its own. It relies on external font
