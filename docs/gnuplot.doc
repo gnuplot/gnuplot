@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.623 2010/08/13 18:13:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.624 2010/09/18 22:00:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1890,31 +1890,20 @@ C ... and restart the table:
  See `show colornames`, `set palette`, `cbrange`.
 
  For terminals that support dot/dash patterns, each default linetype has both
- a dot-dash pattern and a default color. However, you can override the default
- color by using the keyword `linecolor`, abbreviated `lc`.  For example, the
- postscript terminal provides a dashed blue line as linetype 3.  The plot
- commands below use this same dash pattern for three plots, one in blue (the
- default), another in red (the default for linetype 1), and a third in gold.
+ a dot-dash pattern and a default color. Gnuplot does not currently provide a
+ mechanism for changing the dot-dash pattern, so if you want both a particular
+ dash pattern and a particular color you must first choose a linetype that has
+ the required dash pattern, then override the default color using the keyword 
+ `linecolor`, abbreviated `lc`.  For example, the postscript terminal provides
+ a dashed blue line as linetype 3.  The plot commands below use this same dash
+ pattern for three plots, one in blue (the default), another in red
+ (the default for linetype 1), and a third in gold.
 
  Example:
 
       set term postscript dashed color
       plot 'foo' lt 3, 'baz' lt 3 linecolor 1, 'bar' lt 3 lc rgb 'gold'
 
- Lines can have additional properties such as linewidth.  You can associate
- these various properties, as well as equivalent properties for point symbols,
- into user-defined "line styles" using the command `set style line`.  Once
- you have defined a linestyle, you can use it in a plot command to control
- the appearance of one or more plot elements.
-
- Examples:
-
-      # define a new line style with terminal-independent color cyan,
-      # linewidth 3, and associated point type 6 (a circle with a dot in it).
-      set style line 5 lt rgb "cyan" lw 3 pt 6
-      plot sin(x) with linespoints ls 5          # user-defined line style 5
-
- See `linestyle`, `set style line`.
 3 colorspec
 ?colorspec
 ?rgbcolor
@@ -1965,61 +1954,65 @@ C ... and restart the table:
  cbrange mapping of the palette. This allows smoothly-varying color along a
  3d line or surface. It also allows coloring 2D plots by palette values read
  from an extra column of data (not all 2D plot styles allow an extra column).
-4 rgbcolor variable
-?rgbcolor variable
-?lc rgbcolor variable
-?tc rgbcolor variable
- Most plot commands assign a single color (linetype) to each element of the
- plot.  If there are multiple plots on a single graph, the default color
- (linetype) is incremented sequentially.  You can instead assign a separate
- color for each data point, line segment, or label based on additional 
- information in the input data file.  This is indicated by the colorspec
- keyword `variable`.  
- 
- `lc rgbcolor variable` tells the program to use a 24-bit RGB color from a
- separate column in the data file. This requires a corresponding additional
- column in the `using` specifier.  The extra column is interpreted as a 24-bit
- packed RGB triple. These are most easily specified as hexidecimal values
- (see `rgbcolor`). Text colors are similarly set using `tc rgbcolor variable`.
-
- Example:
-
-       # Place colored points in 3D at the x,y,z coordinates corresponding to
-       # their red, green, and blue components
-       rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
-       splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
-
 4 linecolor variable
 ?linecolor variable
 ?lc variable
 ?textcolor variable
 ?tc variable
- Most plot commands assign a single color (linetype) to each element of the
- plot.  If there are multiple plots on a single graph, the default color
- (linetype) is incremented sequentially.  You can instead assign a separate
- color for each data point, line segment, or label based on additional 
- information in the input data file.  This is indicated by the colorspec
- keyword `variable`. 
- 
  `lc variable` tells the program to use the value read from one column of the
  input data as a linestyle index, and use the color belonging to that linestyle.
  This requires a corresponding additional column in the `using` specifier.
  Text colors can be set similarly using `tc variable`.
 
- A single data file may contain multiple sets of data, separated by two blank
- lines. Each of these separate sets is assigned an index value (see `index`)
- that can be retrieved via the using specifier column(-2). See `pseudocolumns`.
- All data in the file is drawn with the same color/linestyle/pointtype
- properties by default.  The command `lc variable` can be used to assign
- different colors to each data set in the file by using the index value from
- pseudocolumn -2.
-
  Examples:
        # Use the third column of data to assign colors to individual points
        plot 'data' using 1:2:3 with points lc variable
 
-       # Use the data set index to choose a line color
+       # A single data file may contain multiple sets of data, separated by two
+       # blank lines.  Each data set is assigned as index value (see `index`)
+       # that can be retrieved via the `using` specifier `column(-2)`.
+       # See `pseudocolumns`.  This example uses to value in column -2 to 
+       # draw each data set in a different line color.
        plot 'data' using 1:2:(column(-2)) with lines lc variable
+
+4 rgbcolor variable
+?rgbcolor variable
+?lc rgbcolor variable
+?tc rgbcolor variable
+ You can assign a separate color for each data point, line segment, or label in
+ your plot.  `lc rgbcolor variable` tells the program to read RGB color
+ information for each line in the data file. This requires a corresponding
+ additional column in the `using` specifier.  The extra column is interpreted as
+ a 24-bit packed RGB triple. If the value is provided directly in the data file
+ it is easiest to give it as a hexidecimal value (see `rgbcolor`). 
+ Alternatively, the `using` specifier can contain an expression that evaluates
+ to a 24-bit RGB color as in the example below.
+ Text colors are similarly set using `tc rgbcolor variable`.
+
+ Example:
+       # Place colored points in 3D at the x,y,z coordinates corresponding to
+       # their red, green, and blue components
+       rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
+       splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
+
+3 linestyles vs linetypes
+? linestyles vs linetypes
+ Lines can have additional properties such as linewidth.  You can associate
+ these various properties, as well as equivalent properties for point symbols,
+ into user-defined "linestyles" using the command `set style line`.  Once
+ you have defined a linestyle, you can use it in a plot command to control
+ the appearance of one or more plot elements.
+
+ Whereas `linetypes` are permanent (they last until you explicitly redefine
+ them), `linestyles` are temporary.  They only last until the next reset 
+ of the graphics state. 
+
+ Examples:
+
+      # define a new line style with terminal-independent color cyan,
+      # linewidth 3, and associated point type 6 (a circle with a dot in it).
+      set style line 5 lt rgb "cyan" lw 3 pt 6
+      plot sin(x) with linespoints ls 5          # user-defined line style 5
 
 2 mouse input
 ?mouse input
@@ -10493,8 +10486,8 @@ Ffigure_mapcontours
        unset style line
        show style line
 
- If `default` is given all line style parameters are set to their default
- values.
+ `default` sets all line style parameters to those of the linetype with
+ that same index.
 
  If the linestyle <index> already exists, only the given parameters are
  changed while all others are preserved.  If not, all undefined values are

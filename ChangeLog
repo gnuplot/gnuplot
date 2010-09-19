@@ -6,6 +6,8 @@
 	I can't see any good reason to treat this as a fatal error.
 	Bug #2824879
 
+	* docs/gnuplot.doc: Clarify the section on linetypes and linestyles.
+
 2010-09-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/internal.c src/internal.h docs/gnuplot.doc:
