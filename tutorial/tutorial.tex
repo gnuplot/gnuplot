@@ -1,5 +1,5 @@
 %
-% $Id: tutorial.tex,v 1.7.2.1 2010/09/17 03:04:32 sfeam Exp $
+% $Id: tutorial.tex,v 1.7.2.2 2010/09/17 21:06:03 sfeam Exp $
 %
 % Tutorial for gnuplot plotting program, for LaTeX users
 % David Kotz
@@ -460,8 +460,8 @@ postscript parts for text and lines, respectively, included by
 \item \texttt{pslatex and epslatex}:  Rewritten version.  See the example below. 
 
 \item \texttt{tikz}:  Much improved graphics compaired to earlier \LaTeX terminals.  
-Requires a lua interpreter that is called by gnuplot. Compare the output
-of the \texttt{test} command to that from the minimal latex terminal.
+Use of the terminal requires a lua interpreter that is called by gnuplot. 
+The resulting .tex file can be processed using pdflatex.
 
 \end{itemize}
 
@@ -504,14 +504,9 @@ generated with the following commands:
 
 \begin{figure}[htbp]
   \begin{center}
-
-  \subfigure[Line and point types in the latex driver]
-            {\input{test}}
-  \subfigure[Line and point types in the tikz driver]
-            {\input{test_tikz}}
-  
+  \input{test}
   \end{center}
-  \caption{The exact line and point types available depend on the terminal type.}
+  \caption{Line and point types for the basic latex terminal. Note lack of text rotation.}
   \label{testcomp}
 \end{figure}
 
