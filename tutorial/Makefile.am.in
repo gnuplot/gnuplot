@@ -32,7 +32,7 @@ tutorial.ps: tutorial.dvi
 
 pdf: tutorial.pdf
 
-tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex eg7.tex eg7.eps test.tex \
+tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex eg7.tex eg7.eps test.tex test_tikz.tex \
 	tutorial.tex header.tex
 	@echo Building LaTeX tutorial
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) tutorial
