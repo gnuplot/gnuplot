@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.339 2010/09/10 17:09:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.340 2010/09/12 22:33:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4507,13 +4507,12 @@ edge_intersect(
 	if (inrange(X_AXIS.max, ix, ox)) {
 	    *ex = X_AXIS.max;
 	    return RIGHT_EDGE;
-	} else if (inrange(X_AXIS.min, ix, ox)) {
-	    *ex = X_AXIS.min;
-	    return LEFT_EDGE;
-	} else {
-	    graph_error("error in edge_intersect");
-	    return 0;
 	}
+	*ex = X_AXIS.min;
+	if (!inrange(X_AXIS.min, ix, ox))
+	    int_warn(NO_CARET,"error in edge_intersect");
+	return LEFT_EDGE;
+
     } else if (ix == ox) {
 	/* vertical line */
 	/* assume inrange(ix, X_AXIS.min, X_AXIS.max) */
@@ -4522,13 +4521,11 @@ edge_intersect(
 	if (inrange(Y_AXIS.max, iy, oy)) {
 	    *ey = Y_AXIS.max;
 	    return TOP_EDGE;
-	} else if (inrange(Y_AXIS.min, iy, oy)) {
-	    *ey = Y_AXIS.min;
-	    return BOTTOM_EDGE;
-	} else {
-	    graph_error("error in edge_intersect");
-	    return 0;
 	}
+	*ey = Y_AXIS.min;
+	if (!inrange(Y_AXIS.min, iy, oy))
+	    int_warn(NO_CARET,"error in edge_intersect");
+	return BOTTOM_EDGE;
     }
     /* slanted line of some kind */
 
