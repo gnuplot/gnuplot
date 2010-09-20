@@ -8,6 +8,9 @@
 	curves.  Later we may add back support for the case of lc palette z.
 	Bug #3063366
 
+	* src/graphics.c (fill_between):  Fix filled curve clipping error.
+	Bug #2963485
+
 2010-09-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (edge_intersect):  If for some reason we fail to find

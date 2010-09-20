@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.340 2010/09/12 22:33:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.341 2010/09/19 23:17:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2737,6 +2737,7 @@ struct curve_points *plot)
 	    xu1 = x1;
 	    xu2 = x2;
 	}
+	dx = x2 - x1;
 
     /* Clip against y-axis range */
 	axis = plot->y_axis;
