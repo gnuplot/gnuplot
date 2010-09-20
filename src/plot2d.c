@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.224 2010/09/08 21:14:00 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.225 2010/09/11 06:20:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -475,19 +475,19 @@ get_data(struct curve_points *current_plot)
 
     case RGBIMAGE:
 	min_cols = 5;
-        max_cols = 6;
-        break;
+	max_cols = 6;
+	break;
 
     case RGBA_IMAGE:
-        min_cols = 6;
-        max_cols = 6;
+	min_cols = 6;
+	max_cols = 6;
 	break;
 
 #ifdef EAM_OBJECTS
     case CIRCLES:	/* 3 + possible variable color, or 5 + possible variable color */
-        min_cols = 2;
-        max_cols = 6;
-        break;
+	min_cols = 2;
+	max_cols = 6;
+	break;
 
 	case ELLIPSES:
 	    min_cols = 2; /* x, y, major axis, minor axis */
@@ -621,7 +621,7 @@ get_data(struct curve_points *current_plot)
 	     * ignored for certain plot types requiring 3D coordinates in
 	     * MODE_PLOT.
 	     */
-            if (current_plot->plot_style == IMAGE
+	    if (current_plot->plot_style == IMAGE
 	    ||  current_plot->plot_style == RGBIMAGE
 	    ||  current_plot->plot_style == RGBA_IMAGE)
 		continue;
@@ -986,19 +986,19 @@ get_data(struct curve_points *current_plot)
 		break;
 
 images:
-            case RGBA_IMAGE:  /* x_cent y_cent red green blue alpha */
-            case RGBIMAGE:    /* x_cent y_cent red green blue */
-                store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1], v[1], v[2]);
-                /* We will autoscale the RGB components to  a total range [0:255]
-                 * so we don't need to do any fancy scaling here.
-                 */
-                cp = &(current_plot->points[i]);
-                cp->CRD_R = v[2];
-                cp->CRD_G = v[3];
-                cp->CRD_B = v[4];
-                cp->CRD_A = v[5];	/* Alpha channel */
-                i++;
-                break;
+	    case RGBA_IMAGE:  /* x_cent y_cent red green blue alpha */
+	    case RGBIMAGE:    /* x_cent y_cent red green blue */
+		store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1], v[1], v[2]);
+		/* We will autoscale the RGB components to  a total range [0:255]
+		 * so we don't need to do any fancy scaling here.
+		 */
+		cp = &(current_plot->points[i]);
+		cp->CRD_R = v[2];
+		cp->CRD_G = v[3];
+		cp->CRD_B = v[4];
+		cp->CRD_A = v[5];	/* Alpha channel */
+		i++;
+		break;
 	    }
 
 	}                       /*switch */
@@ -1059,7 +1059,9 @@ store2d_point(
 
     if (polar) {
 	double newx, newy;
-	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && y > axis_array[R_AXIS].max) {
+
+	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) 
+	&&  y > axis_array[R_AXIS].max) {
 	    cp->type = OUTRANGE;
 	}
 	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
@@ -1071,40 +1073,50 @@ store2d_point(
 	y = newy;
 	x = newx;
 
-	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && yhigh > axis_array[R_AXIS].max) {
-	    cp->type = OUTRANGE;
-	}
-	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
-	    /* we store internally as if plotting r(t)-rmin */
-	    yhigh -= axis_array[R_AXIS].min;
-	}
-	newx = yhigh * cos(xhigh * ang2rad);
-	newy = yhigh * sin(xhigh * ang2rad);
-	yhigh = newy;
-	xhigh = newx;
+	/* Some plot styles use xhigh and yhigh for other quantities, */
+	/* which polar mode transforms would break		      */
+	if (current_plot->plot_style == CIRCLES) {
+	    double radius = (xhigh - xlow)/2.0;
+	    xlow = x - radius;
+	    xhigh = x + radius;
 
-	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && ylow > axis_array[R_AXIS].max) {
-	    cp->type = OUTRANGE;
+	} else {
+	    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) 
+	    &&  yhigh > axis_array[R_AXIS].max) {
+		cp->type = OUTRANGE;
+	    }
+	    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
+		/* we store internally as if plotting r(t)-rmin */
+		yhigh -= axis_array[R_AXIS].min;
+	    }
+	    newx = yhigh * cos(xhigh * ang2rad);
+	    newy = yhigh * sin(xhigh * ang2rad);
+	    yhigh = newy;
+	    xhigh = newx;
+
+	    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) 
+	    &&  ylow > axis_array[R_AXIS].max) {
+		cp->type = OUTRANGE;
+	    }
+	    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
+		/* we store internally as if plotting r(t)-rmin */
+		ylow -= axis_array[R_AXIS].min;
+	    }
+	    newx = ylow * cos(xlow * ang2rad);
+	    newy = ylow * sin(xlow * ang2rad);
+	    ylow = newy;
+	    xlow = newx;
 	}
-	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
-	    /* we store internally as if plotting r(t)-rmin */
-	    ylow -= axis_array[R_AXIS].min;
-	}
-	newx = ylow * cos(xlow * ang2rad);
-	newy = ylow * sin(xlow * ang2rad);
-	ylow = newy;
-	xlow = newx;
     }
+
     /* return immediately if x or y are undefined
      * we dont care if outrange for high/low.
-     * BUT if high/low undefined (ie log( < 0 ), no number is stored,
-     * but graphics.c doesn't know.
-     * explicitly store -VERYLARGE;
+     * BUT if high/low undefined (ie log( < 0 ), no number is stored.
      */
     STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, current_plot->x_axis,
-    			current_plot->noautoscale, NOOP, return);
+			current_plot->noautoscale, NOOP, return);
     STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, current_plot->y_axis,
-    			current_plot->noautoscale, NOOP, return);
+			current_plot->noautoscale, NOOP, return);
 
     switch (current_plot->plot_style) {
     case POINTSTYLE:		/* Only x and y are relevant to axis scaling */
@@ -1131,7 +1143,7 @@ store2d_point(
 					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);
 	break;
 #ifdef EAM_OBJECTS	
-	case CIRCLES:
+    case CIRCLES:
 	cp->yhigh = yhigh;	
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
@@ -1142,7 +1154,7 @@ store2d_point(
 	if (fabs(ylow) > 1000. || fabs(yhigh) > 1000.) /* safety check for insane arc angles */
 	    cp->type = UNDEFINED;
 	break;
-	case ELLIPSES:
+    case ELLIPSES:
 	/* We want to pass the parameters to the ellipse drawing routine as they are, 
 	 * so we have to calculate the extent of the ellipses for autoscaling here. 
 	 * Properly calculating the correct extent of a rotated ellipse, respecting 
@@ -1236,7 +1248,7 @@ boxplot_range_fiddling(struct curve_points *plot)
 {
     double extra_width = plot->points[0].xhigh - plot->points[0].xlow;
     if (extra_width == 0)
-    	extra_width = (boxwidth > 0 && boxwidth_is_absolute) ? boxwidth : 0.5;
+	extra_width = (boxwidth > 0 && boxwidth_is_absolute) ? boxwidth : 0.5;
 
     /* FIXME:  This is a boxplot-specific kludge to remove any extra, undefined
      * points at the end of the point list.  A more general fix would be nice.
@@ -1407,7 +1419,7 @@ store_label(
 	tl->lp_properties.pm3d_color.value = colorval;
     /* Check for optional (point linecolor rgb variable) */
     else if (listhead->lp_properties.pm3d_color.type == TC_RGB 
-             && listhead->lp_properties.pm3d_color.value < 0)
+	     && listhead->lp_properties.pm3d_color.value < 0)
 	tl->lp_properties.pm3d_color.lt = colorval;
     /* Check for optional (point linecolor variable) */
     else if (listhead->lp_properties.l_type == LT_COLORFROMCOLUMN) {
@@ -1947,15 +1959,15 @@ eval_plots()
 		    if (almost_equals(c_token,"unit$s")) {
 			c_token++;
 		        if (equals(c_token,"xy")) {
-	                    this_plot->ellipseaxes_units = ELLIPSEAXES_XY;
-	                } else if (equals(c_token,"xx")) {
-	                    this_plot->ellipseaxes_units = ELLIPSEAXES_XX;
-	                } else if (equals(c_token,"yy")) {
-	                    this_plot->ellipseaxes_units = ELLIPSEAXES_YY;
-	                } else {
-	                    int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
-	                }
-	                c_token++;
+		            this_plot->ellipseaxes_units = ELLIPSEAXES_XY;
+		        } else if (equals(c_token,"xx")) {
+		            this_plot->ellipseaxes_units = ELLIPSEAXES_XX;
+		        } else if (equals(c_token,"yy")) {
+		            this_plot->ellipseaxes_units = ELLIPSEAXES_YY;
+		        } else {
+		            int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
+		        }
+		        c_token++;
 		    }
 		    if (stored_token != c_token) {
 			if (set_ellipseaxes_units) {
@@ -2125,7 +2137,7 @@ eval_plots()
 
 	    if (df_matrix) {
 		if (!(this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE
-	              || this_plot->plot_style == RGBA_IMAGE || this_plot->plot_style == LINES
+		      || this_plot->plot_style == RGBA_IMAGE || this_plot->plot_style == LINES
 		      || this_plot->plot_style == POINTSTYLE))
 		int_error(NO_CARET, "this 2D plot style cannot handle matrix data");
 
@@ -2267,7 +2279,7 @@ eval_plots()
 	    if (!in_parametric
 		&& this_plot->plot_style != IMAGE
 		&& this_plot->plot_style != RGBIMAGE
-                && this_plot->plot_style != RGBA_IMAGE
+		&& this_plot->plot_style != RGBA_IMAGE
 		/* don't increment the default line/point properties if
 		 * this_plot is an image */
 	    ) {
@@ -2343,7 +2355,7 @@ eval_plots()
 		 * Compensate for extent of the image so `set autoscale fix`
 		 * uses outer edges of outer pixels in axes adjustment.
 		 */
-                if ((this_plot->plot_style == IMAGE
+		if ((this_plot->plot_style == IMAGE
 		    || this_plot->plot_style == RGBIMAGE
 		    || this_plot->plot_style == RGBA_IMAGE)) {
 		    this_plot->image_properties.type = IC_PALETTE;

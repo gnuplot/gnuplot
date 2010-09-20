@@ -1,8 +1,13 @@
+2010-09-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (store2d_point):  Allow the use of "with circles" in
+	polar coordinate mode.
+
 2010-09-19  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (edge_intersect):  If for some reason we fail to
-	find find the intersection points of a vector both of whose ends
-	are out of range, issue a warning, pick an edge, and continue.
+	* src/graphics.c (edge_intersect):  If for some reason we fail to find
+	find the intersection points of a vector both of whose ends are out of
+	range, issue a warning, pick an edge, and continue.
 	I can't see any good reason to treat this as a fatal error.
 	Bug #2824879
 
