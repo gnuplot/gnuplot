@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.225 2010/09/11 06:20:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.226 2010/09/21 03:07:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -336,6 +336,12 @@ get_data(struct curve_points *current_plot)
 	    variable_color = TRUE;
 	if (current_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 	    variable_color = TRUE;
+	if (current_plot->plot_smooth != SMOOTH_NONE) {
+	    /* FIXME:  It would be possible to support smooth cspline lc palette */
+	    /* but it would require expanding and interpolating plot->varcolor   */
+	    /* in parallel with the y values.                                    */
+	    variable_color = FALSE;
+	}
 	if (variable_color)
 	    current_plot->varcolor = gp_alloc(current_plot->p_max * sizeof(double),
 		"varcolor array");

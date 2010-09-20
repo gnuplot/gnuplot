@@ -3,6 +3,11 @@
 	* src/plot2d.c (store2d_point):  Allow the use of "with circles" in
 	polar coordinate mode.
 
+	* src/plot2d.c (get_data):  The combination of smoothing and variable
+	color cannot work in general.  Disable variable color for all smoothed
+	curves.  Later we may add back support for the case of lc palette z.
+	Bug #3063366
+
 2010-09-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (edge_intersect):  If for some reason we fail to find
