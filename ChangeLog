@@ -1,3 +1,9 @@
+2010-09-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (axis_checked_extend_empty_range):  When extending from
+	an empty range, don't invert the axis direction by accident.
+	Bug #3074365
+
 2010-09-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (fill_between):  Fix filled curve clipping error.

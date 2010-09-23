@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.77.2.3 2009/08/02 23:38:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.77.2.4 2009/11/04 16:11:25 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -314,7 +314,7 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
 	    /* range came from autoscaling ==> widen it */
 	    double widen = (dmax == 0.0) ?
 		FIXUP_RANGE__WIDEN_ZERO_ABS
-		: FIXUP_RANGE__WIDEN_NONZERO_REL * dmax;
+		: FIXUP_RANGE__WIDEN_NONZERO_REL * fabs(dmax);
 	    if (!(axis == FIRST_Z_AXIS && !mesg)) /* set view map */
 		fprintf(stderr, "Warning: empty %s range [%g:%g], ",
 		    axis_defaults[axis].name, dmin, dmax);
