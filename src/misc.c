@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.108.2.1 2009/08/02 23:38:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.108.2.2 2010/07/08 23:45:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -791,17 +791,16 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    }
 
 	    if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")) {
+		lp->use_palette = 1;
 		if (set_pal++)
 		    break;
 		c_token++;
 		if (almost_equals(c_token, "rgb$color")) {
 		    c_token--;
 		    parse_colorspec(&lp->pm3d_color, TC_RGB);
-		    lp->use_palette = 1;
 		} else if (almost_equals(c_token, "pal$ette")) {
 		    c_token--;
 		    parse_colorspec(&lp->pm3d_color, TC_Z);
-		    lp->use_palette = 1;
 #ifdef KEYWORD_BGND
 		} else if (equals(c_token,"bgnd")) {
 		    lp->pm3d_color.type = TC_LT;

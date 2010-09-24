@@ -1,3 +1,8 @@
+2010-09-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* Fix a regression in 4.4.1 that causes "lc N" not to work in several
+	contexts.
+
 2010-09-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (axis_checked_extend_empty_range):  When extending from
