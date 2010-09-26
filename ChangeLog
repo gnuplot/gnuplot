@@ -1,3 +1,8 @@
+2010-09-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (replotrequest):  Once we have started to replot, the
+	previous data no longer exists. Therefore we must set refresh_ok = 0.
+
 2010-09-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (axis_checked_extend_empty_range):  When extending from
