@@ -1,10 +1,16 @@
-New features, changes and fixes in gnuplot version 4.4.2
+New features, changes and fixes in gnuplot version 4.4.3
 ========================================================
 
 * NEW set key maxcolumns N maxrows M
 * NEW value("varname") returns the value of the named variable
 * FIX better estimation of latex string lengths
+
+New features, changes and fixes in gnuplot version 4.4.2
+========================================================
+
 * FIX error in clipping filled curves to plot boundary
+* FIX regression in colorspec parsing ("lc N" not recognized)
+* FIX prevent segfault if refresh follows interrupted replot
 
 New features, changes and fixes in gnuplot version 4.4.1
 ========================================================
