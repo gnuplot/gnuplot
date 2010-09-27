@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.207 2010/09/09 04:08:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.208 2010/09/15 23:46:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1197,8 +1197,7 @@ do_arrow(
     if ((head != NOHEAD) && fabs(len_arrow) >= DBL_EPSILON) {
 	int x1, y1, x2, y2;
 	if (curr_arrow_headlength <= 0) {
-	    /* arrow head with the default size */
-	    /* now calc the head_coeff */
+	    /* An arrow head with the default size and angles */
 	    double coeff_shortest = len_tic * HEAD_SHORT_LIMIT / len_arrow;
 	    double coeff_longest = len_tic * HEAD_LONG_LIMIT / len_arrow;
 	    double head_coeff = GPMAX(coeff_shortest,
@@ -1212,23 +1211,34 @@ do_arrow(
 	    xm = (int) ((x1 + x2)/2);
 	    ym = (int) ((y1 + y2)/2);
 	} else {
-	    /* the arrow head with the length + angle specified explicitly */
+	    /* An arrow head with the length + angle specified explicitly.	*/
+	    /* Assume that if the arrow is shorter than the arrowhead, this is	*/
+	    /* because of foreshortening in a 3D plot.                  	*/
 	    double alpha = curr_arrow_headangle * DEG2RAD;
 	    double beta = curr_arrow_headbackangle * DEG2RAD;
 	    double phi = atan2(-dy,-dx); /* azimuthal angle of the vector */
-	    double backlen = curr_arrow_headlength * sin(alpha) / sin(beta);
+	    double backlen, effective_length;
 	    double dx2, dy2;
+
+	    effective_length = curr_arrow_headlength;
+	    if (curr_arrow_headlength > len_arrow/2.) {
+		effective_length = len_arrow/2.;
+		alpha = atan(tan(alpha)*((double)curr_arrow_headlength/effective_length));
+		beta = atan(tan(beta)*((double)curr_arrow_headlength/effective_length));
+	    }
+	    backlen = sin(alpha) / sin(beta);
+
 	    /* anticlock-wise head segment */
-	    x1 = -(int)(curr_arrow_headlength * cos( alpha - phi ));
-	    y1 =  (int)(curr_arrow_headlength * sin( alpha - phi ));
+	    x1 = -(int)(effective_length * cos( alpha - phi ));
+	    y1 =  (int)(effective_length * sin( alpha - phi ));
 	    /* clock-wise head segment */
-	    dx2 = -curr_arrow_headlength * cos( phi + alpha );
-	    dy2 = -curr_arrow_headlength * sin( phi + alpha );
+	    dx2 = -effective_length * cos( phi + alpha );
+	    dy2 = -effective_length * sin( phi + alpha );
 	    x2 = (int) (dx2);
 	    y2 = (int) (dy2);
 	    /* back point */
-	    xm = (int) (dx2 + backlen * cos( phi + beta ));
-	    ym = (int) (dy2 + backlen * sin( phi + beta ));
+	    xm = (int) (dx2 + backlen*effective_length * cos( phi + beta ));
+	    ym = (int) (dy2 + backlen*effective_length * sin( phi + beta ));
 	}
 
 	if (head & END_HEAD) {

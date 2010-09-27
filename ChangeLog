@@ -13,6 +13,11 @@
 	that the 2D routine apply_head_properties() can be shared by 3D code.
 	Bug #3074212
 
+	* src/term.c (do_arrow): To do proper foreshortening of 3D arrowheads
+	would require a new approach. As an approximation, assume that any short
+	arrow with a big arrowhead is the result of foreshortening.
+	This affects 2D arrows also, but the visual effect is not bad.
+
 2010-09-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (replotrequest):  Once we have started to replot, the
