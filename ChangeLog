@@ -1,3 +1,9 @@
+2010-09-27  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/datafile.c (f_stringcolumn): The stringcolumn function didn't 
+	recognize columns 0, -1, and -2. Now it treats them the same as the
+	column function does.
+
 2010-09-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (apply_head_properties): Simplify the arrowhead code.

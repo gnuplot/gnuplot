@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.189 2010/07/08 04:54:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.190 2010/09/09 03:17:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2120,7 +2120,19 @@ f_stringcolumn(union argument *arg)
     if (!evaluate_inside_using || df_matrix)
 	int_error(c_token-1, "stringcolumn() called from invalid context");
 
-    if (column < 1 || column > df_no_cols) {
+    if (column == -2) {
+	char temp_string[32];
+	sprintf(temp_string, "%d", df_current_index);
+	push(Gstring(&a, temp_string ));
+    } else if (column == -1) {
+	char temp_string[32];
+	sprintf(temp_string, "%d", line_count);
+	push(Gstring(&a, temp_string ));
+    } else if (column == 0) {      /* $0 = df_datum */
+	char temp_string[32];
+	sprintf(temp_string, "%d", df_datum);
+	push(Gstring(&a, temp_string ));
+    } else if (column < 1 || column > df_no_cols) {
 	undefined = TRUE;
 	push(&a);               /* any objection to this ? */
     } else {
