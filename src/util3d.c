@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.40 2010/07/12 04:16:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.41 2010/07/15 04:44:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -1082,4 +1082,15 @@ polyline3d_next(p_vertex v2, struct lp_style_type *lp)
     TERMCOORD(v2, x2, y2);
     draw_clip_line(x1,y1,x2,y2);
     polyline3d_previous_vertex = *v2;
+}
+
+/*
+ * Dummy up an x-axis scale so that we can share the 2D arrowhead routine.
+ */
+void
+apply_3dhead_properties(struct arrow_style_type *arrow_properties)
+{
+    X_AXIS.term_scale = (plot_bounds.xright - plot_bounds.xleft)
+			/ (X_AXIS.max - X_AXIS.min);
+    apply_head_properties(arrow_properties);
 }

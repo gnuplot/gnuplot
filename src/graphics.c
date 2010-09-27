@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.341 2010/09/19 23:17:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.342 2010/09/21 06:02:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1267,21 +1267,17 @@ apply_head_properties(struct arrow_style_type *arrow_properties)
     curr_arrow_headlength = 0;
     if (arrow_properties->head_length > 0) {
 	/* set head length+angle for term->arrow */
-	int itmp, x1, x2;
-	struct position headsize = {0,0,0,0.,0.,0.};
+	double xtmp, ytmp;
+	struct position headsize = {first_axes,graph,graph,0.,0.,0.};
 
 	headsize.x = arrow_properties->head_length;
 	headsize.scalex = arrow_properties->head_lengthunit;
 
-	headsize.y = 1.0; /* any value, just avoid log y */
-	map_position(&headsize, &x2, &itmp, "arrow");
-
-	headsize.x = 0; /* measure length from zero */
-	map_position(&headsize, &x1, &itmp, "arrow");
+	map_position_r(&headsize, &xtmp, &ytmp, "arrow");
 
 	curr_arrow_headangle = arrow_properties->head_angle;
 	curr_arrow_headbackangle = arrow_properties->head_backangle;
-	curr_arrow_headlength = x2 - x1;
+	curr_arrow_headlength = xtmp;
     }
 }
 

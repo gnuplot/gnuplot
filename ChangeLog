@@ -1,3 +1,12 @@
+2010-09-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (apply_head_properties): Simplify the arrowhead code.
+
+	* src/graph3d.c src/hidden3d.c src/util3d.c src/util3d.h: Provide a
+	3D wrapper apply_3dhead_properties() that dummies up an x-axis scale so
+	that the 2D routine apply_head_properties() can be shared by 3D code.
+	Bug #3074212
+
 2010-09-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (replotrequest):  Once we have started to replot, the

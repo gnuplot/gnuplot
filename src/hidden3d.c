@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.73 2010/07/15 03:51:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.74 2010/07/15 04:44:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -50,7 +50,6 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.73 2010/07/15 03:51:03 
 #include "command.h"
 #include "dynarray.h"
 #include "graph3d.h"
-#include "graphics.h"	/* For apply_head_properties, which should probably be in gadgets */
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
@@ -1172,7 +1171,7 @@ build_networks(struct surface_points *plots, int pcount)
 	lp_style = &(this_plot->lp_properties);
 
 	if (this_plot->plot_style == VECTOR) {
-	    apply_head_properties(&(this_plot->arrow_properties));
+	    apply_3dhead_properties(&(this_plot->arrow_properties));
 	    lp->p_type = PT_ARROWHEAD;
 	}
 

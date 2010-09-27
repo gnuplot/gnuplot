@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.238 2010/09/08 20:56:14 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.239 2010/09/16 05:56:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -551,7 +551,7 @@ place_arrows3d(int layer)
 	    continue;
 	if (get_arrow3d(this_arrow, &sx, &sy, &ex, &ey)) {
 	    term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
-	    apply_head_properties(&(this_arrow->arrow_properties));
+	    apply_3dhead_properties(&(this_arrow->arrow_properties));
 	    draw_clip_arrow(sx, sy, ex, ey, this_arrow->arrow_properties.head);
 	} else {
 	    FPRINTF((stderr,"place_arrows3d: skipping out-of-bounds arrow\n"));
@@ -3176,7 +3176,7 @@ plot3d_vectors(struct surface_points *plot)
 
     /* Only necessary once because all arrows equal */
     term_apply_lp_properties(&(plot->arrow_properties.lp_properties));
-    apply_head_properties(&(plot->arrow_properties));
+    apply_3dhead_properties(&(plot->arrow_properties));
 
     for (i = 0; i < plot->iso_crvs->p_count; i++) {
 	
