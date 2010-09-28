@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.74 2010/07/15 04:44:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.75 2010/09/27 19:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1654,21 +1654,28 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
     struct t_colorspec color = e->lp->pm3d_color;
     struct lp_style_type lptemp = *(e->lp);
     TBOOLEAN recolor = FALSE;
+    TBOOLEAN arrow = (lptemp.p_type == PT_ARROWHEAD || lptemp.p_type == PT_BACKARROW);
+    int varcolor;
+
+    if (arrow && (e->style == PT_BACKARROW))
+	varcolor = v2->real_z;
+    else
+	varcolor = v1->real_z;
 
     /* This handles 'lc rgb variable' */
     if (color.type == TC_RGB && color.lt == LT_COLORFROMCOLUMN) {
 	recolor = TRUE;
-	lptemp.pm3d_color.lt = (int)v1->real_z;
+	lptemp.pm3d_color.lt = varcolor;
     } else
 
     /* This handles 'lc variable' */
     if (lptemp.l_type == LT_COLORFROMCOLUMN) {
 	recolor = TRUE;
-	load_linetype(&lptemp, (int)v1->real_z);
+	load_linetype(&lptemp, varcolor);
     } else
 
     /* This handles style VECTORS */
-    if (lptemp.p_type == PT_ARROWHEAD || lptemp.p_type == PT_BACKARROW) {
+    if (arrow) {
 	lptemp.p_type = e->style;
     } else
 
@@ -1682,8 +1689,11 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
     if (recolor) {
 	color = lptemp.pm3d_color;
 	lptemp = *(e->lp);
-	lptemp.l_type = e->style;
 	lptemp.pm3d_color = color;
+	if (arrow)
+	    lptemp.p_type = e->style;
+	else
+	    lptemp.l_type = e->style;
     }
 
     draw3d_line_unconditional(v1, v2, &lptemp, color);

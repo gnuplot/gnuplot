@@ -7,6 +7,9 @@
 	* src/graphics.c (plot_image_or_update_axes): Add support for log-scale
 	transformation of 2D image data.
 
+	* src/hidden3d.c: Disentangle variable color from the direction of 
+	arrows.  Bug #3074212
+
 2010-09-28  Volker Dobler  <vdobler@users.sourceforge.net>
 
 	* src/axis.c (load_one_range load_range) src/axis.h
