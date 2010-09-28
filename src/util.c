@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.90 2010/08/09 04:41:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.91 2010/09/19 03:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -967,6 +967,8 @@ os_error(int t_num, const char *str, va_dcl)
     putc('\n', stderr);
 #endif /* VMS */
 
+    scanning_range_in_progress = FALSE;
+
     bail_to_command_line();
 }
 
@@ -1024,6 +1026,7 @@ int_error(int t_num, const char str[], va_dcl)
     /* the normal cleanup code. Reset any flags before bailing.   */
     df_reset_after_error();
     eval_reset_after_error();
+    scanning_range_in_progress = FALSE;
 
     /* Load error state variables */
     update_gpval_variables(2);

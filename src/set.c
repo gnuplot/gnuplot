@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.322 2010/09/04 21:21:48 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.323 2010/09/16 05:56:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -810,6 +810,10 @@ set_autoscale()
     } else if (equals(c_token, "xy") || equals(c_token, "yx")) {
 	axis_array[FIRST_X_AXIS].set_autoscale =
 	    axis_array[FIRST_Y_AXIS].set_autoscale =  AUTOSCALE_BOTH;
+	axis_array[FIRST_X_AXIS].min_constraint =
+	    axis_array[FIRST_X_AXIS].max_constraint =
+	    axis_array[FIRST_Y_AXIS].min_constraint = 
+	    axis_array[FIRST_Y_AXIS].max_constraint = CONSTRAINT_NONE;
 	c_token++;
 	return;
     } else if (equals(c_token, "fix")) {
@@ -835,18 +839,22 @@ set_autoscale()
 									\
 	if (equals(c_token, axis_defaults[axis].name)) {		\
 	    this->set_autoscale = AUTOSCALE_BOTH;			\
+	    this->min_constraint = CONSTRAINT_NONE;			\
+	    this->max_constraint = CONSTRAINT_NONE;			\
 	    ++c_token;							\
 	    return;							\
 	}								\
 	sprintf(min_string, "%smi$n", axis_defaults[axis].name);	\
 	if (almost_equals(c_token, min_string)) {			\
 	    this->set_autoscale |= AUTOSCALE_MIN;			\
+	    this->min_constraint = CONSTRAINT_NONE;			\
 	    ++c_token;							\
 	    return;							\
 	}								\
 	sprintf(max_string, "%sma$x", axis_defaults[axis].name);	\
 	if (almost_equals(c_token, max_string)) {			\
 	    this->set_autoscale |= AUTOSCALE_MAX;			\
+	    this->max_constraint = CONSTRAINT_NONE;			\
 	    ++c_token;							\
 	    return;							\
 	}								\

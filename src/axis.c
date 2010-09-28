@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.81 2009/10/26 18:47:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.82 2010/09/24 05:20:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -774,6 +774,22 @@ setup_tics(AXIS_INDEX axis, int max)
     TBOOLEAN autoextend_max = (this->autoscale & AUTOSCALE_MAX)
 	&& ! (this->autoscale & AUTOSCALE_FIXMAX);
 
+    /*  Apply constraints on autoscaled axis if requested:
+     *  The range is _expanded_ here only.  Limiting the range is done
+     *  in the macro STORE_WITH_LOG_AND_UPDATE_RANGE() of axis.h  */
+    if (this->autoscale & AUTOSCALE_MIN) {
+      	if (this->min_constraint & CONSTRAINT_UPPER) {
+	    if (this->min > this->min_ub)
+		this->min = this->min_ub;
+	}
+    }
+    if (this->autoscale & AUTOSCALE_MAX) {
+	if (this->max_constraint & CONSTRAINT_LOWER) {
+	    if (this->max < this->max_lb)
+		this->max = this->max_lb;
+	}
+    }
+
     /* HBB 20000506: if no tics required for this axis, do
      * nothing. This used to be done exactly before each call of
      * setup_tics, anyway... */
@@ -807,11 +823,17 @@ setup_tics(AXIS_INDEX axis, int max)
 	else                           timelevel[axis] = TIMELEVEL_SECONDS;
     }
 
-    if (autoextend_min)
+    if (autoextend_min) {
 	this->min = round_outward(axis, ! (this->min < this->max), this->min);
+	if (this->min_constraint & CONSTRAINT_LOWER && this->min < this->min_lb)
+	    this->min = this->min_lb;
+    }
 
-    if (autoextend_max)
+    if (autoextend_max) {
 	this->max = round_outward(axis, this->min < this->max, this->max);
+	if (this->max_constraint & CONSTRAINT_UPPER && this->max > this->max_ub)
+	    this->max = this->max_ub;
+    }
 
 
     /* Set up ticfmt[axis] correctly. If necessary (time axis, but not
@@ -1394,6 +1416,127 @@ axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
 }
 /* }}} */
 
+void load_one_range(AXIS_INDEX axis, double *a, t_autoscale *autoscale, t_autoscale which )
+{
+    double number;
+    
+    assert( which==AUTOSCALE_MIN || which==AUTOSCALE_MAX );
+
+    if (equals(c_token, "*")) {
+	/*  easy:  do autoscaling!  */
+	*autoscale |= which;
+	if (which==AUTOSCALE_MIN) {
+	    axis_array[axis].min_constraint &= ~CONSTRAINT_LOWER;
+	    axis_array[axis].min_lb = 0;  /*  dummy entry  */
+	} else {
+	    axis_array[axis].max_constraint &= ~CONSTRAINT_LOWER;
+	    axis_array[axis].max_lb = 0;  /*  dummy entry  */
+	}
+	c_token++;
+    } else {
+	/*  this _might_ be autoscaling with constraint or fixed value */
+	/*  The syntax of '0 < *...' confuses the parser as he will try to
+            include the '<' as a comparison operator in the expression.
+            Setting scanning_range_in_progress will stop the parser from
+            trying to build an action table if he finds '<' followed by '*'
+            (which would normaly trigger a 'invalid expression'),  */
+	scanning_range_in_progress = TRUE;
+	GET_NUM_OR_TIME(number, axis);
+	scanning_range_in_progress = FALSE;
+
+	if (END_OF_COMMAND)
+	    int_error(c_token, "unfinished range");
+
+	if (equals(c_token, "<")) {
+	    /*  this _seems_ to be autoscaling with lower bound  */
+	    c_token++;
+	    if (END_OF_COMMAND) {
+		int_error(c_token, "unfinished range with constraint");
+	    } else if (equals(c_token, "*")) {
+		/*  okay:  this _is_ autoscaling with lower bound!  */
+		*autoscale |= which;
+		if (which==AUTOSCALE_MIN) {
+		    axis_array[axis].min_constraint |= CONSTRAINT_LOWER;
+		    axis_array[axis].min_lb = number;
+		} else {
+		    axis_array[axis].max_constraint |= CONSTRAINT_LOWER;
+		    axis_array[axis].max_lb = number;
+		}
+		c_token++;
+	    } else {
+		int_error(c_token, "malformed range with constarint");
+            }
+        } else if (equals(c_token, ">")) {
+	    int_error(c_token, "malformed range with constraint (use '<' only)");
+	} else { 
+	    /*  no autoscaling-with-lower-bound but simple fixed value only  */
+	    *autoscale &= ~which;
+	    if (which==AUTOSCALE_MIN) {
+		axis_array[axis].min_constraint = CONSTRAINT_NONE;
+		axis_array[axis].min_ub = 0;  /*  dummy entry  */
+	    } else {
+		axis_array[axis].max_constraint = CONSTRAINT_NONE;
+		axis_array[axis].max_ub = 0;  /*  dummy entry  */
+	    }
+	    *a = number;
+        }
+    }
+    
+    if (*autoscale & which) {
+	/*  check for upper bound only if autoscaling is on  */
+	if (END_OF_COMMAND)  int_error(c_token, "unfinished range");
+	if (equals(c_token, "<")) {
+	    /*  looks like upper bound up to now...  */
+
+	    c_token++;
+	    if (END_OF_COMMAND) int_error(c_token, "unfinished range with constraint");
+
+	    GET_NUM_OR_TIME(number, axis);
+	    /*  this autoscaling has an upper bound:  */
+
+	    if (which==AUTOSCALE_MIN) {
+		axis_array[axis].min_constraint |= CONSTRAINT_UPPER;
+		axis_array[axis].min_ub = number;
+	    } else {
+		axis_array[axis].max_constraint |= CONSTRAINT_UPPER;
+		axis_array[axis].max_ub = number;
+	    }
+	} else if (equals(c_token, ">")) {
+	    int_error(c_token, "malformed range with constraint (use '<' only)");
+	} else {
+	    /*  there is _no_ upper bound on this autoscaling  */
+	    if (which==AUTOSCALE_MIN) {
+		axis_array[axis].min_constraint &= ~CONSTRAINT_UPPER;
+		axis_array[axis].min_ub = 0;  /*  dummy entry  */
+	    } else {
+		axis_array[axis].max_constraint &= ~CONSTRAINT_UPPER;
+		axis_array[axis].max_ub = 0;  /*  dummy entry  */
+	    }
+	}
+    } else if (!END_OF_COMMAND){
+	/*  no autoscaling = fixed value --> complain about constraints  */
+	if (equals(c_token, "<") || equals(c_token, ">") ) {
+	    int_error(c_token, "no upper bound constraint allowed if not autoscaling");
+	}
+    }
+
+    /*  Consitency check  */
+    if (*autoscale & which) {
+	if (which==AUTOSCALE_MIN && axis_array[axis].min_constraint==CONSTRAINT_BOTH) {
+	    if (axis_array[axis].min_ub < axis_array[axis].min_lb ) {
+		int_warn(c_token,"Upper bound of constraint < lower bound:  Turning of constraints.");
+		axis_array[axis].min_constraint = CONSTRAINT_NONE;
+	    }
+	}
+	if (which==AUTOSCALE_MAX && axis_array[axis].max_constraint==CONSTRAINT_BOTH) {
+	    if (axis_array[axis].max_ub < axis_array[axis].max_lb ) {
+		int_warn(c_token,"Upper bound of constraint < lower bound:  Turning of constraints.");
+		axis_array[axis].max_constraint = CONSTRAINT_NONE;
+	    }
+	}
+    }
+}
+
 
 /* {{{ load_range() */
 /* loads a range specification from the input line into variables 'a'
@@ -1401,19 +1544,18 @@ axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
 t_autoscale
 load_range(AXIS_INDEX axis, double *a, double *b, t_autoscale autoscale)
 {
-    if (equals(c_token, "]"))
+    double lb, ub;
+
+    if (equals(c_token, "]")) {
+	axis_array[axis].min_constraint = CONSTRAINT_NONE;
+	axis_array[axis].max_constraint = CONSTRAINT_NONE;
 	return (autoscale);
+    }
 
     if (END_OF_COMMAND) {
 	int_error(c_token, "starting range value or ':' or 'to' expected");
     } else if (!equals(c_token, "to") && !equals(c_token, ":")) {
-	if (equals(c_token, "*")) {
-	    autoscale |= AUTOSCALE_MIN;
-	    c_token++;
-	} else {
-	    GET_NUM_OR_TIME(*a, axis);
-	    autoscale &= ~AUTOSCALE_MIN;
-	}
+	load_one_range(axis, a, &autoscale, AUTOSCALE_MIN );
     }
 
     if (!equals(c_token, "to") && !equals(c_token, ":"))
@@ -1421,13 +1563,7 @@ load_range(AXIS_INDEX axis, double *a, double *b, t_autoscale autoscale)
     c_token++;
 
     if (!equals(c_token, "]")) {
-	if (equals(c_token, "*")) {
-	    autoscale |= AUTOSCALE_MAX;
-	    c_token++;
-	} else {
-	    GET_NUM_OR_TIME(*b, axis);
-	    autoscale &= ~AUTOSCALE_MAX;
-	}
+	load_one_range(axis, b, &autoscale, AUTOSCALE_MAX );
     }
 
     /* HBB 20030127: If range input backwards, automatically turn on

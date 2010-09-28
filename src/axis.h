@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.57 2009/08/02 22:06:19 sfeam Exp $
+ * $Id: axis.h,v 1.58 2010/07/01 16:50:32 sfeam Exp $
  *
  */
 
@@ -175,6 +175,13 @@ typedef enum e_autoscale {
     AUTOSCALE_FIXMAX = 1<<3
 } t_autoscale;
 
+typedef enum e_constraint {
+    CONSTRAINT_NONE  = 0,
+    CONSTRAINT_LOWER = 1<<0,
+    CONSTRAINT_UPPER = 1<<1,
+    CONSTRAINT_BOTH  = (1<<0 | 1<<1)
+} t_constraint;
+    
 
 /* FIXME 20000725: collect some of those various TBOOLEAN fields into
  * a larger int (or -- shudder -- a bitfield?) */
@@ -197,6 +204,12 @@ typedef struct axis {
     double data_min;		/* Not necessarily the same as axis min */
     double data_max;
 
+/* range constraints */
+    t_constraint min_constraint;
+    t_constraint max_constraint;
+    double min_lb, min_ub;     /* min lower- and upper-bound */
+    double max_lb, max_ub;     /* min lower- and upper-bound */
+    
 /* output-related quantities */
     int term_lower;		/* low and high end of the axis on output, */
     int term_upper;		/* ... (in terminal coordinates)*/
@@ -242,6 +255,8 @@ typedef struct axis {
 	-10.0, 10.0,							    \
 	-10.0, 10.0,							    \
 	  0.0,  0.0,		/* and another min/max for the data */	    \
+	CONSTRAINT_NONE, CONSTRAINT_NONE,  /* min and max constraints */    \
+	0, 0, 0, 0,             /* lower and upper bound for min and max */ \
 	0, 0, 0, 0,		/* terminal dependents */		    \
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
 	0, 1,			/* is_timedata, format_numeric */	    \
@@ -587,9 +602,20 @@ do {									  \
     if ( VALUE<axis_array[AXIS].data_min )				  \
 	axis_array[AXIS].data_min = VALUE;				  \
     if ( VALUE<axis_array[AXIS].min ) {					  \
-	if (axis_array[AXIS].autoscale & AUTOSCALE_MIN)			  \
-	    axis_array[AXIS].min = VALUE;				  \
-	else {								  \
+	if (axis_array[AXIS].autoscale & AUTOSCALE_MIN)	{		  \
+            if (axis_array[AXIS].min_constraint & CONSTRAINT_LOWER) {     \
+                if (axis_array[AXIS].min_lb <= VALUE) {                   \
+                    axis_array[AXIS].min = VALUE;                         \
+                } else {                                                  \
+                    axis_array[AXIS].min = axis_array[AXIS].min_lb;       \
+                    TYPE = OUTRANGE;                                       \
+                    OUT_ACTION;                                           \
+                    break;                                                \
+                }                                                         \
+            } else {                                                      \
+	        axis_array[AXIS].min = VALUE;				  \
+	    }								  \
+	} else {							  \
 	    TYPE = OUTRANGE;						  \
 	    OUT_ACTION;							  \
 	    break;							  \
@@ -598,9 +624,20 @@ do {									  \
     if ( VALUE>axis_array[AXIS].data_max )				  \
 	axis_array[AXIS].data_max = VALUE;				  \
     if ( VALUE>axis_array[AXIS].max ) {					  \
-	if (axis_array[AXIS].autoscale & AUTOSCALE_MAX)			  \
-	    axis_array[AXIS].max = VALUE;				  \
-	else {								  \
+	if (axis_array[AXIS].autoscale & AUTOSCALE_MAX)	{		  \
+	    if (axis_array[AXIS].max_constraint & CONSTRAINT_UPPER) {     \
+                if (axis_array[AXIS].max_ub >= VALUE) {                   \
+                    axis_array[AXIS].max = VALUE;                         \
+                } else {                                                  \
+                    axis_array[AXIS].max = axis_array[AXIS].max_ub;       \
+                    TYPE =OUTRANGE;                                       \
+                    OUT_ACTION;                                           \
+                    break;                                                \
+                }                                                         \
+            } else {                                                      \
+	        axis_array[AXIS].max = VALUE;                             \
+            }                                                     	  \
+	} else {							  \
 	    TYPE = OUTRANGE;						  \
 	    OUT_ACTION;							  \
 	}								  \

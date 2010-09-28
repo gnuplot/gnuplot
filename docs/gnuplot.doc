@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.624 2010/09/18 22:00:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.625 2010/09/20 05:00:39 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11374,7 +11374,8 @@ Ffigure_mapcontours
        show xrange
 
  where <min> and <max> terms are constants, expressions or an asterisk to set
- autoscaling.  If the data are time/date, you must give the range as a quoted
+ autoscaling.  See below for full autoscaling syntax.  
+ If the data are time/date, you must give the range as a quoted
  string according to the `set timefmt` format.  Any value omitted will not be
  changed.
 
@@ -11385,6 +11386,22 @@ Ffigure_mapcontours
  [0:1] reverse` will produce an axis with 1 on the left and 0 on the right.
  This is identical to the axis produced by `set xrange [1:0]`, of course.
  `reverse` is intended primarily for use with `autoscale`.
+
+ Autoscaling:  If <min> (the same applies for correspondingly to <max>) is
+ an asterisk "*" autoscaling is turned on.  The range in which autoscaling
+ is being performed may be limited by a lower bound <lb> or an upper bound
+ <ub> or both.  The syntax is 
+       { <lb> < } * { < <ub> }
+ For example,
+       0 < * < 200
+ sets <lb> = 0 and <ub> = 200.  With such a setting <min> would be autoscaled,
+ but its final value will be between 0 and 200 (both inclusive despite the
+ '<' sign).  If no lower or upper bound is specified, the '<' to also be
+ ommited.  If <ub> is lower than <lb> the constraints will be turned off
+ and full autoscaling will happen.
+ This feature is useful to plot measured data with autoscaling but providing
+ a limit on the range, to clip outliers, or to guarantee a minimum range
+ that will be displayed even if the data would not need such a big range. 
 
  The `writeback` option essentially saves the range found by `autoscale` in
  the buffers that would be filled by `set xrange`.  This is useful if you wish
@@ -11436,6 +11453,20 @@ Ffigure_mapcontours
 
  To autoscale xmin while leaving xmax unchanged:
        set xrange [*:]
+
+ To autoscale xmin but keeping xmin positive:
+       set xrange [0<*:]
+
+ To autoscale x but keep minumum range of 10 to 50 (actual might be larger):
+       set xrange [*<10:50<*]
+
+ Autoscaling but limit maximum xrange to -1000 to 1000, i.e. autoscaling
+ within [-1000:1000]
+       set xrange [-1000<*:*<1000]
+
+ Make sure xmin is somwehere between -200 and 100:
+       set xrange [-200<*<100:]
+
 3 xtics
 ?commands set xtics
 ?commands unset xtics

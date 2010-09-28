@@ -1,3 +1,15 @@
+2010-09-28  Volker Dobler  <vdobler@users.sourceforge.net>
+
+	* src/axis.c (load_one_range load_range) src/axis.h
+	src/parse.c src/parse.h src/save.c src/set.c src/unset.c src/util.c
+	demo/all.dem demo/autoscale.dem docs/gnuplot.doc:
+
+	Introduce a mechanism for constraining the axis limits chosen during
+	autoscaling.  For example:
+	    set yrange [* : 100<*<200]
+	constrains autoscaling on y such that the upper range limit must fall
+	between 100 and 200.
+
 2010-09-27  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/datafile.c (f_stringcolumn): The stringcolumn function didn't 

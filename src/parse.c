@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.56 2008/09/09 06:05:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.57 2009/04/01 00:02:40 vanzandt Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -49,6 +49,7 @@ static TBOOLEAN string_result_only = FALSE;
 /* Exported globals: the current 'dummy' variable names */
 char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 char set_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1] = { "x", "y" };
+TBOOLEAN scanning_range_in_progress = FALSE;
 
 /* This is used by plot_option_using() */
 int at_highest_column_used = -1;
@@ -734,6 +735,11 @@ parse_relational_expression()
 	    accept_additive_expression();
 	    (void) add_action(GT);
 	} else if (equals(c_token, "<")) {
+	    /*  Workaround for * in syntax of range constraints  */
+	    if (scanning_range_in_progress && 
+		c_token+1<num_tokens && equals(c_token+1, "*") ) {
+		break;
+	    }
 	    c_token++;
 	    accept_additive_expression();
 	    (void) add_action(LT);

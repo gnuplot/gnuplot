@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.183 2010/07/08 04:54:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.184 2010/08/08 03:46:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1064,13 +1064,29 @@ save_range(FILE *fp, AXIS_INDEX axis)
 {
     fprintf(fp, "set %srange [ ", axis_defaults[axis].name);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
+	if (axis_array[axis].min_constraint & CONSTRAINT_LOWER ) {
+	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min_lb, axis);
+	    fputs(" < ", fp);
+	}
 	putc('*', fp);
+	if (axis_array[axis].min_constraint & CONSTRAINT_UPPER ) {
+	    fputs(" < ", fp);
+	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min_ub, axis);
+	}
     } else {
 	SAVE_NUM_OR_TIME(fp, axis_array[axis].set_min, axis);
     }
     fputs(" : ", fp);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
+	if (axis_array[axis].max_constraint & CONSTRAINT_LOWER ) {
+	    SAVE_NUM_OR_TIME(fp, axis_array[axis].max_lb, axis);
+	    fputs(" < ", fp);
+	}
 	putc('*', fp);
+	if (axis_array[axis].max_constraint & CONSTRAINT_UPPER ) {
+	    fputs(" < ", fp);
+	    SAVE_NUM_OR_TIME(fp, axis_array[axis].max_ub, axis);
+	}
     } else {
 	SAVE_NUM_OR_TIME(fp, axis_array[axis].set_max, axis);
     }

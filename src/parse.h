@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.18 2008/04/06 17:23:06 sfeam Exp $
+ * $Id: parse.h,v 1.19 2008/09/09 06:05:05 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -45,6 +45,7 @@
 /* externally usable types defined by parse.h */
 
 /* exported variables of parse.c */
+extern TBOOLEAN scanning_range_in_progress;
 
 /* The choice of dummy variables, as set by 'set dummy', 'set polar'
  * and 'set parametric' */

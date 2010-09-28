@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.136 2010/07/08 04:54:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.137 2010/09/16 05:56:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1674,6 +1674,9 @@ reset_command()
 	axis_array[axis].writeback_max = axis_array[axis].set_max
 	    = axis_defaults[axis].max;
 
+	axis_array[axis].min_constraint = CONSTRAINT_NONE;
+	axis_array[axis].max_constraint = CONSTRAINT_NONE;
+	
 	/* 'tics' default is on for some, off for the other axes: */
 	unset_tics(axis);
 	axis_array[axis].ticmode = axis_defaults[axis].ticmode;
