@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.342 2010/09/21 06:02:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.343 2010/09/27 19:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6052,7 +6052,7 @@ hyperplane_between_points(double *p1, double *p2, double *w, double *b)
  *  within some tolerance and they are aligned with the view
  *  box x and y directions, then use the image feature of the
  *  terminal if it has one.  Otherwise, use parallelograms via
- *  the polynomial function.  If it just necessary to update
+ *  the polynomial function.  If it is only necessary to update
  *  the axis ranges for `set autoscale`, do so and then return.
  */
 void
@@ -6097,6 +6097,12 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	int_warn(NO_CARET, "Image grid must be at least 4 points (2 x 2).\n\n");
 	return;
     }
+    
+    if (project_points && (X_AXIS.log || Y_AXIS.log || Z_AXIS.log)) {
+	int_warn(NO_CARET, "Log scaling of 3D image plots is not supported");
+	return;
+    }
+	
 
     /* Check if the pixel data forms a valid rectangular grid for potential image
      * matrix support.  A general grid orientation is considered.  If the grid
@@ -6104,6 +6110,10 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
      * function for images will be used.  Otherwise, the terminal function for
      * filled polygons are used to construct parallelograms for the pixel elements.
      */
+#define GRIDX(X) AXIS_DE_LOG_VALUE(((struct curve_points *)plot)->x_axis,points[X].x)
+#define GRIDY(Y) AXIS_DE_LOG_VALUE(((struct curve_points *)plot)->y_axis,points[Y].y)
+#define GRIDZ(Z) AXIS_DE_LOG_VALUE(((struct curve_points *)plot)->z_axis,points[Z].z)
+
 
     /* Compute the hyperplane representation of the cross diagonal from
      * the very first point of the scan to the very last point of the
@@ -6112,6 +6122,13 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     if (project_points) {
 	map3d_xy_double(points[0].x, points[0].y, points[0].z, &p_start_corner[0], &p_start_corner[1]);
 	map3d_xy_double(points[p_count-1].x, points[p_count-1].y, points[p_count-1].z, &p_end_corner[0], &p_end_corner[1]);
+
+    } else if (X_AXIS.log || Y_AXIS.log) {
+	p_start_corner[0] = GRIDX(0);
+	p_start_corner[1] = GRIDY(0);
+	p_end_corner[0] = GRIDX(p_count-1);
+	p_end_corner[1] = GRIDY(p_count-1);
+
     } else {
 	p_start_corner[0] = points[0].x;
 	p_start_corner[1] = points[0].y;
@@ -6125,6 +6142,9 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	double p[2];
 	if (project_points) {
 	    map3d_xy_double(points[i].x, points[i].y, points[i].z, &p[0], &p[1]);
+	} else if (X_AXIS.log || Y_AXIS.log) {
+	    p[0] = GRIDX(i);
+	    p[1] = GRIDY(i);
 	} else {
 	    p[0] = points[i].x;
 	    p[1] = points[i].y;
@@ -6154,7 +6174,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 
     if (K == p_count) {
 	int_warn(NO_CARET, "Image grid must be at least 2 x 2.\n\n");
-	return;
+	/* return; */
     }
     L = p_count/K;
     if (((double)L) != ((double)p_count/K)) {
@@ -6167,10 +6187,15 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     grid_corner[2] = p_count - K;
     if (project_points) {
 	map3d_xy_double(points[K-1].x, points[K-1].y, points[K-1].z, &p_mid_corner[0], &p_mid_corner[1]);
+    } else if (X_AXIS.log || Y_AXIS.log) {
+	p_mid_corner[0] = GRIDX(K-1);
+	p_mid_corner[1] = GRIDY(K-1);
+
     } else {
 	p_mid_corner[0] = points[K-1].x;
 	p_mid_corner[1] = points[K-1].y;
     }
+
     /* The grid spacing in one direction. */
     delta_x_grid[0] = (p_mid_corner[0] - p_start_corner[0])/(K-1);
     delta_y_grid[0] = (p_mid_corner[1] - p_start_corner[1])/(K-1);
@@ -6181,12 +6206,25 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     if (update_axes) {
 	for (i=0; i < 4; i++) {
 	    coord_type dummy_type = INRANGE;
-	    double x = points[grid_corner[i]].x;
-	    double y = points[grid_corner[i]].y;
+	    double x,y;
+
+	    if (X_AXIS.log || Y_AXIS.log) {
+	    x = GRIDX(i);
+	    y = GRIDY(i);
+	    x -= (GRIDX((5-i)%4) - GRIDX(i)) / (2*(K-1));
+	    y -= (GRIDY((5-i)%4) - GRIDY(i)) / (2*(K-1));
+	    x -= (GRIDX((i+2)%4) - GRIDX(i)) / (2*(L-1));
+	    y -= (GRIDY((i+2)%4) - GRIDY(i)) / (2*(L-1));
+	    
+	    } else {
+	    x = points[grid_corner[i]].x;
+	    y = points[grid_corner[i]].y;
 	    x -= (points[grid_corner[(5-i)%4]].x - points[grid_corner[i]].x)/(2*(K-1));
 	    y -= (points[grid_corner[(5-i)%4]].y - points[grid_corner[i]].y)/(2*(K-1));
 	    x -= (points[grid_corner[(i+2)%4]].x - points[grid_corner[i]].x)/(2*(L-1));
 	    y -= (points[grid_corner[(i+2)%4]].y - points[grid_corner[i]].y)/(2*(L-1));
+	    }
+
 	    /* Update range and store value back into itself. */
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(x, x, dummy_type, ((struct curve_points *)plot)->x_axis,
 				((struct curve_points *)plot)->noautoscale, NOOP, x = -VERYLARGE);
@@ -6230,6 +6268,10 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     }
     /* Use generic code to handle alpha channel if the terminal can't */
     if (pixel_planes == IC_RGBA && !(term->flags & TERM_ALPHA_CHANNEL))
+	fallback = TRUE;
+
+    /* Also use generic code if the pixels are of unequal size, e.g. log scale */
+    if (X_AXIS.log || Y_AXIS.log)
 	fallback = TRUE;
 
     view_port_x[0] = (X_AXIS.set_autoscale & AUTOSCALE_MIN) ? X_AXIS.min : X_AXIS.set_min;
@@ -6450,17 +6492,27 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	/* Use sum of vectors to compute the pixel corners with respect to its center. */
 	struct {double x; double y; double z;} delta_grid[2], delta_pixel[2];
 	int j, i_image;
+	TBOOLEAN log_axes = (X_AXIS.log || Y_AXIS.log);
 
 	if (!term->filled_polygon)
 	    int_error(NO_CARET, "This terminal does not support filled polygons");
 
 	/* Grid spacing in 3D space. */
-	delta_grid[0].x = (points[grid_corner[1]].x - points[grid_corner[0]].x)/(K-1);
-	delta_grid[0].y = (points[grid_corner[1]].y - points[grid_corner[0]].y)/(K-1);
-	delta_grid[0].z = (points[grid_corner[1]].z - points[grid_corner[0]].z)/(K-1);
-	delta_grid[1].x = (points[grid_corner[2]].x - points[grid_corner[0]].x)/(L-1);
-	delta_grid[1].y = (points[grid_corner[2]].y - points[grid_corner[0]].y)/(L-1);
-	delta_grid[1].z = (points[grid_corner[2]].z - points[grid_corner[0]].z)/(L-1);
+	if (log_axes) {
+	    delta_grid[0].x = (GRIDX(grid_corner[1]) - GRIDX(grid_corner[0])) / (K-1);
+	    delta_grid[0].y = (GRIDY(grid_corner[1]) - GRIDY(grid_corner[0])) / (K-1);
+	    delta_grid[0].z = (GRIDZ(grid_corner[1]) - GRIDZ(grid_corner[0])) / (K-1);
+	    delta_grid[1].x = (GRIDX(grid_corner[2]) - GRIDX(grid_corner[0])) / (L-1);
+	    delta_grid[1].y = (GRIDY(grid_corner[2]) - GRIDY(grid_corner[0])) / (L-1);
+	    delta_grid[1].z = (GRIDZ(grid_corner[2]) - GRIDZ(grid_corner[0])) / (L-1);
+	} else {
+	    delta_grid[0].x = (points[grid_corner[1]].x - points[grid_corner[0]].x)/(K-1);
+	    delta_grid[0].y = (points[grid_corner[1]].y - points[grid_corner[0]].y)/(K-1);
+	    delta_grid[0].z = (points[grid_corner[1]].z - points[grid_corner[0]].z)/(K-1);
+	    delta_grid[1].x = (points[grid_corner[2]].x - points[grid_corner[0]].x)/(L-1);
+	    delta_grid[1].y = (points[grid_corner[2]].y - points[grid_corner[0]].y)/(L-1);
+	    delta_grid[1].z = (points[grid_corner[2]].z - points[grid_corner[0]].z)/(L-1);
+	}
 
 	/* Pixel dimensions in the 3D space. */
 	delta_pixel[0].x = (delta_grid[0].x + delta_grid[1].x) / 2;
@@ -6476,9 +6528,15 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 
 	    double x_line_start, y_line_start, z_line_start;
 
-	    x_line_start = points[grid_corner[0]].x + j * delta_grid[1].x;
-	    y_line_start = points[grid_corner[0]].y + j * delta_grid[1].y;
-	    z_line_start = points[grid_corner[0]].z + j * delta_grid[1].z;
+	    if (log_axes) {
+		x_line_start = GRIDX(grid_corner[0]) + j * delta_grid[1].x;
+		y_line_start = GRIDY(grid_corner[0]) + j * delta_grid[1].y;
+		z_line_start = GRIDZ(grid_corner[0]) + j * delta_grid[1].z;
+	    } else {
+		x_line_start = points[grid_corner[0]].x + j * delta_grid[1].x;
+		y_line_start = points[grid_corner[0]].y + j * delta_grid[1].y;
+		z_line_start = points[grid_corner[0]].z + j * delta_grid[1].z;
+	    }
 
 	    for (i=0; i < K; i++) {
 
@@ -6541,8 +6599,13 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 				    corners[i_corners].x = x;
 				    corners[i_corners].y = y;
 			    } else {
-				    corners[i_corners].x = map_x(p_corners[i_corners].x);
-				    corners[i_corners].y = map_y(p_corners[i_corners].y);
+				    if (log_axes) {
+					corners[i_corners].x = map_x(AXIS_LOG_VALUE(x_axis,p_corners[i_corners].x));
+					corners[i_corners].y = map_y(AXIS_LOG_VALUE(y_axis,p_corners[i_corners].y));
+				    } else {
+					corners[i_corners].x = map_x(p_corners[i_corners].x);
+					corners[i_corners].y = map_y(p_corners[i_corners].y);
+				    }
 			    }
 			    /* Clip rectangle if necessary */
 			    if (rectangular_image && term->fillbox && corners_in_view < 4) {
