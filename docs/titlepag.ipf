@@ -4,9 +4,10 @@
 An Interactive Plotting Program
 Thomas Williams &amp. Colin Kelley
 
-Version 4.1 organized by: Hans-Bernhard Broeker and others
+Version 4.4 organized by: Hans-Bernhard Broeker, Ethan A Merrit, and others
 
 Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+Copyright (C) 2004 - 2010  various authors
 
 Mailing list for comments: gnuplot-info@lists.sourceforge.net  
 Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net
@@ -14,7 +15,7 @@ Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net
 Major contributors (alphabetic order):
 
     Hans-Bernhard Broeker
-    John Campbell        
+    John Campbell
     Robert Cunningham
     David Denholm
     Gershon Elber
