@@ -1,6 +1,8 @@
 #
 # Demonstrate explicit choice of both dot/dash pattern (linetype) and color (linecolor).
 #
+set termoption dash
+
 reset
 set xrange [-0.5:3.5]
 set yrange [-1:1.4]
