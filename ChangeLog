@@ -1,3 +1,7 @@
+2010-09-28  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/titlepage.ipf docs/titlepage.tex: Years updated.
+
 2010-09-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_image_or_update_axes): Add support for log-scale
