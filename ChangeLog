@@ -1,3 +1,12 @@
+2010-09-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c (draw_inside_color_smooth_box_bitmap):
+	The color box is constructed from 128 segments.  If any of these
+	straddles a boundary within a defined palette, split it into 2 segments
+	so that discrete color transitions are described with pixel accuracy.
+	This does not fix imprecision in the palette itself, which can result
+	if too few colors are allocated (set palette maxcolors).
+
 2010-09-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/titlepage.ipf docs/titlepage.tex: Years updated.

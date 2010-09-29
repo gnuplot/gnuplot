@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.85.2.2 2009/08/02 23:38:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.85.2.3 2009/11/04 16:10:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -353,17 +353,18 @@ draw_inside_color_smooth_box_postscript(FILE * out)
 
 
 
-/* plot the colour smooth box for from terminal's integer coordinates
+/* plot a colour smooth box bounded by the terminal's integer coordinates
    [x_from,y_from] to [x_to,y_to].
-   This routine is for non-postscript files, as it does explicitly the loop
+   This routine is for non-postscript files, as it does an explicit loop
    over all thin rectangles
  */
 static void
 draw_inside_color_smooth_box_bitmap(FILE * out)
 {
     int steps = 128; /* I think that nobody can distinguish more colours drawn in the palette */
-    int i, xy, xy2, xy_from, xy_to;
-    double xy_step, gray;
+    int i, j, xy, xy2, xy_from, xy_to;
+    int jmin = 0;
+    double xy_step, gray, range;
     gpiPoint corners[4];
 
     (void) out;			/* to avoid "unused parameter" warning */
@@ -372,22 +373,47 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
 	corners[1].x = corners[2].x = color_box.bounds.xright;
 	xy_from = color_box.bounds.ybot;
 	xy_to = color_box.bounds.ytop;
+	xy_step = (color_box.bounds.ytop - color_box.bounds.ybot) / (double)steps;
     } else {
 	corners[0].y = corners[1].y = color_box.bounds.ybot;
 	corners[2].y = corners[3].y = color_box.bounds.ytop;
 	xy_from = color_box.bounds.xleft;
 	xy_to = color_box.bounds.xright;
+	xy_step = (color_box.bounds.xright - color_box.bounds.xleft) / (double)steps;
     }
-    xy_step = (color_box.rotation == 'h' ? color_box.bounds.xright - color_box.bounds.xleft : color_box.bounds.ytop - color_box.bounds.ybot) / (double) steps;
+    range = (xy_to - xy_from);
 
-    for (i = 0; i < steps; i++) {
-	gray = (double) i / steps;	/* colours equidistantly from [0,1] */
+    for (i = 0, xy2 = xy_from-1; i < steps; i++) {
+
+	/* Start from one pixel beyond the previous box */
+	xy = xy2+1;
+	xy2 = xy_from + (int) (xy_step * (i + 1));
+
+	/* Set the colour for the next range increment */
+	gray = (double)(xy - xy_from) / range;
 	if (sm_palette.positive == SMPAL_NEGATIVE)
 	    gray = 1 - gray;
-	/* Set the colour (also for terminals which support extended specs). */
 	set_color(gray);
-	xy = xy_from + (int) (xy_step * i);
-	xy2 = xy_from + (int) (xy_step * (i + 1));
+
+	/* If this is a defined palette, make sure that the range increment */
+	/* does not straddle a palette segment boundary. If it does, split  */
+	/* it into two parts.                                               */
+	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT)
+	    for (j=jmin; j<sm_palette.gradient_num; j++) {
+		int boundary = xy_from + (int)(sm_palette.gradient[j].pos * range);
+		if (xy >= boundary) {
+		    jmin = j;
+		} else {
+		    if (xy2 > boundary) {
+			xy2 = boundary;
+			i--;
+			break;
+		    }
+		}
+		if (xy2 < boundary)
+		    break;
+	    }
+
 	if (color_box.rotation == 'v') {
 	    corners[0].y = corners[1].y = xy;
 	    corners[2].y = corners[3].y = (i == steps - 1) ? xy_to : xy2;
@@ -396,9 +422,8 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
 	    corners[1].x = corners[2].x = (i == steps - 1) ? xy_to : xy2;
 	}
 #ifdef EXTENDED_COLOR_SPECS
-	if (supply_extended_color_specs) {
+	if (supply_extended_color_specs)
 	    corners[0].spec.gray = -1;	/* force solid color */
-	}
 #endif
 	/* print the rectangle with the given colour */
 	if (default_fillstyle.fillstyle == FS_EMPTY)

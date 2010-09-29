@@ -4,6 +4,7 @@ New features, changes and fixes in gnuplot version 4.4.3
 * NEW set key maxcolumns N maxrows M
 * NEW value("varname") returns the value of the named variable
 * FIX better estimation of latex string lengths
+* FIX colorbar representation of discrete color palettes is pixel accurate
 
 New features, changes and fixes in gnuplot version 4.4.2
 ========================================================
