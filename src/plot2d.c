@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.226 2010/09/21 03:07:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.227 2010/09/21 03:58:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1420,18 +1420,20 @@ store_label(
 	tl->textcolor = lptmp.pm3d_color;
     }
 
-    /* Check for optional (point linecolor palette ...) */
-    if (tl->lp_properties.pm3d_color.type == TC_Z)
-	tl->lp_properties.pm3d_color.value = colorval;
-    /* Check for optional (point linecolor rgb variable) */
-    else if (listhead->lp_properties.pm3d_color.type == TC_RGB 
-	     && listhead->lp_properties.pm3d_color.value < 0)
-	tl->lp_properties.pm3d_color.lt = colorval;
-    /* Check for optional (point linecolor variable) */
-    else if (listhead->lp_properties.l_type == LT_COLORFROMCOLUMN) {
-	struct lp_style_type lptmp;
-	load_linetype(&lptmp, (int)colorval);
-	tl->lp_properties.pm3d_color = lptmp.pm3d_color;
+    if (listhead->lp_properties.pointflag > 0) {
+	/* Check for optional (point linecolor palette ...) */
+	if (tl->lp_properties.pm3d_color.type == TC_Z)
+	    tl->lp_properties.pm3d_color.value = colorval;
+	/* Check for optional (point linecolor rgb variable) */
+	else if (listhead->lp_properties.pm3d_color.type == TC_RGB 
+		&& listhead->lp_properties.pm3d_color.value < 0)
+	    tl->lp_properties.pm3d_color.lt = colorval;
+	/* Check for optional (point linecolor variable) */
+	else if (listhead->lp_properties.l_type == LT_COLORFROMCOLUMN) {
+	    struct lp_style_type lptmp;
+	    load_linetype(&lptmp, (int)colorval);
+	    tl->lp_properties.pm3d_color = lptmp.pm3d_color;
+	}
     }
     
 
@@ -2188,7 +2190,8 @@ eval_plots()
 		/* We want to trigger the variable color mechanism even if 
 		 * there was no 'textcolor variable/palette/rgb var' , 
 		 * but there was a 'point linecolor variable/palette/rgb var'. */
-		if (this_plot->labels->textcolor.type != TC_Z
+		if (this_plot->labels->lp_properties.pointflag > 0
+		&& this_plot->labels->textcolor.type != TC_Z
 		&& this_plot->labels->textcolor.type != TC_VARIABLE
 		&& (this_plot->labels->textcolor.type != TC_RGB 
 		 || this_plot->labels->textcolor.value >= 0)) {
