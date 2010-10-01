@@ -4,6 +4,20 @@
 	structure containing dynamically allocated data is reused for a later
 	plot.
 
+	* src/color.c (make_palette) src/getcolor.c (rgb1maxcolors_from_gray)
+	docs/gnuplot.doc:
+	Revamp the interaction of `set palette maxcolors` and defined palettes.
+	Up until now, `set palette maxcolors N` meant both "allocate N colors"
+	and "divide the color range into N equal parts".  This meant that a
+	user-defined palette that used unequal divisions of the total range
+	interacted badly with a limited number of palette colors.  Now we 
+	guarantee that in the case of defined palette ranges, a gray value is
+	never mapped to a color outside its proper range even if the ranges
+	are very unevenly spaced.  If more color ranges are defined than the
+	value of maxcolors, this may (or may not) result in increasing the
+	effective value of maxcolors.  Terminals that strictly enforce
+	maxcolors post facto (e.g. x11) do not benefit from this change.
+
 2010-09-30  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/plot2d.c (store_label eval_plots): Fix bug introduced by my patch

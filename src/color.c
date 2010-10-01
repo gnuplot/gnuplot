@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.89 2010/09/30 03:47:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.90 2010/10/01 04:25:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -123,8 +123,12 @@ make_palette()
 
     /* set the number of colours to be used (allocated) */
     sm_palette.colors = i;
-    if (sm_palette.use_maxcolors > 0 && i > sm_palette.use_maxcolors)
-	sm_palette.colors = sm_palette.use_maxcolors;
+    if (sm_palette.use_maxcolors > 0) {
+	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT)
+	    sm_palette.colors = i;	/* EAM Sep 2010 - could this be a constant? */
+	else if (i > sm_palette.use_maxcolors)
+	    sm_palette.colors = sm_palette.use_maxcolors;
+    }
 
     if (prev_palette.colorFormulae < 0
 	|| sm_palette.colorFormulae != prev_palette.colorFormulae
@@ -136,7 +140,8 @@ make_palette()
 	|| sm_palette.colors != prev_palette.colors) {
 	/* print the message only if colors have changed */
 	if (interactive)
-	fprintf(stderr, "smooth palette in %s: available %i color positions; using %i of them\n", term->name, i, sm_palette.colors);
+	    fprintf(stderr, "smooth palette in %s: using %i of %i available color positions\n",
+	    		term->name, sm_palette.colors, i);
     }
 
     prev_palette = sm_palette;
