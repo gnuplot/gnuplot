@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.243 2010/08/13 23:36:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.244 2010/08/30 18:29:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3239,12 +3239,9 @@ disp_value(FILE *fp, struct value *val, TBOOLEAN need_quotes)
 	fprintf(fp, "%d", val->v.int_val);
 	break;
     case CMPLX:
-#ifdef HAVE_ISNAN
 	if (isnan(val->v.cmplx_val.real))
 	    fprintf(fp, "NaN");
-	else
-#endif
-	if (val->v.cmplx_val.imag != 0.0)
+	else if (val->v.cmplx_val.imag != 0.0)
 	    fprintf(fp, "{%s, %s}",
 		    num_to_str(val->v.cmplx_val.real),
 		    num_to_str(val->v.cmplx_val.imag));

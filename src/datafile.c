@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.190 2010/09/09 03:17:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.191 2010/09/27 20:24:46 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -787,10 +787,9 @@ df_tokenise(char *s)
 	    }
 
 	    df_column[df_no_cols].good = count == 1 ? DF_GOOD : DF_BAD;
-#ifdef HAVE_ISNAN
+
 	    if (isnan(df_column[df_no_cols].datum))
 		df_column[df_no_cols].good = DF_BAD;
-#endif
 	}
 
 	++df_no_cols;

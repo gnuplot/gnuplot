@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.118 2010/08/10 05:40:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.119 2010/08/13 23:36:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -418,11 +418,9 @@ main(int argc, char **argv)
 
     /* Initialize pre-loaded user variables */
     (void) Gcomplex(&udv_pi.udv_value, M_PI, 0.0);
-#ifdef HAVE_ISNAN
     udv_NaN = add_udv_by_name("NaN");
     (void) Gcomplex(&(udv_NaN->udv_value), not_a_number(), 0.0);
     udv_NaN->udv_undef = FALSE;
-#endif
 
     init_memory();
 

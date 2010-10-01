@@ -18,6 +18,12 @@
 	effective value of maxcolors.  Terminals that strictly enforce
 	maxcolors post facto (e.g. x11) do not benefit from this change.
 
+	* configure.in src/datafile.c src/eval.c src/plot.c src/show.c
+	term/lua.trm:  Remove conditional flag HAVE_ISNAN.
+	Apparently we have been getting along OK with an unprotected call 
+	to isnan() since Oct 2009.  That would seem to be good evidence 
+	that we can remove the #ifdef protection elsewhere as well.
+
 2010-09-30  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/plot2d.c (store_label eval_plots): Fix bug introduced by my patch
