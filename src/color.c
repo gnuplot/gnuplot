@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.85.2.3 2009/11/04 16:10:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.90 2010/10/01 04:25:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -413,6 +413,9 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
 		if (xy2 < boundary)
 		    break;
 	    }
+
+	/* Overlap by 1 pixel because otherwise some terminals show a gap */
+	xy--;
 
 	if (color_box.rotation == 'v') {
 	    corners[0].y = corners[1].y = xy;
