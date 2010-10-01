@@ -1,3 +1,9 @@
+2010-10-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (cp_free): Prevent use-after-free error if a plot
+	structure containing dynamically allocated data is reused for a later
+	plot.
+
 2010-09-30  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/plot2d.c (store_label eval_plots): Fix bug introduced by my patch

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.227 2010/09/21 03:58:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.228 2010/09/30 21:30:05 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -164,14 +164,16 @@ cp_free(struct curve_points *cp)
     while (cp) {
 	struct curve_points *next = cp->next;
 
-	if (cp->title)
-	    free(cp->title);
-	if (cp->points)
-	    free(cp->points);
+	free(cp->title);
+	cp->title = NULL;
+	free(cp->points);
+	cp->points = NULL;
+	free(cp->varcolor);
+	cp->varcolor = NULL;
 	if (cp->labels)
 	    free_labels(cp->labels);
-	if (cp->varcolor)
-	    free(cp->varcolor);
+	cp->labels = NULL;
+
 	free(cp);
 	cp = next;
     }

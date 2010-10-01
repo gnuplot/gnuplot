@@ -4,7 +4,7 @@
 An Interactive Plotting Program
 Thomas Williams &amp. Colin Kelley
 
-Version 4.4 organized by: Hans-Bernhard Broeker, Ethan A Merrit, and others
+Version 4.4 organized by: Hans-Bernhard Broeker, Ethan A Merritt, and others
 
 Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 Copyright (C) 2004 - 2010  various authors
