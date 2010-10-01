@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.24 2006/02/21 09:14:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.25 2010/10/01 21:06:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -393,10 +393,12 @@ rgb1maxcolors_from_gray(double gray, rgb_color *color)
 	double degray = floor(gray * sm_palette.use_maxcolors)
 			/ (sm_palette.use_maxcolors-1);
 
-	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT && degray != 0) {
+	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT) {
 	    int j;
 
-	    for (j=0; j<sm_palette.gradient_num; j++) {
+	    if ((sm_palette.gradient_num <= 2) && (degray == 0))
+	    	; /* Backward compatibility with common case of 1 segment */
+	    else for (j=0; j<sm_palette.gradient_num; j++) {
 		if ((gray >= sm_palette.gradient[j].pos)
 		&&  (gray <  sm_palette.gradient[j+1].pos)) {
 		    if ((degray <= sm_palette.gradient[j].pos)
