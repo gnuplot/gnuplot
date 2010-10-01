@@ -13,10 +13,12 @@ New features, changes and fixes since gnuplot version 4.4
 * NEW "set key opaque" produces a key with an opaque background
 * NEW ISO-IEC-80000 prefixes (ki Mi Gi etc) available as gprintf formats %b %B
 * FIX length estimation of UTF-8 strings
+* FIX accurate placement of color boundaries in the colorbar
 * CHANGE 3D zoom using middle mouse button is now a logarithmic response
 * CHANGE 3D impulses are now always drawn from z=0
 * CHANGE remove vestigial code supporting Amiga, Apollo, and 16-bit MSDOS/WIN
 * CHANGE extend formats x/X/o/O to 64 bits if necessary to represent the value
+* CHANGE "set palette maxcolors" no longer fights with "set palette defined"
 
 New features, changes and fixes in gnuplot version 4.4.0
 ========================================================
