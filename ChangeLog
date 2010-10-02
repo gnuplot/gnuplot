@@ -1,3 +1,9 @@
+2010-10-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stdfn.c (not_a_number): Although DJGPP version 2.04 supposedly
+	supports atod("NaN"), this version is not universal. Switch to using
+	an explicit bit pattern instead.
+
 2010-09-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (draw_inside_color_smooth_box_bitmap):
