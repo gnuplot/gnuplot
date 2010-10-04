@@ -1,7 +1,7 @@
 2010-10-02  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/stdfn.c (not_a_number): Although DJGPP version 2.04 supposedly
-	supports atod("NaN"), this version is not universal. Switch to using
+	* src/stdfn.c (not_a_number): Although DJGPP version 2.04 is reported
+	to support atod("NaN"), this version is not universal. Switch to using
 	an explicit bit pattern for NaN.
 
 2010-10-01  Ethan A Merritt  <merritt@u.washington.edu>
