@@ -1,3 +1,9 @@
+2010-10-04  Matthew Biggar  <biggarm@users.sourceforge.net>
+
+	* src/Makefile.am src/alloc.c:  Architecture (Alpha) specific work-
+	around to insure that gp_malloc() does fail on error if 0 bytes are
+	successfully allocated.
+
 2010-10-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/stdfn.c (not_a_number): Although DJGPP version 2.04 supposedly

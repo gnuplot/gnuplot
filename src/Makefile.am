@@ -90,7 +90,7 @@ gnuplot_SOURCES += wxterminal/gp_cairo.c wxterminal/gp_cairo_helpers.c
 endif
 
 clean-demo:
-	rm -vf $(GNUPLOT_X11)
+	rm -f $(GNUPLOT_X11)
 
 clean-local: clean-demo
 
