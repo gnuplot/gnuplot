@@ -125,7 +125,7 @@ clean-qt-extra:
 
 # Clean transform gnuplot_x11 for demo
 clean-demo:
-	rm -vf $(GNUPLOT_X11)
+	rm -f $(GNUPLOT_X11)
 
 clean-local: clean-qt-extra clean-demo
 
