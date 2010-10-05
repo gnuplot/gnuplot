@@ -4,6 +4,10 @@
 	Continuation of defined palette revamp (2010-10-01). Break out the
 	new code into a separate subroutine that can be shared with gnuplot_x11.
 
+	* term/post.trm term/pslatex.trm term/svg.trm term/PostScript/cp1251.ps
+	src/term_api.h src/term.c docs/gnuplot.doc: Add support for codepage 1251,
+	an alternative 8-bit Cyrillic encoding.
+
 2010-10-04  Matthew Biggar  <biggarm@users.sourceforge.net>
 
 	* src/Makefile.am src/alloc.c:  Architecture (Alpha) specific work-
