@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.25 2010/10/01 21:06:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.26 2010/10/01 23:32:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -389,31 +389,36 @@ rgb255_from_rgb1(rgb_color rgb1, rgb255_color *rgb255)
 void
 rgb1maxcolors_from_gray(double gray, rgb_color *color)
 {
-    if (sm_palette.use_maxcolors != 0) {
-	double degray = floor(gray * sm_palette.use_maxcolors)
-			/ (sm_palette.use_maxcolors-1);
-
-	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT) {
-	    int j;
-
-	    if ((sm_palette.gradient_num <= 2) && (degray == 0))
-	    	; /* Backward compatibility with common case of 1 segment */
-	    else for (j=0; j<sm_palette.gradient_num; j++) {
-		if ((gray >= sm_palette.gradient[j].pos)
-		&&  (gray <  sm_palette.gradient[j+1].pos)) {
-		    if ((degray <= sm_palette.gradient[j].pos)
-		    ||  (degray > sm_palette.gradient[j+1].pos))
-			degray = (sm_palette.gradient[j].pos
-				+ sm_palette.gradient[j+1].pos) / 2.;
-		}
-		if (gray < sm_palette.gradient[j+1].pos)
-		    break;
-	    }
-	}
-	gray = degray;
-    }
+    if (sm_palette.use_maxcolors != 0)
+	gray = quantize_gray(gray);
 
     rgb1_from_gray(gray, color);
+}
+
+double 
+quantize_gray( double gray )
+{
+    double degray = floor(gray * sm_palette.use_maxcolors)
+			/ (sm_palette.use_maxcolors-1);
+
+    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT) {
+	int j;
+	if ((sm_palette.gradient_num <= 2) && (degray == 0))
+	    ; /* Backward compatibility with common case of 1 segment */
+	else for (j=0; j<sm_palette.gradient_num; j++) {
+	    if ((gray >= sm_palette.gradient[j].pos)
+	    &&  (gray <  sm_palette.gradient[j+1].pos)) {
+		if ((degray <= sm_palette.gradient[j].pos)
+		||  (degray > sm_palette.gradient[j+1].pos))
+		    degray = (sm_palette.gradient[j].pos
+			    + sm_palette.gradient[j+1].pos) / 2.;
+	    }
+	    if (gray < sm_palette.gradient[j+1].pos)
+		break;
+	}
+    }
+
+    return degray;	
 }
 
 

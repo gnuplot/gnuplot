@@ -1,3 +1,9 @@
+2010-10-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/getcolor.c (quantize_gray) src/getcolor.h src/gplt_x11.c:
+	Continuation of defined palette revamp (2010-10-01). Break out the
+	new code into a separate subroutine that can be shared with gnuplot_x11.
+
 2010-10-04  Matthew Biggar  <biggarm@users.sourceforge.net>
 
 	* src/Makefile.am src/alloc.c:  Architecture (Alpha) specific work-
@@ -27,8 +33,8 @@
 	never mapped to a color outside its proper range even if the ranges
 	are very unevenly spaced.  If more color ranges are defined than the
 	value of maxcolors, this may (or may not) result in increasing the
-	effective value of maxcolors.  Terminals that strictly enforce
-	maxcolors post facto (e.g. x11) do not benefit from this change.
+	effective value of maxcolors.  Outboard terminals that enforce maxcolors
+	(e.g. x11) do not yet benefit from this change.
 
 	* configure.in src/datafile.c src/eval.c src/plot.c src/show.c
 	term/lua.trm:  Remove conditional flag HAVE_ISNAN.
