@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.90 2010/10/01 04:25:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.91 2010/10/01 21:06:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -388,14 +388,15 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
     }
     range = (xy_to - xy_from);
 
-    for (i = 0, xy2 = xy_from-1; i < steps; i++) {
+    for (i = 0, xy2 = xy_from; i < steps; i++) {
 
 	/* Start from one pixel beyond the previous box */
-	xy = xy2+1;
+	xy = xy2;
 	xy2 = xy_from + (int) (xy_step * (i + 1));
 
 	/* Set the colour for the next range increment */
-	gray = (double)(xy - xy_from) / range;
+	/* FIXME - The "1 +" seems wrong, yet it improves the placement in gd */
+	gray = (double)(1 + xy - xy_from) / range;
 	if (sm_palette.positive == SMPAL_NEGATIVE)
 	    gray = 1 - gray;
 	set_color(gray);
@@ -419,15 +420,12 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
 		    break;
 	    }
 
-	/* Overlap by 1 pixel because otherwise some terminals show a gap */
-	xy--;
-
 	if (color_box.rotation == 'v') {
 	    corners[0].y = corners[1].y = xy;
-	    corners[2].y = corners[3].y = (i == steps - 1) ? xy_to : xy2;
+	    corners[2].y = corners[3].y = GPMIN(xy_to,xy2+1);
 	} else {
 	    corners[0].x = corners[3].x = xy;
-	    corners[1].x = corners[2].x = (i == steps - 1) ? xy_to : xy2;
+	    corners[1].x = corners[2].x = GPMIN(xy_to,xy2+1);
 	}
 #ifdef EXTENDED_COLOR_SPECS
 	if (supply_extended_color_specs)

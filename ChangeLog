@@ -4,6 +4,11 @@
 	Continuation of defined palette revamp (2010-10-01). Break out the
 	new code into a separate subroutine that can be shared with gnuplot_x11.
 
+	* src/color.c (draw_inside_color_smooth_box_bitmap):
+	Assign colors to component colorbox rectangles by rounding the pixel
+	coordinate up rather than down.  This empirically gives better results
+	in gd.trm, and doesn't seem to hurt other terminals.
+
 	* term/post.trm term/pslatex.trm term/svg.trm term/PostScript/cp1251.ps
 	src/term_api.h src/term.c docs/gnuplot.doc: Add support for codepage 1251,
 	an alternative 8-bit Cyrillic encoding.
