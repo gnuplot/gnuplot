@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.323 2010/09/16 05:56:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.324 2010/09/28 17:14:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3297,15 +3297,15 @@ set_pm3d()
 		pm3d.ftriangles = 0;
 		continue;
 	    /* pm3d-specific hidden line overwrite */
-	    case S_PM3D_HIDDEN: { /* "hi$dden3d" */
+	    case S_PM3D_HIDDEN: /* "hi$dden3d" */
 		c_token++;
-		pm3d.hidden3d_tag = int_expression();
+		pm3d.hidden3d_tag = -1;
+		if (isanumber(c_token) || type_udv(c_token)==INTGR) {
+		    pm3d.hidden3d_tag = int_expression();
+		    if (pm3d.hidden3d_tag < -1)
+			pm3d.hidden3d_tag = -1;
+		}
 		--c_token;
-		if (pm3d.hidden3d_tag <= 0) {
-		    pm3d.hidden3d_tag = 0;
-		    int_error(c_token,"tag must be strictly positive (see `help set style line')");
-		}
-		}
 		continue;
 	    case S_PM3D_NOHIDDEN: /* "nohi$dden3d" */
 		pm3d.hidden3d_tag = 0;

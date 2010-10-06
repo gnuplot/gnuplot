@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.184 2010/08/08 03:46:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.185 2010/09/28 17:14:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -835,8 +835,8 @@ set origin %g,%g\n",
     }
     fputs((pm3d.ftriangles ? " " : " no"), fp);
     fputs("ftriangles", fp);
-    if (pm3d.hidden3d_tag) fprintf(fp," hidden3d %d", pm3d.hidden3d_tag);
-	else fputs(" nohidden3d", fp);
+    if (pm3d.hidden3d_tag > 0) fprintf(fp," hidden3d %d", pm3d.hidden3d_tag);
+	else fputs(pm3d.hidden3d_tag ? " hidden3d" : " nohidden3d", fp);
     fputs(" corners2color ", fp);
     switch (pm3d.which_corner_color) {
 	case PM3D_WHICHCORNER_MEAN:    fputs("mean", fp); break;

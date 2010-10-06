@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.91 2010/10/01 21:06:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.92 2010/10/06 19:06:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -211,16 +211,11 @@ void ifilled_quadrangle(gpiPoint* icorners)
     term->filled_polygon(4, icorners);
 
     if (pm3d.hidden3d_tag) {
-
 	int i;
 
-	/* Colour has changed, so we must apply line properties again.
-	 * FIXME: It would be cleaner to apply the general line properties
-	 * outside this loop, and limit ourselves to apply_pm3dcolor().
-	 */
-	static struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
-	lp_use_properties(&lp, pm3d.hidden3d_tag);
-	term_apply_lp_properties(&lp);
+	if (pm3d.hidden3d_tag) {
+	    apply_pm3dcolor(&pm3d_border_lp.pm3d_color, term);
+	}
 
 	term->move(icorners[0].x, icorners[0].y);
 	for (i = 3; i >= 0; i--) {

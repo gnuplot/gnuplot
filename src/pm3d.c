@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.78 2010/03/14 22:44:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.79 2010/06/29 20:01:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -31,6 +31,8 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.78 2010/03/14 22:44:38 sfea
 
 #include <stdlib.h> /* qsort() */
 
+/* Needed by routine fill_quadrangle() in color.c */
+struct lp_style_type pm3d_border_lp;
 
 /*
   Global options for pm3d algorithm (to be accessed by set / show).
@@ -424,6 +426,12 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
     if (this_plot == NULL)
 	return;
+
+    /* Apply and save the user-requested line properties */
+    pm3d_border_lp = this_plot->lp_properties;
+    if (pm3d.hidden3d_tag > 0)
+	lp_use_properties(&pm3d_border_lp, pm3d.hidden3d_tag);
+    term_apply_lp_properties(&pm3d_border_lp);
 
     if (at_which_z != PM3D_AT_BASE && at_which_z != PM3D_AT_TOP && at_which_z != PM3D_AT_SURFACE)
 	return;

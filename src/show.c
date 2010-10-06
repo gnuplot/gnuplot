@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.244 2010/08/30 18:29:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.245 2010/10/01 23:10:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2414,11 +2414,11 @@ show_pm3d()
 	fputs("at least 1 point of the quadrangle in x,y ranges\n", stderr);
     else
 	fputs( "all 4 points of the quadrangle in x,y ranges\n", stderr);
-    if (pm3d.hidden3d_tag) {
-	fprintf(stderr,"\tpm3d-hidden3d is on an will use linestyle %d\n",
+    if (pm3d.hidden3d_tag > 0) {
+	fprintf(stderr,"\tpm3d-hidden3d is on and will use linestyle %d\n",
 	    pm3d.hidden3d_tag);
     } else {
-	fputs("\tpm3d-hidden3d is off\n", stderr);
+	fprintf(stderr,"\tpm3d-hidden3d is %s\n", pm3d.hidden3d_tag ? "on" : "off");
     }
 
     fprintf(stderr,"\tsteps for bilinear interpolation: %d,%d\n",

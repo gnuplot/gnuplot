@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.627 2010/10/01 21:06:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.628 2010/10/06 05:44:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9340,32 +9340,61 @@ Ffigure_mapcontours
 ?show pm3d
 ?pm3d
  pm3d is an `splot` style for drawing palette-mapped 3d and 4d data as
- color/gray maps and surfaces.  It uses a pm3d algorithm which allows plotting
+ color/gray maps and surfaces.  It uses an algorithm that allows plotting
  gridded as well as non-gridded data without preprocessing, even when the data
  scans do not have the same number of points.
 
- Drawing of color surfaces is available on terminals supporting filled colored
- polygons with color mapping specified by `palette`. Currently supported
- terminals include
+ Syntax (the options can be given in any order):
+       set pm3d {
+                  { at <position> }
+                  { interpolate <steps/points in scan, between scans> }
+                  { scansautomatic | scansforward | scansbackward | depthorder }
+                  { flush { begin | center | end } }
+                  { ftriangles | noftriangles }
+                  { clip1in | clip4in }
+                  { corners2color { mean|geomean|median|min|max|c1|c2|c3|c4 } }
+                  { hidden3d {<linestyle>} | nohidden3d }
+                  { implicit | explicit }
+                  { map }
+                }
+       show pm3d
+       unset pm3d
 
-   Screen terminals:
-     OS/2 Presentation Manager
-     X11
-     Linux VGA (vgagl)
-     GGI
-     Windows
-     AquaTerm (Mac OS X)
-     wxWidgets (wxt)
-   Files:
-     PostScript
-     pslatex, pstex, epslatex
-     gif, png, jpeg
-     (x)fig
-     tgif
-     cgm
-     pdf
-     svg
-     emf
+ A pm3d color surface is drawn if the splot command specifies `with pm3d`,  
+ if the data or function `style` is set to pm3d globally, or if the pm3d mode is
+ `set pm3d implicit`.  In the latter two cases, the pm3d surface is draw in
+ addition to the mesh produced byt the style specified in the plot command. E.g.
+       splot 'fred.dat' with lines, 'lola.dat' with lines
+ would draw both a mesh of lines and a pm3d surface for each data set.
+ If the option `explicit` is on (or `implicit` is off) only plots specified
+ by the `with pm3d` attribute are plotted with a pm3d surface, e.g.:
+       splot 'fred.dat' with lines, 'lola.dat' with pm3d
+ would plot 'fred.dat' with lines (only) and 'lola.dat' with a pm3d surface.
+
+ On gnuplot start-up, the mode is `explicit`. For historical and compatibility
+ reasons, the commands `set pm3d;` (i.e. no options) and `set pm3d at X ...`
+ (i.e.  `at` is the first option) set change the mode to `implicit`.
+ The command `set pm3d;` sets other options to their default state.
+
+ If you set the default data or function style to `pm3d`, e.g.:
+       set style data pm3d
+ then the options `implicit` and `explicit` have no effect.
+
+ Note that when plotting several plots, they are plotted in the order given
+ on the command line. This can be of interest especially for filled surfaces
+ which can overwrite and therefore hide part of earlier plots.
+
+ The pm3d coloring can be drawn at any or all of three different positions,
+ `top`, `bottom`, or `surface`. See `pm3d position`.
+ The following command draws three color surfaces at different altitudes:
+       set border 4095
+       set pm3d at s
+       splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
+
+ See also help for `set palette`, `set cbrange`, `set colorbox`, 
+ and definitely the demo file `demo/pm3d.dem`.
+4 algorithm
+?pm3d algorithm
 
  Let us first describe how a map/surface is drawn.  The input data come from an
  evaluated function or from an `splot data file`.  Each surface consists of a
@@ -9410,28 +9439,8 @@ Ffigure_mapcontours
 
  3. To use pm3d coloring to generate a two-dimensional plot rather than a 3D
  surface, use `set view map` or `set pm3d map`.
-
- Syntax (the options can be given in any order):
-       set pm3d {
-                  { at <bst combination> }
-                  { interpolate <steps/points in scan, between scans> }
-                  { scansautomatic | scansforward | scansbackward | depthorder }
-                  { flush { begin | center | end } }
-                  { ftriangles | noftriangles }
-                  { clip1in | clip4in }
-                  { corners2color { mean|geomean|median|min|max|c1|c2|c3|c4 } }
-                  { hidden3d <linestyle> | nohidden3d }
-                  { implicit | explicit }
-                  { map }
-                }
-       show pm3d
-       unset pm3d
-
- Color surface is drawn if data or function `style` is set to pm3d globally or
- via 'with' option, or if the option `implicit` is on---then the pm3d surface
- is combined with the line surface mesh. See bottom of this section for mode
- details.
-
+4 position
+?pm3d position
  Color surface can be drawn at the base or top (then it is a gray/color planar
  map) or at z-coordinates of surface points (gray/color surface).  This is
  defined by the `at` option with a string of up to 6 combinations of `b`, `t`
@@ -9447,8 +9456,22 @@ Ffigure_mapcontours
  order.  On the other hand, the `depthorder` option completely reorders the
  quadrangles. The rendering is performed after a depth sorting, which allows to
  visualize even complicated surfaces; see `pm3d depthorder` for more details.
+4 scanorder
+?pm3d scanorder
+?pm3d depthorder
+?pm3d flush
+?depthorder
+=flush
+=scansforward
+=scansbackward
+=scansautomatic
+=depthorder
+ By default the quadrangles making up a pm3d solid surface are rendered in the
+ order they are encountered along the surface grid points.  This order may be
+ controlled by the options `scansautomatic`|`scansforward`|`scansbackward`.
+ These scan options are not in general compatible with hidden-surface removal.
 
- If two subsequent scans do not have same number of points, then it has to be
+ If two successive scans do not have same number of points, then it has to be
  decided whether to start taking points for quadrangles from the beginning of
  both scans (`flush begin`), from their ends (`flush end`) or to center them
  (`flush center`).  Note, that `flush (center|end)` are incompatible with
@@ -9460,10 +9483,33 @@ Ffigure_mapcontours
  where there are not enough points in either of the scan. This can be used to
  draw a smooth map boundary.
 
+ Gnuplot does not do true hidden surface removal for solid surfaces, but often
+ it is sufficient to render the component quadrangles in order from furthest
+ to closest.  This mode may be selected using the options
+       set pm3d depthorder hidden3d
+ The `depthorder` option orders the solid quadrangles; the `hidden3d` option
+ similarly orders the bounding lines (if drawn).  Note that the global option
+ `set hidden3d` does not affect pm3d surfaces.
+
+4 clipping
+?pm3d clipping
  Clipping with respect to x, y coordinates of quadrangles can be done in two
  ways.  `clip1in`: all 4 points of each quadrangle must be defined and at least
  1 point of the quadrangle must lie in the x and y ranges.  `clip4in`: all 4
  points of each quadrangle must lie in the x and y ranges.
+
+4 color_assignment
+?pm3d color_assignment
+=mean
+=geomean
+=median
+=min
+=max
+ The coloring setup as well as the color box drawing are determined by
+ `set palette`.  There can be only one palette for the current plot.  Drawing
+ of several surfaces with different palettes can be achieved by `multiplot`
+ with fixed `origin` and `size`; don't forget to use `set palette maxcolors`
+ when your terminal is running out of available colors.
 
  There is a single gray/color value associated to each drawn pm3d quadrangle
  (no smooth color change among vertices).  The value is calculated from
@@ -9491,31 +9537,26 @@ Ffigure_mapcontours
  independently by `set zrange`, `set cbrange`, as well as `set log` for z or
  cb.  Maps can be adjusted by the cb-axis only; see also `set view map` and
  `set colorbox`.
+4 hidden3d
+?set pm3d hidden3d
+?pm3d hidden3d
+ The option `set pm3d hidden3d` draws the bounding lines of each quadrangle
+ at the same time that the quadrangle itself is drawn. Normally it is used in
+ conjunction with the `depthorder` option to achieve an approximation to true
+ hidden line removal.  This is far more efficient than using the command
+ `set hidden3d`.  The command takes an optional linestyle controlling the
+ appearance of the bounding lines.  If the linestyle parameter is negative,
+ or omitted, then the line properties given in the plot command are used.
+ Example of recommended usage:
 
- The option `hidden3d` takes as the argument a linestyle which must be created
- by `set style line ...`. (The style need not to be present when setting pm3d,
- but it must be present when plotting).  If set, lines are drawn using the
- specified line style, taking into account hidden line removal.  This is by
- far more efficient than using the command `set hidden3d` as it doesn't really
- calculate hidden line removal, but just draws the filled polygons in the
- correct order. So the recommended choice when using pm3d is
-       set pm3d at s hidden3d 100
-       set style line 100 lt 5 lw 0.5
+       set pm3d at s hidden3d depthorder
        unset hidden3d
        unset surf
-       splot x*x+y*y
+       splot x*x+y*y linecolor rgb "black" linewidth 0.5
 
- There used to be an option {transparent|solid} to this command.  Now
- you get the same effect from `set grid {front|layerdefault}`,
- respectively.
-
- The `set pm3d map` is an abbreviation for `set pm3d at b`; `set view map`;
- `set style data pm3d`; `set style func pm3d`;.
- It is used for backwards compatibility, when `set view map` was not available.
- Take care that you properly use `zrange` and `cbrange` for input data point
- filtering and color range scaling, respectively; and also `set (no)surface`
- seems to have a (side?) effect.
-
+4 interpolate
+?set pm3d interpolate
+?pm3d interpolate
  The option `interpolate m,n` will interpolate grid points into a finer mesh,
  and color each quadrangle appropriately.  For data files, this will smoothen
  the color surface, and enhance spikes in a color surface. For functions,
@@ -9527,64 +9568,17 @@ Ffigure_mapcontours
  |m| and |n| points drawn; you can consider this as a special gridding function.
  Zeros, i.e. `interpolation 0,0`, will automatically choose an optimal number of
  interpolated surface points.
+4 deprecated_options
+?pm3d deprecated_options
+ There used to be an option {transparent|solid} to this command.  Now
+ you get the same effect from `set grid {front|layerdefault}`, respectively.
 
- The coloring setup as well as the color box drawing are determined by
- `set palette`.  There can be only one palette for the current plot.  Drawing
- of several surfaces with different palettes can be achieved by `multiplot`
- with fixed `origin` and `size`; don't forget to use `set palette maxcolors`
- when your terminal is running out of available colors.
-
- On gnuplot start-up, mode is `explicit`. For historical and thus compatibility
- reasons, commands `set pm3d;` (i.e. no options) and `set pm3d at X ...` (i.e.
- `at` is the first option) sets mode `implicit`. Further, `set pm3d;` sets up
- the other options to their default.
-
- If the option `implicit` is on, all surface plots will be plotted additionally
- to the default type, e.g.
-       splot 'fred.dat' with lines, 'lola.dat' with lines
- would give both plots (meshes) additionally to a pm3d surface. That's what you
- are used to after `set pm3d;`.
-
- If the option `explicit` is on (or `implicit` is off) only plots specified
- by the `with pm3d` attribute are plotted with a pm3d surface, e.g.:
-       splot 'fred.dat' with lines, 'lola.dat' with pm3d
- would plot 'fred.dat' with lines (and only lines) and 'lola.dat' with
- a pm3d surface.
-
- If you set the default data or function style to `pm3d`, e.g.:
-       set style data pm3d
- then the options `implicit` and `explicit` have no effect.
-
- Note that when plotting several plots, they are plotted in the order given
- on the command line. This can be of interest especially for filled surfaces
- which can overwrite and therefore hide part of earlier plots.
-
- If `with pm3d` is specified in the `splot` command line, then it accepts the
- 'at' option.  The following plots draw three color surfaces at different
- altitudes:
-       set border 4095
-       set pm3d at s
-       splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
-
- See also help for `set palette`, `set cbrange`, `set colorbox`, `x11 pm3d`
- and definitely the demo file `demo/pm3d.dem`.
-4 depthorder
-?commands set pm3d depthorder
-?set pm3d depthorder
-?pm3d depthorder
-?depthorder
- By default the quadrangles making up a pm3d solid surface are rendered in the
- order they are encountered along the surface grid points.  This order may be
- controlled by the options `scansautomatic`|`scansforward`|`scansbackward`.
- These scan options are not in general compatible with hidden-surface removal.
-
- Gnuplot does not do true hidden surface removal for solid surfaces, but often
- it is sufficient to render the component quadrangles in order from furthest
- to closest.  This mode may be selected using the options
-       set pm3d depthorder hidden3d
- The `depthorder` option orders the solid quadrangles; the `hidden3d` option
- similarly orders the bounding lines (if drawn).  Note that the global option
- `set hidden3d` does not affect pm3d surfaces.
+ The command `set pm3d map` is equivalent to `set pm3d at b`; `set view map`;
+ `set style data pm3d`; `set style func pm3d`;.
+ It is used for backwards compatibility, when `set view map` was not available.
+ Take care that you properly use `zrange` and `cbrange` for input data point
+ filtering and color range scaling, respectively; and also `set (no)surface`
+ seems to have a (side?) effect.
 3 palette
 ?commands set palette
 ?commands show palette

@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.26 2006/06/15 15:42:33 sfeam Exp $
+ * $Id: pm3d.h,v 1.27 2008/03/13 21:00:37 sfeam Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -118,6 +118,8 @@ typedef struct {
 
 
 extern pm3d_struct pm3d;
+extern struct lp_style_type pm3d_border_lp;
+
 
 
 /****

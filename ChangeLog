@@ -2,6 +2,14 @@
 
 	* docs/psdoc/ps_symbols.gpi: "set angle radian"
 
+2010-10-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c src/pm3d.c src/pm3d.h set.c show.c docs/gnuplot.doc:
+	Simplify the syntax for "set pm3d hidden3d". A linestyle is no longer
+	required.  If no linestyle is given, the line properties are taken from
+	the plot command line.
+	Bug #2997853
+
 2010-10-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c (quantize_gray) src/getcolor.h src/gplt_x11.c:
