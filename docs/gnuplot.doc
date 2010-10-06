@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.34 2010/09/18 02:48:01 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.35 2010/09/19 02:31:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7298,6 +7298,7 @@ Ffigure_mapcontours
     cp850       - codepage for OS/2, Western Europe
     cp852       - codepage for OS/2, Central and Eastern Europe
     cp1250      - codepage for MS Windows, Central and Eastern Europe
+    cp1251      - codepage for 8-bit Russian, Serbian, Bulgarian, Macedonian
     cp1254      - codepage for MS Windows, Turkish (superset of Latin5)
     utf8        - variable-length (multibyte) representation of Unicode
                   entry point for each character
