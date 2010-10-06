@@ -1,5 +1,5 @@
 /*
- * $Id: getcolor.h,v 1.8 2004/07/13 14:11:22 broeker Exp $
+ * $Id: getcolor.h,v 1.10 2010/10/06 00:19:50 sfeam Exp $
  */
 
 /* GNUPLOT - getcolor.h */
@@ -41,6 +41,7 @@ void rgb255_from_rgb1 __PROTO(( rgb_color rgb1, rgb255_color *rgb255 ));
 /* main gray --> rgb color mapping as above, with take care of palette maxcolors */
 void rgb1maxcolors_from_gray __PROTO(( double gray, rgb_color *color ));
 void rgb255maxcolors_from_gray __PROTO(( double gray, rgb255_color *rgb255 ));
+double quantize_gray __PROTO(( double gray ));
 
 /* used to (de-)serialize color/gradient information */
 char *gradient_entry_to_str __PROTO(( gradient_struct *gs ));

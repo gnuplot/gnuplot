@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.23 2005/09/18 03:45:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.27 2010/10/06 00:19:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -378,15 +378,47 @@ rgb255_from_rgb1(rgb_color rgb1, rgb255_color *rgb255)
 
 /*
  *  Convenience function to map gray values to R, G and B values in [0,1],
- *  taking care of palette maxcolors (i.e., discrete nb of colors).
+ *  limiting the resolution of sampling a continuous palette to use_maxcolors.
+ *
+ *  EAM Sep 2010 - Guarantee that for palettes with multiple segments
+ *  (created by 'set palette defined ...') the mapped gray value is always
+ *  in the appropriate segment.  This has the effect of overriding 
+ *  use_maxcolors if the defined palette has more segments than the nominal
+ *  limit.
  */
 void
 rgb1maxcolors_from_gray(double gray, rgb_color *color)
 {
     if (sm_palette.use_maxcolors != 0)
-	gray = floor(gray * sm_palette.use_maxcolors)
-	    / (sm_palette.use_maxcolors-1);
+	gray = quantize_gray(gray);
+
     rgb1_from_gray(gray, color);
+}
+
+double 
+quantize_gray( double gray )
+{
+    double degray = floor(gray * sm_palette.use_maxcolors)
+			/ (sm_palette.use_maxcolors-1);
+
+    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT) {
+	int j;
+	if ((sm_palette.gradient_num <= 2) && (degray == 0))
+	    ; /* Backward compatibility with common case of 1 segment */
+	else for (j=0; j<sm_palette.gradient_num; j++) {
+	    if ((gray >= sm_palette.gradient[j].pos)
+	    &&  (gray <  sm_palette.gradient[j+1].pos)) {
+		if ((degray <= sm_palette.gradient[j].pos)
+		||  (degray > sm_palette.gradient[j+1].pos))
+		    degray = (sm_palette.gradient[j].pos
+			    + sm_palette.gradient[j+1].pos) / 2.;
+	    }
+	    if (gray < sm_palette.gradient[j+1].pos)
+		break;
+	}
+    }
+
+    return degray;	
 }
 
 

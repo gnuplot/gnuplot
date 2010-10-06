@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.194.2.4 2010/03/10 00:15:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.194.2.5 2010/08/15 00:02:53 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3700,7 +3700,8 @@ PaletteSetColor(plot_struct * plot, double gray)
     if (plot->cmap->allocated) {
 	int index;
 
-	gray = floor(gray * plot->cmap->allocated) / (plot->cmap->allocated - 1);
+	gray = quantize_gray(gray);
+
 	index = gray * (plot->cmap->allocated - 1);
 	if (index >= plot->cmap->allocated)
 		index = plot->cmap->allocated -1;

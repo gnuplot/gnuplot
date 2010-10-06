@@ -4,6 +4,9 @@
 	src/term_api.h src/term.c docs/gnuplot.doc: Add support for codepage 1251,
 	an alternative 8-bit Cyrillic encoding.
 
+	* src/getcolor.c (quantize_gray) src/getcolor.h src/gplt_x11.c:
+	Break out new code into a separate subroutine shared with gnuplot_x11.
+
 2010-10-04  Matthew Biggar  <biggarm@users.sourceforge.net>
 
 	* src/Makefile.am src/alloc.c:  Architecture (Alpha) specific work-
