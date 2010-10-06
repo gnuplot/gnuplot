@@ -160,7 +160,7 @@ HBB:
 
 [Optional:] See if 16-bit compilations can be made to work again.
 
-Ethan's List (2009):
+Ethan's List (2010):
 
 - separate out the handling of junk, NaN, Inf, and missing data entries
 - you should be able to set a default style for arrows and labels
@@ -168,10 +168,9 @@ Ethan's List (2009):
 - fix emf text handling to match other terminals (vertical centering, enhanced)
 - javascript mousing support integrated with svg output
   (low priority now that the canvas terminal supports mousing).
-- pdflatex driver
-- user-configuration options, e.g. permanently redefine line and point
-  properties and sequence
 - allow the user to assign arbitrary coordinate transforms to the axes
 - more demos and more comprehensible descriptions in the user manual
-- update the FAQ!
+- revise the coordinate system used by x11 so that the terminal coordinates
+  are proportional to the actual on-screen coordinates. 
+  This will fix 'set size ratio'.
 
