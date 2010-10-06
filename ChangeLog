@@ -1,3 +1,7 @@
+2010-10-06  Marco Cammarata  <marcocamma@users.sourceforge.net>
+
+	* docs/psdoc/ps_symbols.gpi: "set angle radian"
+
 2010-10-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c (quantize_gray) src/getcolor.h src/gplt_x11.c:

@@ -4,6 +4,7 @@ set title 'Symbols and linetypes in Postscript terminal'
 set noborder; set nozeroaxis; set noxtics; set noytics
 set xlabel ''; set ylabel ''; set nokey; set size square;
 set xrange [-1.2:1.2]; set yrange [-1.2:1.2]; set parametric; set samples 2
+set angle radian
 f(x)=cos(pi*x/38.0); g(x)=sin(pi*x/38.0)
 set label '(#70--75 are opaque)' at 0,0 center
 set label  '0' at  1.07*f(0),  1.07*g(0) center
