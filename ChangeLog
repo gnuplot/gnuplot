@@ -1,3 +1,8 @@
+2010-10-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Protect against the case that the x11 colormap is not
+	partitioned identically to the palette.
+
 2010-10-06  Marco Cammarata  <marcocamma@users.sourceforge.net>
 
 	* docs/psdoc/ps_symbols.gpi: "set angle radian"
@@ -28,7 +33,7 @@
 2010-10-04  Matthew Biggar  <biggarm@users.sourceforge.net>
 
 	* src/Makefile.am src/alloc.c:  Architecture (Alpha) specific work-
-	around to insure that gp_malloc() does fail on error if 0 bytes are
+	around to insure that gp_malloc() does not fail on error if 0 bytes are
 	successfully allocated.
 
 2010-10-02  Ethan A Merritt  <merritt@u.washington.edu>
