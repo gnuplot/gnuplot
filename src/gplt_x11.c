@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.194.2.5 2010/08/15 00:02:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.194.2.6 2010/10/07 05:58:27 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3700,7 +3700,13 @@ PaletteSetColor(plot_struct * plot, double gray)
     if (plot->cmap->allocated) {
 	int index;
 
-	gray = quantize_gray(gray);
+	/* FIXME  -  I don't understand why sm_palette is not always in sync	*/
+	/* with plot->cmap->allocated, but in practice they can be different.	*/
+	if (sm_palette.use_maxcolors == plot->cmap->allocated) {
+	    gray = quantize_gray(gray);
+	    FPRINTF((stderr," %d",plot->cmap->allocated));
+	} else
+	    gray = floor(gray * plot->cmap->allocated) / (plot->cmap->allocated - 1);
 
 	index = gray * (plot->cmap->allocated - 1);
 	if (index >= plot->cmap->allocated)
