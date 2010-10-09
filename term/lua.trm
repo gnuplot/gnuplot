@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.5.2.2 2010/03/21 03:50:23 sfeam Exp $
- *  $Date: 2010/03/21 03:50:23 $
+ *  $Id: lua.trm,v 1.5.2.3 2010/09/18 02:55:56 sfeam Exp $
+ *  $Date: 2010/09/18 02:55:56 $
  *  $Rev: 90 $
  */
 
@@ -712,7 +712,9 @@ LUA_options()
       LUA_script = s;
     }
     opt_str = gp_input_line + token[c_token].start_index;
-    c_token = num_tokens;
+    while (!END_OF_COMMAND)
+	c_token++;
+
   } else {
     LUA_close();
     int_error(NO_CARET, "No Lua driver name or file name given!");
@@ -726,12 +728,16 @@ LUA_options()
   }
 
   if(LUA_init_luaterm_function("options")) {
+    /* isolate the "set term ...;" part of the command line */
+    opt_str = gp_strdup(opt_str);
+    opt_str[ strcspn(opt_str,";") ] = '\0';
     lua_pushstring(L, opt_str);
     lua_pushinteger(L, need_init);
     lua_pushinteger(L, tc_off);
     LUA_call_report(lua_pcall(L, 3, 1, tb));
     lua_term_result = (int)lua_tointeger(L, -1);
     lua_pop(L, 1);
+    free(opt_str);
   }
 
   LUA_get_term_vars();

@@ -1,3 +1,8 @@
+2010-10-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/lua.trm (LUA_options): Null-terminate the "set term lua ..."
+	command string at the first semicolon before passing it to lua.
+
 2010-10-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm term/pslatex.trm term/svg.trm term/PostScript/cp1251.ps
