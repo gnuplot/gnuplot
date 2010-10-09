@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.628 2010/10/06 05:44:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.629 2010/10/06 23:20:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7491,11 +7491,9 @@ Ffigure_mapcontours
 ?set fit
 ?show fit
  The `fit` setting defines where the `fit` command writes its output.
- If this option was built into your version of gnuplot, it also controls
- whether parameter errors from the fit will be written into variables.
 
  Syntax:
-       set fit {logfile {"<filename>"}} {{no}errorvariables}
+       set fit {logfile {"<filename>"}} {{no}errorvariables} {{no}quiet}
        unset fit
        show fit
 
@@ -7520,6 +7518,9 @@ Ffigure_mapcontours
         print "error of a is:", a_err
         set label 'a=%6.2f', a, '+/- %6.2f', a_err
         plot 'datafile' using 1:2, f(x)
+
+ By default the information written to the log file is also echoed to
+ the terminal session.  "set fit quiet" turns off the echo.
 3 fontpath
 ?commands set fontpath
 ?commands show fontpath

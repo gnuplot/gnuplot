@@ -3,6 +3,11 @@
 	* term/lua.trm (LUA_options): Null-terminate the "set term lua ..."
 	command string at the first semicolon before passing it to lua.
 
+	* src/fit.c src/fit.h src/set.c docs/gnuplot.doc:
+	New option "set fit quiet" prevents fit information sent to the log 
+	file from being echoed also to stderr.
+	Bug #2355210
+
 2010-10-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Protect against the case that the x11 colormap is not
