@@ -1,3 +1,8 @@
+2010-10-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/lua.trm (LUA_options): Null-terminate the "set term lua ..."
+	command string at the first semicolon before passing it to lua.
+
 2010-10-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Protect against the case that the x11 colormap is not
