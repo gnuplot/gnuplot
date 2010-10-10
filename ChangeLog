@@ -1,3 +1,7 @@
+2010-10-10  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
+
+	* src/stdfn.c (not_a_number): Bit-pattern definition of NaN for MINGW
+
 2010-10-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/lua.trm (LUA_options): Null-terminate the "set term lua ..."
