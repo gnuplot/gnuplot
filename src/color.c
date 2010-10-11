@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.90 2010/10/01 04:25:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.85.2.5 2010/10/01 04:26:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -123,8 +123,12 @@ make_palette()
 
     /* set the number of colours to be used (allocated) */
     sm_palette.colors = i;
-    if (sm_palette.use_maxcolors > 0 && i > sm_palette.use_maxcolors)
-	sm_palette.colors = sm_palette.use_maxcolors;
+    if (sm_palette.use_maxcolors > 0) {
+	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT)
+	    sm_palette.colors = i;	/* EAM Sep 2010 - could this be a constant? */
+	else if (i > sm_palette.use_maxcolors)
+	    sm_palette.colors = sm_palette.use_maxcolors;
+    }
 
     if (prev_palette.colorFormulae < 0
 	|| sm_palette.colorFormulae != prev_palette.colorFormulae
@@ -136,7 +140,8 @@ make_palette()
 	|| sm_palette.colors != prev_palette.colors) {
 	/* print the message only if colors have changed */
 	if (interactive)
-	fprintf(stderr, "smooth palette in %s: available %i color positions; using %i of them\n", term->name, i, sm_palette.colors);
+	    fprintf(stderr, "smooth palette in %s: using %i of %i available color positions\n",
+	    		term->name, sm_palette.colors, i);
     }
 
     prev_palette = sm_palette;
@@ -383,14 +388,15 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
     }
     range = (xy_to - xy_from);
 
-    for (i = 0, xy2 = xy_from-1; i < steps; i++) {
+    for (i = 0, xy2 = xy_from; i < steps; i++) {
 
 	/* Start from one pixel beyond the previous box */
-	xy = xy2+1;
+	xy = xy2;
 	xy2 = xy_from + (int) (xy_step * (i + 1));
 
 	/* Set the colour for the next range increment */
-	gray = (double)(xy - xy_from) / range;
+	/* FIXME - The "1 +" seems wrong, yet it improves the placement in gd */
+	gray = (double)(1 + xy - xy_from) / range;
 	if (sm_palette.positive == SMPAL_NEGATIVE)
 	    gray = 1 - gray;
 	set_color(gray);
@@ -414,15 +420,12 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
 		    break;
 	    }
 
-	/* Overlap by 1 pixel because otherwise some terminals show a gap */
-	xy--;
-
 	if (color_box.rotation == 'v') {
 	    corners[0].y = corners[1].y = xy;
-	    corners[2].y = corners[3].y = (i == steps - 1) ? xy_to : xy2;
+	    corners[2].y = corners[3].y = GPMIN(xy_to,xy2+1);
 	} else {
 	    corners[0].x = corners[3].x = xy;
-	    corners[1].x = corners[2].x = (i == steps - 1) ? xy_to : xy2;
+	    corners[1].x = corners[2].x = GPMIN(xy_to,xy2+1);
 	}
 #ifdef EXTENDED_COLOR_SPECS
 	if (supply_extended_color_specs)

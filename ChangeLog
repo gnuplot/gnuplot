@@ -1,3 +1,10 @@
+2010-10-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c (draw_inside_color_smooth_box_bitmap):
+	Assign colors to component colorbox rectangles by rounding the pixel
+	coordinate up rather than down.  This empirically gives better results
+	in gd.trm, and doesn't seem to hurt other terminals.
+
 2010-10-10  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
 	* src/stdfn.c (not_a_number): Bit-pattern definition of NaN for MINGW
