@@ -1,3 +1,8 @@
+2010-10-11  James R. Van Zandt  <jrvz@comcast.net>
+
+        * src/specfun.c src/specfun.h src/eval.c docs/gnuplot.doc:  Adding
+        support for the exponential integral E_n(x) as gnuplot function expint(n,x).
+
 2010-10-10  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
 	* src/stdfn.c (not_a_number): Bit-pattern definition of NaN for MINGW
