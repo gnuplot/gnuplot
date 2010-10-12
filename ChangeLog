@@ -1,3 +1,10 @@
+2010-10-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c: Reduce the size of the pm3d surface quadrangle structure
+	by removing a redundant copy of the vertex coordinates. Add a pointer to
+	track the current plot's line color.
+	Bug #2997853
+
 2010-10-11  James R. Van Zandt  <jrvz@comcast.net>
 
         * src/specfun.c src/specfun.h src/eval.c docs/gnuplot.doc:  Adding
