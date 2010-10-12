@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.92 2010/10/06 19:06:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.93 2010/10/06 23:20:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -213,9 +213,7 @@ void ifilled_quadrangle(gpiPoint* icorners)
     if (pm3d.hidden3d_tag) {
 	int i;
 
-	if (pm3d.hidden3d_tag) {
-	    apply_pm3dcolor(&pm3d_border_lp.pm3d_color, term);
-	}
+	apply_pm3dcolor(&pm3d_border_lp.pm3d_color, term);
 
 	term->move(icorners[0].x, icorners[0].y);
 	for (i = 3; i >= 0; i--) {
