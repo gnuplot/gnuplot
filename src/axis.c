@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.77.2.4 2009/11/04 16:11:25 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.77.2.5 2010/09/24 18:18:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -121,6 +121,11 @@ const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE + 1] =
 /* HBB 20000416: for the testing, these are global... */
 /* static */ int tic_start, tic_direction, tic_text,
     rotate_tics, tic_hjust, tic_vjust, tic_mirror;
+
+/* These are declare volatile in order to fool the compiler into not */
+/* optimizing out intermediate values, thus hiding loss of precision.*/
+volatile double vol_this_tic;
+volatile double vol_previous_tic;
 
 const struct ticdef default_axis_ticdef = DEFAULT_AXIS_TICDEF;
 
@@ -1065,22 +1070,17 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	/* This protects against infinite loops if the separation between   */
 	/* two ticks is less than the precision of the control variables.   */
 	/* The for(...) loop here must be identical to the true loop below. */
+	/* Furthermore, compiler optimization can muck up this test, so we  */
+	/* tell the compiler that the control variables are volatile.       */
 	if (1) /* (some-test-for-range-and-or-step-size) */ {
-	    int anyticput = 0;
-	    double previous_tic = 0;
-
-	    for (tic = start; tic <= end; tic += step) {
-		/* EAM Oct 2008: Previous code (2001) checked only the start and end
-		 * points, but rounding error can strike at any point in the range.
-		 */
-		if (anyticput == 0)
-		    anyticput = 1;
-		else if (fabs(tic - previous_tic) < (step/4.)) {
+	    vol_previous_tic = start-step;
+	    for (vol_this_tic = start; vol_this_tic <= end; vol_this_tic += step) {
+		if (fabs((float)vol_this_tic - (float)vol_previous_tic) < (step/4.)) {
 		    step = end - start;
 		    int_warn(NO_CARET, "tick interval too small for machine precision");
 		    break;
 		}
-		previous_tic = tic;
+		vol_previous_tic = vol_this_tic;
 	    }
 	}
 
