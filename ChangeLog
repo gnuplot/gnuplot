@@ -1,3 +1,10 @@
+2010-10-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics): A smart (or maybe that's dumb) compiler may 
+	optimize out our tests for step size less that the machine precision.
+	Try to forestall this by marking the steps as (float)(volatile double).
+	Bug #3085168
+
 2010-10-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c: Reduce the size of the pm3d surface quadrangle structure
