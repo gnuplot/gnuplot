@@ -1,3 +1,14 @@
+2010-10-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/graphics.c: Auto-extension of the xrange used by
+	plots with boxes will fail if there is only one point and boxwidth < 0.
+	Clean up the boxwidth code so that it isn't necessary to copy the
+	global boxwidth flag into every individual box.  Add Peter Juhasz'
+	code to sort boxes in box_range_fiddling() if boxwidth < 0, but leave
+	it commented out for now because "smooth unique" accomplishes almost
+	the same thing.
+	Bug #3075938
+
 2010-10-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics): A smart (or maybe that's dumb) compiler may 
