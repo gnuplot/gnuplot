@@ -1,3 +1,9 @@
+2010-10-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (box_range_fiddling) src/graphics.c (plot_boxes):
+	Catch a couple of corner cases of "plot ... with boxes".
+	Bug #3075938
+
 2010-10-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics): A smart (or maybe that's dumb) compiler may 

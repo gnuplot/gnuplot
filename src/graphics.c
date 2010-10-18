@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.20 2010/09/18 02:48:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.21 2010/09/21 06:04:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3541,7 +3541,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			else /* Hits here on 3 column BOXERRORBARS */
 			    dxl = -boxwidth / 2.0;
 		    } else {
-			if (boxwidth_is_absolute)
+			if (boxwidth > 0 && boxwidth_is_absolute)
 			    dxl = -boxwidth / 2.0;
 			else
 			    dxl = 0.0;
