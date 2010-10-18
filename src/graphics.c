@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.344 2010/09/28 19:23:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.345 2010/10/18 04:44:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3494,12 +3494,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 	switch (plot->points[i].type) {
 	case OUTRANGE:
 	case INRANGE:{
-		/* We already loaded explicit extent on x */
-		if (plot->points[i].xhigh != plot->points[i].xlow) {
-		    dxr = plot->points[i].xhigh;
-		    dxl = plot->points[i].xlow;
-
-		} else {
+		if (plot->points[i].z < 0.0) {
 		    /* need to auto-calc width */
 		    if (prev != UNDEFINED) {
 			if (boxwidth < 0)
@@ -3535,6 +3530,9 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 
 		    dxl = plot->points[i].x + dxl;
 		    dxr = plot->points[i].x + dxr;
+		} else {	/* z >= 0 */
+		    dxr = plot->points[i].xhigh;
+		    dxl = plot->points[i].xlow;
 		}
 
 		/* HBB 20040521: ylow should be clipped to the y range. */

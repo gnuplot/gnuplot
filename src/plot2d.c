@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.229 2010/10/01 20:43:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.230 2010/10/18 04:44:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -314,6 +314,8 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
  * calculate widths yet, since it may be sorted, etc. But if
  * width is set, we must do it now, before logs of xmin/xmax
  * are taken.
+ * We store -1 in point->z as a marker to mean width needs to be
+ * calculated, or 0 to mean that xmin/xmax are set correctly
  */
 /* current_plot->token is after datafile spec, for error reporting
  * it will later be moved passed title/with/linetype/pointtype
@@ -740,8 +742,9 @@ get_data(struct curve_points *current_plot)
 			current_plot->plot_style = POINTSTYLE;
 		    }
 		    /* xlow and xhigh are same as x */
+		    /* auto width if boxes, else ignored */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1],
-				  v[1], 0.0);
+				  v[1], -1.0);
 	    }
 	    break;
 
@@ -889,7 +892,7 @@ get_data(struct curve_points *current_plot)
 		if (boxwidth == -2)
 		    /* x,y, ylow, yhigh --- width automatic */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
-				  v[2], v[3], 0.0);
+				  v[2], v[3], -1.0);
 		else
 		    /* x, y, dy, width */
 		    store2d_point(current_plot, i++, v[0], v[1],
@@ -1229,34 +1232,17 @@ static void
 box_range_fiddling(struct curve_points *plot)
 {
     double xlow, xhigh;
-    int i = plot->p_count - 1;
-
-#if (0)
-    /* Relative boxwidths assume that the points are sorted. 		*/
-    /* But sorting would break variable color unless we temporarily	*/
-    /* copy it into (struct coord). Commented out because the whole	*/
-    /* thing doesn't seem worth it. Let them use "smooth unique".	*/ 
-    if (boxwidth < 0 || !boxwidth_is_absolute) {
-	int j;
-	if (plot->varcolor)
-	    for (j=0; j < plot->p_count; j++)
-		plot->points[j].z = plot->varcolor[j];
-	sort_points(plot);
-	if (plot->varcolor)
-	    for (j=0; j < plot->p_count; j++)
-		plot->varcolor[j] = plot->points[j].z;
-    }
-#endif
 
     if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MIN) {
-	if (i > 0 && plot->points[0].type != UNDEFINED && plot->points[1].type != UNDEFINED) {
+	if (plot->points[0].type != UNDEFINED && plot->points[1].type != UNDEFINED) {
 	    xlow = plot->points[0].x - (plot->points[1].x - plot->points[0].x) / 2.;
 	    if (axis_array[plot->x_axis].min > xlow)
 		axis_array[plot->x_axis].min = xlow;
 	}
     }
     if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MAX) {
-	if (i > 0 && plot->points[i].type != UNDEFINED && plot->points[i-1].type != UNDEFINED) {
+	int i = plot->p_count -1;
+	if (plot->points[i].type != UNDEFINED && plot->points[i-1].type != UNDEFINED) {
 	    xhigh = plot->points[i].x + (plot->points[i].x - plot->points[i-1].x) / 2.;
 	    if (axis_array[plot->x_axis].max < xhigh)
 		axis_array[plot->x_axis].max = xhigh;
@@ -2324,7 +2310,7 @@ eval_plots()
 		/* Fiddle the auto-scaling data for specific plot styles */
 		if (this_plot->plot_style == HISTOGRAMS)
 		    histogram_range_fiddling(this_plot);
-		if (this_plot->plot_style == BOXES || this_plot->plot_style == BOXERROR)
+		if (this_plot->plot_style == BOXES)
 		    box_range_fiddling(this_plot);
 		if (this_plot->plot_style == BOXPLOT)
 		    boxplot_range_fiddling(this_plot);
