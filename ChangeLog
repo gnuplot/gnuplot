@@ -1,3 +1,10 @@
+2010-10-20  Graham Reed  <greed@users.sourceforge.net>
+
+	* configure.in src/alloc.c:  Test at configuration time whether the
+	local implementation of malloc(0) returns 0 rather than a pointer.
+	If so, work around it in gp_malloc().  Replaces alpha-specific fix
+	of 2010-10-04.
+
 2010-10-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (box_range_fiddling) src/graphics.c (plot_boxes):

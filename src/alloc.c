@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: alloc.c,v 1.13 2010/03/14 06:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: alloc.c,v 1.14 2010/10/04 19:06:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - alloc.c */
@@ -66,10 +66,10 @@ static char *RCSid() { return RCSid("$Id: alloc.c,v 1.13 2010/03/14 06:43:17 sfe
 #  define GP_FARMALLOC(size) farmalloc ((size))
 #  define GP_FARREALLOC(p,size) farrealloc ((p), (size))
 # else
-#  ifdef __alpha
-#    define GP_FARMALLOC(size) malloc ((size_t)((size>0) ? size : (size+1)))
+#  ifdef MALLOC_ZERO_RETURNS_ZERO
+#   define GP_FARMALLOC(size) malloc ((size_t)((size==0)?1:size))
 #  else
-#    define GP_FARMALLOC(size) malloc ((size_t)(size))
+#   define GP_FARMALLOC(size) malloc ((size_t)(size))
 #  endif
 #  define GP_FARREALLOC(p,size) realloc ((p), (size_t)(size))
 # endif

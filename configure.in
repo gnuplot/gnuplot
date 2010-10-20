@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.270 2010/08/10 05:40:17 sfeam Exp $
+dnl $Id: configure.in,v 1.271 2010/10/01 23:10:46 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -270,6 +270,19 @@ AC_TRY_LINK([#include <setjmp.h>], [jmp_buf env; sigsetjmp(env, 1);],
 if test "$ac_cv_func_pclose" = yes -a "$ac_cv_func_popen" = yes ; then
   AC_DEFINE(PIPES,1,[ Define if you do have the popen and pclose functions. ])
 fi
+
+AC_MSG_CHECKING(if malloc(0) returns 0)
+AC_RUN_IFELSE([AC_LANG_PROGRAM([[#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+]],
+[[if(malloc(0)==0) return 1;]])],
+[malloc_zero_returns_zero=no],
+[malloc_zero_returns_zero=yes],
+[malloc_zero_returns_zero=yes])
+AC_MSG_RESULT([$malloc_zero_returns_zero])
+AS_IF([test x$malloc_zero_returns_zero = xyes],
+      [AC_DEFINE([MALLOC_ZERO_RETURNS_ZERO],[1],[Define to 1 if malloc(0)==0])])
 
 dnl Argument types of select()
 AC_FUNC_SELECT_ARGTYPES
