@@ -1,3 +1,16 @@
+2010-10-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (boxplot_range_fiddling): trap and report an error
+	if the x coordinate of a boxplot is undefined.
+	Bug #3092435
+
+	* src/plot2d.c (get_data): Up until now this routine has returned
+	the number of lines from which data were read, including lines
+	containing undefined points. Change this to return the number of
+	well-defined data points.  That way a file of junk is recognized as
+	empty if read with either 'using 1:2' or 'using ($1):($2)'.
+	Bug #3092435
+
 2010-10-20  Graham Reed  <greed@users.sourceforge.net>
 
 	* configure.in src/alloc.c:  Test at configuration time whether the

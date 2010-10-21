@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.231 2010/10/18 07:04:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.232 2010/10/19 16:20:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -324,6 +324,7 @@ static int
 get_data(struct curve_points *current_plot)
 {
     int i /* num. points ! */ , j;
+    int ngood;
     int max_cols, min_cols;    /* allowed range of column numbers */
     double v[MAXDATACOLS];
     int storetoken = current_plot->token;
@@ -529,7 +530,7 @@ get_data(struct curve_points *current_plot)
     if (df_no_use_specs > 0 && df_no_use_specs < min_cols)
 	int_error(NO_CARET, "Not enough columns for this style");
 
-    i = 0;
+    i = 0; ngood = 0;
 
     /* If the user has set an explicit locale for numeric input, apply it */
     /* here so that it affects data fields read from the input file.      */
@@ -546,6 +547,7 @@ get_data(struct curve_points *current_plot)
 	}
 
 	if (j > 0) {
+	    ngood++;
 	    /* June 2010 - New mechanism for variable color                  */
 	    /* If variable color is requested, take the color value from the */
 	    /* final column of input and decrement the column count by one.  */
@@ -1025,7 +1027,7 @@ images:
     /* We are finished reading user input; return to C locale for internal use */
     reset_numeric_locale();
 
-    return i;                   /* i==0 indicates an 'empty' file */
+    return ngood;                   /* 0 indicates an 'empty' file */
 }
 
 /* called by get_data for each point */
@@ -1256,7 +1258,12 @@ box_range_fiddling(struct curve_points *plot)
 static void
 boxplot_range_fiddling(struct curve_points *plot)
 {
-    double extra_width = plot->points[0].xhigh - plot->points[0].xlow;
+    double extra_width;
+
+    if (plot->points[0].type == UNDEFINED)
+	int_error(NO_CARET,"boxplot has undefined x coordinate");
+
+    extra_width = plot->points[0].xhigh - plot->points[0].xlow;
     if (extra_width == 0)
 	extra_width = (boxwidth > 0 && boxwidth_is_absolute) ? boxwidth : 0.5;
 
