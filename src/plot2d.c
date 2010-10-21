@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.16 2010/09/18 03:03:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.17 2010/10/19 04:32:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -327,6 +327,7 @@ static int
 get_data(struct curve_points *current_plot)
 {
     int i /* num. points ! */ , j;
+    int ngood;
     int max_cols, min_cols;    /* allowed range of column numbers */
     double v[MAXDATACOLS];
     int storetoken = current_plot->token;
@@ -510,7 +511,7 @@ get_data(struct curve_points *current_plot)
     if (df_no_use_specs > 0 && df_no_use_specs < min_cols)
 	int_error(NO_CARET, "Not enough columns for this style");
 
-    i = 0;
+    i = 0; ngood = 0;
 
     /* If the user has set an explicit locale for numeric input, apply it */
     /* here so that it affects data fields read from the input file.      */
@@ -526,21 +527,22 @@ get_data(struct curve_points *current_plot)
 	    cp_extend(current_plot, i + i + 1000);
 	}
 
-        if (j > 0) {
-            /* Allow for optional columns.  Currently only used for a few styles, */
-            /* but could be extended to a more general mechanism.                 */
-            variable_color_value = 0;
-            if (variable_color) {
-                static char *errmsg = "Not enough columns for variable color";
-                switch (current_plot->plot_style) {
-                case VECTOR:	if (j < 5) int_error(NO_CARET,errmsg);
-                case CIRCLES: 	if (j < 4) int_error(NO_CARET,errmsg);
-                case BOXES:	if (j < 3) int_error(NO_CARET,errmsg);
-                    variable_color_value = v[--j];
-                default:	break;
-                }
-            }
-        }
+	if (j > 0) {
+	    ngood++;
+	    /* Allow for optional columns.  Currently only used for a few styles, */
+	    /* but could be extended to a more general mechanism.                 */
+	    variable_color_value = 0;
+	    if (variable_color) {
+		static char *errmsg = "Not enough columns for variable color";
+		switch (current_plot->plot_style) {
+		case VECTOR:	if (j < 5) int_error(NO_CARET,errmsg);
+		case CIRCLES: 	if (j < 4) int_error(NO_CARET,errmsg);
+		case BOXES:	if (j < 3) int_error(NO_CARET,errmsg);
+		    variable_color_value = v[--j];
+		default:	break;
+		}
+	    }
+	}
 	switch (j) {
 	default:
 	    {
@@ -939,7 +941,7 @@ images:
     /* We are finished reading user input; return to C locale for internal use */
     reset_numeric_locale();
 
-    return i;                   /* i==0 indicates an 'empty' file */
+    return ngood;                   /* 0 indicates an 'empty' file */
 }
 
 /* called by get_data for each point */
