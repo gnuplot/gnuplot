@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.629 2010/10/06 23:20:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.630 2010/10/10 04:44:34 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -927,6 +927,15 @@ C
  raised to the power of its argument).  On some implementations (notably
  suns), exp(-x) returns undefined for very large x.  A user-defined function
  like safe(x) = x<-100 ? 0 : exp(x) might prove useful in these cases.
+4 expint
+?expressions functions expint
+?functions expint
+?expint
+#expint(n,x) & int $n\ge0$, real $x\ge0$ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$,  exponential integral of $x$ \\
+%expint(n,x)@any@$E sub n (x)$, exponential integral function of $x$
+ The `expint(n,x)` function returns the exponential integral of the real
+ part of its argument: integral from 1 to infinity of t^(-n) e^(-tx) dt.
+ n must be a nonnegative integer, x>=0, and either x>0 or n>1.
 4 floor
 ?expressions functions floor
 ?functions floor

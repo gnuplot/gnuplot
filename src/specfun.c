@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.40 2010/02/24 04:17:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.41 2010/03/21 17:42:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -116,6 +116,7 @@ static double inverse_normal_func __PROTO((double p));
 static double lambertw __PROTO((double x));
 static double airy_neg __PROTO(( double x ));
 static double airy_pos __PROTO((double x));
+static double expint __PROTO((double n, double x));
 #ifndef GAMMA
 static int ISNAN __PROTO((double x));
 static int ISFINITE __PROTO((double x));
@@ -2163,3 +2164,138 @@ f_airy(union argument *arg)
 
     push(Gcomplex(&a, x, 0.0));
 }
+
+/* ** expint.c
+ *
+ *   DESCRIBE  Approximate the exponential integral function
+ *
+ *                           
+ *                       /inf   -n    -zt
+ *             E_n(z) =  |     t   * e    dt (n = 0, 1, 2, ...)
+ *                       /1
+ *
+ *
+ *   CALL      p = expint(n, z)
+ *
+ *             double    n    >= 0  
+ *             double    z    >= 0  
+ *               also: n must be an integer
+ *                     either z > 0 or n > 1
+ *
+ *   WARNING   none
+ *
+ *   RETURN    double    p    > 0
+ *                            -1.0 on error condition
+ *
+ *   REFERENCE Abramowitz and Stegun (1964)
+ *
+ * Copyright (c) 2010 James R. Van Zandt, jrvz@comcast.net
+ */
+
+static double
+expint(double n, double z)
+{
+    double y; /* the answer */
+
+    {
+      /* Test for admissibility of arguments */
+      double junk;
+      if (n < 0 || z < 0 || modf(n,&junk))
+	return -1.0;
+      if (z == 0 && n < 2)
+	return -1.0;
+    }
+
+    /* special cases */
+    if (n == 0) return exp(-z)/z;
+    if (z == 0) return 1/(n-1);
+
+    /* for z=3, CF requires 36 terms and series requires 29 */
+
+    if (z > 3)
+      {	/* For large z, use continued fraction (Abramowitz & Stegun 5.1.22):
+	   E_n(z) = exp(-z)(1/(z+n/(1+1/(z+(n+1)/1+2/(z+...)))))
+	   The CF is valid and stable for z>0, and efficient for z>1 or so.  */
+	double n0, n1, n2, n3, d0, d1, d2, d3, y_prev=1;
+	int i;
+
+	n0 = 0; n1 = 1;
+	d0 = 1; d1 = z;
+
+	for (i=0; i<333; i++)
+	  { /* evaluate the CF "top down" using the recurrence
+	       relations for the numerators and denominators of
+	       successive convergents */
+	    n2 = n0*(n+i) + n1;
+	    d2 = d0*(n+i) + d1;
+	    n3 = n1*(1+i) + n2*z;
+	    d3 = d1*(1+i) + d2*z;
+	    y = n3/d3;
+	    if (y == y_prev) break;
+	    y_prev = y;
+	    n0 = n2; n1 = n3;
+	    d0 = d2; d1 = d3;
+
+	    /* Re-scale terms in continued fraction if terms are large */
+	    if (d3 >= OFLOW) {
+
+		n0 /= OFLOW;
+		n1 /= OFLOW;
+		d0 /= OFLOW;
+		d1 /= OFLOW;
+	    }
+	  }
+	y = exp(-z)*y;
+      }
+    
+    else
+      {	/* For small z, use series (Abramowitz & Stegun 5.1.12):
+	   E_1(z) = -\gamma + \ln z +
+	            \sum_{m=1}^\infty { (-z)^m \over (m) m! }   
+	   The series is valid for z>0, and efficient for z<4 or so.  */
+
+	/* from Abramowitz & Stegun, Table 1.1 */
+	double euler_constant = .577215664901532860606512;
+  
+	double y_prev = 0;
+	double t, m;
+
+	y = -euler_constant - log(z);
+	t = 1;
+	for (m = 1; m<333; m++)
+	  {
+	    t = -t*z/m;
+	    y = y - t/m;
+	    if (y == y_prev) break; 
+	    y_prev = y;
+	  }
+
+	/* For n > 1, use recurrence relation (Abramowitz & Stegun 5.1.14):
+	   n E_{n+1}(z) + z E_n(z) = e^{-z}, n >= 1 
+	   The recurrence is unstable for increasing n and z>4 or so,
+	   but okay for z<3.  */
+  
+	for (m=1; m<n; m++)
+	  y=(exp(-z) - z*y)/m;
+      }
+    return y;
+}
+
+void
+f_expint(union argument *arg)
+{
+    struct value a;
+    double n, x;
+
+    (void) arg;                        /* avoid -Wunused warning */
+    x = real(pop(&a));
+    n = real(pop(&a));
+
+    x = expint(n, x);
+    if (x <= -1)
+	/* Error return from expint --> flag 'undefined' */
+	undefined = TRUE;
+
+    push(Gcomplex(&a, x, 0.0));
+}
+

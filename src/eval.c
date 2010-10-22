@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.84 2010/09/18 22:00:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.85 2010/10/01 23:10:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -173,7 +173,7 @@ const struct ft_entry GPFAR ft[] =
     {"atanh",  f_atanh},
     {"lambertw",  f_lambertw}, /* HBB, from G.Kuhnle 20001107 */
     {"airy",  f_airy},         /* janert, 20090905 */
-
+    {"expint",  f_expint},     /* Jim Van Zandt, 20101010 */
 
     {"column",  f_column},	/* for using */
     {"valid",  f_valid},	/* for using */
