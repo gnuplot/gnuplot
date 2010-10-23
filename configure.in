@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.248.2.20 2010/09/27 05:08:23 sfeam Exp $
+dnl $Id: configure.in,v 1.248.2.21 2010/10/21 04:07:53 sfeam Exp $
 dnl
 dnl AC_INIT must match the release number
 AC_INIT(gnuplot, 4.4.3)
@@ -402,24 +402,23 @@ if test "$with_readline" != no; then
 
     dnl Work around some functions missing from the OSX readline library.
     dnl Would it be better to simply switch to with_readline=bsd in this case?
-    AC_CHECK_LIB(readline, rl_ding, , , [${gp_tcap}])
-    if [test "$ac_cv_lib_readline_rl_ding" == no]; then
-	AC_DEFINE(MISSING_RL_DING,1,[ Define if your libreadline has no rl_ding])
-    fi
-    AC_CHECK_LIB(readline, rl_forced_update_display, , , [${gp_tcap}])
-    if [test "$ac_cv_lib_readline_rl_forced_update_display" == no]; then
-	AC_DEFINE(MISSING_RL_FORCED_UPDATE_DISPLAY,1,[ Define if your libreadline has no rl_force_update_display])
-    fi
-    AC_CHECK_LIB(readline, rl_reset_after_signal, , , [${gp_tcap}])
-    if [test "$ac_cv_lib_readline_rl_reset_after_signal" == yes]; then
-	AC_DEFINE(HAVE_READLINE_RESET,1,[ Define if your libreadline has rl_reset_after_signal])
-    fi
+    _libs="$LIBS"
+    AC_SEARCH_LIBS(rl_ding, readline, ,
+	AC_DEFINE(MISSING_RL_DING,1,[ Define if your libreadline has no rl_ding]),
+        [${TERMLIBS}])
+    AC_SEARCH_LIBS(rl_forced_update_display, readline, ,
+	AC_DEFINE(MISSING_RL_FORCED_UPDATE_DISPLAY,1,[ Define if your libreadline has no rl_force_update_display]),
+        [${TERMLIBS}])
+    AC_SEARCH_LIBS(rl_reset_after_signal, readline,
+	AC_DEFINE(HAVE_READLINE_RESET,1,[ Define if your libreadline has rl_reset_after_signal]),
+	,
+        [${TERMLIBS}])
     # Warning: rl_complete_with_tilde_expansion is an int, not a function.
     # I.e., it is not callable.  AC_CHECK_LIB seems to work anyhow, but...
-    AC_CHECK_LIB(readline, rl_complete_with_tilde_expansion, , , [${gp_tcap}])
-    if [test "$ac_cv_lib_readline_rl_complete_with_tilde_expansion" == no]; then
-	AC_DEFINE(MISSING_RL_TILDE_EXPANSION,1,[ Define if your libreadline has no rl_complete_with_tilde_expansion])
-    fi
+    AC_SEARCH_LIBS(rl_complete_with_tilde_expansion, readline, , 
+	AC_DEFINE(MISSING_RL_TILDE_EXPANSION,1,[ Define if your libreadline has no rl_complete_with_tilde_expansion]),
+        [${TERMLIBS}])
+    LIBS="$_libs"
 
     if [test "$ac_cv_lib_readline_remove_history" != no || test "$ac_cv_lib_history_remove_history" != no]; then
       if test "$with_readline" = bsd; then

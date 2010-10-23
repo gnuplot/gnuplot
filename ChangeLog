@@ -1,3 +1,11 @@
+2010-10-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: The AC_CHECK_LIB macro apparently always appends
+	to LIBS (despite what the documentation says). We want to accummulate
+	libraries in TERMLIBS rather than LIBS, so save and restore LIBS
+	around the checks.
+	Bug #3093208
+
 2010-10-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data): Up until now this routine has returned
