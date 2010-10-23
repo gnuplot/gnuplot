@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.232 2010/10/19 16:20:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.233 2010/10/22 04:23:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2067,7 +2067,10 @@ eval_plots()
 			set_fillstyle = TRUE;
 		    }
 		    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
-			parse_colorspec(&this_plot->lp_properties.pm3d_color,TC_Z);
+			struct lp_style_type lptmp;
+			c_token++;
+			lp_parse(&lptmp, FALSE, FALSE);
+			this_plot->lp_properties.pm3d_color = lptmp.pm3d_color;
 			this_plot->lp_properties.use_palette = TRUE;
 			set_lpstyle = TRUE;
 		    }
@@ -2121,7 +2124,7 @@ eval_plots()
 		/* user may prefer explicit line styles */
 		if (prefer_line_styles)
 		    lp_use_properties(&this_plot->lp_properties, line_num+1);
-		else if (first_perm_linestyle)
+		else
 		    load_linetype(&this_plot->lp_properties, line_num+1);
 
 		if (this_plot->plot_style == BOXPLOT)

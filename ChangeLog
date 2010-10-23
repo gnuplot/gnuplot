@@ -1,5 +1,15 @@
 2010-10-23  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/misc.c (parse_fillstyle):  Allow "border" as a keyword without
+	necessarily having an immediately following linetype or color.
+
+	* src/plot2d.c (eval_plots):  fillcolor was not taking into account
+	user-defined linetypes.
+
+	* src/plot3d.c src/misc.c:  Simplify calls to load_linetype() 
+
+2010-10-23  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* configure.in: The AC_CHECK_LIB macro apparently always appends
 	to LIBS (despite what the documentation says). We want to accummulate
 	readline-associated libraries in TERMLIBS rather than LIBS, 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.181 2010/05/11 04:27:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.182 2010/07/29 17:51:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1598,7 +1598,7 @@ eval_3dplots()
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
 			lp_use_properties(&lp, line_num+1);
-		    else if (first_perm_linestyle)
+		    else
 			load_linetype(&lp, line_num+1);
 
  		    lp_parse(&lp, TRUE,
