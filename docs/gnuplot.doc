@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.35 2010/09/19 02:31:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.36 2010/10/07 05:31:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9999,7 +9999,7 @@ Ffigure_mapcontours
        set style fill {empty
                        | {transparent} solid {<density>}
                        | {transparent} pattern {<n>}}
-                      {border {<colorspec>} | noborder}
+                      {border {lt} {lc <colorspec>} | noborder}
 
  The default fillstyle is `empty`.
 
