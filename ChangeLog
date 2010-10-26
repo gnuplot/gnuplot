@@ -13,6 +13,8 @@
 
 	* ChangeLog.2: Split off ChangeLog at the point 4.5 was tagged.
 
+	* docs/gnuplot.texi:  regenerate from gnuplot.doc v 1.633
+
 2010-10-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: The AC_CHECK_LIB macro apparently always appends

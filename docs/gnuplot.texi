@@ -1018,6 +1018,7 @@ defaults to radians.
 * erf::                         
 * erfc::                        
 * exp::                         
+* expint::                      
 * floor::                       
 * gamma::                       
 * ibeta::                       
@@ -1066,6 +1067,7 @@ defaults to radians.
 * valid::                       
 * elliptic_integrals::          
 * Random_number_generator::     
+* value::                       
 @end menu
 
 @node abs, acos, Functions, Functions
@@ -1322,7 +1324,7 @@ The `erfc(x)` function returns 1.0 - the error function of the real part of
 its argument.  If the argument is a complex value, the imaginary component is
 ignored.  See `erf`, @ref{inverf}, and @ref{norm}.
 
-@node exp, floor, erfc, Functions
+@node exp, expint, erfc, Functions
 @subsubsection exp
 
 @c ?expressions functions exp
@@ -1336,7 +1338,20 @@ raised to the power of its argument).  On some implementations (notably
 suns), exp(-x) returns undefined for very large x.  A user-defined function
 like safe(x) = x<-100 ? 0 : exp(x) might prove useful in these cases.
 
-@node floor, gamma, exp, Functions
+@node expint, floor, exp, Functions
+@subsubsection expint
+
+@c ?expressions functions expint
+@c ?functions expint
+@cindex expint
+@findex expint
+
+
+The `expint(n,x)` function returns the exponential integral of the real
+part of its argument: integral from 1 to infinity of t^(-n) e^(-tx) dt.
+n must be a nonnegative integer, x>=0, and either x>0 or n>1.
+
+@node floor, gamma, expint, Functions
 @subsubsection floor
 
 @c ?expressions functions floor
@@ -1958,6 +1973,7 @@ to fits or datafile plots.  See @ref{using}.
 
 
 
+
 @node elliptic_integrals, Random_number_generator, valid, Functions
 @subsubsection elliptic integrals
 
@@ -1982,7 +1998,7 @@ third kind, i.e. the definite integral between 0 and pi/2 of the function
 than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
 definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
 
-@node Random_number_generator,  , elliptic_integrals, Functions
+@node Random_number_generator, value, elliptic_integrals, Functions
 @subsubsection Random number generator
 
 @c ?expressions random
@@ -1999,6 +2015,24 @@ pseudo-random numbers.  The current behavior is as follows:
  `rand(@{x,y@})` for x>0 sets seed1 to x and seed2 to y.
 
 @end example
+
+
+@node value,  , Random_number_generator, Functions
+@subsubsection value
+
+@c ?expressions functions value
+@c ?functions value
+@cindex value
+@findex value
+
+
+B = value("A") is effectively the same as B = A, where A is the name of a 
+user-defined variable.  This is useful when the name of the variable is itself
+held in a string variable. See @ref{variables}.  It also allows you to
+read the name of a variable from a data file.  If the argument is a numerical
+expression, value() returns the value of that expression.  If the argument is a
+string that does not correspond to a currently defined variable,
+value() returns NaN.
 
 
 @node Operators, Gnuplot-defined_variables, Functions, Expressions
@@ -2289,7 +2323,8 @@ Example:
 
 @end example
 
-See @ref{functions}, @ref{functions}, @ref{variables}, @ref{macros}.
+See @ref{functions}, @ref{functions}, @ref{variables}, @ref{macros},
+@ref{value}.
 
 @node Fonts, Glossary, Expressions, gnuplot
 @section Fonts
@@ -2543,11 +2578,14 @@ Examples:
 See @ref{colornames}, @ref{palette}, @ref{cbrange}.
 
 For terminals that support dot/dash patterns, each default linetype has both
-a dot-dash pattern and a default color. However, you can override the default
-color by using the keyword `linecolor`, abbreviated `lc`.  For example, the
-postscript terminal provides a dashed blue line as linetype 3.  The plot
-commands below use this same dash pattern for three plots, one in blue (the
-default), another in red (the default for linetype 1), and a third in gold.
+a dot-dash pattern and a default color. Gnuplot does not currently provide a
+mechanism for changing the dot-dash pattern, so if you want both a particular
+dash pattern and a particular color you must first choose a linetype that has
+the required dash pattern, then override the default color using the keyword 
+`linecolor`, abbreviated `lc`.  For example, the postscript terminal provides
+a dashed blue line as linetype 3.  The plot commands below use this same dash
+pattern for three plots, one in blue (the default), another in red
+(the default for linetype 1), and a third in gold.
 
 Example:
 
@@ -2557,29 +2595,13 @@ Example:
 
 @end example
 
-Lines can have additional properties such as linewidth.  You can associate
-these various properties, as well as equivalent properties for point symbols,
-into user-defined "line styles" using the command `set style line`.  Once
-you have defined a linestyle, you can use it in a plot command to control
-the appearance of one or more plot elements.
-
-Examples:
-
-@example
-     # define a new line style with terminal-independent color cyan,
-     # linewidth 3, and associated point type 6 (a circle with a dot in it).
-     set style line 5 lt rgb "cyan" lw 3 pt 6
-     plot sin(x) with linespoints ls 5          # user-defined line style 5
-
-@end example
-
-See `linestyle`, `set style line`.
 
 @menu
 * colorspec::                   
+* linestyles_vs_linetypes::     
 @end menu
 
-@node colorspec,  , linetypes, linetypes
+@node colorspec, linestyles_vs_linetypes, linetypes, linetypes
 @subsection colorspec
 
 @cindex colorspec
@@ -2646,66 +2668,21 @@ cbrange mapping of the palette. This allows smoothly-varying color along a
 from an extra column of data (not all 2D plot styles allow an extra column).
 
 @menu
-* rgbcolor_variable::           
 * linecolor_variable::          
+* rgbcolor_variable::           
 @end menu
 
-@node rgbcolor_variable, linecolor_variable, colorspec, colorspec
-@subsubsection rgbcolor variable
-
-@c ?rgbcolor variable
-@c ?lc rgbcolor variable
-@c ?tc rgbcolor variable
-Most plot commands assign a single color (linetype) to each element of the
-plot.  If there are multiple plots on a single graph, the default color
-(linetype) is incremented sequentially.  You can instead assign a separate
-color for each data point, line segment, or label based on additional 
-information in the input data file.  This is indicated by the colorspec
-keyword `variable`.  
-
-`lc rgbcolor variable` tells the program to use a 24-bit RGB color from a
-separate column in the data file. This requires a corresponding additional
-column in the @ref{using} specifier.  The extra column is interpreted as a 24-bit
-packed RGB triple. These are most easily specified as hexidecimal values
-(see `rgbcolor`). Text colors are similarly set using `tc rgbcolor variable`.
-
-Example:
-
-@example
-      # Place colored points in 3D at the x,y,z coordinates corresponding to
-      # their red, green, and blue components
-      rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
-      splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
-
-@end example
-
-
-@node linecolor_variable,  , rgbcolor_variable, colorspec
+@node linecolor_variable, rgbcolor_variable, colorspec, colorspec
 @subsubsection linecolor variable
 
 @c ?linecolor variable
 @c ?lc variable
 @c ?textcolor variable
 @c ?tc variable
-Most plot commands assign a single color (linetype) to each element of the
-plot.  If there are multiple plots on a single graph, the default color
-(linetype) is incremented sequentially.  You can instead assign a separate
-color for each data point, line segment, or label based on additional 
-information in the input data file.  This is indicated by the colorspec
-keyword `variable`. 
-
 `lc variable` tells the program to use the value read from one column of the
 input data as a linestyle index, and use the color belonging to that linestyle.
 This requires a corresponding additional column in the @ref{using} specifier.
 Text colors can be set similarly using `tc variable`.
-
-A single data file may contain multiple sets of data, separated by two blank
-lines. Each of these separate sets is assigned an index value (see @ref{index})
-that can be retrieved via the using specifier column(-2). See `pseudocolumns`.
-All data in the file is drawn with the same color/linestyle/pointtype
-properties by default.  The command `lc variable` can be used to assign
-different colors to each data set in the file by using the index value from
-pseudocolumn -2.
 
 Examples:
 @example
@@ -2715,8 +2692,63 @@ Examples:
 @end example
 
 @example
-      # Use the data set index to choose a line color
+      # A single data file may contain multiple sets of data, separated by two
+      # blank lines.  Each data set is assigned as index value (see @ref{index})
+      # that can be retrieved via the @ref{using} specifier `column(-2)`.
+      # See `pseudocolumns`.  This example uses to value in column -2 to 
+      # draw each data set in a different line color.
       plot 'data' using 1:2:(column(-2)) with lines lc variable
+
+@end example
+
+
+@node rgbcolor_variable,  , linecolor_variable, colorspec
+@subsubsection rgbcolor variable
+
+@c ?rgbcolor variable
+@c ?lc rgbcolor variable
+@c ?tc rgbcolor variable
+You can assign a separate color for each data point, line segment, or label in
+your plot.  `lc rgbcolor variable` tells the program to read RGB color
+information for each line in the data file. This requires a corresponding
+additional column in the @ref{using} specifier.  The extra column is interpreted as
+a 24-bit packed RGB triple. If the value is provided directly in the data file
+it is easiest to give it as a hexidecimal value (see `rgbcolor`). 
+Alternatively, the @ref{using} specifier can contain an expression that evaluates
+to a 24-bit RGB color as in the example below.
+Text colors are similarly set using `tc rgbcolor variable`.
+
+Example:
+@example
+      # Place colored points in 3D at the x,y,z coordinates corresponding to
+      # their red, green, and blue components
+      rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
+      splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
+
+@end example
+
+
+@node linestyles_vs_linetypes,  , colorspec, linetypes
+@subsection linestyles vs linetypes
+
+@c ? linestyles vs linetypes
+Lines can have additional properties such as linewidth.  You can associate
+these various properties, as well as equivalent properties for point symbols,
+into user-defined "linestyles" using the command `set style line`.  Once
+you have defined a linestyle, you can use it in a plot command to control
+the appearance of one or more plot elements.
+
+Whereas `linetypes` are permanent (they last until you explicitly redefine
+them), `linestyles` are temporary.  They only last until the next reset 
+of the graphics state. 
+
+Examples:
+
+@example
+     # define a new line style with terminal-independent color cyan,
+     # linewidth 3, and associated point type 6 (a circle with a dot in it).
+     set style line 5 lt rgb "cyan" lw 3 pt 6
+     plot sin(x) with linespoints ls 5          # user-defined line style 5
 
 @end example
 
@@ -4571,7 +4603,7 @@ Example:
 @end example
 
 `set clip one` and `set clip two` affect vectors drawn in 2D.
-Please see @ref{clip} and `arrowstyle`.
+Please see `set clip` and `arrowstyle`.
 
 @node xerrorbars, xyerrorbars, vectors, plotting_styles
 @section xerrorbars
@@ -4778,7 +4810,7 @@ Usually the surface is displayed at some arbitrary viewing angle,
 such that it clearly represents a 3D surface.  In this case the X, Y, and Z
 axes are all visible in the plot. The illusion of 3D is enhanced by choosing
 hidden line removal or depth-sorted surface elements.
-See @ref{hidden3d} and the @ref{depthorder} option of @ref{pm3d}.
+See @ref{hidden3d} and the `depthorder` option of @ref{pm3d}.
 The `splot` command can also calculate and draw contour lines corresponding
 to constant Z values. These contour lines may be drawn onto the surface
 itself, or projected onto the XY plane. See @ref{contour}.
@@ -9292,7 +9324,7 @@ permitted:
 
 @end example
 
-@ref{clip} is synonymous with `set clip points`; @ref{clip} turns off all
+`set clip` is synonymous with `set clip points`; `unset clip` turns off all
 three types of clipping.
 
 @node cntrparam, color_box, clip, set-show
@@ -10098,6 +10130,7 @@ Valid values are
    cp852       - codepage for OS/2, Central and Eastern Europe
    cp950       - MS version of Big5 (emf terminal only)
    cp1250      - codepage for MS Windows, Central and Eastern Europe
+   cp1251      - codepage for 8-bit Russian, Serbian, Bulgarian, Macedonian
    cp1254      - codepage for MS Windows, Turkish (superset of Latin5)
    utf8        - variable-length (multibyte) representation of Unicode
                  entry point for each character
@@ -10125,12 +10158,10 @@ the device must be able to produce the desired non-standard characters.
 @c ?set fit
 @c ?show fit
 The @ref{fit} setting defines where the @ref{fit} command writes its output.
-If this option was built into your version of gnuplot, it also controls
-whether parameter errors from the fit will be written into variables.
 
 Syntax:
 @example
-      set fit @{logfile @{"<filename>"@}@} @{@{no@}errorvariables@}
+      set fit @{logfile @{"<filename>"@}@} @{@{no@}errorvariables@} @{@{no@}quiet@}
       unset fit
       show fit
 
@@ -10160,6 +10191,9 @@ a plot of the data and the fitted function, for reference, as in:
        plot 'datafile' using 1:2, f(x)
 
 @end example
+
+By default the information written to the log file is also echoed to
+the terminal session.  "set fit quiet" turns off the echo.
 
 @node fontpath, format_, fit_, set-show
 @subsection fontpath
@@ -10584,7 +10618,7 @@ explicitly excluded from this processing by appending the extra option
 `nohidden3d` to the @ref{with} specifier.
 
 Hidden3d does not affect solid surfaces drawn using the pm3d mode. To achieve
-a similar effect purely for pm3d surfaces, use instead @ref{depthorder}.
+a similar effect purely for pm3d surfaces, use instead `set pm3d depthorder`.
 To mix pm3d surfaces with normal @ref{hidden3d} processing, use the option
 `set hidden3d front` to force all elements included in hidden3d processing to
 be drawn after any remaining plot elements. Then draw the surface twice, once
@@ -12396,35 +12430,90 @@ more curves to the current plot and you want to edit the whole command now.
 
 
 pm3d is an `splot` style for drawing palette-mapped 3d and 4d data as
-color/gray maps and surfaces.  It uses a pm3d algorithm which allows plotting
+color/gray maps and surfaces.  It uses an algorithm that allows plotting
 gridded as well as non-gridded data without preprocessing, even when the data
 scans do not have the same number of points.
 
-Drawing of color surfaces is available on terminals supporting filled colored
-polygons with color mapping specified by @ref{palette}. Currently supported
-terminals include
-
+Syntax (the options can be given in any order):
 @example
-  Screen terminals:
-    OS/2 Presentation Manager
-    X11
-    Linux VGA (vgagl)
-    GGI
-    Windows
-    AquaTerm (Mac OS X)
-    wxWidgets (wxt)
-  Files:
-    PostScript
-    pslatex, pstex, epslatex
-    gif, png, jpeg
-    (x)fig
-    tgif
-    cgm
-    pdf
-    svg
-    emf
+      set pm3d @{
+                 @{ at <position> @}
+                 @{ interpolate <steps/points in scan, between scans> @}
+                 @{ scansautomatic | scansforward | scansbackward | depthorder @}
+                 @{ flush @{ begin | center | end @} @}
+                 @{ ftriangles | noftriangles @}
+                 @{ clip1in | clip4in @}
+                 @{ corners2color @{ mean|geomean|median|min|max|c1|c2|c3|c4 @} @}
+                 @{ hidden3d @{<linestyle>@} | nohidden3d @}
+                 @{ implicit | explicit @}
+                 @{ map @}
+               @}
+      show pm3d
+      unset pm3d
 
 @end example
+
+A pm3d color surface is drawn if the splot command specifies @ref{pm3d},  
+if the data or function @ref{style} is set to pm3d globally, or if the pm3d mode is
+`set pm3d implicit`.  In the latter two cases, the pm3d surface is draw in
+addition to the mesh produced byt the style specified in the plot command. E.g.
+@example
+      splot 'fred.dat' with lines, 'lola.dat' with lines
+@end example
+
+would draw both a mesh of lines and a pm3d surface for each data set.
+If the option `explicit` is on (or `implicit` is off) only plots specified
+by the @ref{pm3d} attribute are plotted with a pm3d surface, e.g.:
+@example
+      splot 'fred.dat' with lines, 'lola.dat' with pm3d
+@end example
+
+would plot 'fred.dat' with lines (only) and 'lola.dat' with a pm3d surface.
+
+On gnuplot start-up, the mode is `explicit`. For historical and compatibility
+reasons, the commands `set pm3d;` (i.e. no options) and `set pm3d at X ...`
+(i.e.  `at` is the first option) set change the mode to `implicit`.
+The command `set pm3d;` sets other options to their default state.
+
+If you set the default data or function style to @ref{pm3d}, e.g.:
+@example
+      set style data pm3d
+@end example
+
+then the options `implicit` and `explicit` have no effect.
+
+Note that when plotting several plots, they are plotted in the order given
+on the command line. This can be of interest especially for filled surfaces
+which can overwrite and therefore hide part of earlier plots.
+
+The pm3d coloring can be drawn at any or all of three different positions,
+`top`, `bottom`, or @ref{surface}. See @ref{position}.
+The following command draws three color surfaces at different altitudes:
+@example
+      set border 4095
+      set pm3d at s
+      splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
+
+@end example
+
+See also help for @ref{palette}, @ref{cbrange}, `set colorbox`, 
+and definitely the demo file `demo/pm3d.dem`.
+
+@menu
+* algorithm::                   
+* position::                    
+* scanorder::                   
+* clipping::                    
+* color_assignment::            
+* hidden3d_::                   
+* interpolate::                 
+* deprecated_options::          
+@end menu
+
+@node algorithm, position, pm3d, pm3d
+@subsubsection algorithm
+
+@c ?pm3d algorithm
 
 Let us first describe how a map/surface is drawn.  The input data come from an
 evaluated function or from an `splot data file`.  Each surface consists of a
@@ -12470,30 +12559,10 @@ See `set colorbox`, @ref{cbrange}.
 3. To use pm3d coloring to generate a two-dimensional plot rather than a 3D
 surface, use `set view map` or `set pm3d map`.
 
-Syntax (the options can be given in any order):
-@example
-      set pm3d @{
-                 @{ at <bst combination> @}
-                 @{ interpolate <steps/points in scan, between scans> @}
-                 @{ scansautomatic | scansforward | scansbackward | depthorder @}
-                 @{ flush @{ begin | center | end @} @}
-                 @{ ftriangles | noftriangles @}
-                 @{ clip1in | clip4in @}
-                 @{ corners2color @{ mean|geomean|median|min|max|c1|c2|c3|c4 @} @}
-                 @{ hidden3d <linestyle> | nohidden3d @}
-                 @{ implicit | explicit @}
-                 @{ map @}
-               @}
-      show pm3d
-      unset pm3d
+@node position, scanorder, algorithm, pm3d
+@subsubsection position
 
-@end example
-
-Color surface is drawn if data or function @ref{style} is set to pm3d globally or
-via 'with' option, or if the option `implicit` is on---then the pm3d surface
-is combined with the line surface mesh. See bottom of this section for mode
-details.
-
+@c ?pm3d position
 Color surface can be drawn at the base or top (then it is a gray/color planar
 map) or at z-coordinates of surface points (gray/color surface).  This is
 defined by the `at` option with a string of up to 6 combinations of `b`, `t`
@@ -12506,11 +12575,34 @@ Colored quadrangles are plotted one after another.  When plotting surfaces
 polygon meshes.)  You may try to switch between `scansforward` and
 `scansbackward` to force the first scan of the data to be plotted first or
 last.  The default is `scansautomatic` where gnuplot makes a guess about scans
-order.  On the other hand, the @ref{depthorder} option completely reorders the
+order.  On the other hand, the `depthorder` option completely reorders the
 quadrangles. The rendering is performed after a depth sorting, which allows to
-visualize even complicated surfaces; see @ref{depthorder} for more details.
+visualize even complicated surfaces; see `pm3d depthorder` for more details.
 
-If two subsequent scans do not have same number of points, then it has to be
+@node scanorder, clipping, position, pm3d
+@subsubsection scanorder
+
+@c ?pm3d scanorder
+@c ?pm3d depthorder
+@c ?pm3d flush
+@cindex depthorder
+
+@cindex flush
+
+@cindex scansforward
+
+@cindex scansbackward
+
+@cindex scansautomatic
+
+@cindex depthorder
+
+By default the quadrangles making up a pm3d solid surface are rendered in the
+order they are encountered along the surface grid points.  This order may be
+controlled by the options `scansautomatic`|`scansforward`|`scansbackward`.
+These scan options are not in general compatible with hidden-surface removal.
+
+If two successive scans do not have same number of points, then it has to be
 decided whether to start taking points for quadrangles from the beginning of
 both scans (`flush begin`), from their ends (`flush end`) or to center them
 (`flush center`).  Note, that `flush (center|end)` are incompatible with
@@ -12522,10 +12614,47 @@ If two subsequent scans do not have the same number of points, the option
 where there are not enough points in either of the scan. This can be used to
 draw a smooth map boundary.
 
+Gnuplot does not do true hidden surface removal for solid surfaces, but often
+it is sufficient to render the component quadrangles in order from furthest
+to closest.  This mode may be selected using the options
+@example
+      set pm3d depthorder hidden3d
+@end example
+
+The `depthorder` option orders the solid quadrangles; the @ref{hidden3d} option
+similarly orders the bounding lines (if drawn).  Note that the global option
+@ref{hidden3d} does not affect pm3d surfaces.
+
+
+@node clipping, color_assignment, scanorder, pm3d
+@subsubsection clipping
+
+@c ?pm3d clipping
 Clipping with respect to x, y coordinates of quadrangles can be done in two
 ways.  `clip1in`: all 4 points of each quadrangle must be defined and at least
 1 point of the quadrangle must lie in the x and y ranges.  `clip4in`: all 4
 points of each quadrangle must lie in the x and y ranges.
+
+
+@node color_assignment, hidden3d_, clipping, pm3d
+@subsubsection color_assignment
+
+@c ?pm3d color_assignment
+@cindex mean
+
+@cindex geomean
+
+@cindex median
+
+@cindex min
+
+@cindex max
+
+The coloring setup as well as the color box drawing are determined by
+@ref{palette}.  There can be only one palette for the current plot.  Drawing
+of several surfaces with different palettes can be achieved by @ref{multiplot}
+with fixed @ref{origin} and @ref{size}; don't forget to use `set palette maxcolors`
+when your terminal is running out of available colors.
 
 There is a single gray/color value associated to each drawn pm3d quadrangle
 (no smooth color change among vertices).  The value is calculated from
@@ -12554,33 +12683,34 @@ independently by @ref{zrange}, @ref{cbrange}, as well as `set log` for z or
 cb.  Maps can be adjusted by the cb-axis only; see also `set view map` and
 `set colorbox`.
 
-The option @ref{hidden3d} takes as the argument a linestyle which must be created
-by `set style line ...`. (The style need not to be present when setting pm3d,
-but it must be present when plotting).  If set, lines are drawn using the
-specified line style, taking into account hidden line removal.  This is by
-far more efficient than using the command @ref{hidden3d} as it doesn't really
-calculate hidden line removal, but just draws the filled polygons in the
-correct order. So the recommended choice when using pm3d is
+@node hidden3d_, interpolate, color_assignment, pm3d
+@subsubsection hidden3d
+
+@c ?set pm3d hidden3d
+@c ?pm3d hidden3d
+The option @ref{hidden3d} draws the bounding lines of each quadrangle
+at the same time that the quadrangle itself is drawn. Normally it is used in
+conjunction with the `depthorder` option to achieve an approximation to true
+hidden line removal.  This is far more efficient than using the command
+@ref{hidden3d}.  The command takes an optional linestyle controlling the
+appearance of the bounding lines.  If the linestyle parameter is negative,
+or omitted, then the line properties given in the plot command are used.
+Example of recommended usage:
+
 @example
-      set pm3d at s hidden3d 100
-      set style line 100 lt 5 lw 0.5
+      set pm3d at s hidden3d depthorder
       unset hidden3d
       unset surf
-      splot x*x+y*y
+      splot x*x+y*y linecolor rgb "black" linewidth 0.5
 
 @end example
 
-There used to be an option @{transparent|solid@} to this command.  Now
-you get the same effect from `set grid @{front|layerdefault@}`,
-respectively.
 
-The `set pm3d map` is an abbreviation for `set pm3d at b`; `set view map`;
-@ref{pm3d}; @ref{pm3d};.
-It is used for backwards compatibility, when `set view map` was not available.
-Take care that you properly use @ref{zrange} and @ref{cbrange} for input data point
-filtering and color range scaling, respectively; and also `set (no)surface`
-seems to have a (side?) effect.
+@node interpolate, deprecated_options, hidden3d_, pm3d
+@subsubsection interpolate
 
+@c ?set pm3d interpolate
+@c ?pm3d interpolate
 The option `interpolate m,n` will interpolate grid points into a finer mesh,
 and color each quadrangle appropriately.  For data files, this will smoothen
 the color surface, and enhance spikes in a color surface. For functions,
@@ -12593,86 +12723,19 @@ m and n, the interpolation frequency is chosen so that there will be at least
 Zeros, i.e. `interpolation 0,0`, will automatically choose an optimal number of
 interpolated surface points.
 
-The coloring setup as well as the color box drawing are determined by
-@ref{palette}.  There can be only one palette for the current plot.  Drawing
-of several surfaces with different palettes can be achieved by @ref{multiplot}
-with fixed @ref{origin} and @ref{size}; don't forget to use `set palette maxcolors`
-when your terminal is running out of available colors.
+@node deprecated_options,  , interpolate, pm3d
+@subsubsection deprecated_options
 
-On gnuplot start-up, mode is `explicit`. For historical and thus compatibility
-reasons, commands `set pm3d;` (i.e. no options) and `set pm3d at X ...` (i.e.
-`at` is the first option) sets mode `implicit`. Further, `set pm3d;` sets up
-the other options to their default.
+@c ?pm3d deprecated_options
+There used to be an option @{transparent|solid@} to this command.  Now
+you get the same effect from `set grid @{front|layerdefault@}`, respectively.
 
-If the option `implicit` is on, all surface plots will be plotted additionally
-to the default type, e.g.
-@example
-      splot 'fred.dat' with lines, 'lola.dat' with lines
-@end example
-
-would give both plots (meshes) additionally to a pm3d surface. That's what you
-are used to after `set pm3d;`.
-
-If the option `explicit` is on (or `implicit` is off) only plots specified
-by the @ref{pm3d} attribute are plotted with a pm3d surface, e.g.:
-@example
-      splot 'fred.dat' with lines, 'lola.dat' with pm3d
-@end example
-
-would plot 'fred.dat' with lines (and only lines) and 'lola.dat' with
-a pm3d surface.
-
-If you set the default data or function style to @ref{pm3d}, e.g.:
-@example
-      set style data pm3d
-@end example
-
-then the options `implicit` and `explicit` have no effect.
-
-Note that when plotting several plots, they are plotted in the order given
-on the command line. This can be of interest especially for filled surfaces
-which can overwrite and therefore hide part of earlier plots.
-
-If @ref{pm3d} is specified in the `splot` command line, then it accepts the
-'at' option.  The following plots draw three color surfaces at different
-altitudes:
-@example
-      set border 4095
-      set pm3d at s
-      splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
-
-@end example
-
-See also help for @ref{palette}, @ref{cbrange}, `set colorbox`, @ref{pm3d}
-and definitely the demo file `demo/pm3d.dem`.
-
-@menu
-* depthorder::                  
-@end menu
-
-@node depthorder,  , pm3d, pm3d
-@subsubsection depthorder
-
-@c ?commands set pm3d depthorder
-@c ?set pm3d depthorder
-@c ?pm3d depthorder
-@cindex depthorder
-
-By default the quadrangles making up a pm3d solid surface are rendered in the
-order they are encountered along the surface grid points.  This order may be
-controlled by the options `scansautomatic`|`scansforward`|`scansbackward`.
-These scan options are not in general compatible with hidden-surface removal.
-
-Gnuplot does not do true hidden surface removal for solid surfaces, but often
-it is sufficient to render the component quadrangles in order from furthest
-to closest.  This mode may be selected using the options
-@example
-      set pm3d depthorder hidden3d
-@end example
-
-The @ref{depthorder} option orders the solid quadrangles; the @ref{hidden3d} option
-similarly orders the bounding lines (if drawn).  Note that the global option
-@ref{hidden3d} does not affect pm3d surfaces.
+The command `set pm3d map` is equivalent to `set pm3d at b`; `set view map`;
+@ref{pm3d}; @ref{pm3d};.
+It is used for backwards compatibility, when `set view map` was not available.
+Take care that you properly use @ref{zrange} and @ref{cbrange} for input data point
+filtering and color range scaling, respectively; and also `set (no)surface`
+seems to have a (side?) effect.
 
 @node palette, pointsize, pm3d, set-show
 @subsection palette
@@ -12769,15 +12832,16 @@ Automatic gamma correction via `set palette gamma <gamma>` can be done for
 gray maps only (`set palette gray`).  Linear mapping to gray is for gamma
 equals 1, see @ref{palette}.  Gamma is ignored for color mappings.
 
-Most terminals support only discrete number of colors (e.g. 256 colors in
-gif).  All entries of the palette remaining after the default gnuplot linetype
-colors declaration are allocated for pm3d by default.  Then @ref{multiplot} could
-fail if there are no more color positions in the terminal available.  Then you
-should use `set palette maxcolors <maxcolors>` with a reasonably small value.
-This option can also be used to separate levels of z=constant in discrete
-steps, thus to emulate filled contours. Default value of 0 stays for
-allocating all remaining entries in the terminal palette or for to use exact
-mapping to RGB.
+Many terminals support only discrete number of colors (e.g. 256 colors in gif).
+After the default gnuplot linetype colors are allocated, the rest of the
+available colors are by default reserved for pm3d.  Thus a multiplot using
+multiple palettes could fail because the first palette has used all the
+available color positions.  You can mitigate this limitation by using
+`set palette maxcolors <N>` with a reasonably small value of N.
+This option causes N discrete colors to be selected from a continuous palette
+sampled at equally spaced intervals.  If you want unequal spacing of N
+discrete colors, use @ref{defined} instead of a single continuous
+palette.
 
 RGB color space might not be the most useful color space to work in.  For that
 reason you may change the color space with `model` to one of `RGB`, `HSV`,
@@ -12942,18 +13006,19 @@ Approximate the default palette used by MATLAB:
 
 @end example
 
-To produce a palette with few colors only use:
+To produce a palette with only a few, equally-spaced colors:
 @example
       set palette model RGB maxcolors 4
-      set palette defined ( 0 "blue", 1 "green", 2 "yellow", 3 "red" )
+      set palette defined ( 0 "yellow", 1 "red" )
 
 @end example
 
 'Traffic light' palette (non-smooth color jumps at gray = 1/3 and 2/3).
 @example
       set palette model RGB
-      set palette defined (0 "dark-green", 1 "green", 1 "yellow", \
-                           2 "dark-yellow", 2 "red", 3 "dark-red" )
+      set palette defined (0 "dark-green", 1 "green", \
+                           1 "yellow",     2 "dark-yellow", \
+                           2 "red",        3 "dark-red" )
 
 @end example
 
@@ -13375,8 +13440,8 @@ the plot specified by <xscale> and <yscale>.
 
 The meaning of a negative value for <r> is different.  If <r>=-1, gnuplot
 tries to set the scales so that the unit has the same length on both the x
-and y axes (suitable for geographical data, for instance).  If <r>=-2, the
-unit on y has twice the length of the unit on x, and so on.
+and y axes.  This is equivalent to `set view equal xy`.  See `set view equal`.
+If <r>=-2, the unit on y has twice the length of the unit on x, and so on.
 
 The success of `gnuplot` in producing the requested aspect ratio depends on
 the terminal selected.  The graph area will be the largest rectangle of
@@ -13661,7 +13726,7 @@ Syntax:
       set style fill @{empty
                       | @{transparent@} solid @{<density>@}
                       | @{transparent@} pattern @{<n>@}@}
-                     @{border @{<colorspec>@} | noborder@}
+                     @{border @{lt@} @{lc <colorspec>@} | noborder@}
 
 @end example
 
@@ -13831,8 +13896,8 @@ Syntax:
 
 @end example
 
-If `default` is given all line style parameters are set to their default
-values.
+`default` sets all line style parameters to those of the linetype with
+that same index.
 
 If the linestyle <index> already exists, only the given parameters are
 changed while all others are preserved.  If not, all undefined values are
@@ -14971,7 +15036,8 @@ Syntax:
 @end example
 
 where <min> and <max> terms are constants, expressions or an asterisk to set
-autoscaling.  If the data are time/date, you must give the range as a quoted
+autoscaling.  See below for full autoscaling syntax.  
+If the data are time/date, you must give the range as a quoted
 string according to the @ref{timefmt} format.  Any value omitted will not be
 changed.
 
@@ -14982,6 +15048,28 @@ The `reverse` option reverses the direction of the axis, e.g., `set xrange
 [0:1] reverse` will produce an axis with 1 on the left and 0 on the right.
 This is identical to the axis produced by `set xrange [1:0]`, of course.
 `reverse` is intended primarily for use with @ref{autoscale}.
+
+Autoscaling:  If <min> (the same applies for correspondingly to <max>) is
+an asterisk "*" autoscaling is turned on.  The range in which autoscaling
+is being performed may be limited by a lower bound <lb> or an upper bound
+<ub> or both.  The syntax is 
+@example
+      @{ <lb> < @} * @{ < <ub> @}
+@end example
+
+For example,
+@example
+      0 < * < 200
+@end example
+
+sets <lb> = 0 and <ub> = 200.  With such a setting <min> would be autoscaled,
+but its final value will be between 0 and 200 (both inclusive despite the
+'<' sign).  If no lower or upper bound is specified, the '<' to also be
+ommited.  If <ub> is lower than <lb> the constraints will be turned off
+and full autoscaling will happen.
+This feature is useful to plot measured data with autoscaling but providing
+a limit on the range, to clip outliers, or to guarantee a minimum range
+that will be displayed even if the data would not need such a big range. 
 
 The `writeback` option essentially saves the range found by @ref{autoscale} in
 the buffers that would be filled by @ref{xrange}.  This is useful if you wish
@@ -15048,6 +15136,32 @@ To autoscale xmin while leaving xmax unchanged:
       set xrange [*:]
 
 @end example
+
+To autoscale xmin but keeping xmin positive:
+@example
+      set xrange [0<*:]
+
+@end example
+
+To autoscale x but keep minumum range of 10 to 50 (actual might be larger):
+@example
+      set xrange [*<10:50<*]
+
+@end example
+
+Autoscaling but limit maximum xrange to -1000 to 1000, i.e. autoscaling
+within [-1000:1000]
+@example
+      set xrange [-1000<*:*<1000]
+
+@end example
+
+Make sure xmin is somwehere between -200 and 100:
+@example
+      set xrange [-200<*<100:]
+
+@end example
+
 
 @node xtics, xyplane, xrange, set-show
 @subsection xtics
@@ -20177,7 +20291,7 @@ takes either one or three integers in the range [0, 255]. If only one
 integers is supplied, it is taken as gray value for the background.
 If three integers are present, the background gets the corresponding
 color.
-The (mutually exclusive) options `interpolate` and `uniform` control
+The (mutually exclusive) options @ref{interpolate} and `uniform` control
 if color interpolation is done while drawing triangles (on by default).
 
 A `screen dump file` can be specified with the `dump "file"` option.
@@ -20255,7 +20369,7 @@ where `color` and `monochrome` select colored or mono output,
 superscripts and mixed fonts). See `enhanced` for more information.
 `"<fontname>"` is the name of a valid Windows font, and `<fontsize>`
 is the size of the font in points.
-@ref{size} defines the width and height of the window in pixel and `position`
+@ref{size} defines the width and height of the window in pixel and @ref{position}
 the origin of the window i.e. the position of the top left corner on the
 screen (again in pixel). Both these options override the default settings
 from the WGNUPLOT.INI file (see below).
@@ -20596,10 +20710,6 @@ between sessions through the configuration dialog."
 
 @cindex X11
 
-`gnuplot` provides the `x11` terminal type for use with X servers.  This
-terminal type is set automatically at startup if the `DISPLAY` environment
-variable is set, if the `TERM` environment variable is set to `xterm`, or
-if the `-display` command line option is used.
 
 Syntax:
 @example
@@ -21115,10 +21225,6 @@ you can set the resource 'gnuplot.fastrotate' to 'off'
 
 @cindex X11
 
-`gnuplot` provides the `x11` terminal type for use with X servers.  This
-terminal type is set automatically at startup if the `DISPLAY` environment
-variable is set, if the `TERM` environment variable is set to `xterm`, or
-if the `-display` command line option is used.
 
 Syntax:
 @example
