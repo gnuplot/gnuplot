@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.631 2010/10/22 05:28:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.632 2010/10/27 04:07:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10120,8 +10120,8 @@ Ffigure_mapcontours
 
  The meaning of a negative value for <r> is different.  If <r>=-1, gnuplot
  tries to set the scales so that the unit has the same length on both the x
- and y axes (suitable for geographical data, for instance).  If <r>=-2, the
- unit on y has twice the length of the unit on x, and so on.
+ and y axes.  This is equivalent to `set view equal xy`.  See `set view equal`.
+ If <r>=-2, the unit on y has twice the length of the unit on x, and so on.
 
  The success of `gnuplot` in producing the requested aspect ratio depends on
  the terminal selected.  The graph area will be the largest rectangle of
