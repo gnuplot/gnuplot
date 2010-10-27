@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.47 2010/07/08 04:54:51 sfeam Exp $
+ * $Id: gp_types.h,v 1.48 2010/07/30 18:32:55 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -166,19 +166,6 @@ typedef struct coordinate {
     coordval x, y, z;
     coordval ylow, yhigh;	/* ignored in 3d */
     coordval xlow, xhigh;	/* also ignored in 3d */
-#if 0
-    /* Currently color information is overloaded onto yhigh by the defintion
-     * of CRD_COLOR. This saves 8 bytes, but limits the use of variable color
-     * data to plot styles that do not already use the full set of coordinate
-     * fields (e.g. candlesticks, boxxyerror).
-     */
-    coordval color;		/* PM3D's color value to be used */
-				/* Note: accessed only if NEED_PALETTE(this_plot) */
-#endif
-#if (defined(MSDOS) && defined(__TURBOC__))
-    /* FIXME HBB 20020301: addition of 'color' probably broke this */
-    char pad[2];		/* pad to 32 byte boundary */
-#endif
 } coordinate;
 
 #endif /* GNUPLOT_GPTYPES_H */
