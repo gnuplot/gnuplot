@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.122 2010/09/08 20:56:14 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.123 2010/09/09 04:08:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -994,8 +994,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	    if (equals(c_token,"-") || isanumber(c_token)) {
 		fs->border_color.type = TC_LT;
 		fs->border_color.lt = int_expression() - 1;
-	    } else if (!END_OF_COMMAND) {
-		c_token--;
+	    } else if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")) {
 		parse_colorspec(&fs->border_color, TC_Z);
 	    }
 	    continue;
