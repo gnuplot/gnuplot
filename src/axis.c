@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.83 2010/09/28 17:14:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.84 2010/10/14 17:38:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -155,7 +155,6 @@ AXIS_INDEX y_axis = FIRST_Y_AXIS;
 AXIS_INDEX z_axis = FIRST_Z_AXIS;
 
 /* --------- internal prototypes ------------------------- */
-static double dbl_raise __PROTO((double x, int y));
 static double make_auto_time_minitics __PROTO((t_timelevel, double));
 static double make_tics __PROTO((AXIS_INDEX, int));
 static double quantize_time_tics __PROTO((AXIS_INDEX, double, double, int));
@@ -164,7 +163,6 @@ static double round_outward __PROTO((AXIS_INDEX, TBOOLEAN, double));
 static TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
 static double quantize_duodecimal_tics __PROTO((double, int));
 static void get_position_type __PROTO((enum position_type * type, int *axes));
-
 
 /* ---------------------- routines ----------------------- */
 
@@ -520,24 +518,6 @@ copy_or_invent_formatstring(AXIS_INDEX axis)
 
 /* }}} */
 
-/* {{{ dbl_raise() used by quantize_normal_tics */
-/* FIXME HBB 20000426: is this really useful? */
-static double
-dbl_raise(double x, int y)
-{
-    int i = abs(y);
-    double val = 1.0;
-
-    while (--i >= 0)
-	val *= x;
-
-    if (y < 0)
-	return (1.0 / val);
-    return (val);
-}
-
-/* }}} */
-
 /* {{{ quantize_normal_tics() */
 /* the guide parameter was intended to allow the number of tics
  * to depend on the relative sizes of the plot and the font.
@@ -555,7 +535,7 @@ double
 quantize_normal_tics(double arg, int guide)
 {
     /* order of magnitude of argument: */
-    double power = dbl_raise(10.0, floor(log10(arg)));
+    double power = pow(10.0, floor(log10(arg)));
     double xnorm = arg / power;	/* approx number of decades */
     /* we expect 1 <= xnorm <= 10 */
     double posns = guide / xnorm; /* approx number of tic posns per decade */
@@ -632,7 +612,7 @@ static double
 quantize_duodecimal_tics(double arg, int guide)
 {
     /* order of magnitude of argument: */
-    double power = dbl_raise(12.0, floor(log(arg)/log(12.0)));
+    double power = pow(12.0, floor(log(arg)/log(12.0)));
     double xnorm = arg / power;	/* approx number of decades */
     double posns = guide / xnorm; /* approx number of tic posns per decade */
 

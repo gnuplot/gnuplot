@@ -5,6 +5,10 @@
 	vector format output.
 	Bug #3096750
 
+	* src/axis.c: The custom routine dbl_raise() was failing to handle NaN
+	correctly, causing an infinite loop from e.g.   set yrange [*:NaN]
+	Replace it with a call to the C library routine pow().
+
 2010-10-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_fillstyle):  Allow "border" as a keyword without
