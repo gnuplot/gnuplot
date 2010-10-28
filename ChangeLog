@@ -1,3 +1,10 @@
+2010-10-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_boxes): Prevent out-of-range boxes from creating
+	degenerate invisible boxes in the output file.  This can reduce file
+	size for vector format output.
+	Bug #3096750
+
 2010-10-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_fillstyle):  Allow "border" as a keyword without

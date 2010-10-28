@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.21 2010/09/21 06:04:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.22 2010/10/19 04:32:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3572,12 +3572,10 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    dxl = plot->points[i].xlow;
 		}
 
-		/* HBB 20040521: ylow should be clipped to the y range. */
 		if (plot->plot_style == BOXXYERROR) {
-		    double temp_y = plot->points[i].ylow;
-
-		    cliptorange(temp_y, Y_AXIS.min, Y_AXIS.max);
-		    xaxis_y = map_y(temp_y);
+		    dyb = plot->points[i].ylow;
+		    cliptorange(dyb, Y_AXIS.min, Y_AXIS.max);
+		    xaxis_y = map_y(dyb);
 		    dyt = plot->points[i].yhigh;
 		} else {
 		    dyt = plot->points[i].y;
@@ -3656,10 +3654,18 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		cliptorange(dxr, X_AXIS.min, X_AXIS.max);
 		cliptorange(dxl, X_AXIS.min, X_AXIS.max);
 
+		/* Entire box is out of range on x */
+		if (dxr == dxl && (dxr == X_AXIS.min || dxr == X_AXIS.max))
+		    break;
+
 		xl = map_x(dxl);
 		xr = map_x(dxr);
 		yt = map_y(dyt);
 		yb = xaxis_y;
+
+		/* Entire box is out of range on y */
+		if (yb == yt && (dyt == Y_AXIS.min || dyt == Y_AXIS.max))
+		    break;
 
 		if (plot->plot_style == HISTOGRAMS
 		&& (histogram_opts.type == HT_STACKED_IN_LAYERS
