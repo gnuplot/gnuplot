@@ -1,3 +1,8 @@
+2010-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/pm3dcolors.dem: Added first page with multiple palettes. Show
+	color ranges in [0:1].
+
 2010-10-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxes): Prevent out-of-range boxes from creating
@@ -104,7 +109,6 @@
 	* src/command.c (replotrequest):  Once we have started to replot, the
 	previous data no longer exists. Therefore we must set refresh_ok = 0.
 	(This fix is in 4.4.2)
-
 
 2010-09-24  Ethan A Merritt  <merritt@u.washington.edu>
 
