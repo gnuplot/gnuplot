@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.632 2010/10/27 04:07:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.633 2010/10/27 04:25:12 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7529,7 +7529,7 @@ Ffigure_mapcontours
         plot 'datafile' using 1:2, f(x)
 
  By default the information written to the log file is also echoed to
- the terminal session.  "set fit quiet" turns off the echo.
+ the terminal session. `set fit quiet` turns off the echo.
 3 fontpath
 ?commands set fontpath
 ?commands show fontpath
@@ -9373,7 +9373,7 @@ Ffigure_mapcontours
  A pm3d color surface is drawn if the splot command specifies `with pm3d`,  
  if the data or function `style` is set to pm3d globally, or if the pm3d mode is
  `set pm3d implicit`.  In the latter two cases, the pm3d surface is draw in
- addition to the mesh produced byt the style specified in the plot command. E.g.
+ addition to the mesh produced by the style specified in the plot command. E.g.
        splot 'fred.dat' with lines, 'lola.dat' with lines
  would draw both a mesh of lines and a pm3d surface for each data set.
  If the option `explicit` is on (or `implicit` is off) only plots specified
@@ -9383,7 +9383,7 @@ Ffigure_mapcontours
 
  On gnuplot start-up, the mode is `explicit`. For historical and compatibility
  reasons, the commands `set pm3d;` (i.e. no options) and `set pm3d at X ...`
- (i.e.  `at` is the first option) set change the mode to `implicit`.
+ (i.e.  `at` is the first option) change the mode to `implicit`.
  The command `set pm3d;` sets other options to their default state.
 
  If you set the default data or function style to `pm3d`, e.g.:
@@ -11471,7 +11471,7 @@ Ffigure_mapcontours
  within [-1000:1000]
        set xrange [-1000<*:*<1000]
 
- Make sure xmin is somwehere between -200 and 100:
+ Make sure xmin is somewhere between -200 and 100:
        set xrange [-200<*<100:]
 
 3 xtics

@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.339 2010-08-19 10:40:36+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.623
+C RCS $Id: gnuplot-ja.doc,v 1.346 2010-10-28 09:50:57+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.633
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -92,7 +92,7 @@ C Shigeharu Takeno et al (3.7, 4.X)
  (以下おおまかな訳; 訳は正しくないかも知れませんので詳しくは上記の原文
  を当たってください。訳者は責任を持ちません。)
 
-       Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+     Copyright (C) 1986 - 1993, 1998, 2004, 2007  Thomas Williams, Colin Kelley
 
  このソフトウェアとその付属文書の使用、複製、配布の許可は、上記の著作権
  (copyright) 表示が、全ての複製物に書かれていること、および著作権表示と
@@ -994,6 +994,15 @@ C Shigeharu Takeno et al (3.7, 4.X)
  ては (特に sun) 大きい x の値に対する exp(-x) は未定義値を返す場合があ
  ります。このような場合、safe(x) = x<-100 ? 0 : exp(x) のようなユーザ定
  義関数が役に立つでしょう。
+4 expint
+?expressions functions expint
+?functions expint
+?expint
+#expint(n,x) & 整数 $n\ge0$, 実数 $x\ge0$ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$, $x$ の指数積分 \\
+%expint(n,x)@any@$E sub n (x)$, $x$ の指数積分
+ 関数 `expint(n,x)` は、その引数の実数部分の指数積分、すなわち t の関数
+ t^(-n) e^(-tx) の 1 から∞までの積分値を返します。n は 0 以上の整数、
+ x は 0 以上の実数で、x>0 か n>1 のいずれかでなければなりません。
 4 floor
 ?expressions functions floor
 ?functions floor
@@ -1307,8 +1316,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
 ?expressions functions exists
 ?functions exists
 ?exists
-#exists("X") & "変数名" & 変数名 X が定義されていれば 1 そうでなければ 0 を返す\\
-%exists("X")@"変数名"@ 変数名 X が定義されていれば 1 そうでなければ 0 を返す
+#exists("X") & 文字列 & 変数名 X が定義されていれば 1 そうでなければ 0 を返す\\
+%exists("X")@文字列@ 変数名 X が定義されていれば 1 そうでなければ 0 を返す
  exists() の引数は文字列定数、または文字列変数です。その文字列が、定義
  されている変数名を持っていれば 1 を、そうでなければ 0 を返します。
 4 stringcolumn
@@ -1412,6 +1421,9 @@ C Shigeharu Takeno et al (3.7, 4.X)
 %valid(x)@整数@ データ中の column($x$) の正当性
  `valid(x)` は、データ描画か fit における `using` の式の中でしか使われ
  ません。以下参照: `plot datafile using`。
+
+#value("name") & 文字列 & name の変数値を返す。\\
+%value("name")@文字列@ name の変数値を返す。
 @end table
 
 4 種々の楕円積分 (elliptic integrals)
@@ -1443,6 +1455,17 @@ C Shigeharu Takeno et al (3.7, 4.X)
   `rand(-1)` 2 つの種の値を標準値に戻す
   `rand(x)`  x>0 ならば両方の種に x の値に基づく値を設定する
   `rand({x,y})` x>0 ならば seed1 を x に、seed2 を y に設定する
+
+4 value
+?expressions functions value
+?functions value
+?value
+ A がユーザー定義変数の名前であれば、B = value("A") は事実上 B = A と全
+ く同じです。これは、変数の名前自身が文字列変数に収められている場合に有
+ 用です。以下参照: `user-defined variables`。これは、変数名をデータファ
+ イルから読み取ることも可能にします。引数が数式である場合、value() はそ
+ の数式の値を返します。引数が文字列で、定義されている変数に対応するもの
+ がない場合、value() は NaN を返します。
 
 3 演算子 (Operators)
 ?expressions operators
@@ -1746,7 +1769,7 @@ C ... and restart the table:
        set label GPFUN_sinc at graph .05,.95
 
  以下参照: `show functions`, `functions`, `gnuplot-defined variables`,
- `macros`。
+ `macros`, `value`。
 2 フォント
 ?fonts
  gnuplot それ自身にはどんなフォントも含まれてはおらず、外部フォント処理
@@ -1942,31 +1965,20 @@ C ... and restart the table:
  以下参照: `show colornames`, `set palette`, `cbrange`。
 
  点線/破線のパターンをサポートする出力形式では、デフォルトの線種は点線/
- 破線のパターンと色の両方が定義されています。しかし、デフォルトの色は、
- キーワード `linecolor` (省略形は `lc`) を使うことで上書きできます。例
- えば、postscript 出力形式のデフォルトの線種 3 は青の破線です。以下の描
- 画コマンドは同じ破線パターンで 3 つの描画を行ないますが、一つは青 (デ
- フォルト)、一つは赤 (線種 1 のデフォルト色)、もう一つは金色になります。
+ 破線のパターンと色の両方が定義されています。今の所 gnuplot には、点線/
+ 破線パターンを変更する仕組みがないので、特定の点線パターンと特定の色を
+ 組み合わせたい場合は、先にその点線パターンを持つ線種 (linetype) を選択
+ し、デフォルトの色をキーワード `linecolor` (省略形は `lc`) で上書きす
+ る必要があります。例えば、postscript 出力形式のデフォルトの線種 3 は青
+ の破線です。以下の描画コマンドは同じ破線パターンで 3 つの描画を行ない
+ ますが、一つは青 (デフォルト)、一つは赤 (線種 1 のデフォルト色)、もう
+ 一つは金色になります。
 
  例:
 
       set term postscript dashed color
       plot 'foo' lt 3, 'baz' lt 3 linecolor 1, 'bar' lt 3 lc rgb 'gold'
 
- 線は、線幅のような他の属性も持つことができます。点 (point) の記号に対
- する同様の属性とともに、これらの属性をコマンド `set style line` を使っ
- てユーザ定義 "ラインスタイル (linestyle)" として結びつけることができま
- す。一度定義された linestyle は、plot コマンド中で、一つまたは多くの描
- 画要素に対してその表示を制御するのに使うことができます。
-
- 例:
-
-      # 新しいラインスタイルを、出力形式に依存しない色 cyan、線幅が 3、
-      # 点種 6 (丸の中に点) と定義
-      set style line 5 lt rgb "cyan" lw 3 pt 6
-      plot sin(x) with linespoints ls 5          # 定義スタイル 5 で
-
- 以下参照: `linestyle`, `set style line`。
 3 色指定 (colorspec)
 ?colorspec
 ?rgbcolor
@@ -2018,60 +2030,66 @@ C ... and restart the table:
  に沿って色を滑らかに変化させることができます。これは、2 次元描画で、パ
  レット値を追加の列データから読み込ませて色付けするのにも使えます (すべ
  ての 2 次元描画スタイルがこの追加列を認識するわけではありません)。
-4 rgbcolor variable
-?rgbcolor variable
-?lc rgbcolor variable
-?tc rgbcolor variable
- 大抵の場合描画コマンドは、各描画要素に一つの色 (線種) を割り当て、一つ
- のグラフに複数の描画を行う場合、デフォルトの色 (線種) が順番に使われて
- いきます。これとは別に、入力データファイルの追加情報に基づいて、各デー
- タ点、各線分、または各ラベルにそれぞれ異なる色を割り当てることも可能で、
- これは、色指定のキーワード `variable` を使うことで行えます。
-
- `lc rgbcolor variable` は、データファイルの別の列から 24-bit RGB 色を
- 取得して使用するようプログラムに指示します。よってこれは、`using` 指定
- 子へ対応する列の指定の追加を必要とし、その列は 24-bit 形式の RGB の 3
- つ組であるとみなされます。これは、最も簡単な形式の 16 進値として指定し
- ます (以下参照: `rgbcolor`)。文字の色も同様に、`tc rgbcolor variable`
- で指定できます。
-
- 例:
-
-       # 3 次元描画で、各 x,y,z 座標に対応した赤、緑、青の成分を持つ色
-       # のついた点を配置
-       rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
-       splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
-
 4 linecolor variable
 ?linecolor variable
 ?lc variable
 ?textcolor variable
 ?tc variable
- 大抵の場合描画コマンドは、各描画要素に一つの色 (線種) を割り当て、一つ
- のグラフに複数の描画を行う場合、デフォルトの色 (線種) が順番に使われて
- いきます。これとは別に、入力データファイルの追加情報に基づいて、各デー
- タ点、各線分、または各ラベルにそれぞれ異なる色を割り当てることも可能で、
- これは、色指定のキーワード `variable` を使うことで行えます。
-
  `lc variable` は、入力データの一つの列から読んだ値をラインスタイルの番
  号として使い、そのラインスタイルに属する色を使うようプログラムに指示し
  ます。よってこれは、`using` 指定子へ対応する列の指定の追加を必要としま
  す。文字の色も同様に、`tc variable` で指定できます。
 
- 一つのデータファイルには、複数のデータ集合を入れることが可能で、それら
- は 2 行の空行で分離されています。これらの個々のデータ集合には、index
- 値が割り当てられていて (以下参照: `index`)、using 指定の column(-2) で
- 取得できます。以下参照: `pseudocolumns`。デフォルトでは、ファイル内の
- すべてのデータが同じ色、線種、点種の属性で描画されますが、コマンド
- `lc variable` を使えば、疑似列 -2 による index 値を用いて、そのファイ
- ル内の個々のデータ集合に異なる色を割り当てることが可能です。
-
  例:
        # データの 3 列目を、個々の点に色を割り当てるのに使用
        plot 'data' using 1:2:3 with points lc variable
 
-       # 線色を選択するのにデータ集合の index を使用
+       # 一つのデータファイルには複数のデータ集合を入れることが可能で、
+       # それらは 2 行の空行で分離されています。個々のデータ集合には
+       # index 値が割り当てられていて (以下参照: `index`)、using 指定の
+       # column(-2) で取得できます。以下参照: `pseudocolumns`。以下の例
+       # は -2 の column 値を使って、個々のデータ集合を異なる線色で描画
+       # します。
        plot 'data' using 1:2:(column(-2)) with lines lc variable
+
+4 rgbcolor variable
+?rgbcolor variable
+?lc rgbcolor variable
+?tc rgbcolor variable
+ グラフの各データ点、各線分、または各ラベルにそれぞれ異なる色を割り当て
+ ることができます。`lc rgbcolor variable` は、データファイルの各行から
+ RGB 色の情報を読み込むようプログラムに指示します。よってこれは、
+ `using` 指定子による対応する列の指定の追加を必要とし、その列は 24-bit
+ 形式の RGB の 3 つ組であるとみなされます。その値をデータファイルから直
+ 接与える場合は、これは最も簡単な形式の 16 進値で与えます (以下参照:
+ `rgbcolor`)。一方で、以下の例のように 24-bit RGB 色として評価されるよ
+ うな数式を `using` 指定子に入れることもできます。文字の色も同様に、
+ `tc rgbcolor variable` で指定できます。
+
+ 例:
+       # 3 次元描画で、各 x,y,z 座標に対応した赤、緑、青の成分を持つ色
+       # のついた点を配置
+       rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
+       splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
+
+3 linestyles と linetypes
+? linestyles vs linetypes
+ 線は、線幅のような他の属性も持つことができます。点 (point) の記号に対
+ する同様の属性とともに、これらの属性をコマンド `set style line` を使っ
+ てユーザ定義 "ラインスタイル (linestyle)" として結びつけることができま
+ す。一度定義された linestyle は、plot コマンド中で、一つまたは多くの描
+ 画要素に対してその表示を制御するのに使うことができます。
+
+ `linetypes` は永続的 (明示的にそれらを再定義するまでは保持される) です
+ が、`linestyles` は一時的なものです。次のグラフィックの状態がリセット
+ されるまでの間しか保持されません。
+
+ 例:
+
+      # 新しいラインスタイルを、出力形式に依存しない色 cyan、線幅が 3、
+      # 点種 6 (丸の中に点) と定義
+      set style line 5 lt rgb "cyan" lw 3 pt 6
+      plot sin(x) with linespoints ls 5          # 定義スタイル 5 で
 
 2 マウス入力 (mouse input)
 ?mouse input
@@ -3518,7 +3536,7 @@ Ffigure_xerrorbars
 Ffigure_xyerrorbars
  `xyerrorbars` スタイルは 2 次元のデータ描画のみで利用可能です。
  `xyerrorbars` は、水平、垂直の誤差指示線 (error bar) も表示される以外
- は `pointss` と同じです。各点 (x,y) において (x,y-ydelta) から
+ は `points` と同じです。各点 (x,y) において (x,y-ydelta) から
  (x,y+ydelta) までと (x-xdelta,y) から (x+xdelta,y) まで、または
  (x,ylow) から (x,yhigh) までと (xlow,y) から (xhigh,y) までの線分が引
  かれますが、これらはいくつのデータ列が与えられるかによって変わります。
@@ -7600,6 +7618,7 @@ Ffigure_mapcontours
     cp852       - 中央/東ヨーロッパの OS/2 のコードページ
     cp950       - MS 版の Big5 (emf terminal のみ)
     cp1250      - 中央/東ヨーロッパの MS Windows のコードページ
+    cp1251      - ロシア、セルビア、ブルガリア、マケドニア語 (8 ビット)
     cp1254      - トルコの MS Windows のコードページ (Latin5 の拡張)
     utf8        - 各文字の Unicode エントリポイントの、可変長 (マルチバ
                   イト) 表現
@@ -7621,11 +7640,9 @@ Ffigure_mapcontours
 ?set fit
 ?show fit
  `fit` の設定は、コマンド `fit` がその出力を行うファイルを定義します。
- 使用している gnuplot が使えるように作られていれば、このコマンドは当て
- はめのパラメータ誤差を変数に書き出すかどうかも制御できます。
 
  書式:
-       set fit {logfile {"<filename>"}} {{no}errorvariables}
+       set fit {logfile {"<filename>"}} {{no}errorvariables} {{no}quiet}
        unset fit
        show fit
 
@@ -7649,6 +7666,9 @@ Ffigure_mapcontours
         print "error of a is:", a_err
         set label 'a=%6.2f', a, '+/- %6.2f', a_err
         plot 'datafile' using 1:2, f(x)
+
+ デフォルトでは、ログファイルに書き出される情報は画面にも表示されます。
+ `set fit quiet` とすればこの画面表示は消えます。
 3 fontpath
 ?commands set fontpath
 ?commands show fontpath
@@ -9477,33 +9497,68 @@ Ffigure_mapcontours
 ?show pm3d
 ?pm3d
  pm3d は `splot` の一つのスタイルで、パレットに割り付けられた 3 次元、
- 4 次元データを、カラー/灰色の色地図/曲面として描画します。これは pm3d
- アルゴリズムを用いていて、これはデータが格子状であっても、データ走査毎
- に点の数が違っているような非格子状のデータであっても、前処理することな
- く描画できます。
+ 4 次元データを、カラー/灰色の色地図/曲面として描画します。これはあるア
+ ルゴリズムを用いていて、これはデータが格子状であっても、データ走査毎に
+ 点の数が違っているような非格子状のデータであっても、前処理することなく
+ 描画できます。
 
- カラー曲面の描画は、`palette` で指定した色割当による多角形の塗りつぶし
- をサポートしている出力形式で行えます。現在サポートしている出力形式には
- 以下のものが含まれます。
+ 書式 (オプションは任意の順で与えることができます):
+       set pm3d
+       set pm3d {
+                  { at <position> }
+                  { interpolate <steps/points in scan, between scans> }
+                  { scansautomatic | scansforward | scansbackward | depthorder }
+                  { flush { begin | center | end } }
+                  { ftriangles | noftriangles }
+                  { clip1in | clip4in }
+                  { corners2color { mean|geomean|median|min|max|c1|c2|c3|c4 } }
+                  { hidden3d {<linestyle>} | nohidden3d }
+                  { implicit | explicit }
+                  { map }
+                }
+       show pm3d
+       unset pm3d
 
-   画像出力ドライバ:
-     OS/2 Presentation Manager
-     X11
-     Linux VGA (vgagl)
-     GGI
-     Windows
-     AquaTerm (Mac OS X)
-     wxWidgets (wxt)
-   画像ファイル出力ドライバ:
-     PostScript
-     pslatex, pstex, epslatex
-     gif, png, jpeg
-     (x)fig
-     tgif
-     cgm
-     pdf
-     svg
-     emf
+ splot コマンドで `with pm3d` を指定した場合、またはデータや関数描画ス
+ タイル (`style`) が大域的に pm3d にセットされている場合、あるいは、
+ pm3d モードが `set pm3d implicit` となっている場合は、pm3d のカラー曲
+ 面が描画されます。後の 2 つの場合は、plot コマンドで指定したスタイルで
+ 生成される網目に p3md 曲面を追加する形で描画します。例えば、
+       splot 'fred.dat' with lines, 'lola.dat' with lines
+ は、各データ集合毎に折れ線による網目と pm3d 曲面の両方を描画します。
+ オプション `explicit` が ON (または `implicit` が OFF) の場合は、属性
+ `with pm3d` が指定された描画のみが pm3d 曲面として描画されます。例えば
+       splot 'fred.dat' with lines, 'lola.dat' with pm3d
+ は、'freq.dat' は折れ線で (線のみで)、'lola.dat' は pm3d 曲面で描画さ
+ れます。
+
+ gnuplot の起動時はそのモードは `explicit` になっています。歴史的、そし
+ て互換性のために、コマンド `set pm3d;` (すなわちオプションを指定しない
+ 場合) と `set pm3d at X ...` (すなわち `at` が最初のオプションの場合)
+ はモードを `implicit` に変更します。コマンド `set pm3d;` は、その他の
+ オプションをそれらのデフォルトの状態に設定します。
+
+ デフォルトのデータ/関数の描画スタイルを `pm3d` にしたい場合は、例えば
+       set style data pm3d
+ とします。この場合、オプション `implicit` と `explicit` は効力を持ちま
+ せん。
+
+ いくつかの描画においては、それらはコマンドラインで与えられた順に描画さ
+ れることに注意してください。これは特に、以前の描画を上書きしてそれでそ
+ の一部を隠してしまう可能性があるような曲面の塗りつぶしの際に関心を持た
+ れるでしょう。
+
+ p3md の色付けは、3 つの異なる位置 `top`, `bottom`, `surface` のいずれ
+ か、またはすべてに行えます。以下参照: `pm3d position`。以下のコマンド
+ は、異なった高さで 3 つの色付きの曲面を描きます:
+       set border 4095
+       set pm3d at s
+       splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
+
+ 以下も参照: `set palette`, `set cbrange`, `set colorbox`。そしてもちろ
+ んデモファイル `demo/pm3d.dem` も参考になるでしょう。
+4 pm3d のアルゴリズム (algorithm)
+?pm3d algorithm
 
  まず、地図/曲面がどのように描かれるのかについて記述します。入力データ
  は、関数を評価して得られるかまたは `splot data file` から得られます。
@@ -9548,30 +9603,8 @@ Ffigure_mapcontours
 
  3. pm3d の色づけを 3 次元曲面ではなく 2 次元描画に使うには、
  `set view map` か `set pm3d map` を使用してください。
-
- 書式 (オプションは任意の順で与えることができます):
-       set pm3d
-       set pm3d {
-                  { at <bst combination> }
-                  { interpolate <steps/points in scan, between scans> }
-                  { scansautomatic | scansforward | scansbackward | depthorder }
-                  { flush { begin | center | end } }
-                  { ftriangles | noftriangles }
-                  { clip1in | clip4in }
-                  { corners2color { mean|geomean|median|min|max|c1|c2|c3|c4 } }
-                  { hidden3d <linestyle> | nohidden3d }
-                  { implicit | explicit }
-                  { map }
-                }
-       show pm3d
-       unset pm3d
-
- データまたは関数の描画スタイル (`style`) がグローバルに、または `with`
- オプションで pm3d に設定されている場合、色付きの曲面が描画されます。
- オプション `implicit` が有効になっている場合、pm3d の曲面は線分による
- 曲面の網目による表示も一緒に行なわれます。詳しいことは、この節の下の方
- をご覧ください。
-
+4 pm3d の位置 (position)
+?pm3d position
  色の曲面は底面か天井 (この場合は灰色/カラーの平面地図) か曲面上の点の
  z 座標 (灰色/カラー曲面) に描くことができます。その選択は、オプション
  `at` に、`b`, `t`, `s` の 6 つまでの組合せの文字列をつけて指定すること
@@ -9589,6 +9622,20 @@ Ffigure_mapcontours
  構成します。塗りつぶしは深さ順に並び変えされた後で行われ、これによりか
  なり複雑な曲面でも視覚的なものにすることができます。詳細は、以下参照:
  `pm3d depthorder`。
+4 走査の順番 (scanorder)
+?pm3d scanorder
+?pm3d depthorder
+?pm3d flush
+?depthorder
+=flush
+=scansforward
+=scansbackward
+=scansautomatic
+=depthorder
+ デフォルトでは、pm3d の塗り潰し曲面を構成する四角形は、それらが曲面の
+ 格子点に沿って出会う順番に塗り潰されます。この順番は、オプション
+ `scansautomatic`|`scansforward`|`scansbackward` で制御できます。これら
+ の走査 (scan) オプションは、一般には隠面処理とは両立しません。
 
  2 回の連続する走査で点の数が同じでなかった場合、四辺形の点の取り始めを、
  両方の走査の最初から (`flush begin`) にするか、最後から (`flush end`)
@@ -9601,11 +9648,35 @@ Ffigure_mapcontours
  い場合に、走査の最後に色三角形を描くかどうかをオプション `ftriangles`
  は指示します。これは滑らかな色地図の境界を描くのに使われます。
 
+ gnuplot は、曲面の塗り潰しにおいては、本当の隠面処理は行いませんが、た
+ いていは遠い方から近い方へ順に四角形要素を塗り潰すことで十分なできあが
+ りになります。このモードは、以下のオプションを使うことで選択できます:
+       set pm3d depthorder hidden3d
+ オプション `depthorder` は塗り潰し四角形への指示で、オプション
+ `hidden3d` は同様に境界線 (もし描くなら) への指示です。大域的なオプシ
+ ョンである `set hidden3d` は、pm3d 曲面には影響しないことに注意してく
+ ださい。
+
+4 クリッピング (clipping)
+?pm3d clipping
  四辺形の x,y 座標に関するクリッピングは 2 つの方法で行われます。
  `clip1in`: 各四辺形の全ての 4 点が定義されていなければならず、少なくと
  もそのうちの 1 点が x, y の範囲におさまっていなければなりません。
  `clip4in`: 各四辺形の全ての 4 点が x, y の範囲におさまっていなければな
  りません。
+
+4 色の割り当て
+?pm3d color_assignment
+=mean
+=geomean
+=median
+=min
+=max
+ 色づけの設定はカラーボックスの描画と同様に `set palette` で決定されま
+ す。一つの描画では一つのパレットのみが存在し得ます。いくつもの曲面を異
+ なるパレットで描画するには、`origin` と `size` を固定して `mutiplot`
+ を使うことで行えます。出力ドライバが利用できる色を使い尽くしてしまう場
+ 合には `set palette maxcolors` を使うことを忘れずに。
 
  描画される各 pm3d 四辺形には一つの灰色/カラー値が対応します (4 頂点間
  で滑らかなカラー変化は起こりません)。その値は、`corners2color <option>`
@@ -9633,32 +9704,25 @@ Ffigure_mapcontours
  `set zrange` と `set cbrange` によって独立に調整し得ることに注意して
  ください。色地図は cb 軸のみで調節されます。以下も参照: `set view map`,
  `set colorbox`。
+4 hidden3d
+?set pm3d hidden3d
+?pm3d hidden3d
+ オプション `set pm3d hidden3d` は、各四辺形の境界線を、四辺形それ自身
+ が描画されるのと同時に描画します。通常は、それは擬似的な隠線処理を達成
+ するために、オプション `depthorder` とともに使用します。これは、コマン
+ ド `set hidden3d` を用いるよりもずっと効果的でしょう。このコマンドは、
+ 境界線の見た目を制御するための追加のラインスタイルオプションを一つ取り
+ ます。ライスタイルパラメータを負と指定するか省略した場合は、その plot
+ コマンドで与えられた線の属性が使用されます。推奨する使用例:
 
- オプション `hidden3d` は、線種 (linestyle) を引数に取りますが、それは
- `set style line ...` で生成しなければなりません (その線種は pm3d の設
- 定時には存在している必要はありませんが、描画時には必要です)。これが設
- 定されると、線は隠線処理を考慮に入れながら、指定された線種で描画されま
- す。これは、`set hidden3d` コマンドを使うよりもはるかに効果的で、これ
- は実際に隠線処理を計算することはしませんが、塗りつぶされた多角形を正し
- い順序で描いて行きます。よって、pm3d を使う場合のお勧めの選択は以下の
- 通りです:
-       set pm3d at s hidden3d 100
-       set style line 100 lt 5 lw 0.5
+       set pm3d at s hidden3d depthorder
        unset hidden3d
        unset surf
-       splot x*x+y*y
+       splot x*x+y*y linecolor rgb "black" linewidth 0.5
 
- 従来、このコマンドに {transparent|solid} のオプションが用意されていま
- したが、現在はそれらはそれぞれ `set grid {front|layerdefault}` で行な
- うことができます。
-
- `set pm3d map` は `set pm3d at b`; `set view map`; `set style data pm3d`;
- `set style func pm3d`; を省略したものです。これは、`set view map` がな
- かったころの旧バージョンへの互換性のためのものです。入力データ点をフィ
- ルタするための `zrange`、および色の範囲の変更用の `cbrange` を注意して
- 適切に使用してください。`set (no)surface` も 効果 (副作用 ?) があるよ
- うです。
-
+4 interpolate
+?set pm3d interpolate
+?pm3d interpolate
  オプション `interpolate m,n` は、格子点をより細かな網目に補間し、色四
  角形も近似的に補間します。データ描画に対しては、これは曲面の色の変化を
  滑らかにし、曲面の色の尖りを補正します。関数描画に対しては、この補間は
@@ -9669,68 +9733,18 @@ Ffigure_mapcontours
  |m|, |n| 点が描画されるように選択されます。これは特別な格子関数と見な
  すことができます。0 の場合、すなわち `interpolation 0,0` は、自動的に
  最適な補間曲面点数を選択します。
+4 非推奨なオプション
+?pm3d deprecated_options
+ このコマンドにはオプション {transparent|solid} も使われていました。現
+ 在は、同じ効果をそれぞれ `set grid {front|layerdefault}` によって得る
+ ことができます。
 
- 色づけの設定はカラーボックスの描画と同様に `set palette` で決定されま
- す。一つの描画では一つのパレットのみが存在し得ます。いくつもの曲面を
- 異なるパレットで描画するには、`origin` と `size` を固定して `mutiplot`
- を使うことで行えます。出力ドライバが利用できる色を使い尽くしてしまう場
- 合には `set palette maxcolors` を使うことを忘れずに。
-
- gnuplot の起動時はモードは `explicit` になっています。歴史的な、よって
- 互換性のために、コマンド `set pm3d;` (すなわちオプションを指定しない場
- 合) と `set pm3d at X ...` (すなわち `at` が最初のオプションの場合) は
- モードを `implicit` に設定します。`set pm3d;` はさらにその他のオプショ
- ンをデフォルトの値に設定します。
-
- オプション `implicit` が ON の場合、全ての曲面の描画が追加的にデフォル
- トの型で行われます。例えば
-       splot 'fred.dat' with lines, 'lola.dat' with lines
- は、両方の描画 (網目の曲面) を追加的に pm3d 曲面に描きます。`set pm3d;`
- の後はこちらの方が慣れているでしょう。
-
- オプション `explicit` が ON (または `implicit` が OFF) の場合、属性
- `with pm3d` が指定された描画のみが pm3d 曲面として描画されます。例えば
-       splot 'fred.dat' with lines, 'lola.dat' with pm3d
- は、'freq.dat' は線で (線のみで) 描画され、'lola.dat' は pm3d 曲面とし
- て描かれます。
-
- デフォルトのデータ/関数の描画スタイルを `pm3d` にしたい場合は、例えば
-       set style data pm3d
- とします。この場合、オプション `implicit` と `explicit` は効力を持ちま
- せん。
-
- いくつかの描画においては、それらはコマンドラインで与えられた順に描画さ
- れることに注意してください。これは特に、以前の描画を上書きしてそれで一
- 部を隠してしまう可能性がある、曲面の塗りつぶしに関して関心を持たれるこ
- とです。
-
- `splot` コマンドライン上で `with pm3d` が指定されている場合はオプショ
- ン `at` も使えます。以下の描画は、異なった高さで 3 つのカラー曲面を描き
- ます:
-       set border 4095
-       set pm3d at s
-       splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
-
- 以下も参照: `set palette`, `set cbrange`, `set colorbox`, `x11 pm3d`。
- そしてもちろんデモファイル `demo/pm3d.dem` も参考になるでしょう。
-4 depthorder
-?commands set pm3d depthorder
-?set pm3d depthorder
-?pm3d depthorder
-?depthorder
- デフォルトでは、pm3d の塗り潰し曲面を構成する四角形は、それらが曲面の
- 格子点に沿って出会う順番に塗り潰されます。この順番は、オプション
- `scansautomatic`|`scansforward`|`scansbackward` で制御できます。これら
- の走査 (scan) オプションは、一般には隠面処理とは両立しません。
-
- gnuplot は、曲面の塗り潰しにおいては、本当の隠面処理は行いませんが、た
- いていは遠い方から近い方へ順に四角形要素を塗り潰すことで十分なできあが
- りになります。このモードは、以下のオプションを使うことで選択できます:
-       set pm3d depthorder hidden3d
- オプション `depthorder` は塗り潰し四角形への指示で、オプション
- `hidden3d` は同様に境界線 (もし描くなら) への指示です。大域的なオプシ
- ョンである `set hidden3d` は、pm3d 曲面には影響しないことに注意してく
- ださい。
+ コマンド `set pm3d map` は以下の一連のものと同値です: `set pm3d at b`;
+ `set view map`; `set style data pm3d`; `set style func pm3d`;。これは
+ `set view map` がなかったころの旧バージョンへの互換のためのものです。
+ 入力データ点をフィルタするための `zrange`、および色の範囲の変更用の
+ `cbrange` を注意して適切に使用してください。`set (no)surface` も 効果
+ (副作用 ?) があるようです。
 3 palette
 ?commands set palette
 ?commands show palette
@@ -9824,15 +9838,15 @@ Ffigure_mapcontours
  に相当します (以下参照: `test palette`)。カラーパレットに対してはガン
  マ値は無視されます。
 
- ほとんどの出力形式は、有限個の色数しかサポートしていません (例えば gif
- では 256 個)。デフォルトでは、パレットは、gnuplot のデフォルトの線種の
- 色の宣言の後に残ったものが全て pm3d 用に割り当てられます。よって、出力
- 形式が利用できる色の場所がなくなってしまった場合、`multiplot` は失敗し
- てしまうでしょう。その場合、`set palette maxcolors <maxcolors>` で適当
- に小さい値を設定すべきです。このオプションは、z=定数の高低を離散個に分
- 割し、よって等高線の疑似的な塗りつぶしを行うことにも使えます。デフォル
- トの値は 0 で、これは出力形式のパレットの残りの全てを割り当てる、ある
- いは正確な RGB への対応を使用することを意味します。
+ 出力形式の多くは、有限個の色数しかサポートしていません (例えば gif で
+ は 256 個)。デフォルトの gnuplot の線種色を割り当てた後の残りの有効な
+ 色領域は、デフォルトでは pm3d 用に保存されます。よって、複数のパレット
+ を使用するような multiplot は、最初のパレットがすべての有効な色の配置
+ として使用されてるので、失敗してしまうでしょう。このような制限は、十分
+ 小さい値 N で `set palette maxcolors <N>` を使うことで緩和できます。こ
+ のオプションは、N 個の離散的な色を、連続的なパレットから等間隔なサンプ
+ リングで選択します。不等間隔な N 個の離散色を使いたい場合は、一つの連
+ 続的なパレットの代わりに `set palette defined` を使用してください。
 
  RGB 色空間が作業を行うのに常にもっとも有用な色空間であるとは限らない、
  という理由で、色空間は `model` を使うことで、`RGB`, `HSV`, `CMY`,
@@ -9953,14 +9967,15 @@ Ffigure_mapcontours
        set pal defined (1 '#00008f', 8 '#0000ff', 24 '#00ffff', \
                         40 '#ffff00', 56 '#ff0000', 64 '#800000')
 
- あまり色を使わないパレットを生成するには:
+ 等間隔な少しの色だけのパレットを生成するには:
        set palette model RGB maxcolors 4
-       set palette defined ( 0 "blue", 1 "green", 2 "yellow", 3 "red" )
+       set palette defined ( 0 "yellow", 1 "red" )
 
  '交通信号' (滑らかではなく gray = 1/3, 2/3 で跳びを持つ):
        set palette model RGB
-       set palette defined (0 "dark-green", 1 "green", 1 "yellow", \
-                            2 "dark-yellow", 2 "red", 3 "dark-red" )
+       set palette defined (0 "dark-green", 1 "green", \
+                            1 "yellow",     2 "dark-yellow", \
+                            2 "red",        3 "dark-red" )
 
 4 functions
 ?commands set palette functions
@@ -10269,10 +10284,10 @@ Ffigure_mapcontours
  長さの比)。
 
  <r> の値を負にするとその意味は違って来ます。<r>=-1 のとき、x 軸、y 軸
- の双方の単位 (つまり 1) の目盛の長さが同一になるよう設定されます。(例
- えば地理データ表示に向く)。<r>=-2 のとき、y 軸の単位目盛の長さは x 軸
- の単位目盛の長さの 2 倍に設定されます。<r> が負の値に関して以下同様で
- す。
+ の双方の単位 (つまり 1) の目盛の長さが同一になるよう設定されます。これ
+ は `set view equal xy` と同じです。以下参照: `set view equal`。<r>=-2
+ のとき、y 軸の単位目盛の長さは x 軸の単位目盛の長さの 2 倍に設定されま
+ す。<r> が負の値に関して以下同様です。
 
  `gnuplot` が指定されたアスペクト比のグラフをちゃんと書けるかは選択され
  る出力形式に依存します。グラフの領域は出力の指定された部分にちゃんと収
@@ -10492,7 +10507,7 @@ Ffigure_mapcontours
        set style fill {empty
                        | {transparent} solid {<density>}
                        | {transparent} pattern {<n>}}
-                      {border {<colorspec>} | noborder}
+                      {border {lt} {lc <colorspec>} | noborder}
 
  デフォルトの塗りつぶしスタイル (fillstyle) は `empty` です。
 
@@ -10645,8 +10660,8 @@ Ffigure_mapcontours
        unset style line
        show style line
 
- `default` を指定すると、全ての line スタイルパラメータはそのデフォルト
- の値になります。
+ `default` は、全てのラインスタイルパラメータをそれと同じ index を持つ
+ 線種 (linetype) に設定します。
 
  <index> の linestyle が既に存在する場合、他の全ては保存されたまま、与
  えられたパラメータのみが変更されます。<index> が存在しなければ、指定さ
@@ -11539,8 +11554,9 @@ Ffigure_mapcontours
        show xrange
 
  ここで <min> と <max> には定数、数式、または '*' で、'*' は自動縮尺機
- 能を意味します。日時データの場合、範囲は `set timefmt` の書式に従った
- 文字列を引用符で囲む必要があります。省略された値は変更されません。
+ 能を意味します。自動縮尺機能に関する詳細は下に述べます。日時データの場
+ 合、範囲は `set timefmt` の書式に従った文字列を引用符で囲む必要があり
+ ます。省略された値は変更されません。
 
  `yrange`, `zrange`, `x2range`, `y2range`, `cbrange`, `rrange`, `trange`,
  `urange`, `vrange` は同じ書式を使用します。
@@ -11549,6 +11565,22 @@ Ffigure_mapcontours
  `set xrange [0:1] reverse` は、1 が左、0 が右であるような軸にします。
  これは、もちろん `set xrange [1:0]` と同じですが、`reverse` は主に自動
  縮尺 (`autoscale`) で用いられることを意図しています。
+
+ 自動縮尺機能: <min> (同様のことが <max> にも適用されます) がアスタリス
+ ク "*" の場合は自動縮尺機能がオンになります。その場合のその値に、下限
+ <lb>、または上限 <ub>、またはその両方の制限を与えられます。書式は以下
+ の通りです。
+       { <lb> < } * { < <ub> }
+ 例えば
+       0 < * < 200
+ は <lb> = 0, <ub> = 200 となります。そのような設定では、<min> は自動縮
+ 尺されますが、その最終的な値は 0 から 200 の間になります (記号は '<'
+ ですが両端の値も含みます)。下限か上限を指定しない場合は、その '<' も省
+ 略できます。<ub> が <lb> より小さい場合は、制限はオフになり、完全な自
+ 動縮尺になります。
+ この機能は、自動縮尺だけれども範囲に制限がある測定データの描画や、外れ
+ 値のクリッピング、またはデータがそれほどの範囲を必要としていなくても最
+ 小の描画範囲を保証するのに有用でしょう。
 
  オプション `writeback` は、`set xrange` で占められているバッファの中に
  自動縮尺機能により作られた範囲を保存します。これは、いくつかの関数を同
@@ -11602,6 +11634,21 @@ Ffigure_mapcontours
 
  x の最小値は自動縮尺とし、最大値は変更しません:
        set xrange [*:]
+
+ x の最小値を自動縮尺としますが、その最小値は 0 以上にします。
+       set xrange [0<*:]
+
+ x の範囲を自動縮尺としますが、小さくても 10 から 50 の範囲を保持します
+ (実際はそれより大きくなるでしょう):
+       set xrange [*<10:50<*]
+
+ 自動縮尺で最大範囲を -1000 から 1000、すなわち [-1000:1000] 内で自動縮
+ 尺します:
+       set xrange [-1000<*:*<1000]
+
+ x の最小値を -200 から 100 の間のどこかにします:
+       set xrange [-200<*<100:]
+
 3 xtics
 ?commands set xtics
 ?commands unset xtics
