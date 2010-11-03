@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.272 2010/10/21 04:14:36 sfeam Exp $
+dnl $Id: configure.in,v 1.273 2010/10/24 00:31:30 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -689,8 +689,8 @@ dnl end pdf
 
 dnl check presence of lua/TikZ support
 AC_ARG_WITH(lua,dnl
-[  --with-lua            enable lua/TikZ terminal driver],,
-  with_lua=yes)
+[  --without-lua         disable lua/TikZ terminal (default enabled)],,
+  [test -z "${with_lua}" && with_lua=yes])
 
 if test "${with_lua}" = yes ; then
   PKG_CHECK_MODULES(LUA, [lua], LUAFOUND=yes, [LUAFOUND=no])
