@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.185 2010/09/28 17:14:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.186 2010/10/06 23:20:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -291,10 +291,11 @@ set y2data%s\n",
 	fprintf(fp, "set dgrid3d %d,%d splines\n",
           	dgrid3d_row_fineness, dgrid3d_col_fineness );
       } else {
-	fprintf(fp, "set dgrid3d %d,%d %s %f,%f\n",
+	fprintf(fp, "set dgrid3d %d,%d %s%s %f,%f\n",
           	dgrid3d_row_fineness,
           	dgrid3d_col_fineness,
 		reverse_table_lookup(dgrid3d_mode_tbl, dgrid3d_mode),
+		dgrid3d_kdensity ? " kdensity2d" : "",
           	dgrid3d_x_scale,
           	dgrid3d_y_scale );
       }

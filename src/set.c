@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.325 2010/10/06 23:20:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.326 2010/10/10 04:44:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1206,6 +1206,8 @@ set_dgrid3d()
        If there is a "mode" keyword, the syntax is new, otherwise it is classic.*/
     dgrid3d_mode  = DGRID3D_DEFAULT;
 
+    dgrid3d_kdensity = FALSE;
+
     c_token++;
     while ( !(END_OF_COMMAND) ) { 
         int tmp_mode = lookup_table(&dgrid3d_mode_tbl[0],c_token);
@@ -1225,6 +1227,10 @@ set_dgrid3d()
 	case DGRID3D_EXP:
 	case DGRID3D_BOX:
 	case DGRID3D_HANN:
+				if (!(END_OF_COMMAND) && almost_equals( c_token, "kdens$ity2d" )) {
+					dgrid3d_kdensity = TRUE;
+					c_token++;
+				}
 				if (!(END_OF_COMMAND)) {
 					scalex = real_expression();
 					scaley = scalex;

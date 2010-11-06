@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.633 2010/10/27 04:25:12 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.634 2010/11/03 06:08:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7327,6 +7327,7 @@ Ffigure_mapcontours
 ?show dgrid3d
 ?dgrid3d
 ?nodgrid3d
+?kdensity2d
  The `set dgrid3d` command enables, and can set parameters for, non-grid to
  grid data mapping.  See `splot grid_data` for more details about the grid data
  structure.
@@ -7335,7 +7336,8 @@ Ffigure_mapcontours
        set dgrid3d {<rows>} {,{<cols>}}
                    { splines |
                      qnorm {<norm>} |
-                     (gauss | cauchy | exp | box | hann) {<dx>} {,dy} }
+                     (gauss | cauchy | exp | box | hann) 
+                       {kdensity} {<dx>} {,<dy>} }
        unset dgrid3d
        show dgrid3d
 
@@ -7360,15 +7362,15 @@ Ffigure_mapcontours
  splines". It does not take additional paramaters.
 
  The `qnorm` algorithm calculates a weighted average of the input data at
- each grid point. Each data point is
- weighted inversely by its distance from the grid point raised to the norm
- power.  (Actually, the weights are given by the inverse of dx^norm + dy^norm,
- where dx and dy are the components of the separation of the grid point from
- each data point.  For some norms that are powers of two, specifically 4, 8,
- and 16, the computation is optimized by using the Euclidean distance in the
- weight calculation, (dx^2+dy^2)^norm/2.  However, any non-negative integer
- can be used.) The power of the norm can be specified as a single optional
- parameter. This algorithm is the default.
+ each grid point. Each data point is weighted inversely by its distance from
+ the grid point raised to the norm power.  (Actually, the weights are given
+ by the inverse of dx^norm + dy^norm, where dx and dy are the components of
+ the separation of the grid point from each data point.  For some norms 
+ that are powers of two, specifically 4, 8, and 16, the computation is 
+ optimized by using the Euclidean distance in the weight calculation, 
+ (dx^2+dy^2)^norm/2.  However, any non-negative integer can be used.) 
+ The power of the norm can be specified as a single optional parameter. 
+ This algorithm is the default.
 
  Finally, several smoothing kernels are available to calculate weighted
  averages: z = Sum_i w(d_i) * z_i / Sum_i w(d_i), where z_i is the value
@@ -7387,14 +7389,25 @@ Ffigure_mapcontours
                    w(d) = 0                     otherwise
 
  When using one of these five smoothing kernels, up to two additional
- parameter can be specified: dx and dy. These are used to rescale the
- coordinate differences when calculating the distance: 
+ numerical parameters can be specified: dx and dy. These are used to 
+ rescale the coordinate differences when calculating the distance: 
  d_i = sqrt( ((x-x_i)/dx)**2 + ((y-y_i)/dy)**2 ), where x,y are the
  coordinates of the current grid point and x_i,y_i are the coordinates
  of the i-th data point. The value of dy defaults to the value of dx,
  which defaults to 1. The parameters dx and dy make it possible to 
  control the radius over which data points contribute to a grid point
  IN THE UNITS OF THE DATA ITSELF.
+
+ The optional keyword `kdensity2d`, which must come after the name of the
+ kernel, but before the (optional) scale parameters, modifies the algorithm
+ so that the values calculated for the grid points are not divided by the 
+ sum of the weights ( z = Sum_i w(d_i) * z_i ). If all z_i are constant, 
+ this effectively plots a bivariate kernel density estimate: a kernel 
+ function (one of the five defined above) is placed at each data point,
+ the sum of these kernels is evaluated at every grid point, and this smooth
+ surface is plotted instead of the original data. This is similar in 
+ principle to + what the `smooth kdensity` option does to 1D datasets.
+ (See kdensity2d.dem for usage demo)
 
  A slightly different syntax is also supported for reasons of backwards
  compatibility. If no interpolation algorithm has been explicitly selected,
@@ -7403,7 +7416,7 @@ Ffigure_mapcontours
  rows, the number of columns, and the norm value, respectively.
 
  The `dgrid3d` option is a simple scheme which replaces scattered data
- with weighted averages on a regular grid.More sophisticated approaches
+ with weighted averages on a regular grid.  More sophisticated approaches
  to this problem exist and should be used to preprocess the data outside
  `gnuplot` if this simple solution is found inadequate.
 

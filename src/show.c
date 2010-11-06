@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.245 2010/10/01 23:10:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.246 2010/10/06 23:20:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1361,12 +1361,13 @@ show_dgrid3d()
 		dgrid3d_col_fineness );
       } else {
 	fprintf(stderr, 
-		"\tdata grid3d is enabled for mesh of size %dx%d, kernel=%s, scale factors x=%f, y=%f\n", 
+		"\tdata grid3d is enabled for mesh of size %dx%d, kernel=%s,\n\tscale factors x=%f, y=%f%s\n", 
 		dgrid3d_row_fineness,
 		dgrid3d_col_fineness,
 		reverse_table_lookup(dgrid3d_mode_tbl, dgrid3d_mode),
 		dgrid3d_x_scale,
-		dgrid3d_y_scale );
+		dgrid3d_y_scale,
+		dgrid3d_kdensity ? ", kdensity2d mode" : "" );
       }
     else
 	fputs("\tdata grid3d is disabled\n", stderr);

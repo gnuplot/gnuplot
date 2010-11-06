@@ -14,6 +14,7 @@ New features, changes and fixes since gnuplot version 4.4
 * NEW ISO-IEC-80000 prefixes (ki Mi Gi etc) available as gprintf formats %b %B
 * NEW encodings cp950 cp1251
 * NEW option "set fit quiet"
+* NEW option "kdensity2d" for two-dimensional kernel density plots
 * FIX length estimation of UTF-8 strings
 * FIX accurate placement of color boundaries in the colorbar
 * CHANGE 3D zoom using middle mouse button is now a logarithmic response

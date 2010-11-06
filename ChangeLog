@@ -1,3 +1,9 @@
+2010-11-06  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/plot3d.c src/plot3d.h src/set.c src/show.c src/save.c
+	docs/gnuplot.doc demo/kdensity2d.dem: New option "kdensity2d" for 
+	"set dgrid3d" to create two-dimensional kernel density plots.
+
 2010-11-03  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc:  typos
