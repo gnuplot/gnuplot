@@ -2,7 +2,10 @@
 
 	* src/datafile.c (df_readascii): The "labels" style did not work with 
 	pseudocolumns (e.g. "using 1:2:0"). Now it correctly handles pseudocolumns 
-	0, -1, -2. 
+	0, -1, -2.
+	
+	* term/cairo.trm: Documentation fix: the section on the default size 
+	for the pngcairo terminal was incorrect.
 
 2010-11-06  Peter Juhasz  <juhaszp@users.sourceforge.net>
 

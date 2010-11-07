@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.38 2010/05/14 05:24:15 sfeam Exp $
+ * $Id: cairo.trm,v 1.39 2010/05/15 05:31:05 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -985,7 +985,7 @@ START_HELP(pdfcairo)
 "",
 " The default size for the output is 5 inches x 3 inches. The `size` option",
 " changes this to whatever the user requests. By default the X and Y sizes are",
-" taken to be in inches, but other units are possibly (currently only cm).",
+" taken to be in inches, but other units are possible (currently only cm).",
 " Screen coordinates always run from 0.0 to 1.0 along the full length of the",
 " plot edges as specified by the `size` option.",
 "",
@@ -1071,9 +1071,11 @@ START_HELP(pngcairo)
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",
 " default, butt caps and mitered joins.",
 "",
-" The default size for the output is 5 inches x 3 inches. The `size` option",
+" The default size for the output is 640 x 480 pixels. The `size` option",
 " changes this to whatever the user requests. By default the X and Y sizes are",
-" taken to be in inches, but other units are possibly (currently only cm).",
+" taken to be in pixels, but other units are possible (currently cm and inch).",
+" If the sizes are given in centimeters or inches, the image will be rendered",
+" with a resolution of 72 DPI (currently this can't be changed.)",
 " Screen coordinates always run from 0.0 to 1.0 along the full length of the",
 " plot edges as specified by the `size` option.",
 "",
