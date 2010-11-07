@@ -1,3 +1,9 @@
+2010-11-07  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/datafile.c (df_readascii): The "labels" style did not work with 
+	pseudocolumns (e.g. "using 1:2:0"). Now it correctly handles pseudocolumns 
+	0, -1, -2. 
+
 2010-11-06  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/plot3d.c src/plot3d.h src/set.c src/show.c src/save.c
