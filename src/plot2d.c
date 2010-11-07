@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.233 2010/10/22 04:23:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.234 2010/10/27 04:07:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2155,6 +2155,23 @@ eval_plots()
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_POINT)
 		&&  (this_plot->lp_properties.p_size == PTSZ_VARIABLE))
 		    this_plot->lp_properties.p_size = 1;
+	    }
+	    if (polar) switch (this_plot->plot_style) {
+		case LINES:
+		case POINTSTYLE:
+		case IMPULSES:
+		case LINESPOINTS:
+		case DOTS:
+		case VECTOR:
+		case FILLEDCURVES:
+		case LABELPOINTS:
+		case CIRCLES:
+		case YERRORBARS:
+		case YERRORLINES:
+				break;	
+		default:
+				int_error(NO_CARET, 
+				    "This plot style is not available in polar mode");
 	    }
 
 	    if (df_matrix) {
