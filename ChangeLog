@@ -11,6 +11,11 @@
 	polar mode with a style that is not supported.
 	Bug #3072150
 
+	* src/axis.h (AXIS_INIT2D) src/set.c (set_logscale):
+	Keep AXIS.log_base in sync with AXIS.base.
+	Otherwise calls to AXIS_DO_LOG or AXIS_UNDO_LOG prior to the first plot
+	command cause divide-by-zero or other math errors.
+
 2010-11-07  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/datafile.c (df_readascii): The "labels" style did not work with 

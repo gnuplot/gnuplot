@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.59 2010/09/28 17:14:38 sfeam Exp $
+ * $Id: axis.h,v 1.60 2010/11/07 19:32:27 sfeam Exp $
  *
  */
 
@@ -421,7 +421,6 @@ do {									\
 	? VERYLARGE : this->set_min;					\
     this->max = (infinite && (this->set_autoscale & AUTOSCALE_MAX))	\
 	? -VERYLARGE : this->set_max;					\
-    this->log_base = this->log ? log(this->base) : 0;			\
     this->data_min = VERYLARGE;						\
     this->data_max = -VERYLARGE;					\
 } while(0)

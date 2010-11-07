@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.327 2010/11/06 22:02:37 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.328 2010/11/07 19:32:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2235,6 +2235,7 @@ set_logscale()
 	    if (set_for_axis[axis]) {
 		axis_array[axis].log = TRUE;
 		axis_array[axis].base = newbase;
+		axis_array[axis].log_base = log(newbase);
 	}
     }
 
