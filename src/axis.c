@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.84 2010/10/14 17:38:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.85 2010/10/29 05:35:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -64,14 +64,14 @@ const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
     { -10, 10, "z" , TICS_ON_BORDER,               },
     { -10, 10, "y" , TICS_ON_BORDER | TICS_MIRROR, },
     { -10, 10, "x" , TICS_ON_BORDER | TICS_MIRROR, },
-    { - 5,  5, "t" , NO_TICS,                      },
+    { -10, 10, "cb", TICS_ON_BORDER | TICS_MIRROR, },
     { -10, 10, "z2", NO_TICS,                      },
     { -10, 10, "y2", NO_TICS,                      },
     { -10, 10, "x2", NO_TICS,                      },
     { - 0, 10, "r" , NO_TICS,                      },
+    { - 5,  5, "t" , NO_TICS,                      },
     { - 5,  5, "u" , NO_TICS,                      },
     { - 5,  5, "v" , NO_TICS,                      },
-    { -10, 10, "cb", TICS_ON_BORDER | TICS_MIRROR, },
 };
 
 
@@ -101,14 +101,14 @@ const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE + 1] =
     { "z", FIRST_Z_AXIS},
     { "y", FIRST_Y_AXIS},
     { "x", FIRST_X_AXIS},
-    { "t", T_AXIS},
+    { "cb",COLOR_AXIS},
     { "z2",SECOND_Z_AXIS},
     { "y2",SECOND_Y_AXIS},
     { "x2",SECOND_X_AXIS},
     { "r", R_AXIS},
+    { "t", T_AXIS},
     { "u", U_AXIS},
     { "v", V_AXIS},
-    { "cb", COLOR_AXIS},
     { NULL, -1}
 };
 

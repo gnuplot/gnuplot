@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.58 2010/07/01 16:50:32 sfeam Exp $
+ * $Id: axis.h,v 1.59 2010/09/28 17:14:38 sfeam Exp $
  *
  */
 
@@ -59,19 +59,20 @@ typedef enum AXIS_INDEX {
     FIRST_Z_AXIS,
     FIRST_Y_AXIS,
     FIRST_X_AXIS,
-    T_AXIS,			/* fill gap */
+    COLOR_AXIS,			/* fill gap */
 #define SECOND_AXES 4
     SECOND_Z_AXIS,		/* not used, yet */
     SECOND_Y_AXIS,
     SECOND_X_AXIS,
-    R_AXIS,			/* never used ? */
-    U_AXIS,			/* ditto */
+    R_AXIS,
+    T_AXIS,
+    U_AXIS,			/* never used? */
     V_AXIS			/* ditto */
-    ,COLOR_AXIS
 #define NO_AXIS 99
 } AXIS_INDEX;
 
 # define AXIS_ARRAY_SIZE 11
+# define LAST_REAL_AXIS  SECOND_X_AXIS
 
 /* What kind of ticmarking is wanted? */
 typedef enum en_ticseries_type {
