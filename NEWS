@@ -6,6 +6,7 @@ New features, changes and fixes in gnuplot version 4.4.3
 * NEW encoding cp1251 - 8-bit Cyrillic
 * FIX better estimation of latex string lengths
 * FIX colorbar representation of discrete color palettes is pixel accurate
+* FIX NaN initialization and tests working on more (all?) platforms
 * FIX configuration script tests for readline+ncurses
 * FIX prevent out-of-range boxes from creating degenerate ghosts on the border
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cairo.trm,v 1.29.2.4 2010/04/05 05:38:00 sfeam Exp $
+ * $Id: cairo.trm,v 1.29.2.5 2010/05/06 22:00:16 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -1055,9 +1055,11 @@ START_HELP(pngcairo)
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",
 " default, butt caps and mitered joins.",
 "",
-" The default size for the output is 5 inches x 3 inches. The `size` option",
+" The default size for the output is 640 x 480 pixels. The `size` option",
 " changes this to whatever the user requests. By default the X and Y sizes are",
-" taken to be in inches, but other units are possibly (currently only cm).",
+" taken to be in pixels, but other units are possibly (currently cm or inch).",
+" A size given in centimeters or inches is translated into pixels assuming a",
+" resolution of 72 dpi (currently this can't be changed).",
 " Screen coordinates always run from 0.0 to 1.0 along the full length of the",
 " plot edges as specified by the `size` option.",
 "",
