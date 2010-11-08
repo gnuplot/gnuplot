@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.39 2010/05/15 05:31:05 sfeam Exp $
+ * $Id: cairo.trm,v 1.40 2010/11/07 12:23:13 juhaszp Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -1074,8 +1074,8 @@ START_HELP(pngcairo)
 " The default size for the output is 640 x 480 pixels. The `size` option",
 " changes this to whatever the user requests. By default the X and Y sizes are",
 " taken to be in pixels, but other units are possible (currently cm and inch).",
-" If the sizes are given in centimeters or inches, the image will be rendered",
-" with a resolution of 72 DPI (currently this can't be changed.)",
+" A size given in centimeters or inches will be converted into pixels assuming",
+" a resolution of 72 dpi (currently this can't be changed.)",
 " Screen coordinates always run from 0.0 to 1.0 along the full length of the",
 " plot edges as specified by the `size` option.",
 "",
