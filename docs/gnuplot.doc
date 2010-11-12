@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.634 2010/11/03 06:08:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.635 2010/11/06 22:02:37 juhaszp Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1886,7 +1886,7 @@ C ... and restart the table:
 =colors
  For many terminal types it is also possible to assign user-defined colors
  using explicit rgb (red, green, blue) values, named colors, or color values
- that refer to the current PM3D palette.
+ that refer to the current pm3d palette.
 
  Examples:
 
@@ -3575,6 +3575,8 @@ Ffigure_yerrorlines
 2 3D (surface) plots
 ?3D (surface) plots
 ?plotting styles 3d (surface) plots
+=3D
+=surface
 Ffigure_surface
  Surface plots are generated using the `splot` command rather than the `plot`
  command. The style `with lines` draws a surface made from a grid of lines.

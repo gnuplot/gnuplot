@@ -1,3 +1,9 @@
+2010-11-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc command.c (help_command) util.h:
+	"help" was collapsing all text to lower case, which broke "help 3D".
+	Remove a vestigial call to lower_case().  Also make sure it is indexed.
+
 2010-11-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/set.c src/unset.c:

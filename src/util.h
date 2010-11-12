@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.31 2008/03/18 00:16:33 sfeam Exp $
+ * $Id: util.h,v 1.32 2009/10/31 20:20:07 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -114,7 +114,8 @@ void graph_error __PROTO(());
 /* Helper functions for help_command() */
 /* FIXME HBB 20010726: should be moved to where help_comamnd() is, and
  * made static. Currently, that's command.c, but it should probably
- * move to help.c, instead. */
+ * move to help.c, instead. 
+ * Nov 2010: lower_case() no longer used by help. */
 void lower_case __PROTO((char *));
 void squash_spaces __PROTO((char *));
 
