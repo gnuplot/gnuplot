@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.328 2010/11/07 19:32:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.329 2010/11/08 00:43:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1528,7 +1528,7 @@ set_grid()
 	/* probably just  set grid <linetype> */
 
 	if (END_OF_COMMAND) {
-	    memcpy(&mgrid_lp,&grid_lp,sizeof(struct lp_style_type));
+	    mgrid_lp = grid_lp;
 	} else {
 	    if (equals(c_token,","))
 		c_token++;
@@ -3719,8 +3719,7 @@ set_obj(int tag, int obj_type)
 		    this_polygon->vertex = gp_realloc(this_polygon->vertex,
 					(this_polygon->type+1) * sizeof(struct position),
 					"polygon vertex");
-		    memcpy(&this_polygon->vertex[this_polygon->type],
-					&this_polygon->vertex[0],sizeof(struct position));
+		    this_polygon->vertex[this_polygon->type] = this_polygon->vertex[0];
 		    this_polygon->type++;
 		}
 		break;
@@ -5541,9 +5540,9 @@ parse_label_options( struct text_label *this_label )
 	if (set_font)
 	    this_label->font = font;
 	if (set_textcolor)
-	    memcpy(&(this_label->textcolor), &textcolor, sizeof(t_colorspec));
+	    this_label->textcolor = textcolor;
 	if (loc_lp.pointflag >= 0)
-	    memcpy(&(this_label->lp_properties), &loc_lp, sizeof(loc_lp));
+	    this_label->lp_properties = loc_lp;
 	if (set_offset)
 	    this_label->offset = offset;
 
@@ -5594,7 +5593,7 @@ parse_histogramstyle( histogram_style *hs,
 	} else if (almost_equals(c_token, "ti$tle")) {
 	    title_specs.offset = hs->title.offset;
 	    set_xyzlabel(&title_specs);
-	    memcpy(&hs->title.textcolor,&title_specs.textcolor,sizeof(t_colorspec));
+	    hs->title.textcolor = title_specs.textcolor;
 	    hs->title.offset = title_specs.offset;
 	    /* EAM FIXME - could allocate space and copy parsed font instead */
 	    hs->title.font = axis_array[FIRST_X_AXIS].label.font;

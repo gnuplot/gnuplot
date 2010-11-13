@@ -8,6 +8,8 @@
 		epson.trm hp500c.trm hpljii.trm hppj.trm pbm.trm
 	This affects HP deskjet-era printers, but not HPGL or PCL5 printers.
 
+	* src/set.c:  Replace unnecessary memcpy() calls with direct assignment.
+
 2010-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc command.c (help_command) util.h:
