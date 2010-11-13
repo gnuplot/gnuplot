@@ -1,3 +1,13 @@
+2010-11-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in INSTALL src/Makefile.am src/term.c src/term.h:
+	The copyright notice in bitmap.c is more restrictive than the gnuplot
+	license. The new configuration option --without-bitmap-terminals
+	omits this code from the gnuplot executable and also disables all
+	terminals that depend on it. These are:
+		epson.trm hp500c.trm hpljii.trm hppj.trm pbm.trm
+	This affects HP deskjet-era printers, but not HPGL or PCL5 printers.
+
 2010-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc command.c (help_command) util.h:

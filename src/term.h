@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.45 2010/03/14 18:52:45 sfeam Exp $
+ * $Id: term.h,v 1.46 2010/07/30 19:11:41 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -310,17 +310,20 @@
 /* HP2647 and 2648 */
 #include "hp2648.trm"
 
-/* HP DeskJet 500 C */
-#include "hp500c.trm"
-
 /* HP7475, HP7220 plotters, and (hopefully) lots of others */
 #include "hpgl.trm"
+
+#ifndef NO_BITMAP_SUPPORT
+/* HP DeskJet 500 C */
+#include "hp500c.trm"
 
 /* HP Laserjet II */
 #include "hpljii.trm"
 
 /* HP PrintJet */
 #include "hppj.trm"
+
+#endif /* NO_BITMAP_SUPPORT */
 
 /* Imagen laser printers */
 #include "imagen.trm"
@@ -330,9 +333,6 @@
 
 /* Frame Maker MIF 3.00 format driver */
 #include "mif.trm"
-
-/* portable bit map */
-#include "pbm.trm"
 
 /* Adobe Portable Document Format (PDF) */
 /* NOTE THAT PDF REQUIRES A SEPARATE LIBRARY : see term/pdf.trm */
@@ -364,6 +364,11 @@
 /* Vectrix 384 printer, also Tandy colour */
 /* #include "v384.trm" */
 
+#ifndef NO_BITMAP_SUPPORT
+
+/* portable bit map */
+#include "pbm.trm"
+
 /* wire printers */
 /* Epson LX-800, Star NL-10, NX-1000 and lots of others */
 #define EPSONP
@@ -387,6 +392,7 @@
 /* the common driver file for all of these */
 #include "epson.trm"
 
+#endif /* NO_BITMAP_SUPPORT */
 
 /* TeX related terminals */
 #define EMTEX

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.635 2010/11/06 22:02:37 juhaszp Exp $
+C RCS $Id: gnuplot.doc,v 1.636 2010/11/12 19:18:02 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -105,7 +105,7 @@ C
  printers, and output to many file formats (eps, fig, jpeg, LaTeX, metafont,
  pbm, pdf, png, postscript, svg, ...). Gnuplot is easily extensible to include
  new output modes. Recent additions include interactive terminals based on
- aquaterm (OSX) and wxWidgets (multiple platforms). 
+ aquaterm (OSX), wxWidgets (multiple platforms), and Qt. 
 
  The command language of `gnuplot` is case sensitive, i.e. commands and
  function names written in lowercase are not the same as those written in
@@ -8234,12 +8234,10 @@ Ffigure_mapcontours
  z are all used as a 3D location mapped using the same mapping as the graph
  itself to form the required 2D screen position of the imaginary line.
 
- When using the TeX or PostScript drivers, or similar drivers where formatting
- information is embedded in the string, `gnuplot` is unable to calculate
- correctly the width of the string for key positioning.  If the key is to be
- positioned at the left, it may be convenient to use the combination  `set key
- left Left reverse`.  The box and gap in the grid will be the width of the
- literal string.
+ When using the TeX or other terminals where formatting information is embedded
+ in the string, `gnuplot` can only estimate the correctly exact width of the
+ string for key positioning.  If the key is to be positioned at the left, it may
+ be convenient to use the combination  `set key left Left reverse`.
 
  If `splot` is being used to draw contours, the contour labels will be listed
  in the key.  If the alignment of these labels is poor or a different number

@@ -37,7 +37,7 @@ GNUPLOT_X11 = `echo gnuplot_x11 | sed '$(transform)'`$(EXEEXT)
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"  -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\" -DXAPPLRESDIR=\"$(XAPPLRESDIR)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
-breaders.c breaders.h bitmap.c bitmap.h color.c color.h command.c \
+breaders.c breaders.h bitmap.h color.c color.h command.c \
 command.h contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h \
 eval.c eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c getcolor.h gp_hist.h \
 gp_time.h gp_types.h gplt_x11.h graph3d.c graph3d.h graphics.c graphics.h \
@@ -87,6 +87,10 @@ endif
 
 if BUILD_GPCAIRO
 gnuplot_SOURCES += wxterminal/gp_cairo.c wxterminal/gp_cairo_helpers.c
+endif
+
+if BUILD_BITMAP
+gnuplot_SOURCES += bitmap.c
 endif
 
 if BUILD_QT
