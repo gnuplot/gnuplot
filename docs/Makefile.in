@@ -141,10 +141,11 @@ HEADERS = doc2x.h xref.h
 
 EXTRA_DIST = doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex makefile.ami \
 makefile.dst titlepag.ipf titlepag.ms titlepag.tex toc_entr.sty old psdoc \
-faq-ja.tex gnuplot-ja.doc README.ja term-ja.diff plotstyles.gnu pdffigures.tex
+faq-ja.tex gnuplot-ja.doc README.ja term-ja.diff plotstyles.gnu \
+pdffigures.tex gnuplot.pdf
 
 CLEANFILES = doc2tex gnuplot.tex gnuplot.dvi gnuplot.aux gnuplot.log \
-gnuplot.toc gnuplot.pdf gnuplot.ps gpcard.dvi gpcard.log gpcard.ps alldoc2gih \
+gnuplot.toc gnuplot.ps gpcard.dvi gpcard.log gpcard.ps alldoc2gih \
 doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.idx gnuplot.ilg gnuplot.ind \
 gnuplot.info* gnuplot.out doc2ipf gnuplot.ipf doc2ms gnuplot.ms doc2rnh \
 gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff checkdoc gnuplot.txt gnuplot.tmp \
@@ -170,7 +171,7 @@ allterm.h: $(CORETERM)
 #	@rm -f term.c
 
 # for debugging
-alldoc: check dvi gih hlp html info ipf ms nroff pdf ps rnh rtf
+alldoc: check dvi gih hlp html info ipf ms nroff pdffigures ps rnh rtf
 
 ### [tn]roff documentation
 troff: gnuplot.ms titlepag.ms
@@ -419,11 +420,17 @@ checkdoc.o: checkdoc.c $(BUILT_SOURCES)
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/checkdoc.c
 
 # install section
-install: install-gih install-info
+install: install-gih install-info install-pdf
 
 install-gih: gnuplot.gih
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(GIHDIR)
 	$(INSTALL_DATA) gnuplot.gih $(DESTDIR)$(GIHDIR)/gnuplot.gih
+
+install-pdf:
+	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(GIHDIR)
+	if test -f gnuplot.pdf ; then \
+	    $(INSTALL_DATA) gnuplot.pdf $(DESTDIR)$(GIHDIR)/gnuplot.pdf; \
+	fi
 
 install-info: gnuplot.info
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir)
@@ -439,10 +446,13 @@ installcheck:
 install-exec:
 
 # uninstall section
-uninstall: uninstall-gih uninstall-info
+uninstall: uninstall-gih uninstall-info uninstall-pdf
 
 uninstall-gih:
 	rm -f $(DESTDIR)$(GIHDIR)/gnuplot.gih
+
+uninstall-pdf:
+	rm -f $(DESTDIR)$(GIHDIR)/gnuplot.pdf
 
 uninstall-info:
 	$(PRE_UNINSTALL)

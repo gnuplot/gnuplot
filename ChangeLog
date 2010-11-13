@@ -10,6 +10,9 @@
 
 	* src/set.c:  Replace unnecessary memcpy() calls with direct assignment.
 
+	* docs/Makefile.in: Add gnuplot.pdf to the distributed package.
+	Install it in the same directory as gnuplot.gih.
+
 2010-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc command.c (help_command) util.h:
