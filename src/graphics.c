@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.347 2010/10/19 16:20:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.348 2010/10/29 04:08:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1325,15 +1325,9 @@ place_grid()
 	int oy = map_y(0);
 	term_apply_lp_properties(&grid_lp);
 	for (theta = 0; theta < 6.29; theta += polar_grid_angle) {
-	    /* copy ox in case it gets moved (but it shouldn't) */
-	    int oox = ox;
-	    int ooy = oy;
 	    int x = map_x(largest_polar_circle * cos(theta));
 	    int y = map_y(largest_polar_circle * sin(theta));
-	    if (clip_line(&oox, &ooy, &x, &y)) {
-		(*t->move) ((unsigned int) oox, (unsigned int) ooy);
-		(*t->vector) ((unsigned int) x, (unsigned int) y);
-	    }
+	    draw_clip_line(ox, oy, x, y);
 	}
 	draw_clip_line(ox, oy, map_x(largest_polar_circle * cos(theta)), map_y(largest_polar_circle * sin(theta)));
     }
@@ -2109,39 +2103,21 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
     struct termentry *t = term;
 
     for (i = 0; i < plot->p_count; i++) {
-	switch (plot->points[i].type) {
-	case INRANGE:
-	    x = map_x(plot->points[i].x);
-	    y = map_y(plot->points[i].y);
-	    break;
-	case OUTRANGE:
-	    if (!inrange(plot->points[i].x, X_AXIS.min, X_AXIS.max))
-		continue;
-	    {
-		double clipped_y = plot->points[i].y;
 
-		x = map_x(plot->points[i].x);
-		cliptorange(clipped_y, Y_AXIS.min, Y_AXIS.max);
-		y = map_y(clipped_y);
+	if (!polar && !inrange(plot->points[i].x, X_AXIS.min, X_AXIS.max))
+	    continue;
 
-		break;
-	    }
-	default:		/* just a safety */
-	case UNDEFINED:{
-		continue;
-	    }
-	}
+	x = map_x(plot->points[i].x);
+	y = map_y(plot->points[i].y);
 
-	/* variable color read from data column */
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	if (polar)
-	    (*t->move) (yaxis_x, xaxis_y);
+	    draw_clip_line(yaxis_x, xaxis_y, x, y);
 	else
-	    (*t->move) (x, xaxis_y);
-	(*t->vector) (x, y);
-    }
+	    draw_clip_line(x, xaxis_y, x, y);
 
+    }
 }
 
 /* plot_lines:
@@ -5102,7 +5078,7 @@ xtick2d_callback(
 	    int i;
 	    int ogx = map_x(x);
 	    int ogy = map_y(0);
-	    int tmpgx, tmpgy, gx, gy;
+	    int gx, gy;
 
 	    if (place > largest_polar_circle)
 		largest_polar_circle = place;
@@ -5116,12 +5092,9 @@ xtick2d_callback(
 		    y = y * c + x * s;
 		    x = tx;
 		}
-		tmpgx = gx = map_x(x);
-		tmpgy = gy = map_y(y);
-		if (clip_line(&ogx, &ogy, &tmpgx, &tmpgy)) {
-		    (*t->move) ((unsigned int) ogx, (unsigned int) ogy);
-		    (*t->vector) ((unsigned int) tmpgx, (unsigned int) tmpgy);
-		}
+		gx = map_x(x);
+		gy = map_y(y);
+		draw_clip_line(ogx, ogy, gx, gy);
 		ogx = gx;
 		ogy = gy;
 	    }

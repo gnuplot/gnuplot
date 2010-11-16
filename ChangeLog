@@ -1,3 +1,17 @@
+2010-11-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c (clip_line):  When draw_clip_line() was made into a
+	wrapper for clip_line() in May 2000, they differed in a single test.
+	The version of the test from clip_line() was kept.  But this broke
+	the case clip_line(x, ymin, x, ymax+eps), which clipped to ymin,ymin
+	rather than to ymin,ymax. I do not know if there were any callers of
+	clip_line() at the time that needed the variant test, but if so they no
+	longer exist.  There is now only one other caller of clip_line().
+	Restore the test to the version that is correct for draw_clip_line().
+	
+	* src/graphics.c (place_grid xtick2d_callback plot_impulses)
+	src/term.c (do_arrow): Simplify these routines to use draw_clip_line().
+
 2010-11-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in INSTALL src/Makefile.am src/term.c src/term.h:

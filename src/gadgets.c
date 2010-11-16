@@ -232,10 +232,6 @@ draw_clip_line(int x1, int y1, int x2, int y2)
 {
     struct termentry *t = term;
 
-    /* HBB 20000522: I've made this routine use the clippling in
-     * clip_line(), in a movement to reduce code duplication. There
-     * was one very small difference between these two routines. See
-     * clip_line() for a comment about it, at the relevant place. */
     if (!clip_line(&x1, &y1, &x2, &y2))
 	/* clip_line() returns zero --> segment completely outside
 	 * bounding box */
@@ -350,9 +346,12 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
 	    *y2 = y_intr[1];
 	}
     } else if (pos1) {		/* Only x1/y1 was out - update only it */
-	/* This is about the only real difference between this and
-	 * draw_clip_line(): it compares for '>0', here */
-	if (dx * (*x2 - x_intr[0]) + dy * (*y2 - y_intr[0]) >= 0) {
+	/* Nov 2010: When clip_line() and draw_clip_line() were consolidated in */
+	/* 2000, the test below was the only point of difference between them.  */
+	/* Unfortunately, the wrong version was kept. Now I change it back.     */
+	/* The effect of the wrong version (>= rather than >) was that a line   */
+	/* from ymin to ymax+eps was clipped to ymin,ymin rather than ymin,ymax */
+	if (dx * (*x2 - x_intr[0]) + dy * (*y2 - y_intr[0]) > 0) {
 	    *x1 = x_intr[0];
 	    *y1 = y_intr[0];
 	} else {
@@ -361,7 +360,7 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
 	}
     } else {			/* Only x2/y2 was out - update only it */
 	/* Same difference here, again */
-	if (dx * (x_intr[0] - *x1) + dy * (y_intr[0] - *y1) >= 0) {
+	if (dx * (x_intr[0] - *x1) + dy * (y_intr[0] - *y1) > 0) {
 	    *x2 = x_intr[0];
 	    *y2 = y_intr[0];
 	} else {
