@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.76 2010/08/08 03:46:41 sfeam Exp $
+ * $Id: tables.h,v 1.77 2010/11/18 23:59:59 sfeam Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -196,6 +196,7 @@ enum filledcurves_opts_id {
     /* requirement: FILLEDCURVES_ATX1 = FILLEDCURVES_X1+4 */
     FILLEDCURVES_ATX1, FILLEDCURVES_ATY1, FILLEDCURVES_ATX2, FILLEDCURVES_ATY2,
     FILLEDCURVES_ATXY,
+    FILLEDCURVES_ATR,
     FILLEDCURVES_ABOVE, FILLEDCURVES_BELOW,
     FILLEDCURVES_BETWEEN
 };

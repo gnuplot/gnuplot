@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.126 2010/10/27 23:20:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.127 2010/10/28 00:20:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -689,10 +689,11 @@ get_filledcurves_style_options(filledcurves_opts *fco)
     c_token++;
 
     fco->closeto = p;
+    fco->at = 0;
     if (!equals(c_token, "="))
 	return;
     /* parameter required for filledcurves x1=... and friends */
-    if (p != FILLEDCURVES_ATXY)
+    if (p < FILLEDCURVES_ATXY)
 	fco->closeto += 4;
     c_token++;
     fco->at = real_expression();

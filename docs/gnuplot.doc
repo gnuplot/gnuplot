@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.637 2010/11/14 00:06:53 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.638 2010/11/18 23:59:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2882,7 +2882,7 @@ Ffigure_filledcurves
  where the option can be one of the following
 
      [closed | {above | below}
-     {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
+     {x1 | x2 | y1 | y2 | r}[=<a>] | xy=<x>,<y>]
 
  The first variant, `closed`, treats the curve itself as a closed polygon.
  This is the default if there are two columns of input data.
@@ -2896,6 +2896,7 @@ Ffigure_filledcurves
      filledcurves y1=0     ... line y=0 (at y1 axis) ie parallel to x1 axis,
      filledcurves y2=42    ... line y=42 (at y2 axis) ie parallel to x2, etc,
      filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
+     filledcurves above r=1.5  the area of a polar plot outside radius 1.5
 
  The third variant requires three columns of input data: the x coordinate and
  two y coordinates corresponding to two curves sampled at the same set of
@@ -2912,7 +2913,7 @@ Ffigure_filledcurves
      plot 'data' using 1:2:3 with filledcurves
 
  The `above` and `below` options apply both to commands of the form
-     ... filledcurves above {x1|x2|y1|y2}=<val>
+     ... filledcurves above {x1|x2|y1|y2|r}=<val>
  and to commands of the form
      ... using 1:2:3 with filledcurves below
  In either case the option limits the filled area to one side of the bounding

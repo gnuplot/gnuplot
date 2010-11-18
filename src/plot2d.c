@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.235 2010/11/08 00:38:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.236 2010/11/18 23:59:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2627,6 +2627,7 @@ eval_plots()
 				this_plot->points[i].z = 0;
 			} else if (polar) {
 			    double y;
+			    double phi = x;
 
 			    if (temp > R_AXIS.max) {
 				if (R_AXIS.autoscale & AUTOSCALE_MAX)
@@ -2644,32 +2645,32 @@ eval_plots()
 			    } else
 			    if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
 				temp -= R_AXIS.min;
-			    y = temp * sin(x * ang2rad);
-			    x = temp * cos(x * ang2rad);
+			    y = temp * sin(phi * ang2rad);
+			    x = temp * cos(phi * ang2rad);
 
-			    if (boxwidth >= 0 &&  boxwidth_is_absolute) {
-				double xlow, xhigh;
-				coord_type dmy_type = INRANGE;
-				this_plot->points[i].z = 0;
-				if (axis_array[this_plot->x_axis].log) {
-				    double base = axis_array[this_plot->x_axis].base;
-				    xlow = x * pow(base, -boxwidth/2.);
-				    xhigh = x * pow(base, boxwidth/2.);
-				} else {
-				    xlow = x - boxwidth/2;
-				    xhigh = x + boxwidth/2;
-				}
-				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, xlow, dmy_type, x_axis, 
-								 this_plot->noautoscale, NOOP, NOOP );
-				dmy_type = INRANGE;
-				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, xhigh, dmy_type, x_axis,
-								 this_plot->noautoscale, NOOP, NOOP );
+
+			    if ((this_plot->plot_style == FILLEDCURVES) 
+			    &&  (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR)) {
+			    	double xhigh, yhigh;
+				double temp = this_plot->filledcurves_options.at;
+				temp = AXIS_LOG_VALUE(POLAR_AXIS,temp)
+				     - AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.min);
+				yhigh = temp * sin(phi * ang2rad);
+				xhigh = temp * cos(phi * ang2rad);
+				STORE_WITH_LOG_AND_UPDATE_RANGE(
+				    this_plot->points[i].xhigh, xhigh, this_plot->points[i].type, x_axis,
+				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+			 	STORE_WITH_LOG_AND_UPDATE_RANGE(
+				    this_plot->points[i].yhigh, yhigh, this_plot->points[i].type, y_axis,
+				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 			    }
-			    temp = y;
-			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].x, x, this_plot->points[i].type, x_axis,
-			    				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
-			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, y, this_plot->points[i].type, y_axis,
-			    				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+
+			    STORE_WITH_LOG_AND_UPDATE_RANGE(
+			    	this_plot->points[i].x, x, this_plot->points[i].type, x_axis,
+			    	this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+			    STORE_WITH_LOG_AND_UPDATE_RANGE(
+			    	this_plot->points[i].y, y, this_plot->points[i].type, y_axis,
+			        this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 			} else {        /* neither parametric or polar */
 			    /* If non-para, it must be INRANGE */
 			    /* logscale ? log(x) : x */

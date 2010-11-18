@@ -1,8 +1,8 @@
 2010-11-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/command.c src/eval.c src/graphics.c
- 	src/mouse.c src/plot2d.c src/save.c src/set.c src/setshow.h src/show.c
-	src/tables.c src/tables.h src/unset.c
+ 	src/misc.c src/mouse.c src/plot2d.c src/save.c src/set.c src/setshow.h
+	src/show.c src/tables.c src/tables.h src/unset.c
  	demo/polar.dem demo/poldat.dem docs/gnuplot.doc:
 
 	Improved support for polar coordinate mode. 

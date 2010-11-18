@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.349 2010/11/16 20:59:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.350 2010/11/18 23:59:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1946,8 +1946,10 @@ do_plot(struct curve_points *plots, int pcount)
 	    case FILLEDCURVES:
 		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN) {
 		    plot_betweencurves(this_plot);
-		    /* FIXME: would like to call plot_lines() here twice, once for the lower */
-		    /* curve and once for the upper curve(), conditional on need_fill_border */
+		    /* FIXME: maybe call plot_lines() here twice, once for the lower */
+		    /* curve and once for the upper, conditional on need_fill_border */
+		} else if (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR) {
+		    plot_betweencurves(this_plot);
 		} else {
 		    plot_filledcurves(this_plot);
 		    if (need_fill_border(&this_plot->fill_properties))
@@ -2304,6 +2306,7 @@ finish_filled_curve(
 		points++;
 		break;
 	case FILLEDCURVES_BETWEEN:
+	case FILLEDCURVES_ATR:
 		side = (corners[points].x > 0) ? 1 : -1;
 
 		/* Prevent 1-pixel overlap of component rectangles, which */
