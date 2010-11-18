@@ -19,6 +19,8 @@
 
 	* src/set.c (set_grid): Clean up the option parsing for set grid.
 
+	* src/save.c: save output for "set view" could not be read in.
+
 2010-11-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (clip_line):  When draw_clip_line() was made into a
