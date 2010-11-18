@@ -1,3 +1,22 @@
+2010-11-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/command.c src/eval.c src/graphics.c
+ 	src/mouse.c src/plot2d.c src/save.c src/set.c src/setshow.h src/show.c
+	src/tables.c src/tables.h src/unset.c
+ 	demo/polar.dem demo/poldat.dem docs/gnuplot.doc:
+
+	Improved support for polar coordinate mode. 
+	The polar axis gets syntax and properties equivalent to the x/y/z axes.
+	- set/unset raxis (always drawn through the origin)
+	- set rrange controls the extent of the axes and of the plot itself;
+	  the xrange and yrange are set to match, but can be changed afterward
+	- set rtics (drawn to right of origin; optionally mirrored to the left)
+	- set log r (does not affect scaling on x or y)
+	- polar coordinate readout from mousing
+	- filledcurves bounded by constant r
+	- polar.dem (turn off rtics so the demo output remains as before)
+	  poldat.dem (add a plot showing raxis, rtics, and log scaling on r)
+	
 2010-11-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (clip_line):  When draw_clip_line() was made into a

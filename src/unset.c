@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.138 2010/09/28 17:14:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.139 2010/11/07 19:32:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -326,6 +326,9 @@ unset_command()
 	unset_object();
 	break;
 #endif
+    case S_RTICS:
+	unset_tics(POLAR_AXIS);
+	break;
     case S_SAMPLES:
 	unset_samples();
 	break;
@@ -492,7 +495,7 @@ unset_command()
 	unset_range(COLOR_AXIS);
 	break;
     case S_RRANGE:
-	unset_range(R_AXIS);
+	unset_range(POLAR_AXIS);
 	break;
     case S_TRANGE:
 	unset_range(T_AXIS);
@@ -502,6 +505,10 @@ unset_command()
 	break;
     case S_VRANGE:
 	unset_range(V_AXIS);
+	break;
+    case S_RAXIS:
+	raxis = FALSE;
+	c_token++;
 	break;
     case S_XZEROAXIS:
 	unset_zeroaxis(FIRST_X_AXIS);
@@ -811,6 +818,7 @@ unset_format()
 	SET_DEFFORMAT(SECOND_X_AXIS, set_for_axis);
 	SET_DEFFORMAT(SECOND_Y_AXIS, set_for_axis);
 	SET_DEFFORMAT(COLOR_AXIS   , set_for_axis);
+	SET_DEFFORMAT(POLAR_AXIS   , set_for_axis);
     }
 }
 
@@ -1045,8 +1053,11 @@ unset_locale()
 static void
 reset_logscale(AXIS_INDEX axis)
 {
+    TBOOLEAN undo_rlog = (axis == POLAR_AXIS && R_AXIS.log);
     axis_array[axis].log = FALSE;
     axis_array[axis].base = 0.0;
+    if (undo_rlog)
+	rrange_to_xy();
 }
 
 /* process 'unset logscale' command */

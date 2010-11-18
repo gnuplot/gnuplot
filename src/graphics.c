@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.348 2010/10/29 04:08:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.349 2010/11/16 20:59:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -132,6 +132,7 @@ static void plot_boxplot __PROTO((struct curve_points * plot));
 static void place_labels __PROTO((struct text_label * listhead, int layer, TBOOLEAN clip));
 static void place_arrows __PROTO((int layer));
 static void place_grid __PROTO((void));
+static void place_raxis __PROTO((void));
 
 static int edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
 static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
@@ -938,6 +939,9 @@ boundary(struct curve_points *plots, int count)
     setup_tics(FIRST_X_AXIS, 20);
     setup_tics(SECOND_X_AXIS, 20);
 
+    if (polar)
+	setup_tics(POLAR_AXIS, 10);
+
 
     /* Modify the bounding box to fit the aspect ratio, if any was
      * given. */
@@ -1314,11 +1318,23 @@ place_grid()
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
 
-/* RADIAL LINES FOR POLAR GRID */
+    /* POLAR GRID */
+    if (polar && R_AXIS.ticmode) {
+	/* Piggyback on the xtick2d_callback.  Avoid a call to the full    */
+	/* axis_output_tics(), which wasn't really designed for this axis. */
+	tic_start = map_y(0);   /* Always equivalent to tics on phi=0 axis */
+	tic_mirror = tic_start; /* tic extends on both sides of phi=0 */
+	tic_text = tic_start - t->v_char;
+	rotate_tics = R_AXIS.tic_rotate;
+	if (rotate_tics == 0)
+	    tic_hjust = CENTRE;
+	else if ((*t->text_angle)(rotate_tics))
+	    tic_hjust = (rotate_tics == TEXT_VERTICAL) ? RIGHT : LEFT;
+	gen_tics(POLAR_AXIS, xtick2d_callback);
+	(*t->text_angle) (0);
+    }
 
-    /* note that draw_clip_line takes unsigneds, but (fortunately)
-     * clip_line takes signeds
-     */
+    /* Radial lines */
     if (polar_grid_angle) {
 	double theta = 0;
 	int ox = map_x(0);
@@ -1331,6 +1347,7 @@ place_grid()
 	}
 	draw_clip_line(ox, oy, map_x(largest_polar_circle * cos(theta)), map_y(largest_polar_circle * sin(theta)));
     }
+
 }
 
 static void
@@ -2041,6 +2058,8 @@ do_plot(struct curve_points *plots, int pcount)
     /* DRAW TICS AND GRID */
     if (grid_layer == 1)
 	place_grid();
+    if (polar && raxis)
+	place_raxis();
 
     /* REDRAW PLOT BORDER */
     if (draw_border && border_layer == 1)
@@ -5555,6 +5574,38 @@ place_histogram_titles()
     }
 }
 
+/*
+ * Draw a solid line for the polar axis.
+ * If the center of the polar plot is not a zero (rmin != 0)
+ * indicate this by drawing an open circle.
+ */
+static void
+place_raxis()
+{
+#ifdef EAM_OBJECTS
+    t_object raxis_circle = {
+	NULL, 1, 1, OBJ_CIRCLE,	/* link, tag, layer (front), object_type */
+	{FS_SOLID, 100, 0, BLACK_COLORSPEC},
+	{0, LT_BACKGROUND, 0, 0, 0.2, 0.0, FALSE, BACKGROUND_COLORSPEC},
+	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360. }}
+    };
+#endif
+    int x0,y0, xend,yend;
+
+    x0 = map_x(0);
+    y0 = map_y(0);
+    xend = map_x( AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.set_max)
+		- AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.set_min));
+    yend = y0;
+    term_apply_lp_properties(&border_lp);
+    draw_clip_line(x0,y0,xend,yend);
+
+#ifdef EAM_OBJECTS
+    if (!(R_AXIS.autoscale & AUTOSCALE_MIN) && R_AXIS.set_min != 0)
+	place_objects( &raxis_circle, 1, 2, clip_area );
+#endif
+
+}
 
 /*
  * Make this code a subroutine, rather than in-line, so that it can

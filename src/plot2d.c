@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.234 2010/10/27 04:07:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.235 2010/11/08 00:38:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -208,7 +208,7 @@ plotrequest()
     AXIS_INIT2D(SECOND_X_AXIS, 0);
     AXIS_INIT2D(SECOND_Y_AXIS, 1);
     AXIS_INIT2D(T_AXIS, 0);
-    AXIS_INIT2D(R_AXIS, 1);
+    AXIS_INIT2D(POLAR_AXIS, 1);
     AXIS_INIT2D(COLOR_AXIS, 1);
 
     t_axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
@@ -1070,14 +1070,39 @@ store2d_point(
     if (polar) {
 	double newx, newy;
 
-	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) 
-	&&  y > axis_array[R_AXIS].max) {
-	    cp->type = OUTRANGE;
+	if (y < R_AXIS.data_min)
+	    R_AXIS.data_min = y;
+	if (y < R_AXIS.min) {
+	    if (R_AXIS.autoscale & AUTOSCALE_MIN)
+		    R_AXIS.min = (y>0) ? 0 : y;
 	}
-	if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
+	if (y > R_AXIS.data_max)
+	    R_AXIS.data_max = y;
+	if (y > R_AXIS.max) {
+	    if (R_AXIS.autoscale & AUTOSCALE_MAX)	{
+		if (R_AXIS.max_constraint & CONSTRAINT_UPPER) {
+		    if (R_AXIS.max_ub >= y)
+			R_AXIS.max = y;
+		    else
+			R_AXIS.max = R_AXIS.max_ub;
+		} else {
+		    R_AXIS.max = y;
+		}
+	    } else {
+		cp->type = OUTRANGE;
+	    }
+	}
+
+	if (R_AXIS.log) {
+	    if (R_AXIS.min <= 0 || R_AXIS.autoscale & AUTOSCALE_MIN)
+		int_error(NO_CARET,"In log mode rrange must not include 0");
+	    y = AXIS_DO_LOG(POLAR_AXIS,y) - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
+	} else
+
+	if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
 	    /* we store internally as if plotting r(t)-rmin */
-	    y -= axis_array[R_AXIS].min;
-	}
+	    y -= R_AXIS.min;
+
 	newx = y * cos(x * ang2rad);
 	newy = y * sin(x * ang2rad);
 	y = newy;
@@ -1091,26 +1116,34 @@ store2d_point(
 	    xhigh = x + radius;
 
 	} else {
-	    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) 
-	    &&  yhigh > axis_array[R_AXIS].max) {
+	    if (!(R_AXIS.autoscale & AUTOSCALE_MAX) 
+	    &&  yhigh > R_AXIS.max) {
 		cp->type = OUTRANGE;
 	    }
-	    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
+	    if (R_AXIS.log) {
+		yhigh = AXIS_DO_LOG(POLAR_AXIS,yhigh)
+			- AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
+	    } else
+	    if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 		/* we store internally as if plotting r(t)-rmin */
-		yhigh -= axis_array[R_AXIS].min;
+		yhigh -= R_AXIS.min;
 	    }
 	    newx = yhigh * cos(xhigh * ang2rad);
 	    newy = yhigh * sin(xhigh * ang2rad);
 	    yhigh = newy;
 	    xhigh = newx;
 
-	    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) 
-	    &&  ylow > axis_array[R_AXIS].max) {
+	    if (!(R_AXIS.autoscale & AUTOSCALE_MAX) 
+	    &&  ylow > R_AXIS.max) {
 		cp->type = OUTRANGE;
 	    }
-	    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
+	    if (R_AXIS.log) {
+		ylow = AXIS_DO_LOG(POLAR_AXIS,ylow)
+		     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
+	    } else
+	    if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 		/* we store internally as if plotting r(t)-rmin */
-		ylow -= axis_array[R_AXIS].min;
+		ylow -= R_AXIS.min;
 	    }
 	    newx = ylow * cos(xlow * ang2rad);
 	    newy = ylow * sin(xlow * ang2rad);
@@ -2594,12 +2627,26 @@ eval_plots()
 				this_plot->points[i].z = 0;
 			} else if (polar) {
 			    double y;
-			    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && temp > axis_array[R_AXIS].max)
-				this_plot->points[i].type = OUTRANGE;
-			    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN))
-				temp -= axis_array[R_AXIS].min;
+
+			    if (temp > R_AXIS.max) {
+				if (R_AXIS.autoscale & AUTOSCALE_MAX)
+				    R_AXIS.max = temp;
+				else
+				    this_plot->points[i].type = OUTRANGE;
+			    }
+			    if (temp < R_AXIS.min) {
+				if (R_AXIS.autoscale & AUTOSCALE_MIN)
+				    R_AXIS.min = (temp>0) ? 0 : temp;
+			    }
+			    if (R_AXIS.log) {
+				temp = AXIS_DO_LOG(POLAR_AXIS,temp)
+				     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
+			    } else
+			    if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
+				temp -= R_AXIS.min;
 			    y = temp * sin(x * ang2rad);
 			    x = temp * cos(x * ang2rad);
+
 			    if (boxwidth >= 0 &&  boxwidth_is_absolute) {
 				double xlow, xhigh;
 				coord_type dmy_type = INRANGE;
@@ -2871,11 +2918,11 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 		    double r = yp->points[i].y;
 		    double t = xp->points[i].y * ang2rad;
 		    double x, y;
-		    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && r > axis_array[R_AXIS].max)
+		    if (!(R_AXIS.autoscale & AUTOSCALE_MAX) && r > R_AXIS.max)
 			yp->points[i].type = OUTRANGE;
-		    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MIN)) {
+		    if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 			/* store internally as if plotting r(t)-rmin */
-			r -= axis_array[R_AXIS].min;
+			r -= R_AXIS.min;
 		    }
 		    x = r * cos(t);
 		    y = r * sin(t);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.186 2010/10/06 23:20:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.187 2010/11/06 22:02:37 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -312,6 +312,7 @@ set y2data%s\n",
     SAVE_FORMAT(SECOND_Y_AXIS);
     SAVE_FORMAT(FIRST_Z_AXIS );
     SAVE_FORMAT(COLOR_AXIS );
+    SAVE_FORMAT(POLAR_AXIS );
 #undef SAVE_FORMAT
 
     fprintf(fp, "set angles %s\n",
@@ -352,6 +353,7 @@ set y2data%s\n",
 	save_linetype(fp, &mgrid_lp, FALSE);
 	fputc('\n', fp);
     }
+    fprintf(fp, "%sset raxis\n", raxis ? "" : "un");
 
     fprintf(fp, "set key title \"%s\"", conv_text(key->title));
     if (key->font)
@@ -567,6 +569,7 @@ set y2data%s\n",
     SAVE_LOG(SECOND_Y_AXIS);
     SAVE_LOG(FIRST_Z_AXIS );
     SAVE_LOG(COLOR_AXIS );
+    SAVE_LOG(POLAR_AXIS );
 #undef SAVE_LOG
 
     save_offsets(fp, "set offsets");
@@ -748,6 +751,7 @@ set origin %g,%g\n",
     save_tics(fp, SECOND_X_AXIS);
     save_tics(fp, SECOND_Y_AXIS);
     save_tics(fp, COLOR_AXIS);
+    save_tics(fp, POLAR_AXIS);
 
 #define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)			 \
     {									 \
@@ -770,7 +774,7 @@ set origin %g,%g\n",
     fprintf(fp, "set timestamp %s \n", timelabel_bottom ? "bottom" : "top");
     SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel);
 
-    save_range(fp, R_AXIS);
+    save_range(fp, POLAR_AXIS);
     save_range(fp, T_AXIS);
     save_range(fp, U_AXIS);
     save_range(fp, V_AXIS);

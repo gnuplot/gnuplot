@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.246 2010/10/06 23:20:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.247 2010/11/06 22:02:37 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -99,6 +99,7 @@ static void show_style_circle __PROTO((void));
 static void show_style_ellipse __PROTO((void));
 #endif
 static void show_grid __PROTO((void));
+static void show_raxis __PROTO((void));
 static void show_zeroaxis __PROTO((AXIS_INDEX));
 static void show_label __PROTO((int tag));
 static void show_keytitle __PROTO((void));
@@ -250,6 +251,9 @@ show_command()
 	break;
     case S_GRID:
 	show_grid();
+	break;
+    case S_RAXIS:
+	show_raxis();
 	break;
     case S_ZEROAXIS:
 	show_zeroaxis(FIRST_X_AXIS);
@@ -448,7 +452,7 @@ show_command()
 	show_timestamp();
 	break;
     case S_RRANGE:
-	show_range(R_AXIS);
+	show_range(POLAR_AXIS);
 	break;
     case S_TRANGE:
 	show_range(T_AXIS);
@@ -570,6 +574,9 @@ show_command()
     case S_CBDTICS:
     case S_CBMTICS:
 	show_tics(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE);
+	break;
+    case S_RTICS:
+	show_ticdef(POLAR_AXIS);
 	break;
     case S_X2TICS:
     case S_X2DTICS:
@@ -754,6 +761,7 @@ show_all()
     show_format();
     show_style();
     show_grid();
+    show_raxis();
     show_zeroaxis(FIRST_X_AXIS);
     show_zeroaxis(FIRST_Y_AXIS);
     show_zeroaxis(FIRST_Z_AXIS);
@@ -1130,7 +1138,7 @@ show_autoscale()
     }
 
     if (polar) {
-	SHOW_AUTOSCALE(R_AXIS)
+	SHOW_AUTOSCALE(POLAR_AXIS)
     }
 
     SHOW_AUTOSCALE(FIRST_X_AXIS );
@@ -1433,6 +1441,7 @@ show_format()
     SHOW_FORMAT(SECOND_Y_AXIS);
     SHOW_FORMAT(FIRST_Z_AXIS );
     SHOW_FORMAT(COLOR_AXIS);
+    SHOW_FORMAT(POLAR_AXIS);
 #undef SHOW_FORMAT
 }
 
@@ -1624,6 +1633,7 @@ show_grid()
     SHOW_GRID(SECOND_Y_AXIS);
     SHOW_GRID(FIRST_Z_AXIS );
     SHOW_GRID(COLOR_AXIS);
+    SHOW_GRID(POLAR_AXIS);
 #undef SHOW_GRID
     fputs(" tics\n", stderr);
 
@@ -1641,6 +1651,11 @@ show_grid()
     fprintf(stderr, "\tGrid drawn at %s\n", (grid_layer==-1) ? "default layer" : ((grid_layer==0) ? "back" : "front"));
 }
 
+static void
+show_raxis()
+{
+    fprintf(stderr,"raxis is %sdrawn\n",raxis ? "" : "not ");
+}
 
 /* process 'show {x|y|z}zeroaxis' command */
 static void
@@ -1934,6 +1949,7 @@ show_logscale()
     SHOW_LOG(SECOND_X_AXIS);
     SHOW_LOG(SECOND_Y_AXIS);
     SHOW_LOG(COLOR_AXIS );
+    SHOW_LOG(POLAR_AXIS );
 #undef SHOW_LOG
 
     if (count == 0)

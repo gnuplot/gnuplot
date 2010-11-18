@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.60 2010/11/07 19:32:27 sfeam Exp $
+ * $Id: axis.h,v 1.61 2010/11/08 00:43:38 sfeam Exp $
  *
  */
 
@@ -64,7 +64,7 @@ typedef enum AXIS_INDEX {
     SECOND_Z_AXIS,		/* not used, yet */
     SECOND_Y_AXIS,
     SECOND_X_AXIS,
-    R_AXIS,
+    POLAR_AXIS,
     T_AXIS,
     U_AXIS,			/* never used? */
     V_AXIS			/* ditto */
@@ -72,7 +72,7 @@ typedef enum AXIS_INDEX {
 } AXIS_INDEX;
 
 # define AXIS_ARRAY_SIZE 11
-# define LAST_REAL_AXIS  SECOND_X_AXIS
+# define LAST_REAL_AXIS  POLAR_AXIS
 
 /* What kind of ticmarking is wanted? */
 typedef enum en_ticseries_type {
@@ -312,6 +312,9 @@ extern const struct lp_style_type default_grid_lp;
 /* grid layer: -1 default, 0 back, 1 front */
 extern int grid_layer;
 
+/* Whether or not to draw a separate polar axis in polar mode */
+extern TBOOLEAN raxis;
+
 /* global variables for communication with the tic callback functions */
 /* FIXME HBB 20010806: had better be collected into a struct that's
  * passed to the callback */
@@ -334,6 +337,7 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
 #define X_AXIS axis_array[x_axis]
 #define Y_AXIS axis_array[y_axis]
 #define Z_AXIS axis_array[z_axis]
+#define R_AXIS axis_array[POLAR_AXIS]
 #define CB_AXIS axis_array[COLOR_AXIS]
 
 /* -------- macros using these variables: */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.126 2010/09/10 17:09:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.127 2010/09/16 05:56:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -372,22 +372,22 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 static char *
 xy_format()
 {
-    static char format[0xff];
+    static char format[64];
     format[0] = NUL;
-    strcat(format, mouse_setting.fmt);
-    strcat(format, ", ");
-    strcat(format, mouse_setting.fmt);
+    strncat(format, mouse_setting.fmt, 30);
+    strncat(format, ", ", 2);
+    strncat(format, mouse_setting.fmt, 30);
     return format;
 }
 
 static char *
 zoombox_format()
 {
-    static char format[0xff];
+    static char format[64];
     format[0] = NUL;
-    strcat(format, mouse_setting.fmt);
-    strcat(format, "\r");
-    strcat(format, mouse_setting.fmt);
+    strncat(format, mouse_setting.fmt, 30);
+    strncat(format, "\r", 2);
+    strncat(format, mouse_setting.fmt, 30);
     return format;
 }
 
@@ -425,8 +425,25 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 	}
     } else if (mode == MOUSE_COORDINATES_REAL1) {
 	sprintf(s, xy_format(), x, y);	/* w/o brackets */
-    } else if (mode == MOUSE_COORDINATES_ALT && fmt) {
-	sprintf(s, fmt, x, y);	/* user defined format */
+    } else if (mode == MOUSE_COORDINATES_ALT && (fmt || polar)) {
+	if (polar) {
+	    double phi, r;
+	    double rmin = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0.0 : R_AXIS.set_min;
+	    phi = atan2(y,x);
+	    if (R_AXIS.log)
+		r = AXIS_UNDO_LOG(POLAR_AXIS, x/cos(phi) + AXIS_DO_LOG(POLAR_AXIS, rmin));
+	    else
+		r = x/cos(phi) + rmin;
+	    if (fmt)
+		sprintf(s, fmt, phi/ang2rad, r);
+	    else {
+		sprintf(s, "polar: ");
+		s += strlen(s);
+		sprintf(s, xy_format(), phi/ang2rad, r);
+	    }
+	} else {
+	    sprintf(s, fmt, x, y);	/* user defined format */
+	}
     } else {
 	sprintf(s, xy_format(), x, y);	/* usual x,y values */
     }
@@ -744,21 +761,18 @@ incr_mousemode(const int amount)
 {
     long int old = mouse_mode;
     mouse_mode += amount;
-    if (MOUSE_COORDINATES_ALT == mouse_mode && !mouse_alt_string) {
+    if (MOUSE_COORDINATES_ALT == mouse_mode && !(mouse_alt_string || polar))
 	mouse_mode += amount;	/* stepping over */
-    }
     if (mouse_mode > MOUSE_COORDINATES_ALT) {
 	mouse_mode = MOUSE_COORDINATES_REAL;
     } else if (mouse_mode < MOUSE_COORDINATES_REAL) {
 	mouse_mode = MOUSE_COORDINATES_ALT;
-	if (MOUSE_COORDINATES_ALT == mouse_mode && !mouse_alt_string) {
+	if (!(mouse_alt_string || polar))
 	    mouse_mode--;	/* stepping over */
-	}
     }
     UpdateStatusline();
-    if (display_ipc_commands()) {
+    if (display_ipc_commands())
 	fprintf(stderr, "switched mouse format from %ld to %ld\n", old, mouse_mode);
-    }
 }
 
 static void

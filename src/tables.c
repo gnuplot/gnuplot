@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.101 2010/07/08 04:54:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.102 2010/08/08 03:46:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -272,6 +272,8 @@ const struct gen_table set_tbl[] =
     { "noy2ti$cs", S_NOY2TICS },
     { "zti$cs", S_ZTICS },
     { "nozti$cs", S_NOZTICS },
+    { "rti$cs", S_RTICS },
+    { "norti$cs", S_NORTICS },
     { "cbti$cs", S_CBTICS },
     { "nocbti$cs", S_NOCBTICS },
 
@@ -318,6 +320,7 @@ const struct gen_table set_tbl[] =
     { "y2zeroa$xis", S_Y2ZEROAXIS },
     { "zzeroa$xis", S_ZZEROAXIS },
     { "zeroa$xis", S_ZEROAXIS },
+    { "rax$is", S_RAXIS },
 
     { "z$ero", S_ZERO },
     { NULL, S_INVALID }

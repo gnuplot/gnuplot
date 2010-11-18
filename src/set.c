@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.329 2010/11/08 00:43:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.330 2010/11/14 00:08:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -140,6 +140,7 @@ static void set_view __PROTO((void));
 static void set_zero __PROTO((void));
 static void set_timedata __PROTO((AXIS_INDEX));
 static void set_range __PROTO((AXIS_INDEX));
+static void set_raxis __PROTO((void));
 static void set_xyplane __PROTO((void));
 static void set_ticslevel __PROTO((void));
 static void set_zeroaxis __PROTO((AXIS_INDEX));
@@ -533,6 +534,10 @@ set_command()
 	case S_NOCBMTICS:
 	    set_tic_prop(COLOR_AXIS);
 	    break;
+	case S_RTICS:
+	case S_NORTICS:
+	    set_tic_prop(POLAR_AXIS);
+	    break;
 	case S_XDATA:
 	    set_timedata(FIRST_X_AXIS);
 	    /* HBB 20000506: the old cod this this, too, although it
@@ -598,7 +603,9 @@ set_command()
 	    set_range(COLOR_AXIS);
 	    break;
 	case S_RRANGE:
-	    set_range(R_AXIS);
+	    set_range(POLAR_AXIS);
+	    if (polar)
+		rrange_to_xy();
 	    break;
 	case S_TRANGE:
 	    set_range(T_AXIS);
@@ -608,6 +615,9 @@ set_command()
 	    break;
 	case S_VRANGE:
 	    set_range(V_AXIS);
+	    break;
+	case S_RAXIS:
+	    set_raxis();
 	    break;
 	case S_XZEROAXIS:
 	    set_zeroaxis(FIRST_X_AXIS);
@@ -878,7 +888,7 @@ set_autoscale()
 	}								\
     } while(0)
 
-    PROCESS_AUTO_LETTER(R_AXIS);
+    PROCESS_AUTO_LETTER(POLAR_AXIS);
     PROCESS_AUTO_LETTER(T_AXIS);
     PROCESS_AUTO_LETTER(U_AXIS);
     PROCESS_AUTO_LETTER(V_AXIS);
@@ -1430,6 +1440,7 @@ set_format()
 	SET_DEFFORMAT(SECOND_X_AXIS, set_for_axis);
 	SET_DEFFORMAT(SECOND_Y_AXIS, set_for_axis);
 	SET_DEFFORMAT(COLOR_AXIS   , set_for_axis);
+	SET_DEFFORMAT(POLAR_AXIS   , set_for_axis);
     } else {
 	char *format = try_to_get_string();
 	if (!format)
@@ -1446,6 +1457,7 @@ set_format()
 	SET_FORMATSTRING(SECOND_X_AXIS);
 	SET_FORMATSTRING(SECOND_Y_AXIS);
 	SET_FORMATSTRING(COLOR_AXIS);
+	SET_FORMATSTRING(POLAR_AXIS);
 #undef SET_FORMATSTRING
 
 	free(format);
@@ -1489,18 +1501,16 @@ set_grid()
 	else GRID_MATCH(SECOND_Y_AXIS, "nomy2$tics")
 	else GRID_MATCH(COLOR_AXIS, "nocb$tics")
 	else GRID_MATCH(COLOR_AXIS, "nomcb$tics")
+	else GRID_MATCH(POLAR_AXIS, "nor$tics")
 	else if (almost_equals(c_token,"po$lar")) {
 	    if (!some_grid_selected()) {
-		/* grid_selection = GRID_X; */
-		axis_array[FIRST_X_AXIS].gridmajor = TRUE;
+		axis_array[POLAR_AXIS].gridmajor = TRUE;
 	    }
 	    c_token++;
-	    if (END_OF_COMMAND) {
+	    if (END_OF_COMMAND)
 		polar_grid_angle = 30*DEG2RAD;
-	    } else {
-		/* get radial interval */
+	    else /* get radial interval */
 		polar_grid_angle = ang2rad*real_expression();
-	    }
 	} else if (almost_equals(c_token,"nopo$lar")) {
 	    polar_grid_angle = 0; /* not polar grid */
 	    c_token++;
@@ -1542,8 +1552,12 @@ set_grid()
 
     if (!explicit_change && !some_grid_selected()) {
 	/* no axis specified, thus select default grid */
-	axis_array[FIRST_X_AXIS].gridmajor = TRUE;
-	axis_array[FIRST_Y_AXIS].gridmajor = TRUE;
+	if (polar) {
+	    axis_array[POLAR_AXIS].gridmajor = TRUE;
+	} else {
+	    axis_array[FIRST_X_AXIS].gridmajor = TRUE;
+	    axis_array[FIRST_Y_AXIS].gridmajor = TRUE;
+	}
     }
 }
 
@@ -2236,6 +2250,8 @@ set_logscale()
 		axis_array[axis].log = TRUE;
 		axis_array[axis].base = newbase;
 		axis_array[axis].log_base = log(newbase);
+		if ((axis == POLAR_AXIS) && polar)
+		    rrange_to_xy();
 	}
     }
 
@@ -3398,20 +3414,24 @@ set_polar()
 {
     c_token++;
 
-    if (!polar) {
-	if (!parametric) {
-	    if (interactive)
-		(void) fprintf(stderr,"\n\tdummy variable is t for curves\n");
-	    strcpy (set_dummy_var[0], "t");
-	}
+    if (polar)
+	return;
+    else
 	polar = TRUE;
-	if (axis_array[T_AXIS].set_autoscale) {
-	    /* only if user has not set a range manually */
-	    axis_array[T_AXIS].set_min = 0.0;
-	    /* 360 if degrees, 2pi if radians */
-	    axis_array[T_AXIS].set_max = 2 * M_PI / ang2rad;
-	}
+
+    if (!parametric) {
+	if (interactive)
+	    (void) fprintf(stderr,"\n\tdummy variable is t for curves\n");
+	strcpy (set_dummy_var[0], "t");
     }
+    if (axis_array[T_AXIS].set_autoscale) {
+	/* only if user has not set a range manually */
+	axis_array[T_AXIS].set_min = 0.0;
+	/* 360 if degrees, 2pi if radians */
+	axis_array[T_AXIS].set_max = 2 * M_PI / ang2rad;
+    }
+    if (axis_array[POLAR_AXIS].set_autoscale != AUTOSCALE_BOTH)
+	rrange_to_xy();
 }
 
 #ifdef EAM_OBJECTS
@@ -4606,6 +4626,13 @@ set_range(AXIS_INDEX axis)
 	splot_map_activate();
 }
 
+static void
+set_raxis()
+{
+    raxis = TRUE;
+    c_token++;
+}
+
 /* process 'set {xyz}zeroaxis' command */
 static void
 set_zeroaxis(AXIS_INDEX axis)
@@ -4860,7 +4887,7 @@ set_tic_prop(AXIS_INDEX axis)
 	}
     }
     if (almost_equals(c_token, nocmd)) {	/* NOMINI */
-	axis_array[axis].minitics = FALSE;
+	axis_array[axis].minitics = MINI_OFF;
 	c_token++;
 	match = 1;
     }
@@ -5606,5 +5633,30 @@ parse_histogramstyle( histogram_style *hs,
 	} else
 	    /* We hit something unexpected */
 	    break;
+    }
+}
+
+/* Utility routine to propagate rrange into corresponding x and y ranges */
+void
+rrange_to_xy()
+{
+    double min;
+    if (R_AXIS.set_autoscale & AUTOSCALE_MIN)
+	min = 0;
+    else
+	min = R_AXIS.set_min;
+    if (R_AXIS.set_autoscale & AUTOSCALE_MAX) {
+	X_AXIS.set_autoscale = AUTOSCALE_BOTH;
+	Y_AXIS.set_autoscale = AUTOSCALE_BOTH;
+    } else {
+	X_AXIS.set_autoscale = AUTOSCALE_NONE;
+	Y_AXIS.set_autoscale = AUTOSCALE_NONE;
+	if (R_AXIS.log)
+	    X_AXIS.set_max =  AXIS_DO_LOG(POLAR_AXIS, R_AXIS.set_max)
+			    - AXIS_DO_LOG(POLAR_AXIS, min);
+	else
+	    X_AXIS.set_max = R_AXIS.set_max - min;
+	Y_AXIS.set_max = X_AXIS.set_max;
+	Y_AXIS.set_min = X_AXIS.set_min = -X_AXIS.set_max;
     }
 }

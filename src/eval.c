@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.85 2010/10/01 23:10:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.86 2010/10/22 05:28:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -701,7 +701,7 @@ fill_gpval_axis(AXIS_INDEX axis)
     set_gpval_axis_sth_double(prefix, axis, "REVERSE", (A.range_flags & RANGE_REVERSE), 1);
     set_gpval_axis_sth_double(prefix, axis, "LOG", A.base, 0);
 
-    if (axis < R_AXIS) {
+    if (axis < POLAR_AXIS) {
 	if (axis == T_AXIS) axis = COLOR_AXIS; /* T axis is never drawn; colorbar is. */
 	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MIN", AXIS_DE_LOG_VALUE(axis, A.data_min), 0);
 	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MAX", AXIS_DE_LOG_VALUE(axis, A.data_max), 0);

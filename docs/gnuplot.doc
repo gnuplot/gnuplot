@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.636 2010/11/12 19:18:02 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.637 2010/11/14 00:06:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6581,15 +6581,13 @@ Ffigure_mapcontours
 4 polar mode
 ?commands set autoscale polar
 ?set autoscale polar
- When in polar mode (`set polar`), the xrange and the yrange are both found
- from the polar coordinates, and thus they can both be automatically scaled.
- In other words, in polar mode both the x and y axes can be automatically
- scaled to fit the ranges of the polar function that is being plotted.
-
- When plotting functions in polar mode, the rrange may be autoscaled.  When
- plotting data files in polar mode, the trange may also be autoscaled.  Note
- that if the trange is contained within one quadrant, autoscaling will produce
- a polar plot of only that single quadrant.
+ When in polar mode (`set polar`), the xrange and the yrange may be left
+ in autoscale mode.  If `set rrange` is used to limit the extent of the polar
+ axis, then xrange and yrange will adjust to match this automatically.
+ However, explicit xrange and yrange commands can later be used to make
+ further adjustments.  See `set rrange`.  The trange may also be autoscaled.
+ Note that if the trange is contained within one quadrant, autoscaling will
+ produce a polar plot of only that single quadrant.
 
  Explicitly setting one or two ranges but not others may lead to unexpected
  results.
@@ -9999,20 +9997,22 @@ Ffigure_mapcontours
 
  While in polar coordinates the meaning of an expression in t is really
  r = f(t), where t is an angle of rotation.  The trange controls the domain
- (the angle) of the function, and the x and y ranges control the range of the
+ (the angle) of the function. The r, x and y ranges control the extent of the
  graph in the x and y directions.  Each of these ranges, as well as the
- rrange, may be autoscaled or set explicitly.  Ffor details of all the `ranges`
- commands, see `set xrange`.
+ rrange, may be autoscaled or set explicitly.  For details, see `set rrange`
+ and `set xrange`.
 
  Example:
        set polar
        plot t*sin(t)
-       plot [-2*pi:2*pi] [-3:3] [-3:3] t*sin(t)
+       set trange [-2*pi:2*pi]
+       set rrange [0:3]
+       plot t*sin(t)
 
  The first `plot` uses the default polar angular domain of 0 to 2*pi.  The
  radius and the size of the graph are scaled automatically.  The second `plot`
- expands the domain, and restricts the size of the graph to [-3:3] in both
- directions.
+ expands the domain, and restricts the size of the graph to the area within
+ 3 units of the origin.  This has the effect of limiting x and y to [-3:3].
 
  You may want to `set size square` to have `gnuplot` try to make the aspect
  ratio equal to unity, so that circles look circular.
@@ -10057,6 +10057,15 @@ Ffigure_mapcontours
        2) The directory specified by environmental variable GNUPLOT_PS_DIR
        3) A built-in header or one from the default system directory
        4) Directories set by `set loadpath`
+3 raxis
+?commands set raxis
+?raxis
+ The commands `set raxis` and `unset raxis` toggle whether the polar axis
+ is drawn separately from grid lines and the x axis.  If the minimum of the
+ current rrange is non-zero (and not autoscaled), then a white circle is drawn
+ at the center of the polar plot to indicate that the plot lines and axes do
+ not reach 0.  The axis line is drawn using the same line type as the plot
+ border.  See `polar`, `rrange`, `rtics`, `set grid`.
 3 rmargin
 ?commands set rmargin
 ?set rmargin
@@ -10069,8 +10078,22 @@ Ffigure_mapcontours
 ?set rrange
 ?show rrange
 ?rrange
- The `set rrange` command sets the range of the radial coordinate for a
- graph in polar mode.  Please see `set xrange` for details.
+ The `set rrange` command sets the range of the radial coordinate for a graph
+ in polar mode.  This has the effect of setting both xrange and yrange as well.
+ The resulting xrange and yrange are both [-(rmax-rmin) : +(rmax-rmin)].
+ However if you later change the x or y range, for example by zooming, this does
+ not change rrange, so data points continue to be clipped against rrange.
+ Autoscaling of rmin always results in rmin = 0.
+3 rtics
+?commands set rtics
+?commands show rtics
+?set rtics
+?show rtics
+?rtics
+ The `set rtics` command places tics along the polar axis. These will only be
+ shown in polar plot mode.  The tics and labels are drawn to the right of the
+ origin. The `mirror` keyword causes them to be drawn also to the left of the
+ origin. See `polar`, and see `set xtics` for discussion of other keywords.
 3 samples
 ?commands set samples
 ?commands show samples
