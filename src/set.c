@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.330 2010/11/14 00:08:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.331 2010/11/18 23:59:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1503,13 +1503,11 @@ set_grid()
 	else GRID_MATCH(COLOR_AXIS, "nomcb$tics")
 	else GRID_MATCH(POLAR_AXIS, "nor$tics")
 	else if (almost_equals(c_token,"po$lar")) {
-	    if (!some_grid_selected()) {
+	    if (!some_grid_selected())
 		axis_array[POLAR_AXIS].gridmajor = TRUE;
-	    }
+	    polar_grid_angle = 30*DEG2RAD;
 	    c_token++;
-	    if (END_OF_COMMAND)
-		polar_grid_angle = 30*DEG2RAD;
-	    else /* get radial interval */
+	    if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX)
 		polar_grid_angle = ang2rad*real_expression();
 	} else if (almost_equals(c_token,"nopo$lar")) {
 	    polar_grid_angle = 0; /* not polar grid */
@@ -1523,30 +1521,16 @@ set_grid()
 	} else if (almost_equals(c_token,"layerd$efault")) {
 	    grid_layer = -1;
 	    c_token++;
-	} else
-	    break; /* might be a linetype */
-    }
-
-    if (!END_OF_COMMAND) {
-	int old_token = c_token;
-
-	lp_parse(&grid_lp, TRUE, FALSE);
-	if (c_token == old_token) { /* nothing parseable found... */
-	    grid_lp.l_type = int_expression() - 1;
-	}
-
-	/* probably just  set grid <linetype> */
-
-	if (END_OF_COMMAND) {
-	    mgrid_lp = grid_lp;
-	} else {
-	    if (equals(c_token,","))
+	} else { /* only remaining possibility is a line type */
+	    int save_token = c_token;
+	    lp_parse(&grid_lp, TRUE, FALSE);
+	    if (equals(c_token,",")) {
 		c_token++;
-	    old_token = c_token;
-	    lp_parse(&mgrid_lp, TRUE, FALSE);
-	    if (c_token == old_token) {
-		mgrid_lp.l_type = int_expression() - 1;
-	    }
+		lp_parse(&mgrid_lp, TRUE, FALSE);
+	    } else if (save_token != c_token)
+		mgrid_lp = grid_lp;
+	    if (save_token == c_token)
+		break;
 	}
     }
 

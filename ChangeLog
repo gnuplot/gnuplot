@@ -16,7 +16,9 @@
 	- filledcurves bounded by constant r
 	- polar.dem (turn off rtics so the demo output remains as before)
 	  poldat.dem (add a plot showing raxis, rtics, and log scaling on r)
-	
+
+	* src/set.c (set_grid): Clean up the option parsing for set grid.
+
 2010-11-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (clip_line):  When draw_clip_line() was made into a
