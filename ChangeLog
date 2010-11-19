@@ -1,3 +1,7 @@
+2010-11-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c: save output for "set view" could not be read in
+
 2010-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc command.c (help_command) util.h:
