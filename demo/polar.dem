@@ -1,5 +1,5 @@
 #
-# $Id: polar.dem,v 1.6 2004/01/13 07:01:10 sfeam Exp $
+# $Id: polar.dem,v 1.7 2010/11/18 23:59:58 sfeam Exp $
 #
 # Show some of the new polar capabilities.
 #
@@ -43,11 +43,26 @@ pause -1 "Hit return to continue"
 
 butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5
 set samples 800
-print "This is a big one (many samples), be patient..."
 set title "Butterfly"
 unset key
 plot butterfly(t)
 pause -1 "Hit return to continue"
+reset
 
+set polar
+set grid polar 
+unset xtics
+unset ytics
+set border 0
+set style fill solid 0.5
+set rrange [0.1 : 4]
+set size square
+set key title "bounding radius 2.5"
+set key outside top right samplen 0.7
+
+plot 3.+sin(t)*cos(5*t) with filledcurve above r=2.5 notitle,\
+     3.+sin(t)*cos(5*t) with line
+
+pause -1 "Hit return to continue"
 # undo what we've done above
 reset
