@@ -1,3 +1,7 @@
+2010-11-20  Casey Carter   <ctcarter@users.sourceforge.net>
+
+	* term/canvas.trm:  syntax error in link record of standalone mode.
+
 2010-11-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/command.c src/eval.c src/graphics.c
