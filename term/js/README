@@ -53,7 +53,7 @@ This document contains
 	  as clickable icons for additional mousing operations
 The *.css and *.js references point back to whatever source URL you specified
 in the jsdir option to the 'set term' command.  For example:
-<link text="text/css" href="http://myserver/gnuplot_mouse.css" rel="stylesheet">
+<link type="text/css" href="http://myserver/gnuplot_mouse.css" rel="stylesheet">
 In order for viewers to use your plot document, they must be able to access the
 *.css and *.js files via the URL embedded in the document.
 
