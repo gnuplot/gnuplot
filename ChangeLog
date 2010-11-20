@@ -1,3 +1,7 @@
+2010-11-20  Casey Carter   <ctcarter@users.sourceforge.net>
+
+	* term/canvas.trm:  syntax error in link record of standalone mode.
+
 2010-11-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c: save output for "set view" could not be read in

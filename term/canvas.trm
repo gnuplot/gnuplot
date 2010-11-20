@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.25.2.7 2010/05/22 16:12:00 sfeam Exp $
+ * $Id: canvas.trm,v 1.25.2.8 2010/05/22 16:12:37 sfeam Exp $
  *
  */
 
@@ -470,7 +470,7 @@ CANVAS_text()
     if (CANVAS_standalone) {
 	fprintf(gpoutfile,
 		"</script>\n"
-		"<link text=\"text/css\" href=\"%sgnuplot_mouse.css\" rel=\"stylesheet\">\n"
+		"<link type=\"text/css\" href=\"%sgnuplot_mouse.css\" rel=\"stylesheet\">\n"
 		"</head>\n"
 		"<body onload=\"gnuplot_canvas(); gnuplot_init();\" oncontextmenu=\"return false;\">\n\n"
 		"<div class=\"gnuplot\">\n",
