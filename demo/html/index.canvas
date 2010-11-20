@@ -1,7 +1,7 @@
 <html>
 <head><title>Gnuplot demo scripts run through the HTML canvas terminal</title>
-<link text="text/css" href="gnuplot_demo.css" rel="stylesheet">
-<link text="text/css" href="gnuplot_mouse.css" rel="stylesheet">
+<link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
+<link type="text/css" href="gnuplot_mouse.css" rel="stylesheet">
 </head>
 
 <body oncontextmenu="return false;">
