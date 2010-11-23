@@ -2,6 +2,7 @@
 
 	* term/js/gnuplot_common.js:  Rotated text should be zoomed also.
 	* term/js/gnuplot_mouse.js:   Avoid negative height or width.
+	* term/canvas.trm: Avoid zero or negative size points.
 
 2010-11-20  Casey Carter   <ctcarter@users.sourceforge.net>
 
