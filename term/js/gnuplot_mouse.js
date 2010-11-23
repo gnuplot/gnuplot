@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.7 2009/05/30 17:55:42 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.9 2010/11/24 21:54:48 sfeam Exp $
  */
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -169,9 +169,13 @@ function mouse_update(e)
       ctx.putImageData(full_canvas_image,0,0);
     }
     ctx.strokeStyle="rgba(128,128,128,0.60)";
-    ctx.strokeRect(
-	plot_xmin + zoom_temp_plotx,  plot_ybot - zoom_temp_ploty,
-	plotx - zoom_temp_plotx, -(ploty - zoom_temp_ploty));
+    var x0 = plot_xmin + zoom_temp_plotx;
+    var y0 = plot_ybot - zoom_temp_ploty;
+    var w = plotx - zoom_temp_plotx;
+    var h = -(ploty - zoom_temp_ploty);
+    if (w<0) {x0 = x0 + w; w = -w;}
+    if (h<0) {y0 = y0 + h; h = -h;}
+    ctx.strokeRect(x0,y0,w,h);
   }
 }
 
