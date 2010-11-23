@@ -2,6 +2,9 @@
 
 	* term/js/gnuplot_common.js:  Rotated text should be zoomed also.
 
+	* term/js/gnuplot_mouse.js:  Konqueror (webkit?) implementation of ctx
+	does not like negative values of width or height.
+
 	* src/eval.c (fill_gpval_axis) term/canvas.trm:
 	Export polar axis limits and logscale status for external mousing.
 
