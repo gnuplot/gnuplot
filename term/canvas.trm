@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.34 2010/07/30 18:24:03 sfeam Exp $
+ * $Id: canvas.trm,v 1.35 2010/11/20 17:19:20 sfeam Exp $
  *
  */
 
@@ -453,6 +453,9 @@ CANVAS_text()
 	MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymin");
 	MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymax");
 
+	if (polar)
+	    MOUSE_PARAM("GPVAL_R_MIN", "plot_axis_rmin");
+
 	if ((axis_array[SECOND_X_AXIS].ticmode & TICS_MASK) != NO_TICS) {
 	    MOUSE_PARAM("GPVAL_X2_MIN", "plot_axis_x2min");
 	    MOUSE_PARAM("GPVAL_X2_MAX", "plot_axis_x2max");
@@ -469,6 +472,9 @@ CANVAS_text()
 		axis_array[FIRST_X_AXIS].log ? 1: 0);
 	fprintf(gpoutfile, "plot_logaxis_y = %d;\n",
 		axis_array[FIRST_Y_AXIS].log ? 1: 0);
+	if (polar)
+	    fprintf(gpoutfile, "plot_logaxis_r = %d;\n",
+		axis_array[POLAR_AXIS].log ? 1: 0);
 
 	fprintf(gpoutfile, "plot_axis_width = plot_axis_xmax - plot_axis_xmin;\n");
 	fprintf(gpoutfile, "plot_axis_height = plot_axis_ymax - plot_axis_ymin;\n");

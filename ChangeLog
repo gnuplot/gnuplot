@@ -2,6 +2,9 @@
 
 	* term/js/gnuplot_common.js:  Rotated text should be zoomed also.
 
+	* src/eval.c (fill_gpval_axis) term/canvas.trm:
+	Export polar axis limits and logscale status for external mousing.
+
 2010-11-20  Casey Carter   <ctcarter@users.sourceforge.net>
 
 	* demo/html/index.canvas demo/html/index.save demo/html/index.svg 

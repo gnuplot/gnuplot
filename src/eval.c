@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.86 2010/10/22 05:28:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.87 2010/11/18 23:59:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -702,7 +702,6 @@ fill_gpval_axis(AXIS_INDEX axis)
     set_gpval_axis_sth_double(prefix, axis, "LOG", A.base, 0);
 
     if (axis < POLAR_AXIS) {
-	if (axis == T_AXIS) axis = COLOR_AXIS; /* T axis is never drawn; colorbar is. */
 	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MIN", AXIS_DE_LOG_VALUE(axis, A.data_min), 0);
 	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MAX", AXIS_DE_LOG_VALUE(axis, A.data_max), 0);
     }
@@ -795,6 +794,8 @@ update_gpval_variables(int context)
 	fill_gpval_axis(T_AXIS);
 	fill_gpval_axis(U_AXIS);
 	fill_gpval_axis(V_AXIS);
+	fill_gpval_float("GPVAL_R_MIN", R_AXIS.min);
+	fill_gpval_float("GPVAL_R_LOG", R_AXIS.base);
 	update_plot_bounds();
 	fill_gpval_integer("GPVAL_PLOT", is_3d_plot ? 0:1);
 	fill_gpval_integer("GPVAL_SPLOT", is_3d_plot ? 1:0);
