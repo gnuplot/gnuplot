@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_common.js,v 1.1 2009/04/01 03:45:53 sfeam Exp $
+ * $Id: gnuplot_common.js,v 1.2 2009/05/29 03:14:48 sfeam Exp $
  */
 // Shared helper routines for gnuplot's canvas terminal driver.
 // Link to this file by reference rather than including the function definitions
@@ -45,6 +45,11 @@ function TR(x,y,angle,fontsize,justify,string) {
   if (zoomed) {zoom = zoomXY(xx,yy); ctx.translate(zoom.x,zoom.y);}
   else ctx.translate(xx,yy);
   ctx.rotate(angle * Math.PI / 180);
+  if (zoomed) {
+    if (plot_xmin < xx && xx < plot_xmax && plot_ybot > yy && yy > plot_ytop)
+      if ((typeof(zoom_text) != "undefined") && (zoom_text == true))
+	fontsize = Math.sqrt(zoomW(fontsize)*zoomH(fontsize));
+  }
   if (justify=="") ctx.drawText("sans", fontsize, 0, 0, string);
   else if (justify=="Right") ctx.drawTextRight("sans", fontsize, 0, 0, string);
   else if (justify=="Center") ctx.drawTextCenter("sans", fontsize, 0, 0, string);

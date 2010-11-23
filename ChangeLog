@@ -1,3 +1,7 @@
+2010-11-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/js/gnuplot_common.js:  Rotated text should be zoomed also.
+
 2010-11-20  Casey Carter   <ctcarter@users.sourceforge.net>
 
 	* demo/html/index.canvas demo/html/index.save demo/html/index.svg 
