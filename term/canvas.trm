@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.35 2010/11/20 17:19:20 sfeam Exp $
+ * $Id: canvas.trm,v 1.36 2010/11/24 03:32:47 sfeam Exp $
  *
  */
 
@@ -402,9 +402,11 @@ CANVAS_graphics()
 	    "  zoomed = false;\n"
 	    "  zoom_axis_width = 0;\n"
 	    "  zoom_in_progress = false;\n"
+	    "  polar_mode = %s;\n"
 	    "  ctx.clearRect(0,0,%d,%d);\n"
 	    "}\n",
 		CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name,
+		(polar) ? "true" : "false",
 		(int)(term->xmax / CANVAS_OVERSAMPLE), (int)(term->ymax / CANVAS_OVERSAMPLE)
 	);
     }
