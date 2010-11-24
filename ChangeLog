@@ -1,6 +1,20 @@
+2010-11-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm term/js/gnuplot_common.js term/js/gnuplot_mouse.js:
+	Revamp the javascript support for the HTML5 canvas terminal.
+	Move all global variables into a single object "gnuplot" declared in
+	gnuplot_common.js.  This revision also adds polar mode mousing support.
+
+	* demo/html/Makefile.canvas demo/html/index.canvas 
+	demo/html/mouseable.dem demo/html/mousebox.template 
+	demo/html/webify_canvas.pl:
+	Revamp the demos and build scripts to use the new javascript syntax.
+
+	See tracker item #3058147
+
 2010-11-23  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/js/gnuplot_common.js:  Rotated text should be zoomed also.
+	* term/js/gnuplot_common.js:  Rotated text should be zoom-able also.
 
 	* term/js/gnuplot_mouse.js:  Konqueror (webkit?) implementation of ctx
 	does not like negative values of width or height.

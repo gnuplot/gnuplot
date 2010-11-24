@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.37 2010/11/24 05:10:03 sfeam Exp $
+ * $Id: canvas.trm,v 1.38 2010/11/25 00:44:55 sfeam Exp $
  *
  */
 
@@ -373,9 +373,9 @@ CANVAS_graphics()
 	fprintf(gpoutfile,
 		"<script type=\"text/javascript\">\n"
 		"var canvas, ctx;\n"
-		"var grid_lines = true;\n"
-		"var zoomed = false;\n"
-		"var active_plot_name = \"gnuplot_canvas\";\n\n"
+		"gnuplot.grid_lines = true;\n"
+		"gnuplot.zoomed = false;\n"
+		"gnuplot.active_plot_name = \"gnuplot_canvas\";\n\n"
 		"function gnuplot_canvas() {\n"
 		"canvas = document.getElementById(\"gnuplot_canvas\");\n"
 		"ctx = canvas.getContext(\"2d\");\n"
@@ -390,19 +390,19 @@ CANVAS_graphics()
 	);
 	fprintf(gpoutfile,
 	    "// Reinitialize mouse tracking and zoom for this particular plot\n"
-	    "if ((typeof(active_plot) == \"undefined\" || active_plot != %s)  &&  typeof(mouse_update) != \"undefined\") {\n"
-	    "  active_plot_name = \"%s\";\n"
-	    "  active_plot = %s;\n"
-	    "  canvas.onmousemove = mouse_update;\n"
-	    "  canvas.onmouseup = zoom_in;\n"
-	    "  canvas.onmousedown = saveclick;\n"
-	    "  canvas.onkeypress = do_hotkey;\n"
+	    "if ((typeof(gnuplot.active_plot) == \"undefined\" || gnuplot.active_plot != %s)  &&  typeof(gnuplot.mouse_update) != \"undefined\") {\n"
+	    "  gnuplot.active_plot_name = \"%s\";\n"
+	    "  gnuplot.active_plot = %s;\n"
+	    "  canvas.onmousemove = gnuplot.mouse_update;\n"
+	    "  canvas.onmouseup = gnuplot.zoom_in;\n"
+	    "  canvas.onmousedown = gnuplot.saveclick;\n"
+	    "  canvas.onkeypress = gnuplot.do_hotkey;\n"
 	    "  if (canvas.attachEvent) {canvas.attachEvent('mouseover', %s);}\n"
 	    "  else if (canvas.addEventListener) {canvas.addEventListener('mouseover', %s, false);} \n"
-	    "  zoomed = false;\n"
-	    "  zoom_axis_width = 0;\n"
-	    "  zoom_in_progress = false;\n"
-	    "  polar_mode = %s;\n"
+	    "  gnuplot.zoomed = false;\n"
+	    "  gnuplot.zoom_axis_width = 0;\n"
+	    "  gnuplot.zoom_in_progress = false;\n"
+	    "  gnuplot.polar_mode = %s;\n"
 	    "  ctx.clearRect(0,0,%d,%d);\n"
 	    "}\n",
 		CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name,
@@ -410,6 +410,21 @@ CANVAS_graphics()
 		(int)(term->xmax / CANVAS_OVERSAMPLE), (int)(term->ymax / CANVAS_OVERSAMPLE)
 	);
     }
+
+    fprintf(gpoutfile,
+	"// short forms of commands provided by gnuplot_common.js\n"
+	"function Dot (x,y) {gnuplot.Dot(x,y);};\n"
+	"function Pt  (N,x,y,w) {gnuplot.Pt(N,x,y,w);};\n"
+	"function M   (x,y) {gnuplot.M(x,y);};\n"
+	"function L   (x,y) {gnuplot.L(x,y);};\n"
+	"function R   (x,y,w,h) {gnuplot.R(x,y,w,h);};\n"
+	"function T   (x,y,fontsize,justify,string) {gnuplot.T(x,y,fontsize,justify,string);};\n"
+	"function TR  (x,y,angle,fontsize,justify,string) {gnuplot.TR(x,y,angle,fontsize,justify,string);};\n"
+	"function bp  (x,y) {gnuplot.bp(x,y);};\n"
+	"function cfp () {gnuplot.cfp();};\n"
+	"function cfsp() {gnuplot.cfsp();};\n"
+	"\n"
+    );
 
     fprintf(gpoutfile,
 	    "CanvasTextFunctions.enable(ctx);\n"
@@ -431,14 +446,14 @@ CANVAS_text()
     if (TRUE) {
 	struct udvt_entry *udv;
 	fprintf(gpoutfile, "\n// plot boundaries and axis scaling information for mousing \n");
-	fprintf(gpoutfile, "plot_term_xmax = %d;\n", (int)(term->xmax / CANVAS_OVERSAMPLE));
-	fprintf(gpoutfile, "plot_term_ymax = %d;\n", (int)(term->ymax / CANVAS_OVERSAMPLE));
-	fprintf(gpoutfile, "plot_xmin = %.1f;\n", (double)plot_bounds.xleft / CANVAS_OVERSAMPLE);
-	fprintf(gpoutfile, "plot_xmax = %.1f;\n", (double)plot_bounds.xright / CANVAS_OVERSAMPLE);
-	fprintf(gpoutfile, "plot_ybot = %.1f;\n", (double)(term->ymax-plot_bounds.ybot) / CANVAS_OVERSAMPLE);
-	fprintf(gpoutfile, "plot_ytop = %.1f;\n", (double)(term->ymax-plot_bounds.ytop) / CANVAS_OVERSAMPLE);
-	fprintf(gpoutfile, "plot_width = %.1f;\n", (double)(plot_bounds.xright - plot_bounds.xleft) / CANVAS_OVERSAMPLE);
-	fprintf(gpoutfile, "plot_height = %.1f;\n", (double)(plot_bounds.ytop - plot_bounds.ybot) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot.plot_term_xmax = %d;\n", (int)(term->xmax / CANVAS_OVERSAMPLE));
+	fprintf(gpoutfile, "gnuplot.plot_term_ymax = %d;\n", (int)(term->ymax / CANVAS_OVERSAMPLE));
+	fprintf(gpoutfile, "gnuplot.plot_xmin = %.1f;\n", (double)plot_bounds.xleft / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot.plot_xmax = %.1f;\n", (double)plot_bounds.xright / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot.plot_ybot = %.1f;\n", (double)(term->ymax-plot_bounds.ybot) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot.plot_ytop = %.1f;\n", (double)(term->ymax-plot_bounds.ytop) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot.plot_width = %.1f;\n", (double)(plot_bounds.xright - plot_bounds.xleft) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot.plot_height = %.1f;\n", (double)(plot_bounds.ytop - plot_bounds.ybot) / CANVAS_OVERSAMPLE);
 
 	/* Get true axis ranges as used in the plot */
 	update_gpval_variables(1);
@@ -450,36 +465,37 @@ CANVAS_text()
 	    else if (udv->udv_value.type == CMPLX) \
 		fprintf(gpoutfile, "%s = %g;\n", js_NAME, udv->udv_value.v.cmplx_val.real); \
 	}
-	MOUSE_PARAM("GPVAL_X_MIN", "plot_axis_xmin");
-	MOUSE_PARAM("GPVAL_X_MAX", "plot_axis_xmax");
-	MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymin");
-	MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymax");
+	MOUSE_PARAM("GPVAL_X_MIN", "gnuplot.plot_axis_xmin");
+	MOUSE_PARAM("GPVAL_X_MAX", "gnuplot.plot_axis_xmax");
+	MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymin");
+	MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymax");
 
 	if (polar)
-	    MOUSE_PARAM("GPVAL_R_MIN", "plot_axis_rmin");
+	    fprintf(gpoutfile, "gnuplot.plot_axis_rmin = %g;\n",
+		(R_AXIS.autoscale & AUTOSCALE_MIN) ? 0.0 : R_AXIS.set_min);
 
 	if ((axis_array[SECOND_X_AXIS].ticmode & TICS_MASK) != NO_TICS) {
-	    MOUSE_PARAM("GPVAL_X2_MIN", "plot_axis_x2min");
-	    MOUSE_PARAM("GPVAL_X2_MAX", "plot_axis_x2max");
+	    MOUSE_PARAM("GPVAL_X2_MIN", "gnuplot.plot_axis_x2min");
+	    MOUSE_PARAM("GPVAL_X2_MAX", "gnuplot.plot_axis_x2max");
 	} else
-	    fprintf(gpoutfile, "plot_axis_x2min = \"none\"\n");
+	    fprintf(gpoutfile, "gnuplot.plot_axis_x2min = \"none\"\n");
 	if ((axis_array[SECOND_Y_AXIS].ticmode & TICS_MASK) != NO_TICS) {
-	    MOUSE_PARAM("GPVAL_Y2_MIN", "plot_axis_y2min");
-	    MOUSE_PARAM("GPVAL_Y2_MAX", "plot_axis_y2max");
+	    MOUSE_PARAM("GPVAL_Y2_MIN", "gnuplot.plot_axis_y2min");
+	    MOUSE_PARAM("GPVAL_Y2_MAX", "gnuplot.plot_axis_y2max");
 	} else
-	    fprintf(gpoutfile, "plot_axis_y2min = \"none\"\n");
+	    fprintf(gpoutfile, "gnuplot.plot_axis_y2min = \"none\"\n");
 #undef MOUSE_PARAM
 
-	fprintf(gpoutfile, "plot_logaxis_x = %d;\n",
+	fprintf(gpoutfile, "gnuplot.plot_logaxis_x = %d;\n",
 		axis_array[FIRST_X_AXIS].log ? 1: 0);
-	fprintf(gpoutfile, "plot_logaxis_y = %d;\n",
+	fprintf(gpoutfile, "gnuplot.plot_logaxis_y = %d;\n",
 		axis_array[FIRST_Y_AXIS].log ? 1: 0);
 	if (polar)
-	    fprintf(gpoutfile, "plot_logaxis_r = %d;\n",
+	    fprintf(gpoutfile, "gnuplot.plot_logaxis_r = %d;\n",
 		axis_array[POLAR_AXIS].log ? 1: 0);
 
-	fprintf(gpoutfile, "plot_axis_width = plot_axis_xmax - plot_axis_xmin;\n");
-	fprintf(gpoutfile, "plot_axis_height = plot_axis_ymax - plot_axis_ymin;\n");
+	fprintf(gpoutfile, "gnuplot.plot_axis_width = gnuplot.plot_axis_xmax - gnuplot.plot_axis_xmin;\n");
+	fprintf(gpoutfile, "gnuplot.plot_axis_height = gnuplot.plot_axis_ymax - gnuplot.plot_axis_ymin;\n");
 
     } /* End of section writing out variables for mousing */
 
@@ -513,10 +529,10 @@ CANVAS_text()
 		"      <table class=\"mousebox\">\n"
 		"	<tr>\n"
 		"	  <td class=\"icon\"></td>\n"
-		"	  <td class=\"icon\" onclick=toggle_grid><img src=\"%sgrid.png\" id=\"gnuplot_grid_icon\" align=right alt=\"#\" title=\"toggle grid\"></td>\n"
-		"	  <td class=\"icon\" onclick=unzoom><img src=\"%spreviouszoom.png\" id=\"gnuplot_unzoom_icon\" align=right alt=\"unzoom\" title=\"unzoom\"></td>\n"
-		"	  <td class=\"icon\" onclick=rezoom><img src=\"%snextzoom.png\" id=\"gnuplot_rezoom_icon\" align=right alt=\"rezoom\" title=\"rezoom\"></td>\n"
-		"	  <td class=\"icon\" onclick=toggle_zoom_text><img src=\"%stextzoom.png\" id=\"gnuplot_textzoom_icon\" align=right alt=\"zoom text\" title=\"zoom text with plot\"></td>\n"
+		"	  <td class=\"icon\" onclick=gnuplot.toggle_grid><img src=\"%sgrid.png\" id=\"gnuplot_grid_icon\" align=right alt=\"#\" title=\"toggle grid\"></td>\n"
+		"	  <td class=\"icon\" onclick=gnuplot.unzoom><img src=\"%spreviouszoom.png\" id=\"gnuplot_unzoom_icon\" align=right alt=\"unzoom\" title=\"unzoom\"></td>\n"
+		"	  <td class=\"icon\" onclick=gnuplot.rezoom><img src=\"%snextzoom.png\" id=\"gnuplot_rezoom_icon\" align=right alt=\"rezoom\" title=\"rezoom\"></td>\n"
+		"	  <td class=\"icon\" onclick=gnuplot.toggle_zoom_text><img src=\"%stextzoom.png\" id=\"gnuplot_textzoom_icon\" align=right alt=\"zoom text\" title=\"zoom text with plot\"></td>\n"
 		"	  <td class=\"icon\"><img src=\"%shelp.png\" id=\"gnuplot_help_icon\" align=right alt=\"?\" title=\"help\"></td>\n"
 		"	</tr>\n"
 		"      </table>\n"
@@ -906,7 +922,7 @@ TERM_PUBLIC void
 CANVAS_layer(t_termlayer layer)
 {
 	if (layer == TERM_LAYER_BEGIN_GRID) {
-	    fprintf(gpoutfile, "if (grid_lines) {\n"
+	    fprintf(gpoutfile, "if (gnuplot.grid_lines) {\n"
 			"var saveWidth = ctx.lineWidth;\n"
 			"ctx.lineWidth = ctx.lineWidth * 0.5;\n");
 	} else if (layer == TERM_LAYER_END_GRID) {

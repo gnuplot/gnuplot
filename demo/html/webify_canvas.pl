@@ -52,15 +52,20 @@ require "ctime.pl";
 	my $date = &ctime(time);
 	my $plot = 1;
 	my $mousing = 0;
+	my $grid = 0;
 	my $name = "foo";
 
 # options
-	if ($ARGV[0] eq "--mouse") {
+	my $iar = 0;
+	if ($ARGV[$iar] eq "--mouse") {
 	    $mousing = 1;
-	    $name = $ARGV[1];
-	} else {
-	    $name = $ARGV[0];
+	    $iar++;
+	} 
+	if ($ARGV[$iar] eq "--grid") {
+	    $grid = 1;
+	    $iar++;
 	}
+	$name = $ARGV[$iar];
 
 print STDERR $name, "\n";
 
@@ -76,6 +81,9 @@ print STDERR $name, "\n";
 	    print GNUPLOT "set term canvas name \"$name"."_$plot\" jsdir \".\"\n";
 	}
 	print GNUPLOT "set output \"$name.$plot.js\"\n";
+	if ($grid) {
+	    print GNUPLOT "set grid x y mx my\n";
+	}
 
 # find out if gpsavediff is available in current path
 	my $savescripts = T;
@@ -97,12 +105,12 @@ print STDERR $name, "\n";
 
 	print OUT "<script type=\"text/javascript\">\n";
 	print OUT "var canvas, ctx;\n";
-	print OUT "var grid_lines = true;\n";
-	print OUT "var zoomed = false;\n";
-	print OUT "var active_plot_name = \"gnuplot_canvas\";\n";
-	print OUT "var active_plot = dummyplot;\n";
-	print OUT "function dummyplot() {};\n";
-	print OUT "function gnuplot_canvas( plot ) { active_plot(); };\n";
+	print OUT "gnuplot.grid_lines = true;\n";
+	print OUT "gnuplot.zoomed = false;\n";
+	print OUT "gnuplot.active_plot_name = \"gnuplot_canvas\";\n";
+	print OUT "gnuplot.active_plot = gnuplot.dummyplot;\n";
+	print OUT "gnuplot.dummyplot = function() {};\n";
+	print OUT "function gnuplot_canvas( plot ) { gnuplot.active_plot(); };\n";
 	print OUT "</script>\n";
 
 	print OUT "</head>\n";
@@ -161,8 +169,8 @@ print STDERR $name, "\n";
 			print OUT "if (window.attachEvent) {window.attachEvent('onload', $name"."_$plot);}\n";
 			print OUT "else if (window.addEventListener) {window.addEventListener('load', $name"."_$plot, false);}\n";
 			print OUT "else {document.addEventListener('load', $name"."_$plot, false);}\n";
-			print OUT "var grid_lines = true;\n";
-			print OUT "var zoom = false;\n";
+			print OUT "gnuplot.grid_lines = true;\n";
+			print OUT "gnuplot.zoom = false;\n";
 			print OUT "</script>\n";
 
 			print OUT "</td><td valign=top>\n";

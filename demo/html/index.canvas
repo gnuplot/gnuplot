@@ -18,7 +18,6 @@
 <p>
 The canvas driver for gnuplot was contributed by Bruce Lueckenhoff, and extended by Ethan Merritt (sfeam).
 To view the results you need a browser that supports the HTML 5 'canvas' element.
-That currently means firefox, safari, opera, or konqueror (KDE 4.2).
 
 
 <table border="0" width="100%">
@@ -40,6 +39,7 @@ That currently means firefox, safari, opera, or konqueror (KDE 4.2).
     <li><a href="param.html">parametric&nbsp;functions</a></li>
     <li><a href="vector.html">vector fields</a></li>
     <li><a href="circles.html">circles</a></li>
+    <li><a href="boxplot.html">boxplots</a></li>
     </ul>
 
     <h4>Math functions</h4>
@@ -143,7 +143,6 @@ That currently means firefox, safari, opera, or konqueror (KDE 4.2).
 
 <tr valign=top><td align=center>
 
-<script src="gnuplot_mouse.js"></script>
 
 <h3>Example of mouse tracking, zoom/unzoom</h3>
 
@@ -153,25 +152,25 @@ That currently means firefox, safari, opera, or konqueror (KDE 4.2).
 	<td>
 	    <script src="canvastext.js"></script>
 	    <script src="gnuplot_common.js"></script>
+	    <script src="gnuplot_mouse.js"></script>
 	    <script src="mouseable.js"></script>
-	    <canvas id="gnuplot_canvas" width="500" height="350" onkeypress=do_hotkey() tabindex="0"></canvas>
+	    <canvas id="gnuplot_canvas" width="500" height="350" onkeypress=gnuplot.do_hotkey() tabindex="0"></canvas>
 	    <script>
-		var grid_lines = 1;
-		var zoomed = false;
-		if (window.attachEvent) {window.attachEvent('onload', gnuplot_init);}
-		else if (window.addEventListener) {window.addEventListener('load', gnuplot_init, false);}
-		else {document.addEventListener('load', gnuplot_init, false);}
-		if (window.attachEvent) {window.attachEvent('onload', gnuplot_canvas);}
-		else if (window.addEventListener) {window.addEventListener('load', gnuplot_canvas, false);}
-		else {document.addEventListener('load', gnuplot_canvas, false);}
+		gnuplot.grid_lines = true;
+		gnuplot.zoomed = false;
+		gnuplot.active_plot_name = "gnuplot_canvas";
+		gnuplot.active_plot = function(){gnuplot_canvas();};
+		if (window.attachEvent) {window.attachEvent('onload', gnuplot.active_plot);}
+		else if (window.addEventListener) {window.addEventListener('load', gnuplot.active_plot, false);}
+		else {document.addEventListener('load', gnuplot.active_plot, false);}
 	    </script>
 	</td></tr>
 	<tr><td>
 	    <table id="gnuplot_mousebox" class="mbunder">
 	    <tr>
-		<td class="icon" onclick=toggle_grid><img src="grid.png" id="gnuplot_grid_icon" align=right alt="#" title="toggle grid"></td>
-		<td class="icon" onclick=unzoom><img src="previouszoom.png" id="gnuplot_unzoom_icon" align=right alt="unzoom" title="unzoom"></td>
-		<td class="icon" onclick=rezoom><img src="nextzoom.png" id="gnuplot_rezoom_icon" align=right alt="rezoom" title="rezoom"></td>
+		<td class="icon" onclick="gnuplot.toggle_grid();"><img src="grid.png" id="gnuplot_grid_icon" align=right alt="#" title="toggle grid"></td>
+		<td class="icon" onclick="gnuplot.unzoom();"><img src="previouszoom.png" id="gnuplot_unzoom_icon" align=right alt="unzoom" title="unzoom"></td>
+		<td class="icon" onclick="gnuplot.rezoom();"><img src="nextzoom.png" id="gnuplot_rezoom_icon" align=right alt="rezoom" title="rezoom"></td>
 		<td class="icon"><a href="canvas_help.html">
 		                 <img src="help.png" align=right alt="help" title="help"></a></td>
 	        <td class="mb0">x</td>
@@ -198,7 +197,7 @@ That currently means firefox, safari, opera, or konqueror (KDE 4.2).
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>May 2009</i>
+    <i>This page created by Ethan Merritt<br>Nov 2010</i>
     </td>
 
     <td>
@@ -206,9 +205,9 @@ That currently means firefox, safari, opera, or konqueror (KDE 4.2).
     <li><a href="http://sourceforge.net/projects/gnuplot/">
 	Gnuplot development pages on SourceForge</a></li>
     <li>On-line PDF documentation in
-	<a href="http://gnuplot.sourceforge.net/docs_cvs/gnuplot.pdf">English</a>
+	<a href="http://gnuplot.sourceforge.net/docs/gnuplot.pdf">English</a>
 	and
-	<a href="http://gnuplot.sourceforge.net/docs_cvs/gnuplot-ja.pdf">Japanese</a></li>
+	<a href="http://gnuplot.sourceforge.net/docs/gnuplot-ja.pdf">Japanese</a></li>
     </ul>
     </td>
     
