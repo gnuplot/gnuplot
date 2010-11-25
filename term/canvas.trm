@@ -369,7 +369,7 @@ CANVAS_graphics()
 	else
 	    fprintf(gpoutfile,
 		"<script type=\"text/javascript\">"
-		"function gnuplot_init() {};</script>\n");
+		"gnuplot.init = function() {};</script>\n");
 	fprintf(gpoutfile,
 		"<script type=\"text/javascript\">\n"
 		"var canvas, ctx;\n"
@@ -506,7 +506,7 @@ CANVAS_text()
 		"</script>\n"
 		"<link type=\"text/css\" href=\"%sgnuplot_mouse.css\" rel=\"stylesheet\">\n"
 		"</head>\n"
-		"<body onload=\"gnuplot_canvas(); gnuplot_init();\" oncontextmenu=\"return false;\">\n\n"
+		"<body onload=\"gnuplot_canvas(); gnuplot.init();\" oncontextmenu=\"return false;\">\n\n"
 		"<div class=\"gnuplot\">\n",
 			CANVAS_scriptdir ? CANVAS_scriptdir : ""
 	);
