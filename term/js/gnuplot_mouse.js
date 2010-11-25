@@ -66,10 +66,10 @@ gnuplot.init = function ()
       document.getElementById("gnuplot_grid_icon").onmouseup = gnuplot.toggle_grid;
   if (document.getElementById("gnuplot_textzoom_icon"))
       document.getElementById("gnuplot_textzoom_icon").onmouseup = gnuplot.toggle_zoom_text;
-  if (document.getElementById("rezoom_icon"))
-      document.getElementById("rezoom_icon").onmouseup = gnuplot.rezoom;
-  if (document.getElementById("unzoom_icon"))
-      document.getElementById("unzoom_icon").onmouseup = gnuplot.unzoom;
+  if (document.getElementById("gnuplot_rezoom_icon"))
+      document.getElementById("gnuplot_rezoom_icon").onmouseup = gnuplot.rezoom;
+  if (document.getElementById("gnuplot_unzoom_icon"))
+      document.getElementById("gnuplot_unzoom_icon").onmouseup = gnuplot.unzoom;
   gnuplot.mouse_update();
 }
 
