@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.36 2010/11/24 03:32:47 sfeam Exp $
+ * $Id: canvas.trm,v 1.37 2010/11/24 05:10:03 sfeam Exp $
  *
  */
 
@@ -684,6 +684,10 @@ CANVAS_point(unsigned int x, unsigned int y, int number)
 {
     double width  = CANVAS_ps * 0.6 * CANVASHTIC / CANVAS_OVERSAMPLE;
     int pt = number % 9;
+
+    /* Skip size 0 points;  the alternative would be to draw a Dot instead */
+    if (width <= 0 && pt >= 0)
+	return;
 
     CANVAS_finish();
 
