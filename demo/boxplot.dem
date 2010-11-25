@@ -12,7 +12,7 @@ set border 2
 set xtics ("A" 1, "B" 2) scale 0.0
 set xtics nomirror
 set ytics nomirror
-
+set yrange [0:100]
 
 plot 'silver.dat' using (1):2, '' using (2):(5*$3)
 
