@@ -1,4 +1,7 @@
 /*
+ * $Id: gnuplot_dashedlines.js,v 1.1 2010/11/26 05:53:49 sfeam Exp $
+ */
+/*
  * Ethan Merritt November 2010
  * Add a dashed line method to gnuplot's HTML5 canvas toolset.
  * To start a path use DS(x0,y0) instead of M(x0,y0)
