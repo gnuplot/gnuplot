@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.38 2010/11/25 00:44:55 sfeam Exp $
+ * $Id: canvas.trm,v 1.40 2010/11/25 06:07:03 sfeam Exp $
  *
  */
 
@@ -32,6 +32,9 @@
  *   Ethan A Merritt, May 2009
  *	Give each plot its own namespace for mousing (allows multiple mouseable
  *	plots in a single HTML document).
+ *   Ethan A Merritt, Nov 2010
+ *	Dashed line support, butt/rounded line properties
+ *	revised javascript with all methods and variables in container gnuplot()
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -91,6 +94,7 @@ static int canvas_xmax = CANVAS_XMAX;
 static int canvas_ymax = CANVAS_YMAX;
 static int canvas_line_type = LT_UNDEFINED;
 static double canvas_linewidth = 1.0;
+static double canvas_dashlength_factor = 1.0;
 static double CANVAS_ps = 1;	/* pointsize multiplier */
 static double canvas_font_size = 10;
 static double canvas_fontscale = 1.0;
@@ -98,6 +102,8 @@ static char *canvas_justify = "";
 static int canvas_text_angle = 0;
 static int canvas_in_a_path = FALSE;
 static int already_closed = FALSE;
+static TBOOLEAN canvas_dashed = FALSE;
+static TBOOLEAN canvas_rounded = FALSE;
 static TBOOLEAN CANVAS_mouseable = FALSE;
 static TBOOLEAN CANVAS_standalone = TRUE;
 static char *CANVAS_name = NULL;
@@ -114,7 +120,8 @@ static struct {
 enum CANVAS_case {
     CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, CANVAS_TITLE,
     CANVAS_LINEWIDTH, CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_ENH, CANVAS_NOENH,
-    CANVAS_FONTSCALE, CANVAS_OTHER
+    CANVAS_FONTSCALE, CANVAS_SOLID, CANVAS_DASHED, CANVAS_DASHLENGTH,
+    CANVAS_ROUNDED, CANVAS_BUTT, CANVAS_OTHER
 };
 
 static struct gen_table CANVAS_opts[] =
@@ -132,6 +139,12 @@ static struct gen_table CANVAS_opts[] =
     { "linew$idth", CANVAS_LINEWIDTH },
     { "title", CANVAS_TITLE },
     { "fontscale", CANVAS_FONTSCALE },
+    { "solid", CANVAS_SOLID },
+    { "dash$ed", CANVAS_DASHED },
+    { "dashl$ength", CANVAS_DASHLENGTH },
+    { "dl", CANVAS_DASHLENGTH },
+    { "round$ed", CANVAS_ROUNDED },
+    { "butt", CANVAS_BUTT },
     { NULL, CANVAS_OTHER }
 };
 
@@ -176,6 +189,8 @@ CANVAS_options()
 	free(CANVAS_scriptdir);
 	CANVAS_scriptdir = NULL;
 	canvas_linewidth = 1.0;
+	canvas_dashed = FALSE;
+	canvas_dashlength_factor = 1.0;
     }
 
     while (!END_OF_COMMAND) {
@@ -255,6 +270,28 @@ CANVAS_options()
 		canvas_fontscale = 1.0;
 	    break;
 
+	case CANVAS_SOLID:
+	    canvas_dashed = FALSE;
+	    break;
+
+	case CANVAS_DASHED:
+	    canvas_dashed = TRUE;
+	    break;
+
+	case CANVAS_DASHLENGTH:
+	    canvas_dashlength_factor = real_expression();
+	    if (canvas_dashlength_factor <= 0.2)
+		canvas_dashlength_factor = 1.0;
+	    break;
+
+	case CANVAS_ROUNDED:
+	    canvas_rounded = TRUE;
+	    break;
+
+	case CANVAS_BUTT:
+	    canvas_rounded = FALSE;
+	    break;
+
 	default:
 	    int_warn(c_token-1,"unrecognized terminal option");
  	    break;
@@ -264,7 +301,11 @@ CANVAS_options()
     term->v_char = canvas_font_size * canvas_fontscale * CANVAS_OVERSAMPLE;
     term->h_char = canvas_font_size * canvas_fontscale * 0.8 * CANVAS_OVERSAMPLE;
 
-    sprintf(term_options, "size %d,%d", (int)(term->xmax/CANVAS_OVERSAMPLE), (int)(term->ymax/CANVAS_OVERSAMPLE));
+    sprintf(term_options, canvas_dashed ? " dashed" : " solid");
+    if (canvas_dashed && canvas_dashlength_factor != 1.0)
+	sprintf(term_options + strlen(term_options), " dashlength %3.1f", canvas_dashlength_factor);
+    sprintf(term_options + strlen(term_options), canvas_rounded ? " rounded" : " butt");
+    sprintf(term_options + strlen(term_options), " size %d,%d", (int)(term->xmax/CANVAS_OVERSAMPLE), (int)(term->ymax/CANVAS_OVERSAMPLE));
     sprintf(term_options + strlen(term_options), "%s fsize %g lw %g", 
 	term->put_text == ENHCANVAS_put_text ? " enhanced" : "",
 	canvas_font_size, canvas_linewidth);
@@ -362,6 +403,10 @@ CANVAS_graphics()
 		"<script src=\"%sgnuplot_common.js\"></script>\n"
 		, CANVAS_scriptdir
 		, CANVAS_scriptdir);
+	if (canvas_dashed)
+	    fprintf(gpoutfile,
+		"<script src=\"%sgnuplot_dashedlines.js\"></script>\n"
+		, CANVAS_scriptdir);
 	if (CANVAS_mouseable)
 	    fprintf(gpoutfile,
 		"<script src=\"%sgnuplot_mouse.js\"></script>\n"
@@ -413,10 +458,13 @@ CANVAS_graphics()
 
     fprintf(gpoutfile,
 	"// short forms of commands provided by gnuplot_common.js\n"
+	"function DT  (dt)  {gnuplot.dashtype(dt);};\n"
+	"function DS  (x,y) {gnuplot.dashstart(x,y);};\n"
+	"function DL  (x,y) {gnuplot.dashstep(x,y);};\n"
+	"function M   (x,y) {if (gnuplot.pattern.length > 0) DS(x,y); else gnuplot.M(x,y);};\n"
+	"function L   (x,y) {if (gnuplot.pattern.length > 0) DL(x,y); else gnuplot.L(x,y);};\n"
 	"function Dot (x,y) {gnuplot.Dot(x,y);};\n"
 	"function Pt  (N,x,y,w) {gnuplot.Pt(N,x,y,w);};\n"
-	"function M   (x,y) {gnuplot.M(x,y);};\n"
-	"function L   (x,y) {gnuplot.L(x,y);};\n"
 	"function R   (x,y,w,h) {gnuplot.R(x,y,w,h);};\n"
 	"function T   (x,y,fontsize,justify,string) {gnuplot.T(x,y,fontsize,justify,string);};\n"
 	"function TR  (x,y,angle,fontsize,justify,string) {gnuplot.TR(x,y,angle,fontsize,justify,string);};\n"
@@ -424,6 +472,17 @@ CANVAS_graphics()
 	"function cfp () {gnuplot.cfp();};\n"
 	"function cfsp() {gnuplot.cfsp();};\n"
 	"\n"
+    );
+    if (canvas_dashed)
+	fprintf(gpoutfile,
+	    "gnuplot.dashlength = %d;\n",
+	    (int)(200 * canvas_dashlength_factor)
+	);
+
+    fprintf(gpoutfile,
+	"ctx.lineCap = \"%s\"; ctx.lineJoin = \"%s\"\n",
+	canvas_rounded ? "round" : "butt",
+	canvas_rounded ? "round" : "miter"
     );
 
     fprintf(gpoutfile,
@@ -626,6 +685,7 @@ CANVAS_linetype(int linetype)
 	"rgb(214,000,120)", /* mulberry*/
 	"rgb(171,214,000)", /* green yellow*/
     };
+
     if (linetype == canvas_line_type)
 	return;
     canvas_line_type = linetype;
@@ -639,6 +699,12 @@ CANVAS_linetype(int linetype)
     if (strcmp(canvas_state.color, canvas_state.previous_color)) {
 	fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_state.color);
 	strcpy(canvas_state.previous_color, canvas_state.color);
+    }
+    if (canvas_dashed) {
+	if (0 < linetype && linetype < 5)
+	    fprintf(gpoutfile, "DT(gnuplot.dashpattern%1d);\n",linetype+1);
+	else
+	    fprintf(gpoutfile, "DT(gnuplot.solid);\n");
     }
 }
 
@@ -1131,7 +1197,7 @@ TERM_TABLE_START(canvas_driver)
     CANVAS_justify_text, CANVAS_point, do_arrow, 
     set_font_null,
     CANVAS_pointsize,
-    TERM_CAN_MULTIPLOT|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH,
+    TERM_CAN_MULTIPLOT|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_CAN_DASH,
     NULL, NULL, CANVAS_fillbox, CANVAS_linewidth
 #ifdef USE_MOUSE
     , NULL, NULL, NULL, NULL, NULL
@@ -1161,6 +1227,8 @@ START_HELP(canvas)
 " Syntax:",
 "       set terminal canvas {size <xsize>, <ysize>} {fsize <fontsize>}",
 "                           {{no}enhanced} {linewidth <lw>}",
+"                           {rounded | butt}",
+"                           {solid | dashed {dashlength <dl>}}",
 "                           {standalone {mousing} | name '<funcname>'}",
 "                           {jsdir 'URL/for/javascripts'}",
 "                           {title '<some string>'}",
@@ -1175,6 +1243,7 @@ START_HELP(canvas)
 " The default `standalone` mode creates an html page containing javascript",
 " code that renders the plot using the HTML 5 canvas element.  The html page",
 " links to two required javascript files 'canvastext.js' and 'gnuplot_common.js'.",
+" An additional file 'gnuplot_dashedlines.js' is needed to support dashed lines.",
 " By default these point to local files, on unix-like systems usually in",
 " directory /usr/local/share/gnuplot/<version>/js.  See installation notes for",
 " other platforms. You can change this by using the `jsdir` option to specify",

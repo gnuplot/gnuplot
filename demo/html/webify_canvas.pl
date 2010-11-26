@@ -100,6 +100,7 @@ print STDERR $name, "\n";
 	print OUT "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n";
 	print OUT "<script src=\"canvastext.js\"></script>\n";
 	print OUT "<script src=\"gnuplot_common.js\"></script>\n";
+	print OUT "<script src=\"gnuplot_dashedlines.js\"></script>\n";
 	print OUT "<script src=\"gnuplot_mouse.js\"></script>\n"
 		  if ($mousing && -e "gnuplot_mouse.js");
 

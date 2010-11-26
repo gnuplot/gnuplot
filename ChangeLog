@@ -1,3 +1,9 @@
+2010-11-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm demo/html/webify_canvas.pl
+	term/js/gnuplot_common.js term/js/gnuplot_dashedlines.js:
+	Add support for dashed lines and rounded/butt line properties.
+
 2010-11-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/js/gnuplot_common.js term/js/gnuplot_mouse.js:

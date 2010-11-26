@@ -1,8 +1,7 @@
 /*
- * $Id: gnuplot_common.js,v 1.3 2010/11/24 03:28:46 sfeam Exp $
+ * $Id: gnuplot_common.js,v 1.4 2010/11/25 04:29:35 sfeam Exp $
  */
-// Shared routines for gnuplot's HTML canvas terminal driver.
-// Ethan A Merritt  November 2010: Move everything into a single object.
+// Shared routines for gnuplot's HTML5 canvas terminal driver.
 
 var gnuplot = { };
 
@@ -120,3 +119,10 @@ gnuplot.Pt = function (N,x,y,w) {
 	break;
     }
 }
+
+// These methods are place holders that are loaded by gnuplot_dashedlines.js
+
+gnuplot.dashtype  = function (dt) {} ;
+gnuplot.dashstart = function (x,y) {gnuplot.M(x,y);} ;
+gnuplot.dashstep  = function (x,y) {gnuplot.L(x,y);} ;
+gnuplot.pattern   = [];

@@ -24,6 +24,7 @@ New features, changes and fixes since gnuplot version 4.4
 * CHANGE remove vestigial code supporting Amiga, Apollo, and 16-bit MSDOS/WIN
 * CHANGE extend formats x/X/o/O to 64 bits if necessary to represent the value
 * CHANGE "set palette maxcolors" no longer fights with "set palette defined"
+* CHANGE javascript support for HTML5 canvas does not use global variables
 
 New features, changes and fixes in gnuplot version 4.4.0
 ========================================================
