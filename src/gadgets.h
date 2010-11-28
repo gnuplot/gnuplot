@@ -370,6 +370,7 @@ extern TBOOLEAN	polar;
 extern double zero;		/* zero threshold, not 0! */
 
 extern double pointsize;
+extern double pointintervalbox;
 
 #define SOUTH		1 /* 0th bit */
 #define WEST		2 /* 1th bit */

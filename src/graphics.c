@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.22 2010/10/19 04:32:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.23 2010/10/29 04:20:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2071,6 +2071,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    if (this_plot->plot_style == LINESPOINTS
 	    &&  this_plot->lp_properties.p_interval < 0) {
 		(*t->linetype)(LT_BACKGROUND);
+		(*t->pointsize)(pointsize * pointintervalbox);
 		(*t->point)(xl + key_point_offset, yl, 6);
 		term_apply_lp_properties(&this_plot->lp_properties);
 	    }
@@ -3765,8 +3766,10 @@ plot_points(struct curve_points *plot)
 		/* area behind the point symbol. This could be done better by   */
 		/* implementing a special point type, but that would require    */
 		/* modification to all terminal drivers. It might be worth it.  */
+		/* term_apply_lp_properties will restore the point type and size*/
 		if (plot->plot_style == LINESPOINTS && interval < 0) {
 		    (*t->linetype)(LT_BACKGROUND);
+		    (*t->pointsize)(pointsize * pointintervalbox);
 		    (*t->point) (x, y, 6);
 		    term_apply_lp_properties(&(plot->lp_properties));
 		}

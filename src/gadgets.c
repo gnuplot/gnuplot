@@ -123,8 +123,9 @@ TBOOLEAN polar = FALSE;
 /* zero threshold, may _not_ be 0! */
 double zero = ZERO;
 
-/* Status of 'set pointsize' command */
+/* Status of 'set pointsize' and 'set pointintervalbox' commands */
 double pointsize = 1.0;
+double pointintervalbox = 2.0;
 
 /* set border */
 int draw_border = 31;	/* The current settings */
