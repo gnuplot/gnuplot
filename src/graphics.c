@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.350 2010/11/18 23:59:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.351 2010/11/19 04:03:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2010,17 +2010,19 @@ do_plot(struct curve_points *plots, int pcount)
 
 	if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 	    /* If there are two passes, defer point sample till the second */
-	    if (key->front && !key_pass) {
-		; /* Do nothing during first pass */
+	    if (key->front && !key_pass)
+		continue; /* Do nothing during first pass */
 
 	    /* we deferred point sample until now */
-	    } else if (this_plot->plot_style == LINESPOINTS
+	    if (this_plot->plot_style == LINESPOINTS
 	         &&  this_plot->lp_properties.p_interval < 0) {
 		(*t->linetype)(LT_BACKGROUND);
+		(*t->pointsize)(pointsize * pointintervalbox);
 		(*t->point)(xl + key_point_offset, yl, 6);
 		term_apply_lp_properties(&this_plot->lp_properties);
+	    }
 
-	    } else if (this_plot->plot_style == BOXPLOT) {
+	    if (this_plot->plot_style == BOXPLOT) {
 		;	/* Don't draw a sample point in the key */
 
 	    } else if (this_plot->plot_style == DOTS) {
@@ -3730,8 +3732,10 @@ plot_points(struct curve_points *plot)
 		/* area behind the point symbol. This could be done better by   */
 		/* implementing a special point type, but that would require    */
 		/* modification to all terminal drivers. It might be worth it.  */
+		/* term_apply_lp_properties will restore the point type and size*/
 		if (plot->plot_style == LINESPOINTS && interval < 0) {
 		    (*t->linetype)(LT_BACKGROUND);
+		    (*t->pointsize)(pointsize * pointintervalbox);
 		    (*t->point) (x, y, 6);
 		    term_apply_lp_properties(&(plot->lp_properties));
 		}

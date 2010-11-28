@@ -1,3 +1,9 @@
+2010-11-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/gadgets.h src/graphics.c demo/dashcolor.dem:
+	Fix breakage to the pointinterval property that was caused by 
+	opaque key support.  Add a demo plot illustrating pointinterval.
+
 2010-11-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm demo/html/webify_canvas.pl
