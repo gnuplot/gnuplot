@@ -1,3 +1,8 @@
+2010-11-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_decimalsign):  Possible fix for problem with
+	numeric locales on Windows.  Bug #3120819.
+
 2010-11-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/gadgets.h src/graphics.c demo/dashcolor.dem:
