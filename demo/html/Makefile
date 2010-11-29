@@ -49,12 +49,9 @@ transparent.html: $(GNUPLOT_LIB)/transparent.dem ./webify.pl
 transparent_solids.html: $(GNUPLOT_LIB)/transparent_solids.dem ./webify.pl
 	export DEMOTERM="png enhanced truecolor font 'arial,9' size 512,384"; ./webify.pl transparent_solids
 
-# The png terminal does not support dashed lines, so we create an eps file and convert it.
-# Do this one last, so that if conversion fails everything else has already been done.
+# The png terminal does not support dashed lines, so let's use pngcairo
 dashcolor.html: $(GNUPLOT_LIB)/dashcolor.dem ./webify.pl
-	export DEMOTERM="post eps color dash dashlength 3 font 'Helvetica' 16"; ./webify.pl dashcolor
-	mv dashcolor.1.png dashcolor.1.eps
-	convert -density 100 dashcolor.1.eps dashcolor.1.png
+	export DEMOTERM="pngcairo dash"; ./webify.pl dashcolor
 
 animate2.html: $(GNUPLOT_LIB)/animate2.dem ./webify.pl
 	export DEMOTERM="gif animate transparent opt delay 10 size 200,200 x000000"; ./webify.pl animate2
