@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.66 2010/05/23 21:58:44 sfeam Exp $
+ * $Id: emf.trm,v 1.67 2010/07/29 20:45:11 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -43,6 +43,11 @@
  * TODO
  *
  * HISTORY
+ *
+ * 4.5   28-Nov-2010 Ethan A Merritt
+ * - Use the EMR_ELLIPSE primitive to draw point types 6 and 7
+ * - Switch to using linecap=flat and linejoin=miter by default,
+ *   but add option "rounded/butt" to toggle this
  *
  * 4.3.1 12-Sep-2008 Ethan A Merritt
  * - enhanced text mode
@@ -181,6 +186,28 @@ TERM_PUBLIC void ENHemf_FLUSH __PROTO((void));
 #define EMF_HANDLE_BRUSH	3
 #define EMF_HANDLE_MAX		4
 
+/*
+typedef  enum {
+  EMF_PS_COSMETIC = 0x00000000,
+  EMF_PS_ENDCAP_ROUND = 0x00000000,
+  EMF_PS_JOIN_ROUND = 0x00000000,
+  EMF_PS_SOLID = 0x00000000,
+  EMF_PS_DASH = 0x00000001,
+  EMF_PS_DOT = 0x00000002,
+  EMF_PS_DASHDOT = 0x00000003,
+  EMF_PS_DASHDOTDOT = 0x00000004,
+  EMF_PS_NULL = 0x00000005,
+  EMF_PS_INSIDEFRAME = 0x00000006,
+  EMF_PS_USERSTYLE = 0x00000007,
+  EMF_PS_ALTERNATE = 0x00000008,
+  EMF_PS_ENDCAP_SQUARE = 0x00000100,
+  EMF_PS_ENDCAP_FLAT = 0x00000200,
+  EMF_PS_JOIN_BEVEL = 0x00001000,
+  EMF_PS_JOIN_MITER = 0x00002000,
+  EMF_PS_GEOMETRIC = 0x00010000
+} EMF_PenStyle;
+*/
+
 #define EMF_STOCK_OBJECT_FLAG	((unsigned long)0x1 << 31)
 #define EMF_STOCK_OBJECT_WHITE_BRUSH 	(EMF_STOCK_OBJECT_FLAG + 0x00)
 #define EMF_STOCK_OBJECT_BLACK_PEN   	(EMF_STOCK_OBJECT_FLAG + 0x07)
@@ -211,7 +238,7 @@ TERM_PUBLIC void ENHemf_FLUSH __PROTO((void));
 }
 
 #define EMF_EOF() {				\
-    EMF_write_emr(14, 20);			\
+    EMF_write_emr(14, 0x14);			\
     EMF_write_long(0);				\
     EMF_write_long(0x10);			\
     EMF_write_long(20);				\
@@ -271,6 +298,10 @@ TERM_PUBLIC void ENHemf_FLUSH __PROTO((void));
     EMF_write_emr(40, 0x0C);			\
     EMF_write_long(handle);			\
 }
+#define EMF_Ellipse(left,top,right,bottom)  {	\
+    EMF_write_emr(42, 0x18);			\
+    EMF_write_rectl(left,top,right,bottom)	\
+}    
 #define EMF_SetTextAlign(align) {		\
     EMF_write_emr(22, 0x0C);			\
     EMF_write_long(align);			\
@@ -306,6 +337,7 @@ static unsigned int emf_record_count = 0;
 static unsigned int emf_linetype = 1;
 static unsigned int emf_dashtype = 0;
 static unsigned long emf_color = 0L;
+static unsigned long emf_pentype = 0x2200;		/* cap=flat join=miter */
 static unsigned long emf_textcolor = LT_UNDEFINED;
 static unsigned int emf_colors = EMF_COLORS;
 static unsigned int emf_polyline[EMF_MAX_SEGMENTS];	/* stored polyline coordinates */
@@ -603,6 +635,16 @@ EMF_options()
 	    c_token++;
 	    continue;
 	}
+	if (almost_equals(c_token, "round$ed")) {
+	    emf_pentype= 0x0;
+	    c_token++;
+	    continue;
+	}
+	if (almost_equals(c_token, "butt")) {
+	    emf_pentype = 0x2200;
+	    c_token++;
+	    continue;
+	}
 	if (equals(c_token, "dl") || almost_equals(c_token, "dashl$ength")) {
 	    c_token++;
 	    emf_dashlength = real_expression();
@@ -692,9 +734,10 @@ EMF_options()
     
     emf_colors = emf_monochrome ? 1 : EMF_COLORS;
 
-    sprintf(term_options, "%s %s \"%s\" %g",
+    sprintf(term_options, "%s %s %s \"%s\" %g",
 	    emf_monochrome ? "monochrome" : "color",
 	    emf_dashed ? "dashed" : "solid",
+	    emf_pentype ? "butt" : "rounded",
 	    emf_defaultfontname, emf_defaultfontsize);
 
     if (term->flags & TERM_ENHANCED_TEXT)
@@ -763,7 +806,7 @@ EMF_graphics()
     EMF_SetMapMode(8);		/* forcing anisotropic mode */
     EMF_SetWindowExtEx(term->xmax, term->ymax);		/* setting logical (himetric) size      */
     EMF_SetViewportExtEx(term->xmax / EMF_PX2HM, term->ymax / EMF_PX2HM);	/* setting device (pixel) size */
-    EMF_CreatePen(EMF_HANDLE_PEN, 0, 1, 0x000000);	/* init default pen */
+    EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, 1, 0x000000);	/* init default pen */
     EMF_SelectObject(EMF_HANDLE_PEN);
     EMF_SetBkMode(1);		/* transparent background for text */
     EMF_CreateBrush(EMF_HANDLE_BRUSH, 1, 0, 0);		/* transparent brush for polygons */
@@ -1017,14 +1060,14 @@ EMF_dashtype(int dashtype)
     if (dashtype < 1 || !emf_dashed) {	/* solid mode */
 	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
 	EMF_DeleteObject(EMF_HANDLE_PEN);
-	EMF_CreatePen(EMF_HANDLE_PEN, 0, emf_linewidth * EMF_PX2HM, emf_color);
+	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 
 	term->vector = EMF_solid_vector;
     } else {			/* Since win32 dashed lines works only with 1 pixel linewith we must emulate */
 	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
 	EMF_DeleteObject(EMF_HANDLE_PEN);
-	EMF_CreatePen(EMF_HANDLE_PEN, 0, emf_linewidth * EMF_PX2HM, emf_color);
+	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 
 	term->vector = EMF_dashed_vector;
@@ -1278,37 +1321,21 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	EMF_filled_polygon(4, corners);
 	break;
     case 5:
-	/* draw circle (actually, dodecagon) (WinWord 6 accepts the
-	 * CGM "circle" element, but the resulting circle is not
-	 * correctly centered!) */
-	EMF_move(x, y - emf_tic);
-	EMF_solid_vector(x + emf_tic500, y - emf_tic866);
-	EMF_solid_vector(x + emf_tic866, y - emf_tic500);
-	EMF_solid_vector(x + emf_tic, y);
-	EMF_solid_vector(x + emf_tic866, y + emf_tic500);
-	EMF_solid_vector(x + emf_tic500, y + emf_tic866);
-	EMF_solid_vector(x, y + emf_tic);
-	EMF_solid_vector(x - emf_tic500, y + emf_tic866);
-	EMF_solid_vector(x - emf_tic866, y + emf_tic500);
-	EMF_solid_vector(x - emf_tic, y);
-	EMF_solid_vector(x - emf_tic866, y - emf_tic500);
-	EMF_solid_vector(x - emf_tic500, y - emf_tic866);
-	EMF_flush_polygon();
+	y = term->ymax-y; /* EAM - WTF? */ 
+	EMF_CreateBrush(EMF_HANDLE_BRUSH, 1, 0, 0);	/* transparent brush */
+	EMF_SelectObject(EMF_HANDLE_BRUSH);
+	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, 1, emf_color);
+	EMF_SelectObject(EMF_HANDLE_PEN);
+	EMF_Ellipse((long)(x-emf_tic),(long)(y-emf_tic),(long)(x+emf_tic),(long)(y+emf_tic));
+	EMF_DeleteObject(EMF_HANDLE_PEN);
+	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 	break;
     case 6: /* filled circle */
-	corners [0].x = x             ; corners [0].y = y - emf_tic;
-	corners [1].x = x + emf_tic500; corners [1].y = y - emf_tic866;
-	corners [2].x = x + emf_tic866; corners [2].y = y - emf_tic500;
-	corners [3].x = x + emf_tic   ; corners [3].y = y;
-	corners [4].x = x + emf_tic866; corners [4].y = y + emf_tic500;
-	corners [5].x = x + emf_tic500; corners [5].y = y + emf_tic866;
-	corners [6].x = x             ; corners [6].y = y + emf_tic;
-	corners [7].x = x - emf_tic500; corners [7].y = y + emf_tic866;
-	corners [8].x = x - emf_tic866; corners [8].y = y + emf_tic500;
-	corners [9].x = x - emf_tic   ; corners [9].y = y;
-	corners[10].x = x - emf_tic866; corners[10].y = y - emf_tic500;
-	corners[11].x = x - emf_tic500; corners[11].y = y - emf_tic866;
-	EMF_filled_polygon(12, corners);
+	y = term->ymax-y; /* EAM - WTF? */ 
+	EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, emf_color, 0);
+	EMF_SelectObject(EMF_HANDLE_BRUSH);
+	EMF_Ellipse((long)(x-emf_tic),(long)(y-emf_tic),(long)(x+emf_tic),(long)(y+emf_tic));
+	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 	break;
     case 7:			/* draw triangle (point up) */
 	EMF_move(x, y + emf_tic1241);
@@ -1360,7 +1387,7 @@ EMF_set_pointsize(double size)
     if (size < 0)
 	size = 1;
     emf_tic = (size * term->h_tic);
-    emf_tic707 = emf_tic * 12 / 17;
+    emf_tic707 = floor((double)emf_tic * 0.707 + 0.5);
     emf_tic866 = emf_tic * 13 / 15;
     emf_tic500 = emf_tic / 2;
     emf_tic1241 = emf_tic * 36 / 29;
@@ -1663,6 +1690,7 @@ START_HELP(emf)
 " Syntax:",
 "       set terminal emf {color | monochrome} {solid | dashed}",
 "                        {enhanced {noproportional}}",
+"                        {rounded | butt}",
 "                        {linewidth <LW>} {dashlength <DL>} {size XX,YY}",
 "                        {\"<fontname>\"} {<fontsize>}    #old syntax",
 "                        {font \"<fontname>,<fontsize>\"} #new syntax",

@@ -6,6 +6,12 @@
 	* src/pm3d.c (pm3d_depth_queue_flush): Restore deleted code needed for
 	extended color support.  (There are still some svga users after all!)
 
+	* term/emf.trm: 
+	Use the EMR_ELLIPSE primitive to draw point types 6 and 7.
+	Make point types 4 and 5 slightly larger (looks better on MSWin).
+	Switch to using linecap=flat and linejoin=miter by default,
+	but add option "rounded/butt" to toggle this.
+
 2010-11-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_decimalsign):  Possible fix for problem with
