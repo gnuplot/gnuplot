@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.86 2010/11/07 19:32:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.87 2010/11/18 23:59:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1093,7 +1093,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	if (1) /* (some-test-for-range-and-or-step-size) */ {
 	    vol_previous_tic = start-step;
 	    for (vol_this_tic = start; vol_this_tic <= end; vol_this_tic += step) {
-		if (fabs((float)vol_this_tic - (float)vol_previous_tic) < (step/4.)) {
+		if (fabs(vol_this_tic - vol_previous_tic) < (step/4.)) {
 		    step = end - start;
 		    int_warn(NO_CARET, "tick interval too small for machine precision");
 		    break;

@@ -1,3 +1,8 @@
+2010-12-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics): Casting to a float may have been clever, but
+	we can't afford the loss of precision (fails for time coordinates).
+
 2010-11-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_decimalsign):  Possible fix for problem with
