@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.80 2010/10/06 23:20:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.81 2010/10/12 23:45:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -362,6 +362,9 @@ void pm3d_depth_queue_flush(void)
 	quadrangle* qp;
 	quadrangle* qe;
 	gpdPoint* gpdPtr;
+#ifdef EXTENDED_COLOR_SPECS
+	gpdPoint* gpiPtr;
+#endif
 	vertex out;
 	double z = 0; /* assignment keeps the compiler happy */
 	double w = trans_mat[3][3];
@@ -370,6 +373,9 @@ void pm3d_depth_queue_flush(void)
 	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
 
 	    gpdPtr = qp->corners;
+#ifdef EXTENDED_COLOR_SPECS
+	    gpiPtr = qp->icorners;
+#endif
 
 	    for (i = 0; i < 4; i++, gpdPtr++) {
 
@@ -378,6 +384,11 @@ void pm3d_depth_queue_flush(void)
 		if (i == 0 || out.z > z)
 		    z = out.z;
 
+#ifdef EXTENDED_COLOR_SPECS
+		gpiPtr->x = (unsigned int) ((out.x * xscaler / w) + xmiddle);
+		gpiPtr->y = (unsigned int) ((out.y * yscaler / w) + ymiddle);
+		gpiPtr++;
+#endif
 	    }
 
 	    qp->z = z; /* maximal z value of all four corners */
@@ -390,7 +401,11 @@ void pm3d_depth_queue_flush(void)
 	    set_color(qp->gray);
 	    if (pm3d.hidden3d_tag < 0)
 		pm3d_border_lp.pm3d_color = *(qp->border_color);
+#ifdef EXTENDED_COLOR_SPECS
+	    ifilled_quadrangle(qp->icorners);
+#else
 	    filled_quadrangle(qp->corners);
+#endif
 	}
     }
 

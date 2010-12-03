@@ -3,6 +3,9 @@
 	* src/axis.c (gen_tics): Casting to a float may have been clever, but
 	we can't afford the loss of precision (fails for time coordinates).
 
+	* src/pm3d.c (pm3d_depth_queue_flush): Restore deleted code needed for
+	extended color support.  (There are still some svga users after all!)
+
 2010-11-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_decimalsign):  Possible fix for problem with
