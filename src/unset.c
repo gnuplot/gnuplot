@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.139 2010/11/07 19:32:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.140 2010/11/18 23:59:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -120,6 +120,7 @@ static void unset_palette __PROTO((void));
 static void reset_colorbox __PROTO((void));
 static void unset_colorbox __PROTO((void));
 static void unset_pointsize __PROTO((void));
+static void unset_pointintervalbox __PROTO((void));
 static void unset_polar __PROTO((void));
 static void unset_print __PROTO((void));
 static void unset_psdir __PROTO((void));
@@ -308,6 +309,9 @@ unset_command()
 	break;
     case S_COLORBOX:
 	unset_colorbox();
+	break;
+    case S_POINTINTERVALBOX:
+	unset_pointintervalbox();
 	break;
     case S_POINTSIZE:
 	unset_pointsize();
@@ -1295,6 +1299,13 @@ unset_pm3d()
 }
 
 
+/* process 'unset pointintervalbox' command */
+static void
+unset_pointintervalbox()
+{
+    pointintervalbox = 1.0;
+}
+
 /* process 'unset pointsize' command */
 static void
 unset_pointsize()
@@ -1755,6 +1766,7 @@ reset_command()
     unset_margin(&rmargin);
     unset_margin(&tmargin);
     unset_pointsize();
+    unset_pointintervalbox();
     pm3d_reset();
     reset_colorbox();
     reset_palette();

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.332 2010/11/19 00:01:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.333 2010/11/30 03:51:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -118,6 +118,7 @@ static void set_pm3d __PROTO((void));
 static void set_palette __PROTO((void));
 static void set_colorbox __PROTO((void));
 static void set_pointsize __PROTO((void));
+static void set_pointintervalbox __PROTO((void));
 static void set_polar __PROTO((void));
 static void set_print __PROTO((void));
 #ifdef EAM_OBJECTS
@@ -413,6 +414,9 @@ set_command()
 	    break;
 	case S_COLORBOX:
 	    set_colorbox();
+	    break;
+	case S_POINTINTERVALBOX:
+	    set_pointintervalbox();
 	    break;
 	case S_POINTSIZE:
 	    set_pointsize();
@@ -3381,6 +3385,19 @@ set_pm3d()
 }
 
 
+/* process 'set pointintervalbox' command */
+static void
+set_pointintervalbox()
+{
+    c_token++;
+    if (END_OF_COMMAND)
+	pointintervalbox = 1.0;
+    else
+	pointintervalbox = real_expression();
+    if (pointintervalbox <= 0)
+	pointintervalbox = 1.0;
+}
+
 /* process 'set pointsize' command */
 static void
 set_pointsize()
@@ -3390,7 +3407,8 @@ set_pointsize()
 	pointsize = 1.0;
     else
 	pointsize = real_expression();
-    if(pointsize <= 0) pointsize = 1;
+    if (pointsize <= 0)
+	pointsize = 1.0;
 }
 
 

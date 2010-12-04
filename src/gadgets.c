@@ -126,7 +126,7 @@ double zero = ZERO;
 
 /* Status of 'set pointsize' and 'set pointintervalbox' commands */
 double pointsize = 1.0;
-double pointintervalbox = 2.0;
+double pointintervalbox = 1.0;
 
 /* set border */
 int draw_border = 31;	/* The current settings */
