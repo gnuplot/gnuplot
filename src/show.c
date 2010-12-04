@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.227.2.7 2010/08/09 21:38:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.227.2.8 2010/09/18 02:48:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -111,6 +111,7 @@ static void show_palette_gradient __PROTO((void));
 static void show_palette_colornames __PROTO((void));
 static void show_colorbox __PROTO((void));
 static void show_pointsize __PROTO((void));
+static void show_pointintervalbox __PROTO((void));
 static void show_encoding __PROTO((void));
 static void show_decimalsign __PROTO((void));
 static void show_fit __PROTO((void));
@@ -331,6 +332,9 @@ show_command()
     case S_COLORNAMES:
 	c_token--;
 	show_palette_colornames();
+	break;
+    case S_POINTINTERVALBOX:
+	show_pointintervalbox();
 	break;
     case S_POINTSIZE:
 	show_pointsize();
@@ -761,6 +765,7 @@ show_all()
     show_colorbox();
     show_pm3d();
     show_pointsize();
+    show_pointintervalbox();
     show_encoding();
     show_decimalsign();
     show_fit();
@@ -2336,6 +2341,14 @@ show_pointsize()
 {
     SHOW_ALL_NL;
     fprintf(stderr, "\tpointsize is %g\n", pointsize);
+}
+
+/* process 'show pointintervalbox' command */
+static void
+show_pointintervalbox()
+{
+    SHOW_ALL_NL;
+    fprintf(stderr, "\tpointintervalbox is %g\n", pointintervalbox);
 }
 
 

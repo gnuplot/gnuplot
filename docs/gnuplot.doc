@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.38 2010/11/12 19:34:39 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.39 2010/11/29 05:42:56 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3216,7 +3216,8 @@ Ffigure_linespoints
  control whether or not every point in the plot is given a symbol.  For example,
  'with lp pi 3' will draw line segments through every data point, but will only
  place a symbol on every 3rd point.  A negative value for `pointinterval` will
- erase the portion of line segment that passes underneath the symbol.
+ erase the portion of line segment that passes underneath the symbol. The size
+ of the erased portion is controlled by `set pointintervalbox`.
 
  `linespoints` may be abbreviated `lp`.
 2 points
@@ -9663,6 +9664,15 @@ Ffigure_mapcontours
 
  You may manually change the postscript output from gray to color and vice
  versa and change the definition of <maxcolors>.
+3 pointintervalbox
+?commands set pointintervalbox
+?set pointintervalbox
+?pointintervalbox
+ The `pointinterval` property of line types is used in plot style `linespoints`.
+ A negative value of pointinterval, e.g. -N, means that point symbols are drawn
+ only for every Nth point, and that a box (actually circle) behind each point
+ symbol is blanked out by filling with the background color.  The command
+ `set pointintervalbox` controls the radius of this blanked out region.
 3 pointsize
 ?commands set pointsize
 ?commands show pointsize

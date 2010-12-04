@@ -1,3 +1,8 @@
+2010-12-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/save.c src/set.c src/show.c src/tables.c
+	src/tables.h src/unset.c docs/gnuplot.doc: 'set pointintervalbox'.
+
 2010-12-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics): Casting to a float may have been clever, but
