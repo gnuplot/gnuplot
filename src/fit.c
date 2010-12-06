@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.72 2010/07/30 19:11:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.73 2010/10/10 04:44:34 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1239,6 +1239,7 @@ fit_command()
     time_t timer;
     int token1, token2, token3;
     char *tmp, *file_name;
+    AXIS saved_axis;
 
     c_token++;
 
@@ -1269,11 +1270,11 @@ fit_command()
       if (num_ranges > 5)
 	int_error(c_token, "only 6 range specs are permitted");
       i=var_order[num_ranges];
-      /* Store the Z axis dummy variable and range (if any) in the
-       * axis for the next independent variable.  Save the current
-       * values in an otherwise unused axis, so they can be restored
-       * later if there are fewer than 5 independent variables. */
-      axis_array[SECOND_Z_AXIS] = axis_array[i]; /* copy entire structure */
+      /* Store the Z axis dummy variable and range (if any) in the axis
+       * for the next independent variable.  Save the current values to be
+       * restored later if there are fewer than 5 independent variables.
+       */
+      saved_axis = axis_array[i];
       dummy_token[6] = dummy_token[i];
 
       dummy_token[num_ranges] = -1;
@@ -1367,7 +1368,7 @@ fit_command()
 	Z_AXIS.max = axis_array[i].max;
       
       /* restore former values */
-      axis_array[i] = axis_array[SECOND_Z_AXIS]; /* copy entire structure */
+      axis_array[i] = saved_axis;
       dummy_token[num_ranges-1] = dummy_token[6];
     }
 

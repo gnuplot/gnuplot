@@ -1,3 +1,10 @@
+2010-12-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.x (fit_command): Do not use axis_array[SECOND_Z_AXIS] as 
+	temporary storage, because leaving junk in it can cause an erroneous
+	free() operation later on.
+	Bug #3130115
+
 2010-12-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/save.c src/set.c src/show.c src/tables.c
