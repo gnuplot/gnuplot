@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.346 2010-10-28 09:50:57+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.633
+C RCS $Id: gnuplot-ja.doc,v 1.351 2010-12-06 09:42:17+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.641
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -154,8 +154,8 @@ C Shigeharu Takeno et al (3.7, 4.X)
  接出力、または多くのファイル形式への出力 (eps, fig, jpeg, LaTeX,
  metafont, pbm, pdf, png, postscript, svg, ...)。gnuplot は、容易に新し
  い出力形式を追加するよう拡張することができます。最近追加された対話型出
- 力形式には、aquaterm (OSX) や wxWidgets (マルチプラットホーム) を元に
- したものがあります。
+ 力形式には、aquaterm (OSX) や wxWidgets (マルチプラットホーム), Qt を
+ 元にしたものがあります。
 
  `gnuplot` のコマンド言語は大文字小文字を区別します。すなわち、小文字で
  書かれたコマンドや関数名は、それらを大文字で書いたものとは同じではあり
@@ -1951,7 +1951,7 @@ C ... and restart the table:
 
 =colors
  多くの出力形式で、ユーザ定義色を定義できるようになっています。色の定義
- は明示的な rgb (赤、緑、青) を指定するか、色名か、現在の PM3D パレット
+ は明示的な rgb (赤、緑、青) を指定するか、色名か、現在の pm3d パレット
  を参照する色の値のいずれかで行ないます。
 
  例:
@@ -2956,7 +2956,7 @@ Ffigure_filledcurves
  ここで、オプションは以下のうちのいずれかです:
 
      [closed | {above | below}
-     {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
+     {x1 | x2 | y1 | y2 | r}[=<a>] | xy=<x>,<y>]
 
  最初のものは `closed` で、これは曲線それ自身を閉多角形と見なします。入
  力データが 2 列の場合にはこれがデフォルトです。
@@ -2970,6 +2970,7 @@ Ffigure_filledcurves
      filledcurves y1=0     ... (y1 軸での) 直線 y=0 i.e. x1 軸と平行
      filledcurves y2=42    ... (y2 軸での) 直線 y=42 i.e. x2 軸と平行
      filledcurves xy=10,20 ... x1,y1 軸での点 10,20 (扇型のような形状)
+     filledcurves above r=1.5  極座標での動径軸の 1.5 の外側の領域
 
  3 種類目は 3 列の入力データを必要とし、それらは x 座標と、それに対する
  2 つの y 座標からなり、それらは同じ x 座標の集合に対する 2 つの曲線の
@@ -2986,7 +2987,7 @@ Ffigure_filledcurves
      plot 'data' using 1:2:3 with filledcurves
 
  `above` と `below` オプションは
-     ... filledcurves above {x1|x2|y1|y2}=<val>
+     ... filledcurves above {x1|x2|y1|y2|r}=<val>
  および
      ... using 1:2:3 with filledcurves below
  の形のコマンドに適用可能です。どちらの場合でも、これらのオプションは
@@ -3418,7 +3419,7 @@ Ffigure_lines
 ?style lp
 ?linespoints
 ?lp
-=pointinterval
+?pointinterval
 Ffigure_linespoints
  `linespoints` スタイルは、隣接する点を真っ直ぐな線分で結び、その後で最
  初に戻って各点に小さな記号を描きます。コマンド `set pointsize` を使っ
@@ -3432,7 +3433,8 @@ Ffigure_linespoints
  すべての点を与えた記号にするかどうかを制御できます。例えば、
  `with lp pi 3` は、すべてのデータ点間に線分を引きますが、点の記号は 3
  つおきにしか書きません。`pointinterval` を負の値にした場合は、記号の下
- の線分の部分を消します。
+ の線分の部分を消します。消す部分のサイズは `set pointintervalbox` で制
+ 御できます。
 
  `linespoints` は `lp` と略すことが出来ます。
 2 points
@@ -3669,6 +3671,8 @@ Ffigure_yerrorlines
 2 3 次元 (曲面) 描画 (3D (surface) plots)
 ?3D (surface) plots
 ?plotting styles 3d (surface) plots
+=3D
+=surface
 Ffigure_surface
  曲面描画は、コマンド `plot` ではなくコマンド `splot` を使って生成しま
  す。スタイル `with lines` を使えば、曲面を格子線で生成できます。曲面の
@@ -6720,15 +6724,13 @@ Ffigure_mapcontours
 4 極座標モード (polar)
 ?commands set autoscale polar
 ?set autoscale polar
- 極座標モード (`set polar`) では、xrange と yrange は極座標から求められ、
- それによって自動的に範囲設定がなされます。言いかえると、極座標モードでは
- 描こうとしている極座標関数が収まるように x 軸、y 軸が自動的に縮尺が調整
- されます。
-
- 極座標モードで関数を描画する場合、rrange も自動範囲設定されます。データ
- ファイルを描画する場合はさらに trange も自動範囲設定がなされます。もし、
- trange がある象限 (四分円) に収まるならば、自動縮尺機能によりその象限のみ
- の描画が行われることに注意してください。
+ 極座標モード (`set polar`) では、xrange と yrange は自動縮尺モードでは
+ なくなります。動径軸の範囲制限用に `set rrange` を使用した場合、xrange
+ と yrange はそれに合うように自動的に調整されます。しかし、さらにそれを
+ 調整したければ、その後に明示的に xrange や yrange コマンドを使うことが
+ できます。以下参照: `set rrange`。trange は自動範囲設定がなされます。
+ もし、trange がある象限 (四分円) に収まるならば、自動縮尺機能によりそ
+ の象限のみの描画が行われることに注意してください。
 
  1 つ、あるいは 2 つの範囲は明示的に設定してその他のものを指定しない場合は
  予期しない結果を引き起こすかも知れません。
@@ -7474,6 +7476,7 @@ Ffigure_mapcontours
 ?show dgrid3d
 ?dgrid3d
 ?nodgrid3d
+?kdensity2d
  コマンド `set dgrid3d` は、非格子状データから格子状データへの写像機能を
  有効にし、そのためのパラメータを設定します。格子状データの構造について
  の詳細は、以下参照: `splot grid_data`。
@@ -7482,7 +7485,8 @@ Ffigure_mapcontours
        set dgrid3d {<rows>} {,{<cols>}}
                    { splines |
                      qnorm {<norm>} |
-                     (gauss | cauchy | exp | box | hann) {<dx>} {,dy} }
+                     (gauss | cauchy | exp | box | hann)
+                       {kdensity} {<dx>} {,<dy>} }
        unset dgrid3d
        show dgrid3d
 
@@ -7537,6 +7541,16 @@ Ffigure_mapcontours
  の値は dx で、そのデフォルトの値は 1 になっています。パラメータ dx と
  dy は、データ点が格子点へ「データそれ自身の単位で」の寄与を行う範囲の
  制御を可能にします。
+
+ オプションキーワード `kdensity2d` は、重み付け関数名の後ろで (オプショ
+ ンの) スケール変換のパラメータの前に置くもので、これはアルゴリズムを変
+ 更して、格子点用に計算する値を重みの和 ( z = Sum_i w(d_i) * z_i ) では
+ 割らないようにします。z_i がすべて定数の場合、これは事実上 2 変数の重
+ み付け評価を描画します: (上の 5 つのうちの一つの) 重み付け関数が各デー
+ タ点に置かれ、それらの重みの和がすべての格子点で評価され、そして元のデ
+ ータの代わりにこの滑らかな曲面が描画されます。これは、1 次元のデータ集
+ 合に対する `smooth kdensity` オプションが行うこととおおまかには同じで
+ す (使用例は kdensity2d.dem を参照してください)。
 
  後方互換性のために、わずかに異なる書式もサポートされています。どのアル
  ゴリズムも明示的に選択しなかった場合、`qnorm` アルゴリズムが仮定され、
@@ -8353,11 +8367,10 @@ Ffigure_mapcontours
  へ投影するのと同じ方法を使って、架空の直線の 2 次元画面での位置を生成
  します。
 
- TeX, PostScript, またはこれらと同等の、整形情報が文字列に埋め込まれる
- 出力を使う場合は、`gnuplot` は説明の位置合わせのための文字列の幅を
- 正しく計算できません。よって説明を左に置く場合は
- `set key left Left reverse` という組合せを使うのがいいでしょう。そうす
- れば説明の枠と枠内のすき間は文字列そのままの幅に合わせられます。
+ TeX や、整形情報が文字列に埋め込まれる出力を使う場合は、`gnuplot` は説
+ 明の位置合わせのための文字列の幅を正しく評価することしかできません。よ
+ って説明を左に置く場合は `set key left Left reverse` という組合せを使
+ うのがいいでしょう。
 
  `splot` で等高線を書く場合、説明には等高線のラベルも表示されます。
  これらのラベルの並び具合がうまくいかない、または別な位置に小数点を
@@ -10101,6 +10114,15 @@ Ffigure_mapcontours
 
  postscript 出力の灰色階調をカラーへ、またはその逆、そして <maxcolors>
  の定義などを、手動で変更することができます。
+3 pointintervalbox
+?commands set pointintervalbox
+?set pointintervalbox
+?pointintervalbox
+ 線種の属性 `pointinterval` は描画スタイル `linespoints` で使われます。
+ pointinterval を負の値、例えば -N とすると、点の記号は N 番目毎に書かれ、
+ そして各点の記号の後ろの箱 (実際には円) の部分は背景色で塗りつぶして消
+ されます。コマンド `set pointintervalbox` は、この消す領域の大きさ (半
+ 径) を制御します。
 3 pointsize
 ?commands set pointsize
 ?commands show pointsize
@@ -10149,19 +10171,22 @@ Ffigure_mapcontours
  対する同様の機能に関しては、以下参照: `set mapping`。
 
  極座標モードでは t の数式の意味は r=f(t) となり、t は回転角となります。
- trange は関数の定義域 (角度) を制御し、xrange と yrange はそれぞれグラ
- フの x,y 方向の範囲を制御することになります。これらの範囲と rrange は
- 自動的に設定されるか、または明示的に設定できます。これらすべての
- `ranges` コマンドの詳細に関しては、以下参照: `set xrange`。
+ trange は関数の定義域 (角度) を制御し、rrange, xrange, yrange はそれぞ
+ れグラフの x,y 方向の範囲を制御することになります。これらの範囲と
+ rrange は自動的に設定されるか、または明示的に設定できます。詳細に関し
+ ては、以下参照: `set rrange`, `set xrange`。
 
  例:
        set polar
        plot t*sin(t)
-       plot [-2*pi:2*pi] [-3:3] [-3:3] t*sin(t)
+       set trange [-2*pi:2*pi]
+       set rrange [0:3]
+       plot t*sin(t)
 
- 最初の `plot` はデフォルトの角度の範囲の 0 から 2*pi を使います。半径
- とグラフのサイズは自動的に伸縮されます。2 番目の `plot` は角度の定義域
- を拡張し、グラフのサイズを x,y のいずれの方向にも [-3:3] に制限します。
+ 最初の `plot` はデフォルトの角度の範囲の 0 から 2*pi を使います。動径
+ 方向とグラフのサイズは自動的に伸縮されます。2 番目の `plot` は角度の定
+ 義域を拡張し、グラフのサイズを原点から 3 の幅に制限します。これは x,y
+ のそれぞれの方向を [-3:3] に制限することになります。
 
  `set size square` とすると `gnuplot` はアスペクト比 (縦横の比) を 1 に
  するので円が (楕円でなく) 円に見えるようになります。
@@ -10207,6 +10232,14 @@ Ffigure_mapcontours
        2) 環境変数 GNUPLOT_PS_DIR で指定したディレクトリ
        3) 組み込まれたヘッダー、またはデフォルトのシステムディレクトリ
        4) `set loadpath` で指定したディレクトリ
+3 raxis
+?commands set raxis
+?raxis
+ コマンド `set raxis` と `unset raxis` は、動径軸を格子線と x 軸から分
+ 離して描画するかどうかを切り替えます。現在の rrange の最小値が 0 でな
+ い (そして自動縮尺でない) 場合、グラフと軸が原点に達しないことを示す白
+ 丸が極座標グラフの中心に描かれます。軸の線は、グラフの境界と同じ線種で
+ 描画されます。以下参照: `polar`, `rrange`, `rtics`, `set grid`。
 3 rmargin
 ?commands set rmargin
 ?set rmargin
@@ -10219,8 +10252,22 @@ Ffigure_mapcontours
 ?set rrange
 ?show rrange
 ?rrange
- コマンド `set rrange` は極座標モードのグラフの半径方向の範囲を設定しま
- す。詳細は、以下参照: `set xrange`。
+ コマンド `set rrange` は極座標モードのグラフの動径方向の範囲を設定しま
+ す。これは xrange と yrange の両方も設定してしまいます。両者は、
+ [-(rmax-rmin) : +(rmax-rmin)] になります。しかし、これの後で xrange や
+ yrange を変更しても (例えば拡大するために)、それは rrange を変更しない
+ ので、データ点は rrange に関してクリッピングされたままとなります。rmin
+ に関する自動縮尺は常に rmin = 0 となります。
+3 rtics
+?commands set rtics
+?commands show rtics
+?set rtics
+?show rtics
+?rtics
+ コマンド `set rtics` は、動径軸に沿って目盛りを配置します。これは、極
+ 座標モードでのみ表示されます。目盛りとその見出しは原点の右側に描かれま
+ す。キーワード `mirror` は、それらを原点の左側にも描きます。その他のキ
+ ーワードに関する話については以下参照: `polar`, `set xtics`。
 3 samples
 ?commands set samples
 ?commands show samples
@@ -10683,7 +10730,7 @@ Ffigure_mapcontours
  `pointinterval` は、スタイル `linespoints` でグラフ中に描かれる点の間
  隔を制御します。デフォルトは 0 です (すべての点が描画される)。例えば、
  `set style line N pi 3` は、点種が N、点の大きさと線幅は現在の出力形式
- のデフォルトで、`with linespoints` での描画では点は 3 つおきに描画され
+ のデフォルトで、`with linespoints` での描画では点は 3 番目毎に描画され
  るようなラインスタイルを定義します。その間隔を負の値にすると、それは間
  隔は正の値の場合と同じですが、点の記号の下になる線を書かないようにしま
  す (出力形式によっては)。
@@ -11545,7 +11592,7 @@ Ffigure_mapcontours
 ?restore
 ?xrange
  コマンド `set xrange` は表示される水平方向の範囲を指定します。他の軸
- にも同様のコマンドが存在しますし、極座標での半径 r, 媒介変数 t, u, v
+ にも同様のコマンドが存在しますし、極座標での動径 r, 媒介変数 t, u, v
  にも存在します。
 
  書式:
@@ -11605,9 +11652,9 @@ Ffigure_mapcontours
  決定します。同様に 3 次元媒介変数モードでは、`xrange`, `yrange`, `zrange`
  が軸の範囲を管理し、`urange` と `yrange` が媒介変数の範囲を管理します。
 
- 極座標モードでは、`rrange` は描画される半径の範囲を決定します。<rmin>
- は半径への追加の定数として作用し、一方 <rmax> は半径を切り捨てる (clip)
- ように作用し、<rmax> を越えた半径に対する点は描画されません。`xrange`
+ 極座標モードでは、`rrange` は描画される動径の範囲を決定します。<rmin>
+ は動径への追加の定数として作用し、一方 <rmax> は動径を切り捨てる (clip)
+ ように作用し、<rmax> を越えた動径に対する点は描画されません。`xrange`
  と `yrange` は影響されます。これらの範囲は、グラフが r(t)-rmin のグラ
  フで、目盛りの見出しにはそれぞれ rmin を加えたようなものであるかのよう
  にセットされます。
