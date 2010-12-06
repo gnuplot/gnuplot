@@ -1,3 +1,7 @@
+2010-12-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c:  Honor "set key tc <foo>" in 3D plots.  Bugfix.
+
 2010-12-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/term-ja.diff docs/gnuplot-ja.doc:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.239 2010/09/16 05:56:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.240 2010/09/27 19:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1007,8 +1007,12 @@ do_3dplot(
 				 && !this_plot->title_is_suppressed);
 
 	    if (lkey) {
-		/* EAM - force key text to black, then restore */
-		(*t->linetype)(LT_BLACK);
+		if (key->textcolor.type != TC_DEFAULT)
+		    /* Draw key text in same color as key title */
+		    apply_pm3dcolor(&key->textcolor, t);
+		else
+		    /* Draw key text in black */
+		    (*t->linetype)(LT_BLACK);
 		ignore_enhanced(this_plot->title_no_enhanced);
 		key_text(xl, yl, this_plot->title);
 		ignore_enhanced(FALSE);
