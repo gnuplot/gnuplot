@@ -1,4 +1,9 @@
-2010-12-06  Ethan A Merritt  <merritt@u.washington.edu>
+2010-12-13  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
+
+	* term/emf.trm:  Create special point types 70-74 to be filled polygons,
+	just as they are for the postscript terminal.
+
+2010-12-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  Honor "set key tc <foo>" in 3D plots.  Bugfix.
 
