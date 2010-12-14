@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.42 2010/07/30 19:11:40 sfeam Exp $
+ * $Id: syscfg.h,v 1.43 2010/08/13 23:36:58 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -236,6 +236,11 @@
 # define HAVE_GETCWD 1
 # define GP_EXCEPTION_NAME _exception
 #endif
+
+#ifdef __MSC__
+# include <direct.h> /* for getcwd() */
+#endif
+
 
 
 #if defined(alliant)
