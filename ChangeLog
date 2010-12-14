@@ -1,3 +1,33 @@
+2010-12-14  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
+
+	* config/watcom/Makefile, config/watcom/config.h: New version of
+	Makefiles for OpenWatcom that builds outside the src tree.
+
+	* config/config.oww (pclose, popen): New defines need to compile
+	pipe-enabled version on OpenWatcom.
+
+	* docs/Makefile.in (pdffigures): Make indirect target depending on
+	pdffigures.tex, to avoid unconditional rebuild.
+	(pdffigures.tex): New, renamed copy of previous target pdffigures.
+	(figures): Set loadpath for demos; allow this to work from
+	out-of-source builds.
+
+	* docs/gnuplot.texi: Regenerated.
+
+	* docs/gnuplot.doc: Clean up blank-only lines.
+
+	* src/win/wtext.c, src/win/wprinter.c, src/win/wpause.c,
+	src/win/wmenu.c, src/win/winmain.c, src/win/wgraph.c
+	{HAVE_CONFIG_H}: Add "config.h" include.
+
+	* src/syscfg.h {MSVC}: Add missing include (was hidden in MSDOS
+	section, which the Win32 build doesn't touch).
+
+	* src/makefile.awc (COREOBJS): Add missing entry for tabulate.c
+
+	* term/PostScript/prologues.h (): Regenerated. prologue_cp1251_ps
+	was missing completely, among other lapses.
+
 2010-12-13  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
 	* term/emf.trm:  Create special point types 70-74 to be filled polygons,
