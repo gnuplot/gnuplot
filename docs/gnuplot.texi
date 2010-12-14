@@ -16666,7 +16666,6 @@ with no modifiers.
 * kyo::                         
 * latex::                       
 * linux::                       
-* linux_::                      
 * lua::                         
 * macintosh::                   
 * mf::                          
@@ -18885,7 +18884,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, linux_, latex, complete_list_of_terminals
+@node linux, lua, latex, complete_list_of_terminals
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -18902,24 +18901,7 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node linux_, lua, linux, complete_list_of_terminals
-@subsubsection linux
-
-@c ?commands set terminal linux
-@c ?set terminal linux
-@c ?set term linux
-@c ?terminal linux
-@c ?term linux
-@cindex linux
-@tmindex linux
-
-
-The `linux` driver has no additional options to specify.  It looks at the
-environment variable GSVGAMODE for the default mode; if not set, it uses
-1024x768x256 as default mode or, if that is not possible, 640x480x16
-(standard VGA)."
-
-@node lua, macintosh, linux_, complete_list_of_terminals
+@node lua, macintosh, linux, complete_list_of_terminals
 @subsubsection lua
 
 @c ?commands set terminal lua
