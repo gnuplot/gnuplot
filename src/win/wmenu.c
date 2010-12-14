@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.8 2006/08/09 07:39:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.9 2010/02/16 07:14:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -40,6 +40,10 @@ static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.8 2006/08/09 07:39:34 miku
  *   Russell Lang
  *
  */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #define STRICT
 #define COBJMACROS

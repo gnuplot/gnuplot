@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.15 2007/02/10 00:14:54 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.16 2009/08/31 18:31:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -43,6 +43,10 @@ static char *RCSid() { return RCSid("$Id: wpause.c,v 1.15 2007/02/10 00:14:54 mi
 
 /* MessageBox ALWAYS appears in the middle of the screen so instead */
 /* we use this PauseBox so we can decide where it is to be placed */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #define STRICT
 #include <windows.h>

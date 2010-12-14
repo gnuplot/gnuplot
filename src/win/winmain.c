@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.30 2009/10/30 22:15:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.31 2010/01/13 05:07:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -43,12 +43,12 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.30 2009/10/30 22:15:39 m
 
 /* This file implements the initialization code for running gnuplot   */
 /* under Microsoft Windows. The code currently compiles only with the */
-/* Borland C++ 3.1 compiler.					      */
-/* 								      */
+/* Borland C++ 3.1 compiler.                                          */
+/*                                                                    */
 /* The modifications to allow Gnuplot to run under Windows were made  */
 /* by Maurice Castro. (maurice@bruce.cs.monash.edu.au)  3 Jul 1992    */
 /* and Russell Lang (rjl@monu1.cc.monash.edu.au) 30 Nov 1992          */
-/*								      */
+/*                                                                    */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -122,61 +122,61 @@ int gnu_main(int argc, char *argv[], char *env[]);
 void
 CheckMemory(LPSTR str)
 {
-	if (str == (LPSTR)NULL) {
-		MessageBox(NULL, "out of memory", "gnuplot", MB_ICONSTOP | MB_OK);
-		exit(1);
-	}
+        if (str == (LPSTR)NULL) {
+                MessageBox(NULL, "out of memory", "gnuplot", MB_ICONSTOP | MB_OK);
+                exit(1);
+        }
 }
 
 int
 Pause(LPSTR str)
 {
-	pausewin.Message = str;
-	return (PauseBox(&pausewin) == IDOK);
+        pausewin.Message = str;
+        return (PauseBox(&pausewin) == IDOK);
 }
 
 void
 kill_pending_Pause_dialog ()
 {
-	if (pausewin.bPause == FALSE) /* no Pause dialog displayed */
-	    return;
-	/* Pause dialog displayed, thus kill it */
-	DestroyWindow(pausewin.hWndPause);
+        if (pausewin.bPause == FALSE) /* no Pause dialog displayed */
+            return;
+        /* Pause dialog displayed, thus kill it */
+        DestroyWindow(pausewin.hWndPause);
 #ifndef WIN32
 #ifndef __DLL__
-	FreeProcInstance((FARPROC)pausewin.lpfnPauseButtonProc);
+        FreeProcInstance((FARPROC)pausewin.lpfnPauseButtonProc);
 #endif
 #endif
-	pausewin.bPause = FALSE;
+        pausewin.bPause = FALSE;
 }
 
 /* atexit procedure */
 void
 WinExit()
 {
-	term_reset();
+        term_reset();
 
 #ifndef __MINGW32__ /* HBB 980809: FIXME: doesn't exist for MinGW32. So...? */
-	fcloseall();
+        fcloseall();
 #endif
-	if (graphwin.hWndGraph && IsWindow(graphwin.hWndGraph))
-		GraphClose(&graphwin);
+        if (graphwin.hWndGraph && IsWindow(graphwin.hWndGraph))
+                GraphClose(&graphwin);
 #ifndef WGP_CONSOLE
-	TextMessage();	/* process messages */
+        TextMessage();  /* process messages */
 #endif
- 	WinHelp(textwin.hWndText,(LPSTR)winhelpname,HELP_QUIT,(DWORD)NULL);
+        WinHelp(textwin.hWndText,(LPSTR)winhelpname,HELP_QUIT,(DWORD)NULL);
 #ifndef WGP_CONSOLE
-	TextMessage();	/* process messages */
+        TextMessage();  /* process messages */
 #endif
-	return;
+        return;
 }
 
 /* call back function from Text Window WM_CLOSE */
 int CALLBACK WINEXPORT
 ShutDown()
 {
-	exit(0);
-	return 0;
+        exit(0);
+        return 0;
 }
 
 #ifdef WIN32
@@ -229,27 +229,27 @@ appdata_directory(void)
     static char dir[MAX_PATH] = "";
 
     if (dir[0])
-	return dir;
+        return dir;
 
     /* Make sure that SHGetSpecialFolderPath is supported. */
     hShell32 = LoadLibrary(TEXT("shell32.dll"));
     if (hShell32) {
-	pSHGetSpecialFolderPath =
-	    GetProcAddress(hShell32,
-			   TEXT("SHGetSpecialFolderPathA"));
-	if (pSHGetSpecialFolderPath)
-	    (*pSHGetSpecialFolderPath)(NULL, dir, CSIDL_APPDATA, FALSE);
-	FreeModule(hShell32);
-	return dir;
+        pSHGetSpecialFolderPath =
+            GetProcAddress(hShell32,
+                           TEXT("SHGetSpecialFolderPathA"));
+        if (pSHGetSpecialFolderPath)
+            (*pSHGetSpecialFolderPath)(NULL, dir, CSIDL_APPDATA, FALSE);
+        FreeModule(hShell32);
+        return dir;
     }
 
     /* use APPDATA environment variable as fallback */
     if (dir[0] == '\0') {
-	char *appdata = getenv("APPDATA");
-	if (appdata) {
-	    strcpy(dir, appdata);
-	    return dir;
-	}
+        char *appdata = getenv("APPDATA");
+        if (appdata) {
+            strcpy(dir, appdata);
+            return dir;
+        }
     }
 
     return NULL;
@@ -259,19 +259,19 @@ appdata_directory(void)
 
 #ifndef WGP_CONSOLE
 int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-		LPSTR lpszCmdLine, int nCmdShow)
+                LPSTR lpszCmdLine, int nCmdShow)
 #else
 int main(int argc, char **argv)
 #endif
 {
-	/*WNDCLASS wndclass;*/
-	LPSTR tail;
+        /*WNDCLASS wndclass;*/
+        LPSTR tail;
 
 #ifdef WGP_CONSOLE
 # define _argv argv
 # define _argc argc
-	HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
-	int nCmdShow = 0;
+        HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
+        int nCmdShow = 0;
 #else
 #ifdef __MSC__  /* MSC doesn't give us _argc and _argv[] so ...   */
 # ifdef WIN32    /* WIN32 has __argc and __argv */
@@ -279,144 +279,143 @@ int main(int argc, char **argv)
 #  define _argc __argc
 # else
 #  define MAXCMDTOKENS 128
-	int     _argc=0;
-	LPSTR   _argv[MAXCMDTOKENS];
-	_argv[_argc] = "wgnuplot.exe";
-	_argv[++_argc] = _fstrtok( lpszCmdLine, " ");
-	while (_argv[_argc] != NULL)
-		_argv[++_argc] = _fstrtok( NULL, " ");
+        int     _argc=0;
+        LPSTR   _argv[MAXCMDTOKENS];
+        _argv[_argc] = "wgnuplot.exe";
+        _argv[++_argc] = _fstrtok( lpszCmdLine, " ");
+        while (_argv[_argc] != NULL)
+                _argv[++_argc] = _fstrtok( NULL, " ");
 # endif /* WIN32 */
 #endif /* __MSC__ */
-#endif /* WGP_CONSOLE */
-
-#ifdef	__WATCOMC__
+#ifdef  __WATCOMC__
 # define _argv __argv
 # define _argc __argc
 #endif
+#endif /* WGP_CONSOLE */
 
-	szModuleName = (LPSTR)farmalloc(MAXSTR+1);
-	CheckMemory(szModuleName);
+        szModuleName = (LPSTR)farmalloc(MAXSTR+1);
+        CheckMemory(szModuleName);
 
-	/* get path to EXE */
-	GetModuleFileName(hInstance, (LPSTR) szModuleName, MAXSTR);
+        /* get path to EXE */
+        GetModuleFileName(hInstance, (LPSTR) szModuleName, MAXSTR);
 #ifndef WIN32
-	if (CheckWGNUPLOTVersion(WGNUPLOTVERSION)) {
-		MessageBox(NULL, "Wrong version of WGNUPLOT.DLL", szModuleName, MB_ICONSTOP | MB_OK);
-		exit(1);
-	}
+        if (CheckWGNUPLOTVersion(WGNUPLOTVERSION)) {
+                MessageBox(NULL, "Wrong version of WGNUPLOT.DLL", szModuleName, MB_ICONSTOP | MB_OK);
+                exit(1);
+        }
 #endif
-	if ((tail = (LPSTR)_fstrrchr(szModuleName,'\\')) != (LPSTR)NULL)
-	{
-		tail++;
-		*tail = 0;
-	}
-	szModuleName = (LPSTR)farrealloc(szModuleName, _fstrlen(szModuleName)+1);
-	CheckMemory(szModuleName);
+        if ((tail = (LPSTR)_fstrrchr(szModuleName,'\\')) != (LPSTR)NULL)
+        {
+                tail++;
+                *tail = 0;
+        }
+        szModuleName = (LPSTR)farrealloc(szModuleName, _fstrlen(szModuleName)+1);
+        CheckMemory(szModuleName);
 
-	if (_fstrlen(szModuleName) >= 5 && _fstrnicmp(&szModuleName[_fstrlen(szModuleName)-5], "\\bin\\", 5) == 0)
-	{
-		int len = _fstrlen(szModuleName)-4;
-		szPackageDir = (LPSTR)farmalloc(len+1);
-		CheckMemory(szPackageDir);
-		_fstrncpy(szPackageDir, szModuleName, len);
-		szPackageDir[len] = '\0';
-	}
-	else
-		szPackageDir = szModuleName;
+        if (_fstrlen(szModuleName) >= 5 && _fstrnicmp(&szModuleName[_fstrlen(szModuleName)-5], "\\bin\\", 5) == 0)
+        {
+                int len = _fstrlen(szModuleName)-4;
+                szPackageDir = (LPSTR)farmalloc(len+1);
+                CheckMemory(szPackageDir);
+                _fstrncpy(szPackageDir, szModuleName, len);
+                szPackageDir[len] = '\0';
+        }
+        else
+                szPackageDir = szModuleName;
 
-	winhelpname = (LPSTR)farmalloc(_fstrlen(szModuleName)+_fstrlen(HELPFILE)+1);
-	CheckMemory(winhelpname);
-	_fstrcpy(winhelpname,szModuleName);
-	_fstrcat(winhelpname,HELPFILE);
+        winhelpname = (LPSTR)farmalloc(_fstrlen(szModuleName)+_fstrlen(HELPFILE)+1);
+        CheckMemory(winhelpname);
+        _fstrcpy(winhelpname,szModuleName);
+        _fstrcat(winhelpname,HELPFILE);
 
-	szMenuName = (LPSTR)farmalloc(_fstrlen(szModuleName)+_fstrlen(MENUNAME)+1);
-	CheckMemory(szMenuName);
-	_fstrcpy(szMenuName,szModuleName);
-	_fstrcat(szMenuName,MENUNAME);
+        szMenuName = (LPSTR)farmalloc(_fstrlen(szModuleName)+_fstrlen(MENUNAME)+1);
+        CheckMemory(szMenuName);
+        _fstrcpy(szMenuName,szModuleName);
+        _fstrcat(szMenuName,MENUNAME);
 
-	textwin.hInstance = hInstance;
-	textwin.hPrevInstance = hPrevInstance;
-	textwin.nCmdShow = nCmdShow;
-	textwin.Title = "gnuplot";
+        textwin.hInstance = hInstance;
+        textwin.hPrevInstance = hPrevInstance;
+        textwin.nCmdShow = nCmdShow;
+        textwin.Title = "gnuplot";
 
         get_user_env(); /* this hasn't been called yet */
         textwin.IniFile = gp_strdup("~\\wgnuplot.ini");
         gp_expand_tilde(&(textwin.IniFile));
 
-	/* if tilde expansion fails use current directory as
-	   default - that was the previous default behaviour */
-	if (textwin.IniFile[0] == '~') {
-	    free(textwin.IniFile);
-	    textwin.IniFile = "wgnuplot.ini";
-	}
-	textwin.IniSection = "WGNUPLOT";
-	textwin.DragPre = "load '";
-	textwin.DragPost = "'\n";
-	textwin.lpmw = &menuwin;
-	textwin.ScreenSize.x = 80;
-	textwin.ScreenSize.y = 80;
-	textwin.KeyBufSize = 2048;
-	textwin.CursorFlag = 1;	/* scroll to cursor after \n & \r */
-	textwin.shutdown = MakeProcInstance((FARPROC)ShutDown, hInstance);
-	textwin.AboutText = (LPSTR)farmalloc(1024);
-	CheckMemory(textwin.AboutText);
-	sprintf(textwin.AboutText,"Version %s\nPatchlevel %s\nLast Modified %s\n%s\n%s, %s and many others",
-		gnuplot_version, gnuplot_patchlevel, gnuplot_date, gnuplot_copyright, authors[1], authors[0]);
-	textwin.AboutText = (LPSTR)farrealloc(textwin.AboutText, _fstrlen(textwin.AboutText)+1);
-	CheckMemory(textwin.AboutText);
+        /* if tilde expansion fails use current directory as
+           default - that was the previous default behaviour */
+        if (textwin.IniFile[0] == '~') {
+            free(textwin.IniFile);
+            textwin.IniFile = "wgnuplot.ini";
+        }
+        textwin.IniSection = "WGNUPLOT";
+        textwin.DragPre = "load '";
+        textwin.DragPost = "'\n";
+        textwin.lpmw = &menuwin;
+        textwin.ScreenSize.x = 80;
+        textwin.ScreenSize.y = 80;
+        textwin.KeyBufSize = 2048;
+        textwin.CursorFlag = 1; /* scroll to cursor after \n & \r */
+        textwin.shutdown = MakeProcInstance((FARPROC)ShutDown, hInstance);
+        textwin.AboutText = (LPSTR)farmalloc(1024);
+        CheckMemory(textwin.AboutText);
+        sprintf(textwin.AboutText,"Version %s\nPatchlevel %s\nLast Modified %s\n%s\n%s, %s and many others",
+                gnuplot_version, gnuplot_patchlevel, gnuplot_date, gnuplot_copyright, authors[1], authors[0]);
+        textwin.AboutText = (LPSTR)farrealloc(textwin.AboutText, _fstrlen(textwin.AboutText)+1);
+        CheckMemory(textwin.AboutText);
 
-	menuwin.szMenuName = szMenuName;
+        menuwin.szMenuName = szMenuName;
 
-	pausewin.hInstance = hInstance;
-	pausewin.hPrevInstance = hPrevInstance;
-	pausewin.Title = "gnuplot pause";
+        pausewin.hInstance = hInstance;
+        pausewin.hPrevInstance = hPrevInstance;
+        pausewin.Title = "gnuplot pause";
 
-	graphwin.hInstance = hInstance;
-	graphwin.hPrevInstance = hPrevInstance;
-	graphwin.Title = WINGRAPHTITLE;
-	graphwin.lptw = &textwin;
-	graphwin.IniFile = textwin.IniFile;
-	graphwin.IniSection = textwin.IniSection;
-	graphwin.color=TRUE;
-	graphwin.fontsize = WINFONTSIZE;
+        graphwin.hInstance = hInstance;
+        graphwin.hPrevInstance = hPrevInstance;
+        graphwin.Title = WINGRAPHTITLE;
+        graphwin.lptw = &textwin;
+        graphwin.IniFile = textwin.IniFile;
+        graphwin.IniSection = textwin.IniSection;
+        graphwin.color=TRUE;
+        graphwin.fontsize = WINFONTSIZE;
 
 #ifndef WGP_CONSOLE
-	if (TextInit(&textwin))
-		exit(1);
-	textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
+        if (TextInit(&textwin))
+                exit(1);
+        textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
 #ifdef WIN32
-	SetClassLong(textwin.hWndParent, GCL_HICON, (DWORD)textwin.hIcon);
+        SetClassLong(textwin.hWndParent, GCL_HICON, (DWORD)textwin.hIcon);
 #else
-	SetClassWord(textwin.hWndParent, GCW_HICON, (WORD)textwin.hIcon);
+        SetClassWord(textwin.hWndParent, GCW_HICON, (WORD)textwin.hIcon);
 #endif
-	if (_argc>1) {
-		int i,noend=FALSE;
-		for (i=0; i<_argc; ++i)
-			if (!stricmp(_argv[i],"-noend") || !stricmp(_argv[i],"/noend")
-			    || !stricmp(_argv[i],"-persist"))
-				noend = TRUE;
-		if (noend)
-			ShowWindow(textwin.hWndParent, textwin.nCmdShow);
-	}
-	else
-		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
-	if (IsIconic(textwin.hWndParent)) { /* update icon */
-		RECT rect;
-		GetClientRect(textwin.hWndParent, (LPRECT) &rect);
-		InvalidateRect(textwin.hWndParent, (LPRECT) &rect, 1);
-		UpdateWindow(textwin.hWndParent);
-	}
+        if (_argc>1) {
+                int i,noend=FALSE;
+                for (i=0; i<_argc; ++i)
+                        if (!stricmp(_argv[i],"-noend") || !stricmp(_argv[i],"/noend")
+                            || !stricmp(_argv[i],"-persist"))
+                                noend = TRUE;
+                if (noend)
+                        ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+        }
+        else
+                ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+        if (IsIconic(textwin.hWndParent)) { /* update icon */
+                RECT rect;
+                GetClientRect(textwin.hWndParent, (LPRECT) &rect);
+                InvalidateRect(textwin.hWndParent, (LPRECT) &rect, 1);
+                UpdateWindow(textwin.hWndParent);
+        }
 #endif
 
 
-	atexit(WinExit);
+        atexit(WinExit);
 
-	if (!isatty(fileno(stdin)))
-		setmode(fileno(stdin), O_BINARY);
+        if (!isatty(fileno(stdin)))
+                setmode(fileno(stdin), O_BINARY);
 
-	gnu_main(_argc, _argv, environ);
+        gnu_main(_argc, _argv, environ);
 
-	return 0;
+        return 0;
 }
 
 
@@ -485,7 +484,7 @@ int
 MyFGetC(FILE *file)
 {
     if (isterm(file)) {
-	return MyGetChE();
+        return MyGetChE();
     }
     return fgetc(file);
 }
@@ -496,8 +495,8 @@ MyGetS(char *str)
     TextPutS(&textwin,"\nDANGER: gets() used\n");
     MyFGetS(str,80,stdin);
     if (strlen(str) > 0
-	&& str[strlen(str)-1]=='\n')
-	str[strlen(str)-1] = '\0';
+        && str[strlen(str)-1]=='\n')
+        str[strlen(str)-1] = '\0';
     return str;
 }
 
@@ -507,10 +506,10 @@ MyFGetS(char *str, unsigned int size, FILE *file)
     char FAR *p;
 
     if (isterm(file)) {
-	p = TextGetS(&textwin, str, size);
-	if (p != (char FAR *)NULL)
-	    return str;
-	return (char *)NULL;
+        p = TextGetS(&textwin, str, size);
+        if (p != (char FAR *)NULL)
+            return str;
+        return (char *)NULL;
     }
     return fgets(str,size,file);
 }
@@ -519,11 +518,11 @@ int
 MyFPutC(int ch, FILE *file)
 {
     if (isterm(file)) {
-	MyPutCh((BYTE)ch);
+        MyPutCh((BYTE)ch);
 #ifndef WGP_CONSOLE
-	TextMessage();
+        TextMessage();
 #endif
-	return ch;
+        return ch;
     }
     return fputc(ch,file);
 }
@@ -532,11 +531,11 @@ int
 MyFPutS(const char *str, FILE *file)
 {
     if (isterm(file)) {
-	TextPutS(&textwin, (char*) str);
+        TextPutS(&textwin, (char*) str);
 #ifndef WGP_CONSOLE
-	TextMessage();
+        TextMessage();
 #endif
-	return (*str);	/* different from Borland library */
+        return (*str);  /* different from Borland library */
     }
     return fputs(str,file);
 }
@@ -547,7 +546,7 @@ MyPutS(char *str)
     TextPutS(&textwin, str);
     MyPutCh('\n');
     TextMessage();
-    return 0;	/* different from Borland library */
+    return 0;   /* different from Borland library */
 }
 
 int
@@ -558,21 +557,21 @@ MyFPrintF(FILE *file, const char *fmt, ...)
 
     va_start(args, fmt);
     if (isterm(file)) {
-	char *buf;
+        char *buf;
 #ifdef __MSC__
-	count = _vscprintf(fmt, args) + 1;
+        count = _vscprintf(fmt, args) + 1;
 #else
-	count = vsnprintf(NULL,0,fmt,args) + 1;
-	if (count == 0) count = MAXPRINTF;
+        count = vsnprintf(NULL,0,fmt,args) + 1;
+        if (count == 0) count = MAXPRINTF;
 #endif
-	va_end(args);
-	va_start(args, fmt);
-	buf = (char *)malloc(count * sizeof(char));
-	count = vsnprintf(buf, count, fmt, args);
-	TextPutS(&textwin, buf);
-	free(buf);
+        va_end(args);
+        va_start(args, fmt);
+        buf = (char *)malloc(count * sizeof(char));
+        count = vsnprintf(buf, count, fmt, args);
+        TextPutS(&textwin, buf);
+        free(buf);
     } else
-	count = vfprintf(file, fmt, args);
+        count = vfprintf(file, fmt, args);
     va_end(args);
     return count;
 }
@@ -583,23 +582,23 @@ MyVFPrintF(FILE *file, const char *fmt, va_list args)
     int count;
 
     if (isterm(file)) {
-	char *buf;
+        char *buf;
 
 #ifdef __MSC__
-	count = _vscprintf(fmt, args) + 1;
+        count = _vscprintf(fmt, args) + 1;
 #else
-	va_list args_copied;
-	va_copy(args_copied, args);
-	count = vsnprintf(NULL, 0U, fmt, args_copied) + 1;
-	if (count == 0) count = MAXPRINTF;
-	va_end(args_copied);
+        va_list args_copied;
+        va_copy(args_copied, args);
+        count = vsnprintf(NULL, 0U, fmt, args_copied) + 1;
+        if (count == 0) count = MAXPRINTF;
+        va_end(args_copied);
 #endif
-	buf = (char *)malloc(count * sizeof(char));
-	count = vsnprintf(buf, count, fmt, args);
-	TextPutS(&textwin, buf);
-	free(buf);
+        buf = (char *)malloc(count * sizeof(char));
+        count = vsnprintf(buf, count, fmt, args);
+        TextPutS(&textwin, buf);
+        free(buf);
     } else
-	count = vfprintf(file, fmt, args);
+        count = vfprintf(file, fmt, args);
     return count;
 }
 
@@ -631,11 +630,11 @@ size_t
 MyFWrite(const void *ptr, size_t size, size_t n, FILE *file)
 {
     if (isterm(file)) {
-	size_t i;
-	for (i=0; i<n; i++)
-	    TextPutCh(&textwin, ((BYTE *)ptr)[i]);
-	TextMessage();
-	return n;
+        size_t i;
+        for (i=0; i<n; i++)
+            TextPutCh(&textwin, ((BYTE *)ptr)[i]);
+        TextMessage();
+        return n;
     }
     return fwrite(ptr, size, n, file);
 }
@@ -644,12 +643,12 @@ size_t
 MyFRead(void *ptr, size_t size, size_t n, FILE *file)
 {
     if (isterm(file)) {
-	size_t i;
+        size_t i;
 
-	for (i=0; i<n; i++)
-	    ((BYTE *)ptr)[i] = TextGetChE(&textwin);
-	TextMessage();
-	return n;
+        for (i=0; i<n; i++)
+            ((BYTE *)ptr)[i] = TextGetChE(&textwin);
+        TextMessage();
+        return n;
     }
     return fread(ptr, size, n, file);
 }
@@ -718,7 +717,7 @@ int ConsoleGetch()
             {
                 DWORD c;
                 GetExitCodeThread(h, &c);
-		CloseHandle(h);
+                CloseHandle(h);
                 return c;
             }
         }
@@ -752,14 +751,14 @@ open_printer()
     char *temp;
 
     if ((temp = getenv("TEMP")) == (char *)NULL)
-	*win_prntmp='\0';
+        *win_prntmp='\0';
     else  {
-	strncpy(win_prntmp,temp,MAX_PRT_LEN);
-	/* stop X's in path being converted by mktemp */
-	for (temp=win_prntmp; *temp; temp++)
-	    *temp = tolower(*temp);
-	if ( strlen(win_prntmp) && (win_prntmp[strlen(win_prntmp)-1]!='\\') )
-	    strcat(win_prntmp,"\\");
+        strncpy(win_prntmp,temp,MAX_PRT_LEN);
+        /* stop X's in path being converted by mktemp */
+        for (temp=win_prntmp; *temp; temp++)
+            *temp = tolower(*temp);
+        if ( strlen(win_prntmp) && (win_prntmp[strlen(win_prntmp)-1]!='\\') )
+            strcat(win_prntmp,"\\");
     }
     strncat(win_prntmp, "_gptmp",MAX_PRT_LEN-strlen(win_prntmp));
     strncat(win_prntmp, "XXXXXX",MAX_PRT_LEN-strlen(win_prntmp));
