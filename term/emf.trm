@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.59.2.5 2010/02/28 04:33:36 sfeam Exp $
+ * $Id: emf.trm,v 1.59.2.6 2010/12/14 02:32:05 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1251,13 +1251,32 @@ EMF_point(unsigned int x, unsigned int y, int number)
     old_dashtype = emf_dashtype;
     EMF_dashtype(0);
 
-    /* if (number < 0)*/
-    {
-	/* draw dot */
-	EMF_move(x, y);
-	EMF_solid_vector(x + 1, y);
-	/* goto end_points;*/
+    /* A few special point types */
+    if (69 <= number && number <= 73) {
+	int emf_color_save = emf_color;
+	emf_color = RGB(255,255,255);	/* Should be background */
+	switch (number) {
+	case 69:  EMF_point(x,y,4); break;
+	case 70:  EMF_point(x,y,6); break;
+	case 71:  EMF_point(x,y,8); break;
+	case 72:  EMF_point(x,y,10); break;
+	case 73:  EMF_point(x,y,12); break;
+	}
+	emf_color = emf_color_save;
+	switch (number) {
+	case 69:  EMF_point(x,y,3); break;
+	case 70:  EMF_point(x,y,5); break;
+	case 71:  EMF_point(x,y,7); break;
+	case 72:  EMF_point(x,y,9); break;
+	case 73:  EMF_point(x,y,11); break;
+	}
+	EMF_dashtype(old_dashtype);
+	return;
     }
+
+    /* draw dot */
+    EMF_move(x, y);
+    EMF_solid_vector(x + 1, y);
     number = number % EMF_POINTS;
 
     switch (number) {
