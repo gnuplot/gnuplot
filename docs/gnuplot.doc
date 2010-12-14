@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.640 2010/11/29 05:35:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.641 2010/12/05 00:01:02 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1697,7 +1697,7 @@ C ... and restart the table:
 
        NaN = GPVAL_NaN
        pi  = GPVAL_pi
- 
+
  Other variables may be defined under various gnuplot operations like mousing in
  interactive terminals or fitting; see `gnuplot-defined variables` for details.
 
@@ -1712,7 +1712,7 @@ C ... and restart the table:
 
  Each function definition is made available as a special string-valued
  variable with the prefix 'GPFUN_'.
- 
+
  Example:
        set label GPFUN_sinc at graph .05,.95
 
@@ -1788,7 +1788,7 @@ C ... and restart the table:
  no fonts at all are installed on your computer.  Gnuplot simply refers to the
  font by name in the output file, and assumes that the printer or viewing
  program will know how to find or approximate a font by that name.
- 
+
  All PostScript printers or viewers should know about the standard set of Adobe
  fonts `Times-Roman`, `Helvetica`, `Courier`, and `Symbol`.  It is likely that
  many additional fonts are also available, but the specific set depends on your
@@ -2546,7 +2546,7 @@ Ffigure_boxerrorbars
  form "ylow yhigh".  In this case the boxwidth will be calculated so that each
  box touches the adjacent boxes.  The width will also be calculated in cases
  where three-column data are used.
- 
+
  An additional (4th, 5th or 6th) input column may be used to provide variable 
  (per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
  The error bar will be drawn in the same color as the border of the box.
@@ -2651,7 +2651,7 @@ Ffigure_boxplot
  point whose y value lies within 1.5 times the interquartile range. By default
  outliers are drawn as circles (point type 7).  The width of the bars at the
  end of the whiskers may be controlled using `set bars`.
- 
+
  These default properties may be changed using the `set style boxplot` command.
  See `set style boxplot`, `bars`, `boxwidth`, `fillstyle`, `candlesticks`.
 
@@ -2675,7 +2675,7 @@ Ffigure_boxxyerrorbars
  way as they are for the `xyerrorbars` style---either from xlow to xhigh and
  from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
  y+ydelta, depending on how many data columns are provided.
- 
+
  An additional (5th or 7th) input column may be used to provide variable 
  (per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
 
@@ -2710,11 +2710,11 @@ Ffigure_candlesticks
  Alternatively, an explicit width for each box-and-whiskers grouping may be
  specified in an optional 6th column of data.  The width must be given in the
  same units as the x coordinate.
- 
+
  An additional (6th, or 7th if the 6th column is used for width data)
  input column may be used to provide variable (per-datapoint) color
  information (see `linecolor` and `rgbcolor variable`).
- 
+
  By default the vertical line segments have no crossbars at the top and
  bottom. If you want crossbars, which are typically used for box-and-whisker
  plots, then add the keyword `whiskerbars` to the plot command.  By default
@@ -2769,7 +2769,7 @@ Ffigure_circles
 
 
  Examples:
- 
+
      # draws circles whose area is proportional to the value in column 3
      set style fill transparent solid 0.2 noborder
      plot 'data' using 1:2:(sqrt($3)) with circles, \
@@ -2777,7 +2777,7 @@ Ffigure_circles
 
      # draws Pac-men instead of circles
      plot 'data' using 1:2:(10):(40):(320) with circles
-     
+
      # draw a pie chart with inline data
      set xrange [-15:15]
      set style fill transparent solid 0.9 noborder
@@ -3217,7 +3217,7 @@ Ffigure_scaled_image
  The `image` style handles input pixels containing a grayscale or color palette
  value. Thus 2D plots (`plot` command) require 3 columns of data (x,y,value),
  while 3D plots (`splot` command) require 4 columns of data (x,y,z,value).
- 
+
  The `rgbimage` style handles input pixels that are described by three separate
  values for the red, green, and blue components.  Thus 5D data (x,y,r,g,b) is
  needed for `plot` and 6D data (x,y,z,r,g,b) for `splot`.  The individual red,
@@ -3263,7 +3263,7 @@ Ffigure_impulses
  values may be negative.  Data from additional columns can be used to control
  the color of each impulse.  To use this style effectively in 3D plots, it is
  useful to use thick lines (linewidth > 1).  This approximates a 3D bar chart.
-      
+
       1 column:   y        # implicit x coordinate from row number (2D)
       2 columns:  x  y     # line from [x,0] to [x,y]  (2D)
       3 columns:  x  y  z  # line from [x,y,0] to [x,y,z] (3D)
@@ -3410,7 +3410,7 @@ Ffigure_steps
  In both cases, an additional input column (5th in 2D, 7th in 3D) may be used
  to provide variable (per-datapoint) color information. 
  (see `linecolor` and `rgbcolor variable`).
- 
+
  splot with vectors is supported only for `set mapping cartesian`.
  The keywords "with vectors" may be followed by arrow style specifications.
  See `arrowstyle` for more details.
@@ -3464,10 +3464,10 @@ Ffigure_xyerrorbars
  if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
-       
+
  An additional input column (5th or 7th) may be used to provide variable 
  (per-datapoint) color information. 
- 
+
 2 yerrorbars
 ?commands set style yerrorbars
 ?commands set style errorbars
@@ -3544,7 +3544,7 @@ Ffigure_xyerrorlines
 
  An additional input column (5th or 7th) may be used to provide variable 
  (per-datapoint) color information. 
- 
+
 2 yerrorlines
 ?commands set style yerrorlines
 ?commands set style errorlines
@@ -3592,17 +3592,17 @@ Ffigure_surface+contours
  The `splot` command can also calculate and draw contour lines corresponding
  to constant Z values. These contour lines may be drawn onto the surface
  itself, or projected onto the XY plane. See `set contour`.
-    
-    
-    
-    
-    
+
+
+
+
+
 
 Ffigure_mapcontours
  An important special case of the `splot` command is to map the Z coordinate
  onto a 2D surface by projecting the plot along the Z axis.  See `set view map`.
  This plot mode can be used to generate contour plots and heat maps.
-    
+
 
 1 Commands
 ?commands
@@ -4569,7 +4569,7 @@ Ffigure_mapcontours
 
  In datafiles, blank records (records with no characters other than blanks and
  a newline and/or carriage return) are significant.
- 
+
  Single blank records designate discontinuities in a `plot`; no line will join
  points separated by a blank records (if they are plotted with a line style).
 
@@ -4597,7 +4597,7 @@ Ffigure_mapcontours
  To avoid this, you can use the `fixmin`/`fixmax` feature of the
  `set autoscale` command, which turns off the automatic extension of the
  axis range upto the next tic mark.
- 
+
  Label coordinates and text can also be read from a data file (see `labels`).
 
 
@@ -5445,7 +5445,7 @@ Ffigure_mapcontours
  presents data from several "pseudo-columns" that hold bookkeeping information.
  E.g. $0 or column(0) returns the sequence number of this data record within a
  dataset.  Please see `pseudocolumns`.
- 
+
  An empty <entry> will default to its order in the list of entries.
  For example, `using ::4` is interpreted as `using 1:2:4`.
 
@@ -7607,7 +7607,7 @@ Ffigure_mapcontours
  equivalent:
        set format y "%.2f"
        set ytics format "%.2f"
- 
+
  The length of the string is restricted to 100 characters.  The default format
  is "% g", but other formats such as "%.2f" or "%3.0em" are often desirable.
  The format "$%g$" is often desirable for LaTeX.  If no format string is given,
@@ -8448,7 +8448,7 @@ Ffigure_mapcontours
 
  The EEPIC, Imagen, LaTeX, and TPIC drivers allow \\ in a string to specify
  a newline.
- 
+
  Label coordinates and text can also be read from a data file (see `labels`).
 
  Examples:
@@ -8511,7 +8511,7 @@ Ffigure_mapcontours
  for plots.  The command options are identical to those for "set style line".
  Unlike line styles, redefinitions by `set linetype` are persistent;  they
  are not affected by `reset`.
- 
+
  For example, linetypes one and two default to red and green. If you redefine
  them like this:
 
@@ -9149,7 +9149,7 @@ Ffigure_mapcontours
  ellipses are scaled in the units of the x axis, while `units yy` means 
  that both axes are in units of the y axis. 
  The default is `xy` or whatever `set style ellipse units` was set to.
- 
+
  NB: If the x and y axis scales are not equal, (e.g. `units xy` is in
  effect) then the major/minor axis ratio will no longer be correct after
  rotation.
@@ -10226,7 +10226,7 @@ Ffigure_mapcontours
 
  If `gnuplot` was built with the support of objects, then the following
  options are also available:
- 
+
  Syntax:
        set style rectangle <object options> <linestyle> <fillstyle>
        set style circle radius <size>
@@ -10329,7 +10329,7 @@ Ffigure_mapcontours
        set style boxplot {range <r> | fraction <f>}
                          {{no}outliers} {pointtype <p>}
                          {candlesticks | financebars}
- 
+
  The box in the boxplot always spans the range of values from the first
  quartile to the third quartile of the data points.  The limit of the whiskers
  that extend from the box can be controlled in two different ways. By default
@@ -10554,7 +10554,7 @@ Ffigure_mapcontours
 
  The line and point types default to the index value. The exact symbol that is
  drawn for that index value may vary from one terminal type to another.
- 
+
  The line width and point size are multipliers for the current terminal's
  default width and size (but note that <point_size> here is unaffected by
  the multiplier given by the command`set pointsize`).
@@ -10628,7 +10628,7 @@ Ffigure_mapcontours
 
  Syntax:
        set style circle {radius {graph|screen} <R>}
- 
+
  This command sets the default radius used in plot style "with circles".  It
  applies to data plots with only 2 columns of data (x,y) and to function plots.
  The default is "set style circle radius graph 0.02".
@@ -10681,7 +10681,7 @@ Ffigure_mapcontours
  This means that the ratio of the axes of the plotted ellipses will be
  correct even after rotation, but either their vertical or horizontal extent
  will not be correct.
- 
+
  This is a global setting that affects all ellipses, both those defined as
  objects and those generated with the `plot` command, however, the value of
  `units` can also be redefined on a per-plot and per-object basis.
@@ -12430,7 +12430,7 @@ Ffigure_mapcontours
  stream from stdout as a string.  One optional trailing newline is ignored.
 
  This can be used to import external functions into gnuplot scripts:
- 
+
        f(x) = real(system(sprintf("somecommand %f", x)))
 2 test
 ?commands test
