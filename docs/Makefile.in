@@ -251,12 +251,14 @@ htmldocs/gnuplot.html: $(srcdir)/gnuplot.dvi
 	mv gnuplot.html gnuplot.css gnuplot*.png gnuplot.log htmldocs/
 
 ### PDF documentation
-pdffigures: figures gnuplot.pdf
+pdffigures: pdffigures.tex
+
+pdffigures.tex:	figures gnuplot.pdf
 	rm -f gnuplot.tex
 	echo "" > pdffigures.tex
 
 figures: doc2tex
-	../src/gnuplot plotstyles.gnu
+	GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu
 	./doc2tex -figures $(srcdir)/gnuplot.doc gnuplot.tex
 	echo "\usepackage{graphicx}" > pdffigures.tex
 	echo "\usepackage{picins}" >> pdffigures.tex
