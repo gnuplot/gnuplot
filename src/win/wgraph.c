@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.12 2010/03/21 03:06:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.13 2010/07/26 20:25:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -972,7 +972,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		LOGPEN cur_penstruct;
 		short cur_pen = curptr->x;
 
-		if (cur_pen > WGNUMPENS)
+		if (cur_pen >= WGNUMPENS)
 		    cur_pen = cur_pen % WGNUMPENS;
 		if (cur_pen <= LT_BACKGROUND) {
 		    cur_pen = 0;
