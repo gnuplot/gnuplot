@@ -1,3 +1,18 @@
+2010-12-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.h src/graphics.c:  Use t->set_color() rather than
+	t->linetype() to set the fill color for pointinterval < 0.
+
+2010-12-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/win.trm: (WIN_point WIN_filled_polygon):
+	Always draw point symbols using a solid line, even if the current line
+	type is dashed.  Unfortunately this fix is limited to monochrome mode.
+	Bug #1952364
+
+	* src/win/wgraph.c (drawgraph): Selecting linetype 16 caused
+	corruption of the color and pen assignments in mono mode.
+
 2010-12-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm:  Backport revised emf terminal from 4.5 branch.
