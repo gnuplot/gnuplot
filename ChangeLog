@@ -1,3 +1,20 @@
+2010-12-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c:  Use t->set_color() rather than t->linetype() to
+	set the fill color for pointinterval < 0 and for opaque key.
+	Needed for windows terminal [any others?].
+
+2010-12-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/win.trm: (WIN_point WIN_filled_polygon):
+	Always draw point symbols using a solid line, even if the current 
+	line type is dashed.  Unfortunately this fix is limited to monochrome
+	mode.
+	Bug #1952364
+
+	* src/win/wgraph.c (drawgraph): Selecting linetype 16 caused
+	corruption of the color and pen assignments in mono mode.
+
 2010-12-14  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
 
 	* config/watcom/Makefile, config/watcom/config.h: New version of
