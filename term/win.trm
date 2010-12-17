@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.78 2010/07/06 00:21:24 sfeam Exp $
+ * $Id: win.trm,v 1.79 2010/07/26 20:24:29 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -446,6 +446,12 @@ WIN_text_angle(int ang)
 TERM_PUBLIC void
 WIN_point(unsigned int x, unsigned int y, int number)
 {
+    int oldlinetype;
+
+    if (!graphwin.color) {
+	oldlinetype = WIN_last_linetype;
+	WIN_linetype(0);
+    }
     /* draw point shapes later to save memory */
     /* size of point symbols */
     graphwin.htic = pointsize * term->h_tic / 2;
@@ -458,6 +464,8 @@ WIN_point(unsigned int x, unsigned int y, int number)
     number += 1;
     /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_dot + number, x, y, NULL);
+    if (!graphwin.color)
+      WIN_linetype(oldlinetype);
 }
 
 TERM_PUBLIC void
@@ -664,6 +672,12 @@ TERM_PUBLIC void
 WIN_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
+    int oldlinetype;
+
+    if (!graphwin.color) {
+	oldlinetype = WIN_last_linetype;
+	WIN_linetype(0);
+    }
     /* FIXME:  fillstyle is ignored by the polygon code in wgraph.c
      * This is an experiment to see if we can piggyback on the fillbox() code
      * to set a pattern brush that will stay in effect for the polygon fill.
@@ -675,6 +689,8 @@ WIN_filled_polygon(int points, gpiPoint *corners)
     	GraphOp(&graphwin, W_pm3d_filled_polygon_pt, corners[i].x, corners[i].y, NULL);
     /* finish series: */
     GraphOp(&graphwin, W_pm3d_filled_polygon_draw, points, 0, NULL);
+    if (!graphwin.color)
+      WIN_linetype(oldlinetype);
 }
 
 TERM_PUBLIC void
