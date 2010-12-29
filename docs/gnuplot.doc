@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.641 2010/12/05 00:01:02 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.642 2010/12/14 23:06:18 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1054,13 +1054,12 @@ C
 ?expressions functions rand
 ?functions rand
 ?rand
-#rand(x) & any & $\mbox{rand}(x)$,  pseudo random number generator \\
-%rand(x)@any@$rand (x)$, pseudo random number generator
- `rand(0)`  returns a pseudo random number in the interval [0:1] generated
-            from the current value of two internal 32-bit seeds.
+#rand(x) & int & pseudo random number in the interval [0:1] \\
+%rand(x)@int@pseudo random number in the interval [0:1]
+ `rand(0)`  returns a pseudo random number in the interval [0:1]
  `rand(-1)` resets both seeds to a standard value.
- `rand(x)`  for x>0 sets both seeds to a value based on the value of x.
- `rand({x,y})` for x>0 sets seed1 to x and seed2 to y.
+ `rand(x)`  for integer 0 < x < 2^31-1 sets both internal seeds to x
+ `rand({x,y})` for integer 0 < x,y < 2^31-1 sets seed1 to x and seed2 to y.
 4 real
 ?expressions functions real
 ?functions real
@@ -1396,14 +1395,16 @@ C
 ?expressions random
 ?functions random
 ?random
- Some older versions of gnuplot used rand(x>0) to produce sequential
- pseudo-random numbers.  The current behavior is as follows:
+=rand
+ The function rand() produces a sequence of pseudo-random numbers between
+ 0 and 1 using an algorithm from P. L'Ecuyer and S. Cote, "Implementing a
+ random number package with splitting facilities", ACM Transactions on
+ Mathematical Software, 17:98-111 (1991).
   `rand(0)`  returns a pseudo random number in the interval [0:1] generated
              from the current value of two internal 32-bit seeds.
   `rand(-1)` resets both seeds to a standard value.
-  `rand(x)`  for x>0 sets both seeds to a value based on the value of x.
-  `rand({x,y})` for x>0 sets seed1 to x and seed2 to y.
-
+  `rand(x)`  for integer 0 < x < 2^31-1 sets both seeds to x.
+  `rand({x,y})` for 0 < x,y < 2^31-1 sets seed1 to x and seed2 to y.
 4 value
 ?expressions functions value
 ?functions value

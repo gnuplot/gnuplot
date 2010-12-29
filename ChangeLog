@@ -1,3 +1,11 @@
+2010-12-29  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/specfun.c (ranf):  Place more restrictions on seed values
+	used by rand(seed).
+
+	* docs/gnuplot.doc (rand):  Updated documentation of rand()
+	function with details about algorithm and allowable seeds.
+
 2010-12-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c:  Make all the numerical routines f_whatever()
