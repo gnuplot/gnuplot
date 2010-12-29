@@ -1,3 +1,11 @@
+2010-12-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/specfun.c:  Make all the numerical routines f_whatever()
+	retrieve their argument via pop_or_convert_from_string().
+
+	* src/specfun.c (ranf):  Disallow fractional seed values since
+	truncation to an integer produces an invalid seed value of zero.
+
 2010-12-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c:  Use t->set_color() rather than t->linetype() to

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.41 2010/03/21 17:42:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.42 2010/10/22 05:28:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -552,6 +552,12 @@ lngamma(double x)
 
 #endif /* !GAMMA */
 
+/*
+ * Make all the following internal routines f_whatever() perform 
+ * autoconversion from string to numeric value.
+ */
+#define pop(x) pop_or_convert_from_string(x)
+
 void
 f_erf(union argument *arg)
 {
@@ -1098,7 +1104,7 @@ ranf(struct value *init)
 
     /* Construct new seed values from input parameter */
     /* FIXME: Ideally we should allow all 64 bits of seed to be set */
-    if (real(init) > 0.0) {
+    if (real(init) > 1.0) {
 	if (real(init) >= (double)(017777777777UL))
 	    int_error(NO_CARET,"Illegal seed value");
 	if (imag(init) >= (double)(017777777777UL))
