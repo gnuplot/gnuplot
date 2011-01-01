@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.56 2010/07/01 16:50:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.57 2010/09/18 22:00:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1433,6 +1433,21 @@ f_strptime(union argument *arg)
     gpfree_string(&val);
     gpfree_string(&fmt);
     push(Gcomplex(&val, result, 0.0));
+}
+
+/* Get current system time in seconds since 2000 */
+void
+f_time(union argument *arg)
+{
+    struct value val;
+    double now;
+    
+    (void) arg; /* Avoid compiler warnings */
+    (void) real(pop(&val)); /* Unused argument */
+    
+    now = (double) time(NULL);
+    now -= SEC_OFFS_SYS;
+    push(Gcomplex(&val, now, 0.0));
 }
 
 

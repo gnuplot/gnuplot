@@ -2,6 +2,7 @@ New features, changes and fixes since gnuplot version 4.4
 =========================================================
 
 * NEW time formats can handle fractional seconds (microsecond precision)
+* NEW time() function returns current time
 * NEW hidden3d supports "with impulses"
 * NEW hidden3d supports arrow style parameters for "with vectors"
 * NEW user-definable linetypes

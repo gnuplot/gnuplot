@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.87 2010/11/18 23:59:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.88 2010/11/24 03:32:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -199,6 +199,7 @@ const struct ft_entry GPFAR ft[] =
     {"words", f_words},		/* implemented as word(s,-1) */
     {"strftime",  f_strftime},  /* time to string */
     {"strptime",  f_strptime},  /* string to time */
+    {"time", f_time},		/* get current time */
     {"system", f_system},       /* "dynamic backtics" */
     {"exist", f_exists},	/* exists("foo") replaces defined(foo) */
     {"exists", f_exists},	/* exists("foo") replaces defined(foo) */

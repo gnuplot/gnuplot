@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.642 2010/12/14 23:06:18 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.643 2010/12/30 07:23:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1360,6 +1360,17 @@ C
 %tm_year(x)@int@the year
  The `tm_year` function interprets its argument as a time, in seconds from
  1 Jan 2000.  It returns the year (an integer) as a real.
+4 time
+?expressions time
+?functions time
+?time
+#time(x) & any & the current system time \\
+%time(x)@any@the current system time
+ The `time` function returns the current system time, in seconds from
+ 1 Jan 2000. This value can be converted to a date string with the 
+ `strftime` function, or it can be used in conjunction with the `timecolumn`
+ function to generate relative time/date plots. 
+ The argument to the `time` function is ignored.
 4 valid
 ?expressions functions valid
 ?functions valid

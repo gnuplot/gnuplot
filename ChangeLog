@@ -1,3 +1,11 @@
+2011-01-01  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/eval.c src/internal.c src/internal.h: 
+	New time() function to get the current system time
+	
+	* docs/gnuplot.doc demo/timedat.dem:
+	Documentation and demo for time()
+	
 2010-12-29  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/specfun.c (ranf):  Place more restrictions on seed values
