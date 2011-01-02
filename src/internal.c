@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.57 2010/09/18 22:00:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.58 2011/01/01 15:33:32 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1435,19 +1435,44 @@ f_strptime(union argument *arg)
     push(Gcomplex(&val, result, 0.0));
 }
 
-/* Get current system time in seconds since 2000 */
+/* Get current system time in seconds since 2000 
+ * The type of the value popped from the stack 
+ * determines what is returned.
+ * If integer, the result is also an integer.
+ * If real (complex), the result is also real, 
+ * with microsecond precision (if available).
+ * If string, it is assumed to be a format string, 
+ * and it is passed to strftime to get a formatted time string.
+ */
 void
 f_time(union argument *arg)
 {
-    struct value val;
-    double now;
+    struct value val, val2;
+    double time;
+    struct timeval tp;
     
     (void) arg; /* Avoid compiler warnings */
-    (void) real(pop(&val)); /* Unused argument */
+    pop(&val); 
+
+    gettimeofday(&tp, NULL);
+    tp.tv_sec -= SEC_OFFS_SYS;
+    time = tp.tv_sec + (tp.tv_usec/1000000.0);    
     
-    now = (double) time(NULL);
-    now -= SEC_OFFS_SYS;
-    push(Gcomplex(&val, now, 0.0));
+    switch(val.type) {
+	case INTGR:
+	    push(Ginteger(&val, tp.tv_sec));
+	    break;
+	case CMPLX:
+	    push(Gcomplex(&val, time, 0.0));
+	    break;
+	case STRING:
+	    push(&val); /* format string */
+	    push(Gcomplex(&val2, time, 0.0));
+	    f_strftime(arg);
+	    break;
+	default:
+	    int_error(NO_CARET,"internal error: invalid argument type");
+    }
 }
 
 

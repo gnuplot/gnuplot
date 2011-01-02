@@ -1,3 +1,8 @@
+2011-01-02  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/internal.c (f_time) docs/gnuplot.doc:
+	Modified time() so that type of result depends on type of argument
+
 2011-01-01  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/eval.c src/internal.c src/internal.h: 

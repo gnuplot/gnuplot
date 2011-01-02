@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.643 2010/12/30 07:23:41 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.644 2011/01/01 15:33:32 juhaszp Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1366,11 +1366,14 @@ C
 ?time
 #time(x) & any & the current system time \\
 %time(x)@any@the current system time
- The `time` function returns the current system time, in seconds from
- 1 Jan 2000. This value can be converted to a date string with the 
- `strftime` function, or it can be used in conjunction with the `timecolumn`
- function to generate relative time/date plots. 
- The argument to the `time` function is ignored.
+ The `time` function returns the current system time. This value can be 
+ converted to a date string with the `strftime` function, or it can be used
+ in conjunction with `timecolumn` to generate relative time/date plots. 
+ The type of the argument determines what is returned. If the argument is an
+ integer, time() returns the current time as an integer, in seconds from 
+ 1 Jan 2000. If the argument is real (or complex), the result is real as well.
+ If the argument is a string, it is assumed to be a format string, 
+ and it is passed to `strftime` to provide a formatted time string.
 4 valid
 ?expressions functions valid
 ?functions valid
