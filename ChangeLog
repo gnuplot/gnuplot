@@ -1,3 +1,8 @@
+2011-01-03  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/internal.c (f_time) src/stdfn.h docs/gnuplot.doc:
+	Fix breakage caused by the previous update
+
 2011-01-02  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/internal.c (f_time) docs/gnuplot.doc:

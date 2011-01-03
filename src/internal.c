@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.58 2011/01/01 15:33:32 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.59 2011/01/02 15:54:01 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1449,18 +1449,24 @@ f_time(union argument *arg)
 {
     struct value val, val2;
     double time;
+#ifdef HAVE_SYS_TIME_H
     struct timeval tp;
-    
-    (void) arg; /* Avoid compiler warnings */
-    pop(&val); 
 
     gettimeofday(&tp, NULL);
     tp.tv_sec -= SEC_OFFS_SYS;
-    time = tp.tv_sec + (tp.tv_usec/1000000.0);    
+    time = tp.tv_sec + (tp.tv_usec/1000000.0);
+#else
+
+	time = (double) time(NULL);
+	time -= SEC_OFFS_SYS;
+#endif
+
+    (void) arg; /* Avoid compiler warnings */
+    pop(&val); 
     
     switch(val.type) {
 	case INTGR:
-	    push(Ginteger(&val, tp.tv_sec));
+	    push(Ginteger(&val, (int) time));
 	    break;
 	case CMPLX:
 	    push(Gcomplex(&val, time, 0.0));
