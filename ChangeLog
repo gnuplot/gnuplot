@@ -1,3 +1,8 @@
+2011-01-07  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/unset.c (reset_command):
+	"reset" didn't restore default for "set raxis"
+
 2011-01-03  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/internal.c (f_time) src/stdfn.h docs/gnuplot.doc:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.140 2010/11/18 23:59:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.141 2010/12/05 00:01:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1708,6 +1708,7 @@ reset_command()
 
 	reset_logscale(axis);
     }
+    raxis = TRUE;
 
     unset_boxplot();
     unset_boxwidth();
