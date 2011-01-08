@@ -1,3 +1,8 @@
+2011-01-08  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
+
+	* src/internal.c (f_time): Don't use a local variable of the same
+	name as a function you're trying to call.
+
 2011-01-07  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/unset.c (reset_command):

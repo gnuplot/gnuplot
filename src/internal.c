@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.59 2011/01/02 15:54:01 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.60 2011/01/03 14:30:31 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -40,7 +40,7 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.59 2011/01/02 15:54:01 
 #include "stdfn.h"
 #include "alloc.h"
 #include "util.h"		/* for int_error() */
-# include "gp_time.h"           /* for str(p|f)time */
+#include "gp_time.h"           /* for str(p|f)time */
 #include "command.h"            /* for do_system_func */
 #include "variable.h" /* For locale handling */
 
@@ -1448,17 +1448,17 @@ void
 f_time(union argument *arg)
 {
     struct value val, val2;
-    double time;
+    double time_now;
 #ifdef HAVE_SYS_TIME_H
     struct timeval tp;
 
     gettimeofday(&tp, NULL);
     tp.tv_sec -= SEC_OFFS_SYS;
-    time = tp.tv_sec + (tp.tv_usec/1000000.0);
+    time_now = tp.tv_sec + (tp.tv_usec/1000000.0);
 #else
 
-	time = (double) time(NULL);
-	time -= SEC_OFFS_SYS;
+    time_now = (double) time(NULL);
+    time_now -= SEC_OFFS_SYS;
 #endif
 
     (void) arg; /* Avoid compiler warnings */
@@ -1466,14 +1466,14 @@ f_time(union argument *arg)
     
     switch(val.type) {
 	case INTGR:
-	    push(Ginteger(&val, (int) time));
+	    push(Ginteger(&val, (int) time_now));
 	    break;
 	case CMPLX:
-	    push(Gcomplex(&val, time, 0.0));
+	    push(Gcomplex(&val, time_now, 0.0));
 	    break;
 	case STRING:
 	    push(&val); /* format string */
-	    push(Gcomplex(&val2, time, 0.0));
+	    push(Gcomplex(&val2, time_now, 0.0));
 	    f_strftime(arg);
 	    break;
 	default:
