@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: linux.trm,v 1.28 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: linux.trm,v 1.29 2006/07/21 02:35:47 sfeam Exp $
  *
  */
 
@@ -239,7 +239,7 @@ LINUX_linetype(int linetype)
 	linetype = LT_BLACK;
     if (linetype >= 13)
 	linetype %= 13;
-    vga_setcolor(vgacolor[linetype + 2]);
+    vga_setegacolor(vgacolor[linetype + 2]);
 }
 
 TERM_PUBLIC void

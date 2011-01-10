@@ -1,3 +1,11 @@
+2011-01-10  David Kuehling <dvdkhlng@gmx.de>
+
+	* term/linux.trm:  Makes linux.trm work with all SVGAlib video modes,
+	not only 16 and 256-color modes.
+
+	* src/term.c(init_terminal):  Correct the auto-selection of terminal
+	type vgagl or linux.  Only select vgagl if lib3dkit is present.
+
 2010-12-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.h src/graphics.c:  Use t->set_color() rather than
