@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.211 2010/11/14 00:06:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.212 2010/11/16 20:59:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1808,7 +1808,7 @@ init_terminal()
    LINUX_setup has failed, also if we are logged in by network */
 #ifdef LINUXVGA
 	if (LINUX_graphics_allowed)
-#ifdef VGAGL
+#if defined(VGAGL) && defined (THREEDKIT)
 	    term_name = "vgagl";
 #else
 	    term_name = "linux";
