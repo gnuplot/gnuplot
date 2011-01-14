@@ -1,3 +1,8 @@
+2011-01-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots):  Minimum value of polar axis always
+	auto-scales to 0 (already documented but implementation lacked).
+
 2011-01-10  David Kuehling <dvdkhlng@gmx.de>
 
 	* term/linux.trm:  Makes linux.trm work with all SVGAlib video modes,

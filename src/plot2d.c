@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.236 2010/11/18 23:59:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.237 2010/11/19 04:03:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2636,8 +2636,9 @@ eval_plots()
 				    this_plot->points[i].type = OUTRANGE;
 			    }
 			    if (temp < R_AXIS.min) {
+				/* FIXME: could do this outside the loop */
 				if (R_AXIS.autoscale & AUTOSCALE_MIN)
-				    R_AXIS.min = (temp>0) ? 0 : temp;
+				    R_AXIS.min = 0;
 			    }
 			    if (R_AXIS.log) {
 				temp = AXIS_DO_LOG(POLAR_AXIS,temp)
