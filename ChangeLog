@@ -1,5 +1,23 @@
 2011-01-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	Installer for Windows. Japanese translation by Shigeharu Takeno.
+
+	* win/gnuplot.iss win/modpath.iss: Installer script to be compiled by
+	Inno Setup. New files.
+
+	* win/Copyright-ja.txt: Japanese translation of Copyright, includes
+	original text. Encoding is Shift-JIS.
+
+	* win/README-Windows.txt win/README-Windows-ja.txt: New files, 
+	displayed by installer before installation. Based on Tatsuro Matsuoka's
+	README.Windows.gpteam and README.
+
+	* config/mingw/Makefile: New make target 'installer'.
+
+	* Makefile.am (EXTRA_DIST): Include win/
+
+2011-01-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
 	* config/mingw/Makefile config/msvc/Makefile src/plot.c:
 	GNUPLOT_SHARE_DIR is relative to gnuplot directory on Windows.
 

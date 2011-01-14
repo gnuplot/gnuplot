@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.14.2.1 2011/12/11 11:45:24 markisch Exp $
+# $Id: Makefile,v 1.14.2.2 2012/01/14 08:01:14 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -161,6 +161,10 @@ endif
 
 # GNU sort
 GNUSORT = /bin/sort
+
+# Inno Setup Compiler
+# get it from: http://www.jrsoftware.org/isdl.php
+ISCC = "$(PROGRAMFILES)/Inno Setup 5/iscc"
 
 # Directory that might contain extra files to be shipped with the installer.
 # This should include dependencies like DLLs, but also fontconfig configuration files.
@@ -644,7 +648,7 @@ allterm.h: $(CORETERM)
 	  sed '/^ *$$/d;/^#/d' > allterm.h
 	@rm -f allterm.c
 endif
-doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h
+doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h $(CORETERM)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DALL_TERM_DOC $(CFLAGS) \
 	  -I. -I$(D) -I$(T) $(D)doc2tex.c $(D)termdoc.c
 else
@@ -752,12 +756,13 @@ ifdef LUA
 endif
 # README etc
 	cp -p $(TOP)/Copyright $(DESTDIR)/
+	cp -p $(TOP)/win/Copyright-ja.txt $(DESTDIR)/
 	cp -p $(TOP)/README $(DESTDIR)/
 	cp -p $(TOP)/NEWS $(DESTDIR)/
 	cp -p $(TOP)/ChangeLog $(DESTDIR)/
 	cp -p $(TOP)/BUGS $(DESTDIR)/
-#	cp -p $(TOP)/win/README.Windows $(DESTDIR)/
-	cp -p $(TOP)/src/win/README.win-ja $(DESTDIR)/
+	cp -p $(TOP)/win/README-Windows.txt $(DESTDIR)/
+	cp -p $(TOP)/win/README-Windows-ja.txt $(DESTDIR)/
 # demo and contrib
 	mkdir -p $(DESTDIR)/demo
 	-cp -p $(M)* $(DESTDIR)/demo/
@@ -770,3 +775,10 @@ endif
 ifdef EXTRADIST
 	cp -pR $(EXTRADIST)/* $(DESTDIR)/
 endif
+
+installer:
+	$(MAKE) DESTDIR=./dist install
+	cp -p grpicon.ico ./dist/bin/
+	cp -p $(TOP)/win/*.iss ./dist
+	(cd ./dist; $(ISCC) gnuplot.iss)
+	mv ./dist/gp*-setup.exe .

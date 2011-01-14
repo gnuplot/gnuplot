@@ -38,6 +38,8 @@ New features, changes and fixes since gnuplot version 4.4
 * NEW tab-completion for builtin readline
 * NEW windows terminal can save graph as EMF file
 * NEW cubehelix scheme for color palettes
+* NEW localisation support for Windows help and menu file
+* NEW Windows installer
 * NEW shared initialization file $GNUPLOT_SHARE_DIR/gnuplotrc
 * FIX length estimation of UTF-8 strings
 * FIX accurate placement of color boundaries in the colorbar
