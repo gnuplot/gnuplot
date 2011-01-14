@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.134 2012/01/08 19:32:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.135 2012/01/09 19:50:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -98,7 +98,7 @@ extern smg$create_key_table();
 # ifndef SIGINT
 #  define SIGINT 2		/* for MSC */
 # endif
-# include "win/wgnuplib.h"
+# include "win/winmain.h"
 # include "win/wcommon.h"
 #endif /* _Windows */
 
@@ -709,8 +709,17 @@ load_rcfile(int where)
 
     if (where == 0) {
 #ifdef GNUPLOT_SHARE_DIR
+# if defined(_Windows)
+	/* retrieve path relative to gnuplot executable,
+	 * whose path is in szModuleName (winmain.c) */
+	rcfile = gp_alloc(strlen((char *)szPackageDir) + 1 +
+		strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
+	strcpy(rcfile, (char *)szPackageDir);
+	PATH_CONCAT(rcfile, GNUPLOT_SHARE_DIR);
+# else
 	rcfile = (char *) gp_alloc(strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
 	strcpy(rcfile, GNUPLOT_SHARE_DIR);
+# endif
 	PATH_CONCAT(rcfile, "gnuplotrc");
 	plotrc = fopen(rcfile, "r");
 #endif

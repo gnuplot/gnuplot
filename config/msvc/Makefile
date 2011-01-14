@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2011/11/27 22:18:36 markisch Exp $
+# $Id: Makefile,v 1.4 2011/12/06 20:31:50 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -41,7 +41,7 @@
 
 # Compilation options, disable by setting to zero
 # Is libgd available? (required by terminal png/jpeg/gif)?
-GDLIB = 0
+GDLIB = 1
 # Is pdflib available? (required by terminal pdf)
 PDFLIB = 0
 # Build wxt terminal? (required GTK, wxWidgets, cairo and pango libraries)
@@ -49,7 +49,7 @@ PDFLIB = 0
 #     http://wiki.wxwidgets.org/Visual_Studio_2008_%289.0%29
 WXT = 0
 # Build the lua/tikz terminal?
-LUA = 0
+LUA = 1
 # Choose help format:
 # for HTML help (.chm) this should be 1, for (.hlp) it should be 0
 HTML_HELP = 1
@@ -73,6 +73,9 @@ GNUPLOT_JS_DIR = share\\js
 # Similarly for scripts used by the lua terminal
 GNUPLOT_LUA_DIR = share\\lua
 
+# gnuplot will look for gnuplotrc here:
+GNUPLOT_SHARE_DIR = share
+
 #CC = cl
 LD = link
 
@@ -85,6 +88,7 @@ LD = link
 # /MD means include multi-thread support (DLL)
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
+CFLAGS = $(CFLAGS) /DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 WIN_CFLAGS = /DUSE_FAKEPIPES
 CONSOLE_CFLAGS = /DWGP_CONSOLE /DCONSOLE_SWITCH_CP /DPIPES
 OPTIONS = /DUSE_MOUSE
