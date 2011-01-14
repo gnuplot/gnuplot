@@ -18,8 +18,11 @@
 
 2011-01-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* tutorial/linepoin.plt: Avoid deprecated syntax.
+
 	* config/mingw/Makefile config/msvc/Makefile src/plot.c:
 	GNUPLOT_SHARE_DIR is relative to gnuplot directory on Windows.
+	Extend build support for documentation, include in installer.
 
 2012-01-11  Ethan A Merritt  <merritt@u.washington.edu>
 

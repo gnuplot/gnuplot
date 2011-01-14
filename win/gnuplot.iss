@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.2 2012/01/12 17:25:26 sfeam Exp $
+; $Id: gnuplot.iss,v 1.2.2.2 2012/01/14 08:16:17 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -151,6 +151,7 @@ Name: "{group}\{#MyAppName} Help (Japanese)"; Filename: {app}\bin\wgnuplot-ja.ch
 Name: "{group}\{#MyAppName} Documentation"; Filename: {app}\docs\gnuplot.pdf; Components: docs; Flags: CreateOnlyIfFileExists;
 Name: "{group}\{#MyAppName} FAQ"; Filename: {app}\docs\FAQ.pdf; Components: docs; Flags: CreateOnlyIfFileExists;
 Name: "{group}\{#MyAppName} Quick Reference"; Filename: {app}\docs\gpcard.pdf; Components: docs; Flags: CreateOnlyIfFileExists;
+Name: "{group}\{#MyAppName} LaTeX Tutorial"; Filename: {app}\docs\tutorial.pdf; Components: docs; Flags: CreateOnlyIfFileExists;
 Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName} {#MyAppVersionShort}"; Filename: "{app}\bin\{#MyAppExeName}"; Tasks: desktopicon; WorkingDir: {userdocs}; Components: core;
