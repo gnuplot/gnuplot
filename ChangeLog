@@ -1,7 +1,12 @@
 2011-01-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* tutorial/linepoin.plt: Avoid deprecated syntax.
+
+	* win/gnuplot.iss: Create startup menu item for tutorial.pdf.
+
 	* config/mingw/Makefile config/msvc/Makefile src/plot.c:
 	GNUPLOT_SHARE_DIR is relative to gnuplot directory on Windows.
+	Extend build support for documentation, include in installer.
 
 2012-01-12  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
@@ -29,8 +34,8 @@
 	* src/plot.c:  Allow shell commands from ~/.gnuplot but not from shared
 	initialization files.
 
-	* configure.in:  Report status of aquaterm configuration correctly
-	(Lutz Maibaum)
+	* configure.in: Report status of aquaterm configuration correctly
+	(Lutz Maibaum).
 
 2012-01-07  Ethan A Merritt  <merritt@u.washington.edu>
 

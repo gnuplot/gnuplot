@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.1 2011/12/23 13:19:11 markisch Exp $
+; $Id: gnuplot.iss,v 1.2 2012/01/12 17:25:26 sfeam Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -151,6 +151,7 @@ Name: "{group}\{#MyAppName} Help (Japanese)"; Filename: {app}\bin\wgnuplot-ja.ch
 Name: "{group}\{#MyAppName} Documentation"; Filename: {app}\docs\gnuplot.pdf; Components: docs; Flags: CreateOnlyIfFileExists;
 Name: "{group}\{#MyAppName} FAQ"; Filename: {app}\docs\FAQ.pdf; Components: docs; Flags: CreateOnlyIfFileExists;
 Name: "{group}\{#MyAppName} Quick Reference"; Filename: {app}\docs\gpcard.pdf; Components: docs; Flags: CreateOnlyIfFileExists;
+Name: "{group}\{#MyAppName} LaTeX Tutorial"; Filename: {app}\docs\tutorial.pdf; Components: docs; Flags: CreateOnlyIfFileExists;
 Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName} {#MyAppVersionShort}"; Filename: "{app}\bin\{#MyAppExeName}"; Tasks: desktopicon; WorkingDir: {userdocs}; Components: core;
@@ -241,7 +242,6 @@ ja.defaultterm=gnuplot のデフォルト出力形式 (terminal) の選択:
 ja.termpreserve=GNUTERM 環境変数を変更しない
 ja.other=Other tasks:
 ja.setassociations=ファイルの関連づけを行う:
-; ja.path=Add application directory to PATH environment variable
 ja.path=実行ファイルのディレクトリを PATH 環境変数に追加する
 ; actions
 ja.view=%1 を表示する

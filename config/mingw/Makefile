@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.19 2011/12/23 13:21:26 markisch Exp $
+# $Id: Makefile,v 1.20 2012/01/14 07:55:14 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -43,11 +43,11 @@ HTML_HELP=1
 # fontconfig or iconv; then, uncomment GDAUTOCONFIGLIBS so that all of the
 # libraries needed for linking will be taken by running 'gdlib-config'.
 # Uncomment BGD if you want to use the binary DLL version of libgd.
-NEWGD=1
-JPEG=1
-FREETYPE=1
+#NEWGD=1
+#JPEG=1
+#FREETYPE=1
 #GDAUTOCONFIGLIBS=1
-BGD=1
+#BGD=1
 
 # PDF device driver
 # Requires PNG and Z libraries based on particular PDF library used, and
@@ -73,17 +73,17 @@ MOUSE=1
 # Cairo/Pango terminals
 # Uncomment the following lines to select the pngcairo and pdfcairo
 # terminals
-CAIROTERMS=1
-CAIROLIBS=1
+#CAIROTERMS=1
+#CAIROLIBS=1
 
 # WXWIDGETS interactive terminal
 # Requires wxWidgets, Cairo, Pango, and their respective dependencies.
 # Uncomment the following lines to compile it.
-WXT=1
-CAIROLIBS=1
+#WXT=1
+#CAIROLIBS=1
 
 # Uncomment the following line to select the lua/tikz terminal
-LUA=lua5.1
+#LUA=lua5.1
 
 # Uncomment if you have libiconv
 ICONV=1
@@ -116,8 +116,7 @@ GNUPLOT_SHARE_DIR = share
 
 # Destination directory, used in 'make install':
 #DESTDIR = /local/opt/gnuplot-4.5
-#DESTDIR = "$(PROGRAMFILES)/gnuplot"
-DESTDIR = "$(USERPROFILE)/Desktop/gnuplot"
+DESTDIR = "$(PROGRAMFILES)/gnuplot"
 
 # give here the path to MinGW compiler unless it is already in PATH
 #GCCPATH = g:/mingw32/bin/
@@ -169,7 +168,6 @@ ISCC = "$(PROGRAMFILES)/Inno Setup 5/iscc"
 # Directory that might contain extra files to be shipped with the installer.
 # This should include dependencies like DLLs, but also fontconfig configuration files.
 #EXTRADIST = /d/Software/gnuplot-misc/gp-dist
-EXTRADIST = "$(USERPROFILE)/Desktop/gnuplot-dist"
 
 #
 # *************** End of Configuration section *************************
@@ -262,7 +260,6 @@ S=$(TOP)/src
 W=$(S)/win
 T=$(TOP)/term/
 D=$(TOP)/docs/
-L=docs/latex/
 M=$(TOP)/demo/
 
 VPATH = $(S)
@@ -417,7 +414,8 @@ pipes:
 	$(MAKE) TARGET=wgnuplot_pipes.exe wgnuplot_pipes.exe
 
 docs:
-	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf
+	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf gpcard.pdf tutorial.pdf \
+		ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
 
 support: $(HELPFILE) $(M)bf_test.exe $(PGNUPLOT) $(LUATARGETS) $(HELPFILEJA)
 
@@ -693,6 +691,44 @@ gnuplot.pdf: gnuplot-figures.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.te
 	mv gp_tex2.pdf gnuplot.pdf
 	rm -f gp_tex2.*
 
+TUT = $(TOP)/tutorial
+tutorial.pdf: $(TUT)/eg1.plt $(TUT)/eg2.plt $(TUT)/eg3.plt $(TUT)/eg4.plt \
+	$(TUT)/eg5.plt $(TUT)/eg6.plt $(TUT)/eg7.plt $(TUT)/linepoin.plt \
+	$(TUT)/test.plt $(TUT)/test_tikz.plt $(TUT)/tutorial.tex
+	GNUPLOT_LIB=$(TUT) gnuplot eg1.plt
+	GNUPLOT_LIB=$(TUT) gnuplot eg2.plt
+	GNUPLOT_LIB=$(TUT) gnuplot eg3.plt
+	GNUPLOT_LIB=$(TUT) gnuplot eg4.plt
+	GNUPLOT_LIB=$(TUT) gnuplot eg5.plt
+	GNUPLOT_LIB=$(TUT) gnuplot eg6.plt
+	GNUPLOT_LIB=$(TUT) GNUPLOT_PS_DIR=$(T)PostScript gnuplot eg7.plt
+	GNUPLOT_LIB=$(TUT) gnuplot linepoin.plt
+	GNUPLOT_LIB=$(TUT) gnuplot test.plt
+	GNUPLOT_LIB=$(TUT) GNUPLOT_LUA_DIR=$(T)lua gnuplot test_tikz.plt
+	# run latex twice to get refernces right
+	TEXINPUTS=.:$(TUT) latex tutorial.tex
+	TEXINPUTS=.:$(TUT) latex tutorial.tex
+	dvipdfm tutorial.dvi
+
+gpcard.pdf: $(D)gpcard.tex
+	TEXINPUTS=$(TOP):$(D):${TEXINPUTS}: tex gpcard.tex
+	dvipdfm gpcard.dvi
+
+ps_symbols.pdf: $(D)psdoc/ps_symbols.gpi
+	GNUPLOT_LIB=$(D)psdoc GNUPLOT_PS_DIR=$(T)PostScript $(TARGET) ps_symbols.gpi
+	ps2pdf ps_symbols.ps
+
+ps_fontfile_doc.ps: $(D)psdoc/ps_fontfile_doc.tex
+	TEXINPUTS=$(D)psdoc:${TEXINPUTS}: latex ps_fontfile_doc
+	TEXINPUTS=$(D)psdoc:${TEXINPUTS}: latex ps_fontfile_doc
+	dvips -j0 ps_fontfile_doc
+
+ps_fontfile_doc.pdf: $(D)psdoc/ps_fontfile_doc.tex
+	TEXINPUTS=$(D)psdoc:${TEXINPUTS}: pdflatex ps_fontfile_doc
+	TEXINPUTS=$(D)psdoc:${TEXINPUTS}: pdflatex ps_fontfile_doc
+
+ps_guide.pdf: $(D)psdoc/ps_guide.ps
+	ps2pdf $(D)psdoc/ps_guide.ps ps_guide.pdf
 
 # clean up temporary files
 clean:
@@ -772,7 +808,17 @@ endif
 	-cp -p $(TOP)/pm3d/contrib/* $(DESTDIR)/contrib/pm3d/
 # docs
 	mkdir -p $(DESTDIR)/docs
-	cp -p gnuplot.pdf $(DESTDIR)/docs/
+	-cp -p gnuplot.pdf $(DESTDIR)/docs/
+	cp -p $(TOP)/FAQ.pdf $(DESTDIR)/docs/
+	-cp -p gpcard.pdf $(DESTDIR)/docs/
+	-cp -p tutorial.pdf $(DESTDIR)/docs/
+	mkdir -p $(DESTDIR)/docs/psdoc
+	cp -p $(D)psdoc/ps_file.doc $(DESTDIR)/docs/psdoc/ps_file_doc.txt
+	cp -p $(D)psdoc/ps_guide.ps $(DESTDIR)/docs/psdoc/
+	-cp -p ps_guide.pdf $(DESTDIR)/docs/psdoc/
+	-cp -p ps_symbols.ps $(DESTDIR)/docs/psdoc/
+	-cp -p ps_symbols.pdf $(DESTDIR)/docs/psdoc/
+	-cp -p ps_fontfile_doc.pdf $(DESTDIR)/docs/psdoc/
 # runtime libraries, configuration files etc.
 ifdef EXTRADIST
 	cp -pR $(EXTRADIST)/* $(DESTDIR)/
