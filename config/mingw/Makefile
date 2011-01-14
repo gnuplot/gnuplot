@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.14 2011/10/01 20:55:36 markisch Exp $
+# $Id: Makefile,v 1.14.2.1 2011/12/11 11:45:24 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -43,11 +43,11 @@ HTML_HELP=1
 # fontconfig or iconv; then, uncomment GDAUTOCONFIGLIBS so that all of the
 # libraries needed for linking will be taken by running 'gdlib-config'.
 # Uncomment BGD if you want to use the binary DLL version of libgd.
-#NEWGD=1
-#JPEG=1
-#FREETYPE=1
+NEWGD=1
+JPEG=1
+FREETYPE=1
 #GDAUTOCONFIGLIBS=1
-#BGD=1
+BGD=1
 
 # PDF device driver
 # Requires PNG and Z libraries based on particular PDF library used, and
@@ -73,17 +73,17 @@ MOUSE=1
 # Cairo/Pango terminals
 # Uncomment the following lines to select the pngcairo and pdfcairo
 # terminals
-#CAIROTERMS=1
-#CAIROLIBS=1
+CAIROTERMS=1
+CAIROLIBS=1
 
 # WXWIDGETS interactive terminal
 # Requires wxWidgets, Cairo, Pango, and their respective dependencies.
 # Uncomment the following lines to compile it.
-#WXT=1
-#CAIROLIBS=1
+WXT=1
+CAIROLIBS=1
 
 # Uncomment the following line to select the lua/tikz terminal
-#LUA=lua5.1
+LUA=lua5.1
 
 # Uncomment if you have libiconv
 ICONV=1
@@ -108,9 +108,16 @@ GNUPLOT_JS_DIR = share/js
 # Similarly for scripts used by the lua terminal
 GNUPLOT_LUA_DIR = share/lua
 
+# Install will put TeX files here:
+GNUPLOT_TEX_DIR = share/texmf/tex
+
+# gnuplot will look for gnuplotrc here:
+GNUPLOT_SHARE_DIR = share
+
 # Destination directory, used in 'make install':
 #DESTDIR = /local/opt/gnuplot-4.5
-DESTDIR = "$(PROGRAMFILES)/gnuplot"
+#DESTDIR = "$(PROGRAMFILES)/gnuplot"
+DESTDIR = "$(USERPROFILE)/Desktop/gnuplot"
 
 # give here the path to MinGW compiler unless it is already in PATH
 #GCCPATH = g:/mingw32/bin/
@@ -260,6 +267,7 @@ TERMFLAGS += -I$(TOP)/term
 TERMLIBS =
 
 CFLAGS += -I. -I$(S) -D_Windows -DHAVE_CONFIG_H $(OPTS)
+CFLAGS += -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 
 ifdef RELEASE
   CFLAGS += -DRELEASE_VERSION
@@ -543,7 +551,7 @@ endif
 JA = ja/
 JAD = $(JA)docs/
 JADW = $(JAD)windows/
-# Random file which receives patches by term-ja.diff to get dependicies right
+# Random file which receives patches by term-ja.diff to get dependencies right
 JASRC = $(JA)term/cairo.trm
 
 $(JASRC): $(D)gnuplot-ja.doc $(D)term-ja.diff $(CORETERM)
@@ -721,20 +729,26 @@ endif
 # terminal support files
 	mkdir -p $(DESTDIR)/$(GNUPLOT_PS_DIR)
 	cp -p $(TOP)/term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)/
+	cp -p $(TOP)/term/PostScript/*.txt $(DESTDIR)/$(GNUPLOT_PS_DIR)/
 	mkdir -p $(DESTDIR)/$(GNUPLOT_JS_DIR)
 	cp -p $(TOP)/term/js/*.* $(DESTDIR)/$(GNUPLOT_JS_DIR)/
 	cp -p $(TOP)/term/js/README $(DESTDIR)/$(GNUPLOT_JS_DIR)/
-	mkdir -p $(DESTDIR)/share/LaTeX
-	cp -p $(TOP)/share/LaTeX/README $(DESTDIR)/share/LaTeX/
-	cp -p $(TOP)/share/LaTeX/gnuplot.cfg $(DESTDIR)/share/LaTeX/
+	mkdir -p $(DESTDIR)/$(GNUPLOT_TEX_DIR)/generic/gnuplot
+	mkdir -p $(DESTDIR)/$(GNUPLOT_TEX_DIR)/plain/gnuplot
+	mkdir -p $(DESTDIR)/$(GNUPLOT_TEX_DIR)/latex/gnuplot
+	mkdir -p $(DESTDIR)/$(GNUPLOT_TEX_DIR)/context/gnuplot
+	cp -p $(TOP)/share/LaTeX/README $(DESTDIR)/$(GNUPLOT_TEX_DIR)/latex/gnuplot/
+	cp -p $(TOP)/share/LaTeX/gnuplot.cfg $(DESTDIR)/$(GNUPLOT_TEX_DIR)/latex/gnuplot/
 ifdef LUA
 	mkdir -p $(DESTDIR)/$(GNUPLOT_LUA_DIR)
 	cp -p $(TOP)/term/lua/README $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
 	cp -p $(TOP)/term/lua/NEWS $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
 	cp -p $(TOP)/term/lua/TODO $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
 	cp -p $(TOP)/term/lua/gnuplot-tikz.lua $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
-	cp -p gnuplot-lua-tikz.sty gnuplot-lua-tikz.tex $(DESTDIR)/share/LaTeX/
-	cp -p gnuplot-lua-tikz-common.tex t-gnuplot-lua-tikz.tex $(DESTDIR)/share/LaTeX/
+	cp -p gnuplot-lua-tikz.sty $(DESTDIR)/$(GNUPLOT_TEX_DIR)/latex/gnuplot/
+	cp -p gnuplot-lua-tikz.tex $(DESTDIR)/$(GNUPLOT_TEX_DIR)/plain/gnuplot/
+	cp -p t-gnuplot-lua-tikz.tex $(DESTDIR)/$(GNUPLOT_TEX_DIR)/context/gnuplot/
+	cp -p gnuplot-lua-tikz-common.tex $(DESTDIR)/$(GNUPLOT_TEX_DIR)/generic/gnuplot/
 endif
 # README etc
 	cp -p $(TOP)/Copyright $(DESTDIR)/

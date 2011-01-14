@@ -1,3 +1,8 @@
+2011-01-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile config/msvc/Makefile src/plot.c:
+	GNUPLOT_SHARE_DIR is relative to gnuplot directory on Windows.
+
 2012-01-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.h src/util3d.c (edge3d_intersect two_edge3d_intersect) 
@@ -89,7 +94,7 @@
 	Do not allow execution of system(), shell, or popen() commands in the
 	initialization files.
 
-	* src/plot.c show/plot.c: More compact splash page.
+	* src/plot.c src/show.c: More compact splash page.
 
 	* src/graphics.c src/graphics.h src/graph3d.c:
 	Strangely, the final parameter of place_objects(,,,clip_area) was

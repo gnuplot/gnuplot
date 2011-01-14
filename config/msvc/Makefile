@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2011/12/06 20:31:50 markisch Exp $
+# $Id: Makefile,v 1.2.2.1 2011/12/11 11:44:57 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -73,6 +73,9 @@ GNUPLOT_JS_DIR = share\\js
 # Similarly for scripts used by the lua terminal
 GNUPLOT_LUA_DIR = share\\lua
 
+# gnuplot will look for gnuplotrc here:
+GNUPLOT_SHARE_DIR = share
+
 #CC = cl
 LD = link
 
@@ -85,6 +88,7 @@ LD = link
 # /MD means include multi-thread support (DLL)
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
+CFLAGS = $(CFLAGS) /DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 CONSOLE_CFLAGS = /DWGP_CONSOLE /DCONSOLE_SWITCH_CP /DPIPES
 OPTIONS = /DUSE_MOUSE
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
