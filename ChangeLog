@@ -1,3 +1,7 @@
+2011-01-15 Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.mgw: Sync with configure.
+
 2011-01-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Installer for Windows. Japanese translation by Shigeharu Takeno.
