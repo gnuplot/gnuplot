@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.61 2010/11/08 00:43:38 sfeam Exp $
+ * $Id: axis.h,v 1.62 2010/11/18 23:59:59 sfeam Exp $
  *
  */
 
@@ -664,15 +664,6 @@ do {									  \
 /* #define NOOP (0) caused many warnings from gcc 3.2 */
 /* Now trying ((void)0) */
 #define NOOP ((void)0)
-
-/* HBB 20000506: new macro, initializes one variable to the same
- * value, for all axes. */
-#define INIT_AXIS_ARRAY(field, value)		\
-do {						\
-    int tmp;					\
-    for (tmp=0; tmp<AXIS_ARRAY_SIZE; tmp++)	\
-	axis_array[tmp].field=(value);		\
-} while(0)
 
 /* HBB 20000506: new macro to automatically build intializer lists
  * for arrays of AXIS_ARRAY_SIZE equal elements */

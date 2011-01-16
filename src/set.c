@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.334 2010/12/05 00:01:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.335 2010/12/09 04:13:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -819,7 +819,9 @@ set_autoscale()
 
     c_token++;
     if (END_OF_COMMAND) {
-	INIT_AXIS_ARRAY(set_autoscale , AUTOSCALE_BOTH);
+	int axis;
+	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
+	    axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
 	return;
     } else if (equals(c_token, "xy") || equals(c_token, "yx")) {
 	axis_array[FIRST_X_AXIS].set_autoscale =
@@ -2205,15 +2207,15 @@ set_locale()
 static void
 set_logscale()
 {
+    TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(FALSE);
+    int axis;
+    double newbase = 10;
     c_token++;
-    if (END_OF_COMMAND) {
-	INIT_AXIS_ARRAY(log,TRUE);
-	INIT_AXIS_ARRAY(base, 10.0);
-    } else {
-	TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(FALSE);
-	int axis;
-	double newbase = 10;
 
+    if (END_OF_COMMAND) {
+	for (axis = 0; axis < LAST_REAL_AXIS; axis++)
+	    set_for_axis[axis] = TRUE;
+    } else {
 	/* do reverse search because of "x", "x1", "x2" sequence in axisname_tbl */
 	int i = 0;
 	while (i < token[c_token].length) {
@@ -2234,14 +2236,15 @@ set_logscale()
 		int_error(c_token,
 			  "log base must be > 1.0; logscale unchanged");
 	}
+    }
 
-	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
-	    if (set_for_axis[axis]) {
-		axis_array[axis].log = TRUE;
-		axis_array[axis].base = newbase;
-		axis_array[axis].log_base = log(newbase);
-		if ((axis == POLAR_AXIS) && polar)
-		    rrange_to_xy();
+    for (axis = 0; axis <= LAST_REAL_AXIS; axis++) {
+	if (set_for_axis[axis]) {
+	    axis_array[axis].log = TRUE;
+	    axis_array[axis].base = newbase;
+	    axis_array[axis].log_base = log(newbase);
+	    if ((axis == POLAR_AXIS) && polar)
+		rrange_to_xy();
 	}
     }
 

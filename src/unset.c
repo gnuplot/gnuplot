@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.141 2010/12/05 00:01:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.142 2011/01/07 18:24:25 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -626,7 +626,9 @@ static void
 unset_autoscale()
 {
     if (END_OF_COMMAND) {
-	INIT_AXIS_ARRAY(set_autoscale, FALSE);
+	int axis;
+	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
+	    axis_array[axis].set_autoscale = FALSE;
     } else if (equals(c_token, "xy") || equals(c_token, "tyx")) {
 	axis_array[FIRST_X_AXIS].set_autoscale
 	    = axis_array[FIRST_Y_AXIS].set_autoscale = AUTOSCALE_NONE;

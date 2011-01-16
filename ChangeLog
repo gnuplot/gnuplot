@@ -1,3 +1,10 @@
+2011-01-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_logscale set_autoscale) src/unset.c (unset_autoscale)
+	src/axis.h docs/gnuplot.doc:  Remove macro INIT_AXIS_ARRAY.
+	"set logscale" should not affect pseudo-axes.
+	Bug #3159062
+
 2011-01-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots):  Minimum value of polar axis always

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.645 2011/01/02 15:54:01 juhaszp Exp $
+C RCS $Id: gnuplot.doc,v 1.646 2011/01/03 14:30:31 juhaszp Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8647,14 +8647,14 @@ Ffigure_mapcontours
 ?logscale
 ?nologscale
  Syntax:
-       set logscale <axes> <base>
+       set logscale <axes> {<base>}
        unset logscale <axes>
        show logscale
 
- where <axes> may be any combinations of `x`, `x2`, `y`, `y2`, `z`, and `cb` in
- any order, and where <base> is the base of the log scaling.  If <base> is not
- given, then 10 is assumed.  If <axes> is not given, then all axes are assumed.
- The command `unset logscale` turns off log scaling for the specified axes.
+ where <axes> may be any combinations of `x`, `x2`, `y`, `y2`, `z`, `cb`, and
+ `r` in any order.  <base> is the base of the log scaling (default is base 10).
+ If no axes are specified, the command affects all axes except `r`.
+ The command `unset logscale` turns off log scaling for all axes.
 
  Examples:
 
