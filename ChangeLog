@@ -1,3 +1,9 @@
+2011-01-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/win/wgraph.c:  Pass mouse wheel events through to the core
+	mousing code so that interactive pan/zoom works from the windows
+	terminal.
+
 2011-01-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_logscale set_autoscale) src/unset.c (unset_autoscale)

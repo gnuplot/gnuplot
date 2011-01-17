@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.84 2010/12/14 23:02:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.85 2010/12/17 18:19:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -45,6 +45,10 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.84 2010/12/14 23:02:23 br
 #endif
 
 #define STRICT
+#if defined(WIN32) && defined(USE_MOUSE)
+/* shige: for mouse wheel */
+#define __WIN32_WINNT 0x0400
+#endif
 #include <windows.h>
 #include <windowsx.h>
 #if WINVER >= 0x030a
@@ -2203,6 +2207,28 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case WM_MBUTTONDOWN:
 				Wnd_exec_event(lpgw, lParam, GE_buttonpress, 2);
 				return 0L;
+
+#if _WIN32_WINNT >= 0x0400
+			/* shige : mouse wheel support */
+			case WM_MOUSEWHEEL: {
+			    WORD fwKeys;
+			    short int zDelta;
+			    int modifier_mask;
+
+			    fwKeys = LOWORD(wParam);
+			    zDelta = HIWORD(wParam);
+			    modifier_mask = ((fwKeys & MK_SHIFT)? Mod_Shift : 0)
+				| ((fwKeys & MK_CONTROL)? Mod_Ctrl : 0)
+				| ((fwKeys & MK_ALT)? Mod_Alt : 0);
+			    if (last_modifier_mask != modifier_mask)
+			    	Wnd_exec_event(lpgw, lParam, GE_modifier, 
+					       modifier_mask);
+			    Wnd_exec_event(lpgw, lParam, GE_buttonpress,
+					   zDelta > 0 ? 4 : 5);
+			    last_modifier_mask = modifier_mask;
+			    return 0L;
+			}
+#endif
 
 			case WM_LBUTTONDBLCLK:
 				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 1);
