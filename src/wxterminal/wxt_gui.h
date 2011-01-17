@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.31 2009/01/14 23:16:49 tlecomte Exp $
+ * $Id: wxt_gui.h,v 1.32 2009/03/26 00:49:18 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -318,6 +318,7 @@ public :
 	void OnMiddleUp( wxMouseEvent& event );
 	void OnRightDown( wxMouseEvent& event );
 	void OnRightUp( wxMouseEvent& event );
+	void OnMouseWheel( wxMouseEvent& event );
 	void OnKeyDownChar( wxKeyEvent& event );
 
 	void UpdateModifiers( wxMouseEvent& event );

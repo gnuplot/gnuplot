@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.72.2.4 2010/01/31 20:28:47 mikulik Exp $
+ * $Id: wxt_gui.cpp,v 1.72.2.5 2010/03/21 03:07:08 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -158,6 +158,7 @@ BEGIN_EVENT_TABLE( wxtPanel, wxPanel )
 	EVT_MIDDLE_UP( wxtPanel::OnMiddleUp )
 	EVT_RIGHT_DOWN( wxtPanel::OnRightDown )
 	EVT_RIGHT_UP( wxtPanel::OnRightUp )
+	EVT_MOUSEWHEEL( wxtPanel::OnMouseWheel )
 	EVT_CHAR( wxtPanel::OnKeyDownChar )
 #endif /*USE_MOUSE*/
 END_EVENT_TABLE()
@@ -929,6 +930,16 @@ void wxtPanel::OnRightUp( wxMouseEvent& event )
 		/* start a watch to send the time elapsed between up and down */
 		right_button_sw.Start();
 	}
+}
+
+/* mouse wheel event */
+void wxtPanel::OnMouseWheel( wxMouseEvent& event )
+{
+	UpdateModifiers(event);
+
+	wxt_exec_event(GE_buttonpress, 0, 0, 
+			event.GetWheelRotation() > 0 ? 4 : 5, 
+			0, this->GetId());
 }
 
 /* the state of the modifiers is checked each time a key is pressed instead of

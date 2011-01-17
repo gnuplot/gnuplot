@@ -1,3 +1,14 @@
+2011-01-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/win/wgraph.c:  Pass mouse wheel events through to the core
+	mousing code so that interactive pan/zoom works from the windows
+	terminal.
+
+2011-01-17  James R. Van Zandt  <jrvz@comcast.net>
+	* src/mouse.c (event_buttonpress) src/wxterminal/wxt_gui.cpp
+	src/wxterminal/wxt_gui.h: Implement pan and zoom via mouse wheel.
+	Back-ported from 4.5.
+
 2011-01-10  David Kuehling <dvdkhlng@gmx.de>
 
 	* term/linux.trm:  Makes linux.trm work with all SVGAlib video modes,
