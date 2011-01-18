@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.51 2010/04/05 05:20:04 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.52 2010/08/26 18:17:21 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -675,7 +675,7 @@ gchar * gp_cairo_convert(plot_struct *plot, const char* string)
 		if (error != NULL) {
 			fprintf(stderr, "Unable to convert \"%s\": the sequence is invalid "\
 				"in the current charset (%s), %d bytes read out of %d\n",
-				string, charset, bytes_read, strlen(string));
+				string, charset, (int)bytes_read, (int)strlen(string));
 			string_utf8 = g_convert(string, bytes_read, "UTF-8", charset, NULL, NULL, NULL);
 			g_error_free (error);
 		} else

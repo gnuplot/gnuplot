@@ -1,3 +1,7 @@
+2011-01-18  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* src/wxterminal/gp_cairo.c:  Cast size_t arguments to (int).
+
 2011-01-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/win/wgraph.c:  Pass mouse wheel events through to the core
