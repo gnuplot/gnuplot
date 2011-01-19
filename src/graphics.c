@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.352 2010/11/29 05:35:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.353 2010/12/18 04:26:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5585,7 +5585,7 @@ place_histogram_titles()
 
 /*
  * Draw a solid line for the polar axis.
- * If the center of the polar plot is not a zero (rmin != 0)
+ * If the center of the polar plot is not at zero (rmin != 0)
  * indicate this by drawing an open circle.
  */
 static void
@@ -5600,10 +5600,12 @@ place_raxis()
     };
 #endif
     int x0,y0, xend,yend;
+    double rightend;
 
     x0 = map_x(0);
     y0 = map_y(0);
-    xend = map_x( AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.set_max)
+    rightend = (R_AXIS.autoscale & AUTOSCALE_MAX) ? R_AXIS.max : R_AXIS.set_max;
+    xend = map_x( AXIS_LOG_VALUE(POLAR_AXIS,rightend)
 		- AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.set_min));
     yend = y0;
     term_apply_lp_properties(&border_lp);

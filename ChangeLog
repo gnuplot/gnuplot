@@ -1,3 +1,9 @@
+2011-01-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (place_raxis): If the polar axis maximum is autoscaled,
+	draw the raxis all the way to that maximum value.
+	Bug #3153406
+
 2011-01-18  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* src/wxterminal/gp_cairo.c:  Cast size_t arguments to (int).
