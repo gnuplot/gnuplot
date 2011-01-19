@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.256 2010/05/11 04:20:23 sfeam Exp $
+ * $Id: post.trm,v 1.257 2010/10/06 05:44:57 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1790,7 +1790,6 @@ PS_init()
 TERM_PUBLIC void
 PS_graphics()
 {
-    static char GPFAR psg1[] = "0 setgray\nnewpath\n";
     struct termentry *t = term;
     ps_page++;
     if (ps_params->psformat != PSTERM_EPS)
@@ -1816,7 +1815,7 @@ doclip\n\
 	    (ps_params->psformat == PSTERM_EPS ? 0.5 : 1.0)/PS_SC);
     if (ps_params->psformat == PSTERM_LANDSCAPE)
 	fprintf(gppsfile,"90 rotate\n0 %d translate\n", -(int)(term->ymax));
-    fprintf(gppsfile, psg1);
+    fprintf(gppsfile, "0 setgray\nnewpath\n");
     if (ps_common_uses_fonts)
 	fprintf(gppsfile, "(%s) findfont %d scalefont setfont\n",
 		ps_params->font, (t->v_char));

@@ -4,6 +4,8 @@
 	draw the raxis all the way to that maximum value.
 	Bug #3153406
 
+	* term/post.trm: Replace a use-once character array by a literal string.
+
 2011-01-18  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* src/wxterminal/gp_cairo.c:  Cast size_t arguments to (int).
