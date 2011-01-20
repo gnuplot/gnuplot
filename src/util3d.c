@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.42 2010/09/27 19:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.43 2011/01/21 04:49:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -922,28 +922,9 @@ map3d_xy_double(
     double x, double y, double z,
     double *xt, double *yt)
 {
-    int i, j;
-    double v[4], res[4];	/* Homogeneous coords. vectors. */
-    double w = trans_mat[3][3];
-
-    v[0] = map_x3d(x);		/* Normalize object space to -1..1 */
-    v[1] = map_y3d(y);
-    v[2] = map_z3d(z);
-    v[3] = 1.0;
-
-    for (i = 0; i < 2; i++) {	/* Dont use the third axes (z). */
-	res[i] = trans_mat[3][i];	/* Initiate it with the weight factor */
-	for (j = 0; j < 3; j++)
-	    res[i] += v[j] * trans_mat[j][i];
-    }
-
-    for (i = 0; i < 3; i++)
-	w += v[i] * trans_mat[i][3];
-    if (w == 0)
-	w = 1e-5;
-
-    *xt = ((res[0] * xscaler / w) + xmiddle);
-    *yt = ((res[1] * yscaler / w) + ymiddle);
+    vertex v;
+    map3d_xyz(x, y, z, &v);
+    TERMCOORD(&v, *xt, *yt);
 }
 
 

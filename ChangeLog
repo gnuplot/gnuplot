@@ -1,3 +1,12 @@
+2011-01-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (xtick_callback ytick_callback ztick_callbacke):
+	Revert change made 2011-01-20 because it breaks hidden3d.
+
+	* src/util3d.c (map3d_xy_double):  Instead revise the map3d_xy() code
+	path to share the coordinate transformation used by map3d_xyz().
+	Bug #3157712
+
 2011-01-22  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/win/wgraph.c:  Fix typo in previous definition of _WIN32_WINNT.
@@ -20,8 +29,8 @@
 	"set view map" (Bug #3157712).
 	This patch switches the tick_callback() routines to use the map3d_xy()
 	pathway, which fixes the problem case described by the bug report.
-	It would be good to fix also the map3d_xyz() + TERMCOORD() pathway in
-	general so that the discrepancy doesn't occur in other conditions.
+	It would be to make both pathways share the same underlying code
+	so that the discrepancy doesn't occur in other conditions.
 	Bug #3157712
 
 2011-01-19  Ethan A Merritt  <merritt@u.washington.edu>
