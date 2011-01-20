@@ -1,3 +1,19 @@
+2011-01-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (xtick_callback ytick_callback ztick_callbacke):
+	Gnuplot uses two different pathways to convert 3D coordinates in user
+	space into 2D coordinates in the terminal coordinate space.  One of
+	these goes via map3d_xyz() and TERMCOORD(); the other uses map3d_xy().
+	Unfortunately it seems the two paths can differ by +/- one pixel in the
+	final terminal coordinates.  This discrepancy is particularly
+	noticeable in the grid and axis tic placement of 3D plots after
+	"set view map" (Bug #3157712).
+	This patch switches the tick_callback() routines to use the map3d_xy()
+	pathway, which fixes the problem case described by the bug report.
+	It would be good to fix also the map3d_xyz() + TERMCOORD() pathway in
+	general so that the discrepancy doesn't occur in other conditions.
+	Bug #3157712
+
 2011-01-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_raxis): If the polar axis maximum is autoscaled,

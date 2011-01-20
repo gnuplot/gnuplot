@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.41 2010/07/15 04:44:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.42 2010/09/27 19:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -923,8 +923,8 @@ map3d_xy_double(
     double *xt, double *yt)
 {
     int i, j;
-    double v[4], res[4],	/* Homogeneous coords. vectors. */
-     w = trans_mat[3][3];
+    double v[4], res[4];	/* Homogeneous coords. vectors. */
+    double w = trans_mat[3][3];
 
     v[0] = map_x3d(x);		/* Normalize object space to -1..1 */
     v[1] = map_y3d(y);
