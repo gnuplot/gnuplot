@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.353 2010/12/18 04:26:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.354 2011/01/19 20:40:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4333,6 +4333,14 @@ plot_boxplot(struct curve_points *plot)
     while (plot->points[N-1].type == UNDEFINED)
 	N--;
 
+    /* Not enough points left to make a boxplot */
+    if (N < 4) {
+	candle.x = plot->points->x;
+	candle.yhigh = -VERYLARGE;
+	candle.ylow = VERYLARGE;
+	goto outliers;
+    }
+
     if ((N & 0x1) == 0)
 	median = 0.5 * (plot->points[N/2 - 1].y + plot->points[N/2].y);
     else
@@ -4378,18 +4386,19 @@ plot_boxplot(struct curve_points *plot)
 	    whisker_bot = plot->points[bot].y;
 	    if (whisker_top - median >= median - whisker_bot) {
 		top--;
-		while (plot->points[top].y == plot->points[top-1].y)
+		while ((top > 0) && (plot->points[top].y == plot->points[top-1].y))
 		    top--;
 	    }
 	    if (whisker_top - median <= median - whisker_bot) {
 		bot++;
-		while (plot->points[bot].y == plot->points[bot+1].y)
+		while ((bot < top) && (plot->points[bot].y == plot->points[bot+1].y))
 		    bot++;
 	    }
 	}
     }
 
     /* Dummy up a single-point candlesticks plot using these limiting values */
+    candle.type = INRANGE;
     if (plot->plot_type == FUNC)
 	candle.x = (plot->points[0].x + plot->points[N-1].x) / 2.;
     else
@@ -4412,6 +4421,7 @@ plot_boxplot(struct curve_points *plot)
     plot->p_count = N;
 
     /* Now draw individual points for the outliers */
+    outliers:
     if (boxplot_opts.outliers) {
 	int i,j,x,y;
 	p_width = plot->lp_properties.p_size * term->h_tic;

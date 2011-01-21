@@ -1,3 +1,9 @@
+2011-01-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_boxplot):  Handle some corner cases
+	(all points have the same value, fewer than 4 valid points).
+	Bug #3162872
+
 2011-01-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (xtick_callback ytick_callback ztick_callbacke):
