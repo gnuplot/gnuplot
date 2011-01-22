@@ -1,3 +1,7 @@
+2011-01-22  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/win/wgraph.c:  Fix typo in previous definition of _WIN32_WINNT.
+
 2011-01-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxplot):  Handle some corner cases
