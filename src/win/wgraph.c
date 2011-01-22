@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.14 2010/12/17 18:21:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.15 2011/01/18 21:46:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -43,7 +43,7 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.14 2010/12/17 18:21:
 #define STRICT
 #if defined(WIN32) && defined(USE_MOUSE)
 /* shige: for mouse wheel */
-#define __WIN32_WINNT 0x0400
+#define _WIN32_WINNT 0x0400
 #endif
 #include <windows.h>
 #include <windowsx.h>
