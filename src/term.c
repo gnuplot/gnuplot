@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.212 2010/11/16 20:59:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.213 2011/01/11 01:04:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -140,7 +140,7 @@ enum set_encoding_id encoding;
 const char *encoding_names[] = {
     "default", "iso_8859_1", "iso_8859_2", "iso_8859_9", "iso_8859_15",
     "cp437", "cp850", "cp852", "cp950", "cp1250", "cp1251", "cp1254", 
-    "koi8r", "koi8u", "utf8", NULL };
+    "koi8r", "koi8u", "sjis", "utf8", NULL };
 /* 'set encoding' options */
 const struct gen_table set_encoding_tbl[] =
 {
@@ -159,6 +159,7 @@ const struct gen_table set_encoding_tbl[] =
     { "cp1254", S_ENC_CP1254 },
     { "koi8$r", S_ENC_KOI8_R },
     { "koi8$u", S_ENC_KOI8_U },
+    { "sj$is", S_ENC_SJIS },
     { NULL, S_ENC_INVALID }
 };
 
@@ -2494,6 +2495,11 @@ enhanced_recursion(
 	    } else {					/* Some other multibyte encoding? */
 		(term->enhanced_writec)(*p);
 	    }
+/* shige : for Shift_JIS */
+	} else if ((*p & 0x80) && (encoding == S_ENC_SJIS)) {
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+	    (term->enhanced_writec)(*(p++));
+	    (term->enhanced_writec)(*p);
 	} else
 
 	switch (*p) {
@@ -2685,13 +2691,6 @@ enhanced_recursion(
 		}
 		break;
 	    } else if (term->flags & TERM_IS_POSTSCRIPT) {
-		/* Shigeharu TAKENO  Aug 2004 - Needed in order for shift-JIS */
-		/* encoding to work. If this change causes problems then we   */
-		/* need a separate flag for shift-JIS and certain other 8-bit */
-		/* character sets.                                            */
-		/* EAM Nov 2004 - Nevertheless we must allow \ to act as an   */
-		/* escape for a few enhanced mode formatting characters even  */
-		/* though it corrupts certain Shift-JIS character sequences.  */
 		if (strchr("^_@&~{}",p[1]) == NULL) {
 		    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
 		    (term->enhanced_writec)('\\');

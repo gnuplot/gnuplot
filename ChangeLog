@@ -1,4 +1,11 @@
-2011-01-20  Ethan A Merritt  <merritt@u.washington.edu>
+2011-01-25  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/term.c src/term_api.h term/post.trm term/svg.trm NEWS
+	docs/gnuplot.doc:
+	"set encoding sjis" allows characters in Shift-JIS Japanese encoding to
+	survive enhanced text processing by the postscript and svg terminals.
+
+2011-01-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (xtick_callback ytick_callback ztick_callbacke):
 	Revert change made 2011-01-20 because it breaks hidden3d.

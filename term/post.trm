@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.257 2010/10/06 05:44:57 sfeam Exp $
+ * $Id: post.trm,v 1.258 2011/01/19 20:49:26 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2435,6 +2435,23 @@ ENHPS_WRITEC(int c)
 		ENHps_opened_string = FALSE;
 	    }
 	}
+
+    /* shige jan 2011 */
+    } else if (encoding == S_ENC_SJIS) {
+	static TBOOLEAN in_sjis = FALSE;
+
+	fputc(c, gppsfile);
+	if (in_sjis || (c & 0x80)) {  
+	    /* shige: This may remain original string instead octal bytes. */
+	    if (in_sjis) {
+		in_sjis = 0;
+		if ((unsigned)(c) == '\\')
+		    fputc('\\', gppsfile);
+	    } else {
+		in_sjis = TRUE;
+	    }
+	}
+	
     } else
 
     /* Single byte character */
