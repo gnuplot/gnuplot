@@ -1,3 +1,8 @@
+2011-01-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* set/set.c (set_decimalsign):  Possible fix for problem with
+	numeric locales on Windows.  Bug #3120819.
+
 2011-01-22  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/win/wgraph.c:  Fix typo in previous definition of _WIN32_WINNT.
