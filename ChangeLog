@@ -1,3 +1,8 @@
+2011-01-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_encoding): Check result of "set encoding locale"
+	to see if we have just loaded an sjis (codepage 932) locale.
+
 2011-01-25  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/term.c src/term_api.h term/post.trm term/svg.trm NEWS

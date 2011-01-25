@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.335 2010/12/09 04:13:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.336 2011/01/16 19:15:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1371,6 +1371,8 @@ set_encoding()
 	char *l = setlocale(LC_CTYPE,"");
 	if (l && (strstr(l,"utf") || strstr(l,"UTF")))
 	    encoding = S_ENC_UTF8;
+	if (l && (strstr(l,"sjis") || strstr(l,"SJIS") || strstr(l,"932")))
+	    encoding = S_ENC_SJIS;
 	c_token++;
 #endif
     } else {
