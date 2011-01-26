@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.59.2.6 2010/12/14 02:32:05 sfeam Exp $
+ * $Id: emf.trm,v 1.59.2.7 2010/12/14 04:57:25 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -964,10 +964,15 @@ EMF_filled_polygon(int points, gpiPoint *corners)
 	EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, color, 0);
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
 
+	/* EAM DEBUG - does this get rid of the border? */
+	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, 0, color);
+	EMF_SelectObject(EMF_HANDLE_PEN);
+
 	EMF_CreatePolygon(points);
 	for (i=0; i<points; i++)
 	    EMF_write_pointl(corners[i].x, term->ymax - corners[i].y);
 
+	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 
     /* Force re-evaluation of linetype next time we draw a line */
