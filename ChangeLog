@@ -1,3 +1,10 @@
+2011-01-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm (EMF_filled_polygon): Explicitly set a zero-width
+	same-color border for filled polygons, otherwise it inherits a border
+	line style.
+	Bug #3165902
+
 2011-01-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_encoding): Check result of "set encoding locale"
