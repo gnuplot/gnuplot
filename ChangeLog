@@ -5,6 +5,8 @@
 	and LT_BACKGROUND. This prevents a freeze, but is not a complete fix.
 	Bugfix
 
+	* src/save.c (save_linetype): save/show variable linecolor correctly.
+
 2011-01-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm (EMF_filled_polygon): Explicitly set a zero-width
