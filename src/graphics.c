@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.354 2011/01/19 20:40:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.355 2011/01/22 05:56:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4311,15 +4311,11 @@ compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
     return (0);
 }
 
-static void
-plot_boxplot(struct curve_points *plot)
+int
+filter_boxplot(struct curve_points *plot)
 {
     int i;
     int N = plot->p_count;
-    struct coordinate *save_points = plot->points;
-    struct coordinate candle;
-    double median, quartile1, quartile3;
-    double whisker_top, whisker_bot;
 
     /* Force any undefined points to the end of the list */
     for (i=0; i<N; i++)
@@ -4332,6 +4328,25 @@ plot_boxplot(struct curve_points *plot)
     /* Remove any undefined points */
     while (plot->points[N-1].type == UNDEFINED)
 	N--;
+    plot->p_count = N;
+
+    return N;
+}
+
+static void
+plot_boxplot(struct curve_points *plot)
+{
+    int i;
+    int N;
+    struct coordinate *save_points = plot->points;
+    struct coordinate candle;
+    double median, quartile1, quartile3;
+    double whisker_top, whisker_bot;
+
+    /* Sort the points and get rid of any that are undefined */
+    /* EAM Feb 2011:  Move this to boxplot_range_fiddling()  */
+    /* N = filter_boxplot(plot);                             */
+    N = plot->p_count;
 
     /* Not enough points left to make a boxplot */
     if (N < 4) {

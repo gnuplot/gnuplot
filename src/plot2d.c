@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.237 2010/11/19 04:03:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.238 2011/01/14 07:30:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1293,18 +1293,15 @@ boxplot_range_fiddling(struct curve_points *plot)
 {
     double extra_width;
 
+    /* Sort the points and removed any that are undefined */
+    int N = filter_boxplot(plot);
+
     if (plot->points[0].type == UNDEFINED)
 	int_error(NO_CARET,"boxplot has undefined x coordinate");
 
     extra_width = plot->points[0].xhigh - plot->points[0].xlow;
     if (extra_width == 0)
 	extra_width = (boxwidth > 0 && boxwidth_is_absolute) ? boxwidth : 0.5;
-
-    /* FIXME:  This is a boxplot-specific kludge to remove any extra, undefined
-     * points at the end of the point list.  A more general fix would be nice.
-     */
-    while (plot->points[plot->p_count-1].type == UNDEFINED)
-	plot->p_count--;
 
     if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MIN) {
 	if (axis_array[plot->x_axis].min >= plot->points[0].x)
@@ -1313,9 +1310,9 @@ boxplot_range_fiddling(struct curve_points *plot)
 	    axis_array[plot->x_axis].min -= 1 * extra_width;
     }
     if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MAX) {
-	if (axis_array[plot->x_axis].max <= plot->points[plot->p_count-1].x)
+	if (axis_array[plot->x_axis].max <= plot->points[N-1].x)
 	    axis_array[plot->x_axis].max += 1.5 * extra_width;
-	else if (axis_array[plot->x_axis].max <= plot->points[plot->p_count-1].x + extra_width)
+	else if (axis_array[plot->x_axis].max <= plot->points[N-1].x + extra_width)
 	    axis_array[plot->x_axis].max += 1 * extra_width;
     }
 }

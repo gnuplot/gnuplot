@@ -6,6 +6,15 @@
 
 	* src/save.c (save_linetype): save/show variable linecolor correctly.
 
+	* src/misc.h src/misc.c (parse_colorname):  Split out color name
+	interpretation into a separate routine.
+
+	* src/graphics.c (filter_boxplot) src/graphics.h
+	src/plot2d.c (boxplot_range_fiddling):
+	Sort and filter points contributing to a boxplot at the point we pick
+	the auto-range limits rather than waiting till when we draw it.
+	Bug #3155750
+
 2011-01-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm (EMF_filled_polygon): Explicitly set a zero-width
