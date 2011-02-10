@@ -1,3 +1,10 @@
+2011-02-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/lua.trm (LUA_set_color): Initialize rgb_color for the case TC_LT.
+	term/lua/gnuplot-tikz.lua: Work around failure to handle LT_NODRAW
+	and LT_BACKGROUND. This prevents a freeze, but is not a complete fix.
+	Bugfix
+
 2011-01-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm (EMF_filled_polygon): Explicitly set a zero-width

@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2009/06/05 05:37:04 $
+  $Date: 2010/03/21 03:50:23 $
   $Author: sfeam $
   $Rev: 96 $
 
@@ -75,7 +75,7 @@ pgf.DEFAULT_FONT_SIZE = 10
 pgf.LATEX_STYLE_FILE = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 96a $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2009/06/05 05:37:04 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2010/03/21 03:50:23 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -1196,7 +1196,12 @@ gfx.check_linetype = function()
   if gfx.linetype_idx ~= gfx.linetype_idx_set then
     local lt
     if gfx.linetype_idx < 0 then
-      lt = pgf.styles.linetypes_axes[math.abs(gfx.linetype_idx)][1]
+      if gfx.linetype_idx < -2 then
+	-- FIXME: what linetype to use for LT_BACKGROUND or LT_NODRAW?
+        lt = pgf.styles.linetypes[1][1]
+      else
+        lt = pgf.styles.linetypes_axes[math.abs(gfx.linetype_idx)][1]
+      end
     else
       lt = pgf.styles.linetypes[(gfx.linetype_idx % #pgf.styles.linetypes)+1][1]
     end
