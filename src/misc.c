@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.127 2010/10/28 00:20:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.128 2010/11/19 04:03:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1080,20 +1080,10 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	if (almost_equals(c_token, "var$iable")) {
 	    tc->value = -1.0;
 	    c_token++;
-	    return;
-	} else
+	} else {
 	    tc->value = 0.0;
-	if (!(color = try_to_get_string()))
-	    int_error(c_token, "expected a color name or a string of form \"#RRGGBB\"");
-	if ((rgbtriple = lookup_table_nth(pm3d_color_names_tbl, color)) >= 0)
-	    rgbtriple = pm3d_color_names_tbl[rgbtriple].value;
-	else
-	    sscanf(color,"#%x",&rgbtriple);
-	free(color);
-	if (rgbtriple < 0)
-	    int_error(c_token, "expected a known color name or a string of form \"#RRGGBB\"");
-	tc->type = TC_RGB;
-	tc->lt = rgbtriple;
+	    tc->lt = parse_color_name();
+	}
     } else if (almost_equals(c_token,"pal$ette")) {
 	c_token++;
 	if (equals(c_token,"z")) {
@@ -1130,6 +1120,27 @@ parse_colorspec(struct t_colorspec *tc, int options)
     } else {
 	int_error(c_token, "colorspec option not recognized");
     }
+}
+
+long
+parse_color_name()
+{
+    char *string;
+    int index;
+    int color = -1;
+
+    if ((string = try_to_get_string())) {
+	color = lookup_table_nth(pm3d_color_names_tbl, string);
+	if (color >= 0)
+	    color = pm3d_color_names_tbl[color].value;
+	else
+	    sscanf(string,"#%x",&color);
+	free(string);
+    }
+    if ((color & 0xff000000) != 0)
+	int_error(c_token, "not recognized as a color name or a string of form \"#RRGGBB\"");
+
+    return color;
 }
 
 /* arrow parsing...
