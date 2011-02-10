@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.10 2010/10/01 23:10:46 sfeam Exp $
- *  $Date: 2010/10/01 23:10:46 $
+ *  $Id: lua.trm,v 1.11 2010/10/09 21:01:50 sfeam Exp $
+ *  $Date: 2010/10/09 21:01:50 $
  *  $Rev: 90 $
  */
 
@@ -1016,8 +1016,7 @@ LUA_set_color (t_colorspec *colorspec)
 {
 
   double gray = colorspec->value;
-  rgb_color color;
-
+  rgb_color color = {0.,0.,0.};
 
   if(LUA_init_luaterm_function("set_color")) {
     if (colorspec->type == TC_FRAC) {
