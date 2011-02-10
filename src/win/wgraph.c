@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.15 2011/01/18 21:46:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.16 2011/01/22 16:44:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -2627,9 +2627,10 @@ GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect)
 {
     int newfontsize;
     bool remakefonts = FALSE;
+    bool font_is_not_empty = (font != NULL && *font != '\0');
 
     newfontsize = (fontsize != 0) ? fontsize : lpgw->deffontsize;
-    if (font != NULL) {
+    if (font_is_not_empty) {
 	remakefonts = (strcmp(lpgw->fontname, font) != 0) || (newfontsize != lpgw->fontsize);
     } else {
 	remakefonts = (strcmp(lpgw->fontname, lpgw->deffontname) != 0) || (newfontsize != lpgw->fontsize);
@@ -2637,7 +2638,7 @@ GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect)
 
     if (remakefonts) {
         lpgw->fontsize = newfontsize;
-        strcpy(lpgw->fontname, (font) ? font : lpgw->deffontname);
+        strcpy(lpgw->fontname, font_is_not_empty ? font : lpgw->deffontname);
 
         DestroyFonts(lpgw);
         MakeFonts(lpgw, &rect, hdc);

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.65.2.14 2010/07/26 20:25:51 sfeam Exp $
+ * $Id: win.trm,v 1.65.2.15 2010/12/17 18:21:25 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -713,7 +713,6 @@ WIN_set_font(const char *font)
     int  fontsize;
 
 	if (font == NULL) {
-	    GraphOp(&graphwin, W_font, 0, 0, "");
 	    strcpy(WIN_font, graphwin.deffontname);
 	    WIN_fontsize = graphwin.deffontsize;
 	    return TRUE;
