@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.87 2011/01/22 16:45:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.88 2011/02/11 03:47:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -2701,7 +2701,7 @@ GraphGetTextLength(LPGW lpgw, LPCSTR text, LPCSTR fontname, int fontsize)
     GetTextExtentPoint(hdc, text, strlen(text), &size);
     SelectObject(hdc, hprevfont);
     
-    size.cx = MulDiv(size.cx + GetTextCharacterExtra(hdc), lpgw->xmax, rect.right-rect.left-1);
+    size.cx += GetTextCharacterExtra(hdc);
     /* shige: restore original font */
     GraphChangeFont(lpgw, lpgw->deffontname, lpgw->deffontsize, hdc, rect);
     return size.cx;

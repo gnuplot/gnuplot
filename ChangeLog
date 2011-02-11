@@ -1,3 +1,8 @@
+2011-02-11  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
+	* term/win.trm(WIN_enhanced_flush) src/win/wgraph.c(GraphGetTextLength):
+	Adjust position of enhanced text to account for terminal aspect ratio.
+
 2011-02-10  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* term/win.trm (WIN_set_font) src/win/wgraph.c (GraphChangeFont):

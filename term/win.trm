@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.80 2010/12/17 18:18:30 sfeam Exp $
+ * $Id: win.trm,v 1.81 2011/02/11 03:47:59 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -822,6 +822,7 @@ WIN_enhanced_flush()
     if (ENHwin_opened_string) {
 	int width, height;
 	unsigned int x, y, len;
+	RECT rect;
 
 	*enhanced_cur_text = '\0';
 	
@@ -831,9 +832,10 @@ WIN_enhanced_flush()
 	y = WIN_y + ENHwin_base * cos(WIN_angle);
 
 	/* calculate length of string first */
-    	len = GraphGetTextLength(&graphwin, enhanced_text, WIN_font, WIN_fontsize);
-	width = cos(WIN_angle) * len;
-	height = sin(WIN_angle) * len;
+	len = GraphGetTextLength(&graphwin, enhanced_text, WIN_font, WIN_fontsize);
+	GetPlotRect(&graphwin,&rect);
+	width = round(cos(WIN_angle)*len*graphwin.xmax / (rect.right-rect.left-1));
+	height = round(sin(WIN_angle)*len*graphwin.ymax / (rect.bottom-rect.top-1));
 
 	if (ENHwin_show && !ENHwin_sizeonly) {
 	    /* display string */
