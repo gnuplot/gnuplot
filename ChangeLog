@@ -1,3 +1,7 @@
+2011-02-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm: Add missing TERM_ALPHA_CHANNEL flag for pdfcairo
+
 2011-02-10  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* term/win.trm (WIN_set_font) src/win/wgraph.c (GraphChangeFont):
