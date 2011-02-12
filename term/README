@@ -406,11 +406,14 @@ _image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor c
    along rows finishing in the lower right corner.  If 'color_mode' is
    IC_PALETTE, the terminal is to use palette lookup to generate color
    information.  In this scenario the size of 'image' is M*N.  If
-   'color_mode' is IC_RGB, the terminal is to use RGB components.  In
-   this scenario the size of 'image' is 3*M*N.  The data appears in RGB
-   triples, i.e., image[0] = R(1,1), image[1] = G(1,1), image[2] =
-   B(1,1), image[3] = R(1,2), image[4] = G(1,2), ..., image[3*M*N-1] =
-   B(M,N).  The 'image' is actually an "input" image in the sense that
+   'color_mode' is IC_RGB, successive bytes of the data structure are 
+   interpreted as RGB components of a single pixel.  In this scenario
+   the size of 'image' is 3*M*N.  The data appears in RGB triples, i.e.,
+   image[0] = R(1,1), image[1] = G(1,1), image[2] = B(1,1), 
+   image[3] = R(1,2), image[4] = G(1,2), ..., image[3*M*N-1] = B(M,N).
+   The mode IC_RGBA is similar except that four values red, green, blue,
+   alpha per pixel are passed to the terminal in the image structure.
+   The 'image' is actually an "input" image in the sense that
    it must also be properly resampled for the output device.  Many output
    media, e.g., PostScript, do this work via various driver functions.
    To determine the appropriate rescaling, the 'corner' information
