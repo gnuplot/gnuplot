@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.60 2011/01/03 14:30:31 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.61 2011/01/08 13:37:26 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -191,7 +191,13 @@ f_calln(union argument *x)
     for (i = num_pop - 1; i >= 0; i--)
 	(void) pop(&(udf->dummy_values[i]));
 
+    if (recursion_depth++ > STACK_DEPTH)
+	int_error(NO_CARET, "recursion depth limit exceeded");
+
     execute_at(udf->at);
+
+    recursion_depth--;
+
     for (i = 0; i < MAX_NUM_VAR; i++) {
 	gpfree_string(&udf->dummy_values[i]);
 	udf->dummy_values[i] = save_dummy[i];
