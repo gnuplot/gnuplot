@@ -4,6 +4,10 @@
 	functions in the same manner as for single-variable functions.
 	Bug #3184671
 
+	* docs/gnuplot.texi: This file is generated from gnuplot.doc. The copy
+	in cvs is perennially out of date, so remove it. "make gnuplot.texi" to
+	regenerate it when needed.
+
 2011-02-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm: Add missing TERM_ALPHA_CHANNEL flag for pdfcairo
