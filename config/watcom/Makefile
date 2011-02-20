@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.oww,v 1.9 2006/10/22 11:56:03 broeker Exp $
+# $Id: Makefile,v 1.1 2010/12/14 23:28:46 broeker Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -22,9 +22,18 @@ TARGET=gnuplot.exe
 
 TOP = ..\..
 
+# activate one of these to choose which of the help file formats you want:
+#   old-fashioned WinHelp ...
+HELP_EXT=hlp
+#   ... or HTML help
+# HELP_EXT=chm
+
 # Programs: 
 # The Microsoft Help compiler:
 HCW = "c:\program files\help workshop\hcw.exe"
+# ... and the HTML help compiler
+HHC_DIR = c:\Program Files\HTML Help Workshop
+HHC = "$(HHC_DIR)\hhc.exe"
 
 # OpenWatcom programs:
 WCL = wcl386
@@ -49,7 +58,10 @@ WRC = wrc
 # wgnuplot.exe
 GNUPLOT_PS_DIR = share/PostScript
 
-# macros for makefile.all
+# paths for external libs added here... 
+LDLIBS = 
+
+# Macros for makefile.all
 O=obj
 T=$(TOP)\term\
 D=$(TOP)\docs\
@@ -73,11 +85,11 @@ DEFAULT_TARGETS = $(TARGET) $(BINARYFILES)
 
 !ifeqi TARGET wgnuplot.exe
 DEFAULT_TARGETS += wgnuplot.mnu pgnuplot.exe
-HELPFILE = wgnuplot.hlp
+HELPFILE = wgnuplot.$(HELP_EXT)
 !endif
 !ifeqi TARGET wgnuplot_pipes.exe
 DEFAULT_TARGETS += wgnuplot.mnu pgnuplot.exe
-HELPFILE = wgnuplot.hlp
+HELPFILE = wgnuplot.$(HELP_EXT)
 CPPFLAGS += -DPIPES=1
 !endif
 !ifeqi TARGET gnuplot.exe
@@ -85,6 +97,11 @@ HELPFILE = gnuplot.gih
 CPPFLAGS += -DPIPES=1 -DWGP_CONSOLE
 !endif
 
+!ifeq HELP_EXT chm
+CPPFLAGS += -DWITH_HTML_HELP
+LDLIBS += LIBRARY htmlhelp.lib
+!endif
+DEFAULT_TARGETS += $(HELPFILE)
 
 # compiler flags, determined from MS ones by OW's "cl /showwopts"
 
@@ -108,8 +125,6 @@ CPPFLAGS += -DPIPES=1 -DWGP_CONSOLE
 WCFLAGS = -zlf -ei -zq -I$(S);$(W) -zm -bm -5r -sg -orilt -j -aa -d2 $(CPPFLAGS)
 # removed: -za99
 
-# paths for external libs added here... 
-LDLIBS = 
 # ...and here.
 # see other terminal defines in term.h
 TERMFLAGS = -DGNUPLOT_PS_DIR="$(GNUPLOT_PS_DIR)" -I$(T)
@@ -252,10 +267,28 @@ wgnuplot.hlp: doc2rtf.exe $(D)gnuplot.doc $(W)\wgnuplot.hpj
         if exist $(W)\wgnuplot.hlp copy $(W)\wgnuplot.hlp .
 
 doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c .AUTODEPEND
-        $(WCL) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI -I$(D);$(T) -fedoc2rtf.exe $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
+        $(WCL) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI -I$(D);$(T) -fe$^@ $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
+
+WD=$(D)windows\
+HHP_PROJ=$(WD)wgnuplot.hhp
+HHP_CONTENT=$(WD)wgnuplot.hhc
+HHP_INPUT=$(WD)wgnuplot.html
+HHP_OUTPUT=$(WD)wgnuplot.chm   
+
+wgnuplot.chm: $(HHP_OUTPUT)
+        copy $(HHP_OUTPUT) .
+
+$(HHP_OUTPUT): $(HHP_PROJ) $(HHP_INPUT) $(HHP_CONTENT)
+        -$(HHC) $(HHP_PROJ)
+
+$(HHP_INPUT) $(HHP_CONTENT): doc2html.exe $(D)gnuplot.doc
+        doc2html $(D)gnuplot.doc $(HHP_INPUT) $(HHP_CONTENT)
+
+doc2html.exe: $(WD)doc2html.c $(D)termdoc.c $(D)xref.c version.$(O) .AUTODEPEND
+        $(WCL) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI -I$(D);$(T) -fe$^@ $(WD)doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
 
 gnuplot.gih: doc2gih.exe $(D)gnuplot.doc
-	doc2gih $(D)gnuplot.doc $^@
+        doc2gih $(D)gnuplot.doc $^@
 
 doc2gih.exe: $(D)doc2gih.c $(D)termdoc.c $(D)xref.c .AUTODEPEND
         $(WCL) $(WCFLAGS) -w1 -I$(D);$(T) -fe$^@ $(D)doc2gih.c $(D)termdoc.c $(D)xref.c
@@ -267,7 +300,7 @@ bf_test.exe : bf_test.c dbinary.obj alloc.obj .AUTODEPEND
 $(BINARYFILES): bf_test.exe
         .\bf_test
         move binary? $(M).
-        
+
 # _Windows causes wtext.h to define fread() etc
 dbinary.obj: $(S)\binary.c
         $(WCC) $(WCFLAGS) /U_Windows -w1 -fodbinary.obj $[@
@@ -276,10 +309,11 @@ dbinary.obj: $(S)\binary.c
 clean: .SYMBOLIC
         rm -f *.obj *.err *.ico
         rm -f wgnuplot.res $(W)\gnuplot.rtf $(W)\wgnuplot.hlp
-        rm -f bf_test.exe linkopt1.oww doc2rtf.exe geticon.exe
-        rm -f wgnuplot.map wgnuplot.sym pgnuplot.map wgnuplot.gid
-        
+        rm -f bf_test.exe linkopt1.oww doc2rtf.exe doc2html.exe geticon.exe
+        rm -f *.map *.sym wgnuplot.gid        
 
 realclean: clean .SYMBOLIC
-        rm -f wgnuplot.exe wgnuplot.hlp wgnuplot.mnu pgnuplot.exe
+        rm -f wgnuplot.exe wgnuplot.mnu pgnuplot.exe gnuplot.exe wgnuplot_pipes.exe
+        rm -f $(HHP_CONTENT) $(HHP_INPUT) $(HHP_OUTPUT) $(WD)wgnuplot.log
+        rm -f wgnuplot.hlp wgnuplot.chm wgnuplot.chw
         rm -f $(D)binary[123] $(D)fit.log $(D)soundfit.par
