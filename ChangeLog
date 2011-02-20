@@ -3,6 +3,8 @@
 	* src/win/text.c(DragFunc): Support drag and drop of directories onto 
 	the windows terminal emulator.
 
+	* plot.c(main): init rl_library_name before first call to editline, otherwise .editrc does not work
+	
 2011-02-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_calln): Limit recursion depth for multi-variable

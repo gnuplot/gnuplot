@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.119 2010/08/13 23:36:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.120 2010/10/01 23:10:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -332,11 +332,13 @@ main(int argc, char **argv)
 #endif
 
 #if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
-    using_history();
     /* T.Walter 1999-06-24: 'rl_readline_name' must be this fix name.
-     * It is used to parse a 'gnuplot' specific section in '~/.inputrc' */
+     * It is used to parse a 'gnuplot' specific section in '~/.inputrc' 
+     * or gnuplot specific commands in '.editrc' (when using editline
+     * instead of readline) */
     rl_readline_name = "Gnuplot";
     rl_terminal_name = getenv("TERM");
+    using_history();
 #endif
 #if defined(HAVE_LIBREADLINE) && !defined(MISSING_RL_TILDE_EXPANSION)
     rl_complete_with_tilde_expansion = 1;
