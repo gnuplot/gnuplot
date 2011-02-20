@@ -1,10 +1,33 @@
+2011-02-20  U-nb2\HBB  <HBB@nb2>
+
+	* config/config.oww [WITH_HTML_HELP]: Change helpfile name.
+
+	* src/command.c [WITH_HTML_HELP]: Include <htmlhelp.h>.
+	(help_command) [WITH_HTML_HELP]: Use HTML help instead of classic
+	WinHelp32 helpfile system.
+
+	* docs/windows/wgnuplot.hhp: New file.  HTML help project file.
+
+	* docs/windows/doc2html.c: New help file format converter.
+
+	* config/watcom/Makefile (HELP_EXT, HHC_DIR, HHC, WD, HHP_PROJ)
+	(HHP_CONTENT, HHP_INPUT, HHP_OUTPUT): New variables.
+	(HELPFILE, CPPFLAGS, LDLIBS) [HELP_EXT==chm]: Optionally modify
+	settings to build and use HTML help.
+	(wgnuplot.chm, $(HHP_OUTPUT), $(HHP_INPUT) $(HHP_CONTENT))
+	(doc2html.exe) [HELP_EXT==chm]: New targets.
+	(clean, realclean): Delete files generated for HTML help.
+
+	* term/win.trm (WIN_enhanced_flush): Replace C99-ism by simpler cast.
+
 2011-02-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/text.c(DragFunc): Support drag and drop of directories onto 
-	the windows terminal emulator.
+	* src/win/text.c(DragFunc): Support drag and drop of directories
+	onto the windows terminal emulator.
 
-	* plot.c(main): init rl_library_name before first call to editline, otherwise .editrc does not work
-	
+	* plot.c(main): init rl_library_name before first call to
+	editline, otherwise .editrc does not work
+
 2011-02-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_calln): Limit recursion depth for multi-variable
