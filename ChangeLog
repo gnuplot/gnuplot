@@ -1,3 +1,7 @@
+2011-02-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: Revised configuration tests for lua support.
+
 2011-02-20  U-nb2\HBB  <HBB@nb2>
 
 	* config/config.oww [WITH_HTML_HELP]: Change helpfile name.
