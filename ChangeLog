@@ -2,6 +2,16 @@
 
 	* configure.in: Revised configuration tests for lua support.
 
+	Variable arrowstyle for vector plots.
+	* src/gadgets.c src/gadgets.h src/set.c src/term_api.h:
+	  Add tag field to arrow_style_type
+	* src/misc.c (arrow_parse) src/misc.h (arrow_use_properties):
+	  Parse "arrowstyle variable", export a routine to apply it.
+	* src/plot2d.c (get_data): Allow 5 column "with vectors" style.
+	* src/graphics.c (plot_vectors) src/graph3d.c (plot3d_vectors):
+	  Check for arrowstyle variable, apply to each vector if needed
+	* demo/arrowstyle.dem: Modify last plot to show arrowstyle from column
+
 2011-02-20  U-nb2\HBB  <HBB@nb2>
 
 	* config/config.oww [WITH_HTML_HELP]: Change helpfile name.

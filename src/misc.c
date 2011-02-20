@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.128 2010/11/19 04:03:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.129 2011/02/10 21:27:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -53,7 +53,6 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.128 2010/11/19 04:03:23 sfe
 # include <windows.h>
 #endif
 
-static void arrow_use_properties __PROTO((struct arrow_style_type *arrow, int tag));
 static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
 static void prepare_call __PROTO((void));
 static void expand_call_args __PROTO((void));
@@ -1149,7 +1148,7 @@ parse_color_name()
  * the current context [ie not when doing a  set style arrow command]
  */
 
-static void
+void
 arrow_use_properties(struct arrow_style_type *arrow, int tag)
 {
     /*  This function looks for an arrowstyle defined by 'tag' and
@@ -1167,7 +1166,8 @@ arrow_use_properties(struct arrow_style_type *arrow, int tag)
     }
 
     /* tag not found: */
-    int_error(NO_CARET,"arrowstyle not found", NO_CARET);
+    default_arrow_style(arrow);
+    int_warn(NO_CARET,"arrowstyle %d not found", tag);
 }
 
 void
@@ -1175,119 +1175,126 @@ arrow_parse(
     struct arrow_style_type *arrow,
     TBOOLEAN allow_as)
 {
+    int set_layer=0, set_line=0, set_head=0;
+    int set_headsize=0, set_headfilled=0;
+
+    /* Use predefined arrow style */
     if (allow_as && (almost_equals(c_token, "arrows$tyle") ||
 		     equals(c_token, "as"))) {
 	c_token++;
-	arrow_use_properties(arrow, int_expression());
-    } else {
-	/* avoid duplicating options */
-	int set_layer=0, set_line=0, set_head=0;
-	int set_headsize=0, set_headfilled=0;
+	if (almost_equals(c_token, "var$iable")) {
+	    arrow->tag = AS_VARIABLE;
+	    c_token++;
+	} else {
+	    arrow_use_properties(arrow, int_expression());
+	}
+	return;
+    }
 
-	while (!END_OF_COMMAND) {
-	    if (equals(c_token, "nohead")) {
-		if (set_head++)
-		    break;
-		c_token++;
-		arrow->head = NOHEAD;
-		continue;
-	    }
-	    if (equals(c_token, "head")) {
-		if (set_head++)
-		    break;
-		c_token++;
-		arrow->head = END_HEAD;
-		continue;
-	    }
-	    if (equals(c_token, "backhead")) {
-		if (set_head++)
-		    break;
-		c_token++;
-		arrow->head = BACKHEAD;
-		continue;
-	    }
-	    if (equals(c_token, "heads")) {
-		if (set_head++)
-		    break;
-		c_token++;
-		arrow->head = BACKHEAD | END_HEAD;
-		continue;
-	    }
-
-	    if (almost_equals(c_token, "fill$ed")) {
-		if (set_headfilled++)
-		    break;
-		c_token++;
-		arrow->head_filled = 2;
-		continue;
-	    }
-	    if (almost_equals(c_token, "empty")) {
-		if (set_headfilled++)
-		    break;
-		c_token++;
-		arrow->head_filled = 1;
-		continue;
-	    }
-	    if (almost_equals(c_token, "nofill$ed")) {
-		if (set_headfilled++)
-		    break;
-		c_token++;
-		arrow->head_filled = 0;
-		continue;
-	    }
-
-	    if (equals(c_token, "size")) {
-		struct position hsize;
-		if (set_headsize++)
-		    break;
-		hsize.scalex = hsize.scaley = hsize.scalez = first_axes;
-		/* only scalex used; scaley is angle of the head in [deg] */
-		c_token++;
-		if (END_OF_COMMAND)
-		    int_error(c_token, "head size expected");
-		get_position(&hsize);
-		arrow->head_length = hsize.x;
-		arrow->head_lengthunit = hsize.scalex;
-		arrow->head_angle = hsize.y;
-		arrow->head_backangle = hsize.z;
-		/* invalid backangle --> default of 90.0 degrees */
-		if (arrow->head_backangle <= arrow->head_angle)
-		    arrow->head_backangle = 90.0;
-		continue;
-	    }
-
-	    if (equals(c_token, "back")) {
-		if (set_layer++)
-		    break;
-		c_token++;
-		arrow->layer = 0;
-		continue;
-	    }
-	    if (equals(c_token, "front")) {
-		if (set_layer++)
-		    break;
-		c_token++;
-		arrow->layer = 1;
-		continue;
-	    }
-
-	    /* pick up a line spec - allow ls, but no point. */
-	    {
-		int stored_token = c_token;
-		lp_parse(&arrow->lp_properties, TRUE, FALSE);
-		if (stored_token == c_token || set_line++)
-		    break;
-		continue;
-	    }
-
-	    /* unknown option caught -> quit the while(1) loop */
-	    break;
+    /* No predefined arrow style; read properties from command line */
+    /* avoid duplicating options */
+    while (!END_OF_COMMAND) {
+	if (equals(c_token, "nohead")) {
+	    if (set_head++)
+		break;
+	    c_token++;
+	    arrow->head = NOHEAD;
+	    continue;
+	}
+	if (equals(c_token, "head")) {
+	    if (set_head++)
+		break;
+	    c_token++;
+	    arrow->head = END_HEAD;
+	    continue;
+	}
+	if (equals(c_token, "backhead")) {
+	    if (set_head++)
+		break;
+	    c_token++;
+	    arrow->head = BACKHEAD;
+	    continue;
+	}
+	if (equals(c_token, "heads")) {
+	    if (set_head++)
+		break;
+	    c_token++;
+	    arrow->head = BACKHEAD | END_HEAD;
+	    continue;
 	}
 
-	if (set_layer>1 || set_line>1 || set_head>1 || set_headsize>1 || set_headfilled>1)
-	    int_error(c_token, "duplicated arguments in style specification");
+	if (almost_equals(c_token, "fill$ed")) {
+	    if (set_headfilled++)
+		break;
+	    c_token++;
+	    arrow->head_filled = 2;
+	    continue;
+	}
+	if (almost_equals(c_token, "empty")) {
+	    if (set_headfilled++)
+		break;
+	    c_token++;
+	    arrow->head_filled = 1;
+	    continue;
+	}
+	if (almost_equals(c_token, "nofill$ed")) {
+	    if (set_headfilled++)
+		break;
+	    c_token++;
+	    arrow->head_filled = 0;
+	    continue;
+	}
 
+	if (equals(c_token, "size")) {
+	    struct position hsize;
+	    if (set_headsize++)
+		break;
+	    hsize.scalex = hsize.scaley = hsize.scalez = first_axes;
+	    /* only scalex used; scaley is angle of the head in [deg] */
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "head size expected");
+	    get_position(&hsize);
+	    arrow->head_length = hsize.x;
+	    arrow->head_lengthunit = hsize.scalex;
+	    arrow->head_angle = hsize.y;
+	    arrow->head_backangle = hsize.z;
+	    /* invalid backangle --> default of 90.0 degrees */
+	    if (arrow->head_backangle <= arrow->head_angle)
+		arrow->head_backangle = 90.0;
+	    continue;
+	}
+
+	if (equals(c_token, "back")) {
+	    if (set_layer++)
+		break;
+	    c_token++;
+	    arrow->layer = 0;
+	    continue;
+	}
+	if (equals(c_token, "front")) {
+	    if (set_layer++)
+		break;
+	    c_token++;
+	    arrow->layer = 1;
+	    continue;
+	}
+
+	/* pick up a line spec - allow ls, but no point. */
+	{
+	    int stored_token = c_token;
+	    lp_parse(&arrow->lp_properties, TRUE, FALSE);
+	    if (stored_token == c_token || set_line++)
+		break;
+	    continue;
+	}
+
+	/* unknown option caught -> quit the while(1) loop */
+	break;
     }
+
+    if (set_layer>1 || set_line>1 || set_head>1 || set_headsize>1 || set_headfilled>1)
+	int_error(c_token, "duplicated arguments in style specification");
 }
 
 void

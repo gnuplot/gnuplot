@@ -52,6 +52,7 @@
 /* Default point size is taken from the global "pointsize" variable */
 #define PTSZ_DEFAULT    (-2)
 #define PTSZ_VARIABLE   (-3)
+#define AS_VARIABLE	(-3)
 
 /* Type definitions */
 

@@ -449,6 +449,7 @@ default_arrow_style(struct arrow_style_type *arrow)
 {
     static const struct lp_style_type tmp_lp_style = DEFAULT_LP_STYLE_TYPE;
 
+    arrow->tag = -1;
     arrow->layer = 0;
     arrow->lp_properties = tmp_lp_style;
     arrow->head = 1;

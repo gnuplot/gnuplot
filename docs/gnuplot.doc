@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.647 2011/01/16 19:15:20 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.648 2011/01/26 06:09:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3437,7 +3437,18 @@ Ffigure_steps
  (see `linecolor` and `rgbcolor variable`).
 
  splot with vectors is supported only for `set mapping cartesian`.
- The keywords "with vectors" may be followed by arrow style specifications.
+
+ The keywords "with vectors" may be followed by an in-line arrow style
+ specifications, a reference to a predefined arrow style, or a request to read
+ the index of the desired arrow style for each vector from a separate column.
+ Note: If you choose "arrowstyle variable" it will fill in all arrow properties
+ at the time the corresponding vector is drawn; you cannot mix this keyword with
+ other line or arrow style qualifiers in the plot command.
+
+      plot ... with vectors filled heads
+      plot ... with vectors arrowstyle 3
+      plot ... using 1:2:3:4:5 with vectors arrowstyle variable
+
  See `arrowstyle` for more details.
 
  Example:

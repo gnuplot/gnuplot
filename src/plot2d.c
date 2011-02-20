@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.238 2011/01/14 07:30:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.239 2011/02/10 21:29:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -420,7 +420,7 @@ get_data(struct curve_points *current_plot)
 	    df_axis[2] = df_axis[3] = df_axis[1];
 	break;
 
-    case VECTOR:	/* x, y, dx, dy, variable_color */
+    case VECTOR:	/* x, y, dx, dy, variable color or arrow style */
 	min_cols = 4;
 	max_cols = 5;
 	break;
@@ -948,6 +948,12 @@ get_data(struct curve_points *current_plot)
 		case CANDLESTICKS:
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
 				  v[2], v[3], v[4]);
+		    break;
+
+		case VECTOR:
+		    /* x,y,dx,dy, variable arrowstyle */
+		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0] + v[2],
+				  v[1], v[1] + v[3], v[4]);
 		    break;
 
 #ifdef EAM_OBJECTS

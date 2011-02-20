@@ -1,9 +1,10 @@
 #
-# $Id: arrowstyle.dem,v 1.1 2002/10/21 10:25:51 mikulik Exp $
+# $Id: arrowstyle.dem,v 1.2 2003/07/03 00:13:29 sfeam Exp $
 #
 #
 set xrange [-1000:1000]
 set yrange [-178:86]
+set tics scale 0
 
 set style line 1 lt 1 lw 2
 set style line 2 lt 3 lw 2
@@ -78,17 +79,19 @@ plot \
      'arrowstyle.dat' using 1:2:(0):3 notitle with vectors arrowstyle 8
 pause -1 "Hit return to continue"
 
-reset
+#reset
 
 #
 # Show plot with data style vectors
 #
 set title "Plot 'file' with vectors <arrowstyle>"
-set key box
+set key box opaque
+set xrange [*:*]
 set yrange [*:10]
+set for [i=1:8] style arrow i lc i
 plot '1.dat' using 1:2:(+1):(+1) with vectors lt 4 filled title 'filled', \
      '2.dat' using 1:2:(+1):(+1) with vectors lt 1 heads title 'double-headed', \
-     '2.dat' using ($1):(2-$2/3):(+1):(+.5) with vectors lt -1 lw 3 nohead title 'no head'
+     '2.dat' using ($1):(2-$2/3):(+1):(+2.5):(int($0)%8 + 1) with vectors as var ti 'arrowstyle variable'
 #
 pause -1 "Hi return to continue"
 #

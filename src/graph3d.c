@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.242 2011/01/21 04:49:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.243 2011/01/23 23:01:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -3175,24 +3175,34 @@ plot3d_vectors(struct surface_points *plot)
 {
     int i;
     double x1, y1, x2, y2;
+    arrow_style_type ap;
     struct coordinate GPHUGE *heads = plot->iso_crvs->points;
     struct coordinate GPHUGE *tails = plot->iso_crvs->next->points;
 
-    /* Only necessary once because all arrows equal */
-    term_apply_lp_properties(&(plot->arrow_properties.lp_properties));
-    apply_3dhead_properties(&(plot->arrow_properties));
+    /* Only necessary once, unless variable arrow style */
+    ap = plot->arrow_properties;
+    term_apply_lp_properties(&ap.lp_properties);
+    apply_3dhead_properties(&ap);
 
     for (i = 0; i < plot->iso_crvs->p_count; i++) {
 	
 	if (heads[i].type == UNDEFINED || tails[i].type == UNDEFINED)
 	    continue;
-		
-	check_for_variable_color(plot, &heads[i]);
+
+	/* variable arrow style read from extra data column */
+	if (plot->arrow_properties.tag == AS_VARIABLE) {
+	    int as= heads[i].CRD_COLOR;
+	    arrow_use_properties(&ap, as);
+	    term_apply_lp_properties(&ap.lp_properties);
+	    apply_head_properties(&ap);
+	} else {
+	    check_for_variable_color(plot, &heads[i]);
+	}
 
 	if (heads[i].type == INRANGE && tails[i].type == INRANGE) {
 	    map3d_xy_double(heads[i].x, heads[i].y, heads[i].z, &x1, &y1);
 	    map3d_xy_double(tails[i].x, tails[i].y, tails[i].z, &x2, &y2);
-	    draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2, plot->arrow_properties.head);
+	    draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2, ap.head);
 	}
     }
 }

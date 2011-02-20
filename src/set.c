@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.336 2011/01/16 19:15:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.337 2011/01/26 07:06:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5055,6 +5055,7 @@ set_arrowstyle()
 	    prev_arrowstyle->next = new_arrowstyle;	/* add it to end of list */
 	else
 	    first_arrowstyle = new_arrowstyle;	/* make it start of list */
+	new_arrowstyle->arrow_properties.tag = tag;
 	new_arrowstyle->tag = tag;
 	new_arrowstyle->next = this_arrowstyle;
 	this_arrowstyle = new_arrowstyle;

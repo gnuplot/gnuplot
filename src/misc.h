@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.33 2009/12/20 21:32:53 sfeam Exp $
+ * $Id: misc.h,v 1.34 2011/02/10 21:27:43 sfeam Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -71,6 +71,7 @@ void filledcurves_options_tofile __PROTO((filledcurves_opts *, FILE *));
 void lp_parse __PROTO((struct lp_style_type *, TBOOLEAN, TBOOLEAN));
 
 void arrow_parse __PROTO((struct arrow_style_type *, TBOOLEAN));
+void arrow_use_properties __PROTO((struct arrow_style_type *arrow, int tag));
 
 void parse_fillstyle __PROTO((struct fill_style_type *fs, int def_style,
                               int def_density, int def_pattern, t_colorspec def_border ));

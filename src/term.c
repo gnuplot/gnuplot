@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.213 2011/01/11 01:04:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.214 2011/01/26 06:09:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -911,8 +911,11 @@ term_apply_lp_properties(struct lp_style_type *lp)
 
     /* FIXME: This shouldn't happen, because the higher level code */
     /* should have made some decision about color before this. But */
-    /* better to draw in black than not to draw at all.            */
-    if (lt <= LT_COLORFROMCOLUMN) lt = LT_BLACK;
+    /* better to draw in black than to draw in some random color.  */
+    if (lt <= LT_COLORFROMCOLUMN) {
+	(*term->linetype) (LT_BLACK);
+	return;
+    }
 
     /* Apply "linetype", which can include both color and dot/dash */
     (*term->linetype) (lt);

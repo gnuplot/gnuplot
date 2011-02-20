@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.355 2011/01/22 05:56:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.356 2011/02/10 21:29:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3911,10 +3911,12 @@ plot_vectors(struct curve_points *plot)
     struct coordinate points[2];
     double ex, ey;
     double lx[2], ly[2];
+    arrow_style_type ap;
 
-    /* Only necessary once because all arrows equal */
-    term_apply_lp_properties(&(plot->arrow_properties.lp_properties));
-    apply_head_properties(&(plot->arrow_properties));
+    /* Normally this is only necessary once because all arrows equal */
+    ap = plot->arrow_properties;
+    term_apply_lp_properties(&ap.lp_properties);
+    apply_head_properties(&ap);
 
     for (i = 0; i < plot->p_count; i++) {
 
@@ -3924,6 +3926,14 @@ plot_vectors(struct curve_points *plot)
 
 	points[1].x = plot->points[i].xhigh;
 	points[1].y = plot->points[i].yhigh;
+
+	/* variable arrow style read from extra data column */
+	if (plot->arrow_properties.tag == AS_VARIABLE) {
+	    int as = plot->points[i].z;
+	    arrow_use_properties(&ap, as);
+	    term_apply_lp_properties(&ap.lp_properties);
+	    apply_head_properties(&ap);
+	}
 
 	/* variable color read from extra data column. */
 	check_for_variable_color(plot, &plot->varcolor[i]);
@@ -3937,14 +3947,14 @@ plot_vectors(struct curve_points *plot)
 	    if (points[0].type == INRANGE) {
 		x1 = map_x(points[0].x);
 		y1 = map_y(points[0].y);
-		(*t->arrow) (x1, y1, x2, y2, plot->arrow_properties.head);
+		(*t->arrow) (x1, y1, x2, y2, ap.head);
 	    } else if (points[0].type == OUTRANGE) {
 		/* from outrange to inrange */
 		if (clip_lines1) {
 		    edge_intersect(points, 1, &ex, &ey);
 		    x1 = map_x(ex);
 		    y1 = map_y(ey);
-		    if (plot->arrow_properties.head & END_HEAD)
+		    if (ap.head & END_HEAD)
 			(*t->arrow) (x1, y1, x2, y2, END_HEAD);
 		    else
 			(*t->arrow) (x1, y1, x2, y2, NOHEAD);
@@ -3961,7 +3971,7 @@ plot_vectors(struct curve_points *plot)
 		    edge_intersect(points, 1, &ex, &ey);
 		    x2 = map_x(ex);
 		    y2 = map_y(ey);
-		    if (plot->arrow_properties.head & BACKHEAD)
+		    if (ap.head & BACKHEAD)
 			(*t->arrow) (x2, y2, x1, y1, BACKHEAD);
 		    else
 			(*t->arrow) (x1, y1, x2, y2, NOHEAD);
