@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.19 2008/11/07 11:55:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.20 2010/12/14 23:02:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -55,6 +55,7 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.19 2008/11/07 11:55:46 mik
 #ifndef __MSC__
 # include <mem.h>
 #endif
+#include <sys/stat.h>
 
 #ifdef WIN32
 /* needed for mouse scroll wheel support */
@@ -1810,6 +1811,7 @@ DragFunc(LPTW lptw, HDROP hdrop)
 {
     int i, cFiles;
     LPSTR p;
+    struct stat buf;
 
     if ((lptw->DragPre==(LPSTR)NULL) || (lptw->DragPost==(LPSTR)NULL))
 	return;
@@ -1818,8 +1820,13 @@ DragFunc(LPTW lptw, HDROP hdrop)
 	char szFile[MAX_PATH];
 
 	DragQueryFile(hdrop, i, szFile, MAX_PATH);
-	for (p=lptw->DragPre; *p; p++)
-	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
+	stat(szFile, &buf);
+	if (buf.st_mode & S_IFDIR)
+	    for (p="cd '"; *p; p++)
+		SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
+	else
+	    for (p=lptw->DragPre; *p; p++)
+		SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
 	for (p=szFile; *p; p++)
 	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
 	for (p=lptw->DragPost; *p; p++)

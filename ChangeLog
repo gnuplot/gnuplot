@@ -1,3 +1,8 @@
+2011-02-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/text.c(DragFunc): Support drag and drop of directories onto 
+	the windows terminal emulator.
+
 2011-02-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_calln): Limit recursion depth for multi-variable
