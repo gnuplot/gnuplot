@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.201 2010/11/12 19:18:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.202 2010/11/18 23:59:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -130,6 +130,9 @@ static int winsystem __PROTO((const char *));
 #   include <dir.h>		/* setdisk() */
 #  endif
 # endif				/* !MSC */
+# ifdef WITH_HTML_HELP
+#   include <htmlhelp.h>
+# endif
 # include "win/winmain.h"
 #endif /* _Windows */
 
@@ -2131,7 +2134,29 @@ do_system(const char *cmd)
 void
 help_command()
 {
-
+#ifdef WITH_HTML_HELP
+    HtmlHelp(textwin.hWndParent, winhelpname, HH_DISPLAY_TOPIC, (DWORD_PTR)NULL);  // open help file if necessary
+    if (END_OF_COMMAND) {
+        printf("help: toc\n");
+	HtmlHelp(textwin.hWndParent, winhelpname, HH_DISPLAY_TOC, (DWORD_PTR)NULL);
+    } else {
+        HH_AKLINK link;
+	char buf[128];
+	int start = ++c_token;
+	while (!(END_OF_COMMAND))
+	    c_token++;
+	capture(buf, start, c_token - 1, 128);
+        link.cbStruct =     sizeof(HH_AKLINK) ;
+        link.fReserved =    FALSE;
+        link.pszKeywords =  buf; 
+        link.pszUrl =       NULL; 
+        link.pszMsgText =   NULL; 
+        link.pszMsgTitle =  NULL; 
+        link.pszWindow =    NULL;
+        link.fIndexOnFail = TRUE;
+        HtmlHelp(textwin.hWndParent, winhelpname, HH_KEYWORD_LOOKUP, (DWORD_PTR)&link);
+    }
+#else
     if (END_OF_COMMAND)
 	WinHelp(textwin.hWndParent, (LPSTR) winhelpname, HELP_INDEX, (DWORD) NULL);
     else {
@@ -2142,6 +2167,7 @@ help_command()
 	capture(buf, start, c_token - 1, 128);
 	WinHelp(textwin.hWndParent, (LPSTR) winhelpname, HELP_PARTIALKEY, (DWORD) buf);
     }
+#endif
 }
 #else  /* !_Windows */
 void
