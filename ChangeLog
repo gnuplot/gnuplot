@@ -1,6 +1,10 @@
 2011-02-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Windows HTML help, SF patch set #3186000.
+	* docs/gnuplot.doc: changes for windows html help: update titlepage,
+	  comment out old html anchor definitions and links, and add html
+	  replacements for tables
+	  
 	* docs/windows/doc2html.c: New help file format converter derived
 	  from docs/doc2rtf.c and docs/doc2html.c (Attic)
 
@@ -11,6 +15,12 @@
 	* docs/windows/wgnuplot.stp: New file. HTML help negative 
 	  list for search index generation. Caution: maximum size 512 bytes.
 
+	* src/command.c (help_command): issue error message if helpfile
+	  could not be opened, fix table of contents command ("help")
+	  
+	* src/win/winmain.c (WinExit) [WITH_HTML_HELP]: non need to close
+	  help window
+	
 	SF patch set #3186010.
 	* history.c (write_history_list history_find history_find_all):
 	  use ANSI C definitions
