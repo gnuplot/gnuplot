@@ -8,17 +8,8 @@ terminals in Lua instead of C. The first (and currently only) implemented
 `backend' is the PGF/TikZ terminal for the use with TeX/LaTeX.
 
 The actual terminal functionality is a provided by a separate Lua script
-`gnuplot.lua'. The LaTeX style file is usually derived from PGF/TikZ terminal
+`gnuplot-tikz.lua'. The LaTeX style file is usually derived from PGF/TikZ terminal
 script to keep things consistent.
-
-
-
-Disclaimer
-==========
-
-This terminal is tested with Lua 5.1 and gnuplot 4.2 and 4.3csv,
-and since I am exclusively using Linux it is also mainly tested on
-this platform.
 
 
 
@@ -52,9 +43,36 @@ Here is a brief list of reasons:
        are available.
     e. overlaying of the plot with e.g. additional nodes, arrows etc. is 
        possible through the use the of tikz coordinates of the actual
-       plotting area (at least on 2D plots).
+       plotting area.
 
 For more reasons please have a look at the PGF/TikZ manual ;-)
+
+
+
+Generating style and help file
+==============================
+
+To generate the style files and wrapper for the various TeX flavors enter
+
+  lua gnuplot-tikz.lua style
+
+on the command line. The files generated should be
+
+  t-gnuplot-lua-tikz.tex        (Context wrapper)
+  gnuplot-lua-tikz.tex          (plain TeX wrapper)
+  gnuplot-lua-tikz.sty          (LaTeX wrapper)
+  gnuplot-lua-tikz-common.tex   (common definitions)
+
+and can be copied to the appropriate places.
+
+  lua gnuplot-tikz.lua help
+
+prints the terminal help on stdout and
+
+  lua gnuplot-tikz.lua termhelp > gnuplot-tikz.help
+
+generates the version to be included in gnuplot help system.
+
 
 
 Usage
@@ -63,15 +81,15 @@ Usage
 The usage is quite similar to the other terminals with the difference that
 most terminal options are processed by the external Lua script. To see the
 list of additional script options just type
-  gnuplot> set term lua help
+  gnuplot> set term lua tikz help
 or
-  # lua gnuplot.lua
+  # lua gnuplot-tikz.lua
 on the command line.
 
 
 A minimalist gnuplot session (or script) may look like this:
   
-> set term lua          # activate the Lua terminal and load "gnuplot.lua"
+> set term lua tikz     # activate the Lua terminal and load "gnuplot.lua"
 > set out 'test.tex'    # write output to file 'test.tex'
 > plot x*x              # plot a nice parabola
 
@@ -89,10 +107,9 @@ to the preamble.
 
 
 
-Any comments, suggestions and bug reports are most welcome and should go
-to <peter(at)affenbande.org>.
+Any comments, suggestions and bug reports are most welcome and can go
+to <peter(at)affenbande.org> or the Sourceforge bug and patch trackers.
 
 Have fun!
 
--Peter Hedwig <peter@affenbande.org>
-
+Peter Hedwig <peter@affenbande.org>

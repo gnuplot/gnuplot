@@ -1,10 +1,21 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 AUTOMAKE_OPTIONS = foreign 1.2h
 
-EXTRA_DIST = README gnuplot.cfg gnuplot-lua-tikz.sty
+EXTRA_DIST = README ${tex_DATA}
 
-tex_DATA = gnuplot.cfg gnuplot-lua-tikz.sty
+lua_files = gnuplot-lua-tikz.sty gnuplot-lua-tikz-common.tex gnuplot-lua-tikz.tex t-gnuplot-lua-tikz.tex
+
+if BUILD_LUA
+     build_lua = BUILD_LUA
+else
+     build_lua =
+endif
+
+tex_DATA = gnuplot.cfg ${lua_files}
 texdir = @TEXDIR@
+
+${lua_files}:
+	test -z "$(build_lua)" || lua ../../term/lua/gnuplot-tikz.lua style
 
 install-data-hook:
 	test -n "$(DESTDIR)" || $(TEXHASH)

@@ -1,3 +1,17 @@
+2011-02-19
+
+  * support for ConTeXt and plain TeX
+  * removed dependencies for LaTeX packages other than TikZ
+  * needs TikZ Version >= 2.0
+  * better support for saving terminal options with gnuplot 'save' command
+  * all bitmap images can be externalized
+  * alpha channel support for bimap images via externalized PNGs
+  * new options 'crop', 'background', 'textscale', 'externalimages'
+  * fixed "overflow" bug on negative coordinates that are outside of the crop box
+  * various small bugfixes
+  
+  Backward compatibility is dropped again.
+
 2009-03-29
 
   * Providing a script or target name is now mandatory. The new syntax:

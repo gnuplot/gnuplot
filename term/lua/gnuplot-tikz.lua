@@ -37,9 +37,9 @@
 
 
 
-  $Date: 2009/10/29 03:42:14 $
+  $Date: 2009/06/05 05:37:04 $
   $Author: sfeam $
-  $Rev: 96 $
+  $Rev: 98 $
 
 ]]--
 
@@ -71,11 +71,17 @@ pgf.DEFAULT_TIC_SIZE = 0.18
 pgf.DEFAULT_RESOLUTION = 1000
 -- default font size in TeX pt
 pgf.DEFAULT_FONT_SIZE = 10
+-- default sizes for CM@10pt and default resolution
+-- there is no need to adapt these values when changing 
+-- pgf.DEFAULT_FONT_SIZE or pgf.DEFAULT_RESOLUTION !
+pgf.DEFAULT_FONT_H_CHAR = 184
+pgf.DEFAULT_FONT_V_CHAR = 308
 
-pgf.LATEX_STYLE_FILE = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = string.sub("$Rev: 96a $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2009/10/29 03:42:14 $",
+pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
+
+pgf.REVISION = string.sub("$Rev: 98 $",7,-3)
+pgf.REVISION_DATE = string.gsub("$Date: 2011/02/13 05:37:04 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -117,7 +123,7 @@ pgf.styles.plotstyles = {
 }
 
 pgf.styles.linetypes_axes = {
-  [1] = {"gp lt axes", "dashed"},  -- An lt of -1 is used for the X and Y axes.  
+  [1] = {"gp lt axes", "dotted"},  -- An lt of -1 is used for the X and Y axes.  
   [2] = {"gp lt border", "solid"}, -- An lt of -2 is used for the border of the plot.
 }
 
@@ -134,19 +140,19 @@ pgf.styles.linetypes = {
 
 -- corresponds to pgf.styles.linetypes
 pgf.styles.lt_colors_axes = {
-  [1] = {"gp lt color axes", "black"},
+  [1] = {"gp lt color axes", "black!30"},
   [2] = {"gp lt color border", "black"},
 }
 
 pgf.styles.lt_colors = {
   [1] = {"gp lt color 0", "red"},
-  [2] = {"gp lt color 1", "green!60!black"},
+  [2] = {"gp lt color 1", "green"},
   [3] = {"gp lt color 2", "blue"},
   [4] = {"gp lt color 3", "magenta"},
   [5] = {"gp lt color 4", "cyan"},
-  [6] = {"gp lt color 5", "orange"},
-  [7] = {"gp lt color 6", "yellow!80!red"},
-  [8] = {"gp lt color 7", "blue!80!black"}
+  [6] = {"gp lt color 5", "yellow"},
+  [7] = {"gp lt color 6", "orange"},
+  [8] = {"gp lt color 7", "purple"}
 }
 
 pgf.styles.patterns = {
@@ -226,36 +232,34 @@ pgf.format_coord = function(xc, yc)
 end
 
 pgf.write_doc_begin = function(preamble)
-  gp.write("\\documentclass["..pgf.DEFAULT_FONT_SIZE.."pt]{article}\n"
-        .."\\usepackage[T1]{fontenc}\n"
-        .."\\usepackage{textcomp}\n\n"
-        .."\\usepackage[utf8x]{inputenc}\n\n"
-        .."\\usepackage{"..pgf.LATEX_STYLE_FILE.."}\n"
-        .."\\pagestyle{empty}\n"
-        .."\\usepackage[active,tightpage]{preview}\n"
-        .."\\PreviewEnvironment{tikzpicture}\n"
-        .."\\setlength\\PreviewBorder{2mm}\n"
-        ..preamble.."\n\n"
-        .."\\begin{document}\n")
+  gp.write(gfx.format[gfx.opt.tex_format].docheader)
+  gp.write(preamble)
+  gp.write(gfx.format[gfx.opt.tex_format].begindocument)
 end
 
 pgf.write_doc_end = function()
-  gp.write("\\end{document}\n")
+    gp.write(gfx.format[gfx.opt.tex_format].enddocument)
 end
 
 pgf.write_graph_begin = function (font, noenv)
   local global_opt = "" -- unused
+  if gfx.opt.full_doc then
+    gp.write(gfx.format[gfx.opt.tex_format].beforetikzpicture)
+  end
   if noenv then
     gp.write("%% ") -- comment out
   end
-  gp.write(string.format("\\begin{tikzpicture}[gnuplot%s]\n",global_opt))
-  gp.write(string.format("%%%% generated with GNUPLOT %sp%s (%s; terminal rev. %s, script rev. %s)\n%%%% %s\n",
-      term.gp_version, term.gp_patchlevel,
-      string.match(term.lua_ident, "Lua [0-9\.]+"),
-      string.sub(term.lua_term_revision,7,-3),
-      pgf.REVISION,os.date()))
+  gp.write(string.format("%s[gnuplot%s]\n", gfx.format[gfx.opt.tex_format].begintikzpicture, global_opt))
+  gp.write(string.format("%%%% generated with GNUPLOT %sp%s (%s; terminal rev. %s, script rev. %s)\n",
+      term.gp_version, term.gp_patchlevel, _VERSION, string.sub(term.lua_term_revision,7,-3), pgf.REVISION))
+  if not gfx.opt.notimestamp then
+    gp.write(string.format("%%%% %s\n", os.date()))
+  end
   if font ~= "" then
-    gp.write(string.format("\\tikzstyle{every node}+=[font=%s]\n", font))
+    gp.write(string.format("\\tikzset{every node/.append style={font=%s}}\n", font))
+  end
+  if gfx.opt.fontscale ~= nil then
+    gp.write(string.format("\\tikzset{every node/.append style={scale=%.2f}}\n", gfx.opt.fontscale))
   end
   if not gfx.opt.lines_dashed then
     gp.write("\\gpsolidlines\n")
@@ -263,13 +267,22 @@ pgf.write_graph_begin = function (font, noenv)
   if not gfx.opt.lines_colored then
     gp.write("\\gpmonochromelines\n")
   end
+  if gfx.opt.bgcolor ~= nil then
+    gp.write(string.format("\\gpsetbgcolor{%.3f,%.3f,%.3f}\n", gfx.opt.bgcolor[1], gfx.opt.bgcolor[3], gfx.opt.bgcolor[3]))
+  end
 end
 
 pgf.write_graph_end = function(noenv)
   if noenv then
     gp.write("%% ") -- comment out
   end
-  gp.write("\\end{tikzpicture}\n")
+  if gfx.opt.full_doc then
+    gp.write(gfx.format[gfx.opt.tex_format].beforeendtikzpicture)
+  end
+  gp.write(gfx.format[gfx.opt.tex_format].endtikzpicture .. "\n")
+  if gfx.opt.full_doc then
+    gp.write(gfx.format[gfx.opt.tex_format].aftertikzpicture)
+  end
 end
 
 pgf.draw_path = function(t)
@@ -380,10 +393,10 @@ end
 
 pgf.draw_fill = function(t, pattern, color, saturation, opacity)
   local fill_path = ''
-  local fill_style = ''
+  local fill_style = color
   
   if saturation < 100 then
-    gp.write("\\begin{colormixin}{"..saturation.."!white}\n")
+    fill_style = fill_style .. ",color=.!"..saturation;
   end
 
   fill_path = fill_path .. '('..pgf.format_coord(t[1][1], t[1][2])..')'
@@ -410,7 +423,7 @@ pgf.draw_fill = function(t, pattern, color, saturation, opacity)
   
   if pattern == '' then
     -- solid fills
-    fill_style = 'color='..color
+--    fill_style = 'color='..color
     if opacity < 100 then
       fill_style = fill_style..string.format(",opacity=%.2f", opacity/100)
     else
@@ -418,7 +431,7 @@ pgf.draw_fill = function(t, pattern, color, saturation, opacity)
     end
   else
     -- pattern fills
-    fill_style = pattern..',pattern color='..color
+    fill_style = fill_style..','..pattern..',pattern color=.'
   end
   local out = ''
   if (pattern ~= '') and (opacity == 100) then
@@ -429,13 +442,17 @@ pgf.draw_fill = function(t, pattern, color, saturation, opacity)
   else
     gp.write("\\gpfill{"..fill_style.."} "..fill_path..";\n")
   end
+end
   
-  if saturation < 100 then
-    gp.write("\\end{colormixin}\n")
-  end
+pgf.load_image_file = function(ll, ur, xfile)
+  gp.write(string.format("\\gploadimage{%.3f}{%.3f}{%.3f}{%.3f}{%s}\n",
+      pgf.transform_xcoord(ll[1]), pgf.transform_ycoord(ll[2]),
+      (pgf.transform_xcoord(ur[1]) - pgf.transform_xcoord(ll[1])),
+      (pgf.transform_ycoord(ur[2]) - pgf.transform_ycoord(ll[2])),
+       xfile))
 end
 
-pgf.draw_raw_rgb_image = function(t, m, n, ll, ur)
+pgf.draw_raw_rgb_image = function(t, m, n, ll, ur, xfile)
   local gw = gp.write
   local sf = string.format
   local xs = sf("%.3f", pgf.transform_xcoord(ur[1]) - pgf.transform_xcoord(ll[1]))
@@ -450,10 +467,10 @@ pgf.draw_raw_rgb_image = function(t, m, n, ll, ur)
   gw("}%\n")
   gw("\\gprawimage{rgb}{"..sf("%.3f", pgf.transform_xcoord(ll[1])).."}"
       .."{"..sf("%.3f", pgf.transform_ycoord(ll[2])).."}"
-      .."{"..m.."}{"..n.."}{"..xs.."}{"..ys.."}{\\gprawrgbimagedata}\n")
+      .."{"..m.."}{"..n.."}{"..xs.."}{"..ys.."}{\\gprawrgbimagedata}{"..xfile.."}\n")
 end
 
-pgf.draw_raw_cmyk_image = function(t, m, n, ll, ur)
+pgf.draw_raw_cmyk_image = function(t, m, n, ll, ur, xfile)
   local gw = gp.write
   local sf = string.format
   local min = math.min
@@ -483,17 +500,17 @@ pgf.draw_raw_cmyk_image = function(t, m, n, ll, ur)
   gw("}%\n")
   gw("\\gprawimage{cmyk}{"..sf("%.3f", pgf.transform_xcoord(ll[1])).."}"
       .."{"..sf("%.3f", pgf.transform_ycoord(ll[2])).."}"
-      .."{"..m.."}{"..n.."}{"..xs.."}{"..ys.."}{\\gprawcmykimagedata}\n")
+      .."{"..m.."}{"..n.."}{"..xs.."}{"..ys.."}{\\gprawcmykimagedata}{"..xfile.."}\n")
 end
 
 pgf.write_clipbox_begin = function (ll, ur)
-  gp.write("\\begin{scope}\n")
+  gp.write(gfx.format[gfx.opt.tex_format].beginscope.."\n")
   gp.write(string.format("\\clip (%s) rectangle (%s);\n",
       pgf.format_coord(ll[1],ll[2]),pgf.format_coord(ur[1],ur[2])))
 end
 
 pgf.write_clipbox_end = function()
-  gp.write("\\end{scope}\n")
+  gp.write(gfx.format[gfx.opt.tex_format].endscope.."\n")
 end
 
 pgf.write_boundingbox = function(t, num)
@@ -511,27 +528,148 @@ pgf.write_variables = function(t)
 end
 
 -- write style to seperate file, or whatever...
-pgf.create_style = function(f)
-f:write([[
+pgf.create_style = function()
+  local name_common  = pgf.STYLE_FILE_BASENAME.."-common.tex"
+  local name_latex   = pgf.STYLE_FILE_BASENAME..".sty"
+  local name_tex     = pgf.STYLE_FILE_BASENAME..".tex"
+  local name_context = "t-"..pgf.STYLE_FILE_BASENAME..".tex"
+
+-- LaTeX
+
+local f_latex   = io.open(name_latex, "w+")
+f_latex:write([[
 %%
-%%  This is the style file for the gnuplot PGF/TikZ terminal
+%%  LaTeX wrapper for gnuplot-tikz style file
+%%
+\NeedsTeXFormat{LaTeX2e}
+]])
+f_latex:write("\\ProvidesPackage{"..pgf.STYLE_FILE_BASENAME.."}%\n")
+f_latex:write("          ["..pgf.REVISION_DATE.." (rev. "..pgf.REVISION..") GNUPLOT Lua terminal style]\n\n")
+f_latex:write([[
+\RequirePackage{tikz}
+
+\usetikzlibrary{arrows,patterns,plotmarks,backgrounds}
+]])
+f_latex:write("\\input "..name_common.."\n")
+f_latex:write([[
+
+\endinput
+]])
+f_latex:close()
+
+-- ConTeXt
+
+local f_context = io.open(name_context, "w+")
+f_context:write([[
+%%
+%%  ConTeXt wrapper for gnuplot-tikz style file
+%%
+\usemodule[tikz]
+
+\usetikzlibrary[arrows,patterns,plotmarks,backgrounds]
+
+\edef\tikzatcode{\the\catcode`\@}
+\edef\tikzbarcode{\the\catcode`\|}
+\edef\tikzexclaimcode{\the\catcode`\!}
+\catcode`\@=11
+\catcode`\|=12
+\catcode`\!=12
+
+]])
+f_context:write("\\input "..name_common.."\n")
+f_context:write([[
+
+\catcode`\@=\tikzatcode
+\catcode`\|=\tikzbarcode
+\catcode`\!=\tikzexclaimcode
+
+\endinput
+]])
+f_context:close()
+
+
+-- plain TeX
+
+local f_tex     = io.open(name_tex, "w+")
+f_tex:write([[
+%%
+%%  plain TeX wrapper for gnuplot-tikz style file
+%%
+\input tikz.tex
+\usetikzlibrary{arrows,patterns,plotmarks,backgrounds}
+
+\edef\tikzatcode{\the\catcode`\@}
+\catcode`\@=11
+
+]])
+f_tex:write("\\input "..name_common.."\n\n")
+f_tex:write([[
+
+\catcode`\@=\tikzatcode
+
+\endinput
+]])
+f_tex:close()
+
+-- common
+
+local f = io.open(name_common, "w+")
+f:write([[
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%     Common style file for TeX, LaTeX and ConTeXt
 %%  
 %%  It is associated with the 'gnuplot.lua' script, and usually generated
 %%  automatically. So take care whenever you make any changes!
 %%
-\NeedsTeXFormat{LaTeX2e}
-]])
-f:write("\\ProvidesPackage{"..pgf.LATEX_STYLE_FILE.."}%\n")
-f:write("          ["..pgf.REVISION_DATE.." (rev. "..pgf.REVISION..") GNUPLOT Lua terminal style]\n\n")
-f:write([[
-\RequirePackage{tikz,xxcolor,ifpdf,ifxetex}
 
-\usetikzlibrary{arrows,patterns,plotmarks}
+% check for the correct TikZ version
+\def\gpchecktikzversion#1.#2\relax{%
+\ifnum#1<2%
+  \PackageError{gnuplot-lua-tikz}{PGF/TikZ version >= 2.0 is required, but version \pgfversion\space was found}{}%
+\fi}
+\expandafter\gpchecktikzversion\pgfversion\relax
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%%  
-%%
+% FIXME: is there a more elegant way to determine the output format?
+
+\def\pgfsysdriver@a{pgfsys-dvi.def}       % ps
+\def\pgfsysdriver@b{pgfsys-dvipdfm.def}   % pdf
+\def\pgfsysdriver@c{pgfsys-dvipdfmx.def}  % pdf
+\def\pgfsysdriver@d{pgfsys-dvips.def}     % ps
+\def\pgfsysdriver@e{pgfsys-pdftex.def}    % pdf
+\def\pgfsysdriver@f{pgfsys-tex4ht.def}    % html
+\def\pgfsysdriver@g{pgfsys-textures.def}  % ps
+\def\pgfsysdriver@h{pgfsys-vtex.def}      % ps
+\def\pgfsysdriver@i{pgfsys-xetex.def}     % pdf
+
+\newif\ifgppdfout\gppdfoutfalse
+\newif\ifgppsout\gppsoutfalse
+
+\ifx\pgfsysdriver\pgfsysdriver@a
+  \gppsouttrue
+\else\ifx\pgfsysdriver\pgfsysdriver@b
+  \gppdfouttrue
+\else\ifx\pgfsysdriver\pgfsysdriver@c
+  \gppdfouttrue
+\else\ifx\pgfsysdriver\pgfsysdriver@d
+  \gppsouttrue
+\else\ifx\pgfsysdriver\pgfsysdriver@e
+  \gppdfouttrue
+\else\ifx\pgfsysdriver\pgfsysdriver@f
+  % tex4ht
+\else\ifx\pgfsysdriver\pgfsysdriver@g
+  \gppsouttrue
+\else\ifx\pgfsysdriver\pgfsysdriver@h
+  \gppsouttrue
+\else\ifx\pgfsysdriver\pgfsysdriver@i
+  \gppdfouttrue
+\fi\fi\fi\fi\fi\fi\fi\fi\fi
+
+% uncomment the following lines to make font values "appendable"
+% and if you are really sure about that ;-)
+% \pgfkeyslet{/tikz/font/.@cmd}{\undefined}
+% \tikzset{font/.initial={}}
+% \def\tikz@textfont{\pgfkeysvalueof{/tikz/font}}
 
 %
 % image related stuff
@@ -565,24 +703,30 @@ f:write([[
   \pgfsysprotocol@literalbuffered{false \gp@temp\space colorimage}%
   \pgfsysprotocol@literal{#6 >}%
 }
+\def\gp@rawimage@html#1#2#3#4#5#6{%
+% FIXME: print a warning message here
+}
 
-
-\ifpdf
+\ifgppdfout
   \def\gp@rawimage{\gp@rawimage@pdf}
 \else
-  \ifxetex
-    \def\gp@rawimage{\gp@rawimage@pdf}
-  \else
+  \ifgppsout
     \def\gp@rawimage{\gp@rawimage@ps}
+  \else
+    \def\gp@rawimage{\gp@rawimage@html}
   \fi
 \fi
+
+
+\def\gploadimage#1#2#3#4#5{%
+  \pgftext[left,bottom,x=#1cm,y=#2cm] {\pgfimage[interpolate=false,width=#3cm,height=#4cm]{#5}};%
+}
 
 \def\gp@set@size#1{%
   \def\gp@image@size{#1}%
 }
-%% \gprawimage{color model}{xcoord}{ycoord}{# of xpixel}{# of ypixel}{xsize}{ysize}{rgb/cmyk hex data RRGGBB/CCMMYYKK ...}
-%% color model is 'cmyk' or 'rgb' (default)
-\def\gprawimage#1#2#3#4#5#6#7#8{%
+
+\def\gp@rawimage@#1#2#3#4#5#6#7#8{
   \tikz@scan@one@point\gp@set@size(#6,#7)\relax%
   \tikz@scan@one@point\pgftransformshift(#2,#3)\relax%
   \pgftext {%
@@ -593,12 +737,27 @@ f:write([[
   }%
 }
 
+%% \gprawimage{color model}{xcoord}{ycoord}{# of xpixel}{# of ypixel}{xsize}{ysize}{rgb/cmyk hex data RRGGBB/CCMMYYKK ...}{file name}
+%% color model is 'cmyk' or 'rgb' (default)
+\def\gprawimage#1#2#3#4#5#6#7#8#9{%
+  \ifx&#9&%
+    \gp@rawimage@{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}
+  \else
+    \ifgppsout
+      \gp@rawimage@{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}
+    \else
+      \gploadimage{#2}{#3}{#6}{#7}{#9}
+    \fi
+  \fi
+}
+
 %
 % gnuplottex comapatibility
 % (see http://www.ctan.org/tex-archive/help/Catalogue/entries/gnuplottex.html)
 %
 
 \def\gnuplottexextension@lua{\string tex}
+\def\gnuplottexextension@tikz{\string tex}
 
 %
 % gnuplot variables getter and setter
@@ -616,41 +775,36 @@ f:write([[
 % some wrapper code
 %
 
-% short for the lengthy xcolor rgb definition
-\def\gprgb#1#2#3{rgb,1000:red,#1;green,#2;blue,#3}
-
 % short for a filled path
 \def\gpfill#1{\path[fill,#1]}
 
-% short for changing the linewidth
+% short for changing the line width
 \def\gpsetlinewidth#1{\pgfsetlinewidth{#1\gpbaselw}}
 
-\def\gpsetlinetype#1{\tikzstyle{gp path}=[#1,#1 add]}
+% short for changing the line type
+\def\gpsetlinetype#1{\tikzset{gp path/.style={#1,#1 add}}}
 
-% short for changing the pointsize
-\def\gpsetpointsize#1{\tikzstyle{gp point}=[mark size=#1\gpbasems]}
+% short for changing the point size
+\def\gpsetpointsize#1{\tikzset{gp point/.style={mark size=#1\gpbasems}}}
 
 % wrapper for color settings
-\def\gpcolor#1{\pgfsetcolor{#1}}
+\def\gpcolor#1{\tikzset{global #1}}
+\tikzset{rgb color/.code={\pgfutil@definecolor{.}{rgb}{#1}\color{.}}}
+\tikzset{global rgb color/.code={\pgfutil@definecolor{.}{rgb}{#1}\color{.}}}
+\tikzset{global color/.code={\color{#1}}}
 
 % prevent plot mark distortions due to changes in the PGF transformation matrix
 % use `\gpscalepointstrue' and `\gpscalepointsfalse' for enabling and disabling
 % point scaling
 %
 \newif\ifgpscalepoints
-\tikzoption{gp shift only}[]{%
-  \ifgpscalepoints%
-  \else%
-    % this is actually the same definition as used by "shift only" (seen
-    % in pgf-1.18 and later)
-    \tikz@addtransform{\pgftransformresetnontranslations}%
-  \fi%
-}
+\tikzset{gp shift only/.style={%
+  \ifgpscalepoints\else shift only\fi%
+}}
 \def\gppoint#1#2{%
   \path[solid] plot[only marks,gp point,#1,mark options={gp shift only}] coordinates {#2};%
 }
 
-\def\gpfontsize#1#2{\fontsize{#1}{#2}\selectfont}
 
 %
 % char size calculation, that might be used with gnuplottex
@@ -690,7 +844,6 @@ f:write([[
 
 %
 %  define a rectangular node in tikz e.g. for the plot area
-%  FIXME: this is done globally to work with gnuplottex.sty
 %
 %  #1 node name
 %  #2 coordinate of "south west"
@@ -718,15 +871,15 @@ f:write([[
 %
 % style for every plot
 %
-\tikzstyle{gnuplot}=[%
+\tikzset{gnuplot/.style={%
   >=stealth',%
   cap=round,%
   join=round,%
-]
+}}
 
-\tikzstyle{gp node left}=[anchor=mid west,yshift=-.12ex]
-\tikzstyle{gp node center}=[anchor=mid,yshift=-.12ex]
-\tikzstyle{gp node right}=[anchor=mid east,yshift=-.12ex]
+\tikzset{gp node left/.style={anchor=mid west,yshift=-.12ex}}
+\tikzset{gp node center/.style={anchor=mid,yshift=-.12ex}}
+\tikzset{gp node right/.style={anchor=mid east,yshift=-.12ex}}
 
 % basic plot mark size (points)
 \newdimen\gpbasems
@@ -739,10 +892,15 @@ f:write([[
 % this is the default color for pattern backgrounds
 \colorlet{gpbgfillcolor}{white}
 
+% set background color and fill color
+\def\gpsetbgcolor#1{%
+  \pgfutil@definecolor{gpbgfillcolor}{rgb}{#1}%
+  \tikzset{tight background,background rectangle/.style={fill=gpbgfillcolor},show background rectangle}%
+}
 
 % this should reverse the normal text node presets, for the
 % later referencing as described below
-\tikzstyle{gp refnode}=[coordinate,yshift=.12ex]
+\tikzset{gp refnode/.style={coordinate,yshift=.12ex}}
 
 % to add an empty label with the referenceable name "my node"
 % to the plot, just add the following line to your gnuplot
@@ -750,6 +908,9 @@ f:write([[
 %
 % set label "" at 1,1 font ",gp refnode,name=my node"
 %
+
+% enlargement of the bounding box in standalone mode (only used by LaTeX/ConTeXt)
+\def\gpbboxborder{0mm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -762,35 +923,35 @@ f:write([[
 ]])
   f:write("% arrow styles settings\n")
   for i = 1, #pgf.styles.arrows do
-    f:write("\\tikzstyle{"..pgf.styles.arrows[i][1].."} = ["..pgf.styles.arrows[i][2].."]\n")
+    f:write("\\tikzset{"..pgf.styles.arrows[i][1].."/.style={"..pgf.styles.arrows[i][2].."}}\n")
   end
   f:write("\n% plotmark settings\n")
   for i = 1, #pgf.styles.plotmarks do
-    f:write("\\tikzstyle{"..pgf.styles.plotmarks[i][1].."} = ["..pgf.styles.plotmarks[i][2].."]\n")
+    f:write("\\tikzset{"..pgf.styles.plotmarks[i][1].."/.style={"..pgf.styles.plotmarks[i][2].."}}\n")
   end
   f:write("\n% pattern settings\n")
   for i = 1, #pgf.styles.patterns do
-    f:write("\\tikzstyle{"..pgf.styles.patterns[i][1].."} = ["..pgf.styles.patterns[i][2].."]\n")
+    f:write("\\tikzset{"..pgf.styles.patterns[i][1].."/.style={"..pgf.styles.patterns[i][2].."}}\n")
   end
   f:write("\n% if the 'tikzplot' option is used the corresponding lines will be smoothed by default\n")
   for i = 1, #pgf.styles.plotstyles_axes do
-    f:write("\\tikzstyle{"..pgf.styles.plotstyles_axes[i][1].."} = ["..pgf.styles.plotstyles_axes[i][2].."]%\n")
+    f:write("\\tikzset{"..pgf.styles.plotstyles_axes[i][1].."/.style="..pgf.styles.plotstyles_axes[i][2].."}\n")
   end
   for i = 1, #pgf.styles.plotstyles do
-    f:write("\\tikzstyle{"..pgf.styles.plotstyles[i][1].."} = ["..pgf.styles.plotstyles[i][2].."]%\n")
+    f:write("\\tikzset{"..pgf.styles.plotstyles[i][1].."/.style="..pgf.styles.plotstyles[i][2].."}\n")
   end
   -- line styles for borders etc ...
   f:write("\n% linestyle settings\n")
   for i = 1, #pgf.styles.linetypes_axes do
-    f:write("\\tikzstyle{"..pgf.styles.linetypes_axes[i][1].."} = ["..pgf.styles.linetypes_axes[i][2].."]\n")
+    f:write("\\tikzset{"..pgf.styles.linetypes_axes[i][1].."/.style="..pgf.styles.linetypes_axes[i][2].."}\n")
   end
   f:write("\n% linestyle \"addon\" settings for overwriting a default linestyle within the\n")
-  f:write("% TeX document via eg. \\tikzstyle{gp lt plot 1 add}=[fill=black,draw=none] etc.\n")
+  f:write("% TeX document via eg. \\tikzset{gp lt plot 1 add}=[fill=black,draw=none] etc.\n")
   for i = 1, #pgf.styles.linetypes_axes do
-    f:write("\\tikzstyle{"..pgf.styles.linetypes_axes[i][1].." add} = []\n")
+    f:write("\\tikzset{"..pgf.styles.linetypes_axes[i][1].." add/.style={}}\n")
   end
   for i = 1, #pgf.styles.linetypes do
-    f:write("\\tikzstyle{"..pgf.styles.linetypes[i][1].." add} = []\n")
+    f:write("\\tikzset{"..pgf.styles.linetypes[i][1].." add/.style={}}\n")
   end
   f:write("\n% linestyle color settings\n")
   for i = 1, #pgf.styles.lt_colors_axes do
@@ -800,7 +961,7 @@ f:write([[
   f:write("\n% command for switching to dashed lines\n")
   f:write("\\def\\gpdashedlines{%\n")
   for i = 1, #pgf.styles.linetypes do
-    f:write("  \\tikzstyle{"..pgf.styles.linetypes[i][1].."} = ["..pgf.styles.linetypes[i][2].."]%\n")
+    f:write("  \\tikzset{"..pgf.styles.linetypes[i][1].."/.style={"..pgf.styles.linetypes[i][2].."}}\n")
   end
   f:write("}\n")
   f:write("\n% command for switching to colored lines\n")
@@ -812,7 +973,7 @@ f:write([[
   f:write("\n% command for switching to solid lines\n")
   f:write("\\def\\gpsolidlines{%\n")
   for i = 1, #pgf.styles.linetypes do
-    f:write("  \\tikzstyle{"..pgf.styles.linetypes[i][1].."} = [solid]%\n")
+    f:write("  \\tikzset{"..pgf.styles.linetypes[i][1].."/.style=solid}%\n")
   end
   f:write("}\n")
   f:write("\n% command for switching to monochrome (black) lines\n")
@@ -840,26 +1001,31 @@ end
 pgf.print_help = function(fwrite)
 
   fwrite([[
-      {help}
-      {monochrome}
-      {solid}
-      {originreset}
-      {gparrows}
-      {gppoints}
-      {nopicenvironment}
+      {latex | tex | context}
+      {color | monochrome}
+      {dashed | solid}
+      {nooriginreset | originreset}
+      {nogparrows | gparrows}
+      {nogppoints | gppoints}
+      {picenvironment | nopicenvironment}
+      {noclip | clip}
+      {background "<colorpec>"}
       {size <x>{unit},<y>{unit}}
       {scale <x>,<y>}
       {plotsize <x>{unit},<y>{unit}}
       {charsize <x>{unit},<y>{unit}}
       {font "<fontdesc>"}
-      {createstyle}
-      {fulldoc|standalone}
-      {{preamble|header} "<preamble_string>"}
+      {{fontscale | textscale} <scale>}
+      {nofulldoc | nostandalone | fulldoc | standalone}
+      {{preamble | header} "<preamble_string>"}
       {tikzplot <ltn>,...}
-      {tikzarrows}
-      {cmykimages}
-      {nobitmap}
+      {notikzarrows | tikzarrows}
+      {rgbimages | cmykimages}
+      {noexternalimages|externalimages}
+      {bitmap | nobitmap}
       {providevars <var name>,...}
+      {createstyle}
+      {help}
 
  For all options that expect lengths as their arguments they
  will default to 'cm' if no unit is specified. For all lengths
@@ -887,8 +1053,19 @@ pgf.print_help = function(fwrite)
  environment in order to set it manually. This permits putting
  some PGF/TikZ code directly before or after the plot.
 
- The 'size' option expects two lenghts <x> and <y> as the canvas size.
- The default size of the canvas is ]]..pgf.DEFAULT_CANVAS_SIZE_X..[[cm x ]]..pgf.DEFAULT_CANVAS_SIZE_Y..[[cm.
+ 'clip' crops the plot at the defined canvas size. Default is
+ 'noclip' by which only a minimum bounding box of the canvas size
+ is set. Neither a fixed bounding box nor a crop box is set if the
+ 'plotsize' option is used.
+
+ 'background' sets the background color to the value specified in
+ the <colorpec> argument. <colorspec> must be a valid color name or
+ a 3 byte RGB code as a hexadecimal number with a preceding number
+ sign ('#'). E.g. '#ff0000' specifies pure red. If omitted the
+ background is transparent.
+
+ The 'size' option expects two lenghts <x> and <y> as the canvas
+ size. The default size of the canvas is ]]..pgf.DEFAULT_CANVAS_SIZE_X..[[cm x ]]..pgf.DEFAULT_CANVAS_SIZE_Y..[[cm.
 
  The 'scale' option works similar to the 'size' option but expects
  scaling factors <x> and <y> instead of lengths.
@@ -897,14 +1074,26 @@ pgf.print_help = function(fwrite)
  instead of the canvas size, which is the usual gnuplot behaviour.
  Using this option may lead to slightly asymmetric tic lengths.
  Like 'originreset' this option may not lead to convenient results
- if used with multiplots or pm3d plots.
+ if used with multiplots or pm3d plots. An alternative approach
+ is to set all margins to zero and to use the 'noclip' option.
+ The plot area has then the dimensions of the given canvas sizes.
 
  The 'charsize' option expects the average horizontal and vertical
  size of the used font. Look at the generated style file for an
  example of how to use it from within your TeX document.
 
- 'createstyle' derives the LaTeX style file from the script and
- writes it to the file ']]..pgf.LATEX_STYLE_FILE..'.sty'..[['.
+ 'fontscale' or 'textscale' expects a scaling factor as a parameter.
+ All texts in the plot are scaled by this factor then.
+
+ The options 'tex', 'latex' and 'context' choose the TeX output
+ format. LaTeX is the default. To load the style file put the
+ according line at the beginning of your document:
+   \input ]]..pgf.STYLE_FILE_BASENAME..[[.tex    % (for plain TeX)
+   \usepackage{]]..pgf.STYLE_FILE_BASENAME..[[}  % (for LaTeX)
+   \usemodule[]]..pgf.STYLE_FILE_BASENAME..[[]   % (for ConTeXt)
+
+ 'createstyle' derives the TeX/LaTeX/ConTeXt styles from the script
+ and writes them to the appropriate files.
 
  'fulldoc' or 'standalone' produces a full LaTeX document for direct
  compilation.
@@ -926,23 +1115,29 @@ pgf.print_help = function(fwrite)
  tips for all arrows. To obtain the default gnuplot behaviour please use
  the 'gparrows' option.
 
- With 'cmykimages' the CMYK color model will be used for image data
+ With 'cmykimages' the CMYK color model will be used for inline image data
  instead of the RGB model. All other colors (like line colors etc.) are
- not affected by this option, since they are handled by the xcolors
- package. So take care to change the color model also there if needed.
+ not affected by this option, since they are handled e.g. by LaTeX's
+ xcolor package. This option is ignored if images are externalized.
 
- The 'nobitmap' option let images be rendered as filled rectangles
- instead of the nativ PS or PDF image format. This option has to be
- enabled if you intend to use other output formats.
+ By using the 'externalimages' option all bitmap images will be written
+ as external PNG images and included at compile time of the document.
+ Generating DVI and later postscript files requires to convert the PNGs
+ into EPS files in a seperate step e.g. by using ImageMagick's `convert'.
+ Transparent bitmap images are always generated as an external PNGs.
+
+ The 'nobitmap' option let images be rendered as filled rectangles instead
+ of the nativ PS or PDF inline image format. This option is ignored if
+ images are externalized.
 
  The 'providevars' options makes gnuplot's internal and user variables
  available by using the '\gpgetvar{<var name>}' commmand within the TeX
  script. Use gnuplot's 'show variables all' command to see the list
  of valid variables.
 
- The <fontdesc> string may contain any valid LaTeX font commands like
- e.g. '\small'. It is passed directly as a node parameter in form of
- "font=<fontdesc>". This can be 'misused' to add further code to a node,
+ The <fontdesc> string may contain any valid TeX/LaTeX/ConTeXt font commands
+ like e.g. '\small'. It is passed directly as a node parameter in form of
+ "font={<fontdesc>}". This can be 'misused' to add further code to a node,
  e.g. '\small,yshift=1ex' or ',yshift=1ex' are also valid while the
  latter does not change the current font settings. One exception is
  the second argument of the list. If it is a number of the form
@@ -951,6 +1146,11 @@ pgf.print_help = function(fwrite)
  omitted the value is interpreted as 'pt'. As an example the string
  '\sffamily,12,fill=red' sets the font to LaTeX's sans serif font at
  a size of 12pt and red background color.
+ The same applies to ConTeXt, e.g. '\switchtobodyfont[iwona],10' changes the
+ font to Iwona at a size of 10pt.
+ Plain TeX users have to change the font size explicitly within the first
+ argument. The second should be set to the same value to get proper scaling
+ of text boxes.
 
  Strings have to be put in single or double quotes. Double quoted
  strings may contain special characters like newlines '\n' etc.
@@ -1041,7 +1241,71 @@ gfx.opt = {
   -- style.
   tikzarrows = false,
   -- if true, cmyk image model will be used for bitmap images
-  cmykimage = false
+  cmykimage = false,
+  -- output TeX flavor, default is LaTeX
+  tex_format = 'latex',
+  -- for regression tests etc. we can turn off the timestamp
+  notimestamp = false,
+  -- background color, contains RGB triplet when set
+  bgcolor = nil,
+  -- crop to the given canvas size
+  clip = false,
+  -- fontscale
+  fontscale = nil
+}
+
+-- Formats for the various TeX flavors 
+gfx.format = {}
+
+gfx.format.tex = {
+  docheader        = "\\input "..pgf.STYLE_FILE_BASENAME..".tex\n",
+  begindocument    = "",
+  enddocument      = "\\bye\n",
+  beforetikzpicture= "",  -- standalone only
+  aftertikzpicture = "",  -- standalone only
+  begintikzpicture = "\\tikzpicture",
+  endtikzpicture   = "\\endtikzpicture",
+  beginscope       = "\\scope",
+  endscope         = "\\endscope",
+  beforeendtikzpicture = "",  -- standalone only
+  fontsize         = ""
+}
+
+gfx.format.latex = {
+  docheader        = "\\documentclass["..pgf.DEFAULT_FONT_SIZE.."pt]{article}\n"
+                      .."\\usepackage[T1]{fontenc}\n"
+                      .."\\usepackage{textcomp}\n\n"
+                      .."\\usepackage[utf8x]{inputenc}\n\n"
+                      .."\\usepackage{"..pgf.STYLE_FILE_BASENAME.."}\n"
+                      .."\\pagestyle{empty}\n"
+                      .."\\usepackage[active,tightpage]{preview}\n"
+                      .."\\PreviewEnvironment{tikzpicture}\n"
+                      .."\\setlength\\PreviewBorder{\\gpbboxborder}\n",
+  begindocument    = "\\begin{document}\n",
+  enddocument      = "\\end{document}\n",
+  beforetikzpicture= "",  -- standalone only
+  aftertikzpicture = "",  -- standalone only
+  begintikzpicture = "\\begin{tikzpicture}",
+  endtikzpicture   = "\\end{tikzpicture}",
+  beginscope       = "\\begin{scope}",
+  endscope         = "\\end{scope}",
+  beforeendtikzpicture = "",  -- standalone only
+  fontsize         = "\\fontsize{%spt}{%spt}\\selectfont"
+}
+
+gfx.format.context = {
+  docheader        = "\\usemodule["..pgf.STYLE_FILE_BASENAME.."]\n",
+  begindocument    = "\\starttext\n",
+  enddocument      = "\\stoptext\n",
+  beforetikzpicture= "\\startTEXpage\n",  -- standalone only
+  aftertikzpicture = "\\stopTEXpage\n",   -- standalone only
+  begintikzpicture = "\\starttikzpicture",
+  endtikzpicture   = "\\stoptikzpicture",
+  beginscope       = "\\startscope",
+  endscope         = "\\stopscope",
+  beforeendtikzpicture = "\\path[use as bounding box] ([shift={(-\\gpbboxborder,-\\gpbboxborder)}]current bounding box.south west)"
+                            .." rectangle ([shift={(\\gpbboxborder,\\gpbboxborder)}]current bounding box.north east);\n",  -- standalone only
+  fontsize         = "\\switchtobodyfont[%spt]"
 }
 
 -- within tikzpicture environment or not
@@ -1083,7 +1347,7 @@ gfx.units = {
 gfx.parse_number_unit = function (str, from, to)
   to = to or 'cm'
   from = from or 'cm'
-  local num, unit = string.match(str, '([%d%.]+)([a-z]*)')
+  local num, unit = string.match(str, '^([%d%.]+)([a-z]*)$')
   if unit and (string.len(unit) > 0) then
     from = unit
   else
@@ -1111,11 +1375,19 @@ gfx.parse_font_string = function (str)
     size, _ = gfx.parse_number_unit(toks[1],'pt','pt')
     if (size) then
       table.remove(toks,1)
-      rets = rets .. string.format('\\gpfontsize{%.2fpt}{%.2fpt}',size,size*1.2)
+      rets = rets .. string.format(gfx.format[gfx.opt.tex_format].fontsize,size,size*1.2)
+    end
+    -- add grouping braces for the font settings
+    if #rets > 0 then 
+      rets = "{" .. rets .. "}"
     end
     -- add remaining parts
     for k,v in ipairs(toks) do
       rets = rets .. ',' .. v
+    end
+  else
+    if #rets > 0 then 
+      rets = "{" .. rets .. "}"
     end
   end
   return rets, size
@@ -1150,6 +1422,13 @@ gfx.adjust_plotbox = function()
       -- plotsize as the canvas size
       gp.term_out("WARNING: PGF/TikZ Terminal: `plotsize' option used, but I could not determin the plot area!\n")
     end
+  else
+    if gfx.opt.clip then
+      gp.write("\\clip")
+    else
+      gp.write("\\path")
+    end
+    gp.write(" (" .. pgf.format_coord(0,0) ..") rectangle (" .. pgf.format_coord(term.xmax, term.ymax) .. ");\n")
   end
 end
 
@@ -1196,12 +1475,7 @@ gfx.check_linetype = function()
   if gfx.linetype_idx ~= gfx.linetype_idx_set then
     local lt
     if gfx.linetype_idx < 0 then
-      if gfx.linetype_idx < -2 then
-	-- FIXME: what linetype to use for LT_BACKGROUND or LT_NODRAW?
-        lt = pgf.styles.linetypes[1][1]
-      else
         lt = pgf.styles.linetypes_axes[math.abs(gfx.linetype_idx)][1]
-      end
     else
       lt = pgf.styles.linetypes[(gfx.linetype_idx % #pgf.styles.linetypes)+1][1]
     end
@@ -1265,19 +1539,20 @@ gfx.format_color = function(ctype, val)
   if ctype == 'LT' then
     if val[1] < 0 then
       if val[1] < -2 then --  LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED
-        c = 'gpbgfillcolor'
+        c = 'color=gpbgfillcolor'
       else
-        c = pgf.styles.lt_colors_axes[math.abs(val[1])][1]
+        c = 'color='..pgf.styles.lt_colors_axes[math.abs(val[1])][1]
       end
     else
-      c = pgf.styles.lt_colors[(val[1] % #pgf.styles.lt_colors)+1][1]
+      c = 'color='..pgf.styles.lt_colors[(val[1] % #pgf.styles.lt_colors)+1][1]
     end
     -- c = pgf.styles.lt_colors[((val[1]+3) % #pgf.styles.lt_colors) + 1][1]
   elseif ctype == 'RGB' then
-    c = string.format("\\gprgb{%i}{%i}{%i}",
-                  1000*val[1]+0.5, 1000*val[2]+0.5, 1000*val[3]+0.5)
+    c = string.format("rgb color={%.3f,%.3f,%.3f}", val[1], val[2], val[3])
+  elseif ctype == 'RGBA' then
+      c = string.format("rgb color={%.3f,%.3f,%.3f},opacity=%.3f", val[1], val[2], val[3], val[4])
   elseif ctype == 'GRAY' then
-    c = string.format("black!%i", 100*val[1]+0.5)
+    c = string.format("color=black!%i", 100*val[1]+0.5)
   end
   return c
 end
@@ -1310,12 +1585,12 @@ else
   term.h_tic =  pgf.DEFAULT_RESOLUTION * pgf.DEFAULT_TIC_SIZE
   term.v_tic =  pgf.DEFAULT_RESOLUTION * pgf.DEFAULT_TIC_SIZE
   -- default size for CM@10pt
-  term.h_char = 184 * math.floor((pgf.DEFAULT_FONT_SIZE/10) * (pgf.DEFAULT_RESOLUTION/1000) + .5)
-  term.v_char = 308 * math.floor((pgf.DEFAULT_FONT_SIZE/10) * (pgf.DEFAULT_RESOLUTION/1000) + .5)
-  term.description = "Lua PGF/TikZ terminal for LaTeX2e"
-  term.flags = term.TERM_BINARY + term.TERM_CAN_CLIP
-                + term.TERM_IS_POSTSCRIPT + term.TERM_CAN_MULTIPLOT
-  term.flags = term.flags + term.TERM_CAN_DASH
+  term.h_char = math.floor(pgf.DEFAULT_FONT_H_CHAR * (pgf.DEFAULT_FONT_SIZE/10) * (pgf.DEFAULT_RESOLUTION/1000) + .5)
+  term.v_char = math.floor(pgf.DEFAULT_FONT_V_CHAR * (pgf.DEFAULT_FONT_SIZE/10) * (pgf.DEFAULT_RESOLUTION/1000) + .5)
+  term.description = "Lua PGF/TikZ terminal for TeX and friends"
+  term_default_flags = term.TERM_BINARY + term.TERM_CAN_MULTIPLOT + term.TERM_CAN_DASH + term.TERM_ALPHA_CHANNEL
+                       + term.TERM_LINEWIDTH + term.TERM_IS_LATEX + term.TERM_FONTSCALE
+  term.flags = term_default_flags + term.TERM_CAN_CLIP
 end
 
 
@@ -1331,7 +1606,9 @@ term.options = function(opt_str, initial, t_count)
   local o_next = ""
   local o_type = nil
   local s_start, s_end = 1, 1
-
+  local term_opt = ""
+  local term_opt_font, term_opt_size, term_opt_background, term_opt_fontscale, term_opt_scale, term_opt_preamble = "", "", "", "", "", ""
+  local charsize_h, charsize_v, fontsize, fontscale = nil, nil, nil, nil
   -- trim spaces
   opt_str = opt_str:gsub("^%s*(.-)%s*$", "%1")
   local opt_len = string.len(opt_str)
@@ -1411,7 +1688,11 @@ term.options = function(opt_str, initial, t_count)
         s_end = s_end + 1
       end
       o_next = string.sub(opt_str, s_start, s_end-1)
+      if tonumber(o_next) ~= nil then
+        o_type = 'number'
+      else
       o_type = "op"
+    end
     end
     s_start = s_end + 1
     return
@@ -1449,6 +1730,9 @@ term.options = function(opt_str, initial, t_count)
       print_help = true
     elseif almost_equals(o_next, "mono$chrome") then
       -- no colored lines
+      -- Setting `term.TERM_MONOCHROME' would internally disable colors for all drawings.
+      -- We do it the `soft' way by redefining all colors via a TeX command.
+      -- Maybe an additional terminal option is useful here...
       gfx.opt.lines_colored = false
     elseif almost_equals(o_next, "c$olor") or almost_equals(o_next, "c$olour") then
       -- colored lines
@@ -1456,21 +1740,36 @@ term.options = function(opt_str, initial, t_count)
     elseif almost_equals(o_next, "so$lid") then
       -- no dashed and dotted etc. lines
       gfx.opt.lines_dashed = false
+    elseif almost_equals(o_next, "notime$stamp") then
+      -- omit output of the timestamp
+      gfx.opt.notimestamp = true
     elseif almost_equals(o_next, "da$shed") then
       -- dashed and dotted etc. lines
       gfx.opt.lines_dashed = true
     elseif almost_equals(o_next, "gparr$ows") then
       -- use gnuplot arrows instead of TikZ
       gfx.opt.gp_arrows = true
+    elseif almost_equals(o_next, "nogparr$ows") then
+      -- use gnuplot arrows instead of TikZ
+      gfx.opt.gp_arrows = false
     elseif almost_equals(o_next, "gppoint$s") then
       -- use gnuplot points instead of TikZ
       gfx.opt.gp_points = true
+    elseif almost_equals(o_next, "nogppoint$s") then
+      -- use gnuplot points instead of TikZ
+      gfx.opt.gp_points = false
     elseif almost_equals(o_next, "nopic$environment") then
       -- omit the 'tikzpicture' environment
       gfx.opt.nopicenv = true
+    elseif almost_equals(o_next, "pic$environment") then
+      -- omit the 'tikzpicture' environment
+      gfx.opt.nopicenv = false
     elseif almost_equals(o_next, "origin$reset") then
       -- moves the origin of the TikZ picture to the lower left corner of the plot
       gfx.opt.set_origin = true
+    elseif almost_equals(o_next, "noorigin$reset") then
+      -- moves the origin of the TikZ picture to the lower left corner of the plot
+      gfx.opt.set_origin = false
     elseif almost_equals(o_next, "plot$size") then
       get_next_token()
       gfx.opt.plotsize_x, gfx.opt.plotsize_y = get_two_sizes(o_next)
@@ -1478,8 +1777,9 @@ term.options = function(opt_str, initial, t_count)
         gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", o_next))
       end
       gfx.opt.set_plotsize = true
+      term_opt_size = string.format("plotsize %s,%s ", gfx.opt.plotsize_x, gfx.opt.plotsize_y)
       -- we set the canvas size to the plotsize to keep the aspect ratio as good as possible
-      -- and rescale later once we know the actual plotsize...
+      -- and rescale later once we know the actual plot size...
       term.xmax = gfx.opt.plotsize_x*pgf.DEFAULT_RESOLUTION
       term.ymax = gfx.opt.plotsize_y*pgf.DEFAULT_RESOLUTION
     elseif almost_equals(o_next, "si$ze") then
@@ -1488,6 +1788,8 @@ term.options = function(opt_str, initial, t_count)
       if not plotsize_x then
         gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", o_next))
       end
+      gfx.opt.set_plotsize = false
+      term_opt_size = string.format("size %s,%s ", plotsize_x, plotsize_y)
       term.xmax = plotsize_x*pgf.DEFAULT_RESOLUTION
       term.ymax = plotsize_y*pgf.DEFAULT_RESOLUTION
     elseif almost_equals(o_next, "char$size") then
@@ -1496,14 +1798,13 @@ term.options = function(opt_str, initial, t_count)
       if not charsize_h then
         gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", o_next))
       end
-      term.h_char = math.floor(charsize_h*pgf.DEFAULT_RESOLUTION + .5)
-      term.v_char = math.floor(charsize_v*pgf.DEFAULT_RESOLUTION + .5)
     elseif almost_equals(o_next, "sc$ale") then
       get_next_token()
       local xscale, yscale = get_two_sizes(o_next)
       if not xscale then
         gp.int_error(t_count, string.format("error: two comma seperated numbers expected, got `%s'.", o_next))
       end
+      term_opt_scale = string.format("scale %s,%s ",xscale, yscale)
       term.xmax = term.xmax * xscale
       term.ymax = term.ymax * yscale
     elseif almost_equals(o_next, "tikzpl$ot") then
@@ -1526,61 +1827,169 @@ term.options = function(opt_str, initial, t_count)
     elseif almost_equals(o_next, "tikzar$rows") then
       -- map the arrow angles to TikZ arrow styles
       gfx.opt.tikzarrows = true
+    elseif almost_equals(o_next, "notikzar$rows") then
+      -- don't map the arrow angles to TikZ arrow styles
+      gfx.opt.tikzarrows = false
     elseif almost_equals(o_next, "nobit$map") then
       -- render images as filled rectangles instead of the nativ
       -- PS or PDF image format
       gfx.opt.direct_image = false
+    elseif almost_equals(o_next, "bit$map") then
+      -- render images as nativ PS or PDF image
+      gfx.opt.direct_image = true
     elseif almost_equals(o_next, "cmyk$image") then
       -- use cmyk color model for images
       gfx.opt.cmykimage = true
+    elseif almost_equals(o_next, "rgb$image") then
+      -- use cmyk color model for images
+      gfx.opt.cmykimage = false
     elseif almost_equals(o_next, "full$doc") or almost_equals(o_next, "stand$alone") then
+      -- produce full tex document
+      gfx.opt.full_doc = true
+    elseif almost_equals(o_next, "nofull$doc") or almost_equals(o_next, "nostand$alone") then
       -- produce full tex document
       gfx.opt.full_doc = true
     elseif almost_equals(o_next, "create$style") then
       -- creates the coresponding LaTeX style from the script
-      local f = io.open(pgf.LATEX_STYLE_FILE..".sty" , "w+")
-      pgf.create_style(f)
-    elseif almost_equals(o_next, "fo$nt") then
-      local fsize
+      pgf.create_style()
+    elseif almost_equals(o_next, "backg$round") then
+      -- set background color
       get_next_token()
+      -- ignore rgbcolor keyword if present
+      if almost_equals(o_next, "rgb$color") then get_next_token() end
       if o_type == 'string' then
-        gfx.opt.default_font, fsize = gfx.parse_font_string(o_next)
+        gfx.opt.bgcolor = gp.parse_color_name(t_count, o_next)
+        term_opt_background = string.format("background '%s'", o_next)
       else
         gp.int_error(t_count, string.format("error: string expected, got `%s'.", o_next))
       end
-      if fsize then
-        term.h_char = math.floor(term.h_char * (fsize/pgf.DEFAULT_FONT_SIZE) + .5)
-        term.v_char = math.floor(term.v_char * (fsize/pgf.DEFAULT_FONT_SIZE) + .5)
+    elseif almost_equals(o_next, "fo$nt") then
+      get_next_token()
+      if o_type == 'string' then
+        gfx.opt.default_font, fontsize = gfx.parse_font_string(o_next)
+      else
+        gp.int_error(t_count, string.format("error: string expected, got `%s'.", o_next))
+      end
+      term_opt_font = string.format("font %q ", o_next)
+    elseif almost_equals(o_next, "fonts$cale") or  almost_equals(o_next, "texts$cale") then
+      get_next_token()
+      if o_type == 'number' then
+        fontscale = tonumber(o_next)
+        if fontscale < 0 then
+          fontscale = 1.0
+        end
+      else
+        gp.int_error(t_count, string.format("error: number expected, got `%s'.", o_next))
+      end
+    elseif almost_equals(o_next, "externalimages") then
+      if term.external_images ~= nil then
+        term.external_images = true;
+      else
+        gp.int_warn(t_count, "Externalization of images is not supported.")
+      end
+    elseif almost_equals(o_next, "noexternalimages") then
+      if term.external_images ~= nil then
+        term.external_images = false;
+      else
+        gp.int_warn(t_count, "Externalization of images is not supported.")
       end
     elseif almost_equals(o_next, "pre$amble") or almost_equals(o_next, "header") then
       get_next_token()
       if o_type == 'string' then
+        term_opt_preamble = term_opt_preamble .. string.format("preamble %q ", o_next)
         gfx.opt.latex_preamble = gfx.opt.latex_preamble .. o_next .. "\n"
       else
         gp.int_error(t_count, string.format("error: string expected, got `%s'.", o_next))
       end
+    elseif almost_equals(o_next, "nopre$amble") or almost_equals(o_next, "noheader") then
+        gfx.opt.latex_preamble = ''
+    elseif almost_equals(o_next, "con$text") then
+      gfx.opt.tex_format = "context"
+      -- ConTeXt has a default of 12pt
+      fontsize = 12
+    elseif almost_equals(o_next, "tex") then
+      gfx.opt.tex_format = "tex"
+    elseif almost_equals(o_next, "latex") then
+      gfx.opt.tex_format = "latex"
+    elseif almost_equals(o_next, "clip") then
+      gfx.opt.clip = true
+      term.flags = term_default_flags
+      term.flags = term_default_flags + term.TERM_CAN_CLIP
+    elseif almost_equals(o_next, "noclip") then
+      gfx.opt.clip = false
+      term.flags = term_default_flags
     else
       gp.int_warn(t_count, string.format("unknown option `%s'.", o_next))
     end
   end
+
+  -- determine "internal" font size
+  -- FIXME: what happens on "set termoptions font ..." or subsequent terminal calls
+  local term_h_char, term_v_char = term.h_char, term.v_char
+  if fontsize ~= nil then
+    term_h_char = pgf.DEFAULT_FONT_H_CHAR * (fontsize/10) * (pgf.DEFAULT_RESOLUTION/1000)
+    term_v_char = pgf.DEFAULT_FONT_V_CHAR * (fontsize/10) * (pgf.DEFAULT_RESOLUTION/1000)
+    -- on change apply old text scaling
+    if not fontscale then
+      fontscale = gfx.opt.fontscale;
+    end
+  end
+  -- a given character size overwrites font size
+  if charsize_h ~= nil then
+    term_h_char = charsize_h*pgf.DEFAULT_RESOLUTION
+    term_v_char = charsize_v*pgf.DEFAULT_RESOLUTION
+    -- on change apply old text scaling
+    if not fontscale then
+      fontscale = gfx.opt.fontscale;
+    end
+  end
+  if fontscale ~= nil then
+    term_h_char = term_h_char * fontscale
+    term_v_char = term_v_char * fontscale
+    gfx.opt.fontscale = fontscale;
+    term_opt_fontscale = string.format("fontscale %s", gfx.opt.fontscale)
+  end
+  term.h_char = math.floor(term_h_char + .5)
+  term.v_char = math.floor(term_v_char + .5)
+
 
   if print_help then
     pgf.print_help(gp.term_out)
   end
 
   local tf = function(b,y,n)
+    local addopt = ''
     if b then 
-      return(y)
+      addopt = y
     else
-      return(n)
+      addopt = n
+    end
+    if (string.len(addopt) > 0) then
+      term_opt = term_opt .. addopt .. ' '
     end
   end
 
-  local opt_str = string.format("%s %s",
-    tf(gfx.opt.lines_colored, 'color', 'monochrome'),
-    tf(gfx.opt.lines_dashed, 'dashed', 'solid'))
-
-  gp.term_options(opt_str)
+  tf(true, gfx.opt.tex_format, nil)
+  tf(true, term_opt_font, nil)
+  tf(true, term_opt_size, nil)
+  tf(true, term_opt_background, nil)
+  tf(true, term_opt_fontscale, nil)
+  tf((#gfx.opt.latex_preamble>0), term_opt_preamble, 'nopreamble')
+  tf(gfx.opt.lines_colored, 'color', 'monochrome')
+  tf(gfx.opt.full_doc, 'standalone', 'nostandalone')
+  tf(gfx.opt.lines_dashed, 'dashed', 'solid')
+  tf(gfx.opt.gp_arrows, 'gparrows', 'nogparrows')
+  tf(gfx.opt.tikzarrows, 'tikzarrows', 'notikzarrows')
+  tf(gfx.opt.gp_points, 'gppoints', 'nogppoints')
+  tf(gfx.opt.nopicenv, 'nopicenvironment', 'picenvironment')
+  tf(gfx.opt.set_origin, 'originreset', 'nooriginreset')
+  tf(gfx.opt.direct_image, 'bitmap', 'nobitmap')
+  tf(gfx.opt.cmykimage, 'cmykimage', 'rgbimage')
+  tf(gfx.opt.clip, 'clip', 'noclip')
+  if term.external_images ~= nil then
+    tf(term.external_images, 'externalimages', 'noexternalimages')
+  end
+  gp.term_options(term_opt)
 
   return 1
 end
@@ -1641,6 +2050,11 @@ term.linetype = function(ltype)
   gfx.check_in_path()
 
   gfx.set_color('LT', {ltype})
+
+  if (ltype < -2) then -- LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED
+    ltype = -2
+  end
+
   gfx.linetype_idx = ltype
 
   return 1
@@ -1820,21 +2234,31 @@ end
 -- points[row][column]
 -- m: #cols, n: #rows
 -- corners: clip box and draw box coordinates
--- ctype: "RGB" or "GRAY" (unused since we allways use RGB to keep things simple)
-term.image = function(m, n, points, corners, ctype)
+-- ctype: "RGB" or "RGBA" or "PALETTE"
+term.image = function(m, n, points, corners, ctype, xfile)
   gfx.check_in_path()
   
   pgf.write_clipbox_begin({corners[3][1],corners[3][2]},{corners[4][1],corners[4][2]})
   
-  if gfx.opt.direct_image then
     local ll = {corners[1][1],corners[2][2]}
     local ur = {corners[2][1],corners[1][2]}
+  local xxfile
+
+  if xfile ~= nil then
+    -- strip file extension
+    xxfile = string.match(xfile, "^(.*).png$")
+  end
+  -- load exclusively an external file and don't generate inline images
+  if xfile ~= nil and term.external_images == true then
+     pgf.load_image_file(ll, ur, xxfile)
+  elseif gfx.opt.direct_image then
     if gfx.opt.cmykimage then
-      pgf.draw_raw_cmyk_image(points, m, n, ll, ur)
+      pgf.draw_raw_cmyk_image(points, m, n, ll, ur, xxfile)
     else
-      pgf.draw_raw_rgb_image(points, m, n, ll, ur)
+      pgf.draw_raw_rgb_image(points, m, n, ll, ur, xxfile)
     end
   else
+    -- draw as filled squares
     local w = (corners[2][1] - corners[1][1])/m
     local h = (corners[1][2] - corners[2][2])/n
 
@@ -1844,7 +2268,7 @@ term.image = function(m, n, points, corners, ctype)
       yy = corners[1][2]-math.floor(cnt/m)*h
       yyy = yy-h
       xxx = xx+w
-      pgf.draw_fill({{xx, yy}, {xxx, yy}, {xxx, yyy}, {xx, yyy}}, '', gfx.format_color('RGB', points[cnt]) , 100, 100)
+      pgf.draw_fill({{xx, yy}, {xxx, yy}, {xxx, yyy}, {xx, yyy}}, '', gfx.format_color(ctype, points[cnt]) , 100, 100)
     end
   end
   pgf.write_clipbox_end()
@@ -1912,8 +2336,7 @@ end
 if arg then -- called from the command line!
   if #arg > 0 and arg[1] == 'style' then
     -- write style file
-    local f = io.open(pgf.LATEX_STYLE_FILE..".sty" , "w+")
-    pgf.create_style(f)
+    pgf.create_style()
   elseif arg[1] == 'termhelp' then
     io.write([["2 tikz",
 "?set terminal lua tikz",
@@ -1933,9 +2356,8 @@ if arg then -- called from the command line!
     io.write([[
  This script is intended to be called from GNUPLOT.
 
- For generating the associated LaTeX style file
-  (']] .. pgf.LATEX_STYLE_FILE..".sty')" .. [[ just call this script
- with the additional option 'style':
+ For generating the associated TeX/LaTeX/ConTeXt style files
+ just call this script with the additional option 'style':
 
    # lua gnuplot.lua style
 

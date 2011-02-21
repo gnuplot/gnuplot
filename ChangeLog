@@ -1,3 +1,13 @@
+2011-02-21  Peter Hedwig <peter@affenbande.org>
+
+	* term/lua/gnuplot-tikz.help term/lua/gnuplot-tikz.lua
+	term/lua/NEWS term/lua/README term/lua/TODO term/lua.trm:
+	Re-work the lua terminal to support ConTeXt and plain TeX in addition
+	to TikZ.  Requires TikZ >= 2.0
+
+	* share/LaTeX/Makefile.am: Regenerate the lua terminal *.tex and *.sty
+	files from the Makefile rather than keeping them in cvs.
+
 2011-02-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Windows HTML help, SF patch set #3186000.

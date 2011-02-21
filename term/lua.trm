@@ -1,7 +1,7 @@
 /*
  *  $Id: lua.trm,v 1.11 2010/10/09 21:01:50 sfeam Exp $
  *  $Date: 2010/10/09 21:01:50 $
- *  $Rev: 90 $
+ *  $Rev: 99 $
  */
 
 /* 
@@ -43,7 +43,7 @@
 
 #include "driver.h"
 
-#define LUA_TERM_REVISON "$Rev: 97 $"
+#define LUA_TERM_REVISON "$Rev: 99 $"
 
 #ifdef TERM_REGISTER
 register_term(lua)
@@ -96,6 +96,9 @@ TERM_PUBLIC void LUA_path __PROTO((int p));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+#include "wxterminal/gp_cairo.h"
+#include "wxterminal/gp_cairo_helpers.h"
+
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -105,7 +108,7 @@ static lua_State *L = NULL;
 static char *LUA_script = NULL;
 
 static int lua_term_status, lua_term_result;
-static int tb, luaterm;
+static int tb, luaterm, image_cnt, image_extern;
 
 /*
  * static buffer, because we cannot free memory after
@@ -256,7 +259,7 @@ LUA_GP_int_warn(lua_State *L) {
 static int
 LUA_GP_term_out(lua_State *L) {
   char c;             /* dummy input char */
-  char *line;
+  char *line, *last;
   int pagelines = 0;  
   const char *msg = "";
   
@@ -270,10 +273,9 @@ LUA_GP_term_out(lua_State *L) {
       break;
   }
 
-  line = strtok((char*)msg, "\n");
-  while(line != NULL) {
-    /* built-in dumb pager code stolen from help.c
-      maybe someone has a fancy old ATARI :-) */
+  last = (char *)msg;
+  while ((line = strchr(last, '\n'))) {
+    *line = '\0';
     if (pagelines >= 22) {
       fputs("Press return for more: ", stderr);
 #if defined(ATARI) || defined(MTOS)
@@ -287,11 +289,14 @@ LUA_GP_term_out(lua_State *L) {
 #endif
       pagelines = 0;
     }
-    fputs(line, stderr);
+    fputs(last, stderr);
     fputs("\n", stderr);
     pagelines++;
-    line = strtok(NULL, "\n");
+    last = line+1;
   }
+  if (*last)
+    fputs(last, stderr);
+
   return(0);
 }
 
@@ -346,11 +351,13 @@ LUA_GP_get_all_variables(lua_State *L) {
           lua_pushstring(L, "real");
           lua_rawseti(L, -2, 2);
         }
-
+#ifdef HAVE_ISNAN
         if (isnan(val->v.cmplx_val.real)) {
           lua_pushnil(L);
           lua_rawseti(L, -2, 3);
-        } else {
+        } else
+#endif
+        {
           lua_pushnumber(L, val->v.cmplx_val.real);
           lua_rawseti(L, -2, 3);
         }
@@ -376,6 +383,38 @@ LUA_GP_get_all_variables(lua_State *L) {
   return(1);
 }
 
+/*
+ * based on the parse_color_name() function in misc.c
+ * returns rgb triplet based on color name or hex values
+ */
+static int
+LUA_GP_parse_color_name(lua_State *L)
+{
+  int color = -1, token_cnt;
+  int n = lua_gettop(L);  /* Number of arguments */
+  const char *opt_str;
+  if (n != 2)
+    return luaL_error(L, "Got %d arguments expected 2", n);
+  token_cnt = luaL_checkinteger(L, 1);
+  opt_str = luaL_checkstring(L, 2);
+
+  color = lookup_table_nth(pm3d_color_names_tbl, opt_str);
+  if (color >= 0)
+    color = pm3d_color_names_tbl[color].value;
+  else
+    sscanf(opt_str, "#%x", &color);
+  if ((color & 0xff000000) != 0)
+    int_error(token_cnt, "not recognized as a color name or a string of form \"#RRGGBB\"");
+
+  lua_createtable(L, 3, 0);
+  n = lua_gettop(L);
+  lua_pushnumber(L, (double)((color >> 16 ) & 255) / 255.); lua_rawseti(L, n, 1);
+  lua_pushnumber(L, (double)((color >> 8 ) & 255) / 255.); lua_rawseti(L, n, 2);
+  lua_pushnumber(L, (double)(color & 255) / 255.); lua_rawseti(L, n, 3);
+
+  return (1);
+}
+
 
 static const luaL_reg gp_methods[] = {
   {"write", LUA_GP_write},
@@ -386,6 +425,7 @@ static const luaL_reg gp_methods[] = {
   {"is_multiplot", LUA_GP_is_multiplot},
   {"get_all_variables", LUA_GP_get_all_variables},
   {"term_options", LUA_GP_term_options},
+  {"parse_color_name", LUA_GP_parse_color_name},
   {NULL, NULL}
 };
 
@@ -437,12 +477,14 @@ LUA_get_term_vars(void) {
   lua_getfield(L, luaterm, "tscale");
   term->tscale = (lua_isnumber(L, -1)) ? (double)lua_tonumber(L, -1) : LUA_TSCALE;
   lua_pop(L, 1);
+
+  lua_getfield(L, luaterm, "external_images");
+  image_extern = lua_toboolean(L ,1);
+  lua_pop(L, 1);
 }
 
 static void
 LUA_set_term_vars() {
-  extern const char lua_ident[];
-
   /* set term.version */
   lua_pushstring(L, gnuplot_version);
   lua_setfield(L, luaterm, "gp_version");
@@ -453,12 +495,15 @@ LUA_set_term_vars() {
   lua_pushstring(L, LUA_TERM_REVISON);
   lua_setfield(L, luaterm, "lua_term_revision");
   /* set term.lua_ident */
-  lua_pushstring(L, lua_ident);
+  lua_pushstring(L, LUA_RELEASE);
   lua_setfield(L, luaterm, "lua_ident");
-  lua_pushboolean(L, 1);
-  lua_setfield(L, luaterm, "IS_GNUPLOT_43");
-  
-  /* some static definitions */
+  /* set flag if terminal supports external images */
+#ifdef HAVE_CAIROPDF
+  image_extern = 0;
+  lua_pushboolean(L, image_extern);
+  lua_setfield(L, luaterm, "external_images");
+#endif
+  /* some static definitions from term_api.h */
   lua_pushinteger(L, TERM_CAN_MULTIPLOT);     /* tested if stdout not redirected */
   lua_setfield(L, luaterm, "TERM_CAN_MULTIPLOT");
   lua_pushinteger(L, TERM_CANNOT_MULTIPLOT);  /* tested if stdout is redirected  */
@@ -479,6 +524,16 @@ LUA_set_term_vars() {
   lua_setfield(L, luaterm, "TERM_CAN_CLIP");
   lua_pushinteger(L, TERM_CAN_DASH);          /* terminal knows dashed lines */
   lua_setfield(L, luaterm, "TERM_CAN_DASH");
+  lua_pushinteger(L, TERM_ALPHA_CHANNEL);     /* alpha channel transparency      */
+  lua_setfield(L, luaterm, "TERM_ALPHA_CHANNEL");
+  lua_pushinteger(L, TERM_MONOCHROME);        /* term is running in mono mode    */
+  lua_setfield(L, luaterm, "TERM_MONOCHROME");
+  lua_pushinteger(L, TERM_LINEWIDTH);         /* support for set term linewidth  */
+  lua_setfield(L, luaterm, "TERM_LINEWIDTH");
+#ifdef TERM_FONTSCALE
+  lua_pushinteger(L, TERM_FONTSCALE);         /* terminal supports fontscale     */
+  lua_setfield(L, luaterm, "TERM_FONTSCALE");
+#endif
 }
 
 static int
@@ -676,17 +731,21 @@ LUA_options()
   int tc_off = c_token+1; /* token counter offset */
   int need_init = 1;
 
-
   /* 'set term tikz' is short for 'set term lua tikz' */
-  if (c_token == 3) {
-    if (almost_equals(2,"termop$tions"))
-      need_init = 0;
-    else if (equals(2,"tikz"))
+  if (c_token == 3 && equals(2,"tikz")) {
       c_token--;
+  } else if (c_token == 2) { /* 'set termoptions' */
+      if (!LUA_script) {
+        int_error(NO_CARET, "No Lua context for setting terminal options!");
+        return;
+      }
+      need_init = 0;
   }
 
-  if (!END_OF_COMMAND) {
     opt_str = gp_input_line + token[c_token].start_index;
+
+  if (need_init) {
+    if (!END_OF_COMMAND) {
     if (*opt_str == '"' || *opt_str == '\'') {
       s = try_to_get_string();
         gp_expand_tilde(&s);
@@ -710,20 +769,20 @@ LUA_options()
       LUA_script = s;
     }
     opt_str = gp_input_line + token[c_token].start_index;
-    while (!END_OF_COMMAND)
-	c_token++;
-
   } else {
     LUA_close();
     int_error(NO_CARET, "No Lua driver name or file name given!");
   }
 
   /* init lua when opening the terminal or on script change */
-  if(need_init) {
     if(!LUA_init_lua()) {
       return;
     }
   }
+
+  /* since options are tokenized again in the script we always "finish" this here */
+  while (!END_OF_COMMAND)
+    c_token++;
 
   if(LUA_init_luaterm_function("options")) {
     /* isolate the "set term ...;" part of the command line */
@@ -747,7 +806,11 @@ TERM_PUBLIC void
 LUA_init()
 {
   fseek(gpoutfile, 0, SEEK_SET);
-  ftruncate(fileno(gpoutfile),0);
+  /* ignore compiler warnings here, because `gpoutfile' is already open */
+  if (ftruncate(fileno(gpoutfile), 0));
+
+  /* reset image counter */
+  image_cnt = 0;
   
   LUA_linetype(-1);
   if(LUA_init_luaterm_function("init")) {
@@ -796,8 +859,8 @@ TERM_PUBLIC void
 LUA_move(unsigned int x, unsigned int y)
 {
   if(LUA_init_luaterm_function("move")) {
-    lua_pushinteger(L, x);
-    lua_pushinteger(L, y);
+    lua_pushinteger(L, (int)x);
+    lua_pushinteger(L, (int)y);
     LUA_call_report(lua_pcall(L, 2, 1, tb));
   	lua_term_result = (int)lua_tointeger(L, -1);
 	lua_pop(L, 1);
@@ -812,8 +875,8 @@ LUA_point(unsigned int x, unsigned int y, int number)
   lua_term_result = 0;
   
   if(LUA_init_luaterm_function("point")) {
-    lua_pushinteger(L, x);
-    lua_pushinteger(L, y);
+    lua_pushinteger(L, (int)x);
+    lua_pushinteger(L, (int)y);
     lua_pushinteger(L, number);
     LUA_call_report(lua_pcall(L, 3, 1, tb));
   	lua_term_result = (int)lua_tointeger(L, -1);
@@ -839,8 +902,8 @@ TERM_PUBLIC void
 LUA_vector(unsigned int ux, unsigned int uy)
 {
   if(LUA_init_luaterm_function("vector")) {
-    lua_pushinteger(L, ux);
-    lua_pushinteger(L, uy);
+    lua_pushinteger(L, (int)ux);
+    lua_pushinteger(L, (int)uy);
     LUA_call_report(lua_pcall(L, 2, 1, tb));
   	lua_term_result = (int)lua_tointeger(L, -1);
 	lua_pop(L, 1);
@@ -861,10 +924,10 @@ LUA_arrow(
   lua_term_result = 0;
 
   if(LUA_init_luaterm_function("arrow")) {
-    lua_pushinteger(L, sx);
-    lua_pushinteger(L, sy);
-    lua_pushinteger(L, ex);
-    lua_pushinteger(L, ey);
+    lua_pushinteger(L, (int)sx);
+    lua_pushinteger(L, (int)sy);
+    lua_pushinteger(L, (int)ex);
+    lua_pushinteger(L, (int)ey);
     lua_pushinteger(L, head);
     /*   additional vars  */
     lua_pushinteger(L, curr_arrow_headlength);    /* access head length + angle (int) */
@@ -885,8 +948,8 @@ TERM_PUBLIC void
 LUA_put_text(unsigned int x, unsigned int y, const char str[])
 {
   if(LUA_init_luaterm_function("put_text")) {
-    lua_pushinteger(L, x);
-    lua_pushinteger(L, y);
+    lua_pushinteger(L, (int)x);
+    lua_pushinteger(L, (int)y);
     lua_pushstring(L, str);
     LUA_call_report(lua_pcall(L, 3, 1, tb));
     lua_term_result = (int)lua_tointeger(L, -1);
@@ -956,10 +1019,10 @@ LUA_boxfill (int style, unsigned int x1,
   if(LUA_init_luaterm_function("boxfill")) {
     lua_pushstring(L, LUA_get_fillstyle(style));
     lua_pushinteger(L, style >> 4);
-    lua_pushinteger(L, x1);
-    lua_pushinteger(L, y1);
-    lua_pushinteger(L, width);
-    lua_pushinteger(L, height);
+    lua_pushinteger(L, (int)x1);
+    lua_pushinteger(L, (int)y1);
+    lua_pushinteger(L, (int)width);
+    lua_pushinteger(L, (int)height);
     LUA_call_report(lua_pcall(L, 6, 1, tb));
     lua_term_result = (int)lua_tointeger(L, -1);
     lua_pop(L, 1);
@@ -1124,30 +1187,50 @@ LUA_path (int path)
 }
 /*
   Lua table structure for the image pixel:
-  pixel = {{r,g,b}, {r,g,b}, ... , {r,g,b}}
-
-  FIXME: would be nice to optionally generate a PNG
-  for inclusion since libgd is linked anyway...
+  pixel = {{r, g, b, [, a]}, {r, g, b [, a]}, ... , {r, g, b [, a]}}
 
 */
 TERM_PUBLIC void
 LUA_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode) {
   if(LUA_init_luaterm_function("image")) {
-    int i, is_rgb;
+    int i;
     rgb_color rgb1;
+    coordval alpha;
+    char *image_file = NULL;
+
+#ifdef HAVE_CAIROPDF
+    /* "externalize" if transparent images are used or on user request */
+    if ((color_mode == IC_RGBA) || image_extern) {
+      cairo_surface_t *image_surface;
+      unsigned int *image255;
+      char *idx;
+      /* cairo based png images with alpha channel */
+      if ((idx = strrchr(outstr, '.')) == NULL)
+        idx = strchr(outstr, '\0');
+      image_file = (char*)gp_alloc((idx-outstr)+10, "LUA_image");
+      strncpy(image_file, outstr, (idx-outstr) + 1);
+      snprintf(image_file+(idx-outstr), 8, ".%02d.png", ++image_cnt);
+
+      image255 = gp_cairo_helper_coordval_to_chars(image, m, n, color_mode);
+      image_surface = cairo_image_surface_create_for_data((unsigned char*) image255, CAIRO_FORMAT_ARGB32, m, n, 4*m);
+      cairo_surface_write_to_png(image_surface, image_file);
+      cairo_surface_destroy(image_surface);
+    }
+#endif
     
     lua_pushinteger(L, m);
     lua_pushinteger(L, n);
 
-    is_rgb = (color_mode == IC_RGB) ? 1 : 0;
     lua_newtable(L); /* pixel table */
     for (i = 0; i < m*n; i++) {
-      if (is_rgb) {
+      if (color_mode == IC_PALETTE) {
+        /* FIXME: Is this correct? Needs a testcase. Would be nice to map it correctly to RGB. */
+        rgb1maxcolors_from_gray(*image++, &rgb1);
+      } else { /* IC_RGB and IC_RGBA*/
         rgb1.r = *image++;
         rgb1.g = *image++;
         rgb1.b = *image++;
-      } else {
-        rgb1maxcolors_from_gray(*image++, &rgb1);
+        if (color_mode == IC_RGBA) alpha = (*image++)/255.;
       }
       lua_newtable(L); /* pixel color */
       lua_pushnumber(L, rgb1.r);
@@ -1156,23 +1239,38 @@ LUA_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
       lua_rawseti(L, -2, 2);
       lua_pushnumber(L, rgb1.b);
       lua_rawseti(L, -2, 3);
+      if (color_mode == IC_RGBA) {
+        lua_pushnumber(L, alpha);
+        lua_rawseti(L, -2, 4);
+      }
       lua_rawseti(L, -2, i+1); /* add "pixel" */
     }
     
     lua_newtable(L); /* "corner" table */
     for (i = 0; i < 4; i++) {
       lua_newtable(L);
-      lua_pushinteger(L, corner[i].x);
+      lua_pushinteger(L, (int)corner[i].x);
       lua_rawseti(L, -2, 1);
-      lua_pushinteger(L, corner[i].y);
+      lua_pushinteger(L, (int)corner[i].y);
       lua_rawseti(L, -2, 2);
       lua_rawseti(L, -2 , i+1); /* add "subtable" */
     }
-    if (is_rgb)
+    switch (color_mode) {
+      case IC_PALETTE:
+      case IC_RGB:
       lua_pushstring(L, "RGB");
-    else
-      lua_pushstring(L, "GRAY");
-    LUA_call_report(lua_pcall(L, 5, 1, tb));
+        break;
+      case IC_RGBA:
+        lua_pushstring(L, "RGBA");
+        break;
+    }
+    if (image_file) {
+      lua_pushstring(L, image_file);
+      free(image_file);
+    } else {
+      lua_pushnil(L);
+    }
+    LUA_call_report(lua_pcall(L, 6, 1, tb));
     lua_term_result = (int)lua_tointeger(L, -1);
     lua_pop(L, 1);
   }
@@ -1215,7 +1313,7 @@ TERM_TABLE_START(tikz_driver)
     LUA_text, null_scale, LUA_graphics, LUA_move, LUA_vector,
     LUA_linetype, LUA_put_text, LUA_text_angle,
     LUA_justify_text, LUA_point, LUA_arrow, LUA_set_font, LUA_pointsize,
-    TERM_BINARY|TERM_IS_LATEX /*flags*/, 0 /*suspend*/, 0 /*resume*/,
+    TERM_BINARY /*flags*/, 0 /*suspend*/, 0 /*resume*/,
     LUA_boxfill, LUA_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
