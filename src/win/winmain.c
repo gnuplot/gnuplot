@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.31 2010/01/13 05:07:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.32 2010/12/14 23:02:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -164,7 +164,9 @@ WinExit()
 #ifndef WGP_CONSOLE
         TextMessage();  /* process messages */
 #endif
+#ifndef WITH_HTML_HELP
         WinHelp(textwin.hWndText,(LPSTR)winhelpname,HELP_QUIT,(DWORD)NULL);
+#endif
 #ifndef WGP_CONSOLE
         TextMessage();  /* process messages */
 #endif
