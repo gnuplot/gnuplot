@@ -4,6 +4,9 @@
 	* docs/gnuplot.doc: changes for windows html help: update titlepage,
 	  comment out old html anchor definitions and links, and add html
 	  replacements for tables
+	
+	* docs/plotstyles.gnu: new variable winhelp used to switch between PDF
+	  output for "make pdffigures" and PNG output for windows html help
 	  
 	* docs/windows/doc2html.c: New help file format converter derived
 	  from docs/doc2rtf.c and docs/doc2html.c (Attic)
