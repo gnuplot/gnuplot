@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.25 2009/03/26 22:00:53 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.26 2010/08/06 01:21:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -346,10 +346,7 @@ history_find_all(char *cmd)
  */
 
 void
-write_history_list(num, filename, mode)
-const int num;
-const char *const filename;
-const char *mode;
+write_history_list(const int num, const char *const filename, const char *mode)
 {
     const HIST_ENTRY *list_entry;
     FILE *out = stdout;
@@ -405,10 +402,7 @@ const char *mode;
 
 /* This is the function getting called in command.c */
 void
-write_history_n(n, filename, mode)
-const int n;
-const char *filename;
-const char *mode;
+write_history_n(const int n, const char *filename, const char *mode)
 {
     write_history_list(n, filename, mode);
 }
@@ -419,8 +413,7 @@ const char *mode;
  * Peter Weilbacher, 28Jun2004
  */
 const char *
-history_find(cmd)
-char *cmd;
+history_find(char *cmd)
 {
     int len;
 
@@ -446,8 +439,7 @@ char *cmd;
  * Peter Weilbacher 28Jun2004
  */
 int
-history_find_all(cmd)
-char *cmd;
+history_find_all(char *cmd)
 {
     int len;
     int found;
