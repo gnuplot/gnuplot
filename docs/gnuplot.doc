@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.649 2011/02/20 23:17:11 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.650 2011/02/21 16:03:51 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1296,6 +1296,7 @@ C marker below is used to signal this to doc2html:
  one part in 10^4.
 @end table
 
+^<!-- INCLUDE_NEXT_TABLE -->
 @start table
 #\begin{tabular}{|ccl|} \hline
 #\multicolumn{3}{|c|}{String functions} \\ \hline \hline
@@ -1401,6 +1402,7 @@ C marker below is used to signal this to doc2html:
  `words(" a b c d")` returns the 4.
 @end table
 
+^<!-- INCLUDE_NEXT_TABLE -->
 @start table
 #\begin{tabular}{|ccl|} \hline
 #\multicolumn{3}{|c|}{other {\bf gnuplot} functions} \\ \hline \hline
