@@ -18,9 +18,12 @@
 	* src/command.c (help_command): issue error message if helpfile
 	  could not be opened, fix table of contents command ("help")
 	  
-	* src/win/winmain.c (WinExit) [WITH_HTML_HELP]: non need to close
+	* src/win/winmain.c (WinExit) [WITH_HTML_HELP]: no need to close
 	  help window
 	
+	* config/makefile.mgw: Optionally modify settings to build and use 
+	  HTML help [HTML_HELP]. 
+	  
 	SF patch set #3186010.
 	* history.c (write_history_list history_find history_find_all):
 	  use ANSI C definitions

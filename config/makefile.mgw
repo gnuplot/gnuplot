@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.57 2009/12/05 06:34:57 sfeam Exp $
+# $Id: makefile.mgw,v 1.58 2010/03/07 00:26:56 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -12,7 +12,7 @@
 #	 make install -C src -f ../config/makefile.mgw
 #
 # This makefile was tested with MSYS, MingW32 and Microsoft Help
-# Workshop 4.03.
+# Workshop 4.03 / Microsoft HTML Help 1.4 SDK.
 
 
 #
@@ -37,6 +37,10 @@ TARGET=wgnuplot.exe
 #TARGET=gnuplot.exe
 
 # Comment out the definition lines to disable the according features:
+
+# Use more modern HTML help instead of no longer supported Windows help system
+# Please update the HHWPATH below if necessary.
+HTML_HELP=1
 
 # GIF, PNG, JPEG device drivers
 # Requires gd library. There are two possibilities how to configure these
@@ -99,7 +103,11 @@ MOUSE=1
 # Below you can adapt paths according to your software setup:
 
 # Where to place gnuplot.gih helpfile:
-HELPFILE = wgnuplot.hlp
+ifdef HTML_HELP
+  HELPFILE = wgnuplot.chm
+else
+  HELPFILE = wgnuplot.hlp
+endif
 
 # Where to install the PostScript prologue files, relatively to the executable
 # wgnuplot.exe
@@ -123,6 +131,17 @@ DESTDIR = /c/Progra~1/Gnuplot4.5
 # -mpentiumpro means optimize for Pentium II and Pro procesors
 CFLAGS =
 
+ifdef HTML_HELP
+
+# To compile the .chm file you need the Microsoft HTML Help 1.4 SDK
+# It can be obtained here:
+# http://go.microsoft.com/fwlink/?LinkId=154968
+# We need to explicitly set the correct path here since we also need 
+# adjust the include and linrary paths.
+HHWPATH = /c/Programme/HTML\ Help\ Workshop/
+HHC = $(HHWPATH)hhc
+
+else
 
 # To compile the .hlp file you need hcw either out of Microsoft SDK or MS Help
 # Workshop. The latter can be obtained from either of
@@ -133,6 +152,8 @@ CFLAGS =
 HCW = $(HCWPATH)hcw
 # Switches are for HCW 4.03:
 HCWFLAG =
+
+endif
 
 # Choose which windres/rc do you want to use (GNU windres or MS RC):
 GNU_RC = 1
@@ -212,6 +233,14 @@ CFLAGS += -I$(TOP) -I. -D_Windows -DHAVE_CONFIG_H\
 
 ifdef MOUSE
   CFLAGS += -DUSE_MOUSE=1 -DWIN_IPC
+endif
+
+ifdef HTML_HELP
+  CFLAGS += -DWITH_HTML_HELP -I$(HHWPATH)include
+  TERMLIBS += -L$(HHWPATH)lib -lhtmlhelp
+  BUILDHELPFILE = $(D)windows/$(HELPFILE)
+else
+  BUILDHELPFILE = $(HELPFILE)
 endif
 
 ifdef NEWGD
@@ -345,8 +374,13 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 	win/wgnuplot.def win/wgnuplot.hpj win/wgnuplot.mnu win/wgraph.c \
 	win/winmain.c win/wmenu.c win/wpause.c win/wprinter.c \
 	win/wresourc.h win/wtext.c win/wtext.h win/geticon.c \
-	$(D)doc2rtf.c $(T)win.trm win/grpicon.ico win/texticon.ico
+	$(T)win.trm win/grpicon.ico win/texticon.ico
 
+ifdef HTML_HELP
+WINDOWS +=	$(D)windows/doc2html.c
+else
+WINDOWS +=	$(D)doc2rtf.c
+endif
 
 # default rules
 .SUFFIXES: .exe .o .c
@@ -428,10 +462,26 @@ grpicon.ico: geticon.exe win/wgnuplot.rc
 geticon.exe: win/geticon.c
 	$(LD) $(LDFLAGS) -o $@ win/geticon.c
 
+ifdef HTML_HELP
+# convert gnuplot.doc to windows/wgnuplot.html
+$(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk $(D)windows/wgnuplot.stp $(D)plotstyles.gnu
+	./doc2html $(D)gnuplot.doc $(D)windows/wgnuplot.html $(D)windows/wgnuplot.hhc
+	cd $(D)
+	-../src/$(TARGET) -e "winhelp=1" $(D)plotstyles.gnu
+	cd ../src
+	-$(HHC) $(D)windows/wgnuplot.hhp
+
+$(HELPFILE): $(BUILDHELPFILE)
+	$(CP) $^ $@
+else
 # convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win/wgnuplot.hpj
 	./doc2rtf $(D)gnuplot.doc win/gnuplot.rtf
 	$(HCW) -c -e win/wgnuplot.hpj
+endif
+
+doc2html.exe: $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
+	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) $^
 
 doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) $^
@@ -505,14 +555,17 @@ gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
 clean:
 	$(RM) config.h *.$(O) wgnuplot.map wgnuplot.res win/gnuplot.rtf
 	$(RM) wxterminal/*.$(O)
-	$(RM) doc2rtf.exe win/wgnuplib.res wgnuplib.map wgnuplot.lib
+	$(RM) doc2rtf.exe doc2html.exe
+	$(RM) win/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe *.ico geticon.exe allterm.h allterm.c
 	$(RM) gnuplot.tex gnuplot.dvi gnuplot.ps gnuplot.pdf
+	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc 
+	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
 
 realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
-	$(RM) wgnuplot.hlp wgnuplot.gid
+	$(RM) $(HELPFILE) wgnuplot.gid wgnuplot.mnu
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
 
 # now move the whole stuff to its destination
@@ -523,7 +576,11 @@ install: default
 	cp wgnuplot_pipes.exe $(DESTDIR)/wgnuplot_pipes.exe
 	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
 	cp win/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
+ifdef HTML_HELP	
+	cp $(D)windows/wgnuplot.chm $(DESTDIR)/wgnuplot.chm
+else
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
+endif
 	mkdir -p $(DESTDIR)/$(GNUPLOT_PS_DIR)
 	cp ../term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
 	mkdir -p $(DESTDIR)/$(GNUPLOT_JS_DIR)
