@@ -1,3 +1,15 @@
+2011-02-21  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	SF patch set #3186010
+
+	* history.c (write_history_list history_find history_find_all):
+	  use ANSI C definitions
+	
+	* command.c (history_command): mention editline in message for 
+	  missing history support
+	
+	* readline.c(getc_wrapper): generalize code used for editline
+	
 2011-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Revised configuration tests for lua support.
