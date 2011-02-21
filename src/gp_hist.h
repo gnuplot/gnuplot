@@ -1,5 +1,5 @@
 /*
- * $Id: gp_hist.h,v 1.9 2005/08/12 08:31:56 mikulik Exp $
+ * $Id: gp_hist.h,v 1.10 2008/12/12 21:06:13 sfeam Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
@@ -67,7 +67,7 @@ extern long int gnuplot_history_size;
 #endif
 
 /* NetBSD editline
- * (almost) compatible readline relacement
+ * (almost) compatible readline replacement
  */
 #if defined(HAVE_LIBEDITLINE)
 # include <editline/readline.h>
@@ -84,6 +84,6 @@ int history_find_all __PROTO((char *));
 void write_history_n __PROTO((const int, const char *, const char *));
 const char *history_find __PROTO((char *));
 int history_find_all __PROTO((char *));
-#endif /* READLINE && !HAVE_LIBREADLINE */
+#endif /* READLINE && !HAVE_LIBREADLINE && !HAVE_LIBEDITLINE */
 
 #endif /* GNUPLOT_HISTORY_H */
