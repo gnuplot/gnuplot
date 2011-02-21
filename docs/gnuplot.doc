@@ -1,44 +1,45 @@
-C RCS $Id: gnuplot.doc,v 1.648 2011/01/26 06:09:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.649 2011/02/20 23:17:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
-^ <h2> An Interactive Plotting Program </h2><p>
-^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-^ <h2>  Version 4.4 organized by Ethan A Merritt and others</h2><p>
-^ <h2>Major contributors (alphabetic order):</h2>
-^<ul><h3>
-^<li>  Hans-Bernhard Broeker
-^<li>  John Campbell
-^<li>  Robert Cunningham
-^<li>  David Denholm
-^<li>  Gershon Elber
-^<li>  Roger Fearick
-^<li>  Carsten Grammes
-^<li>  Lucas Hart
-^<li>  Lars Hecking
-^<li>  Thomas Koenig
-^<li>  David Kotz
-^<li>  Ed Kubaitis
-^<li>  Russell Lang
-^<li>  Alexander Lehmann
-^<li>  Alexander Mai
-^<li>  Ethan A Merritt
-^<li>  Petr Mikulik
-^<li>  Carsten Steger
-^<li>  Tom Tkacik
-^<li>  Jos Van der Woude
-^<li>  Alex Woo
-^<li>  James R. Van Zandt
-^<li>  Johannes Zellner
-^</h3></ul> <p>
-^<h2>  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<p>
-^   Mailing list for comments: gnuplot-info@lists.sourceforge.net <p>
-^   Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net <p>
-^</h2><p>
-^<h3> This manual was originally prepared by Dick Crawford</h3><p>
-^<h3> Last revised: March 2009</h3><p>
-^<hr>
 1 gnuplot
+?gnuplot
+^<h2 align="center"> An Interactive Plotting Program </h2>
+^<p align="center">  Thomas Williams & Colin Kelley</p>
+^<p align="center">  Version 4.4 organized by Ethan A Merritt and others</p>
+^<p align="center">Major contributors (alphabetic order):<br>
+^<br>
+^  Hans-Bernhard Broeker<br>
+^  John Campbell<br>
+^  Robert Cunningham<br>
+^  David Denholm<br>
+^  Gershon Elber<br>
+^  Roger Fearick<br>
+^  Carsten Grammes<br>
+^  Lucas Hart<br>
+^  Lars Hecking<br>
+^  Thomas Koenig<br>
+^  David Kotz<br>
+^  Ed Kubaitis<br>
+^  Russell Lang<br>
+^  Timoth&eacute;e Lecomte<br>
+^  Alexander Lehmann<br>
+^  Alexander Mai<br>
+^  Ethan A Merritt<br>
+^  Petr Mikulik<br>
+^  Carsten Steger<br>
+^  Tom Tkacik<br>
+^  Jos Van der Woude<br>
+^  Alex Woo<br>
+^  James R. Van Zandt<br>
+^  Johannes Zellner<br>
+^</p>
+^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
+^     Copyright (C) 2004 - 2010 various authors</p>
+^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
+^      Mailing list for bug reports: <tt>gnuplot-bugs@lists.sourceforge.net</tt><br>
+^      Web access (preferred): <tt>http://sourceforge.net/projects/gnuplot</tt></p>
+^<p align="center"> This manual was originally prepared by Dick Crawford</p>
 2 Copyright
 ?copyright
 ?license
@@ -178,7 +179,7 @@ C
 2 Seeking-assistance
 ?help-desk
 ?seeking-assistance
-^ <a name="Seeking-assistance"></a>
+C^ <a name="Seeking-assistance"></a>
  The canonical gnuplot web page can be found at
 ^ <a href="http://www.gnuplot.info">
            http://www.gnuplot.info
@@ -434,6 +435,34 @@ C
 %^P@move back through history.
 %^N@move forward through history.
 @end table
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>	<th>Character</th>	<th>Function</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td></td>				<th>Line Editing</th></tr>
+^<tr>	<td><tt>^B</tt></td>	<td>move back a single character.</td></tr>
+^<tr>	<td><tt>^F</tt></td>	<td>move forward a single character.</td></tr>
+^<tr>	<td><tt>^A</tt></td>	<td>move to the beginning of the line.</td></tr>
+^<tr>	<td><tt>^E</tt></td>	<td>move to the end of the line.</td></tr>
+^<tr>	<td><tt>^H, DEL</tt></td>	<td>delete the previous character.</td></tr>
+^<tr>	<td><tt>^D</tt></td>	<td>delete the current character.</td></tr>
+^<tr>	<td><tt>^K</tt></td>	<td>delete from current position to the end of line.</td></tr>
+^<tr>	<td><tt>^L, ^R</tt></td>	<td>redraw line in case it gets trashed.</td></tr>
+^<tr>	<td><tt>^U</tt></td>	<td>delete the entire line.</td></tr>
+^<tr>	<td><tt>^W</tt></td>	<td>delete from the current word to the end of line.</td></tr>
+^</tbody>
+^<tbody>
+^<tr>	<th></th>				<th>History</th></tr>
+^<tr>	<td><tt>^P</tt></td>	<td>move back through history.</td></tr>
+^<tr>	<td><tt>^N</tt></td>	<td>move forward through history.</td></tr>
+^</tbody>
+^</table>
 2 Comments
 ?comments
  Comments are supported as follows: a `#` may appear in most places in a line
@@ -564,6 +593,24 @@ C
 % ~ $ ~a{.8-}$overprints '-' on 'a', raised by .8
 %   $   $times the current fontsize
 @end table
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>	<th>Control</th>	<th>Examples</th>	<th>Explanation</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td><tt> ^ </tt></td>	<td><tt>a^x</tt></td>			<td>superscript</td></tr>
+^<tr>	<td><tt> _ </tt></td>	<td><tt>a_x</tt></td>			<td>subscript</td></tr>
+^<tr>	<td><tt> @ </tt></td>	<td><tt> @x</tt> or <tt>a@^b_{cd}</tt></td>	<td>phantom box (occupies no width)</td></tr>
+^<tr>	<td><tt> &amp;</tt></td>	<td><tt> &amp;{space}</tt></td>	<td>inserts space of specified length</td></tr>
+^<tr>	<td><tt> ~ </tt></td>	<td><tt> ~a{.8-}</tt></td>		<td>overprints '-' on 'a', raised by .8<br>times the current fontsize</td></tr>
+^</tbody>
+^</table>
 
  Braces can be used to place multiple-character text where a single character
  is expected (e.g., 2^{10}).  To change the font and/or size, use the full form:
@@ -730,6 +777,129 @@ C
  atan2(x) and arg(z)), the unit may be selected by `set angles`, which
  defaults to radians.
 
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3" width="90%">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>   <th colspan="3"> Math library functions </th></tr>
+^<tr>	<th>Function</th>	<th>Arguments</th>	<th>Returns</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td>abs(x)</td>	<td>any</td>	<td>|<i>x</i>|, absolute value of <i>x</i>; same type</td></tr>
+^<tr>	<td>abs(x)</td>	<td>complex</td>	<td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
+^<tr>	<td>acos(x)</td>	<td>any</td>	<td>cos<sup>-1</sup> <i>x</i> (inverse cosine)</td></tr>
+^<tr>	<td>acosh(x)</td>	<td>any</td>	<td>cosh<sup>-1</sup> <i>x</i> (inverse hyperbolic cosine) in radians</td></tr>
+^<tr>	<td>airy(x)</td>	<td>any</td>	<td>Airy function Ai(<i>x</i>)</td></tr>
+^<tr>	<td>arg(x)</td>	<td>complex</td>	<td>the phase of <i>x</i></td></tr>
+^<tr>	<td>asin(x)</td>	<td>any</td>	<td>sin<sup>-1</sup> <i>x</i> (inverse sin)</td></tr>
+^<tr>	<td>asinh(x)</td>	<td>any</td>	<td>sinh<sup>-1</sup> <i>x</i> (inverse hyperbolic sin) in radians</td></tr>
+^<tr>	<td>atan(x)</td>	<td>any</td>	<td>tan<sup>-1</sup> <i>x</i> (inverse tangent)</td></tr>
+^<tr>	<td>atan2(y,x)</td>	<td>int or real</td>	<td>tan<sup>-1</sup>(<i>y/x</i>) (inverse tangent)</td></tr>
+^<tr>	<td>atanh(x)</td>	<td>any</td>	<td>tanh<sup>-1</sup> <i>x</i> (inverse hyperbolic tangent) in radians</td></tr>
+^<tr>	<td>EllipticK(k)</td>	<td>real k in (-1:1)</td>	<td><i>K(k)</i> complete elliptic integral of the first kind</td></tr>
+^<tr>	<td>EllipticE(k)</td>	<td>real k in [-1:1]</td>	<td><i>E(k)</i> complete elliptic integral of the second kind</td></tr>
+^<tr>	<td>EllipticPi(n,k)</td>	<td> real n&lt;1, real k in (-1:1)</td>	<td> &Pi;(<i>n,k</i>) complete elliptic integral of the third kind</td></tr>
+^<tr>	<td>besj0(x)</td>	<td>int or real</td>	<td><i>j</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>	<td>besj1(x)</td>	<td>int or real</td>	<td><i>j</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>	<td>besy0(x)</td>	<td>int or real</td>	<td><i>y</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>	<td>besy1(x)</td>	<td>int or real</td>	<td><i>y</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>	<td>ceil(x)</td>	<td>any</td>	<td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
+^<tr>	<td>cos(x)</td>	<td>radians</td>	<td>cos <i>x</i>, cosine of <i>x</i></td></tr>
+^<tr>	<td>cosh(x)</td>	<td>any</td>	<td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
+^<tr>	<td>erf(x)</td>	<td>any</td>	<td>erf(Re(<i>x</i>)), error function of real(<i>x</i>)</td></tr>
+^<tr>	<td>erfc(x)</td>	<td>any</td>	<td>erfc(Re(<i>x</i>)), 1.0 - error function of real(<i>x</i>)</td></tr>
+^<tr>	<td>exp(x)</td>	<td>any</td>	<td><i>e<sup>x</sup></i>, exponential function of <i>x</i></td></tr>
+^<tr>	<td>expint(n,x)</td>	<td>any</td>	<td><i>E<sub>n</sub></i>(<i>x</i>), exponential integral function of <i>x</i></td></tr>
+^<tr>	<td>floor(x)</td>	<td>any</td>	<td>&lfloor;<i>x</i>&rfloor;, largest integer not greater than <i>x</i> (real part)</td></tr>
+^<tr>	<td>gamma(x)</td>	<td>any</td>	<td>&Gamma;(Re(<i>x</i>)), gamma function of real(<i>x</i>)</td></tr>
+^<tr>	<td>ibeta(p,q,x)</td>	<td>any</td>	<td>ibeta(Re(<i>p,q,x</i>)), ibeta function of real(<i>p</i>,<i>q</i>,<i>x</i>)</td></tr>
+^<tr>	<td>inverf(x)</td>	<td>any</td>	<td>inverse error function real(<i>x</i>)</td></tr>
+^<tr>	<td>igamma(a,x)</td>	<td>any</td>	<td>igamma(Re(<i>a,x</i>)), igamma function of real(<a>a</a>,<i>x</i>)</td></tr>
+^<tr>	<td>imag(x)</td>	<td>complex</td>	<td>Im(<i>x</i>), imaginary part of <i>x</i> as a real number</td></tr>
+^<tr>	<td>invnorm(x)</td>	<td>any</td>	<td>inverse normal distribution function real(<i>x</i>)</td></tr>
+^<tr>	<td>int(x)</td>	<td>real</td>	<td>integer part of <i>x</i>, truncated toward zero</td></tr>
+^<tr>	<td>lambertw(x)</td>	<td>real</td>	<td>Lambert W function</td></tr>
+^<tr>	<td>lgamma(x)</td>	<td>any</td>	<td>lgamma(Re(<i>x</i>)), lgamma function of real(<i>x</i>)</td></tr>
+^<tr>	<td>log(x)</td>	<td>any</td>	<td>ln <i>x</i>, natural logarithm (base <i>e</i>) of <i>x</i></td></tr>
+^<tr>	<td>log10(x)</td>	<td>any</td>	<td>log<sub>10</sub> <i>x</i>, logarithm (base 10) of <i>x</i></td></tr>
+^<tr>	<td>norm(x)</td>	<td>any</td>	<td>norm(<i>x</i>), normal distribution function of real(<i>x</i>)</td></tr>
+^<tr>	<td>rand(x)</td>	<td>int</td>	<td>pseudo random number in the interval [0:1]</td></tr>
+^<tr>	<td>real(x)</td>	<td>any</td>	<td>Re(<i>x</i>), real part of <i>x</i></td></tr>
+^<tr>	<td>sgn(x)</td>	<td>any</td>	<td>1 if <i>x</i> &gt; 0,  -1 if <i>x</i> &lt; 0,  0 if <i>x</i> = 0. &image;(<i>x</i>) ignored</td></tr>
+^<tr>	<td>sin(x)</td>	<td>any</td>	<td>sin <i>x</i>, sine of <i>x</i></td></tr>
+^<tr>	<td>sinh(x)</td>	<td>any</td>	<td>sinh <i>x</i>, hyperbolic sine of <i>x</i> in radians</td></tr>
+^<tr>	<td>sqrt(x)</td>	<td>any</td>	<td>&radic;<i>x</i>, square root of <i>x</i></td></tr>
+^<tr>	<td>tan(x)</td>	<td>any</td>	<td>tan <i>x</i>, tangent of <i>x</i></td></tr>
+^<tr>	<td>tanh(x)</td>	<td>any</td>	<td>tanh <i>x</i>, hyperbolic tangent of <i>x</i> in radians</td></tr>
+^<tr>	<td>voigt(x,y)</td>	<td>real</td>	<td>convolution of Gaussian and Lorentzian</td></tr>
+^</tbody>
+^</table>
+
+^<p>&nbsp;</p>
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3" width="90%">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>   <th colspan="3"> String functions </th></tr>
+^<tr>	<th>Function</th>	<th>Arguments</th>	<th>Returns</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td>gprintf("format",x)</td>	<td>any</td>	<td>string result from applying gnuplot's format parser</td></tr>
+^<tr>	<td>sprintf("format",x,...)</td>	<td>multiple</td>	<td>string result from C-language sprintf</td></tr>
+^<tr>	<td>strlen("string")</td>	<td>string</td>	<td>int length of string</td></tr>
+^<tr>	<td>strstrt("string","key")</td>	<td>strings</td>	<td>int index of first character of substring "key"</td></tr>
+^<tr>	<td>substr("string",beg,end)</td>	<td>multiple</td>	<td>string "string"[beg:end]</td></tr>
+^<tr>	<td>strftime("timeformat",t)</td>	<td>any</td>	<td>string result from applying gnuplot's time parser</td></tr>
+^<tr>	<td>strptime("timeformat",s)</td>	<td>string</td>	<td>seconds since year 2000 as given in string s</td></tr>
+^<tr>	<td>system("command")</td>	<td>string</td>	<td>stdout containing output stream of shell command</td></tr>
+^<tr>	<td>word("string",n)</td>	<td>string, int</td>	<td>returns the nth word in "string"</td></tr>
+^<tr>	<td>words("string")</td>	<td>string</td>	<td>returns the number of words in "string"</td></tr>
+^</tbody>
+^</table>
+
+^<p>&nbsp;</p>
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3" width="90%">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>   <th colspan="3"> other gnuplot functions </th></tr>
+^<tr>	<th>Function</th>	<th>Arguments</th>	<th>Returns</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td>column(x)</td>	<td>int</td>	<td> column <i>x</i> during datafile manipulation.</td></tr>
+^<tr>	<td>defined(X)</td>	<td>variable name</td>	<td> [DEPRECATED] returns 1 if X is defined, 0 otherwise.</td></tr>
+^<tr>	<td>exists("X")</td>	<td>string</td>	<td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
+^<tr>	<td>stringcolumn(x)</td>	<td>int</td>	<td> content column <i>x</i> as a string.</td></tr>
+^<tr>	<td>timecolumn(x)</td>	<td>int</td>	<td> timecolumn <i>x</i> during datafile manipulation.</td></tr>
+^<tr>	<td>tm_hour(x)</td>	<td>int</td>	<td>the hour</td></tr>
+^<tr>	<td>tm_mday(x)</td>	<td>int</td>	<td>the day of the month</td></tr>
+^<tr>	<td>tm_min(x)</td>	<td>int</td>	<td>the minute</td></tr>
+^<tr>	<td>tm_mon(x)</td>	<td>int</td>	<td>the month</td></tr>
+^<tr>	<td>tm_sec(x)</td>	<td>int</td>	<td>the second</td></tr>
+^<tr>	<td>tm_wday(x)</td>	<td>int</td>	<td>the day of the week</td></tr>
+^<tr>	<td>tm_yday(x)</td>	<td>int</td>	<td>the day of the year</td></tr>
+^<tr>	<td>tm_year(x)</td>	<td>int</td>	<td>the year</td></tr>
+^<tr>	<td>time(x)</td>	<td>any</td>	<td>the current system time</td></tr>
+^<tr>	<td>valid(x)</td>	<td>int</td>	<td> test validity of column(<i>x</i>) during datafile manip.</td></tr>
+^<tr>	<td>value("name")</td>	<td>string</td>	<td> returns the current value of the named variable.</td></tr>
+^</tbody>
+^</table>
+
+C For TeX and troff output a table replaces the help sections below.
+C For the HTML help we want both, table and sections, so the magic
+C marker below is used to signal this to doc2html:
+^<!-- INCLUDE_NEXT_TABLE -->
 @start table
 #\begin{tabular}{|ccl|} \hline
 #\multicolumn{3}{|c|}{Math library functions} \\ \hline \hline
@@ -1491,6 +1661,26 @@ C ... and restart the table:
 %$@$3@* call arg/column during `using` manipulation
 %_
 @end table
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>	<th>Symbol</th>	<th>Example</th>	<th>Explanation</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td><tt>-</tt></td>	<td><tt>-a</tt></td>	<td>unary minus</td></tr>
+^<tr>	<td><tt>+</tt></td>	<td><tt>+a</tt></td>	<td>unary plus (no-operation)</td></tr>
+^<tr>	<td><tt>~</tt></td>	<td><tt>~a</tt></td>	<td>* one's complement</td></tr>
+^<tr>	<td><tt>!</tt></td>	<td><tt>!a</tt></td>	<td>* logical negation</td></tr>
+^<tr>	<td><tt>!</tt></td>	<td><tt>a!</tt></td>	<td>* factorial</td></tr>
+^<tr>	<td><tt>$</tt></td>	<td><tt>$3</tt></td>	<td>* call arg/column during `using` manipulation</td></tr>
+^</tbody>
+^</table>
+
  (*) Starred explanations indicate that the operator requires an integer
  argument.
 
@@ -1584,6 +1774,42 @@ C ... and restart the table:
 %ne@A ne B@string inequality
 
 @end table
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>	<th>Symbol</th>	<th>Example</th>	<th>Explanation</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td><tt>**</tt></td>	<td><tt>a**b</tt></td>	<td>exponentiation</td></tr>
+^<tr>	<td><tt>*</tt></td>	<td><tt>a*b</tt></td>	<td>multiplication</td></tr>
+^<tr>	<td><tt>/</tt></td>	<td><tt>a/b</tt></td>	<td>division</td></tr>
+^<tr>	<td><tt>%</tt></td>	<td><tt>a%b</tt></td>	<td>* modulo</td></tr>
+^<tr>	<td><tt>+</tt></td>	<td><tt>a+b</tt></td>	<td>addition</td></tr>
+^<tr>	<td><tt>-</tt></td>	<td><tt>a-b</tt></td>	<td>subtraction</td></tr>
+^<tr>	<td><tt>==</tt></td>	<td><tt>a==b</tt></td>	<td>equality</td></tr>
+^<tr>	<td><tt>!=</tt></td>	<td><tt>a!=b</tt></td>	<td>inequality</td></tr>
+^<tr>	<td><tt>&lt;</tt></td>	<td><tt>a&lt;b</tt></td>	<td>less than</td></tr>
+^<tr>	<td><tt>&lt;=</tt></td>	<td><tt>a&lt;=b</tt></td>	<td>less than or equal to</td></tr>
+^<tr>	<td><tt>&gt;</tt></td>	<td><tt>a&gt;b</tt></td>	<td>greater than</td></tr>
+^<tr>	<td><tt>&gt;=</tt></td>	<td><tt>a&gt;=b</tt></td>	<td>greater than or equal to</td></tr>
+^<tr>	<td><tt>&amp;</tt></td>	<td><tt>a&amp;b</tt></td>	<td>* bitwise AND</td></tr>
+^<tr>	<td><tt>^</tt></td>	<td><tt>a^b</tt></td>	<td>* bitwise exclusive OR</td></tr>
+^<tr>	<td><tt>|</tt></td>	<td><tt>a|b</tt></td>	<td>* bitwise inclusive OR</td></tr>
+^<tr>	<td><tt>&amp;&amp;</tt></td>	<td><tt>a&amp;&amp;b</tt></td>	<td>* logical AND</td></tr>
+^<tr>	<td><tt>||</tt></td>	<td><tt>a||b</tt></td>	<td>* logical OR</td></tr>
+^<tr>	<td><tt>=</tt></td>	<td><tt>a = b</tt></td>	<td>assignment</td></tr>
+^<tr>	<td><tt>,</tt></td>	<td><tt>(a,b)</tt></td>	<td>serial evaluation</td></tr>
+^<tr>	<td><tt>.</tt></td>	<td><tt>a.b</tt></td>	<td>string concatenation</td></tr>
+^<tr>	<td><tt>eq</tt></td>	<td><tt>A eq B</tt></td>	<td>string equality</td></tr>
+^<tr>	<td><tt>ne</tt></td>	<td><tt>A ne B</tt></td>	<td>string inequality</td></tr>
+^</tbody>
+^</table>
+
  (*) Starred explanations indicate that the operator requires integer
  arguments.
  Capital letters A and B indicate that the operator requires string arguments.
@@ -1613,6 +1839,21 @@ C ... and restart the table:
 %?:@a?b:c@* ternary operation
 
 @end table
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>	<th>Symbol</th>	<th>Example</th>	<th>Explanation</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td><tt>?:</tt></td>	<td><tt>a?b:c</tt></td>	<td>* ternary operation</td></tr>
+^</tbody>
+^</table>
+
  The ternary operator behaves as it does in C.  The first argument (a), which
  must be an integer, is evaluated.  If it is true (non-zero), the second
  argument (b) is evaluated and returned; otherwise the third argument (c) is
@@ -1627,7 +1868,7 @@ C ... and restart the table:
  and undefined elsewhere:
        f(x) = 0<=x && x<1 ? sin(x) : 1<=x && x<2 ? 1/x : 1/0
        plot f(x)
-^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
+C^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
  Note that `gnuplot` quietly ignores undefined values, so the final branch of
  the function (1/0) will produce no plottable points.  Note also that f(x)
  will be plotted as a continuous function across the discontinuity if a line
@@ -1700,7 +1941,7 @@ C ... and restart the table:
        file = "mydata.inp"
        file(n) = sprintf("run_%d.dat",n)
 
-^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
+C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
  The final two examples illustrate a user-defined string variable and a
  user-defined string function.
 
@@ -2213,7 +2454,7 @@ C ... and restart the table:
 ?startup
 ?start
 ?.gnuplot
-^ <a name="start-up"></a>
+C^ <a name="start-up"></a>
  When `gnuplot` is run, it looks for an initialization file to load.
  This file is called `.gnuplot` on Unix-like systems, and `GNUPLOT.INI`
  on other systems.  If this file is not found in the current directory,
@@ -2462,8 +2703,8 @@ C ... and restart the table:
  command line.  See `substitution`.
 2 Time/Date data
 ?time/date
-^ <a name="Time/Date data"></a>
-^ <a name="Time/date"></a>
+C^ <a name="Time/Date data"></a>
+C^ <a name="Time/date"></a>
  `gnuplot` supports the use of time and/or date information as input data.
  This feature is activated by the commands `set xdata time`, `set ydata time`,
  etc.
@@ -5077,7 +5318,7 @@ Ffigure_mapcontours
           1980   24
           1985   10
 
-^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[population.gif]" width=640 height=480>
+C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[population.gif]" width=640 height=480>
 4 index
 ?commands plot datafile index
 ?plot datafile index
@@ -5126,10 +5367,10 @@ Ffigure_mapcontours
  data set.  To avoid problems it may be useful to choose a naming scheme like
  '== Population ==' or '[Population]'.
 
-^ See also web page
+^ <p>See also web page
 ^ <a href="http://www.gnuplot.info/demo/multimsh.html">
 ^ splot with indices demo.
-^ </a>
+^ </a></p>
 4 smooth
 ?commands plot datafile smooth
 ?plot datafile smooth
@@ -6263,7 +6504,7 @@ Ffigure_mapcontours
 2 save
 ?commands save
 ?save
-^ <a name="save set"></a>
+C^ <a name="save set"></a>
  The `save` command saves user-defined functions, variables, the `set
  term` status, all `set` options, or all of these, plus the last `plot`
  (`splot`) command to the specified file.
@@ -6746,6 +6987,31 @@ Ffigure_mapcontours
 %1024@no effect@top left front
 %2048@no effect@top right front
 @end table
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="right">
+^  <col align="center">
+^  <col align="center">
+^</colgroup>
+^<thead>
+^<tr>	<th>Bit</th>	<th>plot</th>	<th>splot</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td>1</td>	<td>bottom</td>	<td>bottom left front</td></tr>
+^<tr>	<td>2</td>	<td>left</td>	<td>bottom left back</td></tr>
+^<tr>	<td>4</td>	<td>top</td>	<td>bottom right front</td></tr>
+^<tr>	<td>8</td>	<td>right</td>	<td>bottom right back</td></tr>
+^<tr>	<td>16</td>	<td>no effect</td>	<td>left vertical</td></tr>
+^<tr>	<td>32</td>	<td>no effect</td>	<td>back vertical</td></tr>
+^<tr>	<td>64</td>	<td>no effect</td>	<td>right vertical</td></tr>
+^<tr>	<td>128</td>	<td>no effect</td>	<td>front vertical</td></tr>
+^<tr>	<td>256</td>	<td>no effect</td>	<td>top left back</td></tr>
+^<tr>	<td>512</td>	<td>no effect</td>	<td>top right back</td></tr>
+^<tr>	<td>1024</td>	<td>no effect</td>	<td>top left front</td></tr>
+^<tr>	<td>2048</td>	<td>no effect</td>	<td>top right front</td></tr>
+^</tbody>
+^</table>
 
  Various bits or combinations of bits may be added together in the command.
 
@@ -7738,6 +8004,33 @@ Ffigure_mapcontours
 %_
 @end table
 
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>	<th>Format</th>	<th>Explanation</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td><tt>%f</tt></td>	<td>floating point notation</td></tr>
+^<tr>	<td><tt>%e</tt> or <tt>%E</tt></td>	<td>exponential notation; an "e" or "E" before the power</td></tr>
+^<tr>	<td><tt>%g</tt> or <tt>%G</tt></td>	<td>the shorter of <tt>%e</tt> (or <tt>%E</tt>) and <tt>%f</tt></td></tr>
+^<tr>	<td><tt>%x</tt> or <tt>%X</tt></td>	<td>hex</td></tr>
+^<tr>	<td><tt>%o</tt> or <tt>%O</tt></td>	<td>octal</td></tr>
+^<tr>	<td><tt>%t</tt></td>	<td>mantissa to base 10</td></tr>
+^<tr>	<td><tt>%l</tt></td>	<td>mantissa to base of current logscale</td></tr>
+^<tr>	<td><tt>%s</tt></td>	<td>mantissa to base of current logscale; scientific power</td></tr>
+^<tr>	<td><tt>%T</tt></td>	<td>power to base 10</td></tr>
+^<tr>	<td><tt>%L</tt></td>	<td>power to base of current logscale</td></tr>
+^<tr>	<td><tt>%S</tt></td>	<td>scientific power</td></tr>
+^<tr>	<td><tt>%c</tt></td>	<td>character replacement for scientific power</td></tr>
+^<tr>	<td><tt>%b</tt></td>	<td>mantissa of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi)</td></tr>
+^<tr>	<td><tt>%B</tt></td>	<td>prefix of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi)</td></tr>
+^<tr>	<td><tt>%P</tt></td>	<td>multiple of &pi;</td></tr>
+^</tbody>
+^</table>
+
  A 'scientific' power is one such that the exponent is a multiple of three.
  Character replacement of scientific powers (`"%c"`) has been implemented
  for powers in the range -18 to +18.  For numbers outside of this range the
@@ -7875,6 +8168,44 @@ Ffigure_mapcontours
 %%Y@year, 4-digit
 %_
 @end table
+
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>	<th>Format</th>	<th>Explanation</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td><tt>%a</tt></td>	<td>abbreviated name of day of the week</td></tr>
+^<tr>	<td><tt>%A</tt></td>	<td>full name of day of the week</td></tr>
+^<tr>	<td><tt>%b</tt> or <tt>%h</tt></td>	<td>abbreviated name of the month</td></tr>
+^<tr>	<td><tt>%B</tt></td>	<td>full name of the month</td></tr>
+^<tr>	<td><tt>%d</tt></td>	<td>day of the month, 01&ndash;31</td></tr>
+^<tr>	<td><tt>%D</tt></td>	<td>shorthand for <tt>%m/%d/%y</tt> (only output)</td></tr>
+^<tr>	<td><tt>%F</tt></td>	<td>shorthand for <tt>%Y-%m-%d</tt> (only output)</td></tr>
+^<tr>	<td><tt>%k</tt></td>	<td>hour, 0&ndash;23 (one or two digits)</td></tr>
+^<tr>	<td><tt>%H</tt></td>	<td>hour, 00&ndash;23 (always two digits)</td></tr>
+^<tr>	<td><tt>%l</tt></td>	<td>hour, 1&ndash;12 (one or two digits)</td></tr>
+^<tr>	<td><tt>%I</tt></td>	<td>hour, 01&ndash;12 (always two digits)</td></tr>
+^<tr>	<td><tt>%j</tt></td>	<td>day of the year, 1&ndash;366</td></tr>
+^<tr>	<td><tt>%m</tt></td>	<td>month, 01&ndash;12</td></tr>
+^<tr>	<td><tt>%M</tt></td>	<td>minute, 0&ndash;60</td></tr>
+^<tr>	<td><tt>%p</tt></td>	<td>"am" or "pm"</td></tr>
+^<tr>	<td><tt>%r</tt></td>	<td>shorthand for <tt>%I:%M:%S %p</tt> (only output)</td></tr>
+^<tr>	<td><tt>%R</tt></td>	<td>shorthand for <tt>%H:%M</tt> (only output)</td></tr>
+^<tr>	<td><tt>%S</tt></td>	<td>second, integer 0&ndash;60 on output, (double) on input</td></tr>
+^<tr>	<td><tt>%s</tt></td>	<td>number of seconds since start of year 2000</td></tr>
+^<tr>	<td><tt>%T</tt></td>	<td>shorthand for <tt>%H:%M:%S</tt> (only output)</td></tr>
+^<tr>	<td><tt>%U</tt></td>	<td>week of the year (week starts on Sunday)</td></tr>
+^<tr>	<td><tt>%w</tt></td>	<td>day of the week, 0&ndash;6 (Sunday = 0)</td></tr>
+^<tr>	<td><tt>%W</tt></td>	<td>week of the year (week starts on Monday)</td></tr>
+^<tr>	<td><tt>%y</tt></td>	<td>year, 0-99 in range 1969-2068</td></tr>
+^<tr>	<td><tt>%Y</tt></td>	<td>year, 4-digit</td></tr>
+^</tbody>
+^</table>
 
  Except for the non-numerical formats, these may be preceded by a "0" ("zero",
  not "oh") to pad the field length with leading zeroes, and a positive digit,
@@ -9791,8 +10122,8 @@ Ffigure_mapcontours
  determine the <H>,<S>,<V> or <X>,<Y>,<Z> or ... color components as usual.
 
  Use `positive` and `negative` to invert the figure colors.
-^ <a name="positive"></a>
-^ <a name="negative"></a>
+C^ <a name="positive"></a>
+C^ <a name="negative"></a>
 
  Note that it is possible to find a set of the best matching rgbformulae for any
  other color scheme by the command
@@ -10242,7 +10573,7 @@ Ffigure_mapcontours
 ?set style
 ?show style
 ?unset style
-^ <a name="set style <style>"></a>
+C^ <a name="set style <style>"></a>
  Default plotting styles are chosen with the `set style data` and
  `set style function` commands.  See `plot with` for information about how to
  override the default plotting style for individual functions and data sets.
@@ -10278,8 +10609,8 @@ Ffigure_mapcontours
 ?unset style arrow
 ?show style arrow
 ?arrowstyle
-^ <a name="arrowtype"></a>
-^ <a name="arrowwidth"></a>
+C^ <a name="arrowtype"></a>
+C^ <a name="arrowwidth"></a>
  Each terminal has a default set of arrow and point types, which can be seen
  by using the command `test`.  `set style arrow` defines a set of arrow types
  and widths and point types and sizes so that you can refer to them later by
@@ -10493,6 +10824,29 @@ Ffigure_mapcontours
 %x11@no@yes@no
 %_
 @end table
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="center">
+^  <col align="center">
+^</colgroup>
+^<thead>
+^<tr>	<th>Terminal</th>	<th>solid</th>	<th>pattern</th>	<th>pm3d</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td>gif</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
+^<tr>	<td>jpeg</td>	<td>yes</td>	<td>no</td>	<td>yes</td></tr>
+^<tr>	<td>pdf</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
+^<tr>	<td>png</td>	<td>TrueColor</td>	<td>index</td>	<td>yes</td></tr>
+^<tr>	<td>post</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
+^<tr>	<td>svg</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
+^<tr>	<td>wxt</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
+^<tr>	<td>x11</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
+^</tbody>
+^</table>
+
  Note that there may be additional limitations on the creation or viewing of
  graphs containing transparent fill areas.  For example, the png terminal can
  only use transparent fill if the "truecolor" option is set.  Some pdf viewers
@@ -11029,6 +11383,31 @@ Ffigure_mapcontours
 %%B@name of the month
 %_
 @end table
+
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>	<th>Format</th>	<th>Explanation</th></tr>
+^</thead>
+^<tbody>
+^<tr>	<td><tt>%d</tt></td>	<td>day of the month, 1&ndash;31</td></tr>
+^<tr>	<td><tt>%m</tt></td>	<td>month of the year, 1&ndash;12</td></tr>
+^<tr>	<td><tt>%y</tt></td>	<td>year, 0&ndash;99</td></tr>
+^<tr>	<td><tt>%Y</tt></td>	<td>year, 4-digit</td></tr>
+^<tr>	<td><tt>%j</tt></td>	<td>day of the year, 1&ndash;365</td></tr>
+^<tr>	<td><tt>%H</tt></td>	<td>hour, 0&ndash;24</td></tr>
+^<tr>	<td><tt>%M</tt></td>	<td>minute, 0&ndash;60</td></tr>
+^<tr>	<td><tt>%s</tt></td>	<td>seconds since the Unix epoch (1970-01-01 00:00 UTC)</td></tr>
+^<tr>	<td><tt>%S</tt></td>	<td>second, integer 0&ndash;60 on output, (double) on input</td></tr>
+^<tr>	<td><tt>%b</tt></td>	<td>three-character abbreviation of the name of the month</td></tr>
+^<tr>	<td><tt>%B</tt></td>	<td>name of the month</td></tr>
+^</tbody>
+^</table>
+
  Any character is allowed in the string, but must match exactly.  \t (tab) is
  recognized.  Backslash-octals (\nnn) are converted to char.  If there is no
  separating character between the time/date elements, then %d, %m, %y, %H, %M
@@ -12324,7 +12703,7 @@ Ffigure_mapcontours
  Note that "datafile.dat" defines a 4 by 3 grid ( 4 rows of 3 points each ).
  Rows (datablocks) are separated by blank records.
 
-^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
+C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
  Note also that the x value is held constant within each dataline.  If you
  instead keep y constant, and plot with hidden-line removal enabled, you will
  find that the surface is drawn 'inside-out'.
