@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.203 2011/02/20 15:50:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.204 2011/02/21 08:00:49 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2134,18 +2134,23 @@ do_system(const char *cmd)
 void
 help_command()
 {
+    c_token++;
 #ifdef WITH_HTML_HELP
-    HtmlHelp(textwin.hWndParent, winhelpname, HH_DISPLAY_TOPIC, (DWORD_PTR)NULL);  // open help file if necessary
+    /* open help file if necessary */
+    if (HtmlHelp(textwin.hWndParent, winhelpname, HH_DISPLAY_TOPIC, (DWORD_PTR)NULL) == NULL) {
+        fprintf(stderr, "Error: Could not open help file \"%s\"\n", winhelpname);
+    }
     if (END_OF_COMMAND) {
-        printf("help: toc\n");
-	HtmlHelp(textwin.hWndParent, winhelpname, HH_DISPLAY_TOC, (DWORD_PTR)NULL);
+        /* show table of contents */
+        HtmlHelp(textwin.hWndParent, winhelpname, HH_DISPLAY_TOC, (DWORD_PTR)NULL);
     } else {
+        /* lookup topic in index */
         HH_AKLINK link;
-	char buf[128];
-	int start = ++c_token;
-	while (!(END_OF_COMMAND))
-	    c_token++;
-	capture(buf, start, c_token - 1, 128);
+        char buf[128];
+        int start = c_token;
+        while (!(END_OF_COMMAND))
+            c_token++;
+        capture(buf, start, c_token - 1, 128);
         link.cbStruct =     sizeof(HH_AKLINK) ;
         link.fReserved =    FALSE;
         link.pszKeywords =  buf; 
@@ -2161,7 +2166,7 @@ help_command()
 	WinHelp(textwin.hWndParent, (LPSTR) winhelpname, HELP_INDEX, (DWORD) NULL);
     else {
 	char buf[128];
-	int start = ++c_token;
+	int start = c_token;
 	while (!(END_OF_COMMAND))
 	    c_token++;
 	capture(buf, start, c_token - 1, 128);
