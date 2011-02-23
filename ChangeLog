@@ -1,3 +1,14 @@
+2011-02-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc: correct typos; revive some "html" anchors
+
+2011-02-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* docs/gnuplot.doc: add link from `rand` to `random` and use proper 
+	  table format in random section
+	* term/lua/gnuplot-tikz.help term/lua/gnuplot-tikz.lua: balance
+	  backquotes in gnuplot help.
+
 2011-02-21  Peter Hedwig <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.help term/lua/gnuplot-tikz.lua
