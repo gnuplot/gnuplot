@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.88 2011/02/11 03:47:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.89 2011/02/12 04:54:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -395,18 +395,23 @@ GraphInit(LPGW lpgw)
 	ReleaseDC(lpgw->hWndGraph, hdc);
 
 	lpgw->hPopMenu = CreatePopupMenu();
+	/* actions */
+	AppendMenu(lpgw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard (Ctrl+C)");
+	AppendMenu(lpgw->hPopMenu, MF_STRING, M_SAVE_AS_EMF, "&Save as EMF... (Ctrl+S)");
+	AppendMenu(lpgw->hPopMenu, MF_STRING, M_PRINT, "&Print...");
+	/* settings */
+	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->graphtotop ? MF_CHECKED : MF_UNCHECKED),
 		M_GRAPH_TO_TOP, "Bring to &Top");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->color ? MF_CHECKED : MF_UNCHECKED),
 		M_COLOR, "C&olor");
-	AppendMenu(lpgw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard (Ctrl+C)");
-	AppendMenu(lpgw->hPopMenu, MF_STRING, M_SAVE_AS_EMF, "&Save as EMF... (Ctrl+S)");
 #if WINVER >= 0x030a
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_LINESTYLE, "&Line Styles...");
 #endif
-	AppendMenu(lpgw->hPopMenu, MF_STRING, M_PRINT, "&Print...");
+	/* save settings */
+	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
 	if (lpgw->IniFile != (LPSTR)NULL) {
 		wsprintf(buf,"&Update %s",lpgw->IniFile);
 		AppendMenu(lpgw->hPopMenu, MF_STRING, M_WRITEINI, (LPSTR)buf);
