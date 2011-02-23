@@ -37,8 +37,8 @@
 
 
 
-  $Date: 2011/02/22 04:30:06 $
-  $Author: sfeam $
+  $Date: 2011/02/23 13:53:52 $
+  $Author: markisch $
   $Rev: 98 $
 
 ]]--
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 98 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2011/02/22 04:30:06 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2011/02/23 13:53:52 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -2338,13 +2338,11 @@ if arg then -- called from the command line!
     -- write style file
     pgf.create_style()
   elseif arg[1] == 'termhelp' then
-    io.write([["2 tikz",
+    io.write([["2 lua tikz",
 "?set terminal lua tikz",
 "?set term lua tikz",
 "?term lua tikz",
-"?tikz",
-" The TikZ driver is an output driver for the generic Lua terminal.",
-" Please read the Lua terminal section for additional information.",
+" The TikZ driver is one output mode of the generic Lua terminal.",
 "",
 " Syntax:",
 "     set terminal lua tikz",
