@@ -3,6 +3,8 @@
 	* term/lua/gnuplot-tikz.lua term/lua/gnuplot-tikz.help:
 	Fix redundant definitions that broke TeX-based documentation.
 
+	* term/Makefile.am.in: Regenerate term/lua/gnuplot-tikz.help
+
 2011-02-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: correct typos; revive some "html" anchors

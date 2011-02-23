@@ -30,7 +30,15 @@ Makefile.am: Makefile.am.in
 	echo lua_DATA = lua/gnuplot-tikz.lua | fmt \
 	  | (tr '\012' @; echo) |sed 's/@$$/%/;s/@/ \\@/g' \
 	  | tr @% '\012 ' >> $@t
+	echo if BUILD_LUA >> $@t
+	echo     build_lua = BUILD_LUA >> $@t
+	echo else >> $@t
+	echo     build_lua = >> $@t
+	echo endif >> $@t
 	sed -n '/^##trm-files-end/,$$p' Makefile.am.in >> $@t
 	chmod a-w $@t
 	mv $@t $@
+
+lua/gnuplot-tikz.help: lua/gnuplot-tikz.lua
+	test -z "$(build_lua)" || lua lua/gnuplot-tikz.lua termhelp > lua/gnuplot-tikz.help
 
