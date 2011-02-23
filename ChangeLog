@@ -1,3 +1,7 @@
+2011-02-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/win.trm: update and reformat windows help text
+
 2011-02-24  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc:  sync to docs version 1.651
