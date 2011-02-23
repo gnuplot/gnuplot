@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2009/06/05 05:37:04 $
+  $Date: 2011/02/22 04:30:06 $
   $Author: sfeam $
   $Rev: 98 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 98 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2011/02/13 05:37:04 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2011/02/22 04:30:06 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -1123,7 +1123,7 @@ pgf.print_help = function(fwrite)
  By using the 'externalimages' option all bitmap images will be written
  as external PNG images and included at compile time of the document.
  Generating DVI and later postscript files requires to convert the PNGs
- into EPS files in a seperate step e.g. by using ImageMagick's `convert'.
+ into EPS files in a seperate step e.g. by using ImageMagick's `convert`.
  Transparent bitmap images are always generated as an external PNGs.
 
  The 'nobitmap' option let images be rendered as filled rectangles instead
