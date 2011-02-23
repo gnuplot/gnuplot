@@ -6,9 +6,18 @@
 
 	* docs/gnuplot.doc: add link from `rand` to `random` and use proper 
 	  table format in random section
+
 	* term/lua/gnuplot-tikz.help term/lua/gnuplot-tikz.lua: balance
 	  backquotes in gnuplot help.
+
 	* src/win/wgraph.c: reorder entries of the graph popup menu
+
+	* src/win/winmain.c(IsWindowsXPorLater) src/win/wcommon.h: add a 
+	  function to detect if gnuplot is running on Win XP or later.
+
+	* src/win/wtext.c(TextMakeFont) src/win/wgraph.c(Makefonts): select
+	  ClearType or Proof quality depending on OS version to improve 
+	  rendering quality
 
 2011-02-21  Peter Hedwig <peter@affenbande.org>
 

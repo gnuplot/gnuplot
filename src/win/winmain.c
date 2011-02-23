@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.32 2010/12/14 23:02:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.33 2011/02/21 15:51:53 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -220,6 +220,19 @@ GetDllVersion(LPCTSTR lpszDllName)
         FreeLibrary(hinstDll);
     }
     return dwVersion;
+}
+
+
+BOOL IsWindowsXPorLater(void) 
+{
+    OSVERSIONINFO versionInfo;
+
+    /* get Windows version */
+    ZeroMemory(&versionInfo, sizeof(OSVERSIONINFO));
+    versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&versionInfo);
+    return ((versionInfo.dwMajorVersion > 5) ||
+           ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 1)));
 }
 
 

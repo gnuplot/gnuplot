@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.20 2010/12/14 23:02:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.21 2011/02/20 14:33:06 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -750,6 +750,10 @@ TextMakeFont(LPTW lptw)
     _fstrncpy(lf.lfFaceName,lptw->fontname,LF_FACESIZE);
     lf.lfHeight = -MulDiv(lptw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
     lf.lfPitchAndFamily = FIXED_PITCH;
+    lf.lfOutPrecision = OUT_OUTLINE_PRECIS;
+    lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+    /* ClearType quality is only supported on XP or later */
+    lf.lfQuality = IsWindowsXPorLater() ? CLEARTYPE_QUALITY : PROOF_QUALITY;
     lf.lfCharSet = DEFAULT_CHARSET;
     if ( (p = _fstrstr(lptw->fontname," Italic")) != (LPSTR)NULL ) {
 	lf.lfFaceName[ (unsigned int)(p-lptw->fontname) ] = '\0';

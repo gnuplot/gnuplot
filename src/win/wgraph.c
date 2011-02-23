@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.89 2011/02/12 04:54:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.90 2011/02/23 14:50:49 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -719,6 +719,10 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 		lpgw->lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
 		lpgw->lf.lfWeight = FW_BOLD;
 	}
+	lpgw->lf.lfOutPrecision = OUT_OUTLINE_PRECIS;
+	lpgw->lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+	/* ClearType quality is only supported on XP or later */ 
+	lpgw->lf.lfQuality = IsWindowsXPorLater() ? CLEARTYPE_QUALITY : PROOF_QUALITY;
 
 	if (lpgw->hfonth == 0) {
 		lpgw->hfonth = CreateFontIndirect((LOGFONT FAR *)&(lpgw->lf));
