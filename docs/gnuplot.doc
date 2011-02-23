@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.650 2011/02/21 16:03:51 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.651 2011/02/21 17:58:39 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -179,7 +179,6 @@ C
 2 Seeking-assistance
 ?help-desk
 ?seeking-assistance
-C^ <a name="Seeking-assistance"></a>
  The canonical gnuplot web page can be found at
 ^ <a href="http://www.gnuplot.info">
            http://www.gnuplot.info
@@ -674,7 +673,7 @@ C^ <a name="Seeking-assistance"></a>
  If GNUTERM is defined, it is used as the name of the terminal type to be
  used.  This overrides any terminal type sensed by `gnuplot` on start-up, but
  is itself overridden by the .gnuplot (or equivalent) start-up file
- (see `start-up`) and, of course, by later explicit changes.
+ (see `startup`) and, of course, by later explicit changes.
 
  GNUHELP may be defined to be the pathname of the HELP file (gnuplot.gih).
 
@@ -686,7 +685,7 @@ C^ <a name="Seeking-assistance"></a>
  On Unix, HOME is used as the name of a directory to search for a .gnuplot
  file if none is found in the current directory.  On MS-DOS, Windows and OS/2,
  GNUPLOT is used.  On Windows, the NT-specific variable USERPROFILE is also
- tried. VMS, SYS$LOGIN: is used. Type `help start-up`.
+ tried. VMS, SYS$LOGIN: is used. Type `help startup`.
 
  On Unix, PAGER is used as an output filter for help messages.
 
@@ -851,14 +850,14 @@ C^ <a name="Seeking-assistance"></a>
 ^<tr>	<th>Function</th>	<th>Arguments</th>	<th>Returns</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>gprintf("format",x)</td>	<td>any</td>	<td>string result from applying gnuplot's format parser</td></tr>
+^<tr>	<td>gprintf("format",x,...)</td>	<td>any</td>	<td>string result from applying gnuplot's format parser</td></tr>
 ^<tr>	<td>sprintf("format",x,...)</td>	<td>multiple</td>	<td>string result from C-language sprintf</td></tr>
 ^<tr>	<td>strlen("string")</td>	<td>string</td>	<td>int length of string</td></tr>
 ^<tr>	<td>strstrt("string","key")</td>	<td>strings</td>	<td>int index of first character of substring "key"</td></tr>
 ^<tr>	<td>substr("string",beg,end)</td>	<td>multiple</td>	<td>string "string"[beg:end]</td></tr>
 ^<tr>	<td>strftime("timeformat",t)</td>	<td>any</td>	<td>string result from applying gnuplot's time parser</td></tr>
 ^<tr>	<td>strptime("timeformat",s)</td>	<td>string</td>	<td>seconds since year 2000 as given in string s</td></tr>
-^<tr>	<td>system("command")</td>	<td>string</td>	<td>stdout containing output stream of shell command</td></tr>
+^<tr>	<td>system("command")</td>	<td>string</td>	<td>string containing output stream of shell command</td></tr>
 ^<tr>	<td>word("string",n)</td>	<td>string, int</td>	<td>returns the nth word in "string"</td></tr>
 ^<tr>	<td>words("string")</td>	<td>string</td>	<td>returns the number of words in "string"</td></tr>
 ^</tbody>
@@ -1226,10 +1225,8 @@ C marker below is used to signal this to doc2html:
 ?rand
 #rand(x) & int & pseudo random number in the interval [0:1] \\
 %rand(x)@int@pseudo random number in the interval [0:1]
- `rand(0)`  returns a pseudo random number in the interval [0:1]
- `rand(-1)` resets both seeds to a standard value.
- `rand(x)`  for integer 0 < x < 2^31-1 sets both internal seeds to x
- `rand({x,y})` for integer 0 < x,y < 2^31-1 sets seed1 to x and seed2 to y.
+ `rand(0)` returns a pseudo random number in the interval [0:1]
+ See `random` for more details.
 4 real
 ?expressions functions real
 ?functions real
@@ -1307,8 +1304,8 @@ C marker below is used to signal this to doc2html:
 4 gprintf
 ?expressions functions gprintf
 ?functions gprintf
-#gprintf("format",x) & any & string result from applying gnuplot's format parser \\
-%gprintf("format",x)@any@string result from applying gnuplot's format parser
+#gprintf("format",x,...) & any & string result from applying gnuplot's format parser \\
+%gprintf("format",x,...)@any@string result from applying gnuplot's format parser
  `gprintf("format",x)` applies gnuplot's own format specifiers to the single
  variable x and returns the resulting string. If you want standard C-language
  format specifiers, you must instead use `sprintf("format",x)`.
@@ -1375,7 +1372,7 @@ C marker below is used to signal this to doc2html:
 ?functions system
 =system
 #system("command") & string & string containing output stream of shell command \\
-%system("command")@string@stdout containing output stream of shell command
+%system("command")@string@string containing output stream of shell command
  `system("command")` executes "command" using the standard shell and returns
  the resulting character stream from stdout as string variable.
  One optional trailing newline is ignored.
@@ -1586,11 +1583,15 @@ C marker below is used to signal this to doc2html:
  0 and 1 using an algorithm from P. L'Ecuyer and S. Cote, "Implementing a
  random number package with splitting facilities", ACM Transactions on
  Mathematical Software, 17:98-111 (1991).
-  `rand(0)`  returns a pseudo random number in the interval [0:1] generated
-             from the current value of two internal 32-bit seeds.
-  `rand(-1)` resets both seeds to a standard value.
-  `rand(x)`  for integer 0 < x < 2^31-1 sets both seeds to x.
-  `rand({x,y})` for 0 < x,y < 2^31-1 sets seed1 to x and seed2 to y.
+
+       rand(0)     returns a pseudo random number in the interval [0:1]
+                   generated from the current value of two internal
+                   32-bit seeds.
+       rand(-1)    resets both seeds to a standard value.
+       rand(x)     for integer 0 < x < 2^31-1 sets both internal seeds
+                   to x.
+       rand({x,y}) for integer 0 < x,y < 2^31-1 sets seed1 to x and 
+                   seed2 to y.
 4 value
 ?expressions functions value
 ?functions value
@@ -2455,8 +2456,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
 2 Start-up
 ?startup
 ?start
+?start-up
 ?.gnuplot
-C^ <a name="start-up"></a>
  When `gnuplot` is run, it looks for an initialization file to load.
  This file is called `.gnuplot` on Unix-like systems, and `GNUPLOT.INI`
  on other systems.  If this file is not found in the current directory,
@@ -2705,8 +2706,6 @@ C^ <a name="start-up"></a>
  command line.  See `substitution`.
 2 Time/Date data
 ?time/date
-C^ <a name="Time/Date data"></a>
-C^ <a name="Time/date"></a>
  `gnuplot` supports the use of time and/or date information as input data.
  This feature is activated by the commands `set xdata time`, `set ydata time`,
  etc.
@@ -6505,8 +6504,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  `reset bind` restores all hotkey bindings to their default state.
 2 save
 ?commands save
+?save set
 ?save
-C^ <a name="save set"></a>
  The `save` command saves user-defined functions, variables, the `set
  term` status, all `set` options, or all of these, plus the last `plot`
  (`splot`) command to the specified file.
@@ -9960,7 +9959,7 @@ C^ <a name="save set"></a>
  is interpolated m-times and n-times in the respective direction.  For negative
  m and n, the interpolation frequency is chosen so that there will be at least
  |m| and |n| points drawn; you can consider this as a special gridding function.
- Zeros, i.e. `interpolation 0,0`, will automatically choose an optimal number of
+ Zeros, i.e. `interpolate 0,0`, will automatically choose an optimal number of
  interpolated surface points.
 4 deprecated_options
 ?pm3d deprecated_options
@@ -10124,8 +10123,8 @@ C^ <a name="save set"></a>
  determine the <H>,<S>,<V> or <X>,<Y>,<Z> or ... color components as usual.
 
  Use `positive` and `negative` to invert the figure colors.
-C^ <a name="positive"></a>
-C^ <a name="negative"></a>
+^ <a name="positive"></a>
+^ <a name="negative"></a>
 
  Note that it is possible to find a set of the best matching rgbformulae for any
  other color scheme by the command
@@ -10575,7 +10574,6 @@ C^ <a name="negative"></a>
 ?set style
 ?show style
 ?unset style
-C^ <a name="set style <style>"></a>
  Default plotting styles are chosen with the `set style data` and
  `set style function` commands.  See `plot with` for information about how to
  override the default plotting style for individual functions and data sets.
@@ -10611,8 +10609,6 @@ C^ <a name="set style <style>"></a>
 ?unset style arrow
 ?show style arrow
 ?arrowstyle
-C^ <a name="arrowtype"></a>
-C^ <a name="arrowwidth"></a>
  Each terminal has a default set of arrow and point types, which can be seen
  by using the command `test`.  `set style arrow` defines a set of arrow types
  and widths and point types and sizes so that you can refer to them later by
@@ -11438,7 +11434,7 @@ C^ <a name="arrowwidth"></a>
  the UNIX98 spec, but conventions vary widely and two-digit year values are
  inherently ambiguous.
 
- See also `set xdata` and `Time/date` for more information.
+ See also `set xdata` and `time/date` for more information.
 
  Example:
        set timefmt "%d/%m/%Y\t%H:%M"
@@ -11697,7 +11693,7 @@ C^ <a name="arrowwidth"></a>
  for this  unless the `set format x "string"` has supplied something that does
  not look like a decimal format (more than one '%' or neither %f nor %g).
 
- See also `Time/date` for more information.
+ See also `time/date` for more information.
 3 xdtics
 ?commands set xdtics
 ?commands unset xdtics
@@ -12972,7 +12968,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  Or upload the report to the gnuplot web site on SourceForge.
  Please give complete information on the version of gnuplot you are using
  and, if possible, a test script that demonstrates the bug.
- See `Seeking-assistance`.
+ See `seeking-assistance`.
 
  The sections below list problems known to be present in gnuplot version 4.4 at
  the time of release.  Some of these are actually bugs in external support
