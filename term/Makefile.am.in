@@ -39,6 +39,8 @@ Makefile.am: Makefile.am.in
 	chmod a-w $@t
 	mv $@t $@
 
+all: lua/gnuplot-tikz.help
+
 lua/gnuplot-tikz.help: lua/gnuplot-tikz.lua
 	test -z "$(build_lua)" || lua lua/gnuplot-tikz.lua termhelp > lua/gnuplot-tikz.help
 
