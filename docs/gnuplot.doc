@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.651 2011/02/21 17:58:39 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.652 2011/02/23 13:49:47 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1225,7 +1225,7 @@ C marker below is used to signal this to doc2html:
 ?rand
 #rand(x) & int & pseudo random number in the interval [0:1] \\
 %rand(x)@int@pseudo random number in the interval [0:1]
- `rand(0)` returns a pseudo random number in the interval [0:1]
+ `rand(0)` returns a pseudo random number in the interval [0:1].
  See `random` for more details.
 4 real
 ?expressions functions real
@@ -1579,7 +1579,7 @@ C marker below is used to signal this to doc2html:
 ?functions random
 ?random
 =rand
- The function rand() produces a sequence of pseudo-random numbers between
+ The function `rand()` produces a sequence of pseudo-random numbers between
  0 and 1 using an algorithm from P. L'Ecuyer and S. Cote, "Implementing a
  random number package with splitting facilities", ACM Transactions on
  Mathematical Software, 17:98-111 (1991).
