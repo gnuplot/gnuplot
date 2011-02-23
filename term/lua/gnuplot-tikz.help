@@ -131,7 +131,7 @@
 " By using the 'externalimages' option all bitmap images will be written",
 " as external PNG images and included at compile time of the document.",
 " Generating DVI and later postscript files requires to convert the PNGs",
-" into EPS files in a seperate step e.g. by using ImageMagick's `convert'.",
+" into EPS files in a seperate step e.g. by using ImageMagick's `convert`.",
 " Transparent bitmap images are always generated as an external PNGs.",
 "",
 " The 'nobitmap' option let images be rendered as filled rectangles instead",
