@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.11 2010/10/09 21:01:50 sfeam Exp $
- *  $Date: 2010/10/09 21:01:50 $
+ *  $Id: lua.trm,v 1.13 2011/02/22 04:30:06 sfeam Exp $
+ *  $Date: 2011/02/22 04:30:06 $
  *  $Rev: 99 $
  */
 
@@ -96,8 +96,10 @@ TERM_PUBLIC void LUA_path __PROTO((int p));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+#ifdef HAVE_CAIROPDF
 #include "wxterminal/gp_cairo.h"
 #include "wxterminal/gp_cairo_helpers.h"
+#endif
 
 #include <lua.h>
 #include <lualib.h>

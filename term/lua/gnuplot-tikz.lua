@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2011/02/23 20:49:25 $
+  $Date: 2011/02/24 04:47:22 $
   $Author: sfeam $
   $Rev: 98 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 98 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2011/02/23 20:49:25 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2011/02/24 04:47:22 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -2247,6 +2247,8 @@ term.image = function(m, n, points, corners, ctype, xfile)
   if xfile ~= nil then
     -- strip file extension
     xxfile = string.match(xfile, "^(.*).png$")
+  else
+    xxfile = ""
   end
   -- load exclusively an external file and don't generate inline images
   if xfile ~= nil and term.external_images == true then

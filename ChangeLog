@@ -1,3 +1,9 @@
+2011-02-24  Peter Hedwig <peter@affenbande.org>
+
+	* term/lua/gnuplot-tikz.lua term/lua.trm:  Make full bitmap
+	support conditional on HAVE_CAIROPDF.  Necessary in order to
+	build lua without the cairo terminals.
+
 2011-02-24  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
 
 	* share/LaTeX/Makefile.am (${lua_files}): Missing $(top_srcdir)
