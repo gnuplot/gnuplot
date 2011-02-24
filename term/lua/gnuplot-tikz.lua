@@ -37,8 +37,8 @@
 
 
 
-  $Date: 2011/02/23 13:53:52 $
-  $Author: markisch $
+  $Date: 2011/02/23 20:49:25 $
+  $Author: sfeam $
   $Rev: 98 $
 
 ]]--
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 98 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2011/02/23 13:53:52 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2011/02/23 20:49:25 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -268,7 +268,7 @@ pgf.write_graph_begin = function (font, noenv)
     gp.write("\\gpmonochromelines\n")
   end
   if gfx.opt.bgcolor ~= nil then
-    gp.write(string.format("\\gpsetbgcolor{%.3f,%.3f,%.3f}\n", gfx.opt.bgcolor[1], gfx.opt.bgcolor[3], gfx.opt.bgcolor[3]))
+    gp.write(string.format("\\gpsetbgcolor{%.3f,%.3f,%.3f}\n", gfx.opt.bgcolor[1], gfx.opt.bgcolor[2], gfx.opt.bgcolor[3]))
   end
 end
 
