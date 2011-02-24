@@ -1,3 +1,8 @@
+2011-02-24  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
+
+	* share/LaTeX/Makefile.am (${lua_files}): Missing $(top_srcdir)
+	broke out-of-source-tree build.
+
 2011-02-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/lua/gnuplot-tikz.lua term/lua/gnuplot-tikz.help:
@@ -11,20 +16,20 @@
 
 2011-02-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* docs/gnuplot.doc: add link from `rand` to `random` and use proper 
-	  table format in random section
+	* docs/gnuplot.doc: add link from `rand` to `random` and use
+	proper table format in random section
 
 	* term/lua/gnuplot-tikz.help term/lua/gnuplot-tikz.lua: balance
-	  backquotes in gnuplot help.
+	backquotes in gnuplot help.
 
 	* src/win/wgraph.c: reorder entries of the graph popup menu
 
-	* src/win/winmain.c(IsWindowsXPorLater) src/win/wcommon.h: add a 
-	  function to detect if gnuplot is running on Win XP or later.
+	* src/win/winmain.c(IsWindowsXPorLater) src/win/wcommon.h: add a
+	function to detect if gnuplot is running on Win XP or later.
 
-	* src/win/wtext.c(TextMakeFont) src/win/wgraph.c(Makefonts): select
-	  ClearType or Proof quality depending on OS version to improve 
-	  rendering quality
+	* src/win/wtext.c(TextMakeFont) src/win/wgraph.c(Makefonts):
+	select ClearType or Proof quality depending on OS version to
+	improve rendering quality
 
 2011-02-21  Peter Hedwig <peter@affenbande.org>
 
@@ -39,41 +44,41 @@
 2011-02-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Windows HTML help, SF patch set #3186000.
-	* docs/gnuplot.doc: changes for windows html help: update titlepage,
-	  comment out old html anchor definitions and links, and add html
-	  replacements for tables
-	
-	* docs/plotstyles.gnu: new variable winhelp used to switch between PDF
-	  output for "make pdffigures" and PNG output for windows html help
-	  
+	* docs/gnuplot.doc: changes for windows html help: update
+	titlepage, comment out old html anchor definitions and links, and
+	add html replacements for tables
+
+	* docs/plotstyles.gnu: new variable winhelp used to switch between
+	PDF output for "make pdffigures" and PNG output for windows html
+	help
 	* docs/windows/doc2html.c: New help file format converter derived
-	  from docs/doc2rtf.c and docs/doc2html.c (Attic)
+	from docs/doc2rtf.c and docs/doc2html.c (Attic)
 
 	* docs/windows/wgnuplot.hhp: New file. HTML help project file.
 
 	* docs/windows/wgnuplot.hhk: New file. HTML help stub index file.
 
-	* docs/windows/wgnuplot.stp: New file. HTML help negative 
-	  list for search index generation. Caution: maximum size 512 bytes.
+	* docs/windows/wgnuplot.stp: New file. HTML help negative list for
+	search index generation. Caution: maximum size 512 bytes.
 
 	* src/command.c (help_command): issue error message if helpfile
-	  could not be opened, fix table of contents command ("help")
-	  
+	could not be opened, fix table of contents command ("help")
+
 	* src/win/winmain.c (WinExit) [WITH_HTML_HELP]: no need to close
 	  help window
-	
-	* config/makefile.mgw: Optionally modify settings to build and use 
-	  HTML help [HTML_HELP]. 
-	  
+
+	* config/makefile.mgw: Optionally modify settings to build and use
+	HTML help [HTML_HELP].
+
 	SF patch set #3186010.
 	* history.c (write_history_list history_find history_find_all):
-	  use ANSI C definitions
-	
-	* command.c (history_command): mention editline in message for 
-	  missing history support
-	
+	use ANSI C definitions
+
+	* command.c (history_command): mention editline in message for
+	missing history support
+
 	* readline.c(getc_wrapper): generalize code used for editline
-	
+
 2011-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Revised configuration tests for lua support.
@@ -88,7 +93,7 @@
 	  Check for arrowstyle variable, apply to each vector if needed
 	* demo/arrowstyle.dem: Modify last plot to show arrowstyle from column
 
-2011-02-20  U-nb2\HBB  <HBB@nb2>
+2011-02-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/config.oww [WITH_HTML_HELP]: Change helpfile name.
 

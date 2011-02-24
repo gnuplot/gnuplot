@@ -15,7 +15,7 @@ tex_DATA = gnuplot.cfg ${lua_files}
 texdir = @TEXDIR@
 
 ${lua_files}:
-	test -z "$(build_lua)" || lua ../../term/lua/gnuplot-tikz.lua style
+	test -z "$(build_lua)" || lua $(top_srcdir)/term/lua/gnuplot-tikz.lua style
 
 install-data-hook:
 	test -n "$(DESTDIR)" || $(TEXHASH)
