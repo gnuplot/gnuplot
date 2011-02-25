@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.83 2011/02/20 15:44:25 broeker Exp $
+ * $Id: win.trm,v 1.84 2011/02/25 13:20:15 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -548,7 +548,7 @@ WIN_waitforinput  ()
 #endif /* USE_MOUSE */
 
 
-/* Note: this is a verbatim copy of PM_image (pm.trm) with only minor changes */
+/* Note: this used to be a verbatim copy of PM_image (pm.trm) with only minor changes */
 
 TERM_PUBLIC void
 WIN_image(unsigned int M, unsigned int N, coordval *image,
@@ -558,16 +558,21 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
     unsigned int image_size;
     unsigned int pad_bytes;
 
-    /* IC_PALETTE and IC_RGB images are converted to a 24bit RGB format
+    /* BM: IC_PALETTE, IC_RGB and IC_RGBA images are converted to a format
        suitable for Windows:
         - sequence of lines is reversed 
         - each line starts at a 4 byte boundary
+        - 24bits RGB  for IC_PALETTE and IC_RGB
+        - 32bist RGBA for IC_RGBA
     */
 
-    /* fprintf(stderr, "WIN_image: %i x %i, mode=%s\n", M, N, color_mode==IC_RGB?"IC_RGB":"IC_PALETTE" ); */
-    pad_bytes = (4 - (3 * M) % 4) % 4; /* scan lines start on ULONG boundaries */
-
-    image_size = (M + pad_bytes ) * N * 3;
+    if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB)) {
+	pad_bytes = (4 - (3 * M) % 4) % 4; /* scan lines start on ULONG boundaries */
+	image_size = (M + pad_bytes ) * N * 3;
+    } else if (color_mode == IC_RGBA) {
+	pad_bytes = 0;
+	image_size = M * N * 4;
+    }
     rgb_image = (PBYTE) gp_alloc(image_size, "WIN RGB image");
 
     if (color_mode == IC_PALETTE) {
@@ -576,7 +581,7 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 	rgb_image += N * (3 * M + pad_bytes);
 	for (y=0; y<N; y++) {
 	    rgb_image -= 3 * M + pad_bytes;
-	    for(x=0; x<M; x++) {
+	    for (x=0; x<M; x++) {
 		rgb255_color rgb255;
 		rgb255maxcolors_from_gray(*image++, &rgb255);
 		*(rgb_image++) = rgb255.b;
@@ -591,7 +596,7 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 	rgb_image += N * (3 * M + pad_bytes);
 	for (y=0; y<N; y++) {
 	    rgb_image -= 3 * M + pad_bytes;
-	    for(x=0; x<M; x++) {
+	    for (x=0; x<M; x++) {
 		rgb255_color rgb255;
 		rgb255.r = (BYTE) (*image++ * 255 + 0.5);
 		rgb255.g = (BYTE) (*image++ * 255 + 0.5);
@@ -602,30 +607,30 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 	    }
 	    rgb_image -= 3 * M;
 	}
-#if (0) /* Alpha channel transparency not implemented  yet */
     } else if (color_mode == IC_RGBA) {
     	unsigned int x, y;
 
-	rgb_image += N * (3 * M + pad_bytes);
+	rgb_image += M * N * 4;
 	for (y=0; y<N; y++) {
-	    rgb_image -= 3 * M + pad_bytes;
-	    for(x=0; x<M; x++) {
-		rgb255_color rgb255;
-		rgb255.r = (BYTE) (*image++ * 255 + 0.5);
-		rgb255.g = (BYTE) (*image++ * 255 + 0.5);
-		rgb255.b = (BYTE) (*image++ * 255 + 0.5);
-		image++; /* Throw away alpha channel */
-		*(rgb_image++) = rgb255.b;
-		*(rgb_image++) = rgb255.g;
-		*(rgb_image++) = rgb255.r;
+	    rgb_image -= 4 * M;
+	    for (x=0; x<M; x++) {
+		coordval red, green ,blue, alpha;
+		red   = *image++; /* RGB is [0:1] */
+		green = *image++;
+		blue  = *image++;
+		alpha = *image++; /* BUT alpha is [0:255] */
+		*(rgb_image++) = (BYTE)(blue  * alpha);
+		*(rgb_image++) = (BYTE)(green * alpha);
+		*(rgb_image++) = (BYTE)(red   * alpha);
+		*(rgb_image++) = (BYTE)(alpha);
 	    }
-	    rgb_image -= 3 * M;
+	    rgb_image -= 4 * M;
 	}
-#endif
     }
 
     /* squeze all the information into the buffer */
-    if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB)) {
+    if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB) || (color_mode == IC_RGBA)) {
+        GraphOp(&graphwin, W_image, color_mode,  0, NULL);
         GraphOp(&graphwin, W_image, corner[0].x, corner[0].y, NULL);
         GraphOp(&graphwin, W_image, corner[1].x, corner[1].y, NULL);
         GraphOp(&graphwin, W_image, corner[2].x, corner[2].y, NULL);
@@ -678,17 +683,21 @@ WIN_filled_polygon(int points, gpiPoint *corners)
 	oldlinetype = WIN_last_linetype;
 	WIN_linetype(0);
     }
+
     /* FIXME:  fillstyle is ignored by the polygon code in wgraph.c
      * This is an experiment to see if we can piggyback on the fillbox() code
      * to set a pattern brush that will stay in effect for the polygon fill.
+       BM: we now support setting fillstyle for transparent styles directly
      */
-    if (corners->style != FS_OPAQUE)
+    if ((corners->style != FS_TRANSPARENT_PATTERN) &&
+        (corners->style != FS_TRANSPARENT_SOLID) &&
+        (corners->style != FS_OPAQUE))
 	WIN_boxfill(corners->style, corners->x, corners->y, 0, 1);
 
     for (i=0; i<points; i++)
     	GraphOp(&graphwin, W_pm3d_filled_polygon_pt, corners[i].x, corners[i].y, NULL);
     /* finish series: */
-    GraphOp(&graphwin, W_pm3d_filled_polygon_draw, points, 0, NULL);
+    GraphOp(&graphwin, W_pm3d_filled_polygon_draw, points, corners->style, NULL);
     if (!graphwin.color)
       WIN_linetype(oldlinetype);
 }
@@ -983,7 +992,7 @@ TERM_TABLE_START(win_driver)
     WIN_text, null_scale, WIN_graphics, WIN_move, WIN_vector,
     WIN_linetype, WIN_put_text, WIN_text_angle,
     WIN_justify_text, WIN_point, do_arrow, WIN_set_font,
-    WIN_set_pointsize, TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE,
+    WIN_set_pointsize, TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL,
     WIN_text /* suspend */ , WIN_resume,
     WIN_boxfill, WIN_linewidth
 #ifdef USE_MOUSE
@@ -1103,7 +1112,7 @@ START_HELP(windows)
 "?windows printing",
 "?printing",
 "?screendump",
-" In order of preference, graphs may be be printed in the following ways:",
+" In order of preference, graphs may be printed in the following ways:",
 "",
 " `1.` Use the `gnuplot` command `set terminal` to select a printer and `set",
 " output` to redirect output to a file.",

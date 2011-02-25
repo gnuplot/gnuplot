@@ -1,4 +1,14 @@
-2011-02-23  Bastian Maerkisch  <bmaerkisch@web.de>
+2011-02-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/win.trm (WIN_image, WIN_filled_polygon) src/win/wgraph.c
+	drawgraph: W_boxfill, W_pm3d_setcolor, W_pm3d_filled_polygon, 
+	W_image): support transparency and alpha channel for boxes, images
+	and polygons. Use memory bitmaps to draw and then use AlphaBlend()
+	and TransparentBlt() to copy to the screen. Fix clipping of images.
+
+	* config/makefile.mgw(LDLIBS): additional GDI library file
+
+	* docs/gnuplot.doc: update `set style fill transparent`
 
 	* term/win.trm: update and reformat windows help text
 

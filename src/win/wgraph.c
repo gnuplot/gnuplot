@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.90 2011/02/23 14:50:49 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.91 2011/02/23 19:58:16 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -48,6 +48,8 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.90 2011/02/23 14:50:49 ma
 #if defined(WIN32) && defined(USE_MOUSE)
 /* shige: for mouse wheel */
 #define _WIN32_WINNT 0x0400
+/* BM: for AlphaBlend/TransparentBlt */
+#define WINVER 0x0410
 #endif
 #include <windows.h>
 #include <windowsx.h>
@@ -899,6 +901,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     double line_width = 1.0;
     unsigned int fillstyle = 0.0;
     int idx;
+    static HBRUSH last_pm3d_brush = NULL;
+    static COLORREF last_color = 0;
 
     if (lpgw->locked)
 	return;
@@ -1050,7 +1054,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    fillstyle = curptr->x;
 	    break;
 
-	case W_boxfill:   /* ULIG */
+	case W_boxfill: {  /* ULIG */
+	    double alpha = 0.;
+	    BOOL transparent = FALSE;
 
 	    assert (polyi == 1);
 
@@ -1059,8 +1065,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	     * ppt[0] by a preceding W_move, and the style was memorized
 	     * by a W_fillstyle call. */
 	    switch(fillstyle & 0x0f) {
-		case FS_SOLID:
 		case FS_TRANSPARENT_SOLID:
+		     alpha = (fillstyle >> 4) / 100.;
+		     transparent = TRUE;
+		    /* intentionally fall through */
+		case FS_SOLID:
 		    /* style == 1 --> use halftone fill pattern
 		     * according to filldensity. Density is from
 		     * 0..100 percent: */
@@ -1071,8 +1080,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			idx = halftone_num - 1;
 		    SelectObject(hdc, halftone_brush[idx]);
 		    break;
-		case FS_PATTERN:
 		case FS_TRANSPARENT_PATTERN:
+		    transparent = TRUE;
+		    /* intentionally fall through */
+		case FS_PATTERN:
 		    /* style == 2 --> use fill pattern according to
                      * fillpattern. Pattern number is enumerated */
 		    idx = fillstyle >> 4;
@@ -1094,9 +1105,61 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	    xdash -= rl;
 	    ydash -= rb - 1;
-	    PatBlt(hdc, ppt[0].x, ppt[0].y, xdash, ydash, PATCOPY);
+
+	    if (transparent) {
+		HDC memdc;
+		HBITMAP membmp, oldbmp;
+		BLENDFUNCTION ftn;
+		POINT p;
+		UINT32 width, height;
+
+		/* ydash is negative ... */
+		p.x = ppt[0].x; 
+		p.y = ppt[0].y + ydash;
+		width = xdash;
+		height = abs(ydash);
+
+		/* create memory device context for bitmap */
+		memdc = CreateCompatibleDC(hdc);
+
+		/* create standard bitmap, no alpha channel needed */
+		membmp = CreateCompatibleBitmap(hdc, xdash, abs(ydash));
+		oldbmp = (HBITMAP)SelectObject(memdc, membmp);
+
+		/* prepare memory context */
+		SetTextColor(memdc, last_color);
+		if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)
+		    SelectObject(memdc, pattern_brush[idx]);
+		else
+		    /* draw with last selected brush */
+		    SelectObject(memdc, last_pm3d_brush);
+
+		/* draw into memory bitmap */
+		PatBlt(memdc, 0, 0, width, height, PATCOPY);
+
+		/* copy bitmap back */
+		if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN) {
+		    TransparentBlt(hdc, p.x, p.y, width, height, 
+		           memdc, 0, 0, width, height, 0x00ffffff); 
+		} else {
+		    ftn.AlphaFormat = 0; /* no alpha channel in bitmap */
+		    ftn.SourceConstantAlpha = (UCHAR)((1. - alpha) * 0xff); /* global alpha */
+		    ftn.BlendOp = AC_SRC_OVER;
+		    ftn.BlendFlags = 0;
+		    AlphaBlend(hdc, p.x, p.y, width, height, 
+		               memdc, 0, 0, width, height, ftn);
+		}
+
+		/* clean up */
+		SelectObject(memdc, oldbmp);
+		DeleteObject(membmp);
+		DeleteDC(memdc);
+	    } else {
+		PatBlt(hdc, ppt[0].x, ppt[0].y, xdash, ydash, PATCOPY);
+	    }
 	    polyi = 0;
 	    break;
+	}
   	case W_text_angle:
  	    if (lpgw->angle != (short int)curptr->x) {
  		lpgw->angle = (short int)curptr->x;
@@ -1158,7 +1221,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    break;
 	case W_pm3d_setcolor:
 	    {
-		static HBRUSH last_pm3d_brush = NULL;
 		HBRUSH this_brush;
 		COLORREF c;
 		LOGPEN cur_penstruct;
@@ -1186,7 +1248,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 
 		/* Solid fill brush */
-		this_brush = CreateSolidBrush(c);
+		this_brush = CreateSolidBrush(last_color = c);
 		SelectObject(hdc, this_brush);
 		if (last_pm3d_brush != NULL)
 		    DeleteObject(last_pm3d_brush);
@@ -1226,57 +1288,206 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    break;
 	case W_pm3d_filled_polygon_draw:
 	    {
+		BOOL transparent = FALSE;
+		double alpha = 0.;
+		fillstyle = curptr->y;
+
+		switch (fillstyle & 0x0f) {
+		    case FS_TRANSPARENT_SOLID:
+			alpha = (fillstyle >> 4) / 100.;
+			transparent = TRUE;
+			break;
+		    case FS_TRANSPARENT_PATTERN:
+			/* style == 2 --> use fill pattern according to
+			 * fillpattern. Pattern number is enumerated */
+			idx = max(fillstyle >> 4, 0);
+			if (idx > pattern_num - 1)
+			    idx = idx % pattern_num;
+			alpha = 1.;
+			transparent = TRUE;
+			break;
+		    default:
+			break;
+		}
+
 		/* end of point series --> draw polygon now */
-		Polygon(hdc, ppt, polyi);
-		polyi = 0;
+		if (!transparent) {
+		    Polygon(hdc, ppt, polyi);
+		} else {
+		    /* BM: To support transparent fill on Windows we draw the 
+		       polygon into a memory bitmap using a memory device context. 
+
+		       We then associate an alpha value to the bitmap and use 
+		       AlphaBlend() to copy the bitmap back.
+
+		       Note: we could probably simplify and speed up the case of 
+		       pattern fill by using TransparentBlt() instead.
+		    */
+		    HDC memdc;
+		    HBITMAP membmp, oldbmp;
+		    int minx, miny, maxx, maxy;
+		    UINT32 width, height;
+		    BITMAPINFO bmi;
+		    UINT32 *pvBits;
+		    int x, y, i;
+		    POINT * points;
+		    BLENDFUNCTION ftn;
+		    UINT32 uAlpha = (UCHAR)(0xff * alpha);
+		    /* FIXME: we always use white as inidicator for transparency 
+		       this will fail for last_color = white
+		    */
+		    UINT32 transparentColor = 0x00ffffff; /* white */
+
+                    /* find minimum rectangle enclosing our polygon. */
+                    minx = maxx = ppt[0].x;
+                    miny = maxy = ppt[0].y;
+                    for (i = 1; i < polyi; i++) {
+                        minx = min(ppt[i].x, minx);
+                        miny = min(ppt[i].y, miny);
+                        maxx = max(ppt[i].x, maxx);
+                        maxy = max(ppt[i].y, maxy);
+                    }
+
+                    /* now shift polygon points to upper left corner */
+                    points = (POINT *)LocalAllocPtr(LHND, (polyi+1) * sizeof(POINT));
+                    for (i = 0; i < polyi; i++) {
+                        points[i].x = ppt[i].x - minx;
+                        points[i].y = ppt[i].y - miny;
+                    }
+
+                    /* create memory device context for bitmap */
+                    memdc = CreateCompatibleDC(hdc);
+
+                    /* create memory bitmap with alpha channel and minimal size */
+                    width  = maxx - minx;
+                    height = maxy - miny;
+                    ZeroMemory(&bmi, sizeof(BITMAPINFO));
+                    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+                    bmi.bmiHeader.biWidth = width;
+                    bmi.bmiHeader.biHeight = height;
+                    bmi.bmiHeader.biPlanes = 1;
+                    bmi.bmiHeader.biBitCount = 32;
+                    bmi.bmiHeader.biCompression = BI_RGB;
+                    bmi.bmiHeader.biSizeImage = width * height * 4;
+                    membmp = CreateDIBSection(memdc, &bmi, DIB_RGB_COLORS, (void **)&pvBits, NULL, 0x0);
+                    oldbmp = (HBITMAP)SelectObject(memdc, membmp);
+                    /* clear bitmap, could also do it via GDI */
+                    for (i = 0; i < width * height; i++)
+                        pvBits[i] = transparentColor;
+
+                    /* prepare the memory context */
+                    SetTextColor(memdc, last_color);
+                    SelectObject(memdc, lpgw->hapen);
+                    if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)
+                        SelectObject(memdc, pattern_brush[idx]);
+                    else
+                        SelectObject(memdc, last_pm3d_brush);
+
+                    /* finally, draw polygon */
+                    Polygon(memdc, points, polyi);
+                    
+                    /* add alpha channel to bitmap */
+                    /* Note: this is really a pre-scaled alpha channel, see MSDN.
+                       To make life easy we only use global transparency, see below */
+                   for (y = 0; y < height; y++) {
+                        for (x = 0; x < width; x++) {
+                            UINT32 pixel = pvBits[x + y * width];
+                            if (pixel == transparentColor)
+                                pvBits[x + y * width]  = 0x00000000; /* completely transparent */
+                            else 
+                                pvBits[x + y * width] |= 0xff000000; /* mark as completely opaque */
+                        }
+                    }
+
+                    /* copy to device with alpa blending */
+                    ftn.BlendOp = AC_SRC_OVER;
+                    ftn.BlendFlags = 0;
+                    ftn.AlphaFormat = AC_SRC_ALPHA; /* bitmap has an alpha channel */
+                    ftn.SourceConstantAlpha = uAlpha;
+                    AlphaBlend(hdc, minx, miny, width, height, 
+                               memdc, 0, 0, width, height, ftn);
+
+                    /* clean up */
+                    LocalFreePtr(points);
+                    SelectObject(memdc, oldbmp);
+                    DeleteObject(membmp);
+                    DeleteDC(memdc);
+                }
+                polyi = 0;
 	    }
 	    break;
 	case W_image:
 	    {
-		/* Due to the structure of gwop in total 5 entries are needed.
-		   These static variables help to collect all the needed information
+		/* Due to the structure of gwop in total 6 entries are needed.
+		   These static variables help to collect all the information
 		*/
 		static int seq = 0;  /* sequence counter */
 		static POINT corners[4];
+		static color_mode = 0;
 
-		if (seq < 4) {
-		    /* The first four OPs contain the `corner` array */
-		    corners[seq].x = xdash;
-		    corners[seq].y = ydash;
+		if (seq == 0) {
+		    /* First OP contains only the color mode */
+		    color_mode = curptr->x;
+		} else if (seq < 5) {
+		    /* Next four OPs contain the `corner` array */
+		    corners[seq-1].x = xdash;
+		    corners[seq-1].y = ydash;
 		} else {
 		    /* The last OP contains the image and it's size */
-		    BITMAPINFO bmi;
 		    char *image;
-		    unsigned int M, N;
+		    unsigned int width, height;
 		    int rc;
 
-		    M = curptr->x;
-		    N = curptr->y;
+		    width = curptr->x;
+		    height = curptr->y;
 		    image = LocalLock(curptr->htext);
 		    if (image) {
+			BITMAPINFO bmi;
 
-			/* rc = SetStretchBltMode(hdc, HALFTONE); */
-
-			memset(&bmi, 0, sizeof(bmi));
-			bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
-			bmi.bmiHeader.biWidth = M;
-			bmi.bmiHeader.biHeight = N;
+			ZeroMemory(&bmi, sizeof(BITMAPINFO));
+			bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+			bmi.bmiHeader.biWidth = width;
+			bmi.bmiHeader.biHeight = height;
 			bmi.bmiHeader.biPlanes = 1;
-			bmi.bmiHeader.biBitCount = 24;
-    			bmi.bmiHeader.biCompression = BI_RGB;
-			bmi.bmiHeader.biClrUsed = 0;
+			bmi.bmiHeader.biCompression = BI_RGB;
 
-			rc = StretchDIBits(hdc, 
-			    corners[0].x, corners[0].y, 
-			    corners[1].x - corners[0].x, corners[1].y - corners[0].y,
-			    0, 0,
-			    M, N,
-			    image, &bmi,
-			    DIB_RGB_COLORS, SRCCOPY );
+			if (color_mode != IC_RGBA) {
+			    bmi.bmiHeader.biBitCount = 24;
+
+			    rc = StretchDIBits(hdc, 
+			        corners[2].x, corners[2].y, 
+			        corners[3].x - corners[2].x, corners[3].y - corners[2].y,
+			        0, 0, width, height,
+			        image, &bmi, DIB_RGB_COLORS, SRCCOPY);
+			} else {
+			    HDC memdc;
+			    HBITMAP membmp, oldbmp;
+			    UINT32 *pvBits;
+			    BLENDFUNCTION ftn;
+
+			    bmi.bmiHeader.biBitCount = 32;
+			    memdc = CreateCompatibleDC(hdc);
+			    membmp = CreateDIBSection(memdc, &bmi, DIB_RGB_COLORS, (void **)&pvBits, NULL, 0x0);
+			    oldbmp = (HBITMAP)SelectObject(memdc, membmp);
+
+			    memcpy(pvBits, image, width * height * 4);
+
+			    ftn.BlendOp = AC_SRC_OVER;
+			    ftn.BlendFlags = 0;
+			    ftn.AlphaFormat = AC_SRC_ALPHA; /* bitmap has an alpha channel */
+			    ftn.SourceConstantAlpha = 0xff;
+			    AlphaBlend(hdc, corners[2].x, corners[2].y, 
+			               corners[3].x - corners[2].x, corners[3].y - corners[2].y,
+			               memdc, 0, 0, width, height, ftn);
+
+			    SelectObject(memdc, oldbmp);
+			    DeleteObject(membmp);
+			    DeleteDC(memdc);
+			}
 		    }
 		    LocalUnlock(curptr->htext);
 		}
-		seq = (seq + 1) % 5;
+		seq = (seq + 1) % 6;
 	    }
 	    break;
 	case W_dot:

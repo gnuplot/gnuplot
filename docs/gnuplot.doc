@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.652 2011/02/23 13:49:47 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.653 2011/02/23 13:58:06 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10797,6 +10797,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        png    TrueColor   index     yes
        post          no     yes      no
        svg          yes      no     yes
+       win          yes     yes     yes
        wxt          yes     yes     yes
        x11           no     yes      no
 #\begin{tabular}{|cccl|} \hline
@@ -10807,6 +10808,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 #png        &TrueColor&   index &     yes \\
 #post       &      no &     yes &      no \\
 #svg        &     yes &      no &     yes \\
+#win        &     yes &     yes &     yes \\
 #wxt        &     yes &     yes &     yes \\
 #x11        &      no &     yes &      no \\
 %c l .
@@ -10818,6 +10820,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 %png@TrueColor@index@yes
 %post@no@yes@no
 %svg@yes@yes@yes
+%win@yes@yes@yes
 %wxt@yes@yes@yes
 %x11@no@yes@no
 %_
@@ -10840,6 +10843,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ^<tr>	<td>png</td>	<td>TrueColor</td>	<td>index</td>	<td>yes</td></tr>
 ^<tr>	<td>post</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
 ^<tr>	<td>svg</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
+^<tr>	<td>win</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
 ^<tr>	<td>wxt</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
 ^<tr>	<td>x11</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
 ^</tbody>
