@@ -1,7 +1,13 @@
+2011-02-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph): handle the case of transparent
+	fill with color from linetype: save color to variable last_color
+	on all changes and create solid brushes when required
+
 2011-02-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm (WIN_image, WIN_filled_polygon) src/win/wgraph.c
-	drawgraph: W_boxfill, W_pm3d_setcolor, W_pm3d_filled_polygon, 
+	(drawgraph: W_boxfill, W_pm3d_setcolor, W_pm3d_filled_polygon, 
 	W_image): support transparency and alpha channel for boxes, images
 	and polygons. Use memory bitmaps to draw and then use AlphaBlend()
 	and TransparentBlt() to copy to the screen. Fix clipping of images.

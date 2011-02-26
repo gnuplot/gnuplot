@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.91 2011/02/23 19:58:16 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.92 2011/02/25 19:15:07 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -901,8 +901,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     double line_width = 1.0;
     unsigned int fillstyle = 0.0;
     int idx;
-    static HBRUSH last_pm3d_brush = NULL;
-    static COLORREF last_color = 0;
+    COLORREF last_color = 0;
 
     if (lpgw->locked)
 	return;
@@ -1025,7 +1024,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		pen = cur_pen;
 		SelectObject(hdc, lpgw->colorbrush[pen]);
 		/* Text color is also used for pattern fill */
-		SetTextColor(hdc, cur_penstruct.lopnColor);
+		SetTextColor(hdc, last_color = cur_penstruct.lopnColor);
 	    }
 	break;
 
@@ -1066,8 +1065,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	     * by a W_fillstyle call. */
 	    switch(fillstyle & 0x0f) {
 		case FS_TRANSPARENT_SOLID:
-		     alpha = (fillstyle >> 4) / 100.;
-		     transparent = TRUE;
+		    alpha = (fillstyle >> 4) / 100.;
+		    transparent = TRUE;
 		    /* intentionally fall through */
 		case FS_SOLID:
 		    /* style == 1 --> use halftone fill pattern
@@ -1112,6 +1111,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		BLENDFUNCTION ftn;
 		POINT p;
 		UINT32 width, height;
+		HBRUSH brush;
 
 		/* ydash is negative ... */
 		p.x = ppt[0].x; 
@@ -1130,9 +1130,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		SetTextColor(memdc, last_color);
 		if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)
 		    SelectObject(memdc, pattern_brush[idx]);
-		else
-		    /* draw with last selected brush */
-		    SelectObject(memdc, last_pm3d_brush);
+		else {
+		    /* we don't know if we should use a colorbrush or a pm3d brush,
+		    so we create our own... */
+		    brush = CreateSolidBrush(last_color);
+		    SelectObject(memdc, brush);
+		}
 
 		/* draw into memory bitmap */
 		PatBlt(memdc, 0, 0, width, height, PATCOPY);
@@ -1151,6 +1154,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 
 		/* clean up */
+		if (brush) DeleteObject(brush);
 		SelectObject(memdc, oldbmp);
 		DeleteObject(membmp);
 		DeleteDC(memdc);
@@ -1221,6 +1225,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    break;
 	case W_pm3d_setcolor:
 	    {
+		static HBRUSH last_pm3d_brush = NULL;
 		HBRUSH this_brush;
 		COLORREF c;
 		LOGPEN cur_penstruct;
@@ -1248,7 +1253,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 
 		/* Solid fill brush */
-		this_brush = CreateSolidBrush(last_color = c);
+		this_brush = CreateSolidBrush(c);
 		SelectObject(hdc, this_brush);
 		if (last_pm3d_brush != NULL)
 		    DeleteObject(last_pm3d_brush);
@@ -1271,7 +1276,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		DeleteObject(SelectObject(hdc, lpgw->hapen));
 
 		/* set text color, which is also used for pattern fill */
-		SetTextColor(hdc, c);
+		SetTextColor(hdc, last_color = c);
 	    }
 	    break;
 	case W_pm3d_filled_polygon_pt:
@@ -1337,6 +1342,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		       this will fail for last_color = white
 		    */
 		    UINT32 transparentColor = 0x00ffffff; /* white */
+		    HBRUSH brush;
 
                     /* find minimum rectangle enclosing our polygon. */
                     minx = maxx = ppt[0].x;
@@ -1380,8 +1386,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
                     SelectObject(memdc, lpgw->hapen);
                     if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)
                         SelectObject(memdc, pattern_brush[idx]);
-                    else
-                        SelectObject(memdc, last_pm3d_brush);
+		    else {
+			/* we don't know if we should use a colorbrush or a pm3d brush,
+			   so we create our own... */
+			brush = CreateSolidBrush(last_color);
+			SelectObject(memdc, brush);
+		    }
 
                     /* finally, draw polygon */
                     Polygon(memdc, points, polyi);
@@ -1409,6 +1419,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
                     /* clean up */
                     LocalFreePtr(points);
+		    if (brush) DeleteObject(brush);
                     SelectObject(memdc, oldbmp);
                     DeleteObject(membmp);
                     DeleteDC(memdc);
