@@ -3,12 +3,13 @@ AUTOMAKE_OPTIONS = foreign 1.2h
 
 EXTRA_DIST = README ${tex_DATA}
 
-lua_files = gnuplot-lua-tikz.sty gnuplot-lua-tikz-common.tex gnuplot-lua-tikz.tex t-gnuplot-lua-tikz.tex
 
 if BUILD_LUA
      build_lua = BUILD_LUA
+     lua_files = gnuplot-lua-tikz.sty gnuplot-lua-tikz-common.tex gnuplot-lua-tikz.tex t-gnuplot-lua-tikz.tex
 else
      build_lua =
+     lua_files =
 endif
 
 tex_DATA = gnuplot.cfg ${lua_files}

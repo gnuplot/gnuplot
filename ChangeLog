@@ -1,3 +1,8 @@
+2011-02-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/Makefile.am.in: Don't try to install TeX files for lua
+	if we never build lua support.
+
 2011-02-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph): handle the case of transparent
