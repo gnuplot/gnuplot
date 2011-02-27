@@ -3,6 +3,15 @@
 	* term/Makefile.am.in: Don't try to install TeX files for lua
 	if we never build lua support.
 
+2011-02-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/mingw/Makefile, config/cygwin/Makefile: New files.  Work
+	like config/makefile.cyg and config/makefile.mgw, respectively,
+	but without spilling files into the source tree.
+
+	* config/makefile.oww: Dropped.  Superseded by
+	config/watcom/Makefile.
+
 2011-02-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph): handle the case of transparent
@@ -12,10 +21,11 @@
 2011-02-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm (WIN_image, WIN_filled_polygon) src/win/wgraph.c
-	(drawgraph: W_boxfill, W_pm3d_setcolor, W_pm3d_filled_polygon, 
-	W_image): support transparency and alpha channel for boxes, images
-	and polygons. Use memory bitmaps to draw and then use AlphaBlend()
-	and TransparentBlt() to copy to the screen. Fix clipping of images.
+	(drawgraph: W_boxfill, W_pm3d_setcolor, W_pm3d_filled_polygon)
+	(W_image): support transparency and alpha channel for boxes,
+	images and polygons. Use memory bitmaps to draw and then use
+	AlphaBlend() and TransparentBlt() to copy to the screen. Fix
+	clipping of images.
 
 	* config/makefile.mgw(LDLIBS): additional GDI library file
 
