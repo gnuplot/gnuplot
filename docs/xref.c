@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: xref.c,v 1.11 2005/04/22 21:40:37 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: xref.c,v 1.12 2008/02/25 02:20:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - xref.c */
@@ -297,14 +297,14 @@ refs( int l, FILE *f, char *start, char *end, char *format)
     curlevel = list->level;
     list = list->next;		/* look at next element before going on */
 
-    if (start != NULL && list != NULL) {
+    if ((start != NULL) && (list != NULL) && (list->level > curlevel)) {
 	/* don't write start if there's no menue at all */
 	inlist = TRUE;
 	fprintf(f, "%s", start);
     }
     while (list != NULL) {
 	/* we are onto the next topic so stop */
-	if (list->level == curlevel)
+	if (list->level <= curlevel)
 	    break;
 	/* these are the next topics down the list */
 	if (list->level == curlevel + 1) {
