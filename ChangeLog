@@ -3,8 +3,17 @@
 	* docs/xref.c (refs): Only emit start and stop strings if we
 	write any items at all.
 	
+	Request by Mojca Miklavec
 	* docs/windows/doc2html.c: Include list of subtopics. Optionally
 	use hard links instead of index lookup (HTML_HARDLINKS).
+	
+	Feature Request #874572
+	* term/win.trm src/win/wgraph.c src/win/wgnuplib.h 
+	src/win/wresourc.h: Add double buffering to the windows terminal 
+	to avoid flicker on redraw. Add a poor man's version of antialiasing:
+	draw on a bitmap twice the size of the window on screen, then
+	scale down using halftone mode. Both settings are optional and can 
+	be changed via the `graph-menu` and `wgnuplot.ini`.
 
 2011-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 

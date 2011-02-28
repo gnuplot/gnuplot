@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.84 2011/02/25 13:20:15 markisch Exp $
+ * $Id: win.trm,v 1.85 2011/02/25 19:15:07 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -1091,6 +1091,14 @@ START_HELP(windows)
 " `Color` when checked enables color linestyles.  When unchecked it forces",
 " monochrome linestyles.",
 "",
+" `Double buffer` activates drawing into a memory buffer before copying the",
+" graph to the screen. This avoids flickering e.g. during animation and",
+" rotation of 3d graphs. See `mouse` and `scrolling`.",
+"",
+" `Oversampling` doubles the size of the virtual canvas. It is scaled down",
+" again for drawing to the screen. This gives smoother graphics but requires",
+" more memory and computing time. It requires `double buffer`."
+"",
 " `Background...` sets the window background color.",
 "",
 " `Choose Font...` selects the font used in the graphics window.",
@@ -1208,6 +1216,8 @@ START_HELP(windows)
 "       GraphFont=Arial,10",
 "       GraphColor=1",
 "       GraphToTop=1",
+"       GraphDoublebuffer=1",
+"       GraphOversampling=1",
 "       GraphBackground=255 255 255",
 "       Border=0 0 0 0 0",
 "       Axis=192 192 192 2 2",

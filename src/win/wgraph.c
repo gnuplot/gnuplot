@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.92 2011/02/25 19:15:07 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.93 2011/02/26 09:59:11 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -383,6 +383,7 @@ GraphInit(LPGW lpgw)
 #if 0  /* shige */
 	ReadGraphIni(lpgw);
 #endif
+	lpgw->sampling = 1;
 
 	lpgw->hWndGraph = CreateWindow(szGraphClass, lpgw->Title,
 		WS_OVERLAPPEDWINDOW,
@@ -407,6 +408,10 @@ GraphInit(LPGW lpgw)
 		M_GRAPH_TO_TOP, "Bring to &Top");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->color ? MF_CHECKED : MF_UNCHECKED),
 		M_COLOR, "C&olor");
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->doublebuffer ? MF_CHECKED : MF_UNCHECKED),
+		M_DOUBLEBUFFER, "&Double buffer");
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->oversample ? MF_CHECKED : MF_UNCHECKED),
+		M_OVERSAMPLE, "O&versampling");
 #if WINVER >= 0x030a
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
@@ -711,7 +716,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->rotate = FALSE;
 	_fmemset(&(lpgw->lf), 0, sizeof(LOGFONT));
 	_fstrncpy(lpgw->lf.lfFaceName,lpgw->fontname,LF_FACESIZE);
-	lpgw->lf.lfHeight = -MulDiv(lpgw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	lpgw->lf.lfHeight = -MulDiv(lpgw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72) * lpgw->sampling;
 	lpgw->lf.lfCharSet = DEFAULT_CHARSET;
 	if ( (p = _fstrstr(lpgw->fontname," Italic")) != (LPSTR)NULL ) {
 		lpgw->lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
@@ -898,7 +903,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     POINT *ppt;
     unsigned int ngwop=0;
     BOOL isColor;
-    double line_width = 1.0;
+    int sampling = lpgw->sampling;
+    double line_width = 1.0 * sampling;
     unsigned int fillstyle = 0.0;
     int idx;
     COLORREF last_color = 0;
@@ -914,9 +920,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		> 2)
 	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE));
 
-    if (lpgw->background != RGB(255,255,255) && lpgw->color && isColor) {
-	SetBkColor(hdc,lpgw->background);
+    if (lpgw->color && isColor) {
+	SetBkColor(hdc, lpgw->background);
 	FillRect(hdc, rect, lpgw->hbrush);
+    } else {
+	FillRect(hdc, rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
     }
 
     ppt = (POINT *)LocalAllocPtr(LHND, (polymax+1) * sizeof(POINT));
@@ -926,8 +934,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     rt = rect->top;
     rb = rect->bottom;
 
-    htic = lpgw->org_pointsize*MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1;
-    vtic = lpgw->org_pointsize*MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1;
+    htic = sampling * (lpgw->org_pointsize*MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1);
+    vtic = sampling * (lpgw->org_pointsize*MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1);
 
     lpgw->angle = 0;
     SetFont(lpgw, hdc);
@@ -1222,6 +1230,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	     * that linewidth is exactly 1 iff it's in default
 	     * state */
 	    line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
+	    line_width *= sampling;
 	    break;
 	case W_pm3d_setcolor:
 	    {
@@ -1929,6 +1938,10 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, "GraphColor", profile, file);
 	wsprintf(profile, "%d", lpgw->graphtotop);
 	WritePrivateProfileString(section, "GraphToTop", profile, file);
+	wsprintf(profile, "%d", lpgw->doublebuffer);
+	WritePrivateProfileString(section, "GraphDoublebuffer", profile, file);
+	wsprintf(profile, "%d", lpgw->oversample);
+	WritePrivateProfileString(section, "GraphOversampling", profile, file);
 	wsprintf(profile, "%d %d %d",GetRValue(lpgw->background),
 			GetGValue(lpgw->background), GetBValue(lpgw->background));
 	WritePrivateProfileString(section, "GraphBackground", profile, file);
@@ -2014,6 +2027,16 @@ ReadGraphIni(LPGW lpgw)
 	  GetPrivateProfileString(section, "GraphToTop", "", profile, 80, file);
 		if ( (p = GetInt(profile, (LPINT)&lpgw->graphtotop)) == NULL)
 			lpgw->graphtotop = TRUE;
+
+	if (bOKINI)
+	  GetPrivateProfileString(section, "GraphDoubleBuffer", "", profile, 80, file);
+		if ( (p = GetInt(profile, (LPINT)&lpgw->doublebuffer)) == NULL)
+			lpgw->doublebuffer = TRUE;
+
+	if (bOKINI)
+	  GetPrivateProfileString(section, "GraphOversampling", "", profile, 80, file);
+		if ( (p = GetInt(profile, (LPINT)&lpgw->oversample)) == NULL)
+			lpgw->oversample = TRUE;
 
 	lpgw->background = RGB(255,255,255);
 	if (bOKINI)
@@ -2510,6 +2533,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				case M_GRAPH_TO_TOP:
 				case M_COLOR:
+				case M_DOUBLEBUFFER:
+				case M_OVERSAMPLE:
 				case M_CHOOSE_FONT:
 				case M_COPY_CLIP:
 				case M_SAVE_AS_EMF:
@@ -2708,6 +2733,14 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->color = !lpgw->color;
 					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
 					return(0);
+				case M_OVERSAMPLE:
+					lpgw->oversample = !lpgw->oversample;
+					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
+					return(0);
+				case M_DOUBLEBUFFER:
+					lpgw->doublebuffer = !lpgw->doublebuffer;
+					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
+					return(0);
 				case M_CHOOSE_FONT:
 					SelFont(lpgw);
 					return 0;
@@ -2739,6 +2772,14 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						CheckMenuItem(lpgw->hPopMenu, M_COLOR, MF_BYCOMMAND | MF_CHECKED);
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_COLOR, MF_BYCOMMAND | MF_UNCHECKED);
+					if (lpgw->doublebuffer)
+						CheckMenuItem(lpgw->hPopMenu, M_DOUBLEBUFFER, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_DOUBLEBUFFER, MF_BYCOMMAND | MF_UNCHECKED);
+					if (lpgw->oversample)
+						CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_UNCHECKED);
 					if (lpgw->graphtotop)
 						CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND | MF_CHECKED);
 					else
@@ -2791,7 +2832,15 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 #endif
 			return(0);
-		case WM_PAINT:
+		case WM_ERASEBKGND:
+			return(1); /* we erase the background ourselves */
+		case WM_PAINT: {
+			HDC memdc;
+			HBITMAP membmp, oldbmp;
+			LONG width, height;
+			int sampling;
+			RECT memrect;
+
 			hdc = BeginPaint(hwnd, &ps);
 			SetMapMode(hdc, MM_TEXT);
 			SetBkMode(hdc,OPAQUE);
@@ -2801,7 +2850,52 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 #else
 			SetViewportExt(hdc, rect.right, rect.bottom);
 #endif
-			drawgraph(lpgw, hdc, &rect);
+			/* double buffering */
+			if (lpgw->doublebuffer) {
+			    /* choose oversampling */
+			    if (lpgw->oversample)
+			        sampling = 2; /* anything bigger than that makes the computer crawl ... */
+			    else
+			        sampling = 1;
+
+			    /* create memory device context for double buffering */
+			    width = rect.right - rect.left;
+			    height = rect.bottom - rect.top;
+			    memdc = CreateCompatibleDC(hdc);
+			    memrect.left = 0;
+			    memrect.right = width * sampling + sampling/2;
+			    memrect.top = 0;
+			    memrect.bottom = height * sampling + sampling/2;
+			    membmp = CreateCompatibleBitmap(hdc, memrect.right, memrect.bottom);
+			    oldbmp = (HBITMAP)SelectObject(memdc, membmp);
+
+			    /* TODO: we really should cache the results ... */			
+			    if (sampling > 1) {
+			        lpgw->sampling = sampling;
+			        DestroyFonts(lpgw);
+			        MakeFonts(lpgw, &memrect, memdc);
+			    }
+
+			    /* draw into memdc, then copy to hdc */
+			    drawgraph(lpgw, memdc, &memrect);
+			    if (sampling == 1)
+			        BitBlt(hdc, 0, 0, width, height, memdc, 0, 0, SRCCOPY);
+			    else {
+			        int stretch = SetStretchBltMode(hdc, HALFTONE);
+			        StretchBlt(hdc, 0, 0, width, height, 
+			                   memdc,0, 0, memrect.right, memrect.bottom,
+			                   SRCCOPY);
+			        SetStretchBltMode(hdc, stretch);
+			    }
+			    lpgw->sampling = 1;
+
+			    /* select the old bitmap back into the device context */
+			    SelectObject(memdc, oldbmp);
+			    DeleteObject(membmp);
+			    DeleteDC(memdc);
+			} else {
+			    drawgraph(lpgw, hdc, &rect);
+			}
 			EndPaint(hwnd, &ps);
 #ifdef USE_MOUSE
 			/* drawgraph() erases the plot window, so immediately after
@@ -2813,6 +2907,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			DrawZoomBox(lpgw);
 #endif
 			return 0;
+	}
 		case WM_SIZE:
 			/* update font sizes if graph resized */
 			if ((wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED)) {
@@ -3176,14 +3271,32 @@ DisplayStatusLine(LPGW lpgw)
 {
 	RECT rc;
 	HDC hdc;
-
-	if (!sl_curr_text || !sl_curr_text[0])
-	       return; /* no text to be displayed */
+	SIZE size;
 
 	hdc = GetDC(lpgw->hWndGraph);
 	SetBkMode(hdc, OPAQUE);
 	GetClientRect(lpgw->hWndGraph, &rc);
-	TextOut(hdc,  0, rc.bottom - lpgw->statuslineheight, sl_curr_text, strlen(sl_curr_text));
+	
+	/* determine length of text */
+	size.cx = size.cy = 0;
+	if (sl_curr_text)
+	    GetTextExtentPoint(hdc, sl_curr_text, strlen(sl_curr_text), &size);
+
+	/* erase the rest of status line */
+	rc.left = size.cx;
+	rc.top  = rc.bottom - lpgw->statuslineheight;
+	FillRect(hdc, &rc, (HBRUSH) (COLOR_WINDOW+1));
+	if (size.cx) {
+	    rc.left = 0;
+	    rc.right = size.cx;
+	    rc.top  = rc.bottom - lpgw->statuslineheight + size.cy;
+	    FillRect(hdc, &rc, (HBRUSH) (COLOR_WINDOW+1));
+	}
+
+	/* draw the text */
+	if (sl_curr_text)
+	    TextOut(hdc,  0, rc.bottom - lpgw->statuslineheight, sl_curr_text, strlen(sl_curr_text));
+
 	ReleaseDC(lpgw->hWndGraph, hdc);
 }
 
@@ -3191,7 +3304,7 @@ DisplayStatusLine(LPGW lpgw)
  * Update the status line by the text; erase the previous text
  */
 static void
-UpdateStatusLine (LPGW lpgw, const char text[])
+UpdateStatusLine(LPGW lpgw, const char text[])
 {
 	RECT rc;
 	HDC hdc;
@@ -3201,7 +3314,7 @@ UpdateStatusLine (LPGW lpgw, const char text[])
 	GetClientRect(lpgw->hWndGraph, &rc);
 
 	/* determine length of previous text */
-	size.cx = 0;
+	size.cx = size.cy = 0;
 	if (sl_curr_text) {
 		GetTextExtentPoint(hdc, sl_curr_text, strlen(sl_curr_text), &size);
 		free(sl_curr_text);
@@ -3210,21 +3323,27 @@ UpdateStatusLine (LPGW lpgw, const char text[])
 	/* determine length of new text */
 	if (!text || !*text) {
 		sl_curr_text = 0;
-		size2.cx = 0;
+		size2.cx = size2.cy = 0;
 	} else {
 		sl_curr_text = strdup(text);
 		GetTextExtentPoint(hdc, sl_curr_text, strlen(sl_curr_text), &size2);
-		/* overwrite previous text */
-		SetBkMode(hdc, OPAQUE);
-		TextOut(hdc,  0, rc.bottom - lpgw->statuslineheight, sl_curr_text, strlen(sl_curr_text));
 	}
 
-	/* erase the rest */
-	if (size.cx > size2.cx) {
-		rc.left = size2.cx;
-		rc.right = size.cx;
-		rc.top  = rc.bottom - lpgw->statuslineheight;
-		FillRect(hdc, &rc, (HBRUSH) (COLOR_WINDOW+1));
+	/* erase the rest of the status line */
+	rc.left = size2.cx;
+	rc.top  = rc.bottom - lpgw->statuslineheight;
+	FillRect(hdc, &rc, (HBRUSH) (COLOR_WINDOW+1));
+	if (size2.cy) {
+	    rc.left = 0;
+	    rc.right = size2.cx;
+	    rc.top  = rc.bottom - lpgw->statuslineheight + size.cy;
+	    FillRect(hdc, &rc, (HBRUSH) (COLOR_WINDOW+1));
+	}
+
+	/* overwrite previous text */
+	if (text && *text) {
+	    SetBkMode(hdc, OPAQUE);
+	    TextOut(hdc,  0, rc.bottom - lpgw->statuslineheight, sl_curr_text, strlen(sl_curr_text));
 	}
 
 	ReleaseDC(lpgw->hWndGraph, hdc);

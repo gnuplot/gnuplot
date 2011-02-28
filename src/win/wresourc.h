@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.6 2004/07/01 17:10:11 broeker Exp $
+ * $Id: wresourc.h,v 1.7 2010/02/16 07:12:52 mikulik Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -79,6 +79,8 @@
 
 /* wgraph.c */
 #define M_SAVE_AS_EMF  NUMMENU+14
+#define M_DOUBLEBUFFER NUMMENU+15
+#define M_OVERSAMPLE   NUMMENU+16
 
 /* wprinter.c */
 #define PSIZE_SBOX 100
