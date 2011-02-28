@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.1 2011/02/21 15:45:46 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.2 2011/02/28 11:40:40 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - doc2html.c */
@@ -205,6 +205,7 @@ process_line(char *line, FILE *b, FILE *c)
 		if (klist && (k = klist->line) > 0 && (k != last_line)) {
                     char hyplink1[MAX_LINE_LEN+1];
                     char id[15];
+#ifndef HTML_HARDLINKS
                     sprintf(id, "link%i", ++klink);
                     sprintf(hyplink1, "<OBJECT id=%s type=\"application/x-oleobject\" classid=\"clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11\">\n"
                                       "  <PARAM name=\"Command\" value=\"KLink\">\n"
@@ -215,6 +216,14 @@ process_line(char *line, FILE *b, FILE *c)
                                       id, topic, id);
                     if (debug)
                         fprintf(stderr, "hyper link \"%s\" - %s on line %d\n", topic, id, line_count);
+#else
+                    if ((klist->line) > 1)
+                        sprintf(hyplink1, "<a href=\"loc%d.html\">", klist->line);
+                    else
+                        sprintf(hyplink1, "<a href=\"wgnuplot.html\">");
+                    if (debug)
+                        fprintf(stderr, "hyper link \"%s\" - loc%d.html on line %d\n", topic, klist->line, line_count);
+#endif
                     strcpy(line2 + j, hyplink1);
 		    j += strlen(hyplink1) - 1;
 

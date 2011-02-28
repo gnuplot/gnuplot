@@ -3,7 +3,8 @@
 	* docs/xref.c (refs): Only emit start and stop strings if we
 	write any items at all.
 	
-	* docs/windows/doc2html.c: Include list of subtopics.
+	* docs/windows/doc2html.c: Include list of subtopics. Optionally
+	use hard links instead of index lookup (HTML_HARDLINKS).
 
 2011-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
