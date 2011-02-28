@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.653 2011/02/23 13:58:06 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.654 2011/02/25 19:15:07 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3629,8 +3629,20 @@ Ffigure_points
  The `points` style displays a small symbol at each point.  The command `set
  pointsize` may be used to change the default size of the points.
  1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
- required if 3D plots.  See `style lines`.  Additional input columns may be used
- to provide information such as variable point size or point color.
+ required in 3D plots.  See `style lines`.  Additional input columns may be used
+ to provide information such as variable point size or variable point color.
+       
+       
+       
+2 polar
+Ffigure_polar
+ Polar plots are not really a separate plot style but are listed here for
+ completeness.  The option `set polar` tells gnuplot to interpret input
+ 2D coordinates as <angle>,<radius> rather than <x>,<y>.
+ Many, but not all, 2D plotting styles work in polar mode.
+ The figure shows a combination of plot styles `lines` and `filledcurves`.
+ See `set polar`, `set rrange`, `set size square`.
+       
 2 steps
 ?commands set style steps
 ?set style steps
@@ -10509,6 +10521,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?show size
 ?size
 ?aspect ratio
+?set size square
+?set size ratio
  Syntax:
        set size {{no}square | ratio <r> | noratio} {<xscale>,<yscale>}
        show size

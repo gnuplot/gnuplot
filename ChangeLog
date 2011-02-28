@@ -1,3 +1,9 @@
+2011-02-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/plotstyles.gnu:  Add a polar-mode example
+	to the set of plotting style figures (even though it is not really
+	a "plot style").
+
 2011-02-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* docs/xref.c (refs): Only emit start and stop strings if we
@@ -18,7 +24,7 @@
 2011-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/Makefile.am.in: Don't try to install TeX files for lua
-	if we never build lua support.
+	if we didn't build lua support.
 
 2011-02-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
