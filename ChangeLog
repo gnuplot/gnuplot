@@ -1,3 +1,10 @@
+2011-02-28  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* docs/xref.c (refs): Only emit start and stop strings if we
+	write any items at all.
+	
+	* docs/windows/doc2html.c: Include list of subtopics.
+
 2011-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/Makefile.am.in: Don't try to install TeX files for lua

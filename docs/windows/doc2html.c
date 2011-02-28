@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id$"); }
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.1 2011/02/21 15:45:46 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - doc2html.c */
@@ -372,7 +372,7 @@ process_line(char *line, FILE *b, FILE *c)
                 int newlevel = line[0]-'0';
                 char spacer[10];
 
-		if (startpage) {	/* use new level 0 item */
+		if (startpage) {
 		} else {
 	            if (tabl)
 	                fprintf(b, "</pre>\n");
@@ -381,6 +381,10 @@ process_line(char *line, FILE *b, FILE *c)
 		}
 		para = FALSE;	/* not in a paragraph */
 		tabl = FALSE;
+
+		if (!startpage)	/* add list of subtopics */
+		    refs(last_line, b, "<h3>Subtopics</h3>\n<menu>\n", "</menu>\n", "\t<li><a href=\"loc%d.html\">%s</a></li>\n");
+
 		last_line = line_count;
 		fprintf(b, "\n");
 		
