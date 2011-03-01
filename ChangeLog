@@ -1,3 +1,8 @@
+2011-03-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* PATCHLEVEL:	
+	Tag for release of version 4.4.3
+
 2011-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Revised configuration tests for lua support.
