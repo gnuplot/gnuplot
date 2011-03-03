@@ -1,3 +1,8 @@
+2011-03-03  Peter Hedwig <peter@affenbande.org>
+
+	* term/lua.trm:  If the cairo terminal is not available to make a
+	bitmap image, use libgd instead.
+
 2011-02-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/plotstyles.gnu:  Add a polar-mode example

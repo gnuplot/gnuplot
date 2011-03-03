@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.13 2011/02/22 04:30:06 sfeam Exp $
- *  $Date: 2011/02/22 04:30:06 $
+ *  $Id: lua.trm,v 1.14 2011/02/25 03:40:20 sfeam Exp $
+ *  $Date: 2011/02/25 03:40:20 $
  *  $Rev: 99 $
  */
 
@@ -96,9 +96,14 @@ TERM_PUBLIC void LUA_path __PROTO((int p));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+
 #ifdef HAVE_CAIROPDF
-#include "wxterminal/gp_cairo.h"
-#include "wxterminal/gp_cairo_helpers.h"
+# include "wxterminal/gp_cairo.h"
+# include "wxterminal/gp_cairo_helpers.h"
+# define LUA_EXTERNAL_IMAGES 1
+#elif defined(HAVE_GD_PNG) && (GD2_VERS >= 2)
+# include "gd.h"
+# define LUA_EXTERNAL_IMAGES 1
 #endif
 
 #include <lua.h>
@@ -500,7 +505,7 @@ LUA_set_term_vars() {
   lua_pushstring(L, LUA_RELEASE);
   lua_setfield(L, luaterm, "lua_ident");
   /* set flag if terminal supports external images */
-#ifdef HAVE_CAIROPDF
+#ifdef LUA_EXTERNAL_IMAGES
   image_extern = 0;
   lua_pushboolean(L, image_extern);
   lua_setfield(L, luaterm, "external_images");
@@ -537,6 +542,103 @@ LUA_set_term_vars() {
   lua_setfield(L, luaterm, "TERM_FONTSCALE");
 #endif
 }
+
+
+#ifdef LUA_EXTERNAL_IMAGES
+# ifdef HAVE_CAIROPDF
+/* cairo PNG code */
+static int 
+LUA_write_png_image (unsigned m, unsigned n, coordval *image, t_imagecolor color_mode, const char *filename) {
+  cairo_surface_t *image_surface;
+  cairo_status_t cairo_stat;
+  unsigned int *image255;
+
+  image255 = gp_cairo_helper_coordval_to_chars(image, m, n, color_mode);
+  image_surface = cairo_image_surface_create_for_data((unsigned char*) image255, CAIRO_FORMAT_ARGB32, m, n, 4*m);
+  if ((cairo_stat = cairo_surface_write_to_png(image_surface, filename)) != CAIRO_STATUS_SUCCESS) {
+    os_error(NO_CARET, "Lua Cairo: could not write image file '%s': %s.", filename, cairo_status_to_string(cairo_stat));
+  }
+  cairo_surface_destroy(image_surface);
+  return 0;
+}
+# else
+/* libgd PNG code mainly taken from gd.trm */
+static int 
+LUA_write_png_image (unsigned M, unsigned N, coordval *image, t_imagecolor color_mode, const char *filename) {
+  int m, n, pixel;
+  unsigned int rgb;
+  gdImagePtr im;
+  FILE *out;
+
+  im = gdImageCreateTrueColor(M, N);
+  if (!im)
+    int_error(NO_CARET, "libgd: failed to create image structure");
+  /* gdImageColorAllocateAlpha(im, 255, 255, 255, 127); */
+  gdImageSaveAlpha(im, 1);
+  gdImageAlphaBlending(im, 0);
+
+  if (color_mode == IC_RGBA) {
+    /* RGB + Alpha channel */
+    for (n=0; n<N; n++) {
+      for (m=0; m<M; m++) {
+        rgb_color rgb1;
+        rgb255_color rgb255;
+        int alpha;
+        rgb1.r = *image++;
+        rgb1.g = *image++;
+        rgb1.b = *image++;
+        alpha  = *image++;
+        alpha  = 127 - (alpha>>1);  /* input is [0:255] but gd wants [127:0] */
+        rgb255_from_rgb1( rgb1, &rgb255 );
+        pixel = gdImageColorResolveAlpha(im, (int)rgb255.r, (int)rgb255.g, (int)rgb255.b, alpha);
+        gdImageSetPixel( im, m, n, pixel );
+      }
+    }
+  } else if (color_mode == IC_RGB) {
+    /* TrueColor 24-bit color mode */
+    for (n=0; n<N; n++) {
+      for (m=0; m<M; m++) {
+        rgb_color rgb1;
+        rgb255_color rgb255;
+        rgb1.r = *image++;
+        rgb1.g = *image++;
+        rgb1.b = *image++;
+        rgb255_from_rgb1( rgb1, &rgb255 );
+        pixel = gdImageColorResolve(im, (int)rgb255.r, (int)rgb255.g, (int)rgb255.b );
+        gdImageSetPixel( im, m, n, pixel );
+      }
+    }
+  } else if (color_mode == IC_PALETTE) {
+    /* Palette color lookup from gray value */
+    for (n=0; n<N; n++) {
+      for (m=0; m<M; m++) {
+        rgb255_color rgb;
+        if (isnan(*image)) {
+          /* FIXME: tried to take the comment from gd.trm into account but needs a testcase */
+          pixel = gdImageColorResolveAlpha(im, 0, 0, 0, 127);
+          image++;
+        } else {
+          rgb255maxcolors_from_gray( *image++, &rgb );
+          pixel = gdImageColorResolve( im, (int)rgb.r, (int)rgb.g, (int)rgb.b );
+        }
+        gdImageSetPixel( im, m, n, pixel );
+      }
+    }
+  }
+
+  out = fopen(filename, "wb");
+  if (!out) {
+    os_error(NO_CARET, "Lua libgd: could not write image file '%s'", filename);
+  }
+  gdImagePng(im, out);
+  fclose(out);
+  gdImageDestroy(im);
+
+  return 0;
+}
+# endif
+#endif
+
 
 static int
 LUA_init_luaterm_function(const char *fnc) {
@@ -733,15 +835,19 @@ LUA_options()
   int tc_off = c_token+1; /* token counter offset */
   int need_init = 1;
 
+
   /* 'set term tikz' is short for 'set term lua tikz' */
-  if (c_token == 3 && equals(2,"tikz")) {
-      c_token--;
-  } else if (c_token == 2) { /* 'set termoptions' */
+  c_token--; /* see how we got here */
+  if (!equals(c_token, "tikz")) {
+    if (almost_equals(c_token, "termop$tions")) {
       if (!LUA_script) {
         int_error(NO_CARET, "No Lua context for setting terminal options!");
         return;
       }
       need_init = 0;
+  }
+    /*  else should always be lua, so just count up ... */
+    c_token++;
   }
 
     opt_str = gp_input_line + token[c_token].start_index;
@@ -1187,6 +1293,7 @@ LUA_path (int path)
     lua_pop(L, 1);
   }
 }
+
 /*
   Lua table structure for the image pixel:
   pixel = {{r, g, b, [, a]}, {r, g, b [, a]}, ... , {r, g, b [, a]}}
@@ -1200,11 +1307,9 @@ LUA_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
     coordval alpha;
     char *image_file = NULL;
 
-#ifdef HAVE_CAIROPDF
+#ifdef LUA_EXTERNAL_IMAGES
     /* "externalize" if transparent images are used or on user request */
     if ((color_mode == IC_RGBA) || image_extern) {
-      cairo_surface_t *image_surface;
-      unsigned int *image255;
       char *idx;
       /* cairo based png images with alpha channel */
       if ((idx = strrchr(outstr, '.')) == NULL)
@@ -1213,10 +1318,7 @@ LUA_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
       strncpy(image_file, outstr, (idx-outstr) + 1);
       snprintf(image_file+(idx-outstr), 8, ".%02d.png", ++image_cnt);
 
-      image255 = gp_cairo_helper_coordval_to_chars(image, m, n, color_mode);
-      image_surface = cairo_image_surface_create_for_data((unsigned char*) image255, CAIRO_FORMAT_ARGB32, m, n, 4*m);
-      cairo_surface_write_to_png(image_surface, image_file);
-      cairo_surface_destroy(image_surface);
+      LUA_write_png_image (m, n, image, color_mode, image_file);
     }
 #endif
     
