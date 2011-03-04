@@ -253,7 +253,7 @@ pdffigures: figures gnuplot.pdf
 	echo "" > pdffigures.tex
 
 figures: doc2tex
-	../src/gnuplot plotstyles.gnu
+	GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu
 	./doc2tex -figures $(srcdir)/gnuplot.doc gnuplot.tex
 	echo "\usepackage{graphicx}" > pdffigures.tex
 	echo "\usepackage{picins}" >> pdffigures.tex
