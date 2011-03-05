@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.1 2010/12/14 23:28:46 broeker Exp $
+# $Id: Makefile,v 1.2 2011/02/20 15:52:09 broeker Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -24,9 +24,9 @@ TOP = ..\..
 
 # activate one of these to choose which of the help file formats you want:
 #   old-fashioned WinHelp ...
-HELP_EXT=hlp
+# HELP_EXT=hlp
 #   ... or HTML help
-# HELP_EXT=chm
+HELP_EXT=chm
 
 # Programs: 
 # The Microsoft Help compiler:
@@ -158,6 +158,7 @@ FILE {
 }
 LIBRARY kernel32.lib,user32.lib,gdi32.lib,winspool.lib,comdlg32.lib
 LIBRARY advapi32.lib,shell32.lib
+LIBRARY msimg32.lib
 OPTION map
 OPTION SYMFILE
 NAME $^&
