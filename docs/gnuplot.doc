@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.654 2011/02/25 19:15:07 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.655 2011/03/01 05:39:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -441,25 +441,25 @@ C
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>Character</th>	<th>Function</th></tr>
+^<tr>    <th>Character</th>    <th>Function</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td></td>				<th>Line Editing</th></tr>
-^<tr>	<td><tt>^B</tt></td>	<td>move back a single character.</td></tr>
-^<tr>	<td><tt>^F</tt></td>	<td>move forward a single character.</td></tr>
-^<tr>	<td><tt>^A</tt></td>	<td>move to the beginning of the line.</td></tr>
-^<tr>	<td><tt>^E</tt></td>	<td>move to the end of the line.</td></tr>
-^<tr>	<td><tt>^H, DEL</tt></td>	<td>delete the previous character.</td></tr>
-^<tr>	<td><tt>^D</tt></td>	<td>delete the current character.</td></tr>
-^<tr>	<td><tt>^K</tt></td>	<td>delete from current position to the end of line.</td></tr>
-^<tr>	<td><tt>^L, ^R</tt></td>	<td>redraw line in case it gets trashed.</td></tr>
-^<tr>	<td><tt>^U</tt></td>	<td>delete the entire line.</td></tr>
-^<tr>	<td><tt>^W</tt></td>	<td>delete from the current word to the end of line.</td></tr>
+^<tr>    <td></td>                <th>Line Editing</th></tr>
+^<tr>    <td><tt>^B</tt></td>    <td>move back a single character.</td></tr>
+^<tr>    <td><tt>^F</tt></td>    <td>move forward a single character.</td></tr>
+^<tr>    <td><tt>^A</tt></td>    <td>move to the beginning of the line.</td></tr>
+^<tr>    <td><tt>^E</tt></td>    <td>move to the end of the line.</td></tr>
+^<tr>    <td><tt>^H, DEL</tt></td>    <td>delete the previous character.</td></tr>
+^<tr>    <td><tt>^D</tt></td>    <td>delete the current character.</td></tr>
+^<tr>    <td><tt>^K</tt></td>    <td>delete from current position to the end of line.</td></tr>
+^<tr>    <td><tt>^L, ^R</tt></td>    <td>redraw line in case it gets trashed.</td></tr>
+^<tr>    <td><tt>^U</tt></td>    <td>delete the entire line.</td></tr>
+^<tr>    <td><tt>^W</tt></td>    <td>delete from the current word to the end of line.</td></tr>
 ^</tbody>
 ^<tbody>
-^<tr>	<th></th>				<th>History</th></tr>
-^<tr>	<td><tt>^P</tt></td>	<td>move back through history.</td></tr>
-^<tr>	<td><tt>^N</tt></td>	<td>move forward through history.</td></tr>
+^<tr>    <th></th>                <th>History</th></tr>
+^<tr>    <td><tt>^P</tt></td>    <td>move back through history.</td></tr>
+^<tr>    <td><tt>^N</tt></td>    <td>move forward through history.</td></tr>
 ^</tbody>
 ^</table>
 2 Comments
@@ -600,14 +600,14 @@ C
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>Control</th>	<th>Examples</th>	<th>Explanation</th></tr>
+^<tr>    <th>Control</th>    <th>Examples</th>    <th>Explanation</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt> ^ </tt></td>	<td><tt>a^x</tt></td>			<td>superscript</td></tr>
-^<tr>	<td><tt> _ </tt></td>	<td><tt>a_x</tt></td>			<td>subscript</td></tr>
-^<tr>	<td><tt> @ </tt></td>	<td><tt> @x</tt> or <tt>a@^b_{cd}</tt></td>	<td>phantom box (occupies no width)</td></tr>
-^<tr>	<td><tt> &amp;</tt></td>	<td><tt> &amp;{space}</tt></td>	<td>inserts space of specified length</td></tr>
-^<tr>	<td><tt> ~ </tt></td>	<td><tt> ~a{.8-}</tt></td>		<td>overprints '-' on 'a', raised by .8<br>times the current fontsize</td></tr>
+^<tr>    <td><tt> ^ </tt></td>    <td><tt>a^x</tt></td>            <td>superscript</td></tr>
+^<tr>    <td><tt> _ </tt></td>    <td><tt>a_x</tt></td>            <td>subscript</td></tr>
+^<tr>    <td><tt> @ </tt></td>    <td><tt> @x</tt> or <tt>a@^b_{cd}</tt></td>    <td>phantom box (occupies no width)</td></tr>
+^<tr>    <td><tt> &amp;</tt></td>    <td><tt> &amp;{space}</tt></td>    <td>inserts space of specified length</td></tr>
+^<tr>    <td><tt> ~ </tt></td>    <td><tt> ~a{.8-}</tt></td>        <td>overprints '-' on 'a', raised by .8<br>times the current fontsize</td></tr>
 ^</tbody>
 ^</table>
 
@@ -784,56 +784,56 @@ C
 ^</colgroup>
 ^<thead>
 ^<tr>   <th colspan="3"> Math library functions </th></tr>
-^<tr>	<th>Function</th>	<th>Arguments</th>	<th>Returns</th></tr>
+^<tr>    <th>Function</th>    <th>Arguments</th>    <th>Returns</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>abs(x)</td>	<td>any</td>	<td>|<i>x</i>|, absolute value of <i>x</i>; same type</td></tr>
-^<tr>	<td>abs(x)</td>	<td>complex</td>	<td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
-^<tr>	<td>acos(x)</td>	<td>any</td>	<td>cos<sup>-1</sup> <i>x</i> (inverse cosine)</td></tr>
-^<tr>	<td>acosh(x)</td>	<td>any</td>	<td>cosh<sup>-1</sup> <i>x</i> (inverse hyperbolic cosine) in radians</td></tr>
-^<tr>	<td>airy(x)</td>	<td>any</td>	<td>Airy function Ai(<i>x</i>)</td></tr>
-^<tr>	<td>arg(x)</td>	<td>complex</td>	<td>the phase of <i>x</i></td></tr>
-^<tr>	<td>asin(x)</td>	<td>any</td>	<td>sin<sup>-1</sup> <i>x</i> (inverse sin)</td></tr>
-^<tr>	<td>asinh(x)</td>	<td>any</td>	<td>sinh<sup>-1</sup> <i>x</i> (inverse hyperbolic sin) in radians</td></tr>
-^<tr>	<td>atan(x)</td>	<td>any</td>	<td>tan<sup>-1</sup> <i>x</i> (inverse tangent)</td></tr>
-^<tr>	<td>atan2(y,x)</td>	<td>int or real</td>	<td>tan<sup>-1</sup>(<i>y/x</i>) (inverse tangent)</td></tr>
-^<tr>	<td>atanh(x)</td>	<td>any</td>	<td>tanh<sup>-1</sup> <i>x</i> (inverse hyperbolic tangent) in radians</td></tr>
-^<tr>	<td>EllipticK(k)</td>	<td>real k in (-1:1)</td>	<td><i>K(k)</i> complete elliptic integral of the first kind</td></tr>
-^<tr>	<td>EllipticE(k)</td>	<td>real k in [-1:1]</td>	<td><i>E(k)</i> complete elliptic integral of the second kind</td></tr>
-^<tr>	<td>EllipticPi(n,k)</td>	<td> real n&lt;1, real k in (-1:1)</td>	<td> &Pi;(<i>n,k</i>) complete elliptic integral of the third kind</td></tr>
-^<tr>	<td>besj0(x)</td>	<td>int or real</td>	<td><i>j</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
-^<tr>	<td>besj1(x)</td>	<td>int or real</td>	<td><i>j</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
-^<tr>	<td>besy0(x)</td>	<td>int or real</td>	<td><i>y</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
-^<tr>	<td>besy1(x)</td>	<td>int or real</td>	<td><i>y</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
-^<tr>	<td>ceil(x)</td>	<td>any</td>	<td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
-^<tr>	<td>cos(x)</td>	<td>radians</td>	<td>cos <i>x</i>, cosine of <i>x</i></td></tr>
-^<tr>	<td>cosh(x)</td>	<td>any</td>	<td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
-^<tr>	<td>erf(x)</td>	<td>any</td>	<td>erf(Re(<i>x</i>)), error function of real(<i>x</i>)</td></tr>
-^<tr>	<td>erfc(x)</td>	<td>any</td>	<td>erfc(Re(<i>x</i>)), 1.0 - error function of real(<i>x</i>)</td></tr>
-^<tr>	<td>exp(x)</td>	<td>any</td>	<td><i>e<sup>x</sup></i>, exponential function of <i>x</i></td></tr>
-^<tr>	<td>expint(n,x)</td>	<td>any</td>	<td><i>E<sub>n</sub></i>(<i>x</i>), exponential integral function of <i>x</i></td></tr>
-^<tr>	<td>floor(x)</td>	<td>any</td>	<td>&lfloor;<i>x</i>&rfloor;, largest integer not greater than <i>x</i> (real part)</td></tr>
-^<tr>	<td>gamma(x)</td>	<td>any</td>	<td>&Gamma;(Re(<i>x</i>)), gamma function of real(<i>x</i>)</td></tr>
-^<tr>	<td>ibeta(p,q,x)</td>	<td>any</td>	<td>ibeta(Re(<i>p,q,x</i>)), ibeta function of real(<i>p</i>,<i>q</i>,<i>x</i>)</td></tr>
-^<tr>	<td>inverf(x)</td>	<td>any</td>	<td>inverse error function real(<i>x</i>)</td></tr>
-^<tr>	<td>igamma(a,x)</td>	<td>any</td>	<td>igamma(Re(<i>a,x</i>)), igamma function of real(<a>a</a>,<i>x</i>)</td></tr>
-^<tr>	<td>imag(x)</td>	<td>complex</td>	<td>Im(<i>x</i>), imaginary part of <i>x</i> as a real number</td></tr>
-^<tr>	<td>invnorm(x)</td>	<td>any</td>	<td>inverse normal distribution function real(<i>x</i>)</td></tr>
-^<tr>	<td>int(x)</td>	<td>real</td>	<td>integer part of <i>x</i>, truncated toward zero</td></tr>
-^<tr>	<td>lambertw(x)</td>	<td>real</td>	<td>Lambert W function</td></tr>
-^<tr>	<td>lgamma(x)</td>	<td>any</td>	<td>lgamma(Re(<i>x</i>)), lgamma function of real(<i>x</i>)</td></tr>
-^<tr>	<td>log(x)</td>	<td>any</td>	<td>ln <i>x</i>, natural logarithm (base <i>e</i>) of <i>x</i></td></tr>
-^<tr>	<td>log10(x)</td>	<td>any</td>	<td>log<sub>10</sub> <i>x</i>, logarithm (base 10) of <i>x</i></td></tr>
-^<tr>	<td>norm(x)</td>	<td>any</td>	<td>norm(<i>x</i>), normal distribution function of real(<i>x</i>)</td></tr>
-^<tr>	<td>rand(x)</td>	<td>int</td>	<td>pseudo random number in the interval [0:1]</td></tr>
-^<tr>	<td>real(x)</td>	<td>any</td>	<td>Re(<i>x</i>), real part of <i>x</i></td></tr>
-^<tr>	<td>sgn(x)</td>	<td>any</td>	<td>1 if <i>x</i> &gt; 0,  -1 if <i>x</i> &lt; 0,  0 if <i>x</i> = 0. &image;(<i>x</i>) ignored</td></tr>
-^<tr>	<td>sin(x)</td>	<td>any</td>	<td>sin <i>x</i>, sine of <i>x</i></td></tr>
-^<tr>	<td>sinh(x)</td>	<td>any</td>	<td>sinh <i>x</i>, hyperbolic sine of <i>x</i> in radians</td></tr>
-^<tr>	<td>sqrt(x)</td>	<td>any</td>	<td>&radic;<i>x</i>, square root of <i>x</i></td></tr>
-^<tr>	<td>tan(x)</td>	<td>any</td>	<td>tan <i>x</i>, tangent of <i>x</i></td></tr>
-^<tr>	<td>tanh(x)</td>	<td>any</td>	<td>tanh <i>x</i>, hyperbolic tangent of <i>x</i> in radians</td></tr>
-^<tr>	<td>voigt(x,y)</td>	<td>real</td>	<td>convolution of Gaussian and Lorentzian</td></tr>
+^<tr>    <td>abs(x)</td>    <td>any</td>    <td>|<i>x</i>|, absolute value of <i>x</i>; same type</td></tr>
+^<tr>    <td>abs(x)</td>    <td>complex</td>    <td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
+^<tr>    <td>acos(x)</td>    <td>any</td>    <td>cos<sup>-1</sup> <i>x</i> (inverse cosine)</td></tr>
+^<tr>    <td>acosh(x)</td>    <td>any</td>    <td>cosh<sup>-1</sup> <i>x</i> (inverse hyperbolic cosine) in radians</td></tr>
+^<tr>    <td>airy(x)</td>    <td>any</td>    <td>Airy function Ai(<i>x</i>)</td></tr>
+^<tr>    <td>arg(x)</td>    <td>complex</td>    <td>the phase of <i>x</i></td></tr>
+^<tr>    <td>asin(x)</td>    <td>any</td>    <td>sin<sup>-1</sup> <i>x</i> (inverse sin)</td></tr>
+^<tr>    <td>asinh(x)</td>    <td>any</td>    <td>sinh<sup>-1</sup> <i>x</i> (inverse hyperbolic sin) in radians</td></tr>
+^<tr>    <td>atan(x)</td>    <td>any</td>    <td>tan<sup>-1</sup> <i>x</i> (inverse tangent)</td></tr>
+^<tr>    <td>atan2(y,x)</td>    <td>int or real</td>    <td>tan<sup>-1</sup>(<i>y/x</i>) (inverse tangent)</td></tr>
+^<tr>    <td>atanh(x)</td>    <td>any</td>    <td>tanh<sup>-1</sup> <i>x</i> (inverse hyperbolic tangent) in radians</td></tr>
+^<tr>    <td>EllipticK(k)</td>    <td>real k in (-1:1)</td>    <td><i>K(k)</i> complete elliptic integral of the first kind</td></tr>
+^<tr>    <td>EllipticE(k)</td>    <td>real k in [-1:1]</td>    <td><i>E(k)</i> complete elliptic integral of the second kind</td></tr>
+^<tr>    <td>EllipticPi(n,k)</td>    <td> real n&lt;1, real k in (-1:1)</td>    <td> &Pi;(<i>n,k</i>) complete elliptic integral of the third kind</td></tr>
+^<tr>    <td>besj0(x)</td>    <td>int or real</td>    <td><i>j</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>    <td>besj1(x)</td>    <td>int or real</td>    <td><i>j</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>    <td>besy0(x)</td>    <td>int or real</td>    <td><i>y</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>    <td>besy1(x)</td>    <td>int or real</td>    <td><i>y</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>    <td>ceil(x)</td>    <td>any</td>    <td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
+^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
+^<tr>    <td>cosh(x)</td>    <td>any</td>    <td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
+^<tr>    <td>erf(x)</td>    <td>any</td>    <td>erf(Re(<i>x</i>)), error function of real(<i>x</i>)</td></tr>
+^<tr>    <td>erfc(x)</td>    <td>any</td>    <td>erfc(Re(<i>x</i>)), 1.0 - error function of real(<i>x</i>)</td></tr>
+^<tr>    <td>exp(x)</td>    <td>any</td>    <td><i>e<sup>x</sup></i>, exponential function of <i>x</i></td></tr>
+^<tr>    <td>expint(n,x)</td>    <td>any</td>    <td><i>E<sub>n</sub></i>(<i>x</i>), exponential integral function of <i>x</i></td></tr>
+^<tr>    <td>floor(x)</td>    <td>any</td>    <td>&lfloor;<i>x</i>&rfloor;, largest integer not greater than <i>x</i> (real part)</td></tr>
+^<tr>    <td>gamma(x)</td>    <td>any</td>    <td>&Gamma;(Re(<i>x</i>)), gamma function of real(<i>x</i>)</td></tr>
+^<tr>    <td>ibeta(p,q,x)</td>    <td>any</td>    <td>ibeta(Re(<i>p,q,x</i>)), ibeta function of real(<i>p</i>,<i>q</i>,<i>x</i>)</td></tr>
+^<tr>    <td>inverf(x)</td>    <td>any</td>    <td>inverse error function real(<i>x</i>)</td></tr>
+^<tr>    <td>igamma(a,x)</td>    <td>any</td>    <td>igamma(Re(<i>a,x</i>)), igamma function of real(<a>a</a>,<i>x</i>)</td></tr>
+^<tr>    <td>imag(x)</td>    <td>complex</td>    <td>Im(<i>x</i>), imaginary part of <i>x</i> as a real number</td></tr>
+^<tr>    <td>invnorm(x)</td>    <td>any</td>    <td>inverse normal distribution function real(<i>x</i>)</td></tr>
+^<tr>    <td>int(x)</td>    <td>real</td>    <td>integer part of <i>x</i>, truncated toward zero</td></tr>
+^<tr>    <td>lambertw(x)</td>    <td>real</td>    <td>Lambert W function</td></tr>
+^<tr>    <td>lgamma(x)</td>    <td>any</td>    <td>lgamma(Re(<i>x</i>)), lgamma function of real(<i>x</i>)</td></tr>
+^<tr>    <td>log(x)</td>    <td>any</td>    <td>ln <i>x</i>, natural logarithm (base <i>e</i>) of <i>x</i></td></tr>
+^<tr>    <td>log10(x)</td>    <td>any</td>    <td>log<sub>10</sub> <i>x</i>, logarithm (base 10) of <i>x</i></td></tr>
+^<tr>    <td>norm(x)</td>    <td>any</td>    <td>norm(<i>x</i>), normal distribution function of real(<i>x</i>)</td></tr>
+^<tr>    <td>rand(x)</td>    <td>int</td>    <td>pseudo random number in the interval [0:1]</td></tr>
+^<tr>    <td>real(x)</td>    <td>any</td>    <td>Re(<i>x</i>), real part of <i>x</i></td></tr>
+^<tr>    <td>sgn(x)</td>    <td>any</td>    <td>1 if <i>x</i> &gt; 0,  -1 if <i>x</i> &lt; 0,  0 if <i>x</i> = 0. &image;(<i>x</i>) ignored</td></tr>
+^<tr>    <td>sin(x)</td>    <td>any</td>    <td>sin <i>x</i>, sine of <i>x</i></td></tr>
+^<tr>    <td>sinh(x)</td>    <td>any</td>    <td>sinh <i>x</i>, hyperbolic sine of <i>x</i> in radians</td></tr>
+^<tr>    <td>sqrt(x)</td>    <td>any</td>    <td>&radic;<i>x</i>, square root of <i>x</i></td></tr>
+^<tr>    <td>tan(x)</td>    <td>any</td>    <td>tan <i>x</i>, tangent of <i>x</i></td></tr>
+^<tr>    <td>tanh(x)</td>    <td>any</td>    <td>tanh <i>x</i>, hyperbolic tangent of <i>x</i> in radians</td></tr>
+^<tr>    <td>voigt(x,y)</td>    <td>real</td>    <td>convolution of Gaussian and Lorentzian</td></tr>
 ^</tbody>
 ^</table>
 
@@ -847,19 +847,19 @@ C
 ^</colgroup>
 ^<thead>
 ^<tr>   <th colspan="3"> String functions </th></tr>
-^<tr>	<th>Function</th>	<th>Arguments</th>	<th>Returns</th></tr>
+^<tr>    <th>Function</th>    <th>Arguments</th>    <th>Returns</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>gprintf("format",x,...)</td>	<td>any</td>	<td>string result from applying gnuplot's format parser</td></tr>
-^<tr>	<td>sprintf("format",x,...)</td>	<td>multiple</td>	<td>string result from C-language sprintf</td></tr>
-^<tr>	<td>strlen("string")</td>	<td>string</td>	<td>int length of string</td></tr>
-^<tr>	<td>strstrt("string","key")</td>	<td>strings</td>	<td>int index of first character of substring "key"</td></tr>
-^<tr>	<td>substr("string",beg,end)</td>	<td>multiple</td>	<td>string "string"[beg:end]</td></tr>
-^<tr>	<td>strftime("timeformat",t)</td>	<td>any</td>	<td>string result from applying gnuplot's time parser</td></tr>
-^<tr>	<td>strptime("timeformat",s)</td>	<td>string</td>	<td>seconds since year 2000 as given in string s</td></tr>
-^<tr>	<td>system("command")</td>	<td>string</td>	<td>string containing output stream of shell command</td></tr>
-^<tr>	<td>word("string",n)</td>	<td>string, int</td>	<td>returns the nth word in "string"</td></tr>
-^<tr>	<td>words("string")</td>	<td>string</td>	<td>returns the number of words in "string"</td></tr>
+^<tr>    <td>gprintf("format",x,...)</td>    <td>any</td>    <td>string result from applying gnuplot's format parser</td></tr>
+^<tr>    <td>sprintf("format",x,...)</td>    <td>multiple</td>    <td>string result from C-language sprintf</td></tr>
+^<tr>    <td>strlen("string")</td>    <td>string</td>    <td>int length of string</td></tr>
+^<tr>    <td>strstrt("string","key")</td>    <td>strings</td>    <td>int index of first character of substring "key"</td></tr>
+^<tr>    <td>substr("string",beg,end)</td>    <td>multiple</td>    <td>string "string"[beg:end]</td></tr>
+^<tr>    <td>strftime("timeformat",t)</td>    <td>any</td>    <td>string result from applying gnuplot's time parser</td></tr>
+^<tr>    <td>strptime("timeformat",s)</td>    <td>string</td>    <td>seconds since year 2000 as given in string s</td></tr>
+^<tr>    <td>system("command")</td>    <td>string</td>    <td>string containing output stream of shell command</td></tr>
+^<tr>    <td>word("string",n)</td>    <td>string, int</td>    <td>returns the nth word in "string"</td></tr>
+^<tr>    <td>words("string")</td>    <td>string</td>    <td>returns the number of words in "string"</td></tr>
 ^</tbody>
 ^</table>
 
@@ -873,25 +873,25 @@ C
 ^</colgroup>
 ^<thead>
 ^<tr>   <th colspan="3"> other gnuplot functions </th></tr>
-^<tr>	<th>Function</th>	<th>Arguments</th>	<th>Returns</th></tr>
+^<tr>    <th>Function</th>    <th>Arguments</th>    <th>Returns</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>column(x)</td>	<td>int</td>	<td> column <i>x</i> during datafile manipulation.</td></tr>
-^<tr>	<td>defined(X)</td>	<td>variable name</td>	<td> [DEPRECATED] returns 1 if X is defined, 0 otherwise.</td></tr>
-^<tr>	<td>exists("X")</td>	<td>string</td>	<td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
-^<tr>	<td>stringcolumn(x)</td>	<td>int</td>	<td> content column <i>x</i> as a string.</td></tr>
-^<tr>	<td>timecolumn(x)</td>	<td>int</td>	<td> timecolumn <i>x</i> during datafile manipulation.</td></tr>
-^<tr>	<td>tm_hour(x)</td>	<td>int</td>	<td>the hour</td></tr>
-^<tr>	<td>tm_mday(x)</td>	<td>int</td>	<td>the day of the month</td></tr>
-^<tr>	<td>tm_min(x)</td>	<td>int</td>	<td>the minute</td></tr>
-^<tr>	<td>tm_mon(x)</td>	<td>int</td>	<td>the month</td></tr>
-^<tr>	<td>tm_sec(x)</td>	<td>int</td>	<td>the second</td></tr>
-^<tr>	<td>tm_wday(x)</td>	<td>int</td>	<td>the day of the week</td></tr>
-^<tr>	<td>tm_yday(x)</td>	<td>int</td>	<td>the day of the year</td></tr>
-^<tr>	<td>tm_year(x)</td>	<td>int</td>	<td>the year</td></tr>
-^<tr>	<td>time(x)</td>	<td>any</td>	<td>the current system time</td></tr>
-^<tr>	<td>valid(x)</td>	<td>int</td>	<td> test validity of column(<i>x</i>) during datafile manip.</td></tr>
-^<tr>	<td>value("name")</td>	<td>string</td>	<td> returns the current value of the named variable.</td></tr>
+^<tr>    <td>column(x)</td>    <td>int</td>    <td> column <i>x</i> during datafile manipulation.</td></tr>
+^<tr>    <td>defined(X)</td>    <td>variable name</td>    <td> [DEPRECATED] returns 1 if X is defined, 0 otherwise.</td></tr>
+^<tr>    <td>exists("X")</td>    <td>string</td>    <td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
+^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
+^<tr>    <td>timecolumn(x)</td>    <td>int</td>    <td> timecolumn <i>x</i> during datafile manipulation.</td></tr>
+^<tr>    <td>tm_hour(x)</td>    <td>int</td>    <td>the hour</td></tr>
+^<tr>    <td>tm_mday(x)</td>    <td>int</td>    <td>the day of the month</td></tr>
+^<tr>    <td>tm_min(x)</td>    <td>int</td>    <td>the minute</td></tr>
+^<tr>    <td>tm_mon(x)</td>    <td>int</td>    <td>the month</td></tr>
+^<tr>    <td>tm_sec(x)</td>    <td>int</td>    <td>the second</td></tr>
+^<tr>    <td>tm_wday(x)</td>    <td>int</td>    <td>the day of the week</td></tr>
+^<tr>    <td>tm_yday(x)</td>    <td>int</td>    <td>the day of the year</td></tr>
+^<tr>    <td>tm_year(x)</td>    <td>int</td>    <td>the year</td></tr>
+^<tr>    <td>time(x)</td>    <td>any</td>    <td>the current system time</td></tr>
+^<tr>    <td>valid(x)</td>    <td>int</td>    <td> test validity of column(<i>x</i>) during datafile manip.</td></tr>
+^<tr>    <td>value("name")</td>    <td>string</td>    <td> returns the current value of the named variable.</td></tr>
 ^</tbody>
 ^</table>
 
@@ -1672,15 +1672,15 @@ C ... and restart the table:
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>Symbol</th>	<th>Example</th>	<th>Explanation</th></tr>
+^<tr>    <th>Symbol</th>    <th>Example</th>    <th>Explanation</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>-</tt></td>	<td><tt>-a</tt></td>	<td>unary minus</td></tr>
-^<tr>	<td><tt>+</tt></td>	<td><tt>+a</tt></td>	<td>unary plus (no-operation)</td></tr>
-^<tr>	<td><tt>~</tt></td>	<td><tt>~a</tt></td>	<td>* one's complement</td></tr>
-^<tr>	<td><tt>!</tt></td>	<td><tt>!a</tt></td>	<td>* logical negation</td></tr>
-^<tr>	<td><tt>!</tt></td>	<td><tt>a!</tt></td>	<td>* factorial</td></tr>
-^<tr>	<td><tt>$</tt></td>	<td><tt>$3</tt></td>	<td>* call arg/column during `using` manipulation</td></tr>
+^<tr>    <td><tt>-</tt></td>    <td><tt>-a</tt></td>    <td>unary minus</td></tr>
+^<tr>    <td><tt>+</tt></td>    <td><tt>+a</tt></td>    <td>unary plus (no-operation)</td></tr>
+^<tr>    <td><tt>~</tt></td>    <td><tt>~a</tt></td>    <td>* one's complement</td></tr>
+^<tr>    <td><tt>!</tt></td>    <td><tt>!a</tt></td>    <td>* logical negation</td></tr>
+^<tr>    <td><tt>!</tt></td>    <td><tt>a!</tt></td>    <td>* factorial</td></tr>
+^<tr>    <td><tt>$</tt></td>    <td><tt>$3</tt></td>    <td>* call arg/column during `using` manipulation</td></tr>
 ^</tbody>
 ^</table>
 
@@ -1785,31 +1785,31 @@ C ... and restart the table:
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>Symbol</th>	<th>Example</th>	<th>Explanation</th></tr>
+^<tr>    <th>Symbol</th>    <th>Example</th>    <th>Explanation</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>**</tt></td>	<td><tt>a**b</tt></td>	<td>exponentiation</td></tr>
-^<tr>	<td><tt>*</tt></td>	<td><tt>a*b</tt></td>	<td>multiplication</td></tr>
-^<tr>	<td><tt>/</tt></td>	<td><tt>a/b</tt></td>	<td>division</td></tr>
-^<tr>	<td><tt>%</tt></td>	<td><tt>a%b</tt></td>	<td>* modulo</td></tr>
-^<tr>	<td><tt>+</tt></td>	<td><tt>a+b</tt></td>	<td>addition</td></tr>
-^<tr>	<td><tt>-</tt></td>	<td><tt>a-b</tt></td>	<td>subtraction</td></tr>
-^<tr>	<td><tt>==</tt></td>	<td><tt>a==b</tt></td>	<td>equality</td></tr>
-^<tr>	<td><tt>!=</tt></td>	<td><tt>a!=b</tt></td>	<td>inequality</td></tr>
-^<tr>	<td><tt>&lt;</tt></td>	<td><tt>a&lt;b</tt></td>	<td>less than</td></tr>
-^<tr>	<td><tt>&lt;=</tt></td>	<td><tt>a&lt;=b</tt></td>	<td>less than or equal to</td></tr>
-^<tr>	<td><tt>&gt;</tt></td>	<td><tt>a&gt;b</tt></td>	<td>greater than</td></tr>
-^<tr>	<td><tt>&gt;=</tt></td>	<td><tt>a&gt;=b</tt></td>	<td>greater than or equal to</td></tr>
-^<tr>	<td><tt>&amp;</tt></td>	<td><tt>a&amp;b</tt></td>	<td>* bitwise AND</td></tr>
-^<tr>	<td><tt>^</tt></td>	<td><tt>a^b</tt></td>	<td>* bitwise exclusive OR</td></tr>
-^<tr>	<td><tt>|</tt></td>	<td><tt>a|b</tt></td>	<td>* bitwise inclusive OR</td></tr>
-^<tr>	<td><tt>&amp;&amp;</tt></td>	<td><tt>a&amp;&amp;b</tt></td>	<td>* logical AND</td></tr>
-^<tr>	<td><tt>||</tt></td>	<td><tt>a||b</tt></td>	<td>* logical OR</td></tr>
-^<tr>	<td><tt>=</tt></td>	<td><tt>a = b</tt></td>	<td>assignment</td></tr>
-^<tr>	<td><tt>,</tt></td>	<td><tt>(a,b)</tt></td>	<td>serial evaluation</td></tr>
-^<tr>	<td><tt>.</tt></td>	<td><tt>a.b</tt></td>	<td>string concatenation</td></tr>
-^<tr>	<td><tt>eq</tt></td>	<td><tt>A eq B</tt></td>	<td>string equality</td></tr>
-^<tr>	<td><tt>ne</tt></td>	<td><tt>A ne B</tt></td>	<td>string inequality</td></tr>
+^<tr>    <td><tt>**</tt></td>    <td><tt>a**b</tt></td>    <td>exponentiation</td></tr>
+^<tr>    <td><tt>*</tt></td>    <td><tt>a*b</tt></td>    <td>multiplication</td></tr>
+^<tr>    <td><tt>/</tt></td>    <td><tt>a/b</tt></td>    <td>division</td></tr>
+^<tr>    <td><tt>%</tt></td>    <td><tt>a%b</tt></td>    <td>* modulo</td></tr>
+^<tr>    <td><tt>+</tt></td>    <td><tt>a+b</tt></td>    <td>addition</td></tr>
+^<tr>    <td><tt>-</tt></td>    <td><tt>a-b</tt></td>    <td>subtraction</td></tr>
+^<tr>    <td><tt>==</tt></td>    <td><tt>a==b</tt></td>    <td>equality</td></tr>
+^<tr>    <td><tt>!=</tt></td>    <td><tt>a!=b</tt></td>    <td>inequality</td></tr>
+^<tr>    <td><tt>&lt;</tt></td>    <td><tt>a&lt;b</tt></td>    <td>less than</td></tr>
+^<tr>    <td><tt>&lt;=</tt></td>    <td><tt>a&lt;=b</tt></td>    <td>less than or equal to</td></tr>
+^<tr>    <td><tt>&gt;</tt></td>    <td><tt>a&gt;b</tt></td>    <td>greater than</td></tr>
+^<tr>    <td><tt>&gt;=</tt></td>    <td><tt>a&gt;=b</tt></td>    <td>greater than or equal to</td></tr>
+^<tr>    <td><tt>&amp;</tt></td>    <td><tt>a&amp;b</tt></td>    <td>* bitwise AND</td></tr>
+^<tr>    <td><tt>^</tt></td>    <td><tt>a^b</tt></td>    <td>* bitwise exclusive OR</td></tr>
+^<tr>    <td><tt>|</tt></td>    <td><tt>a|b</tt></td>    <td>* bitwise inclusive OR</td></tr>
+^<tr>    <td><tt>&amp;&amp;</tt></td>    <td><tt>a&amp;&amp;b</tt></td>    <td>* logical AND</td></tr>
+^<tr>    <td><tt>||</tt></td>    <td><tt>a||b</tt></td>    <td>* logical OR</td></tr>
+^<tr>    <td><tt>=</tt></td>    <td><tt>a = b</tt></td>    <td>assignment</td></tr>
+^<tr>    <td><tt>,</tt></td>    <td><tt>(a,b)</tt></td>    <td>serial evaluation</td></tr>
+^<tr>    <td><tt>.</tt></td>    <td><tt>a.b</tt></td>    <td>string concatenation</td></tr>
+^<tr>    <td><tt>eq</tt></td>    <td><tt>A eq B</tt></td>    <td>string equality</td></tr>
+^<tr>    <td><tt>ne</tt></td>    <td><tt>A ne B</tt></td>    <td>string inequality</td></tr>
 ^</tbody>
 ^</table>
 
@@ -1850,10 +1850,10 @@ C ... and restart the table:
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>Symbol</th>	<th>Example</th>	<th>Explanation</th></tr>
+^<tr>    <th>Symbol</th>    <th>Example</th>    <th>Explanation</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>?:</tt></td>	<td><tt>a?b:c</tt></td>	<td>* ternary operation</td></tr>
+^<tr>    <td><tt>?:</tt></td>    <td><tt>a?b:c</tt></td>    <td>* ternary operation</td></tr>
 ^</tbody>
 ^</table>
 
@@ -7008,21 +7008,21 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ^  <col align="center">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>Bit</th>	<th>plot</th>	<th>splot</th></tr>
+^<tr>    <th>Bit</th>    <th>plot</th>    <th>splot</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>1</td>	<td>bottom</td>	<td>bottom left front</td></tr>
-^<tr>	<td>2</td>	<td>left</td>	<td>bottom left back</td></tr>
-^<tr>	<td>4</td>	<td>top</td>	<td>bottom right front</td></tr>
-^<tr>	<td>8</td>	<td>right</td>	<td>bottom right back</td></tr>
-^<tr>	<td>16</td>	<td>no effect</td>	<td>left vertical</td></tr>
-^<tr>	<td>32</td>	<td>no effect</td>	<td>back vertical</td></tr>
-^<tr>	<td>64</td>	<td>no effect</td>	<td>right vertical</td></tr>
-^<tr>	<td>128</td>	<td>no effect</td>	<td>front vertical</td></tr>
-^<tr>	<td>256</td>	<td>no effect</td>	<td>top left back</td></tr>
-^<tr>	<td>512</td>	<td>no effect</td>	<td>top right back</td></tr>
-^<tr>	<td>1024</td>	<td>no effect</td>	<td>top left front</td></tr>
-^<tr>	<td>2048</td>	<td>no effect</td>	<td>top right front</td></tr>
+^<tr>    <td>1</td>    <td>bottom</td>    <td>bottom left front</td></tr>
+^<tr>    <td>2</td>    <td>left</td>    <td>bottom left back</td></tr>
+^<tr>    <td>4</td>    <td>top</td>    <td>bottom right front</td></tr>
+^<tr>    <td>8</td>    <td>right</td>    <td>bottom right back</td></tr>
+^<tr>    <td>16</td>    <td>no effect</td>    <td>left vertical</td></tr>
+^<tr>    <td>32</td>    <td>no effect</td>    <td>back vertical</td></tr>
+^<tr>    <td>64</td>    <td>no effect</td>    <td>right vertical</td></tr>
+^<tr>    <td>128</td>    <td>no effect</td>    <td>front vertical</td></tr>
+^<tr>    <td>256</td>    <td>no effect</td>    <td>top left back</td></tr>
+^<tr>    <td>512</td>    <td>no effect</td>    <td>top right back</td></tr>
+^<tr>    <td>1024</td>    <td>no effect</td>    <td>top left front</td></tr>
+^<tr>    <td>2048</td>    <td>no effect</td>    <td>top right front</td></tr>
 ^</tbody>
 ^</table>
 
@@ -8023,24 +8023,24 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>Format</th>	<th>Explanation</th></tr>
+^<tr>    <th>Format</th>    <th>Explanation</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>%f</tt></td>	<td>floating point notation</td></tr>
-^<tr>	<td><tt>%e</tt> or <tt>%E</tt></td>	<td>exponential notation; an "e" or "E" before the power</td></tr>
-^<tr>	<td><tt>%g</tt> or <tt>%G</tt></td>	<td>the shorter of <tt>%e</tt> (or <tt>%E</tt>) and <tt>%f</tt></td></tr>
-^<tr>	<td><tt>%x</tt> or <tt>%X</tt></td>	<td>hex</td></tr>
-^<tr>	<td><tt>%o</tt> or <tt>%O</tt></td>	<td>octal</td></tr>
-^<tr>	<td><tt>%t</tt></td>	<td>mantissa to base 10</td></tr>
-^<tr>	<td><tt>%l</tt></td>	<td>mantissa to base of current logscale</td></tr>
-^<tr>	<td><tt>%s</tt></td>	<td>mantissa to base of current logscale; scientific power</td></tr>
-^<tr>	<td><tt>%T</tt></td>	<td>power to base 10</td></tr>
-^<tr>	<td><tt>%L</tt></td>	<td>power to base of current logscale</td></tr>
-^<tr>	<td><tt>%S</tt></td>	<td>scientific power</td></tr>
-^<tr>	<td><tt>%c</tt></td>	<td>character replacement for scientific power</td></tr>
-^<tr>	<td><tt>%b</tt></td>	<td>mantissa of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi)</td></tr>
-^<tr>	<td><tt>%B</tt></td>	<td>prefix of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi)</td></tr>
-^<tr>	<td><tt>%P</tt></td>	<td>multiple of &pi;</td></tr>
+^<tr>    <td><tt>%f</tt></td>    <td>floating point notation</td></tr>
+^<tr>    <td><tt>%e</tt> or <tt>%E</tt></td>    <td>exponential notation; an "e" or "E" before the power</td></tr>
+^<tr>    <td><tt>%g</tt> or <tt>%G</tt></td>    <td>the shorter of <tt>%e</tt> (or <tt>%E</tt>) and <tt>%f</tt></td></tr>
+^<tr>    <td><tt>%x</tt> or <tt>%X</tt></td>    <td>hex</td></tr>
+^<tr>    <td><tt>%o</tt> or <tt>%O</tt></td>    <td>octal</td></tr>
+^<tr>    <td><tt>%t</tt></td>    <td>mantissa to base 10</td></tr>
+^<tr>    <td><tt>%l</tt></td>    <td>mantissa to base of current logscale</td></tr>
+^<tr>    <td><tt>%s</tt></td>    <td>mantissa to base of current logscale; scientific power</td></tr>
+^<tr>    <td><tt>%T</tt></td>    <td>power to base 10</td></tr>
+^<tr>    <td><tt>%L</tt></td>    <td>power to base of current logscale</td></tr>
+^<tr>    <td><tt>%S</tt></td>    <td>scientific power</td></tr>
+^<tr>    <td><tt>%c</tt></td>    <td>character replacement for scientific power</td></tr>
+^<tr>    <td><tt>%b</tt></td>    <td>mantissa of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi)</td></tr>
+^<tr>    <td><tt>%B</tt></td>    <td>prefix of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi)</td></tr>
+^<tr>    <td><tt>%P</tt></td>    <td>multiple of &pi;</td></tr>
 ^</tbody>
 ^</table>
 
@@ -8189,34 +8189,34 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>Format</th>	<th>Explanation</th></tr>
+^<tr>    <th>Format</th>    <th>Explanation</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>%a</tt></td>	<td>abbreviated name of day of the week</td></tr>
-^<tr>	<td><tt>%A</tt></td>	<td>full name of day of the week</td></tr>
-^<tr>	<td><tt>%b</tt> or <tt>%h</tt></td>	<td>abbreviated name of the month</td></tr>
-^<tr>	<td><tt>%B</tt></td>	<td>full name of the month</td></tr>
-^<tr>	<td><tt>%d</tt></td>	<td>day of the month, 01&ndash;31</td></tr>
-^<tr>	<td><tt>%D</tt></td>	<td>shorthand for <tt>%m/%d/%y</tt> (only output)</td></tr>
-^<tr>	<td><tt>%F</tt></td>	<td>shorthand for <tt>%Y-%m-%d</tt> (only output)</td></tr>
-^<tr>	<td><tt>%k</tt></td>	<td>hour, 0&ndash;23 (one or two digits)</td></tr>
-^<tr>	<td><tt>%H</tt></td>	<td>hour, 00&ndash;23 (always two digits)</td></tr>
-^<tr>	<td><tt>%l</tt></td>	<td>hour, 1&ndash;12 (one or two digits)</td></tr>
-^<tr>	<td><tt>%I</tt></td>	<td>hour, 01&ndash;12 (always two digits)</td></tr>
-^<tr>	<td><tt>%j</tt></td>	<td>day of the year, 1&ndash;366</td></tr>
-^<tr>	<td><tt>%m</tt></td>	<td>month, 01&ndash;12</td></tr>
-^<tr>	<td><tt>%M</tt></td>	<td>minute, 0&ndash;60</td></tr>
-^<tr>	<td><tt>%p</tt></td>	<td>"am" or "pm"</td></tr>
-^<tr>	<td><tt>%r</tt></td>	<td>shorthand for <tt>%I:%M:%S %p</tt> (only output)</td></tr>
-^<tr>	<td><tt>%R</tt></td>	<td>shorthand for <tt>%H:%M</tt> (only output)</td></tr>
-^<tr>	<td><tt>%S</tt></td>	<td>second, integer 0&ndash;60 on output, (double) on input</td></tr>
-^<tr>	<td><tt>%s</tt></td>	<td>number of seconds since start of year 2000</td></tr>
-^<tr>	<td><tt>%T</tt></td>	<td>shorthand for <tt>%H:%M:%S</tt> (only output)</td></tr>
-^<tr>	<td><tt>%U</tt></td>	<td>week of the year (week starts on Sunday)</td></tr>
-^<tr>	<td><tt>%w</tt></td>	<td>day of the week, 0&ndash;6 (Sunday = 0)</td></tr>
-^<tr>	<td><tt>%W</tt></td>	<td>week of the year (week starts on Monday)</td></tr>
-^<tr>	<td><tt>%y</tt></td>	<td>year, 0-99 in range 1969-2068</td></tr>
-^<tr>	<td><tt>%Y</tt></td>	<td>year, 4-digit</td></tr>
+^<tr>    <td><tt>%a</tt></td>    <td>abbreviated name of day of the week</td></tr>
+^<tr>    <td><tt>%A</tt></td>    <td>full name of day of the week</td></tr>
+^<tr>    <td><tt>%b</tt> or <tt>%h</tt></td>    <td>abbreviated name of the month</td></tr>
+^<tr>    <td><tt>%B</tt></td>    <td>full name of the month</td></tr>
+^<tr>    <td><tt>%d</tt></td>    <td>day of the month, 01&ndash;31</td></tr>
+^<tr>    <td><tt>%D</tt></td>    <td>shorthand for <tt>%m/%d/%y</tt> (only output)</td></tr>
+^<tr>    <td><tt>%F</tt></td>    <td>shorthand for <tt>%Y-%m-%d</tt> (only output)</td></tr>
+^<tr>    <td><tt>%k</tt></td>    <td>hour, 0&ndash;23 (one or two digits)</td></tr>
+^<tr>    <td><tt>%H</tt></td>    <td>hour, 00&ndash;23 (always two digits)</td></tr>
+^<tr>    <td><tt>%l</tt></td>    <td>hour, 1&ndash;12 (one or two digits)</td></tr>
+^<tr>    <td><tt>%I</tt></td>    <td>hour, 01&ndash;12 (always two digits)</td></tr>
+^<tr>    <td><tt>%j</tt></td>    <td>day of the year, 1&ndash;366</td></tr>
+^<tr>    <td><tt>%m</tt></td>    <td>month, 01&ndash;12</td></tr>
+^<tr>    <td><tt>%M</tt></td>    <td>minute, 0&ndash;60</td></tr>
+^<tr>    <td><tt>%p</tt></td>    <td>"am" or "pm"</td></tr>
+^<tr>    <td><tt>%r</tt></td>    <td>shorthand for <tt>%I:%M:%S %p</tt> (only output)</td></tr>
+^<tr>    <td><tt>%R</tt></td>    <td>shorthand for <tt>%H:%M</tt> (only output)</td></tr>
+^<tr>    <td><tt>%S</tt></td>    <td>second, integer 0&ndash;60 on output, (double) on input</td></tr>
+^<tr>    <td><tt>%s</tt></td>    <td>number of seconds since start of year 2000</td></tr>
+^<tr>    <td><tt>%T</tt></td>    <td>shorthand for <tt>%H:%M:%S</tt> (only output)</td></tr>
+^<tr>    <td><tt>%U</tt></td>    <td>week of the year (week starts on Sunday)</td></tr>
+^<tr>    <td><tt>%w</tt></td>    <td>day of the week, 0&ndash;6 (Sunday = 0)</td></tr>
+^<tr>    <td><tt>%W</tt></td>    <td>week of the year (week starts on Monday)</td></tr>
+^<tr>    <td><tt>%y</tt></td>    <td>year, 0-99 in range 1969-2068</td></tr>
+^<tr>    <td><tt>%Y</tt></td>    <td>year, 4-digit</td></tr>
 ^</tbody>
 ^</table>
 
@@ -10848,18 +10848,18 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ^  <col align="center">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>Terminal</th>	<th>solid</th>	<th>pattern</th>	<th>pm3d</th></tr>
+^<tr>    <th>Terminal</th>    <th>solid</th>    <th>pattern</th>    <th>pm3d</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>gif</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
-^<tr>	<td>jpeg</td>	<td>yes</td>	<td>no</td>	<td>yes</td></tr>
-^<tr>	<td>pdf</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
-^<tr>	<td>png</td>	<td>TrueColor</td>	<td>index</td>	<td>yes</td></tr>
-^<tr>	<td>post</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
-^<tr>	<td>svg</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
-^<tr>	<td>win</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
-^<tr>	<td>wxt</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
-^<tr>	<td>x11</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
+^<tr>    <td>gif</td>    <td>no</td>    <td>yes</td>    <td>no</td></tr>
+^<tr>    <td>jpeg</td>    <td>yes</td>    <td>no</td>    <td>yes</td></tr>
+^<tr>    <td>pdf</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
+^<tr>    <td>png</td>    <td>TrueColor</td>    <td>index</td>    <td>yes</td></tr>
+^<tr>    <td>post</td>    <td>no</td>    <td>yes</td>    <td>no</td></tr>
+^<tr>    <td>svg</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
+^<tr>    <td>win</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
+^<tr>    <td>wxt</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
+^<tr>    <td>x11</td>    <td>no</td>    <td>yes</td>    <td>no</td></tr>
 ^</tbody>
 ^</table>
 
@@ -11407,20 +11407,20 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>Format</th>	<th>Explanation</th></tr>
+^<tr>    <th>Format</th>    <th>Explanation</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>%d</tt></td>	<td>day of the month, 1&ndash;31</td></tr>
-^<tr>	<td><tt>%m</tt></td>	<td>month of the year, 1&ndash;12</td></tr>
-^<tr>	<td><tt>%y</tt></td>	<td>year, 0&ndash;99</td></tr>
-^<tr>	<td><tt>%Y</tt></td>	<td>year, 4-digit</td></tr>
-^<tr>	<td><tt>%j</tt></td>	<td>day of the year, 1&ndash;365</td></tr>
-^<tr>	<td><tt>%H</tt></td>	<td>hour, 0&ndash;24</td></tr>
-^<tr>	<td><tt>%M</tt></td>	<td>minute, 0&ndash;60</td></tr>
-^<tr>	<td><tt>%s</tt></td>	<td>seconds since the Unix epoch (1970-01-01 00:00 UTC)</td></tr>
-^<tr>	<td><tt>%S</tt></td>	<td>second, integer 0&ndash;60 on output, (double) on input</td></tr>
-^<tr>	<td><tt>%b</tt></td>	<td>three-character abbreviation of the name of the month</td></tr>
-^<tr>	<td><tt>%B</tt></td>	<td>name of the month</td></tr>
+^<tr>    <td><tt>%d</tt></td>    <td>day of the month, 1&ndash;31</td></tr>
+^<tr>    <td><tt>%m</tt></td>    <td>month of the year, 1&ndash;12</td></tr>
+^<tr>    <td><tt>%y</tt></td>    <td>year, 0&ndash;99</td></tr>
+^<tr>    <td><tt>%Y</tt></td>    <td>year, 4-digit</td></tr>
+^<tr>    <td><tt>%j</tt></td>    <td>day of the year, 1&ndash;365</td></tr>
+^<tr>    <td><tt>%H</tt></td>    <td>hour, 0&ndash;24</td></tr>
+^<tr>    <td><tt>%M</tt></td>    <td>minute, 0&ndash;60</td></tr>
+^<tr>    <td><tt>%s</tt></td>    <td>seconds since the Unix epoch (1970-01-01 00:00 UTC)</td></tr>
+^<tr>    <td><tt>%S</tt></td>    <td>second, integer 0&ndash;60 on output, (double) on input</td></tr>
+^<tr>    <td><tt>%b</tt></td>    <td>three-character abbreviation of the name of the month</td></tr>
+^<tr>    <td><tt>%B</tt></td>    <td>name of the month</td></tr>
 ^</tbody>
 ^</table>
 
