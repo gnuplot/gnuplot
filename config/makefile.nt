@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.22 2008/11/07 11:55:46 mikulik Exp $
+# $Id: makefile.nt,v 1.23 2009/10/31 23:33:12 mikulik Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -13,19 +13,26 @@
 #   Added support for binary version of the GD library (bgd.dll) 
 #     gdlib can be downloaded from http://www.boutell.com/gd
 #   Removed zlib and libpng again as they're already included in bgd.dll
+# Hans-Bernhard Broeker: 
+#   updated to current version of MSVC
+#   undid silly name change for pgnuplot.exe, call console version gnuplot.exe instead
+#   removed remainder of wgnuplot_pipes.exe support
+#   isolated more configuration-dependent parts (gd, pdf, wx) to lines of their own,
+#     so they can be turned on/off more easily.
 
 #
 # To compile with Visual C: 
-#	Download gdlib to ..\src\gdwin32
-#	Download pdflib to ..\src\pdflib and compile it if you choose the source
+#	optionally Download gdlib to ..\src\gdwin32
+#	optionally Download pdflib to ..\src\pdflib and compile it if you choose the source
 #
-#	Find and run VCVARS32.BAT (or maybe VSVARS32.BAT)
+#	Start the Microsoft Visual C++ command shell (e.g. via link installed setup)
 #	change to the gnuplot\src directory
 #	Now run: 
 #	  nmake -f ..\config\makefile.nt
 #       You can also do it like this: 
 #	  copy ..\config\makefile.nt makefile.nt
 #         edit the copy to your liking
+#         (if you don't have the optional libraries, you'll have to disable some parts)
 #         nmake -f makefile.nt
 
 # where to place gnuplot.gih helpfile
@@ -52,7 +59,7 @@ TOP = .
 # /MT means include multi-thread support
 # /MD means include multi-thread support (DLL)
 
-CC = cl /c
+CC = cl
 LD = link
 
 # compiler flags
@@ -60,7 +67,7 @@ OPTIONS = /DUSE_MOUSE
 OPTIONS = $(OPTIONS) /DHAVE_LIBGD /DHAVE_GD_GIF /DGIF_ANIMATION /DHAVE_GD_PNG /DHAVE_GD_JPEG /DHAVE_GD_TTF
 OPTIONS = $(OPTIONS) /DHAVE_LIBPDF
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
-CBASEFLAGS = /G5 /GX /GR /MD /O2 /nologo
+CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 CFLAGS = $(CBASEFLAGS) /I$(TOP) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
 CONSOLE_CFLAGS = /DWGP_CONSOLE
 
@@ -71,19 +78,26 @@ MACHINE = IX86
 !ENDIF
 
 # paths for external libs added here... 
-LDFLAGS = /subsystem:windows /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT /libpath:..\src\pdflib\pdflib /libpath:..\src\gdwin32 
+LDFLAGS = /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT 
+LDFLAGS += /libpath:..\src\pdflib\pdflib 
+LDFLAGS += /libpath:..\src\gdwin32 
 
 # ...and here.
 # see other terminal defines in term.h
-TERMFLAGS = /I..\\term /I..\\src\\pdflib\\pdflib /I..\\src\\gdwin32 /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
+TERMFLAGS = /I..\\term /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
+TERMFLAGS += /I..\\src\\pdflib\\pdflib 
+TERMFLAGS += /I..\\src\\gdwin32 
+
+HCWPATH=c:\program files\help workshop\\
 
 # macros for makefile.all
 
+O=obj
 T=..\\term\\
 D=..\\docs\\
 M=..\\demo\\
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe wgnuplot_pipes.exe
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe gnuplot.exe
 
 !INCLUDE makefile.all
 
@@ -103,10 +117,10 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 
 # default rules
 .c.obj:
-	$(CC) $(CFLAGS) $*.c
+	$(CC) /c $(CFLAGS) $*.c
 
 .c.cobj:
-	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) $*.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $*.c /Fo$@
 
 $(OBJS): config.h
 
@@ -128,6 +142,7 @@ linkopt1.msw: makefile.nt
 	echo comdlg32.lib >> linkopt1.msw
 	echo advapi32.lib >> linkopt1.msw
 	echo shell32.lib >> linkopt1.msw
+	echo msimg32.lib >> linkopt1.msw
 	echo pdflib.lib >> linkopt1.msw
 	echo bgd.lib >> linkopt1.msw
 	echo wgnuplot.res >> linkopt1.msw
@@ -139,7 +154,7 @@ config.h: ..\config\config.nt
 	copy ..\config\config.nt config.h
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win\wgnuplot.def wgnuplot.res linkopt1.msw texticon.ico grpicon.ico
-	$(LD) $(LDFLAGS) /out:wgnuplot.exe @linkopt1.msw
+	$(LD) /subsystem:windows $(LDFLAGS) /out:wgnuplot.exe @linkopt1.msw
 
 # rules
 
@@ -147,70 +162,71 @@ wgnuplot.res :  win\wgnuplot.rc win\wgnuplib.rc win\wresourc.h texticon.ico grpi
 	rc /l 0x409 /fowgnuplot.res /i "win" /d "NDEBUG" /d WIN32 /d MSRC win\wgnuplot.rc
 
 term.obj: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) $(CFLAGS) $(TERMFLAGS) term.c /Fo$@
+	$(CC) /c $(CFLAGS) $(TERMFLAGS) term.c /Fo$@
 
 term.cobj: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) $(TERMFLAGS) term.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(TERMFLAGS) term.c /Fo$@
 
 winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
-	$(CC) $(CFLAGS) win\winmain.c /Fo$@
+	$(CC) /c $(CFLAGS) win\winmain.c /Fo$@
 
 winmain.cobj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
-	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\winmain.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\winmain.c /Fo$@
 
 WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h
 
 wgnuplib.obj: win\wgnuplib.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wgnuplib.c /Fo$@
+	$(CC) /c $(CFLAGS) win\wgnuplib.c /Fo$@
 
 wgnuplib.cobj: win\wgnuplib.c $(WINDEPS)
-	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wgnuplib.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\wgnuplib.c /Fo$@
 
 wmenu.obj: win\wmenu.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wmenu.c /Fo$@
+	$(CC) /c $(CFLAGS) win\wmenu.c /Fo$@
 
 wmenu.cobj: win\wmenu.c $(WINDEPS)
-	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wmenu.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\wmenu.c /Fo$@
 
 wtext.obj: win\wtext.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wtext.c /Fo$@
+	$(CC) /c $(CFLAGS) win\wtext.c /Fo$@
 
 wtext.cobj: win\wtext.c $(WINDEPS)
-	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wtext.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\wtext.c /Fo$@
 
 wpause.obj: win\wpause.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wpause.c /Fo$@
+	$(CC) /c $(CFLAGS) win\wpause.c /Fo$@
 
 wpause.cobj: win\wpause.c $(WINDEPS)
-	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wpause.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\wpause.c /Fo$@
 
 wprinter.obj: win\wprinter.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wprinter.c /Fo$@
+	$(CC) /c $(CFLAGS) win\wprinter.c /Fo$@
 
 wprinter.cobj: win\wprinter.c $(WINDEPS)
-	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wprinter.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\wprinter.c /Fo$@
 
 wgraph.obj: win\wgraph.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\wgraph.c /Fo$@
+	$(CC) /c $(CFLAGS) win\wgraph.c /Fo$@
 
 wgraph.cobj: win\wgraph.c $(WINDEPS)
-	$(CC) $(CFLAGS) $(CONSOLE_CFLAGS) win\wgraph.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\wgraph.c /Fo$@
 
 wgnuplot.mnu: win\wgnuplot.mnu
 	copy win\wgnuplot.mnu wgnuplot.mnu
 
-wgnuplot_pipes.exe: win\pgnuplot.c
-	cl $(CBASEFLAGS) /I$(TOP) win\pgnuplot.c /Fe$@ /link version.obj user32.lib
+pgnuplot.exe: win\pgnuplot.c
+	$(CC) $(CBASEFLAGS) /I$(TOP) win\pgnuplot.c /Fe$@ /link version.obj user32.lib
 
-pgnuplot.exe: $(ALL_CONSOLE_OBJS) win\wgnuplot.def wgnuplot.res texticon.ico grpicon.ico
-	$(LD) $(LDFLAGS) /out:$@ @<<
+gnuplot.exe: $(ALL_CONSOLE_OBJS) win\wgnuplot.def wgnuplot.res texticon.ico grpicon.ico
+	$(LD) /subsystem:console $(LDFLAGS) /out:$@ @<<
 $(ALL_CONSOLE_OBJS)
 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib
 advapi32.lib shell32.lib ole32.lib oleaut32.lib comctl32.lib
-gd.lib wxmsw28.lib wxtiff.lib
-jpeg.lib png.lib
+msimg32.lib
 glib-2.0.lib gobject-2.0.lib gmodule-2.0.lib
 cairo.lib pango-1.0.lib pangocairo-1.0.lib
+wxmsw28.lib wxtiff.lib
+gd.lib jpeg.lib png.lib
 wgnuplot.res
 <<
 
@@ -221,27 +237,27 @@ grpicon.ico: geticon.exe win\wgnuplot.rc
 	geticon win\wgnuplot.rc
 
 geticon.exe: win\geticon.c
-	cl /DMSDOS /F 5000 /W1 win\geticon.c
+	$(CC) /DMSDOS /F 5000 /W1 win\geticon.c
 
 # convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win\wgnuplot.hpj
 	doc2rtf $(D)gnuplot.doc win\gnuplot.rtf
-	hcw /c /e win\wgnuplot.hpj
+	"$(HCWPATH)hcw" /c /e win\wgnuplot.hpj
 	if exist win\wgnuplot.hlp copy win\wgnuplot.hlp .
 
 doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
-	cl $(CFLAGS) /F 5000 /W1 /I. /DWINDOWS_NO_GUI /I$(D) /I$(T) -Fedoc2rtf.exe $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
+	$(CC) $(CFLAGS) /F 5000 /W1 /I. /DWINDOWS_NO_GUI /I$(D) /I$(T) -Fedoc2rtf.exe $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 
 #make binary demo files
 $(M)bf_test.exe : bf_test.c dbinary.obj alloc.obj
-	cl $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe bf_test.c dbinary.obj alloc.obj
+	$(CC) $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe bf_test.c dbinary.obj alloc.obj
 	cd ..\demo
 	bf_test
 	cd ..\src
 
 # _Windows causes wtext.h to define fread() etc
 dbinary.obj: binary.c
-		$(CC) $(CFLAGS) /U_Windows /F 5000 /W1 /Fodbinary.obj binary.c
+		$(CC) /c $(CFLAGS) /U_Windows /F 5000 /W1 /Fodbinary.obj binary.c
 
 # clean up temporary files
 clean:
@@ -262,7 +278,7 @@ veryclean: clean
 	if exist wgnuplot.hlp del wgnuplot.hlp
 	if exist wgnuplot.mnu del wgnuplot.mnu
 	if exist pgnuplot.exe del pgnuplot.exe
-	if exist wgnuplot_pipes.exe del wgnuplot_pipes.exe
+	if exist gnuplot.exe del gnuplot.exe
 	if exist ..\demo\binary1 del ..\demo\binary1
 	if exist ..\demo\binary2 del ..\demo\binary2
 	if exist ..\demo\binary3 del ..\demo\binary3
@@ -279,7 +295,7 @@ install: default
 	copy /Y win\wgnuplot.mnu $(DESTDIR)\bin\wgnuplot.mnu
 #	copy /Y wgnuplot.hlp $(DESTDIR)\bin\wgnuplot.hlp
 	copy /Y pgnuplot.exe $(DESTDIR)\bin\pgnuplot.exe
-	copy /Y wgnuplot_pipes.exe $(DESTDIR)\bin\wgnuplot_pipes.exe
+	copy /Y gnuplot.exe $(DESTDIR)\bin\gnuplot.exe
 	if not exist $(DESTDIR)\$(GNUPLOT_PS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_PS_DIR)
 	xcopy /Y ..\term\PostScript\*.ps $(DESTDIR)\$(GNUPLOT_PS_DIR)
 	if not exist $(DESTDIR)\$(GNUPLOT_JS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_JS_DIR)
