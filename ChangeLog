@@ -1,3 +1,21 @@
+2011-03-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.nt (OPTIONS, LDFLAGS, TERMFLAGS): Grouped for
+	easier disabling of optional terminals (gd, pdf, wx).
+	(gnuplot.exe): Change name of console gnuplot to the common one.
+	Drop wgnuplot_pipes.exe in the process.
+	(pgnuplot.exe): Re-use this name for the original program that had it.
+	(HCWPATH): New.  Help compiler need not be on PATH.
+	($(HELPFILE)): USE $(HCWPATH).
+	(CC): Remove /c option.  Put that into calls that only compile,
+	instead.  Allows to use $(CC) instead of verbatim "cl" in more
+	places.
+	(LDFLAGS): Remove /subsystem option.  Put it into calls instead,
+	because it's different for different builds.
+	(CBASEFLAGS): Adapted to current version of MSVC.
+	(O): Missing macro needed for makefile.all.
+	(linkopt1.msw, gnuplot.exe): Add recently needed library msimg32.
+
 2011-03-03  Peter Hedwig <peter@affenbande.org>
 
 	* term/lua.trm:  If the cairo terminal is not available to make a
