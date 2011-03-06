@@ -1,5 +1,7 @@
 2011-03-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* config/watcom/.cvsignore: Set up list of files to be ignored.
+
   	* config/watcom/Makefile (clean): Remove GIF help files.
 
 	* config/watcom/Makefile (wgnuplot_pipes.exe, gnuplot.exe): Add

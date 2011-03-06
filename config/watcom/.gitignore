@@ -1,0 +1,15 @@
+bf_test.exe
+doc2*.exe
+*gnuplot*.exe
+gnuplot.gih
+wgnuplot.hlp
+wgnuplot.chm
+*.err
+*.obj
+geticon.exe
+GRPICON.ico
+TEXTICON.ico
+*.sym
+*.res
+linkopt1.oww
+*.map
