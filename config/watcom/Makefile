@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.2 2011/02/20 15:52:09 broeker Exp $
+# $Id: Makefile,v 1.3 2011/03/05 14:40:33 broeker Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -181,6 +181,7 @@ FILE {
 }
 LIBRARY kernel32.lib,user32.lib,gdi32.lib,winspool.lib,comdlg32.lib
 LIBRARY advapi32.lib,shell32.lib
+LIBRARY msimg32.lib
 OPTION map
 OPTION SYMFILE
 NAME $^&
@@ -203,6 +204,7 @@ FILE {
 }
 LIBRARY kernel32.lib,user32.lib,gdi32.lib,winspool.lib,comdlg32.lib
 LIBRARY advapi32.lib,shell32.lib
+LIBRARY msimg32.lib
 OPTION map
 OPTION SYMFILE
 NAME gnuplot.exe
@@ -311,6 +313,7 @@ clean: .SYMBOLIC
         rm -f *.obj *.err *.ico
         rm -f wgnuplot.res $(W)\gnuplot.rtf $(W)\wgnuplot.hlp
         rm -f bf_test.exe linkopt1.oww doc2rtf.exe doc2html.exe geticon.exe
+	rm -f doc2gih.exe gnuplot.gih
         rm -f *.map *.sym wgnuplot.gid        
 
 realclean: clean .SYMBOLIC
