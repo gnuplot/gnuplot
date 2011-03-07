@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.3 2011/03/05 14:40:33 broeker Exp $
+# $Id: Makefile,v 1.4 2011/03/06 19:11:04 broeker Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -285,7 +285,7 @@ $(HHP_OUTPUT): $(HHP_PROJ) $(HHP_INPUT) $(HHP_CONTENT)
         -$(HHC) $(HHP_PROJ)
 
 $(HHP_INPUT) $(HHP_CONTENT): doc2html.exe $(D)gnuplot.doc
-        doc2html $(D)gnuplot.doc $(HHP_INPUT) $(HHP_CONTENT)
+        doc2html $(D)gnuplot.doc $(WD)
 
 doc2html.exe: $(WD)doc2html.c $(D)termdoc.c $(D)xref.c version.$(O) .AUTODEPEND
         $(WCL) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI -I$(D);$(T) -fe$^@ $(WD)doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
