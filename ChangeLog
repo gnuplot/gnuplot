@@ -1,5 +1,8 @@
 2011-03-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* docs/Makefile.in: add new target 'htb' to create help file
+	compatible with wxWidgets help viewer
+	
 	* docs/windows/doc2html.c (main): change command line options,
 	(convert, header, footer) optionally split html files manually 
 	[SPLIT_FILES] (Note: this will produce ~500 files!), optionally 

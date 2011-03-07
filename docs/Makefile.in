@@ -131,7 +131,7 @@ $(T)wxt.trm $(T)x11.trm $(T)xlib.trm $(T)qt.trm
 DIST_COMMON = README Makefile.in
 
 SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2ipf.c doc2ms.c doc2rnh.c \
-doc2rtf.c doc2tex.c termdoc.c xref.c
+doc2rtf.c doc2tex.c windows/doc2html.c termdoc.c xref.c
 
 TERM_H = $(top_srcdir)/src/term.h
 
@@ -150,7 +150,7 @@ doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.idx gnuplot.ilg gnuplot.ind \
 gnuplot.info* gnuplot.out doc2ipf gnuplot.ipf doc2ms gnuplot.ms doc2rnh \
 gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff checkdoc gnuplot.txt gnuplot.tmp \
 VERSION gnuplot.4tc gnuplot.4ct gnuplot.idv gnuplot.xref gnuplot.lg \
-figure*.pdf pdffigures.*
+figure*.pdf pdffigures.* wxhelp/*.html wxhelp/wgnuplot.htc wxhelp/wgnuplot.htk
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
@@ -171,7 +171,7 @@ allterm.h: $(CORETERM)
 #	@rm -f term.c
 
 # for debugging
-alldoc: check dvi gih hlp html info ipf ms nroff pdffigures ps rnh rtf
+alldoc: check dvi gih hlp html info ipf ms nroff pdffigures ps rnh rtf htb
 
 ### [tn]roff documentation
 troff: gnuplot.ms titlepag.ms
@@ -362,6 +362,23 @@ alldoc2gih: alldoc2gih.o termdoc.o
 alldoc2gih.o: doc2gih.c $(BUILT_SOURCES)
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2gih.c
 	@mv doc2gih.o alldoc2gih.o
+
+### wxhelp format
+htb: gnuplot.htb
+
+gnuplot.htb: wxhelp/wgnuplot.html
+	../src/gnuplot -e "winhelp=1;" $(srcdir)/plotstyles.gnu
+	zip -j9 gnuplot.htb windows/wgnuplot.hhp wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk wxhelp/*.html windows/*.png
+
+wxhelp/wgnuplot.html: wxhelp/doc2html gnuplot.doc 
+	./wxhelp/doc2html $(srcdir)/gnuplot.doc wxhelp/
+	
+wxhelp/doc2html.o: windows/doc2html.c $(BUILT_SOURCES)
+	-mkdir wxhelp
+	$(COMPILE) -o wxhelp/doc2html.o -I.. -DALL_TERM_DOC -DWXHELP -c $(srcdir)/windows/doc2html.c
+
+wxhelp/doc2html: wxhelp/doc2html.o termdoc.o xref.o ../src/version.o
+	$(LINK) wxhelp/doc2html.o termdoc.o xref.o ../src/version.o
 
 ### GNU info format
 info: gnuplot.info
