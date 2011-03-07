@@ -1,3 +1,14 @@
+2011-03-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* docs/windows/doc2html.c (main): change command line options,
+	(convert, header, footer) optionally split html files manually 
+	[SPLIT_FILES] (Note: this will produce ~500 files!), optionally 
+	create index file manually [CREATE_INDEX], always use hard-coded 
+	links as none of the open source viewers seem to support k-links
+
+	* config/makefile.mgw, config/watcom/Makefile, config/mingw/Makefile:
+	change command line accordingly
+	
 2011-03-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/watcom/.cvsignore: Set up list of files to be ignored.

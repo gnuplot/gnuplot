@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.2 2011/02/28 11:40:40 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.3 2011/02/28 11:53:40 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - doc2html.c */
@@ -40,7 +40,7 @@ static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.2 2011/02/28 11:40:40 m
  *
  * Derived from doc2rtf and doc2html (version 3.7.3) by B. Maerkisch
  *
- * usage:  doc2html file.doc file.html file.htc [-d]
+ * usage:  doc2html file.doc outputdirectory [-d]
  *
  */
 
@@ -51,6 +51,14 @@ static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.2 2011/02/28 11:40:40 m
 # include "config.h"
 #endif
 
+#ifdef WXHELP
+/* The Microsoft help compiler splits topics and creates the index automatically.
+   To create help files for wxWidgets we need to do this manually. 
+   Note that this might overwrite the stub index file from CVS. */
+#define SPLIT_FILES
+#define CREATE_INDEX
+#endif
+
 #include "syscfg.h"
 #include "stdfn.h"
 #define MAX_LINE_LEN 10230
@@ -59,9 +67,11 @@ static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.2 2011/02/28 11:40:40 m
 #include "version.h"
 
 static TBOOLEAN debug = FALSE;
+static char path[PATH_MAX];
+static const char basename[] = "wgnuplot";
 
-void convert __PROTO((FILE *, FILE *, FILE *));
-void process_line __PROTO((char *, FILE *, FILE *));
+void convert __PROTO((FILE *, FILE *, FILE *, FILE *));
+void process_line __PROTO((char *, FILE *, FILE *, FILE *));
 
 int
 main (int argc, char **argv)
@@ -69,11 +79,14 @@ main (int argc, char **argv)
     FILE *infile;
     FILE *outfile;
     FILE *contents;
-    if (argc == 5 && argv[4][0] == '-' && argv[4][1] == 'd')
-	debug = TRUE;
+    FILE *index = NULL;
+    char filename[PATH_MAX];
+    char *last_char;
 
-    if (argc != 4 && !debug) {
-	fprintf(stderr, "Usage: %s infile outfile contentfile\n", argv[0]);
+    if (argc == 4 && argv[3][0] == '-' && argv[3][1] == 'd')
+	debug = TRUE;
+    if (argc != 3 && !debug) {
+	fprintf(stderr, "Usage: %s infile outpath\n", argv[0]);
 	exit(EXIT_FAILURE);
     }
     if ((infile = fopen(argv[1], "r")) == (FILE *) NULL) {
@@ -81,68 +94,110 @@ main (int argc, char **argv)
 		argv[0], argv[1]);
 	exit(EXIT_FAILURE);
     }
-    if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
+    strcpy(path, argv[2]);
+    /* make sure there's a path separator at the end */
+    last_char = path + strlen(path);
+    if ((*last_char != DIRSEP1) && (*last_char != DIRSEP2)) {
+        *last_char++ = DIRSEP1;
+        *last_char = 0;
+    }
+    strcpy(filename, path);
+    strcat(filename, basename);
+    strcat(filename, ".html");
+    if ((outfile = fopen(filename, "w")) == (FILE *) NULL) {
 	fprintf(stderr, "%s: Can't open %s for writing\n",
-		argv[0], argv[2]);
+		argv[0], filename);
 	fclose(infile);
 	exit(EXIT_FAILURE);
     }
-    if ((contents = fopen(argv[3], "w")) == (FILE *) NULL) {
+    strcpy(filename, path);
+    strcat(filename, basename);
+    strcat(filename, ".hhc");
+    if ((contents = fopen(filename, "w")) == (FILE *) NULL) {
 	fprintf(stderr, "%s: Can't open %s for writing\n",
-		argv[0], argv[3]);
+		argv[0], filename);
 	fclose(infile);
 	fclose(outfile);
 	exit(EXIT_FAILURE);
     }
+#ifdef CREATE_INDEX
+    strcpy(filename, path);
+    strcat(filename, basename);
+    strcat(filename, ".hhk");
+    if ((index = fopen(filename, "w")) == (FILE *) NULL) {
+	fprintf(stderr, "%s: Can't open %s for writing\n",
+		argv[0], filename);
+	fclose(infile);
+	fclose(outfile);
+	fclose(contents);
+	exit(EXIT_FAILURE);
+    }
+#endif
     parse(infile);
-    convert(infile, outfile, contents);
+    convert(infile, outfile, contents, index);
     return EXIT_SUCCESS;
 }
 
 
 void
-convert(FILE *a, FILE *b, FILE *c)
+header(FILE *a, char * title)
+{
+    /* generate html header */
+    fprintf(a, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
+    fprintf(a, "<html>\n");
+    fprintf(a, "<head>\n");
+    fprintf(a, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=windows-1252\">\n");
+    fprintf(a, "<title>%s</title>\n", title);
+    fprintf(a, "</head>\n");
+    fprintf(a, "<body>\n");
+}
+
+
+void
+footer(FILE *a)
+{
+    /* close final page and generate trailer */
+    fprintf(a, "</body>\n");
+    fprintf(a, "</html>\n");
+}
+
+
+void
+convert(FILE *a, FILE *b, FILE *c, FILE *d)
 {
     static char line[MAX_LINE_LEN+1];
 
-    /* generate html header */
-    fprintf(b, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
-    fprintf(b, "<html>\n");
-    fprintf(b, "<head>\n");
-    fprintf(b, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=windows-1252\">\n");
-    fprintf(b, "<title>gnuplot help</title>\n");
-    fprintf(b, "</head>\n");
-    fprintf(b, "<body>\n");
+    header(b, "gnuplot help");
     fprintf(b, "<h1 align=\"center\">gnuplot %s patchlevel %s</h1>\n", gnuplot_version, gnuplot_patchlevel);
 	
-    /* generate html header */
-    fprintf(c, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
-    fprintf(c, "<html>\n");
-    fprintf(c, "<head>\n");
-    fprintf(c, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=windows-1252\">\n");
-    fprintf(c, "<title>gnuplot help contents</title>\n");
-    fprintf(c, "</head>\n");
-    fprintf(c, "<body>\n");
+    header(c, "gnuplot help contents");
     fprintf(c, "<ul>\n");
+
+    if (d) {
+        header(d, "gnuplot help index");
+        fprintf(d, "<ul>\n");
+    }
 
     /* process each line of the file */
     while (get_line(line, sizeof(line), a)) {
-	process_line(line, b, c);
+	process_line(line, b, c, d);
     }
 
-   /* close final page and generate trailer */
-    fprintf(b, "</BODY>\n");
-    fprintf(b, "</HTML>\n");
+    footer(b);
 
-    /* close final page and generate trailer */
     fprintf(c, "</ul>\n");
-    fprintf(c, "</BODY>\n");
-    fprintf(c, "</HTML>\n");
+    footer(c);
+
+    if (d) {
+        fprintf(d, "</ul>\n");
+        footer(d);
+    }
+
     list_free();
 }
 
 void
-process_line(char *line, FILE *b, FILE *c)
+process_line(char *line, FILE *b, FILE *c, FILE *d)
 {
     static int line_count = 0;
     static char line2[MAX_LINE_LEN+1];
@@ -159,12 +214,11 @@ process_line(char *line, FILE *b, FILE *c)
     static TBOOLEAN inquote = FALSE;
     static int inref = 0;
     static int klink = 0;  /* link number counter */
-
+    static char location[PATH_MAX+1] = {0};
     struct LIST *klist;
-
     int i, j, k, l;
-    line_count++;
 
+    line_count++;
     i = 0;
     j = 0;
     while (line[i] != NUL) {
@@ -204,8 +258,10 @@ process_line(char *line, FILE *b, FILE *c)
 		klist = lookup(topic);
 		if (klist && (k = klist->line) > 0 && (k != last_line)) {
                     char hyplink1[MAX_LINE_LEN+1];
+#if 0
+                    /* K-link: index lookup via ActiveX and JavaScript. */
+                    /* Deactivated, as none of the open source viewers seem to support this */
                     char id[15];
-#ifndef HTML_HARDLINKS
                     sprintf(id, "link%i", ++klink);
                     sprintf(hyplink1, "<OBJECT id=%s type=\"application/x-oleobject\" classid=\"clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11\">\n"
                                       "  <PARAM name=\"Command\" value=\"KLink\">\n"
@@ -217,10 +273,11 @@ process_line(char *line, FILE *b, FILE *c)
                     if (debug)
                         fprintf(stderr, "hyper link \"%s\" - %s on line %d\n", topic, id, line_count);
 #else
+                    /* explicit links */
                     if ((klist->line) > 1)
                         sprintf(hyplink1, "<a href=\"loc%d.html\">", klist->line);
                     else
-                        sprintf(hyplink1, "<a href=\"wgnuplot.html\">");
+                        sprintf(hyplink1, "<a href=\"%s.html\">", basename);
                     if (debug)
                         fprintf(stderr, "hyper link \"%s\" - loc%d.html on line %d\n", topic, klist->line, line_count);
 #endif
@@ -276,6 +333,7 @@ process_line(char *line, FILE *b, FILE *c)
     case '?':			/* interactive help entry */
     case '=': 			/* latex index entry */
             if ((line2[1] != NUL) && (line2[1] != ' ')) {
+#ifndef CREATE_INDEX
                 if (!inkey) {
                     /* open keyword object */
                     fprintf(b, "<OBJECT type=\"application/x-oleobject\" classid=\"clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e\">\n");
@@ -283,6 +341,13 @@ process_line(char *line, FILE *b, FILE *c)
                 }
                 /* add keyword */
                 fprintf(b, "  <param name=\"Keyword\" value=\"%s\">\n", &line2[1]);
+#else
+                fprintf(d, "<li> <object type=\"text/sitemap\">\n");
+                fprintf(d, "  <param name=\"Name\" value=\"%s\">\n", &line2[1]);
+                fprintf(d, "  <param name=\"Local\" value=\"%s.html\">\n", location);
+                fprintf(d, "  </object>\n");
+                /* NB: don't set inkey here */
+#endif
                 if (debug)
                     fprintf(stderr,"keyword defintion: \"%s\" on line %d.\n", line2 + 1, line_count);
             }
@@ -377,7 +442,6 @@ process_line(char *line, FILE *b, FILE *c)
 	}
     default:{
 	    if (isdigit((int)line[0])) {	/* start of section */
-                char location[MAX_LINE_LEN+1];
                 int newlevel = line[0]-'0';
                 char spacer[10];
 
@@ -398,9 +462,13 @@ process_line(char *line, FILE *b, FILE *c)
 		fprintf(b, "\n");
 		
                 /* output unique ID */
-		sprintf(location, "loc%d", line_count);
+                if (!startpage)
+                    sprintf(location, "loc%d", line_count);
+                else
+                    strcpy(location, basename);
 
-                /* split contents */
+#ifndef SPLIT_FILES		
+                /* let hhc auomatically split contents */
                 if (!startpage) {
                     fprintf(b, "<OBJECT type=\"application/x-oleobject\" classid=\"clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e\">\n");
 	            fprintf(b, "<param name=\"New HTML file\" value=\"%s.html\">\n", location);
@@ -408,6 +476,27 @@ process_line(char *line, FILE *b, FILE *c)
                     fprintf(b, "</OBJECT>\n");
                     fprintf(b, "<h2>%s</h2>\n", &line2[2]);
                 }
+#else
+		/* split contents manually */
+                if (!startpage) {
+		    char newfile[PATH_MAX];
+
+                    /* close current file */
+		    footer(b);
+		    fclose(b);
+
+                    /* open new file */
+                    sprintf(newfile, "%s%s.html", path, location);
+                    /* fprintf(stderr, "%s\n", newfile); */
+                    if (!(b = fopen(newfile, "w"))) {
+                        fprintf(stderr, "%s: Can't open %s for writing\n",
+                            "doc2html", newfile);
+                        exit(EXIT_FAILURE);
+                    }
+		    header(b, &line2[2]);
+                    fprintf(b, "<h2>%s</h2>\n", &line2[2]);
+		}
+#endif
 
                 /* create toc entry */
                 if (newlevel > level) {
@@ -427,7 +516,7 @@ process_line(char *line, FILE *b, FILE *c)
                 spacer[level] = NUL;
                 fprintf(c, "%s<li> <OBJECT type=\"text/sitemap\">\n", spacer);
 		fprintf(c, "%s  <param name=\"Name\" value=\"%s\">\n", spacer, &line2[2]);
-                fprintf(c, "%s  <param name=\"Local\" value=\"%s.html\">\n", spacer, startpage ? "wgnuplot" : location);
+                fprintf(c, "%s  <param name=\"Local\" value=\"%s.html\">\n", spacer, location);
 		fprintf(c, "%s  </OBJECT>\n", spacer);
                 if (debug)
                     fprintf(stderr, "Section \"%s\", Level %i, ID=%s on line %d\n", line2 + 2, level, location, line_count);
