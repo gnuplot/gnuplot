@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.60 2011/02/25 19:15:07 markisch Exp $
+# $Id: makefile.mgw,v 1.61 2011/03/07 11:25:09 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -367,13 +367,13 @@ include makefile.all
 OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS)
 
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
-	  wpause.$(O) wmenu.$(O)
+	  wpause.$(O) wmenu.$(O) screenbuf.$(O)
 
 WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 	win/wgnuplib.c win/wgnuplib.def win/wgnuplib.h win/wgnuplib.rc \
 	win/wgnuplot.def win/wgnuplot.hpj win/wgnuplot.mnu win/wgraph.c \
 	win/winmain.c win/wmenu.c win/wpause.c win/wprinter.c \
-	win/wresourc.h win/wtext.c win/wtext.h win/geticon.c \
+	win/wresourc.h win/wtext.c win/wtext.h win/geticon.c win/screenbuf.c \
 	$(T)win.trm win/grpicon.ico win/texticon.ico
 
 ifdef HTML_HELP
@@ -418,7 +418,7 @@ term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 
 version.$(O): version.c
 
-WINDEPS = win/wgnuplib.h win/wcommon.h win/wresourc.h
+WINDEPS = win/wgnuplib.h win/wcommon.h win/wresourc.h win/screenbuf.h
 
 winmain.$(O): win/winmain.c win/wgnuplib.h win/wtext.h plot.h
 	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\"  win/winmain.c
@@ -431,6 +431,9 @@ wmenu.$(O): win/wmenu.c $(WINDEPS)
 
 wtext.$(O): win/wtext.c $(WINDEPS)
 	$(CC) -c $(CFLAGS) win/wtext.c
+
+screenbuf.$(O): win/screenbuf.c $(WINDEPS)
+	$(CC) -c $(CFLAGS) win/screenbuf.c
 
 wpause.$(O): win/wpause.c wxterminal/wxt_term.h $(WINDEPS)
 	$(CC) -c $(CFLAGS) win/wpause.c

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.85 2011/02/25 19:15:07 markisch Exp $
+ * $Id: win.trm,v 1.86 2011/02/28 12:19:12 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -1156,9 +1156,11 @@ START_HELP(windows)
 " set using the Control Panel.  When unselected, text is black or blue on a",
 " white background.",
 "",
-" `Update wgnuplot.ini` saves the current text window location, text window",
-" size, text window font and text window font size to the initialisation file",
-" `wgnuplot.ini`.",
+" `Wrap long lines` when selected lines longer than the current window width",
+" are wrapped.",
+"",
+" `Update wgnuplot.ini` saves the current settings to the initialisation file",
+" `wgnuplot.ini`, which is located in the user's application data directory.",
 "",
 "2 wgnuplot.mnu", /* FIXME: this is not really related to the windows driver, but the windows platform */
 "?windows wgnuplot.mnu",
@@ -1204,12 +1206,15 @@ START_HELP(windows)
 "?wgnuplot.ini",
 " The Windows text window and the `windows` terminal will read some of their options from",
 " the `[WGNUPLOT]` section of `wgnuplot.ini`.",
-" This file is located in the user's %APPDATA% directory. Here's a sample `wgnuplot.ini` file:",
+" This file is located in the user's application data directory. Here's a sample",
+" `wgnuplot.ini` file:",
 "",
 "       [WGNUPLOT]",
 "       TextOrigin=0 0",
 "       TextSize=640 150",
 "       TextFont=Terminal,9",
+"       TextWrap=1",
+"       TextLines=400",
 "       SysColors=0",
 "       GraphOrigin=0 150",
 "       GraphSize=640 330",
@@ -1226,8 +1231,27 @@ START_HELP(windows)
 "       Line3=255 0 0 0 2",
 "       Line4=255 0 255 0 3",
 "       Line5=0 0 128 0 4",
-"", /* FIXME: Text window options are not described here */
-" The `GraphFont` entry specifies the font name and size in points.  The five",
+"",
+"^ <h3>Text window options</h3> ",
+"",
+" The `TextOrigin` and `TextSize` entries specify the location and size of the",
+" text window.",
+"",
+" The `TextFont` entry specifies the text window font and size.",
+"",
+" The `TextWrap` entry selects wrapping of long text lines.",
+"",
+" The `TextLines` entry specifies the number of (unwrapped) lines the internal",
+" buffer of the text window can hold. This value currently cannot be changed",
+" from within wgnuplot.",
+"",
+" See `text-menu`.",
+"",
+"^ <h3>Graph window options</h3>",
+"",
+" The `GraphFont` entry specifies the font name and size in points.",
+"",
+" The five",
 " numbers given in the `Border`, `Axis` and `Line` entries are the `Red`",
 " intensity (0--255), `Green` intensity, `Blue` intensity, `Color Linestyle`",
 " and `Mono Linestyle`.  `Linestyles` are 0=SOLID, 1=DASH, 2=DOT, 3=DASHDOT,",
@@ -1235,6 +1259,8 @@ START_HELP(windows)
 " solid line in color mode, or a dashed line in monochrome mode.  The default",
 " line width is 1 pixel.  If `Linestyle` is negative, it specifies the width of",
 " a SOLID line in pixels.  Line1 and any linestyle used with the `points` style",
-" must be SOLID with unit width."
+" must be SOLID with unit width.",
+"",
+" See `graph-menu`."
 END_HELP(windows)
 #endif /* TERM_HELP */

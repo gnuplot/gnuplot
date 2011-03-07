@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.7 2010/02/16 07:12:52 mikulik Exp $
+ * $Id: wresourc.h,v 1.8 2011/02/28 12:19:12 markisch Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -76,6 +76,7 @@
 #define M_COMMANDLINE  NUMMENU+12
 /* wtext.c */
 #define M_SYSCOLORS    NUMMENU+13
+#define M_WRAP         NUMMENU+17
 
 /* wgraph.c */
 #define M_SAVE_AS_EMF  NUMMENU+14

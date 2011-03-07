@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.23 2009/10/31 23:33:12 mikulik Exp $
+# $Id: makefile.nt,v 1.24 2011/03/05 14:37:41 broeker Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -104,14 +104,15 @@ default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe gnup
 OBJS = $(COREOBJS) version.obj
 
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj \
-	wpause.obj wmenu.obj gpexecute.obj
+	wpause.obj wmenu.obj gpexecute.obj screenbuf.obj
 
 WINDOWS = makefile.win makefile.nt README.win win\wcommon.h \
 	win\wgnuplib.c win\wgnuplib.def win\wgnuplib.h win\wgnuplib.rc \
 	win\wgnuplot.def win\wgnuplot.hpj win\wgnuplot.mnu win\wgraph.c \
 	win\winmain.c win\wmenu.c win\wpause.c win\wprinter.c \
 	win\wresourc.h win\wtext.c win\wtext.h win\geticon.c \
-	$(D)doc2rtf.c $(T)win.trm win\grpicon.ico win\texticon.ico
+	$(D)doc2rtf.c $(T)win.trm win\grpicon.ico win\texticon.ico \
+	win\screenbuf.c
 
 ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 
@@ -131,6 +132,7 @@ linkopt1.msw: makefile.nt
 	echo readline >> linkopt1.msw
 	echo wgnuplib >> linkopt1.msw
 	echo wtext >> linkopt1.msw
+	echo screenbuf >> linkopt1.msw
 	echo wmenu >> linkopt1.msw
 	echo wpause >> linkopt1.msw
 	echo wgraph >> linkopt1.msw
@@ -173,7 +175,7 @@ winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
 winmain.cobj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\winmain.c /Fo$@
 
-WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h
+WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h win\screenbuf.h
 
 wgnuplib.obj: win\wgnuplib.c $(WINDEPS)
 	$(CC) /c $(CFLAGS) win\wgnuplib.c /Fo$@
@@ -192,6 +194,12 @@ wtext.obj: win\wtext.c $(WINDEPS)
 
 wtext.cobj: win\wtext.c $(WINDEPS)
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\wtext.c /Fo$@
+
+screenbuf.obj: win\screenbuf.c $(WINDEPS)
+	$(CC) $(CFLAGS) win\screenbuf.c /Fo$@
+
+screenbuf.cobj: win\screenbuf.c $(WINDEPS)
+	$(CC) $(CFLAGS) win\screenbuf.c /Fo$@
 
 wpause.obj: win\wpause.c $(WINDEPS)
 	$(CC) /c $(CFLAGS) win\wpause.c /Fo$@

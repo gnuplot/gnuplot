@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.30 2010/02/16 07:15:12 mikulik Exp $
+ * $Id: wgnuplib.h,v 1.31 2011/02/28 12:19:12 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -43,6 +43,7 @@
 /* this file contains items to be visible outside wgnuplot.dll */
 
 #include <windows.h>
+#include "screenbuf.h"
 
 #ifdef _WINDOWS
 # ifndef _Windows
@@ -167,6 +168,7 @@ typedef struct tagMW
 } MW;
 typedef MW FAR * LPMW;
 
+
 /* ================================== */
 /* wtext.c text window structure */
 /* If an optional item is not specified it must be zero */
@@ -178,13 +180,13 @@ typedef struct tagTW
 	HINSTANCE hPrevInstance;	/* required */
 	LPSTR	Title;			/* required */
 	LPMW	lpmw;			/* optional */
-	POINT	ScreenSize;		/* optional */
+	POINT	ScreenSize;		/* optional */  /* size of the visible screen in characters */
 	unsigned int KeyBufSize;	/* optional */
 	LPSTR	IniFile;		/* optional */
 	LPSTR	IniSection;		/* optional */
 	LPSTR	DragPre;		/* optional */
 	LPSTR	DragPost;		/* optional */
-	int		nCmdShow;		/* optional */
+	int	nCmdShow;		/* optional */
 	FARPROC shutdown;		/* optional */
 	HICON	hIcon;			/* optional */
 	LPSTR   AboutText;		/* optional */
@@ -193,8 +195,8 @@ typedef struct tagTW
 	HWND	hWndParent;
 	POINT	Origin;
 	POINT	Size;
-	BYTE FAR *ScreenBuffer;
-	BYTE FAR *AttrBuffer;
+	SB	ScreenBuffer;
+	BOOL	bWrap;			/* wrap long lines */
 	BYTE FAR *KeyBuf;
 	BYTE FAR *KeyBufIn;
 	BYTE FAR *KeyBufOut;
@@ -204,14 +206,14 @@ typedef struct tagTW
 	BOOL	bSysColors;
 	HBRUSH	hbrBackground;
 	char	fontname[MAXFONTNAME];	/* font name */
-	int		fontsize;				/* font size in pts */
+	int	fontsize;		/* font size in pts */
 	HFONT	hfont;
-	int		CharAscent;
-	int		ButtonHeight;
-	int		CaretHeight;
-	int		CursorFlag;
-	POINT	CursorPos;
-	POINT	ClientSize;
+	int	CharAscent;
+	int	ButtonHeight;
+	int	CaretHeight;
+	int	CursorFlag;		/* scroll to cursor after \n & \r */
+	POINT	CursorPos;		/* cursor position on screen */
+	POINT	ClientSize;		/* size of the client window in pixels */
 	POINT	CharSize;
 	POINT	ScrollPos;
 	POINT	ScrollMax;
@@ -235,6 +237,8 @@ int WDPROC TextGetChE(LPTW);
 LPSTR WDPROC TextGetS(LPTW lptw, LPSTR str, unsigned int size);
 int WDPROC TextPutCh(LPTW, BYTE);
 int WDPROC TextPutS(LPTW lptw, LPSTR str);
+#if 0
+/* The new screen buffer currently does not support these */
 void WDPROC TextGotoXY(LPTW lptw, int x, int y);
 int  WDPROC TextWhereX(LPTW lptw);
 int  WDPROC TextWhereY(LPTW lptw);
@@ -244,6 +248,7 @@ void WDPROC TextClearEOS(LPTW lptw);
 void WDPROC TextInsertLine(LPTW lptw);
 void WDPROC TextDeleteLine(LPTW lptw);
 void WDPROC TextScrollReverse(LPTW lptw);
+#endif
 void WDPROC TextAttr(LPTW lptw, BYTE attr);
 #endif /* WGP_CONSOLE */
 

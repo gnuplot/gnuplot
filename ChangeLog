@@ -1,5 +1,22 @@
 2011-03-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	revised implementation of Windows text window, SF patch 1973569,
+	Feature Request 992352
+	* src/win/screenbuf.c|h: new files, implement dynamic buffer to
+	hold screen contents
+	* src/win/wtext.c: use data structures and methods from screenbuf.c|h;
+	optionally wrap long lines which don't fit on screen [TextWrap]; add 
+	menu item to toggle this setting; save/load size of text buffer to/from 
+	wgnuplot.ini [TextLines]; avoid erasing the window area to avoid 
+	flicker during window resize; coloured output is not yet implemented.
+	* src/win/wgnuplib.h: change definition of struct TW accordingly
+	* src/win/wresourc.h: new menu item "Wrap long lines"
+	* term/win.trm: update help texts on `text-menu` and `wgnuplot.ini`
+	* config/makefile.nt, config/makefile.mgw, config/mingw/Makefile: 
+	include screenbuf.c|h in build process
+	
+2011-03-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
 	* docs/Makefile.in: add new target 'htb' to create help file
 	compatible with wxWidgets help viewer
 	

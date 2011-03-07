@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.1 2011/02/26 20:28:21 broeker Exp $
+# $Id: Makefile,v 1.2 2011/03/07 11:25:08 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -373,13 +373,14 @@ include $(S)/makefile.all
 OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS)
 
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
-	  wpause.$(O) wmenu.$(O)
+	  wpause.$(O) wmenu.$(O) screenbuf.$(O)
 
 WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
 	$(W)/wgnuplib.c $(W)/wgnuplib.def $(W)/wgnuplib.h $(W)/wgnuplib.rc \
 	$(W)/wgnuplot.def $(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
 	$(W)/winmain.c $(W)/wmenu.c $(W)/wpause.c $(W)/wprinter.c \
 	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h $(W)/geticon.c \
+	$(W)/screenbuf.c $(W)/screenbuf.h \
 	$(D)doc2rtf.c $(T)win.trm $(W)/grpicon.ico $(W)/texticon.ico
 
 ifdef HTML_HELP
@@ -417,7 +418,7 @@ term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 
 version.$(O): version.c
 
-WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h
+WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h
 
 winmain.$(O): $(W)/winmain.c $(W)/wgnuplib.h $(W)/wtext.h plot.h
 	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\"  $(W)/winmain.c
@@ -430,6 +431,9 @@ wmenu.$(O): $(W)/wmenu.c $(WINDEPS)
 
 wtext.$(O): $(W)/wtext.c $(WINDEPS)
 	$(CC) -c $(CFLAGS) $(W)/wtext.c
+
+screenbuf.$(O): $(W)/screenbuf.c $(WINDEPS)
+	$(CC) -c $(CFLAGS) $(W)/screenbuf.c
 
 wpause.$(O): $(W)/wpause.c wxterminal/wxt_term.h $(WINDEPS)
 	$(CC) -c $(CFLAGS) $(W)/wpause.c
