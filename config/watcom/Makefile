@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.4 2011/03/06 19:11:04 broeker Exp $
+# $Id: Makefile,v 1.5 2011/03/07 11:25:09 markisch Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -16,9 +16,9 @@
 #  MS namesake replacement tools generate their command lines)
 #
 
-#TARGET=wgnuplot.exe
+TARGET=wgnuplot.exe
 #TARGET=wgnuplot_pipes.exe
-TARGET=gnuplot.exe
+#TARGET=gnuplot.exe
 
 TOP = ..\..
 
@@ -138,7 +138,7 @@ default: $(DEFAULT_TARGETS) .SYMBOLIC
 OBJS = $(COREOBJS) version.obj
 
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj &
-        wpause.obj wmenu.obj gpexecute.obj
+        wpause.obj wmenu.obj gpexecute.obj screenbuf.obj
 
 WIN_EXTRA_INPUTS = $(WINOBJS) wgnuplot.res texticon.ico grpicon.ico
 # default rule
@@ -243,6 +243,9 @@ wprinter.obj: $(W)\wprinter.c .AUTODEPEND
         $(WCC) $(WCFLAGS) $[@
 
 wgraph.obj: $(W)\wgraph.c .AUTODEPEND .AUTODEPEND
+        $(WCC) $(WCFLAGS) $[@
+
+screenbuf.obj: $(W)\screenbuf.c .AUTODEPEND .AUTODEPEND
         $(WCC) $(WCFLAGS) $[@
 
 wgnuplot.mnu: $(W)\wgnuplot.mnu

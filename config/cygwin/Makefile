@@ -1,5 +1,5 @@
 # Hey, Emacs, this is a -*- Makefile -*- #
-# $Id: makefile.cyg,v 1.34 2010/03/07 00:26:56 sfeam Exp $
+# $Id: Makefile,v 1.1 2011/02/26 20:27:49 broeker Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -266,14 +266,15 @@ include $(S)/makefile.all
 OBJS = $(COREOBJS) version.$(O) gpexecute.$(O)
 
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
-	wpause.$(O) wmenu.$(O)
+	wpause.$(O) wmenu.$(O) screenbuf.$(O)
 
 WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
 	$(W)/wgnuplib.c $(W)/wgnuplib.def $(W)/wgnuplib.h $(W)/wgnuplib.rc \
 	$(W)/wgnuplot.def $(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
 	$(W)/winmain.c $(W)/wmenu.c $(W)/wpause.c $(W)/wprinter.c \
 	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h $(W)/geticon.c \
-	$(D)doc2rtf.c $(T)win.trm $(W)/grpicon.ico $(W)/texticon.ico
+	$(W)/screenbuf.c $(W)/screenbuf.h \
+	$(D)doc2rtf.c $(T)win.trm $(W)/grpicon.ico $(W)/texticon.ico	
 
 
 # default rules
@@ -328,6 +329,9 @@ wprinter.$(O): $(W)/wprinter.c $(WINDEPS)
 
 wgraph.$(O): $(W)/wgraph.c $(WINDEPS)
 	$(CC) -c $(CFLAGS) $(W)/wgraph.c
+
+screenbuf.$(O): $(W)/screenbuf.c $(WINDEPS)
+	$(CC) -c $(CFLAGS) $(W)/screenbuf.c
 
 wgnuplot.mnu: $(W)/wgnuplot.mnu
 	$(CP) $^ $@

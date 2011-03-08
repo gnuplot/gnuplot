@@ -1,3 +1,8 @@
+2011-03-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/cygwin/Makefile (WINOBJS): Add new object file screenbuf.
+	(screenbuf.$(O)): Rule for new object file.
+
 2011-03-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/makefile.nt: fix copy/paste errors
@@ -8,31 +13,32 @@
 	Feature Request 992352
 	* src/win/screenbuf.c|h: new files, implement dynamic buffer to
 	hold screen contents
-	* src/win/wtext.c: use data structures and methods from screenbuf.c|h;
-	optionally wrap long lines which don't fit on screen [TextWrap]; add 
-	menu item to toggle this setting; save/load size of text buffer to/from 
-	wgnuplot.ini [TextLines]; avoid erasing the window area to avoid 
-	flicker during window resize; coloured output is not yet implemented.
+	* src/win/wtext.c: use data structures and methods from
+	screenbuf.c|h; optionally wrap long lines which don't fit on
+	screen [TextWrap]; add menu item to toggle this setting; save/load
+	size of text buffer to/from wgnuplot.ini [TextLines]; avoid
+	erasing the window area to avoid flicker during window resize;
+	coloured output is not yet implemented.
 	* src/win/wgnuplib.h: change definition of struct TW accordingly
 	* src/win/wresourc.h: new menu item "Wrap long lines"
 	* term/win.trm: update help texts on `text-menu` and `wgnuplot.ini`
-	* config/makefile.nt, config/makefile.mgw, config/mingw/Makefile: 
+	* config/makefile.nt, config/makefile.mgw, config/mingw/Makefile:
 	include screenbuf.c|h in build process
-	
+
 2011-03-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* docs/Makefile.in: add new target 'htb' to create help file
 	compatible with wxWidgets help viewer
-	
+
 	* docs/windows/doc2html.c (main): change command line options,
-	(convert, header, footer) optionally split html files manually 
-	[SPLIT_FILES] (Note: this will produce ~500 files!), optionally 
-	create index file manually [CREATE_INDEX], always use hard-coded 
+	(convert, header, footer) optionally split html files manually
+	[SPLIT_FILES] (Note: this will produce ~500 files!), optionally
+	create index file manually [CREATE_INDEX], always use hard-coded
 	links as none of the open source viewers seem to support k-links
 
 	* config/makefile.mgw, config/watcom/Makefile, config/mingw/Makefile:
 	change command line accordingly
-	
+
 2011-03-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/watcom/.cvsignore: Set up list of files to be ignored.
