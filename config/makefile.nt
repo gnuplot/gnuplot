@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.24 2011/03/05 14:37:41 broeker Exp $
+# $Id: makefile.nt,v 1.25 2011/03/07 21:41:36 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -196,10 +196,10 @@ wtext.cobj: win\wtext.c $(WINDEPS)
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\wtext.c /Fo$@
 
 screenbuf.obj: win\screenbuf.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\screenbuf.c /Fo$@
+	$(CC) /c $(CFLAGS) win\screenbuf.c /Fo$@
 
 screenbuf.cobj: win\screenbuf.c $(WINDEPS)
-	$(CC) $(CFLAGS) win\screenbuf.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\screenbuf.c /Fo$@
 
 wpause.obj: win\wpause.c $(WINDEPS)
 	$(CC) /c $(CFLAGS) win\wpause.c /Fo$@

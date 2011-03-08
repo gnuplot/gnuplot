@@ -1,3 +1,7 @@
+2011-03-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/makefile.nt: fix copy/paste errors
+
 2011-03-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	revised implementation of Windows text window, SF patch 1973569,
