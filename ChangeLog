@@ -1,3 +1,9 @@
+2011-03-09  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/makefile.nt: add chm help (update of SF patch 3191892 by 
+	Shigeharu Takeno), (HCWPATH, HHWPATH) use PROGRAMFILES variable 
+	instead of hard coded path
+
 2011-03-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/cygwin/Makefile (WINOBJS): Add new object file screenbuf.
