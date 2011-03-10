@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.93 2011/02/26 09:59:11 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.94 2011/02/28 12:19:12 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1119,7 +1119,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		BLENDFUNCTION ftn;
 		POINT p;
 		UINT32 width, height;
-		HBRUSH brush;
+		HBRUSH brush = NULL;
 
 		/* ydash is negative ... */
 		p.x = ppt[0].x; 
@@ -1351,7 +1351,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		       this will fail for last_color = white
 		    */
 		    UINT32 transparentColor = 0x00ffffff; /* white */
-		    HBRUSH brush;
+		    HBRUSH brush = NULL;
 
                     /* find minimum rectangle enclosing our polygon. */
                     minx = maxx = ppt[0].x;
