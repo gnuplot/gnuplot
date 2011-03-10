@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.17 2010/10/19 04:32:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.18 2010/10/22 04:38:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -362,7 +362,7 @@ get_data(struct curve_points *current_plot)
     case XYERRORBARS:
     case BOXXYERROR:
 	min_cols = 4;
-	max_cols = 7;		/* HBB FIXME 20060427: what's 7th? */
+	max_cols = 7;
 
 	if (df_no_use_specs >= 6) {
 	    /* HBB 20060427: signal 3rd and 4th column are absolute x
@@ -535,6 +535,7 @@ get_data(struct curve_points *current_plot)
 	    if (variable_color) {
 		static char *errmsg = "Not enough columns for variable color";
 		switch (current_plot->plot_style) {
+		case BOXXYERROR:if (j < 7) int_error(NO_CARET,errmsg);
 		case VECTOR:	if (j < 5) int_error(NO_CARET,errmsg);
 		case CIRCLES: 	if (j < 4) int_error(NO_CARET,errmsg);
 		case BOXES:	if (j < 3) int_error(NO_CARET,errmsg);
@@ -900,7 +901,7 @@ get_data(struct curve_points *current_plot)
 	    case XYERRORBARS:
 	    case BOXXYERROR:
 		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3], v[4],
-			      v[5], 0.0);
+			      v[5], variable_color_value);
 		break;
 
 	    case CANDLESTICKS:
