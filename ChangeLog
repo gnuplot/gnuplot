@@ -1,6 +1,10 @@
 2011-03-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c (test_palette): tmpfile() always fails on a modern
+	Windows. Open a file in the user's temp directory instead.
+	
 	* src/win/winmain.c (WinExit): add missing void parameter
+
 	* src/win/wgraph.c (drawgraph): add missing init
 	
 2011-03-09  Bastian Maerkisch  <bmaerkisch@web.de>

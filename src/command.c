@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.204 2011/02/21 08:00:49 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.205 2011/02/21 15:54:44 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1622,6 +1622,16 @@ title 'R,G,B profiles of the current color palette';";
     char *save_replot_line;
     TBOOLEAN save_is_3d_plot;
     FILE *f = tmpfile();
+
+#if defined(_MSC_VER) || defined(__MINGW32__)
+    /* On Vista/Windows 7 tmpfile() fails. */
+    if (!f) {
+	char  buf[PATH_MAX];
+	GetTempPath(sizeof(buf), buf);
+	strcat(buf, "gnuplot-pal.tmp");
+	f = fopen(buf, "w+");
+    }
+#endif
 
     c_token++;
     /* parse optional option */
