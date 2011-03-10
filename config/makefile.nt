@@ -1,7 +1,7 @@
 #
-# $Id: makefile.nt,v 1.26 2011/03/08 08:49:47 markisch Exp $
+# $Id: makefile.nt,v 1.27 2011/03/09 16:07:41 markisch Exp $
 #
-# GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
+# GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
 # John Bollinger bbands@yahoo.com, 4 March 2002:
 #   Added png support with zlib and libpng as subs of .\src
@@ -11,7 +11,10 @@
 #   Added MSC multi-thread support for compatibility with pdflib
 # Bastian Maerkisch bmaerkisch@web.de:
 #   Added support for binary version of the GD library (bgd.dll) 
-#     gdlib can be downloaded from http://www.boutell.com/gd
+#     gdlib can be downloaded from http://www.libgd.org/
+#     Development of libgd seems to have stalled: 
+#     Latest binary build can be found at http://www.libgd.org/releases/gd-latest-win32.zip
+#     As of March 2011 this is version 2.0.34.
 #   Removed zlib and libpng again as they're already included in bgd.dll
 # Hans-Bernhard Broeker: 
 #   updated to current version of MSVC
@@ -22,8 +25,8 @@
 
 #
 # To compile with Visual C: 
-#	optionally Download gdlib to ..\src\gdwin32
-#	optionally Download pdflib to ..\src\pdflib and compile it if you choose the source
+#	Optionally download gdlib to ..\src\gdwin32
+#	Optionally download pdflib to ..\src\pdflib and compile it if you choose the source
 #
 #	Start the Microsoft Visual C++ command shell (e.g. via link installed setup)
 #	change to the gnuplot\src directory
@@ -35,9 +38,20 @@
 #         (if you don't have the optional libraries, you'll have to disable some parts)
 #         nmake -f makefile.nt
 
+# Compilation options, disable by setting to zero
+# Is libgd available? (required by terminal png/jpeg/gif)?
+GDLIB = 0
+# Is pdflib available? (required by terminal pdf)
+PDFLIB = 0
+# Build wxt terminal? (required GTK, wxWidgets, cairo and pango libraries)
+# See http://wiki.wxwidgets.org/Microsoft_Visual_C%2B%2B_Guide
+#     http://wiki.wxwidgets.org/Visual_Studio_2008_%289.0%29
+WXT = 0
 # Choose help format: 
 # for HTML help (.chm) this should be 1, for (.hlp) it should be 0  
 HTML_HELP = 1
+
+TOP = .
 
 # directory for PostScript prolog and associated files
 GNUPLOT_PS_DIR = share\\PostScript
@@ -45,63 +59,65 @@ GNUPLOT_PS_DIR = share\\PostScript
 # Similarly for javascript files for the canvas terminal:
 GNUPLOT_JS_DIR = share\\js
 
-# name of the help file
-!IF "$(HTML_HELP)" == "1"
-HELPFILE = wgnuplot.chm
-!ELSE
-HELPFILE = wgnuplot.hlp
-!ENDIF
+#CC = cl
+LD = link
 
-TOP = .
-
-# /c  means don't link
+# compiler flags
 # /I  means extra include directory
 # /Fm means produce link map
 # /Od means suppress optimizations (esp. for debug)
 # /O2 mans optimize for speed
-# /Zi mean prepare for codeview
-# /G6 means optimize code for pentium pro
-# /G5 means optimize code for pentium
-# /G4 means optimize code for 486
-# /G3 means optimize code for 386
-# /MT means include multi-thread support
+# /Zi means prepare for codeview
 # /MD means include multi-thread support (DLL)
-
-CC = cl
-LD = link
-
-# compiler flags
-OPTIONS = /DUSE_MOUSE
-OPTIONS = $(OPTIONS) /DHAVE_LIBGD /DHAVE_GD_GIF /DGIF_ANIMATION /DHAVE_GD_PNG /DHAVE_GD_JPEG /DHAVE_GD_TTF
-OPTIONS = $(OPTIONS) /DHAVE_LIBPDF
-OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
-!IF "$(HTML_HELP)" == "1"
-OPTIONS = $(OPTIONS) /DWITH_HTML_HELP
-!ENDIF
-
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 CFLAGS = $(CBASEFLAGS) /I$(TOP) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
 CONSOLE_CFLAGS = /DWGP_CONSOLE
+OPTIONS = /DUSE_MOUSE
+OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
+
+# flags for terminals
+# see other terminal defines in term.h
+TERMFLAGS = /I..\\term /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" /DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
+
+# linker flags, append paths for external libs later
+LDFLAGS = /nologo /MACHINE:$(MACHINE)
+COMMONLIBS = kernel32.lib user32.lib gdi32.lib winspool.lib \
+             comdlg32.lib advapi32.lib shell32.lib msimg32.lib
+CONSOLELIBS = ole32.lib oleaut32.lib comctl32.lib
+
+!IF "$(GDLIB)" == "1"
+OPTIONS = $(OPTIONS) /DHAVE_LIBGD /DHAVE_GD_GIF /DGIF_ANIMATION /DHAVE_GD_PNG /DHAVE_GD_JPEG /DHAVE_GD_TTF
+OPTIONS = $(OPTIONS) /I..\src\gdwin32\include
+LDFLAGS = $(LDFLAGS) /libpath:..\src\gdwin32\lib
+#TERMFLAGS = $(TERMFLAGS) /I..\src\gdwin32\include
+!ENDIF
+
+!IF "$(PDFLIB)" == "1"
+OPTIONS = $(OPTIONS) /DHAVE_LIBPDF
+LDFLAGS = $(LDFLAGS) /libpath:..\src\pdflib\pdflib 
+TERMFLAGS = $(TERMFLAGS) /I..\src\pdflib\pdflib 
+!ENDIF
+
+!IF "$(WXT)" == "1"
+WXTLIBS = glib-2.0.lib gobject-2.0.lib gmodule-2.0.lib \
+	cairo.lib pango-1.0.lib pangocairo-1.0.lib \
+	wxmsw28.lib wxtiff.lib
+!ENDIF
+
+!IF "$(HTML_HELP)" == "1"
+HELPFILE = wgnuplot.chm
+OPTIONS = $(OPTIONS) /DWITH_HTML_HELP
+HHWPATH=$(PROGRAMFILES)\HTML Help Workshop\\
+!ELSE
+HELPFILE = wgnuplot.hlp
+HCWPATH=$(PROGRAMFILES)\help workshop\\
+!ENDIF
 
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = $(PROCESSOR_ARCHITECTURE)
 !ELSE
 MACHINE = IX86
 !ENDIF
-
-# paths for external libs added here... 
-LDFLAGS = /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT 
-LDFLAGS += /libpath:..\src\pdflib\pdflib 
-LDFLAGS += /libpath:..\src\gdwin32 
-
-# ...and here.
-# see other terminal defines in term.h
-TERMFLAGS = /I..\\term /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
-TERMFLAGS += /I..\\src\\pdflib\\pdflib 
-TERMFLAGS += /I..\\src\\gdwin32 
-
-HCWPATH=$(PROGRAMFILES)\help workshop\\
-HHWPATH=$(PROGRAMFILES)\HTML Help Workshop\\
 
 # macros for makefile.all
 
@@ -119,14 +135,6 @@ OBJS = $(COREOBJS) version.obj
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj \
 	screenbuf.obj wpause.obj wmenu.obj gpexecute.obj
 
-WINDOWS = makefile.win makefile.nt README.win win\wcommon.h \
-	win\wgnuplib.c win\wgnuplib.def win\wgnuplib.h win\wgnuplib.rc \
-	win\wgnuplot.def win\wgnuplot.hpj win\wgnuplot.mnu win\wgraph.c \
-	win\winmain.c win\wmenu.c win\wpause.c win\wprinter.c \
-	win\wresourc.h win\wtext.c win\wtext.h win\geticon.c \
-	win\screenbuf.c win\screenbuf.h \
-	$(D)doc2html.c $(D)doc2rtf.c $(T)win.trm win\grpicon.ico win\texticon.ico
-
 ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 
 # default rules
@@ -138,41 +146,62 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 
 $(OBJS): config.h
 
-linkopt1.msw: makefile.nt
-	copy gnuplot.opt linkopt1.msw
-	echo winmain >> linkopt1.msw
-	echo gpexecute >> linkopt1.msw
-	echo readline >> linkopt1.msw
-	echo wgnuplib >> linkopt1.msw
-	echo wtext >> linkopt1.msw
-	echo screenbuf >> linkopt1.msw
-	echo wmenu >> linkopt1.msw
-	echo wpause >> linkopt1.msw
-	echo wgraph >> linkopt1.msw
-	echo wprinter >> linkopt1.msw
-	echo kernel32.lib >> linkopt1.msw
-	echo user32.lib >> linkopt1.msw
-	echo gdi32.lib >> linkopt1.msw
-	echo winspool.lib >> linkopt1.msw
-	echo comdlg32.lib >> linkopt1.msw
-	echo advapi32.lib >> linkopt1.msw
-	echo shell32.lib >> linkopt1.msw
-	echo msimg32.lib >> linkopt1.msw
-!IF "$(HTML_HELP)" == "1"
-	echo htmlhelp.lib >> linkopt1.msw
-!ENDIF
-	echo pdflib.lib >> linkopt1.msw
-	echo bgd.lib >> linkopt1.msw
-	echo wgnuplot.res >> linkopt1.msw
-
 makefile.nt: ..\config\makefile.nt
 	copy ..\config\makefile.nt makefile.nt
 
 config.h: ..\config\config.nt
 	copy ..\config\config.nt config.h
 
-wgnuplot.exe: $(OBJS) $(WINOBJS) win\wgnuplot.def wgnuplot.res linkopt1.msw texticon.ico grpicon.ico
-	$(LD) /subsystem:windows $(LDFLAGS) /out:wgnuplot.exe @linkopt1.msw
+wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res linkopt-w.msw texticon.ico grpicon.ico
+	$(LD) /subsystem:windows $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-w.msw
+!IF "$(GDLIB)" == "1"
+	copy gdwin32\bin\bgd.dll .
+!ENDIF
+
+gnuplot.exe: $(ALL_CONSOLE_OBJS) wgnuplot.res linkopt-c.msw texticon.ico grpicon.ico
+	$(LD) /subsystem:console $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-c.msw
+!IF "$(GDLIB)" == "1"
+	copy gdwin32\bin\bgd.dll .
+!ENDIF
+
+pgnuplot.exe: win\pgnuplot.c
+	$(CC) $(CBASEFLAGS) /I$(TOP) win\pgnuplot.c /Fe$@ /link version.obj user32.lib
+
+linkopt-w.msw: makefile.nt
+	echo $(OBJS) > linkopt-w.msw
+	echo $(WINOBJS) >> linkopt-w.msw
+	echo $(COMMONLIBS) >> linkopt-w.msw
+	echo wgnuplot.res >> linkopt-w.msw
+!IF "$(HTML_HELP)" == "1"
+	echo htmlhelp.lib >> linkopt-w.msw
+!ENDIF
+!IF "$(GDLIB)" == "1"
+	echo bgd.lib >> linkopt-w.msw
+!ENDIF
+!IF "$(PDFLIB)" == "1"
+	echo pdflib.lib >> linkopt-w.msw
+!ENDIF
+!IF "$(WXT)" == "1"
+	echo $(WXTLIBS) >> linkopt-w.msw
+!ENDIF
+
+linkopt-c.msw: makefile.nt
+	echo $(ALL_CONSOLE_OBJS) > linkopt-c.msw
+	echo $(COMMONLIBS) >> linkopt-c.msw
+	echo $(CONSOLELIBS) >> linkopt-c.msw
+	echo wgnuplot.res >> linkopt-c.msw
+!IF "$(HTML_HELP)" == "1"
+	echo htmlhelp.lib >> linkopt-c.msw
+!ENDIF
+!IF "$(GDLIB)" == "1"
+	echo bgd.lib >> linkopt-c.msw
+!ENDIF
+!IF "$(PDFLIB)" == "1"
+	echo pdflib.lib >> linkopt-c.msw
+!ENDIF
+!IF "$(WXT)" == "1"
+	echo $(WXTLIBS) >> linkopt-c.msw
+!ENDIF
 
 # rules
 
@@ -238,23 +267,6 @@ wgraph.cobj: win\wgraph.c $(WINDEPS)
 wgnuplot.mnu: win\wgnuplot.mnu
 	copy win\wgnuplot.mnu wgnuplot.mnu
 
-pgnuplot.exe: win\pgnuplot.c
-	$(CC) $(CBASEFLAGS) /I$(TOP) win\pgnuplot.c /Fe$@ /link version.obj user32.lib
-
-gnuplot.exe: $(ALL_CONSOLE_OBJS) win\wgnuplot.def wgnuplot.res texticon.ico grpicon.ico
-	$(LD) /subsystem:console $(LDFLAGS) /out:$@ @<<
-$(ALL_CONSOLE_OBJS)
-kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib
-advapi32.lib shell32.lib ole32.lib oleaut32.lib comctl32.lib
-msimg32.lib
-htmlhelp.lib
-glib-2.0.lib gobject-2.0.lib gmodule-2.0.lib
-cairo.lib pango-1.0.lib pangocairo-1.0.lib
-wxmsw28.lib wxtiff.lib
-gd.lib jpeg.lib png.lib
-wgnuplot.res
-<<
-
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
 
@@ -263,6 +275,7 @@ grpicon.ico: geticon.exe win\wgnuplot.rc
 
 geticon.exe: win\geticon.c
 	$(CC) /DMSDOS /F 5000 /W1 win\geticon.c
+
 !IF "$(HTML_HELP)" == "1"
 $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
 	doc2html $(D)gnuplot.doc $(D)windows\\
@@ -304,7 +317,8 @@ clean:
 	if exist wgnuplot.res del wgnuplot.res
 	if exist win\gnuplot.rtf del win\gnuplot.rtf
 	if exist ..\demo\bf_test.exe del ..\demo\bf_test.exe
-	if exist linkopt1.msw del linkopt1.msw
+	if exist linkopt-w.msw del linkopt-w.msw
+	if exist linkopt-c.msw del linkopt-c.msw
 	if exist doc2html.exe del doc2html.exe
 	if exist doc2rtf.exe del doc2rtf.exe
 	if exist geticon.exe del geticon.exe

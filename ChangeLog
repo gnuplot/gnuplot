@@ -1,3 +1,11 @@
+2011-03-10  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/makefile.nt: implement suggestions by Shigeharu Takeno:
+	Do not use "+=" to be compatible with Visual C++ 2005; add/update
+	links wo libgd and wxWidgets; add a scheme to easily select options
+	[GDLIB, PDFLIB, WXT]; use linker option files for compilation of 
+	wgnuplot.exe and gnuplot.exe
+	
 2011-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Check for iconv library and iconv.h, since gd uses iconv
