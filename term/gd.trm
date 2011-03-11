@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.148 2010/03/18 04:52:53 sfeam Exp $
+ * $Id: gd.trm,v 1.149 2010/09/16 04:58:45 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -94,6 +94,7 @@
  * Petr Mikulik, Jan 1999: terminal entries for PM3D functionality
  * Ethan Merritt, May 2001: modified gd/gif driver to produce png instead;
  *                          added support for line width and TrueType fonts
+ * Shige Takeno, Mar 2011: deal with libgd built to use SJIS rather than UTF-8
  */
 
 /* Approximate "fillstyle solid FRAC " for indexed palettes */
@@ -326,6 +327,19 @@ static struct gen_table PNG_opts[] =
 #define MAXLINEWIDTH 100
 static double PNG_linewidth_factor = 1.0;
 static double PNG_dashlength_factor = 1.0;
+
+/* shige takeno: 
+ * libgd can be built to prefer UTF-8 or SJIS encoding for Japanese.
+ * If it wants SJIS and we are currently in UTF8, convert.
+ * If it wants UTF8 and we are currently in SJIS, convert.
+ * conditional compilation flags:
+ *   HAVE_ICONV (iconv library)
+ *   JIS_GDLIB (using gdlib configured with -DJISX0208)
+ */
+#ifdef HAVE_ICONV
+#include <iconv.h>
+#endif
+static char *iconv_string = NULL;
 
 /* EAM - gdImage structure to hold brushes for linewidth */
 /* We will allocate and initialize these on demand */
@@ -1635,6 +1649,58 @@ PNG_linewidth(double linewidth)
 TERM_PUBLIC void
 PNG_put_text(unsigned int x, unsigned int y, const char *string)
 {
+    if (contains8bit(string)) {
+#ifdef HAVE_ICONV
+	size_t len1 = strlen(string)+1;
+	size_t len2;
+	iconv_t cd;
+	size_t stat;
+	char *stmp;
+
+#ifdef JIS_GDLIB
+	if (encoding == S_ENC_UTF8) { /* UTF-8 -> Shift_JIS by iconv */
+	    len2 = len1;
+	    iconv_string = gp_alloc(len2, "iconv string");
+	    stmp = iconv_string;
+	    if ((cd = iconv_open("Shift_JIS", "UTF-8")) == (iconv_t)-1) 
+	      int_warn(NO_CARET, "iconv_open failed");
+	    else {
+		if (iconv(cd, &string, &len1, &stmp, &len2) == (size_t)-1)
+		    int_warn(NO_CARET, "iconv failed");
+		else
+		    string = iconv_string;
+		iconv_close(cd);
+	    }
+	}
+#else /* ! JIS_GDLIB */
+	if (encoding == S_ENC_SJIS) { /* Shift_JIS -> UTF-8 by iconv */
+	    len2 = len1*3/2+2;
+	    iconv_string = gp_alloc(len2, "iconv string");
+	    stmp = iconv_string;
+	    if ((cd = iconv_open("UTF-8", "Shift_JIS")) == (iconv_t)-1)
+	      int_warn(NO_CARET, "iconv_open failed");
+	    else {
+		if (iconv(cd, (char **)(&string), &len1, &stmp, &len2) == (size_t)-1)
+		    int_warn(NO_CARET, "iconv failed");
+		else
+		    string = iconv_string;
+		iconv_close(cd);
+	    }
+	}
+#endif /* JIS_GDLIB */
+#else /* ! HAVE_ICONV */
+#ifdef JIS_GDLIB
+	if (encoding == S_ENC_UTF8)
+	    int_warn(NO_CARET, 
+		     "This gdlib supports Shift_JIS encoding, but not UTF-8.");
+#else /* ! JIS_GDLIB */
+	if (encoding == S_ENC_SJIS) /* Shift_JIS -> UTF-8 */
+	    int_warn(NO_CARET, 
+		     "This gdlib supports UTF-8 encoding, but not Shift_JIS.");
+#endif  /* JIS_GDLIB */
+#endif /* HAVE_ICONV */
+    }
+
     if (png_state.ttffont) {
 	int brect[8]; char *err;
 	/* Draw once with a NULL image to get the bounding rectangle */
@@ -1696,6 +1762,9 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 		      x, Y(y),
 		      (unsigned char *)string, png_state.color);
     }
+
+    if (iconv_string)
+	free(iconv_string);
 }
 
 #else  /* not HAVE_GD_TTF */

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.275 2010/11/14 00:06:53 sfeam Exp $
+dnl $Id: configure.in,v 1.276 2011/02/20 20:42:50 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -624,6 +624,14 @@ if test "$with_gd" != no; then
 
 fi
 dnl end gd
+
+dnl The iconv library can be used to switch character encodings.
+dnl So far this is only used by gd.trm.
+AC_SEARCH_LIBS(iconv_open, iconv,
+  AC_CHECK_HEADER(iconv.h,
+    AC_DEFINE(HAVE_ICONV,1,[define if you have libiconv and iconv.h]),
+  ,)
+)
 
 dnl The Portable Document Format (PDF) terminal
 AC_ARG_WITH(pdf,dnl

@@ -1,3 +1,15 @@
+2011-03-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: Check for iconv library and iconv.h, since gd uses iconv
+	to convert between UTF-8 and SJIS encodings if it is available.
+
+2011-03-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/gd.trm: libgd can be customized for Japanese use such that
+	it prefers SJIS encoding rather than UTF-8 encoding.  Add code to
+	check which encoding the local libgd prefers, and convert strings
+	to that encoding if necessary.
+
 2011-03-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c (test_palette): tmpfile() always fails on a modern
